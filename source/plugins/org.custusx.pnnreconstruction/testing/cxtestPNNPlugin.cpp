@@ -37,12 +37,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReporter.h"
 #include "cxtestReconstructionAlgorithmFixture.h"
 #include "cxtestUtilities.h"
+#include "cxLogicManager.h"
 
 namespace cxtest
 {
 
 TEST_CASE("ReconstructAlgorithm: PNN on sphere","[unit][usreconstruction][synthetic][pnn]")
 {
+	cx::LogicManager::initialize();
+	ctkPluginContext* pluginContext = cx::logicManager()->getPluginContext();
+
 	ReconstructionAlgorithmFixture fixture;
 	QDomDocument domdoc;
 	QDomElement settings = domdoc.createElement("PNN");
@@ -51,7 +55,7 @@ TEST_CASE("ReconstructAlgorithm: PNN on sphere","[unit][usreconstruction][synthe
 	fixture.setVerbose(true);
 	fixture.getInputGenerator()->setSpherePhantom();
 
-	fixture.setAlgorithm(cx::PNNReconstructionService::create());
+	fixture.setAlgorithm(cx::PNNReconstructionService::create(pluginContext));
 	fixture.reconstruct(settings);
 
 	fixture.checkRMSBelow(20.0);
@@ -63,10 +67,14 @@ TEST_CASE("ReconstructAlgorithm: PNN on sphere","[unit][usreconstruction][synthe
 		fixture.saveOutputToFile("test/sphere_rec.mhd");
 		fixture.saveNominalOutputToFile("test/sphere_nom.mhd");
 	}
+	cx::LogicManager::shutdown();
 }
 
 TEST_CASE("ReconstructAlgorithm: PNN on sphere, tilt","[unit][usreconstruction][synthetic][pnn]")
 {
+	cx::LogicManager::initialize();
+	ctkPluginContext* pluginContext = cx::logicManager()->getPluginContext();
+
 	QDomDocument domdoc;
 	QDomElement settings = domdoc.createElement("PNN");
 
@@ -81,7 +89,7 @@ TEST_CASE("ReconstructAlgorithm: PNN on sphere, tilt","[unit][usreconstruction][
 	generator->setSpherePhantom();
 	fixture.defineOutputVolume(100, 2);
 
-	fixture.setAlgorithm(cx::PNNReconstructionService::create());
+	fixture.setAlgorithm(cx::PNNReconstructionService::create(pluginContext));
 	fixture.reconstruct(settings);
 
 	fixture.checkRMSBelow(30.0);
@@ -93,6 +101,7 @@ TEST_CASE("ReconstructAlgorithm: PNN on sphere, tilt","[unit][usreconstruction][
 		fixture.saveOutputToFile("test/sphere_rec.mhd");
 		fixture.saveNominalOutputToFile("test/sphere_nom.mhd");
 	}
+	cx::LogicManager::shutdown();
 }
 
 } // namespace cxtest

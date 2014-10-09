@@ -81,8 +81,11 @@ PluginFrameworkManager::PluginFrameworkManager()
 
 PluginFrameworkManager::~PluginFrameworkManager()
 {
-	this->saveState();
-	this->stop();
+	if(mFramework->getState() == ctkPlugin::ACTIVE)//LogicManager calls stop() before the destructor is called
+	{
+		reportWarning("This should not happen: PluginFrameworkManager destructor stopping plugin framework");
+		this->stop();
+	}
 }
 
 QString PluginFrameworkManager::convertToRelativePath(QString path) const
@@ -277,13 +280,13 @@ bool PluginFrameworkManager::start()
 
 bool PluginFrameworkManager::stop()
 {
-	ctkPluginContext* pc = this->getPluginContext();
+	this->saveState();
+
 	// stop the framework
-	QSharedPointer<ctkPluginFramework> fw = qSharedPointerCast<ctkPluginFramework>(pc->getPlugin(0));
 	try
 	{
-		fw->stop();
-		ctkPluginFrameworkEvent fe = fw->waitForStop(5000);
+		mFramework->stop();
+		ctkPluginFrameworkEvent fe = mFramework->waitForStop(5000);
 		if (fe.getType() == ctkPluginFrameworkEvent::FRAMEWORK_WAIT_TIMEDOUT)
 		{
 			reportWarning("Stopping the plugin framework timed out");

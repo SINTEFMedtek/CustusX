@@ -43,6 +43,7 @@ class cxPluginAlgorithm_EXPORT DilationFilter : public FilterImpl
 	Q_OBJECT
 
 public:
+	DilationFilter(PatientModelServicePtr patientModelService);
 	virtual ~DilationFilter() {}
 
 	virtual QString getType() const;

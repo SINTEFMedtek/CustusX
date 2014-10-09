@@ -62,12 +62,37 @@ DataPtr RegistrationServiceNull::getFixedData()
 	return DataPtr();
 }
 
+void RegistrationServiceNull::doPatientRegistration()
+{
+	printWarning();
+}
+
+void RegistrationServiceNull::doFastRegistration_Translation()
+{
+	printWarning();
+}
+
+void RegistrationServiceNull::doFastRegistration_Orientation(const Transform3D &tMtm, const Transform3D &prMt)
+{
+	printWarning();
+}
+
+void RegistrationServiceNull::doImageRegistration(bool translationOnly)
+{
+	printWarning();
+}
+
 void RegistrationServiceNull::applyImage2ImageRegistration(Transform3D delta_pre_rMd, QString description)
 {
 	printWarning();
 }
 
 void RegistrationServiceNull::applyPatientRegistration(Transform3D rMpr_new, QString description)
+{
+	printWarning();
+}
+
+void RegistrationServiceNull::applyPatientOrientation(const Transform3D &tMtm, const Transform3D &prMt)
 {
 	printWarning();
 }

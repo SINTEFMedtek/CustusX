@@ -32,23 +32,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxTransferFunction2DOpacityWidget.h"
 #include "cxDoubleWidgets.h"
-#include "cxDataManager.h"
 #include "cxImageLUT2D.h"
+#include "cxPatientModelService.h"
+
 namespace cx
 {
 
-TransferFunction2DOpacityWidget::TransferFunction2DOpacityWidget(QWidget* parent) :
-  BaseWidget(parent, "TransferFunction2DOpacityWidget", "2D Opacity")
+TransferFunction2DOpacityWidget::TransferFunction2DOpacityWidget(PatientModelServicePtr patientModelService, QWidget* parent) :
+  BaseWidget(parent, "TransferFunction2DOpacityWidget", "2D Opacity"),
+  mPatientModelService(patientModelService)
 {
   QVBoxLayout* layout = new QVBoxLayout(this);
 
-  mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(this);
+  mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(patientModelService, this);
   mTransferFunctionAlphaWidget->setReadOnly(true);
 
   mDataAlpha.reset(new DoubleDataAdapterImageTFDataAlpha);
   mDataLLR.reset(new DoubleDataAdapterImageTFDataLLR);
 
-  mActiveImageProxy = ActiveImageProxy::New(dataService());
+  mActiveImageProxy = ActiveImageProxy::New(patientModelService);
   connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
   connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(activeImageChangedSlot()));
 
@@ -76,7 +78,7 @@ QString TransferFunction2DOpacityWidget::defaultWhatsThis() const
 
 void TransferFunction2DOpacityWidget::activeImageChangedSlot()
 {
-  ImagePtr image = dataManager()->getActiveImage();
+  ImagePtr image = mPatientModelService->getActiveImage();
   ImageTFDataPtr tf;
   if (image)
     tf = image->getLookupTable2D();

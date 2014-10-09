@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
+
 /**
  * \defgroup cx_module_algorithm Algorithm Plugin
  * \ingroup cx_modules
@@ -64,10 +65,13 @@ class cxPluginAlgorithm_EXPORT AlgorithmPlugin : public GUIExtenderService
 {
 	Q_OBJECT
 public:
-	AlgorithmPlugin();
+	AlgorithmPlugin(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService);
 	virtual ~AlgorithmPlugin();
 
 	virtual std::vector<CategorizedWidget> createWidgets() const;
+private:
+	PatientModelServicePtr mPatientModelService;
+	VisualizationServicePtr mVisualizationService;
 };
 typedef boost::shared_ptr<class AlgorithmPlugin> AlgorithmPluginPtr;
 

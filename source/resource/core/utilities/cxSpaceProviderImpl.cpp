@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-SpaceProviderImpl::SpaceProviderImpl(TrackingServicePtr toolManager, DataServicePtr dataManager)
+SpaceProviderImpl::SpaceProviderImpl(TrackingServiceOldPtr toolManager, DataServicePtr dataManager)
 {
 	mToolManager = toolManager;
 	mDataManager = dataManager;

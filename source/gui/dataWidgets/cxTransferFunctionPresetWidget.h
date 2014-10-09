@@ -56,7 +56,7 @@ class cxGui_EXPORT TransferFunctionPresetWidget: public PresetWidget
 	Q_OBJECT
 
 public:
-	TransferFunctionPresetWidget(QWidget* parent, bool is3D);
+	TransferFunctionPresetWidget(PatientModelServicePtr patientModelService, QWidget* parent, bool is3D);
 	virtual ~TransferFunctionPresetWidget() {
 	}
 	virtual QString defaultWhatsThis() const;
@@ -79,6 +79,7 @@ private:
 	bool mIs3D; ///< true if 3D, false if 2D
 	bool mApplyToAll; ///< true if presets are to be applied to both 2D and 3D
 	ActiveImageProxyPtr mActiveImageProxy;
+	PatientModelServicePtr mPatientModelService;
 
 };
 

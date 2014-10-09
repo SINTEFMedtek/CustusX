@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxEraserWidget.h>
 
 #include <QTimer>
+#include <QCheckBox>
 
 #include "vtkSphereWidget.h"
 #include "vtkSplineWidget.h"

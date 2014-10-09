@@ -70,14 +70,8 @@ DataManagerImplPtr DataManagerImpl::create()
 {
 	DataManagerImplPtr retval;
 	retval.reset(new DataManagerImpl());
-//	retval->mSelf = retval;
 	return retval;
 }
-
-//void DataManagerImpl::initialize()
-//{
-//	setInstance(new DataManagerImpl());
-//}
 
 DataManagerImpl::DataManagerImpl() :
 	mDebugMode(false)
@@ -763,13 +757,12 @@ RegistrationHistoryPtr DataManagerImpl::get_rMpr_History()
 	return m_rMpr_History;
 }
 
-
 PresetTransferFunctions3DPtr DataManagerImpl::getPresetTransferFunctions3D() const
 {
 	///< create from filename, create trivial document of type name and root node if no file exists.
 	XmlOptionFile preset = XmlOptionFile(
-					DataLocations::getRootConfigPath() + "/transferFunctions/presets.xml", "transferFunctions");
-	XmlOptionFile custom = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend(
+					DataLocations::getRootConfigPath() + "/transferFunctions/presets.xml");
+	XmlOptionFile custom = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend(
 					"presetTransferFunctions");
 
 	if (!mPresetTransferFunctions3D)
@@ -790,8 +783,6 @@ void DataManagerImpl::setDebugMode(bool on)
 	mDebugMode = on;
 	emit debugModeChanged(mDebugMode);
 }
-
-
 
 } // namespace cx
 

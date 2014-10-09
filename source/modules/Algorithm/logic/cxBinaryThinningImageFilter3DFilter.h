@@ -52,6 +52,7 @@ class cxPluginAlgorithm_EXPORT BinaryThinningImageFilter3DFilter : public Filter
 	Q_OBJECT
 
 public:
+	BinaryThinningImageFilter3DFilter(PatientModelServicePtr patientModelService);
 	virtual ~BinaryThinningImageFilter3DFilter() {}
 
 	virtual QString getType() const;

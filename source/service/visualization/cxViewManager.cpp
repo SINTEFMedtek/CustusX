@@ -81,14 +81,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-VisualizationServicePtr ViewManager::create(VisualizationServiceBackendPtr backend)
+VisualizationServiceOldPtr ViewManager::create(/*PatientModelServicePtr patientModelService, */VisualizationServiceBackendPtr backend)
 {
-	VisualizationServicePtr retval;
-	retval.reset(new ViewManager(backend));
+	VisualizationServiceOldPtr retval;
+	retval.reset(new ViewManager(/*patientModelService, */backend));
 	return retval;
 }
 
-ViewManager::ViewManager(VisualizationServiceBackendPtr backend) :
+ViewManager::ViewManager(/*PatientModelServicePtr patientModelService, */VisualizationServiceBackendPtr backend) :
 				mGlobalObliqueOrientation(false)
 {
 	mBackend = backend;
@@ -126,7 +126,7 @@ ViewManager::ViewManager(VisualizationServiceBackendPtr backend) :
 	mActiveLayout = QStringList() << "" << "";
 	mLayoutWidgets.resize(mActiveLayout.size(), NULL);
 
-	mInteractiveCropper.reset(new InteractiveCropper(mBackend));
+	mInteractiveCropper.reset(new InteractiveCropper(mBackend/*patientModelService*/));
 	mInteractiveClipper.reset(new InteractiveClipper(mBackend));
 	connect(this, SIGNAL(activeLayoutChanged()), mInteractiveClipper.get(), SIGNAL(changed()));
 	connect(mInteractiveCropper.get(), SIGNAL(changed()), mRenderLoop.get(), SLOT(requestPreRenderSignal()));
@@ -581,13 +581,13 @@ bool ViewManager::isCustomLayout(const QString& uid) const
 
 void ViewManager::loadGlobalSettings()
 {
-	XmlOptionFile file = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("viewmanager");
+	XmlOptionFile file = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("viewmanager");
 	mLayoutRepository->load(file);
 }
 
 void ViewManager::saveGlobalSettings()
 {
-	XmlOptionFile file = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("viewmanager");
+	XmlOptionFile file = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("viewmanager");
 	mLayoutRepository->save(file);
 	file.save();
 }

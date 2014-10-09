@@ -55,17 +55,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 //------------------------------------------------------------------------------
-PrepareVesselsWidget::PrepareVesselsWidget(RegistrationManagerPtr regManager, QWidget* parent) :
-    RegistrationBaseWidget(regManager, parent, "PrepareVesselsWidget", "PrepareVesselsWidget")
+PrepareVesselsWidget::PrepareVesselsWidget(RegistrationServicePtr registrationService, VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent) :
+		RegistrationBaseWidget(registrationService, parent, "PrepareVesselsWidget", "PrepareVesselsWidget")
 {  
-    XmlOptionFile options = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("registration").descend("PrepareVesselsWidget");
+	XmlOptionFile options = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("registration").descend("PrepareVesselsWidget");
   // fill the pipeline with filters:
-  mPipeline.reset(new Pipeline());
+	mPipeline.reset(new Pipeline(patientModelService));
   FilterGroupPtr filters(new FilterGroup(options.descend("pipeline")));
-  filters->append(FilterPtr(new ResampleImageFilter()));
-  filters->append(FilterPtr(new SmoothingImageFilter()));
-  filters->append(FilterPtr(new BinaryThresholdImageFilter()));
-  filters->append(FilterPtr(new BinaryThinningImageFilter3DFilter()));
+	filters->append(FilterPtr(new ResampleImageFilter(patientModelService)));
+	filters->append(FilterPtr(new SmoothingImageFilter(patientModelService)));
+	filters->append(FilterPtr(new BinaryThresholdImageFilter(patientModelService)));
+	filters->append(FilterPtr(new BinaryThinningImageFilter3DFilter(patientModelService)));
   mPipeline->initialize(filters);
 
 //  mPipeline->getNodes()[0]->setValueName("US Image:");
@@ -74,7 +74,7 @@ PrepareVesselsWidget::PrepareVesselsWidget(RegistrationManagerPtr regManager, QW
 
   mLayout = new QVBoxLayout(this);
 
-  mPipelineWidget = new PipelineWidget(NULL, mPipeline);
+  mPipelineWidget = new PipelineWidget(visualizationService, patientModelService, NULL, mPipeline);
   mLayout->addWidget(mPipelineWidget);
 
   mColorDataAdapter = ColorDataAdapterXml::initialize("Color", "",
@@ -112,14 +112,14 @@ void PrepareVesselsWidget::toMovingSlot()
 {
     DataPtr data = mPipeline->getNodes().back()->getData();
   if (data)
-    mManager->setMovingData(data);
+		mRegistrationService->setMovingData(data);
 }
 
 void PrepareVesselsWidget::toFixedSlot()
 {
   DataPtr data = mPipeline->getNodes().back()->getData();
   if (data)
-    mManager->setFixedData(data);
+		mRegistrationService->setFixedData(data);
 }
 
 PrepareVesselsWidget::~PrepareVesselsWidget()

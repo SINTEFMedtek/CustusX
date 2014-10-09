@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-typedef boost::shared_ptr<class PatientModelImplService> PatientModelImplServicePtr;
+typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
 
 /**
  * Activator for the patientmodel plugin
@@ -65,8 +65,7 @@ public:
   void stop(ctkPluginContext* context);
 
 private:
-  ctkPluginContext* mContext;
-  PatientModelImplServicePtr mPatientModelService;
+	RegisteredServicePtr mRegistration;
 };
 
 } // namespace cx

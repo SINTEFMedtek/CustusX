@@ -56,17 +56,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx {
 
-AllFiltersWidget::AllFiltersWidget(QWidget* parent) :
+AllFiltersWidget::AllFiltersWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent) :
     BaseWidget(parent, "FilterWidget", "Configurable Filter")
 {
-	XmlOptionFile options = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("filterwidget");
+	XmlOptionFile options = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("filterwidget");
 	mFilters.reset(new FilterGroup(options));
-	mFilters->append(FilterPtr(new BinaryThresholdImageFilter()));
-	mFilters->append(FilterPtr(new BinaryThinningImageFilter3DFilter()));
-	mFilters->append(FilterPtr(new ContourFilter()));
-	mFilters->append(FilterPtr(new SmoothingImageFilter()));
-	mFilters->append(FilterPtr(new ResampleImageFilter()));
-	mFilters->append(FilterPtr(new DilationFilter()));
+	mFilters->append(FilterPtr(new BinaryThresholdImageFilter(patientModelService)));
+	mFilters->append(FilterPtr(new BinaryThinningImageFilter3DFilter(patientModelService)));
+	mFilters->append(FilterPtr(new ContourFilter(patientModelService)));
+	mFilters->append(FilterPtr(new SmoothingImageFilter(patientModelService)));
+	mFilters->append(FilterPtr(new ResampleImageFilter(patientModelService)));
+	mFilters->append(FilterPtr(new DilationFilter(patientModelService)));
 
 	mServiceListener.reset(
 			new ServiceTrackerListener<Filter>(
@@ -91,7 +91,7 @@ AllFiltersWidget::AllFiltersWidget(QWidget* parent) :
 	                                                        availableFilters,
 	                                                        options.getElement());
 	mFilterSelector->setDisplayNames(names);
-	connect(mFilterSelector.get(), SIGNAL(valueWasSet()), this, SLOT(filterChangedSlot()));
+	connect(mFilterSelector.get(), SIGNAL(valueWasSet(int)), this, SLOT(filterChangedSlot()));
 
 	QVBoxLayout* topLayout = new QVBoxLayout(this);
 
@@ -128,7 +128,7 @@ AllFiltersWidget::AllFiltersWidget(QWidget* parent) :
 	mTimedAlgorithmProgressBar = new cx::TimedAlgorithmProgressBar;
 	topLayout->addWidget(mTimedAlgorithmProgressBar);
 
-	mSetupWidget = new FilterSetupWidget(this, options, false);
+	mSetupWidget = new FilterSetupWidget(visualizationService, patientModelService, this, options, false);
 	topLayout->addWidget(mSetupWidget);
 
 	topLayout->addStretch();

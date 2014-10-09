@@ -56,7 +56,7 @@ class cxGui_EXPORT ExportDataDialog : public QDialog
 {
   Q_OBJECT
 public:
-  ExportDataDialog(QWidget* parent=NULL);
+  ExportDataDialog(PatientModelServicePtr patientModelService, QWidget* parent=NULL);
   virtual ~ExportDataDialog();
 
 private slots:
@@ -64,6 +64,7 @@ private slots:
 private:
   QPushButton* mOkButton;
   QCheckBox* mNiftiFormatCheckBox;
+  PatientModelServicePtr mPatientModelService;
 };
 }//namespace cx
 

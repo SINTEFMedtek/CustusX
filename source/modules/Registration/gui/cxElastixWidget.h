@@ -67,7 +67,7 @@ class cxPluginRegistration_EXPORT ElastixWidget: public RegistrationBaseWidget
 {
 Q_OBJECT
 public:
-	ElastixWidget(RegistrationManagerPtr regManager, QWidget* parent = NULL);
+	ElastixWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent = NULL);
 	virtual ~ElastixWidget();
 	virtual QString defaultWhatsThis() const;
 

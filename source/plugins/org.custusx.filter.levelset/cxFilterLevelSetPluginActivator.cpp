@@ -50,14 +50,14 @@ FilterLevelSetPluginActivator::~FilterLevelSetPluginActivator()
 
 }
 
-void FilterLevelSetPluginActivator::start(ctkPluginContext* context)
+void FilterLevelSetPluginActivator::start(ctkPluginContext* pluginContext)
 {
-	this->mContext = context;
+	this->mContext = pluginContext;
 
-	mPlugin.reset(new LevelSetFilter);
+	mPlugin.reset(new LevelSetFilter(pluginContext));
 	try
 	{
-		mRegistration = context->registerService(QStringList(FilterService_iid), mPlugin.get());
+		mRegistration = pluginContext->registerService(QStringList(FilterService_iid), mPlugin.get());
 	}
 	catch(ctkRuntimeException& e)
 	{

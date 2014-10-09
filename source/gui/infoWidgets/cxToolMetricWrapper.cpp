@@ -35,17 +35,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLabeledComboBoxWidget.h"
 #include "cxDataAdapterHelper.h"
 #include "cxToolManager.h"
-#include "cxLegacySingletons.h"
 #include "cxSpaceProvider.h"
+#include "cxPatientModelService.h"
+
+//TODO: remove
+#include "cxLegacySingletons.h"
 
 namespace cx {
 
-ToolMetricWrapper::ToolMetricWrapper(cx::ToolMetricPtr data) : mData(data)
+ToolMetricWrapper::ToolMetricWrapper(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, cx::ToolMetricPtr data) :
+	MetricBase(visualizationService, patientModelService),
+	mData(data)
 {
 	mInternalUpdate = false;
 	connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
 	connect(mData.get(), SIGNAL(propertiesChanged()), this, SLOT(dataChangedSlot()));
-	connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataChangedSlot()));
+	connect(mPatientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataChangedSlot()));
+}
+
+ToolMetricWrapper::~ToolMetricWrapper()
+{
+	disconnect(mPatientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataChangedSlot()));
 }
 
 QWidget* ToolMetricWrapper::createWidget()
@@ -65,8 +75,8 @@ QWidget* ToolMetricWrapper::createWidget()
 	hLayout->setMargin(0);
 	topLayout->addLayout(hLayout);
 
-	hLayout2->addWidget(createDataWidget(widget, mToolNameSelector));
-	hLayout2->addWidget(createDataWidget(widget, mToolOffsetSelector));
+	hLayout2->addWidget(createDataWidget(mVisualizationService, mPatientModelService, widget, mToolNameSelector));
+	hLayout2->addWidget(createDataWidget(mVisualizationService, mPatientModelService, widget, mToolOffsetSelector));
 
 	hLayout->addWidget(new LabeledComboBoxWidget(widget, mSpaceSelector));
 

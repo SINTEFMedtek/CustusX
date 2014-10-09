@@ -91,7 +91,7 @@ TEST_CASE("LevelSetFilter: execute", "[integration][modules][Algorithm][LevelSet
 {
     cx::LogicManager::initialize();
 	//setup filter
-	cx::LevelSetFilterPtr lsf = cx::LevelSetFilterPtr(new cx::LevelSetFilter());
+	cx::LevelSetFilterPtr lsf = cx::LevelSetFilterPtr(new cx::LevelSetFilter(cx::logicManager()->getPluginContext()));
 	REQUIRE(lsf);
 	lsf->getInputTypes();
 	lsf->getOutputTypes();

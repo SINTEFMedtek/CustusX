@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
+
 /**
  * \file
  * \addtogroup cx_gui
@@ -59,7 +60,7 @@ class cxGui_EXPORT SlicePropertiesWidget : public TabbedWidget
   Q_OBJECT
 
 public:
-	SlicePropertiesWidget(QWidget* parent);
+	SlicePropertiesWidget(cx::PatientModelServicePtr patientModelService, cx::VisualizationServicePtr visualizationService, QWidget* parent);
 	virtual ~SlicePropertiesWidget();
   virtual QString defaultWhatsThis() const;
 

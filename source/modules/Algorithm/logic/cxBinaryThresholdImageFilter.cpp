@@ -53,10 +53,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMesh.h"
 #include "cxImage.h"
 #include "cxSelectDataStringDataAdapter.h"
+#include "cxLegacySingletons.h"
 
 
 namespace cx
 {
+
+BinaryThresholdImageFilter::BinaryThresholdImageFilter(PatientModelServicePtr patientModelService) :
+	FilterImpl(patientModelService)
+{
+}
 
 QString BinaryThresholdImageFilter::getName() const
 {
@@ -116,7 +122,7 @@ void BinaryThresholdImageFilter::createInputTypes()
 {
 	SelectDataStringDataAdapterBasePtr temp;
 
-	temp = SelectImageStringDataAdapter::New();
+	temp = SelectImageStringDataAdapter::New(mPatientModelService);
 	temp->setValueName("Input");
 	temp->setHelp("Select image input for thresholding");
 	connect(temp.get(), SIGNAL(dataChanged(QString)), this, SLOT(imageChangedSlot(QString)));
@@ -127,12 +133,12 @@ void BinaryThresholdImageFilter::createOutputTypes()
 {
 	SelectDataStringDataAdapterBasePtr temp;
 
-	temp = SelectDataStringDataAdapter::New();
+	temp = SelectDataStringDataAdapter::New(mPatientModelService);
 	temp->setValueName("Output");
 	temp->setHelp("Output thresholded binary image");
 	mOutputTypes.push_back(temp);
 
-	temp = SelectDataStringDataAdapter::New();
+	temp = SelectDataStringDataAdapter::New(mPatientModelService);
 	temp->setValueName("Contour");
 	temp->setHelp("Output contour generated from thresholded binary image.");
 	mOutputTypes.push_back(temp);

@@ -36,14 +36,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx {
 
-ColorWidget::ColorWidget(QWidget* parent) :
+ColorWidget::ColorWidget(PatientModelServicePtr patientModelService, QWidget* parent) :
 		BaseWidget(parent, "ColorWidget", "Color")
 {
 	QVBoxLayout* layout = new QVBoxLayout(this);
 	layout->setMargin(0);
-	layout->addWidget(new TransferFunction2DColorWidget(this), 0);
+	layout->addWidget(new TransferFunction2DColorWidget(patientModelService, this), 0);
 	layout->addStretch(1);
-	layout->addWidget(new TransferFunctionPresetWidget(this, false), 0);
+	layout->addWidget(new TransferFunctionPresetWidget(patientModelService, this, false), 0);
 }
 
 QString ColorWidget::defaultWhatsThis() const{

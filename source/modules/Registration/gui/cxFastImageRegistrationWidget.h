@@ -58,7 +58,7 @@ class cxPluginRegistration_EXPORT FastImageRegistrationWidget : public LandmarkI
 {
 	Q_OBJECT
 public:
-  FastImageRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent, QString objectName, QString windowTitle);
+  FastImageRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent, QString objectName, QString windowTitle);
  virtual ~FastImageRegistrationWidget();
  virtual QString defaultWhatsThis() const;
 
@@ -70,7 +70,7 @@ class cxPluginRegistration_EXPORT PlateImageRegistrationWidget : public FastImag
 {
 	Q_OBJECT
 public:
-  PlateImageRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent);
+	PlateImageRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent);
  virtual ~PlateImageRegistrationWidget();
  virtual QString defaultWhatsThis() const;
 

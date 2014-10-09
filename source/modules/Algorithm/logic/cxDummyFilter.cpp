@@ -90,17 +90,17 @@ void DummyFilter::createInputTypes()
 {
 	SelectDataStringDataAdapterBasePtr temp;
 
-	temp = SelectDataStringDataAdapter::New();
+	temp = SelectDataStringDataAdapter::New(mPatientModelService);
 	temp->setValueName("Input");
 	temp->setHelp("Dummy data input for a dummy algorithm");
 	mInputTypes.push_back(temp);
 
-	temp = SelectImageStringDataAdapter::New();
+	temp = SelectImageStringDataAdapter::New(mPatientModelService);
 	temp->setValueName("Image");
 	temp->setHelp("Dummy image input for a dummy algorithm");
 	mInputTypes.push_back(temp);
 
-	temp = SelectMeshStringDataAdapter::New();
+	temp = SelectMeshStringDataAdapter::New(mPatientModelService);
 	temp->setValueName("Mesh");
 	temp->setHelp("Dummy mesh input for a dummy algorithm");
 	mInputTypes.push_back(temp);
@@ -110,7 +110,7 @@ void DummyFilter::createOutputTypes()
 {
 	SelectDataStringDataAdapterBasePtr temp;
 
-	temp = SelectDataStringDataAdapter::New();
+	temp = SelectDataStringDataAdapter::New(mPatientModelService);
 	temp->setValueName("Output");
 	temp->setHelp("Dummy output from the dummy algorithm");
 	mOutputTypes.push_back(temp);

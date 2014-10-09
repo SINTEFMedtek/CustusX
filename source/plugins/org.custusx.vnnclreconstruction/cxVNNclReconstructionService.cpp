@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-VNNclReconstructionService::VNNclReconstructionService() :
+VNNclReconstructionService::VNNclReconstructionService(ctkPluginContext* context) :
 		ReconstructionService()
 {
     mAlgorithm = VNNclAlgorithmPtr(new VNNclAlgorithm);

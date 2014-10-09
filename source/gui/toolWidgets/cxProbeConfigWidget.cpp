@@ -31,8 +31,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include <cxProbeConfigWidget.h>
-#include <qinputdialog.h>
-#include <qmessagebox.h>
+#include <QGroupBox>
+#include <QInputDialog>
+#include <QMessageBox>
+#include <QCheckBox>
 #include "cxLabeledComboBoxWidget.h"
 #include "cxDoubleWidgets.h"
 #include "cxToolDataAdapters.h"

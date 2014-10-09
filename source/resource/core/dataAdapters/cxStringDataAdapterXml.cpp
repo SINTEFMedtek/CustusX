@@ -133,7 +133,8 @@ bool StringDataAdapterXml::setValue(const QString& val)
 
 	mValue = val;
 	mStore.writeValue(val);
-	emit valueWasSet();
+	int pos = this->getValueRange().indexOf(val);
+	emit valueWasSet(pos);
 	emit changed();
 	return true;
 }

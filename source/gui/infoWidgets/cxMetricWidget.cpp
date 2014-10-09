@@ -55,7 +55,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataManager.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxVector3DWidget.h"
-//#include "cxRegistrationTransform.h"
 #include "cxTimeKeeper.h"
 #include "cxFrameMetricWrapper.h"
 #include "cxToolMetricWrapper.h"
@@ -63,11 +62,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientData.h"
 #include "cxTime.h"
 #include "cxMetricManager.h"
-
-//#include "cxManualTool.h"
-//#include "cxPointMetric.h"
-//#include "cxDistanceMetric.h"
 #include "cxLogger.h"
+#include "cxPatientModelService.h"
 
 
 namespace cx
@@ -78,10 +74,12 @@ namespace cx
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-MetricWidget::MetricWidget(QWidget* parent) :
+MetricWidget::MetricWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent) :
   BaseWidget(parent, "MetricWidget", "Metrics/3D ruler"),
   mVerticalLayout(new QVBoxLayout(this)),
-  mTable(new QTableWidget(this))
+  mTable(new QTableWidget(this)),
+  mPatientModelService(patientModelService),
+  mVisualizationService(visualizationService)
 {
 	// the delayed timer lowers the update rate of this widget,
 	// as is is seen to strangle the render speed when many metrics are present.
@@ -229,13 +227,6 @@ void MetricWidget::itemSelectionChanged()
 void MetricWidget::showEvent(QShowEvent* event)
 {
   QWidget::showEvent(event);
-
-// Turned off by request (#420) - too confusing
-//  ViewGroupDataPtr data = viewManager()->getViewGroups()[0]->getData();
-//  ViewGroupData::Options options = data->getOptions();
-//  options.mShowPointPickerProbe = true;
-//  data->setOptions(options);
-
   this->setModified();
 }
 
@@ -259,30 +250,30 @@ bool isType(boost::shared_ptr<SUPER> data)
 }
 
 template<class WRAPPER, class METRIC, class SUPER>
-boost::shared_ptr<WRAPPER> createMetricWrapperOfType(boost::shared_ptr<SUPER> data)
+boost::shared_ptr<WRAPPER> createMetricWrapperOfType(cx::VisualizationServicePtr visualizationService, cx::PatientModelServicePtr patientModelService, boost::shared_ptr<SUPER> data)
 {
-	return boost::shared_ptr<WRAPPER>(new WRAPPER(castTo<METRIC>(data)));
+	return boost::shared_ptr<WRAPPER>(new WRAPPER(visualizationService, patientModelService, castTo<METRIC>(data)));
 }
 }
 
-MetricBasePtr MetricWidget::createMetricWrapper(DataPtr data)
+MetricBasePtr MetricWidget::createMetricWrapper(cx::VisualizationServicePtr visualizationService, cx::PatientModelServicePtr patientModelService, DataPtr data)
 {
 	if (isType<PointMetric>(data))
-	  return createMetricWrapperOfType<PointMetricWrapper, PointMetric>(data);
+	  return createMetricWrapperOfType<PointMetricWrapper, PointMetric>(visualizationService, patientModelService, data);
 	if (isType<DistanceMetric>(data))
-	  return createMetricWrapperOfType<DistanceMetricWrapper, DistanceMetric>(data);
+	  return createMetricWrapperOfType<DistanceMetricWrapper, DistanceMetric>(visualizationService, patientModelService, data);
 	if (isType<AngleMetric>(data))
-	  return createMetricWrapperOfType<AngleMetricWrapper, AngleMetric>(data);
+	  return createMetricWrapperOfType<AngleMetricWrapper, AngleMetric>(visualizationService, patientModelService, data);
 	if (isType<FrameMetric>(data))
-	  return createMetricWrapperOfType<FrameMetricWrapper, FrameMetric>(data);
+	  return createMetricWrapperOfType<FrameMetricWrapper, FrameMetric>(visualizationService, patientModelService, data);
 	if (isType<ToolMetric>(data))
-	  return createMetricWrapperOfType<ToolMetricWrapper, ToolMetric>(data);
+	  return createMetricWrapperOfType<ToolMetricWrapper, ToolMetric>(visualizationService, patientModelService, data);
 	if (isType<PlaneMetric>(data))
-	  return createMetricWrapperOfType<PlaneMetricWrapper, PlaneMetric>(data);
+	  return createMetricWrapperOfType<PlaneMetricWrapper, PlaneMetric>(visualizationService, patientModelService, data);
 	if (isType<DonutMetric>(data))
-	  return createMetricWrapperOfType<DonutMetricWrapper, DonutMetric>(data);
+	  return createMetricWrapperOfType<DonutMetricWrapper, DonutMetric>(visualizationService, patientModelService, data);
 	if (isType<SphereMetric>(data))
-	  return createMetricWrapperOfType<SphereMetricWrapper, SphereMetric>(data);
+	  return createMetricWrapperOfType<SphereMetricWrapper, SphereMetric>(visualizationService, patientModelService, data);
 
 	return MetricBasePtr();
 }
@@ -290,13 +281,13 @@ MetricBasePtr MetricWidget::createMetricWrapper(DataPtr data)
 /** create new metric wrappers for all metrics in PaSM
  *
  */
-std::vector<MetricBasePtr> MetricWidget::createMetricWrappers()
+std::vector<MetricBasePtr> MetricWidget::createMetricWrappers(cx::VisualizationServicePtr visualizationService, cx::PatientModelServicePtr patientModelService)
 {
 	std::vector<MetricBasePtr> retval;
   std::map<QString, DataPtr> all = dataManager()->getData();
   for (std::map<QString, DataPtr>::iterator iter=all.begin(); iter!=all.end(); ++iter)
   {
-  	MetricBasePtr wrapper = this->createMetricWrapper(iter->second);
+	MetricBasePtr wrapper = this->createMetricWrapper(visualizationService, patientModelService, iter->second);
   	if (wrapper)
   	{
   		retval.push_back(wrapper);
@@ -311,7 +302,7 @@ void MetricWidget::prePaintEvent()
 //	QTime timer;
 //	timer.start();
 	mPaintCount++;
-  std::vector<MetricBasePtr> newMetrics = this->createMetricWrappers();
+  std::vector<MetricBasePtr> newMetrics = this->createMetricWrappers(mVisualizationService, mPatientModelService);
 
   bool rebuild = !this->checkEqual(newMetrics, mMetrics);
   if (rebuild)
@@ -546,7 +537,7 @@ void MetricWidget::removeButtonClickedSlot()
 		nextUid = nextItem->data(Qt::UserRole).toString();
 	}
 
-	patientService()->getPatientData()->removeData(mMetricManager->getActiveUid());
+	mPatientModelService->removePatientData(mMetricManager->getActiveUid());
 
 	if (!nextUid.isEmpty())
 		mMetricManager->setActiveUid(nextUid);

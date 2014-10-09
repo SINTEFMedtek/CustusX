@@ -62,7 +62,7 @@ class cxPluginCalibration_EXPORT ToolTipSampleWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  ToolTipSampleWidget(QWidget* parent);
+  ToolTipSampleWidget(PatientModelServicePtr patientModelService, QWidget* parent);
   ~ToolTipSampleWidget();
   virtual QString defaultWhatsThis() const;
 
@@ -84,6 +84,7 @@ private:
   LabeledComboBoxWidget* mToolComboBox;
   LabeledComboBoxWidget* mDataComboBox;
   bool mTruncateFile;
+  PatientModelServicePtr mPatientModelService;
 };
 
 

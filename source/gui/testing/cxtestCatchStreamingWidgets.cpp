@@ -34,12 +34,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QTimer>
 #include <QApplication>
+#include <QFile>
 #include "cxtestTestVideoConnectionWidget.h"
 #include "cxtestQueuedSignalListener.h"
 #include "cxDataLocations.h"
 
 #include "cxDummyToolManager.h"
 #include "cxLogicManager.h"
+#include "cxPatientModelService.h"
+#include "cxVisualizationService.h"
+#include "cxVideoService.h"
 
 namespace cxtest
 {
@@ -49,7 +53,7 @@ TEST_CASE("VideoConnectionWidget can stream", "[unit][gui][not_win32][widget][st
 {
 	cx::LogicManager::initialize();
 
-	cx::TrackingServicePtr ts = cx::logicManager()->getTrackingService();
+	cx::TrackingServiceOldPtr ts = cx::logicManager()->getTrackingService();
 
 	cx::DummyToolPtr tool = cx::DummyToolTestUtilities::createDummyTool(cx::DummyToolTestUtilities::createProbeDataLinear(), ts);
 	ts->runDummyTool(tool);
@@ -59,12 +63,17 @@ TEST_CASE("VideoConnectionWidget can stream", "[unit][gui][not_win32][widget][st
 	QString filename = cx::DataLocations::getTestDataPath() + "/testing/TubeSegmentationFramework/Default.mhd";
 	REQUIRE(QFile::exists(filename));
 
-	TestVideoConnectionWidget* widget = new TestVideoConnectionWidget();
+	//Mock with null objects
+	cx::PatientModelServicePtr patientModelService = cx::PatientModelService::getNullObject();
+	cx::VisualizationServicePtr visualizationService = cx::VisualizationService::getNullObject();
+	cx::VideoServicePtr videoService = cx::VideoService::getNullObject();
+
+	TestVideoConnectionWidget* widget = new TestVideoConnectionWidget(visualizationService, patientModelService, videoService);
 	REQUIRE(widget->canStream(filename, "MHDFile"));
 //	REQUIRE(widget->canStream(filename, "SimulatedImageStreamer"));
-	delete widget;
 
 	ts.reset();
+	delete widget;
 	cx::LogicManager::shutdown();
 }
 

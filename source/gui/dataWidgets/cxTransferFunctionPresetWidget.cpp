@@ -38,13 +38,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataManager.h"
 #include "cxSettings.h"
 #include "cxActiveImageProxy.h"
+#include "cxPatientModelService.h"
 
 namespace cx {
 
-TransferFunctionPresetWidget::TransferFunctionPresetWidget(QWidget* parent, bool is3D) :
-		PresetWidget(parent), mIs3D(is3D)
+TransferFunctionPresetWidget::TransferFunctionPresetWidget(PatientModelServicePtr patientModelService, QWidget* parent, bool is3D) :
+		PresetWidget(parent), mIs3D(is3D),
+		mPatientModelService(patientModelService)
 {
-	this->setPresets(dataManager()->getPresetTransferFunctions3D());
+	this->setPresets(patientModelService->getPresetTransferFunctions3D());
 	QString toggleText = "Toggle between apply presets,\neither on %1\nor both 2D and 3D\ntransfer functions.";
 	if (is3D)
 		toggleText = toggleText.arg("3D");
@@ -59,7 +61,7 @@ TransferFunctionPresetWidget::TransferFunctionPresetWidget(QWidget* parent, bool
 	mApplyToAll = settings()->value("applyTransferFunctionPresetsToAll").toBool();
 	this->updateToggles();
 
-	mActiveImageProxy = ActiveImageProxy::New(dataService());
+	mActiveImageProxy = ActiveImageProxy::New(patientModelService);
 	connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this,
 			SLOT(populatePresetListSlot()));
 	connect(mActiveImageProxy.get(), SIGNAL(propertiesChanged()), this,
@@ -97,8 +99,8 @@ QString TransferFunctionPresetWidget::defaultWhatsThis() const
 
 void TransferFunctionPresetWidget::populatePresetListSlot()
 {
-	if (dataManager()->getActiveImage())
-		PresetWidget::populatePresetList(mPresets->getPresetList(dataManager()->getActiveImage()->getModality()));
+	if (mPatientModelService->getActiveImage())
+		PresetWidget::populatePresetList(mPresets->getPresetList(mPatientModelService->getActiveImage()->getModality()));
 	else
 		//No active image, show all available presets for debug/overview purposes
 		PresetWidget::populatePresetList(mPresets->getPresetList("UNKNOWN"));
@@ -106,7 +108,7 @@ void TransferFunctionPresetWidget::populatePresetListSlot()
 
 void TransferFunctionPresetWidget::presetsBoxChangedSlot(const QString& presetName)
 {
-	ImagePtr activeImage = dataManager()->getActiveImage();
+	ImagePtr activeImage = mPatientModelService->getActiveImage();
 	if (activeImage) {
 		TransferFunctions3DPresetsPtr preset = boost::dynamic_pointer_cast<TransferFunctions3DPresets>(mPresets);
 		preset->load(presetName, activeImage, this->use2D(), this->use3D());
@@ -116,7 +118,7 @@ void TransferFunctionPresetWidget::presetsBoxChangedSlot(const QString& presetNa
 void TransferFunctionPresetWidget::resetSlot()
 {
 	PresetWidget::resetSlot();
-	ImagePtr activeImage = dataManager()->getActiveImage();
+	ImagePtr activeImage = mPatientModelService->getActiveImage();
 	activeImage->resetTransferFunctions(this->use2D(), this->use3D());
 }
 
@@ -136,7 +138,7 @@ void TransferFunctionPresetWidget::saveSlot()
 	if (!ok || text.isEmpty())
 		return;
 
-	ImagePtr activeImage = dataManager()->getActiveImage();
+	ImagePtr activeImage = mPatientModelService->getActiveImage();
 	preset->save(text, activeImage, this->use2D(), this->use3D());
 
 	this->populatePresetListSlot();

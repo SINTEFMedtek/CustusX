@@ -54,7 +54,7 @@ class cxPluginAlgorithm_EXPORT CompactFilterSetupWidget : public BaseWidget
 	Q_OBJECT
 
 public:
-	CompactFilterSetupWidget(QWidget* parent, XmlOptionFile options, bool addFrame);
+	CompactFilterSetupWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent, XmlOptionFile options, bool addFrame);
 	void setFilter(FilterPtr filter);
 	QString defaultWhatsThis() const;
 

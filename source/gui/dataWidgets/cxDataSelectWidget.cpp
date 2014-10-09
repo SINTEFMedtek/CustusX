@@ -32,23 +32,24 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxDataSelectWidget.h"
 
-#include "cxViewManager.h"
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"
-#include "cxDataManager.h"
 #include "cxHelperWidgets.h"
 #include "cxDataInterface.h"
 #include "cxSelectDataStringDataAdapter.h"
-#include "cxPatientData.h"
-#include "cxPatientService.h"
 #include "cxTypeConversions.h"
+#include "cxVisualizationService.h"
+#include "cxPatientModelService.h"
+#include "cxData.h"
 
 namespace cx
 {
 
-DataSelectWidget::DataSelectWidget(QWidget* parent, SelectDataStringDataAdapterBasePtr data, QGridLayout* gridLayout, int row) :
+DataSelectWidget::DataSelectWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget *parent, SelectDataStringDataAdapterBasePtr data, QGridLayout* gridLayout, int row) :
     BaseWidget(parent, "DataSelectWidget", "DataSelectWidget"),
-    mData(data)
+	mData(data),
+	mVisualizationService(visualizationService),
+	mPatientModelService(patientModelService)
 {
 
     QHBoxLayout* layout = new QHBoxLayout(this);
@@ -93,19 +94,24 @@ DataSelectWidget::DataSelectWidget(QWidget* parent, SelectDataStringDataAdapterB
 		layout->addWidget(removeButton);
     }
 
-    connect(viewManager(), SIGNAL(activeViewChanged()), this, SLOT(viewGroupChangedSlot()));
+	connect(mVisualizationService.get(), SIGNAL(activeViewChanged()), this, SLOT(viewGroupChangedSlot()));
     connect(mData.get(), SIGNAL(changed()), this, SLOT(updateDataVisibility()));
 
     this->setRemoveIcon();
-    this->viewGroupChangedSlot();
+	this->viewGroupChangedSlot();
+}
+
+DataSelectWidget::~DataSelectWidget()
+{
+	disconnect(mVisualizationService.get(), SIGNAL(activeViewChanged()), this, SLOT(viewGroupChangedSlot()));
 }
 
 ViewGroupDataPtr DataSelectWidget::getActiveViewGroupData()
 {
-    int groupIdx = viewManager()->getActiveViewGroup();
+	int groupIdx = mVisualizationService->getActiveViewGroup();
     if (groupIdx<0)
         groupIdx = 0;
-    return viewManager()->getViewGroups()[groupIdx]->getData();
+	return mVisualizationService->getViewGroupData(groupIdx);
 }
 
 void DataSelectWidget::viewGroupChangedSlot()
@@ -173,7 +179,7 @@ void DataSelectWidget::requestEraseData()
     if (!mData->getData())
         return;
 
-	patientService()->getPatientData()->removeData(mData->getData()->getUid());
+	mPatientModelService->removePatientData(mData->getData()->getUid());
 }
 
 void DataSelectWidget::setRemoveIcon()

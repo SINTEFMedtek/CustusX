@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxResourceExport.h"
 
 #include <QObject>
-#include "boost/shared_ptr.hpp"
+#include <boost/shared_ptr.hpp>
 #include "cxTransform3D.h"
 
 class QDateTime;
@@ -73,8 +73,13 @@ public:
 	virtual DataPtr getMovingData() = 0;
 	virtual DataPtr getFixedData() = 0;
 
+	virtual void doPatientRegistration() = 0; ///< registrates the fixed image to the patient
+	virtual void doFastRegistration_Translation() = 0; ///< use the landmarks in master image and patient to perform a translation-only landmark registration
+	virtual void doFastRegistration_Orientation(const Transform3D& tMtm, const Transform3D &prMt) = 0;
+	virtual void doImageRegistration(bool translationOnly) = 0;
 	virtual void applyImage2ImageRegistration(Transform3D delta_pre_rMd, QString description) = 0;
 	virtual void applyPatientRegistration(Transform3D rMpr_new, QString description) = 0;
+	virtual void applyPatientOrientation(const Transform3D &tMtm, const Transform3D &prMt) = 0;
 
 	virtual QDateTime getLastRegistrationTime() = 0;
 	virtual void setLastRegistrationTime(QDateTime time) = 0;

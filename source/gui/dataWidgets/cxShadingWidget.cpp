@@ -41,20 +41,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVBoxLayout>
 #include <QComboBox>
 #include <QStringList>
-#include "cxDataManager.h"
 #include "cxImageTF3D.h"
-
-//#include "sscAbstractInterface.h"
 #include "cxShadingParamsInterfaces.h"
-
 #include "cxImagePropertiesWidget.h"
+#include "cxPatientModelService.h"
+#include "cxHelpServiceProxy.h"
+#include "cxLogicManager.h"
 
 namespace cx
 {
 
-ShadingWidget::ShadingWidget(QWidget* parent) :
-		BaseWidget(parent, "ShadingWidget", "Shading"),
-  mLayout(new QVBoxLayout(this))
+ShadingWidget::ShadingWidget(PatientModelServicePtr patientModelService, QWidget* parent) :
+	BaseWidget(parent, "ShadingWidget", "Shading"),
+	mLayout(new QVBoxLayout(this)),
+	mPatientModelService(patientModelService)
 {
   this->init();
 }
@@ -68,25 +68,27 @@ void ShadingWidget::init()
 //  mLayout->addWidget(mShadingCheckBox);
 //  mShadingCheckBox->setEnabled(true);
 //
+  HelpServiceProxy(LogicManager::getInstance()->getPluginContext())->registerWidget(this, "property_widgets_volume_shading");
+
   connect(mShadingCheckBox, SIGNAL(toggled(bool)), this, SLOT(shadingToggledSlot(bool)));
 
   QGridLayout* shadingLayput = new QGridLayout();
 	shadingLayput->addWidget(mShadingCheckBox, 0,0);
-  SliderGroupWidget* shadingAmbientWidget = new SliderGroupWidget(this, DoubleDataAdapterPtr(new DoubleDataAdapterShadingAmbient()), shadingLayput, 1);
-  SliderGroupWidget* shadingDiffuseWidget = new SliderGroupWidget(this, DoubleDataAdapterPtr(new DoubleDataAdapterShadingDiffuse()), shadingLayput, 2);
-  SliderGroupWidget* shadingSpecularWidget = new SliderGroupWidget(this, DoubleDataAdapterPtr(new DoubleDataAdapterShadingSpecular()), shadingLayput, 3);
-  SliderGroupWidget* shadingSpecularPowerWidget = new SliderGroupWidget(this, DoubleDataAdapterPtr(new DoubleDataAdapterShadingSpecularPower()), shadingLayput, 4);
+  SliderGroupWidget* shadingAmbientWidget = new SliderGroupWidget(this, DoubleDataAdapterPtr(new DoubleDataAdapterShadingAmbient(mPatientModelService)), shadingLayput, 1);
+  SliderGroupWidget* shadingDiffuseWidget = new SliderGroupWidget(this, DoubleDataAdapterPtr(new DoubleDataAdapterShadingDiffuse(mPatientModelService)), shadingLayput, 2);
+  SliderGroupWidget* shadingSpecularWidget = new SliderGroupWidget(this, DoubleDataAdapterPtr(new DoubleDataAdapterShadingSpecular(mPatientModelService)), shadingLayput, 3);
+  SliderGroupWidget* shadingSpecularPowerWidget = new SliderGroupWidget(this, DoubleDataAdapterPtr(new DoubleDataAdapterShadingSpecularPower(mPatientModelService)), shadingLayput, 4);
 
   shadingAmbientWidget->setEnabled(false);
   shadingDiffuseWidget->setEnabled(false);
   shadingSpecularWidget->setEnabled(false);
   shadingSpecularPowerWidget->setEnabled(false);
 
-  mActiveImageProxy = ActiveImageProxy::New(dataService());
+  mActiveImageProxy = ActiveImageProxy::New(mPatientModelService);
   connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
   connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(activeImageChangedSlot()));
 
-	ImagePropertiesWidget* imagePropertiesWidget = new ImagePropertiesWidget(NULL);
+	ImagePropertiesWidget* imagePropertiesWidget = new ImagePropertiesWidget(mPatientModelService, NULL);
 	shadingLayput->addWidget(imagePropertiesWidget, 5, 0, 1, 2);
   mLayout->addLayout(shadingLayput);
 	mLayout->addStretch(1);
@@ -96,7 +98,7 @@ void ShadingWidget::init()
 
 void ShadingWidget::shadingToggledSlot(bool val)
 {
-  ImagePtr image = dataManager()->getActiveImage();
+  ImagePtr image = mPatientModelService->getActiveImage();
   if (image)
   {
     image->setShadingOn(val);
@@ -105,7 +107,7 @@ void ShadingWidget::shadingToggledSlot(bool val)
 
 void ShadingWidget::activeImageChangedSlot()
 {
-  ImagePtr activeImage = dataManager()->getActiveImage();
+  ImagePtr activeImage = mPatientModelService->getActiveImage();
 
   if (activeImage)
   {
@@ -116,13 +118,14 @@ void ShadingWidget::activeImageChangedSlot()
 
 QString ShadingWidget::defaultWhatsThis() const
 {
-	return "<html>"
-		"<h3>Shading</h3>"
-		"<p>"
-		"Set volume shading properties."
-		"</p>"
-		"<p><i></i></p>"
-		"</html>";
+	return "";
+//	return "<html>"
+//		"<h3>Shading</h3>"
+//		"<p>"
+//		"Set volume shading properties."
+//		"</p>"
+//		"<p><i></i></p>"
+//		"</html>";
 }
 
 }//namespace cx

@@ -58,7 +58,7 @@ class cxPluginAlgorithm_EXPORT AllFiltersWidget : public BaseWidget
 {
 	Q_OBJECT
 public:
-	AllFiltersWidget(QWidget* parent);
+	AllFiltersWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent);
 	QString defaultWhatsThis() const;
 
 private slots:

@@ -46,17 +46,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QAction;
 class QMenu;
 class QActionGroup;
-
-namespace cx
-{
-class GUIExtenderService;
-
-class ConsoleWidget;
-}
+class QDockWidget;
+class QScrollArea;
 
 namespace cx
 {
 class LayoutData;
+class GUIExtenderService;
+class ConsoleWidget;
+class DockWidgets;
 typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
 typedef boost::shared_ptr<class LayoutInteractor> LayoutInteractorPtr;
 
@@ -131,8 +129,9 @@ protected slots:
 	void shootWindow();
 	void recordFullscreen();
 
-	//debug mode
 	void toggleDebugModeSlot(bool checked);
+	void dockWidgetVisibilityChanged(bool val);
+	void focusChanged(QWidget * old, QWidget * now);
 
 	void startupLoadPatient();
 
@@ -144,6 +143,7 @@ protected:
 	void changeEvent(QEvent * event);
 
 private:
+	void focusInsideDockWidget(QObject* dockWidget);
 	LayoutInteractorPtr mLayoutInteractor;
 	void saveScreenShot(QPixmap pixmap, QString id="");
 	void saveScreenShotThreaded(QImage pixmap, QString filename);
@@ -152,14 +152,15 @@ private:
 	void createMenus(); ///< creates and add (gui-)menues
 	void createToolBars(); ///< creates and adds toolbars for convenience
 
-	QWidget* addAsDockWidget(QWidget* widget, QString groupname = "");
 	void registerToolBar(QToolBar* toolbar, QString groupname = "");
 	void addToWidgetGroupMap(QAction* action, QString groupname);
 	void addGUIExtender(GUIExtenderService* service);
+	QWidget *addCategorizedWidget(GUIExtenderService::CategorizedWidget categorizedWidget);
 	void removeGUIExtender(GUIExtenderService* service);
 	void setupGUIExtenders();
 
 	void closeEvent(QCloseEvent *event);///< Save geometry and window state at close
+	QDockWidget* addAsDockWidget(QWidget* widget, QString groupname);
 
 	//menus
 	QMenu* mCustusXMenu; ///< Application menu
@@ -235,8 +236,14 @@ private:
 
 	//Preferences
 	CameraControlPtr mCameraControl;
-	std::set<QDockWidget*> mDockWidgets;
+
+	DockWidgets* mDockWidgets;
+
+	PatientModelServicePtr mPatientModelService;
+	VisualizationServicePtr mVisualizationService;
+	VideoServicePtr mVideoService;
 };
+
 }//namespace cx
 
 #endif /* CXMAINWINDOW_H_ */

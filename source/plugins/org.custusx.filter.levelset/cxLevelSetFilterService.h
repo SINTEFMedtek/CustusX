@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxFilterImpl.h"
 #include "cxVector3D.h"
 #include "org_custusx_filter_levelset_Export.h"
+class ctkPluginContext;
 
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
@@ -47,6 +48,7 @@ class org_custusx_filter_levelset_EXPORT LevelSetFilter: public FilterImpl
 Q_OBJECT
 
 public:
+	LevelSetFilter(ctkPluginContext *pluginContext);
 	virtual ~LevelSetFilter()
 	{
 	}

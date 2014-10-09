@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLevelSetFilterService.h"
 
 
+#include <ctkPluginContext.h>
 #include "cxTime.h"
 #include "cxMesh.h"
 #include "cxTypeConversions.h"
@@ -64,9 +65,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "HelperFunctions.hpp"
 #include "cxLegacySingletons.h"
 #include "cxSpaceProvider.h"
+#include "cxPatientModelServiceProxy.h"
 
 namespace cx
 {
+
+LevelSetFilter::LevelSetFilter(ctkPluginContext *pluginContext) :
+	FilterImpl(PatientModelServicePtr(new PatientModelServiceProxy(pluginContext)))
+{
+}
 
 QString LevelSetFilter::getName() const
 {
@@ -315,7 +322,7 @@ void LevelSetFilter::createInputTypes()
 {
 	SelectDataStringDataAdapterBasePtr temp;
 
-	temp = SelectImageStringDataAdapter::New();
+	temp = SelectImageStringDataAdapter::New(mPatientModelService);
 	temp->setValueName("Input");
 	temp->setHelp("Select image input for thresholding");
 	mInputTypes.push_back(temp);
@@ -325,12 +332,12 @@ void LevelSetFilter::createOutputTypes()
 {
 	SelectDataStringDataAdapterBasePtr temp;
 
-	temp = SelectDataStringDataAdapter::New();
+	temp = SelectDataStringDataAdapter::New(mPatientModelService);
 	temp->setValueName("Output");
 	temp->setHelp("Output segmented binary image");
 	mOutputTypes.push_back(temp);
 
-	temp = SelectDataStringDataAdapter::New();
+	temp = SelectDataStringDataAdapter::New(mPatientModelService);
 	temp->setValueName("Contour");
 	temp->setHelp("Output contour generated from thresholded binary image.");
 	mOutputTypes.push_back(temp);

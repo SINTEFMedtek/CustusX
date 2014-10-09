@@ -138,7 +138,7 @@ class cxStateService_EXPORT StateService: public QObject
 Q_OBJECT
 
 public:
-	static StateServicePtr create(StateServiceBackendPtr backend);
+	static StateServicePtr create(VideoServicePtr videoService, StateServiceBackendPtr backend);
 	virtual ~StateService();
 
 //	static StateService* createInstance(StateServiceBackendPtr backend);
@@ -159,7 +159,7 @@ public:
 private:
 	StateService();
 
-	void initialize(StateServiceBackendPtr backend); ///< init stuff that is dependent of the statemanager
+	void initialize(VideoServicePtr videoService, StateServiceBackendPtr backend); ///< init stuff that is dependent of the statemanager
 	void fillDefaultSettings();
 	template<class T>
 	void fillDefault(QString name, T value);

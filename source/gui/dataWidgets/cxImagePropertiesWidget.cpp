@@ -34,15 +34,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QComboBox>
 #include <QVBoxLayout>
-#include "cxDataManager.h"
 #include "cxImage.h"
-#include "cxLegacySingletons.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
 
-ImagePropertiesWidget::ImagePropertiesWidget(QWidget* parent) :
-		BaseWidget(parent, "ImagePropertiesWidget", "Image Properties")
+ImagePropertiesWidget::ImagePropertiesWidget(PatientModelServicePtr patientModelService, QWidget* parent) :
+		BaseWidget(parent, "ImagePropertiesWidget", "Image Properties"),
+		mPatientModelService(patientModelService)
 {
 	mInterpolationType = new QComboBox(this);
 	mInterpolationType->insertItem(0, "Nearest");
@@ -52,7 +52,7 @@ ImagePropertiesWidget::ImagePropertiesWidget(QWidget* parent) :
 
 	connect(mInterpolationType, SIGNAL(currentIndexChanged(int)), this, SLOT(interpolationTypeChanged(int)));
 
-	mActiveImageProxy = ActiveImageProxy::New(dataService());
+	mActiveImageProxy = ActiveImageProxy::New(patientModelService);
 	connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
 
 	QLabel* interpolationTypeLabel = new QLabel("Volume interpolation type", this);
@@ -64,14 +64,14 @@ ImagePropertiesWidget::ImagePropertiesWidget(QWidget* parent) :
 
 void ImagePropertiesWidget::interpolationTypeChanged(int index)
 {
-	ImagePtr image = dataManager()->getActiveImage();
+	ImagePtr image = mPatientModelService->getActiveImage();
 	if (image)
 		image->setInterpolationType(index);
 }
 
 void ImagePropertiesWidget::activeImageChangedSlot()
 {
-	ImagePtr activeImage = dataManager()->getActiveImage();
+	ImagePtr activeImage = mPatientModelService->getActiveImage();
 	if (activeImage)
 	{
 		mInterpolationType->setCurrentIndex(activeImage->getInterpolationType());

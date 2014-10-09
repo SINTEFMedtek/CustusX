@@ -45,13 +45,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationTransform.h"
 #include "cxAcquisitionData.h"
 #include "cxLandmark.h"
-#include "cxRegistrationService.h"
-#include "cxServiceTrackerListener.h"
+class ctkPluginContext;
 
 namespace cx
 {
 class Reporter;
 typedef boost::shared_ptr<class RegistrationManager> RegistrationManagerPtr;
+typedef boost::shared_ptr<class RegistrationService> RegistrationServicePtr;
 
 /**
  * \file
@@ -72,7 +72,7 @@ class cxPluginRegistration_EXPORT RegistrationManager : public QObject
   Q_OBJECT
 
 public:
-  RegistrationManager(AcquisitionDataPtr acquisitionData, ctkPluginContext* pluginContext); ///< use getInstance instead
+	RegistrationManager(RegistrationServicePtr registrationService, AcquisitionDataPtr acquisitionData); ///< use getInstance instead
   virtual ~RegistrationManager() {} ///< destructor
 
   typedef std::pair<QString, bool> StringBoolPair; ///< name and if the point is active or not
@@ -112,36 +112,15 @@ protected:
   void addXml(QDomNode& parentNode); ///< adds xml information about the registrationmanger and its variabels
   void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of the RegistrationManager.
 
-  Transform3D performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr target, bool* ok) const;
-  vtkPointsPtr convertTovtkPoints(const std::vector<QString>& uids, const LandmarkMap& data, Transform3D M);
-  std::vector<Vector3D> convertAndTransformToPoints(const std::vector<QString>& uids, const LandmarkMap& data, Transform3D M);
-  std::vector<Vector3D> convertVtkPointsToPoints(vtkPointsPtr base);
-  std::vector<QString> getUsableLandmarks(const LandmarkMap& data_a, const LandmarkMap& data_b);
-//  void updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data, QString masterFrame);
-  void writePreLandmarkRegistration(QString name, LandmarkMap landmarks);
-
-//  DataPtr mFixedData; ///< the data that shouldn't update its matrices during a registrations
-//  DataPtr mMovingData; ///< the data that should update its matrices during a registration
-
-//  QDateTime mLastRegistrationTime; ///< last timestamp for registration during this session. All registrations in one session results in only one reg transform.
-
 	AcquisitionDataPtr mAcquisitionData;
 
 private:
   RegistrationManager(RegistrationManager const&); ///< not implemented
   RegistrationManager& operator=(RegistrationManager const&); ///< not implemented
 
-  void onServiceAdded(RegistrationService *service);
-  void onServiceRemoved(RegistrationService *service);
-
-  boost::shared_ptr<ServiceTrackerListener<RegistrationService> > mServiceListener;
-  RegistrationServicePtr mRegistrationService;
-  ctkPluginContext* mPluginContext;
+	RegistrationServicePtr mRegistrationService;
 };
 
-/**Shortcut for accessing the registrationmanager instance.
- */
-//RegistrationManager* registrationManager();
 
 /**
  * @}

@@ -39,7 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLabeledComboBoxWidget.h"
 #include "cxLabeledLineEditWidget.h"
 #include "cxImage.h"
-#include "cxDataManager.h"
 #include "cxTransferFunctionWidget.h"
 #include "cxCroppingWidget.h"
 #include "cxClippingWidget.h"
@@ -50,6 +49,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVolumeInfoWidget.h"
 #include "cxVolumeHelpers.h"
 #include "cxTypeConversions.h"
+#include "cxHelpServiceProxy.h"
+#include "cxLogicManager.h"
 
 namespace cx
 {
@@ -58,12 +59,12 @@ namespace cx
 /// -------------------------------------------------------
 /// -------------------------------------------------------
 
-ActiveVolumeWidget::ActiveVolumeWidget(QWidget* parent) :
+ActiveVolumeWidget::ActiveVolumeWidget(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget* parent) :
   BaseWidget(parent, "ActiveVolumeWidget", "Active Volume")
 {
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->setMargin(0);
-  layout->addWidget(new DataSelectWidget(this, ActiveImageStringDataAdapter::New()));
+	layout->addWidget(new DataSelectWidget(visualizationService, patientModelService, this, ActiveImageStringDataAdapter::New(patientModelService)));
 }
 
 QString ActiveVolumeWidget::defaultWhatsThis() const
@@ -79,25 +80,27 @@ QString ActiveVolumeWidget::defaultWhatsThis() const
 /// -------------------------------------------------------
 /// -------------------------------------------------------
 
-VolumePropertiesWidget::VolumePropertiesWidget(QWidget* parent) :
+VolumePropertiesWidget::VolumePropertiesWidget(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget *parent) :
 		TabbedWidget(parent, "VolumePropertiesWidget", "Volume Properties")
 {
-	this->insertWidgetAtTop(new ActiveVolumeWidget(this));
+	this->insertWidgetAtTop(new ActiveVolumeWidget(patientModelService, visualizationService, this));
+	HelpServiceProxy(LogicManager::getInstance()->getPluginContext())->registerWidget(this, "property_widgets_volume");
 
-	this->addTab(new VolumeInfoWidget(this), "Info");
-	this->addTab(new TransferFunctionWidget(this), QString("Transfer Functions"));
-	this->addTab(new ShadingWidget(this), "Shading");
+	this->addTab(new VolumeInfoWidget(patientModelService, this), "Info");
+	this->addTab(new TransferFunctionWidget(patientModelService, this), QString("Transfer Functions"));
+	this->addTab(new ShadingWidget(patientModelService, this), "Shading");
 	this->addTab(new CroppingWidget(this), "Crop");
-	this->addTab(new ClippingWidget(this), "Clip");
+	this->addTab(new ClippingWidget(patientModelService, this), "Clip");
 }
 
 QString VolumePropertiesWidget::defaultWhatsThis() const
 {
-  return "<html>"
-      "<h3>Volume properties</h3>"
-      "<p>Displays and adjusts information about a selected volume.</p>"
-      "<p><i>Click the tabs to see what properties can be changed.</i></p>"
-      "</html>";
+	return "";
+//  return "<html>"
+//      "<h3>Volume properties</h3>"
+//      "<p>Displays and adjusts information about a selected volume.</p>"
+//      "<p><i>Click the tabs to see what properties can be changed.</i></p>"
+//      "</html>";
 }
 
 }//namespace

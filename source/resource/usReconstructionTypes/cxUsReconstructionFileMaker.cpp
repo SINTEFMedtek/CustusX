@@ -240,7 +240,7 @@ bool UsReconstructionFileMaker::writeUSTimestamps(QString reconstructionFolder, 
  */
 void UsReconstructionFileMaker::writeProbeConfiguration(QString reconstructionFolder, QString session, ProbeDefinition data, QString uid)
 {
-	XmlOptionFile file = XmlOptionFile(reconstructionFolder + "/" + session + ".probedata.xml", "navnet");
+	XmlOptionFile file = XmlOptionFile(reconstructionFolder + "/" + session + ".probedata.xml");
 	data.addXml(file.getElement("configuration"));
 	file.getElement("tool").toElement().setAttribute("toolID", uid);
 	file.save();

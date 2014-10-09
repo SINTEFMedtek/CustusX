@@ -42,24 +42,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 #include <vtkTransform.h>
-//#include <vtkPolyData.h>
 #include <vtkAbstractVolumeMapper.h>
 #include <vtkVolumeMapper.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
 #include <vtkImageData.h>
-#include "cxTypeConversions.h"
-#include "cxRepManager.h"
-#include "cxDataManager.h"
+#include <vtkCommand.h>
 #include <vtkBoxWidget2.h>
 #include <vtkBoxWidget.h>
+#include "cxTypeConversions.h"
+#include "cxRepManager.h"
 #include "cxBoundingBox3D.h"
 #include "cxImage.h"
 #include "cxTransform3D.h"
 #include "cxVolumetricRep.h"
-#include "cxActiveImageProxy.h"
 #include "cxVisualizationServiceBackend.h"
-#include <vtkCommand.h>
+#include "cxPatientModelService.h"
+
+// This class is used from ViewManager constructor, so patientModelService can't be used
+//TODO: Use ActiveImageProxy when possible, and use patientModelService instead of VisualizationServiceBackend
+#include "cxActiveImageProxyOld.h"
+#include "cxDataManager.h"
 
 namespace cx
 {
@@ -115,10 +118,11 @@ public:
 //---------------------------------------------------------
 
 
-InteractiveCropper::InteractiveCropper(VisualizationServiceBackendPtr backend) :
+InteractiveCropper::InteractiveCropper(VisualizationServiceBackendPtr backend/*PatientModelServicePtr patientModelService*/) :
 	mBackend(backend)
+//	mPatientModelService(patientModelService)
 {
-	mActiveImageProxy = ActiveImageProxy::New(mBackend->getDataManager());
+	mActiveImageProxy = ActiveImageProxyOld::New(mBackend->getDataManager());
 	connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(imageChangedSlot()));
 	connect(mActiveImageProxy.get(), SIGNAL(cropBoxChanged()), this, SLOT(imageCropChangedSlot()));
 }
@@ -240,6 +244,7 @@ void InteractiveCropper::resetBoundingBox()
 
 void InteractiveCropper::imageChangedSlot()
 {
+//	mImage = mPatientModelService->getActiveImage();
 	mImage = mBackend->getDataManager()->getActiveImage();
 
 	this->imageCropChangedSlot();

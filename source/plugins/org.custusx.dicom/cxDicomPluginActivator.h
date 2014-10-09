@@ -40,8 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-
 typedef boost::shared_ptr<class DicomGUIExtenderService> DicomGUIExtenderServicePtr;
+typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
 
 /**
  * Activator for the dicom plugin
@@ -66,8 +66,7 @@ public:
   void stop(ctkPluginContext* context);
 
 private:
-  ctkPluginContext* mContext;
-  DicomGUIExtenderServicePtr mDicomPlugin;
+  RegisteredServicePtr mRegistration;
 };
 
 } // namespace cx

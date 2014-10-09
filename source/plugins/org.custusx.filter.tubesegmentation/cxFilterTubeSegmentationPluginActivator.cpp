@@ -36,42 +36,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 
 #include "cxTubeSegmentationFilterService.h"
+#include "cxRegisteredService.h"
 
 namespace cx
 {
 
 FilterTubeSegmentationPluginActivator::FilterTubeSegmentationPluginActivator()
-: mContext(0)
 {
 }
 
 FilterTubeSegmentationPluginActivator::~FilterTubeSegmentationPluginActivator()
 {
-
 }
 
 void FilterTubeSegmentationPluginActivator::start(ctkPluginContext* context)
 {
-	this->mContext = context;
-
-	mPlugin.reset(new TubeSegmentationFilter);
-	try
-	{
-		mRegistration = context->registerService(QStringList(FilterService_iid), mPlugin.get());
-	}
-	catch(ctkRuntimeException& e)
-	{
-		std::cout << e.what() << std::endl;
-		mPlugin.reset();
-	}
+	mRegistration = RegisteredService::create<TubeSegmentationFilter>(context, FilterService_iid);
 }
 
 void FilterTubeSegmentationPluginActivator::stop(ctkPluginContext* context)
 {
-	mRegistration.unregister();
-	if(mPlugin)
-		mPlugin.reset();
-	Q_UNUSED(context)
+	mRegistration.reset();
+	Q_UNUSED(context);
 }
 
 } // namespace cx

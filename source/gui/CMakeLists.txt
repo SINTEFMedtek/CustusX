@@ -8,7 +8,6 @@ cx_add_class_qt_moc(cxGui_SRCS
 	dataAdapters/cxShadingParamsInterfaces
 	dataAdapters/cxToolDataAdapters
 	dataAdapters/cxDoubleDataAdapterTemporalCalibration
-	dataAdapters/cxSelectDataStringDataAdapter
 	dataAdapters/cxOptionsWidget
     #----------------------
 	dataWidgets/cxVolumePropertiesWidget
@@ -83,6 +82,7 @@ cx_add_class_qt_moc(cxGui_SRCS
 cx_add_class(cxGui_SRCS
 	${cxGui_SRCS}
 	dataAdapters/cxDataAdapterHelper
+	utilities/cxDockWidgets
 	)
 
 set(SUB_FOLDERS

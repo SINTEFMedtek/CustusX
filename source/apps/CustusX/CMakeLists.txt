@@ -31,8 +31,9 @@ include_directories(
     ${CustusX_BINARY_DIR}/source/modules/Algorithm
     ${CustusX_SOURCE_DIR}/source/modules/Registration/gui
     ${CustusX_BINARY_DIR}/source/modules/Registration
-	${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
+    ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
 	${CustusX_BINARY_DIR}/source/resource
+	${CustusX_SOURCE_DIR}/source/resource/visualization
 	)
 
 #------------------------------------------------------------------------------
@@ -88,3 +89,9 @@ install(TARGETS CustusX
 	RUNTIME DESTINATION ${CX_INSTALL_ROOT_DIR}/bin)
 # Perform full install of package, including config and docs:
 include(cxInstallCustusX)
+
+
+#execute_process(COMMAND ${QT_QCOLLECTIONGENERATOR_EXECUTABLE}
+#				${CustusX_SOURCE_DIR}/documentation/wateringmachine.qhcp -o ${CustusX_BINARY_DIR}/documentation/wateringmachine.qhc
+#				WORKING_DIRECTORY ${CustusX_SOURCE_DIR}/documentation)
+

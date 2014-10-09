@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVideoConnectionManager.h"
 #include "cxToolManager.h"
 #include "cxViewManager.h"
-#include "cxVideoService.h"
+#include "cxVideoServiceOld.h"
 #include "boost/bind.hpp"
 #include <QMetaMethod>
 #include "libQtSignalAdapters/Qt2Func.h"

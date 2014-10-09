@@ -37,19 +37,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPushButton>
 #include "cxVideoSource.h"
 #include "cxStringDataAdapterXml.h"
-#include "cxVideoService.h"
+#include "cxVideoServiceOld.h"
 #include "cxVideoConnectionManager.h"
 #include "cxtestQueuedSignalListener.h"
 #include "cxtestUtilities.h"
-#include "cxDataManager.h"
-#include "cxLegacySingletons.h"
 #include "cxImage.h"
+#include "cxPatientModelService.h"
+
+//TODO: remove
+#include "cxLegacySingletons.h"
 
 namespace cxtest
 {
 
-TestVideoConnectionWidget::TestVideoConnectionWidget() :
-		VideoConnectionWidget(NULL)
+TestVideoConnectionWidget::TestVideoConnectionWidget(cx::VisualizationServicePtr visualizationService, cx::PatientModelServicePtr patientModelService, cx::VideoServicePtr videoService) :
+	VideoConnectionWidget(visualizationService, patientModelService, videoService, NULL)
 {
 }
 
@@ -78,8 +80,8 @@ bool TestVideoConnectionWidget::canStream(QString filename, QString streamerType
 void TestVideoConnectionWidget::setupWidgetToRunStreamer(QString filename, QString streamerType)
 {
 	cx::ImagePtr image = Utilities::create3DImage();
-	cx::dataService()->setActiveImage(image);
-	cx::dataService()->loadData(image);
+	this->mPatientModelService->setActiveImage(image);
+	this->mPatientModelService->loadData(image);
 
 	QString connectionMethod("Direct Link");
 	mConnectionSelector->setValue(connectionMethod);

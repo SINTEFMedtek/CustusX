@@ -2,38 +2,29 @@
 ##               Resource plugin utilities
 ###########################################################
 
-SET( CX_QT_MOC_HEADER_FILES
-)
+cx_create_export_header("cxResourcePluginUtilities")
 
-SET (cxPluginUtilities_SOURCE
-    cxServiceTrackerCustomizer.h
+include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
+
+set(SOURCE_FILES )
+cx_add_class_qt_moc(SOURCE_FILES
+	)
+cx_add_class(SOURCE_FILES
+	cxServiceTrackerCustomizer.h
     cxServiceTrackerListener.h
-)
+    cxRegisteredService
+    )    
 
-#include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
-include_directories(
-    #${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
-    #.
-    #${CustusX_SOURCE_DIR}/source/service/patient     
-    #${CustusX_SOURCE_DIR}/source/service/tracking     
-    #${CustusX_SOURCE_DIR}/source/service/visualization
-    #${CustusX_SOURCE_DIR}/source/service/video
-    #${CustusX_SOURCE_DIR}/source/service/state
+
+set (LIBRARIES
+    ${SSC_GCOV_LIBRARY}
+    Qt5::Widgets
+    cxResource
+    CTKPluginFramework
     )
+    
+add_library (cxPluginUtilities ${SOURCE_FILES})
+target_link_libraries(cxPluginUtilities ${LIBRARIES} )
 
-
-#QT5_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
-
-#ADD_LIBRARY ( cxPluginUtilities ${cxPluginUtilities_SOURCE} ${MOC_HEADER_FILES} )
-
-#target_link_libraries(cxPluginUtilities
-    #CTKPluginFramework
-    #cxResource
-    #cxPatientService
-    #cxTrackingService
-    #cxVisualizationService
-    #cxVideoService
-    #cxStateService
-#    )
 
 

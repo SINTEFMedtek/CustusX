@@ -40,9 +40,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDefinitionStrings.h"
 #include "cxInteractiveClipper.h"
 #include "cxViewManager.h"
-#include "cxDataManager.h"
 #include "cxSelectDataStringDataAdapter.h"
 #include "cxImage.h"
+#include "cxLegacySingletons.h"
+#include "cxPatientModelService.h"
+#include "cxHelpServiceProxy.h"
+#include "cxLogicManager.h"
+
 namespace cx
 {
 
@@ -86,13 +90,16 @@ QStringList ClipPlaneStringDataAdapter::getValueRange() const
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
-ClippingWidget::ClippingWidget(QWidget* parent) :
-	BaseWidget(parent, "ClippingWidget", "Clip")
+ClippingWidget::ClippingWidget(PatientModelServicePtr patientModelService, QWidget* parent) :
+	BaseWidget(parent, "ClippingWidget", "Clip"),
+	mPatientModelService(patientModelService)
 {
+	HelpServiceProxy(LogicManager::getInstance()->getPluginContext())->registerWidget(this, "property_widgets_volume_clipping");
+
 	mInteractiveClipper = viewManager()->getClipper();
 	connect(mInteractiveClipper.get(), SIGNAL(changed()), this, SLOT(clipperChangedSlot()));
 
-	mImageAdapter = SelectImageStringDataAdapter::New();
+	mImageAdapter = SelectImageStringDataAdapter::New(patientModelService);
 	LabeledComboBoxWidget* imageCombo = new LabeledComboBoxWidget(this, mImageAdapter);
 	connect(mImageAdapter.get(), SIGNAL(changed()), this, SLOT(imageChangedSlot()));
 
@@ -162,7 +169,7 @@ void ClippingWidget::clipperChangedSlot()
 
 void ClippingWidget::imageChangedSlot()
 {
-	mInteractiveClipper->setImage(dataManager()->getImage(mImageAdapter->getValue()));
+	mInteractiveClipper->setImage(mPatientModelService->getImage(mImageAdapter->getValue()));
 }
 
 void ClippingWidget::clearButtonClickedSlot()

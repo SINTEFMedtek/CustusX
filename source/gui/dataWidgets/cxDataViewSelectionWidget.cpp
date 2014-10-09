@@ -51,6 +51,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"
 
+//TODO: remove
+#include "cxLegacySingletons.h"
+
 namespace cx
 {
 
@@ -534,15 +537,8 @@ DataViewSelectionWidget::DataViewSelectionWidget(QWidget* parent)
   allLayout->addWidget(mAllDataListWidget);
   layout->addLayout(allLayout);
 
-//  layout->addLayout(selLayout);
-//  layout->addLayout(allLayout);
-
   connect(viewManager(), SIGNAL(activeViewChanged()), this, SLOT(viewGroupChangedSlot()));
   this->viewGroupChangedSlot();
-//  if (!viewManager()->getViewGroups().empty())
-//    mSelectedDataListWidget->setViewGroupData(viewManager()->getViewGroups()[0]->getData());
-//  //nt ViewManager::getActiveViewGroup() const
-//  //void DataViewSelectionWidget::activeViewChanged
 }
 
 void DataViewSelectionWidget::viewGroupChangedSlot()

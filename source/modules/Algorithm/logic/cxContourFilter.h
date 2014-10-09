@@ -53,6 +53,7 @@ class cxPluginAlgorithm_EXPORT ContourFilter : public FilterImpl
 	Q_OBJECT
 
 public:
+	ContourFilter(PatientModelServicePtr patientModelService);
 	virtual ~ContourFilter() {}
 
 	virtual QString getType() const;

@@ -62,7 +62,7 @@ class cxPluginRegistration_EXPORT ElastixManager : public QObject
 {
 	Q_OBJECT
 public:
-	ElastixManager(RegistrationManagerPtr regManager);
+	ElastixManager(RegistrationServicePtr registrationService);
 	virtual ~ElastixManager();
 
 	BoolDataAdapterXmlPtr getDisplayProcessMessages() { return mDisplayProcessMessages; }
@@ -80,11 +80,11 @@ private slots:
 private:
 	void addNonlinearData();
 
-	RegistrationManagerPtr mRegistrationManager;
 	ElastixParametersPtr mParameters;
 	XmlOptionFile mOptions;
 	BoolDataAdapterXmlPtr mDisplayProcessMessages;
 	ElastixExecuterPtr mExecuter;
+	RegistrationServicePtr mRegistrationService;
 };
 typedef boost::shared_ptr<ElastixManager> ElastixManagerPtr;
 

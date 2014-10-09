@@ -61,8 +61,8 @@ class cxTrackingService_EXPORT ManualToolAdapter : public ManualTool
 {
 	Q_OBJECT
 public:
-	explicit ManualToolAdapter(TrackingServicePtr manager, QString uid);
-	explicit ManualToolAdapter(TrackingServicePtr manager, ToolPtr base);
+	explicit ManualToolAdapter(TrackingServiceOldPtr manager, QString uid);
+	explicit ManualToolAdapter(TrackingServiceOldPtr manager, ToolPtr base);
 	virtual ~ManualToolAdapter();
 
 	virtual std::set<Type> getTypes() const;

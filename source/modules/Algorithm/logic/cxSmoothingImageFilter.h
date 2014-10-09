@@ -51,6 +51,7 @@ class cxPluginAlgorithm_EXPORT SmoothingImageFilter : public FilterImpl
 	Q_OBJECT
 
 public:
+	SmoothingImageFilter(PatientModelServicePtr patientModelService);
 	virtual ~SmoothingImageFilter() {}
 
 	virtual QString getType() const;

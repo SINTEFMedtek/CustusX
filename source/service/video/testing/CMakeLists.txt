@@ -13,7 +13,7 @@
 # See CustusX_License.txt for more information.
 
 ###########################################################
-#               cxVideoService Tests
+#               cxVideoServiceOld Tests
 ###########################################################
 
 if (BUILD_TESTING)
@@ -32,6 +32,6 @@ if (BUILD_TESTING)
 	    #cxtestSimulatedImageStreamerFixture.cpp
 	    )
 
-	cx_catch_add_lib_and_exe(cxVideoService "${CXTEST_VIDEOSERVICE_SOURCES}" "${CXTEST_SOURCES_TO_MOC}")
+	cx_catch_add_lib_and_exe(cxVideoServiceOld "${CXTEST_VIDEOSERVICE_SOURCES}" "${CXTEST_SOURCES_TO_MOC}")
 
 endif (BUILD_TESTING)

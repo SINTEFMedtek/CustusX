@@ -35,11 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPluginRegistrationExport.h"
 
 #include <map>
-//#include "cxVolumetricRep.h"
-#include "cxLandmark.h"
 #include "cxTransform3D.h"
 #include "cxRegistrationBaseWidget.h"
-#include "cxActiveImageProxy.h"
 
 
 class QVBoxLayout;
@@ -51,6 +48,7 @@ class QSlider;
 
 namespace cx
 {
+typedef std::map<QString, class Landmark> LandmarkMap;
 typedef boost::shared_ptr<class RegistrationManager> RegistrationManagerPtr;
 
 /**
@@ -68,7 +66,7 @@ class cxPluginRegistration_EXPORT LandmarkRegistrationWidget: public Registratio
 Q_OBJECT
 
 public:
-	LandmarkRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent, QString objectName,
+	LandmarkRegistrationWidget(RegistrationServicePtr registrationService, QWidget* parent, QString objectName,
 		QString windowTitle);
 	virtual ~LandmarkRegistrationWidget();
 

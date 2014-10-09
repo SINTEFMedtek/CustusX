@@ -43,10 +43,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-PlateRegistrationWidget::PlateRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent) :
-    RegistrationBaseWidget(regManager, parent, "PlateRegistrationWidget", "Plate Registration"),
+PlateRegistrationWidget::PlateRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent) :
+		RegistrationBaseWidget(registrationService, parent, "PlateRegistrationWidget", "Plate Registration"),
     mPlateRegistrationButton(new QPushButton("Load registration points", this)),
-    mReferenceToolInfoLabel(new QLabel("", this))
+		mReferenceToolInfoLabel(new QLabel("", this)),
+		mPatientModelService(patientModelService)
 {
   connect(mPlateRegistrationButton, SIGNAL(clicked()), this, SLOT(plateRegistrationSlot()));
   connect(toolManager(), SIGNAL(configured()), this, SLOT(internalUpdate()));
@@ -93,12 +94,12 @@ void PlateRegistrationWidget::hideEvent(QHideEvent* event)
 
 void PlateRegistrationWidget::landmarkUpdatedSlot()
 {
-  mManager->doFastRegistration_Translation();
+	mRegistrationService->doFastRegistration_Translation();
 }
 
 void PlateRegistrationWidget::plateRegistrationSlot()
 {
-  dataManager()->getPatientLandmarks()->clear();
+	mPatientModelService->getPatientLandmarks()->clear();
 
   ToolPtr refTool = toolManager()->getReferenceTool();
   if(!refTool)//cannot register without a reference tool

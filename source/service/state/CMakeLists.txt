@@ -12,7 +12,6 @@ SET( CX_QT_MOC_HEADER_FILES
 	cxApplicationStateMachine.h
 	cxApplicationState.h
 	cxStateService.h
-	cxStateServiceBackend.h
 )
 
 SET ( cxStateService_SOURCE
@@ -27,6 +26,7 @@ SET ( cxStateService_SOURCE
 	cxApplicationState.cpp
 	cxRequestEnterStateTransition.h
 	cxStateServiceBackend.cpp
+	cxStateServiceBackend.h
 )
 
 include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
@@ -48,4 +48,4 @@ QT5_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
 cx_create_export_header("cxStateService")
 add_library( cxStateService ${cxStateService_SOURCE} ${MOC_HEADER_FILES})
-target_link_libraries(cxStateService cxVisualizationService cxVideoService)
+target_link_libraries(cxStateService cxVisualizationService cxVideoServiceOld)

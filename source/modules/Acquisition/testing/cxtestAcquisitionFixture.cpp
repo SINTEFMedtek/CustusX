@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientData.h"
 #include "cxPatientService.h"
 #include "cxDataLocations.h"
-#include "cxVideoService.h"
+#include "cxVideoServiceOld.h"
 #include "cxVideoConnectionManager.h"
 #include "cxReconstructionManager.h"
 #include "cxLogger.h"
@@ -52,6 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogicManager.h"
 #include "cxStateService.h"
 #include "cxLegacySingletons.h"
+#include "cxVideoService.h"
 
 namespace cxtest
 {
@@ -105,7 +106,10 @@ void AcquisitionFixture::setupVideo()
 	connect(mVideoSource.get(), SIGNAL(newFrame()), this, SLOT(newFrameSlot()));
 
 	cx::videoService()->getVideoConnection()->setReconnectInterval(3000); // on slow build servers, a long delay is necessary.
-	cx::videoService()->getVideoConnection()->launchAndConnectServer();
+
+
+	cx::VideoServicePtr videoService = cx::VideoService::getNullObject(); //mock
+	cx::videoService()->getVideoConnection()->launchAndConnectServer(videoService);
 }
 
 void AcquisitionFixture::setupProbe()

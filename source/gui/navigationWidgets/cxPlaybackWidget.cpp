@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPainter>
 #include <QToolTip>
 #include <QMouseEvent>
+#include <QLabel>
 #include "cxToolManager.h"
 #include "cxHelperWidgets.h"
 #include "cxTime.h"
@@ -45,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataManager.h"
 #include "cxData.h"
 #include "cxRegistrationTransform.h"
-#include "cxVideoService.h"
+#include "cxVideoServiceOld.h"
 #include "cxPlaybackUSAcquisitionVideo.h"
 #include "cxSettings.h"
 

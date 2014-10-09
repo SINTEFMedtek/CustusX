@@ -42,6 +42,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx {
 typedef boost::shared_ptr<class DataAdapter> DataAdapterPtr;
+typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
+typedef boost::shared_ptr<class VisualizationService> VisualizationServicePtr;
 
 /**\brief Superclass for all data adapters.
  *

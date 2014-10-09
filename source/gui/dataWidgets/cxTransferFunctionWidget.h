@@ -139,7 +139,7 @@ class cxGui_EXPORT TransferFunction3DWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  TransferFunction3DWidget(QWidget* parent);
+  TransferFunction3DWidget(PatientModelServicePtr patientModelService, QWidget* parent);
   virtual ~TransferFunction3DWidget() {}
   virtual QString defaultWhatsThis() const;
 
@@ -153,6 +153,7 @@ protected:
 //  DoubleDataAdapterImageTFDataBasePtr mDataWindow, mDataAlpha, mDataLLR, mDataLevel;
 
   ActiveImageProxyPtr mActiveImageProxy;
+  PatientModelServicePtr mPatientModelService;
 };
 
 class cxGui_EXPORT TransferFunction2DWidget : public BaseWidget
@@ -160,7 +161,7 @@ class cxGui_EXPORT TransferFunction2DWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  TransferFunction2DWidget(QWidget* parent);
+  TransferFunction2DWidget(PatientModelServicePtr patientModelService, QWidget* parent);
   virtual ~TransferFunction2DWidget() {}
   virtual QString defaultWhatsThis() const;
 
@@ -174,6 +175,7 @@ protected:
   DoubleDataAdapterImageTFDataBasePtr mDataWindow, mDataAlpha, mDataLLR, mDataLevel;
 
   ActiveImageProxyPtr mActiveImageProxy;
+  PatientModelServicePtr mPatientModelService;
 };
 
 
@@ -191,7 +193,7 @@ class cxGui_EXPORT TransferFunctionWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  TransferFunctionWidget(QWidget* parent);
+  TransferFunctionWidget(PatientModelServicePtr patientModelService, QWidget* parent);
   virtual ~TransferFunctionWidget() {}
   virtual QString defaultWhatsThis() const;
 };

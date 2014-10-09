@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxToolManager.h"
 #include "cxDataManager.h"
 #include "cxProbeImpl.h"
-#include "cxVideoService.h"
+#include "cxVideoServiceOld.h"
 #include "cxToolManager.h"
 #include "cxDirectlyLinkedImageReceiverThread.h"
 #include "cxTypeConversions.h"

@@ -36,7 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPluginRegistrationExport.h"
 
 #include "cxGUIExtenderService.h"
-#include <ctkPluginContext.h>
 
 /**
  * \defgroup cx_module_registration Registration Plugin
@@ -68,7 +67,7 @@ class cxPluginRegistration_EXPORT RegistrationPlugin : public GUIExtenderService
 {
 	Q_OBJECT
 public:
-	RegistrationPlugin(AcquisitionDataPtr acquisitionData, ctkPluginContext *pluginContext);
+	RegistrationPlugin(cx::RegistrationServicePtr registrationService, VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, AcquisitionDataPtr acquisitionData);
 	virtual ~RegistrationPlugin() {}
 
 	virtual std::vector<CategorizedWidget> createWidgets() const;
@@ -78,6 +77,10 @@ private slots:
 
 private:
 	RegistrationManagerPtr mRegistrationManager;
+	AcquisitionDataPtr mAquisitionData;
+	RegistrationServicePtr mRegistrationService;
+	VisualizationServicePtr mVisualizationService;
+	PatientModelServicePtr mPatientModelService;
 };
 
 /**

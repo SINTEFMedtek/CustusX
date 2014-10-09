@@ -36,40 +36,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 
 #include "cxPatientModelImplService.h"
+#include "cxRegisteredService.h"
 
 namespace cx
 {
 
 PatientModelPluginActivator::PatientModelPluginActivator()
-: mContext(0)
 {
 }
 
 PatientModelPluginActivator::~PatientModelPluginActivator()
 {
-
 }
 
 void PatientModelPluginActivator::start(ctkPluginContext* context)
 {
-	this->mContext = context;
-
-	mPatientModelService.reset(new cx::PatientModelImplService);
-	try
-	{
-		context->registerService(QStringList(PatientModelService_iid), mPatientModelService.get());
-	}
-	catch(ctkRuntimeException& e)
-	{
-		std::cout << e.what() << std::endl;
-		mPatientModelService.reset();
-	}
+	mRegistration = RegisteredService::create<PatientModelImplService>(context, PatientModelService_iid);
 }
 
 void PatientModelPluginActivator::stop(ctkPluginContext* context)
 {
-	mPatientModelService.reset();
-	Q_UNUSED(context)
+	mRegistration.reset();
+	Q_UNUSED(context);
 }
 
 } // namespace cx

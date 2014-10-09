@@ -38,8 +38,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx {
 
-OptionsWidget::OptionsWidget(QWidget* parent) :
-		mShowAdvanced(false)
+OptionsWidget::OptionsWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent) :
+		mShowAdvanced(false),
+		mVisualizationService(visualizationService),
+		mPatientModelService(patientModelService)
 {
 	this->setSizePolicy(this->sizePolicy().horizontalPolicy(), QSizePolicy::Fixed);
 	mStackedLayout = new QStackedLayout(this);
@@ -147,7 +149,7 @@ void OptionsWidget::populate(bool showAdvanced)
 
 			//make dataadaptewidget and add to existing group
 			blockSignals(true);
-			createDataWidget(groupWidget, mOptions[i], groupLayout, ++itemsInGroup);
+			createDataWidget(mVisualizationService, mPatientModelService, groupWidget, mOptions[i], groupLayout, ++itemsInGroup);
 			blockSignals(false);
 		}
 	}
