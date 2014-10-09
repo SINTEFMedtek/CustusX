@@ -208,4 +208,9 @@ PresetTransferFunctions3DPtr PatientModelImplService::getPresetTransferFunctions
 	return dataService()->getPresetTransferFunctions3D();
 }
 
+void PatientModelImplService::setLandmarkActive(QString uid, bool active)
+{
+	dataService()->setLandmarkActive(uid, active);
+}
+
 } /* namespace cx */

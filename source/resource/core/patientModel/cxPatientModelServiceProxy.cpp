@@ -221,4 +221,9 @@ PresetTransferFunctions3DPtr PatientModelServiceProxy::getPresetTransferFunction
 	return mPatientModelService->getPresetTransferFunctions3D();
 }
 
+void PatientModelServiceProxy::setLandmarkActive(QString uid, bool active)
+{
+	mPatientModelService->setLandmarkActive(uid, active);
+}
+
 } //cx

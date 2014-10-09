@@ -33,14 +33,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxFastImageRegistrationWidget.h"
 
 #include "cxReporter.h"
-#include "cxDataManager.h"
-#include "cxRegistrationManager.h"
+//#include "cxDataManager.h"
+//#include "cxRegistrationManager.h"
+#include "cxPatientModelService.h"
+#include "cxData.h"
+#include "cxImage.h"
 
 namespace cx
 {
 
 FastImageRegistrationWidget::FastImageRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent, QString objectName, QString windowTitle) :
-		LandmarkImageRegistrationWidget(registrationService, patientModelService, parent, objectName, windowTitle)
+	LandmarkImageRegistrationWidget(registrationService, patientModelService, parent, objectName, windowTitle),
+	mPatientModelService(patientModelService)
 {
 }
 
@@ -60,42 +64,15 @@ QString FastImageRegistrationWidget::defaultWhatsThis() const
 
 void FastImageRegistrationWidget::performRegistration()
 {
-  //make sure the masterImage is set
+	//make sure the masterImage is set
 	DataPtr fixedData = mRegistrationService->getFixedData();
-  if(!fixedData)
-		mRegistrationService->setFixedData(dataManager()->getActiveImage());
+	if(!fixedData)
+	{
+		fixedData = mPatientModelService->getActiveImage();
+		mRegistrationService->setFixedData(fixedData);
+	}
 
-  this->updateAvarageAccuracyLabel();
+	this->updateAvarageAccuracyLabel();
 }
-//------------------------------------------------------------------------------
-PlateImageRegistrationWidget::PlateImageRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent) :
-		FastImageRegistrationWidget(registrationService, patientModelService, parent, "PlateImageRegistrationWidget", "Plate Image Registration")
-{
-}
-
-PlateImageRegistrationWidget::~PlateImageRegistrationWidget()
-{}
-
-QString PlateImageRegistrationWidget::defaultWhatsThis() const
-{
-  return "<html>"
-      "<h3>Image registration.</h3>"
-      "<p>Select landmarks in the data set that you want to use for performing plate registration.</p>"
-      "<p><i>Click in the dataset and push the add or resample button.</i></p>"
-      "</html>";
-}
-
-void PlateImageRegistrationWidget::editLandmarkButtonClickedSlot()
-{
-  dataManager()->setLandmarkActive(mActiveLandmark, true);
-  LandmarkImageRegistrationWidget::editLandmarkButtonClickedSlot();
-}
-
-void PlateImageRegistrationWidget::performRegistration()
-{
-  FastImageRegistrationWidget::performRegistration();
-	mRegistrationService->doFastRegistration_Translation();
-}
-//------------------------------------------------------------------------------
 
 }//namespace cx

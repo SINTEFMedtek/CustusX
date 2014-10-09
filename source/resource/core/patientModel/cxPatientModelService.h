@@ -86,8 +86,11 @@ public:
 	virtual void updateRegistration_rMpr(const QDateTime& oldTime, const RegistrationTransform& newTransform) = 0;
 	virtual std::map<QString, DataPtr> getData() const = 0;
 	virtual DataPtr getData(const QString& uid) const = 0;
+
 	virtual LandmarksPtr getPatientLandmarks() const = 0;
 	virtual std::map<QString, LandmarkProperty> getLandmarkProperties() const = 0;
+	virtual void setLandmarkActive(QString uid, bool active) = 0;
+
 	virtual Transform3D get_rMpr() const = 0;
 	virtual ImagePtr getActiveImage() const = 0; ///< used for system state
 	virtual void setActiveImage(ImagePtr activeImage) = 0; ///< used for system state

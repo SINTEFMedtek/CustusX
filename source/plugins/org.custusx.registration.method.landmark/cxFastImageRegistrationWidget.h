@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXFASTIMAGEREGISTRATIONWIDGET_H_
 
 #include "cxPluginRegistrationExport.h"
+#include "org_custusx_registration_method_landmark_Export.h"
 
 #include "cxLandmarkImageRegistrationWidget.h"
 
@@ -52,33 +53,19 @@ namespace cx
  * translation part of the matrix.
  *
  * \date 27. sep. 2010
- * \\author Janne Beate Bakeng
+ * \author Janne Beate Bakeng, SINTEF
  */
-class cxPluginRegistration_EXPORT FastImageRegistrationWidget : public LandmarkImageRegistrationWidget
+class org_custusx_registration_method_landmark_EXPORT FastImageRegistrationWidget : public LandmarkImageRegistrationWidget
 {
 	Q_OBJECT
 public:
-  FastImageRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent, QString objectName, QString windowTitle);
- virtual ~FastImageRegistrationWidget();
- virtual QString defaultWhatsThis() const;
+	FastImageRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent, QString objectName, QString windowTitle);
+	virtual ~FastImageRegistrationWidget();
+	virtual QString defaultWhatsThis() const;
 
 protected:
-  virtual void performRegistration();
-};
-
-class cxPluginRegistration_EXPORT PlateImageRegistrationWidget : public FastImageRegistrationWidget
-{
-	Q_OBJECT
-public:
-	PlateImageRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent);
- virtual ~PlateImageRegistrationWidget();
- virtual QString defaultWhatsThis() const;
-
-protected slots:
- virtual void editLandmarkButtonClickedSlot();
-
-protected:
-  virtual void performRegistration();
+	virtual void performRegistration();
+	PatientModelServicePtr mPatientModelService;
 };
 
 /**

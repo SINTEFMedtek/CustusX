@@ -194,9 +194,15 @@ PresetTransferFunctions3DPtr PatientModelServiceNull::getPresetTransferFunctions
 	return PresetTransferFunctions3DPtr();
 }
 
+void PatientModelServiceNull::setLandmarkActive(QString uid, bool active)
+{
+	printWarning();
+}
+
 void PatientModelServiceNull::printWarning() const
 {
 	reportWarning("Trying to use PatientModelServiceNull. Is PatientModelService (org.custusx.patiemtmodel) disabled?");
 }
+
 
 } // cx
