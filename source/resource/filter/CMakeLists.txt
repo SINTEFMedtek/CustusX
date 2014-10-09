@@ -23,6 +23,8 @@ cx_add_class(CX_RESOURCE_FILTER_FILES
 unset(CX_RESOURCE_FILTER_INCLUDE_DIRECTORIES)
 set(CX_RESOURCE_FILTER_INCLUDE_DIRECTORIES
     ${CX_RESOURCE_INCLUDE_DIRECTORIES}
+    ${CustusX_SOURCE_DIR}/source/resource/filter
+    ${CustusX_BINARY_DIR}/source/resource/filter
     CACHE INTERNAL "Include directories for resource filter library")
 include_directories(${CX_RESOURCE_FILTER_INCLUDE_DIRECTORIES} )
 

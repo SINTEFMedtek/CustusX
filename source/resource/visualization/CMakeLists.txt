@@ -136,7 +136,6 @@ configure_file(Rep/Shaders/glsl/raycasting_shader.vert Rep COPYONLY)
 unset(CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES)
 set(CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES
     ${CX_RESOURCE_INCLUDE_DIRECTORIES}
-    ${CustusX_BINARY_DIR}/source/resource/visualization
     ${CustusX_SOURCE_DIR}/source/resource/visualization
     ${CustusX_SOURCE_DIR}/source/resource/visualization/Rep
     ${CustusX_SOURCE_DIR}/source/resource/visualization/Rep2D
@@ -145,7 +144,7 @@ set(CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES
     ${CustusX_SOURCE_DIR}/source/resource/visualization/Primitives
 	${CustusX_SOURCE_DIR}/source/resource/visualization/View
 
-	${CustusX_BINARY_DIR}/source/service/visualization
+	${CustusX_BINARY_DIR}/source/resource/visualization
 	CACHE INTERNAL "Include directories for resource visualization library")
 
 include_directories(${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}

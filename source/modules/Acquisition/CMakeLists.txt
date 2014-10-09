@@ -57,7 +57,6 @@ SET( SOURCE_FILES
 # =========================================================
 
 include_directories(
-    ${CX_RESOURCE_INCLUDE_DIRECTORIES}
     ${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
     ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
     ${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
@@ -76,20 +75,15 @@ include_directories(
     ${CustusX_SOURCE_DIR}/source/modules/Algorithm/gui
     ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
 
-    ${CustusX_SOURCE_DIR}/source/algorithms
+#    ${CustusX_SOURCE_DIR}/source/algorithms
     ${CustusX_SOURCE_DIR}/source/gui/utilities
     ${CustusX_SOURCE_DIR}/source/gui/dataAdapters
     ${CustusX_SOURCE_DIR}/source/gui/toolWidgets
-
-    ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
     
     ${CustusX_BINARY_DIR}/source/service/patient
     ${CustusX_BINARY_DIR}/source/service/video
     ${CustusX_BINARY_DIR}/source/service/tracking
-    ${CustusX_BINARY_DIR}/source/resource
-#    ${CustusX_BINARY_DIR}/source/resource/widgets
-    ${CustusX_BINARY_DIR}/source/resource/visualization
-#    ${CustusX_BINARY_DIR}/source/resource/usReconstructionTypes
+    ${CustusX_BINARY_DIR}/source/service/visualization
     ${CustusX_BINARY_DIR}/source/modules/Algorithm
     ${CustusX_BINARY_DIR}/source/modules/GUIExtender
     ${CustusX_BINARY_DIR}/source/modules/UsReconstruction
