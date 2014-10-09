@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-typedef boost::shared_ptr<class cxResource_EXPORT ColorDataAdapterXml> ColorDataAdapterXmlPtr;
+typedef boost::shared_ptr<class ColorDataAdapterXml> ColorDataAdapterXmlPtr;
 
 /** DataAdapter for QColor values.
  *

@@ -89,6 +89,7 @@ protected:
   QLabel* mRenderingRateLabel;
   QCheckBox* mSmartRenderCheckBox;
   QCheckBox* mGPU2DRenderCheckBox;
+  QCheckBox* mOptimizedViewsCheckBox;
 //  QCheckBox* mGPU3DDepthPeelingCheckBox;
   QCheckBox* mShadingCheckBox;
   QGridLayout* mMainLayout;

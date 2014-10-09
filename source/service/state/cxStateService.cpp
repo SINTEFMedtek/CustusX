@@ -355,8 +355,8 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("useGPU2DRendering", true);
 #endif
 
-
-	this->fillDefault("smartRender", true);
+    this->fillDefault("optimizedViews", true);
+    this->fillDefault("smartRender", true);
 
 	this->fillDefault("IGSTKDebugLogging", false);
 	this->fillDefault("giveManualToolPhysicalProperties", false);

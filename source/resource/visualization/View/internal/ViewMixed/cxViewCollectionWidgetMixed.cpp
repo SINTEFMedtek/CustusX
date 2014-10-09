@@ -64,8 +64,10 @@ ViewPtr ViewCollectionWidgetMixed::addView(View::Type type, LayoutRegion region)
 
 	if (type==View::VIEW_3D)
 	{
-		LayoutWidgetUsingViewWidgets* overlay = new LayoutWidgetUsingViewWidgets();
-		overlay->setGridMargin(0);
+//        std::cout << "ViewCollectionWidgetMixed::addView(3D)" << std::endl;
+//        LayoutWidgetUsingViewWidgets* overlay = new LayoutWidgetUsingViewWidgets();
+        ViewCollectionWidget* overlay = new ViewCollectionWidgetUsingViewContainer();
+        overlay->setGridMargin(0);
 		overlay->setGridSpacing(0);
 		mOverlays.push_back(overlay);
 		mOverlayRegions.push_back(region);
@@ -74,7 +76,8 @@ ViewPtr ViewCollectionWidgetMixed::addView(View::Type type, LayoutRegion region)
 	}
 	else
 	{
-		mBaseRegion = merge(region, mBaseRegion);
+//        std::cout << "ViewCollectionWidgetMixed::addView(other)" << std::endl;
+        mBaseRegion = merge(region, mBaseRegion);
 		view = mBaseLayout->addView(type, region);
 		// re-add the base widget with updated position in grid
 		this->addWidgetToLayout(mLayout, mBaseLayout, mBaseRegion);
@@ -93,6 +96,7 @@ void ViewCollectionWidgetMixed::addWidgetToLayout(QGridLayout* layout, QWidget* 
 
 void ViewCollectionWidgetMixed::clearViews()
 {
+//    std::cout << "ViewCollectionWidgetMixed::clearViews()" << std::endl;
 	mBaseLayout->clearViews();
 	for (unsigned i=0; i<mOverlays.size(); ++i)
 		mOverlays[i]->clearViews();
@@ -120,6 +124,8 @@ void ViewCollectionWidgetMixed::setModified()
 
 void ViewCollectionWidgetMixed::render()
 {
+//    std::cout << "ViewCollectionWidgetMixed::render()" << std::endl;
+
 	mBaseLayout->render();
 	for (unsigned i=0; i<mOverlays.size(); ++i)
 		mOverlays[i]->render();

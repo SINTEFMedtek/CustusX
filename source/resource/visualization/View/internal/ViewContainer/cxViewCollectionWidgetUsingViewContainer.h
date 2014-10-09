@@ -58,7 +58,7 @@ class cxResourceVisualization_EXPORT ViewCollectionWidgetUsingViewContainer : pu
 	Q_OBJECT
 public:
 	ViewCollectionWidgetUsingViewContainer();
-	~ViewCollectionWidgetUsingViewContainer();
+    virtual ~ViewCollectionWidgetUsingViewContainer();
 
 	ViewPtr addView(View::Type type, LayoutRegion region);
 	void clearViews();
