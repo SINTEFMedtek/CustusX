@@ -30,46 +30,41 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXREGISTRATIONMETHODLANDMARKPLUGINACTIVATOR_H_
-#define CXREGISTRATIONMETHODLANDMARKPLUGINACTIVATOR_H_
+#include "cxRegistrationMethodPlatePluginActivator.h"
 
-#include <ctkPluginActivator.h>
-#include "boost/shared_ptr.hpp"
+#include <QtPlugin>
+#include <iostream>
+
+#include "cxRegistrationMethodPlateService.h"
+#include "cxRegisteredService.h"
+#include "cxRegistrationServiceProxy.h"
+#include "cxPatientModelServiceProxy.h"
 
 namespace cx
 {
 
-//typedef boost::shared_ptr<class RegistrationMethodLandmarkService> RegistrationMethodLandmarkServicePtr;
-typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
-
-/**
- * Activator for Registration method landmark service
- *
- * \ingroup org_custusx_registration_method_landmark
- *
- * \date 2014-10-01
- * \author Ole Vegard Solberg, SINTEF
- */
-class RegistrationMethodLandmarkPluginActivator :  public QObject, public ctkPluginActivator
+RegistrationMethodPlatePluginActivator::RegistrationMethodPlatePluginActivator()
 {
-	Q_OBJECT
-	Q_INTERFACES(ctkPluginActivator)
-	Q_PLUGIN_METADATA(IID "org_custusx_registration_method_landmark")
+//	std::cout << "Created RegistrationMethodPlatePluginActivator" << std::endl;
+}
 
-public:
+RegistrationMethodPlatePluginActivator::~RegistrationMethodPlatePluginActivator()
+{}
 
-	RegistrationMethodLandmarkPluginActivator();
-	~RegistrationMethodLandmarkPluginActivator();
+void RegistrationMethodPlatePluginActivator::start(ctkPluginContext* context)
+{
+	RegistrationServicePtr registrationService(new RegistrationServiceProxy(context));
+	PatientModelServicePtr patientModelService(new PatientModelServiceProxy(context));
 
-	void start(ctkPluginContext* context);
-	void stop(ctkPluginContext* context);
+	RegistrationMethodPlateImageToPatientService* image2patientService = new RegistrationMethodPlateImageToPatientService(registrationService, patientModelService);
 
-private:
-	RegisteredServicePtr mRegistrationImageToImage;
-	RegisteredServicePtr mRegistrationImageToPatient;
-	RegisteredServicePtr mRegistrationFastImageToPatient;
-};
+	mRegistrationImageToPatient = RegisteredServicePtr(new RegisteredService(context, image2patientService, RegistrationMethodService_iid));
+}
+
+void RegistrationMethodPlatePluginActivator::stop(ctkPluginContext* context)
+{
+	mRegistrationImageToPatient.reset();
+	Q_UNUSED(context);
+}
 
 } // namespace cx
-
-#endif /* CXREGISTRATIONMETHODLANDMARKPLUGINACTIVATOR_H_ */

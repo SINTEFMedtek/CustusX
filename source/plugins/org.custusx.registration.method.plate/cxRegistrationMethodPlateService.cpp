@@ -30,46 +30,24 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXREGISTRATIONMETHODLANDMARKPLUGINACTIVATOR_H_
-#define CXREGISTRATIONMETHODLANDMARKPLUGINACTIVATOR_H_
-
-#include <ctkPluginActivator.h>
-#include "boost/shared_ptr.hpp"
+#include "cxRegistrationMethodPlateService.h"
+#include "cxRegistrationMethodsWidget.h"
+#include "cxFastImageRegistrationWidget.h"
+#include "cxPlateRegistrationWidget.h"
 
 namespace cx
 {
 
-//typedef boost::shared_ptr<class RegistrationMethodLandmarkService> RegistrationMethodLandmarkServicePtr;
-typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
-
-/**
- * Activator for Registration method landmark service
- *
- * \ingroup org_custusx_registration_method_landmark
- *
- * \date 2014-10-01
- * \author Ole Vegard Solberg, SINTEF
- */
-class RegistrationMethodLandmarkPluginActivator :  public QObject, public ctkPluginActivator
+QWidget *RegistrationMethodPlateImageToPatientService::createWidget()
 {
-	Q_OBJECT
-	Q_INTERFACES(ctkPluginActivator)
-	Q_PLUGIN_METADATA(IID "org_custusx_registration_method_landmark")
+	Image2PlateRegistrationWidget* imageAndPlateRegistrationWidget = new Image2PlateRegistrationWidget(NULL, "PlateRegistrationWidget", "Plate");
+	PlateImageRegistrationWidget* platesImageRegistrationWidget = new PlateImageRegistrationWidget(mRegistrationService, mPatientModelService, imageAndPlateRegistrationWidget);
+	PlateRegistrationWidget* plateRegistrationWidget = new PlateRegistrationWidget(mRegistrationService, mPatientModelService, imageAndPlateRegistrationWidget);
 
-public:
+	imageAndPlateRegistrationWidget->addTab(plateRegistrationWidget, "Plate");
+	imageAndPlateRegistrationWidget->addTab(platesImageRegistrationWidget, "Image");
 
-	RegistrationMethodLandmarkPluginActivator();
-	~RegistrationMethodLandmarkPluginActivator();
+	return imageAndPlateRegistrationWidget;
+}
 
-	void start(ctkPluginContext* context);
-	void stop(ctkPluginContext* context);
-
-private:
-	RegisteredServicePtr mRegistrationImageToImage;
-	RegisteredServicePtr mRegistrationImageToPatient;
-	RegisteredServicePtr mRegistrationFastImageToPatient;
-};
-
-} // namespace cx
-
-#endif /* CXREGISTRATIONMETHODLANDMARKPLUGINACTIVATOR_H_ */
+} /* namespace cx */

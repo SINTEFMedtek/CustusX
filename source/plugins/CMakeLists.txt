@@ -54,6 +54,7 @@ set(CX_PLUGINS
   org.custusx.registration.method.bronchoscopy:ON
   org.custusx.registration.method.vessel:ON
   org.custusx.registration.method.commandline:ON
+  org.custusx.registration.method.plate:ON
   org.custusx.visualization:ON
   org.custusx.tracking:ON
   org.custusx.video:ON

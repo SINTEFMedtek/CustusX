@@ -30,46 +30,41 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXREGISTRATIONMETHODLANDMARKPLUGINACTIVATOR_H_
-#define CXREGISTRATIONMETHODLANDMARKPLUGINACTIVATOR_H_
+#ifndef CXREGISTRATIONMETHODPLATESERVICE_H_
+#define CXREGISTRATIONMETHODPLATESERVICE_H_
 
-#include <ctkPluginActivator.h>
-#include "boost/shared_ptr.hpp"
+#include "cxRegistrationMethodService.h"
+#include "org_custusx_registration_method_plate_export.h"
 
 namespace cx
 {
 
-//typedef boost::shared_ptr<class RegistrationMethodLandmarkService> RegistrationMethodLandmarkServicePtr;
-typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
-
 /**
- * Activator for Registration method landmark service
+ * Registration method: Plate image to patient service implementation
  *
- * \ingroup org_custusx_registration_method_landmark
+ * \ingroup org_custusx_registration_method_Plate
  *
  * \date 2014-10-01
  * \author Ole Vegard Solberg, SINTEF
  */
-class RegistrationMethodLandmarkPluginActivator :  public QObject, public ctkPluginActivator
+class org_custusx_registration_method_plate_EXPORT RegistrationMethodPlateImageToPatientService : public RegistrationMethodService
 {
-	Q_OBJECT
-	Q_INTERFACES(ctkPluginActivator)
-	Q_PLUGIN_METADATA(IID "org_custusx_registration_method_landmark")
-
+	Q_INTERFACES(cx::RegistrationMethodService)
 public:
-
-	RegistrationMethodLandmarkPluginActivator();
-	~RegistrationMethodLandmarkPluginActivator();
-
-	void start(ctkPluginContext* context);
-	void stop(ctkPluginContext* context);
+	RegistrationMethodPlateImageToPatientService(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService) :
+		RegistrationMethodService(registrationService),
+		mPatientModelService(patientModelService) {}
+	virtual ~RegistrationMethodPlateImageToPatientService() {}
+	virtual QString getRegistrationType() {return QString("ImageToPatient");}
+	virtual QString getRegistrationMethod() {return QString("Plate Landmark");}
+	virtual QString getWidgetName() {return QString("PlateImage2PatientRegistrationWidget");}
+	virtual QWidget* createWidget();
 
 private:
-	RegisteredServicePtr mRegistrationImageToImage;
-	RegisteredServicePtr mRegistrationImageToPatient;
-	RegisteredServicePtr mRegistrationFastImageToPatient;
+	PatientModelServicePtr mPatientModelService;
 };
 
-} // namespace cx
+} /* namespace cx */
 
-#endif /* CXREGISTRATIONMETHODLANDMARKPLUGINACTIVATOR_H_ */
+#endif /* CXREGISTRATIONMETHODPLATESERVICE_H_ */
+

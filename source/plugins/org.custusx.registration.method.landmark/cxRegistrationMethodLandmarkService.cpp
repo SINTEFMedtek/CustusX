@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationMethodLandmarkService.h"
 #include "cxRegistrationMethodsWidget.h"
 #include "cxLandmarkImageRegistrationWidget.h"
-//#include "cxRegisterI2IWidget.h"
 #include "cxLandmarkImage2ImageRegistrationWidget.h"
 #include "cxLandmarkPatientRegistrationWidget.h"
 
@@ -49,10 +48,6 @@ QWidget *RegistrationMethodLandmarkImageToImageService::createWidget()
 	LandmarkRegistrationsWidget* landmarkRegistrationsWidget = new LandmarkRegistrationsWidget(NULL, "LandmarkRegistrationImageToImageWidget", "Image to Image Landmark Registration");
 	LandmarkImageRegistrationWidget* imageRegistrationWidget = new LandmarkImageRegistrationWidget(mRegistrationService, mPatientModelService, landmarkRegistrationsWidget, "LMImageRegistrationWidget", "Image Registration");
 	LandmarkImage2ImageRegistrationWidget* image2imageRegistrationWidget = new LandmarkImage2ImageRegistrationWidget(mRegistrationService, mPatientModelService, landmarkRegistrationsWidget, "LMImage2ImageRegistrationWidget", "Image2Image Registration");
-
-	//Try to reuse existing widget
-//	Image2ImageRegistrationWidget* image2imageWidget = new Image2ImageRegistrationWidget(NULL, this->getWidgetName(), "Image 2 Image Registration");
-//	landmarkRegistrationsWidget->addTab(new RegisterI2IWidget(mRegistrationService, mPatientModelService, image2imageWidget),"Register");
 
 	landmarkRegistrationsWidget->addTab(imageRegistrationWidget, "Image landmarks");
 	landmarkRegistrationsWidget->addTab(image2imageRegistrationWidget, "Register");

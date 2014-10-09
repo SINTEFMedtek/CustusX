@@ -30,8 +30,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXREGISTRATIONMETHODLANDMARKPLUGINACTIVATOR_H_
-#define CXREGISTRATIONMETHODLANDMARKPLUGINACTIVATOR_H_
+#ifndef CXREGISTRATIONMETHODPLATEPLUGINACTIVATOR_H_
+#define CXREGISTRATIONMETHODPLATEPLUGINACTIVATOR_H_
 
 #include <ctkPluginActivator.h>
 #include "boost/shared_ptr.hpp"
@@ -39,37 +39,35 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-//typedef boost::shared_ptr<class RegistrationMethodLandmarkService> RegistrationMethodLandmarkServicePtr;
+//typedef boost::shared_ptr<class RegistrationMethodPlateService> RegistrationMethodPlateServicePtr;
 typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
 
 /**
- * Activator for Registration method landmark service
+ * Activator for Registration method Plate service
  *
- * \ingroup org_custusx_registration_method_landmark
+ * \ingroup org_custusx_registration_method_plate
  *
  * \date 2014-10-01
  * \author Ole Vegard Solberg, SINTEF
  */
-class RegistrationMethodLandmarkPluginActivator :  public QObject, public ctkPluginActivator
+class RegistrationMethodPlatePluginActivator :  public QObject, public ctkPluginActivator
 {
 	Q_OBJECT
 	Q_INTERFACES(ctkPluginActivator)
-	Q_PLUGIN_METADATA(IID "org_custusx_registration_method_landmark")
+	Q_PLUGIN_METADATA(IID "org_custusx_registration_method_plate")
 
 public:
 
-	RegistrationMethodLandmarkPluginActivator();
-	~RegistrationMethodLandmarkPluginActivator();
+	RegistrationMethodPlatePluginActivator();
+	~RegistrationMethodPlatePluginActivator();
 
 	void start(ctkPluginContext* context);
 	void stop(ctkPluginContext* context);
 
 private:
-	RegisteredServicePtr mRegistrationImageToImage;
 	RegisteredServicePtr mRegistrationImageToPatient;
-	RegisteredServicePtr mRegistrationFastImageToPatient;
 };
 
 } // namespace cx
 
-#endif /* CXREGISTRATIONMETHODLANDMARKPLUGINACTIVATOR_H_ */
+#endif /* CXREGISTRATIONMETHODPLATEPLUGINACTIVATOR_H_ */
