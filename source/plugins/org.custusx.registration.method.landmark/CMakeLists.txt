@@ -7,7 +7,6 @@ message(STATUS "===================================== parsing org_custusx_regist
 include_directories(
     ${CX_RESOURCE_INCLUDE_DIRECTORIES}
     ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
-    ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.registration
     ${CustusX_SOURCE_DIR}/source/logic
 	${CustusX_SOURCE_DIR}/source/modules/Registration/gui
 	${CustusX_SOURCE_DIR}/source/modules/Algorithm/logic
@@ -22,12 +21,14 @@ include_directories(
 set(PLUGIN_SRCS
   cxRegistrationMethodLandmarkPluginActivator.cpp
   cxRegistrationMethodLandmarkService.cpp
+  cxFastImageRegistrationWidget.cpp
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
   cxRegistrationMethodLandmarkPluginActivator.h
   cxRegistrationMethodLandmarkService.h
+  cxFastImageRegistrationWidget.h
 )
 
 # Qt Designer files which should be processed by Qts uic

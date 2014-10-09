@@ -41,7 +41,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLandmarkImageRegistrationWidget.h"
 #include "cxLandmarkImage2ImageRegistrationWidget.h"
 #include "cxLandmarkPatientRegistrationWidget.h"
-#include "cxFastImageRegistrationWidget.h"
 #include "cxFastPatientRegistrationWidget.h"
 #include "cxFastOrientationRegistrationWidget.h"
 #include "cxPlateRegistrationWidget.h"
@@ -154,13 +153,13 @@ RegistrationMethodsWidget::RegistrationMethodsWidget(RegistrationServicePtr regi
   landmarkRegistrationsWidget->addTab(image2imageRegistrationWidget, "Image2Image");
 
   //fast
-  FastRegistrationsWidget* fastRegistrationsWidget = new FastRegistrationsWidget(this, "FastRegistrationWidget", "Fast Registrations");
-	FastOrientationRegistrationWidget* fastOrientationRegistrationWidget = new FastOrientationRegistrationWidget(registrationService, fastRegistrationsWidget);
-	FastImageRegistrationWidget* fastImageRegistrationWidget = new FastImageRegistrationWidget(registrationService, patientModelService, fastRegistrationsWidget, "FastImageRegistrationWidget", "Fast Image Registration");
-	FastPatientRegistrationWidget* fastPatientRegistrationWidget = new FastPatientRegistrationWidget(registrationService, patientModelService, fastRegistrationsWidget);
-  fastRegistrationsWidget->addTab(fastOrientationRegistrationWidget, "Orientation");
-  fastRegistrationsWidget->addTab(fastImageRegistrationWidget, "Image");
-  fastRegistrationsWidget->addTab(fastPatientRegistrationWidget, "Image2Patient");
+//  FastRegistrationsWidget* fastRegistrationsWidget = new FastRegistrationsWidget(this, "FastRegistrationWidget", "Fast Registrations");
+//	FastOrientationRegistrationWidget* fastOrientationRegistrationWidget = new FastOrientationRegistrationWidget(registrationService, fastRegistrationsWidget);
+//	FastImageRegistrationWidget* fastImageRegistrationWidget = new FastImageRegistrationWidget(registrationService, patientModelService, fastRegistrationsWidget, "FastImageRegistrationWidget", "Fast Image Registration");
+//	FastPatientRegistrationWidget* fastPatientRegistrationWidget = new FastPatientRegistrationWidget(registrationService, patientModelService, fastRegistrationsWidget);
+//  fastRegistrationsWidget->addTab(fastOrientationRegistrationWidget, "Orientation");
+//  fastRegistrationsWidget->addTab(fastImageRegistrationWidget, "Image");
+//  fastRegistrationsWidget->addTab(fastPatientRegistrationWidget, "Image2Patient");
 
   //fast
   ManualRegistrationsWidget* manRegWidget = new ManualRegistrationsWidget(this, "ManualRegistrationWidget", "Manual Registrations");
@@ -191,7 +190,7 @@ RegistrationMethodsWidget::RegistrationMethodsWidget(RegistrationServicePtr regi
 //  imageAndPlateRegistrationWidget->addTab(platesImageRegistrationWidget, "Image");
 
   this->addTab(landmarkRegistrationsWidget, "Landmark");
-  this->addTab(fastRegistrationsWidget, "Fast");
+//  this->addTab(fastRegistrationsWidget, "Fast");
   this->addTab(manRegWidget, "Manual");
 	this->addTab(new ElastixWidget(registrationService, patientModelService, this), "ElastiX");
   this->addTab(image2imageWidget, "Vessel");

@@ -30,42 +30,47 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxFastImageRegistrationWidget.h"
+#ifndef CXFASTIMAGEREGISTRATIONWIDGET_H_
+#define CXFASTIMAGEREGISTRATIONWIDGET_H_
 
-#include "cxReporter.h"
-#include "cxDataManager.h"
-#include "cxRegistrationManager.h"
+#include "cxPluginRegistrationExport.h"
+#include "org_custusx_registration_method_landmark_Export.h"
+
+#include "cxLandmarkImageRegistrationWidget.h"
 
 namespace cx
 {
+/**
+ * \file
+ * \addtogroup cx_module_registration
+ * @{
+ */
 
-FastImageRegistrationWidget::FastImageRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent, QString objectName, QString windowTitle) :
-		LandmarkImageRegistrationWidget(registrationService, patientModelService, parent, objectName, windowTitle)
+/**
+ * \class FastImageRegistrationWidget
+ *
+ * \brief Widget for performing landmark based image registration using only the
+ * translation part of the matrix.
+ *
+ * \date 27. sep. 2010
+ * \author Janne Beate Bakeng, SINTEF
+ */
+class org_custusx_registration_method_landmark_EXPORT FastImageRegistrationWidget : public LandmarkImageRegistrationWidget
 {
-}
+	Q_OBJECT
+public:
+	FastImageRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent, QString objectName, QString windowTitle);
+	virtual ~FastImageRegistrationWidget();
+	virtual QString defaultWhatsThis() const;
 
-FastImageRegistrationWidget::~FastImageRegistrationWidget()
-{
+protected:
+	virtual void performRegistration();
+	PatientModelServicePtr mPatientModelService;
+};
 
-}
-
-QString FastImageRegistrationWidget::defaultWhatsThis() const
-{
-	return "<html>"
-			"<h3>Fast image registration.</h3>"
-			"<p>Select landmarks in the data set that you want to use for performing fast registration.</p>"
-			"<p><i>Click in the dataset and push the add or resample button.</i></p>"
-			"</html>";
-}
-
-void FastImageRegistrationWidget::performRegistration()
-{
-  //make sure the masterImage is set
-	DataPtr fixedData = mRegistrationService->getFixedData();
-  if(!fixedData)
-		mRegistrationService->setFixedData(dataManager()->getActiveImage());
-
-  this->updateAvarageAccuracyLabel();
-}
-
+/**
+ * @}
+ */
 }//namespace cx
+
+#endif /* CXFASTIMAGEREGISTRATIONWIDGET_H_ */
