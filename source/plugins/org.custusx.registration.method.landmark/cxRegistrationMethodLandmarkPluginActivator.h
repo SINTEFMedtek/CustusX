@@ -52,22 +52,22 @@ typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
  */
 class RegistrationMethodLandmarkPluginActivator :  public QObject, public ctkPluginActivator
 {
-  Q_OBJECT
-  Q_INTERFACES(ctkPluginActivator)
+	Q_OBJECT
+	Q_INTERFACES(ctkPluginActivator)
 	Q_PLUGIN_METADATA(IID "org_custusx_registration_method_landmark")
 
 public:
 
-  RegistrationMethodLandmarkPluginActivator();
-  ~RegistrationMethodLandmarkPluginActivator();
+	RegistrationMethodLandmarkPluginActivator();
+	~RegistrationMethodLandmarkPluginActivator();
 
-  void start(ctkPluginContext* context);
-  void stop(ctkPluginContext* context);
+	void start(ctkPluginContext* context);
+	void stop(ctkPluginContext* context);
 
 private:
-  RegisteredServicePtr mRegistrationImageToImage;
-  RegisteredServicePtr mRegistrationImageToPatient;
-  RegisteredServicePtr mRegistrationFastImageToPatient;
+	RegisteredServicePtr mRegistrationImageToImage;
+	RegisteredServicePtr mRegistrationImageToPatient;
+	RegisteredServicePtr mRegistrationFastImageToPatient;
 };
 
 } // namespace cx
