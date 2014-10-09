@@ -32,12 +32,12 @@ cx_add_class_qt_moc(CX_RESOURCE_WIDGETS_FILES
     cxFileInputWidget
     cxMultiFileInputWidget
 	cxFilterPresetWidget
+	cxTabbedWidget
 	${QXT_FOLDER}/qxtspanslider_p.h
 	${QXT_FOLDER}/qxtspanslider
 	)
 
 cx_add_class(CX_RESOURCE_WIDGETS_FILES
-	cxTabbedWidget
 	snwSyntaxHighlighter
     )
 

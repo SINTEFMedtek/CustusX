@@ -85,10 +85,9 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	registration/cxRegistrationServiceProxy
 	registration/cxRegistrationMethodService.h
 	registration/cxRegistrationDataAdapters
-	registration/cxRegistrationMethodService.h
-	registration/cxRegistrationDataAdapters
-
 	patientModel/cxPatientModelService
+	
+	help/cxHelpService.h
 	)
 
      
@@ -96,6 +95,8 @@ cx_add_class_qt_moc(cxResource_SOURCE
 cx_add_class(cxResource_SOURCE
 	cxForwardDeclarations.h
 	vtkForwardDeclarations.h
+	help/cxHelpServiceNull
+	help/cxHelpServiceProxy
 
 	Tool/cxProbeSector
 	Tool/cxProbeData
@@ -274,6 +275,7 @@ set(CX_RESOURCE_INCLUDE_DIRECTORIES
 	${CustusX_SOURCE_DIR}/source/resource/core/patientModel
     ${CustusX_SOURCE_DIR}/source/resource/core
     ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
+    ${CustusX_SOURCE_DIR}/source/resource/core/help
     ${CustusX_SOURCE_DIR}/source/ThirdParty
     ${CustusX_SOURCE_DIR}/source/ThirdParty/iir1
     

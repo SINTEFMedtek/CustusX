@@ -8,7 +8,6 @@ include_directories(
     ${CX_RESOURCE_INCLUDE_DIRECTORIES}
     ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
     ${CustusX_SOURCE_DIR}/source/logic
-
     ${CustusX_BINARY_DIR}/source/service/patient
     ${CustusX_BINARY_DIR}/source/logic
     )

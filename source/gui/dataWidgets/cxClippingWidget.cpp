@@ -44,6 +44,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImage.h"
 #include "cxLegacySingletons.h"
 #include "cxPatientModelService.h"
+#include "cxHelpServiceProxy.h"
+#include "cxLogicManager.h"
 
 namespace cx
 {
@@ -92,6 +94,8 @@ ClippingWidget::ClippingWidget(PatientModelServicePtr patientModelService, QWidg
 	BaseWidget(parent, "ClippingWidget", "Clip"),
 	mPatientModelService(patientModelService)
 {
+	HelpServiceProxy(LogicManager::getInstance()->getPluginContext())->registerWidget(this, "property_widgets_volume_clipping");
+
 	mInteractiveClipper = viewManager()->getClipper();
 	connect(mInteractiveClipper.get(), SIGNAL(changed()), this, SLOT(clipperChangedSlot()));
 

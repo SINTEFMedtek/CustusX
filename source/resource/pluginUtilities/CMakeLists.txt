@@ -2,25 +2,29 @@
 ##               Resource plugin utilities
 ###########################################################
 
-SET( CX_QT_MOC_HEADER_FILES
-)
-
-SET (cxPluginUtilities_SOURCE
-    cxServiceTrackerCustomizer.h
-    cxServiceTrackerListener.h
-    cxRegisteredService.h
-    cxRegisteredService.cpp
-)
+cx_create_export_header("cxResourcePluginUtilities")
 
 include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
 
-#QT5_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
+set(SOURCE_FILES )
+cx_add_class_qt_moc(SOURCE_FILES
+	)
+cx_add_class(SOURCE_FILES
+	cxServiceTrackerCustomizer.h
+    cxServiceTrackerListener.h
+    cxRegisteredService
+    )    
 
-cx_create_export_header("cxResourcePluginUtilities")
-ADD_LIBRARY ( cxPluginUtilities ${cxPluginUtilities_SOURCE} ${MOC_HEADER_FILES} )
 
-target_link_libraries(cxPluginUtilities
+set (LIBRARIES
+    ${SSC_GCOV_LIBRARY}
+    Qt5::Widgets
     cxResource
+    CTKPluginFramework
     )
+    
+add_library (cxPluginUtilities ${SOURCE_FILES})
+target_link_libraries(cxPluginUtilities ${LIBRARIES} )
+
 
 

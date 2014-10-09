@@ -45,6 +45,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxShadingParamsInterfaces.h"
 #include "cxImagePropertiesWidget.h"
 #include "cxPatientModelService.h"
+#include "cxHelpServiceProxy.h"
+#include "cxLogicManager.h"
 
 namespace cx
 {
@@ -66,6 +68,8 @@ void ShadingWidget::init()
 //  mLayout->addWidget(mShadingCheckBox);
 //  mShadingCheckBox->setEnabled(true);
 //
+  HelpServiceProxy(LogicManager::getInstance()->getPluginContext())->registerWidget(this, "property_widgets_volume_shading");
+
   connect(mShadingCheckBox, SIGNAL(toggled(bool)), this, SLOT(shadingToggledSlot(bool)));
 
   QGridLayout* shadingLayput = new QGridLayout();
@@ -114,13 +118,14 @@ void ShadingWidget::activeImageChangedSlot()
 
 QString ShadingWidget::defaultWhatsThis() const
 {
-	return "<html>"
-		"<h3>Shading</h3>"
-		"<p>"
-		"Set volume shading properties."
-		"</p>"
-		"<p><i></i></p>"
-		"</html>";
+	return "";
+//	return "<html>"
+//		"<h3>Shading</h3>"
+//		"<p>"
+//		"Set volume shading properties."
+//		"</p>"
+//		"<p><i></i></p>"
+//		"</html>";
 }
 
 }//namespace cx

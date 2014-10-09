@@ -32,6 +32,7 @@ QDockWidget* DockWidgets::createDockWidget(QWidget* widget)
 		QScrollArea* scroller = this->addVerticalScroller(widget);
 		QDockWidget* dockWidget = new QDockWidget(widget->windowTitle(), mParent);
 		dockWidget->setObjectName(widget->objectName() + "DockWidget");
+		dockWidget->setFocusPolicy(Qt::StrongFocus); // we really want to focus on the embedded widget, see focusInsideDockWidget()
 		dockWidget->setWidget(scroller);
 		return dockWidget;
 }
