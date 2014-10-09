@@ -66,21 +66,6 @@ protected:
   virtual void performRegistration();
 };
 
-class cxPluginRegistration_EXPORT PlateImageRegistrationWidget : public FastImageRegistrationWidget
-{
-	Q_OBJECT
-public:
-	PlateImageRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent);
- virtual ~PlateImageRegistrationWidget();
- virtual QString defaultWhatsThis() const;
-
-protected slots:
- virtual void editLandmarkButtonClickedSlot();
-
-protected:
-  virtual void performRegistration();
-};
-
 /**
  * @}
  */

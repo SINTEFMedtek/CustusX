@@ -184,11 +184,11 @@ RegistrationMethodsWidget::RegistrationMethodsWidget(RegistrationServicePtr regi
 	PatientOrientationWidget* patientOrientationWidget = new PatientOrientationWidget(registrationService, patientModelService, this, "PatientOrientationWidget", "Patient Orientation");
 
   //plate
-	Image2PlateRegistrationWidget* imageAndPlateRegistrationWidget = new Image2PlateRegistrationWidget(this, "PlateRegistrationWidget", "Plate");
-	PlateImageRegistrationWidget* platesImageRegistrationWidget = new PlateImageRegistrationWidget(registrationService, patientModelService, imageAndPlateRegistrationWidget);
-	PlateRegistrationWidget* plateRegistrationWidget = new PlateRegistrationWidget(registrationService, patientModelService, imageAndPlateRegistrationWidget);
-  imageAndPlateRegistrationWidget->addTab(plateRegistrationWidget, "Plate");
-  imageAndPlateRegistrationWidget->addTab(platesImageRegistrationWidget, "Image");
+//	Image2PlateRegistrationWidget* imageAndPlateRegistrationWidget = new Image2PlateRegistrationWidget(this, "PlateRegistrationWidget", "Plate");
+//	PlateImageRegistrationWidget* platesImageRegistrationWidget = new PlateImageRegistrationWidget(registrationService, patientModelService, imageAndPlateRegistrationWidget);
+//	PlateRegistrationWidget* plateRegistrationWidget = new PlateRegistrationWidget(registrationService, patientModelService, imageAndPlateRegistrationWidget);
+//  imageAndPlateRegistrationWidget->addTab(plateRegistrationWidget, "Plate");
+//  imageAndPlateRegistrationWidget->addTab(platesImageRegistrationWidget, "Image");
 
   this->addTab(landmarkRegistrationsWidget, "Landmark");
   this->addTab(fastRegistrationsWidget, "Fast");
@@ -196,7 +196,7 @@ RegistrationMethodsWidget::RegistrationMethodsWidget(RegistrationServicePtr regi
 	this->addTab(new ElastixWidget(registrationService, patientModelService, this), "ElastiX");
   this->addTab(image2imageWidget, "Vessel");
   this->addTab(patientOrientationWidget, "Patient Orientation");
-  this->addTab(imageAndPlateRegistrationWidget, "Plate");
+//  this->addTab(imageAndPlateRegistrationWidget, "Plate");
   this->addTab(new BronchoscopyRegistrationWidget(registrationService, visualizationService, patientModelService, this), "Bronchoscopy");
 
   connect(mTabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChangedSlot(int)));

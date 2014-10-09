@@ -44,7 +44,7 @@ namespace cx
  *
  * \ingroup org_custusx_registration_method_Plate
  *
- * \date 2014-10-01
+ * \date 2014-10-09
  * \author Ole Vegard Solberg, SINTEF
  */
 class org_custusx_registration_method_plate_EXPORT RegistrationMethodPlateImageToPatientService : public RegistrationMethodService

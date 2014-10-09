@@ -22,6 +22,8 @@ include_directories(
 set(PLUGIN_SRCS
   cxRegistrationMethodPlatePluginActivator.cpp
   cxRegistrationMethodPlateService.cpp
+  cxPlateImageRegistrationWidget.cpp
+  cxPlateImageRegistrationWidget.h
 )
 
 # Files which should be processed by Qts moc
