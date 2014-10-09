@@ -69,15 +69,6 @@ public:
   virtual QString defaultWhatsThis() const;
 };
 //------------------------------------------------------------------------------
-class cxPluginRegistration_EXPORT Image2PlateRegistrationWidget : public TabbedWidget
-{
-public:
-  Image2PlateRegistrationWidget(QWidget* parent, QString objectName, QString windowTitle);
-  virtual ~Image2PlateRegistrationWidget(){};
-  virtual QString defaultWhatsThis() const;
-};
-//------------------------------------------------------------------------------
-
 class cxPluginRegistration_EXPORT ManualRegistrationsWidget : public TabbedWidget
 {
 public:

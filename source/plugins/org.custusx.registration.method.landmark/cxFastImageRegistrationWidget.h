@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXFASTIMAGEREGISTRATIONWIDGET_H_
 #define CXFASTIMAGEREGISTRATIONWIDGET_H_
 
-#include "cxPluginRegistrationExport.h"
 #include "org_custusx_registration_method_landmark_Export.h"
 
 #include "cxLandmarkImageRegistrationWidget.h"

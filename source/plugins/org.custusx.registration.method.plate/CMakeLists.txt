@@ -9,7 +9,7 @@ include_directories(
     ${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
     ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.registration.method.landmark
     ${CustusX_SOURCE_DIR}/source/logic
-	${CustusX_SOURCE_DIR}/source/modules/Registration/gui
+    ${CustusX_SOURCE_DIR}/source/modules/Registration/gui
 	${CustusX_SOURCE_DIR}/source/modules/Algorithm/logic
 	${CustusX_SOURCE_DIR}/source/service/tracking
 
@@ -26,6 +26,8 @@ set(PLUGIN_SRCS
   cxPlateImageRegistrationWidget.cpp
   cxPlateImageRegistrationWidget.h
   cxPlateRegistrationWidget.cpp
+  cxImage2PlateRegistrationWidget.cpp
+  cxImage2PlateRegistrationWidget.h
 )
 
 # Files which should be processed by Qts moc

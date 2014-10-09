@@ -32,23 +32,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXREGISTRATIONBASEWIDGET_H_
 #define CXREGISTRATIONBASEWIDGET_H_
 
-#include "cxPluginRegistrationExport.h"
-
 #include "cxBaseWidget.h"
-#include "cxRegistrationServiceProxy.h"
+#include "cxResourceWidgetsExport.h"
+
+#include "cxRegistrationService.h"
 
 namespace cx
 {
 
 /**
  * \file
- * \addtogroup cx_module_registration
+ * \addtogroup cx_resource_widgets
  * @{
  */
 
-class cxPluginRegistration_EXPORT RegistrationBaseWidget : public BaseWidget
+class cxResourceWidgets_EXPORT RegistrationBaseWidget : public BaseWidget
 {
-//  Q_OBJECT
 public:
 	RegistrationBaseWidget(RegistrationServicePtr registrationService, QWidget *parent, QString objectName, QString windowTitle);
   virtual ~RegistrationBaseWidget() {}

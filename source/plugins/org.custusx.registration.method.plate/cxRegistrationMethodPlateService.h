@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXREGISTRATIONMETHODPLATESERVICE_H_
 
 #include "cxRegistrationMethodService.h"
-#include "org_custusx_registration_method_plate_export.h"
+#include "org_custusx_registration_method_plate_Export.h"
 
 namespace cx
 {

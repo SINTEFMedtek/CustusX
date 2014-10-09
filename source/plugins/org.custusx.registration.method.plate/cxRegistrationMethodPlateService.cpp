@@ -31,9 +31,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxRegistrationMethodPlateService.h"
-#include "cxRegistrationMethodsWidget.h"
 #include "cxPlateRegistrationWidget.h"
 #include "cxPlateImageRegistrationWidget.h"
+#include "cxImage2PlateRegistrationWidget.h"
 
 namespace cx
 {

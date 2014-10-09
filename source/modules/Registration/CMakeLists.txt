@@ -47,8 +47,6 @@ SET( SOURCE_FILES
     
    gui/cxRegistrationPlugin.h
    gui/cxRegistrationPlugin.cpp
-   gui/cxRegistrationBaseWidget.h
-   gui/cxRegistrationBaseWidget.cpp
 	gui/cxPrepareVesselsWidget.h
 	gui/cxPrepareVesselsWidget.cpp
 	gui/cxLandmarkImageRegistrationWidget.h

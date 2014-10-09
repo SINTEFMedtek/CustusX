@@ -97,26 +97,10 @@ Image2ImageRegistrationWidget::Image2ImageRegistrationWidget(QWidget* parent, QS
 QString Image2ImageRegistrationWidget::defaultWhatsThis() const
 {
   return "<html>"
-      "<h3>Image to image registration.</h3>"
-      "<p>This is a method used to registrate one image to another using segments of the images.</p>"
-      "<p><i>Choose a step to continue.</i></p>"
-      "</html>";
-}
-
-//------------------------------------------------------------------------------
-
-Image2PlateRegistrationWidget::Image2PlateRegistrationWidget(QWidget* parent, QString objectName, QString windowTitle) :
-  TabbedWidget(parent, objectName, windowTitle)
-{
-}
-
-QString Image2PlateRegistrationWidget::defaultWhatsThis() const
-{
-  return "<html>"
-      "<h3>Image to plate registration.</h3>"
-      "<p>This is a method used to registrate one image to a specific aurora tool (a plastic plate with ct markers).</p>"
-      "<p><i>Choose a step to continue.</i></p>"
-      "</html>";
+	  "<h3>Image to image registration.</h3>"
+	  "<p>This is a method used to registrate one image to another using segments of the images.</p>"
+	  "<p><i>Choose a step to continue.</i></p>"
+	  "</html>";
 }
 
 //------------------------------------------------------------------------------
