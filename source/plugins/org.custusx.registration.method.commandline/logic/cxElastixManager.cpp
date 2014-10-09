@@ -44,6 +44,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataReaderWriter.h"
 #include "cxDataManager.h"
 #include "cxRegistrationServiceProxy.h"
+#include "cxPatientService.h"
+#include "cxRegistrationTransform.h"
 
 namespace cx
 {

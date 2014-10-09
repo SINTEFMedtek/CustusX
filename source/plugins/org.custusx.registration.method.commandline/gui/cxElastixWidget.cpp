@@ -38,7 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogger.h"
 #include "cxTypeConversions.h"
 #include "cxReporter.h"
-#include "cxRegistrationManager.h"
 #include "cxTimedAlgorithm.h"
 #include "cxPatientData.h"
 #include "cxLabeledComboBoxWidget.h"

@@ -13,9 +13,6 @@
 
 SET( MOC_HEADER_FILES
     logic/cxRegistrationManager.h
-    logic/cxElastixManager.h
-    logic/cxElastixParameters.h
-    logic/cxElastixExecuter.h
 
     gui/cxRegistrationPlugin.h
     gui/cxLandmarkImageRegistrationWidget.h
@@ -30,7 +27,6 @@ SET( MOC_HEADER_FILES
     gui/cxSeansVesselRegistrationWidget.h
     gui/cxRegisterI2IWidget.h
     gui/cxRegistrationMethodsWidget.h
-    gui/cxElastixWidget.h
     gui/cxWirePhantomWidget.h
     gui/cxPatientOrientationWidget.h
     gui/cxBronchoscopyRegistrationWidget.h
@@ -44,12 +40,6 @@ SET( SOURCE_FILES
     ${MOC_HEADER_FILES}
    logic/cxRegistrationManager.h
    logic/cxRegistrationManager.cpp
-   logic/cxElastixManager.h
-   logic/cxElastixManager.cpp
-   logic/cxElastixExecuter.h
-   logic/cxElastixExecuter.cpp
-   logic/cxElastixParameters.h
-   logic/cxElastixParameters.cpp
    logic/cxBronchoscopyRegistration.h
    logic/cxBronchoscopyRegistration.cpp
    logic/cxBranch.h
@@ -87,10 +77,6 @@ SET( SOURCE_FILES
     gui/cxRegisterI2IWidget.cpp
     gui/cxRegistrationMethodsWidget.h
     gui/cxRegistrationMethodsWidget.cpp
-    gui/cxElastixWidget.h
-    gui/cxElastixWidget.cpp
-    gui/cxElastixSyntaxHighlighter.h
-	gui/cxElastixSyntaxHighlighter.cpp
     gui/cxWirePhantomWidget.h
     gui/cxWirePhantomWidget.cpp
 	gui/cxPatientOrientationWidget.h

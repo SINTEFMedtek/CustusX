@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include "cxForwardDeclarations.h"
 #include "cxXmlOptionItem.h"
-#include "cxRegistrationManager.h"
+//#include "cxRegistrationManager.h"
 #include "cxBoolDataAdapterXml.h"
 #include "cxStringDataAdapterXml.h"
 #include "cxElastixParameters.h"

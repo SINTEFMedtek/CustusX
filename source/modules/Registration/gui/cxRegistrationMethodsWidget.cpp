@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxFastOrientationRegistrationWidget.h"
 #include "cxPlateRegistrationWidget.h"
 #include "cxRegisterI2IWidget.h"
-#include "cxElastixWidget.h"
+//#include "cxElastixWidget.h"
 #include "cxManualRegistrationWidget.h"
 #include "cxSettings.h"
 #include "cxPatientOrientationWidget.h"
@@ -193,7 +193,7 @@ RegistrationMethodsWidget::RegistrationMethodsWidget(RegistrationServicePtr regi
   this->addTab(landmarkRegistrationsWidget, "Landmark");
   this->addTab(fastRegistrationsWidget, "Fast");
   this->addTab(manRegWidget, "Manual");
-	this->addTab(new ElastixWidget(registrationService, patientModelService, this), "ElastiX");
+//	this->addTab(new ElastixWidget(registrationService, patientModelService, this), "ElastiX");
   this->addTab(image2imageWidget, "Vessel");
   this->addTab(patientOrientationWidget, "Patient Orientation");
   this->addTab(imageAndPlateRegistrationWidget, "Plate");
