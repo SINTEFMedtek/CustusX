@@ -3,7 +3,11 @@
 #
 find_package(Doxygen)
 
-option(CX_BUILD_USER_DOCUMENTATION "Build the user documentation and embed in installer" ON)
+if(Doxygen_FOUND)
+    option(CX_BUILD_USER_DOCUMENTATION "Build the user documentation and embed in installer" ON)
+else()
+    option(CX_BUILD_USER_DOCUMENTATION "Build the user documentation and embed in installer" OFF)
+endif()
 
 IF (CX_BUILD_USER_DOCUMENTATION)
     SET(CX_DOC_INPUT_DIRECTORY ${CustusX_SOURCE_DIR}/documentation)
