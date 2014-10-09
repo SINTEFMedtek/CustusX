@@ -51,19 +51,20 @@ typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
  */
 class RegistrationMethodModelToUSPluginActivator :  public QObject, public ctkPluginActivator
 {
-  Q_OBJECT
-  Q_INTERFACES(ctkPluginActivator)
+	Q_OBJECT
+	Q_INTERFACES(ctkPluginActivator)
+	Q_PLUGIN_METADATA(IID "org_custusx_registration_method_modelToUS")
 
 public:
 
 	RegistrationMethodModelToUSPluginActivator();
 	~RegistrationMethodModelToUSPluginActivator();
 
-  void start(ctkPluginContext* context);
-  void stop(ctkPluginContext* context);
+	void start(ctkPluginContext* context);
+	void stop(ctkPluginContext* context);
 
 private:
-  RegisteredServicePtr mRegistration;
+	RegisteredServicePtr mRegistration;
 };
 
 } // namespace cx

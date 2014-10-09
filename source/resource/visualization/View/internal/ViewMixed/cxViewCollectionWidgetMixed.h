@@ -71,7 +71,7 @@ class ViewCollectionWidgetMixed : public ViewCollectionWidget
 	Q_OBJECT
 public:
 	ViewCollectionWidgetMixed();
-	~ViewCollectionWidgetMixed();
+    virtual ~ViewCollectionWidgetMixed();
 
 	ViewPtr addView(View::Type type, LayoutRegion region);
 	void clearViews();
@@ -85,9 +85,9 @@ private:
 	LayoutRegion mBaseRegion;
 	LayoutRegion mTotalRegion;
 	QGridLayout* mLayout;
-	ViewCollectionWidgetUsingViewContainer* mBaseLayout;
+    ViewCollectionWidget* mBaseLayout;
 	std::vector<LayoutRegion> mOverlayRegions;
-	std::vector<LayoutWidgetUsingViewWidgets*> mOverlays;
+    std::vector<ViewCollectionWidget*> mOverlays;
 };
 
 

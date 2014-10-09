@@ -7,14 +7,19 @@ message(STATUS "===================================== parsing org_custusx_regist
 include_directories(
     ${CX_RESOURCE_INCLUDE_DIRECTORIES}
     ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
+    ${CX_RESOURCE_FILTER_INCLUDE_DIRECTORIES}
+    ${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
     ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.registration
     ${CustusX_SOURCE_DIR}/source/logic
     ${CustusX_SOURCE_DIR}/source/modules/Algorithm/logic
 	${CustusX_SOURCE_DIR}/source/modules/Algorithm/gui
-    ${CustusX_SOURCE_DIR}/source/resource/filter
-	${CustusX_SOURCE_DIR}/source/resource/visualization
 	${CustusX_SOURCE_DIR}/source/gui/dataAdapters
 	${CustusX_SOURCE_DIR}/source/modules/Registration/gui
+
+	${CustusX_BINARY_DIR}/source/logic
+	${CustusX_BINARY_DIR}/source/gui
+	${CustusX_BINARY_DIR}/source/modules/Algorithm
+	${CustusX_BINARY_DIR}/source/modules/Registration
 )
 
 set(PLUGIN_SRCS

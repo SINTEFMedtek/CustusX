@@ -72,6 +72,7 @@ PerformanceTab::PerformanceTab(QWidget *parent) :
 	mRenderingRateLabel = NULL;
 	mSmartRenderCheckBox = NULL;
 	mGPU2DRenderCheckBox = NULL;
+    mOptimizedViewsCheckBox = NULL;
 	mShadingCheckBox = NULL;
 	mMainLayout = NULL;
 }
@@ -129,15 +130,12 @@ void PerformanceTab::init()
 									 "the software-based one, if available.</p>"
 									 "<p>This enables multiple volume rendering in 2D.<p>");
 
-//#ifndef USE_GLX_SHARED_CONTEXT
-//	mGPU2DRenderCheckBox->setChecked(false);
-//	mGPU2DRenderCheckBox->setEnabled(false);
-//#endif
+    bool optimizedViews = settings()->value("optimizedViews").toBool();
+      mOptimizedViewsCheckBox = new QCheckBox("Optimized Views");
+      mOptimizedViewsCheckBox->setChecked(optimizedViews);
+      mOptimizedViewsCheckBox->setToolTip("<p>Merge all non-3D views into a single vtkRenderWindow</p>"
+                                       "<p>This speeds up render on some platforms, still experimental.<p>");
 
-//  bool useGPU3DDepthPeeling = settings()->value("View3D/depthPeeling").toBool();
-//	mGPU3DDepthPeelingCheckBox = new QCheckBox("Use GPU 3D depth peeling");
-//	mGPU3DDepthPeelingCheckBox->setChecked(useGPU3DDepthPeeling);
-//	mGPU3DDepthPeelingCheckBox->setToolTip("Use a GPU-based 3D depth peeling to correctly visualize translucent surfaces.");
 
   //Layout
   mMainLayout = new QGridLayout;
@@ -147,6 +145,7 @@ void PerformanceTab::init()
   mMainLayout->addWidget(mRenderingRateLabel, 0, 2);
   mMainLayout->addWidget(mSmartRenderCheckBox, 2, 0);
   mMainLayout->addWidget(mGPU2DRenderCheckBox, 5, 0);
+  mMainLayout->addWidget(mOptimizedViewsCheckBox, 6, 0);
   new SpinBoxGroupWidget(this, mStillUpdateRate, mMainLayout, 7);
   mMainLayout->addWidget(sscCreateDataWidget(this, m3DVisualizer), 8, 0, 1, 2);
 
@@ -166,6 +165,8 @@ void PerformanceTab::saveParametersSlot()
 {
   settings()->setValue("renderingInterval", mRenderingIntervalSpinBox->value());
   settings()->setValue("useGPU2DRendering", mGPU2DRenderCheckBox->isChecked());
+  settings()->setValue("optimizedViews", mOptimizedViewsCheckBox->isChecked());
+
   settings()->setValue("View3D/maxRenderSize",     mMaxRenderSize->getValue());
   settings()->setValue("smartRender",       mSmartRenderCheckBox->isChecked());
   settings()->setValue("stillUpdateRate",   mStillUpdateRate->getValue());

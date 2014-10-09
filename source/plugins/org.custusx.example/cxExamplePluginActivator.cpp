@@ -51,13 +51,13 @@ ExamplePluginActivator::~ExamplePluginActivator()
 
 void ExamplePluginActivator::start(ctkPluginContext* context)
 {
-  mRegistration = RegisteredService::create<ExampleGUIExtenderService>(context, GUIExtenderService_iid);
+	mRegistration = RegisteredService::create<ExampleGUIExtenderService>(context, GUIExtenderService_iid);
 }
 
 void ExamplePluginActivator::stop(ctkPluginContext* context)
 {
-  mRegistration.reset();
-    Q_UNUSED(context);
+	mRegistration.reset();
+	Q_UNUSED(context);
 }
 
 } // namespace cx

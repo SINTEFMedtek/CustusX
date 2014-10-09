@@ -102,10 +102,10 @@ SET( SOURCE_FILES
 # =========================================================
 
 include_directories(
-    ${CX_RESOURCE_INCLUDE_DIRECTORIES}
     ${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
     ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
     ${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
+    ${CX_RESOURCE_FILTER_INCLUDE_DIRECTORIES}
     .
     ./logic
     ./gui
@@ -136,13 +136,6 @@ include_directories(
     ${CustusX_SOURCE_DIR}/source/gui/infoWidgets
     ${CustusX_SOURCE_DIR}/source/gui/dataWidgets
     ${CustusX_BINARY_DIR}/source/gui
-
-    ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
-    ${CustusX_SOURCE_DIR}/source/resource/core/registration
-    ${CustusX_BINARY_DIR}/source/resource/widgets
-    ${CustusX_BINARY_DIR}/source/resource/visualization
-    ${CustusX_BINARY_DIR}/source/resource/usReconstructionTypes
-	${CustusX_SOURCE_DIR}/source/resource/filter
     )
 
 
