@@ -41,7 +41,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkPolyData.h>
 #include "cxToolManager.h"
 #include "cxReporter.h"
-#include "cxDataManager.h"
 #include "cxMesh.h"
 #include "cxTransform3D.h"
 #include "cxRecordSessionWidget.h"

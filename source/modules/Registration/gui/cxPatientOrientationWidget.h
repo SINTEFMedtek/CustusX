@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxForwardDeclarations.h"
 #include "cxTransform3D.h"
 #include "cxDominantToolProxy.h"
-#include "cxPatientModelServiceProxy.h"
+#include "cxPatientModelService.h"
 
 class QPushButton;
 class QCheckBox;

@@ -38,7 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString>
 #include <map>
 #include "boost/shared_ptr.hpp"
-//#include "cxToolManager.h"
 #include "cxForwardDeclarations.h"
 #include "cxTransform3D.h"
 

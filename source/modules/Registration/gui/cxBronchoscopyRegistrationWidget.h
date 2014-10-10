@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QPushButton>
 #include "cxRegistrationBaseWidget.h"
-#include "cxTrackedCenterlineWidget.h"
+#include "cxForwardDeclarations.h"
 
 namespace cx
 {

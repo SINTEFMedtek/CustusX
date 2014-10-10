@@ -7,12 +7,9 @@ message(STATUS "===================================== parsing org_custusx_regist
 include_directories(
     ${CX_RESOURCE_INCLUDE_DIRECTORIES}
     ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
-    ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.registration
-    ${CustusX_SOURCE_DIR}/source/logic
-	${CustusX_SOURCE_DIR}/source/modules/Registration/gui
+    ${CustusX_SOURCE_DIR}/source/modules/Registration/gui
 	${CustusX_SOURCE_DIR}/source/service/tracking
 
-	${CustusX_BINARY_DIR}/source/logic
 	${CustusX_BINARY_DIR}/source/modules/Registration
 	${CustusX_BINARY_DIR}/source/service/tracking
 )
