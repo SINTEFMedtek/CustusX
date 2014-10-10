@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //#include "cxPlateRegistrationWidget.h"
 #include "cxRegisterI2IWidget.h"
 //#include "cxElastixWidget.h"
-#include "cxManualRegistrationWidget.h"
+//#include "cxManualRegistrationWidget.h"
 #include "cxSettings.h"
 #include "cxPatientOrientationWidget.h"
 
@@ -105,20 +105,20 @@ QString Image2ImageRegistrationWidget::defaultWhatsThis() const
 
 //------------------------------------------------------------------------------
 
-ManualRegistrationsWidget::ManualRegistrationsWidget(QWidget* parent, QString objectName, QString windowTitle) :
-  TabbedWidget(parent, objectName, windowTitle)
-{
-}
+//ManualRegistrationsWidget::ManualRegistrationsWidget(QWidget* parent, QString objectName, QString windowTitle) :
+//  TabbedWidget(parent, objectName, windowTitle)
+//{
+//}
 
-QString ManualRegistrationsWidget::defaultWhatsThis() const
-{
-  return "<html>"
-      "<h3>Manual registration.</h3>"
-      "<p>Directly manipulate the image or patient registrations via either"
-      "the defining matrix, or using sliders.</p>"
-      "<p><i>Chose image or patient</i></p>"
-      "</html>";
-}
+//QString ManualRegistrationsWidget::defaultWhatsThis() const
+//{
+//  return "<html>"
+//      "<h3>Manual registration.</h3>"
+//      "<p>Directly manipulate the image or patient registrations via either"
+//      "the defining matrix, or using sliders.</p>"
+//      "<p><i>Chose image or patient</i></p>"
+//      "</html>";
+//}
 
 //------------------------------------------------------------------------------
 
@@ -146,13 +146,13 @@ RegistrationMethodsWidget::RegistrationMethodsWidget(RegistrationServicePtr regi
 //  fastRegistrationsWidget->addTab(fastPatientRegistrationWidget, "Image2Patient");
 
   //fast
-  ManualRegistrationsWidget* manRegWidget = new ManualRegistrationsWidget(this, "ManualRegistrationWidget", "Manual Registrations");
-	ManualImage2ImageRegistrationWidget* manImage2ImageRegWidget = new ManualImage2ImageRegistrationWidget(registrationService, patientModelService, manRegWidget);
-	ManualImageTransformRegistrationWidget* manImageTransformRegWidget = new ManualImageTransformRegistrationWidget(registrationService, patientModelService, manRegWidget);
-	ManualPatientRegistrationWidget* manPatientRegWidget = new ManualPatientRegistrationWidget(registrationService, manRegWidget);
-  manRegWidget->addTab(manImage2ImageRegWidget, "Image2Image");
-  manRegWidget->addTab(manImageTransformRegWidget, "Image Transform");
-  manRegWidget->addTab(manPatientRegWidget, "Patient");
+//  ManualRegistrationsWidget* manRegWidget = new ManualRegistrationsWidget(this, "ManualRegistrationWidget", "Manual Registrations");
+//	ManualImage2ImageRegistrationWidget* manImage2ImageRegWidget = new ManualImage2ImageRegistrationWidget(registrationService, patientModelService, manRegWidget);
+//	ManualImageTransformRegistrationWidget* manImageTransformRegWidget = new ManualImageTransformRegistrationWidget(registrationService, patientModelService, manRegWidget);
+//	ManualPatientRegistrationWidget* manPatientRegWidget = new ManualPatientRegistrationWidget(registrationService, manRegWidget);
+//  manRegWidget->addTab(manImage2ImageRegWidget, "Image2Image");
+//  manRegWidget->addTab(manImageTransformRegWidget, "Image Transform");
+//  manRegWidget->addTab(manPatientRegWidget, "Patient");
 
 
   //vessel based image to image
@@ -175,7 +175,7 @@ RegistrationMethodsWidget::RegistrationMethodsWidget(RegistrationServicePtr regi
 
   this->addTab(landmarkRegistrationsWidget, "Landmark");
 //  this->addTab(fastRegistrationsWidget, "Fast");
-  this->addTab(manRegWidget, "Manual");
+//  this->addTab(manRegWidget, "Manual");
 //	this->addTab(new ElastixWidget(registrationService, patientModelService, this), "ElastiX");
   this->addTab(image2imageWidget, "Vessel");
   this->addTab(patientOrientationWidget, "Patient Orientation");

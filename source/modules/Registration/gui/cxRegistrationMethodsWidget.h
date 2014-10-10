@@ -69,13 +69,13 @@ public:
   virtual QString defaultWhatsThis() const;
 };
 //------------------------------------------------------------------------------
-class cxPluginRegistration_EXPORT ManualRegistrationsWidget : public TabbedWidget
-{
-public:
-	ManualRegistrationsWidget(QWidget* parent, QString objectName, QString windowTitle);
-  virtual ~ManualRegistrationsWidget(){};
-  virtual QString defaultWhatsThis() const;
-};
+//class cxPluginRegistration_EXPORT ManualRegistrationsWidget : public TabbedWidget
+//{
+//public:
+//	ManualRegistrationsWidget(QWidget* parent, QString objectName, QString windowTitle);
+//  virtual ~ManualRegistrationsWidget(){};
+//  virtual QString defaultWhatsThis() const;
+//};
 //------------------------------------------------------------------------------
 
 class cxPluginRegistration_EXPORT RegistrationMethodsWidget : public TabbedWidget

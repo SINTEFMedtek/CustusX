@@ -19,7 +19,7 @@ SET( MOC_HEADER_FILES
     gui/cxLandmarkImage2ImageRegistrationWidget.h
     gui/cxLandmarkRegistrationWidget.h
     gui/cxLandmarkPatientRegistrationWidget.h
-    gui/cxManualRegistrationWidget.h
+#    gui/cxManualRegistrationWidget.h
     gui/cxFastOrientationRegistrationWidget.h
     gui/cxPrepareVesselsWidget.h
     gui/cxSeansVesselRegistrationWidget.h
@@ -50,8 +50,8 @@ SET( SOURCE_FILES
     gui/cxLandmarkPatientRegistrationWidget.cpp
     gui/cxLandmarkImage2ImageRegistrationWidget.h
     gui/cxLandmarkImage2ImageRegistrationWidget.cpp
-    gui/cxManualRegistrationWidget.h
-    gui/cxManualRegistrationWidget.cpp
+#    gui/cxManualRegistrationWidget.h
+#    gui/cxManualRegistrationWidget.cpp
     gui/cxFastPatientRegistrationWidget.h
     gui/cxFastPatientRegistrationWidget.cpp
     gui/cxFastOrientationRegistrationWidget.h
