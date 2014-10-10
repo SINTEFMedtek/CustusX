@@ -178,16 +178,16 @@ QWidget *ViewManager::getLayoutWidget(int index)
 	{
         bool optimizedViews = settings()->value("optimizedViews").toBool();
 
-//        if (optimizedViews)
-//        {
+		if (optimizedViews)
+		{
 			report("creating optimized wiew layout");
 			mLayoutWidgets[index] = ViewCollectionWidget::createOptimizedLayout();
-//        }
-//        else
-//        {
-//			report("creating classic wiew layout");
-//			mLayoutWidgets[index] = ViewCollectionWidget::createViewWidgetLayout();
-//        }
+		}
+		else
+		{
+			report("creating classic wiew layout");
+			mLayoutWidgets[index] = ViewCollectionWidget::createViewWidgetLayout();
+		}
 
         mRenderLoop->addLayout(mLayoutWidgets[index]);
 
