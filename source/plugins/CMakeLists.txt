@@ -58,6 +58,7 @@ set(CX_PLUGINS
   org.custusx.visualization:ON
   org.custusx.tracking:ON
   org.custusx.video:ON
+  org.custusx.help:ON
 )
 
 #foreach(var ${CX_PLUGINS})

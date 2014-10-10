@@ -54,7 +54,7 @@ std::vector<GUIExtenderService::CategorizedWidget> DicomGUIExtenderService::crea
 
 	retval.push_back(GUIExtenderService::CategorizedWidget(
 			new DicomWidget(mContext),
-			"Plugins"));
+			"Utility"));
 
 	return retval;
 }

@@ -32,6 +32,9 @@ if (CX_WINDOWS)
     add_definitions(-D_USE_MATH_DEFINES)
 endif(CX_WINDOWS)
 
+# required to compile some eigen code on at least Ubuntu
+SET ( CMAKE_CXX_FLAGS "-ftemplate-depth=1024" CACHE STRING "Allow heavy templated Eigen code" FORCE)
+
 if(SSC_PRINT_CALLER_INFO)
         add_definitions(-DSSC_PRINT_CALLER_INFO)
 endif()
