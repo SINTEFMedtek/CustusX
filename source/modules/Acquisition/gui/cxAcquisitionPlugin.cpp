@@ -43,6 +43,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxUSAcqusitionWidget.h"
 #include "cxTrackedCenterlineWidget.h"
 
+#include "cxLegacySingletons.h"
+
 namespace cx
 {
 

@@ -8,25 +8,39 @@ include_directories(
     ${CX_RESOURCE_INCLUDE_DIRECTORIES}
     ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
     ${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
-	${CustusX_SOURCE_DIR}/source/modules/Registration/gui
-	${CustusX_SOURCE_DIR}/source/modules/Acquisition/gui
-	${CustusX_SOURCE_DIR}/source/modules/Acquisition/logic
+    ${CustusX_SOURCE_DIR}/source/modules/Registration/gui
+    ${CustusX_SOURCE_DIR}/source/modules/Acquisition/gui
+    ${CustusX_SOURCE_DIR}/source/modules/Acquisition/logic
 	${CustusX_SOURCE_DIR}/source/service/tracking
+	${CustusX_SOURCE_DIR}/source/service/visualization
+	${CustusX_SOURCE_DIR}/source/gui/dataWidgets
+	${CustusX_SOURCE_DIR}/source/logic
 
     ${CustusX_BINARY_DIR}/source/modules/Registration
     ${CustusX_BINARY_DIR}/source/modules/Acquisition
     ${CustusX_BINARY_DIR}/source/service/tracking
+    ${CustusX_BINARY_DIR}/source/service/visualization
+    ${CustusX_BINARY_DIR}/source/gui
+    ${CustusX_BINARY_DIR}/source/logic
 )
 
 set(PLUGIN_SRCS
   cxRegistrationMethodBronchoscopyPluginActivator.cpp
   cxRegistrationMethodBronchoscopyService.cpp
+  cxBronchoscopyRegistrationWidget.cpp
+  cxBronchoscopyRegistration.h
+  cxBronchoscopyRegistration.cpp
+  cxBranch.h
+  cxBranch.cpp
+  cxBranchList.h
+  cxBranchList.cpp
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
   cxRegistrationMethodBronchoscopyPluginActivator.h
   cxRegistrationMethodBronchoscopyService.h
+  cxBronchoscopyRegistrationWidget.h
 )
 
 # Qt Designer files which should be processed by Qts uic

@@ -27,7 +27,6 @@ SET( MOC_HEADER_FILES
     gui/cxRegistrationMethodsWidget.h
     gui/cxWirePhantomWidget.h
     gui/cxPatientOrientationWidget.h
-    gui/cxBronchoscopyRegistrationWidget.h
     )
 
 cx_remove_duplicate_include_directories()
@@ -38,12 +37,6 @@ SET( SOURCE_FILES
     ${MOC_HEADER_FILES}
    logic/cxRegistrationManager.h
    logic/cxRegistrationManager.cpp
-   logic/cxBronchoscopyRegistration.h
-   logic/cxBronchoscopyRegistration.cpp
-   logic/cxBranch.h
-   logic/cxBranch.cpp
-   logic/cxBranchList.h
-   logic/cxBranchList.cpp
     
    gui/cxRegistrationPlugin.h
    gui/cxRegistrationPlugin.cpp
@@ -73,8 +66,6 @@ SET( SOURCE_FILES
     gui/cxWirePhantomWidget.cpp
 	gui/cxPatientOrientationWidget.h
     gui/cxPatientOrientationWidget.cpp
-    gui/cxBronchoscopyRegistrationWidget.h
-    gui/cxBronchoscopyRegistrationWidget.cpp
     )
 
 # =========================================================

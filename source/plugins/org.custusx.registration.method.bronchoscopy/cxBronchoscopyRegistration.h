@@ -29,64 +29,36 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef BRONCHOSCOPYREGISTRATION_H_
+#define BRONCHOSCOPYREGISTRATION_H_
 
-#ifndef CXBRONCHOSCOPYREGISTRATIONWIDGET_H
-#define CXBRONCHOSCOPYREGISTRATIONWIDGET_H
+//#include "PositionData.h"
+#include "cxBranchList.h"
+#include <vector>
+#include "vtkForwardDeclarations.h"
 
-#include "cxPluginRegistrationExport.h"
 
-#include <QPushButton>
-#include "cxRegistrationBaseWidget.h"
-#include "cxForwardDeclarations.h"
+typedef std::vector< Eigen::Matrix4d > M4Vector;
+
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class Acquisition> AcquisitionPtr;
-typedef boost::shared_ptr<class SelectMeshStringDataAdapter> SelectMeshStringDataAdapterPtr;
-typedef boost::shared_ptr<class ToolRep3D> ToolRep3DPtr;
-typedef boost::shared_ptr<class RecordSessionWidget> RecordSessionWidgetPtr;
+typedef std::map<double, Transform3D> TimedTransformMap;
 
-/**
- * BronchoscopyRegistrationWidget
- *
- * \brief Register tracked bronchostopy tool path to lung centerline data (from CT)
- *
- * \date Oct 10, 2013
- * \author Ole Vegard Solberg
- * \author Erlend Hofstad
- */
-class cxPluginRegistration_EXPORT BronchoscopyRegistrationWidget: public RegistrationBaseWidget
+class BronchoscopyRegistration
 {
-	Q_OBJECT
 public:
-	BronchoscopyRegistrationWidget(RegistrationServicePtr registrationService, VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget *parent);
-	virtual ~BronchoscopyRegistrationWidget()
-	{
-	}
-	virtual QString defaultWhatsThis() const;
-private slots:
-	void registerSlot();
-	void acquisitionStarted();
-	void acquisitionStopped();
-    void obscuredSlot(bool obscured);
-
-private:
-	QVBoxLayout* mVerticalLayout;
-	QLabel* mLabel;
-
-
-	AcquisitionPtr mAquisition;
-	RecordSessionWidgetPtr mRecordSessionWidget;
-	SelectMeshStringDataAdapterPtr mSelectMeshWidget;
-	QPushButton* mRegisterButton;
-    ToolPtr mTool;
-//    TrackedCenterlineWidget* mTrackedCenterLine;
-
-    ToolRep3DPtr getToolRepIn3DView(ToolPtr tool);
-
+	BronchoscopyRegistration();
+    Eigen::Matrix4d runBronchoscopyRegistration(vtkPolyDataPtr centerline, TimedTransformMap trackingData_prMt, Transform3D old_rMpr, Transform3D rMd);
+	virtual ~BronchoscopyRegistration();
 };
 
-} //namespace cx
+M4Vector excludeClosePositions();
+Eigen::Matrix4d registrationAlgorithm(BranchList* branches, M4Vector Tnavigation);
+std::vector<Eigen::MatrixXd::Index> dsearch2n(Eigen::MatrixXd pos1, Eigen::MatrixXd pos2, Eigen::MatrixXd ori1, Eigen::MatrixXd ori2);
+vtkPointsPtr convertTovtkPoints(Eigen::MatrixXd positions);
+Eigen::Matrix4d performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr target, bool* ok);
+}//namespace cx
 
-#endif // CXBRONCHOSCOPYREGISTRATIONWIDGET_H
+#endif /* BRONCHOSCOPYREGISTRATION_H_ */

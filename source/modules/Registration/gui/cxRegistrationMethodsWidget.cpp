@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientOrientationWidget.h"
 
 #include "cxPrepareVesselsWidget.h"
-#include "cxBronchoscopyRegistrationWidget.h"
+//#include "cxBronchoscopyRegistrationWidget.h"
 
 namespace cx
 {
@@ -180,7 +180,7 @@ RegistrationMethodsWidget::RegistrationMethodsWidget(RegistrationServicePtr regi
   this->addTab(image2imageWidget, "Vessel");
   this->addTab(patientOrientationWidget, "Patient Orientation");
 //  this->addTab(imageAndPlateRegistrationWidget, "Plate");
-  this->addTab(new BronchoscopyRegistrationWidget(registrationService, visualizationService, patientModelService, this), "Bronchoscopy");
+//  this->addTab(new BronchoscopyRegistrationWidget(registrationService, visualizationService, patientModelService, this), "Bronchoscopy");
 
   connect(mTabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChangedSlot(int)));
   mTabWidget->setCurrentIndex(settings()->value("registration/tabIndex").toInt());

@@ -42,6 +42,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxToolManager.h"
 #include "cxSettings.h"
 
+#include "cxLegacySingletons.h"
+
 namespace cx
 {
 AcquisitionData::AcquisitionData()

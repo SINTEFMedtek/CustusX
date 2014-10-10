@@ -36,7 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataSelectWidget.h"
 #include "cxToolManager.h"
 #include "cxMesh.h"
-#include "cxRegistrationManager.h"
 #include "cxAcquisitionData.h"
 #include "cxSelectDataStringDataAdapter.h"
 #include "cxTrackedCenterlineWidget.h"
@@ -51,13 +50,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReporter.h"
 #include "cxTypeConversions.h"
 #include "cxThresholdPreview.h"
+#include "cxPatientModelService.h"
+
+#include "cxLegacySingletons.h"
 
 
 namespace cx
 {
 BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegistrationServicePtr registrationService, VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent) :
 	RegistrationBaseWidget(registrationService, parent, "BronchoscopyRegistrationWidget",
-						   "Bronchoscopy Registration"), mVerticalLayout(new QVBoxLayout(this))
+						   "Bronchoscopy Registration"), mVerticalLayout(new QVBoxLayout(this)),
+	mPatientModelService(patientModelService)
 {
 	mSelectMeshWidget = SelectMeshStringDataAdapter::New(patientModelService);
 	mSelectMeshWidget->setValueName("Centerline: ");
@@ -101,7 +104,7 @@ QString BronchoscopyRegistrationWidget::defaultWhatsThis() const
 
 void BronchoscopyRegistrationWidget::registerSlot()
 {
-    Transform3D old_rMpr = dataManager()->get_rMpr();//input to registrationAlgorithm
+	Transform3D old_rMpr = mPatientModelService->get_rMpr();//input to registrationAlgorithm
     //std::cout << "rMpr: " << std::endl;
     //std::cout << old_rMpr << std::endl;
 

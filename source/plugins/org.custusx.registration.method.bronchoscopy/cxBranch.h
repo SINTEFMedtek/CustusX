@@ -29,38 +29,50 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef BRONCHOSCOPYREGISTRATION_H_
-#define BRONCHOSCOPYREGISTRATION_H_
+#ifndef BRANCH_H_
+#define BRANCH_H_
 
-#include "cxPluginRegistrationExport.h"
-
-//#include "PositionData.h"
-#include "cxBranchList.h"
 #include <vector>
-#include "vtkForwardDeclarations.h"
+#include "cxDataManager.h"
+#include "cxMesh.h"
+#include "cxVector3D.h"
 
-
-typedef std::vector< Eigen::Matrix4d > M4Vector;
+typedef std::vector<double> dVector;
+typedef std::vector<dVector> dVectors;
 
 
 namespace cx
 {
 
-typedef std::map<double, Transform3D> TimedTransformMap;
+class Branch;
+typedef std::vector<Branch*> branchVector;
 
-class cxPluginRegistration_EXPORT BronchoscopyRegistration
+class Branch
 {
+	Eigen::MatrixXd positions;
+	Eigen::MatrixXd orientations;
+	branchVector childBranches;
+	Branch* parentBranch;
 public:
-	BronchoscopyRegistration();
-    Eigen::Matrix4d runBronchoscopyRegistration(vtkPolyDataPtr centerline, TimedTransformMap trackingData_prMt, Transform3D old_rMpr, Transform3D rMd);
-	virtual ~BronchoscopyRegistration();
+	Branch();
+	virtual ~Branch();
+	void setPositions(Eigen::MatrixXd pos);
+	Eigen::MatrixXd getPositions();
+	void setOrientations(Eigen::MatrixXd orient);
+	Eigen::MatrixXd getOrientations();
+	void addChildBranch(Branch* child);
+	void setChildBranches(branchVector children);
+	void deleteChildBranches();
+	branchVector getChildBranches();
+	void setParentBranch(Branch* parent);
+	Branch* getParentBranch();
+
 };
 
-M4Vector excludeClosePositions();
-Eigen::Matrix4d registrationAlgorithm(BranchList* branches, M4Vector Tnavigation);
-std::vector<Eigen::MatrixXd::Index> dsearch2n(Eigen::MatrixXd pos1, Eigen::MatrixXd pos2, Eigen::MatrixXd ori1, Eigen::MatrixXd ori2);
-vtkPointsPtr convertTovtkPoints(Eigen::MatrixXd positions);
-Eigen::Matrix4d performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr target, bool* ok);
+
 }//namespace cx
 
-#endif /* BRONCHOSCOPYREGISTRATION_H_ */
+#endif /* BRANCH_H_ */
+
+
+

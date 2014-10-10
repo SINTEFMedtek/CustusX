@@ -29,52 +29,65 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef BRANCH_H_
-#define BRANCH_H_
 
-#include "cxPluginRegistrationExport.h"
+#ifndef CXBRONCHOSCOPYREGISTRATIONWIDGET_H
+#define CXBRONCHOSCOPYREGISTRATIONWIDGET_H
 
-#include <vector>
-#include "cxDataManager.h"
-#include "cxMesh.h"
-#include "cxVector3D.h"
+//#include "cxPluginRegistrationExport.h"
 
-typedef std::vector<double> dVector;
-typedef std::vector<dVector> dVectors;
-
+#include <QPushButton>
+#include "cxRegistrationBaseWidget.h"
+#include "cxForwardDeclarations.h"
 
 namespace cx
 {
 
-class Branch;
-typedef std::vector<Branch*> branchVector;
+typedef boost::shared_ptr<class Acquisition> AcquisitionPtr;
+typedef boost::shared_ptr<class SelectMeshStringDataAdapter> SelectMeshStringDataAdapterPtr;
+typedef boost::shared_ptr<class ToolRep3D> ToolRep3DPtr;
+typedef boost::shared_ptr<class RecordSessionWidget> RecordSessionWidgetPtr;
 
-class cxPluginRegistration_EXPORT Branch
+/**
+ * BronchoscopyRegistrationWidget
+ *
+ * \brief Register tracked bronchostopy tool path to lung centerline data (from CT)
+ *
+ * \date Oct 10, 2013
+ * \author Ole Vegard Solberg
+ * \author Erlend Hofstad
+ */
+class BronchoscopyRegistrationWidget: public RegistrationBaseWidget
 {
-	Eigen::MatrixXd positions;
-	Eigen::MatrixXd orientations;
-	branchVector childBranches;
-	Branch* parentBranch;
+	Q_OBJECT
 public:
-	Branch();
-	virtual ~Branch();
-	void setPositions(Eigen::MatrixXd pos);
-	Eigen::MatrixXd getPositions();
-	void setOrientations(Eigen::MatrixXd orient);
-	Eigen::MatrixXd getOrientations();
-	void addChildBranch(Branch* child);
-	void setChildBranches(branchVector children);
-	void deleteChildBranches();
-	branchVector getChildBranches();
-	void setParentBranch(Branch* parent);
-	Branch* getParentBranch();
+	BronchoscopyRegistrationWidget(RegistrationServicePtr registrationService, VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget *parent);
+	virtual ~BronchoscopyRegistrationWidget()
+	{
+	}
+	virtual QString defaultWhatsThis() const;
+private slots:
+	void registerSlot();
+	void acquisitionStarted();
+	void acquisitionStopped();
+    void obscuredSlot(bool obscured);
+
+private:
+	QVBoxLayout* mVerticalLayout;
+	QLabel* mLabel;
+
+
+	AcquisitionPtr mAquisition;
+	RecordSessionWidgetPtr mRecordSessionWidget;
+	SelectMeshStringDataAdapterPtr mSelectMeshWidget;
+	QPushButton* mRegisterButton;
+    ToolPtr mTool;
+//    TrackedCenterlineWidget* mTrackedCenterLine;
+	PatientModelServicePtr mPatientModelService;
+
+    ToolRep3DPtr getToolRepIn3DView(ToolPtr tool);
 
 };
 
+} //namespace cx
 
-}//namespace cx
-
-#endif /* BRANCH_H_ */
-
-
-
+#endif // CXBRONCHOSCOPYREGISTRATIONWIDGET_H

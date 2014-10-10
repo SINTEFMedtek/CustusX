@@ -31,7 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxRegistrationMethodBronchoscopyService.h"
-#include "cxRegistrationMethodsWidget.h"
 #include "cxBronchoscopyRegistrationWidget.h"
 
 namespace cx

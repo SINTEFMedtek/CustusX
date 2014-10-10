@@ -56,6 +56,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxSelectDataStringDataAdapter.h"
 
+#include "cxLegacySingletons.h"
+
 namespace cx
 {
 LandmarkImageRegistrationWidget::LandmarkImageRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent,
