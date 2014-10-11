@@ -60,7 +60,7 @@ class PlateRegistrationWidget : public RegistrationBaseWidget
 {
 	Q_OBJECT
 public:
-	PlateRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget* parent);
+	PlateRegistrationWidget(regServices services, QWidget* parent);
 	virtual ~PlateRegistrationWidget();
 	virtual QString defaultWhatsThis() const;
 
@@ -74,8 +74,6 @@ private slots:
 private:
 	QPushButton* mPlateRegistrationButton;
 	QLabel*      mReferenceToolInfoLabel;
-	PatientModelServicePtr mPatientModelService;
-	VisualizationServicePtr mVisualizationService;
 };
 
 /**

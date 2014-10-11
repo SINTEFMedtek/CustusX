@@ -8,15 +8,15 @@ Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
 1. Redistributions of source code must retain the above copyright notice,
-	 this list of conditions and the following disclaimer.
+   this list of conditions and the following disclaimer.
 
 2. Redistributions in binary form must reproduce the above copyright notice,
-	 this list of conditions and the following disclaimer in the documentation
-	 and/or other materials provided with the distribution.
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
 
 3. Neither the name of the copyright holder nor the names of its contributors
-	 may be used to endorse or promote products derived from this software
-	 without specific prior written permission.
+   may be used to endorse or promote products derived from this software
+   without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -30,21 +30,23 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxRegistrationMethodManualImageToPatientService.h"
-#include "cxManualPatientRegistrationWidget.h"
+#include "cxLandmarkRegistrationsWidget.h"
 
 namespace cx
 {
 
-RegistrationMethodManualImageToPatientService::RegistrationMethodManualImageToPatientService(regServices services) :
-	RegistrationMethodManualService(services)
+LandmarkRegistrationsWidget::LandmarkRegistrationsWidget(QWidget* parent, QString objectName, QString windowTitle) :
+  TabbedWidget(parent, objectName, windowTitle)
 {
 }
 
-QWidget* RegistrationMethodManualImageToPatientService::createWidget()
+QString LandmarkRegistrationsWidget::defaultWhatsThis() const
 {
-	QWidget *retval = new ManualPatientRegistrationWidget(mServices, NULL, this->getWidgetName());
-	return retval;
+  return "<html>"
+	  "<h3>Landmark based registrations.</h3>"
+	  "<p>This is a set of methods that use landmarks/fiducials to connect the images with the real world.</p>"
+	  "<p><i>Choose a step to continue..</i></p>"
+	  "</html>";
 }
 
 } //cx

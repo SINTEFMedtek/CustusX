@@ -51,19 +51,13 @@ class org_custusx_registration_method_plate_EXPORT RegistrationMethodPlateImageT
 {
 	Q_INTERFACES(cx::RegistrationMethodService)
 public:
-	RegistrationMethodPlateImageToPatientService(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService) :
-		RegistrationMethodService(registrationService),
-		mPatientModelService(patientModelService),
-		mVisualizationService(visualizationService) {}
+	RegistrationMethodPlateImageToPatientService(regServices services) :
+		RegistrationMethodService(services) {}
 	virtual ~RegistrationMethodPlateImageToPatientService() {}
 	virtual QString getRegistrationType() {return QString("ImageToPatient");}
 	virtual QString getRegistrationMethod() {return QString("Plate Landmark");}
 	virtual QString getWidgetName() {return QString("PlateImage2PatientRegistrationWidget");}
 	virtual QWidget* createWidget();
-
-private:
-	PatientModelServicePtr mPatientModelService;
-	VisualizationServicePtr mVisualizationService;
 };
 
 } /* namespace cx */

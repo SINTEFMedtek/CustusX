@@ -104,6 +104,11 @@ std::map<QString, LandmarkProperty> PatientModelImplService::getLandmarkProperti
 	return dataService()->getLandmarkProperties();
 }
 
+void PatientModelImplService::setLandmarkName(QString uid, QString name)
+{
+	dataService()->setLandmarkName(uid, name);
+}
+
 Transform3D PatientModelImplService::get_rMpr() const
 {
 	return dataService()->get_rMpr();
@@ -206,6 +211,16 @@ void PatientModelImplService::removePatientData(QString uid)
 PresetTransferFunctions3DPtr PatientModelImplService::getPresetTransferFunctions3D() const
 {
 	return dataService()->getPresetTransferFunctions3D();
+}
+
+void PatientModelImplService::setCenter(const Vector3D &center)
+{
+	dataManager()->setCenter(center);
+}
+
+QString PatientModelImplService::addLandmark()
+{
+	return dataService()->addLandmark();
 }
 
 void PatientModelImplService::setLandmarkActive(QString uid, bool active)

@@ -67,6 +67,7 @@ public:
 
 	virtual LandmarksPtr getPatientLandmarks() const;
 	virtual std::map<QString, LandmarkProperty> getLandmarkProperties() const;
+	virtual void setLandmarkName(QString uid, QString name);
 	virtual void setLandmarkActive(QString uid, bool active);
 
 	virtual Transform3D get_rMpr() const;
@@ -90,6 +91,10 @@ public:
 	virtual void removePatientData(QString uid);
 
 	virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const;
+
+	virtual void setCenter(const Vector3D& center);
+
+	virtual QString addLandmark();
 
 	virtual void autoSave();
 	virtual bool isNull();

@@ -38,11 +38,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVBoxLayout>
 
 //registration
-#include "cxLandmarkImageRegistrationWidget.h"
-#include "cxLandmarkImage2ImageRegistrationWidget.h"
-#include "cxLandmarkPatientRegistrationWidget.h"
-#include "cxFastPatientRegistrationWidget.h"
-#include "cxFastOrientationRegistrationWidget.h"
+//#include "cxLandmarkImageRegistrationWidget.h"
+//#include "cxLandmarkImage2ImageRegistrationWidget.h"
+//#include "cxLandmarkPatientRegistrationWidget.h"
+//#include "cxFastPatientRegistrationWidget.h"
+//#include "cxFastOrientationRegistrationWidget.h"
 //#include "cxPlateRegistrationWidget.h"
 #include "cxRegisterI2IWidget.h"
 //#include "cxElastixWidget.h"
@@ -56,36 +56,36 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-LandmarkRegistrationsWidget::LandmarkRegistrationsWidget(QWidget* parent, QString objectName, QString windowTitle) :
-  TabbedWidget(parent, objectName, windowTitle)
-{
-}
+//LandmarkRegistrationsWidget::LandmarkRegistrationsWidget(QWidget* parent, QString objectName, QString windowTitle) :
+//  TabbedWidget(parent, objectName, windowTitle)
+//{
+//}
 
-QString LandmarkRegistrationsWidget::defaultWhatsThis() const
-{
-  return "<html>"
-      "<h3>Landmark based registrations.</h3>"
-      "<p>This is a set of methods that use landmarks/fiducials to connect the images with the real world.</p>"
-      "<p><i>Choose a step to continue..</i></p>"
-      "</html>";
-}
+//QString LandmarkRegistrationsWidget::defaultWhatsThis() const
+//{
+//  return "<html>"
+//      "<h3>Landmark based registrations.</h3>"
+//      "<p>This is a set of methods that use landmarks/fiducials to connect the images with the real world.</p>"
+//      "<p><i>Choose a step to continue..</i></p>"
+//      "</html>";
+//}
 
 //------------------------------------------------------------------------------
 
-FastRegistrationsWidget::FastRegistrationsWidget(QWidget* parent, QString objectName, QString windowTitle) :
-  TabbedWidget(parent, objectName, windowTitle)
-{
-}
+//FastRegistrationsWidget::FastRegistrationsWidget(QWidget* parent, QString objectName, QString windowTitle) :
+//  TabbedWidget(parent, objectName, windowTitle)
+//{
+//}
 
-QString FastRegistrationsWidget::defaultWhatsThis() const
-{
-	return "<html>"
-			"<h3>Fast and approximate registration.</h3>"
-			"<p><b>Prerequisite:</b> Correctly oriented DICOM axes.</p>"
-			"<p>This is a method designed to be quick and easy, it uses a tools orientation and a landmarks translation to determine where the image is relative to the patient.</p>"
-			"<p><i>Choose a step to continue.</i></p>"
-			"</html>";
-}
+//QString FastRegistrationsWidget::defaultWhatsThis() const
+//{
+//	return "<html>"
+//			"<h3>Fast and approximate registration.</h3>"
+//			"<p><b>Prerequisite:</b> Correctly oriented DICOM axes.</p>"
+//			"<p>This is a method designed to be quick and easy, it uses a tools orientation and a landmarks translation to determine where the image is relative to the patient.</p>"
+//			"<p><i>Choose a step to continue.</i></p>"
+//			"</html>";
+//}
 
 //------------------------------------------------------------------------------
 
@@ -128,13 +128,13 @@ RegistrationMethodsWidget::RegistrationMethodsWidget(RegistrationServicePtr regi
 
 
   //landmark
-  LandmarkRegistrationsWidget* landmarkRegistrationsWidget = new LandmarkRegistrationsWidget(this, "LandmarkRegistrationWidget", "Landmark Registrations");
-	LandmarkImageRegistrationWidget* imageRegistrationWidget = new LandmarkImageRegistrationWidget(registrationService, patientModelService, landmarkRegistrationsWidget, "LMImageRegistrationWidget", "Image Registration");
-	LandmarkPatientRegistrationWidget* patientRegistrationWidget = new LandmarkPatientRegistrationWidget(registrationService, patientModelService, landmarkRegistrationsWidget, "LMPatientRegistrationWidget", "Patient Registration");
-	LandmarkImage2ImageRegistrationWidget* image2imageRegistrationWidget = new LandmarkImage2ImageRegistrationWidget(registrationService, patientModelService, landmarkRegistrationsWidget, "LMImage2ImageRegistrationWidget", "Image2Image Registration");
-  landmarkRegistrationsWidget->addTab(imageRegistrationWidget, "Image");
-  landmarkRegistrationsWidget->addTab(patientRegistrationWidget, "Image2Patient");
-  landmarkRegistrationsWidget->addTab(image2imageRegistrationWidget, "Image2Image");
+//  LandmarkRegistrationsWidget* landmarkRegistrationsWidget = new LandmarkRegistrationsWidget(this, "LandmarkRegistrationWidget", "Landmark Registrations");
+//	LandmarkImageRegistrationWidget* imageRegistrationWidget = new LandmarkImageRegistrationWidget(registrationService, patientModelService, landmarkRegistrationsWidget, "LMImageRegistrationWidget", "Image Registration");
+//	LandmarkPatientRegistrationWidget* patientRegistrationWidget = new LandmarkPatientRegistrationWidget(registrationService, patientModelService, landmarkRegistrationsWidget, "LMPatientRegistrationWidget", "Patient Registration");
+//	LandmarkImage2ImageRegistrationWidget* image2imageRegistrationWidget = new LandmarkImage2ImageRegistrationWidget(registrationService, patientModelService, landmarkRegistrationsWidget, "LMImage2ImageRegistrationWidget", "Image2Image Registration");
+//  landmarkRegistrationsWidget->addTab(imageRegistrationWidget, "Image");
+//  landmarkRegistrationsWidget->addTab(patientRegistrationWidget, "Image2Patient");
+//  landmarkRegistrationsWidget->addTab(image2imageRegistrationWidget, "Image2Image");
 
   //fast
 //  FastRegistrationsWidget* fastRegistrationsWidget = new FastRegistrationsWidget(this, "FastRegistrationWidget", "Fast Registrations");
@@ -156,15 +156,15 @@ RegistrationMethodsWidget::RegistrationMethodsWidget(RegistrationServicePtr regi
 
 
   //vessel based image to image
-  Image2ImageRegistrationWidget* image2imageWidget = new Image2ImageRegistrationWidget(this, "Image2ImageRegistrationWidget", "Image 2 Image Registration");
+//  Image2ImageRegistrationWidget* image2imageWidget = new Image2ImageRegistrationWidget(this, "Image2ImageRegistrationWidget", "Image 2 Image Registration");
 
-  PrepareVesselsWidget* prepareRegistrationWidget = new PrepareVesselsWidget(registrationService, visualizationService, patientModelService, image2imageWidget);
+//  PrepareVesselsWidget* prepareRegistrationWidget = new PrepareVesselsWidget(registrationService, visualizationService, patientModelService, image2imageWidget);
 
-  image2imageWidget->addTab(prepareRegistrationWidget, "Prepare"); //should be application specific
-	image2imageWidget->addTab(new RegisterI2IWidget(registrationService, patientModelService, image2imageWidget),"Register");
+//  image2imageWidget->addTab(prepareRegistrationWidget, "Prepare"); //should be application specific
+//	image2imageWidget->addTab(new RegisterI2IWidget(registrationService, patientModelService, image2imageWidget),"Register");
 
   //patient orientation
-	PatientOrientationWidget* patientOrientationWidget = new PatientOrientationWidget(registrationService, patientModelService, this, "PatientOrientationWidget", "Patient Orientation");
+//	PatientOrientationWidget* patientOrientationWidget = new PatientOrientationWidget(registrationService, patientModelService, this, "PatientOrientationWidget", "Patient Orientation");
 
   //plate
 //	Image2PlateRegistrationWidget* imageAndPlateRegistrationWidget = new Image2PlateRegistrationWidget(this, "PlateRegistrationWidget", "Plate");
@@ -173,12 +173,12 @@ RegistrationMethodsWidget::RegistrationMethodsWidget(RegistrationServicePtr regi
 //  imageAndPlateRegistrationWidget->addTab(plateRegistrationWidget, "Plate");
 //  imageAndPlateRegistrationWidget->addTab(platesImageRegistrationWidget, "Image");
 
-  this->addTab(landmarkRegistrationsWidget, "Landmark");
+//  this->addTab(landmarkRegistrationsWidget, "Landmark");
 //  this->addTab(fastRegistrationsWidget, "Fast");
 //  this->addTab(manRegWidget, "Manual");
 //	this->addTab(new ElastixWidget(registrationService, patientModelService, this), "ElastiX");
-  this->addTab(image2imageWidget, "Vessel");
-  this->addTab(patientOrientationWidget, "Patient Orientation");
+//  this->addTab(image2imageWidget, "Vessel");
+//  this->addTab(patientOrientationWidget, "Patient Orientation");
 //  this->addTab(imageAndPlateRegistrationWidget, "Plate");
 //  this->addTab(new BronchoscopyRegistrationWidget(registrationService, visualizationService, patientModelService, this), "Bronchoscopy");
 

@@ -7,24 +7,50 @@ message(STATUS "===================================== parsing org_custusx_regist
 include_directories(
     ${CX_RESOURCE_INCLUDE_DIRECTORIES}
     ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
+    ${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
 	${CustusX_SOURCE_DIR}/source/modules/Registration/gui
+	${CustusX_SOURCE_DIR}/source/modules/Registration/logic
+	${CustusX_SOURCE_DIR}/source/modules/Acquisition/logic
 	${CustusX_SOURCE_DIR}/source/service/tracking
+	${CustusX_SOURCE_DIR}/source/service/visualization
+	${CustusX_SOURCE_DIR}/source/gui/infoWidgets
+	${CustusX_SOURCE_DIR}/source/logic
 
 	${CustusX_BINARY_DIR}/source/modules/Registration
+	${CustusX_BINARY_DIR}/source/modules/Acquisition
 	${CustusX_BINARY_DIR}/source/service/tracking
+	${CustusX_BINARY_DIR}/source/service/visualization
+	${CustusX_BINARY_DIR}/source/gui
+	${CustusX_BINARY_DIR}/source/logic
 )
 
 set(PLUGIN_SRCS
-  cxRegistrationMethodLandmarkPluginActivator.cpp
-  cxRegistrationMethodLandmarkService.cpp
-  cxFastImageRegistrationWidget.cpp
+    cxRegistrationMethodLandmarkPluginActivator.cpp
+    cxRegistrationMethodLandmarkService.cpp
+    cxFastImageRegistrationWidget.cpp
+    cxFastRegistrationsWidget.cpp
+    cxFastRegistrationsWidget.h
+    cxLandmarkRegistrationsWidget.cpp
+    cxLandmarkImageRegistrationWidget.cpp
+    cxLandmarkRegistrationWidget.cpp
+    cxLandmarkPatientRegistrationWidget.cpp
+    cxLandmarkImage2ImageRegistrationWidget.cpp
+    cxFastPatientRegistrationWidget.cpp
+    cxFastOrientationRegistrationWidget.cpp
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
-  cxRegistrationMethodLandmarkPluginActivator.h
-  cxRegistrationMethodLandmarkService.h
-  cxFastImageRegistrationWidget.h
+    cxRegistrationMethodLandmarkPluginActivator.h
+    cxRegistrationMethodLandmarkService.h
+    cxLandmarkRegistrationsWidget.h
+    cxLandmarkRegistrationWidget.h
+    cxLandmarkImageRegistrationWidget.h
+    cxLandmarkPatientRegistrationWidget.h
+    cxLandmarkImage2ImageRegistrationWidget.h
+    cxFastPatientRegistrationWidget.h
+    cxFastImageRegistrationWidget.h
+    cxFastOrientationRegistrationWidget.h
 )
 
 # Qt Designer files which should be processed by Qts uic

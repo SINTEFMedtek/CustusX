@@ -29,27 +29,32 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXLANDMARKREGISTRATIONWIDGET_H_
-#define CXLANDMARKREGISTRATIONWIDGET_H_
+
+#ifndef CXLANDMARKPATIENTREGISTRATIONWIDGET_H_
+#define CXLANDMARKPATIENTREGISTRATIONWIDGET_H_
 
 #include "cxPluginRegistrationExport.h"
 
-#include <map>
-#include "cxTransform3D.h"
-#include "cxRegistrationBaseWidget.h"
+#include "cxLandmarkRegistrationWidget.h"
+#include "cxRegistrationDataAdapters.h"
 
+#include "cxImage.h"
+#include "cxTransform3D.h"
+#include "cxDominantToolProxy.h"
 
 class QVBoxLayout;
 class QComboBox;
 class QTableWidget;
 class QPushButton;
+class QString;
 class QLabel;
 class QSlider;
+class QGridLayout;
+class QSpinBox;
 
 namespace cx
 {
-typedef std::map<QString, class Landmark> LandmarkMap;
-typedef boost::shared_ptr<class RegistrationManager> RegistrationManagerPtr;
+typedef Transform3D Transform3D;
 
 /**
  * \file
@@ -58,55 +63,54 @@ typedef boost::shared_ptr<class RegistrationManager> RegistrationManagerPtr;
  */
 
 /**
- * \class LandmarkRegistrationWidget
- * Superclass for Image Registration and Patient Registration
+ * \class LandmarkPatientRegistrationWidget
+ *
+ * \brief Widget used as a tab in the ContexDockWidget for patient registration.
+ *
+ * \date Feb 3, 2009
+ * \\author Janne Beate Bakeng, SINTEF
  */
-class cxPluginRegistration_EXPORT LandmarkRegistrationWidget: public RegistrationBaseWidget
+class cxPluginRegistration_EXPORT LandmarkPatientRegistrationWidget: public LandmarkRegistrationWidget
 {
 Q_OBJECT
 
 public:
-	LandmarkRegistrationWidget(RegistrationServicePtr registrationService, QWidget* parent, QString objectName,
-		QString windowTitle);
-	virtual ~LandmarkRegistrationWidget();
-
+	LandmarkPatientRegistrationWidget(regServices services, QWidget* parent, QString objectName,
+		QString windowTitle); ///< sets up layout and connects signals and slots
+	virtual ~LandmarkPatientRegistrationWidget(); ///< empty
 	virtual QString defaultWhatsThis() const;
 
 protected slots:
-	virtual void cellClickedSlot(int row, int column); ///< when a landmark i selected from the table
 
-	void cellChangedSlot(int row, int column); ///< reacts when the user types in a (landmark) name
-	void landmarkUpdatedSlot();
-	void updateAvarageAccuracyLabel();
+	void registerSlot();
+	virtual void fixedDataChanged(); ///< listens to the datamanager for when the active image is changed
+	void toolSampleButtonClickedSlot(); ///< reacts when the Sample Tool button is clicked
+	virtual void cellClickedSlot(int row, int column); ///< when a landmark i selected from the table
+	void removeLandmarkButtonClickedSlot();
+	void updateToolSampleButton();
 
 protected:
 	virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
 	virtual void hideEvent(QHideEvent* event);
     virtual void prePaintEvent(); ///< populates the table widget
-	virtual LandmarkMap getTargetLandmarks() const = 0;
-	virtual void performRegistration() = 0;
-	virtual Transform3D getTargetTransform() const = 0; ///< Return transform from target space to reference space
-	virtual void setTargetLandmark(QString uid, Vector3D p_target) = 0;
-	virtual QString getTargetName() const = 0;
-	void setManualToolPosition(Vector3D p_r);
-    QString getNextLandmark();
-    void activateLandmark(QString uid);
-
-	std::vector<Landmark> getAllLandmarks() const; ///< get all the landmarks from the image and the datamanager
-	QString getLandmarkName(QString uid);
-	double getAccuracy(QString uid);
-	double getAvarageAccuracy();
+    virtual LandmarkMap getTargetLandmarks() const;
+	virtual Transform3D getTargetTransform() const;
+	virtual void setTargetLandmark(QString uid, Vector3D p_target);
+	virtual QString getTargetName() const;
+	virtual void performRegistration();
 
 	//gui
-	QVBoxLayout* mVerticalLayout; ///< vertical layout is used
-	QTableWidget* mLandmarkTableWidget; ///< the table widget presenting the landmarks
-	QLabel* mAvarageAccuracyLabel; ///< label showing the average accuracy
+	QPushButton* mToolSampleButton; ///< the Sample Tool button
+	QPushButton* mRemoveLandmarkButton;
+	QPushButton* mRegisterButton;
 
 	//data
-	QString mActiveLandmark; ///< uid of surrently selected landmark.
+	ImageLandmarksSourcePtr mImageLandmarkSource;
+	RegistrationFixedImageStringDataAdapterPtr mFixedDataAdapter;
+	DominantToolProxyPtr mDominantToolProxy;
 
 private:
-	LandmarkRegistrationWidget(); ///< not implemented
+	LandmarkPatientRegistrationWidget(); ///< not implemented
 };
 
 /**
@@ -114,5 +118,4 @@ private:
  */
 }//namespace cx
 
-
-#endif /* CXLANDMARKREGISTRATIONWIDGET_H_ */
+#endif /* CXLANDMARKPATIENTREGISTRATIONWIDGET_H_ */

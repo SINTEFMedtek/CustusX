@@ -51,19 +51,13 @@ class org_custusx_registration_method_bronchoscopy_EXPORT RegistrationMethodBron
 {
 	Q_INTERFACES(cx::RegistrationMethodService)
 public:
-	RegistrationMethodBronchoscopyImageToPatientService(RegistrationServicePtr registrationService, VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService) :
-		RegistrationMethodService(registrationService),
-		mPatientModelService(patientModelService),
-		mVisualizationService(visualizationService) {}
+	RegistrationMethodBronchoscopyImageToPatientService(regServices services) :
+		RegistrationMethodService(services) {}
 	virtual ~RegistrationMethodBronchoscopyImageToPatientService() {}
 	virtual QString getRegistrationType() {return QString("ImageToPatient");}
 	virtual QString getRegistrationMethod() {return QString("Bronchoscopy");}
 	virtual QString getWidgetName() {return QString("BronchoscopyImage2PatientRegistrationWidget");}
 	virtual QWidget* createWidget();
-
-private:
-	PatientModelServicePtr mPatientModelService;
-	VisualizationServicePtr mVisualizationService;
 };
 
 } /* namespace cx */

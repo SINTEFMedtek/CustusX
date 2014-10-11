@@ -52,7 +52,7 @@ class PlateImageRegistrationWidget : public FastImageRegistrationWidget
 {
 //	Q_OBJECT
 public:
-	PlateImageRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent);
+	PlateImageRegistrationWidget(regServices services, QWidget* parent);
 	virtual ~PlateImageRegistrationWidget();
 	virtual QString defaultWhatsThis() const;
 
@@ -61,8 +61,6 @@ protected slots:
 
 protected:
 	virtual void performRegistration();
-
-	PatientModelServicePtr mPatientModelService;
 };
 
 } //cx

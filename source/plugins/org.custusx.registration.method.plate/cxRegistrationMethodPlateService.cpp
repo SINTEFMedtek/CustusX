@@ -41,8 +41,8 @@ namespace cx
 QWidget *RegistrationMethodPlateImageToPatientService::createWidget()
 {
 	Image2PlateRegistrationWidget* imageAndPlateRegistrationWidget = new Image2PlateRegistrationWidget(NULL, "PlateRegistrationWidget", "Plate");
-	PlateImageRegistrationWidget* platesImageRegistrationWidget = new PlateImageRegistrationWidget(mRegistrationService, mPatientModelService, imageAndPlateRegistrationWidget);
-	PlateRegistrationWidget* plateRegistrationWidget = new PlateRegistrationWidget(mRegistrationService, mPatientModelService, mVisualizationService, imageAndPlateRegistrationWidget);
+	PlateImageRegistrationWidget* platesImageRegistrationWidget = new PlateImageRegistrationWidget(mServices, imageAndPlateRegistrationWidget);
+	PlateRegistrationWidget* plateRegistrationWidget = new PlateRegistrationWidget(mServices, imageAndPlateRegistrationWidget);
 
 	imageAndPlateRegistrationWidget->addTab(plateRegistrationWidget, "Plate");
 	imageAndPlateRegistrationWidget->addTab(platesImageRegistrationWidget, "Image");

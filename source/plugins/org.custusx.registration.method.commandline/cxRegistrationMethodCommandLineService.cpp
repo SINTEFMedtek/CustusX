@@ -39,7 +39,7 @@ namespace cx
 
 QWidget *RegistrationMethodCommandLineService::createWidget()
 {
-	ElastixWidget* widget = new ElastixWidget(mRegistrationService, mPatientModelService, NULL);
+	ElastixWidget* widget = new ElastixWidget(mServices, NULL);
 	return widget;
 }
 

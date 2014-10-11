@@ -43,28 +43,32 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSpinBox>
 #include <vtkDoubleArray.h>
 #include "cxVector3D.h"
-#include "cxViewManager.h"
 #include "cxReporter.h"
 #include "cxTypeConversions.h"
 #include "cxRegistrationManager.h"
 #include "cxToolManager.h"
 #include "cxDataManager.h"
 #include "cxLabeledComboBoxWidget.h"
-#include "cxRepManager.h"
 #include "cxLandmarkRep.h"
 #include "cxView.h"
+#include "cxRegistrationService.h"
+
+//TODO: remove
 #include "cxLogicManager.h"
+#include "cxViewManager.h"
+#include "cxRepManager.h"
 
 namespace cx
 {
-LandmarkPatientRegistrationWidget::LandmarkPatientRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService,
+LandmarkPatientRegistrationWidget::LandmarkPatientRegistrationWidget(regServices services,
 	QWidget* parent, QString objectName, QString windowTitle) :
-	LandmarkRegistrationWidget(registrationService, parent, objectName, windowTitle), mToolSampleButton(new QPushButton(
+	LandmarkRegistrationWidget(services, parent, objectName, windowTitle), mToolSampleButton(new QPushButton(
 		"Sample Tool", this))
 {
 	mImageLandmarkSource = ImageLandmarksSource::New();
-	mFixedDataAdapter.reset(new RegistrationFixedImageStringDataAdapter(registrationService, patientModelService));
-	connect(mRegistrationService.get(), SIGNAL(fixedDataChanged(QString)), this, SLOT(fixedDataChanged()));
+	mFixedDataAdapter.reset(new RegistrationFixedImageStringDataAdapter(services.registrationService, services.patientModelService));
+	connect(services.registrationService.get(), &RegistrationService::fixedDataChanged,
+			this, &LandmarkPatientRegistrationWidget::fixedDataChanged);
 	connect(dataManager(), SIGNAL(rMprChanged()), this, SLOT(setModified()));
 
 	//buttons
@@ -121,7 +125,7 @@ void LandmarkPatientRegistrationWidget::registerSlot()
 
 void LandmarkPatientRegistrationWidget::fixedDataChanged()
 {
-	mImageLandmarkSource->setData(mRegistrationService->getFixedData());
+	mImageLandmarkSource->setData(mServices.registrationService->getFixedData());
 }
 
 void LandmarkPatientRegistrationWidget::updateToolSampleButton()
@@ -246,13 +250,13 @@ void LandmarkPatientRegistrationWidget::setTargetLandmark(QString uid, Vector3D 
 
 void LandmarkPatientRegistrationWidget::performRegistration()
 {
-	if (!mRegistrationService->getFixedData())
-		mRegistrationService->setFixedData(dataManager()->getActiveImage());
+	if (!mServices.registrationService->getFixedData())
+		mServices.registrationService->setFixedData(dataManager()->getActiveImage());
 
 	if (dataManager()->getPatientLandmarks()->getLandmarks().size() < 3)
 		return;
 
-	mRegistrationService->doPatientRegistration();
+	mServices.registrationService->doPatientRegistration();
 
 	this->updateAvarageAccuracyLabel();
 }

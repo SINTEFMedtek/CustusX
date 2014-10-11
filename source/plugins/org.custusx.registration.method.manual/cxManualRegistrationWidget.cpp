@@ -42,10 +42,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ManualImageRegistrationWidget::ManualImageRegistrationWidget(RegistrationServicePtr registrationService, QWidget* parent, QString objectName, QString windowTitle) :
+ManualImageRegistrationWidget::ManualImageRegistrationWidget(regServices services, QWidget* parent, QString objectName, QString windowTitle) :
 	BaseWidget(parent, objectName, windowTitle),
 	mVerticalLayout(new QVBoxLayout(this)),
-	mRegistrationService(registrationService)
+	mServices(services)
 {
 	mLabel = new QLabel("Data matrix rMd");
 	mVerticalLayout->addWidget(mLabel);
@@ -56,7 +56,7 @@ ManualImageRegistrationWidget::ManualImageRegistrationWidget(RegistrationService
 
 	mVerticalLayout->addStretch();
 
-	connect(mRegistrationService.get(), SIGNAL(movingDataChanged(QString)), this, SLOT(movingDataChanged()));
+	connect(mServices.registrationService.get(), SIGNAL(movingDataChanged(QString)), this, SLOT(movingDataChanged()));
 }
 
 void ManualImageRegistrationWidget::showEvent(QShowEvent* event)
@@ -73,7 +73,7 @@ void ManualImageRegistrationWidget::movingDataChanged()
 	if (mConnectedMovingImage)
 		disconnect(mConnectedMovingImage.get(), SIGNAL(transformChanged()), this, SLOT(imageMatrixChanged()));
 
-	mConnectedMovingImage = mRegistrationService->getMovingData();
+	mConnectedMovingImage = mServices.registrationService->getMovingData();
 
 	if (mConnectedMovingImage)
 		connect(mConnectedMovingImage.get(), SIGNAL(transformChanged()), this, SLOT(imageMatrixChanged()));

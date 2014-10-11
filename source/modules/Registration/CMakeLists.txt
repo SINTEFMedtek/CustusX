@@ -14,13 +14,6 @@
 SET( MOC_HEADER_FILES
     logic/cxRegistrationManager.h
 
-    gui/cxRegistrationPlugin.h
-    gui/cxLandmarkImageRegistrationWidget.h
-    gui/cxLandmarkImage2ImageRegistrationWidget.h
-    gui/cxLandmarkRegistrationWidget.h
-    gui/cxLandmarkPatientRegistrationWidget.h
-#    gui/cxManualRegistrationWidget.h
-    gui/cxFastOrientationRegistrationWidget.h
     gui/cxPrepareVesselsWidget.h
     gui/cxSeansVesselRegistrationWidget.h
     gui/cxRegisterI2IWidget.h
@@ -38,24 +31,8 @@ SET( SOURCE_FILES
    logic/cxRegistrationManager.h
    logic/cxRegistrationManager.cpp
     
-   gui/cxRegistrationPlugin.h
-   gui/cxRegistrationPlugin.cpp
 	gui/cxPrepareVesselsWidget.h
 	gui/cxPrepareVesselsWidget.cpp
-	gui/cxLandmarkImageRegistrationWidget.h
-    gui/cxLandmarkImageRegistrationWidget.cpp
-    gui/cxLandmarkRegistrationWidget.h
-    gui/cxLandmarkRegistrationWidget.cpp
-    gui/cxLandmarkPatientRegistrationWidget.h
-    gui/cxLandmarkPatientRegistrationWidget.cpp
-    gui/cxLandmarkImage2ImageRegistrationWidget.h
-    gui/cxLandmarkImage2ImageRegistrationWidget.cpp
-#    gui/cxManualRegistrationWidget.h
-#    gui/cxManualRegistrationWidget.cpp
-    gui/cxFastPatientRegistrationWidget.h
-    gui/cxFastPatientRegistrationWidget.cpp
-    gui/cxFastOrientationRegistrationWidget.h
-    gui/cxFastOrientationRegistrationWidget.cpp
     gui/cxSeansVesselRegistrationWidget.h
     gui/cxSeansVesselRegistrationWidget.cpp
     gui/cxRegisterI2IWidget.h

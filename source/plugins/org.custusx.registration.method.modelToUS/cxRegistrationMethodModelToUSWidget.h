@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //#include "cxBaseWidget.h"
 #include "cxTabbedWidget.h"
 #include "cxRegistrationService.h"
+#include "cxRegistrationMethodService.h"
 class QVBoxLayout;
 class ctkPluginContext;
 
@@ -54,12 +55,11 @@ class RegistrationMethodModelToUSWidget : public TabbedWidget
 {
 	Q_OBJECT
 public:
-	RegistrationMethodModelToUSWidget(RegistrationServicePtr registrationService, VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget *parent, QString objectName);
+	RegistrationMethodModelToUSWidget(regServices services, QWidget *parent, QString objectName);
 	virtual ~RegistrationMethodModelToUSWidget();
 
 private:
 	QString defaultWhatsThis() const;
-	//RegistrationServicePtr mRegistrationService;
 };
 
 } /* namespace cx */

@@ -37,20 +37,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxToolManager.h"
 #include "cxReporter.h"
-#include "cxDataManager.h"
-//#include "cxRegistrationManager.h"
-//#include "cxViewManager.h"
-#include "cxLegacySingletons.h"
 #include "cxVisualizationService.h"
+#include "cxRegistrationService.h"
+
+#include "cxLegacySingletons.h"
 
 namespace cx
 {
-PlateRegistrationWidget::PlateRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget* parent) :
-	RegistrationBaseWidget(registrationService, parent, "PlateRegistrationWidget", "Plate Registration"),
+PlateRegistrationWidget::PlateRegistrationWidget(regServices services, QWidget* parent) :
+	RegistrationBaseWidget(services, parent, "PlateRegistrationWidget", "Plate Registration"),
 	mPlateRegistrationButton(new QPushButton("Load registration points", this)),
-	mReferenceToolInfoLabel(new QLabel("", this)),
-	mPatientModelService(patientModelService),
-	mVisualizationService(visualizationService)
+	mReferenceToolInfoLabel(new QLabel("", this))
 {
 	connect(mPlateRegistrationButton, SIGNAL(clicked()), this, SLOT(plateRegistrationSlot()));
 	connect(toolManager(), SIGNAL(configured()), this, SLOT(internalUpdate()));
@@ -80,33 +77,33 @@ QString PlateRegistrationWidget::defaultWhatsThis() const
 void PlateRegistrationWidget::showEvent(QShowEvent* event)
 {
   BaseWidget::showEvent(event);
-  connect(mPatientModelService->getPatientLandmarks().get(), &Landmarks::landmarkAdded,
+  connect(mServices.patientModelService->getPatientLandmarks().get(), &Landmarks::landmarkAdded,
 		  this, &PlateRegistrationWidget::landmarkUpdatedSlot);
-  connect(mPatientModelService->getPatientLandmarks().get(), &Landmarks::landmarkRemoved,
+  connect(mServices.patientModelService->getPatientLandmarks().get(), &Landmarks::landmarkRemoved,
 		  this, &PlateRegistrationWidget::landmarkUpdatedSlot);
 
-  mVisualizationService->setRegistrationMode(rsPATIENT_REGISTRATED);
+  mServices.visualizationService->setRegistrationMode(rsPATIENT_REGISTRATED);
 }
 
 void PlateRegistrationWidget::hideEvent(QHideEvent* event)
 {
   BaseWidget::hideEvent(event);
-  disconnect(mPatientModelService->getPatientLandmarks().get(), &Landmarks::landmarkAdded,
+  disconnect(mServices.patientModelService->getPatientLandmarks().get(), &Landmarks::landmarkAdded,
 			 this, &PlateRegistrationWidget::landmarkUpdatedSlot);
-  disconnect(mPatientModelService->getPatientLandmarks().get(), &Landmarks::landmarkRemoved,
+  disconnect(mServices.patientModelService->getPatientLandmarks().get(), &Landmarks::landmarkRemoved,
 			 this, &PlateRegistrationWidget::landmarkUpdatedSlot);
 
-  mVisualizationService->setRegistrationMode(rsNOT_REGISTRATED);
+  mServices.visualizationService->setRegistrationMode(rsNOT_REGISTRATED);
 }
 
 void PlateRegistrationWidget::landmarkUpdatedSlot()
 {
-	mRegistrationService->doFastRegistration_Translation();
+	mServices.registrationService->doFastRegistration_Translation();
 }
 
 void PlateRegistrationWidget::plateRegistrationSlot()
 {
-	mPatientModelService->getPatientLandmarks()->clear();
+	mServices.patientModelService->getPatientLandmarks()->clear();
 
   ToolPtr refTool = toolManager()->getReferenceTool();
   if(!refTool)//cannot register without a reference tool
@@ -124,17 +121,17 @@ void PlateRegistrationWidget::plateRegistrationSlot()
   std::map<int, Vector3D>::iterator it = referencePoints.begin();
   for(; it != referencePoints.end(); ++it)
   {
-    QString uid = dataManager()->addLandmark();
-    dataManager()->setLandmarkName(uid, qstring_cast(it->first));
-	dataManager()->getPatientLandmarks()->setLandmark(Landmark(uid, it->second));
+	QString uid = mServices.patientModelService->addLandmark();
+	mServices.patientModelService->setLandmarkName(uid, qstring_cast(it->first));
+	mServices.patientModelService->getPatientLandmarks()->setLandmark(Landmark(uid, it->second));
   }
 
   // set all landmarks as not active as default
-  LandmarkPropertyMap map = dataManager()->getLandmarkProperties();
+  LandmarkPropertyMap map = mServices.patientModelService->getLandmarkProperties();
   LandmarkPropertyMap::iterator landmarkIt = map.begin();
   for(; landmarkIt != map.end(); ++landmarkIt)
   {
-    dataManager()->setLandmarkActive(landmarkIt->first, false);
+	mServices.patientModelService->setLandmarkActive(landmarkIt->first, false);
   }
 
   //we don't want the user to load the landmarks twice, it will result in alot of global landmarks...

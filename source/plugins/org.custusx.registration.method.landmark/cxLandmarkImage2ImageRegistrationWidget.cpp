@@ -44,30 +44,36 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkImageData.h>
 #include "cxReporter.h"
 #include "cxLabeledComboBoxWidget.h"
-#include "cxRepManager.h"
-#include "cxViewManager.h"
 #include "cxSettings.h"
 #include "cxLandmarkRep.h"
 #include "cxView.h"
-#include "cxLogicManager.h"
 #include "cxRegistrationDataAdapters.h"
+#include "cxRegistrationService.h"
+#include "cxVisualizationService.h"
+
+//TODO: remove
+#include "cxLogicManager.h"
+#include "cxRepManager.h"
+#include "cxViewManager.h"
 
 namespace cx
 {
-LandmarkImage2ImageRegistrationWidget::LandmarkImage2ImageRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService,
+LandmarkImage2ImageRegistrationWidget::LandmarkImage2ImageRegistrationWidget(regServices services,
 	QWidget* parent, QString objectName, QString windowTitle) :
-	LandmarkRegistrationWidget(registrationService, parent, objectName, windowTitle)
+	LandmarkRegistrationWidget(services, parent, objectName, windowTitle)
 {
 	mLandmarkTableWidget->hide();
 
 	mFixedLandmarkSource = ImageLandmarksSource::New();
 	mMovingLandmarkSource = ImageLandmarksSource::New();
 
-	connect(mRegistrationService.get(), SIGNAL(fixedDataChanged(QString)), this, SLOT(updateRep()));
-	connect(mRegistrationService.get(), SIGNAL(movingDataChanged(QString)), this, SLOT(updateRep()));
+	connect(services.registrationService.get(), &RegistrationService::fixedDataChanged,
+			this, &LandmarkImage2ImageRegistrationWidget::updateRep);
+	connect(services.registrationService.get(), &RegistrationService::movingDataChanged,
+			this, &LandmarkImage2ImageRegistrationWidget::updateRep);
 
-	mFixedDataAdapter.reset(new RegistrationFixedImageStringDataAdapter(registrationService, patientModelService));
-	mMovingDataAdapter.reset(new RegistrationMovingImageStringDataAdapter(registrationService, patientModelService));
+	mFixedDataAdapter.reset(new RegistrationFixedImageStringDataAdapter(services.registrationService, services.patientModelService));
+	mMovingDataAdapter.reset(new RegistrationMovingImageStringDataAdapter(services.registrationService, services.patientModelService));
 
 	mTranslationCheckBox = new QCheckBox("Translation only", this);
 	mTranslationCheckBox->setChecked(settings()->value("registration/I2ILandmarkTranslation", false).toBool());
@@ -95,8 +101,8 @@ void LandmarkImage2ImageRegistrationWidget::translationCheckBoxChanged()
 
 void LandmarkImage2ImageRegistrationWidget::updateRep()
 {
-	mFixedLandmarkSource->setData(mRegistrationService->getFixedData());
-	mMovingLandmarkSource->setData(mRegistrationService->getMovingData());
+	mFixedLandmarkSource->setData(mServices.registrationService->getFixedData());
+	mMovingLandmarkSource->setData(mServices.registrationService->getMovingData());
 }
 
 void LandmarkImage2ImageRegistrationWidget::registerSlot()
@@ -119,7 +125,7 @@ QString LandmarkImage2ImageRegistrationWidget::defaultWhatsThis() const
 void LandmarkImage2ImageRegistrationWidget::showEvent(QShowEvent* event)
 {
 	LandmarkRegistrationWidget::showEvent(event);
-	viewManager()->setRegistrationMode(rsIMAGE_REGISTRATED);
+	mServices.visualizationService->setRegistrationMode(rsIMAGE_REGISTRATED);
 
 	LandmarkRepPtr rep = RepManager::findFirstRep<LandmarkRep>(viewManager()->get3DView(0, 0)->getReps());
 	if (rep)
@@ -152,7 +158,7 @@ void LandmarkImage2ImageRegistrationWidget::prePaintEvent()
 
 LandmarkMap LandmarkImage2ImageRegistrationWidget::getTargetLandmarks() const
 {
-	ImagePtr moving = boost::dynamic_pointer_cast<Image>(mRegistrationService->getMovingData());
+	ImagePtr moving = boost::dynamic_pointer_cast<Image>(mServices.registrationService->getMovingData());
 
 	if (moving)
 		return moving->getLandmarks()->getLandmarks();
@@ -162,7 +168,7 @@ LandmarkMap LandmarkImage2ImageRegistrationWidget::getTargetLandmarks() const
 
 void LandmarkImage2ImageRegistrationWidget::performRegistration()
 {
-	mRegistrationService->doImageRegistration(mTranslationCheckBox->isChecked());
+	mServices.registrationService->doImageRegistration(mTranslationCheckBox->isChecked());
 	this->updateAvarageAccuracyLabel();
 }
 
@@ -171,14 +177,14 @@ void LandmarkImage2ImageRegistrationWidget::performRegistration()
  */
 Transform3D LandmarkImage2ImageRegistrationWidget::getTargetTransform() const
 {
-	if (!mRegistrationService->getMovingData())
+	if (!mServices.registrationService->getMovingData())
 		return Transform3D::Identity();
-	return mRegistrationService->getMovingData()->get_rMd();
+	return mServices.registrationService->getMovingData()->get_rMd();
 }
 
 void LandmarkImage2ImageRegistrationWidget::setTargetLandmark(QString uid, Vector3D p_target)
 {
-	ImagePtr image = boost::dynamic_pointer_cast<Image>(mRegistrationService->getMovingData());
+	ImagePtr image = boost::dynamic_pointer_cast<Image>(mServices.registrationService->getMovingData());
 	if (!image)
 		return;
 	image->getLandmarks()->setLandmark(Landmark(uid, p_target));
@@ -186,7 +192,7 @@ void LandmarkImage2ImageRegistrationWidget::setTargetLandmark(QString uid, Vecto
 
 QString LandmarkImage2ImageRegistrationWidget::getTargetName() const
 {
-	DataPtr image = mRegistrationService->getMovingData();
+	DataPtr image = mServices.registrationService->getMovingData();
 	if (!image)
 		return "None";
 	return image->getName();

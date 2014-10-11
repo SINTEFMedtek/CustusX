@@ -78,6 +78,11 @@ std::map<QString, LandmarkProperty> PatientModelServiceNull::getLandmarkProperti
 	return std::map<QString, LandmarkProperty>();
 }
 
+void PatientModelServiceNull::setLandmarkName(QString uid, QString name)
+{
+	printWarning();;
+}
+
 Transform3D PatientModelServiceNull::get_rMpr() const
 {
 	printWarning();
@@ -192,6 +197,17 @@ PresetTransferFunctions3DPtr PatientModelServiceNull::getPresetTransferFunctions
 {
 	printWarning();
 	return PresetTransferFunctions3DPtr();
+}
+
+void PatientModelServiceNull::setCenter(const Vector3D &center)
+{
+	printWarning();
+}
+
+QString PatientModelServiceNull::addLandmark()
+{
+	printWarning();
+	return QString();
 }
 
 void PatientModelServiceNull::setLandmarkActive(QString uid, bool active)

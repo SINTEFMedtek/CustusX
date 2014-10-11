@@ -43,28 +43,30 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkDoubleArray.h>
 #include <vtkImageData.h>
 #include "cxReporter.h"
-#include "cxDataManager.h"
 #include "cxPickerRep.h"
 #include "cxLabeledComboBoxWidget.h"
-#include "cxRepManager.h"
 #include "cxRegistrationManager.h"
-#include "cxViewManager.h"
 #include "cxSettings.h"
 #include "cxToolManager.h"
 #include "cxLandmarkRep.h"
 #include "cxView.h"
 #include "cxTypeConversions.h"
 #include "cxSelectDataStringDataAdapter.h"
+#include "cxRegistrationService.h"
+#include "cxPatientModelService.h"
 
+//TODO: remove
+#include "cxViewManager.h"
+#include "cxRepManager.h"
 #include "cxLegacySingletons.h"
 
 namespace cx
 {
-LandmarkImageRegistrationWidget::LandmarkImageRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent,
+LandmarkImageRegistrationWidget::LandmarkImageRegistrationWidget(regServices services, QWidget* parent,
 	QString objectName, QString windowTitle) :
-	LandmarkRegistrationWidget(registrationService, parent, objectName, windowTitle)
+	LandmarkRegistrationWidget(services, parent, objectName, windowTitle)
 {
-	mCurrentDataAdapter = SelectDataStringDataAdapter::New(patientModelService);
+	mCurrentDataAdapter = SelectDataStringDataAdapter::New(mServices.patientModelService);
 	connect(mCurrentDataAdapter.get(), SIGNAL(changed()), this, SLOT(onCurrentImageChanged()));
 	mImageLandmarkSource = ImageLandmarksSource::New();
 
@@ -121,8 +123,8 @@ void LandmarkImageRegistrationWidget::onCurrentImageChanged()
 	mImageLandmarkSource->setData(data);
 	this->enableButtons();
 
-	if (data && !mRegistrationService->getFixedData())
-		mRegistrationService->setFixedData(data);
+	if (data && !mServices.registrationService->getFixedData())
+		mServices.registrationService->setFixedData(data);
 
 	this->setModified();
 }
@@ -153,7 +155,7 @@ void LandmarkImageRegistrationWidget::addLandmarkButtonClickedSlot()
 	if (!image)
 		return;
 
-	QString uid = dataManager()->addLandmark();
+	QString uid = mServices.patientModelService->addLandmark();
 	Vector3D pos_r = PickerRep->getPosition();
 	Vector3D pos_d = image->get_rMd().inv().coord(pos_r);
 	image->getLandmarks()->setLandmark(Landmark(uid, pos_d));
@@ -222,7 +224,7 @@ void LandmarkImageRegistrationWidget::showEvent(QShowEvent* event)
 {
 	LandmarkRegistrationWidget::showEvent(event);
 
-	ImagePtr image = dataManager()->getActiveImage();
+	ImagePtr image = mServices.patientModelService->getActiveImage();
 	if (image)
 		mCurrentDataAdapter->setValue(image->getUid());
 //	if (image && !mManager->getFixedData())

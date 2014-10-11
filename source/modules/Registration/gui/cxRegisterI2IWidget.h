@@ -67,7 +67,7 @@ class cxPluginRegistration_EXPORT RegisterI2IWidget : public RegistrationBaseWid
   Q_OBJECT
 
 public:
-	RegisterI2IWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent);
+	RegisterI2IWidget(regServices services, QWidget* parent);
   ~RegisterI2IWidget();
   virtual QString defaultWhatsThis() const;
 

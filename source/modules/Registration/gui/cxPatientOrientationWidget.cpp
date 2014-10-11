@@ -38,16 +38,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVBoxLayout>
 #include "cxReporter.h"
 #include "cxToolManager.h"
+#include "cxRegistrationServiceProxy.h"
+#include "cxPatientModelServiceProxy.h"
 
 #include "cxLogicManager.h"
 
 namespace cx
 {
-PatientOrientationWidget::PatientOrientationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent, QString objectName, QString windowTitle) :
-	RegistrationBaseWidget(registrationService, parent, objectName, windowTitle),
+PatientOrientationWidget::PatientOrientationWidget(regServices services, QWidget* parent, QString objectName, QString windowTitle) :
+	RegistrationBaseWidget(services, parent, objectName, windowTitle),
 	mPatientOrientationButton(new QPushButton("Patient Orientation")),
-	mInvertButton(new QCheckBox("Back face")),
-	mPatientModelService(patientModelService)
+	mInvertButton(new QCheckBox("Back face"))
 {
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->addWidget(mInvertButton);
@@ -57,7 +58,8 @@ PatientOrientationWidget::PatientOrientationWidget(RegistrationServicePtr regist
   mPatientOrientationButton->setToolTip(defaultWhatsThis());
   connect(mPatientOrientationButton, SIGNAL(clicked()), this, SLOT(setPatientOrientationSlot()));
 
-  connect(patientModelService.get(), SIGNAL(debugModeChanged(bool)), this, SLOT(enableToolSampleButtonSlot()));
+  connect(services.patientModelService.get(), &PatientModelService::debugModeChanged,
+		  this, &PatientOrientationWidget::enableToolSampleButtonSlot);
 
   mDominantToolProxy =  DominantToolProxy::New(trackingService());
   connect(mDominantToolProxy.get(), SIGNAL(toolVisible(bool)), this, SLOT(enableToolSampleButtonSlot()));
@@ -101,7 +103,7 @@ Transform3D PatientOrientationWidget::get_tMtm() const
 void PatientOrientationWidget::setPatientOrientationSlot()
 {
 	Transform3D prMt = toolManager()->getDominantTool()->get_prMt();
-	mRegistrationService->applyPatientOrientation(this->get_tMtm(), prMt);
+	mServices.registrationService->applyPatientOrientation(this->get_tMtm(), prMt);
 }
 
 void PatientOrientationWidget::enableToolSampleButtonSlot()
@@ -110,7 +112,7 @@ void PatientOrientationWidget::enableToolSampleButtonSlot()
   bool enabled = false;
   enabled = tool &&
 	  tool->getVisible() &&
-	  (!tool->hasType(Tool::TOOL_MANUAL) || mPatientModelService->getDebugMode()); // enable only for non-manual tools. ignore this in debug mode.
+	  (!tool->hasType(Tool::TOOL_MANUAL) || mServices.patientModelService->getDebugMode()); // enable only for non-manual tools. ignore this in debug mode.
 
   mPatientOrientationButton->setEnabled(enabled);
 }

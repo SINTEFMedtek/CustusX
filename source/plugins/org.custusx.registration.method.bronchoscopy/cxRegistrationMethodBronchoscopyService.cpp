@@ -38,7 +38,7 @@ namespace cx
 
 QWidget *RegistrationMethodBronchoscopyImageToPatientService::createWidget()
 {
-	BronchoscopyRegistrationWidget* bronchoscopyRegistrationWidget = new BronchoscopyRegistrationWidget(mRegistrationService, mVisualizationService, mPatientModelService, NULL);
+	BronchoscopyRegistrationWidget* bronchoscopyRegistrationWidget = new BronchoscopyRegistrationWidget(mServices, NULL);
 	return bronchoscopyRegistrationWidget;
 }
 

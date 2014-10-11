@@ -59,16 +59,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-SeansVesselRegistrationWidget::SeansVesselRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent) :
-	RegistrationBaseWidget(registrationService, parent, "SeansVesselRegistrationWidget", "Seans Vessel Registration"),
-		mLTSRatioSpinBox(new QSpinBox()), mLinearCheckBox(new QCheckBox()), mAutoLTSCheckBox(new QCheckBox()),
-		mRegisterButton(new QPushButton("Register"))
+SeansVesselRegistrationWidget::SeansVesselRegistrationWidget(regServices services, QWidget* parent) :
+	RegistrationBaseWidget(services, parent, "SeansVesselRegistrationWidget", "Seans Vessel Registration"),
+	mLTSRatioSpinBox(new QSpinBox()), mLinearCheckBox(new QCheckBox()), mAutoLTSCheckBox(new QCheckBox()),
+	mRegisterButton(new QPushButton("Register"))
 {
 	mRegisterButton->setEnabled(false);
 	connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
 
-	connect(mRegistrationService.get(), SIGNAL(fixedDataChanged(QString)), this, SLOT(inputChanged()));
-	connect(mRegistrationService.get(), SIGNAL(movingDataChanged(QString)), this, SLOT(inputChanged()));
+	connect(mServices.registrationService.get(), &RegistrationService::fixedDataChanged,
+			this, &SeansVesselRegistrationWidget::inputChanged);
+	connect(mServices.registrationService.get(), &RegistrationService::movingDataChanged,
+			this, &SeansVesselRegistrationWidget::inputChanged);
 
 	QVBoxLayout* topLayout = new QVBoxLayout(this);
 	QGridLayout* layout = new QGridLayout();
@@ -86,9 +88,9 @@ SeansVesselRegistrationWidget::SeansVesselRegistrationWidget(RegistrationService
 	QGridLayout* entryLayout = new QGridLayout;
 	entryLayout->setColumnStretch(1, 1);
 
-	mFixedImage.reset(new RegistrationFixedImageStringDataAdapter(registrationService, patientModelService));
+	mFixedImage.reset(new RegistrationFixedImageStringDataAdapter(services.registrationService, services.patientModelService));
 	new LabeledComboBoxWidget(this, mFixedImage, entryLayout, 0);
-	mMovingImage.reset(new RegistrationMovingImageStringDataAdapter(registrationService, patientModelService));
+	mMovingImage.reset(new RegistrationMovingImageStringDataAdapter(services.registrationService, services.patientModelService));
 	new LabeledComboBoxWidget(this, mMovingImage, entryLayout, 1);
 
 	layout->addLayout(entryLayout, 0, 0, 2, 2);
@@ -112,7 +114,7 @@ QString SeansVesselRegistrationWidget::defaultWhatsThis() const
 
 void SeansVesselRegistrationWidget::inputChanged()
 {
-	if(mRegistrationService->getMovingData() && mRegistrationService->getFixedData())
+	if(mServices.registrationService->getMovingData() && mServices.registrationService->getFixedData())
 	{
 		mRegisterButton->setEnabled(true);
 		mVesselRegOptionsButton->setEnabled(true);
@@ -157,18 +159,18 @@ void SeansVesselRegistrationWidget::registerSlot()
 		reporter()->sendDebug("Using lts_ratio: " + qstring_cast(vesselReg.mt_ltsRatio));
 	}
 
-	if(!mRegistrationService->getMovingData())
+	if(!mServices.registrationService->getMovingData())
 	{
 		reportWarning("Moving volume not set.");
 		return;
 	}
-	else if(!mRegistrationService->getFixedData())
+	else if(!mServices.registrationService->getFixedData())
 	{
 		reportWarning("Fixed volume not set.");
 		return;
 	}
 
-	bool success = vesselReg.execute(mRegistrationService->getMovingData(), mRegistrationService->getFixedData(), logPath);
+	bool success = vesselReg.execute(mServices.registrationService->getMovingData(), mServices.registrationService->getFixedData(), logPath);
 	if (!success)
 	{
 		reportWarning("Vessel registration failed.");
@@ -186,7 +188,7 @@ void SeansVesselRegistrationWidget::registerSlot()
 	// Delta is thus equal to Q:
 	Transform3D delta = linearTransform.inv();
 	//std::cout << "delta:\n" << delta << std::endl;
-	mRegistrationService->applyImage2ImageRegistration(delta, "Vessel based");
+	mServices.registrationService->applyImage2ImageRegistration(delta, "Vessel based");
 }
 
 /**Utililty class for debugging the SeansVesselRegistration class interactively.
@@ -332,7 +334,7 @@ private:
 
 void SeansVesselRegistrationWidget::debugInit()
 {
-	mDebugger.reset(new SeansVesselRegistrationDebugger(mRegistrationService, mLTSRatioSpinBox->value(),
+	mDebugger.reset(new SeansVesselRegistrationDebugger(mServices.registrationService, mLTSRatioSpinBox->value(),
 		mLinearCheckBox->isChecked()));
 }
 void SeansVesselRegistrationWidget::debugRunOneLinearStep()

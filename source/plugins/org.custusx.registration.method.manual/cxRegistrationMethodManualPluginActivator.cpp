@@ -43,6 +43,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegisteredService.h"
 #include "cxPatientModelServiceProxy.h"
 #include "cxRegistrationServiceProxy.h"
+#include "cxVisualizationServiceProxy.h"
+#include "cxTrackingServiceProxy.h"
 
 namespace cx
 {
@@ -57,13 +59,16 @@ RegistrationMethodManualPluginActivator::~RegistrationMethodManualPluginActivato
 
 void RegistrationMethodManualPluginActivator::start(ctkPluginContext* context)
 {
-	PatientModelServicePtr patientModelService = PatientModelServicePtr(new PatientModelServiceProxy(context));
-	RegistrationServicePtr registrationService = RegistrationServicePtr(new RegistrationServiceProxy(context));
+	regServices services;
+	services.registrationService	= RegistrationServicePtr(new RegistrationServiceProxy(context));
+	services.patientModelService	= PatientModelServicePtr(new PatientModelServiceProxy(context));
+	services.visualizationService	= VisualizationServicePtr(new VisualizationServiceProxy(context));
+	services.trackingService		= TrackingServicePtr(new TrackingServiceProxy(context));
 
-	RegistrationMethodManualImageToImageService *i2i = new RegistrationMethodManualImageToImageService(registrationService, patientModelService);
-	RegistrationMethodManualImageToPatientService *i2p = new RegistrationMethodManualImageToPatientService(registrationService, patientModelService);
-	RegistrationMethodManualImageTransformService *iTransform = new RegistrationMethodManualImageTransformService(registrationService);
-	RegistrationMethodManualPatientOrientationService *patientOrientation = new RegistrationMethodManualPatientOrientationService(registrationService, patientModelService);
+	RegistrationMethodManualImageToImageService *i2i = new RegistrationMethodManualImageToImageService(services);
+	RegistrationMethodManualImageToPatientService *i2p = new RegistrationMethodManualImageToPatientService(services);
+	RegistrationMethodManualImageTransformService *iTransform = new RegistrationMethodManualImageTransformService(services);
+	RegistrationMethodManualPatientOrientationService *patientOrientation = new RegistrationMethodManualPatientOrientationService(services);
 
 	mRegistrationImageToImage = RegisteredServicePtr(new RegisteredService(context, i2i, RegistrationMethodService_iid));
 	mRegistrationImageToPatient = RegisteredServicePtr(new RegisteredService(context, i2p, RegistrationMethodService_iid));

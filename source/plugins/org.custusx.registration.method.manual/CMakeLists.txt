@@ -7,6 +7,7 @@ message(STATUS "===================================== parsing org_custusx_regist
 include_directories(
     ${CX_RESOURCE_INCLUDE_DIRECTORIES}
     ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
+    ${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
     ${CustusX_SOURCE_DIR}/source/modules/Registration/gui
 	${CustusX_SOURCE_DIR}/source/service/tracking
 

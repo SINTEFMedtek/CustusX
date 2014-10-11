@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxRegistrationMethodLandmarkService.h"
-#include "cxRegistrationMethodsWidget.h"
+//#include "cxRegistrationMethodsWidget.h"
 #include "cxLandmarkImageRegistrationWidget.h"
 #include "cxLandmarkImage2ImageRegistrationWidget.h"
 #include "cxLandmarkPatientRegistrationWidget.h"
@@ -40,14 +40,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxFastImageRegistrationWidget.h"
 #include "cxFastPatientRegistrationWidget.h"
 
+#include "cxLandmarkRegistrationsWidget.h"
+#include "cxFastRegistrationsWidget.h"
+
 namespace cx
 {
 
 QWidget *RegistrationMethodLandmarkImageToImageService::createWidget()
 {
 	LandmarkRegistrationsWidget* landmarkRegistrationsWidget = new LandmarkRegistrationsWidget(NULL, "LandmarkRegistrationImageToImageWidget", "Image to Image Landmark Registration");
-	LandmarkImageRegistrationWidget* imageRegistrationWidget = new LandmarkImageRegistrationWidget(mRegistrationService, mPatientModelService, landmarkRegistrationsWidget, "LMImageRegistrationWidget", "Image Registration");
-	LandmarkImage2ImageRegistrationWidget* image2imageRegistrationWidget = new LandmarkImage2ImageRegistrationWidget(mRegistrationService, mPatientModelService, landmarkRegistrationsWidget, "LMImage2ImageRegistrationWidget", "Image2Image Registration");
+	LandmarkImageRegistrationWidget* imageRegistrationWidget = new LandmarkImageRegistrationWidget(mServices, landmarkRegistrationsWidget, "LMImageRegistrationWidget", "Image Registration");
+	LandmarkImage2ImageRegistrationWidget* image2imageRegistrationWidget = new LandmarkImage2ImageRegistrationWidget(mServices, landmarkRegistrationsWidget, "LMImage2ImageRegistrationWidget", "Image2Image Registration");
 
 	landmarkRegistrationsWidget->addTab(imageRegistrationWidget, "Image landmarks");
 	landmarkRegistrationsWidget->addTab(image2imageRegistrationWidget, "Register");
@@ -58,8 +61,8 @@ QWidget *RegistrationMethodLandmarkImageToImageService::createWidget()
 QWidget *RegistrationMethodLandmarkImageToPatientService::createWidget()
 {
 	LandmarkRegistrationsWidget* landmarkRegistrationsWidget = new LandmarkRegistrationsWidget(NULL, "LandmarkRegistrationImageToImageWidget", "Image to Image Landmark Registration");
-	LandmarkImageRegistrationWidget* imageRegistrationWidget = new LandmarkImageRegistrationWidget(mRegistrationService, mPatientModelService, landmarkRegistrationsWidget, "LMImageRegistrationWidget", "Image Registration");
-	LandmarkPatientRegistrationWidget* patientRegistrationWidget = new LandmarkPatientRegistrationWidget(mRegistrationService, mPatientModelService, landmarkRegistrationsWidget, "LMPatientRegistrationWidget", "Patient Registration");
+	LandmarkImageRegistrationWidget* imageRegistrationWidget = new LandmarkImageRegistrationWidget(mServices, landmarkRegistrationsWidget, "LMImageRegistrationWidget", "Image Registration");
+	LandmarkPatientRegistrationWidget* patientRegistrationWidget = new LandmarkPatientRegistrationWidget(mServices, landmarkRegistrationsWidget, "LMPatientRegistrationWidget", "Patient Registration");
 
 	landmarkRegistrationsWidget->addTab(imageRegistrationWidget, "Image landmarks");
 	landmarkRegistrationsWidget->addTab(patientRegistrationWidget, "Patient landmarks");
@@ -70,9 +73,9 @@ QWidget *RegistrationMethodLandmarkImageToPatientService::createWidget()
 QWidget *RegistrationMethodFastLandmarkImageToPatientService::createWidget()
 {
 	FastRegistrationsWidget* fastRegistrationsWidget = new FastRegistrationsWidget(NULL, "FastRegistrationWidget", "Fast Landmark Registration");
-	FastOrientationRegistrationWidget* fastOrientationRegistrationWidget = new FastOrientationRegistrationWidget(mRegistrationService, fastRegistrationsWidget);
-	FastImageRegistrationWidget* fastImageRegistrationWidget = new FastImageRegistrationWidget(mRegistrationService, mPatientModelService, fastRegistrationsWidget, "FastImageRegistrationWidget", "Fast Image Registration");
-	FastPatientRegistrationWidget* fastPatientRegistrationWidget = new FastPatientRegistrationWidget(mRegistrationService, mPatientModelService, fastRegistrationsWidget);
+	FastOrientationRegistrationWidget* fastOrientationRegistrationWidget = new FastOrientationRegistrationWidget(mServices, fastRegistrationsWidget);
+	FastImageRegistrationWidget* fastImageRegistrationWidget = new FastImageRegistrationWidget(mServices, fastRegistrationsWidget, "FastImageRegistrationWidget", "Fast Image Registration");
+	FastPatientRegistrationWidget* fastPatientRegistrationWidget = new FastPatientRegistrationWidget(mServices, fastRegistrationsWidget);
 	fastRegistrationsWidget->addTab(fastOrientationRegistrationWidget, "Orientation");
 	fastRegistrationsWidget->addTab(fastImageRegistrationWidget, "Image landmark(s)");
 	fastRegistrationsWidget->addTab(fastPatientRegistrationWidget, "Patient landmark(s)");
