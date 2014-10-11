@@ -52,10 +52,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLandmarkRep.h"
 #include "cxView.h"
 #include "cxRegistrationService.h"
+#include "cxVisualizationService.h"
 
 //TODO: remove
 #include "cxLogicManager.h"
-#include "cxViewManager.h"
 #include "cxRepManager.h"
 
 namespace cx
@@ -174,9 +174,9 @@ void LandmarkPatientRegistrationWidget::showEvent(QShowEvent* event)
 	connect(dataManager()->getPatientLandmarks().get(), SIGNAL(landmarkAdded(QString)), this, SLOT(landmarkUpdatedSlot()));
 	connect(dataManager()->getPatientLandmarks().get(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
 
-	viewManager()->setRegistrationMode(rsPATIENT_REGISTRATED);
+	mServices.visualizationService->setRegistrationMode(rsPATIENT_REGISTRATED);
 
-	LandmarkRepPtr rep = RepManager::findFirstRep<LandmarkRep>(viewManager()->get3DView(0, 0)->getReps());
+	LandmarkRepPtr rep = RepManager::findFirstRep<LandmarkRep>(mServices.visualizationService->get3DView(0, 0)->getReps());
 	if (rep)
 	{
 		rep->setPrimarySource(mImageLandmarkSource);
@@ -192,16 +192,16 @@ void LandmarkPatientRegistrationWidget::hideEvent(QHideEvent* event)
 	disconnect(dataManager()->getPatientLandmarks().get(), SIGNAL(landmarkAdded(QString)), this, SLOT(landmarkUpdatedSlot()));
 	disconnect(dataManager()->getPatientLandmarks().get(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
 
-	if(viewManager()->get3DView(0, 0))
+	if(mServices.visualizationService->get3DView(0, 0))
 	{
-		LandmarkRepPtr rep = RepManager::findFirstRep<LandmarkRep>(viewManager()->get3DView(0, 0)->getReps());
+		LandmarkRepPtr rep = RepManager::findFirstRep<LandmarkRep>(mServices.visualizationService->get3DView(0, 0)->getReps());
 		if (rep)
 		{
 			rep->setPrimarySource(LandmarksSourcePtr());
 			rep->setSecondarySource(LandmarksSourcePtr());
 		}
 	}
-	viewManager()->setRegistrationMode(rsNOT_REGISTRATED);
+	mServices.visualizationService->setRegistrationMode(rsNOT_REGISTRATED);
 }
 
 void LandmarkPatientRegistrationWidget::removeLandmarkButtonClickedSlot()

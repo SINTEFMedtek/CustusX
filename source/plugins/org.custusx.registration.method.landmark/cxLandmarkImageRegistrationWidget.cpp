@@ -54,9 +54,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSelectDataStringDataAdapter.h"
 #include "cxRegistrationService.h"
 #include "cxPatientModelService.h"
+#include "cxVisualizationService.h"
 
 //TODO: remove
-#include "cxViewManager.h"
 #include "cxRepManager.h"
 #include "cxLegacySingletons.h"
 
@@ -131,10 +131,10 @@ void LandmarkImageRegistrationWidget::onCurrentImageChanged()
 
 PickerRepPtr LandmarkImageRegistrationWidget::getPickerRep()
 {
-	if (!viewManager()->get3DView(0, 0))
+	if (!mServices.visualizationService->get3DView(0, 0))
 		return PickerRepPtr();
 
-	return RepManager::findFirstRep<PickerRep>(viewManager()->get3DView(0, 0)->getReps());
+	return RepManager::findFirstRep<PickerRep>(mServices.visualizationService->get3DView(0, 0)->getReps());
 }
 
 DataPtr LandmarkImageRegistrationWidget::getCurrentData() const
@@ -232,8 +232,8 @@ void LandmarkImageRegistrationWidget::showEvent(QShowEvent* event)
 //	if (image && !mImageLandmarkSource->getData())
 //		mImageLandmarkSource->setData(image);
 
-	viewManager()->setRegistrationMode(rsIMAGE_REGISTRATED);
-	LandmarkRepPtr rep = RepManager::findFirstRep<LandmarkRep>(viewManager()->get3DView(0, 0)->getReps());
+	mServices.visualizationService->setRegistrationMode(rsIMAGE_REGISTRATED);
+	LandmarkRepPtr rep = RepManager::findFirstRep<LandmarkRep>(mServices.visualizationService->get3DView(0, 0)->getReps());
 	if (rep)
 	{
 		rep->setPrimarySource(mImageLandmarkSource);
@@ -245,16 +245,16 @@ void LandmarkImageRegistrationWidget::hideEvent(QHideEvent* event)
 {
 	LandmarkRegistrationWidget::hideEvent(event);
 
-	if(viewManager()->get3DView(0, 0))
+	if(mServices.visualizationService->get3DView(0, 0))
 	{
-		LandmarkRepPtr rep = RepManager::findFirstRep<LandmarkRep>(viewManager()->get3DView(0, 0)->getReps());
+		LandmarkRepPtr rep = RepManager::findFirstRep<LandmarkRep>(mServices.visualizationService->get3DView(0, 0)->getReps());
 		if (rep)
 		{
 			rep->setPrimarySource(LandmarksSourcePtr());
 			rep->setSecondarySource(LandmarksSourcePtr());
 		}
 	}
-	viewManager()->setRegistrationMode(rsNOT_REGISTRATED);
+	mServices.visualizationService->setRegistrationMode(rsNOT_REGISTRATED);
 }
 
 void LandmarkImageRegistrationWidget::prePaintEvent()

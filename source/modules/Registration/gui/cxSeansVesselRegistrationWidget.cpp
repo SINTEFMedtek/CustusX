@@ -55,6 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxGraphicalPrimitives.h"
 #include "cxLogicManager.h"
 #include "cxRegistrationServiceProxy.h"
+#include "cxVisualizationService.h"
 
 namespace cx
 {
@@ -198,14 +199,14 @@ void SeansVesselRegistrationWidget::registerSlot()
 class SeansVesselRegistrationDebugger
 {
 public:
-	SeansVesselRegistrationDebugger(RegistrationServicePtr registrationService, double ltsRatio, bool linear) :
-		mRegistrationService(registrationService)
+	SeansVesselRegistrationDebugger(regServices services, double ltsRatio, bool linear) :
+		mServices(services)
 	{
 		mRegistrator.mt_doOnlyLinear = linear;
 		mRegistrator.mt_ltsRatio = ltsRatio;
 		mRegistrator.mt_auto_lts = false;
 
-		mContext = mRegistrator.createContext(mRegistrationService->getMovingData(), mRegistrationService->getFixedData());
+		mContext = mRegistrator.createContext(mServices.registrationService->getMovingData(), mServices.registrationService->getFixedData());
 
 		//mMovingData = mRegistrator.convertToPolyData(mContext->mSourcePoints);
 		mMovingData = mContext->getMovingPoints();
@@ -221,7 +222,7 @@ public:
 		MeshPtr lines(new Mesh("v2vreg_lines", "v2vreg_lines", mPolyLines));
 		lines->setColor(QColor("cornflowerblue"));
 
-		ViewPtr view = viewManager()->get3DView();
+		ViewPtr view = mServices.visualizationService->get3DView();
 
 		m_mRep = GeometricRep::New();
 		m_mRep->setMesh(moving);
@@ -241,7 +242,7 @@ public:
 	}
 	~SeansVesselRegistrationDebugger()
 	{
-		ViewPtr view = viewManager()->get3DView();
+		ViewPtr view = mServices.visualizationService->get3DView();
 		view->removeRep(m_mRep);
 		view->removeRep(m_fRep);
 		view->removeRep(m_lineRep);
@@ -273,7 +274,7 @@ public:
 
 		mRegistrator.checkQuality(linearTransform);
 		Transform3D delta = linearTransform.inv();
-		mRegistrationService->applyImage2ImageRegistration(delta, "Vessel based");
+		mServices.registrationService->applyImage2ImageRegistration(delta, "Vessel based");
 
 		report(QString("Applied linear registration from debug iteration."));
 	}
@@ -296,7 +297,7 @@ public:
 
 		//		// draw lines: slow but nice
 		//		mLines.clear();
-		//		View* view = viewManager()->get3DView();
+		//		View* view = mServices.visualizationService->get3DView();
 		//		for (int i=0; i<mContext->mSortedSourcePoints->GetNumberOfPoints(); ++i)
 		//		{
 		//			GraphicalLine3DPtr line(new GraphicalLine3D(view->getRenderer()));
@@ -325,16 +326,16 @@ public:
 private:
 	SeansVesselReg mRegistrator;
 	SeansVesselReg::ContextPtr mContext;
-	RegistrationServicePtr mRegistrationService;
 	vtkPolyDataPtr mMovingData, mFixedData;
 	vtkPolyDataPtr mPolyLines;
 	GeometricRepPtr m_mRep, m_fRep, m_lineRep;
 	//	std::vector<GraphicalLine3DPtr> mLines;
+	regServices mServices;
 };
 
 void SeansVesselRegistrationWidget::debugInit()
 {
-	mDebugger.reset(new SeansVesselRegistrationDebugger(mServices.registrationService, mLTSRatioSpinBox->value(),
+	mDebugger.reset(new SeansVesselRegistrationDebugger(mServices, mLTSRatioSpinBox->value(),
 		mLinearCheckBox->isChecked()));
 }
 void SeansVesselRegistrationWidget::debugRunOneLinearStep()

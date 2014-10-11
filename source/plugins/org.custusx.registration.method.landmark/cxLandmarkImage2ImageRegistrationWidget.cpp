@@ -54,7 +54,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //TODO: remove
 #include "cxLogicManager.h"
 #include "cxRepManager.h"
-#include "cxViewManager.h"
 
 namespace cx
 {
@@ -127,7 +126,7 @@ void LandmarkImage2ImageRegistrationWidget::showEvent(QShowEvent* event)
 	LandmarkRegistrationWidget::showEvent(event);
 	mServices.visualizationService->setRegistrationMode(rsIMAGE_REGISTRATED);
 
-	LandmarkRepPtr rep = RepManager::findFirstRep<LandmarkRep>(viewManager()->get3DView(0, 0)->getReps());
+	LandmarkRepPtr rep = RepManager::findFirstRep<LandmarkRep>(mServices.visualizationService->get3DView(0, 0)->getReps());
 	if (rep)
 	{
 		rep->setPrimarySource(mFixedLandmarkSource);
@@ -140,16 +139,16 @@ void LandmarkImage2ImageRegistrationWidget::hideEvent(QHideEvent* event)
 {
 	LandmarkRegistrationWidget::hideEvent(event);
 
-	if(viewManager()->get3DView(0, 0))
+	if(mServices.visualizationService->get3DView(0, 0))
 	{
-		LandmarkRepPtr rep = RepManager::findFirstRep<LandmarkRep>(viewManager()->get3DView(0, 0)->getReps());
+		LandmarkRepPtr rep = RepManager::findFirstRep<LandmarkRep>(mServices.visualizationService->get3DView(0, 0)->getReps());
 		if (rep)
 		{
 			rep->setPrimarySource(LandmarksSourcePtr());
 			rep->setSecondarySource(LandmarksSourcePtr());
 		}
 	}
-	viewManager()->setRegistrationMode(rsNOT_REGISTRATED);
+	mServices.visualizationService->setRegistrationMode(rsNOT_REGISTRATED);
 }
 
 void LandmarkImage2ImageRegistrationWidget::prePaintEvent()

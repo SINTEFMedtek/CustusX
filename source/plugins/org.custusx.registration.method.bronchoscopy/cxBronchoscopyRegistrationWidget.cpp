@@ -42,7 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRecordSessionWidget.h"
 #include "cxRecordSession.h"
 #include "cxRepManager.h"
-#include "cxViewManager.h"
 #include "cxView.h"
 #include "cxToolRep3D.h"
 #include "cxToolTracer.h"
@@ -52,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxThresholdPreview.h"
 #include "cxPatientModelService.h"
 #include "cxRegistrationService.h"
+#include "cxVisualizationService.h"
 
 #include "cxLegacySingletons.h"
 
@@ -180,7 +180,7 @@ void BronchoscopyRegistrationWidget::acquisitionStopped()
 
 ToolRep3DPtr BronchoscopyRegistrationWidget::getToolRepIn3DView(ToolPtr tool)
 {
-	ViewPtr view = viewManager()->get3DView();
+	ViewPtr view = mServices.visualizationService->get3DView();
     ToolRep3DPtr retval = RepManager::findFirstRep<ToolRep3D>(view->getReps(),tool);
 	return retval;
 }

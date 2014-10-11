@@ -39,6 +39,12 @@ VisualizationServiceNull::VisualizationServiceNull()
 {
 }
 
+ViewPtr VisualizationServiceNull::get3DView(int group, int index)
+{
+	printWarning();
+	return ViewPtr();
+}
+
 int VisualizationServiceNull::getActiveViewGroup() const
 {
 	printWarning();

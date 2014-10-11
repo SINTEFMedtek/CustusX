@@ -47,6 +47,11 @@ VisualizationServiceProxy::VisualizationServiceProxy(ctkPluginContext *pluginCon
 	this->initServiceListener();
 }
 
+ViewPtr VisualizationServiceProxy::get3DView(int group, int index)
+{
+	return mVisualizationService->get3DView(group, index);
+}
+
 int VisualizationServiceProxy::getActiveViewGroup() const
 {
 	return mVisualizationService->getActiveViewGroup();

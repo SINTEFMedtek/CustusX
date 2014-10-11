@@ -57,6 +57,8 @@ class VisualizationService : public QObject
 {
 	Q_OBJECT
 public:
+	virtual ViewPtr get3DView(int group = 0, int index = 0) = 0;
+
 	virtual int getActiveViewGroup() const = 0;
 	virtual ViewGroupDataPtr getViewGroupData(int groupIdx) = 0;
 
