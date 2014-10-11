@@ -48,7 +48,7 @@ std::vector<GUIExtenderService::CategorizedWidget> ExampleGUIExtenderService::cr
 
 	retval.push_back(GUIExtenderService::CategorizedWidget(
 			new ExampleWidget(),
-			"Plugins"));
+			"Utility"));
 
 	return retval;
 }

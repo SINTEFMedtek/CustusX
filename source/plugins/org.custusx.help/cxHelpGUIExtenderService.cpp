@@ -54,7 +54,7 @@ std::vector<GUIExtenderService::CategorizedWidget> HelpGUIExtenderService::creat
 
 	retval.push_back(GUIExtenderService::CategorizedWidget(
 			new HelpWidget(mEngine),
-			"Plugins"));
+			"Browsing"));
 
 	return retval;
 }
