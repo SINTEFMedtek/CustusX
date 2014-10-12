@@ -63,7 +63,7 @@ public:
 	static QString getArgumentHelpText(QString applicationName);
 	bool initialize();
 protected:
-	void incomingConnection(int socketDescriptor);
+	void incomingConnection(qintptr socketDescriptor);
 private slots:
 	void socketDisconnectedSlot();
 private:

@@ -93,7 +93,7 @@ ImageServer::~ImageServer()
 {
 }
 
-void ImageServer::incomingConnection(int socketDescriptor)
+void ImageServer::incomingConnection(qintptr socketDescriptor)
 {
 	std::cout << "Server: Incoming connection..." << std::endl;
 
