@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationServiceProxy.h"
 #include "cxPatientModelServiceProxy.h"
 #include "cxVisualizationServiceProxy.h"
+#include "cxTrackingServiceProxy.h"
 
 namespace cx
 {
@@ -56,11 +57,13 @@ RegistrationMethodModelToUSPluginActivator::~RegistrationMethodModelToUSPluginAc
 
 void RegistrationMethodModelToUSPluginActivator::start(ctkPluginContext* context)
 {
-	RegistrationServicePtr registrationService(new RegistrationServiceProxy(context));
-	VisualizationServicePtr visualizationService(new VisualizationServiceProxy(context));
-	PatientModelServicePtr patientModelService(new PatientModelServiceProxy(context));
+	regServices services;
+	services.registrationService	= RegistrationServicePtr(new RegistrationServiceProxy(context));
+	services.patientModelService	= PatientModelServicePtr(new PatientModelServiceProxy(context));
+	services.visualizationService	= VisualizationServicePtr(new VisualizationServiceProxy(context));
+	services.trackingService		= TrackingServicePtr(new TrackingServiceProxy(context));
 
-	mRegistration = RegisteredServicePtr(new RegisteredService(context, new RegistrationMethodModelToUSService(registrationService, visualizationService, patientModelService), RegistrationMethodService_iid));
+	mRegistration = RegisteredServicePtr(new RegisteredService(context, new RegistrationMethodModelToUSService(services), RegistrationMethodService_iid));
 }
 
 void RegistrationMethodModelToUSPluginActivator::stop(ctkPluginContext* context)

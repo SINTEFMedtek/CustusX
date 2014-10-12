@@ -39,6 +39,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegisteredService.h"
 #include "cxRegistrationServiceProxy.h"
 #include "cxPatientModelServiceProxy.h"
+#include "cxVisualizationServiceProxy.h"
+#include "cxTrackingServiceProxy.h"
 
 namespace cx
 {
@@ -53,12 +55,15 @@ RegistrationMethodLandmarkPluginActivator::~RegistrationMethodLandmarkPluginActi
 
 void RegistrationMethodLandmarkPluginActivator::start(ctkPluginContext* context)
 {
-	RegistrationServicePtr registrationService(new RegistrationServiceProxy(context));
-	PatientModelServicePtr patientModelService(new PatientModelServiceProxy(context));
+	regServices services;
+	services.registrationService	= RegistrationServicePtr(new RegistrationServiceProxy(context));
+	services.patientModelService	= PatientModelServicePtr(new PatientModelServiceProxy(context));
+	services.visualizationService	= VisualizationServicePtr(new VisualizationServiceProxy(context));
+	services.trackingService		= TrackingServicePtr(new TrackingServiceProxy(context));
 
-	RegistrationMethodLandmarkImageToImageService* image2imageService = new RegistrationMethodLandmarkImageToImageService(registrationService, patientModelService);
-	RegistrationMethodLandmarkImageToPatientService* image2patientService = new RegistrationMethodLandmarkImageToPatientService(registrationService, patientModelService);
-	RegistrationMethodFastLandmarkImageToPatientService* fastImage2patientService = new RegistrationMethodFastLandmarkImageToPatientService(registrationService, patientModelService);
+	RegistrationMethodLandmarkImageToImageService* image2imageService = new RegistrationMethodLandmarkImageToImageService(services);
+	RegistrationMethodLandmarkImageToPatientService* image2patientService = new RegistrationMethodLandmarkImageToPatientService(services);
+	RegistrationMethodFastLandmarkImageToPatientService* fastImage2patientService = new RegistrationMethodFastLandmarkImageToPatientService(services);
 
 	mRegistrationImageToImage = RegisteredServicePtr(new RegisteredService(context, image2imageService, RegistrationMethodService_iid));
 	mRegistrationImageToPatient = RegisteredServicePtr(new RegisteredService(context, image2patientService, RegistrationMethodService_iid));

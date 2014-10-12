@@ -56,6 +56,11 @@ VisualizationImplService::~VisualizationImplService()
 	}
 }
 
+ViewPtr VisualizationImplService::get3DView(int group, int index)
+{
+	return viewManager()->get3DView(group, index);
+}
+
 int VisualizationImplService::getActiveViewGroup() const
 {
 	return viewManager()->getActiveViewGroup();

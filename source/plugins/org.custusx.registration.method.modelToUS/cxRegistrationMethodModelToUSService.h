@@ -50,15 +50,12 @@ namespace cx
 class org_custusx_registration_method_modelToUS_EXPORT RegistrationMethodModelToUSService : public RegistrationMethodService
 {
 public:
-	RegistrationMethodModelToUSService(RegistrationServicePtr registrationService, VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService);
+	RegistrationMethodModelToUSService(regServices services);
 	virtual ~RegistrationMethodModelToUSService() {}
 	virtual QString getRegistrationType() {return QString("ImageToImage");}
 	virtual QString getRegistrationMethod() {return QString("ModelToUS");}
 	virtual QWidget* createWidget();
 	virtual QString getWidgetName() {return QString("ModelToUSRegistrationWidget");}
-private:
-	VisualizationServicePtr mVisualizationService;
-	PatientModelServicePtr mPatientModelService;
 };
 
 } /* namespace cx */

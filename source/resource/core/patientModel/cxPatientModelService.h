@@ -89,6 +89,7 @@ public:
 
 	virtual LandmarksPtr getPatientLandmarks() const = 0;
 	virtual std::map<QString, LandmarkProperty> getLandmarkProperties() const = 0;
+	virtual void setLandmarkName(QString uid, QString name) = 0;
 	virtual void setLandmarkActive(QString uid, bool active) = 0;
 
 	virtual Transform3D get_rMpr() const = 0;
@@ -113,6 +114,10 @@ public:
 
 	virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const = 0;
 
+	virtual void setCenter(const Vector3D& center) = 0;
+
+	virtual QString addLandmark() = 0;
+
 	virtual void autoSave() = 0;//TODO remove, and integrate into other functions
 	virtual bool isNull() = 0;
 
@@ -130,6 +135,7 @@ public:
 signals:
 	void dataAddedOrRemoved();
 	void activeImageChanged(const QString& uId);
+	void landmarkPropertiesChanged(); ///< emitted when global info about a landmark changed
 	void debugModeChanged(bool on);
 	void rMprChanged();
 	void streamLoaded();

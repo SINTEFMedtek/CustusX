@@ -41,6 +41,9 @@ class VisualizationServiceNull : public VisualizationService
 {
 public:
 	VisualizationServiceNull();
+
+	virtual ViewPtr get3DView(int group = 0, int index = 0);
+
 	virtual int getActiveViewGroup() const;
 	virtual ViewGroupDataPtr getViewGroupData(int groupIdx);
 

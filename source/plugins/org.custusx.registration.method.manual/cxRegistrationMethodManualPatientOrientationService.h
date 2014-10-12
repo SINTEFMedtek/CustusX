@@ -20,17 +20,13 @@ class org_custusx_registration_method_manual_EXPORT RegistrationMethodManualPati
 {
 	Q_INTERFACES(cx::RegistrationMethodService)
 public:
-	RegistrationMethodManualPatientOrientationService(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService) :
-		RegistrationMethodService(registrationService),
-		mPatientModelService(patientModelService) {}
+	RegistrationMethodManualPatientOrientationService(regServices services) :
+		RegistrationMethodService(services) {}
 	virtual ~RegistrationMethodManualPatientOrientationService() {}
 	virtual QString getRegistrationType() {return QString("ImageTransform");}
 	virtual QString getRegistrationMethod() {return QString("Manual Patient Orientation");}
 	virtual QString getWidgetName() {return QString("ManualPatientOrientationRegistrationWidget");}
 	virtual QWidget* createWidget();
-
-private:
-	PatientModelServicePtr mPatientModelService;
 };
 } // cx
 

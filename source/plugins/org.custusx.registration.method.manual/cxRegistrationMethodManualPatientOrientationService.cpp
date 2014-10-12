@@ -7,7 +7,7 @@ namespace cx
 
 QWidget *cx::RegistrationMethodManualPatientOrientationService::createWidget()
 {
-	PatientOrientationWidget* patientOrientationWidget = new PatientOrientationWidget(mRegistrationService, mPatientModelService, NULL, this->getWidgetName(), "Patient Orientation");
+	PatientOrientationWidget* patientOrientationWidget = new PatientOrientationWidget(mServices, NULL, this->getWidgetName(), "Patient Orientation");
 	return patientOrientationWidget;
 }
 } // cx

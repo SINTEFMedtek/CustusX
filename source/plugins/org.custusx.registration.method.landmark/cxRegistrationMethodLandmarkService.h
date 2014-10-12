@@ -51,17 +51,13 @@ class org_custusx_registration_method_landmark_EXPORT RegistrationMethodLandmark
 {
 	Q_INTERFACES(cx::RegistrationMethodService)
 public:
-	RegistrationMethodLandmarkImageToImageService(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService) :
-		RegistrationMethodService(registrationService),
-		mPatientModelService(patientModelService) {}
+	RegistrationMethodLandmarkImageToImageService(regServices services) :
+		RegistrationMethodService(services) {}
 	virtual ~RegistrationMethodLandmarkImageToImageService() {}
 	virtual QString getRegistrationType() {return QString("ImageToImage");}
 	virtual QString getRegistrationMethod() {return QString("Landmark");}
 	virtual QString getWidgetName() {return QString("LandmarkImage2ImageRegistrationWidget");}
 	virtual QWidget* createWidget();
-
-private:
-	PatientModelServicePtr mPatientModelService;
 };
 
 /**
@@ -76,17 +72,13 @@ class org_custusx_registration_method_landmark_EXPORT RegistrationMethodLandmark
 {
 	Q_INTERFACES(cx::RegistrationMethodService)
 public:
-	RegistrationMethodLandmarkImageToPatientService(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService) :
-		RegistrationMethodService(registrationService),
-		mPatientModelService(patientModelService) {}
+	RegistrationMethodLandmarkImageToPatientService(regServices services) :
+		RegistrationMethodService(services) {}
 	virtual ~RegistrationMethodLandmarkImageToPatientService() {}
 	virtual QString getRegistrationType() {return QString("ImageToPatient");}
 	virtual QString getRegistrationMethod() {return QString("Landmark");}
 	virtual QString getWidgetName() {return QString("LandmarkImage2PatientRegistrationWidget");}
 	virtual QWidget* createWidget();
-
-private:
-	PatientModelServicePtr mPatientModelService;
 };
 
 /**
@@ -101,17 +93,13 @@ class org_custusx_registration_method_landmark_EXPORT RegistrationMethodFastLand
 {
 	Q_INTERFACES(cx::RegistrationMethodService)
 public:
-	RegistrationMethodFastLandmarkImageToPatientService(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService) :
-		RegistrationMethodService(registrationService),
-		mPatientModelService(patientModelService) {}
+	RegistrationMethodFastLandmarkImageToPatientService(regServices services) :
+		RegistrationMethodService(services) {}
 	virtual ~RegistrationMethodFastLandmarkImageToPatientService() {}
 	virtual QString getRegistrationType() {return QString("ImageToPatient");}
 	virtual QString getRegistrationMethod() {return QString("Fast Landmark");}
 	virtual QString getWidgetName() {return QString("FastLandmarkImage2PatientRegistrationWidget");}
 	virtual QWidget* createWidget();
-
-private:
-	PatientModelServicePtr mPatientModelService;
 };
 
 } /* namespace cx */

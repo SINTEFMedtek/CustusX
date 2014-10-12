@@ -63,7 +63,7 @@ class cxPluginRegistration_EXPORT WirePhantomWidget: public RegistrationBaseWidg
 Q_OBJECT
 
 public:
-	WirePhantomWidget(RegistrationServicePtr registrationService, VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, AcquisitionDataPtr aquisitionData, QWidget* parent);
+	WirePhantomWidget(regServices services, AcquisitionDataPtr aquisitionData, QWidget* parent);
 	virtual ~WirePhantomWidget();
 	virtual QString defaultWhatsThis() const;
 
@@ -89,7 +89,6 @@ private:
 	QTextEdit* mResults;
 	Transform3D mLastRegistration;
 	AcquisitionDataPtr mAquisitionData;
-	VisualizationServicePtr mVisualizationService;
 };
 
 } /* namespace cx */

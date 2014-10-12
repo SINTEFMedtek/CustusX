@@ -51,8 +51,8 @@ namespace cx
 class ManualImageTransformRegistrationWidget : public ManualImageRegistrationWidget
 {
 public:
-	ManualImageTransformRegistrationWidget(RegistrationServicePtr registrationService, QWidget* parent, QString objectName) :
-		ManualImageRegistrationWidget(registrationService, parent, objectName, "Manual Image Transform Registration") {}
+	ManualImageTransformRegistrationWidget(regServices services, QWidget* parent, QString objectName) :
+		ManualImageRegistrationWidget(services, parent, objectName, "Manual Image Transform Registration") {}
 	virtual QString getDescription();
 	virtual Transform3D getMatrixFromBackend();
 	virtual void setMatrixFromWidget(Transform3D M);

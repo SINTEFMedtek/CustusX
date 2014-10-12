@@ -5,15 +5,14 @@
 namespace cx
 {
 
-RegistrationMethodManualImageToImageService::RegistrationMethodManualImageToImageService(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService) :
-	RegistrationMethodManualService(registrationService),
-	mPatientModelService(patientModelService)
+RegistrationMethodManualImageToImageService::RegistrationMethodManualImageToImageService(regServices services) :
+	RegistrationMethodManualService(services)
 {
 }
 
 QWidget* RegistrationMethodManualImageToImageService::createWidget()
 {
-	QWidget* retval = new ManualImage2ImageRegistrationWidget(mRegistrationService, mPatientModelService, NULL, this->getWidgetName());
+	QWidget* retval = new ManualImage2ImageRegistrationWidget(mServices, NULL, this->getWidgetName());
 	return retval;
 }
 

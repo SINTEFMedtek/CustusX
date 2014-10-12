@@ -33,18 +33,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxFastImageRegistrationWidget.h"
 
 #include "cxReporter.h"
-//#include "cxDataManager.h"
-//#include "cxRegistrationManager.h"
 #include "cxPatientModelService.h"
 #include "cxData.h"
 #include "cxImage.h"
+#include "cxRegistrationService.h"
 
 namespace cx
 {
 
-FastImageRegistrationWidget::FastImageRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent, QString objectName, QString windowTitle) :
-	LandmarkImageRegistrationWidget(registrationService, patientModelService, parent, objectName, windowTitle),
-	mPatientModelService(patientModelService)
+FastImageRegistrationWidget::FastImageRegistrationWidget(regServices services, QWidget* parent, QString objectName, QString windowTitle) :
+	LandmarkImageRegistrationWidget(services, parent, objectName, windowTitle)
 {
 }
 
@@ -65,11 +63,11 @@ QString FastImageRegistrationWidget::defaultWhatsThis() const
 void FastImageRegistrationWidget::performRegistration()
 {
 	//make sure the masterImage is set
-	DataPtr fixedData = mRegistrationService->getFixedData();
+	DataPtr fixedData = mServices.registrationService->getFixedData();
 	if(!fixedData)
 	{
-		fixedData = mPatientModelService->getActiveImage();
-		mRegistrationService->setFixedData(fixedData);
+		fixedData = mServices.patientModelService->getActiveImage();
+		mServices.registrationService->setFixedData(fixedData);
 	}
 
 	this->updateAvarageAccuracyLabel();

@@ -36,8 +36,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-RegistrationMethodManualService::RegistrationMethodManualService(RegistrationServicePtr registrationService) :
-	RegistrationMethodService(registrationService)
+RegistrationMethodManualService::RegistrationMethodManualService(regServices services) :
+	RegistrationMethodService(services)
 {
 }
 

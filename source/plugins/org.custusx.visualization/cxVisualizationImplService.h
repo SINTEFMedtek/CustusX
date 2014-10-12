@@ -55,6 +55,8 @@ public:
 	VisualizationImplService(ctkPluginContext* context);
 	virtual ~VisualizationImplService();
 
+	virtual ViewPtr get3DView(int group = 0, int index = 0);
+
 	virtual int getActiveViewGroup() const;
 	virtual ViewGroupDataPtr getViewGroupData(int groupIdx);
 

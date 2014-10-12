@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationServiceProxy.h"
 #include "cxPatientModelServiceProxy.h"
 #include "cxVisualizationServiceProxy.h"
+#include "cxTrackingServiceProxy.h"
 
 namespace cx
 {
@@ -54,11 +55,13 @@ RegistrationMethodBronchoscopyPluginActivator::~RegistrationMethodBronchoscopyPl
 
 void RegistrationMethodBronchoscopyPluginActivator::start(ctkPluginContext* context)
 {
-	RegistrationServicePtr registrationService(new RegistrationServiceProxy(context));
-	PatientModelServicePtr patientModelService(new PatientModelServiceProxy(context));
-	VisualizationServicePtr visualizationService(new VisualizationServiceProxy(context));
+	regServices services;
+	services.registrationService	= RegistrationServicePtr(new RegistrationServiceProxy(context));
+	services.patientModelService	= PatientModelServicePtr(new PatientModelServiceProxy(context));
+	services.visualizationService	= VisualizationServicePtr(new VisualizationServiceProxy(context));
+	services.trackingService		= TrackingServicePtr(new TrackingServiceProxy(context));
 
-	RegistrationMethodBronchoscopyImageToPatientService* image2patientService = new RegistrationMethodBronchoscopyImageToPatientService(registrationService, visualizationService, patientModelService);
+	RegistrationMethodBronchoscopyImageToPatientService* image2patientService = new RegistrationMethodBronchoscopyImageToPatientService(services);
 
 	mRegistrationImageToPatient = RegisteredServicePtr(new RegisteredService(context, image2patientService, RegistrationMethodService_iid));
 }

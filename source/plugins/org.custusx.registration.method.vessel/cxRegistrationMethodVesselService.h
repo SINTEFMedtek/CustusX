@@ -51,19 +51,13 @@ class org_custusx_registration_method_vessel_EXPORT RegistrationMethodVesselImag
 {
 	Q_INTERFACES(cx::RegistrationMethodService)
 public:
-	RegistrationMethodVesselImageToImageService(RegistrationServicePtr registrationService, VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService) :
-		RegistrationMethodService(registrationService),
-		mPatientModelService(patientModelService),
-		mVisualizationService(visualizationService) {}
+	RegistrationMethodVesselImageToImageService(regServices services) :
+		RegistrationMethodService(services) {}
 	virtual ~RegistrationMethodVesselImageToImageService() {}
 	virtual QString getRegistrationType() {return QString("ImageToImage");}
 	virtual QString getRegistrationMethod() {return QString("Vessel");}
 	virtual QString getWidgetName() {return QString("VesselImage2ImageRegistrationWidget");}
 	virtual QWidget* createWidget();
-
-private:
-	PatientModelServicePtr mPatientModelService;
-	VisualizationServicePtr mVisualizationService;
 };
 
 

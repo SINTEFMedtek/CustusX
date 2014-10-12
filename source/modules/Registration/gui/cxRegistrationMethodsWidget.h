@@ -45,21 +45,21 @@ namespace cx
  * @{
  */
 
-class cxPluginRegistration_EXPORT LandmarkRegistrationsWidget : public TabbedWidget
-{
-public:
-  LandmarkRegistrationsWidget(QWidget* parent, QString objectName, QString windowTitle);
-  virtual ~LandmarkRegistrationsWidget(){};
-  virtual QString defaultWhatsThis() const;
-};
+//class cxPluginRegistration_EXPORT LandmarkRegistrationsWidget : public TabbedWidget
+//{
+//public:
+//  LandmarkRegistrationsWidget(QWidget* parent, QString objectName, QString windowTitle);
+//  virtual ~LandmarkRegistrationsWidget(){};
+//  virtual QString defaultWhatsThis() const;
+//};
 //------------------------------------------------------------------------------
-class cxPluginRegistration_EXPORT FastRegistrationsWidget : public TabbedWidget
-{
-public:
-  FastRegistrationsWidget(QWidget* parent, QString objectName, QString windowTitle);
-  virtual ~FastRegistrationsWidget(){};
-  virtual QString defaultWhatsThis() const;
-};
+//class cxPluginRegistration_EXPORT FastRegistrationsWidget : public TabbedWidget
+//{
+//public:
+//  FastRegistrationsWidget(QWidget* parent, QString objectName, QString windowTitle);
+//  virtual ~FastRegistrationsWidget(){};
+//  virtual QString defaultWhatsThis() const;
+//};
 //------------------------------------------------------------------------------
 class cxPluginRegistration_EXPORT Image2ImageRegistrationWidget : public TabbedWidget
 {

@@ -38,16 +38,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVBoxLayout>
 #include "cxReporter.h"
 #include "cxToolManager.h"
-#include "cxDataManager.h"
-#include "cxRegistrationManager.h"
+#include "cxPatientModelService.h"
+#include "cxRegistrationService.h"
 
 #include "cxLegacySingletons.h"
 
 namespace cx
 {
-FastOrientationRegistrationWidget::FastOrientationRegistrationWidget(RegistrationServicePtr registrationService, QWidget* parent) :
-		RegistrationBaseWidget(registrationService, parent, "FastOrientationRegistrationWidget", "Fast Orientation Registration"),
-    mSetOrientationButton(new QPushButton("Define Orientation")),
+FastOrientationRegistrationWidget::FastOrientationRegistrationWidget(regServices services, QWidget* parent) :
+	RegistrationBaseWidget(services, parent, "FastOrientationRegistrationWidget", "Fast Orientation Registration"),
+	mSetOrientationButton(new QPushButton("Define Orientation")),
     mInvertButton(new QCheckBox("Back face"))
 {
   QVBoxLayout* layout = new QVBoxLayout(this);
@@ -57,7 +57,8 @@ FastOrientationRegistrationWidget::FastOrientationRegistrationWidget(Registratio
 
   mSetOrientationButton->setToolTip(this->defaultWhatsThis());
 
-  connect(dataManager(), SIGNAL(debugModeChanged(bool)), this, SLOT(enableToolSampleButtonSlot()));
+  connect(services.patientModelService.get(), &PatientModelService::debugModeChanged,
+		  this, &FastOrientationRegistrationWidget::enableToolSampleButtonSlot);
 
   mDominantToolProxy =  DominantToolProxy::New(trackingService());
   connect(mDominantToolProxy.get(), SIGNAL(toolVisible(bool)), this, SLOT(enableToolSampleButtonSlot()));
@@ -98,7 +99,7 @@ void FastOrientationRegistrationWidget::hideEvent(QHideEvent* event)
 void FastOrientationRegistrationWidget::setOrientationSlot()
 {
 	Transform3D prMt = toolManager()->getDominantTool()->get_prMt();
-	mRegistrationService->doFastRegistration_Orientation(this->get_tMtm(), prMt);
+	mServices.registrationService->doFastRegistration_Orientation(this->get_tMtm(), prMt);
 }
 
 Transform3D FastOrientationRegistrationWidget::get_tMtm() const
@@ -123,7 +124,7 @@ void FastOrientationRegistrationWidget::enableToolSampleButtonSlot()
   bool enabled = false;
   enabled = tool &&
 	  tool->getVisible() &&
-	  (!tool->hasType(Tool::TOOL_MANUAL) || dataManager()->getDebugMode()); // enable only for non-manual tools. ignore this in debug mode.
+	  (!tool->hasType(Tool::TOOL_MANUAL) || mServices.patientModelService->getDebugMode()); // enable only for non-manual tools. ignore this in debug mode.
 
   mSetOrientationButton->setEnabled(enabled);
 }

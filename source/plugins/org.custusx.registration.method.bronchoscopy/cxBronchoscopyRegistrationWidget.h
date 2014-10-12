@@ -60,7 +60,7 @@ class BronchoscopyRegistrationWidget: public RegistrationBaseWidget
 {
 	Q_OBJECT
 public:
-	BronchoscopyRegistrationWidget(RegistrationServicePtr registrationService, VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget *parent);
+	BronchoscopyRegistrationWidget(regServices services, QWidget *parent);
 	virtual ~BronchoscopyRegistrationWidget()
 	{
 	}
@@ -82,7 +82,6 @@ private:
 	QPushButton* mRegisterButton;
     ToolPtr mTool;
 //    TrackedCenterlineWidget* mTrackedCenterLine;
-	PatientModelServicePtr mPatientModelService;
 
     ToolRep3DPtr getToolRepIn3DView(ToolPtr tool);
 

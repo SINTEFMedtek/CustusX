@@ -58,13 +58,12 @@ class org_custusx_registration_method_landmark_EXPORT FastImageRegistrationWidge
 {
 	Q_OBJECT
 public:
-	FastImageRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent, QString objectName, QString windowTitle);
+	FastImageRegistrationWidget(regServices services, QWidget* parent, QString objectName, QString windowTitle);
 	virtual ~FastImageRegistrationWidget();
 	virtual QString defaultWhatsThis() const;
 
 protected:
 	virtual void performRegistration();
-	PatientModelServicePtr mPatientModelService;
 };
 
 /**

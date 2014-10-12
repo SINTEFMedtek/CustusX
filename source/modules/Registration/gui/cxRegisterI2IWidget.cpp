@@ -46,9 +46,9 @@ namespace cx
 {
 
 
-RegisterI2IWidget::RegisterI2IWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent) :
-		RegistrationBaseWidget(registrationService, parent, "RegisterI2IWidget", "Register Image2Image"),
-		mSeansVesselRegsitrationWidget(new SeansVesselRegistrationWidget(registrationService, patientModelService, this))
+RegisterI2IWidget::RegisterI2IWidget(regServices services, QWidget* parent) :
+		RegistrationBaseWidget(services, parent, "RegisterI2IWidget", "Register Image2Image"),
+		mSeansVesselRegsitrationWidget(new SeansVesselRegistrationWidget(services, this))
 {
 //  connect(registrationManager(), SIGNAL(fixedDataChanged(QString)), this, SLOT(fixedImageSlot(QString)));
 //  connect(registrationManager(), SIGNAL(movingDataChanged(QString)), this, SLOT(movingImageSlot(QString)));

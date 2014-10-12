@@ -34,13 +34,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXREGISTRATIONMETHODTOUSPREPAREWIDGET_H
 
 #include "cxBaseWidget.h"
+#include "cxRegistrationMethodService.h"
 
 namespace cx {
 
 class RegistrationMethodToUSPrepareWidget : public BaseWidget
 {
 public:
-	RegistrationMethodToUSPrepareWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget *parent, QString objectName);
+	RegistrationMethodToUSPrepareWidget(regServices services, QWidget *parent, QString objectName);
 private:
 	QString defaultWhatsThis() const;
 

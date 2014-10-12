@@ -43,18 +43,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkDoubleArray.h>
 #include <vtkImageData.h>
 #include "cxReporter.h"
-#include "cxRegistrationManager.h"
-#include "cxDataManager.h"
 #include "cxRegistrationHistoryWidget.h"
 #include "cxTypeConversions.h"
 #include "cxManualTool.h"
 #include "cxToolManager.h"
+#include "cxPatientModelService.h"
+#include "cxRegistrationService.h"
+#include"cxData.h"
 
 namespace cx
 {
-LandmarkRegistrationWidget::LandmarkRegistrationWidget(RegistrationServicePtr registrationService, QWidget* parent,
+LandmarkRegistrationWidget::LandmarkRegistrationWidget(regServices services, QWidget* parent,
 	QString objectName, QString windowTitle) :
-	RegistrationBaseWidget(registrationService, parent, objectName, windowTitle), mVerticalLayout(new QVBoxLayout(this)),
+	RegistrationBaseWidget(services, parent, objectName, windowTitle), mVerticalLayout(new QVBoxLayout(this)),
 		mLandmarkTableWidget(new QTableWidget(this)), mAvarageAccuracyLabel(new QLabel(QString(" "), this))
 {
 	//table widget
@@ -93,7 +94,7 @@ void LandmarkRegistrationWidget::cellClickedSlot(int row, int column)
 	{
 		Vector3D p_d = targetData[mActiveLandmark].getCoord();
 		Vector3D p_r = this->getTargetTransform().coord(p_d);
-		Vector3D p_pr = dataManager()->get_rMpr().coord(p_r);
+		Vector3D p_pr = mServices.patientModelService->get_rMpr().coord(p_r);
 		this->setManualToolPosition(p_r);
 	}
 
@@ -101,7 +102,7 @@ void LandmarkRegistrationWidget::cellClickedSlot(int row, int column)
 
 void LandmarkRegistrationWidget::setManualToolPosition(Vector3D p_r)
 {
-	Transform3D rMpr = dataManager()->get_rMpr();
+	Transform3D rMpr = mServices.patientModelService->get_rMpr();
 	Vector3D p_pr = rMpr.inv().coord(p_r);
 
 	// set the picked point as offset tip
@@ -111,7 +112,7 @@ void LandmarkRegistrationWidget::setManualToolPosition(Vector3D p_r)
 	p_r = rMpr.coord(p_pr);
 
 	// TODO set center here will not do: must handle
-	dataManager()->setCenter(p_r);
+	mServices.patientModelService->setCenter(p_r);
 	Vector3D p0_pr = tool->get_prMt().coord(Vector3D(0, 0, 0));
 	tool->set_prMt(createTransformTranslate(p_pr - p0_pr) * tool->get_prMt());
 }
@@ -119,17 +120,19 @@ void LandmarkRegistrationWidget::setManualToolPosition(Vector3D p_r)
 void LandmarkRegistrationWidget::showEvent(QShowEvent* event)
 {
 	QWidget::showEvent(event);
-	connect(dataManager(), SIGNAL(landmarkPropertiesChanged()), this, SLOT(landmarkUpdatedSlot()));
+	connect(mServices.patientModelService.get(), &PatientModelService::landmarkPropertiesChanged,
+			this, &LandmarkRegistrationWidget::landmarkUpdatedSlot);
 
 //	mManager->restart();
-	mRegistrationService->setLastRegistrationTime(QDateTime::currentDateTime());
+	mServices.registrationService->setLastRegistrationTime(QDateTime::currentDateTime());
 	this->setModified();
 }
 
 void LandmarkRegistrationWidget::hideEvent(QHideEvent* event)
 {
 	QWidget::hideEvent(event);
-	disconnect(dataManager(), SIGNAL(landmarkPropertiesChanged()), this, SLOT(landmarkUpdatedSlot()));
+	disconnect(mServices.patientModelService.get(), &PatientModelService::landmarkPropertiesChanged,
+			this, &LandmarkRegistrationWidget::landmarkUpdatedSlot);
 }
 
 void LandmarkRegistrationWidget::prePaintEvent()
@@ -138,7 +141,7 @@ void LandmarkRegistrationWidget::prePaintEvent()
 	mLandmarkTableWidget->clear();
 
 	QString fixedName;
-	DataPtr fixedData = boost::dynamic_pointer_cast<Data>(mRegistrationService->getFixedData());
+	DataPtr fixedData = boost::dynamic_pointer_cast<Data>(mServices.registrationService->getFixedData());
 	if (fixedData)
 		fixedName = fixedData->getName();
 
@@ -158,7 +161,7 @@ void LandmarkRegistrationWidget::prePaintEvent()
 	{
 		std::vector<QTableWidgetItem*> items(4); // name, status, coordinates, accuracy
 
-		LandmarkProperty prop = dataManager()->getLandmarkProperties()[landmarks[i].getUid()];
+		LandmarkProperty prop = mServices.patientModelService->getLandmarkProperties()[landmarks[i].getUid()];
 		Vector3D coord = landmarks[i].getCoord();
 		coord = rMtarget.coord(coord); // display coordinates in space r (in principle, this means all coords should be equal)
 
@@ -233,7 +236,7 @@ std::vector<Landmark> LandmarkRegistrationWidget::getAllLandmarks() const
 {
 	std::vector<Landmark> retval;
 	LandmarkMap targetData = this->getTargetLandmarks();
-	std::map<QString, LandmarkProperty> dataData = dataManager()->getLandmarkProperties();
+	std::map<QString, LandmarkProperty> dataData = mServices.patientModelService->getLandmarkProperties();
 	std::map<QString, LandmarkProperty>::iterator iter;
 
 	for (iter = dataData.begin(); iter != dataData.end(); ++iter)
@@ -257,12 +260,12 @@ void LandmarkRegistrationWidget::cellChangedSlot(int row, int column)
 	if (column == 0)
 	{
 		QString name = item->text();
-		dataManager()->setLandmarkName(uid, name);
+		mServices.patientModelService->setLandmarkName(uid, name);
 	}
 	if (column == 1)
 	{
 		Qt::CheckState state = item->checkState();
-		dataManager()->setLandmarkActive(uid, state == Qt::Checked);
+		mServices.patientModelService->setLandmarkActive(uid, state == Qt::Checked);
 		this->performRegistration(); // automatic when changing active state (Mantis #0000674)s
 	}
 	if (column == 2)
@@ -293,7 +296,7 @@ void LandmarkRegistrationWidget::landmarkUpdatedSlot()
 void LandmarkRegistrationWidget::updateAvarageAccuracyLabel()
 {
 	QString fixedName;
-	DataPtr fixedData = boost::dynamic_pointer_cast<Data>(mRegistrationService->getFixedData());
+	DataPtr fixedData = boost::dynamic_pointer_cast<Data>(mServices.registrationService->getFixedData());
 	if (fixedData)
 		fixedName = fixedData->getName();
 
@@ -303,7 +306,7 @@ void LandmarkRegistrationWidget::updateAvarageAccuracyLabel()
 
 double LandmarkRegistrationWidget::getAvarageAccuracy()
 {
-	std::map<QString, LandmarkProperty> props = dataManager()->getLandmarkProperties();
+	std::map<QString, LandmarkProperty> props = mServices.patientModelService->getLandmarkProperties();
 
 	double sum = 0;
 	int count = 0;
@@ -327,7 +330,7 @@ double LandmarkRegistrationWidget::getAvarageAccuracy()
 
 double LandmarkRegistrationWidget::getAccuracy(QString uid)
 {
-	DataPtr fixedData = mRegistrationService->getFixedData();
+	DataPtr fixedData = mServices.registrationService->getFixedData();
 	if (!fixedData)
 		return 1000.0;
 

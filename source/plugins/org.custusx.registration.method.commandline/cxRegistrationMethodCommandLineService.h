@@ -52,17 +52,13 @@ class org_custusx_registration_method_commandline_EXPORT RegistrationMethodComma
 {
 	Q_INTERFACES(cx::RegistrationMethodService)
 public:
-	RegistrationMethodCommandLineService(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService) :
-		RegistrationMethodService(registrationService),
-		mPatientModelService(patientModelService) {}
+	RegistrationMethodCommandLineService(regServices services) :
+		RegistrationMethodService(services) {}
 	virtual ~RegistrationMethodCommandLineService() {}
 	virtual QString getRegistrationType() {return QString("ImageToImage");}
 	virtual QString getRegistrationMethod() {return QString("CommandLine");}
 	virtual QString getWidgetName() {return QString("ElastiX");}
 	virtual QWidget* createWidget();
-
-private:
-	PatientModelServicePtr mPatientModelService;
 };
 
 

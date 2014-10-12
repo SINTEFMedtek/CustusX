@@ -30,35 +30,61 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxFastPatientRegistrationWidget.h"
+#ifndef CXFASTORIENTATIONREGISTRATIONWIDGET_H_
+#define CXFASTORIENTATIONREGISTRATIONWIDGET_H_
 
-#include "cxReporter.h"
-#include "cxRegistrationManager.h"
+#include "cxPluginRegistrationExport.h"
+
+#include "cxRegistrationBaseWidget.h"
+#include "cxForwardDeclarations.h"
+#include "cxTransform3D.h"
+#include "cxDominantToolProxy.h"
+
+class QPushButton;
+class QCheckBox;
 
 namespace cx
 {
-FastPatientRegistrationWidget::FastPatientRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent) :
-		LandmarkPatientRegistrationWidget(registrationService, patientModelService, parent, "FastPatientRegistrationWidget", "Fast Patient Registration")
+/**
+ * \file
+ * \addtogroup cx_module_registration
+ * @{
+ */
+
+/**
+ * \class FastOrientationRegistrationWidget
+ *
+ * \brief Widget for registrating the orientation part of a fast registration
+ *
+ * \date 27. sep. 2010
+ * \\author Janne Beate Bakeng
+ */
+
+class cxPluginRegistration_EXPORT FastOrientationRegistrationWidget : public RegistrationBaseWidget
 {
+  Q_OBJECT
+
+public:
+	FastOrientationRegistrationWidget(regServices services, QWidget* parent);
+  ~FastOrientationRegistrationWidget();
+  virtual QString defaultWhatsThis() const;
+
+protected:
+  virtual void showEvent(QShowEvent* event);
+  virtual void hideEvent(QHideEvent* event);
+
+private slots:
+  void setOrientationSlot();
+  void enableToolSampleButtonSlot();
+private:
+  Transform3D get_tMtm() const;
+  QPushButton* mSetOrientationButton;
+  QCheckBox* mInvertButton;
+  DominantToolProxyPtr mDominantToolProxy;
+};
+
+/**
+ * @}
+ */
 }
-
-FastPatientRegistrationWidget::~FastPatientRegistrationWidget()
-{}
-
-QString FastPatientRegistrationWidget::defaultWhatsThis() const
-{
-  return "<html>"
-      "<h3>Fast translation registration. </h3>"
-      "<p>Select landmarks on the patient that corresponds to one or more of the points sampled in image registration. "
-      "Points are used to determine the translation of the patient registration.</p>"
-      "<p><i>Point on the patient using a tool and click the Sample button.</i></p>"
-      "</html>";
-}
-
-void FastPatientRegistrationWidget::performRegistration()
-{
-	mRegistrationService->doFastRegistration_Translation();
-  this->updateAvarageAccuracyLabel();
-}
-
-}//namespace cx
+#endif /* CXFASTORIENTATIONREGISTRATIONWIDGET_H_ */

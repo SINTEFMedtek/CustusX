@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxBaseWidget.h"
 #include "cxTransform3D.h"
+#include "cxRegistrationMethodService.h"
 
 class ctkPluginContext;
 
@@ -61,7 +62,7 @@ class ManualImageRegistrationWidget: public BaseWidget
 {
 Q_OBJECT
 public:
-	ManualImageRegistrationWidget(RegistrationServicePtr registrationService, QWidget* parent, QString objectName, QString windowTitle);
+	ManualImageRegistrationWidget(regServices services, QWidget* parent, QString objectName, QString windowTitle);
 	virtual ~ManualImageRegistrationWidget()
 	{
 //		mRegistrationService.reset();
@@ -71,8 +72,8 @@ public:
 protected:
 	virtual void showEvent(QShowEvent* event);
 	DataPtr mConnectedMovingImage;
-	RegistrationServicePtr mRegistrationService;
 	QVBoxLayout* mVerticalLayout;
+	regServices mServices;
 
 private slots:
 	void matrixWidgetChanged();

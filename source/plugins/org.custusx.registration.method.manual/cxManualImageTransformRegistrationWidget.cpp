@@ -56,7 +56,7 @@ void ManualImageTransformRegistrationWidget::setMatrixFromWidget(Transform3D M)
 	Transform3D rMMd = M;
 
 	Transform3D delta_pre_rMd = rMMd * rMd.inv(); // gives delta on the r (left) side.
-	mRegistrationService->applyImage2ImageRegistration(delta_pre_rMd, "Manual Image rMd");
+	mServices.registrationService->applyImage2ImageRegistration(delta_pre_rMd, "Manual Image rMd");
 }
 
 } //cx

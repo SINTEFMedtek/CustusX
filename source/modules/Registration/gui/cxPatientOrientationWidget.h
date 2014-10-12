@@ -67,7 +67,7 @@ class cxPluginRegistration_EXPORT PatientOrientationWidget : public Registration
   Q_OBJECT
 
 public:
-	PatientOrientationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent, QString objectName, QString windowTitle);
+	PatientOrientationWidget(regServices services, QWidget* parent, QString objectName, QString windowTitle);
   ~PatientOrientationWidget();
   virtual QString defaultWhatsThis() const;
 
@@ -81,7 +81,6 @@ private:
   QCheckBox* mInvertButton;
 
   DominantToolProxyPtr mDominantToolProxy;
-	PatientModelServicePtr mPatientModelService;
 };
 
 /**

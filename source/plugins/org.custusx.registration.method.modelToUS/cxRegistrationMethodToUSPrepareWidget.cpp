@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx {
 
-RegistrationMethodToUSPrepareWidget::RegistrationMethodToUSPrepareWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent, QString objectName) :
+RegistrationMethodToUSPrepareWidget::RegistrationMethodToUSPrepareWidget(regServices services, QWidget* parent, QString objectName) :
 	BaseWidget(parent, objectName, "Model to US Registration preparation"),
 	mVerticalLayout(new QVBoxLayout(this))
 {
@@ -49,15 +49,15 @@ RegistrationMethodToUSPrepareWidget::RegistrationMethodToUSPrepareWidget(Visuali
 	XmlOptionFile options = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("registration").descend("PrepareVesselsWidget");
 	// fill the pipeline with filters:
 	PipelinePtr mPipeline;
-	mPipeline.reset(new Pipeline(patientModelService));
+	mPipeline.reset(new Pipeline(services.patientModelService));
 	FilterGroupPtr filters(new FilterGroup(options.descend("pipeline")));
 	//filters->append(FilterPtr(new ResampleImageFilter(patientModelService)));
 	//filters->append(FilterPtr(new SmoothingImageFilter(patientModelService)));
-	filters->append(FilterPtr(new BinaryThresholdImageFilter(patientModelService)));
+	filters->append(FilterPtr(new BinaryThresholdImageFilter(services.patientModelService)));
 	//filters->append(FilterPtr(new BinaryThinningImageFilter3DFilter(patientModelService)));
 	mPipeline->initialize(filters);
 
-	PipelineWidget *mPipelineWidget = new PipelineWidget(visualizationService, patientModelService, NULL, mPipeline);
+	PipelineWidget *mPipelineWidget = new PipelineWidget(services.visualizationService, services.patientModelService, NULL, mPipeline);
 	mVerticalLayout->addWidget(mPipelineWidget);
 }
 

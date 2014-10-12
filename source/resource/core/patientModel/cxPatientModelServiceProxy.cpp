@@ -69,6 +69,7 @@ void PatientModelServiceProxy::onServiceAdded(PatientModelService* service)
 	mPatientModelService.reset(service, null_deleter());
 	connect(service, SIGNAL(dataAddedOrRemoved()), this, SIGNAL(dataAddedOrRemoved()));
 	connect(service, SIGNAL(activeImageChanged(const QString&)), this, SIGNAL(activeImageChanged(const QString&)));
+	connect(service, SIGNAL(landmarkPropertiesChanged()), this, SIGNAL(landmarkPropertiesChanged()));
 	connect(service, SIGNAL(debugModeChanged(bool)), this, SIGNAL(debugModeChanged(bool)));
 	connect(service, SIGNAL(rMprChanged()), this, SIGNAL(rMprChanged()));
 	connect(service, SIGNAL(streamLoaded()), this, SIGNAL(streamLoaded()));
@@ -80,6 +81,7 @@ void PatientModelServiceProxy::onServiceRemoved(PatientModelService *service)
 {
 	disconnect(service, SIGNAL(dataAddedOrRemoved()), this, SIGNAL(dataAddedOrRemoved()));
 	disconnect(service, SIGNAL(activeImageChanged(const QString&)), this, SIGNAL(activeImageChanged(const QString&)));
+	disconnect(service, SIGNAL(landmarkPropertiesChanged()), this, SIGNAL(landmarkPropertiesChanged()));
 	disconnect(service, SIGNAL(debugModeChanged(bool)), this, SIGNAL(debugModeChanged(bool)));
 	disconnect(service, SIGNAL(rMprChanged()), this, SIGNAL(rMprChanged()));
 	disconnect(service, SIGNAL(streamLoaded()), this, SIGNAL(streamLoaded()));
@@ -114,6 +116,11 @@ LandmarksPtr PatientModelServiceProxy::getPatientLandmarks() const
 std::map<QString, LandmarkProperty> PatientModelServiceProxy::getLandmarkProperties() const
 {
 	return mPatientModelService->getLandmarkProperties();
+}
+
+void PatientModelServiceProxy::setLandmarkName(QString uid, QString name)
+{
+	mPatientModelService->setLandmarkName(uid, name);
 }
 
 Transform3D PatientModelServiceProxy::get_rMpr() const
@@ -219,6 +226,16 @@ void PatientModelServiceProxy::removePatientData(QString uid)
 PresetTransferFunctions3DPtr PatientModelServiceProxy::getPresetTransferFunctions3D() const
 {
 	return mPatientModelService->getPresetTransferFunctions3D();
+}
+
+void PatientModelServiceProxy::setCenter(const Vector3D &center)
+{
+	return mPatientModelService->setCenter(center);
+}
+
+QString PatientModelServiceProxy::addLandmark()
+{
+	return mPatientModelService->addLandmark();
 }
 
 void PatientModelServiceProxy::setLandmarkActive(QString uid, bool active)

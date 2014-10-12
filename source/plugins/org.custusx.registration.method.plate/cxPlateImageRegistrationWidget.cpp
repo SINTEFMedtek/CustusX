@@ -32,12 +32,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxPlateImageRegistrationWidget.h"
 #include "cxPatientModelService.h"
+#include "cxRegistrationService.h"
 
 namespace cx {
 
-PlateImageRegistrationWidget::PlateImageRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent) :
-	FastImageRegistrationWidget(registrationService, patientModelService, parent, "PlateImageRegistrationWidget", "Plate Image Registration"),
-	mPatientModelService(patientModelService)
+PlateImageRegistrationWidget::PlateImageRegistrationWidget(regServices services, QWidget* parent) :
+	FastImageRegistrationWidget(services, parent, "PlateImageRegistrationWidget", "Plate Image Registration")
 {
 }
 
@@ -55,14 +55,14 @@ QString PlateImageRegistrationWidget::defaultWhatsThis() const
 
 void PlateImageRegistrationWidget::editLandmarkButtonClickedSlot()
 {
-	mPatientModelService->setLandmarkActive(mActiveLandmark, true);
+	mServices.patientModelService->setLandmarkActive(mActiveLandmark, true);
 	LandmarkImageRegistrationWidget::editLandmarkButtonClickedSlot();
 }
 
 void PlateImageRegistrationWidget::performRegistration()
 {
 	FastImageRegistrationWidget::performRegistration();
-	mRegistrationService->doFastRegistration_Translation();
+	mServices.registrationService->doFastRegistration_Translation();
 }
 
 } //cx

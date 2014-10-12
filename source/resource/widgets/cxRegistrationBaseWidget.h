@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxBaseWidget.h"
 #include "cxResourceWidgetsExport.h"
 
-#include "cxRegistrationService.h"
+#include "cxRegistrationMethodService.h"
 
 namespace cx
 {
@@ -49,11 +49,11 @@ namespace cx
 class cxResourceWidgets_EXPORT RegistrationBaseWidget : public BaseWidget
 {
 public:
-	RegistrationBaseWidget(RegistrationServicePtr registrationService, QWidget *parent, QString objectName, QString windowTitle);
+	RegistrationBaseWidget(regServices services, QWidget *parent, QString objectName, QString windowTitle);
   virtual ~RegistrationBaseWidget() {}
 
 protected:
-	RegistrationServicePtr mRegistrationService;
+	regServices mServices;
 };
 
 /**

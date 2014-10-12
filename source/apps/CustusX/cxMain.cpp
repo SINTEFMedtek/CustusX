@@ -38,14 +38,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxAcquisitionPlugin.h"
 #include "cxCalibrationPlugin.h"
 #include "cxAlgorithmPlugin.h"
-#include "cxRegistrationPlugin.h"
 
 #include "cxTypeConversions.h"
 #include "cxLogicManager.h"
 #include "cxApplication.h"
 #include "cxPluginFramework.h"
 #include "cxPatientModelServiceProxy.h"
-#include "cxRegistrationServiceProxy.h"
 #include "cxVisualizationServiceProxy.h"
 
 #if !defined(WIN32)
@@ -105,27 +103,27 @@ int main(int argc, char *argv[])
 
 
 	cx::PatientModelServicePtr patientModelService = cx::PatientModelServicePtr(new cx::PatientModelServiceProxy(cx::LogicManager::getInstance()->getPluginContext()));
-	cx::RegistrationServicePtr registrationService = cx::RegistrationServicePtr(new cx::RegistrationServiceProxy(cx::LogicManager::getInstance()->getPluginContext()));
+//	cx::RegistrationServicePtr registrationService = cx::RegistrationServicePtr(new cx::RegistrationServiceProxy(cx::LogicManager::getInstance()->getPluginContext()));
 	cx::VisualizationServicePtr visualizationService = cx::VisualizationServicePtr(new cx::VisualizationServiceProxy(cx::LogicManager::getInstance()->getPluginContext()));
 
 	cx::UsReconstructionPluginPtr reconstructionPlugin(new cx::UsReconstructionPlugin());
 	cx::AcquisitionPluginPtr acquisitionPlugin(new cx::AcquisitionPlugin(reconstructionPlugin->getReconstructer()));
 	cx::CalibrationPluginPtr calibrationPlugin(new cx::CalibrationPlugin(patientModelService, acquisitionPlugin->getAcquisitionData()));
 	cx::AlgorithmPluginPtr algorithmPlugin(new cx::AlgorithmPlugin(visualizationService, patientModelService));
-	cx::RegistrationPluginPtr registrationPlugin(new cx::RegistrationPlugin(registrationService, visualizationService, patientModelService, acquisitionPlugin->getAcquisitionData()));
+//	cx::RegistrationPluginPtr registrationPlugin(new cx::RegistrationPlugin(registrationService, visualizationService, patientModelService, acquisitionPlugin->getAcquisitionData()));
 
 	plugins.push_back(reconstructionPlugin);
 	plugins.push_back(acquisitionPlugin);
 	plugins.push_back(calibrationPlugin);
 	plugins.push_back(algorithmPlugin);
-	plugins.push_back(registrationPlugin);
+//	plugins.push_back(registrationPlugin);
 
 	//Need to remove local variables so that plugins.clear() will trigger the destructors before LogicManager destroys the plugin framework
 	reconstructionPlugin.reset();
 	acquisitionPlugin.reset();
 	calibrationPlugin.reset();
 	algorithmPlugin.reset();
-	registrationPlugin.reset();
+//	registrationPlugin.reset();
 
 	cx::MainWindow* mainWin = new cx::MainWindow(plugins);
 

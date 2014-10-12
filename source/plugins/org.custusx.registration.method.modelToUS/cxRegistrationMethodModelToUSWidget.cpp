@@ -44,20 +44,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-RegistrationMethodModelToUSWidget::RegistrationMethodModelToUSWidget(RegistrationServicePtr registrationService,
-																	 VisualizationServicePtr visualizationService,
-																	 PatientModelServicePtr patientModelService,
+RegistrationMethodModelToUSWidget::RegistrationMethodModelToUSWidget(regServices services,
 																	 QWidget* parent, QString objectName) :
 	TabbedWidget(parent, objectName, "Model to US Registration")
 {
 	//mVerticalLayout->addWidget(new QLabel("Hello Plugin!"));
 
-	RegistrationMethodToUSPrepareWidget* prepareWidget = new RegistrationMethodToUSPrepareWidget(visualizationService, patientModelService, NULL, "PrepareModelToUSRegistrationWidget");
+	RegistrationMethodToUSPrepareWidget* prepareWidget = new RegistrationMethodToUSPrepareWidget(services, NULL, "PrepareModelToUSRegistrationWidget");
 	this->addTab(prepareWidget, "Prepare");
 
 	//Try to reuse existing widget
 	Image2ImageRegistrationWidget* image2imageWidget = new Image2ImageRegistrationWidget(NULL, "Image2ImageRegistrationWidget", "Image 2 Image Registration");
-	this->addTab(new RegisterI2IWidget(registrationService, patientModelService, image2imageWidget),"Register");
+	this->addTab(new RegisterI2IWidget(services, image2imageWidget),"Register");
 }
 
 RegistrationMethodModelToUSWidget::~RegistrationMethodModelToUSWidget()

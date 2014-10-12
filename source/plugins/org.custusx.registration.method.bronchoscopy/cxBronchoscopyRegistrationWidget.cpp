@@ -42,7 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRecordSessionWidget.h"
 #include "cxRecordSession.h"
 #include "cxRepManager.h"
-#include "cxViewManager.h"
 #include "cxView.h"
 #include "cxToolRep3D.h"
 #include "cxToolTracer.h"
@@ -51,18 +50,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxThresholdPreview.h"
 #include "cxPatientModelService.h"
+#include "cxRegistrationService.h"
+#include "cxVisualizationService.h"
 
 #include "cxLegacySingletons.h"
 
 
 namespace cx
 {
-BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegistrationServicePtr registrationService, VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent) :
-	RegistrationBaseWidget(registrationService, parent, "BronchoscopyRegistrationWidget",
-						   "Bronchoscopy Registration"), mVerticalLayout(new QVBoxLayout(this)),
-	mPatientModelService(patientModelService)
+BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(regServices services, QWidget* parent) :
+	RegistrationBaseWidget(services, parent, "BronchoscopyRegistrationWidget",
+						   "Bronchoscopy Registration"), mVerticalLayout(new QVBoxLayout(this))
 {
-	mSelectMeshWidget = SelectMeshStringDataAdapter::New(patientModelService);
+	mSelectMeshWidget = SelectMeshStringDataAdapter::New(services.patientModelService);
 	mSelectMeshWidget->setValueName("Centerline: ");
 
 	mRegisterButton = new QPushButton("Register");
@@ -83,7 +83,7 @@ BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegistrationServi
 
     mRecordSessionWidget.reset(new RecordSessionWidget(mAquisition, this, "Bronchoscope path"));
 
-	mVerticalLayout->addWidget(new DataSelectWidget(visualizationService, patientModelService, this, mSelectMeshWidget));
+	mVerticalLayout->addWidget(new DataSelectWidget(services.visualizationService, services.patientModelService, this, mSelectMeshWidget));
 //    mVerticalLayout->addWidget(mTrackedCenterLine);
     mVerticalLayout->addWidget(mRecordSessionWidget.get());
 	mVerticalLayout->addWidget(mRegisterButton);
@@ -104,7 +104,7 @@ QString BronchoscopyRegistrationWidget::defaultWhatsThis() const
 
 void BronchoscopyRegistrationWidget::registerSlot()
 {
-	Transform3D old_rMpr = mPatientModelService->get_rMpr();//input to registrationAlgorithm
+	Transform3D old_rMpr = mServices.patientModelService->get_rMpr();//input to registrationAlgorithm
     //std::cout << "rMpr: " << std::endl;
     //std::cout << old_rMpr << std::endl;
 
@@ -139,7 +139,7 @@ void BronchoscopyRegistrationWidget::registerSlot()
     Transform3D new_rMpr = Transform3D(reg.runBronchoscopyRegistration(centerline,trackerRecordedData_prMt,old_rMpr,rMd));
 
     new_rMpr = new_rMpr*old_rMpr;//output
-		mRegistrationService->applyPatientRegistration(new_rMpr, "Bronchoscopy centerline to tracking data");
+	mServices.registrationService->applyPatientRegistration(new_rMpr, "Bronchoscopy centerline to tracking data");
 
     Eigen::Matrix4d display_rMpr = Eigen::Matrix4d::Identity();
             display_rMpr = new_rMpr*display_rMpr;
@@ -180,7 +180,7 @@ void BronchoscopyRegistrationWidget::acquisitionStopped()
 
 ToolRep3DPtr BronchoscopyRegistrationWidget::getToolRepIn3DView(ToolPtr tool)
 {
-	ViewPtr view = viewManager()->get3DView();
+	ViewPtr view = mServices.visualizationService->get3DView();
     ToolRep3DPtr retval = RepManager::findFirstRep<ToolRep3D>(view->getReps(),tool);
 	return retval;
 }
