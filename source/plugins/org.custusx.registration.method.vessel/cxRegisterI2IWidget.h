@@ -29,22 +29,22 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXREGISTERI2IWIDGET_H_
+#define CXREGISTERI2IWIDGET_H_
 
-#ifndef CXSEANSVESSELREGISTRATIONWIDGET_H_
-#define CXSEANSVESSELREGISTRATIONWIDGET_H_
+#include <vector>
+#include <QtWidgets>
 
-#include "cxPluginRegistrationExport.h"
-
+#include "cxDoubleDataAdapterXml.h"
+#include "cxDoubleWidgets.h"
 #include "cxRegistrationBaseWidget.h"
-#include "cxStringDataAdapter.h"
+#include "cxBinaryThresholdImageFilter.h"
 
-class QSpinBox;
-class QPushButton;
-class QLabel;
 
 namespace cx
 {
-typedef boost::shared_ptr<class SeansVesselRegistrationDebugger> SeansVesselRegistrationDebuggerPtr;
+typedef boost::shared_ptr<class SelectImageStringDataAdapter> SelectImageStringDataAdapterPtr;
+class SeansVesselRegistrationWidget;
 
 /**
  * \file
@@ -53,50 +53,35 @@ typedef boost::shared_ptr<class SeansVesselRegistrationDebugger> SeansVesselRegi
  */
 
 /**
- * SeansVesselRegistrationWidget.h
+ * \class RegisterI2IWidget
  *
- * \brief Widget for controlling input to
- * Seans Vessel Registration
+ * \brief Widget for performing the registration between two vessel segments.
  *
- * \date Feb 21, 2011
- * \author Janne Beate Bakeng, SINTEF
+ * \date 13. okt. 2010
+ * \\author Janne Beate Bakeng
  */
-
-class cxPluginRegistration_EXPORT SeansVesselRegistrationWidget : public RegistrationBaseWidget
+class RegisterI2IWidget : public RegistrationBaseWidget
 {
   Q_OBJECT
+
 public:
-	SeansVesselRegistrationWidget(regServices services, QWidget* parent);
-  virtual ~SeansVesselRegistrationWidget();
+	RegisterI2IWidget(regServices services, QWidget* parent);
+  ~RegisterI2IWidget();
   virtual QString defaultWhatsThis() const;
 
-private slots:
-  void registerSlot();
-  void debugInit();
-  void debugRunOneLinearStep();
-  void debugRunOneNonlinearStep();
-  void debugClear();
-  void debugApply();
-	void inputChanged();
+//public slots:
+//  void fixedImageSlot(QString uid);
+//  void movingImageSlot(QString uid);
 
 private:
-  QWidget* createOptionsWidget();
-  SeansVesselRegistrationDebuggerPtr mDebugger;
+  RegisterI2IWidget();
 
-  QSpinBox* mLTSRatioSpinBox;
-  QCheckBox* mLinearCheckBox;
-  QCheckBox* mAutoLTSCheckBox;
-  QPushButton* mRegisterButton;
-	QPushButton* mVesselRegOptionsButton;
-	QGroupBox* mVesselRegOptionsWidget;
-
-  StringDataAdapterPtr mFixedImage;
-  StringDataAdapterPtr mMovingImage;
+  SeansVesselRegistrationWidget* mSeansVesselRegsitrationWidget;
 };
 
 /**
  * @}
  */
-}//namespace cx
+}
 
-#endif /* CXSEANSVESSELREGISTRATIONWIDGET_H_ */
+#endif /* CXREGISTERI2IWIDGET_H_ */

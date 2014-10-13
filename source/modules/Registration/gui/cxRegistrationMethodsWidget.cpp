@@ -44,13 +44,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //#include "cxFastPatientRegistrationWidget.h"
 //#include "cxFastOrientationRegistrationWidget.h"
 //#include "cxPlateRegistrationWidget.h"
-#include "cxRegisterI2IWidget.h"
+//#include "cxRegisterI2IWidget.h"
 //#include "cxElastixWidget.h"
 //#include "cxManualRegistrationWidget.h"
 #include "cxSettings.h"
 #include "cxPatientOrientationWidget.h"
 
-#include "cxPrepareVesselsWidget.h"
+//#include "cxPrepareVesselsWidget.h"
 //#include "cxBronchoscopyRegistrationWidget.h"
 
 namespace cx

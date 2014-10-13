@@ -34,13 +34,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QVBoxLayout>
 #include <QPushButton>
-#include "cxDataInterface.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxTypeConversions.h"
 #include "cxColorSelectButton.h"
-#include "cxDataManager.h"
 #include "cxMesh.h"
-#include "cxRegistrationManager.h"
 #include "cxDataLocations.h"
 
 #include "cxPipelineWidget.h"

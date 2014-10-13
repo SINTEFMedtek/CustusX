@@ -29,58 +29,72 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include <cxRegisterI2IWidget.h>
 
-#include "cxImageTF3D.h"
-#include "cxImageLUT2D.h"
-#include "cxTypeConversions.h"
-#include "cxImage.h"
-#include "cxDataManager.h"
-#include "cxLabeledComboBoxWidget.h"
-#include "cxPatientData.h"
-#include "cxFrameTreeWidget.h"
-#include "cxDataInterface.h"
-#include "cxSeansVesselRegistrationWidget.h"
+#ifndef CXSEANSVESSELREGISTRATIONWIDGET_H_
+#define CXSEANSVESSELREGISTRATIONWIDGET_H_
+
+#include "cxRegistrationBaseWidget.h"
+#include "cxStringDataAdapter.h"
+
+class QSpinBox;
+class QPushButton;
+class QLabel;
 
 namespace cx
 {
+typedef boost::shared_ptr<class SeansVesselRegistrationDebugger> SeansVesselRegistrationDebuggerPtr;
 
+/**
+ * \file
+ * \addtogroup cx_module_registration
+ * @{
+ */
 
-RegisterI2IWidget::RegisterI2IWidget(regServices services, QWidget* parent) :
-		RegistrationBaseWidget(services, parent, "RegisterI2IWidget", "Register Image2Image"),
-		mSeansVesselRegsitrationWidget(new SeansVesselRegistrationWidget(services, this))
+/**
+ * SeansVesselRegistrationWidget.h
+ *
+ * \brief Widget for controlling input to
+ * Seans Vessel Registration
+ *
+ * \date Feb 21, 2011
+ * \author Janne Beate Bakeng, SINTEF
+ */
+
+class SeansVesselRegistrationWidget : public RegistrationBaseWidget
 {
-//  connect(registrationManager(), SIGNAL(fixedDataChanged(QString)), this, SLOT(fixedImageSlot(QString)));
-//  connect(registrationManager(), SIGNAL(movingDataChanged(QString)), this, SLOT(movingImageSlot(QString)));
+  Q_OBJECT
+public:
+	SeansVesselRegistrationWidget(regServices services, QWidget* parent);
+  virtual ~SeansVesselRegistrationWidget();
+  virtual QString defaultWhatsThis() const;
 
-  QVBoxLayout* topLayout = new QVBoxLayout(this);
-  QGridLayout* layout = new QGridLayout();
-  topLayout->addLayout(layout);
+private slots:
+  void registerSlot();
+  void debugInit();
+  void debugRunOneLinearStep();
+  void debugRunOneNonlinearStep();
+  void debugClear();
+  void debugApply();
+	void inputChanged();
 
-  layout->addWidget(mSeansVesselRegsitrationWidget);
-  layout->addWidget(new QLabel("Parent frame tree status:"), 3, 0);
-  layout->addWidget(new FrameTreeWidget(this), 4, 0);
-}
+private:
+  QWidget* createOptionsWidget();
+  SeansVesselRegistrationDebuggerPtr mDebugger;
 
-RegisterI2IWidget::~RegisterI2IWidget()
-{}
+  QSpinBox* mLTSRatioSpinBox;
+  QCheckBox* mLinearCheckBox;
+  QCheckBox* mAutoLTSCheckBox;
+  QPushButton* mRegisterButton;
+	QPushButton* mVesselRegOptionsButton;
+	QGroupBox* mVesselRegOptionsWidget;
 
-QString RegisterI2IWidget::defaultWhatsThis() const
-{
-  return "<html>"
-      "<h3>Registration of vessel segments to eachother.</h3>"
-      "<p><i>Press the button to perform vessel based registration between image 1 and image 2s centerlines.</i></p>"
-      "</html>";
-}
-//
-//void RegisterI2IWidget::fixedImageSlot(QString uid)
-//{
-//  mSeansVesselRegsitrationWidget->fixedImageSlot(uid);
-//}
-//
-//void RegisterI2IWidget::movingImageSlot(QString uid)
-//{
-//  mSeansVesselRegsitrationWidget->movingImageSlot(uid);
-//}
+  StringDataAdapterPtr mFixedImage;
+  StringDataAdapterPtr mMovingImage;
+};
 
-}
+/**
+ * @}
+ */
+}//namespace cx
+
+#endif /* CXSEANSVESSELREGISTRATIONWIDGET_H_ */
