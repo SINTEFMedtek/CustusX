@@ -72,6 +72,19 @@ void ElastixSyntaxHighlighter::highlightBlock(const QString &text)
 	pattern = "//.*";
 //  pattern = "//[^\\n]*\\n";
 	applyFormat(text, format, pattern);
+
+	// XML block: <name ...>, </name>
+	format = QTextCharFormat();
+	format.setForeground(QColor("green"));
+	pattern = "\\<[^!]\\S*[\\>]?";
+	applyFormat(text, format, pattern);
+
+	// XML block: <!-- ... -->
+	format = QTextCharFormat();
+	format.setForeground(QColor("gray"));
+	pattern = "\\<!--.*--\\>";
+	applyFormat(text, format, pattern);
+
 }
 
 void ElastixSyntaxHighlighter::highlightTimestamp(const QString &text)

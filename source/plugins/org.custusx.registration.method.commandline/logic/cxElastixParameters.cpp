@@ -98,15 +98,15 @@ void ElastixParameters::currentPresetChangedSlot()
 
 QString ElastixParameters::getFullParameterFilename(QString filename)
 {
-    if (filename.isEmpty())
-        return "";
-    QDir dir(this->getParameterFilesDir());
-    return dir.filePath(filename);
+	return DataLocations::getExistingConfigPath("elastix/parameterFiles", "", filename);
 }
 
-QString ElastixParameters::getParameterFilesDir() const
+QStringList ElastixParameters::getParameterFilesDir() const
 {
-    return cx::DataLocations::getRootConfigPath() + "/elastix/parameterFiles";
+	QStringList folders = DataLocations::getRootConfigPaths();
+	for(int i=0; i<folders.size(); ++i)
+		folders[i] = folders[i] + "/elastix/parameterFiles";
+	return folders;
 }
 
 StringDataAdapterPtr ElastixParameters::getCurrentPreset()

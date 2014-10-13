@@ -59,7 +59,7 @@ namespace cx
  * current path (recursively), and a tool button is
  * used to browse for files outside this path.
  *
- * Default name filter is .mhdmNameFilters
+ * Default name filter is .mhd
  *
  * \ingroup cx_resource_widgets
  */
@@ -72,6 +72,7 @@ public:
 	QString getFilename() const;
 	void setFilename(QString name);
 	void setNameFilter(QStringList filter);
+	void setPaths(QStringList paths);
 	void setPath(QString path);
 	void setFolderDepth(int depth);
 
@@ -94,7 +95,7 @@ private:
 	QAction* mSelectDataAction;
 
 	QString mFilename;
-	QString mRootPath;
+	QStringList mRootPaths;
 	QStringList mNameFilters;
 	int mFolderDepth;
 };

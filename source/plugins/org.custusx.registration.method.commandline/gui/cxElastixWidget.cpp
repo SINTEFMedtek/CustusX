@@ -232,11 +232,15 @@ void ElastixWidget::userParameterFileSelected(QString filename)
 void ElastixWidget::elastixChangedSlot()
 {
 	ElastixParametersPtr par = mElastixManager->getParameters();
-	QDir folder(par->getParameterFilesDir());
-	folder.mkpath(".");
-	mParameterFileWidget0->setPath(folder.absolutePath());
+	QStringList folders = par->getParameterFilesDir();
+	for (int i=0; i<folders.size(); ++i)
+	{
+		QDir folder(folders[i]);
+		folder.mkpath(".");
+	}
+	mParameterFileWidget0->setPaths(folders);
 	QStringList nameFilters;
-	nameFilters << "*.txt";
+	nameFilters << "*.*";
 	mParameterFileWidget0->setNameFilter(nameFilters);
 	mParameterFileWidget0->setFilename(par->getActiveParameterFile0());
 

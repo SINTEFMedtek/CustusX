@@ -71,7 +71,7 @@ public:
 
     QStringList getActiveParameterFiles() const;
     QString getPresetNameSuggesion() const; ///< create a name describing the active state, can be used as name for a new preset.
-    QString getParameterFilesDir() const;
+	QStringList getParameterFilesDir() const;
 
 signals:
     void elastixParametersChanged();
