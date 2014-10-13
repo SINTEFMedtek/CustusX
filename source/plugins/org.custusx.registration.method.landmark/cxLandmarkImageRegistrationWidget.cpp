@@ -45,9 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReporter.h"
 #include "cxPickerRep.h"
 #include "cxLabeledComboBoxWidget.h"
-#include "cxRegistrationManager.h"
 #include "cxSettings.h"
-#include "cxToolManager.h"
 #include "cxLandmarkRep.h"
 #include "cxView.h"
 #include "cxTypeConversions.h"
@@ -58,6 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //TODO: remove
 #include "cxRepManager.h"
+#include "cxToolManager.h"
 #include "cxLegacySingletons.h"
 
 namespace cx

@@ -8,9 +8,7 @@ include_directories(
     ${CX_RESOURCE_INCLUDE_DIRECTORIES}
     ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
     ${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
-#    ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.registration
     ${CustusX_SOURCE_DIR}/source/logic
-	${CustusX_SOURCE_DIR}/source/modules/Registration/gui
 	${CustusX_SOURCE_DIR}/source/modules/Algorithm/logic
 	${CustusX_SOURCE_DIR}/source/modules/Algorithm/gui
 	${CustusX_SOURCE_DIR}/source/service/tracking
@@ -18,7 +16,6 @@ include_directories(
 	${CustusX_SOURCE_DIR}/source/gui/infoWidgets
 
 	${CustusX_BINARY_DIR}/source/logic
-	${CustusX_BINARY_DIR}/source/modules/Registration
 	${CustusX_BINARY_DIR}/source/modules/Algorithm
 	${CustusX_BINARY_DIR}/source/service/tracking
 	${CustusX_BINARY_DIR}/source/gui
@@ -32,6 +29,7 @@ set(PLUGIN_SRCS
     cxSeansVesselRegistrationWidget.cpp
     cxRegisterI2IWidget.cpp
     cxPrepareVesselsWidget.cpp
+    cxImage2ImageRegistrationWidget.cpp
 )
 
 # Files which should be processed by Qts moc
@@ -41,6 +39,7 @@ set(PLUGIN_MOC_SRCS
     cxSeansVesselRegistrationWidget.h
     cxRegisterI2IWidget.h
     cxPrepareVesselsWidget.h
+    cxImage2ImageRegistrationWidget.h
 )
 
 # Qt Designer files which should be processed by Qts uic
@@ -58,7 +57,6 @@ set(PLUGIN_target_libraries
     ${PLUGIN_target_libraries}   
     cxResourceWidgets
     cxPluginUtilities
-	cxPluginRegistration
 	cxPluginAlgorithm
 	cxTrackingService
 	cxResourceVisualization

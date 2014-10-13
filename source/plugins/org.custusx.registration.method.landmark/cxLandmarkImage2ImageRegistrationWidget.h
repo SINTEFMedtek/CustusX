@@ -32,8 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXLANDMARKIMAGE2IMAGEREGISTRATIONWIDGET_H_
 #define CXLANDMARKIMAGE2IMAGEREGISTRATIONWIDGET_H_
 
-#include "cxPluginRegistrationExport.h"
-
 #include "cxLandmarkRegistrationWidget.h"
 
 class QVBoxLayout;
@@ -59,7 +57,7 @@ typedef boost::shared_ptr<class RegistrationMovingImageStringDataAdapter> Regist
  * Widget for performing image to image registration
  * using landmarks.
  */
-class cxPluginRegistration_EXPORT LandmarkImage2ImageRegistrationWidget: public LandmarkRegistrationWidget
+class LandmarkImage2ImageRegistrationWidget: public LandmarkRegistrationWidget
 {
 Q_OBJECT
 

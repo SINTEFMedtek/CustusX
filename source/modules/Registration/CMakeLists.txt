@@ -16,7 +16,6 @@ SET( MOC_HEADER_FILES
 
     gui/cxRegistrationMethodsWidget.h
     gui/cxWirePhantomWidget.h
-    gui/cxPatientOrientationWidget.h
     )
 
 cx_remove_duplicate_include_directories()
@@ -32,8 +31,6 @@ SET( SOURCE_FILES
     gui/cxRegistrationMethodsWidget.cpp
     gui/cxWirePhantomWidget.h
     gui/cxWirePhantomWidget.cpp
-	gui/cxPatientOrientationWidget.h
-    gui/cxPatientOrientationWidget.cpp
     )
 
 # =========================================================

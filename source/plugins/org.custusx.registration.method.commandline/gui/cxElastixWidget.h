@@ -33,8 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXELASTIXWIDGET_H_
 #define CXELASTIXWIDGET_H_
 
-#include "cxPluginRegistrationExport.h"
-
 #include "cxRegistrationBaseWidget.h"
 #include "cxStringDataAdapter.h"
 #include "cxFileSelectWidget.h"
@@ -63,7 +61,7 @@ class TimedAlgorithmProgressBar;
  * \date Feb 4, 2012
  * \author Christian Askeland, SINTEF
  */
-class cxPluginRegistration_EXPORT ElastixWidget: public RegistrationBaseWidget
+class ElastixWidget: public RegistrationBaseWidget
 {
 Q_OBJECT
 public:

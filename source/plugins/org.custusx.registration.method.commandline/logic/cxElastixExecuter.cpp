@@ -37,8 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QFile>
 #include <QDir>
 #include "cxReporter.h"
-#include "cxPatientService.h"
-#include "cxPatientData.h"
 #include "cxTypeConversions.h"
 #include "cxTime.h"
 #include "cxData.h"
@@ -46,11 +44,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTransformFile.h"
 #include "cxCustomMetaImage.h"
 #include "cxLogger.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
 
-ElastixExecuter::ElastixExecuter(QObject* parent) : TimedBaseAlgorithm("ElastiX", 1000)
+ElastixExecuter::ElastixExecuter(regServices services, QObject* parent) :
+	TimedBaseAlgorithm("ElastiX", 1000),
+	mServices(services)
 {
 	mProcess = new QProcess(this);
 	connect(mProcess, SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(processStateChanged(QProcess::ProcessState)));
@@ -110,8 +111,8 @@ bool ElastixExecuter::setInput(QString application,
 
 	QStringList cmd;
 	cmd << application;
-	cmd << "-f" << patientService()->getPatientData()->getActivePatientFolder()+"/"+fixed->getFilename();
-	cmd << "-m" << patientService()->getPatientData()->getActivePatientFolder()+"/"+moving->getFilename();
+	cmd << "-f" << mServices.patientModelService->getActivePatientFolder()+"/"+fixed->getFilename();
+	cmd << "-m" << mServices.patientModelService->getActivePatientFolder()+"/"+moving->getFilename();
 	cmd << "-out" << outdir;
 	cmd << "-t0" << initFilename;
 	for (int i=0; i<parameterfiles.size(); ++i)
@@ -292,7 +293,7 @@ QString ElastixExecuter::findMostRecentTransformOutputFile() const
 
 Transform3D ElastixExecuter::getFileTransform_ddMd(DataPtr volume)
 {
-	QString patFolder = patientService()->getPatientData()->getActivePatientFolder();
+	QString patFolder = mServices.patientModelService->getActivePatientFolder();
 	CustomMetaImagePtr reader = CustomMetaImage::create(patFolder+"/"+volume->getFilename());
 	Transform3D ddMd = reader->readTransform();
 	return ddMd;

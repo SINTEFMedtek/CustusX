@@ -180,6 +180,7 @@ cx_add_class(cxResource_SOURCE
 	patientModel/cxPatientModelServiceNull
 	patientModel/cxPatientModelServiceProxy
 	registration/cxRegistrationServiceNull
+	registration/cxRegistrationMethodServices.h
 	Video/cxVideoServiceNull
 	Video/cxVideoServiceProxy
 	Tool/cxTrackingServiceNull

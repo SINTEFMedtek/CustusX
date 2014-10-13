@@ -33,8 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXLANDMARKPATIENTREGISTRATIONWIDGET_H_
 #define CXLANDMARKPATIENTREGISTRATIONWIDGET_H_
 
-#include "cxPluginRegistrationExport.h"
-
 #include "cxLandmarkRegistrationWidget.h"
 #include "cxRegistrationDataAdapters.h"
 
@@ -70,7 +68,7 @@ typedef Transform3D Transform3D;
  * \date Feb 3, 2009
  * \\author Janne Beate Bakeng, SINTEF
  */
-class cxPluginRegistration_EXPORT LandmarkPatientRegistrationWidget: public LandmarkRegistrationWidget
+class LandmarkPatientRegistrationWidget: public LandmarkRegistrationWidget
 {
 Q_OBJECT
 

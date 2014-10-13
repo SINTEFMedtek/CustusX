@@ -8,38 +8,40 @@ include_directories(
     ${CX_RESOURCE_INCLUDE_DIRECTORIES}
     ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
     ${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
-    ${CustusX_SOURCE_DIR}/source/modules/Registration/gui
 	${CustusX_SOURCE_DIR}/source/service/tracking
+	${CustusX_SOURCE_DIR}/source/logic
 
-	${CustusX_BINARY_DIR}/source/modules/Registration
 	${CustusX_BINARY_DIR}/source/service/tracking
+	${CustusX_BINARY_DIR}/source/logic
 )
 
 set(PLUGIN_SRCS
-  cxRegistrationMethodManualPluginActivator.cpp
-  cxRegistrationMethodManualService.cpp
-  cxManualRegistrationWidget.cpp
-  cxRegistrationMethodManualImageToImageService.cpp
-  cxRegistrationMethodManualImageToPatientService.cpp
-  cxRegistrationMethodManualImageTransformService.cpp
-  cxRegistrationMethodManualImageToImageService.h
-  cxRegistrationMethodManualImageToPatientService.h
-  cxRegistrationMethodManualImageTransformService.h
-  cxManualImage2ImageRegistrationWidget.cpp
-  cxManualImage2ImageRegistrationWidget.h
-  cxManualImageTransformRegistrationWidget.cpp
-  cxManualImageTransformRegistrationWidget.h
-  cxManualPatientRegistrationWidget.cpp
-  cxRegistrationMethodManualPatientOrientationService.h
-  cxRegistrationMethodManualPatientOrientationService.cpp
+    cxRegistrationMethodManualPluginActivator.cpp
+    cxRegistrationMethodManualService.cpp
+    cxManualRegistrationWidget.cpp
+    cxRegistrationMethodManualImageToImageService.cpp
+    cxRegistrationMethodManualImageToPatientService.cpp
+    cxRegistrationMethodManualImageTransformService.cpp
+    cxRegistrationMethodManualImageToImageService.h
+    cxRegistrationMethodManualImageToPatientService.h
+    cxRegistrationMethodManualImageTransformService.h
+    cxManualImage2ImageRegistrationWidget.cpp
+    cxManualImage2ImageRegistrationWidget.h
+    cxManualImageTransformRegistrationWidget.cpp
+    cxManualImageTransformRegistrationWidget.h
+    cxManualPatientRegistrationWidget.cpp
+    cxRegistrationMethodManualPatientOrientationService.h
+    cxRegistrationMethodManualPatientOrientationService.cpp
+    cxPatientOrientationWidget.cpp
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
-  cxRegistrationMethodManualPluginActivator.h
-  cxRegistrationMethodManualService.h
-  cxManualRegistrationWidget.h
-  cxManualPatientRegistrationWidget.h
+    cxRegistrationMethodManualPluginActivator.h
+    cxRegistrationMethodManualService.h
+    cxManualRegistrationWidget.h
+    cxManualPatientRegistrationWidget.h
+    cxPatientOrientationWidget.h
 )
 
 # Qt Designer files which should be processed by Qts uic
@@ -57,8 +59,8 @@ set(PLUGIN_target_libraries
     ${PLUGIN_target_libraries}
     cxResourceWidgets
     cxPluginUtilities
-	cxPluginRegistration
 	cxTrackingService
+	cxLogicManager
 )
 
 ctkMacroBuildPlugin(

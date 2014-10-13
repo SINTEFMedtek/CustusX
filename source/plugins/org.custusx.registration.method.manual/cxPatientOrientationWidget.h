@@ -33,8 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPATIENTORIENTATIONWIDGET_H_
 #define CXPATIENTORIENTATIONWIDGET_H_
 
-#include "cxPluginRegistrationExport.h"
-
 #include "cxRegistrationBaseWidget.h"
 #include "cxForwardDeclarations.h"
 #include "cxTransform3D.h"
@@ -62,7 +60,7 @@ namespace cx
  * \\author Christian Askeland
  */
 
-class cxPluginRegistration_EXPORT PatientOrientationWidget : public RegistrationBaseWidget
+class PatientOrientationWidget : public RegistrationBaseWidget
 {
   Q_OBJECT
 

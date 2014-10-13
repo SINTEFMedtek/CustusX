@@ -41,8 +41,6 @@ class ctkPluginContext;
 namespace cx
 {
 
-typedef boost::shared_ptr<class RegistrationService> RegistrationServicePtr;
-
 /** \brief Always provides a PatientModelService
  *
  * Use the Proxy design pattern.

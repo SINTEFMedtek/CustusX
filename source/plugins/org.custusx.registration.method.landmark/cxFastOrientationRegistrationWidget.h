@@ -33,8 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXFASTORIENTATIONREGISTRATIONWIDGET_H_
 #define CXFASTORIENTATIONREGISTRATIONWIDGET_H_
 
-#include "cxPluginRegistrationExport.h"
-
 #include "cxRegistrationBaseWidget.h"
 #include "cxForwardDeclarations.h"
 #include "cxTransform3D.h"
@@ -60,7 +58,7 @@ namespace cx
  * \\author Janne Beate Bakeng
  */
 
-class cxPluginRegistration_EXPORT FastOrientationRegistrationWidget : public RegistrationBaseWidget
+class FastOrientationRegistrationWidget : public RegistrationBaseWidget
 {
   Q_OBJECT
 
