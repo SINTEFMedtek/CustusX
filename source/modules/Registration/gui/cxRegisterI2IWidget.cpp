@@ -40,15 +40,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientData.h"
 #include "cxFrameTreeWidget.h"
 #include "cxDataInterface.h"
-//#include "cxSeansVesselRegistrationWidget.h"
+#include "cxSeansVesselRegistrationWidget.h"
 
 namespace cx
 {
 
 
 RegisterI2IWidget::RegisterI2IWidget(regServices services, QWidget* parent) :
-		RegistrationBaseWidget(services, parent, "RegisterI2IWidget", "Register Image2Image")
-//		mSeansVesselRegsitrationWidget(new SeansVesselRegistrationWidget(services, this))
+		RegistrationBaseWidget(services, parent, "RegisterI2IWidget", "Register Image2Image"),
+		mSeansVesselRegsitrationWidget(new SeansVesselRegistrationWidget(services, this))
 {
 //  connect(registrationManager(), SIGNAL(fixedDataChanged(QString)), this, SLOT(fixedImageSlot(QString)));
 //  connect(registrationManager(), SIGNAL(movingDataChanged(QString)), this, SLOT(movingImageSlot(QString)));
@@ -57,7 +57,7 @@ RegisterI2IWidget::RegisterI2IWidget(regServices services, QWidget* parent) :
   QGridLayout* layout = new QGridLayout();
   topLayout->addLayout(layout);
 
-//  layout->addWidget(mSeansVesselRegsitrationWidget);
+  layout->addWidget(mSeansVesselRegsitrationWidget);
   layout->addWidget(new QLabel("Parent frame tree status:"), 3, 0);
   layout->addWidget(new FrameTreeWidget(this), 4, 0);
 }

@@ -37,8 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationService.h"
 #include "cxPatientModelService.h"
 #include "cxRegistrationMethodToUSPrepareWidget.h"
-#include "cxRegistrationMethodsWidget.h"
-#include "cxRegisterI2IWidget.h"
+//#include "cxRegisterI2IWidget.h"
 
 
 namespace cx
@@ -53,9 +52,9 @@ RegistrationMethodModelToUSWidget::RegistrationMethodModelToUSWidget(regServices
 	RegistrationMethodToUSPrepareWidget* prepareWidget = new RegistrationMethodToUSPrepareWidget(services, NULL, "PrepareModelToUSRegistrationWidget");
 	this->addTab(prepareWidget, "Prepare");
 
-	//Try to reuse existing widget
-	Image2ImageRegistrationWidget* image2imageWidget = new Image2ImageRegistrationWidget(NULL, "Image2ImageRegistrationWidget", "Image 2 Image Registration");
-	this->addTab(new RegisterI2IWidget(services, image2imageWidget),"Register");
+	//Try to reuse existing widget. Cannot use this one as this is only meant ot be used with vessel2vessel registration
+//	Image2ImageRegistrationWidget* image2imageWidget = new Image2ImageRegistrationWidget(NULL, "Image2ImageRegistrationWidget", "Image 2 Image Registration");
+//	this->addTab(new RegisterI2IWidget(services, image2imageWidget),"Register");
 }
 
 RegistrationMethodModelToUSWidget::~RegistrationMethodModelToUSWidget()
