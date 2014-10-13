@@ -176,7 +176,7 @@ void DataManagerImpl::setActiveImage(ImagePtr activeImage)
 		uid = mActiveImage->getUid();
 
 	emit activeImageChanged(uid);
-	report("Active image set to " + qstring_cast(uid));
+//	report("Active image set to " + qstring_cast(uid));
 }
 
 void DataManagerImpl::setLandmarkNames(std::vector<QString> names)

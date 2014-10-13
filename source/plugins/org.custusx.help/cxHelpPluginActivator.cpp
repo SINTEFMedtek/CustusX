@@ -45,7 +45,7 @@ namespace cx
 
 HelpPluginActivator::HelpPluginActivator()
 {
-	std::cout << "Created HelpPluginActivator" << std::endl;
+//	std::cout << "Created HelpPluginActivator" << std::endl;
 }
 
 HelpPluginActivator::~HelpPluginActivator()

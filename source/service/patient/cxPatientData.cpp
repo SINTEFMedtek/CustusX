@@ -125,6 +125,11 @@ QString PatientData::generateFilePath(QString folderName, QString ending)
 	return folder+filename;
 }
 
+void PatientData::reportActivePatient()
+{
+	report("Set Active Patient: " + mActivePatientFolder);
+}
+
 void PatientData::setActivePatient(const QString& activePatientFolder)
 {
 	if (activePatientFolder == mActivePatientFolder)
@@ -132,16 +137,16 @@ void PatientData::setActivePatient(const QString& activePatientFolder)
 
 	mActivePatientFolder = activePatientFolder;
 
-	report("Set Active Patient: " + mActivePatientFolder);
-
 	emit patientChanged();
 }
 
 void PatientData::newPatient(QString choosenDir)
 {
-	this->clearPatient();
+//	this->clearPatient();
+	this->clearPatientSilent();
 	createPatientFolders(choosenDir);
 	this->setActivePatient(choosenDir);
+	this->reportActivePatient();
 }
 
 /**Remove all data referring to the current patient from the system,
@@ -149,12 +154,14 @@ void PatientData::newPatient(QString choosenDir)
  */
 void PatientData::clearPatient()
 {
+	this->clearPatientSilent();
+	this->reportActivePatient();
+}
+
+void PatientData::clearPatientSilent()
+{
 	mDataManager->clear();
-
-//	QString patientDatafolder = settings()->value("globalPatientDataFolder").toString();
-
 	this->setActivePatient(this->getNullFolder());
-
 	emit cleared();
 }
 
@@ -222,7 +229,13 @@ void PatientData::startupLoadPatient()
 
 void PatientData::loadPatient(QString choosenDir)
 {
-	this->clearPatient();
+	this->loadPatientSilent(choosenDir);
+	this->reportActivePatient();
+}
+
+void PatientData::loadPatientSilent(QString choosenDir)
+{
+	this->clearPatientSilent();
 	if (choosenDir == QString::null)
 		return; // On cancel
 
