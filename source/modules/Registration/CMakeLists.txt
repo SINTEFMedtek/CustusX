@@ -14,12 +14,8 @@
 SET( MOC_HEADER_FILES
     logic/cxRegistrationManager.h
 
-    gui/cxPrepareVesselsWidget.h
-    gui/cxSeansVesselRegistrationWidget.h
-    gui/cxRegisterI2IWidget.h
     gui/cxRegistrationMethodsWidget.h
     gui/cxWirePhantomWidget.h
-    gui/cxPatientOrientationWidget.h
     )
 
 cx_remove_duplicate_include_directories()
@@ -30,19 +26,11 @@ SET( SOURCE_FILES
     ${MOC_HEADER_FILES}
    logic/cxRegistrationManager.h
    logic/cxRegistrationManager.cpp
-    
-	gui/cxPrepareVesselsWidget.h
-	gui/cxPrepareVesselsWidget.cpp
-	gui/cxSeansVesselRegistrationWidget.h
-	gui/cxSeansVesselRegistrationWidget.cpp
-    gui/cxRegisterI2IWidget.h
-    gui/cxRegisterI2IWidget.cpp
+
     gui/cxRegistrationMethodsWidget.h
     gui/cxRegistrationMethodsWidget.cpp
     gui/cxWirePhantomWidget.h
     gui/cxWirePhantomWidget.cpp
-	gui/cxPatientOrientationWidget.h
-    gui/cxPatientOrientationWidget.cpp
     )
 
 # =========================================================

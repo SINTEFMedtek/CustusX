@@ -37,11 +37,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QCheckBox>
 #include <QVBoxLayout>
 #include "cxReporter.h"
-#include "cxToolManager.h"
 #include "cxRegistrationServiceProxy.h"
 #include "cxPatientModelServiceProxy.h"
 
-#include "cxLogicManager.h"
+#include "cxLegacySingletons.h"
+#include "cxToolManager.h"
 
 namespace cx
 {

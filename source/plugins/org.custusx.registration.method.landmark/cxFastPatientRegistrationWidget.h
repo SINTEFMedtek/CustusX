@@ -33,8 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXFASTPATIENTREGISTRATIONWIDGET_H_
 #define CXFASTPATIENTREGISTRATIONWIDGET_H_
 
-#include "cxPluginRegistrationExport.h"
-
 #include "cxLandmarkPatientRegistrationWidget.h"
 
 namespace cx
@@ -54,7 +52,7 @@ namespace cx
  * \date 27. sep. 2010
  * \\author Janne Beate Bakeng
  */
-class cxPluginRegistration_EXPORT FastPatientRegistrationWidget : public LandmarkPatientRegistrationWidget
+class FastPatientRegistrationWidget : public LandmarkPatientRegistrationWidget
 {
 public:
   FastPatientRegistrationWidget(regServices services, QWidget* parent);

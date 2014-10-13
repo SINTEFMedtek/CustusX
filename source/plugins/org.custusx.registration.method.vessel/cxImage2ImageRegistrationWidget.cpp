@@ -30,48 +30,23 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXREGISTRATIONMETHODSERVICE_H
-#define CXREGISTRATIONMETHODSERVICE_H
+#include "cxImage2ImageRegistrationWidget.h"
 
-#include <QObject>
 
-#include <boost/shared_ptr.hpp>
-#include "cxRegistrationMethodServices.h"
+namespace cx {
 
-#define RegistrationMethodService_iid "cx::RegistrationMethodService"
-
-namespace cx
+Image2ImageRegistrationWidget::Image2ImageRegistrationWidget(QWidget* parent, QString objectName, QString windowTitle) :
+  TabbedWidget(parent, objectName, windowTitle)
 {
+}
 
-
-/** \brief Registration Method services
- *
- * This class defines the common interface towards the registration methods plugins.
- *
- *  \ingroup cx_resource_core_registration
- *  \date 2014-09-02
- *  \author Ole Vegard Solberg, SINTEF
- *  \author Geir Arne Tangen, SINTEF
- */
-class RegistrationMethodService : public QObject
+QString Image2ImageRegistrationWidget::defaultWhatsThis() const
 {
-	Q_OBJECT
-public:
-	RegistrationMethodService(regServices services) :
-	mServices(services) {}
-    virtual ~RegistrationMethodService() {}
+  return "<html>"
+	  "<h3>Image to image registration.</h3>"
+	  "<p>This is a method used to registrate one image to another using segments of the images.</p>"
+	  "<p><i>Choose a step to continue.</i></p>"
+	  "</html>";
+}
 
-	virtual QWidget* createWidget() = 0;
-	virtual QString getWidgetName() = 0;
-	virtual QString getRegistrationType() = 0;
-	virtual QString getRegistrationMethod() = 0;
-
-protected:
-	regServices mServices;
-};
-
-} //namespace cx
-Q_DECLARE_INTERFACE(cx::RegistrationMethodService, RegistrationMethodService_iid)
-
-
-#endif // CXREGISTRATIONMETHODSERVICE_H
+} //cx

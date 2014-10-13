@@ -30,48 +30,22 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXREGISTRATIONMETHODSERVICE_H
-#define CXREGISTRATIONMETHODSERVICE_H
+#ifndef CXIMAGE2IMAGEREGISTRATIONWIDGET_H
+#define CXIMAGE2IMAGEREGISTRATIONWIDGET_H
 
-#include <QObject>
-
-#include <boost/shared_ptr.hpp>
-#include "cxRegistrationMethodServices.h"
-
-#define RegistrationMethodService_iid "cx::RegistrationMethodService"
+#include "cxTabbedWidget.h"
 
 namespace cx
 {
 
-
-/** \brief Registration Method services
- *
- * This class defines the common interface towards the registration methods plugins.
- *
- *  \ingroup cx_resource_core_registration
- *  \date 2014-09-02
- *  \author Ole Vegard Solberg, SINTEF
- *  \author Geir Arne Tangen, SINTEF
- */
-class RegistrationMethodService : public QObject
+class Image2ImageRegistrationWidget : public TabbedWidget
 {
-	Q_OBJECT
 public:
-	RegistrationMethodService(regServices services) :
-	mServices(services) {}
-    virtual ~RegistrationMethodService() {}
-
-	virtual QWidget* createWidget() = 0;
-	virtual QString getWidgetName() = 0;
-	virtual QString getRegistrationType() = 0;
-	virtual QString getRegistrationMethod() = 0;
-
-protected:
-	regServices mServices;
+  Image2ImageRegistrationWidget(QWidget* parent, QString objectName, QString windowTitle);
+  virtual ~Image2ImageRegistrationWidget(){}
+  virtual QString defaultWhatsThis() const;
 };
 
-} //namespace cx
-Q_DECLARE_INTERFACE(cx::RegistrationMethodService, RegistrationMethodService_iid)
+} //cx
 
-
-#endif // CXREGISTRATIONMETHODSERVICE_H
+#endif // CXIMAGE2IMAGEREGISTRATIONWIDGET_H

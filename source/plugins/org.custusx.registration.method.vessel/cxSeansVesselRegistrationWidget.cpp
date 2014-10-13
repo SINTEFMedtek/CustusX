@@ -40,22 +40,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkCellArray.h>
 #include "cxTypeConversions.h"
 #include "cxReporter.h"
-#include "cxRegistrationManager.h"
 #include "cxTimedAlgorithm.h"
-#include "cxPatientData.h"
 #include "cxLabeledComboBoxWidget.h"
-#include "cxDataInterface.h"
-#include "cxPatientService.h"
 #include "cxRegistrationDataAdapters.h"
 #include "vesselReg/SeansVesselReg.hxx"
 #include "cxMesh.h"
-#include "cxViewManager.h"
 #include "cxView.h"
 #include "cxGeometricRep.h"
 #include "cxGraphicalPrimitives.h"
-#include "cxLogicManager.h"
-#include "cxRegistrationServiceProxy.h"
+#include "cxRegistrationService.h"
 #include "cxVisualizationService.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
@@ -140,7 +135,7 @@ void SeansVesselRegistrationWidget::registerSlot()
 //	int single_point_thre = 1; //TODO, add user interface
 //	bool verbose = 1; //TODO, add user interface
 
-	QString logPath = patientService()->getPatientData()->getActivePatientFolder() + "/Logs/";
+	QString logPath = mServices.patientModelService->getActivePatientFolder() + "/Logs/";
 
 //	mRegistrationService->doVesselRegistration(lts_ratio, stop_delta, lambda, sigma, lin_flag, sample, single_point_thre, verbose,
 //		logPath);

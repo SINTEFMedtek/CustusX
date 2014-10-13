@@ -32,15 +32,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXELASTIXMANAGER_H_
 #define CXELASTIXMANAGER_H_
 
-#include "cxPluginRegistrationExport.h"
-
 #include <QObject>
 #include "cxForwardDeclarations.h"
 #include "cxXmlOptionItem.h"
-//#include "cxRegistrationManager.h"
 #include "cxBoolDataAdapterXml.h"
 #include "cxStringDataAdapterXml.h"
 #include "cxElastixParameters.h"
+#include "cxRegistrationMethodServices.h"
 
 namespace cx
 {
@@ -58,11 +56,11 @@ typedef boost::shared_ptr<class ElastixExecuter> ElastixExecuterPtr;
  * \date Feb 4, 2012
  * \author Christian Askeland, SINTEF
  */
-class cxPluginRegistration_EXPORT ElastixManager : public QObject
+class ElastixManager : public QObject
 {
 	Q_OBJECT
 public:
-	ElastixManager(RegistrationServicePtr registrationService);
+	ElastixManager(regServices services);
 	virtual ~ElastixManager();
 
 	BoolDataAdapterXmlPtr getDisplayProcessMessages() { return mDisplayProcessMessages; }
@@ -84,7 +82,7 @@ private:
 	XmlOptionFile mOptions;
 	BoolDataAdapterXmlPtr mDisplayProcessMessages;
 	ElastixExecuterPtr mExecuter;
-	RegistrationServicePtr mRegistrationService;
+	regServices mServices;
 };
 typedef boost::shared_ptr<ElastixManager> ElastixManagerPtr;
 

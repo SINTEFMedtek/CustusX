@@ -9,13 +9,11 @@ include_directories(
     ${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
     ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.registration.method.landmark
     ${CustusX_SOURCE_DIR}/source/logic
-    ${CustusX_SOURCE_DIR}/source/modules/Registration/gui
 	${CustusX_SOURCE_DIR}/source/modules/Algorithm/logic
 	${CustusX_SOURCE_DIR}/source/service/tracking
 
 	${CustusX_BINARY_DIR}/source/plugins/org.custusx.registration.method.landmark
 	${CustusX_BINARY_DIR}/source/logic
-	${CustusX_BINARY_DIR}/source/modules/Registration
 	${CustusX_BINARY_DIR}/source/modules/Algorithm
 	${CustusX_BINARY_DIR}/source/service/tracking
 )
@@ -52,7 +50,6 @@ set(PLUGIN_target_libraries
     ${PLUGIN_target_libraries}   
     cxResourceWidgets
     cxPluginUtilities
-	cxPluginRegistration
 	cxPluginAlgorithm
 	cxTrackingService
 	org_custusx_registration_method_landmark

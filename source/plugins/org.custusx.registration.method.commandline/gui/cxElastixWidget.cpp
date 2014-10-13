@@ -39,10 +39,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxReporter.h"
 #include "cxTimedAlgorithm.h"
-#include "cxPatientData.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxDataInterface.h"
-#include "cxPatientService.h"
 #include "cxRegistrationDataAdapters.h"
 #include "cxFileSelectWidget.h"
 #include "cxDataLocations.h"
@@ -60,7 +58,7 @@ namespace cx
 ElastixWidget::ElastixWidget(regServices services, QWidget* parent) :
 	RegistrationBaseWidget(services, parent, "ElastiXWidget", "ElastiX Registration")
 {
-	mElastixManager.reset(new ElastixManager(services.registrationService));
+	mElastixManager.reset(new ElastixManager(services));
 	connect(mElastixManager.get(), SIGNAL(elastixChanged()), this, SLOT(elastixChangedSlot()));
 
 	mRegisterButton = new QPushButton("Register");

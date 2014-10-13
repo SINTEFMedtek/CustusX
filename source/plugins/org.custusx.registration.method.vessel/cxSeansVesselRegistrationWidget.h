@@ -30,22 +30,20 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXPATIENTORIENTATIONWIDGET_H_
-#define CXPATIENTORIENTATIONWIDGET_H_
-
-#include "cxPluginRegistrationExport.h"
+#ifndef CXSEANSVESSELREGISTRATIONWIDGET_H_
+#define CXSEANSVESSELREGISTRATIONWIDGET_H_
 
 #include "cxRegistrationBaseWidget.h"
-#include "cxForwardDeclarations.h"
-#include "cxTransform3D.h"
-#include "cxDominantToolProxy.h"
-#include "cxPatientModelService.h"
+#include "cxStringDataAdapter.h"
 
+class QSpinBox;
 class QPushButton;
-class QCheckBox;
+class QLabel;
 
 namespace cx
 {
+typedef boost::shared_ptr<class SeansVesselRegistrationDebugger> SeansVesselRegistrationDebuggerPtr;
+
 /**
  * \file
  * \addtogroup cx_module_registration
@@ -53,38 +51,50 @@ namespace cx
  */
 
 /**
- * \class PatientOrientationWidget
+ * SeansVesselRegistrationWidget.h
  *
- * \brief Widget for setting reference space to current tool orientation,
- * without changing absolute position of data.
+ * \brief Widget for controlling input to
+ * Seans Vessel Registration
  *
- * \date 24. sep. 2012
- * \\author Christian Askeland
+ * \date Feb 21, 2011
+ * \author Janne Beate Bakeng, SINTEF
  */
 
-class cxPluginRegistration_EXPORT PatientOrientationWidget : public RegistrationBaseWidget
+class SeansVesselRegistrationWidget : public RegistrationBaseWidget
 {
   Q_OBJECT
-
 public:
-	PatientOrientationWidget(regServices services, QWidget* parent, QString objectName, QString windowTitle);
-  ~PatientOrientationWidget();
+	SeansVesselRegistrationWidget(regServices services, QWidget* parent);
+  virtual ~SeansVesselRegistrationWidget();
   virtual QString defaultWhatsThis() const;
 
 private slots:
-  void enableToolSampleButtonSlot();
-  void setPatientOrientationSlot();
+  void registerSlot();
+  void debugInit();
+  void debugRunOneLinearStep();
+  void debugRunOneNonlinearStep();
+  void debugClear();
+  void debugApply();
+	void inputChanged();
 
 private:
-  Transform3D get_tMtm() const;
-  QPushButton* mPatientOrientationButton;
-  QCheckBox* mInvertButton;
+  QWidget* createOptionsWidget();
+  SeansVesselRegistrationDebuggerPtr mDebugger;
 
-  DominantToolProxyPtr mDominantToolProxy;
+  QSpinBox* mLTSRatioSpinBox;
+  QCheckBox* mLinearCheckBox;
+  QCheckBox* mAutoLTSCheckBox;
+  QPushButton* mRegisterButton;
+	QPushButton* mVesselRegOptionsButton;
+	QGroupBox* mVesselRegOptionsWidget;
+
+  StringDataAdapterPtr mFixedImage;
+  StringDataAdapterPtr mMovingImage;
 };
 
 /**
  * @}
  */
-}
-#endif /* CXPATIENTORIENTATIONWIDGET_H_ */
+}//namespace cx
+
+#endif /* CXSEANSVESSELREGISTRATIONWIDGET_H_ */

@@ -33,8 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXELASTIXSYNTAXHIGHLIGHTER_H_
 #define CXELASTIXSYNTAXHIGHLIGHTER_H_
 
-#include "cxPluginRegistrationExport.h"
-
 #include <QtWidgets>
 
 
@@ -47,7 +45,7 @@ namespace cx
  *  \date Feb 14, 2012
  *  \author christiana
  */
-class cxPluginRegistration_EXPORT ElastixSyntaxHighlighter : public QSyntaxHighlighter
+class ElastixSyntaxHighlighter : public QSyntaxHighlighter
 {
 public:
 	ElastixSyntaxHighlighter(QTextDocument* parent);

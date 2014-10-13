@@ -44,13 +44,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //#include "cxFastPatientRegistrationWidget.h"
 //#include "cxFastOrientationRegistrationWidget.h"
 //#include "cxPlateRegistrationWidget.h"
-#include "cxRegisterI2IWidget.h"
+//#include "cxRegisterI2IWidget.h"
 //#include "cxElastixWidget.h"
 //#include "cxManualRegistrationWidget.h"
 #include "cxSettings.h"
-#include "cxPatientOrientationWidget.h"
+//#include "cxPatientOrientationWidget.h"
 
-#include "cxPrepareVesselsWidget.h"
+//#include "cxPrepareVesselsWidget.h"
 //#include "cxBronchoscopyRegistrationWidget.h"
 
 namespace cx
@@ -89,19 +89,19 @@ namespace cx
 
 //------------------------------------------------------------------------------
 
-Image2ImageRegistrationWidget::Image2ImageRegistrationWidget(QWidget* parent, QString objectName, QString windowTitle) :
-  TabbedWidget(parent, objectName, windowTitle)
-{
-}
+//Image2ImageRegistrationWidget::Image2ImageRegistrationWidget(QWidget* parent, QString objectName, QString windowTitle) :
+//  TabbedWidget(parent, objectName, windowTitle)
+//{
+//}
 
-QString Image2ImageRegistrationWidget::defaultWhatsThis() const
-{
-  return "<html>"
-	  "<h3>Image to image registration.</h3>"
-	  "<p>This is a method used to registrate one image to another using segments of the images.</p>"
-	  "<p><i>Choose a step to continue.</i></p>"
-	  "</html>";
-}
+//QString Image2ImageRegistrationWidget::defaultWhatsThis() const
+//{
+//  return "<html>"
+//	  "<h3>Image to image registration.</h3>"
+//	  "<p>This is a method used to registrate one image to another using segments of the images.</p>"
+//	  "<p><i>Choose a step to continue.</i></p>"
+//	  "</html>";
+//}
 
 //------------------------------------------------------------------------------
 

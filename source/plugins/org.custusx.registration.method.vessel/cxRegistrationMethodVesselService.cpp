@@ -31,9 +31,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxRegistrationMethodVesselService.h"
-#include "cxRegistrationMethodsWidget.h"
 #include "cxRegisterI2IWidget.h"
 #include "cxPrepareVesselsWidget.h"
+#include "cxImage2ImageRegistrationWidget.h"
 
 namespace cx
 {
