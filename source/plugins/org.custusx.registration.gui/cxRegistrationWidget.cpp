@@ -103,7 +103,13 @@ void RegistrationWidget::indexChanged(QString registrationType)
 {
 	StringDataAdapterXmlPtr comboBox = mMethodsSelectorMap[registrationType];
 	QStackedWidget *stackedWidget = mRegistrationTypeMap[registrationType];
-	int pos = comboBox->getValueRange().indexOf(registrationType);
+	this->selectStackWidget(comboBox, stackedWidget);
+}
+
+void RegistrationWidget::selectStackWidget(StringDataAdapterXmlPtr comboBox, QStackedWidget *stackedWidget)
+{
+	QString method = comboBox->getValue();
+	int pos = comboBox->getValueRange().indexOf(method);
 	stackedWidget->setCurrentIndex(pos);
 }
 
@@ -131,8 +137,8 @@ void RegistrationWidget::onServiceAdded(RegistrationMethodService* service)
 	values << service->getRegistrationMethod();
 	comboBox->setValueRange(values);
 
-	if(comboBox->getValue().isEmpty())
-		comboBox->setValue(service->getRegistrationMethod());
+	if (comboBox->getValue() == service->getRegistrationMethod())
+		this->selectStackWidget(comboBox, stackedWidget);
 }
 
 bool RegistrationWidget::knownType(QString registrationType)

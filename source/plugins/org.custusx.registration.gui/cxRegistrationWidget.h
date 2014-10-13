@@ -72,6 +72,7 @@ private:
 	bool knownType(QString registrationType);
 	void removeWidgetFromStackedWidget(QString widgetName, QStackedWidget *stackedWidget);
 	void indexChanged(QString registrationType);
+	void selectStackWidget(StringDataAdapterXmlPtr comboBox, QStackedWidget *stackedWidget);
 
 	ctkPluginContext* mPluginContext;
 	QVBoxLayout*  mVerticalLayout;
