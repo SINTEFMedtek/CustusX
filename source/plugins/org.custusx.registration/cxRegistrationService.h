@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXREGISTRATIONSERVICE_H
 
 #include "cxResourceExport.h"
+#include "org_custusx_registration_Export.h"
 
 #include <QObject>
 #include <boost/shared_ptr.hpp>
@@ -62,7 +63,7 @@ typedef boost::shared_ptr<class RegistrationService> RegistrationServicePtr;
  *  \author Ole Vegard Solberg, SINTEF
  *  \author Geir Arne Tangen, SINTEF
  */
-class cxResource_EXPORT RegistrationService : public QObject
+class org_custusx_registration_EXPORT RegistrationService : public QObject
 {
 	Q_OBJECT
 public:

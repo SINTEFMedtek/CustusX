@@ -5,13 +5,14 @@ set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 include_directories(
     ${CX_RESOURCE_INCLUDE_DIRECTORIES}
     ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
-    ${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
+    ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.registration
     ${CustusX_SOURCE_DIR}/source/logic
 	${CustusX_SOURCE_DIR}/source/modules/Algorithm/logic
 	${CustusX_SOURCE_DIR}/source/modules/Algorithm/gui
 	${CustusX_SOURCE_DIR}/source/service/tracking
 	${CustusX_SOURCE_DIR}/source/gui/dataAdapters
 
+	${CustusX_BINARY_DIR}/source/plugins/org.custusx.registration
 	${CustusX_BINARY_DIR}/source/logic
 	${CustusX_BINARY_DIR}/source/modules/Algorithm
 	${CustusX_BINARY_DIR}/source/service/tracking		
@@ -60,9 +61,9 @@ ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
     ${PLUGIN_target_libraries}   
     cxResourceWidgets
-    cxPluginUtilities
 	cxPluginAlgorithm
 	cxTrackingService
+	org_custusx_registration
     )
 
 ctkMacroBuildPlugin(

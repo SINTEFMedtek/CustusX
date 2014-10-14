@@ -39,14 +39,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataManager.h"
 #include "cxMesh.h"
 #include "cxDataLocations.h"
-#include "cxPatientData.h"
-#include "cxPatientService.h"
+//#include "cxPatientData.h"
+//#include "cxPatientService.h"
 #include "vesselReg/SeansVesselReg.hxx"
-#include "cxViewManager.h"
+//#include "cxViewManager.h"
 #include "cxPointMetric.h"
 #include "cxDistanceMetric.h"
-#include "cxViewGroup.h"
-#include "cxViewWrapper.h"
+//#include "cxViewGroup.h"
+//#include "cxViewWrapper.h"
 #include "cxTool.h"
 #include "cxToolManager.h"
 #include "cxTypeConversions.h"
@@ -63,6 +63,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVisualizationService.h"
 #include "cxRegistrationService.h"
 #include "cxRegistrationTransform.h"
+#include "cxPatientModelService.h"
+#include "cxViewGroupData.h"
 
 namespace cx
 {
@@ -148,7 +150,7 @@ MeshPtr WirePhantomWidget::loadNominalCross()
     if (!retval)
     {
     	QString infoText;
-        retval = boost::dynamic_pointer_cast<Mesh>(patientService()->getPatientData()->importData(nominalCrossFilename, infoText));
+		retval = boost::dynamic_pointer_cast<Mesh>(mServices.patientModelService->importData(nominalCrossFilename, infoText));
     }
 
     if (!retval)
@@ -226,7 +228,7 @@ void WirePhantomWidget::registration()
     vesselReg.mt_auto_lts = true;
     vesselReg.mt_ltsRatio = 80;
     vesselReg.mt_doOnlyLinear = true;
-    QString logPath = patientService()->getPatientData()->getActivePatientFolder() + "/Logs/";
+	QString logPath = mServices.patientModelService->getActivePatientFolder() + "/Logs/";
 //	vesselReg.setDebugOutput(true);
 
 	bool success = vesselReg.execute(mServices.registrationService->getMovingData(), mServices.registrationService->getFixedData(), logPath);

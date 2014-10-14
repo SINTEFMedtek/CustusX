@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXREGISTRATIONDATAADAPTERS_H_
 
 #include "cxSelectDataStringDataAdapterBase.h"
+#include "org_custusx_registration_Export.h"
 
 namespace cx
 {
@@ -48,7 +49,7 @@ typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
 typedef boost::shared_ptr<class RegistrationFixedImageStringDataAdapter> RegistrationFixedImageStringDataAdapterPtr;
 /** Adapter that connects to the fixed image in the registration manager.
  */
-class cxResource_EXPORT RegistrationFixedImageStringDataAdapter : public SelectDataStringDataAdapterBase
+class org_custusx_registration_EXPORT RegistrationFixedImageStringDataAdapter : public SelectDataStringDataAdapterBase
 {
   Q_OBJECT
 public:
@@ -68,7 +69,7 @@ private:
 typedef boost::shared_ptr<class RegistrationMovingImageStringDataAdapter> RegistrationMovingImageStringDataAdapterPtr;
 /** Adapter that connects to the fixed image in the registration manager.
  */
-class cxResource_EXPORT RegistrationMovingImageStringDataAdapter : public SelectDataStringDataAdapterBase
+class org_custusx_registration_EXPORT RegistrationMovingImageStringDataAdapter : public SelectDataStringDataAdapterBase
 {
   Q_OBJECT
 public:

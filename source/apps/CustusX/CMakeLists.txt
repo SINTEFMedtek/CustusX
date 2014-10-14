@@ -76,7 +76,6 @@ SET(LINK_LIBRARIES
                 cxGui
                 cxPluginCalibration
                 cxPluginAlgorithm
-                cxPluginRegistration
                 cxPluginUSReconstruction
                 cxPluginAcquisition
 		)

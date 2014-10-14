@@ -66,6 +66,8 @@ public:
 
 private:
 	RegisteredServicePtr mRegistration;
+//	RegisteredServicePtr mRegistrationHistory;
+//	RegisteredServicePtr mWirePhantomWidget;
 };
 
 } // namespace cx

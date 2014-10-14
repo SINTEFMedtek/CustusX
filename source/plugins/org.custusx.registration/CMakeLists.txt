@@ -5,11 +5,25 @@ set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 message(STATUS "===================================== parsing example")
 
 include_directories(
-    ${CX_RESOURCE_INCLUDE_DIRECTORIES}
     ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
+    ${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
+    ${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
     ${CustusX_SOURCE_DIR}/source/logic
+    ${CustusX_SOURCE_DIR}/source/modules/Acquisition/logic
+    ${CustusX_SOURCE_DIR}/source/modules/UsReconstruction/logic
+    ${CustusX_SOURCE_DIR}/source/modules/Algorithm
+    ${CustusX_SOURCE_DIR}/source/modules/Algorithm/gui
+    ${CustusX_SOURCE_DIR}/source/modules/Algorithm/logic
+    ${CustusX_SOURCE_DIR}/source/gui/dataAdapters
+    ${CustusX_SOURCE_DIR}/source/service/visualization
+
     ${CustusX_BINARY_DIR}/source/service/patient
     ${CustusX_BINARY_DIR}/source/logic
+    ${CustusX_BINARY_DIR}/source/modules/Acquisition
+    ${CustusX_BINARY_DIR}/source/modules/UsReconstruction
+    ${CustusX_BINARY_DIR}/source/modules/Algorithm
+    ${CustusX_BINARY_DIR}/source/gui
+    ${CustusX_BINARY_DIR}/source/service/visualization
     )
 
 set(PLUGIN_SRCS
@@ -21,11 +35,29 @@ set(PLUGIN_SRCS
   cxRegistrationApplicator.h
   cxLandmarkTranslationRegistration.cpp
   cxLandmarkTranslationRegistration.h
+  cxRegistrationMethodServices.cpp
+  cxRegistrationMethodServices.h
+
+  cxRegistrationServiceNull.cpp
+  cxRegistrationServiceNull.h
+  cxRegistrationService.cpp
+  cxRegistrationServiceProxy.cpp
+  cxRegistrationDataAdapters.cpp
+
+  cxRegistrationBaseWidget.cpp
+  cxRegistrationBaseWidget.h
+  cxWirePhantomWidget.cpp
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
   cxRegistrationPluginActivator.h
+
+  cxRegistrationService.h
+  cxRegistrationServiceProxy.h
+  cxRegistrationMethodService.h
+  cxRegistrationDataAdapters.h
+  cxWirePhantomWidget.h
 )
 
 # Qt Designer files which should be processed by Qts uic
@@ -42,9 +74,14 @@ ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries
     ${PLUGIN_target_libraries}
     cxResource
+    cxResourceWidgets
+    cxResourceUsReconstructionTypes
     cxPluginUtilities
 #TODO: Remove these dependencies
     cxLogicManager
+    cxPluginAlgorithm
+    cxGui
+    cxVisualizationService
     )
 
 ctkMacroBuildPlugin(

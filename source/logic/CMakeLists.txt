@@ -56,7 +56,6 @@ target_link_libraries(cxLogicManager
     cxVisualizationService
     cxVideoServiceOld
 	cxStateService
-    cxPluginUtilities
     )
 
 add_subdirectory(testing)

@@ -37,10 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxRegistrationMethodCommandLineService.h"
 #include "cxRegisteredService.h"
-#include "cxRegistrationServiceProxy.h"
-#include "cxPatientModelServiceProxy.h"
-#include "cxVisualizationServiceProxy.h"
-#include "cxTrackingServiceProxy.h"
 
 namespace cx
 {
@@ -54,12 +50,7 @@ RegistrationMethodCommandLinePluginActivator::~RegistrationMethodCommandLinePlug
 
 void RegistrationMethodCommandLinePluginActivator::start(ctkPluginContext* context)
 {
-	regServices services;
-	services.registrationService	= RegistrationServicePtr(new RegistrationServiceProxy(context));
-	services.patientModelService	= PatientModelServicePtr(new PatientModelServiceProxy(context));
-	services.visualizationService	= VisualizationServicePtr(new VisualizationServiceProxy(context));
-	services.trackingService		= TrackingServicePtr(new TrackingServiceProxy(context));
-
+	regServices services(context);
 	RegistrationMethodCommandLineService* service = new RegistrationMethodCommandLineService(services);
 	mRegistrationCommandLine = RegisteredService::create<RegistrationMethodCommandLineService>(context, service, RegistrationMethodService_iid);
 }

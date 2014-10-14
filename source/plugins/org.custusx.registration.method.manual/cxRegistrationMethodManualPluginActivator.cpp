@@ -35,16 +35,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtPlugin>
 #include <iostream>
 
-//#include "cxRegistrationMethodManualService.h"
 #include "cxRegistrationMethodManualImageToImageService.h"
 #include "cxRegistrationMethodManualImageToPatientService.h"
 #include "cxRegistrationMethodManualImageTransformService.h"
 #include "cxRegistrationMethodManualPatientOrientationService.h"
 #include "cxRegisteredService.h"
-#include "cxPatientModelServiceProxy.h"
-#include "cxRegistrationServiceProxy.h"
-#include "cxVisualizationServiceProxy.h"
-#include "cxTrackingServiceProxy.h"
 
 namespace cx
 {
@@ -59,11 +54,7 @@ RegistrationMethodManualPluginActivator::~RegistrationMethodManualPluginActivato
 
 void RegistrationMethodManualPluginActivator::start(ctkPluginContext* context)
 {
-	regServices services;
-	services.registrationService	= RegistrationServicePtr(new RegistrationServiceProxy(context));
-	services.patientModelService	= PatientModelServicePtr(new PatientModelServiceProxy(context));
-	services.visualizationService	= VisualizationServicePtr(new VisualizationServiceProxy(context));
-	services.trackingService		= TrackingServicePtr(new TrackingServiceProxy(context));
+	regServices services(context);
 
 	RegistrationMethodManualImageToImageService *i2i = new RegistrationMethodManualImageToImageService(services);
 	RegistrationMethodManualImageToPatientService *i2p = new RegistrationMethodManualImageToPatientService(services);

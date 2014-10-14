@@ -38,8 +38,7 @@ cx_add_class_qt_moc(CX_RESOURCE_WIDGETS_FILES
 	)
 
 cx_add_class(CX_RESOURCE_WIDGETS_FILES
-	snwSyntaxHighlighter
-	cxRegistrationBaseWidget
+    snwSyntaxHighlighter
     )
 
 unset(CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES)

@@ -46,7 +46,7 @@ namespace cx
  * @{
  */
 
-class cxResourceWidgets_EXPORT RegistrationBaseWidget : public BaseWidget
+class org_custusx_registration_EXPORT RegistrationBaseWidget : public BaseWidget
 {
 public:
 	RegistrationBaseWidget(regServices services, QWidget *parent, QString objectName, QString windowTitle);
