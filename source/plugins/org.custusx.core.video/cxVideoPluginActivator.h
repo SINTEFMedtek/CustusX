@@ -30,46 +30,42 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXVISUALIZATIONIMPLSERVICE_H_
-#define CXVISUALIZATIONIMPLSERVICE_H_
+#ifndef CXTRACKINGPLUGINACTIVATOR_H_
+#define CXTRACKINGPLUGINACTIVATOR_H_
 
-#include "cxVisualizationService.h"
-#include "org_custusx_visualization_Export.h"
-class ctkPluginContext;
+#include <ctkPluginActivator.h>
+#include "boost/shared_ptr.hpp"
 
 namespace cx
 {
 
+typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
+
 /**
- * Implementation of VisualizationService.
+ * Activator for the Video plugin
  *
- * \ingroup org_custusx_visualization
- *
+ * \ingroup org_custusx_core_video
  * \date 2014-09-19
  * \author Ole Vegard Solberg
  */
-class org_custusx_visualization_EXPORT VisualizationImplService : public VisualizationService
+class VideoPluginActivator :  public QObject, public ctkPluginActivator
 {
-	Q_INTERFACES(cx::VisualizationService)
+  Q_OBJECT
+  Q_INTERFACES(ctkPluginActivator)
+	Q_PLUGIN_METADATA(IID "org_custusx_core_video")
+
 public:
-	VisualizationImplService(ctkPluginContext* context);
-	virtual ~VisualizationImplService();
 
-	virtual ViewPtr get3DView(int group = 0, int index = 0);
+  VideoPluginActivator();
+  ~VideoPluginActivator();
 
-	virtual int getActiveViewGroup() const;
-	virtual ViewGroupDataPtr getViewGroupData(int groupIdx);
-
-	virtual void setRegistrationMode(REGISTRATION_STATUS mode);
-
-	virtual bool isNull();
+  void start(ctkPluginContext* context);
+  void stop(ctkPluginContext* context);
 
 private:
-	ctkPluginContext *mContext;
+	RegisteredServicePtr mRegistration;
 };
-typedef boost::shared_ptr<VisualizationImplService> VisualizationImplServicePtr;
 
-} /* namespace cx */
+} // namespace cx
 
-#endif /* CXVISUALIZATIONIMPLSERVICE_H_ */
-
+#endif /* CXTRACKINGPLUGINACTIVATOR_H_ */

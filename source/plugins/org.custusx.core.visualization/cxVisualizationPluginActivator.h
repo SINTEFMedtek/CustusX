@@ -30,8 +30,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXTRACKINGPLUGINACTIVATOR_H_
-#define CXTRACKINGPLUGINACTIVATOR_H_
+#ifndef CXVISUALIZATIONPLUGINACTIVATOR_H_
+#define CXVISUALIZATIONPLUGINACTIVATOR_H_
 
 #include <ctkPluginActivator.h>
 #include "boost/shared_ptr.hpp"
@@ -42,22 +42,22 @@ namespace cx
 typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
 
 /**
- * Activator for the Tracking plugin
+ * Activator for the Visualization plugin
  *
- * \ingroup org_custusx_tracking
+ * \ingroup org_custusx_core_visualization
  * \date 2014-09-19
  * \author Ole Vegard Solberg
  */
-class TrackingPluginActivator :  public QObject, public ctkPluginActivator
+class VisualizationPluginActivator :  public QObject, public ctkPluginActivator
 {
-  Q_OBJECT
-  Q_INTERFACES(ctkPluginActivator)
-	Q_PLUGIN_METADATA(IID "org_custusx_registration_method_vessel")
+	Q_OBJECT
+	Q_INTERFACES(ctkPluginActivator)
+	Q_PLUGIN_METADATA(IID "org_custusx_core_visualization")
 
 public:
 
-  TrackingPluginActivator();
-  ~TrackingPluginActivator();
+  VisualizationPluginActivator();
+  ~VisualizationPluginActivator();
 
   void start(ctkPluginContext* context);
   void stop(ctkPluginContext* context);
@@ -68,4 +68,4 @@ private:
 
 } // namespace cx
 
-#endif /* CXTRACKINGPLUGINACTIVATOR_H_ */
+#endif /* CXVISUALIZATIONPLUGINACTIVATOR_H_ */

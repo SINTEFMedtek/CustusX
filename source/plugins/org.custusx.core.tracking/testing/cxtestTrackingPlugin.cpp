@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "catch.hpp"
 
-TEST_CASE("VideoPlugin: Check nothing", "[unit][plugins][org.custusx.video][hide]")
+TEST_CASE("TrackingPlugin: Check nothing", "[unit][plugins][org.custusx.core.tracking][hide]")
 {
 	CHECK(true);
 }

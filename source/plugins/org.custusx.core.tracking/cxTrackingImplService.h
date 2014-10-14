@@ -30,42 +30,39 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXVISUALIZATIONPLUGINACTIVATOR_H_
-#define CXVISUALIZATIONPLUGINACTIVATOR_H_
+#ifndef CXTRACKINGIMPLSERVICE_H_
+#define CXTRACKINGIMPLSERVICE_H_
 
-#include <ctkPluginActivator.h>
-#include "boost/shared_ptr.hpp"
+#include "cxTrackingService.h"
+#include "org_custusx_core_tracking_Export.h"
+class ctkPluginContext;
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
-
 /**
- * Activator for the Visualization plugin
+ * Implementation of TrackingService.
  *
- * \ingroup org_custusx_visualization
+ * \ingroup org_custusx_core_tracking
+ *
  * \date 2014-09-19
  * \author Ole Vegard Solberg
  */
-class VisualizationPluginActivator :  public QObject, public ctkPluginActivator
+class org_custusx_core_tracking_EXPORT TrackingImplService : public TrackingService
 {
-	Q_OBJECT
-	Q_INTERFACES(ctkPluginActivator)
-	Q_PLUGIN_METADATA(IID "org_custusx_visualization")
-
+	Q_INTERFACES(cx::TrackingService)
 public:
+	TrackingImplService(ctkPluginContext* context);
+	virtual ~TrackingImplService();
 
-  VisualizationPluginActivator();
-  ~VisualizationPluginActivator();
-
-  void start(ctkPluginContext* context);
-  void stop(ctkPluginContext* context);
+	virtual bool isNull();
 
 private:
-	RegisteredServicePtr mRegistration;
+	ctkPluginContext *mContext;
 };
+typedef boost::shared_ptr<TrackingImplService> TrackingImplServicePtr;
 
-} // namespace cx
+} /* namespace cx */
 
-#endif /* CXVISUALIZATIONPLUGINACTIVATOR_H_ */
+#endif /* CXTRACKINGIMPLSERVICE_H_ */
+

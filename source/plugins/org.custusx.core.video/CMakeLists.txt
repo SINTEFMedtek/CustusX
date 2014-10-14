@@ -1,26 +1,25 @@
-project(org_custusx_visualization)
+project(org_custusx_core_video)
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
 include_directories(
-	${CX_RESOURCE_INCLUDE_DIRECTORIES}
-	${CustusX_SOURCE_DIR}/source/resource/visualization
-	${CustusX_SOURCE_DIR}/source/logic
-	${CustusX_SOURCE_DIR}/source/service/visualization
+    ${CX_RESOURCE_INCLUDE_DIRECTORIES}
+    ${CustusX_SOURCE_DIR}/source/logic
+    ${CustusX_SOURCE_DIR}/source/service/patient
 
-	${CustusX_BINARY_DIR}/source/logic
-	${CustusX_BINARY_DIR}/source/service/visualization
+    ${CustusX_BINARY_DIR}/source/logic
+    ${CustusX_BINARY_DIR}/source/service/patient
     )
 
 set(PLUGIN_SRCS
-  cxVisualizationPluginActivator.cpp
-  cxVisualizationImplService.cpp
-  cxVisualizationImplService.h
+  cxVideoPluginActivator.cpp
+  cxVideoImplService.cpp
+  cxVideoImplService.h
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
-  cxVisualizationPluginActivator.h
+  cxVideoPluginActivator.h
 )
 
 # Qt Designer files which should be processed by Qts uic

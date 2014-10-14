@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "catch.hpp"
 
-TEST_CASE("PatientModelPlugin: Check nothing", "[unit][plugins][org.custusx.patientmodel][hide]")
+TEST_CASE("VisualizationPlugin: Check nothing", "[unit][plugins][org.custusx.core.visualization][hide]")
 {
 	CHECK(true);
 }

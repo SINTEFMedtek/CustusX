@@ -45,7 +45,7 @@ bool TrackingServiceNull::isNull()
 
 void TrackingServiceNull::printWarning()
 {
-	reportWarning("Trying to use VideoServiceNull. Is VideoService (org.custusx.video) disabled?");
+	reportWarning("Trying to use VideoServiceNull. Is VideoService (org.custusx.core.tracking) disabled?");
 }
 
 } //cx

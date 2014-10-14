@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPATIENTMODELIMPLSERVICE_H_
 #define CXPATIENTMODELIMPLSERVICE_H_
 
-#include "org_custusx_patientmodel_Export.h"
+#include "org_custusx_core_patientmodel_Export.h"
 class ctkPluginContext;
 
 #include "cxPatientModelService.h"
@@ -44,12 +44,12 @@ namespace cx
 /**
  * Implementation of PatientModelService.
  *
- * \ingroup org_custusx_patientmodel
+ * \ingroup org_custusx_core_patientmodel
  *
  * \date 2014-05-15
  * \author Christian Askeland
  */
-class org_custusx_patientmodel_EXPORT PatientModelImplService : public PatientModelService
+class org_custusx_core_patientmodel_EXPORT PatientModelImplService : public PatientModelService
 {
 	Q_INTERFACES(cx::PatientModelService)
 public:

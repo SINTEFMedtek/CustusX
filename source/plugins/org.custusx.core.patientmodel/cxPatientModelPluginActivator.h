@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPATIENTMODELPLUGINACTIVATOR_H_
 #define CXPATIENTMODELPLUGINACTIVATOR_H_
 
-#include "org_custusx_patientmodel_Export.h"
+#include "org_custusx_core_patientmodel_Export.h"
 
 #include <ctkPluginActivator.h>
 #include "boost/shared_ptr.hpp"
@@ -46,15 +46,15 @@ typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
 /**
  * Activator for the patientmodel plugin
  *
- * \ingroup org_custusx_patientmodel
+ * \ingroup org_custusx_core_patientmodel
  * \date 2014-05-15
  * \author Christian Askeland
  */
-class org_custusx_patientmodel_EXPORT PatientModelPluginActivator :  public QObject, public ctkPluginActivator
+class org_custusx_core_patientmodel_EXPORT PatientModelPluginActivator :  public QObject, public ctkPluginActivator
 {
   Q_OBJECT
   Q_INTERFACES(ctkPluginActivator)
-  Q_PLUGIN_METADATA(IID "org_custusx_patientmodel")
+  Q_PLUGIN_METADATA(IID "org_custusx_core_patientmodel")
 
 public:
 

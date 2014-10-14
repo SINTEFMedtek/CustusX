@@ -30,42 +30,9 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXTRACKINGPLUGINACTIVATOR_H_
-#define CXTRACKINGPLUGINACTIVATOR_H_
+#include "catch.hpp"
 
-#include <ctkPluginActivator.h>
-#include "boost/shared_ptr.hpp"
-
-namespace cx
+TEST_CASE("PatientModelPlugin: Check nothing", "[unit][plugins][org.custusx.core.patientmodel][hide]")
 {
-
-typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
-
-/**
- * Activator for the Video plugin
- *
- * \ingroup org_custusx_video
- * \date 2014-09-19
- * \author Ole Vegard Solberg
- */
-class VideoPluginActivator :  public QObject, public ctkPluginActivator
-{
-  Q_OBJECT
-  Q_INTERFACES(ctkPluginActivator)
-	Q_PLUGIN_METADATA(IID "org_custusx_video")
-
-public:
-
-  VideoPluginActivator();
-  ~VideoPluginActivator();
-
-  void start(ctkPluginContext* context);
-  void stop(ctkPluginContext* context);
-
-private:
-	RegisteredServicePtr mRegistration;
-};
-
-} // namespace cx
-
-#endif /* CXTRACKINGPLUGINACTIVATOR_H_ */
+	CHECK(true);
+}
