@@ -12,8 +12,6 @@
 ###########################################################
 
 SET( MOC_HEADER_FILES
-    logic/cxRegistrationManager.h
-
     gui/cxRegistrationMethodsWidget.h
     gui/cxWirePhantomWidget.h
     )
@@ -24,9 +22,6 @@ QT5_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
 # library
 SET( SOURCE_FILES
     ${MOC_HEADER_FILES}
-   logic/cxRegistrationManager.h
-   logic/cxRegistrationManager.cpp
-
     gui/cxRegistrationMethodsWidget.h
     gui/cxRegistrationMethodsWidget.cpp
     gui/cxWirePhantomWidget.h

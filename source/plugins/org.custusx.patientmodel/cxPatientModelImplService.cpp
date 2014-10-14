@@ -52,6 +52,10 @@ PatientModelImplService::PatientModelImplService(ctkPluginContext *context) :
 	connect(dataService().get(), SIGNAL(debugModeChanged(bool)), this, SIGNAL(debugModeChanged(bool)));
 	connect(dataService().get(), SIGNAL(rMprChanged()), this, SIGNAL(rMprChanged()));
 	connect(dataService().get(), SIGNAL(streamLoaded()), this, SIGNAL(streamLoaded()));
+
+	connect(patientService()->getPatientData().get(), &PatientData::cleared, this, &PatientModelService::cleared);
+	connect(patientService()->getPatientData().get(), &PatientData::isSaving, this, &PatientModelService::isSaving);
+	connect(patientService()->getPatientData().get(), &PatientData::isLoading, this, &PatientModelService::isLoading);
 }
 
 PatientModelImplService::~PatientModelImplService()
@@ -63,6 +67,10 @@ PatientModelImplService::~PatientModelImplService()
 		disconnect(dataService().get(), SIGNAL(debugModeChanged(bool)), this, SIGNAL(debugModeChanged(bool)));
 		disconnect(dataService().get(), SIGNAL(rMprChanged()), this, SIGNAL(rMprChanged()));
 		disconnect(dataService().get(), SIGNAL(streamLoaded()), this, SIGNAL(streamLoaded()));
+
+		disconnect(patientService()->getPatientData().get(), &PatientData::cleared, this, &PatientModelService::cleared);
+		disconnect(patientService()->getPatientData().get(), &PatientData::isSaving, this, &PatientModelService::isSaving);
+		disconnect(patientService()->getPatientData().get(), &PatientData::isLoading, this, &PatientModelService::isLoading);
 	}
 }
 
@@ -226,6 +234,11 @@ QString PatientModelImplService::addLandmark()
 void PatientModelImplService::setLandmarkActive(QString uid, bool active)
 {
 	dataService()->setLandmarkActive(uid, active);
+}
+
+QDomElement cx::PatientModelImplService::getCurrentWorkingElement(QString path)
+{
+	return patientService()->getPatientData()->getCurrentWorkingElement(path);
 }
 
 } /* namespace cx */

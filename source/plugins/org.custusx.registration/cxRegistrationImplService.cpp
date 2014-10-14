@@ -53,15 +53,74 @@ namespace cx
 {
 
 RegistrationImplService::RegistrationImplService(ctkPluginContext *context) :
+	mLastRegistrationTime(QDateTime::currentDateTime()),
 	mContext(context),
 	mPatientModelService(new PatientModelServiceProxy(context))
 {
-	mLastRegistrationTime = QDateTime::currentDateTime();
+//	mLastRegistrationTime = QDateTime::currentDateTime();
+
+	connect(mPatientModelService.get(), &PatientModelService::isSaving, this, &RegistrationImplService::duringSavePatientSlot);
+	connect(mPatientModelService.get(), &PatientModelService::isLoading, this, &RegistrationImplService::duringLoadPatientSlot);
+	connect(mPatientModelService.get(), &PatientModelService::cleared, this, &RegistrationImplService::clearSlot);
 }
 
 RegistrationImplService::~RegistrationImplService()
 {
 }
+
+void RegistrationImplService::duringSavePatientSlot()
+{
+	QDomElement managerNode = mPatientModelService->getCurrentWorkingElement("managers");
+	this->addXml(managerNode);
+}
+
+void RegistrationImplService::duringLoadPatientSlot()
+{
+	QDomElement registrationManager = mPatientModelService->getCurrentWorkingElement("managers/registrationManager");
+	this->parseXml(registrationManager);
+}
+
+void RegistrationImplService::addXml(QDomNode& parentNode)
+{
+	std::cout << "RegistrationImplService::addXml" << std::endl;
+	QDomDocument doc = parentNode.ownerDocument();
+	QDomElement base = doc.createElement("registrationManager");
+	parentNode.appendChild(base);
+
+	QDomElement fixedDataNode = doc.createElement("fixedDataUid");
+	DataPtr fixedData = this->getFixedData();
+	if(fixedData)
+	{
+		fixedDataNode.appendChild(doc.createTextNode(fixedData->getUid()));
+	}
+	base.appendChild(fixedDataNode);
+
+	QDomElement movingDataNode = doc.createElement("movingDataUid");
+	DataPtr movingData = this->getMovingData();
+	if(movingData)
+	{
+		movingDataNode.appendChild(doc.createTextNode(movingData->getUid()));
+	}
+	base.appendChild(movingDataNode);
+}
+
+void RegistrationImplService::parseXml(QDomNode& dataNode)
+{
+	std::cout << "RegistrationImplService::parseXml" << std::endl;
+	QString fixedData = dataNode.namedItem("fixedDataUid").toElement().text();
+	this->setFixedData(mPatientModelService->getData(fixedData));
+
+	QString movingData = dataNode.namedItem("movingDataUid").toElement().text();
+	this->setMovingData(mPatientModelService->getData(movingData));
+}
+
+void RegistrationImplService::clearSlot()
+{
+	this->setLastRegistrationTime(QDateTime());
+	this->setFixedData(DataPtr());
+}
+
+
 
 void RegistrationImplService::setMovingData(DataPtr movingData)
 {

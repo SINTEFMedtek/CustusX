@@ -85,6 +85,8 @@ public:
 
 	virtual QString addLandmark();
 
+	virtual QDomElement getCurrentWorkingElement(QString path);
+
 	virtual void autoSave();
 	virtual bool isNull();
 

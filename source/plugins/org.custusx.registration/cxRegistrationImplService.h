@@ -81,6 +81,12 @@ public:
 
 	virtual bool isNull();
 
+private slots:
+	void duringSavePatientSlot();
+	void duringLoadPatientSlot();
+	void addXml(QDomNode &parentNode);
+	void parseXml(QDomNode &dataNode);
+	void clearSlot();
 private:
 	virtual void updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data);
 //	PatientModelService* getPatientModelService();

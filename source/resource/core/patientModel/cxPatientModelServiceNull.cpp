@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxPatientModelServiceNull.h"
+#include <QDomElement>
 #include <map>
 #include "cxImage.h"
 #include "cxReporter.h"
@@ -218,6 +219,12 @@ void PatientModelServiceNull::setLandmarkActive(QString uid, bool active)
 void PatientModelServiceNull::printWarning() const
 {
 	reportWarning("Trying to use PatientModelServiceNull. Is PatientModelService (org.custusx.patiemtmodel) disabled?");
+}
+
+QDomElement PatientModelServiceNull::getCurrentWorkingElement(QString path)
+{
+	printWarning();
+	return QDomElement();
 }
 
 
