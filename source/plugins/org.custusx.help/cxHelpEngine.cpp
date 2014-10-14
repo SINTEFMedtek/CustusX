@@ -49,7 +49,7 @@ HelpEngine::HelpEngine()
 		QString helpFile = DataLocations::getDocPath()+"/cx_user_doc.qhc";
 	//	QString helpFile = DataLocations::getDocPath()+"/doxygen/cx_user_doc.qch"; // virker med QtAssistant
 	//	QString helpFile;
-		std::cout << "helpFile " << helpFile << " -- " << QFileInfo(helpFile).exists() << std::endl;
+//		std::cout << "helpFile " << helpFile << " -- " << QFileInfo(helpFile).exists() << std::endl;
 		helpEngine = new QHelpEngine(helpFile, NULL);
 		helpEngine->setupData();
 

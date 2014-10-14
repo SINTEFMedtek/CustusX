@@ -81,19 +81,16 @@ QString FileSelectWidget::getFilename() const
 void FileSelectWidget::setFilename(QString name)
 {
 	mFilename = name;
-	//  QString temp = QFileInfo(mFilename).dir().absolutePath();
-	//  std::cout << "isdir " << QFileInfo(mFilename).isDir() << std::endl;
-	//  std::cout << "FileSelectWidget::setFilename name" << mFilename << '\n' << QFileInfo(mFilename).dir().absolutePath() << std::endl;
 
 	if (QFileInfo(mFilename).isDir())
 	{
-		mRootPath = QFileInfo(mFilename).dir().absolutePath();
-		//    std::cout << "FileSelectWidget::setFilename root" << mRootPath << std::endl;
+		mRootPaths.clear();
+		mRootPaths << QFileInfo(mFilename).dir().absolutePath();
 	}
 	else
 	{
-		if (mRootPath.isEmpty())
-			mRootPath = QFileInfo(mFilename).dir().absolutePath();
+		if (mRootPaths.isEmpty())
+			mRootPaths << QFileInfo(mFilename).dir().absolutePath();
 	}
 
 
@@ -108,15 +105,25 @@ void FileSelectWidget::setNameFilter(QStringList filter)
 
 void FileSelectWidget::setPath(QString path)
 {
-	mRootPath = path;
-	//  std::cout << "FileSelectWidget::setPath root" << mRootPath << std::endl;
+	this->setPaths(QStringList() << path);
+//	mRootPath = path;
+//	//  std::cout << "FileSelectWidget::setPath root" << mRootPath << std::endl;
+//	this->refresh();
+}
+
+void FileSelectWidget::setPaths(QStringList paths)
+{
+	mRootPaths = paths;
 	this->refresh();
 }
 
 void FileSelectWidget::selectData()
 {
 	QString filter = mNameFilters.join(";;");
-	QString filename = QFileDialog::getOpenFileName(this, QString(tr("Select file")), mRootPath, filter);
+	QString folder;
+	if (!mRootPaths.isEmpty())
+		folder = mRootPaths.front();
+	QString filename = QFileDialog::getOpenFileName(this, QString(tr("Select file")), folder, filter);
 
 	if (filename.isEmpty())
 		return;
@@ -162,7 +169,9 @@ void FileSelectWidget::updateComboBox()
 	mDataComboBox->blockSignals(true);
 	mDataComboBox->clear();
 
-	QStringList files = this->getAllFiles(mRootPath, mFolderDepth);
+	QStringList files;
+	for (int i=0; i<mRootPaths.size(); ++i)
+		files << this->getAllFiles(mRootPaths[i], mFolderDepth);
 
 	for (int i = 0; i < files.size(); ++i)
 	{

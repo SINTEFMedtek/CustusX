@@ -180,12 +180,12 @@ QWidget *ViewManager::getLayoutWidget(int index)
 
 		if (optimizedViews)
 		{
-			report("creating optimized wiew layout");
+//			report("creating optimized wiew layout");
 			mLayoutWidgets[index] = ViewCollectionWidget::createOptimizedLayout();
 		}
 		else
 		{
-			report("creating classic wiew layout");
+//			report("creating classic wiew layout");
 			mLayoutWidgets[index] = ViewCollectionWidget::createViewWidgetLayout();
 		}
 

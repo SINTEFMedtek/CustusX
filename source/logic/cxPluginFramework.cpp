@@ -270,6 +270,10 @@ void PluginFrameworkManager::install(const QString& symbolicName)
 	{
 		qWarning() << "Failed to install plugin:" << symbolicName << ", " << exc;
 	}
+	catch (const ctkRuntimeException& exc)
+	{
+		reportError(QString("Failed to install plugin (runtime error): %1, %2").arg(symbolicName).arg(exc.what()));
+	}
 }
 
 bool PluginFrameworkManager::start()
@@ -337,7 +341,12 @@ bool PluginFrameworkManager::start(const QString& symbolicName, ctkPlugin::Start
 	}
 	catch (const ctkPluginException& exc)
 	{
-		reportWarning(QString("Failed to start plugin: %1, %2").arg(symbolicName).arg(exc.what()));
+		reportError(QString("Failed to start plugin (plugin error): %1, %2").arg(symbolicName).arg(exc.what()));
+		return false;
+	}
+	catch (const ctkRuntimeException& exc)
+	{
+		reportError(QString("Failed to start plugin (runtime error): %1, %2").arg(symbolicName).arg(exc.what()));
 		return false;
 	}
 
@@ -429,6 +438,7 @@ QStringList PluginFrameworkManager::getPluginSymbolicNames()
 	{
 		result.append(this->getPluginSymbolicNames(searchPath));
 	}
+	result.removeDuplicates();
 	return result;
 }
 
