@@ -82,7 +82,6 @@ void RegistrationImplService::duringLoadPatientSlot()
 
 void RegistrationImplService::addXml(QDomNode& parentNode)
 {
-	std::cout << "RegistrationImplService::addXml" << std::endl;
 	QDomDocument doc = parentNode.ownerDocument();
 	QDomElement base = doc.createElement("registrationManager");
 	parentNode.appendChild(base);
@@ -106,7 +105,6 @@ void RegistrationImplService::addXml(QDomNode& parentNode)
 
 void RegistrationImplService::parseXml(QDomNode& dataNode)
 {
-	std::cout << "RegistrationImplService::parseXml" << std::endl;
 	QString fixedData = dataNode.namedItem("fixedDataUid").toElement().text();
 	this->setFixedData(mPatientModelService->getData(fixedData));
 
