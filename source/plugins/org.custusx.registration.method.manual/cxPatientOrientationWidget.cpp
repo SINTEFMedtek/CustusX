@@ -37,8 +37,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QCheckBox>
 #include <QVBoxLayout>
 #include "cxReporter.h"
-#include "cxRegistrationServiceProxy.h"
-#include "cxPatientModelServiceProxy.h"
+#include "cxRegistrationService.h"
+#include "cxPatientModelService.h"
 
 #include "cxLegacySingletons.h"
 #include "cxToolManager.h"

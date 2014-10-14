@@ -34,7 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXPLATEREGISTRATIONWIDGET_H_
 
 #include "cxRegistrationBaseWidget.h"
-#include "cxPatientModelServiceProxy.h"
 
 class QPushButton;
 class QLabel;
