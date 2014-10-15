@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelServiceProxy.h"
 
 #include <boost/bind.hpp>
+#include <QDomElement>
 #include <ctkPluginContext.h>
 #include "cxNullDeleter.h"
 #include "cxReporter.h"
@@ -73,6 +74,11 @@ void PatientModelServiceProxy::onServiceAdded(PatientModelService* service)
 	connect(service, SIGNAL(debugModeChanged(bool)), this, SIGNAL(debugModeChanged(bool)));
 	connect(service, SIGNAL(rMprChanged()), this, SIGNAL(rMprChanged()));
 	connect(service, SIGNAL(streamLoaded()), this, SIGNAL(streamLoaded()));
+
+	connect(service, &PatientModelService::cleared, this, &PatientModelService::cleared);
+	connect(service, &PatientModelService::isSaving, this, &PatientModelService::isSaving);
+	connect(service, &PatientModelService::isLoading, this, &PatientModelService::isLoading);
+
 	if(mPatientModelService->isNull())
 		reportWarning("PatientModelServiceProxy::onServiceAdded mPatientModelService->isNull()");
 }
@@ -85,6 +91,11 @@ void PatientModelServiceProxy::onServiceRemoved(PatientModelService *service)
 	disconnect(service, SIGNAL(debugModeChanged(bool)), this, SIGNAL(debugModeChanged(bool)));
 	disconnect(service, SIGNAL(rMprChanged()), this, SIGNAL(rMprChanged()));
 	disconnect(service, SIGNAL(streamLoaded()), this, SIGNAL(streamLoaded()));
+
+	disconnect(service, &PatientModelService::cleared, this, &PatientModelService::cleared);
+	disconnect(service, &PatientModelService::isSaving, this, &PatientModelService::isSaving);
+	disconnect(service, &PatientModelService::isLoading, this, &PatientModelService::isLoading);
+
 	mPatientModelService = PatientModelService::getNullObject();
 }
 
@@ -236,6 +247,11 @@ void PatientModelServiceProxy::setCenter(const Vector3D &center)
 QString PatientModelServiceProxy::addLandmark()
 {
 	return mPatientModelService->addLandmark();
+}
+
+QDomElement PatientModelServiceProxy::getCurrentWorkingElement(QString path)
+{
+	return mPatientModelService->getCurrentWorkingElement(path);
 }
 
 void PatientModelServiceProxy::setLandmarkActive(QString uid, bool active)

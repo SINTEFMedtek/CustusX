@@ -30,9 +30,46 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "catch.hpp"
+#ifndef CXVISUALIZATIONIMPLSERVICE_H_
+#define CXVISUALIZATIONIMPLSERVICE_H_
 
-TEST_CASE("VisualizationPlugin: Check nothing", "[unit][plugins][org.custusx.visualization][hide]")
+#include "cxVisualizationService.h"
+#include "org_custusx_core_visualization_Export.h"
+class ctkPluginContext;
+
+namespace cx
 {
-	CHECK(true);
-}
+
+/**
+ * Implementation of VisualizationService.
+ *
+ * \ingroup org_custusx_core_visualization
+ *
+ * \date 2014-09-19
+ * \author Ole Vegard Solberg
+ */
+class org_custusx_core_visualization_EXPORT VisualizationImplService : public VisualizationService
+{
+	Q_INTERFACES(cx::VisualizationService)
+public:
+	VisualizationImplService(ctkPluginContext* context);
+	virtual ~VisualizationImplService();
+
+	virtual ViewPtr get3DView(int group = 0, int index = 0);
+
+	virtual int getActiveViewGroup() const;
+	virtual ViewGroupDataPtr getViewGroupData(int groupIdx);
+
+	virtual void setRegistrationMode(REGISTRATION_STATUS mode);
+
+	virtual bool isNull();
+
+private:
+	ctkPluginContext *mContext;
+};
+typedef boost::shared_ptr<VisualizationImplService> VisualizationImplServicePtr;
+
+} /* namespace cx */
+
+#endif /* CXVISUALIZATIONIMPLSERVICE_H_ */
+

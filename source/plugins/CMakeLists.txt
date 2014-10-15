@@ -40,11 +40,14 @@ getListOfVarsStartingWith(${PLUGIN_BUILD_OPTION_PREFIX} matchedVars)
 # Create a list of available plug-ins and make them known to the build system
 set(CX_PLUGINS
   ${CX_PLUGINS}
+  org.custusx.core.patientmodel:ON
+  org.custusx.core.visualization:ON
+  org.custusx.core.tracking:ON
+  org.custusx.core.video:ON
   org.custusx.dicom:ON
 #  org.custusx.example:OFF
   org.custusx.vnnclreconstruction:ON
   org.custusx.pnnreconstruction:ON
-  org.custusx.patientmodel:ON
 #  org.custusx.filter.tubesegmentation:OFF
   org.custusx.registration:ON
   org.custusx.registration.gui:ON
@@ -55,9 +58,6 @@ set(CX_PLUGINS
   org.custusx.registration.method.vessel:ON
   org.custusx.registration.method.commandline:ON
   org.custusx.registration.method.plate:ON
-  org.custusx.visualization:ON
-  org.custusx.tracking:ON
-  org.custusx.video:ON
   org.custusx.help:ON
 )
 

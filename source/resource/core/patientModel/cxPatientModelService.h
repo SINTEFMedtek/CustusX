@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxForwardDeclarations.h"
 #include "vtkForwardDeclarations.h"
 class QDateTime;
+class QDomElement;
 
 namespace cx
 {
@@ -118,6 +119,8 @@ public:
 
 	virtual QString addLandmark() = 0;
 
+	virtual QDomElement getCurrentWorkingElement(QString path) = 0;
+
 	virtual void autoSave() = 0;//TODO remove, and integrate into other functions
 	virtual bool isNull() = 0;
 
@@ -139,6 +142,11 @@ signals:
 	void debugModeChanged(bool on);
 	void rMprChanged();
 	void streamLoaded();
+
+	//From PatientData
+	void cleared();
+	void isSaving();
+	void isLoading();
 };
 
 } // namespace cx

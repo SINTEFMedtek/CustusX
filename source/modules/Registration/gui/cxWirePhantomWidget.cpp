@@ -38,7 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkPoints.h>
 #include "cxDataManager.h"
 #include "cxMesh.h"
-#include "cxRegistrationManager.h"
 #include "cxDataLocations.h"
 #include "cxPatientData.h"
 #include "cxPatientService.h"
@@ -63,6 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReporter.h"
 #include "cxVisualizationService.h"
 #include "cxRegistrationService.h"
+#include "cxRegistrationTransform.h"
 
 namespace cx
 {

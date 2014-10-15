@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReporter.h"
 #include "cxVisualizationService.h"
 #include "cxRegistrationService.h"
+#include "cxPatientModelService.h"
 
 #include "cxLegacySingletons.h"
 

@@ -30,41 +30,42 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXTRACKINGIMPLSERVICE_H_
-#define CXTRACKINGIMPLSERVICE_H_
+#ifndef CXTRACKINGPLUGINACTIVATOR_H_
+#define CXTRACKINGPLUGINACTIVATOR_H_
 
-#include "cxVideoService.h"
-#include "org_custusx_video_Export.h"
-class ctkPluginContext;
+#include <ctkPluginActivator.h>
+#include "boost/shared_ptr.hpp"
 
 namespace cx
 {
 
+typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
+
 /**
- * Implementation of VideoService.
+ * Activator for the Tracking plugin
  *
- * \ingroup org_custusx_video
- *
+ * \ingroup org_custusx_core_tracking
  * \date 2014-09-19
  * \author Ole Vegard Solberg
  */
-class org_custusx_video_EXPORT VideoImplService : public VideoService
+class TrackingPluginActivator :  public QObject, public ctkPluginActivator
 {
-	Q_INTERFACES(cx::VideoService)
-public:
-	VideoImplService(ctkPluginContext* context);
-	virtual ~VideoImplService();
-	virtual StreamerService *getStreamerService(QString service);
-	virtual QList<StreamerService *> getStreamerServices();
+  Q_OBJECT
+  Q_INTERFACES(ctkPluginActivator)
+	Q_PLUGIN_METADATA(IID "org_custusx_registration_method_vessel")
 
-	virtual bool isNull();
+public:
+
+  TrackingPluginActivator();
+  ~TrackingPluginActivator();
+
+  void start(ctkPluginContext* context);
+  void stop(ctkPluginContext* context);
 
 private:
-	ctkPluginContext *mContext;
+	RegisteredServicePtr mRegistration;
 };
-typedef boost::shared_ptr<VideoImplService> VideoImplServicePtr;
 
-} /* namespace cx */
+} // namespace cx
 
-#endif /* CXTRACKINGIMPLSERVICE_H_ */
-
+#endif /* CXTRACKINGPLUGINACTIVATOR_H_ */

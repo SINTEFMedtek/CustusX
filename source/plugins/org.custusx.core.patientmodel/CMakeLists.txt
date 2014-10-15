@@ -1,4 +1,4 @@
-project(org_custusx_patientmodel)
+project(org_custusx_core_patientmodel)
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 

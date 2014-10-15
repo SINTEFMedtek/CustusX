@@ -51,7 +51,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxSharedPointerChecker.h"
 #include "cxPluginFramework.h"
-#include "cxPatientModelServiceProxy.h"
 #include "cxVideoServiceProxy.h"
 
 namespace cx
@@ -243,8 +242,7 @@ void LogicManager::createVisualizationService()
 												  mTrackingService,
 													mVideoServiceOld,
 												  mSpaceProvider));
-//	PatientModelServicePtr patientModelService(new PatientModelServiceProxy(getPluginContext()));
-	mVisualizationService = ViewManager::create(/*patientModelService, */backend);
+	mVisualizationService = ViewManager::create(backend);
 	LegacySingletons::mVisualizationService = mVisualizationService;
 }
 

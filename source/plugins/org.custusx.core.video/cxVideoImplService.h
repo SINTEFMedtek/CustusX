@@ -33,34 +33,36 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTRACKINGIMPLSERVICE_H_
 #define CXTRACKINGIMPLSERVICE_H_
 
-#include "cxTrackingService.h"
-#include "org_custusx_tracking_Export.h"
+#include "cxVideoService.h"
+#include "org_custusx_core_video_Export.h"
 class ctkPluginContext;
 
 namespace cx
 {
 
 /**
- * Implementation of TrackingService.
+ * Implementation of VideoService.
  *
- * \ingroup org_custusx_tracking
+ * \ingroup org_custusx_core_video
  *
  * \date 2014-09-19
  * \author Ole Vegard Solberg
  */
-class org_custusx_tracking_EXPORT TrackingImplService : public TrackingService
+class org_custusx_core_video_EXPORT VideoImplService : public VideoService
 {
-	Q_INTERFACES(cx::TrackingService)
+	Q_INTERFACES(cx::VideoService)
 public:
-	TrackingImplService(ctkPluginContext* context);
-	virtual ~TrackingImplService();
+	VideoImplService(ctkPluginContext* context);
+	virtual ~VideoImplService();
+	virtual StreamerService *getStreamerService(QString service);
+	virtual QList<StreamerService *> getStreamerServices();
 
 	virtual bool isNull();
 
 private:
 	ctkPluginContext *mContext;
 };
-typedef boost::shared_ptr<TrackingImplService> TrackingImplServicePtr;
+typedef boost::shared_ptr<VideoImplService> VideoImplServicePtr;
 
 } /* namespace cx */
 

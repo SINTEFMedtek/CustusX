@@ -34,7 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXPATIENTORIENTATIONWIDGET_H_
 
 #include "cxRegistrationBaseWidget.h"
-#include "cxForwardDeclarations.h"
 #include "cxTransform3D.h"
 #include "cxDominantToolProxy.h"
 #include "cxPatientModelService.h"

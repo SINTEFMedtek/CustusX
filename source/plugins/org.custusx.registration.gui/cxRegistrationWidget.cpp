@@ -44,8 +44,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReporter.h"
 #include "cxRegistrationDataAdapters.h"
 #include "cxLabeledComboBoxWidget.h"
-#include "cxRegistrationServiceProxy.h"
-#include "cxPatientModelServiceProxy.h"
+#include "cxRegistrationService.h"
+#include "cxPatientModelService.h"
 #include "cxStringDataAdapterXml.h"
 #include "cxDataLocations.h"
 

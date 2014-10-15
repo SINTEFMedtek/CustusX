@@ -1,4 +1,4 @@
-project(org_custusx_tracking)
+project(org_custusx_core_tracking)
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 

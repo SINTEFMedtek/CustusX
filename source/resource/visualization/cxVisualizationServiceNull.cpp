@@ -63,7 +63,7 @@ bool VisualizationServiceNull::isNull()
 
 void VisualizationServiceNull::printWarning() const
 {
-	reportWarning("Trying to use VideoServiceNull. Is VideoService (org.custusx.video) disabled?");
+	reportWarning("Trying to use VideoServiceNull. Is VideoService (org.custusx.core.visualization) disabled?");
 }
 
 void VisualizationServiceNull::setRegistrationMode(cx::REGISTRATION_STATUS mode)
