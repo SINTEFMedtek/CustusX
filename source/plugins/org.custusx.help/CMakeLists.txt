@@ -21,7 +21,6 @@ set(PLUGIN_SRCS
   widgets/cxHelpIndexWidget.cpp
   widgets/cxHelpSearchWidget.cpp
   widgets/cxHelpBrowser.cpp
-  cxHelpServiceImpl.cpp
   cxHelpEngine.cpp
 )
 
@@ -33,7 +32,6 @@ set(PLUGIN_MOC_SRCS
   widgets/cxHelpIndexWidget.h
   widgets/cxHelpSearchWidget.h
   widgets/cxHelpBrowser.h
-  cxHelpServiceImpl.h
   cxHelpEngine.h
 )
 

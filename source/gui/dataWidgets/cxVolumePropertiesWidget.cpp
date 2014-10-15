@@ -49,7 +49,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVolumeInfoWidget.h"
 #include "cxVolumeHelpers.h"
 #include "cxTypeConversions.h"
-#include "cxHelpServiceProxy.h"
 #include "cxLogicManager.h"
 
 namespace cx
@@ -84,7 +83,6 @@ VolumePropertiesWidget::VolumePropertiesWidget(PatientModelServicePtr patientMod
 		TabbedWidget(parent, "VolumePropertiesWidget", "Volume Properties")
 {
 	this->insertWidgetAtTop(new ActiveVolumeWidget(patientModelService, visualizationService, this));
-	HelpServiceProxy(LogicManager::getInstance()->getPluginContext())->registerWidget(this, "property_widgets_volume");
 
 	this->addTab(new VolumeInfoWidget(patientModelService, this), "Info");
 	this->addTab(new TransferFunctionWidget(patientModelService, this), QString("Transfer Functions"));

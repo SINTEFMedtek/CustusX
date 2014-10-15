@@ -65,7 +65,6 @@ public:
   void stop(ctkPluginContext* context);
 
 private:
-  RegisteredServicePtr mHelp;
   RegisteredServicePtr mGUIExtender;
   HelpEnginePtr mEngine;
 };

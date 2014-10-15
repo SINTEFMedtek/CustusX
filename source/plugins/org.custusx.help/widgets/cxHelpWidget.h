@@ -67,6 +67,8 @@ signals:
 
 private slots:
 	void toggleShowNavigationControls();
+	void backSlot();
+	void forwardSlot();
 private:
 	virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
 	virtual void hideEvent(QHideEvent* event);
@@ -76,6 +78,7 @@ private:
 	void addIndexWidget(QTabWidget* tabWidget, QBoxLayout* buttonLayout);
 	void addContentWidget(QTabWidget* tabWidget, QBoxLayout* buttonLayout);
 	void addToggleTabWidgetButton(QBoxLayout* buttonLayout);
+	void addWebNavigationButtons(QBoxLayout* buttonLayout);
 
 	QVBoxLayout* mVerticalLayout;
 	QTabWidget* mTabWidget;
@@ -83,6 +86,7 @@ private:
 
 	HelpSearchWidget* mSearchWidget;
 	HelpIndexWidget* mIndexWidget;
+	class HelpBrowser *mBrowser ;
 
 	QAction* mShowNavigationControlsAction;
 	QSplitter* mSplitter;

@@ -45,11 +45,7 @@ namespace cx
 
 HelpEngine::HelpEngine()
 {
-	//	helpEngine = new QHelpEngine(DataLocations::getDocPath()+"/wateringmachine.qhc", this);
 		QString helpFile = DataLocations::getDocPath()+"/cx_user_doc.qhc";
-	//	QString helpFile = DataLocations::getDocPath()+"/doxygen/cx_user_doc.qch"; // virker med QtAssistant
-	//	QString helpFile;
-//		std::cout << "helpFile " << helpFile << " -- " << QFileInfo(helpFile).exists() << std::endl;
 		helpEngine = new QHelpEngine(helpFile, NULL);
 		helpEngine->setupData();
 
@@ -70,7 +66,6 @@ void HelpEngine::focusObjectChanged(QObject* newFocus)
 	if (!newFocus)
 		return;
 //	std::cout << "HelpEngine::focusObjectChanged " << newFocus->objectName() << " -- " << dynamic_cast<QWidget*>(newFocus)->windowTitle() << std::endl;
-//	newFocus
 	QString keyword = this->findBestMatchingKeyword(newFocus);
 	if (!keyword.isEmpty())
 	{
@@ -79,21 +74,71 @@ void HelpEngine::focusObjectChanged(QObject* newFocus)
 	}
 }
 
+bool HelpEngine::isBreakChar(QChar c) const
+{
+	return c.isDigit() || c.isUpper();
+}
+
+bool HelpEngine::isBreakChar(QString text, int index) const
+{
+	if (!this->isBreakChar(text[index]))
+		return false;
+
+	bool prev = true;
+	if (index>0)
+		prev = this->isBreakChar(text[index-1]);
+
+	bool next = true;
+	if (index+1<text.size())
+		next = this->isBreakChar(text[index+1]);
+
+	if (!prev || !next)
+		return true;
+
+	return false;
+}
+
+QString HelpEngine::convertToKeyword(QString id) const
+{
+	// convert camel case strings into whitespace-separated lowercase strings:
+	// MyWidget -> my widget
+	// myFancy3DWidget2D -> my Fancy 3D Widget 2D -> my fancy 3d widget 2d
+	// myFancyDWidget -> my Fancy D Widget -> my fancy D widget
+	QString retval;
+	retval.push_back(id[0]);
+	for (int i=1; i<id.size(); ++i)
+	{
+		// break condition Q is (uppercase or digit)
+		// insert whitespace before Q
+		// ignore if previous was Q
+		if (this->isBreakChar(id, i))
+		{
+			retval.push_back("_"); // cant't get doxygenerated anchors to work properly with whitespace
+		}
+		retval.push_back(id[i]);
+	}
+	return retval.toLower();
+}
+
 QString HelpEngine::findBestMatchingKeyword(QObject* object)
 {
 	while (object)
 	{
-//		std::cout << "    examining " << object->objectName() << std::endl;
-		if (mKeywords.count(object))
-			return mKeywords[object];
+		QString id = this->convertToKeyword(object->objectName());
+//		std::cout << "    examining " << object->objectName() << ", keyword = " << id << std::endl;
+
+		if (id.contains("help_widget"))
+			return "";
+
+		QMap<QString, QUrl> links = this->engine()->linksForIdentifier(id);
+		if (!links.empty())
+		{
+			return id;
+		}
+
 		object = object->parent();
 	}
 	return "";
-}
-
-void HelpEngine::registerWidget(QWidget* widget, QString keyword)
-{
-	mKeywords[widget] = keyword;
 }
 
 }

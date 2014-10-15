@@ -4,7 +4,7 @@ Utility Widgets {#utility_widgets}
 [TOC]
 
 
-\addindex utility_widgets_metrics
+\addindex metric_widget
 Metrics Widget {#utility_widgets_metrics}
 ===========================================================
 
@@ -14,7 +14,7 @@ Lets you sample points in 3D and get the distance between sampled points.
 
 
 
-\addindex utility_widgets_video_connection
+\addindex igt_link_widget
 Video Connection Widget {#utility_widgets_video_connection}
 ===========================================================
 
@@ -24,7 +24,7 @@ pick one. TBD.
 
 
 
-\addindex utility_widgets_camera_control
+\addindex track_pad_widget
 Camera Control Widget {#utility_widgets_camera_control}
 ===========================================================
 
@@ -34,7 +34,7 @@ Helps the user control the camera on a touch screen.
 
 
 
-\addindex utility_widgets_console
+\addindex console_widget
 Console Widget {#utility_widgets_console}
 ===========================================================
 CustusX console, display device for system administration messages.
@@ -44,7 +44,7 @@ CustusX console, display device for system administration messages.
 
 
 
-\addindex utility_widgets_us_acquisition
+\addindex us_acquisition_widget
 US Acquisition Widget {#utility_widgets_us_acquisition}
 ===========================================================
 

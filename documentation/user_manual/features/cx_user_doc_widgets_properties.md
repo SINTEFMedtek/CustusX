@@ -3,11 +3,11 @@ Property Widgets {#property_widgets}
 
 [TOC]
 
-\addindex property_widgets_volume
+\addindex volume_properties_widget
 Volume Properties {#property_widgets_volume}
 ===========================================================
 
-\addindex property_widgets_volume_clipping 
+\addindex clipping_widget 
 Volume Clipping {#property_widgets_volume_clipping}
 -----------------------------------------------------------
 *Functionality for clipping a volume.*
@@ -20,7 +20,7 @@ The current clip can also be saved along with the volume.
 This can be done several times.
 
 
-\addindex property_widgets_volume_cropping 
+\addindex cropping_widget 
 Volume Cropping {#property_widgets_volume_cropping}
 -----------------------------------------------------------
  
@@ -35,58 +35,56 @@ How to use the bounding box:
  
 > **Tip:** To make the crop permanent, press the button to create a new volume from the crop.
 
-\addindex property_widgets_volume_shading 
+\addindex shading_widget 
 Volume Shading {#property_widgets_volume_shading}
 -----------------------------------------------------------
  
 Set volume shading properties.
 
-\addindex property_widgets_volume_transfer_function
+\addindex transfer_function_widget
 Volume Transfer Function {#property_widgets_volume_transfer_function}
 -----------------------------------------------------------
 
-\addindex property_widgets_volume_transfer_function_3D 
+\addindex transfer_function_3d_widget 
 ### 3D Transfer Function {#property_widgets_volume_transfer_function_3D}
 Lets you set a transfer function on a 3D volume.
 
-\addindex property_widgets_volume_transfer_function_presets 
+\addindex transfer_function_preset_widget 
 ### Transfer Function Presets {#property_widgets_volume_transfer_function_presets}
 Let you select a predefined transfer function.
 
-\addindex property_widgets_volume_information 
+\addindex volume_info_widget 
 Volume Information {#property_widgets_volume_information}
 -----------------------------------------------------------
 
 Displays information about a selected volume.
 
 
-\addindex property_widgets_slice
+\addindex slice_properties_widget
 Slice Properties {#property_widgets_slice}
 ===========================================================
 Lets you set properties on a 2d image slice.
 
-\addindex property_widgets_volume_information 
 Slice Information {#property_widgets_slice_information}
 -----------------------------------------------------------
 Displays information about a selected volume. 
 Identical to \ref property_widgets_volume_information.
 
-\addindex property_widgets_slice_color
+\addindex color_widget
 Slice Color {#property_widgets_slice_color}
 -----------------------------------------------------------
 Allows setting 2D image properties 
 by setting colors and window with and level.
 
-\addindex property_widgets_slice_transfer_function_2D 
+\addindex transfer_function_2d_widget 
 ### 2D Transfer Function {#property_widgets_slice_transfer_function_2D}
 Lets you set a transfer function on a 2D volume.
 
-\addindex property_widgets_slice_transfer_function_presets 
 ### Transfer Function Slice Presets {#property_widgets_slice_transfer_function_presets}
 Let you select a predefined transfer function.
 Identical to \ref property_widgets_volume_transfer_function_presets.
 
-\addindex property_widgets_slice_overlay 
+\addindex overlay_widget 
 Slice 2D Overlay {#property_widgets_slice_overlay}
 -----------------------------------------------------------
 Allow visualizing several 2D slices  in top of each other 
@@ -98,17 +96,17 @@ Not working on Windows.
 
 
 
-\addindex property_widgets_tool
+\addindex tool_properties_widget
 Tool Properties {#property_widgets_tool}
 ===========================================================
 TBD
 
-\addindex property_widgets_mesh
+\addindex mesh_info_widget
 Mesh Properties {#property_widgets_mesh}
 ===========================================================
 Displays Information.
 
-\addindex property_widgets_eraser
+\addindex eraser_widget
 Eraser {#property_widgets_eraser}
 ===========================================================
 Functionality for erasing parts of volumes/meshes.

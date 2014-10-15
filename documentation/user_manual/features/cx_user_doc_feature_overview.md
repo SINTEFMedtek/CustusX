@@ -3,6 +3,7 @@ Feature Overview {#feature_overview}
 
 Main Window {#feature_overview_main_window}
 ===========================================================
+\addindex main_window
 
 ![CustusX Main Window](mainwindow.png)
 

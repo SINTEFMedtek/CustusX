@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <boost/shared_ptr.hpp>
 #include "cxOptimizedUpdateWidget.h"
+#include "boost/function.hpp"
 
 class QWidget;
 class QGroupBox;
@@ -142,7 +143,6 @@ public:
 	  }
 	  return action;
 	}
-
 
 public slots:
     void adjustSizeSlot();

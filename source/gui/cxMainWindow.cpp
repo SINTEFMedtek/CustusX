@@ -107,6 +107,8 @@ namespace cx
 MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
 	mFullScreenAction(NULL), mStandard3DViewActions(NULL), mControlPanel(NULL), mDockWidgets(new DockWidgets(this))
 {
+	this->setObjectName("MainWindow");
+
 	QFile stylesheet(":/cxStyleSheet.ss");
 	stylesheet.open(QIODevice::ReadOnly);
 	qApp->setStyleSheet(stylesheet.readAll());

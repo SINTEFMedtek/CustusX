@@ -53,11 +53,12 @@ class HelpBrowser : public QTextBrowser
 
 public:
 	HelpBrowser(QWidget *parent, HelpEnginePtr engine);
+	virtual void setSource(const QUrl& name);
 public slots:
 	void showHelpForKeyword(const QString &id);
 
 private:
-	QVariant loadResource(int type, const QUrl &name);
+	virtual QVariant loadResource(int type, const QUrl &name);
 	HelpEnginePtr mEngine;
 };
 
