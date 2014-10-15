@@ -422,7 +422,7 @@ class CustusX(CppComponent):
 #        add('CX_USE_TSF:BOOL', platform.system() != 'Windows');
         add('CX_PLUGIN_org.custusx.filter.levelset:BOOL', platform.system() == 'Linux');
         add('CX_PLUGIN_org.custusx.filter.tubesegmentation:BOOL', platform.system() != 'Windows');
-        add('CX_PLUGIN_org.custusx.ussimulator:BOOL', True);
+        add('CX_PLUGIN_org.custusx.ussimulator:BOOL', platform.system() != 'Linux');
         add('CX_USE_ISB_GE:BOOL', platform.system() != 'Windows');
         add('CX_BUILD_MEHDI_VTKMULTIVOLUME:BOOL', False);
         
