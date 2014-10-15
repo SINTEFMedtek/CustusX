@@ -74,9 +74,8 @@ class Common(object):
         self.main_branch = "master"
         self.static = False # build as shared or static libraries
         self.jom = False
+        self.ninja = False
         self.eclipse_version = '3.6'
-        if platform.system() == 'Windows':
-            self.jom = False
         self.setBuildType("Debug") 
         self.threads = 1
         self.xcode = False
@@ -86,6 +85,7 @@ class Common(object):
         self.mOSX_DEPLOYMENT_TARGET = "10.6" # Deploy for OSX 10.6 Snow Leopard and later
         self.short_pathnames = False
         if (platform.system() == 'Windows'):
+            self.ninja = True
             self.short_pathnames = True
             self.mBuildSSCExamples = False
             self.mBuildTesting = True
@@ -171,6 +171,8 @@ class Common(object):
             return "Xcode"
         if self.jom:
             return "NMake Makefiles JOM"
+        if self.ninja:
+            return 'Ninja'
         if platform.system() == 'Windows':
             return 'Eclipse CDT4 - NMake Makefiles' # need to surround with ' ' instead of " " on windows for it to work
         return "Eclipse CDT4 - Unix Makefiles" 
