@@ -76,6 +76,7 @@ void HelpWidget::setup()
 	HelpBrowser *browser = new HelpBrowser(this, mEngine);
 	connect(this, &HelpWidget::requestShowLink,
 			browser, &HelpBrowser::setSource);
+	mBrowser = browser;
 
 	QHBoxLayout* buttonLayout = new QHBoxLayout;
 	//	buttonLayout->setMargin(0);
@@ -91,6 +92,7 @@ void HelpWidget::setup()
 	this->addIndexWidget(mTabWidget, buttonLayout);
 
 	this->addToggleTabWidgetButton(buttonLayout);
+	this->addWebNavigationButtons(buttonLayout);
 	buttonLayout->addStretch();
 
 	browser->showHelpForKeyword("mainpage_overview");
@@ -123,6 +125,34 @@ void HelpWidget::addContentWidget(QTabWidget* tabWidget, QBoxLayout* buttonLayou
 
 	connect(mEngine->engine()->contentWidget(), &QHelpContentWidget::linkActivated,
 			this, &HelpWidget::requestShowLink);
+}
+
+void HelpWidget::addWebNavigationButtons(QBoxLayout* buttonLayout)
+{
+	QAction* back = this->createAction(this,
+									   QIcon(":/icons/open_icon_library/arrow-left-3.png"),
+									   "Back", "Back to previous page",
+									   SLOT(backSlot()),
+									   buttonLayout, new CXSmallToolButton());
+
+	QAction* forward = this->createAction(this,
+										  QIcon(":/icons/open_icon_library/arrow-right-3.png"),
+										  "Forward", "Forward to next page",
+										  SLOT(forwardSlot()),
+										  buttonLayout, new CXSmallToolButton());
+
+	connect(mBrowser, SIGNAL(backwardAvailable(bool)), back, SLOT(setEnabled(bool)));
+	connect(mBrowser, SIGNAL(forwardAvailable(bool)), forward, SLOT(setEnabled(bool)));
+}
+
+void HelpWidget::backSlot()
+{
+	mBrowser->backward();
+}
+
+void HelpWidget::forwardSlot()
+{
+	mBrowser->forward();
 }
 
 void HelpWidget::addToggleTabWidgetButton(QBoxLayout* buttonLayout)

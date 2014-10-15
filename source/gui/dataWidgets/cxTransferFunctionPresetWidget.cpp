@@ -46,6 +46,7 @@ TransferFunctionPresetWidget::TransferFunctionPresetWidget(PatientModelServicePt
 		PresetWidget(parent), mIs3D(is3D),
 		mPatientModelService(patientModelService)
 {
+	this->setObjectName("TransferFunctionPresetWidget");
 	this->setPresets(patientModelService->getPresetTransferFunctions3D());
 	QString toggleText = "Toggle between apply presets,\neither on %1\nor both 2D and 3D\ntransfer functions.";
 	if (is3D)

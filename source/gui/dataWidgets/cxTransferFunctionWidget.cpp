@@ -55,7 +55,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSettings.h"
 #include "cxPatientModelService.h"
 #include "cxLogicManager.h"
-#include "cxHelpServiceProxy.h"
 
 namespace cx
 {
@@ -196,9 +195,6 @@ TransferFunction3DWidget::TransferFunction3DWidget(PatientModelServicePtr patien
   mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(patientModelService, this);
   mTransferFunctionColorWidget = new TransferFunctionColorWidget(patientModelService, this);
 
-  HelpServiceProxy(LogicManager::getInstance()->getPluginContext())->registerWidget(this, "property_widgets_volume_transfer_function_3D");
-
-
 //  mDataWindow.reset(new DoubleDataAdapterImageTFDataWindow);
 //  mDataLevel.reset(new DoubleDataAdapterImageTFDataLevel);
 //  mDataAlpha.reset(new DoubleDataAdapterImageTFDataAlpha);
@@ -263,7 +259,6 @@ TransferFunction2DWidget::TransferFunction2DWidget(PatientModelServicePtr patien
   mPatientModelService(patientModelService)
 {
   mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(patientModelService, this);
-  HelpServiceProxy(LogicManager::getInstance()->getPluginContext())->registerWidget(this, "property_widgets_volume_transfer_function_2D");
   mTransferFunctionAlphaWidget->setReadOnly(true);
   mTransferFunctionColorWidget = new TransferFunctionColorWidget(patientModelService, this);
 
@@ -331,7 +326,6 @@ TransferFunctionWidget::TransferFunctionWidget(PatientModelServicePtr patientMod
 {
   QVBoxLayout* mLayout = new QVBoxLayout(this);
 
-  HelpServiceProxy(LogicManager::getInstance()->getPluginContext())->registerWidget(this, "property_widgets_volume_transfer_function");
   mLayout->setMargin(0);
   mLayout->addWidget(new TransferFunction3DWidget(patientModelService, this));
   mLayout->addWidget(new TransferFunctionPresetWidget(patientModelService, this, true));

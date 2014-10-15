@@ -3,7 +3,7 @@ Browsing Widgets {#browsing_widgets}
 
 [TOC]
 
-\addindex browsing_widgets_frame_tree
+\addindex frame_tree_widget
 Frame Tree Widget {#browsing_widgets_frame_tree}
 ===========================================================
 
@@ -12,7 +12,7 @@ Lets you look at the frame dependencies between different data.
 
 
 
-\addindex property_widgbrowsing_widgets_playbackets_volume
+\addindex playback_widget
 Playback Widget {#browsing_widgets_playback}
 ===========================================================
 
@@ -34,7 +34,7 @@ Hover the mouse above the timeline in order to get information about that time.
 
 
 
-\addindex browsing_widgets_registration_history
+\addindex registration_history_widget
 Registration History Widget {#browsing_widgets_registration_history}
 ===========================================================
 
@@ -43,3 +43,11 @@ all registrations performed after the active time is ignored by the system.
 
 > **NB:** While a previous time is active, *no new registrations or adding of data* should be performed. 
 > This will lead to undefined behaviour!
+
+
+
+\addindex plugin_framework_widget
+Plugin Framework Widget {#browsing_widgets_plugin_framework}
+===========================================================
+
+Lists all plugins and gives the option to install/start/stop/investigate them.

@@ -61,7 +61,7 @@ class HelpEngine : public QObject
 public:
 	HelpEngine();
 	QHelpEngine* engine() { return helpEngine; }
-	void registerWidget(QWidget* widget, QString keyword);
+//	void registerWidget(QWidget* widget, QString keyword);
 signals:
 	void keywordActivated(QString);
 private slots:
@@ -70,7 +70,11 @@ private slots:
 private:
 	QString findBestMatchingKeyword(QObject* object);
 	QHelpEngine* helpEngine;
-	std::map<QObject*, QString> mKeywords;
+//	std::map<QObject*, QString> mKeywords;
+
+	bool isBreakChar(QChar c) const;
+	bool isBreakChar(QString text, int index) const;
+	QString convertToKeyword(QString id) const;
 
 };
 typedef boost::shared_ptr<HelpEngine> HelpEnginePtr;

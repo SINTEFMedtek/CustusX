@@ -49,7 +49,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientService.h"
 #include "cxDataManager.h"
 #include "cxImage.h"
-#include "cxHelpServiceProxy.h"
 #include "cxLogicManager.h"
 
 namespace cx
@@ -60,7 +59,6 @@ CroppingWidget::CroppingWidget(QWidget* parent) :
 {
   mInteractiveCropper = viewManager()->getCropper();
   connect(mInteractiveCropper.get(), SIGNAL(changed()), this, SLOT(cropperChangedSlot()));
-  HelpServiceProxy(LogicManager::getInstance()->getPluginContext())->registerWidget(this, "property_widgets_volume_cropping");
 
   QVBoxLayout* layout = new QVBoxLayout(this);
 

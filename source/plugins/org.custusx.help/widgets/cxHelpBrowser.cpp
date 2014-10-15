@@ -34,6 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QHelpEngine>
 #include "cxHelpEngine.h"
+#include "cxTypeConversions.h"
+#include <iostream>
+#include <QDesktopServices>
 
 namespace cx
 {
@@ -41,6 +44,7 @@ HelpBrowser::HelpBrowser(QWidget *parent, HelpEnginePtr engine)
 	: QTextBrowser(parent), mEngine(engine)
 {
 	connect(mEngine.get(), SIGNAL(keywordActivated(QString)), this, SLOT(showHelpForKeyword(const QString&)));
+//	this->setOpenExternalLinks(true);
 }
 
 void HelpBrowser::showHelpForKeyword(const QString &id)
@@ -51,21 +55,45 @@ void HelpBrowser::showHelpForKeyword(const QString &id)
 //		std::cout << "[links]" << links.size() << std::endl;
 		if (links.count())
 		{
-			setSource(links.constBegin().value());
+//			std::cout << "Set links: " << links.size()
+//					  << ", " << links.first().toString()
+//					  << ", " << links.firstKey()
+//					  << std::endl;
+//			std::cout << "sourceH: " << links.first().toString() << std::endl;
+//			std::cout << "sourceE: " << QString(links.first().toEncoded()) << std::endl;
+
+			setSource(links.first());
 		}
 	}
 }
 
+void HelpBrowser::setSource(const QUrl& name)
+{
+	if (name.scheme() == "qthelp")
+		QTextBrowser::setSource(name);
+	else
+	{
+		QDesktopServices::openUrl(name);
+	}
+
+}
+
 QVariant HelpBrowser::loadResource(int type, const QUrl &name)
 {
-	QByteArray ba;
-	if (type < 4 && mEngine->engine()) {
+	if (type < 4 && mEngine->engine())
+	{
 		QUrl url(name);
 		if (name.isRelative())
 			url = source().resolved(url);
-		ba = mEngine->engine()->fileData(url);
+
+//		std::cout << "HelpBrowser::loadResource, scheme=" << url.scheme() << "  url=" << url.toString() << std::endl;
+
+		if (url.scheme() == "qthelp")
+			return QVariant(mEngine->engine()->fileData(url));
+		else
+			return QTextBrowser::loadResource(type, url);
 	}
-	return ba;
+	return QVariant();
 }
 
 }//end namespace cx

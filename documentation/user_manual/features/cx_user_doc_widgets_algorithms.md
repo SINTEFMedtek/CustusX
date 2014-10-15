@@ -3,7 +3,7 @@ Algorithms Widgets {#algorithms_widgets}
 
 [TOC]
 
-\addindex algorithm_widgets_configurable_filter
+\addindex filter_widget
 Configurable Filter Widget {#algorithm_widgets_configurable_filter}
 ===========================================================
 
@@ -22,12 +22,12 @@ There are several methods.
 
 TBD.
 
-\addindex algorithm_widgets_calibration
+\addindex calibration_methods_widget
 Calibration Widget {#algorithm_widgets_calibration}
 ===========================================================
 
 
-\addindex algorithm_widgets_calibration_tooltip
+\addindex tool_tip_calibrate_widget
 Tooltip Calibration Widget {#algorithm_widgets_calibration_tooltip}
 -----------------------------------------------------------
 Calibrates a tool by sampling it when pointing at a known point on another frame.
@@ -35,7 +35,7 @@ Calibrates a tool by sampling it when pointing at a known point on another frame
 > By using the test button you can test your calibration by pointing at a known reference point.
 
 
-\addindex algorithm_widgets_calibration_lapframe
+\addindex lap_frame_tool_calibration_widget
 Lapframe Calibration Widget {#algorithm_widgets_calibration_lapframe}
 -----------------------------------------------------------
 Calibrates a tool by sampling it when it is inserted into the slot of the custom-made calibration frame.
@@ -45,13 +45,13 @@ are in the same position.
 
 > By using the test button you can test your calibration by pointing at a known reference point.
 
-\addindex algorithm_widgets_calibration_sample_tooltip
+\addindex tool_tip_sample_widget
 Sample Tooltip Widget {#algorithm_widgets_calibration_sample_tooltip}
 -----------------------------------------------------------
 Sample the active tool tooltip in any coordinate system and get the results written to file.
 
 
-\addindex algorithm_widgets_calibration_temporal
+\addindex temporal_calibration_widget
 Temporal Calibration Widget {#algorithm_widgets_calibration_temporal}
 -----------------------------------------------------------
 Calibrate the time shift between the tracking system and the video acquisition source.
@@ -66,13 +66,13 @@ Refer to the log folder for the calibration curves.
 > **NB:** Previous temporal calibration is applied to probe frames during acqusition.
 
 
-\addindex algorithm_widgets_calibration_manual_tool
+\addindex tool_manual_calibration_widget
 Manual Tool Calibration Widget {#algorithm_widgets_calibration_manual_tool}
 -----------------------------------------------------------
 Manipulate the tool calibration matrix sMt directly, using the matrix manipulation interface.
 
 
-\addindex algorithm_widgets_calibration_probe_config
+\addindex probe_config_widget
 Probe Config Calibration Widget {#algorithm_widgets_calibration_probe_config}
 -----------------------------------------------------------
 View and edit the probe configuration. 
