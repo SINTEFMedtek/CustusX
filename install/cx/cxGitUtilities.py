@@ -14,6 +14,8 @@ import argparse
 import os
 import fnmatch
 from cxShell import *
+import re
+import os.path
 
 #################################################
 #
@@ -50,6 +52,29 @@ class GitRepository(object):
     def status(self):
         return_value = self.__run_git_command('status', True)
         self.__evaluate(return_value)
+        
+    def branch_info(self):
+        text = self.__run_git_command('status --porcelain -b', True).stdout
+#        expr = r'##(.*)\n'       
+#        regexp = re.compile(expr)
+        hit = re.match(r'##(.*)\n', text)
+        if hit:
+            if hit.group(1):
+#                if hit.group(2):
+#                    print "TWO: ", hit.group(2) 
+                text = hit.group(1)
+                
+        branch_ahead = ''
+        hit = re.match(r'.*\[(.*)\].*', text)
+        if (hit and hit.group(1)):
+            branch_ahead = hit.group(1)
+#        print "text: ", text
+#        print "branch_ahead: ", branch_ahead
+#        print '*'*50
+        
+        text = text.split('...')[0]
+        self.branch_name = text
+        self.branch_ahead = branch_ahead
         
     def __run_git_command(self, command, silent):
         shell.setSilent(silent)
@@ -95,6 +120,7 @@ class TextColor:
 #################################################      
 class Reporter(object):
     def __init__(self, root_path):
+        self.root_path = root_path
         self.__print_info("Looking for git repositories in \""+root_path+"\"")
         self.git_repositories = findGitRepositories(root_path)
 
@@ -105,16 +131,26 @@ class Reporter(object):
             
         for repo in self.git_repositories:
             repo.status()
-            if(repo.clean):
-                self.__print_clean(repo)
-            else:
-                self.__print_dirty(repo)
+            repo.branch_info()
+            b = repo.branch_name 
+#        self.branch_ahead = branch_ahead
+            p = self.__get_repo_path(repo)
+            d = self.__get_repo_details(repo)
+#            print '{0:<30}  {1:<60}  {2}'.format(b, p, d)
+            print '{0:<70}  {1:<30}  {2}'.format(p, b, d)    
     
-    def __print_clean(self, repo):
-        print TextColor.CLEAN + repo.path
-        
-    def __print_dirty(self, repo):
-        print TextColor.DIRTY + repo.path + '    ' + self.__format_details(repo).ljust(50)
+    def __get_repo_path(self, repo):
+        path = os.path.relpath(repo.path, self.root_path)        
+        if(repo.clean):
+            return TextColor.CLEAN + path
+        else:
+            return TextColor.DIRTY + path
+    
+    def __get_repo_details(self, repo):
+        if(repo.clean):
+            return ''
+        else:
+            return self.__format_details(repo).ljust(50)
         
     def __format_details(self, repo):
         text = TextColor.ENDC 
@@ -127,6 +163,8 @@ class Reporter(object):
             text += TextColor.UNTRACKED + ' untracked ' + TextColor.ENDC
         if repo.renamed_files:
             text += TextColor.RENAMED + ' renamed ' + TextColor.ENDC
+        if repo.branch_ahead:
+            text += TextColor.MODIFIED + ' %s '%repo.branch_ahead + TextColor.ENDC
         text += ']' 
         text += TextColor.ENDC
         
@@ -147,8 +185,8 @@ class Reporter(object):
 #
 #################################################
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Git utilities for the CustusX project.')
-    parser.add_argument('root_path', help='the top directory to recursivly look for git repositories in (abs or rel)') 
+    parser = argparse.ArgumentParser(description='Display condensed git status for all projects.')
+    parser.add_argument('root_path', help='the top directory to recursively look for git repositories in (abs or rel)') 
     args = parser.parse_args()
     
     root_path = os.path.abspath(args.root_path)
