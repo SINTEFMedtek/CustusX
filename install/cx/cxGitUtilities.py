@@ -68,6 +68,8 @@ class GitRepository(object):
         hit = re.match(r'.*\[(.*)\].*', text)
         if (hit and hit.group(1)):
             branch_ahead = hit.group(1)
+#        print '*'*50
+#        print "plugin: ", self.path
 #        print "text: ", text
 #        print "branch_ahead: ", branch_ahead
 #        print '*'*50
@@ -104,7 +106,7 @@ class TextColor:
     INFO = '\033[95m' #light magenta
     
     CLEAN = '\033[0m' #white
-    DIRTY = '\033[93m' #light yellow
+    DIRTY = '\033[1m' #bold
     
     MODIFIED = '\033[94m' #light blue
     DELETED = '\033[91m' #light red
@@ -141,13 +143,13 @@ class Reporter(object):
     
     def __get_repo_path(self, repo):
         path = os.path.relpath(repo.path, self.root_path)        
-        if(repo.clean):
+        if repo and not repo.branch_ahead:
             return TextColor.CLEAN + path
         else:
             return TextColor.DIRTY + path
     
     def __get_repo_details(self, repo):
-        if(repo.clean):
+        if repo and not repo.branch_ahead:
             return ''
         else:
             return self.__format_details(repo).ljust(50)
@@ -163,6 +165,10 @@ class Reporter(object):
             text += TextColor.UNTRACKED + ' untracked ' + TextColor.ENDC
         if repo.renamed_files:
             text += TextColor.RENAMED + ' renamed ' + TextColor.ENDC
+#        print '*'*50
+#        print repo.path
+#        print repo.branch_ahead
+#        print '*'*50
         if repo.branch_ahead:
             text += TextColor.MODIFIED + ' %s '%repo.branch_ahead + TextColor.ENDC
         text += ']' 
