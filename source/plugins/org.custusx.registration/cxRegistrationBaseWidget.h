@@ -29,67 +29,36 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXREGISTRATIONBASEWIDGET_H_
+#define CXREGISTRATIONBASEWIDGET_H_
 
-#ifndef CXWIREPHANTOMWIDGET_H_
-#define CXWIREPHANTOMWIDGET_H_
+#include "cxBaseWidget.h"
+#include "cxResourceWidgetsExport.h"
 
-#include "cxPluginRegistrationExport.h"
-
-#include "cxRegistrationBaseWidget.h"
-#include "cxPipeline.h"
-#include "cxFilter.h"
-#include "cxVector3D.h"
-#include "cxTransform3D.h"
-#include "cxBoundingBox3D.h"
-
-class QPushButton;
-class QVBoxLayout;
-class QTextEdit;
+#include "cxRegistrationMethodService.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
 
 /**
- * \brief Probe accuracy measurements using the Wire Phantom.
- * \ingroup cx_module_registration
- *
- *  \date Jun 21, 2012
- *  \date Nov 28, 2012
- *  \author christiana
+ * \file
+ * \addtogroup cx_resource_widgets
+ * @{
  */
-class cxPluginRegistration_EXPORT WirePhantomWidget: public RegistrationBaseWidget
-{
-Q_OBJECT
 
+class org_custusx_registration_EXPORT RegistrationBaseWidget : public BaseWidget
+{
 public:
-	WirePhantomWidget(regServices services, AcquisitionDataPtr aquisitionData, QWidget* parent);
-	virtual ~WirePhantomWidget();
-	virtual QString defaultWhatsThis() const;
+	RegistrationBaseWidget(regServices services, QWidget *parent, QString objectName, QString windowTitle);
+  virtual ~RegistrationBaseWidget() {}
 
 protected:
-	QVBoxLayout* mLayout;
-
-private slots:
-	void measureSlot();
-	MeshPtr loadNominalCross();
-	void registration();
-	void generate_sMt();
-
-private:
-    void showDataMetrics(Vector3D cross_r);
-    std::pair<QString, Transform3D> getLastProbePosition();
-	void showData(DataPtr data);
-	Vector3D findCentroid(MeshPtr mesh);
-
-    class PipelineWidget* mPipelineWidget;
-    PipelinePtr mPipeline;
-	QPushButton* mMeasureButton;
-	QPushButton* mCalibrationButton;
-	QTextEdit* mResults;
-	Transform3D mLastRegistration;
-	AcquisitionDataPtr mAquisitionData;
+	regServices mServices;
 };
 
-} /* namespace cx */
-#endif /* CXWIREPHANTOMWIDGET_H_ */
+/**
+ * @}
+ */
+}
+
+#endif /* CXREGISTRATIONBASEWIDGET_H_ */

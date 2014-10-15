@@ -241,4 +241,9 @@ QDomElement cx::PatientModelImplService::getCurrentWorkingElement(QString path)
 	return patientService()->getPatientData()->getCurrentWorkingElement(path);
 }
 
+RegistrationHistoryPtr PatientModelImplService::get_rMpr_History()
+{
+	return dataManager()->get_rMpr_History();
+}
+
 } /* namespace cx */

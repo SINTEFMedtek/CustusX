@@ -67,6 +67,8 @@ public:
 	virtual void setLandmarkActive(QString uid, bool active);
 
 	virtual Transform3D get_rMpr() const; ///< get the patient registration transform
+	virtual RegistrationHistoryPtr get_rMpr_History();
+
 	virtual ImagePtr getActiveImage() const; ///< used for system state
 	virtual void setActiveImage(ImagePtr activeImage); ///< used for system state
 

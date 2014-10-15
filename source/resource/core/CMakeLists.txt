@@ -81,10 +81,6 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	utilities/cxSpaceListener
 	utilities/cxSpaceListenerImpl
 
-	registration/cxRegistrationService
-	registration/cxRegistrationServiceProxy
-	registration/cxRegistrationMethodService.h
-	registration/cxRegistrationDataAdapters
 	patientModel/cxPatientModelService
 	)
 
@@ -175,8 +171,6 @@ cx_add_class(cxResource_SOURCE
 
 	patientModel/cxPatientModelServiceNull
 	patientModel/cxPatientModelServiceProxy
-	registration/cxRegistrationServiceNull
-	registration/cxRegistrationMethodServices.h
 	Video/cxVideoServiceNull
 	Video/cxVideoServiceProxy
 	Tool/cxTrackingServiceNull

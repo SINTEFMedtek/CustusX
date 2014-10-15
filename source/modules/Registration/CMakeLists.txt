@@ -12,8 +12,7 @@
 ###########################################################
 
 SET( MOC_HEADER_FILES
-    gui/cxRegistrationMethodsWidget.h
-    gui/cxWirePhantomWidget.h
+#    gui/cxRegistrationMethodsWidget.h
     )
 
 cx_remove_duplicate_include_directories()
@@ -22,10 +21,8 @@ QT5_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
 # library
 SET( SOURCE_FILES
     ${MOC_HEADER_FILES}
-    gui/cxRegistrationMethodsWidget.h
-    gui/cxRegistrationMethodsWidget.cpp
-    gui/cxWirePhantomWidget.h
-    gui/cxWirePhantomWidget.cpp
+#    gui/cxRegistrationMethodsWidget.h
+#    gui/cxRegistrationMethodsWidget.cpp
     )
 
 # =========================================================

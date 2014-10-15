@@ -227,5 +227,11 @@ QDomElement PatientModelServiceNull::getCurrentWorkingElement(QString path)
 	return QDomElement();
 }
 
+RegistrationHistoryPtr PatientModelServiceNull::get_rMpr_History()
+{
+	printWarning();
+	return RegistrationHistoryPtr();
+}
+
 
 } // cx

@@ -57,6 +57,7 @@ class LandmarkProperty;
 typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
 typedef boost::shared_ptr<class Landmarks> LandmarksPtr;
 typedef boost::shared_ptr<class TransferFunctions3DPresets> PresetTransferFunctions3DPtr;
+typedef boost::shared_ptr<class RegistrationHistory> RegistrationHistoryPtr;
 
 /** \brief The virtual patient
  *
@@ -94,6 +95,8 @@ public:
 	virtual void setLandmarkActive(QString uid, bool active) = 0;
 
 	virtual Transform3D get_rMpr() const = 0;
+	virtual RegistrationHistoryPtr get_rMpr_History() = 0;
+
 	virtual ImagePtr getActiveImage() const = 0; ///< used for system state
 	virtual void setActiveImage(ImagePtr activeImage) = 0; ///< used for system state
 

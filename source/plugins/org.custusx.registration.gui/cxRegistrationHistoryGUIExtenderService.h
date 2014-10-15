@@ -30,35 +30,39 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxRegistrationMethodCommandLinePluginActivator.h"
+#ifndef CXREGISTRATIONHISTORYGUIEXTENDERSERVICE_H
+#define CXREGISTRATIONHISTORYGUIEXTENDERSERVICE_H
 
-#include <QtPlugin>
-#include <iostream>
-
-#include "cxRegistrationMethodCommandLineService.h"
-#include "cxRegisteredService.h"
+#include "cxGUIExtenderService.h"
+#include "org_custusx_registration_Export.h"
+#include "cxRegistrationMethodServices.h"
+class ctkPluginContext;
 
 namespace cx
 {
 
-RegistrationMethodCommandLinePluginActivator::RegistrationMethodCommandLinePluginActivator()
+/**
+ * Implementation of RegistrationHistory GUI service.
+ *
+ * \ingroup org_custusx_registration_gui
+ *
+ * \date Oct 14 2014
+ * \author Ole Vegard Solberg, SINTEF
+ */
+class org_custusx_registration_EXPORT RegistrationHistoryGUIExtenderService : public GUIExtenderService
 {
-}
+	Q_INTERFACES(cx::GUIExtenderService)
+public:
+	RegistrationHistoryGUIExtenderService(regServices services);
+	virtual ~RegistrationHistoryGUIExtenderService();
 
-RegistrationMethodCommandLinePluginActivator::~RegistrationMethodCommandLinePluginActivator()
-{}
+	virtual std::vector<CategorizedWidget> createWidgets() const;
 
-void RegistrationMethodCommandLinePluginActivator::start(ctkPluginContext* context)
-{
-	regServices services(context);
-	RegistrationMethodCommandLineService* service = new RegistrationMethodCommandLineService(services);
-	mRegistrationCommandLine = RegisteredService::create<RegistrationMethodCommandLineService>(context, service, RegistrationMethodService_iid);
-}
+private:
+	regServices mServices;
+};
 
-void RegistrationMethodCommandLinePluginActivator::stop(ctkPluginContext* context)
-{
-	mRegistrationCommandLine.reset();
-	Q_UNUSED(context);
-}
+} /* namespace cx */
 
-} // namespace cx
+
+#endif // CXREGISTRATIONHISTORYGUIEXTENDERSERVICE_H

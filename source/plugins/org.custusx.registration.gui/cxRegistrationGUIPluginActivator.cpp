@@ -36,7 +36,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 
 #include "cxRegistrationGUIExtenderService.h"
+#include "cxRegistrationHistoryGUIExtenderService.h"
 #include "cxRegisteredService.h"
+#include "cxRegistrationMethodServices.h"
 
 namespace cx
 {
@@ -52,11 +54,16 @@ RegistrationGUIPluginActivator::~RegistrationGUIPluginActivator()
 void RegistrationGUIPluginActivator::start(ctkPluginContext* context)
 {
 	mRegistration = RegisteredService::create<RegistrationGUIExtenderService>(context, GUIExtenderService_iid);
+
+	regServices services(context);
+	RegistrationHistoryGUIExtenderService *history = new RegistrationHistoryGUIExtenderService(services);
+	mRegistrationHistory = RegisteredServicePtr(new RegisteredService(context, history, GUIExtenderService_iid));
 }
 
 void RegistrationGUIPluginActivator::stop(ctkPluginContext* context)
 {
-  mRegistration.reset();
+	mRegistration.reset();
+	mRegistrationHistory.reset();
 	Q_UNUSED(context);
 }
 

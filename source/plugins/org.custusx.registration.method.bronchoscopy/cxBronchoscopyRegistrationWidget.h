@@ -33,8 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXBRONCHOSCOPYREGISTRATIONWIDGET_H
 #define CXBRONCHOSCOPYREGISTRATIONWIDGET_H
 
-//#include "cxPluginRegistrationExport.h"
-
 #include <QPushButton>
 #include "cxRegistrationBaseWidget.h"
 #include "cxForwardDeclarations.h"

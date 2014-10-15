@@ -37,10 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxRegistrationMethodVesselService.h"
 #include "cxRegisteredService.h"
-#include "cxRegistrationServiceProxy.h"
-#include "cxPatientModelServiceProxy.h"
-#include "cxVisualizationServiceProxy.h"
-#include "cxTrackingServiceProxy.h"
 
 namespace cx
 {
@@ -55,12 +51,7 @@ RegistrationMethodVesselPluginActivator::~RegistrationMethodVesselPluginActivato
 
 void RegistrationMethodVesselPluginActivator::start(ctkPluginContext* context)
 {
-	regServices services;
-	services.registrationService	= RegistrationServicePtr(new RegistrationServiceProxy(context));
-	services.patientModelService	= PatientModelServicePtr(new PatientModelServiceProxy(context));
-	services.visualizationService	= VisualizationServicePtr(new VisualizationServiceProxy(context));
-	services.trackingService		= TrackingServicePtr(new TrackingServiceProxy(context));
-
+	regServices services(context);
 	RegistrationMethodVesselImageToImageService* image2imageService = new RegistrationMethodVesselImageToImageService(services);
 
 	mRegistrationImageToImage = RegisteredServicePtr(new RegisteredService(context, image2imageService, RegistrationMethodService_iid));

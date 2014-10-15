@@ -69,6 +69,8 @@ public:
 	virtual void setLandmarkActive(QString uid, bool active);
 
 	virtual Transform3D get_rMpr() const;
+	virtual RegistrationHistoryPtr get_rMpr_History();
+
 	virtual ImagePtr getActiveImage() const;
 	virtual void setActiveImage(ImagePtr activeImage);
 

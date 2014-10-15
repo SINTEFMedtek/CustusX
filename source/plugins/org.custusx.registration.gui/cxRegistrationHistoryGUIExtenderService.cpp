@@ -30,35 +30,33 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxRegistrationMethodCommandLinePluginActivator.h"
-
-#include <QtPlugin>
-#include <iostream>
-
-#include "cxRegistrationMethodCommandLineService.h"
-#include "cxRegisteredService.h"
+#include "cxRegistrationHistoryGUIExtenderService.h"
+#include "ctkPluginContext.h"
+//#include "cxRegistrationWidget.h"
+#include "cxRegistrationHistoryWidget.h"
 
 namespace cx
 {
 
-RegistrationMethodCommandLinePluginActivator::RegistrationMethodCommandLinePluginActivator()
+
+RegistrationHistoryGUIExtenderService::RegistrationHistoryGUIExtenderService(regServices services) :
+	mServices(services)
 {
 }
 
-RegistrationMethodCommandLinePluginActivator::~RegistrationMethodCommandLinePluginActivator()
-{}
-
-void RegistrationMethodCommandLinePluginActivator::start(ctkPluginContext* context)
+RegistrationHistoryGUIExtenderService::~RegistrationHistoryGUIExtenderService()
 {
-	regServices services(context);
-	RegistrationMethodCommandLineService* service = new RegistrationMethodCommandLineService(services);
-	mRegistrationCommandLine = RegisteredService::create<RegistrationMethodCommandLineService>(context, service, RegistrationMethodService_iid);
 }
 
-void RegistrationMethodCommandLinePluginActivator::stop(ctkPluginContext* context)
+std::vector<GUIExtenderService::CategorizedWidget> RegistrationHistoryGUIExtenderService::createWidgets() const
 {
-	mRegistrationCommandLine.reset();
-	Q_UNUSED(context);
+	std::vector<CategorizedWidget> retval;
+
+	retval.push_back(GUIExtenderService::CategorizedWidget(
+						 new RegistrationHistoryWidget(mServices, NULL), "Browsing"));
+
+	return retval;
 }
 
-} // namespace cx
+
+} /* namespace cx */

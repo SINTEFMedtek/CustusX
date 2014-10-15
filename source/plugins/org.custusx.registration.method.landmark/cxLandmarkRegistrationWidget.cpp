@@ -43,13 +43,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkDoubleArray.h>
 #include <vtkImageData.h>
 #include "cxReporter.h"
-#include "cxRegistrationHistoryWidget.h"
 #include "cxTypeConversions.h"
 #include "cxManualTool.h"
-#include "cxToolManager.h"
 #include "cxPatientModelService.h"
 #include "cxRegistrationService.h"
 #include"cxData.h"
+
+#include "cxLegacySingletons.h"
+#include "cxToolManager.h"
 
 namespace cx
 {

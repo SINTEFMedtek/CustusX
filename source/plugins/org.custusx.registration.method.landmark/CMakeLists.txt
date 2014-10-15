@@ -8,12 +8,14 @@ include_directories(
     ${CX_RESOURCE_INCLUDE_DIRECTORIES}
     ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
     ${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
+    ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.registration
 	${CustusX_SOURCE_DIR}/source/modules/Acquisition/logic
 	${CustusX_SOURCE_DIR}/source/service/tracking
 	${CustusX_SOURCE_DIR}/source/service/visualization
 	${CustusX_SOURCE_DIR}/source/gui/infoWidgets
 	${CustusX_SOURCE_DIR}/source/logic
 
+	${CustusX_BINARY_DIR}/source/plugins/org.custusx.registration
 	${CustusX_BINARY_DIR}/source/modules/Acquisition
 	${CustusX_BINARY_DIR}/source/service/tracking
 	${CustusX_BINARY_DIR}/source/service/visualization
@@ -64,9 +66,9 @@ ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
     ${PLUGIN_target_libraries}   
     cxResourceWidgets
-    cxPluginUtilities
 	cxPluginAlgorithm
 	cxTrackingService
+	org_custusx_registration
     )
 
 ctkMacroBuildPlugin(
