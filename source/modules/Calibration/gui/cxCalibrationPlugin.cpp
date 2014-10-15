@@ -38,8 +38,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-CalibrationPlugin::CalibrationPlugin(PatientModelServicePtr patientModelService, AcquisitionDataPtr acquisitionData) :
+CalibrationPlugin::CalibrationPlugin(/*RegistrationServicePtr registrationService, VisualizationServicePtr visualizationService, */PatientModelServicePtr patientModelService, AcquisitionDataPtr acquisitionData) :
 		mAcquisitionData(acquisitionData),
+//		mRegistrationService(registrationService),
+//		mVisualizationService(visualizationService),
 		mPatientModelService(patientModelService)
 {
 }

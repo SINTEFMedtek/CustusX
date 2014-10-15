@@ -62,6 +62,7 @@ set(PLUGIN_target_libraries
 	cxTrackingService
 	cxResourceVisualization
 	org_custusx_registration
+#	cxGUIExtenderService
     )
 
 ctkMacroBuildPlugin(

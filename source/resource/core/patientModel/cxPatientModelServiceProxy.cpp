@@ -259,4 +259,9 @@ void PatientModelServiceProxy::setLandmarkActive(QString uid, bool active)
 	mPatientModelService->setLandmarkActive(uid, active);
 }
 
+RegistrationHistoryPtr PatientModelServiceProxy::get_rMpr_History()
+{
+	return mPatientModelService->get_rMpr_History();
+}
+
 } //cx

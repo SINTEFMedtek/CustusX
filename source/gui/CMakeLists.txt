@@ -40,8 +40,7 @@ cx_add_class_qt_moc(cxGui_SRCS
 	infoWidgets/cxDataMetricWrappers
 	infoWidgets/cxSamplerWidget
 	infoWidgets/cxFrameMetricWrapper
-    infoWidgets/cxToolMetricWrapper
-    infoWidgets/cxRegistrationHistoryWidget
+	infoWidgets/cxToolMetricWrapper
 	infoWidgets/cxMetricManager
 
     #----------------------

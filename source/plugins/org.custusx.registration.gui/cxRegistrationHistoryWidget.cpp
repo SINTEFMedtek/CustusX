@@ -38,16 +38,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVBoxLayout>
 #include "cxImage.h"
 #include "cxReporter.h"
-#include "cxDataManager.h"
-#include "cxToolManager.h"
-#include "cxViewManager.h"
+//#include "cxDataManager.h"
+//#include "cxViewManager.h"
 #include "cxTime.h"
 #include "cxTypeConversions.h"
+#include "cxPatientModelService.h"
+
+#include "cxLegacySingletons.h"
+#include "cxToolManager.h"
 
 namespace cx
 {
-RegistrationHistoryWidget::RegistrationHistoryWidget(QWidget* parent, bool compact) :
-		BaseWidget(parent, "RegistrationHistoryWidget", "Registration History")
+RegistrationHistoryWidget::RegistrationHistoryWidget(regServices services, QWidget* parent, bool compact) :
+	BaseWidget(parent, "RegistrationHistoryWidget", "Registration History"),
+	mServices(services)
 {
 	this->setWhatsThis(this->defaultWhatsThis());
 	this->setToolTip(this->defaultWhatsThis());
@@ -126,8 +130,8 @@ void RegistrationHistoryWidget::showEvent(QShowEvent* event)
 	QWidget::showEvent(event);
 
 	this->reconnectSlot();
-	connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SLOT(reconnectSlot()));
-	connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SLOT(updateSlot()));
+	connect(mServices.patientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &RegistrationHistoryWidget::reconnectSlot);
+	connect(mServices.patientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &RegistrationHistoryWidget::updateSlot);
 
 	updateSlot();
 }
@@ -140,8 +144,8 @@ void RegistrationHistoryWidget::hideEvent(QCloseEvent* event)
 	{
 		disconnect(mHistories[i].get(), SIGNAL(currentChanged()), this, SLOT(updateSlot()));
 	}
-	disconnect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SLOT(updateSlot()));
-	disconnect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SLOT(reconnectSlot()));
+	disconnect(mServices.patientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &RegistrationHistoryWidget::reconnectSlot);
+	disconnect(mServices.patientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &RegistrationHistoryWidget::updateSlot);
 }
 
 void RegistrationHistoryWidget::reconnectSlot()
@@ -234,9 +238,9 @@ void RegistrationHistoryWidget::setActiveTime(QDateTime active)
 std::vector<RegistrationHistoryPtr> RegistrationHistoryWidget::getAllRegistrationHistories()
 {
 	std::vector<RegistrationHistoryPtr> retval;
-	retval.push_back(dataManager()->get_rMpr_History());
+	retval.push_back(mServices.patientModelService->get_rMpr_History());
 
-	std::map<QString, DataPtr> data = dataManager()->getData();
+	std::map<QString, DataPtr> data = mServices.patientModelService->getData();
 	for (std::map<QString, DataPtr>::iterator iter = data.begin(); iter != data.end(); ++iter)
 	{
 		retval.push_back(iter->second->get_rMd_History());

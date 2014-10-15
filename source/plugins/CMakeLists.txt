@@ -58,6 +58,7 @@ set(CX_PLUGINS
   org.custusx.registration.method.vessel:ON
   org.custusx.registration.method.commandline:ON
   org.custusx.registration.method.plate:ON
+#  org.custusx.calibration:ON
   org.custusx.help:ON
 )
 

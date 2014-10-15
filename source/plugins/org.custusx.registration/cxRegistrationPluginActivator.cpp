@@ -52,26 +52,11 @@ RegistrationPluginActivator::~RegistrationPluginActivator()
 void RegistrationPluginActivator::start(ctkPluginContext* context)
 {
 	mRegistration = RegisteredService::create<RegistrationImplService>(context, RegistrationService_iid);
-
-
-	//TODO: publish additional registration widgets
-//	RegistrationHistoryWidgetService *i2i = new RegistrationHistoryWidgetService(services);
-//	WirePhantomWidgetService *i2i = new WirePhantomWidgetService(services);
-//	mRegistrationHistory = RegisteredServicePtr(new RegisteredService(context, i2i, GUIExtenderService_iid));
-//	mWirePhantomWidget = RegisteredServicePtr(new RegisteredService(context, i2i, GUIExtenderService_iid));
-
-	//TODO: Create services for these
-//	mRegistrationHistory = GUIExtenderService::CategorizedWidget(new RegistrationHistoryWidget(NULL), "Browsing");
-//	mWirePhantomWidget = GUIExtenderService::CategorizedWidget(new WirePhantomWidget(mRegistrationService, mVisualizationService, mPatientModelService, mAquisitionData, NULL), "Algorithms");
-
-
 }
 
 void RegistrationPluginActivator::stop(ctkPluginContext* context)
 {
 	mRegistration.reset();
-//	mRegistrationHistory.reset();
-//	mWirePhantomWidget.reset();
 	Q_UNUSED(context);
 }
 

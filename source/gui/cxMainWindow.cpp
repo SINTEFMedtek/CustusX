@@ -86,7 +86,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxConfig.h"
 #include "cxVLCRecorder.h"
 #include "cxSecondaryViewLayoutWindow.h"
-#include "cxRegistrationHistoryWidget.h"
+//#include "cxRegistrationHistoryWidget.h"
 #include "cxLogger.h"
 #include "cxLayoutInteractor.h"
 #include "cxNavigation.h"
@@ -969,10 +969,10 @@ void MainWindow::createToolBars()
 	toolOffsetToolBar->addWidget(createDataWidget(mVisualizationService, mPatientModelService, this, DoubleDataAdapterActiveToolOffset::create()));
 	this->registerToolBar(toolOffsetToolBar, "Toolbar");
 
-	QToolBar* registrationHistoryToolBar = addToolBar("Registration History");
-	registrationHistoryToolBar->setObjectName("RegistrationHistoryToolBar");
-	registrationHistoryToolBar->addWidget(new RegistrationHistoryWidget(this, true));
-	this->registerToolBar(registrationHistoryToolBar, "Toolbar");
+//	QToolBar* registrationHistoryToolBar = addToolBar("Registration History");
+//	registrationHistoryToolBar->setObjectName("RegistrationHistoryToolBar");
+//	registrationHistoryToolBar->addWidget(new RegistrationHistoryWidget(this, true));
+//	this->registerToolBar(registrationHistoryToolBar, "Toolbar");
 }
 
 void MainWindow::registerToolBar(QToolBar* toolbar, QString groupname)

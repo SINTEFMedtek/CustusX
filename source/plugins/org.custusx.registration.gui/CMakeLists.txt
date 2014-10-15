@@ -10,10 +10,12 @@ include_directories(
     ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.registration
     ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
     ${CustusX_SOURCE_DIR}/source/logic
+#	${CustusX_SOURCE_DIR}/source/gui/infoWidgets
 
     ${CustusX_BINARY_DIR}/source/plugins/org.custusx.registration
     ${CustusX_BINARY_DIR}/source/modules/GUIExtender
     ${CustusX_BINARY_DIR}/source/logic
+#	${CustusX_BINARY_DIR}/source/gui
 )
 
 set(PLUGIN_SRCS
@@ -21,12 +23,16 @@ set(PLUGIN_SRCS
   cxRegistrationGUIExtenderService.cpp
   cxRegistrationGUIExtenderService.h
   cxRegistrationWidget.cpp
+  cxRegistrationHistoryGUIExtenderService.cpp
+  cxRegistrationHistoryGUIExtenderService.h
+  cxRegistrationHistoryWidget.cpp
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
   cxRegistrationGUIPluginActivator.h
   cxRegistrationWidget.h
+  cxRegistrationHistoryWidget.h
 )
 
 # Qt Designer files which should be processed by Qts uic

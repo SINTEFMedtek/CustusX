@@ -33,14 +33,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXREGISTRATIONHISTORYWIDGET_H_
 #define CXREGISTRATIONHISTORYWIDGET_H_
 
-#include "cxGuiExport.h"
-
 #include <vector>
 #include <QtWidgets>
 
 #include "cxRegistrationTransform.h"
 #include "cxBaseWidget.h"
-#include "cxLegacySingletons.h"
+#include "cxRegistrationMethodServices.h"
 
 namespace cx
 {
@@ -59,12 +57,12 @@ namespace cx
  * \date 2010.03.17
  * \\author Christian Askeland, SINTEF
  */
-class cxGui_EXPORT RegistrationHistoryWidget : public BaseWidget
+class RegistrationHistoryWidget : public BaseWidget
 {
   Q_OBJECT
 
 public:
-  RegistrationHistoryWidget(QWidget* parent, bool compact = false);
+  RegistrationHistoryWidget(regServices services, QWidget* parent, bool compact = false);
   virtual ~RegistrationHistoryWidget();
   virtual QString defaultWhatsThis() const;
 
@@ -106,6 +104,8 @@ private:
 
   std::vector<RegistrationHistoryPtr> getAllRegistrationHistories();
   std::vector<RegistrationTransform> mergeHistory(const std::vector<RegistrationHistoryPtr>& allHistories);
+
+  regServices mServices;
 };
 
 /**
