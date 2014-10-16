@@ -88,7 +88,10 @@ function(cx_catch_add_master_exe)
 #        _cx_catch_generate_master_catch_using_libs(${TEST_EXE_NAME} ${cxtest_MAIN})
 #    endif()
     
-    cx_install_target(${TEST_EXE_NAME})
+	if(CX_APPLE)
+		set(TEST_EXE_NAME "Catch.app/Contents/MacOS/Catch")
+	endif()
+	cx_install_target(${TEST_EXE_NAME})
 
 endfunction()
 

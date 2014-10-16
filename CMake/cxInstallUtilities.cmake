@@ -268,10 +268,18 @@ function(cx_install_all_stored_targets BUNDLE_BINARY_DIR)
 		#message(STATUS "############################## All exes: " ${CX_APPLE_TARGETS_TO_COPY})
 		foreach(EXE ${CX_APPLE_TARGETS_TO_COPY} )
 			message(STATUS "Install target by file copy: " ${EXE})
-			install(FILES
-				${EXE}
-                                DESTINATION ${CX_INSTALL_BINARY_DIR}
-				PERMISSIONS ${CX_FULL_PERMISSIONS})
+			if(IS_DIRECTORY ${EXE})
+				install(DIRECTORY
+					${EXE}
+					DESTINATION ${CX_INSTALL_BINARY_DIR}
+					FILE_PERMISSIONS ${CX_FULL_PERMISSIONS}
+					DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS})
+			else()
+				install(FILES
+					${EXE}
+					DESTINATION ${CX_INSTALL_BINARY_DIR}
+					PERMISSIONS ${CX_FULL_PERMISSIONS})
+			endif()
 		endforeach()
 	else()
 		# NA: cx_install_target() does all the work.
