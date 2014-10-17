@@ -44,7 +44,7 @@ set(CX_PLUGINS
   org.custusx.core.visualization:ON
   org.custusx.core.tracking:ON
   org.custusx.core.video:ON
-  org.custusx.dicom:ON
+#  org.custusx.dicom:OFF
 #  org.custusx.example:OFF
   org.custusx.vnnclreconstruction:ON
   org.custusx.pnnreconstruction:ON
@@ -61,6 +61,14 @@ set(CX_PLUGINS
 #  org.custusx.calibration:ON
   org.custusx.help:ON
 )
+
+# DICOM/CTK currently not linking on mac (dcmtk libs not found)
+if (NOT CX_APPLE)
+	set(CX_PLUGINS
+	  ${CX_PLUGINS}
+	  org.custusx.dicom:ON
+)
+endif()
 
 #foreach(var ${CX_PLUGINS})
 #  message("==plugin: " ${var})
