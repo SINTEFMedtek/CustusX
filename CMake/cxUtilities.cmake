@@ -149,7 +149,7 @@ MACRO(cx_get_git_build_description RESULT)
 	find_package(Git REQUIRED)
 	IF(WIN32)
 	    execute_process(
-		    COMMAND "C:/Program Files (x86)/Git/bin/git.exe" describe --tags
+		    COMMAND "git.exe" describe --tags
 		    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 		    OUTPUT_VARIABLE ${RESULT}
 		    )
