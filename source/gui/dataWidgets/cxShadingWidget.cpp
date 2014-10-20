@@ -116,14 +116,7 @@ void ShadingWidget::activeImageChangedSlot()
 
 QString ShadingWidget::defaultWhatsThis() const
 {
-	return "";
-//	return "<html>"
-//		"<h3>Shading</h3>"
-//		"<p>"
-//		"Set volume shading properties."
-//		"</p>"
-//		"<p><i></i></p>"
-//		"</html>";
+	return "<html></html>";
 }
 
 }//namespace cx

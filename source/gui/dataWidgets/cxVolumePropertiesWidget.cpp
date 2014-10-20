@@ -93,12 +93,7 @@ VolumePropertiesWidget::VolumePropertiesWidget(PatientModelServicePtr patientMod
 
 QString VolumePropertiesWidget::defaultWhatsThis() const
 {
-	return "";
-//  return "<html>"
-//      "<h3>Volume properties</h3>"
-//      "<p>Displays and adjusts information about a selected volume.</p>"
-//      "<p><i>Click the tabs to see what properties can be changed.</i></p>"
-//      "</html>";
+	return "<html></html>";
 }
 
 }//namespace

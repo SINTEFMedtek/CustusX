@@ -80,12 +80,7 @@ void VolumeInfoWidget::addWidgets()
 
 QString VolumeInfoWidget::defaultWhatsThis() const
 {
-	return "";
-//  return "<html>"
-//      "<h3>Volume information</h3>"
-//      "<p>Displays information about a selected volume.</p>"
-//      "<p><i></i></p>"
-//      "</html>";
+	return "<html></html>";
 }
 
 void VolumeInfoWidget::updateSlot()

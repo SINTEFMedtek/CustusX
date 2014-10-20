@@ -77,7 +77,7 @@ LabeledComboBoxWidget::LabeledComboBoxWidget(QWidget* parent, StringDataAdapterP
 
 QString LabeledComboBoxWidget::defaultWhatsThis() const
 {
-	return "";
+	return "<html></html>";
 }
 
 void LabeledComboBoxWidget::comboIndexChanged(int index)

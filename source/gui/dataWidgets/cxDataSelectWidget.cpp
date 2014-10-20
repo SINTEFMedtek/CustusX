@@ -161,7 +161,7 @@ void DataSelectWidget::updateDataVisibility()
 
 QString DataSelectWidget::defaultWhatsThis() const
 {
-    return "";
+	return "<html></html>";
 }
 
 /** If button is checked (first press), do nothing, except
