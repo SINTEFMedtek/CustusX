@@ -237,7 +237,7 @@ TEST_CASE("Visual rendering: Show ACS+3D, centered hidden tool",
 }
 
 TEST_CASE("Visual rendering: Show layout, clear, show new layout",
-		  "[unit][resource][visualization][not_win32][not_win64]")
+		  "[unit][resource][visualization][not_win32][not_win64][hide]")
 {
 	cxtest::ViewsFixture fixture;
 	ImageTestList imagenames;

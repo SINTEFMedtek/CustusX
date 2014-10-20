@@ -18,7 +18,7 @@ class ShellCommand:
             self.process = process
         def __nonzero__(self):
             'makes type convertible to bool - evaluate to True when zero retcode.'
-            return self.returncode == 0
+            return self.returncode == 0        
     
     def run(self):
         pass
@@ -87,6 +87,7 @@ class ShellCommandReal(ShellCommand):
                 self._printOutput(line.rstrip())
             if self.keep_output:
                 output.append(line) 
+        p.returncode = self._convertCatchReturnCode139ToSegfault(p.returncode)
         return ShellCommand.ReturnValue(stdout="".join(output), returncode=p.returncode, process=p)
 #        return p
 
