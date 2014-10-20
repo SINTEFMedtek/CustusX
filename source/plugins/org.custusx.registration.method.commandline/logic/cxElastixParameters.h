@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxForwardDeclarations.h"
 #include "cxXmlOptionItem.h"
 #include "cxStringDataAdapterXml.h"
+#include "org_custusx_registration_method_commandline_Export.h"
 
 namespace cx
 {
@@ -51,7 +52,7 @@ namespace cx
  * \date Apr 10, 2013
  * \author Christian Askeland, SINTEF
  */
-class ElastixParameters : public QObject
+class org_custusx_registration_method_commandline_EXPORT ElastixParameters : public QObject
 {
     Q_OBJECT
 public:

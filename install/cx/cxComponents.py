@@ -409,6 +409,8 @@ class CustusX(CppComponent):
             if lib.pluginPath() and os.path.exists(lib.pluginPath()):
                 add('CX_EXTERNAL_PLUGIN_%s'%lib.name(), lib.pluginPath())
         
+        add('CX_PLUGIN_org.custusx.ussimulator:BOOL', False);
+
         if self.controlData.force_connect_sublibraries:
             self.forceConnectSublibraries(add)
         cmakeOptions = ''
@@ -422,7 +424,7 @@ class CustusX(CppComponent):
 #        add('CX_USE_TSF:BOOL', platform.system() != 'Windows');
         add('CX_PLUGIN_org.custusx.filter.levelset:BOOL', platform.system() == 'Linux');
         add('CX_PLUGIN_org.custusx.filter.tubesegmentation:BOOL', platform.system() != 'Windows');
-        add('CX_PLUGIN_org.custusx.ussimulator:BOOL', platform.system() != 'Linux');
+#        add('CX_PLUGIN_org.custusx.ussimulator:BOOL', platform.system() != 'Linux');
         add('CX_USE_ISB_GE:BOOL', platform.system() != 'Windows');
         add('CX_BUILD_MEHDI_VTKMULTIVOLUME:BOOL', False);
         

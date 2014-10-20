@@ -29,6 +29,8 @@ set(PLUGIN_SRCS
   cxRegistrationMethodServices.cpp
   cxRegistrationMethodServices.h
 
+  cxRegistrationMethodService.h
+
   cxRegistrationServiceNull.cpp
   cxRegistrationServiceNull.h
   cxRegistrationService.cpp

@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QString;
 class QDateTime;
 class ctkPluginContext;
+#include "org_custusx_registration_Export.h"
 
 namespace cx
 {
@@ -57,7 +58,7 @@ typedef boost::shared_ptr<class Data> DataPtr;
  *  \date 2014-09-10
  *  \author Ole Vegard Solberg, SINTEF
  */
-class RegistrationServiceProxy : public RegistrationService
+class org_custusx_registration_EXPORT RegistrationServiceProxy : public RegistrationService
 {
 	Q_OBJECT
 public:

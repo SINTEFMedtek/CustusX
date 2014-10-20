@@ -46,7 +46,7 @@ namespace cx
  *  \date 2014-08-28
  *  \author Ole Vegard Solberg, SINTEF
  */
-class cxResource_EXPORT RegistrationServiceNull : public RegistrationService
+class RegistrationServiceNull : public RegistrationService
 {
 
 public:

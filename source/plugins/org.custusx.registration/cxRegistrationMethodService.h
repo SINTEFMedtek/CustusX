@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <boost/shared_ptr.hpp>
 #include "cxRegistrationMethodServices.h"
+#include "org_custusx_registration_Export.h"
 
 #define RegistrationMethodService_iid "cx::RegistrationMethodService"
 
@@ -53,7 +54,7 @@ namespace cx
  *  \author Ole Vegard Solberg, SINTEF
  *  \author Geir Arne Tangen, SINTEF
  */
-class RegistrationMethodService : public QObject
+class org_custusx_registration_EXPORT RegistrationMethodService : public QObject
 {
 	Q_OBJECT
 public:
