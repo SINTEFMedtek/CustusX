@@ -52,13 +52,17 @@ class CppBuilder:
             if(self.controlData.getCMakeGenerator() == 'Eclipse CDT4 - Ninja'):
                 runShell('''ninja''')
         else:
+            maker = 'make -j%s' % str(self.controlData.threads)
+            if(self.controlData.getCMakeGenerator() == 'Eclipse CDT4 - Ninja'):
+                maker = 'ninja'
+
             # the export DYLD... line is a hack to get shared linking to work on MacOS with vtk5.6
             # - http://www.mail-archive.com/paraview@paraview.org/msg07520.html
             # (add it to all project because it does no harm if not needed)
             runShell('''\
     export DYLD_LIBRARY_PATH=`pwd`/bin; \
-    make -j%s
-    ''' % str(self.controlData.threads))
+    %s
+    ''' % maker)
 
     def gitClone(self, repository, folder=''):
         self._changeDirToBase()

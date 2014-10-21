@@ -41,7 +41,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataLocations.h"
 #include "cxVideoServiceOld.h"
 #include "cxVideoConnectionManager.h"
-#include "cxReconstructionManager.h"
 #include "cxLogger.h"
 #include "cxUSFrameData.h"
 #include "cxUsReconstructionFileReader.h"
@@ -53,6 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxStateService.h"
 #include "cxLegacySingletons.h"
 #include "cxVideoService.h"
+#include "cxUsReconstructionService.h"
 
 namespace cxtest
 {
@@ -79,18 +79,6 @@ AcquisitionFixture::AcquisitionFixture(QObject* parent) :
 AcquisitionFixture::~AcquisitionFixture()
 {
 	this->tearDown();
-}
-
-cx::ReconstructManagerPtr AcquisitionFixture::createReconstructionManager()
-{
-	mRecordDuration = 3000;
-	cx::XmlOptionFile settings;
-	cx::ReconstructionManagerPtr reconstructer(new cx::ReconstructionManager(settings,""));
-
-	reconstructer->setOutputBasePath(cx::DataLocations::getTestDataPath() + "/temp/");
-	reconstructer->setOutputRelativePath("Images");
-
-	return reconstructer;
 }
 
 void AcquisitionFixture::setupVideo()
@@ -136,7 +124,9 @@ void AcquisitionFixture::initialize()
 
 	qApp->processEvents(); // wait for stateservice to finish init of application states - needed before load patient.
 	cx::patientService()->getPatientData()->newPatient(cx::DataLocations::getTestDataPath() + "/temp/Acquisition/");
-	mAcquisitionData.reset(new cx::AcquisitionData(this->createReconstructionManager()));
+
+	//Mock UsReconstructionService with null object
+	mAcquisitionData.reset(new cx::AcquisitionData(cx::UsReconstructionService::getNullObject()));
 
 	mAcquisitionBase.reset(new cx::Acquisition(mAcquisitionData));
 	mAcquisition.reset(new cx::USAcquisition(mAcquisitionBase));

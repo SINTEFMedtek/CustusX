@@ -66,6 +66,8 @@ public:
 
 	virtual void setRegistrationMode(REGISTRATION_STATUS mode) = 0;
 
+	virtual void autoShowData(DataPtr data) = 0;
+
 	virtual bool isNull() = 0;
 	static VisualizationServicePtr getNullObject();
 

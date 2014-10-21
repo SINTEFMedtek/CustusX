@@ -152,6 +152,7 @@ signals:
 	void cleared();
 	void isSaving();
 	void isLoading();
+	void patientChanged();
 };
 
 } // namespace cx
