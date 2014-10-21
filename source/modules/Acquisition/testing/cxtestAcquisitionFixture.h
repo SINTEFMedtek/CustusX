@@ -74,7 +74,6 @@ private:
 	void setUp();
 	void tearDown();
 
-	cx::ReconstructManagerPtr createReconstructionManager();
 	void verifyFileData(cx::USReconstructInputData data);
 
 	cx::USReconstructInputData mMemOutputData;

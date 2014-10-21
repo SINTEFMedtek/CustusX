@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReporter.h"
 #include "cxToolManager.h"
 #include "cxSettings.h"
+#include "cxUsReconstructionService.h"
 
 #include "cxLegacySingletons.h"
 
@@ -49,7 +50,7 @@ namespace cx
 AcquisitionData::AcquisitionData()
 {}
 
-AcquisitionData::AcquisitionData(ReconstructManagerPtr reconstructer) :
+AcquisitionData::AcquisitionData(UsReconstructionServicePtr reconstructer) :
 	mReconstructer(reconstructer)
 {
 

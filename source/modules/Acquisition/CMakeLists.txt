@@ -69,13 +69,10 @@ include_directories(
     ${CustusX_SOURCE_DIR}/source/service/visualization
     ${CustusX_SOURCE_DIR}/source/logic
 
-    ${CustusX_SOURCE_DIR}/source/modules/UsReconstruction/logic
-    ${CustusX_SOURCE_DIR}/source/modules/UsReconstruction/logic/3DReconstruction
     ${CustusX_SOURCE_DIR}/source/modules/Algorithm/logic
     ${CustusX_SOURCE_DIR}/source/modules/Algorithm/gui
     ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
 
-#    ${CustusX_SOURCE_DIR}/source/algorithms
     ${CustusX_SOURCE_DIR}/source/gui/utilities
     ${CustusX_SOURCE_DIR}/source/gui/dataAdapters
     ${CustusX_SOURCE_DIR}/source/gui/toolWidgets
@@ -86,15 +83,17 @@ include_directories(
     ${CustusX_BINARY_DIR}/source/service/visualization
     ${CustusX_BINARY_DIR}/source/modules/Algorithm
     ${CustusX_BINARY_DIR}/source/modules/GUIExtender
-    ${CustusX_BINARY_DIR}/source/modules/UsReconstruction
     ${CustusX_BINARY_DIR}/source/gui
     ${CustusX_BINARY_DIR}/source/logic
+
+    ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.usreconstruction
+    ${CustusX_BINARY_DIR}/source/plugins/org.custusx.usreconstruction
     )
 
 set(CX_ACQUISITION_LIBRARIES
-                        cxPluginAlgorithm
-                        cxPluginUSReconstruction
-                        cxGui)
+    cxPluginAlgorithm
+    org_custusx_usreconstruction
+    cxGui)
 # =========================================================
 cx_remove_duplicate_include_directories()
 cx_create_export_header("cxPluginAcquisition")

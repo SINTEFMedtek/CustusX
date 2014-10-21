@@ -58,7 +58,9 @@ set(CX_PLUGINS
   org.custusx.registration.method.vessel:ON
   org.custusx.registration.method.commandline:ON
   org.custusx.registration.method.plate:ON
+  org.custusx.usreconstruction:ON
 #  org.custusx.calibration:ON
+#  org.custusx.acquisition:ON
   org.custusx.help:ON
 )
 if(CX_WINDOWS)

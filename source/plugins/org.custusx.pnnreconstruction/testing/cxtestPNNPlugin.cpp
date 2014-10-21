@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "catch.hpp"
 #include <QDomElement>
-#include "cxPNNReconstructionService.h"
+#include "cxPNNReconstructionMethodService.h"
 #include "cxDummyTool.h"
 #include "cxReporter.h"
 #include "cxtestReconstructionAlgorithmFixture.h"
@@ -55,7 +55,7 @@ TEST_CASE("ReconstructAlgorithm: PNN on sphere","[unit][usreconstruction][synthe
 	fixture.setVerbose(true);
 	fixture.getInputGenerator()->setSpherePhantom();
 
-	fixture.setAlgorithm(cx::PNNReconstructionService::create(pluginContext));
+	fixture.setAlgorithm(cx::PNNReconstructionMethodService::create(pluginContext));
 	fixture.reconstruct(settings);
 
 	fixture.checkRMSBelow(20.0);
@@ -89,7 +89,7 @@ TEST_CASE("ReconstructAlgorithm: PNN on sphere, tilt","[unit][usreconstruction][
 	generator->setSpherePhantom();
 	fixture.defineOutputVolume(100, 2);
 
-	fixture.setAlgorithm(cx::PNNReconstructionService::create(pluginContext));
+	fixture.setAlgorithm(cx::PNNReconstructionMethodService::create(pluginContext));
 	fixture.reconstruct(settings);
 
 	fixture.checkRMSBelow(30.0);

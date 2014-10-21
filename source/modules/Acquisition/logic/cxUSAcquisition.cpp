@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxUSAcquisition.h"
 
-#include "cxReconstructionManager.h"
+//#include "cxReconstructionManager.h"
 #include "cxReconstructParams.h"
 #include "cxBoolDataAdapterXml.h"
 
@@ -45,6 +45,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxUSSavingRecorder.h"
 #include "cxDataManager.h"
 #include "cxAcquisitionData.h"
+#include "cxUsReconstructionService.h"
+#include "cxUSReconstructInputData.h"
 
 namespace cx
 {

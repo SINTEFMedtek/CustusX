@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSettings.h"
 #include "cxToolDataAdapters.h"
 #include "cxDoubleDataAdapterTemporalCalibration.h"
-#include "cxReconstructionManager.h"
+//#include "cxReconstructionManager.h"
 #include "cxTimedAlgorithmProgressBar.h"
 #include "cxProbeConfigWidget.h"
 #include "cxDisplayTimerWidget.h"
@@ -54,6 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTimedAlgorithm.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxStringDataAdapterXml.h"
+#include "cxUsReconstructionService.h"
 
 namespace cx
 {
@@ -64,9 +65,9 @@ USAcqusitionWidget::USAcqusitionWidget(AcquisitionDataPtr pluginData, QWidget* p
 	this->setObjectName("USAcqusitionWidget");
 	this->setWindowTitle("US Acquisition");
 
-	connect(mPluginData->getReconstructer().get(), SIGNAL(reconstructAboutToStart()), this, SLOT(reconstructAboutToStartSlot()));
-	connect(mPluginData->getReconstructer().get(), SIGNAL(reconstructStarted()), this, SLOT(reconstructStartedSlot()));
-	connect(mPluginData->getReconstructer().get(), SIGNAL(reconstructFinished()), this, SLOT(reconstructFinishedSlot()));
+	connect(mPluginData->getReconstructer().get(), &UsReconstructionService::reconstructAboutToStart, this, &USAcqusitionWidget::reconstructAboutToStartSlot);
+	connect(mPluginData->getReconstructer().get(), &UsReconstructionService::reconstructStarted, this, &USAcqusitionWidget::reconstructStartedSlot);
+	connect(mPluginData->getReconstructer().get(), &UsReconstructionService::reconstructFinished, this, &USAcqusitionWidget::reconstructFinishedSlot);
 
 	mAcquisition.reset(new USAcquisition(mBase));
 	connect(mAcquisition.get(), SIGNAL(acquisitionDataReady()), this, SLOT(acquisitionDataReadySlot()));

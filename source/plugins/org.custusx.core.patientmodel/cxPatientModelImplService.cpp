@@ -56,6 +56,7 @@ PatientModelImplService::PatientModelImplService(ctkPluginContext *context) :
 	connect(patientService()->getPatientData().get(), &PatientData::cleared, this, &PatientModelService::cleared);
 	connect(patientService()->getPatientData().get(), &PatientData::isSaving, this, &PatientModelService::isSaving);
 	connect(patientService()->getPatientData().get(), &PatientData::isLoading, this, &PatientModelService::isLoading);
+	connect(patientService()->getPatientData().get(), &PatientData::patientChanged, this, &PatientModelService::patientChanged);
 }
 
 PatientModelImplService::~PatientModelImplService()
@@ -71,6 +72,7 @@ PatientModelImplService::~PatientModelImplService()
 		disconnect(patientService()->getPatientData().get(), &PatientData::cleared, this, &PatientModelService::cleared);
 		disconnect(patientService()->getPatientData().get(), &PatientData::isSaving, this, &PatientModelService::isSaving);
 		disconnect(patientService()->getPatientData().get(), &PatientData::isLoading, this, &PatientModelService::isLoading);
+		disconnect(patientService()->getPatientData().get(), &PatientData::patientChanged, this, &PatientModelService::patientChanged);
 	}
 }
 

@@ -51,6 +51,8 @@ public:
 
 	virtual void setRegistrationMode(REGISTRATION_STATUS mode);
 
+	virtual void autoShowData(DataPtr data);
+
 	virtual bool isNull();
 private:
 	void printWarning() const;

@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtPlugin>
 #include <iostream>
 
-#include "cxPNNReconstructionService.h"
+#include "cxPNNReconstructionMethodService.h"
 #include "cxRegisteredService.h"
 
 namespace cx
@@ -51,7 +51,7 @@ PNNReconstructionPluginActivator::~PNNReconstructionPluginActivator()
 
 void PNNReconstructionPluginActivator::start(ctkPluginContext* context)
 {
-	mRegistration = RegisteredService::create<PNNReconstructionService>(context, ReconstructionService_iid);
+	mRegistration = RegisteredService::create<PNNReconstructionMethodService>(context, ReconstructionMethodService_iid);
 }
 
 void PNNReconstructionPluginActivator::stop(ctkPluginContext* context)

@@ -71,4 +71,9 @@ void VisualizationServiceNull::setRegistrationMode(cx::REGISTRATION_STATUS mode)
 	printWarning();
 }
 
+void VisualizationServiceNull::autoShowData(cx::DataPtr data)
+{
+	printWarning();
+}
+
 } //cx

@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QtPlugin>
 #include <iostream>
-#include "cxVNNclReconstructionService.h"
+#include "cxVNNclReconstructionMethodService.h"
 #include "cxRegisteredService.h"
 
 namespace cx
@@ -51,7 +51,7 @@ VNNclPluginActivator::~VNNclPluginActivator()
 
 void VNNclPluginActivator::start(ctkPluginContext* context)
 {
-	mRegistration = RegisteredService::create<VNNclReconstructionService>(context, ReconstructionService_iid);
+	mRegistration = RegisteredService::create<VNNclReconstructionMethodService>(context, ReconstructionMethodService_iid);
 }
 
 void VNNclPluginActivator::stop(ctkPluginContext* context)
