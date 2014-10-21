@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <boost/shared_ptr.hpp>
 #include <set>
-#include <QObject.h>
+#include <QObject>
 
 #include "cxForwardDeclarations.h"
 
