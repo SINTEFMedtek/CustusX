@@ -81,13 +81,11 @@ public:
 	virtual std::vector<RepPtr> getReps(); ///< Returns all reps in the view
 	virtual void removeReps(); ///< Removes all reps in the view
 	virtual void setBackgroundColor(QColor color);
-	virtual void render(); ///< render the view contents if vtk-MTimes are changed
 
-	virtual void setModified() { mMTimeHash = 0; }
+	virtual void setModified();
 	int computeTotalMTime();
 
 	QColor mBackgroundColor;
-	unsigned long mMTimeHash; ///< sum of all MTimes in objects rendered
 	QString mUid; ///< The view's unique id
 	QString mName; ///< The view's name
 	vtkRenderWindowPtr mRenderWindow;
