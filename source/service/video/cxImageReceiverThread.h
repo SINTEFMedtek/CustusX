@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXImageReceiverThread_H_
 #define CXImageReceiverThread_H_
 
-#include "cxVideoServiceExport.h"
+#include "cxVideoServiceOldExport.h"
 
 #include <vector>
 #include "boost/shared_ptr.hpp"
@@ -57,7 +57,7 @@ typedef boost::shared_ptr<class CyclicActionLogger> CyclicActionLoggerPtr;
  */
 
 
-class cxVideoService_EXPORT AbsDoubleLess
+class cxVideoServiceOld_EXPORT AbsDoubleLess
 {
 public:
 	AbsDoubleLess(double center) : mCenter(center) { };
@@ -83,7 +83,7 @@ typedef boost::shared_ptr<class ImageReceiverThread> ImageReceiverThreadPtr;
  * \date Oct 11, 2012
  * \author Christian Askeland, SINTEF
  */
-class cxVideoService_EXPORT ImageReceiverThread: public QThread
+class cxVideoServiceOld_EXPORT ImageReceiverThread: public QThread
 {
 Q_OBJECT
 public:

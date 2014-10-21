@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVISUALIZATIONSERVICEPROXY_H
 #define CXVISUALIZATIONSERVICEPROXY_H
 
+#include "cxResourceVisualizationExport.h"
+
 #include "cxVisualizationService.h"
 #include "cxServiceTrackerListener.h"
 class ctkPluginContext;
@@ -40,7 +42,7 @@ class ctkPluginContext;
 namespace cx
 {
 
-class VisualizationServiceProxy : public VisualizationService
+class cxResourceVisualization_EXPORT VisualizationServiceProxy : public VisualizationService
 {
 public:
 	VisualizationServiceProxy(ctkPluginContext *pluginContext);

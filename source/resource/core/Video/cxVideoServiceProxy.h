@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVIDEOSERVICEPROXY_H
 #define CXVIDEOSERVICEPROXY_H
 
+#include "cxResourceExport.h"
+
 #include "cxVideoService.h"
 #include "cxServiceTrackerListener.h"
 class ctkPluginContext;
@@ -40,7 +42,7 @@ class ctkPluginContext;
 namespace cx
 {
 
-class VideoServiceProxy : public VideoService
+class cxResource_EXPORT VideoServiceProxy : public VideoService
 {
 public:
 	VideoServiceProxy(ctkPluginContext *pluginContext);

@@ -172,7 +172,7 @@ class Common(object):
         if self.jom:
             return "NMake Makefiles JOM"
         if self.ninja:
-            return 'Ninja'
+            return 'Eclipse CDT4 - Ninja'
         if platform.system() == 'Windows':
             return 'Eclipse CDT4 - NMake Makefiles' # need to surround with ' ' instead of " " on windows for it to work
         return "Eclipse CDT4 - Unix Makefiles" 

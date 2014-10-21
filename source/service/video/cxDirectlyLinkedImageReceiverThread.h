@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDirectlyLinkedImageReceiverThread_H_
 #define CXDirectlyLinkedImageReceiverThread_H_
 
-#include "cxVideoServiceExport.h"
+#include "cxVideoServiceOldExport.h"
 
 #include "boost/shared_ptr.hpp"
 
@@ -62,7 +62,7 @@ typedef boost::shared_ptr<class DirectlyLinkedImageReceiverThread> DirectlyLinke
  *  \author Christian Askeland, SINTEF
  *  \author Janne Beate Bakeng, SINTEF
  */
-class cxVideoService_EXPORT DirectlyLinkedImageReceiverThread: public ImageReceiverThread
+class cxVideoServiceOld_EXPORT DirectlyLinkedImageReceiverThread: public ImageReceiverThread
 {
 	Q_OBJECT
 

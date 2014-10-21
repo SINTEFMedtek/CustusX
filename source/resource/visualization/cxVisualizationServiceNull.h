@@ -33,11 +33,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVISUALIZATIONSERVICENULL_H
 #define CXVISUALIZATIONSERVICENULL_H
 
+#include "cxResourceVisualizationExport.h"
+
 #include "cxVisualizationService.h"
 
 namespace cx
 {
-class VisualizationServiceNull : public VisualizationService
+class cxResourceVisualization_EXPORT VisualizationServiceNull : public VisualizationService
 {
 public:
 	VisualizationServiceNull();

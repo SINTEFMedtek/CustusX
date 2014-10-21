@@ -49,6 +49,8 @@ class CppBuilder:
                 runShell('nmake')
             if(self.controlData.getCMakeGenerator() == 'NMake Makefiles JOM'):
                 runShell('''jom -k -j%s''' % str(self.controlData.threads))
+            if(self.controlData.getCMakeGenerator() == 'Eclipse CDT4 - Ninja'):
+                runShell('''ninja''')
         else:
             # the export DYLD... line is a hack to get shared linking to work on MacOS with vtk5.6
             # - http://www.mail-archive.com/paraview@paraview.org/msg07520.html

@@ -18,7 +18,7 @@
 
 SET( CX_QT_MOC_HEADER_FILES
     cxBasicVideoSource.h
-        cxVideoServiceOld.h
+    cxVideoServiceOld.h
     cxVideoConnectionManager.h
     cxVideoConnection.h
     cxPlaybackUSAcquisitionVideo.h
@@ -28,6 +28,7 @@ SET( CX_QT_MOC_HEADER_FILES
 )
 
 SET (cxVideoServiceOld_SOURCE
+    ${CX_QT_MOC_HEADER_FILES}
     cxBasicVideoSource.h
 	cxBasicVideoSource.cpp
 	cxVideoServiceOld.cpp
@@ -72,8 +73,8 @@ include_directories(
 
 
 cx_remove_duplicate_include_directories()
-cx_create_export_header("cxVideoService")
 QT5_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
+cx_create_export_header("cxVideoServiceOld")
 
 
 add_library( cxVideoServiceOld ${cxVideoServiceOld_SOURCE} ${MOC_HEADER_FILES} )

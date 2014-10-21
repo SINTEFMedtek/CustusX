@@ -247,7 +247,7 @@ TEST_CASE("Visual rendering: Show layout, clear, show new layout",
 	fixture.defineSlice("C", imagenames.image[0], cx::ptCORONAL, 1, 0);
 	fixture.defineSlice("S", imagenames.image[0], cx::ptSAGITTAL, 0, 1);
 	REQUIRE(fixture.quickRunWidget());
-    sleep(1);
+    cxtest::Utilities::sleep_sec(1);
 
 
     std::cout << "===== CLEAR START" << std::endl;
@@ -255,7 +255,7 @@ TEST_CASE("Visual rendering: Show layout, clear, show new layout",
 	fixture.clear();
     std::cout << "===== CLEAR STOP" << std::endl;
     REQUIRE(fixture.quickRunWidget());
-    sleep(1);
+    cxtest::Utilities::sleep_sec(1);
 //    return;
 
     std::cout << "===== DEFINE 2 START" << std::endl;
@@ -267,7 +267,7 @@ TEST_CASE("Visual rendering: Show layout, clear, show new layout",
     REQUIRE(fixture.quickRunWidget());
 //    REQUIRE(fixture.quickRunWidget());
     REQUIRE(fixture.runWidget());
-    sleep(1);
+    cxtest::Utilities::sleep_sec(1);
 
 	CHECK(fixture.getFractionOfBrightPixelsInView(0,0) > 0.02);
 	CHECK(fixture.getFractionOfBrightPixelsInView(1,20) > 0.02);

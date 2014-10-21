@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTRACKINGSERVICEPROXY_H
 #define CXTRACKINGSERVICEPROXY_H
 
+#include "cxResourceExport.h"
+
 #include "cxTrackingService.h"
 #include "cxServiceTrackerListener.h"
 class ctkPluginContext;
@@ -40,7 +42,7 @@ class ctkPluginContext;
 namespace cx
 {
 
-class TrackingServiceProxy : public TrackingService
+class cxResource_EXPORT TrackingServiceProxy : public TrackingService
 {
 public:
 	TrackingServiceProxy(ctkPluginContext *pluginContext);

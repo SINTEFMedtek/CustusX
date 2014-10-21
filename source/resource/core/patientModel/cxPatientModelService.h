@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPATIENTMODELSERVICE_H_
 #define CXPATIENTMODELSERVICE_H_
 
+#include "cxResourceExport.h"
+
 #include <QObject>
 #include <map>
 #include "boost/shared_ptr.hpp"
@@ -78,7 +80,7 @@ typedef boost::shared_ptr<class RegistrationHistory> RegistrationHistoryPtr;
  *  \author Christian Askeland, SINTEF
  *  \author Ole Vegard Solberg, SINTEF
  */
-class PatientModelService : public QObject
+class cxResource_EXPORT PatientModelService : public QObject
 {
 	Q_OBJECT
 public:

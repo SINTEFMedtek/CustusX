@@ -33,11 +33,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVIDEOSERVICENULL_H
 #define CXVIDEOSERVICENULL_H
 
+#include "cxResourceExport.h"
+
 #include "cxVideoService.h"
 
 namespace cx
 {
-class VideoServiceNull : public VideoService
+class cxResource_EXPORT VideoServiceNull : public VideoService
 {
 public:
 	VideoServiceNull();

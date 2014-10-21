@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXActiveImageProxyOld_H_
 #define CXActiveImageProxyOld_H_
 
+#include "cxPatientServiceExport.h"
+
 #include <QObject>
 #include "cxForwardDeclarations.h"
 
@@ -59,7 +61,7 @@ typedef boost::shared_ptr<class ActiveImageProxyOld> ActiveImageProxyOldPtr;
  * NB: This is a deprecated class that will be removed as soon as possible. Use ActiveImageProxy instead
  *
  */
-class ActiveImageProxyOld: public QObject
+class cxPatientService_EXPORT ActiveImageProxyOld: public QObject
 {
 Q_OBJECT
 public:

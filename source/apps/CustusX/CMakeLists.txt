@@ -34,6 +34,7 @@ include_directories(
     ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
 	${CustusX_BINARY_DIR}/source/resource
 	${CustusX_SOURCE_DIR}/source/resource/visualization
+	${CustusX_BINARY_DIR}/source/resource/visualization
 	)
 
 #------------------------------------------------------------------------------

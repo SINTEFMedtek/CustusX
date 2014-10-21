@@ -114,8 +114,9 @@ function(_cx_catch_generate_master_catch_using_sources EXE_NAME PATH_TO_MAIN)
         #add_definitions(-DcxResourceVisualizationTestUtilities_EXPORTS)
     endif(WIN32)
     # required to compile some eigen code on at least Ubuntu
-    SET ( CMAKE_CXX_FLAGS "-ftemplate-depth=1024" CACHE STRING "Allow heavy templated Eigen code" FORCE)
-
+    if(CX_LINUX)
+        SET ( CMAKE_CXX_FLAGS "-ftemplate-depth=1024" CACHE STRING "Allow heavy templated Eigen code" FORCE)
+    endif(CX_LINUX)
     QT5_WRAP_CPP(MOCCED ${CX_TEST_CATCH_MOC_SOURCES})
 
     add_executable(${EXE_NAME} MACOSX_BUNDLE ${PATH_TO_MAIN} ${CX_TEST_CATCH_SOURCES} ${MOCCED})

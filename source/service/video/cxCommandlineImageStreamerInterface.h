@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXCOMMANDLINEIMAGESTREAMERINTERFACE_H
 #define CXCOMMANDLINEIMAGESTREAMERINTERFACE_H
 
-#include "cxVideoServiceExport.h"
+#include "cxVideoServiceOldExport.h"
 
 #include <map>
 #include <QString>
@@ -49,7 +49,7 @@ typedef boost::shared_ptr<class CommandlineImageStreamerInterface> CommandlineIm
  * \date May 20, 2014
  * \author Ole Vegard Solberg, SINTEF
  */
-class cxVideoService_EXPORT CommandlineImageStreamerInterface : public StreamerService
+class cxVideoServiceOld_EXPORT CommandlineImageStreamerInterface : public StreamerService
 {
 public:
 	CommandlineImageStreamerInterface();

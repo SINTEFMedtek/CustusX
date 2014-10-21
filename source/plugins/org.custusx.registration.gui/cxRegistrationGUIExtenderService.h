@@ -33,8 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXREGISTRATIONGUIEXTENDERSERVICE_H_
 #define CXREGISTRATIONGUIEXTENDERSERVICE_H_
 
-#include "cxGUIExtenderService.h"
 #include "org_custusx_registration_gui_Export.h"
+#include "cxGUIExtenderService.h"
 class ctkPluginContext;
 
 namespace cx

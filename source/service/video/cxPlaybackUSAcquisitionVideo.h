@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPLAYBACKUSACQUISITIONVIDEO_H_
 #define CXPLAYBACKUSACQUISITIONVIDEO_H_
 
-#include "cxVideoServiceExport.h"
+#include "cxVideoServiceOldExport.h"
 
 #include <QObject>
 #include <QFuture>
@@ -62,7 +62,7 @@ typedef boost::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
  * \author Christian Askeland, SINTEF
  *
  */
-class cxVideoService_EXPORT USAcquisitionVideoPlayback : public QObject
+class cxVideoServiceOld_EXPORT USAcquisitionVideoPlayback : public QObject
 {
 	Q_OBJECT
 public:
