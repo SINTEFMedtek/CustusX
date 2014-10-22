@@ -188,9 +188,6 @@ macro(cx_install_set_folder_structure)
 	endif(CX_LINUX)
 
 	set(CX_INSTALL_BINARY_DIR ${CX_INSTALL_ROOT_DIR}/bin)
-	if(CX_WINDOWS)
-	   set(CX_INSTALL_BINARY_DIR /bin)
-	endif(CX_WINDOWS)
 	if(APPLE)
 		set(CX_INSTALL_BINARY_DIR "${CX_INSTALL_ROOT_DIR}/${CX_BUNDLE_NAME}.app/Contents/MacOS")
 	endif(APPLE)
@@ -405,7 +402,11 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
 	ENDIF(APPLE)
 
 	# Install needed Qt plugins by copying directories from the qt installation
-	install(DIRECTORY "${QT_PLUGINS_DIR}/" 	                  
+	install(DIRECTORY "${QT_PLUGINS_DIR}/" 
+#	install(DIRECTORY "${QT_PLUGINS_DIR}/imageformats" 
+#	                  "${QT_PLUGINS_DIR}/sqldrivers"
+#	                  "${QT_PLUGINS_DIR}/platforms"
+#	                  "${QT_PLUGINS_DIR}/iconengines"	                  
 		DESTINATION ${INSTALL_QTPLUGIN_DIR}
 		DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS})
 
@@ -420,11 +421,9 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
 		get_filename_component(TARGET_FILENAME ${TARGET} NAME)
 		set(TARGET_FILEPATH ${INSTALL_BINARY_DIR}/${TARGET_FILENAME})
 		set(LIB_PATTERN_CODE
-			"
-			${LIB_PATTERN_CODE}
-			set(TEMP \"\${CMAKE_INSTALL_PREFIX}/${TARGET_FILEPATH}\"\)
-			set(PLUGINS \"\${PLUGINS} \${TEMP}\")
-			"
+			"${LIB_PATTERN_CODE}
+			set\(TEMP \"\${CMAKE_INSTALL_PREFIX}/${TARGET_FILEPATH}\"\)
+			set(PLUGINS \${PLUGINS} \${TEMP})"
 			)
 	endforeach()
 
@@ -447,23 +446,22 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
 	#                         add files to PLUGINS
 	foreach(PATTERN ${INSTALL_LIBRARIES_PATTERN_LOCAL} )
 		set(LIB_PATTERN_CODE
-			"
-			${LIB_PATTERN_CODE}
-            set(TEMP)
+			"${LIB_PATTERN_CODE}
+                        set(TEMP)
 			file\(GLOB_RECURSE TEMP \"\${CMAKE_INSTALL_PREFIX}/${PATTERN}\"\)
-			set(PLUGINS \${PLUGINS} \${TEMP})
-			"
+			set(PLUGINS \${PLUGINS} \${TEMP})"
 			)
 	endforeach()
-	
-    # fixup_bundle resets link paths for all targets within the bundle.
-    # this code appears in cmake_install.cmake in the CURRENT_BINARY_DIR. Check there when changing.
-    install(CODE "
-                 ${LIB_PATTERN_CODE}
-                 include(BundleUtilities)
-                 fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/${APPS_LOCAL}\"   \"\${PLUGINS}\"   \"\${DIRS_LOCAL}\")
-                 " 
-            )
+
+        # fixup_bundle resets link paths for all targets within the bundle.
+        # this code appears in cmake_install.cmake in the CURRENT_BINARY_DIR. Check there when changing.
+        install(CODE "
+                # Begin inserted fixup_bundle snippet
+                ${LIB_PATTERN_CODE}
+                include(BundleUtilities)
+                fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/${APPS_LOCAL}\"   \"\${PLUGINS}\"   \"${DIRS_LOCAL}\") "
+                # End inserted fixup_bundle snippet
+                )
 endfunction()
 
 ###############################################################################
