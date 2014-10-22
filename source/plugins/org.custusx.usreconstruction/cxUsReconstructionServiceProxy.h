@@ -52,7 +52,8 @@ public:
 
 	virtual QString getSelectedFilename() const;
 	virtual USReconstructInputData getSelectedFileData();
-	virtual ReconstructParamsPtr getParams();
+//	virtual ReconstructParamsPtr getParams();
+	virtual DataAdapterPtr getParam(QString uid);
 	virtual std::vector<DataAdapterPtr> getAlgoOptions();
 	virtual XmlOptionFile getSettings();
 	virtual OutputVolumeParams getOutputVolumeParams() const;

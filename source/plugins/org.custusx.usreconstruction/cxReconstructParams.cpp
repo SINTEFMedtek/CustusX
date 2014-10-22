@@ -32,13 +32,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxReconstructParams.h"
 
-//#include "cxDataManager.h"
 #include "cxStringDataAdapterXml.h"
 #include "cxDoubleDataAdapterXml.h"
 #include "cxBoolDataAdapterXml.h"
 #include "cxTransferFunctions3DPresets.h"
 #include "cxDoubleRange.h"
 #include "cxPatientModelService.h"
+#include "cxReporter.h"
 
 //Windows fix
 #ifndef M_PI
@@ -48,9 +48,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ReconstructParams::ReconstructParams(PatientModelServicePtr patientModelService, XmlOptionFile settings)
+ReconstructParams::ReconstructParams(PatientModelServicePtr patientModelService, XmlOptionFile settings) :
+	mPatientModelService(patientModelService),
+	mSettings(settings)
 {
-	mSettings = settings;
+}
+
+ReconstructParams::~ReconstructParams()
+{
+	mSettings.save();
+}
+
+void ReconstructParams::createParameters()
+{
+	if (!mParameters.empty())
+		return;
+
 	mSettings.getElement("algorithms");
 
 	mOrientationAdapter = StringDataAdapterXml::initialize("Orientation", "",
@@ -58,30 +71,40 @@ ReconstructParams::ReconstructParams(PatientModelServicePtr patientModelService,
 		QString("PatientReference MiddleFrame").split(" "),
 		mSettings.getElement());
 	connect(mOrientationAdapter.get(), &StringDataAdapterXml::valueWasSet, this, &ReconstructParams::changedInputSettings);
+	this->add(mOrientationAdapter);
 
-	PresetTransferFunctions3DPtr presets = patientModelService->getPresetTransferFunctions3D();
+	PresetTransferFunctions3DPtr presets = mPatientModelService->getPresetTransferFunctions3D();
+	QStringList presetList;
+	if (presets)
+	{
+		presetList = presets->getPresetList("US");
+	}
 	mPresetTFAdapter = StringDataAdapterXml::initialize("Preset", "",
-		"Preset transfer function to apply to the reconstructed volume", "US B-Mode", presets->getPresetList("US"),
+		"Preset transfer function to apply to the reconstructed volume", "US B-Mode", presetList,
 		mSettings.getElement());
-
-	connect(mPresetTFAdapter.get(), &StringDataAdapterXml::valueWasSet, this, &ReconstructParams::transferFunctionChanged);
+	connect(mPresetTFAdapter.get(), &StringDataAdapterXml::valueWasSet, this, &ReconstructParams::transferFunctionChangedSlot);
+//	connect(mParams.get(), SIGNAL(transferFunctionChanged()), this, SLOT(transferFunctionChangedSlot()));
+	this->add(mPresetTFAdapter);
 
 	mMaskReduce = StringDataAdapterXml::initialize("Reduce mask (% in 1D)", "",
 		"Speedup by reducing mask size", "3",
 		QString("0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15").split(" "),
 		mSettings.getElement());
 	connect(mMaskReduce.get(), &StringDataAdapterXml::valueWasSet, this, &ReconstructParams::changedInputSettings);
+	this->add(mMaskReduce);
 
 	mAlignTimestamps = BoolDataAdapterXml::initialize("Align timestamps", "",
 		"Align the first of tracker and frame timestamps, ignoring lags.", false,
 		mSettings.getElement());
 	connect(mAlignTimestamps.get(), SIGNAL(valueWasSet()), this, SIGNAL(changedInputSettings()));
+	this->add(mAlignTimestamps);
 
 	mTimeCalibration = DoubleDataAdapterXml::initialize("Extra Temporal Calib", "",
 		"Set an offset in the frame timestamps, in addition to the one used in acquisition", 0.0,
 		DoubleRange(-1000, 1000, 10), 0,
 		mSettings.getElement());
 	connect(mTimeCalibration.get(), SIGNAL(valueWasSet()), this, SIGNAL(changedInputSettings()));
+	this->add(mTimeCalibration);
 
 	double maxVolumeSizeFactor = 1024*1024;
 	mMaxVolumeSize = DoubleDataAdapterXml::initialize("Volume Size", "",
@@ -90,25 +113,61 @@ ReconstructParams::ReconstructParams(PatientModelServicePtr patientModelService,
 		mSettings.getElement());
 	mMaxVolumeSize->setInternal2Display(1.0/maxVolumeSizeFactor);
 	connect(mMaxVolumeSize.get(), SIGNAL(valueWasSet()), this, SIGNAL(changedInputSettings()));
+	this->add(mMaxVolumeSize);
 
 	mAngioAdapter = BoolDataAdapterXml::initialize("Angio data", "",
 		"Ultrasound angio data is used as input", false,
 		mSettings.getElement());
 	connect(mAngioAdapter.get(), SIGNAL(valueWasSet()), this, SIGNAL(changedInputSettings()));
+	this->add(mAngioAdapter);
 
 	mCreateBModeWhenAngio = BoolDataAdapterXml::initialize("Dual Angio", "",
 		"If angio requested, also create a B-mode reconstruction based on the same data set.", true,
 		mSettings.getElement());
 	connect(mCreateBModeWhenAngio.get(), SIGNAL(valueWasSet()), this, SIGNAL(changedInputSettings()));
+	this->add(mCreateBModeWhenAngio);
 
 	mAlgorithmAdapter = StringDataAdapterXml::initialize("Algorithm", "", "Choose algorithm to use for reconstruction",
 			QString(), QStringList(), mSettings.getElement());
 	connect(mAlgorithmAdapter.get(), &StringDataAdapterXml::valueWasSet, this, &ReconstructParams::changedInputSettings);
+	this->add(mAlgorithmAdapter);
 }
 
-ReconstructParams::~ReconstructParams()
+void ReconstructParams::add(DataAdapterPtr param)
 {
-	mSettings.save();
+	mParameters[param->getUid()] = param;
+}
+
+DataAdapterPtr ReconstructParams::getParameter(QString uid)
+{
+	if (mParameters.empty())
+		this->createParameters();
+	if (mParameters.count(uid))
+			return mParameters[uid];
+	return DataAdapterPtr();
+}
+
+QStringList ReconstructParams::getParameterUids() const
+{
+	QStringList retval;
+	for (std::map<QString, DataAdapterPtr>::const_iterator iter=mParameters.begin(); iter!=mParameters.end(); ++iter)
+		retval << iter->first;
+	return retval;
+}
+
+void ReconstructParams::transferFunctionChangedSlot()
+{
+	//Use angio reconstruction also if only transfer function is set to angio
+	if(mPresetTFAdapter->getValue() == "US Angio")
+	{
+		reportDebug("Reconstructing angio (Because of angio transfer function)");
+		mAngioAdapter->setValue(true);
+	}
+	else if(mPresetTFAdapter->getValue() == "US B-Mode" && mAngioAdapter->getValue())
+	{
+		reportDebug("Not reconstructing angio (Because of B-Mode transfer function)");
+		mAngioAdapter->setValue(false);
+	}
 }
 
 

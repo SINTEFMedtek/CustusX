@@ -78,11 +78,17 @@ USReconstructInputData UsReconstructionServiceNull::getSelectedFileData()
 	return USReconstructInputData();
 }
 
-ReconstructParamsPtr UsReconstructionServiceNull::getParams()
+DataAdapterPtr UsReconstructionServiceNull::getParam(QString uid)
 {
 	printWarning();
-	return ReconstructParamsPtr();
+	return DataAdapterPtr();
 }
+
+//ReconstructParamsPtr UsReconstructionServiceNull::getParams()
+//{
+//	printWarning();
+//	return ReconstructParamsPtr();
+//}
 
 std::vector<DataAdapterPtr> UsReconstructionServiceNull::getAlgoOptions()
 {

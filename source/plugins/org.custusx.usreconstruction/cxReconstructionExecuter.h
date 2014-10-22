@@ -41,7 +41,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxReconstructionMethodService.h"
 #include "cxReconstructPreprocessor.h"
-#include "cxReconstructParams.h"
 #include "cxCompositeTimedAlgorithm.h"
 
 namespace cx

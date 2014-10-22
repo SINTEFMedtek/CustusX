@@ -30,7 +30,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxReconstructParams.h"
 #include "cxBoolDataAdapterXml.h"
 #include "catch.hpp"
 #include "cxtestReconstructionManagerFixture.h"
@@ -61,8 +60,8 @@ TEST_CASE("ReconstructManager: PNN on sphere","[unit][usreconstruction][syntheti
 
 	cx::UsReconstructionServicePtr reconstructer = fixture.getManager();
 	reconstructer->selectData(inputData);
-	reconstructer->getParams()->mAlgorithmAdapter->setValue("PNN");
-	reconstructer->getParams()->mCreateBModeWhenAngio->setValue(false);
+	reconstructer->getParam("Algorithm")->setValueFromVariant("PNN");
+	reconstructer->getParam("Dual Angio")->setValueFromVariant(false);
 	// set an algorithm-specific parameter
 	fixture.setPNN_InterpolationSteps(1);
 
@@ -103,9 +102,9 @@ TEST_CASE("ReconstructManager: PNN on angio sphere","[unit][usreconstruction][sy
 
 	cx::UsReconstructionServicePtr reconstructer = fixture.getManager();
 	reconstructer->selectData(inputData);
-	reconstructer->getParams()->mAlgorithmAdapter->setValue("PNN");//default
-	reconstructer->getParams()->mAngioAdapter->setValue(true);
-	reconstructer->getParams()->mCreateBModeWhenAngio->setValue(false);
+	reconstructer->getParam("Algorithm")->setValueFromVariant("PNN");//default
+	reconstructer->getParam("Angio data")->setValueFromVariant(true);
+	reconstructer->getParam("Dual Angio")->setValueFromVariant(false);
 	// set an algorithm-specific parameter
 	fixture.setPNN_InterpolationSteps(1);
 
@@ -136,9 +135,10 @@ TEST_CASE("ReconstructManager: Angio Reconstruction on real data", "[usreconstru
 	cx::UsReconstructionServicePtr reconstructer = fixture.getManager();
 
 	reconstructer->selectData(realData.getSourceFilename());
-	reconstructer->getParams()->mAlgorithmAdapter->setValue("PNN");
-	reconstructer->getParams()->mAngioAdapter->setValue(true);
-	reconstructer->getParams()->mCreateBModeWhenAngio->setValue(false);
+
+	reconstructer->getParam("Algorithm")->setValueFromVariant("PNN");//default
+	reconstructer->getParam("Angio data")->setValueFromVariant(true);
+	reconstructer->getParam("Dual Angio")->setValueFromVariant(false);
 	// set an algorithm-specific parameter
 	fixture.setPNN_InterpolationSteps(1);
 
@@ -156,9 +156,11 @@ TEST_CASE("ReconstructManager: Threaded Dual Angio on real data", "[usreconstruc
 	cx::UsReconstructionServicePtr reconstructer = fixture.getManager();
 
 	reconstructer->selectData(realData.getSourceFilename());
-	reconstructer->getParams()->mAlgorithmAdapter->setValue("PNN");
-	reconstructer->getParams()->mAngioAdapter->setValue(true);
-	reconstructer->getParams()->mCreateBModeWhenAngio->setValue(true);
+
+	reconstructer->getParam("Algorithm")->setValueFromVariant("PNN");//default
+	reconstructer->getParam("Angio data")->setValueFromVariant(true);
+	reconstructer->getParam("Dual Angio")->setValueFromVariant(true);
+
 	// set an algorithm-specific parameter
 	fixture.setPNN_InterpolationSteps(1);
 

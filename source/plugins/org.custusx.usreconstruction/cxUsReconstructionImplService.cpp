@@ -71,7 +71,7 @@ UsReconstructionImplService::UsReconstructionImplService(ctkPluginContext *plugi
 
 	mParams.reset(new ReconstructParams(patientModelService, settings));
 	connect(mParams.get(), SIGNAL(changedInputSettings()), this, SLOT(setSettings()));
-	connect(mParams.get(), SIGNAL(transferFunctionChanged()), this, SLOT(transferFunctionChangedSlot()));
+//	connect(mParams.get(), SIGNAL(transferFunctionChanged()), this, SLOT(transferFunctionChangedSlot()));
 	connect(patientModelService.get(), &PatientModelService::patientChanged, this, &UsReconstructionImplService::patientChangedSlot);
 
 	mServiceListener = boost::shared_ptr<ServiceTrackerListener<ReconstructionMethodService> >(new ServiceTrackerListener<ReconstructionMethodService>(
@@ -104,7 +104,8 @@ void UsReconstructionImplService::patientChangedSlot()
 
 ReconstructionMethodService *UsReconstructionImplService::createAlgorithm()
 {
-	QString name = mParams->mAlgorithmAdapter->getValue();
+//	QString name = mParams->mAlgorithmAdapter->getValue();
+	QString name = mParams->getParameter("Algorithm")->getValueAsVariant().toString();
 
 	if(name.isEmpty())
 		return NULL;
@@ -137,20 +138,20 @@ void UsReconstructionImplService::setSettings()
 	emit paramsChanged();
 }
 
-void UsReconstructionImplService::transferFunctionChangedSlot()
-{
-	//Use angio reconstruction also if only transfer function is set to angio
-	if(mParams->mPresetTFAdapter->getValue() == "US Angio")
-	{
-		reportDebug("Reconstructing angio (Because of angio transfer function)");
-		mParams->mAngioAdapter->setValue(true);
-	}
-	else if(mParams->mPresetTFAdapter->getValue() == "US B-Mode" && mParams->mAngioAdapter->getValue())
-	{
-		reportDebug("Not reconstructing angio (Because of B-Mode transfer function)");
-		mParams->mAngioAdapter->setValue(false);
-	}
-}
+//void UsReconstructionImplService::transferFunctionChangedSlot()
+//{
+//	//Use angio reconstruction also if only transfer function is set to angio
+//	if(mParams->mPresetTFAdapter->getValue() == "US Angio")
+//	{
+//		reportDebug("Reconstructing angio (Because of angio transfer function)");
+//		mParams->mAngioAdapter->setValue(true);
+//	}
+//	else if(mParams->mPresetTFAdapter->getValue() == "US B-Mode" && mParams->mAngioAdapter->getValue())
+//	{
+//		reportDebug("Not reconstructing angio (Because of B-Mode transfer function)");
+//		mParams->mAngioAdapter->setValue(false);
+//	}
+//}
 
 void UsReconstructionImplService::startReconstruction()
 {
@@ -171,7 +172,7 @@ void UsReconstructionImplService::startReconstruction()
 	connect(executer.get(), SIGNAL(reconstructFinished()), this, SLOT(reconstructFinishedSlot()));
 	mExecuters.push_back(executer);
 
-	executer->startReconstruction(algo, par, fileData, mParams->mCreateBModeWhenAngio->getValue());
+	executer->startReconstruction(algo, par, fileData, mParams->getCreateBModeWhenAngio()->getValue());
 }
 
 std::set<cx::TimedAlgorithmPtr> UsReconstructionImplService::getThreadedReconstruction()
@@ -230,10 +231,10 @@ void UsReconstructionImplService::setOutputBasePath(QString path)
 	mOutputBasePath = path;
 }
 
-ReconstructParamsPtr UsReconstructionImplService::getParams()
-{
-	return mParams;
-}
+//ReconstructParamsPtr UsReconstructionImplService::getParams()
+//{
+//	return mParams;
+//}
 
 std::vector<DataAdapterPtr> UsReconstructionImplService::getAlgoOptions()
 {
@@ -253,6 +254,11 @@ QString UsReconstructionImplService::getSelectedFilename() const
 USReconstructInputData UsReconstructionImplService::getSelectedFileData()
 {
 	return mOriginalFileData;
+}
+
+DataAdapterPtr UsReconstructionImplService::getParam(QString uid)
+{
+	return mParams->getParameter(uid);
 }
 
 void UsReconstructionImplService::selectData(QString filename, QString calFilesPath)
@@ -299,26 +305,28 @@ void UsReconstructionImplService::updateFromOriginalFileData()
 ReconstructCore::InputParams UsReconstructionImplService::createCoreParameters()
 {
 	ReconstructCore::InputParams par;
-	par.mAlgorithmUid = mParams->mAlgorithmAdapter->getValue();
+	par.mAlgorithmUid = mParams->getAlgorithmAdapter()->getValue();
 	par.mAlgoSettings = mSettings.getElement("algorithms", par.mAlgorithmUid).cloneNode(true).toElement();
 	par.mOutputBasePath = mOutputBasePath;
 	par.mOutputRelativePath = mOutputRelativePath;
 	par.mShaderPath = mShaderPath;
-	par.mAngio = mParams->mAngioAdapter->getValue();
-	par.mTransferFunctionPreset = mParams->mPresetTFAdapter->getValue();
-	par.mMaxOutputVolumeSize = mParams->mMaxVolumeSize->getValue();
-	par.mExtraTimeCalibration = mParams->mTimeCalibration->getValue();
-	par.mAlignTimestamps = mParams->mAlignTimestamps->getValue();
-	par.mMaskReduce = mParams->mMaskReduce->getValue().toDouble();
-	par.mOrientation = mParams->mOrientationAdapter->getValue();
+	par.mAngio = mParams->getAngioAdapter()->getValue();
+	par.mTransferFunctionPreset = mParams->getPresetTFAdapter()->getValue();
+	par.mMaxOutputVolumeSize = mParams->getMaxVolumeSize()->getValue();
+	par.mExtraTimeCalibration = mParams->getTimeCalibration()->getValue();
+	par.mAlignTimestamps = mParams->getAlignTimestamps()->getValue();
+	par.mMaskReduce = mParams->getMaskReduce()->getValue().toDouble();
+	par.mOrientation = mParams->getOrientationAdapter()->getValue();
 	return par;
 }
 
 void UsReconstructionImplService::onServiceAdded(ReconstructionMethodService* service)
 {
-	QStringList range = mParams->mAlgorithmAdapter->getValueRange();
+//	std::cout << "UsReconstructionImplService::onServiceAdded" << std::endl;
+	QStringList range = mParams->getAlgorithmAdapter()->getValueRange();
+	std::cout << "UsReconstructionImplService::onServiceAdded " << service->getName() << std::endl;
 	range << service->getName();
-	mParams->mAlgorithmAdapter->setValueRange(range);
+	mParams->getAlgorithmAdapter()->setValueRange(range);
 }
 
 void UsReconstructionImplService::onServiceModified(ReconstructionMethodService* service)
@@ -328,9 +336,9 @@ void UsReconstructionImplService::onServiceModified(ReconstructionMethodService*
 
 void UsReconstructionImplService::onServiceRemoved(ReconstructionMethodService* service)
 {
-	QStringList range = mParams->mAlgorithmAdapter->getValueRange();
+	QStringList range = mParams->getAlgorithmAdapter()->getValueRange();
 	range.removeAll(service->getName());
-	mParams->mAlgorithmAdapter->setValueRange(range);
+	mParams->getAlgorithmAdapter()->setValueRange(range);
 }
 
 } //cx

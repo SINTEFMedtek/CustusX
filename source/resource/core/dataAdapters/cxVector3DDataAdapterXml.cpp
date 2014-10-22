@@ -80,18 +80,6 @@ QString Vector3DDataAdapterXml::getDisplayName() const
 	return mName;
 }
 
-QString Vector3DDataAdapterXml::getValueAsString() const
-{
-	QString val = prettyFormat(mValue, mDecimals);
-	return val;
-}
-
-void Vector3DDataAdapterXml::setValueFromString(QString value)
-{
-	Vector3D val = Vector3D::fromString(value);
-	this->setValue(val);
-}
-
 QString Vector3DDataAdapterXml::getUid() const
 {
 	return mUid;

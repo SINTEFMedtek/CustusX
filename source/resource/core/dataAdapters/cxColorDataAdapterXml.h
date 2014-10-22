@@ -67,8 +67,6 @@ public:
 public:
     // basic methods
     virtual QString getDisplayName() const; ///< name of data entity. Used for display to user.
-	virtual QString getValueAsString() const;
-	virtual void setValueFromString(QString value);
     virtual QString getUid() const;
     virtual bool setValue(QColor value); ///< set the data value.
     virtual QColor getValue() const; ///< get the data value.

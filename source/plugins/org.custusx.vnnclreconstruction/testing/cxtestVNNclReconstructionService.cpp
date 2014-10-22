@@ -35,7 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReporter.h"
 #include "cxVNNclAlgorithm.h"
 #include "cxVNNclReconstructionMethodService.h"
-#include "cxReconstructParams.h"
 #include "cxBoolDataAdapterXml.h"
 #include "cxtestUtilities.h"
 #include "cxtestReconstructRealData.h"
@@ -154,9 +153,9 @@ TEST_CASE("ReconstructManager: VNNcl on real data", "[usreconstruction][integrat
 
 //	reconstructer->init();
 	reconstructer->selectData(realData.getSourceFilename());
-	reconstructer->getParams()->mAlgorithmAdapter->setValue("VNNcl");
-	reconstructer->getParams()->mAngioAdapter->setValue(false);
-	reconstructer->getParams()->mCreateBModeWhenAngio->setValue(false);
+	reconstructer->getParam("Algorithm")->setValueFromVariant("VNNcl");
+	reconstructer->getParam("Angio data")->setValueFromVariant(false);
+	reconstructer->getParam("Dual Angio")->setValueFromVariant(false);
 
 	cx::VNNclReconstructionMethodService* algorithm;
 	cx::ReconstructionMethodService* algorithmService = reconstructer->createAlgorithm();

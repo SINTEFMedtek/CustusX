@@ -95,7 +95,7 @@ private:
 	QPushButton* mReloadButton;
 	QLineEdit* mExtentLineEdit;
 	QLineEdit* mInputSpacingLineEdit;
-	SpinBoxGroupWidget* mMaxVolSizeWidget;
+//	SpinBoxGroupWidget* mMaxVolSizeWidget;
 	SpinBoxGroupWidget* mSpacingWidget;
 	SpinBoxGroupWidget* mDimXWidget;
 	SpinBoxGroupWidget* mDimYWidget;

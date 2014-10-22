@@ -65,16 +65,6 @@ QString BoolDataAdapterXml::getDisplayName() const
 	return mName;
 }
 
-QString BoolDataAdapterXml::getValueAsString() const
-{
-	return mValue ? "true" : "false";
-}
-
-void BoolDataAdapterXml::setValueFromString(QString value)
-{
-	bool val = QString::compare(value, "true", Qt::CaseInsensitive) == 0 ? true : false;
-	this->setValue(val);
-}
 
 QString BoolDataAdapterXml::getUid() const
 {
@@ -91,18 +81,6 @@ void BoolDataAdapterXml::setHelp(QString val)
     mHelp = val;
     emit changed();
 }
-
-/*
-bool BoolDataAdapterXml::getEnabled() const
-{
-	return mStore.readValue(QString::number(value)).toInt();
-}
-
-bool BoolDataAdapterXml::setEnabled(bool enabled)
-{
-
-}
-*/
 
 bool BoolDataAdapterXml::getValue() const
 {

@@ -32,8 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxUSAcquisition.h"
 
-//#include "cxReconstructionManager.h"
-#include "cxReconstructParams.h"
 #include "cxBoolDataAdapterXml.h"
 
 #include "cxPatientData.h"
@@ -189,7 +187,7 @@ std::vector<VideoSourcePtr> USAcquisition::getRecordingVideoSources(ToolPtr tool
 
 bool USAcquisition::getWriteColor() const
 {
-	bool writeColor = mBase->getPluginData()->getReconstructer()->getParams()->mAngioAdapter->getValue()
+	bool writeColor = mBase->getPluginData()->getReconstructer()->getParam("Angio data")->getValueAsVariant().toBool()
 	        ||  !settings()->value("Ultrasound/8bitAcquisitionData").toBool();
 	return writeColor;
 }

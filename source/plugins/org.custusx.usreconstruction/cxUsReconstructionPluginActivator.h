@@ -65,7 +65,7 @@ public:
 
 private:
   RegisteredServicePtr mRegisteredGui;
-  RegisteredServicePtr mRegisteredBackend;
+  RegisteredServicePtr mUsReconstruction;
 };
 
 } // namespace cx

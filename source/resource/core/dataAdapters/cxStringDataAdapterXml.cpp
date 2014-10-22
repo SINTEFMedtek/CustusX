@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <QDomElement>
 #include <QStringList>
+#include "cxTypeConversions.h"
 
 namespace cx
 {
@@ -91,16 +92,6 @@ QString StringDataAdapterXml::getDisplayName() const
 	return mName;
 }
 
-QString StringDataAdapterXml::getValueAsString() const
-{
-	return mValue;
-}
-
-void StringDataAdapterXml::setValueFromString(QString value)
-{
-	this->setValue(value);
-}
-
 QString StringDataAdapterXml::getUid() const
 {
 	return mUid;
@@ -140,11 +131,16 @@ bool StringDataAdapterXml::setValue(const QString& val)
 
 QStringList StringDataAdapterXml::getValueRange() const
 {
+	if (this->getDisplayName()=="Algorithm")
+		std::cout << this << " StringDataAdapterXml::getValueRange " << this->getDisplayName() << " -- " << mRange.join(" ") << std::endl;
 	return mRange;
 }
 
 void StringDataAdapterXml::setValueRange(QStringList range)
 {
+	if (this->getDisplayName()=="Algorithm")
+		std::cout << this <<" StringDataAdapterXml::setValueRange " << this->getDisplayName() << " -- " << range.join(" ") << std::endl;
+
 	mRange = range;
 	emit changed();
 }

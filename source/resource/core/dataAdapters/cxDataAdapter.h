@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include <QString>
 #include <QObject>
+#include <QVariant>
 
 namespace cx {
 typedef boost::shared_ptr<class DataAdapter> DataAdapterPtr;
@@ -71,11 +72,11 @@ public:
 	static DataAdapterPtr findAdapter(std::vector<DataAdapterPtr> adapters, QString id);
 
 public:
-	// basic methods
 	virtual QString getDisplayName() const = 0; ///< name of data entity. Used for display to user.
-	virtual QString getValueAsString() const = 0;
-	virtual void setValueFromString(QString value) = 0;
 	virtual QString getUid() const = 0;
+
+	virtual QVariant getValueAsVariant() const = 0;
+	virtual void setValueFromVariant(QVariant val) = 0;
 
 	virtual bool getEnabled() const; ///< Get the enabled/disabled state of the dataadapter.
 	virtual bool getAdvanced() const; ///< Set the advanced flag of the adapter

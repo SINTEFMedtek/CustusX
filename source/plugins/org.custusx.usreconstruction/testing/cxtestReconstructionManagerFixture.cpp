@@ -80,7 +80,7 @@ void ReconstructionManagerTestFixture::setPNN_InterpolationSteps(int value)
 	std::vector<cx::DataAdapterPtr> adaptors = algorithm->getSettings(algo);
 	cx::DataAdapterPtr adapter = cx::DataAdapter::findAdapter(adaptors, "interpolationSteps");
 	if(adapter)
-		adapter->setValueFromString(QString::number(value));
+		adapter->setValueFromVariant(value);
 	else
 		cx::reportError("Could not find adapter interpolationSteps");
 }
@@ -89,7 +89,7 @@ void ReconstructionManagerTestFixture::reconstruct()
 {
 	mOutput.clear();
 	cx::UsReconstructionServicePtr reconstructer = this->getManager();
-	bool createBModeWhenAngio = reconstructer->getParams()->mCreateBModeWhenAngio->getValue();
+	bool createBModeWhenAngio = reconstructer->getParam("Dual Angio")->getValueAsVariant().toBool();
 
 	cx::ReconstructionExecuterPtr executer(new cx::ReconstructionExecuter(mPatientModelService, mVisualizationService));
 
@@ -108,7 +108,7 @@ void ReconstructionManagerTestFixture::threadedReconstruct()
 
 	cx::ReconstructionExecuterPtr executer(new cx::ReconstructionExecuter(mPatientModelService, mVisualizationService));
 
-	bool createBModeWhenAngio = reconstructer->getParams()->mCreateBModeWhenAngio->getValue();
+	bool createBModeWhenAngio = reconstructer->getParam("Dual Angio")->getValueAsVariant().toBool();
 	executer->startReconstruction(reconstructer->createAlgorithm(),
 			reconstructer->createCoreParameters(),
 			reconstructer->getSelectedFileData(),

@@ -38,6 +38,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataAdapter.h"
 #include "cxDoubleRange.h"
 #include "cxMathBase.h"
+#include "cxTypeConversions.h"
+#include "cxVector3D.h"
 
 namespace cx
 {
@@ -65,6 +67,18 @@ public:
 	virtual Eigen::Vector2d getValue() const = 0; ///< get the data value.
 
 	virtual void setValueRange(DoubleRange range) = 0;
+
+	virtual QVariant getValueAsVariant() const
+	{
+		QString val = qstring_cast(this->getValue());
+		return QVariant(val);
+	}
+
+	virtual void setValueFromVariant(QVariant value)
+	{
+		Eigen::Vector2d val = fromString(value.toString());
+		this->setValue(val);
+	}
 
 public:
 	// optional methods

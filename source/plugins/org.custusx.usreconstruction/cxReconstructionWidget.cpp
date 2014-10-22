@@ -37,7 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxTimedAlgorithmProgressBar.h"
 #include "cxSettings.h"
-#include "cxReconstructParams.h"
 #include "cxTimedAlgorithm.h"
 #include "cxStringDataAdapterXml.h"
 #include "cxDoubleDataAdapterXml.h"
@@ -82,12 +81,12 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, UsReconstructionServ
 	mTimedAlgorithmProgressBar = new cx::TimedAlgorithmProgressBar;
 
 	QGridLayout* sizesLayout = new QGridLayout;
-	mMaxVolSizeWidget = new SpinBoxGroupWidget(this, mReconstructer->getParams()->mMaxVolumeSize);
+	QWidget* maxVolSizeWidget = sscCreateDataWidget(this, mReconstructer->getParam("Volume Size"));
 	sizesLayout->addWidget(inputSpacingLabel, 0, 0);
 	sizesLayout->addWidget(mInputSpacingLineEdit, 0, 1);
 	sizesLayout->addLayout(extentLayout, 0, 2);
 	mSpacingWidget = new SpinBoxGroupWidget(this, DoubleDataAdapterPtr(new DoubleDataAdapterSpacing(mReconstructer)), sizesLayout, 1);
-	sizesLayout->addWidget(mMaxVolSizeWidget, 1, 2);
+	sizesLayout->addWidget(maxVolSizeWidget, 1, 2);
 
 	QHBoxLayout* runLayout = new QHBoxLayout;
 	topLayout->addLayout(runLayout);
@@ -101,7 +100,7 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, UsReconstructionServ
 	topLayout->addWidget(mFileSelectWidget);
 	topLayout->addLayout(sizesLayout);
 
-	LabeledComboBoxWidget* presetTFWidget = new LabeledComboBoxWidget(this, mReconstructer->getParams()->mPresetTFAdapter);
+	QWidget* presetTFWidget = sscCreateDataWidget(this, mReconstructer->getParam("Preset"));
 	topLayout->addWidget(presetTFWidget);
 
 	mOptionsWidget = this->createOptionsWidget();
@@ -142,7 +141,7 @@ QWidget* ReconstructionWidget::createOptionsWidget()
 	mAlgorithmGroup->setSizePolicy(mAlgorithmGroup->sizePolicy().horizontalPolicy(),QSizePolicy::Fixed);
 
 	QVBoxLayout* algoOuterLayout = new QVBoxLayout(mAlgorithmGroup);
-	LabeledComboBoxWidget* algorithmWidget = new LabeledComboBoxWidget(this, mReconstructer->getParams()->mAlgorithmAdapter);
+	QWidget* algorithmWidget = sscCreateDataWidget(this, mReconstructer->getParam("Algorithm"));
 	algoOuterLayout->addWidget(algorithmWidget);
 	mAlgoLayout = new QStackedLayout;
 	this->repopulateAlgorithmGroup();
@@ -151,9 +150,9 @@ QWidget* ReconstructionWidget::createOptionsWidget()
 	layout->addWidget(mAlgorithmGroup, line, 0, 1, 2);
 	++line;
 
-	sscCreateDataWidget(this, mReconstructer->getParams()->mAngioAdapter, layout, line++);
-	sscCreateDataWidget(this, mReconstructer->getParams()->mCreateBModeWhenAngio, layout, line++);
-	sscCreateDataWidget(this, mReconstructer->getParams()->mOrientationAdapter, layout, line++);
+	sscCreateDataWidget(this, mReconstructer->getParam("Angio data"), layout, line++);
+	sscCreateDataWidget(this, mReconstructer->getParam("Dual Angio"), layout, line++);
+	sscCreateDataWidget(this, mReconstructer->getParam("Orientation"), layout, line++);
 	layout->addWidget(this->createHorizontalLine(), line++, 0, 1, 2);
 
 	mDimXWidget = new SpinBoxGroupWidget(this, DoubleDataAdapterPtr(new DoubleDataAdapterXDim(mReconstructer)));
@@ -165,16 +164,16 @@ QWidget* ReconstructionWidget::createOptionsWidget()
 	outputVolDimLayout->addWidget(mDimZWidget);
 	layout->addLayout(outputVolDimLayout, line++, 0, 1, 2);
 
-	sscCreateDataWidget(this, mReconstructer->getParams()->mAlignTimestamps, layout, line++);
-	sscCreateDataWidget(this, mReconstructer->getParams()->mTimeCalibration, layout, line++);
-	sscCreateDataWidget(this, mReconstructer->getParams()->mMaskReduce, layout, line++);
+	sscCreateDataWidget(this, mReconstructer->getParam("Align timestamps"), layout, line++);
+	sscCreateDataWidget(this, mReconstructer->getParam("Extra Temporal Calib"), layout, line++);
+	sscCreateDataWidget(this, mReconstructer->getParam("Reduce mask (% in 1D)"), layout, line++);
 
 	return retval;
 }
 
 void ReconstructionWidget::repopulateAlgorithmGroup()
 {
-	QString algoName = mReconstructer->getParams()->mAlgorithmAdapter->getValue();
+	QString algoName = mReconstructer->getParam("Algorithm")->getValueAsVariant().toString();
 
 	if (mAlgoLayout->currentWidget() && (algoName == mAlgoLayout->currentWidget()->objectName()))
 		return;

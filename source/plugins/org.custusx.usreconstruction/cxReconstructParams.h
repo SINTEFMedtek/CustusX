@@ -61,6 +61,30 @@ public:
 	ReconstructParams(PatientModelServicePtr patientModelService, XmlOptionFile settings);
 	virtual ~ReconstructParams();
 
+	DataAdapterPtr getParameter(QString uid);
+	QStringList getParameterUids() const;
+
+	StringDataAdapterXmlPtr getOrientationAdapter() { this->createParameters(); return mOrientationAdapter; }
+	StringDataAdapterXmlPtr getPresetTFAdapter() { this->createParameters(); return mPresetTFAdapter; }
+	StringDataAdapterXmlPtr getAlgorithmAdapter() { this->createParameters(); return mAlgorithmAdapter; }
+	StringDataAdapterXmlPtr getMaskReduce() { this->createParameters(); return mMaskReduce; }
+	BoolDataAdapterXmlPtr getAlignTimestamps() { this->createParameters(); return mAlignTimestamps; }
+	DoubleDataAdapterXmlPtr getTimeCalibration() { this->createParameters(); return mTimeCalibration; }
+	DoubleDataAdapterXmlPtr getMaxVolumeSize() { this->createParameters(); return mMaxVolumeSize; }
+	BoolDataAdapterXmlPtr getAngioAdapter() { this->createParameters(); return mAngioAdapter; }
+	BoolDataAdapterXmlPtr getCreateBModeWhenAngio() { this->createParameters(); return mCreateBModeWhenAngio; }
+
+signals:
+	void changedInputSettings();
+//	void transferFunctionChanged();
+
+private slots:
+	void transferFunctionChangedSlot();
+
+private:
+	std::map<QString, DataAdapterPtr> mParameters;
+	void createParameters();
+
 	StringDataAdapterXmlPtr mOrientationAdapter;
 	StringDataAdapterXmlPtr mPresetTFAdapter;
 	StringDataAdapterXmlPtr mAlgorithmAdapter;
@@ -71,11 +95,9 @@ public:
 	BoolDataAdapterXmlPtr mAngioAdapter; ///US angio data is used as input
 	BoolDataAdapterXmlPtr mCreateBModeWhenAngio; /// If angio requested, create a B-mode reoconstruction based on the same data set.
 
+	PatientModelServicePtr mPatientModelService;
 	XmlOptionFile mSettings;
-
-signals:
-	void changedInputSettings();
-	void transferFunctionChanged();
+	void add(DataAdapterPtr param);
 };
 typedef boost::shared_ptr<class ReconstructParams> ReconstructParamsPtr;
 

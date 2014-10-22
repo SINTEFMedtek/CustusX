@@ -62,12 +62,12 @@ void UsReconstructionPluginActivator::start(ctkPluginContext* context)
 	VisualizationServicePtr visualizationService = VisualizationServicePtr(new VisualizationServiceProxy(context));
 
 	XmlOptionFile xmlFile = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("usReconstruction");
-	UsReconstructionImplService *backendService = new UsReconstructionImplService(context, patientModelService, visualizationService, xmlFile);
+	UsReconstructionImplService *usReconstructionService = new UsReconstructionImplService(context, patientModelService, visualizationService, xmlFile);
 
-	mRegisteredBackend = RegisteredServicePtr(new RegisteredService(context, backendService, UsReconstructionService_iid));
+	mUsReconstruction = RegisteredServicePtr(new RegisteredService(context, usReconstructionService, UsReconstructionService_iid));
 
-	UsReconstructionServicePtr usReconstructionService = UsReconstructionServicePtr(new UsReconstructionServiceProxy(context));
-	UsReconstructionGUIExtenderService *guiService = new UsReconstructionGUIExtenderService(usReconstructionService, patientModelService);
+	UsReconstructionServicePtr usReconstructionServiceProxy = UsReconstructionServicePtr(new UsReconstructionServiceProxy(context));
+	UsReconstructionGUIExtenderService *guiService = new UsReconstructionGUIExtenderService(usReconstructionServiceProxy, patientModelService);
 	mRegisteredGui = RegisteredServicePtr(new RegisteredService(context, guiService, GUIExtenderService_iid));
 
 	//	mRegisteredBackend = RegisteredService::create<UsReconstructionImplService>(context, UsReconstructionService_iid);
@@ -76,7 +76,7 @@ void UsReconstructionPluginActivator::start(ctkPluginContext* context)
 void UsReconstructionPluginActivator::stop(ctkPluginContext* context)
 {
 	mRegisteredGui.reset();
-	mRegisteredBackend.reset();
+	mUsReconstruction.reset();
 	Q_UNUSED(context);
 }
 

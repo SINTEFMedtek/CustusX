@@ -72,21 +72,6 @@ QString DoubleDataAdapterXml::getDisplayName() const
 	return mName;
 }
 
-QString DoubleDataAdapterXml::getValueAsString() const
-{
-	return QString::number(mValue);
-}
-
-void DoubleDataAdapterXml::setValueFromString(QString value)
-{
-	bool ok;
-	double val = value.toDouble(&ok);
-	if(ok)
-		this->setValue(val);
-	else
-		reportError("Could not convert "+value+" to double.");
-}
-
 QString DoubleDataAdapterXml::getUid() const
 {
 	return mUid;
