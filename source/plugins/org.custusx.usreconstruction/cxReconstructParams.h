@@ -80,6 +80,7 @@ signals:
 
 private slots:
 	void transferFunctionChangedSlot();
+	void onPatientChanged();
 
 private:
 	std::map<QString, DataAdapterPtr> mParameters;

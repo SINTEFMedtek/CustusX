@@ -52,11 +52,26 @@ ReconstructParams::ReconstructParams(PatientModelServicePtr patientModelService,
 	mPatientModelService(patientModelService),
 	mSettings(settings)
 {
+	connect(mPatientModelService.get(), &PatientModelService::patientChanged, this, &ReconstructParams::onPatientChanged);
 }
 
 ReconstructParams::~ReconstructParams()
 {
 	mSettings.save();
+}
+
+void ReconstructParams::onPatientChanged()
+{
+	if (mParameters.empty())
+		return;
+
+	PresetTransferFunctions3DPtr presets = mPatientModelService->getPresetTransferFunctions3D();
+	QStringList presetList;
+	if (presets)
+	{
+		presetList = presets->getPresetList("US");
+		mPresetTFAdapter->setValueRange(presetList);
+	}
 }
 
 void ReconstructParams::createParameters()
@@ -73,17 +88,11 @@ void ReconstructParams::createParameters()
 	connect(mOrientationAdapter.get(), &StringDataAdapterXml::valueWasSet, this, &ReconstructParams::changedInputSettings);
 	this->add(mOrientationAdapter);
 
-	PresetTransferFunctions3DPtr presets = mPatientModelService->getPresetTransferFunctions3D();
-	QStringList presetList;
-	if (presets)
-	{
-		presetList = presets->getPresetList("US");
-	}
+	// note: value range initialized by onPatientChanged()
 	mPresetTFAdapter = StringDataAdapterXml::initialize("Preset", "",
-		"Preset transfer function to apply to the reconstructed volume", "US B-Mode", presetList,
+		"Preset transfer function to apply to the reconstructed volume", "US B-Mode", QStringList(),
 		mSettings.getElement());
 	connect(mPresetTFAdapter.get(), &StringDataAdapterXml::valueWasSet, this, &ReconstructParams::transferFunctionChangedSlot);
-//	connect(mParams.get(), SIGNAL(transferFunctionChanged()), this, SLOT(transferFunctionChangedSlot()));
 	this->add(mPresetTFAdapter);
 
 	mMaskReduce = StringDataAdapterXml::initialize("Reduce mask (% in 1D)", "",
@@ -131,6 +140,8 @@ void ReconstructParams::createParameters()
 			QString(), QStringList(), mSettings.getElement());
 	connect(mAlgorithmAdapter.get(), &StringDataAdapterXml::valueWasSet, this, &ReconstructParams::changedInputSettings);
 	this->add(mAlgorithmAdapter);
+
+	this->onPatientChanged();
 }
 
 void ReconstructParams::add(DataAdapterPtr param)

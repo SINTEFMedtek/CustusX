@@ -131,16 +131,11 @@ bool StringDataAdapterXml::setValue(const QString& val)
 
 QStringList StringDataAdapterXml::getValueRange() const
 {
-	if (this->getDisplayName()=="Algorithm")
-		std::cout << this << " StringDataAdapterXml::getValueRange " << this->getDisplayName() << " -- " << mRange.join(" ") << std::endl;
 	return mRange;
 }
 
 void StringDataAdapterXml::setValueRange(QStringList range)
 {
-	if (this->getDisplayName()=="Algorithm")
-		std::cout << this <<" StringDataAdapterXml::setValueRange " << this->getDisplayName() << " -- " << range.join(" ") << std::endl;
-
 	mRange = range;
 	emit changed();
 }

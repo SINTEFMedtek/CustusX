@@ -322,9 +322,7 @@ ReconstructCore::InputParams UsReconstructionImplService::createCoreParameters()
 
 void UsReconstructionImplService::onServiceAdded(ReconstructionMethodService* service)
 {
-//	std::cout << "UsReconstructionImplService::onServiceAdded" << std::endl;
 	QStringList range = mParams->getAlgorithmAdapter()->getValueRange();
-	std::cout << "UsReconstructionImplService::onServiceAdded " << service->getName() << std::endl;
 	range << service->getName();
 	mParams->getAlgorithmAdapter()->setValueRange(range);
 }

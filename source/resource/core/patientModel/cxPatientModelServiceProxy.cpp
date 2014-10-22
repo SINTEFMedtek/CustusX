@@ -82,6 +82,8 @@ void PatientModelServiceProxy::onServiceAdded(PatientModelService* service)
 
 	if(mPatientModelService->isNull())
 		reportWarning("PatientModelServiceProxy::onServiceAdded mPatientModelService->isNull()");
+
+	emit patientChanged();
 }
 
 void PatientModelServiceProxy::onServiceRemoved(PatientModelService *service)
@@ -99,6 +101,8 @@ void PatientModelServiceProxy::onServiceRemoved(PatientModelService *service)
 	disconnect(service, &PatientModelService::patientChanged, this, &PatientModelService::patientChanged);
 
 	mPatientModelService = PatientModelService::getNullObject();
+
+	emit patientChanged();
 }
 
 void PatientModelServiceProxy::insertData(DataPtr data)

@@ -44,11 +44,6 @@ LabeledComboBoxWidget::LabeledComboBoxWidget(QWidget* parent, StringDataAdapterP
 	QGridLayout* gridLayout, int row) :
     BaseWidget(parent, "LabeledComboBoxWidget", "LabeledComboBoxWidget")
 {
-	if (dataInterface->getDisplayName()=="Algorithm")
-	{
-		std::cout << " *** LabeledComboBoxWidget::LabeledComboBoxWidget() " << dataInterface.get() << " " << dataInterface->getDisplayName() << " -- " << dataInterface->getValueRange().join(" ") << std::endl;
-	}
-
 	SSC_ASSERT(dataInterface->getAllowOnlyValuesInRange()==true);
 
 	this->setEnabled(dataInterface->getEnabled());
@@ -106,8 +101,6 @@ void LabeledComboBoxWidget::prePaintEvent()
 
 	QString currentValue = mData->getValue();
 	QStringList range = mData->getValueRange();
-	if (mData->getDisplayName()=="Algorithm")
-		std::cout << "LabeledComboBoxWidget::prePaintEvent() " << mData->getDisplayName() << " -- " << range.join(" ") << std::endl;
 	int currentIndex = -1;
 	for (int i = 0; i < range.size(); ++i)
 	{
@@ -115,7 +108,6 @@ void LabeledComboBoxWidget::prePaintEvent()
 		mCombo->setItemData(i, range[i]);
 		if (range[i] == currentValue)
 			currentIndex = i;
-		//      mCombo->setCurrentIndex(i);
 	}
 	mCombo->setCurrentIndex(currentIndex);
 
