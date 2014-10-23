@@ -196,6 +196,10 @@ macro(cx_install_set_folder_structure)
 		set(CPACK_PACKAGING_INSTALL_PREFIX "/")
 		set(CX_INSTALL_ROOT_DIR ${CX_BUNDLE_NAME})
 	endif(CX_LINUX)
+    if(CX_WINDOWS)
+        set(CPACK_PACKAGING_INSTALL_PREFIX "/")
+        set(CX_INSTALL_ROOT_DIR ${CX_BUNDLE_NAME})
+    endif(CX_WINDOWS)
 
 	set(CX_INSTALL_BINARY_DIR ${CX_INSTALL_ROOT_DIR}/bin)
 	if(APPLE)
@@ -391,7 +395,7 @@ endfunction()
 ###############################################################################
 function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS_LOCAL)
     find_qt_plugin_dir(QT_PLUGINS_DIR)
-
+    
 	cx_assert_variable_exists(${QT_PLUGINS_DIR})
 	cx_assert_variable_exists(${CX_INSTALL_ROOT_DIR})
 	cx_assert_variable_exists(${INSTALL_BINARY_DIR})
