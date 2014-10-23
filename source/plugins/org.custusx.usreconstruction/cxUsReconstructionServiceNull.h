@@ -33,9 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXUSRECONSTRUCTIONSERVICENULL_H
 #define CXUSRECONSTRUCTIONSERVICENULL_H
 
+#include "org_custusx_usreconstruction_Export.h"
 #include "cxUsReconstructionService.h"
-
-
 
 namespace cx
 {

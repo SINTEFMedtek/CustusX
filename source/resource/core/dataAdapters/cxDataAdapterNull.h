@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDATAADAPTERNULL_H
 #define CXDATAADAPTERNULL_H
 
+#include "cxResourceExport.h"
 #include "cxDataAdapter.h"
 
 namespace cx {
@@ -45,6 +46,7 @@ namespace cx {
  */
 class cxResource_EXPORT DataAdapterNull: public DataAdapter
 {
+	Q_OBJECT
 public:
     virtual ~DataAdapterNull(){}
     static DataAdapterPtr create() { return DataAdapterPtr(new DataAdapterNull()); }
@@ -60,9 +62,9 @@ public:
     virtual bool getAdvanced() const { return false; }
     virtual QString getGroup() const { return ""; }
 
-    virtual bool setEnabled(bool enabled) {}
-    virtual bool setAdvanced(bool advanced) {}
-    virtual bool setGroup(QString name) {}
+    virtual bool setEnabled(bool enabled) { return false;}
+    virtual bool setAdvanced(bool advanced) { return false;}
+    virtual bool setGroup(QString name) { return false;}
 };
 
 } //namespace cx

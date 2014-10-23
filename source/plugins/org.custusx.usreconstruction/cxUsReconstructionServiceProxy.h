@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXUSRECONSTRUCTIONSERVICEPROXY_H
 #define CXUSRECONSTRUCTIONSERVICEPROXY_H
 
+#include "org_custusx_usreconstruction_Export.h"
+
 #include "cxUsReconstructionService.h"
 #include "cxServiceTrackerListener.h"
 class ctkPluginContext;
@@ -42,7 +44,8 @@ namespace cx
 
 class org_custusx_usreconstruction_EXPORT UsReconstructionServiceProxy : public UsReconstructionService
 {
-Q_OBJECT
+
+	Q_OBJECT
 
 public:
 	UsReconstructionServiceProxy(ctkPluginContext *pluginContext);

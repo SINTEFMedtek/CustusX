@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MATRIXINTERPOLATION_H_
 #define MATRIXINTERPOLATION_H_
 
-#include "cxPluginUSReconstructionExport.h"
+#include "org_custusx_usreconstruction_Export.h"
 
 #include <vector>
 #include "vnl/vnl_matrix.h"

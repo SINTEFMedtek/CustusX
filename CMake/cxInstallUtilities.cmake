@@ -143,7 +143,7 @@ endmacro()
 #
 # Setup a folder structure for the installed system.
 #
-# Structure on linux
+# Structure on linux:
 #
 #   bundle/bin/bundle
 #              binary*
@@ -153,7 +153,7 @@ endmacro()
 #   bundle/doc/something.txt
 #   bundle/config/...
 #
-# Structure on mac
+# Structure on mac:
 #
 #   bundle/bundle.app/Contents/MacOS/bundle
 #                                    binary*
@@ -162,6 +162,16 @@ endmacro()
 #   bundle/bundle.app/Contents/Resources/qt.conf
 #   bundle/doc/something.txt
 #   bundle/config/...
+#
+# Structure on windows:
+#
+#  bundle/bin/*.exe
+#             *.dll
+#             plugins/
+#  bundle/config/...
+#  bundle/doc/...
+#  bundle/documentation/...
+#  bundle/include/...
 #
 #
 #  Creates the following variables:

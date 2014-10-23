@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <boost/shared_ptr.hpp>
 #include <set>
+#include <vector>
 #include <QObject>
 
 #include "cxForwardDeclarations.h"
@@ -52,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-class USReconstructInputData;
+struct USReconstructInputData;
 class XmlOptionFile;
 class OutputVolumeParams;
 class ReconstructionMethodService;
