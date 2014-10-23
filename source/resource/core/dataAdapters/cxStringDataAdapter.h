@@ -131,35 +131,6 @@ public:
 };
 typedef boost::shared_ptr<StringDataAdapter> StringDataAdapterPtr;
 
-/**
- * \brief Dummy implementation of the StringDataAdapter
- *
- * \author Christian Askeland, SINTEF
- */
-class cxResource_EXPORT StringDataAdapterNull: public StringDataAdapter
-{
-Q_OBJECT
-public:
-	virtual ~StringDataAdapterNull()
-	{
-	}
-	virtual QString getDisplayName() const
-	{
-		return "dummy";
-	}
-	virtual QString getUid() const
-	{
-		return "dummy_id";
-	}
-	virtual bool setValue(const QString& value)
-	{
-		return false;
-	}
-	virtual QString getValue() const
-	{
-		return "";
-	}
-};
 } // namespace cx
 
 #endif /* CXSTRINGDATAADAPTER_H_ */

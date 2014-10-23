@@ -31,20 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxUsReconstructionServiceNull.h"
-
-//#include <QString.h>
-
-//#include "cxUSReconstructInputData.h"
-
-
-//#include <set>
-//#include "cxForwardDeclarations.h"
-//#include "cxXmlOptionItem.h"
-//#include "cxReconstructCore.h"
+#include "cxDataAdapterNull.h"
 #include "cxUSReconstructInputData.h"
-//#include "cxReconstructedOutputVolumeParams.h"
-//#include "cxReconstructionMethodService.h"
-//#include "cxServiceTrackerListener.h"
 
 namespace cx {
 
@@ -81,7 +69,7 @@ USReconstructInputData UsReconstructionServiceNull::getSelectedFileData()
 DataAdapterPtr UsReconstructionServiceNull::getParam(QString uid)
 {
 	printWarning();
-	return DataAdapterPtr();
+	return DataAdapterNull::create();
 }
 
 //ReconstructParamsPtr UsReconstructionServiceNull::getParams()

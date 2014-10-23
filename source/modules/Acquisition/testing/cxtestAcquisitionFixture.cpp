@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxStateService.h"
 #include "cxLegacySingletons.h"
 #include "cxVideoService.h"
-#include "cxUsReconstructionService.h"
+#include "cxUsReconstructionServiceProxy.h"
 
 namespace cxtest
 {
@@ -126,7 +126,10 @@ void AcquisitionFixture::initialize()
 	cx::patientService()->getPatientData()->newPatient(cx::DataLocations::getTestDataPath() + "/temp/Acquisition/");
 
 	//Mock UsReconstructionService with null object
-	mAcquisitionData.reset(new cx::AcquisitionData(cx::UsReconstructionService::getNullObject()));
+//	mAcquisitionData.reset(new cx::AcquisitionData(cx::UsReconstructionService::getNullObject()));
+	ctkPluginContext *pluginContext = cx::logicManager()->getPluginContext();
+	cx::UsReconstructionServicePtr reconstructer = cx::UsReconstructionServicePtr(new cx::UsReconstructionServiceProxy(pluginContext));
+	mAcquisitionData.reset(new cx::AcquisitionData(reconstructer));
 
 	mAcquisitionBase.reset(new cx::Acquisition(mAcquisitionData));
 	mAcquisition.reset(new cx::USAcquisition(mAcquisitionBase));

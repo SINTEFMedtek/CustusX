@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDoubleRange.h"
 #include "cxPatientModelService.h"
 #include "cxReporter.h"
+#include "cxTypeConversions.h"
 
 //Windows fix
 #ifndef M_PI

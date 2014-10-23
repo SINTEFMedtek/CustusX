@@ -187,7 +187,8 @@ std::vector<VideoSourcePtr> USAcquisition::getRecordingVideoSources(ToolPtr tool
 
 bool USAcquisition::getWriteColor() const
 {
-	bool writeColor = mBase->getPluginData()->getReconstructer()->getParam("Angio data")->getValueAsVariant().toBool()
+	DataAdapterPtr angio = mBase->getPluginData()->getReconstructer()->getParam("Angio data");
+	bool writeColor = angio->getValueAsVariant().toBool()
 	        ||  !settings()->value("Ultrasound/8bitAcquisitionData").toBool();
 	return writeColor;
 }
