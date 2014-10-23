@@ -1,0 +1,7 @@
+# This empty directory is used by source/apps/CustusX/CMakeLists.txt to make sure all users get write permissions
+# in the folder CustusX is installed in
+#
+# Ignore everything in this directory
+*
+# Except this file
+!.gitignore
