@@ -159,7 +159,9 @@ class CppBuilder:
     def makeClean(self):
         self._changeDirToBuild()
         #self._changeDirToBuild()
-        if(platform.system() == 'Windows'):
+        if(self.controlData.getCMakeGenerator() == 'Eclipse CDT4 - Ninja'):
+            runShell('ninja clean')
+        elif(platform.system() == 'Windows'):
             if(self.controlData.getCMakeGenerator() == 'Eclipse CDT4 - NMake Makefiles'):
                 runShell('nmake -clean')
             if(self.controlData.getCMakeGenerator() == 'NMake Makefiles JOM'):
