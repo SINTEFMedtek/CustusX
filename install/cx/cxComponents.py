@@ -158,12 +158,13 @@ class ITK(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git://itk.org/ITK.git')
     def update(self):
-        self._getBuilder().gitCheckout('v4.5.1')
+        self._getBuilder().gitCheckout('v4.6.1')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
         add('BUILD_TESTING:BOOL', self.controlData.mBuildExAndTest)
         add('BUILD_EXAMPLES:BOOL', self.controlData.mBuildExAndTest)
+#        add('Module_ITKVtkGlue:BOOL', True)
         builder.configureCMake()
 # ---------------------------------------------------------
 
