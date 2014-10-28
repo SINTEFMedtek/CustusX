@@ -410,7 +410,7 @@ class CustusX(CppComponent):
             if lib.pluginPath() and os.path.exists(lib.pluginPath()):
                 add('CX_EXTERNAL_PLUGIN_%s'%lib.name(), lib.pluginPath())
         
-        add('CX_PLUGIN_org.custusx.ussimulator:BOOL', False);
+        add('CX_PLUGIN_org.custusx.ussimulator:BOOL', platform.system() != 'Linux');
 
         if self.controlData.force_connect_sublibraries:
             self.forceConnectSublibraries(add)
