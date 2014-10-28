@@ -49,15 +49,5 @@ TEST_CASE("Speed: Render 10 empty viewWidgets", "[speed][gui][integration]")
 //    helper.printResult();
 }
 
-TEST_CASE("Speed: Render 10 empty vtkRenderWindows", "[speed][gui][integration]")
-{
-	TestRenderWindowSpeed helper;
-	helper.testSeveralVtkRenderWindows();
-
-	REQUIRE(helper.getRenderFPS() > 10);
-
-	JenkinsMeasurement jenkins;
-	jenkins.createOutput("FPS", QString::number(helper.getRenderFPS()));
-}
 
 } //namespace cxtest

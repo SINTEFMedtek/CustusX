@@ -33,11 +33,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVISUALIZATIONSERVICENULL_H
 #define CXVISUALIZATIONSERVICENULL_H
 
+#include "cxResourceVisualizationExport.h"
+
 #include "cxVisualizationService.h"
 
 namespace cx
 {
-class VisualizationServiceNull : public VisualizationService
+class cxResourceVisualization_EXPORT VisualizationServiceNull : public VisualizationService
 {
 public:
 	VisualizationServiceNull();
@@ -48,6 +50,8 @@ public:
 	virtual ViewGroupDataPtr getViewGroupData(int groupIdx);
 
 	virtual void setRegistrationMode(REGISTRATION_STATUS mode);
+
+	virtual void autoShowData(DataPtr data);
 
 	virtual bool isNull();
 private:

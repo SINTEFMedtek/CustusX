@@ -49,14 +49,20 @@ class CppBuilder:
                 runShell('nmake')
             if(self.controlData.getCMakeGenerator() == 'NMake Makefiles JOM'):
                 runShell('''jom -k -j%s''' % str(self.controlData.threads))
+            if(self.controlData.getCMakeGenerator() == 'Eclipse CDT4 - Ninja'):
+                runShell('''ninja''')
         else:
+            maker = 'make -j%s' % str(self.controlData.threads)
+            if(self.controlData.getCMakeGenerator() == 'Eclipse CDT4 - Ninja'):
+                maker = 'ninja'
+
             # the export DYLD... line is a hack to get shared linking to work on MacOS with vtk5.6
             # - http://www.mail-archive.com/paraview@paraview.org/msg07520.html
             # (add it to all project because it does no harm if not needed)
             runShell('''\
     export DYLD_LIBRARY_PATH=`pwd`/bin; \
-    make -j%s
-    ''' % str(self.controlData.threads))
+    %s
+    ''' % maker)
 
     def gitClone(self, repository, folder=''):
         self._changeDirToBase()
@@ -153,7 +159,9 @@ class CppBuilder:
     def makeClean(self):
         self._changeDirToBuild()
         #self._changeDirToBuild()
-        if(platform.system() == 'Windows'):
+        if(self.controlData.getCMakeGenerator() == 'Eclipse CDT4 - Ninja'):
+            runShell('ninja clean')
+        elif(platform.system() == 'Windows'):
             if(self.controlData.getCMakeGenerator() == 'Eclipse CDT4 - NMake Makefiles'):
                 runShell('nmake -clean')
             if(self.controlData.getCMakeGenerator() == 'NMake Makefiles JOM'):

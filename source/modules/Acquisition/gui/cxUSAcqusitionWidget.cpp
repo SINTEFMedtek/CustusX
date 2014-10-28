@@ -46,14 +46,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSettings.h"
 #include "cxToolDataAdapters.h"
 #include "cxDoubleDataAdapterTemporalCalibration.h"
-#include "cxReconstructionManager.h"
 #include "cxTimedAlgorithmProgressBar.h"
 #include "cxProbeConfigWidget.h"
 #include "cxDisplayTimerWidget.h"
-#include "cxReconstructParams.h"
 #include "cxTimedAlgorithm.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxStringDataAdapterXml.h"
+#include "cxUsReconstructionService.h"
+#include "cxHelperWidgets.h"
+
 
 namespace cx
 {
@@ -64,9 +65,9 @@ USAcqusitionWidget::USAcqusitionWidget(AcquisitionDataPtr pluginData, QWidget* p
 	this->setObjectName("USAcqusitionWidget");
 	this->setWindowTitle("US Acquisition");
 
-	connect(mPluginData->getReconstructer().get(), SIGNAL(reconstructAboutToStart()), this, SLOT(reconstructAboutToStartSlot()));
-	connect(mPluginData->getReconstructer().get(), SIGNAL(reconstructStarted()), this, SLOT(reconstructStartedSlot()));
-	connect(mPluginData->getReconstructer().get(), SIGNAL(reconstructFinished()), this, SLOT(reconstructFinishedSlot()));
+	connect(mPluginData->getReconstructer().get(), &UsReconstructionService::reconstructAboutToStart, this, &USAcqusitionWidget::reconstructAboutToStartSlot);
+	connect(mPluginData->getReconstructer().get(), &UsReconstructionService::reconstructStarted, this, &USAcqusitionWidget::reconstructStartedSlot);
+	connect(mPluginData->getReconstructer().get(), &UsReconstructionService::reconstructFinished, this, &USAcqusitionWidget::reconstructFinishedSlot);
 
 	mAcquisition.reset(new USAcquisition(mBase));
 	connect(mAcquisition.get(), SIGNAL(acquisitionDataReady()), this, SLOT(acquisitionDataReadySlot()));
@@ -92,7 +93,7 @@ USAcqusitionWidget::USAcqusitionWidget(AcquisitionDataPtr pluginData, QWidget* p
 	editsLayout->setColumnStretch(1,1);
 	RecordBaseWidget::mLayout->addLayout(editsLayout);
 	new LabeledComboBoxWidget(this, ActiveProbeConfigurationStringDataAdapter::New(), editsLayout, 0);
-	new LabeledComboBoxWidget(this, mPluginData->getReconstructer()->getParams()->mPresetTFAdapter, editsLayout, 1);
+	sscCreateDataWidget(this, mPluginData->getReconstructer()->getParam("Preset"), editsLayout, 1);
 
 	QAction* optionsAction = this->createAction(this,
 	      QIcon(":/icons/open_icon_library/system-run-5.png"),

@@ -77,8 +77,6 @@ public:
 public:
 	// inherited interface
 	virtual QString getDisplayName() const;///< name of data entity. Used for display to user.
-	virtual QString getValueAsString() const;
-	virtual void setValueFromString(QString value);
 	virtual QString getUid() const;
 	virtual bool setValue(const QString& value); ///< set the data value.
 	virtual QString getValue() const; ///< get the data value.

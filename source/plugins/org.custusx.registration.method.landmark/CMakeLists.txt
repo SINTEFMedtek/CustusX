@@ -52,6 +52,10 @@ set(PLUGIN_MOC_SRCS
     cxFastOrientationRegistrationWidget.h
 )
 
+
+cx_create_export_header(${PROJECT_NAME})
+cx_remove_duplicate_include_directories()
+
 # Qt Designer files which should be processed by Qts uic
 set(PLUGIN_UI_FORMS
 )
@@ -59,7 +63,6 @@ set(PLUGIN_UI_FORMS
 # QRC Files which should be compiled into the plugin
 set(PLUGIN_resources
 )
-
 
 #Compute the plugin dependencies
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)

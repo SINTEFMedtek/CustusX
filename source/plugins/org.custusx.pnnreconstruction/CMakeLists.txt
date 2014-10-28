@@ -4,20 +4,24 @@ set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
 include_directories(
     ${CX_RESOURCE_INCLUDE_DIRECTORIES}
-    ${CustusX_SOURCE_DIR}/source/modules/UsReconstruction/logic
-    ${CustusX_SOURCE_DIR}/source/resource/usReconstructionTypes
+    ${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
+#    ${CustusX_SOURCE_DIR}/source/modules/UsReconstruction/logic
+#    ${CustusX_SOURCE_DIR}/source/resource/usReconstructionTypes
     ${CustusX_SOURCE_DIR}/source/ThirdParty
-    ${CustusX_BINARY_DIR}/source/modules/UsReconstruction
-    ${CustusX_BINARY_DIR}/source/resource/core
-    ${CustusX_BINARY_DIR}/source/resource/usReconstructionTypes
+#    ${CustusX_BINARY_DIR}/source/modules/UsReconstruction
+#    ${CustusX_BINARY_DIR}/source/resource/core
+#    ${CustusX_BINARY_DIR}/source/resource/usReconstructionTypes
     ${CustusX_BINARY_DIR}/source/ThirdParty
     ${CustusX_SOURCE_DIR}/source/logic
+
+    ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.usreconstruction
+    ${CustusX_BINARY_DIR}/source/plugins/org.custusx.usreconstruction
     )
 
 set(PLUGIN_SRCS
   cxPNNReconstructionPluginActivator.cpp
-  cxPNNReconstructionService.cpp
-  cxPNNReconstructionService.h
+  cxPNNReconstructionMethodService.cpp
+  cxPNNReconstructionMethodService.h
 )
 
 # Files which should be processed by Qts moc
@@ -37,8 +41,9 @@ set(PLUGIN_resources
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
     ${PLUGIN_target_libraries}   
-    cxPluginUSReconstruction
+#    cxPluginUSReconstruction
     cxPluginUtilities
+    org_custusx_usreconstruction
     )
 
 ctkMacroBuildPlugin(

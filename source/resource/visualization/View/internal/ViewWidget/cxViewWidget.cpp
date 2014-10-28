@@ -45,6 +45,7 @@ namespace cx
 ViewWidget::ViewWidget(const QString& uid, const QString& name, QWidget *parent, Qt::WindowFlags f) :
 	inherited(parent, f)
 {
+	mMTimeHash = 0;
 	this->setContextMenuPolicy(Qt::CustomContextMenu);
 	mZoomFactor = -1.0;
 	mView = ViewLinkingViewWidget::create(this, vtkRenderWindowPtr::New());
@@ -74,6 +75,19 @@ ViewWidget::~ViewWidget()
 vtkRendererPtr ViewWidget::getRenderer()
 {
 	return this->getView()->getRenderer();
+}
+
+void ViewWidget::render()
+{
+	// Render is called only when mtime is changed.
+	// At least on MaxOS, this is not done automatically.
+	unsigned long hash = mView->computeTotalMTime();
+
+	if (hash != mMTimeHash)
+	{
+		this->getRenderWindow()->Render();
+		mMTimeHash = hash;
+	}
 }
 
 void ViewWidget::resizeEvent(QResizeEvent * event)

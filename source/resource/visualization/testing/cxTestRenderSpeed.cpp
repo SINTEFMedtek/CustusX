@@ -111,7 +111,8 @@ TestRenderSpeed::TestRenderSpeed()
 {
 	mCounter.setName("cxView");
 	cx::reporter()->initialize();
-	mMainWidget.reset(cx::ViewCollectionWidget::createViewWidgetLayout().data());
+	mMainWidget.reset(cx::ViewCollectionWidget::createOptimizedLayout().data());
+//	mMainWidget.reset(cx::ViewCollectionWidget::createViewWidgetLayout().data());
 }
 
 TestRenderSpeed::~TestRenderSpeed()
@@ -142,7 +143,6 @@ void TestRenderSpeed::testLotsOfViews()
 
 void TestRenderSpeed::createViews(int num)
 {
-//	mNumViews += num;
 	for(int i = 0; i < num; ++i)
 	{
 		int v = num;
@@ -150,73 +150,30 @@ void TestRenderSpeed::createViews(int num)
 		cx::LayoutRegion region(v%rmax, v/rmax);
 		cx::ViewPtr view = mMainWidget->addView(cx::View::VIEW, region);
 
-//		cx::ViewWidget* view = new cx::ViewWidget("testView3D", "testView3D", NULL);
 		mViews.push_back(view);
 	}
 }
 
-//void TestRenderSpeed::create2Dviews(int num)
-//{
-//	mNumViews += num;
-//	for(int i = 0; i < num; ++i)
-//	{
-//		cx::ViewWidget* view = new cx::ViewWidget("testView2D", "testView2D", NULL);
-//		mViews.push_back(view);
-//	}
-//}
-
 void TestRenderSpeed::showViews()
 {
-	SSC_ASSERT(!mMainWidget);
+	SSC_ASSERT(mMainWidget);
 
-//	mMainWidget.reset(new QWidget);
 	mMainWidget->resize(1000,500);
-//	QGridLayout* layout = new QGridLayout();
-//	mMainWidget->setLayout(layout);
-//	this->addViewsToGridLayout(layout);
 	mMainWidget->show();
 }
 
 void TestRenderSpeed::renderNumTimes(int num)
 {
 	mCounter.startRender(num, mViews.size());
-//	mNumRenderings = num;
-//	QTime clock;
-//	clock.start();
 	for(int i = 0; i < num; ++i)
+	{
 		for(int v = 0; v < mViews.size(); v++)
-			mViews[v]->getRenderWindow()->Render();
-//	this->setTotalRenderTimeInMs(clock.elapsed());
+			mViews[v]->setModified();
+		mMainWidget->render();
+	}
+
 	mCounter.stopRender();
 }
-
-//void TestRenderSpeed::renderViewNum(int viewNum)
-//{
-//	if(mViews.size() != 0)
-//		mViews[viewNum]->getView()->getRenderWindow()->Render();
-//	else if(mInteractors.size() != 0)
-//		mInteractors[viewNum]->GetRenderWindow()->Render();
-//}
-
-
-//void TestRenderSpeed::addViewsToLayout(QLayout* layout)
-//{
-//	std::vector<cx::ViewWidget*>::iterator iter;
-//	for (iter = mViews.begin(); iter != mViews.end(); ++iter)
-//		layout->addWidget(*iter);
-//}
-
-//void TestRenderSpeed::addViewsToGridLayout(QGridLayout* layout)
-//{
-//	int squareNumViews = sqrt((double)this->getNumViews());
-//	for (int i = 0; i < this->getNumViews(); i++)
-//		layout->addWidget(mViews[i], i / squareNumViews, i % squareNumViews);
-//}
-
-//int TestRenderSpeed::getNumViews()
-//{
-//	return mNumViews;
-//}
 
 ///--------------------------------------------------------
 ///--------------------------------------------------------
@@ -266,10 +223,5 @@ void TestRenderWindowSpeed::renderNumTimes(int num)
 			mInteractors[v]->GetRenderWindow()->Render();
 	mCounter.stopRender();
 }
-
-//int TestRenderWindowSpeed::getNumViews()
-//{
-//	return mNumViews;
-//}
 
 } //namespace cxtest

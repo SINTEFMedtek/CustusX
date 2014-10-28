@@ -37,11 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxGUIExtenderService.h"
 class QDomNode;
 
-namespace cx
-{
-typedef boost::shared_ptr<class ReconstructionManager> ReconstructManagerPtr;
-}
-
 /**
  * \defgroup cx_module_acquisition Acquisition Plugin
  * \ingroup cx_modules
@@ -56,6 +51,7 @@ namespace cx
 {
 typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
 typedef boost::shared_ptr<class AcquisitionPlugin> AcquisitionPluginPtr;
+typedef boost::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
 
 
 /**
@@ -71,7 +67,7 @@ class cxPluginAcquisition_EXPORT  AcquisitionPlugin: public GUIExtenderService
 {
 Q_OBJECT
 public:
-	AcquisitionPlugin(ReconstructManagerPtr reconstructer);
+	AcquisitionPlugin(UsReconstructionServicePtr reconstructer);
 	virtual ~AcquisitionPlugin();
 
 	AcquisitionDataPtr getAcquisitionData()

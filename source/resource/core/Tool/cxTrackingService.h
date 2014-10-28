@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTRACKINGSERVICE_H
 #define CXTRACKINGSERVICE_H
 
+#include "cxResourceExport.h"
+
 #include <QObject>
 #include <boost/shared_ptr.hpp>
 
@@ -49,7 +51,7 @@ typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
  *  \date 2014-09-19
  *  \author Ole Vegard Solberg, SINTEF
  */
-class TrackingService : public QObject
+class cxResource_EXPORT TrackingService : public QObject
 {
 	Q_OBJECT
 public:

@@ -33,8 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXREGISTRATIONHISTORYGUIEXTENDERSERVICE_H
 #define CXREGISTRATIONHISTORYGUIEXTENDERSERVICE_H
 
+#include "org_custusx_registration_gui_Export.h"
 #include "cxGUIExtenderService.h"
-#include "org_custusx_registration_Export.h"
 #include "cxRegistrationMethodServices.h"
 class ctkPluginContext;
 
@@ -49,7 +49,7 @@ namespace cx
  * \date Oct 14 2014
  * \author Ole Vegard Solberg, SINTEF
  */
-class org_custusx_registration_EXPORT RegistrationHistoryGUIExtenderService : public GUIExtenderService
+class org_custusx_registration_gui_EXPORT RegistrationHistoryGUIExtenderService : public GUIExtenderService
 {
 	Q_INTERFACES(cx::GUIExtenderService)
 public:

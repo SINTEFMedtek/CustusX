@@ -59,20 +59,6 @@ QString ColorDataAdapterXml::getDisplayName() const
     return mName;
 }
 
-QString ColorDataAdapterXml::getValueAsString() const
-{
-	return mValue.name();
-}
-
-void ColorDataAdapterXml::setValueFromString(QString value)
-{
-	QColor val(value);
-	if(val.isValid())
-		this->setValue(val);
-	else
-		reportError("Could not convert "+value+" to QColor.");
-}
-
 QString ColorDataAdapterXml::getUid() const
 {
     return mUid;

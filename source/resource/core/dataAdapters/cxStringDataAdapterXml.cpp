@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <QDomElement>
 #include <QStringList>
+#include "cxTypeConversions.h"
 
 namespace cx
 {
@@ -89,16 +90,6 @@ void StringDataAdapterXml::setReadOnly(bool val)
 QString StringDataAdapterXml::getDisplayName() const
 {
 	return mName;
-}
-
-QString StringDataAdapterXml::getValueAsString() const
-{
-	return mValue;
-}
-
-void StringDataAdapterXml::setValueFromString(QString value)
-{
-	this->setValue(value);
 }
 
 QString StringDataAdapterXml::getUid() const

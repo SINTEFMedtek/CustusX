@@ -108,7 +108,6 @@ void LabeledComboBoxWidget::prePaintEvent()
 		mCombo->setItemData(i, range[i]);
 		if (range[i] == currentValue)
 			currentIndex = i;
-		//      mCombo->setCurrentIndex(i);
 	}
 	mCombo->setCurrentIndex(currentIndex);
 

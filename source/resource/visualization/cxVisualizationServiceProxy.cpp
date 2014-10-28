@@ -98,4 +98,9 @@ void VisualizationServiceProxy::setRegistrationMode(cx::REGISTRATION_STATUS mode
 	mVisualizationService->setRegistrationMode(mode);
 }
 
+void VisualizationServiceProxy::autoShowData(cx::DataPtr data)
+{
+	mVisualizationService->autoShowData(data);
+}
+
 } //cx

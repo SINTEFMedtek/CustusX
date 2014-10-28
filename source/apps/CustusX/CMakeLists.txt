@@ -14,6 +14,8 @@ set(SOURCES cxMain.cpp)
 include_directories( ${CX_RESOURCE_INCLUDE_DIRECTORIES} )
 include_directories(
     .
+    ${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
+    ${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
     ${CustusX_SOURCE_DIR}/source/gui
     ${CustusX_BINARY_DIR}/source/gui
     ${CustusX_SOURCE_DIR}/source/gui/utilities
@@ -21,8 +23,6 @@ include_directories(
     ${CustusX_BINARY_DIR}/source/logic
     ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
     ${CustusX_BINARY_DIR}/source/modules/GUIExtender
-    ${CustusX_SOURCE_DIR}/source/modules/UsReconstruction/gui
-    ${CustusX_BINARY_DIR}/source/modules/UsReconstruction
     ${CustusX_SOURCE_DIR}/source/modules/Acquisition/gui
     ${CustusX_BINARY_DIR}/source/modules/Acquisition
     ${CustusX_SOURCE_DIR}/source/modules/Calibration/gui
@@ -31,9 +31,9 @@ include_directories(
     ${CustusX_BINARY_DIR}/source/modules/Algorithm
     ${CustusX_SOURCE_DIR}/source/modules/Registration/gui
     ${CustusX_BINARY_DIR}/source/modules/Registration
-    ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
-	${CustusX_BINARY_DIR}/source/resource
-	${CustusX_SOURCE_DIR}/source/resource/visualization
+
+    ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.usreconstruction
+    ${CustusX_BINARY_DIR}/source/plugins/org.custusx.usreconstruction
 	)
 
 #------------------------------------------------------------------------------
@@ -56,33 +56,38 @@ endif(APPLE)
 # Executable
 #-----------------------------------------------------------------------------
 cx_remove_duplicate_include_directories()
-if (APPLE)
-    add_executable(CustusX MACOSX_BUNDLE ${SOURCES} )
-else (APPLE)
-    if(CX_WIN32)
-        add_executable(CustusX ${SOURCES} CustusX.rc) #32bit dunno why
-    elseif(CX_WIN64)
-        add_executable(CustusX WIN32 ${SOURCES} CustusX.rc) #64bit
-    else() # WINDOWS or LINUX
-        add_executable(CustusX ${SOURCES} )
+if(APPLE)
+    add_executable(CustusX MACOSX_BUNDLE ${SOURCES} ) #APPLE
+else(APPLE)
+    if(CX_WINDOWS)
+        add_executable(CustusX ${SOURCES} CustusX.rc) #WINDOWS
+    else()
+        add_executable(CustusX ${SOURCES} ) #LINUX
     endif()
-endif (APPLE)
+endif(APPLE)
 
 #------------------------------------------------------------------------------
 # Linking
 #------------------------------------------------------------------------------
 # Add link directories needed to use IGSTK.
 SET(LINK_LIBRARIES
-                cxGui
-                cxPluginCalibration
-                cxPluginAlgorithm
-                cxPluginUSReconstruction
-                cxPluginAcquisition
+    cxGui
+    cxPluginCalibration
+    cxPluginAlgorithm
+    cxPluginAcquisition
+    org_custusx_usreconstruction
 		)
 
 target_link_libraries(CustusX ${LINK_LIBRARIES} )
 
 # Install CustusX
+
+#Needed to make sure all users get write permissions on the folder CustusX is installed in
+#To make this tric work an empty CustusX dir is needed in source/apps/CustusX
+install(DIRECTORY CustusX
+	DESTINATION ${CX_INSTALL_ROOT_DIR}/..
+	DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS})
+
 install(TARGETS CustusX
 	BUNDLE DESTINATION ${CX_INSTALL_ROOT_DIR}
 	RUNTIME DESTINATION ${CX_INSTALL_ROOT_DIR}/bin)

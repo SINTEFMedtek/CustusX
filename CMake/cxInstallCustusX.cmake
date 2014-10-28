@@ -30,7 +30,6 @@ cx_install_windows_runtime_libs(${CX_INSTALL_ROOT_DIR}/bin)
 #--------------------------------------------------------------------------------
 # Bundle utilities
 #--------------------------------------------------------------------------------
-
 set(CUSTUSX_EXECUTABLE "${CX_INSTALL_BINARY_DIR}/${CX_BUNDLE_NAME}")
 if(CX_WINDOWS)
 	set( CUSTUSX_EXECUTABLE "${CUSTUSX_EXECUTABLE}.exe")
@@ -44,14 +43,18 @@ set(CX_ALL_LIBRARY_DIRS
     ${QT_BINARY_DIR}
     ${GEStreamer_LIBRARY_DIRS}
     ${OpenCV_LIB_DIR}
+    ${OpenCV_DIR}/bin
     ${OPENCL_LIBRARY_DIRS}
     ${IGSTK_LIBRARY_DIRS}
     ${OpenIGTLink_LIBRARY_DIRS}
     ${VTK_DIR}/lib
+    ${VTK_DIR}/bin
     ${CTK_DIR}/CTK-build/bin
 	${CTK_DIR}/DCMTK-build/lib # remove?
 	${CTK_DCMTK_DIR}/lib
+	${CTK_DCMTK_DIR}/bin
     ${ITK_DIR}/lib
+    ${ITK_DIR}/bin
     ${Level-Set-Segmentation_LIBRARY_DIRS}
     ${Tube-Segmentation-Framework_LIBRARY_DIRS}
     ${OpenCLUtilityLibrary_LIBRARY_DIRS}
@@ -64,8 +67,9 @@ cx_install_all_stored_targets(${CX_INSTALL_BINARY_DIR})
 
 cx_fixup_and_add_qtplugins_to_bundle(
 	"${CUSTUSX_EXECUTABLE}"
-	${CX_INSTALL_BINARY_DIR}
-	"${CX_ALL_LIBRARY_DIRS}")
+	"${CX_INSTALL_BINARY_DIR}"
+	"${CX_ALL_LIBRARY_DIRS}"
+)
 
 
 include(CPack)

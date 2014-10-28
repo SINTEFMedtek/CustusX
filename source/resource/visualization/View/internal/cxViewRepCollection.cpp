@@ -47,7 +47,6 @@ namespace cx
 ViewRepCollection::ViewRepCollection(vtkRenderWindowPtr renderWindow, const QString& uid, const QString& name)
 {
 	mRenderWindow = renderWindow;
-	mMTimeHash = 0;
 	mBackgroundColor = QColor("black");
 	mUid = uid;
 	mName = name;
@@ -206,17 +205,10 @@ void ViewRepCollection::printSelf(std::ostream & os, Indent indent)
 	}
 }
 
-void ViewRepCollection::render()
+void ViewRepCollection::setModified()
 {
-	// Render is called only when mtime is changed.
-	// At least on MaxOS, this is not done automatically.
-	unsigned long hash = this->computeTotalMTime();
-
-	if (hash != mMTimeHash)
-	{
-		this->getRenderWindow()->Render();
-		mMTimeHash = hash;
-	}
+	this->getRenderer()->Modified();
+	this->getRenderWindow()->Modified();
 }
 
 int ViewRepCollection::computeTotalMTime()

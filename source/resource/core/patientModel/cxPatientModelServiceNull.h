@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPATIENTMODELSERVICENULL_H
 #define CXPATIENTMODELSERVICENULL_H
 
+#include "cxResourceExport.h"
 #include "cxPatientModelService.h"
 
 namespace cx
@@ -45,7 +46,7 @@ namespace cx
  *  \date 2014-09-10
  *  \author Ole Vegard Solberg, SINTEF
  */
-class PatientModelServiceNull : public PatientModelService
+class cxResource_EXPORT PatientModelServiceNull : public PatientModelService
 {
 public:
 	PatientModelServiceNull();

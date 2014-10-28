@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXIGTLinkedImageReceiverThread_H_
 #define CXIGTLinkedImageReceiverThread_H_
 
-#include "cxVideoServiceExport.h"
+#include "cxVideoServiceOldExport.h"
 
 #include <vector>
 #include <QTcpSocket>
@@ -56,7 +56,7 @@ typedef boost::shared_ptr<class IGTLinkedImageReceiverThread> IGTLinkedImageRece
  *
  *
  */
-class cxVideoService_EXPORT IGTLinkedImageReceiverThread: public ImageReceiverThread
+class cxVideoServiceOld_EXPORT IGTLinkedImageReceiverThread: public ImageReceiverThread
 {
 Q_OBJECT
 public:

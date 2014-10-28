@@ -34,7 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMainWindow.h"
 #include "cxReporter.h"
 
-#include "cxUsReconstructionPlugin.h"
 #include "cxAcquisitionPlugin.h"
 #include "cxCalibrationPlugin.h"
 #include "cxAlgorithmPlugin.h"
@@ -45,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPluginFramework.h"
 #include "cxPatientModelServiceProxy.h"
 #include "cxVisualizationServiceProxy.h"
+#include "cxUsReconstructionServiceProxy.h"
 
 #if !defined(WIN32)
 #include <langinfo.h>
@@ -74,7 +74,8 @@ void force_C_locale_decimalseparator()
 
 
 #ifdef WIN32
-int WinMain(int argc, char *argv[])
+//int WinMain(int argc, char *argv[]) //add WIN32 to add_executable and use this entrypoint if you want CustusX not to have a console
+int main(int argc, char *argv[])
 #else
 int main(int argc, char *argv[])
 #endif
@@ -105,25 +106,20 @@ int main(int argc, char *argv[])
 	cx::PatientModelServicePtr patientModelService = cx::PatientModelServicePtr(new cx::PatientModelServiceProxy(cx::LogicManager::getInstance()->getPluginContext()));
 //	cx::RegistrationServicePtr registrationService = cx::RegistrationServicePtr(new cx::RegistrationServiceProxy(cx::LogicManager::getInstance()->getPluginContext()));
 	cx::VisualizationServicePtr visualizationService = cx::VisualizationServicePtr(new cx::VisualizationServiceProxy(cx::LogicManager::getInstance()->getPluginContext()));
+	cx::UsReconstructionServicePtr usReconstructionService = cx::UsReconstructionServicePtr(new cx::UsReconstructionServiceProxy(cx::LogicManager::getInstance()->getPluginContext()));
 
-	cx::UsReconstructionPluginPtr reconstructionPlugin(new cx::UsReconstructionPlugin());
-	cx::AcquisitionPluginPtr acquisitionPlugin(new cx::AcquisitionPlugin(reconstructionPlugin->getReconstructer()));
+	cx::AcquisitionPluginPtr acquisitionPlugin(new cx::AcquisitionPlugin(usReconstructionService));
 	cx::CalibrationPluginPtr calibrationPlugin(new cx::CalibrationPlugin(patientModelService, acquisitionPlugin->getAcquisitionData()));
 	cx::AlgorithmPluginPtr algorithmPlugin(new cx::AlgorithmPlugin(visualizationService, patientModelService));
-//	cx::RegistrationPluginPtr registrationPlugin(new cx::RegistrationPlugin(registrationService, visualizationService, patientModelService, acquisitionPlugin->getAcquisitionData()));
 
-	plugins.push_back(reconstructionPlugin);
 	plugins.push_back(acquisitionPlugin);
 	plugins.push_back(calibrationPlugin);
 	plugins.push_back(algorithmPlugin);
-//	plugins.push_back(registrationPlugin);
 
 	//Need to remove local variables so that plugins.clear() will trigger the destructors before LogicManager destroys the plugin framework
-	reconstructionPlugin.reset();
 	acquisitionPlugin.reset();
 	calibrationPlugin.reset();
 	algorithmPlugin.reset();
-//	registrationPlugin.reset();
 
 	cx::MainWindow* mainWin = new cx::MainWindow(plugins);
 

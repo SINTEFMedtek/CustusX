@@ -33,11 +33,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTRACKINGSERVICENULL_H
 #define CXTRACKINGSERVICENULL_H
 
+#include "cxResourceExport.h"
+
 #include "cxTrackingService.h"
 
 namespace cx
 {
-class TrackingServiceNull : public TrackingService
+class cxResource_EXPORT TrackingServiceNull : public TrackingService
 {
 public:
 	TrackingServiceNull();

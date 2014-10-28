@@ -61,6 +61,16 @@ public:
     virtual bool setValue(QColor value) = 0; ///< set the data value.
     virtual QColor getValue() const = 0; ///< get the data value.
 
+	virtual QVariant getValueAsVariant() const
+	{
+		return QVariant(this->getValue());
+	}
+
+	virtual void setValueFromVariant(QVariant value)
+	{
+		this->setValue(value.value<QColor>());
+	}
+
 public:
     // optional methods
     virtual QString getHelp() const

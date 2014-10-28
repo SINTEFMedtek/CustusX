@@ -73,6 +73,19 @@ public:
 	virtual bool setValue(const Vector3D& value) = 0; ///< set the data value.
 	virtual Vector3D getValue() const = 0; ///< get the data value.
 
+	virtual QVariant getValueAsVariant() const
+	{
+		QString val = prettyFormat(this->getValue(), this->getValueDecimals());
+		return QVariant(val);
+	//	return QVariant(this->getValue());
+	}
+
+	virtual void setValueFromVariant(QVariant value)
+	{
+		Vector3D val = Vector3D::fromString(value.toString());
+		this->setValue(val);
+	}
+
 public:
 	// optional methods
 	virtual QString getHelp() const

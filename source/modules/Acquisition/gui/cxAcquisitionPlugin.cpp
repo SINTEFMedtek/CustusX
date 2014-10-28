@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-AcquisitionPlugin::AcquisitionPlugin(ReconstructManagerPtr reconstructer)
+AcquisitionPlugin::AcquisitionPlugin(UsReconstructionServicePtr reconstructer)
 {
 	mAcquisitionData.reset(new AcquisitionData(reconstructer));
 

@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPATIENTMODELSERVICEPROXY_H
 #define CXPATIENTMODELSERVICEPROXY_H
 
+#include "cxResourceExport.h"
+
 #include "cxPatientModelService.h"
 #include <boost/shared_ptr.hpp>
 #include "cxServiceTrackerListener.h"
@@ -52,7 +54,7 @@ namespace cx
  *  \date 2014-09-10
  *  \author Ole Vegard Solberg, SINTEF
  */
-class PatientModelServiceProxy : public PatientModelService
+class cxResource_EXPORT PatientModelServiceProxy : public PatientModelService
 {
 public:
 	PatientModelServiceProxy(ctkPluginContext *context);

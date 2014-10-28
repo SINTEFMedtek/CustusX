@@ -92,8 +92,16 @@ public:
 public:
 	// basic methods
 	virtual QString getDisplayName() const = 0;///< name of data entity. Used for display to user.
-	virtual QString getValueAsString() const { return this->getValue(); }
-	virtual void setValueFromString(QString value) { this->setValue(value); }
+
+	virtual QVariant getValueAsVariant() const
+	{
+		return QVariant(this->getValue());
+	}
+	virtual void setValueFromVariant(QVariant val)
+	{
+		this->setValue(val.toString());
+	}
+
 	virtual QString getUid() const { return this->getDisplayName()+"_uid"; }
 	virtual bool setValue(const QString& value) = 0; ///< set the data value.
 	virtual QString getValue() const = 0; ///< get the data value.
@@ -123,43 +131,6 @@ public:
 };
 typedef boost::shared_ptr<StringDataAdapter> StringDataAdapterPtr;
 
-/**
- * \brief Dummy implementation of the StringDataAdapter
- *
- * \author Christian Askeland, SINTEF
- */
-class cxResource_EXPORT StringDataAdapterNull: public StringDataAdapter
-{
-Q_OBJECT
-public:
-	virtual ~StringDataAdapterNull()
-	{
-	}
-	virtual QString getDisplayName() const
-	{
-		return "dummy";
-	}
-	virtual QString getValueAsString() const
-	{
-		return "dummy";
-	}
-	virtual void setValueFromString(QString value)
-	{
-
-	}
-	virtual QString getUid() const
-	{
-		return "dummy_id";
-	}
-	virtual bool setValue(const QString& value)
-	{
-		return false;
-	}
-	virtual QString getValue() const
-	{
-		return "";
-	}
-};
 } // namespace cx
 
 #endif /* CXSTRINGDATAADAPTER_H_ */

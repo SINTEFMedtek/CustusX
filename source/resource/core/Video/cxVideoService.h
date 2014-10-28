@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVIDEOSERVICE_H
 #define CXVIDEOSERVICE_H
 
+#include "cxResourceExport.h"
+
 #include <QObject>
 #include <boost/shared_ptr.hpp>
 
@@ -50,7 +52,7 @@ typedef boost::shared_ptr<class VideoService> VideoServicePtr;
  *  \date 2014-09-19
  *  \author Ole Vegard Solberg, SINTEF
  */
-class VideoService : public QObject
+class cxResource_EXPORT VideoService : public QObject
 {
 	Q_OBJECT
 public:

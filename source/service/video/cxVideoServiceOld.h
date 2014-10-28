@@ -30,17 +30,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-/*
- * cxVideoService.h
- *
- *  \date May 31, 2011
- *      \author christiana
- */
-
 #ifndef CXVIDEOSERVICEOLD_H_
 #define CXVIDEOSERVICEOLD_H_
 
-#include "cxVideoServiceExport.h"
+#include "cxVideoServiceOldExport.h"
 
 #include <QObject>
 
@@ -100,7 +93,7 @@ typedef boost::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
  *
  *
  */
-class cxVideoService_EXPORT VideoServiceOld: public QObject
+class cxVideoServiceOld_EXPORT VideoServiceOld : public QObject
 {
 Q_OBJECT
 public:

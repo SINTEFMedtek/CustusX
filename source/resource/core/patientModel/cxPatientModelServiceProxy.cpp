@@ -78,9 +78,12 @@ void PatientModelServiceProxy::onServiceAdded(PatientModelService* service)
 	connect(service, &PatientModelService::cleared, this, &PatientModelService::cleared);
 	connect(service, &PatientModelService::isSaving, this, &PatientModelService::isSaving);
 	connect(service, &PatientModelService::isLoading, this, &PatientModelService::isLoading);
+	connect(service, &PatientModelService::patientChanged, this, &PatientModelService::patientChanged);
 
 	if(mPatientModelService->isNull())
 		reportWarning("PatientModelServiceProxy::onServiceAdded mPatientModelService->isNull()");
+
+	emit patientChanged();
 }
 
 void PatientModelServiceProxy::onServiceRemoved(PatientModelService *service)
@@ -95,8 +98,11 @@ void PatientModelServiceProxy::onServiceRemoved(PatientModelService *service)
 	disconnect(service, &PatientModelService::cleared, this, &PatientModelService::cleared);
 	disconnect(service, &PatientModelService::isSaving, this, &PatientModelService::isSaving);
 	disconnect(service, &PatientModelService::isLoading, this, &PatientModelService::isLoading);
+	disconnect(service, &PatientModelService::patientChanged, this, &PatientModelService::patientChanged);
 
 	mPatientModelService = PatientModelService::getNullObject();
+
+	emit patientChanged();
 }
 
 void PatientModelServiceProxy::insertData(DataPtr data)

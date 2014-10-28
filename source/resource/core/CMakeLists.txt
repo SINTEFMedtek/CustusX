@@ -49,6 +49,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	Tool/cxTrackingService
 
 	dataAdapters/cxDataAdapter
+	dataAdapters/cxDataAdapterNull.h
 	dataAdapters/cxDoubleDataAdapter.h
 	dataAdapters/cxStringDataAdapter.h
 	dataAdapters/cxDoubleDataAdapterXml

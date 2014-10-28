@@ -142,6 +142,7 @@ class Common(object):
         p.add_boolean_inverter('--static', default=self.static, dest='static', help='Link statically.')        
         if platform.system() == 'Windows':
             p.add_boolean_inverter('--jom', default=self.jom, dest='jom', help='Use jom to build.')
+        p.add_boolean_inverter('--ninja', default=self.jom, dest='ninja', help='Use ninja to build.')
         if platform.system() == 'Darwin':
             p.add_boolean_inverter('--xcode', default=self.xcode, dest='xcode', help='Generate xcode targets')
         p.add_boolean_inverter('--force_connect_sublibraries', default=self.force_connect_sublibraries, dest='force_connect_sublibraries', help='Force libs such as gestreamer and tsf to be connected to cx, during configuration step.')        
@@ -172,7 +173,7 @@ class Common(object):
         if self.jom:
             return "NMake Makefiles JOM"
         if self.ninja:
-            return 'Ninja'
+            return 'Eclipse CDT4 - Ninja'
         if platform.system() == 'Windows':
             return 'Eclipse CDT4 - NMake Makefiles' # need to surround with ' ' instead of " " on windows for it to work
         return "Eclipse CDT4 - Unix Makefiles" 
@@ -233,6 +234,7 @@ class Common(object):
         self._appendToBuildFolder(retval, self._addLongOrShortPathID("32", "32", add_only_if=self.m32bit), delimiter='')
         self._appendToBuildFolder(retval, self._addLongOrShortPathID("xcode", "x", add_only_if=self.xcode))
         self._appendToBuildFolder(retval, self._addLongOrShortPathID("jom", "j", add_only_if=self.jom))
+        self._appendToBuildFolder(retval, self._addLongOrShortPathID("ninja", "n", add_only_if=self.ninja))
         return ''.join(retval)
     
     def _appendToBuildFolder(self, retval, value, delimiter='_'):

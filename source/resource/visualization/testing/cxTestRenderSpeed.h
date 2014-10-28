@@ -92,15 +92,7 @@ public:
 
 	void showViews();
 	void renderNumTimes(int num);
-//	void renderViewNum(int viewNum);
 	void createViews(int num);
-
-//	void addViewsToLayout(QLayout* layout);
-//	void addViewsToGridLayout(QGridLayout* layout);
-//	int getNumViews();
-//	void create3Dviews(int num);
-//	void create2Dviews(int num);
-
 
 	std::vector<cx::ViewPtr> mViews;
 	boost::shared_ptr<cx::ViewCollectionWidget> mMainWidget;
@@ -126,11 +118,8 @@ public:
 	void createVtkRenderWindows(int num);
 	void showViews();
 	void renderNumTimes(int num);
-//	int getNumViews();
 	int getRenderFPS() { return mCounter.getRenderFPS(); }
 
-
-//	boost::shared_ptr<QWidget> mMainWidget;
 	RenderSpeedCounter mCounter;
 	std::vector<vtkRenderWindowInteractorPtr> mInteractors;
 };

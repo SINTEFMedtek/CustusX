@@ -66,6 +66,15 @@ public:
 	virtual bool setValue(bool value) = 0; ///< set the data value.
 	virtual bool getValue() const = 0; ///< get the data value.
 
+	virtual QVariant getValueAsVariant() const
+	{
+		return QVariant(this->getValue());
+	}
+	virtual void setValueFromVariant(QVariant val)
+	{
+		this->setValue(val.toBool());
+	}
+
 public:
 	// optional methods
 	virtual QString getHelp() const

@@ -158,12 +158,13 @@ class ITK(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git://itk.org/ITK.git')
     def update(self):
-        self._getBuilder().gitCheckout('v4.5.1')
+        self._getBuilder().gitCheckout('v4.6.1')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
         add('BUILD_TESTING:BOOL', self.controlData.mBuildExAndTest)
         add('BUILD_EXAMPLES:BOOL', self.controlData.mBuildExAndTest)
+#        add('Module_ITKVtkGlue:BOOL', True)
         builder.configureCMake()
 # ---------------------------------------------------------
 
@@ -409,7 +410,7 @@ class CustusX(CppComponent):
             if lib.pluginPath() and os.path.exists(lib.pluginPath()):
                 add('CX_EXTERNAL_PLUGIN_%s'%lib.name(), lib.pluginPath())
         
-        add('CX_PLUGIN_org.custusx.ussimulator:BOOL', False);
+        add('CX_PLUGIN_org.custusx.ussimulator:BOOL', platform.system() != 'Linux');
 
         if self.controlData.force_connect_sublibraries:
             self.forceConnectSublibraries(add)

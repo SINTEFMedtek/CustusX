@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVISUALIZATIONSERVICE_H
 #define CXVISUALIZATIONSERVICE_H
 
+#include "cxResourceVisualizationExport.h"
+
 #include <QObject>
 #include <boost/shared_ptr.hpp>
 #include <vector>
@@ -53,7 +55,7 @@ typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
  *  \date 2014-09-19
  *  \author Ole Vegard Solberg, SINTEF
  */
-class VisualizationService : public QObject
+class cxResourceVisualization_EXPORT VisualizationService : public QObject
 {
 	Q_OBJECT
 public:
@@ -63,6 +65,8 @@ public:
 	virtual ViewGroupDataPtr getViewGroupData(int groupIdx) = 0;
 
 	virtual void setRegistrationMode(REGISTRATION_STATUS mode) = 0;
+
+	virtual void autoShowData(DataPtr data) = 0;
 
 	virtual bool isNull() = 0;
 	static VisualizationServicePtr getNullObject();
