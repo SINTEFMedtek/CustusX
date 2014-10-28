@@ -74,7 +74,8 @@ void force_C_locale_decimalseparator()
 
 
 #ifdef WIN32
-int WinMain(int argc, char *argv[])
+//int WinMain(int argc, char *argv[]) //add WIN32 to add_executable and use this entrypoint if you want CustusX not to have a console
+int main(int argc, char *argv[])
 #else
 int main(int argc, char *argv[])
 #endif
