@@ -51,7 +51,8 @@ bool ProcessWrapperFixture::canLaunchGit_Version()
 	cx::ProcessWrapperPtr exe(new cx::ProcessWrapper());
 
 #if defined CX_WINDOWS
-	exe->launch("\"C:\\Program Files (x86)\\Git\\cmd\\git.cmd\"", QStringList("--version"));
+    //git should be available in the run environment of Catch
+    exe->launch("git", QStringList("--version"));
 #else
 	QString location1 = "/usr/bin/git";
 	QString location2 = "/opt/local/bin/git";
