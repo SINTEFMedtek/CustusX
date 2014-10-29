@@ -376,7 +376,7 @@ Transform3D ElastixExecuter::getAffineResult_mmMff(bool* ok)
 QString ElastixExecuter::getNonlinearResultVolume(bool* ok)
 {
 	if (ok)
-		*ok = true;
+		*ok = false;
 
 	QString retval;
 	int i=0;
@@ -399,12 +399,12 @@ QString ElastixExecuter::getNonlinearResultVolume(bool* ok)
 	if ((transform=="BSplineTransform") || (transform=="SplineKernelTransform"))
 	{
 		report(QString("Reading result file %1 created with transform %2").arg(retval).arg(transform));
+		if (ok)
+			*ok = true;
 		return retval;
 	}
 	else
 	{
-		if (ok)
-			*ok = false;
 		return "";
 	}
 

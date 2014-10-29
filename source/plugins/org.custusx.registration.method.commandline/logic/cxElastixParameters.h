@@ -79,6 +79,7 @@ private slots:
     void currentPresetChangedSlot(); ///< Called when the current preset changes. Save to settings and reload dependent values
 
 private:
+    bool validParameterFile(QString file) const;
     void reloadPresets(); ///< Read presets anew and update the current.
     QString getFullParameterFilename(QString filename);
     void addDefaultPreset(QString name, QString executable, QStringList parameterFiles);

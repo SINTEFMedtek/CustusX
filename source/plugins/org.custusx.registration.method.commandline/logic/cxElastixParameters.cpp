@@ -157,7 +157,9 @@ void ElastixParameters::setActiveParameterFile0(QString filename)
 
 QString ElastixParameters::getActiveParameterFile0() const
 {
-    return mActiveParameterFile0;
+    if (this->validParameterFile(mActiveParameterFile0))
+    	return mActiveParameterFile0;
+    return "";
 }
 
 void ElastixParameters::setActiveParameterFile1(QString filename)
@@ -168,7 +170,9 @@ void ElastixParameters::setActiveParameterFile1(QString filename)
 
 QString ElastixParameters::getActiveParameterFile1() const
 {
-    return mActiveParameterFile1;
+    if (this->validParameterFile(mActiveParameterFile1))
+    	return mActiveParameterFile1;
+    return "";
 }
 
 void ElastixParameters::setActiveExecutable(QString filename)
@@ -182,12 +186,17 @@ QString ElastixParameters::getActiveExecutable() const
     return mActiveExecutable;
 }
 
+bool ElastixParameters::validParameterFile(QString file) const
+{
+    return QFileInfo(file).exists() && QFileInfo(file).isFile();
+}
+
 QStringList ElastixParameters::getActiveParameterFiles() const
 {
     QStringList retval;
-    if (QFileInfo(mActiveParameterFile0).exists() && QFileInfo(mActiveParameterFile0).isFile())
+    if (this->validParameterFile(mActiveParameterFile0))
         retval << mActiveParameterFile0;
-    if (QFileInfo(mActiveParameterFile1).exists() && QFileInfo(mActiveParameterFile1).isFile())
+    if (this->validParameterFile(mActiveParameterFile1))
         retval  << mActiveParameterFile1;
     return retval;
 }

@@ -236,6 +236,7 @@ void ElastixWidget::elastixChangedSlot()
 		QDir folder(folders[i]);
 		folder.mkpath(".");
 	}
+
 	mParameterFileWidget0->setPaths(folders);
 	QStringList nameFilters;
 	nameFilters << "*.*";

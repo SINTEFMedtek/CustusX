@@ -136,7 +136,7 @@ public:
 
 		if (!errorObserver->mMessage.isEmpty())
 		{
-			reportError("Load of data " + filename + " failed with message:\n"
+			reportError("Load of data [" + filename + "] failed with message:\n"
 				+ errorObserver->mMessage);
 			return false;
 		}

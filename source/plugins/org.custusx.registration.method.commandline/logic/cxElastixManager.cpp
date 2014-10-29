@@ -105,7 +105,7 @@ void ElastixManager::executionFinishedSlot()
 	if (!ok)
 		return;
 
-	std::cout << "ElastixManager::executionFinishedSlot(), Linear Result mMf: \n" << mMf << std::endl;
+//	std::cout << "ElastixManager::executionFinishedSlot(), Linear Result mMf: \n" << mMf << std::endl;
 
 	QStringList parameterFiles = mParameters->getActiveParameterFiles();
 	QString desc = QString("Image2Image [exe=%1]").arg(QFileInfo(mParameters->getActiveExecutable()).fileName());
@@ -124,8 +124,8 @@ void ElastixManager::executionFinishedSlot()
 		* mMf.inv()
 		* mServices.registrationService->getMovingData()->get_rMd().inv();
 
-	std::cout << "ElastixManager::executionFinishedSlot(), delta_pre_rMd: \n" << delta_pre_rMd << std::endl;
-	std::cout << "ElastixManager::executionFinishedSlot(), expected new rMdm: \n" << mServices.registrationService->getFixedData()->get_rMd() * mMf.inv() << std::endl;
+//	std::cout << "ElastixManager::executionFinishedSlot(), delta_pre_rMd: \n" << delta_pre_rMd << std::endl;
+//	std::cout << "ElastixManager::executionFinishedSlot(), expected new rMdm: \n" << mServices.registrationService->getFixedData()->get_rMd() * mMf.inv() << std::endl;
 
 //	mServices.registrationService->applyImage2ImageRegistration(mMf.inv(), desc);
 	mServices.registrationService->applyImage2ImageRegistration(delta_pre_rMd, desc);
