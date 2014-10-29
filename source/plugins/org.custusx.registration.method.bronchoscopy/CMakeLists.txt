@@ -2,8 +2,6 @@ project(org_custusx_registration_method_bronchoscopy)
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
-message(STATUS "===================================== parsing org_custusx_registration_method_bronchoscopy")
-
 include_directories(
     ${CX_RESOURCE_INCLUDE_DIRECTORIES}
     ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}

@@ -2,8 +2,6 @@ project(org_custusx_registration)
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
-message(STATUS "===================================== parsing example")
-
 include_directories(
     ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
     ${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}

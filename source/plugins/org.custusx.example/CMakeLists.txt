@@ -2,8 +2,6 @@ project(org_custusx_example)
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
-message(STATUS "===================================== parsing example")
-
 include_directories(
     ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
     ${CustusX_BINARY_DIR}/source/modules/GUIExtender
