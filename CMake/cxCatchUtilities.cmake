@@ -146,7 +146,6 @@ endfunction()
 # a master Catch.
 ###############################################################################
 function(_cx_catch_save_info_in_globals LIB_TO_TEST SOURCES MOC_SOURCES ADDITIONAL_LIBS)
-    message(STATUS "Saving globals: " ${LIB_TO_TEST})
     foreach( SOURCE_FILE ${MOC_SOURCES})
         cx_make_path_absolute(${SOURCE_FILE} RESULT)
         set(ABS_MOC_SOURCES
