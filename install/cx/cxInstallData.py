@@ -74,7 +74,7 @@ class Common(object):
         self.main_branch = "master"
         self.static = False # build as shared or static libraries
         self.jom = False
-        self.ninja = False
+        self.ninja = self.ninja_installed()                
         self.eclipse_version = '3.6'
         self.setBuildType("Debug") 
         self.threads = 1
@@ -234,7 +234,7 @@ class Common(object):
         self._appendToBuildFolder(retval, self._addLongOrShortPathID("32", "32", add_only_if=self.m32bit), delimiter='')
         self._appendToBuildFolder(retval, self._addLongOrShortPathID("xcode", "x", add_only_if=self.xcode))
         self._appendToBuildFolder(retval, self._addLongOrShortPathID("jom", "j", add_only_if=self.jom))
-        self._appendToBuildFolder(retval, self._addLongOrShortPathID("ninja", "n", add_only_if=self.ninja))
+        #self._appendToBuildFolder(retval, self._addLongOrShortPathID("ninja", "n", add_only_if=self.ninja))
         return ''.join(retval)
     
     def _appendToBuildFolder(self, retval, value, delimiter='_'):
@@ -276,6 +276,13 @@ class Common(object):
         if self.git_tag == "":
             return None
         return self.git_tag
+
+    def ninja_installed(self):
+        spawn = cxUtilities.try_module_import('distutils.spawn')
+        if not spawn:
+            return False
+        ninja_found = spawn.find_executable('ninja')
+        return ninja_found is not None
 
 # ---------------------------------------------------------
 

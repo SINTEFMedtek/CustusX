@@ -431,51 +431,6 @@ MACRO(SUBDIRLIST result curdir)
   SET(${result} ${dirlist})
 ENDMACRO()
 
-###############################################################################
-#
-# Given a PLUGINS_LIST of plugin name:VAL pairs, 
-# insert the NEW_PLUGIN with NEW_PLUGIN_VALUE
-# if it is not already present in the list
-#
-# PLUGINS_VARIABLE: variable containing <pluginname>:<val> pairs
-#
-###############################################################################
-function(cx_insert_plugin_if_not_in_list PLUGINS_LIST_VARIABLE NEW_PLUGIN_NAME NEW_PLUGIN_VALUE PLUGIN_BUILD_OPTION_PREFIX)
-    set(plugins_list ${${PLUGINS_LIST_VARIABLE}})
-    list(FIND plugins_list ${NEW_PLUGIN_NAME}:OFF FOUND_OFF)
-    list(FIND plugins_list ${NEW_PLUGIN_NAME}:ON FOUND_ON)
-    getListOfVarsStartingWith(${PLUGIN_BUILD_OPTION_PREFIX}${NEW_PLUGIN_NAME} matchedVars)
-    list(LENGTH matchedVars VAR_DEFINED)
-    #message(STATUS "plugin_name " ${NEW_PLUGIN_NAME} "  found OFF=" ${FOUND_OFF} " ON=" ${FOUND_ON} " DEFINED=" ${VAR_DEFINED} " existing: " ${matchedVars})
-    if((${FOUND_OFF} EQUAL -1) AND (${FOUND_ON} EQUAL -1))
-        if(${VAR_DEFINED} EQUAL 0)
-            message("Found new plugin " ${NEW_PLUGIN_NAME} ", adding option " ${NEW_PLUGIN_VALUE} ".")
-        endif()
-        set(plugins_list ${plugins_list} ${NEW_PLUGIN_NAME}:${NEW_PLUGIN_VALUE})
-    endif()
-
-    set(${PLUGINS_LIST_VARIABLE} ${plugins_list} PARENT_SCOPE)
-endfunction()
-
-###############################################################################
-#
-# Given a list of plugin name:VAL pairs, look for other plugins not defined in the list.
-# Undefined plugins are added with the default value of OFF.
-#
-# PLUGINS_VARIABLE: variable containing <pluginname>:<val> pairs
-# PLUGIN_BUILD_OPTION_PREFIX: prefix used by ctkMacroSetupPlugins to generate build variables
-#
-###############################################################################
-function(cx_insert_undefined_plugins PLUGINS_VARIABLE PLUGIN_BUILD_OPTION_PREFIX)
-    SUBDIRLIST(SUBDIRS ${CMAKE_CURRENT_SOURCE_DIR})
-    set(plugins_list ${${PLUGINS_VARIABLE}})
-
-    foreach(plugin_name ${SUBDIRS})
-        cx_insert_plugin_if_not_in_list(plugins_list ${plugin_name} "OFF" ${PLUGIN_BUILD_OPTION_PREFIX})
-    endforeach()
-
-    set(${PLUGINS_VARIABLE} ${plugins_list} PARENT_SCOPE)
-endfunction()
 
 ###############################################################################
 #

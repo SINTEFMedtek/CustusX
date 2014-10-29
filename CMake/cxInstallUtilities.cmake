@@ -196,10 +196,10 @@ macro(cx_install_set_folder_structure)
 		set(CPACK_PACKAGING_INSTALL_PREFIX "/")
 		set(CX_INSTALL_ROOT_DIR ${CX_BUNDLE_NAME})
 	endif(CX_LINUX)
-    if(CX_WINDOWS)
-        set(CPACK_PACKAGING_INSTALL_PREFIX "/")
-        set(CX_INSTALL_ROOT_DIR ${CX_BUNDLE_NAME})
-    endif(CX_WINDOWS)
+        if(CX_WINDOWS)
+            set(CPACK_PACKAGING_INSTALL_PREFIX "/")
+            set(CX_INSTALL_ROOT_DIR ".")
+        endif(CX_WINDOWS)
 
 	set(CX_INSTALL_BINARY_DIR ${CX_INSTALL_ROOT_DIR}/bin)
 	if(APPLE)
@@ -248,7 +248,7 @@ endmacro()
 #
 ###############################################################################
 function(cx_install_target TARGET_ID)
-	cx_assert_variable_exists(${CX_INSTALL_ROOT_DIR})
+        cx_assert_variable_exists(${CX_INSTALL_ROOT_DIR})
 
 	if(CX_APPLE)
 		set( NEW_ENTRY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TARGET_ID}" )
@@ -466,6 +466,17 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
 			set(PLUGINS \${PLUGINS} \${TEMP})"
 			)
 	endforeach()
+
+        if(CX_WINDOWS)
+            #On Windows verify_app fails if path contains a .
+            set(TEMP_APPS_LOCAL "")
+            foreach(APP ${APPS_LOCAL})
+                string(REPLACE "./" "/" APP ${APP})
+                list(APPEND TEMP_APPS_LOCAL ${APP})
+                message(STATUS "========================== ${APP}")
+            endforeach()
+            set(APPS_LOCAL ${TEMP_APPS_LOCAL})
+        endif(CX_WINDOWS)
 
         # fixup_bundle resets link paths for all targets within the bundle.
         # this code appears in cmake_install.cmake in the CURRENT_BINARY_DIR. Check there when changing.
