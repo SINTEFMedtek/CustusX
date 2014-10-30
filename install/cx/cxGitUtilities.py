@@ -135,7 +135,10 @@ class Reporter(object):
             b = repo.branch_name 
             p = self.__get_repo_path(repo)
             d = self.__get_repo_details(repo)
-            print '{0:<70}  {1:<30}  {2}'.format(p, b, d)    
+            a = '*'
+            if('[]' in d):
+                a = ''
+            print '{0:<1}  {1:<70}  {2:<30}  {3}'.format(a, p, b, d)
     
     def __get_repo_path(self, repo):
         path = os.path.relpath(repo.path, self.root_path)        
