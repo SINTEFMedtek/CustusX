@@ -303,6 +303,7 @@ void MainWindow::focusInsideDockWidget(QObject *dockWidget)
 
 void MainWindow::addToWidgetGroupMap(QAction* action, QString groupname)
 {
+	action->setMenuRole(QAction::NoRole);
 	if (mWidgetGroupsMap.find(groupname) != mWidgetGroupsMap.end())
 	{
 		mWidgetGroupsMap[groupname]->addAction(action);
@@ -370,11 +371,9 @@ void MainWindow::createActions()
 	connect(mSecondaryViewLayoutWindowAction, SIGNAL(triggered()), this, SLOT(showSecondaryViewLayoutWindowActionSlot()));
 
 	// Application
-	mAboutAction = new QAction(tr("&About"), this); // About burde gitt About CustusX, det gj√∏r det ikke av en eller annen grunn???
-	mAboutAction->setShortcut(tr("Ctrl+A"));
+	mAboutAction = new QAction(tr("About"), this);
 	mAboutAction->setStatusTip(tr("Show the application's About box"));
-	mPreferencesAction = new QAction(tr("&Preferences"), this);
-	mPreferencesAction->setShortcut(tr("Ctrl+P"));
+	mPreferencesAction = new QAction(tr("Preferences"), this);
 	mPreferencesAction->setStatusTip(tr("Show the preferences dialog"));
 
 	mDebugModeAction = new QAction(tr("&Debug Mode"), this);
@@ -832,7 +831,6 @@ void MainWindow::patientChangedSlot()
 
 void MainWindow::createMenus()
 {
-	mCustusXMenu = new QMenu(tr("CustusX"), this);
 	mFileMenu = new QMenu(tr("File"), this);
 	mWorkflowMenu = new QMenu(tr("Workflow"), this);
 	mToolMenu = new QMenu(tr("Tracking"), this);
@@ -840,12 +838,9 @@ void MainWindow::createMenus()
 	mNavigationMenu = new QMenu(tr("Navigation"), this);
 	mHelpMenu = new QMenu(tr("Help"), this);
 
-	// Application
-	this->menuBar()->addMenu(mCustusXMenu);
-	mCustusXMenu->addAction(mAboutAction);
-	mCustusXMenu->addAction(mPreferencesAction);
-
 	// File
+	mFileMenu->addAction(mAboutAction);
+	mFileMenu->addAction(mPreferencesAction);
 	this->menuBar()->addMenu(mFileMenu);
 	mFileMenu->addAction(mNewPatientAction);
 	mFileMenu->addAction(mSaveFileAction);

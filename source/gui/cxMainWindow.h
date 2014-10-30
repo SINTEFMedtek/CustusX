@@ -163,7 +163,6 @@ private:
 	QDockWidget* addAsDockWidget(QWidget* widget, QString groupname);
 
 	//menus
-	QMenu* mCustusXMenu; ///< Application menu
 	QMenu* mFileMenu; ///< Menu for file operations (ex: save/load)
 	QMenu* mWorkflowMenu; ///< menu for choosing workflow
 	QMenu* mToolMenu; ///< menu for interacting with the navigation system
