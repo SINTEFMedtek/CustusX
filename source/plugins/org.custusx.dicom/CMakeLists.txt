@@ -85,6 +85,12 @@ set(PLUGIN_target_libraries
 ${CTK_EXTERNAL_LIBRARIES}
 	)
 
+set(PLUGIN_OUTPUT_DIR "")
+if(CX_WINDOWS)
+    #on windows we want dlls to be placed with the executables
+    set(PLUGIN_OUTPUT_DIR "../")
+endif(CX_WINDOWS)
+
 ctkMacroBuildPlugin(
   NAME ${PROJECT_NAME}
   EXPORT_DIRECTIVE ${PLUGIN_export_directive}
@@ -93,6 +99,7 @@ ctkMacroBuildPlugin(
   UI_FORMS ${PLUGIN_UI_FORMS}
   RESOURCES ${PLUGIN_resources}
   TARGET_LIBRARIES ${PLUGIN_target_libraries}
+  OUTPUT_DIR ${PLUGIN_OUTPUT_DIR}
 )
 
 add_subdirectory(testing)

@@ -425,7 +425,11 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
 		DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS})
 
 	# install runtime plugins
-	install(DIRECTORY "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/plugins/" # trailing slash copies contents, not plugin folder
+        set(CX_PLUGIN_DIR "/plugins/")
+        if(CX_WINDOWS)
+            set(CX_PLUGIN_DIR "/")
+        endif(CX_WINDOWS)
+        install(DIRECTORY "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}${CX_PLUGIN_DIR}" # trailing slash copies contents, not plugin folder
 		DESTINATION ${CX_INSTALL_PLUGIN_DIR}
 		DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS})
 
