@@ -55,24 +55,15 @@ class GitRepository(object):
         
     def branch_info(self):
         text = self.__run_git_command('status --porcelain -b', True).stdout
-#        expr = r'##(.*)\n'       
-#        regexp = re.compile(expr)
         hit = re.match(r'##(.*)\n', text)
         if hit:
             if hit.group(1):
-#                if hit.group(2):
-#                    print "TWO: ", hit.group(2) 
                 text = hit.group(1)
                 
         branch_ahead = ''
         hit = re.match(r'.*\[(.*)\].*', text)
         if (hit and hit.group(1)):
             branch_ahead = hit.group(1)
-#        print '*'*50
-#        print "plugin: ", self.path
-#        print "text: ", text
-#        print "branch_ahead: ", branch_ahead
-#        print '*'*50
         
         text = text.split('...')[0]
         self.branch_name = text
@@ -103,17 +94,24 @@ class GitRepository(object):
 #
 #################################################
 class TextColor:
-    INFO = '\033[95m' #light magenta
-    
-    CLEAN = '\033[0m' #white
-    DIRTY = '\033[1m' #bold
-    
-    MODIFIED = '\033[94m' #light blue
-    DELETED = '\033[91m' #light red
-    UNTRACKED = '\033[96m' #light cyan
-    RENAMED = '\033[92m' #light green
-    
-    ENDC = '\033[0m' #white
+    if(platform.system() == 'Windows'):
+        INFO = ''
+        CLEAN = ''
+        DIRTY = ''
+        MODIFIED = ''
+        DELETED = ''
+        UNTRACKED = ''
+        RENAMED = ''
+        ENDC = ''
+    else:
+        INFO = '\033[95m' #light magenta
+        CLEAN = '\033[0m' #white
+        DIRTY = '\033[1m' #bold
+        MODIFIED = '\033[94m' #light blue
+        DELETED = '\033[91m' #light red
+        UNTRACKED = '\033[96m' #light cyan
+        RENAMED = '\033[92m' #light green
+        ENDC = '\033[0m' #white
 
 #################################################
 #
@@ -135,10 +133,8 @@ class Reporter(object):
             repo.status()
             repo.branch_info()
             b = repo.branch_name 
-#        self.branch_ahead = branch_ahead
             p = self.__get_repo_path(repo)
             d = self.__get_repo_details(repo)
-#            print '{0:<30}  {1:<60}  {2}'.format(b, p, d)
             print '{0:<70}  {1:<30}  {2}'.format(p, b, d)    
     
     def __get_repo_path(self, repo):
@@ -149,10 +145,7 @@ class Reporter(object):
             return TextColor.DIRTY + path
     
     def __get_repo_details(self, repo):
-        if repo and not repo.branch_ahead:
-            return ''
-        else:
-            return self.__format_details(repo).ljust(50)
+         return self.__format_details(repo).ljust(50)
         
     def __format_details(self, repo):
         text = TextColor.ENDC 
@@ -165,10 +158,6 @@ class Reporter(object):
             text += TextColor.UNTRACKED + ' untracked ' + TextColor.ENDC
         if repo.renamed_files:
             text += TextColor.RENAMED + ' renamed ' + TextColor.ENDC
-#        print '*'*50
-#        print repo.path
-#        print repo.branch_ahead
-#        print '*'*50
         if repo.branch_ahead:
             text += TextColor.MODIFIED + ' %s '%repo.branch_ahead + TextColor.ENDC
         text += ']' 
