@@ -51,7 +51,8 @@ PlateRegistrationWidget::PlateRegistrationWidget(regServices services, QWidget* 
 	mReferenceToolInfoLabel(new QLabel("", this))
 {
 	connect(mPlateRegistrationButton, SIGNAL(clicked()), this, SLOT(plateRegistrationSlot()));
-	connect(toolManager(), SIGNAL(configured()), this, SLOT(internalUpdate()));
+//	connect(toolManager(), SIGNAL(configured()), this, SLOT(internalUpdate()));
+	connect(toolManager(), &ToolManager::stateChanged, this, &PlateRegistrationWidget::internalUpdate);
 
 	QVBoxLayout* toptopLayout = new QVBoxLayout(this);
 	toptopLayout->addWidget(mReferenceToolInfoLabel);

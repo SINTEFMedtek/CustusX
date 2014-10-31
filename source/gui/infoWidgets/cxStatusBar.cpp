@@ -67,10 +67,11 @@ StatusBar::StatusBar() :
 {
 	connect(reporter(), SIGNAL(emittedMessage(Message)), this, SLOT(showMessageSlot(Message)));
 
-	connect(toolManager(), SIGNAL(configured()),      this, SLOT(connectToToolSignals()));
-	connect(toolManager(), SIGNAL(deconfigured()),    this, SLOT(disconnectFromToolSignals()));
-	connect(toolManager(), SIGNAL(trackingStarted()), this, SLOT(updateToolButtons()));
-	connect(toolManager(), SIGNAL(trackingStopped()), this, SLOT(updateToolButtons()));
+	connect(toolManager(), &ToolManager::stateChanged, this, &StatusBar::resetToolManagerConnection);
+//	connect(toolManager(), SIGNAL(configured()),      this, SLOT(connectToToolSignals()));
+//	connect(toolManager(), SIGNAL(deconfigured()),    this, SLOT(disconnectFromToolSignals()));
+//	connect(toolManager(), SIGNAL(trackingStarted()), this, SLOT(updateToolButtons()));
+//	connect(toolManager(), SIGNAL(trackingStopped()), this, SLOT(updateToolButtons()));
 
 	connect(toolManager(), SIGNAL(tps(int)), this, SLOT(tpsSlot(int)));
 	connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(updateToolButtons()));
@@ -86,6 +87,14 @@ StatusBar::StatusBar() :
 
 StatusBar::~StatusBar()
 {
+}
+
+void StatusBar::resetToolManagerConnection()
+{
+	this->disconnectFromToolSignals();
+	if (toolManager()->getState()>=Tool::tsCONFIGURED)
+		this->connectToToolSignals();
+	this->updateToolButtons();
 }
 
 void StatusBar::connectToToolSignals()

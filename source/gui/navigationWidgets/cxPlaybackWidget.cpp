@@ -59,7 +59,8 @@ PlaybackWidget::PlaybackWidget(QWidget* parent) :
 	mOpen = false;
 	this->setToolTip(this->defaultWhatsThis());
 
-	connect(toolManager(), SIGNAL(initialized()), this, SLOT(toolManagerInitializedSlot()));
+//	connect(toolManager(), SIGNAL(initialized()), this, SLOT(toolManagerInitializedSlot()));
+	connect(toolManager(), &ToolManager::stateChanged, this, &PlaybackWidget::toolManagerInitializedSlot);
 
 	mTimer.reset(new PlaybackTime());
 	mTimer->initialize(QDateTime::currentDateTime(), 100000);
@@ -332,6 +333,9 @@ std::pair<double,double> PlaybackWidget::findTimeRange(std::vector<TimelineEvent
 
 void PlaybackWidget::toolManagerInitializedSlot()
 {
+	if (toolManager()->getState() < Tool::tsINITIALIZED)
+		return;
+
 	if (toolManager()->isPlaybackMode())
 	{
 		mOpenAction->setText("Close Playback");

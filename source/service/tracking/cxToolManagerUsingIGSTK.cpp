@@ -88,9 +88,10 @@ QStringList ToolManagerUsingIGSTK::getSupportedTrackingSystems()
 ToolManagerUsingIGSTK::ToolManagerUsingIGSTK() :
 				mConfigurationFilePath(""),
 				mLoggingFolder(""),
-				mConfigured(false),
-				mInitialized(false),
-				mTracking(false),
+				mState(Tool::tsNONE),
+//				mConfigured(false),
+//				mInitialized(false),
+//				mTracking(false),
 				mPlayBackMode(false),
 				mLastLoadPositionHistory(0),
 				mToolTipOffset(0)
@@ -176,6 +177,7 @@ void ToolManagerUsingIGSTK::setPlaybackMode(PlaybackTimePtr controller)
 	report("Opened Playback Mode");
 	mPlayBackMode = true;
 	emit initialized();
+	emit stateChanged();
 }
 
 /**Close playback mode by removing the playback tools and resetting to the original tools
@@ -198,6 +200,7 @@ void ToolManagerUsingIGSTK::closePlayBackMode()
 	report("Closed Playback Mode");
 	mPlayBackMode = false;
 	emit initialized();
+	emit stateChanged();
 }
 
 void ToolManagerUsingIGSTK::runDummyTool(DummyToolPtr tool)
@@ -211,8 +214,10 @@ void ToolManagerUsingIGSTK::runDummyTool(DummyToolPtr tool)
 	this->setDominantTool(tool->getUid());
 
 	report("Dummy: Config/Init/Track started in toolManager");
-	mConfigured = true;
+	mState = Tool::tsCONFIGURED;
 	emit configured();
+	emit stateChanged();
+
 	this->initializedSlot(true);
 	this->trackerTrackingSlot(true);
 }
@@ -235,17 +240,50 @@ void ToolManagerUsingIGSTK::initializeManualTool()
 	mManualTool->set_prMt(prMt);
 }
 
+Tool::State ToolManagerUsingIGSTK::getState() const
+{
+	return mState;
+}
+
+void ToolManagerUsingIGSTK::setState(const Tool::State val)
+{
+	if (mState==val)
+		return;
+
+	if (val > mState) // up
+	{
+		if (val == Tool::tsTRACKING)
+			this->startTracking();
+		else if (val == Tool::tsINITIALIZED)
+			this->initialize();
+		else if (val == Tool::tsCONFIGURED)
+			this->configure();
+	}
+	else // down
+	{
+		if (val == Tool::tsINITIALIZED)
+			this->stopTracking();
+		else if (val == Tool::tsCONFIGURED)
+			this->uninitialize();
+		else if (val == Tool::tsNONE)
+			this->deconfigure();
+	}
+}
+
 bool ToolManagerUsingIGSTK::isConfigured() const
 {
-	return mConfigured;
+	return mState>=Tool::tsCONFIGURED;
+//	return mConfigured;
 }
 bool ToolManagerUsingIGSTK::isInitialized() const
 {
-	return mInitialized;
+	return mState>=Tool::tsINITIALIZED;
+//	return mInitialized;
 }
 bool ToolManagerUsingIGSTK::isTracking() const
 {
-	return mTracking;
+	return mState>=Tool::tsTRACKING;
+//	return mTracking;
 }
 void ToolManagerUsingIGSTK::configure()
 {
@@ -350,12 +388,14 @@ void ToolManagerUsingIGSTK::trackerConfiguredSlot(bool on)
 
 	this->setDominantTool(this->getManualTool()->getUid());
 
-	mConfigured = true;
+	mState = Tool::tsCONFIGURED;
+//	mConfigured = true;
 
 	this->loadPositionHistory(); // the tools are always reconfigured after a setloggingfolder
 
 	reportSuccess("ToolManager is configured.");
 	emit configured();
+	emit stateChanged();
 }
 
 void ToolManagerUsingIGSTK::deconfigure()
@@ -382,9 +422,10 @@ void ToolManagerUsingIGSTK::deconfigure()
 
 	this->setDominantTool(this->getManualTool()->getUid());
 
-	mConfigured = false;
-	emit
-	deconfigured();
+	mState = Tool::tsNONE;
+//	mConfigured = false;
+	emit deconfigured();
+	emit stateChanged();
 	report("ToolManager is deconfigured.");
 }
 
@@ -536,18 +577,18 @@ void ToolManagerUsingIGSTK::startTracking()
 		return;
 	}
 
-	if (!mInitialized)
-	{
-		reportWarning("Please initialize before trying to start tracking.");
-		return;
-	}
+//	if (!mInitialized)
+//	{
+//		reportWarning("Please initialize before trying to start tracking.");
+//		return;
+//	}
 	if (mTrackerThread)
 		mTrackerThread->track(true);
 }
 
 void ToolManagerUsingIGSTK::stopTracking()
 {
-	if (!mTracking)
+	if (!this->isTracking())
 	{
 //		reportWarning("Please start tracking before trying to stop tracking.");
 		return;
@@ -755,30 +796,38 @@ void ToolManagerUsingIGSTK::setLoggingFolder(QString loggingFolder)
 
 void ToolManagerUsingIGSTK::initializedSlot(bool value)
 {
-	mInitialized = value;
-	if (mInitialized)
+//	mInitialized = value;
+	if (value)
 	{
+		mState = Tool::tsINITIALIZED;
 		reportSuccess("ToolManager is initialized.");
+		emit stateChanged();
 		emit initialized();
 	}
 	else
 	{
+		mState = Tool::tsCONFIGURED;
 		report("ToolManager is uninitialized.");
+		emit stateChanged();
 		emit uninitialized();
 	}
 }
 
 void ToolManagerUsingIGSTK::trackerTrackingSlot(bool value)
 {
-	mTracking = value;
-	if (mTracking)
+//	mTracking = value;
+	if (value)
 	{
+		mState = Tool::tsTRACKING;
 		reportSuccess("ToolManager started tracking.");
+		emit stateChanged();
 		emit trackingStarted();
 	}
 	else
 	{
+		mState = Tool::tsINITIALIZED;
 		reportSuccess("ToolManager stopped tracking.");
+		emit stateChanged();
 		emit trackingStopped();
 	}
 }

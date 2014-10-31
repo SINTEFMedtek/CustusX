@@ -71,10 +71,11 @@ ToolManualCalibrationWidget::ToolManualCalibrationWidget(QWidget* parent) :
 
   mToptopLayout->addStretch();
 
-  connect(toolManager(), SIGNAL(configured()), this, SLOT(toolCalibrationChanged()));
-  connect(toolManager(), SIGNAL(initialized()), this, SLOT(toolCalibrationChanged()));
-  connect(toolManager(), SIGNAL(trackingStarted()), this, SLOT(toolCalibrationChanged()));
-  connect(toolManager(), SIGNAL(trackingStopped()), this, SLOT(toolCalibrationChanged()));
+//  connect(toolManager(), SIGNAL(configured()), this, SLOT(toolCalibrationChanged()));
+//  connect(toolManager(), SIGNAL(initialized()), this, SLOT(toolCalibrationChanged()));
+//  connect(toolManager(), SIGNAL(trackingStarted()), this, SLOT(toolCalibrationChanged()));
+//  connect(toolManager(), SIGNAL(trackingStopped()), this, SLOT(toolCalibrationChanged()));
+  connect(toolManager(), &ToolManager::stateChanged, this, &ToolManualCalibrationWidget::toolCalibrationChanged);
 }
 
 

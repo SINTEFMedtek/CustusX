@@ -151,7 +151,7 @@ QString ToolConfigureGroupBox::requestSaveConfigurationSlot()
     return retval;
 
   // deconfigure toolmanager in order to be able to reread config data
-  toolManager()->deconfigure();
+  toolManager()->setState(Tool::tsNONE);
 
   TrackerConfiguration::Configuration current = this->getCurrentConfiguration();
   TrackerConfigurationPtr config = toolManager()->getConfiguration();

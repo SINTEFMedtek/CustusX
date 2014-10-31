@@ -63,7 +63,8 @@ PointSamplingWidget::PointSamplingWidget(QWidget* parent) :
   mRemoveButton(new QPushButton("Remove", this)),
   mLoadReferencePointsButton(new QPushButton("Load reference points", this))
 {
-  connect(toolManager(), SIGNAL(configured()), this, SLOT(updateSlot()));
+	connect(toolManager(), &ToolManager::stateChanged, this, &PointSamplingWidget::updateSlot);
+//  connect(toolManager(), SIGNAL(configured()), this, SLOT(updateSlot()));
 
   //table widget
   connect(mTable, SIGNAL(itemSelectionChanged()), this, SLOT(itemSelectionChanged()));

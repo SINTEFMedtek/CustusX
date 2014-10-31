@@ -83,8 +83,9 @@ VideoConnection::VideoConnection(VideoServiceBackendPtr backend)
 	mConnected = false;
 	mUnsusedProbeDataVector.clear();
 
-	connect(mBackend->getToolManager().get(), SIGNAL(configured()),                 this, SLOT(connectVideoToProbe()));
-	connect(mBackend->getToolManager().get(), SIGNAL(initialized()),                this, SLOT(connectVideoToProbe()));
+	connect(mBackend->getToolManager().get(), &ToolManager::stateChanged, this, &VideoConnection::connectVideoToProbe);
+//	connect(mBackend->getToolManager().get(), SIGNAL(configured()),                 this, SLOT(connectVideoToProbe()));
+//	connect(mBackend->getToolManager().get(), SIGNAL(initialized()),                this, SLOT(connectVideoToProbe()));
 	connect(mBackend->getToolManager().get(), SIGNAL(dominantToolChanged(QString)), this, SLOT(connectVideoToProbe()));
 }
 

@@ -77,6 +77,7 @@ private slots:
   void tpsSlot(int numTps); ///< Show transforms per seconds
   void showMessageSlot(Message message); ///< prints the incomming message to the statusbar
   void updateToolButtons();
+  void resetToolManagerConnection();
 
 private:
   void activateTool(QString uid);

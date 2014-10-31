@@ -80,6 +80,15 @@ public:
 	{
 	}
 
+	/**Enumerates the state of the tool
+	 */
+	enum State
+	{
+		tsNONE=0,         ///< not available
+		tsCONFIGURED,     ///< configured with basic info
+		tsINITIALIZED,    ///< connected to hardware, if any, ready to use
+		tsTRACKING,       ///< emitting tracking data
+	};
 	/**Enumerates the general type of tool.
 	 */
 	enum Type

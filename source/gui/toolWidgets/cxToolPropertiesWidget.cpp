@@ -122,14 +122,17 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
 
   mToptopLayout->addStretch();
 
-  connect(toolManager(), SIGNAL(trackingStarted()), this, SLOT(referenceToolChangedSlot()));
-  connect(toolManager(), SIGNAL(trackingStopped()), this, SLOT(referenceToolChangedSlot()));
+  connect(toolManager(), &ToolManager::stateChanged, this, &ToolPropertiesWidget::referenceToolChangedSlot);
+
+//  connect(toolManager(), SIGNAL(trackingStarted()), this, SLOT(referenceToolChangedSlot()));
+//  connect(toolManager(), SIGNAL(trackingStopped()), this, SLOT(referenceToolChangedSlot()));
   connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
 
-  connect(toolManager(), SIGNAL(configured()), this, SLOT(updateSlot()));
-  connect(toolManager(), SIGNAL(initialized()), this, SLOT(updateSlot()));
-  connect(toolManager(), SIGNAL(trackingStarted()), this, SLOT(updateSlot()));
-  connect(toolManager(), SIGNAL(trackingStopped()), this, SLOT(updateSlot()));
+  connect(toolManager(), &ToolManager::stateChanged, this, &ToolPropertiesWidget::updateSlot);
+//  connect(toolManager(), SIGNAL(configured()), this, SLOT(updateSlot()));
+//  connect(toolManager(), SIGNAL(initialized()), this, SLOT(updateSlot()));
+//  connect(toolManager(), SIGNAL(trackingStarted()), this, SLOT(updateSlot()));
+//  connect(toolManager(), SIGNAL(trackingStopped()), this, SLOT(updateSlot()));
   connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(updateSlot()));
 
   this->dominantToolChangedSlot();
@@ -255,12 +258,12 @@ void ToolPropertiesWidget::updateSlot()
   }
 
   QString status = "Unconfigured";
-  if (toolManager()->isConfigured())
+  if (toolManager()->getState()==Tool::tsCONFIGURED)
     status = "Configured";
-  if (toolManager()->isInitialized())
-    status = "Initialized";
-  if (toolManager()->isTracking())
-    status = "Tracking";
+  if (toolManager()->getState()==Tool::tsINITIALIZED)
+	status = "Initialized";
+  if (toolManager()->getState()==Tool::tsTRACKING)
+	status = "Tracking";
   mTrackingSystemStatusLabel->setText("Tracking status: " + status);
 }
 

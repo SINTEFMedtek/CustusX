@@ -457,12 +457,14 @@ void MainWindow::createActions()
 
 	mConfigureToolsAction->setChecked(true);
 
+//	connect(mConfigureToolsAction, &QAction::triggered, this, boost::bind(&MainWindow::setState, this, Tool::tsCONFIGURED));
 	connect(mConfigureToolsAction, SIGNAL(triggered()), this, SLOT(configureSlot()));
-	connect(mInitializeToolsAction, SIGNAL(triggered()), toolManager(), SLOT(initialize()));
-	connect(mTrackingToolsAction, SIGNAL(triggered()), this, SLOT(toggleTrackingSlot()));
+	boost::function<void()> finit = boost::bind(&ToolManager::setState, toolManager(), Tool::tsINITIALIZED);
+	connect(mInitializeToolsAction, &QAction::triggered, finit);
+//	connect(mTrackingToolsAction, SIGNAL(triggered()), this, SLOT(toggleTrackingSlot()));
 	connect(mSaveToolsPositionsAction, SIGNAL(triggered()), toolManager(), SLOT(saveToolsSlot()));
-	connect(toolManager(), SIGNAL(trackingStarted()), this, SLOT(updateTrackingActionSlot()));
-	connect(toolManager(), SIGNAL(trackingStopped()), this, SLOT(updateTrackingActionSlot()));
+	connect(toolManager(), SIGNAL(stateChanged()), this, SLOT(updateTrackingActionSlot()));
+	connect(toolManager(), SIGNAL(stateChanged()), this, SLOT(updateTrackingActionSlot()));
 	this->updateTrackingActionSlot();
 
 	mCenterToImageCenterAction = new QAction(tr("Center Image"), this);
@@ -620,7 +622,7 @@ void MainWindow::updatePointPickerActionSlot()
 
 void MainWindow::updateTrackingActionSlot()
 {
-	if (toolManager()->isTracking())
+	if (toolManager()->getState() >= Tool::tsTRACKING)
 	{
 		mTrackingToolsAction->setIcon(QIcon(":/icons/polaris-green.png"));
 		mTrackingToolsAction->setText("Stop Tracking");
@@ -634,10 +636,10 @@ void MainWindow::updateTrackingActionSlot()
 
 void MainWindow::toggleTrackingSlot()
 {
-	if (toolManager()->isTracking())
-		toolManager()->stopTracking();
+	if (toolManager()->getState() >= Tool::tsTRACKING)
+		toolManager()->setState(Tool::tsINITIALIZED);
 	else
-		toolManager()->startTracking();
+		toolManager()->setState(Tool::tsTRACKING);
 }
 
 namespace
@@ -1041,7 +1043,7 @@ void MainWindow::deleteDataSlot()
 
 void MainWindow::configureSlot()
 {
-	toolManager()->configure();
+	toolManager()->setState(Tool::tsCONFIGURED);
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)

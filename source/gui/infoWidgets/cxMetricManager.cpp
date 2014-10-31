@@ -61,7 +61,8 @@ namespace cx
 
 MetricManager::MetricManager() : QObject(NULL)
 {
-	connect(toolManager(), SIGNAL(configured()), this, SIGNAL(metricsChanged()));
+	connect(toolManager(), &ToolManager::stateChanged, this, &MetricManager::metricsChanged);
+//	connect(toolManager(), SIGNAL(configured()), this, SIGNAL(metricsChanged()));
 	connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SIGNAL(metricsChanged()));
 }
 

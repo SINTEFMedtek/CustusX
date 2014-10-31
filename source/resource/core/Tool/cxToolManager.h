@@ -72,16 +72,18 @@ Q_OBJECT
 public:
 	typedef std::map<QString, ToolPtr> ToolMap;
 
-	virtual bool isConfigured() const = 0; ///< system is ready to use but not connected to hardware
-	virtual bool isInitialized() const = 0; ///< system is connected to hw and ready
-	virtual bool isTracking() const = 0; ///< system is tracking
+	virtual Tool::State getState() const = 0;
+	virtual void setState(const Tool::State val) = 0;
+//	virtual bool isConfigured() const = 0; ///< system is ready to use but not connected to hardware
+//	virtual bool isInitialized() const = 0; ///< system is connected to hw and ready
+//	virtual bool isTracking() const = 0; ///< system is tracking
 
-	virtual void configure() = 0; ///< get the system ready without connecting to the tracking hardware
-	virtual void deconfigure() = 0;
-	virtual void initialize() = 0; ///< connect the system to the tracking hardware
-	virtual void uninitialize() = 0; ///< disconnect the system from the hardware
-	virtual void startTracking() = 0; ///< start tracking
-	virtual void stopTracking() = 0; ///< stop tracking
+//	virtual void configure() = 0; ///< get the system ready without connecting to the tracking hardware
+//	virtual void deconfigure() = 0;
+//	virtual void initialize() = 0; ///< connect the system to the tracking hardware
+//	virtual void uninitialize() = 0; ///< disconnect the system from the hardware
+//	virtual void startTracking() = 0; ///< start tracking
+//	virtual void stopTracking() = 0; ///< stop tracking
 
 	virtual ToolMap getTools() = 0; ///< get configured and initialized tools
 	virtual ToolPtr getTool(const QString& uid) = 0; ///< get a tool
@@ -115,12 +117,13 @@ public slots:
 	virtual void saveToolsSlot() {}
 
 signals:
-	void configured(); ///< system is configured
-	void deconfigured(); ///<
-	void initialized(); ///< system is initialized
-	void uninitialized(); ///< system is uninitialized
-	void trackingStarted(); ///< system starts tracking
-	void trackingStopped(); ///< system stops tracking
+	void stateChanged();
+//	void configured(); ///< system is configured
+//	void deconfigured(); ///<
+//	void initialized(); ///< system is initialized
+//	void uninitialized(); ///< system is uninitialized
+//	void trackingStarted(); ///< system starts tracking
+//	void trackingStopped(); ///< system stops tracking
 
 	void dominantToolChanged(const QString& uId);
 	void tps(int); ///< the dominant tools tps

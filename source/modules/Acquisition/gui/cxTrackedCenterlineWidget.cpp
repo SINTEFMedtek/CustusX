@@ -61,8 +61,9 @@ TrackedCenterlineWidget::TrackedCenterlineWidget(AcquisitionDataPtr pluginData, 
 //  connect(&mCenterlineAlgorithm, SIGNAL(finished()), this, SLOT(centerlineFinishedSlot()));
 //  connect(&mCenterlineAlgorithm, SIGNAL(aboutToStart()), this, SLOT(preprocessResampler()));
 
-  connect(toolManager(), SIGNAL(trackingStarted()), this, SLOT(checkIfReadySlot()));
-  connect(toolManager(), SIGNAL(trackingStopped()), this, SLOT(checkIfReadySlot()));
+	connect(toolManager(), &ToolManager::stateChanged, this, &TrackedCenterlineWidget::checkIfReadySlot);
+//  connect(toolManager(), SIGNAL(trackingStarted()), this, SLOT(checkIfReadySlot()));
+//  connect(toolManager(), SIGNAL(trackingStopped()), this, SLOT(checkIfReadySlot()));
   mLayout->addStretch();
 
   this->checkIfReadySlot();
@@ -81,7 +82,7 @@ QString TrackedCenterlineWidget::defaultWhatsThis() const
 
 void TrackedCenterlineWidget::checkIfReadySlot()
 {
-  if(toolManager()->isTracking())
+  if(toolManager()->getState()>=Tool::tsTRACKING)
   {
     mRecordSessionWidget->setReady(true, "<font color=green>Ready to record!</font>\n");
   }

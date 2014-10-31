@@ -43,6 +43,35 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
+typedef boost::shared_ptr<class TrackingSystemService> TrackingSystemServicePtr;
+
+/** \brief Tracking System Service
+ *
+ * Represents one tracking system consisting of a collection of tools.
+ * Several such may exist.
+ *
+ *  \ingroup cx_resource_core_tool
+ *  \date 2014-09-30
+ *  \author Christian Askeland, SINTEF
+ */
+/*class cxResource_EXPORT TrackingSystemService : public QObject
+{
+	Q_OBJECT
+public:
+	virtual Tool::State getState() const = 0;
+	virtual void setState(const Tool::State val) = 0;
+	virtual ToolMap getTools() = 0;
+	virtual TrackerConfigurationPtr getConfiguration() = 0;
+
+	virtual bool isNull() = 0;
+	static TrackingSystemServicePtr getNullObject();
+signals:
+	void stateChanged();
+public slots:
+};
+*/
+
+
 typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
 
 /** \brief Tracking services

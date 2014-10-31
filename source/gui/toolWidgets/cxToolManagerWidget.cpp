@@ -57,12 +57,13 @@ ToolManagerWidget::ToolManagerWidget(QWidget* parent) :
   connect(mStartTrackingButton, SIGNAL(clicked(bool)), this, SLOT(startTrackingClickedSlot(bool)));
   connect(mStopTrackingButton, SIGNAL(clicked(bool)), this, SLOT(stopTrackingClickedSlot(bool)));
 
-  connect(toolManager(), SIGNAL(configured()), this, SLOT(updateButtonStatusSlot()));
-  connect(toolManager(), SIGNAL(deconfigured()), this, SLOT(updateButtonStatusSlot()));
-  connect(toolManager(), SIGNAL(initialized()), this, SLOT(updateButtonStatusSlot()));
-  connect(toolManager(), SIGNAL(uninitialized()), this, SLOT(updateButtonStatusSlot()));
-  connect(toolManager(), SIGNAL(trackingStarted()), this, SLOT(updateButtonStatusSlot()));
-  connect(toolManager(), SIGNAL(trackingStopped()), this, SLOT(updateButtonStatusSlot()));
+//  connect(toolManager(), SIGNAL(configured()), this, SLOT(updateButtonStatusSlot()));
+//  connect(toolManager(), SIGNAL(deconfigured()), this, SLOT(updateButtonStatusSlot()));
+//  connect(toolManager(), SIGNAL(initialized()), this, SLOT(updateButtonStatusSlot()));
+//  connect(toolManager(), SIGNAL(uninitialized()), this, SLOT(updateButtonStatusSlot()));
+//  connect(toolManager(), SIGNAL(trackingStarted()), this, SLOT(updateButtonStatusSlot()));
+//  connect(toolManager(), SIGNAL(trackingStopped()), this, SLOT(updateButtonStatusSlot()));
+  connect(toolManager(), &ToolManager::stateChanged, this, &ToolManagerWidget::updateButtonStatusSlot);
 
   //layout
   QGridLayout* layout = new QGridLayout(this);
@@ -91,41 +92,55 @@ QString ToolManagerWidget::defaultWhatsThis() const
 
 void ToolManagerWidget::configureClickedSlot(bool checked)
 {
-  toolManager()->configure();
+  toolManager()->setState(Tool::tsCONFIGURED);
 }
 
 void ToolManagerWidget::deconfigureClickedSlot(bool checked)
 {
-  toolManager()->deconfigure();
+	toolManager()->setState(Tool::tsNONE);
+//  toolManager()->deconfigure();
 }
 
 void ToolManagerWidget::initializeClickedSlot(bool checked)
 {
-  toolManager()->initialize();
+	toolManager()->setState(Tool::tsINITIALIZED);
+//  toolManager()->initialize();
 }
 
 void ToolManagerWidget::uninitializeClickedSlot(bool checked)
 {
-  toolManager()->uninitialize();
+	toolManager()->setState(Tool::tsCONFIGURED);
+//  toolManager()->uninitialize();
 }
 
 void ToolManagerWidget::startTrackingClickedSlot(bool checked)
 {
-  toolManager()->startTracking();
+	toolManager()->setState(Tool::tsTRACKING);
+//  toolManager()->startTracking();
 }
 
 void ToolManagerWidget::stopTrackingClickedSlot(bool checked)
 {
-  toolManager()->stopTracking();
+	toolManager()->setState(Tool::tsINITIALIZED);
+//  toolManager()->stopTracking();
 }
 
 void ToolManagerWidget::updateButtonStatusSlot()
 {
-  mConfigureButton->setDisabled(toolManager()->isConfigured());
-  mDeConfigureButton->setDisabled(!toolManager()->isConfigured());
-  mInitializeButton->setDisabled(toolManager()->isInitialized());
-  mUnInitializeButton->setDisabled(!toolManager()->isInitialized());
-  mStartTrackingButton->setDisabled(toolManager()->isTracking());
-  mStopTrackingButton->setDisabled(!toolManager()->isTracking());
+	mConfigureButton->setEnabled(toolManager()->getState() < Tool::tsCONFIGURED);
+	mDeConfigureButton->setEnabled(toolManager()->getState() >= Tool::tsCONFIGURED);
+
+	mInitializeButton->setEnabled(toolManager()->getState() < Tool::tsINITIALIZED);
+	mUnInitializeButton->setEnabled(toolManager()->getState() >= Tool::tsINITIALIZED);
+
+	mStartTrackingButton->setEnabled(toolManager()->getState() < Tool::tsTRACKING);
+	mStopTrackingButton->setEnabled(toolManager()->getState() >= Tool::tsTRACKING);
+
+//  mConfigureButton->setDisabled(toolManager()->isConfigured());
+//  mDeConfigureButton->setDisabled(!toolManager()->isConfigured());
+//  mInitializeButton->setDisabled(toolManager()->isInitialized());
+//  mUnInitializeButton->setDisabled(!toolManager()->isInitialized());
+//  mStartTrackingButton->setDisabled(toolManager()->isTracking());
+//  mStopTrackingButton->setDisabled(!toolManager()->isTracking());
 }
 }
