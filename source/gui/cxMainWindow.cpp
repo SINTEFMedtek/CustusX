@@ -839,7 +839,6 @@ void MainWindow::createMenus()
 	mHelpMenu = new QMenu(tr("Help"), this);
 
 	// File
-	mFileMenu->addAction(mAboutAction);
 	mFileMenu->addAction(mPreferencesAction);
 	this->menuBar()->addMenu(mFileMenu);
 	mFileMenu->addAction(mNewPatientAction);
@@ -899,6 +898,7 @@ void MainWindow::createMenus()
 	mNavigationMenu->addActions(mInteractorStyleActionGroup->actions());
 
 	mHelpMenuAction = this->menuBar()->addMenu(mHelpMenu);
+	mHelpMenu->addAction(mAboutAction);
 	mHelpMenu->addAction(QWhatsThis::createAction(this));
 }
 
