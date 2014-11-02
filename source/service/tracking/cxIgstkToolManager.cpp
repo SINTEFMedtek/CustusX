@@ -155,20 +155,15 @@ void IgstkToolManager::initializeSlot(bool on)
 {
 	if (on)
 	{
-//    if(!mTracker->isInitialized())
-//    {
 		connect(mTracker.get(), SIGNAL(initialized(bool)), this, SLOT(attachToolsWhenTrackerIsInitializedSlot(bool)));
-		mTracker->open();
-//    }else
-//      mTracker->attachTools(mTools);
+		if (!mTracker->isOpen())
+			mTracker->open();
 	}
 	else
 	{
-//    if(mTracker->isInitialized())
-//    {
 		mTracker->detachTools(mTools); //not sure we have to detach all tools before we close, read NDI manual
-		mTracker->close();
-//    }
+		if (mTracker->isOpen())
+			mTracker->close();
 	}
 }
 

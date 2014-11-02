@@ -119,7 +119,9 @@ void TrackingSystemIGSTKService::setState(const Tool::State val)
 		else if (val == Tool::tsCONFIGURED)
 			this->uninitialize();
 		else if (val == Tool::tsNONE)
+		{
 			this->deconfigure();
+		}
 	}
 }
 
@@ -202,6 +204,7 @@ void TrackingSystemIGSTKService::trackerConfiguredSlot(bool on)
 	}
 
 	//new all tools
+	mTools.clear();
 	std::map<QString, IgstkToolPtr> igstkTools = mTrackerThread->getTools();
 	IgstkToolPtr reference = mTrackerThread->getRefereceTool();
 	std::map<QString, IgstkToolPtr>::iterator it = igstkTools.begin();
@@ -219,7 +222,7 @@ void TrackingSystemIGSTKService::trackerConfiguredSlot(bool on)
 
 	mState = Tool::tsCONFIGURED;
 
-	reportSuccess("ToolManager is configured.");
+	reportSuccess("IGSTK Tracking Service Configured.");
 	emit configured();
 	emit stateChanged();
 }
@@ -231,25 +234,25 @@ void TrackingSystemIGSTKService::trackerConfiguredSlot(bool on)
 
 void TrackingSystemIGSTKService::deconfigure()
 {
-	SSC_LOG("******************");
+	if (!this->isConfigured())
+		return;
+
 	if (this->isInitialized())
 	{
 		connect(this, SIGNAL(uninitialized()), this, SLOT(deconfigureAfterUninitializedSlot()));
 		this->uninitialize();
 		return;
 	}
-	SSC_LOG("******************");
+	mTools.clear();
 
 	this->destroyTrackerThread();
-	SSC_LOG("******************");
 
 //	this->setDominantTool(this->getManualTool()->getUid());
 
 	mState = Tool::tsNONE;
 	emit deconfigured();
-	SSC_LOG("******************");
 	emit stateChanged();
-	report("ToolManager is deconfigured.");
+	report("IGSTK Tracking Service is deconfigured.");
 }
 
 void TrackingSystemIGSTKService::initialize()
@@ -446,14 +449,14 @@ void TrackingSystemIGSTKService::initializedSlot(bool value)
 	if (value)
 	{
 		mState = Tool::tsINITIALIZED;
-		reportSuccess("ToolManager is initialized.");
+		reportSuccess("IGSTK Tracking Service is initialized.");
 		emit stateChanged();
 		emit initialized();
 	}
 	else
 	{
 		mState = Tool::tsCONFIGURED;
-		report("ToolManager is uninitialized.");
+		report("IGSTK Tracking Service is uninitialized.");
 		emit stateChanged();
 		emit uninitialized();
 	}
@@ -464,14 +467,14 @@ void TrackingSystemIGSTKService::trackerTrackingSlot(bool value)
 	if (value)
 	{
 		mState = Tool::tsTRACKING;
-		reportSuccess("ToolManager started tracking.");
+		reportSuccess("IGSTK Tracking Service started tracking.");
 		emit stateChanged();
 		emit trackingStarted();
 	}
 	else
 	{
 		mState = Tool::tsINITIALIZED;
-		reportSuccess("ToolManager stopped tracking.");
+		reportSuccess("IGSTK Tracking Service stopped tracking.");
 		emit stateChanged();
 		emit trackingStopped();
 	}

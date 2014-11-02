@@ -207,9 +207,10 @@ void ToolManagerUsingIGSTK::setState(const Tool::State val)
 void ToolManagerUsingIGSTK::rebuildCachedTools()
 {
 	mTools.clear();
-
 	for (unsigned i=0; i<mTrackingSystems.size(); ++i)
+	{
 		this->addToolsFrom(mTrackingSystems[i]);
+	}
 
 	mTools[mManualTool->getUid()] = mManualTool;
 	this->imbueManualToolWithRealProperties();
@@ -373,6 +374,8 @@ void ToolManagerUsingIGSTK::savePositionHistory()
 
 void ToolManagerUsingIGSTK::loadPositionHistory()
 {
+	if (this->getState()==Tool::tsNONE)
+		return;
 	// save all position data acquired so far, in case of multiple calls.
 	this->savePositionHistory();
 
@@ -407,10 +410,9 @@ void ToolManagerUsingIGSTK::loadPositionHistory()
 
 	if (!missingTools.empty())
 	{
-		reportWarning(
-						QString("Loaded position history.\n"
-								"The following tools were found in the history\n"
-								"but not in the configuration:\n%1").arg(missingTools.join(", ")));
+		reportWarning(QString("Loaded position history, but some of the tools "
+							  "are not present in the configuration:"
+							  "\n  \t%1").arg(missingTools.join("\n  \t")));
 	}
 
 	mLastLoadPositionHistory = getMilliSecondsSinceEpoch();
