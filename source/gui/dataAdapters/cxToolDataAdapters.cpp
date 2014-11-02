@@ -43,7 +43,7 @@ namespace cx
 ActiveToolStringDataAdapter::ActiveToolStringDataAdapter()
 {
   connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SIGNAL(changed()));
-  connect(toolManager(), SIGNAL(configured()), this, SIGNAL(changed()));
+  connect(toolManager(), &ToolManager::stateChanged, this, &ActiveToolStringDataAdapter::changed);
 }
 
 QString ActiveToolStringDataAdapter::getDisplayName() const
@@ -106,8 +106,6 @@ QString ActiveToolStringDataAdapter::convertInternal2Display(QString internal)
 ActiveProbeConfigurationStringDataAdapter::ActiveProbeConfigurationStringDataAdapter()
 {
   connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChanged()));
-//  connect(toolManager(), SIGNAL(configured()), this, SLOT(dominantToolChanged())); // for debugging: if initializing a manual tool with probe properties
-//  connect(toolManager(), SIGNAL(trackingStarted()), this, SLOT(dominantToolChanged()));
   connect(toolManager(), &ToolManager::stateChanged, this, &ActiveProbeConfigurationStringDataAdapter::dominantToolChanged);
   this->dominantToolChanged();
 }

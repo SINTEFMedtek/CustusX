@@ -29,43 +29,62 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXTRACKINGSYSTEMPLAYBACKSERVICE_H
+#define CXTRACKINGSYSTEMPLAYBACKSERVICE_H
 
-#ifndef CXTRACKINGSERVICE_H
-#define CXTRACKINGSERVICE_H
-
-#include "cxResourceExport.h"
-
-#include <QObject>
-#include <boost/shared_ptr.hpp>
-
-#define TrackingService_iid "cx::TrackingService"
+#include "cxTrackingServiceExport.h"
+#include "cxTrackingSystemService.h"
 
 namespace cx
 {
+typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
+typedef boost::shared_ptr<class PlaybackTool> PlaybackToolPtr;
 
-typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
-
-/** \brief Tracking services
+/**
+ * \brief Interface towards a playback tracking system.
+ * \ingroup cx_service_tracking
  *
- *  \ingroup cx_resource_core_tool
- *  \date 2014-09-19
- *  \author Ole Vegard Solberg, SINTEF
+ * Wraps another tracking system, enabling playback of the tools in that system
+ *
+ *
+ * The original tools are wrapped by playback tools. The original ones are
+ * not changed, only their movement is ignored.
+ *
+ * \date 2014-11-01
+ * \author Christian Askeland, SINTEF
  */
-class cxResource_EXPORT TrackingService : public QObject
+class cxTrackingService_EXPORT TrackingSystemPlaybackService : public TrackingSystemService
 {
-	Q_OBJECT
+Q_OBJECT
+
 public:
+	TrackingSystemPlaybackService(PlaybackTimePtr controller, TrackingSystemServicePtr base);
+	virtual ~TrackingSystemPlaybackService();
 
-	virtual bool isNull() = 0;
-	static TrackingServicePtr getNullObject();
+	virtual std::vector<ToolPtr> getTools();
+	virtual ToolPtr getReference() { return ToolPtr(); }
 
-signals:
+	virtual Tool::State getState() const;
+	virtual void setState(const Tool::State val);
 
-public slots:
+	virtual void setLoggingFolder(QString loggingFolder); ///<\param loggingFolder path to the folder where logs should be saved
+	virtual TrackerConfigurationPtr getConfiguration();
 
+	TrackingSystemServicePtr getBase() { return mBase; }
+
+private:
+	void start(PlaybackTimePtr controller);
+	void stop();
+	bool forceBaseToConfiguredState();
+	void waitForState(TrackingSystemServicePtr base, Tool::State state, int timeout);
+
+	std::vector<PlaybackToolPtr> mTools; ///< all tools
+	Tool::State mState;
+	TrackingSystemServicePtr mBase;
 };
 
-} //cx
-Q_DECLARE_INTERFACE(cx::TrackingService, TrackingService_iid)
 
-#endif // CXTRACKINGSERVICE_H
+} // namespace cx
+
+
+#endif // CXTRACKINGSYSTEMPLAYBACKSERVICE_H

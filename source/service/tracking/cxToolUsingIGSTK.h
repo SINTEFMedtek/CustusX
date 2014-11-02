@@ -97,7 +97,7 @@ public:
 	 TOOL_AURORA_CHANNEL_NUMBER        ///< hardware responds to Aurora channel number
 	 */
 
-	ToolUsingIGSTK(TrackingServiceOldPtr manager, IgstkToolPtr igstkTool);
+	ToolUsingIGSTK(IgstkToolPtr igstkTool);
 	virtual ~ToolUsingIGSTK();
 
 	virtual std::set<Type> getTypes() const;

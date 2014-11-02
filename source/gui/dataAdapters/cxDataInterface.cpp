@@ -249,7 +249,6 @@ QString ActiveVideoSourceStringDataAdapter::getHelp() const
 SelectToolStringDataAdapterBase::SelectToolStringDataAdapterBase()
 {
 	connect(toolManager(), &ToolManager::stateChanged, this, &SelectToolStringDataAdapterBase::changed);
-//  connect(toolManager(), SIGNAL(configured()), this, SIGNAL(changed()));
 }
 
 QStringList SelectToolStringDataAdapterBase::getValueRange() const
@@ -388,7 +387,6 @@ void SelectRTSourceStringDataAdapter::setDefaultSlot()
 SelectCoordinateSystemStringDataAdapter::SelectCoordinateSystemStringDataAdapter()
 {
 	mCoordinateSystem = csCOUNT;
-//  connect(toolManager(), SIGNAL(configured()), this, SLOT(setDefaultSlot()));
   connect(toolManager(), &ToolManager::stateChanged, this, &SelectCoordinateSystemStringDataAdapter::setDefaultSlot);
 }
 

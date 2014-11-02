@@ -462,7 +462,8 @@ void MainWindow::createActions()
 	boost::function<void()> finit = boost::bind(&ToolManager::setState, toolManager(), Tool::tsINITIALIZED);
 	connect(mInitializeToolsAction, &QAction::triggered, finit);
 //	connect(mTrackingToolsAction, SIGNAL(triggered()), this, SLOT(toggleTrackingSlot()));
-	connect(mSaveToolsPositionsAction, SIGNAL(triggered()), toolManager(), SLOT(saveToolsSlot()));
+	boost::function<void()> fsavetools = boost::bind(&ToolManager::savePositionHistory, toolManager());
+	connect(mSaveToolsPositionsAction, &QAction::triggered, fsavetools);
 	connect(toolManager(), SIGNAL(stateChanged()), this, SLOT(updateTrackingActionSlot()));
 	connect(toolManager(), SIGNAL(stateChanged()), this, SLOT(updateTrackingActionSlot()));
 	this->updateTrackingActionSlot();

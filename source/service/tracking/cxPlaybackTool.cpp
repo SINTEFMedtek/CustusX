@@ -40,8 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-PlaybackTool::PlaybackTool(TrackingServiceOldPtr manager, ToolPtr base, PlaybackTimePtr time) :
-	ToolImpl(manager, "playback_"+base->getUid(), "playback "+base->getName()), mBase(base),
+PlaybackTool::PlaybackTool(ToolPtr base, PlaybackTimePtr time) :
+	ToolImpl("playback_"+base->getUid(), "playback "+base->getName()), mBase(base),
     mTime(time),
     mVisible(false)
 {
@@ -89,13 +89,13 @@ void PlaybackTool::timeChangedSlot()
 		emit toolTransformAndTimestamp(m_rMpr, mTimestamp);
 	}
 
-	// Overwrite manual tool pos, set timestamp to 1ms previous.
-	// This makes sure manual tool is not picked as dominant.
-	if (this->getTrackingService())
-	{
-		this->getTrackingService()->getManualTool()->set_prMt(m_rMpr, mTimestamp-1);
-		this->getTrackingService()->dominantCheckSlot();
-	}
+//	// Overwrite manual tool pos, set timestamp to 1ms previous.
+//	// This makes sure manual tool is not picked as dominant.
+//	if (this->getTrackingService())
+//	{
+//		this->getTrackingService()->getManualTool()->set_prMt(m_rMpr, mTimestamp-1);
+//		this->getTrackingService()->dominantCheckSlot();
+//	}
 }
 
 std::set<Tool::Type> PlaybackTool::getTypes() const

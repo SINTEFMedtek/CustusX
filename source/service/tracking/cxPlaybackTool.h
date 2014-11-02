@@ -55,7 +55,7 @@ class cxTrackingService_EXPORT PlaybackTool: public ToolImpl
 {
 Q_OBJECT
 public:
-	explicit PlaybackTool(TrackingServiceOldPtr manager, ToolPtr base, PlaybackTimePtr time);
+	explicit PlaybackTool(ToolPtr base, PlaybackTimePtr time);
 	virtual ~PlaybackTool();
 	virtual std::set<Type> getTypes() const;
 	virtual vtkPolyDataPtr getGraphicsPolyData() const;

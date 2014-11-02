@@ -293,9 +293,7 @@ void IgstkTracker::trackerTransformCallback(const itk::EventObject &event)
 	//failures
 	else if (igstk::InvalidRequestErrorEvent().CheckEvent(&event))
 	{
-		reportWarning(
-						mUid
-										+ " received an invalid request. This means that the internal igstk tracker did not accept the request. Do not know which request.");
+		reportWarning(mUid + " received an invalid request. This means that the internal igstk tracker did not accept the request. Do not know which request.");
 		this->shutdown();
 	}
 	else if (igstk::TrackerOpenErrorEvent().CheckEvent(&event))

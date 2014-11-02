@@ -49,16 +49,6 @@ namespace cx
 
 ServiceController::ServiceController()
 {
-	// load the ever-present video stream into the patient service
-//	dataManager()->loadStream(videoService()->getActiveVideoSource());
-
-	// connecting the video source and the tracking us probe.
-//	connect(toolManager(), SIGNAL(configured()), this, SLOT(updateVideoConnections()));
-//	connect(toolManager(), SIGNAL(initialized()), this, SLOT(updateVideoConnections()));
-//	connect(toolManager(), SIGNAL(dominantToolChanged(QString)), this, SLOT(updateVideoConnections()));
-////	connect(videoService()->getVideoConnection().get(), SIGNAL(connected(bool)), this, SLOT(updateVideoConnections()));
-//	connect(videoService(), SIGNAL(activeVideoSourceChanged()), this, SLOT(updateVideoConnections()));
-
 	connect(patientService()->getPatientData().get(), SIGNAL(isSaving()), this, SLOT(duringSavePatientSlot()));
 	connect(patientService()->getPatientData().get(), SIGNAL(isLoading()), this, SLOT(duringLoadPatientSlot()));
 	connect(patientService()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));

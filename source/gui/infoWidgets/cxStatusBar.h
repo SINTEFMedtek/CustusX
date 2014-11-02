@@ -49,6 +49,10 @@ class QToolButton;
 
 namespace cx
 {
+
+typedef boost::shared_ptr<class DominantToolProxy> DominantToolProxyPtr;
+
+
 /**
  * \class StatusBar
  *
@@ -88,6 +92,7 @@ private:
   QLabel* mTpsLabel; ///< Label for showing TPS
 //  QLabel* mMessageLevelLabel;
   QToolButton* mMessageLevelLabel;
+  DominantToolProxyPtr mActiveTool;
 
   struct ToolData
   {

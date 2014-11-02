@@ -124,15 +124,9 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
 
   connect(toolManager(), &ToolManager::stateChanged, this, &ToolPropertiesWidget::referenceToolChangedSlot);
 
-//  connect(toolManager(), SIGNAL(trackingStarted()), this, SLOT(referenceToolChangedSlot()));
-//  connect(toolManager(), SIGNAL(trackingStopped()), this, SLOT(referenceToolChangedSlot()));
   connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
 
   connect(toolManager(), &ToolManager::stateChanged, this, &ToolPropertiesWidget::updateSlot);
-//  connect(toolManager(), SIGNAL(configured()), this, SLOT(updateSlot()));
-//  connect(toolManager(), SIGNAL(initialized()), this, SLOT(updateSlot()));
-//  connect(toolManager(), SIGNAL(trackingStarted()), this, SLOT(updateSlot()));
-//  connect(toolManager(), SIGNAL(trackingStopped()), this, SLOT(updateSlot()));
   connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(updateSlot()));
 
   this->dominantToolChangedSlot();

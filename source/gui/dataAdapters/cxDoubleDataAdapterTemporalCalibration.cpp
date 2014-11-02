@@ -39,8 +39,6 @@ DoubleDataAdapterTimeCalibration::DoubleDataAdapterTimeCalibration()
 {
   connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChanged()));
   connect(toolManager(), &ToolManager::stateChanged, this, &DoubleDataAdapterTimeCalibration::dominantToolChanged);
-//  connect(toolManager(), SIGNAL(configured()), this, SLOT(dominantToolChanged())); // for debugging: if initializing a manual tool with probe properties
-//  connect(toolManager(), SIGNAL(trackingStarted()), this, SLOT(dominantToolChanged()));
   this->dominantToolChanged();
 }
 

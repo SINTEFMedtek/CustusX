@@ -64,17 +64,6 @@ public:
 	virtual Tool::State getState() const;
 	virtual void setState(const Tool::State val);
 
-//	virtual bool isConfigured() const;
-//	virtual bool isInitialized() const;
-//	virtual bool isTracking() const;
-
-//	virtual void configure();
-//	virtual void deconfigure() {}
-//	virtual void initialize();
-//	virtual void uninitialize();
-//	virtual void startTracking();
-//	virtual void stopTracking();
-
 	virtual ToolMap getTools();
 	virtual ToolPtr getTool(const QString& uid);
 

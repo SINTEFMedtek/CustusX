@@ -36,13 +36,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ToolImpl::ToolImpl(TrackingServiceOldPtr manager, const QString& uid, const QString& name) :
+ToolImpl::ToolImpl(const QString& uid, const QString& name) :
 	Tool(uid, name),
 	mPositionHistory(new TimedTransformMap()),
 	m_prMt(Transform3D::Identity()),
-	mManager(manager)
+	mTooltipOffset(0)
+//	mManager(manager)
 {
-
 }
 
 ToolImpl::~ToolImpl()
@@ -50,28 +50,32 @@ ToolImpl::~ToolImpl()
 
 }
 
-TrackingServiceOldPtr ToolImpl::getTrackingService()
-{
-	return mManager.lock();
-}
-TrackingServiceOldPtr ToolImpl::getTrackingService() const
-{
-	return mManager.lock();
-}
+//TrackingServiceOldPtr ToolImpl::getTrackingService()
+//{
+//	return mManager.lock();
+//}
+//TrackingServiceOldPtr ToolImpl::getTrackingService() const
+//{
+//	return mManager.lock();
+//}
 
 // Just use the tool tip offset from the tool manager
 double ToolImpl::getTooltipOffset() const
 {
-	if (this->getTrackingService())
-		return this->getTrackingService()->getTooltipOffset();
-	return 0;
+//	if (this->getTrackingService())
+//		return this->getTrackingService()->getTooltipOffset();
+	return mTooltipOffset;
 }
 
 // Just use the tool tip offset from the tool manager
 void ToolImpl::setTooltipOffset(double val)
 {
-	if (this->getTrackingService())
-		this->getTrackingService()->setTooltipOffset(val);
+	if (similar(val, mTooltipOffset))
+		return;
+	mTooltipOffset = val;
+	emit tooltipOffset(mTooltipOffset);
+//	if (this->getTrackingService())
+//		this->getTrackingService()->setTooltipOffset(val);
 }
 
 TimedTransformMapPtr ToolImpl::getPositionHistory()

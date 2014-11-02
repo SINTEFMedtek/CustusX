@@ -153,8 +153,6 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ViewPtr view, VisualizationServiceB
 	this->updateMetricNamesRep();
 
 	connect(mBackend->getToolManager().get(), &ToolManager::stateChanged, this, &ViewWrapper3D::toolsAvailableSlot);
-//	connect(mBackend->getToolManager().get(), SIGNAL(configured()), this, SLOT(toolsAvailableSlot()));
-//	connect(mBackend->getToolManager().get(), SIGNAL(initialized()), this, SLOT(toolsAvailableSlot()));
 	connect(mBackend->getDataManager().get(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(activeImageChangedSlot()));
 	this->toolsAvailableSlot();
 

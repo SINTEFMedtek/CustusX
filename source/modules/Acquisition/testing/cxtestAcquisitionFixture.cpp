@@ -103,7 +103,7 @@ void AcquisitionFixture::setupVideo()
 void AcquisitionFixture::setupProbe()
 {
 	SSC_LOG("");
-	cx::DummyToolPtr dummyTool(new cx::DummyTool(cx::trackingService()));
+	cx::DummyToolPtr dummyTool(new cx::DummyTool());
 	dummyTool->setToolPositionMovement(dummyTool->createToolPositionMovementTranslationOnly(cx::DoubleBoundingBox3D(0,0,0,10,10,10)));
 	std::pair<QString, cx::ProbeDefinition> probedata = cx::UsReconstructionFileReader::readProbeDataFromFile(mAcqDataFilename);
 	cx::ProbeImplPtr probe = cx::ProbeImpl::New("","");

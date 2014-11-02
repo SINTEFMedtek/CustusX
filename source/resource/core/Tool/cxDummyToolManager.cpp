@@ -54,7 +54,7 @@ DummyToolManager::DummyToolManager() :
 //	mIsTracking(false),
 	mState(Tool::tsNONE)
 {
-	DummyToolPtr tool1(new DummyTool(mSelf.lock()));
+	DummyToolPtr tool1(new DummyTool());
 
 	mDominantTool = tool1;
 	mReferenceTool = tool1;
@@ -63,18 +63,6 @@ DummyToolManager::DummyToolManager() :
 }
 DummyToolManager::~ DummyToolManager()
 {}
-//bool DummyToolManager::isConfigured() const
-//{
-//	return mConfigured;
-//}
-//bool DummyToolManager::isInitialized() const
-//{
-//	return mInitialized;
-//}
-//bool DummyToolManager::isTracking() const
-//{
-//	return mIsTracking;
-//}
 
 Tool::State DummyToolManager::getState() const
 {
@@ -95,27 +83,8 @@ void DummyToolManager::setState(const Tool::State val)
 	emit stateChanged();
 }
 
-//void DummyToolManager::configure()
-//{
-//	mConfigured = true;
-//	emit configured();
-//}
-//void DummyToolManager::initialize()
-//{
-//	mInitialized = true;
-//	emit initialized();
-//}
-//void DummyToolManager::uninitialize()
-//{
-//	mInitialized = false;
-//	emit initialized();
-//}
-
 void DummyToolManager::startTracking()
 {
-//	mIsTracking = true;
-//	emit trackingStarted();
-
 	DummyToolMapConstIter it = mDummyTools.begin();
 	while(it != mDummyTools.end())
 	{
@@ -127,9 +96,6 @@ void DummyToolManager::startTracking()
 
 void DummyToolManager::stopTracking()
 {
-//	mIsTracking = false;
-//	emit trackingStopped();
-
 	DummyToolMapConstIter it = mDummyTools.begin();
 	while(it != mDummyTools.end())
 	{

@@ -61,7 +61,7 @@ class cxResource_EXPORT ManualTool : public ToolImpl
 	Q_OBJECT
 public:
 
-	explicit ManualTool(TrackingServiceOldPtr manager, const QString& uid, const QString& name ="");
+	explicit ManualTool(const QString& uid, const QString& name ="");
 	virtual ~ManualTool();
 	virtual std::set<Type> getTypes() const;
 	virtual vtkPolyDataPtr getGraphicsPolyData() const;
@@ -75,9 +75,6 @@ public:
 	virtual double getTimestamp() const;
 	virtual void set_prMt(const Transform3D& prMt);
 	virtual void set_prMt(const Transform3D& prMt, double timestamp);
-
-//	virtual double getTooltipOffset() const;
-//	virtual void setTooltipOffset(double val);
 
 	virtual Transform3D getCalibration_sMt() const;
 	virtual std::map<int, Vector3D> getReferencePoints() const { return std::map<int, Vector3D>(); }

@@ -57,12 +57,6 @@ ToolManagerWidget::ToolManagerWidget(QWidget* parent) :
   connect(mStartTrackingButton, SIGNAL(clicked(bool)), this, SLOT(startTrackingClickedSlot(bool)));
   connect(mStopTrackingButton, SIGNAL(clicked(bool)), this, SLOT(stopTrackingClickedSlot(bool)));
 
-//  connect(toolManager(), SIGNAL(configured()), this, SLOT(updateButtonStatusSlot()));
-//  connect(toolManager(), SIGNAL(deconfigured()), this, SLOT(updateButtonStatusSlot()));
-//  connect(toolManager(), SIGNAL(initialized()), this, SLOT(updateButtonStatusSlot()));
-//  connect(toolManager(), SIGNAL(uninitialized()), this, SLOT(updateButtonStatusSlot()));
-//  connect(toolManager(), SIGNAL(trackingStarted()), this, SLOT(updateButtonStatusSlot()));
-//  connect(toolManager(), SIGNAL(trackingStopped()), this, SLOT(updateButtonStatusSlot()));
   connect(toolManager(), &ToolManager::stateChanged, this, &ToolManagerWidget::updateButtonStatusSlot);
 
   //layout
@@ -136,11 +130,6 @@ void ToolManagerWidget::updateButtonStatusSlot()
 	mStartTrackingButton->setEnabled(toolManager()->getState() < Tool::tsTRACKING);
 	mStopTrackingButton->setEnabled(toolManager()->getState() >= Tool::tsTRACKING);
 
-//  mConfigureButton->setDisabled(toolManager()->isConfigured());
-//  mDeConfigureButton->setDisabled(!toolManager()->isConfigured());
-//  mInitializeButton->setDisabled(toolManager()->isInitialized());
-//  mUnInitializeButton->setDisabled(!toolManager()->isInitialized());
-//  mStartTrackingButton->setDisabled(toolManager()->isTracking());
-//  mStopTrackingButton->setDisabled(!toolManager()->isTracking());
 }
+
 }

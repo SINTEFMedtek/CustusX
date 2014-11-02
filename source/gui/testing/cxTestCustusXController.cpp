@@ -110,7 +110,7 @@ void CustusXController::loadPatientSlot()
 
   cx::dataService()->setCenter(bb_r.center());
 
-  cx::DummyToolPtr dummyTool(new cx::DummyTool(cx::trackingService()));
+  cx::DummyToolPtr dummyTool(new cx::DummyTool());
   dummyTool->setToolPositionMovement(dummyTool->createToolPositionMovementTranslationOnly(bb_r));
   cx::trackingService()->runDummyTool(dummyTool);
 }

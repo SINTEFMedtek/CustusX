@@ -54,7 +54,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxManualTool.h"
 #include "cxTypeConversions.h"
 #include "cxDefinitionStrings.h"
-
+#include "cxDominantToolProxy.h"
+#include "cxLogicManager.h"
 
 namespace cx
 {
@@ -62,18 +63,15 @@ StatusBar::StatusBar() :
 	mRenderingFpsLabel(new QLabel(this)),
 	mGrabbingInfoLabel(new QLabel(this)),
 	mTpsLabel(new QLabel(this))
-//	mMessageLevelLabel(new QToolButton(this))
-//	mMessageLevelLabel(new QLabel(this))
 {
 	connect(reporter(), SIGNAL(emittedMessage(Message)), this, SLOT(showMessageSlot(Message)));
 
 	connect(toolManager(), &ToolManager::stateChanged, this, &StatusBar::resetToolManagerConnection);
-//	connect(toolManager(), SIGNAL(configured()),      this, SLOT(connectToToolSignals()));
-//	connect(toolManager(), SIGNAL(deconfigured()),    this, SLOT(disconnectFromToolSignals()));
-//	connect(toolManager(), SIGNAL(trackingStarted()), this, SLOT(updateToolButtons()));
-//	connect(toolManager(), SIGNAL(trackingStopped()), this, SLOT(updateToolButtons()));
 
-	connect(toolManager(), SIGNAL(tps(int)), this, SLOT(tpsSlot(int)));
+	cx::TrackingServiceOldPtr ts = cx::logicManager()->getTrackingService();
+	mActiveTool = DominantToolProxy::New(ts);
+	connect(mActiveTool.get(), &DominantToolProxy::tps, this, &StatusBar::tpsSlot);
+
 	connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(updateToolButtons()));
 
 	connect(viewManager(), SIGNAL(fps(int)), this, SLOT(renderingFpsSlot(int)));

@@ -71,7 +71,7 @@ ProbeDefinition DummyToolTestUtilities::createProbeDataLinear(double depth, doub
 
 DummyToolPtr DummyToolTestUtilities::createDummyTool(ProbeDefinition probeData, TrackingServiceOldPtr manager)
 {
-	DummyToolPtr retval(new DummyTool(manager));
+	DummyToolPtr retval(new DummyTool());
 	retval->setProbeSector(probeData);
 	retval->setVisible(true);
 	retval->startTracking(30);
@@ -87,8 +87,8 @@ int DummyTool::mTransformCount = 0;
 
 
 
-DummyTool::DummyTool(TrackingServiceOldPtr manager, const QString& uid) :
-	ToolImpl(manager, uid),
+DummyTool::DummyTool(const QString& uid) :
+	ToolImpl(uid),
 	mVisible(false),
 	mTransformSaveFileName("DummyToolsAreToDumbToSaveThemselves"),
 	mTimer(new QTimer()),
@@ -103,8 +103,8 @@ DummyTool::DummyTool(TrackingServiceOldPtr manager, const QString& uid) :
 	mPolyData = this->createPolyData(150, 15, 4, 2);
 
 	connect(mTimer.get(), SIGNAL(timeout()),this, SLOT(sendTransform()));
-	if (this->getTrackingService())
-		connect(this->getTrackingService().get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
+//	if (this->getTrackingService())
+//		connect(this->getTrackingService().get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
 }
 
 DummyTool::~DummyTool()

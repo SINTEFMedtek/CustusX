@@ -200,8 +200,6 @@ void LapFrameToolCalibrationWidget::toolSelectedSlot()
 
 void LapFrameToolCalibrationWidget::trackingStartedSlot()
 {
-	if (toolManager()->getState()<Tool::tsTRACKING)
-		return;
 	ToolPtr ref = toolManager()->getTool("calibration_tool");
 	if (ref)
 		mCalibRefTool->setValue(ref->getUid());

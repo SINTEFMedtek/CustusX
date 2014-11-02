@@ -166,7 +166,7 @@ class cxResource_EXPORT DummyTool : public ToolImpl
 {
 	Q_OBJECT
 public:
-	explicit DummyTool(TrackingServiceOldPtr manager, const QString& uid="dummytool");
+	explicit DummyTool(const QString& uid="dummytool");
 	~DummyTool();
 	virtual std::set<Type> getTypes() const;
 	virtual void setType(Type);

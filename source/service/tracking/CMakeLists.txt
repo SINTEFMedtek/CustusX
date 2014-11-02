@@ -15,6 +15,10 @@ SET( CX_QT_MOC_HEADER_FILES
     cxIgstkTrackerThread.h
     cxDominantToolProxy.h
     cxPlaybackTool.h
+	cxTrackingSystemIGSTKService.h
+	cxTrackingSystemService.h
+	cxTrackingSystemDummyService.h
+	cxTrackingSystemPlaybackService.h
 )
 
 SET ( cxTrackingService_SOURCE
@@ -43,6 +47,9 @@ SET ( cxTrackingService_SOURCE
     cxPlaybackTool.cpp
 	cxTrackerConfigurationImpl.h
 	cxTrackerConfigurationImpl.cpp
+	cxTrackingSystemIGSTKService.cpp
+	cxTrackingSystemDummyService.cpp
+	cxTrackingSystemPlaybackService.cpp
 )
 
 include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES} ${IGSTK_LIBRARY_DIRS})

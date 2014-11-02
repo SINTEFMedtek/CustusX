@@ -51,8 +51,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ToolUsingIGSTK::ToolUsingIGSTK(TrackingServiceOldPtr manager, IgstkToolPtr igstkTool) :
-	ToolImpl(manager, ""),
+ToolUsingIGSTK::ToolUsingIGSTK(IgstkToolPtr igstkTool) :
+	ToolImpl(""),
 				mTool(igstkTool), mPolyData(NULL),
 				mValid(false), mConfigured(false), mTracked(false)
 {
@@ -75,7 +75,7 @@ ToolUsingIGSTK::ToolUsingIGSTK(TrackingServiceOldPtr manager, IgstkToolPtr igstk
 						mTool->getInternalStructure().mInstrumentScannerId);
 		connect(mProbe.get(), SIGNAL(sectorChanged()), this, SIGNAL(toolProbeSector()));
 	}
-	connect(this->getTrackingService().get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
+//	connect(this->getTrackingService().get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
 }
 
 ToolUsingIGSTK::~ToolUsingIGSTK()

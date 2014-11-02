@@ -36,15 +36,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ManualToolAdapter::ManualToolAdapter(TrackingServiceOldPtr manager, QString uid) :
-				ManualTool(manager, uid)
+ManualToolAdapter::ManualToolAdapter(QString uid) :
+				ManualTool(uid)
 {
-	mBase.reset(new ManualTool(manager, uid + "base"));
+	mBase.reset(new ManualTool(uid + "base"));
 	connect(mBase.get(), SIGNAL(toolProbeSector()), this, SIGNAL(toolProbeSector()));
 }
 
-ManualToolAdapter::ManualToolAdapter(TrackingServiceOldPtr manager, ToolPtr base) :
-				ManualTool(manager, mBase->getUid() + "_manual"), mBase(base)
+ManualToolAdapter::ManualToolAdapter(ToolPtr base) :
+				ManualTool(mBase->getUid() + "_manual"), mBase(base)
 {
 }
 

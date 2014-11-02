@@ -52,6 +52,7 @@ namespace cx
 {
 typedef std::map<double, Transform3D> TimedTransformMap;
 typedef boost::shared_ptr<TimedTransformMap> TimedTransformMapPtr;
+typedef boost::shared_ptr<class TrackingPositionFilter> TrackingPositionFilterPtr;
 
 /**\brief Interface to a tool,
  * i.e. a pointer, US probe or similar.
@@ -143,9 +144,7 @@ public:
 	virtual TimedTransformMap getSessionHistory(double startTime, double stopTime) = 0;
 	virtual Transform3D get_prMt() const = 0;
 
-//	virtual CoordinateSystem getSensorCoordinateSystem() { return CoordinateSystem(csSENSOR, this->getUid()); }
-//	virtual CoordinateSystem getToolCoordinateSystem() { return CoordinateSystem(csTOOL, this->getUid()); }
-//	virtual CoordinateSystem getToolOffsetCoordinateSystem() { return CoordinateSystem(csTOOL_OFFSET, this->getUid()); }
+	virtual void resetTrackingPositionFilter(TrackingPositionFilterPtr filter) = 0;
 
 #ifdef WIN32
 	typedef Transform3D Transform3D;
