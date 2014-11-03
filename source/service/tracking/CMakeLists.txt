@@ -7,18 +7,18 @@ cx_initialize_IGSTK()
 SET( CX_QT_MOC_HEADER_FILES
     cxToolManagerUsingIGSTK.h
     cxProbeImpl.h
-    cxToolUsingIGSTK.h
-    cxIgstkTracker.h
+    trackingSystemIGSTK/cxToolUsingIGSTK.h
+    trackingSystemIGSTK/cxIgstkTracker.h
     cxManualToolAdapter.h
-    cxIgstkTool.h
-    cxIgstkToolManager.h
-    cxIgstkTrackerThread.h
     cxDominantToolProxy.h
-    cxPlaybackTool.h
-	cxTrackingSystemIGSTKService.h
 	cxTrackingSystemService.h
 	cxTrackingSystemDummyService.h
-	cxTrackingSystemPlaybackService.h
+    trackingSystemPlayback/cxPlaybackTool.h
+	trackingSystemPlayback/cxTrackingSystemPlaybackService.h
+    trackingSystemIGSTK/cxIgstkTool.h
+    trackingSystemIGSTK/cxIgstkToolManager.h
+    trackingSystemIGSTK/cxIgstkTrackerThread.h
+	trackingSystemIGSTK/cxTrackingSystemIGSTKService.h
 )
 
 SET ( cxTrackingService_SOURCE
@@ -27,32 +27,40 @@ SET ( cxTrackingService_SOURCE
     cxToolManagerUsingIGSTK.cpp
     cxProbeImpl.h
     cxProbeImpl.cpp
-    cxToolUsingIGSTK.h
-    cxToolUsingIGSTK.cpp
     cxManualToolAdapter.h
     cxManualToolAdapter.cpp
-    cxIgstkTracker.h
-    cxIgstkTracker.cpp
     cxToolConfigurationParser.h
     cxToolConfigurationParser.cpp
-    cxIgstkTool.h
-    cxIgstkTool.cpp
-    cxIgstkToolManager.h
-    cxIgstkToolManager.cpp
-    cxIgstkTrackerThread.h
-    cxIgstkTrackerThread.cpp
     cxDominantToolProxy.h
     cxDominantToolProxy.cpp
-    cxPlaybackTool.h
-    cxPlaybackTool.cpp
 	cxTrackerConfigurationImpl.h
 	cxTrackerConfigurationImpl.cpp
-	cxTrackingSystemIGSTKService.cpp
 	cxTrackingSystemDummyService.cpp
-	cxTrackingSystemPlaybackService.cpp
+
+    trackingSystemPlayback/cxPlaybackTool.h
+    trackingSystemPlayback/cxPlaybackTool.cpp
+	trackingSystemPlayback/cxTrackingSystemPlaybackService.cpp
+
+    trackingSystemIGSTK/cxToolUsingIGSTK.h
+    trackingSystemIGSTK/cxToolUsingIGSTK.cpp
+    trackingSystemIGSTK/cxIgstkTracker.h
+    trackingSystemIGSTK/cxIgstkTracker.cpp
+    trackingSystemIGSTK/cxIgstkTool.h
+    trackingSystemIGSTK/cxIgstkTool.cpp
+    trackingSystemIGSTK/cxIgstkToolManager.h
+    trackingSystemIGSTK/cxIgstkToolManager.cpp
+    trackingSystemIGSTK/cxIgstkTrackerThread.h
+    trackingSystemIGSTK/cxIgstkTrackerThread.cpp
+	trackingSystemIGSTK/cxTrackingSystemIGSTKService.cpp
 )
 
-include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES} ${IGSTK_LIBRARY_DIRS})
+include_directories(
+	${CX_RESOURCE_INCLUDE_DIRECTORIES}
+	${IGSTK_LIBRARY_DIRS}
+	./trackingSystemIGSTK
+	./trackingSystemPlayback
+	.
+	)
 
 cx_remove_duplicate_include_directories()
 QT5_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
