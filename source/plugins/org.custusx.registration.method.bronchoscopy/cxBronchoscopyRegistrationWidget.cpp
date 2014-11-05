@@ -52,6 +52,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxRegistrationService.h"
 #include "cxVisualizationService.h"
+#include "cxStringDataAdapterXml.h"
+#include "cxLabeledComboBoxWidget.h"
 
 #include "cxLegacySingletons.h"
 
@@ -65,26 +67,32 @@ BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(regServices servi
 	mSelectMeshWidget = SelectMeshStringDataAdapter::New(services.patientModelService);
 	mSelectMeshWidget->setValueName("Centerline: ");
 
+	AcquisitionDataPtr mAcquisitionData;
+	mAcquisitionData.reset(new AcquisitionData());
+
+	QDomElement sessionsNode = mServices.patientModelService->getCurrentWorkingElement("bronchoscopySessions");
+	mAcquisitionData->parseXml(sessionsNode);
+
+	this->initSessionSelector(mAcquisitionData);
+
 	mRegisterButton = new QPushButton("Register");
 	connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
 	mRegisterButton->setToolTip(this->defaultWhatsThis());
 
 
-	AcquisitionDataPtr mAcquisitionData;
-	mAcquisitionData.reset(new AcquisitionData());
+	mAcquisition.reset(new Acquisition(mAcquisitionData, this));
 
-    mAquisition.reset(new Acquisition(mAcquisitionData, this));
-
-    connect(mAquisition.get(), SIGNAL(started()), this, SLOT(acquisitionStarted()));
-		connect(mAquisition.get(), SIGNAL(acquisitionStopped()), this, SLOT(acquisitionStopped()), Qt::QueuedConnection);
-    connect(mAquisition.get(), SIGNAL(cancelled()), this, SLOT(acquisitionStopped()));
+	connect(mAcquisition.get(), SIGNAL(started()), this, SLOT(acquisitionStarted()));
+		connect(mAcquisition.get(), SIGNAL(acquisitionStopped()), this, SLOT(acquisitionStopped()), Qt::QueuedConnection);
+	connect(mAcquisition.get(), SIGNAL(cancelled()), this, SLOT(acquisitionStopped()));
 
 //    mTrackedCenterLine = new TrackedCenterlineWidget(mAcquisitionData, this);
 
-    mRecordSessionWidget.reset(new RecordSessionWidget(mAquisition, this, "Bronchoscope path"));
+	mRecordSessionWidget.reset(new RecordSessionWidget(mAcquisition, this, "Bronchoscope path"));
 
 	mVerticalLayout->addWidget(new DataSelectWidget(services.visualizationService, services.patientModelService, this, mSelectMeshWidget));
 //    mVerticalLayout->addWidget(mTrackedCenterLine);
+	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mSessionSelector));
     mVerticalLayout->addWidget(mRecordSessionWidget.get());
 	mVerticalLayout->addWidget(mRegisterButton);
 
@@ -96,6 +104,26 @@ BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(regServices servi
     connect(mObscuredListener.get(), SIGNAL(obscured(bool)), this, SLOT(obscuredSlot(bool)));
 }
 
+void BronchoscopyRegistrationWidget::initSessionSelector(AcquisitionDataPtr acquisitionData)
+{
+	std::vector<RecordSessionPtr> sessions = acquisitionData->getRecordSessions();
+	QStringList sessionUids;
+
+	std::vector<RecordSessionPtr>::iterator it = sessions.begin();
+	QString defaultValue;
+	if(it != sessions.end())
+		defaultValue = (*it)->getUid();
+
+	for(; it != sessions.end(); ++it)
+	{
+		QString uid = (*it)->getUid();
+		sessionUids << uid;
+		if(defaultValue < uid)
+			defaultValue = uid;
+	}
+
+	mSessionSelector = StringDataAdapterXml::initialize("bronchoscopy_session", "Bronchoscope path", "Select bronchoscope path for registration", defaultValue, sessionUids, QDomNode());
+}
 
 QString BronchoscopyRegistrationWidget::defaultWhatsThis() const
 {
@@ -122,7 +150,14 @@ void BronchoscopyRegistrationWidget::registerSlot()
         reportError("No tool");
     }
     std::cout << "Tool name: " << mTool->getName() << std::endl;
-	RecordSessionPtr session = mAquisition->getLatestSession();
+
+	RecordSessionPtr session;
+	QString sessionUid = mSessionSelector->getValue();
+	if(!sessionUid.isEmpty())
+		session = mAcquisition->getPluginData()->getRecordSession(sessionUid);
+//	else
+//		session = mAcquisition->getLatestSession();
+
     if(!session)
         reportError("No session");
 
@@ -176,6 +211,17 @@ void BronchoscopyRegistrationWidget::acquisitionStopped()
 		return;
 
 	activeRep3D->getTracer()->stop();
+
+	mSessionSelector->setValue(mAcquisition->getLatestSession()->getUid());
+
+	this->saveSessions();
+}
+
+void BronchoscopyRegistrationWidget::saveSessions()
+{
+//	RecordSessionPtr session = mAquisition->getLatestSession();
+	QDomElement sessionsNode = mServices.patientModelService->getCurrentWorkingElement("bronchoscopySessions");
+	mAcquisition->getPluginData()->addXml(sessionsNode);
 }
 
 ToolRep3DPtr BronchoscopyRegistrationWidget::getToolRepIn3DView(ToolPtr tool)
