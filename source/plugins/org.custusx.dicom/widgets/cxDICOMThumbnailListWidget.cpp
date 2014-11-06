@@ -164,6 +164,7 @@ void DICOMThumbnailListWidgetPrivate::addSeriesThumbnails(const QModelIndex &ind
   QModelIndex seriesIndex = index;
 
   ctkDICOMModel* model = const_cast<ctkDICOMModel*>(qobject_cast<const ctkDICOMModel*>(index.model()));
+  std::cout << "DICOMThumbnailListWidgetPrivate::addSeriesThumbnails " << model << std::endl;
 
   if (!model)
 	{
@@ -175,10 +176,13 @@ void DICOMThumbnailListWidgetPrivate::addSeriesThumbnails(const QModelIndex &ind
   QString seriesUid = model->data(seriesIndex ,ctkDICOMModel::UIDRole).toString();
 
   QStringList thumbnails = this->getThumbnailsForSeries(studyUid, seriesUid);
+  std::cout << "Thumbnails: " << thumbnails.size() << std::endl;
 
   for (int i=0; i<thumbnails.size(); ++i)
   {
-	  QString caption = QString("Image %1").arg(i);
+	  std::cout << "   Thumbnail: " << thumbnails[i].toStdString() << std::endl;
+	  int humanIndex = i+1;
+	  QString caption = QString("Image %1").arg(humanIndex);
 	  this->addThumbnailWidget(thumbnails[i], caption);
   }
 
@@ -194,6 +198,7 @@ void DICOMThumbnailListWidgetPrivate::addSeriesThumbnails(const QModelIndex &ind
 
 QStringList DICOMThumbnailListWidgetPrivate::getThumbnailsForSeries(QString studyUid, QString seriesUid)
 {
+	std::cout << "DICOMThumbnailListWidgetPrivate::getThumbnailsForSeries" << std::endl;
 	QStringList files = Database->filesForSeries(seriesUid);
 
 	QStringList thumbnails;
@@ -227,23 +232,27 @@ QStringList DICOMThumbnailListWidgetPrivate::getFilesForImage(QString studyUid, 
 			.arg(seriesUid)
 			.arg(imageUid);
 
-	if(QFileInfo(baseFilename).exists())
-	{
-		QStringList() << baseFilename;
-	}
+	QStringList retval;
 
 	QStringList splitPath = baseFilename.split(".");
-	QStringList retval;
 
 	for (int i=0; true; ++i)
 	{
 		splitPath.back() = QString("frame_%1.png").arg(i);
 		QString frameFilename = splitPath.join(".");
-		retval << frameFilename;
 
 		if(!QFileInfo(frameFilename).exists())
 			break;
+		retval << frameFilename;
 	}
+
+	// if no multiimage found, fallback to singleimage.
+	if(retval.empty() && QFileInfo(baseFilename).exists())
+	{
+		retval << baseFilename;
+		return retval;
+	}
+
 	return retval;
 }
 
