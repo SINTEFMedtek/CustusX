@@ -190,20 +190,24 @@ class CppBuilder:
         add('CMAKE_BUILD_TYPE:STRING', self.mBuildType)        
         if self.controlData.m32bit: # todo: add if darwin
             add('CMAKE_OSX_ARCHITECTURES', 'i386')
-        add('BUILD_SHARED_LIBS:BOOL', self.controlData.getBuildShared())
+        if('BUILD_SHARED_LIBS:BOOL' not in self.cmakeOptions):
+            add('BUILD_SHARED_LIBS:BOOL', self.controlData.getBuildShared())
         add('CMAKE_ECLIPSE_VERSION', self.controlData.getEclipseVersion())
         add('CMAKE_ECLIPSE_GENERATE_LINKED_RESOURCES', False)            
     
     def _assembleOptions(self):
         return " ".join(["-D%s=%s"%(key,val) for key,val in self.cmakeOptions.iteritems()])
+    
     def _printOptions(self):
         options = "".join(["    %s = %s\n"%(key,val) for key,val in self.cmakeOptions.iteritems()])
         print "*** CMake Options:\n", options
 
     def _changeDirToBase(self):
         changeDir(self.mBasePath)
+    
     def _changeDirToSource(self):
         changeDir(self.mSourcePath)
+    
     def _changeDirToBuild(self):
         changeDir(self.mBuildPath)
 # ---------------------------------------------------------
