@@ -65,10 +65,12 @@ install(DIRECTORY ${Tube-Segmentation-Framework_PARAMETERS_DIR}
 #Compute the plugin dependencies
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries
-    LINK_PUBLIC 
-    ${PLUGIN_target_libraries}   
+    PUBLIC
+    ${PLUGIN_target_libraries}
     cxPluginAlgorithm
-    LINK_PRIVATE tubeSegmentationLib
+    PRIVATE
+    tubeSegmentationLib
+    SIPL
     cxPluginUtilities
 	cxResourceFilter
     )    
