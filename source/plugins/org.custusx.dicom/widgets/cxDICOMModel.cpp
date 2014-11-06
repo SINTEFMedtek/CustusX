@@ -37,7 +37,7 @@
 #include "ctkLogger.h"
 #include "boost/shared_ptr.hpp"
 #include "ctkDICOMDatabase.h"
-#include "cxDicomImageReader.h"
+//#include "cxDicomImageReader.h"
 #include "cxDicomModelNode.h"
 
 static ctkLogger logger ( "org.commontk.dicom.DICOMModel" );

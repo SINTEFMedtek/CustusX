@@ -11,7 +11,7 @@ set(CX_PLUGINS
   org.custusx.core.visualization:ON
   org.custusx.core.tracking:ON
   org.custusx.core.video:ON
-#  org.custusx.dicom:OFF
+  org.custusx.dicom:ON
 #  org.custusx.example:OFF
   org.custusx.vnnclreconstruction:ON
   org.custusx.pnnreconstruction:ON
@@ -36,14 +36,6 @@ if(CX_WINDOWS)
       org.custusx.vnnclreconstruction:OFF
       )
 endif(CX_WINDOWS)
-
-# DICOM/CTK currently not linking on mac (dcmtk libs not found)
-if (NOT CX_APPLE)
-	set(CX_PLUGINS
-	  ${CX_PLUGINS}
-	  org.custusx.dicom:ON
-)
-endif()
 
 # Add plugins defined externally, i.e defined outside CustusX core.
 # Why: Enables enabling of external plugins,
