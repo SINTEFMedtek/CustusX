@@ -69,7 +69,7 @@ public:
 
 	virtual ToolPtr getDominantTool();
 	virtual void setDominantTool(const QString& uid);
-	virtual void dominantCheckSlot() {}
+//	virtual void dominantCheckSlot() {}
 
 	virtual Transform3D get_rMpr() const;
 	virtual void set_rMpr(const Transform3D& val);

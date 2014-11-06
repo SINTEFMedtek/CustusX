@@ -89,7 +89,7 @@ public:
 	void initializeActiveView(SyncedValuePtr val);
 
 private slots:
-	void activateManualToolSlot();
+//	void activateManualToolSlot();
 	void mouseClickInViewGroupSlot();
 
 protected:

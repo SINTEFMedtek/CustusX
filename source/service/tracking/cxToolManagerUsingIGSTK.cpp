@@ -182,7 +182,8 @@ void ToolManagerUsingIGSTK::initializeManualTool()
 		mManualTool.reset(new ManualToolAdapter("ManualTool"));
 		mTools["ManualTool"] = mManualTool;
 		mManualTool->setVisible(true);
-		connect(mManualTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(dominantCheckSlot()));
+		connect(mManualTool.get(), &Tool::toolVisible, this, &ToolManagerUsingIGSTK::dominantCheckSlot);
+		connect(mManualTool.get(), &Tool::toolTransformAndTimestamp, this, &ToolManagerUsingIGSTK::dominantCheckSlot);
 	}
 
 	Transform3D rMpr = Transform3D::Identity(); // not known: not really important either
@@ -298,18 +299,18 @@ ToolPtr ToolManagerUsingIGSTK::getTool(const QString& uid)
 	return retval;
 }
 
-void ToolManagerUsingIGSTK::setTooltipOffset(double offset)
-{
-	if (similar(offset, mToolTipOffset))
-		return;
-	mToolTipOffset = offset;
-	emit tooltipOffset(mToolTipOffset);
-}
+//void ToolManagerUsingIGSTK::setTooltipOffset(double offset)
+//{
+//	if (similar(offset, mToolTipOffset))
+//		return;
+//	mToolTipOffset = offset;
+//	emit tooltipOffset(mToolTipOffset);
+//}
 
-double ToolManagerUsingIGSTK::getTooltipOffset() const
-{
-	return mToolTipOffset;
-}
+//double ToolManagerUsingIGSTK::getTooltipOffset() const
+//{
+//	return mToolTipOffset;
+//}
 
 ToolPtr ToolManagerUsingIGSTK::getDominantTool()
 {

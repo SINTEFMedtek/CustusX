@@ -73,12 +73,9 @@ public:
 	virtual ToolMap getTools() = 0; ///< get configured and initialized tools
 	virtual ToolPtr getTool(const QString& uid) = 0; ///< get a tool
 
-	virtual void setTooltipOffset(double) {}; ///< set the tool tip offset
-	virtual double getTooltipOffset() const {return 0.0;}; ///< get the tool tip offset
-
 	virtual ToolPtr getDominantTool() = 0; ///< get the tool that has higest priority when tracking
 	virtual void setDominantTool(const QString& uid) = 0; ///< set a tool to be the dominant tool
-	virtual void dominantCheckSlot() = 0; ///< checks if the visible tool is going to be set as dominant tool
+//	virtual void dominantCheckSlot() = 0; ///< checks if the visible tool is going to be set as dominant tool
 	virtual ToolPtr findFirstProbe() = 0;
 
 	virtual ToolPtr getReferenceTool() const = 0; ///< tool used as patient reference

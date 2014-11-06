@@ -107,8 +107,8 @@ public:
 
 	virtual ToolManager::ToolMap getTools(); ///< get all configured and initialized tools
 	virtual ToolPtr getTool(const QString& uid); ///< get a specific tool
-	virtual void setTooltipOffset(double offset); ///< set the tool tip offset
-	virtual double getTooltipOffset() const; ///< get the tool tip offset
+//	virtual void setTooltipOffset(double offset); ///< set the tool tip offset
+//	virtual double getTooltipOffset() const; ///< get the tool tip offset
 
 	virtual ToolPtr getDominantTool(); ///< get the dominant tool
 	virtual void setDominantTool(const QString& uid); ///< can be set to either a connected or configured tool
@@ -140,12 +140,13 @@ public:
 signals:
 	void probeAvailable(); ///< Emitted when a probe is configured
 
-public slots:
-	virtual void dominantCheckSlot(); ///< checks if the visible tool is going to be set as dominant tool
+//public slots:
+//	virtual void dominantCheckSlot(); ///< checks if the visible tool is going to be set as dominant tool
 
 private slots:
 	void globalConfigurationFileChangedSlot(QString key);
 	void onSystemStateChanged();
+	void dominantCheckSlot(); ///< checks if the visible tool is going to be set as dominant tool
 	void onTooltipOffset(double val);
 
 private:
