@@ -44,6 +44,7 @@ typedef boost::shared_ptr<class Acquisition> AcquisitionPtr;
 typedef boost::shared_ptr<class SelectMeshStringDataAdapter> SelectMeshStringDataAdapterPtr;
 typedef boost::shared_ptr<class ToolRep3D> ToolRep3DPtr;
 typedef boost::shared_ptr<class RecordSessionWidget> RecordSessionWidgetPtr;
+typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
 
 /**
  * BronchoscopyRegistrationWidget
@@ -74,15 +75,18 @@ private:
 	QLabel* mLabel;
 
 
-	AcquisitionPtr mAquisition;
+	AcquisitionPtr mAcquisition;
 	RecordSessionWidgetPtr mRecordSessionWidget;
 	SelectMeshStringDataAdapterPtr mSelectMeshWidget;
+	StringDataAdapterXmlPtr mSessionSelector;
 	QPushButton* mRegisterButton;
     ToolPtr mTool;
 //    TrackedCenterlineWidget* mTrackedCenterLine;
 
     ToolRep3DPtr getToolRepIn3DView(ToolPtr tool);
 
+	void saveSessions();
+	void initSessionSelector(AcquisitionDataPtr acquisitionData);
 };
 
 } //namespace cx
