@@ -454,6 +454,8 @@ class TubeSegmentationFramework(CppComponent):
         add('sipl_use_gtk:BOOL', False) #variables in cmake are case sensitive, SIPL uses this options
         add('TSF_USE_EXTRNAL_OUL:BOOL', True)
         add('TSF_EXTERNAL_OUL_PATH:PATH', self._createSibling(OpenCLUtilityLibrary).findPackagePath())
+        if(platform.system() == 'Windows'):
+            add('BUILD_SHARED_LIBS:BOOL', False) #On windows we build TSF as static, because TSF and SIPL does not export symbols
         builder.configureCMake()
 
  # ---------------------------------------------------------

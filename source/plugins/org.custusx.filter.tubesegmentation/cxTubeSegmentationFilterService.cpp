@@ -578,7 +578,7 @@ MeshPtr TubeSegmentationFilter::loadVtkFile(QString pathToFile, QString newDatas
 
 	MeshPtr retval = boost::dynamic_pointer_cast<Mesh>(data);
 
-	if(!data or !retval)
+    if(!data || !retval)
 		reportError("Could not load "+pathToFile);
 
 	return retval;

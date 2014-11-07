@@ -41,10 +41,8 @@ class LibraryAssembly(object):
         self.addComponent(cxComponents.OpenIGTLink())
         self.addComponent(cxComponents.IGSTK())
         self.addComponent(cxComponents.CTK())
-        if (platform.system() != 'Windows'):
-            self.addComponent(cxComponents.OpenCLUtilityLibrary())
-        if (platform.system() != 'Windows'):
-            self.addComponent(cxComponents.TubeSegmentationFramework());
+        self.addComponent(cxComponents.OpenCLUtilityLibrary())
+        self.addComponent(cxComponents.TubeSegmentationFramework());
         if (platform.system() == 'Linux'):
             self.addComponent(cxComponents.LevelSetSegmentation());
         self.addComponent(self.custusx)
