@@ -68,10 +68,12 @@ TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Create with mock XML parser", "[u
 
 TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Use digital video setting", "[unit][service][tracking]")
 {
-	CHECK(!mProbe->isUsingDigitalVideo());
+	CHECK(!mProbe->getProbeData().getUseDigitalVideo());
 	CHECK(mProbe->getRtSourceName().compare(mDefaultRtSourceName) == 0);
-	mProbe->useDigitalVideo(true);
-	CHECK(mProbe->isUsingDigitalVideo());
+	cx::ProbeDefinition data = mProbe->getProbeData();
+	data.setUseDigitalVideo(true);
+	mProbe->setProbeSector(data);
+	CHECK(mProbe->getProbeData().getUseDigitalVideo());
 	CHECK(mProbe->getRtSourceName().compare("Digital") == 0);
 	CHECK(mProbe->getConfigId().compare("Digital") == 0);
 }

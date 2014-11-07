@@ -33,8 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDOMINANTTOOLPROXY_H_
 #define CXDOMINANTTOOLPROXY_H_
 
-#include "cxTrackingServiceExport.h"
-
+#include "cxResourceExport.h"
 #include "cxTool.h"
 
 namespace cx
@@ -42,7 +41,7 @@ namespace cx
 
 /**
  * \file
- * \addtogroup cx_service_tracking
+ * \addtogroup cx_resource_core_tool
  * @{
  */
 
@@ -59,7 +58,7 @@ class ToolManager;
  *  \date Sep 9, 2011
  *  \author christiana
  */
-class cxTrackingService_EXPORT DominantToolProxy: public QObject
+class cxResource_EXPORT DominantToolProxy: public QObject
 {
 Q_OBJECT
 
@@ -68,6 +67,8 @@ public:
 	{
 		return DominantToolProxyPtr(new DominantToolProxy(toolManager));
 	}
+
+	ToolPtr getTool() { return mTool; }
 
 signals:
 	// the original tool change signal

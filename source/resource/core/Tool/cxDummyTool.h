@@ -91,6 +91,8 @@ public:
 	virtual QString getConfigName(QString uid) { return QString(); }
 	virtual QString getConfigId() const { return QString(); }
 	virtual QString getConfigurationPath() const { return QString(); }
+	virtual void removeCurrentConfig() {}
+	virtual void saveCurrentConfig(QString uid, QString name) {}
 
 	virtual void applyNewConfigurationWithId(QString uid) {}
 	virtual void setTemporalCalibration(double val) {}

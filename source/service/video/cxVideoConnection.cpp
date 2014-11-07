@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxProbeData.h"
 #include "cxToolManager.h"
 #include "cxDataManager.h"
-#include "cxProbeImpl.h"
+//#include "cxProbeImpl.h"
 #include "cxVideoServiceOld.h"
 #include "cxToolManager.h"
 #include "cxDirectlyLinkedImageReceiverThread.h"
@@ -241,9 +241,14 @@ void VideoConnection::resetProbe()
 	ToolPtr tool = mBackend->getToolManager()->findFirstProbe();
 	if (!tool || !tool->getProbe())
 		return;
-	ProbeImplPtr probe = boost::dynamic_pointer_cast<ProbeImpl>(tool->getProbe());
+	ProbePtr probe = tool->getProbe();
 	if (probe)
-		probe->useDigitalVideo(false);
+	{
+		ProbeDefinition data = probe->getProbeData();
+		data.setUseDigitalVideo(false);
+		probe->setProbeSector(data);
+	}
+//		probe->useDigitalVideo(false);
 }
 
 /** extract information from the IGTLinkUSStatusMessage
@@ -261,7 +266,7 @@ void VideoConnection::updateStatus(ProbeDefinitionPtr msg)
 		mUnsusedProbeDataVector.push_back(msg);
 		return;
 	}
-	ProbeImplPtr probe = boost::dynamic_pointer_cast<ProbeImpl>(tool->getProbe());
+	ProbePtr probe = tool->getProbe();
 
 	// start with getting a valid data object from the probe, in order to keep
 	// existing values (such as temporal calibration).
@@ -275,8 +280,8 @@ void VideoConnection::updateStatus(ProbeDefinitionPtr msg)
 	data.setSize(msg->getSize());
 	data.setSpacing(msg->getSpacing());
 	data.setClipRect_p(msg->getClipRect_p());
+	data.setUseDigitalVideo(true);
 
-	probe->useDigitalVideo(true);
 	probe->setProbeSector(data);
 	probe->setActiveStream(msg->getUid());
 }

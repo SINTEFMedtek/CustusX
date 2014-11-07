@@ -10,7 +10,6 @@ SET( CX_QT_MOC_HEADER_FILES
     trackingSystemIGSTK/cxToolUsingIGSTK.h
     trackingSystemIGSTK/cxIgstkTracker.h
     cxManualToolAdapter.h
-    cxDominantToolProxy.h
 	cxTrackingSystemService.h
 	cxTrackingSystemDummyService.h
     trackingSystemPlayback/cxPlaybackTool.h
@@ -31,8 +30,6 @@ SET ( cxTrackingService_SOURCE
     cxManualToolAdapter.cpp
     cxToolConfigurationParser.h
     cxToolConfigurationParser.cpp
-    cxDominantToolProxy.h
-    cxDominantToolProxy.cpp
 	cxTrackerConfigurationImpl.h
 	cxTrackerConfigurationImpl.cpp
 	cxTrackingSystemDummyService.cpp

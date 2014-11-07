@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVideoSource.h"
 #include "cxVideoServiceOld.h"
 #include "cxPatientModelService.h"
+#include "cxDominantToolProxy.h"
 
 //TODO: remove
 #include "cxLegacySingletons.h"
@@ -55,40 +56,19 @@ namespace cx
 {
 DoubleDataAdapterActiveToolOffset::DoubleDataAdapterActiveToolOffset()
 {
-  connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
-  dominantToolChangedSlot();
+  mActiveTool = DominantToolProxy::New(trackingService());
+  connect(mActiveTool.get(), &DominantToolProxy::tooltipOffset, this, &DataAdapter::changed);
 }
 
 double DoubleDataAdapterActiveToolOffset::getValue() const
 {
-  if (mTool)
-    return mTool->getTooltipOffset();
-  return 0.0;
+	return mActiveTool->getTool()->getTooltipOffset();
 }
 
 bool DoubleDataAdapterActiveToolOffset::setValue(double val)
 {
-  if (!mTool)
-    return false;
-  mTool->setTooltipOffset(val);
+  mActiveTool->getTool()->setTooltipOffset(val);
   return true;
-}
-
-void DoubleDataAdapterActiveToolOffset::dominantToolChangedSlot()
-{
-  if (mTool)
-  {
-    disconnect(mTool.get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(changed()));
-  }
-
-  mTool = toolManager()->getDominantTool();
-
-  if (mTool)
-  {
-    connect(mTool.get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(changed()));
-  }
-
-  emit changed();
 }
 
 DoubleRange DoubleDataAdapterActiveToolOffset::getValueRange() const

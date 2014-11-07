@@ -5,7 +5,6 @@ if(BUILD_TESTING)
 	../logic
 	..
 	${CustusX_SOURCE_DIR}/source/service/patient
-	${CustusX_SOURCE_DIR}/source/service/tracking
 	)
 
     set(CXTEST_SOURCES_TO_MOC

@@ -75,8 +75,8 @@ public:
 	virtual void set_rMpr(const Transform3D& val);
 	virtual ToolPtr getReferenceTool() const;
 
-	virtual void setTooltipOffset(double offset);
-	virtual double getTooltipOffset() const;
+//	virtual void setTooltipOffset(double offset);
+//	virtual double getTooltipOffset() const;
 
 	virtual ManualToolPtr getManualTool() { return ManualToolPtr(); }
 	virtual void savePositionHistory() {}

@@ -146,17 +146,17 @@ void DummyToolManager::addTool(DummyToolPtr tool)
 	mDummyTools.insert(std::make_pair(tool->getUid(), tool));
 }
 
-void DummyToolManager::setTooltipOffset(double offset)
-{
-	if (similar(offset, mToolTipOffset))
-		return;
-	mToolTipOffset = offset;
-	emit tooltipOffset(mToolTipOffset);
-}
-double DummyToolManager::getTooltipOffset() const
-{
-	return mToolTipOffset;
-}
+//void DummyToolManager::setTooltipOffset(double offset)
+//{
+//	if (similar(offset, mToolTipOffset))
+//		return;
+//	mToolTipOffset = offset;
+//	emit tooltipOffset(mToolTipOffset);
+//}
+//double DummyToolManager::getTooltipOffset() const
+//{
+//	return mToolTipOffset;
+//}
 
 
 } //namespace cx

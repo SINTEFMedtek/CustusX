@@ -19,15 +19,9 @@
 if(BUILD_TESTING)
     include_directories(
 	    ${CustusX_SOURCE_DIR}/source/logic/
-	    ${CustusX_SOURCE_DIR}/source/service/tracking/
 	)
 
     cx_add_class(CXTEST_PLUGINALGORITHM_SOURCES ${CXTEST_PLUGINALGORITHM_SOURCES}
-  #      cxtestTSFFixture
- #       cxtestTSF.cpp
-#		cxtestTSFPresetsFixture
-#		cxtestTSFPresets.cpp
-#        cxtestLevelSetFilter.cpp
         cxtestDilationFilter.cpp
     )
     set(CXTEST_SOURCES_TO_MOC

@@ -102,7 +102,7 @@ signals:
 	void stateChanged();
 	void dominantToolChanged(const QString& uId);
 //	void tps(int); ///< the dominant tools tps
-	void tooltipOffset(double offset);
+//	void tooltipOffset(double offset);
 
 protected:
 	virtual ~ToolManager() {}

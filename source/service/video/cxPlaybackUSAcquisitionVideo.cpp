@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxUsReconstructionFileReader.h"
 #include "cxTestVideoSource.h"
 #include "cxToolManager.h"
-#include "cxProbeImpl.h"
+//#include "cxProbeImpl.h"
 #include "cxUSFrameData.h"
 #include "cxPlaybackTime.h"
 #include "cxLogger.h"
@@ -200,7 +200,7 @@ void USAcquisitionVideoPlayback::usDataLoadFinishedSlot()
 	ToolPtr tool = mBackend->getToolManager()->findFirstProbe();
 	if (tool)
 	{
-		ProbePtr probe = boost::dynamic_pointer_cast<ProbeImpl>(tool->getProbe());
+		ProbePtr probe = tool->getProbe();
 		if (probe)
 			probe->setProbeSector(mCurrentData.mProbeData.mData);
 	}

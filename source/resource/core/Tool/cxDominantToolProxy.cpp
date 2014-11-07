@@ -73,6 +73,10 @@ void DominantToolProxy::dominantToolChangedSlot(const QString& uid)
 		connect(mTool.get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
 		connect(mTool.get(), SIGNAL(toolProbeSector()), this, SIGNAL(toolProbeSector()));
 		connect(mTool.get(), SIGNAL(tps(int)), this, SIGNAL(tps(int)));
+
+		emit toolVisible(mTool->getVisible());
+		emit toolTransformAndTimestamp(mTool->get_prMt(), mTool->getTimestamp());
+		emit tooltipOffset(mTool->getTooltipOffset());
 	}
 }
 

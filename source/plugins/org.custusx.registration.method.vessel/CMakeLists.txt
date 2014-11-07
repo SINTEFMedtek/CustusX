@@ -10,14 +10,12 @@ include_directories(
     ${CustusX_SOURCE_DIR}/source/logic
 	${CustusX_SOURCE_DIR}/source/modules/Algorithm/logic
 	${CustusX_SOURCE_DIR}/source/modules/Algorithm/gui
-	${CustusX_SOURCE_DIR}/source/service/tracking
 	${CustusX_SOURCE_DIR}/source/gui/dataAdapters
 	${CustusX_SOURCE_DIR}/source/gui/infoWidgets
 
 	${CustusX_BINARY_DIR}/source/plugins/org.custusx.registration
 	${CustusX_BINARY_DIR}/source/logic
 	${CustusX_BINARY_DIR}/source/modules/Algorithm
-	${CustusX_BINARY_DIR}/source/service/tracking
 	${CustusX_BINARY_DIR}/source/gui
 
 )

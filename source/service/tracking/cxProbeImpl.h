@@ -92,11 +92,11 @@ public:
 	virtual QString getActiveStream() const;
 
 	ProbeXmlConfigParser::Configuration getConfiguration();
-	void removeCurrentConfig(); ///< remove the current config from disk
-	void saveCurrentConfig(QString uid, QString name); ///< save current config to disk under ids (uid,name).
+	virtual void removeCurrentConfig(); ///< remove the current config from disk
+	virtual void saveCurrentConfig(QString uid, QString name); ///< save current config to disk under ids (uid,name).
 
-	void useDigitalVideo(bool digitalStatus);///< RTSource is digital (eg. US sector is set digitally, not read from .xml file)
-	bool isUsingDigitalVideo() const;
+//	virtual void useDigitalVideo(bool digitalStatus);///< RTSource is digital (eg. US sector is set digitally, not read from .xml file)
+//	virtual bool isUsingDigitalVideo() const;
 	QString getRtSourceName() const;
 
 private:
@@ -125,7 +125,7 @@ private:
 	double mSoundSpeedCompensationFactor;
 	bool mOverrideTemporalCalibration;
 	double mTemporalCalibration;
-	bool mDigitalInterface;///< RTSource is digital (eg. US sector is set digitally, not read from .xml file)
+//	bool mDigitalInterface;///< RTSource is digital (eg. US sector is set digitally, not read from .xml file)
 
 	ProbeXmlConfigParserPtr mXml; ///< the xml parser for the ultrasoundImageConfigs.xml
 	QString mConfigurationId; ///< The probe sector configuration matching the config id in ultrasoundImageConfigs.xml

@@ -267,17 +267,17 @@ void ProbeImpl::saveCurrentConfig(QString uid, QString name)
 	this->applyNewConfigurationWithId(uid);
 }
 
-void ProbeImpl::useDigitalVideo(bool digitalStatus)
-{
-	mDigitalInterface = digitalStatus;
-	if (mDigitalInterface)
-		this->applyNewConfigurationWithId("Digital");
-}
+//void ProbeImpl::useDigitalVideo(bool digitalStatus)
+//{
+//	mDigitalInterface = digitalStatus;
+//	if (mDigitalInterface)
+//		this->applyNewConfigurationWithId("Digital");
+//}
 
-bool ProbeImpl::isUsingDigitalVideo() const
-{
-	return mDigitalInterface;
-}
+//bool ProbeImpl::isUsingDigitalVideo() const
+//{
+//	return mDigitalInterface;
+//}
 
 QString ProbeImpl::getRtSourceName() const
 {
@@ -285,7 +285,7 @@ QString ProbeImpl::getRtSourceName() const
 	if (rtSourceList.empty())
 		return QString();
 	QString rtSource = rtSourceList.at(0);
-	if (this->isUsingDigitalVideo())
+	if (this->getProbeData().getUseDigitalVideo())
 		rtSource = "Digital";
 	return rtSource;
 }
@@ -295,8 +295,7 @@ ProbeImpl::ProbeImpl(QString instrumentUid, QString scannerUid) :
 		mScannerUid(scannerUid),
 		mSoundSpeedCompensationFactor(1.0),
 		mOverrideTemporalCalibration(false),
-		mTemporalCalibration(0.0),
-		mDigitalInterface(false)
+		mTemporalCalibration(0.0)
 {
 	ProbeDefinition probeData;
 	mProbeData[probeData.getUid()] = probeData;
@@ -370,7 +369,7 @@ void ProbeImpl::setConfigId(QString uid)
 
 void ProbeImpl::updateProbeSector()
 {
-	if(this->isValidConfigId() && !this->isUsingDigitalVideo())
+	if(this->isValidConfigId() && !this->getProbeData().getUseDigitalVideo())
 	{
 		ProbeDefinition probeSector = this->createProbeSector();
 		this->setProbeSector(probeSector);
