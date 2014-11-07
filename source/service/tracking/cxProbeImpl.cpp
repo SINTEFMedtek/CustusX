@@ -138,6 +138,8 @@ QString ProbeImpl::getConfigName(QString configString) ///< get a name for the g
 
 QString ProbeImpl::getConfigId() const
 {
+	if (this->getProbeData().getUseDigitalVideo())
+		return "Digital";
 	return mConfigurationId;
 }
 
