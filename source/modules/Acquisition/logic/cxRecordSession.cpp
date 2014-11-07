@@ -120,7 +120,7 @@ TimedTransformMap RecordSession::getToolHistory_prMt(ToolPtr tool, RecordSession
 
 	if(retval.empty() && session)
 	{
-		reportError("Could not find any tracking data from session "+session->getUid()+". Volume data only will be written.");
+		reportError("RecordSession::getToolHistory_prMt(): Could not find any tracking data from session "+session->getUid()+".");
 	}
 
 	return retval;

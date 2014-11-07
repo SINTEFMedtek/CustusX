@@ -155,6 +155,7 @@ void BronchoscopyRegistrationWidget::registerSlot()
     if(!mTool)
     {
         reportError("No tool");
+		return;
     }
     std::cout << "Tool name: " << mTool->getName() << std::endl;
 
