@@ -344,6 +344,8 @@ ctkPluginContext* LogicManager::getPluginContext()
 
 void LogicManager::shutdownServices()
 {
+    mPluginFramework->stop();
+
 	this->shutdownStateService();
 	this->shutdownVisualizationService();
 	this->shutdownVideoServiceOld();
@@ -415,7 +417,6 @@ void LogicManager::shutdownTrackingService()
 
 void LogicManager::shutdownPluginFramework()
 {
-	mPluginFramework->stop();
 	requireUnique(mPluginFramework, "PluginFramework");
 	mPluginFramework.reset();
 }
