@@ -58,7 +58,7 @@ class cxTrackingService_EXPORT TrackingSystemPlaybackService : public TrackingSy
 Q_OBJECT
 
 public:
-	TrackingSystemPlaybackService(PlaybackTimePtr controller, TrackingSystemServicePtr base);
+	TrackingSystemPlaybackService(PlaybackTimePtr controller, TrackingSystemServicePtr base, ManualToolPtr manual);
 	virtual ~TrackingSystemPlaybackService();
 
 	virtual std::vector<ToolPtr> getTools();
@@ -72,14 +72,20 @@ public:
 
 	TrackingSystemServicePtr getBase() { return mBase; }
 
+private slots:
+	void onToolPositionChanged(Transform3D matrix, double timestamp);
+
 private:
-	void start(PlaybackTimePtr controller);
+	void start();
 	void stop();
 	bool forceBaseToConfiguredState();
 	void waitForState(TrackingSystemServicePtr base, Tool::State state, int timeout);
+	bool isRunning() const;
 
 	std::vector<PlaybackToolPtr> mTools; ///< all tools
 	Tool::State mState;
+	PlaybackTimePtr mController;
+	ManualToolPtr mManual;
 	TrackingSystemServicePtr mBase;
 };
 

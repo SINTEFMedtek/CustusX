@@ -99,6 +99,12 @@ Transform3D ToolImpl::get_prMt() const
 
 void ToolImpl::set_prMt(const Transform3D& prMt, double timestamp)
 {
+	if (mPositionHistory->count(timestamp))
+	{
+		if (similar(mPositionHistory->find(timestamp)->second, prMt))
+			return;
+	}
+
 	m_prMt = prMt;
 	(*mPositionHistory)[timestamp] = m_prMt;
 	emit toolTransformAndTimestamp(m_prMt, timestamp);

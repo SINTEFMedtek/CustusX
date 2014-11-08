@@ -75,11 +75,6 @@ ToolManagerUsingIGSTK::ToolManagerUsingIGSTKPtr ToolManagerUsingIGSTK::create()
 {
 	ToolManagerUsingIGSTKPtr retval;
 	retval.reset(new ToolManagerUsingIGSTK());
-	retval->mSelf = retval;
-
-	retval->initializeManualTool(); // do this after setting self.
-	retval->setDominantTool("ManualTool");
-
 	return retval;
 }
 
@@ -95,6 +90,8 @@ ToolManagerUsingIGSTK::ToolManagerUsingIGSTK() :
 				mLastLoadPositionHistory(0),
 				mToolTipOffset(0)
 {
+	this->initializeManualTool(); // do this after setting self.
+
 	TrackingSystemServicePtr igstk(new TrackingSystemIGSTKService());
 	this->installTrackingSystem(igstk);
 
@@ -103,7 +100,8 @@ ToolManagerUsingIGSTK::ToolManagerUsingIGSTK() :
 
 ToolManagerUsingIGSTK::~ToolManagerUsingIGSTK()
 {
-//	mTrackingSystemServices.clear();
+	while (!mTrackingSystems.empty())
+		this->unInstallTrackingSystem(mTrackingSystems.back());
 }
 
 void ToolManagerUsingIGSTK::onSystemStateChanged()
@@ -122,24 +120,24 @@ void ToolManagerUsingIGSTK::setPlaybackMode(PlaybackTimePtr controller)
 {
 	if (mPlaybackSystem)
 	{
+		mPlaybackSystem->setState(Tool::tsNONE);
 		this->unInstallTrackingSystem(mPlaybackSystem);
 		this->installTrackingSystem(mPlaybackSystem->getBase());
-
 		mPlaybackSystem.reset();
 	}
 
 	if (controller)
 	{
-		mPlaybackSystem.reset(new TrackingSystemPlaybackService(controller, mTrackingSystems.back()));
-
+		mPlaybackSystem.reset(new TrackingSystemPlaybackService(controller, mTrackingSystems.back(), mManualTool));
 		this->unInstallTrackingSystem(mPlaybackSystem->getBase());
 		this->installTrackingSystem(mPlaybackSystem);
+		mPlaybackSystem->setState(Tool::tsTRACKING);
 	}
 }
 
 bool ToolManagerUsingIGSTK::isPlaybackMode() const
 {
-	return mPlaybackSystem != NULL;
+	return mPlaybackSystem && (mPlaybackSystem->getState()>=Tool::tsCONFIGURED);
 }
 
 void ToolManagerUsingIGSTK::runDummyTool(DummyToolPtr tool)
@@ -156,7 +154,7 @@ void ToolManagerUsingIGSTK::installTrackingSystem(TrackingSystemServicePtr syste
 {
 	mTrackingSystems.push_back(system);
 	connect(system.get(), &TrackingSystemService::stateChanged, this, &ToolManagerUsingIGSTK::onSystemStateChanged);
-	emit stateChanged();
+	this->onSystemStateChanged();
 }
 
 void ToolManagerUsingIGSTK::unInstallTrackingSystem(TrackingSystemServicePtr system)
@@ -171,7 +169,7 @@ void ToolManagerUsingIGSTK::unInstallTrackingSystem(TrackingSystemServicePtr sys
 		break;
 	}
 
-	emit stateChanged();
+	this->onSystemStateChanged();
 }
 
 void ToolManagerUsingIGSTK::initializeManualTool()
@@ -189,6 +187,7 @@ void ToolManagerUsingIGSTK::initializeManualTool()
 	Transform3D rMpr = Transform3D::Identity(); // not known: not really important either
 	Transform3D prMt = rMpr.inv() * createTransformRotateY(M_PI) * createTransformRotateZ(M_PI/2);
 	mManualTool->set_prMt(prMt);
+	this->dominantCheckSlot();
 }
 
 Tool::State ToolManagerUsingIGSTK::getState() const
@@ -245,9 +244,9 @@ void ToolManagerUsingIGSTK::addToolsFrom(TrackingSystemServicePtr system)
 	for (unsigned i=0; i<tools.size(); ++i)
 	{
 		ToolPtr tool = tools[i];
-
 		mTools[tool->getUid()] = tool;
 		connect(tool.get(), SIGNAL(toolVisible(bool)), this, SLOT(dominantCheckSlot()));
+//		connect(tool.get(), &Tool::toolTransformAndTimestamp, this, &ToolManagerUsingIGSTK::dominantCheckSlot);
 		connect(tool.get(), &Tool::tooltipOffset, this, &ToolManagerUsingIGSTK::onTooltipOffset);
 
 		if (tool->hasType(Tool::TOOL_REFERENCE))
@@ -299,19 +298,6 @@ ToolPtr ToolManagerUsingIGSTK::getTool(const QString& uid)
 	return retval;
 }
 
-//void ToolManagerUsingIGSTK::setTooltipOffset(double offset)
-//{
-//	if (similar(offset, mToolTipOffset))
-//		return;
-//	mToolTipOffset = offset;
-//	emit tooltipOffset(mToolTipOffset);
-//}
-
-//double ToolManagerUsingIGSTK::getTooltipOffset() const
-//{
-//	return mToolTipOffset;
-//}
-
 ToolPtr ToolManagerUsingIGSTK::getDominantTool()
 {
 	return mDominantTool;
@@ -322,25 +308,39 @@ void ToolManagerUsingIGSTK::setDominantTool(const QString& uid)
 	if (mDominantTool && mDominantTool->getUid() == uid)
 		return;
 
-	if (mDominantTool)
-	{
-		// make manual tool invisible when other tools are active.
-		if (mDominantTool->hasType(Tool::TOOL_MANUAL))
-			mManualTool->setVisible(false);
-	}
+//	if (mDominantTool)
+//	{
+//		// make manual tool invisible when other tools are active.
+//		if (mDominantTool->hasType(Tool::TOOL_MANUAL))
+//			mManualTool->setVisible(false);
+//	}
 
 	ToolPtr newTool;
 	newTool = this->getTool(uid);
 
+//	// special case for manual tool
+//	if (newTool && newTool->hasType(Tool::TOOL_MANUAL) && mManualTool)
+//	{
+//		if (mDominantTool && (mDominantTool!=mManualTool))
+//			mManualTool->set_prMt(mDominantTool->get_prMt());
+//		mManualTool->setVisible(true);
+//	}
+
+	ToolPtr oldTool = mDominantTool;
+	mDominantTool = newTool; // set dominant before calling setters, which possibly can emit signal and cause cycles.
+
 	// special case for manual tool
 	if (newTool && newTool->hasType(Tool::TOOL_MANUAL) && mManualTool)
 	{
-		if (mDominantTool)
-			mManualTool->set_prMt(mDominantTool->get_prMt());
+		if (oldTool && (oldTool!=mManualTool))
+			mManualTool->set_prMt(oldTool->get_prMt());
 		mManualTool->setVisible(true);
 	}
+	else
+	{
+		mManualTool->setVisible(false);
+	}
 
-	mDominantTool = newTool;
 	emit dominantToolChanged(uid);
 }
 
@@ -452,8 +452,10 @@ void ToolManagerUsingIGSTK::resetTrackingPositionFilters()
 
 void ToolManagerUsingIGSTK::dominantCheckSlot()
 {
+//	std::cout << "check dominant" << std::endl;
 	if (this->manualToolHasMostRecentTimestamp())
 	{
+//		std::cout << "  set dominant to manual" << std::endl;
 		this->setDominantTool(this->getManualTool()->getUid());
 		return;
 	}
@@ -471,6 +473,7 @@ void ToolManagerUsingIGSTK::dominantCheckSlot()
 		//sort most important tool to the start of the vector:
 		sort(tools.begin(), tools.end(), toolTypeSort);
 		const QString uid = tools[0]->getUid();
+//		std::cout << "  set dominant " << uid << std::endl;
 		this->setDominantTool(uid);
 	}
 }

@@ -41,7 +41,7 @@ namespace cx
 {
 
 PlaybackTool::PlaybackTool(ToolPtr base, PlaybackTimePtr time) :
-	ToolImpl("playback_"+base->getUid(), "playback "+base->getName()), mBase(base),
+	ToolImpl(base->getUid(), "playback "+base->getName()), mBase(base),
     mTime(time),
     mVisible(false)
 {
@@ -54,6 +54,7 @@ PlaybackTool::PlaybackTool(ToolPtr base, PlaybackTimePtr time) :
 
 PlaybackTool::~PlaybackTool()
 {
+	std::cout << "PlaybackTool::~PlaybackTool " << this->getUid() << std::endl;
 }
 
 void PlaybackTool::timeChangedSlot()
@@ -88,14 +89,6 @@ void PlaybackTool::timeChangedSlot()
 		mTimestamp = lastSample->first;
 		emit toolTransformAndTimestamp(m_rMpr, mTimestamp);
 	}
-
-//	// Overwrite manual tool pos, set timestamp to 1ms previous.
-//	// This makes sure manual tool is not picked as dominant.
-//	if (this->getTrackingService())
-//	{
-//		this->getTrackingService()->getManualTool()->set_prMt(m_rMpr, mTimestamp-1);
-//		this->getTrackingService()->dominantCheckSlot();
-//	}
 }
 
 std::set<Tool::Type> PlaybackTool::getTypes() const
@@ -163,6 +156,11 @@ Transform3D PlaybackTool::getCalibration_sMt() const
 std::map<int, Vector3D> PlaybackTool::getReferencePoints() const
 {
 	return mBase->getReferencePoints();
+}
+
+bool PlaybackTool::isInitialized() const
+{
+	return true;
 }
 
 

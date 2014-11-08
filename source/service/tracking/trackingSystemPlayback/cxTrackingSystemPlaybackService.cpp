@@ -38,84 +38,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPlaybackTool.h"
 #include <QApplication>
 #include "cxUtilHelpers.h"
+#include "cxManualTool.h"
 
 namespace cx
 {
 
-TrackingSystemPlaybackService::TrackingSystemPlaybackService(PlaybackTimePtr controller, TrackingSystemServicePtr base)
+TrackingSystemPlaybackService::TrackingSystemPlaybackService(PlaybackTimePtr controller, TrackingSystemServicePtr base, ManualToolPtr manual)
 {
 	mBase = base;
 	mState = Tool::tsNONE;
-
-	if (controller)
-		this->start(controller);
-	else
-		this->stop();
-
-
-//	if (!controller)
-//	{
-//		mTools.clear();
-//		mState = Tool::tsNONE;
-//		report("Closed Playback Mode");
-//		emit stateChanged();
-////		this->closePlayBackMode();
-//		return;
-//	}
-
-//	// attempt to configure tracker if not configured,
-//	// or deinit/stop tracking if on.
-//	if (mBase->getState() != Tool::tsCONFIGURED)
-//	{
-//		this->setState(Tool::tsCONFIGURED);
-//		this->waitForState(mBase, Tool::tsCONFIGURED, 200);
-//	}
-
-//	if (!this->getState() <= Tool::tsCONFIGURED)
-//	{
-//		reportWarning("ToolManager must be configured before setting playback");
-//		return;
-//	}
-
-//	std::vector<Tool> original = mBase->getTools();
-////	mBase->setEnabled(false); // do we need this?? we are only in the configured state for the base, but this can be changed...
-////	ToolManager::ToolMap original = mTools; ///< all tools
-////	mTools.clear();
-
-//	std::pair<double,double> timeRange(getMilliSecondsSinceEpoch(), 0);
-
-//	for (ToolManager::ToolMap::iterator iter = original.begin(); iter!=original.end(); ++iter)
-//	{
-////		if (iter->second==mManualTool)
-////			continue; // dont wrap the manual tool
-//		cx::PlaybackToolPtr current(new PlaybackTool(iter->second, controller));
-//		mTools.push_back(current);
-
-//		TimedTransformMapPtr history = iter->second->getPositionHistory();
-//		if (!history->empty())
-//		{
-//			timeRange.first = std::min(timeRange.first, history->begin()->first);
-//			timeRange.second = std::max(timeRange.second, history->rbegin()->first);
-//		}
-//	}
-////	mTools[mManualTool->getUid()] = mManualTool;
-
-//	controller->initialize(QDateTime::fromMSecsSinceEpoch(timeRange.first), timeRange.second - timeRange.first);
-
-//	report("Opened Playback Mode");
-////	mPlayBackMode = true;
-////	emit initialized();
-//	mState = Tool::tsTRACKING;
-//	emit stateChanged();
-
+	mController = controller;
+	mManual = manual;
 }
 
 TrackingSystemPlaybackService::~TrackingSystemPlaybackService()
 {
-
+	this->setState(Tool::tsNONE);
 }
 
-void TrackingSystemPlaybackService::start(PlaybackTimePtr controller)
+void TrackingSystemPlaybackService::start()
 {
 	if (!this->forceBaseToConfiguredState())
 	{
@@ -124,17 +65,13 @@ void TrackingSystemPlaybackService::start(PlaybackTimePtr controller)
 	}
 
 	std::vector<ToolPtr> original = mBase->getTools();
-//	mBase->setEnabled(false); // do we need this?? we are only in the configured state for the base, but this can be changed...
-//	ToolManager::ToolMap original = mTools; ///< all tools
-//	mTools.clear();
 
 	std::pair<double,double> timeRange(getMilliSecondsSinceEpoch(), 0);
 
 	for (unsigned i=0; i<original.size(); ++i)
 	{
-//		if (iter->second==mManualTool)
-//			continue; // dont wrap the manual tool
-		cx::PlaybackToolPtr current(new PlaybackTool(original[i], controller));
+		cx::PlaybackToolPtr current(new PlaybackTool(original[i], mController));
+		connect(current.get(), &Tool::toolTransformAndTimestamp, this, &TrackingSystemPlaybackService::onToolPositionChanged);
 		mTools.push_back(current);
 
 		TimedTransformMapPtr history = original[i]->getPositionHistory();
@@ -144,13 +81,10 @@ void TrackingSystemPlaybackService::start(PlaybackTimePtr controller)
 			timeRange.second = std::max(timeRange.second, history->rbegin()->first);
 		}
 	}
-//	mTools[mManualTool->getUid()] = mManualTool;
 
-	controller->initialize(QDateTime::fromMSecsSinceEpoch(timeRange.first), timeRange.second - timeRange.first);
+	mController->initialize(QDateTime::fromMSecsSinceEpoch(timeRange.first), timeRange.second - timeRange.first);
 
 	report("Opened Playback Mode");
-//	mPlayBackMode = true;
-//	emit initialized();
 	mState = Tool::tsTRACKING;
 	emit stateChanged();
 }
@@ -169,7 +103,7 @@ bool TrackingSystemPlaybackService::forceBaseToConfiguredState()
 	// or deinit/stop tracking if on.
 	if (mBase->getState() != Tool::tsCONFIGURED)
 	{
-		this->setState(Tool::tsCONFIGURED);
+		mBase->setState(Tool::tsCONFIGURED);
 		this->waitForState(mBase, Tool::tsCONFIGURED, 200);
 	}
 
@@ -188,7 +122,6 @@ void TrackingSystemPlaybackService::waitForState(TrackingSystemServicePtr base, 
 			break;
 		qApp->processEvents();
 		sleep_ms(interval);
-//		mTrackerThread->wait(interval);
 	}
 }
 
@@ -204,32 +137,25 @@ Tool::State TrackingSystemPlaybackService::getState() const
 	return mState;
 }
 
+bool TrackingSystemPlaybackService::isRunning() const
+{
+	return !mTools.empty();
+}
+
 void TrackingSystemPlaybackService::setState(const Tool::State val)
 {
-	return; // cannot modify state, always on.
+	mState = val;
 
-//	if (mState==val)
-//		return;
-//	mState = val;
-
-////	if (mState>=Tool::tsTRACKING)
-////	{
-////		for (unsigned i=0; i<mTools.size(); ++i)
-////		{
-////			mTools[i]->setVisible(true);
-////			mTools[i]->startTracking(30);
-////		}
-////	}
-////	else
-////	{
-////		for (unsigned i=0; i<mTools.size(); ++i)
-////		{
-////			mTools[i]->setVisible(false);
-////			mTools[i]->stopTracking();
-////		}
-////	}
-
-//	emit stateChanged();
+	if (mState >= Tool::tsCONFIGURED)
+	{
+		if (!this->isRunning())
+			this->start();
+	}
+	else
+	{
+		if (this->isRunning())
+			this->stop();
+	}
 }
 
 void TrackingSystemPlaybackService::setLoggingFolder(QString loggingFolder)
@@ -241,6 +167,16 @@ TrackerConfigurationPtr TrackingSystemPlaybackService::getConfiguration()
 {
 	return TrackerConfigurationPtr();
 }
+
+void TrackingSystemPlaybackService::onToolPositionChanged(Transform3D matrix, double timestamp)
+{
+	// Overwrite manual tool pos, set timestamp to 1ms previous.
+	// This makes sure manual tool is not picked as dominant.
+	mManual->set_prMt(matrix, timestamp-1);
+//	mManual->setVisible(false);
+//	mManual->setVisible(true);
+}
+
 
 
 } // namespace cx

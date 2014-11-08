@@ -151,7 +151,7 @@ private slots:
 
 private:
 	ToolManagerUsingIGSTK();
-	TrackingServiceWeakPtr mSelf;
+//	TrackingServiceWeakPtr mSelf;
 
 	void rebuildCachedTools();
 //	void closePlayBackMode();

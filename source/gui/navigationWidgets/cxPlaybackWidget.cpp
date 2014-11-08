@@ -333,9 +333,6 @@ std::pair<double,double> PlaybackWidget::findTimeRange(std::vector<TimelineEvent
 
 void PlaybackWidget::toolManagerInitializedSlot()
 {
-	if (toolManager()->getState() < Tool::tsINITIALIZED)
-		return;
-
 	if (toolManager()->isPlaybackMode())
 	{
 		mOpenAction->setText("Close Playback");
@@ -345,8 +342,12 @@ void PlaybackWidget::toolManagerInitializedSlot()
 	{
 		mOpenAction->setText("Open Playback");
 		mOpenAction->setIcon(QIcon(":/icons/open_icon_library/button-red.png"));
+		mToolTimelineWidget->setEvents(std::vector<TimelineEvent>());
 		return;
 	}
+
+	if (toolManager()->getState() < Tool::tsINITIALIZED)
+		return;
 
 	std::vector<TimelineEvent> events = this->createEvents();
 	std::pair<double,double> range = this->findTimeRange(events);
