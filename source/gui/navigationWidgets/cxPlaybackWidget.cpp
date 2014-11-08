@@ -171,6 +171,7 @@ void PlaybackWidget::toggleOpenSlot()
 {
 	if (toolManager()->isPlaybackMode())
 	{
+		mTimer->stop();
 		toolManager()->setPlaybackMode(PlaybackTimePtr());
 		videoService()->setPlaybackMode(PlaybackTimePtr());
 	}
