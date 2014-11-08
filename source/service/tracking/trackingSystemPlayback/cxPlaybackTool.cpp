@@ -45,7 +45,6 @@ PlaybackTool::PlaybackTool(ToolPtr base, PlaybackTimePtr time) :
     mTime(time),
     mVisible(false)
 {
-	std::cout << "PlaybackTool::PlaybackTool " << this->getUid() << std::endl;
 	connect(mTime.get(), SIGNAL(changed()), this, SLOT(timeChangedSlot()));
 
 	connect(mBase.get(), SIGNAL(toolProbeSector()), this, SIGNAL(toolProbeSector()));
@@ -54,7 +53,6 @@ PlaybackTool::PlaybackTool(ToolPtr base, PlaybackTimePtr time) :
 
 PlaybackTool::~PlaybackTool()
 {
-	std::cout << "PlaybackTool::~PlaybackTool " << this->getUid() << std::endl;
 }
 
 void PlaybackTool::timeChangedSlot()

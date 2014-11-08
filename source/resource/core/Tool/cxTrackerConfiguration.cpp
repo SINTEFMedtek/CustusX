@@ -31,10 +31,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxTrackerConfiguration.h"
+#include "cxTrackerConfigurationNull.h"
+#include "cxNullDeleter.h"
 
 namespace cx
 {
 
+TrackerConfigurationPtr TrackerConfiguration::getNullObject()
+{
+	static TrackerConfigurationPtr mNull;
+	if (!mNull)
+		mNull.reset(new TrackerConfigurationNull, null_deleter());
+	return mNull;
+}
 
 } // namespace cx
 

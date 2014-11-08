@@ -59,6 +59,8 @@ public:
 	virtual QStringList getAllConfigurations();
 	virtual QStringList getAllTools();
 
+	virtual bool isNull() { return false; }
+
 private:
 	QStringList filter(QStringList toolsToFilter, QStringList applicationsFilter,
 			QStringList trackingsystemsFilter);

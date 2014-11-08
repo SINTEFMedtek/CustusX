@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
+typedef boost::shared_ptr<class TrackerConfiguration> TrackerConfigurationPtr;
 
 /** Tracker and Tool configuration info
  *
@@ -84,8 +85,10 @@ public:
 
 	virtual Tool getTool(QString uid) = 0;
 	virtual bool verifyTool(QString uid) = 0;
+
+	virtual bool isNull() = 0;
+	static TrackerConfigurationPtr getNullObject();
 };
-typedef boost::shared_ptr<TrackerConfiguration> TrackerConfigurationPtr;
 
 } // namespace cx
 

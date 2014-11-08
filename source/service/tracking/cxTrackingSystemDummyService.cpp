@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxDummyTool.h"
 #include "cxReporter.h"
+#include "cxTrackerConfiguration.h"
 
 namespace cx
 {
@@ -98,7 +99,7 @@ void TrackingSystemDummyService::setLoggingFolder(QString loggingFolder)
 
 TrackerConfigurationPtr TrackingSystemDummyService::getConfiguration()
 {
-	return TrackerConfigurationPtr();
+	return TrackerConfiguration::getNullObject();
 }
 
 //void ToolManagerUsingIGSTK::runDummyTool(DummyToolPtr tool)

@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QApplication>
 #include "cxUtilHelpers.h"
 #include "cxManualTool.h"
+#include "cxTrackerConfiguration.h"
 
 namespace cx
 {
@@ -165,7 +166,7 @@ void TrackingSystemPlaybackService::setLoggingFolder(QString loggingFolder)
 
 TrackerConfigurationPtr TrackingSystemPlaybackService::getConfiguration()
 {
-	return TrackerConfigurationPtr();
+	return TrackerConfiguration::getNullObject();
 }
 
 void TrackingSystemPlaybackService::onToolPositionChanged(Transform3D matrix, double timestamp)

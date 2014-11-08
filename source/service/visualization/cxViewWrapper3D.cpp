@@ -772,6 +772,8 @@ void ViewWrapper3D::dominantToolChangedSlot()
 
 void ViewWrapper3D::toolsAvailableSlot()
 {
+	std::vector<ToolRep3DPtr> reps = RepManager::findReps<ToolRep3D>(mView->getReps());
+
 	ToolManager::ToolMap tools = mBackend->getToolManager()->getTools();
 	ToolManager::ToolMap::iterator iter;
 	for (iter = tools.begin(); iter != tools.end(); ++iter)
@@ -781,6 +783,10 @@ void ViewWrapper3D::toolsAvailableSlot()
 			continue;
 
 		ToolRep3DPtr toolRep = RepManager::findFirstRep<ToolRep3D>(mView->getReps(), tool);
+
+		std::vector<ToolRep3DPtr>::iterator oldRep = std::find(reps.begin(), reps.end(), toolRep);
+		if (oldRep!=reps.end())
+			reps.erase(oldRep);
 
 		if (tool->hasType(Tool::TOOL_MANUAL) && !settings()->value("showManualTool").toBool())
 		{
@@ -803,6 +809,12 @@ void ViewWrapper3D::toolsAvailableSlot()
 		toolRep->setTool(tool);
 		toolRep->setOffsetPointVisibleAtZeroOffset(true);
 		mView->addRep(toolRep);
+	}
+
+	// remove reps for tools no longer present
+	for (unsigned i=0; i<reps.size(); ++i)
+	{
+		mView->removeRep(reps[i]);
 	}
 }
 
