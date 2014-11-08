@@ -308,23 +308,8 @@ void ToolManagerUsingIGSTK::setDominantTool(const QString& uid)
 	if (mDominantTool && mDominantTool->getUid() == uid)
 		return;
 
-//	if (mDominantTool)
-//	{
-//		// make manual tool invisible when other tools are active.
-//		if (mDominantTool->hasType(Tool::TOOL_MANUAL))
-//			mManualTool->setVisible(false);
-//	}
-
 	ToolPtr newTool;
 	newTool = this->getTool(uid);
-
-//	// special case for manual tool
-//	if (newTool && newTool->hasType(Tool::TOOL_MANUAL) && mManualTool)
-//	{
-//		if (mDominantTool && (mDominantTool!=mManualTool))
-//			mManualTool->set_prMt(mDominantTool->get_prMt());
-//		mManualTool->setVisible(true);
-//	}
 
 	ToolPtr oldTool = mDominantTool;
 	mDominantTool = newTool; // set dominant before calling setters, which possibly can emit signal and cause cycles.
@@ -452,10 +437,8 @@ void ToolManagerUsingIGSTK::resetTrackingPositionFilters()
 
 void ToolManagerUsingIGSTK::dominantCheckSlot()
 {
-//	std::cout << "check dominant" << std::endl;
 	if (this->manualToolHasMostRecentTimestamp())
 	{
-//		std::cout << "  set dominant to manual" << std::endl;
 		this->setDominantTool(this->getManualTool()->getUid());
 		return;
 	}
@@ -473,7 +456,6 @@ void ToolManagerUsingIGSTK::dominantCheckSlot()
 		//sort most important tool to the start of the vector:
 		sort(tools.begin(), tools.end(), toolTypeSort);
 		const QString uid = tools[0]->getUid();
-//		std::cout << "  set dominant " << uid << std::endl;
 		this->setDominantTool(uid);
 	}
 }
