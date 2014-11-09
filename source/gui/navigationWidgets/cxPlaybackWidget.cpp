@@ -59,7 +59,6 @@ PlaybackWidget::PlaybackWidget(QWidget* parent) :
 	mOpen = false;
 	this->setToolTip(this->defaultWhatsThis());
 
-//	connect(toolManager(), SIGNAL(initialized()), this, SLOT(toolManagerInitializedSlot()));
 	connect(toolManager(), &ToolManager::stateChanged, this, &PlaybackWidget::toolManagerInitializedSlot);
 
 	mTimer.reset(new PlaybackTime());

@@ -190,31 +190,12 @@ void MetricManager::addToolButtonClickedSlot()
 
 void MetricManager::addPlaneButtonClickedSlot()
 {
-//  CoordinateSystem ref = CoordinateSystem::reference();
-
   PlaneMetricPtr p1 = this->getDataFactory()->createSpecific<PlaneMetric>("plane%1");
   p1->get_rMd_History()->setParentSpace("reference");
-//  p1->setSpace(ref);
 
   std::vector<DataPtr> args = this->getSpecifiedNumberOfValidArguments(p1->getArguments());
   for (unsigned i=0; i<args.size(); ++i)
 	p1->getArguments()->set(i, args[i]);
-
-//  ToolPtr tool = toolManager()->getDominantTool();
-//  if (!tool)
-//  {
-//	  p1->setCoordinate(Vector3D(0,0,0));
-//	  p1->setNormal(Vector3D(1,0,0));
-//  }
-//  else
-//  {
-//	  CoordinateSystem from(csTOOL_OFFSET, tool->getUid());
-//	  Vector3D point_t = Vector3D(0,0,0);
-//	  Transform3D rMto = spaceProvider()->get_toMfrom(from, ref);
-
-//	  p1->setCoordinate(rMto.coord(Vector3D(0,0,0)));
-//	  p1->setNormal(rMto.vector(Vector3D(0,0,1)));
-//  }
 
   this->installNewMetric(p1);
 }

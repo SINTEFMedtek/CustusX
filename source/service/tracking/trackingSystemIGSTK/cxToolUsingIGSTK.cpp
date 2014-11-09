@@ -75,7 +75,6 @@ ToolUsingIGSTK::ToolUsingIGSTK(IgstkToolPtr igstkTool) :
 						mTool->getInternalStructure().mInstrumentScannerId);
 		connect(mProbe.get(), SIGNAL(sectorChanged()), this, SIGNAL(toolProbeSector()));
 	}
-//	connect(this->getTrackingService().get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
 }
 
 ToolUsingIGSTK::~ToolUsingIGSTK()
@@ -131,7 +130,6 @@ double ToolUsingIGSTK::getTooltipOffset() const
 	if(this->getProbe())
 		return this->getProbe()->getProbeData().getDepthStart();
 	return ToolImpl::getTooltipOffset();
-//		return this->getTrackingService()->getTooltipOffset();
 }
 
 void ToolUsingIGSTK::setTooltipOffset(double val)
@@ -139,7 +137,6 @@ void ToolUsingIGSTK::setTooltipOffset(double val)
 	if(this->getProbe())
 		return;
 	ToolImpl::setTooltipOffset(val);
-//	this->getTrackingService()->setTooltipOffset(val);
 }
 
 bool ToolUsingIGSTK::isValid() const

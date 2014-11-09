@@ -72,9 +72,6 @@ ViewsFixture::ViewsFixture(QString displayText)
 	mShaderFolder = cx::DataLocations::getShaderPath();
 
 	// Initialize dummy toolmanager.
-//	mServices->trackingService()->configure();
-//	mServices->trackingService()->initialize();
-//	mServices->trackingService()->startTracking();
 	mServices->trackingService()->setState(cx::Tool::tsTRACKING);
 
 	mWindow.reset(new ViewsWindow());

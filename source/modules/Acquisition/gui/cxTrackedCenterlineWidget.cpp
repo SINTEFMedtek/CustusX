@@ -58,12 +58,7 @@ TrackedCenterlineWidget::TrackedCenterlineWidget(AcquisitionDataPtr pluginData, 
   this->setObjectName("TrackedCenterlineWidget");
   this->setWindowTitle("Tracked Centerline");
 
-//  connect(&mCenterlineAlgorithm, SIGNAL(finished()), this, SLOT(centerlineFinishedSlot()));
-//  connect(&mCenterlineAlgorithm, SIGNAL(aboutToStart()), this, SLOT(preprocessResampler()));
-
 	connect(toolManager(), &ToolManager::stateChanged, this, &TrackedCenterlineWidget::checkIfReadySlot);
-//  connect(toolManager(), SIGNAL(trackingStarted()), this, SLOT(checkIfReadySlot()));
-//  connect(toolManager(), SIGNAL(trackingStopped()), this, SLOT(checkIfReadySlot()));
   mLayout->addStretch();
 
   this->checkIfReadySlot();

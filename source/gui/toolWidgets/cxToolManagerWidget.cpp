@@ -92,31 +92,26 @@ void ToolManagerWidget::configureClickedSlot(bool checked)
 void ToolManagerWidget::deconfigureClickedSlot(bool checked)
 {
 	toolManager()->setState(Tool::tsNONE);
-//  toolManager()->deconfigure();
 }
 
 void ToolManagerWidget::initializeClickedSlot(bool checked)
 {
 	toolManager()->setState(Tool::tsINITIALIZED);
-//  toolManager()->initialize();
 }
 
 void ToolManagerWidget::uninitializeClickedSlot(bool checked)
 {
 	toolManager()->setState(Tool::tsCONFIGURED);
-//  toolManager()->uninitialize();
 }
 
 void ToolManagerWidget::startTrackingClickedSlot(bool checked)
 {
 	toolManager()->setState(Tool::tsTRACKING);
-//  toolManager()->startTracking();
 }
 
 void ToolManagerWidget::stopTrackingClickedSlot(bool checked)
 {
 	toolManager()->setState(Tool::tsINITIALIZED);
-//  toolManager()->stopTracking();
 }
 
 void ToolManagerWidget::updateButtonStatusSlot()

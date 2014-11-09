@@ -126,7 +126,6 @@ void AcquisitionFixture::initialize()
 	cx::patientService()->getPatientData()->newPatient(cx::DataLocations::getTestDataPath() + "/temp/Acquisition/");
 
 	//Mock UsReconstructionService with null object
-//	mAcquisitionData.reset(new cx::AcquisitionData(cx::UsReconstructionService::getNullObject()));
 	ctkPluginContext *pluginContext = cx::logicManager()->getPluginContext();
 	cx::UsReconstructionServicePtr reconstructer = cx::UsReconstructionServicePtr(new cx::UsReconstructionServiceProxy(pluginContext));
 	mAcquisitionData.reset(new cx::AcquisitionData(reconstructer));
@@ -140,7 +139,6 @@ void AcquisitionFixture::initialize()
 	// run setup of video, probe and start acquisition in series, each depending on the success of the previous:
 	QTimer::singleShot(0, this, SLOT(setupVideo()));
 	connect(cx::videoService()->getVideoConnection().get(), SIGNAL(connected(bool)), this, SLOT(videoConnectedSlot()));
-//	connect(cx::toolManager(), SIGNAL(trackingStarted()), this, SLOT(start()));
 	connect(cx::toolManager(), &cx::ToolManager::stateChanged, this, &AcquisitionFixture::start);
 }
 

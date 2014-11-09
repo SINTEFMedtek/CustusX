@@ -44,11 +44,5 @@ TEST_CASE("DummyToolManager setup/shutdown works multiple times", "[unit]")
 		REQUIRE(service);
 		CHECK(service.unique());
 		service.reset();
-
-//		cx::ToolManager::setInstance(cx::DummyToolManager::getInstance());
-//		CHECK(cx::toolManager());
-//		cx::ToolManager::shutdown();
-//        //DummyToolManager::shutdown();
-//		CHECK_FALSE(cx::toolManager());
     }
 }

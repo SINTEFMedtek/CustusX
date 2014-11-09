@@ -49,7 +49,6 @@ ManualTool::ManualTool(const QString& uid, const QString& name) :
 	mTimestamp = 0;
 	mVisible = false;
 	read3DCrossHairSlot(0);
-//	connect(this->getTrackingService().get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
 	connect(this, SIGNAL(tooltipOffset(double)), this, SLOT(read3DCrossHairSlot(double)));
 }
 

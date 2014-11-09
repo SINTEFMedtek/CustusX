@@ -103,8 +103,6 @@ DummyTool::DummyTool(const QString& uid) :
 	mPolyData = this->createPolyData(150, 15, 4, 2);
 
 	connect(mTimer.get(), SIGNAL(timeout()),this, SLOT(sendTransform()));
-//	if (this->getTrackingService())
-//		connect(this->getTrackingService().get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
 }
 
 DummyTool::~DummyTool()
@@ -393,19 +391,6 @@ void DummyTool::set_prMt(const Transform3D& prMt)
 	double timestamp = this->getTimestamp();
 	ToolImpl::set_prMt(prMt, timestamp);
 }
-
-//double DummyTool::getTooltipOffset() const
-//{
-//	if (this->getTrackingService())
-//		return this->getTrackingService()->getTooltipOffset();
-//	return 0;
-//}
-
-//void DummyTool::setTooltipOffset(double val)
-//{
-//	if (this->getTrackingService())
-//		this->getTrackingService()->setTooltipOffset(val);
-//}
 
 Transform3D DummyTool::getCalibration_sMt() const
 {

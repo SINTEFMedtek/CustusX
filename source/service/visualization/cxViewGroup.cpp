@@ -146,11 +146,6 @@ std::vector<ViewPtr> ViewGroup::getViews() const
 	return mViews;
 }
 
-//void ViewGroup::activateManualToolSlot()
-//{
-//	mBackend->getToolManager()->dominantCheckSlot();
-//}
-
 void ViewGroup::initializeActiveView(SyncedValuePtr val)
 {
 	mActiveView = val;

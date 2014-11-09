@@ -36,29 +36,4 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-//TrackingServiceOldPtr toolManager()
-//{
-//	return ToolManager::getInstance();
-//}
-
-//TrackingServiceOldPtr ToolManager::mInstance = NULL;
-
-///** not sure if this is needed? we have getInstance in subclasses...*/
-//void ToolManager::setInstance(TrackingServiceOldPtr instance)
-//{
-//	mInstance = instance;
-//}
-//;
-
-//TrackingServiceOldPtr ToolManager::getInstance()
-//{
-//	return mInstance;
-//}
-
-//void ToolManager::shutdown()
-//{
-//	delete mInstance;
-//	mInstance = NULL;
-//}
-
 }
