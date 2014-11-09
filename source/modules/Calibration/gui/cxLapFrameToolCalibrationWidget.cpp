@@ -106,7 +106,7 @@ LapFrameToolCalibrationWidget::LapFrameToolCalibrationWidget(QWidget* parent) :
   //setting default state
   this->toolSelectedSlot();
 
-  connect(cx::toolManager(), &cx::ToolManager::stateChanged, this, &LapFrameToolCalibrationWidget::trackingStartedSlot);
+  connect(cx::trackingService().get(), &cx::ToolManager::stateChanged, this, &LapFrameToolCalibrationWidget::trackingStartedSlot);
 }
 
 LapFrameToolCalibrationWidget::~LapFrameToolCalibrationWidget()
@@ -199,7 +199,7 @@ void LapFrameToolCalibrationWidget::toolSelectedSlot()
 
 void LapFrameToolCalibrationWidget::trackingStartedSlot()
 {
-	ToolPtr ref = toolManager()->getTool("calibration_tool");
+	ToolPtr ref = trackingService()->getTool("calibration_tool");
 	if (ref)
 		mCalibRefTool->setValue(ref->getUid());
 }

@@ -67,8 +67,8 @@ public:
 	virtual ToolMap getTools();
 	virtual ToolPtr getTool(const QString& uid);
 
-	virtual ToolPtr getDominantTool();
-	virtual void setDominantTool(const QString& uid);
+	virtual ToolPtr getActiveTool();
+	virtual void setActiveTool(const QString& uid);
 
 	virtual Transform3D get_rMpr() const;
 	virtual void set_rMpr(const Transform3D& val);

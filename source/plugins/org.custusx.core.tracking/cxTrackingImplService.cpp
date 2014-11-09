@@ -48,11 +48,20 @@ namespace cx
 TrackingImplService::TrackingImplService(ctkPluginContext *context) :
 	mContext(context )
 {
+	mOld = LogicManager::getInstance()->getTrackingService();
+	connect(mOld.get(), &ToolManager::stateChanged, this, &TrackingService::stateChanged);
+	connect(mOld.get(), &ToolManager::dominantToolChanged, this, &TrackingService::dominantToolChanged);
 }
 
 TrackingImplService::~TrackingImplService()
 {
 }
+
+TrackingServiceOldPtr TrackingImplService::getOld() const
+{
+	return mOld;
+}
+
 
 bool TrackingImplService::isNull()
 {
@@ -66,22 +75,17 @@ ToolPtr TrackingImplService::getTool(const QString& uid)
 
 ToolPtr TrackingImplService::getActiveTool()
 {
-	return this->getOld()->getDominantTool();
+	return this->getOld()->getActiveTool();
 }
 
 void TrackingImplService::setActiveTool(const QString& uid)
 {
-	this->getOld()->setDominantTool(uid);
+	this->getOld()->setActiveTool(uid);
 }
 
 ToolPtr TrackingImplService::getFirstProbe()
 {
 	return this->getOld()->findFirstProbe();
-}
-
-TrackingServiceOldPtr TrackingImplService::getOld() const
-{
-	return LogicManager::getInstance()->getTrackingService();
 }
 
 ToolPtr TrackingImplService::getReferenceTool() const
@@ -92,6 +96,76 @@ ToolPtr TrackingImplService::getReferenceTool() const
 ToolPtr TrackingImplService::getManualTool()
 {
 	return this->getOld()->getManualTool();
+}
+
+
+
+
+
+
+TrackingService::ToolMap TrackingImplService::getTools()
+{
+	return this->getOld()->getTools();
+}
+
+bool TrackingImplService::isPlaybackMode() const
+{
+	return this->getOld()->isPlaybackMode();
+}
+
+void TrackingImplService::setPlaybackMode(PlaybackTimePtr controller)
+{
+	this->getOld()->setPlaybackMode(controller);
+}
+
+void TrackingImplService::savePositionHistory()
+{
+	this->getOld()->savePositionHistory();
+}
+
+void TrackingImplService::loadPositionHistory()
+{
+	this->getOld()->loadPositionHistory();
+}
+
+void TrackingImplService::addXml(QDomNode& parentNode)
+{
+	this->getOld()->addXml(parentNode);
+}
+
+void TrackingImplService::parseXml(QDomNode& dataNode)
+{
+	this->getOld()->parseXml(dataNode);
+}
+
+void TrackingImplService::clear()
+{
+	this->getOld()->clear();
+}
+
+SessionToolHistoryMap TrackingImplService::getSessionHistory(double startTime, double stopTime)
+{
+	return this->getOld()->getSessionHistory(startTime, stopTime);
+}
+
+void TrackingImplService::setLoggingFolder(QString loggingFolder)
+{
+	this->getOld()->setLoggingFolder(loggingFolder);
+}
+
+void TrackingImplService::runDummyTool(DummyToolPtr tool)
+{
+	this->getOld()->runDummyTool(tool);
+}
+
+QStringList TrackingImplService::getSupportedTrackingSystems()
+{
+	return this->getOld()->getSupportedTrackingSystems();
+}
+
+TrackerConfigurationPtr TrackingImplService::getConfiguration()
+{
+	return this->getOld()->getConfiguration();
 }
 
 

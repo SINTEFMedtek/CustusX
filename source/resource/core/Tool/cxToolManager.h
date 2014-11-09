@@ -73,8 +73,8 @@ public:
 	virtual ToolMap getTools() = 0; ///< get configured and initialized tools
 	virtual ToolPtr getTool(const QString& uid) = 0; ///< get a tool
 
-	virtual ToolPtr getDominantTool() = 0; ///< get the tool that has higest priority when tracking
-	virtual void setDominantTool(const QString& uid) = 0; ///< set a tool to be the dominant tool
+	virtual ToolPtr getActiveTool() = 0; ///< get the tool that has higest priority when tracking
+	virtual void setActiveTool(const QString& uid) = 0; ///< set a tool to be the dominant tool
 	virtual ToolPtr findFirstProbe() = 0;
 
 	virtual ToolPtr getReferenceTool() const = 0; ///< tool used as patient reference
@@ -94,14 +94,9 @@ public:
 	virtual QStringList getSupportedTrackingSystems() { return QStringList(); }
 	virtual TrackerConfigurationPtr getConfiguration() = 0;
 
-//public slots:
-//	virtual void saveToolsSlot() {}
-
 signals:
 	void stateChanged();
 	void dominantToolChanged(const QString& uId);
-//	void tps(int); ///< the dominant tools tps
-//	void tooltipOffset(double offset);
 
 protected:
 	virtual ~ToolManager() {}

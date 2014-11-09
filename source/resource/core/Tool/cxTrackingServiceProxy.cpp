@@ -118,4 +118,76 @@ ToolPtr TrackingServiceProxy::getManualTool()
 }
 
 
+
+
+
+
+
+TrackingService::ToolMap TrackingServiceProxy::getTools()
+{
+	return mTrackingService->getTools();
+}
+
+bool TrackingServiceProxy::isPlaybackMode() const
+{
+	return mTrackingService->isPlaybackMode();
+}
+
+void TrackingServiceProxy::setPlaybackMode(PlaybackTimePtr controller)
+{
+	mTrackingService->setPlaybackMode(controller);
+}
+
+void TrackingServiceProxy::savePositionHistory()
+{
+	mTrackingService->savePositionHistory();
+}
+
+void TrackingServiceProxy::loadPositionHistory()
+{
+	mTrackingService->loadPositionHistory();
+}
+
+void TrackingServiceProxy::addXml(QDomNode& parentNode)
+{
+	mTrackingService->addXml(parentNode);
+}
+
+void TrackingServiceProxy::parseXml(QDomNode& dataNode)
+{
+	mTrackingService->parseXml(dataNode);
+}
+
+void TrackingServiceProxy::clear()
+{
+	mTrackingService->clear();
+}
+
+SessionToolHistoryMap TrackingServiceProxy::getSessionHistory(double startTime, double stopTime)
+{
+	return mTrackingService->getSessionHistory(startTime, stopTime);
+}
+
+void TrackingServiceProxy::setLoggingFolder(QString loggingFolder)
+{
+	mTrackingService->setLoggingFolder(loggingFolder);
+}
+
+void TrackingServiceProxy::runDummyTool(DummyToolPtr tool)
+{
+	mTrackingService->runDummyTool(tool);
+}
+
+QStringList TrackingServiceProxy::getSupportedTrackingSystems()
+{
+	return mTrackingService->getSupportedTrackingSystems();
+}
+
+TrackerConfigurationPtr TrackingServiceProxy::getConfiguration()
+{
+	return mTrackingService->getConfiguration();
+}
+
+
+
 } //cx

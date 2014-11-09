@@ -110,9 +110,9 @@ void ToolTipCalibrateWidget::calibrateSlot()
   if(!refTool || !refTool->hasReferencePointWithId(1))
     return;
 
-  ToolPtr tool = toolManager()->getDominantTool();
+  ToolPtr tool = trackingService()->getActiveTool();
   CoordinateSystem to = spaceProvider()->getT(tool);
-  Vector3D P_t = spaceProvider()->getDominantToolTipPoint(to);
+  Vector3D P_t = spaceProvider()->getActiveToolTipPoint(to);
 
   ToolTipCalibrationCalculator calc(tool, refTool, P_t);
   Transform3D calibration = calc.get_calibration_sMt();
@@ -137,10 +137,10 @@ void ToolTipCalibrateWidget::testCalibrationSlot()
   if(!selectedTool || !selectedTool->hasReferencePointWithId(1))
     return;
 
-  CoordinateSystem to = spaceProvider()->getT(toolManager()->getDominantTool());
-  Vector3D sampledPoint = spaceProvider()->getDominantToolTipPoint(to);
+  CoordinateSystem to = spaceProvider()->getT(trackingService()->getActiveTool());
+  Vector3D sampledPoint = spaceProvider()->getActiveToolTipPoint(to);
 
-  ToolTipCalibrationCalculator calc(toolManager()->getDominantTool(), selectedTool, sampledPoint);
+  ToolTipCalibrationCalculator calc(trackingService()->getActiveTool(), selectedTool, sampledPoint);
   Vector3D delta_selectedTool = calc.get_delta_ref();
 
   mDeltaLabel->setText("<b>Delta:</b> "+qstring_cast(delta_selectedTool)+" <br> <b>Length:</b>  "+qstring_cast(delta_selectedTool.length()));

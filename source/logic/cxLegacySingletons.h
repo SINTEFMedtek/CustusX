@@ -59,7 +59,7 @@ typedef boost::shared_ptr<class StateService> StateServicePtr;
 
 // old style singleton accessors:
 cxLogicManager_EXPORT DataManager* dataManager();
-cxLogicManager_EXPORT ToolManager* toolManager();
+//cxLogicManager_EXPORT ToolManager* trackingService();
 cxLogicManager_EXPORT ViewManager* viewManager();
 // access to new shared ptrs:
 cxLogicManager_EXPORT SpaceProviderPtr spaceProvider();

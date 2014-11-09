@@ -489,7 +489,7 @@ void VideoConnectionWidget::importStreamImageSlot()
 		return;
 	}
 	Transform3D rMd = Transform3D::Identity();
-	ToolPtr probe = toolManager()->findFirstProbe();
+	ToolPtr probe = trackingService()->findFirstProbe();
 	VideoSourcePtr videoSource;
 	if (probe)
 	{

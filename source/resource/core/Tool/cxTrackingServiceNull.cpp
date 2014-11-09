@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxTrackingServiceNull.h"
 #include "cxReporter.h"
+#include "cxTrackerConfiguration.h"
 
 namespace cx
 {
@@ -83,5 +84,69 @@ ToolPtr TrackingServiceNull::getManualTool()
 	return ToolPtr();
 }
 
+TrackingService::ToolMap TrackingServiceNull::getTools()
+{
+	return ToolMap();
+}
+
+bool TrackingServiceNull::isPlaybackMode() const
+{
+	return false;
+}
+
+void TrackingServiceNull::setPlaybackMode(PlaybackTimePtr controller)
+{
+
+}
+
+void TrackingServiceNull::savePositionHistory()
+{
+
+}
+
+void TrackingServiceNull::loadPositionHistory()
+{
+
+}
+
+void TrackingServiceNull::addXml(QDomNode& parentNode)
+{
+
+}
+
+void TrackingServiceNull::parseXml(QDomNode& dataNode)
+{
+
+}
+
+void TrackingServiceNull::clear()
+{
+
+}
+
+SessionToolHistoryMap TrackingServiceNull::getSessionHistory(double startTime, double stopTime)
+{
+	return SessionToolHistoryMap();
+}
+
+void TrackingServiceNull::setLoggingFolder(QString loggingFolder)
+{
+
+}
+
+void TrackingServiceNull::runDummyTool(DummyToolPtr tool)
+{
+
+}
+
+QStringList TrackingServiceNull::getSupportedTrackingSystems()
+{
+	return QStringList();
+}
+
+TrackerConfigurationPtr TrackingServiceNull::getConfiguration()
+{
+	return TrackerConfiguration::getNullObject();
+}
 
 } //cx

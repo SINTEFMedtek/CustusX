@@ -71,9 +71,9 @@ std::vector<CoordinateSystem> SpaceProviderImpl::getSpacesToPresentInGUI()
 	return retval;
 }
 
-Vector3D SpaceProviderImpl::getDominantToolTipPoint(CoordinateSystem to, bool useOffset)
+Vector3D SpaceProviderImpl::getActiveToolTipPoint(CoordinateSystem to, bool useOffset)
 {
-	Transform3D toMfrom = this->getDominantToolTipTransform(to, useOffset);
+	Transform3D toMfrom = this->getActiveToolTipTransform(to, useOffset);
 	return toMfrom.coord(Vector3D(0,0,0));
 }
 
@@ -87,9 +87,9 @@ CoordinateSystem SpaceProviderImpl::getToolCoordinateSystem(ToolPtr tool)
 
 /** return toMfrom = qMt or qMto
   */
-Transform3D SpaceProviderImpl::getDominantToolTipTransform(CoordinateSystem to, bool useOffset)
+Transform3D SpaceProviderImpl::getActiveToolTipTransform(CoordinateSystem to, bool useOffset)
 {
-	ToolPtr tool = mToolManager->getDominantTool();
+	ToolPtr tool = mToolManager->getActiveTool();
 	if (!tool)
 		return Transform3D::Identity();
 
@@ -270,7 +270,7 @@ Transform3D SpaceProviderImpl::get_rMt(QString uid)
 	ToolPtr tool = mToolManager->getTool(uid);
 
 	if (!tool && uid=="active")
-		tool = mToolManager->getDominantTool();
+		tool = mToolManager->getActiveTool();
 
 	if(!tool)
 	{
@@ -285,7 +285,7 @@ Transform3D SpaceProviderImpl::get_rMto(QString uid)
 	ToolPtr tool = mToolManager->getTool(uid);
 
 	if (!tool && uid=="active")
-		tool = mToolManager->getDominantTool();
+		tool = mToolManager->getActiveTool();
 
 	if(!tool)
 	{
@@ -303,7 +303,7 @@ Transform3D SpaceProviderImpl::get_rMs(QString uid)
 	ToolPtr tool = mToolManager->getTool(uid);
 
 	if (!tool && uid=="active")
-		tool = mToolManager->getDominantTool();
+		tool = mToolManager->getActiveTool();
 
 	if(!tool)
 	{

@@ -424,7 +424,7 @@ void ViewWrapper3D::setViewGroup(ViewGroupDataPtr group)
 void ViewWrapper3D::showToolPathSlot(bool checked)
 {
 	ToolRep3DPtr activeRep3D = RepManager::findFirstRep<ToolRep3D>(mView->getReps(),
-					mBackend->getToolManager()->getDominantTool());
+					mBackend->getToolManager()->getActiveTool());
 	if (activeRep3D)
 	{
 		if (activeRep3D->getTracer()->isRunning())
@@ -752,7 +752,7 @@ void ViewWrapper3D::updateSlices()
 		mSlices3DRep->addPlane(planes[i], mBackend->getDataManager());
 	mSlices3DRep->setShaderPath(DataLocations::getShaderPath());
 	mSlices3DRep->setImages(images);
-	mSlices3DRep->setTool(mBackend->getToolManager()->getDominantTool());
+	mSlices3DRep->setTool(mBackend->getToolManager()->getActiveTool());
 
 	mView->addRep(mSlices3DRep);
 }
@@ -764,7 +764,7 @@ ViewPtr ViewWrapper3D::getView()
 
 void ViewWrapper3D::dominantToolChangedSlot()
 {
-	ToolPtr dominantTool = mBackend->getToolManager()->getDominantTool();
+	ToolPtr dominantTool = mBackend->getToolManager()->getActiveTool();
 	mPickerRep->setTool(dominantTool);
 	if (mSlices3DRep)
 		mSlices3DRep->setTool(dominantTool);

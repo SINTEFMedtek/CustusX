@@ -247,7 +247,7 @@ void TrackingSystemIGSTKService::deconfigure()
 
 	this->destroyTrackerThread();
 
-//	this->setDominantTool(this->getManualTool()->getUid());
+//	this->setActiveTool(this->getManualTool()->getUid());
 
 	mState = Tool::tsNONE;
 	emit deconfigured();

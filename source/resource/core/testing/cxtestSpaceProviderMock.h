@@ -57,8 +57,8 @@ public:
 	virtual std::vector<cx::CoordinateSystem> getSpacesToPresentInGUI() { return std::vector<cx::CoordinateSystem>(); }
 	virtual cx::SpaceListenerPtr createListener() { return SpaceListenerMock::create(); }
 
-	virtual cx::Vector3D getDominantToolTipPoint(cx::CoordinateSystem to, bool useOffset = false) { return cx::Vector3D::Zero(); }
-	virtual cx::Transform3D getDominantToolTipTransform(cx::CoordinateSystem to, bool useOffset = false) { return cx::Transform3D::Identity(); }
+	virtual cx::Vector3D getActiveToolTipPoint(cx::CoordinateSystem to, bool useOffset = false) { return cx::Vector3D::Zero(); }
+	virtual cx::Transform3D getActiveToolTipTransform(cx::CoordinateSystem to, bool useOffset = false) { return cx::Transform3D::Identity(); }
 	virtual cx::Transform3D get_rMpr() { return cx::Transform3D::Identity(); }
 
 	virtual cx::CoordinateSystem getS(cx::ToolPtr tool) { return cx::CoordinateSystem(cx::csSENSOR); }

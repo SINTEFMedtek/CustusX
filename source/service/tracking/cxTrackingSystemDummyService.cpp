@@ -107,7 +107,7 @@ TrackerConfigurationPtr TrackingSystemDummyService::getConfiguration()
 //	TrackingSystemServicePtr dummySystem;
 //	dummySystem.reset(new TrackingSystemDummyService(tool));
 //	this->installTrackingSystem(dummySystem);
-//	this->setDominantTool(tool->getUid());
+//	this->setActiveTool(tool->getUid());
 //	dummySystem->setState(Tool::tsTRACKING);
 
 //	report("Running dummy tool " + tool->getUid());
@@ -116,7 +116,7 @@ TrackerConfigurationPtr TrackingSystemDummyService::getConfiguration()
 //	tool->setVisible(true);
 //	connect(tool.get(), SIGNAL(toolVisible(bool)), this, SLOT(dominantCheckSlot()));
 //	tool->startTracking(30);
-//	this->setDominantTool(tool->getUid());
+//	this->setActiveTool(tool->getUid());
 
 //	report("Dummy: Config/Init/Track started in toolManager");
 //	mState = Tool::tsCONFIGURED;

@@ -152,10 +152,10 @@ QString ToolMetricWrapper::getArguments() const
 void ToolMetricWrapper::resampleMetric()
 {
 //	CoordinateSystem ref = CoordinateSystemHelpers::getR();
-	Transform3D qMt = spaceProvider()->getDominantToolTipTransform(mData->getSpace(), true);
+	Transform3D qMt = spaceProvider()->getActiveToolTipTransform(mData->getSpace(), true);
 	mData->setFrame(qMt);
-	mData->setToolName(toolManager()->getDominantTool()->getName());
-	mData->setToolOffset(toolManager()->getDominantTool()->getTooltipOffset());
+	mData->setToolName(trackingService()->getActiveTool()->getName());
+	mData->setToolOffset(trackingService()->getActiveTool()->getTooltipOffset());
 }
 
 

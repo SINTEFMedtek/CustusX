@@ -71,13 +71,13 @@ void ServiceController::patientChangedSlot()
 	}
 	videoService()->getUSAcquisitionVideoPlayback()->setRoot(patientService()->getPatientData()->getActivePatientFolder() + "/US_Acq/");
 
-	toolManager()->setLoggingFolder(loggingPath);
+	trackingService()->setLoggingFolder(loggingPath);
 	reporter()->setLoggingFolder(loggingPath);
 }
 
 void ServiceController::clearPatientSlot()
 {
-	toolManager()->clear();
+	trackingService()->clear();
 	viewManager()->clear();
 }
 
@@ -85,8 +85,8 @@ void ServiceController::duringSavePatientSlot()
 {
 	QDomElement managerNode = patientService()->getPatientData()->getCurrentWorkingElement("managers");
 
-	toolManager()->addXml(managerNode);
-	toolManager()->savePositionHistory();
+	trackingService()->addXml(managerNode);
+	trackingService()->savePositionHistory();
 
 	viewManager()->addXml(managerNode);
 }
@@ -96,7 +96,7 @@ void ServiceController::duringLoadPatientSlot()
 	QDomElement managerNode = patientService()->getPatientData()->getCurrentWorkingElement("managers");
 
 	QDomNode toolmanagerNode = managerNode.namedItem("toolManager");
-	toolManager()->parseXml(toolmanagerNode);
+	trackingService()->parseXml(toolmanagerNode);
 
 	QDomNode viewmanagerNode = managerNode.namedItem("viewManager");
 	viewManager()->parseXml(viewmanagerNode);

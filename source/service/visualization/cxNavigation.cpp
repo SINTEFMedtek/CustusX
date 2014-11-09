@@ -117,7 +117,7 @@ void Navigation::centerToGlobalDataCenter()
  */
 void Navigation::centerToTooltip()
 {
-	ToolPtr tool = mBackend->getToolManager()->getDominantTool();
+	ToolPtr tool = mBackend->getToolManager()->getActiveTool();
 	Vector3D p_pr = tool->get_prMt().coord(Vector3D(0, 0, tool->getTooltipOffset()));
 	Vector3D p_r = mBackend->getDataManager()->get_rMpr().coord(p_pr);
 

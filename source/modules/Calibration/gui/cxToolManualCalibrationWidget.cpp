@@ -71,7 +71,7 @@ ToolManualCalibrationWidget::ToolManualCalibrationWidget(QWidget* parent) :
 
   mToptopLayout->addStretch();
 
-  connect(toolManager(), &ToolManager::stateChanged, this, &ToolManualCalibrationWidget::toolCalibrationChanged);
+  connect(trackingService().get(), &ToolManager::stateChanged, this, &ToolManualCalibrationWidget::toolCalibrationChanged);
 }
 
 

@@ -59,7 +59,7 @@ PlaybackWidget::PlaybackWidget(QWidget* parent) :
 	mOpen = false;
 	this->setToolTip(this->defaultWhatsThis());
 
-	connect(toolManager(), &ToolManager::stateChanged, this, &PlaybackWidget::toolManagerInitializedSlot);
+	connect(trackingService().get(), &ToolManager::stateChanged, this, &PlaybackWidget::toolManagerInitializedSlot);
 
 	mTimer.reset(new PlaybackTime());
 	mTimer->initialize(QDateTime::currentDateTime(), 100000);
@@ -168,17 +168,17 @@ void PlaybackWidget::timeLineWidgetValueChangedSlot()
 
 void PlaybackWidget::toggleOpenSlot()
 {
-	if (toolManager()->isPlaybackMode())
+	if (trackingService()->isPlaybackMode())
 	{
 		mTimer->stop();
-		toolManager()->setPlaybackMode(PlaybackTimePtr());
+		trackingService()->setPlaybackMode(PlaybackTimePtr());
 		videoService()->setPlaybackMode(PlaybackTimePtr());
 	}
 	else
 	{
-		toolManager()->setPlaybackMode(mTimer);
+		trackingService()->setPlaybackMode(mTimer);
 		videoService()->setPlaybackMode(mTimer);
-		if (!toolManager()->isPlaybackMode())
+		if (!trackingService()->isPlaybackMode())
 			return;
 		report(QString("Started Playback with start time [%1] and end time [%2]")
 						.arg(mTimer->getStartTime().toString(timestampMilliSecondsFormatNice()))
@@ -263,7 +263,7 @@ std::vector<TimelineEvent> PlaybackWidget::createEvents()
 
 	// find all valid regions (i.e. time sequences with tool navigation)
 	TimelineEventVector events;
-	ToolManager::ToolMap tools = toolManager()->getTools();
+	ToolManager::ToolMap tools = trackingService()->getTools();
 	for (ToolManager::ToolMap::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
 	{
 		if(!iter->second->hasType(Tool::TOOL_MANUAL))
@@ -333,7 +333,7 @@ std::pair<double,double> PlaybackWidget::findTimeRange(std::vector<TimelineEvent
 
 void PlaybackWidget::toolManagerInitializedSlot()
 {
-	if (toolManager()->isPlaybackMode())
+	if (trackingService()->isPlaybackMode())
 	{
 		mOpenAction->setText("Close Playback");
 		mOpenAction->setIcon(QIcon(":/icons/open_icon_library/button-green.png"));
@@ -346,7 +346,7 @@ void PlaybackWidget::toolManagerInitializedSlot()
 		return;
 	}
 
-	if (toolManager()->getState() < Tool::tsINITIALIZED)
+	if (trackingService()->getState() < Tool::tsINITIALIZED)
 		return;
 
 	std::vector<TimelineEvent> events = this->createEvents();

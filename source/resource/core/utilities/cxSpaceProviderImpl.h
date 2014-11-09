@@ -59,8 +59,8 @@ public:
 	virtual std::vector<CoordinateSystem> getSpacesToPresentInGUI();
 	virtual SpaceListenerPtr createListener();
 
-	virtual Vector3D getDominantToolTipPoint(CoordinateSystem to, bool useOffset = false); ///< P_to, dominant tools current point in coord
-	virtual Transform3D getDominantToolTipTransform(CoordinateSystem to, bool useOffset = false);///< Get toMt, where t is dominant tool
+	virtual Vector3D getActiveToolTipPoint(CoordinateSystem to, bool useOffset = false); ///< P_to, dominant tools current point in coord
+	virtual Transform3D getActiveToolTipTransform(CoordinateSystem to, bool useOffset = false);///< Get toMt, where t is dominant tool
 	virtual Transform3D get_rMpr();
 
 	virtual CoordinateSystem getS(ToolPtr tool); ///<tools sensor coordinate system

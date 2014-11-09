@@ -312,7 +312,7 @@ QString PointMetricWrapper::getArguments() const
 
 void PointMetricWrapper::moveToToolPosition()
 {
-	Vector3D p = spaceProvider()->getDominantToolTipPoint(mData->getSpace(), true);
+	Vector3D p = spaceProvider()->getActiveToolTipPoint(mData->getSpace(), true);
 	mData->setCoordinate(p);
 }
 

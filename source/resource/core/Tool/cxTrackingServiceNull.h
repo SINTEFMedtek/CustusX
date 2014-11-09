@@ -52,6 +52,22 @@ public:
 	virtual ToolPtr getReferenceTool() const;
 	virtual ToolPtr getManualTool();
 
+	virtual ToolMap getTools(); ///< get configured and initialized tools
+
+	virtual bool isPlaybackMode() const;
+	virtual void setPlaybackMode(PlaybackTimePtr controller);
+
+	virtual void savePositionHistory();
+	virtual void loadPositionHistory();
+	virtual void addXml(QDomNode& parentNode);
+	virtual void parseXml(QDomNode& dataNode);
+	virtual void clear();
+	virtual SessionToolHistoryMap getSessionHistory(double startTime, double stopTime);
+	virtual void setLoggingFolder(QString loggingFolder);
+	virtual void runDummyTool(DummyToolPtr tool);
+	virtual QStringList getSupportedTrackingSystems();
+	virtual TrackerConfigurationPtr getConfiguration();
+
 	virtual bool isNull();
 private:
 	void printWarning() const;

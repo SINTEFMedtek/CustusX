@@ -61,7 +61,7 @@ namespace cx
 
 MetricManager::MetricManager() : QObject(NULL)
 {
-	connect(toolManager(), &ToolManager::stateChanged, this, &MetricManager::metricsChanged);
+	connect(trackingService().get(), &ToolManager::stateChanged, this, &MetricManager::metricsChanged);
 	connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SIGNAL(metricsChanged()));
 }
 
@@ -112,7 +112,7 @@ void MetricManager::setManualToolPosition(Vector3D p_r)
 	Vector3D p_pr = rMpr.inv().coord(p_r);
 
 	// set the picked point as offset tip
-	ToolPtr tool = toolManager()->getManualTool();
+	ToolPtr tool = trackingService()->getManualTool();
 	Vector3D offset = tool->get_prMt().vector(Vector3D(0, 0, tool->getTooltipOffset()));
 	p_pr -= offset;
 	p_r = rMpr.coord(p_pr);
@@ -153,7 +153,7 @@ void MetricManager::addPointButtonClickedSlot()
 PointMetricPtr MetricManager::addPointInDefaultPosition()
 {
 	CoordinateSystem ref = CoordinateSystem::reference();
-	Vector3D p_ref = spaceProvider()->getDominantToolTipPoint(ref, true);
+	Vector3D p_ref = spaceProvider()->getActiveToolTipPoint(ref, true);
 	return this->addPoint(p_ref, ref);
 }
 
@@ -164,7 +164,7 @@ void MetricManager::addFrameButtonClickedSlot()
   frame->get_rMd_History()->setParentSpace("reference");
 
   CoordinateSystem ref = CoordinateSystem::reference();
-  Transform3D rMt = spaceProvider()->getDominantToolTipTransform(ref, true);
+  Transform3D rMt = spaceProvider()->getActiveToolTipTransform(ref, true);
 
   frame->setSpace(ref);
   frame->setFrame(rMt);
@@ -178,12 +178,12 @@ void MetricManager::addToolButtonClickedSlot()
   frame->get_rMd_History()->setParentSpace("reference");
 
   CoordinateSystem ref = CoordinateSystem::reference();
-  Transform3D rMt = spaceProvider()->getDominantToolTipTransform(ref, true);
+  Transform3D rMt = spaceProvider()->getActiveToolTipTransform(ref, true);
 
   frame->setSpace(ref);
   frame->setFrame(rMt);
-  frame->setToolName(toolManager()->getDominantTool()->getName());
-  frame->setToolOffset(toolManager()->getDominantTool()->getTooltipOffset());
+  frame->setToolName(trackingService()->getActiveTool()->getName());
+  frame->setToolOffset(trackingService()->getActiveTool()->getTooltipOffset());
 
   this->installNewMetric(frame);
 }
@@ -308,7 +308,7 @@ void MetricManager::installNewMetric(DataMetricPtr metric)
 
 void MetricManager::loadReferencePointsSlot()
 {
-  ToolPtr refTool = toolManager()->getReferenceTool();
+  ToolPtr refTool = trackingService()->getReferenceTool();
   if(!refTool) // we only load reference points from reference tools
   {
 	reporter()->sendDebug("No reference tool, cannot load reference points into the pointsampler");

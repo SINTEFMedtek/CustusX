@@ -616,7 +616,7 @@ void DebugTab::runDebugToolSlot()
 	dummyTool->setType(Tool::TOOL_POINTER);
 	dummyTool->setToolPositionMovement(dummyTool->createToolPositionMovementTranslationOnly(bb_r));
 	report(QString("Running debug tool inside box %1").arg(qstring_cast(bb_r)));
-	toolManager()->runDummyTool(dummyTool);
+	trackingService()->runDummyTool(dummyTool);
 }
 
 void DebugTab::saveParametersSlot()

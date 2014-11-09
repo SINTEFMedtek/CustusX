@@ -44,8 +44,8 @@ DominantToolProxy::DominantToolProxy(TrackingServiceOldPtr toolManager) :
 	connect(mToolManager.get(), SIGNAL(dominantToolChanged(const QString&)), this,
 					SIGNAL(dominantToolChanged(const QString&)));
 
-	if (mToolManager->getDominantTool())
-		this->dominantToolChangedSlot(mToolManager->getDominantTool()->getUid());
+	if (mToolManager->getActiveTool())
+		this->dominantToolChangedSlot(mToolManager->getActiveTool()->getUid());
 }
 
 void DominantToolProxy::dominantToolChangedSlot(const QString& uid)
@@ -63,7 +63,7 @@ void DominantToolProxy::dominantToolChangedSlot(const QString& uid)
 		disconnect(mTool.get(), SIGNAL(tps(int)), this, SIGNAL(tps(int)));
 	}
 
-	mTool = mToolManager->getDominantTool();
+	mTool = mToolManager->getActiveTool();
 
 	if (mTool)
 	{

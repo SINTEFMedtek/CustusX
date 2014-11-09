@@ -147,7 +147,7 @@ void ToolManagerUsingIGSTK::runDummyTool(DummyToolPtr tool)
 	this->installTrackingSystem(dummySystem);
 
 	dummySystem->setState(Tool::tsTRACKING);
-	this->setDominantTool(tool->getUid());
+	this->setActiveTool(tool->getUid());
 }
 
 void ToolManagerUsingIGSTK::installTrackingSystem(TrackingSystemServicePtr system)
@@ -214,7 +214,7 @@ void ToolManagerUsingIGSTK::rebuildCachedTools()
 
 	mTools[mManualTool->getUid()] = mManualTool;
 	this->imbueManualToolWithRealProperties();
-	this->setDominantTool(this->getManualTool()->getUid());
+	this->setActiveTool(this->getManualTool()->getUid());
 	this->loadPositionHistory(); // the tools are always reconfigured after a setloggingfolder
 
 //	reportSuccess("ToolManager is set to state ...");
@@ -288,7 +288,7 @@ ToolManager::ToolMap ToolManagerUsingIGSTK::getTools()
 ToolPtr ToolManagerUsingIGSTK::getTool(const QString& uid)
 {
 	if (uid == "active")
-		return this->getDominantTool();
+		return this->getActiveTool();
 
 	ToolPtr retval;
 	ToolManager::ToolMap::iterator it = mTools.find(uid);
@@ -298,12 +298,12 @@ ToolPtr ToolManagerUsingIGSTK::getTool(const QString& uid)
 	return retval;
 }
 
-ToolPtr ToolManagerUsingIGSTK::getDominantTool()
+ToolPtr ToolManagerUsingIGSTK::getActiveTool()
 {
 	return mDominantTool;
 }
 
-void ToolManagerUsingIGSTK::setDominantTool(const QString& uid)
+void ToolManagerUsingIGSTK::setActiveTool(const QString& uid)
 {
 	if (mDominantTool && mDominantTool->getUid() == uid)
 		return;
@@ -439,7 +439,7 @@ void ToolManagerUsingIGSTK::dominantCheckSlot()
 {
 	if (this->manualToolHasMostRecentTimestamp())
 	{
-		this->setDominantTool(this->getManualTool()->getUid());
+		this->setActiveTool(this->getManualTool()->getUid());
 		return;
 	}
 
@@ -456,7 +456,7 @@ void ToolManagerUsingIGSTK::dominantCheckSlot()
 		//sort most important tool to the start of the vector:
 		sort(tools.begin(), tools.end(), toolTypeSort);
 		const QString uid = tools[0]->getUid();
-		this->setDominantTool(uid);
+		this->setActiveTool(uid);
 	}
 }
 
@@ -594,7 +594,7 @@ ToolPtr ToolManagerUsingIGSTK::getManualTool()
  */
 ToolPtr ToolManagerUsingIGSTK::findFirstProbe()
 {
-	ToolPtr active = this->getDominantTool();
+	ToolPtr active = this->getActiveTool();
 	if (active && active->getProbe() && active->getProbe()->isValid())
 		return active;
 

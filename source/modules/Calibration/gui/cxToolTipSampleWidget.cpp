@@ -121,7 +121,7 @@ void ToolTipSampleWidget::sampleSlot()
   QFile samplingFile(mSaveToFileNameLabel->text());
 
   CoordinateSystem to = this->getSelectedCoordinateSystem();
-  Vector3D toolPoint = spaceProvider()->getDominantToolTipPoint(to, false);
+  Vector3D toolPoint = spaceProvider()->getActiveToolTipPoint(to, false);
 
   if(!samplingFile.open(QIODevice::WriteOnly | (mTruncateFile ? QIODevice::Truncate : QIODevice::Append)))
   {

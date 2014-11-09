@@ -75,10 +75,10 @@ VideoServiceOldPtr LegacySingletons::mVideoServiceOld;
 VisualizationServiceOldPtr LegacySingletons::mVisualizationService;
 StateServicePtr LegacySingletons::mStateService;
 
-ToolManager* toolManager()
-{
-	return LegacySingletons::mToolManager.get(); // TODO remove get()
-}
+//ToolManager* trackingService()
+//{
+//	return LegacySingletons::mToolManager.get(); // TODO remove get()
+//}
 DataManager* dataManager()
 {
 	return LegacySingletons::mDataManager.get(); // TODO remove get()

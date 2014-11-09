@@ -58,7 +58,7 @@ TrackedCenterlineWidget::TrackedCenterlineWidget(AcquisitionDataPtr pluginData, 
   this->setObjectName("TrackedCenterlineWidget");
   this->setWindowTitle("Tracked Centerline");
 
-	connect(toolManager(), &ToolManager::stateChanged, this, &TrackedCenterlineWidget::checkIfReadySlot);
+	connect(trackingService().get(), &ToolManager::stateChanged, this, &TrackedCenterlineWidget::checkIfReadySlot);
   mLayout->addStretch();
 
   this->checkIfReadySlot();
@@ -77,7 +77,7 @@ QString TrackedCenterlineWidget::defaultWhatsThis() const
 
 void TrackedCenterlineWidget::checkIfReadySlot()
 {
-  if(toolManager()->getState()>=Tool::tsTRACKING)
+  if(trackingService()->getState()>=Tool::tsTRACKING)
   {
     mRecordSessionWidget->setReady(true, "<font color=green>Ready to record!</font>\n");
   }
@@ -152,7 +152,7 @@ void TrackedCenterlineWidget::centerlineFinishedSlot()
 void TrackedCenterlineWidget::startedSlot(QString sessionId)
 {
   //show preview of tool path
-  ToolManager::ToolMap tools = toolManager()->getTools();
+  ToolManager::ToolMap tools = trackingService()->getTools();
   ToolManager::ToolMap::iterator toolIt = tools.begin();
 
   ViewPtr view = viewManager()->get3DView(0,0);
@@ -170,7 +170,7 @@ void TrackedCenterlineWidget::startedSlot(QString sessionId)
 void TrackedCenterlineWidget::stoppedSlot(bool)
 {
   //hide preview of tool path
-  ToolManager::ToolMap tools = toolManager()->getTools();
+  ToolManager::ToolMap tools = trackingService()->getTools();
   ToolManager::ToolMap::iterator toolIt = tools.begin();
 
   ViewPtr view = viewManager()->get3DView(0,0);
@@ -210,7 +210,7 @@ ToolPtr TrackedCenterlineWidget::findTool(double startTime, double stopTime)
 {
   ToolPtr retval;
 
-  SessionToolHistoryMap toolTransformMap = toolManager()->getSessionHistory(startTime, stopTime);
+  SessionToolHistoryMap toolTransformMap = trackingService()->getSessionHistory(startTime, stopTime);
   if(toolTransformMap.size() == 1)
   {
 	report("Found one tool("+toolTransformMap.begin()->first->getName()+") with relevant data.");

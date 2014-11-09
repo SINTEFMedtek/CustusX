@@ -58,7 +58,7 @@ QString ToolImagePreviewWidget::defaultWhatsThis() const
 
 void ToolImagePreviewWidget::previewFileSlot(const QString& absoluteFilePath)
 {
-	TrackerConfigurationPtr config = toolManager()->getConfiguration();
+	TrackerConfigurationPtr config = trackingService()->getConfiguration();
 	const QString imageAbsoluteFilePath = config->getTool(absoluteFilePath).mPictureFilename;
 	ImagePreviewWidget::previewFileSlot(imageAbsoluteFilePath);
 }

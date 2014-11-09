@@ -115,11 +115,11 @@ ToolPtr DummyToolManager::getTool(const QString& uid)
 	return (*it).second;
 }
 
-ToolPtr DummyToolManager::getDominantTool()
+ToolPtr DummyToolManager::getActiveTool()
 {
 	return mDominantTool;
 }
-void DummyToolManager::setDominantTool(const QString& uid)
+void DummyToolManager::setActiveTool(const QString& uid)
 {
 	DummyToolMapConstIter it = mDummyTools.find(uid);
 	mDominantTool = (*it).second;

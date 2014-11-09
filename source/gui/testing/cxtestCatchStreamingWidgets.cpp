@@ -63,7 +63,7 @@ TEST_CASE("VideoConnectionWidget can stream", "[unit][gui][not_win32][widget][st
 
 	cx::DummyToolPtr tool = cx::DummyToolTestUtilities::createDummyTool(cx::DummyToolTestUtilities::createProbeDataLinear(), ts);
 	ts->runDummyTool(tool);
-	ts->setDominantTool(tool->getUid());
+	ts->setActiveTool(tool->getUid());
 
 	REQUIRE((ts->getState()>=cx::Tool::tsTRACKING));
 //	while(ts->getState()>=cx::Tool::tsTRACKING)

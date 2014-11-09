@@ -58,7 +58,7 @@ SamplerWidget::SamplerWidget(QWidget* parent) :
 	connect(mActiveTool.get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(setModified()));
 	connect(mActiveTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), SLOT(setModified()));
 	connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SLOT(spacesChangedSlot()));
-	connect(toolManager(), &ToolManager::stateChanged, this, &SamplerWidget::spacesChangedSlot);
+	connect(trackingService().get(), &ToolManager::stateChanged, this, &SamplerWidget::spacesChangedSlot);
 
 	mLayout = new QHBoxLayout(this);
 	mLayout->setMargin(4);
@@ -148,14 +148,14 @@ void SamplerWidget::spacesChangedSlot()
 void SamplerWidget::prePaintEvent()
 {
 	CoordinateSystem space = CoordinateSystem::fromString(mSpaceSelector->getValue());
-	Vector3D p = spaceProvider()->getDominantToolTipPoint(space, true);
+	Vector3D p = spaceProvider()->getActiveToolTipPoint(space, true);
 	int w=1;
 	QString coord = QString("%1, %2, %3").arg(p[0], w, 'f', 1).arg(p[1], w, 'f', 1).arg(p[2], w, 'f', 1);
 
 	ImagePtr image = dataManager()->getActiveImage();
 	if (image)
 	{
-		Vector3D p = spaceProvider()->getDominantToolTipPoint(Space(csDATA_VOXEL,"active"), true);
+		Vector3D p = spaceProvider()->getActiveToolTipPoint(Space(csDATA_VOXEL,"active"), true);
 		IntBoundingBox3D bb(Eigen::Vector3i(0,0,0),
 		                         Eigen::Vector3i(image->getBaseVtkImageData()->GetDimensions())-Eigen::Vector3i(1,1,1));
 		if (bb.contains(p.cast<int>()))

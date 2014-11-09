@@ -63,7 +63,7 @@ PointSamplingWidget::PointSamplingWidget(QWidget* parent) :
   mRemoveButton(new QPushButton("Remove", this)),
   mLoadReferencePointsButton(new QPushButton("Load reference points", this))
 {
-	connect(toolManager(), &ToolManager::stateChanged, this, &PointSamplingWidget::updateSlot);
+	connect(trackingService().get(), &ToolManager::stateChanged, this, &PointSamplingWidget::updateSlot);
 
   //table widget
   connect(mTable, SIGNAL(itemSelectionChanged()), this, SLOT(itemSelectionChanged()));
@@ -200,7 +200,7 @@ void PointSamplingWidget::enablebuttons()
   mAddButton->setEnabled(true);
   mEditButton->setEnabled(mActiveLandmark!="");
   mRemoveButton->setEnabled(mActiveLandmark!="");
-  mLoadReferencePointsButton->setEnabled(toolManager()->getReferenceTool() ? true : false);
+  mLoadReferencePointsButton->setEnabled(trackingService()->getReferenceTool() ? true : false);
 }
 
 void PointSamplingWidget::addPoint(Vector3D point)
@@ -221,7 +221,7 @@ void PointSamplingWidget::addPoint(Vector3D point)
 
 void PointSamplingWidget::setManualTool(const Vector3D& p_r)
 {
-  ToolPtr tool = toolManager()->getManualTool();
+  ToolPtr tool = trackingService()->getManualTool();
 
   //Transform3D sMr = mSliceProxy->get_sMr();
   Transform3D rMpr = dataManager()->get_rMpr();
@@ -254,7 +254,7 @@ void PointSamplingWidget::addButtonClickedSlot()
 Vector3D PointSamplingWidget::getSample() const
 {
 //  CoordinateSystem ref = spaceProvider()->getR();
-  Vector3D P_ref = spaceProvider()->getDominantToolTipPoint(CoordinateSystem::reference(), true);
+  Vector3D P_ref = spaceProvider()->getActiveToolTipPoint(CoordinateSystem::reference(), true);
 
   return P_ref;
 }
@@ -292,7 +292,7 @@ void PointSamplingWidget::gotoButtonClickedSlot()
 
 void PointSamplingWidget::loadReferencePointsSlot()
 {
-  ToolPtr refTool = toolManager()->getReferenceTool();
+  ToolPtr refTool = trackingService()->getReferenceTool();
   if(!refTool) // we only load reference points from reference tools
   {
     reporter()->sendDebug("No reference tool, cannot load reference points into the pointsampler");

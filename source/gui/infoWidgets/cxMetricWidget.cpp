@@ -475,7 +475,7 @@ bool MetricWidget::checkEqual(const std::vector<MetricBasePtr>& a, const std::ve
 void MetricWidget::enablebuttons()
 {
 	mRemoveAction->setEnabled(!mMetricManager->getActiveUid().isEmpty());
-  mLoadReferencePointsAction->setEnabled(toolManager()->getReferenceTool() ? true : false);
+  mLoadReferencePointsAction->setEnabled(trackingService()->getReferenceTool() ? true : false);
 }
 
 void MetricWidget::loadReferencePointsSlot()

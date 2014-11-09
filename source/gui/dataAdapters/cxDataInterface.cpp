@@ -228,12 +228,12 @@ QString ActiveVideoSourceStringDataAdapter::getHelp() const
 
 SelectToolStringDataAdapterBase::SelectToolStringDataAdapterBase()
 {
-	connect(toolManager(), &ToolManager::stateChanged, this, &SelectToolStringDataAdapterBase::changed);
+	connect(trackingService().get(), &ToolManager::stateChanged, this, &SelectToolStringDataAdapterBase::changed);
 }
 
 QStringList SelectToolStringDataAdapterBase::getValueRange() const
 {
-	ToolManager::ToolMap tools = toolManager()->getTools();
+	ToolManager::ToolMap tools = trackingService()->getTools();
 
 	QStringList retval;
 	for (ToolManager::ToolMap::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
@@ -243,7 +243,7 @@ QStringList SelectToolStringDataAdapterBase::getValueRange() const
 
 QString SelectToolStringDataAdapterBase::convertInternal2Display(QString internal)
 {
-  ToolPtr tool = toolManager()->getTool(internal);
+  ToolPtr tool = trackingService()->getTool(internal);
   if (!tool)
   {
     return "<no tool>";
@@ -367,7 +367,7 @@ void SelectRTSourceStringDataAdapter::setDefaultSlot()
 SelectCoordinateSystemStringDataAdapter::SelectCoordinateSystemStringDataAdapter()
 {
 	mCoordinateSystem = csCOUNT;
-  connect(toolManager(), &ToolManager::stateChanged, this, &SelectCoordinateSystemStringDataAdapter::setDefaultSlot);
+  connect(trackingService().get(), &ToolManager::stateChanged, this, &SelectCoordinateSystemStringDataAdapter::setDefaultSlot);
 }
 
 QString SelectCoordinateSystemStringDataAdapter::getDisplayName() const
@@ -426,7 +426,7 @@ bool SelectToolStringDataAdapter::setValue(const QString& value)
 {
   if(mTool && value==mTool->getUid())
     return false;
-  ToolPtr temp = toolManager()->getTool(value);
+  ToolPtr temp = trackingService()->getTool(value);
   if(!temp)
     return false;
 

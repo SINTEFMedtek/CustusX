@@ -508,7 +508,7 @@ void ViewWrapper2D::dataRemoved(const QString& uid)
 
 void ViewWrapper2D::dominantToolChangedSlot()
 {
-	ToolPtr dominantTool = mBackend->getToolManager()->getDominantTool();
+	ToolPtr dominantTool = mBackend->getToolManager()->getActiveTool();
 	mSliceProxy->setTool(dominantTool);
 }
 

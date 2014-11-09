@@ -37,8 +37,8 @@ namespace cx
 
 DoubleDataAdapterTimeCalibration::DoubleDataAdapterTimeCalibration()
 {
-  connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChanged()));
-  connect(toolManager(), &ToolManager::stateChanged, this, &DoubleDataAdapterTimeCalibration::dominantToolChanged);
+  connect(trackingService().get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChanged()));
+  connect(trackingService().get(), &ToolManager::stateChanged, this, &DoubleDataAdapterTimeCalibration::dominantToolChanged);
   this->dominantToolChanged();
 }
 
@@ -48,14 +48,14 @@ void DoubleDataAdapterTimeCalibration::dominantToolChanged()
 
   // ignore tool changes to something non-probeish.
   // This gives the user a chance to use the widget without having to show the probe.
-  ToolPtr newTool = toolManager()->getDominantTool();
+  ToolPtr newTool = trackingService()->getActiveTool();
   if (!newTool || !newTool->hasType(Tool::TOOL_US_PROBE))
     return;
 
   if (mTool)
     disconnect(mTool->getProbe().get(), SIGNAL(sectorChanged()), this, SIGNAL(changed()));
 
-  mTool = toolManager()->getDominantTool();
+  mTool = trackingService()->getActiveTool();
 
   if (mTool)
     connect(mTool->getProbe().get(), SIGNAL(sectorChanged()), this, SIGNAL(changed()));

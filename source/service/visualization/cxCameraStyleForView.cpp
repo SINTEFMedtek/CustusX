@@ -189,7 +189,7 @@ void CameraStyleForView::moveCameraToolStyleSlot(Transform3D prMt, double timest
 
 void CameraStyleForView::dominantToolChangedSlot()
 {
-	ToolPtr newTool = mBackend->getToolManager()->getDominantTool();
+	ToolPtr newTool = mBackend->getToolManager()->getActiveTool();
 	if (newTool == mFollowingTool)
 		return;
 
@@ -207,7 +207,7 @@ void CameraStyleForView::connectTool()
 	if (!this->isToolFollowingStyle(mCameraStyleForView))
 		return;
 
-	mFollowingTool = mBackend->getToolManager()->getDominantTool();
+	mFollowingTool = mBackend->getToolManager()->getActiveTool();
 
 	if (!mFollowingTool)
 		return;

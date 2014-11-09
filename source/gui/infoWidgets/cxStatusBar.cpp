@@ -66,13 +66,13 @@ StatusBar::StatusBar() :
 {
 	connect(reporter(), SIGNAL(emittedMessage(Message)), this, SLOT(showMessageSlot(Message)));
 
-	connect(toolManager(), &ToolManager::stateChanged, this, &StatusBar::resetToolManagerConnection);
+	connect(trackingService().get(), &ToolManager::stateChanged, this, &StatusBar::resetToolManagerConnection);
 
 	cx::TrackingServiceOldPtr ts = cx::logicManager()->getTrackingService();
 	mActiveTool = DominantToolProxy::New(ts);
 	connect(mActiveTool.get(), &DominantToolProxy::tps, this, &StatusBar::tpsSlot);
 
-	connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(updateToolButtons()));
+	connect(trackingService().get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(updateToolButtons()));
 
 	connect(viewManager(), SIGNAL(fps(int)), this, SLOT(renderingFpsSlot(int)));
 
@@ -90,7 +90,7 @@ StatusBar::~StatusBar()
 void StatusBar::resetToolManagerConnection()
 {
 	this->disconnectFromToolSignals();
-	if (toolManager()->getState()>=Tool::tsCONFIGURED)
+	if (trackingService()->getState()>=Tool::tsCONFIGURED)
 		this->connectToToolSignals();
 	this->updateToolButtons();
 }
@@ -101,13 +101,13 @@ void StatusBar::connectToToolSignals()
 
 	this->addPermanentWidget(mTpsLabel);
 
-	ToolManager::ToolMap tools = toolManager()->getTools();
+	ToolManager::ToolMap tools = trackingService()->getTools();
 	for (ToolManager::ToolMap::iterator it = tools.begin(); it != tools.end(); ++it)
 	{
 		ToolPtr tool = it->second;
 		if (tool->hasType(Tool::TOOL_MANUAL))
 			continue;
-		if (tool == toolManager()->getManualTool())
+		if (tool == trackingService()->getManualTool())
 			continue;
 		connect(tool.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateToolButtons()));
 
@@ -147,12 +147,12 @@ void StatusBar::disconnectFromToolSignals()
 
 void StatusBar::activateTool(QString uid)
 {
-	toolManager()->setDominantTool(uid);
+	trackingService()->setActiveTool(uid);
 }
 
 void StatusBar::updateToolButtons()
 {
-	ToolPtr dominant = toolManager()->getDominantTool();
+	ToolPtr dominant = trackingService()->getActiveTool();
 
 	for (unsigned i = 0; i < mToolData.size(); ++i)
 	{

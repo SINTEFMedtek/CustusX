@@ -56,8 +56,8 @@ USAcquisition::USAcquisition(AcquisitionPtr base, QObject* parent) : QObject(par
 	connect(mCore.get(), SIGNAL(saveDataCompleted(QString)), this, SIGNAL(saveDataCompleted(QString)));
 
 
-	connect(toolManager(), &ToolManager::stateChanged, this, &USAcquisition::checkIfReadySlot);
-	connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(checkIfReadySlot()));
+	connect(trackingService().get(), &ToolManager::stateChanged, this, &USAcquisition::checkIfReadySlot);
+	connect(trackingService().get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(checkIfReadySlot()));
 	connect(videoService().get(), SIGNAL(activeVideoSourceChanged()), this, SLOT(checkIfReadySlot()));
 	connect(videoService()->getVideoConnection().get(), SIGNAL(connected(bool)), this, SLOT(checkIfReadySlot()));
 
@@ -75,9 +75,9 @@ USAcquisition::~USAcquisition()
 
 void USAcquisition::checkIfReadySlot()
 {
-	bool tracking = toolManager()->getState()>=Tool::tsTRACKING;
+	bool tracking = trackingService()->getState()>=Tool::tsTRACKING;
 	bool streaming = videoService()->getVideoConnection()->isConnected();
-	ToolPtr tool = toolManager()->findFirstProbe();
+	ToolPtr tool = trackingService()->findFirstProbe();
 
 	QString mWhatsMissing;
 	mWhatsMissing.clear();
@@ -124,7 +124,7 @@ void USAcquisition::recordStarted()
 {
 	mBase->getPluginData()->getReconstructer()->selectData(USReconstructInputData()); // clear old data in reconstructeer
 
-	ToolPtr tool = toolManager()->findFirstProbe();
+	ToolPtr tool = trackingService()->findFirstProbe();
 	mCore->setWriteColor(this->getWriteColor());
 	mCore->startRecord(mBase->getLatestSession(), tool, this->getRecordingVideoSources(tool));
 }

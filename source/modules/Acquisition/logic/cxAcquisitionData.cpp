@@ -203,7 +203,7 @@ void Acquisition::stopRecord()
 
 	mLatestSession->setStopTime(getMilliSecondsSinceEpoch());
 	mPluginData->addRecordSession(mLatestSession);
-	toolManager()->savePositionHistory(); //asks all the tools to save their transforms and timestamps
+	trackingService()->savePositionHistory(); //asks all the tools to save their transforms and timestamps
 	reporter()->playStopSound();
 	this->setState(sNOT_RUNNING);
 }

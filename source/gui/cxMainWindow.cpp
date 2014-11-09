@@ -459,13 +459,13 @@ void MainWindow::createActions()
 
 //	connect(mConfigureToolsAction, &QAction::triggered, this, boost::bind(&MainWindow::setState, this, Tool::tsCONFIGURED));
 	connect(mConfigureToolsAction, SIGNAL(triggered()), this, SLOT(configureSlot()));
-	boost::function<void()> finit = boost::bind(&ToolManager::setState, toolManager(), Tool::tsINITIALIZED);
+	boost::function<void()> finit = boost::bind(&ToolManager::setState, trackingService(), Tool::tsINITIALIZED);
 	connect(mInitializeToolsAction, &QAction::triggered, finit);
 //	connect(mTrackingToolsAction, SIGNAL(triggered()), this, SLOT(toggleTrackingSlot()));
-	boost::function<void()> fsavetools = boost::bind(&ToolManager::savePositionHistory, toolManager());
+	boost::function<void()> fsavetools = boost::bind(&ToolManager::savePositionHistory, trackingService());
 	connect(mSaveToolsPositionsAction, &QAction::triggered, fsavetools);
-	connect(toolManager(), SIGNAL(stateChanged()), this, SLOT(updateTrackingActionSlot()));
-	connect(toolManager(), SIGNAL(stateChanged()), this, SLOT(updateTrackingActionSlot()));
+	connect(trackingService().get(), SIGNAL(stateChanged()), this, SLOT(updateTrackingActionSlot()));
+	connect(trackingService().get(), SIGNAL(stateChanged()), this, SLOT(updateTrackingActionSlot()));
 	this->updateTrackingActionSlot();
 
 	mCenterToImageCenterAction = new QAction(tr("Center Image"), this);
@@ -623,7 +623,7 @@ void MainWindow::updatePointPickerActionSlot()
 
 void MainWindow::updateTrackingActionSlot()
 {
-	if (toolManager()->getState() >= Tool::tsTRACKING)
+	if (trackingService()->getState() >= Tool::tsTRACKING)
 	{
 		mTrackingToolsAction->setIcon(QIcon(":/icons/polaris-green.png"));
 		mTrackingToolsAction->setText("Stop Tracking");
@@ -637,10 +637,10 @@ void MainWindow::updateTrackingActionSlot()
 
 void MainWindow::toggleTrackingSlot()
 {
-	if (toolManager()->getState() >= Tool::tsTRACKING)
-		toolManager()->setState(Tool::tsINITIALIZED);
+	if (trackingService()->getState() >= Tool::tsTRACKING)
+		trackingService()->setState(Tool::tsINITIALIZED);
 	else
-		toolManager()->setState(Tool::tsTRACKING);
+		trackingService()->setState(Tool::tsTRACKING);
 }
 
 namespace
@@ -1044,7 +1044,7 @@ void MainWindow::deleteDataSlot()
 
 void MainWindow::configureSlot()
 {
-	toolManager()->setState(Tool::tsCONFIGURED);
+	trackingService()->setState(Tool::tsCONFIGURED);
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)

@@ -110,8 +110,8 @@ public:
 //	virtual void setTooltipOffset(double offset); ///< set the tool tip offset
 //	virtual double getTooltipOffset() const; ///< get the tool tip offset
 
-	virtual ToolPtr getDominantTool(); ///< get the dominant tool
-	virtual void setDominantTool(const QString& uid); ///< can be set to either a connected or configured tool
+	virtual ToolPtr getActiveTool(); ///< get the dominant tool
+	virtual void setActiveTool(const QString& uid); ///< can be set to either a connected or configured tool
 
 	virtual ToolPtr getReferenceTool() const; ///< get the tool that is used as a reference, if any
 

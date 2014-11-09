@@ -69,7 +69,7 @@ ToolConfigureGroupBox::ToolConfigureGroupBox(QWidget* parent) :
   mApplicationGroupBox->setEnabledButtons(false); //< application application is determined by the application state chosen elsewhere in the system
   mApplicationGroupBox->hide(); // large and redundant box - info is only used for path generation, which can be found in the "Save Path" box
   mApplicationGroupBox->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Expanding);
-  mTrackingSystemGroupBox = new SelectionGroupBox("Tracking systems", toolManager()->getSupportedTrackingSystems(), Qt::Horizontal, true, NULL);
+  mTrackingSystemGroupBox = new SelectionGroupBox("Tracking systems", trackingService()->getSupportedTrackingSystems(), Qt::Horizontal, true, NULL);
   mToolListWidget = new ConfigToolListWidget(NULL);
 
   this->setClinicalApplicationSlot(string2enum<CLINICAL_APPLICATION>(stateService()->getApplication()->getActiveStateName()));
@@ -151,10 +151,10 @@ QString ToolConfigureGroupBox::requestSaveConfigurationSlot()
     return retval;
 
   // deconfigure toolmanager in order to be able to reread config data
-  toolManager()->setState(Tool::tsNONE);
+  trackingService()->setState(Tool::tsNONE);
 
   TrackerConfiguration::Configuration current = this->getCurrentConfiguration();
-  TrackerConfigurationPtr config = toolManager()->getConfiguration();
+  TrackerConfigurationPtr config = trackingService()->getConfiguration();
   config->saveConfiguration(current);
 
   retval = current.mUid;
@@ -180,7 +180,7 @@ void ToolConfigureGroupBox::configChangedSlot()
 	QString absoluteConfigFilePath = mConfigFilesComboBox->itemData(mConfigFilesComboBox->currentIndex(),
 					Qt::ToolTipRole).toString();
 	bool suggestDefaultNames;
-	TrackerConfigurationPtr config = toolManager()->getConfiguration();
+	TrackerConfigurationPtr config = trackingService()->getConfiguration();
 
 	if (mConfigFilesComboBox->currentText().contains("<new config>"))
 	{
@@ -257,7 +257,7 @@ void ToolConfigureGroupBox::populateConfigurations()
 {
   mConfigFilesComboBox->clear();
 
-  TrackerConfigurationPtr config = toolManager()->getConfiguration();
+  TrackerConfigurationPtr config = trackingService()->getConfiguration();
   QStringList configurations = config->getConfigurationsGivenApplication(enum2string(mClinicalApplication));
 
   foreach(QString filename, configurations)
@@ -317,7 +317,7 @@ QString ToolConfigureGroupBox::generateConfigName()
 {
 	QStringList applicationFilter = mApplicationGroupBox->getSelected();
 	QString app = ((applicationFilter.size() >= 1) ? applicationFilter[0] : "");
-	TrackerConfigurationPtr config = toolManager()->getConfiguration();
+	TrackerConfigurationPtr config = trackingService()->getConfiguration();
 	QString root = config->getConfigurationApplicationsPath(app);
 	return root + "/MyConfig.xml";
 }
@@ -335,7 +335,7 @@ void ToolConfigureGroupBox::populateReference()
 
 	int currentIndex = -1;
 
-	TrackerConfigurationPtr config = toolManager()->getConfiguration();
+	TrackerConfigurationPtr config = trackingService()->getConfiguration();
 
 	// populate list
 	QStringList selectedTools = mToolListWidget->getTools();

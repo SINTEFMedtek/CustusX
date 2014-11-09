@@ -139,7 +139,7 @@ void AcquisitionFixture::initialize()
 	// run setup of video, probe and start acquisition in series, each depending on the success of the previous:
 	QTimer::singleShot(0, this, SLOT(setupVideo()));
 	connect(cx::videoService()->getVideoConnection().get(), SIGNAL(connected(bool)), this, SLOT(videoConnectedSlot()));
-	connect(cx::toolManager(), &cx::ToolManager::stateChanged, this, &AcquisitionFixture::start);
+	connect(cx::trackingService().get(), &cx::ToolManager::stateChanged, this, &AcquisitionFixture::start);
 }
 
 void AcquisitionFixture::videoConnectedSlot()
@@ -158,7 +158,7 @@ void AcquisitionFixture::videoConnectedSlot()
 
 void AcquisitionFixture::start()
 {
-	if (cx::toolManager()->getState() < cx::Tool::tsTRACKING)
+	if (cx::trackingService()->getState() < cx::Tool::tsTRACKING)
 		return;
 
 	SSC_LOG("");

@@ -42,8 +42,8 @@ namespace cx
 
 ActiveToolStringDataAdapter::ActiveToolStringDataAdapter()
 {
-  connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SIGNAL(changed()));
-  connect(toolManager(), &ToolManager::stateChanged, this, &ActiveToolStringDataAdapter::changed);
+  connect(trackingService().get(), SIGNAL(dominantToolChanged(const QString&)), this, SIGNAL(changed()));
+  connect(trackingService().get(), &ToolManager::stateChanged, this, &ActiveToolStringDataAdapter::changed);
 }
 
 QString ActiveToolStringDataAdapter::getDisplayName() const
@@ -53,20 +53,20 @@ QString ActiveToolStringDataAdapter::getDisplayName() const
 
 bool ActiveToolStringDataAdapter::setValue(const QString& value)
 {
-  ToolPtr newTool = toolManager()->getTool(value);
+  ToolPtr newTool = trackingService()->getTool(value);
   if (!newTool)
 	  return false;
-  if(newTool == toolManager()->getDominantTool())
+  if(newTool == trackingService()->getActiveTool())
     return false;
-  toolManager()->setDominantTool(newTool->getUid());
+  trackingService()->setActiveTool(newTool->getUid());
   return true;
 }
 
 QString ActiveToolStringDataAdapter::getValue() const
 {
-  if (!toolManager()->getDominantTool())
+  if (!trackingService()->getActiveTool())
     return "";
-  return qstring_cast(toolManager()->getDominantTool()->getUid());
+  return qstring_cast(trackingService()->getActiveTool()->getUid());
 }
 
 QString ActiveToolStringDataAdapter::getHelp() const
@@ -76,7 +76,7 @@ QString ActiveToolStringDataAdapter::getHelp() const
 
 QStringList ActiveToolStringDataAdapter::getValueRange() const
 {
-	ToolManager::ToolMap tools = toolManager()->getTools();
+	ToolManager::ToolMap tools = trackingService()->getTools();
 
 	QStringList retval;
 	for (ToolManager::ToolMap::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
@@ -86,7 +86,7 @@ QStringList ActiveToolStringDataAdapter::getValueRange() const
 
 QString ActiveToolStringDataAdapter::convertInternal2Display(QString internal)
 {
-  ToolPtr tool = toolManager()->getTool(internal);
+  ToolPtr tool = trackingService()->getTool(internal);
   if (!tool)
     return "<no tool>";
   return qstring_cast(tool->getName());
@@ -105,8 +105,8 @@ QString ActiveToolStringDataAdapter::convertInternal2Display(QString internal)
 
 ActiveProbeConfigurationStringDataAdapter::ActiveProbeConfigurationStringDataAdapter()
 {
-  connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChanged()));
-  connect(toolManager(), &ToolManager::stateChanged, this, &ActiveProbeConfigurationStringDataAdapter::dominantToolChanged);
+  connect(trackingService().get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChanged()));
+  connect(trackingService().get(), &ToolManager::stateChanged, this, &ActiveProbeConfigurationStringDataAdapter::dominantToolChanged);
   this->dominantToolChanged();
 }
 
@@ -114,7 +114,7 @@ void ActiveProbeConfigurationStringDataAdapter::dominantToolChanged()
 {
 	// ignore tool changes to something non-probeish.
 	// This gives the user a chance to use the widget without having to show the probe.
-	ToolPtr newTool = toolManager()->findFirstProbe();
+	ToolPtr newTool = trackingService()->findFirstProbe();
 	if (!newTool || !newTool->getProbe())
 		return;
 
