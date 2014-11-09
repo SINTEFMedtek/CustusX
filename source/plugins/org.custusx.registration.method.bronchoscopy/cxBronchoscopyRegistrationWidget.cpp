@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkPolyData.h>
 #include "cxTransform3D.h"
 #include "cxDataSelectWidget.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxMesh.h"
 #include "cxAcquisitionData.h"
 #include "cxSelectDataStringDataAdapter.h"

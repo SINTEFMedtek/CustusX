@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxToolDataAdapters.h>
 
 #include "cxTypeConversions.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxTool.h"
 
 namespace cx
@@ -43,7 +43,7 @@ namespace cx
 ActiveToolStringDataAdapter::ActiveToolStringDataAdapter()
 {
   connect(trackingService().get(), SIGNAL(dominantToolChanged(const QString&)), this, SIGNAL(changed()));
-  connect(trackingService().get(), &ToolManager::stateChanged, this, &ActiveToolStringDataAdapter::changed);
+  connect(trackingService().get(), &TrackingService::stateChanged, this, &ActiveToolStringDataAdapter::changed);
 }
 
 QString ActiveToolStringDataAdapter::getDisplayName() const
@@ -76,10 +76,10 @@ QString ActiveToolStringDataAdapter::getHelp() const
 
 QStringList ActiveToolStringDataAdapter::getValueRange() const
 {
-	ToolManager::ToolMap tools = trackingService()->getTools();
+	TrackingService::ToolMap tools = trackingService()->getTools();
 
 	QStringList retval;
-	for (ToolManager::ToolMap::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
+	for (TrackingService::ToolMap::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
 		retval << iter->second->getUid();
 	return retval;
 }
@@ -106,7 +106,7 @@ QString ActiveToolStringDataAdapter::convertInternal2Display(QString internal)
 ActiveProbeConfigurationStringDataAdapter::ActiveProbeConfigurationStringDataAdapter()
 {
   connect(trackingService().get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChanged()));
-  connect(trackingService().get(), &ToolManager::stateChanged, this, &ActiveProbeConfigurationStringDataAdapter::dominantToolChanged);
+  connect(trackingService().get(), &TrackingService::stateChanged, this, &ActiveProbeConfigurationStringDataAdapter::dominantToolChanged);
   this->dominantToolChanged();
 }
 
@@ -114,7 +114,7 @@ void ActiveProbeConfigurationStringDataAdapter::dominantToolChanged()
 {
 	// ignore tool changes to something non-probeish.
 	// This gives the user a chance to use the widget without having to show the probe.
-	ToolPtr newTool = trackingService()->findFirstProbe();
+	ToolPtr newTool = trackingService()->getFirstProbe();
 	if (!newTool || !newTool->getProbe())
 		return;
 

@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMesh.h"
 #include "cxReporter.h"
 #include "cxImageLUT2D.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxTypeConversions.h"
 #include "cxDefinitionStrings.h"
 #include "cxEnumConverter.h"
@@ -228,15 +228,15 @@ QString ActiveVideoSourceStringDataAdapter::getHelp() const
 
 SelectToolStringDataAdapterBase::SelectToolStringDataAdapterBase()
 {
-	connect(trackingService().get(), &ToolManager::stateChanged, this, &SelectToolStringDataAdapterBase::changed);
+	connect(trackingService().get(), &TrackingService::stateChanged, this, &SelectToolStringDataAdapterBase::changed);
 }
 
 QStringList SelectToolStringDataAdapterBase::getValueRange() const
 {
-	ToolManager::ToolMap tools = trackingService()->getTools();
+	TrackingService::ToolMap tools = trackingService()->getTools();
 
 	QStringList retval;
-	for (ToolManager::ToolMap::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
+	for (TrackingService::ToolMap::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
 		retval << iter->second->getUid();
 	return retval;
 }
@@ -367,7 +367,7 @@ void SelectRTSourceStringDataAdapter::setDefaultSlot()
 SelectCoordinateSystemStringDataAdapter::SelectCoordinateSystemStringDataAdapter()
 {
 	mCoordinateSystem = csCOUNT;
-  connect(trackingService().get(), &ToolManager::stateChanged, this, &SelectCoordinateSystemStringDataAdapter::setDefaultSlot);
+  connect(trackingService().get(), &TrackingService::stateChanged, this, &SelectCoordinateSystemStringDataAdapter::setDefaultSlot);
 }
 
 QString SelectCoordinateSystemStringDataAdapter::getDisplayName() const

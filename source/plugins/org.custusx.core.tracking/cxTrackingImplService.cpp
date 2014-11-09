@@ -48,7 +48,7 @@ namespace cx
 TrackingImplService::TrackingImplService(ctkPluginContext *context) :
 	mContext(context )
 {
-	mOld = LogicManager::getInstance()->getTrackingService();
+//	mOld = LogicManager::getInstance()->getTrackingService();
 	connect(mOld.get(), &ToolManager::stateChanged, this, &TrackingService::stateChanged);
 	connect(mOld.get(), &ToolManager::dominantToolChanged, this, &TrackingService::dominantToolChanged);
 }
@@ -68,6 +68,16 @@ bool TrackingImplService::isNull()
 	return false;
 }
 
+Tool::State TrackingImplService::getState() const
+{
+	return this->getOld()->getState();
+}
+
+void TrackingImplService::setState(const Tool::State val)
+{
+	this->getOld()->setState(val);
+}
+
 ToolPtr TrackingImplService::getTool(const QString& uid)
 {
 	return this->getOld()->getTool(uid);
@@ -85,7 +95,7 @@ void TrackingImplService::setActiveTool(const QString& uid)
 
 ToolPtr TrackingImplService::getFirstProbe()
 {
-	return this->getOld()->findFirstProbe();
+	return this->getOld()->getFirstProbe();
 }
 
 ToolPtr TrackingImplService::getReferenceTool() const

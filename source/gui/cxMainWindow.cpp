@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataManager.h"
 #include "cxViewManager.h"
 #include "cxRepManager.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxStatusBar.h"
 #include "cxVolumePropertiesWidget.h"
 #include "cxNavigationWidget.h"
@@ -459,10 +459,10 @@ void MainWindow::createActions()
 
 //	connect(mConfigureToolsAction, &QAction::triggered, this, boost::bind(&MainWindow::setState, this, Tool::tsCONFIGURED));
 	connect(mConfigureToolsAction, SIGNAL(triggered()), this, SLOT(configureSlot()));
-	boost::function<void()> finit = boost::bind(&ToolManager::setState, trackingService(), Tool::tsINITIALIZED);
+	boost::function<void()> finit = boost::bind(&TrackingService::setState, trackingService(), Tool::tsINITIALIZED);
 	connect(mInitializeToolsAction, &QAction::triggered, finit);
 //	connect(mTrackingToolsAction, SIGNAL(triggered()), this, SLOT(toggleTrackingSlot()));
-	boost::function<void()> fsavetools = boost::bind(&ToolManager::savePositionHistory, trackingService());
+	boost::function<void()> fsavetools = boost::bind(&TrackingService::savePositionHistory, trackingService());
 	connect(mSaveToolsPositionsAction, &QAction::triggered, fsavetools);
 	connect(trackingService().get(), SIGNAL(stateChanged()), this, SLOT(updateTrackingActionSlot()));
 	connect(trackingService().get(), SIGNAL(stateChanged()), this, SLOT(updateTrackingActionSlot()));

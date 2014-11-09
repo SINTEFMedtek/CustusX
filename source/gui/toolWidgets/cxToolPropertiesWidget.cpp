@@ -40,12 +40,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QCheckBox>
 
 #include "cxReporter.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxTypeConversions.h"
 //#include "UsConfigGui.h"
 #include "cxDataInterface.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxTool.h"
 #include "cxToolDataAdapters.h"
 #include "cxActiveToolWidget.h"
@@ -122,11 +122,11 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
 
   mToptopLayout->addStretch();
 
-  connect(trackingService().get(), &ToolManager::stateChanged, this, &ToolPropertiesWidget::referenceToolChangedSlot);
+  connect(trackingService().get(), &TrackingService::stateChanged, this, &ToolPropertiesWidget::referenceToolChangedSlot);
 
   connect(trackingService().get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
 
-  connect(trackingService().get(), &ToolManager::stateChanged, this, &ToolPropertiesWidget::updateSlot);
+  connect(trackingService().get(), &TrackingService::stateChanged, this, &ToolPropertiesWidget::updateSlot);
   connect(trackingService().get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(updateSlot()));
 
   this->dominantToolChangedSlot();

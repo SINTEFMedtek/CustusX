@@ -52,7 +52,7 @@ class DataManager;
 class cxResource_EXPORT SpaceProviderImpl : public SpaceProvider
 {
 public:
-	SpaceProviderImpl(TrackingServiceOldPtr toolManager, DataServicePtr dataManager);
+	SpaceProviderImpl(TrackingServicePtr trackingService, DataServicePtr dataManager);
 	virtual ~SpaceProviderImpl() {}
 
 	virtual Transform3D get_toMfrom(CoordinateSystem from, CoordinateSystem to); ///< to_M_from
@@ -83,7 +83,7 @@ private:
 
 	CoordinateSystem getToolCoordinateSystem(ToolPtr tool);
 
-	TrackingServiceOldPtr mToolManager;
+	TrackingServicePtr mTrackingService;
 	DataServicePtr mDataManager;
 };
 

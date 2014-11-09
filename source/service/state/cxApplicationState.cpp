@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxStateService.h"
 #include "cxPatientData.h"
 #include "cxPatientService.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxWorkflowStateMachine.h"
 #include "cxStateServiceBackend.h"
 

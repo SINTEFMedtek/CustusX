@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxStateServiceBackend.h"
 
 #include "cxDataManager.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxSpaceProvider.h"
 #include "cxPatientService.h"
 
@@ -41,12 +41,12 @@ namespace cx
 {
 
 StateServiceBackend::StateServiceBackend(DataServicePtr dataManager,
-										 TrackingServiceOldPtr toolManager,
+										 TrackingServicePtr trackingService,
 										 VideoServiceOldPtr videoService,
 										 SpaceProviderPtr spaceProvider,
 										 PatientServicePtr patientService) :
 	mDataManager(dataManager),
-	mToolManager(toolManager),
+	mTrackingService(trackingService),
 	mSpaceProvider(spaceProvider),
 	mVideoServiceOld(videoService),
 	mPatientService(patientService)
@@ -59,9 +59,9 @@ DataServicePtr StateServiceBackend::getDataManager()
 	return mDataManager;
 }
 
-TrackingServiceOldPtr StateServiceBackend::getToolManager()
+TrackingServicePtr StateServiceBackend::getToolManager()
 {
-	return mToolManager;
+	return mTrackingService;
 }
 
 VideoServiceOldPtr StateServiceBackend::getVideoServiceOld()

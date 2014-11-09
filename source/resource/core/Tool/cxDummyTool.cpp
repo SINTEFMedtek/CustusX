@@ -69,7 +69,7 @@ ProbeDefinition DummyToolTestUtilities::createProbeDataLinear(double depth, doub
 	return createProbeData(ProbeDefinition::tLINEAR, depth, width, frameSize);
 }
 
-DummyToolPtr DummyToolTestUtilities::createDummyTool(ProbeDefinition probeData, TrackingServiceOldPtr manager)
+DummyToolPtr DummyToolTestUtilities::createDummyTool(ProbeDefinition probeData)
 {
 	DummyToolPtr retval(new DummyTool());
 	retval->setProbeSector(probeData);

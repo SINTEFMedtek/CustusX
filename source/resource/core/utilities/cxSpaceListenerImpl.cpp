@@ -33,15 +33,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSpaceListenerImpl.h"
 
 #include "cxDataManager.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxData.h"
+#include "cxTool.h"
 
 namespace cx
 {
 
-SpaceListenerImpl::SpaceListenerImpl(TrackingServiceOldPtr toolManager, DataServicePtr dataManager)
+SpaceListenerImpl::SpaceListenerImpl(TrackingServicePtr trackingService, DataServicePtr dataManager)
 {
-	mToolManager = toolManager;
+	mTrackingService = trackingService;
 	mDataManager = dataManager;
 }
 
@@ -89,7 +90,7 @@ void SpaceListenerImpl::doConnect()
 
 	if (mSpace.mId == csSENSOR || mSpace.mId == csTOOL || mSpace.mId == csTOOL_OFFSET)
 	{
-		ToolPtr tool = mToolManager->getTool(mSpace.mRefObject);
+		ToolPtr tool = mTrackingService->getTool(mSpace.mRefObject);
 		if (tool)
 		{
 			connect(tool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D,double)), this, SIGNAL(changed()));
@@ -97,8 +98,8 @@ void SpaceListenerImpl::doConnect()
 
 			if (mSpace.mRefObject == "active")
 			{
-				connect(mToolManager.get(), SIGNAL(dominantToolChanged(const QString&)), this, SIGNAL(changed()));
-				connect(mToolManager.get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(reconnect()));
+				connect(mTrackingService.get(), SIGNAL(dominantToolChanged(const QString&)), this, SIGNAL(changed()));
+				connect(mTrackingService.get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(reconnect()));
 			}
 			connect(mDataManager.get(), SIGNAL(rMprChanged()), this, SIGNAL(changed()));
 		}
@@ -124,7 +125,7 @@ void SpaceListenerImpl::doDisconnect()
 
 	if (mSpace.mId == csSENSOR || mSpace.mId == csTOOL || mSpace.mId == csTOOL_OFFSET)
 	{
-		ToolPtr tool = mToolManager->getTool(mSpace.mRefObject);
+		ToolPtr tool = mTrackingService->getTool(mSpace.mRefObject);
 		if (tool)
 		{
 			disconnect(tool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D,double)), this, SIGNAL(changed()));
@@ -132,8 +133,8 @@ void SpaceListenerImpl::doDisconnect()
 
 			if (mSpace.mRefObject == "active")
 			{
-				disconnect(mToolManager.get(), SIGNAL(dominantToolChanged(const QString&)), this, SIGNAL(changed()));
-				disconnect(mToolManager.get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(reconnect()));
+				disconnect(mTrackingService.get(), SIGNAL(dominantToolChanged(const QString&)), this, SIGNAL(changed()));
+				disconnect(mTrackingService.get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(reconnect()));
 			}
 			disconnect(mDataManager.get(), SIGNAL(rMprChanged()), this, SIGNAL(changed()));
 		}

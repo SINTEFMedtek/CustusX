@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPreferencesDialog.h"
 #include "cxViewManager.h"
 #include "cxDataLocations.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxDataLocations.h"
 #include "cxStateService.h"
 #include "cxFilePreviewWidget.h"

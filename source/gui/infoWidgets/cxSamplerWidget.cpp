@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxCoordinateSystemHelpers.h"
 #include <vtkImageData.h>
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxTypeConversions.h"
 #include "cxSettings.h"
@@ -58,7 +58,7 @@ SamplerWidget::SamplerWidget(QWidget* parent) :
 	connect(mActiveTool.get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(setModified()));
 	connect(mActiveTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), SLOT(setModified()));
 	connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SLOT(spacesChangedSlot()));
-	connect(trackingService().get(), &ToolManager::stateChanged, this, &SamplerWidget::spacesChangedSlot);
+	connect(trackingService().get(), &TrackingService::stateChanged, this, &SamplerWidget::spacesChangedSlot);
 
 	mLayout = new QHBoxLayout(this);
 	mLayout->setMargin(4);

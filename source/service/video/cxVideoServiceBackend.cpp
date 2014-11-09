@@ -34,24 +34,24 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ctkPluginFramework.h>
 #include "cxDataManager.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxSpaceProvider.h"
 
 namespace cx
 {
 
 VideoServiceBackendPtr VideoServiceBackend::create(DataServicePtr dataManager,
-							TrackingServiceOldPtr toolManager,
+							TrackingServicePtr trackingService,
 							SpaceProviderPtr spaceProvider)
 {
-	return VideoServiceBackendPtr(new VideoServiceBackend(dataManager, toolManager, spaceProvider));
+	return VideoServiceBackendPtr(new VideoServiceBackend(dataManager, trackingService, spaceProvider));
 }
 
 VideoServiceBackend::VideoServiceBackend(DataServicePtr dataManager,
-							TrackingServiceOldPtr toolManager,
+							TrackingServicePtr trackingService,
 							SpaceProviderPtr spaceProvider) :
 	mDataManager(dataManager),
-	mToolManager(toolManager),
+	mTrackingService(trackingService),
 	mSpaceProvider(spaceProvider)
 {
 
@@ -62,9 +62,9 @@ DataServicePtr VideoServiceBackend::getDataManager()
 	return mDataManager;
 }
 
-TrackingServiceOldPtr VideoServiceBackend::getToolManager()
+TrackingServicePtr VideoServiceBackend::getToolManager()
 {
-	return mToolManager;
+	return mTrackingService;
 }
 
 SpaceProviderPtr VideoServiceBackend::getSpaceProvider()

@@ -31,21 +31,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxDominantToolProxy.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
+#include "cxTool.h"
 
 namespace cx
 {
 
-DominantToolProxy::DominantToolProxy(TrackingServiceOldPtr toolManager) :
-	mToolManager(toolManager)
+DominantToolProxy::DominantToolProxy(TrackingServicePtr trackingService) :
+	mTrackingService(trackingService)
 {
-	connect(mToolManager.get(), SIGNAL(dominantToolChanged(const QString&)), this,
+	connect(mTrackingService.get(), SIGNAL(dominantToolChanged(const QString&)), this,
 					SLOT(dominantToolChangedSlot(const QString&)));
-	connect(mToolManager.get(), SIGNAL(dominantToolChanged(const QString&)), this,
+	connect(mTrackingService.get(), SIGNAL(dominantToolChanged(const QString&)), this,
 					SIGNAL(dominantToolChanged(const QString&)));
 
-	if (mToolManager->getActiveTool())
-		this->dominantToolChangedSlot(mToolManager->getActiveTool()->getUid());
+	if (mTrackingService->getActiveTool())
+		this->dominantToolChangedSlot(mTrackingService->getActiveTool()->getUid());
 }
 
 void DominantToolProxy::dominantToolChangedSlot(const QString& uid)
@@ -63,7 +64,7 @@ void DominantToolProxy::dominantToolChangedSlot(const QString& uid)
 		disconnect(mTool.get(), SIGNAL(tps(int)), this, SIGNAL(tps(int)));
 	}
 
-	mTool = mToolManager->getActiveTool();
+	mTool = mTrackingService->getActiveTool();
 
 	if (mTool)
 	{

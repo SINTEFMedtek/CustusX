@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImage.h"
 #include "cxPatientData.h"
 #include "cxCyclicActionLogger.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxViewManager.h"
 #include "cxStateService.h"
 #include "cxPatientService.h"

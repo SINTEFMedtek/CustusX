@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImageDataContainer.h"
 #include "cxStringDataAdapterXml.h"
 #include "cxProbeImpl.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxLogicManager.h"
 #include "cxStateService.h"
 #include "cxLegacySingletons.h"
@@ -139,7 +139,7 @@ void AcquisitionFixture::initialize()
 	// run setup of video, probe and start acquisition in series, each depending on the success of the previous:
 	QTimer::singleShot(0, this, SLOT(setupVideo()));
 	connect(cx::videoService()->getVideoConnection().get(), SIGNAL(connected(bool)), this, SLOT(videoConnectedSlot()));
-	connect(cx::trackingService().get(), &cx::ToolManager::stateChanged, this, &AcquisitionFixture::start);
+	connect(cx::trackingService().get(), &cx::TrackingService::stateChanged, this, &AcquisitionFixture::start);
 }
 
 void AcquisitionFixture::videoConnectedSlot()

@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QVBoxLayout>
 #include "boost/bind.hpp"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxDoubleWidgets.h"
 #include "cxTypeConversions.h"

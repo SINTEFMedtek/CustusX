@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //#include "cxToolConfigurationParser.h"
 #include "cxTrackerConfiguration.h"
 #include "cxLegacySingletons.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 
 namespace cx
 {

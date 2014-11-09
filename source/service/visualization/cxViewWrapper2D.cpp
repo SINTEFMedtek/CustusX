@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxManualTool.h"
 #include "cxDataManager.h"
 #include "cxViewManager.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxViewGroup.h"
 #include "cxDefinitionStrings.h"
 #include "cxSlicePlanes3DRep.h"

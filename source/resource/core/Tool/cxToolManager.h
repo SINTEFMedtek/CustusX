@@ -75,7 +75,7 @@ public:
 
 	virtual ToolPtr getActiveTool() = 0; ///< get the tool that has higest priority when tracking
 	virtual void setActiveTool(const QString& uid) = 0; ///< set a tool to be the dominant tool
-	virtual ToolPtr findFirstProbe() = 0;
+	virtual ToolPtr getFirstProbe() = 0;
 
 	virtual ToolPtr getReferenceTool() const = 0; ///< tool used as patient reference
 	virtual ToolPtr getManualTool() = 0; ///< a mouse-controllable virtual tool that is available even when not tracking.

@@ -40,10 +40,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPixmap>
 #include <QMetaObject>
 
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxReporter.h"
 #include "cxVideoConnectionManager.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxViewManager.h"
 #include "cxVideoServiceOld.h"
 #include "boost/bind.hpp"
@@ -66,9 +66,9 @@ StatusBar::StatusBar() :
 {
 	connect(reporter(), SIGNAL(emittedMessage(Message)), this, SLOT(showMessageSlot(Message)));
 
-	connect(trackingService().get(), &ToolManager::stateChanged, this, &StatusBar::resetToolManagerConnection);
+	connect(trackingService().get(), &TrackingService::stateChanged, this, &StatusBar::resetToolManagerConnection);
 
-	cx::TrackingServiceOldPtr ts = cx::logicManager()->getTrackingService();
+	cx::TrackingServicePtr ts = cx::logicManager()->getTrackingService();
 	mActiveTool = DominantToolProxy::New(ts);
 	connect(mActiveTool.get(), &DominantToolProxy::tps, this, &StatusBar::tpsSlot);
 
@@ -101,8 +101,8 @@ void StatusBar::connectToToolSignals()
 
 	this->addPermanentWidget(mTpsLabel);
 
-	ToolManager::ToolMap tools = trackingService()->getTools();
-	for (ToolManager::ToolMap::iterator it = tools.begin(); it != tools.end(); ++it)
+	TrackingService::ToolMap tools = trackingService()->getTools();
+	for (TrackingService::ToolMap::iterator it = tools.begin(); it != tools.end(); ++it)
 	{
 		ToolPtr tool = it->second;
 		if (tool->hasType(Tool::TOOL_MANUAL))

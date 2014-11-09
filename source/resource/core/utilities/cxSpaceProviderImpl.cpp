@@ -32,25 +32,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSpaceProviderImpl.h"
 
 #include "cxDataManager.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxData.h"
 #include "cxImage.h"
 #include "vtkImageData.h"
 #include "cxReporter.h"
 #include "cxSpaceListenerImpl.h"
+#include "cxTool.h"
+
 
 namespace cx
 {
 
-SpaceProviderImpl::SpaceProviderImpl(TrackingServiceOldPtr toolManager, DataServicePtr dataManager)
+SpaceProviderImpl::SpaceProviderImpl(TrackingServicePtr trackingService, DataServicePtr dataManager)
 {
-	mToolManager = toolManager;
+	mTrackingService = trackingService;
 	mDataManager = dataManager;
 }
 
 SpaceListenerPtr SpaceProviderImpl::createListener()
 {
-	return SpaceListenerPtr(new SpaceListenerImpl(mToolManager, mDataManager));
+	return SpaceListenerPtr(new SpaceListenerImpl(mTrackingService, mDataManager));
 }
 
 std::vector<CoordinateSystem> SpaceProviderImpl::getSpacesToPresentInGUI()
@@ -89,7 +91,7 @@ CoordinateSystem SpaceProviderImpl::getToolCoordinateSystem(ToolPtr tool)
   */
 Transform3D SpaceProviderImpl::getActiveToolTipTransform(CoordinateSystem to, bool useOffset)
 {
-	ToolPtr tool = mToolManager->getActiveTool();
+	ToolPtr tool = mTrackingService->getActiveTool();
 	if (!tool)
 		return Transform3D::Identity();
 
@@ -164,7 +166,7 @@ CoordinateSystem SpaceProviderImpl::getT(ToolPtr tool)
 	if (!tool)
 		return retval;
 
-	ToolPtr refTool = mToolManager->getReferenceTool();
+	ToolPtr refTool = mTrackingService->getReferenceTool();
 	if (refTool && (tool == refTool))
 	{
 		retval.mId = csPATIENTREF;
@@ -183,7 +185,7 @@ CoordinateSystem SpaceProviderImpl::getTO(ToolPtr tool)
 	if (!tool)
 		return retval;
 
-	ToolPtr refTool = mToolManager->getReferenceTool();
+	ToolPtr refTool = mTrackingService->getReferenceTool();
 	if (refTool && (tool == refTool))
 	{
 		retval.mId = csPATIENTREF;
@@ -267,10 +269,10 @@ Transform3D SpaceProviderImpl::get_rMpr()
 
 Transform3D SpaceProviderImpl::get_rMt(QString uid)
 {
-	ToolPtr tool = mToolManager->getTool(uid);
+	ToolPtr tool = mTrackingService->getTool(uid);
 
 	if (!tool && uid=="active")
-		tool = mToolManager->getActiveTool();
+		tool = mTrackingService->getActiveTool();
 
 	if(!tool)
 	{
@@ -282,10 +284,10 @@ Transform3D SpaceProviderImpl::get_rMt(QString uid)
 
 Transform3D SpaceProviderImpl::get_rMto(QString uid)
 {
-	ToolPtr tool = mToolManager->getTool(uid);
+	ToolPtr tool = mTrackingService->getTool(uid);
 
 	if (!tool && uid=="active")
-		tool = mToolManager->getActiveTool();
+		tool = mTrackingService->getActiveTool();
 
 	if(!tool)
 	{
@@ -300,10 +302,10 @@ Transform3D SpaceProviderImpl::get_rMto(QString uid)
 
 Transform3D SpaceProviderImpl::get_rMs(QString uid)
 {
-	ToolPtr tool = mToolManager->getTool(uid);
+	ToolPtr tool = mTrackingService->getTool(uid);
 
 	if (!tool && uid=="active")
-		tool = mToolManager->getActiveTool();
+		tool = mTrackingService->getActiveTool();
 
 	if(!tool)
 	{

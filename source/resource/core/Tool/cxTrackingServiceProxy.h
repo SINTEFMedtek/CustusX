@@ -48,6 +48,9 @@ public:
 	static TrackingServicePtr create(ctkPluginContext *pluginContext);
 	TrackingServiceProxy(ctkPluginContext *pluginContext);
 
+	virtual Tool::State getState() const;
+	virtual void setState(const Tool::State val);
+
 	virtual ToolPtr getTool(const QString& uid);
 	virtual ToolPtr getActiveTool();
 	virtual void setActiveTool(const QString& uid);

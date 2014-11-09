@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxEnumConverter.h"
 #include "cxReporter.h"
 #include "cxStateService.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxSelectionGroupBox.h"
 #include "cxToolListWidget.h"
 #include "cxDataLocations.h"

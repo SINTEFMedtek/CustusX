@@ -35,13 +35,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPushButton>
 #include <QLabel>
 #include "cxTypeConversions.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxReporter.h"
 #include "cxVisualizationService.h"
 #include "cxRegistrationService.h"
 #include "cxPatientModelService.h"
 #include "cxTrackingService.h"
 #include "cxLegacySingletons.h"
+#include "cxLandmark.h"
 
 namespace cx
 {

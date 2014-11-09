@@ -86,6 +86,16 @@ bool TrackingServiceProxy::isNull()
 	return mTrackingService->isNull();
 }
 
+Tool::State TrackingServiceProxy::getState() const
+{
+	return mTrackingService->getState();
+}
+
+void TrackingServiceProxy::setState(const Tool::State val)
+{
+	mTrackingService->setState(val);
+}
+
 ToolPtr TrackingServiceProxy::getTool(const QString& uid)
 {
 	return mTrackingService->getTool(uid);

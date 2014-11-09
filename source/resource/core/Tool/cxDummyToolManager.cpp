@@ -42,13 +42,12 @@ DummyToolManager::DummyToolManagerPtr DummyToolManager::create()
 {
 	DummyToolManagerPtr retval;
 	retval.reset(new DummyToolManager());
-	retval->mSelf = retval;
 	return retval;
 }
 
 DummyToolManager::DummyToolManager() :
 	m_rMpr(Transform3D::Identity()),
-	mToolTipOffset(0),
+//	mToolTipOffset(0),
 //	mConfigured(false),
 //	mInitialized(false),
 //	mIsTracking(false),
@@ -104,9 +103,9 @@ void DummyToolManager::stopTracking()
 	}
 }
 
-ToolManager::ToolMap DummyToolManager::getTools()
+TrackingService::ToolMap DummyToolManager::getTools()
 {
-	return ToolManager::ToolMap(mDummyTools.begin(), mDummyTools.end());
+	return TrackingService::ToolMap(mDummyTools.begin(), mDummyTools.end());
 }
 
 ToolPtr DummyToolManager::getTool(const QString& uid)

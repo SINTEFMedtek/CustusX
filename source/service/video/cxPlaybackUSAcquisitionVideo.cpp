@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxUsReconstructionFileReader.h"
 #include "cxTestVideoSource.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 //#include "cxProbeImpl.h"
 #include "cxUSFrameData.h"
 #include "cxPlaybackTime.h"
@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVideoServiceBackend.h"
 #include "cxFileHelpers.h"
 #include <QtConcurrent>
+#include "cxTool.h"
 
 namespace cx
 {
@@ -197,7 +198,7 @@ void USAcquisitionVideoPlayback::usDataLoadFinishedSlot()
 	mVideoSource->start();
 
 	// set the probe sector from file data:
-	ToolPtr tool = mBackend->getToolManager()->findFirstProbe();
+	ToolPtr tool = mBackend->getToolManager()->getFirstProbe();
 	if (tool)
 	{
 		ProbePtr probe = tool->getProbe();

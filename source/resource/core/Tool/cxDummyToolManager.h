@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxResourceExport.h"
 
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxDummyTool.h"
 
 namespace cx
@@ -49,7 +49,7 @@ namespace cx
  *
  * \ingroup cx_resource_core_tool
  */
-class cxResource_EXPORT DummyToolManager : public ToolManager
+class cxResource_EXPORT DummyToolManager : public TrackingService
 {
 	Q_OBJECT
 
@@ -82,8 +82,15 @@ public:
 	virtual void clear() {}
 	virtual SessionToolHistoryMap getSessionHistory(double startTime, double stopTime) { return SessionToolHistoryMap(); }
 
+	virtual bool isPlaybackMode() const { return false; }
+	virtual void setPlaybackMode(PlaybackTimePtr controller) {}
+	virtual void setLoggingFolder(QString loggingFolder) {}
+	virtual void runDummyTool(DummyToolPtr tool) {}
+	virtual QStringList getSupportedTrackingSystems() { return QStringList(); }
+	virtual bool isNull() { return false; }
+
 	void addTool(DummyToolPtr tool);
-	virtual ToolPtr findFirstProbe() { return ToolPtr(); }
+	virtual ToolPtr getFirstProbe() { return ToolPtr(); }
 	virtual TrackerConfigurationPtr getConfiguration() { return TrackerConfigurationPtr(); }
 
 private:
@@ -91,7 +98,6 @@ private:
 	typedef DummyToolMap::const_iterator DummyToolMapConstIter;
 
 	DummyToolManager();
-	TrackingServiceWeakPtr mSelf;
 
 	DummyToolMap mDummyTools;
 	DummyToolPtr mDominantTool;
@@ -101,7 +107,7 @@ private:
 	virtual void stopTracking();
 
 	Transform3D m_rMpr;
-	double mToolTipOffset; ///< Common tool tip offset for all tools
+//	double mToolTipOffset; ///< Common tool tip offset for all tools
 
 //	bool mConfigured;
 //	bool mInitialized;

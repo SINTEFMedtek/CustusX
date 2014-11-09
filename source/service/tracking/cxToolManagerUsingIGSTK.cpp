@@ -592,7 +592,7 @@ ToolPtr ToolManagerUsingIGSTK::getManualTool()
  *  - any probe
  *
  */
-ToolPtr ToolManagerUsingIGSTK::findFirstProbe()
+ToolPtr ToolManagerUsingIGSTK::getFirstProbe()
 {
 	ToolPtr active = this->getActiveTool();
 	if (active && active->getProbe() && active->getProbe()->isValid())

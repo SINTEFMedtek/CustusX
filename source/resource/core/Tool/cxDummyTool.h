@@ -150,7 +150,7 @@ signals:
 
 struct cxResource_EXPORT DummyToolTestUtilities
 {
-	static DummyToolPtr createDummyTool(ProbeDefinition probeData = ProbeDefinition(), TrackingServiceOldPtr manager = TrackingServiceOldPtr());
+	static DummyToolPtr createDummyTool(ProbeDefinition probeData = ProbeDefinition());
 	static ProbeDefinition createProbeDataLinear(double depth=40, double width=50, Eigen::Array2i frameSize=Eigen::Array2i(80,40));
 	static ProbeDefinition createProbeData(ProbeDefinition::TYPE, double depth=40, double width=50, Eigen::Array2i frameSize=Eigen::Array2i(80,40));
 };

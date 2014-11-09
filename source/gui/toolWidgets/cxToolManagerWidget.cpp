@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QGridLayout>
 #include <QPushButton>
 
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 
 namespace cx
 {
@@ -57,7 +57,7 @@ ToolManagerWidget::ToolManagerWidget(QWidget* parent) :
   connect(mStartTrackingButton, SIGNAL(clicked(bool)), this, SLOT(startTrackingClickedSlot(bool)));
   connect(mStopTrackingButton, SIGNAL(clicked(bool)), this, SLOT(stopTrackingClickedSlot(bool)));
 
-  connect(trackingService().get(), &ToolManager::stateChanged, this, &ToolManagerWidget::updateButtonStatusSlot);
+  connect(trackingService().get(), &TrackingService::stateChanged, this, &ToolManagerWidget::updateButtonStatusSlot);
 
   //layout
   QGridLayout* layout = new QGridLayout(this);

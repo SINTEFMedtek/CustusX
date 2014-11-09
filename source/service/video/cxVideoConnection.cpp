@@ -53,11 +53,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTime.h"
 #include "cxVector3D.h"
 #include "cxProbeData.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxDataManager.h"
 //#include "cxProbeImpl.h"
 #include "cxVideoServiceOld.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxDirectlyLinkedImageReceiverThread.h"
 #include "cxTypeConversions.h"
 #include "cxImage.h"
@@ -70,6 +70,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImageStreamerFactory.h"
 #include "cxSettings.h"
 #include "cxNullDeleter.h"
+#include "cxTrackingService.h"
+#include "cxTool.h"
+
 
 typedef vtkSmartPointer<vtkDataSetMapper> vtkDataSetMapperPtr;
 typedef vtkSmartPointer<vtkImageFlip> vtkImageFlipPtr;
@@ -83,7 +86,7 @@ VideoConnection::VideoConnection(VideoServiceBackendPtr backend)
 	mConnected = false;
 	mUnsusedProbeDataVector.clear();
 
-	connect(mBackend->getToolManager().get(), &ToolManager::stateChanged, this, &VideoConnection::connectVideoToProbe);
+	connect(mBackend->getToolManager().get(), &TrackingService::stateChanged, this, &VideoConnection::connectVideoToProbe);
 	connect(mBackend->getToolManager().get(), SIGNAL(dominantToolChanged(QString)), this, SLOT(connectVideoToProbe()));
 }
 
@@ -210,7 +213,7 @@ void VideoConnection::disconnectServer()
 	for (unsigned i=0; i<mSources.size(); ++i)
 		mSources[i]->setInput(ImagePtr());
 
-	ToolPtr tool = mBackend->getToolManager()->findFirstProbe();
+	ToolPtr tool = mBackend->getToolManager()->getFirstProbe();
 	if (tool && tool->getProbe())
 		this->removeSourceFromProbe(tool);
 
@@ -238,7 +241,7 @@ void VideoConnection::useUnusedProbeDataSlot()
 
 void VideoConnection::resetProbe()
 {
-	ToolPtr tool = mBackend->getToolManager()->findFirstProbe();
+	ToolPtr tool = mBackend->getToolManager()->getFirstProbe();
 	if (!tool || !tool->getProbe())
 		return;
 	ProbePtr probe = tool->getProbe();
@@ -257,7 +260,7 @@ void VideoConnection::resetProbe()
  */
 void VideoConnection::updateStatus(ProbeDefinitionPtr msg)
 {
-	ToolPtr tool = mBackend->getToolManager()->findFirstProbe();
+	ToolPtr tool = mBackend->getToolManager()->getFirstProbe();
 	if (!tool || !tool->getProbe())
 	{
 		//Don't throw away the ProbeData. Save it until it can be used
@@ -348,7 +351,7 @@ std::vector<VideoSourcePtr> VideoConnection::getVideoSources()
  */
 void VideoConnection::connectVideoToProbe()
 {
-	ToolPtr tool = mBackend->getToolManager()->findFirstProbe();
+	ToolPtr tool = mBackend->getToolManager()->getFirstProbe();
 	if (!tool)
 		return;
 

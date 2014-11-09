@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewManager.h"
 #include "cxViewGroup.h"
 #include "cxViewGroupData.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include <QFile>
 #include "cxReporter.h"
 #include "cxDataReaderWriter.h"
@@ -61,7 +61,7 @@ namespace cx
 
 MetricManager::MetricManager() : QObject(NULL)
 {
-	connect(trackingService().get(), &ToolManager::stateChanged, this, &MetricManager::metricsChanged);
+	connect(trackingService().get(), &TrackingService::stateChanged, this, &MetricManager::metricsChanged);
 	connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SIGNAL(metricsChanged()));
 }
 

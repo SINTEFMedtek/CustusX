@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QHBoxLayout>
 #include "cxLabeledComboBoxWidget.h"
 #include "cxDataAdapterHelper.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxSpaceProvider.h"
 #include "cxPatientModelService.h"
 

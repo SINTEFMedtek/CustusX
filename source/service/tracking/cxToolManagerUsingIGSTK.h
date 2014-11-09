@@ -129,7 +129,7 @@ public:
 	virtual SessionToolHistoryMap getSessionHistory(double startTime, double stopTime);
 
 	virtual void runDummyTool(DummyToolPtr tool);
-	virtual ToolPtr findFirstProbe();
+	virtual ToolPtr getFirstProbe();
 
 	virtual void setPlaybackMode(PlaybackTimePtr controller);
 	virtual TrackerConfigurationPtr getConfiguration();

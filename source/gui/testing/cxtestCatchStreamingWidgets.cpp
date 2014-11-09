@@ -59,11 +59,10 @@ TEST_CASE("VideoConnectionWidget can stream", "[unit][gui][not_win32][widget][st
 	cx::LogicManager::initialize();
 	SSC_LOG("");
 
-	cx::TrackingServiceOldPtr ts = cx::logicManager()->getTrackingService();
+	cx::TrackingServicePtr ts = cx::logicManager()->getTrackingService();
 
-	cx::DummyToolPtr tool = cx::DummyToolTestUtilities::createDummyTool(cx::DummyToolTestUtilities::createProbeDataLinear(), ts);
+	cx::DummyToolPtr tool = cx::DummyToolTestUtilities::createDummyTool(cx::DummyToolTestUtilities::createProbeDataLinear());
 	ts->runDummyTool(tool);
-	ts->setActiveTool(tool->getUid());
 
 	REQUIRE((ts->getState()>=cx::Tool::tsTRACKING));
 //	while(ts->getState()>=cx::Tool::tsTRACKING)

@@ -30,7 +30,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include <cxDoubleDataAdapterTemporalCalibration.h>
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 
 namespace cx
 {
@@ -38,7 +38,7 @@ namespace cx
 DoubleDataAdapterTimeCalibration::DoubleDataAdapterTimeCalibration()
 {
   connect(trackingService().get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChanged()));
-  connect(trackingService().get(), &ToolManager::stateChanged, this, &DoubleDataAdapterTimeCalibration::dominantToolChanged);
+  connect(trackingService().get(), &TrackingService::stateChanged, this, &DoubleDataAdapterTimeCalibration::dominantToolChanged);
   this->dominantToolChanged();
 }
 

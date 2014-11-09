@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientService.h"
 #include "cxVideoServiceOld.h"
 #include "cxVideoConnectionManager.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxUSSavingRecorder.h"
 #include "cxDataManager.h"
 #include "cxAcquisitionData.h"
@@ -56,7 +56,7 @@ USAcquisition::USAcquisition(AcquisitionPtr base, QObject* parent) : QObject(par
 	connect(mCore.get(), SIGNAL(saveDataCompleted(QString)), this, SIGNAL(saveDataCompleted(QString)));
 
 
-	connect(trackingService().get(), &ToolManager::stateChanged, this, &USAcquisition::checkIfReadySlot);
+	connect(trackingService().get(), &TrackingService::stateChanged, this, &USAcquisition::checkIfReadySlot);
 	connect(trackingService().get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(checkIfReadySlot()));
 	connect(videoService().get(), SIGNAL(activeVideoSourceChanged()), this, SLOT(checkIfReadySlot()));
 	connect(videoService()->getVideoConnection().get(), SIGNAL(connected(bool)), this, SLOT(checkIfReadySlot()));
@@ -77,7 +77,7 @@ void USAcquisition::checkIfReadySlot()
 {
 	bool tracking = trackingService()->getState()>=Tool::tsTRACKING;
 	bool streaming = videoService()->getVideoConnection()->isConnected();
-	ToolPtr tool = trackingService()->findFirstProbe();
+	ToolPtr tool = trackingService()->getFirstProbe();
 
 	QString mWhatsMissing;
 	mWhatsMissing.clear();
@@ -124,7 +124,7 @@ void USAcquisition::recordStarted()
 {
 	mBase->getPluginData()->getReconstructer()->selectData(USReconstructInputData()); // clear old data in reconstructeer
 
-	ToolPtr tool = trackingService()->findFirstProbe();
+	ToolPtr tool = trackingService()->getFirstProbe();
 	mCore->setWriteColor(this->getWriteColor());
 	mCore->startRecord(mBase->getLatestSession(), tool, this->getRecordingVideoSources(tool));
 }

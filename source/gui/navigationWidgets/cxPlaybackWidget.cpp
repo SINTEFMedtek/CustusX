@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QToolTip>
 #include <QMouseEvent>
 #include <QLabel>
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxHelperWidgets.h"
 #include "cxTime.h"
 #include "cxReporter.h"
@@ -59,7 +59,7 @@ PlaybackWidget::PlaybackWidget(QWidget* parent) :
 	mOpen = false;
 	this->setToolTip(this->defaultWhatsThis());
 
-	connect(trackingService().get(), &ToolManager::stateChanged, this, &PlaybackWidget::toolManagerInitializedSlot);
+	connect(trackingService().get(), &TrackingService::stateChanged, this, &PlaybackWidget::toolManagerInitializedSlot);
 
 	mTimer.reset(new PlaybackTime());
 	mTimer->initialize(QDateTime::currentDateTime(), 100000);
@@ -263,8 +263,8 @@ std::vector<TimelineEvent> PlaybackWidget::createEvents()
 
 	// find all valid regions (i.e. time sequences with tool navigation)
 	TimelineEventVector events;
-	ToolManager::ToolMap tools = trackingService()->getTools();
-	for (ToolManager::ToolMap::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
+	TrackingService::ToolMap tools = trackingService()->getTools();
+	for (TrackingService::ToolMap::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
 	{
 		if(!iter->second->hasType(Tool::TOOL_MANUAL))
 		{

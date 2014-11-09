@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxToolTracer.h"
 #include "cxOrientationAnnotation3DRep.h"
 #include "cxSettings.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxRepManager.h"
 #include "cxCameraControl.h"
 #include "cxLandmarkRep.h"
@@ -152,7 +152,7 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ViewPtr view, VisualizationServiceB
 	//data name text rep
 	this->updateMetricNamesRep();
 
-	connect(mBackend->getToolManager().get(), &ToolManager::stateChanged, this, &ViewWrapper3D::toolsAvailableSlot);
+	connect(mBackend->getToolManager().get(), &TrackingService::stateChanged, this, &ViewWrapper3D::toolsAvailableSlot);
 	connect(mBackend->getDataManager().get(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(activeImageChangedSlot()));
 	this->toolsAvailableSlot();
 
@@ -479,8 +479,8 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 		}
 
 		// tool spaces
-		ToolManager::ToolMap tools = mBackend->getToolManager()->getTools();
-		ToolManager::ToolMap::iterator iter;
+		TrackingService::ToolMap tools = mBackend->getToolManager()->getTools();
+		TrackingService::ToolMap::iterator iter;
 		for (iter = tools.begin(); iter != tools.end(); ++iter)
 		{
 			ToolPtr tool = iter->second;
@@ -774,8 +774,8 @@ void ViewWrapper3D::toolsAvailableSlot()
 {
 	std::vector<ToolRep3DPtr> reps = RepManager::findReps<ToolRep3D>(mView->getReps());
 
-	ToolManager::ToolMap tools = mBackend->getToolManager()->getTools();
-	ToolManager::ToolMap::iterator iter;
+	TrackingService::ToolMap tools = mBackend->getToolManager()->getTools();
+	TrackingService::ToolMap::iterator iter;
 	for (iter = tools.begin(); iter != tools.end(); ++iter)
 	{
 		ToolPtr tool = iter->second;

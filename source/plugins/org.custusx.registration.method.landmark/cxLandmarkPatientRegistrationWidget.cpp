@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //TODO: remove
 #include "cxLegacySingletons.h"
 #include "cxRepManager.h"
-//#include "cxToolManager.h"
+//#include "cxTrackingService.h"
 #include "cxTrackingService.h"
 
 namespace cx

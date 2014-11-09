@@ -44,6 +44,9 @@ class cxResource_EXPORT TrackingServiceNull : public TrackingService
 public:
 	TrackingServiceNull();
 
+	virtual Tool::State getState() const;
+	virtual void setState(const Tool::State val);
+
 	virtual ToolPtr getTool(const QString& uid);
 	virtual ToolPtr getActiveTool();
 	virtual void setActiveTool(const QString& uid);

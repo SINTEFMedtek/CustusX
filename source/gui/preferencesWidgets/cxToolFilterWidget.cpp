@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QHBoxLayout>
 #include "cxEnumConverter.h"
 #include "cxStateService.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxSelectionGroupBox.h"
 #include "cxToolListWidget.h"
 #include "cxApplicationStateMachine.h"

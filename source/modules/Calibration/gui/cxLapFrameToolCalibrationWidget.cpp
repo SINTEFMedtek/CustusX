@@ -39,13 +39,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMessageBox>
 #include "cxTypeConversions.h"
 #include "cxReporter.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxVector3D.h"
 #include "cxDefinitionStrings.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxDataLocations.h"
 #include "cxTool.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxPatientData.h"
 #include <cxActiveToolWidget.h>
 #include "cxDoubleWidgets.h"
@@ -106,7 +106,7 @@ LapFrameToolCalibrationWidget::LapFrameToolCalibrationWidget(QWidget* parent) :
   //setting default state
   this->toolSelectedSlot();
 
-  connect(cx::trackingService().get(), &cx::ToolManager::stateChanged, this, &LapFrameToolCalibrationWidget::trackingStartedSlot);
+  connect(cx::trackingService().get(), &cx::TrackingService::stateChanged, this, &LapFrameToolCalibrationWidget::trackingStartedSlot);
 }
 
 LapFrameToolCalibrationWidget::~LapFrameToolCalibrationWidget()

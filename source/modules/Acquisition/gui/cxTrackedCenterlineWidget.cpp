@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackedCenterlineWidget.h"
 
 #include <QVBoxLayout>
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxDataManager.h"
 #include "cxMeshHelpers.h"
 #include "cxToolRep3D.h"
@@ -58,7 +58,7 @@ TrackedCenterlineWidget::TrackedCenterlineWidget(AcquisitionDataPtr pluginData, 
   this->setObjectName("TrackedCenterlineWidget");
   this->setWindowTitle("Tracked Centerline");
 
-	connect(trackingService().get(), &ToolManager::stateChanged, this, &TrackedCenterlineWidget::checkIfReadySlot);
+	connect(trackingService().get(), &TrackingService::stateChanged, this, &TrackedCenterlineWidget::checkIfReadySlot);
   mLayout->addStretch();
 
   this->checkIfReadySlot();
@@ -152,8 +152,8 @@ void TrackedCenterlineWidget::centerlineFinishedSlot()
 void TrackedCenterlineWidget::startedSlot(QString sessionId)
 {
   //show preview of tool path
-  ToolManager::ToolMap tools = trackingService()->getTools();
-  ToolManager::ToolMap::iterator toolIt = tools.begin();
+  TrackingService::ToolMap tools = trackingService()->getTools();
+  TrackingService::ToolMap::iterator toolIt = tools.begin();
 
   ViewPtr view = viewManager()->get3DView(0,0);
   ToolRep3DPtr activeRep3D;
@@ -170,8 +170,8 @@ void TrackedCenterlineWidget::startedSlot(QString sessionId)
 void TrackedCenterlineWidget::stoppedSlot(bool)
 {
   //hide preview of tool path
-  ToolManager::ToolMap tools = trackingService()->getTools();
-  ToolManager::ToolMap::iterator toolIt = tools.begin();
+  TrackingService::ToolMap tools = trackingService()->getTools();
+  TrackingService::ToolMap::iterator toolIt = tools.begin();
 
   ViewPtr view = viewManager()->get3DView(0,0);
   ToolRep3DPtr activeRep3D;

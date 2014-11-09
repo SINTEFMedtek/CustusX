@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReporter.h"
 #include "cxTrackerConfiguration.h"
 
+
 namespace cx
 {
 TrackingServiceNull::TrackingServiceNull()
@@ -47,6 +48,16 @@ bool TrackingServiceNull::isNull()
 void TrackingServiceNull::printWarning() const
 {
 	reportWarning("Trying to use TrackingServiceNull. Is TrackingService (org.custusx.core.tracking) disabled?");
+}
+
+Tool::State TrackingServiceNull::getState() const
+{
+	return Tool::tsNONE;
+}
+
+void TrackingServiceNull::setState(const Tool::State val)
+{
+
 }
 
 ToolPtr TrackingServiceNull::getTool(const QString& uid)

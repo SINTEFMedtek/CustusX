@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include <boost/shared_ptr.hpp>
 #include "cxTransform3D.h"
+#include "cxTool.h"
 
 #define TrackingService_iid "cx::TrackingService"
 
@@ -57,7 +58,6 @@ typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
 typedef boost::shared_ptr<class DummyTool> DummyToolPtr;
 typedef boost::shared_ptr<class ManualTool> ManualToolPtr;
 
-
 /** \brief Tracking services
  *
  *  \ingroup cx_resource_core_tool
@@ -72,6 +72,9 @@ public:
 
 	virtual ~TrackingService() {}
 
+	virtual Tool::State getState() const = 0;
+	virtual void setState(const Tool::State val) = 0;
+
 	virtual ToolPtr getTool(const QString& uid) = 0; ///< get a tool
 	virtual ToolPtr getActiveTool() = 0; ///< get the tool that has higest priority when tracking
 	virtual void setActiveTool(const QString& uid) = 0; ///< set a tool to be the dominant tool
@@ -79,9 +82,6 @@ public:
 
 	virtual ToolPtr getReferenceTool() const = 0; ///< tool used as patient reference
 	virtual ToolPtr getManualTool() = 0; ///< a mouse-controllable virtual tool that is available even when not tracking.
-
-
-	///
 
 	virtual ToolMap getTools() = 0; ///< get configured and initialized tools
 
@@ -98,10 +98,6 @@ public:
 	virtual void runDummyTool(DummyToolPtr tool) = 0;
 	virtual QStringList getSupportedTrackingSystems() = 0;
 	virtual TrackerConfigurationPtr getConfiguration() = 0;
-	///
-
-
-
 
 	virtual bool isNull() = 0;
 	static TrackingServicePtr getNullObject();

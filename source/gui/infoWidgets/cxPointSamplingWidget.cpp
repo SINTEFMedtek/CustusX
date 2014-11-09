@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReporter.h"
 #include "cxTypeConversions.h"
 #include "cxCoordinateSystemHelpers.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxViewManager.h"
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"
@@ -63,7 +63,7 @@ PointSamplingWidget::PointSamplingWidget(QWidget* parent) :
   mRemoveButton(new QPushButton("Remove", this)),
   mLoadReferencePointsButton(new QPushButton("Load reference points", this))
 {
-	connect(trackingService().get(), &ToolManager::stateChanged, this, &PointSamplingWidget::updateSlot);
+	connect(trackingService().get(), &TrackingService::stateChanged, this, &PointSamplingWidget::updateSlot);
 
   //table widget
   connect(mTable, SIGNAL(itemSelectionChanged()), this, SLOT(itemSelectionChanged()));
