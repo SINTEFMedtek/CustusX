@@ -79,6 +79,7 @@ public:
 	virtual QStringList getConfigurationsGivenApplication(QString application) = 0;
 	virtual QStringList getAllConfigurations() = 0;
 
+	virtual QStringList getSupportedTrackingSystems() = 0;
 	virtual QStringList getToolsGivenFilter(QStringList applicationsFilter,
 											QStringList trackingsystemsFilter) = 0;
 	virtual QStringList getAllTools() = 0;

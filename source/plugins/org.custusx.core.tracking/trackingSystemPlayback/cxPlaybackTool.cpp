@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPlaybackTool.h"
 #include "cxTime.h"
 #include "cxTypeConversions.h"
-#include "cxToolManager.h"
 #include "cxPlaybackTime.h"
 #include "cxManualToolAdapter.h"
 

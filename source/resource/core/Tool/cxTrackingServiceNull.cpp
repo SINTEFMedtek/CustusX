@@ -150,10 +150,6 @@ void TrackingServiceNull::runDummyTool(DummyToolPtr tool)
 
 }
 
-QStringList TrackingServiceNull::getSupportedTrackingSystems()
-{
-	return QStringList();
-}
 
 TrackerConfigurationPtr TrackingServiceNull::getConfiguration()
 {

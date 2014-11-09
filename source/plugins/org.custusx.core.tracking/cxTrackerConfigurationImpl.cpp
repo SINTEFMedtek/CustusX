@@ -227,5 +227,13 @@ QStringList TrackerConfigurationImpl::getAllTools()
 	return retval;
 }
 
+QStringList TrackerConfigurationImpl::getSupportedTrackingSystems()
+{
+	QStringList retval;
+	retval = IgstkTracker::getSupportedTrackingSystems();
+	return retval;
+}
+
+
 } // namespace cx
 

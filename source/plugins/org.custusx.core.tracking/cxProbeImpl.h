@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPROBEIMPL_H_
 #define CXPROBEIMPL_H_
 
-#include "cxTrackingServiceExport.h"
+#include "org_custusx_core_tracking_Export.h"
 
 #include "cxProbe.h"
 #include <map>
@@ -60,7 +60,7 @@ typedef boost::shared_ptr<class ProbeImpl> ProbeImplPtr;
 /**
  * \ingroup cx_service_tracking
  */
-class cxTrackingService_EXPORT ProbeImpl: public Probe
+class org_custusx_core_tracking_EXPORT ProbeImpl: public Probe
 {
 Q_OBJECT
 public:

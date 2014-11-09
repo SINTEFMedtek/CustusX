@@ -29,37 +29,29 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXTRACKINGSYSTEMPLAYBACKSERVICE_H
-#define CXTRACKINGSYSTEMPLAYBACKSERVICE_H
+#ifndef CXTRACKINGSYSTEMDUMMYSERVICE_H
+#define CXTRACKINGSYSTEMDUMMYSERVICE_H
 
-#include "cxTrackingServiceExport.h"
+#include "org_custusx_core_tracking_Export.h"
 #include "cxTrackingSystemService.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
-typedef boost::shared_ptr<class PlaybackTool> PlaybackToolPtr;
 
 /**
- * \brief Interface towards a playback tracking system.
+ * \brief Interface towards a dummy tracking system.
  * \ingroup cx_service_tracking
- *
- * Wraps another tracking system, enabling playback of the tools in that system
- *
- *
- * The original tools are wrapped by playback tools. The original ones are
- * not changed, only their movement is ignored.
  *
  * \date 2014-11-01
  * \author Christian Askeland, SINTEF
  */
-class cxTrackingService_EXPORT TrackingSystemPlaybackService : public TrackingSystemService
+class org_custusx_core_tracking_EXPORT TrackingSystemDummyService : public TrackingSystemService
 {
 Q_OBJECT
 
 public:
-	TrackingSystemPlaybackService(PlaybackTimePtr controller, TrackingSystemServicePtr base, ManualToolPtr manual);
-	virtual ~TrackingSystemPlaybackService();
+	TrackingSystemDummyService(DummyToolPtr tool);
+	virtual ~TrackingSystemDummyService();
 
 	virtual std::vector<ToolPtr> getTools();
 	virtual ToolPtr getReference() { return ToolPtr(); }
@@ -70,27 +62,13 @@ public:
 	virtual void setLoggingFolder(QString loggingFolder); ///<\param loggingFolder path to the folder where logs should be saved
 	virtual TrackerConfigurationPtr getConfiguration();
 
-	TrackingSystemServicePtr getBase() { return mBase; }
-
-private slots:
-	void onToolPositionChanged(Transform3D matrix, double timestamp);
-
 private:
-	void start();
-	void stop();
-	bool forceBaseToConfiguredState();
-	void waitForState(TrackingSystemServicePtr base, Tool::State state, int timeout);
-	bool isRunning() const;
-
-	std::vector<PlaybackToolPtr> mTools; ///< all tools
+	std::vector<DummyToolPtr> mTools; ///< all tools
 	Tool::State mState;
-	PlaybackTimePtr mController;
-	ManualToolPtr mManual;
-	TrackingSystemServicePtr mBase;
 };
 
 
 } // namespace cx
 
 
-#endif // CXTRACKINGSYSTEMPLAYBACKSERVICE_H
+#endif // CXTRACKINGSYSTEMDUMMYSERVICE_H

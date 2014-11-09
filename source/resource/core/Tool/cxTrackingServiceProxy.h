@@ -72,7 +72,6 @@ public:
 	virtual SessionToolHistoryMap getSessionHistory(double startTime, double stopTime);
 	virtual void setLoggingFolder(QString loggingFolder);
 	virtual void runDummyTool(DummyToolPtr tool);
-	virtual QStringList getSupportedTrackingSystems();
 	virtual TrackerConfigurationPtr getConfiguration();
 
 	bool isNull();

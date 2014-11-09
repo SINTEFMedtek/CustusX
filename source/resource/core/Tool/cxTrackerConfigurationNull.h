@@ -50,6 +50,7 @@ public:
 	virtual QStringList getConfigurationsGivenApplication(QString application) { return QStringList(); }
 	virtual QStringList getAllConfigurations() { return QStringList(); }
 
+	virtual QStringList getSupportedTrackingSystems() { return QStringList(); }
 	virtual QStringList getToolsGivenFilter(QStringList applicationsFilter,
 											QStringList trackingsystemsFilter) { return QStringList(); }
 	virtual QStringList getAllTools() { return QStringList(); }

@@ -66,12 +66,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-QStringList TrackingSystemIGSTKService::getSupportedTrackingSystems()
-{
-	QStringList retval;
-	retval = IgstkTracker::getSupportedTrackingSystems();
-	return retval;
-}
+//QStringList TrackingSystemIGSTKService::getSupportedTrackingSystems()
+//{
+//	QStringList retval;
+//	retval = IgstkTracker::getSupportedTrackingSystems();
+//	return retval;
+//}
 
 TrackingSystemIGSTKService::TrackingSystemIGSTKService() :
 				mConfigurationFilePath(""),

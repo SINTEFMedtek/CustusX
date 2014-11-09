@@ -37,7 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkCursor3D.h>
 #include "cxDummyTool.h"
 #include "cxReporter.h"
-#include "cxToolManager.h"
 #include "cxTime.h"
 
 namespace cx

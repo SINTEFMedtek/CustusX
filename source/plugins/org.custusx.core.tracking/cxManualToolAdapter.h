@@ -30,77 +30,64 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxManualToolAdapter.h"
-#include "cxToolManager.h"
+#ifndef CXMANUALTOOLADAPTER_H_
+#define CXMANUALTOOLADAPTER_H_
+
+#include "org_custusx_core_tracking_Export.h"
+
+#include "cxManualTool.h"
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cx_service_tracking
+* @{
+*/
 
-ManualToolAdapter::ManualToolAdapter(QString uid) :
-				ManualTool(uid)
+/**
+ * \brief Adapter class for ManualTool.
+ * \ingroup cx_service_tracking
+ *
+ * A ManualToolAdapter inherits from manual tool, but also
+ * contains a cx::Tool that is requests shape and probe info from.
+ *
+ * Used for debug - when testing tools without a tracking system.
+ *
+ *  \date Feb 14, 2011
+ *  \author christiana
+ */
+class org_custusx_core_tracking_EXPORT ManualToolAdapter : public ManualTool
 {
-	mBase.reset(new ManualTool(uid + "base"));
-	connect(mBase.get(), SIGNAL(toolProbeSector()), this, SIGNAL(toolProbeSector()));
+	Q_OBJECT
+public:
+	explicit ManualToolAdapter(QString uid);
+	explicit ManualToolAdapter(ToolPtr base);
+	virtual ~ManualToolAdapter();
+
+	virtual std::set<Type> getTypes() const;
+	virtual vtkPolyDataPtr getGraphicsPolyData() const;
+	virtual bool isCalibrated() const;
+	virtual ProbePtr getProbe() const;
+
+	virtual Transform3D getCalibration_sMt() const;
+	virtual std::map<int, Vector3D> getReferencePoints() const;
+
+	void setBase(ToolPtr base);
+
+	virtual double getTooltipOffset() const;
+	virtual void setTooltipOffset(double val);
+
+private:
+  ToolPtr mBase;
+};
+
+typedef boost::shared_ptr<ManualToolAdapter> ManualToolAdapterPtr;
+
+
+/**
+* @}
+*/
 }
 
-ManualToolAdapter::ManualToolAdapter(ToolPtr base) :
-				ManualTool(mBase->getUid() + "_manual"), mBase(base)
-{
-}
-
-ManualToolAdapter::~ManualToolAdapter()
-{
-}
-
-void ManualToolAdapter::setBase(ToolPtr base)
-{
-	disconnect(mBase.get(), SIGNAL(toolProbeSector()), this, SIGNAL(toolProbeSector()));
-	mBase = base;
-	connect(mBase.get(), SIGNAL(toolProbeSector()), this, SIGNAL(toolProbeSector()));
-
-	emit toolProbeSector();
-}
-
-vtkPolyDataPtr ManualToolAdapter::getGraphicsPolyData() const
-{
-	return mBase->getGraphicsPolyData();
-}
-
-bool ManualToolAdapter::isCalibrated() const
-{
-	return mBase->isCalibrated();
-}
-
-ProbePtr ManualToolAdapter::getProbe() const
-{
-	return mBase->getProbe();
-}
-
-Transform3D ManualToolAdapter::getCalibration_sMt() const
-{
-	return mBase->getCalibration_sMt();
-}
-
-std::map<int, Vector3D> ManualToolAdapter::getReferencePoints() const
-{
-	return mBase->getReferencePoints();
-}
-
-double ManualToolAdapter::getTooltipOffset() const
-{
-	return mBase->getTooltipOffset();
-}
-
-void ManualToolAdapter::setTooltipOffset(double val)
-{
-	mBase->setTooltipOffset(val);
-}
-
-std::set<Tool::Type> ManualToolAdapter::getTypes() const
-{
-	std::set<Tool::Type> retval = mBase->getTypes();
-	retval.insert(Tool::TOOL_MANUAL);
-	return retval;
-}
-
-}
+#endif /* CXMANUALTOOLADAPTER_H_ */

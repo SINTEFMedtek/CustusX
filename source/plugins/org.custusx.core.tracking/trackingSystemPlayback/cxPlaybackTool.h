@@ -30,64 +30,72 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXMANUALTOOLADAPTER_H_
-#define CXMANUALTOOLADAPTER_H_
+#ifndef CXPLAYBACKTOOL_H_
+#define CXPLAYBACKTOOL_H_
 
-#include "cxTrackingServiceExport.h"
+#include "cxToolImpl.h"
 
-#include "cxManualTool.h"
+#include "org_custusx_core_tracking_Export.h"
 
 namespace cx
 {
-/**
-* \file
-* \addtogroup cx_service_tracking
-* @{
-*/
 
-/**
- * \brief Adapter class for ManualTool.
+typedef boost::shared_ptr<class PlaybackTool> PlaybackToolPtr;
+typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
+
+
+/** \brief A tool used during playback
+ *
+ * \date Mar 29, 2012
+ * \author Christian Askeland, SINTEF
+ *
  * \ingroup cx_service_tracking
- *
- * A ManualToolAdapter inherits from manual tool, but also
- * contains a cx::Tool that is requests shape and probe info from.
- *
- * Used for debug - when testing tools without a tracking system.
- *
- *  \date Feb 14, 2011
- *  \author christiana
  */
-class cxTrackingService_EXPORT ManualToolAdapter : public ManualTool
+class org_custusx_core_tracking_EXPORT PlaybackTool: public ToolImpl
 {
-	Q_OBJECT
+Q_OBJECT
 public:
-	explicit ManualToolAdapter(QString uid);
-	explicit ManualToolAdapter(ToolPtr base);
-	virtual ~ManualToolAdapter();
-
+	explicit PlaybackTool(ToolPtr base, PlaybackTimePtr time);
+	virtual ~PlaybackTool();
 	virtual std::set<Type> getTypes() const;
 	virtual vtkPolyDataPtr getGraphicsPolyData() const;
+	virtual void setTransformSaveFile(const QString& filename) {}
+	virtual Transform3D get_prMt() const;
+	virtual bool getVisible() const;
+	virtual QString getUid() const;
+	virtual QString getName() const;
 	virtual bool isCalibrated() const;
-	virtual ProbePtr getProbe() const;
-
-	virtual Transform3D getCalibration_sMt() const;
-	virtual std::map<int, Vector3D> getReferencePoints() const;
-
-	void setBase(ToolPtr base);
+	virtual double getTimestamp() const;
 
 	virtual double getTooltipOffset() const;
 	virtual void setTooltipOffset(double val);
 
+	virtual Transform3D getCalibration_sMt() const;
+	virtual std::map<int, Vector3D> getReferencePoints() const;
+
+
+	virtual TimedTransformMapPtr getPositionHistory() { return mBase->getPositionHistory(); }
+	virtual bool isInitialized() const;
+	virtual ProbePtr getProbe() const { return mBase->getProbe(); }
+	virtual bool hasReferencePointWithId(int id) { return mBase->hasReferencePointWithId(id); }
+	virtual TimedTransformMap getSessionHistory(double startTime, double stopTime) { return mBase->getSessionHistory(startTime, stopTime); }
+
+	virtual void set_prMt(const Transform3D& prMt, double timestamp);
+	virtual void setVisible(bool vis);
+
+	// extensions
+	ToolPtr getBase() { return mBase; }
+
+private slots:
+	void timeChangedSlot();
 private:
-  ToolPtr mBase;
+	ToolPtr mBase;
+	PlaybackTimePtr mTime;
+
+	bool mVisible;
+	double mTimestamp;
+	Transform3D m_rMpr;
 };
 
-typedef boost::shared_ptr<ManualToolAdapter> ManualToolAdapterPtr;
-
-
-/**
-* @}
-*/
-}
-
-#endif /* CXMANUALTOOLADAPTER_H_ */
+} /* namespace cx */
+#endif /* CXPLAYBACKTOOL_H_ */

@@ -30,10 +30,76 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-
-#include "cxToolManager.h"
+#include "cxManualToolAdapter.h"
 
 namespace cx
 {
+
+ManualToolAdapter::ManualToolAdapter(QString uid) :
+				ManualTool(uid)
+{
+	mBase.reset(new ManualTool(uid + "base"));
+	connect(mBase.get(), SIGNAL(toolProbeSector()), this, SIGNAL(toolProbeSector()));
+}
+
+ManualToolAdapter::ManualToolAdapter(ToolPtr base) :
+				ManualTool(mBase->getUid() + "_manual"), mBase(base)
+{
+}
+
+ManualToolAdapter::~ManualToolAdapter()
+{
+}
+
+void ManualToolAdapter::setBase(ToolPtr base)
+{
+	disconnect(mBase.get(), SIGNAL(toolProbeSector()), this, SIGNAL(toolProbeSector()));
+	mBase = base;
+	connect(mBase.get(), SIGNAL(toolProbeSector()), this, SIGNAL(toolProbeSector()));
+
+	emit toolProbeSector();
+}
+
+vtkPolyDataPtr ManualToolAdapter::getGraphicsPolyData() const
+{
+	return mBase->getGraphicsPolyData();
+}
+
+bool ManualToolAdapter::isCalibrated() const
+{
+	return mBase->isCalibrated();
+}
+
+ProbePtr ManualToolAdapter::getProbe() const
+{
+	return mBase->getProbe();
+}
+
+Transform3D ManualToolAdapter::getCalibration_sMt() const
+{
+	return mBase->getCalibration_sMt();
+}
+
+std::map<int, Vector3D> ManualToolAdapter::getReferencePoints() const
+{
+	return mBase->getReferencePoints();
+}
+
+double ManualToolAdapter::getTooltipOffset() const
+{
+	return mBase->getTooltipOffset();
+}
+
+void ManualToolAdapter::setTooltipOffset(double val)
+{
+	mBase->setTooltipOffset(val);
+}
+
+std::set<Tool::Type> ManualToolAdapter::getTypes() const
+{
+	std::set<Tool::Type> retval = mBase->getTypes();
+	retval.insert(Tool::TOOL_MANUAL);
+	return retval;
+}
 
 }

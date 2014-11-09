@@ -76,7 +76,7 @@ cx_create_export_header("cxVideoServiceOld")
 
 
 add_library( cxVideoServiceOld ${cxVideoServiceOld_SOURCE} ${MOC_HEADER_FILES} )
-target_link_libraries(cxVideoServiceOld cxResource cxResourceUsReconstructionTypes OpenIGTLink cxTrackingService cxGrabber CTKPluginFramework)
+target_link_libraries(cxVideoServiceOld cxResource cxResourceUsReconstructionTypes OpenIGTLink cxGrabber CTKPluginFramework)
 
 add_subdirectory(testing)
 

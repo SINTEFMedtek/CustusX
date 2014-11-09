@@ -86,7 +86,6 @@ public:
 	virtual void setPlaybackMode(PlaybackTimePtr controller) {}
 	virtual void setLoggingFolder(QString loggingFolder) {}
 	virtual void runDummyTool(DummyToolPtr tool) {}
-	virtual QStringList getSupportedTrackingSystems() { return QStringList(); }
 	virtual bool isNull() { return false; }
 
 	void addTool(DummyToolPtr tool);

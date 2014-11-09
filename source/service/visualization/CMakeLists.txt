@@ -55,7 +55,6 @@ set(cxVisualizationService_LIBS
     cxResourceVisualization
     cxVideoServiceOld
     cxPatientService
-    cxTrackingService
     )
 
 cx_create_export_header("cxVisualizationService")

@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTRACKERCONFIGURATIONIMPL_H
 #define CXTRACKERCONFIGURATIONIMPL_H
 
-#include "cxTrackingServiceExport.h"
+#include "org_custusx_core_tracking_Export.h"
 
 #include "cxTrackerConfiguration.h"
 #include "cxIgstkTool.h"
@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-class cxTrackingService_EXPORT TrackerConfigurationImpl : public TrackerConfiguration
+class org_custusx_core_tracking_EXPORT TrackerConfigurationImpl : public TrackerConfiguration
 {
 public:
 	virtual ~TrackerConfigurationImpl() {}
@@ -49,6 +49,7 @@ public:
 	virtual void saveConfiguration(const Configuration& config);
 	virtual Configuration getConfiguration(QString uid);
 
+	virtual QStringList getSupportedTrackingSystems();
 	virtual QStringList getToolsGivenFilter(QStringList applicationsFilter,
 											QStringList trackingsystemsFilter);
 	virtual Tool getTool(QString uid);

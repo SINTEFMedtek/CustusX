@@ -36,10 +36,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxtestTestToolMesh.h"
 
 #include <QStringList>
-#include "cxToolManagerUsingIGSTK.h"
 #include "cxEnumConverter.h"
 #include "cxDefinitions.h"
 #include "cxTrackerConfiguration.h"
+#include "cxTrackingSystemIGSTKService.h"
 #include "cxFileHelpers.h"
 #include "cxDataLocations.h"
 
@@ -69,9 +69,10 @@ TEST_CASE("Sonowand intraop navigator STL file are readable", "[unit][tool]")
 
 TEST_CASE("Tool xml files use tracking systems supported by ToolManagerUsingIGSTK", "[unit][tool][xml]")
 {
-	cx::TrackingServiceOldPtr trackingService = cx::ToolManagerUsingIGSTK::create();
-	cx::TrackerConfigurationPtr config = trackingService->getConfiguration();
-	QStringList trackingSystems = trackingService->getSupportedTrackingSystems();
+	cx::TrackingSystemServicePtr system(new cx::TrackingSystemIGSTKService());
+//	cx::TrackingServiceOldPtr trackingService = cx::ToolManagerUsingIGSTK::create();
+	cx::TrackerConfigurationPtr config = system->getConfiguration();
+	QStringList trackingSystems = config->getSupportedTrackingSystems();
 
 	//Verify tool uses supported tracking system
 	foreach(QString filename, config->getAllTools())
@@ -86,8 +87,9 @@ TEST_CASE("Tool xml files use tracking systems supported by ToolManagerUsingIGST
 
 TEST_CASE("Tool configuration files", "[unit][tool][xml]")
 {
-	cx::TrackingServiceOldPtr trackingService = cx::ToolManagerUsingIGSTK::create();
-	cx::TrackerConfigurationPtr config = trackingService->getConfiguration();
+	cx::TrackingSystemServicePtr system(new cx::TrackingSystemIGSTKService());
+//	cx::TrackingServiceOldPtr trackingService = cx::ToolManagerUsingIGSTK::create();
+	cx::TrackerConfigurationPtr config = system->getConfiguration();
 
 	QStringList configurations = config->getAllConfigurations();
 
@@ -109,8 +111,9 @@ TEST_CASE("Tool configuration files", "[unit][tool][xml]")
 
 TEST_CASE("Tool xml files got existing image files", "[unit][tool][xml]")
 {
-	cx::TrackingServiceOldPtr trackingService = cx::ToolManagerUsingIGSTK::create();
-	cx::TrackerConfigurationPtr config = trackingService->getConfiguration();
+	cx::TrackingSystemServicePtr system(new cx::TrackingSystemIGSTKService());
+//	cx::TrackingServiceOldPtr trackingService = cx::ToolManagerUsingIGSTK::create();
+	cx::TrackerConfigurationPtr config = system->getConfiguration();
 
 	foreach(QString filename, config->getAllTools())
 	{
@@ -127,8 +130,9 @@ TEST_CASE("Tool xml files got existing image files", "[unit][tool][xml]")
 
 TEST_CASE("Verify tool xml files", "[unit][tool][xml]")
 {
-	cx::TrackingServiceOldPtr trackingService = cx::ToolManagerUsingIGSTK::create();
-	cx::TrackerConfigurationPtr config = trackingService->getConfiguration();
+	cx::TrackingSystemServicePtr system(new cx::TrackingSystemIGSTKService());
+//	cx::TrackingServiceOldPtr trackingService = cx::ToolManagerUsingIGSTK::create();
+	cx::TrackerConfigurationPtr config = system->getConfiguration();
 
 	foreach(QString filename, config->getAllTools())
 	{

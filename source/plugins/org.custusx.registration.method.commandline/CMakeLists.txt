@@ -60,7 +60,6 @@ set(PLUGIN_target_libraries
     ${PLUGIN_target_libraries}   
     cxResourceWidgets
 	cxPluginAlgorithm
-	cxTrackingService
 	org_custusx_registration
     )
 

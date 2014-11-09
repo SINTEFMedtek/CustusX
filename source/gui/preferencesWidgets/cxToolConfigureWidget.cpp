@@ -69,7 +69,8 @@ ToolConfigureGroupBox::ToolConfigureGroupBox(QWidget* parent) :
   mApplicationGroupBox->setEnabledButtons(false); //< application application is determined by the application state chosen elsewhere in the system
   mApplicationGroupBox->hide(); // large and redundant box - info is only used for path generation, which can be found in the "Save Path" box
   mApplicationGroupBox->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Expanding);
-  mTrackingSystemGroupBox = new SelectionGroupBox("Tracking systems", trackingService()->getSupportedTrackingSystems(), Qt::Horizontal, true, NULL);
+  TrackerConfigurationPtr config = trackingService()->getConfiguration();
+  mTrackingSystemGroupBox = new SelectionGroupBox("Tracking systems", config->getSupportedTrackingSystems(), Qt::Horizontal, true, NULL);
   mToolListWidget = new ConfigToolListWidget(NULL);
 
   this->setClinicalApplicationSlot(string2enum<CLINICAL_APPLICATION>(stateService()->getApplication()->getActiveStateName()));

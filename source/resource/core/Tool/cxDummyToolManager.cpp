@@ -36,8 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-//TrackingServiceOldPtr ToolManager::mInstance = NULL;
-
 DummyToolManager::DummyToolManagerPtr DummyToolManager::create()
 {
 	DummyToolManagerPtr retval;

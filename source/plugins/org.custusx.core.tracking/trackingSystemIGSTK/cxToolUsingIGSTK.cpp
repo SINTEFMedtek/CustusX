@@ -43,7 +43,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReporter.h"
 #include "cxTypeConversions.h"
 #include "cxProbeData.h"
-#include "cxToolManager.h"
 #include "cxProbeImpl.h"
 #include "cxIgstkTool.h"
 #include "cxTrackingPositionFilter.h"

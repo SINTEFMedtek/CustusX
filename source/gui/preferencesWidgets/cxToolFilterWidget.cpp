@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSelectionGroupBox.h"
 #include "cxToolListWidget.h"
 #include "cxApplicationStateMachine.h"
+#include "cxTrackerConfiguration.h"
 
 namespace cx
 {
@@ -52,7 +53,8 @@ ToolFilterGroupBox::ToolFilterGroupBox(QWidget* parent) :
   mApplicationGroupBox = new SelectionGroupBox("Applications", stateService()->getApplication()->getAllApplicationNames(), Qt::Vertical, false, NULL);
   mApplicationGroupBox->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Expanding);
 
-  mTrackingSystemGroupBox = new SelectionGroupBox("Tracking systems", trackingService()->getSupportedTrackingSystems(), Qt::Horizontal, true, NULL);
+  TrackerConfigurationPtr config = trackingService()->getConfiguration();
+  mTrackingSystemGroupBox = new SelectionGroupBox("Tracking systems", config->getSupportedTrackingSystems(), Qt::Horizontal, true, NULL);
   mToolListWidget = new FilteringToolListWidget(NULL);
   connect(mToolListWidget, SIGNAL(toolSelected(QString)), this, SIGNAL(toolSelected(QString)));
 

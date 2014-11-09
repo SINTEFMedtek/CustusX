@@ -188,11 +188,6 @@ void TrackingServiceProxy::runDummyTool(DummyToolPtr tool)
 	mTrackingService->runDummyTool(tool);
 }
 
-QStringList TrackingServiceProxy::getSupportedTrackingSystems()
-{
-	return mTrackingService->getSupportedTrackingSystems();
-}
-
 TrackerConfigurationPtr TrackingServiceProxy::getConfiguration()
 {
 	return mTrackingService->getConfiguration();

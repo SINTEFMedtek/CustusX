@@ -96,7 +96,6 @@ public:
 	virtual SessionToolHistoryMap getSessionHistory(double startTime, double stopTime) = 0;
 	virtual void setLoggingFolder(QString loggingFolder) = 0;
 	virtual void runDummyTool(DummyToolPtr tool) = 0;
-	virtual QStringList getSupportedTrackingSystems() = 0;
 	virtual TrackerConfigurationPtr getConfiguration() = 0;
 
 	virtual bool isNull() = 0;

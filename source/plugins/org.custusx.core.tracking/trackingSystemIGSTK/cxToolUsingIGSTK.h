@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTOOLUSINGIGSTK_H_
 #define CXTOOLUSINGIGSTK_H_
 
-#include "cxTrackingServiceExport.h"
+#include "org_custusx_core_tracking_Export.h"
 
 #include "cxToolImpl.h"
 
@@ -78,7 +78,7 @@ typedef boost::shared_ptr<class ProbeImpl> ProbeImplPtr;
  * \date Nov 6, 2008
  * \author Janne Beate Bakeng, SINTEF
  */
-class cxTrackingService_EXPORT ToolUsingIGSTK: public ToolImpl
+class org_custusx_core_tracking_EXPORT ToolUsingIGSTK: public ToolImpl
 {
 	Q_OBJECT
 

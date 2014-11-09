@@ -98,7 +98,7 @@ include_directories(
 	${CustusX_SOURCE_DIR}/source/resource/filter
 	)
 
-set(CX_ALGORITHM_LIBRARIES cxPatientService cxTrackingService cxResource cxGui cxGUIExtenderService cxResourceFilter)
+set(CX_ALGORITHM_LIBRARIES cxPatientService cxResource cxGui cxGUIExtenderService cxResourceFilter)
 
 
 

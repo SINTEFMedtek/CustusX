@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReporter.h"
 #include "cxPatientService.h"
 #include "cxVideoServiceOld.h"
-#include "cxToolManagerUsingIGSTK.h"
+//#include "cxToolManagerUsingIGSTK.h"
 #include "cxViewManager.h"
 #include "cxStateService.h"
 #include "cxDataManagerImpl.h"

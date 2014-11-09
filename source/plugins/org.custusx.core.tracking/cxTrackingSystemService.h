@@ -1,7 +1,7 @@
 #ifndef CXTRACKINGSYSTEMSERVICE_H
 #define CXTRACKINGSYSTEMSERVICE_H
 
-#include "cxTrackingServiceExport.h"
+#include "org_custusx_core_tracking_Export.h"
 #include "cxTool.h"
 
 namespace cx
@@ -19,7 +19,7 @@ typedef boost::shared_ptr<class TrackerConfiguration> TrackerConfigurationPtr;
  *  \date 2014-09-30
  *  \author Christian Askeland, SINTEF
  */
-class cxTrackingService_EXPORT TrackingSystemService : public QObject
+class org_custusx_core_tracking_EXPORT TrackingSystemService : public QObject
 {
 	Q_OBJECT
 public:

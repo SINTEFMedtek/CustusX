@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTRACKINGSYSTEMIGSTKSERVICE_H
 #define CXTRACKINGSYSTEMIGSTKSERVICE_H
 
-#include "cxTrackingServiceExport.h"
+#include "org_custusx_core_tracking_Export.h"
 
 #include "cxTrackingSystemService.h"
 #include "vtkForwardDeclarations.h"
@@ -80,7 +80,7 @@ typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
  * \author Janne Beate Bakeng, SINTEF
  * \author Christian Askeland, SINTEF
  */
-class cxTrackingService_EXPORT TrackingSystemIGSTKService : public TrackingSystemService
+class org_custusx_core_tracking_EXPORT TrackingSystemIGSTKService : public TrackingSystemService
 {
 Q_OBJECT
 
@@ -90,7 +90,7 @@ public:
 
 	virtual std::vector<ToolPtr> getTools();
 	virtual ToolPtr getReference() { return mReference; }
-	virtual QStringList getSupportedTrackingSystems();
+//	virtual QStringList getSupportedTrackingSystems();
 
 	virtual Tool::State getState() const;
 	virtual void setState(const Tool::State val);
