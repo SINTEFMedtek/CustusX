@@ -71,7 +71,6 @@ public:
 	virtual QString getName() const;
 	virtual int getIndex() const;
 	virtual bool isCalibrated() const;
-	virtual ProbeDefinition getProbeSector() const;
 	virtual double getTimestamp() const;
 	virtual void set_prMt(const Transform3D& prMt);
 	virtual void set_prMt(const Transform3D& prMt, double timestamp);

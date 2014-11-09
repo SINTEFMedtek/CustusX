@@ -71,11 +71,6 @@ bool ManualToolAdapter::isCalibrated() const
 	return mBase->isCalibrated();
 }
 
-ProbeDefinition ManualToolAdapter::getProbeSector() const
-{
-	return mBase->getProbeSector();
-}
-
 ProbePtr ManualToolAdapter::getProbe() const
 {
 	return mBase->getProbe();

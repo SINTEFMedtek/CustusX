@@ -29,53 +29,55 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXTOOLNULL_H
+#define CXTOOLNULL_H
 
-#ifndef CXTRACKINGSERVICE_H
-#define CXTRACKINGSERVICE_H
-
-#include "cxResourceExport.h"
-
-#include <QObject>
-#include <boost/shared_ptr.hpp>
-
-#define TrackingService_iid "cx::TrackingService"
+#include "cxTool.h"
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
-typedef boost::shared_ptr<class Tool> ToolPtr;
-
-
-/** \brief Tracking services
+/** Null implementation of Tool
  *
- *  \ingroup cx_resource_core_tool
- *  \date 2014-09-19
- *  \author Ole Vegard Solberg, SINTEF
+ * \ingroup cx_resource_core_tool
  */
-class cxResource_EXPORT TrackingService : public QObject
+class cxResource_EXPORT ToolNull: public Tool
 {
-	Q_OBJECT
 public:
-	virtual ~TrackingService() {}
+	virtual ~ToolNull() {}
 
-	virtual ToolPtr getTool(const QString& uid) = 0; ///< get a tool
-	virtual ToolPtr getActiveTool() = 0; ///< get the tool that has higest priority when tracking
-	virtual void setActiveTool(const QString& uid) = 0; ///< set a tool to be the dominant tool
-	virtual ToolPtr getFirstProbe() = 0; ///< get the active probe or any if none active
+	virtual std::set<Type> getTypes() const;
+	virtual vtkPolyDataPtr getGraphicsPolyData() const;
+	virtual TimedTransformMapPtr getPositionHistory();
 
-	virtual bool isNull() = 0;
-	static TrackingServicePtr getNullObject();
+	virtual bool getVisible() const;
+	virtual bool isInitialized() const;
 
-signals:
-	void stateChanged();
-	void dominantToolChanged(const QString& uId);
+	virtual QString getUid() const;
+	virtual QString getName() const;
 
-public slots:
+	virtual bool isCalibrated() const;
+	virtual Transform3D getCalibration_sMt() const;
+	virtual void setCalibration_sMt(Transform3D calibration);
 
+	virtual ProbePtr getProbe() const;
+	virtual double getTimestamp() const;
+	virtual void printSelf(std::ostream &os, Indent indent);
+
+	virtual double getTooltipOffset() const;
+	virtual void setTooltipOffset(double val);
+	virtual std::map<int, Vector3D> getReferencePoints() const;
+	virtual bool hasReferencePointWithId(int id);
+
+	virtual TimedTransformMap getSessionHistory(double startTime, double stopTime);
+	virtual Transform3D get_prMt() const;
+
+	virtual void resetTrackingPositionFilter(TrackingPositionFilterPtr filter);
+
+	virtual bool isNull();
+	static ToolPtr getNullObject();
 };
 
-} //cx
-Q_DECLARE_INTERFACE(cx::TrackingService, TrackingService_iid)
+} // namespace cx
 
-#endif // CXTRACKINGSERVICE_H
+#endif // CXTOOLNULL_H

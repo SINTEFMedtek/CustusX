@@ -63,13 +63,11 @@ public:
 	virtual void setTooltipOffset(double val);
 
 	virtual void resetTrackingPositionFilter(TrackingPositionFilterPtr filter);
+	virtual bool isNull() { return false; }
 
 protected:
-//	TrackingServiceOldPtr getTrackingService();
-//	TrackingServiceOldPtr getTrackingService() const;
 	virtual void set_prMt(const Transform3D& prMt, double timestamp);
 	TimedTransformMapPtr mPositionHistory;
-//	TrackingServiceWeakPtr mManager;
 	Transform3D m_prMt; ///< the transform from the tool to the patient reference
 	TrackingPositionFilterPtr mTrackingPositionFilter;
 private slots:

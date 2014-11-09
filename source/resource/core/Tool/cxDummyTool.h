@@ -184,7 +184,6 @@ public:
 	{
 		return mProbe;
 	}
-	virtual ProbeDefinition getProbeSector() const { return mProbeData; }
 	void setProbeSector( ProbeDefinition probeData )
 	{
 		mProbeData = probeData;

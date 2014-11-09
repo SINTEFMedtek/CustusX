@@ -210,13 +210,6 @@ void ToolUsingIGSTK::printInternalStructure()
 	mTool->printInternalStructure();
 }
 
-ProbeDefinition ToolUsingIGSTK::getProbeSector() const
-{
-	if (mProbe)
-		return mProbe->getProbeData();
-	return ProbeDefinition();
-}
-
 std::map<int, Vector3D> ToolUsingIGSTK::getReferencePoints() const
 {
 	return mTool->getInternalStructure().mReferencePoints;

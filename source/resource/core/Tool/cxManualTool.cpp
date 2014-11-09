@@ -132,11 +132,6 @@ bool ManualTool::isCalibrated() const
 	return false;
 }
 
-ProbeDefinition ManualTool::getProbeSector() const
-{
-	return mSector;
-}
-
 double ManualTool::getTimestamp() const
 {
 	return mTimestamp;

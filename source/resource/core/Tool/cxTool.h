@@ -101,10 +101,6 @@ public:
 		TOOL_US_PROBE,  ///< Ultrasond probe. The tool has a Probe subinterface with a sector and a video stream.
 		TOOL_MICROSCOPE ///< A tool following the focus point of a microscope
 	};
-	/**
-	 * \return the types of the tool.
-	 * Implement this one instead of the deprecated getType()
-	 */
 	virtual std::set<Type> getTypes() const = 0;
 	/**
 	 * \return true is the tool has properties of the input type.
@@ -113,13 +109,8 @@ public:
 	{
 		return this->getTypes().count(type);
 	}
-	/**Get a pointer to the tools graphical data in the form of vtkPolyData.
-	 */
-	virtual vtkPolyDataPtr getGraphicsPolyData() const = 0;
-
-	/**Saves the tools internal buffers of transforms and timestamps to file.
-	 */
-	virtual TimedTransformMapPtr getPositionHistory() = 0;
+	virtual vtkPolyDataPtr getGraphicsPolyData() const = 0; ///< get geometric 3D description
+	virtual TimedTransformMapPtr getPositionHistory() = 0; ///< get historical positions
 
 	virtual bool getVisible() const = 0; ///< \return the visibility status of the tool
 	virtual bool isInitialized() const	{ return true; }
@@ -132,7 +123,6 @@ public:
 	virtual void setCalibration_sMt(Transform3D calibration) { Q_UNUSED(calibration); } ///< requests to use the calibration and replaces the tools calibration file
 
 	virtual ProbePtr getProbe() const { return ProbePtr(); } ///< additional information if the tool represents an US Probe. Extends getProbeSector()
-	virtual ProbeDefinition getProbeSector() const = 0; ///< additional information if the tool represents an US Probe. Obsolete - use getProbe()
 	virtual double getTimestamp() const = 0; ///< latest valid timestamp for the position matrix. 0 means indeterminate (for f.ex. manual tools)
 	virtual void printSelf(std::ostream &os, Indent indent) { Q_UNUSED(os); Q_UNUSED(indent); } ///< dump internal debug data
 
@@ -146,6 +136,9 @@ public:
 
 	virtual void resetTrackingPositionFilter(TrackingPositionFilterPtr filter) = 0;
 
+	virtual bool isNull() = 0;
+	static ToolPtr getNullObject();
+
 #ifdef WIN32
 	typedef Transform3D Transform3D;
 #endif
@@ -154,9 +147,8 @@ signals:
 	void toolTransformAndTimestamp(Transform3D matrix, double timestamp);
 	void toolVisible(bool visible);
 	void tooltipOffset(double offset);
-	void toolProbeSector();///< Only used by sscDummyTool
+	void toolProbeSector();
 	void tps(int);
-//	void probeChanged(); ///< Deprecated: Use sscProbe::sectorChanged() instead.  (Probe/tool characteristics changed)
 
 protected:
 	QString mUid;

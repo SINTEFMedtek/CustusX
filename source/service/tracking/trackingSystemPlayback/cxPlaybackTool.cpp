@@ -124,11 +124,6 @@ bool PlaybackTool::isCalibrated() const
 	return mBase->isCalibrated();
 }
 
-ProbeDefinition PlaybackTool::getProbeSector() const
-{
-	return mBase->getProbeSector();
-}
-
 double PlaybackTool::getTimestamp() const
 {
 	return mTimestamp;

@@ -65,16 +65,19 @@ void TrackingServiceProxy::initServiceListener()
 void TrackingServiceProxy::onServiceAdded(TrackingService* service)
 {
 	mTrackingService.reset(service, null_deleter());
-//	connect(mVideoService.get(), SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
-//	connect(mVideoService.get(), SIGNAL(movingDataChanged(QString)), this, SIGNAL(movingDataChanged(QString)));
+
+	connect(mTrackingService.get(), &TrackingService::stateChanged, this, &TrackingService::stateChanged);
+	connect(mTrackingService.get(), &TrackingService::dominantToolChanged, this, &TrackingService::dominantToolChanged);
+
 	if(mTrackingService->isNull())
 		reportWarning("VideoServiceProxy::onServiceAdded mVideoService->isNull()");
 }
 
 void TrackingServiceProxy::onServiceRemoved(TrackingService *service)
 {
-//	disconnect(service, SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
-//	disconnect(service, SIGNAL(movingDataChanged(QString)), this, SIGNAL(movingDataChanged(QString)));
+	disconnect(mTrackingService.get(), &TrackingService::stateChanged, this, &TrackingService::stateChanged);
+	disconnect(mTrackingService.get(), &TrackingService::dominantToolChanged, this, &TrackingService::dominantToolChanged);
+
 	mTrackingService = TrackingService::getNullObject();
 }
 

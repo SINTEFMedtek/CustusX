@@ -68,7 +68,6 @@ public:
 	virtual std::set<Type> getTypes() const;
 	virtual vtkPolyDataPtr getGraphicsPolyData() const;
 	virtual bool isCalibrated() const;
-	virtual ProbeDefinition getProbeSector() const;
 	virtual ProbePtr getProbe() const;
 
 	virtual Transform3D getCalibration_sMt() const;

@@ -29,53 +29,76 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXTOOLPROXY_H
+#define CXTOOLPROXY_H
 
-#ifndef CXTRACKINGSERVICE_H
-#define CXTRACKINGSERVICE_H
+#include "cxTool.h"
+#include "cxServiceTrackerListener.h"
 
-#include "cxResourceExport.h"
-
-#include <QObject>
-#include <boost/shared_ptr.hpp>
-
-#define TrackingService_iid "cx::TrackingService"
+class ctkPluginContext;
 
 namespace cx
 {
-
 typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
-typedef boost::shared_ptr<class Tool> ToolPtr;
 
-
-/** \brief Tracking services
+/** Proxy for a real Tool. Turns to Null when Tool becomes unavailable
  *
- *  \ingroup cx_resource_core_tool
- *  \date 2014-09-19
- *  \author Ole Vegard Solberg, SINTEF
+ * \ingroup cx_resource_core_tool
  */
-class cxResource_EXPORT TrackingService : public QObject
+class cxResource_EXPORT ToolProxy: public Tool
 {
 	Q_OBJECT
 public:
-	virtual ~TrackingService() {}
+	static ToolPtr create(ToolPtr base, ctkPluginContext *pluginContext);
 
-	virtual ToolPtr getTool(const QString& uid) = 0; ///< get a tool
-	virtual ToolPtr getActiveTool() = 0; ///< get the tool that has higest priority when tracking
-	virtual void setActiveTool(const QString& uid) = 0; ///< set a tool to be the dominant tool
-	virtual ToolPtr getFirstProbe() = 0; ///< get the active probe or any if none active
+	virtual ~ToolProxy() {}
 
-	virtual bool isNull() = 0;
-	static TrackingServicePtr getNullObject();
+	virtual std::set<Type> getTypes() const;
+	virtual vtkPolyDataPtr getGraphicsPolyData() const;
+	virtual TimedTransformMapPtr getPositionHistory();
 
-signals:
-	void stateChanged();
-	void dominantToolChanged(const QString& uId);
+	virtual bool getVisible() const;
+	virtual bool isInitialized() const;
 
-public slots:
+	virtual QString getUid() const;
+	virtual QString getName() const;
+
+	virtual bool isCalibrated() const;
+	virtual Transform3D getCalibration_sMt() const;
+	virtual void setCalibration_sMt(Transform3D calibration);
+
+	virtual ProbePtr getProbe() const;
+	virtual double getTimestamp() const;
+	virtual void printSelf(std::ostream &os, Indent indent);
+
+	virtual double getTooltipOffset() const;
+	virtual void setTooltipOffset(double val);
+	virtual std::map<int, Vector3D> getReferencePoints() const;
+	virtual bool hasReferencePointWithId(int id);
+
+	virtual TimedTransformMap getSessionHistory(double startTime, double stopTime);
+	virtual Transform3D get_prMt() const;
+
+	virtual void resetTrackingPositionFilter(TrackingPositionFilterPtr filter);
+
+	virtual bool isNull();
+
+private slots:
+	void onStateChanged();
+private:
+	ToolProxy(ToolPtr base, ctkPluginContext *pluginContext);
+	void initServiceListener();
+	void onServiceAdded(TrackingService* service);
+	void onServiceRemoved(TrackingService *service);
+	void checkToolValidity();
+
+	ctkPluginContext *mPluginContext;
+	ToolPtr mTool;
+	TrackingServicePtr mTrackingService;
+	boost::shared_ptr<ServiceTrackerListener<TrackingService> > mServiceListener;
 
 };
 
-} //cx
-Q_DECLARE_INTERFACE(cx::TrackingService, TrackingService_iid)
+} // namespace cx
 
-#endif // CXTRACKINGSERVICE_H
+#endif // CXTOOLPROXY_H
