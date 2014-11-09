@@ -36,7 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackingServiceExport.h"
 
 #include "cxTrackingSystemService.h"
-#include "cxToolManager.h"
 #include "vtkForwardDeclarations.h"
 
 class QDomNode;

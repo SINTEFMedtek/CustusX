@@ -40,6 +40,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
+TrackingServicePtr TrackingServiceProxy::create(ctkPluginContext *pluginContext)
+{
+	return TrackingServicePtr(new TrackingServiceProxy(pluginContext));
+}
+
 TrackingServiceProxy::TrackingServiceProxy(ctkPluginContext *pluginContext) :
 	mPluginContext(pluginContext),
 	mTrackingService(TrackingService::getNullObject())
@@ -77,4 +82,25 @@ bool TrackingServiceProxy::isNull()
 {
 	return mTrackingService->isNull();
 }
+
+ToolPtr TrackingServiceProxy::getTool(const QString& uid)
+{
+	return mTrackingService->getTool(uid);
+}
+
+ToolPtr TrackingServiceProxy::getActiveTool()
+{
+	return mTrackingService->getActiveTool();
+}
+
+void TrackingServiceProxy::setActiveTool(const QString& uid)
+{
+	mTrackingService->setActiveTool(uid);
+}
+
+ToolPtr TrackingServiceProxy::getFirstProbe()
+{
+	return mTrackingService->getFirstProbe();
+}
+
 } //cx

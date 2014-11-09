@@ -44,6 +44,11 @@ class cxResource_EXPORT TrackingServiceNull : public TrackingService
 public:
 	TrackingServiceNull();
 
+	virtual ToolPtr getTool(const QString& uid);
+	virtual ToolPtr getActiveTool();
+	virtual void setActiveTool(const QString& uid);
+	virtual ToolPtr getFirstProbe();
+
 	virtual bool isNull();
 private:
 	void printWarning();

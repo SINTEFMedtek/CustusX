@@ -48,4 +48,27 @@ void TrackingServiceNull::printWarning()
 	reportWarning("Trying to use VideoServiceNull. Is VideoService (org.custusx.core.tracking) disabled?");
 }
 
+ToolPtr TrackingServiceNull::getTool(const QString& uid)
+{
+	this->printWarning();
+	return ToolPtr();
+}
+
+ToolPtr TrackingServiceNull::getActiveTool()
+{
+	this->printWarning();
+	return ToolPtr();
+}
+
+void TrackingServiceNull::setActiveTool(const QString& uid)
+{
+	this->printWarning();
+}
+
+ToolPtr TrackingServiceNull::getFirstProbe()
+{
+	this->printWarning();
+	return ToolPtr();
+}
+
 } //cx

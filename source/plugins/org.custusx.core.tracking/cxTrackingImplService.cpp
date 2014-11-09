@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientData.h"
 #include "cxPatientService.h"
 #include "cxRegistrationTransform.h"
+#include "cxToolManager.h"
 
 namespace cx
 {
@@ -57,5 +58,31 @@ bool TrackingImplService::isNull()
 {
 	return false;
 }
+
+ToolPtr TrackingImplService::getTool(const QString& uid)
+{
+	return this->getOld()->getTool(uid);
+}
+
+ToolPtr TrackingImplService::getActiveTool()
+{
+	return this->getOld()->getDominantTool();
+}
+
+void TrackingImplService::setActiveTool(const QString& uid)
+{
+	this->getOld()->setDominantTool(uid);
+}
+
+ToolPtr TrackingImplService::getFirstProbe()
+{
+	return this->getOld()->findFirstProbe();
+}
+
+TrackingServiceOldPtr TrackingImplService::getOld()
+{
+	return LogicManager::getInstance()->getTrackingService();
+}
+
 
 } /* namespace cx */

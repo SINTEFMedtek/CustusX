@@ -57,6 +57,7 @@ namespace cx
 class cxResource_EXPORT PatientModelServiceProxy : public PatientModelService
 {
 public:
+	static PatientModelServicePtr create(ctkPluginContext *pluginContext);
 	PatientModelServiceProxy(ctkPluginContext *context);
 	virtual ~PatientModelServiceProxy();
 

@@ -44,6 +44,8 @@ namespace cx
 {
 
 typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
+typedef boost::shared_ptr<class Tool> ToolPtr;
+
 
 /** \brief Tracking services
  *
@@ -55,6 +57,12 @@ class cxResource_EXPORT TrackingService : public QObject
 {
 	Q_OBJECT
 public:
+	virtual ~TrackingService() {}
+
+	virtual ToolPtr getTool(const QString& uid) = 0; ///< get a tool
+	virtual ToolPtr getActiveTool() = 0; ///< get the tool that has higest priority when tracking
+	virtual void setActiveTool(const QString& uid) = 0; ///< set a tool to be the dominant tool
+	virtual ToolPtr getFirstProbe() = 0; ///< get the active probe or any if none active
 
 	virtual bool isNull() = 0;
 	static TrackingServicePtr getNullObject();

@@ -39,6 +39,7 @@ class ctkPluginContext;
 
 namespace cx
 {
+typedef boost::shared_ptr<class ToolManager> TrackingServiceOldPtr;
 
 /**
  * Implementation of TrackingService.
@@ -55,10 +56,17 @@ public:
 	TrackingImplService(ctkPluginContext* context);
 	virtual ~TrackingImplService();
 
+	virtual ToolPtr getTool(const QString& uid);
+	virtual ToolPtr getActiveTool();
+	virtual void setActiveTool(const QString& uid);
+	virtual ToolPtr getFirstProbe();
+
 	virtual bool isNull();
 
 private:
 	ctkPluginContext *mContext;
+	TrackingServiceOldPtr getOld();
+
 };
 typedef boost::shared_ptr<TrackingImplService> TrackingImplServicePtr;
 
