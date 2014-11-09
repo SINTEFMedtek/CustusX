@@ -69,16 +69,12 @@ public:
 
 	virtual ToolPtr getDominantTool();
 	virtual void setDominantTool(const QString& uid);
-//	virtual void dominantCheckSlot() {}
 
 	virtual Transform3D get_rMpr() const;
 	virtual void set_rMpr(const Transform3D& val);
 	virtual ToolPtr getReferenceTool() const;
 
-//	virtual void setTooltipOffset(double offset);
-//	virtual double getTooltipOffset() const;
-
-	virtual ManualToolPtr getManualTool() { return ManualToolPtr(); }
+	virtual ToolPtr getManualTool() { return ToolPtr(); }
 	virtual void savePositionHistory() {}
 	virtual void loadPositionHistory() {}
 	virtual void addXml(QDomNode& parentNode) {}

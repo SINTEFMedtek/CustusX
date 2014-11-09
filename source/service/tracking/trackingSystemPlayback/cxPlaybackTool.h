@@ -80,6 +80,9 @@ public:
 	virtual bool hasReferencePointWithId(int id) { return mBase->hasReferencePointWithId(id); }
 	virtual TimedTransformMap getSessionHistory(double startTime, double stopTime) { return mBase->getSessionHistory(startTime, stopTime); }
 
+	virtual void set_prMt(const Transform3D& prMt, double timestamp);
+	virtual void setVisible(bool vis);
+
 	// extensions
 	ToolPtr getBase() { return mBase; }
 

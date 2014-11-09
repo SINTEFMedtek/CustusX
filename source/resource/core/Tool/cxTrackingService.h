@@ -45,6 +45,7 @@ namespace cx
 
 typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
 typedef boost::shared_ptr<class Tool> ToolPtr;
+typedef boost::shared_ptr<class ManualTool> ManualToolPtr;
 
 
 /** \brief Tracking services
@@ -63,6 +64,9 @@ public:
 	virtual ToolPtr getActiveTool() = 0; ///< get the tool that has higest priority when tracking
 	virtual void setActiveTool(const QString& uid) = 0; ///< set a tool to be the dominant tool
 	virtual ToolPtr getFirstProbe() = 0; ///< get the active probe or any if none active
+
+	virtual ToolPtr getReferenceTool() const = 0; ///< tool used as patient reference
+	virtual ToolPtr getManualTool() = 0; ///< a mouse-controllable virtual tool that is available even when not tracking.
 
 	virtual bool isNull() = 0;
 	static TrackingServicePtr getNullObject();

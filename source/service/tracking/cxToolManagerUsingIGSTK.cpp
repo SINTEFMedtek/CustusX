@@ -579,7 +579,7 @@ void ToolManagerUsingIGSTK::parseXml(QDomNode& dataNode)
 	}
 }
 
-ManualToolPtr ToolManagerUsingIGSTK::getManualTool()
+ToolPtr ToolManagerUsingIGSTK::getManualTool()
 {
 	return mManualTool;
 }

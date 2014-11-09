@@ -43,9 +43,9 @@ bool TrackingServiceNull::isNull()
 	return true;
 }
 
-void TrackingServiceNull::printWarning()
+void TrackingServiceNull::printWarning() const
 {
-	reportWarning("Trying to use VideoServiceNull. Is VideoService (org.custusx.core.tracking) disabled?");
+	reportWarning("Trying to use TrackingServiceNull. Is TrackingService (org.custusx.core.tracking) disabled?");
 }
 
 ToolPtr TrackingServiceNull::getTool(const QString& uid)
@@ -70,5 +70,18 @@ ToolPtr TrackingServiceNull::getFirstProbe()
 	this->printWarning();
 	return ToolPtr();
 }
+
+ToolPtr TrackingServiceNull::getReferenceTool() const
+{
+	this->printWarning();
+	return ToolPtr();
+}
+
+ToolPtr TrackingServiceNull::getManualTool()
+{
+	this->printWarning();
+	return ToolPtr();
+}
+
 
 } //cx

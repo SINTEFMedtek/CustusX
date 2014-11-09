@@ -70,17 +70,13 @@ void ManualTool::read3DCrossHairSlot(double toolTipOffset)
 	mCrossHair->Update();
 }
 
-/**Set tool position, use current time as timestamp
- */
-void ManualTool::set_prMt(const Transform3D& prMt)
-{
-	this->set_prMt(prMt, getMilliSecondsSinceEpoch());
-}
 
 /**Set tool position and timestamp
  */
 void ManualTool::set_prMt(const Transform3D& prMt, double timestamp)
 {
+	if (timestamp < 0)
+		timestamp = getMilliSecondsSinceEpoch();
 	mTimestamp = timestamp;
 	ToolImpl::set_prMt(prMt, timestamp);
 }

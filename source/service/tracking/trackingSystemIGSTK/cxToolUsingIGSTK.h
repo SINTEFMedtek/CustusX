@@ -125,6 +125,9 @@ public:
 
 	bool isValid() const; ///< whether this tool is constructed correctly or not
 
+	virtual void set_prMt(const Transform3D& prMt, double timestamp);
+	virtual void setVisible(bool vis);
+
 	void addXml(QDomNode& dataNode);
 	void parseXml(QDomNode& dataNode);
 

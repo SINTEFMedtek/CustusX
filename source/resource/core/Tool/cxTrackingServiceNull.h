@@ -49,9 +49,12 @@ public:
 	virtual void setActiveTool(const QString& uid);
 	virtual ToolPtr getFirstProbe();
 
+	virtual ToolPtr getReferenceTool() const;
+	virtual ToolPtr getManualTool();
+
 	virtual bool isNull();
 private:
-	void printWarning();
+	void printWarning() const;
 };
 } //cx
 #endif // CXTRACKINGSERVICENULL_H

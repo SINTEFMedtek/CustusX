@@ -156,5 +156,15 @@ bool PlaybackTool::isInitialized() const
 	return true;
 }
 
+void PlaybackTool::set_prMt(const Transform3D& prMt, double timestamp)
+{
+
+}
+
+void PlaybackTool::setVisible(bool vis)
+{
+
+}
+
 
 } /* namespace cx */

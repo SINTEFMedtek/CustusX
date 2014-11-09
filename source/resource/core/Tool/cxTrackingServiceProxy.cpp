@@ -106,4 +106,16 @@ ToolPtr TrackingServiceProxy::getFirstProbe()
 	return mTrackingService->getFirstProbe();
 }
 
+
+ToolPtr TrackingServiceProxy::getReferenceTool() const
+{
+	return mTrackingService->getReferenceTool();
+}
+
+ToolPtr TrackingServiceProxy::getManualTool()
+{
+	return mTrackingService->getManualTool();
+}
+
+
 } //cx

@@ -124,7 +124,7 @@ public:
 	void parseXml(QDomNode& dataNode); ///< read internal state from node
 	virtual void clear(); ///< clear everything loaded from xml
 
-	virtual ManualToolPtr getManualTool(); ///< a mouse-controllable virtual tool that is available even when not tracking.
+	virtual ToolPtr getManualTool(); ///< a mouse-controllable virtual tool that is available even when not tracking.
 
 	virtual SessionToolHistoryMap getSessionHistory(double startTime, double stopTime);
 

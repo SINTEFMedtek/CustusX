@@ -53,6 +53,8 @@ public:
 	virtual void setActiveTool(const QString& uid);
 	virtual ToolPtr getFirstProbe();
 
+	virtual ToolPtr getReferenceTool() const;
+	virtual ToolPtr getManualTool();
 
 	bool isNull();
 

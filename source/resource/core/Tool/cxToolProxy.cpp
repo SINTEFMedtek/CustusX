@@ -162,6 +162,17 @@ void ToolProxy::resetTrackingPositionFilter(TrackingPositionFilterPtr filter)
 	mTool->resetTrackingPositionFilter(filter);
 }
 
+void ToolProxy::set_prMt(const Transform3D& prMt, double timestamp)
+{
+	mTool->set_prMt(prMt, timestamp);
+}
+
+void ToolProxy::setVisible(bool vis)
+{
+	mTool->setVisible(vis);
+}
+
+
 bool ToolProxy::isNull()
 {
 	return mTool->isNull();

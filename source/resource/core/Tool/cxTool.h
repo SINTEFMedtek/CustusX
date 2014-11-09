@@ -136,6 +136,9 @@ public:
 
 	virtual void resetTrackingPositionFilter(TrackingPositionFilterPtr filter) = 0;
 
+	virtual void set_prMt(const Transform3D& prMt, double timestamp=-1) = 0; ///< if available for this type, set pos, ts<0 means use current time
+	virtual void setVisible(bool vis) = 0; ///< if available for this type, set visibility
+
 	virtual bool isNull() = 0;
 	static ToolPtr getNullObject();
 

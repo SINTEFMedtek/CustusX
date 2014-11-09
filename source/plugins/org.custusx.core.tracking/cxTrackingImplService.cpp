@@ -79,10 +79,21 @@ ToolPtr TrackingImplService::getFirstProbe()
 	return this->getOld()->findFirstProbe();
 }
 
-TrackingServiceOldPtr TrackingImplService::getOld()
+TrackingServiceOldPtr TrackingImplService::getOld() const
 {
 	return LogicManager::getInstance()->getTrackingService();
 }
+
+ToolPtr TrackingImplService::getReferenceTool() const
+{
+	return this->getOld()->getReferenceTool();
+}
+
+ToolPtr TrackingImplService::getManualTool()
+{
+	return this->getOld()->getManualTool();
+}
+
 
 
 } /* namespace cx */

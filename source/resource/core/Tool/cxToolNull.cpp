@@ -104,6 +104,17 @@ void ToolNull::resetTrackingPositionFilter(TrackingPositionFilterPtr filter)
 	Q_UNUSED(filter);
 }
 
+void ToolNull::set_prMt(const Transform3D& prMt, double timestamp)
+{
+	Q_UNUSED(prMt);
+	Q_UNUSED(timestamp);
+}
+
+void ToolNull::setVisible(bool vis)
+{
+	Q_UNUSED(vis);
+}
+
 bool ToolNull::isNull()
 {
 	return true;

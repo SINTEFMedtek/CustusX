@@ -81,6 +81,9 @@ public:
 
 	virtual void resetTrackingPositionFilter(TrackingPositionFilterPtr filter);
 
+	virtual void set_prMt(const Transform3D& prMt, double timestamp);
+	virtual void setVisible(bool vis);
+
 	virtual bool isNull();
 
 private slots:

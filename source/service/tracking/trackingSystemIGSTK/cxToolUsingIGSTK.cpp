@@ -289,4 +289,15 @@ void ToolUsingIGSTK::toolVisibleSlot(bool on)
 		mTpsTimer.stop();
 }
 
+void ToolUsingIGSTK::set_prMt(const Transform3D& prMt, double timestamp)
+{
+
+}
+
+void ToolUsingIGSTK::setVisible(bool vis)
+{
+
+}
+
+
 }//namespace cx

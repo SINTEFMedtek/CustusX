@@ -60,12 +60,14 @@ public:
 	virtual ToolPtr getActiveTool();
 	virtual void setActiveTool(const QString& uid);
 	virtual ToolPtr getFirstProbe();
+	ToolPtr getReferenceTool() const;
+	ToolPtr getManualTool();
 
 	virtual bool isNull();
 
 private:
 	ctkPluginContext *mContext;
-	TrackingServiceOldPtr getOld();
+	TrackingServiceOldPtr getOld() const;
 
 };
 typedef boost::shared_ptr<TrackingImplService> TrackingImplServicePtr;

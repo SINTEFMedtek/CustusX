@@ -166,7 +166,7 @@ Vector3D Navigation::findDataCenter(std::vector<DataPtr> data)
 void Navigation::moveManualToolToPosition(Vector3D& p_r)
 {
 	// move the manual tool to the same position. (this is a side effect... do we want it?)
-	ManualToolPtr manual = mBackend->getToolManager()->getManualTool();
+	ToolPtr manual = mBackend->getToolManager()->getManualTool();
 	Vector3D p_pr = mBackend->getDataManager()->get_rMpr().inv().coord(p_r);
 	Transform3D prM0t = manual->get_prMt(); // modify old pos in order to keep orientation
 	Vector3D t_pr = prM0t.coord(Vector3D(0, 0, manual->getTooltipOffset()));

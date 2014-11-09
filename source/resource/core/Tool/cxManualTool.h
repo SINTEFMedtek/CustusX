@@ -72,14 +72,11 @@ public:
 	virtual int getIndex() const;
 	virtual bool isCalibrated() const;
 	virtual double getTimestamp() const;
-	virtual void set_prMt(const Transform3D& prMt);
-	virtual void set_prMt(const Transform3D& prMt, double timestamp);
+	virtual void set_prMt(const Transform3D& prMt, double timestamp=-1);
 
 	virtual Transform3D getCalibration_sMt() const;
 	virtual std::map<int, Vector3D> getReferencePoints() const { return std::map<int, Vector3D>(); }
-
-	// extensions:
-	void setVisible(bool vis);
+	virtual void setVisible(bool vis);
 
 private slots:
 	void read3DCrossHairSlot(double toolTipOffset);

@@ -97,9 +97,6 @@ set(PLUGIN_target_libraries
     cxGUIExtenderService
     cxResourceWidgets
     cxPluginUtilities
-#    org_custusx_registration
-#    org_custusx_acquisition
-#    cxGui
     cxResourceUsReconstructionTypes
     cxVisualizationService
     cxPluginAlgorithm

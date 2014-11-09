@@ -78,7 +78,7 @@ public:
 	virtual ToolPtr findFirstProbe() = 0;
 
 	virtual ToolPtr getReferenceTool() const = 0; ///< tool used as patient reference
-	virtual ManualToolPtr getManualTool() = 0; ///< a mouse-controllable virtual tool that is available even when not tracking.
+	virtual ToolPtr getManualTool() = 0; ///< a mouse-controllable virtual tool that is available even when not tracking.
 
 	virtual bool isPlaybackMode() const { return false; }
 	virtual void setPlaybackMode(PlaybackTimePtr controller) {}
