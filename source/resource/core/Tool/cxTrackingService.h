@@ -54,6 +54,7 @@ typedef boost::shared_ptr<class Landmarks> LandmarksPtr;
 typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
 typedef boost::shared_ptr<class TrackerConfiguration> TrackerConfigurationPtr;
 
+typedef boost::shared_ptr<class TrackingSystemService> TrackingSystemServicePtr;
 typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
 typedef boost::shared_ptr<class DummyTool> DummyToolPtr;
 typedef boost::shared_ptr<class ManualTool> ManualToolPtr;
@@ -97,6 +98,10 @@ public:
 	virtual void setLoggingFolder(QString loggingFolder) = 0;
 	virtual void runDummyTool(DummyToolPtr tool) = 0;
 	virtual TrackerConfigurationPtr getConfiguration() = 0;
+
+	virtual void installTrackingSystem(TrackingSystemServicePtr system) = 0;
+	virtual void unInstallTrackingSystem(TrackingSystemServicePtr system) = 0;
+	virtual std::vector<TrackingSystemServicePtr> getTrackingSystems() = 0;
 
 	virtual bool isNull() = 0;
 	static TrackingServicePtr getNullObject();

@@ -88,6 +88,7 @@ public:
 	TrackingSystemIGSTKService();
 	virtual ~TrackingSystemIGSTKService();
 
+	virtual QString getUid() const { return "org.custusx.core.tracking.system.igstk"; }
 	virtual std::vector<ToolPtr> getTools();
 	virtual ToolPtr getReference() { return mReference; }
 //	virtual QStringList getSupportedTrackingSystems();

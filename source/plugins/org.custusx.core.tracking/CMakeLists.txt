@@ -57,7 +57,6 @@ set(PLUGIN_MOC_SRCS
 	trackingSystemIGSTK/cxToolUsingIGSTK.h
     trackingSystemIGSTK/cxIgstkTracker.h
     cxManualToolAdapter.h
-	cxTrackingSystemService.h
 	cxTrackingSystemDummyService.h
     trackingSystemPlayback/cxPlaybackTool.h
 	trackingSystemPlayback/cxTrackingSystemPlaybackService.h

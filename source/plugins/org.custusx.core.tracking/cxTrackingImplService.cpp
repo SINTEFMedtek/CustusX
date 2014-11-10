@@ -172,6 +172,11 @@ void TrackingImplService::unInstallTrackingSystem(TrackingSystemServicePtr syste
 	this->onSystemStateChanged();
 }
 
+std::vector<TrackingSystemServicePtr> TrackingImplService::getTrackingSystems()
+{
+	return mTrackingSystems;
+}
+
 void TrackingImplService::initializeManualTool()
 {
 	if (!mManualTool)

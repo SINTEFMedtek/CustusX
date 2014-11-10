@@ -110,6 +110,10 @@ void CustusXController::loadPatientSlot()
 
   cx::dataService()->setCenter(bb_r.center());
 
+  std::vector<cx::TrackingSystemServicePtr> systems = cx::trackingService()->getTrackingSystems();
+  for (unsigned i=0; i<systems.size(); ++i)
+	  cx::trackingService()->unInstallTrackingSystem(systems[i]);
+
   cx::DummyToolPtr dummyTool(new cx::DummyTool());
   dummyTool->setToolPositionMovement(dummyTool->createToolPositionMovementTranslationOnly(bb_r));
   cx::trackingService()->runDummyTool(dummyTool);

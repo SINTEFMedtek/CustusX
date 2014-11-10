@@ -53,6 +53,7 @@ public:
 	TrackingSystemDummyService(DummyToolPtr tool);
 	virtual ~TrackingSystemDummyService();
 
+	virtual QString getUid() const { return "org.custusx.core.tracking.system.dummy"; }
 	virtual std::vector<ToolPtr> getTools();
 	virtual ToolPtr getReference() { return ToolPtr(); }
 

@@ -156,4 +156,19 @@ TrackerConfigurationPtr TrackingServiceNull::getConfiguration()
 	return TrackerConfiguration::getNullObject();
 }
 
+void TrackingServiceNull::installTrackingSystem(TrackingSystemServicePtr system)
+{
+
+}
+
+void TrackingServiceNull::unInstallTrackingSystem(TrackingSystemServicePtr system)
+{
+
+}
+
+std::vector<TrackingSystemServicePtr> TrackingServiceNull::getTrackingSystems()
+{
+	return std::vector<TrackingSystemServicePtr> ();
+}
+
 } //cx

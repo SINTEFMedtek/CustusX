@@ -194,5 +194,21 @@ TrackerConfigurationPtr TrackingServiceProxy::getConfiguration()
 }
 
 
+void TrackingServiceProxy::installTrackingSystem(TrackingSystemServicePtr system)
+{
+	mTrackingService->installTrackingSystem(system);
+}
+
+void TrackingServiceProxy::unInstallTrackingSystem(TrackingSystemServicePtr system)
+{
+	mTrackingService->unInstallTrackingSystem(system);
+}
+
+std::vector<TrackingSystemServicePtr> TrackingServiceProxy::getTrackingSystems()
+{
+	return mTrackingService->getTrackingSystems();
+}
+
+
 
 } //cx

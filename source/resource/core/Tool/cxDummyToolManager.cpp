@@ -155,5 +155,20 @@ void DummyToolManager::addTool(DummyToolPtr tool)
 //	return mToolTipOffset;
 //}
 
+void DummyToolManager::installTrackingSystem(TrackingSystemServicePtr system)
+{
+
+}
+
+void DummyToolManager::unInstallTrackingSystem(TrackingSystemServicePtr system)
+{
+
+}
+
+std::vector<TrackingSystemServicePtr> DummyToolManager::getTrackingSystems()
+{
+	return std::vector<TrackingSystemServicePtr> ();
+}
+
 
 } //namespace cx

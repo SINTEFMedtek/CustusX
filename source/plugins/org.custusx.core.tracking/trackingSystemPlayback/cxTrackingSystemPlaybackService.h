@@ -61,6 +61,7 @@ public:
 	TrackingSystemPlaybackService(PlaybackTimePtr controller, TrackingSystemServicePtr base, ManualToolPtr manual);
 	virtual ~TrackingSystemPlaybackService();
 
+	virtual QString getUid() const { return "org.custusx.core.tracking.system.playback"; }
 	virtual std::vector<ToolPtr> getTools();
 	virtual ToolPtr getReference() { return ToolPtr(); }
 

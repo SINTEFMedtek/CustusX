@@ -92,6 +92,10 @@ public:
 	virtual ToolPtr getFirstProbe() { return ToolPtr(); }
 	virtual TrackerConfigurationPtr getConfiguration() { return TrackerConfigurationPtr(); }
 
+	virtual void installTrackingSystem(TrackingSystemServicePtr system);
+	virtual void unInstallTrackingSystem(TrackingSystemServicePtr system);
+	virtual std::vector<TrackingSystemServicePtr> getTrackingSystems();
+
 private:
 	typedef DummyToolMap::iterator DummyToolMapIter;
 	typedef DummyToolMap::const_iterator DummyToolMapConstIter;

@@ -48,6 +48,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	Tool/cxToolImpl
 	Tool/cxTrackingService
     Tool/cxDominantToolProxy
+    Tool/cxTrackingSystemService.h
 
 	dataAdapters/cxDataAdapter
 	dataAdapters/cxDataAdapterNull.h
