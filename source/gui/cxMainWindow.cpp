@@ -322,6 +322,7 @@ void MainWindow::addToWidgetGroupMap(QAction* action, QString groupname)
 
 MainWindow::~MainWindow()
 {
+	reporter()->setAudioSource(AudioPtr()); // important! QSound::play fires a thread, causes segfault during shutdown
 	mServiceListener.reset();
 }
 
