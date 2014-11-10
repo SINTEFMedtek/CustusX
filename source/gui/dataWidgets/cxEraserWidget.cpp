@@ -59,7 +59,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientService.h"
 #include "cxInteractiveCropper.h"
 #include "cxViewManager.h"
-#include "cxToolManager.h"
 #include "cxViewWrapper.h"
 #include "cxViewGroup.h"
 #include "cxVolumeHelpers.h"

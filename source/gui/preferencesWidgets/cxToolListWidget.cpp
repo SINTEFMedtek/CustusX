@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //#include "cxToolConfigurationParser.h"
 #include "cxTrackerConfiguration.h"
 #include "cxLegacySingletons.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 
 namespace cx
 {
@@ -77,7 +77,7 @@ void ToolListWidget::populate(QStringList toolsAbsoluteFilePath)
 
 void ToolListWidget::addTool(QString absoluteFilePath)
 {
-	TrackerConfigurationPtr config = toolManager()->getConfiguration();
+	TrackerConfigurationPtr config = trackingService()->getConfiguration();
 	QString name = config->getTool(absoluteFilePath).mName;
 
 //	QFile file(absoluteFilePath);
@@ -151,7 +151,7 @@ void FilteringToolListWidget::startDrag()
 
 void FilteringToolListWidget::filterSlot(QStringList applicationsFilter, QStringList trackingsystemsFilter)
 {
-	TrackerConfigurationPtr config = toolManager()->getConfiguration();
+	TrackerConfigurationPtr config = trackingService()->getConfiguration();
 	QStringList filteredTools = config->getToolsGivenFilter(applicationsFilter,
 														  trackingsystemsFilter);
 
@@ -228,7 +228,7 @@ void ConfigToolListWidget::configSlot(QStringList toolsAbsoluteFilePath)
 
 void ConfigToolListWidget::filterSlot(QStringList trackingsystemFilter)
 {
-	TrackerConfigurationPtr config = toolManager()->getConfiguration();
+	TrackerConfigurationPtr config = trackingService()->getConfiguration();
 
 	for (int i = 0; i < this->count(); ++i)
 	{

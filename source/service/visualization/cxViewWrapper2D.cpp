@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxManualTool.h"
 #include "cxDataManager.h"
 #include "cxViewManager.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxViewGroup.h"
 #include "cxDefinitionStrings.h"
 #include "cxSlicePlanes3DRep.h"
@@ -508,7 +508,7 @@ void ViewWrapper2D::dataRemoved(const QString& uid)
 
 void ViewWrapper2D::dominantToolChangedSlot()
 {
-	ToolPtr dominantTool = mBackend->getToolManager()->getDominantTool();
+	ToolPtr dominantTool = mBackend->getToolManager()->getActiveTool();
 	mSliceProxy->setTool(dominantTool);
 }
 
@@ -596,7 +596,7 @@ Vector3D ViewWrapper2D::qvp2vp(QPoint pos_qvp)
 void ViewWrapper2D::shiftAxisPos(Vector3D delta_vp)
 {
 	delta_vp = -delta_vp;
-	ManualToolPtr tool = mBackend->getToolManager()->getManualTool();
+	ToolPtr tool = mBackend->getToolManager()->getManualTool();
 
 	Transform3D sMr = mSliceProxy->get_sMr();
 	Transform3D rMpr = mBackend->getDataManager()->get_rMpr();
@@ -617,7 +617,7 @@ void ViewWrapper2D::shiftAxisPos(Vector3D delta_vp)
  */
 void ViewWrapper2D::setAxisPos(Vector3D click_vp)
 {
-	ManualToolPtr tool = mBackend->getToolManager()->getManualTool();
+	ToolPtr tool = mBackend->getToolManager()->getManualTool();
 
 	Transform3D sMr = mSliceProxy->get_sMr();
 	Transform3D rMpr = mBackend->getDataManager()->get_rMpr();

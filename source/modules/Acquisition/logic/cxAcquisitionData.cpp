@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStringList>
 #include "cxTime.h"
 #include "cxReporter.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxSettings.h"
 #include "cxUsReconstructionService.h"
 
@@ -203,7 +203,7 @@ void Acquisition::stopRecord()
 
 	mLatestSession->setStopTime(getMilliSecondsSinceEpoch());
 	mPluginData->addRecordSession(mLatestSession);
-	toolManager()->saveToolsSlot(); //asks all the tools to save their transforms and timestamps
+	trackingService()->savePositionHistory(); //asks all the tools to save their transforms and timestamps
 	reporter()->playStopSound();
 	this->setState(sNOT_RUNNING);
 }

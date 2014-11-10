@@ -159,6 +159,9 @@ public:
 	void setClipRect_p(DoubleBoundingBox3D clipRect_p);
 	void setSize(QSize size);
 
+	void setUseDigitalVideo(bool val); ///< RTSource is digital (eg. US sector is set digitally, not read from .xml file)
+	bool getUseDigitalVideo() const;
+
 private:
 	TYPE mType; ///< type of probe
 	double mDepthStart; ///< start of sector, mm
@@ -174,6 +177,7 @@ private:
 	Vector3D mSpacing;//(_p)
 	DoubleBoundingBox3D mClipRect_p; ///< sector clipping rect, in addition to the standard sector definition. The probe sector is the intersection of the sector definition and the clip rect.
 	QSize mSize;//_p
+	bool mDigital; ///< RTSource is digital (eg. US sector is set digitally, not read from .xml file)
 
 	//ProbeImageData
 	Vector3D transform_p_to_u(const Vector3D& q_p) const;

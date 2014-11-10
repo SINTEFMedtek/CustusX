@@ -40,10 +40,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPixmap>
 #include <QMetaObject>
 
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxReporter.h"
 #include "cxVideoConnectionManager.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxViewManager.h"
 #include "cxVideoServiceOld.h"
 #include "boost/bind.hpp"
@@ -54,7 +54,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxManualTool.h"
 #include "cxTypeConversions.h"
 #include "cxDefinitionStrings.h"
-
+#include "cxDominantToolProxy.h"
+#include "cxLogicManager.h"
 
 namespace cx
 {
@@ -62,18 +63,16 @@ StatusBar::StatusBar() :
 	mRenderingFpsLabel(new QLabel(this)),
 	mGrabbingInfoLabel(new QLabel(this)),
 	mTpsLabel(new QLabel(this))
-//	mMessageLevelLabel(new QToolButton(this))
-//	mMessageLevelLabel(new QLabel(this))
 {
 	connect(reporter(), SIGNAL(emittedMessage(Message)), this, SLOT(showMessageSlot(Message)));
 
-	connect(toolManager(), SIGNAL(configured()),      this, SLOT(connectToToolSignals()));
-	connect(toolManager(), SIGNAL(deconfigured()),    this, SLOT(disconnectFromToolSignals()));
-	connect(toolManager(), SIGNAL(trackingStarted()), this, SLOT(updateToolButtons()));
-	connect(toolManager(), SIGNAL(trackingStopped()), this, SLOT(updateToolButtons()));
+	connect(trackingService().get(), &TrackingService::stateChanged, this, &StatusBar::resetToolManagerConnection);
 
-	connect(toolManager(), SIGNAL(tps(int)), this, SLOT(tpsSlot(int)));
-	connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(updateToolButtons()));
+	cx::TrackingServicePtr ts = cx::logicManager()->getTrackingService();
+	mActiveTool = DominantToolProxy::New(ts);
+	connect(mActiveTool.get(), &DominantToolProxy::tps, this, &StatusBar::tpsSlot);
+
+	connect(trackingService().get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(updateToolButtons()));
 
 	connect(viewManager(), SIGNAL(fps(int)), this, SLOT(renderingFpsSlot(int)));
 
@@ -88,19 +87,27 @@ StatusBar::~StatusBar()
 {
 }
 
+void StatusBar::resetToolManagerConnection()
+{
+	this->disconnectFromToolSignals();
+	if (trackingService()->getState()>=Tool::tsCONFIGURED)
+		this->connectToToolSignals();
+	this->updateToolButtons();
+}
+
 void StatusBar::connectToToolSignals()
 {
 	this->disconnectFromToolSignals(); // avoid duplicates
 
 	this->addPermanentWidget(mTpsLabel);
 
-	ToolManager::ToolMap tools = toolManager()->getTools();
-	for (ToolManager::ToolMap::iterator it = tools.begin(); it != tools.end(); ++it)
+	TrackingService::ToolMap tools = trackingService()->getTools();
+	for (TrackingService::ToolMap::iterator it = tools.begin(); it != tools.end(); ++it)
 	{
 		ToolPtr tool = it->second;
 		if (tool->hasType(Tool::TOOL_MANUAL))
 			continue;
-		if (tool == toolManager()->getManualTool())
+		if (tool == trackingService()->getManualTool())
 			continue;
 		connect(tool.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateToolButtons()));
 
@@ -140,12 +147,12 @@ void StatusBar::disconnectFromToolSignals()
 
 void StatusBar::activateTool(QString uid)
 {
-	toolManager()->setDominantTool(uid);
+	trackingService()->setActiveTool(uid);
 }
 
 void StatusBar::updateToolButtons()
 {
-	ToolPtr dominant = toolManager()->getDominantTool();
+	ToolPtr dominant = trackingService()->getActiveTool();
 
 	for (unsigned i = 0; i < mToolData.size(); ++i)
 	{

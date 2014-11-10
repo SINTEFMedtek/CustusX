@@ -36,8 +36,8 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	Video/cxVideoService
 	Video/cxStreamerService
         
-	Tool/cxToolManager
-	Tool/cxTool.h
+	Tool/cxTool
+	Tool/cxToolProxy
 	Tool/cxProbe.h
 	Tool/cxDummyTool
 	Tool/cxDummyToolManager
@@ -46,7 +46,9 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	Tool/cxSliceProxy
 	Tool/cxSlicedImageProxy
 	Tool/cxToolImpl
+	Tool/cxToolNull
 	Tool/cxTrackingService
+    Tool/cxDominantToolProxy
 
 	dataAdapters/cxDataAdapter
 	dataAdapters/cxDataAdapterNull.h

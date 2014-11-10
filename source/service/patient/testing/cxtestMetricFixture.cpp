@@ -47,16 +47,10 @@ MetricFixture::MetricFixture()
 {
 	mMessageListener = cx::MessageListener::create();
 	mServices = TestServices::create();
-//	cx::cxDataManager::initialize();
-//	cx::ToolManager::setInstance(cx::DummyToolManager::getInstance());
 }
 
 MetricFixture::~MetricFixture()
 {
-//	cx::ToolManager::shutdown();
-//	cx::DummyToolManager::shutdown();
-//	cx::cxDataManager::shutdown();
-
 	mServices.reset();
 	CHECK(!mMessageListener->containsErrors());
 }
@@ -69,7 +63,6 @@ cx::DataServicePtr MetricFixture::getDataManager()
 cx::SpaceProviderPtr MetricFixture::getSpaceProvider()
 {
 	return mServices->spaceProvider();
-//	return cx::SpaceProviderPtr(new cx::SpaceProviderImpl(cx::toolManager(), cx::dataManager()));
 }
 
 FrameMetricWithInput MetricFixture::getFrameMetricWithInput()
@@ -80,7 +73,6 @@ FrameMetricWithInput MetricFixture::getFrameMetricWithInput()
 	retval.mSpace = cx::CoordinateSystem::reference();
 
 	retval.mMetric = this->createTestMetric<cx::FrameMetric>("testMetric%1");
-//	retval.mMetric = cx::FrameMetric::create("testMetric%1", "");
     retval.mMetric->setFrame(retval.m_qMt);
     retval.mMetric->setSpace(retval.mSpace);
 	this->getDataManager()->loadData(retval.mMetric);
@@ -130,15 +122,10 @@ PlaneMetricWithInput MetricFixture::getPlaneMetricWithInput(cx::Vector3D point, 
 
 	retval.mPoint = point;
 	retval.mNormal = normal;
-//	retval.mSpace = cx::CoordinateSystem::reference();
 
-//	retval.mMetric = cx::PlaneMetric::create("testMetric%1");
 	retval.mMetric = this->createTestMetric<cx::PlaneMetric>("testMetric%1");
 	retval.mMetric->getArguments()->set(0, p0);
 	retval.mMetric->getArguments()->set(1, p1);
-//	retval.mMetric->setCoordinate(point);
-//    retval.mMetric->setNormal(normal);
-//    retval.mMetric->setSpace(retval.mSpace);
 	this->getDataManager()->loadData(retval.mMetric);
 
     return retval;
@@ -151,7 +138,6 @@ DistanceMetricWithInput MetricFixture::getDistanceMetricWithInput(double distanc
     retval.mDistance = distance;
 
 	retval.mMetric = this->createTestMetric<cx::DistanceMetric>("testMetric%1");
-//	retval.mMetric = cx::DistanceMetric::create("testMetric%1");
 	retval.mMetric->getArguments()->set(0, p0);
 	retval.mMetric->getArguments()->set(1, p1);
 	this->getDataManager()->loadData(retval.mMetric);
@@ -166,7 +152,6 @@ DistanceMetricWithInput MetricFixture::getDistanceMetricWithInput(double distanc
     retval.mDistance = distance;
 
 	retval.mMetric = this->createTestMetric<cx::DistanceMetric>("testMetric%1");
-//	retval.mMetric = cx::DistanceMetric::create("testMetric%1");
 	retval.mMetric->getArguments()->set(0, this->getPointMetricWithInput(cx::Vector3D(0,0,0)).mMetric);
 	retval.mMetric->getArguments()->set(1, this->getPointMetricWithInput(cx::Vector3D(distance,0,0)).mMetric);
 	this->getDataManager()->loadData(retval.mMetric);
@@ -181,7 +166,6 @@ bool MetricFixture::inputEqualsMetric(FrameMetricWithInput data)
     INFO(qstring_cast(data.m_qMt));
     INFO("==");
     INFO(qstring_cast(data.mMetric->getFrame()));
-    //    INFO("Space: " + qstring_cast(data.mSpace));
 
 	return cx::similar(data.m_qMt, data.mMetric->getFrame())
             && (data.mSpace == data.mMetric->getSpace());
@@ -193,7 +177,6 @@ bool MetricFixture::inputEqualsMetric(ToolMetricWithInput data)
 	INFO(qstring_cast(data.m_qMt));
 	INFO("==");
 	INFO(qstring_cast(data.mMetric->getFrame()));
-	//    INFO("Space: " + qstring_cast(data.mSpace));
 
 	return cx::similar(data.m_qMt, data.mMetric->getFrame())
 			&& (data.mSpace == data.mMetric->getSpace())

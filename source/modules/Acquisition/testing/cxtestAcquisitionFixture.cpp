@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImageDataContainer.h"
 #include "cxStringDataAdapterXml.h"
 #include "cxProbeImpl.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxLogicManager.h"
 #include "cxStateService.h"
 #include "cxLegacySingletons.h"
@@ -103,7 +103,7 @@ void AcquisitionFixture::setupVideo()
 void AcquisitionFixture::setupProbe()
 {
 	SSC_LOG("");
-	cx::DummyToolPtr dummyTool(new cx::DummyTool(cx::trackingService()));
+	cx::DummyToolPtr dummyTool(new cx::DummyTool());
 	dummyTool->setToolPositionMovement(dummyTool->createToolPositionMovementTranslationOnly(cx::DoubleBoundingBox3D(0,0,0,10,10,10)));
 	std::pair<QString, cx::ProbeDefinition> probedata = cx::UsReconstructionFileReader::readProbeDataFromFile(mAcqDataFilename);
 	cx::ProbeImplPtr probe = cx::ProbeImpl::New("","");
@@ -126,7 +126,6 @@ void AcquisitionFixture::initialize()
 	cx::patientService()->getPatientData()->newPatient(cx::DataLocations::getTestDataPath() + "/temp/Acquisition/");
 
 	//Mock UsReconstructionService with null object
-//	mAcquisitionData.reset(new cx::AcquisitionData(cx::UsReconstructionService::getNullObject()));
 	ctkPluginContext *pluginContext = cx::logicManager()->getPluginContext();
 	cx::UsReconstructionServicePtr reconstructer = cx::UsReconstructionServicePtr(new cx::UsReconstructionServiceProxy(pluginContext));
 	mAcquisitionData.reset(new cx::AcquisitionData(reconstructer));
@@ -140,7 +139,7 @@ void AcquisitionFixture::initialize()
 	// run setup of video, probe and start acquisition in series, each depending on the success of the previous:
 	QTimer::singleShot(0, this, SLOT(setupVideo()));
 	connect(cx::videoService()->getVideoConnection().get(), SIGNAL(connected(bool)), this, SLOT(videoConnectedSlot()));
-	connect(cx::toolManager(), SIGNAL(trackingStarted()), this, SLOT(start()));
+	connect(cx::trackingService().get(), &cx::TrackingService::stateChanged, this, &AcquisitionFixture::start);
 }
 
 void AcquisitionFixture::videoConnectedSlot()
@@ -159,6 +158,9 @@ void AcquisitionFixture::videoConnectedSlot()
 
 void AcquisitionFixture::start()
 {
+	if (cx::trackingService()->getState() < cx::Tool::tsTRACKING)
+		return;
+
 	SSC_LOG("");
 	mAcquisitionBase->startRecord();
 	QTimer::singleShot(mRecordDuration, this, SLOT(stop()));

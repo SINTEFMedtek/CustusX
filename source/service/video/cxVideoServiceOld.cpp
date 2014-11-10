@@ -47,8 +47,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxBasicVideoSource.h"
 #include "cxTypeConversions.h"
 
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
+#include "cxTool.h"
 #include "cxVideoServiceBackend.h"
+#include "cxLogger.h"
+
 
 namespace cx
 {
@@ -104,8 +107,8 @@ void VideoServiceOld::setActiveVideoSource(QString uid)
 //	std::cout << "VideoServiceOld::setActiveVideoSource() " << mActiveVideoSource->getUid() << std::endl;
 
 	// set active stream in all probes if stream is present:
-	ToolManager::ToolMap tools = mBackend->getToolManager()->getTools();
-	for (ToolManager::ToolMap::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
+	TrackingService::ToolMap tools = mBackend->getToolManager()->getTools();
+	for (TrackingService::ToolMap::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
 	{
 		ProbePtr probe = iter->second->getProbe();
 		if (!probe)
@@ -125,7 +128,7 @@ VideoSourcePtr VideoServiceOld::getGuessForActiveVideoSource(VideoSourcePtr old)
 		return mUSAcquisitionVideoPlayback->getVideoSource();
 
 	// ask for active stream in first probe:
-	ToolPtr tool = mBackend->getToolManager()->findFirstProbe();
+	ToolPtr tool = mBackend->getToolManager()->getFirstProbe();
 	if (tool && tool->getProbe() && tool->getProbe()->getRTSource())
 	{
 		// keep existing if present
@@ -174,8 +177,8 @@ void VideoServiceOld::setPlaybackMode(PlaybackTimePtr controller)
 	this->autoSelectActiveVideoSource();
 
 	VideoSourcePtr playbackSource = mUSAcquisitionVideoPlayback->getVideoSource();
-	ToolManager::ToolMap tools = mBackend->getToolManager()->getTools();
-	for (ToolManager::ToolMap::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
+	TrackingService::ToolMap tools = mBackend->getToolManager()->getTools();
+	for (TrackingService::ToolMap::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
 	{
 		ProbePtr probe = iter->second->getProbe();
 		if (!probe)

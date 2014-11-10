@@ -55,7 +55,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //TODO: remove
 #include "cxLegacySingletons.h"
 #include "cxRepManager.h"
-#include "cxToolManager.h"
+//#include "cxTrackingService.h"
+#include "cxTrackingService.h"
 
 namespace cx
 {
@@ -129,13 +130,13 @@ void LandmarkPatientRegistrationWidget::fixedDataChanged()
 
 void LandmarkPatientRegistrationWidget::updateToolSampleButton()
 {
-	ToolPtr tool = toolManager()->getDominantTool();
+	ToolPtr tool = mServices.trackingService->getActiveTool();
 
 	bool enabled = false;
 	enabled = tool && tool->getVisible() && (!tool->hasType(Tool::TOOL_MANUAL) || mServices.patientModelService->getDebugMode()); // enable only for non-manual tools. ignore this in debug mode.
 	mToolSampleButton->setEnabled(enabled);
 
-	if (toolManager()->getDominantTool())
+	if (mServices.trackingService->getActiveTool())
 		mToolSampleButton->setText("Sample " + qstring_cast(tool->getName()));
 	else
 		mToolSampleButton->setText("No tool");
@@ -143,7 +144,7 @@ void LandmarkPatientRegistrationWidget::updateToolSampleButton()
 
 void LandmarkPatientRegistrationWidget::toolSampleButtonClickedSlot()
 {
-	ToolPtr tool = toolManager()->getDominantTool();
+	ToolPtr tool = mServices.trackingService->getActiveTool();
 
 	if (!tool)
 	{

@@ -63,7 +63,8 @@ ProbeDefinition::ProbeDefinition(TYPE type) :
 	mType(type), mDepthStart(0), mDepthEnd(0), mWidth(0),
 	mTemporalCalibration(0), mCenterOffset(0), mSoundSpeedCompensationFactor(1.0),
 	mUid("default"),
-	mOrigin_p(0, 0, 0), mSpacing(-1, -1, -1), mClipRect_p(0, 0, 0, 0), mSize(0, 0)
+	mOrigin_p(0, 0, 0), mSpacing(-1, -1, -1), mClipRect_p(0, 0, 0, 0), mSize(0, 0),
+	mDigital(false)
 {}
 
 void ProbeDefinition::addXml(QDomNode dataNode) const
@@ -289,6 +290,16 @@ void ProbeDefinition::setClipRect_p(DoubleBoundingBox3D clipRect_p)
 void ProbeDefinition::setSize(QSize size)
 {
 	mSize = size;
+}
+
+void ProbeDefinition::setUseDigitalVideo(bool val)
+{
+	mDigital = val;
+}
+
+bool ProbeDefinition::getUseDigitalVideo() const
+{
+	return mDigital;
 }
 
 }

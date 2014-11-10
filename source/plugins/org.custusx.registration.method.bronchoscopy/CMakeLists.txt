@@ -9,14 +9,12 @@ include_directories(
     ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.registration
     ${CustusX_SOURCE_DIR}/source/modules/Acquisition/gui
     ${CustusX_SOURCE_DIR}/source/modules/Acquisition/logic
-	${CustusX_SOURCE_DIR}/source/service/tracking
 	${CustusX_SOURCE_DIR}/source/service/visualization
 	${CustusX_SOURCE_DIR}/source/gui/dataWidgets
 	${CustusX_SOURCE_DIR}/source/logic
 
     ${CustusX_BINARY_DIR}/source/plugins/org.custusx.registration
     ${CustusX_BINARY_DIR}/source/modules/Acquisition
-    ${CustusX_BINARY_DIR}/source/service/tracking
     ${CustusX_BINARY_DIR}/source/service/visualization
     ${CustusX_BINARY_DIR}/source/gui
     ${CustusX_BINARY_DIR}/source/logic
@@ -56,7 +54,6 @@ set(PLUGIN_target_libraries
     ${PLUGIN_target_libraries}   
     cxResourceWidgets
 	cxPluginAlgorithm
-	cxTrackingService
 	cxPluginAcquisition
 	cxResourceVisualization
 	org_custusx_registration

@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImage.h"
 #include "cxPatientData.h"
 #include "cxCyclicActionLogger.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxViewManager.h"
 #include "cxStateService.h"
 #include "cxPatientService.h"
@@ -110,7 +110,7 @@ void CustusXController::loadPatientSlot()
 
   cx::dataService()->setCenter(bb_r.center());
 
-  cx::DummyToolPtr dummyTool(new cx::DummyTool(cx::trackingService()));
+  cx::DummyToolPtr dummyTool(new cx::DummyTool());
   dummyTool->setToolPositionMovement(dummyTool->createToolPositionMovementTranslationOnly(bb_r));
   cx::trackingService()->runDummyTool(dummyTool);
 }

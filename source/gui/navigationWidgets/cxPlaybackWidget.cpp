@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QToolTip>
 #include <QMouseEvent>
 #include <QLabel>
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxHelperWidgets.h"
 #include "cxTime.h"
 #include "cxReporter.h"
@@ -59,7 +59,7 @@ PlaybackWidget::PlaybackWidget(QWidget* parent) :
 	mOpen = false;
 	this->setToolTip(this->defaultWhatsThis());
 
-	connect(toolManager(), SIGNAL(initialized()), this, SLOT(toolManagerInitializedSlot()));
+	connect(trackingService().get(), &TrackingService::stateChanged, this, &PlaybackWidget::toolManagerInitializedSlot);
 
 	mTimer.reset(new PlaybackTime());
 	mTimer->initialize(QDateTime::currentDateTime(), 100000);
@@ -168,16 +168,17 @@ void PlaybackWidget::timeLineWidgetValueChangedSlot()
 
 void PlaybackWidget::toggleOpenSlot()
 {
-	if (toolManager()->isPlaybackMode())
+	if (trackingService()->isPlaybackMode())
 	{
-		toolManager()->setPlaybackMode(PlaybackTimePtr());
+		mTimer->stop();
+		trackingService()->setPlaybackMode(PlaybackTimePtr());
 		videoService()->setPlaybackMode(PlaybackTimePtr());
 	}
 	else
 	{
-		toolManager()->setPlaybackMode(mTimer);
+		trackingService()->setPlaybackMode(mTimer);
 		videoService()->setPlaybackMode(mTimer);
-		if (!toolManager()->isPlaybackMode())
+		if (!trackingService()->isPlaybackMode())
 			return;
 		report(QString("Started Playback with start time [%1] and end time [%2]")
 						.arg(mTimer->getStartTime().toString(timestampMilliSecondsFormatNice()))
@@ -262,8 +263,8 @@ std::vector<TimelineEvent> PlaybackWidget::createEvents()
 
 	// find all valid regions (i.e. time sequences with tool navigation)
 	TimelineEventVector events;
-	ToolManager::ToolMap tools = toolManager()->getTools();
-	for (ToolManager::ToolMap::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
+	TrackingService::ToolMap tools = trackingService()->getTools();
+	for (TrackingService::ToolMap::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
 	{
 		if(!iter->second->hasType(Tool::TOOL_MANUAL))
 		{
@@ -332,7 +333,7 @@ std::pair<double,double> PlaybackWidget::findTimeRange(std::vector<TimelineEvent
 
 void PlaybackWidget::toolManagerInitializedSlot()
 {
-	if (toolManager()->isPlaybackMode())
+	if (trackingService()->isPlaybackMode())
 	{
 		mOpenAction->setText("Close Playback");
 		mOpenAction->setIcon(QIcon(":/icons/open_icon_library/button-green.png"));
@@ -341,8 +342,12 @@ void PlaybackWidget::toolManagerInitializedSlot()
 	{
 		mOpenAction->setText("Open Playback");
 		mOpenAction->setIcon(QIcon(":/icons/open_icon_library/button-red.png"));
+		mToolTimelineWidget->setEvents(std::vector<TimelineEvent>());
 		return;
 	}
+
+	if (trackingService()->getState() < Tool::tsINITIALIZED)
+		return;
 
 	std::vector<TimelineEvent> events = this->createEvents();
 	std::pair<double,double> range = this->findTimeRange(events);

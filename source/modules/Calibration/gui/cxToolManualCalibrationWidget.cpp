@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QLabel>
 #include <QGroupBox>
 #include "cxActiveToolWidget.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxDataInterface.h"
 #include "cxHelperWidgets.h"
 
@@ -71,10 +71,7 @@ ToolManualCalibrationWidget::ToolManualCalibrationWidget(QWidget* parent) :
 
   mToptopLayout->addStretch();
 
-  connect(toolManager(), SIGNAL(configured()), this, SLOT(toolCalibrationChanged()));
-  connect(toolManager(), SIGNAL(initialized()), this, SLOT(toolCalibrationChanged()));
-  connect(toolManager(), SIGNAL(trackingStarted()), this, SLOT(toolCalibrationChanged()));
-  connect(toolManager(), SIGNAL(trackingStopped()), this, SLOT(toolCalibrationChanged()));
+  connect(trackingService().get(), &TrackingService::stateChanged, this, &ToolManualCalibrationWidget::toolCalibrationChanged);
 }
 
 

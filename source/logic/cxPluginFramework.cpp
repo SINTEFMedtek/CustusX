@@ -76,7 +76,7 @@ PluginFrameworkManager::PluginFrameworkManager()
 
 	mFrameworkFactory.reset(new ctkPluginFrameworkFactory(fwProps));
 	mPluginLibFilter << "*.dll" << "*.so" << "*.dylib";
-	this->loadState();
+//	this->loadState();
 }
 
 PluginFrameworkManager::~PluginFrameworkManager()

@@ -36,39 +36,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-//TrackingServiceOldPtr ToolManager::mInstance = NULL;
-
 DummyToolManager::DummyToolManagerPtr DummyToolManager::create()
 {
 	DummyToolManagerPtr retval;
 	retval.reset(new DummyToolManager());
-	retval->mSelf = retval;
 	return retval;
 }
 
-//TrackingServiceOldPtr DummyToolManager::getInstance()
-//{
-//	if(ToolManager::mInstance == NULL)
-//	{
-//		ToolManager::mInstance = new DummyToolManager();
-//	}
-//	return ToolManager::mInstance;
-//}
-
-//void DummyToolManager::reset()
-//{
-//	ToolManager::mInstance = NULL;
-//	getInstance();
-//}
-
 DummyToolManager::DummyToolManager() :
 	m_rMpr(Transform3D::Identity()),
-	mToolTipOffset(0),
-	mConfigured(false),
-	mInitialized(false),
-	mIsTracking(false)
+//	mToolTipOffset(0),
+//	mConfigured(false),
+//	mInitialized(false),
+//	mIsTracking(false),
+	mState(Tool::tsNONE)
 {
-	DummyToolPtr tool1(new DummyTool(mSelf.lock()));
+	DummyToolPtr tool1(new DummyTool());
 
 	mDominantTool = tool1;
 	mReferenceTool = tool1;
@@ -77,40 +60,28 @@ DummyToolManager::DummyToolManager() :
 }
 DummyToolManager::~ DummyToolManager()
 {}
-bool DummyToolManager::isConfigured() const
+
+Tool::State DummyToolManager::getState() const
 {
-	return mConfigured;
-}
-bool DummyToolManager::isInitialized() const
-{
-	return mInitialized;
-}
-bool DummyToolManager::isTracking() const
-{
-	return mIsTracking;
+	return mState;
 }
 
-void DummyToolManager::configure()
+void DummyToolManager::setState(const Tool::State val)
 {
-	mConfigured = true;
-	emit configured();
-}
-void DummyToolManager::initialize()
-{
-	mInitialized = true;
-	emit initialized();
-}
-void DummyToolManager::uninitialize()
-{
-	mInitialized = false;
-	emit initialized();
+	if (val==mState)
+		return;
+
+	if (val==Tool::tsTRACKING)
+		this->startTracking();
+	else if (mState==Tool::tsTRACKING)
+		this->stopTracking();
+
+	mState = val;
+	emit stateChanged();
 }
 
 void DummyToolManager::startTracking()
 {
-	mIsTracking = true;
-	emit trackingStarted();
-
 	DummyToolMapConstIter it = mDummyTools.begin();
 	while(it != mDummyTools.end())
 	{
@@ -122,9 +93,6 @@ void DummyToolManager::startTracking()
 
 void DummyToolManager::stopTracking()
 {
-	mIsTracking = false;
-	emit trackingStopped();
-
 	DummyToolMapConstIter it = mDummyTools.begin();
 	while(it != mDummyTools.end())
 	{
@@ -133,9 +101,9 @@ void DummyToolManager::stopTracking()
 	}
 }
 
-ToolManager::ToolMap DummyToolManager::getTools()
+TrackingService::ToolMap DummyToolManager::getTools()
 {
-	return ToolManager::ToolMap(mDummyTools.begin(), mDummyTools.end());
+	return TrackingService::ToolMap(mDummyTools.begin(), mDummyTools.end());
 }
 
 ToolPtr DummyToolManager::getTool(const QString& uid)
@@ -144,11 +112,11 @@ ToolPtr DummyToolManager::getTool(const QString& uid)
 	return (*it).second;
 }
 
-ToolPtr DummyToolManager::getDominantTool()
+ToolPtr DummyToolManager::getActiveTool()
 {
 	return mDominantTool;
 }
-void DummyToolManager::setDominantTool(const QString& uid)
+void DummyToolManager::setActiveTool(const QString& uid)
 {
 	DummyToolMapConstIter it = mDummyTools.find(uid);
 	mDominantTool = (*it).second;
@@ -175,17 +143,17 @@ void DummyToolManager::addTool(DummyToolPtr tool)
 	mDummyTools.insert(std::make_pair(tool->getUid(), tool));
 }
 
-void DummyToolManager::setTooltipOffset(double offset)
-{
-	if (similar(offset, mToolTipOffset))
-		return;
-	mToolTipOffset = offset;
-	emit tooltipOffset(mToolTipOffset);
-}
-double DummyToolManager::getTooltipOffset() const
-{
-	return mToolTipOffset;
-}
+//void DummyToolManager::setTooltipOffset(double offset)
+//{
+//	if (similar(offset, mToolTipOffset))
+//		return;
+//	mToolTipOffset = offset;
+//	emit tooltipOffset(mToolTipOffset);
+//}
+//double DummyToolManager::getTooltipOffset() const
+//{
+//	return mToolTipOffset;
+//}
 
 
 } //namespace cx

@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataManager.h"
 #include "cxViewManager.h"
 #include "cxRepManager.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxStatusBar.h"
 #include "cxVolumePropertiesWidget.h"
 #include "cxNavigationWidget.h"
@@ -457,12 +457,15 @@ void MainWindow::createActions()
 
 	mConfigureToolsAction->setChecked(true);
 
+//	connect(mConfigureToolsAction, &QAction::triggered, this, boost::bind(&MainWindow::setState, this, Tool::tsCONFIGURED));
 	connect(mConfigureToolsAction, SIGNAL(triggered()), this, SLOT(configureSlot()));
-	connect(mInitializeToolsAction, SIGNAL(triggered()), toolManager(), SLOT(initialize()));
+	boost::function<void()> finit = boost::bind(&TrackingService::setState, trackingService(), Tool::tsINITIALIZED);
+	connect(mInitializeToolsAction, &QAction::triggered, finit);
 	connect(mTrackingToolsAction, SIGNAL(triggered()), this, SLOT(toggleTrackingSlot()));
-	connect(mSaveToolsPositionsAction, SIGNAL(triggered()), toolManager(), SLOT(saveToolsSlot()));
-	connect(toolManager(), SIGNAL(trackingStarted()), this, SLOT(updateTrackingActionSlot()));
-	connect(toolManager(), SIGNAL(trackingStopped()), this, SLOT(updateTrackingActionSlot()));
+	boost::function<void()> fsavetools = boost::bind(&TrackingService::savePositionHistory, trackingService());
+	connect(mSaveToolsPositionsAction, &QAction::triggered, fsavetools);
+	connect(trackingService().get(), SIGNAL(stateChanged()), this, SLOT(updateTrackingActionSlot()));
+	connect(trackingService().get(), SIGNAL(stateChanged()), this, SLOT(updateTrackingActionSlot()));
 	this->updateTrackingActionSlot();
 
 	mCenterToImageCenterAction = new QAction(tr("Center Image"), this);
@@ -620,7 +623,7 @@ void MainWindow::updatePointPickerActionSlot()
 
 void MainWindow::updateTrackingActionSlot()
 {
-	if (toolManager()->isTracking())
+	if (trackingService()->getState() >= Tool::tsTRACKING)
 	{
 		mTrackingToolsAction->setIcon(QIcon(":/icons/polaris-green.png"));
 		mTrackingToolsAction->setText("Stop Tracking");
@@ -634,10 +637,10 @@ void MainWindow::updateTrackingActionSlot()
 
 void MainWindow::toggleTrackingSlot()
 {
-	if (toolManager()->isTracking())
-		toolManager()->stopTracking();
+	if (trackingService()->getState() >= Tool::tsTRACKING)
+		trackingService()->setState(Tool::tsINITIALIZED);
 	else
-		toolManager()->startTracking();
+		trackingService()->setState(Tool::tsTRACKING);
 }
 
 namespace
@@ -1041,7 +1044,7 @@ void MainWindow::deleteDataSlot()
 
 void MainWindow::configureSlot()
 {
-	toolManager()->configure();
+	trackingService()->setState(Tool::tsCONFIGURED);
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)

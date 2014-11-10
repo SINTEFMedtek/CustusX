@@ -6,7 +6,6 @@ if (BUILD_TESTING)
     		../logic/3DReconstruction
     		${CustusX_BINARY_DIR}/source/service/patient
     		${CustusX_SOURCE_DIR}/source/service/patient
-    		${CustusX_SOURCE_DIR}/source/service/tracking
 		)
 
 	# Catch unit test framework stuff:

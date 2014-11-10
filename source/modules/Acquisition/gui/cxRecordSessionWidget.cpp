@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTime.h"
 #include "cxReporter.h"
 #include "cxRecordSession.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxTypeConversions.h"
 
 namespace cx

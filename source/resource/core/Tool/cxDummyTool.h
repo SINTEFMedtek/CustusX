@@ -91,6 +91,8 @@ public:
 	virtual QString getConfigName(QString uid) { return QString(); }
 	virtual QString getConfigId() const { return QString(); }
 	virtual QString getConfigurationPath() const { return QString(); }
+	virtual void removeCurrentConfig() {}
+	virtual void saveCurrentConfig(QString uid, QString name) {}
 
 	virtual void applyNewConfigurationWithId(QString uid) {}
 	virtual void setTemporalCalibration(double val) {}
@@ -148,7 +150,7 @@ signals:
 
 struct cxResource_EXPORT DummyToolTestUtilities
 {
-	static DummyToolPtr createDummyTool(ProbeDefinition probeData = ProbeDefinition(), TrackingServiceOldPtr manager = TrackingServiceOldPtr());
+	static DummyToolPtr createDummyTool(ProbeDefinition probeData = ProbeDefinition());
 	static ProbeDefinition createProbeDataLinear(double depth=40, double width=50, Eigen::Array2i frameSize=Eigen::Array2i(80,40));
 	static ProbeDefinition createProbeData(ProbeDefinition::TYPE, double depth=40, double width=50, Eigen::Array2i frameSize=Eigen::Array2i(80,40));
 };
@@ -166,7 +168,7 @@ class cxResource_EXPORT DummyTool : public ToolImpl
 {
 	Q_OBJECT
 public:
-	explicit DummyTool(TrackingServiceOldPtr manager, const QString& uid="dummytool");
+	explicit DummyTool(const QString& uid="dummytool");
 	~DummyTool();
 	virtual std::set<Type> getTypes() const;
 	virtual void setType(Type);
@@ -182,7 +184,6 @@ public:
 	{
 		return mProbe;
 	}
-	virtual ProbeDefinition getProbeSector() const { return mProbeData; }
 	void setProbeSector( ProbeDefinition probeData )
 	{
 		mProbeData = probeData;

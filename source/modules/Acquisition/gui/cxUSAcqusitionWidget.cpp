@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QVBoxLayout>
 #include "boost/bind.hpp"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxDoubleWidgets.h"
 #include "cxTypeConversions.h"
@@ -141,7 +141,7 @@ QWidget* USAcqusitionWidget::createOptionsWidget()
 	layout->setMargin(0);
 
 	SoundSpeedConverterWidget* soundSpeedWidget = new SoundSpeedConverterWidget(this);
-	connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), soundSpeedWidget, SLOT(setToolSlot(const QString&)));
+	connect(trackingService().get(), SIGNAL(dominantToolChanged(const QString&)), soundSpeedWidget, SLOT(setToolSlot(const QString&)));
 
 	ProbeConfigWidget* probeWidget = new ProbeConfigWidget(this);
 	probeWidget->getActiveProbeConfigWidget()->setVisible(false);

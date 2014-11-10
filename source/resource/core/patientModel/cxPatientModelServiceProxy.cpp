@@ -41,6 +41,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
+PatientModelServicePtr PatientModelServiceProxy::create(ctkPluginContext *pluginContext)
+{
+	return PatientModelServicePtr(new PatientModelServiceProxy(pluginContext));
+}
 
 PatientModelServiceProxy::PatientModelServiceProxy(ctkPluginContext *context) :
 	mPluginContext(context),

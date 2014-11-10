@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxResourceExport.h"
 
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxDummyTool.h"
 
 namespace cx
@@ -49,7 +49,7 @@ namespace cx
  *
  * \ingroup cx_resource_core_tool
  */
-class cxResource_EXPORT DummyToolManager : public ToolManager
+class cxResource_EXPORT DummyToolManager : public TrackingService
 {
 	Q_OBJECT
 
@@ -61,32 +61,20 @@ public:
 
 	typedef std::map<QString, DummyToolPtr> DummyToolMap;
 
-	virtual bool isConfigured() const;
-	virtual bool isInitialized() const;
-	virtual bool isTracking() const;
-
-	virtual void configure();
-	virtual void deconfigure() {}
-	virtual void initialize();
-	virtual void uninitialize();
-	virtual void startTracking();
-	virtual void stopTracking();
+	virtual Tool::State getState() const;
+	virtual void setState(const Tool::State val);
 
 	virtual ToolMap getTools();
 	virtual ToolPtr getTool(const QString& uid);
 
-	virtual ToolPtr getDominantTool();
-	virtual void setDominantTool(const QString& uid);
-	virtual void dominantCheckSlot() {}
+	virtual ToolPtr getActiveTool();
+	virtual void setActiveTool(const QString& uid);
 
 	virtual Transform3D get_rMpr() const;
 	virtual void set_rMpr(const Transform3D& val);
 	virtual ToolPtr getReferenceTool() const;
 
-	virtual void setTooltipOffset(double offset);
-	virtual double getTooltipOffset() const;
-
-	virtual ManualToolPtr getManualTool() { return ManualToolPtr(); }
+	virtual ToolPtr getManualTool() { return ToolPtr(); }
 	virtual void savePositionHistory() {}
 	virtual void loadPositionHistory() {}
 	virtual void addXml(QDomNode& parentNode) {}
@@ -94,8 +82,14 @@ public:
 	virtual void clear() {}
 	virtual SessionToolHistoryMap getSessionHistory(double startTime, double stopTime) { return SessionToolHistoryMap(); }
 
+	virtual bool isPlaybackMode() const { return false; }
+	virtual void setPlaybackMode(PlaybackTimePtr controller) {}
+	virtual void setLoggingFolder(QString loggingFolder) {}
+	virtual void runDummyTool(DummyToolPtr tool) {}
+	virtual bool isNull() { return false; }
+
 	void addTool(DummyToolPtr tool);
-	virtual ToolPtr findFirstProbe() { return ToolPtr(); }
+	virtual ToolPtr getFirstProbe() { return ToolPtr(); }
 	virtual TrackerConfigurationPtr getConfiguration() { return TrackerConfigurationPtr(); }
 
 private:
@@ -103,18 +97,21 @@ private:
 	typedef DummyToolMap::const_iterator DummyToolMapConstIter;
 
 	DummyToolManager();
-	TrackingServiceWeakPtr mSelf;
 
 	DummyToolMap mDummyTools;
 	DummyToolPtr mDominantTool;
 	DummyToolPtr mReferenceTool;
 
-	Transform3D m_rMpr;
-	double mToolTipOffset; ///< Common tool tip offset for all tools
+	virtual void startTracking();
+	virtual void stopTracking();
 
-	bool mConfigured;
-	bool mInitialized;
-	bool mIsTracking;
+	Transform3D m_rMpr;
+//	double mToolTipOffset; ///< Common tool tip offset for all tools
+
+//	bool mConfigured;
+//	bool mInitialized;
+//	bool mIsTracking;
+	Tool::State mState;
 };
 
 }//namespace cx

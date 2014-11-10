@@ -45,7 +45,34 @@ namespace cx
 class cxResource_EXPORT TrackingServiceProxy : public TrackingService
 {
 public:
+	static TrackingServicePtr create(ctkPluginContext *pluginContext);
 	TrackingServiceProxy(ctkPluginContext *pluginContext);
+
+	virtual Tool::State getState() const;
+	virtual void setState(const Tool::State val);
+
+	virtual ToolPtr getTool(const QString& uid);
+	virtual ToolPtr getActiveTool();
+	virtual void setActiveTool(const QString& uid);
+	virtual ToolPtr getFirstProbe();
+
+	virtual ToolPtr getReferenceTool() const;
+	virtual ToolPtr getManualTool();
+
+	virtual ToolMap getTools(); ///< get configured and initialized tools
+
+	virtual bool isPlaybackMode() const;
+	virtual void setPlaybackMode(PlaybackTimePtr controller);
+
+	virtual void savePositionHistory();
+	virtual void loadPositionHistory();
+	virtual void addXml(QDomNode& parentNode);
+	virtual void parseXml(QDomNode& dataNode);
+	virtual void clear();
+	virtual SessionToolHistoryMap getSessionHistory(double startTime, double stopTime);
+	virtual void setLoggingFolder(QString loggingFolder);
+	virtual void runDummyTool(DummyToolPtr tool);
+	virtual TrackerConfigurationPtr getConfiguration();
 
 	bool isNull();
 

@@ -49,6 +49,10 @@ class QToolButton;
 
 namespace cx
 {
+
+typedef boost::shared_ptr<class DominantToolProxy> DominantToolProxyPtr;
+
+
 /**
  * \class StatusBar
  *
@@ -77,6 +81,7 @@ private slots:
   void tpsSlot(int numTps); ///< Show transforms per seconds
   void showMessageSlot(Message message); ///< prints the incomming message to the statusbar
   void updateToolButtons();
+  void resetToolManagerConnection();
 
 private:
   void activateTool(QString uid);
@@ -87,6 +92,7 @@ private:
   QLabel* mTpsLabel; ///< Label for showing TPS
 //  QLabel* mMessageLevelLabel;
   QToolButton* mMessageLevelLabel;
+  DominantToolProxyPtr mActiveTool;
 
   struct ToolData
   {

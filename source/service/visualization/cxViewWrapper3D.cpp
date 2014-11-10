@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxToolTracer.h"
 #include "cxOrientationAnnotation3DRep.h"
 #include "cxSettings.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxRepManager.h"
 #include "cxCameraControl.h"
 #include "cxLandmarkRep.h"
@@ -152,8 +152,7 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ViewPtr view, VisualizationServiceB
 	//data name text rep
 	this->updateMetricNamesRep();
 
-	connect(mBackend->getToolManager().get(), SIGNAL(configured()), this, SLOT(toolsAvailableSlot()));
-	connect(mBackend->getToolManager().get(), SIGNAL(initialized()), this, SLOT(toolsAvailableSlot()));
+	connect(mBackend->getToolManager().get(), &TrackingService::stateChanged, this, &ViewWrapper3D::toolsAvailableSlot);
 	connect(mBackend->getDataManager().get(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(activeImageChangedSlot()));
 	this->toolsAvailableSlot();
 
@@ -425,7 +424,7 @@ void ViewWrapper3D::setViewGroup(ViewGroupDataPtr group)
 void ViewWrapper3D::showToolPathSlot(bool checked)
 {
 	ToolRep3DPtr activeRep3D = RepManager::findFirstRep<ToolRep3D>(mView->getReps(),
-					mBackend->getToolManager()->getDominantTool());
+					mBackend->getToolManager()->getActiveTool());
 	if (activeRep3D)
 	{
 		if (activeRep3D->getTracer()->isRunning())
@@ -480,8 +479,8 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 		}
 
 		// tool spaces
-		ToolManager::ToolMap tools = mBackend->getToolManager()->getTools();
-		ToolManager::ToolMap::iterator iter;
+		TrackingService::ToolMap tools = mBackend->getToolManager()->getTools();
+		TrackingService::ToolMap::iterator iter;
 		for (iter = tools.begin(); iter != tools.end(); ++iter)
 		{
 			ToolPtr tool = iter->second;
@@ -753,7 +752,7 @@ void ViewWrapper3D::updateSlices()
 		mSlices3DRep->addPlane(planes[i], mBackend->getDataManager());
 	mSlices3DRep->setShaderPath(DataLocations::getShaderPath());
 	mSlices3DRep->setImages(images);
-	mSlices3DRep->setTool(mBackend->getToolManager()->getDominantTool());
+	mSlices3DRep->setTool(mBackend->getToolManager()->getActiveTool());
 
 	mView->addRep(mSlices3DRep);
 }
@@ -765,7 +764,7 @@ ViewPtr ViewWrapper3D::getView()
 
 void ViewWrapper3D::dominantToolChangedSlot()
 {
-	ToolPtr dominantTool = mBackend->getToolManager()->getDominantTool();
+	ToolPtr dominantTool = mBackend->getToolManager()->getActiveTool();
 	mPickerRep->setTool(dominantTool);
 	if (mSlices3DRep)
 		mSlices3DRep->setTool(dominantTool);
@@ -773,8 +772,10 @@ void ViewWrapper3D::dominantToolChangedSlot()
 
 void ViewWrapper3D::toolsAvailableSlot()
 {
-	ToolManager::ToolMap tools = mBackend->getToolManager()->getTools();
-	ToolManager::ToolMap::iterator iter;
+	std::vector<ToolRep3DPtr> reps = RepManager::findReps<ToolRep3D>(mView->getReps());
+
+	TrackingService::ToolMap tools = mBackend->getToolManager()->getTools();
+	TrackingService::ToolMap::iterator iter;
 	for (iter = tools.begin(); iter != tools.end(); ++iter)
 	{
 		ToolPtr tool = iter->second;
@@ -782,6 +783,10 @@ void ViewWrapper3D::toolsAvailableSlot()
 			continue;
 
 		ToolRep3DPtr toolRep = RepManager::findFirstRep<ToolRep3D>(mView->getReps(), tool);
+
+		std::vector<ToolRep3DPtr>::iterator oldRep = std::find(reps.begin(), reps.end(), toolRep);
+		if (oldRep!=reps.end())
+			reps.erase(oldRep);
 
 		if (tool->hasType(Tool::TOOL_MANUAL) && !settings()->value("showManualTool").toBool())
 		{
@@ -804,6 +809,12 @@ void ViewWrapper3D::toolsAvailableSlot()
 		toolRep->setTool(tool);
 		toolRep->setOffsetPointVisibleAtZeroOffset(true);
 		mView->addRep(toolRep);
+	}
+
+	// remove reps for tools no longer present
+	for (unsigned i=0; i<reps.size(); ++i)
+	{
+		mView->removeRep(reps[i]);
 	}
 }
 

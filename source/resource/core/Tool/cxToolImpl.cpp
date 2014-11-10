@@ -31,18 +31,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxToolImpl.h"
-#include "cxToolManager.h"
 
 namespace cx
 {
 
-ToolImpl::ToolImpl(TrackingServiceOldPtr manager, const QString& uid, const QString& name) :
+ToolImpl::ToolImpl(const QString& uid, const QString& name) :
 	Tool(uid, name),
 	mPositionHistory(new TimedTransformMap()),
 	m_prMt(Transform3D::Identity()),
-	mManager(manager)
+	mTooltipOffset(0)
 {
-
 }
 
 ToolImpl::~ToolImpl()
@@ -50,28 +48,17 @@ ToolImpl::~ToolImpl()
 
 }
 
-TrackingServiceOldPtr ToolImpl::getTrackingService()
-{
-	return mManager.lock();
-}
-TrackingServiceOldPtr ToolImpl::getTrackingService() const
-{
-	return mManager.lock();
-}
-
-// Just use the tool tip offset from the tool manager
 double ToolImpl::getTooltipOffset() const
 {
-	if (this->getTrackingService())
-		return this->getTrackingService()->getTooltipOffset();
-	return 0;
+	return mTooltipOffset;
 }
 
-// Just use the tool tip offset from the tool manager
 void ToolImpl::setTooltipOffset(double val)
 {
-	if (this->getTrackingService())
-		this->getTrackingService()->setTooltipOffset(val);
+	if (similar(val, mTooltipOffset))
+		return;
+	mTooltipOffset = val;
+	emit tooltipOffset(mTooltipOffset);
 }
 
 TimedTransformMapPtr ToolImpl::getPositionHistory()
@@ -95,6 +82,12 @@ Transform3D ToolImpl::get_prMt() const
 
 void ToolImpl::set_prMt(const Transform3D& prMt, double timestamp)
 {
+	if (mPositionHistory->count(timestamp))
+	{
+		if (similar(mPositionHistory->find(timestamp)->second, prMt))
+			return;
+	}
+
 	m_prMt = prMt;
 	(*mPositionHistory)[timestamp] = m_prMt;
 	emit toolTransformAndTimestamp(m_prMt, timestamp);

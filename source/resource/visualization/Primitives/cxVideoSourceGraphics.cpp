@@ -93,7 +93,7 @@ void VideoSourceGraphics::setTool(ToolPtr tool)
 	}
 
 	// accept only tool with a probe sector
-	if (tool && tool->getProbeSector().getType()!=ProbeDefinition::tNONE)
+	if (tool && tool->getProbe())
 	{
 		mTool = tool;
 	}
@@ -122,7 +122,7 @@ void VideoSourceGraphics::probeSectorChanged()
 	if (!mTool)
 		return;
 
-	mProbeData.setData(mTool->getProbeSector());
+	mProbeData.setData(mTool->getProbe()->getProbeData());
 	if (mClipToSector)
 	{
 		mPipeline->setClip(mProbeData.getSector());

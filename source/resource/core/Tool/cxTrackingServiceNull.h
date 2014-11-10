@@ -44,9 +44,35 @@ class cxResource_EXPORT TrackingServiceNull : public TrackingService
 public:
 	TrackingServiceNull();
 
+	virtual Tool::State getState() const;
+	virtual void setState(const Tool::State val);
+
+	virtual ToolPtr getTool(const QString& uid);
+	virtual ToolPtr getActiveTool();
+	virtual void setActiveTool(const QString& uid);
+	virtual ToolPtr getFirstProbe();
+
+	virtual ToolPtr getReferenceTool() const;
+	virtual ToolPtr getManualTool();
+
+	virtual ToolMap getTools(); ///< get configured and initialized tools
+
+	virtual bool isPlaybackMode() const;
+	virtual void setPlaybackMode(PlaybackTimePtr controller);
+
+	virtual void savePositionHistory();
+	virtual void loadPositionHistory();
+	virtual void addXml(QDomNode& parentNode);
+	virtual void parseXml(QDomNode& dataNode);
+	virtual void clear();
+	virtual SessionToolHistoryMap getSessionHistory(double startTime, double stopTime);
+	virtual void setLoggingFolder(QString loggingFolder);
+	virtual void runDummyTool(DummyToolPtr tool);
+	virtual TrackerConfigurationPtr getConfiguration();
+
 	virtual bool isNull();
 private:
-	void printWarning();
+	void printWarning() const;
 };
 } //cx
 #endif // CXTRACKINGSERVICENULL_H

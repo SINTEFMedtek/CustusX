@@ -37,8 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReconstructCore.h"
 #include <vtkImageData.h>
 #include <QFileInfo>
-//#include "cxDataManager.h"
-#include "cxToolManager.h"
 #include "cxTime.h"
 #include "cxTypeConversions.h"
 #include "cxRegistrationTransform.h"
