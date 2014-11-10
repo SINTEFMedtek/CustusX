@@ -46,7 +46,6 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	Tool/cxSliceProxy
 	Tool/cxSlicedImageProxy
 	Tool/cxToolImpl
-	Tool/cxToolNull
 	Tool/cxTrackingService
     Tool/cxDominantToolProxy
 
@@ -101,6 +100,7 @@ cx_add_class(cxResource_SOURCE
 	Tool/cxCreateProbeDataFromConfiguration
 	Tool/cxTrackingPositionFilter
 	Tool/cxTrackerConfiguration
+	Tool/cxToolNull
 
 	Data/cxDataMetric
 	Data/cxDataReaderWriter

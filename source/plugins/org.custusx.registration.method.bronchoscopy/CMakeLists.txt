@@ -22,6 +22,7 @@ include_directories(
 
 set(PLUGIN_SRCS
   cxRegistrationMethodBronchoscopyPluginActivator.cpp
+  cxRegistrationMethodBronchoscopyService.h
   cxRegistrationMethodBronchoscopyService.cpp
   cxBronchoscopyRegistrationWidget.cpp
   cxBronchoscopyRegistration.h
@@ -35,7 +36,6 @@ set(PLUGIN_SRCS
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
   cxRegistrationMethodBronchoscopyPluginActivator.h
-  cxRegistrationMethodBronchoscopyService.h
   cxBronchoscopyRegistrationWidget.h
 )
 

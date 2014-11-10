@@ -16,6 +16,7 @@ include_directories(
 
 set(PLUGIN_SRCS
   cxHelpPluginActivator.cpp
+  cxHelpGUIExtenderService.h
   cxHelpGUIExtenderService.cpp
   widgets/cxHelpWidget.cpp
   widgets/cxHelpIndexWidget.cpp
@@ -27,7 +28,6 @@ set(PLUGIN_SRCS
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
   cxHelpPluginActivator.h
-  cxHelpGUIExtenderService.h
   widgets/cxHelpWidget.h
   widgets/cxHelpIndexWidget.h
   widgets/cxHelpSearchWidget.h

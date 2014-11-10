@@ -21,29 +21,29 @@ include_directories(
 
 set(PLUGIN_SRCS
     cxRegistrationMethodLandmarkPluginActivator.cpp
-    cxRegistrationMethodLandmarkService.cpp
-    cxFastImageRegistrationWidget.cpp
+	cxRegistrationMethodLandmarkService.h
+	cxRegistrationMethodLandmarkService.cpp
+	cxFastImageRegistrationWidget.cpp
     cxFastRegistrationsWidget.cpp
     cxFastRegistrationsWidget.h
-    cxLandmarkRegistrationsWidget.cpp
+	cxLandmarkRegistrationsWidget.h
+	cxLandmarkRegistrationsWidget.cpp
     cxLandmarkImageRegistrationWidget.cpp
     cxLandmarkRegistrationWidget.cpp
     cxLandmarkPatientRegistrationWidget.cpp
     cxLandmarkImage2ImageRegistrationWidget.cpp
-    cxFastPatientRegistrationWidget.cpp
+	cxFastPatientRegistrationWidget.h
+	cxFastPatientRegistrationWidget.cpp
     cxFastOrientationRegistrationWidget.cpp
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
     cxRegistrationMethodLandmarkPluginActivator.h
-    cxRegistrationMethodLandmarkService.h
-    cxLandmarkRegistrationsWidget.h
     cxLandmarkRegistrationWidget.h
     cxLandmarkImageRegistrationWidget.h
     cxLandmarkPatientRegistrationWidget.h
     cxLandmarkImage2ImageRegistrationWidget.h
-    cxFastPatientRegistrationWidget.h
     cxFastImageRegistrationWidget.h
     cxFastOrientationRegistrationWidget.h
 )

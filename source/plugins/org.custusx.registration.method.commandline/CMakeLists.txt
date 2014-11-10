@@ -22,7 +22,8 @@ include_directories(
 
 set(PLUGIN_SRCS
     cxRegistrationMethodCommandLinePluginActivator.cpp
-    cxRegistrationMethodCommandLineService.cpp
+	cxRegistrationMethodCommandLineService.h
+	cxRegistrationMethodCommandLineService.cpp
     logic/cxElastixManager.h
     logic/cxElastixManager.cpp
     logic/cxElastixExecuter.h
@@ -38,7 +39,6 @@ set(PLUGIN_SRCS
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
     cxRegistrationMethodCommandLinePluginActivator.h
-    cxRegistrationMethodCommandLineService.h
     logic/cxElastixManager.h
     logic/cxElastixParameters.h
     logic/cxElastixExecuter.h

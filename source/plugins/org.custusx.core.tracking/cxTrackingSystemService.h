@@ -25,6 +25,7 @@ class org_custusx_core_tracking_EXPORT TrackingSystemService : public QObject
 public:
 	virtual ~TrackingSystemService() {}
 
+//	virtual QString getUid() const = 0;
 	virtual Tool::State getState() const = 0;
 	virtual void setState(const Tool::State val) = 0; ///< asynchronously request a state. Wait for signal stateChanged()
 	virtual std::vector<ToolPtr> getTools() = 0;

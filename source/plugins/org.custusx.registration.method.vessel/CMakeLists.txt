@@ -22,22 +22,22 @@ include_directories(
 
 set(PLUGIN_SRCS
     cxRegistrationMethodVesselPluginActivator.cpp
-    cxRegistrationMethodVesselService.cpp
+	cxRegistrationMethodVesselService.h
+	cxRegistrationMethodVesselService.cpp
     cxPrepareVesselsWidget.cpp
     cxSeansVesselRegistrationWidget.cpp
     cxRegisterI2IWidget.cpp
     cxPrepareVesselsWidget.cpp
-    cxImage2ImageRegistrationWidget.cpp
+	cxImage2ImageRegistrationWidget.h
+	cxImage2ImageRegistrationWidget.cpp
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
     cxRegistrationMethodVesselPluginActivator.h
-    cxRegistrationMethodVesselService.h
     cxSeansVesselRegistrationWidget.h
     cxRegisterI2IWidget.h
     cxPrepareVesselsWidget.h
-    cxImage2ImageRegistrationWidget.h
 )
 
 # Qt Designer files which should be processed by Qts uic
