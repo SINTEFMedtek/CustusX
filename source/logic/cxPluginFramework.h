@@ -82,6 +82,7 @@ public:
 	QStringList getPluginSymbolicNames();
 	QSharedPointer<ctkPlugin> getInstalledPluginFromSymbolicName(QString symbolicName);
 	ctkPlugin::State getStateFromSymbolicName(QString name);
+	void loadState();
 
 signals:
 	void pluginPoolChanged();
@@ -100,7 +101,6 @@ private:
 	bool frameworkInitialized() const;
 	bool frameworkStarted() const;
 
-	void loadState();
 	void saveState();
 	void loadPluginFromStoredState(QString symbolicName, QString storedState);
 

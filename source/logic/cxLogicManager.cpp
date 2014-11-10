@@ -144,7 +144,13 @@ void LogicManager::initializeServices()
 	// resources layer
 	Reporter::initialize();
 
+	// HACKS to get the system up and running while converting to plugin framework:
+	// - start ONLY the specified plugins first, because they are required later on
+	// - load all other plugins after initing system, as they are generally dependent on singletons.
 //	PluginFrameworkManagerPtr pfw = this->getPluginFramework();
+	mPluginFramework = PluginFrameworkManager::create();
+	mPluginFramework->start();
+	mPluginFramework->start("org.custusx.core.tracking", ctkPlugin::START_TRANSIENT);
 
 	// services layer
 	this->getPatientService();
@@ -156,6 +162,7 @@ void LogicManager::initializeServices()
 
 	mServiceController.reset(new ServiceController);
 
+	mPluginFramework->loadState();
 	// logic layer
 	//cx::LogicManager::initialize();
 
@@ -268,8 +275,8 @@ void LogicManager::createStateService()
 
 void LogicManager::createPluginFramework()
 {
-	mPluginFramework = PluginFrameworkManager::create();
-	mPluginFramework->start();
+//	mPluginFramework = PluginFrameworkManager::create();
+//	mPluginFramework->start();
 
 }
 
