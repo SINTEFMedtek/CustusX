@@ -246,7 +246,7 @@ void TrackingImplService::addToolsFrom(TrackingSystemServicePtr system)
 		ToolPtr tool = tools[i];
 		mTools[tool->getUid()] = tool;
 		connect(tool.get(), SIGNAL(toolVisible(bool)), this, SLOT(dominantCheckSlot()));
-//		connect(tool.get(), &Tool::toolTransformAndTimestamp, this, &TrackingImplService::dominantCheckSlot);
+		connect(tool.get(), &Tool::toolTransformAndTimestamp, this, &TrackingImplService::dominantCheckSlot);
 		connect(tool.get(), &Tool::tooltipOffset, this, &TrackingImplService::onTooltipOffset);
 
 		if (tool->hasType(Tool::TOOL_REFERENCE))
@@ -318,7 +318,7 @@ void TrackingImplService::setActiveTool(const QString& uid)
 	if (newTool && newTool->hasType(Tool::TOOL_MANUAL) && mManualTool)
 	{
 		if (oldTool && (oldTool!=mManualTool))
-			mManualTool->set_prMt(oldTool->get_prMt());
+			mManualTool->set_prMt(oldTool->get_prMt(), oldTool->getTimestamp() -1);
 		mManualTool->setVisible(true);
 	}
 	else
@@ -437,7 +437,7 @@ void TrackingImplService::resetTrackingPositionFilters()
 
 void TrackingImplService::dominantCheckSlot()
 {
-	if (this->manualToolHasMostRecentTimestamp())
+	if (this->manualToolHasMostRecentTimestamp() && mManualTool->getVisible())
 	{
 		this->setActiveTool(this->getManualTool()->getUid());
 		return;
@@ -469,15 +469,23 @@ bool TrackingImplService::manualToolHasMostRecentTimestamp()
 	// This enables automatic change to manual tool if the user
 	// manipulates the manual tool in some way.
 
+	double mts = this->getManualTool()->getTimestamp();
+//	std::cout << "  manual tooltime " << mts << std::endl;
+
 	double bestTime = 0;
 	for (ToolMap::iterator it = mTools.begin(); it != mTools.end(); ++it)
 	{
+//		std::cout << "  tool " << it->first << " -- "<< it->second->getTimestamp() << std::endl;
 		if (it->second->hasType(Tool::TOOL_MANUAL))
 			continue;
+//		std::cout << "    tool " << it->first << " : "<< it->second->getTimestamp() - mts << std::endl;
 		bestTime = std::max(bestTime, it->second->getTimestamp());
 	}
+	double ahead = mts -bestTime;
+//	std::cout << "  mts -bestTime " << " : "<< (mts -bestTime) << std::endl;
+//	std::cout << "  mts > bestTime " << " : "<< bool(mts > bestTime) << std::endl;
 
-	return (this->getManualTool()->getTimestamp() >= bestTime);
+	return (mts > bestTime);
 }
 
 std::vector<ToolPtr> TrackingImplService::getVisibleTools()

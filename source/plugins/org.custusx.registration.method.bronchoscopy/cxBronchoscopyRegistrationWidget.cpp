@@ -202,7 +202,7 @@ void BronchoscopyRegistrationWidget::acquisitionStarted()
 	if (!activeRep3D)
 		return;
 
-	activeRep3D->getTracer()->start();
+    activeRep3D->getTracer()->start();
 }
 void BronchoscopyRegistrationWidget::acquisitionStopped()
 {

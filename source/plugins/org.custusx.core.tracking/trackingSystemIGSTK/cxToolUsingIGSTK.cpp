@@ -55,6 +55,7 @@ ToolUsingIGSTK::ToolUsingIGSTK(IgstkToolPtr igstkTool) :
 				mTool(igstkTool), mPolyData(NULL),
 				mValid(false), mConfigured(false), mTracked(false)
 {
+	mTimestamp = 0;
 	Tool::mUid = mTool->getInternalStructure().mUid;
 	Tool::mName = mTool->getInternalStructure().mName;
     mValid = igstkTool->isValid();
@@ -249,6 +250,7 @@ void ToolUsingIGSTK::toolTransformAndTimestampSlot(Transform3D matrix, double ti
 		prMt_filtered = mTrackingPositionFilter->getFilteredPosition();
 	}
 
+	mTimestamp = timestamp;
 	(*mPositionHistory)[timestamp] = matrix; // store original in history
 	m_prMt = prMt_filtered;
 	emit toolTransformAndTimestamp(m_prMt, timestamp);

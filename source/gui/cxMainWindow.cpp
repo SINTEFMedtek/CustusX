@@ -461,7 +461,7 @@ void MainWindow::createActions()
 	connect(mConfigureToolsAction, SIGNAL(triggered()), this, SLOT(configureSlot()));
 	boost::function<void()> finit = boost::bind(&TrackingService::setState, trackingService(), Tool::tsINITIALIZED);
 	connect(mInitializeToolsAction, &QAction::triggered, finit);
-//	connect(mTrackingToolsAction, SIGNAL(triggered()), this, SLOT(toggleTrackingSlot()));
+	connect(mTrackingToolsAction, SIGNAL(triggered()), this, SLOT(toggleTrackingSlot()));
 	boost::function<void()> fsavetools = boost::bind(&TrackingService::savePositionHistory, trackingService());
 	connect(mSaveToolsPositionsAction, &QAction::triggered, fsavetools);
 	connect(trackingService().get(), SIGNAL(stateChanged()), this, SLOT(updateTrackingActionSlot()));

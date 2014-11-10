@@ -109,7 +109,7 @@ public:
 	virtual QString getName() const;
 	virtual int getIndex() const { return 0; }
 	virtual ProbePtr getProbe() const;
-	virtual double getTimestamp() const { return 0; } //	TODO
+	virtual double getTimestamp() const { return mTimestamp; } //	TODO
 	virtual double getTooltipOffset() const; ///< get a virtual offset extending from the tool tip.
 	virtual void setTooltipOffset(double val); ///< set a virtual offset extending from the tool tip.
 
@@ -152,6 +152,7 @@ private:
 	bool mTracked; ///< whether the tool is being tracked or not
 	ProbePtr mProbe;
 	QTimer mTpsTimer;
+	double mTimestamp;
 };
 typedef boost::shared_ptr<ToolUsingIGSTK> cxToolPtr;
 
