@@ -72,7 +72,7 @@ RegistrationWidget::~RegistrationWidget()
 
 void RegistrationWidget::initRegistrationTypesWidgets()
 {
-	mRegistrationTypes << "ImageToImage" << "ImageToPatient" << "ImageTransform";
+	mRegistrationTypes << "ImageToPatient" << "ImageToImage" << "ImageTransform";
 	for(int i = 0; i < mRegistrationTypes.count(); ++i)
 	{
 		QWidget *widget = new QWidget(this);
