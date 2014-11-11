@@ -76,6 +76,7 @@ void VisualizationServiceProxy::onServiceAdded(VisualizationService* service)
 {
 	mVisualizationService.reset(service, null_deleter());
 	connect(service, SIGNAL(activeViewChanged()), this, SIGNAL(activeViewChanged()));
+	connect(service, &VisualizationService::activeViewChanged, this, &VisualizationService::activeViewChanged);
 //	connect(service, SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
 	if(mVisualizationService->isNull())
 		reportWarning("VideoServiceProxy::onServiceAdded mVideoService->isNull()");
@@ -84,6 +85,7 @@ void VisualizationServiceProxy::onServiceAdded(VisualizationService* service)
 void VisualizationServiceProxy::onServiceRemoved(VisualizationService *service)
 {
 	disconnect(service, SIGNAL(activeViewChanged()), this, SIGNAL(activeViewChanged()));
+	disconnect(service, &VisualizationService::activeViewChanged, this, &VisualizationService::activeViewChanged);
 //	disconnect(service, SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
 	mVisualizationService = VisualizationService::getNullObject();
 }
@@ -102,5 +104,16 @@ void VisualizationServiceProxy::autoShowData(cx::DataPtr data)
 {
 	mVisualizationService->autoShowData(data);
 }
+
+void VisualizationServiceProxy::enableRender(bool val)
+{
+	mVisualizationService->enableRender(val);
+}
+
+bool VisualizationServiceProxy::renderingIsEnabled() const
+{
+	return mVisualizationService->renderingIsEnabled();
+}
+
 
 } //cx

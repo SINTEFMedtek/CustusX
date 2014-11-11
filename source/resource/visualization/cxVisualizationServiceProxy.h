@@ -55,6 +55,8 @@ public:
 	virtual void setRegistrationMode(REGISTRATION_STATUS mode);
 
 	virtual void autoShowData(DataPtr data);
+	virtual void enableRender(bool val);
+	virtual bool renderingIsEnabled() const;
 
 	bool isNull();
 

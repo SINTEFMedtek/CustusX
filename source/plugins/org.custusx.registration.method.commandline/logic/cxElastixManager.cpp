@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationService.h"
 #include "cxRegistrationTransform.h"
 #include "cxPatientModelService.h"
+#include "cxVisualizationService.h"
 
 namespace cx
 {
@@ -59,6 +60,13 @@ ElastixManager::ElastixManager(regServices services) :
 	mDisplayProcessMessages = BoolDataAdapterXml::initialize("displayProcessMessages",
 		"Show Messages",
 		"Display messages from the running registration process in CustusX",
+		false,
+		mOptions.getElement());
+
+	mDisableRendering = BoolDataAdapterXml::initialize("disableRendering",
+		"Disable Rendering",
+		"Disable rendering while running process.\n"
+		"Can be used to avoid clash in GPU usage.",
 		false,
 		mOptions.getElement());
 
@@ -95,10 +103,18 @@ void ElastixManager::preprocessExecuter()
 					 mServices.registrationService->getMovingData(),
 	         outDir.absolutePath(),
 	         parameterFiles);
+
+	if (mDisableRendering->getValue())
+	{
+		mServices.visualizationService->enableRender(false);
+	}
 }
 
 void ElastixManager::executionFinishedSlot()
 {
+	if (mDisableRendering->getValue())
+		mServices.visualizationService->enableRender(true);
+
 	bool ok = false;
 	Transform3D mMf = mExecuter->getAffineResult_mMf(&ok);
 

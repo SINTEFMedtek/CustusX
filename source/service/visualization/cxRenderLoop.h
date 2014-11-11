@@ -59,14 +59,13 @@ class cxVisualizationService_EXPORT RenderLoop : public QObject
 public:
 	RenderLoop();
 	void start();
+	void stop();
+	bool isRunning() const;
 	void setRenderingInterval(int interval);
-	/** If set: Render only views with modified props using the given interval,
-	  * render nonmodified at a slower pace. */
-	void setSmartRender(bool val) { mSmartRender = val; }
+	void setSmartRender(bool val); ///< If set: Render only views with modified props using the given interval, render nonmodified at a slower pace.
 	void setLogging(bool on);
 
 	void clearViews();
-//	void addView(ViewPtr view);
 	void addLayout(ViewCollectionWidget* layout);
 
 	CyclicActionLoggerPtr getRenderTimer() { return mCyclicLogger; }

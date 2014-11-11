@@ -146,6 +146,7 @@ QWidget* ElastixWidget::createOptionsWidget()
 	layout->addLayout(buttonsLayout, line, 0, 1, 3);
 
 	buttonsLayout->addWidget(new CheckBoxWidget(this, mElastixManager->getDisplayProcessMessages()));
+	buttonsLayout->addWidget(new CheckBoxWidget(this, mElastixManager->getDisableRendering()));
 
 	this->createAction(this,
 	                QIcon(":/icons/preset_remove.png"),

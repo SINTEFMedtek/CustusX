@@ -151,6 +151,9 @@ public:
 	void initialize();
 	QWidget* getLayoutWidget(int index=0);
 
+	void enableRender(bool val);
+	bool renderingIsEnabled() const;
+
 	void setRegistrationMode(REGISTRATION_STATUS mode);
 
 	QString getActiveLayout(int widgetIndex=0) const; ///< returns the active layout
@@ -177,6 +180,7 @@ signals:
 	void fps(int number); ///< Emits number of frames per second
 	void activeLayoutChanged(); ///< emitted when the active layout changes
 	void activeViewChanged(); ///< emitted when the active view changes
+	void renderingEnabledChanged(); ///< emitted then rendering is enabled/disabled
 
 protected slots:
 	void settingsChangedSlot(QString key);

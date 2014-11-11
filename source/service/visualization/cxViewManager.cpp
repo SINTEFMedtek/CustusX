@@ -144,8 +144,25 @@ void ViewManager::initialize()
 	this->setActiveLayout("LAYOUT_3D_ACS_SINGLE", 0);
 
 	mRenderLoop->setRenderingInterval(settings()->value("renderingInterval").toInt());
-	mRenderLoop->start();
+	this->enableRender(true);
+//	mRenderLoop->start();
 }
+
+void ViewManager::enableRender(bool val)
+{
+	if (val)
+		mRenderLoop->start();
+	else
+		mRenderLoop->stop();
+
+	emit renderingEnabledChanged();
+}
+
+bool ViewManager::renderingIsEnabled() const
+{
+	return mRenderLoop->isRunning();
+}
+
 
 void ViewManager::initializeGlobal2DZoom()
 {
