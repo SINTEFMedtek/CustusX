@@ -34,8 +34,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationService.h"
 #include "cxData.h"
 
+#include "cxRegistrationDataAdapters.h"
+#include "cxLabeledComboBoxWidget.h"
+#include "cxRegistrationTransform.h"
+
 namespace cx
 {
+
+ManualImageTransformRegistrationWidget::ManualImageTransformRegistrationWidget(regServices services, QWidget *parent, QString objectName) :
+	ManualImageRegistrationWidget(services, parent, objectName, "Manual Image Transform Registration")
+{
+	StringDataAdapterPtr movingImage(new RegistrationMovingImageStringDataAdapter(services.registrationService, services.patientModelService));
+
+	LabeledComboBoxWidget* moving = new LabeledComboBoxWidget(this, movingImage);
+
+	mVerticalLayout->insertWidget(1, moving);
+}
 
 QString ManualImageTransformRegistrationWidget::getDescription()
 {

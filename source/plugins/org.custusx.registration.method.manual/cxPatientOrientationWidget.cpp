@@ -51,6 +51,7 @@ PatientOrientationWidget::PatientOrientationWidget(regServices services, QWidget
 	mInvertButton(new QCheckBox("Back face"))
 {
   QVBoxLayout* layout = new QVBoxLayout(this);
+  layout->setMargin(0);
   layout->addWidget(mInvertButton);
   layout->addWidget(mPatientOrientationButton);
   layout->addStretch();

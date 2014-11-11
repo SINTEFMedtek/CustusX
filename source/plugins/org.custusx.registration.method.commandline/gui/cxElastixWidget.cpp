@@ -66,6 +66,7 @@ ElastixWidget::ElastixWidget(regServices services, QWidget* parent) :
 	mRegisterButton->setToolTip(this->defaultWhatsThis());
 
 	QVBoxLayout* topLayout = new QVBoxLayout(this);
+	topLayout->setMargin(0);
 
 	mOptionsWidget = this->createOptionsWidget();
 	mOptionsWidget->setVisible(settings()->value("registration/elastixShowDetails").toBool());

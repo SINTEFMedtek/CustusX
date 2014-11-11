@@ -47,6 +47,7 @@ ManualImageRegistrationWidget::ManualImageRegistrationWidget(regServices service
 	mVerticalLayout(new QVBoxLayout(this)),
 	mServices(services)
 {
+	mVerticalLayout->setMargin(0);
 	mLabel = new QLabel("Data matrix rMd");
 	mVerticalLayout->addWidget(mLabel);
 	mMatrixWidget = new Transform3DWidget(this);

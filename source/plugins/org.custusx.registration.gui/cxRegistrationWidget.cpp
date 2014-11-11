@@ -80,6 +80,7 @@ void RegistrationWidget::initRegistrationTypesWidgets()
 		mRegistrationTypeMap[mRegistrationTypes[i]] = registrationTypeWidget;
 
 		QVBoxLayout *layoutV = new QVBoxLayout(widget);
+//		layoutV->setMargin(0);
 
 		StringDataAdapterXmlPtr methodSelector = StringDataAdapterXml::initialize(mRegistrationTypes[i],
 																				  "Method",

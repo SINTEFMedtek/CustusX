@@ -134,11 +134,10 @@ bool FrameForest::isRootNode(QDomNode node)
  */
 QDomNode FrameForest::getOldestAncestor(QDomNode node)
 {
-	//while (!node.parentNode().isNull() && !node.parentNode().toElement().tagName().isEmpty())
+	if (this->isRootNode(node))
+		return node;
 	while (!this->isRootNode(node.parentNode()))
-	{
 		node = node.parentNode();
-	}
 	return node;
 }
 
