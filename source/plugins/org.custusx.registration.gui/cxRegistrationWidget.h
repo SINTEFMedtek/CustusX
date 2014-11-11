@@ -62,6 +62,8 @@ public:
 	RegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent = 0);
 	virtual ~RegistrationWidget();
 
+private slots:
+	void onCurrentChanged(int index);
 private:
 	void initRegistrationTypesWidgets();
 	void initServiceListener();
@@ -78,10 +80,12 @@ private:
 	QVBoxLayout*  mVerticalLayout;
 	boost::shared_ptr<ServiceTrackerListener<RegistrationMethodService> > mServiceListener;
 
+	StringDataAdapterXmlPtr mTypeSelector;
 	std::map<QString, StringDataAdapterXmlPtr> mMethodsSelectorMap;
 	std::map<QString, QStackedWidget*> mRegistrationTypeMap;
 	QStringList mRegistrationTypes;
 	XmlOptionFile mOptions;
+
 };
 
 } /* namespace cx */
