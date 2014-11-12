@@ -76,4 +76,14 @@ void VisualizationServiceNull::autoShowData(cx::DataPtr data)
 	printWarning();
 }
 
+void VisualizationServiceNull::enableRender(bool val)
+{
+
+}
+
+bool VisualizationServiceNull::renderingIsEnabled() const
+{
+	return false;
+}
+
 } //cx

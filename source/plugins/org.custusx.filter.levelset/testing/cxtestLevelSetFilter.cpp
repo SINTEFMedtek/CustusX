@@ -33,9 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "catch.hpp"
 #include "cxLevelSetFilterService.h"
 #include "cxCoordinateSystemHelpers.h"
-#include "cxToolManager.h"
-#include "cxToolManager.h"
 #include "cxManualTool.h"
+#include "cxTrackingService.h"
 #include "cxData.h"
 #include "cxImage.h"
 #include "cxtestUtilities.h"
@@ -53,7 +52,7 @@ namespace cxtest {
 
 void setSeedPoint(cx::Vector3D point)
 {
-	cx::ManualToolPtr tool = cx::trackingService()->getManualTool();
+	cx::ToolPtr tool = cx::trackingService()->getManualTool();
     tool->set_prMt(cx::createTransformTranslate(point));
 
 }

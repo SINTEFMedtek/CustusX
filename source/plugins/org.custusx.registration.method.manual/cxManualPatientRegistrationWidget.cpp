@@ -45,6 +45,7 @@ ManualPatientRegistrationWidget::ManualPatientRegistrationWidget(regServices ser
 				mVerticalLayout(new QVBoxLayout(this)),
 				mServices(services)
 {
+	mVerticalLayout->setMargin(0);
 	mLabel = new QLabel("Patient Registration matrix rMpr");
 	mVerticalLayout->addWidget(mLabel);
 	mMatrixWidget = new Transform3DWidget(this);

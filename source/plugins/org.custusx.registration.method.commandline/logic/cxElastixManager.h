@@ -64,6 +64,7 @@ public:
 	virtual ~ElastixManager();
 
 	BoolDataAdapterXmlPtr getDisplayProcessMessages() { return mDisplayProcessMessages; }
+	BoolDataAdapterXmlPtr getDisableRendering() { return mDisableRendering; }
 	ElastixExecuterPtr getExecuter() { return mExecuter; }
 	ElastixParametersPtr getParameters() { return mParameters; }
 
@@ -81,6 +82,7 @@ private:
 	ElastixParametersPtr mParameters;
 	XmlOptionFile mOptions;
 	BoolDataAdapterXmlPtr mDisplayProcessMessages;
+	BoolDataAdapterXmlPtr mDisableRendering;
 	ElastixExecuterPtr mExecuter;
 	regServices mServices;
 };

@@ -239,8 +239,6 @@ void RegistrationImplService::doFastRegistration_Translation()
  */
 void RegistrationImplService::doFastRegistration_Orientation(const Transform3D& tMtm, const Transform3D& prMt)
 {
-//	Transform3D prMt = toolManager()->getDominantTool()->get_prMt();
-
 	//create a marked(m) space tm, which is related to tool space (t) as follows:
 	//the tool is defined in DICOM space such that
 	//the tool points toward the patients feet and the spheres faces the same
@@ -462,7 +460,6 @@ void RegistrationImplService::updateRegistration(QDateTime oldTime, Registration
 void RegistrationImplService::applyPatientOrientation(const Transform3D& tMtm, const Transform3D& prMt)
 {
 	Transform3D rMpr = mPatientModelService->get_rMpr();
-//	Transform3D prMt = toolManager()->getDominantTool()->get_prMt();
 
 	//create a marked(m) space tm, which is related to tool space (t) as follows:
 	//the tool is defined in DICOM space such that

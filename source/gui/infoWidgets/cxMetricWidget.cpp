@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReporter.h"
 #include "cxTypeConversions.h"
 #include "cxCoordinateSystemHelpers.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxViewManager.h"
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"
@@ -475,7 +475,7 @@ bool MetricWidget::checkEqual(const std::vector<MetricBasePtr>& a, const std::ve
 void MetricWidget::enablebuttons()
 {
 	mRemoveAction->setEnabled(!mMetricManager->getActiveUid().isEmpty());
-  mLoadReferencePointsAction->setEnabled(toolManager()->getReferenceTool() ? true : false);
+  mLoadReferencePointsAction->setEnabled(trackingService()->getReferenceTool() ? true : false);
 }
 
 void MetricWidget::loadReferencePointsSlot()

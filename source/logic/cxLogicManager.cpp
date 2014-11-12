@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReporter.h"
 #include "cxPatientService.h"
 #include "cxVideoServiceOld.h"
-#include "cxToolManagerUsingIGSTK.h"
+//#include "cxToolManagerUsingIGSTK.h"
 #include "cxViewManager.h"
 #include "cxStateService.h"
 #include "cxDataManagerImpl.h"
@@ -52,13 +52,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSharedPointerChecker.h"
 #include "cxPluginFramework.h"
 #include "cxVideoServiceProxy.h"
+#include "cxTrackingServiceProxy.h"
 
 namespace cx
 {
 
 struct LegacySingletons
 {
-	static TrackingServiceOldPtr mToolManager;
+	static TrackingServicePtr mTrackingService;
 	static DataServicePtr mDataManager;
 	static SpaceProviderPtr mSpaceProvider;
 	static PatientServicePtr mPatientService;
@@ -67,7 +68,7 @@ struct LegacySingletons
 	static StateServicePtr mStateService;
 };
 
-TrackingServiceOldPtr LegacySingletons::mToolManager;
+TrackingServicePtr LegacySingletons::mTrackingService;
 DataServicePtr LegacySingletons::mDataManager;
 SpaceProviderPtr LegacySingletons::mSpaceProvider;
 PatientServicePtr LegacySingletons::mPatientService;
@@ -75,10 +76,6 @@ VideoServiceOldPtr LegacySingletons::mVideoServiceOld;
 VisualizationServiceOldPtr LegacySingletons::mVisualizationService;
 StateServicePtr LegacySingletons::mStateService;
 
-ToolManager* toolManager()
-{
-	return LegacySingletons::mToolManager.get(); // TODO remove get()
-}
 DataManager* dataManager()
 {
 	return LegacySingletons::mDataManager.get(); // TODO remove get()
@@ -88,9 +85,9 @@ ViewManager* viewManager()
 	return LegacySingletons::mVisualizationService.get();
 }
 
-TrackingServiceOldPtr trackingService()
+TrackingServicePtr trackingService()
 {
-	return LegacySingletons::mToolManager;
+	return LegacySingletons::mTrackingService;
 }
 SpaceProviderPtr spaceProvider()
 {
@@ -147,6 +144,14 @@ void LogicManager::initializeServices()
 	// resources layer
 	Reporter::initialize();
 
+	// HACKS to get the system up and running while converting to plugin framework:
+	// - start ONLY the specified plugins first, because they are required later on
+	// - load all other plugins after initing system, as they are generally dependent on singletons.
+//	PluginFrameworkManagerPtr pfw = this->getPluginFramework();
+	mPluginFramework = PluginFrameworkManager::create();
+	mPluginFramework->start();
+	mPluginFramework->start("org.custusx.core.tracking", ctkPlugin::START_TRANSIENT);
+
 	// services layer
 	this->getPatientService();
 	this->getTrackingService();
@@ -157,6 +162,7 @@ void LogicManager::initializeServices()
 
 	mServiceController.reset(new ServiceController);
 
+	mPluginFramework->loadState();
 	// logic layer
 	//cx::LogicManager::initialize();
 
@@ -165,9 +171,9 @@ void LogicManager::initializeServices()
 }
 
 void LogicManager::createTrackingService()
-{
-	mTrackingService = ToolManagerUsingIGSTK::create();
-	LegacySingletons::mToolManager = mTrackingService;
+{	
+	mTrackingService = TrackingServiceProxy::create(this->getPluginContext());
+	LegacySingletons::mTrackingService = mTrackingService;
 }
 
 void LogicManager::createInterconnectedDataAndSpace()
@@ -269,8 +275,8 @@ void LogicManager::createStateService()
 
 void LogicManager::createPluginFramework()
 {
-	mPluginFramework = PluginFrameworkManager::create();
-	mPluginFramework->start();
+//	mPluginFramework = PluginFrameworkManager::create();
+//	mPluginFramework->start();
 
 }
 
@@ -295,7 +301,7 @@ PatientServicePtr LogicManager::getPatientService()
 	return mPatientService;
 }
 
-TrackingServiceOldPtr LogicManager::getTrackingService()
+TrackingServicePtr LogicManager::getTrackingService()
 {
 	if (!mTrackingService)
 		this->createTrackingService();
@@ -410,8 +416,8 @@ void LogicManager::shutdownInterconnectedDataAndSpace()
 
 void LogicManager::shutdownTrackingService()
 {
-	LegacySingletons::mToolManager.reset();
-	requireUnique(mTrackingService, "TrackingService");
+	LegacySingletons::mTrackingService.reset();
+	requireUnique(mTrackingService, "TrackingService (converted to plugin)");
 	mTrackingService.reset();
 }
 

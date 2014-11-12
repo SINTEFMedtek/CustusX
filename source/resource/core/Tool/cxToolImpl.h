@@ -52,7 +52,7 @@ class cxResource_EXPORT ToolImpl : public Tool
 {
 	Q_OBJECT
 public:
-	explicit ToolImpl(TrackingServiceOldPtr manager, const QString& uid="", const QString& name ="");
+	explicit ToolImpl(const QString& uid="", const QString& name ="");
 	virtual ~ToolImpl();
 
 	virtual TimedTransformMapPtr getPositionHistory();
@@ -62,18 +62,17 @@ public:
 	virtual double getTooltipOffset() const;
 	virtual void setTooltipOffset(double val);
 
-	void resetTrackingPositionFilter(TrackingPositionFilterPtr filter);
+	virtual void resetTrackingPositionFilter(TrackingPositionFilterPtr filter);
+	virtual bool isNull() { return false; }
 
 protected:
-	TrackingServiceOldPtr getTrackingService();
-	TrackingServiceOldPtr getTrackingService() const;
 	virtual void set_prMt(const Transform3D& prMt, double timestamp);
 	TimedTransformMapPtr mPositionHistory;
-	TrackingServiceWeakPtr mManager;
 	Transform3D m_prMt; ///< the transform from the tool to the patient reference
 	TrackingPositionFilterPtr mTrackingPositionFilter;
 private slots:
 private:
+	double mTooltipOffset;
 };
 
 

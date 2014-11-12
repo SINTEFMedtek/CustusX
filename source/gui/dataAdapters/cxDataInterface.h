@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 typedef boost::shared_ptr<class ActiveImageProxy> ActiveImageProxyPtr;
+typedef boost::shared_ptr<class DominantToolProxy> DominantToolProxyPtr;
 
 /**
  * \brief Interface to the tool offset of the dominant tool
@@ -73,10 +74,8 @@ public:
   virtual void connectValueSignals(bool on) {}
   DoubleRange getValueRange() const;
 
-private slots:
-  void dominantToolChangedSlot();
 protected:
-  ToolPtr mTool;
+  DominantToolProxyPtr mActiveTool;
 };
 
 /**

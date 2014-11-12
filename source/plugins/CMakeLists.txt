@@ -19,7 +19,7 @@ set(CX_PLUGINS
   org.custusx.registration:ON
   org.custusx.registration.gui:ON
   org.custusx.registration.method.manual:ON
-  org.custusx.registration.method.modelToUS:OFF
+#  org.custusx.registration.method.modelToUS:OFF
   org.custusx.registration.method.landmark:ON
   org.custusx.registration.method.bronchoscopy:ON
   org.custusx.registration.method.vessel:ON

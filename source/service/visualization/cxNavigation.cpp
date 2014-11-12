@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxData.h"
 #include "cxBoundingBox3D.h"
 #include "cxDataManager.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxManualTool.h"
 #include "cxVolumeHelpers.h"
 #include "cxCameraControl.h"
@@ -117,7 +117,7 @@ void Navigation::centerToGlobalDataCenter()
  */
 void Navigation::centerToTooltip()
 {
-	ToolPtr tool = mBackend->getToolManager()->getDominantTool();
+	ToolPtr tool = mBackend->getToolManager()->getActiveTool();
 	Vector3D p_pr = tool->get_prMt().coord(Vector3D(0, 0, tool->getTooltipOffset()));
 	Vector3D p_r = mBackend->getDataManager()->get_rMpr().coord(p_pr);
 
@@ -166,7 +166,7 @@ Vector3D Navigation::findDataCenter(std::vector<DataPtr> data)
 void Navigation::moveManualToolToPosition(Vector3D& p_r)
 {
 	// move the manual tool to the same position. (this is a side effect... do we want it?)
-	ManualToolPtr manual = mBackend->getToolManager()->getManualTool();
+	ToolPtr manual = mBackend->getToolManager()->getManualTool();
 	Vector3D p_pr = mBackend->getDataManager()->get_rMpr().inv().coord(p_r);
 	Transform3D prM0t = manual->get_prMt(); // modify old pos in order to keep orientation
 	Vector3D t_pr = prM0t.coord(Vector3D(0, 0, manual->getTooltipOffset()));

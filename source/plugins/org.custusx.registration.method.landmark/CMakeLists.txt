@@ -8,14 +8,12 @@ include_directories(
     ${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
     ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.registration
 	${CustusX_SOURCE_DIR}/source/modules/Acquisition/logic
-	${CustusX_SOURCE_DIR}/source/service/tracking
 	${CustusX_SOURCE_DIR}/source/service/visualization
 	${CustusX_SOURCE_DIR}/source/gui/infoWidgets
 	${CustusX_SOURCE_DIR}/source/logic
 
 	${CustusX_BINARY_DIR}/source/plugins/org.custusx.registration
 	${CustusX_BINARY_DIR}/source/modules/Acquisition
-	${CustusX_BINARY_DIR}/source/service/tracking
 	${CustusX_BINARY_DIR}/source/service/visualization
 	${CustusX_BINARY_DIR}/source/gui
 	${CustusX_BINARY_DIR}/source/logic
@@ -23,29 +21,29 @@ include_directories(
 
 set(PLUGIN_SRCS
     cxRegistrationMethodLandmarkPluginActivator.cpp
-    cxRegistrationMethodLandmarkService.cpp
-    cxFastImageRegistrationWidget.cpp
+	cxRegistrationMethodLandmarkService.h
+	cxRegistrationMethodLandmarkService.cpp
+	cxFastImageRegistrationWidget.cpp
     cxFastRegistrationsWidget.cpp
     cxFastRegistrationsWidget.h
-    cxLandmarkRegistrationsWidget.cpp
+	cxLandmarkRegistrationsWidget.h
+	cxLandmarkRegistrationsWidget.cpp
     cxLandmarkImageRegistrationWidget.cpp
     cxLandmarkRegistrationWidget.cpp
     cxLandmarkPatientRegistrationWidget.cpp
     cxLandmarkImage2ImageRegistrationWidget.cpp
-    cxFastPatientRegistrationWidget.cpp
+	cxFastPatientRegistrationWidget.h
+	cxFastPatientRegistrationWidget.cpp
     cxFastOrientationRegistrationWidget.cpp
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
     cxRegistrationMethodLandmarkPluginActivator.h
-    cxRegistrationMethodLandmarkService.h
-    cxLandmarkRegistrationsWidget.h
     cxLandmarkRegistrationWidget.h
     cxLandmarkImageRegistrationWidget.h
     cxLandmarkPatientRegistrationWidget.h
     cxLandmarkImage2ImageRegistrationWidget.h
-    cxFastPatientRegistrationWidget.h
     cxFastImageRegistrationWidget.h
     cxFastOrientationRegistrationWidget.h
 )
@@ -68,7 +66,6 @@ set(PLUGIN_target_libraries
     ${PLUGIN_target_libraries}   
     cxResourceWidgets
 	cxPluginAlgorithm
-	cxTrackingService
 	org_custusx_registration
     )
 

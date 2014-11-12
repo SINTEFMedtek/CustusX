@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReporter.h"
 #include "cxTrackerConfiguration.h"
 #include "cxLegacySingletons.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 
 namespace cx
 {
@@ -58,7 +58,7 @@ QString ToolImagePreviewWidget::defaultWhatsThis() const
 
 void ToolImagePreviewWidget::previewFileSlot(const QString& absoluteFilePath)
 {
-	TrackerConfigurationPtr config = toolManager()->getConfiguration();
+	TrackerConfigurationPtr config = trackingService()->getConfiguration();
 	const QString imageAbsoluteFilePath = config->getTool(absoluteFilePath).mPictureFilename;
 	ImagePreviewWidget::previewFileSlot(imageAbsoluteFilePath);
 }

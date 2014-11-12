@@ -40,6 +40,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
+TrackingServicePtr TrackingServiceProxy::create(ctkPluginContext *pluginContext)
+{
+	return TrackingServicePtr(new TrackingServiceProxy(pluginContext));
+}
+
 TrackingServiceProxy::TrackingServiceProxy(ctkPluginContext *pluginContext) :
 	mPluginContext(pluginContext),
 	mTrackingService(TrackingService::getNullObject())
@@ -60,16 +65,19 @@ void TrackingServiceProxy::initServiceListener()
 void TrackingServiceProxy::onServiceAdded(TrackingService* service)
 {
 	mTrackingService.reset(service, null_deleter());
-//	connect(mVideoService.get(), SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
-//	connect(mVideoService.get(), SIGNAL(movingDataChanged(QString)), this, SIGNAL(movingDataChanged(QString)));
+
+	connect(mTrackingService.get(), &TrackingService::stateChanged, this, &TrackingService::stateChanged);
+	connect(mTrackingService.get(), &TrackingService::dominantToolChanged, this, &TrackingService::dominantToolChanged);
+
 	if(mTrackingService->isNull())
 		reportWarning("VideoServiceProxy::onServiceAdded mVideoService->isNull()");
 }
 
 void TrackingServiceProxy::onServiceRemoved(TrackingService *service)
 {
-//	disconnect(service, SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
-//	disconnect(service, SIGNAL(movingDataChanged(QString)), this, SIGNAL(movingDataChanged(QString)));
+	disconnect(mTrackingService.get(), &TrackingService::stateChanged, this, &TrackingService::stateChanged);
+	disconnect(mTrackingService.get(), &TrackingService::dominantToolChanged, this, &TrackingService::dominantToolChanged);
+
 	mTrackingService = TrackingService::getNullObject();
 }
 
@@ -77,4 +85,130 @@ bool TrackingServiceProxy::isNull()
 {
 	return mTrackingService->isNull();
 }
+
+Tool::State TrackingServiceProxy::getState() const
+{
+	return mTrackingService->getState();
+}
+
+void TrackingServiceProxy::setState(const Tool::State val)
+{
+	mTrackingService->setState(val);
+}
+
+ToolPtr TrackingServiceProxy::getTool(const QString& uid)
+{
+	return mTrackingService->getTool(uid);
+}
+
+ToolPtr TrackingServiceProxy::getActiveTool()
+{
+	return mTrackingService->getActiveTool();
+}
+
+void TrackingServiceProxy::setActiveTool(const QString& uid)
+{
+	mTrackingService->setActiveTool(uid);
+}
+
+ToolPtr TrackingServiceProxy::getFirstProbe()
+{
+	return mTrackingService->getFirstProbe();
+}
+
+
+ToolPtr TrackingServiceProxy::getReferenceTool() const
+{
+	return mTrackingService->getReferenceTool();
+}
+
+ToolPtr TrackingServiceProxy::getManualTool()
+{
+	return mTrackingService->getManualTool();
+}
+
+
+
+
+
+
+
+TrackingService::ToolMap TrackingServiceProxy::getTools()
+{
+	return mTrackingService->getTools();
+}
+
+bool TrackingServiceProxy::isPlaybackMode() const
+{
+	return mTrackingService->isPlaybackMode();
+}
+
+void TrackingServiceProxy::setPlaybackMode(PlaybackTimePtr controller)
+{
+	mTrackingService->setPlaybackMode(controller);
+}
+
+void TrackingServiceProxy::savePositionHistory()
+{
+	mTrackingService->savePositionHistory();
+}
+
+void TrackingServiceProxy::loadPositionHistory()
+{
+	mTrackingService->loadPositionHistory();
+}
+
+void TrackingServiceProxy::addXml(QDomNode& parentNode)
+{
+	mTrackingService->addXml(parentNode);
+}
+
+void TrackingServiceProxy::parseXml(QDomNode& dataNode)
+{
+	mTrackingService->parseXml(dataNode);
+}
+
+void TrackingServiceProxy::clear()
+{
+	mTrackingService->clear();
+}
+
+SessionToolHistoryMap TrackingServiceProxy::getSessionHistory(double startTime, double stopTime)
+{
+	return mTrackingService->getSessionHistory(startTime, stopTime);
+}
+
+void TrackingServiceProxy::setLoggingFolder(QString loggingFolder)
+{
+	mTrackingService->setLoggingFolder(loggingFolder);
+}
+
+void TrackingServiceProxy::runDummyTool(DummyToolPtr tool)
+{
+	mTrackingService->runDummyTool(tool);
+}
+
+TrackerConfigurationPtr TrackingServiceProxy::getConfiguration()
+{
+	return mTrackingService->getConfiguration();
+}
+
+
+void TrackingServiceProxy::installTrackingSystem(TrackingSystemServicePtr system)
+{
+	mTrackingService->installTrackingSystem(system);
+}
+
+void TrackingServiceProxy::unInstallTrackingSystem(TrackingSystemServicePtr system)
+{
+	mTrackingService->unInstallTrackingSystem(system);
+}
+
+std::vector<TrackingSystemServicePtr> TrackingServiceProxy::getTrackingSystems()
+{
+	return mTrackingService->getTrackingSystems();
+}
+
+
+
 } //cx

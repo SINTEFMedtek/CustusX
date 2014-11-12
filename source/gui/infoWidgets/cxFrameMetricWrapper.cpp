@@ -121,7 +121,7 @@ QString FrameMetricWrapper::getArguments() const
 void FrameMetricWrapper::moveToToolPosition()
 {
 //	CoordinateSystem ref = CoordinateSystem::reference()
-	Transform3D qMt = spaceProvider()->getDominantToolTipTransform(mData->getSpace(), true);
+	Transform3D qMt = spaceProvider()->getActiveToolTipTransform(mData->getSpace(), true);
 	mData->setFrame(qMt);
 }
 

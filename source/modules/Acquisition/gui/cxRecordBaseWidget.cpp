@@ -39,13 +39,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QHBoxLayout>
 #include <QDoubleSpinBox>
 #include <vtkPolyData.h>
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxReporter.h"
 #include "cxMesh.h"
 #include "cxTransform3D.h"
 #include "cxRecordSessionWidget.h"
 #include "cxVideoConnectionManager.h"
-#include "cxProbeImpl.h"
+//#include "cxProbeImpl.h"
 #include "cxSoundSpeedConversionWidget.h"
 
 namespace cx

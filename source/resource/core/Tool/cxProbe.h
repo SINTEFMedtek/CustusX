@@ -66,6 +66,9 @@ public:
 	virtual QString getConfigId() const = 0;
 	virtual QString getConfigurationPath() const = 0;
 
+	virtual void removeCurrentConfig() = 0; ///< remove the current config from disk
+	virtual void saveCurrentConfig(QString uid, QString name) = 0; ///< save current config to disk under ids (uid,name).
+
 	virtual void applyNewConfigurationWithId(QString uid) = 0;
 	virtual void setTemporalCalibration(double val) = 0;
 	virtual void setSoundSpeedCompensationFactor(double val) = 0;

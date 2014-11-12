@@ -39,12 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationTransform.h"
 #include "cxFrameForest.h"
 
- //TODO: Remove these by moving functionality to PatientModelService
-//#include "cxLogicManager.h"
-//#include "cxPatientService.h"
-//#include "cxDataManager.h"
-//#include "cxLegacySingletons.h"
-//#include "cxPatientData.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -69,12 +64,13 @@ void RegistrationApplicator::updateRegistration(QDateTime oldTime, RegistrationT
 {
   FrameForest forest(mSource);
   QDomNode moving = forest.getNode(movingData->getUid());
+  QDomNode fixed = forest.getNode(delta_pre_rMd.mFixed);
+
+  // if no parent, assume this is an operation on the moving image, thus set fixed to its parent.
   if (delta_pre_rMd.mFixed == "")
   {
-	  report("No fixed data found, ignoring registration.");
-	  return;
+	  fixed = forest.getNode(movingData->getParentSpace());
   }
-  QDomNode fixed = forest.getNode(delta_pre_rMd.mFixed);
   QDomNode movingBase = forest.getOldestAncestorNotCommonToRef(moving, fixed);
 
   std::vector<DataPtr> allMovingData = forest.getDataFromDescendantsAndSelf(movingBase);

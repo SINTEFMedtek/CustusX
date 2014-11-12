@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkPolyData.h>
 #include "cxTransform3D.h"
 #include "cxDataSelectWidget.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxMesh.h"
 #include "cxAcquisitionData.h"
 #include "cxSelectDataStringDataAdapter.h"
@@ -54,6 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVisualizationService.h"
 #include "cxStringDataAdapterXml.h"
 #include "cxLabeledComboBoxWidget.h"
+#include "cxTrackingService.h"
 
 #include "cxLegacySingletons.h"
 
@@ -90,6 +91,7 @@ BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(regServices servi
 
 	mRecordSessionWidget.reset(new RecordSessionWidget(mAcquisition, this, "Bronchoscope path"));
 
+	mVerticalLayout->setMargin(0);
 	mVerticalLayout->addWidget(new DataSelectWidget(services.visualizationService, services.patientModelService, this, mSelectMeshWidget));
 //    mVerticalLayout->addWidget(mTrackedCenterLine);
 
@@ -204,12 +206,12 @@ void BronchoscopyRegistrationWidget::acquisitionStarted()
 {
     std::cout << "acquisitionStarted" << std::endl;
 
-    mTool = toolManager()->getDominantTool();
+	mTool = mServices.trackingService->getActiveTool();
     ToolRep3DPtr activeRep3D = this->getToolRepIn3DView(mTool);
 	if (!activeRep3D)
 		return;
 
-	activeRep3D->getTracer()->start();
+    activeRep3D->getTracer()->start();
 }
 void BronchoscopyRegistrationWidget::acquisitionStopped()
 {

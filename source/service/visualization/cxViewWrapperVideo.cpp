@@ -46,10 +46,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 
 #include "cxSettings.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxVideoServiceOld.h"
 #include "cxVisualizationServiceBackend.h"
 #include "vtkRenderWindowInteractor.h"
+#include "cxTool.h"
 
 namespace cx
 {
@@ -66,7 +67,7 @@ ViewWrapperVideo::ViewWrapperVideo(ViewPtr view, VisualizationServiceBackendPtr 
 	double clipDepth = 1.0; // 1mm depth, i.e. all 3D props rendered outside this range is not shown.
 	mView->getRenderer()->GetActiveCamera()->SetClippingRange(-clipDepth / 2.0, clipDepth / 2.0);
 
-	connect(mBackend->getToolManager().get(), SIGNAL(configured()), this, SLOT(connectStream()));
+	connect(mBackend->getToolManager().get(), &TrackingService::stateChanged, this, &ViewWrapperVideo::connectStream);
 	connect(mBackend->getVideoServiceOld().get(), SIGNAL(activeVideoSourceChanged()), this, SLOT(connectStream()));
 	connect(mBackend->getToolManager().get(), SIGNAL(dominantToolChanged(QString)), this, SLOT(connectStream()));
 
@@ -172,7 +173,7 @@ void ViewWrapperVideo::connectStream()
 		uid = source->getUid();
 
 	ToolPtr newTool;
-	ToolPtr tool = mBackend->getToolManager()->findFirstProbe();
+	ToolPtr tool = mBackend->getToolManager()->getFirstProbe();
 	if (tool && tool->getProbe())
 	{
 		if (tool->getProbe()->getAvailableVideoSources().count(uid))

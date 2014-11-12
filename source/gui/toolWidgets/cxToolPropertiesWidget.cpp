@@ -40,12 +40,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QCheckBox>
 
 #include "cxReporter.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxTypeConversions.h"
 //#include "UsConfigGui.h"
 #include "cxDataInterface.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxTool.h"
 #include "cxToolDataAdapters.h"
 #include "cxActiveToolWidget.h"
@@ -96,8 +96,8 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   manualGroupLayout->setMargin(0);
   mManualToolWidget = new Transform3DWidget(manualGroup);
   manualGroupLayout->addWidget(mManualToolWidget);
-  connect(toolManager()->getManualTool().get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(manualToolChanged()));
-  connect(toolManager()->getManualTool().get(), SIGNAL(toolVisible(bool)), this, SLOT(manualToolChanged()));
+  connect(trackingService()->getManualTool().get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(manualToolChanged()));
+  connect(trackingService()->getManualTool().get(), SIGNAL(toolVisible(bool)), this, SLOT(manualToolChanged()));
   connect(mManualToolWidget, SIGNAL(changed()), this, SLOT(manualToolWidgetChanged()));
 
   mSpaceSelector = StringDataAdapterXml::initialize("selectSpace",
@@ -122,15 +122,12 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
 
   mToptopLayout->addStretch();
 
-  connect(toolManager(), SIGNAL(trackingStarted()), this, SLOT(referenceToolChangedSlot()));
-  connect(toolManager(), SIGNAL(trackingStopped()), this, SLOT(referenceToolChangedSlot()));
-  connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
+  connect(trackingService().get(), &TrackingService::stateChanged, this, &ToolPropertiesWidget::referenceToolChangedSlot);
 
-  connect(toolManager(), SIGNAL(configured()), this, SLOT(updateSlot()));
-  connect(toolManager(), SIGNAL(initialized()), this, SLOT(updateSlot()));
-  connect(toolManager(), SIGNAL(trackingStarted()), this, SLOT(updateSlot()));
-  connect(toolManager(), SIGNAL(trackingStopped()), this, SLOT(updateSlot()));
-  connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(updateSlot()));
+  connect(trackingService().get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
+
+  connect(trackingService().get(), &TrackingService::stateChanged, this, &ToolPropertiesWidget::updateSlot);
+  connect(trackingService().get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(updateSlot()));
 
   this->dominantToolChangedSlot();
   this->referenceToolChangedSlot();
@@ -154,14 +151,14 @@ QString ToolPropertiesWidget::defaultWhatsThis() const
 
 void ToolPropertiesWidget::manualToolChanged()
 {
-	if (!toolManager()->getManualTool())
+	if (!trackingService()->getManualTool())
 		return;
-  mManualGroup->setVisible(toolManager()->getManualTool()->getVisible());
+  mManualGroup->setVisible(trackingService()->getManualTool()->getVisible());
   mManualToolWidget->blockSignals(true);
 
-  Transform3D prMt = toolManager()->getManualTool()->get_prMt();
+  Transform3D prMt = trackingService()->getManualTool()->get_prMt();
   CoordinateSystem space_q = CoordinateSystem::fromString(mSpaceSelector->getValue());
-  CoordinateSystem space_mt = spaceProvider()->getTO(toolManager()->getManualTool());
+  CoordinateSystem space_mt = spaceProvider()->getTO(trackingService()->getManualTool());
   Transform3D qMt = spaceProvider()->get_toMfrom(space_mt, space_q);
 
   mManualToolWidget->setMatrix(qMt);
@@ -172,12 +169,12 @@ void ToolPropertiesWidget::manualToolWidgetChanged()
 {
 	Transform3D qMt = mManualToolWidget->getMatrix();
   CoordinateSystem space_q = CoordinateSystem::fromString(mSpaceSelector->getValue());
-  CoordinateSystem space_mt = spaceProvider()->getTO(toolManager()->getManualTool());
+  CoordinateSystem space_mt = spaceProvider()->getTO(trackingService()->getManualTool());
   CoordinateSystem space_pr = spaceProvider()->getPr();
   Transform3D qMpr = spaceProvider()->get_toMfrom(space_pr, space_q);
   Transform3D prMt = qMpr.inv() * qMt;
 
-  toolManager()->getManualTool()->set_prMt(prMt);
+  trackingService()->getManualTool()->set_prMt(prMt);
 }
 
 void ToolPropertiesWidget::spacesChangedSlot()
@@ -202,7 +199,7 @@ void ToolPropertiesWidget::dominantToolChangedSlot()
   if (mActiveTool)
     disconnect(mActiveTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateSlot()));
 
-  mActiveTool = toolManager()->getDominantTool();
+  mActiveTool = trackingService()->getActiveTool();
 
   if(mActiveTool && mActiveTool->hasType(Tool::TOOL_US_PROBE))
   {
@@ -224,7 +221,7 @@ void ToolPropertiesWidget::referenceToolChangedSlot()
   if (mReferenceTool)
     disconnect(mReferenceTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateSlot()));
 
-  mReferenceTool = toolManager()->getReferenceTool();
+  mReferenceTool = trackingService()->getReferenceTool();
 
   if (mReferenceTool)
     connect(mReferenceTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateSlot()));
@@ -255,12 +252,12 @@ void ToolPropertiesWidget::updateSlot()
   }
 
   QString status = "Unconfigured";
-  if (toolManager()->isConfigured())
+  if (trackingService()->getState()==Tool::tsCONFIGURED)
     status = "Configured";
-  if (toolManager()->isInitialized())
-    status = "Initialized";
-  if (toolManager()->isTracking())
-    status = "Tracking";
+  if (trackingService()->getState()==Tool::tsINITIALIZED)
+	status = "Initialized";
+  if (trackingService()->getState()==Tool::tsTRACKING)
+	status = "Tracking";
   mTrackingSystemStatusLabel->setText("Tracking status: " + status);
 }
 

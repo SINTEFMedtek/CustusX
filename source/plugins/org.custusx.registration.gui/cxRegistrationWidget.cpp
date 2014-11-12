@@ -62,6 +62,7 @@ RegistrationWidget::RegistrationWidget(ctkPluginContext *pluginContext, QWidget*
 	this->setWindowTitle("Registration");
 	this->setWhatsThis(this->defaultWhatsThis());
 
+	connect(this, &QTabWidget::currentChanged, this, &RegistrationWidget::onCurrentChanged);
 	this->initRegistrationTypesWidgets();
 	this->initServiceListener();
 }
@@ -73,6 +74,15 @@ RegistrationWidget::~RegistrationWidget()
 void RegistrationWidget::initRegistrationTypesWidgets()
 {
 	mRegistrationTypes << "ImageToPatient" << "ImageToImage" << "ImageTransform";
+
+	mTypeSelector = StringDataAdapterXml::initialize("RegistrationTypes",
+													 "Registration Types",
+													 "Select registration type",
+													 "",
+													 mRegistrationTypes,
+													 mOptions.getElement());
+	this->blockSignals(true); // we dont want the onCurrentChanged() to be called while constructing
+
 	for(int i = 0; i < mRegistrationTypes.count(); ++i)
 	{
 		QWidget *widget = new QWidget(this);
@@ -80,6 +90,7 @@ void RegistrationWidget::initRegistrationTypesWidgets()
 		mRegistrationTypeMap[mRegistrationTypes[i]] = registrationTypeWidget;
 
 		QVBoxLayout *layoutV = new QVBoxLayout(widget);
+//		layoutV->setMargin(0);
 
 		StringDataAdapterXmlPtr methodSelector = StringDataAdapterXml::initialize(mRegistrationTypes[i],
 																				  "Method",
@@ -96,7 +107,19 @@ void RegistrationWidget::initRegistrationTypesWidgets()
 
 		mVerticalLayout->addWidget(widget);
 		this->addTab(widget, mRegistrationTypes[i]);
+
+		if (mTypeSelector->getValue() == mRegistrationTypes[i])
+			this->setCurrentIndex(i);
 	}
+
+	this->blockSignals(false);
+}
+
+void RegistrationWidget::onCurrentChanged(int index)
+{
+	if (index<0)
+		return;
+	mTypeSelector->setValue(mRegistrationTypes[index]);
 }
 
 void RegistrationWidget::indexChanged(QString registrationType)

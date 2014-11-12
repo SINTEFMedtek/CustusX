@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMesh.h"
 #include "cxReporter.h"
 #include "cxImageLUT2D.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxTypeConversions.h"
 #include "cxDefinitionStrings.h"
 #include "cxEnumConverter.h"
@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVideoSource.h"
 #include "cxVideoServiceOld.h"
 #include "cxPatientModelService.h"
+#include "cxDominantToolProxy.h"
 
 //TODO: remove
 #include "cxLegacySingletons.h"
@@ -55,40 +56,19 @@ namespace cx
 {
 DoubleDataAdapterActiveToolOffset::DoubleDataAdapterActiveToolOffset()
 {
-  connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
-  dominantToolChangedSlot();
+  mActiveTool = DominantToolProxy::New(trackingService());
+  connect(mActiveTool.get(), &DominantToolProxy::tooltipOffset, this, &DataAdapter::changed);
 }
 
 double DoubleDataAdapterActiveToolOffset::getValue() const
 {
-  if (mTool)
-    return mTool->getTooltipOffset();
-  return 0.0;
+	return mActiveTool->getTool()->getTooltipOffset();
 }
 
 bool DoubleDataAdapterActiveToolOffset::setValue(double val)
 {
-  if (!mTool)
-    return false;
-  mTool->setTooltipOffset(val);
+  mActiveTool->getTool()->setTooltipOffset(val);
   return true;
-}
-
-void DoubleDataAdapterActiveToolOffset::dominantToolChangedSlot()
-{
-  if (mTool)
-  {
-    disconnect(mTool.get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(changed()));
-  }
-
-  mTool = toolManager()->getDominantTool();
-
-  if (mTool)
-  {
-    connect(mTool.get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(changed()));
-  }
-
-  emit changed();
 }
 
 DoubleRange DoubleDataAdapterActiveToolOffset::getValueRange() const
@@ -248,22 +228,22 @@ QString ActiveVideoSourceStringDataAdapter::getHelp() const
 
 SelectToolStringDataAdapterBase::SelectToolStringDataAdapterBase()
 {
-  connect(toolManager(), SIGNAL(configured()), this, SIGNAL(changed()));
+	connect(trackingService().get(), &TrackingService::stateChanged, this, &SelectToolStringDataAdapterBase::changed);
 }
 
 QStringList SelectToolStringDataAdapterBase::getValueRange() const
 {
-	ToolManager::ToolMap tools = toolManager()->getTools();
+	TrackingService::ToolMap tools = trackingService()->getTools();
 
 	QStringList retval;
-	for (ToolManager::ToolMap::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
+	for (TrackingService::ToolMap::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
 		retval << iter->second->getUid();
 	return retval;
 }
 
 QString SelectToolStringDataAdapterBase::convertInternal2Display(QString internal)
 {
-  ToolPtr tool = toolManager()->getTool(internal);
+  ToolPtr tool = trackingService()->getTool(internal);
   if (!tool)
   {
     return "<no tool>";
@@ -387,7 +367,7 @@ void SelectRTSourceStringDataAdapter::setDefaultSlot()
 SelectCoordinateSystemStringDataAdapter::SelectCoordinateSystemStringDataAdapter()
 {
 	mCoordinateSystem = csCOUNT;
-  connect(toolManager(), SIGNAL(configured()), this, SLOT(setDefaultSlot()));
+  connect(trackingService().get(), &TrackingService::stateChanged, this, &SelectCoordinateSystemStringDataAdapter::setDefaultSlot);
 }
 
 QString SelectCoordinateSystemStringDataAdapter::getDisplayName() const
@@ -446,7 +426,7 @@ bool SelectToolStringDataAdapter::setValue(const QString& value)
 {
   if(mTool && value==mTool->getUid())
     return false;
-  ToolPtr temp = toolManager()->getTool(value);
+  ToolPtr temp = trackingService()->getTool(value);
   if(!temp)
     return false;
 

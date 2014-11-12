@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackedCenterlineWidget.h"
 
 #include <QVBoxLayout>
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxDataManager.h"
 #include "cxMeshHelpers.h"
 #include "cxToolRep3D.h"
@@ -58,11 +58,7 @@ TrackedCenterlineWidget::TrackedCenterlineWidget(AcquisitionDataPtr pluginData, 
   this->setObjectName("TrackedCenterlineWidget");
   this->setWindowTitle("Tracked Centerline");
 
-//  connect(&mCenterlineAlgorithm, SIGNAL(finished()), this, SLOT(centerlineFinishedSlot()));
-//  connect(&mCenterlineAlgorithm, SIGNAL(aboutToStart()), this, SLOT(preprocessResampler()));
-
-  connect(toolManager(), SIGNAL(trackingStarted()), this, SLOT(checkIfReadySlot()));
-  connect(toolManager(), SIGNAL(trackingStopped()), this, SLOT(checkIfReadySlot()));
+	connect(trackingService().get(), &TrackingService::stateChanged, this, &TrackedCenterlineWidget::checkIfReadySlot);
   mLayout->addStretch();
 
   this->checkIfReadySlot();
@@ -81,7 +77,7 @@ QString TrackedCenterlineWidget::defaultWhatsThis() const
 
 void TrackedCenterlineWidget::checkIfReadySlot()
 {
-  if(toolManager()->isTracking())
+  if(trackingService()->getState()>=Tool::tsTRACKING)
   {
     mRecordSessionWidget->setReady(true, "<font color=green>Ready to record!</font>\n");
   }
@@ -156,8 +152,8 @@ void TrackedCenterlineWidget::centerlineFinishedSlot()
 void TrackedCenterlineWidget::startedSlot(QString sessionId)
 {
   //show preview of tool path
-  ToolManager::ToolMap tools = toolManager()->getTools();
-  ToolManager::ToolMap::iterator toolIt = tools.begin();
+  TrackingService::ToolMap tools = trackingService()->getTools();
+  TrackingService::ToolMap::iterator toolIt = tools.begin();
 
   ViewPtr view = viewManager()->get3DView(0,0);
   ToolRep3DPtr activeRep3D;
@@ -174,8 +170,8 @@ void TrackedCenterlineWidget::startedSlot(QString sessionId)
 void TrackedCenterlineWidget::stoppedSlot(bool)
 {
   //hide preview of tool path
-  ToolManager::ToolMap tools = toolManager()->getTools();
-  ToolManager::ToolMap::iterator toolIt = tools.begin();
+  TrackingService::ToolMap tools = trackingService()->getTools();
+  TrackingService::ToolMap::iterator toolIt = tools.begin();
 
   ViewPtr view = viewManager()->get3DView(0,0);
   ToolRep3DPtr activeRep3D;
@@ -214,7 +210,7 @@ ToolPtr TrackedCenterlineWidget::findTool(double startTime, double stopTime)
 {
   ToolPtr retval;
 
-  SessionToolHistoryMap toolTransformMap = toolManager()->getSessionHistory(startTime, stopTime);
+  SessionToolHistoryMap toolTransformMap = trackingService()->getSessionHistory(startTime, stopTime);
   if(toolTransformMap.size() == 1)
   {
 	report("Found one tool("+toolTransformMap.begin()->first->getName()+") with relevant data.");

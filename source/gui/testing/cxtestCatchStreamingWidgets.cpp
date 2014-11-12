@@ -44,6 +44,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxVisualizationService.h"
 #include "cxVideoService.h"
+#include "cxUtilHelpers.h"
+#include "cxLogger.h"
+#include "cxReporter.h"
 
 namespace cxtest
 {
@@ -51,14 +54,24 @@ namespace cxtest
 //Disabled test of SimulatedImageStreamer
 TEST_CASE("VideoConnectionWidget can stream", "[unit][gui][not_win32][widget][streaming]")
 {
+	cx::Reporter::initialize();
+	SSC_LOG("");
 	cx::LogicManager::initialize();
+	SSC_LOG("");
 
-	cx::TrackingServiceOldPtr ts = cx::logicManager()->getTrackingService();
+	cx::TrackingServicePtr ts = cx::logicManager()->getTrackingService();
 
-	cx::DummyToolPtr tool = cx::DummyToolTestUtilities::createDummyTool(cx::DummyToolTestUtilities::createProbeDataLinear(), ts);
+	cx::DummyToolPtr tool = cx::DummyToolTestUtilities::createDummyTool(cx::DummyToolTestUtilities::createProbeDataLinear());
 	ts->runDummyTool(tool);
-	ts->setDominantTool(tool->getUid());
-	waitForQueuedSignal(ts.get(), SIGNAL(trackingStarted()));
+
+	REQUIRE((ts->getState()>=cx::Tool::tsTRACKING));
+//	while(ts->getState()>=cx::Tool::tsTRACKING)
+//	{
+//		SSC_LOG("");
+		waitForQueuedSignal(ts.get(), SIGNAL(stateChanged()));
+//		cx::sleep_ms(5);
+//	}
+//	waitForQueuedSignal(ts.get(), SIGNAL(trackingStarted()));
 
 	QString filename = cx::DataLocations::getTestDataPath() + "/testing/TubeSegmentationFramework/Default.mhd";
 	REQUIRE(QFile::exists(filename));

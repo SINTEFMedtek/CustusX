@@ -30,16 +30,15 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include <cxDoubleDataAdapterTemporalCalibration.h>
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 
 namespace cx
 {
 
 DoubleDataAdapterTimeCalibration::DoubleDataAdapterTimeCalibration()
 {
-  connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChanged()));
-  connect(toolManager(), SIGNAL(configured()), this, SLOT(dominantToolChanged())); // for debugging: if initializing a manual tool with probe properties
-  connect(toolManager(), SIGNAL(trackingStarted()), this, SLOT(dominantToolChanged()));
+  connect(trackingService().get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChanged()));
+  connect(trackingService().get(), &TrackingService::stateChanged, this, &DoubleDataAdapterTimeCalibration::dominantToolChanged);
   this->dominantToolChanged();
 }
 
@@ -49,14 +48,14 @@ void DoubleDataAdapterTimeCalibration::dominantToolChanged()
 
   // ignore tool changes to something non-probeish.
   // This gives the user a chance to use the widget without having to show the probe.
-  ToolPtr newTool = toolManager()->getDominantTool();
+  ToolPtr newTool = trackingService()->getActiveTool();
   if (!newTool || !newTool->hasType(Tool::TOOL_US_PROBE))
     return;
 
   if (mTool)
     disconnect(mTool->getProbe().get(), SIGNAL(sectorChanged()), this, SIGNAL(changed()));
 
-  mTool = toolManager()->getDominantTool();
+  mTool = trackingService()->getActiveTool();
 
   if (mTool)
     connect(mTool->getProbe().get(), SIGNAL(sectorChanged()), this, SIGNAL(changed()));

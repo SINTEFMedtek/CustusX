@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QHBoxLayout>
 #include <QLabel>
 #include "cxReporter.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxProbe.h"
 
 namespace cx
@@ -106,7 +106,7 @@ void SoundSpeedConverterWidget::applySoundSpeedCompensationFactorSlot()
 
 void SoundSpeedConverterWidget::setToolSlot(const QString& uid)
 {
-  ToolPtr tool = toolManager()->getTool(uid);
+  ToolPtr tool = trackingService()->getTool(uid);
   ProbePtr probe = tool->getProbe();
   if(!probe)
     return;
