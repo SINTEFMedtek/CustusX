@@ -57,5 +57,4 @@ std::vector<GUIExtenderService::CategorizedWidget> RegistrationGUIExtenderServic
 	return retval;
 }
 
-
 } /* namespace cx */

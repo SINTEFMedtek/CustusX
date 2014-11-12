@@ -68,7 +68,7 @@ public:
 	virtual ~GUIExtenderService() {}
 
 	virtual std::vector<CategorizedWidget> createWidgets() const = 0;
-//	virtual std::vector<QToolBar*> createToolBars() const { return std::vector<QToolBar*>(); }
+	virtual std::vector<QToolBar*> createToolBars() const { return std::vector<QToolBar*>(); }
 };
 
 } // namespace cx
