@@ -6,9 +6,9 @@
 namespace cx
 {
 
-BronchoscopePositionProjection::BronchoscopePositionProjection(vtkPolyDataPtr centerline, Transform3D rMd)
+BronchoscopePositionProjection::BronchoscopePositionProjection(vtkPolyDataPtr centerline, Transform3D prMd)
 {
-	mCLpoints = this->getCenterlinePositions(centerline, rMd);
+    mCLpoints = this->getCenterlinePositions(centerline, prMd);
 }
 
 BronchoscopePositionProjection::~BronchoscopePositionProjection()
@@ -32,15 +32,14 @@ Eigen::MatrixXd BronchoscopePositionProjection::getCenterlinePositions(vtkPolyDa
 }
 
 
-Transform3D BronchoscopePositionProjection::findClosestPoint(Transform3D prMt, float maxDistance)
+Transform3D BronchoscopePositionProjection::findClosestPoint(Transform3D prMd, float maxDistance)
 {
 
-	Eigen::VectorXd toolPos  = prMt.matrix().topRightCorner(3 , 1);
+    Eigen::VectorXd toolPos  = prMd.matrix().topRightCorner(3 , 1);
 	Eigen::MatrixXd::Index index;
-	Transform3D newprMt = prMt;
+    Transform3D new_prMd = prMd;
 
 		Eigen::VectorXd P(mCLpoints.cols());
-
 		for (int i = 0; i < mCLpoints.cols(); i++)
 		{
 			float p0 = ( mCLpoints(0,i) - toolPos(0) );
@@ -51,13 +50,10 @@ Transform3D BronchoscopePositionProjection::findClosestPoint(Transform3D prMt, f
 		}
 
 		P.minCoeff(&index);
+        if (P.minCoeff() < maxDistance)
+            new_prMd.matrix().topRightCorner(3 , 1) = mCLpoints.col(index);
 
-		if (maxDistance > P.minCoeff())
-			newprMt.matrix().topRightCorner(3 , 1) = mCLpoints.col(index);
-
-		//std::cout << "index: " << index << std::endl;
-
-	return newprMt;
+    return new_prMd;
 }
 
 

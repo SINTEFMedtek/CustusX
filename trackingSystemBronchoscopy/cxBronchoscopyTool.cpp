@@ -63,7 +63,6 @@ std::set<Tool::Type> BronchoscopyTool::getTypes() const
 
 void BronchoscopyTool::onToolTransformAndTimestamp(Transform3D prMt, double timestamp)
 {
-	//m_prMt = findClosestPoint(prMt, float maxDistance);
 	m_prMt = mProjectionCenterline->findClosestPoint(prMt,mMaxDistanceToCenterline);
 
 	emit toolTransformAndTimestamp(m_prMt, timestamp);

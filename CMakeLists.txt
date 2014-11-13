@@ -79,5 +79,5 @@ ctkMacroBuildPlugin(
   TARGET_LIBRARIES ${PLUGIN_target_libraries}
 )
 
-add_subdirectory(testing)
+#add_subdirectory(testing)
 
