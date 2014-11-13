@@ -238,7 +238,7 @@ void Texture3DSlicerProxyImpl::setImages(std::vector<ImagePtr> images_raw)
 		if (equal)
 			return;
 	}
-	//  std::cout << "Texture3DSlicerRep::setImages" << std::endl;
+
 	for (unsigned i = 0; i < mImages.size(); ++i)
 	{
 		disconnect(mImages[i].get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
@@ -295,7 +295,6 @@ QString Texture3DSlicerProxyImpl::getTCoordName(int index)
 
 void Texture3DSlicerProxyImpl::updateCoordinates(int index)
 {
-//	std::cout << "Texture3DSlicerRep::updateCoordinates" << std::endl;
 	if (!mPolyData || !mSliceProxy)
 		return;
 
@@ -303,7 +302,6 @@ void Texture3DSlicerProxyImpl::updateCoordinates(int index)
 	// create a bb describing the volume in physical (raw data) space
 	Vector3D origin(volume->GetOrigin());
 	Vector3D spacing(volume->GetSpacing());
-//	DoubleBoundingBox3D imageSize(volume->GetWholeExtent());
 	DoubleBoundingBox3D imageSize(volume->GetExtent());
 
 	for (int i = 0; i < 3; ++i)
@@ -317,7 +315,6 @@ void Texture3DSlicerProxyImpl::updateCoordinates(int index)
 
 	// create transform from slice space to raw data space
 	Transform3D iMs = mImages[index]->get_rMd().inv() * mSliceProxy->get_sMr().inv();
-	//		std::cout << "Texture3DSlicerRep iMs " << this <<  "\n" << iMs << std::endl;
 	// create transform from image space to texture normalized space
 	Transform3D nMi = createTransformNormalize(imageSize, textureSpace);
 	// total transform from slice space to texture space
@@ -383,10 +380,6 @@ void Texture3DSlicerProxyImpl::updateColorAttributeSlot()
 		float level = (float) imin/scalarTypeMax + window/2;
 		float alpha = (float) mImages[i]->getLookupTable2D()->getAlpha();
 
-//		float window = (float) mImages[i]->getLookupTable2D()->getWindow() / scalarTypeMax;
-//		float llr = (float) mImages[i]->getLookupTable2D()->getLLR() / scalarTypeMax;
-//		float level = (float) mImages[i]->getLookupTable2D()->getLevel() / scalarTypeMax;
-//		float alpha = (float) mImages[i]->getLookupTable2D()->getAlpha();
 		mPainter->SetColorAttribute(i, window, level, llr, alpha);
 	}
 	mActor->Modified();
@@ -396,13 +389,22 @@ void Texture3DSlicerProxyImpl::transformChangedSlot()
 {
 	if (mTargetSpaceIsR)
 		this->resetGeometryPlane();
-//	this->viewChanged();
 	this->update();
 }
 
 void Texture3DSlicerProxyImpl::imageChanged()
 {
 	mActor->Modified();
+
+	for (unsigned i = 0; i < mImages .size(); ++i)
+	{
+		vtkImageDataPtr inputImage = mImages[i]->getBaseVtkImageData();//
+
+		GPUImageDataBufferPtr dataBuffer = GPUImageBufferRepository::getInstance()->getGPUImageDataBuffer(
+			inputImage);
+
+		mPainter->SetVolumeBuffer(i, dataBuffer);
+	}
 }
 
 void Texture3DSlicerProxyImpl::update()
