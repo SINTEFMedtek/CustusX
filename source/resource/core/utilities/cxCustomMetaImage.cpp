@@ -43,9 +43,7 @@ namespace cx
 
 CustomMetaImage::CustomMetaImage(QString filename) :
     mFilename(filename)
-{
-
-}
+{}
 
 QString CustomMetaImage::readKey(QString key)
 {
@@ -147,22 +145,6 @@ void CustomMetaImage::setModality(QString value)
         value = "UNKNOWN";
 
 	this->setKey("Modality", value);
-
-//	QFile file(mFilename);
-
-//    if (!file.open(QIODevice::ReadWrite))
-//    {
-//      reportError("Failed to open file " + mFilename + ".");
-//      return;
-//    }
-
-//    QStringList data = QTextStream(&file).readAll().split("\n");
-
-//	this->remove(&data, QStringList()<<"Modality");
-//	this->append(&data, "Modality", value);
-
-//    file.resize(0);
-//    file.write(data.join("\n").toAscii());
 }
 
 void CustomMetaImage::setImageType(QString value)
@@ -170,27 +152,11 @@ void CustomMetaImage::setImageType(QString value)
 	if (value.isEmpty())
 		return;
 	this->setKey("ImageType3", value);
-//	QFile file(mFilename);
-
-//    if (!file.open(QIODevice::ReadWrite))
-//    {
-//      reportError("Failed to open file " + mFilename + ".");
-//      return;
-//    }
-
-//    QStringList data = QTextStream(&file).readAll().split("\n");
-
-//	this->remove(&data, QStringList()<<"ImageType3");
-//	this->append(&data, "ImageType3", value);
-
-//    file.resize(0);
-//    file.write(data.join("\n").toAscii());
 }
 
 
 Transform3D CustomMetaImage::readTransform()
 {
-  //reportDebug("load filename: "+string_cast(filename));
   //read the specific TransformMatrix-tag from the header
   Vector3D p_r(0, 0, 0);
   Vector3D e_x(1, 0, 0);
