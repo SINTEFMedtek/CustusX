@@ -45,7 +45,8 @@ set(CX_ALL_LIBRARY_DIRS
     ${OpenCV_LIB_DIR}
     ${OpenCV_DIR}/bin
     ${OPENCL_LIBRARY_DIRS}
-    ${IGSTK_LIBRARY_DIRS}
+    ${IGSTK_DIR}/bin
+    ${IGSTK_DIR}/lib
     ${OpenIGTLink_LIBRARY_DIRS}
     ${VTK_DIR}/lib
     ${VTK_DIR}/bin

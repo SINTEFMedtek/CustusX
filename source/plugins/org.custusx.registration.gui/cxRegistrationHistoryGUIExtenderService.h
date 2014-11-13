@@ -56,7 +56,8 @@ public:
 	RegistrationHistoryGUIExtenderService(regServices services);
 	virtual ~RegistrationHistoryGUIExtenderService();
 
-	virtual std::vector<CategorizedWidget> createWidgets() const;
+	virtual std::vector<CategorizedWidget> createWidgets() const;	
+	std::vector<QToolBar *> createToolBars() const;
 
 private:
 	regServices mServices;

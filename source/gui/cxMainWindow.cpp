@@ -219,6 +219,14 @@ void MainWindow::addGUIExtender(GUIExtenderService* service)
 		QWidget* widget = this->addCategorizedWidget(widgets[j]);
 		mWidgetsByPlugin[service].push_back(widget);
 	}
+
+	std::vector<QToolBar*> toolBars = service->createToolBars();
+	for(unsigned j = 0; j < toolBars.size(); ++j)
+	{
+//		toolBars[j]->setParent(this);
+		addToolBar(toolBars[j]);
+		this->registerToolBar(toolBars[j], "Toolbar");
+	}
 }
 
 QWidget *MainWindow::addCategorizedWidget(GUIExtenderService::CategorizedWidget categorizedWidget)
@@ -969,11 +977,6 @@ void MainWindow::createToolBars()
 	toolOffsetToolBar->setObjectName("ToolOffsetToolBar");
 	toolOffsetToolBar->addWidget(createDataWidget(mVisualizationService, mPatientModelService, this, DoubleDataAdapterActiveToolOffset::create()));
 	this->registerToolBar(toolOffsetToolBar, "Toolbar");
-
-//	QToolBar* registrationHistoryToolBar = addToolBar("Registration History");
-//	registrationHistoryToolBar->setObjectName("RegistrationHistoryToolBar");
-//	registrationHistoryToolBar->addWidget(new RegistrationHistoryWidget(this, true));
-//	this->registerToolBar(registrationHistoryToolBar, "Toolbar");
 }
 
 void MainWindow::registerToolBar(QToolBar* toolbar, QString groupname)
