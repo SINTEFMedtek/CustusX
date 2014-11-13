@@ -141,6 +141,11 @@ void CustomMetaImage::setKey(QString key, QString value)
 
 void CustomMetaImage::setModality(QString value)
 {
+    QStringList valid_values;
+    valid_values << "CT" << "MR" << "NM" << "US" << "OTHER" << "UNKNOWN";
+    if(!valid_values.contains(value, Qt::CaseInsensitive))
+        value = "UNKNOWN";
+
 	this->setKey("Modality", value);
 
 //	QFile file(mFilename);
