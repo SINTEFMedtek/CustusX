@@ -24,12 +24,19 @@ include_directories(
     ${CustusX_BINARY_DIR}/source/service/visualization
     ${CustusX_BINARY_DIR}/source/gui
     ${CustusX_BINARY_DIR}/source/logic
+
+    ./trackingSystemBronchoscopy
         )
 
 set(PLUGIN_SRCS
   cxBronchoscopyNavigationPluginActivator.cpp
   cxBronchoscopyNavigationGUIExtenderService.cpp
   cxBronchoscopyNavigationWidget.cpp
+ cxBronchoscopePositionProjection.cpp
+
+    trackingSystemBronchoscopy/cxBronchoscopyTool.h
+    trackingSystemBronchoscopy/cxBronchoscopyTool.cpp
+    trackingSystemBronchoscopy/cxTrackingSystemBronchoscopyService.cpp
 )
 
 # Files which should be processed by Qts moc
@@ -37,6 +44,9 @@ set(PLUGIN_MOC_SRCS
   cxBronchoscopyNavigationPluginActivator.h
   cxBronchoscopyNavigationGUIExtenderService.h
   cxBronchoscopyNavigationWidget.h
+  cxBronchoscopePositionProjection.h
+  trackingSystemBronchoscopy/cxBronchoscopyTool.h
+  trackingSystemBronchoscopy/cxTrackingSystemBronchoscopyService.h
 )
 
 # Qt Designer files which should be processed by Qts uic
@@ -55,7 +65,8 @@ set(PLUGIN_target_libraries
     cxGUIExtenderService
     #cxLogicManager
     cxPluginUtilities
-	Qt5::Widgets
+    Qt5::Widgets
+    cxGui
     )
 
 ctkMacroBuildPlugin(

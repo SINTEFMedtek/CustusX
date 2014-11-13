@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxBronchoscopyNavigationGUIExtenderService.h"
 #include "ctkPluginContext.h"
 #include "cxBronchoscopyNavigationWidget.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
@@ -47,7 +48,7 @@ std::vector<GUIExtenderService::CategorizedWidget> BronchoscopyNavigationGUIExte
 	std::vector<CategorizedWidget> retval;
 
 	retval.push_back(GUIExtenderService::CategorizedWidget(
-			new BronchoscopyNavigationWidget(mServices, NULL),
+			new BronchoscopyNavigationWidget(mContext, NULL),
 			"Utility"));
 
 	return retval;

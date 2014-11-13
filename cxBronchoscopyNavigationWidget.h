@@ -40,12 +40,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxResourceWidgetsExport.h"
 #include "cxBaseWidget.h"
 #include "cxSelectDataStringDataAdapter.h"
+#include "cxMesh.h"
 
 class QVBoxLayout;
+
 
 namespace cx
 {
 
+typedef boost::shared_ptr<class TrackingSystemBronchoscopyService> TrackingSystemBronchoscopyServicePtr;
 typedef boost::shared_ptr<class SelectMeshStringDataAdapter> SelectMeshStringDataAdapterPtr;
 
 /**
@@ -60,12 +63,12 @@ class BronchoscopyNavigationWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	BronchoscopyNavigationWidget(regServices services, QWidget* parent = 0);
+	BronchoscopyNavigationWidget(ctkPluginContext *context, QWidget* parent = 0);
 	virtual ~BronchoscopyNavigationWidget();
 
 private slots:
 	void enableSlot();
-	void disablaSlot();
+	void disableSlot();
 
 private:
 	QString defaultWhatsThis() const;
@@ -74,8 +77,13 @@ private:
 	SelectMeshStringDataAdapterPtr mSelectMeshWidget;
 	QPushButton* mEnableButton;
 	QPushButton* mDisableButton;
-};
+	ToolPtr mTool;
+	TrackingSystemBronchoscopyServicePtr mTrackingSystem;
 
+	PatientModelServicePtr mPatientModelService;
+	VisualizationServicePtr mVisualizationService;
+	TrackingServicePtr mTrackingService;
+};
 } /* namespace cx */
 
 #endif /* CXBRONCHOSCOPYNAVIGATIONWIDGET_H_ */

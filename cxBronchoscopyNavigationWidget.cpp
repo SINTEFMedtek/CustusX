@@ -34,34 +34,49 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QLabel>
 #include <QVBoxLayout>
 #include "cxMesh.h"
-//#include "cxDataSelectWidget.h"
-#include "cxRegistrationService.h"
+#include "cxDataSelectWidget.h"
+#include "cxReporter.h"
+#include <vtkPolyData.h>
+#include "cxTrackingSystemBronchoscopyService.h"
+#include "cxTrackingServiceProxy.h"
+#include "cxPatientModelServiceProxy.h"
+#include "cxVisualizationServiceProxy.h"
+#include "cxBronchoscopePositionProjection.h"
 
 namespace cx
 {
 
-BronchoscopyNavigationWidget::BronchoscopyNavigationWidget(regServices services, QWidget* parent) :
+BronchoscopyNavigationWidget::BronchoscopyNavigationWidget(ctkPluginContext *context, QWidget* parent) :
     QWidget(parent),
     mVerticalLayout(new QVBoxLayout(this))
 {
+	mPatientModelService = PatientModelServicePtr(new PatientModelServiceProxy(context));
+	mVisualizationService = VisualizationServicePtr(new VisualizationServiceProxy(context));
+	mTrackingService = TrackingServiceProxy::create(context);
+
+
 	this->setObjectName("BronchoscopyNavigationWidget");
 	this->setWindowTitle("BronchoscopyNavigation");
     this->setWhatsThis(this->defaultWhatsThis());
 
-	mSelectMeshWidget = SelectMeshStringDataAdapter::New(services.patientModelService);
+	mSelectMeshWidget = SelectMeshStringDataAdapter::New(mPatientModelService);
 	mSelectMeshWidget->setValueName("Centerline: ");
 
-	mEnableButton = new QPushButton("Enable");
+	mEnableButton = new QPushButton("Enable", this);
 	connect(mEnableButton, SIGNAL(clicked()), this, SLOT(enableSlot()));
 	mEnableButton->setToolTip(this->defaultWhatsThis());
 
-	mDisableButton = new QPushButton("Disable");
+	mDisableButton = new QPushButton("Disable", this);
 	connect(mDisableButton, SIGNAL(clicked()), this, SLOT(disableSlot()));
 	mDisableButton->setToolTip(this->defaultWhatsThis());
 
 
 
-    mVerticalLayout->addWidget(new QLabel("Hello Plugin!"));
+	mVerticalLayout->addWidget(new DataSelectWidget(mVisualizationService, mPatientModelService, this, mSelectMeshWidget));
+//    mVerticalLayout->addWidget(mTrackedCenterLine);
+	mVerticalLayout->addWidget(mEnableButton);
+	mVerticalLayout->addWidget(mDisableButton);
+	mVerticalLayout->addStretch();
 }
 
 BronchoscopyNavigationWidget::~BronchoscopyNavigationWidget()
@@ -70,11 +85,50 @@ BronchoscopyNavigationWidget::~BronchoscopyNavigationWidget()
 
 void BronchoscopyNavigationWidget::enableSlot()
 {
+	std::cout << "BronchoscopyNavigation started. Position locked to centerline." << std::endl;
+//	mTool = toolManager()->getDominantTool();
+
+	if(!mSelectMeshWidget->getMesh())
+	{
+		reportError("No centerline");
+		return;
+	}
+	vtkPolyDataPtr centerline = mSelectMeshWidget->getMesh()->getVtkPolyData();//input
+	Transform3D rMd = mSelectMeshWidget->getMesh()->get_rMd();
+//	if(!mTool)
+//	{
+//		reportError("No tool");
+//		return;
+//	}
+
+//	std::cout << "Tool name: " << mTool->getName() << std::endl;
+
+	//Eigen::MatrixXd CLpoints = getCenterlinePositions(centerline, rMd);
+
+	float maxDistanceToCenterline = 30; //mm - Max distance from tool to closest centerline for projection to centerline to be performed.
+
+	BronchoscopePositionProjectionPtr projectionCenterline = BronchoscopePositionProjectionPtr(new BronchoscopePositionProjection(centerline, rMd));
+	if (!mTrackingSystem)
+	{
+		mTrackingSystem = TrackingSystemBronchoscopyServicePtr(new TrackingSystemBronchoscopyService(mTrackingService, projectionCenterline, maxDistanceToCenterline));
+		mTrackingService->unInstallTrackingSystem(mTrackingSystem->getBase());
+		mTrackingService->installTrackingSystem(mTrackingSystem);
+	}
+
+	//	prMt = findClosestPoint(prMt, CLpoints, maxDistance);
 
 }
 
 void BronchoscopyNavigationWidget::disableSlot()
 {
+	if (mTrackingSystem)
+	{
+		mTrackingService->unInstallTrackingSystem(mTrackingSystem);
+		mTrackingService->installTrackingSystem(mTrackingSystem->getBase());
+		mTrackingSystem.reset();
+	}
+
+	std::cout << "BronchoscopyNavigation stopped." << std::endl;
 
 }
 
@@ -85,7 +139,6 @@ QString BronchoscopyNavigationWidget::defaultWhatsThis() const
 	  "<p>Locks tool position to CT centerline.</p>"
       "</html>";
 }
-
 
 
 } /* namespace cx */

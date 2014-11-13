@@ -59,7 +59,6 @@ public:
 
 private:
   ctkPluginContext* mContext;
-
 };
 typedef boost::shared_ptr<BronchoscopyNavigationGUIExtenderService> BronchoscopyNavigationGUIExtenderServicePtr;
 
