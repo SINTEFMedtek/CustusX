@@ -155,6 +155,9 @@ void BronchoscopyRegistrationWidget::registerSlot()
     Transform3D rMd = mSelectMeshWidget->getMesh()->get_rMd();
 
     if(!mTool)
+        mTool = mServices.trackingService->getActiveTool();
+
+    if(!mTool)
     {
         reportError("No tool");
 		return;
@@ -193,7 +196,8 @@ void BronchoscopyRegistrationWidget::registerSlot()
             std::cout << display_rMpr.row(i) << std::endl;
 
     ToolRep3DPtr activeRep3D = getToolRepIn3DView(mTool);
-    activeRep3D->getTracer()->clear();
+    if(activeRep3D->getTracer())
+        activeRep3D->getTracer()->clear();
 
     QColor colorGreen = QColor(0, 255, 0, 255);
     activeRep3D->getTracer()->setColor(colorGreen);
