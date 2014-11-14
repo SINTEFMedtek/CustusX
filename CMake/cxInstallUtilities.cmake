@@ -74,7 +74,7 @@ macro(cx_install_decorate_generators)
 
 	if(CX_WINDOWS)
 		set(CPACK_NSIS_MUI_ICON "${PROJECT_SOURCE_DIR}/source/gui/icons\\\\CustusX.ico")
-#		set(CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/source/gui/icons\\\\CustusX.png")
+        set(CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/source/gui/icons\\\\CustusX.png")
 #		set(CPACK_RESOURCE_FILE_README "${PROJECT_SOURCE_DIR}/install/Windows\\\\Windows_Install_ReadMe.rtf")
 		set(CPACK_NSIS_INSTALLED_ICON_NAME "bin/CustusX.exe")
 		set(CPACK_NSIS_MENU_LINKS "doc/Windows_Install_ReadMe.rtf" "README")
