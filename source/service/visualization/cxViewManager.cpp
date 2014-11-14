@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReporter.h"
 #include "cxXmlOptionItem.h"
 #include "cxDataManager.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxSlicePlanes3DRep.h"
 #include "cxSliceProxy.h"
 #include "cxViewGroup.h"
@@ -144,8 +144,25 @@ void ViewManager::initialize()
 	this->setActiveLayout("LAYOUT_3D_ACS_SINGLE", 0);
 
 	mRenderLoop->setRenderingInterval(settings()->value("renderingInterval").toInt());
-	mRenderLoop->start();
+	this->enableRender(true);
+//	mRenderLoop->start();
 }
+
+void ViewManager::enableRender(bool val)
+{
+	if (val)
+		mRenderLoop->start();
+	else
+		mRenderLoop->stop();
+
+	emit renderingEnabledChanged();
+}
+
+bool ViewManager::renderingIsEnabled() const
+{
+	return mRenderLoop->isRunning();
+}
+
 
 void ViewManager::initializeGlobal2DZoom()
 {

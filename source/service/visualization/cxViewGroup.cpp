@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSlicePlanes3DRep.h"
 #include "cxReporter.h"
 #include "cxDataManager.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxViewWrapper2D.h"
 #include "cxViewManager.h"
 #include "cxCameraControl.h"
@@ -85,7 +85,7 @@ void ViewGroup::addView(ViewWrapperPtr wrapper)
 
 	View* view = wrapper->getView().get();
 	// connect signals
-	connect(view, SIGNAL(mousePress(int, int, Qt::MouseButtons)), this, SLOT(activateManualToolSlot()));
+//	connect(view, SIGNAL(mousePress(int, int, Qt::MouseButtons)), this, SLOT(activateManualToolSlot()));
 	connect(view, SIGNAL(mousePress(int, int, Qt::MouseButtons)), this, SLOT(mouseClickInViewGroupSlot()));
 	connect(view, SIGNAL(focusChange(bool, Qt::FocusReason)), this, SLOT(mouseClickInViewGroupSlot()));
 }
@@ -97,7 +97,7 @@ void ViewGroup::removeViews()
 		ViewWrapperPtr wrapper = mViewWrappers[i];
 		View* view = wrapper->getView().get();
 
-		disconnect(view, SIGNAL(mousePress(int, int, Qt::MouseButtons)), this, SLOT(activateManualToolSlot()));
+//		disconnect(view, SIGNAL(mousePress(int, int, Qt::MouseButtons)), this, SLOT(activateManualToolSlot()));
 		disconnect(view, SIGNAL(mousePress(int, int, Qt::MouseButtons)), this, SLOT(mouseClickInViewGroupSlot()));
 		disconnect(view, SIGNAL(focusChange(bool, Qt::FocusReason)), this, SLOT(mouseClickInViewGroupSlot()));
 	}
@@ -144,11 +144,6 @@ void ViewGroup::mouseClickInViewGroupSlot()
 std::vector<ViewPtr> ViewGroup::getViews() const
 {
 	return mViews;
-}
-
-void ViewGroup::activateManualToolSlot()
-{
-	mBackend->getToolManager()->dominantCheckSlot();
 }
 
 void ViewGroup::initializeActiveView(SyncedValuePtr val)

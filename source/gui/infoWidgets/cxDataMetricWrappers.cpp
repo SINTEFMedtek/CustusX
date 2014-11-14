@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReporter.h"
 #include "cxTypeConversions.h"
 #include "cxCoordinateSystemHelpers.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxViewManager.h"
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"
@@ -312,7 +312,7 @@ QString PointMetricWrapper::getArguments() const
 
 void PointMetricWrapper::moveToToolPosition()
 {
-	Vector3D p = spaceProvider()->getDominantToolTipPoint(mData->getSpace(), true);
+	Vector3D p = spaceProvider()->getActiveToolTipPoint(mData->getSpace(), true);
 	mData->setCoordinate(p);
 }
 

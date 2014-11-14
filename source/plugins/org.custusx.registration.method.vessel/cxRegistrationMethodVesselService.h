@@ -51,7 +51,7 @@ class org_custusx_registration_method_vessel_EXPORT RegistrationMethodVesselImag
 {
 	Q_INTERFACES(cx::RegistrationMethodService)
 public:
-	RegistrationMethodVesselImageToImageService(regServices services) :
+	RegistrationMethodVesselImageToImageService(RegServices services) :
 		RegistrationMethodService(services) {}
 	virtual ~RegistrationMethodVesselImageToImageService() {}
 	virtual QString getRegistrationType() {return QString("ImageToImage");}

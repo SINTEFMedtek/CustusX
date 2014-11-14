@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx {
 
-PlateImageRegistrationWidget::PlateImageRegistrationWidget(regServices services, QWidget* parent) :
+PlateImageRegistrationWidget::PlateImageRegistrationWidget(RegServices services, QWidget* parent) :
 	FastImageRegistrationWidget(services, parent, "PlateImageRegistrationWidget", "Plate Image Registration")
 {
 }

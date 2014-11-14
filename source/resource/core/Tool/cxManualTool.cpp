@@ -37,20 +37,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkCursor3D.h>
 #include "cxDummyTool.h"
 #include "cxReporter.h"
-#include "cxToolManager.h"
 #include "cxTime.h"
 
 namespace cx
 {
 
-ManualTool::ManualTool(TrackingServiceOldPtr manager, const QString& uid, const QString& name) :
-	ToolImpl(manager, uid, name)
+ManualTool::ManualTool(const QString& uid, const QString& name) :
+	ToolImpl(uid, name)
 {
 	mTimestamp = 0;
 	mVisible = false;
 	read3DCrossHairSlot(0);
-	connect(this->getTrackingService().get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
-	connect(this->getTrackingService().get(), SIGNAL(tooltipOffset(double)), this, SLOT(read3DCrossHairSlot(double)));
+	connect(this, SIGNAL(tooltipOffset(double)), this, SLOT(read3DCrossHairSlot(double)));
 }
 
 ManualTool::~ManualTool()
@@ -71,17 +69,13 @@ void ManualTool::read3DCrossHairSlot(double toolTipOffset)
 	mCrossHair->Update();
 }
 
-/**Set tool position, use current time as timestamp
- */
-void ManualTool::set_prMt(const Transform3D& prMt)
-{
-	this->set_prMt(prMt, getMilliSecondsSinceEpoch());
-}
 
 /**Set tool position and timestamp
  */
 void ManualTool::set_prMt(const Transform3D& prMt, double timestamp)
 {
+	if (timestamp < 0)
+		timestamp = getMilliSecondsSinceEpoch();
 	mTimestamp = timestamp;
 	ToolImpl::set_prMt(prMt, timestamp);
 }
@@ -132,30 +126,10 @@ bool ManualTool::isCalibrated() const
 	return false;
 }
 
-ProbeDefinition ManualTool::getProbeSector() const
-{
-	return mSector;
-}
-
 double ManualTool::getTimestamp() const
 {
 	return mTimestamp;
 }
-
-//// Just use the tool tip offset from the tool manager
-//double ManualTool::getTooltipOffset() const
-//{
-//	if (this->getTrackingService())
-//		return this->getTrackingService()->getTooltipOffset();
-//	return 0;
-//}
-
-//// Just use the tool tip offset from the tool manager
-//void ManualTool::setTooltipOffset(double val)
-//{
-//	if (this->getTrackingService())
-//		this->getTrackingService()->setTooltipOffset(val);
-//}
 
 Transform3D ManualTool::getCalibration_sMt() const
 {

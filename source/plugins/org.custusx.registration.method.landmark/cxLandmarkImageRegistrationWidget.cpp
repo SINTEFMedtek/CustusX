@@ -56,12 +56,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //TODO: remove
 #include "cxRepManager.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxLegacySingletons.h"
 
 namespace cx
 {
-LandmarkImageRegistrationWidget::LandmarkImageRegistrationWidget(regServices services, QWidget* parent,
+LandmarkImageRegistrationWidget::LandmarkImageRegistrationWidget(RegServices services, QWidget* parent,
 	QString objectName, QString windowTitle) :
 	LandmarkRegistrationWidget(services, parent, objectName, windowTitle)
 {

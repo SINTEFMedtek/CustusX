@@ -41,16 +41,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 
 #include "cxLegacySingletons.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 
 namespace cx
 {
-PatientOrientationWidget::PatientOrientationWidget(regServices services, QWidget* parent, QString objectName, QString windowTitle) :
+PatientOrientationWidget::PatientOrientationWidget(RegServices services, QWidget* parent, QString objectName, QString windowTitle) :
 	RegistrationBaseWidget(services, parent, objectName, windowTitle),
 	mPatientOrientationButton(new QPushButton("Patient Orientation")),
 	mInvertButton(new QCheckBox("Back face"))
 {
   QVBoxLayout* layout = new QVBoxLayout(this);
+  layout->setMargin(0);
   layout->addWidget(mInvertButton);
   layout->addWidget(mPatientOrientationButton);
   layout->addStretch();
@@ -102,13 +103,13 @@ Transform3D PatientOrientationWidget::get_tMtm() const
 
 void PatientOrientationWidget::setPatientOrientationSlot()
 {
-	Transform3D prMt = toolManager()->getDominantTool()->get_prMt();
+	Transform3D prMt = mServices.trackingService->getActiveTool()->get_prMt();
 	mServices.registrationService->applyPatientOrientation(this->get_tMtm(), prMt);
 }
 
 void PatientOrientationWidget::enableToolSampleButtonSlot()
 {
-  ToolPtr tool = toolManager()->getDominantTool();
+  ToolPtr tool = mServices.trackingService->getActiveTool();
   bool enabled = false;
   enabled = tool &&
 	  tool->getVisible() &&

@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVector3D.h"
 #include "cxCyclicActionLogger.h"
 #include "cxDirectlyLinkedSender.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxDataManager.h"
 #include "cxVideoServiceBackend.h"
 #include "cxStreamerService.h"

@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QToolBar>
 #include "cxReporter.h"
 #include "cxViewManager.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxDoubleWidgets.h"
 #include "cxDataInterface.h"
 #include "cxDataAdapterHelper.h"

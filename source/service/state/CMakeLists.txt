@@ -34,7 +34,6 @@ include_directories(
     .
     ${CustusX_SOURCE_DIR}/source/service/patient
     ${CustusX_BINARY_DIR}/source/service/patient     
-    ${CustusX_SOURCE_DIR}/source/service/tracking     
     ${CustusX_SOURCE_DIR}/source/service/visualization
     ${CustusX_BINARY_DIR}/source/service/visualization
     ${CustusX_SOURCE_DIR}/source/service/video

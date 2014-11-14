@@ -40,11 +40,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ManualPatientRegistrationWidget::ManualPatientRegistrationWidget(regServices services, QWidget* parent, QString objectName) :
+ManualPatientRegistrationWidget::ManualPatientRegistrationWidget(RegServices services, QWidget* parent, QString objectName) :
 				BaseWidget(parent, objectName, "Manual Patient Registration"),
 				mVerticalLayout(new QVBoxLayout(this)),
 				mServices(services)
 {
+	mVerticalLayout->setMargin(0);
 	mLabel = new QLabel("Patient Registration matrix rMpr");
 	mVerticalLayout->addWidget(mLabel);
 	mMatrixWidget = new Transform3DWidget(this);

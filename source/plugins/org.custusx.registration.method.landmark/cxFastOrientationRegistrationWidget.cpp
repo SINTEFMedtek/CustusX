@@ -37,15 +37,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QCheckBox>
 #include <QVBoxLayout>
 #include "cxReporter.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxPatientModelService.h"
 #include "cxRegistrationService.h"
+#include "cxTrackingService.h"
 
 #include "cxLegacySingletons.h"
 
 namespace cx
 {
-FastOrientationRegistrationWidget::FastOrientationRegistrationWidget(regServices services, QWidget* parent) :
+FastOrientationRegistrationWidget::FastOrientationRegistrationWidget(RegServices services, QWidget* parent) :
 	RegistrationBaseWidget(services, parent, "FastOrientationRegistrationWidget", "Fast Orientation Registration"),
 	mSetOrientationButton(new QPushButton("Define Orientation")),
     mInvertButton(new QCheckBox("Back face"))
@@ -98,7 +99,7 @@ void FastOrientationRegistrationWidget::hideEvent(QHideEvent* event)
 
 void FastOrientationRegistrationWidget::setOrientationSlot()
 {
-	Transform3D prMt = toolManager()->getDominantTool()->get_prMt();
+	Transform3D prMt = mServices.trackingService->getActiveTool()->get_prMt();
 	mServices.registrationService->doFastRegistration_Orientation(this->get_tMtm(), prMt);
 }
 
@@ -120,7 +121,7 @@ Transform3D FastOrientationRegistrationWidget::get_tMtm() const
 
 void FastOrientationRegistrationWidget::enableToolSampleButtonSlot()
 {
-  ToolPtr tool = toolManager()->getDominantTool();
+  ToolPtr tool = mServices.trackingService->getActiveTool();
   bool enabled = false;
   enabled = tool &&
 	  tool->getVisible() &&

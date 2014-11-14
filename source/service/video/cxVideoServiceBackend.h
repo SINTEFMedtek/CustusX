@@ -58,19 +58,19 @@ class cxVideoServiceOld_EXPORT VideoServiceBackend
 {
 public:
 	static VideoServiceBackendPtr create(DataServicePtr dataManager,
-								TrackingServiceOldPtr toolManager,
+								TrackingServicePtr trackingService,
 								SpaceProviderPtr spaceProvider);
 	VideoServiceBackend(DataServicePtr dataManager,
-								TrackingServiceOldPtr toolManager,
+								TrackingServicePtr trackingService,
 								SpaceProviderPtr spaceProvider);
 
 	DataServicePtr getDataManager();
-	TrackingServiceOldPtr getToolManager();
+	TrackingServicePtr getToolManager();
 	SpaceProviderPtr getSpaceProvider();
 
 private:
 	DataServicePtr mDataManager;
-	TrackingServiceOldPtr mToolManager;
+	TrackingServicePtr mTrackingService;
 	SpaceProviderPtr mSpaceProvider;
 };
 

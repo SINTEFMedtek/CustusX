@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QFile>
 #include "cxTimedAlgorithm.h"
 #include "cxReporter.h"
-#include "cxRegistrationMethodServices.h"
+#include "cxRegServices.h"
 #include "org_custusx_registration_method_commandline_Export.h"
 
 namespace cx
@@ -71,7 +71,7 @@ class org_custusx_registration_method_commandline_EXPORT ElastixExecuter : publi
 {
 	Q_OBJECT
 public:
-	ElastixExecuter(regServices services, QObject* parent=NULL);
+	ElastixExecuter(RegServices services, QObject* parent=NULL);
 	virtual ~ElastixExecuter();
 
 	void setDisplayProcessMessages(bool on);
@@ -144,7 +144,7 @@ private:
 	QProcess* mProcess;
 	DataPtr mFixed;
 	DataPtr mMoving;
-	regServices mServices;
+	RegServices mServices;
 };
 
 /**Reader class for an Elastix-style parameter file.

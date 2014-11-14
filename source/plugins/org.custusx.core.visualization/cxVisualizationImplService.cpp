@@ -46,6 +46,7 @@ VisualizationImplService::VisualizationImplService(ctkPluginContext *context) :
 	if(!viewManager())
 		std::cout << "VisualizationImplService got no viewManager" << std::endl;
 	connect(viewManager(), SIGNAL(activeViewChanged()), this, SIGNAL(activeViewChanged()));
+	connect(viewManager(), &ViewManager::renderingEnabledChanged, this, &VisualizationService::renderingEnabledChanged);
 }
 
 VisualizationImplService::~VisualizationImplService()
@@ -53,6 +54,7 @@ VisualizationImplService::~VisualizationImplService()
 	if(viewManager())
 	{
 		disconnect(viewManager(), SIGNAL(activeViewChanged()), this, SIGNAL(activeViewChanged()));
+		disconnect(viewManager(), &ViewManager::renderingEnabledChanged, this, &VisualizationService::renderingEnabledChanged);
 	}
 }
 
@@ -88,5 +90,16 @@ void VisualizationImplService::autoShowData(cx::DataPtr data)
 {
 	viewManager()->autoShowData(data);
 }
+
+void VisualizationImplService::enableRender(bool val)
+{
+	viewManager()->enableRender(val);
+}
+
+bool VisualizationImplService::renderingIsEnabled() const
+{
+	return viewManager()->renderingIsEnabled();
+}
+
 
 } /* namespace cx */

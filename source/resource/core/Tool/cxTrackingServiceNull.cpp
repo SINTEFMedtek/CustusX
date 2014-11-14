@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxTrackingServiceNull.h"
 #include "cxReporter.h"
+#include "cxTrackerConfiguration.h"
+
 
 namespace cx
 {
@@ -43,9 +45,130 @@ bool TrackingServiceNull::isNull()
 	return true;
 }
 
-void TrackingServiceNull::printWarning()
+void TrackingServiceNull::printWarning() const
 {
-	reportWarning("Trying to use VideoServiceNull. Is VideoService (org.custusx.core.tracking) disabled?");
+	reportWarning("Trying to use TrackingServiceNull. Is TrackingService (org.custusx.core.tracking) disabled?");
+}
+
+Tool::State TrackingServiceNull::getState() const
+{
+	return Tool::tsNONE;
+}
+
+void TrackingServiceNull::setState(const Tool::State val)
+{
+
+}
+
+ToolPtr TrackingServiceNull::getTool(const QString& uid)
+{
+	this->printWarning();
+	return ToolPtr();
+}
+
+ToolPtr TrackingServiceNull::getActiveTool()
+{
+	this->printWarning();
+	return ToolPtr();
+}
+
+void TrackingServiceNull::setActiveTool(const QString& uid)
+{
+	this->printWarning();
+}
+
+ToolPtr TrackingServiceNull::getFirstProbe()
+{
+	this->printWarning();
+	return ToolPtr();
+}
+
+ToolPtr TrackingServiceNull::getReferenceTool() const
+{
+	this->printWarning();
+	return ToolPtr();
+}
+
+ToolPtr TrackingServiceNull::getManualTool()
+{
+	this->printWarning();
+	return ToolPtr();
+}
+
+TrackingService::ToolMap TrackingServiceNull::getTools()
+{
+	return ToolMap();
+}
+
+bool TrackingServiceNull::isPlaybackMode() const
+{
+	return false;
+}
+
+void TrackingServiceNull::setPlaybackMode(PlaybackTimePtr controller)
+{
+
+}
+
+void TrackingServiceNull::savePositionHistory()
+{
+
+}
+
+void TrackingServiceNull::loadPositionHistory()
+{
+
+}
+
+void TrackingServiceNull::addXml(QDomNode& parentNode)
+{
+
+}
+
+void TrackingServiceNull::parseXml(QDomNode& dataNode)
+{
+
+}
+
+void TrackingServiceNull::clear()
+{
+
+}
+
+SessionToolHistoryMap TrackingServiceNull::getSessionHistory(double startTime, double stopTime)
+{
+	return SessionToolHistoryMap();
+}
+
+void TrackingServiceNull::setLoggingFolder(QString loggingFolder)
+{
+
+}
+
+void TrackingServiceNull::runDummyTool(DummyToolPtr tool)
+{
+
+}
+
+
+TrackerConfigurationPtr TrackingServiceNull::getConfiguration()
+{
+	return TrackerConfiguration::getNullObject();
+}
+
+void TrackingServiceNull::installTrackingSystem(TrackingSystemServicePtr system)
+{
+
+}
+
+void TrackingServiceNull::unInstallTrackingSystem(TrackingSystemServicePtr system)
+{
+
+}
+
+std::vector<TrackingSystemServicePtr> TrackingServiceNull::getTrackingSystems()
+{
+	return std::vector<TrackingSystemServicePtr> ();
 }
 
 } //cx

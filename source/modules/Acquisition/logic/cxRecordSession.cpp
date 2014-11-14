@@ -94,14 +94,17 @@ void RecordSession::addXml(QDomNode& parentNode)
 void RecordSession::parseXml(QDomNode& parentNode)
 {
 	if (parentNode.isNull())
+	{
+		reportWarning("RecordSession::parseXml() parentnode is null");
 		return;
+	}
 
 	QDomElement base = parentNode.toElement();
 
 	mUid = base.attribute("uid");
 	bool ok;
-	mStartTime = parentNode.namedItem("start").toElement().text().toInt(&ok);
-	mStopTime = parentNode.namedItem("stop").toElement().text().toInt(&ok);
+	mStartTime = parentNode.namedItem("start").toElement().text().toDouble(&ok);
+	mStopTime = parentNode.namedItem("stop").toElement().text().toDouble(&ok);
 	mDescription = parentNode.namedItem("description").toElement().text();
 }
 
@@ -117,7 +120,7 @@ TimedTransformMap RecordSession::getToolHistory_prMt(ToolPtr tool, RecordSession
 
 	if(retval.empty() && session)
 	{
-		reportError("Could not find any tracking data from session "+session->getUid()+". Volume data only will be written.");
+		reportError("RecordSession::getToolHistory_prMt(): Could not find any tracking data from session "+session->getUid()+".");
 	}
 
 	return retval;

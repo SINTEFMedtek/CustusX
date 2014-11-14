@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPreferencesDialog.h"
 #include "cxViewManager.h"
 #include "cxDataLocations.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxDataLocations.h"
 #include "cxStateService.h"
 #include "cxFilePreviewWidget.h"
@@ -612,10 +612,11 @@ void DebugTab::runDebugToolSlot()
 
 	dataManager()->setCenter(bb_r.center());
 
-	cx::DummyToolPtr dummyTool(new cx::DummyTool(trackingService()));
+	cx::DummyToolPtr dummyTool(new cx::DummyTool());
+	dummyTool->setType(Tool::TOOL_POINTER);
 	dummyTool->setToolPositionMovement(dummyTool->createToolPositionMovementTranslationOnly(bb_r));
 	report(QString("Running debug tool inside box %1").arg(qstring_cast(bb_r)));
-	toolManager()->runDummyTool(dummyTool);
+	trackingService()->runDummyTool(dummyTool);
 }
 
 void DebugTab::saveParametersSlot()

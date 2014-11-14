@@ -62,13 +62,11 @@ include_directories(
     .
     ${CustusX_SOURCE_DIR}/source/resource/videoServer
     ${CustusX_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
-    ${CustusX_SOURCE_DIR}/source/service/tracking
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
  	${CustusX_BINARY_DIR}/source/resource/usReconstructionTypes
  	${CustusX_BINARY_DIR}/source/resource/videoServer
  	${CustusX_BINARY_DIR}/source/resource/OpenIGTLinkUtilities
- 	${CustusX_BINARY_DIR}/source/service/tracking
     )
 
 
@@ -78,7 +76,7 @@ cx_create_export_header("cxVideoServiceOld")
 
 
 add_library( cxVideoServiceOld ${cxVideoServiceOld_SOURCE} ${MOC_HEADER_FILES} )
-target_link_libraries(cxVideoServiceOld cxResource cxResourceUsReconstructionTypes OpenIGTLink cxTrackingService cxGrabber CTKPluginFramework)
+target_link_libraries(cxVideoServiceOld cxResource cxResourceUsReconstructionTypes OpenIGTLink cxGrabber CTKPluginFramework)
 
 add_subdirectory(testing)
 

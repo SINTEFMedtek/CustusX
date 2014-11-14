@@ -47,7 +47,7 @@ namespace cxtest
 TestServicesType createDummyCoreServices()
 {
 	cx::DataManagerImplPtr dataService = cx::DataManagerImpl::create();
-	cx::TrackingServiceOldPtr trackingService = cx::DummyToolManager::create();
+	cx::TrackingServicePtr trackingService = cx::DummyToolManager::create();
 
 	cx::SpaceProviderPtr spaceProvider;
 	spaceProvider.reset(new cx::SpaceProviderImpl(trackingService, dataService));

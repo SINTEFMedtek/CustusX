@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxRegistrationTransform.h"
 #include "cxBaseWidget.h"
-#include "cxRegistrationMethodServices.h"
+#include "cxRegServices.h"
 
 namespace cx
 {
@@ -62,7 +62,7 @@ class RegistrationHistoryWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  RegistrationHistoryWidget(regServices services, QWidget* parent, bool compact = false);
+  RegistrationHistoryWidget(RegServices services, QWidget* parent, bool compact = false);
   virtual ~RegistrationHistoryWidget();
   virtual QString defaultWhatsThis() const;
 
@@ -105,7 +105,7 @@ private:
   std::vector<RegistrationHistoryPtr> getAllRegistrationHistories();
   std::vector<RegistrationTransform> mergeHistory(const std::vector<RegistrationHistoryPtr>& allHistories);
 
-  regServices mServices;
+  RegServices mServices;
 };
 
 /**

@@ -42,18 +42,18 @@ namespace cx
 
 /**
  * \file
- * \addtogroup cx_resource_widgets
+ * \addtogroup org_custusx_registration
  * @{
  */
 
 class org_custusx_registration_EXPORT RegistrationBaseWidget : public BaseWidget
 {
 public:
-	RegistrationBaseWidget(regServices services, QWidget *parent, QString objectName, QString windowTitle);
+	RegistrationBaseWidget(RegServices services, QWidget *parent, QString objectName, QString windowTitle);
   virtual ~RegistrationBaseWidget() {}
 
 protected:
-	regServices mServices;
+	RegServices mServices;
 };
 
 /**

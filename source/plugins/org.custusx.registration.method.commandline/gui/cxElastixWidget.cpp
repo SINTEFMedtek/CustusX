@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ElastixWidget::ElastixWidget(regServices services, QWidget* parent) :
+ElastixWidget::ElastixWidget(RegServices services, QWidget* parent) :
 	RegistrationBaseWidget(services, parent, "ElastiXWidget", "ElastiX Registration")
 {
 	mElastixManager.reset(new ElastixManager(services));
@@ -66,6 +66,7 @@ ElastixWidget::ElastixWidget(regServices services, QWidget* parent) :
 	mRegisterButton->setToolTip(this->defaultWhatsThis());
 
 	QVBoxLayout* topLayout = new QVBoxLayout(this);
+	topLayout->setMargin(0);
 
 	mOptionsWidget = this->createOptionsWidget();
 	mOptionsWidget->setVisible(settings()->value("registration/elastixShowDetails").toBool());
@@ -145,6 +146,7 @@ QWidget* ElastixWidget::createOptionsWidget()
 	layout->addLayout(buttonsLayout, line, 0, 1, 3);
 
 	buttonsLayout->addWidget(new CheckBoxWidget(this, mElastixManager->getDisplayProcessMessages()));
+	buttonsLayout->addWidget(new CheckBoxWidget(this, mElastixManager->getDisableRendering()));
 
 	this->createAction(this,
 	                QIcon(":/icons/preset_remove.png"),

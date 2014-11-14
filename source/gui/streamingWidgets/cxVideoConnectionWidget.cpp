@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVideoServiceOld.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxViewManager.h"
 #include "cxFileInputWidget.h"
 #include "cxLogger.h"
@@ -489,7 +489,7 @@ void VideoConnectionWidget::importStreamImageSlot()
 		return;
 	}
 	Transform3D rMd = Transform3D::Identity();
-	ToolPtr probe = toolManager()->findFirstProbe();
+	ToolPtr probe = trackingService()->getFirstProbe();
 	VideoSourcePtr videoSource;
 	if (probe)
 	{

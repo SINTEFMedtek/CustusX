@@ -55,18 +55,18 @@ class cxVisualizationService_EXPORT VisualizationServiceBackend
 {
 public:
 	VisualizationServiceBackend(DataServicePtr dataManager,
-								TrackingServiceOldPtr toolManager,
+								TrackingServicePtr trackingService,
 								VideoServiceOldPtr videoService,
 								SpaceProviderPtr spaceProvider);
 
 	DataServicePtr getDataManager();
-	TrackingServiceOldPtr getToolManager();
+	TrackingServicePtr getToolManager();
 	VideoServiceOldPtr getVideoServiceOld();
 	SpaceProviderPtr getSpaceProvider();
 
 private:
 	DataServicePtr mDataManager;
-	TrackingServiceOldPtr mToolManager;
+	TrackingServicePtr mTrackingService;
 	SpaceProviderPtr mSpaceProvider;
 	VideoServiceOldPtr mVideoServiceOld;
 };

@@ -35,23 +35,24 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPushButton>
 #include <QLabel>
 #include "cxTypeConversions.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxReporter.h"
 #include "cxVisualizationService.h"
 #include "cxRegistrationService.h"
 #include "cxPatientModelService.h"
-
+#include "cxTrackingService.h"
 #include "cxLegacySingletons.h"
+#include "cxLandmark.h"
 
 namespace cx
 {
-PlateRegistrationWidget::PlateRegistrationWidget(regServices services, QWidget* parent) :
+PlateRegistrationWidget::PlateRegistrationWidget(RegServices services, QWidget* parent) :
 	RegistrationBaseWidget(services, parent, "PlateRegistrationWidget", "Plate Registration"),
 	mPlateRegistrationButton(new QPushButton("Load registration points", this)),
 	mReferenceToolInfoLabel(new QLabel("", this))
 {
 	connect(mPlateRegistrationButton, SIGNAL(clicked()), this, SLOT(plateRegistrationSlot()));
-	connect(toolManager(), SIGNAL(configured()), this, SLOT(internalUpdate()));
+	connect(mServices.trackingService.get(), &TrackingService::stateChanged, this, &PlateRegistrationWidget::internalUpdate);
 
 	QVBoxLayout* toptopLayout = new QVBoxLayout(this);
 	toptopLayout->addWidget(mReferenceToolInfoLabel);
@@ -106,7 +107,7 @@ void PlateRegistrationWidget::plateRegistrationSlot()
 {
 	mServices.patientModelService->getPatientLandmarks()->clear();
 
-  ToolPtr refTool = toolManager()->getReferenceTool();
+  ToolPtr refTool = mServices.trackingService->getReferenceTool();
   if(!refTool)//cannot register without a reference tool
   {
     reporter()->sendDebug("No refTool");
@@ -141,7 +142,7 @@ void PlateRegistrationWidget::plateRegistrationSlot()
 
 void PlateRegistrationWidget::internalUpdate()
 {
-  ToolPtr refTool = toolManager()->getReferenceTool();
+  ToolPtr refTool = mServices.trackingService->getReferenceTool();
 
   QString labelText = "";
   if(!refTool || refTool->getReferencePoints().size()<1)

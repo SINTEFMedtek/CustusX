@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDoubleWidgets.h"
 #include "cxToolDataAdapters.h"
 #include "cxVector3DWidget.h"
-#include "cxProbeImpl.h"
+//#include "cxProbeImpl.h"
 #include "cxDoubleSpanSlider.h"
 #include "cxHelperWidgets.h"
 #include "cxTypeConversions.h"
@@ -155,7 +155,8 @@ void ProbeConfigWidget::savePresetSlot()
 {
 	if (!mActiveProbeConfig->getTool())
 		return;
-	ProbeImplPtr probe = boost::dynamic_pointer_cast<ProbeImpl>(mActiveProbeConfig->getTool()->getProbe());
+	ProbePtr probe = mActiveProbeConfig->getTool()->getProbe();
+//	ProbeImplPtr probe = boost::dynamic_pointer_cast<ProbeImpl>(mActiveProbeConfig->getTool()->getProbe());
 	if (!probe)
 		return;
 
@@ -203,7 +204,8 @@ void ProbeConfigWidget::savePresetSlot()
 
 void ProbeConfigWidget::deletePresetSlot()
 {
-	ProbeImplPtr probe = boost::dynamic_pointer_cast<ProbeImpl>(mActiveProbeConfig->getTool()->getProbe());
+	ProbePtr probe = mActiveProbeConfig->getTool()->getProbe();
+//	ProbeImplPtr probe = boost::dynamic_pointer_cast<ProbeImpl>(mActiveProbeConfig->getTool()->getProbe());
 	if (!probe)
 		return;
 
@@ -222,7 +224,7 @@ void ProbeConfigWidget::deletePresetSlot()
 
 void ProbeConfigWidget::activeProbeConfigurationChangedSlot()
 {
-	cx::ProbePtr probe = boost::dynamic_pointer_cast<cx::ProbeImpl>(mActiveProbeConfig->getTool()->getProbe());
+	cx::ProbePtr probe = mActiveProbeConfig->getTool()->getProbe();
 	if (!probe)
 		return;
 	ProbeDefinition data = probe->getProbeData();
@@ -267,7 +269,7 @@ void ProbeConfigWidget::guiProbeSectorChanged()
 	if(!mActiveProbeConfig->getTool())
 		return;
 	// need a cx probe here, in order to set data.
-	cx::ProbePtr probe = boost::dynamic_pointer_cast<cx::ProbeImpl>(mActiveProbeConfig->getTool()->getProbe());
+	cx::ProbePtr probe = mActiveProbeConfig->getTool()->getProbe();
 	if (!probe)
 		return;
 	ProbeDefinition data = probe->getProbeData();
@@ -290,7 +292,7 @@ void ProbeConfigWidget::guiImageSettingsChanged()
 	// need a cx probe here, in order to set data.
 	if (!mActiveProbeConfig->getTool())
 		return;
-	cx::ProbePtr probe = boost::dynamic_pointer_cast<cx::ProbeImpl>(mActiveProbeConfig->getTool()->getProbe());
+	cx::ProbePtr probe = mActiveProbeConfig->getTool()->getProbe();
 	if (!probe)
 		return;
 	ProbeDefinition data = probe->getProbeData();
@@ -307,7 +309,7 @@ void ProbeConfigWidget::guiOriginSettingsChanged()
 	// need a cx probe here, in order to set data.
 	if (!mActiveProbeConfig->getTool())
 		return;
-	cx::ProbePtr probe = boost::dynamic_pointer_cast<cx::ProbeImpl>(mActiveProbeConfig->getTool()->getProbe());
+	cx::ProbePtr probe = mActiveProbeConfig->getTool()->getProbe();
 	if (!probe)
 		return;
 	ProbeDefinition data = probe->getProbeData();

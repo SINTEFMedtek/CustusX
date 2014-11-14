@@ -72,9 +72,7 @@ ViewsFixture::ViewsFixture(QString displayText)
 	mShaderFolder = cx::DataLocations::getShaderPath();
 
 	// Initialize dummy toolmanager.
-	mServices->trackingService()->configure();
-	mServices->trackingService()->initialize();
-	mServices->trackingService()->startTracking();
+	mServices->trackingService()->setState(cx::Tool::tsTRACKING);
 
 	mWindow.reset(new ViewsWindow());
 	mWindow->setDescription(displayText);
@@ -90,7 +88,7 @@ ViewsFixture::~ViewsFixture()
 
 cx::DummyToolPtr ViewsFixture::dummyTool()
 {
-	return boost::dynamic_pointer_cast<cx::DummyTool>(mServices->trackingService()->getDominantTool());
+	return boost::dynamic_pointer_cast<cx::DummyTool>(mServices->trackingService()->getActiveTool());
 }
 
 void ViewsFixture::clear()
@@ -141,7 +139,7 @@ void ViewsFixture::defineSlice(const QString& uid, const QString& imageFilename,
 
 cx::SliceProxyPtr ViewsFixture::createSliceProxy(cx::PLANE_TYPE plane)
 {
-	cx::ToolPtr tool = mServices->trackingService()->getDominantTool();
+	cx::ToolPtr tool = mServices->trackingService()->getActiveTool();
 
 	cx::SliceProxyPtr proxy = cx::SliceProxy::create(mServices->dataService());
 	proxy->setTool(tool);

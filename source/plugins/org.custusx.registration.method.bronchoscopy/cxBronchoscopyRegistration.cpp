@@ -309,7 +309,7 @@ Eigen::Matrix4d registrationAlgorithm(BranchList* branches, M4Vector Tnavigation
             trackingPositions = eraseCol(i,trackingPositions);
             trackingOrientations = eraseCol(i,trackingOrientations);
         }
-        else if ( (trackingOrientations.block(0 , i , 1 , 1).sum() == 0 && trackingOrientations.block(1 , i , 1 , 1).sum() == 0 && trackingOrientations.block(2 , i , 1 , 1).sum() == 0) |
+        else if ( (trackingOrientations.block(0 , i , 1 , 1).sum() == 0 && trackingOrientations.block(1 , i , 1 , 1).sum() == 0 && trackingOrientations.block(2 , i , 1 , 1).sum() == 0) ||
                   (trackingPositions.block(0 , i , 1 , 1).sum() == 0 && trackingPositions.block(1 , i , 1 , 1).sum() == 0 && trackingPositions.block(2 , i , 1 , 1).sum() == 0))
         {
             std::cout << "Warning in bronchoscopyRegistration: Removed tool position at origo: " << trackingOrientations.block(0 , i , 3 , 1) << std::endl;

@@ -52,7 +52,6 @@ target_link_libraries(cxLogicManager
 	CTKPluginFramework
     cxResource
     cxPatientService
-    cxTrackingService
     cxVisualizationService
     cxVideoServiceOld
 	cxStateService

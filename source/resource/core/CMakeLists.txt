@@ -36,8 +36,8 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	Video/cxVideoService
 	Video/cxStreamerService
         
-	Tool/cxToolManager
-	Tool/cxTool.h
+	Tool/cxTool
+	Tool/cxToolProxy
 	Tool/cxProbe.h
 	Tool/cxDummyTool
 	Tool/cxDummyToolManager
@@ -47,6 +47,8 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	Tool/cxSlicedImageProxy
 	Tool/cxToolImpl
 	Tool/cxTrackingService
+    Tool/cxDominantToolProxy
+    Tool/cxTrackingSystemService.h
 
 	dataAdapters/cxDataAdapter
 	dataAdapters/cxDataAdapterNull.h
@@ -90,6 +92,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
 cx_add_class(cxResource_SOURCE
 	cxForwardDeclarations.h
 	vtkForwardDeclarations.h
+	cxCoreServices
 
 	Tool/cxProbeSector
 	Tool/cxProbeData
@@ -99,6 +102,7 @@ cx_add_class(cxResource_SOURCE
 	Tool/cxCreateProbeDataFromConfiguration
 	Tool/cxTrackingPositionFilter
 	Tool/cxTrackerConfiguration
+	Tool/cxToolNull
 
 	Data/cxDataMetric
 	Data/cxDataReaderWriter

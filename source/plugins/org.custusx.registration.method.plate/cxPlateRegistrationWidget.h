@@ -59,7 +59,7 @@ class PlateRegistrationWidget : public RegistrationBaseWidget
 {
 	Q_OBJECT
 public:
-	PlateRegistrationWidget(regServices services, QWidget* parent);
+	PlateRegistrationWidget(RegServices services, QWidget* parent);
 	virtual ~PlateRegistrationWidget();
 	virtual QString defaultWhatsThis() const;
 

@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSlicePlanes3DRep.h"
 #include "cxSliceProxy.h"
 #include "cxImage.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include "cxLogger.h"
 #include "cxVisualizationServiceBackend.h"
 
@@ -196,7 +196,7 @@ std::vector<PLANE_TYPE> InteractiveClipper::getAvailableSlicePlanes() const
 
 void InteractiveClipper::dominantToolChangedSlot()
 {
-	ToolPtr dominantTool = mBackend->getToolManager()->getDominantTool();
+	ToolPtr dominantTool = mBackend->getToolManager()->getActiveTool();
 
 	SlicePlanesProxy::DataMap data = mSlicePlanesProxy->getData();
 	for (SlicePlanesProxy::DataMap::iterator iter = data.begin(); iter != data.end(); ++iter)

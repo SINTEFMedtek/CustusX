@@ -39,7 +39,7 @@ namespace cx
 {
 
 
-RegistrationHistoryGUIExtenderService::RegistrationHistoryGUIExtenderService(regServices services) :
+RegistrationHistoryGUIExtenderService::RegistrationHistoryGUIExtenderService(RegServices services) :
 	mServices(services)
 {
 }
@@ -58,5 +58,15 @@ std::vector<GUIExtenderService::CategorizedWidget> RegistrationHistoryGUIExtende
 	return retval;
 }
 
+std::vector<QToolBar *> RegistrationHistoryGUIExtenderService::createToolBars() const
+{
+	QToolBar* registrationHistoryToolBar = new QToolBar("Registration History");
+	registrationHistoryToolBar->setObjectName("RegistrationHistoryToolBar");
+	registrationHistoryToolBar->addWidget(new RegistrationHistoryWidget(mServices, registrationHistoryToolBar, true));
+
+	std::vector<QToolBar*> retval;
+	retval.push_back(registrationHistoryToolBar);
+	return retval;
+}
 
 } /* namespace cx */

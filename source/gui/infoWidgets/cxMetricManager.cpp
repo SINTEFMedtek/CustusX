@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewManager.h"
 #include "cxViewGroup.h"
 #include "cxViewGroupData.h"
-#include "cxToolManager.h"
+#include "cxTrackingService.h"
 #include <QFile>
 #include "cxReporter.h"
 #include "cxDataReaderWriter.h"
@@ -61,7 +61,7 @@ namespace cx
 
 MetricManager::MetricManager() : QObject(NULL)
 {
-	connect(toolManager(), SIGNAL(configured()), this, SIGNAL(metricsChanged()));
+	connect(trackingService().get(), &TrackingService::stateChanged, this, &MetricManager::metricsChanged);
 	connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SIGNAL(metricsChanged()));
 }
 
@@ -112,7 +112,7 @@ void MetricManager::setManualToolPosition(Vector3D p_r)
 	Vector3D p_pr = rMpr.inv().coord(p_r);
 
 	// set the picked point as offset tip
-	ManualToolPtr tool = toolManager()->getManualTool();
+	ToolPtr tool = trackingService()->getManualTool();
 	Vector3D offset = tool->get_prMt().vector(Vector3D(0, 0, tool->getTooltipOffset()));
 	p_pr -= offset;
 	p_r = rMpr.coord(p_pr);
@@ -153,7 +153,7 @@ void MetricManager::addPointButtonClickedSlot()
 PointMetricPtr MetricManager::addPointInDefaultPosition()
 {
 	CoordinateSystem ref = CoordinateSystem::reference();
-	Vector3D p_ref = spaceProvider()->getDominantToolTipPoint(ref, true);
+	Vector3D p_ref = spaceProvider()->getActiveToolTipPoint(ref, true);
 	return this->addPoint(p_ref, ref);
 }
 
@@ -164,7 +164,7 @@ void MetricManager::addFrameButtonClickedSlot()
   frame->get_rMd_History()->setParentSpace("reference");
 
   CoordinateSystem ref = CoordinateSystem::reference();
-  Transform3D rMt = spaceProvider()->getDominantToolTipTransform(ref, true);
+  Transform3D rMt = spaceProvider()->getActiveToolTipTransform(ref, true);
 
   frame->setSpace(ref);
   frame->setFrame(rMt);
@@ -178,43 +178,24 @@ void MetricManager::addToolButtonClickedSlot()
   frame->get_rMd_History()->setParentSpace("reference");
 
   CoordinateSystem ref = CoordinateSystem::reference();
-  Transform3D rMt = spaceProvider()->getDominantToolTipTransform(ref, true);
+  Transform3D rMt = spaceProvider()->getActiveToolTipTransform(ref, true);
 
   frame->setSpace(ref);
   frame->setFrame(rMt);
-  frame->setToolName(toolManager()->getDominantTool()->getName());
-  frame->setToolOffset(toolManager()->getDominantTool()->getTooltipOffset());
+  frame->setToolName(trackingService()->getActiveTool()->getName());
+  frame->setToolOffset(trackingService()->getActiveTool()->getTooltipOffset());
 
   this->installNewMetric(frame);
 }
 
 void MetricManager::addPlaneButtonClickedSlot()
 {
-//  CoordinateSystem ref = CoordinateSystem::reference();
-
   PlaneMetricPtr p1 = this->getDataFactory()->createSpecific<PlaneMetric>("plane%1");
   p1->get_rMd_History()->setParentSpace("reference");
-//  p1->setSpace(ref);
 
   std::vector<DataPtr> args = this->getSpecifiedNumberOfValidArguments(p1->getArguments());
   for (unsigned i=0; i<args.size(); ++i)
 	p1->getArguments()->set(i, args[i]);
-
-//  ToolPtr tool = toolManager()->getDominantTool();
-//  if (!tool)
-//  {
-//	  p1->setCoordinate(Vector3D(0,0,0));
-//	  p1->setNormal(Vector3D(1,0,0));
-//  }
-//  else
-//  {
-//	  CoordinateSystem from(csTOOL_OFFSET, tool->getUid());
-//	  Vector3D point_t = Vector3D(0,0,0);
-//	  Transform3D rMto = spaceProvider()->get_toMfrom(from, ref);
-
-//	  p1->setCoordinate(rMto.coord(Vector3D(0,0,0)));
-//	  p1->setNormal(rMto.vector(Vector3D(0,0,1)));
-//  }
 
   this->installNewMetric(p1);
 }
@@ -327,7 +308,7 @@ void MetricManager::installNewMetric(DataMetricPtr metric)
 
 void MetricManager::loadReferencePointsSlot()
 {
-  ToolPtr refTool = toolManager()->getReferenceTool();
+  ToolPtr refTool = trackingService()->getReferenceTool();
   if(!refTool) // we only load reference points from reference tools
   {
 	reporter()->sendDebug("No reference tool, cannot load reference points into the pointsampler");

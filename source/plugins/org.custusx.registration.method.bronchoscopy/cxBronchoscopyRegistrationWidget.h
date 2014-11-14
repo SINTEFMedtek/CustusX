@@ -59,7 +59,7 @@ class BronchoscopyRegistrationWidget: public RegistrationBaseWidget
 {
 	Q_OBJECT
 public:
-	BronchoscopyRegistrationWidget(regServices services, QWidget *parent);
+	BronchoscopyRegistrationWidget(RegServices services, QWidget *parent);
 	virtual ~BronchoscopyRegistrationWidget()
 	{
 	}
@@ -70,6 +70,9 @@ private slots:
 	void acquisitionStopped();
     void obscuredSlot(bool obscured);
 
+	void duringSavePatientSlot();
+	void duringLoadPatientSlot();
+	void acquisitionCancelled();
 private:
 	QVBoxLayout* mVerticalLayout;
 	QLabel* mLabel;
@@ -85,8 +88,8 @@ private:
 
     ToolRep3DPtr getToolRepIn3DView(ToolPtr tool);
 
-	void saveSessions();
 	void initSessionSelector(AcquisitionDataPtr acquisitionData);
+	QStringList getSessionList(AcquisitionDataPtr acquisitionData);
 };
 
 } //namespace cx

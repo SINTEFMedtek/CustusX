@@ -49,12 +49,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationService.h"
 #include"cxData.h"
 
-#include "cxLegacySingletons.h"
-#include "cxToolManager.h"
+#include "cxLandmark.h"
+#include "cxTrackingService.h"
 
 namespace cx
 {
-LandmarkRegistrationWidget::LandmarkRegistrationWidget(regServices services, QWidget* parent,
+LandmarkRegistrationWidget::LandmarkRegistrationWidget(RegServices services, QWidget* parent,
 	QString objectName, QString windowTitle) :
 	RegistrationBaseWidget(services, parent, objectName, windowTitle), mVerticalLayout(new QVBoxLayout(this)),
 		mLandmarkTableWidget(new QTableWidget(this)), mAvarageAccuracyLabel(new QLabel(QString(" "), this))
@@ -107,7 +107,7 @@ void LandmarkRegistrationWidget::setManualToolPosition(Vector3D p_r)
 	Vector3D p_pr = rMpr.inv().coord(p_r);
 
 	// set the picked point as offset tip
-	ManualToolPtr tool = toolManager()->getManualTool();
+	ToolPtr tool = mServices.trackingService->getManualTool();
 	Vector3D offset = tool->get_prMt().vector(Vector3D(0, 0, tool->getTooltipOffset()));
 	p_pr -= offset;
 	p_r = rMpr.coord(p_pr);

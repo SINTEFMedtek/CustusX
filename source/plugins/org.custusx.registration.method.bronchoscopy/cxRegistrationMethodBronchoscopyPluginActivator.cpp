@@ -51,7 +51,7 @@ RegistrationMethodBronchoscopyPluginActivator::~RegistrationMethodBronchoscopyPl
 
 void RegistrationMethodBronchoscopyPluginActivator::start(ctkPluginContext* context)
 {
-	regServices services(context);
+	RegServices services(context);
 	RegistrationMethodBronchoscopyImageToPatientService* image2patientService = new RegistrationMethodBronchoscopyImageToPatientService(services);
 
 	mRegistrationImageToPatient = RegisteredServicePtr(new RegisteredService(context, image2patientService, RegistrationMethodService_iid));

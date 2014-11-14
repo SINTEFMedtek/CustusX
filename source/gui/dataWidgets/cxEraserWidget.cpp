@@ -59,7 +59,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientService.h"
 #include "cxInteractiveCropper.h"
 #include "cxViewManager.h"
-#include "cxToolManager.h"
 #include "cxViewWrapper.h"
 #include "cxViewGroup.h"
 #include "cxVolumeHelpers.h"
@@ -192,7 +191,10 @@ void EraserWidget::duplicateSlot()
 void EraserWidget::sphereSizeChangedSlot()
 {
 	if (mSphere)
+	{
 		mSphere->SetRadius(mSphereSizeAdapter->getValue());
+		mSphere->Update();
+	}
 }
 
 /**The image data themselves are not saved during normal file save.
@@ -214,8 +216,6 @@ void EraserWidget::eraseVolume(TYPE* volumePointer, TYPE replaceVal)
 	ImagePtr image = dataManager()->getActiveImage();
 	vtkImageDataPtr img = image->getBaseVtkImageData();
 
-//	std::cout << "starting" << std::endl;
-
 	Eigen::Array3i dim(img->GetDimensions());
 	Vector3D spacing(img->GetSpacing());
 
@@ -236,7 +236,6 @@ void EraserWidget::eraseVolume(TYPE* volumePointer, TYPE replaceVal)
 	c = rawMr.coord(c);
 	r = rawMr.vector(r * Vector3D::UnitX()).length();
 	DoubleBoundingBox3D bb0_raw = transform(rawMr, bb_r);
-//	IntBoundingBox3D bb1_raw(0, dim[0]-1, 0, dim[1]-1, 0, dim[2]-1);
 	IntBoundingBox3D bb1_raw(0, dim[0], 0, dim[1], 0, dim[2]);
 
 //	std::cout << "     sphere: " << bb0_raw << std::endl;
@@ -248,18 +247,11 @@ void EraserWidget::eraseVolume(TYPE* volumePointer, TYPE replaceVal)
 		bb1_raw[2*i+1] = std::min<double>(bb1_raw[2*i+1], bb0_raw[2*i+1]);
 	}
 
-//	std::cout << "clip in raw: " << bb1_raw << std::endl;
-	//	double r=50;
-	//	Vector3D c(200,200,200);
 	for (int x = bb1_raw[0]; x < bb1_raw[1]; ++x)
 		for (int y = bb1_raw[2]; y < bb1_raw[3]; ++y)
 			for (int z = bb1_raw[4]; z < bb1_raw[5]; ++z)
 			{
 				int index = x + y * dim[0] + z * dim[0] * dim[1];
-//				volumePointer[index] = replaceVal;
-
-//				if ((Vector3D(x, y, z) - c).length() < r)
-//					volumePointer[index] = replaceVal;
 				if ((Vector3D(x*spacing[0], y*spacing[1], z*spacing[2]) - c_d).length() < r_d)
 					volumePointer[index] = replaceVal;
 			}
@@ -357,6 +349,7 @@ void EraserWidget::toggleShowEraser(bool on)
 
 		double a = mSphereSizeAdapter->getValue();
 		mSphere->SetRadius(a);
+		mSphere->Update();
 		MeshPtr glyph = viewGroups.front()->getData()->getOptions().mPickerGlyph;
 		glyph->setVtkPolyData(mSphere->GetOutput());
 		glyph->setColor(QColor(255, 204, 0)); // same as tool

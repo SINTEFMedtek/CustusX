@@ -34,7 +34,8 @@ include_directories(
 
 set(PLUGIN_SRCS
     cxUsReconstructionPluginActivator.cpp
-    cxUsReconstructionGUIExtenderService.cpp
+	cxUsReconstructionGUIExtenderService.h
+	cxUsReconstructionGUIExtenderService.cpp
     cxUsReconstructionImplService.cpp
     cxUsReconstructionService.cpp
     cxUsReconstructionServiceNull.cpp
@@ -66,7 +67,6 @@ set(PLUGIN_SRCS
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
     cxUsReconstructionPluginActivator.h
-    cxUsReconstructionGUIExtenderService.h
     cxUsReconstructionImplService.h
     cxUsReconstructionService.h
     cxUsReconstructionServiceNull.h
@@ -97,9 +97,6 @@ set(PLUGIN_target_libraries
     cxGUIExtenderService
     cxResourceWidgets
     cxPluginUtilities
-#    org_custusx_registration
-#    org_custusx_acquisition
-#    cxGui
     cxResourceUsReconstructionTypes
     cxVisualizationService
     cxPluginAlgorithm

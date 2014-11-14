@@ -54,13 +54,27 @@ RenderLoop::RenderLoop() :
 {
 	mLastFullRender = QDateTime::currentDateTime();
 	mCyclicLogger.reset(new CyclicActionLogger("Main Render timer"));
+
+	mTimer = new QTimer(this);
+	connect(mTimer, SIGNAL(timeout()), this, SLOT(timeoutSlot()));
+
+	this->sendRenderIntervalToTimer(mBaseRenderInterval);
 }
 
 void RenderLoop::start()
 {
-	mTimer = new QTimer(this);
-	connect(mTimer, SIGNAL(timeout()), this, SLOT(timeoutSlot()));
-	this->sendRenderIntervalToTimer(mBaseRenderInterval);
+	mTimer->start();
+}
+
+void RenderLoop::stop()
+{
+	mTimer->stop();
+	emit fps(0);
+}
+
+bool RenderLoop::isRunning() const
+{
+	return mTimer->isActive();
 }
 
 void RenderLoop::requestPreRenderSignal()
@@ -79,17 +93,24 @@ void RenderLoop::setLogging(bool on)
 	mLogging = on;
 }
 
+void RenderLoop::setSmartRender(bool val)
+{
+	mSmartRender = val;
+}
+
 void RenderLoop::sendRenderIntervalToTimer(int interval)
 {
-	if (!mTimer)
-		return;
 	if (interval==mTimer->interval())
 		return;
-
-	mTimer->stop();
 	if (interval == 0)
 		interval = 30;
-	mTimer->start(interval);
+
+	bool active = this->isRunning();
+	if (active)
+		mTimer->stop();
+	mTimer->setInterval(interval);
+	if (active)
+		mTimer->start();
 }
 
 void RenderLoop::addLayout(ViewCollectionWidget* layout)
