@@ -47,7 +47,7 @@ bool TrackingServiceNull::isNull()
 
 void TrackingServiceNull::printWarning() const
 {
-	reportWarning("Trying to use TrackingServiceNull. Is TrackingService (org.custusx.core.tracking) disabled?");
+//	reportWarning("Trying to use TrackingServiceNull. Is TrackingService (org.custusx.core.tracking) disabled?");
 }
 
 Tool::State TrackingServiceNull::getState() const

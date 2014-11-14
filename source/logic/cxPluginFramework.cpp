@@ -103,41 +103,71 @@ QString PluginFrameworkManager::convertToAbsolutePath(QString path) const
 	return QDir(base.path() + "/" + path).absolutePath();
 }
 
+
+
+std::vector<PluginFrameworkManager::PluginLoadInfo> PluginFrameworkManager::getPluginLoadInfo(QStringList symbolicNames)
+{
+	std::vector<PluginLoadInfo> retval;
+
+	for (unsigned i=0; i<symbolicNames.size(); ++i)
+	{
+		PluginLoadInfo info;
+		info.symbolicName = symbolicNames[i];
+		info.storedState = settings()->value(mSettingsBase+"/"+info.symbolicName).toString();
+
+		if (info.storedState.isEmpty())
+		{
+			info.isNew = true;
+			info.storedState = getStringForctkPluginState(ctkPlugin::ACTIVE);
+		}
+		else
+		{
+			info.isNew = false;
+		}
+
+		info.targetState = getctkPluginStateForString(info.storedState);
+
+		retval.push_back(info);
+	}
+
+	return retval;
+}
+
 void PluginFrameworkManager::loadState()
 {
 	QStringList paths = settings()->value(mSettingsSearchPaths, QStringList()).toStringList();
 	this->setSearchPaths(paths);
 
 	QStringList names = this->getPluginSymbolicNames();
-	for (unsigned i=0; i<names.size(); ++i)
-	{
-		QString name = names[i];
-		QString storedState = settings()->value(mSettingsBase+"/"+name).toString();
-		this->loadPluginFromStoredState(name, storedState);
-	}
-}
+	std::vector<PluginLoadInfo> info = this->getPluginLoadInfo(names);
 
-void PluginFrameworkManager::loadPluginFromStoredState(QString symbolicName, QString storedState)
-{	
-	if (storedState.isEmpty())
+	// install all plugins, must do this first in order to let FW handle dependencies.
+	report(QString("Installing all plugins..."));
+	for (unsigned i=0; i< info.size(); ++i)
 	{
-		report(QString("Initializing new plugin, autostarting: %1").arg(symbolicName));
-		storedState = getStringForctkPluginState(ctkPlugin::ACTIVE);
-	}
-	else
-	{
-		report(QString("Initializing plugin to state [%2]: %1").arg(symbolicName).arg(storedState));
+		if (info[i].targetState != ctkPlugin::UNINSTALLED)
+			this->install(info[i].symbolicName);
 	}
 
-	ctkPlugin::State state = getctkPluginStateForString(storedState);
 
-	if (state==ctkPlugin::UNINSTALLED)
-		return;
+	// start all plugins
+	for (unsigned i=0; i< info.size(); ++i)
+	{
+		if (info[i].targetState == ctkPlugin::ACTIVE)
+		{
+			if (info[i].isNew)
+				report(QString("Autostarting plugin %1").arg(info[i].symbolicName));
+			else
+				report(QString("Starting plugin %1").arg(info[i].symbolicName));
 
-	if (state==ctkPlugin::ACTIVE)
-		this->start(symbolicName, ctkPlugin::START_TRANSIENT);
-	else
-		this->install(symbolicName);
+			this->start(info[i].symbolicName, ctkPlugin::START_TRANSIENT);
+		}
+		else
+		{
+			report(QString("Set plugin to state [%2]: %1").arg(info[i].symbolicName).arg(info[i].storedState));
+		}
+	}
+
 }
 
 void PluginFrameworkManager::saveState()
