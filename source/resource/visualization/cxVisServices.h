@@ -29,30 +29,30 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include "cxRegistrationMethodServices.h"
+#ifndef CXVISSERVICES_H
+#define CXVISSERVICES_H
 
-#include <ctkPluginContext.h>
-#include "cxRegistrationServiceProxy.h"
-#include "cxVisualizationServiceProxy.h"
+#include "cxResourceVisualizationExport.h"
 
-namespace cx {
+#include "cxCoreServices.h"
 
-RegServices::RegServices(ctkPluginContext* context) :
-	CoreServices(context)
+namespace cx
 {
-	registrationService	= RegistrationServicePtr(new RegistrationServiceProxy(context));
-	visualizationService = VisualizationServicePtr(new VisualizationServiceProxy(context));
+
+typedef boost::shared_ptr<class VisualizationService> VisualizationServicePtr;
+
+class cxResourceVisualization_EXPORT VisServices : public CoreServices
+{
+public:
+	VisServices(ctkPluginContext* context);
+	static VisServices getNullObjects();
+
+	VisualizationServicePtr visualizationService;
+
+private:
+	VisServices();
+};
+
 }
 
-RegServices RegServices::getNullObjects()
-{
-	return RegServices();
-}
-
-RegServices::RegServices() :
-	CoreServices()
-{
-	registrationService	= cx::RegistrationService::getNullObject();
-	visualizationService = cx::VisualizationService::getNullObject();
-}
-} // cx
+#endif // CXVISSERVICES_H

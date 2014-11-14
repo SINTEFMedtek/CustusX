@@ -29,30 +29,28 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include "cxRegistrationMethodServices.h"
+#include "cxCoreServices.h"
 
 #include <ctkPluginContext.h>
-#include "cxRegistrationServiceProxy.h"
-#include "cxVisualizationServiceProxy.h"
+#include "cxPatientModelServiceProxy.h"
+#include "cxTrackingServiceProxy.h"
 
 namespace cx {
 
-RegServices::RegServices(ctkPluginContext* context) :
-	CoreServices(context)
+CoreServices::CoreServices(ctkPluginContext* context)
 {
-	registrationService	= RegistrationServicePtr(new RegistrationServiceProxy(context));
-	visualizationService = VisualizationServicePtr(new VisualizationServiceProxy(context));
+	patientModelService	= PatientModelServicePtr(new PatientModelServiceProxy(context));
+	trackingService		= TrackingServicePtr(new TrackingServiceProxy(context));
 }
 
-RegServices RegServices::getNullObjects()
+CoreServices CoreServices::getNullObjects()
 {
-	return RegServices();
+	return CoreServices();
 }
 
-RegServices::RegServices() :
-	CoreServices()
+CoreServices::CoreServices()
 {
-	registrationService	= cx::RegistrationService::getNullObject();
-	visualizationService = cx::VisualizationService::getNullObject();
+	patientModelService	= cx::PatientModelService::getNullObject();
+	trackingService	= cx::TrackingService::getNullObject();
 }
 } // cx

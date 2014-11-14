@@ -29,30 +29,26 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include "cxRegistrationMethodServices.h"
+#include "cxVisServices.h"
 
-#include <ctkPluginContext.h>
-#include "cxRegistrationServiceProxy.h"
 #include "cxVisualizationServiceProxy.h"
 
 namespace cx {
 
-RegServices::RegServices(ctkPluginContext* context) :
+VisServices::VisServices(ctkPluginContext* context) :
 	CoreServices(context)
 {
-	registrationService	= RegistrationServicePtr(new RegistrationServiceProxy(context));
 	visualizationService = VisualizationServicePtr(new VisualizationServiceProxy(context));
 }
 
-RegServices RegServices::getNullObjects()
+VisServices VisServices::getNullObjects()
 {
-	return RegServices();
+	return VisServices();
 }
 
-RegServices::RegServices() :
+VisServices::VisServices() :
 	CoreServices()
 {
-	registrationService	= cx::RegistrationService::getNullObject();
 	visualizationService = cx::VisualizationService::getNullObject();
 }
 } // cx

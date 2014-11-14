@@ -29,30 +29,32 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include "cxRegistrationMethodServices.h"
+#ifndef CXCORESERVICES_H
+#define CXCORESERVICES_H
 
-#include <ctkPluginContext.h>
-#include "cxRegistrationServiceProxy.h"
-#include "cxVisualizationServiceProxy.h"
+#include "cxResourceExport.h"
+#include <boost/shared_ptr.hpp>
+class ctkPluginContext;
 
-namespace cx {
-
-RegServices::RegServices(ctkPluginContext* context) :
-	CoreServices(context)
+namespace cx
 {
-	registrationService	= RegistrationServicePtr(new RegistrationServiceProxy(context));
-	visualizationService = VisualizationServicePtr(new VisualizationServiceProxy(context));
+
+typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
+typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
+
+class cxResource_EXPORT CoreServices
+{
+public:
+	CoreServices(ctkPluginContext* context);
+	static CoreServices getNullObjects();
+
+	PatientModelServicePtr patientModelService;
+	TrackingServicePtr trackingService;
+protected:
+	CoreServices();
+};
+
 }
 
-RegServices RegServices::getNullObjects()
-{
-	return RegServices();
-}
 
-RegServices::RegServices() :
-	CoreServices()
-{
-	registrationService	= cx::RegistrationService::getNullObject();
-	visualizationService = cx::VisualizationService::getNullObject();
-}
-} // cx
+#endif // CXCORESERVICES_H
