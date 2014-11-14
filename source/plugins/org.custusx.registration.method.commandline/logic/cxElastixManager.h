@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxBoolDataAdapterXml.h"
 #include "cxStringDataAdapterXml.h"
 #include "cxElastixParameters.h"
-#include "cxRegistrationMethodServices.h"
+#include "cxRegServices.h"
 
 namespace cx
 {
@@ -60,7 +60,7 @@ class ElastixManager : public QObject
 {
 	Q_OBJECT
 public:
-	ElastixManager(regServices services);
+	ElastixManager(RegServices services);
 	virtual ~ElastixManager();
 
 	BoolDataAdapterXmlPtr getDisplayProcessMessages() { return mDisplayProcessMessages; }
@@ -84,7 +84,7 @@ private:
 	BoolDataAdapterXmlPtr mDisplayProcessMessages;
 	BoolDataAdapterXmlPtr mDisableRendering;
 	ElastixExecuterPtr mExecuter;
-	regServices mServices;
+	RegServices mServices;
 };
 typedef boost::shared_ptr<ElastixManager> ElastixManagerPtr;
 

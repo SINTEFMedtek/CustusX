@@ -44,7 +44,7 @@ namespace cx
 {
 
 
-RegisterI2IWidget::RegisterI2IWidget(regServices services, QWidget* parent) :
+RegisterI2IWidget::RegisterI2IWidget(RegServices services, QWidget* parent) :
 		RegistrationBaseWidget(services, parent, "RegisterI2IWidget", "Register Image2Image"),
 		mSeansVesselRegsitrationWidget(new SeansVesselRegistrationWidget(services, this))
 {

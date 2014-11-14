@@ -52,7 +52,7 @@ class org_custusx_registration_method_manual_EXPORT RegistrationMethodManualServ
 {
 	Q_OBJECT
 public:
-	RegistrationMethodManualService(regServices services);
+	RegistrationMethodManualService(RegServices services);
 };
 
 } /* namespace cx */

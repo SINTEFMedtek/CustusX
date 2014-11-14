@@ -29,36 +29,38 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXVISSERVICES_H
+#define CXVISSERVICES_H
 
-#include "cxRegistrationMethodCommandLinePluginActivator.h"
+#include "cxResourceVisualizationExport.h"
 
-#include <QtPlugin>
-#include <iostream>
-
-#include "cxRegistrationMethodCommandLineService.h"
-#include "cxRegisteredService.h"
+#include "cxCoreServices.h"
 
 namespace cx
 {
 
-RegistrationMethodCommandLinePluginActivator::RegistrationMethodCommandLinePluginActivator()
+typedef boost::shared_ptr<class VisualizationService> VisualizationServicePtr;
+
+/**
+ * Convenience class combining all services used by visualization.
+ *
+ * \ingroup cx_resource_visualization
+ *
+ * \date Nov 14 2014
+ * \author Ole Vegard Solberg, SINTEF
+ */
+class cxResourceVisualization_EXPORT VisServices : public CoreServices
 {
+public:
+	VisServices(ctkPluginContext* context);
+	static VisServices getNullObjects();
+
+	VisualizationServicePtr visualizationService;
+
+private:
+	VisServices();
+};
+
 }
 
-RegistrationMethodCommandLinePluginActivator::~RegistrationMethodCommandLinePluginActivator()
-{}
-
-void RegistrationMethodCommandLinePluginActivator::start(ctkPluginContext* context)
-{
-	RegServices services(context);
-	RegistrationMethodCommandLineService* service = new RegistrationMethodCommandLineService(services);
-	mRegistrationCommandLine = RegisteredService::create<RegistrationMethodCommandLineService>(context, service, RegistrationMethodService_iid);
-}
-
-void RegistrationMethodCommandLinePluginActivator::stop(ctkPluginContext* context)
-{
-	mRegistrationCommandLine.reset();
-	Q_UNUSED(context);
-}
-
-} // namespace cx
+#endif // CXVISSERVICES_H

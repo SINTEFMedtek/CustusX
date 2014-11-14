@@ -77,6 +77,7 @@ cx_add_class( CX_RESOURCE_VISUALIZATION_FILES
 	View/internal/ViewContainer/cxViewLinkingViewContainerItem
 	cxVisualizationServiceNull
 	cxVisualizationServiceProxy
+	cxVisServices
 	Primitives/cxDepthPeeling
 	Primitives/cxGraphicalTorus3D
 	Primitives/cxVtkHelperClasses

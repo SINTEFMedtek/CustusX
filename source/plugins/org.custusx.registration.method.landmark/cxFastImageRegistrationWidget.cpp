@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-FastImageRegistrationWidget::FastImageRegistrationWidget(regServices services, QWidget* parent, QString objectName, QString windowTitle) :
+FastImageRegistrationWidget::FastImageRegistrationWidget(RegServices services, QWidget* parent, QString objectName, QString windowTitle) :
 	LandmarkImageRegistrationWidget(services, parent, objectName, windowTitle)
 {
 }

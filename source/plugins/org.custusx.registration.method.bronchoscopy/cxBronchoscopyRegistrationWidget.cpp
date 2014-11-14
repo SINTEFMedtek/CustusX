@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(regServices services, QWidget* parent) :
+BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegServices services, QWidget* parent) :
 	RegistrationBaseWidget(services, parent, "BronchoscopyRegistrationWidget",
 						   "Bronchoscopy Registration"), mVerticalLayout(new QVBoxLayout(this))
 {

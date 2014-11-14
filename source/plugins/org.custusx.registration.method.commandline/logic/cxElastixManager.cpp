@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ElastixManager::ElastixManager(regServices services) :
+ElastixManager::ElastixManager(RegServices services) :
 	mServices(services)
 {
 	mOptions = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("elastix");

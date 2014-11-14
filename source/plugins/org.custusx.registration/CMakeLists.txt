@@ -24,8 +24,8 @@ set(PLUGIN_SRCS
   cxRegistrationApplicator.h
   cxLandmarkTranslationRegistration.cpp
   cxLandmarkTranslationRegistration.h
-  cxRegistrationMethodServices.cpp
-  cxRegistrationMethodServices.h
+  cxRegServices.cpp
+  cxRegServices.h
 
   cxRegistrationMethodService.h
 

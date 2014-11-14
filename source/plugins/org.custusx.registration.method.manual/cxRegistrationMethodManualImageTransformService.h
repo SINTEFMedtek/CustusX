@@ -42,7 +42,7 @@ class org_custusx_registration_method_manual_EXPORT RegistrationMethodManualImag
 {
 	Q_INTERFACES(cx::RegistrationMethodService)
 public:
-	RegistrationMethodManualImageTransformService(regServices services);
+	RegistrationMethodManualImageTransformService(RegServices services);
 	virtual ~RegistrationMethodManualImageTransformService() {}
 	virtual QString getRegistrationType() {return QString("ImageTransform");}
 	virtual QString getRegistrationMethod() {return QString("Manual Image Transform");}

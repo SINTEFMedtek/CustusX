@@ -383,6 +383,7 @@ void MainWindow::createActions()
 	mAboutAction = new QAction(tr("About"), this);
 	mAboutAction->setStatusTip(tr("Show the application's About box"));
 	mPreferencesAction = new QAction(tr("Preferences"), this);
+	mPreferencesAction->setShortcut(tr("Ctrl+,"));
 	mPreferencesAction->setStatusTip(tr("Show the preferences dialog"));
 
 	mDebugModeAction = new QAction(tr("&Debug Mode"), this);

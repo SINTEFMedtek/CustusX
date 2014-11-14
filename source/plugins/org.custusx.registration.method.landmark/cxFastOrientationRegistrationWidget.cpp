@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-FastOrientationRegistrationWidget::FastOrientationRegistrationWidget(regServices services, QWidget* parent) :
+FastOrientationRegistrationWidget::FastOrientationRegistrationWidget(RegServices services, QWidget* parent) :
 	RegistrationBaseWidget(services, parent, "FastOrientationRegistrationWidget", "Fast Orientation Registration"),
 	mSetOrientationButton(new QPushButton("Define Orientation")),
     mInvertButton(new QCheckBox("Back face"))

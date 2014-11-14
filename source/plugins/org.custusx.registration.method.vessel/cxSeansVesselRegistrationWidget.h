@@ -64,7 +64,7 @@ class SeansVesselRegistrationWidget : public RegistrationBaseWidget
 {
   Q_OBJECT
 public:
-	SeansVesselRegistrationWidget(regServices services, QWidget* parent);
+	SeansVesselRegistrationWidget(RegServices services, QWidget* parent);
   virtual ~SeansVesselRegistrationWidget();
   virtual QString defaultWhatsThis() const;
 

@@ -101,7 +101,6 @@ public:
 	virtual TrackerConfigurationPtr getConfiguration();
 
 signals:
-//	void probeAvailable(); ///< Emitted when a probe is configured
 
 	// internal use only
 	void configured(); ///< system is configured

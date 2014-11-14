@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-LandmarkRegistrationWidget::LandmarkRegistrationWidget(regServices services, QWidget* parent,
+LandmarkRegistrationWidget::LandmarkRegistrationWidget(RegServices services, QWidget* parent,
 	QString objectName, QString windowTitle) :
 	RegistrationBaseWidget(services, parent, objectName, windowTitle), mVerticalLayout(new QVBoxLayout(this)),
 		mLandmarkTableWidget(new QTableWidget(this)), mAvarageAccuracyLabel(new QLabel(QString(" "), this))

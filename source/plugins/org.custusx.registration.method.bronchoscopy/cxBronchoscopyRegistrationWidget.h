@@ -59,7 +59,7 @@ class BronchoscopyRegistrationWidget: public RegistrationBaseWidget
 {
 	Q_OBJECT
 public:
-	BronchoscopyRegistrationWidget(regServices services, QWidget *parent);
+	BronchoscopyRegistrationWidget(RegServices services, QWidget *parent);
 	virtual ~BronchoscopyRegistrationWidget()
 	{
 	}

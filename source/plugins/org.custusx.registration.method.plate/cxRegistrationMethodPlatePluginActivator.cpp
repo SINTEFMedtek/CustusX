@@ -51,7 +51,7 @@ RegistrationMethodPlatePluginActivator::~RegistrationMethodPlatePluginActivator(
 
 void RegistrationMethodPlatePluginActivator::start(ctkPluginContext* context)
 {
-	regServices services(context);
+	RegServices services(context);
 	RegistrationMethodPlateImageToPatientService* image2patientService = new RegistrationMethodPlateImageToPatientService(services);
 
 	mRegistrationImageToPatient = RegisteredServicePtr(new RegisteredService(context, image2patientService, RegistrationMethodService_iid));

@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxElastixParameters.h"
 #include "cxLogicManager.h"
-#include "cxRegistrationMethodServices.h"
+#include "cxRegServices.h"
 
 namespace cxtest
 {
@@ -149,7 +149,7 @@ TEST_CASE("ElastiX should register kaisa to a translated+resampled version of sa
 	parameters->getCurrentPreset()->setValue(elastixPreset);
 
 
-	cx::regServices services = cx::regServices::getNullObjects();
+	cx::RegServices services = cx::RegServices::getNullObjects();
 
 	cx::ElastixSingleThreadedRunner runner(services);
 	REQUIRE(runner.registerLinear(kaisa_padded, kaisa_resliced_linear, parameters, &result));
