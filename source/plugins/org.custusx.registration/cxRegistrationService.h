@@ -58,7 +58,7 @@ typedef boost::shared_ptr<class RegistrationService> RegistrationServicePtr;
  *
  * This service replaces the old RegistrationManager class.
  *
- *  \ingroup cx_resource_core_registration
+ *  \ingroup org_custusx_registration
  *  \date 2014-08-26
  *  \author Ole Vegard Solberg, SINTEF
  *  \author Geir Arne Tangen, SINTEF

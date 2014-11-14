@@ -54,7 +54,7 @@ typedef boost::shared_ptr<class Data> DataPtr;
  * implementation of RegistrationService or
  * the null object (RegistrationServiceNull)
  *
- *  \ingroup cx_resource_core_registration
+ *  \ingroup org_custusx_registration
  *  \date 2014-09-10
  *  \author Ole Vegard Solberg, SINTEF
  */

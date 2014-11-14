@@ -42,6 +42,14 @@ namespace cx
 typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
 typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
 
+/**
+ * Convenience class combining all services in resource/core.
+ *
+ * \ingroup cx_resource_core
+ *
+ * \date Nov 14 2014
+ * \author Ole Vegard Solberg, SINTEF
+ */
 class cxResource_EXPORT CoreServices
 {
 public:

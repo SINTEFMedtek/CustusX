@@ -51,7 +51,7 @@ typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
 
 /** \brief Visualization services
  *
- *  \ingroup cx_resource_core_visualization
+ *  \ingroup cx_resource_visualization
  *  \date 2014-09-19
  *  \author Ole Vegard Solberg, SINTEF
  */

@@ -42,7 +42,7 @@ namespace cx
 
 /**
  * \file
- * \addtogroup cx_resource_widgets
+ * \addtogroup org_custusx_registration
  * @{
  */
 

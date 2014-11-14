@@ -42,6 +42,14 @@ namespace cx
 typedef boost::shared_ptr<class RegistrationService> RegistrationServicePtr;
 typedef boost::shared_ptr<class VisualizationService> VisualizationServicePtr;
 
+/**
+ * Convenience class combining all services used by registration methods.
+ *
+ * \ingroup org_custusx_registration
+ *
+ * \date Nov 14 2014
+ * \author Ole Vegard Solberg, SINTEF
+ */
 class org_custusx_registration_EXPORT RegServices : public CoreServices
 {
 public:

@@ -41,6 +41,14 @@ namespace cx
 
 typedef boost::shared_ptr<class VisualizationService> VisualizationServicePtr;
 
+/**
+ * Convenience class combining all services used by visualization.
+ *
+ * \ingroup cx_resource_visualization
+ *
+ * \date Nov 14 2014
+ * \author Ole Vegard Solberg, SINTEF
+ */
 class cxResourceVisualization_EXPORT VisServices : public CoreServices
 {
 public:
