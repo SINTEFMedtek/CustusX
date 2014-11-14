@@ -138,9 +138,6 @@ public:
 
 	bool isNull();
 
-signals:
-	void probeAvailable(); ///< Emitted when a probe is configured
-
 private slots:
 	void globalConfigurationFileChangedSlot(QString key);
 	void onSystemStateChanged();

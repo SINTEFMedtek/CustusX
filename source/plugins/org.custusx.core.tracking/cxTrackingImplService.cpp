@@ -256,8 +256,6 @@ void TrackingImplService::addToolsFrom(TrackingSystemServicePtr system)
 
 		if (tool->hasType(Tool::TOOL_REFERENCE))
 			mReferenceTool = tool;
-		if (tool->hasType(ToolUsingIGSTK::TOOL_US_PROBE))
-			emit probeAvailable();
 	}
 }
 
