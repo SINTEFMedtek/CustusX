@@ -8,7 +8,7 @@
 
 namespace cx {
 
-regServices::regServices(ctkPluginContext* context)
+RegServices::RegServices(ctkPluginContext* context)
 {
 	registrationService	= RegistrationServicePtr(new RegistrationServiceProxy(context));
 	patientModelService	= PatientModelServicePtr(new PatientModelServiceProxy(context));
@@ -16,14 +16,14 @@ regServices::regServices(ctkPluginContext* context)
 	trackingService		= TrackingServicePtr(new TrackingServiceProxy(context));
 }
 
-regServices regServices::getNullObjects()
+RegServices RegServices::getNullObjects()
 {
 //	static regServices mServices();
 //	return mServices();
-	return regServices();
+	return RegServices();
 }
 
-regServices::regServices()
+RegServices::RegServices()
 {
 	registrationService	= cx::RegistrationService::getNullObject();
 	patientModelService	= cx::PatientModelService::getNullObject();

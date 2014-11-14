@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ManualImageRegistrationWidget::ManualImageRegistrationWidget(regServices services, QWidget* parent, QString objectName, QString windowTitle) :
+ManualImageRegistrationWidget::ManualImageRegistrationWidget(RegServices services, QWidget* parent, QString objectName, QString windowTitle) :
 	BaseWidget(parent, objectName, windowTitle),
 	mVerticalLayout(new QVBoxLayout(this)),
 	mServices(services)

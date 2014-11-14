@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ElastixWidget::ElastixWidget(regServices services, QWidget* parent) :
+ElastixWidget::ElastixWidget(RegServices services, QWidget* parent) :
 	RegistrationBaseWidget(services, parent, "ElastiXWidget", "ElastiX Registration")
 {
 	mElastixManager.reset(new ElastixManager(services));

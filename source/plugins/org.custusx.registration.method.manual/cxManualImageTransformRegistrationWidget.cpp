@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ManualImageTransformRegistrationWidget::ManualImageTransformRegistrationWidget(regServices services, QWidget *parent, QString objectName) :
+ManualImageTransformRegistrationWidget::ManualImageTransformRegistrationWidget(RegServices services, QWidget *parent, QString objectName) :
 	ManualImageRegistrationWidget(services, parent, objectName, "Manual Image Transform Registration")
 {
 	StringDataAdapterPtr movingImage(new RegistrationMovingImageStringDataAdapter(services.registrationService, services.patientModelService));

@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ManualImage2ImageRegistrationWidget::ManualImage2ImageRegistrationWidget(regServices services, QWidget *parent, QString objectName) :
+ManualImage2ImageRegistrationWidget::ManualImage2ImageRegistrationWidget(RegServices services, QWidget *parent, QString objectName) :
 	ManualImageRegistrationWidget(services, parent, objectName, "Manual Image to Image Registration")
 {
 	StringDataAdapterPtr fixedImage(new RegistrationFixedImageStringDataAdapter(services.registrationService, services.patientModelService));

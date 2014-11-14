@@ -62,7 +62,7 @@ class ManualImageRegistrationWidget: public BaseWidget
 {
 Q_OBJECT
 public:
-	ManualImageRegistrationWidget(regServices services, QWidget* parent, QString objectName, QString windowTitle);
+	ManualImageRegistrationWidget(RegServices services, QWidget* parent, QString objectName, QString windowTitle);
 	virtual ~ManualImageRegistrationWidget()
 	{
 //		mRegistrationService.reset();
@@ -73,7 +73,7 @@ protected:
 	virtual void showEvent(QShowEvent* event);
 	DataPtr mConnectedMovingImage;
 	QVBoxLayout* mVerticalLayout;
-	regServices mServices;
+	RegServices mServices;
 
 private slots:
 	void matrixWidgetChanged();

@@ -55,7 +55,7 @@ void RegistrationGUIPluginActivator::start(ctkPluginContext* context)
 {
 	mRegistration = RegisteredService::create<RegistrationGUIExtenderService>(context, GUIExtenderService_iid);
 
-	regServices services(context);
+	RegServices services(context);
 	RegistrationHistoryGUIExtenderService *history = new RegistrationHistoryGUIExtenderService(services);
 	mRegistrationHistory = RegisteredServicePtr(new RegisteredService(context, history, GUIExtenderService_iid));
 }

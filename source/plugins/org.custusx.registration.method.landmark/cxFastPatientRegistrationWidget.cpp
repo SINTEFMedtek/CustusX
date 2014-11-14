@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-FastPatientRegistrationWidget::FastPatientRegistrationWidget(regServices services, QWidget* parent) :
+FastPatientRegistrationWidget::FastPatientRegistrationWidget(RegServices services, QWidget* parent) :
 		LandmarkPatientRegistrationWidget(services, parent, "FastPatientRegistrationWidget", "Fast Patient Registration")
 {
 }

@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 //------------------------------------------------------------------------------
-PrepareVesselsWidget::PrepareVesselsWidget(regServices services, QWidget* parent) :
+PrepareVesselsWidget::PrepareVesselsWidget(RegServices services, QWidget* parent) :
 		RegistrationBaseWidget(services, parent, "PrepareVesselsWidget", "PrepareVesselsWidget")
 {  
 	XmlOptionFile options = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("registration").descend("PrepareVesselsWidget");

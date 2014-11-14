@@ -53,14 +53,14 @@ class org_custusx_registration_gui_EXPORT RegistrationHistoryGUIExtenderService 
 {
 	Q_INTERFACES(cx::GUIExtenderService)
 public:
-	RegistrationHistoryGUIExtenderService(regServices services);
+	RegistrationHistoryGUIExtenderService(RegServices services);
 	virtual ~RegistrationHistoryGUIExtenderService();
 
 	virtual std::vector<CategorizedWidget> createWidgets() const;	
 	std::vector<QToolBar *> createToolBars() const;
 
 private:
-	regServices mServices;
+	RegServices mServices;
 };
 
 } /* namespace cx */

@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-LandmarkPatientRegistrationWidget::LandmarkPatientRegistrationWidget(regServices services,
+LandmarkPatientRegistrationWidget::LandmarkPatientRegistrationWidget(RegServices services,
 	QWidget* parent, QString objectName, QString windowTitle) :
 	LandmarkRegistrationWidget(services, parent, objectName, windowTitle), mToolSampleButton(new QPushButton(
 		"Sample Tool", this))

@@ -65,7 +65,7 @@ class ElastixWidget: public RegistrationBaseWidget
 {
 Q_OBJECT
 public:
-	ElastixWidget(regServices services, QWidget* parent = NULL);
+	ElastixWidget(RegServices services, QWidget* parent = NULL);
 	virtual ~ElastixWidget();
 	virtual QString defaultWhatsThis() const;
 

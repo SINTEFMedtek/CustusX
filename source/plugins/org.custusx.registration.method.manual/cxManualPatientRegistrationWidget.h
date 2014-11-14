@@ -54,14 +54,14 @@ class ManualPatientRegistrationWidget: public BaseWidget
 {
 Q_OBJECT
 public:
-ManualPatientRegistrationWidget(regServices services, QWidget* parent, QString objectName);
+ManualPatientRegistrationWidget(RegServices services, QWidget* parent, QString objectName);
 	 ~ManualPatientRegistrationWidget()
 	{
 	}
 	 QString defaultWhatsThis() const;
 protected:
 	void showEvent(QShowEvent *event);
-	regServices mServices;
+	RegServices mServices;
 
 private slots:
 	void matrixWidgetChanged();

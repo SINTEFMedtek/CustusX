@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ElastixExecuter::ElastixExecuter(regServices services, QObject* parent) :
+ElastixExecuter::ElastixExecuter(RegServices services, QObject* parent) :
 	TimedBaseAlgorithm("ElastiX", 1000),
 	mServices(services)
 {

@@ -13,18 +13,18 @@ typedef boost::shared_ptr<class RegistrationService> RegistrationServicePtr;
 typedef boost::shared_ptr<class VisualizationService> VisualizationServicePtr;
 typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
 
-class org_custusx_registration_EXPORT regServices
+class org_custusx_registration_EXPORT RegServices
 {
 public:
-	regServices(ctkPluginContext* context);
-	static regServices getNullObjects();
+	RegServices(ctkPluginContext* context);
+	static RegServices getNullObjects();
 
 	RegistrationServicePtr registrationService;
 	PatientModelServicePtr patientModelService;
 	VisualizationServicePtr visualizationService;
 	TrackingServicePtr trackingService;
 private:
-	regServices();
+	RegServices();
 };
 
 }
