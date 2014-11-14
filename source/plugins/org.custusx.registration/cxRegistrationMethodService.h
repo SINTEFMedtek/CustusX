@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 
 #include <boost/shared_ptr.hpp>
-#include "cxRegistrationMethodServices.h"
+#include "cxRegServices.h"
 #include "org_custusx_registration_Export.h"
 
 #define RegistrationMethodService_iid "cx::RegistrationMethodService"

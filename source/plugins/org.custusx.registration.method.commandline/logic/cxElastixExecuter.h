@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QFile>
 #include "cxTimedAlgorithm.h"
 #include "cxReporter.h"
-#include "cxRegistrationMethodServices.h"
+#include "cxRegServices.h"
 #include "org_custusx_registration_method_commandline_Export.h"
 
 namespace cx

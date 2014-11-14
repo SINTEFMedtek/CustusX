@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationGUIExtenderService.h"
 #include "cxRegistrationHistoryGUIExtenderService.h"
 #include "cxRegisteredService.h"
-#include "cxRegistrationMethodServices.h"
+#include "cxRegServices.h"
 
 namespace cx
 {
