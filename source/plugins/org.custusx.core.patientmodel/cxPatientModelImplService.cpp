@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientData.h"
 #include "cxPatientService.h"
 #include "cxRegistrationTransform.h"
+#include "cxDataFactory.h"
 
 namespace cx
 {
@@ -79,15 +80,15 @@ PatientModelImplService::~PatientModelImplService()
 void PatientModelImplService::insertData(DataPtr data)
 {
 	LogicManager* lm = LogicManager::getInstance();
-	lm->getDataService()->loadData(data);
 	QString outputBasePath = lm->getPatientService()->getPatientData()->getActivePatientFolder();
+
+	lm->getDataService()->loadData(data);
 	lm->getDataService()->saveData(data, outputBasePath);
 }
 
-void PatientModelImplService::updateRegistration_rMpr(const QDateTime& oldTime, const RegistrationTransform& newTransform)
+DataPtr PatientModelImplService::createData(QString type, QString uid, QString name)
 {
-	dataService()->get_rMpr_History()->updateRegistration(oldTime, newTransform);
-	patientService()->getPatientData()->autoSave();
+	return dataService()->getDataFactory()->create(type, uid, name);
 }
 
 std::map<QString, DataPtr> PatientModelImplService::getData() const
@@ -213,7 +214,7 @@ void PatientModelImplService::exportPatient(bool niftiFormat)
 	patientService()->getPatientData()->exportPatient(niftiFormat);
 }
 
-void PatientModelImplService::removePatientData(QString uid)
+void PatientModelImplService::removeData(QString uid)
 {
 	patientService()->getPatientData()->removeData(uid);
 }
@@ -243,7 +244,7 @@ QDomElement cx::PatientModelImplService::getCurrentWorkingElement(QString path)
 	return patientService()->getPatientData()->getCurrentWorkingElement(path);
 }
 
-RegistrationHistoryPtr PatientModelImplService::get_rMpr_History()
+RegistrationHistoryPtr PatientModelImplService::get_rMpr_History() const
 {
 	return dataManager()->get_rMpr_History();
 }

@@ -553,11 +553,18 @@ void VideoConnectionWidget::saveAndImportSnapshot(vtkImageDataPtr input, QString
 {
 	vtkImageDataPtr copiedImage = vtkImageDataPtr::New();
 	copiedImage->DeepCopy(input);
-	ImagePtr output = mPatientModelService->createImage(copiedImage, filename, filename);
+
+	ImagePtr output = mPatientModelService->createSpecificData<Image>(filename);
+	output->setVtkImageData(input);
 	output->get_rMd_History()->setRegistration(rMd);
-	QString folder = patientService()->getPatientData()->getActivePatientFolder();
-	mPatientModelService->loadData(output);
-	mPatientModelService->saveImage(output, folder);
+	mPatientModelService->insertData(output);
+
+//	ImagePtr output = mPatientModelService->createImage(copiedImage, filename, filename);
+//	output->get_rMd_History()->setRegistration(rMd);
+//	QString folder = patientService()->getPatientData()->getActivePatientFolder();
+//	mPatientModelService->loadData(output);
+//	mPatientModelService->saveImage(output, folder);
+
 	viewManager()->autoShowData(output);
 	report(QString("Saved snapshot %1 from active video source").arg(output->getName()));
 }

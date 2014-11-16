@@ -752,7 +752,7 @@ void DataManagerImpl::set_rMpr(const Transform3D& val)
 	m_rMpr_History->setRegistration(val);
 }
 
-RegistrationHistoryPtr DataManagerImpl::get_rMpr_History()
+RegistrationHistoryPtr DataManagerImpl::get_rMpr_History() const
 {
 	return m_rMpr_History;
 }

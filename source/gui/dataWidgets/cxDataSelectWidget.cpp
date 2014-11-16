@@ -179,7 +179,7 @@ void DataSelectWidget::requestEraseData()
     if (!mData->getData())
         return;
 
-	mPatientModelService->removePatientData(mData->getData()->getUid());
+	mPatientModelService->removeData(mData->getData()->getUid());
 }
 
 void DataSelectWidget::setRemoveIcon()

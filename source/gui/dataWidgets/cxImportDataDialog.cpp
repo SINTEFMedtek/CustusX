@@ -57,6 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImageTF3D.h"
 #include "cxImageLUT2D.h"
 #include "cxPatientModelService.h"
+#include "cxMesh.h"
 
 //TODO: remove
 #include "cxLegacySingletons.h"
@@ -177,7 +178,7 @@ void ImportDataDialog::importDataSlot()
   mParentFrameCombo->setEnabled(mPatientModelService->getData().size()>1);
 
   // enable nifti imiport only for meshes. (as this is the only case we have seen)
-  mNiftiFormatCheckBox->setEnabled(mPatientModelService->getMesh(mData->getUid())!=0);
+  mNiftiFormatCheckBox->setEnabled(mPatientModelService->getData<Mesh>(mData->getUid())!=0);
 
   mConvertToUnsignedCheckBox->setEnabled(false);
 //  ImagePtr image = boost::dynamic_pointer_cast<Image>(mData);

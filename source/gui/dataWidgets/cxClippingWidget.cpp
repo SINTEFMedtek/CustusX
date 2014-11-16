@@ -166,7 +166,7 @@ void ClippingWidget::clipperChangedSlot()
 
 void ClippingWidget::imageChangedSlot()
 {
-	mInteractiveClipper->setImage(mPatientModelService->getImage(mImageAdapter->getValue()));
+	mInteractiveClipper->setImage(mPatientModelService->getData<Image>(mImageAdapter->getValue()));
 }
 
 void ClippingWidget::clearButtonClickedSlot()

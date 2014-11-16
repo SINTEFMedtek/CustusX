@@ -48,9 +48,9 @@ void PatientModelServiceNull::insertData(DataPtr data)
 	printWarning();
 }
 
-void PatientModelServiceNull::updateRegistration_rMpr(const QDateTime& oldTime, const RegistrationTransform& newTransform)
+DataPtr PatientModelServiceNull::createData(QString type, QString uid, QString name)
 {
-	printWarning();
+	return DataPtr();
 }
 
 std::map<QString, DataPtr> PatientModelServiceNull::getData() const
@@ -84,11 +84,6 @@ void PatientModelServiceNull::setLandmarkName(QString uid, QString name)
 	printWarning();;
 }
 
-Transform3D PatientModelServiceNull::get_rMpr() const
-{
-	printWarning();
-	return Transform3D();
-}
 
 ImagePtr PatientModelServiceNull::getActiveImage() const
 {
@@ -189,7 +184,7 @@ void PatientModelServiceNull::exportPatient(bool niftiFormat)
 	printWarning();
 }
 
-void PatientModelServiceNull::removePatientData(QString uid)
+void PatientModelServiceNull::removeData(QString uid)
 {
 	printWarning();
 }
@@ -227,7 +222,7 @@ QDomElement PatientModelServiceNull::getCurrentWorkingElement(QString path)
 	return QDomElement();
 }
 
-RegistrationHistoryPtr PatientModelServiceNull::get_rMpr_History()
+RegistrationHistoryPtr PatientModelServiceNull::get_rMpr_History() const
 {
 	printWarning();
 	return RegistrationHistoryPtr();

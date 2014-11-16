@@ -140,6 +140,8 @@ Image::Image(const QString& uid, const vtkImageDataPtr& data, const QString& nam
 
 	mImageLookupTable2D.reset();
 	mImageTransferFunctions3D.reset();
+
+	this->setAcquisitionTime(QDateTime::currentDateTime());
 }
 
 ImagePtr Image::copy()
@@ -168,6 +170,19 @@ ImagePtr Image::copy()
 	retval->m_rMd_History = m_rMd_History;
 
 	return retval;
+}
+
+void Image::intitializeFromParentImage(ImagePtr parentImage)
+{
+	this->get_rMd_History()->setRegistration(parentImage->get_rMd());
+	this->get_rMd_History()->setParentSpace(parentImage->getUid());
+	ImageTF3DPtr transferFunctions = parentImage->getTransferFunctions3D()->createCopy();
+	ImageLUT2DPtr LUT2D = parentImage->getLookupTable2D()->createCopy();
+	this->setLookupTable2D(LUT2D);
+	this->setTransferFunctions3D(transferFunctions);
+	this->setModality(parentImage->getModality());
+	this->setImageType(parentImage->getImageType());
+	this->setShading(parentImage->getShading());
 }
 
 DoubleBoundingBox3D Image::getInitialBoundingBox() const

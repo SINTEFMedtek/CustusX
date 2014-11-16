@@ -51,7 +51,7 @@ class cxResource_EXPORT PatientModelServiceNull : public PatientModelService
 public:
 	PatientModelServiceNull();
 	virtual void insertData(DataPtr data);
-	virtual void updateRegistration_rMpr(const QDateTime& oldTime, const RegistrationTransform& newTransform);
+	virtual DataPtr createData(QString type, QString uid, QString name="");
 	virtual std::map<QString, DataPtr> getData() const;
 	virtual DataPtr getData(const QString& uid) const;
 
@@ -60,8 +60,7 @@ public:
 	virtual void setLandmarkName(QString uid, QString name);
 	virtual void setLandmarkActive(QString uid, bool active);
 
-	virtual Transform3D get_rMpr() const;
-	virtual RegistrationHistoryPtr get_rMpr_History();
+	virtual RegistrationHistoryPtr get_rMpr_History() const;
 
 	virtual ImagePtr getActiveImage() const;
 	virtual void setActiveImage(ImagePtr activeImage);
@@ -80,7 +79,7 @@ public:
 	virtual bool isPatientValid() const;
 	virtual DataPtr importData(QString fileName, QString &infoText);
 	virtual void exportPatient(bool niftiFormat);
-	virtual void removePatientData(QString uid);
+	virtual void removeData(QString uid);
 
 	virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const;
 

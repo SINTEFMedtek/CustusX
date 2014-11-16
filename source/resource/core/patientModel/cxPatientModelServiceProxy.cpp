@@ -114,9 +114,9 @@ void PatientModelServiceProxy::insertData(DataPtr data)
 	mPatientModelService->insertData(data);
 }
 
-void PatientModelServiceProxy::updateRegistration_rMpr(const QDateTime& oldTime, const RegistrationTransform& newTransform)
+DataPtr PatientModelServiceProxy::createData(QString type, QString uid, QString name)
 {
-	mPatientModelService->updateRegistration_rMpr(oldTime, newTransform);
+	return mPatientModelService->createData(type, uid, name);
 }
 
 std::map<QString, DataPtr> PatientModelServiceProxy::getData() const
@@ -142,11 +142,6 @@ std::map<QString, LandmarkProperty> PatientModelServiceProxy::getLandmarkPropert
 void PatientModelServiceProxy::setLandmarkName(QString uid, QString name)
 {
 	mPatientModelService->setLandmarkName(uid, name);
-}
-
-Transform3D PatientModelServiceProxy::get_rMpr() const
-{
-	return mPatientModelService->get_rMpr();
 }
 
 ImagePtr PatientModelServiceProxy::getActiveImage() const
@@ -179,40 +174,40 @@ void PatientModelServiceProxy::setDebugMode(bool on)
 	mPatientModelService->setDebugMode(on);
 }
 
-cx::ImagePtr cx::PatientModelServiceProxy::createDerivedImage(vtkImageDataPtr data, QString uid, QString name, cx::ImagePtr parentImage, QString filePath)
-{
-	return mPatientModelService->createDerivedImage(data, uid, name, parentImage, filePath);
-}
+//cx::ImagePtr cx::PatientModelServiceProxy::createDerivedImage(vtkImageDataPtr data, QString uid, QString name, cx::ImagePtr parentImage, QString filePath)
+//{
+//	return mPatientModelService->createDerivedImage(data, uid, name, parentImage, filePath);
+//}
 
-MeshPtr PatientModelServiceProxy::createMesh(vtkPolyDataPtr data, QString uidBase, QString nameBase, QString filePath)
-{
-	return mPatientModelService->createMesh(data, uidBase, nameBase, filePath);
-}
+//MeshPtr PatientModelServiceProxy::createMesh(vtkPolyDataPtr data, QString uidBase, QString nameBase, QString filePath)
+//{
+//	return mPatientModelService->createMesh(data, uidBase, nameBase, filePath);
+//}
 
-ImagePtr PatientModelServiceProxy::createImage(vtkImageDataPtr data, QString uidBase, QString nameBase, QString filePath)
-{
-	return mPatientModelService->createImage(data, uidBase, nameBase, filePath);
-}
+//ImagePtr PatientModelServiceProxy::createImage(vtkImageDataPtr data, QString uidBase, QString nameBase, QString filePath)
+//{
+//	return mPatientModelService->createImage(data, uidBase, nameBase, filePath);
+//}
 
-void PatientModelServiceProxy::loadData(DataPtr data)
-{
-	mPatientModelService->loadData(data);
-}
+//void PatientModelServiceProxy::loadData(DataPtr data)
+//{
+//	mPatientModelService->loadData(data);
+//}
 
-void PatientModelServiceProxy::saveData(DataPtr data, const QString &basePath)
-{
-	mPatientModelService->saveData(data, basePath);
-}
+//void PatientModelServiceProxy::saveData(DataPtr data, const QString &basePath)
+//{
+//	mPatientModelService->saveData(data, basePath);
+//}
 
-void PatientModelServiceProxy::saveImage(ImagePtr image, const QString &basePath)
-{
-	mPatientModelService->saveImage(image, basePath);
-}
+//void PatientModelServiceProxy::saveImage(ImagePtr image, const QString &basePath)
+//{
+//	mPatientModelService->saveImage(image, basePath);
+//}
 
-void PatientModelServiceProxy::saveMesh(MeshPtr mesh, const QString &basePath)
-{
-	mPatientModelService->saveMesh(mesh, basePath);
-}
+//void PatientModelServiceProxy::saveMesh(MeshPtr mesh, const QString &basePath)
+//{
+//	mPatientModelService->saveMesh(mesh, basePath);
+//}
 
 std::map<QString, VideoSourcePtr> PatientModelServiceProxy::getStreams() const
 {
@@ -239,9 +234,9 @@ void PatientModelServiceProxy::exportPatient(bool niftiFormat)
 	return mPatientModelService->exportPatient(niftiFormat);
 }
 
-void PatientModelServiceProxy::removePatientData(QString uid)
+void PatientModelServiceProxy::removeData(QString uid)
 {
-	return mPatientModelService->removePatientData(uid);
+	return mPatientModelService->removeData(uid);
 }
 
 PresetTransferFunctions3DPtr PatientModelServiceProxy::getPresetTransferFunctions3D() const
@@ -269,7 +264,7 @@ void PatientModelServiceProxy::setLandmarkActive(QString uid, bool active)
 	mPatientModelService->setLandmarkActive(uid, active);
 }
 
-RegistrationHistoryPtr PatientModelServiceProxy::get_rMpr_History()
+RegistrationHistoryPtr PatientModelServiceProxy::get_rMpr_History() const
 {
 	return mPatientModelService->get_rMpr_History();
 }

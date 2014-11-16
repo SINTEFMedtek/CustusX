@@ -132,8 +132,9 @@ public:
 
 	virtual Transform3D get_rMpr() const = 0; ///< get the patient registration transform
 	virtual void set_rMpr(const Transform3D& val) = 0; ///<  set the transform from patient to reference space
-	virtual RegistrationHistoryPtr get_rMpr_History() = 0;
+	virtual RegistrationHistoryPtr get_rMpr_History() const = 0;
 	virtual LandmarksPtr getPatientLandmarks() = 0;
+	virtual void generateUidAndName(QString* _uid, QString* _name) = 0;
 
 	virtual bool getDebugMode() const = 0;
 
