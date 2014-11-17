@@ -146,6 +146,7 @@ void PatientData::newPatient(QString choosenDir)
 	this->clearPatientSilent();
 	createPatientFolders(choosenDir);
 	this->setActivePatient(choosenDir);
+	this->savePatient();
 	this->reportActivePatient();
 	this->writeRecentPatientData();
 }
@@ -510,7 +511,7 @@ void PatientData::createPatientFolders(QString choosenDir)
 		report("Made a new ultrasound folder: " + newDir);
 	}
 
-	this->savePatient();
+//	this->savePatient();
 }
 
 QString PatientData::getVersionName()

@@ -44,13 +44,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //#include "cxVisualizationService.h"
 #include "cxPatientModelService.h"
+#include "cxMessageListener.h"
+#include "cxLogger.h"
 
 namespace cxtest
 {
 
+
 TEST_CASE("ReconstructManager: PNN on sphere","[unit][usreconstruction][synthetic][not_win32][pnn]")
 {
 	ReconstructionManagerTestFixture fixture;
+	cx::MessageListenerPtr messageListener = cx::MessageListener::create();
 	fixture.setVerbose(true);
 
 	SyntheticReconstructInputPtr input(new SyntheticReconstructInput);
@@ -83,6 +87,8 @@ TEST_CASE("ReconstructManager: PNN on sphere","[unit][usreconstruction][syntheti
 		comparer->saveOutputToFile("sphere_recman.mhd");
 		comparer->saveNominalOutputToFile("sphere_nomman.mhd");
 	}
+
+	CHECK(!messageListener->containsErrors());
 }
 
 TEST_CASE("ReconstructManager: PNN on angio sphere","[unit][usreconstruction][synthetic][pnn][hide]")
