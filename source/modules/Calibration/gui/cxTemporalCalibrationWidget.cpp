@@ -52,6 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkImageCorrelation.h"
 #include "cxReporter.h"
 #include "cxPatientService.h"
+#include "cxPatientModelService.h"
 
 typedef vtkSmartPointer<vtkImageCorrelation> vtkImageCorrelationPtr;
 typedef vtkSmartPointer<vtkDoubleArray> vtkDoubleArrayPtr;
@@ -69,7 +70,7 @@ TemporalCalibrationWidget::TemporalCalibrationWidget(AcquisitionDataPtr acquisit
 {
 
   mAlgorithm.reset(new TemporalCalibration);
-  connect(patientService()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
+  connect(patientService().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
 
   AcquisitionPtr acquisitionBase(new Acquisition(acquisitionData));
   mAcquisition.reset(new USAcquisition(acquisitionBase));
@@ -152,7 +153,7 @@ void TemporalCalibrationWidget::showEvent(QShowEvent* event)
 void TemporalCalibrationWidget::patientChangedSlot()
 {
 //  std::cout << "TemporalCalibrationWidget::patientChangedSlot() "  << std::endl;
-  QString filename = patientService()->getPatientData()->getActivePatientFolder() + "/US_Acq/";
+  QString filename = patientService()->getActivePatientFolder() + "/US_Acq/";
   mFileSelectWidget->setPath(filename);
 //  this->selectData(filename);
 }
@@ -171,7 +172,7 @@ void TemporalCalibrationWidget::selectData(QString filename)
 void TemporalCalibrationWidget::calibrateSlot()
 {
   if (mVerbose->isChecked())
-    mAlgorithm->setDebugFolder(patientService()->getPatientData()->getActivePatientFolder()+"/Logs/");
+	mAlgorithm->setDebugFolder(patientService()->getActivePatientFolder()+"/Logs/");
   else
     mAlgorithm->setDebugFolder("");
 

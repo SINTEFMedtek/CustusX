@@ -293,7 +293,8 @@ void ImportDataDialog::convertToUnsigned()
 	ImageLUT2DPtr LUT2D = converted->getLookupTable2D()->createCopy();
 	image->setLookupTable2D(LUT2D);
 	image->setTransferFunctions3D(TF3D);
-	dataManager()->saveImage(image, patientService()->getPatientData()->getActivePatientFolder());
+//	dataManager()->saveImage(image, patientService()->getPatientData()->getActivePatientFolder());
+	patientService()->insertData(image);
 }
 
 

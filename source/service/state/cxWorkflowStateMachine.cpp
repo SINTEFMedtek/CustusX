@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxWorkflowState.h"
 #include "cxRequestEnterStateTransition.h"
 #include "cxStateServiceBackend.h"
-#include "cxDataManager.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
@@ -61,7 +61,7 @@ WorkflowStateMachine::WorkflowStateMachine(VideoServicePtr videoService, StateSe
 	this->setInitialState(mParentState);
 	mParentState->setInitialState(patientData);
 
-	connect(mBackend->getDataManager().get(), SIGNAL(clinicalApplicationChanged()), this, SLOT(clinicalApplicationChangedSlot()));
+	connect(mBackend->getPatientService().get(), SIGNAL(clinicalApplicationChanged()), this, SLOT(clinicalApplicationChangedSlot()));
 }
 
 void WorkflowStateMachine::clinicalApplicationChangedSlot()

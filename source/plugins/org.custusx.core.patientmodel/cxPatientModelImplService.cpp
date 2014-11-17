@@ -53,11 +53,12 @@ PatientModelImplService::PatientModelImplService(ctkPluginContext *context) :
 	connect(dataService().get(), SIGNAL(debugModeChanged(bool)), this, SIGNAL(debugModeChanged(bool)));
 	connect(dataService().get(), SIGNAL(rMprChanged()), this, SIGNAL(rMprChanged()));
 	connect(dataService().get(), SIGNAL(streamLoaded()), this, SIGNAL(streamLoaded()));
+	connect(dataService().get(), SIGNAL(clinicalApplicationChanged()), this, SIGNAL(clinicalApplicationChanged()));
 
-	connect(patientService()->getPatientData().get(), &PatientData::cleared, this, &PatientModelService::cleared);
-	connect(patientService()->getPatientData().get(), &PatientData::isSaving, this, &PatientModelService::isSaving);
-	connect(patientService()->getPatientData().get(), &PatientData::isLoading, this, &PatientModelService::isLoading);
-	connect(patientService()->getPatientData().get(), &PatientData::patientChanged, this, &PatientModelService::patientChanged);
+	connect(logicManager()->getPatientServiceOld()->getPatientData().get(), &PatientData::cleared, this, &PatientModelService::cleared);
+	connect(logicManager()->getPatientServiceOld()->getPatientData().get(), &PatientData::isSaving, this, &PatientModelService::isSaving);
+	connect(logicManager()->getPatientServiceOld()->getPatientData().get(), &PatientData::isLoading, this, &PatientModelService::isLoading);
+	connect(logicManager()->getPatientServiceOld()->getPatientData().get(), &PatientData::patientChanged, this, &PatientModelService::patientChanged);
 }
 
 PatientModelImplService::~PatientModelImplService()
@@ -70,17 +71,17 @@ PatientModelImplService::~PatientModelImplService()
 		disconnect(dataService().get(), SIGNAL(rMprChanged()), this, SIGNAL(rMprChanged()));
 		disconnect(dataService().get(), SIGNAL(streamLoaded()), this, SIGNAL(streamLoaded()));
 
-		disconnect(patientService()->getPatientData().get(), &PatientData::cleared, this, &PatientModelService::cleared);
-		disconnect(patientService()->getPatientData().get(), &PatientData::isSaving, this, &PatientModelService::isSaving);
-		disconnect(patientService()->getPatientData().get(), &PatientData::isLoading, this, &PatientModelService::isLoading);
-		disconnect(patientService()->getPatientData().get(), &PatientData::patientChanged, this, &PatientModelService::patientChanged);
+		disconnect(logicManager()->getPatientServiceOld()->getPatientData().get(), &PatientData::cleared, this, &PatientModelService::cleared);
+		disconnect(logicManager()->getPatientServiceOld()->getPatientData().get(), &PatientData::isSaving, this, &PatientModelService::isSaving);
+		disconnect(logicManager()->getPatientServiceOld()->getPatientData().get(), &PatientData::isLoading, this, &PatientModelService::isLoading);
+		disconnect(logicManager()->getPatientServiceOld()->getPatientData().get(), &PatientData::patientChanged, this, &PatientModelService::patientChanged);
 	}
 }
 
 void PatientModelImplService::insertData(DataPtr data)
 {
 	LogicManager* lm = LogicManager::getInstance();
-	QString outputBasePath = lm->getPatientService()->getPatientData()->getActivePatientFolder();
+	QString outputBasePath = lm->getPatientServiceOld()->getPatientData()->getActivePatientFolder();
 
 	lm->getDataService()->loadData(data);
 	lm->getDataService()->saveData(data, outputBasePath);
@@ -127,7 +128,7 @@ Transform3D PatientModelImplService::get_rMpr() const
 
 void PatientModelImplService::autoSave()
 {
-	patientService()->getPatientData()->autoSave();
+	logicManager()->getPatientServiceOld()->getPatientData()->autoSave();
 }
 
 bool PatientModelImplService::isNull()
@@ -154,7 +155,17 @@ void PatientModelImplService::setActiveImage(ImagePtr activeImage)
 	dataService()->setActiveImage(activeImage);
 }
 
-cx::ImagePtr cx::PatientModelImplService::createDerivedImage(vtkImageDataPtr data, QString uid, QString name, cx::ImagePtr parentImage, QString filePath)
+CLINICAL_APPLICATION PatientModelImplService::getClinicalApplication() const
+{
+	return dataService()->getClinicalApplication();
+}
+
+void PatientModelImplService::setClinicalApplication(CLINICAL_APPLICATION application)
+{
+	dataService()->setClinicalApplication(application);
+}
+
+cx::ImagePtr PatientModelImplService::createDerivedImage(vtkImageDataPtr data, QString uid, QString name, cx::ImagePtr parentImage, QString filePath)
 {
 	return dataService()->createDerivedImage(data, uid, name, parentImage, filePath);
 }
@@ -196,27 +207,48 @@ std::map<QString, VideoSourcePtr> PatientModelImplService::getStreams() const
 
 QString PatientModelImplService::getActivePatientFolder() const
 {
-	return patientService()->getPatientData()->getActivePatientFolder();
+	return logicManager()->getPatientServiceOld()->getPatientData()->getActivePatientFolder();
 }
 
 bool PatientModelImplService::isPatientValid() const
 {
-	return patientService()->getPatientData()->isPatientValid();
+	return logicManager()->getPatientServiceOld()->getPatientData()->isPatientValid();
 }
 
 DataPtr PatientModelImplService::importData(QString fileName, QString &infoText)
 {
-	return patientService()->getPatientData()->importData(fileName, infoText);
+	return logicManager()->getPatientServiceOld()->getPatientData()->importData(fileName, infoText);
 }
 
 void PatientModelImplService::exportPatient(bool niftiFormat)
 {
-	patientService()->getPatientData()->exportPatient(niftiFormat);
+	logicManager()->getPatientServiceOld()->getPatientData()->exportPatient(niftiFormat);
 }
+
+void PatientModelImplService::newPatient(QString choosenDir)
+{
+	logicManager()->getPatientServiceOld()->getPatientData()->newPatient(choosenDir);
+}
+
+void PatientModelImplService::loadPatient(QString chosenDir)
+{
+	logicManager()->getPatientServiceOld()->getPatientData()->loadPatient(chosenDir);
+}
+
+void PatientModelImplService::savePatient()
+{
+	logicManager()->getPatientServiceOld()->getPatientData()->savePatient();
+}
+
+void PatientModelImplService::clearPatient()
+{
+	logicManager()->getPatientServiceOld()->getPatientData()->clearPatient();
+}
+
 
 void PatientModelImplService::removeData(QString uid)
 {
-	patientService()->getPatientData()->removeData(uid);
+	logicManager()->getPatientServiceOld()->getPatientData()->removeData(uid);
 }
 
 PresetTransferFunctions3DPtr PatientModelImplService::getPresetTransferFunctions3D() const
@@ -241,7 +273,7 @@ void PatientModelImplService::setLandmarkActive(QString uid, bool active)
 
 QDomElement cx::PatientModelImplService::getCurrentWorkingElement(QString path)
 {
-	return patientService()->getPatientData()->getCurrentWorkingElement(path);
+	return logicManager()->getPatientServiceOld()->getPatientData()->getCurrentWorkingElement(path);
 }
 
 RegistrationHistoryPtr PatientModelImplService::get_rMpr_History() const

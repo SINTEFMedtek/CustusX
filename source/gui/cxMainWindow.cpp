@@ -157,7 +157,7 @@ MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
 	this->addAsDockWidget(new ToolManagerWidget(this), "Debugging");
 	this->addAsDockWidget(new PluginFrameworkWidget(this), "Browsing");
 
-	connect(patientService()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
+	connect(patientService().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
 	connect(qApp, SIGNAL(focusChanged(QWidget*, QWidget*)), this, SLOT(focusChanged(QWidget*, QWidget*)));
 
 	// insert all widgets from all guiExtenders
@@ -185,7 +185,7 @@ MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
 	if (settings()->value("gui/fullscreen").toBool())
 		this->setWindowState(this->windowState() | Qt::WindowFullScreen);
 
-	QTimer::singleShot(0, this, SLOT(startupLoadPatient())); // make sure this is called after application state change
+//	QTimer::singleShot(0, this, SLOT(startupLoadPatient())); // make sure this is called after application state change
 	this->toggleDebugModeSlot(mDebugModeAction->isChecked());
 }
 
@@ -273,12 +273,12 @@ void MainWindow::onPluginBaseRemoved(GUIExtenderService* service)
 	this->removeGUIExtender(service);
 }
 
-/**Parse the command line and load a patient if the switch --patient is found
- */
-void MainWindow::startupLoadPatient()
-{
-	patientService()->getPatientData()->startupLoadPatient();
-}
+///**Parse the command line and load a patient if the switch --patient is found
+// */
+//void MainWindow::startupLoadPatient()
+//{
+//	patientService()->startupLoadPatient();
+//}
 
 void MainWindow::dockWidgetVisibilityChanged(bool val)
 {
@@ -529,7 +529,7 @@ void MainWindow::shootWindow()
 
 void MainWindow::recordFullscreen()
 {
-	QString path = patientService()->getPatientData()->generateFilePath("Screenshots", "mp4");
+	QString path = patientService()->generateFilePath("Screenshots", "mp4");
 
 	if(vlc()->isRecording())
 		vlc()->stopRecording();
@@ -561,7 +561,7 @@ void MainWindow::saveScreenShot(QPixmap pixmap, QString id)
 	QString ending = "png";
 	if (!id.isEmpty())
 		ending = id + "." + ending;
-	QString path = patientService()->getPatientData()->generateFilePath("Screenshots", ending);
+	QString path = patientService()->generateFilePath("Screenshots", ending);
 	QtConcurrent::run(boost::bind(&MainWindow::saveScreenShotThreaded, this, pixmap.toImage(), path));
 }
 
@@ -692,28 +692,25 @@ void MainWindow::newPatientSlot()
 	int patientNumber = settings()->value("globalPatientNumber").toInt();
 	settings()->setValue("globalPatientNumber", ++patientNumber);
 
-	patientService()->getPatientData()->newPatient(choosenDir);
-	patientService()->getPatientData()->writeRecentPatientData();
+	patientService()->newPatient(choosenDir);
 }
 
 void MainWindow::clearPatientSlot()
 {
-	patientService()->getPatientData()->clearPatient();
-	patientService()->getPatientData()->writeRecentPatientData();
+	patientService()->clearPatient();
 	reportWarning("Cleared current patient data");
 }
 
 void MainWindow::savePatientFileSlot()
 {
-	if (patientService()->getPatientData()->getActivePatientFolder().isEmpty())
+	if (patientService()->getActivePatientFolder().isEmpty())
 	{
 		reportWarning("No patient selected, select or create patient before saving!");
 		this->newPatientSlot();
 		return;
 	}
 
-	patientService()->getPatientData()->savePatient();
-	patientService()->getPatientData()->writeRecentPatientData();
+	patientService()->savePatient();
 }
 
 void MainWindow::onApplicationStateChangedSlot()
@@ -729,7 +726,7 @@ void MainWindow::updateWindowTitle()
 
 	QString versionName = stateService()->getVersionName();
 
-	QString activePatientFolder = patientService()->getPatientData()->getActivePatientFolder();
+	QString activePatientFolder = patientService()->getActivePatientFolder();
 	if (activePatientFolder.endsWith('/'))
 		activePatientFolder.chop(1);
 	QString patientName;
@@ -752,7 +749,7 @@ void MainWindow::onWorkflowStateChangedSlot()
 	viewManager()->setActiveLayout(desktop.mLayoutUid, 0);
 	viewManager()->setActiveLayout(desktop.mSecondaryLayoutUid, 1);
 	this->restoreState(desktop.mMainWindowState);
-	patientService()->getPatientData()->autoSave();
+	patientService()->autoSave();
 }
 
 void MainWindow::saveDesktopSlot()
@@ -800,8 +797,7 @@ void MainWindow::loadPatientFileSlot()
 	if (choosenDir == QString::null)
 		return; // On cancel
 
-	patientService()->getPatientData()->loadPatient(choosenDir);
-	patientService()->getPatientData()->writeRecentPatientData();
+	patientService()->loadPatient(choosenDir);
 }
 
 void MainWindow::exportDataSlot()
@@ -1027,7 +1023,7 @@ void MainWindow::quitSlot()
 	report("Shutting down CustusX");
 	viewManager()->deactivateCurrentLayout();
 
-	patientService()->getPatientData()->autoSave();
+	patientService()->autoSave();
 
 	settings()->setValue("mainWindow/geometry", saveGeometry());
 	settings()->setValue("mainWindow/windowState", saveState());

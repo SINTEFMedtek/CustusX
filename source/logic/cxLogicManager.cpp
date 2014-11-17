@@ -53,6 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPluginFramework.h"
 #include "cxVideoServiceProxy.h"
 #include "cxTrackingServiceProxy.h"
+#include "cxPatientModelServiceProxy.h"
 
 namespace cx
 {
@@ -62,7 +63,7 @@ struct LegacySingletons
 	static TrackingServicePtr mTrackingService;
 	static DataServicePtr mDataManager;
 	static SpaceProviderPtr mSpaceProvider;
-	static PatientServicePtr mPatientService;
+	static PatientModelServicePtr mPatientService;
 	static VideoServiceOldPtr mVideoServiceOld;
 	static VisualizationServiceOldPtr mVisualizationService;
 	static StateServicePtr mStateService;
@@ -71,7 +72,7 @@ struct LegacySingletons
 TrackingServicePtr LegacySingletons::mTrackingService;
 DataServicePtr LegacySingletons::mDataManager;
 SpaceProviderPtr LegacySingletons::mSpaceProvider;
-PatientServicePtr LegacySingletons::mPatientService;
+PatientModelServicePtr LegacySingletons::mPatientService;
 VideoServiceOldPtr LegacySingletons::mVideoServiceOld;
 VisualizationServiceOldPtr LegacySingletons::mVisualizationService;
 StateServicePtr LegacySingletons::mStateService;
@@ -93,7 +94,7 @@ SpaceProviderPtr spaceProvider()
 {
 	return LegacySingletons::mSpaceProvider;
 }
-PatientServicePtr patientService()
+PatientModelServicePtr patientService()
 {
 	return LegacySingletons::mPatientService;
 }
@@ -147,7 +148,7 @@ void LogicManager::initializeServices()
 	mPluginFramework->start();
 
 	// services layer
-	this->getPatientService();
+	this->getPatientModelService();
 	this->getTrackingService();
 	this->getVideoServiceOld();
 	this->getVisualizationService();
@@ -198,13 +199,14 @@ void LogicManager::createSpaceProvider()
 	this->createInterconnectedDataAndSpace();
 }
 
-void LogicManager::createPatientService()
+void LogicManager::createPatientModelService()
 {
 	// prerequisites:
 	this->getDataService();
 	// build object(s):
-	mPatientService = PatientService::create(mDataService);
-	LegacySingletons::mPatientService = mPatientService;
+	mPatientServiceOld = PatientService::create(mDataService);
+	mPatientModelService = PatientModelServiceProxy::create(this->getPluginContext());
+	LegacySingletons::mPatientService = mPatientModelService;
 }
 
 void LogicManager::createVideoServiceOld()
@@ -245,18 +247,16 @@ void LogicManager::createStateService()
 {
 	// prerequisites:
 	this->getTrackingService();
-	this->getDataService();
-	this->getPatientService();
+	this->getPatientModelService();
 	this->getVideoServiceOld();
 	this->getSpaceProvider();
 
 	// build object(s):
 	StateServiceBackendPtr backend;
-	backend.reset(new StateServiceBackend(mDataService,
-										  mTrackingService,
-											mVideoServiceOld,
+	backend.reset(new StateServiceBackend(mTrackingService,
+										  mVideoServiceOld,
 										  mSpaceProvider,
-										  mPatientService));
+										  mPatientModelService));
 	VideoServicePtr videoService(new VideoServiceProxy(getPluginContext()));
 	mStateService = StateService::create(videoService, backend);
 	LegacySingletons::mStateService = mStateService;
@@ -272,7 +272,7 @@ void LogicManager::createPluginFramework()
 DataFactoryPtr LogicManager::getDataFactory()
 {
 	if (!mDataFactory)
-		this->createPatientService();
+		this->createPatientModelService();
 	return mDataFactory;
 }
 
@@ -283,12 +283,20 @@ DataServicePtr LogicManager::getDataService()
 	return mDataService;
 }
 
-PatientServicePtr LogicManager::getPatientService()
+
+PatientModelServicePtr LogicManager::getPatientModelService()
 {
-	if (!mPatientService)
-		this->createPatientService();
-	return mPatientService;
+	if (!mPatientModelService)
+		this->createPatientModelService();
+	return mPatientModelService;
 }
+
+PatientServicePtr LogicManager::getPatientServiceOld()
+{
+	this->getPatientModelService();
+	return mPatientServiceOld;
+}
+
 
 TrackingServicePtr LogicManager::getTrackingService()
 {
@@ -380,8 +388,9 @@ void LogicManager::shutdownVideoServiceOld()
 void LogicManager::shutdownPatientService()
 {
 	LegacySingletons::mPatientService.reset();
-	requireUnique(mPatientService, "PatientService");
-	mPatientService.reset();
+	requireUnique(mPatientServiceOld, "PatientService");
+	mPatientModelService.reset();
+	mPatientServiceOld.reset();
 }
 
 void LogicManager::shutdownInterconnectedDataAndSpace()

@@ -90,6 +90,7 @@ QDomElement getElementForced(QDomNode root, QString path)
 PatientData::PatientData(DataServicePtr dataManager) : mDataManager(dataManager)
 {
 	connect(dataManager.get(), SIGNAL(clinicalApplicationChanged()), this, SLOT(clearPatient()));
+	QTimer::singleShot(0, this, SLOT(startupLoadPatient())); // make sure this is called after application state change
 }
 
 PatientData::~PatientData()
@@ -115,15 +116,15 @@ QDomDocument PatientData::getCurrentWorkingDocument()
 	return mWorkingDocument;
 }
 
-QString PatientData::generateFilePath(QString folderName, QString ending)
-{
-	QString folder = this->getActivePatientFolder() + "/" +folderName + "/";
-	QDir().mkpath(folder);
-	QString format = timestampSecondsFormat();
-	QString filename = QDateTime::currentDateTime().toString(format) + "." + ending;
+//QString PatientData::generateFilePath(QString folderName, QString ending)
+//{
+//	QString folder = this->getActivePatientFolder() + "/" +folderName + "/";
+//	QDir().mkpath(folder);
+//	QString format = timestampSecondsFormat();
+//	QString filename = QDateTime::currentDateTime().toString(format) + "." + ending;
 
-	return folder+filename;
-}
+//	return folder+filename;
+//}
 
 void PatientData::reportActivePatient()
 {
@@ -142,11 +143,11 @@ void PatientData::setActivePatient(const QString& activePatientFolder)
 
 void PatientData::newPatient(QString choosenDir)
 {
-//	this->clearPatient();
 	this->clearPatientSilent();
 	createPatientFolders(choosenDir);
 	this->setActivePatient(choosenDir);
 	this->reportActivePatient();
+	this->writeRecentPatientData();
 }
 
 /**Remove all data referring to the current patient from the system,
@@ -156,6 +157,7 @@ void PatientData::clearPatient()
 {
 	this->clearPatientSilent();
 	this->reportActivePatient();
+	this->writeRecentPatientData();
 }
 
 void PatientData::clearPatientSilent()
@@ -231,6 +233,7 @@ void PatientData::loadPatient(QString choosenDir)
 {
 	this->loadPatientSilent(choosenDir);
 	this->reportActivePatient();
+	this->writeRecentPatientData();
 }
 
 void PatientData::loadPatientSilent(QString choosenDir)
@@ -307,6 +310,8 @@ void PatientData::savePatient()
 	mWorkingDocument = QDomDocument();
 
 	report("Saved patient " + mActivePatientFolder);
+	this->writeRecentPatientData();
+
 }
 
 /** Writes settings info describing the patient name and current time.

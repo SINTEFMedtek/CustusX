@@ -35,6 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImage.h"
 #include "cxMesh.h"
 #include "cxRegistrationTransform.h"
+#include <QDir>
+#include "cxTime.h"
 
 namespace cx
 {
@@ -106,5 +108,15 @@ VideoSourcePtr PatientModelService::getStream(const QString& uid) const
 //{
 //	this->saveMesh(mesh, this->getActivePatientFolder());
 //}
+
+QString PatientModelService::generateFilePath(QString folderName, QString ending)
+{
+	QString folder = this->getActivePatientFolder() + "/" +folderName + "/";
+	QDir().mkpath(folder);
+	QString format = timestampSecondsFormat();
+	QString filename = QDateTime::currentDateTime().toString(format) + "." + ending;
+
+	return folder+filename;
+}
 
 } //cx

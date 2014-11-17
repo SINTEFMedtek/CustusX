@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientService.h"
 #include "cxPatientData.h"
 #include "cxLegacySingletons.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
@@ -159,8 +160,9 @@ bool SmoothingImageFilter::postProcess()
 		return false;
 
 	//    output->resetTransferFunctions();
-	dataManager()->loadData(output);
-	dataManager()->saveImage(output, patientService()->getPatientData()->getActivePatientFolder());
+	patientService()->insertData(output);
+//	dataManager()->loadData(output);
+//	dataManager()->saveImage(output, patientService()->getPatientData()->getActivePatientFolder());
 
 	// set output
 	mOutputTypes.front()->setValue(output->getUid());

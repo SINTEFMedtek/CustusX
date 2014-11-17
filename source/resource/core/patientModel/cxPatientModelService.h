@@ -41,6 +41,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTransform3D.h"
 #include "cxForwardDeclarations.h"
 #include "vtkForwardDeclarations.h"
+#include "cxDefinitions.h"
+
 class QDateTime;
 class QDomElement;
 
@@ -135,13 +137,24 @@ public:
 	virtual void updateRegistration_rMpr(const QDateTime& oldTime, const RegistrationTransform& newTransform);
 
 	virtual QString getActivePatientFolder() const = 0;
+	QString generateFilePath(QString folderName, QString ending);
+
 	virtual bool isPatientValid() const = 0;
 	virtual DataPtr importData(QString fileName, QString &infoText) = 0;
 	virtual void exportPatient(bool niftiFormat) = 0;
 
+	virtual void newPatient(QString choosenDir) = 0;
+	virtual void loadPatient(QString chosenDir) = 0;
+	virtual void savePatient() = 0; ///< Save all application data to XML file
+	virtual void clearPatient() = 0;
+
+
 	virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const = 0;
 
 	virtual void setCenter(const Vector3D& center) = 0;
+
+	virtual CLINICAL_APPLICATION getClinicalApplication() const = 0;
+	virtual void setClinicalApplication(CLINICAL_APPLICATION application) = 0;
 
 	virtual QDomElement getCurrentWorkingElement(QString path) = 0;
 
@@ -158,6 +171,7 @@ signals:
 	void activeImageChanged(const QString& uId);
 	void landmarkPropertiesChanged(); ///< emitted when global info about a landmark changed
 	void debugModeChanged(bool on);
+	void clinicalApplicationChanged();
 	void rMprChanged();
 	void streamLoaded();
 

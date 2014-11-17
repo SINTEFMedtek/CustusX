@@ -40,23 +40,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-StateServiceBackend::StateServiceBackend(DataServicePtr dataManager,
-										 TrackingServicePtr trackingService,
+StateServiceBackend::StateServiceBackend(TrackingServicePtr trackingService,
 										 VideoServiceOldPtr videoService,
 										 SpaceProviderPtr spaceProvider,
-										 PatientServicePtr patientService) :
-	mDataManager(dataManager),
+										 PatientModelServicePtr patientService) :
 	mTrackingService(trackingService),
 	mSpaceProvider(spaceProvider),
 	mVideoServiceOld(videoService),
 	mPatientService(patientService)
 {
 
-}
-
-DataServicePtr StateServiceBackend::getDataManager()
-{
-	return mDataManager;
 }
 
 TrackingServicePtr StateServiceBackend::getToolManager()
@@ -74,7 +67,7 @@ SpaceProviderPtr StateServiceBackend::getSpaceProvider()
 	return mSpaceProvider;
 }
 
-PatientServicePtr StateServiceBackend::getPatientService()
+PatientModelServicePtr StateServiceBackend::getPatientService()
 {
 	return mPatientService;
 }

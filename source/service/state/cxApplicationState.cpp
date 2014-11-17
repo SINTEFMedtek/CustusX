@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackingService.h"
 #include "cxWorkflowStateMachine.h"
 #include "cxStateServiceBackend.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
@@ -73,7 +74,7 @@ void ApplicationState::onEntry(QEvent * event)
 	if (mAction)
 		mAction->setChecked(true);
 
-	mBackend->getDataManager()->setClinicalApplication(this->getClinicalApplication());
+	mBackend->getPatientService()->setClinicalApplication(this->getClinicalApplication());
 }
 
 void ApplicationState::onExit(QEvent * event)

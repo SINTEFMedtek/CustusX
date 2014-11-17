@@ -546,7 +546,7 @@ void MetricWidget::removeButtonClickedSlot()
 void MetricWidget::exportMetricsButtonClickedSlot()
 {
 	QString suggestion = QString("%1/Logs/metrics_%2.txt")
-			.arg(patientService()->getPatientData()->getActivePatientFolder())
+			.arg(patientService()->getActivePatientFolder())
 			.arg(QDateTime::currentDateTime().toString(timestampSecondsFormat()));
 
 	QString filename = QFileDialog::getSaveFileName(this,

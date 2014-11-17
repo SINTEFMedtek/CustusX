@@ -43,16 +43,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPlaybackUSAcquisitionVideo.h"
 #include "cxViewManager.h"
 #include "cxLegacySingletons.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
 
 ServiceController::ServiceController()
 {
-	connect(patientService()->getPatientData().get(), SIGNAL(isSaving()), this, SLOT(duringSavePatientSlot()));
-	connect(patientService()->getPatientData().get(), SIGNAL(isLoading()), this, SLOT(duringLoadPatientSlot()));
-	connect(patientService()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
-	connect(patientService()->getPatientData().get(), SIGNAL(cleared()), this, SLOT(clearPatientSlot()));
+	connect(patientService().get(), SIGNAL(isSaving()), this, SLOT(duringSavePatientSlot()));
+	connect(patientService().get(), SIGNAL(isLoading()), this, SLOT(duringLoadPatientSlot()));
+	connect(patientService().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
+	connect(patientService().get(), SIGNAL(cleared()), this, SLOT(clearPatientSlot()));
 }
 
 ServiceController::~ServiceController()
@@ -61,7 +62,7 @@ ServiceController::~ServiceController()
 
 void ServiceController::patientChangedSlot()
 {
-	QString patientFolder = patientService()->getPatientData()->getActivePatientFolder();
+	QString patientFolder = patientService()->getActivePatientFolder();
 
 	QString loggingPath = patientFolder + "/Logs/";
 	QDir loggingDir(loggingPath);
@@ -69,10 +70,11 @@ void ServiceController::patientChangedSlot()
 	{
 		loggingDir.mkpath(loggingPath);
 	}
-	videoService()->getUSAcquisitionVideoPlayback()->setRoot(patientService()->getPatientData()->getActivePatientFolder() + "/US_Acq/");
+	videoService()->getUSAcquisitionVideoPlayback()->setRoot(patientService()->getActivePatientFolder() + "/US_Acq/");
 
 	trackingService()->setLoggingFolder(loggingPath);
 	reporter()->setLoggingFolder(loggingPath);
+	std::cout << "***************************** changedslot " << loggingPath << std::endl;
 }
 
 void ServiceController::clearPatientSlot()
@@ -83,7 +85,7 @@ void ServiceController::clearPatientSlot()
 
 void ServiceController::duringSavePatientSlot()
 {
-	QDomElement managerNode = patientService()->getPatientData()->getCurrentWorkingElement("managers");
+	QDomElement managerNode = patientService()->getCurrentWorkingElement("managers");
 
 	trackingService()->addXml(managerNode);
 	trackingService()->savePositionHistory();
@@ -93,7 +95,7 @@ void ServiceController::duringSavePatientSlot()
 
 void ServiceController::duringLoadPatientSlot()
 {
-	QDomElement managerNode = patientService()->getPatientData()->getCurrentWorkingElement("managers");
+	QDomElement managerNode = patientService()->getCurrentWorkingElement("managers");
 
 	QDomNode toolmanagerNode = managerNode.namedItem("toolManager");
 	trackingService()->parseXml(toolmanagerNode);

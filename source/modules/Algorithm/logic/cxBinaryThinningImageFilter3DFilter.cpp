@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSelectDataStringDataAdapter.h"
 #include "cxAlgorithmHelpers.h"
 #include "cxLegacySingletons.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
@@ -201,8 +202,9 @@ bool BinaryThinningImageFilter3DFilter::postProcess()
 	MeshPtr mesh = dataManager()->createMesh(centerlinePolyData, uid, name, "Images");
 	mesh->setColor(outputColor->getValue());
 	mesh->get_rMd_History()->setParentSpace(input->getUid());
-	dataManager()->loadData(mesh);
-	dataManager()->saveMesh(mesh, patientService()->getPatientData()->getActivePatientFolder());
+	patientService()->insertData(mesh);
+//	dataManager()->loadData(mesh);
+//	dataManager()->saveMesh(mesh, patientService()->getPatientData()->getActivePatientFolder());
 
 	// set output
 	mOutputTypes.front()->setValue(mesh->getUid());

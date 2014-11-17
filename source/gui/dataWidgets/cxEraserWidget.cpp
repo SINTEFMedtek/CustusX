@@ -62,6 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewWrapper.h"
 #include "cxViewGroup.h"
 #include "cxVolumeHelpers.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
@@ -172,11 +173,12 @@ void EraserWidget::continousRemoveSlot()
 void EraserWidget::duplicateSlot()
 {
 	ImagePtr original = dataManager()->getActiveImage();
-	QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
+//	QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
 
 	ImagePtr duplicate = duplicateImage(dataService(), original);
-	dataManager()->loadData(duplicate);
-	dataManager()->saveImage(duplicate, outputBasePath);
+	patientService()->insertData(duplicate);
+//	dataManager()->loadData(duplicate);
+//	dataManager()->saveImage(duplicate, outputBasePath);
 	dataManager()->setActiveImage(duplicate);
 
 	// replace viz of original with duplicate
@@ -203,10 +205,11 @@ void EraserWidget::sphereSizeChangedSlot()
  */
 void EraserWidget::saveSlot()
 {
-	ImagePtr image = dataManager()->getActiveImage();
-	QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
+	patientService()->insertData(dataManager()->getActiveImage());
+//	ImagePtr image = dataManager()->getActiveImage();
+//	QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
 
-	dataManager()->saveImage(image, outputBasePath);
+//	dataManager()->saveImage(image, outputBasePath);
 }
 
 

@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxAcquisitionData.h"
 #include "cxUsReconstructionService.h"
 #include "cxUSReconstructInputData.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
@@ -137,7 +138,7 @@ void USAcquisition::recordStopped()
 
 	mCore->set_rMpr(dataManager()->get_rMpr());
 	bool compress = settings()->value("Ultrasound/CompressAcquisition", true).toBool();
-	QString baseFolder = patientService()->getPatientData()->getActivePatientFolder();
+	QString baseFolder = patientService()->getActivePatientFolder();
 	mCore->startSaveData(baseFolder, compress);
 
 	mCore->clearRecording();

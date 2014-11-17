@@ -138,7 +138,7 @@ void TrackedCenterlineWidget::preprocessResampler()
 	ImagePtr image_d = converter.getOutput();
 
 	//extract the centerline
-	QString savepath = patientService()->getPatientData()->getActivePatientFolder();
+//	QString savepath = patientService()->getPatientData()->getActivePatientFolder();
 //	mCenterlineAlgorithm.setInput(image_d, savepath);
 	mRecordSessionWidget->setReady(false, "<font color=orange>Generating centerline... Please wait!</font>\n");
 }

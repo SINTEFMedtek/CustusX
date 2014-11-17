@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientData.h"
 #include "cxSelectDataStringDataAdapter.h"
 #include "cxDoubleDataAdapterXml.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
@@ -164,8 +165,9 @@ bool ResampleImageFilter::postProcess()
 	ImagePtr output = mRawResult;
 	mRawResult.reset();
 	//    output->resetTransferFunctions();
-	dataManager()->loadData(output);
-	dataManager()->saveImage(output, patientService()->getPatientData()->getActivePatientFolder());
+	patientService()->insertData(output);
+//	dataManager()->loadData(output);
+//	dataManager()->saveImage(output, patientService()->getPatientData()->getActivePatientFolder());
 
 	// set output
 	mOutputTypes.front()->setValue(output->getUid());

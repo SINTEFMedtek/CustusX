@@ -228,5 +228,30 @@ RegistrationHistoryPtr PatientModelServiceNull::get_rMpr_History() const
 	return RegistrationHistoryPtr();
 }
 
+CLINICAL_APPLICATION PatientModelServiceNull::getClinicalApplication() const
+{
+	return mdCOUNT;
+}
+
+void PatientModelServiceNull::setClinicalApplication(CLINICAL_APPLICATION application)
+{
+
+}
+
+void PatientModelServiceNull::newPatient(QString choosenDir)
+{
+}
+
+void PatientModelServiceNull::loadPatient(QString chosenDir)
+{
+}
+
+void PatientModelServiceNull::savePatient()
+{
+}
+
+void PatientModelServiceNull::clearPatient()
+{
+}
 
 } // cx

@@ -67,6 +67,16 @@ def try_lxml_import():
         raise
 
 def try_paramiko_import():
+    '''
+    paramiko dont install out of the box on mac 10.8. install crypto using:
+    http://stackoverflow.com/questions/19617686/trying-to-install-pycrypto-on-mac-osx-mavericks
+        sudo port install gmp
+        sudo ln -s  /opt/local/lib/libgmp.dylib  /usr/lib/libgmp.dylib  
+        ARCHFLAGS=-Wno-error CFLAGS=-I/opt/local/include sudo -E pip install pycrypto
+    Then install ecdsa:
+        sudo pip install ecdsa
+    
+    '''
     return try_module_import('paramiko')
     
     

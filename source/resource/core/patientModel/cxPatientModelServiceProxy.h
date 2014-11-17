@@ -76,6 +76,9 @@ public:
 	virtual ImagePtr getActiveImage() const;
 	virtual void setActiveImage(ImagePtr activeImage);
 
+	virtual CLINICAL_APPLICATION getClinicalApplication() const;
+	virtual void setClinicalApplication(CLINICAL_APPLICATION application);
+
 	virtual std::map<QString, VideoSourcePtr> getStreams() const;
 
 	virtual QString getActivePatientFolder() const;
@@ -83,6 +86,10 @@ public:
 	virtual DataPtr importData(QString fileName, QString &infoText);
 	virtual void exportPatient(bool niftiFormat);
 	virtual void removeData(QString uid);
+	virtual void newPatient(QString choosenDir);
+	virtual void loadPatient(QString chosenDir);
+	virtual void savePatient();
+	virtual void clearPatient();
 
 	virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const;
 

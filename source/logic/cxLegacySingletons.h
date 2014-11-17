@@ -42,7 +42,8 @@ class DataManager;
 class ViewManager;
 typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
 typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
-typedef boost::shared_ptr<class PatientService> PatientServicePtr;
+typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
+//typedef boost::shared_ptr<class PatientService> PatientServicePtr;
 typedef boost::shared_ptr<class DataManager> DataServicePtr;
 typedef boost::shared_ptr<class VideoServiceOld> VideoServiceOldPtr;
 typedef boost::shared_ptr<class ViewManager> VisualizationServiceOldPtr;
@@ -65,7 +66,7 @@ cxLogicManager_EXPORT SpaceProviderPtr spaceProvider();
 //cxLogicManager_EXPORT TrackingServiceOldPtr trackingService();
 cxLogicManager_EXPORT TrackingServicePtr trackingService();
 cxLogicManager_EXPORT DataServicePtr dataService();
-cxLogicManager_EXPORT PatientServicePtr patientService();
+cxLogicManager_EXPORT PatientModelServicePtr patientService();
 cxLogicManager_EXPORT VideoServiceOldPtr videoService();
 cxLogicManager_EXPORT StateServicePtr stateService();
 

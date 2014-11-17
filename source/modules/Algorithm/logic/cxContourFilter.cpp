@@ -55,6 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxThresholdPreview.h"
 #include "cxSelectDataStringDataAdapter.h"
 #include "cxLegacySingletons.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
@@ -344,8 +345,9 @@ MeshPtr ContourFilter::postProcess(vtkPolyDataPtr contour, ImagePtr base, QColor
 
 	output->setColor(color);
 
-	dataManager()->loadData(output);
-	dataManager()->saveData(output, patientService()->getPatientData()->getActivePatientFolder());
+	patientService()->insertData(output);
+//	dataManager()->loadData(output);
+//	dataManager()->saveData(output, patientService()->getPatientData()->getActivePatientFolder());
 
 	return output;
 }

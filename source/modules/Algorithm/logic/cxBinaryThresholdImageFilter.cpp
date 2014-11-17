@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImage.h"
 #include "cxSelectDataStringDataAdapter.h"
 #include "cxLegacySingletons.h"
-
+#include "cxPatientModelService.h"
 
 namespace cx
 {
@@ -241,8 +241,9 @@ bool BinaryThresholdImageFilter::postProcess()
 		return false;
 
 	output->resetTransferFunctions();
-	dataManager()->loadData(output);
-	dataManager()->saveImage(output, patientService()->getPatientData()->getActivePatientFolder());
+	patientService()->insertData(output);
+//	dataManager()->loadData(output);
+//	dataManager()->saveImage(output, patientService()->getPatientData()->getActivePatientFolder());
 
 	// set output
 	mOutputTypes.front()->setValue(output->getUid());

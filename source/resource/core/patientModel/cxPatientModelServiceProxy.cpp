@@ -269,4 +269,34 @@ RegistrationHistoryPtr PatientModelServiceProxy::get_rMpr_History() const
 	return mPatientModelService->get_rMpr_History();
 }
 
+CLINICAL_APPLICATION PatientModelServiceProxy::getClinicalApplication() const
+{
+	return mPatientModelService->getClinicalApplication();
+}
+
+void PatientModelServiceProxy::setClinicalApplication(CLINICAL_APPLICATION application)
+{
+	mPatientModelService->setClinicalApplication(application);
+}
+
+void PatientModelServiceProxy::newPatient(QString choosenDir)
+{
+	mPatientModelService->newPatient(choosenDir);
+}
+
+void PatientModelServiceProxy::loadPatient(QString chosenDir)
+{
+	mPatientModelService->loadPatient(chosenDir);
+}
+
+void PatientModelServiceProxy::savePatient()
+{
+	mPatientModelService->savePatient();
+}
+
+void PatientModelServiceProxy::clearPatient()
+{
+	mPatientModelService->clearPatient();
+}
+
 } //cx

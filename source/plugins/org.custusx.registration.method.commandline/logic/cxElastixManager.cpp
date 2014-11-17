@@ -86,13 +86,6 @@ void ElastixManager::execute()
 
 void ElastixManager::preprocessExecuter()
 {
-	// Not necessary - executer makes sure that file transform is read and deviations
-	// accounted for in t0.
-	//
-	// We MUST save the patient before registering.
-	// elastiX uses the Offset+TransformMatrix values, so they must be up to date.
-	//patientService()->getPatientData()->savePatient();
-
 	QStringList parameterFiles = mParameters->getActiveParameterFiles();
 	QString timestamp = QDateTime::currentDateTime().toString(timestampSecondsFormat());
 	QDir outDir(mServices.patientModelService->getActivePatientFolder()+"/elastix/"+timestamp);
