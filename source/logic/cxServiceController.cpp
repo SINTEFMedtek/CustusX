@@ -63,6 +63,8 @@ ServiceController::~ServiceController()
 void ServiceController::patientChangedSlot()
 {
 	QString patientFolder = patientService()->getActivePatientFolder();
+	if (patientFolder.isEmpty())
+		return;
 
 	QString loggingPath = patientFolder + "/Logs/";
 	QDir loggingDir(loggingPath);
@@ -74,7 +76,6 @@ void ServiceController::patientChangedSlot()
 
 	trackingService()->setLoggingFolder(loggingPath);
 	reporter()->setLoggingFolder(loggingPath);
-	std::cout << "***************************** changedslot " << loggingPath << std::endl;
 }
 
 void ServiceController::clearPatientSlot()

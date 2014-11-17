@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImage.h"
 #include "cxReporter.h"
 #include "cxLandmark.h"
+#include "cxRegistrationTransform.h"
 
 namespace cx
 {
@@ -224,8 +225,8 @@ QDomElement PatientModelServiceNull::getCurrentWorkingElement(QString path)
 
 RegistrationHistoryPtr PatientModelServiceNull::get_rMpr_History() const
 {
-	printWarning();
-	return RegistrationHistoryPtr();
+	printWarning();	
+	return RegistrationHistory::getNullObject();
 }
 
 CLINICAL_APPLICATION PatientModelServiceNull::getClinicalApplication() const
