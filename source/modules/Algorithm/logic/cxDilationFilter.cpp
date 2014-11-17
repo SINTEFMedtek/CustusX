@@ -48,8 +48,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMesh.h"
 #include "cxImage.h"
 #include "cxDataManager.h"
-#include "cxPatientService.h"
-#include "cxPatientData.h"
 #include "cxLegacySingletons.h"
 #include "cxPatientModelService.h"
 

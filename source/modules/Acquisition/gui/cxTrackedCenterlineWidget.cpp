@@ -41,10 +41,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewManager.h"
 #include "cxRepManager.h"
 #include "cxTrackingDataToVolume.h"
-#include "cxPatientData.h"
 #include "cxRecordSessionWidget.h"
 #include "cxTool.h"
-#include "cxPatientService.h"
 #include "cxReporter.h"
 #include "cxView.h"
 

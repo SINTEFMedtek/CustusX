@@ -37,8 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStringList>
 #include "cxTime.h"
 #include "cxAcquisitionData.h"
-#include "cxPatientService.h"
-#include "cxPatientData.h"
 
 #include "cxUSAcqusitionWidget.h"
 #include "cxTrackedCenterlineWidget.h"

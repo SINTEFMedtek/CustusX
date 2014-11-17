@@ -36,8 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QApplication>
 
 #include "cxDummyTool.h"
-#include "cxPatientData.h"
-#include "cxPatientService.h"
 #include "cxDataLocations.h"
 #include "cxVideoServiceOld.h"
 #include "cxVideoConnectionManager.h"

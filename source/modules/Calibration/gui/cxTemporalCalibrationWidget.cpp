@@ -42,7 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkPointData.h>
 #include "cxDoubleWidgets.h"
 #include "cxTypeConversions.h"
-#include "cxPatientData.h"
 #include "cxRecordSessionWidget.h"
 #include "cxSettings.h"
 #include "cxToolDataAdapters.h"
@@ -51,7 +50,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVolumeHelpers.h"
 #include "vtkImageCorrelation.h"
 #include "cxReporter.h"
-#include "cxPatientService.h"
 #include "cxPatientModelService.h"
 
 typedef vtkSmartPointer<vtkImageCorrelation> vtkImageCorrelationPtr;

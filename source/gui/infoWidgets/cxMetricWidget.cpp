@@ -58,8 +58,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTimeKeeper.h"
 #include "cxFrameMetricWrapper.h"
 #include "cxToolMetricWrapper.h"
-#include "cxPatientService.h"
-#include "cxPatientData.h"
 #include "cxTime.h"
 #include "cxMetricManager.h"
 #include "cxLogger.h"

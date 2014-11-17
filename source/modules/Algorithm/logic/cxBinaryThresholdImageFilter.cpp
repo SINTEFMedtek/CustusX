@@ -45,8 +45,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxDoublePairDataAdapterXml.h"
 
-#include "cxPatientService.h"
-#include "cxPatientData.h"
 #include "cxRepManager.h"
 #include "cxThresholdPreview.h"
 #include "cxContourFilter.h"

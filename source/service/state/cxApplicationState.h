@@ -45,8 +45,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReporter.h"
 #include "cxDataManager.h"
 #include "cxRequestEnterStateTransition.h"
-//#include "cxStateService.h"
-#include "cxPatientData.h"
 
 namespace cx
 {

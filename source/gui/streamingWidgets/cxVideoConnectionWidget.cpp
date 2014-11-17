@@ -54,8 +54,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVideoConnectionManager.h"
 #include "cxImageServer.h"
 #include "cxVideoServiceOld.h"
-#include "cxPatientService.h"
-#include "cxPatientData.h"
 #include "cxTrackingService.h"
 #include "cxViewManager.h"
 #include "cxFileInputWidget.h"

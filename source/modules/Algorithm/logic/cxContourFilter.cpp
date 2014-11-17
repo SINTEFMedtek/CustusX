@@ -49,8 +49,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDoubleDataAdapterXml.h"
 #include "cxBoolDataAdapterXml.h"
 #include "cxColorDataAdapterXml.h"
-#include "cxPatientData.h"
-#include "cxPatientService.h"
 #include "cxRepManager.h"
 #include "cxThresholdPreview.h"
 #include "cxSelectDataStringDataAdapter.h"

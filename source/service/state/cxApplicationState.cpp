@@ -42,8 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReporter.h"
 #include "cxDataManager.h"
 #include "cxStateService.h"
-#include "cxPatientData.h"
-#include "cxPatientService.h"
 #include "cxTrackingService.h"
 #include "cxWorkflowStateMachine.h"
 #include "cxStateServiceBackend.h"

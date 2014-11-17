@@ -37,8 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReporter.h"
 #include "cxLogicManager.h"
 #include "cxDataManager.h"
-#include "cxPatientData.h"
-#include "cxPatientService.h"
 #include "cxRegistrationTransform.h"
 
 namespace cx

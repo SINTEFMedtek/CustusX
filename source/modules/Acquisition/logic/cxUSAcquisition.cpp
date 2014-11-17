@@ -34,9 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxBoolDataAdapterXml.h"
 
-#include "cxPatientData.h"
 #include "cxSettings.h"
-#include "cxPatientService.h"
 #include "cxVideoServiceOld.h"
 #include "cxVideoConnectionManager.h"
 #include "cxTrackingService.h"

@@ -41,8 +41,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImage.h"
 #include "cxColorDataAdapterXml.h"
 #include "vesselReg/SeansVesselReg.hxx"
-#include "cxPatientService.h"
-#include "cxPatientData.h"
 #include "cxSelectDataStringDataAdapter.h"
 #include "cxAlgorithmHelpers.h"
 #include "cxLegacySingletons.h"

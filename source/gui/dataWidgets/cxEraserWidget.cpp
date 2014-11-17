@@ -55,8 +55,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImageAlgorithms.h"
 #include "cxDoubleWidgets.h"
 #include "cxImage.h"
-#include "cxPatientData.h"
-#include "cxPatientService.h"
 #include "cxInteractiveCropper.h"
 #include "cxViewManager.h"
 #include "cxViewWrapper.h"

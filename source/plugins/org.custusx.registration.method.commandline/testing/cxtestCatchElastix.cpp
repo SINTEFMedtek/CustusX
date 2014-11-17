@@ -50,8 +50,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTime.h"
 #include "cxDataLocations.h"
 #include "cxElastixExecuter.h"
-#include "cxPatientService.h"
-#include "cxPatientData.h"
 #include "cxSettings.h"
 #include "cxElastixSingleThreadedRunner.h"
 #include "cxTypeConversions.h"

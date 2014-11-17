@@ -33,8 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "catch.hpp"
 #include <ctkPluginContext.h>
 #include "cxDilationFilter.h"
-#include "cxPatientService.h"
-#include "cxPatientData.h"
 #include "cxDataLocations.h"
 #include "cxSelectDataStringDataAdapter.h"
 #include "cxData.h"

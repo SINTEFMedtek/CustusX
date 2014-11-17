@@ -63,8 +63,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataLocations.h"
 #include "cxInteractiveCropper.h"
 #include "vtkForwardDeclarations.h"
-#include "cxPatientService.h"
-#include "cxPatientData.h"
 #include "cxInteractiveClipper.h"
 #include "cxImage.h"
 #include "cxCameraStyle.h"

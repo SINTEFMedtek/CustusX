@@ -40,8 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxCoordinateSystemHelpers.h"
 #include "cxVolumeHelpers.h"
 #include "cxReporter.h"
-//#include "cxStateService.h"
-//#include "cxPatientData.h"
 
 #include "cxLegacySingletons.h"
 #include "cxSpaceProvider.h"

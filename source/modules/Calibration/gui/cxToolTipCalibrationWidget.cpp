@@ -45,8 +45,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLabeledComboBoxWidget.h"
 #include "cxDataLocations.h"
 #include "cxTool.h"
-//#include "cxStateService.h"
-#include "cxPatientData.h"
 
 #include "cxLegacySingletons.h"
 #include "cxSpaceProvider.h"

@@ -37,8 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackingService.h"
 #include "cxVideoServiceOld.h"
 #include "cxReporter.h"
-#include "cxPatientService.h"
-#include "cxPatientData.h"
 #include "cxTypeConversions.h"
 #include "cxPlaybackUSAcquisitionVideo.h"
 #include "cxViewManager.h"

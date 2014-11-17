@@ -33,9 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReconstructThreads.h"
 
 #include "cxImage.h"
-//#include "cxPatientService.h"
-//#include "cxPatientData.h"
-//#include "cxViewManager.h"
 #include "cxReconstructPreprocessor.h"
 #include "cxReconstructCore.h"
 #include "cxPatientModelService.h"
