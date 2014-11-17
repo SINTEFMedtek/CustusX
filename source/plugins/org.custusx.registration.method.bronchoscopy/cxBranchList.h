@@ -46,13 +46,15 @@ typedef std::vector< Eigen::Matrix4d > M4Vector;
 
 class BranchList
 {
-	std::vector<Branch*> Branches;
+	std::vector<Branch*> mBranches;
 public:
 	BranchList();
 	virtual ~BranchList();
 	void addBranch(Branch* b);
+	void deleteBranch(Branch* b);
 	std::vector<Branch*> getBranches();
 	void findBranchesInCenterline(Eigen::MatrixXd positions);
+	void selectGenerations(int maxGeneration);
 	void calculateOrientations();
 	void smoothOrientations();
 
