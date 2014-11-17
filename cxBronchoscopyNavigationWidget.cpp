@@ -42,6 +42,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelServiceProxy.h"
 #include "cxVisualizationServiceProxy.h"
 #include "cxBronchoscopePositionProjection.h"
+#include "cxDataAdapterHelper.h"
+#include "cxDoubleDataAdapterXml.h"
+#include "cxDataLocations.h"
 
 namespace cx
 {
@@ -50,6 +53,8 @@ BronchoscopyNavigationWidget::BronchoscopyNavigationWidget(ctkPluginContext *con
     QWidget(parent),
     mVerticalLayout(new QVBoxLayout(this))
 {
+	mOptions = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("bronchoscopynavigationwidget");
+
 	mPatientModelService = PatientModelServicePtr(new PatientModelServiceProxy(context));
 	mVisualizationService = VisualizationServicePtr(new VisualizationServiceProxy(context));
 	mTrackingService = TrackingServiceProxy::create(context);
@@ -62,6 +67,10 @@ BronchoscopyNavigationWidget::BronchoscopyNavigationWidget(ctkPluginContext *con
 	mSelectMeshWidget = SelectMeshStringDataAdapter::New(mPatientModelService);
 	mSelectMeshWidget->setValueName("Centerline: ");
 
+	//mSelectMaxDistanceWidget =
+	mProjectionCenterlinePtr = BronchoscopePositionProjectionPtr(new BronchoscopePositionProjection());
+	mProjectionCenterlinePtr->createMaxDistanceToCenterlineOption(mOptions.getElement());
+
 	mEnableButton = new QPushButton("Enable", this);
 	connect(mEnableButton, SIGNAL(clicked()), this, SLOT(enableSlot()));
 	mEnableButton->setToolTip(this->defaultWhatsThis());
@@ -71,9 +80,10 @@ BronchoscopyNavigationWidget::BronchoscopyNavigationWidget(ctkPluginContext *con
 	mDisableButton->setToolTip(this->defaultWhatsThis());
 
 
+	DataAdapterPtr maxDistanceToCenterline = mProjectionCenterlinePtr->getMaxDistanceToCenterlineOption();
 
 	mVerticalLayout->addWidget(new DataSelectWidget(mVisualizationService, mPatientModelService, this, mSelectMeshWidget));
-//    mVerticalLayout->addWidget(mTrackedCenterLine);
+	mVerticalLayout->addWidget(createDataWidget(mVisualizationService, mPatientModelService, this, maxDistanceToCenterline));
 	mVerticalLayout->addWidget(mEnableButton);
 	mVerticalLayout->addWidget(mDisableButton);
 	mVerticalLayout->addStretch();
@@ -107,12 +117,13 @@ void BronchoscopyNavigationWidget::enableSlot()
 
 	//Eigen::MatrixXd CLpoints = getCenterlinePositions(centerline, rMd);
 
-    float maxDistanceToCenterline = 30; //mm - Max distance from tool to closest centerline for projection to centerline to be performed.
+	//float maxDistanceToCenterline = 30; //mm - Max distance from tool to closest centerline for projection to centerline to be performed.
 
-    BronchoscopePositionProjectionPtr projectionCenterline = BronchoscopePositionProjectionPtr(new BronchoscopePositionProjection(centerline, prMd));
+	//BronchoscopePositionProjectionPtr projectionCenterlinePtr = BronchoscopePositionProjectionPtr(new BronchoscopePositionProjection(centerline, prMd));
+	mProjectionCenterlinePtr->setCenterline(centerline, prMd);
 	if (!mTrackingSystem)
 	{
-		mTrackingSystem = TrackingSystemBronchoscopyServicePtr(new TrackingSystemBronchoscopyService(mTrackingService, projectionCenterline, maxDistanceToCenterline));
+		mTrackingSystem = TrackingSystemBronchoscopyServicePtr(new TrackingSystemBronchoscopyService(mTrackingService, mProjectionCenterlinePtr));
 		mTrackingService->unInstallTrackingSystem(mTrackingSystem->getBase());
 		mTrackingService->installTrackingSystem(mTrackingSystem);
 	}

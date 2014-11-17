@@ -61,7 +61,7 @@ class org_custusx_bronchoscopynavigation_EXPORT TrackingSystemBronchoscopyServic
 Q_OBJECT
 
 public:
-	TrackingSystemBronchoscopyService(TrackingServicePtr trackingService, BronchoscopePositionProjectionPtr projectionCenterline, float maxDistanceToCenterline);
+	TrackingSystemBronchoscopyService(TrackingServicePtr trackingService, BronchoscopePositionProjectionPtr projectionCenterline);
 	virtual ~TrackingSystemBronchoscopyService();
 
 	virtual QString getUid() const { return "org.custusx.bronchoscopynavigation"; }
@@ -87,7 +87,6 @@ private:
 	TrackingSystemServicePtr mBase;
 	TrackingServicePtr mTrackingService;
 	BronchoscopePositionProjectionPtr mProjectionCenterline;
-	float mMaxDistanceToCenterline;
 };
 
 

@@ -46,11 +46,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-TrackingSystemBronchoscopyService::TrackingSystemBronchoscopyService(TrackingServicePtr trackingService, BronchoscopePositionProjectionPtr projectionCenterline, float maxDistanceToCenterline):
+TrackingSystemBronchoscopyService::TrackingSystemBronchoscopyService(TrackingServicePtr trackingService, BronchoscopePositionProjectionPtr projectionCenterline):
 	mBase(trackingService->getTrackingSystems().front()),
 	mTrackingService(trackingService),
-	mProjectionCenterline(projectionCenterline),
-	mMaxDistanceToCenterline(maxDistanceToCenterline)
+	mProjectionCenterline(projectionCenterline)
 {
 	connect(mBase.get(), &TrackingSystemService::stateChanged, this, &TrackingSystemBronchoscopyService::onStateChanged);
 	this->onStateChanged();
@@ -70,7 +69,7 @@ void TrackingSystemBronchoscopyService::onStateChanged()
 	{
 		if (tools[i] == activeTool)
 		{
-			BronchoscopyToolPtr current(new BronchoscopyTool(tools[i], mProjectionCenterline, mMaxDistanceToCenterline));
+			BronchoscopyToolPtr current(new BronchoscopyTool(tools[i], mProjectionCenterline));
 			mTools.push_back(current);
 		}
 		else

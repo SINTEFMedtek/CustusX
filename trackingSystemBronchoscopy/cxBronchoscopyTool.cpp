@@ -33,15 +33,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxBronchoscopyTool.h"
 #include "cxTypeConversions.h"
 #include "cxBronchoscopePositionProjection.h"
+#include "cxDoubleDataAdapterXml.h"
 
 namespace cx
 {
 
-BronchoscopyTool::BronchoscopyTool(ToolPtr base, BronchoscopePositionProjectionPtr projectionCenterline, float maxDistanceToCenterline) :
+BronchoscopyTool::BronchoscopyTool(ToolPtr base, BronchoscopePositionProjectionPtr projectionCenterline) :
 	ToolImpl(base->getUid(), "Bronchoscopy Navigation "+base->getName()),
 	mBase(base),
-	mProjectionCenterline(projectionCenterline),
-	mMaxDistanceToCenterline(maxDistanceToCenterline)
+	mProjectionCenterline(projectionCenterline)
 {
 	connect(mBase.get(), &Tool::toolProbeSector, this, &Tool::toolProbeSector);
 	connect(mBase.get(), &Tool::tooltipOffset, this, &Tool::tooltipOffset);
@@ -63,7 +63,8 @@ std::set<Tool::Type> BronchoscopyTool::getTypes() const
 
 void BronchoscopyTool::onToolTransformAndTimestamp(Transform3D prMt, double timestamp)
 {
-	m_prMt = mProjectionCenterline->findClosestPoint(prMt,mMaxDistanceToCenterline);
+	double maxDistanceToCenterline = mProjectionCenterline->getMaxDistanceToCenterlineOption()->getValue();
+	m_prMt = mProjectionCenterline->findClosestPoint(prMt,maxDistanceToCenterline);
 
 	emit toolTransformAndTimestamp(m_prMt, timestamp);
 }

@@ -55,7 +55,7 @@ class org_custusx_bronchoscopynavigation_EXPORT BronchoscopyTool: public ToolImp
 {
 Q_OBJECT
 public:
-	explicit BronchoscopyTool(ToolPtr base, BronchoscopePositionProjectionPtr	projectionCenterline, float maxDistanceToCenterline);
+	explicit BronchoscopyTool(ToolPtr base, BronchoscopePositionProjectionPtr	projectionCenterline);
 	virtual ~BronchoscopyTool();
 	virtual std::set<Type> getTypes() const;
 	virtual vtkPolyDataPtr getGraphicsPolyData() const;
@@ -89,7 +89,6 @@ private:
 	ToolPtr mBase;
 	Transform3D m_prMt;
 	BronchoscopePositionProjectionPtr mProjectionCenterline;
-	float mMaxDistanceToCenterline;
 
 private slots:
 	void onToolTransformAndTimestamp(Transform3D matrix, double timestamp);
