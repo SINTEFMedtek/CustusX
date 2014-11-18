@@ -88,9 +88,4 @@ void DataManager::setActiveImage(ImagePtr activeImage)
 {
 } ///< used for system state
 
-//DataServicePtr dataManager()
-//{
-//	return DataManager::getInstance();
-//}
-
 } // namespace cx

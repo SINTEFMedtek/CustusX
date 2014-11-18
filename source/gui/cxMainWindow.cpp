@@ -40,7 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "boost/bind.hpp"
 #include "cxTime.h"
 #include "cxReporter.h"
-#include "cxDataManager.h"
 #include "cxViewManager.h"
 #include "cxRepManager.h"
 #include "cxTrackingService.h"

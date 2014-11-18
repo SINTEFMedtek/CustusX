@@ -188,7 +188,10 @@ bool BinaryThinningImageFilter3DFilter::postProcess()
 
 	ImagePtr input = this->getCopiedInputImage();
 
-	ImagePtr outImage = dataManager()->createDerivedImage(mRawResult,input->getUid() + "_cl_temp%1", input->getName()+" cl_temp%1", input);
+	ImagePtr outImage = patientService()->createSpecificData<Image>(input->getUid() + "_cl_temp%1", input->getName()+" cl_temp%1");
+	outImage->intitializeFromParentImage(input);
+	outImage->setVtkImageData(mRawResult);
+
 	mRawResult = NULL;
 	outImage->resetTransferFunctions();
 
@@ -197,12 +200,11 @@ bool BinaryThinningImageFilter3DFilter::postProcess()
 
 	QString uid = input->getUid() + "_cl%1";
 	QString name = input->getName()+" cl%1";
-	MeshPtr mesh = dataManager()->createMesh(centerlinePolyData, uid, name, "Images");
+	MeshPtr mesh = patientService()->createSpecificData<Mesh>(uid, name);
+	mesh->setVtkPolyData(centerlinePolyData);
 	mesh->setColor(outputColor->getValue());
 	mesh->get_rMd_History()->setParentSpace(input->getUid());
 	patientService()->insertData(mesh);
-//	dataManager()->loadData(mesh);
-//	dataManager()->saveMesh(mesh, patientService()->getPatientData()->getActivePatientFolder());
 
 	// set output
 	mOutputTypes.front()->setValue(mesh->getUid());

@@ -37,7 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLabeledComboBoxWidget.h"
 #include "cxTypeConversions.h"
 #include "cxSettings.h"
-#include "cxDataManager.h"
 #include "cxImage.h"
 #include "cxLegacySingletons.h"
 #include "cxSpaceProvider.h"

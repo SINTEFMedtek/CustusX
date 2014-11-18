@@ -199,7 +199,8 @@ bool DilationFilter::execute() {
     return true;
 }
 
-bool DilationFilter::postProcess() {
+bool DilationFilter::postProcess()
+{
 	if (!mRawResult)
 		return false;
 
@@ -210,15 +211,15 @@ bool DilationFilter::postProcess() {
 
 	QString uid = input->getUid() + "_seg%1";
 	QString name = input->getName()+" seg%1";
-	ImagePtr output = dataManager()->createDerivedImage(mRawResult,uid, name, input);
+	ImagePtr output = patientService()->createSpecificData<Image>(uid, name);
+	output->intitializeFromParentImage(input);
+	output->setVtkImageData(mRawResult);
 	mRawResult = NULL;
 	if (!output)
 		return false;
 
 	output->resetTransferFunctions();
 	patientService()->insertData(output);
-//	dataManager()->loadData(output);
-//	dataManager()->saveImage(output, patientService()->getPatientData()->getActivePatientFolder());
 
 	// set output
 	mOutputTypes.front()->setValue(output->getUid());

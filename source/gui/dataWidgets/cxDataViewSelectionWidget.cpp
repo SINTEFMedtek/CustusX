@@ -31,7 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include <cxDataViewSelectionWidget.h>
 #include "cxToolListWidget.h"
-#include "cxDataManager.h"
 #include "cxData.h"
 #include <QListWidgetItem>
 #include <QDir>

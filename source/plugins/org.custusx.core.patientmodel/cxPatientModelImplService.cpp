@@ -258,7 +258,7 @@ PresetTransferFunctions3DPtr PatientModelImplService::getPresetTransferFunctions
 
 void PatientModelImplService::setCenter(const Vector3D &center)
 {
-	dataManager()->setCenter(center);
+	logicManager()->getDataService()->setCenter(center);
 }
 
 QString PatientModelImplService::addLandmark()
@@ -278,7 +278,7 @@ QDomElement cx::PatientModelImplService::getCurrentWorkingElement(QString path)
 
 RegistrationHistoryPtr PatientModelImplService::get_rMpr_History() const
 {
-	return dataManager()->get_rMpr_History();
+	return logicManager()->getDataService()->get_rMpr_History();
 }
 
 } /* namespace cx */

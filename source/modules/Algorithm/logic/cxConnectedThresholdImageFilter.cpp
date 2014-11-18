@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataManager.h"
 #include "cxRegistrationTransform.h"
 #include "cxImage.h"
+#include "cxPatientModelService.h"
 
 
 namespace cx
@@ -77,24 +78,23 @@ void ConnectedThresholdImageFilter::postProcessingSlot()
 	//get the result from the thread
 	vtkImageDataPtr rawResult = this->getResult();
 
+	if(!rawResult)
+	{
+		reportError("Segmentation failed.");
+		return;
+	}
+
 	//generate a new name and unique id for the newly created object
 	QString uid = mInput->getUid() + "_seg%1";
 	QString name = mInput->getName()+" seg%1";
 
 	//create a Image
-	mOutput = dataManager()->createDerivedImage(rawResult,uid, name, mInput);
-	if(!mOutput)
-	{
-		reportError("Segmentation failed.");
-		return;
-	}
+	mOutput = patientService()->createSpecificData<Image>(uid, name);
+	mOutput->intitializeFromParentImage(mInput);
+	mOutput->setVtkImageData(rawResult);
 	mOutput->resetTransferFunctions();
 
-	//load the image into CustusX for visualization
-	dataManager()->loadData(mOutput);
-
-	//save the data to file
-	dataManager()->saveImage(mOutput, mOutputBasePath);
+	patientService()->insertData(mOutput);
 
 	//let the user know you are finished
 	reportSuccess("Done segmenting: \"" + mOutput->getName()+"\"");

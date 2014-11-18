@@ -39,7 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVideoConnectionManager.h"
 #include "cxTrackingService.h"
 #include "cxUSSavingRecorder.h"
-#include "cxDataManager.h"
 #include "cxAcquisitionData.h"
 #include "cxUsReconstructionService.h"
 #include "cxUSReconstructInputData.h"
@@ -134,7 +133,7 @@ void USAcquisition::recordStopped()
 
 	this->sendAcquisitionDataToReconstructer();
 
-	mCore->set_rMpr(dataManager()->get_rMpr());
+	mCore->set_rMpr(patientService()->get_rMpr());
 	bool compress = settings()->value("Ultrasound/CompressAcquisition", true).toBool();
 	QString baseFolder = patientService()->getActivePatientFolder();
 	mCore->startSaveData(baseFolder, compress);
@@ -151,7 +150,7 @@ void USAcquisition::recordCancelled()
 
 void USAcquisition::sendAcquisitionDataToReconstructer()
 {
-	mCore->set_rMpr(dataManager()->get_rMpr());
+	mCore->set_rMpr(patientService()->get_rMpr());
 
 	VideoSourcePtr activeVideoSource = videoService()->getActiveVideoSource();
 	if (activeVideoSource)

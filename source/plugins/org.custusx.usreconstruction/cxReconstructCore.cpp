@@ -131,8 +131,6 @@ void ReconstructCore::threadedPostReconstruct()
 										.arg(mInput.mAngio));
 
 		mPatientModelService->insertData(mOutput);
-//		mPatientModelService->loadData(mOutput);
-//		mPatientModelService->saveImage(mOutput, mInput.mOutputBasePath);
 	}
 	else
 	{

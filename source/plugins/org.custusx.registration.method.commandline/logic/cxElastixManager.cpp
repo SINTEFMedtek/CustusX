@@ -169,20 +169,11 @@ void ElastixManager::addNonlinearData()
 	ImagePtr nlVolume = mServices.patientModelService->createSpecificData<Image>(uid, name);
 	nlVolume->setVtkImageData(raw->getBaseVtkImageData());
 	nlVolume->intitializeFromParentImage(movingImage);
-//	ImagePtr nlVolume = mServices.patientModelService->createDerivedImage(raw->getBaseVtkImageData(), uid, name, movingImage);
-
-//	if (!nlVolume)
-//	{
-//		report(QString("Failed to import nonlinear volume %1").arg(nonlinearVolumeFilename));
-//		return;
-//	}
 
 	// volume is resampled into the space of the fixed data:
 	nlVolume->get_rMd_History()->setRegistration(mServices.registrationService->getFixedData()->get_rMd());
 
 	mServices.patientModelService->insertData(nlVolume);
-//	mServices.patientModelService->loadData(nlVolume);
-//	mServices.patientModelService->saveImage(nlVolume, mServices.patientModelService->getActivePatientFolder());
 
 	report(QString("Added volume %1, created by a nonlinear transform").arg(nlVolume->getName()));
 }

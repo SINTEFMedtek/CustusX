@@ -152,15 +152,16 @@ bool SmoothingImageFilter::postProcess()
 
 	QString uid = input->getUid() + "_sm%1";
 	QString name = input->getName()+" sm%1";
-	ImagePtr output = dataManager()->createDerivedImage(mRawResult,uid, name, input);
+	ImagePtr output = patientService()->createSpecificData<Image>(uid, name);
+	output->intitializeFromParentImage(input);
+	output->setVtkImageData(mRawResult);
+
+
 	mRawResult = NULL;
 	if (!output)
 		return false;
 
-	//    output->resetTransferFunctions();
 	patientService()->insertData(output);
-//	dataManager()->loadData(output);
-//	dataManager()->saveImage(output, patientService()->getPatientData()->getActivePatientFolder());
 
 	// set output
 	mOutputTypes.front()->setValue(output->getUid());

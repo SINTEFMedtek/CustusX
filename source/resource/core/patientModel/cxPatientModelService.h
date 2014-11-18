@@ -101,6 +101,19 @@ public:
 	virtual void removeData(QString uid) = 0;
 
 	// extended Data interface
+	template <class DATA>
+	std::map<QString, boost::shared_ptr<DATA> > getDataOfType() const
+	{
+		std::map<QString, DataPtr> data = this->getData();
+		std::map<QString, boost::shared_ptr<DATA> > retval;
+		for (std::map<QString, DataPtr>::const_iterator i=data.begin(); i!=data.end(); ++i)
+		{
+			boost::shared_ptr<DATA> val = boost::dynamic_pointer_cast<DATA>(i->second);
+			if (val)
+				retval[val->getUid()] = val;
+		}
+		return retval;
+	}
 	DataPtr getData(const QString& uid) const;
 	template <class DATA>
 	boost::shared_ptr<DATA> getData(const QString& uid) const

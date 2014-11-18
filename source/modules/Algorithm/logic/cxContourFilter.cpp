@@ -175,7 +175,7 @@ void ContourFilter::setActive(bool on)
 
 void ContourFilter::imageChangedSlot(QString uid)
 {
-	ImagePtr image = dataManager()->getImage(uid);
+	ImagePtr image = patientService()->getData<Image>(uid);
 	if(!image)
 		return;
 
@@ -334,7 +334,8 @@ MeshPtr ContourFilter::postProcess(vtkPolyDataPtr contour, ImagePtr base, QColor
 
 	QString uid = base->getUid() + "_ge%1";
 	QString name = base->getName()+" ge%1";
-	MeshPtr output = dataManager()->createMesh(contour, uid, name, "");
+	MeshPtr output = patientService()->createSpecificData<Mesh>(uid, name);
+	output->setVtkPolyData(contour);
 	if (!output)
 		return MeshPtr();
 
@@ -344,8 +345,6 @@ MeshPtr ContourFilter::postProcess(vtkPolyDataPtr contour, ImagePtr base, QColor
 	output->setColor(color);
 
 	patientService()->insertData(output);
-//	dataManager()->loadData(output);
-//	dataManager()->saveData(output, patientService()->getPatientData()->getActivePatientFolder());
 
 	return output;
 }

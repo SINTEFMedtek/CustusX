@@ -162,10 +162,7 @@ bool ResampleImageFilter::postProcess()
 
 	ImagePtr output = mRawResult;
 	mRawResult.reset();
-	//    output->resetTransferFunctions();
 	patientService()->insertData(output);
-//	dataManager()->loadData(output);
-//	dataManager()->saveImage(output, patientService()->getPatientData()->getActivePatientFolder());
 
 	// set output
 	mOutputTypes.front()->setValue(output->getUid());

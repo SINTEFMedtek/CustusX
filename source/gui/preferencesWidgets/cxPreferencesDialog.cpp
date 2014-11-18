@@ -57,9 +57,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxDummyTool.h"
 
-//TODO: remove
-#include "cxDataManager.h"
-
 namespace cx
 {
 
@@ -607,7 +604,7 @@ void DebugTab::runDebugToolSlot()
 	if (!patientService()->getData().size())
 		return;
 
-	cx::ImagePtr image = dataManager()->getImages().begin()->second;
+	cx::ImagePtr image = patientService()->getDataOfType<Image>().begin()->second;
 	cx::DoubleBoundingBox3D bb_r = transform(image->get_rMd(), image->boundingBox());
 
 	patientService()->setCenter(bb_r.center());

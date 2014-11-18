@@ -54,11 +54,13 @@ Mesh::Mesh(const QString& uid, const QString& name) :
 	Data(uid, name), mVtkPolyData(vtkPolyDataPtr::New()), mWireframe(false), mBackfaceCulling(false), mFrontfaceCulling(false)
 {
 	mColor = QColor(255, 0, 0, 255);
+	this->setAcquisitionTime(QDateTime::currentDateTime());
 }
 Mesh::Mesh(const QString& uid, const QString& name, const vtkPolyDataPtr& polyData) :
 	Data(uid, name), mVtkPolyData(polyData), mWireframe(false), mBackfaceCulling(false), mFrontfaceCulling(false)
 {
 	mColor = QColor(255, 0, 0, 255);
+	this->setAcquisitionTime(QDateTime::currentDateTime());
 }
 Mesh::~Mesh()
 {

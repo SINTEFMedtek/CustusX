@@ -265,6 +265,8 @@ void DataManagerImpl::loadData(DataPtr data)
 
 	if (data)
 	{
+		if (mData.count(data->getUid()) && mData[data->getUid()]!=data)
+			reportError(QString("Overwriting Data with uid=%1 with new object into PasM").arg(data->getUid()));
 //		this->verifyParentFrame(data);
 		mData[data->getUid()] = data;
 		emit dataAddedOrRemoved();

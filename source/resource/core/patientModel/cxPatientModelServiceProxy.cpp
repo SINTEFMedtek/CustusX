@@ -174,41 +174,6 @@ void PatientModelServiceProxy::setDebugMode(bool on)
 	mPatientModelService->setDebugMode(on);
 }
 
-//cx::ImagePtr cx::PatientModelServiceProxy::createDerivedImage(vtkImageDataPtr data, QString uid, QString name, cx::ImagePtr parentImage, QString filePath)
-//{
-//	return mPatientModelService->createDerivedImage(data, uid, name, parentImage, filePath);
-//}
-
-//MeshPtr PatientModelServiceProxy::createMesh(vtkPolyDataPtr data, QString uidBase, QString nameBase, QString filePath)
-//{
-//	return mPatientModelService->createMesh(data, uidBase, nameBase, filePath);
-//}
-
-//ImagePtr PatientModelServiceProxy::createImage(vtkImageDataPtr data, QString uidBase, QString nameBase, QString filePath)
-//{
-//	return mPatientModelService->createImage(data, uidBase, nameBase, filePath);
-//}
-
-//void PatientModelServiceProxy::loadData(DataPtr data)
-//{
-//	mPatientModelService->loadData(data);
-//}
-
-//void PatientModelServiceProxy::saveData(DataPtr data, const QString &basePath)
-//{
-//	mPatientModelService->saveData(data, basePath);
-//}
-
-//void PatientModelServiceProxy::saveImage(ImagePtr image, const QString &basePath)
-//{
-//	mPatientModelService->saveImage(image, basePath);
-//}
-
-//void PatientModelServiceProxy::saveMesh(MeshPtr mesh, const QString &basePath)
-//{
-//	mPatientModelService->saveMesh(mesh, basePath);
-//}
-
 std::map<QString, VideoSourcePtr> PatientModelServiceProxy::getStreams() const
 {
 	return mPatientModelService->getStreams();

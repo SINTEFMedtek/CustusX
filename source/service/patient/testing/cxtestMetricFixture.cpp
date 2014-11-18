@@ -57,7 +57,7 @@ MetricFixture::~MetricFixture()
 
 cx::DataServicePtr MetricFixture::getDataManager()
 {
-	return mServices->dataService();//return cx::dataManager();
+	return mServices->dataService();
 }
 
 cx::SpaceProviderPtr MetricFixture::getSpaceProvider()

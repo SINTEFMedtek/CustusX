@@ -45,7 +45,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationTransform.h"
 #include "cxImageAlgorithms.h"
 #include "cxInteractiveCropper.h"
-#include "cxDataManager.h"
 #include "cxImage.h"
 #include "cxLogicManager.h"
 #include "cxPatientModelService.h"

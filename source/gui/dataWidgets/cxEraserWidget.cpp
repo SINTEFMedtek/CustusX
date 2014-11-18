@@ -48,7 +48,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxStringDataAdapter.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxDefinitionStrings.h"
-#include "cxDataManager.h"
 #include "cxUtilHelpers.h"
 #include "cxReporter.h"
 #include "cxRegistrationTransform.h"

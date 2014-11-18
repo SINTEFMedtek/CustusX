@@ -35,7 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTextEdit>
 #include <QTimer>
 
-#include "cxDataManager.h"
 #include "cxDummyTool.h"
 #include "cxTypeConversions.h"
 #include "cxData.h"
@@ -48,11 +47,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogicManager.h"
 #include "cxWorkflowStateMachine.h"
 
-
 #include "cxClippingWidget.h"
 #include "cxInteractiveClipper.h"
 #include "cxViewManager.h"
-#include "cxDataManager.h"
 #include "cxSettings.h"
 #include "cxPatientModelService.h"
 
@@ -101,13 +98,13 @@ void CustusXController::loadPatientSlot()
   cx::stateService()->getWorkflow()->setActiveState("NavigationUid");
   mMainWindow->setGeometry( 0, 0, 2560, 1440);
 
-  if (!cx::dataService()->getImages().size())
+  if (!cx::patientService()->getDataOfType<cx::Image>().size())
 		return;
 
-  cx::ImagePtr image = cx::dataService()->getImages().begin()->second;
+  cx::ImagePtr image = cx::patientService()->getDataOfType<cx::Image>().begin()->second;
   cx::DoubleBoundingBox3D bb_r = transform(image->get_rMd(), image->boundingBox());
 
-  cx::dataService()->setCenter(bb_r.center());
+  cx::patientService()->setCenter(bb_r.center());
 
   std::vector<cx::TrackingSystemServicePtr> systems = cx::trackingService()->getTrackingSystems();
   for (unsigned i=0; i<systems.size(); ++i)
@@ -124,14 +121,12 @@ void CustusXController::enableSlicingSlot()
 		cx::InteractiveClipperPtr interactiveClipper = cx::viewManager()->getClipper();
 		interactiveClipper->setSlicePlane(cx::ptAXIAL);
 
-	//	ImagePtr image = dataManager()->getActiveImage();
-		std::map<QString, cx::ImagePtr> imageMap = cx::dataManager()->getImages();
+		std::map<QString, cx::ImagePtr> imageMap = cx::patientService()->getDataOfType<cx::Image>();
 		if(!imageMap.empty())
 		{
 			cx::ImagePtr image = imageMap.begin()->second;
 			interactiveClipper->setImage(image);
 			interactiveClipper->useClipper(true);
-//			std::cout << "clip in image: " << image->getName()  << std::endl;
 		}
 		else
 			std::cout << "No images!!!"  << std::endl;

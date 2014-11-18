@@ -34,7 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QVBoxLayout>
 #include "cxTrackingService.h"
-#include "cxDataManager.h"
 #include "cxMeshHelpers.h"
 #include "cxToolRep3D.h"
 #include "cxToolTracer.h"

@@ -45,7 +45,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReporter.h"
 #include "cxTypeConversions.h"
 #include "cxData.h"
-#include "cxDataManager.h"
 #include "cxRegistrationTransform.h"
 #include "cxImageAlgorithms.h"
 #include "cxImage.h"

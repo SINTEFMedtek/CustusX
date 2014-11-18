@@ -154,14 +154,6 @@ void VideoSourceGraphics::setRealtimeStream(VideoSourcePtr data)
 	{
 		connect(mData.get(), SIGNAL(newFrame()), this, SLOT(newDataSlot()));
 		mPipeline->setInputVideo(mData->getVtkImageData());
-
-//		//Only add image in dataManager once
-//		mImage = dataManager()->getImage("4D US");
-//		if(!mImage)
-//		{
-////			mImage = dataManager()->createImage(mDataRedirecter->GetOutput(), "4D US", mData->getName());
-////			dataManager()->loadData(boost::dynamic_pointer_cast<Data>(mImage));//Uncomment to test unstable 4D US
-//		}
 	}
 
 	this->newDataSlot();
