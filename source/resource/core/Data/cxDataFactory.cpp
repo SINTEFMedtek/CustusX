@@ -66,7 +66,8 @@ DataFactory::DataFactory(DataServicePtr dataManager, SpaceProviderPtr spaceProvi
 
 DataPtr DataFactory::create(QString type, QString uid, QString name)
 {
-	mDataManager->generateUidAndName(&uid, &name);
+	if (mDataManager)
+		mDataManager->generateUidAndName(&uid, &name);
 
 	CREATE_IF_MATCH(type, Image);
 	CREATE_IF_MATCH(type, Mesh);

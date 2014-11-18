@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSpaceProviderImpl.h"
 #include "cxReporter.h"
 #include "cxSharedPointerChecker.h"
+#include "cxtestPatientModelServiceMock.h"
 
 namespace cxtest
 {
@@ -59,6 +60,7 @@ TestServicesType createDummyCoreServices()
 	dataService->setDataFactory(dataFactory);
 
 	TestServicesType retval;
+	retval.mPatientModelService.reset(new PatientModelServiceMock());
 	retval.mDataFactory = dataFactory;
 	retval.mDataService = dataService;
 	retval.mSpaceProvider = spaceProvider;

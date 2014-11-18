@@ -53,7 +53,6 @@ public:
 	virtual void insertData(DataPtr data);
 	virtual DataPtr createData(QString type, QString uid, QString name="");
 	virtual std::map<QString, DataPtr> getData() const;
-	virtual DataPtr getData(const QString& uid) const;
 
 	virtual LandmarksPtr getPatientLandmarks() const;
 	virtual std::map<QString, LandmarkProperty> getLandmarkProperties() const;
@@ -68,14 +67,6 @@ public:
 	virtual CLINICAL_APPLICATION getClinicalApplication() const;
 	virtual void setClinicalApplication(CLINICAL_APPLICATION application);
 
-	virtual ImagePtr createDerivedImage(vtkImageDataPtr data, QString uid, QString name, ImagePtr parentImage, QString filePath);
-	virtual MeshPtr createMesh(vtkPolyDataPtr data, QString uidBase, QString nameBase, QString filePath);
-	virtual ImagePtr createImage(vtkImageDataPtr data, QString uidBase, QString nameBase, QString filePath);
-
-	virtual void loadData(DataPtr data);
-	virtual void saveData(DataPtr data, const QString& basePath); ///< Save data to file
-	virtual void saveImage(ImagePtr image, const QString& basePath);
-	virtual void saveMesh(MeshPtr mesh, const QString& basePath);
 	virtual std::map<QString, cx::VideoSourcePtr> getStreams() const;
 
 	virtual QString getActivePatientFolder() const;

@@ -171,7 +171,7 @@ void EraserWidget::duplicateSlot()
 {
 	ImagePtr original = patientService()->getActiveImage();
 
-	ImagePtr duplicate = duplicateImage(dataService(), original);
+	ImagePtr duplicate = duplicateImage(patientService(), original);
 	patientService()->insertData(duplicate);
 	patientService()->setActiveImage(duplicate);
 

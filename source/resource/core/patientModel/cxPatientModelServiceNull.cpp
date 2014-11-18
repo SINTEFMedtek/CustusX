@@ -61,11 +61,6 @@ std::map<QString, DataPtr> PatientModelServiceNull::getData() const
 	return retval;
 }
 
-DataPtr PatientModelServiceNull::getData(const QString& uid) const
-{
-	printWarning();
-	return DataPtr();
-}
 
 LandmarksPtr PatientModelServiceNull::getPatientLandmarks() const
 {
@@ -118,43 +113,6 @@ void PatientModelServiceNull::setDebugMode(bool on)
 	printWarning();
 }
 
-cx::ImagePtr cx::PatientModelServiceNull::createDerivedImage(vtkImageDataPtr data, QString uid, QString name, cx::ImagePtr parentImage, QString filePath)
-{
-	printWarning();
-	return ImagePtr();
-}
-
-MeshPtr PatientModelServiceNull::createMesh(vtkPolyDataPtr data, QString uidBase, QString nameBase, QString filePath)
-{
-	printWarning();
-	return MeshPtr();
-}
-
-ImagePtr PatientModelServiceNull::createImage(vtkImageDataPtr data, QString uidBase, QString nameBase, QString filePath)
-{
-	printWarning();
-	return ImagePtr();
-}
-
-void PatientModelServiceNull::loadData(DataPtr data)
-{
-	printWarning();
-}
-
-void PatientModelServiceNull::saveData(DataPtr data, const QString &basePath)
-{
-	printWarning();
-}
-
-void PatientModelServiceNull::saveImage(ImagePtr image, const QString &basePath)
-{
-	printWarning();
-}
-
-void PatientModelServiceNull::saveMesh(MeshPtr mesh, const QString &basePath)
-{
-	printWarning();
-}
 
 std::map<QString, VideoSourcePtr> PatientModelServiceNull::getStreams() const
 {

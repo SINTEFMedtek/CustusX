@@ -140,7 +140,7 @@ ImagePtr CroppingWidget::cropClipButtonClickedSlot()
 {
   ImagePtr image = patientService()->getActiveImage();
 
-  ImagePtr retval = cropImage(dataService(), image);
+  ImagePtr retval = cropImage(patientService(), image);
   patientService()->insertData(retval);
   return retval;
 }

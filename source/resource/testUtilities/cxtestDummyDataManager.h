@@ -41,6 +41,7 @@ namespace cxtest
 
 struct TestServicesType
 {
+	cx::PatientModelServicePtr mPatientModelService;
 	cx::DataFactoryPtr mDataFactory;
 	cx::DataServicePtr mDataService;
 	cx::SpaceProviderPtr mSpaceProvider;
@@ -64,6 +65,7 @@ public:
 	static TestServicesPtr create();
 	~TestServices();
 
+	cx::PatientModelServicePtr patientModelService() { return mPatientModelService; }
 	cx::DataFactoryPtr dataFactory() { return mDataFactory; }
 	cx::DataServicePtr dataService() { return mDataService; }
 	cx::SpaceProviderPtr spaceProvider() { return mSpaceProvider; }
