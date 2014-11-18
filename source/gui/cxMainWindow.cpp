@@ -388,7 +388,9 @@ void MainWindow::createActions()
 	mDebugModeAction->setCheckable(true);
 	mDebugModeAction->setChecked(patientService()->getDebugMode());
 	mDebugModeAction->setStatusTip(tr("Set debug mode, this enables lots of weird stuff."));
-	connect(mDebugModeAction, SIGNAL(triggered(bool)), patientService().get(), SLOT(setDebugMode(bool)));
+	boost::function<void(bool)> setDebug = boost::bind(&PatientModelService::setDebugMode, patientService().get(), _1);
+	connect(mDebugModeAction, &QAction::triggered, setDebug);
+//	connect(mDebugModeAction, SIGNAL(triggered(bool)), patientService().get(), SLOT(setDebugMode(bool)));
 	connect(patientService().get(), SIGNAL(debugModeChanged(bool)), mDebugModeAction, SLOT(setChecked(bool)));
 	connect(mDebugModeAction, SIGNAL(toggled(bool)), this, SLOT(toggleDebugModeSlot(bool)));
 

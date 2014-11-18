@@ -67,11 +67,8 @@ DataFactory::DataFactory(PatientModelServicePtr dataManager, SpaceProviderPtr sp
 		return TYPE::create(uid, "", mDataManager, mSpaceProvider); \
 }
 
-DataPtr DataFactory::create(QString type, QString uid, QString name)
+DataPtr DataFactory::createRaw(QString type, QString uid)
 {
-//	if (mDataManager)
-//		mDataManager->generateUidAndName(&uid, &name);
-
 	CREATE_IF_MATCH(type, Image);
 	CREATE_IF_MATCH(type, Mesh);
 	CREATE_METRIC_IF_MATCH(type, PointMetric);
@@ -83,6 +80,19 @@ DataPtr DataFactory::create(QString type, QString uid, QString name)
 	CREATE_METRIC_IF_MATCH(type, DonutMetric);
 	CREATE_METRIC_IF_MATCH(type, SphereMetric);
 	return DataPtr ();
+}
+
+DataPtr DataFactory::create(QString type, QString uid, QString name)
+{
+//	if (mDataManager)
+//		mDataManager->generateUidAndName(&uid, &name);
+
+	DataPtr retval = this->createRaw(type, uid);
+	if (name.isEmpty())
+		name = uid;
+	if (retval)
+		retval->setName(name);
+	return retval;
 }
 
 } // namespace cx

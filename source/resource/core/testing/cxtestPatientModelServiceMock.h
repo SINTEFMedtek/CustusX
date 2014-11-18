@@ -40,15 +40,18 @@ namespace cxtest
 class PatientModelServiceMock : public cx::PatientModelServiceNull
 {
 public:
+	PatientModelServiceMock();
 	virtual ~PatientModelServiceMock() {}
 
 	virtual void insertData(cx::DataPtr data);
 	virtual cx::DataPtr createData(QString type, QString uid, QString name="");
 	virtual std::map<QString, cx::DataPtr> getData() const;
 	virtual cx::DataPtr importData(QString fileName, QString &infoText);
+	virtual cx::RegistrationHistoryPtr get_rMpr_History() const;
 
 private:
 	std::map<QString, cx::DataPtr> mData;
+	cx::RegistrationHistoryPtr m_rMpr;
 };
 
 }

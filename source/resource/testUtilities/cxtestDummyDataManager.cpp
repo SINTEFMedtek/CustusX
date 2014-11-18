@@ -112,6 +112,7 @@ TestServices::TestServices()
 
 	TestServicesType data = createDummyCoreServices();
 
+	mPatientModelService = data.mPatientModelService;
 	mDataFactory = data.mDataFactory;
 	mDataService = data.mDataService;
 	mSpaceProvider = data.mSpaceProvider;

@@ -37,9 +37,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSpaceProvider.h"
 #include "cxDataFactory.h"
 #include "cxDataReaderWriter.h"
+#include "cxNullDeleter.h"
+#include "cxSpaceProviderImpl.h"
+#include "cxTrackingService.h"
+#include "cxRegistrationTransform.h"
 
 namespace cxtest
 {
+
+PatientModelServiceMock::PatientModelServiceMock()
+{
+	m_rMpr.reset(new cx::RegistrationHistory());
+	connect(m_rMpr.get(), SIGNAL(currentChanged()), this, SIGNAL(rMprChanged()));
+}
 
 void PatientModelServiceMock::insertData(cx::DataPtr data)
 {
@@ -48,9 +58,17 @@ void PatientModelServiceMock::insertData(cx::DataPtr data)
 
 cx::DataPtr PatientModelServiceMock::createData(QString type, QString uid, QString name)
 {
-	cx::DataFactory factory = cx::DataFactory(cx::PatientModelServicePtr(), cx::SpaceProviderPtr());
-	cx::DataPtr data = factory.create(type, uid);
-	data->setName(name);
+	cx::PatientModelServicePtr self(cx::PatientModelServicePtr(this, cx::null_deleter()));
+	cx::SpaceProviderPtr space(new cx::SpaceProviderImpl(cx::TrackingService::getNullObject(), self));
+
+	static int count = 0;
+	if (uid.contains("%"))
+		uid = uid.arg(count++);
+	if (name.contains("%"))
+		name = name.arg(count);
+
+	cx::DataFactory factory = cx::DataFactory(self, space);
+	cx::DataPtr data = factory.create(type, uid, name);
 	return data;
 }
 
@@ -67,5 +85,11 @@ cx::DataPtr PatientModelServiceMock::importData(QString fileName, QString &infoT
 	this->insertData(data);
 	return data;
 }
+
+cx::RegistrationHistoryPtr PatientModelServiceMock::get_rMpr_History() const
+{
+	return m_rMpr;
+}
+
 
 }

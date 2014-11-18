@@ -66,6 +66,8 @@ public:
 private:
 	PatientModelServicePtr mDataManager;
 	SpaceProviderPtr mSpaceProvider;
+	DataPtr createRaw(QString type, QString uid);
+
 };
 typedef boost::shared_ptr<DataFactory> DataFactoryPtr;
 

@@ -171,6 +171,9 @@ void LogicManager::createInterconnectedDataAndSpace()
 	this->getTrackingService();
 
 	// build object(s):
+	mPatientModelService = PatientModelServiceProxy::create(this->getPluginContext());
+	LegacySingletons::mPatientService = mPatientModelService;
+
 	mDataService = DataManagerImpl::create();
 	LegacySingletons::mDataManager = mDataService;
 
@@ -204,8 +207,6 @@ void LogicManager::createPatientModelService()
 	this->getDataService();
 	// build object(s):
 	mPatientServiceOld = PatientService::create(mDataService);
-	mPatientModelService = PatientModelServiceProxy::create(this->getPluginContext());
-	LegacySingletons::mPatientService = mPatientModelService;
 }
 
 void LogicManager::createVideoServiceOld()

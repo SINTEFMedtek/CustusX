@@ -71,7 +71,7 @@ FrameMetricWithInput MetricFixture::getFrameMetricWithInput()
 	retval.mMetric = this->createTestMetric<cx::FrameMetric>("testMetric%1");
     retval.mMetric->setFrame(retval.m_qMt);
     retval.mMetric->setSpace(retval.mSpace);
-//	this->getDataManager()->loadData(retval.mMetric);
+	this->insertData(retval.mMetric);
 
     return retval;
 }
@@ -91,7 +91,7 @@ ToolMetricWithInput MetricFixture::getToolMetricWithInput()
 	retval.mMetric->setSpace(retval.mSpace);
 	retval.mMetric->setToolName(retval.mName);
 	retval.mMetric->setToolOffset(retval.mOffset);
-//	this->getDataManager()->loadData(retval.mMetric);
+	this->insertData(retval.mMetric);
 
 	return retval;
 }
@@ -107,7 +107,7 @@ PointMetricWithInput MetricFixture::getPointMetricWithInput(cx::Vector3D point)
 	retval.mMetric = this->createTestMetric<cx::PointMetric>("testMetric%1");
 	retval.mMetric->setCoordinate(point);
     retval.mMetric->setSpace(retval.mSpace);
-//	this->getDataManager()->loadData(retval.mMetric);
+	this->insertData(retval.mMetric);
 
     return retval;
 }
@@ -122,7 +122,7 @@ PlaneMetricWithInput MetricFixture::getPlaneMetricWithInput(cx::Vector3D point, 
 	retval.mMetric = this->createTestMetric<cx::PlaneMetric>("testMetric%1");
 	retval.mMetric->getArguments()->set(0, p0);
 	retval.mMetric->getArguments()->set(1, p1);
-//	this->getDataManager()->loadData(retval.mMetric);
+	this->insertData(retval.mMetric);
 
     return retval;
 }
@@ -136,7 +136,7 @@ DistanceMetricWithInput MetricFixture::getDistanceMetricWithInput(double distanc
 	retval.mMetric = this->createTestMetric<cx::DistanceMetric>("testMetric%1");
 	retval.mMetric->getArguments()->set(0, p0);
 	retval.mMetric->getArguments()->set(1, p1);
-//	this->getDataManager()->loadData(retval.mMetric);
+	this->insertData(retval.mMetric);
 
     return retval;
 }
@@ -150,7 +150,7 @@ DistanceMetricWithInput MetricFixture::getDistanceMetricWithInput(double distanc
 	retval.mMetric = this->createTestMetric<cx::DistanceMetric>("testMetric%1");
 	retval.mMetric->getArguments()->set(0, this->getPointMetricWithInput(cx::Vector3D(0,0,0)).mMetric);
 	retval.mMetric->getArguments()->set(1, this->getPointMetricWithInput(cx::Vector3D(distance,0,0)).mMetric);
-//	this->getDataManager()->loadData(retval.mMetric);
+	this->insertData(retval.mMetric);
 
     return retval;
 }
