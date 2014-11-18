@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewsWindow.h"
 #include <QApplication>
 #include "cxPatientModelService.h"
+#include "cxLogger.h"
 
 #include "catch.hpp"
 
@@ -150,21 +151,30 @@ cx::SliceProxyPtr ViewsFixture::createSliceProxy(cx::PLANE_TYPE plane)
 
 cx::ImagePtr ViewsFixture::loadImage(const QString& imageFilename)
 {
+	SSC_LOG("");
 	QString filename = cxtest::Utilities::getDataRoot(imageFilename);
 	QString dummy;
+	SSC_LOG("");
 	cx::DataPtr data = mServices->patientModelService()->importData(filename, dummy);
+	SSC_LOG("");
 	cx::ImagePtr image = boost::dynamic_pointer_cast<cx::Image>(data);
 //	cx::ImagePtr image = mServices->dataService()->loadImage(filename, filename);
+	SSC_LOG("");
 	cx::Vector3D center = image->boundingBox().center();
+	SSC_LOG("");
 	center = image->get_rMd().coord(center);
+	SSC_LOG("");
 	mServices->dataService()->setCenter(center);
+	SSC_LOG("");
 
 	if (!image)
 		return cx::ImagePtr();
 
 	// side effect: set tool movement box to data box,
 	dummyTool()->setToolPositionMovementBB(transform(image->get_rMd(), image->boundingBox()));
+	SSC_LOG("");
 	this->fixToolToCenter();
+	SSC_LOG("");
 
 	return image;
 }
