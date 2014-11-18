@@ -291,7 +291,8 @@ Eigen::Matrix4d registrationAlgorithm(BranchList* branches, M4Vector Tnavigation
     }
 
 
-    for (int i = 0; i < Tnavigation.size(); i++)
+    int size = Tnavigation.size();
+    for (int i = 0; i < size; i++)
 	{
         Tnavigation[i] = old_rMpr * Tnavigation[i];
 		trackingPositions.block(0 , i , 3 , 1) = Tnavigation[i].topRightCorner(3 , 1);
@@ -302,12 +303,16 @@ Eigen::Matrix4d registrationAlgorithm(BranchList* branches, M4Vector Tnavigation
             std::cout << "Warning in bronchoscopyRegistration: Removed tool position containing inf number: " << trackingOrientations.block(0 , i , 3 , 1) << std::endl;
             trackingPositions = eraseCol(i,trackingPositions);
             trackingOrientations = eraseCol(i,trackingOrientations);
+            --size;
+            --i;
         }
 				else if (boost::math::isnan( trackingOrientations.block(0 , i , 3 , 1).sum() ) || boost::math::isnan( trackingPositions.block(0 , i , 3 , 1).sum() ))
         {
             std::cout << "Warning in bronchoscopyRegistration: Removed tool position containing nan number: " << trackingOrientations.block(0 , i , 3 , 1) << std::endl;
             trackingPositions = eraseCol(i,trackingPositions);
             trackingOrientations = eraseCol(i,trackingOrientations);
+            --size;
+            --i;
         }
 		else if ( (trackingOrientations.block(0 , i , 1 , 1).sum() == 0 && trackingOrientations.block(1 , i , 1 , 1).sum() == 0 && trackingOrientations.block(2 , i , 1 , 1).sum() == 0) ||
                   (trackingPositions.block(0 , i , 1 , 1).sum() == 0 && trackingPositions.block(1 , i , 1 , 1).sum() == 0 && trackingPositions.block(2 , i , 1 , 1).sum() == 0))
@@ -315,6 +320,8 @@ Eigen::Matrix4d registrationAlgorithm(BranchList* branches, M4Vector Tnavigation
             std::cout << "Warning in bronchoscopyRegistration: Removed tool position at origo: " << trackingOrientations.block(0 , i , 3 , 1) << std::endl;
             trackingPositions = eraseCol(i,trackingPositions);
             trackingOrientations = eraseCol(i,trackingOrientations);
+            --size;
+            --i;
         }
 	}
 
