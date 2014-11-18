@@ -29,36 +29,28 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#include "cxCoreServices.h"
 
-#include "cxRegistrationMethodCommandLinePluginActivator.h"
+#include <ctkPluginContext.h>
+#include "cxPatientModelServiceProxy.h"
+#include "cxTrackingServiceProxy.h"
 
-#include <QtPlugin>
-#include <iostream>
+namespace cx {
 
-#include "cxRegistrationMethodCommandLineService.h"
-#include "cxRegisteredService.h"
-
-namespace cx
+CoreServices::CoreServices(ctkPluginContext* context)
 {
-
-RegistrationMethodCommandLinePluginActivator::RegistrationMethodCommandLinePluginActivator()
-{
+	patientModelService	= PatientModelServicePtr(new PatientModelServiceProxy(context));
+	trackingService		= TrackingServicePtr(new TrackingServiceProxy(context));
 }
 
-RegistrationMethodCommandLinePluginActivator::~RegistrationMethodCommandLinePluginActivator()
-{}
-
-void RegistrationMethodCommandLinePluginActivator::start(ctkPluginContext* context)
+CoreServices CoreServices::getNullObjects()
 {
-	RegServices services(context);
-	RegistrationMethodCommandLineService* service = new RegistrationMethodCommandLineService(services);
-	mRegistrationCommandLine = RegisteredService::create<RegistrationMethodCommandLineService>(context, service, RegistrationMethodService_iid);
+	return CoreServices();
 }
 
-void RegistrationMethodCommandLinePluginActivator::stop(ctkPluginContext* context)
+CoreServices::CoreServices()
 {
-	mRegistrationCommandLine.reset();
-	Q_UNUSED(context);
+	patientModelService	= cx::PatientModelService::getNullObject();
+	trackingService	= cx::TrackingService::getNullObject();
 }
-
-} // namespace cx
+} // cx

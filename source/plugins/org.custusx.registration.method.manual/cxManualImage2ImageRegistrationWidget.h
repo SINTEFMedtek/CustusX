@@ -49,7 +49,7 @@ namespace cx
 class ManualImage2ImageRegistrationWidget : public ManualImageRegistrationWidget
 {
 public:
-	ManualImage2ImageRegistrationWidget(regServices services, QWidget* parent, QString objectName);
+	ManualImage2ImageRegistrationWidget(RegServices services, QWidget* parent, QString objectName);
 	virtual QString getDescription();
 	virtual Transform3D getMatrixFromBackend();
 	virtual void setMatrixFromWidget(Transform3D M);

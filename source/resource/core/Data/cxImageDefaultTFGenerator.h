@@ -62,14 +62,15 @@ public:
 
 private:
 	ImagePtr mImage;
-	double_pair guessInitialScalarRange();
-	double_pair getFullScalarRange();
-	double_pair getInitialWindowRange();
+	double_pair guessInitialScalarRange() const;
+	double_pair getFullScalarRange() const;
+	double_pair getInitialWindowRange() const;
 	bool hasValidInitialWindow() const;
-	double_pair guessMRRange();
-	double_pair guessCTRange();
-	double_pair ensureNonZeroRoundedRange(double_pair range);
+	double_pair guessMRRange() const;
+	double_pair guessCTRange() const;
+	double_pair ensureNonZeroRoundedRange(double_pair range) const;
 	bool isUnsignedChar() const;
+	bool looksLikeBinaryImage() const;
 };
 
 

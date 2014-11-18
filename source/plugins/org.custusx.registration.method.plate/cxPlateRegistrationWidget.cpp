@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-PlateRegistrationWidget::PlateRegistrationWidget(regServices services, QWidget* parent) :
+PlateRegistrationWidget::PlateRegistrationWidget(RegServices services, QWidget* parent) :
 	RegistrationBaseWidget(services, parent, "PlateRegistrationWidget", "Plate Registration"),
 	mPlateRegistrationButton(new QPushButton("Load registration points", this)),
 	mReferenceToolInfoLabel(new QLabel("", this))

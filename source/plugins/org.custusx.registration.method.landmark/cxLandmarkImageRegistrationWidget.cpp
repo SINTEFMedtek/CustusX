@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-LandmarkImageRegistrationWidget::LandmarkImageRegistrationWidget(regServices services, QWidget* parent,
+LandmarkImageRegistrationWidget::LandmarkImageRegistrationWidget(RegServices services, QWidget* parent,
 	QString objectName, QString windowTitle) :
 	LandmarkRegistrationWidget(services, parent, objectName, windowTitle)
 {

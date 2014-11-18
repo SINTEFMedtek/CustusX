@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-RegistrationHistoryWidget::RegistrationHistoryWidget(regServices services, QWidget* parent, bool compact) :
+RegistrationHistoryWidget::RegistrationHistoryWidget(RegServices services, QWidget* parent, bool compact) :
 	BaseWidget(parent, "RegistrationHistoryWidget", "Registration History"),
 	mServices(services)
 {

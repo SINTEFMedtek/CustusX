@@ -119,7 +119,7 @@ bool RegistrationServiceNull::isNull()
 
 void RegistrationServiceNull::printWarning()
 {
-	reportWarning("Trying to use RegistrationServiceNull. Is RegistrationService (org.custusx.registration) disabled?");
+//	reportWarning("Trying to use RegistrationServiceNull. Is RegistrationService (org.custusx.registration) disabled?");
 }
 
 } // namespace cx

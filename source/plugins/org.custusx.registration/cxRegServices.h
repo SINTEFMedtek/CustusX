@@ -29,36 +29,39 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXREGISTRATIONMETHODSERVICES_H
+#define CXREGISTRATIONMETHODSERVICES_H
 
-#include "cxRegistrationMethodCommandLinePluginActivator.h"
+#include "org_custusx_registration_Export.h"
 
-#include <QtPlugin>
-#include <iostream>
-
-#include "cxRegistrationMethodCommandLineService.h"
-#include "cxRegisteredService.h"
+#include "cxCoreServices.h"
 
 namespace cx
 {
 
-RegistrationMethodCommandLinePluginActivator::RegistrationMethodCommandLinePluginActivator()
+typedef boost::shared_ptr<class RegistrationService> RegistrationServicePtr;
+typedef boost::shared_ptr<class VisualizationService> VisualizationServicePtr;
+
+/**
+ * Convenience class combining all services used by registration methods.
+ *
+ * \ingroup org_custusx_registration
+ *
+ * \date Nov 14 2014
+ * \author Ole Vegard Solberg, SINTEF
+ */
+class org_custusx_registration_EXPORT RegServices : public CoreServices
 {
+public:
+	RegServices(ctkPluginContext* context);
+	static RegServices getNullObjects();
+
+	RegistrationServicePtr registrationService;
+	VisualizationServicePtr visualizationService;
+private:
+	RegServices();
+};
+
 }
 
-RegistrationMethodCommandLinePluginActivator::~RegistrationMethodCommandLinePluginActivator()
-{}
-
-void RegistrationMethodCommandLinePluginActivator::start(ctkPluginContext* context)
-{
-	RegServices services(context);
-	RegistrationMethodCommandLineService* service = new RegistrationMethodCommandLineService(services);
-	mRegistrationCommandLine = RegisteredService::create<RegistrationMethodCommandLineService>(context, service, RegistrationMethodService_iid);
-}
-
-void RegistrationMethodCommandLinePluginActivator::stop(ctkPluginContext* context)
-{
-	mRegistrationCommandLine.reset();
-	Q_UNUSED(context);
-}
-
-} // namespace cx
+#endif // CXREGISTRATIONMETHODSERVICES_H

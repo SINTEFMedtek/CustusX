@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-SeansVesselRegistrationWidget::SeansVesselRegistrationWidget(regServices services, QWidget* parent) :
+SeansVesselRegistrationWidget::SeansVesselRegistrationWidget(RegServices services, QWidget* parent) :
 	RegistrationBaseWidget(services, parent, "SeansVesselRegistrationWidget", "Seans Vessel Registration"),
 	mLTSRatioSpinBox(new QSpinBox()), mLinearCheckBox(new QCheckBox()), mAutoLTSCheckBox(new QCheckBox()),
 	mRegisterButton(new QPushButton("Register"))
@@ -194,7 +194,7 @@ void SeansVesselRegistrationWidget::registerSlot()
 class SeansVesselRegistrationDebugger
 {
 public:
-	SeansVesselRegistrationDebugger(regServices services, double ltsRatio, bool linear) :
+	SeansVesselRegistrationDebugger(RegServices services, double ltsRatio, bool linear) :
 		mServices(services)
 	{
 		mRegistrator.mt_doOnlyLinear = linear;
@@ -325,7 +325,7 @@ private:
 	vtkPolyDataPtr mPolyLines;
 	GeometricRepPtr m_mRep, m_fRep, m_lineRep;
 	//	std::vector<GraphicalLine3DPtr> mLines;
-	regServices mServices;
+	RegServices mServices;
 };
 
 void SeansVesselRegistrationWidget::debugInit()

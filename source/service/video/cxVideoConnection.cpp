@@ -233,7 +233,7 @@ void VideoConnection::clientFinishedSlot()
 
 void VideoConnection::useUnusedProbeDataSlot()
 {
-	disconnect(mBackend->getToolManager().get(), SIGNAL(probeAvailable()), this, SLOT(useUnusedProbeDataSlot()));
+	disconnect(mBackend->getToolManager().get(), &TrackingService::stateChanged, this, &VideoConnection::useUnusedProbeDataSlot);
 	for (std::vector<ProbeDefinitionPtr>::const_iterator citer = mUnsusedProbeDataVector.begin(); citer != mUnsusedProbeDataVector.end(); ++citer)
 		this->updateStatus(*citer);
 	mUnsusedProbeDataVector.clear();
@@ -265,7 +265,7 @@ void VideoConnection::updateStatus(ProbeDefinitionPtr msg)
 	{
 		//Don't throw away the ProbeData. Save it until it can be used
 		if (mUnsusedProbeDataVector.empty())
-			connect(mBackend->getToolManager().get(), SIGNAL(probeAvailable()), this, SLOT(useUnusedProbeDataSlot()));
+			connect(mBackend->getToolManager().get(), &TrackingService::stateChanged, this, &VideoConnection::useUnusedProbeDataSlot);
 		mUnsusedProbeDataVector.push_back(msg);
 		return;
 	}

@@ -58,7 +58,7 @@ bool VideoServiceNull::isNull()
 
 void VideoServiceNull::printWarning()
 {
-	reportWarning("Trying to use VideoServiceNull. Is VideoService (org.custusx.core.video) disabled?");
+//	reportWarning("Trying to use VideoServiceNull. Is VideoService (org.custusx.core.video) disabled?");
 }
 
 } //cx

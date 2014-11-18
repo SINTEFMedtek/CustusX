@@ -236,7 +236,7 @@ return matrix;
 Eigen::MatrixXd eraseCol(int removeIndex, Eigen::MatrixXd positions)
 {
 	positions.block(0 , removeIndex , positions.rows() , positions.cols() - removeIndex - 1) = positions.rightCols(positions.cols() - removeIndex - 1);
-	positions.conservativeResize(Eigen::NoChange, positions.cols() - 1);
+    positions.conservativeResize(Eigen::NoChange, positions.cols() - 1);
 	return positions;
 }
 

@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "org_custusx_registration_gui_Export.h"
 #include "cxGUIExtenderService.h"
-#include "cxRegistrationMethodServices.h"
+#include "cxRegServices.h"
 class ctkPluginContext;
 
 namespace cx
@@ -53,14 +53,14 @@ class org_custusx_registration_gui_EXPORT RegistrationHistoryGUIExtenderService 
 {
 	Q_INTERFACES(cx::GUIExtenderService)
 public:
-	RegistrationHistoryGUIExtenderService(regServices services);
+	RegistrationHistoryGUIExtenderService(RegServices services);
 	virtual ~RegistrationHistoryGUIExtenderService();
 
 	virtual std::vector<CategorizedWidget> createWidgets() const;	
 	std::vector<QToolBar *> createToolBars() const;
 
 private:
-	regServices mServices;
+	RegServices mServices;
 };
 
 } /* namespace cx */

@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-RegistrationMethodManualImageTransformService::RegistrationMethodManualImageTransformService(regServices services) :
+RegistrationMethodManualImageTransformService::RegistrationMethodManualImageTransformService(RegServices services) :
 	RegistrationMethodManualService(services)
 {
 }

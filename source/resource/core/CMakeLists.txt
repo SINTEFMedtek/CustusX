@@ -92,6 +92,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
 cx_add_class(cxResource_SOURCE
 	cxForwardDeclarations.h
 	vtkForwardDeclarations.h
+	cxCoreServices
 
 	Tool/cxProbeSector
 	Tool/cxProbeData

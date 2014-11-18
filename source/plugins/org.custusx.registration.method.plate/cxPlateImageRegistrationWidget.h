@@ -52,7 +52,7 @@ class PlateImageRegistrationWidget : public FastImageRegistrationWidget
 {
 //	Q_OBJECT
 public:
-	PlateImageRegistrationWidget(regServices services, QWidget* parent);
+	PlateImageRegistrationWidget(RegServices services, QWidget* parent);
 	virtual ~PlateImageRegistrationWidget();
 	virtual QString defaultWhatsThis() const;
 

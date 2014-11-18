@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImage.h"
 #include "cxImageLUT2D.h"
 #include "cxImageTF3D.h"
+#include "math.h"
 
 namespace cx
 {
@@ -60,8 +61,6 @@ ImageLUT2DPtr ImageDefaultTFGenerator::generate2DTFPreset()
 	double_pair range = this->guessInitialScalarRange();
 	double smin = range.first;
 	double smax = range.second;
-//	double srange = smax - smin;
-//	std::cout << "TF2D: " << smin << ", " << smax << std::endl;
 
 	IntIntMap opacity;
 	opacity[fullRange.first - 1] = 0;
@@ -76,25 +75,31 @@ ImageLUT2DPtr ImageDefaultTFGenerator::generate2DTFPreset()
 	return tf;
 }
 
+namespace
+{
+int myround(double val)
+{
+	return int(val+0.5);
+}
+}
+
 ImageTF3DPtr ImageDefaultTFGenerator::generate3DTFPreset()
 {
 	ImageTF3DPtr tf(new ImageTF3D());
 
 	double_pair range = this->guessInitialScalarRange();
-//	std::cout << "    end: " << range.first << ", " << range.second << std::endl;
 
 	double smin = range.first;
 	double smax = range.second;
 	double srange = smax - smin;
-//	std::cout << "TF3D: " << smin << ", " << smax << std::endl;
 
 	IntIntMap opacity;
-//	opacity[smin - 1] = 0;
 	// Note the ordering: add in descending order to ensure zero is
 	// always written into smin, also for binary volumes
-	opacity[smin + 0.5*srange] = 255;
-	opacity[smin + 0.3*srange] = 255.0 * 0.7;
-	opacity[smin + 0.1*srange] = 0;
+	// Round is required for binary volumes.
+	opacity[smin + myround(0.5*srange)] = 255;
+	opacity[smin + myround(0.3*srange)] = 255.0 * 0.7;
+	opacity[smin + myround(0.1*srange)] = 0;
 	tf->resetAlpha(opacity);
 
 	ColorMap colors;
@@ -110,7 +115,7 @@ bool ImageDefaultTFGenerator::hasValidInitialWindow() const
 	return mImage->getInitialWindowWidth()>0;
 }
 
-double_pair ImageDefaultTFGenerator::guessInitialScalarRange()
+double_pair ImageDefaultTFGenerator::guessInitialScalarRange() const
 {
 	double_pair srange = this->getFullScalarRange();
 
@@ -125,6 +130,12 @@ double_pair ImageDefaultTFGenerator::guessInitialScalarRange()
 		{
 			srange.first = 0;
 			srange.second = 255;
+
+			if (this->looksLikeBinaryImage())
+			{
+				srange.first = 0;
+				srange.second = 1;
+			}
 		}
 		if (mImage->getModality().contains("CT"))
 		{
@@ -145,7 +156,14 @@ bool ImageDefaultTFGenerator::isUnsignedChar() const
 	return mImage->getBaseVtkImageData()->GetScalarType() == VTK_UNSIGNED_CHAR;
 }
 
-double_pair ImageDefaultTFGenerator::ensureNonZeroRoundedRange(double_pair range)
+bool ImageDefaultTFGenerator::looksLikeBinaryImage() const
+{
+	double_pair r = this->getFullScalarRange();
+	return similar(r.first, 0) && similar(r.second, 1);
+}
+
+
+double_pair ImageDefaultTFGenerator::ensureNonZeroRoundedRange(double_pair range) const
 {
 	range.first = int(range.first+0.5);
 	range.second = int(range.second+0.5);
@@ -153,44 +171,39 @@ double_pair ImageDefaultTFGenerator::ensureNonZeroRoundedRange(double_pair range
 	return range;
 }
 
-double_pair ImageDefaultTFGenerator::getFullScalarRange()
+double_pair ImageDefaultTFGenerator::getFullScalarRange() const
 {
 	double smin = mImage->getBaseVtkImageData()->GetScalarRange()[0];
 	double smax = mImage->getBaseVtkImageData()->GetScalarRange()[1];
-//	std::cout << "    basic: " << smin << ", " << smax << std::endl;
 	return std::make_pair(smin, smax);
 }
 
-double_pair ImageDefaultTFGenerator::getInitialWindowRange()
+double_pair ImageDefaultTFGenerator::getInitialWindowRange() const
 {
 	double smin = mImage->getInitialWindowLevel() - mImage->getInitialWindowWidth()/2;
 	double smax = mImage->getInitialWindowLevel() + mImage->getInitialWindowWidth()/2;
-//	std::cout << "    initial: " << smin << ", " << smax << std::endl;
 	return std::make_pair(smin, smax);
 }
 
-double_pair ImageDefaultTFGenerator::guessCTRange()
+double_pair ImageDefaultTFGenerator::guessCTRange() const
 {
 	// signed: [-1024...3072]
 	// choose a default from lung to bone, approximately.
 	double smin = -500;
 	double smax = 900;
-//	std::cout << "    signedCT: " << smin << ", " << smax << std::endl;
 	if (0 >= mImage->getMin()) // unsigned: [0..4096]
 	{
 		int ct_signed2unsigned = 1024;
 		smin += ct_signed2unsigned;
 		smax += ct_signed2unsigned;
-//		std::cout << "    unsignedCT: " << smin << ", " << smax << std::endl;
 	}
 	return std::make_pair(smin, smax);
 }
 
-double_pair ImageDefaultTFGenerator::guessMRRange()
+double_pair ImageDefaultTFGenerator::guessMRRange() const
 {
 	double_pair srange = this->getFullScalarRange();
 	srange.second *= 0.25; // usually lots of high-intensity noise of no interest
-//	std::cout << "    MR: " << srange.first << ", " << srange.second << std::endl;
 	return srange;
 }
 

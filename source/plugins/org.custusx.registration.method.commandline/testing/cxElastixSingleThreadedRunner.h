@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include "cxTransform3D.h"
 #include "cxForwardDeclarations.h"
-#include "cxRegistrationMethodServices.h"
+#include "cxRegServices.h"
 
 namespace cx
 {
@@ -60,7 +60,7 @@ public:
 		ElastixParametersPtr preset,
         Transform3D* result);
 
-	ElastixSingleThreadedRunner(regServices services);
+	ElastixSingleThreadedRunner(RegServices services);
 	virtual ~ElastixSingleThreadedRunner();
 
 private slots:
