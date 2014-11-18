@@ -58,7 +58,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxGPUImageBuffer.h"
 #include "cxTexture3DSlicerProxy.h"
 #include "cxReporter.h"
-#include "cxDataManager.h"
 
 //---------------------------------------------------------
 namespace cx

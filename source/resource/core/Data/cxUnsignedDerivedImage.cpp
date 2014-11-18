@@ -39,14 +39,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkDoubleArray.h>
 
 #include "cxImage.h"
-#include "cxDataManagerImpl.h"
 
 #include <vtkImageResample.h>
 #include <vtkImageClip.h>
 #include "vtkImageShiftScale.h"
 
 #include "cxImage.h"
-#include "cxDataManager.h"
 #include "cxUtilHelpers.h"
 #include "cxImageTF3D.h"
 #include "cxImageLUT2D.h"

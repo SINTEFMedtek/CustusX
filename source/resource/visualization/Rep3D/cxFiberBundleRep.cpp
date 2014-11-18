@@ -45,7 +45,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxGraphicalPrimitives.h"
 #include "cxView.h"
 #include "cxTypeConversions.h"
-#include "cxDataManager.h"
 #include "cxMesh.h"
 
 namespace cx

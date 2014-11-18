@@ -51,7 +51,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDisplayTextRep.h"
 #include "cxReporter.h"
 #include "cxSlicePlanes3DRep.h"
-#include "cxDataManager.h"
 #include "cxMesh.h"
 #include "cxPickerRep.h"
 #include "cxGeometricRep.h"

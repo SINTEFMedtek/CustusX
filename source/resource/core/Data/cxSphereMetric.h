@@ -37,7 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxDataMetric.h"
 #include "cxPointMetric.h"
-#include "cxDataManagerImpl.h"
 #include "cxMetricReferenceArgumentList.h"
 
 namespace cx

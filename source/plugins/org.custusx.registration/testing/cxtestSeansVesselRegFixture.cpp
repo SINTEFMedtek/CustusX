@@ -35,7 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkPolyData.h>
 #include <vtkPolyDataWriter.h>
 #include <vtkCellArray.h>
-//#include "cxDataManager.h"
 #include "cxMesh.h"
 #include "cxDataLocations.h"
 #include "vesselReg/SeansVesselReg.hxx"

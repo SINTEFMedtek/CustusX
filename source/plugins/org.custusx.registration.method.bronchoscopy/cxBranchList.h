@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define BRANCHLIST_H_
 
 #include "cxBranch.h"
-#include "cxDataManager.h"
 #include "cxMesh.h"
 #include "cxVector3D.h"
 #include <vtkPolyData.h>

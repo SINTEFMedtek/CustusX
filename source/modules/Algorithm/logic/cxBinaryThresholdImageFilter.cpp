@@ -35,7 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxAlgorithmHelpers.h"
 #include <itkBinaryThresholdImageFilter.h>
 #include <vtkImageCast.h>
-#include "cxDataManager.h"
 #include "cxUtilHelpers.h"
 #include "cxRegistrationTransform.h"
 #include "cxStringDataAdapterXml.h"

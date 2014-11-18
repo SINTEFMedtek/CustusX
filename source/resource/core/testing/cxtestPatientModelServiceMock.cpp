@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxtestPatientModelServiceMock.h"
 #include "cxData.h"
 
-#include "cxDataManager.h"
 #include "cxSpaceProvider.h"
 #include "cxDataFactory.h"
 #include "cxDataReaderWriter.h"

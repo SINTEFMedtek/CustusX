@@ -47,7 +47,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxView.h"
 #include "cxVideoSourceGraphics.h"
 #include "cxTypeConversions.h"
-#include "cxDataManager.h"
 #include "cxToolTracer.h"
 #include "cxTool.h"
 #include "cxSpaceProvider.h"

@@ -38,7 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRepManager.h"
 #include "cxTrackingService.h"
 #include "cxToolRep3D.h"
-#include "cxDataManager.h"
 #include "cxView.h"
 #include "boost/bind.hpp"
 #include <vtkRenderWindow.h>

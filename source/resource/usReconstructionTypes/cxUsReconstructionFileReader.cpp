@@ -37,7 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDataStream>
 #include "cxReporter.h"
 #include "cxTypeConversions.h"
-#include "cxDataManagerImpl.h"
 #include <vtkImageData.h>
 #include "cxImage.h"
 #include "cxUtilHelpers.h"

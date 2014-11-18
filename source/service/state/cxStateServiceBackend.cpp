@@ -32,7 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxStateServiceBackend.h"
 
-#include "cxDataManager.h"
 #include "cxTrackingService.h"
 #include "cxSpaceProvider.h"
 

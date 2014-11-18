@@ -32,7 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxtestReconstructionManagerFixture.h"
 
-#include "cxDataManager.h"
 #include "catch.hpp"
 #include <QApplication>
 #include "cxDoubleDataAdapterXml.h"

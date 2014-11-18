@@ -42,16 +42,10 @@ namespace cxtest
 struct TestServicesType
 {
 	cx::PatientModelServicePtr mPatientModelService;
-	cx::DataFactoryPtr mDataFactory;
-	cx::DataServicePtr mDataService;
 	cx::SpaceProviderPtr mSpaceProvider;
 	cx::TrackingServicePtr mTrackingService;
 };
 
-/** Create a dummy DataService that is not using a toolmanager internally
-  *
-  */
-cx::DataServicePtr createDummyDataService();
 TestServicesType createDummyCoreServices();
 void destroyDummyCoreServices(TestServicesType& services);
 
@@ -66,8 +60,6 @@ public:
 	~TestServices();
 
 	cx::PatientModelServicePtr patientModelService() { return mPatientModelService; }
-	cx::DataFactoryPtr dataFactory() { return mDataFactory; }
-	cx::DataServicePtr dataService() { return mDataService; }
 	cx::SpaceProviderPtr spaceProvider() { return mSpaceProvider; }
 	cx::TrackingServicePtr trackingService() { return mTrackingService; }
 

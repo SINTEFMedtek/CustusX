@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxDataManager.h"
 
-#include "cxDataManagerImpl.h"
 #include "cxTransferFunctions3DPresets.h"
 
 namespace cx

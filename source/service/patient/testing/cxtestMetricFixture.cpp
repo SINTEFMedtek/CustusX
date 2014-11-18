@@ -32,8 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxtestMetricFixture.h"
 
-#include "cxDataManagerImpl.h"
-#include "cxDataManager.h"
 #include "cxDummyToolManager.h"
 #include "cxDataLocations.h"
 #include "catch.hpp"

@@ -40,7 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxElastixExecuter.h"
 #include "cxSettings.h"
 #include "cxDataReaderWriter.h"
-#include "cxDataManager.h"
 #include "cxRegistrationService.h"
 #include "cxRegistrationTransform.h"
 #include "cxPatientModelService.h"

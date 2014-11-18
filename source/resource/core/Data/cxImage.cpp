@@ -52,7 +52,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLandmark.h"
 #include "cxLogger.h"
 #include "cxReporter.h"
-#include "cxDataManager.h"
 #include "cxTypeConversions.h"
 #include "cxUtilHelpers.h"
 #include "cxVolumeHelpers.h"

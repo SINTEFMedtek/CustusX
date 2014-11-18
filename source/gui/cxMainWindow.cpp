@@ -88,6 +88,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLayoutInteractor.h"
 #include "cxNavigation.h"
 #include "cxPluginFrameworkWidget.h"
+#include "cxImage.h"
 
 #include "ctkServiceTracker.h"
 #include "cxLogicManager.h"
@@ -390,7 +391,6 @@ void MainWindow::createActions()
 	mDebugModeAction->setStatusTip(tr("Set debug mode, this enables lots of weird stuff."));
 	boost::function<void(bool)> setDebug = boost::bind(&PatientModelService::setDebugMode, patientService().get(), _1);
 	connect(mDebugModeAction, &QAction::triggered, setDebug);
-//	connect(mDebugModeAction, SIGNAL(triggered(bool)), patientService().get(), SLOT(setDebugMode(bool)));
 	connect(patientService().get(), SIGNAL(debugModeChanged(bool)), mDebugModeAction, SLOT(setChecked(bool)));
 	connect(mDebugModeAction, SIGNAL(toggled(bool)), this, SLOT(toggleDebugModeSlot(bool)));
 

@@ -36,11 +36,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxData.h"
 #include "cxReporter.h"
 #include "cxLogicManager.h"
-#include "cxDataManager.h"
 #include "cxPatientData.h"
 #include "cxPatientService.h"
 #include "cxRegistrationTransform.h"
 #include "cxDataFactory.h"
+#include "cxDataManager.h"
 
 namespace cx
 {

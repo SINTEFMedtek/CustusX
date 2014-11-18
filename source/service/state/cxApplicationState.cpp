@@ -40,7 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxRequestEnterStateTransition.h"
 #include "cxReporter.h"
-#include "cxDataManager.h"
 #include "cxStateService.h"
 #include "cxTrackingService.h"
 #include "cxWorkflowStateMachine.h"

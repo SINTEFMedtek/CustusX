@@ -46,7 +46,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReporter.h"
 #include "cxTypeConversions.h"
 #include "cxProbeSector.h"
-#include "cxDataManager.h"
 #include "cxSpaceProvider.h"
 
 namespace cx

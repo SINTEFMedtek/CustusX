@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVideoServiceBackend.h"
 
 #include <ctkPluginFramework.h>
-#include "cxDataManager.h"
 #include "cxTrackingService.h"
 #include "cxSpaceProvider.h"
 

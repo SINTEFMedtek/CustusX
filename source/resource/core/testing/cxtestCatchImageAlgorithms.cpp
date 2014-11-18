@@ -34,7 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImageAlgorithms.h"
 
 #include <vtkImageData.h>
-#include "cxDataManager.h"
 #include "cxImage.h"
 #include "cxImageTF3D.h"
 #include "cxImageLUT2D.h"

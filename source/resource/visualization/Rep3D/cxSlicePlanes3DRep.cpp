@@ -44,7 +44,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSliceProxy.h"
 #include "cxVtkHelperClasses.h"
 #include "cxTypeConversions.h"
-#include "cxDataManager.h"
 
 namespace cx
 {

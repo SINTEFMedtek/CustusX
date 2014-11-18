@@ -42,12 +42,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <itkBinaryBallStructuringElement.h>
 #include "cxAlgorithmHelpers.h"
 #include <vtkImageCast.h>
-#include "cxDataManager.h"
 #include "cxUtilHelpers.h"
 #include "cxContourFilter.h"
 #include "cxMesh.h"
 #include "cxImage.h"
-#include "cxDataManager.h"
 #include "cxLegacySingletons.h"
 #include "cxPatientModelService.h"
 

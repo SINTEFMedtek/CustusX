@@ -50,7 +50,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVolumetricRep.h"
 #include "cxReporter.h"
 #include "cxXmlOptionItem.h"
-#include "cxDataManager.h"
 #include "cxTrackingService.h"
 #include "cxSlicePlanes3DRep.h"
 #include "cxSliceProxy.h"

@@ -39,7 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxDataMetric.h"
 #include "cxCoordinateSystemHelpers.h"
-#include "cxDataManagerImpl.h"
 #include "cxPointMetric.h"
 #include "cxMetricReferenceArgumentList.h"
 

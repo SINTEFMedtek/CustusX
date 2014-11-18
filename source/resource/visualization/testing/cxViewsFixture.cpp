@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkLookupTable.h"
 #include "cxtestUtilities.h"
-#include "cxDataManager.h"
 #include "cxImage.h"
 #include "cxImageTF3D.h"
 #include "cxVolumetricRep.h"
@@ -156,7 +155,7 @@ cx::ImagePtr ViewsFixture::loadImage(const QString& imageFilename)
 	cx::ImagePtr image = boost::dynamic_pointer_cast<cx::Image>(data);
 	cx::Vector3D center = image->boundingBox().center();
 	center = image->get_rMd().coord(center);
-	mServices->dataService()->setCenter(center);
+	mServices->patientModelService()->setCenter(center);
 
 	if (!image)
 		return cx::ImagePtr();
@@ -170,7 +169,7 @@ cx::ImagePtr ViewsFixture::loadImage(const QString& imageFilename)
 
 void ViewsFixture::fixToolToCenter()
 {
-	cx::Vector3D c = mServices->dataService()->getCenter();
+	cx::Vector3D c = mServices->patientModelService()->getCenter();
 	cx::Transform3D prMt = cx::createTransformTranslate(c);
 	dummyTool()->setToolPositionMovement(std::vector<cx::Transform3D>(1, prMt));
 	dummyTool()->set_prMt(prMt);

@@ -35,7 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <itkBinaryThinningImageFilter3D.h>
 
 #include "cxReporter.h"
-#include "cxDataManager.h"
 #include "cxRegistrationTransform.h"
 #include "cxMesh.h"
 #include "cxImage.h"

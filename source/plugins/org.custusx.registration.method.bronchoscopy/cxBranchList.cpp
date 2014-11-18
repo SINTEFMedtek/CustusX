@@ -30,9 +30,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxBranchList.h"
-//#include "RegistrationFunctions.h"
 #include "cxBranch.h"
-#include "cxDataManager.h"
 #include "cxMesh.h"
 #include "cxVector3D.h"
 #include <vtkPolyData.h>

@@ -32,7 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxWorkflowState.h"
 #include "cxVideoConnectionManager.h"
-#include "cxDataManager.h"
 #include "cxStateService.h"
 #include "cxSettings.h"
 #include "cxTrackingService.h"
