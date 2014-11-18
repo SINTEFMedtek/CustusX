@@ -131,22 +131,15 @@ public:
 
 	virtual ReconstructCore::InputParams createCoreParameters();
 
-//signals:
-//	void paramsChanged();
-//	void algorithmChanged();
-//	void inputDataSelected(QString mhdFileName);
-//	void reconstructAboutToStart();
-//	void reconstructStarted();
-//	void reconstructFinished();
-
-//	void newInputDataAvailable(QString mhdFileName);
+public slots:
+	virtual void newDataOnDisk(QString mhdFilename);
 
 private slots:
 	void setSettings();
-//	void transferFunctionChangedSlot();
 	void reconstructFinishedSlot();
 
 	void patientChangedSlot();
+
 private:
 	void clearAll();
 

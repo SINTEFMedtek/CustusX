@@ -87,6 +87,7 @@ private slots:
 
 	void reconstructAboutToStartSlot();
 
+	void updateFileSelectorPath(QString path);
 private:
 	UsReconstructionServicePtr mReconstructer;
 

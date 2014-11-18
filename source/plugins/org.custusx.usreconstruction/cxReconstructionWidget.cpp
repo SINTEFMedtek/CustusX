@@ -47,7 +47,9 @@ namespace cx
 {
 
 ReconstructionWidget::ReconstructionWidget(QWidget* parent, UsReconstructionServicePtr reconstructer) :
-	BaseWidget(parent, "USReconstruction", "US Reconstruction"), mReconstructer(reconstructer)
+	BaseWidget(parent, "USReconstruction", "US Reconstruction"),
+	mReconstructer(reconstructer),
+	mFileSelectWidget( new FileSelectWidget(this))
 {
 	connect(mReconstructer.get(), SIGNAL(reconstructAboutToStart()), this, SLOT(reconstructAboutToStartSlot()));
 	connect(mReconstructer.get(), SIGNAL(reconstructStarted()), this, SLOT(reconstructStartedSlot()));
@@ -60,10 +62,10 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, UsReconstructionServ
 
 	QVBoxLayout* topLayout = new QVBoxLayout(this);
 
-	mFileSelectWidget = new FileSelectWidget(this);
 	connect(mFileSelectWidget, SIGNAL(fileSelected(QString)), this, SLOT(selectData(QString)));
 	mFileSelectWidget->setNameFilter(QStringList() << "*.fts");
 	connect(mReconstructer.get(), SIGNAL(newInputDataAvailable(QString)), mFileSelectWidget, SLOT(refresh()));
+	connect(mReconstructer.get(), &UsReconstructionService::newInputDataPath, this, &ReconstructionWidget::updateFileSelectorPath);
 
 	QHBoxLayout* extentLayout = new QHBoxLayout;
 	mExtentLineEdit = new QLineEdit(this);
@@ -109,6 +111,12 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, UsReconstructionServ
 
 	topLayout->addStretch();
 	topLayout->addWidget(mTimedAlgorithmProgressBar);
+}
+
+void ReconstructionWidget::updateFileSelectorPath(QString path)
+{
+	mFileSelectWidget->setPath(path);
+	mFileSelectWidget->refresh();
 }
 
 QString ReconstructionWidget::defaultWhatsThis() const

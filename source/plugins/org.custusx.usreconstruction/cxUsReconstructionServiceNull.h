@@ -68,6 +68,9 @@ public:
 
 	virtual bool isNull();
 
+public slots:
+	virtual void newDataOnDisk(QString mhdFilename);
+
 private:
 	void printWarning() const;
 

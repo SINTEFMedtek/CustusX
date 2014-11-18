@@ -222,6 +222,7 @@ void USSavingRecorder::fileMakerWriteFinished()
 		QString result = (*iter)->future().result();
 		delete *iter;
 		iter = mSaveThreads.erase(iter);
+
 		emit saveDataCompleted(result);
 	}
 }
