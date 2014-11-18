@@ -67,6 +67,16 @@ public:
     this->setRange(0, mRange.resolution());
     this->setSingleStep(mRange.step());
   }
+  DoubleRange getDoubleRange() const
+  {
+	return mRange;
+  }
+  void setDoubleSpan(double lower, double upper)
+  {
+	int lower_i = (lower-mRange.min())/mRange.step();
+	int upper_i = (upper-mRange.min())/mRange.step();
+	this->setSpan(lower_i, upper_i);
+  }
   void setDoubleLowerValue(double val)
   {
     int v_i = (val-mRange.min())/mRange.step();
@@ -139,7 +149,6 @@ private:
 	DoubleSpanSlider* mSpanSlider;
 
 	DoublePairDataAdapterPtr mData;
-
 };
 
 
