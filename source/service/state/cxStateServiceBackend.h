@@ -57,24 +57,21 @@ typedef boost::shared_ptr<class StateServiceBackend> StateServiceBackendPtr;
 class cxStateService_EXPORT StateServiceBackend
 {
 public:
-	StateServiceBackend(DataServicePtr dataManager,
-								TrackingServicePtr trackingService,
-								VideoServiceOldPtr videoService,
-								SpaceProviderPtr spaceProvider,
-						PatientServicePtr patientService);
+	StateServiceBackend(TrackingServicePtr trackingService,
+						VideoServiceOldPtr videoService,
+						SpaceProviderPtr spaceProvider,
+						PatientModelServicePtr patientService);
 
-	DataServicePtr getDataManager();
 	TrackingServicePtr getToolManager();
 	VideoServiceOldPtr getVideoServiceOld();
 	SpaceProviderPtr getSpaceProvider();
-	PatientServicePtr getPatientService();
+	PatientModelServicePtr getPatientService();
 
 private:
-	DataServicePtr mDataManager;
 	TrackingServicePtr mTrackingService;
 	SpaceProviderPtr mSpaceProvider;
 	VideoServiceOldPtr mVideoServiceOld;
-	PatientServicePtr mPatientService;
+	PatientModelServicePtr mPatientService;
 };
 
 

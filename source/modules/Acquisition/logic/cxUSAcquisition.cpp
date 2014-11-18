@@ -34,17 +34,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxBoolDataAdapterXml.h"
 
-#include "cxPatientData.h"
 #include "cxSettings.h"
-#include "cxPatientService.h"
 #include "cxVideoServiceOld.h"
 #include "cxVideoConnectionManager.h"
 #include "cxTrackingService.h"
 #include "cxUSSavingRecorder.h"
-#include "cxDataManager.h"
 #include "cxAcquisitionData.h"
 #include "cxUsReconstructionService.h"
 #include "cxUSReconstructInputData.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
@@ -135,9 +133,9 @@ void USAcquisition::recordStopped()
 
 	this->sendAcquisitionDataToReconstructer();
 
-	mCore->set_rMpr(dataManager()->get_rMpr());
+	mCore->set_rMpr(patientService()->get_rMpr());
 	bool compress = settings()->value("Ultrasound/CompressAcquisition", true).toBool();
-	QString baseFolder = patientService()->getPatientData()->getActivePatientFolder();
+	QString baseFolder = patientService()->getActivePatientFolder();
 	mCore->startSaveData(baseFolder, compress);
 
 	mCore->clearRecording();
@@ -152,7 +150,7 @@ void USAcquisition::recordCancelled()
 
 void USAcquisition::sendAcquisitionDataToReconstructer()
 {
-	mCore->set_rMpr(dataManager()->get_rMpr());
+	mCore->set_rMpr(patientService()->get_rMpr());
 
 	VideoSourcePtr activeVideoSource = videoService()->getActiveVideoSource();
 	if (activeVideoSource)

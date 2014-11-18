@@ -45,7 +45,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 
-#include "cxDataManager.h"
 #include "cxImage.h"
 #include "cxAxesRep.h"
 #include "cxVolumetricRep.h"

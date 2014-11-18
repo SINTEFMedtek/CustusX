@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxDataManager.h"
 
-#include "cxDataManagerImpl.h"
 #include "cxTransferFunctions3DPresets.h"
 
 namespace cx
@@ -87,10 +86,5 @@ ImagePtr DataManager::getActiveImage() const
 void DataManager::setActiveImage(ImagePtr activeImage)
 {
 } ///< used for system state
-
-//DataServicePtr dataManager()
-//{
-//	return DataManager::getInstance();
-//}
 
 } // namespace cx

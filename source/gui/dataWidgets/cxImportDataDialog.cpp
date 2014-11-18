@@ -45,18 +45,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReporter.h"
 #include "cxTypeConversions.h"
 #include "cxData.h"
-#include "cxDataManager.h"
 #include "cxRegistrationTransform.h"
 #include "cxImageAlgorithms.h"
 #include "cxImage.h"
 #include "cxStateService.h"
-#include "cxPatientData.h"
-#include "cxPatientService.h"
 #include "cxViewManager.h"
 #include "cxVolumeHelpers.h"
 #include "cxImageTF3D.h"
 #include "cxImageLUT2D.h"
 #include "cxPatientModelService.h"
+#include "cxMesh.h"
 
 //TODO: remove
 #include "cxLegacySingletons.h"
@@ -177,7 +175,7 @@ void ImportDataDialog::importDataSlot()
   mParentFrameCombo->setEnabled(mPatientModelService->getData().size()>1);
 
   // enable nifti imiport only for meshes. (as this is the only case we have seen)
-  mNiftiFormatCheckBox->setEnabled(mPatientModelService->getMesh(mData->getUid())!=0);
+  mNiftiFormatCheckBox->setEnabled(mPatientModelService->getData<Mesh>(mData->getUid())!=0);
 
   mConvertToUnsignedCheckBox->setEnabled(false);
 //  ImagePtr image = boost::dynamic_pointer_cast<Image>(mData);
@@ -284,7 +282,7 @@ void ImportDataDialog::convertToUnsigned()
 	if (!image)
 		return;
 
-	ImagePtr converted = convertImageToUnsigned(dataService(), image);
+	ImagePtr converted = convertImageToUnsigned(patientService(), image);
 
 	image->setVtkImageData(converted->getBaseVtkImageData());
 
@@ -292,7 +290,7 @@ void ImportDataDialog::convertToUnsigned()
 	ImageLUT2DPtr LUT2D = converted->getLookupTable2D()->createCopy();
 	image->setLookupTable2D(LUT2D);
 	image->setTransferFunctions3D(TF3D);
-	dataManager()->saveImage(image, patientService()->getPatientData()->getActivePatientFolder());
+	patientService()->insertData(image);
 }
 
 

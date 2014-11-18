@@ -59,10 +59,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVisualizationServiceBackend.h"
 #include "cxPatientModelService.h"
 
-// This class is used from ViewManager constructor, so patientModelService can't be used
-//TODO: Use ActiveImageProxy when possible, and use patientModelService instead of VisualizationServiceBackend
-#include "cxActiveImageProxyOld.h"
-#include "cxDataManager.h"
+#include "cxActiveImageProxy.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
@@ -122,7 +120,7 @@ InteractiveCropper::InteractiveCropper(VisualizationServiceBackendPtr backend/*P
 	mBackend(backend)
 //	mPatientModelService(patientModelService)
 {
-	mActiveImageProxy = ActiveImageProxyOld::New(mBackend->getDataManager());
+	mActiveImageProxy = ActiveImageProxy::New(mBackend->getPatientService());
 	connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(imageChangedSlot()));
 	connect(mActiveImageProxy.get(), SIGNAL(cropBoxChanged()), this, SLOT(imageCropChangedSlot()));
 }
@@ -245,7 +243,7 @@ void InteractiveCropper::resetBoundingBox()
 void InteractiveCropper::imageChangedSlot()
 {
 //	mImage = mPatientModelService->getActiveImage();
-	mImage = mBackend->getDataManager()->getActiveImage();
+	mImage = mBackend->getPatientService()->getActiveImage();
 
 	this->imageCropChangedSlot();
 	emit changed();

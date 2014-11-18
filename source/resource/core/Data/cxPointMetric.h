@@ -66,7 +66,7 @@ Q_OBJECT
 public:
 	virtual ~PointMetric();
 //    static PointMetricPtr create(QDomNode node);
-	static PointMetricPtr create(QString uid, QString name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider);
+	static PointMetricPtr create(QString uid, QString name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider);
 
 	void setCoordinate(const Vector3D& p);
 	Vector3D getCoordinate() const;
@@ -93,7 +93,7 @@ public:
 private slots:
 	void resetCachedValues();
 private:
-	PointMetric(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider);
+	PointMetric(const QString& uid, const QString& name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider);
 	Vector3D mCoordinate;
 	CoordinateSystem mSpace;
 	SpaceListenerPtr mSpaceListener;

@@ -44,12 +44,6 @@ TEST_CASE("DataManagerImpl setup/shutdown works multiple times", "[unit]")
 		REQUIRE(service);
 		CHECK(service.unique());
 		service.reset();
-
-//		cx::DataManagerImpl::initialize();
-//		CHECK(cx::dataManager());
-
-//		cx::DataManagerImpl::shutdown();
-        //REQUIRE_FALSE(dataManager()); //todo: should work
     }
 }
 

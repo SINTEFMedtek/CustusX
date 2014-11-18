@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx {
 
-FrameMetricBase::FrameMetricBase(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider) :
+FrameMetricBase::FrameMetricBase(const QString& uid, const QString& name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider) :
 		DataMetric(uid, name, dataManager, spaceProvider),
 		mSpace(CoordinateSystem::reference()),
 		mFrame(Transform3D::Identity())

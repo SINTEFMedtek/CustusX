@@ -35,14 +35,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkPolyData.h>
 #include <vtkPolyDataWriter.h>
 #include <vtkCellArray.h>
-#include "cxDataManager.h"
 #include "cxMesh.h"
 #include "cxDataLocations.h"
 #include "vesselReg/SeansVesselReg.hxx"
 #include "cxRegistrationTransform.h"
 #include "cxTypeConversions.h"
 #include <QDir>
-#include "cxLogicManager.h"
+//#include "cxLogicManager.h"
+#include "cxtestPatientModelServiceMock.h"
+#include "cxReporter.h"
 
 #include "catch.hpp"
 
@@ -61,13 +62,15 @@ SeansVesselRegFixture::~SeansVesselRegFixture()
 void SeansVesselRegFixture::setUp()
 {
 	cx::DataLocations::setTestMode();
-	cx::LogicManager::initialize();
+//	cx::LogicManager::initialize();
+	cx::Reporter::initialize();
 }
 
 void SeansVesselRegFixture::tearDown()
 {
-	cx::LogicManager::shutdown();
+//	cx::LogicManager::shutdown();
 //	cx::DataManager::shutdown();
+	cx::Reporter::shutdown();
 }
 
 /**return endpoint
@@ -223,10 +226,11 @@ void SeansVesselRegFixture::doTestVessel2VesselRegistration(
 				<< std::endl;
 	}
 
-	cx::DataPtr source = cx::dataManager()->loadData("source_" + filenameSource,
-			filenameSource);
-	cx::DataPtr target = cx::dataManager()->loadData("target_" + filenameTarget,
-			filenameTarget);
+	PatientModelServiceMock pasm;
+
+	QString dummy;
+	cx::DataPtr source = pasm.importData(filenameSource, dummy);
+	cx::DataPtr target = pasm.importData(filenameTarget, dummy);
 	CHECK(source);
 	CHECK(target);
 	source->get_rMd_History()->setRegistration(perturbation);

@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkCamera.h>
 #include <vtkRenderer.h>
 #include "boost/bind.hpp"
+#include "cxBoundingBox3D.h"
 
 namespace cx
 {

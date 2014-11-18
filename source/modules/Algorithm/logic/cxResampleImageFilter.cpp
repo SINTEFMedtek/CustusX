@@ -35,13 +35,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QApplication>
 
 #include "cxImageAlgorithms.h"
-#include "cxDataManager.h"
 #include "cxImage.h"
 #include "vtkImageData.h"
-#include "cxPatientService.h"
-#include "cxPatientData.h"
 #include "cxSelectDataStringDataAdapter.h"
 #include "cxDoubleDataAdapterXml.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
@@ -127,7 +125,7 @@ bool ResampleImageFilter::execute()
 	double margin = marginOption->getValue();
 
 	Transform3D refMi = reference->get_rMd().inv() * input->get_rMd();
-	ImagePtr oriented = resampleImage(dataService(), input, refMi);//There is an error with the transfer functions in this image
+	ImagePtr oriented = resampleImage(patientService(), input, refMi);//There is an error with the transfer functions in this image
 
 	Transform3D orient_M_ref = oriented->get_rMd().inv() * reference->get_rMd();
 	DoubleBoundingBox3D bb_crop = transform(orient_M_ref, reference->boundingBox());
@@ -142,12 +140,12 @@ bool ResampleImageFilter::execute()
 
 	oriented->setCroppingBox(bb_crop);
 
-	ImagePtr cropped = cropImage(dataService(), oriented);
+	ImagePtr cropped = cropImage(patientService(), oriented);
 
 	QString uid = input->getUid() + "_resample%1";
 	QString name = input->getName() + " resample%1";
 
-	ImagePtr resampled = resampleImage(dataService(), cropped, Vector3D(reference->getBaseVtkImageData()->GetSpacing()), uid, name);
+	ImagePtr resampled = resampleImage(patientService(), cropped, Vector3D(reference->getBaseVtkImageData()->GetSpacing()), uid, name);
 
 	// important! move thread affinity to main thread - ensures signals/slots is still called correctly
 	resampled->moveThisAndChildrenToThread(QApplication::instance()->thread());
@@ -163,9 +161,7 @@ bool ResampleImageFilter::postProcess()
 
 	ImagePtr output = mRawResult;
 	mRawResult.reset();
-	//    output->resetTransferFunctions();
-	dataManager()->loadData(output);
-	dataManager()->saveImage(output, patientService()->getPatientData()->getActivePatientFolder());
+	patientService()->insertData(output);
 
 	// set output
 	mOutputTypes.front()->setValue(output->getUid());

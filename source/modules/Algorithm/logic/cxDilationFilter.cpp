@@ -42,15 +42,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <itkBinaryBallStructuringElement.h>
 #include "cxAlgorithmHelpers.h"
 #include <vtkImageCast.h>
-#include "cxDataManager.h"
 #include "cxUtilHelpers.h"
 #include "cxContourFilter.h"
 #include "cxMesh.h"
 #include "cxImage.h"
-#include "cxDataManager.h"
-#include "cxPatientService.h"
-#include "cxPatientData.h"
 #include "cxLegacySingletons.h"
+#include "cxPatientModelService.h"
+
 
 namespace cx {
 
@@ -199,7 +197,8 @@ bool DilationFilter::execute() {
     return true;
 }
 
-bool DilationFilter::postProcess() {
+bool DilationFilter::postProcess()
+{
 	if (!mRawResult)
 		return false;
 
@@ -210,14 +209,15 @@ bool DilationFilter::postProcess() {
 
 	QString uid = input->getUid() + "_seg%1";
 	QString name = input->getName()+" seg%1";
-	ImagePtr output = dataManager()->createDerivedImage(mRawResult,uid, name, input);
+	ImagePtr output = patientService()->createSpecificData<Image>(uid, name);
+	output->intitializeFromParentImage(input);
+	output->setVtkImageData(mRawResult);
 	mRawResult = NULL;
 	if (!output)
 		return false;
 
 	output->resetTransferFunctions();
-	dataManager()->loadData(output);
-	dataManager()->saveImage(output, patientService()->getPatientData()->getActivePatientFolder());
+	patientService()->insertData(output);
 
 	// set output
 	mOutputTypes.front()->setValue(output->getUid());

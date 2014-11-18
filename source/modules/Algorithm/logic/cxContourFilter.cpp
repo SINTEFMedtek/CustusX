@@ -45,16 +45,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxImage.h"
 #include "cxMesh.h"
-#include "cxDataManager.h"
 #include "cxDoubleDataAdapterXml.h"
 #include "cxBoolDataAdapterXml.h"
 #include "cxColorDataAdapterXml.h"
-#include "cxPatientData.h"
-#include "cxPatientService.h"
 #include "cxRepManager.h"
 #include "cxThresholdPreview.h"
 #include "cxSelectDataStringDataAdapter.h"
 #include "cxLegacySingletons.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
@@ -176,7 +174,7 @@ void ContourFilter::setActive(bool on)
 
 void ContourFilter::imageChangedSlot(QString uid)
 {
-	ImagePtr image = dataManager()->getImage(uid);
+	ImagePtr image = patientService()->getData<Image>(uid);
 	if(!image)
 		return;
 
@@ -335,7 +333,8 @@ MeshPtr ContourFilter::postProcess(vtkPolyDataPtr contour, ImagePtr base, QColor
 
 	QString uid = base->getUid() + "_ge%1";
 	QString name = base->getName()+" ge%1";
-	MeshPtr output = dataManager()->createMesh(contour, uid, name, "");
+	MeshPtr output = patientService()->createSpecificData<Mesh>(uid, name);
+	output->setVtkPolyData(contour);
 	if (!output)
 		return MeshPtr();
 
@@ -344,8 +343,7 @@ MeshPtr ContourFilter::postProcess(vtkPolyDataPtr contour, ImagePtr base, QColor
 
 	output->setColor(color);
 
-	dataManager()->loadData(output);
-	dataManager()->saveData(output, patientService()->getPatientData()->getActivePatientFolder());
+	patientService()->insertData(output);
 
 	return output;
 }

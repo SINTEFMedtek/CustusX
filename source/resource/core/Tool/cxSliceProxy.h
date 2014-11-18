@@ -104,7 +104,7 @@ class cxResource_EXPORT SliceProxy : public SliceProxyInterface
 {
 	Q_OBJECT
 public:
-	static SliceProxyPtr create(DataServicePtr dataManager);
+	static SliceProxyPtr create(PatientModelServicePtr dataManager);
 	virtual ~SliceProxy();
 
 	void setTool(ToolPtr tool);
@@ -148,7 +148,7 @@ private slots:
 	void changed();
 
 private:
-	SliceProxy(DataServicePtr dataManager);
+	SliceProxy(PatientModelServicePtr dataManager);
 	Transform3D getSyntheticToolPos(const Vector3D& center) const;
 	ToolPtr mTool;
 	boost::scoped_ptr<SliceComputer> mCutplane;
@@ -156,7 +156,7 @@ private:
 	bool mAlwaysUseDefaultCenter; ///< use def center anyway
 //	QString mName; ///< for debug
 	bool mUseTooltipOffset;
-	DataServicePtr mDataManager;
+	PatientModelServicePtr mDataManager;
 };
 
 /**

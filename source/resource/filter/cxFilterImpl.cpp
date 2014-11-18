@@ -125,7 +125,7 @@ ImagePtr FilterImpl::getCopiedInputImage(int index)
 
 void FilterImpl::updateThresholdFromImageChange(QString uid, DoubleDataAdapterXmlPtr threshold)
 {
-	ImagePtr image = mPatientModelService->getImage(uid);
+	ImagePtr image = mPatientModelService->getData<Image>(uid);
 	if(!image)
 		return;
 	threshold->setValueRange(DoubleRange(image->getMin(), image->getMax(), 1));
@@ -143,7 +143,7 @@ void FilterImpl::updateThresholdFromImageChange(QString uid, DoubleDataAdapterXm
 
 void FilterImpl::updateThresholdPairFromImageChange(QString uid, DoublePairDataAdapterXmlPtr threshold)
 {
-	ImagePtr image = mPatientModelService->getImage(uid);
+	ImagePtr image = mPatientModelService->getData<Image>(uid);
 	if(!image)
 		return;
 	threshold->setValueRange(DoubleRange(image->getMin(), image->getMax(), 1));

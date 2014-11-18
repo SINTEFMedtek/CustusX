@@ -34,17 +34,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxBoundingBox3D.h"
 #include "cxTypeConversions.h"
-#include "cxDataManager.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
 
-//DataPtr SphereMetricReader::load(const QString& uid, const QString& filename)
-//{
-//	return DataPtr(new SphereMetric(uid, filename));
-//}
-
-SphereMetric::SphereMetric(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider) :
+SphereMetric::SphereMetric(const QString& uid, const QString& name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider) :
 				DataMetric(uid, name, dataManager, spaceProvider)
 {
 	mArguments.reset(new MetricReferenceArgumentList(QStringList() << "position"));
@@ -52,17 +47,10 @@ SphereMetric::SphereMetric(const QString& uid, const QString& name, DataServiceP
 	mRadius = 5;
 }
 
-SphereMetricPtr SphereMetric::create(QString uid, QString name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider)
+SphereMetricPtr SphereMetric::create(QString uid, QString name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider)
 {
 	return SphereMetricPtr(new SphereMetric(uid, name, dataManager, spaceProvider));
 }
-
-//SphereMetricPtr SphereMetric::create(QDomNode node)
-//{
-//	SphereMetricPtr retval = SphereMetric::create("");
-//	retval->parseXml(node);
-//	return retval;
-//}
 
 SphereMetric::~SphereMetric()
 {

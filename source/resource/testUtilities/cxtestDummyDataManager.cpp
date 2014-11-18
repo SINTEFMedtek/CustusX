@@ -32,13 +32,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxtestDummyDataManager.h"
 
-#include "cxDataManagerImpl.h"
-//#include "cxtestSpaceProviderMock.h"
 #include "cxDataFactory.h"
 #include "cxDummyToolManager.h"
 #include "cxSpaceProviderImpl.h"
 #include "cxReporter.h"
 #include "cxSharedPointerChecker.h"
+#include "cxtestPatientModelServiceMock.h"
 
 namespace cxtest
 {
@@ -46,21 +45,12 @@ namespace cxtest
 
 TestServicesType createDummyCoreServices()
 {
-	cx::DataManagerImplPtr dataService = cx::DataManagerImpl::create();
+	TestServicesType retval;
+	retval.mPatientModelService.reset(new PatientModelServiceMock());
 	cx::TrackingServicePtr trackingService = cx::DummyToolManager::create();
 
 	cx::SpaceProviderPtr spaceProvider;
-	spaceProvider.reset(new cx::SpaceProviderImpl(trackingService, dataService));
-//	cx::SpaceProviderPtr spaceProvider = cxtest::SpaceProviderMock::create();
-	dataService->setSpaceProvider(spaceProvider);
-
-	cx::DataFactoryPtr dataFactory;
-	dataFactory.reset(new cx::DataFactory(dataService, spaceProvider));
-	dataService->setDataFactory(dataFactory);
-
-	TestServicesType retval;
-	retval.mDataFactory = dataFactory;
-	retval.mDataService = dataService;
+	spaceProvider.reset(new cx::SpaceProviderImpl(trackingService, retval.mPatientModelService));
 	retval.mSpaceProvider = spaceProvider;
 	retval.mTrackingService = trackingService;
 	return retval;
@@ -68,35 +58,16 @@ TestServicesType createDummyCoreServices()
 
 void destroyDummyCoreServices(TestServicesType& services)
 {
-	// [HACK] break loop by removing connection to DataFactory and SpaceProvider
-	cx::DataManagerImplPtr dataManagerImpl;
-	dataManagerImpl = boost::dynamic_pointer_cast<cx::DataManagerImpl>(services.mDataService);
-	if (dataManagerImpl)
-	{
-		dataManagerImpl->setSpaceProvider(cx::SpaceProviderPtr());
-		dataManagerImpl->setDataFactory(cx::DataFactoryPtr());
-		dataManagerImpl->clear();
-		dataManagerImpl.reset();
-	}
-
-	requireUnique(services.mDataFactory, "DataFactory");
-	services.mDataFactory.reset();
-
 	requireUnique(services.mSpaceProvider, "SpaceProvider");
 	services.mSpaceProvider.reset();
 
-	requireUnique(services.mDataService, "DataService");
-	services.mDataService.reset();
+	requireUnique(services.mPatientModelService, "PatientModelService");
+	services.mPatientModelService.reset();
 
 	requireUnique(services.mTrackingService, "TrackingService");
 	services.mTrackingService.reset();
 
 	cx::Reporter::shutdown();
-}
-
-cx::DataServicePtr createDummyDataService()
-{
-	return createDummyCoreServices().mDataService;
 }
 
 TestServicesPtr TestServices::create()
@@ -110,8 +81,7 @@ TestServices::TestServices()
 
 	TestServicesType data = createDummyCoreServices();
 
-	mDataFactory = data.mDataFactory;
-	mDataService = data.mDataService;
+	mPatientModelService = data.mPatientModelService;
 	mSpaceProvider = data.mSpaceProvider;
 	mTrackingService = data.mTrackingService;
 }

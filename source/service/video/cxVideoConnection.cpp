@@ -54,8 +54,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVector3D.h"
 #include "cxProbeData.h"
 #include "cxTrackingService.h"
-#include "cxDataManager.h"
-//#include "cxProbeImpl.h"
 #include "cxVideoServiceOld.h"
 #include "cxTrackingService.h"
 #include "cxDirectlyLinkedImageReceiverThread.h"

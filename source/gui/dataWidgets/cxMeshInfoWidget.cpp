@@ -34,7 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVBoxLayout>
 #include "cxImage.h"
 #include "cxReporter.h"
-#include "cxDataManager.h"
 #include "cxRegistrationTransform.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxLabeledLineEditWidget.h"

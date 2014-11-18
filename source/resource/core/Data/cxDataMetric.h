@@ -65,7 +65,7 @@ class DataManager;
 class cxResource_EXPORT DataMetric : public Data
 {
 public:
-	DataMetric(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider);
+	DataMetric(const QString& uid, const QString& name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider);
 	virtual ~DataMetric();
 
     virtual QString getSpace();
@@ -83,7 +83,7 @@ public:
 	virtual bool load(QString path) { return true; } ///< metrics dont store info in file, xml only.
 
 protected:
-	DataServicePtr mDataManager;
+	PatientModelServicePtr mDataManager;
 	SpaceProviderPtr mSpaceProvider;
 
 	QString getSingleLineHeader() const;

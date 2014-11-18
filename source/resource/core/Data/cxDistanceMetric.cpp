@@ -37,12 +37,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPlaneMetric.h"
 #include "cxPointMetric.h"
 
-#include "cxDataManager.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
 
-DistanceMetric::DistanceMetric(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider) :
+DistanceMetric::DistanceMetric(const QString& uid, const QString& name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider) :
 				DataMetric(uid, name, dataManager, spaceProvider)
 {
 	mArguments.reset(new MetricReferenceArgumentList(QStringList() << "line endpoint 0" << "line endpoint 1"));
@@ -52,7 +52,7 @@ DistanceMetric::DistanceMetric(const QString& uid, const QString& name, DataServ
 	connect(mArguments.get(), SIGNAL(argumentsChanged()), this, SIGNAL(transformChanged()));
 }
 
-DistanceMetricPtr DistanceMetric::create(QString uid, QString name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider)
+DistanceMetricPtr DistanceMetric::create(QString uid, QString name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider)
 {
 	return DistanceMetricPtr(new DistanceMetric(uid, name, dataManager, spaceProvider));
 }

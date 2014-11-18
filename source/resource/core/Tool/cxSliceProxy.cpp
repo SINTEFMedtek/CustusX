@@ -35,20 +35,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <math.h>
 #include "cxTypeConversions.h"
-#include "cxDataManager.h"
+#include "cxPatientModelService.h"
 #include "cxSliceComputer.h"
 #include "cxTool.h"
 
 namespace cx
 {
 
-SliceProxyPtr SliceProxy::create(DataServicePtr dataManager)
+SliceProxyPtr SliceProxy::create(PatientModelServicePtr dataManager)
 {
 	SliceProxyPtr retval(new SliceProxy(dataManager));
 	return retval;
 }
 
-SliceProxy::SliceProxy(DataServicePtr dataManager) :
+SliceProxy::SliceProxy(PatientModelServicePtr dataManager) :
 	mCutplane(new SliceComputer())
 {
 	mDataManager = dataManager;

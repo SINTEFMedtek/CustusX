@@ -32,7 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxtestReconstructionManagerFixture.h"
 
-#include "cxDataManager.h"
 #include "catch.hpp"
 #include <QApplication>
 #include "cxDoubleDataAdapterXml.h"
@@ -49,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVisualizationService.h"
 #include "cxUsReconstructionServiceProxy.h"
 #include "cxPatientModelServiceProxy.h"
+#include "cxLogger.h"
 
 namespace cxtest
 {
@@ -61,8 +61,11 @@ ReconstructionManagerTestFixture::ReconstructionManagerTestFixture() :
 	cx::DataLocations::setTestMode();
 	cx::LogicManager::initialize();
 
+	QString folder = cx::DataLocations::getTestDataPath() + "/temp/test.cx3";
+	cx::logicManager()->getPatientModelService()->newPatient(folder);
+
 	ctkPluginContext *pluginContext = cx::logicManager()->getPluginContext();
-	mPatientModelService = cx::PatientModelServicePtr(new cx::PatientModelServiceProxy(pluginContext));//Can't mock
+	mPatientModelService = cx::PatientModelServiceProxy::create(pluginContext);
 }
 
 ReconstructionManagerTestFixture::~ReconstructionManagerTestFixture()
@@ -153,8 +156,8 @@ cx::UsReconstructionServicePtr ReconstructionManagerTestFixture::getManager()
 		cx::UsReconstructionServicePtr reconstructer = cx::UsReconstructionServicePtr(new cx::UsReconstructionServiceProxy(pluginContext)); //Can't mock
 
 
-		reconstructer->setOutputBasePath(cx::DataLocations::getTestDataPath() + "/temp/");
-		reconstructer->setOutputRelativePath("Images");
+//		reconstructer->setOutputBasePath(cx::DataLocations::getTestDataPath() + "/temp/");
+//		reconstructer->setOutputRelativePath("Images");
 
 		mManager = reconstructer;
 	}

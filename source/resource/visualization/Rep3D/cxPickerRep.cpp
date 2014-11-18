@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkEventQtSlotConnect.h>
 //#include <vtkCellPicker.h>
 #include "cxMesh.h"
-#include "cxDataManager.h"
+#include "cxPatientModelService.h"
 #include "cxReporter.h"
 #include "cxImage.h"
 #include "cxView.h"
@@ -72,11 +72,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-PickerRepPtr PickerRep::New(DataServicePtr dataManager, const QString& uid)
+PickerRepPtr PickerRep::New(PatientModelServicePtr dataManager, const QString& uid)
 {
 	return wrap_new(new PickerRep(dataManager), uid);
 }
-PickerRep::PickerRep(DataServicePtr dataManager) :
+PickerRep::PickerRep(PatientModelServicePtr dataManager) :
 	RepImpl(),
 	mDataManager(dataManager),
 	mPickedPoint(), mSphereRadius(2) //, mConnections(vtkEventQtSlotConnectPtr::New())

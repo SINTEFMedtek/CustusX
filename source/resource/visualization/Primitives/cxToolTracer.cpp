@@ -48,7 +48,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTool.h"
 #include "cxBoundingBox3D.h"
 #include "cxVolumeHelpers.h"
-#include "cxDataManager.h"
 #include "cxSpaceProvider.h"
 
 namespace cx

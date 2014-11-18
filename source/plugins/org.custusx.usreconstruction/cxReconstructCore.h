@@ -75,8 +75,8 @@ public:
 
 		QString mAlgorithmUid;
 		QDomElement mAlgoSettings;
-		QString mOutputRelativePath;///< Relative path to the output image
-		QString mOutputBasePath;///< Global path where the relative path starts, for the output image
+//		QString mOutputRelativePath;///< Relative path to the output image
+//		QString mOutputBasePath;///< Global path where the relative path starts, for the output image
 		QString mShaderPath; ///< name of shader folder
 		bool mAngio; ///< true for angio data, false is B-mode.
 		QString mTransferFunctionPreset;

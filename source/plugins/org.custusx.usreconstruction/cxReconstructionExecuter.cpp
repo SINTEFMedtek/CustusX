@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReconstructionExecuter.h"
 #include "cxTimedAlgorithm.h"
 #include "cxReconstructThreads.h"
-
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -62,7 +62,6 @@ void ReconstructionExecuter::startNonThreadedReconstruction(ReconstructionMethod
 	{
 		mCores[i]->reconstruct();
 	}
-
 }
 
 void ReconstructionExecuter::startReconstruction(ReconstructionMethodService* algo, ReconstructCore::InputParams par, USReconstructInputData fileData, bool createBModeWhenAngio)
