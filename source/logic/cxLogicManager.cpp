@@ -76,10 +76,10 @@ VideoServiceOldPtr LegacySingletons::mVideoServiceOld;
 VisualizationServiceOldPtr LegacySingletons::mVisualizationService;
 StateServicePtr LegacySingletons::mStateService;
 
-DataManager* dataManager()
-{
-	return LegacySingletons::mDataManager.get(); // TODO remove get()
-}
+//DataManager* dataManager()
+//{
+//	return LegacySingletons::mDataManager.get(); // TODO remove get()
+//}
 ViewManager* viewManager()
 {
 	return LegacySingletons::mVisualizationService.get();

@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkPolyData.h>
 #include <vtkPolyDataWriter.h>
 #include <vtkCellArray.h>
-#include "cxDataManager.h"
+//#include "cxDataManager.h"
 #include "cxMesh.h"
 #include "cxVector3D.h"
 #include "cxDataLocations.h"
@@ -54,8 +54,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxElastixSingleThreadedRunner.h"
 #include "cxTypeConversions.h"
 #include "cxElastixParameters.h"
-#include "cxLogicManager.h"
+//#include "cxLogicManager.h"
 #include "cxRegServices.h"
+#include "cxReporter.h"
+#include "cxtestPatientModelServiceMock.h"
 
 namespace cxtest
 {
@@ -73,16 +75,16 @@ class ElastiXFixture
 public:
 	ElastiXFixture()
 	{
-//		cx::Reporter::initialize();
+		cx::Reporter::initialize();
 //		cx::cxDataManager::initialize();
-		cx::LogicManager::initialize();
+//		cx::LogicManager::initialize();
 	}
 
 	~ElastiXFixture()
 	{
-		cx::LogicManager::shutdown();
+//		cx::LogicManager::shutdown();
 //		cx::DataManager::shutdown();
-//		cx::Reporter::shutdown();
+		cx::Reporter::shutdown();
 	}
 	bool compareTransforms(cx::Transform3D result, cx::Transform3D solution)
 	{
@@ -125,10 +127,12 @@ TEST_CASE("ElastiX should register kaisa to a translated+resampled version of sa
 	QString kaisa_resliced_fname = cx::DataLocations::getTestDataPath() + "/testing/elastiX/kaisa_resliced.mhd";
 	QString kaisa_resliced_linear_fname = cx::DataLocations::getTestDataPath() + "/testing/elastiX/kaisa_resliced_linear.mhd";
 
-	std::cout << "------" << kaisa_padded_fname << std::endl;
-	cx::DataPtr kaisa_resliced_linear = cx::dataManager()->loadData("source_"+kaisa_resliced_linear_fname, kaisa_resliced_linear_fname);
-	cx::DataPtr kaisa_padded = cx::dataManager()->loadData("source_"+kaisa_padded_fname, kaisa_padded_fname);
-	cx::DataPtr kaisa_resliced = cx::dataManager()->loadData("source_"+kaisa_resliced_fname, kaisa_resliced_fname);
+//	std::cout << "------" << kaisa_padded_fname << std::endl;
+	cxtest::PatientModelServiceMock pasm;
+	QString dummy;
+	cx::DataPtr kaisa_resliced_linear = pasm.importData(kaisa_resliced_linear_fname, dummy);
+	cx::DataPtr kaisa_padded = pasm.importData(kaisa_padded_fname, dummy);
+	cx::DataPtr kaisa_resliced = pasm.importData(kaisa_resliced_fname, dummy);
 
 	REQUIRE(kaisa_resliced_linear.get());
 	REQUIRE(kaisa_padded.get());
