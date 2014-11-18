@@ -48,7 +48,6 @@ SliderRangeGroupWidget::SliderRangeGroupWidget(QWidget* parent, DoublePairDataAd
 {
 	mData = dataInterface;
 	this->init(gridLayout, row);
-	connect(mData.get(), SIGNAL(changed()), this, SLOT(dataChanged()));
 }
 
 void SliderRangeGroupWidget::init(QGridLayout *gridLayout, int row)
@@ -92,6 +91,10 @@ void SliderRangeGroupWidget::init(QGridLayout *gridLayout, int row)
 	// connect to slider
 	connect(mSpanSlider, SIGNAL(doubleSpanChanged(double, double)), this, SLOT(doubleSpanChangedSlot(double, double)));
 	connect(mUpperEdit, SIGNAL(valueChanged(double)), this, SLOT(textEditedSlot()));
+
+	// connect to backend
+	connect(mData.get(), SIGNAL(changed()), this, SLOT(dataChanged()));
+	this->dataChanged();
 }
 
 void SliderRangeGroupWidget::setRange(const DoubleRange& range)
@@ -139,8 +142,7 @@ void SliderRangeGroupWidget::dataChanged()
 	mLowerEdit->blockSignals(true);
 	mUpperEdit->blockSignals(true);
 
-	mSpanSlider->setDoubleLowerValue(mData->getValue()[0]);
-	mSpanSlider->setDoubleUpperValue(mData->getValue()[1]);
+	mSpanSlider->setDoubleSpan(mData->getValue()[0], mData->getValue()[1]);
 	mLowerEdit->setValue(mData->getValue()[0]);
 	mUpperEdit->setValue(mData->getValue()[1]);
 
@@ -155,9 +157,12 @@ void SliderRangeGroupWidget::dataChanged()
 void SliderRangeGroupWidget::updateGuiRange()
 {
 	DoubleRange range = mData->getValueRange();
+
 	mSpanSlider->setDoubleRange(range);
+
 	mLowerEdit->setRange(range.min(), range.max());
 	mLowerEdit->setSingleStep(range.step());
+
 	mUpperEdit->setRange(range.min(), range.max());
 	mUpperEdit->setSingleStep(range.step());
 }
