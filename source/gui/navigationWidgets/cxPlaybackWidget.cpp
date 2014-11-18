@@ -43,12 +43,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogger.h"
 #include "cxTypeConversions.h"
 #include "cxTimelineWidget.h"
-#include "cxDataManager.h"
 #include "cxData.h"
 #include "cxRegistrationTransform.h"
 #include "cxVideoServiceOld.h"
 #include "cxPlaybackUSAcquisitionVideo.h"
 #include "cxSettings.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
@@ -273,7 +273,7 @@ std::vector<TimelineEvent> PlaybackWidget::createEvents()
 		}
 	}
 
-	std::map<QString, DataPtr> data = dataManager()->getData();
+	std::map<QString, DataPtr> data = patientService()->getData();
 	for (std::map<QString, DataPtr>::iterator iter=data.begin(); iter!=data.end(); ++iter)
 	{
 		QString desc("loaded " + iter->second->getName());
@@ -288,7 +288,7 @@ std::vector<TimelineEvent> PlaybackWidget::createEvents()
 		copy(current.begin(), current.end(), std::back_inserter(events));
 	}
 
-	RegistrationHistoryPtr reg = dataManager()->get_rMpr_History();
+	RegistrationHistoryPtr reg = patientService()->get_rMpr_History();
 	TimelineEventVector current = this->convertRegistrationHistoryToEvents(reg);
 	copy(current.begin(), current.end(), std::back_inserter(events));
 

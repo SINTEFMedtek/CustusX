@@ -54,6 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLegacySingletons.h"
 #include "cxSpaceProvider.h"
 #include "cxTypeConversions.h"
+#include "cxPatientModelService.h"
 
 
 namespace cx
@@ -62,12 +63,12 @@ namespace cx
 MetricManager::MetricManager() : QObject(NULL)
 {
 	connect(trackingService().get(), &TrackingService::stateChanged, this, &MetricManager::metricsChanged);
-	connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SIGNAL(metricsChanged()));
+	connect(patientService().get(), SIGNAL(dataAddedOrRemoved()), this, SIGNAL(metricsChanged()));
 }
 
 DataMetricPtr MetricManager::getMetric(QString uid)
 {
-	DataPtr data = dataManager()->getData(uid);
+	DataPtr data = patientService()->getData(uid);
 	DataMetricPtr metric = boost::dynamic_pointer_cast<DataMetric>(data);
 	return metric;
 }
@@ -75,7 +76,7 @@ DataMetricPtr MetricManager::getMetric(QString uid)
 std::vector<DataMetricPtr> MetricManager::getAllMetrics()
 {
 	std::vector<DataMetricPtr> retval;
-	std::map<QString, DataPtr> all = dataManager()->getData();
+	std::map<QString, DataPtr> all = patientService()->getData();
 	for (std::map<QString, DataPtr>::iterator iter=all.begin(); iter!=all.end(); ++iter)
 	{
 		DataMetricPtr metric = boost::dynamic_pointer_cast<DataMetric>(iter->second);
@@ -108,7 +109,7 @@ void MetricManager::moveToMetric(QString uid)
 
 void MetricManager::setManualToolPosition(Vector3D p_r)
 {
-	Transform3D rMpr = dataManager()->get_rMpr();
+	Transform3D rMpr = patientService()->get_rMpr();
 	Vector3D p_pr = rMpr.inv().coord(p_r);
 
 	// set the picked point as offset tip
@@ -118,25 +119,18 @@ void MetricManager::setManualToolPosition(Vector3D p_r)
 	p_r = rMpr.coord(p_pr);
 
 	// TODO set center here will not do: must handle
-	dataManager()->setCenter(p_r);
+	patientService()->setCenter(p_r);
 	Vector3D p0_pr = tool->get_prMt().coord(Vector3D(0, 0, 0));
 	tool->set_prMt(createTransformTranslate(p_pr - p0_pr) * tool->get_prMt());
 }
 
-DataFactoryPtr MetricManager::getDataFactory()
-{
-	return dataManager()->getDataFactory();
-}
-
 PointMetricPtr MetricManager::addPoint(Vector3D point, CoordinateSystem space, QString name)
 {
-	PointMetricPtr p1 =	this->getDataFactory()->createSpecific<PointMetric>("point%1");
-//	PointMetricPtr p1 = this->createTestMetric<cx::PointMetric>("point%1");
-//	PointMetricPtr p1 = PointMetric::create("point%1","point%1");
-  p1->get_rMd_History()->setParentSpace("reference");
+	PointMetricPtr p1 =	patientService()->createSpecificData<PointMetric>("point%1");
+	p1->get_rMd_History()->setParentSpace("reference");
 	p1->setSpace(space);
 	p1->setCoordinate(point);
-	dataManager()->loadData(p1);
+	patientService()->insertData(p1);
 
 	viewManager()->getViewGroups()[0]->getData()->addData(p1);
 	this->setActiveUid(p1->getUid());
@@ -159,7 +153,7 @@ PointMetricPtr MetricManager::addPointInDefaultPosition()
 
 void MetricManager::addFrameButtonClickedSlot()
 {
-	FrameMetricPtr frame = this->getDataFactory()->createSpecific<FrameMetric>("frame%1");
+	FrameMetricPtr frame = patientService()->createSpecificData<FrameMetric>("frame%1");
 //	  FrameMetricPtr frame(new FrameMetric("frame%1", "frame%1"));
   frame->get_rMd_History()->setParentSpace("reference");
 
@@ -174,7 +168,7 @@ void MetricManager::addFrameButtonClickedSlot()
 
 void MetricManager::addToolButtonClickedSlot()
 {
-	ToolMetricPtr frame = this->getDataFactory()->createSpecific<ToolMetric>("tool%1");
+	ToolMetricPtr frame = patientService()->createSpecificData<ToolMetric>("tool%1");
   frame->get_rMd_History()->setParentSpace("reference");
 
   CoordinateSystem ref = CoordinateSystem::reference();
@@ -190,7 +184,7 @@ void MetricManager::addToolButtonClickedSlot()
 
 void MetricManager::addPlaneButtonClickedSlot()
 {
-  PlaneMetricPtr p1 = this->getDataFactory()->createSpecific<PlaneMetric>("plane%1");
+  PlaneMetricPtr p1 = patientService()->createSpecificData<PlaneMetric>("plane%1");
   p1->get_rMd_History()->setParentSpace("reference");
 
   std::vector<DataPtr> args = this->getSpecifiedNumberOfValidArguments(p1->getArguments());
@@ -232,7 +226,7 @@ std::vector<DataPtr> MetricManager::refinePointArguments(std::vector<DataPtr> ar
 
 void MetricManager::addDistanceButtonClickedSlot()
 {
-	DistanceMetricPtr d0 = this->getDataFactory()->createSpecific<DistanceMetric>("distance%1");
+	DistanceMetricPtr d0 = patientService()->createSpecificData<DistanceMetric>("distance%1");
 //	DistanceMetricPtr d0(new DistanceMetric("distance%1","distance%1"));
   d0->get_rMd_History()->setParentSpace("reference");
 
@@ -245,7 +239,7 @@ void MetricManager::addDistanceButtonClickedSlot()
 
 void MetricManager::addAngleButtonClickedSlot()
 {
-	AngleMetricPtr d0 = this->getDataFactory()->createSpecific<AngleMetric>("angle%1");
+	AngleMetricPtr d0 = patientService()->createSpecificData<AngleMetric>("angle%1");
 //	AngleMetricPtr d0(new AngleMetric("angle%1","angle%1"));
   d0->get_rMd_History()->setParentSpace("reference");
 
@@ -280,7 +274,7 @@ std::vector<DataPtr> MetricManager::getSpecifiedNumberOfValidArguments(MetricRef
 
 void MetricManager::addSphereButtonClickedSlot()
 {
-	SphereMetricPtr d0 = this->getDataFactory()->createSpecific<SphereMetric>("sphere%1");
+	SphereMetricPtr d0 = patientService()->createSpecificData<SphereMetric>("sphere%1");
 	d0->get_rMd_History()->setParentSpace("reference");
 	std::vector<DataPtr> args = this->getSpecifiedNumberOfValidArguments(d0->getArguments());
 	d0->getArguments()->set(0, args[0]);
@@ -290,7 +284,7 @@ void MetricManager::addSphereButtonClickedSlot()
 
 void MetricManager::addDonutButtonClickedSlot()
 {
-	DonutMetricPtr d0 = this->getDataFactory()->createSpecific<DonutMetric>("donut%1");
+	DonutMetricPtr d0 = patientService()->createSpecificData<DonutMetric>("donut%1");
 	d0->get_rMd_History()->setParentSpace("reference");
 	std::vector<DataPtr> args = this->getSpecifiedNumberOfValidArguments(d0->getArguments());
 	d0->getArguments()->set(0, args[0]);
@@ -301,7 +295,7 @@ void MetricManager::addDonutButtonClickedSlot()
 
 void MetricManager::installNewMetric(DataMetricPtr metric)
 {
-	dataManager()->loadData(metric);
+	patientService()->insertData(metric);
 	this->setActiveUid(metric->getUid());
 	viewManager()->getViewGroups()[0]->getData()->addData(metric);
 }
@@ -340,7 +334,7 @@ void MetricManager::exportMetricsToFile(QString filename)
 	if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
 		return;
 
-	std::map<QString, DataPtr> dataMap = dataManager()->getData();
+	std::map<QString, DataPtr> dataMap = patientService()->getData();
 	std::map<QString, DataPtr>::iterator iter;
 	for (iter = dataMap.begin(); iter != dataMap.end(); ++iter)
 	{

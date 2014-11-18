@@ -170,14 +170,11 @@ void EraserWidget::continousRemoveSlot()
 
 void EraserWidget::duplicateSlot()
 {
-	ImagePtr original = dataManager()->getActiveImage();
-//	QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
+	ImagePtr original = patientService()->getActiveImage();
 
 	ImagePtr duplicate = duplicateImage(dataService(), original);
 	patientService()->insertData(duplicate);
-//	dataManager()->loadData(duplicate);
-//	dataManager()->saveImage(duplicate, outputBasePath);
-	dataManager()->setActiveImage(duplicate);
+	patientService()->setActiveImage(duplicate);
 
 	// replace viz of original with duplicate
 	std::vector<ViewGroupPtr> viewGroups = viewManager()->getViewGroups();
@@ -203,18 +200,14 @@ void EraserWidget::sphereSizeChangedSlot()
  */
 void EraserWidget::saveSlot()
 {
-	patientService()->insertData(dataManager()->getActiveImage());
-//	ImagePtr image = dataManager()->getActiveImage();
-//	QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
-
-//	dataManager()->saveImage(image, outputBasePath);
+	patientService()->insertData(patientService()->getActiveImage());
 }
 
 
 template <class TYPE>
 void EraserWidget::eraseVolume(TYPE* volumePointer, TYPE replaceVal)
 {
-	ImagePtr image = dataManager()->getActiveImage();
+	ImagePtr image = patientService()->getActiveImage();
 	vtkImageDataPtr img = image->getBaseVtkImageData();
 
 	Eigen::Array3i dim(img->GetDimensions());
@@ -278,37 +271,7 @@ void EraserWidget::removeSlot()
 	if (!mSphere)
 		return;
 
-//	vtkPolyDataPtr poly = vtkPolyDataPtr::New();
-//	mEraserSphere->GetPolyData(poly);
-
-#if 0
-	// experimental clipping of mesh - has no effect...
-	std::map<QString,MeshPtr> meshes = dataManager()->getMeshes();
-	if (!meshes.empty())
-	{
-		MeshPtr mesh = meshes.begin()->second;
-
-		Vector3D c(mEraserSphere->GetCenter());
-		double r = mEraserSphere->GetRadius();
-		Transform3D dMr = mesh->get_rMd().inv();
-		Vector3D c_d = dMr.coord(c);
-		double r_d = dMr.vector(r * Vector3D::UnitX()).length();
-		vtkSphere* sphere = vtkSphere::New();
-		sphere->SetRadius(r_d);
-		sphere->SetCenter(c_d.data());
-
-
-//		mEraserSphere->GetSphere(sphere);
-		vtkClipPolyData* clipper = vtkClipPolyData::New();
-		clipper->SetInput(mesh->getVtkPolyData());
-		clipper->SetClipFunction(sphere);
-		clipper->Update();
-		mesh->setVtkPolyData(clipper->GetOutput());
-		return;
-	}
-#endif
-
-	ImagePtr image = dataManager()->getActiveImage();
+	ImagePtr image = patientService()->getActiveImage();
 	vtkImageDataPtr img = image->getBaseVtkImageData();
 
 	if (img->GetScalarType()==VTK_CHAR)

@@ -139,13 +139,10 @@ void CroppingWidget::cropperChangedSlot()
 
 ImagePtr CroppingWidget::cropClipButtonClickedSlot()
 {
-  ImagePtr image = dataManager()->getActiveImage();
-//  QString outputBasePath = patientService()->getActivePatientFolder();
+  ImagePtr image = patientService()->getActiveImage();
 
   ImagePtr retval = cropImage(dataService(), image);
   patientService()->insertData(retval);
-//  dataManager()->loadData(retval);
-//  dataManager()->saveImage(retval, outputBasePath);
   return retval;
 }
 

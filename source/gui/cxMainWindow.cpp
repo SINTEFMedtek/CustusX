@@ -387,10 +387,10 @@ void MainWindow::createActions()
 	mDebugModeAction = new QAction(tr("&Debug Mode"), this);
 	mDebugModeAction->setShortcut(tr("Ctrl+D"));
 	mDebugModeAction->setCheckable(true);
-	mDebugModeAction->setChecked(dataManager()->getDebugMode());
+	mDebugModeAction->setChecked(patientService()->getDebugMode());
 	mDebugModeAction->setStatusTip(tr("Set debug mode, this enables lots of weird stuff."));
-	connect(mDebugModeAction, SIGNAL(triggered(bool)), dataManager(), SLOT(setDebugMode(bool)));
-	connect(dataManager(), SIGNAL(debugModeChanged(bool)), mDebugModeAction, SLOT(setChecked(bool)));
+	connect(mDebugModeAction, SIGNAL(triggered(bool)), patientService().get(), SLOT(setDebugMode(bool)));
+	connect(patientService().get(), SIGNAL(debugModeChanged(bool)), mDebugModeAction, SLOT(setChecked(bool)));
 	connect(mDebugModeAction, SIGNAL(toggled(bool)), this, SLOT(toggleDebugModeSlot(bool)));
 
 	mFullScreenAction = new QAction(tr("Fullscreen"), this);
@@ -599,8 +599,8 @@ void MainWindow::centerToImageCenterSlot()
 {
 	NavigationPtr nav = viewManager()->getNavigation();
 
-	if (dataManager()->getActiveImage())
-		nav->centerToData(dataManager()->getActiveImage());
+	if (patientService()->getActiveImage())
+		nav->centerToData(patientService()->getActiveImage());
 	else if (!viewManager()->getViewGroups().empty())
 		nav->centerToView(viewManager()->getViewGroups()[0]->getData()->getData());
 //		nav->centerToView(mVisualizationService->getViewGroupData(0)->getData());//Too early?
@@ -1033,12 +1033,12 @@ void MainWindow::quitSlot()
 
 void MainWindow::deleteDataSlot()
 {
-	if (!dataManager()->getActiveImage())
+	if (!patientService()->getActiveImage())
 		return;
-	QString text = QString("Do you really want to delete data %1?").arg(dataManager()->getActiveImage()->getName());
+	QString text = QString("Do you really want to delete data %1?").arg(patientService()->getActiveImage()->getName());
 	if (QMessageBox::question(this, "Data delete", text, QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel))!=QMessageBox::Ok)
 		return;
-	mPatientModelService->removeData(dataManager()->getActiveImage()->getUid());
+	mPatientModelService->removeData(patientService()->getActiveImage()->getUid());
 }
 
 void MainWindow::configureSlot()

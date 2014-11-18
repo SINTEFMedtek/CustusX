@@ -36,8 +36,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include "cxFrameForest.h"
-#include "cxDataManager.h"
 #include "cxData.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
@@ -53,7 +53,7 @@ FrameTreeWidget::FrameTreeWidget(QWidget* parent) :
   mTreeWidget->setHeaderLabels(QStringList() << "Frame");
 
   // TODO this must also listen to all changed() in all data
-  connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataLoadedSlot()));
+  connect(patientService().get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataLoadedSlot()));
 }
 
 QString FrameTreeWidget::defaultWhatsThis() const
@@ -67,14 +67,14 @@ QString FrameTreeWidget::defaultWhatsThis() const
 
 void FrameTreeWidget::dataLoadedSlot()
 {
-  for (DataManager::DataMap::iterator iter=mConnectedData.begin(); iter!=mConnectedData.end(); ++iter)
+  for (std::map<QString, DataPtr>::iterator iter=mConnectedData.begin(); iter!=mConnectedData.end(); ++iter)
   {
 	disconnect(iter->second.get(), SIGNAL(transformChanged()), this, SLOT(setModified()));
   }
 
-  mConnectedData = dataManager()->getData();
+  mConnectedData = patientService()->getData();
 
-  for (DataManager::DataMap::iterator iter=mConnectedData.begin(); iter!=mConnectedData.end(); ++iter)
+  for (std::map<QString, DataPtr>::iterator iter=mConnectedData.begin(); iter!=mConnectedData.end(); ++iter)
   {
 	connect(iter->second.get(), SIGNAL(transformChanged()), this, SLOT(setModified()));
   }
@@ -91,7 +91,7 @@ void FrameTreeWidget::rebuild()
 {
   mTreeWidget->clear();
 
-  FrameForest forest(dataService()->getData());
+  FrameForest forest(patientService()->getData());
   QDomElement root = forest.getDocument().documentElement();
 
   this->fill(mTreeWidget->invisibleRootItem(), root);
@@ -107,7 +107,7 @@ void FrameTreeWidget::fill(QTreeWidgetItem* parent, QDomNode node)
     QString frameName = child.toElement().tagName();
 
     // if frame refers to a data, use its name instead.
-    DataPtr data = dataManager()->getData(frameName);
+	DataPtr data = patientService()->getData(frameName);
     if (data)
       frameName = data->getName();
 
