@@ -165,6 +165,7 @@ public:
 	virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const = 0;
 
 	virtual void setCenter(const Vector3D& center) = 0;
+	virtual Vector3D getCenter() const = 0; ///< current common center point for user viewing.
 
 	virtual CLINICAL_APPLICATION getClinicalApplication() const = 0;
 	virtual void setClinicalApplication(CLINICAL_APPLICATION application) = 0;
@@ -180,6 +181,7 @@ public:
 	static PatientModelServicePtr getNullObject();
 
 signals:
+	void centerChanged(); ///< emitted when center is changed.
 	void dataAddedOrRemoved();
 	void activeImageChanged(const QString& uId);
 	void landmarkPropertiesChanged(); ///< emitted when global info about a landmark changed

@@ -282,7 +282,7 @@ void ImportDataDialog::convertToUnsigned()
 	if (!image)
 		return;
 
-	ImagePtr converted = convertImageToUnsigned(dataService(), image);
+	ImagePtr converted = convertImageToUnsigned(patientService(), image);
 
 	image->setVtkImageData(converted->getBaseVtkImageData());
 

@@ -126,7 +126,7 @@ void TrackedCenterlineWidget::preprocessResampler()
 	}
 
 	//visualize the tracked data as a mesh
-	loadMeshFromToolTransforms(dataService(), transforms_prMt);
+	loadMeshFromToolTransforms(patientService(), transforms_prMt);
 
 	//convert the transforms into a binary image
 	TrackingDataToVolume converter;

@@ -47,20 +47,20 @@ namespace cxtest
 
 TestServicesType createDummyCoreServices()
 {
+	TestServicesType retval;
+	retval.mPatientModelService.reset(new PatientModelServiceMock());
 	cx::DataManagerImplPtr dataService = cx::DataManagerImpl::create();
 	cx::TrackingServicePtr trackingService = cx::DummyToolManager::create();
 
 	cx::SpaceProviderPtr spaceProvider;
-	spaceProvider.reset(new cx::SpaceProviderImpl(trackingService, dataService));
+	spaceProvider.reset(new cx::SpaceProviderImpl(trackingService, retval.mPatientModelService));
 //	cx::SpaceProviderPtr spaceProvider = cxtest::SpaceProviderMock::create();
 	dataService->setSpaceProvider(spaceProvider);
 
 	cx::DataFactoryPtr dataFactory;
-	dataFactory.reset(new cx::DataFactory(dataService, spaceProvider));
+	dataFactory.reset(new cx::DataFactory(retval.mPatientModelService, spaceProvider));
 	dataService->setDataFactory(dataFactory);
 
-	TestServicesType retval;
-	retval.mPatientModelService.reset(new PatientModelServiceMock());
 	retval.mDataFactory = dataFactory;
 	retval.mDataService = dataService;
 	retval.mSpaceProvider = spaceProvider;

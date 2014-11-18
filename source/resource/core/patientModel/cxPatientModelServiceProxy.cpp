@@ -72,6 +72,7 @@ void PatientModelServiceProxy::initServiceListener()
 void PatientModelServiceProxy::onServiceAdded(PatientModelService* service)
 {
 	mPatientModelService.reset(service, null_deleter());
+	connect(service, &PatientModelService::centerChanged, this, &PatientModelService::centerChanged);
 	connect(service, SIGNAL(dataAddedOrRemoved()), this, SIGNAL(dataAddedOrRemoved()));
 	connect(service, SIGNAL(activeImageChanged(const QString&)), this, SIGNAL(activeImageChanged(const QString&)));
 	connect(service, SIGNAL(landmarkPropertiesChanged()), this, SIGNAL(landmarkPropertiesChanged()));
@@ -92,6 +93,7 @@ void PatientModelServiceProxy::onServiceAdded(PatientModelService* service)
 
 void PatientModelServiceProxy::onServiceRemoved(PatientModelService *service)
 {
+	connect(service, &PatientModelService::centerChanged, this, &PatientModelService::centerChanged);
 	disconnect(service, SIGNAL(dataAddedOrRemoved()), this, SIGNAL(dataAddedOrRemoved()));
 	disconnect(service, SIGNAL(activeImageChanged(const QString&)), this, SIGNAL(activeImageChanged(const QString&)));
 	disconnect(service, SIGNAL(landmarkPropertiesChanged()), this, SIGNAL(landmarkPropertiesChanged()));
@@ -211,7 +213,12 @@ PresetTransferFunctions3DPtr PatientModelServiceProxy::getPresetTransferFunction
 
 void PatientModelServiceProxy::setCenter(const Vector3D &center)
 {
-	return mPatientModelService->setCenter(center);
+	mPatientModelService->setCenter(center);
+}
+
+Vector3D PatientModelServiceProxy::getCenter() const
+{
+	return mPatientModelService->getCenter();
 }
 
 QString PatientModelServiceProxy::addLandmark()

@@ -159,6 +159,11 @@ void PatientModelServiceNull::setCenter(const Vector3D &center)
 	printWarning();
 }
 
+Vector3D PatientModelServiceNull::getCenter() const
+{
+	return Vector3D::Zero();
+}
+
 QString PatientModelServiceNull::addLandmark()
 {
 	printWarning();

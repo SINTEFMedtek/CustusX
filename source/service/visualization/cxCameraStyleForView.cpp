@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogger.h"
 #include "cxTool.h"
 #include <vtkRenderWindowInteractor.h>
+#include "cxPatientModelService.h"
 
 SNW_DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, CAMERA_STYLE_TYPE, cstCOUNT)
 {
@@ -147,7 +148,7 @@ void CameraStyleForView::moveCameraToolStyleSlot(Transform3D prMt, double timest
 	if (!camera)
 		return;
 
-	Transform3D rMpr = mBackend->getDataManager()->get_rMpr();
+	Transform3D rMpr = mBackend->getPatientService()->get_rMpr();
 
 	Transform3D rMt = rMpr * prMt;
 

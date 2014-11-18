@@ -160,6 +160,7 @@ void DataManagerImpl::setCenter(const Vector3D& center)
 	mCenter = center;
 	emit centerChanged();
 }
+
 ImagePtr DataManagerImpl::getActiveImage() const
 {
 	return mActiveImage;

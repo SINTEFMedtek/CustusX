@@ -48,7 +48,7 @@ void PatientModelServiceMock::insertData(cx::DataPtr data)
 
 cx::DataPtr PatientModelServiceMock::createData(QString type, QString uid, QString name)
 {
-	cx::DataFactory factory = cx::DataFactory(cx::DataServicePtr(), cx::SpaceProviderPtr());
+	cx::DataFactory factory = cx::DataFactory(cx::PatientModelServicePtr(), cx::SpaceProviderPtr());
 	cx::DataPtr data = factory.create(type, uid);
 	data->setName(name);
 	return data;

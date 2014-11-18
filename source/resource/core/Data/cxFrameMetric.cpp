@@ -37,12 +37,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-FrameMetricPtr FrameMetric::create(QString uid, QString name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider)
+FrameMetricPtr FrameMetric::create(QString uid, QString name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider)
 {
 	return FrameMetricPtr(new FrameMetric(uid, name, dataManager, spaceProvider));
 }
 
-FrameMetric::FrameMetric(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider) :
+FrameMetric::FrameMetric(const QString& uid, const QString& name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider) :
 		cx::FrameMetricBase(uid, name, dataManager, spaceProvider)
 {
 }

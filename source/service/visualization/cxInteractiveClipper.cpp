@@ -57,7 +57,7 @@ InteractiveClipper::InteractiveClipper(VisualizationServiceBackendPtr backend) :
 
 	// create a slice planes proxy containing all slice definitions,
 	// for use with the clipper
-	DataServicePtr dm = mBackend->getDataManager();
+	PatientModelServicePtr dm = mBackend->getPatientService();
 	mSlicePlanesProxy = SlicePlanesProxyPtr(new SlicePlanesProxy());
 	mSlicePlanesProxy->addSimpleSlicePlane(ptSAGITTAL, dm);
 	mSlicePlanesProxy->addSimpleSlicePlane(ptCORONAL, dm);

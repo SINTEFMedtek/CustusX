@@ -180,7 +180,7 @@ void LandmarkPatientRegistrationWidget::showEvent(QShowEvent* event)
 	if (rep)
 	{
 		rep->setPrimarySource(mImageLandmarkSource);
-		rep->setSecondarySource(PatientLandmarksSource::New(dataService()));
+		rep->setSecondarySource(PatientLandmarksSource::New(patientService()));
 		rep->setSecondaryColor(QColor::fromRgbF(0, 0.6, 0.8));
 	}
 }

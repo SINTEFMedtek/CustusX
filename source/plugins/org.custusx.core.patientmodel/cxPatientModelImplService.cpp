@@ -261,6 +261,12 @@ void PatientModelImplService::setCenter(const Vector3D &center)
 	logicManager()->getDataService()->setCenter(center);
 }
 
+Vector3D PatientModelImplService::getCenter() const
+{
+	return logicManager()->getDataService()->getCenter();
+}
+
+
 QString PatientModelImplService::addLandmark()
 {
 	return dataService()->addLandmark();

@@ -175,11 +175,11 @@ void LogicManager::createInterconnectedDataAndSpace()
 	LegacySingletons::mDataManager = mDataService;
 
 	mSpaceProvider.reset(new cx::SpaceProviderImpl(mTrackingService,
-												   mDataService));
+												   mPatientModelService));
 	mDataService->setSpaceProvider(mSpaceProvider);
 	LegacySingletons::mSpaceProvider= mSpaceProvider;
 
-	mDataFactory.reset(new DataFactory(mDataService, mSpaceProvider));
+	mDataFactory.reset(new DataFactory(mPatientModelService, mSpaceProvider));
 	mDataService->setDataFactory(mDataFactory);
 }
 
@@ -217,7 +217,7 @@ void LogicManager::createVideoServiceOld()
 
 	// build object(s):
 	VideoServiceBackendPtr videoBackend;
-	videoBackend = VideoServiceBackend::create(mDataService,
+	videoBackend = VideoServiceBackend::create(mPatientModelService,
 											   mTrackingService,
 												 mSpaceProvider);
 	mVideoServiceOld = VideoServiceOld::create(videoBackend);
@@ -234,7 +234,7 @@ void LogicManager::createVisualizationService()
 
 	// build object(s):
 	VisualizationServiceBackendPtr backend;
-	backend.reset(new VisualizationServiceBackend(mDataService,
+	backend.reset(new VisualizationServiceBackend(mPatientModelService,
 												  mTrackingService,
 													mVideoServiceOld,
 												  mSpaceProvider));

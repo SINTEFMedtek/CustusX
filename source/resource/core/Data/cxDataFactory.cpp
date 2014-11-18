@@ -43,10 +43,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxFrameMetric.h"
 #include "cxToolMetric.h"
 
+#include "cxPatientModelService.h"
+
+
 namespace cx
 {
 
-DataFactory::DataFactory(DataServicePtr dataManager, SpaceProviderPtr spaceProvider) :
+DataFactory::DataFactory(PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider) :
 	mDataManager(dataManager),
 	mSpaceProvider(spaceProvider)
 {
@@ -66,8 +69,8 @@ DataFactory::DataFactory(DataServicePtr dataManager, SpaceProviderPtr spaceProvi
 
 DataPtr DataFactory::create(QString type, QString uid, QString name)
 {
-	if (mDataManager)
-		mDataManager->generateUidAndName(&uid, &name);
+//	if (mDataManager)
+//		mDataManager->generateUidAndName(&uid, &name);
 
 	CREATE_IF_MATCH(type, Image);
 	CREATE_IF_MATCH(type, Mesh);

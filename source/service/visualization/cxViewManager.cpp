@@ -75,14 +75,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxXMLNodeWrapper.h"
 #include "cxCameraControl.h"
 #include "cxNavigation.h"
+#include "cxPatientModelService.h"
+
 
 namespace cx
 {
 
-VisualizationServiceOldPtr ViewManager::create(/*PatientModelServicePtr patientModelService, */VisualizationServiceBackendPtr backend)
+VisualizationServiceOldPtr ViewManager::create(VisualizationServiceBackendPtr backend)
 {
 	VisualizationServiceOldPtr retval;
-	retval.reset(new ViewManager(/*patientModelService, */backend));
+	retval.reset(new ViewManager(backend));
 	return retval;
 }
 
@@ -348,7 +350,7 @@ void ViewManager::parseXml(QDomNode viewmanagerNode)
 	XMLNodeParser base(viewmanagerNode);
 
 	QString clippedImage = base.parseTextFromElement("clippedImage");
-	mInteractiveClipper->setImage(mBackend->getDataManager()->getImage(clippedImage));
+	mInteractiveClipper->setImage(mBackend->getPatientService()->getData<Image>(clippedImage));
 
 	base.parseDoubleFromElementWithDefault("global2DZoom", mGlobal2DZoomVal->get().toDouble());
 

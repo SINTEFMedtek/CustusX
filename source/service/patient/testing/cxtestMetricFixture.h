@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDomNode>
 #include "cxtestDummyDataManager.h"
 #include "cxMessageListener.h"
+#include "cxPatientModelService.h"
 
 namespace cxtest {
 
@@ -131,7 +132,12 @@ public:
 	template<class METRIC_TYPE>
 	boost::shared_ptr<METRIC_TYPE> createTestMetric(QString uid="")
 	{
-		return METRIC_TYPE::create(uid, "", this->getDataManager(), this->getSpaceProvider());
+		boost::shared_ptr<METRIC_TYPE> retval;
+		retval = mServices->mPatientModelService->createSpecificData<METRIC_TYPE>(uid);
+		mServices->mPatientModelService->insertData(retval);
+		return retval;
+
+		//return METRIC_TYPE::create(uid, "", this->getDataManager(), this->getSpaceProvider());
 	}
 
     template<class DATA>
@@ -155,7 +161,6 @@ private:
 	TestServicesPtr mServices;
 	cx::MessageListenerPtr mMessageListener;
 
-	cx::DataServicePtr getDataManager();
 	cx::SpaceProviderPtr getSpaceProvider();
 
 };

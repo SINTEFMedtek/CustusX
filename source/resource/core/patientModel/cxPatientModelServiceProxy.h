@@ -94,6 +94,7 @@ public:
 	virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const;
 
 	virtual void setCenter(const Vector3D& center);
+	virtual Vector3D getCenter() const;
 
 	virtual QString addLandmark();
 

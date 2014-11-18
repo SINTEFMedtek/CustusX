@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkPoints.h>
 #include <vtkCellArray.h>
 
-#include "cxDataManager.h"
+#include "cxPatientModelService.h"
 #include "cxMesh.h"
 #include "cxTypeConversions.h"
 #include "cxTime.h"
@@ -77,16 +77,17 @@ vtkPolyDataPtr polydataFromTransforms(TimedTransformMap transformMap_prMt, Trans
   return retval;
 }
 
-void loadMeshFromToolTransforms(DataServicePtr dataManager, TimedTransformMap transforms_prMt)
+void loadMeshFromToolTransforms(PatientModelServicePtr dataManager, TimedTransformMap transforms_prMt)
 {
   //create polydata from positions
 	Transform3D rMpr = dataManager->get_rMpr();
   vtkPolyDataPtr centerlinePolydata = polydataFromTransforms(transforms_prMt, rMpr);
   QString uid = "tool_positions_mesh_%1";
   QString name = "Tool positions mesh %1";
-  MeshPtr mesh = dataManager->createMesh(centerlinePolydata, uid, name, "Images");
+  MeshPtr mesh = dataManager->createSpecificData<Mesh>(uid, name);
+  mesh->setVtkPolyData(centerlinePolydata);
   mesh->setColor(QColor("red"));
-  dataManager->loadData(mesh);
+  dataManager->insertData(mesh);
 }
 
 std::map<std::string, std::string> getDisplayFriendlyInfo(MeshPtr mesh)

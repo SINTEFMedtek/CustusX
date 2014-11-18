@@ -6,7 +6,6 @@ SET( CX_QT_MOC_HEADER_FILES
     cxPatientData.h
     cxPatientService.h
     cxActiveImageProxy.h
-	cxActiveImageProxyOld.h
 )
 
 SET ( cxPatientService_SOURCE
@@ -16,7 +15,6 @@ SET ( cxPatientService_SOURCE
     cxPatientService.cpp
     cxActiveImageProxy.h
     cxActiveImageProxy.cpp
-	cxActiveImageProxyOld.cpp
     
 #	../cxForwardDeclarations.h
 )

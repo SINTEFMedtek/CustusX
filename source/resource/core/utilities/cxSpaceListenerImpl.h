@@ -53,7 +53,7 @@ class cxResource_EXPORT SpaceListenerImpl: public SpaceListener
 Q_OBJECT
 
 public:
-	SpaceListenerImpl(TrackingServicePtr trackingService, DataServicePtr dataManager);
+	SpaceListenerImpl(TrackingServicePtr trackingService, PatientModelServicePtr dataManager);
 //	SpaceListenerImpl(CoordinateSystem space);
 	virtual ~SpaceListenerImpl();
 	void setSpace(CoordinateSystem space);
@@ -68,7 +68,7 @@ private:
 	CoordinateSystem mSpace;
 
 	TrackingServicePtr mTrackingService;
-	DataServicePtr mDataManager;
+	PatientModelServicePtr mDataManager;
 };
 
 } // namespace cx

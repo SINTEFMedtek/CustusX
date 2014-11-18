@@ -55,6 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxVisualizationServiceBackend.h"
 #include "cxCameraStyle.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
@@ -130,9 +131,9 @@ void ViewGroup::mouseClickInViewGroupSlot()
 	std::vector<ImagePtr> images = mViewGroupData->getImages(DataViewProperties::createFull());
 	if (!images.empty())
 	{
-		if (!std::count(images.begin(), images.end(), mBackend->getDataManager()->getActiveImage()))
+		if (!std::count(images.begin(), images.end(), mBackend->getPatientService()->getActiveImage()))
 		{
-			mBackend->getDataManager()->setActiveImage(images.front());
+			mBackend->getPatientService()->setActiveImage(images.front());
 		}
 	}
 
