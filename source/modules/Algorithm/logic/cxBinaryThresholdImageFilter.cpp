@@ -89,16 +89,16 @@ QString BinaryThresholdImageFilter::getHelp() const
 DoublePairDataAdapterXmlPtr BinaryThresholdImageFilter::getThresholdOption(QDomElement root)
 {
 	DoublePairDataAdapterXmlPtr retval = DoublePairDataAdapterXml::initialize("Thresholds", "",
-																																							"Select lower and upper threshold for the segmentation", DoubleRange(0, 100, 1), 0,
-																																							root);
+																			  "Select lower and upper threshold for the segmentation", DoubleRange(0, 100, 1), 0,
+																			  root);
 	return retval;
 }
 
 BoolDataAdapterXmlPtr BinaryThresholdImageFilter::getGenerateSurfaceOption(QDomElement root)
 {
 	BoolDataAdapterXmlPtr retval = BoolDataAdapterXml::initialize("Generate Surface", "",
-	                                                                        "Generate a surface of the output volume", true,
-	                                                                            root);
+																  "Generate a surface of the output volume", true,
+																  root);
 	return retval;
 }
 

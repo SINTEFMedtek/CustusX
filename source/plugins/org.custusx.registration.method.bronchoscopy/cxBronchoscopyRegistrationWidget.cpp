@@ -228,6 +228,8 @@ void BronchoscopyRegistrationWidget::acquisitionStopped()
 	mSessionSelector->setValueRange(range);
 	mSessionSelector->setValue(newUid);
 
+    mServices.patientModelService->autoSave();
+
 //	this->saveSessions();
 }
 

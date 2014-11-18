@@ -50,39 +50,73 @@ BranchList::BranchList()
 
 BranchList::~BranchList()
 {
-	for (int i = 0; i < Branches.size(); i++)
-		Branches[i]->~Branch();
+	for (int i = 0; i < mBranches.size(); i++)
+		mBranches[i]->~Branch();
 }
 
 void BranchList::addBranch(Branch* b)
 {
-	Branches.push_back(b);
+	mBranches.push_back(b);
+}
+
+void BranchList::deleteBranch(Branch* b)
+{
+	for( int i = 0; i < mBranches.size(); i++ )
+	{
+		if (b == mBranches[i])
+		{
+			mBranches.erase(mBranches.begin() + i);
+			return;
+		}
+	}
 }
 
 std::vector<Branch*> BranchList::getBranches()
 {
-	return Branches;
+	return mBranches;
+}
+
+void BranchList::selectGenerations(int maxGeneration)
+{
+
+	for( int i = 0; i < mBranches.size(); i++ )
+	{
+		int generationCounter = 1;
+		Branch* currentBranch = mBranches[i];
+		while (true){
+			if (currentBranch->getParentBranch())
+			{
+				generationCounter++;
+				if (generationCounter <= maxGeneration)
+				{
+					deleteBranch(mBranches[i]);
+				}
+				currentBranch = currentBranch->getParentBranch();
+			}
+		}
+	}
+
 }
 
 
 void BranchList::calculateOrientations()
 {
-	for (int i = 0; i < Branches.size(); i++)
+	for (int i = 0; i < mBranches.size(); i++)
 	{
-		Eigen::MatrixXd positions = Branches[i]->getPositions();
+		Eigen::MatrixXd positions = mBranches[i]->getPositions();
 		Eigen::MatrixXd diff = positions.rightCols(positions.cols() - 1) - positions.leftCols(positions.cols() - 1);
 		Eigen::MatrixXd orientations(positions.rows(),positions.cols());
 		orientations.leftCols(orientations.cols() - 1) = diff / diff.norm();
 		orientations.rightCols(1) = orientations.col(orientations.cols() - 1);
-		Branches[i]->setOrientations(orientations);
+		mBranches[i]->setOrientations(orientations);
 	}
 }
 
 void BranchList::smoothOrientations()
 {
-	for (int i = 0; i < Branches.size(); i++)
+	for (int i = 0; i < mBranches.size(); i++)
 	{
-		Eigen::MatrixXd orientations = Branches[i]->getOrientations();
+		Eigen::MatrixXd orientations = mBranches[i]->getOrientations();
 		Eigen::MatrixXd newOrientations(orientations.rows(),orientations.cols());
 		int numberOfColumns = orientations.cols();
 		for (int j = 0; j < numberOfColumns; j++)
@@ -90,11 +124,9 @@ void BranchList::smoothOrientations()
 			newOrientations.col(j) = orientations.block(0,std::max(j-2,0),orientations.rows(),std::min(5,numberOfColumns-j)).rowwise().mean(); //smoothing
 			newOrientations.col(j) = newOrientations.col(j) / newOrientations.col(j).norm(); // normalizing
 		}
-		Branches[i]->setOrientations(newOrientations);
+		mBranches[i]->setOrientations(newOrientations);
 	}
 }
-
-
 
 
 void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions)
@@ -109,18 +141,18 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions)
 	Branch* branchToSplit;
     while (positionsNotUsed.cols() > 0)
 	{
-		if (!Branches.empty())
+		if (!mBranches.empty())
 		{
 			double minDistance = 1000;
-			for (int i = 0; i < Branches.size(); i++)
+			for (int i = 0; i < mBranches.size(); i++)
 			{
 				std::pair<std::vector<Eigen::MatrixXd::Index>, Eigen::VectorXd> distances;
-				distances = dsearchn(positionsNotUsed, Branches[i]->getPositions());
+				distances = dsearchn(positionsNotUsed, mBranches[i]->getPositions());
 				double d = distances.second.minCoeff(&index);
 				if (d < minDistance)
 				{
 					minDistance = d;
-					branchToSplit = Branches[i];
+					branchToSplit = mBranches[i];
 					startIndex = index;
 					if (minDistance < 2)
 						break;
@@ -140,9 +172,9 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions)
 		{
 			Branch* newBranch = new Branch();
 			newBranch->setPositions(branchPositions);
-			Branches.push_back(newBranch);
+			mBranches.push_back(newBranch);
 
-			if (Branches.size() > 1) // do not try to split another branch when the first branch is processed
+			if (mBranches.size() > 1) // do not try to split another branch when the first branch is processed
 			{
 				if ((splitIndex + 1 >= 5) && (branchToSplit->getPositions().cols() - splitIndex - 1 >= 5))
 					//do not split branch if the new branch is close to the edge of the branch
@@ -153,7 +185,7 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions)
 					Eigen::MatrixXd branchToSplitPositions = branchToSplit->getPositions();
 					newBranchFromSplit->setPositions(branchToSplitPositions.rightCols(branchToSplitPositions.cols() - splitIndex - 1));
 					branchToSplit->setPositions(branchToSplitPositions.leftCols(splitIndex + 1));
-					Branches.push_back(newBranchFromSplit);
+					mBranches.push_back(newBranchFromSplit);
 					newBranchFromSplit->setParentBranch(branchToSplit);
 					newBranch->setParentBranch(branchToSplit);
 					newBranchFromSplit->setChildBranches(branchToSplit->getChildBranches());

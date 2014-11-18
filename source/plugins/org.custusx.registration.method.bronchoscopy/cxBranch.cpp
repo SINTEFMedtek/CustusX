@@ -35,7 +35,7 @@ namespace cx
 {
 
 Branch::Branch() :
-	parentBranch(NULL)
+	mParentBranch(NULL)
 {
 	// TODO Auto-generated constructor stub
 
@@ -43,51 +43,51 @@ Branch::Branch() :
 
 void Branch::setPositions(Eigen::MatrixXd pos)
 {
-	positions = pos;
+	mPositions = pos;
 }
 
 Eigen::MatrixXd Branch::getPositions()
 {
-	return positions;
+	return mPositions;
 }
 
 void Branch::setOrientations(Eigen::MatrixXd orient)
 {
-	orientations = orient;
+	mOrientations = orient;
 }
 
 Eigen::MatrixXd Branch::getOrientations()
 {
-	return orientations;
+	return mOrientations;
 }
 
 void Branch::addChildBranch(Branch* child)
 {
-	childBranches.push_back(child);
+	mChildBranches.push_back(child);
 }
 
 void Branch::setChildBranches(branchVector children)
 {
-	childBranches = children;
+	mChildBranches = children;
 }
 
 void Branch::deleteChildBranches()
 {
-	childBranches.clear();
+	mChildBranches.clear();
 }
 
 branchVector Branch::getChildBranches()
 {
-	return childBranches;
+	return mChildBranches;
 }
 
 void Branch::setParentBranch(Branch* parent)
 {
-	parentBranch = parent;
+	mParentBranch = parent;
 }
 Branch* Branch::getParentBranch()
 {
-	return parentBranch;
+	return mParentBranch;
 }
 
 
