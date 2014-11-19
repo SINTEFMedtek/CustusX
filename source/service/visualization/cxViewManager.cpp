@@ -99,8 +99,6 @@ ViewManager::ViewManager(/*PatientModelServicePtr patientModelService, */Visuali
 	mLayoutRepository.reset(new LayoutRepository());
 	mCameraControl.reset(new CameraControl());
 
-//	connect(mBackend->getDataManager().get(), SIGNAL(centerChanged()), this, SLOT(globalCenterChangedSlot()));
-
 	this->loadGlobalSettings();
 
 	mRenderLoop->setLogging(settings()->value("renderSpeedLogging").toBool());

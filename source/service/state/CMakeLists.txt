@@ -32,8 +32,6 @@ SET ( cxStateService_SOURCE
 include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
 include_directories(
     .
-    ${CustusX_SOURCE_DIR}/source/service/patient
-    ${CustusX_BINARY_DIR}/source/service/patient     
     ${CustusX_SOURCE_DIR}/source/service/visualization
     ${CustusX_BINARY_DIR}/source/service/visualization
     ${CustusX_SOURCE_DIR}/source/service/video

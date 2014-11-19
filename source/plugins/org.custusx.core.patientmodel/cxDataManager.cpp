@@ -30,79 +30,33 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXPATIENTSERVICE_H_
-#define CXPATIENTSERVICE_H_
 
-#include "cxPatientServiceExport.h"
+#include "cxDataManager.h"
 
-#include <QObject>
-#include "boost/shared_ptr.hpp"
-#include "cxForwardDeclarations.h"
+#include "cxTransferFunctions3DPresets.h"
 
 namespace cx
 {
-/**
- * \file
- * \addtogroup cx_service_patient
- * @{
- */
 
-typedef boost::shared_ptr<class PatientData> PatientDataPtr;
-
-/**\brief The virtual patient
- * \ingroup cx_service_patient
- *
- * PatientService provides access to the Patient Specific Model (PaSM).
- *   - data entities
- *   - relations between entities in space and time and structure
- *   - load/save + simple operations
- *
- *
- *   At least, this is the goal. Just now, it holds the old
- *   PatientData object, which manages save/load session/patient.
- *
- *  \date Jun 14, 2011
- *  \author christiana
- *
- */
-class cxPatientService_EXPORT PatientService: public QObject
+DataManager::DataManager()
 {
-Q_OBJECT
-public:
-	static PatientServicePtr create(DataServicePtr dataService);
-	virtual ~PatientService();
-
-//	static PatientService* getInstance();
-
-//	static void initialize();
-//	static void shutdown();
-
-	PatientDataPtr getPatientData();
-	DataServicePtr getDataService();
-
-private:
-//	static PatientService* mInstance;
-//	static void setInstance(PatientService* instance);
-
-	PatientService(DataServicePtr dataService);
-
-	PatientService(PatientService const&); // not implemented
-	PatientService& operator=(PatientService const&); // not implemented
-
-	PatientDataPtr mPatientData;
-	DataServicePtr mDataService;
-
-	/**
-	  * Clear the global cache used by the entire application (cx::DataLocations::getCachePath()).
-	  */
-	void clearCache();
-};
-
-//PatientService* patientService();
-
-/**
- * @}
- */
 }
 
-#endif /* CXPATIENTSERVICE_H_ */
+DataManager::~DataManager()
+{
+}
+
+PresetTransferFunctions3DPtr DataManager::getPresetTransferFunctions3D() const
+{
+	return PresetTransferFunctions3DPtr(new TransferFunctions3DPresets(XmlOptionFile(), XmlOptionFile()));
+}
+
+ImagePtr DataManager::getActiveImage() const
+{
+	return ImagePtr();
+} ///< used for system state
+void DataManager::setActiveImage(ImagePtr activeImage)
+{
+} ///< used for system state
+
+} // namespace cx

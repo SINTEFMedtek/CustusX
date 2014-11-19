@@ -40,6 +40,10 @@ class ctkPluginContext;
 
 namespace cx
 {
+typedef boost::shared_ptr<class DataManagerImpl> DataManagerImplPtr;
+typedef boost::shared_ptr<class PatientData> PatientDataPtr;
+typedef boost::shared_ptr<class PatientService> PatientServicePtr;
+typedef boost::shared_ptr<class DataManager> DataServicePtr;typedef boost::shared_ptr<class DataFactory> DataFactoryPtr;
 
 /**
  * Implementation of PatientModelService.
@@ -111,6 +115,16 @@ public:
 
 private:
 	ctkPluginContext *mContext;
+
+	void createInterconnectedDataAndSpace();
+	void shutdownInterconnectedDataAndSpace();
+
+	DataManagerImplPtr dataService() const;
+	PatientDataPtr patientData() const;
+
+	DataManagerImplPtr mDataService;
+	PatientServicePtr mPatientServiceOld;
+	DataFactoryPtr mDataFactory;
 };
 typedef boost::shared_ptr<PatientModelImplService> PatientModelImplServicePtr;
 

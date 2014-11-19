@@ -39,8 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-class ToolManager;
-class DataManager;
 
 /** Provides information about all the coordinate systems in the application.
  *

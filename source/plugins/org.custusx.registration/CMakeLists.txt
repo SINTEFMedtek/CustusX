@@ -10,7 +10,6 @@ include_directories(
     ${CustusX_SOURCE_DIR}/source/modules/Acquisition/logic
     ${CustusX_SOURCE_DIR}/source/modules/Algorithm
 
-    ${CustusX_BINARY_DIR}/source/service/patient
     ${CustusX_BINARY_DIR}/source/logic
     ${CustusX_BINARY_DIR}/source/modules/Acquisition
     )

@@ -9,6 +9,12 @@ if (BUILD_TESTING)
 	set(CX_TEST_CATCH_org_custusx_core_patientmodel_SOURCE_FILES
 		${CX_TEST_CATCH_org_custusx_core_patientmodel_MOC_SOURCE_FILES}
 		cxtestPatientModelPlugin.cpp
+
+        cxtestCatchPatientService.cpp
+        cxtestCatchFrameMetric.cpp
+        cxtestCatchToolMetric.cpp
+        cxtestCatchDistanceMetric.cpp
+        cxtestMetricFixture
 		)
 
     cx_catch_add_lib_and_exe(org_custusx_core_patientmodel 

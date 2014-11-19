@@ -4,8 +4,6 @@ if (BUILD_TESTING)
             ${CX_RESOURCE_INCLUDE_DIRECTORIES}
     		../logic
     		../logic/3DReconstruction
-    		${CustusX_BINARY_DIR}/source/service/patient
-    		${CustusX_SOURCE_DIR}/source/service/patient
 		)
 
 	# Catch unit test framework stuff:

@@ -62,14 +62,11 @@ SeansVesselRegFixture::~SeansVesselRegFixture()
 void SeansVesselRegFixture::setUp()
 {
 	cx::DataLocations::setTestMode();
-//	cx::LogicManager::initialize();
 	cx::Reporter::initialize();
 }
 
 void SeansVesselRegFixture::tearDown()
 {
-//	cx::LogicManager::shutdown();
-//	cx::DataManager::shutdown();
 	cx::Reporter::shutdown();
 }
 

@@ -27,13 +27,11 @@ include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
 include_directories(
     ${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
     .
-    ${CustusX_SOURCE_DIR}/source/service/patient     
     ${CustusX_SOURCE_DIR}/source/service/tracking     
     ${CustusX_SOURCE_DIR}/source/service/visualization
     ${CustusX_SOURCE_DIR}/source/service/video
     ${CustusX_SOURCE_DIR}/source/service/state
 
-    ${CustusX_BINARY_DIR}/source/service/patient     
     ${CustusX_BINARY_DIR}/source/service/tracking     
     ${CustusX_BINARY_DIR}/source/service/visualization
     ${CustusX_BINARY_DIR}/source/service/video
@@ -51,7 +49,6 @@ add_library( cxLogicManager ${cxLogicManager_SOURCE} ${MOC_HEADER_FILES} )
 target_link_libraries(cxLogicManager
 	CTKPluginFramework
     cxResource
-    cxPatientService
     cxVisualizationService
     cxVideoServiceOld
 	cxStateService

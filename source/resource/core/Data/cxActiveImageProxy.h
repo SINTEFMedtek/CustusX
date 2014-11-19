@@ -30,61 +30,68 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
+#ifndef CXACTIVEIMAGEPROXY_H_
+#define CXACTIVEIMAGEPROXY_H_
 
-#include "cxDataManager.h"
+#include "cxResourceExport.h"
 
-#include "cxTransferFunctions3DPresets.h"
+#include <QObject>
+#include "cxForwardDeclarations.h"
 
 namespace cx
 {
+/**
+ * \file
+ * \addtogroup cx_service_patient
+ * @{
+ */
 
-//// --------------------------------------------------------
-//DataServicePtr DataManager::mInstance = NULL; ///< static member
-//// --------------------------------------------------------
-
-//void DataManager::shutdown()
-//{
-//	delete mInstance;
-//	mInstance = NULL;
-//}
-
-//DataServicePtr DataManager::getInstance()
-//{
-//    if (!mInstance)
-//    {
-//        DataManagerImpl::initialize();
-//    }
-//	return mInstance;
-//}
-
-//void DataManager::setInstance(DataServicePtr instance)
-//{
-//	if (mInstance)
-//	{
-//		delete mInstance;
-//	}
-//	mInstance = instance;
-//}
-
-DataManager::DataManager()
+typedef boost::shared_ptr<class ActiveImageProxy> ActiveImageProxyPtr;
+/**
+ * \brief Helper class for connection the active image.
+ * \ingroup cx_service_patient
+ *
+ * By listening to this class, you will always listen
+ * to the active image.
+ *
+ *  \date Oct 18, 2011
+ *  \author Ole Vegard Solberg, SINTEF
+ *
+ */
+class cxResource_EXPORT ActiveImageProxy: public QObject
 {
+Q_OBJECT
+public:
+	static ActiveImageProxyPtr New(PatientModelServicePtr patientModelService)
+	{
+		return ActiveImageProxyPtr(new ActiveImageProxy(patientModelService));
+	}
+	ActiveImageProxy(PatientModelServicePtr patientModelService);
+	~ActiveImageProxy();
+
+signals:
+	void activeImageChanged(const QString& uid); ///< The original image changed signal from DataManager
+
+	// Forwarding active image signals
+	void transformChanged();
+	void propertiesChanged();
+	void landmarkRemoved(QString uid);
+	void landmarkAdded(QString uid);
+	void vtkImageDataChanged();
+	void transferFunctionsChanged();
+	void clipPlanesChanged();
+	void cropBoxChanged();
+
+private slots:
+	void activeImageChangedSlot(const QString&);
+private:
+	ImagePtr mImage;
+	PatientModelServicePtr mPatientModelService;
+};
+
+/**
+ * @}
+ */
 }
 
-DataManager::~DataManager()
-{
-}
-
-PresetTransferFunctions3DPtr DataManager::getPresetTransferFunctions3D() const
-{
-	return PresetTransferFunctions3DPtr(new TransferFunctions3DPresets(XmlOptionFile(), XmlOptionFile()));
-}
-
-ImagePtr DataManager::getActiveImage() const
-{
-	return ImagePtr();
-} ///< used for system state
-void DataManager::setActiveImage(ImagePtr activeImage)
-{
-} ///< used for system state
-
-} // namespace cx
+#endif /* CXACTIVEIMAGEPROXY_H_ */

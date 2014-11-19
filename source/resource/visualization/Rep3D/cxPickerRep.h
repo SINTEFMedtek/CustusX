@@ -49,7 +49,6 @@ typedef vtkSmartPointer<class vtkCallbackCommand> vtkCallbackCommandPtr;
 
 namespace cx
 {
-class DataManager;
 typedef boost::shared_ptr<class PickerRep> PickerRepPtr;
 typedef boost::shared_ptr<class Image> ImagePtr;
 typedef boost::shared_ptr<class Tool> ToolPtr;

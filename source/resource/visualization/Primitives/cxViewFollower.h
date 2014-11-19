@@ -42,7 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 typedef boost::shared_ptr<class ViewFollower> ViewFollowerPtr;
-class DataManager;
 
 /**
  * Ensure the tool is inside a given viewport, by moving the global center.

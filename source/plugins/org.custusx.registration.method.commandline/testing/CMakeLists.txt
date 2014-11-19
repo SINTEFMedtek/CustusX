@@ -4,7 +4,6 @@ if(BUILD_TESTING)
   include_directories(
 	../logic
 	..
-	${CustusX_SOURCE_DIR}/source/service/patient
 	)
 
     set(CXTEST_SOURCES_TO_MOC

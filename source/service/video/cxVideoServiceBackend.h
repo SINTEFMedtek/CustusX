@@ -42,8 +42,6 @@ class ctkPluginContext;
 
 namespace cx
 {
-class DataManager;
-class ToolManager;
 typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
 
 typedef boost::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;

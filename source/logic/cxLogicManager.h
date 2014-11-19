@@ -51,7 +51,6 @@ namespace cx
 
 typedef boost::shared_ptr<class PluginFrameworkManager> PluginFrameworkManagerPtr;
 typedef boost::shared_ptr<class ServiceController> ServiceControllerPtr;
-typedef boost::shared_ptr<class DataManagerImpl> DataManagerImplPtr;
 
 /**\brief Responsible for the entire logic layer.
  * \ingroup cx_logic
@@ -78,12 +77,9 @@ public:
   PluginFrameworkManagerPtr getPluginFramework();
 	ctkPluginContext* getPluginContext();
 
-  DataFactoryPtr getDataFactory();
-  DataServicePtr getDataService();
   TrackingServicePtr getTrackingService();
   SpaceProviderPtr getSpaceProvider();
   PatientModelServicePtr getPatientModelService();
-  PatientServicePtr getPatientServiceOld();
 	VideoServiceOldPtr getVideoServiceOld();
   VisualizationServiceOldPtr getVisualizationService();
 	StateServicePtr getStateService();
@@ -134,15 +130,12 @@ private:
 
 // services:
 	SpaceProviderPtr mSpaceProvider;
-	DataFactoryPtr mDataFactory;
 
 	PatientModelServicePtr mPatientModelService;
-	PatientServicePtr mPatientServiceOld;
 	TrackingServicePtr mTrackingService;
 	VideoServiceOldPtr mVideoServiceOld;
 	VisualizationServiceOldPtr mVisualizationService;
 	StateServicePtr mStateService;
-	DataManagerImplPtr mDataService;
 
 	PluginFrameworkManagerPtr mPluginFramework;
 };

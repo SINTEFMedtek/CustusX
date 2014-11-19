@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDATAMANAGERIMPL_H_
 #define CXDATAMANAGERIMPL_H_
 
-#include "cxResourceExport.h"
+#include "org_custusx_core_patientmodel_Export.h"
 #include "cxPrecompiledHeader.h"
 
 #include <map>
@@ -53,6 +53,7 @@ class QDomElement;
 namespace cx
 {
 
+typedef boost::shared_ptr<class DataManager> DataServicePtr;
 typedef boost::shared_ptr<class DataManagerImpl> DataManagerImplPtr;
 
 /**\brief Default implementation of DataManager.
@@ -63,7 +64,7 @@ typedef boost::shared_ptr<class DataManagerImpl> DataManagerImplPtr;
  * \date Jan 6, 2009
  * \author christiana
  */
-class cxResource_EXPORT DataManagerImpl: public DataManager
+class org_custusx_core_patientmodel_EXPORT DataManagerImpl: public DataManager
 {
 Q_OBJECT
 public:

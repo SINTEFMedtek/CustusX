@@ -44,7 +44,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-class DataManager;
 
 class cxResourceVisualization_EXPORT OrientationAnnotation : public vtkCornerAnnotation
 {

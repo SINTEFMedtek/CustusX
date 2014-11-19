@@ -51,7 +51,6 @@ class View;
 
 namespace cx
 {
-class DataManager;
 class Reporter;
 typedef boost::shared_ptr<class LandmarkRep> LandmarkRepPtr;
 

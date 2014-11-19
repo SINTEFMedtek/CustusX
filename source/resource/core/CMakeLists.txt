@@ -8,12 +8,9 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	Data/cxImageTF3D
 	Data/cxImageLUT2D
 	Data/cxImageTFData
-	Data/cxDataManager
 	Data/cxNavigatedVideoImage
 	Data/cxRegistrationTransform
-	Data/cxDataManagerImpl
 	Data/cxMesh
-#	Data/sscVtkFileMesh
 	Data/cxPresets
 	Data/cxTransferFunctions3DPresets
 	Data/cxPointMetric
@@ -28,6 +25,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	Data/cxSphereMetric
 	Data/cxMetricReferenceArgumentList
 	Data/cxLandmark
+    Data/cxActiveImageProxy
 
 	Video/cxVideoSource.h
 	Video/cxVideoRecorder
