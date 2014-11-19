@@ -75,14 +75,10 @@ public:
 	ElastiXFixture()
 	{
 		cx::Reporter::initialize();
-//		cx::cxDataManager::initialize();
-//		cx::LogicManager::initialize();
 	}
 
 	~ElastiXFixture()
 	{
-//		cx::LogicManager::shutdown();
-//		cx::DataManager::shutdown();
 		cx::Reporter::shutdown();
 	}
 	bool compareTransforms(cx::Transform3D result, cx::Transform3D solution)

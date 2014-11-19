@@ -46,7 +46,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-class DataManager;
 class SliceComputer;
 // forward declarations
 typedef boost::shared_ptr<class Tool> ToolPtr;

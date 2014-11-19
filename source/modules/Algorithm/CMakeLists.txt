@@ -79,8 +79,6 @@ include_directories(
 	${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
 	${CustusX_BINARY_DIR}/source/resource/widgets
 	${CustusX_BINARY_DIR}/source/resource/service
-	${CustusX_SOURCE_DIR}/source/service/patient
-	${CustusX_BINARY_DIR}/source/service/patient
     ${CustusX_SOURCE_DIR}/source/service/visualization
     ${CustusX_BINARY_DIR}/source/service/visualization
 	${CustusX_SOURCE_DIR}/source/logic
@@ -95,7 +93,7 @@ include_directories(
 	${CustusX_SOURCE_DIR}/source/resource/filter
 	)
 
-set(CX_ALGORITHM_LIBRARIES cxPatientService cxResource cxGui cxGUIExtenderService cxResourceFilter)
+set(CX_ALGORITHM_LIBRARIES cxResource cxGui cxGUIExtenderService cxResourceFilter)
 
 
 

@@ -63,7 +63,6 @@ include_directories(
     .
     ./logic
     ./gui
-    ${CustusX_SOURCE_DIR}/source/service/patient
     ${CustusX_SOURCE_DIR}/source/service/video
     ${CustusX_SOURCE_DIR}/source/service/visualization
     ${CustusX_SOURCE_DIR}/source/logic
@@ -76,7 +75,6 @@ include_directories(
     ${CustusX_SOURCE_DIR}/source/gui/dataAdapters
     ${CustusX_SOURCE_DIR}/source/gui/toolWidgets
     
-    ${CustusX_BINARY_DIR}/source/service/patient
     ${CustusX_BINARY_DIR}/source/service/video
     ${CustusX_BINARY_DIR}/source/service/visualization
     ${CustusX_BINARY_DIR}/source/modules/Algorithm

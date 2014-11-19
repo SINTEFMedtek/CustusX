@@ -46,7 +46,6 @@ using namespace cx;
 TEST_CASE("ImageAlgorithms: resample() works", "[unit][resource][core]")
 {
 	cxtest::TestServicesType services = cxtest::createDummyCoreServices();
-//	cx::DataServicePtr dataService = cxtest::createDummyDataService();
 	cx::PatientModelServicePtr pasm = services.mPatientModelService;
 
 	QString fname0 = cx::DataLocations::getTestDataPath() + "/testing/ResampleTest.cx3/Images/mra.mhd";

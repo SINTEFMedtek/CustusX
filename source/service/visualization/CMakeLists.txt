@@ -42,9 +42,7 @@ cx_add_class(cxVisualizationService_SOURCE
 include_directories(
     ${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
     .
-    ${CustusX_SOURCE_DIR}/source/service/patient
     ${CustusX_SOURCE_DIR}/source/service/video
-    ${CustusX_BINARY_DIR}/source/service/patient
     ${CustusX_BINARY_DIR}/source/service/video
     ${CustusX_BINARY_DIR}/source/resource/visualization
 	${CustusX_SOURCE_DIR}/source/resource/visualization/ViewContainer
@@ -54,7 +52,6 @@ include_directories(
 set(cxVisualizationService_LIBS
     cxResourceVisualization
     cxVideoServiceOld
-    cxPatientService
     )
 
 cx_create_export_header("cxVisualizationService")

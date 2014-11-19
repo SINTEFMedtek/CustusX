@@ -38,7 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-class ToolManager;
 typedef boost::shared_ptr<class TrackingPositionFilter> TrackingPositionFilterPtr;
 
 /** \brief Common functionality for Tool subclasses

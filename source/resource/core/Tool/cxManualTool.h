@@ -43,8 +43,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-class ToolManager;
-
 /**\brief A manual tool that is unconnected to any hardware.
  *
  * Implementation of a Tool that is controlled programatically.

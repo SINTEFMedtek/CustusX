@@ -40,8 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-class DataManager;
-class ToolManager;
 class VideoServiceOld;
 class PatientService;
 typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;

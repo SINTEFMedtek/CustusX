@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDATAMANAGER_H_
 #define CXDATAMANAGER_H_
 
-#include "cxResourceExport.h"
+#include "org_custusx_core_patientmodel_Export.h"
 #include "cxPrecompiledHeader.h"
 
 #include <map>
@@ -65,7 +65,7 @@ typedef boost::shared_ptr<class DataFactory> DataFactoryPtr;
  *
  * \ingroup cx_resource_core_data
  */
-class cxResource_EXPORT DataManager: public QObject
+class org_custusx_core_patientmodel_EXPORT DataManager: public QObject
 {
 Q_OBJECT
 public:
@@ -73,9 +73,6 @@ public:
 	typedef std::map<QString, ImagePtr> ImagesMap;
 	typedef std::map<QString, MeshPtr> MeshMap;
 	typedef std::map<QString, VideoSourcePtr> StreamMap;
-
-//	static DataServicePtr getInstance();
-//	static void shutdown();
 
 	// streams
 	virtual VideoSourcePtr getStream(const QString& uid) const = 0;

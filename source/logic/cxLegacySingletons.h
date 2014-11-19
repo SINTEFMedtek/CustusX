@@ -38,13 +38,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-class DataManager;
 class ViewManager;
 typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
 typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
 typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
-//typedef boost::shared_ptr<class PatientService> PatientServicePtr;
-typedef boost::shared_ptr<class DataManager> DataServicePtr;
 typedef boost::shared_ptr<class VideoServiceOld> VideoServiceOldPtr;
 typedef boost::shared_ptr<class ViewManager> VisualizationServiceOldPtr;
 typedef boost::shared_ptr<class StateService> StateServicePtr;
@@ -58,14 +55,11 @@ typedef boost::shared_ptr<class StateService> StateServicePtr;
  */
 
 // old style singleton accessors:
-//cxLogicManager_EXPORT DataManager* dataManager();
 //cxLogicManager_EXPORT ToolManager* trackingService();
 cxLogicManager_EXPORT ViewManager* viewManager();
 // access to new shared ptrs:
 cxLogicManager_EXPORT SpaceProviderPtr spaceProvider();
-//cxLogicManager_EXPORT TrackingServiceOldPtr trackingService();
 cxLogicManager_EXPORT TrackingServicePtr trackingService();
-cxLogicManager_EXPORT DataServicePtr dataService();
 cxLogicManager_EXPORT PatientModelServicePtr patientService();
 cxLogicManager_EXPORT VideoServiceOldPtr videoService();
 cxLogicManager_EXPORT StateServicePtr stateService();

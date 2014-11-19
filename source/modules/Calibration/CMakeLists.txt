@@ -56,9 +56,7 @@ include_directories(
     .
     ./logic
     ./gui
-    ${CustusX_SOURCE_DIR}/source/service/patient
 	${CustusX_SOURCE_DIR}/source/logic
-    ${CustusX_BINARY_DIR}/source/service/patient
 	${CustusX_BINARY_DIR}/source/logic
 
     ${CustusX_SOURCE_DIR}/source/modules/GUIExtender

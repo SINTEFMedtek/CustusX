@@ -46,7 +46,6 @@ namespace cx
 {
 typedef boost::shared_ptr<class Image> ImagePtr;
 typedef boost::shared_ptr<class Data> DataPtr;
-class DataManager;
 
 /**
  * \addtogroup cx_resource_core_utilities

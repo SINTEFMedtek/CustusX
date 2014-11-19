@@ -45,7 +45,6 @@ namespace cx
 {
 typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
 typedef boost::shared_ptr<class SpaceListener> SpaceListenerPtr;
-class DataManager;
 
 /**
  * \file

@@ -34,11 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ctkPluginContext.h>
 #include "cxServiceController.h"
 #include "cxReporter.h"
-#include "cxPatientService.h"
 #include "cxVideoServiceOld.h"
 #include "cxViewManager.h"
 #include "cxStateService.h"
-#include "cxDataManagerImpl.h"
 #include "cxRepManager.h"
 #include "cxGPUImageBuffer.h"
 #include "cxSettings.h"
@@ -60,7 +58,6 @@ namespace cx
 struct LegacySingletons
 {
 	static TrackingServicePtr mTrackingService;
-	static DataServicePtr mDataManager;
 	static SpaceProviderPtr mSpaceProvider;
 	static PatientModelServicePtr mPatientService;
 	static VideoServiceOldPtr mVideoServiceOld;
@@ -69,17 +66,12 @@ struct LegacySingletons
 };
 
 TrackingServicePtr LegacySingletons::mTrackingService;
-DataServicePtr LegacySingletons::mDataManager;
 SpaceProviderPtr LegacySingletons::mSpaceProvider;
 PatientModelServicePtr LegacySingletons::mPatientService;
 VideoServiceOldPtr LegacySingletons::mVideoServiceOld;
 VisualizationServiceOldPtr LegacySingletons::mVisualizationService;
 StateServicePtr LegacySingletons::mStateService;
 
-//DataManager* dataManager()
-//{
-//	return LegacySingletons::mDataManager.get(); // TODO remove get()
-//}
 ViewManager* viewManager()
 {
 	return LegacySingletons::mVisualizationService.get();
@@ -96,10 +88,6 @@ SpaceProviderPtr spaceProvider()
 PatientModelServicePtr patientService()
 {
 	return LegacySingletons::mPatientService;
-}
-DataServicePtr dataService()
-{
-	return LegacySingletons::mDataManager;
 }
 VideoServiceOldPtr videoService()
 {
@@ -167,53 +155,29 @@ void LogicManager::createTrackingService()
 
 void LogicManager::createInterconnectedDataAndSpace()
 {
-	// prerequisites:
-	this->getTrackingService();
-
 	// build object(s):
 	mPatientModelService = PatientModelServiceProxy::create(this->getPluginContext());
 	LegacySingletons::mPatientService = mPatientModelService;
-
-	mDataService = DataManagerImpl::create();
-	LegacySingletons::mDataManager = mDataService;
-
-	mSpaceProvider.reset(new cx::SpaceProviderImpl(mTrackingService,
-												   mPatientModelService));
-	mDataService->setSpaceProvider(mSpaceProvider);
-	LegacySingletons::mSpaceProvider= mSpaceProvider;
-
-	mDataFactory.reset(new DataFactory(mPatientModelService, mSpaceProvider));
-	mDataService->setDataFactory(mDataFactory);
-}
-
-void LogicManager::createDataFactory()
-{
-	this->createInterconnectedDataAndSpace();
-}
-
-void LogicManager::createDataService()
-{
-	this->createInterconnectedDataAndSpace();
 }
 
 void LogicManager::createSpaceProvider()
 {
-	this->createInterconnectedDataAndSpace();
+	mSpaceProvider.reset(new cx::SpaceProviderImpl(mTrackingService,
+												   mPatientModelService));
+	LegacySingletons::mSpaceProvider= mSpaceProvider;
 }
 
 void LogicManager::createPatientModelService()
 {
-	// prerequisites:
-	this->getDataService();
-	// build object(s):
-	mPatientServiceOld = PatientService::create(mDataService);
+	mPatientModelService = PatientModelServiceProxy::create(this->getPluginContext());
+	LegacySingletons::mPatientService = mPatientModelService;
 }
 
 void LogicManager::createVideoServiceOld()
 {
 	// prerequisites:
 	this->getTrackingService();
-	this->getDataService();
+	this->createPatientModelService();
 	this->getSpaceProvider();
 
 	// build object(s):
@@ -229,7 +193,7 @@ void LogicManager::createVisualizationService()
 {
 	// prerequisites:
 	this->getTrackingService();
-	this->getDataService();
+	this->createPatientModelService();
 	this->getVideoServiceOld();
 	this->getSpaceProvider();
 
@@ -269,34 +233,12 @@ void LogicManager::createPluginFramework()
 
 }
 
-DataFactoryPtr LogicManager::getDataFactory()
-{
-	if (!mDataFactory)
-		this->createPatientModelService();
-	return mDataFactory;
-}
-
-DataServicePtr LogicManager::getDataService()
-{
-	if (!mDataService)
-		this->createDataService();
-	return mDataService;
-}
-
-
 PatientModelServicePtr LogicManager::getPatientModelService()
 {
 	if (!mPatientModelService)
 		this->createPatientModelService();
 	return mPatientModelService;
 }
-
-PatientServicePtr LogicManager::getPatientServiceOld()
-{
-	this->getPatientModelService();
-	return mPatientServiceOld;
-}
-
 
 TrackingServicePtr LogicManager::getTrackingService()
 {
@@ -388,28 +330,14 @@ void LogicManager::shutdownVideoServiceOld()
 void LogicManager::shutdownPatientService()
 {
 	LegacySingletons::mPatientService.reset();
-	requireUnique(mPatientServiceOld, "PatientService");
 	mPatientModelService.reset();
-	mPatientServiceOld.reset();
 }
 
 void LogicManager::shutdownInterconnectedDataAndSpace()
 {
-	// [HACK] break loop by removing connection to DataFactory and SpaceProvider
-	mDataService->setSpaceProvider(SpaceProviderPtr());
-	mDataService->setDataFactory(DataFactoryPtr());
-	mDataService->clear();
-
-	requireUnique(mDataFactory, "DataFactory");
-	mDataFactory.reset();
-
 	LegacySingletons::mSpaceProvider.reset();
 	requireUnique(mSpaceProvider, "SpaceProvider");
 	mSpaceProvider.reset();
-
-	LegacySingletons::mDataManager.reset();
-	requireUnique(mDataService, "DataService");
-	mDataService.reset();
 }
 
 void LogicManager::shutdownTrackingService()
@@ -424,8 +352,6 @@ void LogicManager::shutdownPluginFramework()
 	requireUnique(mPluginFramework, "PluginFramework");
 	mPluginFramework.reset();
 }
-
-
 
 LogicManager* LogicManager::getInstance()
 {

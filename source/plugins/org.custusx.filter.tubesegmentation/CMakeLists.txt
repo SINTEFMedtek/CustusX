@@ -22,12 +22,10 @@ set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
 include_directories(
     ${CX_RESOURCE_FILTER_INCLUDE_DIRECTORIES}
-    ${CustusX_SOURCE_DIR}/source/service/patient
     ${CustusX_SOURCE_DIR}/source/modules/Algorithm/logic
     ${CustusX_SOURCE_DIR}/source/gui/dataAdapters
 	${CustusX_SOURCE_DIR}/source/logic
 
-    ${CustusX_BINARY_DIR}/source/service/patient
     ${CustusX_BINARY_DIR}/source/modules/Algorithm
     ${CustusX_BINARY_DIR}/source/gui
     ${CustusX_BINARY_DIR}/source/logic

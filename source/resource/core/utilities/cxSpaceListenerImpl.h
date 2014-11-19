@@ -38,8 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-class ToolManager;
-class DataManager;
 
 /**\brief Class that listens to changes in a coordinate system,
  * and emits a signal if that system changes.
