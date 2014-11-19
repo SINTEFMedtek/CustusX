@@ -31,7 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include <cxDataViewSelectionWidget.h>
 #include "cxToolListWidget.h"
-#include "cxDataManager.h"
 #include "cxData.h"
 #include <QListWidgetItem>
 #include <QDir>
@@ -50,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewManager.h"
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"
+#include "cxPatientModelService.h"
 
 //TODO: remove
 #include "cxLegacySingletons.h"
@@ -107,15 +107,15 @@ void DataListWidget::itemSelectionChangedSlot()
   QList<QListWidgetItem*> items = this->selectedItems();
   if (items.empty())
     return;
-  ImagePtr image = dataManager()->getImage(items[0]->data(Qt::UserRole).toString());
+  ImagePtr image = patientService()->getData<Image>(items[0]->data(Qt::UserRole).toString());
   if (image)
-    dataManager()->setActiveImage(image);
+	patientService()->setActiveImage(image);
 
 }
 
 void DataListWidget::populateData(QString uid, bool indent, QListWidgetItem* after)
 {
-  DataPtr data = dataManager()->getData(uid);
+  DataPtr data = patientService()->getData(uid);
   if (!data)
     return;
 
@@ -158,7 +158,7 @@ AllDataListWidget::AllDataListWidget(QWidget* parent) :
   this->setDropIndicatorShown(false);
   this->setDragEnabled(true);
 
-  connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SLOT(populateAllDataList()));
+  connect(patientService().get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(populateAllDataList()));
 }
 
 AllDataListWidget::~AllDataListWidget()
@@ -179,7 +179,7 @@ void AllDataListWidget::populateAllDataList()
   this->clear();
 
   //add actions to the actiongroups and the contextmenu
-  std::vector<DataPtr> sorted = sortOnGroupsAndAcquisitionTime(dataManager()->getData());
+  std::vector<DataPtr> sorted = sortOnGroupsAndAcquisitionTime(patientService()->getData());
   QString lastDataActionUid = "________________________";
   for (std::vector<DataPtr>::iterator iter=sorted.begin(); iter!=sorted.end(); ++iter)
   {
@@ -236,7 +236,7 @@ void SelectedDataListWidget::userChangedListSlot()
   mViewGroupData->clearData();
   for (int i=0; i<data.size(); ++i)
   {
-    DataPtr current = dataManager()->getData(data[i]);
+	DataPtr current = patientService()->getData(data[i]);
     if (!current)
       continue;
 	mViewGroupData->addData(current);

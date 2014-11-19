@@ -33,21 +33,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVideoServiceBackend.h"
 
 #include <ctkPluginFramework.h>
-#include "cxDataManager.h"
 #include "cxTrackingService.h"
 #include "cxSpaceProvider.h"
 
 namespace cx
 {
 
-VideoServiceBackendPtr VideoServiceBackend::create(DataServicePtr dataManager,
+VideoServiceBackendPtr VideoServiceBackend::create(PatientModelServicePtr dataManager,
 							TrackingServicePtr trackingService,
 							SpaceProviderPtr spaceProvider)
 {
 	return VideoServiceBackendPtr(new VideoServiceBackend(dataManager, trackingService, spaceProvider));
 }
 
-VideoServiceBackend::VideoServiceBackend(DataServicePtr dataManager,
+VideoServiceBackend::VideoServiceBackend(PatientModelServicePtr dataManager,
 							TrackingServicePtr trackingService,
 							SpaceProviderPtr spaceProvider) :
 	mDataManager(dataManager),
@@ -57,7 +56,7 @@ VideoServiceBackend::VideoServiceBackend(DataServicePtr dataManager,
 
 }
 
-DataServicePtr VideoServiceBackend::getDataManager()
+PatientModelServicePtr VideoServiceBackend::getDataManager()
 {
 	return mDataManager;
 }

@@ -82,7 +82,8 @@ public:
   DataServicePtr getDataService();
   TrackingServicePtr getTrackingService();
   SpaceProviderPtr getSpaceProvider();
-  PatientServicePtr getPatientService();
+  PatientModelServicePtr getPatientModelService();
+  PatientServicePtr getPatientServiceOld();
 	VideoServiceOldPtr getVideoServiceOld();
   VisualizationServiceOldPtr getVisualizationService();
 	StateServicePtr getStateService();
@@ -101,7 +102,7 @@ private:
   void shutdownServices();
 
   void createTrackingService();
-  void createPatientService();
+  void createPatientModelService();
   void createDataService();
   void createDataFactory();
   void createSpaceProvider();
@@ -135,7 +136,8 @@ private:
 	SpaceProviderPtr mSpaceProvider;
 	DataFactoryPtr mDataFactory;
 
-	PatientServicePtr mPatientService;
+	PatientModelServicePtr mPatientModelService;
+	PatientServicePtr mPatientServiceOld;
 	TrackingServicePtr mTrackingService;
 	VideoServiceOldPtr mVideoServiceOld;
 	VisualizationServiceOldPtr mVisualizationService;

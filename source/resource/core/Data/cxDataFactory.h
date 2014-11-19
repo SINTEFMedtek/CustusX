@@ -53,7 +53,7 @@ class DataManager;
 class cxResource_EXPORT DataFactory
 {
 public:
-	explicit DataFactory(DataServicePtr dataManager, SpaceProviderPtr spaceProvider);
+	explicit DataFactory(PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider);
 
 	DataPtr create(QString type, QString uid, QString name="");
 
@@ -64,8 +64,10 @@ public:
 		return boost::dynamic_pointer_cast<T>(retval);
 	}
 private:
-	DataServicePtr mDataManager;
+	PatientModelServicePtr mDataManager;
 	SpaceProviderPtr mSpaceProvider;
+	DataPtr createRaw(QString type, QString uid);
+
 };
 typedef boost::shared_ptr<DataFactory> DataFactoryPtr;
 

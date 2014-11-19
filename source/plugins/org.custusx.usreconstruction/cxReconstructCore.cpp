@@ -130,8 +130,7 @@ void ReconstructCore::threadedPostReconstruct()
 										.arg(mInput.mTransferFunctionPreset)
 										.arg(mInput.mAngio));
 
-		mPatientModelService->loadData(mOutput);
-		mPatientModelService->saveImage(mOutput, mInput.mOutputBasePath);
+		mPatientModelService->insertData(mOutput);
 	}
 	else
 	{
@@ -147,17 +146,20 @@ ImagePtr ReconstructCore::generateOutputVolume(vtkImageDataPtr rawOutput)
 {
 	setDeepModified(rawOutput);
 
-	//If no output path is selecetd, use the same path as the input
-	QString filePath;
-	if (mInput.mOutputBasePath.isEmpty() && mInput.mOutputRelativePath.isEmpty())
-		filePath = qstring_cast(mFileData->getFilePath());
-	else
-		filePath = mInput.mOutputRelativePath;
+//	//If no output path is selecetd, use the same path as the input
+//	QString filePath;
+//	if (mInput.mOutputBasePath.isEmpty() && mInput.mOutputRelativePath.isEmpty())
+//		filePath = qstring_cast(mFileData->getFilePath());
+//	else
+//		filePath = mInput.mOutputRelativePath;
 
 	QString uid = this->generateOutputUid();
 	QString name = this->generateImageName(uid);
 
-	ImagePtr image = mPatientModelService->createImage(rawOutput, uid + "_%1", name + " %1", filePath);
+	ImagePtr image = mPatientModelService->createSpecificData<Image>(uid + "_%1", name + " %1");
+	image->setVtkImageData(rawOutput);
+
+//	ImagePtr image = mPatientModelService->createImage(rawOutput, uid + "_%1", name + " %1", filePath);
 	image->get_rMd_History()->setRegistration(mOutputVolumeParams.get_rMd());
 	image->setModality("US");
 	if (mInput.mAngio)

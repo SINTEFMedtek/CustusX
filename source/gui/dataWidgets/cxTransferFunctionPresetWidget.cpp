@@ -35,7 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QInputDialog>
 #include <QMessageBox>
 #include "cxReporter.h"
-#include "cxDataManager.h"
 #include "cxSettings.h"
 #include "cxActiveImageProxy.h"
 #include "cxPatientModelService.h"

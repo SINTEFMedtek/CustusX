@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define BRANCH_H_
 
 #include <vector>
-#include "cxDataManager.h"
 #include "cxMesh.h"
 #include "cxVector3D.h"
 

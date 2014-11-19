@@ -39,7 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxDataMetric.h"
 #include "cxCoordinateSystemHelpers.h"
-#include "cxDataManagerImpl.h"
 #include "cxPointMetric.h"
 #include "cxMetricReferenceArgumentList.h"
 
@@ -71,9 +70,9 @@ class cxResource_EXPORT PlaneMetric: public DataMetric
 {
 Q_OBJECT
 public:
-	PlaneMetric(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider);
+	PlaneMetric(const QString& uid, const QString& name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider);
 	virtual ~PlaneMetric();
-	static PlaneMetricPtr create(QString uid, QString name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider);
+	static PlaneMetricPtr create(QString uid, QString name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider);
 
     virtual Vector3D getRefCoord() const;
 	Vector3D getRefNormal() const;

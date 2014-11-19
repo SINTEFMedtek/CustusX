@@ -37,13 +37,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStringList>
 #include "cxTime.h"
 #include "cxAcquisitionData.h"
-#include "cxPatientService.h"
-#include "cxPatientData.h"
 
 #include "cxUSAcqusitionWidget.h"
 #include "cxTrackedCenterlineWidget.h"
 
 #include "cxLegacySingletons.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
@@ -52,9 +51,9 @@ AcquisitionPlugin::AcquisitionPlugin(UsReconstructionServicePtr reconstructer)
 {
 	mAcquisitionData.reset(new AcquisitionData(reconstructer));
 
-	connect(patientService()->getPatientData().get(), SIGNAL(isSaving()), this, SLOT(duringSavePatientSlot()));
-	connect(patientService()->getPatientData().get(), SIGNAL(isLoading()), this, SLOT(duringLoadPatientSlot()));
-	connect(patientService()->getPatientData().get(), SIGNAL(cleared()), this, SLOT(clearSlot()));
+	connect(patientService().get(), SIGNAL(isSaving()), this, SLOT(duringSavePatientSlot()));
+	connect(patientService().get(), SIGNAL(isLoading()), this, SLOT(duringLoadPatientSlot()));
+	connect(patientService().get(), SIGNAL(cleared()), this, SLOT(clearSlot()));
 }
 
 AcquisitionPlugin::~AcquisitionPlugin()
@@ -91,14 +90,14 @@ void AcquisitionPlugin::clearSlot()
 
 void AcquisitionPlugin::duringSavePatientSlot()
 {
-	QDomElement managerNode = patientService()->getPatientData()->getCurrentWorkingElement("managers");
+	QDomElement managerNode = patientService()->getCurrentWorkingElement("managers");
 	this->addXml(managerNode);
 }
 
 void AcquisitionPlugin::duringLoadPatientSlot()
 {
 	QDomElement stateManagerNode =
-					patientService()->getPatientData()->getCurrentWorkingElement("managers/stateManager");
+					patientService()->getCurrentWorkingElement("managers/stateManager");
 	this->parseXml(stateManagerNode);
 }
 

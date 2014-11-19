@@ -36,8 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QApplication>
 
 #include "cxDummyTool.h"
-#include "cxPatientData.h"
-#include "cxPatientService.h"
 #include "cxDataLocations.h"
 #include "cxVideoServiceOld.h"
 #include "cxVideoConnectionManager.h"
@@ -53,6 +51,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLegacySingletons.h"
 #include "cxVideoService.h"
 #include "cxUsReconstructionServiceProxy.h"
+#include "cxPatientModelService.h"
+
 
 namespace cxtest
 {
@@ -123,7 +123,7 @@ void AcquisitionFixture::initialize()
 	mAcqDataFilename = cx::DataLocations::getTestDataPath() + "/testing/us_videos/acq_256x192.mhd";
 
 	qApp->processEvents(); // wait for stateservice to finish init of application states - needed before load patient.
-	cx::patientService()->getPatientData()->newPatient(cx::DataLocations::getTestDataPath() + "/temp/Acquisition/");
+	cx::patientService()->newPatient(cx::DataLocations::getTestDataPath() + "/temp/Acquisition/");
 
 	//Mock UsReconstructionService with null object
 	ctkPluginContext *pluginContext = cx::logicManager()->getPluginContext();

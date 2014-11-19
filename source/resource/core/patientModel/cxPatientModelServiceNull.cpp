@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImage.h"
 #include "cxReporter.h"
 #include "cxLandmark.h"
+#include "cxRegistrationTransform.h"
 
 namespace cx
 {
@@ -48,9 +49,9 @@ void PatientModelServiceNull::insertData(DataPtr data)
 	printWarning();
 }
 
-void PatientModelServiceNull::updateRegistration_rMpr(const QDateTime& oldTime, const RegistrationTransform& newTransform)
+DataPtr PatientModelServiceNull::createData(QString type, QString uid, QString name)
 {
-	printWarning();
+	return DataPtr();
 }
 
 std::map<QString, DataPtr> PatientModelServiceNull::getData() const
@@ -60,11 +61,6 @@ std::map<QString, DataPtr> PatientModelServiceNull::getData() const
 	return retval;
 }
 
-DataPtr PatientModelServiceNull::getData(const QString& uid) const
-{
-	printWarning();
-	return DataPtr();
-}
 
 LandmarksPtr PatientModelServiceNull::getPatientLandmarks() const
 {
@@ -84,11 +80,6 @@ void PatientModelServiceNull::setLandmarkName(QString uid, QString name)
 	printWarning();;
 }
 
-Transform3D PatientModelServiceNull::get_rMpr() const
-{
-	printWarning();
-	return Transform3D();
-}
 
 ImagePtr PatientModelServiceNull::getActiveImage() const
 {
@@ -122,43 +113,6 @@ void PatientModelServiceNull::setDebugMode(bool on)
 	printWarning();
 }
 
-cx::ImagePtr cx::PatientModelServiceNull::createDerivedImage(vtkImageDataPtr data, QString uid, QString name, cx::ImagePtr parentImage, QString filePath)
-{
-	printWarning();
-	return ImagePtr();
-}
-
-MeshPtr PatientModelServiceNull::createMesh(vtkPolyDataPtr data, QString uidBase, QString nameBase, QString filePath)
-{
-	printWarning();
-	return MeshPtr();
-}
-
-ImagePtr PatientModelServiceNull::createImage(vtkImageDataPtr data, QString uidBase, QString nameBase, QString filePath)
-{
-	printWarning();
-	return ImagePtr();
-}
-
-void PatientModelServiceNull::loadData(DataPtr data)
-{
-	printWarning();
-}
-
-void PatientModelServiceNull::saveData(DataPtr data, const QString &basePath)
-{
-	printWarning();
-}
-
-void PatientModelServiceNull::saveImage(ImagePtr image, const QString &basePath)
-{
-	printWarning();
-}
-
-void PatientModelServiceNull::saveMesh(MeshPtr mesh, const QString &basePath)
-{
-	printWarning();
-}
 
 std::map<QString, VideoSourcePtr> PatientModelServiceNull::getStreams() const
 {
@@ -189,7 +143,7 @@ void PatientModelServiceNull::exportPatient(bool niftiFormat)
 	printWarning();
 }
 
-void PatientModelServiceNull::removePatientData(QString uid)
+void PatientModelServiceNull::removeData(QString uid)
 {
 	printWarning();
 }
@@ -203,6 +157,11 @@ PresetTransferFunctions3DPtr PatientModelServiceNull::getPresetTransferFunctions
 void PatientModelServiceNull::setCenter(const Vector3D &center)
 {
 	printWarning();
+}
+
+Vector3D PatientModelServiceNull::getCenter() const
+{
+	return Vector3D::Zero();
 }
 
 QString PatientModelServiceNull::addLandmark()
@@ -227,11 +186,36 @@ QDomElement PatientModelServiceNull::getCurrentWorkingElement(QString path)
 	return QDomElement();
 }
 
-RegistrationHistoryPtr PatientModelServiceNull::get_rMpr_History()
+RegistrationHistoryPtr PatientModelServiceNull::get_rMpr_History() const
 {
-	printWarning();
-	return RegistrationHistoryPtr();
+	printWarning();	
+	return RegistrationHistory::getNullObject();
 }
 
+CLINICAL_APPLICATION PatientModelServiceNull::getClinicalApplication() const
+{
+	return mdCOUNT;
+}
+
+void PatientModelServiceNull::setClinicalApplication(CLINICAL_APPLICATION application)
+{
+
+}
+
+void PatientModelServiceNull::newPatient(QString choosenDir)
+{
+}
+
+void PatientModelServiceNull::loadPatient(QString chosenDir)
+{
+}
+
+void PatientModelServiceNull::savePatient()
+{
+}
+
+void PatientModelServiceNull::clearPatient()
+{
+}
 
 } // cx

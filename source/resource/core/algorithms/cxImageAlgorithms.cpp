@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkImageShiftScale.h"
 
 #include "cxImage.h"
-#include "cxDataManager.h"
+#include "cxPatientModelService.h"
 #include "cxUtilHelpers.h"
 #include "cxImageTF3D.h"
 #include "cxImageLUT2D.h"
@@ -56,7 +56,7 @@ namespace cx
 /** Return an image that is resampled into space q.
  *  The image is not added to the data manager nor saved.
  */
-ImagePtr resampleImage(DataServicePtr dataManager, ImagePtr image, Transform3D qMd)
+ImagePtr resampleImage(PatientModelServicePtr dataManager, ImagePtr image, Transform3D qMd)
 {
 	//TODO: fix error:
 	// There is an error in the transfer functions of the returned image from this function
@@ -76,7 +76,13 @@ ImagePtr resampleImage(DataServicePtr dataManager, ImagePtr image, Transform3D q
 
   QString uid = image->getUid() + "_or%1";
   QString name = image->getName()+" or%1";
-  ImagePtr oriented = dataManager->createDerivedImage(rawResult, uid, name, image);
+//  ImagePtr oriented = dataManager->createDerivedImage(rawResult, uid, name, image);
+
+  ImagePtr oriented = dataManager->createSpecificData<Image>(uid, name);
+  oriented->intitializeFromParentImage(image);
+  oriented->setVtkImageData(rawResult);
+
+
   oriented->get_rMd_History()->setRegistration(image->get_rMd() * qMd.inv());
   oriented->mergevtkSettingsIntosscTransform();
 
@@ -86,7 +92,7 @@ ImagePtr resampleImage(DataServicePtr dataManager, ImagePtr image, Transform3D q
 /** Return an image that is resampled with a new output spacing.
  *  The image is not added to the data manager nor saved.
  */
-ImagePtr resampleImage(DataServicePtr dataManager, ImagePtr image, const Vector3D spacing, QString uid, QString name)
+ImagePtr resampleImage(PatientModelServicePtr dataManager, ImagePtr image, const Vector3D spacing, QString uid, QString name)
 {
 //  std::cout << "oldspacing: " << Vector3D(image->getBaseVtkImageData()->GetSpacing()) << std::endl;
 //  std::cout << "spacing: " << spacing << std::endl;
@@ -105,7 +111,11 @@ ImagePtr resampleImage(DataServicePtr dataManager, ImagePtr image, const Vector3
     uid = image->getUid() + "_res%1";
     name = image->getName()+" res%1";
   }
-  ImagePtr retval = dataManager->createDerivedImage(rawResult, uid, name, image);
+//  ImagePtr retval = dataManager->createDerivedImage(rawResult, uid, name, image);
+
+  ImagePtr retval = dataManager->createSpecificData<Image>(uid, name);
+  retval->intitializeFromParentImage(image);
+  retval->setVtkImageData(rawResult);
 
   return retval;
 }
@@ -113,7 +123,7 @@ ImagePtr resampleImage(DataServicePtr dataManager, ImagePtr image, const Vector3
 /** Return an image that is cropped using its own croppingBox.
  *  The image is not added to the data manager nor saved.
  */
-ImagePtr duplicateImage(DataServicePtr dataManager, ImagePtr image)
+ImagePtr duplicateImage(PatientModelServicePtr dataManager, ImagePtr image)
 {
 	Vector3D spacing(image->getBaseVtkImageData()->GetSpacing());
 	return resampleImage(dataManager, image, spacing, image->getUid()+"_copy%1", image->getName()+" copy%1");
@@ -140,7 +150,7 @@ vtkImageDataPtr cropImage(vtkImageDataPtr input, IntBoundingBox3D cropbox)
 /** Return an image that is cropped using its own croppingBox.
  *  The image is not added to the data manager nor saved.
  */
-ImagePtr cropImage(DataServicePtr dataManager, ImagePtr image)
+ImagePtr cropImage(PatientModelServicePtr dataManager, ImagePtr image)
 {
   DoubleBoundingBox3D bb = image->getCroppingBox();
   double* sp = image->getBaseVtkImageData()->GetSpacing();
@@ -152,7 +162,13 @@ ImagePtr cropImage(DataServicePtr dataManager, ImagePtr image)
 
   QString uid = image->getUid() + "_crop%1";
   QString name = image->getName()+" crop%1";
-  ImagePtr result = dataManager->createDerivedImage(rawResult,uid, name, image);
+//  ImagePtr result = dataManager->createDerivedImage(rawResult,uid, name, image);
+
+
+  ImagePtr result = dataManager->createSpecificData<Image>(uid, name);
+  result->intitializeFromParentImage(image);
+  result->setVtkImageData(rawResult);
+
   result->mergevtkSettingsIntosscTransform();
 
   return result;

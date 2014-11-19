@@ -57,7 +57,7 @@ public:
 	virtual ~PatientModelImplService();
 
 	virtual void insertData(DataPtr data);
-	virtual void updateRegistration_rMpr(const QDateTime& oldTime, const RegistrationTransform& newTransform);
+	virtual DataPtr createData(QString type, QString uid, QString name);
 	virtual std::map<QString, DataPtr> getData() const;
 	virtual DataPtr getData(const QString& uid) const;
 
@@ -67,10 +67,13 @@ public:
 	virtual void setLandmarkActive(QString uid, bool active);
 
 	virtual Transform3D get_rMpr() const; ///< get the patient registration transform
-	virtual RegistrationHistoryPtr get_rMpr_History();
+	virtual RegistrationHistoryPtr get_rMpr_History() const;
 
 	virtual ImagePtr getActiveImage() const; ///< used for system state
 	virtual void setActiveImage(ImagePtr activeImage); ///< used for system state
+
+	virtual CLINICAL_APPLICATION getClinicalApplication() const;
+	virtual void setClinicalApplication(CLINICAL_APPLICATION application);
 
 	virtual ImagePtr createDerivedImage(vtkImageDataPtr data, QString uid, QString name, ImagePtr parentImage, QString filePath);
 	virtual MeshPtr createMesh(vtkPolyDataPtr data, QString uidBase, QString nameBase, QString filePath);
@@ -86,11 +89,15 @@ public:
 	virtual bool isPatientValid() const;
 	virtual DataPtr importData(QString fileName, QString &infoText);
 	virtual void exportPatient(bool niftiFormat);
-	virtual void removePatientData(QString uid);
-
+	virtual void removeData(QString uid);
+	virtual void newPatient(QString choosenDir);
+	virtual void loadPatient(QString chosenDir);
+	virtual void savePatient();
+	virtual void clearPatient();
 	virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const;
 
 	virtual void setCenter(const Vector3D& center);
+	virtual Vector3D getCenter() const;
 
 	virtual QString addLandmark();
 

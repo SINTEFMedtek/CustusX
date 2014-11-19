@@ -35,7 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPointMetric.h"
 #include <QDomNode>
 #include "cxTypeConversions.h"
-#include "cxDataManager.h"
 
 namespace cx
 {

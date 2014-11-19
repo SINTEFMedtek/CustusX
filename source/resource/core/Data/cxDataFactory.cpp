@@ -43,10 +43,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxFrameMetric.h"
 #include "cxToolMetric.h"
 
+#include "cxPatientModelService.h"
+
+
 namespace cx
 {
 
-DataFactory::DataFactory(DataServicePtr dataManager, SpaceProviderPtr spaceProvider) :
+DataFactory::DataFactory(PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider) :
 	mDataManager(dataManager),
 	mSpaceProvider(spaceProvider)
 {
@@ -64,7 +67,7 @@ DataFactory::DataFactory(DataServicePtr dataManager, SpaceProviderPtr spaceProvi
 		return TYPE::create(uid, "", mDataManager, mSpaceProvider); \
 }
 
-DataPtr DataFactory::create(QString type, QString uid, QString name)
+DataPtr DataFactory::createRaw(QString type, QString uid)
 {
 	CREATE_IF_MATCH(type, Image);
 	CREATE_IF_MATCH(type, Mesh);
@@ -77,6 +80,19 @@ DataPtr DataFactory::create(QString type, QString uid, QString name)
 	CREATE_METRIC_IF_MATCH(type, DonutMetric);
 	CREATE_METRIC_IF_MATCH(type, SphereMetric);
 	return DataPtr ();
+}
+
+DataPtr DataFactory::create(QString type, QString uid, QString name)
+{
+//	if (mDataManager)
+//		mDataManager->generateUidAndName(&uid, &name);
+
+	DataPtr retval = this->createRaw(type, uid);
+	if (name.isEmpty())
+		name = uid;
+	if (retval)
+		retval->setName(name);
+	return retval;
 }
 
 } // namespace cx

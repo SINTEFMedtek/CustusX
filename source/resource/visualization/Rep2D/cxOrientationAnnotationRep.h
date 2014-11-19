@@ -75,7 +75,7 @@ class cxResourceVisualization_EXPORT OrientationAnnotationRep : public RepImpl
 {
 	Q_OBJECT
 public:
-	static OrientationAnnotationRepPtr  New(DataServicePtr dataManager, const QString& uid="");
+	static OrientationAnnotationRepPtr  New(PatientModelServicePtr dataManager, const QString& uid="");
 	virtual ~OrientationAnnotationRep();
 	virtual QString getType() const { return "vm::OrientationAnnotationRep"; };
 
@@ -84,7 +84,7 @@ public:
 	private slots:
 	void clinicalApplicationChangedSlot();
 protected:
-	OrientationAnnotationRep(DataServicePtr dataManager);
+	OrientationAnnotationRep(PatientModelServicePtr dataManager);
 	virtual void addRepActorsToViewRenderer(ViewPtr view);
 	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
 
@@ -94,7 +94,7 @@ protected:
 
 	OrientationAnnotationPtr mOrientation;
 	PLANE_TYPE mPlane;
-	DataServicePtr mDataManager;
+	PatientModelServicePtr mDataManager;
 
 	QString mNorthAnnotation;
 	QString mSouthAnnotation;

@@ -40,7 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "boost/bind.hpp"
 #include "cxTime.h"
 #include "cxReporter.h"
-#include "cxDataManager.h"
 #include "cxViewManager.h"
 #include "cxRepManager.h"
 #include "cxTrackingService.h"
@@ -52,7 +51,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewGroup.h"
 #include "cxPreferencesDialog.h"
 #include "cxSlicePropertiesWidget.h"
-#include "cxPatientData.h"
 #include "cxDataLocations.h"
 #include "cxMeshInfoWidget.h"
 #include "cxFrameForest.h"
@@ -73,7 +71,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxConsoleWidget.h"
 #include "cxViewManager.h"
 #include "cxStateService.h"
-#include "cxPatientService.h"
 #include "cxMetricWidget.h"
 #include "cxViewWrapper.h"
 #include "cxPlaybackWidget.h"
@@ -91,6 +88,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLayoutInteractor.h"
 #include "cxNavigation.h"
 #include "cxPluginFrameworkWidget.h"
+#include "cxImage.h"
 
 #include "ctkServiceTracker.h"
 #include "cxLogicManager.h"
@@ -157,7 +155,7 @@ MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
 	this->addAsDockWidget(new ToolManagerWidget(this), "Debugging");
 	this->addAsDockWidget(new PluginFrameworkWidget(this), "Browsing");
 
-	connect(patientService()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
+	connect(patientService().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
 	connect(qApp, SIGNAL(focusChanged(QWidget*, QWidget*)), this, SLOT(focusChanged(QWidget*, QWidget*)));
 
 	// insert all widgets from all guiExtenders
@@ -185,7 +183,7 @@ MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
 	if (settings()->value("gui/fullscreen").toBool())
 		this->setWindowState(this->windowState() | Qt::WindowFullScreen);
 
-	QTimer::singleShot(0, this, SLOT(startupLoadPatient())); // make sure this is called after application state change
+//	QTimer::singleShot(0, this, SLOT(startupLoadPatient())); // make sure this is called after application state change
 	this->toggleDebugModeSlot(mDebugModeAction->isChecked());
 }
 
@@ -273,12 +271,12 @@ void MainWindow::onPluginBaseRemoved(GUIExtenderService* service)
 	this->removeGUIExtender(service);
 }
 
-/**Parse the command line and load a patient if the switch --patient is found
- */
-void MainWindow::startupLoadPatient()
-{
-	patientService()->getPatientData()->startupLoadPatient();
-}
+///**Parse the command line and load a patient if the switch --patient is found
+// */
+//void MainWindow::startupLoadPatient()
+//{
+//	patientService()->startupLoadPatient();
+//}
 
 void MainWindow::dockWidgetVisibilityChanged(bool val)
 {
@@ -389,10 +387,11 @@ void MainWindow::createActions()
 	mDebugModeAction = new QAction(tr("&Debug Mode"), this);
 	mDebugModeAction->setShortcut(tr("Ctrl+D"));
 	mDebugModeAction->setCheckable(true);
-	mDebugModeAction->setChecked(dataManager()->getDebugMode());
+	mDebugModeAction->setChecked(patientService()->getDebugMode());
 	mDebugModeAction->setStatusTip(tr("Set debug mode, this enables lots of weird stuff."));
-	connect(mDebugModeAction, SIGNAL(triggered(bool)), dataManager(), SLOT(setDebugMode(bool)));
-	connect(dataManager(), SIGNAL(debugModeChanged(bool)), mDebugModeAction, SLOT(setChecked(bool)));
+	boost::function<void(bool)> setDebug = boost::bind(&PatientModelService::setDebugMode, patientService().get(), _1);
+	connect(mDebugModeAction, &QAction::triggered, setDebug);
+	connect(patientService().get(), SIGNAL(debugModeChanged(bool)), mDebugModeAction, SLOT(setChecked(bool)));
 	connect(mDebugModeAction, SIGNAL(toggled(bool)), this, SLOT(toggleDebugModeSlot(bool)));
 
 	mFullScreenAction = new QAction(tr("Fullscreen"), this);
@@ -529,7 +528,7 @@ void MainWindow::shootWindow()
 
 void MainWindow::recordFullscreen()
 {
-	QString path = patientService()->getPatientData()->generateFilePath("Screenshots", "mp4");
+	QString path = patientService()->generateFilePath("Screenshots", "mp4");
 
 	if(vlc()->isRecording())
 		vlc()->stopRecording();
@@ -561,7 +560,7 @@ void MainWindow::saveScreenShot(QPixmap pixmap, QString id)
 	QString ending = "png";
 	if (!id.isEmpty())
 		ending = id + "." + ending;
-	QString path = patientService()->getPatientData()->generateFilePath("Screenshots", ending);
+	QString path = patientService()->generateFilePath("Screenshots", ending);
 	QtConcurrent::run(boost::bind(&MainWindow::saveScreenShotThreaded, this, pixmap.toImage(), path));
 }
 
@@ -601,8 +600,8 @@ void MainWindow::centerToImageCenterSlot()
 {
 	NavigationPtr nav = viewManager()->getNavigation();
 
-	if (dataManager()->getActiveImage())
-		nav->centerToData(dataManager()->getActiveImage());
+	if (patientService()->getActiveImage())
+		nav->centerToData(patientService()->getActiveImage());
 	else if (!viewManager()->getViewGroups().empty())
 		nav->centerToView(viewManager()->getViewGroups()[0]->getData()->getData());
 //		nav->centerToView(mVisualizationService->getViewGroupData(0)->getData());//Too early?
@@ -692,28 +691,25 @@ void MainWindow::newPatientSlot()
 	int patientNumber = settings()->value("globalPatientNumber").toInt();
 	settings()->setValue("globalPatientNumber", ++patientNumber);
 
-	patientService()->getPatientData()->newPatient(choosenDir);
-	patientService()->getPatientData()->writeRecentPatientData();
+	patientService()->newPatient(choosenDir);
 }
 
 void MainWindow::clearPatientSlot()
 {
-	patientService()->getPatientData()->clearPatient();
-	patientService()->getPatientData()->writeRecentPatientData();
+	patientService()->clearPatient();
 	reportWarning("Cleared current patient data");
 }
 
 void MainWindow::savePatientFileSlot()
 {
-	if (patientService()->getPatientData()->getActivePatientFolder().isEmpty())
+	if (patientService()->getActivePatientFolder().isEmpty())
 	{
 		reportWarning("No patient selected, select or create patient before saving!");
 		this->newPatientSlot();
 		return;
 	}
 
-	patientService()->getPatientData()->savePatient();
-	patientService()->getPatientData()->writeRecentPatientData();
+	patientService()->savePatient();
 }
 
 void MainWindow::onApplicationStateChangedSlot()
@@ -729,7 +725,7 @@ void MainWindow::updateWindowTitle()
 
 	QString versionName = stateService()->getVersionName();
 
-	QString activePatientFolder = patientService()->getPatientData()->getActivePatientFolder();
+	QString activePatientFolder = patientService()->getActivePatientFolder();
 	if (activePatientFolder.endsWith('/'))
 		activePatientFolder.chop(1);
 	QString patientName;
@@ -752,7 +748,7 @@ void MainWindow::onWorkflowStateChangedSlot()
 	viewManager()->setActiveLayout(desktop.mLayoutUid, 0);
 	viewManager()->setActiveLayout(desktop.mSecondaryLayoutUid, 1);
 	this->restoreState(desktop.mMainWindowState);
-	patientService()->getPatientData()->autoSave();
+	patientService()->autoSave();
 }
 
 void MainWindow::saveDesktopSlot()
@@ -800,8 +796,7 @@ void MainWindow::loadPatientFileSlot()
 	if (choosenDir == QString::null)
 		return; // On cancel
 
-	patientService()->getPatientData()->loadPatient(choosenDir);
-	patientService()->getPatientData()->writeRecentPatientData();
+	patientService()->loadPatient(choosenDir);
 }
 
 void MainWindow::exportDataSlot()
@@ -1027,7 +1022,7 @@ void MainWindow::quitSlot()
 	report("Shutting down CustusX");
 	viewManager()->deactivateCurrentLayout();
 
-	patientService()->getPatientData()->autoSave();
+	patientService()->autoSave();
 
 	settings()->setValue("mainWindow/geometry", saveGeometry());
 	settings()->setValue("mainWindow/windowState", saveState());
@@ -1039,12 +1034,12 @@ void MainWindow::quitSlot()
 
 void MainWindow::deleteDataSlot()
 {
-	if (!dataManager()->getActiveImage())
+	if (!patientService()->getActiveImage())
 		return;
-	QString text = QString("Do you really want to delete data %1?").arg(dataManager()->getActiveImage()->getName());
+	QString text = QString("Do you really want to delete data %1?").arg(patientService()->getActiveImage()->getName());
 	if (QMessageBox::question(this, "Data delete", text, QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel))!=QMessageBox::Ok)
 		return;
-	mPatientModelService->removePatientData(dataManager()->getActiveImage()->getUid());
+	mPatientModelService->removeData(patientService()->getActiveImage()->getUid());
 }
 
 void MainWindow::configureSlot()

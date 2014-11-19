@@ -42,6 +42,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDomNode>
 #include "cxtestDummyDataManager.h"
 #include "cxMessageListener.h"
+#include "cxPatientModelService.h"
+#include "cxTypeConversions.h"
 
 namespace cxtest {
 
@@ -131,7 +133,12 @@ public:
 	template<class METRIC_TYPE>
 	boost::shared_ptr<METRIC_TYPE> createTestMetric(QString uid="")
 	{
-		return METRIC_TYPE::create(uid, "", this->getDataManager(), this->getSpaceProvider());
+		boost::shared_ptr<METRIC_TYPE> retval;
+		retval = mServices->mPatientModelService->createSpecificData<METRIC_TYPE>(uid);
+//		mServices->mPatientModelService->insertData(retval);
+		return retval;
+
+		//return METRIC_TYPE::create(uid, "", this->getDataManager(), this->getSpaceProvider());
 	}
 
     template<class DATA>
@@ -139,15 +146,21 @@ public:
     {
         QDomNode xmlNode = this->createDummyXmlNode();
         data.mMetric->addXml(xmlNode);
+		std::cout << "pre " << streamXml2String(*data.mMetric) << std::endl;
 
-		data.mMetric = this->createTestMetric<typename DATA::METRIC_TYPE>("");
+		data.mMetric = this->createTestMetric<typename DATA::METRIC_TYPE>(data.mMetric->getUid());
 		data.mMetric->parseXml(xmlNode);
+		std::cout << "post " << streamXml2String(*data.mMetric) << std::endl;
 
 		return this->inputEqualsMetric(data);
     }
 
     QDomNode createDummyXmlNode();
     void setPatientRegistration();
+	void insertData(cx::DataPtr data)
+	{
+		mServices->mPatientModelService->insertData(data);
+	}
 
 	bool verifySingleLineHeader(QStringList list, cx::DataMetricPtr metric);
 
@@ -155,7 +168,6 @@ private:
 	TestServicesPtr mServices;
 	cx::MessageListenerPtr mMessageListener;
 
-	cx::DataServicePtr getDataManager();
 	cx::SpaceProviderPtr getSpaceProvider();
 
 };

@@ -43,9 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkImageLuminance.h>
 
 #include "cxImage.h"
-#include "cxDataManagerImpl.h"
 
-#include "cxDataManager.h"
 #include "cxUtilHelpers.h"
 #include "cxImageTF3D.h"
 #include "cxImageLUT2D.h"
@@ -54,6 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxEnumConverter.h"
 #include "cxTime.h"
 #include "cxCoordinateSystemHelpers.h"
+#include "cxPatientModelService.h"
 
 typedef vtkSmartPointer<vtkDoubleArray> vtkDoubleArrayPtr;
 
@@ -174,7 +173,7 @@ void fillShortImageDataWithGradient(vtkImageDataPtr data, int maxValue)
  * as output, depending on the input range.
  *
  */
-ImagePtr convertImageToUnsigned(DataServicePtr dataManager, ImagePtr image, vtkImageDataPtr suggestedConvertedVolume, bool verbose)
+ImagePtr convertImageToUnsigned(PatientModelServicePtr  dataManager, ImagePtr image, vtkImageDataPtr suggestedConvertedVolume, bool verbose)
 {
 	vtkImageDataPtr input = image->getBaseVtkImageData();
 
@@ -221,7 +220,10 @@ ImagePtr convertImageToUnsigned(DataServicePtr dataManager, ImagePtr image, vtkI
 		convertedImageData = cast->GetOutput();
 	}
 
-	ImagePtr retval = dataManager->createDerivedImage(convertedImageData, image->getUid()+"_u", image->getName()+" u", image, "");
+//	ImagePtr retval = dataManager->createDerivedImage(convertedImageData, image->getUid()+"_u", image->getName()+" u", image, "");
+	ImagePtr retval = dataManager->createSpecificData<Image>(image->getUid()+"_u", image->getName()+" u");
+	retval->intitializeFromParentImage(image);
+	retval->setVtkImageData(convertedImageData);
 
 	ImageTF3DPtr TF3D = retval->getTransferFunctions3D()->createCopy();
 	ImageLUT2DPtr LUT2D = retval->getLookupTable2D()->createCopy();

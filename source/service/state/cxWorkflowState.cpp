@@ -32,15 +32,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxWorkflowState.h"
 #include "cxVideoConnectionManager.h"
-#include "cxDataManager.h"
 #include "cxStateService.h"
-#include "cxPatientData.h"
 #include "cxSettings.h"
 #include "cxTrackingService.h"
 #include "cxTool.h"
-#include "cxPatientService.h"
 #include "cxVideoServiceOld.h"
 #include "cxStateServiceBackend.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
@@ -116,7 +114,7 @@ void WorkflowState::autoStartHardware()
 NavigationWorkflowState::NavigationWorkflowState(VideoServicePtr videoService, QState* parent, StateServiceBackendPtr backend) :
 				WorkflowState(videoService, parent, "NavigationUid", "Navigation", backend)
 {
-	connect(mBackend->getPatientService()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(canEnterSlot()));
+	connect(mBackend->getPatientService().get(), SIGNAL(patientChanged()), this, SLOT(canEnterSlot()));
 }
 
 void NavigationWorkflowState::onEntry(QEvent * event)
@@ -126,7 +124,7 @@ void NavigationWorkflowState::onEntry(QEvent * event)
 
 bool NavigationWorkflowState::canEnter() const
 {
-	return mBackend->getPatientService()->getPatientData()->isPatientValid();
+	return mBackend->getPatientService()->isPatientValid();
 }
 
 // --------------------------------------------------------
@@ -138,7 +136,7 @@ bool NavigationWorkflowState::canEnter() const
 RegistrationWorkflowState::RegistrationWorkflowState(VideoServicePtr videoService, QState* parent, StateServiceBackendPtr backend) :
 				WorkflowState(videoService, parent, "RegistrationUid", "Registration", backend)
 {
-	connect(mBackend->getPatientService()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(canEnterSlot()));
+	connect(mBackend->getPatientService().get(), SIGNAL(patientChanged()), this, SLOT(canEnterSlot()));
 }
 ;
 
@@ -146,7 +144,7 @@ bool RegistrationWorkflowState::canEnter() const
 {
 // We need to perform patient orientation prior to
 // running and us acq. Thus we need access to the reg mode.
-	return mBackend->getPatientService()->getPatientData()->isPatientValid();
+	return mBackend->getPatientService()->isPatientValid();
 }
 ;
 
@@ -159,12 +157,12 @@ bool RegistrationWorkflowState::canEnter() const
 PreOpPlanningWorkflowState::PreOpPlanningWorkflowState(VideoServicePtr videoService, QState* parent, StateServiceBackendPtr backend) :
 				WorkflowState(videoService, parent, "PreOpPlanningUid", "Preoperative Planning", backend)
 {
-	connect(mBackend->getDataManager().get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(canEnterSlot()));
+	connect(mBackend->getPatientService().get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(canEnterSlot()));
 }
 
 bool PreOpPlanningWorkflowState::canEnter() const
 {
-	return !mBackend->getDataManager()->getData().empty();
+	return !mBackend->getPatientService()->getData().empty();
 }
 
 // --------------------------------------------------------
@@ -176,7 +174,7 @@ bool PreOpPlanningWorkflowState::canEnter() const
 IntraOpImagingWorkflowState::IntraOpImagingWorkflowState(VideoServicePtr videoService, QState* parent, StateServiceBackendPtr backend) :
 				WorkflowState(videoService, parent, "IntraOpImagingUid", "Intraoperative Imaging", backend)
 {
-	connect(mBackend->getPatientService()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(canEnterSlot()));
+	connect(mBackend->getPatientService().get(), SIGNAL(patientChanged()), this, SLOT(canEnterSlot()));
 }
 
 void IntraOpImagingWorkflowState::onEntry(QEvent * event)
@@ -186,7 +184,7 @@ void IntraOpImagingWorkflowState::onEntry(QEvent * event)
 
 bool IntraOpImagingWorkflowState::canEnter() const
 {
-	return mBackend->getPatientService()->getPatientData()->isPatientValid();
+	return mBackend->getPatientService()->isPatientValid();
 }
 
 // --------------------------------------------------------
@@ -198,12 +196,12 @@ bool IntraOpImagingWorkflowState::canEnter() const
 PostOpControllWorkflowState::PostOpControllWorkflowState(VideoServicePtr videoService, QState* parent, StateServiceBackendPtr backend) :
 				WorkflowState(videoService, parent, "PostOpControllUid", "Postoperative Control", backend)
 {
-	connect(mBackend->getDataManager().get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(canEnterSlot()));
+	connect(mBackend->getPatientService().get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(canEnterSlot()));
 }
 
 bool PostOpControllWorkflowState::canEnter() const
 {
-	return !mBackend->getDataManager()->getData().empty();
+	return !mBackend->getPatientService()->getData().empty();
 }
 
 }

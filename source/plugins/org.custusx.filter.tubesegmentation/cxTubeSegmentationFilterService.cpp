@@ -66,7 +66,7 @@ namespace cx {
 TubeSegmentationFilter::TubeSegmentationFilter(ctkPluginContext *pluginContext) :
 	FilterImpl(PatientModelServicePtr(new PatientModelServiceProxy(pluginContext))), mOutput(NULL)
 {
-	connect(patientService()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
+	connect(patientService().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
 	mPresets = this->populatePresets();
 }
 
@@ -152,7 +152,7 @@ bool TubeSegmentationFilter::execute()
     		return false;
 
 	mParameters = this->getParametersFromOptions();
-	std::string filename = (patientService()->getPatientData()->getActivePatientFolder()+"/"+input->getFilename()).toStdString();
+	std::string filename = (patientService()->getActivePatientFolder()+"/"+input->getFilename()).toStdString();
 
 	try {
 		std::cout << "=================TSF START====================" << std::endl;
@@ -236,14 +236,19 @@ bool TubeSegmentationFilter::postProcess()
 		if(!rawCenterlineResult)
 			return false;
 
-		ImagePtr outputCenterline = dataManager()->createDerivedImage(rawCenterlineResult ,uidCenterline, nameCenterline, inputImage);
+//		ImagePtr outputCenterline = patientService()->createDerivedImage(rawCenterlineResult ,uidCenterline, nameCenterline, inputImage);
+		ImagePtr outputCenterline = patientService()->createSpecificData<Image>(uidCenterline, nameCenterline);
+		outputCenterline->intitializeFromParentImage(inputImage);
+		outputCenterline->setVtkImageData(rawCenterlineResult);
+
 		if (!outputCenterline)
 			return false;
 
 		outputCenterline->get_rMd_History()->setRegistration(rMd_c);
 
-		dataManager()->loadData(outputCenterline);
-		dataManager()->saveImage(outputCenterline, patientService()->getPatientData()->getActivePatientFolder());
+		patientService()->insertData(outputCenterline);
+//		dataManager()->loadData(outputCenterline);
+//		dataManager()->saveImage(outputCenterline, patientService()->getPatientData()->getActivePatientFolder());
 
 		mOutputTypes[0]->setValue(outputCenterline->getUid());
 	}
@@ -268,10 +273,12 @@ bool TubeSegmentationFilter::postProcess()
 		vtkPolyDataPtr poly = tsfMesh->getTransformedPolyData(rMv);
 
 		//create, load and save mesh
-		MeshPtr cxMesh = dataManager()->createMesh(poly, uidVtkCenterline, nameVtkCenterline, "Images");
+		MeshPtr cxMesh = patientService()->createSpecificData<Mesh>(uidVtkCenterline, nameVtkCenterline);
+		cxMesh->setVtkPolyData(poly);
 		cxMesh->get_rMd_History()->setParentSpace(inputImage->getUid());
-		dataManager()->loadData(cxMesh);
-		dataManager()->saveMesh(cxMesh, patientService()->getPatientData()->getActivePatientFolder());
+		patientService()->insertData(cxMesh);
+//		dataManager()->loadData(cxMesh);
+//		dataManager()->saveMesh(cxMesh, patientService()->getPatientData()->getActivePatientFolder());
 		QString uid = cxMesh->getUid();
 
 		mOutputTypes[1]->setValue(uid);
@@ -292,13 +299,18 @@ bool TubeSegmentationFilter::postProcess()
 		//add segmentation internally to cx
 		QString uidSegmentation = inputImage->getUid() + "_tsf_seg%1";
 		QString nameSegmentation = inputImage->getName()+"_tsf_seg%1";
-		ImagePtr outputSegmentation = dataManager()->createDerivedImage(rawSegmentation,uidSegmentation, nameSegmentation, inputImage);
+
+		ImagePtr outputSegmentation = patientService()->createSpecificData<Image>(uidSegmentation, nameSegmentation);
+		outputSegmentation->intitializeFromParentImage(inputImage);
+		outputSegmentation->setVtkImageData(rawSegmentation);
+//		ImagePtr outputSegmentation = dataManager()->createDerivedImage(rawSegmentation,uidSegmentation, nameSegmentation, inputImage);
 		if (!outputSegmentation)
 			return false;
 
 		outputSegmentation->get_rMd_History()->setRegistration(rMd_c);
-		dataManager()->loadData(outputSegmentation);
-		dataManager()->saveImage(outputSegmentation, patientService()->getPatientData()->getActivePatientFolder());
+		patientService()->insertData(outputSegmentation);
+//		dataManager()->loadData(outputSegmentation);
+//		dataManager()->saveImage(outputSegmentation, patientService()->getPatientData()->getActivePatientFolder());
 
 		//add contour internally to cx
 		MeshPtr contour = ContourFilter::postProcess(rawContour, inputImage, QColor("blue"));
@@ -336,14 +348,20 @@ bool TubeSegmentationFilter::postProcess()
 		cast->Update();
 		convertedImageData = cast->GetOutput();
 
-		ImagePtr outputTDF = dataManager()->createDerivedImage(convertedImageData,uidTDF, nameTDF, inputImage);
+//		ImagePtr outputTDF = dataManager()->createDerivedImage(convertedImageData,uidTDF, nameTDF, inputImage);
+		ImagePtr outputTDF = patientService()->createSpecificData<Image>(uidTDF, nameTDF);
+		outputTDF->intitializeFromParentImage(inputImage);
+		outputTDF->setVtkImageData(convertedImageData);
+
+
 		if (!outputTDF)
 			return false;
 
 		rMd_i = rMd_i * d_iMd_c; //translation due to cropping accounted for
 		outputTDF->get_rMd_History()->setRegistration(rMd_i);
-		dataManager()->loadData(outputTDF);
-		dataManager()->saveImage(outputTDF, patientService()->getPatientData()->getActivePatientFolder());
+		patientService()->insertData(outputTDF);
+//		dataManager()->loadData(outputTDF);
+//		dataManager()->saveImage(outputTDF, patientService()->getPatientData()->getActivePatientFolder());
 
 		mOutputTypes[4]->setValue(outputTDF->getUid());
 	}
@@ -424,7 +442,7 @@ void TubeSegmentationFilter::createOutputTypes()
 
 void TubeSegmentationFilter::patientChangedSlot()
 {
-	QString activePatientFolder = patientService()->getPatientData()->getActivePatientFolder()+"/Images/";
+	QString activePatientFolder = patientService()->getActivePatientFolder()+"/Images/";
 
 	StringDataAdapterXmlPtr option = this->getStringOption("storage-dir");
 	if(option)
@@ -433,7 +451,7 @@ void TubeSegmentationFilter::patientChangedSlot()
 
 void TubeSegmentationFilter::inputChangedSlot()
 {
-	QString activePatientFolder = patientService()->getPatientData()->getActivePatientFolder()+"/Images/";
+	QString activePatientFolder = patientService()->getActivePatientFolder()+"/Images/";
 	QString inputsValue = mInputTypes.front()->getValue();
 
 	StringDataAdapterXmlPtr option = this->getStringOption("centerline-vtk-file");

@@ -52,14 +52,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewManager.h"
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"
-#include "cxDataManager.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxVector3DWidget.h"
 #include "cxTimeKeeper.h"
 #include "cxFrameMetricWrapper.h"
 #include "cxToolMetricWrapper.h"
-#include "cxPatientService.h"
-#include "cxPatientData.h"
 #include "cxTime.h"
 #include "cxMetricManager.h"
 #include "cxLogger.h"
@@ -195,7 +192,7 @@ void MetricWidget::cellChangedSlot(int row, int col)
   if (col==0) // data name changed
   {
     QTableWidgetItem* item = mTable->item(row,col);
-    DataPtr data = dataManager()->getData(item->data(Qt::UserRole).toString());
+	DataPtr data = patientService()->getData(item->data(Qt::UserRole).toString());
     if (data)
       data->setName(item->text());
   }
@@ -284,7 +281,7 @@ MetricBasePtr MetricWidget::createMetricWrapper(cx::VisualizationServicePtr visu
 std::vector<MetricBasePtr> MetricWidget::createMetricWrappers(cx::VisualizationServicePtr visualizationService, cx::PatientModelServicePtr patientModelService)
 {
 	std::vector<MetricBasePtr> retval;
-  std::map<QString, DataPtr> all = dataManager()->getData();
+  std::map<QString, DataPtr> all = patientService()->getData();
   for (std::map<QString, DataPtr>::iterator iter=all.begin(); iter!=all.end(); ++iter)
   {
 	MetricBasePtr wrapper = this->createMetricWrapper(visualizationService, patientModelService, iter->second);
@@ -537,7 +534,7 @@ void MetricWidget::removeButtonClickedSlot()
 		nextUid = nextItem->data(Qt::UserRole).toString();
 	}
 
-	mPatientModelService->removePatientData(mMetricManager->getActiveUid());
+	mPatientModelService->removeData(mMetricManager->getActiveUid());
 
 	if (!nextUid.isEmpty())
 		mMetricManager->setActiveUid(nextUid);
@@ -546,7 +543,7 @@ void MetricWidget::removeButtonClickedSlot()
 void MetricWidget::exportMetricsButtonClickedSlot()
 {
 	QString suggestion = QString("%1/Logs/metrics_%2.txt")
-			.arg(patientService()->getPatientData()->getActivePatientFolder())
+			.arg(patientService()->getActivePatientFolder())
 			.arg(QDateTime::currentDateTime().toString(timestampSecondsFormat()));
 
 	QString filename = QFileDialog::getSaveFileName(this,

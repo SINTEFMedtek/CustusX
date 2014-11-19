@@ -31,12 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxUsReconstructionGUIExtenderService.h"
 
-//#include "cxAcquisitionData.h"
 #include "cxPatientModelService.h"
-
-//#include "cxReconstructionManager.h"
-//#include "cxPatientService.h"
-//#include "cxPatientData.h"
 
 #include "cxReconstructionWidget.h"
 #include "cxPatientModelService.h"

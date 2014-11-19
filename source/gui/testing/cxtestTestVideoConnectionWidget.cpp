@@ -81,7 +81,7 @@ void TestVideoConnectionWidget::setupWidgetToRunStreamer(QString filename, QStri
 {
 	cx::ImagePtr image = Utilities::create3DImage();
 	this->mPatientModelService->setActiveImage(image);
-	this->mPatientModelService->loadData(image);
+	this->mPatientModelService->insertData(image);
 
 	QString connectionMethod("Direct Link");
 	mConnectionSelector->setValue(connectionMethod);

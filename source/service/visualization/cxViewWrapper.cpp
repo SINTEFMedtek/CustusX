@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMenu>
 #include "vtkCamera.h"
 #include "cxReporter.h"
-#include "cxDataManager.h"
+#include "cxPatientModelService.h"
 #include "cxViewGroup.h" //for class Navigation
 #include "cxMesh.h"
 #include "cxTypeConversions.h"
@@ -86,7 +86,7 @@ DataViewPropertiesInteractor::DataViewPropertiesInteractor(VisualizationServiceB
 void DataViewPropertiesInteractor::addDataActions(QWidget* parent)
 {
 	//add actions to the actiongroups and the contextmenu
-	std::vector<DataPtr> sorted = sortOnGroupsAndAcquisitionTime(mBackend->getDataManager()->getData());
+	std::vector<DataPtr> sorted = sortOnGroupsAndAcquisitionTime(mBackend->getPatientService()->getData());
 	mLastDataActionUid = "________________________";
 	for (std::vector<DataPtr>::iterator iter=sorted.begin(); iter!=sorted.end(); ++iter)
 	{
@@ -101,7 +101,7 @@ void DataViewPropertiesInteractor::setDataViewProperties(DataViewProperties prop
 
 void DataViewPropertiesInteractor::addDataAction(QString uid, QWidget* parent)
 {
-	DataPtr data = mBackend->getDataManager()->getData(uid);
+	DataPtr data = mBackend->getPatientService()->getData(uid);
 
 	QAction* action = new QAction(qstring_cast(data->getName()), parent);
 
@@ -138,8 +138,8 @@ void DataViewPropertiesInteractor::dataActionSlot()
 		return;
 
 	QString uid = theAction->data().toString();
-	DataPtr data = mBackend->getDataManager()->getData(uid);
-	ImagePtr image = mBackend->getDataManager()->getImage(data->getUid());
+	DataPtr data = mBackend->getPatientService()->getData(uid);
+	ImagePtr image = mBackend->getPatientService()->getData<Image>(data->getUid());
 
 	bool firstData = mGroupData->getData(DataViewProperties::createFull()).empty();
 
@@ -151,7 +151,7 @@ void DataViewPropertiesInteractor::dataActionSlot()
 		mGroupData->setProperties(data, props);
 
 		if (image)
-			mBackend->getDataManager()->setActiveImage(image);
+			mBackend->getPatientService()->setActiveImage(image);
 	}
 	else
 	{
@@ -197,16 +197,6 @@ void ViewWrapper::setViewGroup(ViewGroupDataPtr group)
 void ViewWrapper::dataViewPropertiesChangedSlot(QString uid)
 {
 }
-
-//void ViewWrapper::dataAddedSlot(QString uid)
-//{
-//	this->dataAdded(mBackend->getDataManager()->getData(uid));
-//}
-
-//void ViewWrapper::dataRemovedSlot(QString uid)
-//{
-//	this->dataRemoved(uid);
-//}
 
 void ViewWrapper::contextMenuSlot(const QPoint& point)
 {

@@ -78,7 +78,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //All these widgets in the plugins folder should also be tested
 //#include "cxAllFiltersWidget.h"
 //#include "cxCompactFilterSetupWidget.h"
-//#include "cxConnectedThresholdImageFilterWidget.h"
 //#include "cxFilterWidget.h" //in plugings
 //#include "cxLapFrameToolCalibrationWidget.h"
 //#include "cxPipelineWidget.h"

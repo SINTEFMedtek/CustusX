@@ -35,17 +35,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <itkBinaryThinningImageFilter3D.h>
 
 #include "cxReporter.h"
-#include "cxDataManager.h"
 #include "cxRegistrationTransform.h"
 #include "cxMesh.h"
 #include "cxImage.h"
 #include "cxColorDataAdapterXml.h"
 #include "vesselReg/SeansVesselReg.hxx"
-#include "cxPatientService.h"
-#include "cxPatientData.h"
 #include "cxSelectDataStringDataAdapter.h"
 #include "cxAlgorithmHelpers.h"
 #include "cxLegacySingletons.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
@@ -189,7 +187,10 @@ bool BinaryThinningImageFilter3DFilter::postProcess()
 
 	ImagePtr input = this->getCopiedInputImage();
 
-	ImagePtr outImage = dataManager()->createDerivedImage(mRawResult,input->getUid() + "_cl_temp%1", input->getName()+" cl_temp%1", input);
+	ImagePtr outImage = patientService()->createSpecificData<Image>(input->getUid() + "_cl_temp%1", input->getName()+" cl_temp%1");
+	outImage->intitializeFromParentImage(input);
+	outImage->setVtkImageData(mRawResult);
+
 	mRawResult = NULL;
 	outImage->resetTransferFunctions();
 
@@ -198,11 +199,11 @@ bool BinaryThinningImageFilter3DFilter::postProcess()
 
 	QString uid = input->getUid() + "_cl%1";
 	QString name = input->getName()+" cl%1";
-	MeshPtr mesh = dataManager()->createMesh(centerlinePolyData, uid, name, "Images");
+	MeshPtr mesh = patientService()->createSpecificData<Mesh>(uid, name);
+	mesh->setVtkPolyData(centerlinePolyData);
 	mesh->setColor(outputColor->getValue());
 	mesh->get_rMd_History()->setParentSpace(input->getUid());
-	dataManager()->loadData(mesh);
-	dataManager()->saveMesh(mesh, patientService()->getPatientData()->getActivePatientFolder());
+	patientService()->insertData(mesh);
 
 	// set output
 	mOutputTypes.front()->setValue(mesh->getUid());

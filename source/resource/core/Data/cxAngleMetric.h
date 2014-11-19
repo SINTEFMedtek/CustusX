@@ -40,7 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxDataMetric.h"
 #include "cxPointMetric.h"
-#include "cxDataManagerImpl.h"
 #include "cxMetricReferenceArgumentList.h"
 #include "cxOptionalValue.h"
 
@@ -71,7 +70,7 @@ Q_OBJECT
 public:
 	virtual ~AngleMetric();
 //    static AngleMetricPtr create(QDomNode node);
-	static AngleMetricPtr create(QString uid, QString name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider);
+	static AngleMetricPtr create(QString uid, QString name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider);
 
 	double getAngle() const;
 	std::vector<Vector3D> getEndpoints() const;
@@ -101,7 +100,7 @@ public:
 private slots:
 	void resetCachedValues();
 private:
-	AngleMetric(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider);
+	AngleMetric(const QString& uid, const QString& name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider);
 	boost::array<DataPtr, 4> mArgument;
 	MetricReferenceArgumentListPtr mArguments;
 	bool mUseSimpleVisualization;

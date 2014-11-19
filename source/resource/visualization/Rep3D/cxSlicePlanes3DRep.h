@@ -93,7 +93,7 @@ public:
 
 	void clearViewports();
 	void setViewportData(PLANE_TYPE type, SliceProxyPtr slice, const DoubleBoundingBox3D& vp_s);
-	void addSimpleSlicePlane(PLANE_TYPE type, DataServicePtr dataManager);
+	void addSimpleSlicePlane(PLANE_TYPE type, PatientModelServicePtr dataManager);
 	DataMap getData();
 
 	void setVisible(bool visible);

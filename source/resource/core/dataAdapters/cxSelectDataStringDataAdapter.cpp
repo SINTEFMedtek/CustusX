@@ -50,7 +50,7 @@ ActiveImageStringDataAdapter::ActiveImageStringDataAdapter(PatientModelServicePt
 
 bool ActiveImageStringDataAdapter::setValue(const QString& value)
 {
-  ImagePtr newImage = mPatientModelService->getImage(value);
+  ImagePtr newImage = mPatientModelService->getData<Image>(value);
   if (newImage==mPatientModelService->getActiveImage())
 	return false;
   mPatientModelService->setActiveImage(newImage);
@@ -92,7 +92,7 @@ QString SelectImageStringDataAdapter::getValue() const
 
 ImagePtr SelectImageStringDataAdapter::getImage()
 {
-  return mPatientModelService->getImage(mImageUid);
+  return mPatientModelService->getData<Image>(mImageUid);
 }
 
 //---------------------------------------------------------
@@ -161,7 +161,7 @@ QString SelectMeshStringDataAdapter::getValue() const
 
 MeshPtr SelectMeshStringDataAdapter::getMesh()
 {
-  return mPatientModelService->getMesh(mMeshUid);
+  return mPatientModelService->getData<Mesh>(mMeshUid);
 }
 
 //---------------------------------------------------------

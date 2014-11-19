@@ -133,7 +133,7 @@ protected slots:
 	void dockWidgetVisibilityChanged(bool val);
 	void focusChanged(QWidget * old, QWidget * now);
 
-	void startupLoadPatient();
+//	void startupLoadPatient();
 
     void onPluginBaseAdded(GUIExtenderService* service);
     void onPluginBaseRemoved(GUIExtenderService* service);

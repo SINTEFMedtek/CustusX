@@ -58,7 +58,7 @@ class cxResourceVisualization_EXPORT GuideRep2D: public DataMetricRep
 {
 Q_OBJECT
 public:
-	static GuideRep2DPtr New(DataServicePtr dataManager, const QString& uid="");
+	static GuideRep2DPtr New(PatientModelServicePtr dataManager, const QString& uid="");
 	virtual ~GuideRep2D() {}
 
 	virtual QString getType() const { return "GuideRep2D"; }
@@ -75,10 +75,10 @@ protected:
 	virtual void onModifiedStartRender();
 
 private:
-	GuideRep2D(DataServicePtr dataManager);
+	GuideRep2D(PatientModelServicePtr dataManager);
 	GuideRep2D(); ///< not implemented
 
-	DataServicePtr mDataManager;
+	PatientModelServicePtr mDataManager;
 	SliceProxyPtr mSliceProxy;
 	vtkActorPtr mCircleActor;
 	vtkSectorSourcePtr mCircleSource;

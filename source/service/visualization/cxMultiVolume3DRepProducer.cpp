@@ -41,8 +41,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataLocations.h"
 #include "cxMehdiGPURayCastMultiVolumeRep.h"
 #include "cxConfig.h"
-#include "cxPatientService.h"
-#include "cxPatientData.h"
 
 namespace cx
 {

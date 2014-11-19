@@ -100,7 +100,6 @@ void UsReconstructionImplService::patientChangedSlot()
 	this->setOutputBasePath(mPatientModelService->getActivePatientFolder());
 	this->setOutputRelativePath("Images");
 	emit newInputDataPath(this->getSelectedFileData().mFilename);
-
 }
 
 ReconstructionMethodService *UsReconstructionImplService::createAlgorithm()
@@ -222,15 +221,15 @@ void UsReconstructionImplService::setOutputVolumeParams(const OutputVolumeParams
 	this->setSettings();
 }
 
-void UsReconstructionImplService::setOutputRelativePath(QString path)
-{
-	mOutputRelativePath = path;
-}
+//void UsReconstructionImplService::setOutputRelativePath(QString path)
+//{
+//	mOutputRelativePath = path;
+//}
 
-void UsReconstructionImplService::setOutputBasePath(QString path)
-{
-	mOutputBasePath = path;
-}
+//void UsReconstructionImplService::setOutputBasePath(QString path)
+//{
+//	mOutputBasePath = path;
+//}
 
 //ReconstructParamsPtr UsReconstructionImplService::getParams()
 //{
@@ -308,8 +307,8 @@ ReconstructCore::InputParams UsReconstructionImplService::createCoreParameters()
 	ReconstructCore::InputParams par;
 	par.mAlgorithmUid = mParams->getAlgorithmAdapter()->getValue();
 	par.mAlgoSettings = mSettings.getElement("algorithms", par.mAlgorithmUid).cloneNode(true).toElement();
-	par.mOutputBasePath = mOutputBasePath;
-	par.mOutputRelativePath = mOutputRelativePath;
+//	par.mOutputBasePath = mOutputBasePath;
+//	par.mOutputRelativePath = mOutputRelativePath;
 	par.mShaderPath = mShaderPath;
 	par.mAngio = mParams->getAngioAdapter()->getValue();
 	par.mTransferFunctionPreset = mParams->getPresetTFAdapter()->getValue();

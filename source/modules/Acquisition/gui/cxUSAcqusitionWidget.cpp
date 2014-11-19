@@ -40,7 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLabeledComboBoxWidget.h"
 #include "cxDoubleWidgets.h"
 #include "cxTypeConversions.h"
-#include "cxPatientData.h"
 #include "cxSoundSpeedConversionWidget.h"
 #include "cxRecordSessionWidget.h"
 #include "cxSettings.h"

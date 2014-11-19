@@ -124,13 +124,15 @@ public:
 
 	virtual Transform3D get_rMpr() const; ///< get the patient registration transform
 	virtual void set_rMpr(const Transform3D& val); ///<  set the transform from patient to reference space
-	virtual RegistrationHistoryPtr get_rMpr_History();
+	virtual RegistrationHistoryPtr get_rMpr_History() const;
 
 	virtual LandmarksPtr getPatientLandmarks();
 	virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const;
 
 	virtual bool getDebugMode() const;
 	virtual void setDebugMode(bool on);
+
+	virtual void generateUidAndName(QString* _uid, QString* _name);
 
 protected:
 	DataManagerImpl();
@@ -150,7 +152,6 @@ protected:
 	DataPtr loadData(QDomElement node, QString rootPath);
 //	DataPtr readData(const QString& uid, const QString& path, const QString& type);
 	int findUniqueUidNumber(QString uidBase) const;
-	void generateUidAndName(QString* _uid, QString* _name);
 
 	LandmarkPropertyMap mLandmarkProperties; ///< uid and name
 	RegistrationHistoryPtr m_rMpr_History; ///< transform from the patient reference to the reference, along with historical data.

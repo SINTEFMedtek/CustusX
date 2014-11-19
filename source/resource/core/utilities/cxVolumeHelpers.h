@@ -74,7 +74,7 @@ cxResource_EXPORT void fillShortImageDataWithGradient(vtkImageDataPtr data, int 
   * The suggestedConvertedVolume is a pure optimization: Is set it will be used as the converted
   * output instead of doing the conversion once more. Can be used when only the LUT should be updated.
   */
-cxResource_EXPORT ImagePtr convertImageToUnsigned(DataServicePtr dataManager, ImagePtr image, vtkImageDataPtr suggestedConvertedVolume = vtkImageDataPtr(), bool verbose = true);
+cxResource_EXPORT ImagePtr convertImageToUnsigned(PatientModelServicePtr dataManager, ImagePtr image, vtkImageDataPtr suggestedConvertedVolume = vtkImageDataPtr(), bool verbose = true);
 
 cxResource_EXPORT std::map<std::string, std::string> getDisplayFriendlyInfo(ImagePtr image);
 cxResource_EXPORT std::map<std::string, std::string> getDisplayFriendlyInfo(vtkImageDataPtr image);

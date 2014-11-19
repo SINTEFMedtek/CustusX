@@ -155,15 +155,15 @@ void UsReconstructionServiceProxy::setOutputVolumeParams(const OutputVolumeParam
 	mUsReconstructionService->setOutputVolumeParams(par);
 }
 
-void UsReconstructionServiceProxy::setOutputRelativePath(QString path)
-{
-	mUsReconstructionService->setOutputRelativePath(path);
-}
+//void UsReconstructionServiceProxy::setOutputRelativePath(QString path)
+//{
+//	mUsReconstructionService->setOutputRelativePath(path);
+//}
 
-void UsReconstructionServiceProxy::setOutputBasePath(QString path)
-{
-	mUsReconstructionService->setOutputBasePath(path);
-}
+//void UsReconstructionServiceProxy::setOutputBasePath(QString path)
+//{
+//	mUsReconstructionService->setOutputBasePath(path);
+//}
 
 void UsReconstructionServiceProxy::startReconstruction()
 {

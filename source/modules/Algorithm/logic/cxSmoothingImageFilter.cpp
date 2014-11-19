@@ -36,8 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <itkSmoothingRecursiveGaussianImageFilter.h>
 #include "cxSelectDataStringDataAdapter.h"
 
-
-#include "cxDataManager.h"
 #include "cxUtilHelpers.h"
 #include "cxRegistrationTransform.h"
 #include "cxStringDataAdapterXml.h"
@@ -46,9 +44,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxImage.h"
 
-#include "cxPatientService.h"
-#include "cxPatientData.h"
 #include "cxLegacySingletons.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
@@ -153,14 +150,16 @@ bool SmoothingImageFilter::postProcess()
 
 	QString uid = input->getUid() + "_sm%1";
 	QString name = input->getName()+" sm%1";
-	ImagePtr output = dataManager()->createDerivedImage(mRawResult,uid, name, input);
+	ImagePtr output = patientService()->createSpecificData<Image>(uid, name);
+	output->intitializeFromParentImage(input);
+	output->setVtkImageData(mRawResult);
+
+
 	mRawResult = NULL;
 	if (!output)
 		return false;
 
-	//    output->resetTransferFunctions();
-	dataManager()->loadData(output);
-	dataManager()->saveImage(output, patientService()->getPatientData()->getActivePatientFolder());
+	patientService()->insertData(output);
 
 	// set output
 	mOutputTypes.front()->setValue(output->getUid());

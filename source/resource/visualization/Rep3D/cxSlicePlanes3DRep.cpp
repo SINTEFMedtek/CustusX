@@ -44,7 +44,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSliceProxy.h"
 #include "cxVtkHelperClasses.h"
 #include "cxTypeConversions.h"
-#include "cxDataManager.h"
 
 namespace cx
 {
@@ -141,7 +140,7 @@ void SlicePlanesProxy::setViewportData(PLANE_TYPE type, SliceProxyPtr slice, con
 	emit changed();
 }
 
-void SlicePlanesProxy::addSimpleSlicePlane(PLANE_TYPE type, DataServicePtr dataManager)
+void SlicePlanesProxy::addSimpleSlicePlane(PLANE_TYPE type, PatientModelServicePtr dataManager)
 {
 	SliceProxyPtr slice = SliceProxy::create(dataManager);
 	slice->initializeFromPlane(type, false, Vector3D(0, 0, 1), true, 1, 0.25);

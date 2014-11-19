@@ -58,7 +58,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxGPUImageBuffer.h"
 #include "cxTexture3DSlicerProxy.h"
 #include "cxReporter.h"
-#include "cxDataManager.h"
 
 //---------------------------------------------------------
 namespace cx
@@ -99,7 +98,7 @@ void Slices3DRep::setImages(std::vector<ImagePtr> images)
 	}
 }
 
-void Slices3DRep::addPlane(PLANE_TYPE plane, DataServicePtr dataManager)
+void Slices3DRep::addPlane(PLANE_TYPE plane, PatientModelServicePtr dataManager)
 {
 	SliceProxyPtr sliceProxy = SliceProxy::create(dataManager);
 	sliceProxy->initializeFromPlane(plane, false, Vector3D(0,0,1), true, 150, 0.25);
