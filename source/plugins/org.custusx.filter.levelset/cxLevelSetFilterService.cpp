@@ -45,15 +45,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxCoordinateSystemHelpers.h"
 #include "cxData.h"
 #include "cxImage.h"
-#include "cxDataManager.h"
 #include <vtkImageImport.h>
 #include <vtkImageData.h>
 #include <vtkImageShiftScale.h>
 #include <vtkImageData.h>
 #include "cxContourFilter.h"
 #include "cxDataLocations.h"
-#include "cxPatientService.h"
-#include "cxPatientData.h"
 
 #include <itkBinaryMorphologicalClosingImageFilter.h>
 #include <itkBinaryBallStructuringElement.h>
