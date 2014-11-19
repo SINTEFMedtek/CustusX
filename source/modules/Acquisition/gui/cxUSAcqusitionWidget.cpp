@@ -70,12 +70,12 @@ USAcqusitionWidget::USAcqusitionWidget(AcquisitionDataPtr pluginData, QWidget* p
 	connect(mPluginData->getReconstructer().get(), &UsReconstructionService::reconstructFinished, this, &USAcqusitionWidget::reconstructFinishedSlot);
 
 	mAcquisition.reset(new USAcquisition(mBase));
-	connect(mAcquisition.get(), SIGNAL(acquisitionDataReady()), this, SLOT(acquisitionDataReadySlot()));
+	connect(mAcquisition.get(), &USAcquisition::acquisitionDataReady, this, &USAcqusitionWidget::acquisitionDataReadySlot);
 
-	connect(mBase.get(), SIGNAL(stateChanged()), this, SLOT(acquisitionStateChangedSlot()));
-	connect(mBase.get(), SIGNAL(started()), this, SLOT(recordStarted()));
-	connect(mBase.get(), SIGNAL(acquisitionStopped()), this, SLOT(recordStopped()), Qt::DirectConnection);
-	connect(mBase.get(), SIGNAL(cancelled()), this, SLOT(recordCancelled()));
+	connect(mBase.get(), &Acquisition::stateChanged, this, &USAcqusitionWidget::acquisitionStateChangedSlot);
+	connect(mBase.get(), &Acquisition::started, this, &USAcqusitionWidget::recordStarted);
+	connect(mBase.get(), &Acquisition::acquisitionStopped, this, &USAcqusitionWidget::recordStopped, Qt::DirectConnection);
+	connect(mBase.get(), &Acquisition::cancelled, this, &USAcqusitionWidget::recordCancelled);
 	connect(mAcquisition.get(), &USAcquisition::saveDataCompleted, mPluginData->getReconstructer().get(), &UsReconstructionService::newDataOnDisk);
 
 	mRecordSessionWidget->setDescriptionVisibility(false);
@@ -141,7 +141,7 @@ QWidget* USAcqusitionWidget::createOptionsWidget()
 	layout->setMargin(0);
 
 	SoundSpeedConverterWidget* soundSpeedWidget = new SoundSpeedConverterWidget(this);
-	connect(trackingService().get(), SIGNAL(dominantToolChanged(const QString&)), soundSpeedWidget, SLOT(setToolSlot(const QString&)));
+	connect(trackingService().get(), &TrackingService::dominantToolChanged, soundSpeedWidget, &SoundSpeedConverterWidget::setToolSlot);
 
 	ProbeConfigWidget* probeWidget = new ProbeConfigWidget(this);
 	probeWidget->getActiveProbeConfigWidget()->setVisible(false);

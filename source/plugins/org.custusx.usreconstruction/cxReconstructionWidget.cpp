@@ -51,20 +51,20 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, UsReconstructionServ
 	mReconstructer(reconstructer),
 	mFileSelectWidget( new FileSelectWidget(this))
 {
-	connect(mReconstructer.get(), SIGNAL(reconstructAboutToStart()), this, SLOT(reconstructAboutToStartSlot()));
-	connect(mReconstructer.get(), SIGNAL(reconstructStarted()), this, SLOT(reconstructStartedSlot()));
-	connect(mReconstructer.get(), SIGNAL(reconstructFinished()), this, SLOT(reconstructFinishedSlot()));
+	connect(mReconstructer.get(), &UsReconstructionService::reconstructAboutToStart, this, &ReconstructionWidget::reconstructAboutToStartSlot);
+	connect(mReconstructer.get(), &UsReconstructionService::reconstructStarted, this, &ReconstructionWidget::reconstructStartedSlot);
+	connect(mReconstructer.get(), &UsReconstructionService::reconstructFinished, this, &ReconstructionWidget::reconstructFinishedSlot);
 
-	connect(mReconstructer.get(), SIGNAL(paramsChanged()), this, SLOT(paramsChangedSlot()));
-	connect(mReconstructer.get(), SIGNAL(inputDataSelected(QString)), this, SLOT(inputDataSelected(QString)));
-	connect(mReconstructer.get(), SIGNAL(algorithmChanged()), this, SLOT(repopulateAlgorithmGroup()));
+	connect(mReconstructer.get(), &UsReconstructionService::paramsChanged, this, &ReconstructionWidget::paramsChangedSlot);
+	connect(mReconstructer.get(), &UsReconstructionService::inputDataSelected, this, &ReconstructionWidget::inputDataSelected);
+	connect(mReconstructer.get(), &UsReconstructionService::algorithmChanged, this, &ReconstructionWidget::repopulateAlgorithmGroup);
 
 
 	QVBoxLayout* topLayout = new QVBoxLayout(this);
 
-	connect(mFileSelectWidget, SIGNAL(fileSelected(QString)), this, SLOT(selectData(QString)));
+	connect(mFileSelectWidget, &FileSelectWidget::fileSelected, this, &ReconstructionWidget::selectData);
 	mFileSelectWidget->setNameFilter(QStringList() << "*.fts");
-	connect(mReconstructer.get(), SIGNAL(newInputDataAvailable(QString)), mFileSelectWidget, SLOT(refresh()));
+	connect(mReconstructer.get(), &UsReconstructionService::newInputDataAvailable, mFileSelectWidget, &FileSelectWidget::refresh);
 	connect(mReconstructer.get(), &UsReconstructionService::newInputDataPath, this, &ReconstructionWidget::updateFileSelectorPath);
 
 	QHBoxLayout* extentLayout = new QHBoxLayout;
@@ -78,7 +78,7 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, UsReconstructionServ
 	QLabel* inputSpacingLabel = new QLabel("Spacing In", this);
 
 	mReconstructButton = new QPushButton("Reconstruct", this);
-	connect(mReconstructButton, SIGNAL(clicked()), this, SLOT(reconstruct()));
+	connect(mReconstructButton, &QPushButton::clicked, this, &ReconstructionWidget::reconstruct);
 
 	mTimedAlgorithmProgressBar = new cx::TimedAlgorithmProgressBar;
 
