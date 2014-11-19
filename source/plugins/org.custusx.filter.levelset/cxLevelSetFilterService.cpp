@@ -146,7 +146,7 @@ bool LevelSetFilter::preProcess()
 		return false;
 	}
 
-	filename = (patientService()->getPatientData()->getActivePatientFolder()
+	filename = (patientService()->getActivePatientFolder()
 			+ "/" + inputImage->getFilename()).toStdString();
 
 	seedPoint = getSeedPointFromTool(inputImage);
@@ -155,7 +155,7 @@ bool LevelSetFilter::preProcess()
 		std::cout << "Seed point is not inside image!" << std::endl;
 		return false;
 	}
-	image = dataManager()->getImage(inputImage->getUid());
+	image = patientService()->getData<Image>(inputImage->getUid());
 
 	return true;
 }
@@ -223,8 +223,12 @@ bool LevelSetFilter::postProcess()
 	//add segmentation internally to cx
 	QString uidSegmentation = image->getUid() + "_seg%1";
 	QString nameSegmentation = image->getName() + "_seg%1";
-	ImagePtr outputSegmentation2 = dataManager()->createDerivedImage(
-			rawSegmentation, uidSegmentation, nameSegmentation, image);
+
+	ImagePtr outputSegmentation2 = patientService()->createSpecificData<Image>(uidSegmentation, nameSegmentation);
+	outputSegmentation2->intitializeFromParentImage(image);
+	outputSegmentation2->setVtkImageData(rawSegmentation);
+//	ImagePtr outputSegmentation2 = dataManager()->createDerivedImage(
+//			rawSegmentation, uidSegmentation, nameSegmentation, image);
 	ImagePtr outputSegmentation;
 	if (!outputSegmentation2)
 		return false;
@@ -274,8 +278,9 @@ bool LevelSetFilter::postProcess()
 		imageCast->SetOutputScalarTypeToUnsignedChar();
 		rawResult = imageCast->GetOutput();
 
-		outputSegmentation = dataManager()->createDerivedImage(rawResult,
-				uidSegmentation, nameSegmentation, image);
+		outputSegmentation = patientService()->createSpecificData<Image>(uidSegmentation, nameSegmentation);
+		outputSegmentation->intitializeFromParentImage(image);
+		outputSegmentation->setVtkImageData(rawResult);
 		rawSegmentation = rawResult;
 	}
 	else
@@ -289,9 +294,7 @@ bool LevelSetFilter::postProcess()
 			threshold);
 	Transform3D rMd_i = image->get_rMd(); //transform from the volumes coordinate system to our reference coordinate system
 	outputSegmentation->get_rMd_History()->setRegistration(rMd_i);
-	dataManager()->loadData(outputSegmentation);
-	dataManager()->saveImage(outputSegmentation,
-			patientService()->getPatientData()->getActivePatientFolder());
+	patientService()->insertData(outputSegmentation);
 
 	//add contour internally to cx
 	MeshPtr contour = ContourFilter::postProcess(rawContour, image,
