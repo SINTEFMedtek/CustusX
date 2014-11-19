@@ -97,8 +97,8 @@ bool UsReconstructionImplService::isNull()
 void UsReconstructionImplService::patientChangedSlot()
 {
 	this->selectData(mPatientModelService->getActivePatientFolder() + "/US_Acq/");
-	this->setOutputBasePath(mPatientModelService->getActivePatientFolder());
-	this->setOutputRelativePath("Images");
+//	this->setOutputBasePath(mPatientModelService->getActivePatientFolder());
+//	this->setOutputRelativePath("Images");
 	emit newInputDataPath(this->getSelectedFileData().mFilename);
 }
 
