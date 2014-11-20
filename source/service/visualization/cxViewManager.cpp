@@ -50,7 +50,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVolumetricRep.h"
 #include "cxReporter.h"
 #include "cxXmlOptionItem.h"
-#include "cxDataManager.h"
 #include "cxTrackingService.h"
 #include "cxSlicePlanes3DRep.h"
 #include "cxSliceProxy.h"
@@ -63,8 +62,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataLocations.h"
 #include "cxInteractiveCropper.h"
 #include "vtkForwardDeclarations.h"
-#include "cxPatientService.h"
-#include "cxPatientData.h"
 #include "cxInteractiveClipper.h"
 #include "cxImage.h"
 #include "cxCameraStyle.h"
@@ -77,14 +74,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxXMLNodeWrapper.h"
 #include "cxCameraControl.h"
 #include "cxNavigation.h"
+#include "cxPatientModelService.h"
+
 
 namespace cx
 {
 
-VisualizationServiceOldPtr ViewManager::create(/*PatientModelServicePtr patientModelService, */VisualizationServiceBackendPtr backend)
+VisualizationServiceOldPtr ViewManager::create(VisualizationServiceBackendPtr backend)
 {
 	VisualizationServiceOldPtr retval;
-	retval.reset(new ViewManager(/*patientModelService, */backend));
+	retval.reset(new ViewManager(backend));
 	return retval;
 }
 
@@ -99,8 +98,6 @@ ViewManager::ViewManager(/*PatientModelServicePtr patientModelService, */Visuali
 	mSlicePlanesProxy.reset(new SlicePlanesProxy());
 	mLayoutRepository.reset(new LayoutRepository());
 	mCameraControl.reset(new CameraControl());
-
-//	connect(mBackend->getDataManager().get(), SIGNAL(centerChanged()), this, SLOT(globalCenterChangedSlot()));
 
 	this->loadGlobalSettings();
 
@@ -350,7 +347,7 @@ void ViewManager::parseXml(QDomNode viewmanagerNode)
 	XMLNodeParser base(viewmanagerNode);
 
 	QString clippedImage = base.parseTextFromElement("clippedImage");
-	mInteractiveClipper->setImage(mBackend->getDataManager()->getImage(clippedImage));
+	mInteractiveClipper->setImage(mBackend->getPatientService()->getData<Image>(clippedImage));
 
 	base.parseDoubleFromElementWithDefault("global2DZoom", mGlobal2DZoomVal->get().toDouble());
 

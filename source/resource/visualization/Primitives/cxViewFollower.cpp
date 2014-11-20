@@ -39,18 +39,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxUtilHelpers.h"
 #include "cxDefinitionStrings.h"
 
-#include "cxDataManager.h"
+#include "cxPatientModelService.h"
 #include "cxReporter.h"
 
 namespace cx
 {
 
-ViewFollowerPtr ViewFollower::create(DataServicePtr dataManager)
+ViewFollowerPtr ViewFollower::create(PatientModelServicePtr dataManager)
 {
 	return ViewFollowerPtr(new ViewFollower(dataManager));
 }
 
-ViewFollower::ViewFollower(DataServicePtr dataManager) :
+ViewFollower::ViewFollower(PatientModelServicePtr dataManager) :
 	mDataManager(dataManager)
 {
 

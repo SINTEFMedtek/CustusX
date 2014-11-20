@@ -39,8 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-class DataManager;
-class ToolManager;
 class VideoServiceOld;
 typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
 
@@ -54,18 +52,18 @@ typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServic
 class cxVisualizationService_EXPORT VisualizationServiceBackend
 {
 public:
-	VisualizationServiceBackend(DataServicePtr dataManager,
+	VisualizationServiceBackend(PatientModelServicePtr patientService,
 								TrackingServicePtr trackingService,
 								VideoServiceOldPtr videoService,
 								SpaceProviderPtr spaceProvider);
 
-	DataServicePtr getDataManager();
+	PatientModelServicePtr getPatientService();
 	TrackingServicePtr getToolManager();
 	VideoServiceOldPtr getVideoServiceOld();
 	SpaceProviderPtr getSpaceProvider();
 
 private:
-	DataServicePtr mDataManager;
+	PatientModelServicePtr mPatientService;
 	TrackingServicePtr mTrackingService;
 	SpaceProviderPtr mSpaceProvider;
 	VideoServiceOldPtr mVideoServiceOld;

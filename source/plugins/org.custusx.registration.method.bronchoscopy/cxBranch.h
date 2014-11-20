@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define BRANCH_H_
 
 #include <vector>
-#include "cxDataManager.h"
 #include "cxMesh.h"
 #include "cxVector3D.h"
 
@@ -45,14 +44,15 @@ namespace cx
 {
 
 class Branch;
+typedef boost::shared_ptr<class Branch> BranchPtr;
 typedef std::vector<Branch*> branchVector;
 
 class Branch
 {
-	Eigen::MatrixXd positions;
-	Eigen::MatrixXd orientations;
-	branchVector childBranches;
-	Branch* parentBranch;
+	Eigen::MatrixXd mPositions;
+	Eigen::MatrixXd mOrientations;
+	branchVector mChildBranches;
+	Branch* mParentBranch;
 public:
 	Branch();
 	virtual ~Branch();

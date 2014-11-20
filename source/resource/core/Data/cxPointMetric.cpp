@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-PointMetric::PointMetric(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider) :
+PointMetric::PointMetric(const QString& uid, const QString& name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider) :
 	DataMetric(uid, name, dataManager, spaceProvider),
 	mCoordinate(0,0,0),
 	mSpace(CoordinateSystem::reference())
@@ -53,7 +53,7 @@ PointMetric::PointMetric(const QString& uid, const QString& name, DataServicePtr
 	connect(mSpaceListener.get(), SIGNAL(changed()), this, SIGNAL(transformChanged()));
 }
 
-PointMetricPtr PointMetric::create(QString uid, QString name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider)
+PointMetricPtr PointMetric::create(QString uid, QString name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider)
 {
 	return PointMetricPtr(new PointMetric(uid, name, dataManager, spaceProvider));
 }

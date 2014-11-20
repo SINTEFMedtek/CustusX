@@ -22,7 +22,6 @@ SET( MOC_HEADER_FILES
 	logic/cxResampleImageFilter.h
 	logic/cxDilationFilter.h
     gui/cxAlgorithmPlugin.h
-    gui/cxConnectedThresholdImageFilterWidget.h
     gui/cxTimedAlgorithmProgressBar.h
 	gui/cxFilterWidget.h
 	gui/cxPipelineWidget.h
@@ -56,8 +55,6 @@ SET( SOURCE_FILES
 	logic/cxResampleImageFilter.cpp
     gui/cxAlgorithmPlugin.h
     gui/cxAlgorithmPlugin.cpp
-    gui/cxConnectedThresholdImageFilterWidget.h
-    gui/cxConnectedThresholdImageFilterWidget.cpp
     gui/cxTimedAlgorithmProgressBar.h
     gui/cxTimedAlgorithmProgressBar.cpp
 	gui/cxFilterWidget.h
@@ -82,8 +79,6 @@ include_directories(
 	${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
 	${CustusX_BINARY_DIR}/source/resource/widgets
 	${CustusX_BINARY_DIR}/source/resource/service
-	${CustusX_SOURCE_DIR}/source/service/patient
-	${CustusX_BINARY_DIR}/source/service/patient
     ${CustusX_SOURCE_DIR}/source/service/visualization
     ${CustusX_BINARY_DIR}/source/service/visualization
 	${CustusX_SOURCE_DIR}/source/logic
@@ -98,7 +93,7 @@ include_directories(
 	${CustusX_SOURCE_DIR}/source/resource/filter
 	)
 
-set(CX_ALGORITHM_LIBRARIES cxPatientService cxResource cxGui cxGUIExtenderService cxResourceFilter)
+set(CX_ALGORITHM_LIBRARIES cxResource cxGui cxGUIExtenderService cxResourceFilter)
 
 
 

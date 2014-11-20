@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMenu>
 #include "vtkCamera.h"
 #include "cxReporter.h"
-#include "cxDataManager.h"
+#include "cxPatientModelService.h"
 #include "cxViewGroup.h" //for class Navigation
 #include "cxMesh.h"
 #include "cxTypeConversions.h"
@@ -219,7 +219,7 @@ ViewGroupData::ViewGroupData(VisualizationServiceBackendPtr backend) :
 	mCamera3D(CameraData::create())
 {
 	if(mBackend)
-		connect(mBackend->getDataManager().get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataAddedOrRemovedInManager()));
+		connect(mBackend->getPatientService().get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataAddedOrRemovedInManager()));
 	mVideoSource = "active";
 	mGroup2DZoom = SyncedValue::create(1);
 	mGlobal2DZoom = mGroup2DZoom;
@@ -233,7 +233,7 @@ void ViewGroupData::dataAddedOrRemovedInManager()
 {
 	for (unsigned i = 0; i < mData.size(); )
 	{
-		if (!mBackend->getDataManager()->getData(mData[i].first->getUid()))
+		if (!mBackend->getPatientService()->getData(mData[i].first->getUid()))
 			this->removeData(mData[i].first);
 		else
 			++i;
@@ -430,7 +430,7 @@ void ViewGroupData::parseXml(QDomNode dataNode)
 	{
 		QDomElement elem = dataElems[i];
 		QString uid = elem.text();
-		DataPtr data = mBackend->getDataManager()->getData(uid);
+		DataPtr data = mBackend->getPatientService()->getData(uid);
 		if (!data)
 		{
 			reportError("Couldn't find the data: [" + uid + "] in the datamanager.");

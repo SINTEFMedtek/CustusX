@@ -38,8 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-class ToolManager;
-class DataManager;
 
 /**\brief Class that listens to changes in a coordinate system,
  * and emits a signal if that system changes.
@@ -53,7 +51,7 @@ class cxResource_EXPORT SpaceListenerImpl: public SpaceListener
 Q_OBJECT
 
 public:
-	SpaceListenerImpl(TrackingServicePtr trackingService, DataServicePtr dataManager);
+	SpaceListenerImpl(TrackingServicePtr trackingService, PatientModelServicePtr dataManager);
 //	SpaceListenerImpl(CoordinateSystem space);
 	virtual ~SpaceListenerImpl();
 	void setSpace(CoordinateSystem space);
@@ -68,7 +66,7 @@ private:
 	CoordinateSystem mSpace;
 
 	TrackingServicePtr mTrackingService;
-	DataServicePtr mDataManager;
+	PatientModelServicePtr mDataManager;
 };
 
 } // namespace cx

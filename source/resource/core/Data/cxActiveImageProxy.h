@@ -30,53 +30,63 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXCONNECTEDTHRESHOLDIMAGEFILTERWIDGET_H_
-#define CXCONNECTEDTHRESHOLDIMAGEFILTERWIDGET_H_
+#ifndef CXACTIVEIMAGEPROXY_H_
+#define CXACTIVEIMAGEPROXY_H_
 
-#include "cxPluginAlgorithmExport.h"
+#include "cxResourceExport.h"
 
-#include "cxBaseWidget.h"
-#include "cxConnectedThresholdImageFilter.h"
+#include <QObject>
+#include "cxForwardDeclarations.h"
 
 namespace cx
 {
 /**
  * \file
- * \addtogroup cx_module_algorithm
+ * \addtogroup cx_service_patient
  * @{
  */
 
+typedef boost::shared_ptr<class ActiveImageProxy> ActiveImageProxyPtr;
 /**
- * \class ConnectedThresholdImageFilterWidget
+ * \brief Helper class for connection the active image.
+ * \ingroup cx_service_patient
  *
- * \brief Widget for controlling the connected threshold image filter, a region
- * growing filter.
+ * By listening to this class, you will always listen
+ * to the active image.
  *
- * \warning Class used in course, not tested nor fully implemented.
+ *  \date Oct 18, 2011
+ *  \author Ole Vegard Solberg, SINTEF
  *
- * \date Apr 26, 2011
- * \author Janne Beate Bakeng, SINTEF
  */
-class cxPluginAlgorithm_EXPORT ConnectedThresholdImageFilterWidget : public BaseWidget
+class cxResource_EXPORT ActiveImageProxy: public QObject
 {
-  Q_OBJECT
-
+Q_OBJECT
 public:
-  ConnectedThresholdImageFilterWidget(QWidget* parent = 0);
-  virtual ~ConnectedThresholdImageFilterWidget();
+	static ActiveImageProxyPtr New(PatientModelServicePtr patientModelService)
+	{
+		return ActiveImageProxyPtr(new ActiveImageProxy(patientModelService));
+	}
+	ActiveImageProxy(PatientModelServicePtr patientModelService);
+	~ActiveImageProxy();
 
-  virtual QString defaultWhatsThis() const;
+signals:
+	void activeImageChanged(const QString& uid); ///< The original image changed signal from DataManager
+
+	// Forwarding active image signals
+	void transformChanged();
+	void propertiesChanged();
+	void landmarkRemoved(QString uid);
+	void landmarkAdded(QString uid);
+	void vtkImageDataChanged();
+	void transferFunctionsChanged();
+	void clipPlanesChanged();
+	void cropBoxChanged();
 
 private slots:
-  void handleFinishedSlot();
-  void segmentSlot();
-
+	void activeImageChangedSlot(const QString&);
 private:
-  QWidget* createSegmentationOptionsWidget();
-
-  QLabel* mStatusLabel;
-
-  ConnectedThresholdImageFilter mConnectedThresholdImageFilter;
+	ImagePtr mImage;
+	PatientModelServicePtr mPatientModelService;
 };
 
 /**
@@ -84,4 +94,4 @@ private:
  */
 }
 
-#endif /* CXCONNECTEDTHRESHOLDIMAGEFILTERWIDGET_H_ */
+#endif /* CXACTIVEIMAGEPROXY_H_ */

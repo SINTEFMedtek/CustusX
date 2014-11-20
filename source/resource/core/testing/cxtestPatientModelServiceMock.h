@@ -8,15 +8,15 @@ Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
 1. Redistributions of source code must retain the above copyright notice,
-   this list of conditions and the following disclaimer.
+	 this list of conditions and the following disclaimer.
 
 2. Redistributions in binary form must reproduce the above copyright notice,
-   this list of conditions and the following disclaimer in the documentation
-   and/or other materials provided with the distribution.
+	 this list of conditions and the following disclaimer in the documentation
+	 and/or other materials provided with the distribution.
 
 3. Neither the name of the copyright holder nor the names of its contributors
-   may be used to endorse or promote products derived from this software
-   without specific prior written permission.
+	 may be used to endorse or promote products derived from this software
+	 without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -29,36 +29,31 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXTESTPATIENTMODELSERVICEMOCK_H
+#define CXTESTPATIENTMODELSERVICEMOCK_H
 
-#include "cxVideoServiceNull.h"
-#include "cxReporter.h"
-#include "cxStreamerService.h"
+#include "cxPatientModelServiceNull.h"
 
-namespace cx
+namespace cxtest
 {
-VideoServiceNull::VideoServiceNull()
+
+class PatientModelServiceMock : public cx::PatientModelServiceNull
 {
+public:
+	PatientModelServiceMock();
+	virtual ~PatientModelServiceMock() {}
+
+	virtual void insertData(cx::DataPtr data);
+	virtual cx::DataPtr createData(QString type, QString uid, QString name="");
+	virtual std::map<QString, cx::DataPtr> getData() const;
+	virtual cx::DataPtr importData(QString fileName, QString &infoText);
+	virtual cx::RegistrationHistoryPtr get_rMpr_History() const;
+
+private:
+	std::map<QString, cx::DataPtr> mData;
+	cx::RegistrationHistoryPtr m_rMpr;
+};
+
 }
 
-StreamerService *VideoServiceNull::getStreamerService(QString service)
-{
-	printWarning();
-	return NULL;
-}
-
-QList<StreamerService *> VideoServiceNull::getStreamerServices()
-{
-	printWarning();
-	return QList<StreamerService *>();
-}
-bool VideoServiceNull::isNull()
-{
-	return true;
-}
-
-void VideoServiceNull::printWarning()
-{
-//	reportWarning("Trying to use VideoServiceNull. Is VideoService (org.custusx.core.video) disabled?");
-}
-
-} //cx
+#endif // CXTESTPATIENTMODELSERVICEMOCK_H

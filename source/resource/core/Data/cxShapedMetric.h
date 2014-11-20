@@ -37,7 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxDataMetric.h"
 #include "cxPointMetric.h"
-#include "cxDataManagerImpl.h"
 #include "cxMetricReferenceArgumentList.h"
 
 namespace cx
@@ -64,7 +63,7 @@ class cxResource_EXPORT DonutMetric: public DataMetric
 Q_OBJECT
 public:
 	virtual ~DonutMetric();
-	static DonutMetricPtr create(QString uid, QString name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider);
+	static DonutMetricPtr create(QString uid, QString name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider);
 
 	virtual bool isValid() const;
 	virtual QString getAsSingleLineString() const;
@@ -98,7 +97,7 @@ public:
 	virtual bool showValueInGraphics() const { return false; }
 
 private:
-	DonutMetric(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider);
+	DonutMetric(const QString& uid, const QString& name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider);
 	MetricReferenceArgumentListPtr mArguments;
 	double mRadius;
 	double mThickness;

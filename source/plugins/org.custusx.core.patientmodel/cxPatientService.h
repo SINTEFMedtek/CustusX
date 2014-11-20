@@ -30,12 +30,13 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXACTIVEIMAGEPROXY_H_
-#define CXACTIVEIMAGEPROXY_H_
+#ifndef CXPATIENTSERVICE_H_
+#define CXPATIENTSERVICE_H_
 
-#include "cxPatientServiceExport.h"
+#include "org_custusx_core_patientmodel_Export.h"
 
 #include <QObject>
+#include "boost/shared_ptr.hpp"
 #include "cxForwardDeclarations.h"
 
 namespace cx
@@ -46,52 +47,64 @@ namespace cx
  * @{
  */
 
-typedef boost::shared_ptr<class ActiveImageProxy> ActiveImageProxyPtr;
-/**
- * \brief Helper class for connection the active image.
+typedef boost::shared_ptr<class PatientData> PatientDataPtr;
+typedef boost::shared_ptr<class PatientService> PatientServicePtr;
+typedef boost::shared_ptr<class DataManager> DataServicePtr;
+
+/**\brief The virtual patient
  * \ingroup cx_service_patient
  *
- * By listening to this class, you will always listen
- * to the active image.
+ * PatientService provides access to the Patient Specific Model (PaSM).
+ *   - data entities
+ *   - relations between entities in space and time and structure
+ *   - load/save + simple operations
  *
- *  \date Oct 18, 2011
- *  \author Ole Vegard Solberg, SINTEF
+ *
+ *   At least, this is the goal. Just now, it holds the old
+ *   PatientData object, which manages save/load session/patient.
+ *
+ *  \date Jun 14, 2011
+ *  \author christiana
  *
  */
-class cxPatientService_EXPORT ActiveImageProxy: public QObject
+class org_custusx_core_patientmodel_EXPORT PatientService: public QObject
 {
 Q_OBJECT
 public:
-	static ActiveImageProxyPtr New(PatientModelServicePtr patientModelService)
-	{
-		return ActiveImageProxyPtr(new ActiveImageProxy(patientModelService));
-	}
-	ActiveImageProxy(PatientModelServicePtr patientModelService);
-	~ActiveImageProxy();
+	static PatientServicePtr create(DataServicePtr dataService);
+	virtual ~PatientService();
 
-signals:
-	void activeImageChanged(const QString& uid); ///< The original image changed signal from DataManager
+//	static PatientService* getInstance();
 
-	// Forwarding active image signals
-	void transformChanged();
-	void propertiesChanged();
-	void landmarkRemoved(QString uid);
-	void landmarkAdded(QString uid);
-	void vtkImageDataChanged();
-	void transferFunctionsChanged();
-	void clipPlanesChanged();
-	void cropBoxChanged();
+//	static void initialize();
+//	static void shutdown();
 
-private slots:
-	void activeImageChangedSlot(const QString&);
+	PatientDataPtr getPatientData();
+	DataServicePtr getDataService();
+
 private:
-	ImagePtr mImage;
-	PatientModelServicePtr mPatientModelService;
+//	static PatientService* mInstance;
+//	static void setInstance(PatientService* instance);
+
+	PatientService(DataServicePtr dataService);
+
+	PatientService(PatientService const&); // not implemented
+	PatientService& operator=(PatientService const&); // not implemented
+
+	PatientDataPtr mPatientData;
+	DataServicePtr mDataService;
+
+	/**
+	  * Clear the global cache used by the entire application (cx::DataLocations::getCachePath()).
+	  */
+	void clearCache();
 };
+
+//PatientService* patientService();
 
 /**
  * @}
  */
 }
 
-#endif /* CXACTIVEIMAGEPROXY_H_ */
+#endif /* CXPATIENTSERVICE_H_ */

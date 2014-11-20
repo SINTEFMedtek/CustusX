@@ -32,13 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxCoordinateSystemHelpers.h"
 
-//#include "cxTrackingService.h"
-//#include "cxReporter.h"
-//#include "cxDataManager.h"
-//#include "cxData.h"
 #include "cxDefinitionStrings.h"
-//#include "cxImage.h"
-//#include "vtkImageData.h"
 
 namespace cx
 {

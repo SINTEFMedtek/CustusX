@@ -72,16 +72,29 @@ void UsReconstructionServiceProxy::initServiceListener()
 void UsReconstructionServiceProxy::onServiceAdded(UsReconstructionService* service)
 {
 	mUsReconstructionService.reset(service, null_deleter());
-//	connect(service, SIGNAL(activeViewChanged()), this, SIGNAL(activeViewChanged()));
-//	connect(service, SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
+	connect(service, &UsReconstructionService::paramsChanged, this, &UsReconstructionService::paramsChanged);
+	connect(service, &UsReconstructionService::algorithmChanged, this, &UsReconstructionService::algorithmChanged);
+	connect(service, &UsReconstructionService::inputDataSelected, this, &UsReconstructionService::inputDataSelected);
+	connect(service, &UsReconstructionService::reconstructAboutToStart, this, &UsReconstructionService::reconstructAboutToStart);
+	connect(service, &UsReconstructionService::reconstructStarted, this, &UsReconstructionService::reconstructStarted);
+	connect(service, &UsReconstructionService::reconstructFinished, this, &UsReconstructionService::reconstructFinished);
+	connect(service, &UsReconstructionService::newInputDataAvailable, this, &UsReconstructionService::newInputDataAvailable);
+	connect(service, &UsReconstructionService::newInputDataPath, this, &UsReconstructionService::newInputDataAvailable);
+
 	if(mUsReconstructionService->isNull())
 		reportWarning("UsReconstructionServiceProxy::onServiceAdded mVideoService->isNull()");
 }
 
 void UsReconstructionServiceProxy::onServiceRemoved(UsReconstructionService *service)
 {
-//	disconnect(service, SIGNAL(activeViewChanged()), this, SIGNAL(activeViewChanged()));
-//	disconnect(service, SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
+	disconnect(service, &UsReconstructionService::paramsChanged, this, &UsReconstructionService::paramsChanged);
+	disconnect(service, &UsReconstructionService::algorithmChanged, this, &UsReconstructionService::algorithmChanged);
+	disconnect(service, &UsReconstructionService::inputDataSelected, this, &UsReconstructionService::inputDataSelected);
+	disconnect(service, &UsReconstructionService::reconstructAboutToStart, this, &UsReconstructionService::reconstructAboutToStart);
+	disconnect(service, &UsReconstructionService::reconstructStarted, this, &UsReconstructionService::reconstructStarted);
+	disconnect(service, &UsReconstructionService::reconstructFinished, this, &UsReconstructionService::reconstructFinished);
+	disconnect(service, &UsReconstructionService::newInputDataAvailable, this, &UsReconstructionService::newInputDataAvailable);
+	disconnect(service, &UsReconstructionService::newInputDataPath, this, &UsReconstructionService::newInputDataAvailable);
 	mUsReconstructionService = UsReconstructionService::getNullObject();
 }
 
@@ -142,15 +155,15 @@ void UsReconstructionServiceProxy::setOutputVolumeParams(const OutputVolumeParam
 	mUsReconstructionService->setOutputVolumeParams(par);
 }
 
-void UsReconstructionServiceProxy::setOutputRelativePath(QString path)
-{
-	mUsReconstructionService->setOutputRelativePath(path);
-}
+//void UsReconstructionServiceProxy::setOutputRelativePath(QString path)
+//{
+//	mUsReconstructionService->setOutputRelativePath(path);
+//}
 
-void UsReconstructionServiceProxy::setOutputBasePath(QString path)
-{
-	mUsReconstructionService->setOutputBasePath(path);
-}
+//void UsReconstructionServiceProxy::setOutputBasePath(QString path)
+//{
+//	mUsReconstructionService->setOutputBasePath(path);
+//}
 
 void UsReconstructionServiceProxy::startReconstruction()
 {
@@ -170,6 +183,11 @@ ReconstructionMethodService* UsReconstructionServiceProxy::createAlgorithm()
 ReconstructCore::InputParams UsReconstructionServiceProxy::createCoreParameters()
 {
 	return mUsReconstructionService->createCoreParameters();
+}
+
+void UsReconstructionServiceProxy::newDataOnDisk(QString mhdFilename)
+{
+	return mUsReconstructionService->newDataOnDisk(mhdFilename);
 }
 
 } //cx

@@ -60,7 +60,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDisplayTextRep.h"
 #include "cxReporter.h"
 #include "cxManualTool.h"
-#include "cxDataManager.h"
 #include "cxViewManager.h"
 #include "cxTrackingService.h"
 #include "cxViewGroup.h"
@@ -84,6 +83,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxNavigation.h"
 #include "cxDataRepContainer.h"
 #include "vtkRenderWindowInteractor.h"
+#include "cxPatientModelService.h"
+
 
 namespace cx
 {
@@ -105,13 +106,13 @@ ViewWrapper2D::ViewWrapper2D(ViewPtr view, VisualizationServiceBackendPtr backen
 	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(settingsChangedSlot(QString)));
 
 	// slice proxy
-	mSliceProxy = SliceProxy::create(mBackend->getDataManager());
+	mSliceProxy = SliceProxy::create(mBackend->getPatientService());
 
 	mDataRepContainer.reset(new DataRepContainer());
 	mDataRepContainer->setSliceProxy(mSliceProxy);
 	mDataRepContainer->setView(mView);
 
-	mViewFollower = ViewFollower::create(mBackend->getDataManager());
+	mViewFollower = ViewFollower::create(mBackend->getPatientService());
 	mViewFollower->setSliceProxy(mSliceProxy);
 
 	addReps();
@@ -477,7 +478,7 @@ void ViewWrapper2D::imageRemoved(const QString& uid)
 
 void ViewWrapper2D::dataViewPropertiesChangedSlot(QString uid)
 {
-	DataPtr data = mBackend->getDataManager()->getData(uid);
+	DataPtr data = mBackend->getPatientService()->getData(uid);
 	DataViewProperties properties = mGroupData->getProperties(data);
 
 	if (properties.hasSlice2D())
@@ -599,7 +600,7 @@ void ViewWrapper2D::shiftAxisPos(Vector3D delta_vp)
 	ToolPtr tool = mBackend->getToolManager()->getManualTool();
 
 	Transform3D sMr = mSliceProxy->get_sMr();
-	Transform3D rMpr = mBackend->getDataManager()->get_rMpr();
+	Transform3D rMpr = mBackend->getPatientService()->get_rMpr();
 	Transform3D prMt = tool->get_prMt();
 	Transform3D vpMs = mView->get_vpMs();
 	Vector3D delta_s = vpMs.inv().vector(delta_vp);
@@ -620,7 +621,7 @@ void ViewWrapper2D::setAxisPos(Vector3D click_vp)
 	ToolPtr tool = mBackend->getToolManager()->getManualTool();
 
 	Transform3D sMr = mSliceProxy->get_sMr();
-	Transform3D rMpr = mBackend->getDataManager()->get_rMpr();
+	Transform3D rMpr = mBackend->getPatientService()->get_rMpr();
 	Transform3D prMt = tool->get_prMt();
 
 	// find tool position in s

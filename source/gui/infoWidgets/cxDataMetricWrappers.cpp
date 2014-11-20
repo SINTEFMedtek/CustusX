@@ -101,22 +101,17 @@ MetricReferenceArgumentListGui::MetricReferenceArgumentListGui()
 {
 	mModified = true;
 	mInternalUpdate = false;
-//	connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataChangedSlot()));
 }
 
 void MetricReferenceArgumentListGui::setArguments(MetricReferenceArgumentListPtr arguments)
 {
 	mArguments = arguments;
 	connect(mArguments.get(), SIGNAL(argumentsChanged()), this, SLOT(dataChangedSlot()));
-//	connect(mArguments.get(), SIGNAL(argumentsChanged()), this, SIGNAL(argumentsChanged()));
 }
 
 void MetricReferenceArgumentListGui::addWidgets(QBoxLayout* layout)
 {
-	QString value;// = qstring_cast(mData->getFrame());
-//	QStringList range;
-//	std::map<QString,QString> names;
-//	this->getAvailableArgumentMetrics(&range, &names);
+	QString value;
 
 	mPSelector.resize(mArguments->getCount());
 	for (unsigned i=0; i<mPSelector.size(); ++i)
@@ -137,7 +132,7 @@ void MetricReferenceArgumentListGui::addWidgets(QBoxLayout* layout)
 
 void MetricReferenceArgumentListGui::getAvailableArgumentMetrics(QStringList* uid, std::map<QString,QString>* namemap)
 {
-	std::map<QString, DataPtr> data = dataManager()->getData();
+	std::map<QString, DataPtr> data = patientService()->getData();
 	for (std::map<QString, DataPtr>::iterator iter=data.begin(); iter!=data.end(); ++iter)
 	{
 		if (mArguments->validArgument(iter->second))
@@ -162,7 +157,7 @@ void MetricReferenceArgumentListGui::pointSelected()
 		return;
 	for (unsigned i=0; i<mPSelector.size(); ++i)
 	{
-		DataPtr data = dataManager()->getData(mPSelector[i]->getValue());
+		DataPtr data = patientService()->getData(mPSelector[i]->getValue());
 		if (mArguments->validArgument(data))
 			mArguments->set(i, data);
 		else

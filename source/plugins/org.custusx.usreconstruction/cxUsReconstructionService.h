@@ -92,8 +92,8 @@ public:
 	virtual OutputVolumeParams getOutputVolumeParams() const = 0; ///< Return params controlling the output data. These are data-dependent.
 
 	virtual void setOutputVolumeParams(const OutputVolumeParams& par) = 0; ///< Control the output volume
-	virtual void setOutputRelativePath(QString path) = 0; ///< Set location of output relative to base
-	virtual void setOutputBasePath(QString path) = 0; ///< Set base location of output
+//	virtual void setOutputRelativePath(QString path) = 0; ///< Set location of output relative to base
+//	virtual void setOutputBasePath(QString path) = 0; ///< Set base location of output
 
 	/** Execute the reconstruction in another thread.
 	  *
@@ -115,6 +115,9 @@ public:
 	virtual bool isNull() = 0;
 	static UsReconstructionServicePtr getNullObject();
 
+public slots:
+	virtual void newDataOnDisk(QString mhdFilename) = 0;
+
 signals:
 	void paramsChanged();
 	void algorithmChanged();
@@ -124,6 +127,7 @@ signals:
 	void reconstructFinished();
 
 	void newInputDataAvailable(QString mhdFileName);
+	void newInputDataPath(QString path);
 };
 
 } //cx

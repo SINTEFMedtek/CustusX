@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDoubleDataAdapter.h"
 #include "cxRegistrationTransform.h"
 #include "cxDoubleDataAdapterXml.h"
+#include "cxPatientModelService.h"
 
 namespace cxtest {
 
@@ -98,9 +99,9 @@ TEST_CASE("LevelSetFilter: execute", "[integration][modules][Algorithm][LevelSet
 
     //create a new patient
 	QString filename = cx::DataLocations::getTestDataPath()+ "/testing/TubeSegmentationFramework/Default.mhd";
-	cx::patientService()->getPatientData()->newPatient(cx::DataLocations::getTestDataPath()+ "/temp/LevelSetFilter/");
+	cx::patientService()->newPatient(cx::DataLocations::getTestDataPath()+ "/temp/LevelSetFilter/");
 	QString info;
-	cx::DataPtr data = cx::patientService()->getPatientData()->importData(filename, info);
+	cx::DataPtr data = cx::patientService()->importData(filename, info);
 	data->get_rMd_History()->setRegistration(cx::Transform3D::Identity());
 	REQUIRE(data);
 

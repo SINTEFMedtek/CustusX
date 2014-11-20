@@ -44,11 +44,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewManager.h"
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"
-#include "cxDataManager.h"
 #include "cxManualTool.h"
 
 #include "cxLegacySingletons.h"
 #include "cxSpaceProvider.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
@@ -224,7 +224,7 @@ void PointSamplingWidget::setManualTool(const Vector3D& p_r)
   ToolPtr tool = trackingService()->getManualTool();
 
   //Transform3D sMr = mSliceProxy->get_sMr();
-  Transform3D rMpr = dataManager()->get_rMpr();
+  Transform3D rMpr = patientService()->get_rMpr();
   Transform3D prMt = tool->get_prMt();
 
   // find tool position in r

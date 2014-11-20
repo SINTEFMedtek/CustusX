@@ -31,12 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxUsReconstructionGUIExtenderService.h"
 
-//#include "cxAcquisitionData.h"
 #include "cxPatientModelService.h"
-
-//#include "cxReconstructionManager.h"
-//#include "cxPatientService.h"
-//#include "cxPatientData.h"
 
 #include "cxReconstructionWidget.h"
 #include "cxPatientModelService.h"
@@ -49,25 +44,11 @@ namespace cx
 UsReconstructionGUIExtenderService::UsReconstructionGUIExtenderService(UsReconstructionServicePtr usReconstructionService, PatientModelServicePtr patientModelService) :
 	mReconstructer(usReconstructionService)
 {
-//  XmlOptionFile xmlFile = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("usReconstruction");
-//  mReconstructer.reset(new ReconstructionManager(xmlFile, DataLocations::getShaderPath()));
-//  //mReconstructer->init();
-
-//  connect(patientModelService.get(), &PatientModelService::patientChanged, this, &UsReconstructionGUIExtenderService::patientChangedSlot);
-
 }
 
 UsReconstructionGUIExtenderService::~UsReconstructionGUIExtenderService()
 {
 }
-
-//void UsReconstructionGUIExtenderService::patientChangedSlot()
-//{
-//	mReconstructer->selectData(patientService()->getPatientData()->getActivePatientFolder() + "/US_Acq/");
-//	mReconstructer->setOutputBasePath(patientService()->getPatientData()->getActivePatientFolder());
-//	mReconstructer->setOutputRelativePath("Images");
-
-//}
 
 std::vector<GUIExtenderService::CategorizedWidget> UsReconstructionGUIExtenderService::createWidgets() const
 {

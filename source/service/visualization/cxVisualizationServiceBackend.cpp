@@ -32,18 +32,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxVisualizationServiceBackend.h"
 
-#include "cxDataManager.h"
 #include "cxTrackingService.h"
 #include "cxSpaceProvider.h"
 
 namespace cx
 {
 
-VisualizationServiceBackend::VisualizationServiceBackend(DataServicePtr dataManager,
+VisualizationServiceBackend::VisualizationServiceBackend(PatientModelServicePtr patientService,
 														 TrackingServicePtr trackingService,
 														 VideoServiceOldPtr videoService,
 														 SpaceProviderPtr spaceProvider) :
-	mDataManager(dataManager),
+	mPatientService(patientService),
 	mTrackingService(trackingService),
 	mSpaceProvider(spaceProvider),
   mVideoServiceOld(videoService)
@@ -51,9 +50,9 @@ VisualizationServiceBackend::VisualizationServiceBackend(DataServicePtr dataMana
 
 }
 
-DataServicePtr VisualizationServiceBackend::getDataManager()
+PatientModelServicePtr VisualizationServiceBackend::getPatientService()
 {
-	return mDataManager;
+	return mPatientService;
 }
 
 TrackingServicePtr VisualizationServiceBackend::getToolManager()

@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxView.h"
 #include "cxLandmark.h"
 #include "cxReporter.h"
-#include "cxDataManager.h"
+#include "cxPatientModelService.h"
 #include "cxTypeConversions.h"
 #include "boost/bind.hpp"
 #include "cxVtkHelperClasses.h"
@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-PatientLandmarksSource::PatientLandmarksSource(DataServicePtr dataManager) : mDataManager(dataManager)
+PatientLandmarksSource::PatientLandmarksSource(PatientModelServicePtr dataManager) : mDataManager(dataManager)
 {
 	connect(mDataManager->getPatientLandmarks().get(), SIGNAL(landmarkAdded(QString)), this, SIGNAL(changed()));
 	connect(mDataManager->getPatientLandmarks().get(), SIGNAL(landmarkRemoved(QString)), this, SIGNAL(changed()));
@@ -138,12 +138,12 @@ Vector3D ImageLandmarksSource::getTextPos(Vector3D p_l) const
 // --------------------------------------------------------
 // --------------------------------------------------------
 
-LandmarkRepPtr LandmarkRep::New(DataServicePtr dataManager, const QString& uid)
+LandmarkRepPtr LandmarkRep::New(PatientModelServicePtr dataManager, const QString& uid)
 {
 	return wrap_new(new LandmarkRep(dataManager), uid);
 }
 
-LandmarkRep::LandmarkRep(DataServicePtr dataManager) :
+LandmarkRep::LandmarkRep(PatientModelServicePtr dataManager) :
 	RepImpl(),
 	mDataManager(dataManager),
 	mInactiveColor(QColor::fromRgbF(0.5,0.5,0.5)),

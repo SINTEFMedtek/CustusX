@@ -11,7 +11,6 @@
 #include "cxTypeConversions.h"
 #include "cxRegistrationTransform.h"
 #include "cxReporter.h"
-#include "cxDataManager.h"
 #include <boost/math/special_functions/fpclassify.hpp>
 
 #include "vtkClipPolyData.h"

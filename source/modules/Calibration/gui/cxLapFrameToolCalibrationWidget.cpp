@@ -46,7 +46,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataLocations.h"
 #include "cxTool.h"
 #include "cxTrackingService.h"
-#include "cxPatientData.h"
 #include <cxActiveToolWidget.h>
 #include "cxDoubleWidgets.h"
 

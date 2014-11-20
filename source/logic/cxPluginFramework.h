@@ -60,6 +60,15 @@ typedef boost::shared_ptr<class PluginFrameworkManager> PluginFrameworkManagerPt
 class cxLogicManager_EXPORT PluginFrameworkManager : public QObject
 {
 	Q_OBJECT
+
+	struct PluginLoadInfo
+	{
+		QString symbolicName;
+		QString storedState;
+		ctkPlugin::State targetState;
+		bool isNew;
+	};
+
 public:
 	static PluginFrameworkManagerPtr create() { return PluginFrameworkManagerPtr(new PluginFrameworkManager()); }
 
@@ -91,6 +100,7 @@ private:
 	QString getPluginPath(const QString& symbolicName);
 	QStringList getPluginSymbolicNames(const QString& searchPath);
 	bool nameIsProbablyPlugin(QString name) const;
+	std::vector<PluginFrameworkManager::PluginLoadInfo> getPluginLoadInfo(QStringList symbolicNames);
 
 	QScopedPointer<ctkPluginFrameworkFactory> mFrameworkFactory;
 	QSharedPointer<ctkPluginFramework> mFramework;

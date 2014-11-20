@@ -34,13 +34,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxBoundingBox3D.h"
 #include "cxTypeConversions.h"
-#include "cxDataManager.h"
+#include "cxPatientModelService.h"
 #include "cxTypeConversions.h"
 
 namespace cx
 {
 
-DonutMetric::DonutMetric(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider) :
+DonutMetric::DonutMetric(const QString& uid, const QString& name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider) :
 				DataMetric(uid, name, dataManager, spaceProvider)
 {
 	mArguments.reset(new MetricReferenceArgumentList(QStringList() << "position" << "direction"));
@@ -51,7 +51,7 @@ DonutMetric::DonutMetric(const QString& uid, const QString& name, DataServicePtr
 	mFlat = true;
 }
 
-DonutMetricPtr DonutMetric::create(QString uid, QString name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider)
+DonutMetricPtr DonutMetric::create(QString uid, QString name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider)
 {
 	return DonutMetricPtr(new DonutMetric(uid, name, dataManager, spaceProvider));
 }

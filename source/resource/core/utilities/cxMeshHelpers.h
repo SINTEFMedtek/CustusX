@@ -49,7 +49,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-class DataManager;
 
 /**
  * \addtogroup cx_resource_core_utilities
@@ -57,7 +56,7 @@ class DataManager;
  */
 
 cxResource_EXPORT vtkPolyDataPtr polydataFromTransforms(TimedTransformMap transformMap_prMt, Transform3D rMpr);
-cxResource_EXPORT void loadMeshFromToolTransforms(DataServicePtr dataManager, TimedTransformMap transforms_prMt);
+cxResource_EXPORT void loadMeshFromToolTransforms(PatientModelServicePtr dataManager, TimedTransformMap transforms_prMt);
 
 /**
  * Get information about a ssc mesh.

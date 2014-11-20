@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxSpaceListenerImpl.h"
 
-#include "cxDataManager.h"
+#include "cxPatientModelService.h"
 #include "cxTrackingService.h"
 #include "cxData.h"
 #include "cxTool.h"
@@ -40,17 +40,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-SpaceListenerImpl::SpaceListenerImpl(TrackingServicePtr trackingService, DataServicePtr dataManager)
+SpaceListenerImpl::SpaceListenerImpl(TrackingServicePtr trackingService, PatientModelServicePtr dataManager)
 {
 	mTrackingService = trackingService;
 	mDataManager = dataManager;
 }
-
-//SpaceListenerImpl::SpaceListenerImpl(CoordinateSystem space) :
-//	mSpace(space)
-//{
-//	this->doConnect();
-//}
 
 SpaceListenerImpl::~SpaceListenerImpl()
 {

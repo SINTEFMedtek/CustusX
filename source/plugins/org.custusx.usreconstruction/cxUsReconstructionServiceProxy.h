@@ -62,8 +62,8 @@ public:
 	virtual OutputVolumeParams getOutputVolumeParams() const;
 
 	virtual void setOutputVolumeParams(const OutputVolumeParams& par);
-	virtual void setOutputRelativePath(QString path);
-	virtual void setOutputBasePath(QString path);
+//	virtual void setOutputRelativePath(QString path);
+//	virtual void setOutputBasePath(QString path);
 	virtual void startReconstruction();
 	virtual std::set<cx::TimedAlgorithmPtr> getThreadedReconstruction();
 	virtual ReconstructionMethodService* createAlgorithm();
@@ -72,6 +72,8 @@ public:
 
 	virtual bool isNull();
 
+public slots:
+	virtual void newDataOnDisk(QString mhdFilename);
 private:
 	void initServiceListener();
 	void onServiceAdded(UsReconstructionService* service);

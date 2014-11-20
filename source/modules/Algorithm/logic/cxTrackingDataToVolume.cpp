@@ -34,14 +34,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkImageData.h>
 
 #include "cxBoundingBox3D.h"
-#include "cxDataManager.h"
+#include "cxPatientModelService.h"
 #include "cxTrackingService.h"
 #include "cxRegistrationTransform.h"
 #include "cxCoordinateSystemHelpers.h"
 #include "cxVolumeHelpers.h"
 #include "cxReporter.h"
-//#include "cxStateService.h"
-//#include "cxPatientData.h"
 
 #include "cxLegacySingletons.h"
 #include "cxSpaceProvider.h"
@@ -92,8 +90,10 @@ ImagePtr TrackingDataToVolume::createEmptyImage(DoubleBoundingBox3D bounds_pr, d
   //std::cout << "dim: " << dim << std::endl;
   vtkImageDataPtr data_pr = generateVtkImageData(dim, spacingVector, 0);
 
-  ImagePtr image = dataManager()->createImage(data_pr, "tc%1", "Tool positions %1", "Images");
-  dataManager()->loadData(image);
+//  ImagePtr image = patientService()->createImage(data_pr, "tc%1", "Tool positions %1", "Images");
+  ImagePtr image = patientService()->createSpecificData<Image>("tc%1", "Tool positions %1");
+  image->setVtkImageData(data_pr);
+  patientService()->insertData(image);
   return image;
 }
 
@@ -150,7 +150,7 @@ void TrackingDataToVolume::setInput(TimedTransformMap map_prMt, int padding_voxe
   bounds_mm[5] += padding_mm;
   mImage = createEmptyImage(bounds_mm, initialSpacing_mm);
 
-  Transform3D rMpr = dataManager()->get_rMpr();
+  Transform3D rMpr = patientService()->get_rMpr();
   //std::cout << "rMpr\n" << rMpr << std::endl;
   Transform3D rMd = rMpr * createTransformTranslate(bounds_mm.corner(0,0,0)); // TODO + eller - ?????
   //std::cout << "rMd\n" << rMd << std::endl;

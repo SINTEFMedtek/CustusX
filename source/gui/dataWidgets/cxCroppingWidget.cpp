@@ -45,11 +45,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationTransform.h"
 #include "cxImageAlgorithms.h"
 #include "cxInteractiveCropper.h"
-#include "cxPatientData.h"
-#include "cxPatientService.h"
-#include "cxDataManager.h"
 #include "cxImage.h"
 #include "cxLogicManager.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
@@ -140,12 +138,10 @@ void CroppingWidget::cropperChangedSlot()
 
 ImagePtr CroppingWidget::cropClipButtonClickedSlot()
 {
-  ImagePtr image = dataManager()->getActiveImage();
-  QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
+  ImagePtr image = patientService()->getActiveImage();
 
-  ImagePtr retval = cropImage(dataService(), image);
-  dataManager()->loadData(retval);
-  dataManager()->saveImage(retval, outputBasePath);
+  ImagePtr retval = cropImage(patientService(), image);
+  patientService()->insertData(retval);
   return retval;
 }
 

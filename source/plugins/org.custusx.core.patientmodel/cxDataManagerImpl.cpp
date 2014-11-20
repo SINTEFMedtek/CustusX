@@ -160,6 +160,7 @@ void DataManagerImpl::setCenter(const Vector3D& center)
 	mCenter = center;
 	emit centerChanged();
 }
+
 ImagePtr DataManagerImpl::getActiveImage() const
 {
 	return mActiveImage;
@@ -265,6 +266,8 @@ void DataManagerImpl::loadData(DataPtr data)
 
 	if (data)
 	{
+		if (mData.count(data->getUid()) && mData[data->getUid()]!=data)
+			reportError(QString("Overwriting Data with uid=%1 with new object into PasM").arg(data->getUid()));
 //		this->verifyParentFrame(data);
 		mData[data->getUid()] = data;
 		emit dataAddedOrRemoved();
@@ -752,7 +755,7 @@ void DataManagerImpl::set_rMpr(const Transform3D& val)
 	m_rMpr_History->setRegistration(val);
 }
 
-RegistrationHistoryPtr DataManagerImpl::get_rMpr_History()
+RegistrationHistoryPtr DataManagerImpl::get_rMpr_History() const
 {
 	return m_rMpr_History;
 }

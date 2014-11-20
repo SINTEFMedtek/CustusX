@@ -34,17 +34,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QVBoxLayout>
 #include "cxTrackingService.h"
-#include "cxDataManager.h"
 #include "cxMeshHelpers.h"
 #include "cxToolRep3D.h"
 #include "cxToolTracer.h"
 #include "cxViewManager.h"
 #include "cxRepManager.h"
 #include "cxTrackingDataToVolume.h"
-#include "cxPatientData.h"
 #include "cxRecordSessionWidget.h"
 #include "cxTool.h"
-#include "cxPatientService.h"
 #include "cxReporter.h"
 #include "cxView.h"
 
@@ -129,7 +126,7 @@ void TrackedCenterlineWidget::preprocessResampler()
 	}
 
 	//visualize the tracked data as a mesh
-	loadMeshFromToolTransforms(dataService(), transforms_prMt);
+	loadMeshFromToolTransforms(patientService(), transforms_prMt);
 
 	//convert the transforms into a binary image
 	TrackingDataToVolume converter;
@@ -138,7 +135,7 @@ void TrackedCenterlineWidget::preprocessResampler()
 	ImagePtr image_d = converter.getOutput();
 
 	//extract the centerline
-	QString savepath = patientService()->getPatientData()->getActivePatientFolder();
+//	QString savepath = patientService()->getPatientData()->getActivePatientFolder();
 //	mCenterlineAlgorithm.setInput(image_d, savepath);
 	mRecordSessionWidget->setReady(false, "<font color=orange>Generating centerline... Please wait!</font>\n");
 }

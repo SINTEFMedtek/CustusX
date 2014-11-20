@@ -31,7 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "catch.hpp"
-#include "cxDataManagerImpl.h"
 #include "cxtestDummyDataManager.h"
 #include "cxReporter.h"
 #include "cxMessageListener.h"
@@ -47,30 +46,6 @@ TEST_CASE("Core test services correctly contructed/destructed", "[unit]")
 	services.reset();
 
 	CHECK(!messageListener->containsErrors());
-
-//	// [HACK] break loop by removing connection to DataFactory and SpaceProvider
-//	cx::DataManagerImplPtr dataManagerImpl;
-//	dataManagerImpl = boost::dynamic_pointer_cast<cx::DataManagerImpl>(services.mDataService);
-//	if (dataManagerImpl)
-//	{
-//		dataManagerImpl->setSpaceProvider(cx::SpaceProviderPtr());
-//		dataManagerImpl->setDataFactory(cx::DataFactoryPtr());
-//		dataManagerImpl.reset();
-//	}
-
-//	CHECK(services.mDataFactory.unique());
-//	services.mDataFactory.reset();
-
-//	CHECK(services.mSpaceProvider.unique());
-//	services.mSpaceProvider.reset();
-
-//	CHECK(services.mDataService.unique());
-//	services.mDataService.reset();
-
-//	CHECK(services.mTrackingService.unique());
-//	services.mTrackingService.reset();
-
-//	cx::Reporter::shutdown();
 }
 
 } // namespace cx

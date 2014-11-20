@@ -51,7 +51,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDisplayTextRep.h"
 #include "cxReporter.h"
 #include "cxSlicePlanes3DRep.h"
-#include "cxDataManager.h"
 #include "cxMesh.h"
 #include "cxPickerRep.h"
 #include "cxGeometricRep.h"
@@ -81,6 +80,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxManualTool.h"
 #include "cxImage2DRep3D.h"
 #include "cxLogger.h"
+#include "cxPatientModelService.h"
+
 
 #include "cxData.h"
 #include "cxAxesRep.h"
@@ -125,11 +126,11 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ViewPtr view, VisualizationServiceB
 
 	this->initializeMultiVolume3DRepProducer();
 
-	mLandmarkRep = LandmarkRep::New(mBackend->getDataManager());
+	mLandmarkRep = LandmarkRep::New(mBackend->getPatientService());
 	mLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
 	mLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
 
-	mPickerRep = PickerRep::New(mBackend->getDataManager());
+	mPickerRep = PickerRep::New(mBackend->getPatientService());
 
 	connect(mPickerRep.get(), SIGNAL(pointPicked(Vector3D)), this, SLOT(PickerRepPointPickedSlot(Vector3D)));
 	connect(mPickerRep.get(), SIGNAL(dataPicked(QString)), this, SLOT(PickerRepDataPickedSlot(QString)));
@@ -153,7 +154,7 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ViewPtr view, VisualizationServiceB
 	this->updateMetricNamesRep();
 
 	connect(mBackend->getToolManager().get(), &TrackingService::stateChanged, this, &ViewWrapper3D::toolsAvailableSlot);
-	connect(mBackend->getDataManager().get(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(activeImageChangedSlot()));
+	connect(mBackend->getPatientService().get(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(activeImageChangedSlot()));
 	this->toolsAvailableSlot();
 
 	mAnnotationMarker = RepManager::getInstance()->getCachedRep<OrientationAnnotation3DRep>();
@@ -540,8 +541,8 @@ void ViewWrapper3D::centerImageActionSlot()
 {
 	NavigationPtr nav = this->getNavigation();
 
-	if (mBackend->getDataManager()->getActiveImage())
-		nav->centerToData(mBackend->getDataManager()->getActiveImage());
+	if (mBackend->getPatientService()->getActiveImage())
+		nav->centerToData(mBackend->getPatientService()->getActiveImage());
 	else
 		nav->centerToView(mGroupData->getData(DataViewProperties::create3D()));
 }
@@ -569,7 +570,7 @@ void ViewWrapper3D::fillSlicePlanesActionSlot(bool checked)
 
 void ViewWrapper3D::dataViewPropertiesChangedSlot(QString uid)
 {
-	DataPtr data = mBackend->getDataManager()->getData(uid);
+	DataPtr data = mBackend->getPatientService()->getData(uid);
 	DataViewProperties properties = mGroupData->getProperties(data);
 
 	if (properties.hasVolume3D())
@@ -702,7 +703,7 @@ void ViewWrapper3D::activeImageChangedSlot()
 {
 	if(!mGroupData)
 		return;
-	ImagePtr image = mBackend->getDataManager()->getActiveImage();
+	ImagePtr image = mBackend->getPatientService()->getActiveImage();
 
 	// only show landmarks belonging to image visible in this view:
 	std::vector<ImagePtr> images = mGroupData->getImages(DataViewProperties::create3D());
@@ -749,7 +750,7 @@ void ViewWrapper3D::updateSlices()
 
 	mSlices3DRep = Slices3DRep::New("MultiSliceRep_" + mView->getName());
 	for (unsigned i=0; i<planes.size(); ++i)
-		mSlices3DRep->addPlane(planes[i], mBackend->getDataManager());
+		mSlices3DRep->addPlane(planes[i], mBackend->getPatientService());
 	mSlices3DRep->setShaderPath(DataLocations::getShaderPath());
 	mSlices3DRep->setImages(images);
 	mSlices3DRep->setTool(mBackend->getToolManager()->getActiveTool());

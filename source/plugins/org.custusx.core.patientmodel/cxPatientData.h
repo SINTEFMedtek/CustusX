@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPATIENTDATA_H_
 #define CXPATIENTDATA_H_
 
-#include "cxPatientServiceExport.h"
+#include "org_custusx_core_patientmodel_Export.h"
 
 #include "boost/shared_ptr.hpp"
 #include <QString>
@@ -48,7 +48,7 @@ class QDomDocument;
 namespace cx
 {
 
-class DataManager;
+typedef boost::shared_ptr<class DataManager> DataServicePtr;
 
 /**
  * \file
@@ -61,7 +61,7 @@ class DataManager;
  * necessary.
  *
  */
-cxPatientService_EXPORT QDomElement getElementForced(QDomNode root, QString path);
+org_custusx_core_patientmodel_EXPORT QDomElement getElementForced(QDomNode root, QString path);
 
 /**
  * \brief Functionality for storing patient data in a folder on the disk
@@ -76,7 +76,7 @@ cxPatientService_EXPORT QDomElement getElementForced(QDomNode root, QString path
  *   \author christiana
  *
  */
-class cxPatientService_EXPORT PatientData: public QObject
+class org_custusx_core_patientmodel_EXPORT PatientData: public QObject
 {
 Q_OBJECT
 public:
@@ -89,7 +89,7 @@ public:
 	QDomElement getCurrentWorkingElement(QString path);
 	QDomDocument getCurrentWorkingDocument();  ///< use only during save/load.
 
-	QString generateFilePath(QString folderName, QString ending); ///< Creates the folder in the active patient and returns the path to a (not existing) filename generated using the current timestamp
+//	QString generateFilePath(QString folderName, QString ending); ///< Creates the folder in the active patient and returns the path to a (not existing) filename generated using the current timestamp
 
 public slots:
 	void newPatient(QString choosenDir);

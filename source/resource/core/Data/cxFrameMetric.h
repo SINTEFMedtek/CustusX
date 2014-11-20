@@ -56,7 +56,7 @@ class cxResource_EXPORT FrameMetric: public cx::FrameMetricBase
 Q_OBJECT
 public:
 	virtual ~FrameMetric();
-	static FrameMetricPtr create(QString uid, QString name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider);
+	static FrameMetricPtr create(QString uid, QString name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider);
 	virtual QString getType() const
 	{
 		return getTypeName();
@@ -69,7 +69,7 @@ public:
 	virtual void parseXml(QDomNode& dataNode); ///< Use a XML node to load data. \param dataNode A XML data representation of this object.
 	virtual QString getAsSingleLineString() const;
 private:
-	FrameMetric(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider);
+	FrameMetric(const QString& uid, const QString& name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider);
 };
 
 } //namespace cx

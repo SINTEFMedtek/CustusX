@@ -41,8 +41,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxView.h"
 #include "cxSliceProxy.h"
 #include "cxVtkHelperClasses.h"
-#include "cxDataManager.h"
 #include "cxTypeConversions.h"
+#include "cxPatientModelService.h"
+
 
 // --------------------------------------------------------
 namespace cx
@@ -104,7 +105,7 @@ void OrientationAnnotation::SetTextActorsJustification()
 //---------------------------------------------------------
 
 
-OrientationAnnotationRep::OrientationAnnotationRep(DataServicePtr dataManager) :
+OrientationAnnotationRep::OrientationAnnotationRep(PatientModelServicePtr dataManager) :
 	RepImpl(),
 	mDataManager(dataManager)
 {
@@ -112,7 +113,7 @@ OrientationAnnotationRep::OrientationAnnotationRep(DataServicePtr dataManager) :
 	connect(mDataManager.get(), SIGNAL(clinicalApplicationChanged()), this, SLOT(clinicalApplicationChangedSlot()));
 }
 
-OrientationAnnotationRepPtr OrientationAnnotationRep::New(DataServicePtr dataManager, const QString& uid)
+OrientationAnnotationRepPtr OrientationAnnotationRep::New(PatientModelServicePtr dataManager, const QString& uid)
 {
 	return wrap_new(new OrientationAnnotationRep(dataManager), uid);
 }

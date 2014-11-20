@@ -58,6 +58,8 @@ TEST_CASE("VideoConnectionWidget can stream", "[unit][gui][not_win32][widget][st
 	SSC_LOG("");
 	cx::LogicManager::initialize();
 	SSC_LOG("");
+	QString folder = cx::DataLocations::getTestDataPath() + "/temp/test.cx3";
+	cx::logicManager()->getPatientModelService()->newPatient(folder);
 
 	cx::TrackingServicePtr ts = cx::logicManager()->getTrackingService();
 

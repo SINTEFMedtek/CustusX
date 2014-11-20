@@ -37,17 +37,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxBoundingBox3D.h"
 #include "cxTypeConversions.h"
 
-#include "cxDataManager.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
 
-//DataPtr AngleMetricReader::load(const QString& uid, const QString& filename)
-//{
-//	return DataPtr(new AngleMetric(uid, filename));
-//}
-
-AngleMetric::AngleMetric(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider) :
+AngleMetric::AngleMetric(const QString& uid, const QString& name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider) :
 				DataMetric(uid, name, dataManager, spaceProvider)
 {
 	mUseSimpleVisualization = false;
@@ -57,7 +52,7 @@ AngleMetric::AngleMetric(const QString& uid, const QString& name, DataServicePtr
 	connect(mArguments.get(), SIGNAL(argumentsChanged()), this, SIGNAL(transformChanged()));
 }
 
-AngleMetricPtr AngleMetric::create(QString uid, QString name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider)
+AngleMetricPtr AngleMetric::create(QString uid, QString name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider)
 {
 	return AngleMetricPtr(new AngleMetric(uid, name, dataManager, spaceProvider));
 }

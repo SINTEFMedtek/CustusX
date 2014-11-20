@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxSpaceProviderImpl.h"
 
-#include "cxDataManager.h"
+#include "cxPatientModelService.h"
 #include "cxTrackingService.h"
 #include "cxData.h"
 #include "cxImage.h"
@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-SpaceProviderImpl::SpaceProviderImpl(TrackingServicePtr trackingService, DataServicePtr dataManager)
+SpaceProviderImpl::SpaceProviderImpl(TrackingServicePtr trackingService, PatientModelServicePtr dataManager)
 {
 	mTrackingService = trackingService;
 	mDataManager = dataManager;

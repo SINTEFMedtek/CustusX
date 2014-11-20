@@ -33,8 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "catch.hpp"
 #include <ctkPluginContext.h>
 #include "cxDilationFilter.h"
-#include "cxPatientService.h"
-#include "cxPatientData.h"
 #include "cxDataLocations.h"
 #include "cxSelectDataStringDataAdapter.h"
 #include "cxData.h"
@@ -54,9 +52,9 @@ TEST_CASE("DilationFilter: execute", "[modules][Algorithm][DilationFilter]")
 	filter->getOptions();
 
 	QString filename = cx::DataLocations::getTestDataPath()+ "/testing/DilationFilter/helix_seg.mhd";
-	cx::patientService()->getPatientData()->newPatient(cx::DataLocations::getTestDataPath()+ "/temp/DilationFilter/");
+	cx::patientService()->newPatient(cx::DataLocations::getTestDataPath()+ "/temp/DilationFilter/");
 	QString info;
-	cx::DataPtr data = cx::patientService()->getPatientData()->importData(filename, info);
+	cx::DataPtr data = cx::patientService()->importData(filename, info);
 	REQUIRE(data);
 
 	//set input

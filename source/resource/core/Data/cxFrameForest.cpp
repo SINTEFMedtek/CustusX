@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxFrameForest.h"
 
 #include "cxData.h"
-#include "cxDataManager.h"
 
 namespace cx
 {

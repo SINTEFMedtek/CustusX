@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define BRANCHLIST_H_
 
 #include "cxBranch.h"
-#include "cxDataManager.h"
 #include "cxMesh.h"
 #include "cxVector3D.h"
 #include <vtkPolyData.h>
@@ -46,13 +45,15 @@ typedef std::vector< Eigen::Matrix4d > M4Vector;
 
 class BranchList
 {
-	std::vector<Branch*> Branches;
+	std::vector<Branch*> mBranches;
 public:
 	BranchList();
 	virtual ~BranchList();
 	void addBranch(Branch* b);
+	void deleteBranch(Branch* b);
 	std::vector<Branch*> getBranches();
 	void findBranchesInCenterline(Eigen::MatrixXd positions);
+	void selectGenerations(int maxGeneration);
 	void calculateOrientations();
 	void smoothOrientations();
 

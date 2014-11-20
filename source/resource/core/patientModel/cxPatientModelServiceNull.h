@@ -51,40 +51,38 @@ class cxResource_EXPORT PatientModelServiceNull : public PatientModelService
 public:
 	PatientModelServiceNull();
 	virtual void insertData(DataPtr data);
-	virtual void updateRegistration_rMpr(const QDateTime& oldTime, const RegistrationTransform& newTransform);
+	virtual DataPtr createData(QString type, QString uid, QString name="");
 	virtual std::map<QString, DataPtr> getData() const;
-	virtual DataPtr getData(const QString& uid) const;
 
 	virtual LandmarksPtr getPatientLandmarks() const;
 	virtual std::map<QString, LandmarkProperty> getLandmarkProperties() const;
 	virtual void setLandmarkName(QString uid, QString name);
 	virtual void setLandmarkActive(QString uid, bool active);
 
-	virtual Transform3D get_rMpr() const;
-	virtual RegistrationHistoryPtr get_rMpr_History();
+	virtual RegistrationHistoryPtr get_rMpr_History() const;
 
 	virtual ImagePtr getActiveImage() const;
 	virtual void setActiveImage(ImagePtr activeImage);
 
-	virtual ImagePtr createDerivedImage(vtkImageDataPtr data, QString uid, QString name, ImagePtr parentImage, QString filePath);
-	virtual MeshPtr createMesh(vtkPolyDataPtr data, QString uidBase, QString nameBase, QString filePath);
-	virtual ImagePtr createImage(vtkImageDataPtr data, QString uidBase, QString nameBase, QString filePath);
+	virtual CLINICAL_APPLICATION getClinicalApplication() const;
+	virtual void setClinicalApplication(CLINICAL_APPLICATION application);
 
-	virtual void loadData(DataPtr data);
-	virtual void saveData(DataPtr data, const QString& basePath); ///< Save data to file
-	virtual void saveImage(ImagePtr image, const QString& basePath);
-	virtual void saveMesh(MeshPtr mesh, const QString& basePath);
 	virtual std::map<QString, cx::VideoSourcePtr> getStreams() const;
 
 	virtual QString getActivePatientFolder() const;
 	virtual bool isPatientValid() const;
 	virtual DataPtr importData(QString fileName, QString &infoText);
 	virtual void exportPatient(bool niftiFormat);
-	virtual void removePatientData(QString uid);
+	virtual void removeData(QString uid);
+	void newPatient(QString choosenDir);
+	void loadPatient(QString chosenDir);
+	void savePatient();
+	void clearPatient();
 
 	virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const;
 
 	virtual void setCenter(const Vector3D& center);
+	virtual Vector3D getCenter() const;
 
 	virtual QString addLandmark();
 

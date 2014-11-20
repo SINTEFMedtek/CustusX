@@ -29,7 +29,9 @@ if (BUILD_TESTING)
         cxtestCoreServices.cpp
         cxtestReporter.cpp
         cxtestImage.cpp
-        )
+		cxtestPatientModelServiceMock.cpp
+		cxtestPatientModelServiceMock.h
+		)
 	if (CX_USE_OPENCL_UTILITY)
 	   	set(RESOURCE_TEST_CATCH_SOURCE_FILES
 	   	    ${RESOURCE_TEST_CATCH_SOURCE_FILES}

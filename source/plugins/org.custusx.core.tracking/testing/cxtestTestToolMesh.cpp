@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxtestTestToolMesh.h"
 
 #include "cxDataLocations.h"
-//#include "cxDataManager.h"
 #include "cxDataReaderWriter.h"
 
 namespace cxtest {

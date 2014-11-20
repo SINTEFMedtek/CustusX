@@ -42,7 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 typedef boost::shared_ptr<class ViewFollower> ViewFollowerPtr;
-class DataManager;
 
 /**
  * Ensure the tool is inside a given viewport, by moving the global center.
@@ -55,14 +54,14 @@ class cxResourceVisualization_EXPORT ViewFollower : public QObject
 {
 	Q_OBJECT
 public:
-	static ViewFollowerPtr create(DataServicePtr dataManager);
+	static ViewFollowerPtr create(PatientModelServicePtr dataManager);
 	void setSliceProxy(SliceProxyPtr sliceProxy);
 	void setView(DoubleBoundingBox3D bb_s);
 
 private slots:
 	void ensureCenterWithinView();
 private:
-	explicit ViewFollower(DataServicePtr dataManager);
+	explicit ViewFollower(PatientModelServicePtr dataManager);
 	Vector3D findCenterShift_s();
 	DoubleBoundingBox3D findStaticBox();
 	Vector3D findShiftFromBoxToTool_s(DoubleBoundingBox3D BB_s, Vector3D pt_s);
@@ -71,7 +70,7 @@ private:
 
 	SliceProxyPtr mSliceProxy;
 	DoubleBoundingBox3D mBB_s;
-	DataServicePtr mDataManager;
+	PatientModelServicePtr mDataManager;
 private:
 };
 

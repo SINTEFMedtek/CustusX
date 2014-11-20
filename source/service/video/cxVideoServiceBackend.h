@@ -42,8 +42,6 @@ class ctkPluginContext;
 
 namespace cx
 {
-class DataManager;
-class ToolManager;
 typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
 
 typedef boost::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
@@ -57,19 +55,19 @@ typedef boost::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
 class cxVideoServiceOld_EXPORT VideoServiceBackend
 {
 public:
-	static VideoServiceBackendPtr create(DataServicePtr dataManager,
+	static VideoServiceBackendPtr create(PatientModelServicePtr dataManager,
 								TrackingServicePtr trackingService,
 								SpaceProviderPtr spaceProvider);
-	VideoServiceBackend(DataServicePtr dataManager,
+	VideoServiceBackend(PatientModelServicePtr dataManager,
 								TrackingServicePtr trackingService,
 								SpaceProviderPtr spaceProvider);
 
-	DataServicePtr getDataManager();
+	PatientModelServicePtr getDataManager();
 	TrackingServicePtr getToolManager();
 	SpaceProviderPtr getSpaceProvider();
 
 private:
-	DataServicePtr mDataManager;
+	PatientModelServicePtr mDataManager;
 	TrackingServicePtr mTrackingService;
 	SpaceProviderPtr mSpaceProvider;
 };

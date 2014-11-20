@@ -54,8 +54,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVideoConnectionManager.h"
 #include "cxImageServer.h"
 #include "cxVideoServiceOld.h"
-#include "cxPatientService.h"
-#include "cxPatientData.h"
 #include "cxTrackingService.h"
 #include "cxViewManager.h"
 #include "cxFileInputWidget.h"
@@ -553,11 +551,12 @@ void VideoConnectionWidget::saveAndImportSnapshot(vtkImageDataPtr input, QString
 {
 	vtkImageDataPtr copiedImage = vtkImageDataPtr::New();
 	copiedImage->DeepCopy(input);
-	ImagePtr output = mPatientModelService->createImage(copiedImage, filename, filename);
+
+	ImagePtr output = mPatientModelService->createSpecificData<Image>(filename);
+	output->setVtkImageData(input);
 	output->get_rMd_History()->setRegistration(rMd);
-	QString folder = patientService()->getPatientData()->getActivePatientFolder();
-	mPatientModelService->loadData(output);
-	mPatientModelService->saveImage(output, folder);
+	mPatientModelService->insertData(output);
+
 	viewManager()->autoShowData(output);
 	report(QString("Saved snapshot %1 from active video source").arg(output->getName()));
 }

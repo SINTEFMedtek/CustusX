@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkLookupTable.h"
 #include "cxtestUtilities.h"
-#include "cxDataManager.h"
 #include "cxImage.h"
 #include "cxImageTF3D.h"
 #include "cxVolumetricRep.h"
@@ -45,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxtestRenderTester.h"
 #include "cxViewsWindow.h"
 #include <QApplication>
+#include "cxPatientModelService.h"
 
 #include "catch.hpp"
 
@@ -141,7 +141,7 @@ cx::SliceProxyPtr ViewsFixture::createSliceProxy(cx::PLANE_TYPE plane)
 {
 	cx::ToolPtr tool = mServices->trackingService()->getActiveTool();
 
-	cx::SliceProxyPtr proxy = cx::SliceProxy::create(mServices->dataService());
+	cx::SliceProxyPtr proxy = cx::SliceProxy::create(mServices->patientModelService());
 	proxy->setTool(tool);
 	proxy->initializeFromPlane(plane, false, cx::Vector3D(0,0,-1), false, 1, 0);
 	return proxy;
@@ -150,10 +150,12 @@ cx::SliceProxyPtr ViewsFixture::createSliceProxy(cx::PLANE_TYPE plane)
 cx::ImagePtr ViewsFixture::loadImage(const QString& imageFilename)
 {
 	QString filename = cxtest::Utilities::getDataRoot(imageFilename);
-	cx::ImagePtr image = mServices->dataService()->loadImage(filename, filename);
+	QString dummy;
+	cx::DataPtr data = mServices->patientModelService()->importData(filename, dummy);
+	cx::ImagePtr image = boost::dynamic_pointer_cast<cx::Image>(data);
 	cx::Vector3D center = image->boundingBox().center();
 	center = image->get_rMd().coord(center);
-	mServices->dataService()->setCenter(center);
+	mServices->patientModelService()->setCenter(center);
 
 	if (!image)
 		return cx::ImagePtr();
@@ -167,7 +169,7 @@ cx::ImagePtr ViewsFixture::loadImage(const QString& imageFilename)
 
 void ViewsFixture::fixToolToCenter()
 {
-	cx::Vector3D c = mServices->dataService()->getCenter();
+	cx::Vector3D c = mServices->patientModelService()->getCenter();
 	cx::Transform3D prMt = cx::createTransformTranslate(c);
 	dummyTool()->setToolPositionMovement(std::vector<cx::Transform3D>(1, prMt));
 	dummyTool()->set_prMt(prMt);

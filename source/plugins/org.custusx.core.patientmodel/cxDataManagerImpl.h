@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDATAMANAGERIMPL_H_
 #define CXDATAMANAGERIMPL_H_
 
-#include "cxResourceExport.h"
+#include "org_custusx_core_patientmodel_Export.h"
 #include "cxPrecompiledHeader.h"
 
 #include <map>
@@ -53,6 +53,7 @@ class QDomElement;
 namespace cx
 {
 
+typedef boost::shared_ptr<class DataManager> DataServicePtr;
 typedef boost::shared_ptr<class DataManagerImpl> DataManagerImplPtr;
 
 /**\brief Default implementation of DataManager.
@@ -63,7 +64,7 @@ typedef boost::shared_ptr<class DataManagerImpl> DataManagerImplPtr;
  * \date Jan 6, 2009
  * \author christiana
  */
-class cxResource_EXPORT DataManagerImpl: public DataManager
+class org_custusx_core_patientmodel_EXPORT DataManagerImpl: public DataManager
 {
 Q_OBJECT
 public:
@@ -124,13 +125,15 @@ public:
 
 	virtual Transform3D get_rMpr() const; ///< get the patient registration transform
 	virtual void set_rMpr(const Transform3D& val); ///<  set the transform from patient to reference space
-	virtual RegistrationHistoryPtr get_rMpr_History();
+	virtual RegistrationHistoryPtr get_rMpr_History() const;
 
 	virtual LandmarksPtr getPatientLandmarks();
 	virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const;
 
 	virtual bool getDebugMode() const;
 	virtual void setDebugMode(bool on);
+
+	virtual void generateUidAndName(QString* _uid, QString* _name);
 
 protected:
 	DataManagerImpl();
@@ -150,7 +153,6 @@ protected:
 	DataPtr loadData(QDomElement node, QString rootPath);
 //	DataPtr readData(const QString& uid, const QString& path, const QString& type);
 	int findUniqueUidNumber(QString uidBase) const;
-	void generateUidAndName(QString* _uid, QString* _name);
 
 	LandmarkPropertyMap mLandmarkProperties; ///< uid and name
 	RegistrationHistoryPtr m_rMpr_History; ///< transform from the patient reference to the reference, along with historical data.

@@ -49,7 +49,6 @@ typedef vtkSmartPointer<class vtkCallbackCommand> vtkCallbackCommandPtr;
 
 namespace cx
 {
-class DataManager;
 typedef boost::shared_ptr<class PickerRep> PickerRepPtr;
 typedef boost::shared_ptr<class Image> ImagePtr;
 typedef boost::shared_ptr<class Tool> ToolPtr;
@@ -73,7 +72,7 @@ class cxResourceVisualization_EXPORT PickerRep: public RepImpl
 Q_OBJECT
 
 public:
-	static PickerRepPtr New(DataServicePtr dataManager, const QString& uid=""); ///< for creating new instances
+	static PickerRepPtr New(PatientModelServicePtr dataManager, const QString& uid=""); ///< for creating new instances
 	virtual ~PickerRep(); ///<empty
 
 	virtual QString getType() const; ///< returns a string identifying this class type
@@ -95,7 +94,7 @@ public slots:
 	void pickLandmarkSlot(vtkObject* renderWindowInteractor); ///< When you use the renderwindowinteractor
 
 protected:
-	PickerRep(DataServicePtr dataManager); ///< use New instead
+	PickerRep(PatientModelServicePtr dataManager); ///< use New instead
 	virtual void addRepActorsToViewRenderer(ViewPtr view); ///< connects to the renderwindowinteractor
 	virtual void removeRepActorsFromViewRenderer(ViewPtr view); ///< disconnects from the renderwindowinteractor
 	void connectInteractor();
@@ -130,7 +129,7 @@ protected:
 	GraphicalPoint3DPtr mGraphicalPoint;
 	ViewportListenerPtr mViewportListener;
 	vtkCallbackCommandPtr mCallbackCommand;
-	DataServicePtr mDataManager;
+	PatientModelServicePtr mDataManager;
 };
 
 typedef boost::shared_ptr<PickerRep> PickerRepPtr;

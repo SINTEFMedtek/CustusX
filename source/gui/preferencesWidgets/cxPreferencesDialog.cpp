@@ -44,7 +44,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewManager.h"
 #include "cxDataLocations.h"
 #include "cxTrackingService.h"
-#include "cxDataLocations.h"
 #include "cxStateService.h"
 #include "cxFilePreviewWidget.h"
 #include "cxToolImagePreviewWidget.h"
@@ -55,10 +54,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxHelperWidgets.h"
 #include "cxApplicationStateMachine.h"
 #include "cxMultiVolume3DRepProducer.h"
+#include "cxPatientModelService.h"
 #include "cxDummyTool.h"
-
-//TODO: remove
-#include "cxDataManager.h"
 
 namespace cx
 {
@@ -604,13 +601,13 @@ void DebugTab::init()
 
 void DebugTab::runDebugToolSlot()
 {
-	if (!dataManager()->getImages().size())
+	if (!patientService()->getData().size())
 		return;
 
-	cx::ImagePtr image = dataManager()->getImages().begin()->second;
+	cx::ImagePtr image = patientService()->getDataOfType<Image>().begin()->second;
 	cx::DoubleBoundingBox3D bb_r = transform(image->get_rMd(), image->boundingBox());
 
-	dataManager()->setCenter(bb_r.center());
+	patientService()->setCenter(bb_r.center());
 
 	cx::DummyToolPtr dummyTool(new cx::DummyTool());
 	dummyTool->setType(Tool::TOOL_POINTER);

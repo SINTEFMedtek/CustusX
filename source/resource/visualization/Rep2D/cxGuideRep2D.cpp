@@ -44,17 +44,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxSliceProxy.h"
 #include "cxView.h"
-#include "cxDataManager.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
 
-GuideRep2DPtr GuideRep2D::New(DataServicePtr dataManager, const QString& uid)
+GuideRep2DPtr GuideRep2D::New(PatientModelServicePtr dataManager, const QString& uid)
 {
 	return wrap_new(new GuideRep2D(dataManager), uid);
 }
 
-GuideRep2D::GuideRep2D(DataServicePtr dataManager) :
+GuideRep2D::GuideRep2D(PatientModelServicePtr dataManager) :
 	mDataManager(dataManager),
 	mOutlineWidth(1),
 	mRequestedAccuracy(1)

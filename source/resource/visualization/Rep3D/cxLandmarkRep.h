@@ -51,7 +51,6 @@ class View;
 
 namespace cx
 {
-class DataManager;
 class Reporter;
 typedef boost::shared_ptr<class LandmarkRep> LandmarkRepPtr;
 
@@ -77,14 +76,14 @@ typedef boost::shared_ptr<class PatientLandmarksSource> PatientLandmarksSourcePt
 class cxResourceVisualization_EXPORT PatientLandmarksSource: public LandmarksSource
 {
 public:
-	static PatientLandmarksSourcePtr New(DataServicePtr dataManager) { return PatientLandmarksSourcePtr(new PatientLandmarksSource(dataManager)); }
-	PatientLandmarksSource(DataServicePtr dataManager);
+	static PatientLandmarksSourcePtr New(PatientModelServicePtr dataManager) { return PatientLandmarksSourcePtr(new PatientLandmarksSource(dataManager)); }
+	PatientLandmarksSource(PatientModelServicePtr dataManager);
 	virtual ~PatientLandmarksSource() {}
 	virtual LandmarkMap getLandmarks() const;
 	virtual Transform3D get_rMl() const;
 	virtual Vector3D getTextPos(Vector3D p_l) const;
 private:
-	DataServicePtr mDataManager;
+	PatientModelServicePtr mDataManager;
 };
 
 typedef boost::shared_ptr<class ImageLandmarksSource> ImageLandmarksSourcePtr;
@@ -121,7 +120,7 @@ class cxResourceVisualization_EXPORT LandmarkRep: public RepImpl
 {
 Q_OBJECT
 public:
-	static LandmarkRepPtr New(DataServicePtr dataManager, const QString& uid = "");
+	static LandmarkRepPtr New(PatientModelServicePtr dataManager, const QString& uid = "");
 	virtual ~LandmarkRep();
 
 	void setColor(QColor color); ///< sets the reps color
@@ -135,7 +134,7 @@ public:
 	void setSecondarySource(LandmarksSourcePtr secondary);
 
 protected:
-	LandmarkRep(DataServicePtr dataManager); ///< sets default text scaling to 20
+	LandmarkRep(PatientModelServicePtr dataManager); ///< sets default text scaling to 20
 	virtual void addRepActorsToViewRenderer(ViewPtr view);
 	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
 	void clearAll();
@@ -168,7 +167,7 @@ protected:
 	LandmarksSourcePtr mPrimary;
 	LandmarksSourcePtr mSecondary;
 
-	DataServicePtr mDataManager;
+	PatientModelServicePtr mDataManager;
 
 private:
 	LandmarkRep(); ///< not implemented

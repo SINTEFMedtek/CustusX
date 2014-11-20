@@ -420,10 +420,7 @@ void ReconstructPreprocessor::findExtentAndOutputTransform()
 	double inputSpacing = std::min(mFileData.mUsRaw->getSpacing()[0], mFileData.mUsRaw->getSpacing()[1]);
 	mOutputVolumeParams = OutputVolumeParams(extent, inputSpacing, mInput.mMaxOutputVolumeSize);
 
-//	if (dataManager())
-		mOutputVolumeParams.set_rMd((mPatientModelService->get_rMpr()) * prMd);
-//	else
-//		mOutputVolumeParams.set_rMd(prMd);
+	mOutputVolumeParams.set_rMd((mPatientModelService->get_rMpr()) * prMd);
 }
 
 /**Use the mOriginalFileData structure to rebuild all internal data.

@@ -55,7 +55,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //---------------------------------------------------------
 namespace cx
 {
-class DataManager;
 typedef boost::shared_ptr<class Slices3DRep> Slices3DRepPtr;
 typedef boost::shared_ptr<class Texture3DSlicerProxy> Texture3DSlicerProxyPtr;
 
@@ -84,7 +83,7 @@ public:
 
 	void setShaderPath(QString path);
 	void setImages(std::vector<ImagePtr> images);
-	void addPlane(PLANE_TYPE plane, DataServicePtr dataManager);
+	void addPlane(PLANE_TYPE plane, PatientModelServicePtr dataManager);
 	void setTool(ToolPtr tool);
 
 protected:

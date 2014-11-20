@@ -34,33 +34,34 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImageAlgorithms.h"
 
 #include <vtkImageData.h>
-#include "cxDataManager.h"
 #include "cxImage.h"
 #include "cxImageTF3D.h"
 #include "cxImageLUT2D.h"
 #include "cxDataLocations.h"
 #include "cxtestDummyDataManager.h"
+#include "cxPatientModelService.h"
 
 using namespace cx;
 
 TEST_CASE("ImageAlgorithms: resample() works", "[unit][resource][core]")
 {
-	cx::DataServicePtr dataService = cxtest::createDummyDataService();
+	cxtest::TestServicesType services = cxtest::createDummyCoreServices();
+	cx::PatientModelServicePtr pasm = services.mPatientModelService;
 
 	QString fname0 = cx::DataLocations::getTestDataPath() + "/testing/ResampleTest.cx3/Images/mra.mhd";
 	QString fname1 = cx::DataLocations::getTestDataPath() + "/testing/ResampleTest.cx3/Images/US_01_20110222T110117_1.mhd";
 
-	dataService->loadData(fname0, fname0);
-	dataService->loadData(fname1, fname1);
-	cx::ImagePtr image = dataService->getImage(fname0);
-	cx::ImagePtr referenceImage = dataService->getImage(fname1);
+	pasm->importData(fname0, fname0);
+	pasm->importData(fname1, fname1);
+	cx::ImagePtr image = pasm->getData<cx::Image>(fname0);
+	cx::ImagePtr referenceImage = pasm->getData<cx::Image>(fname1);
 	//	std::cout << "referenceImage base: " << referenceImage->getBaseVtkImageData() << std::endl;
 	REQUIRE(image);
 	REQUIRE(referenceImage);
 
 	cx::Transform3D refMi = referenceImage->get_rMd().inv() * image->get_rMd();
 
-	cx::ImagePtr oriented = resampleImage(dataService, image, refMi);
+	cx::ImagePtr oriented = resampleImage(pasm, image, refMi);
 	REQUIRE(oriented);
 	int inMin = image->getBaseVtkImageData()->GetScalarRange()[0];
 	int inMax = image->getBaseVtkImageData()->GetScalarRange()[1];
@@ -91,7 +92,7 @@ TEST_CASE("ImageAlgorithms: resample() works", "[unit][resource][core]")
 
 	oriented->setCroppingBox(bb_crop);
 
-	cx::ImagePtr cropped = cropImage(dataService, oriented);
+	cx::ImagePtr cropped = cropImage(pasm, oriented);
 	REQUIRE(cropped);
 	int cropMin = cropped->getBaseVtkImageData()->GetScalarRange()[0];
 	int cropMax = cropped->getBaseVtkImageData()->GetScalarRange()[1];
@@ -105,7 +106,7 @@ TEST_CASE("ImageAlgorithms: resample() works", "[unit][resource][core]")
 	QString uid = image->getUid() + "_resample%1";
 	QString name = image->getName() + " resample%1";
 
-	cx::ImagePtr resampled = cx::resampleImage(dataService, cropped, cx::Vector3D(referenceImage->getBaseVtkImageData()->GetSpacing()), uid, name);
+	cx::ImagePtr resampled = cx::resampleImage(pasm, cropped, cx::Vector3D(referenceImage->getBaseVtkImageData()->GetSpacing()), uid, name);
 	REQUIRE(resampled);
 	outMin = resampled->getBaseVtkImageData()->GetScalarRange()[0];
 	outMax = resampled->getBaseVtkImageData()->GetScalarRange()[1];

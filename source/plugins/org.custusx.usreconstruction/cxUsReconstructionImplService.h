@@ -111,8 +111,8 @@ public:
 	virtual OutputVolumeParams getOutputVolumeParams() const; ///< Return params controlling the output data. These are data-dependent.
 
 	virtual void setOutputVolumeParams(const OutputVolumeParams& par); ///< Control the output volume
-	virtual void setOutputRelativePath(QString path); ///< Set location of output relative to base
-	virtual void setOutputBasePath(QString path); ///< Set base location of output
+//	virtual void setOutputRelativePath(QString path); ///< Set location of output relative to base
+//	virtual void setOutputBasePath(QString path); ///< Set base location of output
 
 	/** Execute the reconstruction in another thread.
 	  *
@@ -131,22 +131,15 @@ public:
 
 	virtual ReconstructCore::InputParams createCoreParameters();
 
-//signals:
-//	void paramsChanged();
-//	void algorithmChanged();
-//	void inputDataSelected(QString mhdFileName);
-//	void reconstructAboutToStart();
-//	void reconstructStarted();
-//	void reconstructFinished();
-
-//	void newInputDataAvailable(QString mhdFileName);
+public slots:
+	virtual void newDataOnDisk(QString mhdFilename);
 
 private slots:
 	void setSettings();
-//	void transferFunctionChangedSlot();
 	void reconstructFinishedSlot();
 
 	void patientChangedSlot();
+
 private:
 	void clearAll();
 
@@ -166,8 +159,8 @@ private:
 
 	OutputVolumeParams mOutputVolumeParams;
 	XmlOptionFile mSettings;
-	QString mOutputRelativePath;///< Relative path to the output image
-	QString mOutputBasePath;///< Global path where the relative path starts, for the output image
+//	QString mOutputRelativePath;///< Relative path to the output image
+//	QString mOutputBasePath;///< Global path where the relative path starts, for the output image
 	QString mShaderPath; ///< name of shader folder
 
 	boost::shared_ptr<ServiceTrackerListener<ReconstructionMethodService> > mServiceListener;

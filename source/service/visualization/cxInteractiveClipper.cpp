@@ -35,7 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVolumetricRep.h"
 #include "cxReporter.h"
 #include "cxRepManager.h"
-#include "cxDataManager.h"
 #include "cxSliceComputer.h"
 
 #include "cxSlicePlaneClipper.h"
@@ -57,7 +56,7 @@ InteractiveClipper::InteractiveClipper(VisualizationServiceBackendPtr backend) :
 
 	// create a slice planes proxy containing all slice definitions,
 	// for use with the clipper
-	DataServicePtr dm = mBackend->getDataManager();
+	PatientModelServicePtr dm = mBackend->getPatientService();
 	mSlicePlanesProxy = SlicePlanesProxyPtr(new SlicePlanesProxy());
 	mSlicePlanesProxy->addSimpleSlicePlane(ptSAGITTAL, dm);
 	mSlicePlanesProxy->addSimpleSlicePlane(ptCORONAL, dm);

@@ -47,7 +47,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-class DataManager;
 
 /**
 * \file
@@ -60,11 +59,11 @@ class DataManager;
 * @{
 */
 
-cxResource_EXPORT ImagePtr resampleImage(DataServicePtr dataManager, ImagePtr image, const Vector3D spacing, QString uid="", QString name="");
-cxResource_EXPORT ImagePtr resampleImage(DataServicePtr dataManager, ImagePtr image, Transform3D refMi);
+cxResource_EXPORT ImagePtr resampleImage(PatientModelServicePtr dataManager, ImagePtr image, const Vector3D spacing, QString uid="", QString name="");
+cxResource_EXPORT ImagePtr resampleImage(PatientModelServicePtr dataManager, ImagePtr image, Transform3D refMi);
 cxResource_EXPORT vtkImageDataPtr cropImage(vtkImageDataPtr input, IntBoundingBox3D cropbox);
-cxResource_EXPORT ImagePtr cropImage(DataServicePtr dataManager, ImagePtr image);
-cxResource_EXPORT ImagePtr duplicateImage(DataServicePtr dataManager, ImagePtr image);
+cxResource_EXPORT ImagePtr cropImage(PatientModelServicePtr dataManager, ImagePtr image);
+cxResource_EXPORT ImagePtr duplicateImage(PatientModelServicePtr dataManager, ImagePtr image);
 
 /**
  */

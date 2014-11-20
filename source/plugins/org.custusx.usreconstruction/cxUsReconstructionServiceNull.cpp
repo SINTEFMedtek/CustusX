@@ -41,7 +41,7 @@ UsReconstructionServiceNull::UsReconstructionServiceNull()
 
 void UsReconstructionServiceNull::printWarning() const
 {
-	reportWarning("Trying to use UsReconstructionServiceNull. Is UsReconstructionService (org.custusx.usreconstruction) disabled?");
+//	reportWarning("Trying to use UsReconstructionServiceNull. Is UsReconstructionService (org.custusx.usreconstruction) disabled?");
 }
 
 void UsReconstructionServiceNull::selectData(QString filename, QString calFilesPath)
@@ -137,6 +137,11 @@ ReconstructCore::InputParams UsReconstructionServiceNull::createCoreParameters()
 bool UsReconstructionServiceNull::isNull()
 {
 	return true;
+}
+
+void UsReconstructionServiceNull::newDataOnDisk(QString mhdFilename)
+{
+	printWarning();
 }
 
 } //cx

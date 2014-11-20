@@ -40,7 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxElastixExecuter.h"
 #include "cxSettings.h"
 #include "cxDataReaderWriter.h"
-#include "cxDataManager.h"
 #include "cxRegistrationService.h"
 #include "cxRegistrationTransform.h"
 #include "cxPatientModelService.h"
@@ -86,13 +85,6 @@ void ElastixManager::execute()
 
 void ElastixManager::preprocessExecuter()
 {
-	// Not necessary - executer makes sure that file transform is read and deviations
-	// accounted for in t0.
-	//
-	// We MUST save the patient before registering.
-	// elastiX uses the Offset+TransformMatrix values, so they must be up to date.
-	//patientService()->getPatientData()->savePatient();
-
 	QStringList parameterFiles = mParameters->getActiveParameterFiles();
 	QString timestamp = QDateTime::currentDateTime().toString(timestampSecondsFormat());
 	QDir outDir(mServices.patientModelService->getActivePatientFolder()+"/elastix/"+timestamp);
@@ -165,21 +157,22 @@ void ElastixManager::addNonlinearData()
 	ImagePtr movingImage = boost::dynamic_pointer_cast<Image>(mServices.registrationService->getMovingData());
 	ImagePtr raw = boost::dynamic_pointer_cast<Image>(MetaImageReader().load(nonlinearVolumeFilename, nonlinearVolumeFilename));
 
-	QString uid = movingImage->getUid() + "_nl%1";
-	QString name = movingImage->getName()+" nl%1";
-	ImagePtr nlVolume = mServices.patientModelService->createDerivedImage(raw->getBaseVtkImageData(), uid, name, movingImage);
-
-	if (!nlVolume)
+	if (!raw)
 	{
 		report(QString("Failed to import nonlinear volume %1").arg(nonlinearVolumeFilename));
 		return;
 	}
 
+	QString uid = movingImage->getUid() + "_nl%1";
+	QString name = movingImage->getName()+" nl%1";
+	ImagePtr nlVolume = mServices.patientModelService->createSpecificData<Image>(uid, name);
+	nlVolume->setVtkImageData(raw->getBaseVtkImageData());
+	nlVolume->intitializeFromParentImage(movingImage);
+
 	// volume is resampled into the space of the fixed data:
 	nlVolume->get_rMd_History()->setRegistration(mServices.registrationService->getFixedData()->get_rMd());
 
-	mServices.patientModelService->loadData(nlVolume);
-	mServices.patientModelService->saveImage(nlVolume, mServices.patientModelService->getActivePatientFolder());
+	mServices.patientModelService->insertData(nlVolume);
 
 	report(QString("Added volume %1, created by a nonlinear transform").arg(nlVolume->getName()));
 }
