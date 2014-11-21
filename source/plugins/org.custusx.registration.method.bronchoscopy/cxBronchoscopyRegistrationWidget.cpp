@@ -55,8 +55,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxStringDataAdapterXml.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxTrackingService.h"
-
+#include "cxDoubleDataAdapterXml.h"
 #include "cxLegacySingletons.h"
+#include "cxDataLocations.h"
+#include "cxDataAdapterHelper.h"
+#include "cxBoolDataAdapterXml.h"
+#include "cxCheckBoxWidget.h"
 
 
 namespace cx
@@ -65,6 +69,8 @@ BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegServices servi
 	RegistrationBaseWidget(services, parent, "BronchoscopyRegistrationWidget",
 						   "Bronchoscopy Registration"), mVerticalLayout(new QVBoxLayout(this))
 {
+	mOptions = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("bronchoscopyregistrationwidget");
+
 	mSelectMeshWidget = SelectMeshStringDataAdapter::New(services.patientModelService);
 	mSelectMeshWidget->setValueName("Centerline: ");
 
@@ -95,7 +101,12 @@ BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegServices servi
 	mVerticalLayout->addWidget(new DataSelectWidget(services.visualizationService, services.patientModelService, this, mSelectMeshWidget));
 //    mVerticalLayout->addWidget(mTrackedCenterLine);
 
+	this->selectSubsetOfBranches(mOptions.getElement());
+	this->createMaxNumberOfGenerations(mOptions.getElement());
+
 	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mSessionSelector));
+	mVerticalLayout->addWidget(new CheckBoxWidget(this, mUseSubsetOfGenerations));
+	mVerticalLayout->addWidget(createDataWidget(services.visualizationService, services.patientModelService, this, mMaxNumberOfGenerations));
     mVerticalLayout->addWidget(mRecordSessionWidget.get());
 	mVerticalLayout->addWidget(mRegisterButton);
 
@@ -178,13 +189,17 @@ void BronchoscopyRegistrationWidget::registerSlot()
 //    TimedTransformMap trackerRecordedData = mTrackedCenterLine->getRecording();
 
     if(trackerRecordedData_prMt.size() == 0)
-    {
+	{
         reportError("No positions");
         return;
     }
 
 	BronchoscopyRegistration reg;
-    Transform3D new_rMpr = Transform3D(reg.runBronchoscopyRegistration(centerline,trackerRecordedData_prMt,old_rMpr,rMd));
+	Transform3D new_rMpr;
+	if (mUseSubsetOfGenerations)
+		new_rMpr = Transform3D(reg.runBronchoscopyRegistration(centerline,trackerRecordedData_prMt,old_rMpr,rMd,mMaxNumberOfGenerations->getValue()));
+	else
+		new_rMpr = Transform3D(reg.runBronchoscopyRegistration(centerline,trackerRecordedData_prMt,old_rMpr,rMd));
 
     new_rMpr = new_rMpr*old_rMpr;//output
 	mServices.registrationService->applyPatientRegistration(new_rMpr, "Bronchoscopy centerline to tracking data");
@@ -284,6 +299,21 @@ void BronchoscopyRegistrationWidget::obscuredSlot(bool obscured)
         return;
     //std::cout << "Slot is cleared" << std::endl;
     activeRep3D->getTracer()->clear();
+}
+
+void BronchoscopyRegistrationWidget::createMaxNumberOfGenerations(QDomElement root)
+{
+	mMaxNumberOfGenerations = DoubleDataAdapterXml::initialize("Max number of generations in centerline", "",
+	"Set max number of generations centerline", 4, DoubleRange(0, 10, 1), 0,
+					root);
+	mMaxNumberOfGenerations->setGuiRepresentation(DoubleDataAdapter::grSLIDER);
+}
+
+void BronchoscopyRegistrationWidget::selectSubsetOfBranches(QDomElement root)
+{
+	mUseSubsetOfGenerations = BoolDataAdapterXml::initialize("Select branch generations to be used in registration", "",
+																			"Select branch generations to be used in registration", false,
+																				root);
 }
 
 } //namespace cx

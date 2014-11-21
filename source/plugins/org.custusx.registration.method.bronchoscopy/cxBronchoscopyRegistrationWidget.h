@@ -34,8 +34,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXBRONCHOSCOPYREGISTRATIONWIDGET_H
 
 #include <QPushButton>
+#include <QDomElement>
 #include "cxRegistrationBaseWidget.h"
 #include "cxForwardDeclarations.h"
+#include "cxXmlOptionItem.h"
+
 
 namespace cx
 {
@@ -76,6 +79,9 @@ private slots:
 private:
 	QVBoxLayout* mVerticalLayout;
 	QLabel* mLabel;
+	BoolDataAdapterXmlPtr mUseSubsetOfGenerations;
+	DoubleDataAdapterXmlPtr mMaxNumberOfGenerations;
+	XmlOptionFile mOptions;
 
 
 	AcquisitionPtr mAcquisition;
@@ -90,6 +96,9 @@ private:
 
 	void initSessionSelector(AcquisitionDataPtr acquisitionData);
 	QStringList getSessionList(AcquisitionDataPtr acquisitionData);
+
+	void createMaxNumberOfGenerations(QDomElement root);
+	void selectSubsetOfBranches(QDomElement root);
 };
 
 } //namespace cx
