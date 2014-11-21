@@ -36,10 +36,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxBoolDataAdapterXml.h"
 #include "cxIGTLinkClientStreamer.h"
 #include "cxMHDImageStreamer.h"
-#include "cxOpenCVStreamerService.h"
+#include "cxLocalServerStreamerServer.h"
+#include "cxTypeConversions.h"
 
 namespace cx
 {
+
+
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
 
 QString ImageFileStreamerService::getName()
 {
@@ -49,64 +55,34 @@ QString ImageFileStreamerService::getName()
 std::vector<DataAdapterPtr> ImageFileStreamerService::getSettings(QDomElement root)
 {
 	std::vector<DataAdapterPtr> retval;
+
 	std::vector<DataAdapterPtr> opencvArgs = ImageStreamerDummyArguments().getSettings(root);
 	std::copy(opencvArgs.begin(), opencvArgs.end(), back_inserter(retval));
-	retval.push_back(this->getRunLocalServerOption(root));
-	retval.push_back(this->getLocalServerNameOption(root));
-	return retval;
-}
 
-BoolDataAdapterPtr ImageFileStreamerService::getRunLocalServerOption(QDomElement root)
-{
-	BoolDataAdapterXmlPtr retval;
-	bool defaultValue = false;
-	retval = BoolDataAdapterXml::initialize("runlocalserver", "Run Local Server",
-											"Run streamer in a separate process",
-											defaultValue, root);
-	retval->setAdvanced(false);
-	retval->setGroup("Connection");
-	return retval;
-}
-StringDataAdapterPtr ImageFileStreamerService::getLocalServerNameOption(QDomElement root)
-{
-	StringDataAdapterXmlPtr retval;
-	QString defaultValue = "OpenIGTLinkServer";
-	retval = StringDataAdapterXml::initialize("localservername", "Server Name",
-											  "Name of server executable, used only if Run Local Server is set.",
-											  defaultValue, root);
-	retval->setAdvanced(false);
-	retval->setGroup("Connection");
+	std::vector<DataAdapterPtr> localsvrArgs = LocalServerStreamerArguments().getSettings(root);
+	std::copy(localsvrArgs.begin(), localsvrArgs.end(), back_inserter(retval));
+
 	return retval;
 }
 
 StreamerPtr ImageFileStreamerService::createStreamer(QDomElement root)
 {
-	bool useLocalServer = this->getRunLocalServerOption(root)->getValue();
 	StringMap args = ImageStreamerDummyArguments().convertToCommandLineArguments(root);
+	StreamerPtr localServerStreamer = LocalServerStreamer::createStreamerIfEnabled(root, args);
 
-	if (useLocalServer)
+	if (localServerStreamer)
 	{
-		QStringList cmdlineArguments;
-		for (StringMap::iterator i=args.begin(); i!=args.end(); ++i)
-			cmdlineArguments << i->first << i->second;
-
-		QString localServer = this->getLocalServerNameOption(root)->getValue();
-		boost::shared_ptr<LocalServerStreamer> streamer;
-		streamer.reset(new LocalServerStreamer(localServer, cmdlineArguments.join(" ")));
-
-		return streamer;
+		return localServerStreamer;
 	}
 	else
 	{
 		boost::shared_ptr<DummyImageStreamer> streamer(new DummyImageStreamer());
-		streamer->initialize(args["filename"], args.count("secondary"));
+
+		QString filename = ImageStreamerDummyArguments().getFilenameOption(root)->getValue();
+		bool secondary = ImageStreamerDummyArguments().getSecondaryOption(root)->getValue();
+		streamer->initialize(filename, secondary);
 		return streamer;
 	}
-}
-
-ReceiverPtr ImageFileStreamerService::createReceiver(QDomElement root)
-{
-	return ReceiverPtr();
 }
 
 } // namespace cx

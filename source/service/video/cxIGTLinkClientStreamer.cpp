@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReporter.h"
 #include "cxIGTLinkConversion.h"
 #include "cxCyclicActionLogger.h"
+#include "cxUtilHelpers.h"
 
 namespace cx
 {
@@ -50,12 +51,8 @@ namespace cx
 IGTLinkClientStreamer::IGTLinkClientStreamer() :
 	mHeadingReceived(false),
 	mAddress(""),
-	mPort(0),
-	mSocket(NULL)
+	mPort(0)
 {
-//	this->setSendInterval(200);
-
-
 }
 
 IGTLinkClientStreamer::~IGTLinkClientStreamer()
@@ -67,7 +64,6 @@ void IGTLinkClientStreamer::setAddress(QString address, int port)
 {
 	mAddress = address;
 	mPort = port;
-	std::cout << "IGTLinkClientStreamer::setAddress " << std::endl;
 }
 
 
@@ -80,24 +76,17 @@ bool IGTLinkClientStreamer::startStreaming(SenderPtr sender)
 //	std::cout << "IGTLinkClientStreamer::startStreaming " << std::endl;
 
 	// Establish Connection
-	mSocket = new QTcpSocket();
-	connect(mSocket, SIGNAL(readyRead()), this, SLOT(readyReadSlot()), Qt::DirectConnection);
-	connect(mSocket, SIGNAL(hostFound()), this, SLOT(hostFoundSlot()), Qt::DirectConnection);
-	connect(mSocket, SIGNAL(connected()), this, SLOT(connectedSlot()), Qt::DirectConnection);
-	connect(mSocket, SIGNAL(disconnected()), this, SLOT(disconnectedSlot()), Qt::DirectConnection);
-	connect(mSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(errorSlot(QAbstractSocket::SocketError)),
+	mSocket.reset(new QTcpSocket());
+	connect(mSocket.get(), SIGNAL(readyRead()), this, SLOT(readyReadSlot()), Qt::DirectConnection);
+	connect(mSocket.get(), SIGNAL(hostFound()), this, SLOT(hostFoundSlot()), Qt::DirectConnection);
+	connect(mSocket.get(), SIGNAL(connected()), this, SLOT(connectedSlot()), Qt::DirectConnection);
+	connect(mSocket.get(), SIGNAL(disconnected()), this, SLOT(disconnectedSlot()), Qt::DirectConnection);
+	connect(mSocket.get(), SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(errorSlot(QAbstractSocket::SocketError)),
 					Qt::DirectConnection);
 
-	report("Looking for host: " + this->hostDescription());
-	mSocket->connectToHost(mAddress, mPort);
-
-	int timeout = 5000;
-	if (!mSocket->waitForConnected(timeout))
+	if (!this->multipleTryConnectToHost())
 	{
-		reportWarning("Timeout looking for host " + this->hostDescription());
-		mSocket->disconnectFromHost();
-		delete mSocket;
-		mSocket = NULL;
+		mSocket.reset();
 		return false;
 	}
 
@@ -108,16 +97,42 @@ bool IGTLinkClientStreamer::startStreaming(SenderPtr sender)
 	return true;
 }
 
+bool IGTLinkClientStreamer::multipleTryConnectToHost()
+{
+	// hold here until all attempts are finished
+	int numberOfConnectionAttempts = 5;
+	int baseSleep = 300;
+	for (int i=0; i<numberOfConnectionAttempts; ++i)
+	{
+		if (i>0)
+			report(QString("[%2] Attempt %1 to connect to host").arg(i+1).arg(this->hostDescription()));
+		if (this->tryConnectToHost())
+			return true;
+		sleep_ms(baseSleep*(i+1));
+	}
+	reportError(QString("[%1] Timeout connecting to host").arg(this->hostDescription()));
+	return false;
+}
+
+bool IGTLinkClientStreamer::tryConnectToHost()
+{
+	mSocket->connectToHost(mAddress, mPort);
+
+	int timeout = 5000;
+	if (!mSocket->waitForConnected(timeout))
+	{
+		mSocket->disconnectFromHost();
+		return false;
+	}
+	return true;
+}
+
 void IGTLinkClientStreamer::stopStreaming()
 {
-//	std::cout << "IGTLinkClientStreamer::stopStreaming " << std::endl;
-
 	if (mSocket)
 	{
 		mSocket->disconnectFromHost();
-	//  std::cout << "finished openIGTLink client thread" << std::endl;
-		delete mSocket;
-		mSocket = NULL;
+		mSocket.reset();
 	}
 	mSender.reset();
 }
@@ -127,11 +142,6 @@ QString IGTLinkClientStreamer::getType()
 	return "IGTLinkClient";
 }
 
-//void IGTLinkClientStreamer::myStreamSlot()
-//{
-//	std::cout << "-- IGTLinkClientStreamer::myStreamSlot() " << std::endl;
-//}
-
 QString IGTLinkClientStreamer::hostDescription() const
 {
 	return mAddress + ":" + qstring_cast(mPort);
@@ -139,31 +149,30 @@ QString IGTLinkClientStreamer::hostDescription() const
 
 void IGTLinkClientStreamer::hostFoundSlot()
 {
-	report("Host found: " + this->hostDescription());
+	report(QString("[%1] Found host").arg(this->hostDescription()));
+//	report("Host found: " + this->hostDescription());
 }
 void IGTLinkClientStreamer::connectedSlot()
 {
-	reportSuccess("Connected to host " + this->hostDescription());
-//	emit connected(true);
+	reportSuccess(QString("[%1] Connected to host").arg(this->hostDescription()));
 }
 void IGTLinkClientStreamer::disconnectedSlot()
 {
-	report("Disconnected from host " + this->hostDescription());
-//	emit connected(false);
+	report(QString("[%1] Disconnected from host").arg(this->hostDescription()));
+//	report("Disconnected from host " + this->hostDescription());
 }
 void IGTLinkClientStreamer::errorSlot(QAbstractSocket::SocketError socketError)
 {
-	reportError(
-					"Socket error [Host=" + this->hostDescription() + ", Code=" + QString::number(socketError) + "] "
-									+ mSocket->errorString());
+	report(QString("[%1] Socket error [code=%2]: %3")
+		   .arg(this->hostDescription())
+		   .arg(QString::number(socketError))
+		   .arg(mSocket->errorString()));
 }
 
 void IGTLinkClientStreamer::readyReadSlot()
 {
 	// read messages until one fails
 	while (this->readOneMessage());
-
-//	readOneMessage();
 }
 
 /**Read one IGTLink message from the socket.
@@ -212,11 +221,11 @@ bool IGTLinkClientStreamer::readOneMessage()
 //    }
 		if (QString(mHeaderMsg->GetDeviceType()) == "IMAGE")
 		{
-			success = this->ReceiveImage(mSocket, mHeaderMsg);
+			success = this->ReceiveImage(mSocket.get(), mHeaderMsg);
 		}
 		else if (QString(mHeaderMsg->GetDeviceType()) == "CX_US_ST")
 		{
-			success = this->ReceiveSonixStatus(mSocket, mHeaderMsg);
+			success = this->ReceiveSonixStatus(mSocket.get(), mHeaderMsg);
 		}
 //    else if (QString(mHeaderMsg->GetDeviceType() == "STATUS")
 //    {

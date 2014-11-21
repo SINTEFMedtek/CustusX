@@ -82,11 +82,13 @@ private:
 	bool readOneMessage();
 	void addToQueue(IGTLinkUSStatusMessage::Pointer msg);
 	void addToQueue(IGTLinkImageMessage::Pointer msg);
+	bool multipleTryConnectToHost();
+	bool tryConnectToHost();
 
 	bool mHeadingReceived;
 	QString mAddress;
 	int mPort;
-	QTcpSocket* mSocket;
+	boost::shared_ptr<QTcpSocket> mSocket;
 	igtl::MessageHeader::Pointer mHeaderMsg;
 	IGTLinkUSStatusMessage::Pointer mUnsentUSStatusMessage; ///< received message, will be added to queue when next image arrives
 

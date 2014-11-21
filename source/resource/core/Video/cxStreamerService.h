@@ -74,20 +74,8 @@ public:
 	virtual std::vector<DataAdapterPtr> getSettings(QDomElement root) = 0;
 	/**
 	 * Return a streamer that can emit image data.
-	 * It will be embedded into a default receiver.
-	 *
-	 * Only one of createStreamer() and createReceiver()
-	 * can be nonempty.
 	 */
 	virtual StreamerPtr createStreamer(QDomElement root) = 0;
-	/**
-	 * Return a receiver that emits received data.
-	 * If empty, a default receiver will be created instead
-	 *
-	 * Only one of createStreamer() and createReceiver()
-	 * can be nonempty.
-	 */
-	virtual ReceiverPtr createReceiver(QDomElement root) = 0;
 };
 
 } //end namespace cx

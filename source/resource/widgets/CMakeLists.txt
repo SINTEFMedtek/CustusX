@@ -10,6 +10,7 @@ cx_add_class_qt_moc(CX_RESOURCE_WIDGETS_FILES
 	cxDoubleWidgets
 	cxLabeledComboBoxWidget
 	cxDetailedLabeledComboBoxWidget
+	cxFilenameWidget
 	cxLabeledLineEditWidget
 	cxCheckBoxWidget
 	cxHelperWidgets

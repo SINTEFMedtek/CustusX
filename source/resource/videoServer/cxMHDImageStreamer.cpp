@@ -69,7 +69,7 @@ StringDataAdapterPtr ImageStreamerDummyArguments::getFilenameOption(QDomElement 
 											  "Select a 3D image file to stream from",
 											  "",
 											  root);
-//	retval->setGuiRepresentation(DoubleDataAdapter::grSPINBOX);
+	retval->setGuiRepresentation(StringDataAdapter::grFILENAME);
 	retval->setGroup("File");
 	return retval;
 }

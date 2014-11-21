@@ -87,9 +87,16 @@ class cxResource_EXPORT StringDataAdapter: public DataAdapter
 {
 	Q_OBJECT
 public:
+	StringDataAdapter() : mGuiRepresentation(grSTRING) {}
 	virtual ~StringDataAdapter(){}
 
 public:
+	enum GuiRepresentation
+	{
+		grSTRING,
+		grFILENAME
+	};
+
 	// basic methods
 	virtual QString getDisplayName() const = 0;///< name of data entity. Used for display to user.
 
@@ -128,6 +135,13 @@ public:
 	{
 		return internal;
 	} ///< conversion from internal value to display value
+
+	virtual void setGuiRepresentation(GuiRepresentation type) { mGuiRepresentation = type; };
+	virtual GuiRepresentation getGuiRepresentation() { return mGuiRepresentation; };
+
+protected:
+	GuiRepresentation mGuiRepresentation;
+
 };
 typedef boost::shared_ptr<StringDataAdapter> StringDataAdapterPtr;
 

@@ -29,37 +29,42 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXIMAGEFILESTREAMERSERVICE_H
-#define CXIMAGEFILESTREAMERSERVICE_H
+#ifndef CXFILENAMEWIDGET_H
+#define CXFILENAMEWIDGET_H
 
-#include "cxVideoServiceOldExport.h"
-#include "cxStreamerService.h"
-class ctkPluginContext;
+#include "cxResourceWidgetsExport.h"
+
+#include <QWidget>
+#include <QSlider>
+#include <QLineEdit>
+#include <QLabel>
+#include <QGridLayout>
+#include "cxStringDataAdapter.h"
+#include "cxOptimizedUpdateWidget.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class StringDataAdapter> StringDataAdapterPtr;
-typedef boost::shared_ptr<class DoubleDataAdapter> DoubleDataAdapterPtr;
-typedef boost::shared_ptr<class BoolDataAdapter> BoolDataAdapterPtr;
+class FileInputWidget;
 
-
-/**
- * \ingroup cx_service_video
+/**\brief Composite widget for filename edit.
  *
- * \date 2014-11-21
- * \author Christian Askeland, SINTEF
+ *  Accepts a StringDataAdapterPtr
+ *
+ * \ingroup cx_resource_widgets
  */
-class cxVideoServiceOld_EXPORT ImageFileStreamerService : public StreamerService
+class cxResourceWidgets_EXPORT FilenameWidget: public OptimizedUpdateWidget
 {
+Q_OBJECT
 public:
-	ImageFileStreamerService(ctkPluginContext *context) {}
-	virtual ~ImageFileStreamerService() {}
-	virtual QString getName();
-	virtual std::vector<DataAdapterPtr> getSettings(QDomElement root);
-	virtual StreamerPtr createStreamer(QDomElement root);
+	FilenameWidget(QWidget* parent, StringDataAdapterPtr, QGridLayout* gridLayout = 0, int row = 0);
+private slots:
+	virtual void prePaintEvent();
+	void editingFinished();
 private:
+	FileInputWidget* mFileInput;
+	StringDataAdapterPtr mData;
 };
 
-} //end namespace cx
+} // namespace cx
 
-#endif // CXIMAGEFILESTREAMERSERVICE_H
+#endif // CXFILENAMEWIDGET_H

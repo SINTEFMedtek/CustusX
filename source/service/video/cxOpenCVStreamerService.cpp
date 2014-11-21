@@ -39,100 +39,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxUtilHelpers.h"
 #include "cxReporter.h"
 #include "QApplication"
+#include <QDir>
+#include "cxDataLocations.h"
+#include "cxLocalServerStreamerServer.h"
 
 namespace cx
 {
-
-
-LocalServerStreamer::LocalServerStreamer(QString serverName, QString serverArguments) :
-	mServerName(serverName),
-	mServerArguments(serverArguments)
-{
-	mReconnectInterval = 400;
-	mConnectWhenLocalServerRunning = 0;
-
-	mLocalVideoServerProcess.reset(new ProcessWrapper(QString("Local Video Server: %1").arg(mServerName)));
-
-	boost::shared_ptr<IGTLinkClientStreamer> igtLinkStreamer(new IGTLinkClientStreamer());
-	int defaultport = 18333;
-	igtLinkStreamer->setAddress("Localhost", defaultport);
-	mBase = igtLinkStreamer;
-}
-
-LocalServerStreamer::~LocalServerStreamer()
-{
-
-}
-
-bool LocalServerStreamer::startStreaming(SenderPtr sender)
-{
-	mLocalVideoServerProcess->launchWithRelativePath(mServerName, mServerArguments.split(" "));
-
-	this->waitForServerStart();
-	if (!this->localVideoServerIsRunning())
-	{
-		reportError("Local server failed to start");
-		return false;
-	}
-
-	return this->attemptStartStreaming(sender);
-}
-
-void LocalServerStreamer::waitForServerStart()
-{
-	int waitTime = 5000;
-	while (waitTime > 0)
-	{
-		qApp->processEvents();
-		if (this->localVideoServerIsRunning())
-			return;
-		int interval = 50;
-		sleep_ms(interval);
-		waitTime -= interval;
-	}
-}
-
-bool LocalServerStreamer::attemptStartStreaming(SenderPtr sender)
-{
-	// hold here until all attempts are finished
-	int numberOfConnectionAttempts = 5;
-	for (int i=0; i<numberOfConnectionAttempts; ++i)
-	{
-		if (i>0)
-			report(QString("Attempt %1 to connect to streamer %2").arg(i+1).arg(mBase->getType()));
-		if (mBase->startStreaming(sender))
-			return true;
-		sleep_ms(mReconnectInterval);
-	}
-	return false;
-}
-
-void LocalServerStreamer::stopStreaming()
-{
-	mBase->stopStreaming();
-
-	if (mLocalVideoServerProcess->getProcess())
-		mLocalVideoServerProcess->getProcess()->close();
-}
-
-QString LocalServerStreamer::getType()
-{
-	return "LocalServer";
-}
-
-bool LocalServerStreamer::localVideoServerIsRunning()
-{
-	if (!mLocalVideoServerProcess->getProcess())
-		return false;
-	return this->mLocalVideoServerProcess->getProcess()->state() == QProcess::Running;
-}
-
-
-
-///--------------------------------------------------------
-///--------------------------------------------------------
-///--------------------------------------------------------
-
 
 QString OpenCVStreamerService::getName()
 {
@@ -144,8 +56,10 @@ std::vector<DataAdapterPtr> OpenCVStreamerService::getSettings(QDomElement root)
 	std::vector<DataAdapterPtr> retval;
 	std::vector<DataAdapterPtr> opencvArgs = ImageStreamerOpenCVArguments().getSettings(root);
 	std::copy(opencvArgs.begin(), opencvArgs.end(), back_inserter(retval));
-	retval.push_back(this->getRunLocalServerOption(root));
-	retval.push_back(this->getLocalServerNameOption(root));
+
+	std::vector<DataAdapterPtr> localsvrArgs = LocalServerStreamerArguments().getSettings(root);
+	std::copy(localsvrArgs.begin(), localsvrArgs.end(), back_inserter(retval));
+
 	return retval;
 }
 
@@ -167,6 +81,7 @@ StringDataAdapterPtr OpenCVStreamerService::getLocalServerNameOption(QDomElement
 	retval = StringDataAdapterXml::initialize("localservername", "Server Name",
 											  "Name of server executable, used only if Run Local Server is set.",
 											  defaultValue, root);
+	retval->setGuiRepresentation(StringDataAdapter::grFILENAME);
 	retval->setAdvanced(false);
 	retval->setGroup("Connection");
 	return retval;
@@ -174,32 +89,19 @@ StringDataAdapterPtr OpenCVStreamerService::getLocalServerNameOption(QDomElement
 
 StreamerPtr OpenCVStreamerService::createStreamer(QDomElement root)
 {
-	bool useLocalServer = this->getRunLocalServerOption(root)->getValue();
 	StringMap args = ImageStreamerOpenCVArguments().convertToCommandLineArguments(root);
-
-	if (useLocalServer)
+	StreamerPtr localServerStreamer = LocalServerStreamer::createStreamerIfEnabled(root, args);
+	if (localServerStreamer)
 	{
-		QStringList cmdlineArguments;
-		for (StringMap::iterator i=args.begin(); i!=args.end(); ++i)
-			cmdlineArguments << i->first << i->second;
-
-		QString localServer = this->getLocalServerNameOption(root)->getValue();
-		boost::shared_ptr<LocalServerStreamer> streamer;
-		streamer.reset(new LocalServerStreamer(localServer, cmdlineArguments.join(" ")));
-
-		return streamer;
+		return localServerStreamer;
 	}
+
 	else
 	{
 		boost::shared_ptr<ImageStreamerOpenCV> streamer(new ImageStreamerOpenCV());
 		streamer->initialize(args);
 		return streamer;
 	}
-}
-
-ReceiverPtr OpenCVStreamerService::createReceiver(QDomElement root)
-{
-	return ReceiverPtr();
 }
 
 } // namespace cx

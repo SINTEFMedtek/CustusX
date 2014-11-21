@@ -116,7 +116,7 @@ void ProcessWrapper::internalLaunch(QString executable, QStringList arguments)
 	if(this->isRunning())
 		return;
 
-	report(QString("Launching %1 %2 with arguments: %3").arg(mName).arg(executable).arg(arguments.join(" ")));
+	report(QString("Launching %1: [%2 %3]").arg(mName).arg(executable).arg(arguments.join(" ")));
 
 	if(arguments.isEmpty())
 		mProcess->start(executable);

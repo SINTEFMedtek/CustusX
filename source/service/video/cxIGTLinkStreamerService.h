@@ -56,7 +56,6 @@ public:
 	virtual QString getName();
 	virtual std::vector<DataAdapterPtr> getSettings(QDomElement root);
 	virtual StreamerPtr createStreamer(QDomElement root);
-	virtual ReceiverPtr createReceiver(QDomElement root);
 private:
 	StringDataAdapterPtr getIPOption(QDomElement root);
 	DoubleDataAdapterPtr getStreamPortOption(QDomElement root);

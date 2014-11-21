@@ -28,6 +28,7 @@ SET( CX_QT_MOC_HEADER_FILES
 	cxIGTLinkStreamerService.h
 	cxIGTLinkClientStreamer.h
 	cxOpenCVStreamerService.h
+	cxLocalServerStreamerServer.h
 )
 
 SET (cxVideoServiceOld_SOURCE
@@ -62,6 +63,7 @@ SET (cxVideoServiceOld_SOURCE
 	cxOpenCVStreamerService.cpp
 	cxImageFileStreamerService.h
 	cxImageFileStreamerService.cpp
+	cxLocalServerStreamerServer.cpp
 )
 
 include_directories(

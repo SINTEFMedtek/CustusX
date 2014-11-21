@@ -35,7 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVideoServiceOldExport.h"
 #include "cxStreamerService.h"
 #include "cxStreamer.h"
-#include "cxProcessWrapper.h"
 
 class ctkPluginContext;
 
@@ -45,47 +44,6 @@ typedef boost::shared_ptr<class StringDataAdapter> StringDataAdapterPtr;
 typedef boost::shared_ptr<class DoubleDataAdapter> DoubleDataAdapterPtr;
 typedef boost::shared_ptr<class DataAdapter> DataAdapterPtr;
 typedef boost::shared_ptr<class BoolDataAdapter> BoolDataAdapterPtr;
-
-
-/** Streamer wrapping another Streamer, but also runs an executable as a local process.
- *
- * \ingroup cx_service_video
- *
- * \date 2014-11-21
- * \author Christian Askeland, SINTEF
- */
-class cxVideoServiceOld_EXPORT LocalServerStreamer: public Streamer
-{
-Q_OBJECT
-
-public:
-	LocalServerStreamer(QString serverName, QString serverArguments);
-	virtual ~LocalServerStreamer();
-	virtual bool startStreaming(SenderPtr sender);
-	virtual void stopStreaming();
-	virtual QString getType();
-
-private slots:
-	virtual void streamSlot() {}
-private slots:
-//	void serverProcessStateChanged(QProcess::ProcessState newState);
-
-private:
-	bool localVideoServerIsRunning();
-	void waitForServerStart();
-	bool attemptStartStreaming(SenderPtr sender);
-//	SenderPtr mSender;
-	int mConnectWhenLocalServerRunning;
-	int mReconnectInterval;
-	ProcessWrapperPtr mLocalVideoServerProcess;
-
-
-	StreamerPtr mBase;
-	QString mServerName;
-	QString mServerArguments;
-};
-typedef boost::shared_ptr<class LocalServerStreamer> LocalServerStreamerPtr;
-
 
 /**
  * \ingroup cx_service_video
@@ -101,10 +59,7 @@ public:
 	virtual QString getName();
 	virtual std::vector<DataAdapterPtr> getSettings(QDomElement root);
 	virtual StreamerPtr createStreamer(QDomElement root);
-	virtual ReceiverPtr createReceiver(QDomElement root);
 private:
-//	StringDataAdapterPtr getIPOption(QDomElement root);
-//	DoubleDataAdapterPtr getStreamPortOption(QDomElement root);
 	BoolDataAdapterPtr getRunLocalServerOption(QDomElement root);
 	StringDataAdapterPtr getLocalServerNameOption(QDomElement root);
 };

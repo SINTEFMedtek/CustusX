@@ -60,10 +60,6 @@ StreamerPtr IGTLinkStreamerService::createStreamer(QDomElement root)
 
 }
 
-ReceiverPtr IGTLinkStreamerService::createReceiver(QDomElement root)
-{
-	return ReceiverPtr();
-}
 
 StringDataAdapterPtr IGTLinkStreamerService::getIPOption(QDomElement root)
 {

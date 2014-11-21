@@ -66,11 +66,11 @@ void ProcessReporter::processStateChanged(QProcess::ProcessState newState)
 {
 	if (newState == QProcess::Running)
 	{
-		report(QString("%1 running.").arg(mName));
+		report(QString("%1 started.").arg(mName));
 	}
 	if (newState == QProcess::NotRunning)
 	{
-		report(QString("%1 not running.").arg(mName));
+		report(QString("%1 stopped.").arg(mName));
 	}
 	if (newState == QProcess::Starting)
 	{

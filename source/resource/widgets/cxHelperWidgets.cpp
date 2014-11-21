@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxLabeledLineEditWidget.h"
 #include "cxDoubleSpanSlider.h"
+#include "cxFilenameWidget.h"
 
 namespace cx
 {
@@ -57,7 +58,9 @@ QWidget* sscCreateDataWidget(QWidget* parent, DataAdapterPtr data, QGridLayout* 
 	StringDataAdapterPtr str = boost::dynamic_pointer_cast<StringDataAdapter>(data);
 	if (str)
 	{
-		if (str->getAllowOnlyValuesInRange())
+		if (str->getGuiRepresentation()==StringDataAdapter::grFILENAME)
+			return new FilenameWidget(parent, str, gridLayout, row);
+		else if (str->getAllowOnlyValuesInRange())
 			return new LabeledComboBoxWidget(parent, str, gridLayout, row);
 		else
 			return new LabeledLineEditWidget(parent, str, gridLayout, row);

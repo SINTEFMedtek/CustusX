@@ -29,37 +29,70 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXIMAGEFILESTREAMERSERVICE_H
-#define CXIMAGEFILESTREAMERSERVICE_H
-
-#include "cxVideoServiceOldExport.h"
-#include "cxStreamerService.h"
-class ctkPluginContext;
+#include "cxFilenameWidget.h"
+#include "cxFileInputWidget.h"
+#include "cxDataLocations.h"
+#include <QFileInfo>
+#include <QDir>
+#include "cxTypeConversions.h"
+#include <iostream>
 
 namespace cx
 {
-typedef boost::shared_ptr<class StringDataAdapter> StringDataAdapterPtr;
-typedef boost::shared_ptr<class DoubleDataAdapter> DoubleDataAdapterPtr;
-typedef boost::shared_ptr<class BoolDataAdapter> BoolDataAdapterPtr;
 
+///----------------
 
-/**
- * \ingroup cx_service_video
- *
- * \date 2014-11-21
- * \author Christian Askeland, SINTEF
- */
-class cxVideoServiceOld_EXPORT ImageFileStreamerService : public StreamerService
+FilenameWidget::FilenameWidget(QWidget* parent, StringDataAdapterPtr dataInterface,
+	QGridLayout* gridLayout, int row) :
+	OptimizedUpdateWidget(parent)
 {
-public:
-	ImageFileStreamerService(ctkPluginContext *context) {}
-	virtual ~ImageFileStreamerService() {}
-	virtual QString getName();
-	virtual std::vector<DataAdapterPtr> getSettings(QDomElement root);
-	virtual StreamerPtr createStreamer(QDomElement root);
-private:
-};
+	mData = dataInterface;
+	connect(mData.get(), SIGNAL(changed()), this, SLOT(setModified()));
 
-} //end namespace cx
+	QHBoxLayout* topLayout = new QHBoxLayout;
+	topLayout->setMargin(0);
+	this->setLayout(topLayout);
 
-#endif // CXIMAGEFILESTREAMERSERVICE_H
+	mFileInput = new FileInputWidget(this);
+	mFileInput->setUseRelativePath(false);
+	connect(mFileInput, SIGNAL(fileChanged()), this, SLOT(editingFinished()));
+
+	if (gridLayout) // add to input gridlayout
+	{
+		gridLayout->addWidget(mFileInput, row, 0);
+	}
+	else // add directly to this
+	{
+		topLayout->addWidget(mFileInput);
+	}
+
+	this->setModified();
+}
+
+void FilenameWidget::editingFinished()
+{
+	mData->setValue(mFileInput->getFilename());
+}
+
+void FilenameWidget::prePaintEvent()
+{
+	mFileInput->blockSignals(true);
+
+	QString path = QFileInfo(mData->getValue()).absolutePath();
+	if (path.isEmpty())
+		path = QDir::homePath();
+
+//	std::cout << "---------------" << std::endl;
+//	std::cout << "val:         " << mData->getValue() << std::endl;
+//	std::cout << "path:         " << path << std::endl;
+
+	mFileInput->setDescription(mData->getDisplayName());
+	mFileInput->setBasePath(path);
+	mFileInput->setFilename(mData->getValue());
+	mFileInput->setHelp(mData->getHelp());
+	mFileInput->setBrowseHelp(mData->getHelp());
+
+	mFileInput->blockSignals(false);
+}
+
+} // namespace cx
