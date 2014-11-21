@@ -53,11 +53,10 @@ DirectlyLinkedImageReceiverThread::DirectlyLinkedImageReceiverThread(StreamerSer
 
 void DirectlyLinkedImageReceiverThread::run()
 {
-	report("Starting direct link grabber.");
-
 	XmlOptionFile xmlFile = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("video");
 	QDomElement element = xmlFile.getElement("video");
 	mImageStreamer = mStreamerInterface->createStreamer(element);
+	report(QString("Starting streamer: [%1]").arg(mImageStreamer->getType()));
 
 	if(!mImageStreamer)
 	{
@@ -74,9 +73,8 @@ void DirectlyLinkedImageReceiverThread::run()
 		this->quit();
 	emit connected(true);
 
-//	mFPSTimer->reset(2000);
-
 	this->exec();
+
 
 	mImageStreamer->stopStreaming();
 	mImageStreamer.reset();
@@ -96,7 +94,9 @@ void DirectlyLinkedImageReceiverThread::addSonixStatusToQueueSlot()
 
 QString DirectlyLinkedImageReceiverThread::hostDescription() const
 {
-	return "Direct Link";
+	if (!mStreamerInterface)
+		return "";
+	return mStreamerInterface->getName();
 }
 
 } //end namespace cx

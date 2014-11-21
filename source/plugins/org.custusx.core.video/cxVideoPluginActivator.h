@@ -64,6 +64,9 @@ public:
 
 private:
 	RegisteredServicePtr mRegistration;
+	RegisteredServicePtr mIGTLinkStreamer;
+	RegisteredServicePtr mOpenCVStreamer;
+	RegisteredServicePtr mImageFileStreamer;
 };
 
 } // namespace cx

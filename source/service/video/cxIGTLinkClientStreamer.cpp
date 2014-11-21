@@ -4,33 +4,32 @@ This file is part of CustusX, an Image Guided Therapy Application.
 Copyright (c) 2008-2014, SINTEF Department of Medical Technology
 All rights reserved.
 
-Redistribution and use in source and binary forms, with or without 
+Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
-1. Redistributions of source code must retain the above copyright notice, 
+1. Redistributions of source code must retain the above copyright notice,
    this list of conditions and the following disclaimer.
 
-2. Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
 
-3. Neither the name of the copyright holder nor the names of its contributors 
-   may be used to endorse or promote products derived from this software 
+3. Neither the name of the copyright holder nor the names of its contributors
+   may be used to endorse or promote products derived from this software
    without specific prior written permission.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE 
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR 
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, 
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-
-#include "cxIGTLinkedImageReceiverThread.h"
+#include "cxIGTLinkClientStreamer.h"
 
 #include "igtlOSUtil.h"
 #include "igtlMessageHeader.h"
@@ -45,26 +44,41 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxIGTLinkConversion.h"
 #include "cxCyclicActionLogger.h"
 
-
 namespace cx
 {
 
-IGTLinkedImageReceiverThread::IGTLinkedImageReceiverThread(QString address, int port, QObject* parent) :
-	ImageReceiverThread(parent),
+IGTLinkClientStreamer::IGTLinkClientStreamer() :
 	mHeadingReceived(false),
-	mAddress(address),
-	mPort(port),
+	mAddress(""),
+	mPort(0),
 	mSocket(NULL)
 {
-//  std::cout << "client::create thread: " << QThread::currentThread() << std::endl;
+//	this->setSendInterval(200);
+
+
 }
 
-void IGTLinkedImageReceiverThread::run()
+IGTLinkClientStreamer::~IGTLinkClientStreamer()
 {
-//  std::cout << "client::run thread: " << QThread::currentThread() << std::endl;
-	//std::cout << "run client thread, connecting to " << mAddress << " " << mPort << std::endl;
 
-	//------------------------------------------------------------
+}
+
+void IGTLinkClientStreamer::setAddress(QString address, int port)
+{
+	mAddress = address;
+	mPort = port;
+	std::cout << "IGTLinkClientStreamer::setAddress " << std::endl;
+}
+
+
+bool IGTLinkClientStreamer::startStreaming(SenderPtr sender)
+{
+	mSender = sender;
+//	this->createSendTimer();
+//	mTestTimer = new QTimer(this);
+//	connect(mTestTimer, SIGNAL(timeout()), this, SLOT(myStreamSlot()));
+//	std::cout << "IGTLinkClientStreamer::startStreaming " << std::endl;
+
 	// Establish Connection
 	mSocket = new QTcpSocket();
 	connect(mSocket, SIGNAL(readyRead()), this, SLOT(readyReadSlot()), Qt::DirectConnection);
@@ -82,49 +96,69 @@ void IGTLinkedImageReceiverThread::run()
 	{
 		reportWarning("Timeout looking for host " + this->hostDescription());
 		mSocket->disconnectFromHost();
-		return;
+		delete mSocket;
+		mSocket = NULL;
+		return false;
 	}
 
 	// Create a message buffer to receive header
 	mHeaderMsg = igtl::MessageHeader::New();
 
-//	mFPSTimer->reset(2000);
 
-	// run event loop
-	this->exec();
-
-	mSocket->disconnectFromHost();
-//  std::cout << "finished openIGTLink client thread" << std::endl;
-	delete mSocket;
+	return true;
 }
 
-QString IGTLinkedImageReceiverThread::hostDescription() const
+void IGTLinkClientStreamer::stopStreaming()
+{
+//	std::cout << "IGTLinkClientStreamer::stopStreaming " << std::endl;
+
+	if (mSocket)
+	{
+		mSocket->disconnectFromHost();
+	//  std::cout << "finished openIGTLink client thread" << std::endl;
+		delete mSocket;
+		mSocket = NULL;
+	}
+	mSender.reset();
+}
+
+QString IGTLinkClientStreamer::getType()
+{
+	return "IGTLinkClient";
+}
+
+//void IGTLinkClientStreamer::myStreamSlot()
+//{
+//	std::cout << "-- IGTLinkClientStreamer::myStreamSlot() " << std::endl;
+//}
+
+QString IGTLinkClientStreamer::hostDescription() const
 {
 	return mAddress + ":" + qstring_cast(mPort);
 }
 
-void IGTLinkedImageReceiverThread::hostFoundSlot()
+void IGTLinkClientStreamer::hostFoundSlot()
 {
 	report("Host found: " + this->hostDescription());
 }
-void IGTLinkedImageReceiverThread::connectedSlot()
+void IGTLinkClientStreamer::connectedSlot()
 {
 	reportSuccess("Connected to host " + this->hostDescription());
-	emit connected(true);
+//	emit connected(true);
 }
-void IGTLinkedImageReceiverThread::disconnectedSlot()
+void IGTLinkClientStreamer::disconnectedSlot()
 {
-	report("Disconnected to host " + this->hostDescription());
-	emit connected(false);
+	report("Disconnected from host " + this->hostDescription());
+//	emit connected(false);
 }
-void IGTLinkedImageReceiverThread::errorSlot(QAbstractSocket::SocketError socketError)
+void IGTLinkClientStreamer::errorSlot(QAbstractSocket::SocketError socketError)
 {
 	reportError(
-					"Socket error [Host=" + this->hostDescription() + ", Code=" + socketError + "]\n"
+					"Socket error [Host=" + this->hostDescription() + ", Code=" + QString::number(socketError) + "] "
 									+ mSocket->errorString());
 }
 
-void IGTLinkedImageReceiverThread::readyReadSlot()
+void IGTLinkClientStreamer::readyReadSlot()
 {
 	// read messages until one fails
 	while (this->readOneMessage());
@@ -136,7 +170,7 @@ void IGTLinkedImageReceiverThread::readyReadSlot()
  * Return false if there was not enough data to
  * read the entire message.
  */
-bool IGTLinkedImageReceiverThread::readOneMessage()
+bool IGTLinkClientStreamer::readOneMessage()
 {
 
 //  std::cout << "tick " << std::endl;
@@ -203,7 +237,7 @@ bool IGTLinkedImageReceiverThread::readOneMessage()
 	return true;
 }
 
-bool IGTLinkedImageReceiverThread::ReceiveSonixStatus(QTcpSocket* socket, igtl::MessageHeader::Pointer& header)
+bool IGTLinkClientStreamer::ReceiveSonixStatus(QTcpSocket* socket, igtl::MessageHeader::Pointer& header)
 {
 	IGTLinkUSStatusMessage::Pointer msg;
 	msg = IGTLinkUSStatusMessage::New();
@@ -231,7 +265,7 @@ bool IGTLinkedImageReceiverThread::ReceiveSonixStatus(QTcpSocket* socket, igtl::
 	return true;
 }
 
-bool IGTLinkedImageReceiverThread::ReceiveImage(QTcpSocket* socket, igtl::MessageHeader::Pointer& header)
+bool IGTLinkClientStreamer::ReceiveImage(QTcpSocket* socket, igtl::MessageHeader::Pointer& header)
 {
 	// Create a message buffer to receive transform data
 	IGTLinkImageMessage::Pointer imgMsg;
@@ -263,23 +297,30 @@ bool IGTLinkedImageReceiverThread::ReceiveImage(QTcpSocket* socket, igtl::Messag
 	return true;
 }
 
-void IGTLinkedImageReceiverThread::addToQueue(IGTLinkUSStatusMessage::Pointer msg)
+void IGTLinkClientStreamer::addToQueue(IGTLinkUSStatusMessage::Pointer msg)
 {
 	// set temporary, then assume the image adder will pass this message on.
 	mUnsentUSStatusMessage = msg;
 }
 
-void IGTLinkedImageReceiverThread::addToQueue(IGTLinkImageMessage::Pointer msg)
+void IGTLinkClientStreamer::addToQueue(IGTLinkImageMessage::Pointer msg)
 {
 	IGTLinkConversion converter;
-	this->addImageToQueue(converter.decode(msg));
+
+	PackagePtr package(new Package());
+	package->mIgtLinkImageMessage = msg;
 
 	// if us status not sent, do it here
 	if (mUnsentUSStatusMessage)
 	{
-		this->addSonixStatusToQueue(converter.decode(mUnsentUSStatusMessage, msg, ProbeDefinitionPtr(new ProbeDefinition())));
+		package->mIgtLinkUSStatusMessage = mUnsentUSStatusMessage;
 		mUnsentUSStatusMessage = IGTLinkUSStatusMessage::Pointer();
 	}
+
+	mSender->send(package);
 }
 
-} //end namespace cx
+
+} // namespace cx
+
+

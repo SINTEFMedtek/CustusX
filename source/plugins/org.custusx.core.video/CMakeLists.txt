@@ -5,9 +5,21 @@ set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 include_directories(
     ${CX_RESOURCE_INCLUDE_DIRECTORIES}
     ${CustusX_SOURCE_DIR}/source/logic
-
     ${CustusX_BINARY_DIR}/source/logic
-    )
+
+	${CX_RESOURCE_INCLUDE_DIRECTORIES}
+	${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
+	.
+	${CustusX_SOURCE_DIR}/source/resource/videoServer
+	${CustusX_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
+	${CMAKE_CURRENT_BINARY_DIR}
+	${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
+	${CustusX_BINARY_DIR}/source/resource/usReconstructionTypes
+	${CustusX_BINARY_DIR}/source/resource/videoServer
+	${CustusX_BINARY_DIR}/source/resource/OpenIGTLinkUtilities
+	${CustusX_BINARY_DIR}/source/service/video
+	${CustusX_SOURCE_DIR}/source/service/video
+	)
 
 set(PLUGIN_SRCS
   cxVideoPluginActivator.cpp

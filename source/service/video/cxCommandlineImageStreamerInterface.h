@@ -54,6 +54,7 @@ class cxVideoServiceOld_EXPORT CommandlineImageStreamerInterface : public Stream
 public:
 	CommandlineImageStreamerInterface();
 	virtual StreamerPtr createStreamer(QDomElement root);
+	virtual ReceiverPtr createReceiver(QDomElement root) { return ReceiverPtr(); }
 	virtual std::vector<DataAdapterPtr> getSettings(QDomElement root);
 	virtual QString getName();
 

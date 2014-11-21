@@ -65,11 +65,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxCyclicActionLogger.h"
 #include "cxBasicVideoSource.h"
 #include "cxVideoServiceBackend.h"
-#include "cxImageStreamerFactory.h"
 #include "cxSettings.h"
 #include "cxNullDeleter.h"
 #include "cxTrackingService.h"
 #include "cxTool.h"
+#include "cxCommandlineImageStreamerInterface.h"
 
 
 typedef vtkSmartPointer<vtkDataSetMapper> vtkDataSetMapperPtr;
@@ -123,9 +123,9 @@ StreamerServicePtr VideoConnection::getStreamerInterface()
 
 void VideoConnection::runDirectLinkClient(std::map<QString, QString> args)
 {
-	ImageStreamerFactory imageStreamerFactory;
-	imageStreamerFactory.setArguments(args);
-	mStreamerInterface = imageStreamerFactory.getCommandlineStreamerInterface();
+	CommandlineImageStreamerInterfacePtr streamerInterface(new CommandlineImageStreamerInterface());
+	streamerInterface->setArguments(args);
+	mStreamerInterface = streamerInterface;
 
 	this->runImageReceiverThread();
 }
@@ -183,7 +183,7 @@ void VideoConnection::stopClient()
 	if (mClient)
 	{
 		mClient->quit();
-		mClient->wait(2000); // forever or until dead thread
+		mClient->wait(2000);
 
 		if (mClient->isRunning())
 		{

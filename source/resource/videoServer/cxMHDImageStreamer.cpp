@@ -47,6 +47,70 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkImageLuminance.h>
 #include <QFileInfo>
 
+#include "cxStringDataAdapterXml.h"
+#include "cxDoubleDataAdapterXml.h"
+#include "cxBoolDataAdapterXml.h"
+
+namespace cx
+{
+
+std::vector<DataAdapterPtr> ImageStreamerDummyArguments::getSettings(QDomElement root)
+{
+	std::vector<DataAdapterPtr> retval;
+	retval.push_back(this->getFilenameOption(root));
+	retval.push_back(this->getSecondaryOption(root));
+	return retval;
+}
+
+StringDataAdapterPtr ImageStreamerDummyArguments::getFilenameOption(QDomElement root)
+{
+	StringDataAdapterXmlPtr retval;
+	retval = StringDataAdapterXml::initialize("filename", "Filename",
+											  "Select a 3D image file to stream from",
+											  "",
+											  root);
+//	retval->setGuiRepresentation(DoubleDataAdapter::grSPINBOX);
+	retval->setGroup("File");
+	return retval;
+}
+
+BoolDataAdapterPtr ImageStreamerDummyArguments::getSecondaryOption(QDomElement root)
+{
+	BoolDataAdapterXmlPtr retval;
+	bool defaultValue = false;
+	retval = BoolDataAdapterXml::initialize("secondary", "Secondary",
+											"Create two streams, the second one a dummy color image",
+											defaultValue, root);
+	retval->setAdvanced(true);
+	retval->setGroup("File");
+	return retval;
+}
+
+StringMap ImageStreamerDummyArguments::convertToCommandLineArguments(QDomElement root)
+{
+	StringMap retval;
+	retval["--type"] = "MHDFile";
+	retval["--filename"] = this->getFilenameOption(root)->getValue();
+	if (this->getSecondaryOption(root)->getValue())
+		retval["--secondary"] = "1";
+	return retval;
+}
+
+QStringList ImageStreamerDummyArguments::getArgumentDescription()
+{
+	QStringList retval;
+	retval << "--filename:		name of image file to stream from ";
+	retval << "--secondary:		Create two streams, the second one a dummy color image";
+	return retval;
+}
+
+} // namespace cx
+
+
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+
 namespace cx
 {
 
@@ -202,6 +266,12 @@ QString DummyImageStreamer::getFileName()
 {
 	return mFilename;
 }
+
+QStringList DummyImageStreamer::getArgumentDescription()
+{
+	return ImageStreamerDummyArguments().getArgumentDescription();
+}
+
 
 void DummyImageStreamer::createTestDataSource(vtkImageDataPtr source)
 {
