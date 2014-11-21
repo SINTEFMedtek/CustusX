@@ -115,6 +115,9 @@ public:
 	virtual bool isNull() = 0;
 	static UsReconstructionServicePtr getNullObject();
 
+public slots:
+	virtual void newDataOnDisk(QString mhdFilename) = 0;
+
 signals:
 	void paramsChanged();
 	void algorithmChanged();
@@ -124,6 +127,7 @@ signals:
 	void reconstructFinished();
 
 	void newInputDataAvailable(QString mhdFileName);
+	void newInputDataPath(QString path);
 };
 
 } //cx

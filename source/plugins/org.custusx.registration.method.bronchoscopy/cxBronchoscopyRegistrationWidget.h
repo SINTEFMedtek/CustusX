@@ -34,8 +34,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXBRONCHOSCOPYREGISTRATIONWIDGET_H
 
 #include <QPushButton>
+#include <QDomElement>
 #include "cxRegistrationBaseWidget.h"
 #include "cxForwardDeclarations.h"
+#include "cxXmlOptionItem.h"
+
 
 namespace cx
 {
@@ -45,6 +48,7 @@ typedef boost::shared_ptr<class SelectMeshStringDataAdapter> SelectMeshStringDat
 typedef boost::shared_ptr<class ToolRep3D> ToolRep3DPtr;
 typedef boost::shared_ptr<class RecordSessionWidget> RecordSessionWidgetPtr;
 typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
+typedef boost::shared_ptr<class BronchoscopyRegistration> BronchoscopyRegistrationPtr;
 
 /**
  * BronchoscopyRegistrationWidget
@@ -58,6 +62,9 @@ typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
 class BronchoscopyRegistrationWidget: public RegistrationBaseWidget
 {
 	Q_OBJECT
+
+	BronchoscopyRegistrationPtr mBronchoscopyRegistration;
+
 public:
 	BronchoscopyRegistrationWidget(RegServices services, QWidget *parent);
 	virtual ~BronchoscopyRegistrationWidget()
@@ -65,6 +72,7 @@ public:
 	}
 	virtual QString defaultWhatsThis() const;
 private slots:
+	void processCenterlineSlot();
 	void registerSlot();
 	void acquisitionStarted();
 	void acquisitionStopped();
@@ -76,12 +84,16 @@ private slots:
 private:
 	QVBoxLayout* mVerticalLayout;
 	QLabel* mLabel;
+	BoolDataAdapterXmlPtr mUseSubsetOfGenerations;
+	DoubleDataAdapterXmlPtr mMaxNumberOfGenerations;
+	XmlOptionFile mOptions;
 
 
 	AcquisitionPtr mAcquisition;
 	RecordSessionWidgetPtr mRecordSessionWidget;
 	SelectMeshStringDataAdapterPtr mSelectMeshWidget;
 	StringDataAdapterXmlPtr mSessionSelector;
+	QPushButton* mProcessCenterlineButton;
 	QPushButton* mRegisterButton;
     ToolPtr mTool;
 //    TrackedCenterlineWidget* mTrackedCenterLine;
@@ -90,6 +102,9 @@ private:
 
 	void initSessionSelector(AcquisitionDataPtr acquisitionData);
 	QStringList getSessionList(AcquisitionDataPtr acquisitionData);
+
+	void createMaxNumberOfGenerations(QDomElement root);
+	void selectSubsetOfBranches(QDomElement root);
 };
 
 } //namespace cx

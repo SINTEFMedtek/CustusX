@@ -99,6 +99,7 @@ void UsReconstructionImplService::patientChangedSlot()
 	this->selectData(mPatientModelService->getActivePatientFolder() + "/US_Acq/");
 //	this->setOutputBasePath(mPatientModelService->getActivePatientFolder());
 //	this->setOutputRelativePath("Images");
+	emit newInputDataPath(this->getSelectedFileData().mFilename);
 }
 
 ReconstructionMethodService *UsReconstructionImplService::createAlgorithm()
@@ -336,6 +337,11 @@ void UsReconstructionImplService::onServiceRemoved(ReconstructionMethodService* 
 	QStringList range = mParams->getAlgorithmAdapter()->getValueRange();
 	range.removeAll(service->getName());
 	mParams->getAlgorithmAdapter()->setValueRange(range);
+}
+
+void UsReconstructionImplService::newDataOnDisk(QString mhdFilename)
+{
+	emit newInputDataAvailable(mhdFilename);
 }
 
 } //cx

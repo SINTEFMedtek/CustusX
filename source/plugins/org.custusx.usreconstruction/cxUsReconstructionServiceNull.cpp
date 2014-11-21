@@ -139,4 +139,9 @@ bool UsReconstructionServiceNull::isNull()
 	return true;
 }
 
+void UsReconstructionServiceNull::newDataOnDisk(QString mhdFilename)
+{
+	printWarning();
+}
+
 } //cx
