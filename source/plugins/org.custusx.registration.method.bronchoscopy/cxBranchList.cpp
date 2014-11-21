@@ -69,6 +69,11 @@ void BranchList::deleteBranch(Branch* b)
 	}
 }
 
+void BranchList::deleteAllBranches()
+{
+	mBranches.clear();
+}
+
 std::vector<Branch*> BranchList::getBranches()
 {
 	return mBranches;
@@ -84,16 +89,17 @@ void BranchList::selectGenerations(int maxGeneration)
 		while (currentBranch->getParentBranch()){
 			generationCounter++;
 			currentBranch = currentBranch->getParentBranch();
-			if (generationCounter >= maxGeneration)
+			if (generationCounter > maxGeneration)
 			{
 				branchNumbersToBeDeleted.push_back(i);
 				break;
 			}
 		}
 
-		for ( int i = branchNumbersToBeDeleted.size() - 1; i >= 0; i-- )
-			deleteBranch(mBranches[branchNumbersToBeDeleted[i]]);
 	}
+	std::cout << "branchNumbersToBeDeleted.size(): " << branchNumbersToBeDeleted.size() << std::endl;
+	for ( int i = branchNumbersToBeDeleted.size() - 1; i >= 0; i-- )
+		deleteBranch(mBranches[branchNumbersToBeDeleted[i]]);
 
 }
 

@@ -48,6 +48,7 @@ typedef boost::shared_ptr<class SelectMeshStringDataAdapter> SelectMeshStringDat
 typedef boost::shared_ptr<class ToolRep3D> ToolRep3DPtr;
 typedef boost::shared_ptr<class RecordSessionWidget> RecordSessionWidgetPtr;
 typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
+typedef boost::shared_ptr<class BronchoscopyRegistration> BronchoscopyRegistrationPtr;
 
 /**
  * BronchoscopyRegistrationWidget
@@ -61,6 +62,9 @@ typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
 class BronchoscopyRegistrationWidget: public RegistrationBaseWidget
 {
 	Q_OBJECT
+
+	BronchoscopyRegistrationPtr mBronchoscopyRegistration;
+
 public:
 	BronchoscopyRegistrationWidget(RegServices services, QWidget *parent);
 	virtual ~BronchoscopyRegistrationWidget()
@@ -68,6 +72,7 @@ public:
 	}
 	virtual QString defaultWhatsThis() const;
 private slots:
+	void processCenterlineSlot();
 	void registerSlot();
 	void acquisitionStarted();
 	void acquisitionStopped();
@@ -88,6 +93,7 @@ private:
 	RecordSessionWidgetPtr mRecordSessionWidget;
 	SelectMeshStringDataAdapterPtr mSelectMeshWidget;
 	StringDataAdapterXmlPtr mSessionSelector;
+	QPushButton* mProcessCenterlineButton;
 	QPushButton* mRegisterButton;
     ToolPtr mTool;
 //    TrackedCenterlineWidget* mTrackedCenterLine;

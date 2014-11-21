@@ -67,8 +67,11 @@ namespace cx
 {
 BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegServices services, QWidget* parent) :
 	RegistrationBaseWidget(services, parent, "BronchoscopyRegistrationWidget",
-						   "Bronchoscopy Registration"), mVerticalLayout(new QVBoxLayout(this))
+						   "Bronchoscopy Registration"), mVerticalLayout(new QVBoxLayout(this)),
+	mBronchoscopyRegistration(new BronchoscopyRegistration())
 {
+
+
 	mOptions = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("bronchoscopyregistrationwidget");
 
 	mSelectMeshWidget = SelectMeshStringDataAdapter::New(services.patientModelService);
@@ -81,6 +84,10 @@ BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegServices servi
 
 	connect(services.patientModelService.get(), &PatientModelService::isSaving, this, &BronchoscopyRegistrationWidget::duringSavePatientSlot);
 	connect(services.patientModelService.get(), &PatientModelService::isLoading, this, &BronchoscopyRegistrationWidget::duringLoadPatientSlot);
+
+	mProcessCenterlineButton = new QPushButton("Process centerline");
+	connect(mProcessCenterlineButton, SIGNAL(clicked()), this, SLOT(processCenterlineSlot()));
+	mProcessCenterlineButton->setToolTip(this->defaultWhatsThis());
 
 	mRegisterButton = new QPushButton("Register");
 	connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
@@ -107,6 +114,7 @@ BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegServices servi
 	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mSessionSelector));
 	mVerticalLayout->addWidget(new CheckBoxWidget(this, mUseSubsetOfGenerations));
 	mVerticalLayout->addWidget(createDataWidget(services.visualizationService, services.patientModelService, this, mMaxNumberOfGenerations));
+	mVerticalLayout->addWidget(mProcessCenterlineButton);
     mVerticalLayout->addWidget(mRecordSessionWidget.get());
 	mVerticalLayout->addWidget(mRegisterButton);
 
@@ -150,20 +158,33 @@ QString BronchoscopyRegistrationWidget::defaultWhatsThis() const
 	return QString();
 }
 
+void BronchoscopyRegistrationWidget::processCenterlineSlot()
+{
+	if(!mSelectMeshWidget->getMesh())
+	{
+		reportError("No centerline");
+		return;
+	}
+	vtkPolyDataPtr centerline = mSelectMeshWidget->getMesh()->getVtkPolyData();//input
+	Transform3D rMd = mSelectMeshWidget->getMesh()->get_rMd();
+
+	if (mUseSubsetOfGenerations->getValue())
+		mBronchoscopyRegistration->processCenterline(centerline, rMd, mMaxNumberOfGenerations->getValue());
+	else
+		mBronchoscopyRegistration->processCenterline(centerline, rMd);
+}
+
 void BronchoscopyRegistrationWidget::registerSlot()
 {
+	if(!mBronchoscopyRegistration->isCenterlineProcessed())
+	{
+		reportError("Centerline not processed");
+		return;
+	}
+
 	Transform3D old_rMpr = mServices.patientModelService->get_rMpr();//input to registrationAlgorithm
     //std::cout << "rMpr: " << std::endl;
     //std::cout << old_rMpr << std::endl;
-
-
-    if(!mSelectMeshWidget->getMesh())
-    {
-        reportError("No centerline");
-        return;
-    }
-	vtkPolyDataPtr centerline = mSelectMeshWidget->getMesh()->getVtkPolyData();//input
-    Transform3D rMd = mSelectMeshWidget->getMesh()->get_rMd();
 
     if(!mTool)
         mTool = mServices.trackingService->getActiveTool();
@@ -194,12 +215,8 @@ void BronchoscopyRegistrationWidget::registerSlot()
         return;
     }
 
-	BronchoscopyRegistration reg;
 	Transform3D new_rMpr;
-	if (mUseSubsetOfGenerations)
-		new_rMpr = Transform3D(reg.runBronchoscopyRegistration(centerline,trackerRecordedData_prMt,old_rMpr,rMd,mMaxNumberOfGenerations->getValue()));
-	else
-		new_rMpr = Transform3D(reg.runBronchoscopyRegistration(centerline,trackerRecordedData_prMt,old_rMpr,rMd));
+		new_rMpr = Transform3D(mBronchoscopyRegistration->runBronchoscopyRegistration(trackerRecordedData_prMt,old_rMpr));
 
     new_rMpr = new_rMpr*old_rMpr;//output
 	mServices.registrationService->applyPatientRegistration(new_rMpr, "Bronchoscopy centerline to tracking data");

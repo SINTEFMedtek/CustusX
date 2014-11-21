@@ -51,6 +51,7 @@ public:
 	virtual ~BranchList();
 	void addBranch(Branch* b);
 	void deleteBranch(Branch* b);
+	void deleteAllBranches();
 	std::vector<Branch*> getBranches();
 	void findBranchesInCenterline(Eigen::MatrixXd positions);
 	void selectGenerations(int maxGeneration);
