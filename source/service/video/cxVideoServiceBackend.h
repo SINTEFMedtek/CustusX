@@ -57,14 +57,17 @@ class cxVideoServiceOld_EXPORT VideoServiceBackend
 public:
 	static VideoServiceBackendPtr create(PatientModelServicePtr dataManager,
 								TrackingServicePtr trackingService,
-								SpaceProviderPtr spaceProvider);
+								SpaceProviderPtr spaceProvider,
+										 ctkPluginContext* context);
 	VideoServiceBackend(PatientModelServicePtr dataManager,
 								TrackingServicePtr trackingService,
-								SpaceProviderPtr spaceProvider);
+								SpaceProviderPtr spaceProvider,
+						ctkPluginContext* context);
 
 	PatientModelServicePtr getDataManager();
 	TrackingServicePtr getToolManager();
 	SpaceProviderPtr getSpaceProvider();
+	ctkPluginContext* mContext;
 
 private:
 	PatientModelServicePtr mDataManager;

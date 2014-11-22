@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTool.h"
 #include "cxVideoServiceBackend.h"
 #include "cxLogger.h"
+#include "cxVideoServiceProxy.h"
 
 
 namespace cx
@@ -79,6 +80,8 @@ VideoServiceOld::VideoServiceOld(VideoServiceBackendPtr videoBackend)
 	connect(mVideoConnection.get(), SIGNAL(videoSourcesChanged()), this, SLOT(autoSelectActiveVideoSource()));
 	connect(mVideoConnection.get(), SIGNAL(fps(QString, int)), this, SLOT(fpsSlot(QString, int)));
 	connect(mBackend->getToolManager().get(), SIGNAL(dominantToolChanged(QString)), this, SLOT(autoSelectActiveVideoSource()));
+	connect(mVideoConnection.get(), &VideoConnectionManager::connected,
+			this, &VideoServiceOld::connected);
 }
 
 VideoServiceOld::~VideoServiceOld()
@@ -212,5 +215,32 @@ VideoServiceBackendPtr VideoServiceOld::getBackend()
 {
 	return mBackend;
 }
+
+void VideoServiceOld::openConnection()
+{
+	VideoServicePtr service(new VideoServiceProxy(mBackend->mContext));
+	mVideoConnection->launchAndConnectServer(service);
+}
+
+void VideoServiceOld::closeConnection()
+{
+	mVideoConnection->disconnectServer();
+}
+
+bool VideoServiceOld::isConnected() const
+{
+	return mVideoConnection->isConnected();
+}
+
+QString VideoServiceOld::getConnectionMethod()
+{
+	return mVideoConnection->getConnectionMethod();
+}
+
+void VideoServiceOld::setConnectionMethod(QString connectionMethod)
+{
+	mVideoConnection->setConnectionMethod(connectionMethod);
+}
+
 
 }

@@ -52,10 +52,11 @@ public:
 	virtual ~TestVideoConnectionWidget(){}
 
 public:
-	bool canStream(QString filename, QString streamerType);
+	bool canStream(QString filename);
 
 private:
-	void setupWidgetToRunStreamer(QString filename, QString streamerType);
+	void setupWidgetToRunStreamer(QString filename);
+	cx::DataAdapterPtr getOption(QString uid, QString method);
 };
 
 } /* namespace cxtest */

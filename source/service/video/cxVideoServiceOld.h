@@ -100,7 +100,6 @@ public:
 	static VideoServiceOldPtr create(VideoServiceBackendPtr backend);
 	virtual ~VideoServiceOld();
 
-	VideoConnectionManagerPtr getVideoConnection();
 	USAcquisitionVideoPlaybackPtr getUSAcquisitionVideoPlayback();
 	VideoSourcePtr getActiveVideoSource();
 	void setActiveVideoSource(QString uid);
@@ -108,9 +107,17 @@ public:
 	/** Get all existing video sources.
 	  */
 	std::vector<VideoSourcePtr> getVideoSources();
-	VideoServiceBackendPtr getBackend();
+
+
+	virtual QString getConnectionMethod();
+	virtual void setConnectionMethod(QString connectionMethod);
+	virtual void openConnection();
+	virtual void closeConnection();
+	virtual bool isConnected() const;
 
 signals:
+	void connected(bool on);
+	void connectionMethodChanged();
 	/** Emitted when a video source is set to active,
 	  * OR when the available set of sources are changed.
 	  */
@@ -128,7 +135,8 @@ private slots:
 	void fpsSlot(QString source, int val);
 
 private:
-
+	VideoConnectionManagerPtr getVideoConnection();
+	VideoServiceBackendPtr getBackend();
 	VideoServiceOld(VideoServiceBackendPtr videoBackend);
 
 	VideoServiceOld(VideoServiceOld const&); // not implemented

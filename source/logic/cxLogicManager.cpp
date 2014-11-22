@@ -184,7 +184,8 @@ void LogicManager::createVideoServiceOld()
 	VideoServiceBackendPtr videoBackend;
 	videoBackend = VideoServiceBackend::create(mPatientModelService,
 											   mTrackingService,
-												 mSpaceProvider);
+												 mSpaceProvider,
+											   this->getPluginContext());
 	mVideoServiceOld = VideoServiceOld::create(videoBackend);
 	LegacySingletons::mVideoServiceOld = mVideoServiceOld;
 }

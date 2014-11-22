@@ -72,6 +72,12 @@ public:
 	QString getConnectionMethod();
 	void setConnectionMethod(QString connectionMethod);
 
+	std::vector<VideoSourcePtr> getVideoSources();
+	VideoConnectionPtr getVideoConnection();
+
+	void setReconnectInterval(int interval);
+	bool isConnected() const;
+
 	void setLocalServerExecutable(QString commandline);
 	QString getLocalServerExecutable();
 	void setPort(int port);
@@ -97,11 +103,6 @@ public:
 	void disconnectServer();
 
 	QProcess* getLocalVideoServerProcess();
-	std::vector<VideoSourcePtr> getVideoSources();
-	VideoConnectionPtr getVideoConnection();
-
-	void setReconnectInterval(int interval);
-	bool isConnected() const;
 
 signals:
 	void fps(QString source, int fps);
@@ -129,6 +130,9 @@ private:
 	ProcessWrapperPtr mIniScriptProcess;
 
 	VideoServiceBackendPtr mBackend;
+
+
+
 
 };
 typedef boost::shared_ptr<VideoConnectionManager> VideoConnectionManagerPtr;

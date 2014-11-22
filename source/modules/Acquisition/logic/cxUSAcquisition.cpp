@@ -57,7 +57,7 @@ USAcquisition::USAcquisition(AcquisitionPtr base, QObject* parent) : QObject(par
 	connect(trackingService().get(), &TrackingService::stateChanged, this, &USAcquisition::checkIfReadySlot);
 	connect(trackingService().get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(checkIfReadySlot()));
 	connect(videoService().get(), SIGNAL(activeVideoSourceChanged()), this, SLOT(checkIfReadySlot()));
-	connect(videoService()->getVideoConnection().get(), SIGNAL(connected(bool)), this, SLOT(checkIfReadySlot()));
+	connect(videoService().get(), &VideoServiceOld::connected, this, &USAcquisition::checkIfReadySlot);
 
 	connect(mBase.get(), SIGNAL(started()), this, SLOT(recordStarted()));
 	connect(mBase.get(), SIGNAL(acquisitionStopped()), this, SLOT(recordStopped()), Qt::QueuedConnection);
@@ -74,7 +74,7 @@ USAcquisition::~USAcquisition()
 void USAcquisition::checkIfReadySlot()
 {
 	bool tracking = trackingService()->getState()>=Tool::tsTRACKING;
-	bool streaming = videoService()->getVideoConnection()->isConnected();
+	bool streaming = videoService()->isConnected();
 	ToolPtr tool = trackingService()->getFirstProbe();
 
 	QString mWhatsMissing;
@@ -174,7 +174,7 @@ std::vector<VideoSourcePtr> USAcquisition::getRecordingVideoSources(ToolPtr tool
 	}
 	else
 	{
-		retval = videoService()->getVideoConnection()->getVideoSources();
+		retval = videoService()->getVideoSources();
 	}
 
 	return retval;

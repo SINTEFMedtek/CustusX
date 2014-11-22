@@ -43,6 +43,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxtestUtilities.h"
 #include "cxImage.h"
 #include "cxPatientModelService.h"
+#include "cxDataLocations.h"
+#include "cxStreamerServiceUtilities.h"
+#include "cxLogicManager.h"
 
 //TODO: remove
 #include "cxLegacySingletons.h"
@@ -55,16 +58,16 @@ TestVideoConnectionWidget::TestVideoConnectionWidget(cx::VisualizationServicePtr
 {
 }
 
-bool TestVideoConnectionWidget::canStream(QString filename, QString streamerType)
+bool TestVideoConnectionWidget::canStream(QString filename)
 {
 	this->show();
 	QTest::qWaitForWindowActive(this);
 
-	this->setupWidgetToRunStreamer(filename, streamerType);
+	this->setupWidgetToRunStreamer(filename);
 
 	QTest::mouseClick(mConnectButton, Qt::LeftButton); //connect
 
-	waitForQueuedSignal(this->getVideoConnectionManager().get(), SIGNAL(connected(bool)), 1000);
+	waitForQueuedSignal(cx::videoService().get(), SIGNAL(connected(bool)), 1000);
 	waitForQueuedSignal(cx::videoService().get(), SIGNAL(activeVideoSourceChanged()), 500);
 	cx::VideoSourcePtr stream = cx::videoService()->getActiveVideoSource();
 	waitForQueuedSignal(stream.get(), SIGNAL(newFrame()), 500);
@@ -77,17 +80,35 @@ bool TestVideoConnectionWidget::canStream(QString filename, QString streamerType
 	return canStream;
 }
 
-void TestVideoConnectionWidget::setupWidgetToRunStreamer(QString filename, QString streamerType)
+cx::DataAdapterPtr TestVideoConnectionWidget::getOption(QString uid, QString method)
+{
+	cx::XmlOptionFile options = cx::XmlOptionFile(cx::DataLocations::getXmlSettingsFile()).descend("video");
+	QDomElement element = options.getElement("video");
+	cx::StreamerService* streamer;
+	streamer = cx::StreamerServiceUtilities::getStreamerService(method,
+																cx::logicManager()->getPluginContext());
+	cx::DataAdapterPtr option = cx::DataAdapter::findAdapter(streamer->getSettings(element), uid);
+//	REQUIRE(option.get());
+	return option;
+}
+
+void TestVideoConnectionWidget::setupWidgetToRunStreamer(QString filename)
 {
 	cx::ImagePtr image = Utilities::create3DImage();
 	this->mPatientModelService->setActiveImage(image);
 	this->mPatientModelService->insertData(image);
 
-	QString connectionMethod("Direct Link");
-	mConnectionSelector->setValue(connectionMethod);
-	QString connectionArguments("--type "+streamerType+" --filename " + filename);
-	mDirectLinkArguments->addItem(connectionArguments);
-	mDirectLinkArguments->setCurrentIndex(mDirectLinkArguments->findText(connectionArguments));
+
+
+	QString method = "ImageFile";
+	mConnectionSelector->setValue(method);
+//	cx::videoService()->setConnectionMethod("ImageFile");
+	this->getOption("filename", method)->setValueFromVariant(filename);
+	this->getOption("runlocalserver", method)->setValueFromVariant(false);
+
+//	QString connectionArguments("--type "+streamerType+" --filename " + filename);
+//	mDirectLinkArguments->addItem(connectionArguments);
+//	mDirectLinkArguments->setCurrentIndex(mDirectLinkArguments->findText(connectionArguments));
 }
 
 } /* namespace cxtest */

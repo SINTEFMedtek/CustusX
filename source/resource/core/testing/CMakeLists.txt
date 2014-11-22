@@ -5,7 +5,8 @@ if (BUILD_TESTING)
     )
 
     set(RESOURCE_TEST_CATCH_SOURCE_FILES
-        cxtestCatchStringHelpers.cpp
+		cxtestXmlOptionFile.cpp
+		cxtestCatchStringHelpers.cpp
         cxtestCatchSliceComputer.cpp
         cxtestCatchBoundingBox3D.cpp
         cxtestCatchFrame.cpp

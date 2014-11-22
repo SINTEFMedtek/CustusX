@@ -40,7 +40,7 @@ namespace cx
 
 QString IGTLinkStreamerService::getName()
 {
-	return "OpenIGTLink_new"; // change to "Remote Server"
+	return "Remote Server";
 }
 
 std::vector<DataAdapterPtr> IGTLinkStreamerService::getSettings(QDomElement root)

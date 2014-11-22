@@ -48,7 +48,7 @@ namespace cx
 
 QString OpenCVStreamerService::getName()
 {
-	return "OpenCV_new";
+	return "OpenCV";
 }
 
 std::vector<DataAdapterPtr> OpenCVStreamerService::getSettings(QDomElement root)

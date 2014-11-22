@@ -461,7 +461,7 @@ void MainWindow::createActions()
 	mStartStreamingAction = new QAction(tr("Start Streaming"), mToolsActionGroup);
 	mStartStreamingAction->setShortcut(tr("Ctrl+V"));
 	connect(mStartStreamingAction, SIGNAL(triggered()), this, SLOT(toggleStreamingSlot()));
-	connect(videoService()->getVideoConnection().get(), SIGNAL(connected(bool)), this, SLOT(updateStreamingActionSlot()));
+	connect(videoService().get(), &VideoServiceOld::connected, this, &MainWindow::updateStreamingActionSlot);
 	this->updateStreamingActionSlot();
 
 	mConfigureToolsAction->setChecked(true);
@@ -576,15 +576,15 @@ void MainWindow::saveScreenShotThreaded(QImage pixmap, QString filename)
 
 void MainWindow::toggleStreamingSlot()
 {
-	if (videoService()->getVideoConnection()->isConnected())
-		videoService()->getVideoConnection()->disconnectServer();
+	if (videoService()->isConnected())
+		videoService()->closeConnection();
 	else
-		videoService()->getVideoConnection()->launchAndConnectServer(mVideoService);
+		videoService()->openConnection();
 }
 
 void MainWindow::updateStreamingActionSlot()
 {
-	if (videoService()->getVideoConnection()->isConnected())
+	if (videoService()->isConnected())
 	{
 		mStartStreamingAction->setIcon(QIcon(":/icons/streaming_green.png"));
 		mStartStreamingAction->setText("Stop Streaming");

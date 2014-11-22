@@ -52,6 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVideoService.h"
 #include "cxUsReconstructionServiceProxy.h"
 #include "cxPatientModelService.h"
+#include "cxStreamerServiceUtilities.h"
 
 
 namespace cxtest
@@ -73,6 +74,7 @@ AcquisitionFixture::AcquisitionFixture(QObject* parent) :
 	mRecordDuration(3000)
 {
 	this->setUp();
+	mOptions = cx::XmlOptionFile(cx::DataLocations::getXmlSettingsFile()).descend("video");
 	mNumberOfExpectedStreams = 1;
 }
 
@@ -81,23 +83,56 @@ AcquisitionFixture::~AcquisitionFixture()
 	this->tearDown();
 }
 
+cx::DataAdapterPtr AcquisitionFixture::getOption(QString uid)
+{
+//	cx::XmlOptionFile options = cx::XmlOptionFile(cx::DataLocations::getXmlSettingsFile()).descend("video");
+	QDomElement element = mOptions.getElement("video");
+	cx::StreamerService* streamer;
+	streamer = cx::StreamerServiceUtilities::getStreamerService(mConnectionMethod,
+																cx::logicManager()->getPluginContext());
+	REQUIRE(streamer);
+	cx::DataAdapterPtr option = cx::DataAdapter::findAdapter(streamer->getSettings(element), uid);
+	REQUIRE(option.get());
+	return option;
+}
+
+void AcquisitionFixture::initVideo()
+{
+	mConnectionMethod = "ImageFile";
+	cx::videoService()->setConnectionMethod(mConnectionMethod);
+	INFO("bundle path: "+cx::DataLocations::getBundlePath());
+//	REQUIRE(!cx::stateService()->getOpenIGTLinkServer().isEmpty());
+//	cx::videoService()->getVideoConnection()->
+//			setLocalServerExecutable(cx::stateService()->getOpenIGTLinkServer()[0]);
+//	cx::videoService()->getVideoConnection()->setLocalServerArguments(
+//				QString("%1 --type MHDFile --filename %2 %3")
+//				.arg(cx::stateService()->getOpenIGTLinkServer()[1])
+//				.arg(mAcqDataFilename).arg(mAdditionalGrabberArg));
+
+	this->getOption("filename")->setValueFromVariant(mAcqDataFilename);
+//	this->getOption("runlocalserver")->setValueFromVariant(true);
+//	this->getOption("localservername")->setValueFromVariant(executable);
+
+//	cx::XmlOptionFile options = cx::XmlOptionFile(cx::DataLocations::getXmlSettingsFile()).descend("video");
+//	options.save();
+	std::cout << "filecontent post init\n" << mOptions.getDocument().toString() << std::endl;
+	mOptions.save();
+//	std::cout << "saved to " << cx::DataLocations::getXmlSettingsFile() << std::endl;
+
+}
+
+
 void AcquisitionFixture::setupVideo()
 {
-	SSC_LOG("");
-	cx::videoService()->getVideoConnection()->setConnectionMethod(mConnectionMethod);
-	INFO("bundle path: "+cx::DataLocations::getBundlePath());
-	REQUIRE(!cx::stateService()->getOpenIGTLinkServer().isEmpty());
-	cx::videoService()->getVideoConnection()->setLocalServerExecutable(cx::stateService()->getOpenIGTLinkServer()[0]);
-	cx::videoService()->getVideoConnection()->setLocalServerArguments(
-				QString("%1 --type MHDFile --filename %2 %3").arg(cx::stateService()->getOpenIGTLinkServer()[1]).arg(mAcqDataFilename).arg(mAdditionalGrabberArg));
 	mVideoSource = cx::videoService()->getActiveVideoSource();
 	connect(mVideoSource.get(), SIGNAL(newFrame()), this, SLOT(newFrameSlot()));
 
-	cx::videoService()->getVideoConnection()->setReconnectInterval(3000); // on slow build servers, a long delay is necessary.
+//	cx::videoService()->getVideoConnection()->setReconnectInterval(3000); // on slow build servers, a long delay is necessary.
 
 
-	cx::VideoServicePtr videoService = cx::VideoService::getNullObject(); //mock
-	cx::videoService()->getVideoConnection()->launchAndConnectServer(videoService);
+//	cx::VideoServicePtr videoService = cx::VideoService::getNullObject(); //mock
+//	cx::videoService()->getVideoConnection()->launchAndConnectServer(videoService);
+	cx::videoService()->openConnection();
 }
 
 void AcquisitionFixture::setupProbe()
@@ -138,13 +173,15 @@ void AcquisitionFixture::initialize()
 
 	// run setup of video, probe and start acquisition in series, each depending on the success of the previous:
 	QTimer::singleShot(0, this, SLOT(setupVideo()));
-	connect(cx::videoService()->getVideoConnection().get(), SIGNAL(connected(bool)), this, SLOT(videoConnectedSlot()));
+	connect(cx::videoService().get(), SIGNAL(connected(bool)), this, SLOT(videoConnectedSlot()));
 	connect(cx::trackingService().get(), &cx::TrackingService::stateChanged, this, &AcquisitionFixture::start);
+
+	this->initVideo();
 }
 
 void AcquisitionFixture::videoConnectedSlot()
 {
-	SSC_LOG("");
+//	SSC_LOG("");
 
 	// make sure all sources have started streaming before running probe setup (there might be several sources)
 	if (cx::videoService()->getVideoSources().size() < mNumberOfExpectedStreams)

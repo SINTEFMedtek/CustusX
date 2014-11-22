@@ -42,6 +42,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 #include <iostream>
 #include <QFile>
+#include <QDir>
+#include <QFileInfo>
 #include <QTextStream>
 #include <QDomElement>
 #include <QStringList>
@@ -106,7 +108,9 @@ private:
 		QFile file(filename);
 		if (!file.open(QIODevice::ReadOnly))
 		{
-			return QDomDocument();
+			QDomDocument doc;
+			doc.appendChild(doc.createElement("root"));
+			return doc;
 		}
 
 		QDomDocument loadedDoc;
@@ -201,23 +205,6 @@ XmlOptionFile::XmlOptionFile(QString filename) :
 {
 	mDocument = SharedDocuments::getInstance()->loadDocument(filename);
 
-//	if (!mSharedDocuments)
-//	{
-//		mSharedDocuments = new SharedDocuments;
-//	}
-
-//	mDocument = mSharedDocuments->getDocument(filename);
-//	if (mDocument.isNull())
-//	{
-//		//    std::cout << "    no doc found, creating new. " << std::endl;
-//		this->load();
-//		mSharedDocuments->addDocument(filename, mDocument);
-//	}
-//	else
-//	{
-//		//    std::cout << "    reusing cached document" << std::endl;
-//	}
-
 	mCurrentElement = mDocument.documentElement();
 
 	if (mCurrentElement.isNull())
@@ -228,7 +215,8 @@ XmlOptionFile::XmlOptionFile(QString filename) :
 }
 
 XmlOptionFile::~XmlOptionFile()
-{}
+{
+}
 
 QString XmlOptionFile::getFileName()
 {
@@ -372,6 +360,8 @@ void XmlOptionFile::save()
 		return; //Don't do anything if on filename isn't supplied
 	}
 
+	QString path = QFileInfo(mFilename).absolutePath();
+	QDir().mkpath(path);
 	QFile file(mFilename);
 	if (file.open(QIODevice::WriteOnly | QIODevice::Truncate))
 	{
@@ -387,29 +377,5 @@ void XmlOptionFile::save()
 	}
 }
 
-//void XmlOptionFile::load()
-//{
-//	QFile file(mFilename);
-//	if (!file.open(QIODevice::ReadOnly))
-//	{
-//		// ok to not find file - we have nice defaults.
-//		//reportWarning("file not found: "+ QString(defPath+filename).toStdString());
-//	}
-//	else
-//	{
-//		QDomDocument loadedDoc;
-//		QString error;
-//		int line, col;
-//		if (!loadedDoc.setContent(&file, &error, &line, &col))
-//		{
-//			reportWarning("error setting xml content [" + qstring_cast(line) + "," + qstring_cast(
-//				col) + "]" + qstring_cast(error));
-//		}
-//		file.close();
-//		mDocument = loadedDoc;
-//		mCurrentElement = mDocument.documentElement();
-//	}
-
-//}
 
 } // namespace cx

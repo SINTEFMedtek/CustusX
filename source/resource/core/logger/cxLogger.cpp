@@ -49,8 +49,8 @@ namespace // unnamed
 
 void SSC_Log( const char *file, int line, const char *function, const char *format, ... )
 {
-	if (!cx::reporter()->isEnabled())
-		return;
+//	if (!cx::reporter()->isEnabled())
+//		return;
 
 	va_list ap;
 	char buf[MAX_LEN_LOG_LINE];
@@ -63,8 +63,8 @@ void SSC_Log( const char *file, int line, const char *function, const char *form
 
 void SSC_Error( const char *file, int line, const char *function, const char *format, ... )
 {
-	if (!cx::reporter()->isEnabled())
-		return;
+//	if (!cx::reporter()->isEnabled())
+//		return;
 
 	va_list ap;
 	char buf[MAX_LEN_LOG_LINE];
@@ -77,8 +77,8 @@ void SSC_Error( const char *file, int line, const char *function, const char *fo
 
 void SSC_Warning( const char *file, int line, const char *function, const char *format, ... )
 {
-	if (!cx::reporter()->isEnabled())
-		return;
+//	if (!cx::reporter()->isEnabled())
+//		return;
 
 	va_list ap;
 	char buf[MAX_LEN_LOG_LINE];

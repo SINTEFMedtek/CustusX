@@ -84,7 +84,7 @@ TEST_CASE("VideoConnectionWidget can stream", "[unit][gui][not_win32][widget][st
 	cx::VideoServicePtr videoService = cx::VideoService::getNullObject();
 
 	TestVideoConnectionWidget* widget = new TestVideoConnectionWidget(visualizationService, patientModelService, videoService);
-	REQUIRE(widget->canStream(filename, "MHDFile"));
+	REQUIRE(widget->canStream(filename));
 //	REQUIRE(widget->canStream(filename, "SimulatedImageStreamer"));
 
 	ts.reset();

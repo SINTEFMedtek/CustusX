@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxStringDataAdapterXml.h"
 #include "cxDoubleDataAdapterXml.h"
 #include "cxBoolDataAdapterXml.h"
+#include "cxDataReaderWriter.h"
 
 namespace cx
 {
@@ -114,15 +115,15 @@ QStringList ImageStreamerDummyArguments::getArgumentDescription()
 namespace cx
 {
 
-vtkImageDataPtr loadImage(QString filename)
-{
-	vtkMetaImageReaderPtr reader = vtkMetaImageReaderPtr::New();
-	reader->SetFileName(filename.toStdString().c_str());
-	reader->ReleaseDataFlagOn();
-	reader->Update();
+//vtkImageDataPtr loadImage(QString filename)
+//{
+//	vtkMetaImageReaderPtr reader = vtkMetaImageReaderPtr::New();
+//	reader->SetFileName(filename.toStdString().c_str());
+//	reader->ReleaseDataFlagOn();
+//	reader->Update();
 
-	return reader->GetOutput();
-}
+//	return reader->GetOutput();
+//}
 
 vtkLookupTablePtr createLookupTable(int numberOfTableValues)
 {
@@ -254,7 +255,9 @@ QString DummyImageStreamer::getType()
 
 vtkImageDataPtr DummyImageStreamer::internalLoadImage(QString filename)
 {
-	vtkImageDataPtr source = loadImage(filename);
+	vtkImageDataPtr source = MetaImageReader().loadVtkImageData(filename);
+
+//	vtkImageDataPtr source = loadImage(filename);
 	if (source)
 		std::cout << "DummyImageStreamer: Initialized with source file: \n\t" << getFileName().toStdString() << std::endl;
 	else
