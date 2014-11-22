@@ -87,8 +87,6 @@ TEST_CASE("XmlOptionFile: Write and read value in-memory", "[unit][resource][cor
 	CHECK(item2.readValue("none") == file1.value); //  second item contains same value as first
 }
 
-
-
 TEST_CASE("XmlOptionFile: Multiple instances share data", "[unit][resource][core]")
 {
 	cx::DataLocations::setTestMode();
@@ -111,7 +109,6 @@ TEST_CASE("XmlOptionFile: Writing to file using one instance, then loading using
 {
 	cx::DataLocations::setTestMode();
 
-	cx::report("###################################");
 	// write using file1
 	{
 		XmlOptionFileFixture file1;

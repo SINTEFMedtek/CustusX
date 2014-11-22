@@ -32,21 +32,83 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxImageReceiverThread.h"
 #include "cxReporter.h"
-#include "cxVector3D.h"
 #include "cxCyclicActionLogger.h"
-#include "cxVideoServiceOld.h"
+#include "cxXmlOptionItem.h"
+#include "cxDataLocations.h"
+#include "cxStreamer.h"
+#include "cxStreamerService.h"
+#include "cxDirectlyLinkedSender.h"
 
 namespace cx
 {
 
-ImageReceiverThread::ImageReceiverThread(QObject* parent) :
-		QThread(parent)
+class AbsDoubleLess
 {
-//	mFPSTimer.reset(new CyclicActionLogger());
+public:
+	AbsDoubleLess(double center) : mCenter(center) { };
+
+  bool operator()(const double& d1, const double& d2)
+  {
+	return fabs(d1 - mCenter) < fabs(d2 - mCenter);
+  }
+
+  double mCenter;
+};
+
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+
+ImageReceiverThread::ImageReceiverThread(StreamerServicePtr streamerInterface, QObject* parent) :
+		QThread(parent),
+		mStreamerInterface(streamerInterface)
+{
 	mGeneratingTimeCalibration = false;
 	mLastReferenceTimestampDiff = 0.0;
 	mLastTimeStamps.reserve(20);
 }
+
+void ImageReceiverThread::run()
+{
+	XmlOptionFile xmlFile = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("video");
+	QDomElement element = xmlFile.getElement("video");
+	mImageStreamer = mStreamerInterface->createStreamer(element);
+	report(QString("Starting streamer: [%1]").arg(mImageStreamer->getType()));
+
+	if(!mImageStreamer)
+	{
+		this->quit();
+		std::cout << "quitting..." << std::endl;
+		return;
+	}
+	mSender.reset(new DirectlyLinkedSender());
+
+	connect(mSender.get(), SIGNAL(newImage()), this, SLOT(addImageToQueueSlot()), Qt::DirectConnection);
+	connect(mSender.get(), SIGNAL(newUSStatus()), this, SLOT(addSonixStatusToQueueSlot()), Qt::DirectConnection);
+
+	if(!mImageStreamer->startStreaming(mSender))
+		this->quit();
+	emit connected(true);
+
+	this->exec();
+
+
+	mImageStreamer->stopStreaming();
+	mImageStreamer.reset();
+	mSender.reset();
+	emit connected(false);
+}
+
+void ImageReceiverThread::addImageToQueueSlot()
+{
+	this->addImageToQueue(mSender->popImage());
+}
+
+void ImageReceiverThread::addSonixStatusToQueueSlot()
+{
+	this->addSonixStatusToQueue(mSender->popUSStatus());
+}
+
 
 void ImageReceiverThread::addImageToQueue(ImagePtr imgMsg)
 {
@@ -165,6 +227,13 @@ void ImageReceiverThread::reportFPS(QString streamUid)
 bool ImageReceiverThread::imageComesFromSonix(ImagePtr imgMsg)
 {
 	return imgMsg->getUid().contains("Sonix", Qt::CaseInsensitive);
+}
+
+QString ImageReceiverThread::hostDescription() const
+{
+	if (!mStreamerInterface)
+		return "none";
+	return mStreamerInterface->getName();
 }
 
 

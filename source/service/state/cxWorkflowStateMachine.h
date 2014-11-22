@@ -66,7 +66,7 @@ class cxStateService_EXPORT WorkflowStateMachine: public QStateMachine
 {
 Q_OBJECT
 public:
-	WorkflowStateMachine(VideoServicePtr videoService, StateServiceBackendPtr backend);
+	WorkflowStateMachine(StateServiceBackendPtr backend);
 	virtual ~WorkflowStateMachine();
 
 	QActionGroup* getActionGroup();

@@ -36,13 +36,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxSettings.h"
 #include "cxVideoServiceOld.h"
-#include "cxVideoConnectionManager.h"
 #include "cxTrackingService.h"
 #include "cxUSSavingRecorder.h"
 #include "cxAcquisitionData.h"
 #include "cxUsReconstructionService.h"
 #include "cxUSReconstructInputData.h"
 #include "cxPatientModelService.h"
+#include "cxVideoSource.h"
+
 
 namespace cx
 {

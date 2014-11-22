@@ -42,7 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxTrackingService.h"
 #include "cxReporter.h"
-#include "cxVideoConnectionManager.h"
 #include "cxTrackingService.h"
 #include "cxViewManager.h"
 #include "cxVideoServiceOld.h"
@@ -50,7 +49,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMetaMethod>
 #include "libQtSignalAdapters/Qt2Func.h"
 #include "libQtSignalAdapters/ConnectionFactories.h"
-#include "cxVideoConnection.h"
 #include "cxManualTool.h"
 #include "cxTypeConversions.h"
 #include "cxDefinitionStrings.h"

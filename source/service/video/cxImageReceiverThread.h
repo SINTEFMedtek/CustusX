@@ -37,18 +37,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxVideoServiceOldExport.h"
 
+
 #include <vector>
 #include "boost/shared_ptr.hpp"
-
 #include <QThread>
 #include <QMutex>
-
-#include "cxImage.h"
-#include "cxTool.h"
+#include <QDateTime>
+#include "cxForwardDeclarations.h"
 
 namespace cx
 {
 typedef boost::shared_ptr<class CyclicActionLogger> CyclicActionLoggerPtr;
+typedef boost::shared_ptr<class Streamer> StreamerPtr;
+typedef boost::shared_ptr<class StreamerService> StreamerServicePtr;
+typedef boost::shared_ptr<class DirectlyLinkedSender> DirectlyLinkedSenderPtr;
+typedef boost::shared_ptr<class ProbeDefinition> ProbeDefinitionPtr;
 
 /**
  * \file
@@ -56,19 +59,6 @@ typedef boost::shared_ptr<class CyclicActionLogger> CyclicActionLoggerPtr;
  * @{
  */
 
-
-class cxVideoServiceOld_EXPORT AbsDoubleLess
-{
-public:
-	AbsDoubleLess(double center) : mCenter(center) { };
-
-  bool operator()(const double& d1, const double& d2)
-  {
-    return fabs(d1 - mCenter) < fabs(d2 - mCenter);
-  }
-
-  double mCenter;
-};
 
 typedef boost::shared_ptr<class ImageReceiverThread> ImageReceiverThreadPtr;
 
@@ -87,11 +77,11 @@ class cxVideoServiceOld_EXPORT ImageReceiverThread: public QThread
 {
 Q_OBJECT
 public:
-	ImageReceiverThread(QObject* parent = NULL);
+	ImageReceiverThread(StreamerServicePtr streamerInterface, QObject* parent = NULL);
 	virtual ~ImageReceiverThread() {}
 	virtual ImagePtr getLastImageMessage(); // threadsafe, Threadsafe retrieval of last image message.
 	virtual ProbeDefinitionPtr getLastSonixStatusMessage(); // threadsafe,Threadsafe retrieval of last status message.
-	virtual QString hostDescription() const = 0; // threadsafe
+	virtual QString hostDescription() const; // threadsafe
 
 signals:
 	void imageReceived();
@@ -99,6 +89,9 @@ signals:
 	void fps(QString, double);
 	void connected(bool on);
 	void stopInternal();
+
+protected:
+	virtual void run();
 
 protected:
 	/** Add the message to a thread-safe queue.
@@ -110,6 +103,10 @@ protected:
 	void addImageToQueue(ImagePtr imgMsg);
 	void addSonixStatusToQueue(ProbeDefinitionPtr msg); ///< add the message to a thread-safe queue
 	void calibrateTimeStamp(ImagePtr imgMsg); ///< Calibrate the time stamps of the incoming message based on the computer clock. Calibration is based on an average of several of the last messages. The calibration is updated every 20-30 sec.
+
+private slots:
+	void addImageToQueueSlot();
+	void addSonixStatusToQueueSlot();
 
 private:
 	void reportFPS(QString streamUid);
@@ -125,6 +122,11 @@ private:
 	bool mGeneratingTimeCalibration;
 	QDateTime mLastSyncTime;
 	std::vector<double> mLastTimeStamps;
+
+	StreamerServicePtr mStreamerInterface;
+	StreamerPtr mImageStreamer;
+	DirectlyLinkedSenderPtr mSender;
+
 };
 
 /**

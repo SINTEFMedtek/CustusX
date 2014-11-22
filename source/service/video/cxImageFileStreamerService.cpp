@@ -67,14 +67,9 @@ std::vector<DataAdapterPtr> ImageFileStreamerService::getSettings(QDomElement ro
 
 StreamerPtr ImageFileStreamerService::createStreamer(QDomElement root)
 {
-	std::cout << "filecontent create streamer\n" << root.ownerDocument().toString().toStdString() << std::endl;
+//	std::cout << "filecontent create streamer\n" << root.ownerDocument().toString().toStdString() << std::endl;
 
 	StringMap args = ImageStreamerDummyArguments().convertToCommandLineArguments(root);
-	std::cout << "arg.size() " << args.size() << std::endl;
-	for (StringMap::iterator i=args.begin(); i!=args.end(); ++i)
-	{
-		std::cout << "  -  " << i->first << " - " << i->second << std::endl;
-	}
 	StreamerPtr localServerStreamer = LocalServerStreamer::createStreamerIfEnabled(root, args);
 
 	if (localServerStreamer)

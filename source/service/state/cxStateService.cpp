@@ -162,11 +162,11 @@ private:
 /// -------------------------------------------------------
 /// -------------------------------------------------------
 
-StateServicePtr StateService::create(VideoServicePtr videoService, StateServiceBackendPtr backend)
+StateServicePtr StateService::create(StateServiceBackendPtr backend)
 {
 	StateServicePtr retval;
 	retval.reset(new StateService());
-	retval->initialize(videoService, backend);
+	retval->initialize(backend);
 	return retval;
 }
 
@@ -179,7 +179,7 @@ StateService::~StateService()
 {
 }
 
-void StateService::initialize(VideoServicePtr videoService, StateServiceBackendPtr backend)
+void StateService::initialize(StateServiceBackendPtr backend)
 {
 	mBackend = backend;
 	this->fillDefaultSettings();
@@ -187,7 +187,7 @@ void StateService::initialize(VideoServicePtr videoService, StateServiceBackendP
 	mApplicationStateMachine.reset(new ApplicationStateMachine(mBackend));
 	mApplicationStateMachine->start();
 
-	mWorkflowStateMachine.reset(new WorkflowStateMachine(videoService, mBackend));
+	mWorkflowStateMachine.reset(new WorkflowStateMachine(mBackend));
 	mWorkflowStateMachine->start();
 }
 
@@ -211,80 +211,6 @@ void StateService::fillDefault(QString name, T value)
 {
 	if (!settings()->contains(name))
 		settings()->setValue(name, value);
-}
-
-/** Look for a grabber server with a given name in path.
- *  If found, return filename with args relative to bundle dir.
- *
- */
-QStringList StateService::checkGrabberServerExist(QString path, QString filename, QString args)
-{
-	QStringList retval;
-	path = QDir::cleanPath(path);
-	if (QDir(path).exists(filename))
-		retval << QDir(DataLocations::getBundlePath()).relativeFilePath(path + "/" + filename) << args;
-	return retval;
-}
-
-
-QStringList StateService::getOpenIGTLinkServer()
-{
-	QString filename = "OpenIGTLinkServer";
-	QString postfix = "";
-#ifdef WIN32
-	filename = "OpenIGTLinkServer.exe";
-	postfix = "--in_width 800 --in_height 600";
-#endif
-	return this->getGrabberServer(filename, postfix);
-}
-
-/**Return the location of external video grabber application that
- * can be used as a local server controlled by CustusX.
- *
- */
-QStringList StateService::getDefaultGrabberServer()
-{
-	return this->getOpenIGTLinkServer();
-}
-
-QStringList StateService::getGrabberServer(QString filename, QString postfix)
-{
-
-	QStringList result;
-#ifdef __APPLE__
-	// run from installed folder on mac
-	result = this->checkGrabberServerExist(qApp->applicationDirPath(), filename, postfix);
-	if (!result.isEmpty())
-		return result;
-#endif
-	// run from installed or build bin folder
-	result = this->checkGrabberServerExist(DataLocations::getBundlePath(), filename, postfix);
-	if (!result.isEmpty())
-		return result;
-	else
-		cx::reporter()->sendWarning("StateService::getGrabberServer() can't locate grabber server");
-
-	return result;
-}
-
-QString StateService::getDefaultGrabberInitScript()
-{
-#ifdef __APPLE__
-	return "";
-#elif WIN32
-	return "";
-#else
-	// this applies to VGA-based used of the Epiphan DVI2USB converter. Too specialized to be a general default.
-	// Also causes script to ask for root access, which thrashes the command line.
-//	QStringList result;
-//	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/..", "run_v2u.sh", "");
-//	if (!result.isEmpty())
-//		return result[0];
-//	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../../CustusX/install/Linux/copy/", "run_v2u.sh", "");
-//	if (!result.isEmpty())
-//		return result[0];
-	return "";
-#endif
 }
 
 /**Enter all default Settings here.
@@ -319,19 +245,19 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("Navigation/followTooltip", true);
 	this->fillDefault("Navigation/followTooltipBoundary", 0.1);
 
-	QStringList grabber = this->getDefaultGrabberServer();
-	if (grabber.size()>0)
-	{
-		this->fillDefault("IGTLink/localServer", grabber[0]);
-		grabber.pop_front();
-		if (grabber.size()>0)
-		{
-			this->fillDefault("IGTLink/arguments", grabber.join(" "));
-			this->fillDefault("IGTLink/directLinkArgumentHistory", QStringList() << grabber.join(" "));
-		}
-	}
+//	QStringList grabber = this->getDefaultGrabberServer();
+//	if (grabber.size()>0)
+//	{
+//		this->fillDefault("IGTLink/localServer", grabber[0]);
+//		grabber.pop_front();
+//		if (grabber.size()>0)
+//		{
+//			this->fillDefault("IGTLink/arguments", grabber.join(" "));
+//			this->fillDefault("IGTLink/directLinkArgumentHistory", QStringList() << grabber.join(" "));
+//		}
+//	}
 
-	this->fillDefault("IGTLink/initScript", this->getDefaultGrabberInitScript());
+//	this->fillDefault("IGTLink/initScript", this->getDefaultGrabberInitScript());
 
 	this->fillDefault("showSectorInRTView", true);
 	this->fillDefault("View3D/stereoType", stFRAME_SEQUENTIAL);

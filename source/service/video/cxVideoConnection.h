@@ -38,9 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 #include <boost/array.hpp>
 #include "cxForwardDeclarations.h"
-#include "cxVideoSource.h"
-#include "cxProbeData.h"
-#include "cxStreamerService.h"
 
 class QTimer;
 typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
@@ -54,6 +51,8 @@ namespace cx
  * @{
  */
 
+typedef boost::shared_ptr<class ProbeDefinition> ProbeDefinitionPtr;
+typedef boost::shared_ptr<class StreamerService> StreamerServicePtr;
 typedef boost::shared_ptr<class ImageReceiverThread> ImageReceiverThreadPtr;
 typedef boost::shared_ptr<class BasicVideoSource> BasicVideoSourcePtr;
 typedef boost::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
@@ -81,15 +80,9 @@ public:
 	explicit VideoConnection(VideoServiceBackendPtr backend);
 	virtual ~VideoConnection();
 	virtual bool isConnected() const;
-
-	void runDirectLinkClient(std::map<QString, QString> args);
-	void runDirectLinkClient(StreamerService* service);
-	void runIGTLinkedClient(QString address, int port);
 	void disconnectServer();
-
+	void runDirectLinkClient(StreamerService* service);
 	std::vector<VideoSourcePtr> getVideoSources();
-	StreamerServicePtr getStreamerInterface();
-
 
 signals:
 	bool connected(bool);
@@ -106,6 +99,7 @@ private slots:
 	void useUnusedProbeDataSlot();///< If no probe is available the ProbeData is saved and this slot is called when a probe becomes available
 
 private:
+	StreamerServicePtr getStreamerInterface();
 	void updateImage(ImagePtr message); // called by receiving thread when new data arrives.
 	void runClient(ImageReceiverThreadPtr client);
 	void stopClient(); ///< Get rid of the mClient thread.
@@ -113,17 +107,13 @@ private:
 	void updateStatus(ProbeDefinitionPtr message);
 	void startAllSources();
 	void removeSourceFromProbe(ToolPtr tool);
-	void runImageReceiverThread();
 
 	ImageReceiverThreadPtr mClient;
 	bool mConnected;
 	double mFPS;
 	std::vector<ProbeDefinitionPtr> mUnsusedProbeDataVector;
-
 	std::vector<BasicVideoSourcePtr> mSources;
-
 	VideoServiceBackendPtr mBackend;
-
 	StreamerServicePtr mStreamerInterface;
 };
 typedef boost::shared_ptr<VideoConnection> VideoConnectionPtr;

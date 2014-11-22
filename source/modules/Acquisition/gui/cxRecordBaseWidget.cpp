@@ -44,8 +44,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMesh.h"
 #include "cxTransform3D.h"
 #include "cxRecordSessionWidget.h"
-#include "cxVideoConnectionManager.h"
-//#include "cxProbeImpl.h"
 #include "cxSoundSpeedConversionWidget.h"
 
 namespace cx

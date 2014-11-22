@@ -222,8 +222,7 @@ void LogicManager::createStateService()
 										  mVideoServiceOld,
 										  mSpaceProvider,
 										  mPatientModelService));
-	VideoServicePtr videoService(new VideoServiceProxy(getPluginContext()));
-	mStateService = StateService::create(videoService, backend);
+	mStateService = StateService::create(backend);
 	LegacySingletons::mStateService = mStateService;
 }
 

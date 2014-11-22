@@ -38,7 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVideoSource.h"
 #include "cxStringDataAdapterXml.h"
 #include "cxVideoServiceOld.h"
-#include "cxVideoConnectionManager.h"
 #include "cxtestQueuedSignalListener.h"
 #include "cxtestUtilities.h"
 #include "cxImage.h"

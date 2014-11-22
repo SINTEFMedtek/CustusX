@@ -138,7 +138,7 @@ class cxStateService_EXPORT StateService: public QObject
 Q_OBJECT
 
 public:
-	static StateServicePtr create(VideoServicePtr videoService, StateServiceBackendPtr backend);
+	static StateServicePtr create(StateServiceBackendPtr backend);
 	virtual ~StateService();
 
 //	static StateService* createInstance(StateServiceBackendPtr backend);
@@ -159,25 +159,16 @@ public:
 private:
 	StateService();
 
-	void initialize(VideoServicePtr videoService, StateServiceBackendPtr backend); ///< init stuff that is dependent of the statemanager
+	void initialize(StateServiceBackendPtr backend); ///< init stuff that is dependent of the statemanager
 	void fillDefaultSettings();
 	template<class T>
 	void fillDefault(QString name, T value);
-
-	QStringList getDefaultGrabberServer();
-	QStringList getGrabberServer(QString filename, QString postfix);
-	QStringList checkGrabberServerExist(QString path, QString filename, QString args);
-	QString getDefaultGrabberInitScript();
-
-//	static StateService* mTheInstance; ///< the only instance of this class
 
 	WorkflowStateMachinePtr mWorkflowStateMachine;
 	ApplicationStateMachinePtr mApplicationStateMachine;
 	StateServiceBackendPtr mBackend;
 
 };
-
-//StateService* stateService();
 
 /**
  * @}

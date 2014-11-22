@@ -39,27 +39,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxVideoServiceOld.h"
 
-#include "ctkPluginContext.h"
-
 #include "cxPlaybackUSAcquisitionVideo.h"
 #include "cxVideoConnection.h"
-#include "cxVideoConnectionManager.h"
 #include "cxBasicVideoSource.h"
 #include "cxTypeConversions.h"
-
 #include "cxTrackingService.h"
-#include "cxTool.h"
 #include "cxVideoServiceBackend.h"
-#include "cxLogger.h"
 #include "cxVideoServiceProxy.h"
+#include "cxReporter.h"
 
 
 namespace cx
 {
-
-//// --------------------------------------------------------
-//VideoServiceOldPtr VideoServiceOld::mInstance = NULL; ///< static member
-//// --------------------------------------------------------
 
 VideoServiceOldPtr VideoServiceOld::create(VideoServiceBackendPtr backend)
 {
@@ -72,29 +63,25 @@ VideoServiceOld::VideoServiceOld(VideoServiceBackendPtr videoBackend)
 {
 	mBackend = videoBackend;
 	mEmptyVideoSource.reset(new BasicVideoSource());
-	mVideoConnection.reset(new VideoConnectionManager(mBackend));
+	mVideoConnection.reset(new VideoConnection(mBackend));
 	mActiveVideoSource = mEmptyVideoSource;
 	mUSAcquisitionVideoPlayback.reset(new USAcquisitionVideoPlayback(mBackend));
 
-	connect(mVideoConnection.get(), SIGNAL(connected(bool)), this, SLOT(autoSelectActiveVideoSource()));
-	connect(mVideoConnection.get(), SIGNAL(videoSourcesChanged()), this, SLOT(autoSelectActiveVideoSource()));
-	connect(mVideoConnection.get(), SIGNAL(fps(QString, int)), this, SLOT(fpsSlot(QString, int)));
+	connect(mVideoConnection.get(), &VideoConnection::connected, this, &VideoServiceOld::autoSelectActiveVideoSource);
+	connect(mVideoConnection.get(), &VideoConnection::videoSourcesChanged, this, &VideoServiceOld::autoSelectActiveVideoSource);
+	connect(mVideoConnection.get(), &VideoConnection::fps, this, &VideoServiceOld::fpsSlot);
 	connect(mBackend->getToolManager().get(), SIGNAL(dominantToolChanged(QString)), this, SLOT(autoSelectActiveVideoSource()));
-	connect(mVideoConnection.get(), &VideoConnectionManager::connected,
-			this, &VideoServiceOld::connected);
+	connect(mVideoConnection.get(), &VideoConnection::connected, this, &VideoServiceOld::connected);
 }
 
 VideoServiceOld::~VideoServiceOld()
 {
-	disconnect(mVideoConnection.get(), SIGNAL(connected(bool)), this, SLOT(autoSelectActiveVideoSource()));
-	disconnect(mVideoConnection.get(), SIGNAL(videoSourcesChanged()), this, SLOT(autoSelectActiveVideoSource()));
 	mVideoConnection.reset();
 }
 
 void VideoServiceOld::autoSelectActiveVideoSource()
 {
 	VideoSourcePtr suggestion = this->getGuessForActiveVideoSource(mActiveVideoSource);
-//	std::cout << "VideoServiceOld::autoSelectActiveVideoSource() " << suggestion->getUid() << std::endl;
 	this->setActiveVideoSource(suggestion->getUid());
 }
 
@@ -106,8 +93,6 @@ void VideoServiceOld::setActiveVideoSource(QString uid)
 	for (unsigned i=0; i<sources.size(); ++i)
 		if (sources[i]->getUid()==uid)
 			mActiveVideoSource = sources[i];
-
-//	std::cout << "VideoServiceOld::setActiveVideoSource() " << mActiveVideoSource->getUid() << std::endl;
 
 	// set active stream in all probes if stream is present:
 	TrackingService::ToolMap tools = mBackend->getToolManager()->getTools();
@@ -164,10 +149,10 @@ USAcquisitionVideoPlaybackPtr VideoServiceOld::getUSAcquisitionVideoPlayback()
 	return mUSAcquisitionVideoPlayback;
 }
 
-VideoConnectionManagerPtr VideoServiceOld::getVideoConnection()
-{
-	return mVideoConnection;
-}
+//VideoConnectionManagerPtr VideoServiceOld::getVideoConnection()
+//{
+//	return mVideoConnection;
+//}
 
 VideoSourcePtr VideoServiceOld::getActiveVideoSource()
 {
@@ -218,8 +203,19 @@ VideoServiceBackendPtr VideoServiceOld::getBackend()
 
 void VideoServiceOld::openConnection()
 {
-	VideoServicePtr service(new VideoServiceProxy(mBackend->mContext));
-	mVideoConnection->launchAndConnectServer(service);
+	VideoServicePtr videoService(new VideoServiceProxy(mBackend->mContext));
+
+	if (mVideoConnection->isConnected())
+		return;
+
+	StreamerService* service = videoService->getStreamerService(mConnectionMethod);
+	if (!service)
+	{
+		reportError(QString("Found no streamer for method [%1]").arg(mConnectionMethod));
+		return;
+	}
+
+	mVideoConnection->runDirectLinkClient(service);
 }
 
 void VideoServiceOld::closeConnection()
@@ -234,12 +230,22 @@ bool VideoServiceOld::isConnected() const
 
 QString VideoServiceOld::getConnectionMethod()
 {
-	return mVideoConnection->getConnectionMethod();
+	return mConnectionMethod;
 }
 
 void VideoServiceOld::setConnectionMethod(QString connectionMethod)
 {
-	mVideoConnection->setConnectionMethod(connectionMethod);
+	if (mConnectionMethod == connectionMethod)
+		return;
+
+	if(connectionMethod.isEmpty())
+	{
+		reporter()->sendWarning("Trying to set connection method to empty string");
+		return;
+	}
+
+	mConnectionMethod = connectionMethod;
+	emit connectionMethodChanged();
 }
 
 

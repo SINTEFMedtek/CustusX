@@ -38,15 +38,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 
 #include <vector>
-#include "cxVideoSource.h"
 #include "cxForwardDeclarations.h"
+
 class ctkPluginContext;
 
 namespace cx
 {
+typedef boost::shared_ptr<class VideoSource> VideoSourcePtr;
 typedef boost::shared_ptr<class USAcquisitionVideoPlayback> USAcquisitionVideoPlaybackPtr;
 typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
-typedef boost::shared_ptr<class VideoConnectionManager> VideoConnectionManagerPtr;
+typedef boost::shared_ptr<class VideoConnection> VideoConnectionPtr;
 typedef boost::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
 
 /**
@@ -135,7 +136,7 @@ private slots:
 	void fpsSlot(QString source, int val);
 
 private:
-	VideoConnectionManagerPtr getVideoConnection();
+//	VideoConnectionManagerPtr getVideoConnection();
 	VideoServiceBackendPtr getBackend();
 	VideoServiceOld(VideoServiceBackendPtr videoBackend);
 
@@ -157,7 +158,9 @@ private:
 	  */
 	VideoSourcePtr getGuessForActiveVideoSource(VideoSourcePtr old);
 
-	VideoConnectionManagerPtr mVideoConnection;
+	QString mConnectionMethod;
+	VideoConnectionPtr mVideoConnection;
+
 	VideoSourcePtr mActiveVideoSource;
 	VideoSourcePtr mEmptyVideoSource;
 	USAcquisitionVideoPlaybackPtr mUSAcquisitionVideoPlayback;

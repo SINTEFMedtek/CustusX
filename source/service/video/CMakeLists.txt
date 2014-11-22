@@ -19,12 +19,9 @@
 SET( CX_QT_MOC_HEADER_FILES
     cxBasicVideoSource.h
     cxVideoServiceOld.h
-    cxVideoConnectionManager.h
     cxVideoConnection.h
     cxPlaybackUSAcquisitionVideo.h
     cxImageReceiverThread.h
-    cxDirectlyLinkedImageReceiverThread.h
-	cxIGTLinkedImageReceiverThread.h
 	cxIGTLinkStreamerService.h
 	cxIGTLinkClientStreamer.h
 	cxOpenCVStreamerService.h
@@ -36,8 +33,6 @@ SET (cxVideoServiceOld_SOURCE
     cxBasicVideoSource.h
 	cxBasicVideoSource.cpp
 	cxVideoServiceOld.cpp
-    cxVideoConnectionManager.cpp
-    cxVideoConnectionManager.h
     cxVideoConnection.h
     cxVideoConnection.cpp
     cxPlaybackUSAcquisitionVideo.h
@@ -45,17 +40,11 @@ SET (cxVideoServiceOld_SOURCE
 
     cxImageReceiverThread.h
     cxImageReceiverThread.cpp
-    cxIGTLinkedImageReceiverThread.h
-    cxIGTLinkedImageReceiverThread.cpp
-    cxDirectlyLinkedImageReceiverThread.h
-    cxDirectlyLinkedImageReceiverThread.cpp
     
     cxVideoServiceBackend.h
     cxVideoServiceBackend.cpp
     cxStreamerServiceUtilities.h
     cxStreamerServiceUtilities.cpp
-    cxCommandlineImageStreamerInterface.h
-    cxCommandlineImageStreamerInterface.cpp
 	cxIGTLinkStreamerService.cpp
 	cxIGTLinkClientStreamer.cpp
 

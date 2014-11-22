@@ -38,7 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDummyTool.h"
 #include "cxDataLocations.h"
 #include "cxVideoServiceOld.h"
-#include "cxVideoConnectionManager.h"
 #include "cxLogger.h"
 #include "cxUSFrameData.h"
 #include "cxUsReconstructionFileReader.h"
@@ -53,6 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxUsReconstructionServiceProxy.h"
 #include "cxPatientModelService.h"
 #include "cxStreamerServiceUtilities.h"
+#include "cxVideoSource.h"
 
 
 namespace cxtest
@@ -85,7 +85,6 @@ AcquisitionFixture::~AcquisitionFixture()
 
 cx::DataAdapterPtr AcquisitionFixture::getOption(QString uid)
 {
-//	cx::XmlOptionFile options = cx::XmlOptionFile(cx::DataLocations::getXmlSettingsFile()).descend("video");
 	QDomElement element = mOptions.getElement("video");
 	cx::StreamerService* streamer;
 	streamer = cx::StreamerServiceUtilities::getStreamerService(mConnectionMethod,
@@ -101,24 +100,9 @@ void AcquisitionFixture::initVideo()
 	mConnectionMethod = "ImageFile";
 	cx::videoService()->setConnectionMethod(mConnectionMethod);
 	INFO("bundle path: "+cx::DataLocations::getBundlePath());
-//	REQUIRE(!cx::stateService()->getOpenIGTLinkServer().isEmpty());
-//	cx::videoService()->getVideoConnection()->
-//			setLocalServerExecutable(cx::stateService()->getOpenIGTLinkServer()[0]);
-//	cx::videoService()->getVideoConnection()->setLocalServerArguments(
-//				QString("%1 --type MHDFile --filename %2 %3")
-//				.arg(cx::stateService()->getOpenIGTLinkServer()[1])
-//				.arg(mAcqDataFilename).arg(mAdditionalGrabberArg));
 
 	this->getOption("filename")->setValueFromVariant(mAcqDataFilename);
-//	this->getOption("runlocalserver")->setValueFromVariant(true);
-//	this->getOption("localservername")->setValueFromVariant(executable);
-
-//	cx::XmlOptionFile options = cx::XmlOptionFile(cx::DataLocations::getXmlSettingsFile()).descend("video");
-//	options.save();
-	std::cout << "filecontent post init\n" << mOptions.getDocument().toString() << std::endl;
 	mOptions.save();
-//	std::cout << "saved to " << cx::DataLocations::getXmlSettingsFile() << std::endl;
-
 }
 
 
@@ -126,12 +110,6 @@ void AcquisitionFixture::setupVideo()
 {
 	mVideoSource = cx::videoService()->getActiveVideoSource();
 	connect(mVideoSource.get(), SIGNAL(newFrame()), this, SLOT(newFrameSlot()));
-
-//	cx::videoService()->getVideoConnection()->setReconnectInterval(3000); // on slow build servers, a long delay is necessary.
-
-
-//	cx::VideoServicePtr videoService = cx::VideoService::getNullObject(); //mock
-//	cx::videoService()->getVideoConnection()->launchAndConnectServer(videoService);
 	cx::videoService()->openConnection();
 }
 
@@ -223,16 +201,12 @@ void AcquisitionFixture::readinessChangedSlot()
 
 void AcquisitionFixture::acquisitionDataReadySlot()
 {
-	SSC_LOG("");
-
 	// read data and print info - this if the result of the memory pathway
 	mMemOutputData = mAcquisitionData->getReconstructer()->getSelectedFileData();
 }
 
 void AcquisitionFixture::saveDataCompletedSlot(QString path)
 {
-	SSC_LOG("");
-
 	// this is the last step: quit when finished
 	if (!mAcquisition->getNumberOfSavingThreads())
 		QTimer::singleShot(100,   qApp, SLOT(quit()) );

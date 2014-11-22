@@ -58,7 +58,14 @@ std::vector<DataAdapterPtr> LocalServerStreamerArguments::getSettings(QDomElemen
 BoolDataAdapterPtr LocalServerStreamerArguments::getRunLocalServerOption(QDomElement root)
 {
 	BoolDataAdapterXmlPtr retval;
+
+#ifdef __APPLE__
+	bool defaultValue = true; // problems with opencv on mac - cannot close
+#else
 	bool defaultValue = false;
+#endif
+
+
 	retval = BoolDataAdapterXml::initialize("runlocalserver", "Run Local Server",
 											"Run streamer in a separate process",
 											defaultValue, root);

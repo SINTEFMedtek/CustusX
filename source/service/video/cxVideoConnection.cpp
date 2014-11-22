@@ -31,46 +31,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxVideoConnection.h"
 
-#include <math.h>
-#include <vtkImageData.h>
-#include <vtkImageImport.h>
 #include <vtkDataSetMapper.h>
-#include <vtkTimerLog.h>
 #include <vtkImageFlip.h>
-#include <QTimer>
-#include "vtkForwardDeclarations.h"
-#include <vtkDataSetMapper.h>
-#include <vtkLookupTable.h>
-#include <vtkAlgorithmOutput.h>
-#include <vtkImageExtractComponents.h>
-#include <vtkImageMapToColors.h>
-#include <vtkImageAppendComponents.h>
-#include <vtkImageChangeInformation.h>
-#include <vtkExtractVOI.h>
-#include "cxTypeConversions.h"
-#include "cxIGTLinkedImageReceiverThread.h"
 #include "cxReporter.h"
-#include "cxTime.h"
-#include "cxVector3D.h"
-#include "cxProbeData.h"
 #include "cxTrackingService.h"
-#include "cxVideoServiceOld.h"
-#include "cxTrackingService.h"
-#include "cxDirectlyLinkedImageReceiverThread.h"
-#include "cxTypeConversions.h"
-#include "cxImage.h"
-#include "cxData.h"
-#include "cxLogger.h"
-#include "cxVolumeHelpers.h"
-#include "cxCyclicActionLogger.h"
 #include "cxBasicVideoSource.h"
 #include "cxVideoServiceBackend.h"
-#include "cxSettings.h"
 #include "cxNullDeleter.h"
-#include "cxTrackingService.h"
-#include "cxTool.h"
-#include "cxCommandlineImageStreamerInterface.h"
-
+#include "cxImageReceiverThread.h"
+#include "cxImage.h"
 
 typedef vtkSmartPointer<vtkDataSetMapper> vtkDataSetMapperPtr;
 typedef vtkSmartPointer<vtkImageFlip> vtkImageFlipPtr;
@@ -121,30 +90,11 @@ StreamerServicePtr VideoConnection::getStreamerInterface()
 	return mStreamerInterface;
 }
 
-void VideoConnection::runDirectLinkClient(std::map<QString, QString> args)
-{
-	CommandlineImageStreamerInterfacePtr streamerInterface(new CommandlineImageStreamerInterface());
-	streamerInterface->setArguments(args);
-	mStreamerInterface = streamerInterface;
-
-	this->runImageReceiverThread();
-}
-
-void VideoConnection::runImageReceiverThread()
-{
-	DirectlyLinkedImageReceiverThreadPtr imageReceiverThread(new DirectlyLinkedImageReceiverThread(mStreamerInterface, this));
-	this->runClient(imageReceiverThread);
-}
-
 void VideoConnection::runDirectLinkClient(StreamerService* service)
 {
 	mStreamerInterface.reset(service, null_deleter());//Can't allow boost to delete service
-	this->runImageReceiverThread();
-}
-
-void VideoConnection::runIGTLinkedClient(QString address, int port)
-{
-	this->runClient(ImageReceiverThreadPtr(new IGTLinkedImageReceiverThread(address, port, this)));
+	ImageReceiverThreadPtr imageReceiverThread(new ImageReceiverThread(mStreamerInterface, this));
+	this->runClient(imageReceiverThread);
 }
 
 void VideoConnection::runClient(ImageReceiverThreadPtr client)

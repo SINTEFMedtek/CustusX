@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVisualizationServiceBackend.h"
 #include "vtkRenderWindowInteractor.h"
 #include "cxTool.h"
+#include "cxVideoSource.h"
 
 namespace cx
 {
