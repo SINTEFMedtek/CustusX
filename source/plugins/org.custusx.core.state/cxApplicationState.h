@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXAPPLICATIONSTATE_H_
 #define CXAPPLICATIONSTATE_H_
 
-#include "cxStateServiceExport.h"
+#include "org_custusx_core_state_Export.h"
 
 #include <iostream>
 #include <QState>
@@ -60,7 +60,7 @@ typedef boost::shared_ptr<class StateServiceBackend> StateServiceBackendPtr;
  *  \date Aug 17, 2010
  *  \author christiana
  */
-class cxStateService_EXPORT ApplicationState: public QState
+class org_custusx_core_state_EXPORT ApplicationState: public QState
 {
 Q_OBJECT
 public:
@@ -84,7 +84,7 @@ protected:
 	StateServiceBackendPtr mBackend;
 };
 
-class cxStateService_EXPORT ParentApplicationState: public ApplicationState
+class org_custusx_core_state_EXPORT ParentApplicationState: public ApplicationState
 {
 Q_OBJECT
 public:
@@ -98,7 +98,7 @@ public:
 	virtual CLINICAL_APPLICATION getClinicalApplication() const { return mdCOUNT; }
 };
 
-class cxStateService_EXPORT LaboratoryApplicationState: public ApplicationState
+class org_custusx_core_state_EXPORT LaboratoryApplicationState: public ApplicationState
 {
 Q_OBJECT
 public:
@@ -109,7 +109,7 @@ public:
 	virtual CLINICAL_APPLICATION getClinicalApplication() const { return mdLABORATORY; }
 };
 
-class cxStateService_EXPORT BronchoscopyApplicationState: public ApplicationState
+class org_custusx_core_state_EXPORT BronchoscopyApplicationState: public ApplicationState
 {
 Q_OBJECT
 public:
@@ -120,7 +120,7 @@ public:
 	virtual CLINICAL_APPLICATION getClinicalApplication() const { return mdBRONCHOSCOPY; }
 };
 
-class cxStateService_EXPORT NeurologyApplicationState: public ApplicationState
+class org_custusx_core_state_EXPORT NeurologyApplicationState: public ApplicationState
 {
 Q_OBJECT
 public:
@@ -131,7 +131,7 @@ public:
 	virtual CLINICAL_APPLICATION getClinicalApplication() const { return mdNEUROLOGY; }
 };
 
-class cxStateService_EXPORT LaparoscopyApplicationState: public ApplicationState
+class org_custusx_core_state_EXPORT LaparoscopyApplicationState: public ApplicationState
 {
 Q_OBJECT
 public:
@@ -142,7 +142,7 @@ public:
 	virtual CLINICAL_APPLICATION getClinicalApplication() const { return mdLAPAROSCOPY; }
 };
 
-class cxStateService_EXPORT EndovascularApplicationState: public ApplicationState
+class org_custusx_core_state_EXPORT EndovascularApplicationState: public ApplicationState
 {
 Q_OBJECT
 public:

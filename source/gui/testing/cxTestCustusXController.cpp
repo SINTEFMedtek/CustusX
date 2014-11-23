@@ -45,7 +45,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewManager.h"
 #include "cxStateService.h"
 #include "cxLogicManager.h"
-#include "cxWorkflowStateMachine.h"
 
 #include "cxClippingWidget.h"
 #include "cxInteractiveClipper.h"
@@ -95,7 +94,7 @@ void CustusXController::stop()
 void CustusXController::loadPatientSlot()
 {
   cx::patientService()->loadPatient(mPatientFolder);
-  cx::stateService()->getWorkflow()->setActiveState("NavigationUid");
+  cx::stateService()->setWorkFlowState("NavigationUid");
   mMainWindow->setGeometry( 0, 0, 2560, 1440);
 
   if (!cx::patientService()->getDataOfType<cx::Image>().size())

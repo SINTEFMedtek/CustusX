@@ -136,7 +136,7 @@ QStringList LocalServerStreamerArguments::getGrabberServer(QString filename, QSt
 	if (!result.isEmpty())
 		return result;
 	else
-		cx::reporter()->sendWarning("StateService::getGrabberServer() can't locate grabber server");
+		cx::reporter()->sendWarning("Failed to locate default grabber server");
 
 	return result;
 }

@@ -30,67 +30,73 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxExportDataDialog.h"
+#ifndef CXAPPLICATIONSTATEMACHINE_H_
+#define CXAPPLICATIONSTATEMACHINE_H_
 
-#include <cmath>
-#include <QFileDialog>
-#include <QPushButton>
-#include <QVBoxLayout>
-#include <QLabel>
-#include <Qt>
-#include <QCheckBox>
-#include <QTimer>
-#include <vtkImageData.h>
-#include "cxLabeledComboBoxWidget.h"
-#include "cxReporter.h"
-#include "cxTypeConversions.h"
-#include "cxData.h"
-#include "cxRegistrationTransform.h"
-#include "cxImageAlgorithms.h"
-#include "cxImage.h"
-#include "cxPatientModelService.h"
+#include "org_custusx_core_state_Export.h"
+
+#include <QStateMachine>
+#include <QActionGroup>
+#include "cxForwardDeclarations.h"
+
+class QToolBar;
+class QMenu;
 
 namespace cx
 {
+typedef boost::shared_ptr<class StateServiceBackend> StateServiceBackendPtr;
 
-ExportDataDialog::ExportDataDialog(PatientModelServicePtr patientModelService, QWidget* parent) :
-	QDialog(parent),
-	mPatientModelService(patientModelService)
+/**
+ * \file
+ * \addtogroup cx_service_state
+ * @{
+ */
+
+class ApplicationState;
+
+/** \brief State Machine for the Clinical Application
+ *
+ *  See StateService for a description.
+ *
+ *  \date Aug 17, 2010
+ *  \author christiana
+ */
+class org_custusx_core_state_EXPORT ApplicationStateMachine: public QStateMachine
 {
-  this->setAttribute(Qt::WA_DeleteOnClose);
+Q_OBJECT
+public:
+	ApplicationStateMachine(StateServiceBackendPtr backend);
+	virtual ~ApplicationStateMachine();
 
-  QVBoxLayout* layout = new QVBoxLayout(this);
-  this->setWindowTitle("Export Patient Data");
+	QActionGroup* getActionGroup();
 
-  mNiftiFormatCheckBox = new QCheckBox("Use NIfTI-1/ITK-Snap axis definition", this);
-  mNiftiFormatCheckBox->setToolTip(""
-	  "Use X=Left->Right Y=Posterior->Anterior Z=Inferior->Superior, as in ITK-Snap.\n"
-	  "This is different from normal DICOM.");
-  mNiftiFormatCheckBox->setChecked(true);
-  mNiftiFormatCheckBox->setEnabled(true);
+	QString getActiveUidState();
+	QString getActiveStateName();
 
-  layout->addWidget(mNiftiFormatCheckBox);
+	QStringList getAllApplicationNames();
 
-  QHBoxLayout* buttons = new QHBoxLayout;
-  layout->addLayout(buttons);
-  mOkButton = new QPushButton("OK", this);
-  buttons->addStretch();
-  buttons->addWidget(mOkButton);
-  connect(mOkButton, SIGNAL(clicked()), this, SLOT(accept()));
-  connect(this, SIGNAL(accepted()), this, SLOT(acceptedSlot()));
-  mOkButton->setDefault(true);
-  mOkButton->setFocus();
+signals:
+	void activeStateChanged();
 
-//  report("Exporting data...");
+private slots:
+	void activeStateChangedSlot();
+
+private:
+	QAction* addAction(QString stateUid, QActionGroup* group);
+	ApplicationState* newState(ApplicationState* state);
+
+	typedef std::map<QString, ApplicationState*> ApplicationStateMap;
+	ApplicationStateMap mStates;
+	ApplicationState* mParentState;
+	QActionGroup* mActionGroup;
+	StateServiceBackendPtr mBackend;
+};
+
+typedef boost::shared_ptr<ApplicationStateMachine> ApplicationStateMachinePtr;
+
+/**
+ * @}
+ */
 }
 
-ExportDataDialog::~ExportDataDialog()
-{
-}
-
-void ExportDataDialog::acceptedSlot()
-{
-	mPatientModelService->exportPatient(mNiftiFormatCheckBox->isChecked());
-}
-
-}//namespace cx
+#endif /* CXAPPLICATIONSTATEMACHINE_H_ */

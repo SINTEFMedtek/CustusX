@@ -84,9 +84,8 @@ private slots:
 	void duringLoadPatientSlot();
 
 private:
-	//Interface for saving/loading
-	void addXml(QDomNode& dataNode); ///< adds xml information about the StateService and its variabels
-	void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of the StateService.
+	void addXml(QDomNode& dataNode);
+	void parseXml(QDomNode& dataNode);
 
 	AcquisitionDataPtr mAcquisitionData;
 };

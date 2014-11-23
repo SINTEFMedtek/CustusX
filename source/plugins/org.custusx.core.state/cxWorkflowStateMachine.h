@@ -30,64 +30,76 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXREQUESTENTERSTATETRANSITION_H_
-#define CXREQUESTENTERSTATETRANSITION_H_
+#ifndef CXWORKFLOWSTATEMACHINE_H_
+#define CXWORKFLOWSTATEMACHINE_H_
 
-#include "cxStateServiceExport.h"
+#include "org_custusx_core_state_Export.h"
 
-#include <QEvent>
-#include <QAbstractTransition>
+#include <QStateMachine>
+#include <QActionGroup>
+#include "cxForwardDeclarations.h"
+
+class QToolBar;
+class QMenu;
 
 namespace cx
 {
+typedef boost::shared_ptr<class StateServiceBackend> StateServiceBackendPtr;
+
 /**
  * \file
  * \addtogroup cx_service_state
  * @{
  */
 
-/** \brief Utility class for StateService states.
- *
- */
-struct cxStateService_EXPORT  RequestEnterStateEvent: public QEvent
-{
-	RequestEnterStateEvent(const QString &stateUid) :
-					QEvent(QEvent::Type(QEvent::User + 1)), mStateUid(stateUid)
-	{}
+class WorkflowState;
 
-	QString mStateUid;
-};
-
-/** \brief Utility class for StateService states.
+/** \brief State Machine for the Workflow Steps
  *
- * \date 5. aug. 2010
- * \\author jbake
+ *  See StateService for a description.
+ *
+ * \ingroup cx_service_state
+ * \date 4. aug. 2010
+ * \author Janne Beate Bakeng, SINTEF
  */
-class cxStateService_EXPORT RequestEnterStateTransition: public QAbstractTransition
+class org_custusx_core_state_EXPORT WorkflowStateMachine: public QStateMachine
 {
+Q_OBJECT
 public:
-	RequestEnterStateTransition(const QString &stateUid) :
-					mStateUid(stateUid)
-	{}
+	WorkflowStateMachine(StateServiceBackendPtr backend);
+	virtual ~WorkflowStateMachine();
 
-protected:
-	virtual bool eventTest(QEvent *e)
-	{
-		if (e->type() != QEvent::Type(QEvent::User + 1)) // StringEvent
-			return false;
-		RequestEnterStateEvent *se = static_cast<RequestEnterStateEvent*>(e);
-		return (mStateUid == se->mStateUid);
-	}
+	QActionGroup* getActionGroup();
 
-	virtual void onTransition(QEvent *)
-	{}
+	QString getActiveUidState();
+	void setActiveState(QString uid);
+
+signals:
+	void activeStateChanged();
+	void activeStateAboutToChange();
+
+private slots:
+	void startedSlot();
+	void clinicalApplicationChangedSlot();
 
 private:
-	QString mStateUid;
+	void fillActionGroup(WorkflowState* current, QActionGroup* group);
+	QAction* addAction(QString stateUid, QActionGroup* group);
+	WorkflowState* newState(WorkflowState* state);
+
+	typedef std::map<QString, WorkflowState*> WorkflowStateMap;
+	WorkflowStateMap mStates;
+	WorkflowState* mParentState;
+	QActionGroup* mActionGroup;
+	bool mStarted;
+	StateServiceBackendPtr mBackend;
 };
+
+typedef boost::shared_ptr<WorkflowStateMachine> WorkflowStateMachinePtr;
 
 /**
  * @}
  */
-} //namespace cx
-#endif /* CXREQUESTENTERSTATETRANSITION_H_ */
+}
+
+#endif /* CXWORKFLOWSTATEMACHINE_H_ */

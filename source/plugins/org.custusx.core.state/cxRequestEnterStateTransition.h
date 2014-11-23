@@ -30,73 +30,64 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXAPPLICATIONSTATEMACHINE_H_
-#define CXAPPLICATIONSTATEMACHINE_H_
+#ifndef CXREQUESTENTERSTATETRANSITION_H_
+#define CXREQUESTENTERSTATETRANSITION_H_
 
-#include "cxStateServiceExport.h"
+#include "org_custusx_core_state_Export.h"
 
-#include <QStateMachine>
-#include <QActionGroup>
-#include "cxForwardDeclarations.h"
-
-class QToolBar;
-class QMenu;
+#include <QEvent>
+#include <QAbstractTransition>
 
 namespace cx
 {
-typedef boost::shared_ptr<class StateServiceBackend> StateServiceBackendPtr;
-
 /**
  * \file
  * \addtogroup cx_service_state
  * @{
  */
 
-class ApplicationState;
-
-/** \brief State Machine for the Clinical Application
+/** \brief Utility class for StateService states.
  *
- *  See StateService for a description.
- *
- *  \date Aug 17, 2010
- *  \author christiana
  */
-class cxStateService_EXPORT ApplicationStateMachine: public QStateMachine
+struct org_custusx_core_state_EXPORT  RequestEnterStateEvent: public QEvent
 {
-Q_OBJECT
-public:
-	ApplicationStateMachine(StateServiceBackendPtr backend);
-	virtual ~ApplicationStateMachine();
+	RequestEnterStateEvent(const QString &stateUid) :
+					QEvent(QEvent::Type(QEvent::User + 1)), mStateUid(stateUid)
+	{}
 
-	QActionGroup* getActionGroup();
-
-	QString getActiveUidState();
-	QString getActiveStateName();
-
-	QStringList getAllApplicationNames();
-
-signals:
-	void activeStateChanged();
-
-private slots:
-	void activeStateChangedSlot();
-
-private:
-	QAction* addAction(QString stateUid, QActionGroup* group);
-	ApplicationState* newState(ApplicationState* state);
-
-	typedef std::map<QString, ApplicationState*> ApplicationStateMap;
-	ApplicationStateMap mStates;
-	ApplicationState* mParentState;
-	QActionGroup* mActionGroup;
-	StateServiceBackendPtr mBackend;
+	QString mStateUid;
 };
 
-typedef boost::shared_ptr<ApplicationStateMachine> ApplicationStateMachinePtr;
+/** \brief Utility class for StateService states.
+ *
+ * \date 5. aug. 2010
+ * \\author jbake
+ */
+class org_custusx_core_state_EXPORT RequestEnterStateTransition: public QAbstractTransition
+{
+public:
+	RequestEnterStateTransition(const QString &stateUid) :
+					mStateUid(stateUid)
+	{}
+
+protected:
+	virtual bool eventTest(QEvent *e)
+	{
+		if (e->type() != QEvent::Type(QEvent::User + 1)) // StringEvent
+			return false;
+		RequestEnterStateEvent *se = static_cast<RequestEnterStateEvent*>(e);
+		return (mStateUid == se->mStateUid);
+	}
+
+	virtual void onTransition(QEvent *)
+	{}
+
+private:
+	QString mStateUid;
+};
 
 /**
  * @}
  */
-}
-
-#endif /* CXAPPLICATIONSTATEMACHINE_H_ */
+} //namespace cx
+#endif /* CXREQUESTENTERSTATETRANSITION_H_ */

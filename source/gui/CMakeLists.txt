@@ -130,7 +130,7 @@ include_directories(
     ${CustusX_BINARY_DIR}/source/resource/pluginUtilities
     )
     
-set(CX_GUI_LIBRARIES cxLogicManager cxStateService cxResourceWidgets)
+set(CX_GUI_LIBRARIES cxLogicManager cxResourceWidgets)
 
 cx_create_export_header("cxGui")
 

@@ -33,18 +33,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSTATESERVICE_H_
 #define CXSTATESERVICE_H_
 
-#include "cxStateServiceExport.h"
-
-#include <QDomNode>
+#include "cxResourceExport.h"
 
 #include "cxForwardDeclarations.h"
 #include <QObject>
+class QActionGroup;
+class ctkPluginContext;
+
+#define StateService_iid "cx::StateService"
 
 namespace cx
 {
-typedef boost::shared_ptr<class ApplicationStateMachine> ApplicationStateMachinePtr;
-typedef boost::shared_ptr<class WorkflowStateMachine> WorkflowStateMachinePtr;
-typedef boost::shared_ptr<class StateServiceBackend> StateServiceBackendPtr;
 
 /**
  * \file
@@ -61,7 +60,7 @@ typedef boost::shared_ptr<class StateServiceBackend> StateServiceBackendPtr;
  * \sa StateService
  *
  */
-struct cxStateService_EXPORT Desktop
+struct cxResource_EXPORT Desktop
 {
 	Desktop();
 	Desktop(QString layout, QByteArray mainwindowstate);
@@ -133,45 +132,38 @@ struct cxStateService_EXPORT Desktop
  * \date 4. aug. 2010
  * \author Janne Beate Bakeng, SINTEF
  */
-class cxStateService_EXPORT StateService: public QObject
+class cxResource_EXPORT StateService: public QObject
 {
 Q_OBJECT
 
 public:
-	static StateServicePtr create(StateServiceBackendPtr backend);
-	virtual ~StateService();
+	virtual ~StateService() {}
 
-//	static StateService* createInstance(StateServiceBackendPtr backend);
-//	static StateService* getInstance(); ///< returns the only instance of this class
-//	static void destroyInstance(); ///< destroys the only instance of this class
+	virtual QString getVersionName() = 0;
+	virtual QActionGroup* getApplicationActions() = 0;
+	virtual QString getApplicationStateName() const = 0;
+	virtual QStringList getAllApplicationStateNames() const = 0;
 
-	QString getVersionName();
+	virtual QActionGroup* getWorkflowActions() = 0;
+	virtual void setWorkFlowState(QString uid) = 0;
 
-	WorkflowStateMachinePtr getWorkflow();
-	ApplicationStateMachinePtr getApplication();
+	virtual Desktop getActiveDesktop() = 0;
+	virtual void saveDesktop(Desktop desktop) = 0;
+	virtual void resetDesktop() = 0;
 
-	Desktop getActiveDesktop();
-	void saveDesktop(Desktop desktop);
-	void resetDesktop();
+	virtual bool isNull() = 0;
+	static StateServicePtr getNullObject();
 
-	QStringList getOpenIGTLinkServer();
-
-private:
-	StateService();
-
-	void initialize(StateServiceBackendPtr backend); ///< init stuff that is dependent of the statemanager
-	void fillDefaultSettings();
-	template<class T>
-	void fillDefault(QString name, T value);
-
-	WorkflowStateMachinePtr mWorkflowStateMachine;
-	ApplicationStateMachinePtr mApplicationStateMachine;
-	StateServiceBackendPtr mBackend;
-
+signals:
+	void workflowStateChanged();
+	void workflowStateAboutToChange();
+	void applicationStateChanged();
 };
 
 /**
  * @}
  */
 }
+Q_DECLARE_INTERFACE(cx::StateService, StateService_iid)
+
 #endif /* CXSTATESERVICE_H_ */

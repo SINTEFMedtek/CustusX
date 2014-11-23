@@ -29,81 +29,50 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXSTATESERVICEBACKEND_H
+#define CXSTATESERVICEBACKEND_H
 
-#ifndef CXWORKFLOWSTATEMACHINE_H_
-#define CXWORKFLOWSTATEMACHINE_H_
+#include "org_custusx_core_state_Export.h"
 
-#include "cxStateServiceExport.h"
-
-#include <QStateMachine>
-#include <QActionGroup>
+#include "boost/shared_ptr.hpp"
 #include "cxForwardDeclarations.h"
-
-class QToolBar;
-class QMenu;
 
 namespace cx
 {
+
+class VideoServiceOld;
+class PatientService;
+typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
 typedef boost::shared_ptr<class StateServiceBackend> StateServiceBackendPtr;
 
 /**
- * \file
- * \addtogroup cx_service_state
- * @{
- */
-
-class WorkflowState;
-
-/** \brief State Machine for the Workflow Steps
  *
- *  See StateService for a description.
  *
  * \ingroup cx_service_state
- * \date 4. aug. 2010
- * \author Janne Beate Bakeng, SINTEF
+ * \date 2014-03-06
+ * \author christiana
  */
-class cxStateService_EXPORT WorkflowStateMachine: public QStateMachine
+class org_custusx_core_state_EXPORT StateServiceBackend
 {
-Q_OBJECT
 public:
-	WorkflowStateMachine(StateServiceBackendPtr backend);
-	virtual ~WorkflowStateMachine();
+	StateServiceBackend(TrackingServicePtr trackingService,
+						VideoServicePtr videoService,
+						SpaceProviderPtr spaceProvider,
+						PatientModelServicePtr patientService);
 
-	QActionGroup* getActionGroup();
-	void fillMenu(QMenu* menu);
-	void fillToolBar(QToolBar* toolbar);
-
-	QString getActiveUidState();
-	void setActiveState(QString uid);
-
-signals:
-	void activeStateChanged();
-	void activeStateAboutToChange();
-
-private slots:
-	void startedSlot();
-	void clinicalApplicationChangedSlot();
+	TrackingServicePtr getToolManager();
+	VideoServicePtr getVideoService();
+	SpaceProviderPtr getSpaceProvider();
+	PatientModelServicePtr getPatientService();
 
 private:
-	void fillMenu(QMenu* menu, WorkflowState* current);
-	void fillToolbar(QToolBar* toolbar, WorkflowState* current);
-
-	QAction* addAction(QString stateUid, QActionGroup* group);
-	WorkflowState* newState(WorkflowState* state);
-
-	typedef std::map<QString, WorkflowState*> WorkflowStateMap;
-	WorkflowStateMap mStates;
-	WorkflowState* mParentState;
-	QActionGroup* mActionGroup;
-	bool mStarted;
-	StateServiceBackendPtr mBackend;
+	TrackingServicePtr mTrackingService;
+	SpaceProviderPtr mSpaceProvider;
+	VideoServicePtr mVideoService;
+	PatientModelServicePtr mPatientService;
 };
 
-typedef boost::shared_ptr<WorkflowStateMachine> WorkflowStateMachinePtr;
 
-/**
- * @}
- */
-}
+} // namespace cx
 
-#endif /* CXWORKFLOWSTATEMACHINE_H_ */
+#endif // CXSTATESERVICEBACKEND_H

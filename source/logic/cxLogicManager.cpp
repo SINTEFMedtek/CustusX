@@ -43,14 +43,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSpaceProviderImpl.h"
 #include "cxDataFactory.h"
 #include "cxVisualizationServiceBackend.h"
-//#include "cxVideoServiceBackend.h"
-#include "cxStateServiceBackend.h"
 #include "cxTypeConversions.h"
 #include "cxSharedPointerChecker.h"
 #include "cxPluginFramework.h"
 #include "cxVideoServiceProxy.h"
 #include "cxTrackingServiceProxy.h"
 #include "cxPatientModelServiceProxy.h"
+#include "cxStateServiceProxy.h"
 
 namespace cx
 {
@@ -177,20 +176,6 @@ void LogicManager::createVideoService()
 {
 	mVideoService = VideoServiceProxy::create(this->getPluginContext());
 	LegacySingletons::mVideoService = mVideoService;
-
-//	// prerequisites:
-//	this->getTrackingService();
-//	this->createPatientModelService();
-//	this->getSpaceProvider();
-
-//	// build object(s):
-//	VideoServiceBackendPtr videoBackend;
-//	videoBackend = VideoServiceBackend::create(mPatientModelService,
-//											   mTrackingService,
-//												 mSpaceProvider,
-//											   this->getPluginContext());
-//	mVideoServiceOld = VideoServiceOld::create(videoBackend);
-//	LegacySingletons::mVideoServiceOld = mVideoServiceOld;
 }
 
 void LogicManager::createVisualizationService()
@@ -213,19 +198,7 @@ void LogicManager::createVisualizationService()
 
 void LogicManager::createStateService()
 {
-	// prerequisites:
-	this->getTrackingService();
-	this->getPatientModelService();
-	this->getVideoService();
-	this->getSpaceProvider();
-
-	// build object(s):
-	StateServiceBackendPtr backend;
-	backend.reset(new StateServiceBackend(mTrackingService,
-										  mVideoService,
-										  mSpaceProvider,
-										  mPatientModelService));
-	mStateService = StateService::create(backend);
+	mStateService = StateServiceProxy::create(this->getPluginContext());
 	LegacySingletons::mStateService = mStateService;
 }
 

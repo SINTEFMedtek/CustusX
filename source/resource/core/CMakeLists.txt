@@ -70,6 +70,9 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	logger/cxMessageListener
 
 	settings/cxSettings.h
+	settings/cxStateService
+	settings/cxStateServiceNull
+	settings/cxStateServiceProxy
 
 	algorithms/cxTimedAlgorithm.h
     algorithms/cxThreadedTimedAlgorithm.h

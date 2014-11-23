@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXWORKFLOWSTATE_H_
 #define CXWORKFLOWSTATE_H_
 
-#include "cxStateServiceExport.h"
+#include "org_custusx_core_state_Export.h"
 
 #include <iostream>
 #include <QState>
@@ -59,7 +59,7 @@ typedef boost::shared_ptr<class StateServiceBackend> StateServiceBackendPtr;
  * \date 4. aug. 2010
  * \author jbake
  */
-class cxStateService_EXPORT WorkflowState: public QState
+class org_custusx_core_state_EXPORT WorkflowState: public QState
 {
 Q_OBJECT
 
@@ -101,7 +101,7 @@ protected:
 	StateServiceBackendPtr mBackend;
 };
 
-class cxStateService_EXPORT ParentWorkflowState: public WorkflowState
+class org_custusx_core_state_EXPORT ParentWorkflowState: public WorkflowState
 {
 Q_OBJECT
 public:
@@ -114,7 +114,7 @@ public:
 	virtual QIcon getIcon() const { return QIcon(""); }
 };
 
-class cxStateService_EXPORT PatientDataWorkflowState: public WorkflowState
+class org_custusx_core_state_EXPORT PatientDataWorkflowState: public WorkflowState
 {
 Q_OBJECT
 
@@ -128,7 +128,7 @@ public:
 	virtual bool canEnter() const { return true; }
 };
 
-class cxStateService_EXPORT NavigationWorkflowState: public WorkflowState
+class org_custusx_core_state_EXPORT NavigationWorkflowState: public WorkflowState
 {
 Q_OBJECT
 
@@ -143,7 +143,7 @@ public:
 	virtual bool canEnter() const;
 };
 
-class cxStateService_EXPORT RegistrationWorkflowState: public WorkflowState
+class org_custusx_core_state_EXPORT RegistrationWorkflowState: public WorkflowState
 {
 Q_OBJECT
 
@@ -159,7 +159,7 @@ public:
 	virtual bool canEnter() const;
 };
 
-class cxStateService_EXPORT PreOpPlanningWorkflowState: public WorkflowState
+class org_custusx_core_state_EXPORT PreOpPlanningWorkflowState: public WorkflowState
 {
 Q_OBJECT
 
@@ -176,7 +176,7 @@ public:
 	virtual bool canEnter() const;
 };
 
-class cxStateService_EXPORT IntraOpImagingWorkflowState: public WorkflowState
+class org_custusx_core_state_EXPORT IntraOpImagingWorkflowState: public WorkflowState
 {
 Q_OBJECT
 
@@ -193,7 +193,7 @@ public:
 	virtual bool canEnter() const;
 };
 
-class cxStateService_EXPORT PostOpControllWorkflowState: public WorkflowState
+class org_custusx_core_state_EXPORT PostOpControllWorkflowState: public WorkflowState
 {
 Q_OBJECT
 

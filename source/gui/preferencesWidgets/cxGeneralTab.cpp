@@ -38,9 +38,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QFileDialog>
 #include "cxSettings.h"
 #include "cxStateService.h"
-#include "cxApplicationStateMachine.h"
 #include "cxVLCRecorder.h"
 #include "cxDataAdapterHelper.h"
+#include <QAction>
 
 namespace cx
 {
@@ -63,7 +63,7 @@ void GeneralTab::init()
   if(!QFile::exists(mVLCPath))
 	  this->searchForVLC();
 
-  connect(stateService()->getApplication().get(), SIGNAL(activeStateChanged()), this, SLOT(applicationStateChangedSlot()));
+  connect(stateService().get(), &StateService::applicationStateChanged, this, &GeneralTab::applicationStateChangedSlot);
 
   // patientDataFolder
   QLabel* patientDataFolderLabel = new QLabel(tr("Patient data folder:"));
@@ -144,7 +144,7 @@ void GeneralTab::setApplicationComboBox()
 {
   mChooseApplicationComboBox->blockSignals(true);
   mChooseApplicationComboBox->clear();
-  QList<QAction*> actions = stateService()->getApplication()->getActionGroup()->actions();
+  QList<QAction*> actions = stateService()->getApplicationActions()->actions();
   for (int i=0; i<actions.size(); ++i)
   {
     mChooseApplicationComboBox->insertItem(i, QIcon(), actions[i]->text(), actions[i]->data());
@@ -165,7 +165,7 @@ void GeneralTab::searchForVLC(QStringList searchPaths)
 void GeneralTab::applicationStateChangedSlot()
 {
   mChooseApplicationComboBox->blockSignals(true);
-  QList<QAction*> actions = stateService()->getApplication()->getActionGroup()->actions();
+  QList<QAction*> actions = stateService()->getApplicationActions()->actions();
   for (int i=0; i<actions.size(); ++i)
   {
     if (actions[i]->isChecked())
@@ -177,7 +177,7 @@ void GeneralTab::applicationStateChangedSlot()
 
 void GeneralTab::currentApplicationChangedSlot(int index)
 {
-  QList<QAction*> actions = stateService()->getApplication()->getActionGroup()->actions();
+  QList<QAction*> actions = stateService()->getApplicationActions()->actions();
   if (index<0 || index>=actions.size())
     return;
   actions[index]->trigger();

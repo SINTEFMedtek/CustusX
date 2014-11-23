@@ -4,33 +4,35 @@ This file is part of CustusX, an Image Guided Therapy Application.
 Copyright (c) 2008-2014, SINTEF Department of Medical Technology
 All rights reserved.
 
-Redistribution and use in source and binary forms, with or without 
+Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
-1. Redistributions of source code must retain the above copyright notice, 
+1. Redistributions of source code must retain the above copyright notice,
    this list of conditions and the following disclaimer.
 
-2. Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
 
-3. Neither the name of the copyright holder nor the names of its contributors 
-   may be used to endorse or promote products derived from this software 
+3. Neither the name of the copyright holder nor the names of its contributors
+   may be used to endorse or promote products derived from this software
    without specific prior written permission.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE 
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR 
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, 
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxStateService.h"
+#include "cxStateServiceImpl.h"
+
+
 
 #include <iostream>
 #include <QApplication>
@@ -48,6 +50,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxConfig.h"
 #include "cxVLCRecorder.h"
 #include "cxStateServiceBackend.h"
+
+#include "cxTrackingServiceProxy.h"
+#include "cxPatientModelServiceProxy.h"
+#include "cxSpaceProviderImpl.h"
+#include "cxVideoServiceProxy.h"
 
 namespace cx
 {
@@ -162,24 +169,41 @@ private:
 /// -------------------------------------------------------
 /// -------------------------------------------------------
 
-StateServicePtr StateService::create(StateServiceBackendPtr backend)
+//StateServicePtr StateServiceImpl::create(ctkPluginContext* context)
+//{
+//	boost::shared_ptr<StateServiceImpl> retval;
+//	retval.reset(new StateServiceImpl());
+//	retval->initialize(retval->createBackend(context));
+//	return retval;
+//}
+
+StateServiceImpl::StateServiceImpl(ctkPluginContext* context)
 {
-	StateServicePtr retval;
-	retval.reset(new StateService());
-	retval->initialize(backend);
-	return retval;
+	this->initialize(this->createBackend(context));
 }
 
+StateServiceBackendPtr StateServiceImpl::createBackend(ctkPluginContext* context)
+{
+	TrackingServicePtr tracker = TrackingServiceProxy::create(context);
+	PatientModelServicePtr pasm = PatientModelServiceProxy::create(context);
+	SpaceProviderPtr spacer(new SpaceProviderImpl(tracker, pasm));
+	VideoServicePtr video = VideoServiceProxy::create(context);
 
-StateService::StateService()
+	StateServiceBackendPtr backend;
+	backend.reset(new StateServiceBackend(tracker, video, spacer, pasm));
+	return backend;
+}
+
+StateServiceImpl::~StateServiceImpl()
 {
 }
 
-StateService::~StateService()
+bool StateServiceImpl::isNull()
 {
+	return false;
 }
 
-void StateService::initialize(StateServiceBackendPtr backend)
+void StateServiceImpl::initialize(StateServiceBackendPtr backend)
 {
 	mBackend = backend;
 	this->fillDefaultSettings();
@@ -189,25 +213,57 @@ void StateService::initialize(StateServiceBackendPtr backend)
 
 	mWorkflowStateMachine.reset(new WorkflowStateMachine(mBackend));
 	mWorkflowStateMachine->start();
+
+	connect(mWorkflowStateMachine.get(), &WorkflowStateMachine::activeStateChanged, this, &StateServiceImpl::workflowStateChanged);
+	connect(mWorkflowStateMachine.get(), &WorkflowStateMachine::activeStateAboutToChange, this, &StateServiceImpl::workflowStateAboutToChange);
+
+	connect(mApplicationStateMachine.get(), &ApplicationStateMachine::activeStateChanged, this, &StateServiceImpl::applicationStateChanged);
 }
 
-QString StateService::getVersionName()
+QActionGroup* StateServiceImpl::getApplicationActions()
 {
-    return QString("%1").arg(CustusX_VERSION_STRING);
+	return mApplicationStateMachine->getActionGroup();
 }
 
-WorkflowStateMachinePtr StateService::getWorkflow()
+QString StateServiceImpl::getApplicationStateName() const
+{
+	if (!mApplicationStateMachine)
+		return "";
+	return mApplicationStateMachine->getActiveStateName();
+}
+
+QStringList StateServiceImpl::getAllApplicationStateNames() const
+{
+	return mApplicationStateMachine->getAllApplicationNames();
+}
+
+QString StateServiceImpl::getVersionName()
+{
+	return QString("%1").arg(CustusX_VERSION_STRING);
+}
+
+QActionGroup* StateServiceImpl::getWorkflowActions()
+{
+	return mWorkflowStateMachine->getActionGroup();
+}
+
+WorkflowStateMachinePtr StateServiceImpl::getWorkflow()
 {
 	return mWorkflowStateMachine;
 }
 
-ApplicationStateMachinePtr StateService::getApplication()
+void StateServiceImpl::setWorkFlowState(QString uid)
+{
+	mWorkflowStateMachine->setActiveState(uid);
+}
+
+ApplicationStateMachinePtr StateServiceImpl::getApplication()
 {
 	return mApplicationStateMachine;
 }
 
 template<class T>
-void StateService::fillDefault(QString name, T value)
+void StateServiceImpl::fillDefault(QString name, T value)
 {
 	if (!settings()->contains(name))
 		settings()->setValue(name, value);
@@ -216,7 +272,7 @@ void StateService::fillDefault(QString name, T value)
 /**Enter all default Settings here.
  *
  */
-void StateService::fillDefaultSettings()
+void StateServiceImpl::fillDefaultSettings()
 {
 	this->fillDefault("Automation/autoStartTracking", true);
 	this->fillDefault("Automation/autoStartStreaming", true);
@@ -281,8 +337,8 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("useGPU2DRendering", true);
 #endif
 
-    this->fillDefault("optimizedViews", true);
-    this->fillDefault("smartRender", true);
+	this->fillDefault("optimizedViews", true);
+	this->fillDefault("smartRender", true);
 
 	this->fillDefault("IGSTKDebugLogging", false);
 	this->fillDefault("giveManualToolPhysicalProperties", false);
@@ -296,14 +352,14 @@ void StateService::fillDefaultSettings()
 }
 
 
-Desktop StateService::getActiveDesktop()
+Desktop StateServiceImpl::getActiveDesktop()
 {
 	ApplicationsParser parser;
 	return parser.getDesktop(mApplicationStateMachine->getActiveUidState(),
 							 mWorkflowStateMachine->getActiveUidState());
 }
 
-void StateService::saveDesktop(Desktop desktop)
+void StateServiceImpl::saveDesktop(Desktop desktop)
 {
 	ApplicationsParser parser;
 	parser.setDesktop(mApplicationStateMachine->getActiveUidState(),
@@ -311,7 +367,7 @@ void StateService::saveDesktop(Desktop desktop)
 					  desktop);
 }
 
-void StateService::resetDesktop()
+void StateServiceImpl::resetDesktop()
 {
 	ApplicationsParser parser;
 	parser.resetDesktop(mApplicationStateMachine->getActiveUidState(),

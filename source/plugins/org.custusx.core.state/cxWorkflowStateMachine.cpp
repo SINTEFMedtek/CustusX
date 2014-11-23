@@ -95,36 +95,31 @@ WorkflowStateMachine::~WorkflowStateMachine()
 
 QActionGroup* WorkflowStateMachine::getActionGroup()
 {
-	mActionGroup->setExclusive(true);
-	//TODO rebuild action list when we need dynamic lists. Must rethink memory management then.
-	for (WorkflowStateMap::iterator iter = mStates.begin(); iter != mStates.end(); ++iter)
+//	mActionGroup
+	this->fillActionGroup(mParentState, mActionGroup);
+
+	QList<QAction *> actions = mActionGroup->actions();
+	for (int i = 1; i <= actions.size(); ++i)
 	{
-		iter->second->createAction(mActionGroup);
+		QString shortcut = "Ctrl+" + QString::number(i);
+		actions[i - 1]->setShortcut(shortcut);
 	}
 
 	return mActionGroup;
 }
 
-void WorkflowStateMachine::fillMenu(QMenu* menu)
-{
-	this->fillMenu(menu, mParentState);
-}
-
-void WorkflowStateMachine::fillMenu(QMenu* menu, WorkflowState* current)
+void WorkflowStateMachine::fillActionGroup(WorkflowState* current, QActionGroup* group)
 {
 	std::vector<WorkflowState*> childStates = current->getChildStates();
 
 	if (childStates.empty())
 	{
-		menu->addAction(current->createAction(mActionGroup));
+		group->addAction(current->createAction(group));
 	}
 	else // current is a node. create submenu and fill in recursively
 	{
-		QMenu* submenu = menu;
-		if (current != mParentState) // ignore creation of submenu for parent state
-			submenu = menu->addMenu(current->getName());
 		for (unsigned i = 0; i < childStates.size(); ++i)
-			this->fillMenu(submenu, childStates[i]);
+			this->fillActionGroup(childStates[i], group);
 	}
 }
 
@@ -133,26 +128,6 @@ void WorkflowStateMachine::setActiveState(QString uid)
 
 	if (mStarted)
 		this->postEvent(new RequestEnterStateEvent(uid));
-}
-
-void WorkflowStateMachine::fillToolBar(QToolBar* toolbar)
-{
-	this->fillToolbar(toolbar, mParentState);
-}
-
-void WorkflowStateMachine::fillToolbar(QToolBar* toolbar, WorkflowState* current)
-{
-	std::vector<WorkflowState*> childStates = current->getChildStates();
-
-	if (childStates.empty())
-	{
-		toolbar->addAction(current->createAction(mActionGroup));
-	}
-	else // current is a node. fill in recursively
-	{
-		for (unsigned i = 0; i < childStates.size(); ++i)
-			this->fillToolbar(toolbar, childStates[i]);
-	}
 }
 
 QString WorkflowStateMachine::getActiveUidState()

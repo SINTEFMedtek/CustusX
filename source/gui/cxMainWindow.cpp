@@ -76,8 +76,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxEraserWidget.h"
 #include "cxSamplerWidget.h"
 #include "cxDataAdapterHelper.h"
-#include "cxWorkflowStateMachine.h"
-#include "cxApplicationStateMachine.h"
 #include "cxConfig.h"
 #include "cxVLCRecorder.h"
 #include "cxSecondaryViewLayoutWindow.h"
@@ -124,10 +122,9 @@ MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
 	reporter()->setLoggingFolder(DataLocations::getRootConfigPath());
 	reporter()->setAudioSource(AudioPtr(new AudioImpl()));
 
-	connect(stateService()->getApplication().get(), SIGNAL(activeStateChanged()), this,
-		SLOT(onApplicationStateChangedSlot()));
-	connect(stateService()->getWorkflow().get(), SIGNAL(activeStateChanged()), this, SLOT(onWorkflowStateChangedSlot()));
-	connect(stateService()->getWorkflow().get(), SIGNAL(activeStateAboutToChange()), this, SLOT(saveDesktopSlot()));
+	connect(stateService().get(), &StateService::applicationStateChanged, this, &MainWindow::onApplicationStateChangedSlot);
+	connect(stateService().get(), &StateService::workflowStateChanged, this, &MainWindow::onWorkflowStateChangedSlot);
+	connect(stateService().get(), &StateService::workflowStateAboutToChange, this, &MainWindow::saveDesktopSlot);
 
 	this->updateWindowTitle();
 
@@ -705,10 +702,7 @@ void MainWindow::onApplicationStateChangedSlot()
 
 void MainWindow::updateWindowTitle()
 {
-	QString appName;
-	if (stateService()->getApplication())
-		appName = stateService()->getApplication()->getActiveStateName();
-
+	QString appName = stateService()->getApplicationStateName();
 	QString versionName = stateService()->getVersionName();
 
 	QString activePatientFolder = patientService()->getActivePatientFolder();
@@ -857,14 +851,20 @@ void MainWindow::createMenus()
 
 	//workflow
 	this->menuBar()->addMenu(mWorkflowMenu);
-	stateService()->getWorkflow()->fillMenu(mWorkflowMenu);
-
-	QList<QAction *> actions = mWorkflowMenu->actions();
-	for (int i = 1; i <= actions.size(); ++i)
+	QList<QAction*> actions = stateService()->getWorkflowActions()->actions();
+	for (int i=0; i<actions.size(); ++i)
 	{
-		QString shortcut = "Ctrl+" + QString::number(i);
-		actions[i - 1]->setShortcut(shortcut);
+		mWorkflowMenu->addAction(actions[i]);
 	}
+
+//	stateService()->getWorkflow()->fillMenu(mWorkflowMenu);
+
+//	QList<QAction *> actions = mWorkflowMenu->actions();
+//	for (int i = 1; i <= actions.size(); ++i)
+//	{
+//		QString shortcut = "Ctrl+" + QString::number(i);
+//		actions[i - 1]->setShortcut(shortcut);
+//	}
 	mWorkflowMenu->addSeparator();
 	mWorkflowMenu->addAction(mSaveDesktopAction);
 	mWorkflowMenu->addAction(mResetDesktopAction);
@@ -926,7 +926,14 @@ void MainWindow::createToolBars()
 
 	mWorkflowToolBar = addToolBar("Workflow");
 	mWorkflowToolBar->setObjectName("WorkflowToolBar");
-	stateService()->getWorkflow()->fillToolBar(mWorkflowToolBar);
+
+	QList<QAction*> actions = stateService()->getWorkflowActions()->actions();
+	for (int i=0; i<actions.size(); ++i)
+	{
+		mWorkflowToolBar->addAction(actions[i]);
+	}
+
+//	stateService()->getWorkflow()->fillToolBar(mWorkflowToolBar);
 	this->registerToolBar(mWorkflowToolBar, "Toolbar");
 
 	mDesktopToolBar = addToolBar("Desktop");

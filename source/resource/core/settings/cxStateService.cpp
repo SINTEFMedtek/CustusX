@@ -29,50 +29,30 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXSTATESERVICEBACKEND_H
-#define CXSTATESERVICEBACKEND_H
 
-#include "cxStateServiceExport.h"
+#include "cxStateService.h"
 
-#include "boost/shared_ptr.hpp"
-#include "cxForwardDeclarations.h"
+#include "cxStateServiceNull.h"
+#include "cxNullDeleter.h"
 
 namespace cx
 {
 
-class VideoServiceOld;
-class PatientService;
-typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
-typedef boost::shared_ptr<class StateServiceBackend> StateServiceBackendPtr;
-
-/**
- *
- *
- * \ingroup cx_service_state
- * \date 2014-03-06
- * \author christiana
- */
-class cxStateService_EXPORT StateServiceBackend
+Desktop::Desktop()
 {
-public:
-	StateServiceBackend(TrackingServicePtr trackingService,
-						VideoServicePtr videoService,
-						SpaceProviderPtr spaceProvider,
-						PatientModelServicePtr patientService);
+}
 
-	TrackingServicePtr getToolManager();
-	VideoServicePtr getVideoService();
-	SpaceProviderPtr getSpaceProvider();
-	PatientModelServicePtr getPatientService();
+Desktop::Desktop(QString layout, QByteArray mainwindowstate) :
+				mLayoutUid(layout), mMainWindowState(mainwindowstate)
+{
+}
 
-private:
-	TrackingServicePtr mTrackingService;
-	SpaceProviderPtr mSpaceProvider;
-	VideoServicePtr mVideoService;
-	PatientModelServicePtr mPatientService;
-};
+StateServicePtr StateService::getNullObject()
+{
+	static StateServicePtr mNull;
+	if (!mNull)
+		mNull.reset(new StateServiceNull, null_deleter());
+	return mNull;
+}
 
-
-} // namespace cx
-
-#endif // CXSTATESERVICEBACKEND_H
+} //namespace cx
