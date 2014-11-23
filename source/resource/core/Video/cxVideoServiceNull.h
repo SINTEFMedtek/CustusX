@@ -42,7 +42,21 @@ namespace cx
 class cxResource_EXPORT VideoServiceNull : public VideoService
 {
 public:
-	VideoServiceNull();
+	virtual ~VideoServiceNull() {}
+
+	virtual void setActiveVideoSource(QString uid);
+	virtual VideoSourcePtr getActiveVideoSource();
+	virtual std::vector<VideoSourcePtr> getVideoSources();
+
+	virtual void setConnectionMethod(QString connectionMethod);
+	virtual QString getConnectionMethod();
+	virtual void openConnection();
+	virtual void closeConnection();
+	virtual bool isConnected() const;
+
+	virtual void setPlaybackMode(PlaybackTimePtr controller);
+	virtual std::vector<TimelineEvent> getPlaybackEvents();
+
 	virtual StreamerService *getStreamerService(QString service);
 	virtual QList<StreamerService *> getStreamerServices();
 

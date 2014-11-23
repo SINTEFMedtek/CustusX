@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxBoolDataAdapterXml.h"
 
 #include "cxSettings.h"
-#include "cxVideoServiceOld.h"
+#include "cxVideoService.h"
 #include "cxTrackingService.h"
 #include "cxUSSavingRecorder.h"
 #include "cxAcquisitionData.h"
@@ -58,7 +58,7 @@ USAcquisition::USAcquisition(AcquisitionPtr base, QObject* parent) : QObject(par
 	connect(trackingService().get(), &TrackingService::stateChanged, this, &USAcquisition::checkIfReadySlot);
 	connect(trackingService().get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(checkIfReadySlot()));
 	connect(videoService().get(), SIGNAL(activeVideoSourceChanged()), this, SLOT(checkIfReadySlot()));
-	connect(videoService().get(), &VideoServiceOld::connected, this, &USAcquisition::checkIfReadySlot);
+	connect(videoService().get(), &VideoService::connected, this, &USAcquisition::checkIfReadySlot);
 
 	connect(mBase.get(), SIGNAL(started()), this, SLOT(recordStarted()));
 	connect(mBase.get(), SIGNAL(acquisitionStopped()), this, SLOT(recordStopped()), Qt::QueuedConnection);

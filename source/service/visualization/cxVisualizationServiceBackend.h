@@ -54,19 +54,19 @@ class cxVisualizationService_EXPORT VisualizationServiceBackend
 public:
 	VisualizationServiceBackend(PatientModelServicePtr patientService,
 								TrackingServicePtr trackingService,
-								VideoServiceOldPtr videoService,
+								VideoServicePtr videoService,
 								SpaceProviderPtr spaceProvider);
 
 	PatientModelServicePtr getPatientService();
 	TrackingServicePtr getToolManager();
-	VideoServiceOldPtr getVideoServiceOld();
+	VideoServicePtr getVideoService();
 	SpaceProviderPtr getSpaceProvider();
 
 private:
 	PatientModelServicePtr mPatientService;
 	TrackingServicePtr mTrackingService;
 	SpaceProviderPtr mSpaceProvider;
-	VideoServiceOldPtr mVideoServiceOld;
+	VideoServicePtr mVideoService;
 };
 
 

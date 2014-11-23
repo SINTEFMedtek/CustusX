@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxAudioImpl.h"
 #include "cxSettings.h"
 #include "cxToolManagerWidget.h"
-#include "cxVideoServiceOld.h"
+#include "cxVideoService.h"
 #include "cxExportDataDialog.h"
 #include "cxGPUImageBuffer.h"
 #include "cxData.h"
@@ -459,7 +459,7 @@ void MainWindow::createActions()
 	mStartStreamingAction = new QAction(tr("Start Streaming"), mToolsActionGroup);
 	mStartStreamingAction->setShortcut(tr("Ctrl+V"));
 	connect(mStartStreamingAction, SIGNAL(triggered()), this, SLOT(toggleStreamingSlot()));
-	connect(videoService().get(), &VideoServiceOld::connected, this, &MainWindow::updateStreamingActionSlot);
+	connect(videoService().get(), &VideoService::connected, this, &MainWindow::updateStreamingActionSlot);
 	this->updateStreamingActionSlot();
 
 	mConfigureToolsAction->setChecked(true);

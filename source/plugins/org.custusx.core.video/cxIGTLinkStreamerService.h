@@ -29,73 +29,38 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXIGTLINKCLIENTSTREAMER_H
-#define CXIGTLINKCLIENTSTREAMER_H
+#ifndef CXIGTLINKSTREAMERSERVICE_H
+#define CXIGTLINKSTREAMERSERVICE_H
 
-#include "cxStreamer.h"
-#include "cxVideoServiceOldExport.h"
+#include "org_custusx_core_video_Export.h"
+#include "cxStreamerService.h"
+class ctkPluginContext;
 
 namespace cx
 {
+typedef boost::shared_ptr<class StringDataAdapter> StringDataAdapterPtr;
+typedef boost::shared_ptr<class DoubleDataAdapter> DoubleDataAdapterPtr;
 
 /**
- * Streamer that listens to an IGTLink connection, then
- * streams the incoming data.
+ * \ingroup cx_service_video
  *
- * \addtogroup cx_service_video
- * \author Christian Askeland, SINTEF
  * \date 2014-11-20
+ * \author Christian Askeland, SINTEF
  */
-class cxVideoServiceOld_EXPORT IGTLinkClientStreamer: public Streamer
+class org_custusx_core_video_EXPORT IGTLinkStreamerService : public StreamerService
 {
-Q_OBJECT
-
+	Q_OBJECT
 public:
-	IGTLinkClientStreamer();
-	virtual ~IGTLinkClientStreamer();
-
-	void setAddress(QString address, int port);
-
-	virtual bool startStreaming(SenderPtr sender);
-	virtual void stopStreaming();
-
-	virtual QString getType();
-
-private slots:
-//	virtual void myStreamSlot();
-	virtual void streamSlot() {}
-private slots:
-	void readyReadSlot();
-
-	void hostFoundSlot();
-	void connectedSlot();
-	void disconnectedSlot();
-	void errorSlot(QAbstractSocket::SocketError);
-
+	IGTLinkStreamerService(ctkPluginContext *context) {}
+	virtual ~IGTLinkStreamerService() {}
+	virtual QString getName();
+	virtual std::vector<DataAdapterPtr> getSettings(QDomElement root);
+	virtual StreamerPtr createStreamer(QDomElement root);
 private:
-	SenderPtr mSender;
-//	QTimer* mTestTimer;
-
-	virtual QString hostDescription() const; // threadsafe
-	bool ReceiveImage(QTcpSocket* socket, igtl::MessageHeader::Pointer& header);
-	bool ReceiveSonixStatus(QTcpSocket* socket, igtl::MessageHeader::Pointer& header);
-	bool readOneMessage();
-	void addToQueue(IGTLinkUSStatusMessage::Pointer msg);
-	void addToQueue(IGTLinkImageMessage::Pointer msg);
-	bool multipleTryConnectToHost();
-	bool tryConnectToHost();
-
-	bool mHeadingReceived;
-	QString mAddress;
-	int mPort;
-	boost::shared_ptr<QTcpSocket> mSocket;
-	igtl::MessageHeader::Pointer mHeaderMsg;
-	IGTLinkUSStatusMessage::Pointer mUnsentUSStatusMessage; ///< received message, will be added to queue when next image arrives
-
-
+	StringDataAdapterPtr getIPOption(QDomElement root);
+	DoubleDataAdapterPtr getStreamPortOption(QDomElement root);
 };
-typedef boost::shared_ptr<class IGTLinkClientStreamer> IGTLinkClientStreamerPtr;
 
-} // namespace cx
+} //end namespace cx
 
-#endif // CXIGTLINKCLIENTSTREAMER_H
+#endif // CXIGTLINKSTREAMERSERVICE_H

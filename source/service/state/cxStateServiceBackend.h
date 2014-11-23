@@ -56,19 +56,19 @@ class cxStateService_EXPORT StateServiceBackend
 {
 public:
 	StateServiceBackend(TrackingServicePtr trackingService,
-						VideoServiceOldPtr videoService,
+						VideoServicePtr videoService,
 						SpaceProviderPtr spaceProvider,
 						PatientModelServicePtr patientService);
 
 	TrackingServicePtr getToolManager();
-	VideoServiceOldPtr getVideoServiceOld();
+	VideoServicePtr getVideoService();
 	SpaceProviderPtr getSpaceProvider();
 	PatientModelServicePtr getPatientService();
 
 private:
 	TrackingServicePtr mTrackingService;
 	SpaceProviderPtr mSpaceProvider;
-	VideoServiceOldPtr mVideoServiceOld;
+	VideoServicePtr mVideoService;
 	PatientModelServicePtr mPatientService;
 };
 

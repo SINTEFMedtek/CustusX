@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReporter.h"
 #include "cxTrackingService.h"
 #include "cxViewManager.h"
-#include "cxVideoServiceOld.h"
+#include "cxVideoService.h"
 #include "boost/bind.hpp"
 #include <QMetaMethod>
 #include "libQtSignalAdapters/Qt2Func.h"

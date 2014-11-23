@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXBASICVIDEOSOURCE_H
 #define CXBASICVIDEOSOURCE_H
 
-#include "cxVideoServiceOldExport.h"
+#include "org_custusx_core_video_Export.h"
 
 #include "vtkSmartPointer.h"
 #include <stdint.h>
@@ -62,7 +62,7 @@ namespace cx
  * \date April 26, 2013
  * \author Christian Askeland, SINTEF
  */
-class cxVideoServiceOld_EXPORT BasicVideoSource : public VideoSource
+class org_custusx_core_video_EXPORT BasicVideoSource : public VideoSource
 {
 	Q_OBJECT
 

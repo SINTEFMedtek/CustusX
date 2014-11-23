@@ -80,7 +80,7 @@ public:
   TrackingServicePtr getTrackingService();
   SpaceProviderPtr getSpaceProvider();
   PatientModelServicePtr getPatientModelService();
-	VideoServiceOldPtr getVideoServiceOld();
+	VideoServicePtr getVideoService();
   VisualizationServiceOldPtr getVisualizationService();
 	StateServicePtr getStateService();
 
@@ -102,7 +102,7 @@ private:
   void createDataService();
   void createDataFactory();
   void createSpaceProvider();
-	void createVideoServiceOld();
+	void createVideoService();
   void createVisualizationService();
   void createStateService();
   void createPluginFramework();
@@ -133,7 +133,7 @@ private:
 
 	PatientModelServicePtr mPatientModelService;
 	TrackingServicePtr mTrackingService;
-	VideoServiceOldPtr mVideoServiceOld;
+	VideoServicePtr mVideoService;
 	VisualizationServiceOldPtr mVisualizationService;
 	StateServicePtr mStateService;
 

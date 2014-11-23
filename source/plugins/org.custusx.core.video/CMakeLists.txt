@@ -25,11 +25,44 @@ set(PLUGIN_SRCS
   cxVideoPluginActivator.cpp
   cxVideoImplService.cpp
   cxVideoImplService.h
+
+    cxBasicVideoSource.h
+	cxBasicVideoSource.cpp
+	cxVideoServiceOld.cpp
+    cxVideoConnection.h
+    cxVideoConnection.cpp
+    cxPlaybackUSAcquisitionVideo.cpp
+
+    cxImageReceiverThread.h
+    cxImageReceiverThread.cpp
+    
+    cxVideoServiceBackend.h
+    cxVideoServiceBackend.cpp
+    cxStreamerServiceUtilities.h
+    cxStreamerServiceUtilities.cpp
+	cxIGTLinkStreamerService.cpp
+	cxIGTLinkClientStreamer.cpp
+
+	cxOpenCVStreamerService.h
+	cxOpenCVStreamerService.cpp
+	cxImageFileStreamerService.h
+	cxImageFileStreamerService.cpp
+	cxLocalServerStreamerServer.cpp
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
   cxVideoPluginActivator.h
+
+    cxPlaybackUSAcquisitionVideo.h
+    cxBasicVideoSource.h
+    cxVideoServiceOld.h
+    cxVideoConnection.h
+    cxImageReceiverThread.h
+	cxIGTLinkStreamerService.h
+	cxIGTLinkClientStreamer.h
+	cxOpenCVStreamerService.h
+	cxLocalServerStreamerServer.h
 )
 
 # Qt Designer files which should be processed by Qts uic
@@ -48,6 +81,9 @@ set(PLUGIN_target_libraries
     cxResource
     cxLogicManager
     cxPluginUtilities
+    OpenIGTLink
+    cxGrabber
+	cxResourceUsReconstructionTypes
     )
 
 set(PLUGIN_OUTPUT_DIR "")

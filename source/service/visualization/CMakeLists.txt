@@ -51,7 +51,6 @@ include_directories(
 
 set(cxVisualizationService_LIBS
     cxResourceVisualization
-    cxVideoServiceOld
     )
 
 cx_create_export_header("cxVisualizationService")

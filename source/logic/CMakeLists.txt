@@ -50,7 +50,6 @@ target_link_libraries(cxLogicManager
 	CTKPluginFramework
     cxResource
     cxVisualizationService
-    cxVideoServiceOld
 	cxStateService
     )
 

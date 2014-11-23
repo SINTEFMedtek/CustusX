@@ -45,4 +45,4 @@ QT5_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
 cx_create_export_header("cxStateService")
 add_library( cxStateService ${cxStateService_SOURCE} ${MOC_HEADER_FILES})
-target_link_libraries(cxStateService cxVisualizationService cxVideoServiceOld)
+target_link_libraries(cxStateService cxVisualizationService)

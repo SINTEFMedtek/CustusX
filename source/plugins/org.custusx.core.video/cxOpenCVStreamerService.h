@@ -29,13 +29,12 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXLOCALSERVERSTREAMERSERVER_H
-#define CXLOCALSERVERSTREAMERSERVER_H
+#ifndef CXOPENCVSTREAMERSERVICE_H
+#define CXOPENCVSTREAMERSERVICE_H
 
-#include "cxVideoServiceOldExport.h"
+#include "org_custusx_core_video_Export.h"
 #include "cxStreamerService.h"
 #include "cxStreamer.h"
-#include "cxProcessWrapper.h"
 
 class ctkPluginContext;
 
@@ -46,64 +45,26 @@ typedef boost::shared_ptr<class DoubleDataAdapter> DoubleDataAdapterPtr;
 typedef boost::shared_ptr<class DataAdapter> DataAdapterPtr;
 typedef boost::shared_ptr<class BoolDataAdapter> BoolDataAdapterPtr;
 
-/** Options for LocalServerStreamer
- *
+/**
  * \ingroup cx_service_video
  *
  * \date 2014-11-21
  * \author Christian Askeland, SINTEF
  */
-class cxVideoServiceOld_EXPORT LocalServerStreamerArguments
+class org_custusx_core_video_EXPORT OpenCVStreamerService : public StreamerService
 {
 public:
-	std::vector<DataAdapterPtr> getSettings(QDomElement root);
-
+	OpenCVStreamerService(ctkPluginContext *context) {}
+	virtual ~OpenCVStreamerService() {}
+	virtual QString getName();
+	virtual std::vector<DataAdapterPtr> getSettings(QDomElement root);
+	virtual StreamerPtr createStreamer(QDomElement root);
+private:
 	BoolDataAdapterPtr getRunLocalServerOption(QDomElement root);
 	StringDataAdapterPtr getLocalServerNameOption(QDomElement root);
-
-private:
-	QStringList checkGrabberServerExist(QString path, QString filename, QString args);
-	QStringList getOpenIGTLinkServer();
-	QStringList getDefaultGrabberServer();
-	QStringList getGrabberServer(QString filename, QString postfix);
-
 };
-
-/** Streamer wrapping another Streamer, but also runs an executable as a local process.
- *
- * \ingroup cx_service_video
- *
- * \date 2014-11-21
- * \author Christian Askeland, SINTEF
- */
-class cxVideoServiceOld_EXPORT LocalServerStreamer: public Streamer
-{
-Q_OBJECT
-
-public:
-	LocalServerStreamer(QString serverName, QString serverArguments);
-	virtual ~LocalServerStreamer();
-	virtual bool startStreaming(SenderPtr sender);
-	virtual void stopStreaming();
-	virtual QString getType();
-
-	static StreamerPtr createStreamerIfEnabled(QDomElement root, StringMap args);
-
-private slots:
-	virtual void streamSlot() {}
-
-private:
-	bool localVideoServerIsRunning();
-	void waitForServerStart();
-	ProcessWrapperPtr mLocalVideoServerProcess;
-
-	StreamerPtr mBase;
-	QString mServerName;
-	QString mServerArguments;
-};
-typedef boost::shared_ptr<class LocalServerStreamer> LocalServerStreamerPtr;
 
 } //end namespace cx
 
 
-#endif // CXLOCALSERVERSTREAMERSERVER_H
+#endif // CXOPENCVSTREAMERSERVICE_H

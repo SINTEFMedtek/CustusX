@@ -42,7 +42,7 @@ class ViewManager;
 typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
 typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
 typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
-typedef boost::shared_ptr<class VideoServiceOld> VideoServiceOldPtr;
+typedef boost::shared_ptr<class VideoService> VideoServicePtr;
 typedef boost::shared_ptr<class ViewManager> VisualizationServiceOldPtr;
 typedef boost::shared_ptr<class StateService> StateServicePtr;
 
@@ -55,13 +55,12 @@ typedef boost::shared_ptr<class StateService> StateServicePtr;
  */
 
 // old style singleton accessors:
-//cxLogicManager_EXPORT ToolManager* trackingService();
 cxLogicManager_EXPORT ViewManager* viewManager();
 // access to new shared ptrs:
 cxLogicManager_EXPORT SpaceProviderPtr spaceProvider();
 cxLogicManager_EXPORT TrackingServicePtr trackingService();
 cxLogicManager_EXPORT PatientModelServicePtr patientService();
-cxLogicManager_EXPORT VideoServiceOldPtr videoService();
+cxLogicManager_EXPORT VideoServicePtr videoService();
 cxLogicManager_EXPORT StateServicePtr stateService();
 
 } // namespace cx

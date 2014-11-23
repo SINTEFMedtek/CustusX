@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXIMAGEFILESTREAMERSERVICE_H
 #define CXIMAGEFILESTREAMERSERVICE_H
 
-#include "cxVideoServiceOldExport.h"
+#include "org_custusx_core_video_Export.h"
 #include "cxStreamerService.h"
 class ctkPluginContext;
 
@@ -49,7 +49,7 @@ typedef boost::shared_ptr<class BoolDataAdapter> BoolDataAdapterPtr;
  * \date 2014-11-21
  * \author Christian Askeland, SINTEF
  */
-class cxVideoServiceOld_EXPORT ImageFileStreamerService : public StreamerService
+class org_custusx_core_video_EXPORT ImageFileStreamerService : public StreamerService
 {
 public:
 	ImageFileStreamerService(ctkPluginContext *context) {}

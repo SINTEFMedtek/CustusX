@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXImageReceiverThread_H_
 #define CXImageReceiverThread_H_
 
-#include "cxVideoServiceOldExport.h"
+#include "org_custusx_core_video_Export.h"
 
 
 #include <vector>
@@ -73,7 +73,7 @@ typedef boost::shared_ptr<class ImageReceiverThread> ImageReceiverThreadPtr;
  * \date Oct 11, 2012
  * \author Christian Askeland, SINTEF
  */
-class cxVideoServiceOld_EXPORT ImageReceiverThread: public QThread
+class org_custusx_core_video_EXPORT ImageReceiverThread: public QThread
 {
 Q_OBJECT
 public:

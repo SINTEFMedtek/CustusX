@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPushButton>
 #include "cxVideoSource.h"
 #include "cxStringDataAdapterXml.h"
-#include "cxVideoServiceOld.h"
+#include "cxVideoService.h"
 #include "cxtestQueuedSignalListener.h"
 #include "cxtestUtilities.h"
 #include "cxImage.h"

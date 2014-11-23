@@ -30,45 +30,52 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxStateServiceBackend.h"
+#ifndef CXVIDEOSERVICEBACKEND_H
+#define CXVIDEOSERVICEBACKEND_H
 
-#include "cxTrackingService.h"
-#include "cxSpaceProvider.h"
+#include "org_custusx_core_video_Export.h"
+#include <QSharedPointer>
+#include "boost/shared_ptr.hpp"
+#include "cxForwardDeclarations.h"
+class ctkPluginFramework;
+class ctkPluginContext;
 
 namespace cx
 {
+typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
 
-StateServiceBackend::StateServiceBackend(TrackingServicePtr trackingService,
-										 VideoServicePtr videoService,
-										 SpaceProviderPtr spaceProvider,
-										 PatientModelServicePtr patientService) :
-	mTrackingService(trackingService),
-	mSpaceProvider(spaceProvider),
-	mVideoService(videoService),
-	mPatientService(patientService)
+typedef boost::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
+/**
+ *
+ *
+ * \ingroup cx_service_video
+ * \date 25.02.2014, 2014
+ * \author christiana
+ */
+class org_custusx_core_video_EXPORT VideoServiceBackend
 {
+public:
+	static VideoServiceBackendPtr create(PatientModelServicePtr dataManager,
+								TrackingServicePtr trackingService,
+								SpaceProviderPtr spaceProvider,
+										 ctkPluginContext* context);
+	VideoServiceBackend(PatientModelServicePtr dataManager,
+								TrackingServicePtr trackingService,
+								SpaceProviderPtr spaceProvider,
+						ctkPluginContext* context);
 
-}
+	PatientModelServicePtr getDataManager();
+	TrackingServicePtr getToolManager();
+	SpaceProviderPtr getSpaceProvider();
+	ctkPluginContext* mContext;
 
-TrackingServicePtr StateServiceBackend::getToolManager()
-{
-	return mTrackingService;
-}
-
-VideoServicePtr StateServiceBackend::getVideoService()
-{
-	return mVideoService;
-}
-
-SpaceProviderPtr StateServiceBackend::getSpaceProvider()
-{
-	return mSpaceProvider;
-}
-
-PatientModelServicePtr StateServiceBackend::getPatientService()
-{
-	return mPatientService;
-}
-
+private:
+	PatientModelServicePtr mDataManager;
+	TrackingServicePtr mTrackingService;
+	SpaceProviderPtr mSpaceProvider;
+};
 
 } // namespace cx
+
+
+#endif // CXVIDEOSERVICEBACKEND_H

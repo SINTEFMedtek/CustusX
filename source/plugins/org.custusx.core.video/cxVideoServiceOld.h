@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVIDEOSERVICEOLD_H_
 #define CXVIDEOSERVICEOLD_H_
 
-#include "cxVideoServiceOldExport.h"
+#include "org_custusx_core_video_Export.h"
 
 #include <QObject>
 
@@ -94,78 +94,73 @@ typedef boost::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
  *
  *
  */
-class cxVideoServiceOld_EXPORT VideoServiceOld : public QObject
-{
-Q_OBJECT
-public:
-	static VideoServiceOldPtr create(VideoServiceBackendPtr backend);
-	virtual ~VideoServiceOld();
+//class cxVideoServiceOld_EXPORT VideoServiceOld : public QObject
+//{
+//Q_OBJECT
+//public:
+//	static VideoServiceOldPtr create(VideoServiceBackendPtr backend);
+//	virtual ~VideoServiceOld();
 
-	USAcquisitionVideoPlaybackPtr getUSAcquisitionVideoPlayback();
-	VideoSourcePtr getActiveVideoSource();
-	void setActiveVideoSource(QString uid);
-	void setPlaybackMode(PlaybackTimePtr controller);
-	/** Get all existing video sources.
-	  */
-	std::vector<VideoSourcePtr> getVideoSources();
+//	USAcquisitionVideoPlaybackPtr getUSAcquisitionVideoPlayback();
+//	VideoSourcePtr getActiveVideoSource();
+//	void setActiveVideoSource(QString uid);
+//	void setPlaybackMode(PlaybackTimePtr controller);
+//	std::vector<VideoSourcePtr> getVideoSources();
+//	virtual QString getConnectionMethod();
+//	virtual void setConnectionMethod(QString connectionMethod);
+//	virtual void openConnection();
+//	virtual void closeConnection();
+//	virtual bool isConnected() const;
 
+//signals:
+//	void connected(bool on);
+//	void connectionMethodChanged();
+//	/** Emitted when a video source is set to active,
+//	  * OR when the available set of sources are changed.
+//	  */
+//	void activeVideoSourceChanged();
+//	void fps(int);
 
-	virtual QString getConnectionMethod();
-	virtual void setConnectionMethod(QString connectionMethod);
-	virtual void openConnection();
-	virtual void closeConnection();
-	virtual bool isConnected() const;
+//private slots:
+//	/** Autoselect the active VideoSource
+//	  *
+//	  * Call when video source configuration has changed. The active
+//	  * Video source will automatically be determined by calling
+//	  * autoGuessVideoSource().
+//	  */
+//	void autoSelectActiveVideoSource();
+//	void fpsSlot(QString source, int val);
 
-signals:
-	void connected(bool on);
-	void connectionMethodChanged();
-	/** Emitted when a video source is set to active,
-	  * OR when the available set of sources are changed.
-	  */
-	void activeVideoSourceChanged();
-	void fps(int);
+//private:
+//	VideoServiceBackendPtr getBackend();
+//	VideoServiceOld(VideoServiceBackendPtr videoBackend);
 
-private slots:
-	/** Autoselect the active VideoSource
-	  *
-	  * Call when video source configuration has changed. The active
-	  * Video source will automatically be determined by calling
-	  * autoGuessVideoSource().
-	  */
-	void autoSelectActiveVideoSource();
-	void fpsSlot(QString source, int val);
+//	VideoServiceOld(VideoServiceOld const&); // not implemented
+//	VideoServiceOld& operator=(VideoServiceOld const&); // not implemented
 
-private:
-//	VideoConnectionManagerPtr getVideoConnection();
-	VideoServiceBackendPtr getBackend();
-	VideoServiceOld(VideoServiceBackendPtr videoBackend);
+//	/** Find the best guess for active VideoSource
+//	  *
+//	  * Select from the following in that priority:
+//	  *  - playback sources
+//	  *  - active probe sources
+//	  *  - other probe sources
+//	  *  - free sources (not connected to probe)
+//	  *  - empty source
+//	  *
+//	  * Within each group, keep existing active if it already belongs
+//	  * to that group.
+//	  *
+//	  */
+//	VideoSourcePtr getGuessForActiveVideoSource(VideoSourcePtr old);
 
-	VideoServiceOld(VideoServiceOld const&); // not implemented
-	VideoServiceOld& operator=(VideoServiceOld const&); // not implemented
+//	QString mConnectionMethod;
+//	VideoConnectionPtr mVideoConnection;
 
-	/** Find the best guess for active VideoSource
-	  *
-	  * Select from the following in that priority:
-	  *  - playback sources
-	  *  - active probe sources
-	  *  - other probe sources
-	  *  - free sources (not connected to probe)
-	  *  - empty source
-	  *
-	  * Within each group, keep existing active if it already belongs
-	  * to that group.
-	  *
-	  */
-	VideoSourcePtr getGuessForActiveVideoSource(VideoSourcePtr old);
-
-	QString mConnectionMethod;
-	VideoConnectionPtr mVideoConnection;
-
-	VideoSourcePtr mActiveVideoSource;
-	VideoSourcePtr mEmptyVideoSource;
-	USAcquisitionVideoPlaybackPtr mUSAcquisitionVideoPlayback;
-	VideoServiceBackendPtr mBackend;
-};
+//	VideoSourcePtr mActiveVideoSource;
+//	VideoSourcePtr mEmptyVideoSource;
+//	USAcquisitionVideoPlaybackPtr mUSAcquisitionVideoPlayback;
+//	VideoServiceBackendPtr mBackend;
+//};
 
 //VideoServicePtr videoService();
 

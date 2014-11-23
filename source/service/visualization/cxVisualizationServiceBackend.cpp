@@ -40,12 +40,12 @@ namespace cx
 
 VisualizationServiceBackend::VisualizationServiceBackend(PatientModelServicePtr patientService,
 														 TrackingServicePtr trackingService,
-														 VideoServiceOldPtr videoService,
+														 VideoServicePtr videoService,
 														 SpaceProviderPtr spaceProvider) :
 	mPatientService(patientService),
 	mTrackingService(trackingService),
 	mSpaceProvider(spaceProvider),
-  mVideoServiceOld(videoService)
+	mVideoService(videoService)
 {
 
 }
@@ -60,9 +60,9 @@ TrackingServicePtr VisualizationServiceBackend::getToolManager()
 	return mTrackingService;
 }
 
-VideoServiceOldPtr VisualizationServiceBackend::getVideoServiceOld()
+VideoServicePtr VisualizationServiceBackend::getVideoService()
 {
-	return mVideoServiceOld;
+	return mVideoService;
 }
 
 SpaceProviderPtr VisualizationServiceBackend::getSpaceProvider()

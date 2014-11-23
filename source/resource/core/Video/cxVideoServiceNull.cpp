@@ -36,8 +36,50 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-VideoServiceNull::VideoServiceNull()
+
+void VideoServiceNull::setActiveVideoSource(QString uid)
 {
+}
+
+VideoSourcePtr VideoServiceNull::getActiveVideoSource()
+{
+	return VideoSourcePtr();
+}
+
+std::vector<VideoSourcePtr> VideoServiceNull::getVideoSources()
+{
+	return std::vector<VideoSourcePtr>();
+}
+
+void VideoServiceNull::setConnectionMethod(QString connectionMethod)
+{
+}
+
+QString VideoServiceNull::getConnectionMethod()
+{
+	return "";
+}
+
+void VideoServiceNull::openConnection()
+{
+}
+
+void VideoServiceNull::closeConnection()
+{
+}
+
+bool VideoServiceNull::isConnected() const
+{
+	return false;
+}
+
+void VideoServiceNull::setPlaybackMode(PlaybackTimePtr controller)
+{
+}
+
+std::vector<TimelineEvent> VideoServiceNull::getPlaybackEvents()
+{
+	return std::vector<TimelineEvent>();
 }
 
 StreamerService *VideoServiceNull::getStreamerService(QString service)

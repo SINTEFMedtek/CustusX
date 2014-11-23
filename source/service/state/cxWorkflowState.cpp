@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSettings.h"
 #include "cxTrackingService.h"
 #include "cxTool.h"
-#include "cxVideoServiceOld.h"
+#include "cxVideoService.h"
 #include "cxStateServiceBackend.h"
 #include "cxPatientModelService.h"
 
@@ -101,7 +101,7 @@ void WorkflowState::autoStartHardware()
 	if (settings()->value("Automation/autoStartTracking").toBool())
 		mBackend->getToolManager()->setState(Tool::tsTRACKING);
 	if (settings()->value("Automation/autoStartStreaming").toBool())
-		mBackend->getVideoServiceOld()->openConnection();
+		mBackend->getVideoService()->openConnection();
 }
 
 // --------------------------------------------------------

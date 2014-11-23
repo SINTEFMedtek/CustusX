@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ctkPluginContext.h>
 #include "cxServiceController.h"
 #include "cxReporter.h"
-#include "cxVideoServiceOld.h"
+#include "cxVideoServiceProxy.h"
 #include "cxViewManager.h"
 #include "cxStateService.h"
 #include "cxRepManager.h"
@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSpaceProviderImpl.h"
 #include "cxDataFactory.h"
 #include "cxVisualizationServiceBackend.h"
-#include "cxVideoServiceBackend.h"
+//#include "cxVideoServiceBackend.h"
 #include "cxStateServiceBackend.h"
 #include "cxTypeConversions.h"
 #include "cxSharedPointerChecker.h"
@@ -60,7 +60,7 @@ struct LegacySingletons
 	static TrackingServicePtr mTrackingService;
 	static SpaceProviderPtr mSpaceProvider;
 	static PatientModelServicePtr mPatientService;
-	static VideoServiceOldPtr mVideoServiceOld;
+	static VideoServicePtr mVideoService;
 	static VisualizationServiceOldPtr mVisualizationService;
 	static StateServicePtr mStateService;
 };
@@ -68,7 +68,7 @@ struct LegacySingletons
 TrackingServicePtr LegacySingletons::mTrackingService;
 SpaceProviderPtr LegacySingletons::mSpaceProvider;
 PatientModelServicePtr LegacySingletons::mPatientService;
-VideoServiceOldPtr LegacySingletons::mVideoServiceOld;
+VideoServicePtr LegacySingletons::mVideoService;
 VisualizationServiceOldPtr LegacySingletons::mVisualizationService;
 StateServicePtr LegacySingletons::mStateService;
 
@@ -89,9 +89,9 @@ PatientModelServicePtr patientService()
 {
 	return LegacySingletons::mPatientService;
 }
-VideoServiceOldPtr videoService()
+VideoServicePtr videoService()
 {
-	return LegacySingletons::mVideoServiceOld;
+	return LegacySingletons::mVideoService;
 }
 VisualizationServiceOldPtr visualizationService()
 {
@@ -137,7 +137,7 @@ void LogicManager::initializeServices()
 	// services layer
 	this->getPatientModelService();
 	this->getTrackingService();
-	this->getVideoServiceOld();
+	this->getVideoService();
 	this->getVisualizationService();
 	this->getStateService();
 	this->getSpaceProvider();
@@ -173,21 +173,24 @@ void LogicManager::createPatientModelService()
 	LegacySingletons::mPatientService = mPatientModelService;
 }
 
-void LogicManager::createVideoServiceOld()
+void LogicManager::createVideoService()
 {
-	// prerequisites:
-	this->getTrackingService();
-	this->createPatientModelService();
-	this->getSpaceProvider();
+	mVideoService = VideoServiceProxy::create(this->getPluginContext());
+	LegacySingletons::mVideoService = mVideoService;
 
-	// build object(s):
-	VideoServiceBackendPtr videoBackend;
-	videoBackend = VideoServiceBackend::create(mPatientModelService,
-											   mTrackingService,
-												 mSpaceProvider,
-											   this->getPluginContext());
-	mVideoServiceOld = VideoServiceOld::create(videoBackend);
-	LegacySingletons::mVideoServiceOld = mVideoServiceOld;
+//	// prerequisites:
+//	this->getTrackingService();
+//	this->createPatientModelService();
+//	this->getSpaceProvider();
+
+//	// build object(s):
+//	VideoServiceBackendPtr videoBackend;
+//	videoBackend = VideoServiceBackend::create(mPatientModelService,
+//											   mTrackingService,
+//												 mSpaceProvider,
+//											   this->getPluginContext());
+//	mVideoServiceOld = VideoServiceOld::create(videoBackend);
+//	LegacySingletons::mVideoServiceOld = mVideoServiceOld;
 }
 
 void LogicManager::createVisualizationService()
@@ -195,14 +198,14 @@ void LogicManager::createVisualizationService()
 	// prerequisites:
 	this->getTrackingService();
 	this->createPatientModelService();
-	this->getVideoServiceOld();
+	this->getVideoService();
 	this->getSpaceProvider();
 
 	// build object(s):
 	VisualizationServiceBackendPtr backend;
 	backend.reset(new VisualizationServiceBackend(mPatientModelService,
 												  mTrackingService,
-													mVideoServiceOld,
+													mVideoService,
 												  mSpaceProvider));
 	mVisualizationService = ViewManager::create(backend);
 	LegacySingletons::mVisualizationService = mVisualizationService;
@@ -213,13 +216,13 @@ void LogicManager::createStateService()
 	// prerequisites:
 	this->getTrackingService();
 	this->getPatientModelService();
-	this->getVideoServiceOld();
+	this->getVideoService();
 	this->getSpaceProvider();
 
 	// build object(s):
 	StateServiceBackendPtr backend;
 	backend.reset(new StateServiceBackend(mTrackingService,
-										  mVideoServiceOld,
+										  mVideoService,
 										  mSpaceProvider,
 										  mPatientModelService));
 	mStateService = StateService::create(backend);
@@ -247,11 +250,11 @@ TrackingServicePtr LogicManager::getTrackingService()
 	return mTrackingService;
 }
 
-VideoServiceOldPtr LogicManager::getVideoServiceOld()
+VideoServicePtr LogicManager::getVideoService()
 {
-	if (!mVideoServiceOld)
-		this->createVideoServiceOld();
-	return mVideoServiceOld;
+	if (!mVideoService)
+		this->createVideoService();
+	return mVideoService;
 }
 
 StateServicePtr LogicManager::getStateService()
@@ -322,9 +325,9 @@ void LogicManager::shutdownVisualizationService()
 
 void LogicManager::shutdownVideoServiceOld()
 {
-	LegacySingletons::mVideoServiceOld.reset();
-	requireUnique(mVideoServiceOld, "VideoServiceOld");
-	mVideoServiceOld.reset();
+	LegacySingletons::mVideoService.reset();
+	requireUnique(mVideoService, "VideoServiceOld");
+	mVideoService.reset();
 }
 
 void LogicManager::shutdownPatientService()

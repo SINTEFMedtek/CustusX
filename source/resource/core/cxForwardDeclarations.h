@@ -129,7 +129,7 @@ typedef boost::shared_ptr<class VolumetricRep> VolumetricRepPtr;
 // Services
 typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
 typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
-typedef boost::shared_ptr<class VideoServiceOld> VideoServiceOldPtr;
+typedef boost::shared_ptr<class VideoService> VideoServicePtr;
 typedef boost::shared_ptr<class ViewManager> VisualizationServiceOldPtr;
 typedef boost::shared_ptr<class StateService> StateServicePtr;
 

@@ -29,42 +29,73 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXOPENCVSTREAMERSERVICE_H
-#define CXOPENCVSTREAMERSERVICE_H
+#ifndef CXIGTLINKCLIENTSTREAMER_H
+#define CXIGTLINKCLIENTSTREAMER_H
 
-#include "cxVideoServiceOldExport.h"
-#include "cxStreamerService.h"
 #include "cxStreamer.h"
-
-class ctkPluginContext;
+#include "org_custusx_core_video_Export.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class StringDataAdapter> StringDataAdapterPtr;
-typedef boost::shared_ptr<class DoubleDataAdapter> DoubleDataAdapterPtr;
-typedef boost::shared_ptr<class DataAdapter> DataAdapterPtr;
-typedef boost::shared_ptr<class BoolDataAdapter> BoolDataAdapterPtr;
 
 /**
- * \ingroup cx_service_video
+ * Streamer that listens to an IGTLink connection, then
+ * streams the incoming data.
  *
- * \date 2014-11-21
+ * \addtogroup cx_service_video
  * \author Christian Askeland, SINTEF
+ * \date 2014-11-20
  */
-class cxVideoServiceOld_EXPORT OpenCVStreamerService : public StreamerService
+class org_custusx_core_video_EXPORT IGTLinkClientStreamer: public Streamer
 {
+Q_OBJECT
+
 public:
-	OpenCVStreamerService(ctkPluginContext *context) {}
-	virtual ~OpenCVStreamerService() {}
-	virtual QString getName();
-	virtual std::vector<DataAdapterPtr> getSettings(QDomElement root);
-	virtual StreamerPtr createStreamer(QDomElement root);
+	IGTLinkClientStreamer();
+	virtual ~IGTLinkClientStreamer();
+
+	void setAddress(QString address, int port);
+
+	virtual bool startStreaming(SenderPtr sender);
+	virtual void stopStreaming();
+
+	virtual QString getType();
+
+private slots:
+//	virtual void myStreamSlot();
+	virtual void streamSlot() {}
+private slots:
+	void readyReadSlot();
+
+	void hostFoundSlot();
+	void connectedSlot();
+	void disconnectedSlot();
+	void errorSlot(QAbstractSocket::SocketError);
+
 private:
-	BoolDataAdapterPtr getRunLocalServerOption(QDomElement root);
-	StringDataAdapterPtr getLocalServerNameOption(QDomElement root);
+	SenderPtr mSender;
+//	QTimer* mTestTimer;
+
+	virtual QString hostDescription() const; // threadsafe
+	bool ReceiveImage(QTcpSocket* socket, igtl::MessageHeader::Pointer& header);
+	bool ReceiveSonixStatus(QTcpSocket* socket, igtl::MessageHeader::Pointer& header);
+	bool readOneMessage();
+	void addToQueue(IGTLinkUSStatusMessage::Pointer msg);
+	void addToQueue(IGTLinkImageMessage::Pointer msg);
+	bool multipleTryConnectToHost();
+	bool tryConnectToHost();
+
+	bool mHeadingReceived;
+	QString mAddress;
+	int mPort;
+	boost::shared_ptr<QTcpSocket> mSocket;
+	igtl::MessageHeader::Pointer mHeaderMsg;
+	IGTLinkUSStatusMessage::Pointer mUnsentUSStatusMessage; ///< received message, will be added to queue when next image arrives
+
+
 };
+typedef boost::shared_ptr<class IGTLinkClientStreamer> IGTLinkClientStreamerPtr;
 
-} //end namespace cx
+} // namespace cx
 
-
-#endif // CXOPENCVSTREAMERSERVICE_H
+#endif // CXIGTLINKCLIENTSTREAMER_H

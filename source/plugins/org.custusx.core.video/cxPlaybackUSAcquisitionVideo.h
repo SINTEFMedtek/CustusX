@@ -29,53 +29,80 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXPLAYBACKUSACQUISITIONVIDEO_H_
+#define CXPLAYBACKUSACQUISITIONVIDEO_H_
 
-#ifndef CXVIDEOSERVICEBACKEND_H
-#define CXVIDEOSERVICEBACKEND_H
+#include "org_custusx_core_video_Export.h"
 
-#include "cxVideoServiceOldExport.h"
-#include <QSharedPointer>
-#include "boost/shared_ptr.hpp"
+#include <QObject>
+#include <QFuture>
+#include <QFutureWatcher>
+#include <vector>
+#include "cxVideoSource.h"
+#include "cxUSReconstructInputData.h"
+#include "cxPlaybackTime.h"
 #include "cxForwardDeclarations.h"
-class ctkPluginFramework;
-class ctkPluginContext;
 
 namespace cx
 {
-typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
-
+typedef boost::shared_ptr<class BasicVideoSource> BasicVideoSourcePtr;
 typedef boost::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
+
 /**
- *
+ * \file
+ * \addtogroup cx_service_video
+ * @{
+ */
+
+/**\brief Handler for playback of US image data
+ * from a US recording session.
  *
  * \ingroup cx_service_video
- * \date 25.02.2014, 2014
- * \author christiana
+ * \date Apr 11, 2012
+ * \author Christian Askeland, SINTEF
+ *
  */
-class cxVideoServiceOld_EXPORT VideoServiceBackend
+class org_custusx_core_video_EXPORT USAcquisitionVideoPlayback : public QObject
 {
+	Q_OBJECT
 public:
-	static VideoServiceBackendPtr create(PatientModelServicePtr dataManager,
-								TrackingServicePtr trackingService,
-								SpaceProviderPtr spaceProvider,
-										 ctkPluginContext* context);
-	VideoServiceBackend(PatientModelServicePtr dataManager,
-								TrackingServicePtr trackingService,
-								SpaceProviderPtr spaceProvider,
-						ctkPluginContext* context);
+	explicit USAcquisitionVideoPlayback(VideoServiceBackendPtr backend);
+	virtual ~USAcquisitionVideoPlayback();
+	VideoSourcePtr getVideoSource();
+	void setRoot(const QString path);
+	void setTime(PlaybackTimePtr controller);
+	bool isActive() const;
+	std::vector<TimelineEvent> getEvents();
 
-	PatientModelServicePtr getDataManager();
-	TrackingServicePtr getToolManager();
-	SpaceProviderPtr getSpaceProvider();
-	ctkPluginContext* mContext;
+private slots:
+	void timerChangedSlot();
+	void usDataLoadFinishedSlot();
 
 private:
-	PatientModelServicePtr mDataManager;
-	TrackingServicePtr mTrackingService;
-	SpaceProviderPtr mSpaceProvider;
+	void updateFrame(QString filename);
+	void loadFullData(QString filename);
+	QStringList getAbsolutePathToFtsFiles(QString folder);
+	QString mRoot;
+	PlaybackTimePtr mTimer;
+	BasicVideoSourcePtr mVideoSource;
+	std::vector<TimelineEvent> mEvents;
+	const QString mVideoSourceUid;
+
+	USReconstructInputData mCurrentData;
+	std::vector<double> mCurrentTimestamps; // copy of time frame timestamps from mCurrentData.
+
+	UsReconstructionFileReaderPtr mUSImageDataReader;
+	QFuture<USReconstructInputData> mUSImageDataFutureResult;
+	QFutureWatcher<USReconstructInputData> mUSImageDataFutureWatcher;
+
+	VideoServiceBackendPtr mBackend;
 };
+typedef boost::shared_ptr<USAcquisitionVideoPlayback> USAcquisitionVideoPlaybackPtr;
 
-} // namespace cx
 
+/**
+ * @}
+ */
+}
 
-#endif // CXVIDEOSERVICEBACKEND_H
+#endif /* CXPLAYBACKUSACQUISITIONVIDEO_H_ */

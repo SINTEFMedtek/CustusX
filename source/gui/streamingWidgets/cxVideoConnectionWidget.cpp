@@ -52,7 +52,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataLocations.h"
 #include "cxDataInterface.h"
 #include "cxImageServer.h"
-#include "cxVideoServiceOld.h"
 #include "cxTrackingService.h"
 #include "cxViewManager.h"
 #include "cxFileInputWidget.h"
@@ -83,7 +82,7 @@ VideoConnectionWidget::VideoConnectionWidget(VisualizationServicePtr visualizati
 	mConnectionSelector = StringDataAdapterXml::initialize("Connection", "", "Method for connecting to Video Server", defaultConnection, QStringList(), mOptions.getElement("video"));
 	connect(mConnectionSelector.get(), SIGNAL(changed()), this, SLOT(selectGuiForConnectionMethodSlot()));
 
-	connect(videoService().get(), &VideoServiceOld::connected, this, &VideoConnectionWidget::serverStatusChangedSlot);
+	connect(videoService().get(), &VideoService::connected, this, &VideoConnectionWidget::serverStatusChangedSlot);
 
 	mStackedWidget = new QStackedWidget(this);
 	QFrame* frame = this->wrapStackedWidgetInAFrame();

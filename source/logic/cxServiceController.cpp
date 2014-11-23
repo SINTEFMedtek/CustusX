@@ -34,10 +34,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDir>
 
 #include "cxTrackingService.h"
-#include "cxVideoServiceOld.h"
+#include "cxVideoService.h"
 #include "cxReporter.h"
 #include "cxTypeConversions.h"
-#include "cxPlaybackUSAcquisitionVideo.h"
+//#include "cxPlaybackUSAcquisitionVideo.h"
 #include "cxViewManager.h"
 #include "cxLegacySingletons.h"
 #include "cxPatientModelService.h"
@@ -69,7 +69,7 @@ void ServiceController::patientChangedSlot()
 	{
 		loggingDir.mkpath(loggingPath);
 	}
-	videoService()->getUSAcquisitionVideoPlayback()->setRoot(patientService()->getActivePatientFolder() + "/US_Acq/");
+//	videoService()->getUSAcquisitionVideoPlayback()->setRoot(patientService()->getActivePatientFolder() + "/US_Acq/");
 
 	trackingService()->setLoggingFolder(loggingPath);
 	reporter()->setLoggingFolder(loggingPath);
