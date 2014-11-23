@@ -74,10 +74,6 @@ ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
     LINK_PUBLIC cxResource cxPluginUtilities 
     ${PLUGIN_target_libraries}   
-    #cxResource
-    #cxLogicManager
-#    cxResource cxPluginUtilities 
-#    IGSTK
     LINK_PRIVATE IGSTK
     )
 

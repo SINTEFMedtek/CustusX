@@ -36,7 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "boost/bind.hpp"
 #include "cxData.h"
 #include "cxReporter.h"
-#include "cxLogicManager.h"
 #include "cxRegistrationTransform.h"
 
 #include "cxPlaybackUSAcquisitionVideo.h"

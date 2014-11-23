@@ -47,7 +47,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReconstructParams.h"
 #include "cxReconstructionMethodService.h"
 #include "cxServiceTrackerListener.h"
-//#include "cxLogicManager.h"
 #include "cxPluginFramework.h"
 #include "cxReconstructionExecuter.h"
 #include "cxPatientModelService.h"
