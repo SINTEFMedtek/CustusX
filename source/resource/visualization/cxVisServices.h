@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
+typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 typedef boost::shared_ptr<class VisualizationService> VisualizationServicePtr;
 
 /**
@@ -52,6 +53,7 @@ typedef boost::shared_ptr<class VisualizationService> VisualizationServicePtr;
 class cxResourceVisualization_EXPORT VisServices : public CoreServices
 {
 public:
+	static VisServicesPtr create(ctkPluginContext* context);
 	VisServices(ctkPluginContext* context);
 	static VisServices getNullObjects();
 
@@ -60,6 +62,7 @@ public:
 private:
 	VisServices();
 };
+
 
 }
 

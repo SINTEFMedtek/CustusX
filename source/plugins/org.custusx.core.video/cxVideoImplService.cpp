@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxTrackingService.h"
 #include "cxVideoServiceBackend.h"
-#include "cxVideoServiceProxy.h"
+//#include "cxVideoServiceProxy.h"
 #include "cxReporter.h"
 
 #include "cxTrackingServiceProxy.h"
@@ -76,7 +76,8 @@ VideoImplService::VideoImplService(ctkPluginContext *context) :
 	connect(mVideoConnection.get(), &VideoConnection::connected, this, &VideoImplService::autoSelectActiveVideoSource);
 	connect(mVideoConnection.get(), &VideoConnection::videoSourcesChanged, this, &VideoImplService::autoSelectActiveVideoSource);
 	connect(mVideoConnection.get(), &VideoConnection::fps, this, &VideoImplService::fpsSlot);
-	connect(mBackend->getToolManager().get(), SIGNAL(dominantToolChanged(QString)), this, SLOT(autoSelectActiveVideoSource()));
+//	connect(mBackend->getToolManager().get(), SIGNAL(dominantToolChanged(QString)), this, SLOT(autoSelectActiveVideoSource()));
+	connect(mBackend->getToolManager().get(), &TrackingService::dominantToolChanged, this, &VideoImplService::autoSelectActiveVideoSource);
 	connect(mVideoConnection.get(), &VideoConnection::connected, this, &VideoImplService::connected);
 
 	this->initServiceListener();
@@ -89,12 +90,12 @@ VideoImplService::~VideoImplService()
 
 StreamerService *VideoImplService::getStreamerService(QString service)
 {
-	return NULL;//Let the proxy object handle the plugin framework
+	return mStreamerServiceListener->getService(service);
 }
 
 QList<StreamerService *> VideoImplService::getStreamerServices()
 {
-	return QList<StreamerService *>();//Let the proxy object handle the plugin framework
+	return mStreamerServiceListener->getServices();
 }
 
 bool VideoImplService::isNull()
@@ -167,16 +168,6 @@ VideoSourcePtr VideoImplService::getGuessForActiveVideoSource(VideoSourcePtr old
 	return mEmptyVideoSource;
 }
 
-//USAcquisitionVideoPlaybackPtr VideoImplService::getUSAcquisitionVideoPlayback()
-//{
-//	return mUSAcquisitionVideoPlayback;
-//}
-
-//VideoConnectionManagerPtr VideoService::getVideoConnection()
-//{
-//	return mVideoConnection;
-//}
-
 VideoSourcePtr VideoImplService::getActiveVideoSource()
 {
 	return mActiveVideoSource;
@@ -221,19 +212,12 @@ void VideoImplService::fpsSlot(QString source, int val)
 		emit fps(val);
 }
 
-//VideoServiceBackendPtr VideoImplService::getBackend()
-//{
-//	return mBackend;
-//}
-
 void VideoImplService::openConnection()
 {
-	VideoServicePtr videoService(new VideoServiceProxy(mBackend->mContext));
-
 	if (mVideoConnection->isConnected())
 		return;
 
-	StreamerService* service = videoService->getStreamerService(mConnectionMethod);
+	StreamerService* service = this->getStreamerService(mConnectionMethod);
 	if (!service)
 	{
 		reportError(QString("Found no streamer for method [%1]").arg(mConnectionMethod));

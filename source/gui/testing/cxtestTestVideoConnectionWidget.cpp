@@ -44,16 +44,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxDataLocations.h"
 #include "cxStreamerServiceUtilities.h"
-#include "cxLogicManager.h"
+//#include "cxLogicManager.h"
 
-//TODO: remove
-#include "cxLegacySingletons.h"
+////TODO: remove
+//#include "cxLegacySingletons.h"
 
 namespace cxtest
 {
 
-TestVideoConnectionWidget::TestVideoConnectionWidget(cx::VisualizationServicePtr visualizationService, cx::PatientModelServicePtr patientModelService, cx::VideoServicePtr videoService) :
-	VideoConnectionWidget(visualizationService, patientModelService, videoService, NULL)
+TestVideoConnectionWidget::TestVideoConnectionWidget(cx::VisServicesPtr services) :
+	VideoConnectionWidget(services, NULL)
 {
 }
 
@@ -66,9 +66,9 @@ bool TestVideoConnectionWidget::canStream(QString filename)
 
 	QTest::mouseClick(mConnectButton, Qt::LeftButton); //connect
 
-	waitForQueuedSignal(cx::videoService().get(), SIGNAL(connected(bool)), 1000);
-	waitForQueuedSignal(cx::videoService().get(), SIGNAL(activeVideoSourceChanged()), 500);
-	cx::VideoSourcePtr stream = cx::videoService()->getActiveVideoSource();
+	waitForQueuedSignal(mServices->videoService.get(), SIGNAL(connected(bool)), 1000);
+	waitForQueuedSignal(mServices->videoService.get(), SIGNAL(activeVideoSourceChanged()), 500);
+	cx::VideoSourcePtr stream = mServices->videoService->getActiveVideoSource();
 	waitForQueuedSignal(stream.get(), SIGNAL(newFrame()), 500);
 	bool canStream = stream->isStreaming();
 
@@ -83,31 +83,22 @@ cx::DataAdapterPtr TestVideoConnectionWidget::getOption(QString uid, QString met
 {
 	cx::XmlOptionFile options = cx::XmlOptionFile(cx::DataLocations::getXmlSettingsFile()).descend("video");
 	QDomElement element = options.getElement("video");
-	cx::StreamerService* streamer;
-	streamer = cx::StreamerServiceUtilities::getStreamerService(method,
-																cx::logicManager()->getPluginContext());
+	cx::StreamerService* streamer = mServices->videoService->getStreamerService(method);
 	cx::DataAdapterPtr option = cx::DataAdapter::findAdapter(streamer->getSettings(element), uid);
-//	REQUIRE(option.get());
 	return option;
 }
 
 void TestVideoConnectionWidget::setupWidgetToRunStreamer(QString filename)
 {
 	cx::ImagePtr image = Utilities::create3DImage();
-	this->mPatientModelService->setActiveImage(image);
-	this->mPatientModelService->insertData(image);
-
-
+	mServices->patientModelService->setActiveImage(image);
+	mServices->patientModelService->insertData(image);
 
 	QString method = "ImageFile";
 	mConnectionSelector->setValue(method);
 //	cx::videoService()->setConnectionMethod("ImageFile");
 	this->getOption("filename", method)->setValueFromVariant(filename);
 	this->getOption("runlocalserver", method)->setValueFromVariant(false);
-
-//	QString connectionArguments("--type "+streamerType+" --filename " + filename);
-//	mDirectLinkArguments->addItem(connectionArguments);
-//	mDirectLinkArguments->setCurrentIndex(mDirectLinkArguments->findText(connectionArguments));
 }
 
 } /* namespace cxtest */

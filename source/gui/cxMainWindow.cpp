@@ -132,19 +132,15 @@ MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
 
 	this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
 
-	ctkPluginContext *pluginContext = LogicManager::getInstance()->getPluginContext();
-
-	mPatientModelService = PatientModelServicePtr(new PatientModelServiceProxy(pluginContext));
-	mVisualizationService = VisualizationServicePtr(new VisualizationServiceProxy(pluginContext));
-	mVideoService = VideoServicePtr(new VideoServiceProxy(pluginContext));
+	mServices = VisServices::create(logicManager()->getPluginContext());
 
 	this->addAsDockWidget(new PlaybackWidget(this), "Browsing");
-	this->addAsDockWidget(new VideoConnectionWidget(mVisualizationService, mPatientModelService, mVideoService, this), "Utility");
+	this->addAsDockWidget(new VideoConnectionWidget(mServices, this), "Utility");
 	this->addAsDockWidget(new EraserWidget(this), "Properties");
-	this->addAsDockWidget(new MetricWidget(mVisualizationService, mPatientModelService, this), "Utility");
-	this->addAsDockWidget(new SlicePropertiesWidget(mPatientModelService, mVisualizationService, this), "Properties");
-	this->addAsDockWidget(new VolumePropertiesWidget(mPatientModelService, mVisualizationService, this), "Properties");
-	this->addAsDockWidget(new MeshInfoWidget(mPatientModelService, mVisualizationService, this), "Properties");
+	this->addAsDockWidget(new MetricWidget(mServices->visualizationService, mServices->patientModelService, this), "Utility");
+	this->addAsDockWidget(new SlicePropertiesWidget(mServices->patientModelService, mServices->visualizationService, this), "Properties");
+	this->addAsDockWidget(new VolumePropertiesWidget(mServices->patientModelService, mServices->visualizationService, this), "Properties");
+	this->addAsDockWidget(new MeshInfoWidget(mServices->patientModelService, mServices->visualizationService, this), "Properties");
 	this->addAsDockWidget(new TrackPadWidget(this), "Utility");
 	this->addAsDockWidget(new ToolPropertiesWidget(this), "Properties");
 	this->addAsDockWidget(new NavigationWidget(this), "Properties");
@@ -268,13 +264,6 @@ void MainWindow::onPluginBaseRemoved(GUIExtenderService* service)
 {
 	this->removeGUIExtender(service);
 }
-
-///**Parse the command line and load a patient if the switch --patient is found
-// */
-//void MainWindow::startupLoadPatient()
-//{
-//	patientService()->startupLoadPatient();
-//}
 
 void MainWindow::dockWidgetVisibilityChanged(bool val)
 {
@@ -442,7 +431,7 @@ void MainWindow::createActions()
 	connect(mShowPointPickerAction, SIGNAL(triggered()), this, SLOT(togglePointPickerActionSlot()));
 
 	connect(viewManager()->getViewGroups()[0]->getData().get(), SIGNAL(optionsChanged()), this,
-//	connect(mVisualizationService->getViewGroupData(0).get(), SIGNAL(optionsChanged()), this, //Too early?
+//	connect(mServices->visualizationService->getViewGroupData(0).get(), SIGNAL(optionsChanged()), this, //Too early?
 		SLOT(updatePointPickerActionSlot()));
 	this->updatePointPickerActionSlot();
 
@@ -602,7 +591,7 @@ void MainWindow::centerToImageCenterSlot()
 		nav->centerToData(patientService()->getActiveImage());
 	else if (!viewManager()->getViewGroups().empty())
 		nav->centerToView(viewManager()->getViewGroups()[0]->getData()->getData());
-//		nav->centerToView(mVisualizationService->getViewGroupData(0)->getData());//Too early?
+//		nav->centerToView(mServices->visualizationService->getViewGroupData(0)->getData());//Too early?
 	else
 		nav->centerToGlobalDataCenter();
 }
@@ -616,7 +605,7 @@ void MainWindow::centerToTooltipSlot()
 void MainWindow::togglePointPickerActionSlot()
 {
 	ViewGroupDataPtr data = viewManager()->getViewGroups()[0]->getData();
-//	ViewGroupDataPtr data = mVisualizationService->getViewGroupData(0); //Too early?
+//	ViewGroupDataPtr data = mServices->visualizationService->getViewGroupData(0); //Too early?
 	ViewGroupData::Options options = data->getOptions();
 	options.mShowPointPickerProbe = !options.mShowPointPickerProbe;
 	data->setOptions(options);
@@ -624,7 +613,7 @@ void MainWindow::togglePointPickerActionSlot()
 void MainWindow::updatePointPickerActionSlot()
 {
 	bool show = viewManager()->getViewGroups()[0]->getData()->getOptions().mShowPointPickerProbe;
-//	bool show = mVisualizationService->getViewGroupData(0)->getOptions().mShowPointPickerProbe;//TOO early?
+//	bool show = mServices->visualizationService->getViewGroupData(0)->getOptions().mShowPointPickerProbe;//TOO early?
 	mShowPointPickerAction->setChecked(show);
 }
 
@@ -801,7 +790,7 @@ void MainWindow::exportDataSlot()
 {
 	this->savePatientFileSlot();
 
-	ExportDataDialog* wizard = new ExportDataDialog(mPatientModelService, this);
+	ExportDataDialog* wizard = new ExportDataDialog(mServices->patientModelService, this);
 	wizard->exec(); //calling exec() makes the wizard dialog modal which prevents other user interaction with the system
 }
 
@@ -825,7 +814,7 @@ void MainWindow::importDataSlot()
 
 	for (int i=0; i<fileName.size(); ++i)
 	{
-		ImportDataDialog* wizard = new ImportDataDialog(mPatientModelService, fileName[i], this);
+		ImportDataDialog* wizard = new ImportDataDialog(mServices->patientModelService, fileName[i], this);
 		wizard->exec(); //calling exec() makes the wizard dialog modal which prevents other user interaction with the system
 	}
 }
@@ -969,7 +958,7 @@ void MainWindow::createToolBars()
 
 	QToolBar* toolOffsetToolBar = addToolBar("Tool Offset");
 	toolOffsetToolBar->setObjectName("ToolOffsetToolBar");
-	toolOffsetToolBar->addWidget(createDataWidget(mVisualizationService, mPatientModelService, this, DoubleDataAdapterActiveToolOffset::create()));
+	toolOffsetToolBar->addWidget(createDataWidget(mServices->visualizationService, mServices->patientModelService, this, DoubleDataAdapterActiveToolOffset::create()));
 	this->registerToolBar(toolOffsetToolBar, "Toolbar");
 }
 
@@ -1011,7 +1000,7 @@ void MainWindow::aboutSlot()
 
 void MainWindow::preferencesSlot()
 {
-	PreferencesDialog prefDialog(mVisualizationService, mPatientModelService, this);
+	PreferencesDialog prefDialog(mServices->visualizationService, mServices->patientModelService, this);
 	prefDialog.exec();
 }
 
@@ -1037,7 +1026,7 @@ void MainWindow::deleteDataSlot()
 	QString text = QString("Do you really want to delete data %1?").arg(patientService()->getActiveImage()->getName());
 	if (QMessageBox::question(this, "Data delete", text, QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel))!=QMessageBox::Ok)
 		return;
-	mPatientModelService->removeData(patientService()->getActiveImage()->getUid());
+	mServices->patientModelService->removeData(patientService()->getActiveImage()->getUid());
 }
 
 void MainWindow::configureSlot()

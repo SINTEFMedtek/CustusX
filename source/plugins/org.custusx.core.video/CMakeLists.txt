@@ -28,7 +28,6 @@ set(PLUGIN_SRCS
 
     cxBasicVideoSource.h
 	cxBasicVideoSource.cpp
-	cxVideoServiceOld.cpp
     cxVideoConnection.h
     cxVideoConnection.cpp
     cxPlaybackUSAcquisitionVideo.cpp
@@ -56,7 +55,6 @@ set(PLUGIN_MOC_SRCS
 
     cxPlaybackUSAcquisitionVideo.h
     cxBasicVideoSource.h
-    cxVideoServiceOld.h
     cxVideoConnection.h
     cxImageReceiverThread.h
 	cxIGTLinkStreamerService.h

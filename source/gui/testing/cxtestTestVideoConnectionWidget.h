@@ -48,7 +48,7 @@ class TestVideoConnectionWidget : public cx::VideoConnectionWidget
 {
 	Q_OBJECT
 public:
-	TestVideoConnectionWidget(cx::VisualizationServicePtr visualizationService, cx::PatientModelServicePtr patientModelService, cx::VideoServicePtr videoService);
+	TestVideoConnectionWidget(cx::VisServicesPtr services);
 	virtual ~TestVideoConnectionWidget(){}
 
 public:

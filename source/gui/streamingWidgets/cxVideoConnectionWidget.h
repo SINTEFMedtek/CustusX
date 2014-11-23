@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTransform3D.h"
 #include "cxForwardDeclarations.h"
 #include "cxXmlOptionItem.h"
+#include "cxVisServices.h"
 
 class QPushButton;
 class QComboBox;
@@ -62,6 +63,7 @@ typedef boost::shared_ptr<class VideoConnectionManager> VideoConnectionManagerPt
 typedef boost::shared_ptr<class ActiveVideoSourceStringDataAdapter> ActiveVideoSourceStringDataAdapterPtr;
 typedef boost::shared_ptr<class StringDataAdapterXml> StringDataAdapterXmlPtr;
 typedef boost::shared_ptr<class Tool> ToolPtr;
+typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 
 /**
  * \brief GUI for setting up a connection to a video stream
@@ -78,7 +80,7 @@ class cxGui_EXPORT VideoConnectionWidget : public BaseWidget
   Q_OBJECT
 
 public:
-	VideoConnectionWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, VideoServicePtr newVideoService, QWidget* parent);
+	VideoConnectionWidget(VisServicesPtr services, QWidget* parent);
 	virtual ~VideoConnectionWidget();
 	virtual QString defaultWhatsThis() const;
 
@@ -109,9 +111,10 @@ protected:
 	XmlOptionFile mOptions;
 	DetailedLabeledComboBoxWidget* mConnectionSelectionWidget;
 
-	VisualizationServicePtr mVisualizationService;
-	PatientModelServicePtr mPatientModelService;
-	VideoServicePtr mVideoService;
+//	VisualizationServicePtr mVisualizationService;
+//	PatientModelServicePtr mPatientModelService;
+//	VideoServicePtr mVideoService;
+	VisServicesPtr mServices;
 
 private:
 	QWidget* createStreamerWidget(StreamerService* service);

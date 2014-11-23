@@ -57,6 +57,7 @@ class ConsoleWidget;
 class DockWidgets;
 typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
 typedef boost::shared_ptr<class LayoutInteractor> LayoutInteractorPtr;
+typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 
 /**
  * \class MainWindow
@@ -238,9 +239,10 @@ private:
 
 	DockWidgets* mDockWidgets;
 
-	PatientModelServicePtr mPatientModelService;
-	VisualizationServicePtr mVisualizationService;
-	VideoServicePtr mVideoService;
+//	PatientModelServicePtr mPatientModelService;
+//	VisualizationServicePtr mVisualizationService;
+//	VideoServicePtr mVideoService;
+	VisServicesPtr mServices;
 };
 
 }//namespace cx

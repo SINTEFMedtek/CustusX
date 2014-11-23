@@ -41,6 +41,7 @@ namespace cx
 
 typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
 typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
+typedef boost::shared_ptr<class VideoService> VideoServicePtr;
 
 /**
  * Convenience class combining all services in resource/core.
@@ -58,6 +59,7 @@ public:
 
 	PatientModelServicePtr patientModelService;
 	TrackingServicePtr trackingService;
+	VideoServicePtr videoService;
 protected:
 	CoreServices();
 };

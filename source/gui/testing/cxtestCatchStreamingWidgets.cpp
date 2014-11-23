@@ -51,43 +51,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cxtest
 {
 
-//Disabled test of SimulatedImageStreamer
 TEST_CASE("VideoConnectionWidget can stream", "[unit][gui][not_win32][widget][streaming]")
 {
-	cx::Reporter::initialize();
-	SSC_LOG("");
 	cx::LogicManager::initialize();
-	SSC_LOG("");
 	QString folder = cx::DataLocations::getTestDataPath() + "/temp/test.cx3";
-	cx::logicManager()->getPatientModelService()->newPatient(folder);
+	cx::VisServicesPtr services = cx::VisServices::create(cx::logicManager()->getPluginContext());
 
-	cx::TrackingServicePtr ts = cx::logicManager()->getTrackingService();
+	services->patientModelService->newPatient(folder);
 
 	cx::DummyToolPtr tool = cx::DummyToolTestUtilities::createDummyTool(cx::DummyToolTestUtilities::createProbeDataLinear());
-	ts->runDummyTool(tool);
+	services->trackingService->runDummyTool(tool);
 
-	REQUIRE((ts->getState()>=cx::Tool::tsTRACKING));
-//	while(ts->getState()>=cx::Tool::tsTRACKING)
-//	{
-//		SSC_LOG("");
-		waitForQueuedSignal(ts.get(), SIGNAL(stateChanged()));
-//		cx::sleep_ms(5);
-//	}
-//	waitForQueuedSignal(ts.get(), SIGNAL(trackingStarted()));
+	REQUIRE((services->trackingService->getState()>=cx::Tool::tsTRACKING));
+	waitForQueuedSignal(services->trackingService.get(), SIGNAL(stateChanged()));
 
 	QString filename = cx::DataLocations::getTestDataPath() + "/testing/TubeSegmentationFramework/Default.mhd";
 	REQUIRE(QFile::exists(filename));
 
-	//Mock with null objects
-	cx::PatientModelServicePtr patientModelService = cx::PatientModelService::getNullObject();
-	cx::VisualizationServicePtr visualizationService = cx::VisualizationService::getNullObject();
-	cx::VideoServicePtr videoService = cx::VideoService::getNullObject();
-
-	TestVideoConnectionWidget* widget = new TestVideoConnectionWidget(visualizationService, patientModelService, videoService);
+	TestVideoConnectionWidget* widget = new TestVideoConnectionWidget(services);
 	REQUIRE(widget->canStream(filename));
-//	REQUIRE(widget->canStream(filename, "SimulatedImageStreamer"));
 
-	ts.reset();
+	services.reset();
 	delete widget;
 	cx::LogicManager::shutdown();
 }

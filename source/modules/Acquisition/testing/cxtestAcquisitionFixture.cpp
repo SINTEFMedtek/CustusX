@@ -37,7 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxDummyTool.h"
 #include "cxDataLocations.h"
-#include "cxVideoServiceOld.h"
 #include "cxLogger.h"
 #include "cxUSFrameData.h"
 #include "cxUsReconstructionFileReader.h"
