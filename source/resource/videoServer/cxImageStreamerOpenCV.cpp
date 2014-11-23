@@ -286,7 +286,7 @@ bool ImageStreamerOpenCV::startStreaming(SenderPtr sender)
 	mGrabTimer->start(0);
 	mSendTimer->start(getSendInterval());
 	mCounter.start();
-	std::cout << "*** ImageStreamerOpenCV: Started" << std::endl;
+//	std::cout << "*** ImageStreamerOpenCV: Started" << std::endl;
 
 	return true;
 }

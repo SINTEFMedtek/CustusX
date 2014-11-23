@@ -259,9 +259,9 @@ vtkImageDataPtr DummyImageStreamer::internalLoadImage(QString filename)
 
 //	vtkImageDataPtr source = loadImage(filename);
 	if (source)
-		std::cout << "DummyImageStreamer: Initialized with source file: \n\t" << getFileName().toStdString() << std::endl;
+		std::cout << "DummyImageStreamer: Initialized with source file: " << getFileName().toStdString() << std::endl;
 	else
-		std::cout << "DummyImageStreamer: Failed to initialize with source file: \n\t" << getFileName().toStdString() << std::endl;
+		std::cout << "DummyImageStreamer: Failed to initialize with source file: " << getFileName().toStdString() << std::endl;
 
 	return source;
 }

@@ -114,10 +114,7 @@ private:
 	void onStreamerServiceAdded(StreamerService *service);
 	void onStreamerServiceRemoved(StreamerService *service);
 
-//	ctkPluginContext *mPluginContext;
 	boost::shared_ptr<ServiceTrackerListener<StreamerService> > mStreamerServiceListener;
-
-
 
 private:
 	ctkPluginContext *mContext;

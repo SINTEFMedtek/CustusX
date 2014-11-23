@@ -53,6 +53,7 @@ namespace cxtest
 
 TEST_CASE("VideoConnectionWidget can stream", "[unit][gui][not_win32][widget][streaming]")
 {
+	cx::DataLocations::setTestMode();
 	cx::LogicManager::initialize();
 	QString folder = cx::DataLocations::getTestDataPath() + "/temp/test.cx3";
 	cx::VisServicesPtr services = cx::VisServices::create(cx::logicManager()->getPluginContext());

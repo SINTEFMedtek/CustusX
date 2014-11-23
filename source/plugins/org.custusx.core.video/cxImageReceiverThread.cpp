@@ -78,7 +78,6 @@ void ImageReceiverThread::run()
 	if(!mImageStreamer)
 	{
 		this->quit();
-		std::cout << "quitting..." << std::endl;
 		return;
 	}
 	mSender.reset(new DirectlyLinkedSender());
@@ -92,7 +91,7 @@ void ImageReceiverThread::run()
 
 	this->exec();
 
-
+	report(QString("Stopping streamer: [%1]").arg(mImageStreamer->getType()));
 	mImageStreamer->stopStreaming();
 	mImageStreamer.reset();
 	mSender.reset();

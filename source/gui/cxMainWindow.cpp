@@ -109,6 +109,7 @@ MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
 	stylesheet.open(QIODevice::ReadOnly);
 	qApp->setStyleSheet(stylesheet.readAll());
 
+	mServices = VisServices::create(logicManager()->getPluginContext());
 	mCameraControl = viewManager()->getCameraControl();
 	mLayoutInteractor.reset(new LayoutInteractor());
 
@@ -131,8 +132,6 @@ MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
 	this->updateWindowTitle();
 
 	this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
-
-	mServices = VisServices::create(logicManager()->getPluginContext());
 
 	this->addAsDockWidget(new PlaybackWidget(this), "Browsing");
 	this->addAsDockWidget(new VideoConnectionWidget(mServices, this), "Utility");

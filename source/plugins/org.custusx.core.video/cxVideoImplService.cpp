@@ -45,7 +45,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxTrackingService.h"
 #include "cxVideoServiceBackend.h"
-//#include "cxVideoServiceProxy.h"
 #include "cxReporter.h"
 
 #include "cxTrackingServiceProxy.h"
@@ -76,7 +75,6 @@ VideoImplService::VideoImplService(ctkPluginContext *context) :
 	connect(mVideoConnection.get(), &VideoConnection::connected, this, &VideoImplService::autoSelectActiveVideoSource);
 	connect(mVideoConnection.get(), &VideoConnection::videoSourcesChanged, this, &VideoImplService::autoSelectActiveVideoSource);
 	connect(mVideoConnection.get(), &VideoConnection::fps, this, &VideoImplService::fpsSlot);
-//	connect(mBackend->getToolManager().get(), SIGNAL(dominantToolChanged(QString)), this, SLOT(autoSelectActiveVideoSource()));
 	connect(mBackend->getToolManager().get(), &TrackingService::dominantToolChanged, this, &VideoImplService::autoSelectActiveVideoSource);
 	connect(mVideoConnection.get(), &VideoConnection::connected, this, &VideoImplService::connected);
 
