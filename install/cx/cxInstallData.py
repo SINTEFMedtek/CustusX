@@ -70,7 +70,6 @@ class Common(object):
         self.m32bit = False
         self.use_old_directory_structure = False
         self._initPaths()
-        self.isb_password = ""
         self.main_branch = "master"
         self.static = False # build as shared or static libraries
         self.jom = False
@@ -103,7 +102,6 @@ class Common(object):
         print 'Settings:'
         print '    User:', getpass.getuser()
         print '    platform:', platform.system()
-        print '    ISBpassword:', self.isb_password
         print '    RootDir:', self.getRootDir()
         print '    ExternalDir:', self.getExternalPath()
         print '    WorkingDir:', self.getWorkingPath()
@@ -133,7 +131,6 @@ class Common(object):
 
     def getArgParser_core_build(self):
         p = cxArgParse.ArgumentParser(add_help=False)
-        p.add_argument('-i', '--isb_password', default="not set", metavar='PASSWORD', dest='isb_password', help='Password for ISB GE Connection module')
         p.add_argument('-j', '--threads', type=int, default=1, dest='threads', help='Number of make threads')
         p.add_argument('-g', '--git_tag', default=None, metavar='TAG', dest='git_tag', help='Git tag to use when checking out CustusX. None means checkout master branch.')
         p.add_argument('-t', '--build_type', default=self.build_type, dest='build_type', choices=self._getAllowedBuildTypes(), help='Build type')
