@@ -29,55 +29,79 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include "cxOpenCVStreamerService.h"
 
-#include "cxStringDataAdapterXml.h"
-#include "cxDoubleDataAdapterXml.h"
-#include "cxBoolDataAdapterXml.h"
-#include "cxIGTLinkClientStreamer.h"
-#include "cxImageStreamerOpenCV.h"
-#include "cxUtilHelpers.h"
-#include "cxReporter.h"
-#include "QApplication"
-#include <QDir>
-#include "cxDataLocations.h"
-#include "cxLocalServerStreamerServer.h"
+#ifndef CXSPACEEDITWIDGET_H
+#define CXSPACEEDITWIDGET_H
+
+#include "cxResourceWidgetsExport.h"
+
+#include <QWidget>
+#include <QSlider>
+#include <QLineEdit>
+#include <QLabel>
+#include <QGridLayout>
+#include "cxStringDataAdapter.h"
+#include "cxBaseWidget.h"
 
 namespace cx
 {
 
-QString OpenCVStreamerService::getName()
+/**\brief Composite widget for string selection.
+ *
+ * Consists of <namelabel, combobox>.
+ * Insert a subclass of StringDataAdStringDataAdapter to connect to data.
+ *
+ * \ingroup cx_resource_widgets
+ */
+class cxResourceWidgets_EXPORT SpaceEditWidget: public BaseWidget
 {
-	return "OpenCV";
-}
+Q_OBJECT
+public:
+	SpaceEditWidget(QWidget* parent, StringDataAdapterPtr, QGridLayout* gridLayout = 0, int row = 0);
+	virtual ~SpaceEditWidget() {}
 
-std::vector<DataAdapterPtr> OpenCVStreamerService::getSettings(QDomElement root)
-{
-	std::vector<DataAdapterPtr> retval;
-	std::vector<DataAdapterPtr> opencvArgs = ImageStreamerOpenCVArguments().getSettings(root);
-	std::copy(opencvArgs.begin(), opencvArgs.end(), back_inserter(retval));
+	virtual QString defaultWhatsThis() const;
 
-	std::vector<DataAdapterPtr> localsvrArgs = LocalServerStreamerArguments().getSettings(root);
-	std::copy(localsvrArgs.begin(), localsvrArgs.end(), back_inserter(retval));
+	void showLabel(bool on);
 
-	return retval;
-}
+protected:
+	QHBoxLayout* mTopLayout;
 
-StreamerPtr OpenCVStreamerService::createStreamer(QDomElement root)
-{
-	StringMap args = ImageStreamerOpenCVArguments().convertToCommandLineArguments(root);
-	StreamerPtr localServerStreamer = LocalServerStreamer::createStreamerIfEnabled(root, args);
-	if (localServerStreamer)
+private slots:
+	void prePaintEvent();
+	void comboIndexChanged();
+
+private:
+	struct SpaceData
 	{
-		return localServerStreamer;
-	}
+		SpaceData(QString uid_, QString name_) : uid(uid_), name(name_) {}
+		QString uid; // internal value for space
+		QString name; // display value for space
 
-	else
-	{
-		boost::shared_ptr<ImageStreamerOpenCV> streamer(new ImageStreamerOpenCV());
-		streamer->initialize(args);
-		return streamer;
-	}
-}
+		QStringList uidlist() const { return this->splitSpace(uid); }
+		QStringList namelist() const { return this->splitSpace(name); }
+
+		QStringList splitSpace(QString name) const
+		{
+			QStringList values = name.split("/");
+			if (values.size()==1)
+				values << "";
+			return values;
+		}
+	};
+
+	void rebuildCombobox(QComboBox* widget, QStringList uids, int index, std::vector<SpaceData> allSpaces, QString currentUid);
+	QString getNameForUid(QString uid, int index, std::vector<SpaceData> allSpaces);
+
+	QStringList splitSpace(QString name) const;
+	QString mergeSpace(QString a, QString b) const;
+
+	QLabel* mLabel;
+	QComboBox* mIdCombo;
+	QComboBox* mRefCombo;
+	StringDataAdapterPtr mData;
+};
 
 } // namespace cx
+
+#endif // CXSPACEEDITWIDGET_H

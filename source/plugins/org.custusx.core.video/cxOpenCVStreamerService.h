@@ -60,8 +60,6 @@ public:
 	virtual std::vector<DataAdapterPtr> getSettings(QDomElement root);
 	virtual StreamerPtr createStreamer(QDomElement root);
 private:
-	BoolDataAdapterPtr getRunLocalServerOption(QDomElement root);
-	StringDataAdapterPtr getLocalServerNameOption(QDomElement root);
 };
 
 } //end namespace cx

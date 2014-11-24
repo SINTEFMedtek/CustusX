@@ -66,7 +66,7 @@ BoolDataAdapterPtr LocalServerStreamerArguments::getRunLocalServerOption(QDomEle
 #endif
 
 
-	retval = BoolDataAdapterXml::initialize("runlocalserver", "Run Local Server",
+	retval = BoolDataAdapterXml::initialize("runlocalserver", "Run as separate process",
 											"Run streamer in a separate process",
 											defaultValue, root);
 	retval->setAdvanced(false);
