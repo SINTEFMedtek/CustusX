@@ -65,6 +65,8 @@ Eigen::Matrix4d registrationAlgorithm(BranchListPtr branches, M4Vector Tnavigati
 std::vector<Eigen::MatrixXd::Index> dsearch2n(Eigen::MatrixXd pos1, Eigen::MatrixXd pos2, Eigen::MatrixXd ori1, Eigen::MatrixXd ori2);
 vtkPointsPtr convertTovtkPoints(Eigen::MatrixXd positions);
 Eigen::Matrix4d performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr target, bool* ok);
+std::pair<Eigen::MatrixXd , Eigen::MatrixXd> RemoveInvalidData(Eigen::MatrixXd positionData, Eigen::MatrixXd orientationData);
+M4Vector RemoveInvalidData(M4Vector T_vector);
 }//namespace cx
 
 #endif /* BRONCHOSCOPYREGISTRATION_H_ */
