@@ -97,10 +97,9 @@ void BranchList::selectGenerations(int maxGeneration)
 		}
 
 	}
-	std::cout << "branchNumbersToBeDeleted.size(): " << branchNumbersToBeDeleted.size() << std::endl;
+
 	for ( int i = branchNumbersToBeDeleted.size() - 1; i >= 0; i-- )
 		deleteBranch(mBranches[branchNumbersToBeDeleted[i]]);
-
 }
 
 
