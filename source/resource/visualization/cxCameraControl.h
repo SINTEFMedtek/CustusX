@@ -29,49 +29,94 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXVISUALIZATIONSERVICEBACKEND_H
-#define CXVISUALIZATIONSERVICEBACKEND_H
 
-#include "cxVisualizationServiceExport.h"
+/*
+ * cxCameraControl.h
+ *
+ *  \date Oct 15, 2010
+ *      \author christiana
+ */
 
-#include "boost/shared_ptr.hpp"
+#ifndef CXCAMERACONTROL_H_
+#define CXCAMERACONTROL_H_
+
+#include "cxResourceVisualizationExport.h"
+
+#include <vector>
+#include "cxVector3D.h"
+//#include "cxDoubleWidgets.h"
 #include "cxForwardDeclarations.h"
+#include "vtkForwardDeclarations.h"
+#include "cxForwardDeclarations.h"
+
+class QActionGroup;
+class QAction;
+class QDomNode;
 
 namespace cx
 {
-class VideoServiceOld;
-typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
-
-typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServiceBackendPtr;
 /**
- *
- * \ingroup cx_service_visualization
- * \date 2014-02-23
- * \author christiana
+* \file
+* \addtogroup cx_service_visualization
+* @{
+*/
+
+typedef boost::shared_ptr<class CameraData> CameraDataPtr;
+
+/** Class encapsulating the view transform of a camera. Use with vtkCamera
  */
-class cxVisualizationService_EXPORT VisualizationServiceBackend
+class cxResourceVisualization_EXPORT CameraData
 {
 public:
-	VisualizationServiceBackend(PatientModelServicePtr patientService,
-								TrackingServicePtr trackingService,
-								VideoServicePtr videoService,
-								SpaceProviderPtr spaceProvider);
+	CameraData();
+	static CameraDataPtr create()
+	{
+		return CameraDataPtr(new CameraData());
+	}
+	void setCamera(vtkCameraPtr camera);
+	vtkCameraPtr getCamera() const;
 
-	PatientModelServicePtr getPatientService();
-	TrackingServicePtr getToolManager();
-	VideoServicePtr getVideoService();
-	SpaceProviderPtr getSpaceProvider();
+	void addXml(QDomNode dataNode) const; ///< store internal state info in dataNode
+	void parseXml(QDomNode dataNode);///< load internal state info from dataNode
 
 private:
-	PatientModelServicePtr mPatientService;
-	TrackingServicePtr mTrackingService;
-	SpaceProviderPtr mSpaceProvider;
-	VideoServicePtr mVideoService;
+	mutable vtkCameraPtr mCamera;
+	void addTextElement(QDomNode parentNode, QString name, QString value) const;
 };
 
+/**Utility class for 3D camera control.
+ *
+ */
+class cxResourceVisualization_EXPORT CameraControl: public QObject
+{
+Q_OBJECT
 
-} // namespace cx
+public:
+	CameraControl(QObject* parent = NULL);
+	virtual ~CameraControl();
 
+	void setView(ViewPtr view);
+	QActionGroup* createStandard3DViewActions();
+	void translateByFocusTo(Vector3D p_r);
 
+signals:
 
-#endif // CXVISUALIZATIONSERVICEBACKEND_H
+protected slots:
+	void setStandard3DViewActionSlot();
+
+private:
+	vtkRendererPtr getRenderer() const;
+	vtkCameraPtr getCamera() const;
+	void defineRotateLayout();
+	void definePanLayout();
+	ViewPtr mView;
+
+	QAction* addStandard3DViewAction(QString caption, QString help, Vector3D viewDirection, QActionGroup* group);
+};
+
+/**
+* @}
+*/
+}//end namespace cx
+
+#endif /* CXCAMERACONTROL_H_ */

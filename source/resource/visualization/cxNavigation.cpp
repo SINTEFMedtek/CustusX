@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxNavigation.h"
-#include "cxVisualizationServiceBackend.h"
+//#include "cxCoreServices.h"
 #include "cxData.h"
 #include "cxBoundingBox3D.h"
 #include "cxPatientModelService.h"
@@ -39,11 +39,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxManualTool.h"
 #include "cxVolumeHelpers.h"
 #include "cxCameraControl.h"
+#include "cxCoreServices.h"
 
 namespace cx
 {
 
-Navigation::Navigation(VisualizationServiceBackendPtr backend, CameraControlPtr camera3D) :
+Navigation::Navigation(CoreServicesPtr backend, CameraControlPtr camera3D) :
 	mBackend(backend),
 	mCamera3D(camera3D)
 {
@@ -57,7 +58,7 @@ void Navigation::centerToPosition(Vector3D p_r, QFlags<VIEW_TYPE> viewType)
 	if (viewType.testFlag(v2D))
 	{
 		// set center to calculated position
-		mBackend->getPatientService()->setCenter(p_r);
+		mBackend->patientModelService->setCenter(p_r);
 	}
 
 	if (viewType.testFlag(v3D))
@@ -101,7 +102,7 @@ void Navigation::centerToView(const std::vector<DataPtr>& images)
  */
 void Navigation::centerToGlobalDataCenter()
 {
-	if (mBackend->getPatientService()->getData().empty())
+	if (mBackend->patientModelService->getData().empty())
 		return;
 
 	Vector3D p_r = this->findGlobalDataCenter();
@@ -117,9 +118,9 @@ void Navigation::centerToGlobalDataCenter()
  */
 void Navigation::centerToTooltip()
 {
-	ToolPtr tool = mBackend->getToolManager()->getActiveTool();
+	ToolPtr tool = mBackend->trackingService->getActiveTool();
 	Vector3D p_pr = tool->get_prMt().coord(Vector3D(0, 0, tool->getTooltipOffset()));
-	Vector3D p_r = mBackend->getPatientService()->get_rMpr().coord(p_pr);
+	Vector3D p_r = mBackend->patientModelService->get_rMpr().coord(p_pr);
 
 	this->centerToPosition(p_r);
 //	// set center to calculated position
@@ -139,7 +140,7 @@ Vector3D Navigation::findViewCenter(const std::vector<DataPtr>& images)
  */
 Vector3D Navigation::findGlobalDataCenter()
 {
-	std::map<QString,DataPtr> images = mBackend->getPatientService()->getData();
+	std::map<QString,DataPtr> images = mBackend->patientModelService->getData();
 	if (images.empty())
 		return Vector3D(0, 0, 0);
 
@@ -166,8 +167,8 @@ Vector3D Navigation::findDataCenter(std::vector<DataPtr> data)
 void Navigation::moveManualToolToPosition(Vector3D& p_r)
 {
 	// move the manual tool to the same position. (this is a side effect... do we want it?)
-	ToolPtr manual = mBackend->getToolManager()->getManualTool();
-	Vector3D p_pr = mBackend->getPatientService()->get_rMpr().inv().coord(p_r);
+	ToolPtr manual = mBackend->trackingService->getManualTool();
+	Vector3D p_pr = mBackend->patientModelService->get_rMpr().inv().coord(p_r);
 	Transform3D prM0t = manual->get_prMt(); // modify old pos in order to keep orientation
 	Vector3D t_pr = prM0t.coord(Vector3D(0, 0, manual->getTooltipOffset()));
 	Transform3D prM1t = createTransformTranslate(p_pr - t_pr) * prM0t;

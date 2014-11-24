@@ -127,7 +127,8 @@ void LayoutEditorWidget::contextMenuSlot(const QPoint& point)
   menu.addSeparator();
 
   // actions for view group
-  int viewGroupCount = static_cast<int>(viewManager()->getViewGroups().size());
+//  int viewGroupCount = static_cast<int>(viewManager()->getViewGroups().size());
+  int viewGroupCount = viewManager()->viewGroupCount();
   QActionGroup* groupActions = new QActionGroup(this);
   for (int i=0; i<viewGroupCount; ++i)
   {

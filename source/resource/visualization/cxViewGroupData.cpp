@@ -36,7 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCamera.h"
 #include "cxReporter.h"
 #include "cxPatientModelService.h"
-#include "cxViewGroup.h" //for class Navigation
 #include "cxMesh.h"
 #include "cxTypeConversions.h"
 #include "cxCameraControl.h"
@@ -44,13 +43,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataMetric.h"
 #include "cxView.h"
 #include "cxImage.h"
-#include "cxViewManager.h"
 #include "cxInteractiveClipper.h"
-#include "cxRepManager.h"
-#include "cxVisualizationServiceBackend.h"
-#include "cxViewWrapper.h"
 #include "boost/bind.hpp"
 #include "cxXMLNodeWrapper.h"
+#include "cxSyncedValue.h"
+#include "cxCoreServices.h"
 
 namespace cx
 {
@@ -214,12 +211,12 @@ ViewGroupData::Options::Options() :
 {
 }
 
-ViewGroupData::ViewGroupData(VisualizationServiceBackendPtr backend) :
+ViewGroupData::ViewGroupData(CoreServicesPtr backend) :
 	mBackend(backend),
 	mCamera3D(CameraData::create())
 {
 	if(mBackend)
-		connect(mBackend->getPatientService().get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataAddedOrRemovedInManager()));
+		connect(mBackend->patientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataAddedOrRemovedInManager()));
 	mVideoSource = "active";
 	mGroup2DZoom = SyncedValue::create(1);
 	mGlobal2DZoom = mGroup2DZoom;
@@ -233,7 +230,7 @@ void ViewGroupData::dataAddedOrRemovedInManager()
 {
 	for (unsigned i = 0; i < mData.size(); )
 	{
-		if (!mBackend->getPatientService()->getData(mData[i].first->getUid()))
+		if (!mBackend->patientModelService->getData(mData[i].first->getUid()))
 			this->removeData(mData[i].first);
 		else
 			++i;
@@ -430,7 +427,7 @@ void ViewGroupData::parseXml(QDomNode dataNode)
 	{
 		QDomElement elem = dataElems[i];
 		QString uid = elem.text();
-		DataPtr data = mBackend->getPatientService()->getData(uid);
+		DataPtr data = mBackend->patientModelService->getData(uid);
 		if (!data)
 		{
 			reportError("Couldn't find the data: [" + uid + "] in the datamanager.");
@@ -445,5 +442,27 @@ void ViewGroupData::parseXml(QDomNode dataNode)
 
 	base.parseObjectFromElement("camera3D", this->getCamera3D());
 }
+
+void ViewGroupData::setRegistrationMode(REGISTRATION_STATUS mode)
+{
+	ViewGroupData::Options options = this->getOptions();
+
+	options.mShowLandmarks = false;
+	options.mShowPointPickerProbe = false;
+
+	if (mode == rsIMAGE_REGISTRATED)
+	{
+		options.mShowLandmarks = true;
+		options.mShowPointPickerProbe = true;
+	}
+	if (mode == rsPATIENT_REGISTRATED)
+	{
+		options.mShowLandmarks = true;
+		options.mShowPointPickerProbe = false;
+	}
+
+	this->setOptions(options);
+}
+
 
 } // namespace cx

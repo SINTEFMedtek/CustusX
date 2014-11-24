@@ -45,6 +45,7 @@ typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
 typedef boost::shared_ptr<class VideoService> VideoServicePtr;
 typedef boost::shared_ptr<class ViewManager> VisualizationServiceOldPtr;
 typedef boost::shared_ptr<class StateService> StateServicePtr;
+typedef boost::shared_ptr<class VisualizationService> ViewServicePtr;
 
 /** 
  *
@@ -62,6 +63,7 @@ cxLogicManager_EXPORT TrackingServicePtr trackingService();
 cxLogicManager_EXPORT PatientModelServicePtr patientService();
 cxLogicManager_EXPORT VideoServicePtr videoService();
 cxLogicManager_EXPORT StateServicePtr stateService();
+cxLogicManager_EXPORT ViewServicePtr viewService();
 
 } // namespace cx
 

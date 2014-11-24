@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSettings.h"
 #include "cxSpaceProviderImpl.h"
 #include "cxDataFactory.h"
-#include "cxVisualizationServiceBackend.h"
+#include "cxCoreServices.h"
 #include "cxTypeConversions.h"
 #include "cxSharedPointerChecker.h"
 #include "cxPluginFramework.h"
@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackingServiceProxy.h"
 #include "cxPatientModelServiceProxy.h"
 #include "cxStateServiceProxy.h"
+#include "cxVisualizationServiceProxy.h"
 
 namespace cx
 {
@@ -62,6 +63,7 @@ struct LegacySingletons
 	static VideoServicePtr mVideoService;
 	static VisualizationServiceOldPtr mVisualizationService;
 	static StateServicePtr mStateService;
+	static ViewServicePtr mViewService;
 };
 
 TrackingServicePtr LegacySingletons::mTrackingService;
@@ -70,6 +72,7 @@ PatientModelServicePtr LegacySingletons::mPatientService;
 VideoServicePtr LegacySingletons::mVideoService;
 VisualizationServiceOldPtr LegacySingletons::mVisualizationService;
 StateServicePtr LegacySingletons::mStateService;
+ViewServicePtr LegacySingletons::mViewService;
 
 ViewManager* viewManager()
 {
@@ -100,6 +103,11 @@ StateServicePtr stateService()
 {
 	return LegacySingletons::mStateService;
 }
+ViewServicePtr viewService()
+{
+	return LegacySingletons::mViewService;
+}
+
 
 
 
@@ -187,13 +195,17 @@ void LogicManager::createVisualizationService()
 	this->getSpaceProvider();
 
 	// build object(s):
-	VisualizationServiceBackendPtr backend;
-	backend.reset(new VisualizationServiceBackend(mPatientModelService,
-												  mTrackingService,
-													mVideoService,
-												  mSpaceProvider));
+	CoreServicesPtr backend = CoreServices::create(this->getPluginContext());
+//	backend.reset(new CoreServices(mPatientModelService,
+//												  mTrackingService,
+//													mVideoService,
+//												  mSpaceProvider));
 	mVisualizationService = ViewManager::create(backend);
+
+	mViewService = VisualizationServiceProxy::create(this->getPluginContext());
+
 	LegacySingletons::mVisualizationService = mVisualizationService;
+	LegacySingletons::mViewService = mViewService;
 }
 
 void LogicManager::createStateService()

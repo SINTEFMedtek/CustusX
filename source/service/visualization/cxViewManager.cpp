@@ -70,7 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRenderLoop.h"
 #include "cxLayoutRepository.h"
 #include "cxLogger.h"
-#include "cxVisualizationServiceBackend.h"
+#include "cxCoreServices.h"
 #include "cxXMLNodeWrapper.h"
 #include "cxCameraControl.h"
 #include "cxNavigation.h"
@@ -80,14 +80,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-VisualizationServiceOldPtr ViewManager::create(VisualizationServiceBackendPtr backend)
+VisualizationServiceOldPtr ViewManager::create(CoreServicesPtr backend)
 {
 	VisualizationServiceOldPtr retval;
 	retval.reset(new ViewManager(backend));
 	return retval;
 }
 
-ViewManager::ViewManager(/*PatientModelServicePtr patientModelService, */VisualizationServiceBackendPtr backend) :
+ViewManager::ViewManager(/*PatientModelServicePtr patientModelService, */CoreServicesPtr backend) :
 				mGlobalObliqueOrientation(false)
 {
 	mBackend = backend;
@@ -97,6 +97,7 @@ ViewManager::ViewManager(/*PatientModelServicePtr patientModelService, */Visuali
 
 	mSlicePlanesProxy.reset(new SlicePlanesProxy());
 	mLayoutRepository.reset(new LayoutRepository());
+	connect(mLayoutRepository.get(), &LayoutRepository::layoutChanged, this, &ViewManager::onLayoutRepositoryChanged);
 	mCameraControl.reset(new CameraControl());
 
 	this->loadGlobalSettings();
@@ -129,21 +130,29 @@ ViewManager::ViewManager(/*PatientModelServicePtr patientModelService, */Visuali
 	connect(mInteractiveCropper.get(), SIGNAL(changed()), mRenderLoop.get(), SLOT(requestPreRenderSignal()));
 	connect(mInteractiveClipper.get(), SIGNAL(changed()), mRenderLoop.get(), SLOT(requestPreRenderSignal()));
 	connect(this, SIGNAL(activeViewChanged()), this, SLOT(updateCameraStyleActions()));
-}
 
-ViewManager::~ViewManager()
-{
-}
-
-void ViewManager::initialize()
-{
 	// set start layout
 	this->setActiveLayout("LAYOUT_3D_ACS_SINGLE", 0);
 
 	mRenderLoop->setRenderingInterval(settings()->value("renderingInterval").toInt());
 	this->enableRender(true);
 //	mRenderLoop->start();
+
 }
+
+ViewManager::~ViewManager()
+{
+}
+
+//void ViewManager::initialize()
+//{
+//	// set start layout
+//	this->setActiveLayout("LAYOUT_3D_ACS_SINGLE", 0);
+
+//	mRenderLoop->setRenderingInterval(settings()->value("renderingInterval").toInt());
+//	this->enableRender(true);
+////	mRenderLoop->start();
+//}
 
 void ViewManager::enableRender(bool val)
 {
@@ -246,45 +255,15 @@ InteractiveCropperPtr ViewManager::getCropper()
 	return mInteractiveCropper;
 }
 
-void ViewManager::setRegistrationMode(REGISTRATION_STATUS mode)
-{
-	ViewGroupDataPtr data = this->getViewGroups()[0]->getData();
-	ViewGroupData::Options options = data->getOptions();
-
-	options.mShowLandmarks = false;
-	options.mShowPointPickerProbe = false;
-
-	if (mode == rsIMAGE_REGISTRATED)
-	{
-		options.mShowLandmarks = true;
-		options.mShowPointPickerProbe = true;
-	}
-	if (mode == rsPATIENT_REGISTRATED)
-	{
-		options.mShowLandmarks = true;
-		options.mShowPointPickerProbe = false;
-	}
-
-	data->setOptions(options);
-}
-
 QString ViewManager::getActiveLayout(int widgetIndex) const
 {
 	SSC_ASSERT(mActiveLayout.size() > widgetIndex);
 	return mActiveLayout[widgetIndex];
 }
 
-ViewWrapperPtr ViewManager::getActiveView() const
+QString ViewManager::getActiveView() const
 {
-	for (unsigned i = 0; i < mViewGroups.size(); ++i)
-	{
-		ViewWrapperPtr viewWrapper = mViewGroups[i]->getViewWrapperFromViewUid(mActiveView->get().value<QString>());
-		if (viewWrapper)
-		{
-			return viewWrapper;
-		}
-	}
-	return ViewWrapperPtr();
+	return mActiveView->get().value<QString>();
 }
 
 void ViewManager::setActiveView(QString uid)
@@ -426,6 +405,13 @@ void ViewManager::deactivateCurrentLayout()
 	mSlicePlanesProxy->clearViewports();
 }
 
+ViewGroupDataPtr ViewManager::getViewGroup(int groupIdx) const
+{
+	if (( groupIdx>=0 )&&( groupIdx < mViewGroups.size() ))
+		return mViewGroups[groupIdx]->getData();
+	return ViewGroupDataPtr();
+}
+
 /**Change layout from current to layout.
  */
 void ViewManager::setActiveLayout(const QString& layout, int widgetIndex)
@@ -444,7 +430,7 @@ void ViewManager::setActiveLayout(const QString& layout, int widgetIndex)
 
 	emit activeLayoutChanged();
 
-	QString layoutName = this->getLayoutData(layout).getName();
+	QString layoutName = mLayoutRepository->get(layout).getName();
 	report(QString("Layout %1 changed to %2").arg(widgetIndex).arg(layoutName));
 }
 
@@ -454,7 +440,7 @@ void ViewManager::rebuildLayouts()
 
 	for (unsigned i=0; i<mLayoutWidgets.size(); ++i)
 	{
-		LayoutData next = this->getLayoutData(mActiveLayout[i]);
+		LayoutData next = mLayoutRepository->get(mActiveLayout[i]);
 		if (mLayoutWidgets[i] && !next.getUid().isEmpty())
 			this->activateViews(mLayoutWidgets[i], next);
 	}
@@ -547,51 +533,58 @@ ViewWrapperPtr ViewManager::createViewWrapper(ViewPtr view, LayoutViewData viewD
 	return ViewWrapperPtr();
 }
 
-LayoutData ViewManager::getLayoutData(const QString uid) const
+LayoutRepositoryPtr ViewManager::getLayoutRepository()
 {
-	return mLayoutRepository->get(uid);
+	return mLayoutRepository;
 }
 
-std::vector<QString> ViewManager::getAvailableLayouts() const
-{
-	return mLayoutRepository->getAvailable();
-}
+//LayoutData ViewManager::getLayoutData(const QString uid) const
+//{
+//	return mLayoutRepository->get(uid);
+//}
 
-void ViewManager::setLayoutData(const LayoutData& data)
-{
-	this->storeLayoutData(data);
+//std::vector<QString> ViewManager::getAvailableLayouts() const
+//{
+//	return mLayoutRepository->getAvailable();
+//}
 
-	bool activeChange = mActiveLayout[0] == data.getUid();
+//void ViewManager::setLayoutData(const LayoutData& data)
+//{
+//	this->storeLayoutData(data);
+//}
+
+void ViewManager::onLayoutRepositoryChanged(QString uid)
+{
+	this->saveGlobalSettings();
+
+	bool activeChange = mActiveLayout[0] == uid;
 	if (activeChange)
 	{
-		mActiveLayout[0] = "";
-		this->setActiveLayout(data.getUid(), 0);
+		mActiveLayout[0] = ""; // hack: force trigger a change
+		this->setActiveLayout(uid, 0);
 		emit activeLayoutChanged();
 	}
 }
 
-void ViewManager::storeLayoutData(const LayoutData& data)
-{
-	mLayoutRepository->insert(data);
-	this->saveGlobalSettings();
-}
+//void ViewManager::storeLayoutData(const LayoutData& data)
+//{
+//	mLayoutRepository->insert(data);
+//}
 
-QString ViewManager::generateLayoutUid() const
-{
-	return mLayoutRepository->generateUid();
-}
+//QString ViewManager::generateLayoutUid() const
+//{
+//	return mLayoutRepository->generateUid();
+//}
 
-void ViewManager::deleteLayoutData(const QString uid)
-{
-	mLayoutRepository->erase(uid);
-	this->saveGlobalSettings();
-	emit activeLayoutChanged();
-}
+//void ViewManager::deleteLayoutData(const QString uid)
+//{
+//	mLayoutRepository->erase(uid);
+//}
 
-bool ViewManager::isCustomLayout(const QString& uid) const
-{
-	return mLayoutRepository->isCustom(uid);
-}
+//bool ViewManager::isCustomLayout(const QString& uid) const
+//{
+//	return mLayoutRepository->isCustom(uid);
+//}
 
 void ViewManager::loadGlobalSettings()
 {

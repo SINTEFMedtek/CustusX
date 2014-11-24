@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTool.h"
 #include "cxReporter.h"
 #include "cxView.h"
+#include "cxVisualizationService.h"
 
 #include "cxLegacySingletons.h"
 
@@ -152,7 +153,7 @@ void TrackedCenterlineWidget::startedSlot(QString sessionId)
   TrackingService::ToolMap tools = trackingService()->getTools();
   TrackingService::ToolMap::iterator toolIt = tools.begin();
 
-  ViewPtr view = viewManager()->get3DView(0,0);
+  ViewPtr view = viewService()->get3DView(0,0);
   ToolRep3DPtr activeRep3D;
   for(; toolIt != tools.end(); ++toolIt)
   {
@@ -170,7 +171,7 @@ void TrackedCenterlineWidget::stoppedSlot(bool)
   TrackingService::ToolMap tools = trackingService()->getTools();
   TrackingService::ToolMap::iterator toolIt = tools.begin();
 
-  ViewPtr view = viewManager()->get3DView(0,0);
+  ViewPtr view = viewService()->get3DView(0,0);
   ToolRep3DPtr activeRep3D;
   for(; toolIt != tools.end(); ++toolIt)
   {

@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libQtSignalAdapters/Qt2Func.h"
 #include "libQtSignalAdapters/ConnectionFactories.h"
 #include <QVBoxLayout>
+#include "cxLayoutRepository.h"
 
 namespace cx
 {
@@ -51,6 +52,11 @@ LayoutInteractor::LayoutInteractor(QObject* parent) : QObject(parent)
 	mLayoutActionGroup = NULL;
 	this->createActions();
 	connect(viewManager(), SIGNAL(activeLayoutChanged()), this, SLOT(layoutChangedSlot()));
+}
+
+LayoutRepositoryPtr LayoutInteractor::getRepo()
+{
+	return viewManager()->getLayoutRepository();
 }
 
 void LayoutInteractor::createActions()
@@ -88,7 +94,7 @@ void LayoutInteractor::newCustomLayoutSlot()
 	LayoutData data = this->executeLayoutEditorDialog("New Custom Layout", true);
 	if (data.getUid().isEmpty())
 		return;
-	viewManager()->setLayoutData(data);
+	this->getRepo()->insert(data);
 	viewManager()->setActiveLayout(data.getUid());
 }
 
@@ -97,7 +103,7 @@ void LayoutInteractor::editCustomLayoutSlot()
 	LayoutData data = this->executeLayoutEditorDialog("Edit Current Layout", false);
 	if (data.getUid().isEmpty())
 		return;
-	viewManager()->setLayoutData(data);
+	this->getRepo()->insert(data);
 }
 
 void LayoutInteractor::deleteCustomLayoutSlot()
@@ -105,8 +111,8 @@ void LayoutInteractor::deleteCustomLayoutSlot()
 	if (QMessageBox::question(NULL, "Delete current layout", "Do you really want to delete the current layout?",
 		QMessageBox::Cancel | QMessageBox::Ok) != QMessageBox::Ok)
 		return;
-	viewManager()->deleteLayoutData(viewManager()->getActiveLayout());
-	viewManager()->setActiveLayout(viewManager()->getAvailableLayouts().front()); // revert to existing state
+	this->getRepo()->erase(viewManager()->getActiveLayout());
+	viewManager()->setActiveLayout(this->getRepo()->getAvailable().front()); // revert to existing state
 }
 
 /** Called when the layout is changed: update the layout menu
@@ -125,7 +131,7 @@ void LayoutInteractor::layoutChangedSlot()
 	mSecondaryLayoutActionGroup = this->createLayoutActionGroup(1);
 	mSecondaryLayoutMenu->addActions(mSecondaryLayoutActionGroup->actions());
 
-	bool editable = viewManager()->isCustomLayout(viewManager()->getActiveLayout());
+	bool editable = this->getRepo()->isCustom(viewManager()->getActiveLayout());
 	mEditLayoutAction->setEnabled(editable);
 	mDeleteLayoutAction->setEnabled(editable);
 }
@@ -155,11 +161,11 @@ LayoutData LayoutInteractor::executeLayoutEditorDialog(QString title, bool creat
 
 	LayoutEditorWidget* editor = new LayoutEditorWidget(dialog.get());
 
-	LayoutData data = viewManager()->getLayoutData(viewManager()->getActiveLayout());
+	LayoutData data = this->getRepo()->get(viewManager()->getActiveLayout());
 
 	if (createNew)
 	{
-		data.resetUid(viewManager()->generateLayoutUid());
+		data.resetUid(this->getRepo()->generateUid());
 	}
 	editor->setLayoutData(data);
 	layout->addWidget(editor);
@@ -181,11 +187,11 @@ QActionGroup* LayoutInteractor::createLayoutActionGroup(int widgetIndex)
 	retval->setExclusive(true);
 
 	// add default layouts
-	std::vector<QString> layouts = viewManager()->getAvailableLayouts();
+	std::vector<QString> layouts = this->getRepo()->getAvailable();
 	int defaultLayouts = 0;
 	for (unsigned i = 0; i < layouts.size(); ++i)
 	{
-		if (!viewManager()->isCustomLayout(layouts[i]))
+		if (!this->getRepo()->isCustom(layouts[i]))
 		{
 			this->addLayoutAction(layouts[i], retval, widgetIndex);
 			defaultLayouts++;
@@ -206,7 +212,7 @@ QActionGroup* LayoutInteractor::createLayoutActionGroup(int widgetIndex)
 	// add custom layouts
 	for (unsigned i = 0; i < layouts.size(); ++i)
 	{
-		if (viewManager()->isCustomLayout(layouts[i]))
+		if (this->getRepo()->isCustom(layouts[i]))
 			this->addLayoutAction(layouts[i], retval, widgetIndex);
 	}
 
@@ -226,7 +232,7 @@ QActionGroup* LayoutInteractor::createLayoutActionGroup(int widgetIndex)
  */
 QAction* LayoutInteractor::addLayoutAction(QString layout, QActionGroup* group, int widgetIndex)
 {
-	LayoutData data = viewManager()->getLayoutData(layout);
+	LayoutData data = this->getRepo()->get(layout);
 	if (data.isEmpty())
 	{
 		QAction* sep = new QAction(group);

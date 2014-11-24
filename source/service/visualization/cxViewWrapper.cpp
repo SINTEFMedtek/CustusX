@@ -46,37 +46,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewManager.h"
 #include "cxInteractiveClipper.h"
 #include "cxRepManager.h"
-#include "cxVisualizationServiceBackend.h"
+#include "cxCoreServices.h"
 #include "cxNavigation.h"
 
 namespace cx
 {
 
-SyncedValue::SyncedValue(QVariant val) :
-				mValue(val)
-{
-}
-SyncedValuePtr SyncedValue::create(QVariant val)
-{
-	return SyncedValuePtr(new SyncedValue(val));
-}
-void SyncedValue::set(QVariant val)
-{
-	if (mValue == val)
-		return;
-	mValue = val;
-	emit changed();
-}
-QVariant SyncedValue::get() const
-{
-	return mValue;
-}
-
-///--------------------------------------------------------
-///--------------------------------------------------------
-///--------------------------------------------------------
-
-DataViewPropertiesInteractor::DataViewPropertiesInteractor(VisualizationServiceBackendPtr backend, ViewGroupDataPtr groupData) :
+DataViewPropertiesInteractor::DataViewPropertiesInteractor(CoreServicesPtr backend, ViewGroupDataPtr groupData) :
 	mBackend(backend),
 	mGroupData(groupData)
 {
@@ -170,7 +146,7 @@ void DataViewPropertiesInteractor::dataActionSlot()
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
-ViewWrapper::ViewWrapper(VisualizationServiceBackendPtr backend) :
+ViewWrapper::ViewWrapper(CoreServicesPtr backend) :
 	mBackend(backend)
 {
 }

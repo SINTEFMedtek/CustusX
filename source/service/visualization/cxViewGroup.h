@@ -50,7 +50,7 @@ namespace cx
 typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
 typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
 typedef boost::shared_ptr<class CameraStyle> CameraStylePtr;
-typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServiceBackendPtr;
+typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
 typedef boost::shared_ptr<class Navigation> NavigationPtr;
 
 /**
@@ -70,7 +70,7 @@ class cxVisualizationService_EXPORT ViewGroup: public QObject
 {
 Q_OBJECT
 public:
-	explicit ViewGroup(VisualizationServiceBackendPtr backend);
+	explicit ViewGroup(CoreServicesPtr backend);
 	virtual ~ViewGroup();
 
 	void addView(ViewWrapperPtr wrapper);
@@ -98,7 +98,7 @@ protected:
 	ViewGroupDataPtr mViewGroupData;
 	std::vector<ViewWrapperPtr> mViewWrappers;
 	CameraStylePtr mCameraStyle;
-	VisualizationServiceBackendPtr mBackend;
+	CoreServicesPtr mBackend;
 	SyncedValuePtr mActiveView;
 };
 

@@ -78,7 +78,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPointMetricRep2D.h"
 #include "cxLogger.h"
 #include "cxViewFollower.h"
-#include "cxVisualizationServiceBackend.h"
+#include "cxCoreServices.h"
 #include "cx2DZoomHandler.h"
 #include "cxNavigation.h"
 #include "cxDataRepContainer.h"
@@ -89,7 +89,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ViewWrapper2D::ViewWrapper2D(ViewPtr view, VisualizationServiceBackendPtr backend) :
+ViewWrapper2D::ViewWrapper2D(ViewPtr view, CoreServicesPtr backend) :
 	ViewWrapper(backend),
 	mOrientationActionGroup(new QActionGroup(view.get()))
 {

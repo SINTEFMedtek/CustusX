@@ -78,11 +78,6 @@ typedef boost::shared_ptr<class AxisConnector> AxisConnectorPtr;
 
 typedef boost::shared_ptr<class ToolAxisConnector> ToolAxisConnectorPtr;
 
-enum cxVisualizationService_EXPORT STEREOTYPE
-{
-	stFRAME_SEQUENTIAL, stINTERLACED, stDRESDEN, stRED_BLUE
-};
-
 
 /** Wrapper for a View3D.
  *  Handles the connections between specific reps and the view.
@@ -92,7 +87,7 @@ class cxVisualizationService_EXPORT ViewWrapper3D: public ViewWrapper
 {
 Q_OBJECT
 public:
-	ViewWrapper3D(int startIndex, ViewPtr view, VisualizationServiceBackendPtr backend);
+	ViewWrapper3D(int startIndex, ViewPtr view, CoreServicesPtr backend);
 	virtual ~ViewWrapper3D();
 	virtual ViewPtr getView();
 	virtual double getZoom2D() { return -1.0; }

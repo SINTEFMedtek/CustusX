@@ -155,7 +155,8 @@ void EraserWidget::toggleContinous(bool on)
 
 void EraserWidget::continousRemoveSlot()
 {
-	Transform3D rMd = viewManager()->getViewGroups().front()->getData()->getOptions().mPickerGlyph->get_rMd();
+	Transform3D rMd = viewManager()->getViewGroup(0)->getOptions().mPickerGlyph->get_rMd();
+	//Transform3D rMd = viewManager()->getViewGroups().front()->getData()->getOptions().mPickerGlyph->get_rMd();
 	Vector3D c(mSphere->GetCenter());
 	c = rMd.coord(c);
 	double r = mSphere->GetRadius();
@@ -176,11 +177,11 @@ void EraserWidget::duplicateSlot()
 	patientService()->setActiveImage(duplicate);
 
 	// replace viz of original with duplicate
-	std::vector<ViewGroupPtr> viewGroups = viewManager()->getViewGroups();
-	for (unsigned i = 0; i < viewGroups.size(); ++i)
+//	std::vector<ViewGroupPtr> viewGroups = viewManager()->getViewGroups();
+	for (unsigned i = 0; i < viewManager()->viewGroupCount(); ++i)
 	{
-		if (viewGroups[i]->getData()->removeData(original))
-			viewGroups[i]->getData()->addData(duplicate);
+		if (viewManager()->getViewGroup(i)->removeData(original))
+			viewManager()->getViewGroup(i)->addData(duplicate);
 	}
 }
 
@@ -212,7 +213,7 @@ void EraserWidget::eraseVolume(TYPE* volumePointer, TYPE replaceVal)
 	Eigen::Array3i dim(img->GetDimensions());
 	Vector3D spacing(img->GetSpacing());
 
-	Transform3D rMd = viewManager()->getViewGroups().front()->getData()->getOptions().mPickerGlyph->get_rMd();
+	Transform3D rMd = viewManager()->getViewGroup(0)->getOptions().mPickerGlyph->get_rMd();
 	Vector3D c(mSphere->GetCenter());
 	c = rMd.coord(c);
 	double r = mSphere->GetRadius();
@@ -302,7 +303,7 @@ void EraserWidget::toggleShowEraser(bool on)
 {
 	if (on)
 	{
-		std::vector<ViewGroupPtr> viewGroups = viewManager()->getViewGroups();
+//		std::vector<ViewGroupPtr> viewGroups = viewManager()->getViewGroups();
 		mSphere = vtkSphereSourcePtr::New();
 
 		mSphere->SetRadius(40);
@@ -313,22 +314,22 @@ void EraserWidget::toggleShowEraser(bool on)
 		double a = mSphereSizeAdapter->getValue();
 		mSphere->SetRadius(a);
 		mSphere->Update();
-		MeshPtr glyph = viewGroups.front()->getData()->getOptions().mPickerGlyph;
+		MeshPtr glyph = viewManager()->getViewGroup(0)->getOptions().mPickerGlyph;
 		glyph->setVtkPolyData(mSphere->GetOutput());
 		glyph->setColor(QColor(255, 204, 0)); // same as tool
 		glyph->setIsWireframe(true);
 
 		// set same glyph in all groups
-		for (unsigned i=0; i<viewGroups.size(); ++i)
+		for (unsigned i=0; i<viewManager()->viewGroupCount(); ++i)
 		{
-			ViewGroupData::Options options = viewGroups[i]->getData()->getOptions();
+			ViewGroupData::Options options = viewManager()->getViewGroup(i)->getOptions();
 			options.mPickerGlyph = glyph;
-			viewGroups[i]->getData()->setOptions(options);
+			viewManager()->getViewGroup(i)->setOptions(options);
 		}
 	}
 	else
 	{
-		viewManager()->getViewGroups().front()->getData()->getOptions().mPickerGlyph->setVtkPolyData(NULL);
+		viewManager()->getViewGroup(0)->getOptions().mPickerGlyph->setVtkPolyData(NULL);
 		mContinousEraseCheckBox->setChecked(false);
 	}
 

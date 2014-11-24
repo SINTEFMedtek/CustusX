@@ -61,7 +61,7 @@ class cxVisualizationService_EXPORT ViewWrapperVideo: public ViewWrapper
 {
 Q_OBJECT
 public:
-	ViewWrapperVideo(ViewPtr view, VisualizationServiceBackendPtr backend);
+	ViewWrapperVideo(ViewPtr view, CoreServicesPtr backend);
 	virtual ~ViewWrapperVideo();
 	virtual ViewPtr getView();
 	virtual void setSlicePlanesProxy(SlicePlanesProxyPtr proxy) {}

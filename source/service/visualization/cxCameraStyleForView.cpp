@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkRenderWindow.h>
 #include "vtkInteractorStyleUnicam.h"
 #include "vtkInteractorStyleTrackballCamera.h"
-#include "cxVisualizationServiceBackend.h"
+#include "cxCoreServices.h"
 #include "cxViewportListener.h"
 #include "cxLogger.h"
 #include "cxTool.h"
@@ -62,7 +62,7 @@ SNW_DEFINE_ENUM_STRING_CONVERTERS_END(cx, CAMERA_STYLE_TYPE, cstCOUNT)
 namespace cx
 {
 
-CameraStyleForView::CameraStyleForView(VisualizationServiceBackendPtr backend) :
+CameraStyleForView::CameraStyleForView(CoreServicesPtr backend) :
 	mCameraStyleForView(cstDEFAULT_STYLE),
 	mBlockCameraUpdate(false),
 	mBackend(backend)

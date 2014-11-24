@@ -51,12 +51,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkBoxWidget2.h>
 #include <vtkBoxWidget.h>
 #include "cxTypeConversions.h"
-#include "cxRepManager.h"
+//#include "cxRepManager.h"
 #include "cxBoundingBox3D.h"
 #include "cxImage.h"
 #include "cxTransform3D.h"
 #include "cxVolumetricRep.h"
-#include "cxVisualizationServiceBackend.h"
+#include "cxCoreServices.h"
 #include "cxPatientModelService.h"
 
 #include "cxActiveImageProxy.h"
@@ -116,11 +116,11 @@ public:
 //---------------------------------------------------------
 
 
-InteractiveCropper::InteractiveCropper(VisualizationServiceBackendPtr backend/*PatientModelServicePtr patientModelService*/) :
+InteractiveCropper::InteractiveCropper(CoreServicesPtr backend/*PatientModelServicePtr patientModelService*/) :
 	mBackend(backend)
 //	mPatientModelService(patientModelService)
 {
-	mActiveImageProxy = ActiveImageProxy::New(mBackend->getPatientService());
+	mActiveImageProxy = ActiveImageProxy::New(mBackend->patientModelService);
 	connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(imageChangedSlot()));
 	connect(mActiveImageProxy.get(), SIGNAL(cropBoxChanged()), this, SLOT(imageCropChangedSlot()));
 }
@@ -243,7 +243,7 @@ void InteractiveCropper::resetBoundingBox()
 void InteractiveCropper::imageChangedSlot()
 {
 //	mImage = mPatientModelService->getActiveImage();
-	mImage = mBackend->getPatientService()->getActiveImage();
+	mImage = mBackend->patientModelService->getActiveImage();
 
 	this->imageCropChangedSlot();
 	emit changed();

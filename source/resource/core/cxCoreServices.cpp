@@ -35,14 +35,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelServiceProxy.h"
 #include "cxTrackingServiceProxy.h"
 #include "cxVideoServiceProxy.h"
+#include "cxSpaceProviderImpl.h"
 
 namespace cx {
+
+CoreServicesPtr CoreServices::create(ctkPluginContext* context)
+{
+	return CoreServicesPtr(new CoreServices(context));
+}
 
 CoreServices::CoreServices(ctkPluginContext* context)
 {
 	patientModelService	= PatientModelServicePtr(new PatientModelServiceProxy(context));
 	trackingService		= TrackingServicePtr(new TrackingServiceProxy(context));
 	videoService		= VideoServicePtr(new VideoServiceProxy(context));
+	spaceProvider.reset(new SpaceProviderImpl(trackingService, patientModelService));
 }
 
 CoreServices CoreServices::getNullObjects()
@@ -55,5 +62,6 @@ CoreServices::CoreServices()
 	patientModelService	= cx::PatientModelService::getNullObject();
 	trackingService	= cx::TrackingService::getNullObject();
 	videoService	= cx::VideoService::getNullObject();
+	spaceProvider.reset(new SpaceProviderImpl(trackingService, patientModelService));
 }
 } // cx

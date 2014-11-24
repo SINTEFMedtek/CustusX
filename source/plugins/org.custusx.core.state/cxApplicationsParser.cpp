@@ -43,7 +43,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataLocations.h"
 #include "cxWorkflowStateMachine.h"
 #include "cxApplicationStateMachine.h"
-#include "cxViewWrapper3D.h"
 #include "cxDataLocations.h"
 #include "cxConfig.h"
 #include "cxVLCRecorder.h"

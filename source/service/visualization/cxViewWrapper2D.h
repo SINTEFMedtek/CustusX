@@ -78,7 +78,7 @@ class cxVisualizationService_EXPORT ViewWrapper2D: public ViewWrapper
 {
 Q_OBJECT
 public:
-	ViewWrapper2D(ViewPtr view, VisualizationServiceBackendPtr backend);
+	ViewWrapper2D(ViewPtr view, CoreServicesPtr backend);
 	virtual ~ViewWrapper2D();
 	virtual void initializePlane(PLANE_TYPE plane);
 	virtual ViewPtr getView();

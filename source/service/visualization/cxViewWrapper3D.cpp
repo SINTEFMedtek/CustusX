@@ -99,7 +99,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxAxisConnector.h"
 #include "cxMultiVolume3DRepProducer.h"
 #include "cxMetricNamesRep.h"
-#include "cxVisualizationServiceBackend.h"
+#include "cxCoreServices.h"
 #include "cxNavigation.h"
 
 namespace cx
@@ -107,7 +107,7 @@ namespace cx
 
 
 
-ViewWrapper3D::ViewWrapper3D(int startIndex, ViewPtr view, VisualizationServiceBackendPtr backend):
+ViewWrapper3D::ViewWrapper3D(int startIndex, ViewPtr view, CoreServicesPtr backend):
 	ViewWrapper(backend)
 {
 	view->getRenderer()->GetActiveCamera()->SetClippingRange(1, 2000);

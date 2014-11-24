@@ -67,6 +67,7 @@ void LayoutRepository::insert(const LayoutData& data)
 		mLayouts.push_back(data);
 	else
 		mLayouts[pos] = data;
+	emit layoutChanged(data.getUid());
 }
 
 QString LayoutRepository::generateUid() const
@@ -84,6 +85,7 @@ QString LayoutRepository::generateUid() const
 void LayoutRepository::erase(const QString uid)
 {
 	mLayouts.erase(mLayouts.begin() + indexOf(uid));
+	emit layoutChanged(uid);
 }
 
 unsigned LayoutRepository::indexOf(const QString uid) const
@@ -132,11 +134,12 @@ void LayoutRepository::load(XmlOptionFile file)
 		LayoutData data;
 		data.parseXml(layout);
 
-		unsigned pos = this->indexOf(data.getUid());
-		if (pos == mLayouts.size())
-			mLayouts.push_back(data);
-		else
-			mLayouts[pos] = data;
+		this->insert(data);
+//		unsigned pos = this->indexOf(data.getUid());
+//		if (pos == mLayouts.size())
+//			mLayouts.push_back(data);
+//		else
+//			mLayouts[pos] = data;
 	}
 
 	this->addDefaults(); // ensure we overwrite loaded layouts

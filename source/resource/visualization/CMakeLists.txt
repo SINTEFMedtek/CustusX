@@ -15,7 +15,6 @@ cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
 	View/internal/ViewContainer/cxViewContainerItem
 	View/internal/ViewContainer/cxViewContainer	
 	View/internal/ViewContainer/cxViewCollectionWidgetUsingViewContainer	
-	cxVisualizationService
     
 	Rep/cxRep.h
 	Rep/cxRepImpl
@@ -61,6 +60,14 @@ cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
 	Primitives/cxViewFollower
 
 	RepVideo/cxVideoRep
+	
+	cxVisualizationService
+	cxViewGroupData
+	cxLayoutRepository
+    cxInteractiveClipper
+    cxInteractiveCropper
+    cxCameraControl
+	
         )
 
 if(CX_BUILD_MEHDI_VTKMULTIVOLUME)
@@ -78,6 +85,7 @@ cx_add_class( CX_RESOURCE_VISUALIZATION_FILES
 	cxVisualizationServiceNull
 	cxVisualizationServiceProxy
 	cxVisServices
+	cxNavigation
 	Primitives/cxDepthPeeling
 	Primitives/cxGraphicalTorus3D
 	Primitives/cxVtkHelperClasses
