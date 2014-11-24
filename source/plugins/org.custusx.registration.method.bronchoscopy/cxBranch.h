@@ -45,14 +45,14 @@ namespace cx
 
 class Branch;
 typedef boost::shared_ptr<class Branch> BranchPtr;
-typedef std::vector<Branch*> branchVector;
+typedef std::vector<BranchPtr> branchVector;
 
 class Branch
 {
 	Eigen::MatrixXd mPositions;
 	Eigen::MatrixXd mOrientations;
 	branchVector mChildBranches;
-	Branch* mParentBranch;
+	BranchPtr mParentBranch;
 public:
 	Branch();
 	virtual ~Branch();
@@ -60,12 +60,12 @@ public:
 	Eigen::MatrixXd getPositions();
 	void setOrientations(Eigen::MatrixXd orient);
 	Eigen::MatrixXd getOrientations();
-	void addChildBranch(Branch* child);
+	void addChildBranch(BranchPtr child);
 	void setChildBranches(branchVector children);
 	void deleteChildBranches();
 	branchVector getChildBranches();
-	void setParentBranch(Branch* parent);
-	Branch* getParentBranch();
+	void setParentBranch(BranchPtr parent);
+	BranchPtr getParentBranch();
 
 };
 
