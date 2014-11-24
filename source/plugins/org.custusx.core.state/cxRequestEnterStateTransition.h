@@ -42,6 +42,7 @@ namespace cx
 {
 /**
  * \file
+ * \addtogroup cx_custusx_core_state
  * \addtogroup cx_service_state
  * @{
  */

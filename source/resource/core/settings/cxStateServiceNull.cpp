@@ -31,16 +31,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxStateServiceNull.h"
 #include <QStringList>
+#include <QActionGroup>
 
 namespace cx
 {
 
+StateServiceNull::StateServiceNull()
+{
+	mActionGroup = new QActionGroup(this);
+}
+
 QString StateServiceNull::getVersionName() { return ""; }
-QActionGroup* StateServiceNull::getApplicationActions() { return NULL; }
+QActionGroup* StateServiceNull::getApplicationActions() { return mActionGroup; }
 QString StateServiceNull::getApplicationStateName() const { return ""; }
 QStringList StateServiceNull::getAllApplicationStateNames() const { return QStringList(); }
 
-QActionGroup* StateServiceNull::getWorkflowActions() { return NULL; }
+QActionGroup* StateServiceNull::getWorkflowActions() { return mActionGroup; }
 void StateServiceNull::setWorkFlowState(QString uid) {}
 
 Desktop StateServiceNull::getActiveDesktop() { return Desktop(); }

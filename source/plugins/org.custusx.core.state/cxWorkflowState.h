@@ -50,11 +50,11 @@ typedef boost::shared_ptr<class StateServiceBackend> StateServiceBackendPtr;
 
 /**
  * \file
- * \addtogroup cx_service_state
+ * \addtogroup cx_custusx_core_state
  * @{
  */
 
-/**\brief State in a WorkflowStateMachine
+/** \brief State in a WorkflowStateMachine
  *
  * \date 4. aug. 2010
  * \author jbake

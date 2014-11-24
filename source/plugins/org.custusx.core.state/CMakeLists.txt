@@ -32,6 +32,8 @@ set(PLUGIN_SRCS
 	cxStateServiceBackend.cpp
 	cxStateServiceBackend.h
 	cxStatePluginActivator.cpp
+	cxApplicationsParser.h
+	cxApplicationsParser.cpp
 )
 
 # Files which should be processed by Qts moc

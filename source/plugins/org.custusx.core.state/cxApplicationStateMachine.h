@@ -46,18 +46,13 @@ namespace cx
 {
 typedef boost::shared_ptr<class StateServiceBackend> StateServiceBackendPtr;
 
-/**
- * \file
- * \addtogroup cx_service_state
- * @{
- */
-
 class ApplicationState;
 
 /** \brief State Machine for the Clinical Application
  *
  *  See StateService for a description.
  *
+ * \ingroup cx_custusx_core_state
  *  \date Aug 17, 2010
  *  \author christiana
  */
@@ -94,9 +89,6 @@ private:
 
 typedef boost::shared_ptr<ApplicationStateMachine> ApplicationStateMachinePtr;
 
-/**
- * @}
- */
 }
 
 #endif /* CXAPPLICATIONSTATEMACHINE_H_ */

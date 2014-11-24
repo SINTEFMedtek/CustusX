@@ -42,14 +42,9 @@ typedef boost::shared_ptr<class ApplicationStateMachine> ApplicationStateMachine
 typedef boost::shared_ptr<class WorkflowStateMachine> WorkflowStateMachinePtr;
 typedef boost::shared_ptr<class StateServiceBackend> StateServiceBackendPtr;
 
-/**
- * \file
- * \addtogroup cx_service_state
- * @{
- */
-
 
 /**
+ * \ingroup cx_custusx_core_state
  * \date 4. aug. 2010
  * \author Janne Beate Bakeng, SINTEF
  */
@@ -90,9 +85,6 @@ private:
 	StateServiceBackendPtr mBackend;
 };
 
-/**
- * @}
- */
 }
 
 #endif // CXSTATESERVICEIMPL_H

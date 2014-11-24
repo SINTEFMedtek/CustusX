@@ -46,19 +46,13 @@ namespace cx
 {
 typedef boost::shared_ptr<class StateServiceBackend> StateServiceBackendPtr;
 
-/**
- * \file
- * \addtogroup cx_service_state
- * @{
- */
-
 class WorkflowState;
 
 /** \brief State Machine for the Workflow Steps
  *
  *  See StateService for a description.
  *
- * \ingroup cx_service_state
+ * \ingroup cx_custusx_core_state
  * \date 4. aug. 2010
  * \author Janne Beate Bakeng, SINTEF
  */
@@ -96,10 +90,6 @@ private:
 };
 
 typedef boost::shared_ptr<WorkflowStateMachine> WorkflowStateMachinePtr;
-
-/**
- * @}
- */
 }
 
 #endif /* CXWORKFLOWSTATEMACHINE_H_ */

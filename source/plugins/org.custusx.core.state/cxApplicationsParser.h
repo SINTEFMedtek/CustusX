@@ -29,43 +29,39 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXSTATESERVICENULL_H
-#define CXSTATESERVICENULL_H
+#ifndef CXAPPLICATIONSPARSER_H
+#define CXAPPLICATIONSPARSER_H
 
+#include "org_custusx_core_state_Export.h"
+#include "cxXmlOptionItem.h"
 #include "cxStateService.h"
 
 namespace cx
 {
 
 /**
- * \ingroup org_custusx_core_state
+ * \ingroup cx_custusx_core_state
+ * \date 2010-08-04
+ * \author Christian Askeland, SINTEF
+ *
  */
-class cxResource_EXPORT StateServiceNull: public StateService
+class org_custusx_core_state_EXPORT ApplicationsParser
 {
-Q_OBJECT
-
 public:
-	StateServiceNull();
-	virtual ~StateServiceNull() {}
+	ApplicationsParser();
+	~ApplicationsParser() {}
 
-	virtual QString getVersionName();
-	virtual QActionGroup* getApplicationActions();
-	virtual QString getApplicationStateName() const;
-	virtual QStringList getAllApplicationStateNames() const;
-
-	virtual QActionGroup* getWorkflowActions();
-	virtual void setWorkFlowState(QString uid);
-
-	virtual Desktop getActiveDesktop();
-	virtual void saveDesktop(Desktop desktop);
-	virtual void resetDesktop();
-
-	virtual bool isNull();
+	void addDefaultDesktops(QString workflowStateUid, QString layoutUid, QString mainwindowstate);
+	Desktop getDefaultDesktop(QString applicationName, QString workflowName);
+	Desktop getDesktop(QString applicationName, QString workflowName);
+	void setDesktop(QString applicationName, QString workflowName, Desktop desktop);
+	void resetDesktop(QString applicationName, QString workflowName);
 
 private:
-	QActionGroup* mActionGroup;
+	XmlOptionFile mXmlFile;
+	std::map<QString, Desktop> mWorkflowDefaultDesktops;
 };
 
 }
 
-#endif // CXSTATESERVICENULL_H
+#endif // CXAPPLICATIONSPARSER_H
