@@ -247,7 +247,7 @@ Eigen::Matrix4d registrationAlgorithm(BranchListPtr branches, M4Vector Tnavigati
 	Eigen::MatrixXd trackingPositions(3 , Tnavigation.size());
 	Eigen::MatrixXd trackingOrientations(3, Tnavigation.size());
 
-	std::vector<Branch*> branchVector = branches->getBranches();
+	std::vector<BranchPtr> branchVector = branches->getBranches();
 	CTPositions = branchVector[0]->getPositions();
 	CTOrientations = branchVector[0]->getOrientations();
 
@@ -426,7 +426,7 @@ void BronchoscopyRegistration::processCenterline(vtkPolyDataPtr centerline, Tran
 	mBranchList->calculateOrientations();
 	mBranchList->smoothOrientations();
 
-	//std::vector<Branch*> BL = mBranchList->getBranches();
+	//std::vector<BranchPtr> BL = mBranchList->getBranches();
 	std::cout << "Number of branches in CT centerline: " << mBranchList->getBranches().size() << std::endl;
 
 	mCenterlineProcessed = true;
