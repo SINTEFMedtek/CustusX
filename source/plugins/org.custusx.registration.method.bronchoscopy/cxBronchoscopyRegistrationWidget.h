@@ -81,6 +81,7 @@ private slots:
 	void duringSavePatientSlot();
 	void duringLoadPatientSlot();
 	void acquisitionCancelled();
+	void duringClearPatientSlot();
 private:
 	QVBoxLayout* mVerticalLayout;
 	QLabel* mLabel;
