@@ -79,10 +79,9 @@ BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegServices servi
 	AcquisitionDataPtr mAcquisitionData;
 	mAcquisitionData.reset(new AcquisitionData());
 
-	this->initSessionSelector(mAcquisitionData);
-
 	connect(services.patientModelService.get(), &PatientModelService::isSaving, this, &BronchoscopyRegistrationWidget::duringSavePatientSlot);
 	connect(services.patientModelService.get(), &PatientModelService::isLoading, this, &BronchoscopyRegistrationWidget::duringLoadPatientSlot);
+	connect(services.patientModelService.get(), &PatientModelService::cleared, this, &BronchoscopyRegistrationWidget::duringClearPatientSlot);
 
 	mProcessCenterlineButton = new QPushButton("Process centerline");
 	connect(mProcessCenterlineButton, SIGNAL(clicked()), this, SLOT(processCenterlineSlot()));
@@ -92,8 +91,8 @@ BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegServices servi
 	connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
 	mRegisterButton->setToolTip(this->defaultWhatsThis());
 
-
 	mAcquisition.reset(new Acquisition(mAcquisitionData, this));
+	this->initSessionSelector(mAcquisition->getPluginData());
 
 	connect(mAcquisition.get(), &Acquisition::started, this, &BronchoscopyRegistrationWidget::acquisitionStarted);
 	connect(mAcquisition.get(), &Acquisition::acquisitionStopped, this, &BronchoscopyRegistrationWidget::acquisitionStopped, Qt::QueuedConnection);
@@ -272,7 +271,6 @@ void BronchoscopyRegistrationWidget::acquisitionStopped()
 
 void BronchoscopyRegistrationWidget::acquisitionCancelled()
 {
-//	std::cout << "acquisitionCancelled" << std::endl;
 	ToolRep3DPtr activeRep3D = this->getToolRepIn3DView(mTool);
 	if (!activeRep3D)
 		return;
@@ -291,16 +289,23 @@ void BronchoscopyRegistrationWidget::duringSavePatientSlot()
 
 void BronchoscopyRegistrationWidget::duringLoadPatientSlot()
 {
-	QStringList sessionUids = getSessionList(mAcquisition->getPluginData());
+	mAcquisition->getPluginData()->clear();
 
 	QDomElement sessionsNode = mServices.patientModelService->getCurrentWorkingElement("bronchoscopySessions/stateManager");
 	mAcquisition->getPluginData()->parseXml(sessionsNode);
 
-	sessionUids = getSessionList(mAcquisition->getPluginData());
-
+	QStringList sessionUids = getSessionList(mAcquisition->getPluginData());
 	mSessionSelector->setValueRange(sessionUids);
+
 	if(!sessionUids.isEmpty())
 		mSessionSelector->setValue(sessionUids.last());
+}
+
+void BronchoscopyRegistrationWidget::duringClearPatientSlot()
+{
+	mAcquisition->getPluginData()->clear();
+	QStringList sessionUids = getSessionList(mAcquisition->getPluginData());
+	mSessionSelector->setValueRange(sessionUids);
 }
 
 ToolRep3DPtr BronchoscopyRegistrationWidget::getToolRepIn3DView(ToolPtr tool)
