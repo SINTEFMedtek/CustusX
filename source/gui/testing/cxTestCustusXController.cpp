@@ -42,15 +42,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImage.h"
 #include "cxCyclicActionLogger.h"
 #include "cxTrackingService.h"
-#include "cxViewManager.h"
 #include "cxStateService.h"
 #include "cxLogicManager.h"
 
 #include "cxClippingWidget.h"
 #include "cxInteractiveClipper.h"
-#include "cxViewManager.h"
 #include "cxSettings.h"
 #include "cxPatientModelService.h"
+#include "cxVisualizationService.h"
 
 CustusXController::CustusXController(QObject* parent) : QObject(parent)
 {
@@ -117,7 +116,7 @@ void CustusXController::loadPatientSlot()
 
 void CustusXController::enableSlicingSlot()
 {
-		cx::InteractiveClipperPtr interactiveClipper = cx::viewManager()->getClipper();
+		cx::InteractiveClipperPtr interactiveClipper = cx::viewService()->getClipper();
 		interactiveClipper->setSlicePlane(cx::ptAXIAL);
 
 		std::map<QString, cx::ImagePtr> imageMap = cx::patientService()->getDataOfType<cx::Image>();
@@ -134,23 +133,23 @@ void CustusXController::enableSlicingSlot()
 
 void CustusXController::initialBeginCheckRenderSlot()
 {
-  cx::viewManager()->getRenderTimer()->reset(mBaseTime);
+  cx::viewService()->getRenderTimer()->reset(mBaseTime);
   QTimer::singleShot( 5*1000,   this, SLOT(initialEndCheckRenderSlot()) );
 }
 
 void CustusXController::initialEndCheckRenderSlot()
 {
   // start next timing
-  cx::viewManager()->getRenderTimer()->reset(5*mBaseTime);
+  cx::viewService()->getRenderTimer()->reset(5*mBaseTime);
   QTimer::singleShot(4*mBaseTime,   this, SLOT(secondEndCheckRenderSlot()) );
 }
 
 void CustusXController::secondEndCheckRenderSlot()
 {
 
-  std::cout << cx::viewManager()->getRenderTimer()->dumpStatistics() << std::endl;
-  mTestData += cx::viewManager()->getRenderTimer()->dumpStatistics() + "\n";
-  mMeasuredFPS = cx::viewManager()->getRenderTimer()->getFPS();
+  std::cout << cx::viewService()->getRenderTimer()->dumpStatistics() << std::endl;
+  mTestData += cx::viewService()->getRenderTimer()->dumpStatistics() + "\n";
+  mMeasuredFPS = cx::viewService()->getRenderTimer()->getFPS();
 
   QTimer::singleShot(2*1000,   qApp, SLOT(quit()) );
 }

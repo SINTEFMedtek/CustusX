@@ -32,23 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxSyncedValue.h"
 
-//#include <QMenu>
-//#include "vtkCamera.h"
-//#include "cxReporter.h"
-//#include "cxPatientModelService.h"
-//#include "cxViewGroup.h" //for class Navigation
-//#include "cxMesh.h"
-//#include "cxTypeConversions.h"
-//#include "cxImageAlgorithms.h"
-//#include "cxDataMetric.h"
-//#include "cxView.h"
-//#include "cxImage.h"
-//#include "cxViewManager.h"
-//#include "cxInteractiveClipper.h"
-//#include "cxRepManager.h"
-//#include "cxCoreServices.h"
-//#include "cxNavigation.h"
-
 namespace cx
 {
 

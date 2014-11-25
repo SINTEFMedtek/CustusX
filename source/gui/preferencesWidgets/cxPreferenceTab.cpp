@@ -39,7 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDoubleWidgets.h"
 #include "cxHelperWidgets.h"
 #include "cxSettings.h"
-#include "cxViewManager.h"
 #include "cxMultiVolume3DRepProducer.h"
 #include "sscConfig.h"
 

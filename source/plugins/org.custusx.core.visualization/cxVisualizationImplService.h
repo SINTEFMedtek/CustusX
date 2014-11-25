@@ -58,11 +58,22 @@ public:
 	virtual ViewPtr get3DView(int group = 0, int index = 0);
 
 	virtual int getActiveViewGroup() const;
-	virtual ViewGroupDataPtr getViewGroupData(int groupIdx);
+	virtual ViewGroupDataPtr getViewGroupData(int groupIdx) const;
 
 	virtual void autoShowData(DataPtr data);
 	virtual void enableRender(bool val);
 	virtual bool renderingIsEnabled() const;
+
+	virtual QWidget* getLayoutWidget(int index);
+	virtual QString getActiveLayout(int widgetIndex) const;
+	virtual void setActiveLayout(const QString& uid, int widgetIndex);
+	virtual InteractiveClipperPtr getClipper();
+	virtual InteractiveCropperPtr getCropper();
+	virtual CyclicActionLoggerPtr getRenderTimer();
+	virtual NavigationPtr getNavigation();
+	virtual LayoutRepositoryPtr getLayoutRepository();
+	virtual CameraControlPtr getCameraControl();
+	virtual QActionGroup* createInteractorStyleActionGroup();
 
 	virtual bool isNull();
 

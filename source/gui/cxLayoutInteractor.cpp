@@ -32,7 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxLayoutInteractor.h"
 #include "cxLayoutEditorWidget.h"
-#include "cxViewManager.h"
 #include <QMenu>
 #include <QMessageBox>
 #include <QDialogButtonBox>
@@ -42,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libQtSignalAdapters/ConnectionFactories.h"
 #include <QVBoxLayout>
 #include "cxLayoutRepository.h"
+#include "cxVisualizationService.h"
 
 namespace cx
 {
@@ -51,12 +51,12 @@ LayoutInteractor::LayoutInteractor(QObject* parent) : QObject(parent)
 	mSecondaryLayoutActionGroup = NULL;
 	mLayoutActionGroup = NULL;
 	this->createActions();
-	connect(viewManager(), SIGNAL(activeLayoutChanged()), this, SLOT(layoutChangedSlot()));
+	connect(viewService().get(), SIGNAL(activeLayoutChanged()), this, SLOT(layoutChangedSlot()));
 }
 
 LayoutRepositoryPtr LayoutInteractor::getRepo()
 {
-	return viewManager()->getLayoutRepository();
+	return viewService()->getLayoutRepository();
 }
 
 void LayoutInteractor::createActions()
@@ -95,7 +95,7 @@ void LayoutInteractor::newCustomLayoutSlot()
 	if (data.getUid().isEmpty())
 		return;
 	this->getRepo()->insert(data);
-	viewManager()->setActiveLayout(data.getUid());
+	viewService()->setActiveLayout(data.getUid());
 }
 
 void LayoutInteractor::editCustomLayoutSlot()
@@ -111,8 +111,8 @@ void LayoutInteractor::deleteCustomLayoutSlot()
 	if (QMessageBox::question(NULL, "Delete current layout", "Do you really want to delete the current layout?",
 		QMessageBox::Cancel | QMessageBox::Ok) != QMessageBox::Ok)
 		return;
-	this->getRepo()->erase(viewManager()->getActiveLayout());
-	viewManager()->setActiveLayout(this->getRepo()->getAvailable().front()); // revert to existing state
+	this->getRepo()->erase(viewService()->getActiveLayout());
+	viewService()->setActiveLayout(this->getRepo()->getAvailable().front()); // revert to existing state
 }
 
 /** Called when the layout is changed: update the layout menu
@@ -131,7 +131,7 @@ void LayoutInteractor::layoutChangedSlot()
 	mSecondaryLayoutActionGroup = this->createLayoutActionGroup(1);
 	mSecondaryLayoutMenu->addActions(mSecondaryLayoutActionGroup->actions());
 
-	bool editable = this->getRepo()->isCustom(viewManager()->getActiveLayout());
+	bool editable = this->getRepo()->isCustom(viewService()->getActiveLayout());
 	mEditLayoutAction->setEnabled(editable);
 	mDeleteLayoutAction->setEnabled(editable);
 }
@@ -161,7 +161,7 @@ LayoutData LayoutInteractor::executeLayoutEditorDialog(QString title, bool creat
 
 	LayoutEditorWidget* editor = new LayoutEditorWidget(dialog.get());
 
-	LayoutData data = this->getRepo()->get(viewManager()->getActiveLayout());
+	LayoutData data = this->getRepo()->get(viewService()->getActiveLayout());
 
 	if (createNew)
 	{
@@ -217,7 +217,7 @@ QActionGroup* LayoutInteractor::createLayoutActionGroup(int widgetIndex)
 	}
 
 	// set checked status
-	QString type = viewManager()->getActiveLayout(widgetIndex);
+	QString type = viewService()->getActiveLayout(widgetIndex);
 	QList<QAction*> actions = retval->actions();
 	for (int i = 0; i < actions.size(); ++i)
 	{
@@ -255,7 +255,7 @@ QAction* LayoutInteractor::addLayoutAction(QString layout, QActionGroup* group, 
 void LayoutInteractor::setActiveLayout(QString layout, int widgetIndex)
 {
 //	std::cout << "*slot* " << layout << "-" << widgetIndex << std::endl;
-	viewManager()->setActiveLayout(layout, widgetIndex);
+	viewService()->setActiveLayout(layout, widgetIndex);
 }
 
 } // namespace cx

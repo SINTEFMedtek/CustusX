@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/shared_ptr.hpp>
 #include <vector>
 #include "cxData.h"
+class QActionGroup;
 
 #define VisualizationService_iid "cx::VisualizationService"
 
@@ -48,6 +49,14 @@ namespace cx
 typedef boost::shared_ptr<class VisualizationService> VisualizationServicePtr;
 typedef boost::shared_ptr<class ViewGroup> ViewGroupPtr;
 typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
+typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
+typedef boost::shared_ptr<class InteractiveCropper> InteractiveCropperPtr;
+
+typedef boost::shared_ptr<class CyclicActionLogger> CyclicActionLoggerPtr;
+typedef boost::shared_ptr<class Navigation> NavigationPtr;
+typedef boost::shared_ptr<class LayoutRepository> LayoutRepositoryPtr;
+typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
+
 
 /** \brief Visualization services
  *
@@ -62,11 +71,23 @@ public:
 	virtual ViewPtr get3DView(int group = 0, int index = 0) = 0;
 
 	virtual int getActiveViewGroup() const = 0;
-	virtual ViewGroupDataPtr getViewGroupData(int groupIdx) = 0;
+	virtual ViewGroupDataPtr getViewGroupData(int groupIdx) const = 0;
+	unsigned viewGroupCount() const;
 
 	virtual void autoShowData(DataPtr data) = 0;
 	virtual void enableRender(bool val) = 0;
 	virtual bool renderingIsEnabled() const = 0;
+	virtual QWidget* getLayoutWidget(int index=0) = 0;
+	virtual QString getActiveLayout(int widgetIndex=0) const = 0;
+	virtual void setActiveLayout(const QString& uid, int widgetIndex=0) = 0;
+	virtual void deactivateLayout();
+	virtual InteractiveClipperPtr getClipper() = 0;
+	virtual InteractiveCropperPtr getCropper() = 0;
+	virtual CyclicActionLoggerPtr getRenderTimer() = 0;
+	virtual NavigationPtr getNavigation() = 0;
+	virtual LayoutRepositoryPtr getLayoutRepository() = 0;
+	virtual CameraControlPtr getCameraControl() = 0;
+	virtual QActionGroup* createInteractorStyleActionGroup() = 0;
 
 	virtual bool isNull() = 0;
 	static VisualizationServicePtr getNullObject();

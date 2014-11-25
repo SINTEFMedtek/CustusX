@@ -32,8 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxDataSelectWidget.h"
 
-#include "cxViewGroup.h"
-#include "cxViewWrapper.h"
 #include "cxHelperWidgets.h"
 #include "cxDataInterface.h"
 #include "cxSelectDataStringDataAdapter.h"
@@ -41,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVisualizationService.h"
 #include "cxPatientModelService.h"
 #include "cxData.h"
+#include "cxViewGroupData.h"
 
 namespace cx
 {

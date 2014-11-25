@@ -43,4 +43,23 @@ VisualizationServicePtr VisualizationService::getNullObject()
 		mNull.reset(new VisualizationServiceNull, null_deleter());
 	return mNull;
 }
+
+
+unsigned VisualizationService::viewGroupCount() const
+{
+	int count = 0;
+	while(this->getViewGroupData(count))
+		++count;
+	return count;
+}
+
+void VisualizationService::deactivateLayout()
+{
+	this->setActiveLayout("", 0);
+	this->setActiveLayout("", 1);
+}
+
+
 } //cx
+
+

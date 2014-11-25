@@ -32,9 +32,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cx2DZoomHandler.h"
 #include "cxViewGroup.h"
-#include "cxViewWrapper.h"
 #include "cxReporter.h"
 #include "cxUtilHelpers.h"
+#include "cxSyncedValue.h"
 
 namespace cx
 {

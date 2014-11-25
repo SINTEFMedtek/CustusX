@@ -40,11 +40,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 #include "vtkCamera.h"
 #include "vtkSmartPointer.h"
-#include "cxViewManager.h"
 #include "cxDataInterface.h"
 #include "cxCameraControl.h"
 #include "cxBoundingBox3D.h"
 #include "cxView.h"
+#include "cxVisualizationService.h"
 
 //TODO: remove
 #include "cxLegacySingletons.h"
@@ -59,7 +59,7 @@ namespace cx
 TrackPadWidget::TrackPadWidget(QWidget* parent) :
     BaseWidget(parent, "TrackPadWidget", "Camera Control")
 {
-  mCameraControl = viewManager()->getCameraControl();
+  mCameraControl = viewService()->getCameraControl();
 
   mMinPadSize = QSize(50,50);
   mMinBarSize = QSize(20,50);
@@ -133,7 +133,7 @@ void TrackPadWidget::definePanLayout()
 
 vtkCameraPtr TrackPadWidget::getCamera() const
 {
-  return viewManager()->get3DView()->getRenderer()->GetActiveCamera();
+  return viewService()->get3DView()->getRenderer()->GetActiveCamera();
 }
 
 void TrackPadWidget::rotateYSlot(QPointF delta)
@@ -158,7 +158,7 @@ void TrackPadWidget::dollySlot(QPointF delta)
 {
   double factor = 1 + delta.y();
   this->getCamera()->Dolly(factor);
-  viewManager()->get3DView()->getRenderer()->ResetCameraClippingRange();
+  viewService()->get3DView()->getRenderer()->ResetCameraClippingRange();
 }
 
 void TrackPadWidget::panXZSlot(QPointF delta)
@@ -171,7 +171,7 @@ void TrackPadWidget::panXZSlot(QPointF delta)
   Vector3D e_x = cross(focus-position, vup).normal();
   Vector3D e_y = vup.normal();
 
-  DoubleBoundingBox3D bb(viewManager()->get3DView()->getRenderer()->ComputeVisiblePropBounds());
+  DoubleBoundingBox3D bb(viewService()->get3DView()->getRenderer()->ComputeVisiblePropBounds());
 
   double volSize = bb.range().length() / pow(3, 1.0/3.0); // mm size of volume
   double scale = volSize;///padSize;

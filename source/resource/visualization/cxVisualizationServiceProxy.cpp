@@ -62,7 +62,7 @@ int VisualizationServiceProxy::getActiveViewGroup() const
 	return mVisualizationService->getActiveViewGroup();
 }
 
-ViewGroupDataPtr VisualizationServiceProxy::getViewGroupData(int groupIdx)
+ViewGroupDataPtr VisualizationServiceProxy::getViewGroupData(int groupIdx) const
 {
 	return mVisualizationService->getViewGroupData(groupIdx);
 }
@@ -116,6 +116,57 @@ bool VisualizationServiceProxy::renderingIsEnabled() const
 {
 	return mVisualizationService->renderingIsEnabled();
 }
+
+QWidget* VisualizationServiceProxy::getLayoutWidget(int index)
+{
+	return mVisualizationService->getLayoutWidget(index);
+}
+
+QString VisualizationServiceProxy::getActiveLayout(int widgetIndex) const
+{
+	return mVisualizationService->getActiveLayout(widgetIndex);
+}
+
+void VisualizationServiceProxy::setActiveLayout(const QString& uid, int widgetIndex)
+{
+	mVisualizationService->setActiveLayout(uid, widgetIndex);
+}
+
+InteractiveClipperPtr VisualizationServiceProxy::getClipper()
+{
+	return mVisualizationService->getClipper();
+}
+
+InteractiveCropperPtr VisualizationServiceProxy::getCropper()
+{
+	return mVisualizationService->getCropper();
+}
+
+CyclicActionLoggerPtr VisualizationServiceProxy::getRenderTimer()
+{
+	return mVisualizationService->getRenderTimer();
+}
+
+NavigationPtr VisualizationServiceProxy::getNavigation()
+{
+	return mVisualizationService->getNavigation();
+}
+
+LayoutRepositoryPtr VisualizationServiceProxy::getLayoutRepository()
+{
+	return mVisualizationService->getLayoutRepository();
+}
+
+CameraControlPtr VisualizationServiceProxy::getCameraControl()
+{
+	return mVisualizationService->getCameraControl();
+}
+
+QActionGroup* VisualizationServiceProxy::createInteractorStyleActionGroup()
+{
+	return mVisualizationService->createInteractorStyleActionGroup();
+}
+
 
 
 } //cx

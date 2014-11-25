@@ -40,7 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "boost/bind.hpp"
 #include "cxTime.h"
 #include "cxReporter.h"
-#include "cxViewManager.h"
 #include "cxRepManager.h"
 #include "cxTrackingService.h"
 #include "cxStatusBar.h"
@@ -68,10 +67,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxGPUImageBuffer.h"
 #include "cxData.h"
 #include "cxConsoleWidget.h"
-#include "cxViewManager.h"
 #include "cxStateService.h"
 #include "cxMetricWidget.h"
-#include "cxViewWrapper.h"
 #include "cxPlaybackWidget.h"
 #include "cxEraserWidget.h"
 #include "cxSamplerWidget.h"
@@ -94,6 +91,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelServiceProxy.h"
 #include "cxVisualizationServiceProxy.h"
 #include "cxVideoServiceProxy.h"
+#include "cxViewGroupData.h"
 
 namespace cx
 {
@@ -108,11 +106,11 @@ MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
 	qApp->setStyleSheet(stylesheet.readAll());
 
 	mServices = VisServices::create(logicManager()->getPluginContext());
-	mCameraControl = viewManager()->getCameraControl();
+	mCameraControl = viewService()->getCameraControl();
 	mLayoutInteractor.reset(new LayoutInteractor());
 
-//	viewManager()->initialize();
-	this->setCentralWidget(viewManager()->getLayoutWidget(0));
+//	viewService()->initialize();
+	this->setCentralWidget(viewService()->getLayoutWidget(0));
 
 	this->createActions();
 	this->createMenus();
@@ -426,7 +424,7 @@ void MainWindow::createActions()
 	mShowPointPickerAction->setIcon(QIcon(":/icons/point_picker.png"));
 	connect(mShowPointPickerAction, SIGNAL(triggered()), this, SLOT(togglePointPickerActionSlot()));
 
-	connect(viewManager()->getViewGroup(0).get(), SIGNAL(optionsChanged()), this,
+	connect(viewService()->getViewGroupData(0).get(), SIGNAL(optionsChanged()), this,
 //	connect(mServices->visualizationService->getViewGroupData(0).get(), SIGNAL(optionsChanged()), this, //Too early?
 		SLOT(updatePointPickerActionSlot()));
 	this->updatePointPickerActionSlot();
@@ -474,7 +472,7 @@ void MainWindow::createActions()
 	mResetDesktopAction->setToolTip("Reset desktop for workflow step");
 	connect(mResetDesktopAction, SIGNAL(triggered()), this, SLOT(resetDesktopSlot()));
 
-	mInteractorStyleActionGroup = viewManager()->createInteractorStyleActionGroup();
+	mInteractorStyleActionGroup = viewService()->createInteractorStyleActionGroup();
 }
 
 void MainWindow::toggleFullScreenSlot()
@@ -581,12 +579,12 @@ void MainWindow::updateStreamingActionSlot()
 
 void MainWindow::centerToImageCenterSlot()
 {
-	NavigationPtr nav = viewManager()->getNavigation();
+	NavigationPtr nav = viewService()->getNavigation();
 
 	if (patientService()->getActiveImage())
 		nav->centerToData(patientService()->getActiveImage());
-	else if (!viewManager()->viewGroupCount())
-		nav->centerToView(viewManager()->getViewGroup(0)->getData());
+	else if (!viewService()->viewGroupCount())
+		nav->centerToView(viewService()->getViewGroupData(0)->getData());
 //		nav->centerToView(mServices->visualizationService->getViewGroupData(0)->getData());//Too early?
 	else
 		nav->centerToGlobalDataCenter();
@@ -594,13 +592,13 @@ void MainWindow::centerToImageCenterSlot()
 
 void MainWindow::centerToTooltipSlot()
 {
-	NavigationPtr nav = viewManager()->getNavigation();
+	NavigationPtr nav = viewService()->getNavigation();
 	nav->centerToTooltip();
 }
 
 void MainWindow::togglePointPickerActionSlot()
 {
-	ViewGroupDataPtr data = viewManager()->getViewGroup(0);
+	ViewGroupDataPtr data = viewService()->getViewGroupData(0);
 //	ViewGroupDataPtr data = mServices->visualizationService->getViewGroupData(0); //Too early?
 	ViewGroupData::Options options = data->getOptions();
 	options.mShowPointPickerProbe = !options.mShowPointPickerProbe;
@@ -608,7 +606,7 @@ void MainWindow::togglePointPickerActionSlot()
 }
 void MainWindow::updatePointPickerActionSlot()
 {
-	bool show = viewManager()->getViewGroup(0)->getOptions().mShowPointPickerProbe;
+	bool show = viewService()->getViewGroupData(0)->getOptions().mShowPointPickerProbe;
 //	bool show = mServices->visualizationService->getViewGroupData(0)->getOptions().mShowPointPickerProbe;//TOO early?
 	mShowPointPickerAction->setChecked(show);
 }
@@ -725,8 +723,8 @@ void MainWindow::onWorkflowStateChangedSlot()
 
 	this->mDockWidgets->hideAll();
 
-	viewManager()->setActiveLayout(desktop.mLayoutUid, 0);
-	viewManager()->setActiveLayout(desktop.mSecondaryLayoutUid, 1);
+	viewService()->setActiveLayout(desktop.mLayoutUid, 0);
+	viewService()->setActiveLayout(desktop.mSecondaryLayoutUid, 1);
 	this->restoreState(desktop.mMainWindowState);
 	patientService()->autoSave();
 
@@ -746,8 +744,8 @@ void MainWindow::saveDesktopSlot()
 {
 	Desktop desktop;
 	desktop.mMainWindowState = this->saveState();
-	desktop.mLayoutUid = viewManager()->getActiveLayout(0);
-	desktop.mSecondaryLayoutUid = viewManager()->getActiveLayout(1);
+	desktop.mLayoutUid = viewService()->getActiveLayout(0);
+	desktop.mSecondaryLayoutUid = viewService()->getActiveLayout(1);
 	stateService()->saveDesktop(desktop);
 }
 
@@ -1024,7 +1022,7 @@ void MainWindow::preferencesSlot()
 void MainWindow::quitSlot()
 {
 	report("Shutting down CustusX");
-	viewManager()->deactivateCurrentLayout();
+	viewService()->deactivateLayout();
 
 	patientService()->autoSave();
 

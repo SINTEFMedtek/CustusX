@@ -48,12 +48,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationTransform.h"
 #include "cxImageAlgorithms.h"
 #include "cxImage.h"
-#include "cxViewManager.h"
 #include "cxVolumeHelpers.h"
 #include "cxImageTF3D.h"
 #include "cxImageLUT2D.h"
 #include "cxPatientModelService.h"
 #include "cxMesh.h"
+#include "cxVisualizationService.h"
+
 
 //TODO: remove
 #include "cxLegacySingletons.h"
@@ -234,7 +235,7 @@ void ImportDataDialog::acceptedSlot()
 	this->convertToUnsigned();
 
 	mPatientModelService->autoSave();
-	viewManager()->autoShowData(mData);
+	viewService()->autoShowData(mData);
 }
 
 /** According to

@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxDefinitionStrings.h"
 #include "cxUtilHelpers.h"
-#include "cxViewManager.h"
+#include "cxVisualizationService.h"
 
 namespace cx
 {
@@ -127,8 +127,8 @@ void LayoutEditorWidget::contextMenuSlot(const QPoint& point)
   menu.addSeparator();
 
   // actions for view group
-//  int viewGroupCount = static_cast<int>(viewManager()->getViewGroups().size());
-  int viewGroupCount = viewManager()->viewGroupCount();
+//  int viewGroupCount = static_cast<int>(viewService()->getViewGroups().size());
+  int viewGroupCount = viewService()->viewGroupCount();
   QActionGroup* groupActions = new QActionGroup(this);
   for (int i=0; i<viewGroupCount; ++i)
   {

@@ -41,14 +41,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxCoordinateSystemHelpers.h"
 #include "cxTrackingService.h"
-#include "cxViewManager.h"
-#include "cxViewGroup.h"
-#include "cxViewWrapper.h"
 #include "cxManualTool.h"
 
 #include "cxLegacySingletons.h"
 #include "cxSpaceProvider.h"
 #include "cxPatientModelService.h"
+#include "cxViewGroupData.h"
+#include "cxVisualizationService.h"
+
 
 namespace cx
 {
@@ -125,7 +125,7 @@ void PointSamplingWidget::showEvent(QShowEvent* event)
 {
   QWidget::showEvent(event);
 
-  ViewGroupDataPtr data = viewManager()->getViewGroup(0);
+  ViewGroupDataPtr data = viewService()->getViewGroupData(0);
   ViewGroupData::Options options = data->getOptions();
   options.mShowPointPickerProbe = true;
   data->setOptions(options);

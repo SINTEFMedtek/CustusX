@@ -37,18 +37,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxForwardDeclarations.h"
 #include "cxStringDataAdapter.h"
-#include "cxViewManager.h"
 #include "cxBaseWidget.h"
 #include "cxLegacySingletons.h"
 
 #include "cxBoundingBoxWidget.h"
 
-typedef boost::shared_ptr<class InteractiveCropper> InteractiveCropperPtr;
 class QCheckBox;
 class QLabel;
 
 namespace cx
 {
+typedef boost::shared_ptr<class InteractiveCropper> InteractiveCropperPtr;
+
 /**
  * \file
  * \addtogroup cx_gui

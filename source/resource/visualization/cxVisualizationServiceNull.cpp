@@ -32,11 +32,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxVisualizationServiceNull.h"
 #include "cxReporter.h"
+#include <QActionGroup>
 
 namespace cx
 {
 VisualizationServiceNull::VisualizationServiceNull()
 {
+	mActionGroup = new QActionGroup(this);
 }
 
 ViewPtr VisualizationServiceNull::get3DView(int group, int index)
@@ -51,7 +53,7 @@ int VisualizationServiceNull::getActiveViewGroup() const
 	return -1;
 }
 
-ViewGroupDataPtr VisualizationServiceNull::getViewGroupData(int groupIdx)
+ViewGroupDataPtr VisualizationServiceNull::getViewGroupData(int groupIdx) const
 {
 	printWarning();
 	return ViewGroupDataPtr();
@@ -80,5 +82,17 @@ bool VisualizationServiceNull::renderingIsEnabled() const
 {
 	return false;
 }
+
+QWidget* VisualizationServiceNull::getLayoutWidget(int index) { return NULL; }
+QString VisualizationServiceNull::getActiveLayout(int widgetIndex) const { return ""; }
+void VisualizationServiceNull::setActiveLayout(const QString& uid, int widgetIndex) {}
+InteractiveClipperPtr VisualizationServiceNull::getClipper() { return InteractiveClipperPtr(); }
+InteractiveCropperPtr VisualizationServiceNull::getCropper() { return InteractiveCropperPtr(); }
+CyclicActionLoggerPtr VisualizationServiceNull::getRenderTimer() { return CyclicActionLoggerPtr(); }
+NavigationPtr VisualizationServiceNull::getNavigation() { return NavigationPtr(); }
+LayoutRepositoryPtr VisualizationServiceNull::getLayoutRepository() { return LayoutRepositoryPtr(); }
+CameraControlPtr VisualizationServiceNull::getCameraControl() { return CameraControlPtr(); }
+QActionGroup* VisualizationServiceNull::createInteractorStyleActionGroup() { return mActionGroup; }
+
 
 } //cx

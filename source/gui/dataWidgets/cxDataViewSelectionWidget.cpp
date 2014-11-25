@@ -43,13 +43,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxEnumConverter.h"
 #include "cxReporter.h"
 #include "cxDataLocations.h"
-//#include "cxToolConfigurationParser.h"
 #include "cxImageAlgorithms.h"
 #include "cxImage.h"
-#include "cxViewManager.h"
-#include "cxViewGroup.h"
-#include "cxViewWrapper.h"
 #include "cxPatientModelService.h"
+#include "cxVisualizationService.h"
+#include "cxViewGroupData.h"
 
 //TODO: remove
 #include "cxLegacySingletons.h"
@@ -537,17 +535,17 @@ DataViewSelectionWidget::DataViewSelectionWidget(QWidget* parent)
   allLayout->addWidget(mAllDataListWidget);
   layout->addLayout(allLayout);
 
-  connect(viewManager(), SIGNAL(activeViewChanged()), this, SLOT(viewGroupChangedSlot()));
+  connect(viewService().get(), SIGNAL(activeViewChanged()), this, SLOT(viewGroupChangedSlot()));
   this->viewGroupChangedSlot();
 }
 
 void DataViewSelectionWidget::viewGroupChangedSlot()
 {
-  int vg = viewManager()->getActiveViewGroup();
+  int vg = viewService()->getActiveViewGroup();
   if (vg<0)
     vg = 0;
 
-  ViewGroupDataPtr group = viewManager()->getViewGroup(vg);
+  ViewGroupDataPtr group = viewService()->getViewGroupData(vg);
   if (group)
 	  mSelectedDataListWidget->setViewGroupData(group);
 

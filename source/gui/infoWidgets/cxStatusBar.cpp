@@ -43,7 +43,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackingService.h"
 #include "cxReporter.h"
 #include "cxTrackingService.h"
-#include "cxViewManager.h"
 #include "cxVideoService.h"
 #include "boost/bind.hpp"
 #include <QMetaMethod>
@@ -54,6 +53,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDefinitionStrings.h"
 #include "cxDominantToolProxy.h"
 #include "cxLogicManager.h"
+#include "cxVisualizationService.h"
+
 
 namespace cx
 {
@@ -72,7 +73,7 @@ StatusBar::StatusBar() :
 
 	connect(trackingService().get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(updateToolButtons()));
 
-	connect(viewManager(), SIGNAL(fps(int)), this, SLOT(renderingFpsSlot(int)));
+	connect(viewService().get(), SIGNAL(fps(int)), this, SLOT(renderingFpsSlot(int)));
 
 	connect(videoService().get(), SIGNAL(fps(int)), this, SLOT(grabbingFpsSlot(int)));
 	connect(videoService().get(), SIGNAL(connected(bool)), this, SLOT(grabberConnectedSlot(bool)));

@@ -39,11 +39,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSlider>
 #include <QToolBar>
 #include "cxReporter.h"
-#include "cxViewManager.h"
 #include "cxTrackingService.h"
 #include "cxDoubleWidgets.h"
 #include "cxDataInterface.h"
 #include "cxDataAdapterHelper.h"
+#include "cxVisualizationService.h"
 
 //TODO: remove
 #include "cxLegacySingletons.h"
@@ -62,7 +62,7 @@ NavigationWidget::NavigationWidget(QWidget* parent) :
 
   QToolBar* toolBar = new QToolBar(this);
   mCameraGroupLayout->addWidget(toolBar);
-  toolBar->addActions(viewManager()->createInteractorStyleActionGroup()->actions());
+  toolBar->addActions(viewService()->createInteractorStyleActionGroup()->actions());
 
   QWidget* toolOffsetWidget = new SliderGroupWidget(this, DoubleDataAdapterActiveToolOffset::create());
 

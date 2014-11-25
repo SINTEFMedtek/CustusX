@@ -45,7 +45,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSettings.h"
 #include "cxtestJenkinsMeasurement.h"
 #include "cxtestRenderTester.h"
-#include "cxViewManager.h"
 #include "cxLegacySingletons.h"
 #include "cxMessageListener.h"
 #include "cxVisualizationService.h"

@@ -72,7 +72,7 @@ int VisualizationImplService::getActiveViewGroup() const
 {
 	return viewManager()->getActiveViewGroup();
 }
-ViewGroupDataPtr VisualizationImplService::getViewGroupData(int groupIdx)
+ViewGroupDataPtr VisualizationImplService::getViewGroupData(int groupIdx) const
 {
 	return viewManager()->getViewGroup(groupIdx);
 //	std::vector<ViewGroupPtr> viewGroups = viewManager()->getViewGroups();
@@ -100,6 +100,56 @@ void VisualizationImplService::enableRender(bool val)
 bool VisualizationImplService::renderingIsEnabled() const
 {
 	return viewManager()->renderingIsEnabled();
+}
+
+QWidget* VisualizationImplService::getLayoutWidget(int index)
+{
+	return viewManager()->getLayoutWidget(index);
+}
+
+QString VisualizationImplService::getActiveLayout(int widgetIndex) const
+{
+	return viewManager()->getActiveLayout(widgetIndex);
+}
+
+void VisualizationImplService::setActiveLayout(const QString& uid, int widgetIndex)
+{
+	viewManager()->setActiveLayout(uid, widgetIndex);
+}
+
+InteractiveClipperPtr VisualizationImplService::getClipper()
+{
+	return viewManager()->getClipper();
+}
+
+InteractiveCropperPtr VisualizationImplService::getCropper()
+{
+	return viewManager()->getCropper();
+}
+
+CyclicActionLoggerPtr VisualizationImplService::getRenderTimer()
+{
+	return viewManager()->getRenderTimer();
+}
+
+NavigationPtr VisualizationImplService::getNavigation()
+{
+	return viewManager()->getNavigation();
+}
+
+LayoutRepositoryPtr VisualizationImplService::getLayoutRepository()
+{
+	return viewManager()->getLayoutRepository();
+}
+
+CameraControlPtr VisualizationImplService::getCameraControl()
+{
+	return viewManager()->getCameraControl();
+}
+
+QActionGroup* VisualizationImplService::createInteractorStyleActionGroup()
+{
+	return viewManager()->createInteractorStyleActionGroup();
 }
 
 

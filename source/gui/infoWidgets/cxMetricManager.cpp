@@ -32,7 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxMetricManager.h"
 #include "cxManualTool.h"
-#include "cxViewManager.h"
 #include "cxViewGroup.h"
 #include "cxViewGroupData.h"
 #include "cxTrackingService.h"
@@ -54,6 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSpaceProvider.h"
 #include "cxTypeConversions.h"
 #include "cxPatientModelService.h"
+#include "cxVisualizationService.h"
 
 
 namespace cx
@@ -131,7 +131,7 @@ PointMetricPtr MetricManager::addPoint(Vector3D point, CoordinateSystem space, Q
 	p1->setCoordinate(point);
 	patientService()->insertData(p1);
 
-	viewManager()->getViewGroup(0)->addData(p1);
+	viewService()->getViewGroupData(0)->addData(p1);
 	this->setActiveUid(p1->getUid());
 
 	return p1;
@@ -296,7 +296,7 @@ void MetricManager::installNewMetric(DataMetricPtr metric)
 {
 	patientService()->insertData(metric);
 	this->setActiveUid(metric->getUid());
-	viewManager()->getViewGroup(0)->addData(metric);
+	viewService()->getViewGroupData(0)->addData(metric);
 }
 
 void MetricManager::loadReferencePointsSlot()

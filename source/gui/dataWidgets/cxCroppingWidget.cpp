@@ -48,6 +48,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImage.h"
 #include "cxLogicManager.h"
 #include "cxPatientModelService.h"
+#include "cxVisualizationService.h"
+#include "cxInteractiveCropper.h"
 
 namespace cx
 {
@@ -55,7 +57,7 @@ namespace cx
 CroppingWidget::CroppingWidget(QWidget* parent) : 
 		BaseWidget(parent, "CroppingWidget", "Crop")
 {
-  mInteractiveCropper = viewManager()->getCropper();
+  mInteractiveCropper = viewService()->getCropper();
   connect(mInteractiveCropper.get(), SIGNAL(changed()), this, SLOT(cropperChangedSlot()));
 
   QVBoxLayout* layout = new QVBoxLayout(this);

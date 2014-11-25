@@ -39,12 +39,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLabeledComboBoxWidget.h"
 #include "cxDefinitionStrings.h"
 #include "cxInteractiveClipper.h"
-#include "cxViewManager.h"
 #include "cxSelectDataStringDataAdapter.h"
 #include "cxImage.h"
 #include "cxLegacySingletons.h"
 #include "cxPatientModelService.h"
 #include "cxLogicManager.h"
+#include "cxVisualizationService.h"
 
 namespace cx
 {
@@ -93,7 +93,7 @@ ClippingWidget::ClippingWidget(PatientModelServicePtr patientModelService, QWidg
 	BaseWidget(parent, "ClippingWidget", "Clip"),
 	mPatientModelService(patientModelService)
 {
-	mInteractiveClipper = viewManager()->getClipper();
+	mInteractiveClipper = viewService()->getClipper();
 	connect(mInteractiveClipper.get(), SIGNAL(changed()), this, SLOT(clipperChangedSlot()));
 
 	mImageAdapter = SelectImageStringDataAdapter::New(patientModelService);

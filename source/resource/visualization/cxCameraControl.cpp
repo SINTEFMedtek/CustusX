@@ -41,8 +41,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QAction>
 #include "vtkRenderer.h"
 #include "vtkCamera.h"
-//#include "vtkSmartPointer.h"
-//#include "cxViewManager.h"
 #include "cxView.h"
 #include <QDomNode>
 #include "cxTypeConversions.h"

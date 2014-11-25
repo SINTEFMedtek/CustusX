@@ -54,12 +54,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImageAlgorithms.h"
 #include "cxDoubleWidgets.h"
 #include "cxImage.h"
-#include "cxInteractiveCropper.h"
-#include "cxViewManager.h"
-#include "cxViewWrapper.h"
-#include "cxViewGroup.h"
 #include "cxVolumeHelpers.h"
 #include "cxPatientModelService.h"
+#include "cxVisualizationService.h"
+#include "cxViewGroupData.h"
 
 namespace cx
 {
@@ -155,8 +153,8 @@ void EraserWidget::toggleContinous(bool on)
 
 void EraserWidget::continousRemoveSlot()
 {
-	Transform3D rMd = viewManager()->getViewGroup(0)->getOptions().mPickerGlyph->get_rMd();
-	//Transform3D rMd = viewManager()->getViewGroups().front()->getData()->getOptions().mPickerGlyph->get_rMd();
+	Transform3D rMd = viewService()->getViewGroupData(0)->getOptions().mPickerGlyph->get_rMd();
+	//Transform3D rMd = viewService()->getViewGroupDatas().front()->getData()->getOptions().mPickerGlyph->get_rMd();
 	Vector3D c(mSphere->GetCenter());
 	c = rMd.coord(c);
 	double r = mSphere->GetRadius();
@@ -177,11 +175,11 @@ void EraserWidget::duplicateSlot()
 	patientService()->setActiveImage(duplicate);
 
 	// replace viz of original with duplicate
-//	std::vector<ViewGroupPtr> viewGroups = viewManager()->getViewGroups();
-	for (unsigned i = 0; i < viewManager()->viewGroupCount(); ++i)
+//	std::vector<ViewGroupPtr> viewGroups = viewService()->getViewGroupDatas();
+	for (unsigned i = 0; i < viewService()->viewGroupCount(); ++i)
 	{
-		if (viewManager()->getViewGroup(i)->removeData(original))
-			viewManager()->getViewGroup(i)->addData(duplicate);
+		if (viewService()->getViewGroupData(i)->removeData(original))
+			viewService()->getViewGroupData(i)->addData(duplicate);
 	}
 }
 
@@ -213,7 +211,7 @@ void EraserWidget::eraseVolume(TYPE* volumePointer, TYPE replaceVal)
 	Eigen::Array3i dim(img->GetDimensions());
 	Vector3D spacing(img->GetSpacing());
 
-	Transform3D rMd = viewManager()->getViewGroup(0)->getOptions().mPickerGlyph->get_rMd();
+	Transform3D rMd = viewService()->getViewGroupData(0)->getOptions().mPickerGlyph->get_rMd();
 	Vector3D c(mSphere->GetCenter());
 	c = rMd.coord(c);
 	double r = mSphere->GetRadius();
@@ -303,7 +301,7 @@ void EraserWidget::toggleShowEraser(bool on)
 {
 	if (on)
 	{
-//		std::vector<ViewGroupPtr> viewGroups = viewManager()->getViewGroups();
+//		std::vector<ViewGroupPtr> viewGroups = viewService()->getViewGroups();
 		mSphere = vtkSphereSourcePtr::New();
 
 		mSphere->SetRadius(40);
@@ -314,22 +312,22 @@ void EraserWidget::toggleShowEraser(bool on)
 		double a = mSphereSizeAdapter->getValue();
 		mSphere->SetRadius(a);
 		mSphere->Update();
-		MeshPtr glyph = viewManager()->getViewGroup(0)->getOptions().mPickerGlyph;
+		MeshPtr glyph = viewService()->getViewGroupData(0)->getOptions().mPickerGlyph;
 		glyph->setVtkPolyData(mSphere->GetOutput());
 		glyph->setColor(QColor(255, 204, 0)); // same as tool
 		glyph->setIsWireframe(true);
 
 		// set same glyph in all groups
-		for (unsigned i=0; i<viewManager()->viewGroupCount(); ++i)
+		for (unsigned i=0; i<viewService()->viewGroupCount(); ++i)
 		{
-			ViewGroupData::Options options = viewManager()->getViewGroup(i)->getOptions();
+			ViewGroupData::Options options = viewService()->getViewGroupData(i)->getOptions();
 			options.mPickerGlyph = glyph;
-			viewManager()->getViewGroup(i)->setOptions(options);
+			viewService()->getViewGroupData(i)->setOptions(options);
 		}
 	}
 	else
 	{
-		viewManager()->getViewGroup(0)->getOptions().mPickerGlyph->setVtkPolyData(NULL);
+		viewService()->getViewGroupData(0)->getOptions().mPickerGlyph->setVtkPolyData(NULL);
 		mContinousEraseCheckBox->setChecked(false);
 	}
 
