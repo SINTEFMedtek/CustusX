@@ -68,7 +68,7 @@ private slots:
   void frameWidgetChangedSlot();
 private:
   cx::ToolMetricPtr mData;
-  StringDataAdapterXmlPtr mSpaceSelector;
+  SpaceDataAdapterXmlPtr mSpaceSelector;
   StringDataAdapterXmlPtr mToolNameSelector;
   DoubleDataAdapterXmlPtr mToolOffsetSelector;
   bool mInternalUpdate;

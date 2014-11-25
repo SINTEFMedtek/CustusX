@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxCoordinateSystemHelpers.h"
 #include <vtkImageData.h>
 #include "cxTrackingService.h"
-#include "cxLabeledComboBoxWidget.h"
+#include "cxSpaceEditWidget.h"
 #include "cxTypeConversions.h"
 #include "cxSettings.h"
 #include "cxImage.h"
@@ -57,8 +57,7 @@ SamplerWidget::SamplerWidget(QWidget* parent) :
 	mActiveTool = DominantToolProxy::New(trackingService());
 	connect(mActiveTool.get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(setModified()));
 	connect(mActiveTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), SLOT(setModified()));
-	connect(patientService().get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(spacesChangedSlot()));
-	connect(trackingService().get(), &TrackingService::stateChanged, this, &SamplerWidget::spacesChangedSlot);
+	connect(spaceProvider().get(), &SpaceProvider::spaceAddedOrRemoved, this, &SamplerWidget::spacesChangedSlot);
 
 	mLayout = new QHBoxLayout(this);
 	mLayout->setMargin(4);
@@ -77,19 +76,18 @@ SamplerWidget::SamplerWidget(QWidget* parent) :
 	mAdvancedLayout->setMargin(0);
 	mLayout->addWidget(mAdvancedWidget);
 
-    mSpaceSelector = StringDataAdapterXml::initialize("selectSpace",
-        "Space",
-        "Select coordinate system to store position in.",
-	    "",
-		QStringList(),
-        QDomNode());
-	connect(mSpaceSelector.get(), &StringDataAdapterXml::valueWasSet,
-			this, &SamplerWidget::spacesChangedSlot);
-	connect(mSpaceSelector.get(), &StringDataAdapterXml::valueWasSet,
-			this, &SamplerWidget::setModified);
-	QString space = settings()->value("sampler/Space", Space(csREF).toString()).toString();
+	mSpaceSelector = SpaceDataAdapterXml::initialize("selectSpace",
+											  "Space",
+											  "Select coordinate system to store position in.",
+											  Space(),
+											  std::vector<Space>(),
+											  QDomNode());
+
+	connect(mSpaceSelector.get(), &SpaceDataAdapterXml::valueWasSet, this, &SamplerWidget::spacesChangedSlot);
+	connect(mSpaceSelector.get(), &SpaceDataAdapterXml::valueWasSet, this, &SamplerWidget::setModified);
+	Space space = Space::fromString(settings()->value("sampler/Space", Space(csREF).toString()).toString());
 	mSpaceSelector->setValue(space);
-	LabeledComboBoxWidget* spaceSelectorWidget = new LabeledComboBoxWidget(this, mSpaceSelector);
+	SpaceEditWidget* spaceSelectorWidget = new SpaceEditWidget(this, mSpaceSelector);
 	spaceSelectorWidget->showLabel(false);
     mAdvancedLayout->addWidget(spaceSelectorWidget);
 	this->spacesChangedSlot();
@@ -132,22 +130,17 @@ void SamplerWidget::showAdvanced()
 
 void SamplerWidget::spacesChangedSlot()
 {
-	CoordinateSystem space = CoordinateSystem::fromString(mSpaceSelector->getValue());
+	CoordinateSystem space = mSpaceSelector->getValue();
 	settings()->setValue("sampler/Space", space.toString());
 
-	std::vector<CoordinateSystem> spaces = spaceProvider()->getSpacesToPresentInGUI();
-	QStringList range;
-	for (unsigned i=0; i<spaces.size(); ++i)
-	  range << spaces[i].toString();
-
-	mSpaceSelector->setValueRange(range);
-	mSpaceSelector->setValue(space.toString());
+	mSpaceSelector->setValueRange(spaceProvider()->getSpacesToPresentInGUI());
+	mSpaceSelector->setValue(space);
 	mListener->setSpace(space);
 }
 
 void SamplerWidget::prePaintEvent()
 {
-	CoordinateSystem space = CoordinateSystem::fromString(mSpaceSelector->getValue());
+	CoordinateSystem space = mSpaceSelector->getValue();
 	Vector3D p = spaceProvider()->getActiveToolTipPoint(space, true);
 	int w=1;
 	QString coord = QString("%1, %2, %3").arg(p[0], w, 'f', 1).arg(p[1], w, 'f', 1).arg(p[2], w, 'f', 1);

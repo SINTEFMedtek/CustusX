@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxTransform3D.h"
 #include "cxCoordinateSystemHelpers.h"
+#include <QObject>
 
 namespace cx
 {
@@ -49,8 +50,9 @@ typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
  * \date 2014-02-21
  * \author christiana
  */
-class cxResource_EXPORT SpaceProvider
+class cxResource_EXPORT SpaceProvider : public QObject
 {
+	Q_OBJECT
 public:
 	virtual ~SpaceProvider() {}
 
@@ -69,6 +71,9 @@ public:
 	virtual CoordinateSystem getD(DataPtr data) = 0;///<datas coordinate system	static CoordinateSystem getPr(); ///<patient references coordinate system
 	virtual CoordinateSystem getPr() = 0;
 	virtual CoordinateSystem getR() = 0; ///<data references coordinate system
+
+signals:
+	void spaceAddedOrRemoved();
 };
 
 } // namespace cx

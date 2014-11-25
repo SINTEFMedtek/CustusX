@@ -61,6 +61,7 @@ struct cxResource_EXPORT CoordinateSystem
 	static CoordinateSystem patientReference() { return CoordinateSystem(csPATIENTREF); }
 	QString toString() const;
 	static CoordinateSystem fromString(QString text);
+	bool isValid() const;
 
 };
 cxResource_EXPORT bool operator==(const CoordinateSystem& lhs, const CoordinateSystem& rhs);

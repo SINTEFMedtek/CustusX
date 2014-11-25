@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxBaseWidget.h"
 
-#include "cxStringDataAdapterXml.h"
+#include "cxSpaceDataAdapterXml.h"
 #include "cxVector3DDataAdapterXml.h"
 #include "cxDominantToolProxy.h"
 #include "cxPointMetric.h"
@@ -69,7 +69,7 @@ private:
 	void showAdvanced();
 
 	QHBoxLayout* mLayout;
-	StringDataAdapterXmlPtr mSpaceSelector;
+	SpaceDataAdapterXmlPtr mSpaceSelector;
 	SpaceListenerPtr mListener;
 	DominantToolProxyPtr mActiveTool;
 	QLineEdit* mCoordLineEdit;

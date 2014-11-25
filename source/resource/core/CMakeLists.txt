@@ -65,6 +65,8 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	dataAdapters/cxDoublePairDataAdapterXml
 	dataAdapters/cxSelectDataStringDataAdapterBase
 	dataAdapters/cxSelectDataStringDataAdapter
+	dataAdapters/cxSpaceDataAdapter
+	dataAdapters/cxSpaceDataAdapterXml
 
 	logger/cxReporter
 	logger/cxMessageListener
@@ -85,6 +87,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	utilities/cxSpaceListener
 	utilities/cxSpaceListenerImpl
 	utilities/cxSyncedValue
+	utilities/cxSpaceProvider
 
 	patientModel/cxPatientModelService
 	)
@@ -151,7 +154,6 @@ cx_add_class(cxResource_SOURCE
 	utilities/cxPlaneTypeCollection
 	utilities/cxSharedPointerChecker
 	utilities/cxNullDeleter.h
-	utilities/cxSpaceProvider
 	utilities/cxSpaceProviderImpl
 
 	logger/cxAudio.h
