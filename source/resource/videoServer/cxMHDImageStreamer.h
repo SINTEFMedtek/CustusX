@@ -37,12 +37,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "boost/shared_ptr.hpp"
 #include "cxStreamer.h"
+#include "cxForwardDeclarations.h"
 
 class QTimer;
 class QDomElement;
 
 namespace cx
 {
+
+typedef boost::shared_ptr<class Package> PackagePtr;
 
 vtkImageDataPtr loadImage(QString filename);
 vtkLookupTablePtr createLookupTable(int numberOfTableValues);

@@ -34,6 +34,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxStreamer.h"
 #include "org_custusx_core_video_Export.h"
+#include <QAbstractSocket>
+#include "cxIGTLinkImageMessage.h"
+#include "cxIGTLinkUSStatusMessage.h"
+
+class QTcpSocket;
 
 namespace cx
 {

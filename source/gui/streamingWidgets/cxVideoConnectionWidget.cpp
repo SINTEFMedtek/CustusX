@@ -41,33 +41,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkImageData.h"
 
-#include "cxFileSelectWidget.h"
 #include "cxTime.h"
 #include "cxReporter.h"
 #include "cxProbeSector.h"
 #include "cxRegistrationTransform.h"
 #include "cxStringDataAdapterXml.h"
 #include "cxHelperWidgets.h"
-#include "cxDataAdapterHelper.h"
 #include "cxDataLocations.h"
 #include "cxDataInterface.h"
-#include "cxImageServer.h"
 #include "cxTrackingService.h"
-#include "cxViewManager.h"
-#include "cxFileInputWidget.h"
-#include "cxLogger.h"
 #include "cxOptionsWidget.h"
 #include "cxVideoService.h"
 #include "cxPatientModelService.h"
 #include "cxDetailedLabeledComboBoxWidget.h"
 #include "cxStreamerService.h"
 #include "cxVideoSource.h"
-#include "cxVisServices.h"
 #include "cxVisualizationService.h"
-
-////TODO: remove
-//#include "cxLegacySingletons.h"
-//#include "cxLogicManager.h"
+#include "cxImage.h"
 
 namespace cx
 {

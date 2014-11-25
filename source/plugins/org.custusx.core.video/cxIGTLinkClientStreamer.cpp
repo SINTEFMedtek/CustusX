@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxIGTLinkClientStreamer.h"
 
+#include <QTcpSocket>
 #include "igtlOSUtil.h"
 #include "igtlMessageHeader.h"
 #include "igtlTransformMessage.h"
@@ -44,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxIGTLinkConversion.h"
 #include "cxCyclicActionLogger.h"
 #include "cxUtilHelpers.h"
+#include "cxSender.h"
 
 namespace cx
 {

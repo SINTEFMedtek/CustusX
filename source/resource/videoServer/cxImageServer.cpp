@@ -38,7 +38,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QCoreApplication>
 #include <QHostAddress>
 #include <QNetworkInterface>
+#include <QTcpSocket>
 #include "cxCommandlineImageStreamerFactory.h"
+#include "cxSender.h"
 
 namespace cx
 {

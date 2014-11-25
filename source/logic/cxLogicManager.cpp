@@ -136,7 +136,7 @@ void LogicManager::shutdown()
 void LogicManager::initializeServices()
 {
 	// resources layer
-//	Reporter::initialize();
+	Reporter::initialize();
 
 	mPluginFramework = PluginFrameworkManager::create();
 	mPluginFramework->start();

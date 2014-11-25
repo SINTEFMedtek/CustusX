@@ -42,11 +42,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <map>
 #include "boost/shared_ptr.hpp"
-#include "cxSender.h"
+#include <iostream>
 
 namespace cx
 {
 
+typedef boost::shared_ptr<class Sender> SenderPtr;
 typedef boost::shared_ptr<class Streamer> StreamerPtr;
 
 /**\brief

@@ -111,9 +111,6 @@ protected:
 	XmlOptionFile mOptions;
 	DetailedLabeledComboBoxWidget* mConnectionSelectionWidget;
 
-//	VisualizationServicePtr mVisualizationService;
-//	PatientModelServicePtr mPatientModelService;
-//	VideoServicePtr mVideoService;
 	VisServicesPtr mServices;
 
 private:
