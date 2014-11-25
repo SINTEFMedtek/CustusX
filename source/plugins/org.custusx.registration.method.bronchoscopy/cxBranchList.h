@@ -42,6 +42,7 @@ namespace cx
 {
 
 typedef std::vector< Eigen::Matrix4d > M4Vector;
+typedef boost::shared_ptr<class BranchList> BranchListPtr;
 
 class BranchList
 {
@@ -57,6 +58,7 @@ public:
 	void selectGenerations(int maxGeneration);
 	void calculateOrientations();
 	void smoothOrientations();
+	BranchListPtr removePositionsForLocalRegistration(Eigen::MatrixXd trackingPositions, double maxDistance);
 
 };
 

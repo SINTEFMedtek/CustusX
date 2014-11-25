@@ -54,7 +54,7 @@ class QTime;
 namespace cx
 {
 class LayoutData;
-class LayoutViewData;
+struct LayoutViewData;
 struct LayoutRegion;
 class ViewCollectionWidget;
 class ViewWrapper;

@@ -394,7 +394,7 @@ endfunction()
 #   in some distros, such as ubuntu.
 #   Finally, I came up with a more reliable way by using qmake.
 ###############################################################################
-function (find_qt_plugin_dir _varResult)
+function(find_qt_plugin_dir _varResult)
     get_target_property(QT_QMAKE_EXECUTABLE ${Qt5Core_QMAKE_EXECUTABLE} IMPORTED_LOCATION)
     if(NOT QT_QMAKE_EXECUTABLE)
         message(FATAL_ERROR "qmake is not found.")
@@ -410,6 +410,19 @@ function (find_qt_plugin_dir _varResult)
         message(FATAL_ERROR "Qt5 plugin directory cannot be detected.")
     endif()
 	set (${_varResult} ${_QT_PLUGINS_DIR} PARENT_SCOPE)
+endfunction()
+
+
+###############################################################################
+#
+# Find the location of qts bin folder
+#
+###############################################################################
+function(find_qt_bin_dir _varResult)
+    find_package(Qt5Core REQUIRED)
+    get_target_property(QtCore_location Qt5::Core LOCATION)
+    get_filename_component(_QT_BIN_DIR ${QtCore_location} DIRECTORY)
+    set (${_varResult} ${_QT_BIN_DIR} PARENT_SCOPE)
 endfunction()
 
 

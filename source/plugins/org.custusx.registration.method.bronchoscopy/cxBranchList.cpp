@@ -223,6 +223,42 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions)
 }
 
 
+BranchListPtr BranchList::removePositionsForLocalRegistration(Eigen::MatrixXd trackingPositions, double maxDistance)
+{
+	BranchListPtr retval = BranchListPtr(new BranchList());
+	BranchPtr b;
+	for (int i = 0; i < mBranches.size(); i++)
+	{
+		b = BranchPtr(new Branch());
+		b->setPositions(mBranches[i]->getPositions());
+		b->setOrientations(mBranches[i]->getOrientations());
+		retval->addBranch(b);
+	}
+
+	std::vector<BranchPtr> branches = retval->getBranches();
+	Eigen::MatrixXd positions;
+	Eigen::MatrixXd orientations;
+	for (int i = 0; i < branches.size(); i++)
+	{
+		positions = branches[i]->getPositions();
+		orientations = branches[i]->getOrientations();
+		std::pair<std::vector<Eigen::MatrixXd::Index>, Eigen::VectorXd> distanceData;
+		distanceData = dsearchn(positions, trackingPositions);
+		Eigen::VectorXd distance = distanceData.second;
+		for (int j = positions.cols() - 1; i <= 0; i--)
+		{
+			if (distance(j) > maxDistance)
+			{
+				positions = eraseCol(j, positions);
+				orientations = eraseCol(j, orientations);
+			}
+		}
+		branches[i]->setPositions(positions);
+		branches[i]->setOrientations(orientations);
+	}
+	return retval;
+}
+
 Eigen::MatrixXd sortMatrix(int rowNumber, Eigen::MatrixXd matrix)
 {
 	for (int i = 0; i < matrix.cols() - 1; i++)  {
