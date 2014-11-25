@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include "cxForwardDeclarations.h"
 #include "cxDoubleWidgets.h"
+#include "cxSpaceDataAdapterXml.h"
 #include "cxStringDataAdapterXml.h"
 #include "cxTransform3DWidget.h"
 #include "cxPointMetric.h"
@@ -97,7 +98,7 @@ private:
   QVBoxLayout* mToptopLayout;
   QGroupBox* mManualGroup;
   Transform3DWidget* mManualToolWidget;
-  StringDataAdapterXmlPtr mSpaceSelector;
+  SpaceDataAdapterXmlPtr mSpaceSelector;
 
 //  SliderGroupWidget* mToolOffsetWidget;
   QLabel* mActiveToolVisibleLabel;

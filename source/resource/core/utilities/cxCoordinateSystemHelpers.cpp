@@ -55,6 +55,11 @@ CoordinateSystem CoordinateSystem::fromString(QString text)
 	return retval;
 }
 
+bool CoordinateSystem::isValid() const
+{
+	return mId!=csCOUNT;
+}
+
 bool operator==(const CoordinateSystem& lhs, const CoordinateSystem& rhs)
 {
 	return ( lhs.mId==rhs.mId )&&( lhs.mRefObject==rhs.mRefObject );

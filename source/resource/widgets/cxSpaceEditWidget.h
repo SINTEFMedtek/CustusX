@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QLineEdit>
 #include <QLabel>
 #include <QGridLayout>
-#include "cxStringDataAdapter.h"
+#include "cxSpaceDataAdapter.h"
 #include "cxBaseWidget.h"
 
 namespace cx
@@ -49,7 +49,7 @@ namespace cx
 /**\brief Composite widget for string selection.
  *
  * Consists of <namelabel, combobox>.
- * Insert a subclass of StringDataAdStringDataAdapter to connect to data.
+ * Insert a subclass of SpaceDataAdapter to connect to data.
  *
  * \ingroup cx_resource_widgets
  */
@@ -57,7 +57,7 @@ class cxResourceWidgets_EXPORT SpaceEditWidget: public BaseWidget
 {
 Q_OBJECT
 public:
-	SpaceEditWidget(QWidget* parent, StringDataAdapterPtr, QGridLayout* gridLayout = 0, int row = 0);
+	SpaceEditWidget(QWidget* parent, SpaceDataAdapterPtr, QGridLayout* gridLayout = 0, int row = 0);
 	virtual ~SpaceEditWidget() {}
 
 	virtual QString defaultWhatsThis() const;
@@ -72,34 +72,17 @@ private slots:
 	void comboIndexChanged();
 
 private:
-	struct SpaceData
-	{
-		SpaceData(QString uid_, QString name_) : uid(uid_), name(name_) {}
-		QString uid; // internal value for space
-		QString name; // display value for space
-
-		QStringList uidlist() const { return this->splitSpace(uid); }
-		QStringList namelist() const { return this->splitSpace(name); }
-
-		QStringList splitSpace(QString name) const
-		{
-			QStringList values = name.split("/");
-			if (values.size()==1)
-				values << "";
-			return values;
-		}
-	};
-
-	void rebuildCombobox(QComboBox* widget, QStringList uids, int index, std::vector<SpaceData> allSpaces, QString currentUid);
-	QString getNameForUid(QString uid, int index, std::vector<SpaceData> allSpaces);
-
-	QStringList splitSpace(QString name) const;
-	QString mergeSpace(QString a, QString b) const;
+	void attemptSetValue(COORDINATE_SYSTEM id, QString ref);
+	void rebuildIdCombobox();
+	std::vector<COORDINATE_SYSTEM> getAvailableSpaceIds();
+	void rebuildRefCombobox();
+	QStringList getAvailableSpaceRefs(COORDINATE_SYSTEM id);
 
 	QLabel* mLabel;
 	QComboBox* mIdCombo;
 	QComboBox* mRefCombo;
-	StringDataAdapterPtr mData;
+	SpaceDataAdapterPtr mData;
+
 };
 
 } // namespace cx

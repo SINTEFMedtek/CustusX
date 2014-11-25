@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxToolMetricWrapper.h"
 #include <QHBoxLayout>
-#include "cxLabeledComboBoxWidget.h"
+#include "cxSpaceEditWidget.h"
 #include "cxDataAdapterHelper.h"
 #include "cxTrackingService.h"
 #include "cxSpaceProvider.h"
@@ -78,7 +78,8 @@ QWidget* ToolMetricWrapper::createWidget()
 	hLayout2->addWidget(createDataWidget(mVisualizationService, mPatientModelService, widget, mToolNameSelector));
 	hLayout2->addWidget(createDataWidget(mVisualizationService, mPatientModelService, widget, mToolOffsetSelector));
 
-	hLayout->addWidget(new LabeledComboBoxWidget(widget, mSpaceSelector));
+	hLayout->addWidget(new SpaceEditWidget(widget, mSpaceSelector));
+//	hLayout->addWidget(new LabeledComboBoxWidget(widget, mSpaceSelector));
 
 	QPushButton* sampleButton = new QPushButton("Sample");
 	connect(sampleButton, SIGNAL(clicked()), this, SLOT(resampleMetric()));
@@ -98,18 +99,26 @@ QWidget* ToolMetricWrapper::createWidget()
 
 void ToolMetricWrapper::initializeDataAdapters()
 {
-	QString value;// = qstring_cast(mData->getFrame());
-	std::vector<CoordinateSystem> spaces = spaceProvider()->getSpacesToPresentInGUI();
-	QStringList range;
-	for (unsigned i=0; i<spaces.size(); ++i)
-		range << spaces[i].toString();
+//	QString value;// = qstring_cast(mData->getFrame());
+//	std::vector<CoordinateSystem> spaces = spaceProvider()->getSpacesToPresentInGUI();
+//	QStringList range;
+//	for (unsigned i=0; i<spaces.size(); ++i)
+//		range << spaces[i].toString();
 
-	mSpaceSelector = StringDataAdapterXml::initialize("selectSpace",
-			"Space",
-			"Select coordinate system to store position in.",
-			value,
-			range,
-			QDomNode());
+	mSpaceSelector = SpaceDataAdapterXml::initialize("selectSpace",
+											  "Space",
+											  "Select coordinate system to store position in.",
+											  Space(),
+											  spaceProvider()->getSpacesToPresentInGUI(),
+											  QDomNode());
+//	hLayout->addWidget(new SpaceEditWidget(widget, mSpaceSelector));
+
+//	mSpaceSelector = StringDataAdapterXml::initialize("selectSpace",
+//			"Space",
+//			"Select coordinate system to store position in.",
+//			value,
+//			range,
+//			QDomNode());
 	connect(mSpaceSelector.get(), SIGNAL(valueWasSet()), this, SLOT(spaceSelected()));
 
 	mToolNameSelector = StringDataAdapterXml::initialize("selectToolName",
@@ -163,10 +172,9 @@ void ToolMetricWrapper::spaceSelected()
 {
 	if (mInternalUpdate)
 		return;
-	CoordinateSystem space = CoordinateSystem::fromString(mSpaceSelector->getValue());
-	if (space.mId==csCOUNT)
-		return;
-	mData->setSpace(space);
+	CoordinateSystem space = mSpaceSelector->getValue();
+	if (space.isValid())
+		mData->setSpace(space);
 }
 
 void ToolMetricWrapper::toolNameSet()
@@ -199,7 +207,7 @@ void ToolMetricWrapper::update()
 {
 	mInternalUpdate = true;
 
-	mSpaceSelector->setValue(mData->getSpace().toString());
+	mSpaceSelector->setValue(mData->getSpace());
 	mFrameWidget->setMatrix(mData->getFrame());
 	mToolNameSelector->setValue(mData->getToolName());
 	mToolOffsetSelector->setValue(mData->getToolOffset());

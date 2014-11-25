@@ -67,7 +67,7 @@ private slots:
   void frameWidgetChangedSlot();
 private:
   cx::FrameMetricPtr mData;
-  StringDataAdapterXmlPtr mSpaceSelector;
+  SpaceDataAdapterXmlPtr mSpaceSelector;
   bool mInternalUpdate;
   Transform3DWidget* mFrameWidget;
 };

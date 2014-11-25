@@ -55,6 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSpaceProvider.h"
 #include "cxPatientModelService.h"
 #include "cxSpaceEditWidget.h"
+#include "cxSpaceDataAdapterXml.h"
 
 //TODO :remove
 #include "cxLegacySingletons.h"
@@ -206,6 +207,7 @@ PointMetricWrapper::PointMetricWrapper(VisualizationServicePtr visualizationServ
 	mInternalUpdate = false;
 	connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
 	connect(mPatientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataChangedSlot()));
+	connect(spaceProvider().get(), &SpaceProvider::spaceAddedOrRemoved, this, &PointMetricWrapper::dataChangedSlot);
 }
 
 PointMetricWrapper::~PointMetricWrapper()
@@ -239,20 +241,14 @@ QWidget* PointMetricWrapper::createWidget()
 	return widget;
 }
 
-StringDataAdapterXmlPtr PointMetricWrapper::createSpaceSelector() const
+SpaceDataAdapterXmlPtr PointMetricWrapper::createSpaceSelector() const
 {
-	QString value;// = qstring_cast(mData->getFrame());
-	std::vector<CoordinateSystem> spaces = spaceProvider()->getSpacesToPresentInGUI();
-	QStringList range;
-	for (unsigned i=0; i<spaces.size(); ++i)
-		range << spaces[i].toString();
-
-	StringDataAdapterXmlPtr retval;
-	retval = StringDataAdapterXml::initialize("selectSpace",
+	SpaceDataAdapterXmlPtr retval;
+	retval = SpaceDataAdapterXml::initialize("selectSpace",
 											  "Space",
 											  "Select coordinate system to store position in.",
-											  value,
-											  range,
+											  Space(),
+											  spaceProvider()->getSpacesToPresentInGUI(),
 											  QDomNode());
 	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(spaceSelected()));
 	return retval;
@@ -317,8 +313,8 @@ void PointMetricWrapper::spaceSelected()
 {
 	if (mInternalUpdate)
 		return;
-	CoordinateSystem space = CoordinateSystem::fromString(mSpaceSelector->getValue());
-	if (space.mId==csCOUNT)
+	CoordinateSystem space = mSpaceSelector->getValue();
+	if (!space.isValid())
 		return;
 	mData->setSpace(space);
 }
@@ -332,13 +328,14 @@ void PointMetricWrapper::coordinateChanged()
 
 void PointMetricWrapper::dataChangedSlot()
 {
-
+	std::vector<CoordinateSystem> spaces = spaceProvider()->getSpacesToPresentInGUI();
+	mSpaceSelector->setValueRange(spaces);
 }
 
 void PointMetricWrapper::update()
 {
 	mInternalUpdate = true;
-	mSpaceSelector->setValue(mData->getSpace().toString());
+	mSpaceSelector->setValue(mData->getSpace());
 	mCoordinate->setValue(mData->getCoordinate());
 	mInternalUpdate = false;
 }

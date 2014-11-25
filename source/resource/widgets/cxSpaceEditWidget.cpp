@@ -35,11 +35,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxHelperWidgets.h"
 #include "cxLogger.h"
+#include "cxDefinitionStrings.h"
 
 namespace cx
 {
 
-SpaceEditWidget::SpaceEditWidget(QWidget* parent, StringDataAdapterPtr dataInterface,
+SpaceEditWidget::SpaceEditWidget(QWidget* parent, SpaceDataAdapterPtr dataInterface,
 	QGridLayout* gridLayout, int row) :
 	BaseWidget(parent, "SpaceEditWidget", "SpaceEditWidget")
 {
@@ -55,7 +56,6 @@ SpaceEditWidget::SpaceEditWidget(QWidget* parent, StringDataAdapterPtr dataInter
 
 	mIdCombo = new QComboBox(this);
 	connect(mIdCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(comboIndexChanged()));
-//	connect(mIdCombo, &QComboBox::currentIndexChanged, this, &SpaceEditWidget::comboIndexChanged);
 
 	mRefCombo = new QComboBox(this);
 	connect(mRefCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(comboIndexChanged()));
@@ -85,10 +85,32 @@ QString SpaceEditWidget::defaultWhatsThis() const
 	return "<html></html>";
 }
 
+void SpaceEditWidget::attemptSetValue(COORDINATE_SYSTEM id, QString ref)
+{
+//	std::cout << "setting space " << QString::number(id) << " -- " << ref << std::endl;
+	Space space(id, ref);
+
+	QStringList refs = this->getAvailableSpaceRefs(space.mId);
+	if (refs.isEmpty())
+		space.mRefObject = "";
+	else if (!refs.contains(space.mRefObject))
+		space.mRefObject = refs[0];
+
+
+	std::vector<Space> range = mData->getValueRange();
+	if (!count(range.begin(), range.end(), space))
+	{
+		this->setModified(); // repaint with old data
+		return;
+	}
+
+//	std::cout << "setting space3 " << space.toString() << std::endl;
+	mData->setValue(space);
+}
+
 void SpaceEditWidget::comboIndexChanged()
 {
-	QString selected = this->mergeSpace(mIdCombo->currentData().toString(), mRefCombo->currentData().toString());
-	mData->setValue(selected);
+	this->attemptSetValue(COORDINATE_SYSTEM(mIdCombo->currentData().toInt()), mRefCombo->currentData().toString());
 }
 
 void SpaceEditWidget::showLabel(bool on)
@@ -96,35 +118,80 @@ void SpaceEditWidget::showLabel(bool on)
 	mLabel->setVisible(on);
 }
 
-QString SpaceEditWidget::getNameForUid(QString uid, int index, std::vector<SpaceData> allSpaces)
-{
-	for (int i=0; i<allSpaces.size(); ++i)
-	{
-		if (allSpaces[i].uidlist()[index] == uid)
-			return allSpaces[i].namelist()[index];
-	}
-	return "";
-}
 
-void SpaceEditWidget::rebuildCombobox(QComboBox* widget, QStringList uids, int index, std::vector<SpaceData> allSpaces, QString currentUid)
+void SpaceEditWidget::rebuildIdCombobox()
 {
-	widget->blockSignals(true);
-	widget->clear();
+	mIdCombo->blockSignals(true);
+	mIdCombo->clear();
+
+	Space currentValue = mData->getValue();
+	std::vector<COORDINATE_SYSTEM> ids = this->getAvailableSpaceIds();
 
 	int currentIndex = -1;
-	for (int i = 0; i < uids.size(); ++i)
+	for (int i = 0; i < ids.size(); ++i)
 	{
-		QString uid = uids[i];
-		QString name = this->getNameForUid(uid, index, allSpaces);
+		COORDINATE_SYSTEM id = ids[i];
+		QString name = enum2string<COORDINATE_SYSTEM>(id);
 
-		std::cout << "add item " << uid << " -- " << name << std::endl;
-
-		widget->addItem(name);
-		widget->setItemData(i, uid);
-		if (uid == currentUid)
+		mIdCombo->addItem(name);
+		mIdCombo->setItemData(i, QVariant::fromValue<int>(id));
+		if (id == currentValue.mId)
 			currentIndex = i;
 	}
-	widget->setCurrentIndex(currentIndex);
+	mIdCombo->setCurrentIndex(currentIndex);
+}
+
+std::vector<COORDINATE_SYSTEM> SpaceEditWidget::getAvailableSpaceIds()
+{
+	std::vector<COORDINATE_SYSTEM> retval;
+	std::vector<Space> range = mData->getValueRange();
+
+	for (unsigned i=0; i<range.size(); ++i)
+	{
+		if (!count(retval.begin(), retval.end(), range[i].mId))
+			retval.push_back(range[i].mId);
+	}
+
+	return retval;
+}
+
+void SpaceEditWidget::rebuildRefCombobox()
+{
+	mRefCombo->blockSignals(true);
+	mRefCombo->clear();
+
+	Space currentValue = mData->getValue();
+	QStringList refs = this->getAvailableSpaceRefs(currentValue.mId);
+
+	int currentIndex = -1;
+	for (int i = 0; i < refs.size(); ++i)
+	{
+		QString ref = refs[i];
+		QString name = ref;
+
+		mRefCombo->addItem(name);
+		mRefCombo->setItemData(i, ref);
+		if (ref == currentValue.mRefObject)
+			currentIndex = i;
+	}
+	mRefCombo->setCurrentIndex(currentIndex);
+	mRefCombo->setVisible(!refs.empty());
+}
+
+QStringList SpaceEditWidget::getAvailableSpaceRefs(COORDINATE_SYSTEM id)
+{
+	QStringList retval;
+	std::vector<Space> range = mData->getValueRange();
+
+	for (unsigned i=0; i<range.size(); ++i)
+	{
+		if (range[i].mId == id)
+			retval.push_back(range[i].mRefObject);
+	}
+	retval.removeDuplicates();
+	retval.removeAll("");
+
+	return retval;
 }
 
 void SpaceEditWidget::prePaintEvent()
@@ -139,80 +206,15 @@ void SpaceEditWidget::prePaintEvent()
 	mIdCombo->setEnabled(mData->getEnabled());
 	mRefCombo->setEnabled(mData->getEnabled());
 
-	QString currentValue = mData->getValue();
-	std::cout << "currentValue " << currentValue << std::endl;
-	QStringList currentuidlist = this->splitSpace(currentValue); // id+ref for current
-	QStringList range = mData->getValueRange(); // uid for all
+	this->rebuildIdCombobox();
+	this->rebuildRefCombobox();
 
-	std::vector<SpaceData> allSpaces;
-	QStringList allIds;
-	QStringList allRefs;
-
-	for (int i=0; i<range.size(); ++i)
-	{
-		SpaceData space(range[i], mData->convertInternal2Display(range[i]));
-		std::cout << "val ["<<i<<"] " << range[i] << " -- " <<mData->convertInternal2Display(range[i]) << std::endl;
-		allSpaces.push_back(space);
-		allIds.push_back(space.uidlist()[0]);
-		if (space.uidlist()[0] == currentuidlist[0])
-			allRefs.push_back(space.uidlist()[1]);
-	}
-	allIds.removeDuplicates();
-	allRefs.removeDuplicates();
-	allRefs.removeAll("");
-
-	std::cout << "allIds " << allIds.join(" -- ") << std::endl;
-	std::cout << "allRefs " << allRefs.join(" -- ") << std::endl;
-	std::cout << "currentuidlist  " << currentuidlist.join(" -- ") << std::endl;
-
-	mRefCombo->blockSignals(true);
-	mIdCombo->blockSignals(true);
-
-	std::cout << "=== ids " << std::endl;
-	this->rebuildCombobox(mIdCombo, allIds, 0, allSpaces, currentuidlist[0]);
-	std::cout << "=== refs " << std::endl;
-	this->rebuildCombobox(mRefCombo, allRefs, 1, allSpaces, currentuidlist[1]);
-	std::cout << "=== end " << std::endl;
-
-//	int refIndex = -1;
-//	for (int i = 0; i < allRefs.size(); ++i)
-//	{
-//		QString uid = allRefs[i];
-//		QString name = this->getNameForUid(uid, 1, allSpaces);
-
-//		mIdCombo->addItem(name);
-//		mIdCombo->setItemData(i, uid);
-//		if (uid == currentuidlist[1])
-//			refIndex = i;
-//	}
-//	mIdCombo->setCurrentIndex(refIndex);
-
-	mIdCombo->setToolTip(mData->getHelp());
-	mRefCombo->setToolTip(mData->getHelp());
+	mIdCombo->setToolTip(QString("%1\nSet space type").arg(mData->getHelp()));
+	mRefCombo->setToolTip(QString("%1\nSet space identifier").arg(mData->getHelp()));
 	mLabel->setToolTip(mData->getHelp());
 
 	mRefCombo->blockSignals(false);
 	mIdCombo->blockSignals(false);
-}
-
-QStringList SpaceEditWidget::splitSpace(QString name) const
-{
-	QStringList values = name.split("/");
-	if (values.size()==1)
-		values << "";
-	return values;
-}
-
-QString SpaceEditWidget::mergeSpace(QString a, QString b) const
-{
-	std::cout << "!!! set " << a << " -- " << b << std::endl;
-
-	QStringList values;
-	values << a << b;
-	values.removeAll("");
-	QString selected = values.join("/");
-	std::cout << "!!! setted " << selected << std::endl;
-	return selected;
 }
 
 } // namespace cx

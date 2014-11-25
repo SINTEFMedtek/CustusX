@@ -52,6 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxManualTool.h"
 #include "cxLegacySingletons.h"
 #include "cxSpaceProvider.h"
+#include "cxSpaceEditWidget.h"
 
 namespace cx
 {
@@ -100,16 +101,16 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   connect(trackingService()->getManualTool().get(), SIGNAL(toolVisible(bool)), this, SLOT(manualToolChanged()));
   connect(mManualToolWidget, SIGNAL(changed()), this, SLOT(manualToolWidgetChanged()));
 
-  mSpaceSelector = StringDataAdapterXml::initialize("selectSpace",
+  mSpaceSelector = SpaceDataAdapterXml::initialize("selectSpace",
       "Space",
       "Select coordinate system to store position in.",
-      "",
-	  QStringList(),
+	  Space(),
+	  std::vector<Space>(),
       QDomNode());
-  connect(mSpaceSelector.get(), &StringDataAdapterXml::valueWasSet, this, &ToolPropertiesWidget::spacesChangedSlot);
-  connect(mSpaceSelector.get(), &StringDataAdapterXml::valueWasSet, this, &ToolPropertiesWidget::setModified);
-  mSpaceSelector->setValue(spaceProvider()->getPr().toString());
-  manualGroupLayout->addWidget(new LabeledComboBoxWidget(this, mSpaceSelector));
+  connect(mSpaceSelector.get(), &SpaceDataAdapterXml::valueWasSet, this, &ToolPropertiesWidget::spacesChangedSlot);
+  connect(mSpaceSelector.get(), &SpaceDataAdapterXml::valueWasSet, this, &ToolPropertiesWidget::setModified);
+  mSpaceSelector->setValue(spaceProvider()->getPr());
+  manualGroupLayout->addWidget(new SpaceEditWidget(this, mSpaceSelector));
 
   mUSSectorConfigBox = new LabeledComboBoxWidget(this, ActiveProbeConfigurationStringDataAdapter::New());
   mToptopLayout->addWidget(mUSSectorConfigBox);
@@ -157,7 +158,7 @@ void ToolPropertiesWidget::manualToolChanged()
   mManualToolWidget->blockSignals(true);
 
   Transform3D prMt = trackingService()->getManualTool()->get_prMt();
-  CoordinateSystem space_q = CoordinateSystem::fromString(mSpaceSelector->getValue());
+  CoordinateSystem space_q = mSpaceSelector->getValue();
   CoordinateSystem space_mt = spaceProvider()->getTO(trackingService()->getManualTool());
   Transform3D qMt = spaceProvider()->get_toMfrom(space_mt, space_q);
 
@@ -168,7 +169,7 @@ void ToolPropertiesWidget::manualToolChanged()
 void ToolPropertiesWidget::manualToolWidgetChanged()
 {
 	Transform3D qMt = mManualToolWidget->getMatrix();
-  CoordinateSystem space_q = CoordinateSystem::fromString(mSpaceSelector->getValue());
+  CoordinateSystem space_q = mSpaceSelector->getValue();
   CoordinateSystem space_mt = spaceProvider()->getTO(trackingService()->getManualTool());
   CoordinateSystem space_pr = spaceProvider()->getPr();
   Transform3D qMpr = spaceProvider()->get_toMfrom(space_pr, space_q);
@@ -179,15 +180,10 @@ void ToolPropertiesWidget::manualToolWidgetChanged()
 
 void ToolPropertiesWidget::spacesChangedSlot()
 {
-	CoordinateSystem space = CoordinateSystem::fromString(mSpaceSelector->getValue());
+	CoordinateSystem space = mSpaceSelector->getValue();
 
-	std::vector<CoordinateSystem> spaces = spaceProvider()->getSpacesToPresentInGUI();
-	QStringList range;
-	for (unsigned i=0; i<spaces.size(); ++i)
-	  range << spaces[i].toString();
-
-	mSpaceSelector->setValueRange(range);
-	mSpaceSelector->setValue(space.toString());
+	mSpaceSelector->setValueRange(spaceProvider()->getSpacesToPresentInGUI());
+	mSpaceSelector->setValue(space);
 	mSpaceSelector->setHelp(QString("The space q to display tool position in,\n"
 	                                "qMt"));
 	this->setModified();
