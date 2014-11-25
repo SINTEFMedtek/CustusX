@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLegacySingletons.h"
 #include "cxSpaceProvider.h"
 #include "cxPatientModelService.h"
+#include "cxSpaceEditWidget.h"
 
 namespace cx {
 
@@ -63,19 +64,13 @@ QWidget* FrameMetricWrapper::createWidget()
 	topLayout->setMargin(0);
 	topLayout->addLayout(hLayout);
 
-	QString value;// = qstring_cast(mData->getFrame());
-	std::vector<CoordinateSystem> spaces = spaceProvider()->getSpacesToPresentInGUI();
-	QStringList range;
-	for (unsigned i=0; i<spaces.size(); ++i)
-		range << spaces[i].toString();
-
-	mSpaceSelector = StringDataAdapterXml::initialize("selectSpace",
-			"Space",
-			"Select coordinate system to store position in.",
-			value,
-			range,
-			QDomNode());
-	hLayout->addWidget(new LabeledComboBoxWidget(widget, mSpaceSelector));
+	mSpaceSelector = SpaceDataAdapterXml::initialize("selectSpace",
+											  "Space",
+											  "Select coordinate system to store position in.",
+											  Space(),
+											  spaceProvider()->getSpacesToPresentInGUI(),
+											  QDomNode());
+	hLayout->addWidget(new SpaceEditWidget(widget, mSpaceSelector));
 
 	mFrameWidget = new Transform3DWidget(widget);
 	connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
@@ -129,10 +124,9 @@ void FrameMetricWrapper::spaceSelected()
 {
 	if (mInternalUpdate)
 		return;
-	CoordinateSystem space = CoordinateSystem::fromString(mSpaceSelector->getValue());
-	if (space.mId==csCOUNT)
-		return;
-	mData->setSpace(space);
+	CoordinateSystem space = mSpaceSelector->getValue();
+	if (space.isValid())
+		mData->setSpace(space);
 }
 
 void FrameMetricWrapper::dataChangedSlot()
@@ -154,7 +148,7 @@ void FrameMetricWrapper::frameWidgetChangedSlot()
 void FrameMetricWrapper::update()
 {
 	mInternalUpdate = true;
-	mSpaceSelector->setValue(mData->getSpace().toString());
+	mSpaceSelector->setValue(mData->getSpace());
 	mFrameWidget->setMatrix(mData->getFrame());
 	mInternalUpdate = false;
 }

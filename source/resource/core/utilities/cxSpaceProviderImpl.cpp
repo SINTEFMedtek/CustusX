@@ -48,6 +48,10 @@ SpaceProviderImpl::SpaceProviderImpl(TrackingServicePtr trackingService, Patient
 {
 	mTrackingService = trackingService;
 	mDataManager = dataManager;
+
+//	connect(mTrackingService.get(), SIGNAL(stateChanged()), this, SIGNAL(spaceAddedOrRemoved()));
+	connect(mTrackingService.get(), &TrackingService::stateChanged, this, &SpaceProvider::spaceAddedOrRemoved);
+	connect(mDataManager.get(), &PatientModelService::dataAddedOrRemoved, this, &SpaceProvider::spaceAddedOrRemoved);
 }
 
 SpaceListenerPtr SpaceProviderImpl::createListener()
@@ -69,6 +73,23 @@ std::vector<CoordinateSystem> SpaceProviderImpl::getSpacesToPresentInGUI()
 	retval.push_back(CoordinateSystem(csTOOL, "active"));
 	retval.push_back(CoordinateSystem(csSENSOR, "active"));
 	retval.push_back(CoordinateSystem(csTOOL_OFFSET, "active"));
+
+	std::map<QString, DataPtr> data = mDataManager->getData();
+	for (std::map<QString, DataPtr>::iterator i=data.begin(); i!=data.end(); ++i)
+	{
+		retval.push_back(CoordinateSystem(csDATA, i->second->getSpace()));
+		retval.push_back(CoordinateSystem(csDATA_VOXEL, i->second->getSpace()));
+	}
+
+	std::map<QString, ToolPtr> tools = mTrackingService->getTools();
+	for (std::map<QString, ToolPtr>::iterator i=tools.begin(); i!=tools.end(); ++i)
+	{
+		retval.push_back(CoordinateSystem(csTOOL, i->first));
+		retval.push_back(CoordinateSystem(csSENSOR, i->first));
+		retval.push_back(CoordinateSystem(csTOOL_OFFSET, i->first));
+	}
+
+
 
 	return retval;
 }

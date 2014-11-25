@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVector3DDataAdapterXml.h"
 #include "cxColorDataAdapterXml.h"
 #include "cxDoubleDataAdapterXml.h"
+#include "cxSpaceDataAdapterXml.h"
 
 class QVBoxLayout;
 class QTableWidget;
@@ -131,10 +132,10 @@ private slots:
   void dataChangedSlot();
 private:
   QWidget* createSampleButton(QWidget* parent) const;
-  StringDataAdapterXmlPtr createSpaceSelector() const;
+  SpaceDataAdapterXmlPtr createSpaceSelector() const;
   Vector3DDataAdapterXmlPtr createCoordinateSelector() const;
   PointMetricPtr mData;
-  StringDataAdapterXmlPtr mSpaceSelector;
+  SpaceDataAdapterXmlPtr mSpaceSelector;
   Vector3DDataAdapterXmlPtr mCoordinate;
   bool mInternalUpdate;
 };

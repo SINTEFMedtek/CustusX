@@ -74,6 +74,11 @@ void SpaceListenerImpl::doConnect()
 {
 	if (mSpace.mId == csDATA)
 	{
+		if (mSpace.mRefObject == "active")
+		{
+			connect(mDataManager.get(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(reconnect()));
+		}
+
 		DataPtr data = mDataManager->getData(mSpace.mRefObject);
 		if (data)
 		{
@@ -92,7 +97,7 @@ void SpaceListenerImpl::doConnect()
 
 			if (mSpace.mRefObject == "active")
 			{
-				connect(mTrackingService.get(), SIGNAL(dominantToolChanged(const QString&)), this, SIGNAL(changed()));
+//				connect(mTrackingService.get(), SIGNAL(dominantToolChanged(const QString&)), this, SIGNAL(changed()));
 				connect(mTrackingService.get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(reconnect()));
 			}
 			connect(mDataManager.get(), SIGNAL(rMprChanged()), this, SIGNAL(changed()));
