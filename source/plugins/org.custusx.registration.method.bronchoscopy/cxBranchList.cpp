@@ -52,12 +52,12 @@ BranchList::~BranchList()
 		mBranches[i]->~Branch();
 }
 
-void BranchList::addBranch(Branch* b)
+void BranchList::addBranch(BranchPtr b)
 {
 	mBranches.push_back(b);
 }
 
-void BranchList::deleteBranch(Branch* b)
+void BranchList::deleteBranch(BranchPtr b)
 {
 	for( int i = 0; i < mBranches.size(); i++ )
 	{
@@ -69,31 +69,37 @@ void BranchList::deleteBranch(Branch* b)
 	}
 }
 
-std::vector<Branch*> BranchList::getBranches()
+void BranchList::deleteAllBranches()
+{
+	mBranches.clear();
+}
+
+std::vector<BranchPtr> BranchList::getBranches()
 {
 	return mBranches;
 }
 
 void BranchList::selectGenerations(int maxGeneration)
 {
-
+	std::vector<int> branchNumbersToBeDeleted;
 	for( int i = 0; i < mBranches.size(); i++ )
 	{
 		int generationCounter = 1;
-		Branch* currentBranch = mBranches[i];
-		while (true){
-			if (currentBranch->getParentBranch())
+		BranchPtr currentBranch = mBranches[i];
+		while (currentBranch->getParentBranch()){
+			generationCounter++;
+			currentBranch = currentBranch->getParentBranch();
+			if (generationCounter > maxGeneration)
 			{
-				generationCounter++;
-				if (generationCounter <= maxGeneration)
-				{
-					deleteBranch(mBranches[i]);
-				}
-				currentBranch = currentBranch->getParentBranch();
+				branchNumbersToBeDeleted.push_back(i);
+				break;
 			}
 		}
+
 	}
 
+	for ( int i = branchNumbersToBeDeleted.size() - 1; i >= 0; i-- )
+		deleteBranch(mBranches[branchNumbersToBeDeleted[i]]);
 }
 
 
@@ -136,7 +142,7 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions)
 	int index;
 	int splitIndex;
 	Eigen::MatrixXd::Index startIndex;
-	Branch* branchToSplit;
+	BranchPtr branchToSplit;
     while (positionsNotUsed.cols() > 0)
 	{
 		if (!mBranches.empty())
@@ -168,7 +174,7 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions)
 
 		if (branchPositions.cols() >= 5) //only include brances of length >= 5 points
 		{
-			Branch* newBranch = new Branch();
+			BranchPtr newBranch = BranchPtr(new Branch());
 			newBranch->setPositions(branchPositions);
 			mBranches.push_back(newBranch);
 
@@ -179,7 +185,7 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions)
 					//if the new branch is not close to one of the edges of the
 					//connected existing branch: Split the existing branch
 				{
-					Branch* newBranchFromSplit = new Branch();
+					BranchPtr newBranchFromSplit = BranchPtr(new Branch());
 					Eigen::MatrixXd branchToSplitPositions = branchToSplit->getPositions();
 					newBranchFromSplit->setPositions(branchToSplitPositions.rightCols(branchToSplitPositions.cols() - splitIndex - 1));
 					branchToSplit->setPositions(branchToSplitPositions.leftCols(splitIndex + 1));

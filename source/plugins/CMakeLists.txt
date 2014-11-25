@@ -11,6 +11,7 @@ set(CX_PLUGINS
   org.custusx.core.visualization:ON
   org.custusx.core.tracking:ON
   org.custusx.core.video:ON
+  org.custusx.core.state:ON
   org.custusx.dicom:ON
 #  org.custusx.example:OFF
   org.custusx.vnnclreconstruction:ON

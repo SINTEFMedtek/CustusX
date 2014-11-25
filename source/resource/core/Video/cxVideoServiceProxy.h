@@ -45,8 +45,22 @@ namespace cx
 class cxResource_EXPORT VideoServiceProxy : public VideoService
 {
 public:
+	static VideoServicePtr create(ctkPluginContext *pluginContext);
 	VideoServiceProxy(ctkPluginContext *pluginContext);
 	bool isNull();
+
+	virtual void setActiveVideoSource(QString uid);
+	virtual VideoSourcePtr getActiveVideoSource();
+	virtual std::vector<VideoSourcePtr> getVideoSources();
+
+	virtual void setConnectionMethod(QString connectionMethod);
+	virtual QString getConnectionMethod();
+	virtual void openConnection();
+	virtual void closeConnection();
+	virtual bool isConnected() const;
+
+	virtual void setPlaybackMode(PlaybackTimePtr controller);
+	virtual std::vector<TimelineEvent> getPlaybackEvents();
 
 	virtual StreamerService *getStreamerService(QString service);
 	virtual QList<StreamerService *> getStreamerServices();
@@ -54,13 +68,10 @@ private:
 	void initServiceListener();
 	void onVideoServiceAdded(VideoService* service);
 	void onVideoServiceRemoved(VideoService *service);
-	void onStreamerServiceAdded(StreamerService *service);
-	void onStreamerServiceRemoved(StreamerService *service);
 
 	ctkPluginContext *mPluginContext;
 	VideoServicePtr mVideoService;
 	boost::shared_ptr<ServiceTrackerListener<VideoService> > mVideoServiceListener;
-	boost::shared_ptr<ServiceTrackerListener<StreamerService> > mStreamerServiceListener;
 };
 } //cx
 #endif // CXVIDEOSERVICEPROXY_H

@@ -45,8 +45,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTimelineWidget.h"
 #include "cxData.h"
 #include "cxRegistrationTransform.h"
-#include "cxVideoServiceOld.h"
-#include "cxPlaybackUSAcquisitionVideo.h"
+#include "cxVideoService.h"
+//#include "cxPlaybackUSAcquisitionVideo.h"
 #include "cxSettings.h"
 #include "cxPatientModelService.h"
 
@@ -292,7 +292,7 @@ std::vector<TimelineEvent> PlaybackWidget::createEvents()
 	TimelineEventVector current = this->convertRegistrationHistoryToEvents(reg);
 	copy(current.begin(), current.end(), std::back_inserter(events));
 
-	current = videoService()->getUSAcquisitionVideoPlayback()->getEvents();
+	current = videoService()->getPlaybackEvents();
 	copy(current.begin(), current.end(), std::back_inserter(events));
 
 

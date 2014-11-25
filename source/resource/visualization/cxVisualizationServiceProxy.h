@@ -45,14 +45,13 @@ namespace cx
 class cxResourceVisualization_EXPORT VisualizationServiceProxy : public VisualizationService
 {
 public:
+	static VisualizationServicePtr create(ctkPluginContext *pluginContext);
 	VisualizationServiceProxy(ctkPluginContext *pluginContext);
 
 	virtual ViewPtr get3DView(int group = 0, int index = 0);
 
 	virtual int getActiveViewGroup() const;
 	virtual ViewGroupDataPtr getViewGroupData(int groupIdx);
-
-	virtual void setRegistrationMode(REGISTRATION_STATUS mode);
 
 	virtual void autoShowData(DataPtr data);
 	virtual void enableRender(bool val);

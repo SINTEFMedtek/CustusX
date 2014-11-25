@@ -47,18 +47,83 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkImageLuminance.h>
 #include <QFileInfo>
 
+#include "cxStringDataAdapterXml.h"
+#include "cxDoubleDataAdapterXml.h"
+#include "cxBoolDataAdapterXml.h"
+#include "cxDataReaderWriter.h"
+
 namespace cx
 {
 
-vtkImageDataPtr loadImage(QString filename)
+std::vector<DataAdapterPtr> ImageStreamerDummyArguments::getSettings(QDomElement root)
 {
-	vtkMetaImageReaderPtr reader = vtkMetaImageReaderPtr::New();
-	reader->SetFileName(filename.toStdString().c_str());
-	reader->ReleaseDataFlagOn();
-	reader->Update();
-
-	return reader->GetOutput();
+	std::vector<DataAdapterPtr> retval;
+	retval.push_back(this->getFilenameOption(root));
+	retval.push_back(this->getSecondaryOption(root));
+	return retval;
 }
+
+StringDataAdapterPtr ImageStreamerDummyArguments::getFilenameOption(QDomElement root)
+{
+	StringDataAdapterXmlPtr retval;
+	retval = StringDataAdapterXml::initialize("filename", "Filename",
+											  "Select a 3D image file to stream from",
+											  "",
+											  root);
+	retval->setGuiRepresentation(StringDataAdapter::grFILENAME);
+	retval->setGroup("File");
+	return retval;
+}
+
+BoolDataAdapterPtr ImageStreamerDummyArguments::getSecondaryOption(QDomElement root)
+{
+	BoolDataAdapterXmlPtr retval;
+	bool defaultValue = false;
+	retval = BoolDataAdapterXml::initialize("secondary", "Secondary",
+											"Create two streams, the second one a dummy color image",
+											defaultValue, root);
+	retval->setAdvanced(true);
+	retval->setGroup("File");
+	return retval;
+}
+
+StringMap ImageStreamerDummyArguments::convertToCommandLineArguments(QDomElement root)
+{
+	StringMap retval;
+	retval["--type"] = "MHDFile";
+	retval["--filename"] = this->getFilenameOption(root)->getValue();
+	if (this->getSecondaryOption(root)->getValue())
+		retval["--secondary"] = "1";
+	return retval;
+}
+
+QStringList ImageStreamerDummyArguments::getArgumentDescription()
+{
+	QStringList retval;
+	retval << "--filename:		name of image file to stream from ";
+	retval << "--secondary:		Create two streams, the second one a dummy color image";
+	return retval;
+}
+
+} // namespace cx
+
+
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+
+namespace cx
+{
+
+//vtkImageDataPtr loadImage(QString filename)
+//{
+//	vtkMetaImageReaderPtr reader = vtkMetaImageReaderPtr::New();
+//	reader->SetFileName(filename.toStdString().c_str());
+//	reader->ReleaseDataFlagOn();
+//	reader->Update();
+
+//	return reader->GetOutput();
+//}
 
 vtkLookupTablePtr createLookupTable(int numberOfTableValues)
 {
@@ -190,11 +255,13 @@ QString DummyImageStreamer::getType()
 
 vtkImageDataPtr DummyImageStreamer::internalLoadImage(QString filename)
 {
-	vtkImageDataPtr source = loadImage(filename);
+	vtkImageDataPtr source = MetaImageReader().loadVtkImageData(filename);
+
+//	vtkImageDataPtr source = loadImage(filename);
 	if (source)
-		std::cout << "DummyImageStreamer: Initialized with source file: \n\t" << getFileName().toStdString() << std::endl;
+		std::cout << "DummyImageStreamer: Initialized with source file: " << getFileName().toStdString() << std::endl;
 	else
-		std::cout << "DummyImageStreamer: Failed to initialize with source file: \n\t" << getFileName().toStdString() << std::endl;
+		std::cout << "DummyImageStreamer: Failed to initialize with source file: " << getFileName().toStdString() << std::endl;
 
 	return source;
 }
@@ -202,6 +269,12 @@ QString DummyImageStreamer::getFileName()
 {
 	return mFilename;
 }
+
+QStringList DummyImageStreamer::getArgumentDescription()
+{
+	return ImageStreamerDummyArguments().getArgumentDescription();
+}
+
 
 void DummyImageStreamer::createTestDataSource(vtkImageDataPtr source)
 {

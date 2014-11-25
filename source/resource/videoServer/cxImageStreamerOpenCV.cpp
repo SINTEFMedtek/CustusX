@@ -50,14 +50,79 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxCommandlineImageStreamerFactory.h"
 #include "cxStringHelpers.h"
+#include "cxDoubleDataAdapterXml.h"
+#include "cxBoolDataAdapterXml.h"
 
 #ifdef CX_USE_OpenCV
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #endif
 
+namespace cx
+{
+
+std::vector<DataAdapterPtr> ImageStreamerOpenCVArguments::getSettings(QDomElement root)
+{
+	std::vector<DataAdapterPtr> retval;
+	retval.push_back(this->getVideoPortOption(root));
+	retval.push_back(this->getPrintPropertiesOption(root));
+	return retval;
+}
+
+DoubleDataAdapterPtr ImageStreamerOpenCVArguments::getVideoPortOption(QDomElement root)
+{
+	DoubleDataAdapterXmlPtr retval;
+	retval = DoubleDataAdapterXml::initialize("videoport", "Video Port", "Select video source as an integer from 0 and up.", 0, DoubleRange(0, 10, 1), 0, root);
+	retval->setGuiRepresentation(DoubleDataAdapter::grSPINBOX);
+	retval->setGroup("OpenCV");
+	return retval;
+}
+
+BoolDataAdapterPtr ImageStreamerOpenCVArguments::getPrintPropertiesOption(QDomElement root)
+{
+	BoolDataAdapterXmlPtr retval;
+	bool defaultValue = false;
+	retval = BoolDataAdapterXml::initialize("properties", "Print Properties",
+											"When starting OpenCV, print properties to console",
+											defaultValue, root);
+	retval->setAdvanced(true);
+	retval->setGroup("OpenCV");
+	return retval;
+}
+
+StringMap ImageStreamerOpenCVArguments::convertToCommandLineArguments(QDomElement root)
+{
+	StringMap retval;
+	retval["--type"] = "OpenCV";
+	retval["--videoport"] = this->getVideoPortOption(root)->getValueAsVariant().toString();
+	if (this->getPrintPropertiesOption(root)->getValue())
+		retval["--properties"] = "1";
+	return retval;
+}
+
+QStringList ImageStreamerOpenCVArguments::getArgumentDescription()
+{
+	QStringList retval;
+#ifdef CX_USE_OpenCV
+	retval << "--videoport:		video id,     default=0";
+	retval << "--in_width:		width of incoming image, default=camera";
+	retval << "--in_height:		height of incoming image, default=camera";
+	retval << "--out_width:		width of outgoing image, default=camera";
+	retval << "--out_height:		width of outgoing image, default=camera";
+	retval << "--properties:		dump image properties";
+#endif
+	return retval;
+}
+
+} // namespace cx
+
+//------------------------------------------------------------
+//------------------------------------------------------------
+//------------------------------------------------------------
+
 namespace
 {
+
 //------------------------------------------------------------
 // Function to generate random matrix.
 void GetRandomTestMatrix(igtl::Matrix4x4& matrix)
@@ -92,6 +157,7 @@ ImageStreamerOpenCV::ImageStreamerOpenCV() :
 //	mSendTimer(0),
 	mGrabTimer(0)
 {
+	mGrabbing = false;
 	mAvailableImage = false;
 	setSendInterval(40);
 
@@ -116,16 +182,7 @@ QString ImageStreamerOpenCV::getType()
 
 QStringList ImageStreamerOpenCV::getArgumentDescription()
 {
-	QStringList retval;
-#ifdef CX_USE_OpenCV
-	retval << "--videoport:		video id,     default=0";
-	retval << "--in_width:		width of incoming image, default=camera";
-	retval << "--in_height:		height of incoming image, default=camera";
-	retval << "--out_width:		width of outgoing image, default=camera";
-	retval << "--out_height:		width of outgoing image, default=camera";
-	retval << "--properties:		dump image properties";
-#endif
-	return retval;
+	return ImageStreamerOpenCVArguments().getArgumentDescription();
 }
 
 
@@ -137,6 +194,8 @@ void ImageStreamerOpenCV::initialize(StringMap arguments)
 void ImageStreamerOpenCV::deinitialize_local()
 {
 #ifdef CX_USE_OpenCV
+	while (mGrabbing) // grab() method seems to call processmessages itself...
+		qApp->processEvents();
 	mVideoCapture->release();
 	mVideoCapture.reset(new cv::VideoCapture());
 #endif
@@ -144,6 +203,11 @@ void ImageStreamerOpenCV::deinitialize_local()
 
 void ImageStreamerOpenCV::initialize_local()
 {
+//	for (StringMap::iterator i=mArguments.begin(); i!=mArguments.end(); ++i)
+//	{
+//		std::cout << "A: " << i->first << " = " << i->second << std::endl;
+//	}
+
 	if (!mArguments.count("videoport"))
 		mArguments["videoport"] = "0";
 	if (!mArguments.count("out_width"))
@@ -222,6 +286,7 @@ bool ImageStreamerOpenCV::startStreaming(SenderPtr sender)
 	mGrabTimer->start(0);
 	mSendTimer->start(getSendInterval());
 	mCounter.start();
+//	std::cout << "*** ImageStreamerOpenCV: Started" << std::endl;
 
 	return true;
 }
@@ -278,10 +343,12 @@ void ImageStreamerOpenCV::grab()
 	{
 		return;
 	}
+	mGrabbing = true;
 	// grab images from camera to opencv internal buffer, do not process
 	mVideoCapture->grab();
 	mLastGrabTime = QDateTime::currentDateTime();
 	mAvailableImage = true;
+	mGrabbing = false;
 #endif
 }
 

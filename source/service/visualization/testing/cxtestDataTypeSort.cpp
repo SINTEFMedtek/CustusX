@@ -85,7 +85,7 @@ TEST_CASE("Sort cx::Data user-frindly using getPriority()", "[unit][service][vis
 		CHECK(unsorted1[i]==sorted[i]);
 
 	// test cx::ViewGroupData::addDataSorted()
-	cx::VisualizationServiceBackendPtr nullBackend;
+	cx::CoreServicesPtr nullBackend;
 	cx::ViewGroupData vgData(nullBackend);
 	for (unsigned i=0; i<unsorted2.size(); ++i)
 		vgData.addDataSorted(unsorted2[i]);

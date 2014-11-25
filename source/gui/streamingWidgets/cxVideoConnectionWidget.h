@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTransform3D.h"
 #include "cxForwardDeclarations.h"
 #include "cxXmlOptionItem.h"
+#include "cxVisServices.h"
 
 class QPushButton;
 class QComboBox;
@@ -62,6 +63,7 @@ typedef boost::shared_ptr<class VideoConnectionManager> VideoConnectionManagerPt
 typedef boost::shared_ptr<class ActiveVideoSourceStringDataAdapter> ActiveVideoSourceStringDataAdapterPtr;
 typedef boost::shared_ptr<class StringDataAdapterXml> StringDataAdapterXmlPtr;
 typedef boost::shared_ptr<class Tool> ToolPtr;
+typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 
 /**
  * \brief GUI for setting up a connection to a video stream
@@ -78,40 +80,23 @@ class cxGui_EXPORT VideoConnectionWidget : public BaseWidget
   Q_OBJECT
 
 public:
-	VideoConnectionWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, VideoServicePtr newVideoService, QWidget* parent);
+	VideoConnectionWidget(VisServicesPtr services, QWidget* parent);
 	virtual ~VideoConnectionWidget();
 	virtual QString defaultWhatsThis() const;
 
 protected slots:
-	void toggleLaunchServer();
-	void launchServer();
 	void toggleConnectServer();
-	void serverProcessStateChanged(QProcess::ProcessState newState);
 	void serverStatusChangedSlot();
 	void importStreamImageSlot();
 	void selectGuiForConnectionMethodSlot();
-	void initScriptSelected(QString filename);
 	void onServiceAdded(StreamerService *service);
 	void onServiceRemoved(StreamerService *service);
 
 protected:
-	void connectServer();
-	void disconnectServer();
-	void initializeScriptWidget();
 	ActiveVideoSourceStringDataAdapterPtr initializeActiveVideoSourceSelector();
 	QFrame* wrapStackedWidgetInAFrame();
-	void updateHostHistory();
-	void updateDirectLinkArgumentHistory();
-	QProcess* getServerProcess();
-	bool serverIsRunning();
-	VideoConnectionManagerPtr getVideoConnectionManager();
-	void writeSettings();
 	QPushButton* initializeConnectButton();
 	QPushButton* initializeImportStreamImageButton();
-	QStackedWidget* initializeStackedWidget();
-	QWidget* createDirectLinkWidget();
-	QWidget* createLocalServerWidget();
-	QWidget* createRemoteWidget();
 	QWidget* wrapVerticalStretch(QWidget* input);
 	Transform3D calculate_rMd_ForAProbeImage(ToolPtr probe);
 	QString generateFilename(VideoSourcePtr videoSource);
@@ -120,21 +105,16 @@ protected:
 	QPushButton* mConnectButton;
 	QPushButton* mImportStreamImageButton;
 	QVBoxLayout* mToptopLayout;
-	FileInputWidget* mInitScriptWidget;
-	QComboBox* mAddressEdit;
-	QLineEdit* mPortEdit;
-	QLineEdit* mLocalServerArguments;
-	QPushButton* mLaunchServerButton;
-	QComboBox* mDirectLinkArguments;
 	QStackedWidget* mStackedWidget;
 	StringDataAdapterXmlPtr mConnectionSelector;
 	ActiveVideoSourceStringDataAdapterPtr mActiveVideoSourceSelector;
-	FileInputWidget* mLocalServerFile;
 	XmlOptionFile mOptions;
 	DetailedLabeledComboBoxWidget* mConnectionSelectionWidget;
-	VisualizationServicePtr mVisualizationService;
-	PatientModelServicePtr mPatientModelService;
-	VideoServicePtr mVideoService;
+
+//	VisualizationServicePtr mVisualizationService;
+//	PatientModelServicePtr mPatientModelService;
+//	VideoServicePtr mVideoService;
+	VisServicesPtr mServices;
 
 private:
 	QWidget* createStreamerWidget(StreamerService* service);

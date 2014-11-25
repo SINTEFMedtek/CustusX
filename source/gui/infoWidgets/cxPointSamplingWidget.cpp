@@ -125,7 +125,7 @@ void PointSamplingWidget::showEvent(QShowEvent* event)
 {
   QWidget::showEvent(event);
 
-  ViewGroupDataPtr data = viewManager()->getViewGroups()[0]->getData();
+  ViewGroupDataPtr data = viewManager()->getViewGroup(0);
   ViewGroupData::Options options = data->getOptions();
   options.mShowPointPickerProbe = true;
   data->setOptions(options);

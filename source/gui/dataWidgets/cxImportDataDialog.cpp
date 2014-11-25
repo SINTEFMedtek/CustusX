@@ -48,7 +48,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationTransform.h"
 #include "cxImageAlgorithms.h"
 #include "cxImage.h"
-#include "cxStateService.h"
 #include "cxViewManager.h"
 #include "cxVolumeHelpers.h"
 #include "cxImageTF3D.h"

@@ -80,9 +80,9 @@ public:
   TrackingServicePtr getTrackingService();
   SpaceProviderPtr getSpaceProvider();
   PatientModelServicePtr getPatientModelService();
-	VideoServiceOldPtr getVideoServiceOld();
-  VisualizationServiceOldPtr getVisualizationService();
+	VideoServicePtr getVideoService();
 	StateServicePtr getStateService();
+	ViewServicePtr getViewService();
 
 private:
   /**
@@ -97,12 +97,14 @@ private:
 	*/
   void shutdownServices();
 
+  VisualizationServiceOldPtr getVisualizationService();
+
   void createTrackingService();
   void createPatientModelService();
   void createDataService();
   void createDataFactory();
   void createSpaceProvider();
-	void createVideoServiceOld();
+	void createVideoService();
   void createVisualizationService();
   void createStateService();
   void createPluginFramework();
@@ -133,9 +135,10 @@ private:
 
 	PatientModelServicePtr mPatientModelService;
 	TrackingServicePtr mTrackingService;
-	VideoServiceOldPtr mVideoServiceOld;
+	VideoServicePtr mVideoService;
 	VisualizationServiceOldPtr mVisualizationService;
 	StateServicePtr mStateService;
+	ViewServicePtr mViewService;
 
 	PluginFrameworkManagerPtr mPluginFramework;
 };

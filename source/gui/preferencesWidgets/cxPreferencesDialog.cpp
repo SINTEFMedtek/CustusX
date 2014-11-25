@@ -50,9 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxToolConfigureWidget.h"
 #include "cxToolFilterWidget.h"
 #include "cxColorSelectButton.h"
-#include "cxViewWrapper3D.h"
 #include "cxHelperWidgets.h"
-#include "cxApplicationStateMachine.h"
 #include "cxMultiVolume3DRepProducer.h"
 #include "cxPatientModelService.h"
 #include "cxDummyTool.h"
@@ -391,7 +389,7 @@ ToolConfigTab::ToolConfigTab(QWidget* parent) :
   mToolConfigureGroupBox = new ToolConfigureGroupBox(this);
   mToolFilterGroupBox  = new ToolFilterGroupBox(this);
 
-  connect(stateService()->getApplication().get(), SIGNAL(activeStateChanged()), this, SLOT(applicationChangedSlot()));
+  connect(stateService().get(), &StateService::applicationStateChanged, this, &ToolConfigTab::applicationChangedSlot);
 
   connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(globalConfigurationFileChangedSlot(QString)));
 
@@ -456,7 +454,7 @@ void ToolConfigTab::saveParametersSlot()
 
 void ToolConfigTab::applicationChangedSlot()
 {
-  CLINICAL_APPLICATION clinicalApplication = string2enum<CLINICAL_APPLICATION>(stateService()->getApplication()->getActiveStateName());
+  CLINICAL_APPLICATION clinicalApplication = string2enum<CLINICAL_APPLICATION>(stateService()->getApplicationStateName());
   mToolConfigureGroupBox->setClinicalApplicationSlot(clinicalApplication);
   mToolFilterGroupBox->setClinicalApplicationSlot(clinicalApplication);
   mToolFilterGroupBox->setTrackingSystemSlot(tsPOLARIS);

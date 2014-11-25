@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxAcquisitionData.h"
 #include "cxUSAcquisition.h"
 #include "cxUSReconstructInputData.h"
+#include "cxXmlOptionItem.h"
 
 namespace cxtest
 {
@@ -52,9 +53,9 @@ public:
 	~AcquisitionFixture();
 	void initialize();
 	void verify();
+	cx::DataAdapterPtr getOption(QString uid);
 
-	QString mConnectionMethod;
-	QString mAdditionalGrabberArg;
+//	QString mAdditionalGrabberArg;
 	int mNumberOfExpectedStreams;
 
 private slots:
@@ -70,15 +71,20 @@ private slots:
 	void setupVideo();
 	void setupProbe();
 
+protected:
+	cx::XmlOptionFile mOptions;
+
 private:
 	void setUp();
 	void tearDown();
 
+	void initVideo();
 	void verifyFileData(cx::USReconstructInputData data);
 
 	cx::USReconstructInputData mMemOutputData;
 	std::vector<cx::USReconstructInputData> mFileOutputData;
 	QString mAcqDataFilename;
+	QString mConnectionMethod;
 
 	double mRecordDuration; ///< duration of recording in ms.
 	cx::VideoSourcePtr mVideoSource;

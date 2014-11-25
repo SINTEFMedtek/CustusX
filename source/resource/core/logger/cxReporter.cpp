@@ -433,10 +433,14 @@ void Reporter::sendVolatileWithCallerInfo(QString info, const std::string &calle
 
 void Reporter::sendMessage(QString text, MESSAGE_LEVEL messageLevel, int timeout, bool mute, QString sourceLocation)
 {
-	if (!this->isEnabled())
-		return;
-
 	Message message(text, messageLevel, timeout, sourceLocation);
+
+	if (!this->isEnabled())
+	{
+		std::cout << message.getPrintableMessage() << std::endl;
+		return;
+	}
+
 
 	if (messageLevel!=mlVOLATILE)
 	{

@@ -35,10 +35,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxVideoService.h"
 #include "org_custusx_core_video_Export.h"
+#include "cxServiceTrackerListener.h"
+
 class ctkPluginContext;
 
 namespace cx
 {
+typedef boost::shared_ptr<class VideoConnection> VideoConnectionPtr;
+typedef boost::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
 
 /**
  * Implementation of VideoService.
@@ -58,6 +62,59 @@ public:
 	virtual QList<StreamerService *> getStreamerServices();
 
 	virtual bool isNull();
+
+	virtual VideoSourcePtr getActiveVideoSource();
+	virtual void setActiveVideoSource(QString uid);
+	virtual std::vector<VideoSourcePtr> getVideoSources();
+
+	virtual void setPlaybackMode(PlaybackTimePtr controller);
+	virtual std::vector<TimelineEvent> getPlaybackEvents();
+
+	virtual QString getConnectionMethod();
+	virtual void setConnectionMethod(QString connectionMethod);
+	virtual void openConnection();
+	virtual void closeConnection();
+	virtual bool isConnected() const;
+
+private slots:
+	/** Autoselect the active VideoSource
+	  *
+	  * Call when video source configuration has changed. The active
+	  * Video source will automatically be determined by calling
+	  * autoGuessVideoSource().
+	  */
+	void autoSelectActiveVideoSource();
+	void fpsSlot(QString source, int val);
+
+private:
+	/** Find the best guess for active VideoSource
+	  *
+	  * Select from the following in that priority:
+	  *  - playback sources
+	  *  - active probe sources
+	  *  - other probe sources
+	  *  - free sources (not connected to probe)
+	  *  - empty source
+	  *
+	  * Within each group, keep existing active if it already belongs
+	  * to that group.
+	  *
+	  */
+	VideoSourcePtr getGuessForActiveVideoSource(VideoSourcePtr old);
+
+	QString mConnectionMethod;
+	VideoConnectionPtr mVideoConnection;
+
+	VideoSourcePtr mActiveVideoSource;
+	VideoSourcePtr mEmptyVideoSource;
+	USAcquisitionVideoPlaybackPtr mUSAcquisitionVideoPlayback;
+	VideoServiceBackendPtr mBackend;
+
+	void initServiceListener();
+	void onStreamerServiceAdded(StreamerService *service);
+	void onStreamerServiceRemoved(StreamerService *service);
+
+	boost::shared_ptr<ServiceTrackerListener<StreamerService> > mStreamerServiceListener;
 
 private:
 	ctkPluginContext *mContext;

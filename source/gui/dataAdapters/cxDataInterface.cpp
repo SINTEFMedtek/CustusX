@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogger.h"
 #include "cxActiveImageProxy.h"
 #include "cxVideoSource.h"
-#include "cxVideoServiceOld.h"
+#include "cxVideoService.h"
 #include "cxPatientModelService.h"
 #include "cxDominantToolProxy.h"
 

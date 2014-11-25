@@ -65,7 +65,7 @@ typedef boost::shared_ptr<class CyclicActionLogger> CyclicActionLoggerPtr;
 typedef boost::shared_ptr<class CameraStyleInteractor> CameraStyleInteractorPtr;
 typedef boost::shared_ptr<class RenderLoop> RenderLoopPtr;
 typedef boost::shared_ptr<class LayoutRepository> LayoutRepositoryPtr;
-typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServiceBackendPtr;
+typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
 typedef boost::shared_ptr<class Navigation> NavigationPtr;
 typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
 
@@ -129,39 +129,37 @@ class cxVisualizationService_EXPORT ViewManager: public QObject
 {
 Q_OBJECT
 public:
-	static VisualizationServiceOldPtr create(VisualizationServiceBackendPtr backend);
+	static VisualizationServiceOldPtr create(CoreServicesPtr backend);
 	virtual ~ViewManager();
 
 	ViewPtr get3DView(int group = 0, int index = 0);
-	std::vector<ViewGroupPtr> getViewGroups() { return mViewGroups; }
 
-	LayoutData getLayoutData(const QString uid) const; ///< get data for given layout
-	std::vector<QString> getAvailableLayouts() const; ///< get uids of all defined layouts
-	void setLayoutData(const LayoutData& data); ///< add or edit a layout
-	QString generateLayoutUid() const; ///< return an uid not used in present layouts.
-	void deleteLayoutData(const QString uid);
+	virtual ViewGroupDataPtr getViewGroup(int groupIdx) const;
+	unsigned viewGroupCount() const
+	{
+		int count = 0;
+		while(this->getViewGroup(count))
+			++count;
+		return count;
+	}
+	virtual int getActiveViewGroup() const;
+
+	LayoutRepositoryPtr getLayoutRepository();
+
 	QActionGroup* createInteractorStyleActionGroup();
-	bool isCustomLayout(const QString& uid) const;
 	NavigationPtr getNavigation();
-	int findGroupContaining3DViewGivenGuess(int preferredGroup);
 
 	/** Initialize the widget and fill with the default view layout.
 	  * Return the top widget, it should be added to the calling gui.
 	  */
-	void initialize();
+//	void initialize();
 	QWidget* getLayoutWidget(int index=0);
 
 	void enableRender(bool val);
 	bool renderingIsEnabled() const;
 
-	void setRegistrationMode(REGISTRATION_STATUS mode);
-
 	QString getActiveLayout(int widgetIndex=0) const; ///< returns the active layout
 	void setActiveLayout(const QString& uid, int widgetIndex=0); ///< change the layout
-
-	ViewWrapperPtr getActiveView() const; ///< returns the active view
-	int getActiveViewGroup() const;
-	void storeLayoutData(const LayoutData& data);
 
 	InteractiveClipperPtr getClipper();
 	InteractiveCropperPtr getCropper();
@@ -184,18 +182,23 @@ signals:
 
 protected slots:
 	void settingsChangedSlot(QString key);
+	void onLayoutRepositoryChanged(QString uid);
 
 	void updateViews();
 	void updateCameraStyleActions();
 	void setActiveView(QString viewUid);
 
 protected:
-	ViewManager(VisualizationServiceBackendPtr backend);
+	ViewManager(CoreServicesPtr backend);
 
 	void syncOrientationMode(SyncedValuePtr val);
+//	void storeLayoutData(const LayoutData& data);
+	std::vector<ViewGroupPtr> getViewGroups() { return mViewGroups; }
 
 	void activateView(ViewCollectionWidget* widget, LayoutViewData viewData);
 	ViewWrapperPtr createViewWrapper(ViewPtr view, LayoutViewData viewData);
+	int findGroupContaining3DViewGivenGuess(int preferredGroup);
+	QString getActiveView() const; ///< returns the active view
 
 	void setRenderingInterval(int interval);
 	void setSlicePlanesProxyInViewsUpTo2DViewgroup();
@@ -223,7 +226,7 @@ protected:
 	SlicePlanesProxyPtr mSlicePlanesProxy;
 
 	CameraStyleInteractorPtr mCameraStyleInteractor;
-	VisualizationServiceBackendPtr mBackend;
+	CoreServicesPtr mBackend;
 
 private:
 	ViewManager(ViewManager const&);

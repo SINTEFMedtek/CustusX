@@ -47,15 +47,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxSettings.h"
 #include "cxTrackingService.h"
-#include "cxVideoServiceOld.h"
-#include "cxVisualizationServiceBackend.h"
+#include "cxVideoService.h"
+#include "cxCoreServices.h"
 #include "vtkRenderWindowInteractor.h"
 #include "cxTool.h"
+#include "cxVideoSource.h"
 
 namespace cx
 {
 
-ViewWrapperVideo::ViewWrapperVideo(ViewPtr view, VisualizationServiceBackendPtr backend) :
+ViewWrapperVideo::ViewWrapperVideo(ViewPtr view, CoreServicesPtr backend) :
 	ViewWrapper(backend)
 {
 	mView = view;
@@ -68,7 +69,7 @@ ViewWrapperVideo::ViewWrapperVideo(ViewPtr view, VisualizationServiceBackendPtr 
 	mView->getRenderer()->GetActiveCamera()->SetClippingRange(-clipDepth / 2.0, clipDepth / 2.0);
 
 	connect(mBackend->getToolManager().get(), &TrackingService::stateChanged, this, &ViewWrapperVideo::connectStream);
-	connect(mBackend->getVideoServiceOld().get(), SIGNAL(activeVideoSourceChanged()), this, SLOT(connectStream()));
+	connect(mBackend->getVideoService().get(), SIGNAL(activeVideoSourceChanged()), this, SLOT(connectStream()));
 	connect(mBackend->getToolManager().get(), SIGNAL(dominantToolChanged(QString)), this, SLOT(connectStream()));
 
 	addReps();
@@ -105,7 +106,7 @@ void ViewWrapperVideo::appendToContextMenu(QMenu& contextMenu)
 
 //	QActionGroup sourceGroup = new QActionGroup(&contextMenu);
 	QMenu* sourceMenu = new QMenu("Video Source", &contextMenu);
-	std::vector<VideoSourcePtr> sources = mBackend->getVideoServiceOld()->getVideoSources();
+	std::vector<VideoSourcePtr> sources = mBackend->getVideoService()->getVideoSources();
 	this->addStreamAction("active", sourceMenu);
 	for (unsigned i=0; i<sources.size(); ++i)
 		this->addStreamAction(sources[i]->getUid(), sourceMenu);
@@ -194,9 +195,9 @@ void ViewWrapperVideo::connectStream()
 VideoSourcePtr ViewWrapperVideo::getSourceFromService(QString uid)
 {
 	if (uid=="active")
-		return mBackend->getVideoServiceOld()->getActiveVideoSource();
+		return mBackend->getVideoService()->getActiveVideoSource();
 
-	std::vector<VideoSourcePtr> source = mBackend->getVideoServiceOld()->getVideoSources();
+	std::vector<VideoSourcePtr> source = mBackend->getVideoService()->getVideoSources();
 
 	for (unsigned i=0; i< source.size(); ++i)
 	{

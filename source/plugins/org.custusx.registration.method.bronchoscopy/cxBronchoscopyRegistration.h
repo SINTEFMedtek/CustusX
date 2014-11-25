@@ -45,20 +45,28 @@ namespace cx
 {
 
 typedef std::map<double, Transform3D> TimedTransformMap;
+typedef boost::shared_ptr<class BranchList> BranchListPtr;
 
 class BronchoscopyRegistration
 {
+	BranchListPtr mBranchList;
+	bool mCenterlineProcessed;
+
 public:
 	BronchoscopyRegistration();
-	Eigen::Matrix4d runBronchoscopyRegistration(vtkPolyDataPtr centerline, TimedTransformMap trackingData_prMt, Transform3D old_rMpr, Transform3D rMd, int numberOfGenerations = 0);
+	void processCenterline(vtkPolyDataPtr centerline, Transform3D rMd, int numberOfGenerations = 0);
+	Eigen::Matrix4d runBronchoscopyRegistration(TimedTransformMap trackingData_prMt, Transform3D old_rMpr);
+	bool isCenterlineProcessed();
 	virtual ~BronchoscopyRegistration();
 };
 
 M4Vector excludeClosePositions();
-Eigen::Matrix4d registrationAlgorithm(BranchList* branches, M4Vector Tnavigation);
+Eigen::Matrix4d registrationAlgorithm(BranchListPtr branches, M4Vector Tnavigation);
 std::vector<Eigen::MatrixXd::Index> dsearch2n(Eigen::MatrixXd pos1, Eigen::MatrixXd pos2, Eigen::MatrixXd ori1, Eigen::MatrixXd ori2);
 vtkPointsPtr convertTovtkPoints(Eigen::MatrixXd positions);
 Eigen::Matrix4d performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr target, bool* ok);
+std::pair<Eigen::MatrixXd , Eigen::MatrixXd> RemoveInvalidData(Eigen::MatrixXd positionData, Eigen::MatrixXd orientationData);
+M4Vector RemoveInvalidData(M4Vector T_vector);
 }//namespace cx
 
 #endif /* BRONCHOSCOPYREGISTRATION_H_ */

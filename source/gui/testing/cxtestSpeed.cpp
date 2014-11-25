@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewManager.h"
 #include "cxLegacySingletons.h"
 #include "cxMessageListener.h"
+#include "cxVisualizationService.h"
 
 namespace cxtest
 {
@@ -62,7 +63,7 @@ void initTest()
 
 void requireVolumeIn3DScene()
 {
-	RenderTesterPtr renderTester = cxtest::RenderTester::create(cx::viewManager()->get3DView()->getRenderWindow());
+	RenderTesterPtr renderTester = cxtest::RenderTester::create(cx::viewService()->get3DView()->getRenderWindow());
 	vtkImageDataPtr output = renderTester->renderToImage();
 	int numNonZeroPixels = Utilities::getNumberOfNonZeroVoxels(output);
 //	std::cout << "numNonZeroPixels: " << numNonZeroPixels << std::endl;

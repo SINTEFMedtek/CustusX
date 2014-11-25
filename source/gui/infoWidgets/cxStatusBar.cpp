@@ -42,15 +42,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxTrackingService.h"
 #include "cxReporter.h"
-#include "cxVideoConnectionManager.h"
 #include "cxTrackingService.h"
 #include "cxViewManager.h"
-#include "cxVideoServiceOld.h"
+#include "cxVideoService.h"
 #include "boost/bind.hpp"
 #include <QMetaMethod>
 #include "libQtSignalAdapters/Qt2Func.h"
 #include "libQtSignalAdapters/ConnectionFactories.h"
-#include "cxVideoConnection.h"
 #include "cxManualTool.h"
 #include "cxTypeConversions.h"
 #include "cxDefinitionStrings.h"
@@ -77,7 +75,7 @@ StatusBar::StatusBar() :
 	connect(viewManager(), SIGNAL(fps(int)), this, SLOT(renderingFpsSlot(int)));
 
 	connect(videoService().get(), SIGNAL(fps(int)), this, SLOT(grabbingFpsSlot(int)));
-	connect(videoService()->getVideoConnection().get(), SIGNAL(connected(bool)), this, SLOT(grabberConnectedSlot(bool)));
+	connect(videoService().get(), SIGNAL(connected(bool)), this, SLOT(grabberConnectedSlot(bool)));
 
 //	this->addPermanentWidget(mMessageLevelLabel);
 	this->addPermanentWidget(mRenderingFpsLabel);

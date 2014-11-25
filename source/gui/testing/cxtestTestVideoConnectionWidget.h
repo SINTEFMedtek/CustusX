@@ -48,14 +48,15 @@ class TestVideoConnectionWidget : public cx::VideoConnectionWidget
 {
 	Q_OBJECT
 public:
-	TestVideoConnectionWidget(cx::VisualizationServicePtr visualizationService, cx::PatientModelServicePtr patientModelService, cx::VideoServicePtr videoService);
+	TestVideoConnectionWidget(cx::VisServicesPtr services);
 	virtual ~TestVideoConnectionWidget(){}
 
 public:
-	bool canStream(QString filename, QString streamerType);
+	bool canStream(QString filename);
 
 private:
-	void setupWidgetToRunStreamer(QString filename, QString streamerType);
+	void setupWidgetToRunStreamer(QString filename);
+	cx::DataAdapterPtr getOption(QString uid, QString method);
 };
 
 } /* namespace cxtest */

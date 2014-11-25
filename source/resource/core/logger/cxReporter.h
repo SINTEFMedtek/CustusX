@@ -114,6 +114,7 @@ public:
 
   void setLoggingFolder(QString absoluteLoggingFolderPath); // deprecated
   bool setLogFile(QString filename); ///< set a file to write messages to.
+  bool isEnabled() const;
 
   struct Format
   {
@@ -126,8 +127,6 @@ public:
   void setFormat(Format format); ///< fine-tune messaging format
   void setAudioSource(AudioPtr audioSource); ///< define sounds to go with the messages.
   bool hasAudioSource() const;
-  void setEnabled(bool enabled); ///< enable/disable messaging.
-  bool isEnabled() const;
 
   //Text
   void sendInfo(QString info); ///< Used to report normal interesting activity, no sound associated
@@ -179,6 +178,8 @@ private:
   virtual ~Reporter();
   Reporter(const Reporter&);
   Reporter& operator=(const Reporter&);
+
+  void setEnabled(bool enabled); ///< enable/disable messaging.
 
   bool appendToLogfile(QString text);
   void playSound(MESSAGE_LEVEL messageLevel);

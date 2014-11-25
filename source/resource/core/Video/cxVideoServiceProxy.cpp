@@ -42,6 +42,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
+VideoServicePtr VideoServiceProxy::create(ctkPluginContext *pluginContext)
+{
+	return VideoServicePtr(new VideoServiceProxy(pluginContext));
+}
+
 VideoServiceProxy::VideoServiceProxy(ctkPluginContext *pluginContext) :
 	mPluginContext(pluginContext),
 	mVideoService(VideoService::getNullObject())
@@ -58,42 +63,26 @@ void VideoServiceProxy::initServiceListener()
 								 boost::bind(&VideoServiceProxy::onVideoServiceRemoved, this, _1)
 								 ));
 	mVideoServiceListener->open();
-
-	mStreamerServiceListener.reset(new ServiceTrackerListener<StreamerService>(
-							   mPluginContext,
-							   boost::bind(&VideoServiceProxy::onStreamerServiceAdded, this, _1),
-							   boost::function<void (StreamerService*)>(),
-							   boost::bind(&VideoServiceProxy::onStreamerServiceRemoved, this, _1)
-							   ));
-	mStreamerServiceListener->open();
-
 }
+
 void VideoServiceProxy::onVideoServiceAdded(VideoService* service)
 {
 	mVideoService.reset(service, null_deleter());
-//	connect(mVideoService.get(), SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
-//	connect(mVideoService.get(), SIGNAL(movingDataChanged(QString)), this, SIGNAL(movingDataChanged(QString)));
-	if(mVideoService->isNull())
-		reportWarning("VideoServiceProxy::onVideoServiceAdded mVideoService->isNull()");
+
+	connect(service, &VideoService::connected, this, &VideoService::connected);
+	connect(service, &VideoService::connectionMethodChanged, this, &VideoService::connectionMethodChanged);
+	connect(service, &VideoService::activeVideoSourceChanged, this, &VideoService::activeVideoSourceChanged);
+	connect(service, &VideoService::fps, this, &VideoService::fps);
 }
 
 void VideoServiceProxy::onVideoServiceRemoved(VideoService *service)
 {
-//	disconnect(service, SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
-//	disconnect(service, SIGNAL(movingDataChanged(QString)), this, SIGNAL(movingDataChanged(QString)));
+	disconnect(service, &VideoService::connected, this, &VideoService::connected);
+	disconnect(service, &VideoService::connectionMethodChanged, this, &VideoService::connectionMethodChanged);
+	disconnect(service, &VideoService::activeVideoSourceChanged, this, &VideoService::activeVideoSourceChanged);
+	disconnect(service, &VideoService::fps, this, &VideoService::fps);
+
 	mVideoService = VideoService::getNullObject();
-}
-
-void VideoServiceProxy::onStreamerServiceAdded(StreamerService* service)
-{
-//	std::cout << "VideoServiceProxy:: Streamer Service added!!! " << service->getName() << std::endl;
-	emit StreamerServiceAdded(service);
-}
-
-void VideoServiceProxy::onStreamerServiceRemoved(StreamerService *service)
-{
-//	std::cout << "VideoServiceProxy:: Streamer Service removed!!! " << service->getName() << std::endl;
-	emit StreamerServiceRemoved(service);
 }
 
 bool VideoServiceProxy::isNull()
@@ -103,13 +92,66 @@ bool VideoServiceProxy::isNull()
 
 StreamerService *VideoServiceProxy::getStreamerService(QString service)
 {
-	return mStreamerServiceListener->getService(service);
+	return mVideoService->getStreamerService(service);
 }
 
 QList<StreamerService*> VideoServiceProxy::getStreamerServices()
 {
-	return mStreamerServiceListener->getServices();
+	return mVideoService->getStreamerServices();
 }
+
+
+
+void VideoServiceProxy::setActiveVideoSource(QString uid)
+{
+	mVideoService->setActiveVideoSource(uid);
+}
+
+VideoSourcePtr VideoServiceProxy::getActiveVideoSource()
+{
+	return mVideoService->getActiveVideoSource();
+}
+
+std::vector<VideoSourcePtr> VideoServiceProxy::getVideoSources()
+{
+	return mVideoService->getVideoSources();
+}
+
+void VideoServiceProxy::setConnectionMethod(QString connectionMethod)
+{
+	mVideoService->setConnectionMethod(connectionMethod);
+}
+
+QString VideoServiceProxy::getConnectionMethod()
+{
+	return mVideoService->getConnectionMethod();
+}
+
+void VideoServiceProxy::openConnection()
+{
+	mVideoService->openConnection();
+}
+
+void VideoServiceProxy::closeConnection()
+{
+	mVideoService->closeConnection();
+}
+
+bool VideoServiceProxy::isConnected() const
+{
+	return mVideoService->isConnected();
+}
+
+void VideoServiceProxy::setPlaybackMode(PlaybackTimePtr controller)
+{
+	mVideoService->setPlaybackMode(controller);
+}
+
+std::vector<TimelineEvent> VideoServiceProxy::getPlaybackEvents()
+{
+	return mVideoService->getPlaybackEvents();
+}
+
 
 
 } //cx

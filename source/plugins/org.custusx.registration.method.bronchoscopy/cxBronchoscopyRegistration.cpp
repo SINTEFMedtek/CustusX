@@ -46,7 +46,9 @@ namespace cx
 {
 
 
-BronchoscopyRegistration::BronchoscopyRegistration()
+BronchoscopyRegistration::BronchoscopyRegistration():
+	mCenterlineProcessed(false),
+	mBranchList(new BranchList)
 {
 
 }
@@ -237,7 +239,58 @@ Eigen::Matrix4d performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr ta
         return indexVector;
     }
 
-Eigen::Matrix4d registrationAlgorithm(BranchList* branches, M4Vector Tnavigation, Transform3D old_rMpr)
+std::pair<Eigen::MatrixXd , Eigen::MatrixXd> RemoveInvalidData(Eigen::MatrixXd positionData, Eigen::MatrixXd orientationData)
+{
+	std::vector<int> indicesToBeDeleted;
+
+	for (int i = 0; i < fmin(positionData.cols(), orientationData.cols()); i++)
+	{
+		if ( boost::math::isinf( positionData.block(0 , i , 3 , 1).sum() ) || boost::math::isinf( orientationData.block(0 , i , 3 , 1).sum() ) )
+			indicesToBeDeleted.push_back(i);
+		else if (boost::math::isnan( positionData.block(0 , i , 3 , 1).sum() ) || boost::math::isnan( orientationData.block(0 , i , 3 , 1).sum() ))
+			indicesToBeDeleted.push_back(i);
+		else if ( (positionData.block(0 , i , 1 , 1).sum() == 0 && positionData.block(1 , i , 1 , 1).sum() == 0 && positionData.block(2 , i , 1 , 1).sum() == 0) ||
+				  (orientationData.block(0 , i , 1 , 1).sum() == 0 && orientationData.block(1 , i , 1 , 1).sum() == 0 && orientationData.block(2 , i , 1 , 1).sum() == 0))
+			indicesToBeDeleted.push_back(i);
+	}
+
+	for ( int i = indicesToBeDeleted.size() - 1; i >= 0; i-- )
+	{
+		std::cout << "Warning in bronchoscopyRegistration: Removed corrupted data: " << positionData.block(0 , indicesToBeDeleted[i] , 3 , 1) << " " << orientationData.block(0 , indicesToBeDeleted[i] , 3 , 1) << std::endl;
+		positionData = eraseCol(indicesToBeDeleted[i],positionData);
+		orientationData = eraseCol(indicesToBeDeleted[i],orientationData);
+	}
+	return std::make_pair(positionData , orientationData);
+}
+
+M4Vector RemoveInvalidData(M4Vector T_vector)
+{
+	Eigen::Vector3d position;
+	Eigen::Vector3d orientation;
+	std::vector<int> indicesToBeDeleted;
+
+	for (int i = 0; i < T_vector.size(); i++)
+	{
+	position = T_vector[i].topRightCorner(3 , 1);
+	orientation = T_vector[i].block(0 , 2 , 3 , 1);
+	if ( boost::math::isinf( position.sum() ) || boost::math::isinf( orientation.sum() ) )
+		indicesToBeDeleted.push_back(i);
+	else if (boost::math::isnan( position.sum() ) || boost::math::isnan( orientation.sum() ))
+		indicesToBeDeleted.push_back(i);
+	else if ( (position[0] == 0 && position[1] == 0 && position[2] == 0) ||
+			  (orientation[0] == 0 && orientation[1] == 0 && orientation[2] == 0) )
+		indicesToBeDeleted.push_back(i);
+	}
+
+	for ( int i = indicesToBeDeleted.size() - 1; i >= 0; i-- )
+	{
+		std::cout << "Warning in bronchoscopyRegistration: Removed corrupted data: " << T_vector[i].topRightCorner(3 , 1) << " " <<  T_vector[i].block(0 , 2 , 3 , 1) << std::endl;
+		T_vector.erase(T_vector.begin() + indicesToBeDeleted[i]);
+	}
+	return T_vector;
+}
+
+Eigen::Matrix4d registrationAlgorithm(BranchListPtr branches, M4Vector Tnavigation, Transform3D old_rMpr)
 {
 	Eigen::Matrix4d registrationMatrix;
 	Eigen::MatrixXd CTPositions;
@@ -245,7 +298,7 @@ Eigen::Matrix4d registrationAlgorithm(BranchList* branches, M4Vector Tnavigation
 	Eigen::MatrixXd trackingPositions(3 , Tnavigation.size());
 	Eigen::MatrixXd trackingOrientations(3, Tnavigation.size());
 
-	std::vector<Branch*> branchVector = branches->getBranches();
+	std::vector<BranchPtr> branchVector = branches->getBranches();
 	CTPositions = branchVector[0]->getPositions();
 	CTOrientations = branchVector[0]->getOrientations();
 
@@ -261,70 +314,20 @@ Eigen::Matrix4d registrationAlgorithm(BranchList* branches, M4Vector Tnavigation
         CTOrientations.swap(CTOrientationsNew);
     }
 
-    for (int i = 0; i < CTPositions.cols(); i++)  {
-        if (CTPositions.block(0 , i , 1 , 1).sum() == 0 && CTPositions.block(1 , i , 1 , 1).sum() == 0 && CTPositions.block(2 , i , 1 , 1).sum() == 0)
-             std::cout << "CL position number after sorting: " << i << ": " << CTPositions.col(i) << std::endl;
-     }
+	std::pair<Eigen::MatrixXd , Eigen::MatrixXd> qualityCheckedData = RemoveInvalidData(CTPositions, CTOrientations);
+	CTPositions = qualityCheckedData.first;
+	CTOrientations = qualityCheckedData.second;
 
+	for (int i = 0; i < Tnavigation.size(); i++)
+		Tnavigation[i] = old_rMpr * Tnavigation[i];
 
-    for (int i = 1; i < CTPositions.cols(); i++)
-    {
-				if (boost::math::isinf( CTPositions.col(i).sum() ))
-        {
-            std::cout << "Warning in bronchoscopyRegistration: Removed centerline position containing inf number: " << CTPositions.col(i) << std::endl;
-            CTPositions = eraseCol(i,CTPositions);
-            CTOrientations = eraseCol(i,CTOrientations);
-        }
-				else if (boost::math::isnan( CTPositions.col(i).sum() ))
-        {
-            std::cout << "Warning in bronchoscopyRegistration: Removed centerline position containing nan number: " << CTPositions.col(i) << std::endl;
-            CTPositions = eraseCol(i,CTPositions);
-            CTOrientations = eraseCol(i,CTOrientations);
-        }
-        else if (CTPositions.block(0 , i , 1 , 1).sum() == 0 && CTPositions.block(1 , i , 1 , 1).sum() == 0 && CTPositions.block(2 , i , 1 , 1).sum() == 0)
-        {
-            std::cout << "Warning in bronchoscopyRegistration: Removed centerline position at origo: " << CTPositions.col(i) << std::endl;
-            CTPositions = eraseCol(i,CTPositions);
-            CTOrientations = eraseCol(i,CTOrientations);
-        }
+	Tnavigation = RemoveInvalidData(Tnavigation);
 
-    }
-
-
-    int size = Tnavigation.size();
-    for (int i = 0; i < size; i++)
+	for (int i = 0; i < Tnavigation.size(); i++)
 	{
-        Tnavigation[i] = old_rMpr * Tnavigation[i];
 		trackingPositions.block(0 , i , 3 , 1) = Tnavigation[i].topRightCorner(3 , 1);
 		trackingOrientations.block(0 , i , 3 , 1) = Tnavigation[i].block(0 , 2 , 3 , 1);
-
-				if ( boost::math::isinf( trackingOrientations.block(0 , i , 3 , 1).sum() ) || boost::math::isinf( trackingPositions.block(0 , i , 3 , 1).sum() ))
-        {
-            std::cout << "Warning in bronchoscopyRegistration: Removed tool position containing inf number: " << trackingOrientations.block(0 , i , 3 , 1) << std::endl;
-            trackingPositions = eraseCol(i,trackingPositions);
-            trackingOrientations = eraseCol(i,trackingOrientations);
-            --size;
-            --i;
-        }
-				else if (boost::math::isnan( trackingOrientations.block(0 , i , 3 , 1).sum() ) || boost::math::isnan( trackingPositions.block(0 , i , 3 , 1).sum() ))
-        {
-            std::cout << "Warning in bronchoscopyRegistration: Removed tool position containing nan number: " << trackingOrientations.block(0 , i , 3 , 1) << std::endl;
-            trackingPositions = eraseCol(i,trackingPositions);
-            trackingOrientations = eraseCol(i,trackingOrientations);
-            --size;
-            --i;
-        }
-		else if ( (trackingOrientations.block(0 , i , 1 , 1).sum() == 0 && trackingOrientations.block(1 , i , 1 , 1).sum() == 0 && trackingOrientations.block(2 , i , 1 , 1).sum() == 0) ||
-                  (trackingPositions.block(0 , i , 1 , 1).sum() == 0 && trackingPositions.block(1 , i , 1 , 1).sum() == 0 && trackingPositions.block(2 , i , 1 , 1).sum() == 0))
-        {
-            std::cout << "Warning in bronchoscopyRegistration: Removed tool position at origo: " << trackingOrientations.block(0 , i , 3 , 1) << std::endl;
-            trackingPositions = eraseCol(i,trackingPositions);
-            trackingOrientations = eraseCol(i,trackingOrientations);
-            --size;
-            --i;
-        }
 	}
-
 
 	//Adjusting points for centeroids
     Eigen::MatrixXd::Index maxIndex;
@@ -402,9 +405,37 @@ Eigen::Matrix4d registrationAlgorithm(BranchList* branches, M4Vector Tnavigation
 	return registrationMatrix;
 }
 
+void BronchoscopyRegistration::processCenterline(vtkPolyDataPtr centerline, Transform3D rMd, int numberOfGenerations)
+{
+	mBranchList->deleteAllBranches();
+	int N = centerline->GetNumberOfPoints();
+	Eigen::MatrixXd CLpoints(3,N);
+	for(vtkIdType i = 0; i < N; i++)
+		{
+		double p[3];
+		centerline->GetPoint(i,p);
+		Eigen::Vector3d position;
+		position(0) = p[0]; position(1) = p[1]; position(2) = p[2];
+		CLpoints.block(0 , i , 3 , 1) = rMd.coord(position);
+		}
+
+	mBranchList->findBranchesInCenterline(CLpoints);
+	if (numberOfGenerations != 0)
+	{
+		mBranchList->selectGenerations(numberOfGenerations);
+	}
+	mBranchList->calculateOrientations();
+	mBranchList->smoothOrientations();
+
+	//std::vector<BranchPtr> BL = mBranchList->getBranches();
+	std::cout << "Number of branches in CT centerline: " << mBranchList->getBranches().size() << std::endl;
+
+	mCenterlineProcessed = true;
+
+}
 
 
-Eigen::Matrix4d BronchoscopyRegistration::runBronchoscopyRegistration(vtkPolyDataPtr centerline, TimedTransformMap trackingData_prMt, Transform3D old_rMpr, Transform3D rMd, int numberOfGenerations)
+Eigen::Matrix4d BronchoscopyRegistration::runBronchoscopyRegistration(TimedTransformMap trackingData_prMt, Transform3D old_rMpr)
 {
 
     if(trackingData_prMt.empty())
@@ -416,39 +447,13 @@ Eigen::Matrix4d BronchoscopyRegistration::runBronchoscopyRegistration(vtkPolyDat
 		Tnavigation.push_back(iter->second.	matrix());
 	}
 
-
     //vtkPointsPtr points = centerline->GetPoints();
-
-	int N = centerline->GetNumberOfPoints();
-    Eigen::MatrixXd CLpoints(3,N);
-	for(vtkIdType i = 0; i < N; i++)
-	    {
-	    double p[3];
-		centerline->GetPoint(i,p);
-        Eigen::Vector3d position;
-        position(0) = p[0]; position(1) = p[1]; position(2) = p[2];
-        CLpoints.block(0 , i , 3 , 1) = rMd.coord(position);
-	    }
 
 	Tnavigation = excludeClosePositions(Tnavigation);
 
-	BranchList* branches = new BranchList();
-	branches->findBranchesInCenterline(CLpoints);
-	if (numberOfGenerations != 0)
-	{
-		branches->selectGenerations(numberOfGenerations);
-	}
-	branches->calculateOrientations();
-	branches->smoothOrientations();
-
-    Eigen::Matrix4d regMatrix = registrationAlgorithm(branches, Tnavigation, old_rMpr);
+	Eigen::Matrix4d regMatrix = registrationAlgorithm(mBranchList, Tnavigation, old_rMpr);
 
 	Eigen::Matrix4d regMatrixForCustusX = regMatrix;
-
-	std::vector<Branch*> BL = branches->getBranches();
-
-    std::cout << "Number of branches in CT centerline: " << BL.size() << std::endl;
-
 
 		if ( boost::math::isnan(regMatrixForCustusX.sum()) )
     {
@@ -467,9 +472,14 @@ Eigen::Matrix4d BronchoscopyRegistration::runBronchoscopyRegistration(vtkPolyDat
             std::cout << regMatrixForCustusX.row(i) << std::endl;
 
 	return regMatrixForCustusX;
-
-
 }
+
+
+bool BronchoscopyRegistration::isCenterlineProcessed()
+{
+	return mCenterlineProcessed;
+}
+
 
 BronchoscopyRegistration::~BronchoscopyRegistration()
 {

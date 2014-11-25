@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QApplication>
 
 #include "catch.hpp"
+#include "cxDataAdapter.h"
 
 TEST_CASE_METHOD(cxtest::AcquisitionFixture, "Acquisition: Create fixture", "[integration][modules][Acquisition][not_win32]")
 {
@@ -46,9 +47,9 @@ TEST_CASE_METHOD(cxtest::AcquisitionFixture, "Acquisition: Create fixture", "[in
   */
 TEST_CASE_METHOD(cxtest::AcquisitionFixture, "Acquisition: Stream one MDHSource from LocalServer and save to disk", "[integration][modules][Acquisition][not_win32]")
 {
-	this->mConnectionMethod = "Local Server";
 	this->mNumberOfExpectedStreams = 1;
 	this->initialize();
+	this->getOption("runlocalserver")->setValueFromVariant(true);
 	QTimer::singleShot(20*1000,   qApp, SLOT(quit()) );
 	qApp->exec();
 	this->verify();
@@ -59,9 +60,10 @@ TEST_CASE_METHOD(cxtest::AcquisitionFixture, "Acquisition: Stream one MDHSource 
   */
 TEST_CASE_METHOD(cxtest::AcquisitionFixture, "Acquisition: Stream one MDHSource from DirectLink and save to disk", "[integration][modules][Acquisition][not_win32]")
 {
-	this->mConnectionMethod = "Direct Link";
 	this->mNumberOfExpectedStreams = 1;
 	this->initialize();
+	this->getOption("runlocalserver")->setValueFromVariant(false);
+
 	QTimer::singleShot(20*1000,   qApp, SLOT(quit()) );
 	qApp->exec();
 	this->verify();
@@ -72,10 +74,11 @@ TEST_CASE_METHOD(cxtest::AcquisitionFixture, "Acquisition: Stream one MDHSource 
   */
 TEST_CASE_METHOD(cxtest::AcquisitionFixture, "Acquisition: Stream two MDHSources from DirectLink and save to disk", "[integration][modules][Acquisition][not_win32]")
 {
-	this->mConnectionMethod = "Direct Link";
-	this->mAdditionalGrabberArg = "--secondary";
 	this->mNumberOfExpectedStreams = 2;
 	this->initialize();
+	this->getOption("runlocalserver")->setValueFromVariant(false);
+	this->getOption("secondary")->setValueFromVariant(true);
+
 	QTimer::singleShot(20*1000,   qApp, SLOT(quit()) );
 	qApp->exec();
 	this->verify();

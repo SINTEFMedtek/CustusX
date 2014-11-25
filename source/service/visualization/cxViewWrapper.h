@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
 #include "cxViewGroupData.h"
+#include "cxSyncedValue.h"
 
 typedef vtkSmartPointer<class vtkPolyDataAlgorithm> vtkPolyDataAlgorithmPtr;
 class QMenu;
@@ -51,7 +52,7 @@ namespace cx
 {
 
 typedef boost::shared_ptr<class CameraData> CameraDataPtr;
-typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServiceBackendPtr;
+typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
 
 /**
  * \file
@@ -59,32 +60,6 @@ typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServic
  * @{
  */
 
-///**Define a priority for the input data.
-// * High means display on top, low means in the back.
-// */
-//int getPriority(DataPtr data);
-
-///**Sorts DataPtr in default display ordering, using getPriority().
-// */
-//bool dataTypeSort(const DataPtr data1, const DataPtr data2);
-
-typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
-
-class cxVisualizationService_EXPORT SyncedValue: public QObject
-{
-Q_OBJECT
-public:
-	SyncedValue(QVariant val = QVariant());
-	static SyncedValuePtr create(QVariant val = QVariant());
-	void set(QVariant val);
-	QVariant get() const;
-	template<class T>
-	T value() const { return this->get().value<T>(); }
-private:
-	QVariant mValue;
-signals:
-	void changed();
-};
 
 typedef boost::shared_ptr<class DataViewPropertiesInteractor> DataViewPropertiesInteractorPtr;
 /** Provide an action list for showing data in views.
@@ -94,7 +69,7 @@ class cxVisualizationService_EXPORT DataViewPropertiesInteractor : public QObjec
 {
 	Q_OBJECT
 public:
-	DataViewPropertiesInteractor(VisualizationServiceBackendPtr backend, ViewGroupDataPtr groupData);
+	DataViewPropertiesInteractor(CoreServicesPtr backend, ViewGroupDataPtr groupData);
 	void addDataActions(QWidget* parent);
 	void setDataViewProperties(DataViewProperties properties);
 
@@ -102,7 +77,7 @@ private slots:
 	void dataActionSlot();
 private:
 	void addDataAction(QString uid, QWidget* parent);
-	VisualizationServiceBackendPtr mBackend;
+	CoreServicesPtr mBackend;
 	ViewGroupDataPtr mGroupData;
 	DataViewProperties mProperties;
 
@@ -141,14 +116,14 @@ protected slots:
 	virtual void videoSourceChangedSlot(QString uid) {}
 
 protected:
-	ViewWrapper(VisualizationServiceBackendPtr backend);
+	ViewWrapper(CoreServicesPtr backend);
 
 	void connectContextMenu(ViewPtr view);
 	virtual void appendToContextMenu(QMenu& contextMenu) = 0;
 	QStringList getAllDataNames(DataViewProperties properties) const;
 
 	ViewGroupDataPtr mGroupData;
-	VisualizationServiceBackendPtr mBackend;
+	CoreServicesPtr mBackend;
 	DataViewPropertiesInteractorPtr mDataViewPropertiesInteractor;
 	DataViewPropertiesInteractorPtr mShow3DSlicesInteractor;
 

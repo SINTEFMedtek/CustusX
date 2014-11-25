@@ -62,9 +62,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVideoConnectionWidget.h"
 #include "cxAudioImpl.h"
 #include "cxSettings.h"
-#include "cxVideoConnectionManager.h"
 #include "cxToolManagerWidget.h"
-#include "cxVideoServiceOld.h"
+#include "cxVideoService.h"
 #include "cxExportDataDialog.h"
 #include "cxGPUImageBuffer.h"
 #include "cxData.h"
@@ -77,9 +76,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxEraserWidget.h"
 #include "cxSamplerWidget.h"
 #include "cxDataAdapterHelper.h"
-#include "cxVideoConnection.h"
-#include "cxWorkflowStateMachine.h"
-#include "cxApplicationStateMachine.h"
 #include "cxConfig.h"
 #include "cxVLCRecorder.h"
 #include "cxSecondaryViewLayoutWindow.h"
@@ -111,10 +107,11 @@ MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
 	stylesheet.open(QIODevice::ReadOnly);
 	qApp->setStyleSheet(stylesheet.readAll());
 
+	mServices = VisServices::create(logicManager()->getPluginContext());
 	mCameraControl = viewManager()->getCameraControl();
 	mLayoutInteractor.reset(new LayoutInteractor());
 
-	viewManager()->initialize();
+//	viewManager()->initialize();
 	this->setCentralWidget(viewManager()->getLayoutWidget(0));
 
 	this->createActions();
@@ -125,28 +122,21 @@ MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
 	reporter()->setLoggingFolder(DataLocations::getRootConfigPath());
 	reporter()->setAudioSource(AudioPtr(new AudioImpl()));
 
-	connect(stateService()->getApplication().get(), SIGNAL(activeStateChanged()), this,
-		SLOT(onApplicationStateChangedSlot()));
-	connect(stateService()->getWorkflow().get(), SIGNAL(activeStateChanged()), this, SLOT(onWorkflowStateChangedSlot()));
-	connect(stateService()->getWorkflow().get(), SIGNAL(activeStateAboutToChange()), this, SLOT(saveDesktopSlot()));
+	connect(stateService().get(), &StateService::applicationStateChanged, this, &MainWindow::onApplicationStateChangedSlot);
+	connect(stateService().get(), &StateService::workflowStateChanged, this, &MainWindow::onWorkflowStateChangedSlot);
+	connect(stateService().get(), &StateService::workflowStateAboutToChange, this, &MainWindow::saveDesktopSlot);
 
 	this->updateWindowTitle();
 
 	this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
 
-	ctkPluginContext *pluginContext = LogicManager::getInstance()->getPluginContext();
-
-	mPatientModelService = PatientModelServicePtr(new PatientModelServiceProxy(pluginContext));
-	mVisualizationService = VisualizationServicePtr(new VisualizationServiceProxy(pluginContext));
-	mVideoService = VideoServicePtr(new VideoServiceProxy(pluginContext));
-
 	this->addAsDockWidget(new PlaybackWidget(this), "Browsing");
-	this->addAsDockWidget(new VideoConnectionWidget(mVisualizationService, mPatientModelService, mVideoService, this), "Utility");
+	this->addAsDockWidget(new VideoConnectionWidget(mServices, this), "Utility");
 	this->addAsDockWidget(new EraserWidget(this), "Properties");
-	this->addAsDockWidget(new MetricWidget(mVisualizationService, mPatientModelService, this), "Utility");
-	this->addAsDockWidget(new SlicePropertiesWidget(mPatientModelService, mVisualizationService, this), "Properties");
-	this->addAsDockWidget(new VolumePropertiesWidget(mPatientModelService, mVisualizationService, this), "Properties");
-	this->addAsDockWidget(new MeshInfoWidget(mPatientModelService, mVisualizationService, this), "Properties");
+	this->addAsDockWidget(new MetricWidget(mServices->visualizationService, mServices->patientModelService, this), "Utility");
+	this->addAsDockWidget(new SlicePropertiesWidget(mServices->patientModelService, mServices->visualizationService, this), "Properties");
+	this->addAsDockWidget(new VolumePropertiesWidget(mServices->patientModelService, mServices->visualizationService, this), "Properties");
+	this->addAsDockWidget(new MeshInfoWidget(mServices->patientModelService, mServices->visualizationService, this), "Properties");
 	this->addAsDockWidget(new TrackPadWidget(this), "Utility");
 	this->addAsDockWidget(new ToolPropertiesWidget(this), "Properties");
 	this->addAsDockWidget(new NavigationWidget(this), "Properties");
@@ -270,13 +260,6 @@ void MainWindow::onPluginBaseRemoved(GUIExtenderService* service)
 {
 	this->removeGUIExtender(service);
 }
-
-///**Parse the command line and load a patient if the switch --patient is found
-// */
-//void MainWindow::startupLoadPatient()
-//{
-//	patientService()->startupLoadPatient();
-//}
 
 void MainWindow::dockWidgetVisibilityChanged(bool val)
 {
@@ -443,8 +426,8 @@ void MainWindow::createActions()
 	mShowPointPickerAction->setIcon(QIcon(":/icons/point_picker.png"));
 	connect(mShowPointPickerAction, SIGNAL(triggered()), this, SLOT(togglePointPickerActionSlot()));
 
-	connect(viewManager()->getViewGroups()[0]->getData().get(), SIGNAL(optionsChanged()), this,
-//	connect(mVisualizationService->getViewGroupData(0).get(), SIGNAL(optionsChanged()), this, //Too early?
+	connect(viewManager()->getViewGroup(0).get(), SIGNAL(optionsChanged()), this,
+//	connect(mServices->visualizationService->getViewGroupData(0).get(), SIGNAL(optionsChanged()), this, //Too early?
 		SLOT(updatePointPickerActionSlot()));
 	this->updatePointPickerActionSlot();
 
@@ -461,7 +444,7 @@ void MainWindow::createActions()
 	mStartStreamingAction = new QAction(tr("Start Streaming"), mToolsActionGroup);
 	mStartStreamingAction->setShortcut(tr("Ctrl+V"));
 	connect(mStartStreamingAction, SIGNAL(triggered()), this, SLOT(toggleStreamingSlot()));
-	connect(videoService()->getVideoConnection().get(), SIGNAL(connected(bool)), this, SLOT(updateStreamingActionSlot()));
+	connect(videoService().get(), &VideoService::connected, this, &MainWindow::updateStreamingActionSlot);
 	this->updateStreamingActionSlot();
 
 	mConfigureToolsAction->setChecked(true);
@@ -576,15 +559,15 @@ void MainWindow::saveScreenShotThreaded(QImage pixmap, QString filename)
 
 void MainWindow::toggleStreamingSlot()
 {
-	if (videoService()->getVideoConnection()->isConnected())
-		videoService()->getVideoConnection()->disconnectServer();
+	if (videoService()->isConnected())
+		videoService()->closeConnection();
 	else
-		videoService()->getVideoConnection()->launchAndConnectServer(mVideoService);
+		videoService()->openConnection();
 }
 
 void MainWindow::updateStreamingActionSlot()
 {
-	if (videoService()->getVideoConnection()->isConnected())
+	if (videoService()->isConnected())
 	{
 		mStartStreamingAction->setIcon(QIcon(":/icons/streaming_green.png"));
 		mStartStreamingAction->setText("Stop Streaming");
@@ -602,9 +585,9 @@ void MainWindow::centerToImageCenterSlot()
 
 	if (patientService()->getActiveImage())
 		nav->centerToData(patientService()->getActiveImage());
-	else if (!viewManager()->getViewGroups().empty())
-		nav->centerToView(viewManager()->getViewGroups()[0]->getData()->getData());
-//		nav->centerToView(mVisualizationService->getViewGroupData(0)->getData());//Too early?
+	else if (!viewManager()->viewGroupCount())
+		nav->centerToView(viewManager()->getViewGroup(0)->getData());
+//		nav->centerToView(mServices->visualizationService->getViewGroupData(0)->getData());//Too early?
 	else
 		nav->centerToGlobalDataCenter();
 }
@@ -617,16 +600,16 @@ void MainWindow::centerToTooltipSlot()
 
 void MainWindow::togglePointPickerActionSlot()
 {
-	ViewGroupDataPtr data = viewManager()->getViewGroups()[0]->getData();
-//	ViewGroupDataPtr data = mVisualizationService->getViewGroupData(0); //Too early?
+	ViewGroupDataPtr data = viewManager()->getViewGroup(0);
+//	ViewGroupDataPtr data = mServices->visualizationService->getViewGroupData(0); //Too early?
 	ViewGroupData::Options options = data->getOptions();
 	options.mShowPointPickerProbe = !options.mShowPointPickerProbe;
 	data->setOptions(options);
 }
 void MainWindow::updatePointPickerActionSlot()
 {
-	bool show = viewManager()->getViewGroups()[0]->getData()->getOptions().mShowPointPickerProbe;
-//	bool show = mVisualizationService->getViewGroupData(0)->getOptions().mShowPointPickerProbe;//TOO early?
+	bool show = viewManager()->getViewGroup(0)->getOptions().mShowPointPickerProbe;
+//	bool show = mServices->visualizationService->getViewGroupData(0)->getOptions().mShowPointPickerProbe;//TOO early?
 	mShowPointPickerAction->setChecked(show);
 }
 
@@ -719,10 +702,7 @@ void MainWindow::onApplicationStateChangedSlot()
 
 void MainWindow::updateWindowTitle()
 {
-	QString appName;
-	if (stateService()->getApplication())
-		appName = stateService()->getApplication()->getActiveStateName();
-
+	QString appName = stateService()->getApplicationStateName();
 	QString versionName = stateService()->getVersionName();
 
 	QString activePatientFolder = patientService()->getActivePatientFolder();
@@ -803,7 +783,7 @@ void MainWindow::exportDataSlot()
 {
 	this->savePatientFileSlot();
 
-	ExportDataDialog* wizard = new ExportDataDialog(mPatientModelService, this);
+	ExportDataDialog* wizard = new ExportDataDialog(mServices->patientModelService, this);
 	wizard->exec(); //calling exec() makes the wizard dialog modal which prevents other user interaction with the system
 }
 
@@ -827,7 +807,7 @@ void MainWindow::importDataSlot()
 
 	for (int i=0; i<fileName.size(); ++i)
 	{
-		ImportDataDialog* wizard = new ImportDataDialog(mPatientModelService, fileName[i], this);
+		ImportDataDialog* wizard = new ImportDataDialog(mServices->patientModelService, fileName[i], this);
 		wizard->exec(); //calling exec() makes the wizard dialog modal which prevents other user interaction with the system
 	}
 }
@@ -871,14 +851,20 @@ void MainWindow::createMenus()
 
 	//workflow
 	this->menuBar()->addMenu(mWorkflowMenu);
-	stateService()->getWorkflow()->fillMenu(mWorkflowMenu);
-
-	QList<QAction *> actions = mWorkflowMenu->actions();
-	for (int i = 1; i <= actions.size(); ++i)
+	QList<QAction*> actions = stateService()->getWorkflowActions()->actions();
+	for (int i=0; i<actions.size(); ++i)
 	{
-		QString shortcut = "Ctrl+" + QString::number(i);
-		actions[i - 1]->setShortcut(shortcut);
+		mWorkflowMenu->addAction(actions[i]);
 	}
+
+//	stateService()->getWorkflow()->fillMenu(mWorkflowMenu);
+
+//	QList<QAction *> actions = mWorkflowMenu->actions();
+//	for (int i = 1; i <= actions.size(); ++i)
+//	{
+//		QString shortcut = "Ctrl+" + QString::number(i);
+//		actions[i - 1]->setShortcut(shortcut);
+//	}
 	mWorkflowMenu->addSeparator();
 	mWorkflowMenu->addAction(mSaveDesktopAction);
 	mWorkflowMenu->addAction(mResetDesktopAction);
@@ -940,7 +926,14 @@ void MainWindow::createToolBars()
 
 	mWorkflowToolBar = addToolBar("Workflow");
 	mWorkflowToolBar->setObjectName("WorkflowToolBar");
-	stateService()->getWorkflow()->fillToolBar(mWorkflowToolBar);
+
+	QList<QAction*> actions = stateService()->getWorkflowActions()->actions();
+	for (int i=0; i<actions.size(); ++i)
+	{
+		mWorkflowToolBar->addAction(actions[i]);
+	}
+
+//	stateService()->getWorkflow()->fillToolBar(mWorkflowToolBar);
 	this->registerToolBar(mWorkflowToolBar, "Toolbar");
 
 	mDesktopToolBar = addToolBar("Desktop");
@@ -971,7 +964,7 @@ void MainWindow::createToolBars()
 
 	QToolBar* toolOffsetToolBar = addToolBar("Tool Offset");
 	toolOffsetToolBar->setObjectName("ToolOffsetToolBar");
-	toolOffsetToolBar->addWidget(createDataWidget(mVisualizationService, mPatientModelService, this, DoubleDataAdapterActiveToolOffset::create()));
+	toolOffsetToolBar->addWidget(createDataWidget(mServices->visualizationService, mServices->patientModelService, this, DoubleDataAdapterActiveToolOffset::create()));
 	this->registerToolBar(toolOffsetToolBar, "Toolbar");
 }
 
@@ -1013,7 +1006,7 @@ void MainWindow::aboutSlot()
 
 void MainWindow::preferencesSlot()
 {
-	PreferencesDialog prefDialog(mVisualizationService, mPatientModelService, this);
+	PreferencesDialog prefDialog(mServices->visualizationService, mServices->patientModelService, this);
 	prefDialog.exec();
 }
 
@@ -1039,7 +1032,7 @@ void MainWindow::deleteDataSlot()
 	QString text = QString("Do you really want to delete data %1?").arg(patientService()->getActiveImage()->getName());
 	if (QMessageBox::question(this, "Data delete", text, QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel))!=QMessageBox::Ok)
 		return;
-	mPatientModelService->removeData(patientService()->getActiveImage()->getUid());
+	mServices->patientModelService->removeData(patientService()->getActiveImage()->getUid());
 }
 
 void MainWindow::configureSlot()

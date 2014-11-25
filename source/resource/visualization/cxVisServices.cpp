@@ -35,6 +35,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx {
 
+VisServicesPtr VisServices::create(ctkPluginContext* context)
+{
+	return VisServicesPtr(new VisServices(context));
+}
+
 VisServices::VisServices(ctkPluginContext* context) :
 	CoreServices(context)
 {

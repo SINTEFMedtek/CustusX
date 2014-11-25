@@ -547,10 +547,9 @@ void DataViewSelectionWidget::viewGroupChangedSlot()
   if (vg<0)
     vg = 0;
 
-  if (( vg>=0 )&&( vg<int(viewManager()->getViewGroups().size()) ))
-  {
-    mSelectedDataListWidget->setViewGroupData(viewManager()->getViewGroups()[vg]->getData());
-  }
+  ViewGroupDataPtr group = viewManager()->getViewGroup(vg);
+  if (group)
+	  mSelectedDataListWidget->setViewGroupData(group);
 
   mVisibleLabel->setText("Visible in group "+qstring_cast(vg));
 }

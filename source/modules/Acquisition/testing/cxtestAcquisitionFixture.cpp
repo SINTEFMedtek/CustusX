@@ -37,8 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxDummyTool.h"
 #include "cxDataLocations.h"
-#include "cxVideoServiceOld.h"
-#include "cxVideoConnectionManager.h"
 #include "cxLogger.h"
 #include "cxUSFrameData.h"
 #include "cxUsReconstructionFileReader.h"
@@ -47,11 +45,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxProbeImpl.h"
 #include "cxTrackingService.h"
 #include "cxLogicManager.h"
-#include "cxStateService.h"
 #include "cxLegacySingletons.h"
 #include "cxVideoService.h"
 #include "cxUsReconstructionServiceProxy.h"
 #include "cxPatientModelService.h"
+#include "cxStreamerServiceUtilities.h"
+#include "cxVideoSource.h"
 
 
 namespace cxtest
@@ -73,6 +72,7 @@ AcquisitionFixture::AcquisitionFixture(QObject* parent) :
 	mRecordDuration(3000)
 {
 	this->setUp();
+	mOptions = cx::XmlOptionFile(cx::DataLocations::getXmlSettingsFile()).descend("video");
 	mNumberOfExpectedStreams = 1;
 }
 
@@ -81,23 +81,34 @@ AcquisitionFixture::~AcquisitionFixture()
 	this->tearDown();
 }
 
+cx::DataAdapterPtr AcquisitionFixture::getOption(QString uid)
+{
+	QDomElement element = mOptions.getElement("video");
+	cx::StreamerService* streamer;
+	streamer = cx::StreamerServiceUtilities::getStreamerService(mConnectionMethod,
+																cx::logicManager()->getPluginContext());
+	REQUIRE(streamer);
+	cx::DataAdapterPtr option = cx::DataAdapter::findAdapter(streamer->getSettings(element), uid);
+	REQUIRE(option.get());
+	return option;
+}
+
+void AcquisitionFixture::initVideo()
+{
+	mConnectionMethod = "ImageFile";
+	cx::videoService()->setConnectionMethod(mConnectionMethod);
+	INFO("bundle path: "+cx::DataLocations::getBundlePath());
+
+	this->getOption("filename")->setValueFromVariant(mAcqDataFilename);
+	mOptions.save();
+}
+
+
 void AcquisitionFixture::setupVideo()
 {
-	SSC_LOG("");
-	cx::videoService()->getVideoConnection()->setConnectionMethod(mConnectionMethod);
-	INFO("bundle path: "+cx::DataLocations::getBundlePath());
-	REQUIRE(!cx::stateService()->getOpenIGTLinkServer().isEmpty());
-	cx::videoService()->getVideoConnection()->setLocalServerExecutable(cx::stateService()->getOpenIGTLinkServer()[0]);
-	cx::videoService()->getVideoConnection()->setLocalServerArguments(
-				QString("%1 --type MHDFile --filename %2 %3").arg(cx::stateService()->getOpenIGTLinkServer()[1]).arg(mAcqDataFilename).arg(mAdditionalGrabberArg));
 	mVideoSource = cx::videoService()->getActiveVideoSource();
 	connect(mVideoSource.get(), SIGNAL(newFrame()), this, SLOT(newFrameSlot()));
-
-	cx::videoService()->getVideoConnection()->setReconnectInterval(3000); // on slow build servers, a long delay is necessary.
-
-
-	cx::VideoServicePtr videoService = cx::VideoService::getNullObject(); //mock
-	cx::videoService()->getVideoConnection()->launchAndConnectServer(videoService);
+	cx::videoService()->openConnection();
 }
 
 void AcquisitionFixture::setupProbe()
@@ -138,13 +149,15 @@ void AcquisitionFixture::initialize()
 
 	// run setup of video, probe and start acquisition in series, each depending on the success of the previous:
 	QTimer::singleShot(0, this, SLOT(setupVideo()));
-	connect(cx::videoService()->getVideoConnection().get(), SIGNAL(connected(bool)), this, SLOT(videoConnectedSlot()));
+	connect(cx::videoService().get(), SIGNAL(connected(bool)), this, SLOT(videoConnectedSlot()));
 	connect(cx::trackingService().get(), &cx::TrackingService::stateChanged, this, &AcquisitionFixture::start);
+
+	this->initVideo();
 }
 
 void AcquisitionFixture::videoConnectedSlot()
 {
-	SSC_LOG("");
+//	SSC_LOG("");
 
 	// make sure all sources have started streaming before running probe setup (there might be several sources)
 	if (cx::videoService()->getVideoSources().size() < mNumberOfExpectedStreams)
@@ -186,16 +199,12 @@ void AcquisitionFixture::readinessChangedSlot()
 
 void AcquisitionFixture::acquisitionDataReadySlot()
 {
-	SSC_LOG("");
-
 	// read data and print info - this if the result of the memory pathway
 	mMemOutputData = mAcquisitionData->getReconstructer()->getSelectedFileData();
 }
 
 void AcquisitionFixture::saveDataCompletedSlot(QString path)
 {
-	SSC_LOG("");
-
 	// this is the last step: quit when finished
 	if (!mAcquisition->getNumberOfSavingThreads())
 		QTimer::singleShot(100,   qApp, SLOT(quit()) );

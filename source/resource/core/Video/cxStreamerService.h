@@ -50,7 +50,7 @@ namespace cx
 // The smart pointer can still be used if StreamerService is coming from another source than a ctk plugin
 typedef boost::shared_ptr<class StreamerService> StreamerServicePtr;
 typedef boost::shared_ptr<class Streamer> StreamerPtr;
-//typedef boost::shared_ptr<class DataAdapter> DataAdapterPtr;
+typedef boost::shared_ptr<class Receiver> ReceiverPtr;
 
 /**
  * \brief Abstract class. Interface to Streamers
@@ -72,6 +72,9 @@ public:
 	 *  On completion, the root is filled with default values for settings.
 	 */
 	virtual std::vector<DataAdapterPtr> getSettings(QDomElement root) = 0;
+	/**
+	 * Return a streamer that can emit image data.
+	 */
 	virtual StreamerPtr createStreamer(QDomElement root) = 0;
 };
 

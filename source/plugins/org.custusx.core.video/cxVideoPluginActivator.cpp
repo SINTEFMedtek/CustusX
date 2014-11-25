@@ -37,6 +37,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxVideoImplService.h"
 #include "cxRegisteredService.h"
+#include "cxIGTLinkStreamerService.h"
+#include "cxOpenCVStreamerService.h"
+#include "cxImageFileStreamerService.h"
 
 namespace cx
 {
@@ -52,11 +55,17 @@ VideoPluginActivator::~VideoPluginActivator()
 void VideoPluginActivator::start(ctkPluginContext* context)
 {
 	mRegistration = RegisteredService::create<VideoImplService>(context, VideoService_iid);
+	mIGTLinkStreamer = RegisteredService::create<IGTLinkStreamerService>(context, StreamerService_iid);
+	mOpenCVStreamer = RegisteredService::create<OpenCVStreamerService>(context, StreamerService_iid);
+	mImageFileStreamer = RegisteredService::create<ImageFileStreamerService>(context, StreamerService_iid);
 }
 
 void VideoPluginActivator::stop(ctkPluginContext* context)
 {
+	mIGTLinkStreamer.reset();
 	mRegistration.reset();
+	mOpenCVStreamer.reset();
+	mImageFileStreamer.reset();
 	Q_UNUSED(context);
 }
 

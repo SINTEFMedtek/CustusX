@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkForwardDeclarations.h"
 #include "cxTransform3D.h"
 #include "cxForwardDeclarations.h"
+#include "cxDefinitions.h"
 
 #include <QDateTime>
 class QDomNode;
@@ -58,13 +59,13 @@ typedef boost::weak_ptr<class Rep> RepWeakPtr;
 typedef boost::shared_ptr<class RegistrationHistory> RegistrationHistoryPtr;
 typedef boost::shared_ptr<class Landmarks> LandmarksPtr;
 
-/**Denotes the various states
- * of registration an object is in.
- */
-enum cxResource_EXPORT REGISTRATION_STATUS
-{
-	rsNOT_REGISTRATED, rsIMAGE_REGISTRATED, rsPATIENT_REGISTRATED
-};
+///**Denotes the various states
+// * of registration an object is in.
+// */
+//enum cxResource_EXPORT REGISTRATION_STATUS
+//{
+//	rsNOT_REGISTRATED, rsIMAGE_REGISTRATED, rsPATIENT_REGISTRATED
+//};
 
 /**\brief Superclass for all data objects.
  *

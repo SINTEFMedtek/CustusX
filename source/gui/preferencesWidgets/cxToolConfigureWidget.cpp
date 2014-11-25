@@ -45,7 +45,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSelectionGroupBox.h"
 #include "cxToolListWidget.h"
 #include "cxDataLocations.h"
-#include "cxApplicationStateMachine.h"
 #include "cxTrackerConfiguration.h"
 
 namespace cx
@@ -65,7 +64,7 @@ ToolConfigureGroupBox::ToolConfigureGroupBox(QWidget* parent) :
   //mConfigFilesComboBox->setMinimumSize(200, 0);
   //mConfigFilesComboBox->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
-  mApplicationGroupBox = new SelectionGroupBox("Applications", stateService()->getApplication()->getAllApplicationNames(), Qt::Vertical, true, NULL);
+  mApplicationGroupBox = new SelectionGroupBox("Applications", stateService()->getAllApplicationStateNames(), Qt::Vertical, true, NULL);
   mApplicationGroupBox->setEnabledButtons(false); //< application application is determined by the application state chosen elsewhere in the system
   mApplicationGroupBox->hide(); // large and redundant box - info is only used for path generation, which can be found in the "Save Path" box
   mApplicationGroupBox->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Expanding);
@@ -73,7 +72,7 @@ ToolConfigureGroupBox::ToolConfigureGroupBox(QWidget* parent) :
   mTrackingSystemGroupBox = new SelectionGroupBox("Tracking systems", config->getSupportedTrackingSystems(), Qt::Horizontal, true, NULL);
   mToolListWidget = new ConfigToolListWidget(NULL);
 
-  this->setClinicalApplicationSlot(string2enum<CLINICAL_APPLICATION>(stateService()->getApplication()->getActiveStateName()));
+  this->setClinicalApplicationSlot(string2enum<CLINICAL_APPLICATION>(stateService()->getApplicationStateName()));
 
   QGroupBox* toolGroupBox = new QGroupBox();
   toolGroupBox->setTitle("Tools");

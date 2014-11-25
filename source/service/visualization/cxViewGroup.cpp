@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxManualTool.h"
 #include "cxVolumeHelpers.h"
 #include "cxTypeConversions.h"
-#include "cxVisualizationServiceBackend.h"
+#include "cxCoreServices.h"
 #include "cxCameraStyle.h"
 #include "cxPatientModelService.h"
 
@@ -60,7 +60,7 @@ namespace cx
 {
 
 
-ViewGroup::ViewGroup(VisualizationServiceBackendPtr backend)
+ViewGroup::ViewGroup(CoreServicesPtr backend)
 {
 	mBackend = backend;
 	mCameraStyle.reset(new CameraStyle(mBackend));

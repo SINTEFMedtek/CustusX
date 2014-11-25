@@ -51,9 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataAdapterHelper.h"
 #include "cxDataLocations.h"
 #include "cxDataInterface.h"
-#include "cxVideoConnectionManager.h"
 #include "cxImageServer.h"
-#include "cxVideoServiceOld.h"
 #include "cxTrackingService.h"
 #include "cxViewManager.h"
 #include "cxFileInputWidget.h"
@@ -62,35 +60,31 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVideoService.h"
 #include "cxPatientModelService.h"
 #include "cxDetailedLabeledComboBoxWidget.h"
+#include "cxStreamerService.h"
+#include "cxVideoSource.h"
+#include "cxVisServices.h"
+#include "cxVisualizationService.h"
 
-//TODO: remove
-#include "cxLegacySingletons.h"
-#include "cxLogicManager.h"
+////TODO: remove
+//#include "cxLegacySingletons.h"
+//#include "cxLogicManager.h"
 
 namespace cx
 {
 
-VideoConnectionWidget::VideoConnectionWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, VideoServicePtr newVideoService, QWidget* parent) :
+VideoConnectionWidget::VideoConnectionWidget(VisServicesPtr services, QWidget* parent) :
 	BaseWidget(parent, "IGTLinkWidget", "Video Connection"),
-	mVisualizationService(visualizationService),
-	mPatientModelService(patientModelService),
-	mVideoService(newVideoService)
+	mServices(services)
 {
-	mInitScriptWidget=NULL;
-
 	mOptions = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("video");
 
-	QStringList connectionOptions;
-	QString defaultConnection = this->getVideoConnectionManager()->getConnectionMethod();
-	connectionOptions << "Local Server" << "Direct Link" << "Remote Server";
-	mConnectionSelector = StringDataAdapterXml::initialize("Connection", "", "Method for connecting to Video Server", defaultConnection, connectionOptions, mOptions.getElement("video"));
+	QString defaultConnection = mServices->videoService->getConnectionMethod();
+	mConnectionSelector = StringDataAdapterXml::initialize("Connection", "", "Method for connecting to Video Server", defaultConnection, QStringList(), mOptions.getElement("video"));
 	connect(mConnectionSelector.get(), SIGNAL(changed()), this, SLOT(selectGuiForConnectionMethodSlot()));
 
-	connect(this->getVideoConnectionManager().get(), SIGNAL(connected(bool)), this, SLOT(serverStatusChangedSlot()));
-	connect(this->getServerProcess(), SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(serverProcessStateChanged(QProcess::ProcessState)));
+	connect(mServices->videoService.get(), &VideoService::connected, this, &VideoConnectionWidget::serverStatusChangedSlot);
 
-	this->initializeScriptWidget();
-	mStackedWidget = this->initializeStackedWidget();
+	mStackedWidget = new QStackedWidget(this);
 	QFrame* frame = this->wrapStackedWidgetInAFrame();
 	mConnectButton = this->initializeConnectButton();
 	mImportStreamImageButton = this->initializeImportStreamImageButton();
@@ -98,7 +92,6 @@ VideoConnectionWidget::VideoConnectionWidget(VisualizationServicePtr visualizati
 	mConnectionSelectionWidget = new DetailedLabeledComboBoxWidget(this, mConnectionSelector);
 
 	mToptopLayout = new QVBoxLayout(this);
-	mToptopLayout->addWidget(mInitScriptWidget);
 	mToptopLayout->addWidget(mConnectionSelectionWidget);
 	mToptopLayout->addWidget(frame);
 	mToptopLayout->addWidget(mConnectButton);
@@ -106,8 +99,8 @@ VideoConnectionWidget::VideoConnectionWidget(VisualizationServicePtr visualizati
 	mToptopLayout->addWidget(sscCreateDataWidget(this, mActiveVideoSourceSelector));
 	mToptopLayout->addStretch();
 
-	connect(mVideoService.get(), SIGNAL(StreamerServiceAdded(StreamerService*)), this, SLOT(onServiceAdded(StreamerService*)));
-	connect(mVideoService.get(), SIGNAL(StreamerServiceRemoved(StreamerService*)), this, SLOT(onServiceRemoved(StreamerService*)));
+	connect(mServices->videoService.get(), SIGNAL(StreamerServiceAdded(StreamerService*)), this, SLOT(onServiceAdded(StreamerService*)));
+	connect(mServices->videoService.get(), SIGNAL(StreamerServiceRemoved(StreamerService*)), this, SLOT(onServiceRemoved(StreamerService*)));
 
 	this->addExistingStreamerServices(); //Need to add StreamerServices already existing at this point, since we will only get signals when new Services are added
 
@@ -116,16 +109,16 @@ VideoConnectionWidget::VideoConnectionWidget(VisualizationServicePtr visualizati
 
 VideoConnectionWidget::~VideoConnectionWidget()
 {
-	if (mVideoService)
+	if (mServices->videoService)
 	{
-		disconnect(mVideoService.get(), SIGNAL(StreamerServiceAdded(StreamerService*)), this, SLOT(onServiceAdded(StreamerService*)));
-		disconnect(mVideoService.get(), SIGNAL(StreamerServiceRemoved(StreamerService*)), this, SLOT(onServiceRemoved(StreamerService*)));
+		disconnect(mServices->videoService.get(), SIGNAL(StreamerServiceAdded(StreamerService*)), this, SLOT(onServiceAdded(StreamerService*)));
+		disconnect(mServices->videoService.get(), SIGNAL(StreamerServiceRemoved(StreamerService*)), this, SLOT(onServiceRemoved(StreamerService*)));
 	}
 }
 
 void VideoConnectionWidget::addExistingStreamerServices()
 {
-	QList<StreamerService *> services = mVideoService->getStreamerServices();
+	QList<StreamerService *> services = mServices->videoService->getStreamerServices();
 	foreach(StreamerService* service, services)
 	{
 		this->onServiceAdded(service);
@@ -148,7 +141,7 @@ QWidget* VideoConnectionWidget::createStreamerWidget(StreamerService* service)
 	QDomElement element = mOptions.getElement("video");
 	std::vector<DataAdapterPtr> adapters = service->getSettings(element);
 
-	OptionsWidget* widget = new OptionsWidget(mVisualizationService, mPatientModelService, this);
+	OptionsWidget* widget = new OptionsWidget(mServices->visualizationService, mServices->patientModelService, this);
 	widget->setOptions(serviceName, adapters, false);
 
 	connect(mConnectionSelectionWidget, SIGNAL(detailsTriggered()), widget, SLOT(toggleAdvanced()));
@@ -173,7 +166,6 @@ void VideoConnectionWidget::addServiceToSelector(QString name)
 void VideoConnectionWidget::removeServiceFromSelector(QString name)
 {
 	QStringList range = mConnectionSelector->getValueRange();
-//	range.removeAll(name);
 	int index = range.indexOf(name);
 	if(mConnectionSelector->getValue() == name)
 		mConnectionSelector->setValue(range[0]);
@@ -187,17 +179,6 @@ void VideoConnectionWidget::removeServiceWidget(QString name)
 	mStackedWidget->removeWidget(serviceWidget);
 	delete serviceWidget;
 	mStreamerServiceWidgets.erase(name);
-}
-
-void VideoConnectionWidget::initializeScriptWidget()
-{
-	mInitScriptWidget = new FileInputWidget(this);
-	mInitScriptWidget->setDescription("Init script");
-	mInitScriptWidget->setBasePath(DataLocations::getBundlePath());
-	mInitScriptWidget->setFilename(getVideoConnectionManager()->getInitScript());
-	mInitScriptWidget->setHelp("A script that will be run prior to starting the server. Useful for grabber-specific initialization");
-	mInitScriptWidget->setBrowseHelp("Select an init script");
-	mInitScriptWidget->setUseRelativePath(true);
 }
 
 ActiveVideoSourceStringDataAdapterPtr VideoConnectionWidget::initializeActiveVideoSourceSelector()
@@ -216,60 +197,6 @@ QFrame* VideoConnectionWidget::wrapStackedWidgetInAFrame()
 	return frame;
 }
 
-void VideoConnectionWidget::initScriptSelected(QString filename)
-{
-	getVideoConnectionManager()->setInitScript(filename);
-}
-
-QWidget* VideoConnectionWidget::createDirectLinkWidget()
-{
-	QWidget* retval = new QWidget();
-	QGridLayout* layout = new QGridLayout(retval);
-	layout->setMargin(0);
-	layout->addWidget(new QLabel("Arguments", this), 0, 0);
-	mDirectLinkArguments = new QComboBox(this);
-	mDirectLinkArguments->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLengthWithIcon);
-	mDirectLinkArguments->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-	mDirectLinkArguments->setEditable(true);
-	mDirectLinkArguments->setInsertPolicy(QComboBox::InsertAtTop);
-	mDirectLinkArguments->setToolTip(ImageServer::getArgumentHelpText(""));
-	this->updateDirectLinkArgumentHistory();
-	layout->addWidget(mDirectLinkArguments, 0, 1);
-	return retval;
-}
-
-QWidget* VideoConnectionWidget::createLocalServerWidget()
-{
-	QWidget* retval = new QWidget();
-	QGridLayout* layout = new QGridLayout(retval);
-	layout->setMargin(0);
-	int line=0;
-
-	mLocalServerFile = new FileInputWidget(this);
-	mLocalServerFile->setDescription("Local Server");
-	mLocalServerFile->setBasePath(DataLocations::getBundlePath());
-	mLocalServerFile->setUseRelativePath(true);
-	mLocalServerFile->setFilename(getVideoConnectionManager()->getLocalServerExecutable());
-	mLocalServerFile->setHelp(ImageServer::getArgumentHelpText("<executable>"));
-	mLocalServerFile->setBrowseHelp("Select a local server application");
-	layout->addWidget(mLocalServerFile, line, 0, 1, 2);
-
-	++line;
-	layout->addWidget(new QLabel("Arguments", this), line, 0);
-	mLocalServerArguments = new QLineEdit(this);
-	mLocalServerArguments->setToolTip(ImageServer::getArgumentHelpText("<executable>"));
-	mLocalServerArguments->setText(getVideoConnectionManager()->getLocalServerArguments());
-	layout->addWidget(mLocalServerArguments, line, 1);
-
-	++line;
-	mLaunchServerButton = new QPushButton("Launch Local Server", this);
-	connect(mLaunchServerButton, SIGNAL(clicked()), this, SLOT(toggleLaunchServer()));
-	mLaunchServerButton->setToolTip("Launch/Close the selected server without connecting to it.");
-	layout->addWidget(mLaunchServerButton, line, 0, 2, 0);
-
-	return retval;
-}
-
 QWidget* VideoConnectionWidget::wrapVerticalStretch(QWidget* input)
 {
 	QWidget* retval = new QWidget(this);
@@ -278,26 +205,6 @@ QWidget* VideoConnectionWidget::wrapVerticalStretch(QWidget* input)
 	layout->addStretch();
 	layout->setMargin(0);
 	layout->setSpacing(0);
-	return retval;
-}
-
-QWidget* VideoConnectionWidget::createRemoteWidget()
-{
-	QWidget* retval = new QWidget();
-	QGridLayout* layout = new QGridLayout(retval);
-	layout->setMargin(0);
-	layout->addWidget(new QLabel("IP Address", this), 0, 0);
-	mAddressEdit = new QComboBox(this);
-	mAddressEdit->setEditable(true);
-	mAddressEdit->setInsertPolicy(QComboBox::InsertAtTop);
-	mAddressEdit->setToolTip("Enter TCP/IP address of remote host the Video Server resides on");
-	this->updateHostHistory();
-	layout->addWidget(mAddressEdit, 0, 1);
-	layout->addWidget(new QLabel("Port number", this), 1, 0);
-	mPortEdit = new QLineEdit(this);
-	mPortEdit->setText(QString::number(getVideoConnectionManager()->getPort()));
-	mPortEdit->setToolTip("Enter TCP/IP port that the video server is listening to");
-	layout->addWidget(mPortEdit, 1, 1);
 	return retval;
 }
 
@@ -310,115 +217,23 @@ QString VideoConnectionWidget::defaultWhatsThis() const
 			"</html>";
 }
 
-QProcess* VideoConnectionWidget::getServerProcess()
-{
-	return this->getVideoConnectionManager()->getLocalVideoServerProcess();
-}
-
-bool VideoConnectionWidget::serverIsRunning()
-{
-	bool isRunning = (this->getServerProcess()) && (this->getServerProcess()->state() == QProcess::Running);
-	return isRunning;
-}
-
-VideoConnectionManagerPtr VideoConnectionWidget::getVideoConnectionManager()
-{
-	return videoService()->getVideoConnection();
-}
-
 void VideoConnectionWidget::selectGuiForConnectionMethodSlot()
 {
 	QString name = mConnectionSelector->getValue();
 	//Need to set connection method in VideoConneectionManager before calling useDirectLink(), useLocalServer() and useRemoteServer()
-	this->getVideoConnectionManager()->setConnectionMethod(mConnectionSelector->getValue());
+	mServices->videoService->setConnectionMethod(mConnectionSelector->getValue());
 
-	if (this->getVideoConnectionManager()->useDirectLink())
-		mStackedWidget->setCurrentIndex(0);
-	else if (this->getVideoConnectionManager()->useLocalServer())
-		mStackedWidget->setCurrentIndex(1);
-	else if(this->getVideoConnectionManager()->useRemoteServer())
-		mStackedWidget->setCurrentIndex(2);
-	else
-	{
-		QWidget* serviceWidget = mStreamerServiceWidgets[name];
-		if(serviceWidget)
-			mStackedWidget->setCurrentWidget(serviceWidget);
-	}
-}
-
-void VideoConnectionWidget::updateHostHistory()
-{
-	mAddressEdit->blockSignals(true);
-	mAddressEdit->clear();
-	mAddressEdit->addItems(this->getVideoConnectionManager()->getHostHistory());
-	mAddressEdit->blockSignals(false);
-}
-
-void VideoConnectionWidget::updateDirectLinkArgumentHistory()
-{
-	mDirectLinkArguments->blockSignals(true);
-	mDirectLinkArguments->clear();
-	mDirectLinkArguments->addItems(getVideoConnectionManager()->getDirectLinkArgumentHistory());
-	mDirectLinkArguments->blockSignals(false);
-}
-
-void VideoConnectionWidget::launchServer()
-{
-	this->writeSettings();
-	this->getVideoConnectionManager()->launchServer();
-}
-
-void VideoConnectionWidget::toggleLaunchServer()
-{
-	if (this->serverIsRunning())
-		this->getServerProcess()->close();
-	else
-		this->launchServer();
-}
-
-void VideoConnectionWidget::serverProcessStateChanged(QProcess::ProcessState newState)
-{
-	if (newState == QProcess::Running)
-		mLaunchServerButton->setText("Close Local Server");
-
-	if (newState == QProcess::NotRunning)
-		mLaunchServerButton->setText("Launch Local Server");
-
-	if (newState == QProcess::Starting)
-		mLaunchServerButton->setText("Starting...");
+	QWidget* serviceWidget = mStreamerServiceWidgets[name];
+	if(serviceWidget)
+		mStackedWidget->setCurrentWidget(serviceWidget);
 }
 
 void VideoConnectionWidget::toggleConnectServer()
 {
-	if (!this->getVideoConnectionManager()->isConnected())
-		this->connectServer();
+	if (mServices->videoService->isConnected())
+		mServices->videoService->closeConnection();
 	else
-		this->disconnectServer();
-}
-
-void VideoConnectionWidget::writeSettings()
-{
-	this->getVideoConnectionManager()->setInitScript(mInitScriptWidget->getFilename());
-
-	//Need to set connection method in VideoConneectionManager before calling useDirectLink(), useLocalServer() and useRemoteServer()
-	this->getVideoConnectionManager()->setConnectionMethod(mConnectionSelector->getValue());
-
-	if (this->getVideoConnectionManager()->useDirectLink())
-	{
-		this->getVideoConnectionManager()->setLocalServerArguments(mDirectLinkArguments->currentText());
-		this->updateDirectLinkArgumentHistory();
-	}
-	else if (this->getVideoConnectionManager()->useLocalServer())
-	{
-		this->getVideoConnectionManager()->setLocalServerExecutable(mLocalServerFile->getFilename());
-		this->getVideoConnectionManager()->setLocalServerArguments(mLocalServerArguments->text());
-	}
-	else if (this->getVideoConnectionManager()->useRemoteServer())
-	{
-		this->getVideoConnectionManager()->setHost(mAddressEdit->currentText());
-		this->getVideoConnectionManager()->setPort(mPortEdit->text().toInt());
-		this->updateHostHistory();
-	}
+		mServices->videoService->openConnection();
 }
 
 QPushButton* VideoConnectionWidget::initializeConnectButton()
@@ -439,34 +254,10 @@ QPushButton* VideoConnectionWidget::initializeImportStreamImageButton()
 	return importstreamimagebutton;
 }
 
-QStackedWidget* VideoConnectionWidget::initializeStackedWidget()
-{
-	QStackedWidget* stackedWidget = new QStackedWidget(this);
-	stackedWidget->addWidget(this->wrapVerticalStretch(this->createDirectLinkWidget()));
-	stackedWidget->addWidget(this->wrapVerticalStretch(this->createLocalServerWidget()));
-	stackedWidget->addWidget(this->wrapVerticalStretch(this->createRemoteWidget()));
-
-	return stackedWidget;
-}
-
-void VideoConnectionWidget::connectServer()
-{
-	if (!this->getVideoConnectionManager()->isConnected())
-	{
-		this->writeSettings();
-		this->getVideoConnectionManager()->launchAndConnectServer(mVideoService, mConnectionSelector->getValue());
-	}
-}
-
-void VideoConnectionWidget::disconnectServer()
-{
-	this->getVideoConnectionManager()->disconnectServer();
-}
-
 void VideoConnectionWidget::serverStatusChangedSlot()
 {
-	mImportStreamImageButton->setEnabled(this->getVideoConnectionManager()->isConnected());
-	if (this->getVideoConnectionManager()->isConnected())
+	mImportStreamImageButton->setEnabled(mServices->videoService->isConnected());
+	if (mServices->videoService->isConnected())
 		mConnectButton->setText("Disconnect Server");
 	else
 		mConnectButton->setText("Connect Server");
@@ -476,18 +267,13 @@ void VideoConnectionWidget::serverStatusChangedSlot()
 
 void VideoConnectionWidget::importStreamImageSlot()
 {
-	if (!this->getVideoConnectionManager())
-	{
-		reportWarning("No video connection");
-		return;
-	}
-	if (!this->getVideoConnectionManager()->isConnected())
+	if (!mServices->videoService->isConnected())
 	{
 		reportWarning("Video is not connected");
 		return;
 	}
 	Transform3D rMd = Transform3D::Identity();
-	ToolPtr probe = trackingService()->getFirstProbe();
+	ToolPtr probe = mServices->trackingService->getFirstProbe();
 	VideoSourcePtr videoSource;
 	if (probe)
 	{
@@ -495,7 +281,7 @@ void VideoConnectionWidget::importStreamImageSlot()
 		rMd = calculate_rMd_ForAProbeImage(probe);
 	}
 	else
-		videoSource = videoService()->getActiveVideoSource();
+		videoSource = mServices->videoService->getActiveVideoSource();
 
 	if (!videoSource)
 	{
@@ -524,7 +310,7 @@ void VideoConnectionWidget::importStreamImageSlot()
 Transform3D VideoConnectionWidget::calculate_rMd_ForAProbeImage(ToolPtr probe)
 {
 	Transform3D rMd = Transform3D::Identity();
-	Transform3D rMpr = mPatientModelService->get_rMpr();
+	Transform3D rMpr = mServices->patientModelService->get_rMpr();
 	Transform3D prMt = probe->get_prMt();
 	Transform3D tMu = probe->getProbe()->getSector()->get_tMu();
 	Transform3D uMv = probe->getProbe()->getSector()->get_uMv();
@@ -552,12 +338,12 @@ void VideoConnectionWidget::saveAndImportSnapshot(vtkImageDataPtr input, QString
 	vtkImageDataPtr copiedImage = vtkImageDataPtr::New();
 	copiedImage->DeepCopy(input);
 
-	ImagePtr output = mPatientModelService->createSpecificData<Image>(filename);
+	ImagePtr output = mServices->patientModelService->createSpecificData<Image>(filename);
 	output->setVtkImageData(input);
 	output->get_rMd_History()->setRegistration(rMd);
-	mPatientModelService->insertData(output);
+	mServices->patientModelService->insertData(output);
 
-	viewManager()->autoShowData(output);
+	mServices->visualizationService->autoShowData(output);
 	report(QString("Saved snapshot %1 from active video source").arg(output->getName()));
 }
 

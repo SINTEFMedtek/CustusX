@@ -54,6 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxBoolDataAdapterXml.h"
 #include "cxSpaceProvider.h"
 #include "cxPatientModelService.h"
+#include "cxSpaceEditWidget.h"
 
 //TODO :remove
 #include "cxLegacySingletons.h"
@@ -222,7 +223,8 @@ QWidget* PointMetricWrapper::createWidget()
 	topLayout->addLayout(hLayout);
 
 	mSpaceSelector = this->createSpaceSelector();
-	hLayout->addWidget(new LabeledComboBoxWidget(widget, mSpaceSelector));
+	hLayout->addWidget(new SpaceEditWidget(widget, mSpaceSelector));
+//	hLayout->addWidget(new LabeledComboBoxWidget(widget, mSpaceSelector));
 
 	mCoordinate =  this->createCoordinateSelector();
 	topLayout->addWidget(Vector3DWidget::createSmallHorizontal(widget, mCoordinate));

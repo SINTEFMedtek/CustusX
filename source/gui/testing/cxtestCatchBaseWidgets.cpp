@@ -136,11 +136,9 @@ void testAndDeleteBaseWidgetChild(cx::BaseWidget* widget)
 void init()
 {
 	cx::LogicManager::initialize();
-//	cx::viewManager()->initialize();
 }
 void shutdown()
 {
-//	cx::viewManager()->destroyInstance();
 	cx::LogicManager::shutdown();
 }
 }
@@ -151,9 +149,6 @@ TEST_CASE("BaseWidget's children in gui/dataWidgets correctly constructed", "[un
 	QWidget* testParent = new QWidget();
 	cx::PatientModelServicePtr patientModelService = cx::PatientModelService::getNullObject(); //mock PatientModelService with the null object
 	cx::VisualizationServicePtr visualizationService = cx::VisualizationService::getNullObject(); //mock
-
-//	ctkPluginContext *pluginContext = cx::LogicManager::getInstance()->getPluginContext();
-//	cx::VisualizationServicePtr visualizationService(new cx::VisualizationServiceProxy(pluginContext); //can't mock
 
 	testAndDeleteBaseWidgetChild(new cx::ActiveToolWidget(testParent));
 	testAndDeleteBaseWidgetChild(new cx::ActiveVolumeWidget(patientModelService, visualizationService, testParent));
@@ -193,10 +188,9 @@ TEST_CASE("BaseWidget's children in gui/dataWidgets correctly constructed", "[un
 TEST_CASE("VideoConnectionWidget is correctly constructed", "[unit][gui][widget][not_win32]")
 {
 	init();
-	cx::PatientModelServicePtr patientModelService = cx::PatientModelService::getNullObject(); //mock
-	cx::VisualizationServicePtr visualizationService = cx::VisualizationService::getNullObject(); //mock
-	cx::VideoServicePtr videoService = cx::VideoService::getNullObject(); //mock
-	testAndDeleteBaseWidgetChild(new cx::VideoConnectionWidget(visualizationService, patientModelService, videoService, NULL));
+	cx::VisServicesPtr services = cx::VisServices::create(cx::logicManager()->getPluginContext());
+	testAndDeleteBaseWidgetChild(new cx::VideoConnectionWidget(services, NULL));
+	services.reset();
 	shutdown();
 }
 

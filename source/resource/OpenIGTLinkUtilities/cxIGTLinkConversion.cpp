@@ -112,7 +112,7 @@ IGTLinkImageMessage::Pointer IGTLinkConversion::encode(ImagePtr image)
 
 	if (scalarType==-1)
 	{
-		std::cerr << "unknown image type" << std::endl;
+		std::cerr << "Unsupported file type based on vtk " << rawImage->GetScalarTypeAsString() << std::endl;
 		return IGTLinkImageMessage::Pointer();
 	}
 

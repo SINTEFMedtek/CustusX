@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxStreamer.h"
 
 class QTimer;
+class QDomElement;
 
 namespace cx
 {
@@ -69,6 +70,19 @@ public:
 };
 typedef boost::shared_ptr<class ImageTestData> ImageTestDataPtr;
 
+/**
+ */
+class cxGrabber_EXPORT ImageStreamerDummyArguments
+{
+public:
+	QStringList getArgumentDescription();
+	virtual std::vector<DataAdapterPtr> getSettings(QDomElement root);
+	StringMap convertToCommandLineArguments(QDomElement root);
+
+	StringDataAdapterPtr getFilenameOption(QDomElement root);
+	BoolDataAdapterPtr getSecondaryOption(QDomElement root);
+};
+
 
 /**
  * Reads a mhd file from disk and sends slices at a given interval.
@@ -91,6 +105,7 @@ public:
 	virtual void stopStreaming();
 
 	virtual QString getType();
+	virtual QStringList getArgumentDescription();
 
 private slots:
 	virtual void streamSlot();

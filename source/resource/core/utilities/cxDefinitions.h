@@ -117,6 +117,22 @@ namespace cx
 		tsCOUNT
 	};
 
+	/**Denotes the various states
+	 * of registration an object is in.
+	 */
+	enum cxResource_EXPORT REGISTRATION_STATUS
+	{
+		rsNOT_REGISTRATED,
+		rsIMAGE_REGISTRATED,
+		rsPATIENT_REGISTRATED
+	};
+
+	enum cxResource_EXPORT STEREOTYPE
+	{
+		stFRAME_SEQUENTIAL, stINTERLACED, stDRESDEN, stRED_BLUE
+	};
+
+
 	/*enum TOOL_TYPE
 	{
 		ttNONE,
