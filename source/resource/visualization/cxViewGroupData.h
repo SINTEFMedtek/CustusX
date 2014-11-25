@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVIEWGROUPDATA_H
 #define CXVIEWGROUPDATA_H
 
-#include "cxVisualizationServiceExport.h"
+#include "cxResourceVisualizationExport.h"
 
 #include <vector>
 #include <QVariant>
@@ -48,7 +48,7 @@ namespace cx
 {
 
 typedef boost::shared_ptr<class CameraData> CameraDataPtr;
-typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServiceBackendPtr;
+typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
 
 /**
  * \file
@@ -60,18 +60,18 @@ typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServic
 /**Define a priority for the input data.
  * High means display on top, low means in the back.
  */
-cxVisualizationService_EXPORT  int getPriority(DataPtr data);
+cxResourceVisualization_EXPORT  int getPriority(DataPtr data);
 
 /**Sorts DataPtr in default display ordering, using getPriority().
  */
-cxVisualizationService_EXPORT bool dataTypeSort(const DataPtr data1, const DataPtr data2);
+cxResourceVisualization_EXPORT bool dataTypeSort(const DataPtr data1, const DataPtr data2);
 
 typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
 typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
 
 /** Stores how a Data should be visualized in 2D and 3D views.
   */
-class cxVisualizationService_EXPORT DataViewProperties
+class cxResourceVisualization_EXPORT DataViewProperties
 {
 public:
 	DataViewProperties() : mVolume3D(false), mSlice3D(false), mSlice2D(false) {}
@@ -100,11 +100,11 @@ private:
 
 /** \brief Container for data shared between all members of a view group
  */
-class cxVisualizationService_EXPORT ViewGroupData: public QObject
+class cxResourceVisualization_EXPORT ViewGroupData: public QObject
 {
 Q_OBJECT
 public:
-	explicit ViewGroupData(VisualizationServiceBackendPtr backend);
+	explicit ViewGroupData(CoreServicesPtr backend);
 	void requestInitialize();
 //	std::vector<DataPtr> getData() const;
 	std::vector<DataPtr> getData(DataViewProperties properties=DataViewProperties::createFull()) const;
@@ -140,6 +140,8 @@ public:
 
 	Options getOptions() const;
 	void setOptions(Options options);
+	void setRegistrationMode(REGISTRATION_STATUS mode);
+
 
 	void addXml(QDomNode& dataNode);
 	void parseXml(QDomNode dataNode);
@@ -156,7 +158,7 @@ signals:
 	void optionsChanged();
 
 private:
-	VisualizationServiceBackendPtr mBackend;
+	CoreServicesPtr mBackend;
 	QString mVideoSource;
 //	std::vector<DataPtr> mData;
 	typedef std::pair<DataPtr, DataViewProperties> DataAndViewProperties;

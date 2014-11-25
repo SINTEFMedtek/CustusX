@@ -81,8 +81,8 @@ public:
   SpaceProviderPtr getSpaceProvider();
   PatientModelServicePtr getPatientModelService();
 	VideoServicePtr getVideoService();
-  VisualizationServiceOldPtr getVisualizationService();
 	StateServicePtr getStateService();
+	ViewServicePtr getViewService();
 
 private:
   /**
@@ -96,6 +96,8 @@ private:
 	* Assumes MainWindow already has been destroyed and the mainloop is exited.
 	*/
   void shutdownServices();
+
+  VisualizationServiceOldPtr getVisualizationService();
 
   void createTrackingService();
   void createPatientModelService();
@@ -136,6 +138,7 @@ private:
 	VideoServicePtr mVideoService;
 	VisualizationServiceOldPtr mVisualizationService;
 	StateServicePtr mStateService;
+	ViewServicePtr mViewService;
 
 	PluginFrameworkManagerPtr mPluginFramework;
 };

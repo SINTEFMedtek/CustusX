@@ -29,56 +29,70 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXLAYOUTREPOSITORY_H
-#define CXLAYOUTREPOSITORY_H
 
-#include "cxVisualizationServiceExport.h"
+#ifndef CXINTERACTIVECLIPPER_H_
+#define CXINTERACTIVECLIPPER_H_
 
-#include "cxForwardDeclarations.h"
+#include "cxResourceVisualizationExport.h"
+
 #include <vector>
-#include "cxXmlOptionItem.h"
+#include <QObject>
+#include "cxDefinitions.h"
+#include "cxForwardDeclarations.h"
 
 namespace cx
 {
-class LayoutData;
+typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
 
-/** Repository for View Layouts.
- *
- * Each layout is a separate configuration of 2D/3D/Video views, laid out
- * in a specific way on screen.
- *
- * \ingroup cx_service_visualization
- * \date 2014-02-07
- * \author christiana
+/**
+* \file
+* \addtogroup cx_service_visualization
+* @{
+*/
+
+/** Helper class for clipping the active volume using a specific slice plane.
+ *  The visible slice planes are the only ones allowed for clipping.
+ *  \date Aug 24, 2010
+ *  \author christiana
  */
-class cxVisualizationService_EXPORT LayoutRepository
+class cxResourceVisualization_EXPORT InteractiveClipper: public QObject
 {
+Q_OBJECT
 public:
-	LayoutRepository();
+	InteractiveClipper(CoreServicesPtr backend);
 
-	LayoutData get(const QString uid) const;
-	std::vector<QString> getAvailable() const;
-	void insert(const LayoutData& data);
-	QString generateUid() const;
-	void erase(const QString uid);
-	bool isCustom(const QString& uid) const;
+	void setSlicePlane(PLANE_TYPE plane);
+	void saveClipPlaneToVolume(); ///< save the current clip to image
+	void clearClipPlanesInVolume(); ///< clear all saved clips in the image.
+	PLANE_TYPE getSlicePlane();
+	bool getUseClipper() const;
+	bool getInvertPlane() const;
+	std::vector<PLANE_TYPE> getAvailableSlicePlanes() const;
+	ImagePtr getImage() const;
+	void setImage(ImagePtr image);
 
-	void load(XmlOptionFile file);
-	void save(XmlOptionFile file);
+signals:
+	void changed();
+public slots:
+	void useClipper(bool on);
+	void invertPlane(bool on);
+private slots:
+	void changedSlot();
+	void dominantToolChangedSlot();
 
 private:
-	void addDefault(LayoutData data);
-	void addDefaults();
-	unsigned indexOf(const QString uid) const;
-
-	typedef std::vector<LayoutData> LayoutDataVector;
-	LayoutDataVector mLayouts;
-	std::vector<QString> mDefaultLayouts;
+	PLANE_TYPE getPlaneType();
+	SlicePlaneClipperPtr mSlicePlaneClipper;
+	SlicePlanesProxyPtr mSlicePlanesProxy;
+	bool mUseClipper;
+	ImagePtr mImage;
+	CoreServicesPtr mBackend;
 };
+typedef boost::shared_ptr<InteractiveClipper> InteractiveClipperPtr;
 
-typedef boost::shared_ptr<class LayoutRepository> LayoutRepositoryPtr;
-
+/**
+* @}
+*/
 } // namespace cx
 
-
-#endif // CXLAYOUTREPOSITORY_H
+#endif /* CXINTERACTIVECLIPPER_H_ */

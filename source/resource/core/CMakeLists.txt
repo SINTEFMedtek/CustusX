@@ -84,6 +84,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	utilities/cxVLCRecorder
 	utilities/cxSpaceListener
 	utilities/cxSpaceListenerImpl
+	utilities/cxSyncedValue
 
 	patientModel/cxPatientModelService
 	)

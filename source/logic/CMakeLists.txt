@@ -26,6 +26,7 @@ SET (cxLogicManager_SOURCE
 include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
 include_directories(
     ${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
+	${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
     .
     ${CustusX_SOURCE_DIR}/source/service/tracking     
     ${CustusX_SOURCE_DIR}/source/service/visualization

@@ -140,20 +140,10 @@ void CustusXController::initialBeginCheckRenderSlot()
 
 void CustusXController::initialEndCheckRenderSlot()
 {
-//  std::cout << cx::viewManager()->getRenderTimer()->dumpStatistics() << std::endl;
-//  mTestData += cx::viewManager()->getRenderTimer()->dumpStatistics();
-
   // start next timing
   cx::viewManager()->getRenderTimer()->reset(5*mBaseTime);
   QTimer::singleShot(4*mBaseTime,   this, SLOT(secondEndCheckRenderSlot()) );
 }
-//
-//void CustusXController::secondBeginCheckRenderSlot()
-//{
-//  cx::viewManager()->getRenderTimer()->reset(100000);
-//
-//  QTimer::singleShot(20*1000,   this, SLOT(secondEndCheckRenderSlot()) );
-//}
 
 void CustusXController::secondEndCheckRenderSlot()
 {
@@ -161,15 +151,12 @@ void CustusXController::secondEndCheckRenderSlot()
   std::cout << cx::viewManager()->getRenderTimer()->dumpStatistics() << std::endl;
   mTestData += cx::viewManager()->getRenderTimer()->dumpStatistics() + "\n";
   mMeasuredFPS = cx::viewManager()->getRenderTimer()->getFPS();
-//  mTestData += "\n";
 
-	//this->displayResultsSlot();
   QTimer::singleShot(2*1000,   qApp, SLOT(quit()) );
 }
 
 void CustusXController::displayResultsSlot()
 {
-  //std::cout << "Hello TextEdit!" << std::endl;
   QTextEdit* textEdit = new QTextEdit;
   textEdit->resize(900,480);
   textEdit->setText(mTestData);

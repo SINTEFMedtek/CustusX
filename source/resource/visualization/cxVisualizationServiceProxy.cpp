@@ -40,6 +40,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
+VisualizationServicePtr VisualizationServiceProxy::create(ctkPluginContext *pluginContext)
+{
+	return VisualizationServicePtr(new VisualizationServiceProxy(pluginContext));
+}
+
 VisualizationServiceProxy::VisualizationServiceProxy(ctkPluginContext *pluginContext) :
 	mPluginContext(pluginContext),
 	mVisualizationService(VisualizationService::getNullObject())
@@ -75,29 +80,26 @@ void VisualizationServiceProxy::initServiceListener()
 void VisualizationServiceProxy::onServiceAdded(VisualizationService* service)
 {
 	mVisualizationService.reset(service, null_deleter());
-	connect(service, SIGNAL(activeViewChanged()), this, SIGNAL(activeViewChanged()));
+
 	connect(service, &VisualizationService::activeViewChanged, this, &VisualizationService::activeViewChanged);
-//	connect(service, SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
-	if(mVisualizationService->isNull())
-		reportWarning("VideoServiceProxy::onServiceAdded mVideoService->isNull()");
+	connect(service, &VisualizationService::fps, this, &VisualizationService::fps);
+	connect(service, &VisualizationService::activeLayoutChanged, this, &VisualizationService::activeLayoutChanged);
+	connect(service, &VisualizationService::renderingEnabledChanged, this, &VisualizationService::renderingEnabledChanged);
 }
 
 void VisualizationServiceProxy::onServiceRemoved(VisualizationService *service)
 {
-	disconnect(service, SIGNAL(activeViewChanged()), this, SIGNAL(activeViewChanged()));
 	disconnect(service, &VisualizationService::activeViewChanged, this, &VisualizationService::activeViewChanged);
-//	disconnect(service, SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
+	disconnect(service, &VisualizationService::fps, this, &VisualizationService::fps);
+	disconnect(service, &VisualizationService::activeLayoutChanged, this, &VisualizationService::activeLayoutChanged);
+	disconnect(service, &VisualizationService::renderingEnabledChanged, this, &VisualizationService::renderingEnabledChanged);
+
 	mVisualizationService = VisualizationService::getNullObject();
 }
 
 bool VisualizationServiceProxy::isNull()
 {
 	return mVisualizationService->isNull();
-}
-
-void VisualizationServiceProxy::setRegistrationMode(cx::REGISTRATION_STATUS mode)
-{
-	mVisualizationService->setRegistrationMode(mode);
 }
 
 void VisualizationServiceProxy::autoShowData(cx::DataPtr data)

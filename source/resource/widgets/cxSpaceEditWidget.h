@@ -30,43 +30,78 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXVISUALIZATIONSERVICEPROXY_H
-#define CXVISUALIZATIONSERVICEPROXY_H
+#ifndef CXSPACEEDITWIDGET_H
+#define CXSPACEEDITWIDGET_H
 
-#include "cxResourceVisualizationExport.h"
+#include "cxResourceWidgetsExport.h"
 
-#include "cxVisualizationService.h"
-#include "cxServiceTrackerListener.h"
-class ctkPluginContext;
+#include <QWidget>
+#include <QSlider>
+#include <QLineEdit>
+#include <QLabel>
+#include <QGridLayout>
+#include "cxStringDataAdapter.h"
+#include "cxBaseWidget.h"
 
 namespace cx
 {
 
-class cxResourceVisualization_EXPORT VisualizationServiceProxy : public VisualizationService
+/**\brief Composite widget for string selection.
+ *
+ * Consists of <namelabel, combobox>.
+ * Insert a subclass of StringDataAdStringDataAdapter to connect to data.
+ *
+ * \ingroup cx_resource_widgets
+ */
+class cxResourceWidgets_EXPORT SpaceEditWidget: public BaseWidget
 {
+Q_OBJECT
 public:
-	static VisualizationServicePtr create(ctkPluginContext *pluginContext);
-	VisualizationServiceProxy(ctkPluginContext *pluginContext);
+	SpaceEditWidget(QWidget* parent, StringDataAdapterPtr, QGridLayout* gridLayout = 0, int row = 0);
+	virtual ~SpaceEditWidget() {}
 
-	virtual ViewPtr get3DView(int group = 0, int index = 0);
+	virtual QString defaultWhatsThis() const;
 
-	virtual int getActiveViewGroup() const;
-	virtual ViewGroupDataPtr getViewGroupData(int groupIdx);
+	void showLabel(bool on);
 
-	virtual void autoShowData(DataPtr data);
-	virtual void enableRender(bool val);
-	virtual bool renderingIsEnabled() const;
+protected:
+	QHBoxLayout* mTopLayout;
 
-	bool isNull();
+private slots:
+	void prePaintEvent();
+	void comboIndexChanged();
 
 private:
-	void initServiceListener();
-	void onServiceAdded(VisualizationService* service);
-	void onServiceRemoved(VisualizationService *service);
+	struct SpaceData
+	{
+		SpaceData(QString uid_, QString name_) : uid(uid_), name(name_) {}
+		QString uid; // internal value for space
+		QString name; // display value for space
 
-	ctkPluginContext *mPluginContext;
-	VisualizationServicePtr mVisualizationService;
-	boost::shared_ptr<ServiceTrackerListener<VisualizationService> > mServiceListener;
+		QStringList uidlist() const { return this->splitSpace(uid); }
+		QStringList namelist() const { return this->splitSpace(name); }
+
+		QStringList splitSpace(QString name) const
+		{
+			QStringList values = name.split("/");
+			if (values.size()==1)
+				values << "";
+			return values;
+		}
+	};
+
+	void rebuildCombobox(QComboBox* widget, QStringList uids, int index, std::vector<SpaceData> allSpaces, QString currentUid);
+	QString getNameForUid(QString uid, int index, std::vector<SpaceData> allSpaces);
+
+	QStringList splitSpace(QString name) const;
+	QString mergeSpace(QString a, QString b) const;
+
+	QLabel* mLabel;
+	QComboBox* mIdCombo;
+	QComboBox* mRefCombo;
+	StringDataAdapterPtr mData;
 };
-} //cx
-#endif // CXVISUALIZATIONSERVICEPROXY_H
+
+} // namespace cx
+
+#endif // CXSPACEEDITWIDGET_H

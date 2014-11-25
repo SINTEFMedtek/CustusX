@@ -30,43 +30,40 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXVISUALIZATIONSERVICEPROXY_H
-#define CXVISUALIZATIONSERVICEPROXY_H
+#ifndef CXSYNCEDVALUE_H
+#define CXSYNCEDVALUE_H
 
-#include "cxResourceVisualizationExport.h"
+#include "cxResourceExport.h"
 
-#include "cxVisualizationService.h"
-#include "cxServiceTrackerListener.h"
-class ctkPluginContext;
+#include <QVariant>
+#include <QObject>
+#include "boost/shared_ptr.hpp"
 
 namespace cx
 {
 
-class cxResourceVisualization_EXPORT VisualizationServiceProxy : public VisualizationService
+typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
+
+/** A value intended for sharing between several objects
+ *
+ *  Use the changed() signal to listen for changes made by others.
+ */
+class cxResource_EXPORT  SyncedValue: public QObject
 {
+Q_OBJECT
 public:
-	static VisualizationServicePtr create(ctkPluginContext *pluginContext);
-	VisualizationServiceProxy(ctkPluginContext *pluginContext);
-
-	virtual ViewPtr get3DView(int group = 0, int index = 0);
-
-	virtual int getActiveViewGroup() const;
-	virtual ViewGroupDataPtr getViewGroupData(int groupIdx);
-
-	virtual void autoShowData(DataPtr data);
-	virtual void enableRender(bool val);
-	virtual bool renderingIsEnabled() const;
-
-	bool isNull();
-
+	SyncedValue(QVariant val = QVariant());
+	static SyncedValuePtr create(QVariant val = QVariant());
+	void set(QVariant val);
+	QVariant get() const;
+	template<class T>
+	T value() const { return this->get().value<T>(); }
 private:
-	void initServiceListener();
-	void onServiceAdded(VisualizationService* service);
-	void onServiceRemoved(VisualizationService *service);
-
-	ctkPluginContext *mPluginContext;
-	VisualizationServicePtr mVisualizationService;
-	boost::shared_ptr<ServiceTrackerListener<VisualizationService> > mServiceListener;
+	QVariant mValue;
+signals:
+	void changed();
 };
-} //cx
-#endif // CXVISUALIZATIONSERVICEPROXY_H
+
+} //namespace cx
+
+#endif // CXSYNCEDVALUE_H

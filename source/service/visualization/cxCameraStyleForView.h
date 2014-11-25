@@ -45,7 +45,7 @@ class QActionGroup;
 namespace cx
 {
 typedef boost::shared_ptr<class ViewportPreRenderListener> ViewportPreRenderListenerPtr;
-typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServiceBackendPtr;
+typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
 
 typedef boost::shared_ptr<class CameraStyleForView> CameraStyleForViewPtr;
 using cx::Transform3D;
@@ -78,7 +78,7 @@ class cxVisualizationService_EXPORT CameraStyleForView: public QObject
 {
 Q_OBJECT
 public:
-	explicit CameraStyleForView(VisualizationServiceBackendPtr backend);
+	explicit CameraStyleForView(CoreServicesPtr backend);
 	void setView(ViewPtr widget);
 
 	/** Select tool style. This replaces the vtkInteractor Style.
@@ -110,7 +110,7 @@ private:
 	bool mBlockCameraUpdate; ///< for breaking a camera update loop
 
 	ViewPtr mView;
-	VisualizationServiceBackendPtr mBackend;
+	CoreServicesPtr mBackend;
 };
 
 /**

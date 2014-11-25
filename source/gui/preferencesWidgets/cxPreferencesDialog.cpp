@@ -50,7 +50,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxToolConfigureWidget.h"
 #include "cxToolFilterWidget.h"
 #include "cxColorSelectButton.h"
-#include "cxViewWrapper3D.h"
 #include "cxHelperWidgets.h"
 #include "cxMultiVolume3DRepProducer.h"
 #include "cxPatientModelService.h"

@@ -30,43 +30,47 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXVISUALIZATIONSERVICEPROXY_H
-#define CXVISUALIZATIONSERVICEPROXY_H
+#include "cxSyncedValue.h"
 
-#include "cxResourceVisualizationExport.h"
-
-#include "cxVisualizationService.h"
-#include "cxServiceTrackerListener.h"
-class ctkPluginContext;
+//#include <QMenu>
+//#include "vtkCamera.h"
+//#include "cxReporter.h"
+//#include "cxPatientModelService.h"
+//#include "cxViewGroup.h" //for class Navigation
+//#include "cxMesh.h"
+//#include "cxTypeConversions.h"
+//#include "cxImageAlgorithms.h"
+//#include "cxDataMetric.h"
+//#include "cxView.h"
+//#include "cxImage.h"
+//#include "cxViewManager.h"
+//#include "cxInteractiveClipper.h"
+//#include "cxRepManager.h"
+//#include "cxCoreServices.h"
+//#include "cxNavigation.h"
 
 namespace cx
 {
 
-class cxResourceVisualization_EXPORT VisualizationServiceProxy : public VisualizationService
+SyncedValue::SyncedValue(QVariant val) :
+				mValue(val)
 {
-public:
-	static VisualizationServicePtr create(ctkPluginContext *pluginContext);
-	VisualizationServiceProxy(ctkPluginContext *pluginContext);
+}
+SyncedValuePtr SyncedValue::create(QVariant val)
+{
+	return SyncedValuePtr(new SyncedValue(val));
+}
+void SyncedValue::set(QVariant val)
+{
+	if (mValue == val)
+		return;
+	mValue = val;
+	emit changed();
+}
+QVariant SyncedValue::get() const
+{
+	return mValue;
+}
 
-	virtual ViewPtr get3DView(int group = 0, int index = 0);
 
-	virtual int getActiveViewGroup() const;
-	virtual ViewGroupDataPtr getViewGroupData(int groupIdx);
-
-	virtual void autoShowData(DataPtr data);
-	virtual void enableRender(bool val);
-	virtual bool renderingIsEnabled() const;
-
-	bool isNull();
-
-private:
-	void initServiceListener();
-	void onServiceAdded(VisualizationService* service);
-	void onServiceRemoved(VisualizationService *service);
-
-	ctkPluginContext *mPluginContext;
-	VisualizationServicePtr mVisualizationService;
-	boost::shared_ptr<ServiceTrackerListener<VisualizationService> > mServiceListener;
-};
-} //cx
-#endif // CXVISUALIZATIONSERVICEPROXY_H
+} //namespace cx

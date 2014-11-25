@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSettings.h"
 #include "cxTrackingService.h"
 #include "cxVideoService.h"
-#include "cxVisualizationServiceBackend.h"
+#include "cxCoreServices.h"
 #include "vtkRenderWindowInteractor.h"
 #include "cxTool.h"
 #include "cxVideoSource.h"
@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ViewWrapperVideo::ViewWrapperVideo(ViewPtr view, VisualizationServiceBackendPtr backend) :
+ViewWrapperVideo::ViewWrapperVideo(ViewPtr view, CoreServicesPtr backend) :
 	ViewWrapper(backend)
 {
 	mView = view;

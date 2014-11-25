@@ -64,8 +64,6 @@ public:
 	virtual int getActiveViewGroup() const = 0;
 	virtual ViewGroupDataPtr getViewGroupData(int groupIdx) = 0;
 
-	virtual void setRegistrationMode(REGISTRATION_STATUS mode) = 0;
-
 	virtual void autoShowData(DataPtr data) = 0;
 	virtual void enableRender(bool val) = 0;
 	virtual bool renderingIsEnabled() const = 0;
@@ -74,12 +72,16 @@ public:
 	static VisualizationServicePtr getNullObject();
 
 signals:
-	void renderingEnabledChanged();
+	void fps(int number); ///< Emits number of frames per second
+	void activeLayoutChanged(); ///< emitted when the active layout changes
 	void activeViewChanged(); ///< emitted when the active view changes
+	void renderingEnabledChanged(); ///< emitted then rendering is enabled/disabled
 
 public slots:
 
 };
+
+typedef VisualizationService ViewService;
 
 } //cx
 Q_DECLARE_INTERFACE(cx::VisualizationService, VisualizationService_iid)

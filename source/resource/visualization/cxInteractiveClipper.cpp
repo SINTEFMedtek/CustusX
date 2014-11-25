@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxVolumetricRep.h"
 #include "cxReporter.h"
-#include "cxRepManager.h"
+//#include "cxRepManager.h"
 #include "cxSliceComputer.h"
 
 #include "cxSlicePlaneClipper.h"
@@ -43,20 +43,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImage.h"
 #include "cxTrackingService.h"
 #include "cxLogger.h"
-#include "cxVisualizationServiceBackend.h"
+#include "cxCoreServices.h"
 
 
 namespace cx
 {
 
-InteractiveClipper::InteractiveClipper(VisualizationServiceBackendPtr backend) :
+InteractiveClipper::InteractiveClipper(CoreServicesPtr backend) :
 	mUseClipper(false),
 	mBackend(backend)
 {
 
 	// create a slice planes proxy containing all slice definitions,
 	// for use with the clipper
-	PatientModelServicePtr dm = mBackend->getPatientService();
+	PatientModelServicePtr dm = mBackend->patientModelService;
 	mSlicePlanesProxy = SlicePlanesProxyPtr(new SlicePlanesProxy());
 	mSlicePlanesProxy->addSimpleSlicePlane(ptSAGITTAL, dm);
 	mSlicePlanesProxy->addSimpleSlicePlane(ptCORONAL, dm);
@@ -69,7 +69,7 @@ InteractiveClipper::InteractiveClipper(VisualizationServiceBackendPtr backend) :
 
 	connect(mSlicePlaneClipper.get(), SIGNAL(slicePlaneChanged()), this, SLOT(changedSlot()));
 	connect(this, SIGNAL(changed()), this, SLOT(changedSlot()));
-	connect(mBackend->getToolManager().get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
+	connect(mBackend->trackingService.get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
 
 	this->dominantToolChangedSlot();
 	this->changedSlot();
@@ -195,7 +195,7 @@ std::vector<PLANE_TYPE> InteractiveClipper::getAvailableSlicePlanes() const
 
 void InteractiveClipper::dominantToolChangedSlot()
 {
-	ToolPtr dominantTool = mBackend->getToolManager()->getActiveTool();
+	ToolPtr dominantTool = mBackend->trackingService->getActiveTool();
 
 	SlicePlanesProxy::DataMap data = mSlicePlanesProxy->getData();
 	for (SlicePlanesProxy::DataMap::iterator iter = data.begin(); iter != data.end(); ++iter)

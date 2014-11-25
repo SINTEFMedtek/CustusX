@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXNAVIGATION_H
 #define CXNAVIGATION_H
 
-#include "cxVisualizationServiceExport.h"
+#include "cxResourceVisualizationExport.h"
 
 #include "cxDefinitions.h"
 #include "cxForwardDeclarations.h"
@@ -40,18 +40,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServiceBackendPtr;
 typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
+typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
 
 /** Functions for navigating in the visualization scene(s).
  *
  * \ingroup cx_service_visualization
  */
-class cxVisualizationService_EXPORT Navigation
+class cxResourceVisualization_EXPORT Navigation
 {
 public:
 	enum VIEW_TYPE { v2D = 0x01, v3D=0x02, vBOTH=0x03 };
-	Navigation(VisualizationServiceBackendPtr backend, CameraControlPtr camera3D=CameraControlPtr());
+	Navigation(CoreServicesPtr backend, CameraControlPtr camera3D=CameraControlPtr());
 	void centerToData(DataPtr image);
 	void centerToView(const std::vector<DataPtr>& images);
 	void centerToGlobalDataCenter();
@@ -64,7 +64,7 @@ private:
 	Vector3D findGlobalDataCenter();
 	Vector3D findDataCenter(std::vector<DataPtr> data);
 
-	VisualizationServiceBackendPtr mBackend;
+	CoreServicesPtr mBackend;
 	CameraControlPtr mCamera3D;
 };
 

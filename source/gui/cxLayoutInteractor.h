@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
+typedef boost::shared_ptr<class LayoutRepository> LayoutRepositoryPtr;
 
 /** 
  *
@@ -82,6 +83,8 @@ private:
 	QPointer<QMenu> mMenu;
 	QPointer<QMenu> mSecondaryLayoutMenu;
 	QActionGroup* mSecondaryLayoutActionGroup;
+
+	LayoutRepositoryPtr getRepo();
 
 };
 

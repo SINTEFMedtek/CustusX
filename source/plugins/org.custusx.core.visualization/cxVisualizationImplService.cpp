@@ -45,17 +45,22 @@ VisualizationImplService::VisualizationImplService(ctkPluginContext *context) :
 {
 	if(!viewManager())
 		std::cout << "VisualizationImplService got no viewManager" << std::endl;
-	connect(viewManager(), SIGNAL(activeViewChanged()), this, SIGNAL(activeViewChanged()));
+//	connect(viewManager(), SIGNAL(activeViewChanged()), this, SIGNAL(activeViewChanged()));
+//	connect(viewManager(), &ViewManager::renderingEnabledChanged, this, &VisualizationService::renderingEnabledChanged);
+
+	connect(viewManager(), &ViewManager::activeViewChanged, this, &VisualizationService::activeViewChanged);
+	connect(viewManager(), &ViewManager::fps, this, &VisualizationService::fps);
+	connect(viewManager(), &ViewManager::activeLayoutChanged, this, &VisualizationService::activeLayoutChanged);
 	connect(viewManager(), &ViewManager::renderingEnabledChanged, this, &VisualizationService::renderingEnabledChanged);
 }
 
 VisualizationImplService::~VisualizationImplService()
 {
-	if(viewManager())
-	{
-		disconnect(viewManager(), SIGNAL(activeViewChanged()), this, SIGNAL(activeViewChanged()));
-		disconnect(viewManager(), &ViewManager::renderingEnabledChanged, this, &VisualizationService::renderingEnabledChanged);
-	}
+//	if(viewManager())
+//	{
+//		disconnect(viewManager(), SIGNAL(activeViewChanged()), this, SIGNAL(activeViewChanged()));
+//		disconnect(viewManager(), &ViewManager::renderingEnabledChanged, this, &VisualizationService::renderingEnabledChanged);
+//	}
 }
 
 ViewPtr VisualizationImplService::get3DView(int group, int index)
@@ -69,21 +74,17 @@ int VisualizationImplService::getActiveViewGroup() const
 }
 ViewGroupDataPtr VisualizationImplService::getViewGroupData(int groupIdx)
 {
-	std::vector<ViewGroupPtr> viewGroups = viewManager()->getViewGroups();
-	if (!viewGroups.empty())
-		return viewGroups[groupIdx]->getData();
-	else
-		return ViewGroupDataPtr();
+	return viewManager()->getViewGroup(groupIdx);
+//	std::vector<ViewGroupPtr> viewGroups = viewManager()->getViewGroups();
+//	if (!viewGroups.empty())
+//		return viewGroups[groupIdx]->getData();
+//	else
+//		return ViewGroupDataPtr();
 }
 
 bool VisualizationImplService::isNull()
 {
 	return false;
-}
-
-void VisualizationImplService::setRegistrationMode(cx::REGISTRATION_STATUS mode)
-{
-	viewManager()->setRegistrationMode(mode);
 }
 
 void VisualizationImplService::autoShowData(cx::DataPtr data)

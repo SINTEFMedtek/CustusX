@@ -111,7 +111,7 @@ MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
 	mCameraControl = viewManager()->getCameraControl();
 	mLayoutInteractor.reset(new LayoutInteractor());
 
-	viewManager()->initialize();
+//	viewManager()->initialize();
 	this->setCentralWidget(viewManager()->getLayoutWidget(0));
 
 	this->createActions();
@@ -426,7 +426,7 @@ void MainWindow::createActions()
 	mShowPointPickerAction->setIcon(QIcon(":/icons/point_picker.png"));
 	connect(mShowPointPickerAction, SIGNAL(triggered()), this, SLOT(togglePointPickerActionSlot()));
 
-	connect(viewManager()->getViewGroups()[0]->getData().get(), SIGNAL(optionsChanged()), this,
+	connect(viewManager()->getViewGroup(0).get(), SIGNAL(optionsChanged()), this,
 //	connect(mServices->visualizationService->getViewGroupData(0).get(), SIGNAL(optionsChanged()), this, //Too early?
 		SLOT(updatePointPickerActionSlot()));
 	this->updatePointPickerActionSlot();
@@ -585,8 +585,8 @@ void MainWindow::centerToImageCenterSlot()
 
 	if (patientService()->getActiveImage())
 		nav->centerToData(patientService()->getActiveImage());
-	else if (!viewManager()->getViewGroups().empty())
-		nav->centerToView(viewManager()->getViewGroups()[0]->getData()->getData());
+	else if (!viewManager()->viewGroupCount())
+		nav->centerToView(viewManager()->getViewGroup(0)->getData());
 //		nav->centerToView(mServices->visualizationService->getViewGroupData(0)->getData());//Too early?
 	else
 		nav->centerToGlobalDataCenter();
@@ -600,7 +600,7 @@ void MainWindow::centerToTooltipSlot()
 
 void MainWindow::togglePointPickerActionSlot()
 {
-	ViewGroupDataPtr data = viewManager()->getViewGroups()[0]->getData();
+	ViewGroupDataPtr data = viewManager()->getViewGroup(0);
 //	ViewGroupDataPtr data = mServices->visualizationService->getViewGroupData(0); //Too early?
 	ViewGroupData::Options options = data->getOptions();
 	options.mShowPointPickerProbe = !options.mShowPointPickerProbe;
@@ -608,7 +608,7 @@ void MainWindow::togglePointPickerActionSlot()
 }
 void MainWindow::updatePointPickerActionSlot()
 {
-	bool show = viewManager()->getViewGroups()[0]->getData()->getOptions().mShowPointPickerProbe;
+	bool show = viewManager()->getViewGroup(0)->getOptions().mShowPointPickerProbe;
 //	bool show = mServices->visualizationService->getViewGroupData(0)->getOptions().mShowPointPickerProbe;//TOO early?
 	mShowPointPickerAction->setChecked(show);
 }

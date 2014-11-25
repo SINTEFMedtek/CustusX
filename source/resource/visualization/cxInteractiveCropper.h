@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXINTERACTIVECROPPER_H_
 #define CXINTERACTIVECROPPER_H_
 
-#include "cxVisualizationServiceExport.h"
+#include "cxResourceVisualizationExport.h"
 
 #include <QObject>
 #include <QPointer>
@@ -55,7 +55,7 @@ namespace cx
 typedef vtkSmartPointer<class CropBoxCallback> CropBoxCallbackPtr;
 typedef vtkSmartPointer<class CropBoxEnableCallback> CropBoxEnableCallbackPtr;
 typedef boost::shared_ptr<class ActiveImageProxy> ActiveImageProxyPtr;
-typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServiceBackendPtr;
+typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
 
 /**
 * \file
@@ -68,11 +68,11 @@ typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServic
  * The bounding box can be set either explicitly or using
  * a vtkBoxWidget.
  */
-class cxVisualizationService_EXPORT InteractiveCropper: public QObject
+class cxResourceVisualization_EXPORT InteractiveCropper: public QObject
 {
 Q_OBJECT
 public:
-	explicit InteractiveCropper(VisualizationServiceBackendPtr backend);
+	explicit InteractiveCropper(CoreServicesPtr backend);
 	void setView(ViewPtr view); ///< adds an interactive box widget to the view. Press 'I' to show
 	DoubleBoundingBox3D getBoundingBox(); ///< get BB in data space
 	void setBoundingBox(const DoubleBoundingBox3D& bb_d); ///< set BB in reference space
@@ -109,7 +109,7 @@ private:
 	bool mShowBoxWidget;
 	ActiveImageProxyPtr mActiveImageProxy;
 //	PatientModelServicePtr mPatientModelService;
-	VisualizationServiceBackendPtr mBackend;
+	CoreServicesPtr mBackend;
 };
 
 typedef boost::shared_ptr<InteractiveCropper> InteractiveCropperPtr;

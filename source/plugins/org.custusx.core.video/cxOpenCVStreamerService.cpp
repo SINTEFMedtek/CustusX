@@ -63,30 +63,6 @@ std::vector<DataAdapterPtr> OpenCVStreamerService::getSettings(QDomElement root)
 	return retval;
 }
 
-BoolDataAdapterPtr OpenCVStreamerService::getRunLocalServerOption(QDomElement root)
-{
-	BoolDataAdapterXmlPtr retval;
-	bool defaultValue = false;
-	retval = BoolDataAdapterXml::initialize("runlocalserver", "Run Local Server",
-											"Run streamer in a separate process",
-											defaultValue, root);
-	retval->setAdvanced(false);
-	retval->setGroup("Connection");
-	return retval;
-}
-StringDataAdapterPtr OpenCVStreamerService::getLocalServerNameOption(QDomElement root)
-{
-	StringDataAdapterXmlPtr retval;
-	QString defaultValue = "OpenIGTLinkServer";
-	retval = StringDataAdapterXml::initialize("localservername", "Server Name",
-											  "Name of server executable, used only if Run Local Server is set.",
-											  defaultValue, root);
-	retval->setGuiRepresentation(StringDataAdapter::grFILENAME);
-	retval->setAdvanced(false);
-	retval->setGroup("Connection");
-	return retval;
-}
-
 StreamerPtr OpenCVStreamerService::createStreamer(QDomElement root)
 {
 	StringMap args = ImageStreamerOpenCVArguments().convertToCommandLineArguments(root);

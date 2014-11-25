@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackingService.h"
 #include "cxLegacySingletons.h"
 #include "cxLandmark.h"
+#include "cxViewGroupData.h"
 
 namespace cx
 {
@@ -84,7 +85,7 @@ void PlateRegistrationWidget::showEvent(QShowEvent* event)
   connect(mServices.patientModelService->getPatientLandmarks().get(), &Landmarks::landmarkRemoved,
 		  this, &PlateRegistrationWidget::landmarkUpdatedSlot);
 
-  mServices.visualizationService->setRegistrationMode(rsPATIENT_REGISTRATED);
+  mServices.visualizationService->getViewGroupData(0)->setRegistrationMode(rsPATIENT_REGISTRATED);
 }
 
 void PlateRegistrationWidget::hideEvent(QHideEvent* event)
@@ -95,7 +96,7 @@ void PlateRegistrationWidget::hideEvent(QHideEvent* event)
   disconnect(mServices.patientModelService->getPatientLandmarks().get(), &Landmarks::landmarkRemoved,
 			 this, &PlateRegistrationWidget::landmarkUpdatedSlot);
 
-  mServices.visualizationService->setRegistrationMode(rsNOT_REGISTRATED);
+  mServices.visualizationService->getViewGroupData(0)->setRegistrationMode(rsNOT_REGISTRATED);
 }
 
 void PlateRegistrationWidget::landmarkUpdatedSlot()

@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-CameraStyle::CameraStyle(VisualizationServiceBackendPtr backend) :
+CameraStyle::CameraStyle(CoreServicesPtr backend) :
 	mCameraStyle(cstDEFAULT_STYLE),
 	mBackend(backend)
 {

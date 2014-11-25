@@ -16,15 +16,11 @@ cx_add_class_qt_moc(cxVisualizationService_SOURCE
     cxViewManager
     cxViewWrapper
     cxViewGroup
-    cxInteractiveClipper
-    cxInteractiveCropper
-    cxCameraControl
     cxCameraStyle
 	cxCameraStyleForView
     cxRepManager
     cxThresholdPreview
     cxMultiVolume3DRepProducer
-    cxViewGroupData
     cxAxisConnector
 #	cxViewCollectionWidget
 	cxRenderLoop
@@ -33,9 +29,7 @@ cx_add_class_qt_moc(cxVisualizationService_SOURCE
 
 cx_add_class(cxVisualizationService_SOURCE
 #    cxLayoutData
-	cxLayoutRepository
-	cxVisualizationServiceBackend
-	cxNavigation
+#	cxVisualizationServiceBackend
 	cxDataRepContainer
 	)
 

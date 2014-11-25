@@ -42,6 +42,8 @@ namespace cx
 typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
 typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
 typedef boost::shared_ptr<class VideoService> VideoServicePtr;
+typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
+typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
 
 /**
  * Convenience class combining all services in resource/core.
@@ -54,12 +56,20 @@ typedef boost::shared_ptr<class VideoService> VideoServicePtr;
 class cxResource_EXPORT CoreServices
 {
 public:
+	static CoreServicesPtr create(ctkPluginContext* context);
 	CoreServices(ctkPluginContext* context);
 	static CoreServices getNullObjects();
+
+	PatientModelServicePtr getPatientService() { return patientModelService; }
+	TrackingServicePtr getToolManager() { return trackingService; }
+	VideoServicePtr getVideoService() { return videoService; }
+	SpaceProviderPtr getSpaceProvider() { return spaceProvider; }
 
 	PatientModelServicePtr patientModelService;
 	TrackingServicePtr trackingService;
 	VideoServicePtr videoService;
+	SpaceProviderPtr spaceProvider;
+
 protected:
 	CoreServices();
 };
