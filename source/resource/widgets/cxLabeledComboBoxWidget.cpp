@@ -49,7 +49,7 @@ LabeledComboBoxWidget::LabeledComboBoxWidget(QWidget* parent, StringDataAdapterP
 	this->setEnabled(dataInterface->getEnabled());
 
 	mData = dataInterface;
-    connect(mData.get(), SIGNAL(changed()), this, SLOT(setModified()));
+	connect(mData.get(), &DataAdapter::changed, this, &LabeledComboBoxWidget::setModified);
 
 	mLabel = new QLabel(this);
 	mLabel->setText(mData->getDisplayName());

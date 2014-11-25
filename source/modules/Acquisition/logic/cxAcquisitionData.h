@@ -81,6 +81,7 @@ public:
 	void addXml(QDomNode& dataNode);
 	void parseXml(QDomNode& dataNode);
 
+	void clear();
 signals:
 	void  recordedSessionsChanged();
 

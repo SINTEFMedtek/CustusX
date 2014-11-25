@@ -60,6 +60,11 @@ AcquisitionData::~AcquisitionData()
 {
 }
 
+void AcquisitionData::clear()
+{
+	mRecordSessions.clear();
+}
+
 void AcquisitionData::addRecordSession(RecordSessionPtr session)
 {
 	mRecordSessions.push_back(session);
