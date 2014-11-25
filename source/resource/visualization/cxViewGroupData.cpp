@@ -259,7 +259,7 @@ void ViewGroupData::addDataSorted(DataPtr data)
 	DataViewProperties properties = DataViewProperties::createDefault();
 	DataAndViewProperties item(data, properties);
 
-    for (size_t i=mData.size()-1; i>=0; --i)
+	for (int i=int(mData.size())-1; i>=0; --i)
 	{
 		if (!dataTypeSort(data, mData[i].first))
 		{

@@ -729,6 +729,17 @@ void MainWindow::onWorkflowStateChangedSlot()
 	viewManager()->setActiveLayout(desktop.mSecondaryLayoutUid, 1);
 	this->restoreState(desktop.mMainWindowState);
 	patientService()->autoSave();
+
+#ifdef CX_APPLE
+	// HACK
+	// Toolbars are not correctly refreshed on mac 10.8,
+	// Cause is related to QVTKWidget (removing it removes the problem)
+	// The following "force refresh by resize" solves repaint, but
+	// inactive toolbars are still partly clickable.
+	QSize size = this->size();
+	this->resize(size.width()-1, size.height());
+	this->resize(size);
+#endif
 }
 
 void MainWindow::saveDesktopSlot()
