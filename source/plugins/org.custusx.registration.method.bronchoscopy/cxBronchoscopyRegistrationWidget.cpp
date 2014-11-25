@@ -71,7 +71,6 @@ BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegServices servi
 	mBronchoscopyRegistration(new BronchoscopyRegistration())
 {
 
-
 	mOptions = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("bronchoscopyregistrationwidget");
 
 	mSelectMeshWidget = SelectMeshStringDataAdapter::New(services.patientModelService);
@@ -110,12 +109,14 @@ BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegServices servi
 
 	this->selectSubsetOfBranches(mOptions.getElement());
 	this->createMaxNumberOfGenerations(mOptions.getElement());
+	this->useLocalRegistration(mOptions.getElement());
 
 	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mSessionSelector));
 	mVerticalLayout->addWidget(new CheckBoxWidget(this, mUseSubsetOfGenerations));
 	mVerticalLayout->addWidget(createDataWidget(services.visualizationService, services.patientModelService, this, mMaxNumberOfGenerations));
 	mVerticalLayout->addWidget(mProcessCenterlineButton);
     mVerticalLayout->addWidget(mRecordSessionWidget.get());
+	mVerticalLayout->addWidget(new CheckBoxWidget(this, mUseLocalRegistration));
 	mVerticalLayout->addWidget(mRegisterButton);
 
 	mVerticalLayout->addStretch();
@@ -216,7 +217,11 @@ void BronchoscopyRegistrationWidget::registerSlot()
     }
 
 	Transform3D new_rMpr;
-		new_rMpr = Transform3D(mBronchoscopyRegistration->runBronchoscopyRegistration(trackerRecordedData_prMt,old_rMpr));
+	double maxDistanceForLocalRegistration = 30; //mm
+	if(mUseLocalRegistration->getValue())
+		new_rMpr = Transform3D(mBronchoscopyRegistration->runBronchoscopyRegistration(trackerRecordedData_prMt,old_rMpr,maxDistanceForLocalRegistration));
+	else
+		new_rMpr = Transform3D(mBronchoscopyRegistration->runBronchoscopyRegistration(trackerRecordedData_prMt,old_rMpr,0));
 
     new_rMpr = new_rMpr*old_rMpr;//output
 	mServices.registrationService->applyPatientRegistration(new_rMpr, "Bronchoscopy centerline to tracking data");
@@ -330,6 +335,13 @@ void BronchoscopyRegistrationWidget::selectSubsetOfBranches(QDomElement root)
 {
 	mUseSubsetOfGenerations = BoolDataAdapterXml::initialize("Select branch generations to be used in registration", "",
 																			"Select branch generations to be used in registration", false,
+																				root);
+}
+
+void BronchoscopyRegistrationWidget::useLocalRegistration(QDomElement root)
+{
+	mUseLocalRegistration = BoolDataAdapterXml::initialize("Use local registration", "",
+																			"Use local registration", false,
 																				root);
 }
 

@@ -84,6 +84,7 @@ private slots:
 private:
 	QVBoxLayout* mVerticalLayout;
 	QLabel* mLabel;
+	BoolDataAdapterXmlPtr mUseLocalRegistration;
 	BoolDataAdapterXmlPtr mUseSubsetOfGenerations;
 	DoubleDataAdapterXmlPtr mMaxNumberOfGenerations;
 	XmlOptionFile mOptions;
@@ -105,6 +106,7 @@ private:
 
 	void createMaxNumberOfGenerations(QDomElement root);
 	void selectSubsetOfBranches(QDomElement root);
+	void useLocalRegistration(QDomElement root);
 };
 
 } //namespace cx

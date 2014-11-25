@@ -435,7 +435,7 @@ void BronchoscopyRegistration::processCenterline(vtkPolyDataPtr centerline, Tran
 }
 
 
-Eigen::Matrix4d BronchoscopyRegistration::runBronchoscopyRegistration(TimedTransformMap trackingData_prMt, Transform3D old_rMpr)
+Eigen::Matrix4d BronchoscopyRegistration::runBronchoscopyRegistration(TimedTransformMap trackingData_prMt, Transform3D old_rMpr, double maxDistanceForLocalRegistration)
 {
 
     if(trackingData_prMt.empty())
@@ -451,17 +451,29 @@ Eigen::Matrix4d BronchoscopyRegistration::runBronchoscopyRegistration(TimedTrans
 
 	Tnavigation = excludeClosePositions(Tnavigation);
 
-	Eigen::Matrix4d regMatrix = registrationAlgorithm(mBranchList, Tnavigation, old_rMpr);
+	Eigen::Matrix4d regMatrix;
+	if (maxDistanceForLocalRegistration != 0)
+	{
+		Eigen::MatrixXd trackingPositions(3 , Tnavigation.size());
+		for (int i = 0; i < Tnavigation.size(); i++)
+		{
+			Tnavigation[i] = old_rMpr * Tnavigation[i];
+			trackingPositions.block(0 , i , 3 , 1) = Tnavigation[i].topRightCorner(3 , 1);
+		}
+		BranchListPtr tempPtr = mBranchList->removePositionsForLocalRegistration(trackingPositions, maxDistanceForLocalRegistration);
+		regMatrix = registrationAlgorithm(tempPtr, Tnavigation, old_rMpr);
+	}
+	else
+		regMatrix = registrationAlgorithm(mBranchList, Tnavigation, old_rMpr);
 
-	Eigen::Matrix4d regMatrixForCustusX = regMatrix;
 
-		if ( boost::math::isnan(regMatrixForCustusX.sum()) )
+	if ( boost::math::isnan(regMatrix.sum()) )
     {
         std::cout << "Warning: Registration matrix contains 'nan' number, using identity matrix." << std::endl;
         return Eigen::Matrix4d::Identity();
     }
 
-		if ( boost::math::isinf(regMatrixForCustusX.sum()) )
+		if ( boost::math::isinf(regMatrix.sum()) )
     {
         std::cout << "Warning: Registration matrix contains 'inf' number, using identity matrix." << std::endl;
         return Eigen::Matrix4d::Identity();
@@ -469,9 +481,9 @@ Eigen::Matrix4d BronchoscopyRegistration::runBronchoscopyRegistration(TimedTrans
 
     std::cout << "prMt from bronchoscopyRegistration: " << std::endl;
         for (int i = 0; i < 4; i++)
-            std::cout << regMatrixForCustusX.row(i) << std::endl;
+			std::cout << regMatrix.row(i) << std::endl;
 
-	return regMatrixForCustusX;
+	return regMatrix;
 }
 
 
