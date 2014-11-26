@@ -73,7 +73,8 @@ include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
 
 include_directories(
     ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
-    .
+	${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
+	.
     ./logic
     ./gui
 	${CustusX_SOURCE_DIR}/source/resource/pluginUtilities

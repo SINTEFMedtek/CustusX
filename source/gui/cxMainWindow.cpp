@@ -40,7 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "boost/bind.hpp"
 #include "cxTime.h"
 #include "cxReporter.h"
-#include "cxRepManager.h"
 #include "cxTrackingService.h"
 #include "cxStatusBar.h"
 #include "cxVolumePropertiesWidget.h"
@@ -424,7 +423,7 @@ void MainWindow::createActions()
 	mShowPointPickerAction->setIcon(QIcon(":/icons/point_picker.png"));
 	connect(mShowPointPickerAction, SIGNAL(triggered()), this, SLOT(togglePointPickerActionSlot()));
 
-	connect(viewService()->getViewGroupData(0).get(), SIGNAL(optionsChanged()), this,
+	connect(viewService()->getGroup(0).get(), SIGNAL(optionsChanged()), this,
 //	connect(mServices->visualizationService->getViewGroupData(0).get(), SIGNAL(optionsChanged()), this, //Too early?
 		SLOT(updatePointPickerActionSlot()));
 	this->updatePointPickerActionSlot();
@@ -583,8 +582,8 @@ void MainWindow::centerToImageCenterSlot()
 
 	if (patientService()->getActiveImage())
 		nav->centerToData(patientService()->getActiveImage());
-	else if (!viewService()->viewGroupCount())
-		nav->centerToView(viewService()->getViewGroupData(0)->getData());
+	else if (!viewService()->groupCount())
+		nav->centerToView(viewService()->getGroup(0)->getData());
 //		nav->centerToView(mServices->visualizationService->getViewGroupData(0)->getData());//Too early?
 	else
 		nav->centerToGlobalDataCenter();
@@ -598,7 +597,7 @@ void MainWindow::centerToTooltipSlot()
 
 void MainWindow::togglePointPickerActionSlot()
 {
-	ViewGroupDataPtr data = viewService()->getViewGroupData(0);
+	ViewGroupDataPtr data = viewService()->getGroup(0);
 //	ViewGroupDataPtr data = mServices->visualizationService->getViewGroupData(0); //Too early?
 	ViewGroupData::Options options = data->getOptions();
 	options.mShowPointPickerProbe = !options.mShowPointPickerProbe;
@@ -606,7 +605,7 @@ void MainWindow::togglePointPickerActionSlot()
 }
 void MainWindow::updatePointPickerActionSlot()
 {
-	bool show = viewService()->getViewGroupData(0)->getOptions().mShowPointPickerProbe;
+	bool show = viewService()->getGroup(0)->getOptions().mShowPointPickerProbe;
 //	bool show = mServices->visualizationService->getViewGroupData(0)->getOptions().mShowPointPickerProbe;//TOO early?
 	mShowPointPickerAction->setChecked(show);
 }

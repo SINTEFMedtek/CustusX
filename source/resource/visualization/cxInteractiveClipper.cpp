@@ -34,7 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxVolumetricRep.h"
 #include "cxReporter.h"
-//#include "cxRepManager.h"
 #include "cxSliceComputer.h"
 
 #include "cxSlicePlaneClipper.h"

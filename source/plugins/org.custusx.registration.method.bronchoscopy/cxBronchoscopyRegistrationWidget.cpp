@@ -41,7 +41,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackedCenterlineWidget.h"
 #include "cxRecordSessionWidget.h"
 #include "cxRecordSession.h"
-#include "cxRepManager.h"
 #include "cxView.h"
 #include "cxToolRep3D.h"
 #include "cxToolTracer.h"
@@ -61,6 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataAdapterHelper.h"
 #include "cxBoolDataAdapterXml.h"
 #include "cxCheckBoxWidget.h"
+#include "cxRepManager.h"
 
 
 namespace cx

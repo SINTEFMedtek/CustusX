@@ -85,7 +85,7 @@ void PlateRegistrationWidget::showEvent(QShowEvent* event)
   connect(mServices.patientModelService->getPatientLandmarks().get(), &Landmarks::landmarkRemoved,
 		  this, &PlateRegistrationWidget::landmarkUpdatedSlot);
 
-  mServices.visualizationService->getViewGroupData(0)->setRegistrationMode(rsPATIENT_REGISTRATED);
+  mServices.visualizationService->getGroup(0)->setRegistrationMode(rsPATIENT_REGISTRATED);
 }
 
 void PlateRegistrationWidget::hideEvent(QHideEvent* event)
@@ -96,7 +96,7 @@ void PlateRegistrationWidget::hideEvent(QHideEvent* event)
   disconnect(mServices.patientModelService->getPatientLandmarks().get(), &Landmarks::landmarkRemoved,
 			 this, &PlateRegistrationWidget::landmarkUpdatedSlot);
 
-  mServices.visualizationService->getViewGroupData(0)->setRegistrationMode(rsNOT_REGISTRATED);
+  mServices.visualizationService->getGroup(0)->setRegistrationMode(rsNOT_REGISTRATED);
 }
 
 void PlateRegistrationWidget::landmarkUpdatedSlot()

@@ -54,9 +54,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxVisualizationService.h"
 #include "cxViewGroupData.h"
+#include "cxRepManager.h"
 
 //TODO: remove
-#include "cxRepManager.h"
 #include "cxTrackingService.h"
 #include "cxLegacySingletons.h"
 
@@ -232,7 +232,7 @@ void LandmarkImageRegistrationWidget::showEvent(QShowEvent* event)
 //	if (image && !mImageLandmarkSource->getData())
 //		mImageLandmarkSource->setData(image);
 
-	mServices.visualizationService->getViewGroupData(0)->setRegistrationMode(rsIMAGE_REGISTRATED);
+	mServices.visualizationService->getGroup(0)->setRegistrationMode(rsIMAGE_REGISTRATED);
 	LandmarkRepPtr rep = RepManager::findFirstRep<LandmarkRep>(mServices.visualizationService->get3DView(0, 0)->getReps());
 	if (rep)
 	{
@@ -254,7 +254,7 @@ void LandmarkImageRegistrationWidget::hideEvent(QHideEvent* event)
 			rep->setSecondarySource(LandmarksSourcePtr());
 		}
 	}
-	mServices.visualizationService->getViewGroupData(0)->setRegistrationMode(rsNOT_REGISTRATED);
+	mServices.visualizationService->getGroup(0)->setRegistrationMode(rsNOT_REGISTRATED);
 }
 
 void LandmarkImageRegistrationWidget::prePaintEvent()

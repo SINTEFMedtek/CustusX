@@ -57,14 +57,14 @@ ViewPtr VisualizationServiceProxy::get3DView(int group, int index)
 	return mVisualizationService->get3DView(group, index);
 }
 
-int VisualizationServiceProxy::getActiveViewGroup() const
+int VisualizationServiceProxy::getActiveGroup() const
 {
-	return mVisualizationService->getActiveViewGroup();
+	return mVisualizationService->getActiveGroup();
 }
 
-ViewGroupDataPtr VisualizationServiceProxy::getViewGroupData(int groupIdx) const
+ViewGroupDataPtr VisualizationServiceProxy::getGroup(int groupIdx) const
 {
-	return mVisualizationService->getViewGroupData(groupIdx);
+	return mVisualizationService->getGroup(groupIdx);
 }
 
 void VisualizationServiceProxy::initServiceListener()
@@ -167,6 +167,15 @@ QActionGroup* VisualizationServiceProxy::createInteractorStyleActionGroup()
 	return mVisualizationService->createInteractorStyleActionGroup();
 }
 
+void VisualizationServiceProxy::setPreview(ImagePtr image, const std::vector<double>& threshold)
+{
+	mVisualizationService->setPreview(image, threshold);
+}
+
+void VisualizationServiceProxy::removePreview()
+{
+	mVisualizationService->removePreview();
+}
 
 
 } //cx

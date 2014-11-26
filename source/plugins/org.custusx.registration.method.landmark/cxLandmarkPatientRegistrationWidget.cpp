@@ -52,12 +52,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVisualizationService.h"
 #include "cxPatientModelService.h"
 #include "cxViewGroupData.h"
+#include "cxTrackingService.h"
+#include "cxRepManager.h"
 
 //TODO: remove
 #include "cxLegacySingletons.h"
-#include "cxRepManager.h"
-//#include "cxTrackingService.h"
-#include "cxTrackingService.h"
 
 namespace cx
 {
@@ -175,7 +174,7 @@ void LandmarkPatientRegistrationWidget::showEvent(QShowEvent* event)
 	connect(mServices.patientModelService->getPatientLandmarks().get(), SIGNAL(landmarkAdded(QString)), this, SLOT(landmarkUpdatedSlot()));
 	connect(mServices.patientModelService->getPatientLandmarks().get(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
 
-	mServices.visualizationService->getViewGroupData(0)->setRegistrationMode(rsPATIENT_REGISTRATED);
+	mServices.visualizationService->getGroup(0)->setRegistrationMode(rsPATIENT_REGISTRATED);
 
 	LandmarkRepPtr rep = RepManager::findFirstRep<LandmarkRep>(mServices.visualizationService->get3DView(0, 0)->getReps());
 	if (rep)
@@ -202,7 +201,7 @@ void LandmarkPatientRegistrationWidget::hideEvent(QHideEvent* event)
 			rep->setSecondarySource(LandmarksSourcePtr());
 		}
 	}
-	mServices.visualizationService->getViewGroupData(0)->setRegistrationMode(rsNOT_REGISTRATED);
+	mServices.visualizationService->getGroup(0)->setRegistrationMode(rsNOT_REGISTRATED);
 }
 
 void LandmarkPatientRegistrationWidget::removeLandmarkButtonClickedSlot()

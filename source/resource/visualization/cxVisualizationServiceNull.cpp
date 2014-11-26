@@ -47,13 +47,13 @@ ViewPtr VisualizationServiceNull::get3DView(int group, int index)
 	return ViewPtr();
 }
 
-int VisualizationServiceNull::getActiveViewGroup() const
+int VisualizationServiceNull::getActiveGroup() const
 {
 	printWarning();
 	return -1;
 }
 
-ViewGroupDataPtr VisualizationServiceNull::getViewGroupData(int groupIdx) const
+ViewGroupDataPtr VisualizationServiceNull::getGroup(int groupIdx) const
 {
 	printWarning();
 	return ViewGroupDataPtr();
@@ -93,6 +93,8 @@ NavigationPtr VisualizationServiceNull::getNavigation() { return NavigationPtr()
 LayoutRepositoryPtr VisualizationServiceNull::getLayoutRepository() { return LayoutRepositoryPtr(); }
 CameraControlPtr VisualizationServiceNull::getCameraControl() { return CameraControlPtr(); }
 QActionGroup* VisualizationServiceNull::createInteractorStyleActionGroup() { return mActionGroup; }
+void VisualizationServiceNull::setPreview(ImagePtr image, const std::vector<double>& threshold) {}
+void VisualizationServiceNull::removePreview() {}
 
 
 } //cx

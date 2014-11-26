@@ -131,7 +131,7 @@ PointMetricPtr MetricManager::addPoint(Vector3D point, CoordinateSystem space, Q
 	p1->setCoordinate(point);
 	patientService()->insertData(p1);
 
-	viewService()->getViewGroupData(0)->addData(p1);
+	viewService()->getGroup(0)->addData(p1);
 	this->setActiveUid(p1->getUid());
 
 	return p1;
@@ -296,7 +296,7 @@ void MetricManager::installNewMetric(DataMetricPtr metric)
 {
 	patientService()->insertData(metric);
 	this->setActiveUid(metric->getUid());
-	viewService()->getViewGroupData(0)->addData(metric);
+	viewService()->getGroup(0)->addData(metric);
 }
 
 void MetricManager::loadReferencePointsSlot()

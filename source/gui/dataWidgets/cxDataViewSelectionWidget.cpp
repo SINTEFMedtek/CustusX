@@ -541,11 +541,11 @@ DataViewSelectionWidget::DataViewSelectionWidget(QWidget* parent)
 
 void DataViewSelectionWidget::viewGroupChangedSlot()
 {
-  int vg = viewService()->getActiveViewGroup();
+  int vg = viewService()->getActiveGroup();
   if (vg<0)
     vg = 0;
 
-  ViewGroupDataPtr group = viewService()->getViewGroupData(vg);
+  ViewGroupDataPtr group = viewService()->getGroup(vg);
   if (group)
 	  mSelectedDataListWidget->setViewGroupData(group);
 

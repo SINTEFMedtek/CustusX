@@ -153,7 +153,7 @@ void EraserWidget::toggleContinous(bool on)
 
 void EraserWidget::continousRemoveSlot()
 {
-	Transform3D rMd = viewService()->getViewGroupData(0)->getOptions().mPickerGlyph->get_rMd();
+	Transform3D rMd = viewService()->getGroup(0)->getOptions().mPickerGlyph->get_rMd();
 	//Transform3D rMd = viewService()->getViewGroupDatas().front()->getData()->getOptions().mPickerGlyph->get_rMd();
 	Vector3D c(mSphere->GetCenter());
 	c = rMd.coord(c);
@@ -176,10 +176,10 @@ void EraserWidget::duplicateSlot()
 
 	// replace viz of original with duplicate
 //	std::vector<ViewGroupPtr> viewGroups = viewService()->getViewGroupDatas();
-	for (unsigned i = 0; i < viewService()->viewGroupCount(); ++i)
+	for (unsigned i = 0; i < viewService()->groupCount(); ++i)
 	{
-		if (viewService()->getViewGroupData(i)->removeData(original))
-			viewService()->getViewGroupData(i)->addData(duplicate);
+		if (viewService()->getGroup(i)->removeData(original))
+			viewService()->getGroup(i)->addData(duplicate);
 	}
 }
 
@@ -211,7 +211,7 @@ void EraserWidget::eraseVolume(TYPE* volumePointer, TYPE replaceVal)
 	Eigen::Array3i dim(img->GetDimensions());
 	Vector3D spacing(img->GetSpacing());
 
-	Transform3D rMd = viewService()->getViewGroupData(0)->getOptions().mPickerGlyph->get_rMd();
+	Transform3D rMd = viewService()->getGroup(0)->getOptions().mPickerGlyph->get_rMd();
 	Vector3D c(mSphere->GetCenter());
 	c = rMd.coord(c);
 	double r = mSphere->GetRadius();
@@ -312,22 +312,22 @@ void EraserWidget::toggleShowEraser(bool on)
 		double a = mSphereSizeAdapter->getValue();
 		mSphere->SetRadius(a);
 		mSphere->Update();
-		MeshPtr glyph = viewService()->getViewGroupData(0)->getOptions().mPickerGlyph;
+		MeshPtr glyph = viewService()->getGroup(0)->getOptions().mPickerGlyph;
 		glyph->setVtkPolyData(mSphere->GetOutput());
 		glyph->setColor(QColor(255, 204, 0)); // same as tool
 		glyph->setIsWireframe(true);
 
 		// set same glyph in all groups
-		for (unsigned i=0; i<viewService()->viewGroupCount(); ++i)
+		for (unsigned i=0; i<viewService()->groupCount(); ++i)
 		{
-			ViewGroupData::Options options = viewService()->getViewGroupData(i)->getOptions();
+			ViewGroupData::Options options = viewService()->getGroup(i)->getOptions();
 			options.mPickerGlyph = glyph;
-			viewService()->getViewGroupData(i)->setOptions(options);
+			viewService()->getGroup(i)->setOptions(options);
 		}
 	}
 	else
 	{
-		viewService()->getViewGroupData(0)->getOptions().mPickerGlyph->setVtkPolyData(NULL);
+		viewService()->getGroup(0)->getOptions().mPickerGlyph->setVtkPolyData(NULL);
 		mContinousEraseCheckBox->setChecked(false);
 	}
 

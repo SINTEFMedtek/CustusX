@@ -48,11 +48,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDoubleDataAdapterXml.h"
 #include "cxBoolDataAdapterXml.h"
 #include "cxColorDataAdapterXml.h"
-#include "cxRepManager.h"
 #include "cxThresholdPreview.h"
 #include "cxSelectDataStringDataAdapter.h"
 #include "cxLegacySingletons.h"
 #include "cxPatientModelService.h"
+#include "cxRepManager.h"
+#include "cxVisualizationService.h"
 
 namespace cx
 {
@@ -169,7 +170,7 @@ void ContourFilter::setActive(bool on)
 	FilterImpl::setActive(on);
 
 	if (!mActive)
-		RepManager::getInstance()->getThresholdPreview()->removePreview();
+		viewService()->removePreview();
 }
 
 void ContourFilter::imageChangedSlot(QString uid)
@@ -179,7 +180,7 @@ void ContourFilter::imageChangedSlot(QString uid)
 		return;
 
 	this->updateThresholdFromImageChange(uid, mSurfaceThresholdOption);
-	RepManager::getInstance()->getThresholdPreview()->removePreview();
+	viewService()->removePreview();
 
 	int extent[6];
 	image->getBaseVtkImageData()->GetExtent(extent);
@@ -195,13 +196,16 @@ void ContourFilter::thresholdSlot()
 	if (mActive)
 	{
 		ImagePtr image = boost::dynamic_pointer_cast<Image>(mInputTypes[0]->getData());
-		RepManager::getInstance()->getThresholdPreview()->setPreview(image, mSurfaceThresholdOption->getValue());
+		std::vector<double> threshold;
+		threshold.push_back(mSurfaceThresholdOption->getValue());
+		viewService()->setPreview(image, threshold);
+//		RepManager::getInstance()->getThresholdPreview()->setPreview(image, mSurfaceThresholdOption->getValue());
 	}
 }
 
 bool ContourFilter::preProcess()
 {
-	RepManager::getInstance()->getThresholdPreview()->removePreview();
+	viewService()->removePreview();
 	return FilterImpl::preProcess();
 }
 

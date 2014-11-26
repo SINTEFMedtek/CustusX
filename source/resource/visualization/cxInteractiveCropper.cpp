@@ -51,7 +51,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkBoxWidget2.h>
 #include <vtkBoxWidget.h>
 #include "cxTypeConversions.h"
-//#include "cxRepManager.h"
 #include "cxBoundingBox3D.h"
 #include "cxImage.h"
 #include "cxTransform3D.h"

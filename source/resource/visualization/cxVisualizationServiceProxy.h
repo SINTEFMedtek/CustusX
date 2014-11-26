@@ -50,8 +50,8 @@ public:
 
 	virtual ViewPtr get3DView(int group = 0, int index = 0);
 
-	virtual int getActiveViewGroup() const;
-	virtual ViewGroupDataPtr getViewGroupData(int groupIdx) const;
+	virtual int getActiveGroup() const;
+	virtual ViewGroupDataPtr getGroup(int groupIdx) const;
 
 	virtual void autoShowData(DataPtr data);
 	virtual void enableRender(bool val);
@@ -67,6 +67,8 @@ public:
 	virtual LayoutRepositoryPtr getLayoutRepository();
 	virtual CameraControlPtr getCameraControl();
 	virtual QActionGroup* createInteractorStyleActionGroup();
+	virtual void setPreview(ImagePtr image, const std::vector<double>& threshold);
+	virtual void removePreview();
 
 	bool isNull();
 

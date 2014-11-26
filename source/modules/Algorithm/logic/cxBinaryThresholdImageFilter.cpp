@@ -44,7 +44,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxDoublePairDataAdapterXml.h"
 
-#include "cxRepManager.h"
 #include "cxThresholdPreview.h"
 #include "cxContourFilter.h"
 #include "cxMesh.h"
@@ -52,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSelectDataStringDataAdapter.h"
 #include "cxLegacySingletons.h"
 #include "cxPatientModelService.h"
+#include "cxVisualizationService.h"
 
 namespace cx
 {
@@ -146,13 +146,14 @@ void BinaryThresholdImageFilter::setActive(bool on)
 	FilterImpl::setActive(on);
 
 	if (!mActive)
-		RepManager::getInstance()->getThresholdPreview()->removePreview();
+		viewService()->removePreview();
+//		RepManager::getInstance()->getThresholdPreview()->removePreview();
 }
 
 void BinaryThresholdImageFilter::imageChangedSlot(QString uid)
 {
 	this->updateThresholdPairFromImageChange(uid, mThresholdOption);
-	RepManager::getInstance()->getThresholdPreview()->removePreview();
+	viewService()->removePreview();
 }
 
 void BinaryThresholdImageFilter::thresholdSlot()
@@ -160,13 +161,17 @@ void BinaryThresholdImageFilter::thresholdSlot()
 	if (mActive)
 	{
 		ImagePtr image = boost::dynamic_pointer_cast<Image>(mInputTypes[0]->getData());
-		RepManager::getInstance()->getThresholdPreview()->setPreview(image, mThresholdOption->getValue());
+		std::vector<double> threshold;
+		threshold.push_back(mThresholdOption->getValue()[0]);
+		threshold.push_back(mThresholdOption->getValue()[1]);
+		viewService()->setPreview(image, threshold);
+//		RepManager::getInstance()->getThresholdPreview()->setPreview(image, mThresholdOption->getValue());
 	}
 }
 
 bool BinaryThresholdImageFilter::preProcess()
 {
-	RepManager::getInstance()->getThresholdPreview()->removePreview();
+	viewService()->removePreview();
 	return FilterImpl::preProcess();
 
 }

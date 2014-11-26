@@ -45,10 +45,10 @@ VisualizationServicePtr VisualizationService::getNullObject()
 }
 
 
-unsigned VisualizationService::viewGroupCount() const
+unsigned VisualizationService::groupCount() const
 {
 	int count = 0;
-	while(this->getViewGroupData(count))
+	while(this->getGroup(count))
 		++count;
 	return count;
 }

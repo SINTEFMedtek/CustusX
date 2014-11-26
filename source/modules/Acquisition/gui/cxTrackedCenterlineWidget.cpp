@@ -37,13 +37,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMeshHelpers.h"
 #include "cxToolRep3D.h"
 #include "cxToolTracer.h"
-#include "cxRepManager.h"
 #include "cxTrackingDataToVolume.h"
 #include "cxRecordSessionWidget.h"
 #include "cxTool.h"
 #include "cxReporter.h"
 #include "cxView.h"
 #include "cxVisualizationService.h"
+#include "cxRepManager.h"
 
 #include "cxLegacySingletons.h"
 

@@ -70,9 +70,9 @@ class cxResourceVisualization_EXPORT VisualizationService : public QObject
 public:
 	virtual ViewPtr get3DView(int group = 0, int index = 0) = 0;
 
-	virtual int getActiveViewGroup() const = 0;
-	virtual ViewGroupDataPtr getViewGroupData(int groupIdx) const = 0;
-	unsigned viewGroupCount() const;
+	virtual int getActiveGroup() const = 0;
+	virtual ViewGroupDataPtr getGroup(int groupIdx) const = 0;
+	unsigned groupCount() const;
 
 	virtual void autoShowData(DataPtr data) = 0;
 	virtual void enableRender(bool val) = 0;
@@ -88,6 +88,9 @@ public:
 	virtual LayoutRepositoryPtr getLayoutRepository() = 0;
 	virtual CameraControlPtr getCameraControl() = 0;
 	virtual QActionGroup* createInteractorStyleActionGroup() = 0;
+
+	virtual void setPreview(ImagePtr image, const std::vector<double>& threshold) = 0;
+	virtual void removePreview() = 0;
 
 	virtual bool isNull() = 0;
 	static VisualizationServicePtr getNullObject();

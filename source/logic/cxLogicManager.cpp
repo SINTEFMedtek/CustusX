@@ -37,7 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVideoServiceProxy.h"
 #include "cxViewManager.h"
 #include "cxStateService.h"
-#include "cxRepManager.h"
 #include "cxGPUImageBuffer.h"
 #include "cxSettings.h"
 #include "cxSpaceProviderImpl.h"
