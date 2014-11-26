@@ -69,7 +69,7 @@ public:
 	virtual std::vector<Space> getValueRange() const; /// range of value. Use if data is constrained to a set.
 	virtual void setValueRange(std::vector<Space> range);
 	virtual QString convertInternal2Display(Space internal); ///< conversion from internal value to display value
-	virtual void setDisplayNames(std::map<Space, QString> names);
+//	virtual void setDisplayNames(std::map<Space, QString> names);
 
 	virtual bool isReadOnly() const { return mIsReadOnly; }
 	virtual bool getAllowOnlyValuesInRange() const { return mAllowOnlyValuesInRange; }

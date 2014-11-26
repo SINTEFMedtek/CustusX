@@ -96,7 +96,6 @@ void TestVideoConnectionWidget::setupWidgetToRunStreamer(QString filename)
 
 	QString method = "ImageFile";
 	mConnectionSelector->setValue(method);
-//	cx::videoService()->setConnectionMethod("ImageFile");
 	this->getOption("filename", method)->setValueFromVariant(filename);
 	this->getOption("runlocalserver", method)->setValueFromVariant(false);
 }

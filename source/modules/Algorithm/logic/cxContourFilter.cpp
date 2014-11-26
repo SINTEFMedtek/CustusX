@@ -52,7 +52,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSelectDataStringDataAdapter.h"
 #include "cxLegacySingletons.h"
 #include "cxPatientModelService.h"
-#include "cxRepManager.h"
 #include "cxVisualizationService.h"
 
 namespace cx

@@ -130,10 +130,10 @@ QString SpaceDataAdapterXml::convertInternal2Display(Space internal)
 //	return internal.toString();
 }
 
-void SpaceDataAdapterXml::setDisplayNames(std::map<Space, QString> names)
-{
-	mDisplayNames = names;
-	emit changed();
-}
+//void SpaceDataAdapterXml::setDisplayNames(std::map<Space, QString> names)
+//{
+//	mDisplayNames = names;
+//	emit changed();
+//}
 
 } // namespace cx
