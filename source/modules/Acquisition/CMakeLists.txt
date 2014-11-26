@@ -13,6 +13,9 @@
 ###########################################################
 
 SET( MOC_HEADER_FILES
+    cxAcquisitionService.h
+    cxAcquisitionServiceProxy.h
+
     logic/cxAcquisitionData.h
     logic/cxUSAcquisition.h
 	logic/cxUSSavingRecorder.h
@@ -30,6 +33,13 @@ QT5_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
 # library
 SET( SOURCE_FILES
     ${MOC_HEADER_FILES}
+    cxAcquisitionService.cpp
+    cxAcquisitionServiceProxy.cpp
+    cxAcquisitionServiceNull.h
+    cxAcquisitionServiceNull.cpp
+    cxAcquisitionImplService.h
+    cxAcquisitionImplService.cpp
+
     logic/cxAcquisitionData.h
     logic/cxAcquisitionData.cpp
     logic/cxRecordSession.h
