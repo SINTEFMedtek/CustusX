@@ -58,6 +58,7 @@ void force_C_locale_decimalseparator()
 
 	if (radixChar != C_radixChar)
 	{
+		QLocale::setDefault(QLocale::c());
 		setlocale(LC_NUMERIC,"C");
 
 		std::cout << QString("Detected non-standard decimal separator [%1], changing to standard [%2].")
