@@ -30,55 +30,64 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXDirectlyLinkedSender_H_
-#define CXDirectlyLinkedSender_H_
-
-#include "cxGrabberExport.h"
-
-#include "cxSenderImpl.h"
-
-#include <QObject>
-#include <boost/shared_ptr.hpp>
-#include "cxImage.h"
-#include "cxTool.h"
-#include "cxIGTLinkImageMessage.h"
-#include "cxIGTLinkUSStatusMessage.h"
+#include "cxGrabberSenderQTcpSocket.h"
+#include "cxIGTLinkConversion.h"
 
 namespace cx
 {
 
-/**
- * \ingroup cx_resource_videoserver
- *
- */
-class cxGrabber_EXPORT DirectlyLinkedSender : public SenderImpl
+GrabberSenderQTcpSocket::GrabberSenderQTcpSocket(QTcpSocket* socket)
 {
-	Q_OBJECT
+	mMaxBufferSize = 19200000; //800(width)*600(height)*4(bytes)*10(images)
+	mSocket = socket;
+}
 
-public:
-	DirectlyLinkedSender() {}
-	virtual ~DirectlyLinkedSender() {}
+bool GrabberSenderQTcpSocket::isReady() const
+{
+	if (!mSocket)
+		return false;
+	if (mSocket->bytesToWrite() > mMaxBufferSize)
+		return false;;
+	return true;
+}
 
-	bool isReady() const;
-	virtual void send(IGTLinkImageMessage::Pointer msg);
-	virtual void send(IGTLinkUSStatusMessage::Pointer msg);
-	virtual void send(ImagePtr msg);
-	virtual void send(ProbeDefinitionPtr msg);
+void GrabberSenderQTcpSocket::send(IGTLinkImageMessage::Pointer msg)
+{
+	if (!msg || !this->isReady())
+		return;
 
-	ImagePtr popImage();
-	ProbeDefinitionPtr popUSStatus();
+	// Pack (serialize) and send
+	msg->Pack();
+	mSocket->write(reinterpret_cast<const char*> (msg->GetPackPointer()), msg->GetPackSize());
+}
 
-signals:
-	void newImage();
-	void newUSStatus();
+void GrabberSenderQTcpSocket::send(IGTLinkUSStatusMessage::Pointer msg)
+{
+	if (!msg || !this->isReady())
+		return;
 
-private:
-	ImagePtr mImage;
-	ProbeDefinitionPtr mUSStatus;
-	IGTLinkUSStatusMessage::Pointer mUnsentUSStatusMessage; ///< received message, will be added to queue when next image arrives
+	// Pack (serialize) and send
+	msg->Pack();
+	mSocket->write(reinterpret_cast<const char*> (msg->GetPackPointer()), msg->GetPackSize());
+}
 
-};
-typedef boost::shared_ptr<DirectlyLinkedSender> DirectlyLinkedSenderPtr;
+void GrabberSenderQTcpSocket::send(ImagePtr msg)
+{
+	if (!this->isReady())
+		return;
 
-}//namespace cx
-#endif /* CXDirectlyLinkedSender_H_ */
+	IGTLinkConversion converter;
+	this->send(converter.encode(msg));
+}
+
+void GrabberSenderQTcpSocket::send(ProbeDefinitionPtr msg)
+{
+	if (!this->isReady())
+		return;
+
+	IGTLinkConversion converter;
+	this->send(converter.encode(msg));
+}
+
+
+} /* namespace cx */

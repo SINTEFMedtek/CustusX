@@ -30,55 +30,61 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXDirectlyLinkedSender_H_
-#define CXDirectlyLinkedSender_H_
+#ifndef CXSenderImpl_H_
+#define CXSenderImpl_H_
 
 #include "cxGrabberExport.h"
 
-#include "cxSenderImpl.h"
+#include "cxSender.h"
 
 #include <QObject>
 #include <boost/shared_ptr.hpp>
-#include "cxImage.h"
-#include "cxTool.h"
+#include <qtcpsocket.h>
 #include "cxIGTLinkImageMessage.h"
 #include "cxIGTLinkUSStatusMessage.h"
+#include "cxImage.h"
+#include "cxTool.h"
 
 namespace cx
 {
 
 /**
- * \ingroup cx_resource_videoserver
- *
- */
-class cxGrabber_EXPORT DirectlyLinkedSender : public SenderImpl
+* \file
+* \addtogroup cx_resource_videoserver
+* @{
+*/
+
+class cxGrabber_EXPORT SenderImpl : public Sender
 {
-	Q_OBJECT
-
 public:
-	DirectlyLinkedSender() {}
-	virtual ~DirectlyLinkedSender() {}
+	SenderImpl() {}
+	virtual ~SenderImpl() {}
 
-	bool isReady() const;
-	virtual void send(IGTLinkImageMessage::Pointer msg);
-	virtual void send(IGTLinkUSStatusMessage::Pointer msg);
-	virtual void send(ImagePtr msg);
-	virtual void send(ProbeDefinitionPtr msg);
+	/**Return if sender is ready to send another message. If !isReady(),
+	 * calls to send() will fail.
+	 */
+	virtual bool isReady() const = 0;
 
-	ImagePtr popImage();
-	ProbeDefinitionPtr popUSStatus();
+	virtual void send(PackagePtr package);
 
-signals:
-	void newImage();
-	void newUSStatus();
-
-private:
-	ImagePtr mImage;
-	ProbeDefinitionPtr mUSStatus;
-	IGTLinkUSStatusMessage::Pointer mUnsentUSStatusMessage; ///< received message, will be added to queue when next image arrives
-
+protected:
+	/**Send an image message, NOT packed.
+	 */
+	virtual void send(IGTLinkImageMessage::Pointer msg) = 0;
+	/**Send an US status message, NOT packed
+	 */
+	virtual void send(IGTLinkUSStatusMessage::Pointer msg) = 0;
+	/**Send an image message, NOT packed.
+	 */
+	virtual void send(ImagePtr msg) = 0;
+	/**Send an US status message, NOT packed
+	 */
+	virtual void send(ProbeDefinitionPtr msg) = 0;
 };
-typedef boost::shared_ptr<DirectlyLinkedSender> DirectlyLinkedSenderPtr;
 
-}//namespace cx
-#endif /* CXDirectlyLinkedSender_H_ */
+/**
+* @}
+*/
+
+} /* namespace cx */
+#endif /* CXSenderImpl_H_ */

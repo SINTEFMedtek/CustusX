@@ -30,55 +30,26 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXDirectlyLinkedSender_H_
-#define CXDirectlyLinkedSender_H_
-
-#include "cxGrabberExport.h"
-
 #include "cxSenderImpl.h"
-
-#include <QObject>
-#include <boost/shared_ptr.hpp>
-#include "cxImage.h"
-#include "cxTool.h"
-#include "cxIGTLinkImageMessage.h"
-#include "cxIGTLinkUSStatusMessage.h"
+#include "cxIGTLinkConversion.h"
 
 namespace cx
 {
 
-/**
- * \ingroup cx_resource_videoserver
- *
- */
-class cxGrabber_EXPORT DirectlyLinkedSender : public SenderImpl
+void SenderImpl::send(PackagePtr package)
 {
-	Q_OBJECT
+	if(package->mIgtLinkImageMessage)
+		this->send(package->mIgtLinkImageMessage);
 
-public:
-	DirectlyLinkedSender() {}
-	virtual ~DirectlyLinkedSender() {}
+	if(package->mIgtLinkUSStatusMessage)
+		this->send(package->mIgtLinkUSStatusMessage);
 
-	bool isReady() const;
-	virtual void send(IGTLinkImageMessage::Pointer msg);
-	virtual void send(IGTLinkUSStatusMessage::Pointer msg);
-	virtual void send(ImagePtr msg);
-	virtual void send(ProbeDefinitionPtr msg);
+	if(package->mImage)
+		this->send(package->mImage);
 
-	ImagePtr popImage();
-	ProbeDefinitionPtr popUSStatus();
+	if(package->mProbe)
+		this->send(package->mProbe);
+}
 
-signals:
-	void newImage();
-	void newUSStatus();
 
-private:
-	ImagePtr mImage;
-	ProbeDefinitionPtr mUSStatus;
-	IGTLinkUSStatusMessage::Pointer mUnsentUSStatusMessage; ///< received message, will be added to queue when next image arrives
-
-};
-typedef boost::shared_ptr<DirectlyLinkedSender> DirectlyLinkedSenderPtr;
-
-}//namespace cx
-#endif /* CXDirectlyLinkedSender_H_ */
+} /* namespace cx */

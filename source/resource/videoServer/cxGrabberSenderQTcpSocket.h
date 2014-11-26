@@ -30,8 +30,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXDirectlyLinkedSender_H_
-#define CXDirectlyLinkedSender_H_
+#ifndef CXGrabberSenderQTcpSocket_H_
+#define CXGrabberSenderQTcpSocket_H_
 
 #include "cxGrabberExport.h"
 
@@ -39,46 +39,43 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObject>
 #include <boost/shared_ptr.hpp>
-#include "cxImage.h"
-#include "cxTool.h"
+#include <qtcpsocket.h>
 #include "cxIGTLinkImageMessage.h"
 #include "cxIGTLinkUSStatusMessage.h"
+#include "cxImage.h"
+#include "cxTool.h"
 
 namespace cx
 {
 
 /**
- * \ingroup cx_resource_videoserver
- *
- */
-class cxGrabber_EXPORT DirectlyLinkedSender : public SenderImpl
-{
-	Q_OBJECT
+* \file
+* \addtogroup cx_resource_videoserver
+* @{
+*/
 
+class cxGrabber_EXPORT GrabberSenderQTcpSocket : public SenderImpl
+{
 public:
-	DirectlyLinkedSender() {}
-	virtual ~DirectlyLinkedSender() {}
+	explicit GrabberSenderQTcpSocket(QTcpSocket* socket);
+	virtual ~GrabberSenderQTcpSocket() {}
 
 	bool isReady() const;
+
+protected:
 	virtual void send(IGTLinkImageMessage::Pointer msg);
 	virtual void send(IGTLinkUSStatusMessage::Pointer msg);
 	virtual void send(ImagePtr msg);
 	virtual void send(ProbeDefinitionPtr msg);
 
-	ImagePtr popImage();
-	ProbeDefinitionPtr popUSStatus();
-
-signals:
-	void newImage();
-	void newUSStatus();
-
 private:
-	ImagePtr mImage;
-	ProbeDefinitionPtr mUSStatus;
-	IGTLinkUSStatusMessage::Pointer mUnsentUSStatusMessage; ///< received message, will be added to queue when next image arrives
-
+	QTcpSocket* mSocket;
+	int mMaxBufferSize;
 };
-typedef boost::shared_ptr<DirectlyLinkedSender> DirectlyLinkedSenderPtr;
 
-}//namespace cx
-#endif /* CXDirectlyLinkedSender_H_ */
+/**
+* @}
+*/
+
+} /* namespace cx */
+#endif /* CXGrabberSenderQTcpSocket__H_ */
