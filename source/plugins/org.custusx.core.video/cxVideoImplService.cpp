@@ -273,6 +273,9 @@ void VideoImplService::initServiceListener()
 
 void VideoImplService::onStreamerServiceAdded(StreamerService* service)
 {
+	if (mConnectionMethod.isEmpty())
+		mConnectionMethod = service->getName();
+
 	emit StreamerServiceAdded(service);
 }
 

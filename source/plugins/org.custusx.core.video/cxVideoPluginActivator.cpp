@@ -55,8 +55,9 @@ VideoPluginActivator::~VideoPluginActivator()
 void VideoPluginActivator::start(ctkPluginContext* context)
 {
 	mRegistration = RegisteredService::create<VideoImplService>(context, VideoService_iid);
-	mIGTLinkStreamer = RegisteredService::create<IGTLinkStreamerService>(context, StreamerService_iid);
+	// the first added streamer will be the default selected
 	mOpenCVStreamer = RegisteredService::create<OpenCVStreamerService>(context, StreamerService_iid);
+	mIGTLinkStreamer = RegisteredService::create<IGTLinkStreamerService>(context, StreamerService_iid);
 	mImageFileStreamer = RegisteredService::create<ImageFileStreamerService>(context, StreamerService_iid);
 }
 
