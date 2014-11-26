@@ -55,8 +55,9 @@ public:
 	/** Make sure one given option exists witin root.
 	 * If not present, fill inn the input defaults.
 	 */
-	static SpaceDataAdapterXmlPtr initialize(const QString& uid, QString name, QString help, Space value,
-		std::vector<Space> range, QDomNode root = QDomNode());
+	static SpaceDataAdapterXmlPtr initialize(const QString& uid, QString name, QString help, Space value=Space(),
+		std::vector<Space> range=std::vector<Space>(), QDomNode root = QDomNode());
+	void setSpaceProvider(SpaceProviderPtr provider);
 
 public:
 	// inherited interface
@@ -68,8 +69,8 @@ public:
 	virtual void setHelp(QString val);
 	virtual std::vector<Space> getValueRange() const; /// range of value. Use if data is constrained to a set.
 	virtual void setValueRange(std::vector<Space> range);
-	virtual QString convertInternal2Display(Space internal); ///< conversion from internal value to display value
-//	virtual void setDisplayNames(std::map<Space, QString> names);
+	virtual QString convertRefObjectInternal2Display(QString internal); ///< conversion from internal value to display value
+	virtual void setRefObjectDisplayNames(std::map<QString, QString> names);
 
 	virtual bool isReadOnly() const { return mIsReadOnly; }
 	virtual bool getAllowOnlyValuesInRange() const { return mAllowOnlyValuesInRange; }
@@ -79,6 +80,8 @@ public:
 signals:
 	void valueWasSet(); /// emitted when the value is set using setValue() (similar to changed(), but more constrained)
 
+private slots:
+	void providerChangedSlot();
 private:
 	SpaceDataAdapterXml();
 	QString mName;
@@ -87,9 +90,11 @@ private:
 	Space mValue;
 	std::vector<Space> mRange;
 	XmlOptionItem mStore;
-	std::map<Space, QString> mDisplayNames;
+	std::map<QString, QString> mDisplayNames;
 	bool mIsReadOnly;
 	bool mAllowOnlyValuesInRange;
+
+	SpaceProviderPtr mProvider;
 };
 
 // --------------------------------------------------------

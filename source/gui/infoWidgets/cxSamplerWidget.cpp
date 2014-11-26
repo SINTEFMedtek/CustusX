@@ -78,10 +78,8 @@ SamplerWidget::SamplerWidget(QWidget* parent) :
 
 	mSpaceSelector = SpaceDataAdapterXml::initialize("selectSpace",
 											  "Space",
-											  "Select coordinate system to store position in.",
-											  Space(),
-											  std::vector<Space>(),
-											  QDomNode());
+											  "Select coordinate system to store position in.");
+	mSpaceSelector->setSpaceProvider(spaceProvider());
 
 	connect(mSpaceSelector.get(), &SpaceDataAdapterXml::valueWasSet, this, &SamplerWidget::spacesChangedSlot);
 	connect(mSpaceSelector.get(), &SpaceDataAdapterXml::valueWasSet, this, &SamplerWidget::setModified);
@@ -89,7 +87,7 @@ SamplerWidget::SamplerWidget(QWidget* parent) :
 	mSpaceSelector->setValue(space);
 	SpaceEditWidget* spaceSelectorWidget = new SpaceEditWidget(this, mSpaceSelector);
 	spaceSelectorWidget->showLabel(false);
-    mAdvancedLayout->addWidget(spaceSelectorWidget);
+	mAdvancedLayout->addWidget(spaceSelectorWidget);
 	this->spacesChangedSlot();
 
 	mCoordLineEdit = new QLineEdit(this);
@@ -133,8 +131,8 @@ void SamplerWidget::spacesChangedSlot()
 	CoordinateSystem space = mSpaceSelector->getValue();
 	settings()->setValue("sampler/Space", space.toString());
 
-	mSpaceSelector->setValueRange(spaceProvider()->getSpacesToPresentInGUI());
-	mSpaceSelector->setValue(space);
+//	mSpaceSelector->setValueRange(spaceProvider()->getSpacesToPresentInGUI());
+//	mSpaceSelector->setValue(space);
 	mListener->setSpace(space);
 }
 

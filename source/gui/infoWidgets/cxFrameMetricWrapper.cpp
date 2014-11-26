@@ -66,10 +66,8 @@ QWidget* FrameMetricWrapper::createWidget()
 
 	mSpaceSelector = SpaceDataAdapterXml::initialize("selectSpace",
 											  "Space",
-											  "Select coordinate system to store position in.",
-											  Space(),
-											  spaceProvider()->getSpacesToPresentInGUI(),
-											  QDomNode());
+											  "Select coordinate system to store position in.");
+	mSpaceSelector->setSpaceProvider(spaceProvider());
 	hLayout->addWidget(new SpaceEditWidget(widget, mSpaceSelector));
 
 	mFrameWidget = new Transform3DWidget(widget);
@@ -131,10 +129,6 @@ void FrameMetricWrapper::spaceSelected()
 
 void FrameMetricWrapper::dataChangedSlot()
 {
-//	mInternalUpdate = true;
-//	mSpaceSelector->setValue(mData->getSpace().toString());
-//	mFrameWidget->setMatrix(mData->getFrame());
-//	mInternalUpdate = false;
 }
 
 void FrameMetricWrapper::frameWidgetChangedSlot()

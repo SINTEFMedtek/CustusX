@@ -89,7 +89,26 @@ std::vector<CoordinateSystem> SpaceProviderImpl::getSpacesToPresentInGUI()
 		retval.push_back(CoordinateSystem(csTOOL_OFFSET, i->first));
 	}
 
+	return retval;
+}
 
+std::map<QString, QString> SpaceProviderImpl::getDisplayNamesForCoordRefObjects()
+{
+	std::map<QString, QString> retval;
+
+	retval["active"] = "active";
+
+	std::map<QString, DataPtr> data = mDataManager->getData();
+	for (std::map<QString, DataPtr>::iterator i=data.begin(); i!=data.end(); ++i)
+	{
+		retval[i->second->getSpace()] = i->second->getName();
+	}
+
+	std::map<QString, ToolPtr> tools = mTrackingService->getTools();
+	for (std::map<QString, ToolPtr>::iterator i=tools.begin(); i!=tools.end(); ++i)
+	{
+		retval[i->first] = i->second->getName();
+	}
 
 	return retval;
 }

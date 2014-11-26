@@ -94,6 +94,11 @@ public:
 	{
 		return internal.toString();
 	} ///< conversion from internal value to display value
+	virtual QString convertRefObjectInternal2Display(QString internal)
+	{
+		return internal;
+	}
+
 
 };
 typedef boost::shared_ptr<SpaceDataAdapter> SpaceDataAdapterPtr;

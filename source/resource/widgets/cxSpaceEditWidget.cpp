@@ -167,8 +167,7 @@ void SpaceEditWidget::rebuildRefCombobox()
 	for (int i = 0; i < refs.size(); ++i)
 	{
 		QString ref = refs[i];
-		QString name = ref;
-
+		QString name = mData->convertRefObjectInternal2Display(ref);
 		mRefCombo->addItem(name);
 		mRefCombo->setItemData(i, ref);
 		if (ref == currentValue.mRefObject)

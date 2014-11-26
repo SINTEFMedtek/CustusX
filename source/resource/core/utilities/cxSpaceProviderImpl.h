@@ -55,6 +55,7 @@ public:
 
 	virtual Transform3D get_toMfrom(CoordinateSystem from, CoordinateSystem to); ///< to_M_from
 	virtual std::vector<CoordinateSystem> getSpacesToPresentInGUI();
+	virtual std::map<QString, QString> getDisplayNamesForCoordRefObjects();
 	virtual SpaceListenerPtr createListener();
 
     virtual Vector3D getDominantToolTipPoint(CoordinateSystem to, bool useOffset = false) { return this->getActiveToolTipPoint(to, useOffset); }

@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDomElement>
 #include <QStringList>
 #include "cxTypeConversions.h"
+#include "cxSpaceProvider.h"
 
 namespace cx
 {
@@ -59,6 +60,23 @@ SpaceDataAdapterXmlPtr SpaceDataAdapterXml::initialize(const QString& uid, QStri
 	retval->mAllowOnlyValuesInRange = true;
 	return retval;
 }
+
+void SpaceDataAdapterXml::setSpaceProvider(SpaceProviderPtr provider)
+{
+	mProvider = provider;
+	connect(mProvider.get(), &SpaceProvider::spaceAddedOrRemoved, this, &SpaceDataAdapterXml::providerChangedSlot);
+	this->providerChangedSlot();
+}
+
+void SpaceDataAdapterXml::providerChangedSlot()
+{
+	std::map<QString, QString> names = mProvider->getDisplayNamesForCoordRefObjects();
+	this->setRefObjectDisplayNames(names);
+
+	std::vector<CoordinateSystem> spaces = mProvider->getSpacesToPresentInGUI();
+	this->setValueRange(spaces);
+}
+
 
 void SpaceDataAdapterXml::setReadOnly(bool val)
 {
@@ -122,18 +140,17 @@ void SpaceDataAdapterXml::setValueRange(std::vector<Space> range)
 /**If a mapping from internal name to display name has been set, use it.
  * Otherwise return the input.
  */
-QString SpaceDataAdapterXml::convertInternal2Display(Space internal)
+QString SpaceDataAdapterXml::convertRefObjectInternal2Display(QString internal)
 {
-	return internal.toString();
-//	if (mDisplayNames.count(internal))
-//		return mDisplayNames[internal];
-//	return internal.toString();
+	if (mDisplayNames.count(internal))
+		return mDisplayNames[internal];
+	return internal;
 }
 
-//void SpaceDataAdapterXml::setDisplayNames(std::map<Space, QString> names)
-//{
-//	mDisplayNames = names;
-//	emit changed();
-//}
+void SpaceDataAdapterXml::setRefObjectDisplayNames(std::map<QString, QString> names)
+{
+	mDisplayNames = names;
+	emit changed();
+}
 
 } // namespace cx

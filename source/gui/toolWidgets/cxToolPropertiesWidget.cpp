@@ -103,10 +103,8 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
 
   mSpaceSelector = SpaceDataAdapterXml::initialize("selectSpace",
       "Space",
-      "Select coordinate system to store position in.",
-	  Space(),
-	  std::vector<Space>(),
-      QDomNode());
+	  "Select coordinate system to store position in.");
+  mSpaceSelector->setSpaceProvider(spaceProvider());
   connect(mSpaceSelector.get(), &SpaceDataAdapterXml::valueWasSet, this, &ToolPropertiesWidget::spacesChangedSlot);
   connect(mSpaceSelector.get(), &SpaceDataAdapterXml::valueWasSet, this, &ToolPropertiesWidget::setModified);
   mSpaceSelector->setValue(spaceProvider()->getPr());
@@ -182,7 +180,7 @@ void ToolPropertiesWidget::spacesChangedSlot()
 {
 	CoordinateSystem space = mSpaceSelector->getValue();
 
-	mSpaceSelector->setValueRange(spaceProvider()->getSpacesToPresentInGUI());
+//	mSpaceSelector->setValueRange(spaceProvider()->getSpacesToPresentInGUI());
 	mSpaceSelector->setValue(space);
 	mSpaceSelector->setHelp(QString("The space q to display tool position in,\n"
 	                                "qMt"));

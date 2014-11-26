@@ -204,7 +204,6 @@ PointMetricWrapper::PointMetricWrapper(VisualizationServicePtr visualizationServ
 	mInternalUpdate = false;
 	connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
 	connect(mPatientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataChangedSlot()));
-	connect(spaceProvider().get(), &SpaceProvider::spaceAddedOrRemoved, this, &PointMetricWrapper::dataChangedSlot);
 }
 
 PointMetricWrapper::~PointMetricWrapper()
@@ -223,7 +222,6 @@ QWidget* PointMetricWrapper::createWidget()
 
 	mSpaceSelector = this->createSpaceSelector();
 	hLayout->addWidget(new SpaceEditWidget(widget, mSpaceSelector));
-//	hLayout->addWidget(new LabeledComboBoxWidget(widget, mSpaceSelector));
 
 	mCoordinate =  this->createCoordinateSelector();
 	topLayout->addWidget(Vector3DWidget::createSmallHorizontal(widget, mCoordinate));
@@ -243,11 +241,9 @@ SpaceDataAdapterXmlPtr PointMetricWrapper::createSpaceSelector() const
 	SpaceDataAdapterXmlPtr retval;
 	retval = SpaceDataAdapterXml::initialize("selectSpace",
 											  "Space",
-											  "Select coordinate system to store position in.",
-											  Space(),
-											  spaceProvider()->getSpacesToPresentInGUI(),
-											  QDomNode());
+											  "Select coordinate system to store position in.");
 	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(spaceSelected()));
+	retval->setSpaceProvider(spaceProvider());
 	return retval;
 }
 
@@ -325,8 +321,6 @@ void PointMetricWrapper::coordinateChanged()
 
 void PointMetricWrapper::dataChangedSlot()
 {
-	std::vector<CoordinateSystem> spaces = spaceProvider()->getSpacesToPresentInGUI();
-	mSpaceSelector->setValueRange(spaces);
 }
 
 void PointMetricWrapper::update()
