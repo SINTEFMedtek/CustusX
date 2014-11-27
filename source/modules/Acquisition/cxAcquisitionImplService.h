@@ -34,13 +34,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXACQUISITIONIMPLSERVICE_H
 
 #include "cxAcquisitionService.h"
-
 class ctkPluginContext;
+
 
 namespace cx
 {
+typedef boost::shared_ptr<class Acquisition> AcquisitionPtr;
+typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
 
-/** \brief Implementation for Acqusition service'
+/** \brief Implementation for Acqusition service
  *
  *  \ingroup org_custusx_acqiusition
  *  \date 2014-11-26
@@ -54,8 +56,13 @@ public:
 	virtual ~AcquisitionImplService();
 	virtual bool isNull();
 
+	virtual RecordSessionPtr getLatestSession();
+	virtual std::vector<RecordSessionPtr> getSessions();
+
 private:
 	ctkPluginContext* mContext;
+	AcquisitionDataPtr mAcquisitionData;
+	AcquisitionPtr mAcquisition;
 };
 
 typedef boost::shared_ptr<AcquisitionImplService> AcquisitionImplServicePtr;

@@ -78,4 +78,14 @@ bool AcquisitionServiceProxy::isNull()
 	return mAcquisitionService->isNull();
 }
 
+RecordSessionPtr AcquisitionServiceProxy::getLatestSession()
+{
+	return mAcquisitionService->getLatestSession();
+}
+
+std::vector<RecordSessionPtr> AcquisitionServiceProxy::getSessions()
+{
+	return mAcquisitionService->getSessions();
+}
+
 } //cx

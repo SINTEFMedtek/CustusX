@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxAcquisitionService.h"
 #include "cxAcquisitionServiceNull.h"
 #include "cxNullDeleter.h"
+#include "cxRecordSession.h"
 
 namespace cx
 {
@@ -43,5 +44,17 @@ AcquisitionServicePtr AcquisitionService::getNullObject()
 	if (!mNull)
 		mNull.reset(new AcquisitionServiceNull, null_deleter());
 	return mNull;
+}
+
+RecordSessionPtr AcquisitionService::getSession(QString uid)
+{
+	RecordSessionPtr retval;
+	std::vector<RecordSessionPtr>::iterator it = this->getSessions().begin();
+	for(; it != this->getSessions().end(); ++it)
+	{
+		if((*it)->getUid() == uid)
+			retval = (*it);
+	}
+	return retval;
 }
 } //cx

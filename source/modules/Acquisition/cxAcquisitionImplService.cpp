@@ -31,12 +31,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxAcquisitionImplService.h"
+#include "cxAcquisitionData.h"
 
 namespace cx
 {
 
 AcquisitionImplService::AcquisitionImplService(ctkPluginContext *context) :
-	mContext(context)
+	mContext(context),
+	mAcquisitionData(new AcquisitionData()),
+	mAcquisition(new Acquisition(mAcquisitionData))
 //	mPatientModelService(new PatientModelServiceProxy(context))
 {
 //	connect(mPatientModelService.get(), &PatientModelService::isSaving, this, &AcquisitionImplService::duringSavePatientSlot);
@@ -52,4 +55,15 @@ bool AcquisitionImplService::isNull()
 {
 	return false;
 }
+
+RecordSessionPtr AcquisitionImplService::getLatestSession()
+{
+	return mAcquisition->getLatestSession();
+}
+
+std::vector<RecordSessionPtr> AcquisitionImplService::getSessions()
+{
+	return mAcquisition->getPluginData()->getRecordSessions();
+}
+
 } // cx

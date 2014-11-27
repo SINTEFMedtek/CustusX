@@ -50,6 +50,9 @@ public:
 	AcquisitionServiceNull();
 	~AcquisitionServiceNull() {}
 	virtual bool isNull();
+
+	virtual RecordSessionPtr getLatestSession();
+	virtual std::vector<RecordSessionPtr> getSessions();
 private:
 	void printWarning();
 };
