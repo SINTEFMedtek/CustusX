@@ -48,8 +48,8 @@ BranchList::BranchList()
 
 BranchList::~BranchList()
 {
-	for (int i = 0; i < mBranches.size(); i++)
-		mBranches[i]->~Branch();
+//	for (int i = 0; i < mBranches.size(); i++)
+//		mBranches[i]->~Branch();
 }
 
 void BranchList::addBranch(BranchPtr b)
@@ -245,7 +245,7 @@ BranchListPtr BranchList::removePositionsForLocalRegistration(Eigen::MatrixXd tr
 		std::pair<std::vector<Eigen::MatrixXd::Index>, Eigen::VectorXd> distanceData;
 		distanceData = dsearchn(positions, trackingPositions);
 		Eigen::VectorXd distance = distanceData.second;
-		for (int j = positions.cols() - 1; i <= 0; i--)
+		for (int j = positions.cols() - 1; j <= 0; j--)
 		{
 			if (distance(j) > maxDistance)
 			{

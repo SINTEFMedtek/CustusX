@@ -62,6 +62,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxCheckBoxWidget.h"
 #include "cxRepManager.h"
 #include "cxViewGroupData.h"
+#include "cxDataInterface.h"
+#include "cxHelperWidgets.h"
 
 
 namespace cx
@@ -76,6 +78,9 @@ BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegServices servi
 
 	mSelectMeshWidget = SelectMeshStringDataAdapter::New(services.patientModelService);
 	mSelectMeshWidget->setValueName("Centerline: ");
+
+	mSelectToolWidget = SelectToolStringDataAdapter::New();
+	this->initializeTrackingService(services);
 
 	AcquisitionDataPtr mAcquisitionData;
 	mAcquisitionData.reset(new AcquisitionData());
@@ -111,11 +116,20 @@ BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegServices servi
 	this->createMaxNumberOfGenerations(mOptions.getElement());
 	this->useLocalRegistration(mOptions.getElement());
 
-	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mSessionSelector));
+//	QHBoxLayout* activeToolLayout = new QHBoxLayout;
+//	activeToolLayout->addWidget(new QLabel("Name:", this));
+//	mToolNameLabel = new QLabel(this);
+//	activeToolLayout->addWidget(mToolNameLabel);
+//	mActiveToolVisibleLabel = new QLabel("Visible: NA");
+//	activeToolLayout->addWidget(mActiveToolVisibleLabel);
+//	activeGroupLayout->addLayout(activeToolLayout);
+
 	mVerticalLayout->addWidget(new CheckBoxWidget(this, mUseSubsetOfGenerations));
 	mVerticalLayout->addWidget(createDataWidget(services.visualizationService, services.patientModelService, this, mMaxNumberOfGenerations));
 	mVerticalLayout->addWidget(mProcessCenterlineButton);
+	mVerticalLayout->addWidget(sscCreateDataWidget(this, mSelectToolWidget));
     mVerticalLayout->addWidget(mRecordSessionWidget.get());
+	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mSessionSelector));
 	mVerticalLayout->addWidget(new CheckBoxWidget(this, mUseLocalRegistration));
 	mVerticalLayout->addWidget(mRegisterButton);
 
@@ -159,6 +173,12 @@ QString BronchoscopyRegistrationWidget::defaultWhatsThis() const
 	return QString();
 }
 
+void BronchoscopyRegistrationWidget::initializeTrackingService(RegServices services)
+{
+	if(services.trackingService->getState() < Tool::tsCONFIGURED)
+		services.trackingService->setState(Tool::tsCONFIGURED);
+}
+
 void BronchoscopyRegistrationWidget::processCenterlineSlot()
 {
 	if(!mSelectMeshWidget->getMesh())
@@ -181,7 +201,7 @@ void BronchoscopyRegistrationWidget::processCenterlineSlot()
 		mMesh = patientService()->createSpecificData<Mesh>(uid, name);
 	}
 	mMesh->setVtkPolyData(processedCenterline);
-	mMesh->setColor(QColor(0, 255, 0, 255));
+	mMesh->setColor(QColor(0, 0, 255, 255));
 	mServices.patientModelService->insertData(mMesh);
 	mServices.visualizationService->autoShowData(mMesh);
 }
@@ -198,6 +218,7 @@ void BronchoscopyRegistrationWidget::registerSlot()
     //std::cout << "rMpr: " << std::endl;
     //std::cout << old_rMpr << std::endl;
 
+	mTool = mSelectToolWidget->getTool();
     if(!mTool)
         mTool = mServices.trackingService->getActiveTool();
 
@@ -247,8 +268,8 @@ void BronchoscopyRegistrationWidget::registerSlot()
     if(activeRep3D->getTracer())
         activeRep3D->getTracer()->clear();
 
-    QColor colorGreen = QColor(0, 255, 0, 255);
-    activeRep3D->getTracer()->setColor(colorGreen);
+	QColor colorGreen = QColor(0, 255, 0, 255);
+	activeRep3D->getTracer()->setColor(colorGreen);
     activeRep3D->getTracer()->addManyPositions(trackerRecordedData_prMt);
 
 
