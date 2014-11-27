@@ -70,6 +70,13 @@ public:
 	// Extented interface
 
 	RecordSessionPtr getSession(QString uid);
+
+signals:
+	void started();
+	void cancelled();
+	void stateChanged();
+	void readinessChanged();
+	void acquisitionStopped();
 };
 
 } // cx
