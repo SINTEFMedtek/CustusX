@@ -64,7 +64,7 @@ M4Vector excludeClosePositions(M4Vector Tnavigation)
 	TnavigationIncluded.push_back(Tnavigation[0]); // first position is always included
 	int numberOfIncluded = 0;
 	size_t numberOfPos = Tnavigation.size();
-	for ( size_t index = 1; index <= numberOfPos; index++)
+	for ( size_t index = 1; index < numberOfPos; index++)
 	{
 		double xDistance = (TnavigationIncluded[numberOfIncluded](0,3) - Tnavigation[index](0,3) );
 		double xDistanceSquared = xDistance * xDistance;
@@ -438,8 +438,8 @@ vtkPolyDataPtr BronchoscopyRegistration::processCenterline(vtkPolyDataPtr center
 		Eigen::MatrixXd positions = branches[i]->getPositions();
 		for (int j = 0; j < positions.cols(); j++)
 		{
-			points->InsertNextPoint(positions(0,j),positions(1,j),positions(2,j));
 			vtkIdType cells[1] = { points->GetNumberOfPoints() };
+			points->InsertNextPoint(positions(0,j),positions(1,j),positions(2,j));
 			lines->InsertNextCell(1, cells);
 		}
 	}

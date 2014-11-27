@@ -49,6 +49,8 @@ typedef boost::shared_ptr<class ToolRep3D> ToolRep3DPtr;
 typedef boost::shared_ptr<class RecordSessionWidget> RecordSessionWidgetPtr;
 typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
 typedef boost::shared_ptr<class BronchoscopyRegistration> BronchoscopyRegistrationPtr;
+typedef std::map<QString, ToolPtr> ToolMap;
+typedef boost::shared_ptr<class SelectToolStringDataAdapter> SelectToolStringDataAdapterPtr;
 
 /**
  * BronchoscopyRegistrationWidget
@@ -98,12 +100,14 @@ private:
 	QPushButton* mProcessCenterlineButton;
 	QPushButton* mRegisterButton;
     ToolPtr mTool;
+	SelectToolStringDataAdapterPtr mSelectToolWidget;
 //    TrackedCenterlineWidget* mTrackedCenterLine;
 
     ToolRep3DPtr getToolRepIn3DView(ToolPtr tool);
 
 	void initSessionSelector(AcquisitionDataPtr acquisitionData);
 	QStringList getSessionList(AcquisitionDataPtr acquisitionData);
+	void initializeTrackingService(RegServices services);
 
 	void createMaxNumberOfGenerations(QDomElement root);
 	void selectSubsetOfBranches(QDomElement root);
