@@ -405,9 +405,11 @@ Eigen::Matrix4d registrationAlgorithm(BranchListPtr branches, M4Vector Tnavigati
 	return registrationMatrix;
 }
 
-void BronchoscopyRegistration::processCenterline(vtkPolyDataPtr centerline, Transform3D rMd, int numberOfGenerations)
+vtkPolyDataPtr BronchoscopyRegistration::processCenterline(vtkPolyDataPtr centerline, Transform3D rMd, int numberOfGenerations)
 {
-	mBranchList->deleteAllBranches();
+	if (mBranchList)
+		mBranchList->deleteAllBranches();
+
 	int N = centerline->GetNumberOfPoints();
 	Eigen::MatrixXd CLpoints(3,N);
 	for(vtkIdType i = 0; i < N; i++)
@@ -418,7 +420,6 @@ void BronchoscopyRegistration::processCenterline(vtkPolyDataPtr centerline, Tran
 		position(0) = p[0]; position(1) = p[1]; position(2) = p[2];
 		CLpoints.block(0 , i , 3 , 1) = rMd.coord(position);
 		}
-
 	mBranchList->findBranchesInCenterline(CLpoints);
 	if (numberOfGenerations != 0)
 	{
@@ -427,10 +428,29 @@ void BronchoscopyRegistration::processCenterline(vtkPolyDataPtr centerline, Tran
 	mBranchList->calculateOrientations();
 	mBranchList->smoothOrientations();
 
-	//std::vector<BranchPtr> BL = mBranchList->getBranches();
+	vtkPolyDataPtr retval = vtkPolyDataPtr::New();
+	vtkPointsPtr points = vtkPointsPtr::New();
+	vtkCellArrayPtr lines = vtkCellArrayPtr::New();
+
+	std::vector<BranchPtr> branches = mBranchList->getBranches();
+	for (int i = 0; i < branches.size(); i++)
+	{
+		Eigen::MatrixXd positions = branches[i]->getPositions();
+		for (int j = 0; j < positions.cols(); j++)
+		{
+			points->InsertNextPoint(positions(0,j),positions(1,j),positions(2,j));
+			vtkIdType cells[1] = { points->GetNumberOfPoints() };
+			lines->InsertNextCell(1, cells);
+		}
+	}
+	retval->SetPoints(points);
+	retval->SetVerts(lines);
+
 	std::cout << "Number of branches in CT centerline: " << mBranchList->getBranches().size() << std::endl;
 
 	mCenterlineProcessed = true;
+
+	return retval;
 
 }
 

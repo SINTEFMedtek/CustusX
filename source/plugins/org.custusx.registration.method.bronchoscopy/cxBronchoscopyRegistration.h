@@ -54,7 +54,7 @@ class BronchoscopyRegistration
 
 public:
 	BronchoscopyRegistration();
-	void processCenterline(vtkPolyDataPtr centerline, Transform3D rMd, int numberOfGenerations = 0);
+	vtkPolyDataPtr processCenterline(vtkPolyDataPtr centerline, Transform3D rMd, int numberOfGenerations = 0);
 	Eigen::Matrix4d runBronchoscopyRegistration(TimedTransformMap trackingData_prMt, Transform3D old_rMpr, double maxDistanceForLocalRegistration);
 	bool isCenterlineProcessed();
 	virtual ~BronchoscopyRegistration();

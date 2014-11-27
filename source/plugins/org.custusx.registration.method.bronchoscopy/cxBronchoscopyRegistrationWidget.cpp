@@ -61,6 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxBoolDataAdapterXml.h"
 #include "cxCheckBoxWidget.h"
 #include "cxRepManager.h"
+#include "cxViewGroupData.h"
 
 
 namespace cx
@@ -167,11 +168,22 @@ void BronchoscopyRegistrationWidget::processCenterlineSlot()
 	}
 	vtkPolyDataPtr centerline = mSelectMeshWidget->getMesh()->getVtkPolyData();//input
 	Transform3D rMd = mSelectMeshWidget->getMesh()->get_rMd();
-
+	vtkPolyDataPtr processedCenterline;
 	if (mUseSubsetOfGenerations->getValue())
-		mBronchoscopyRegistration->processCenterline(centerline, rMd, mMaxNumberOfGenerations->getValue());
+		processedCenterline = mBronchoscopyRegistration->processCenterline(centerline, rMd, mMaxNumberOfGenerations->getValue());
 	else
-		mBronchoscopyRegistration->processCenterline(centerline, rMd);
+		processedCenterline = mBronchoscopyRegistration->processCenterline(centerline, rMd);
+
+	if (!mMesh)
+	{
+		QString uid = mSelectMeshWidget->getMesh()->getUid() + "_cl%1";
+		QString name = mSelectMeshWidget->getMesh()->getName()+" cl_processed%1";
+		mMesh = patientService()->createSpecificData<Mesh>(uid, name);
+	}
+	mMesh->setVtkPolyData(processedCenterline);
+	mMesh->setColor(QColor(0, 255, 0, 255));
+	mServices.patientModelService->insertData(mMesh);
+	mServices.visualizationService->autoShowData(mMesh);
 }
 
 void BronchoscopyRegistrationWidget::registerSlot()

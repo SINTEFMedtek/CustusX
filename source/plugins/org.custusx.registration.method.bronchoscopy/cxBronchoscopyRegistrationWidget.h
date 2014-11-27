@@ -89,7 +89,7 @@ private:
 	BoolDataAdapterXmlPtr mUseSubsetOfGenerations;
 	DoubleDataAdapterXmlPtr mMaxNumberOfGenerations;
 	XmlOptionFile mOptions;
-
+	MeshPtr mMesh;
 
 	AcquisitionPtr mAcquisition;
 	RecordSessionWidgetPtr mRecordSessionWidget;
