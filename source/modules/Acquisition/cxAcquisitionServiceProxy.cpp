@@ -60,22 +60,41 @@ void AcquisitionServiceProxy::initServiceListener()
 void AcquisitionServiceProxy::onServiceAdded(AcquisitionService* service)
 {
 	mAcquisitionService.reset(service, null_deleter());
-	connect(mAcquisitionService.get(), SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
-	connect(mAcquisitionService.get(), SIGNAL(movingDataChanged(QString)), this, SIGNAL(movingDataChanged(QString)));
+
+	connect(service, &AcquisitionService::started, this, &AcquisitionService::started);
+	connect(service, &AcquisitionService::cancelled, this, &AcquisitionService::cancelled);
+	connect(service, &AcquisitionService::stateChanged, this, &AcquisitionService::stateChanged);
+	connect(service, &AcquisitionService::readinessChanged, this, &AcquisitionService::readinessChanged);
+	connect(service, &AcquisitionService::acquisitionStopped, this, &AcquisitionService::acquisitionStopped);
+
 	if(mAcquisitionService->isNull())
 		reportWarning("AcquisitionServiceProxy::onServiceAdded mAcquisitionService->isNull()");
 }
 
 void AcquisitionServiceProxy::onServiceRemoved(AcquisitionService *service)
 {
-	disconnect(service, SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
-	disconnect(service, SIGNAL(movingDataChanged(QString)), this, SIGNAL(movingDataChanged(QString)));
+	disconnect(service, &AcquisitionService::started, this, &AcquisitionService::started);
+	disconnect(service, &AcquisitionService::cancelled, this, &AcquisitionService::cancelled);
+	disconnect(service, &AcquisitionService::stateChanged, this, &AcquisitionService::stateChanged);
+	disconnect(service, &AcquisitionService::readinessChanged, this, &AcquisitionService::readinessChanged);
+	disconnect(service, &AcquisitionService::acquisitionStopped, this, &AcquisitionService::acquisitionStopped);
+
 	mAcquisitionService = AcquisitionService::getNullObject();
 }
 
 bool AcquisitionServiceProxy::isNull()
 {
 	return mAcquisitionService->isNull();
+}
+
+RecordSessionPtr AcquisitionServiceProxy::getLatestSession()
+{
+	return mAcquisitionService->getLatestSession();
+}
+
+std::vector<RecordSessionPtr> AcquisitionServiceProxy::getSessions()
+{
+	return mAcquisitionService->getSessions();
 }
 
 } //cx

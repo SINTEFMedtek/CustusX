@@ -58,6 +58,9 @@ public:
 
 	virtual bool isNull();
 
+	virtual RecordSessionPtr getLatestSession();
+	virtual std::vector<RecordSessionPtr> getSessions();
+
 private:
 	ctkPluginContext *mPluginContext;
 	AcquisitionServicePtr mAcquisitionService;

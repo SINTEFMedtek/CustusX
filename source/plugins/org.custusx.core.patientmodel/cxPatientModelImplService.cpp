@@ -53,12 +53,15 @@ PatientModelImplService::PatientModelImplService(ctkPluginContext *context) :
 {
 	this->createInterconnectedDataAndSpace();
 
-	connect(this->dataService().get(), SIGNAL(dataAddedOrRemoved()), this, SIGNAL(dataAddedOrRemoved()));
-	connect(this->dataService().get(), SIGNAL(activeImageChanged(const QString&)), this, SIGNAL(activeImageChanged(const QString&)));
-	connect(this->dataService().get(), SIGNAL(debugModeChanged(bool)), this, SIGNAL(debugModeChanged(bool)));
-	connect(this->dataService().get(), SIGNAL(rMprChanged()), this, SIGNAL(rMprChanged()));
-	connect(this->dataService().get(), SIGNAL(streamLoaded()), this, SIGNAL(streamLoaded()));
-	connect(this->dataService().get(), SIGNAL(clinicalApplicationChanged()), this, SIGNAL(clinicalApplicationChanged()));
+	connect(this->dataService().get(), &DataManager::dataAddedOrRemoved, this, &PatientModelService::dataAddedOrRemoved);
+	connect(this->dataService().get(), &DataManager::activeImageChanged, this, &PatientModelService::activeImageChanged);
+	connect(this->dataService().get(), &DataManager::debugModeChanged, this, &PatientModelService::debugModeChanged);
+	connect(this->dataService().get(), &DataManager::rMprChanged, this, &PatientModelService::rMprChanged);
+	connect(this->dataService().get(), &DataManager::streamLoaded, this, &PatientModelService::streamLoaded);
+	connect(this->dataService().get(), &DataManager::clinicalApplicationChanged, this, &PatientModelService::clinicalApplicationChanged);
+
+	connect(this->dataService().get(), &DataManager::centerChanged, this, &PatientModelService::centerChanged);
+	connect(this->dataService().get(), &DataManager::landmarkPropertiesChanged, this, &PatientModelService::landmarkPropertiesChanged);
 
 	connect(this->patientData().get(), &PatientData::cleared, this, &PatientModelService::cleared);
 	connect(this->patientData().get(), &PatientData::isSaving, this, &PatientModelService::isSaving);
@@ -114,11 +117,12 @@ PatientModelImplService::~PatientModelImplService()
 {
 	if(dataService())
 	{
-		disconnect(this->dataService().get(), SIGNAL(dataAddedOrRemoved()), this, SIGNAL(dataAddedOrRemoved()));
-		disconnect(this->dataService().get(), SIGNAL(activeImageChanged(const QString&)), this, SIGNAL(activeImageChanged(const QString&)));
-		disconnect(this->dataService().get(), SIGNAL(debugModeChanged(bool)), this, SIGNAL(debugModeChanged(bool)));
-		disconnect(this->dataService().get(), SIGNAL(rMprChanged()), this, SIGNAL(rMprChanged()));
-		disconnect(this->dataService().get(), SIGNAL(streamLoaded()), this, SIGNAL(streamLoaded()));
+		disconnect(this->dataService().get(), &DataManager::dataAddedOrRemoved, this, &PatientModelService::dataAddedOrRemoved);
+		disconnect(this->dataService().get(), &DataManager::activeImageChanged, this, &PatientModelService::activeImageChanged);
+		disconnect(this->dataService().get(), &DataManager::debugModeChanged, this, &PatientModelService::debugModeChanged);
+		disconnect(this->dataService().get(), &DataManager::rMprChanged, this, &PatientModelService::rMprChanged);
+		disconnect(this->dataService().get(), &DataManager::streamLoaded, this, &PatientModelService::streamLoaded);
+		disconnect(this->dataService().get(), &DataManager::clinicalApplicationChanged, this, &PatientModelService::clinicalApplicationChanged);
 
 		disconnect(this->patientData().get(), &PatientData::cleared, this, &PatientModelService::cleared);
 		disconnect(this->patientData().get(), &PatientData::isSaving, this, &PatientModelService::isSaving);

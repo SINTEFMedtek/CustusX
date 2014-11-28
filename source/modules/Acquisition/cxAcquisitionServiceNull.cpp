@@ -45,6 +45,16 @@ bool AcquisitionServiceNull::isNull()
 	return true;
 }
 
+RecordSessionPtr AcquisitionServiceNull::getLatestSession()
+{
+	return RecordSessionPtr();
+}
+
+std::vector<RecordSessionPtr> AcquisitionServiceNull::getSessions()
+{
+	return std::vector<RecordSessionPtr>();
+}
+
 void AcquisitionServiceNull::printWarning()
 {
 	reportWarning("Trying to use AcquisitionServiceNull. Is AcquisitionService (org.custusx.acquisition) disabled?");

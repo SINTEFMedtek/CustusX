@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPluginAcquisitionExport.h"
 
 #include <QObject>
+#include <vector>
 #include <boost/shared_ptr.hpp>
 
 #define AcquisitionService_iid "cx::AcquisitionService"
@@ -44,6 +45,7 @@ namespace cx
 {
 
 typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
+typedef boost::shared_ptr<class RecordSession> RecordSessionPtr;
 
 /** \brief Acqusition services abstract interface
  *
@@ -57,8 +59,24 @@ class cxPluginAcquisition_EXPORT AcquisitionService : public QObject
 public:
 	virtual ~AcquisitionService() {}
 
+	// Core interface
+
 	virtual bool isNull() = 0;
 	static AcquisitionServicePtr getNullObject();
+
+	virtual RecordSessionPtr getLatestSession() = 0;
+	virtual std::vector<RecordSessionPtr> getSessions() = 0;
+
+	// Extented interface
+
+	RecordSessionPtr getSession(QString uid);
+
+signals:
+	void started();
+	void cancelled();
+	void stateChanged();
+	void readinessChanged();
+	void acquisitionStopped();
 };
 
 } // cx

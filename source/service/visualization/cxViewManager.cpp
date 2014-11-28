@@ -100,8 +100,6 @@ ViewManager::ViewManager(/*PatientModelServicePtr patientModelService, */CoreSer
 	connect(mLayoutRepository.get(), &LayoutRepository::layoutChanged, this, &ViewManager::onLayoutRepositoryChanged);
 	mCameraControl.reset(new CameraControl());
 
-	this->loadGlobalSettings();
-
 	mRenderLoop->setLogging(settings()->value("renderSpeedLogging").toBool());
 	mRenderLoop->setSmartRender(settings()->value("smartRender", true).toBool());
 	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(settingsChangedSlot(QString)));
@@ -113,10 +111,6 @@ ViewManager::ViewManager(/*PatientModelServicePtr patientModelService, */CoreSer
 		ViewGroupPtr group(new ViewGroup(mBackend));
 		mViewGroups.push_back(group);
 	}
-
-	this->initializeGlobal2DZoom();
-	this->initializeActiveView();
-	this->syncOrientationMode(SyncedValue::create(0));
 
 	// moved here from initialize() ... ensures object is fully callable after construction
 	mCameraStyleInteractor.reset(new CameraStyleInteractor);
@@ -130,6 +124,11 @@ ViewManager::ViewManager(/*PatientModelServicePtr patientModelService, */CoreSer
 	connect(mInteractiveCropper.get(), SIGNAL(changed()), mRenderLoop.get(), SLOT(requestPreRenderSignal()));
 	connect(mInteractiveClipper.get(), SIGNAL(changed()), mRenderLoop.get(), SLOT(requestPreRenderSignal()));
 	connect(this, SIGNAL(activeViewChanged()), this, SLOT(updateCameraStyleActions()));
+
+    this->loadGlobalSettings();
+    this->initializeGlobal2DZoom();
+    this->initializeActiveView();
+    this->syncOrientationMode(SyncedValue::create(0));
 
 	// set start layout
 	this->setActiveLayout("LAYOUT_3D_ACS_SINGLE", 0);

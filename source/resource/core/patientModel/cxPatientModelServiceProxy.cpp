@@ -72,13 +72,15 @@ void PatientModelServiceProxy::initServiceListener()
 void PatientModelServiceProxy::onServiceAdded(PatientModelService* service)
 {
 	mPatientModelService.reset(service, null_deleter());
+
 	connect(service, &PatientModelService::centerChanged, this, &PatientModelService::centerChanged);
-	connect(service, SIGNAL(dataAddedOrRemoved()), this, SIGNAL(dataAddedOrRemoved()));
-	connect(service, SIGNAL(activeImageChanged(const QString&)), this, SIGNAL(activeImageChanged(const QString&)));
-	connect(service, SIGNAL(landmarkPropertiesChanged()), this, SIGNAL(landmarkPropertiesChanged()));
-	connect(service, SIGNAL(debugModeChanged(bool)), this, SIGNAL(debugModeChanged(bool)));
-	connect(service, SIGNAL(rMprChanged()), this, SIGNAL(rMprChanged()));
-	connect(service, SIGNAL(streamLoaded()), this, SIGNAL(streamLoaded()));
+	connect(service, &PatientModelService::dataAddedOrRemoved, this, &PatientModelService::dataAddedOrRemoved);
+	connect(service, &PatientModelService::activeImageChanged, this, &PatientModelService::activeImageChanged);
+	connect(service, &PatientModelService::landmarkPropertiesChanged, this, &PatientModelService::landmarkPropertiesChanged);
+	connect(service, &PatientModelService::debugModeChanged, this, &PatientModelService::debugModeChanged);
+	connect(service, &PatientModelService::clinicalApplicationChanged, this, &PatientModelService::clinicalApplicationChanged);
+	connect(service, &PatientModelService::rMprChanged, this, &PatientModelService::rMprChanged);
+	connect(service, &PatientModelService::streamLoaded, this, &PatientModelService::streamLoaded);
 
 	connect(service, &PatientModelService::cleared, this, &PatientModelService::cleared);
 	connect(service, &PatientModelService::isSaving, this, &PatientModelService::isSaving);
@@ -93,13 +95,14 @@ void PatientModelServiceProxy::onServiceAdded(PatientModelService* service)
 
 void PatientModelServiceProxy::onServiceRemoved(PatientModelService *service)
 {
-	connect(service, &PatientModelService::centerChanged, this, &PatientModelService::centerChanged);
-	disconnect(service, SIGNAL(dataAddedOrRemoved()), this, SIGNAL(dataAddedOrRemoved()));
-	disconnect(service, SIGNAL(activeImageChanged(const QString&)), this, SIGNAL(activeImageChanged(const QString&)));
-	disconnect(service, SIGNAL(landmarkPropertiesChanged()), this, SIGNAL(landmarkPropertiesChanged()));
-	disconnect(service, SIGNAL(debugModeChanged(bool)), this, SIGNAL(debugModeChanged(bool)));
-	disconnect(service, SIGNAL(rMprChanged()), this, SIGNAL(rMprChanged()));
-	disconnect(service, SIGNAL(streamLoaded()), this, SIGNAL(streamLoaded()));
+	disconnect(service, &PatientModelService::centerChanged, this, &PatientModelService::centerChanged);
+	disconnect(service, &PatientModelService::dataAddedOrRemoved, this, &PatientModelService::dataAddedOrRemoved);
+	disconnect(service, &PatientModelService::activeImageChanged, this, &PatientModelService::activeImageChanged);
+	disconnect(service, &PatientModelService::landmarkPropertiesChanged, this, &PatientModelService::landmarkPropertiesChanged);
+	disconnect(service, &PatientModelService::debugModeChanged, this, &PatientModelService::debugModeChanged);
+	disconnect(service, &PatientModelService::clinicalApplicationChanged, this, &PatientModelService::clinicalApplicationChanged);
+	disconnect(service, &PatientModelService::rMprChanged, this, &PatientModelService::rMprChanged);
+	disconnect(service, &PatientModelService::streamLoaded, this, &PatientModelService::streamLoaded);
 
 	disconnect(service, &PatientModelService::cleared, this, &PatientModelService::cleared);
 	disconnect(service, &PatientModelService::isSaving, this, &PatientModelService::isSaving);

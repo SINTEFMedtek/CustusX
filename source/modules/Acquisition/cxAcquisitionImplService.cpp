@@ -31,25 +31,46 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxAcquisitionImplService.h"
+#include "cxAcquisitionData.h"
 
 namespace cx
 {
 
 AcquisitionImplService::AcquisitionImplService(ctkPluginContext *context) :
-	mContext(context)
+	mContext(context),
+	mAcquisitionData(new AcquisitionData()),
+	mAcquisition(new Acquisition(mAcquisitionData))
 //	mPatientModelService(new PatientModelServiceProxy(context))
 {
-//	connect(mPatientModelService.get(), &PatientModelService::isSaving, this, &AcquisitionImplService::duringSavePatientSlot);
-//	connect(mPatientModelService.get(), &PatientModelService::isLoading, this, &AcquisitionImplService::duringLoadPatientSlot);
-//	connect(mPatientModelService.get(), &PatientModelService::cleared, this, &AcquisitionImplService::clearSlot);
+	connect(mAcquisition.get(), &Acquisition::started, this, &AcquisitionService::started);
+	connect(mAcquisition.get(), &Acquisition::cancelled, this, &AcquisitionService::cancelled);
+	connect(mAcquisition.get(), &Acquisition::stateChanged, this, &AcquisitionService::stateChanged);
+	connect(mAcquisition.get(), &Acquisition::readinessChanged, this, &AcquisitionService::readinessChanged);
+	connect(mAcquisition.get(), &Acquisition::acquisitionStopped, this, &AcquisitionService::acquisitionStopped);
 }
 
 AcquisitionImplService::~AcquisitionImplService()
 {
+	disconnect(mAcquisition.get(), &Acquisition::started, this, &AcquisitionService::started);
+	disconnect(mAcquisition.get(), &Acquisition::cancelled, this, &AcquisitionService::cancelled);
+	disconnect(mAcquisition.get(), &Acquisition::stateChanged, this, &AcquisitionService::stateChanged);
+	disconnect(mAcquisition.get(), &Acquisition::readinessChanged, this, &AcquisitionService::readinessChanged);
+	disconnect(mAcquisition.get(), &Acquisition::acquisitionStopped, this, &AcquisitionService::acquisitionStopped);
 }
 
 bool AcquisitionImplService::isNull()
 {
 	return false;
 }
+
+RecordSessionPtr AcquisitionImplService::getLatestSession()
+{
+	return mAcquisition->getLatestSession();
+}
+
+std::vector<RecordSessionPtr> AcquisitionImplService::getSessions()
+{
+	return mAcquisition->getPluginData()->getRecordSessions();
+}
+
 } // cx

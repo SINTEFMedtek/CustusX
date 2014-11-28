@@ -19,6 +19,7 @@ include_directories(
     ${CustusX_BINARY_DIR}/source/service/visualization
     ${CustusX_BINARY_DIR}/source/gui
     ${CustusX_BINARY_DIR}/source/logic
+    ${CustusX_BINARY_DIR}/source/resource/visualization
 )
 
 set(PLUGIN_SRCS
