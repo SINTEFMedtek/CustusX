@@ -107,7 +107,4 @@ cx_create_export_header("cxPluginAcquisition")
 add_library( cxPluginAcquisition ${SOURCE_FILES} )
 target_link_libraries( cxPluginAcquisition ${CX_ACQUISITION_LIBRARIES} )
 
-# add/remove to suit your own needs.
-#add_subdirectory(logic)
-#add_subdirectory(gui)
 add_subdirectory(testing)

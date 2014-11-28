@@ -85,6 +85,3 @@ ctkMacroBuildPlugin(
   TARGET_LIBRARIES ${PLUGIN_target_libraries}
   OUTPUT_DIR ${PLUGIN_OUTPUT_DIR}
 )
-
-#add_subdirectory(testing)
-

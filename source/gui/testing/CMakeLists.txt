@@ -24,7 +24,6 @@ include_directories(
 
     set(CXTEST_SOURCES_TO_MOC
         cxTestCustusXController.h
-        cxtestTestVideoConnectionWidget.h
         cxtestTestTransferFunctionColorWidget.h
     )
 
@@ -32,9 +31,7 @@ include_directories(
 	set(CXTEST_GUI_SOURCES #${CXTEST_GUI_SOURCES}
 		cxTestCustusXController.cpp
 		cxtestSpeed.cpp
-		cxtestCatchStreamingWidgets.cpp
 		cxtestCatchBaseWidgets.cpp
-		cxtestTestVideoConnectionWidget.cpp
 		cxtestTestTransferFunctionColorWidget.h
 		cxtestTestTransferFunctionColorWidget.cpp
 		cxtestTransferFunctionWidgets.cpp
@@ -42,11 +39,6 @@ include_directories(
 		cxtestTestTransferFunctions.cpp
 		cxtestOpenCLAndGui.cpp
 	    )
-
-        #cx_catch_add_lib_and_exe(cxGui
-        #	"${CXTEST_GUI_SOURCES}"
-        #	"${CXTEST_SOURCES_TO_MOC}"
-        #      "cxResourceVisualizationTestUtilities")
 
         cx_catch_add_lib_and_exe(cxGui
                 "${CXTEST_GUI_SOURCES}"
