@@ -238,6 +238,7 @@ private:
 	CameraControlPtr mCameraControl;
 
 	DockWidgets* mDockWidgets;
+	std::set<QToolBar*> mToolbars;
 
 //	PatientModelServicePtr mPatientModelService;
 //	VisualizationServicePtr mVisualizationService;

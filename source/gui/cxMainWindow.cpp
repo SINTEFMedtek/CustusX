@@ -158,17 +158,19 @@ MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
 
 	// Restore saved window states
 	// Must be done after all DockWidgets are created
-	if (!restoreGeometry(settings()->value("mainWindow/geometry").toByteArray()))
+	if (restoreGeometry(settings()->value("mainWindow/geometry").toByteArray()))
 	{
-		this->showMaximized();
+		this->show();
 	}
 	else
 	{
-		this->show();
+		this->showMaximized();
 	}
 
 	if (settings()->value("gui/fullscreen").toBool())
 		this->setWindowState(this->windowState() | Qt::WindowFullScreen);
+
+//	this->setCentralWidget(viewService()->getLayoutWidget(0));
 
 //	QTimer::singleShot(0, this, SLOT(startupLoadPatient())); // make sure this is called after application state change
 	this->toggleDebugModeSlot(mDebugModeAction->isChecked());
@@ -721,6 +723,12 @@ void MainWindow::onWorkflowStateChangedSlot()
 	Desktop desktop = stateService()->getActiveDesktop();
 
 	this->mDockWidgets->hideAll();
+//	for (std::set<QToolBar*>::iterator i=mToolbars.begin(); i!=mToolbars.end(); ++i)
+//		(*i)->hide();
+//	for (std::set<QToolBar*>::iterator i=mToolbars.begin(); i!=mToolbars.end(); ++i)
+//		this->removeToolBar(*i);
+//	for (std::set<QToolBar*>::iterator i=mToolbars.begin(); i!=mToolbars.end(); ++i)
+//		this->addToolBar(*i);
 
 	viewService()->setActiveLayout(desktop.mLayoutUid, 0);
 	viewService()->setActiveLayout(desktop.mSecondaryLayoutUid, 1);
@@ -979,6 +987,11 @@ void MainWindow::createToolBars()
 void MainWindow::registerToolBar(QToolBar* toolbar, QString groupname)
 {
 	this->addToWidgetGroupMap(toolbar->toggleViewAction(), groupname);
+	// this avoids overpopulation of gui at startup, and is the same functionality as for dockwidgets.
+	// also gives correct size of mainwindow at startup.
+	mToolbars.insert(toolbar);
+	if (!mToolbars.empty())
+		toolbar->hide();
 }
 
 void MainWindow::aboutSlot()
