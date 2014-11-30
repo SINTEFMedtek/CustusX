@@ -29,44 +29,27 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef BRONCHOSCOPYREGISTRATION_H_
-#define BRONCHOSCOPYREGISTRATION_H_
 
-//#include "PositionData.h"
-#include "cxBranchList.h"
-#include <vector>
-#include "vtkForwardDeclarations.h"
-
-
-typedef std::vector< Eigen::Matrix4d > M4Vector;
-
+#include "cxSenderImpl.h"
+#include "cxIGTLinkConversion.h"
 
 namespace cx
 {
 
-typedef std::map<double, Transform3D> TimedTransformMap;
-typedef boost::shared_ptr<class BranchList> BranchListPtr;
-
-class BronchoscopyRegistration
+void SenderImpl::send(PackagePtr package)
 {
-	BranchListPtr mBranchList;
-	bool mCenterlineProcessed;
+	if(package->mIgtLinkImageMessage)
+		this->send(package->mIgtLinkImageMessage);
 
-public:
-	BronchoscopyRegistration();
-	vtkPolyDataPtr processCenterline(vtkPolyDataPtr centerline, Transform3D rMd, int numberOfGenerations = 0);
-	Eigen::Matrix4d runBronchoscopyRegistration(TimedTransformMap trackingData_prMt, Transform3D old_rMpr, double maxDistanceForLocalRegistration);
-	bool isCenterlineProcessed();
-	virtual ~BronchoscopyRegistration();
-};
+	if(package->mIgtLinkUSStatusMessage)
+		this->send(package->mIgtLinkUSStatusMessage);
 
-M4Vector excludeClosePositions();
-Eigen::Matrix4d registrationAlgorithm(BranchListPtr branches, M4Vector Tnavigation);
-std::vector<Eigen::MatrixXd::Index> dsearch2n(Eigen::MatrixXd pos1, Eigen::MatrixXd pos2, Eigen::MatrixXd ori1, Eigen::MatrixXd ori2);
-vtkPointsPtr convertTovtkPoints(Eigen::MatrixXd positions);
-Eigen::Matrix4d performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr target, bool* ok);
-std::pair<Eigen::MatrixXd , Eigen::MatrixXd> RemoveInvalidData(Eigen::MatrixXd positionData, Eigen::MatrixXd orientationData);
-M4Vector RemoveInvalidData(M4Vector T_vector);
-}//namespace cx
+	if(package->mImage)
+		this->send(package->mImage);
 
-#endif /* BRONCHOSCOPYREGISTRATION_H_ */
+	if(package->mProbe)
+		this->send(package->mProbe);
+}
+
+
+} /* namespace cx */

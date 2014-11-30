@@ -13,6 +13,9 @@
 ###########################################################
 
 SET( MOC_HEADER_FILES
+    cxAcquisitionService.h
+    cxAcquisitionServiceProxy.h
+
     logic/cxAcquisitionData.h
     logic/cxUSAcquisition.h
 	logic/cxUSSavingRecorder.h
@@ -30,6 +33,13 @@ QT5_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
 # library
 SET( SOURCE_FILES
     ${MOC_HEADER_FILES}
+    cxAcquisitionService.cpp
+    cxAcquisitionServiceProxy.cpp
+    cxAcquisitionServiceNull.h
+    cxAcquisitionServiceNull.cpp
+    cxAcquisitionImplService.h
+    cxAcquisitionImplService.cpp
+
     logic/cxAcquisitionData.h
     logic/cxAcquisitionData.cpp
     logic/cxRecordSession.h
@@ -93,7 +103,4 @@ cx_create_export_header("cxPluginAcquisition")
 add_library( cxPluginAcquisition ${SOURCE_FILES} )
 target_link_libraries( cxPluginAcquisition ${CX_ACQUISITION_LIBRARIES} )
 
-# add/remove to suit your own needs.
-#add_subdirectory(logic)
-#add_subdirectory(gui)
 add_subdirectory(testing)

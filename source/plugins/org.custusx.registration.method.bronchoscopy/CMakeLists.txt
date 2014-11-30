@@ -16,6 +16,7 @@ include_directories(
     ${CustusX_BINARY_DIR}/source/modules/Acquisition
     ${CustusX_BINARY_DIR}/source/gui
     ${CustusX_BINARY_DIR}/source/logic
+    ${CustusX_BINARY_DIR}/source/resource/visualization
 )
 
 set(PLUGIN_SRCS
@@ -73,6 +74,4 @@ ctkMacroBuildPlugin(
   TARGET_LIBRARIES ${PLUGIN_target_libraries}
   OUTPUT_DIR ${PLUGIN_OUTPUT_DIR}
 )
-
-#add_subdirectory(testing)
 

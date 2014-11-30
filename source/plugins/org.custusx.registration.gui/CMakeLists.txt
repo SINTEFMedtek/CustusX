@@ -67,5 +67,3 @@ ctkMacroBuildPlugin(
   OUTPUT_DIR ${PLUGIN_OUTPUT_DIR}
 )
 
-#add_subdirectory(testing)
-

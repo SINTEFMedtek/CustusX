@@ -29,44 +29,65 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef BRONCHOSCOPYREGISTRATION_H_
-#define BRONCHOSCOPYREGISTRATION_H_
 
-//#include "PositionData.h"
-#include "cxBranchList.h"
-#include <vector>
-#include "vtkForwardDeclarations.h"
-
-
-typedef std::vector< Eigen::Matrix4d > M4Vector;
-
+#include "cxGrabberSenderQTcpSocket.h"
+#include "cxIGTLinkConversion.h"
 
 namespace cx
 {
 
-typedef std::map<double, Transform3D> TimedTransformMap;
-typedef boost::shared_ptr<class BranchList> BranchListPtr;
-
-class BronchoscopyRegistration
+GrabberSenderQTcpSocket::GrabberSenderQTcpSocket(QTcpSocket* socket)
 {
-	BranchListPtr mBranchList;
-	bool mCenterlineProcessed;
+	mMaxBufferSize = 19200000; //800(width)*600(height)*4(bytes)*10(images)
+	mSocket = socket;
+}
 
-public:
-	BronchoscopyRegistration();
-	vtkPolyDataPtr processCenterline(vtkPolyDataPtr centerline, Transform3D rMd, int numberOfGenerations = 0);
-	Eigen::Matrix4d runBronchoscopyRegistration(TimedTransformMap trackingData_prMt, Transform3D old_rMpr, double maxDistanceForLocalRegistration);
-	bool isCenterlineProcessed();
-	virtual ~BronchoscopyRegistration();
-};
+bool GrabberSenderQTcpSocket::isReady() const
+{
+	if (!mSocket)
+		return false;
+	if (mSocket->bytesToWrite() > mMaxBufferSize)
+		return false;;
+	return true;
+}
 
-M4Vector excludeClosePositions();
-Eigen::Matrix4d registrationAlgorithm(BranchListPtr branches, M4Vector Tnavigation);
-std::vector<Eigen::MatrixXd::Index> dsearch2n(Eigen::MatrixXd pos1, Eigen::MatrixXd pos2, Eigen::MatrixXd ori1, Eigen::MatrixXd ori2);
-vtkPointsPtr convertTovtkPoints(Eigen::MatrixXd positions);
-Eigen::Matrix4d performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr target, bool* ok);
-std::pair<Eigen::MatrixXd , Eigen::MatrixXd> RemoveInvalidData(Eigen::MatrixXd positionData, Eigen::MatrixXd orientationData);
-M4Vector RemoveInvalidData(M4Vector T_vector);
-}//namespace cx
+void GrabberSenderQTcpSocket::send(IGTLinkImageMessage::Pointer msg)
+{
+	if (!msg || !this->isReady())
+		return;
 
-#endif /* BRONCHOSCOPYREGISTRATION_H_ */
+	// Pack (serialize) and send
+	msg->Pack();
+	mSocket->write(reinterpret_cast<const char*> (msg->GetPackPointer()), msg->GetPackSize());
+}
+
+void GrabberSenderQTcpSocket::send(IGTLinkUSStatusMessage::Pointer msg)
+{
+	if (!msg || !this->isReady())
+		return;
+
+	// Pack (serialize) and send
+	msg->Pack();
+	mSocket->write(reinterpret_cast<const char*> (msg->GetPackPointer()), msg->GetPackSize());
+}
+
+void GrabberSenderQTcpSocket::send(ImagePtr msg)
+{
+	if (!this->isReady())
+		return;
+
+	IGTLinkConversion converter;
+	this->send(converter.encode(msg));
+}
+
+void GrabberSenderQTcpSocket::send(ProbeDefinitionPtr msg)
+{
+	if (!this->isReady())
+		return;
+
+	IGTLinkConversion converter;
+	this->send(converter.encode(msg));
+}
+
+
+} /* namespace cx */

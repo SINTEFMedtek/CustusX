@@ -111,7 +111,6 @@ function(_cx_catch_generate_master_catch_using_sources EXE_NAME PATH_TO_MAIN)
     # http://qt-project.org/forums/viewthread/22133
     if(WIN32)
         add_definitions(-DNOMINMAX)
-        #add_definitions(-DcxResourceVisualizationTestUtilities_EXPORTS)
     endif(WIN32)
     # required to compile some eigen code on at least Ubuntu
     if(CX_LINUX)
@@ -121,8 +120,7 @@ function(_cx_catch_generate_master_catch_using_sources EXE_NAME PATH_TO_MAIN)
 
     add_executable(${EXE_NAME} MACOSX_BUNDLE ${PATH_TO_MAIN} ${CX_TEST_CATCH_SOURCES} ${MOCCED})
     target_link_libraries(${EXE_NAME} ${CX_TEST_CATCH_LINKER_LIBS})
-    #target_link_libraries(${EXE_NAME} ${CX_TEST_CATCH_LINKER_LIBS} cxtestUtilities)
-    
+
 endfunction()
 
 ###############################################################################
@@ -170,7 +168,9 @@ function(_cx_catch_save_info_in_globals LIB_TO_TEST SOURCES MOC_SOURCES ADDITION
         "${ABS_MOC_SOURCES}"
         CACHE INTERNAL
         "List of all sources that needs to be mocced.")
+
     get_property(inc_dirs DIRECTORY PROPERTY INCLUDE_DIRECTORIES)
+
     set(CX_TEST_CATCH_INCLUDE_DIRS
         "${CX_TEST_CATCH_INCLUDE_DIRS}"
         "${CMAKE_CURRENT_LIST_DIR}"
@@ -181,7 +181,7 @@ function(_cx_catch_save_info_in_globals LIB_TO_TEST SOURCES MOC_SOURCES ADDITION
      set(CX_TEST_CATCH_LINKER_LIBS
         "${CX_TEST_CATCH_LINKER_LIBS}"
         ${LIB_TO_TEST}
-		${ADDITIONAL_LIBS}
+        ${ADDITIONAL_LIBS}
         CACHE INTERNAL
         "List of all libraries Catch needs to link to."
         )

@@ -29,44 +29,53 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef BRONCHOSCOPYREGISTRATION_H_
-#define BRONCHOSCOPYREGISTRATION_H_
 
-//#include "PositionData.h"
-#include "cxBranchList.h"
-#include <vector>
-#include "vtkForwardDeclarations.h"
+#ifndef CXGrabberSenderQTcpSocket_H_
+#define CXGrabberSenderQTcpSocket_H_
 
+#include "cxGrabberExport.h"
 
-typedef std::vector< Eigen::Matrix4d > M4Vector;
+#include "cxSenderImpl.h"
 
+#include <QObject>
+#include <boost/shared_ptr.hpp>
+#include <qtcpsocket.h>
+#include "cxIGTLinkImageMessage.h"
+#include "cxIGTLinkUSStatusMessage.h"
+#include "cxImage.h"
+#include "cxTool.h"
 
 namespace cx
 {
 
-typedef std::map<double, Transform3D> TimedTransformMap;
-typedef boost::shared_ptr<class BranchList> BranchListPtr;
+/**
+* \file
+* \addtogroup cx_resource_videoserver
+* @{
+*/
 
-class BronchoscopyRegistration
+class cxGrabber_EXPORT GrabberSenderQTcpSocket : public SenderImpl
 {
-	BranchListPtr mBranchList;
-	bool mCenterlineProcessed;
-
 public:
-	BronchoscopyRegistration();
-	vtkPolyDataPtr processCenterline(vtkPolyDataPtr centerline, Transform3D rMd, int numberOfGenerations = 0);
-	Eigen::Matrix4d runBronchoscopyRegistration(TimedTransformMap trackingData_prMt, Transform3D old_rMpr, double maxDistanceForLocalRegistration);
-	bool isCenterlineProcessed();
-	virtual ~BronchoscopyRegistration();
+	explicit GrabberSenderQTcpSocket(QTcpSocket* socket);
+	virtual ~GrabberSenderQTcpSocket() {}
+
+	bool isReady() const;
+
+protected:
+	virtual void send(IGTLinkImageMessage::Pointer msg);
+	virtual void send(IGTLinkUSStatusMessage::Pointer msg);
+	virtual void send(ImagePtr msg);
+	virtual void send(ProbeDefinitionPtr msg);
+
+private:
+	QTcpSocket* mSocket;
+	int mMaxBufferSize;
 };
 
-M4Vector excludeClosePositions();
-Eigen::Matrix4d registrationAlgorithm(BranchListPtr branches, M4Vector Tnavigation);
-std::vector<Eigen::MatrixXd::Index> dsearch2n(Eigen::MatrixXd pos1, Eigen::MatrixXd pos2, Eigen::MatrixXd ori1, Eigen::MatrixXd ori2);
-vtkPointsPtr convertTovtkPoints(Eigen::MatrixXd positions);
-Eigen::Matrix4d performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr target, bool* ok);
-std::pair<Eigen::MatrixXd , Eigen::MatrixXd> RemoveInvalidData(Eigen::MatrixXd positionData, Eigen::MatrixXd orientationData);
-M4Vector RemoveInvalidData(M4Vector T_vector);
-}//namespace cx
+/**
+* @}
+*/
 
-#endif /* BRONCHOSCOPYREGISTRATION_H_ */
+} /* namespace cx */
+#endif /* CXGrabberSenderQTcpSocket__H_ */

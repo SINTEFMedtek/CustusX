@@ -18,14 +18,8 @@ if (BUILD_TESTING)
 		cxtestReconstructionManager.cpp
 		cxtestReconstructionAlgorithmFixture.h
 		cxtestReconstructionAlgorithmFixture.cpp
-		cxtestSyntheticVolumeComparer.h
-		cxtestSyntheticVolumeComparer.cpp
-		cxtestSphereSyntheticVolume.h
-		cxtestSphereSyntheticVolume.cpp
-		cxtestReconstructRealData.h
-		cxtestReconstructRealData.cpp
-		cxtestSyntheticReconstructInput.h
-		cxtestSyntheticReconstructInput.cpp
+        cxtestReconstructRealData.h
+        cxtestReconstructRealData.cpp
 		)
     
     cx_catch_add_lib_and_exe(org_custusx_usreconstruction "${CXTEST_PLUGIN_USRECONSTRUCTION_SOURCES}" "${CXTEST_SOURCES_TO_MOC}")
