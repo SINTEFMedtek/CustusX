@@ -35,7 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkRenderer.h>
 #include <vtkCamera.h>
 #include "cxReporter.h"
-#include "cxRepManager.h"
 #include "cxTrackingService.h"
 #include "cxToolRep3D.h"
 #include "cxView.h"
@@ -49,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTool.h"
 #include <vtkRenderWindowInteractor.h>
 #include "cxPatientModelService.h"
+#include "cxRepContainer.h"
 
 SNW_DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, CAMERA_STYLE_TYPE, cstCOUNT)
 {
@@ -107,7 +107,7 @@ ToolRep3DPtr CameraStyleForView::getToolRep() const
 	if (!this->getView())
 		return ToolRep3DPtr();
 
-	ToolRep3DPtr rep = RepManager::findFirstRep<ToolRep3D>(this->getView()->getReps(), mFollowingTool);
+	ToolRep3DPtr rep = RepContainer(this->getView()->getReps()).findFirst<ToolRep3D>(mFollowingTool);
 	return rep;
 }
 

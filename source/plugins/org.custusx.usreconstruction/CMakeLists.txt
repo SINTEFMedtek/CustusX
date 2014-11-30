@@ -6,30 +6,12 @@ include_directories(
     ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
     ${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
     ${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
-#    ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.registration
-#    ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.acquisition
     ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
     ${CustusX_SOURCE_DIR}/source/logic
-#	${CustusX_SOURCE_DIR}/source/infoWidgets
-
-#    ${CustusX_SOURCE_DIR}/source/modules/UsReconstruction/logic
-#    ${CustusX_SOURCE_DIR}/source/modules/Algorithm
     ${CustusX_SOURCE_DIR}/source/modules/Algorithm/gui
-#    ${CustusX_SOURCE_DIR}/source/modules/Algorithm/logic
-#    ${CustusX_SOURCE_DIR}/source/dataAdapters
-    ${CustusX_SOURCE_DIR}/source/service/visualization
-
-#    ${CustusX_BINARY_DIR}/source/modules/UsReconstruction
     ${CustusX_BINARY_DIR}/source/modules/Algorithm
-#    ${CustusX_BINARY_DIR}/source/gui
-    ${CustusX_BINARY_DIR}/source/service/visualization
-
-
-#    ${CustusX_BINARY_DIR}/source/plugins/org.custusx.registration
-#    ${CustusX_BINARY_DIR}/source/plugins/org.custusx.acquisition
     ${CustusX_BINARY_DIR}/source/modules/GUIExtender
     ${CustusX_BINARY_DIR}/source/logic
-#	${CustusX_BINARY_DIR}/source/gui
 )
 
 set(PLUGIN_SRCS
@@ -40,9 +22,6 @@ set(PLUGIN_SRCS
     cxUsReconstructionService.cpp
     cxUsReconstructionServiceNull.cpp
     cxUsReconstructionServiceProxy.cpp
-
-#    cxReconstructionManager.h
-#    cxReconstructionManager.cpp
     cxReconstructThreads.h
     cxReconstructThreads.cpp
     cxReconstructParams.h
@@ -98,7 +77,6 @@ set(PLUGIN_target_libraries
     cxResourceWidgets
     cxPluginUtilities
     cxResourceUsReconstructionTypes
-    cxVisualizationService
     cxPluginAlgorithm
     )
 

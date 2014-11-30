@@ -33,41 +33,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxThresholdPreview.h"
 #include <vtkVolume.h>
 #include <vtkVolumeProperty.h>
-#include <QWidget>
+//#include <QWidget>
 #include "cxImageTF3D.h"
 #include "cxImageLUT2D.h"
 #include "cxVolumetricRep.h"
-#include "cxRepManager.h"
-#include <QTimer>
+//#include "cxRepManager.h"
+//#include <QTimer>
 #include "cxImage.h"
 #include "cxReporter.h"
 
 namespace cx
 {
-
-
-WidgetObscuredListener::WidgetObscuredListener(QWidget *listenedTo) : mWidget(listenedTo)
-{
-    mRemoveTimer = new QTimer(this);
-    connect(mRemoveTimer, SIGNAL(timeout()), this, SLOT(timeoutSlot()));
-    mRemoveTimer->start(500);
-
-    mObscuredAtLastCheck = this->isObscured();
-}
-
-bool WidgetObscuredListener::isObscured() const
-{
-    return mWidget->visibleRegion().isEmpty();
-}
-
-void WidgetObscuredListener::timeoutSlot()
-{
-    if (mObscuredAtLastCheck == this->isObscured())
-        return;
-
-    mObscuredAtLastCheck = this->isObscured();
-    emit obscured(mObscuredAtLastCheck);
-}
 
 ///--------------------------------------------------------
 ///--------------------------------------------------------
@@ -88,12 +64,6 @@ void ThresholdPreview::revertTransferFunctions()
     mModifiedImage->setShadingOn(mShadingOn_original);
 
 	mModifiedImage->setInterpolationTypeToLinear();
-//    //Go back to VTK linear interpolation
-//	VolumetricBaseRepPtr volumeRep = RepManager::getInstance()->getVolumetricRep(mModifiedImage);
-//    if(volumeRep)
-//        volumeRep->getVtkVolume()->GetProperty()->SetInterpolationTypeToLinear();
-//    else
-//        reportError("ThresholdPreview::revertTransferFunctions() can not find VolumetricRep");
 
     mTF3D_original.reset();
     mTF2D_original.reset();

@@ -54,7 +54,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxVisualizationService.h"
 #include "cxViewGroupData.h"
-#include "cxRepManager.h"
+#include "cxRepContainer.h"
+
 
 //TODO: remove
 #include "cxTrackingService.h"
@@ -131,10 +132,13 @@ void LandmarkImageRegistrationWidget::onCurrentImageChanged()
 
 PickerRepPtr LandmarkImageRegistrationWidget::getPickerRep()
 {
-	if (!mServices.visualizationService->get3DView(0, 0))
-		return PickerRepPtr();
+	return mServices.visualizationService->get3DReps(0, 0)->findFirst<PickerRep>();
+//	return RepContainer(mServices.visualizationService->get3DView(0, 0))->findFirst<PickerRep>();
 
-	return RepManager::findFirstRep<PickerRep>(mServices.visualizationService->get3DView(0, 0)->getReps());
+//	if (!mServices.visualizationService->get3DView(0, 0))
+//		return PickerRepPtr();
+
+//	return RepContainer::findFirstRep<PickerRep>(mServices.visualizationService->get3DView(0, 0)->getReps());
 }
 
 DataPtr LandmarkImageRegistrationWidget::getCurrentData() const
@@ -233,7 +237,7 @@ void LandmarkImageRegistrationWidget::showEvent(QShowEvent* event)
 //		mImageLandmarkSource->setData(image);
 
 	mServices.visualizationService->getGroup(0)->setRegistrationMode(rsIMAGE_REGISTRATED);
-	LandmarkRepPtr rep = RepManager::findFirstRep<LandmarkRep>(mServices.visualizationService->get3DView(0, 0)->getReps());
+	LandmarkRepPtr rep = mServices.visualizationService->get3DReps(0, 0)->findFirst<LandmarkRep>();
 	if (rep)
 	{
 		rep->setPrimarySource(mImageLandmarkSource);
@@ -247,7 +251,7 @@ void LandmarkImageRegistrationWidget::hideEvent(QHideEvent* event)
 
 	if(mServices.visualizationService->get3DView(0, 0))
 	{
-		LandmarkRepPtr rep = RepManager::findFirstRep<LandmarkRep>(mServices.visualizationService->get3DView(0, 0)->getReps());
+		LandmarkRepPtr rep = mServices.visualizationService->get3DReps(0, 0)->findFirst<LandmarkRep>();
 		if (rep)
 		{
 			rep->setPrimarySource(LandmarksSourcePtr());

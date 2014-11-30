@@ -30,44 +30,35 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxVisualizationService.h"
-#include "cxVisualizationServiceNull.h"
-#include "cxNullDeleter.h"
+#include "cxWidgetObscuredListener.h"
 
-#include "cxRepContainer.h"
-#include "cxView.h"
+#include <QWidget>
+#include <QTimer>
 
 namespace cx
 {
-VisualizationServicePtr VisualizationService::getNullObject()
+
+WidgetObscuredListener::WidgetObscuredListener(QWidget *listenedTo) : mWidget(listenedTo)
 {
-	static VisualizationServicePtr mNull;
-	if (!mNull)
-		mNull.reset(new VisualizationServiceNull, null_deleter());
-	return mNull;
+	mRemoveTimer = new QTimer(this);
+	connect(mRemoveTimer, SIGNAL(timeout()), this, SLOT(timeoutSlot()));
+	mRemoveTimer->start(500);
+
+	mObscuredAtLastCheck = this->isObscured();
 }
 
-
-unsigned VisualizationService::groupCount() const
+bool WidgetObscuredListener::isObscured() const
 {
-	int count = 0;
-	while(this->getGroup(count))
-		++count;
-	return count;
+	return mWidget->visibleRegion().isEmpty();
 }
 
-void VisualizationService::deactivateLayout()
+void WidgetObscuredListener::timeoutSlot()
 {
-	this->setActiveLayout("", 0);
-	this->setActiveLayout("", 1);
+	if (mObscuredAtLastCheck == this->isObscured())
+		return;
+
+	mObscuredAtLastCheck = this->isObscured();
+	emit obscured(mObscuredAtLastCheck);
 }
 
-RepContainerPtr VisualizationService::get3DReps(int group, int index)
-{
-	return RepContainerPtr(new RepContainer(this->get3DView(group, index)->getReps()));
 }
-
-
-} //cx
-
-

@@ -81,6 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImage2DRep3D.h"
 #include "cxLogger.h"
 #include "cxPatientModelService.h"
+#include "cxRepContainer.h"
 
 
 #include "cxData.h"
@@ -343,7 +344,7 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
 	{
 		showRefTool->setText("Show " + refTool->getName());
 		showRefTool->setEnabled(true);
-		showRefTool->setChecked(RepManager::findFirstRep<ToolRep3D>(mView->getReps(), refTool) ? true : false);
+		showRefTool->setChecked(RepContainer(mView->getReps()).findFirst<ToolRep3D>(refTool) ? true : false);
 		connect(showRefTool, SIGNAL(toggled(bool)), this, SLOT(showRefToolSlot(bool)));
 	}
 
@@ -424,8 +425,8 @@ void ViewWrapper3D::setViewGroup(ViewGroupDataPtr group)
 
 void ViewWrapper3D::showToolPathSlot(bool checked)
 {
-	ToolRep3DPtr activeRep3D = RepManager::findFirstRep<ToolRep3D>(mView->getReps(),
-					mBackend->getToolManager()->getActiveTool());
+	ToolPtr tool = mBackend->getToolManager()->getActiveTool();
+	ToolRep3DPtr activeRep3D = RepContainer(mView->getReps()).findFirst<ToolRep3D>(tool);
 	if (activeRep3D)
 	{
 		if (activeRep3D->getTracer()->isRunning())
@@ -716,7 +717,7 @@ void ViewWrapper3D::showRefToolSlot(bool checked)
 	ToolPtr refTool = mBackend->getToolManager()->getReferenceTool();
 	if (!refTool)
 		return;
-	ToolRep3DPtr refRep = RepManager::findFirstRep<ToolRep3D>(mView->getReps(), refTool);
+	ToolRep3DPtr refRep = RepContainer(mView->getReps()).findFirst<ToolRep3D>(refTool);
 	if (!refRep)
 	{
 		refRep = ToolRep3D::New(mBackend->getSpaceProvider(), refTool->getUid() + "_rep3d_" + this->mView->getUid());
@@ -773,7 +774,7 @@ void ViewWrapper3D::dominantToolChangedSlot()
 
 void ViewWrapper3D::toolsAvailableSlot()
 {
-	std::vector<ToolRep3DPtr> reps = RepManager::findReps<ToolRep3D>(mView->getReps());
+	std::vector<ToolRep3DPtr> reps = RepContainer::findReps<ToolRep3D>(mView->getReps());
 
 	TrackingService::ToolMap tools = mBackend->getToolManager()->getTools();
 	TrackingService::ToolMap::iterator iter;
@@ -783,7 +784,7 @@ void ViewWrapper3D::toolsAvailableSlot()
 		if (tool->hasType(Tool::TOOL_REFERENCE))
 			continue;
 
-		ToolRep3DPtr toolRep = RepManager::findFirstRep<ToolRep3D>(mView->getReps(), tool);
+		ToolRep3DPtr toolRep = RepContainer(mView->getReps()).findFirst<ToolRep3D>(tool);
 
 		std::vector<ToolRep3DPtr>::iterator oldRep = std::find(reps.begin(), reps.end(), toolRep);
 		if (oldRep!=reps.end())

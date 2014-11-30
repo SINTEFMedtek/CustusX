@@ -45,7 +45,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImage.h"
 #include "cxViewManager.h"
 #include "cxInteractiveClipper.h"
-#include "cxRepManager.h"
 #include "cxCoreServices.h"
 #include "cxNavigation.h"
 

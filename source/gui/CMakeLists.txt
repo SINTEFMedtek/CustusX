@@ -110,9 +110,6 @@ include_directories(
     .
     ${CustusX_SOURCE_DIR}/source/resource/videoServer
     ${CustusX_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
-    ${CustusX_SOURCE_DIR}/source/service/visualization
-    ${CustusX_SOURCE_DIR}/source/service/video
-    ${CustusX_SOURCE_DIR}/source/service/state
     ${CustusX_SOURCE_DIR}/source/logic
     ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
     ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
@@ -122,9 +119,6 @@ include_directories(
     ${CustusX_BINARY_DIR}/source/resource/usReconstructionTypes
     ${CustusX_BINARY_DIR}/source/resource/videoServer
     ${CustusX_BINARY_DIR}/source/resource/OpenIGTLinkUtilities
-    ${CustusX_BINARY_DIR}/source/service/visualization
-    ${CustusX_BINARY_DIR}/source/service/video
-    ${CustusX_BINARY_DIR}/source/service/state
     ${CustusX_BINARY_DIR}/source/logic
     ${CustusX_BINARY_DIR}/source/modules/GUIExtender
     ${CustusX_BINARY_DIR}/source/resource/pluginUtilities

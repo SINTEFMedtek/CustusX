@@ -68,7 +68,6 @@ set(PLUGIN_target_libraries
 #TODO: Remove these dependencies
     cxLogicManager
     cxPluginAlgorithm
-    cxVisualizationService
     )
 
 set(PLUGIN_OUTPUT_DIR "")

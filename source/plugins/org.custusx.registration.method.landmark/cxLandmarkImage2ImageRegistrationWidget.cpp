@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationService.h"
 #include "cxVisualizationService.h"
 #include "cxViewGroupData.h"
-#include "cxRepManager.h"
+#include "cxRepContainer.h"
 //TODO: remove
 #include "cxLogicManager.h"
 
@@ -126,7 +126,8 @@ void LandmarkImage2ImageRegistrationWidget::showEvent(QShowEvent* event)
 	LandmarkRegistrationWidget::showEvent(event);
 	mServices.visualizationService->getGroup(0)->setRegistrationMode(rsIMAGE_REGISTRATED);
 
-	LandmarkRepPtr rep = RepManager::findFirstRep<LandmarkRep>(mServices.visualizationService->get3DView(0, 0)->getReps());
+	LandmarkRepPtr rep = mServices.visualizationService->get3DReps(0, 0)->findFirst<LandmarkRep>();
+//	LandmarkRepPtr rep = RepContainer::findFirstRep<LandmarkRep>(mServices.visualizationService->get3DView(0, 0)->getReps());
 	if (rep)
 	{
 		rep->setPrimarySource(mFixedLandmarkSource);
@@ -141,7 +142,8 @@ void LandmarkImage2ImageRegistrationWidget::hideEvent(QHideEvent* event)
 
 	if(mServices.visualizationService->get3DView(0, 0))
 	{
-		LandmarkRepPtr rep = RepManager::findFirstRep<LandmarkRep>(mServices.visualizationService->get3DView(0, 0)->getReps());
+		LandmarkRepPtr rep = mServices.visualizationService->get3DReps(0, 0)->findFirst<LandmarkRep>();
+//		LandmarkRepPtr rep = RepContainer::findFirstRep<LandmarkRep>(mServices.visualizationService->get3DView(0, 0)->getReps());
 		if (rep)
 		{
 			rep->setPrimarySource(LandmarksSourcePtr());

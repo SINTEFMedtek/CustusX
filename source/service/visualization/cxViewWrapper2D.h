@@ -86,7 +86,6 @@ public:
 	virtual void setSlicePlanesProxy(SlicePlanesProxyPtr proxy);
 	virtual void setViewGroup(ViewGroupDataPtr group);
 
-	static bool overlayIsEnabled();
 	virtual void updateView();
 
 protected slots:

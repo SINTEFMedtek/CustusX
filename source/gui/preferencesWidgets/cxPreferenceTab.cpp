@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxPreferenceTab.h"
 
+#include <cmath>
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QSpinBox>
@@ -39,8 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDoubleWidgets.h"
 #include "cxHelperWidgets.h"
 #include "cxSettings.h"
-#include "cxMultiVolume3DRepProducer.h"
 #include "sscConfig.h"
+#include "cxImage.h"
 
 namespace cx
 {
@@ -118,9 +119,9 @@ void PerformanceTab::init()
 	  "3D Renderer",
 	  "Select 3D visualization method for images",
 	  settings()->value("View3D/ImageRender3DVisualizer").toString(),
-	  MultiVolume3DRepProducer::getAvailableVisualizers(),
+	  this->getAvailableVisualizers(),
 	  QDomNode());
-  m3DVisualizer->setDisplayNames(MultiVolume3DRepProducer::getAvailableVisualizerDisplayNames());
+  m3DVisualizer->setDisplayNames(this->getAvailableVisualizerDisplayNames());
 
   bool useGPU2DRender = settings()->value("useGPU2DRendering").toBool();
 	mGPU2DRenderCheckBox = new QCheckBox("2D Overlay");
@@ -155,9 +156,33 @@ void PerformanceTab::init()
   mTopLayout->addLayout(mMainLayout);
 }
 
+static QStringList getAvailableVisualizers();
+static std::map<QString, QString> getAvailableVisualizerDisplayNames();
+
 void PerformanceTab::renderingIntervalSlot(int interval)
 {
   mRenderingRateLabel->setText(QString("%1 fps").arg(1000.0/interval, 0, 'f', 1));
+}
+
+QStringList PerformanceTab::getAvailableVisualizers()
+{
+	QStringList retval;
+	retval << "vtkVolumeTextureMapper3D";
+	retval << "vtkGPUVolumeRayCastMapper";
+#ifdef CX_BUILD_MEHDI_VTKMULTIVOLUME
+	retval << "vtkOpenGLGPUMultiVolumeRayCastMapper";
+#endif //CX_BUILD_MEHDI_VTKMULTIVOLUME
+
+	return retval;
+}
+
+std::map<QString, QString> PerformanceTab::getAvailableVisualizerDisplayNames()
+{
+	std::map<QString, QString> names;
+	names["vtkVolumeTextureMapper3D"] = "Texture (single volume)";
+	names["vtkGPUVolumeRayCastMapper"] = "Raycast GPU (single volume)";
+	names["vtkOpenGLGPUMultiVolumeRayCastMapper"] = "Mehdi Raycast GPU (multi volume)";
+	return names;
 }
 
 void PerformanceTab::saveParametersSlot()

@@ -67,8 +67,8 @@ public:
 	void addImage(ImagePtr image);
 	void removeImage(QString uid);
 	std::vector<RepPtr> getAllReps();
-	static QStringList getAvailableVisualizers();
-	static std::map<QString, QString> getAvailableVisualizerDisplayNames();
+//	static QStringList getAvailableVisualizers();
+//	static std::map<QString, QString> getAvailableVisualizerDisplayNames();
 	void removeRepsFromView();
 
 signals:

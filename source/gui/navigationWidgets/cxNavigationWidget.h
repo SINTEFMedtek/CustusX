@@ -43,8 +43,6 @@ class QVBoxLayout;
 class QLabel;
 class QSlider;
 
-#include "cxCameraStyle.h"
-
 namespace cx
 {
 

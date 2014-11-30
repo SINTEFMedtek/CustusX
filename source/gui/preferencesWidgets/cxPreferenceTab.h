@@ -99,6 +99,8 @@ protected:
 
 private slots:
   void renderingIntervalSlot(int interval);
+  static QStringList getAvailableVisualizers();
+  static std::map<QString, QString> getAvailableVisualizerDisplayNames();
 };
 
 } /* namespace cx */

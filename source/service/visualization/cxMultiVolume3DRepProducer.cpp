@@ -64,26 +64,26 @@ void MultiVolume3DRepProducer::setView(ViewPtr view)
 	this->fillReps();
 }
 
-QStringList MultiVolume3DRepProducer::getAvailableVisualizers()
-{
-	QStringList retval;
-	retval << "vtkVolumeTextureMapper3D";
-	retval << "vtkGPUVolumeRayCastMapper";
-#ifdef CX_BUILD_MEHDI_VTKMULTIVOLUME
-	retval << "vtkOpenGLGPUMultiVolumeRayCastMapper";
-#endif //CX_BUILD_MEHDI_VTKMULTIVOLUME
+//QStringList MultiVolume3DRepProducer::getAvailableVisualizers()
+//{
+//	QStringList retval;
+//	retval << "vtkVolumeTextureMapper3D";
+//	retval << "vtkGPUVolumeRayCastMapper";
+//#ifdef CX_BUILD_MEHDI_VTKMULTIVOLUME
+//	retval << "vtkOpenGLGPUMultiVolumeRayCastMapper";
+//#endif //CX_BUILD_MEHDI_VTKMULTIVOLUME
 
-	return retval;
-}
+//	return retval;
+//}
 
-std::map<QString, QString> MultiVolume3DRepProducer::getAvailableVisualizerDisplayNames()
-{
-	std::map<QString, QString> names;
-	names["vtkVolumeTextureMapper3D"] = "Texture (single volume)";
-	names["vtkGPUVolumeRayCastMapper"] = "Raycast GPU (single volume)";
-	names["vtkOpenGLGPUMultiVolumeRayCastMapper"] = "Mehdi Raycast GPU (multi volume)";
-	return names;
-}
+//std::map<QString, QString> MultiVolume3DRepProducer::getAvailableVisualizerDisplayNames()
+//{
+//	std::map<QString, QString> names;
+//	names["vtkVolumeTextureMapper3D"] = "Texture (single volume)";
+//	names["vtkGPUVolumeRayCastMapper"] = "Raycast GPU (single volume)";
+//	names["vtkOpenGLGPUMultiVolumeRayCastMapper"] = "Mehdi Raycast GPU (multi volume)";
+//	return names;
+//}
 
 void MultiVolume3DRepProducer::setMaxRenderSize(int voxels)
 {

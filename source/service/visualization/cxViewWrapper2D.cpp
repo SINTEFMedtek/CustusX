@@ -248,11 +248,6 @@ void ViewWrapper2D::settingsChangedSlot(QString key)
 	}
 }
 
-bool ViewWrapper2D::overlayIsEnabled()
-{
-	return true;
-}
-
 /**Hack: gpu slicer recreate and fill with images every time,
  * due to internal instabilities.
  *

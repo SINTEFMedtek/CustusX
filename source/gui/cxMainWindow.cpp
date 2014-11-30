@@ -46,7 +46,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxNavigationWidget.h"
 #include "cxTabbedWidget.h"
 #include "cxToolPropertiesWidget.h"
-#include "cxViewGroup.h"
 #include "cxPreferencesDialog.h"
 #include "cxSlicePropertiesWidget.h"
 #include "cxDataLocations.h"

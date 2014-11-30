@@ -80,57 +80,6 @@ public:
 
 	ThresholdPreviewPtr getThresholdPreview(); ///< Get the ThresholdPreview object
 
-	template<class REP>
-	static boost::shared_ptr<REP> findFirstRep(std::vector<RepPtr> reps, ToolPtr tool)
-	{
-		for (unsigned i = 0; i < reps.size(); ++i)
-		{
-			boost::shared_ptr<REP> rep = boost::dynamic_pointer_cast<REP>(reps[i]);
-			if (rep && rep->hasTool(tool))
-			{
-				return rep;
-			}
-		}
-		return boost::shared_ptr<REP>();
-	}
-
-	template<class REP>
-	static boost::shared_ptr<REP> findFirstRep(std::vector<RepPtr> reps, DataPtr data)
-	{
-		for (unsigned i = 0; i < reps.size(); ++i)
-		{
-			boost::shared_ptr<REP> rep = boost::dynamic_pointer_cast<REP>(reps[i]);
-			if (rep && rep->hasData(data))
-				return rep;
-		}
-		return boost::shared_ptr<REP>();
-	}
-
-	template<class REP>
-	static boost::shared_ptr<REP> findFirstRep(std::vector<RepPtr> reps)
-	{
-		for (unsigned i = 0; i < reps.size(); ++i)
-		{
-			boost::shared_ptr<REP> rep = boost::dynamic_pointer_cast<REP>(reps[i]);
-			if (rep)
-				return rep;
-		}
-		return boost::shared_ptr<REP>();
-	}
-
-	template<class REP>
-	static std::vector<boost::shared_ptr<REP> > findReps(std::vector<RepPtr> reps)
-	{
-		std::vector<boost::shared_ptr<REP> > retval;
-		for (unsigned i = 0; i < reps.size(); ++i)
-		{
-			boost::shared_ptr<REP> rep = boost::dynamic_pointer_cast<REP>(reps[i]);
-			if (rep)
-				retval.push_back(rep);
-		}
-		return retval;
-	}
-
 	/**Get a previously cached Rep.
 	 *
 	 * Optionally, provide an uid that can be used

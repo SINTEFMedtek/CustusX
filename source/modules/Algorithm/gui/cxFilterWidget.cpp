@@ -35,7 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QGroupBox>
 #include <QCheckBox>
 #include "cxFilterPresetWidget.h"
-#include "cxThresholdPreview.h"
+#include "cxWidgetObscuredListener.h"
+
 
 namespace cx
 {

@@ -32,7 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxMetricManager.h"
 #include "cxManualTool.h"
-#include "cxViewGroup.h"
 #include "cxViewGroupData.h"
 #include "cxTrackingService.h"
 #include <QFile>
