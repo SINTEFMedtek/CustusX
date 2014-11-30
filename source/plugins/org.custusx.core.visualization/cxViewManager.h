@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVIEWMANAGER_H_
 #define CXVIEWMANAGER_H_
 
-#include "cxVisualizationServiceExport.h"
+#include "org_custusx_core_visualization_Export.h"
 
 #include <map>
 #include <vector>
@@ -68,6 +68,8 @@ typedef boost::shared_ptr<class LayoutRepository> LayoutRepositoryPtr;
 typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
 typedef boost::shared_ptr<class Navigation> NavigationPtr;
 typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
+
+typedef boost::shared_ptr<class ViewManager> VisualizationServiceOldPtr;
 
 /**
  * \file
@@ -125,7 +127,7 @@ typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
  * \author Janne Beate Bakeng, SINTEF
  * \author Christian Askeland, SINTEF
  */
-class cxVisualizationService_EXPORT ViewManager: public QObject
+class org_custusx_core_visualization_EXPORT ViewManager: public QObject
 {
 Q_OBJECT
 public:

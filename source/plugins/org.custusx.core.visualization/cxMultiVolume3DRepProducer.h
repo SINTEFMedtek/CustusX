@@ -29,85 +29,87 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXRENDERLOOP_H
-#define CXRENDERLOOP_H
+#ifndef CXMULTIVOLUME3DREPPRODUCER_H
+#define CXMULTIVOLUME3DREPPRODUCER_H
 
-#include "cxVisualizationServiceExport.h"
+#include "org_custusx_core_visualization_Export.h"
 
 #include <QObject>
-#include "cxForwardDeclarations.h"
-class QTimer;
-#include <QDateTime>
-#include <set>
+#include <QPointer>
+#include <boost/shared_ptr.hpp>
+#include "cxImage.h"
+#include "cxRep.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class CyclicActionLogger> CyclicActionLoggerPtr;
-class ViewCollectionWidget;
 
-/** Render a set of Views in a loop.
+typedef boost::shared_ptr<class MultiVolume3DRepProducer> MultiVolume3DVisualizerPtr;
+
+/** 
  *
- * This is the main render loop in Custus.
  *
  * \ingroup cx_service_visualization
- * \date 2014-02-06
- * \author christiana
+ * \date 4 Sep 2013
+ * \author Christian Askeland, SINTEF
+ * \author Ole Vegard Solberg, SINTEF
  */
-class cxVisualizationService_EXPORT RenderLoop : public QObject
+class org_custusx_core_visualization_EXPORT MultiVolume3DRepProducer : public QObject
 {
 	Q_OBJECT
 public:
-	RenderLoop();
-	void start();
-	void stop();
-	bool isRunning() const;
-	void setRenderingInterval(int interval);
-	void setSmartRender(bool val); ///< If set: Render only views with modified props using the given interval, render nonmodified at a slower pace.
-	void setLogging(bool on);
+	MultiVolume3DRepProducer();
+	~MultiVolume3DRepProducer();
 
-	void clearViews();
-	void addLayout(ViewCollectionWidget* layout);
-
-	CyclicActionLoggerPtr getRenderTimer() { return mCyclicLogger; }
-
-public slots:
-	void requestPreRenderSignal();
+	void setView(ViewPtr view);
+	void setMaxRenderSize(int voxels);
+	int getMaxRenderSize() const;
+	void setVisualizerType(QString type);
+	void addImage(ImagePtr image);
+	void removeImage(QString uid);
+	std::vector<RepPtr> getAllReps();
+//	static QStringList getAvailableVisualizers();
+//	static std::map<QString, QString> getAvailableVisualizerDisplayNames();
+	void removeRepsFromView();
 
 signals:
-	void preRender();
-	void fps(int number); ///< Emits number of frames per second
+	void imagesChanged();
 
 private slots:
-	void timeoutSlot();
+	void clearReps();
 
 private:
-	void sendRenderIntervalToTimer(int interval);
-	void emitPreRenderIfRequested();
-	void renderViews();
-	bool pollForSmartRenderingThisCycle();
-	int calculateTimeToNextRender();
-	void emitFPSIfRequired();
-	void dumpStatistics();
+	QString mVisualizerType;
+	std::vector<ImagePtr> m2DImages;
+	std::vector<ImagePtr> m3DImages;
+	std::vector<RepPtr> mReps;
+	int mMaxRenderSize;
+	ViewPtr mView;
 
-	QTimer* mTimer; ///< timer that drives rendering
-	QDateTime mLastFullRender;
-	QDateTime mLastBeginRender;
+	void updateRepsInView();
+	void fillReps();
+	bool contains(ImagePtr image) const;
 
-	CyclicActionLoggerPtr mCyclicLogger;
+	void rebuildReps();
+	void rebuild2DReps();
+	void rebuild3DReps();
 
-	bool mSmartRender;
-	bool mPreRenderSignalRequested;
-	int mBaseRenderInterval;
-	bool mLogging;
+	void addRepsToView();
 
-//	typedef std::set<ViewPtr> ViewSet;
-//	ViewSet mViews;
-	std::vector<QPointer<ViewCollectionWidget> > mLayoutWidgets;
+	ImagePtr removeImageFromVector(QString uid, std::vector<ImagePtr> &images);
+
+	void buildVtkOpenGLGPUMultiVolumeRayCastMapper();
+	void buildVtkVolumeTextureMapper3D(ImagePtr image);
+	void buildVtkGPUVolumeRayCastMapper(ImagePtr image);
+	bool is2DImage(ImagePtr image) const;
+	void buildSscImage2DRep3D(ImagePtr image);
+
+	void buildSingleVolumeRenderer(ImagePtr image);
+	bool isSingleVolumeRenderer() const;
+
 };
-
-typedef boost::shared_ptr<RenderLoop> RenderLoopPtr;
 
 } // namespace cx
 
 
-#endif // CXRENDERLOOP_H
+
+#endif // CXMULTIVOLUME3DREPPRODUCER_H

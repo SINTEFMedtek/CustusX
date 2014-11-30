@@ -4,24 +4,52 @@ set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
 include_directories(
 	${CX_RESOURCE_INCLUDE_DIRECTORIES}
-	${CustusX_SOURCE_DIR}/source/resource/visualization
+    ${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
 	${CustusX_SOURCE_DIR}/source/logic
-	${CustusX_SOURCE_DIR}/source/service/visualization
-
 	${CustusX_BINARY_DIR}/source/logic
-	${CustusX_BINARY_DIR}/source/service/visualization
-	${CustusX_BINARY_DIR}/source/resource/visualization
     )
 
 set(PLUGIN_SRCS
   cxVisualizationPluginActivator.cpp
   cxVisualizationImplService.cpp
   cxVisualizationImplService.h
+  
+    cxAxisConnector.cpp
+	cx2DZoomHandler.cpp
+    cxCameraStyle.cpp
+	cxCameraStyleForView.cpp
+    cxMultiVolume3DRepProducer.cpp
+	cxRenderLoop.cpp
+    cxRepManager.cpp
+    cxThresholdPreview.cpp
+    cxViewGroup.cpp
+    cxViewManager.cpp
+    cxViewWrapper.cpp
+    cxViewWrapper2D.cpp
+    cxViewWrapper3D.cpp
+    cxViewWrapperVideo.cpp  
+    cxDataRepContainer.h
+    cxDataRepContainer.cpp
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
   cxVisualizationPluginActivator.h
+
+    cxAxisConnector.h
+	cx2DZoomHandler.h
+    cxCameraStyle.h
+	cxCameraStyleForView.h
+    cxMultiVolume3DRepProducer.h
+	cxRenderLoop.h
+    cxRepManager.h
+    cxThresholdPreview.h
+    cxViewGroup.h
+    cxViewManager.h
+    cxViewWrapper.h
+    cxViewWrapper2D.h
+    cxViewWrapper3D.h
+    cxViewWrapperVideo.h
 )
 
 # Qt Designer files which should be processed by Qts uic

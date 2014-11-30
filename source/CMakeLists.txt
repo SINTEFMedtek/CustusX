@@ -33,7 +33,6 @@ find_package(X11)
 add_subdirectory(ThirdParty)
 
 add_subdirectory(resource)
-add_subdirectory(service)
 add_subdirectory(logic)
 add_subdirectory(modules)
 add_subdirectory(gui)
@@ -51,7 +50,6 @@ message(STATUS ${CX_CONFIGURATION_DESCRIPTION})
 configure_file(
   "${CustusX_SOURCE_DIR}/source/resource/core/settings/cxConfigDescription.txt.in"
   "${CustusX_BINARY_DIR}/documentation/cxConfigDescription.txt"
-#  "${CustusX_BINARY_DIR}/source/resource/core/settings/cxConfigDescription.txt"
   )
 
 configure_file(

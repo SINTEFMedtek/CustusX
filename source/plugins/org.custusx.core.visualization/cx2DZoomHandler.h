@@ -29,50 +29,53 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXAXISCONNECTOR_H
-#define CXAXISCONNECTOR_H
 
-#include "cxVisualizationServiceExport.h"
+#ifndef CX2DZOOMHANDLER_H
+#define CX2DZOOMHANDLER_H
 
-#include <QObject>
-#include "cxForwardDeclarations.h"
-#include "cxCoordinateSystemHelpers.h"
+#include "org_custusx_core_visualization_Export.h"
+
+#include "cxViewGroupData.h"
+#include <QMenu>
 
 namespace cx
 {
-typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
-typedef boost::shared_ptr<class SpaceListener> SpaceListenerPtr;
+typedef boost::shared_ptr<class Zoom2DHandler> Zoom2DHandlerPtr;
 
 /** 
- * Ad-hoc class for connecting axis reps to coord spaces.
- * Used by ViewWrapper3D.
  *
  * \ingroup cx_service_visualization
- * \date 5 Sep 2013, 2013
+ * \date 2014-02-26
  * \author christiana
  */
-class cxVisualizationService_EXPORT AxisConnector : public QObject
+class org_custusx_core_visualization_EXPORT Zoom2DHandler : public QObject
 {
 	Q_OBJECT
-	public:
-		AxisConnector(CoordinateSystem space, SpaceProviderPtr spaceProvider);
-		void connectTo(ToolPtr tool);
-		void mergeWith(SpaceListenerPtr base);
-		AxesRepPtr mRep; ///< axis
-		SpaceListenerPtr mListener;
-	private slots:
-		void changedSlot();
-	private:
-		SpaceListenerPtr mBase;
-		ToolPtr mTool;
-		SpaceProviderPtr mSpaceProvider;
+public:
+	Zoom2DHandler();
+
+	void addActionsToMenu(QMenu* contextMenu);
+	void setGroupData(ViewGroupDataPtr group);
+	double getFactor();
+	void setFactor(double factor);
+
+private slots:
+	void zoom2DActionSlot();
+signals:
+	void zoomChanged();
+private:
+	void setConnectivityFromType(QString type);
+	QString getConnectivityType();
+	void addConnectivityAction(QString type, QString text, QMenu *contextMenu);
+	void set(SyncedValuePtr value);
+
+	SyncedValuePtr mZoom2D;
+	ViewGroupDataPtr mGroupData;
 };
-typedef boost::shared_ptr<class AxisConnector> AxisConnectorPtr;
 
 
 } // namespace cx
 
 
 
-
-#endif // CXAXISCONNECTOR_H
+#endif // CX2DZOOMHANDLER_H

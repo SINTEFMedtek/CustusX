@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVisualizationServiceNull.h"
 #include "cxReporter.h"
 #include <QActionGroup>
+#include <QDomNode>
 
 namespace cx
 {
@@ -95,6 +96,9 @@ CameraControlPtr VisualizationServiceNull::getCameraControl() { return CameraCon
 QActionGroup* VisualizationServiceNull::createInteractorStyleActionGroup() { return mActionGroup; }
 void VisualizationServiceNull::setPreview(ImagePtr image, const std::vector<double>& threshold) {}
 void VisualizationServiceNull::removePreview() {}
+void VisualizationServiceNull::clear() {}
+void VisualizationServiceNull::addXml(QDomNode& parentNode) {}
+void VisualizationServiceNull::parseXml(QDomNode viewmanagerNode) {}
 
 
 } //cx

@@ -30,52 +30,51 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CX2DZOOMHANDLER_H
-#define CX2DZOOMHANDLER_H
+#ifndef CXTHRESHOLDPREVIEW_H_
+#define CXTHRESHOLDPREVIEW_H_
 
-#include "cxVisualizationServiceExport.h"
+#include "org_custusx_core_visualization_Export.h"
 
-#include "cxViewGroupData.h"
-#include <QMenu>
+#include <QObject>
+class QTimer;
+#include "cxForwardDeclarations.h"
+#include "cxMathBase.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class Zoom2DHandler> Zoom2DHandlerPtr;
 
-/** 
+typedef boost::shared_ptr<class ThresholdPreview> ThresholdPreviewPtr;
+
+/**
+ * \brief Use transfer function to preview a threshold in the selected volume. Used by widgets: segmentation and surface generation
+ * \ingroup cx_service_visualization
  *
  * \ingroup cx_service_visualization
- * \date 2014-02-26
- * \author christiana
+ * \date 12. okt. 2011
+ * \author Ole Vegard Solberg, SINTEF
  */
-class cxVisualizationService_EXPORT Zoom2DHandler : public QObject
+class org_custusx_core_visualization_EXPORT ThresholdPreview: public QObject
 {
-	Q_OBJECT
+Q_OBJECT
 public:
-	Zoom2DHandler();
+	ThresholdPreview();
 
-	void addActionsToMenu(QMenu* contextMenu);
-	void setGroupData(ViewGroupDataPtr group);
-	double getFactor();
-	void setFactor(double factor);
+		void setPreview(ImagePtr image, double lower);
+		void setPreview(ImagePtr image, const Eigen::Vector2d &threshold);
+    void removePreview();
 
-private slots:
-	void zoom2DActionSlot();
-signals:
-	void zoomChanged();
 private:
-	void setConnectivityFromType(QString type);
-	QString getConnectivityType();
-	void addConnectivityAction(QString type, QString text, QMenu *contextMenu);
-	void set(SyncedValuePtr value);
+	void revertTransferFunctions();
+	void storeOriginalTransferfunctions(ImagePtr image);
 
-	SyncedValuePtr mZoom2D;
-	ViewGroupDataPtr mGroupData;
+	ImagePtr mModifiedImage; ///< image that have its TF changed temporarily
+//	QWidget* mFromWidget; ///< The calling widget
+    ImageTF3DPtr mTF3D_original; ///< original TF of modified image.
+	ImageLUT2DPtr mTF2D_original; ///< original TF of modified image.
+	bool mShadingOn_original; ///< Was shading originally enabled in image
+//	QTimer *mRemoveTimer; ///< Timer for removing segmentation preview coloring if widget is not visible
 };
 
+}
 
-} // namespace cx
-
-
-
-#endif // CX2DZOOMHANDLER_H
+#endif /* CXTHRESHOLDPREVIEW_H_ */

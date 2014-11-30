@@ -39,6 +39,7 @@ class ctkPluginContext;
 
 namespace cx
 {
+typedef boost::shared_ptr<class ViewManager> VisualizationServiceOldPtr;
 
 /**
  * Implementation of VisualizationService.
@@ -74,14 +75,18 @@ public:
 	virtual LayoutRepositoryPtr getLayoutRepository();
 	virtual CameraControlPtr getCameraControl();
 	virtual QActionGroup* createInteractorStyleActionGroup();
-
 	virtual void setPreview(ImagePtr image, const std::vector<double>& threshold);
 	virtual void removePreview();
+	virtual void clear();
+	virtual void addXml(QDomNode& parentNode);
+	virtual void parseXml(QDomNode viewmanagerNode);
 
 	virtual bool isNull();
 
 private:
 	ctkPluginContext *mContext;
+	VisualizationServiceOldPtr mBase;
+	ViewManager* viewManager() const { return mBase.get(); }
 };
 typedef boost::shared_ptr<VisualizationImplService> VisualizationImplServicePtr;
 

@@ -135,23 +135,11 @@ ViewManager::ViewManager(/*PatientModelServicePtr patientModelService, */CoreSer
 
 	mRenderLoop->setRenderingInterval(settings()->value("renderingInterval").toInt());
 	this->enableRender(true);
-//	mRenderLoop->start();
-
 }
 
 ViewManager::~ViewManager()
 {
 }
-
-//void ViewManager::initialize()
-//{
-//	// set start layout
-//	this->setActiveLayout("LAYOUT_3D_ACS_SINGLE", 0);
-
-//	mRenderLoop->setRenderingInterval(settings()->value("renderingInterval").toInt());
-//	this->enableRender(true);
-////	mRenderLoop->start();
-//}
 
 void ViewManager::enableRender(bool val)
 {
@@ -537,21 +525,6 @@ LayoutRepositoryPtr ViewManager::getLayoutRepository()
 	return mLayoutRepository;
 }
 
-//LayoutData ViewManager::getLayoutData(const QString uid) const
-//{
-//	return mLayoutRepository->get(uid);
-//}
-
-//std::vector<QString> ViewManager::getAvailableLayouts() const
-//{
-//	return mLayoutRepository->getAvailable();
-//}
-
-//void ViewManager::setLayoutData(const LayoutData& data)
-//{
-//	this->storeLayoutData(data);
-//}
-
 void ViewManager::onLayoutRepositoryChanged(QString uid)
 {
 	this->saveGlobalSettings();
@@ -564,26 +537,6 @@ void ViewManager::onLayoutRepositoryChanged(QString uid)
 		emit activeLayoutChanged();
 	}
 }
-
-//void ViewManager::storeLayoutData(const LayoutData& data)
-//{
-//	mLayoutRepository->insert(data);
-//}
-
-//QString ViewManager::generateLayoutUid() const
-//{
-//	return mLayoutRepository->generateUid();
-//}
-
-//void ViewManager::deleteLayoutData(const QString uid)
-//{
-//	mLayoutRepository->erase(uid);
-//}
-
-//bool ViewManager::isCustomLayout(const QString& uid) const
-//{
-//	return mLayoutRepository->isCustom(uid);
-//}
 
 void ViewManager::loadGlobalSettings()
 {

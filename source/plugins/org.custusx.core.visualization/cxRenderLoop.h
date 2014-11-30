@@ -29,78 +29,85 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXRENDERLOOP_H
+#define CXRENDERLOOP_H
 
-#ifndef CXVIEWWRAPPERRTSTREAM_H_
-#define CXVIEWWRAPPERRTSTREAM_H_
+#include "org_custusx_core_visualization_Export.h"
 
-#include "cxVisualizationServiceExport.h"
-
-#include <vector>
-#include <QPointer>
+#include <QObject>
 #include "cxForwardDeclarations.h"
-#include "cxDefinitions.h"
-
-#include "cxViewWrapper.h"
+class QTimer;
+#include <QDateTime>
+#include <set>
 
 namespace cx
 {
-/**
-* \file
-* \addtogroup cx_service_visualization
-* @{
-*/
+typedef boost::shared_ptr<class CyclicActionLogger> CyclicActionLoggerPtr;
+class ViewCollectionWidget;
 
-/** Wrapper for a View that displays a RealTimeStream.
- *  Handles the connections between specific reps and the view.
+/** Render a set of Views in a loop.
  *
- *  The view displays either a raw rt source or a us probe, depending on
- *  whats available.
+ * This is the main render loop in Custus.
  *
+ * \ingroup cx_service_visualization
+ * \date 2014-02-06
+ * \author christiana
  */
-class cxVisualizationService_EXPORT ViewWrapperVideo: public ViewWrapper
+class org_custusx_core_visualization_EXPORT RenderLoop : public QObject
 {
-Q_OBJECT
+	Q_OBJECT
 public:
-	ViewWrapperVideo(ViewPtr view, CoreServicesPtr backend);
-	virtual ~ViewWrapperVideo();
-	virtual ViewPtr getView();
-	virtual void setSlicePlanesProxy(SlicePlanesProxyPtr proxy) {}
-	virtual void updateView() {}
-	virtual void setViewGroup(ViewGroupDataPtr group);
+	RenderLoop();
+	void start();
+	void stop();
+	bool isRunning() const;
+	void setRenderingInterval(int interval);
+	void setSmartRender(bool val); ///< If set: Render only views with modified props using the given interval, render nonmodified at a slower pace.
+	void setLogging(bool on);
+
+	void clearViews();
+	void addLayout(ViewCollectionWidget* layout);
+
+	CyclicActionLoggerPtr getRenderTimer() { return mCyclicLogger; }
+
+public slots:
+	void requestPreRenderSignal();
+
+signals:
+	void preRender();
+	void fps(int number); ///< Emits number of frames per second
 
 private slots:
-	void updateSlot();
-	void showSectorActionSlot(bool checked);
-	void connectStream();
-	void streamActionSlot();
-protected slots:
-	virtual void dataViewPropertiesChangedSlot(QString uid) {}
-
-protected:
-//	virtual void dataAdded(DataPtr data) {}
-//	virtual void dataRemoved(const QString& uid) {}
-	virtual void videoSourceChangedSlot(QString uid);
+	void timeoutSlot();
 
 private:
-	VideoSourcePtr getSourceFromService(QString uid);
-	void addStreamAction(QString uid, QMenu* contextMenu);
-	void loadStream();
-	virtual void appendToContextMenu(QMenu& contextMenu);
-	void addReps();
-	void setupRep(VideoSourcePtr source, ToolPtr tool);
+	void sendRenderIntervalToTimer(int interval);
+	void emitPreRenderIfRequested();
+	void renderViews();
+	bool pollForSmartRenderingThisCycle();
+	int calculateTimeToNextRender();
+	void emitFPSIfRequired();
+	void dumpStatistics();
 
-	VideoFixedPlaneRepPtr mStreamRep;
-	VideoSourcePtr mSource;
-	DisplayTextRepPtr mPlaneTypeText;
-	DisplayTextRepPtr mDataNameText;
-	ViewPtr mView;
-	ToolPtr mTool;
+	QTimer* mTimer; ///< timer that drives rendering
+	QDateTime mLastFullRender;
+	QDateTime mLastBeginRender;
+
+	CyclicActionLoggerPtr mCyclicLogger;
+
+	bool mSmartRender;
+	bool mPreRenderSignalRequested;
+	int mBaseRenderInterval;
+	bool mLogging;
+
+//	typedef std::set<ViewPtr> ViewSet;
+//	ViewSet mViews;
+	std::vector<QPointer<ViewCollectionWidget> > mLayoutWidgets;
 };
-typedef boost::shared_ptr<ViewWrapperVideo> ViewWrapperVideoPtr;
 
-/**
-* @}
-*/
+typedef boost::shared_ptr<RenderLoop> RenderLoopPtr;
+
 } // namespace cx
 
-#endif /* CXVIEWWRAPPERRTSTREAM_H_ */
+
+#endif // CXRENDERLOOP_H

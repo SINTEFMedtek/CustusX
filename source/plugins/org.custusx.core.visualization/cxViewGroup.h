@@ -30,51 +30,83 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXTHRESHOLDPREVIEW_H_
-#define CXTHRESHOLDPREVIEW_H_
+#ifndef CXVIEWGROUP_H_
+#define CXVIEWGROUP_H_
 
-#include "cxVisualizationServiceExport.h"
+#include "org_custusx_core_visualization_Export.h"
 
+#include <vector>
 #include <QObject>
-class QTimer;
+#include <QDomDocument>
+#include "cxDefinitions.h"
 #include "cxForwardDeclarations.h"
-#include "cxMathBase.h"
+#include "cxVector3D.h"
+
+class QMenu;
+class QPoint;
 
 namespace cx
 {
-
-typedef boost::shared_ptr<class ThresholdPreview> ThresholdPreviewPtr;
+typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
+typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
+typedef boost::shared_ptr<class CameraStyle> CameraStylePtr;
+typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
+typedef boost::shared_ptr<class Navigation> NavigationPtr;
 
 /**
- * \brief Use transfer function to preview a threshold in the selected volume. Used by widgets: segmentation and surface generation
- * \ingroup cx_service_visualization
- *
- * \ingroup cx_service_visualization
- * \date 12. okt. 2011
- * \author Ole Vegard Solberg, SINTEF
+ * \file
+ * \addtogroup cx_service_visualization
+ * @{
  */
-class cxVisualizationService_EXPORT ThresholdPreview: public QObject
+
+
+/**
+ * \brief
+ *
+ * \date 18. mars 2010
+ * \\author jbake
+ */
+class org_custusx_core_visualization_EXPORT ViewGroup: public QObject
 {
 Q_OBJECT
 public:
-	ThresholdPreview();
+	explicit ViewGroup(CoreServicesPtr backend);
+	virtual ~ViewGroup();
 
-		void setPreview(ImagePtr image, double lower);
-		void setPreview(ImagePtr image, const Eigen::Vector2d &threshold);
-    void removePreview();
+	void addView(ViewWrapperPtr wrapper);
+	void removeViews();
+	ViewWrapperPtr getViewWrapperFromViewUid(QString viewUid);
+	std::vector<ViewWrapperPtr> getWrappers() const { return mViewWrappers; }
+	std::vector<ViewPtr> getViews() const;
+	ViewGroupDataPtr getData() { return mViewGroupData; }
+	virtual void addXml(QDomNode& dataNode); ///< store internal state info in dataNode
+	virtual void parseXml(QDomNode dataNode); ///< load internal state info from dataNode
+	void clearPatientData();
+	CameraStylePtr getCameraStyle() { return mCameraStyle; }
 
-private:
-	void revertTransferFunctions();
-	void storeOriginalTransferfunctions(ImagePtr image);
+	bool contains3DView() const;
+	void syncOrientationMode(SyncedValuePtr val);
+	void initializeActiveView(SyncedValuePtr val);
 
-	ImagePtr mModifiedImage; ///< image that have its TF changed temporarily
-//	QWidget* mFromWidget; ///< The calling widget
-    ImageTF3DPtr mTF3D_original; ///< original TF of modified image.
-	ImageLUT2DPtr mTF2D_original; ///< original TF of modified image.
-	bool mShadingOn_original; ///< Was shading originally enabled in image
-//	QTimer *mRemoveTimer; ///< Timer for removing segmentation preview coloring if widget is not visible
+private slots:
+//	void activateManualToolSlot();
+	void mouseClickInViewGroupSlot();
+
+protected:
+	std::vector<ViewPtr> mViews;
+
+	ViewGroupDataPtr mViewGroupData;
+	std::vector<ViewWrapperPtr> mViewWrappers;
+	CameraStylePtr mCameraStyle;
+	CoreServicesPtr mBackend;
+	SyncedValuePtr mActiveView;
 };
 
-}
+bool isViewWrapper2D(ViewWrapperPtr wrapper);
 
-#endif /* CXTHRESHOLDPREVIEW_H_ */
+/**
+ * @}
+ */
+} // namespace cx
+
+#endif /* CXVIEWGROUP_H_ */

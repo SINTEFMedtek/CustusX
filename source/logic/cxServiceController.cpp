@@ -37,10 +37,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVideoService.h"
 #include "cxReporter.h"
 #include "cxTypeConversions.h"
-//#include "cxPlaybackUSAcquisitionVideo.h"
-#include "cxViewManager.h"
 #include "cxLegacySingletons.h"
 #include "cxPatientModelService.h"
+#include "cxVisualizationService.h"
 
 namespace cx
 {
@@ -78,7 +77,7 @@ void ServiceController::patientChangedSlot()
 void ServiceController::clearPatientSlot()
 {
 	trackingService()->clear();
-	viewManager()->clear();
+	viewService()->clear();
 }
 
 void ServiceController::duringSavePatientSlot()
@@ -88,7 +87,7 @@ void ServiceController::duringSavePatientSlot()
 	trackingService()->addXml(managerNode);
 	trackingService()->savePositionHistory();
 
-	viewManager()->addXml(managerNode);
+	viewService()->addXml(managerNode);
 }
 
 void ServiceController::duringLoadPatientSlot()
@@ -99,7 +98,7 @@ void ServiceController::duringLoadPatientSlot()
 	trackingService()->parseXml(toolmanagerNode);
 
 	QDomNode viewmanagerNode = managerNode.namedItem("viewManager");
-	viewManager()->parseXml(viewmanagerNode);
+	viewService()->parseXml(viewmanagerNode);
 }
 
 

@@ -79,7 +79,6 @@ include_directories(
     ./gui
 	${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
 	${CustusX_BINARY_DIR}/source/resource/widgets
-	${CustusX_BINARY_DIR}/source/resource/service
 	${CustusX_SOURCE_DIR}/source/logic
 	${CustusX_BINARY_DIR}/source/logic
 

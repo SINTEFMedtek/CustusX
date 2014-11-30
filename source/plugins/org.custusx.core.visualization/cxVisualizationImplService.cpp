@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewGroup.h"
 #include "cxRepManager.h"
 #include "cxThresholdPreview.h"
+#include "cxCoreServices.h"
 
 namespace cx
 {
@@ -45,6 +46,9 @@ namespace cx
 VisualizationImplService::VisualizationImplService(ctkPluginContext *context) :
 	mContext(context )
 {
+	CoreServicesPtr backend = CoreServices::create(context);
+	mBase = ViewManager::create(backend);
+
 	if(!viewManager())
 		std::cout << "VisualizationImplService got no viewManager" << std::endl;
 //	connect(viewManager(), SIGNAL(activeViewChanged()), this, SIGNAL(activeViewChanged()));
@@ -166,6 +170,21 @@ void VisualizationImplService::removePreview()
 {
 	RepManager::getInstance()->getThresholdPreview()->removePreview();
 //	mVisualizationService->removePreview();
+}
+
+void VisualizationImplService::clear()
+{
+	viewManager()->clear();
+}
+
+void VisualizationImplService::addXml(QDomNode& parentNode)
+{
+	viewManager()->addXml(parentNode);
+}
+
+void VisualizationImplService::parseXml(QDomNode viewmanagerNode)
+{
+	viewManager()->parseXml(viewmanagerNode);
 }
 
 

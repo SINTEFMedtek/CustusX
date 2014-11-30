@@ -29,54 +29,50 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXAXISCONNECTOR_H
+#define CXAXISCONNECTOR_H
 
-#ifndef CXDATAREPCONTAINER_H
-#define CXDATAREPCONTAINER_H
+#include "org_custusx_core_visualization_Export.h"
 
-#include "cxVisualizationServiceExport.h"
-
+#include <QObject>
 #include "cxForwardDeclarations.h"
-#include "cxSettings.h"
+#include "cxCoordinateSystemHelpers.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class SphereMetric> SphereMetricPtr;
+typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
+typedef boost::shared_ptr<class SpaceListener> SpaceListenerPtr;
 
-/** Creates and manages a list of reps based on input Data objects.
- *
+/** 
+ * Ad-hoc class for connecting axis reps to coord spaces.
+ * Used by ViewWrapper3D.
  *
  * \ingroup cx_service_visualization
- * \date 2014-03-27
+ * \date 5 Sep 2013, 2013
  * \author christiana
  */
-typedef boost::shared_ptr<class DataRepContainer> DataRepContainerPtr;
-/** Creates and manages a list of reps based on input Data objects.
-  *
-  */
-class cxVisualizationService_EXPORT DataRepContainer
+class org_custusx_core_visualization_EXPORT AxisConnector : public QObject
 {
-public:
-	void setSliceProxy(SliceProxyPtr sliceProxy);
-	void setView(ViewPtr view);
-
-	void updateSettings();
-
-	void addData(DataPtr data);
-	void removeData(QString uid);
-private:
-	virtual void meshAdded(MeshPtr mesh);
-	virtual void pointMetricAdded(PointMetricPtr mesh);
-	void updateSettings(RepPtr rep);
-	void sphereMetricAdded(SphereMetricPtr mesh);
-
-	SliceProxyPtr mSliceProxy;
-	ViewPtr mView;
-
-	typedef std::map<QString, RepPtr> RepMap;
-	RepMap mDataReps;
+	Q_OBJECT
+	public:
+		AxisConnector(CoordinateSystem space, SpaceProviderPtr spaceProvider);
+		void connectTo(ToolPtr tool);
+		void mergeWith(SpaceListenerPtr base);
+		AxesRepPtr mRep; ///< axis
+		SpaceListenerPtr mListener;
+	private slots:
+		void changedSlot();
+	private:
+		SpaceListenerPtr mBase;
+		ToolPtr mTool;
+		SpaceProviderPtr mSpaceProvider;
 };
+typedef boost::shared_ptr<class AxisConnector> AxisConnectorPtr;
 
 
 } // namespace cx
 
-#endif // CXDATAREPCONTAINER_H
+
+
+
+#endif // CXAXISCONNECTOR_H

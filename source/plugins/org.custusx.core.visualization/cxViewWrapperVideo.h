@@ -30,83 +30,77 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXVIEWGROUP_H_
-#define CXVIEWGROUP_H_
+#ifndef CXVIEWWRAPPERRTSTREAM_H_
+#define CXVIEWWRAPPERRTSTREAM_H_
 
-#include "cxVisualizationServiceExport.h"
+#include "org_custusx_core_visualization_Export.h"
 
 #include <vector>
-#include <QObject>
-#include <QDomDocument>
-#include "cxDefinitions.h"
+#include <QPointer>
 #include "cxForwardDeclarations.h"
-#include "cxVector3D.h"
+#include "cxDefinitions.h"
 
-class QMenu;
-class QPoint;
+#include "cxViewWrapper.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
-typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
-typedef boost::shared_ptr<class CameraStyle> CameraStylePtr;
-typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
-typedef boost::shared_ptr<class Navigation> NavigationPtr;
-
 /**
- * \file
- * \addtogroup cx_service_visualization
- * @{
- */
+* \file
+* \addtogroup cx_service_visualization
+* @{
+*/
 
-
-/**
- * \brief
+/** Wrapper for a View that displays a RealTimeStream.
+ *  Handles the connections between specific reps and the view.
  *
- * \date 18. mars 2010
- * \\author jbake
+ *  The view displays either a raw rt source or a us probe, depending on
+ *  whats available.
+ *
  */
-class cxVisualizationService_EXPORT ViewGroup: public QObject
+class org_custusx_core_visualization_EXPORT ViewWrapperVideo: public ViewWrapper
 {
 Q_OBJECT
 public:
-	explicit ViewGroup(CoreServicesPtr backend);
-	virtual ~ViewGroup();
-
-	void addView(ViewWrapperPtr wrapper);
-	void removeViews();
-	ViewWrapperPtr getViewWrapperFromViewUid(QString viewUid);
-	std::vector<ViewWrapperPtr> getWrappers() const { return mViewWrappers; }
-	std::vector<ViewPtr> getViews() const;
-	ViewGroupDataPtr getData() { return mViewGroupData; }
-	virtual void addXml(QDomNode& dataNode); ///< store internal state info in dataNode
-	virtual void parseXml(QDomNode dataNode); ///< load internal state info from dataNode
-	void clearPatientData();
-	CameraStylePtr getCameraStyle() { return mCameraStyle; }
-
-	bool contains3DView() const;
-	void syncOrientationMode(SyncedValuePtr val);
-	void initializeActiveView(SyncedValuePtr val);
+	ViewWrapperVideo(ViewPtr view, CoreServicesPtr backend);
+	virtual ~ViewWrapperVideo();
+	virtual ViewPtr getView();
+	virtual void setSlicePlanesProxy(SlicePlanesProxyPtr proxy) {}
+	virtual void updateView() {}
+	virtual void setViewGroup(ViewGroupDataPtr group);
 
 private slots:
-//	void activateManualToolSlot();
-	void mouseClickInViewGroupSlot();
+	void updateSlot();
+	void showSectorActionSlot(bool checked);
+	void connectStream();
+	void streamActionSlot();
+protected slots:
+	virtual void dataViewPropertiesChangedSlot(QString uid) {}
 
 protected:
-	std::vector<ViewPtr> mViews;
+//	virtual void dataAdded(DataPtr data) {}
+//	virtual void dataRemoved(const QString& uid) {}
+	virtual void videoSourceChangedSlot(QString uid);
 
-	ViewGroupDataPtr mViewGroupData;
-	std::vector<ViewWrapperPtr> mViewWrappers;
-	CameraStylePtr mCameraStyle;
-	CoreServicesPtr mBackend;
-	SyncedValuePtr mActiveView;
+private:
+	VideoSourcePtr getSourceFromService(QString uid);
+	void addStreamAction(QString uid, QMenu* contextMenu);
+	void loadStream();
+	virtual void appendToContextMenu(QMenu& contextMenu);
+	void addReps();
+	void setupRep(VideoSourcePtr source, ToolPtr tool);
+
+	VideoFixedPlaneRepPtr mStreamRep;
+	VideoSourcePtr mSource;
+	DisplayTextRepPtr mPlaneTypeText;
+	DisplayTextRepPtr mDataNameText;
+	ViewPtr mView;
+	ToolPtr mTool;
 };
-
-bool isViewWrapper2D(ViewWrapperPtr wrapper);
+typedef boost::shared_ptr<ViewWrapperVideo> ViewWrapperVideoPtr;
 
 /**
- * @}
- */
+* @}
+*/
 } // namespace cx
 
-#endif /* CXVIEWGROUP_H_ */
+#endif /* CXVIEWWRAPPERRTSTREAM_H_ */

@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVIEWWRAPPER3D_H_
 #define CXVIEWWRAPPER3D_H_
 
-#include "cxVisualizationServiceExport.h"
+#include "org_custusx_core_visualization_Export.h"
 
 #include <vector>
 #include <QPointer>
@@ -83,7 +83,7 @@ typedef boost::shared_ptr<class ToolAxisConnector> ToolAxisConnectorPtr;
  *  Handles the connections between specific reps and the view.
  *
  */
-class cxVisualizationService_EXPORT ViewWrapper3D: public ViewWrapper
+class org_custusx_core_visualization_EXPORT ViewWrapper3D: public ViewWrapper
 {
 Q_OBJECT
 public:

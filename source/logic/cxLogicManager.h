@@ -52,8 +52,8 @@ namespace cx
 typedef boost::shared_ptr<class PluginFrameworkManager> PluginFrameworkManagerPtr;
 typedef boost::shared_ptr<class ServiceController> ServiceControllerPtr;
 
-/**\brief Responsible for the entire logic layer.
- * \ingroup cx_logic
+/** \brief Responsible for the entire logic layer.
+ *  \ingroup cx_logic
  *
  * All controllers in this layers are embedded in this class.
  * The service layer are managed via the ServiceController aggregate member.
@@ -75,14 +75,14 @@ public:
   static void shutdown();
 
   PluginFrameworkManagerPtr getPluginFramework();
-	ctkPluginContext* getPluginContext();
+  ctkPluginContext* getPluginContext();
 
   TrackingServicePtr getTrackingService();
   SpaceProviderPtr getSpaceProvider();
   PatientModelServicePtr getPatientModelService();
-	VideoServicePtr getVideoService();
-	StateServicePtr getStateService();
-	ViewServicePtr getViewService();
+  VideoServicePtr getVideoService();
+  StateServicePtr getStateService();
+  ViewServicePtr getViewService();
 
 private:
   /**
@@ -97,27 +97,8 @@ private:
 	*/
   void shutdownServices();
 
-  VisualizationServiceOldPtr getVisualizationService();
-
-  void createTrackingService();
-  void createPatientModelService();
-  void createDataService();
-  void createDataFactory();
-  void createSpaceProvider();
-	void createVideoService();
-  void createVisualizationService();
-  void createStateService();
-  void createPluginFramework();
-
-  void createInterconnectedDataAndSpace();
-
-  void shutdownStateService();
-  void shutdownVisualizationService();
-	void shutdownVideoServiceOld();
-  void shutdownPatientService();
-  void shutdownInterconnectedDataAndSpace();
-  void shutdownTrackingService();
-  void shutdownPluginFramework();
+  template<class T>
+  void shutdownService(boost::shared_ptr<T>& service, QString name);
 
   static LogicManager* mInstance;
   static void setInstance(LogicManager* instance);
@@ -132,18 +113,16 @@ private:
 
 // services:
 	SpaceProviderPtr mSpaceProvider;
-
 	PatientModelServicePtr mPatientModelService;
 	TrackingServicePtr mTrackingService;
 	VideoServicePtr mVideoService;
-	VisualizationServiceOldPtr mVisualizationService;
 	StateServicePtr mStateService;
 	ViewServicePtr mViewService;
 
 	PluginFrameworkManagerPtr mPluginFramework;
 };
 
-cxLogicManager_EXPORT LogicManager* logicManager(); // if necessary
+cxLogicManager_EXPORT LogicManager* logicManager(); // access the singleton
 
 /**
 * @}
