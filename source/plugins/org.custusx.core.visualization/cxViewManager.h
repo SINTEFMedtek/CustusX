@@ -211,6 +211,7 @@ protected:
 	void rebuildLayouts();
 	void initializeGlobal2DZoom();
 	void initializeActiveView();
+	void layoutWidgetDestroyed(QObject *object);
 
 	LayoutRepositoryPtr mLayoutRepository;
 	std::vector<QPointer<ViewCollectionWidget> > mLayoutWidgets;
