@@ -85,6 +85,7 @@ private slots:
 	void acquisitionCancelled();
 	void duringClearPatientSlot();
 private:
+	RegServices mServices;
 	QVBoxLayout* mVerticalLayout;
 	QLabel* mLabel;
 	BoolDataAdapterXmlPtr mUseLocalRegistration;
@@ -107,7 +108,7 @@ private:
 
 	void initSessionSelector(AcquisitionDataPtr acquisitionData);
 	QStringList getSessionList(AcquisitionDataPtr acquisitionData);
-	void initializeTrackingService(RegServices services);
+	void initializeTrackingService();
 
 	void createMaxNumberOfGenerations(QDomElement root);
 	void selectSubsetOfBranches(QDomElement root);
