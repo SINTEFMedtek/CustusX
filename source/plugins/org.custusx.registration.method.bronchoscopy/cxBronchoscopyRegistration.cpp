@@ -474,13 +474,14 @@ Eigen::Matrix4d BronchoscopyRegistration::runBronchoscopyRegistration(TimedTrans
 	Eigen::Matrix4d regMatrix;
 	if (maxDistanceForLocalRegistration != 0)
 	{
-		Eigen::MatrixXd trackingPositions(3 , Tnavigation.size());
+		Eigen::MatrixXd trackingPositions_temp(3 , Tnavigation.size());
+		M4Vector Tnavigation_temp = Tnavigation;
 		for (int i = 0; i < Tnavigation.size(); i++)
 		{
-			Tnavigation[i] = old_rMpr * Tnavigation[i];
-			trackingPositions.block(0 , i , 3 , 1) = Tnavigation[i].topRightCorner(3 , 1);
+			Tnavigation_temp[i] = old_rMpr * Tnavigation[i];
+			trackingPositions_temp.block(0 , i , 3 , 1) = Tnavigation_temp[i].topRightCorner(3 , 1);
 		}
-		BranchListPtr tempPtr = mBranchList->removePositionsForLocalRegistration(trackingPositions, maxDistanceForLocalRegistration);
+		BranchListPtr tempPtr = mBranchList->removePositionsForLocalRegistration(trackingPositions_temp, maxDistanceForLocalRegistration);
 		regMatrix = registrationAlgorithm(tempPtr, Tnavigation, old_rMpr);
 	}
 	else
