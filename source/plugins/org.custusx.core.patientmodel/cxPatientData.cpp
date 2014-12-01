@@ -90,7 +90,7 @@ QDomElement getElementForced(QDomNode root, QString path)
 PatientData::PatientData(DataServicePtr dataManager) : mDataManager(dataManager)
 {
 	connect(dataManager.get(), SIGNAL(clinicalApplicationChanged()), this, SLOT(clearPatient()));
-	QTimer::singleShot(0, this, SLOT(startupLoadPatient())); // make sure this is called after application state change
+	QTimer::singleShot(100, this, SLOT(startupLoadPatient())); // make sure this is called after application state change
 }
 
 PatientData::~PatientData()
