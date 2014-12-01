@@ -45,7 +45,7 @@ class QDomElement;
 namespace cx
 {
 
-typedef boost::shared_ptr<class Package> PackagePtr;
+typedef boost::shared_ptr<struct Package> PackagePtr;
 
 vtkImageDataPtr loadImage(QString filename);
 vtkLookupTablePtr createLookupTable(int numberOfTableValues);

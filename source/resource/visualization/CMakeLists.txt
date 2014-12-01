@@ -67,6 +67,7 @@ cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
     cxInteractiveClipper
     cxInteractiveCropper
     cxCameraControl
+	cxRepContainer
 	
         )
 

@@ -269,6 +269,9 @@ Transform3D SpaceProviderImpl::get_rMr()
 
 Transform3D SpaceProviderImpl::get_rMd(QString uid)
 {
+	if (!mDataManager->isPatientValid())
+		return Transform3D::Identity();
+
 	DataPtr data = mDataManager->getData(uid);
 
 	if (!data && uid=="active")
@@ -284,6 +287,9 @@ Transform3D SpaceProviderImpl::get_rMd(QString uid)
 
 Transform3D SpaceProviderImpl::get_rMdv(QString uid)
 {
+	if (!mDataManager->isPatientValid())
+		return Transform3D::Identity();
+
 	DataPtr data = mDataManager->getData(uid);
 
 	if (!data && uid=="active")

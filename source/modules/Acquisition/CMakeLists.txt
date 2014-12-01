@@ -73,8 +73,6 @@ include_directories(
     .
     ./logic
     ./gui
-    ${CustusX_SOURCE_DIR}/source/service/video
-    ${CustusX_SOURCE_DIR}/source/service/visualization
     ${CustusX_SOURCE_DIR}/source/logic
 
     ${CustusX_SOURCE_DIR}/source/modules/Algorithm/logic
@@ -85,8 +83,6 @@ include_directories(
     ${CustusX_SOURCE_DIR}/source/gui/dataAdapters
     ${CustusX_SOURCE_DIR}/source/gui/toolWidgets
     
-    ${CustusX_BINARY_DIR}/source/service/video
-    ${CustusX_BINARY_DIR}/source/service/visualization
     ${CustusX_BINARY_DIR}/source/modules/Algorithm
     ${CustusX_BINARY_DIR}/source/modules/GUIExtender
     ${CustusX_BINARY_DIR}/source/gui
@@ -107,7 +103,4 @@ cx_create_export_header("cxPluginAcquisition")
 add_library( cxPluginAcquisition ${SOURCE_FILES} )
 target_link_libraries( cxPluginAcquisition ${CX_ACQUISITION_LIBRARIES} )
 
-# add/remove to suit your own needs.
-#add_subdirectory(logic)
-#add_subdirectory(gui)
 add_subdirectory(testing)

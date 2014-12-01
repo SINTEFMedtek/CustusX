@@ -62,6 +62,12 @@ if (BUILD_TESTING)
             cxtestDummyDataManager.cpp
             cxtestQueuedSignalListener.cpp
             cxtestDirectSignalListener.cpp
+            cxtestSyntheticVolumeComparer.h
+            cxtestSyntheticVolumeComparer.cpp
+            cxtestSphereSyntheticVolume.h
+            cxtestSphereSyntheticVolume.cpp
+            cxtestSyntheticReconstructInput.h
+            cxtestSyntheticReconstructInput.cpp
         )
 
         set(DEPENDENT_ON_LIBS
@@ -70,12 +76,8 @@ if (BUILD_TESTING)
         )
 
         cx_remove_duplicate_include_directories()
-        #cx_create_export_header("cxtestUtilities")
-#        add_library( cxtestUtilities ${CX_CATCH_SHARED_LIB_TYPE} ${CX_TESTUTILITIES_SOURCE_FILES} )
-        #cx_add_test_library(cxtestUtilities ${CX_TESTUTILITIES_SOURCE_FILES})
         cx_catch_add_lib_and_exe(""
                 "${CX_TESTUTILITIES_SOURCE_FILES}"
                 "${CX_TESTUTILITIES_FILES_TO_MOC}"
                 "${DEPENDENT_ON_LIBS}")
-        #target_link_libraries(cxtestUtilities Qt5::Test cxResource)
 endif (BUILD_TESTING)

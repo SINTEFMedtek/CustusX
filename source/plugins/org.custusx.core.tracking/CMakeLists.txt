@@ -15,8 +15,6 @@ include_directories(
 set(PLUGIN_SRCS
   cxTrackingPluginActivator.cpp
   cxTrackingImplService.cpp
-    cxProbeImpl.h
-    cxProbeImpl.cpp
     cxManualToolAdapter.h
     cxManualToolAdapter.cpp
     cxToolConfigurationParser.h
@@ -44,9 +42,8 @@ set(PLUGIN_SRCS
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
-  cxTrackingPluginActivator.h
-  cxTrackingImplService.h
-	cxProbeImpl.h
+    cxTrackingPluginActivator.h
+    cxTrackingImplService.h
 	trackingSystemIGSTK/cxToolUsingIGSTK.h
     trackingSystemIGSTK/cxIgstkTracker.h
     cxManualToolAdapter.h

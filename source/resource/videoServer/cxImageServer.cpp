@@ -40,7 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QNetworkInterface>
 #include <QTcpSocket>
 #include "cxCommandlineImageStreamerFactory.h"
-#include "cxSender.h"
+//#include "cxSender.h"
+#include "cxGrabberSenderQTcpSocket.h"
 
 namespace cx
 {

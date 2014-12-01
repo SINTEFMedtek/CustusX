@@ -47,7 +47,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxBronchoscopyRegistration.h"
 #include "cxReporter.h"
 #include "cxTypeConversions.h"
-#include "cxThresholdPreview.h"
 #include "cxPatientModelService.h"
 #include "cxRegistrationService.h"
 #include "cxVisualizationService.h"
@@ -60,7 +59,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataAdapterHelper.h"
 #include "cxBoolDataAdapterXml.h"
 #include "cxCheckBoxWidget.h"
-#include "cxRepManager.h"
+#include "cxRepContainer.h"
+#include "cxWidgetObscuredListener.h"
 #include "cxViewGroupData.h"
 #include "cxDataInterface.h"
 #include "cxHelperWidgets.h"
@@ -349,7 +349,8 @@ void BronchoscopyRegistrationWidget::duringClearPatientSlot()
 ToolRep3DPtr BronchoscopyRegistrationWidget::getToolRepIn3DView(ToolPtr tool)
 {
 	ViewPtr view = mServices.visualizationService->get3DView();
-    ToolRep3DPtr retval = RepManager::findFirstRep<ToolRep3D>(view->getReps(),tool);
+	ToolRep3DPtr retval = mServices.visualizationService->get3DReps(0, 0)->findFirst<ToolRep3D>(tool);
+//	ToolRep3DPtr retval = RepContainer::findFirstRep<ToolRep3D>(view->getReps(),tool);
 	return retval;
 }
 

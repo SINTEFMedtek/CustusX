@@ -48,7 +48,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDoubleDataAdapterXml.h"
 #include "cxBoolDataAdapterXml.h"
 #include "cxColorDataAdapterXml.h"
-#include "cxThresholdPreview.h"
 #include "cxSelectDataStringDataAdapter.h"
 #include "cxLegacySingletons.h"
 #include "cxPatientModelService.h"
@@ -191,14 +190,12 @@ void ContourFilter::imageChangedSlot(QString uid)
 
 void ContourFilter::thresholdSlot()
 {
-	//    std::cout << "ContourFilter::thresholdSlot() " << mActive << std::endl;
 	if (mActive)
 	{
 		ImagePtr image = boost::dynamic_pointer_cast<Image>(mInputTypes[0]->getData());
 		std::vector<double> threshold;
 		threshold.push_back(mSurfaceThresholdOption->getValue());
 		viewService()->setPreview(image, threshold);
-//		RepManager::getInstance()->getThresholdPreview()->setPreview(image, mSurfaceThresholdOption->getValue());
 	}
 }
 

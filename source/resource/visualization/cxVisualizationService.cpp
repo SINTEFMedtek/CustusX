@@ -34,6 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVisualizationServiceNull.h"
 #include "cxNullDeleter.h"
 
+#include "cxRepContainer.h"
+#include "cxView.h"
+
 namespace cx
 {
 VisualizationServicePtr VisualizationService::getNullObject()
@@ -57,6 +60,11 @@ void VisualizationService::deactivateLayout()
 {
 	this->setActiveLayout("", 0);
 	this->setActiveLayout("", 1);
+}
+
+RepContainerPtr VisualizationService::get3DReps(int group, int index)
+{
+	return RepContainerPtr(new RepContainer(this->get3DView(group, index)->getReps()));
 }
 
 

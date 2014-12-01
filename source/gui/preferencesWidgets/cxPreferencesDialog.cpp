@@ -50,9 +50,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxToolFilterWidget.h"
 #include "cxColorSelectButton.h"
 #include "cxHelperWidgets.h"
-#include "cxMultiVolume3DRepProducer.h"
 #include "cxPatientModelService.h"
 #include "cxDummyTool.h"
+#include "cxImage.h"
 
 namespace cx
 {

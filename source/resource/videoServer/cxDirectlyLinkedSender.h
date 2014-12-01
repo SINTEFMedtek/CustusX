@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxGrabberExport.h"
 
-#include "cxSender.h"
+#include "cxSenderImpl.h"
 
 #include <QObject>
 #include <boost/shared_ptr.hpp>

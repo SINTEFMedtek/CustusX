@@ -56,6 +56,7 @@ typedef boost::shared_ptr<class CyclicActionLogger> CyclicActionLoggerPtr;
 typedef boost::shared_ptr<class Navigation> NavigationPtr;
 typedef boost::shared_ptr<class LayoutRepository> LayoutRepositoryPtr;
 typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
+typedef boost::shared_ptr<class RepContainer> RepContainerPtr;
 
 
 /** \brief Visualization services
@@ -69,6 +70,7 @@ class cxResourceVisualization_EXPORT VisualizationService : public QObject
 	Q_OBJECT
 public:
 	virtual ViewPtr get3DView(int group = 0, int index = 0) = 0;
+	RepContainerPtr get3DReps(int group = 0, int index = 0);
 
 	virtual int getActiveGroup() const = 0;
 	virtual ViewGroupDataPtr getGroup(int groupIdx) const = 0;
@@ -91,6 +93,10 @@ public:
 
 	virtual void setPreview(ImagePtr image, const std::vector<double>& threshold) = 0;
 	virtual void removePreview() = 0;
+
+	virtual void clear() = 0;
+	virtual void addXml(QDomNode& parentNode) = 0;
+	virtual void parseXml(QDomNode viewmanagerNode) = 0;
 
 	virtual bool isNull() = 0;
 	static VisualizationServicePtr getNullObject();

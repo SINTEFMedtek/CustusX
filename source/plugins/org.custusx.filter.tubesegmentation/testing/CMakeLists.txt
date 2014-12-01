@@ -1,15 +1,6 @@
 
 if(BUILD_TESTING)
     include_directories(
-#        ${CX_RESOURCE_INCLUDE_DIRECTORIES}
- #       ${CustusX_BINARY_DIR}/source/resource/core/utilities/
-#		${CustusX_SOURCE_DIR}/source/logic
-#		${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
-#		${CustusX_SOURCE_DIR}/source/resource/testUtilities
-#		${CustusX_SOURCE_DIR}/source/resource/core/dataAdapters
-
-#	    ${CustusX_SOURCE_DIR}/source/logic/
-#	    ${CustusX_SOURCE_DIR}/source/service/tracking/
 	)
 
     cx_add_class(CXTEST_SOURCES ${CXTEST_SOURCES}

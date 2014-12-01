@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ctkPluginContext.h>
 #include "cxNullDeleter.h"
 #include "cxReporter.h"
+#include <QDomNode>
 
 namespace cx
 {
@@ -175,6 +176,21 @@ void VisualizationServiceProxy::setPreview(ImagePtr image, const std::vector<dou
 void VisualizationServiceProxy::removePreview()
 {
 	mVisualizationService->removePreview();
+}
+
+void VisualizationServiceProxy::clear()
+{
+	mVisualizationService->clear();
+}
+
+void VisualizationServiceProxy::addXml(QDomNode& parentNode)
+{
+	mVisualizationService->addXml(parentNode);
+}
+
+void VisualizationServiceProxy::parseXml(QDomNode viewmanagerNode)
+{
+	mVisualizationService->parseXml(viewmanagerNode);
 }
 
 

@@ -17,8 +17,6 @@ include_directories(
 	${CustusX_BINARY_DIR}/source/resource/usReconstructionTypes
 	${CustusX_BINARY_DIR}/source/resource/videoServer
 	${CustusX_BINARY_DIR}/source/resource/OpenIGTLinkUtilities
-	${CustusX_BINARY_DIR}/source/service/video
-	${CustusX_SOURCE_DIR}/source/service/video
 	)
 
 set(PLUGIN_SRCS

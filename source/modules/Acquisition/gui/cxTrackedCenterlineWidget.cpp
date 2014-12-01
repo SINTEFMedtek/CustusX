@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReporter.h"
 #include "cxView.h"
 #include "cxVisualizationService.h"
-#include "cxRepManager.h"
+#include "cxRepContainer.h"
 
 #include "cxLegacySingletons.h"
 
@@ -152,11 +152,10 @@ void TrackedCenterlineWidget::startedSlot(QString sessionId)
   TrackingService::ToolMap tools = trackingService()->getTools();
   TrackingService::ToolMap::iterator toolIt = tools.begin();
 
-  ViewPtr view = viewService()->get3DView(0,0);
   ToolRep3DPtr activeRep3D;
   for(; toolIt != tools.end(); ++toolIt)
   {
-	activeRep3D = RepManager::findFirstRep<ToolRep3D>(view->getReps(), toolIt->second);
+	  activeRep3D = viewService()->get3DReps()->findFirst<ToolRep3D>(toolIt->second);
     if(!activeRep3D)
       continue;
     activeRep3D->getTracer()->clear();
@@ -170,11 +169,10 @@ void TrackedCenterlineWidget::stoppedSlot(bool)
   TrackingService::ToolMap tools = trackingService()->getTools();
   TrackingService::ToolMap::iterator toolIt = tools.begin();
 
-  ViewPtr view = viewService()->get3DView(0,0);
   ToolRep3DPtr activeRep3D;
   for(; toolIt != tools.end(); ++toolIt)
   {
-	activeRep3D = RepManager::findFirstRep<ToolRep3D>(view->getReps(), toolIt->second);
+	activeRep3D = viewService()->get3DReps()->findFirst<ToolRep3D>(toolIt->second);
     if(!activeRep3D)
       continue;
     if (activeRep3D->getTracer()->isRunning())

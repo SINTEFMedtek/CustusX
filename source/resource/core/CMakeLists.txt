@@ -37,6 +37,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	Tool/cxTool
 	Tool/cxToolProxy
 	Tool/cxProbe.h
+    Tool/cxProbeImpl.h
 	Tool/cxDummyTool
 	Tool/cxDummyToolManager
 	Tool/cxManualTool
@@ -108,6 +109,7 @@ cx_add_class(cxResource_SOURCE
 	Tool/cxTrackingPositionFilter
 	Tool/cxTrackerConfiguration
 	Tool/cxToolNull
+    Tool/cxProbeImpl
 
 	Data/cxDataMetric
 	Data/cxDataReaderWriter

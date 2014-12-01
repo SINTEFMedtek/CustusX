@@ -14,6 +14,7 @@ if (BUILD_TESTING)
 		cxtestSeansVesselRegFixture.h
 		cxtestSeansVesselRegFixture.cpp
 		cxtestCatchSeansVesselReg.cpp
+        cxtestRegistrationServiceProxy.cpp
 		)
 
     cx_catch_add_lib_and_exe(org_custusx_registration

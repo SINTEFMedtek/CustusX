@@ -87,53 +87,6 @@ public:
 };
 typedef boost::shared_ptr<Sender> SenderPtr;
 
-class cxGrabber_EXPORT SenderImpl : public Sender
-{
-public:
-	SenderImpl() {}
-	virtual ~SenderImpl() {}
-
-	/**Return if sender is ready to send another message. If !isReady(),
-	 * calls to send() will fail.
-	 */
-	virtual bool isReady() const = 0;
-
-	virtual void send(PackagePtr package);
-
-protected:
-	/**Send an image message, NOT packed.
-	 */
-	virtual void send(IGTLinkImageMessage::Pointer msg) = 0;
-	/**Send an US status message, NOT packed
-	 */
-	virtual void send(IGTLinkUSStatusMessage::Pointer msg) = 0;
-	/**Send an image message, NOT packed.
-	 */
-	virtual void send(ImagePtr msg) = 0;
-	/**Send an US status message, NOT packed
-	 */
-	virtual void send(ProbeDefinitionPtr msg) = 0;
-};
-
-class cxGrabber_EXPORT GrabberSenderQTcpSocket : public SenderImpl
-{
-public:
-	explicit GrabberSenderQTcpSocket(QTcpSocket* socket);
-	virtual ~GrabberSenderQTcpSocket() {}
-
-	bool isReady() const;
-
-protected:
-	virtual void send(IGTLinkImageMessage::Pointer msg);
-	virtual void send(IGTLinkUSStatusMessage::Pointer msg);
-	virtual void send(ImagePtr msg);
-	virtual void send(ProbeDefinitionPtr msg);
-
-private:
-	QTcpSocket* mSocket;
-	int mMaxBufferSize;
-};
-
 /**
 * @}
 */

@@ -38,13 +38,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxUtilHelpers.h"
 #include "cxRegistrationTransform.h"
 #include "cxStringDataAdapterXml.h"
-//#include "cxDoubleDataAdapterXml.h"
 #include "cxColorDataAdapterXml.h"
 #include "cxBoolDataAdapterXml.h"
 #include "cxTypeConversions.h"
 #include "cxDoublePairDataAdapterXml.h"
-
-#include "cxThresholdPreview.h"
 #include "cxContourFilter.h"
 #include "cxMesh.h"
 #include "cxImage.h"
@@ -147,7 +144,6 @@ void BinaryThresholdImageFilter::setActive(bool on)
 
 	if (!mActive)
 		viewService()->removePreview();
-//		RepManager::getInstance()->getThresholdPreview()->removePreview();
 }
 
 void BinaryThresholdImageFilter::imageChangedSlot(QString uid)
@@ -165,7 +161,6 @@ void BinaryThresholdImageFilter::thresholdSlot()
 		threshold.push_back(mThresholdOption->getValue()[0]);
 		threshold.push_back(mThresholdOption->getValue()[1]);
 		viewService()->setPreview(image, threshold);
-//		RepManager::getInstance()->getThresholdPreview()->setPreview(image, mThresholdOption->getValue());
 	}
 }
 

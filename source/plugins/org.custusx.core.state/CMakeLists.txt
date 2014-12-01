@@ -10,10 +10,6 @@ set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
 include_directories(
     .
-    ${CustusX_SOURCE_DIR}/source/service/visualization
-    ${CustusX_BINARY_DIR}/source/service/visualization
-    ${CustusX_SOURCE_DIR}/source/service/video
-    ${CustusX_BINARY_DIR}/source/service/video
     ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
     ${CustusX_BINARY_DIR}/source/resource/pluginUtilities
     )
@@ -59,7 +55,6 @@ set(PLUGIN_resources
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
     ${PLUGIN_target_libraries}   
-    cxVisualizationService
     cxPluginUtilities
     )
 

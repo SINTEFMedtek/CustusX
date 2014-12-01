@@ -35,7 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxServiceController.h"
 #include "cxReporter.h"
 #include "cxVideoServiceProxy.h"
-#include "cxViewManager.h"
 #include "cxStateService.h"
 #include "cxGPUImageBuffer.h"
 #include "cxSettings.h"
@@ -54,61 +53,34 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-struct LegacySingletons
-{
-	static TrackingServicePtr mTrackingService;
-	static SpaceProviderPtr mSpaceProvider;
-	static PatientModelServicePtr mPatientService;
-	static VideoServicePtr mVideoService;
-	static VisualizationServiceOldPtr mVisualizationService;
-	static StateServicePtr mStateService;
-	static ViewServicePtr mViewService;
-};
-
-TrackingServicePtr LegacySingletons::mTrackingService;
-SpaceProviderPtr LegacySingletons::mSpaceProvider;
-PatientModelServicePtr LegacySingletons::mPatientService;
-VideoServicePtr LegacySingletons::mVideoService;
-VisualizationServiceOldPtr LegacySingletons::mVisualizationService;
-StateServicePtr LegacySingletons::mStateService;
-ViewServicePtr LegacySingletons::mViewService;
-
-ViewManager* viewManager()
-{
-	return LegacySingletons::mVisualizationService.get();
-}
-
 TrackingServicePtr trackingService()
 {
-	return LegacySingletons::mTrackingService;
+	return logicManager()->getTrackingService();
 }
 SpaceProviderPtr spaceProvider()
 {
-	return LegacySingletons::mSpaceProvider;
+	return logicManager()->getSpaceProvider();
 }
 PatientModelServicePtr patientService()
 {
-	return LegacySingletons::mPatientService;
+	return logicManager()->getPatientModelService();
 }
 VideoServicePtr videoService()
 {
-	return LegacySingletons::mVideoService;
-}
-VisualizationServiceOldPtr visualizationService()
-{
-	return LegacySingletons::mVisualizationService;
+	return logicManager()->getVideoService();
 }
 StateServicePtr stateService()
 {
-	return LegacySingletons::mStateService;
+	return logicManager()->getStateService();
 }
 ViewServicePtr viewService()
 {
-	return LegacySingletons::mViewService;
+	return logicManager()->getViewService();
 }
 
-
-
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
 
 // --------------------------------------------------------
 LogicManager* LogicManager::mInstance = NULL; ///< static member
@@ -141,203 +113,77 @@ void LogicManager::initializeServices()
 	mPluginFramework->start();
 
 	// services layer
-	this->getPatientModelService();
-	this->getTrackingService();
-	this->getVideoService();
-	this->getVisualizationService();
-	this->getStateService();
-	this->getSpaceProvider();
+	ctkPluginContext* pc = this->getPluginContext();
 
+	mTrackingService = TrackingServiceProxy::create(pc);
+	mPatientModelService = PatientModelServiceProxy::create(pc);
+	mPatientModelService = PatientModelServiceProxy::create(pc);
+	mVideoService = VideoServiceProxy::create(pc);
+	mViewService = VisualizationServiceProxy::create(pc);
+	mStateService = StateServiceProxy::create(pc);
+
+	mSpaceProvider.reset(new cx::SpaceProviderImpl(mTrackingService, mPatientModelService));
 	mServiceController.reset(new ServiceController);
 
 	mPluginFramework->loadState();
 }
 
-void LogicManager::createTrackingService()
-{	
-	mTrackingService = TrackingServiceProxy::create(this->getPluginContext());
-	LegacySingletons::mTrackingService = mTrackingService;
-}
-
-void LogicManager::createInterconnectedDataAndSpace()
-{
-	// build object(s):
-	mPatientModelService = PatientModelServiceProxy::create(this->getPluginContext());
-	LegacySingletons::mPatientService = mPatientModelService;
-}
-
-void LogicManager::createSpaceProvider()
-{
-	mSpaceProvider.reset(new cx::SpaceProviderImpl(mTrackingService,
-												   mPatientModelService));
-	LegacySingletons::mSpaceProvider= mSpaceProvider;
-}
-
-void LogicManager::createPatientModelService()
-{
-	mPatientModelService = PatientModelServiceProxy::create(this->getPluginContext());
-	LegacySingletons::mPatientService = mPatientModelService;
-}
-
-void LogicManager::createVideoService()
-{
-	mVideoService = VideoServiceProxy::create(this->getPluginContext());
-	LegacySingletons::mVideoService = mVideoService;
-}
-
-void LogicManager::createVisualizationService()
-{
-	// prerequisites:
-	this->getTrackingService();
-	this->createPatientModelService();
-	this->getVideoService();
-	this->getSpaceProvider();
-
-	// build object(s):
-	CoreServicesPtr backend = CoreServices::create(this->getPluginContext());
-//	backend.reset(new CoreServices(mPatientModelService,
-//												  mTrackingService,
-//													mVideoService,
-//												  mSpaceProvider));
-	mVisualizationService = ViewManager::create(backend);
-
-	mViewService = VisualizationServiceProxy::create(this->getPluginContext());
-
-	LegacySingletons::mVisualizationService = mVisualizationService;
-	LegacySingletons::mViewService = mViewService;
-}
-
-void LogicManager::createStateService()
-{
-	mStateService = StateServiceProxy::create(this->getPluginContext());
-	LegacySingletons::mStateService = mStateService;
-}
-
-void LogicManager::createPluginFramework()
-{
-//	mPluginFramework = PluginFrameworkManager::create();
-//	mPluginFramework->start();
-
-}
-
-PatientModelServicePtr LogicManager::getPatientModelService()
-{
-	if (!mPatientModelService)
-		this->createPatientModelService();
-	return mPatientModelService;
-}
-
-TrackingServicePtr LogicManager::getTrackingService()
-{
-	if (!mTrackingService)
-		this->createTrackingService();
-	return mTrackingService;
-}
-
-VideoServicePtr LogicManager::getVideoService()
-{
-	if (!mVideoService)
-		this->createVideoService();
-	return mVideoService;
-}
-
-StateServicePtr LogicManager::getStateService()
-{
-	if (!mStateService)
-		this->createStateService();
-	return mStateService;
-}
-
-VisualizationServiceOldPtr LogicManager::getVisualizationService()
-{
-	if (!mVisualizationService)
-		this->createVisualizationService();
-	return mVisualizationService;
-}
-
-SpaceProviderPtr LogicManager::getSpaceProvider()
-{
-	if (!mSpaceProvider)
-		this->createSpaceProvider();
-	return mSpaceProvider;
-}
-
-PluginFrameworkManagerPtr LogicManager::getPluginFramework()
-{
-	if (!mPluginFramework)
-		this->createPluginFramework();
-	return mPluginFramework;
-}
-
-ctkPluginContext* LogicManager::getPluginContext()
-{
-	return this->getPluginFramework()->getPluginContext();
-}
-
 void LogicManager::shutdownServices()
 {
-    mPluginFramework->stop();
+	mPluginFramework->stop();
 
-	this->shutdownStateService();
-	this->shutdownVisualizationService();
-	this->shutdownVideoServiceOld();
-	this->shutdownPatientService();
-	this->shutdownInterconnectedDataAndSpace();
-	this->shutdownTrackingService();
+	this->shutdownService(mSpaceProvider, "SpaceProvider"); // remove before patmodel and track
+	this->shutdownService(mStateService, "StateService");
+	this->shutdownService(mViewService, "ViewService");
+	this->shutdownService(mTrackingService, "TrackingService");
+	this->shutdownService(mPatientModelService, "PatientModelService");
+	this->shutdownService(mVideoService, "VideoService");
 
-	this->shutdownPluginFramework();
+	this->shutdownService(mPluginFramework, "PluginFramework");
 
 	GPUImageBufferRepository::shutdown();
 	Reporter::shutdown();
 	Settings::destroyInstance();
 }
 
-void LogicManager::shutdownStateService()
+template<class T>
+void LogicManager::shutdownService(boost::shared_ptr<T>& service, QString name)
 {
-	LegacySingletons::mStateService.reset();
-	requireUnique(mStateService, "StateService");
-	mStateService.reset();
+	requireUnique(service, name);
+	service.reset();
 }
 
-void LogicManager::shutdownVisualizationService()
+PatientModelServicePtr LogicManager::getPatientModelService()
 {
-	LegacySingletons::mVisualizationService.reset();
-	requireUnique(mVisualizationService, "VisualizationService");
-	mVisualizationService.reset();
+	return mPatientModelService;
 }
-
-
-void LogicManager::shutdownVideoServiceOld()
+TrackingServicePtr LogicManager::getTrackingService()
 {
-	LegacySingletons::mVideoService.reset();
-	requireUnique(mVideoService, "VideoServiceOld");
-	mVideoService.reset();
+	return mTrackingService;
 }
-
-void LogicManager::shutdownPatientService()
+VideoServicePtr LogicManager::getVideoService()
 {
-	LegacySingletons::mPatientService.reset();
-	mPatientModelService.reset();
+	return mVideoService;
 }
-
-void LogicManager::shutdownInterconnectedDataAndSpace()
+StateServicePtr LogicManager::getStateService()
 {
-	LegacySingletons::mSpaceProvider.reset();
-	requireUnique(mSpaceProvider, "SpaceProvider");
-	mSpaceProvider.reset();
+	return mStateService;
 }
-
-void LogicManager::shutdownTrackingService()
+SpaceProviderPtr LogicManager::getSpaceProvider()
 {
-	LegacySingletons::mTrackingService.reset();
-	requireUnique(mTrackingService, "TrackingService (converted to plugin)");
-	mTrackingService.reset();
+	return mSpaceProvider;
 }
-
-void LogicManager::shutdownPluginFramework()
+ViewServicePtr LogicManager::getViewService()
 {
-	requireUnique(mPluginFramework, "PluginFramework");
-	mPluginFramework.reset();
+	return mViewService;
+}
+PluginFrameworkManagerPtr LogicManager::getPluginFramework()
+{
+	return mPluginFramework;
+}
+ctkPluginContext* LogicManager::getPluginContext()
+{
+	return this->getPluginFramework()->getPluginContext();
 }
 
 LogicManager* LogicManager::getInstance()

@@ -35,7 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTransferFunction2DOpacityWidget.h"
 #include "cxDataSelectWidget.h"
 #include "cxSelectDataStringDataAdapter.h"
-#include "cxViewWrapper2D.h"
 
 namespace cx {
 
@@ -46,7 +45,6 @@ OverlayWidget::OverlayWidget(PatientModelServicePtr patientModelService, QWidget
 	layout->setMargin(0);
 	layout->addWidget(new TransferFunction2DOpacityWidget(patientModelService, this), 0);
 	layout->addWidget(new DataViewSelectionWidget(this), 1);
-	this->setEnabled(ViewWrapper2D::overlayIsEnabled());
 }
 
 QString OverlayWidget::defaultWhatsThis() const{
