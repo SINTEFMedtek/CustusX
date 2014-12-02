@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXACQUISITIONDATA_H_
 #define CXACQUISITIONDATA_H_
 
-#include "cxPluginAcquisitionExport.h"
+#include "org_custusx_acquisition_Export.h"
 
 #include <QObject>
 class QDomNode;
@@ -57,7 +57,7 @@ typedef boost::shared_ptr<class UsReconstructionService> UsReconstructionService
  *  \date Jun 9, 2011
  *  \author christiana
  */
-class cxPluginAcquisition_EXPORT AcquisitionData : public QObject
+class org_custusx_acquisition_EXPORT AcquisitionData : public QObject
 {
 	Q_OBJECT
 
@@ -93,7 +93,7 @@ typedef boost::shared_ptr<AcquisitionData> AcquisitionDataPtr;
 /**Shared Data and resources for the Acquisition Plugin
  *
  */
-class cxPluginAcquisition_EXPORT Acquisition : public QObject
+class org_custusx_acquisition_EXPORT Acquisition : public QObject
 {
 	Q_OBJECT
 

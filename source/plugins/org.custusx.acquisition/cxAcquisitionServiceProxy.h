@@ -30,32 +30,33 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXACQUISITIONIMPLSERVICE_H
-#define CXACQUISITIONIMPLSERVICE_H
+#ifndef CXACQUISITIONSERVICEPROXY_H
+#define CXACQUISITIONSERVICEPROXY_H
 
 #include "cxAcquisitionService.h"
-class ctkPluginContext;
-
-
+#include "cxServiceTrackerListener.h"
 namespace cx
 {
-typedef boost::shared_ptr<class Acquisition> AcquisitionPtr;
-typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
-typedef boost::shared_ptr<class USAcquisition> USAcquisitionPtr;
-typedef boost::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
 
-/** \brief Implementation for Acqusition service
+/** \brief Always provides an AcqusitionService
+ *
+ * Use the Proxy design pattern.
+ * Uses ServiceTrackerListener to either provide an
+ * implementation of AcqusitionService or
+ * the null object (AcqusitionServiceNull)
  *
  *  \ingroup org_custusx_acqiusition
  *  \date 2014-11-26
  *  \author Ole Vegard Solberg, SINTEF
  */
-class cxPluginAcquisition_EXPORT AcquisitionImplService : public AcquisitionService
+class org_custusx_acquisition_EXPORT AcquisitionServiceProxy : public AcquisitionService
 {
-	Q_INTERFACES(cx::AcquisitionService)
+	Q_OBJECT
 public:
-	AcquisitionImplService(ctkPluginContext *context);
-	virtual ~AcquisitionImplService();
+//	static AcquisitionServicePtr create(ctkPluginContext *pluginContext);
+	AcquisitionServiceProxy(ctkPluginContext *context);
+	~AcquisitionServiceProxy() {}
+
 	virtual bool isNull();
 
 	virtual RecordSessionPtr getLatestSession();
@@ -77,15 +78,14 @@ public:
 	virtual void parseXml(QDomNode& dataNode);
 
 private:
-	ctkPluginContext* mContext;
-	AcquisitionDataPtr mAcquisitionData;
-	AcquisitionPtr mAcquisition;
-	UsReconstructionServicePtr mUsReconstructService;
-	USAcquisitionPtr mUsAcquisition;
+	ctkPluginContext *mPluginContext;
+	AcquisitionServicePtr mAcquisitionService;
+	boost::shared_ptr<ServiceTrackerListener<AcquisitionService> > mServiceListener;
+
+	void initServiceListener();
+	void onServiceAdded(AcquisitionService *service);
+	void onServiceRemoved(AcquisitionService *service);
 };
 
-typedef boost::shared_ptr<AcquisitionImplService> AcquisitionImplServicePtr;
-
 } //cx
-
-#endif // CXACQUISITIONIMPLSERVICE_H
+#endif // CXACQUISITIONSERVICEPROXY_H

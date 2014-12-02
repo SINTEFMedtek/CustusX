@@ -7,17 +7,16 @@ include_directories(
     ${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
     ${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
     ${CustusX_SOURCE_DIR}/source/logic
-    ${CustusX_SOURCE_DIR}/source/modules/Acquisition/logic
-    ${CustusX_SOURCE_DIR}/source/modules/Acquisition
     ${CustusX_SOURCE_DIR}/source/modules/Algorithm
 
     ${CustusX_BINARY_DIR}/source/logic
-    ${CustusX_BINARY_DIR}/source/modules/Acquisition
+
+    ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.acquisition
+    ${CustusX_BINARY_DIR}/source/plugins/org.custusx.acquisition
     )
 
 set(PLUGIN_SRCS
   cxRegistrationPluginActivator.cpp
-  cxRegistrationPluginActivator.h
   cxRegistrationImplService.cpp
   cxRegistrationImplService.h
   cxRegistrationApplicator.cpp
@@ -69,7 +68,7 @@ set(PLUGIN_target_libraries
 #TODO: Remove these dependencies
     cxLogicManager
     cxPluginAlgorithm
-    cxPluginAcquisition
+    org_custusx_acquisition
     )
 
 set(PLUGIN_OUTPUT_DIR "")

@@ -63,6 +63,7 @@ AcquisitionData::~AcquisitionData()
 void AcquisitionData::clear()
 {
 	mRecordSessions.clear();
+	emit recordedSessionsChanged();
 }
 
 void AcquisitionData::addRecordSession(RecordSessionPtr session)

@@ -36,7 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataSelectWidget.h"
 #include "cxTrackingService.h"
 #include "cxMesh.h"
-//#include "cxAcquisitionData.h"
 #include "cxSelectDataStringDataAdapter.h"
 #include "cxTrackedCenterlineWidget.h"
 #include "cxRecordSessionWidget.h"
@@ -84,14 +83,6 @@ BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegServices servi
 	mSelectToolWidget = SelectToolStringDataAdapter::New();
 	//this->initializeTrackingService();
 
-//	AcquisitionDataPtr mAcquisitionData;
-//	mAcquisitionData.reset(new AcquisitionData());
-
-//Let the service handle this
-//	connect(mServices.patientModelService.get(), &PatientModelService::isSaving, this, &BronchoscopyRegistrationWidget::duringSavePatientSlot);
-//	connect(mServices.patientModelService.get(), &PatientModelService::isLoading, this, &BronchoscopyRegistrationWidget::duringLoadPatientSlot);
-//	connect(mServices.patientModelService.get(), &PatientModelService::cleared, this, &BronchoscopyRegistrationWidget::duringClearPatientSlot);
-
 	mProcessCenterlineButton = new QPushButton("Process centerline");
 	connect(mProcessCenterlineButton, SIGNAL(clicked()), this, SLOT(processCenterlineSlot()));
 	mProcessCenterlineButton->setToolTip(this->defaultWhatsThis());
@@ -100,13 +91,12 @@ BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegServices servi
 	connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
 	mRegisterButton->setToolTip(this->defaultWhatsThis());
 
-//	mAcquisition.reset(new Acquisition(mAcquisitionData, this));
-//	this->initSessionSelector(mAcquisition->getPluginData());
 	this->initSessionSelector();
 
 	connect(services.acquisitionService.get(), &AcquisitionService::started, this, &BronchoscopyRegistrationWidget::acquisitionStarted);
 	connect(services.acquisitionService.get(), &AcquisitionService::acquisitionStopped, this, &BronchoscopyRegistrationWidget::acquisitionStopped, Qt::QueuedConnection);
 	connect(services.acquisitionService.get(), &AcquisitionService::cancelled, this, &BronchoscopyRegistrationWidget::acquisitionCancelled);
+	connect(services.acquisitionService.get(), &AcquisitionService::recordedSessionsChanged, this, &BronchoscopyRegistrationWidget::recordedSessionsChanged);
 
 //    mTrackedCenterLine = new TrackedCenterlineWidget(mAcquisitionData, this);
 
@@ -318,35 +308,14 @@ void BronchoscopyRegistrationWidget::acquisitionCancelled()
 	activeRep3D->getTracer()->stop();
 }
 
-//void BronchoscopyRegistrationWidget::duringSavePatientSlot()
-//{
-//	QDomElement sessionsNode = mServices.patientModelService->getCurrentWorkingElement("bronchoscopySessions");
-//	if(sessionsNode.isNull())
-//		reportWarning("BronchoscopyRegistrationWidget::duringSavePatientSlot() Try bronchoscopySessions node. Got null node");
-
-//	mServices.acquisitionService->addXml(sessionsNode);
-//}
-
-//void BronchoscopyRegistrationWidget::duringLoadPatientSlot()
-//{
-////	mAcquisition->getPluginData()->clear();//TODO: Check if wee need this
-
-//	QDomElement sessionsNode = mServices.patientModelService->getCurrentWorkingElement("bronchoscopySessions/stateManager");
-//	mServices.acquisitionService->parseXml(sessionsNode);
-
-//	QStringList sessionUids = getSessionList();
-//	mSessionSelector->setValueRange(sessionUids);
-
-//	if(!sessionUids.isEmpty())
-//		mSessionSelector->setValue(sessionUids.last());
-//}
-
-//void BronchoscopyRegistrationWidget::duringClearPatientSlot()
-//{
-////	mAcquisition->getPluginData()->clear();//TODO: Check if wee need this
-//	QStringList sessionUids = getSessionList();
-//	mSessionSelector->setValueRange(sessionUids);
-//}
+void BronchoscopyRegistrationWidget::recordedSessionsChanged()
+{
+	QStringList sessionUids = getSessionList();
+	mSessionSelector->setValueRange(sessionUids);
+	std::cout << "recordedSessionsChanged: "  << sessionUids.join(" ") << std::endl;
+	if(mSessionSelector->getValue().isEmpty() && !sessionUids.isEmpty())
+		mSessionSelector->setValue(sessionUids.last());
+}
 
 ToolRep3DPtr BronchoscopyRegistrationWidget::getToolRepIn3DView(ToolPtr tool)
 {

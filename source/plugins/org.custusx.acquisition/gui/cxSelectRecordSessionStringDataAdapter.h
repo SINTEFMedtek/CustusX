@@ -29,23 +29,14 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXSELECTRECORDSESSIONSTRINGDATAADAPTER_H_
+#define CXSELECTRECORDSESSIONSTRINGDATAADAPTER_H_
 
-#ifndef CXRECORDBASEWIDGET_H_
-#define CXRECORDBASEWIDGET_H_
+#include "org_custusx_acquisition_Export.h"
 
-#include "cxPluginAcquisitionExport.h"
-
-#include <QWidget>
-#include "cxBaseWidget.h"
-#include "cxTool.h"
-#include "cxVideoRecorder.h"
+#include "cxDataInterface.h"
 #include "cxRecordSession.h"
-#include "cxAcquisitionService.h"
-
-class QLabel;
-class QVBoxLayout;
-class QDoubleSpinBox;
-class QPushButton;
+#include "cxAcquisitionData.h"
 
 namespace cx
 {
@@ -55,66 +46,64 @@ namespace cx
 * @{
 */
 
-
-class RecordSessionWidget;
-/**
- * RecordBaseWidget
- *
- * \brief
- *
- * \date Dec 9, 2010
- * \author Janne Beate Bakeng, SINTEF
+/** Base class for all DataAdapters that selects a record session.
  */
-class cxPluginAcquisition_EXPORT  RecordBaseWidget : public BaseWidget
+class org_custusx_acquisition_EXPORT SelectRecordSessionStringDataAdapterBase : public StringDataAdapter
 {
   Q_OBJECT
-
 public:
-  RecordBaseWidget(AcquisitionServicePtr acquisitionService, QWidget* parent, QString description = "Record Session");
-  virtual ~RecordBaseWidget();
+  SelectRecordSessionStringDataAdapterBase(AcquisitionDataPtr pluginData);
+  virtual ~SelectRecordSessionStringDataAdapterBase() {}
+
+public: // basic methods
+
+public: // optional methods
+  virtual QStringList getValueRange() const;
+  virtual QString convertInternal2Display(QString internal);
 
 protected:
-  AcquisitionServicePtr mAcquisitionService;
-  QVBoxLayout* mLayout;
-  RecordSessionWidget* mRecordSessionWidget;
-
+  AcquisitionDataPtr mPluginData;
 };
+typedef boost::shared_ptr<class SelectRecordSessionStringDataAdapterBase> SelectRecordSessionStringDataAdapterBasePtr;
 
-/**
- * TrackedRecordWidget
+
+typedef boost::shared_ptr<class SelectRecordSessionStringDataAdapter> SelectRecordSessionStringDataAdapterPtr;
+
+/** Adapter that selects and stores a tool.
+ * The tool is stored internally in the adapter.
+ * Use setValue/getValue plus changed() to access it.
  *
- * \brief
- *
- * \date Dec 17, 2010
- * \author Janne Beate Bakeng, SINTEF
  */
-class cxPluginAcquisition_EXPORT  TrackedRecordWidget : public RecordBaseWidget
+class org_custusx_acquisition_EXPORT  SelectRecordSessionStringDataAdapter : public SelectRecordSessionStringDataAdapterBase
 {
   Q_OBJECT
 public:
-  TrackedRecordWidget(AcquisitionServicePtr acquisitionService, QWidget* parent, QString description);
-  virtual ~TrackedRecordWidget();
+  static SelectRecordSessionStringDataAdapterPtr New(AcquisitionDataPtr pluginData) { return SelectRecordSessionStringDataAdapterPtr(new SelectRecordSessionStringDataAdapter(pluginData)); }
+  SelectRecordSessionStringDataAdapter(AcquisitionDataPtr pluginData);
+  virtual ~SelectRecordSessionStringDataAdapter() {}
 
-signals:
-  void toolChanged();
+public: // basic methods
+  virtual QString getDisplayName() const;
+  virtual bool setValue(const QString& value);
+  virtual QString getValue() const;
 
-protected slots:
-  virtual void checkIfReadySlot() = 0;
-  virtual void postProcessingSlot(QString sessionId) = 0;
-  virtual void startedSlot(QString sessionId) = 0;
-  virtual void stoppedSlot(bool) = 0;
+public: // optional methods
+  virtual QString getHelp() const;
 
-protected:
-  virtual TimedTransformMap getRecording(RecordSessionPtr session) = 0; ///< gets the tracking data from all relevant tool for the given session
-  void setTool(ToolPtr tool);
-  ToolPtr getTool();
+public: //interface extencion
+  RecordSessionPtr getRecordSession();
+
+private slots:
+  void setDefaultSlot();
 
 private:
-  ToolPtr mTool;
+  RecordSessionPtr mRecordSession;
+
 };
 
 /**
 * @}
 */
-}//namespace cx
-#endif /* CXRECORDBASEWIDGET_H_ */
+}
+
+#endif /* CXSELECTRECORDSESSIONSTRINGDATAADAPTER_H_ */

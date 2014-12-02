@@ -44,7 +44,7 @@ namespace cx
  *  \date 2014-11-26
  *  \author Ole Vegard Solberg, SINTEF
  */
-class cxPluginAcquisition_EXPORT AcquisitionServiceNull : public AcquisitionService
+class org_custusx_acquisition_EXPORT AcquisitionServiceNull : public AcquisitionService
 {
 public:
 	AcquisitionServiceNull();

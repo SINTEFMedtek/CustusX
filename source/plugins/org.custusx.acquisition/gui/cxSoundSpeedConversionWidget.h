@@ -30,13 +30,17 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXTRACKEDCENTERLINEWIDGET_H_
-#define CXTRACKEDCENTERLINEWIDGET_H_
+#ifndef CXSOUNDSPEEDCONVERSIONWIDGET_H_
+#define CXSOUNDSPEEDCONVERSIONWIDGET_H_
 
-#include "cxPluginAcquisitionExport.h"
+#include "org_custusx_acquisition_Export.h"
 
-#include "cxRecordBaseWidget.h"
+#include "cxBaseWidget.h"
 #include "cxTool.h"
+#include "cxLegacySingletons.h"
+
+class QPushButton;
+class QDoubleSpinBox;
 
 namespace cx
 {
@@ -47,41 +51,57 @@ namespace cx
 */
 
 /**
- * TrackedCenterlineWidget
+ * \class SoundSpeedConversionWidget
  *
- * \brief NOT IN USE. TEST!!!
+ * \brief
  *
- * \date Dec 9, 2010
+ * \date Feb 11, 2011
  * \author Janne Beate Bakeng, SINTEF
  */
-class cxPluginAcquisition_EXPORT  TrackedCenterlineWidget : public TrackedRecordWidget
+class org_custusx_acquisition_EXPORT  SoundSpeedConverterWidget : public BaseWidget
 {
   Q_OBJECT
+
 public:
-  TrackedCenterlineWidget(AcquisitionServicePtr acquisitionService, QWidget* parent);
-  virtual ~TrackedCenterlineWidget();
+  SoundSpeedConverterWidget(QWidget* parent);
+  ~SoundSpeedConverterWidget();
+
   virtual QString defaultWhatsThis() const;
 
-protected slots:
-  void checkIfReadySlot();
-  void postProcessingSlot(QString sessionId);
-  void startedSlot(QString sessionId);
-  void stoppedSlot(bool);
+  double getSoundSpeedCompensationFactor(); ///< calculates the sound speed conversion factor
+  double getWaterSoundSpeed(); ///< the sound speed in water given a temperatur
 
-  void centerlineFinishedSlot();
-  void preprocessResampler();
+  void setProbe(ProbePtr probe);
+
+public slots:
+  void applySoundSpeedCompensationFactorSlot(); ///< sets the sounds speed conversion factor on the rt source
+  void setToolSlot(const QString& uid); ///< convenient slot for connecting to the toolmanagers dominantToolChanged signal
+
+private slots:
+  void waterSoundSpeedChangedSlot();
+  void waterDegreeChangedSlot();
+  void resetSlot();
 
 private:
-  virtual TimedTransformMap getRecording(RecordSessionPtr session); ///< gets the tracking data from all relevant tool for the given session
-  ToolPtr findTool(double startTime, double stopTime);
+  void setSoundSpeed(double soundspeed);
+  void setWaterDegree(double degree);
+  void updateButtons();
 
-//  Centerline  mCenterlineAlgorithm;
-  QString mSessionID;
+  const double mScannerSoundSpeed; //m/s
+  double mToSoundSpeed; //m/s
+
+  ProbePtr mProbe;
+
+  QPushButton*    mApplyButton; ///< applies the compensation on the rt source
+  QPushButton*    mResetButton; ///< resets the sound speed to scanner sound speed
+  QDoubleSpinBox* mSoundSpeedSpinBox; //m/s
+  QDoubleSpinBox* mWaterDegreeSpinBox; //celsius
 };
+
 
 /**
 * @}
 */
-}//namespace cx
+}
 
-#endif /* CXTRACKEDCENTERLINEWIDGET_H_ */
+#endif /* CXSOUNDSPEEDCONVERSIONWIDGET_H_ */

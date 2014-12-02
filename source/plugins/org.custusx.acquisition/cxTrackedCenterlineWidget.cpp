@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxToolTracer.h"
 #include "cxTrackingDataToVolume.h"
 #include "cxRecordSessionWidget.h"
+#include "cxRecordSession.h"
 #include "cxTool.h"
 #include "cxReporter.h"
 #include "cxView.h"

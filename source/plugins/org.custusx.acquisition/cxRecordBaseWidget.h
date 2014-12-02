@@ -30,17 +30,22 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXSOUNDSPEEDCONVERSIONWIDGET_H_
-#define CXSOUNDSPEEDCONVERSIONWIDGET_H_
+#ifndef CXRECORDBASEWIDGET_H_
+#define CXRECORDBASEWIDGET_H_
 
-#include "cxPluginAcquisitionExport.h"
+#include "org_custusx_acquisition_Export.h"
 
+#include <QWidget>
 #include "cxBaseWidget.h"
 #include "cxTool.h"
-#include "cxLegacySingletons.h"
+#include "cxVideoRecorder.h"
+//#include "cxRecordSession.h"
+#include "cxAcquisitionService.h"
 
-class QPushButton;
+class QLabel;
+class QVBoxLayout;
 class QDoubleSpinBox;
+class QPushButton;
 
 namespace cx
 {
@@ -50,58 +55,67 @@ namespace cx
 * @{
 */
 
+
+typedef boost::shared_ptr<class RecordSession> RecordSessionPtr;
+class RecordSessionWidget;
 /**
- * \class SoundSpeedConversionWidget
+ * RecordBaseWidget
  *
  * \brief
  *
- * \date Feb 11, 2011
+ * \date Dec 9, 2010
  * \author Janne Beate Bakeng, SINTEF
  */
-class cxPluginAcquisition_EXPORT  SoundSpeedConverterWidget : public BaseWidget
+class org_custusx_acquisition_EXPORT  RecordBaseWidget : public BaseWidget
 {
   Q_OBJECT
 
 public:
-  SoundSpeedConverterWidget(QWidget* parent);
-  ~SoundSpeedConverterWidget();
+  RecordBaseWidget(AcquisitionServicePtr acquisitionService, QWidget* parent, QString description = "Record Session");
+  virtual ~RecordBaseWidget();
 
-  virtual QString defaultWhatsThis() const;
+protected:
+  AcquisitionServicePtr mAcquisitionService;
+  QVBoxLayout* mLayout;
+  RecordSessionWidget* mRecordSessionWidget;
 
-  double getSoundSpeedCompensationFactor(); ///< calculates the sound speed conversion factor
-  double getWaterSoundSpeed(); ///< the sound speed in water given a temperatur
-
-  void setProbe(ProbePtr probe);
-
-public slots:
-  void applySoundSpeedCompensationFactorSlot(); ///< sets the sounds speed conversion factor on the rt source
-  void setToolSlot(const QString& uid); ///< convenient slot for connecting to the toolmanagers dominantToolChanged signal
-
-private slots:
-  void waterSoundSpeedChangedSlot();
-  void waterDegreeChangedSlot();
-  void resetSlot();
-
-private:
-  void setSoundSpeed(double soundspeed);
-  void setWaterDegree(double degree);
-  void updateButtons();
-
-  const double mScannerSoundSpeed; //m/s
-  double mToSoundSpeed; //m/s
-
-  ProbePtr mProbe;
-
-  QPushButton*    mApplyButton; ///< applies the compensation on the rt source
-  QPushButton*    mResetButton; ///< resets the sound speed to scanner sound speed
-  QDoubleSpinBox* mSoundSpeedSpinBox; //m/s
-  QDoubleSpinBox* mWaterDegreeSpinBox; //celsius
 };
 
+/**
+ * TrackedRecordWidget
+ *
+ * \brief
+ *
+ * \date Dec 17, 2010
+ * \author Janne Beate Bakeng, SINTEF
+ */
+class org_custusx_acquisition_EXPORT  TrackedRecordWidget : public RecordBaseWidget
+{
+  Q_OBJECT
+public:
+  TrackedRecordWidget(AcquisitionServicePtr acquisitionService, QWidget* parent, QString description);
+  virtual ~TrackedRecordWidget();
+
+signals:
+  void toolChanged();
+
+protected slots:
+  virtual void checkIfReadySlot() = 0;
+  virtual void postProcessingSlot(QString sessionId) = 0;
+  virtual void startedSlot(QString sessionId) = 0;
+  virtual void stoppedSlot(bool) = 0;
+
+protected:
+  virtual TimedTransformMap getRecording(RecordSessionPtr session) = 0; ///< gets the tracking data from all relevant tool for the given session
+  void setTool(ToolPtr tool);
+  ToolPtr getTool();
+
+private:
+  ToolPtr mTool;
+};
 
 /**
 * @}
 */
-}
-
-#endif /* CXSOUNDSPEEDCONVERSIONWIDGET_H_ */
+}//namespace cx
+#endif /* CXRECORDBASEWIDGET_H_ */

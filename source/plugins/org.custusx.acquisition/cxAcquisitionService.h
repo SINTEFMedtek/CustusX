@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXACQUSITIONSERVICE_H
 #define CXACQUSITIONSERVICE_H
 
-#include "cxPluginAcquisitionExport.h"
+#include "org_custusx_acquisition_Export.h"
 
 #include <QObject>
 #include <vector>
@@ -54,7 +54,7 @@ typedef boost::shared_ptr<class RecordSession> RecordSessionPtr;
  *  \date 2014-11-26
  *  \author Ole Vegard Solberg, SINTEF
  */
-class cxPluginAcquisition_EXPORT AcquisitionService : public QObject
+class org_custusx_acquisition_EXPORT AcquisitionService : public QObject
 {
 	Q_OBJECT
 public:

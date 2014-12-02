@@ -29,31 +29,20 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXACQUISITIONPLUGIN_H_
-#define CXACQUISITIONPLUGIN_H_
 
-#include "cxPluginAcquisitionExport.h"
+#ifndef CXUSACQUSITIONWIDGET_H_
+#define CXUSACQUSITIONWIDGET_H_
 
-#include "cxGUIExtenderService.h"
-class QDomNode;
+#include "org_custusx_acquisition_Export.h"
 
-/**
- * \defgroup cx_module_acquisition Acquisition Plugin
- * \ingroup cx_modules
- * \brief Handles the us acquisition process.
- *
- * See \ref cx::USAcquisition.
- * See \ref cx::AcquisitionPlugin.
- *
- */
+#include "cxRecordBaseWidget.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
-typedef boost::shared_ptr<class AcquisitionPlugin> AcquisitionPluginPtr;
 typedef boost::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
-typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
-
+typedef boost::shared_ptr<class ThreadedTimedReconstructer> ThreadedTimedReconstructerPtr;
+class TimedAlgorithmProgressBar;
+class DisplayTimerWidget;
 
 /**
 * \file
@@ -62,35 +51,47 @@ typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
 */
 
 /**
+ * USAcqusitionWidget
  *
+ * \brief
+ *
+ * \date Dec 9, 2010
+ * \author Janne Beate Bakeng, SINTEF
  */
-class cxPluginAcquisition_EXPORT  AcquisitionPlugin: public GUIExtenderService
+class org_custusx_acquisition_EXPORT USAcqusitionWidget : public RecordBaseWidget
 {
-Q_OBJECT
+	Q_OBJECT
 public:
-	AcquisitionPlugin(UsReconstructionServicePtr reconstructer, AcquisitionServicePtr acquisitionService);
-	virtual ~AcquisitionPlugin();
-
-	virtual std::vector<CategorizedWidget> createWidgets() const;
-
-signals:
+	USAcqusitionWidget(AcquisitionServicePtr acquisitionService, UsReconstructionServicePtr usReconstructionService, QWidget* parent);
+	virtual ~USAcqusitionWidget();
+	virtual QString defaultWhatsThis() const;
 
 private slots:
-	void clearSlot();
-	void duringSavePatientSlot();
-	void duringLoadPatientSlot();
+	void reconstructStartedSlot();
+	void reconstructFinishedSlot();
+	void toggleDetailsSlot();
+	void acquisitionDataReadySlot();
+	void reconstructAboutToStartSlot();
+	void acquisitionStateChangedSlot();
+
+	void recordStarted();
+	void recordStopped();
+	void recordCancelled();
 
 private:
-	void addXml(QDomNode& dataNode);
-	void parseXml(QDomNode& dataNode);
-
 	UsReconstructionServicePtr mUsReconstructionService;
-	AcquisitionServicePtr mAcquisitionService;
+	TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
+	DisplayTimerWidget* mDisplayTimerWidget;
+	QWidget* mOptionsWidget;
+	QWidget* createOptionsWidget();
+	QWidget* wrapVerticalStretch(QWidget* input);
+	QWidget* wrapGroupBox(QWidget* input, QString name, QString tip);
 };
+
 
 /**
 * @}
 */
-}
+}//namespace cx
 
-#endif /* CXACQUISITIONPLUGIN_H_ */
+#endif /* CXUSACQUSITIONWIDGET_H_ */

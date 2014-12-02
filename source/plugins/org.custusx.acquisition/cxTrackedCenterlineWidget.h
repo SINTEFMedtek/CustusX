@@ -29,35 +29,59 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include "cxCalibrationPlugin.h"
 
-#include "cxCalibrationMethodsWidget.h"
-//#include "cxAcquisitionData.h"
-#include "cxPatientModelService.h"
+#ifndef CXTRACKEDCENTERLINEWIDGET_H_
+#define CXTRACKEDCENTERLINEWIDGET_H_
+
+#include "org_custusx_acquisition_Export.h"
+
+#include "cxRecordBaseWidget.h"
+#include "cxTool.h"
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cx_module_acquisition
+* @{
+*/
 
-CalibrationPlugin::CalibrationPlugin(PatientModelServicePtr patientModelService, AcquisitionServicePtr acquisitionService) :
-		mAcquisitionService(acquisitionService),
-		mPatientModelService(patientModelService)
+/**
+ * TrackedCenterlineWidget
+ *
+ * \brief NOT IN USE. TEST!!!
+ *
+ * \date Dec 9, 2010
+ * \author Janne Beate Bakeng, SINTEF
+ */
+class org_custusx_acquisition_EXPORT  TrackedCenterlineWidget : public TrackedRecordWidget
 {
-}
+  Q_OBJECT
+public:
+  TrackedCenterlineWidget(AcquisitionServicePtr acquisitionService, QWidget* parent);
+  virtual ~TrackedCenterlineWidget();
+  virtual QString defaultWhatsThis() const;
 
-CalibrationPlugin::~CalibrationPlugin()
-{
+protected slots:
+  void checkIfReadySlot();
+  void postProcessingSlot(QString sessionId);
+  void startedSlot(QString sessionId);
+  void stoppedSlot(bool);
 
-}
+  void centerlineFinishedSlot();
+  void preprocessResampler();
 
-std::vector<GUIExtenderService::CategorizedWidget> CalibrationPlugin::createWidgets() const
-{
-	std::vector<CategorizedWidget> retval;
+private:
+  virtual TimedTransformMap getRecording(RecordSessionPtr session); ///< gets the tracking data from all relevant tool for the given session
+  ToolPtr findTool(double startTime, double stopTime);
 
-	retval.push_back(GUIExtenderService::CategorizedWidget(
-			new CalibrationMethodsWidget(mPatientModelService, mAcquisitionService, NULL, "CalibrationMethodsWidget", "Calibration Methods"),
-			"Algorithms"));
+//  Centerline  mCenterlineAlgorithm;
+  QString mSessionID;
+};
 
-	return retval;
-}
+/**
+* @}
+*/
+}//namespace cx
 
-}
+#endif /* CXTRACKEDCENTERLINEWIDGET_H_ */

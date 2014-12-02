@@ -60,17 +60,17 @@ include_directories(
 	${CustusX_BINARY_DIR}/source/logic
 
     ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
-    ${CustusX_SOURCE_DIR}/source/modules/Acquisition
-    ${CustusX_SOURCE_DIR}/source/modules/Acquisition/gui
-    ${CustusX_SOURCE_DIR}/source/modules/Acquisition/logic
     ${CustusX_SOURCE_DIR}/source/gui/utilities
     ${CustusX_SOURCE_DIR}/source/gui/dataAdapters
     ${CustusX_SOURCE_DIR}/source/gui/toolWidgets
     ${CustusX_BINARY_DIR}/source/modules/GUIExtender
-    ${CustusX_BINARY_DIR}/source/modules/Acquisition
     ${CustusX_BINARY_DIR}/source/resource/widgets
     ${CustusX_BINARY_DIR}/source/resource/usReconstructionTypes
     ${CustusX_BINARY_DIR}/source/gui
+
+    ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.acquisition
+    ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.acquisition/gui
+    ${CustusX_BINARY_DIR}/source/plugins/org.custusx.acquisition
     )
 
 # =========================================================
@@ -81,7 +81,7 @@ add_library( cxPluginCalibration ${SOURCE_FILES} )
 set(LINK_LIBRARIES
     cxResource
     cxResourceWidgets
-    cxPluginAcquisition
+    org_custusx_acquisition
       )
 target_link_libraries( cxPluginCalibration ${LINK_LIBRARIES} )
 

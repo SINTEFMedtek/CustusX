@@ -40,10 +40,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-AcquisitionServicePtr AcquisitionServiceProxy::create(ctkPluginContext *pluginContext)
-{
-	return AcquisitionServicePtr(new AcquisitionServiceProxy(pluginContext));
-}
+//AcquisitionServicePtr AcquisitionServiceProxy::create(ctkPluginContext *pluginContext)
+//{
+//	return AcquisitionServicePtr(new AcquisitionServiceProxy(pluginContext));
+//}
 
 AcquisitionServiceProxy::AcquisitionServiceProxy(ctkPluginContext *context) :
 	mPluginContext(context),

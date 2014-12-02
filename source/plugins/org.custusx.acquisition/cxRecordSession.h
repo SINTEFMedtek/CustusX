@@ -30,68 +30,67 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXUSACQUSITIONWIDGET_H_
-#define CXUSACQUSITIONWIDGET_H_
+#ifndef CXRecordSession_H_
+#define CXRecordSession_H_
 
-#include "cxPluginAcquisitionExport.h"
+#include "org_custusx_acquisition_Export.h"
 
-#include "cxRecordBaseWidget.h"
+#include <QString>
+#include <map>
+#include "boost/shared_ptr.hpp"
+#include "cxForwardDeclarations.h"
+#include "cxTransform3D.h"
+
+class QDomNode;
 
 namespace cx
 {
-typedef boost::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
-typedef boost::shared_ptr<class ThreadedTimedReconstructer> ThreadedTimedReconstructerPtr;
-class TimedAlgorithmProgressBar;
-class DisplayTimerWidget;
+/**
+ * \file
+ * \addtogroup cx_module_acquisition
+ * @{
+ */
+
+typedef boost::shared_ptr<class RecordSession> RecordSessionPtr;
+typedef std::map<double, Transform3D> TimedTransformMap;
 
 /**
-* \file
-* \addtogroup cx_module_acquisition
-* @{
-*/
-
-/**
- * USAcqusitionWidget
+ * RecordSession
  *
  * \brief
  *
- * \date Dec 9, 2010
- * \author Janne Beate Bakeng, SINTEF
+ * \date Dec 8, 2010
+ * \author Janne Beate Bakeng
  */
-class cxPluginAcquisition_EXPORT USAcqusitionWidget : public RecordBaseWidget
+class org_custusx_acquisition_EXPORT RecordSession
 {
-	Q_OBJECT
 public:
-	USAcqusitionWidget(AcquisitionServicePtr acquisitionService, UsReconstructionServicePtr usReconstructionService, QWidget* parent);
-	virtual ~USAcqusitionWidget();
-	virtual QString defaultWhatsThis() const;
+	RecordSession(QString uid, double startTime, double stopTime, QString description);
+	virtual ~RecordSession();
 
-private slots:
-	void reconstructStartedSlot();
-	void reconstructFinishedSlot();
-	void toggleDetailsSlot();
-	void acquisitionDataReadySlot();
-	void reconstructAboutToStartSlot();
-	void acquisitionStateChangedSlot();
+	QString getUid();
+	QString getDescription();
+	double getStartTime();
+	double getStopTime();
 
-	void recordStarted();
-	void recordStopped();
-	void recordCancelled();
+	void setStopTime(double val) { mStopTime = val; }
 
-private:
-	UsReconstructionServicePtr mUsReconstructionService;
-	TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
-	DisplayTimerWidget* mDisplayTimerWidget;
-	QWidget* mOptionsWidget;
-	QWidget* createOptionsWidget();
-	QWidget* wrapVerticalStretch(QWidget* input);
-	QWidget* wrapGroupBox(QWidget* input, QString name, QString tip);
+	void addXml(QDomNode& dataNode);
+	void parseXml(QDomNode& dataNode);
+
+	static TimedTransformMap getToolHistory_prMt(ToolPtr tool, RecordSessionPtr session);
+
+protected:
+
+	QString mUid;
+	double mStartTime;
+	double mStopTime;
+	QString mDescription;
 };
 
-
 /**
-* @}
-*/
+ * @}
+ */
 }//namespace cx
 
-#endif /* CXUSACQUSITIONWIDGET_H_ */
+#endif /* CXRecordSession_H_ */

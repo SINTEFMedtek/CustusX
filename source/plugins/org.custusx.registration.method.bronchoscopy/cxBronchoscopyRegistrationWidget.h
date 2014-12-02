@@ -80,10 +80,8 @@ private slots:
 	void acquisitionStopped();
     void obscuredSlot(bool obscured);
 
-//	void duringSavePatientSlot();
-//	void duringLoadPatientSlot();
 	void acquisitionCancelled();
-//	void duringClearPatientSlot();
+	void recordedSessionsChanged();
 private:
 	RegServices mServices;
 	QVBoxLayout* mVerticalLayout;

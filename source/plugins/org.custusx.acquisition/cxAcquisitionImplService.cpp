@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxAcquisitionData.h"
 #include "cxUSAcquisition.h"
 #include "cxUsReconstructionServiceProxy.h"
+#include "cxPatientModelServiceProxy.h"
 
 namespace cx
 {
@@ -43,7 +44,8 @@ AcquisitionImplService::AcquisitionImplService(ctkPluginContext *context) :
 	mAcquisitionData(new AcquisitionData()),
 	mAcquisition(new Acquisition(mAcquisitionData)),
 	mUsReconstructService(new UsReconstructionServiceProxy(context)),
-	mUsAcquisition(new USAcquisition(mAcquisition, mUsReconstructService))
+	mUsAcquisition(new USAcquisition(mAcquisition, mUsReconstructService)),
+	mPatientModelService(new PatientModelServiceProxy(context))
 {
 	connect(mAcquisition.get(), &Acquisition::started, this, &AcquisitionService::started);
 	connect(mAcquisition.get(), &Acquisition::cancelled, this, &AcquisitionService::cancelled);
@@ -55,6 +57,10 @@ AcquisitionImplService::AcquisitionImplService(ctkPluginContext *context) :
 
 	connect(mUsAcquisition.get(), &USAcquisition::acquisitionDataReady, this, &AcquisitionService::acquisitionDataReady);
 	connect(mUsAcquisition.get(), &USAcquisition::saveDataCompleted, this, &AcquisitionService::saveDataCompleted);
+
+	connect(mPatientModelService.get(), &PatientModelService::isSaving, this, &AcquisitionImplService::duringSavePatientSlot);
+	connect(mPatientModelService.get(), &PatientModelService::isLoading, this, &AcquisitionImplService::duringLoadPatientSlot);
+	connect(mPatientModelService.get(), &PatientModelService::cleared, this, &AcquisitionImplService::duringClearPatientSlot);
 }
 
 AcquisitionImplService::~AcquisitionImplService()
@@ -69,11 +75,40 @@ AcquisitionImplService::~AcquisitionImplService()
 
 	disconnect(mUsAcquisition.get(), &USAcquisition::acquisitionDataReady, this, &AcquisitionService::acquisitionDataReady);
 	disconnect(mUsAcquisition.get(), &USAcquisition::saveDataCompleted, this, &AcquisitionService::saveDataCompleted);
+
+	disconnect(mPatientModelService.get(), &PatientModelService::isSaving, this, &AcquisitionImplService::duringSavePatientSlot);
+	disconnect(mPatientModelService.get(), &PatientModelService::isLoading, this, &AcquisitionImplService::duringLoadPatientSlot);
+	disconnect(mPatientModelService.get(), &PatientModelService::cleared, this, &AcquisitionImplService::duringClearPatientSlot);
 }
 
 bool AcquisitionImplService::isNull()
 {
 	return false;
+}
+
+void AcquisitionImplService::duringClearPatientSlot()
+{
+	std::cout << "AcquisitionImplService::duringClearPatientSlot()" << std::endl;
+	// clear data?
+	mAcquisitionData->clear();//TODO: Check if wee need this
+}
+
+void AcquisitionImplService::duringSavePatientSlot()
+{
+	std::cout << "AcquisitionImplService::duringSavePatientSlot()" << std::endl;
+	QDomElement managerNode = mPatientModelService->getCurrentWorkingElement("managers");
+	if(managerNode.isNull())
+		reportWarning("AcquisitionImplService::duringSavePatientSlot() Try managers node. Got null node");
+	this->addXml(managerNode);
+}
+
+void AcquisitionImplService::duringLoadPatientSlot()
+{
+	std::cout << "AcquisitionImplService::duringLoadPatientSlot()" << std::endl;
+	QDomElement stateManagerNode = mPatientModelService->getCurrentWorkingElement("managers/stateManager");
+	if(stateManagerNode.isNull())
+		reportWarning("AcquisitionImplService::duringSavePatientSlot() Try stateManagerNode node. Got null node");
+	this->parseXml(stateManagerNode);
 }
 
 RecordSessionPtr AcquisitionImplService::getLatestSession()

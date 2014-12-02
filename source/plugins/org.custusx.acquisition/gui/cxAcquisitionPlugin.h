@@ -29,68 +29,68 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXACQUISITIONPLUGIN_H_
+#define CXACQUISITIONPLUGIN_H_
 
-#ifndef CXRecordSession_H_
-#define CXRecordSession_H_
+#include "org_custusx_acquisition_Export.h"
 
-#include "cxPluginAcquisitionExport.h"
-
-#include <QString>
-#include <map>
-#include "boost/shared_ptr.hpp"
-#include "cxForwardDeclarations.h"
-#include "cxTransform3D.h"
-
+#include "cxGUIExtenderService.h"
 class QDomNode;
+
+/**
+ * \defgroup cx_module_acquisition Acquisition Plugin
+ * \ingroup cx_modules
+ * \brief Handles the us acquisition process.
+ *
+ * See \ref cx::USAcquisition.
+ * See \ref cx::AcquisitionPlugin.
+ *
+ */
 
 namespace cx
 {
-/**
- * \file
- * \addtogroup cx_module_acquisition
- * @{
- */
+typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
+typedef boost::shared_ptr<class AcquisitionPlugin> AcquisitionPluginPtr;
+typedef boost::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
+typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
 
-typedef boost::shared_ptr<class RecordSession> RecordSessionPtr;
-typedef std::map<double, Transform3D> TimedTransformMap;
 
 /**
- * RecordSession
+* \file
+* \addtogroup cx_module_acquisition
+* @{
+*/
+
+/**
  *
- * \brief
- *
- * \date Dec 8, 2010
- * \author Janne Beate Bakeng
  */
-class cxPluginAcquisition_EXPORT RecordSession
+class org_custusx_acquisition_EXPORT  AcquisitionPlugin: public GUIExtenderService
 {
+Q_OBJECT
 public:
-	RecordSession(QString uid, double startTime, double stopTime, QString description);
-	virtual ~RecordSession();
+	AcquisitionPlugin(UsReconstructionServicePtr reconstructer, AcquisitionServicePtr acquisitionService);
+	virtual ~AcquisitionPlugin();
 
-	QString getUid();
-	QString getDescription();
-	double getStartTime();
-	double getStopTime();
+	virtual std::vector<CategorizedWidget> createWidgets() const;
 
-	void setStopTime(double val) { mStopTime = val; }
+signals:
 
+private slots:
+	void clearSlot();
+	void duringSavePatientSlot();
+	void duringLoadPatientSlot();
+
+private:
 	void addXml(QDomNode& dataNode);
 	void parseXml(QDomNode& dataNode);
 
-	static TimedTransformMap getToolHistory_prMt(ToolPtr tool, RecordSessionPtr session);
-
-protected:
-
-	QString mUid;
-	double mStartTime;
-	double mStopTime;
-	QString mDescription;
+	UsReconstructionServicePtr mUsReconstructionService;
+	AcquisitionServicePtr mAcquisitionService;
 };
 
 /**
- * @}
- */
-}//namespace cx
+* @}
+*/
+}
 
-#endif /* CXRecordSession_H_ */
+#endif /* CXACQUISITIONPLUGIN_H_ */

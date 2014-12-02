@@ -19,6 +19,6 @@ if (BUILD_TESTING)
 		cxtestAcquisition.cpp
 		)
 
-	cx_catch_add_lib_and_exe(cxPluginAcquisition "${CX_TEST_CATCH_ACQUISITION_SOURCE_FILES}" "${CX_TEST_CATCH_ACQUISITION_MOC_SOURCE_FILES}")
+	cx_catch_add_lib_and_exe(org_custusx_acquisition "${CX_TEST_CATCH_ACQUISITION_SOURCE_FILES}" "${CX_TEST_CATCH_ACQUISITION_MOC_SOURCE_FILES}")
 
 endif (BUILD_TESTING)
