@@ -200,7 +200,7 @@ QWidget *ViewManager::getLayoutWidget(int index)
 			mLayoutWidgets[index] = ViewCollectionWidget::createViewWidgetLayout();
 		}
 
-		connect(mLayoutWidgets[index], &QObject::destroyed, this, &ViewManager::layoutWidgetDestroyed);
+		connect(mLayoutWidgets[index].data(), &QObject::destroyed, this, &ViewManager::layoutWidgetDestroyed);
 		mRenderLoop->addLayout(mLayoutWidgets[index]);
 
 		this->rebuildLayouts();

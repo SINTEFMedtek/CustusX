@@ -60,8 +60,6 @@ SET( CX_QT_MOC_HEADER_FILES
 		cxImageStreamerOpenCV.h
 		cxStreamer.h
 		cxSender.h
-        cxSenderImpl.h
-        cxGrabberSenderQTcpSocket.h
 		cxDirectlyLinkedSender.h
 		SonixHelper.h
 		cxtestSender.h

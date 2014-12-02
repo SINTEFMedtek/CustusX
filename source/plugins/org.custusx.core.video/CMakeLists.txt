@@ -57,7 +57,6 @@ set(PLUGIN_MOC_SRCS
     cxImageReceiverThread.h
 	cxIGTLinkStreamerService.h
 	cxIGTLinkClientStreamer.h
-	cxOpenCVStreamerService.h
 	cxLocalServerStreamerServer.h
 )
 
