@@ -123,6 +123,7 @@ private:
 	void clearPatientSilent();
 	void reportActivePatient();
 	void loadPatientSilent(QString choosenDir);
+	bool isActivePatient(QString patient) const;
 
 	//saving/loading
 	void generateSaveDoc(QDomDocument& doc);

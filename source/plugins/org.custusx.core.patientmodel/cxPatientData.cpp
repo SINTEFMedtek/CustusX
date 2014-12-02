@@ -89,8 +89,7 @@ QDomElement getElementForced(QDomNode root, QString path)
 
 PatientData::PatientData(DataServicePtr dataManager) : mDataManager(dataManager)
 {
-	connect(dataManager.get(), SIGNAL(clinicalApplicationChanged()), this, SLOT(clearPatient()));
-	QTimer::singleShot(0, this, SLOT(startupLoadPatient())); // make sure this is called after application state change
+	QTimer::singleShot(100, this, SLOT(startupLoadPatient())); // make sure this is called after application state change
 }
 
 PatientData::~PatientData()
@@ -115,16 +114,6 @@ QDomDocument PatientData::getCurrentWorkingDocument()
 {
 	return mWorkingDocument;
 }
-
-//QString PatientData::generateFilePath(QString folderName, QString ending)
-//{
-//	QString folder = this->getActivePatientFolder() + "/" +folderName + "/";
-//	QDir().mkpath(folder);
-//	QString format = timestampSecondsFormat();
-//	QString filename = QDateTime::currentDateTime().toString(format) + "." + ending;
-
-//	return folder+filename;
-//}
 
 void PatientData::reportActivePatient()
 {
@@ -222,16 +211,21 @@ void PatientData::startupLoadPatient()
 			report(QString("Startup Load [%1] as recent patient").arg(folder));
 	}
 
-//	if (folder.isEmpty())
-//		return;
 	if (folder.isEmpty())
-		folder = this->getNullFolder();
+		return;
 
 	this->loadPatient(folder);
 }
 
+bool PatientData::isActivePatient(QString patient) const
+{
+	return (patient == mActivePatientFolder);
+}
+
 void PatientData::loadPatient(QString choosenDir)
 {
+	if (this->isActivePatient(choosenDir))
+		return;
 	this->loadPatientSilent(choosenDir);
 	this->reportActivePatient();
 	this->writeRecentPatientData();
@@ -239,6 +233,8 @@ void PatientData::loadPatient(QString choosenDir)
 
 void PatientData::loadPatientSilent(QString choosenDir)
 {
+	if (this->isActivePatient(choosenDir))
+		return;
 	this->clearPatientSilent();
 	if (choosenDir == QString::null)
 		return; // On cancel

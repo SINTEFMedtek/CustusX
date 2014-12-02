@@ -71,25 +71,26 @@ namespace cx
 {
 BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegServices services, QWidget* parent) :
 	RegistrationBaseWidget(services, parent, "BronchoscopyRegistrationWidget",
-						   "Bronchoscopy Registration"), mVerticalLayout(new QVBoxLayout(this)),
-	mBronchoscopyRegistration(new BronchoscopyRegistration())
+						   "Bronchoscopy Registration"),
+	mBronchoscopyRegistration(new BronchoscopyRegistration()),
+	mServices(services)
 {
-
+	mVerticalLayout = new QVBoxLayout(this);
 	mOptions = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("bronchoscopyregistrationwidget");
 
-	mSelectMeshWidget = SelectMeshStringDataAdapter::New(services.patientModelService);
+	mSelectMeshWidget = SelectMeshStringDataAdapter::New(mServices.patientModelService);
 	mSelectMeshWidget->setValueName("Centerline: ");
 
 	mSelectToolWidget = SelectToolStringDataAdapter::New();
-	this->initializeTrackingService(services);
+	//this->initializeTrackingService();
 
 //	AcquisitionDataPtr mAcquisitionData;
 //	mAcquisitionData.reset(new AcquisitionData());
 
-	//Let the service handle this
-//	connect(services.patientModelService.get(), &PatientModelService::isSaving, this, &BronchoscopyRegistrationWidget::duringSavePatientSlot);
-//	connect(services.patientModelService.get(), &PatientModelService::isLoading, this, &BronchoscopyRegistrationWidget::duringLoadPatientSlot);
-//	connect(services.patientModelService.get(), &PatientModelService::cleared, this, &BronchoscopyRegistrationWidget::duringClearPatientSlot);
+//Let the service handle this
+//	connect(mServices.patientModelService.get(), &PatientModelService::isSaving, this, &BronchoscopyRegistrationWidget::duringSavePatientSlot);
+//	connect(mServices.patientModelService.get(), &PatientModelService::isLoading, this, &BronchoscopyRegistrationWidget::duringLoadPatientSlot);
+//	connect(mServices.patientModelService.get(), &PatientModelService::cleared, this, &BronchoscopyRegistrationWidget::duringClearPatientSlot);
 
 	mProcessCenterlineButton = new QPushButton("Process centerline");
 	connect(mProcessCenterlineButton, SIGNAL(clicked()), this, SLOT(processCenterlineSlot()));
@@ -112,7 +113,7 @@ BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegServices servi
 	mRecordSessionWidget.reset(new RecordSessionWidget(services.acquisitionService, this, "Bronchoscope path"));
 
 	mVerticalLayout->setMargin(0);
-	mVerticalLayout->addWidget(new DataSelectWidget(services.visualizationService, services.patientModelService, this, mSelectMeshWidget));
+	mVerticalLayout->addWidget(new DataSelectWidget(mServices.visualizationService, mServices.patientModelService, this, mSelectMeshWidget));
 //    mVerticalLayout->addWidget(mTrackedCenterLine);
 
 	this->selectSubsetOfBranches(mOptions.getElement());
@@ -128,20 +129,21 @@ BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegServices servi
 //	activeGroupLayout->addLayout(activeToolLayout);
 
 	mVerticalLayout->addWidget(new CheckBoxWidget(this, mUseSubsetOfGenerations));
-	mVerticalLayout->addWidget(createDataWidget(services.visualizationService, services.patientModelService, this, mMaxNumberOfGenerations));
+	mVerticalLayout->addWidget(createDataWidget(mServices.visualizationService, mServices.patientModelService, this, mMaxNumberOfGenerations));
 	mVerticalLayout->addWidget(mProcessCenterlineButton);
 	mVerticalLayout->addWidget(sscCreateDataWidget(this, mSelectToolWidget));
-    mVerticalLayout->addWidget(mRecordSessionWidget.get());
+	mVerticalLayout->addWidget(mRecordSessionWidget.get());
 	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mSessionSelector));
 	mVerticalLayout->addWidget(new CheckBoxWidget(this, mUseLocalRegistration));
 	mVerticalLayout->addWidget(mRegisterButton);
 
 	mVerticalLayout->addStretch();
 
-    boost::shared_ptr<WidgetObscuredListener> mObscuredListener;
+	boost::shared_ptr<WidgetObscuredListener> mObscuredListener;
 
-    mObscuredListener.reset(new WidgetObscuredListener(this));
-    connect(mObscuredListener.get(), SIGNAL(obscured(bool)), this, SLOT(obscuredSlot(bool)));
+	mObscuredListener.reset(new WidgetObscuredListener(this));
+	connect(mObscuredListener.get(), SIGNAL(obscured(bool)), this, SLOT(obscuredSlot(bool)));
+
 }
 
 void BronchoscopyRegistrationWidget::initSessionSelector()
@@ -176,14 +178,16 @@ QString BronchoscopyRegistrationWidget::defaultWhatsThis() const
 	return QString();
 }
 
-void BronchoscopyRegistrationWidget::initializeTrackingService(RegServices services)
+void BronchoscopyRegistrationWidget::initializeTrackingService()
 {
-	if(services.trackingService->getState() < Tool::tsCONFIGURED)
-		services.trackingService->setState(Tool::tsCONFIGURED);
+	if(mServices.trackingService->getState() < Tool::tsCONFIGURED)
+		mServices.trackingService->setState(Tool::tsCONFIGURED);
 }
 
 void BronchoscopyRegistrationWidget::processCenterlineSlot()
 {
+	this->initializeTrackingService();
+
 	if(!mSelectMeshWidget->getMesh())
 	{
 		reportError("No centerline");

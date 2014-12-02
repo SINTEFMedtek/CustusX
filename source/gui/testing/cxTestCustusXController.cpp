@@ -69,6 +69,8 @@ void CustusXController::start()
 
   cx::LogicManager::initialize();
   cx::settings()->setValue("Automation/autoSave", "false");
+  cx::settings()->setValue("Automation/autoLoadRecentPatient", "");
+
 
   mMainWindow = new cx::MainWindow(std::vector<cx::GUIExtenderServicePtr>());
   mMainWindow->show();

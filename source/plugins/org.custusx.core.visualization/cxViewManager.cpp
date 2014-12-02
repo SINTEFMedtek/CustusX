@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "cxLayoutData.h"
+#include "boost/bind.hpp"
 
 #include "cxVolumetricRep.h"
 #include "cxReporter.h"
@@ -199,11 +200,40 @@ QWidget *ViewManager::getLayoutWidget(int index)
 			mLayoutWidgets[index] = ViewCollectionWidget::createViewWidgetLayout();
 		}
 
-        mRenderLoop->addLayout(mLayoutWidgets[index]);
+		connect(mLayoutWidgets[index].data(), &QObject::destroyed, this, &ViewManager::layoutWidgetDestroyed);
+		mRenderLoop->addLayout(mLayoutWidgets[index]);
 
 		this->rebuildLayouts();
 	}
 	return mLayoutWidgets[index];
+}
+
+/**
+ * When GUI deletes the layout widget, we must clear resources here.
+ * Our own destructor gets called in a secondary thread (from pluginframework->stop),
+ * which shouldnt destroy GL stuff.
+ *
+ */
+void ViewManager::layoutWidgetDestroyed(QObject* object)
+{
+	ViewCollectionWidget* widget = dynamic_cast<ViewCollectionWidget*>(object);
+	for (unsigned i=0; i<mLayoutWidgets.size(); ++i)
+	{
+		if (mLayoutWidgets[i] == object)
+			mLayoutWidgets[i] = NULL;
+	}
+
+	for (unsigned i = 0; i < mViewGroups.size(); ++i)
+	{
+		mViewGroups[i]->removeViews();
+	}
+
+	this->setActiveView("");
+	mSlicePlanesProxy->clearViewports();
+
+	QString uid = this->getActiveLayout();
+	mActiveLayout[0] = ""; // hack: force trigger a change
+	this->setActiveLayout(uid, 0);
 }
 
 void ViewManager::updateViews()
@@ -534,7 +564,7 @@ void ViewManager::onLayoutRepositoryChanged(QString uid)
 	{
 		mActiveLayout[0] = ""; // hack: force trigger a change
 		this->setActiveLayout(uid, 0);
-		emit activeLayoutChanged();
+//		emit activeLayoutChanged();
 	}
 }
 
