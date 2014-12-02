@@ -67,7 +67,6 @@ cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
     cxInteractiveClipper
     cxInteractiveCropper
     cxCameraControl
-	cxRepContainer
 	
         )
 
@@ -99,6 +98,7 @@ cx_add_class( CX_RESOURCE_VISUALIZATION_FILES
     Primitives/cxGraphicalAxes3D
     Primitives/cxImageEnveloper
 	Primitives/cxGraphicalDisk
+        cxRepContainer
     )
 
 set( CX_RESOURCE_VISUALIZATION_LIBRARIES ${CX_RESOURCE_VISUALIZATION_LIBRARIES}
