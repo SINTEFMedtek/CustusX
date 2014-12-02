@@ -48,7 +48,7 @@ namespace cx
 
 BronchoscopyRegistration::BronchoscopyRegistration():
 	mCenterlineProcessed(false),
-	mBranchList(new BranchList)
+	mBranchListPtr(new BranchList)
 {
 
 }
@@ -407,8 +407,8 @@ Eigen::Matrix4d registrationAlgorithm(BranchListPtr branches, M4Vector Tnavigati
 
 vtkPolyDataPtr BronchoscopyRegistration::processCenterline(vtkPolyDataPtr centerline, Transform3D rMd, int numberOfGenerations)
 {
-	if (mBranchList)
-		mBranchList->deleteAllBranches();
+	if (mBranchListPtr)
+		mBranchListPtr->deleteAllBranches();
 
 	int N = centerline->GetNumberOfPoints();
 	Eigen::MatrixXd CLpoints(3,N);
@@ -420,19 +420,19 @@ vtkPolyDataPtr BronchoscopyRegistration::processCenterline(vtkPolyDataPtr center
 		position(0) = p[0]; position(1) = p[1]; position(2) = p[2];
 		CLpoints.block(0 , i , 3 , 1) = rMd.coord(position);
 		}
-	mBranchList->findBranchesInCenterline(CLpoints);
+	mBranchListPtr->findBranchesInCenterline(CLpoints);
 	if (numberOfGenerations != 0)
 	{
-		mBranchList->selectGenerations(numberOfGenerations);
+		mBranchListPtr->selectGenerations(numberOfGenerations);
 	}
-	mBranchList->calculateOrientations();
-	mBranchList->smoothOrientations();
+	mBranchListPtr->calculateOrientations();
+	mBranchListPtr->smoothOrientations();
 
 	vtkPolyDataPtr retval = vtkPolyDataPtr::New();
 	vtkPointsPtr points = vtkPointsPtr::New();
 	vtkCellArrayPtr lines = vtkCellArrayPtr::New();
 
-	std::vector<BranchPtr> branches = mBranchList->getBranches();
+	std::vector<BranchPtr> branches = mBranchListPtr->getBranches();
 	for (int i = 0; i < branches.size(); i++)
 	{
 		Eigen::MatrixXd positions = branches[i]->getPositions();
@@ -446,7 +446,7 @@ vtkPolyDataPtr BronchoscopyRegistration::processCenterline(vtkPolyDataPtr center
 	retval->SetPoints(points);
 	retval->SetVerts(lines);
 
-	std::cout << "Number of branches in CT centerline: " << mBranchList->getBranches().size() << std::endl;
+	std::cout << "Number of branches in CT centerline: " << mBranchListPtr->getBranches().size() << std::endl;
 
 	mCenterlineProcessed = true;
 
@@ -481,11 +481,11 @@ Eigen::Matrix4d BronchoscopyRegistration::runBronchoscopyRegistration(TimedTrans
 			Tnavigation_temp[i] = old_rMpr * Tnavigation[i];
 			trackingPositions_temp.block(0 , i , 3 , 1) = Tnavigation_temp[i].topRightCorner(3 , 1);
 		}
-		BranchListPtr tempPtr = mBranchList->removePositionsForLocalRegistration(trackingPositions_temp, maxDistanceForLocalRegistration);
+		BranchListPtr tempPtr = mBranchListPtr->removePositionsForLocalRegistration(trackingPositions_temp, maxDistanceForLocalRegistration);
 		regMatrix = registrationAlgorithm(tempPtr, Tnavigation, old_rMpr);
 	}
 	else
-		regMatrix = registrationAlgorithm(mBranchList, Tnavigation, old_rMpr);
+		regMatrix = registrationAlgorithm(mBranchListPtr, Tnavigation, old_rMpr);
 
 
 	if ( boost::math::isnan(regMatrix.sum()) )

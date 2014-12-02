@@ -49,7 +49,7 @@ typedef boost::shared_ptr<class BranchList> BranchListPtr;
 
 class BronchoscopyRegistration
 {
-	BranchListPtr mBranchList;
+	BranchListPtr mBranchListPtr;
 	bool mCenterlineProcessed;
 
 public:
