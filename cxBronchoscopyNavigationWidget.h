@@ -70,19 +70,24 @@ public:
 	virtual ~BronchoscopyNavigationWidget();
 
 private slots:
+	void processCenterlineSlot();
 	void enableSlot();
 	void disableSlot();
 
 private:
 	QString defaultWhatsThis() const;
+	void useAdvancedCenterlineProjection(QDomElement root);
 	QVBoxLayout*  mVerticalLayout;
+	BoolDataAdapterXmlPtr mUseAdvancedCenterlineProjection;
 
 	SelectMeshStringDataAdapterPtr mSelectMeshWidget;
+	QPushButton* mProcessCenterlineButton;
 	QPushButton* mEnableButton;
 	QPushButton* mDisableButton;
 	ToolPtr mTool;
 	TrackingSystemBronchoscopyServicePtr mTrackingSystem;
 	BronchoscopePositionProjectionPtr mProjectionCenterlinePtr;
+
 
 	PatientModelServicePtr mPatientModelService;
 	VisualizationServicePtr mVisualizationService;
