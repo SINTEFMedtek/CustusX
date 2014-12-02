@@ -47,15 +47,81 @@ bool AcquisitionServiceNull::isNull()
 
 RecordSessionPtr AcquisitionServiceNull::getLatestSession()
 {
+	printWarning();
 	return RecordSessionPtr();
 }
 
 std::vector<RecordSessionPtr> AcquisitionServiceNull::getSessions()
 {
+	printWarning();
 	return std::vector<RecordSessionPtr>();
 }
 
-void AcquisitionServiceNull::printWarning()
+bool AcquisitionServiceNull::isReady() const
+{
+	printWarning();
+	return false;
+}
+
+QString AcquisitionServiceNull::getInfoText() const
+{
+	printWarning();
+	return QString();
+}
+
+AcquisitionService::STATE AcquisitionServiceNull::getState() const
+{
+	printWarning();
+	return AcquisitionService::sNOT_RUNNING;
+}
+
+void AcquisitionServiceNull::toggleRecord()
+{
+	printWarning();
+}
+
+void AcquisitionServiceNull::startRecord()
+{
+	printWarning();
+}
+
+void AcquisitionServiceNull::stopRecord()
+{
+	printWarning();
+}
+
+void AcquisitionServiceNull::cancelRecord()
+{
+	printWarning();
+}
+
+void AcquisitionServiceNull::startPostProcessing()
+{
+	printWarning();
+}
+
+void AcquisitionServiceNull::stopPostProcessing()
+{
+	printWarning();
+}
+
+int AcquisitionServiceNull::getNumberOfSavingThreads() const
+{
+	printWarning();
+	return 0;
+}
+
+void AcquisitionServiceNull::addXml(QDomNode &dataNode)
+{
+	printWarning();
+}
+
+void AcquisitionServiceNull::parseXml(QDomNode &dataNode)
+{
+	printWarning();
+}
+
+void AcquisitionServiceNull::printWarning() const
 {
 	reportWarning("Trying to use AcquisitionServiceNull. Is AcquisitionService (org.custusx.acquisition) disabled?");
 }

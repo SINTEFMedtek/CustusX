@@ -88,9 +88,8 @@ private:
 
 	double mRecordDuration; ///< duration of recording in ms.
 	cx::VideoSourcePtr mVideoSource;
-	cx::AcquisitionDataPtr mAcquisitionData;
-	cx::USAcquisitionPtr mAcquisition;
-	cx::AcquisitionPtr mAcquisitionBase;
+	cx::UsReconstructionServicePtr mUsReconstructionService;
+	cx::AcquisitionServicePtr mAcquisitionService;
 };
 
 } // namespace cxtest

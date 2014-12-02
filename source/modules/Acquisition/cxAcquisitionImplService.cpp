@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxAcquisitionImplService.h"
 #include "cxAcquisitionData.h"
+#include "cxUSAcquisition.h"
+#include "cxUsReconstructionServiceProxy.h"
 
 namespace cx
 {
@@ -39,14 +41,20 @@ namespace cx
 AcquisitionImplService::AcquisitionImplService(ctkPluginContext *context) :
 	mContext(context),
 	mAcquisitionData(new AcquisitionData()),
-	mAcquisition(new Acquisition(mAcquisitionData))
-//	mPatientModelService(new PatientModelServiceProxy(context))
+	mAcquisition(new Acquisition(mAcquisitionData)),
+	mUsReconstructService(new UsReconstructionServiceProxy(context)),
+	mUsAcquisition(new USAcquisition(mAcquisition, mUsReconstructService))
 {
 	connect(mAcquisition.get(), &Acquisition::started, this, &AcquisitionService::started);
 	connect(mAcquisition.get(), &Acquisition::cancelled, this, &AcquisitionService::cancelled);
 	connect(mAcquisition.get(), &Acquisition::stateChanged, this, &AcquisitionService::stateChanged);
 	connect(mAcquisition.get(), &Acquisition::readinessChanged, this, &AcquisitionService::readinessChanged);
 	connect(mAcquisition.get(), &Acquisition::acquisitionStopped, this, &AcquisitionService::acquisitionStopped);
+
+	connect(mAcquisitionData.get(), &AcquisitionData::recordedSessionsChanged, this, &AcquisitionService::recordedSessionsChanged);
+
+	connect(mUsAcquisition.get(), &USAcquisition::acquisitionDataReady, this, &AcquisitionService::acquisitionDataReady);
+	connect(mUsAcquisition.get(), &USAcquisition::saveDataCompleted, this, &AcquisitionService::saveDataCompleted);
 }
 
 AcquisitionImplService::~AcquisitionImplService()
@@ -56,6 +64,11 @@ AcquisitionImplService::~AcquisitionImplService()
 	disconnect(mAcquisition.get(), &Acquisition::stateChanged, this, &AcquisitionService::stateChanged);
 	disconnect(mAcquisition.get(), &Acquisition::readinessChanged, this, &AcquisitionService::readinessChanged);
 	disconnect(mAcquisition.get(), &Acquisition::acquisitionStopped, this, &AcquisitionService::acquisitionStopped);
+
+	disconnect(mAcquisitionData.get(), &AcquisitionData::recordedSessionsChanged, this, &AcquisitionService::recordedSessionsChanged);
+
+	disconnect(mUsAcquisition.get(), &USAcquisition::acquisitionDataReady, this, &AcquisitionService::acquisitionDataReady);
+	disconnect(mUsAcquisition.get(), &USAcquisition::saveDataCompleted, this, &AcquisitionService::saveDataCompleted);
 }
 
 bool AcquisitionImplService::isNull()
@@ -71,6 +84,66 @@ RecordSessionPtr AcquisitionImplService::getLatestSession()
 std::vector<RecordSessionPtr> AcquisitionImplService::getSessions()
 {
 	return mAcquisition->getPluginData()->getRecordSessions();
+}
+
+bool AcquisitionImplService::isReady() const
+{
+	return mAcquisition->isReady();
+}
+
+QString AcquisitionImplService::getInfoText() const
+{
+	return mAcquisition->getInfoText();
+}
+
+AcquisitionService::STATE AcquisitionImplService::getState() const
+{
+	return mAcquisition->getState();
+}
+
+void AcquisitionImplService::toggleRecord()
+{
+	mAcquisition->toggleRecord();
+}
+
+void AcquisitionImplService::startRecord()
+{
+	mAcquisition->startRecord();
+}
+
+void AcquisitionImplService::stopRecord()
+{
+	mAcquisition->stopRecord();
+}
+
+void AcquisitionImplService::cancelRecord()
+{
+	mAcquisition->cancelRecord();
+}
+
+void AcquisitionImplService::startPostProcessing()
+{
+	mAcquisition->startPostProcessing();
+}
+
+void AcquisitionImplService::stopPostProcessing()
+{
+	mAcquisition->stopPostProcessing();
+}
+
+int AcquisitionImplService::getNumberOfSavingThreads() const
+{
+	return mUsAcquisition->getNumberOfSavingThreads();
+}
+
+void AcquisitionImplService::addXml(QDomNode &dataNode)
+{
+	mAcquisitionData->addXml(dataNode);
+}
+
+void AcquisitionImplService::parseXml(QDomNode &dataNode)
+{
+	mAcquisitionData->parseXml(dataNode);
 }
 
 } // cx

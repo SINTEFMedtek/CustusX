@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 typedef boost::shared_ptr<class CalibrationPlugin> CalibrationPluginPtr;
-typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
+typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
 
 /**
  * \file
@@ -64,10 +64,9 @@ class cxPluginCalibration_EXPORT CalibrationPlugin : public GUIExtenderService
 {
 	Q_OBJECT
 public:
-	CalibrationPlugin(/*RegistrationServicePtr registrationService, VisualizationServicePtr visualizationService, */PatientModelServicePtr patientModelService, AcquisitionDataPtr mAcquisitionData);
+	CalibrationPlugin(PatientModelServicePtr patientModelService, AcquisitionServicePtr acquisitionService);
 	virtual ~CalibrationPlugin();
 
-//  AcquisitionDataPtr getAcquisitionData() { return mAcquisitionData; }
 	virtual std::vector<CategorizedWidget> createWidgets() const;
 
 signals:
@@ -75,9 +74,7 @@ signals:
 private slots:
 
 private:
-	AcquisitionDataPtr mAcquisitionData;
-//	RegistrationServicePtr mRegistrationService;
-//	VisualizationServicePtr mVisualizationService;
+	AcquisitionServicePtr mAcquisitionService;
 	PatientModelServicePtr mPatientModelService;
 };
 /**

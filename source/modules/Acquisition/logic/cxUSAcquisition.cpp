@@ -43,12 +43,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxUSReconstructInputData.h"
 #include "cxPatientModelService.h"
 #include "cxVideoSource.h"
+#include "cxAcquisitionService.h"
+#include "cxUsReconstructionService.h"
 
 
 namespace cx
 {
 
-USAcquisition::USAcquisition(AcquisitionPtr base, QObject* parent) : QObject(parent), mBase(base)
+USAcquisition::USAcquisition(AcquisitionPtr base, UsReconstructionServicePtr reconstructer, QObject* parent) :
+	QObject(parent),
+	mBase(base),
+	mUsReconstructionService(reconstructer)
 {
 	mCore.reset(new USSavingRecorder());
 	connect(mCore.get(), SIGNAL(saveDataCompleted(QString)), this, SLOT(checkIfReadySlot()));
@@ -121,7 +126,7 @@ int USAcquisition::getNumberOfSavingThreads() const
 
 void USAcquisition::recordStarted()
 {
-	mBase->getPluginData()->getReconstructer()->selectData(USReconstructInputData()); // clear old data in reconstructeer
+	mUsReconstructionService->selectData(USReconstructInputData()); // clear old data in reconstructeer
 
 	ToolPtr tool = trackingService()->getFirstProbe();
 	mCore->setWriteColor(this->getWriteColor());
@@ -157,7 +162,7 @@ void USAcquisition::sendAcquisitionDataToReconstructer()
 	if (activeVideoSource)
 	{
 		USReconstructInputData data = mCore->getDataForStream(activeVideoSource->getUid());
-		mBase->getPluginData()->getReconstructer()->selectData(data);
+		mUsReconstructionService->selectData(data);
 		emit acquisitionDataReady();
 	}
 }
@@ -183,7 +188,7 @@ std::vector<VideoSourcePtr> USAcquisition::getRecordingVideoSources(ToolPtr tool
 
 bool USAcquisition::getWriteColor() const
 {
-	DataAdapterPtr angio = mBase->getPluginData()->getReconstructer()->getParam("Angio data");
+	DataAdapterPtr angio = mUsReconstructionService->getParam("Angio data");
 	bool writeColor = angio->getValueAsVariant().toBool()
 	        ||  !settings()->value("Ultrasound/8bitAcquisitionData").toBool();
 	return writeColor;

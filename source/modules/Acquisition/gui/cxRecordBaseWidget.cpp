@@ -49,16 +49,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-RecordBaseWidget::RecordBaseWidget(AcquisitionDataPtr pluginData, QWidget* parent, QString description):
+RecordBaseWidget::RecordBaseWidget(AcquisitionServicePtr acquisitionService, QWidget* parent, QString description):
     BaseWidget(parent, "RecordBaseWidget", "Record Base"),
-    mPluginData(pluginData),
+	mAcquisitionService(acquisitionService),
     mLayout(new QVBoxLayout(this))
 {
 	this->setObjectName("RecordBaseWidget");
 	this->setWindowTitle("Record Base");
 
-	mBase.reset(new Acquisition(pluginData));
-	mRecordSessionWidget = new RecordSessionWidget(mBase, this, description);
+	mRecordSessionWidget = new RecordSessionWidget(mAcquisitionService, this, description);
 	mLayout->addWidget(mRecordSessionWidget);
 }
 
@@ -69,8 +68,8 @@ RecordBaseWidget::~RecordBaseWidget()
 ////----------------------------------------------------------------------------------------------------------------------
 ////----------------------------------------------------------------------------------------------------------------------
 
-TrackedRecordWidget::TrackedRecordWidget(AcquisitionDataPtr pluginData, QWidget* parent, QString description) :
-  RecordBaseWidget(pluginData, parent, description)
+TrackedRecordWidget::TrackedRecordWidget(AcquisitionServicePtr acquisitionService, QWidget* parent, QString description) :
+  RecordBaseWidget(acquisitionService, parent, description)
 {}
 
 TrackedRecordWidget::~TrackedRecordWidget()

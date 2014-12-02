@@ -36,7 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPluginAcquisitionExport.h"
 
 #include "cxBaseWidget.h"
-#include "cxAcquisitionData.h"
 
 class QPushButton;
 class QLineEdit;
@@ -50,6 +49,7 @@ namespace cx
 * @{
 */
 
+typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
 typedef boost::shared_ptr<class RecordSessionWidget> RecordSessionWidgetPtr;
 
 /**
@@ -65,7 +65,7 @@ class cxPluginAcquisition_EXPORT  RecordSessionWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  RecordSessionWidget(AcquisitionPtr base, QWidget* parent, QString defaultDescription = "Record Session");
+  RecordSessionWidget(AcquisitionServicePtr base, QWidget* parent, QString defaultDescription = "Record Session");
   virtual ~RecordSessionWidget();
 
   virtual QString defaultWhatsThis() const;
@@ -84,7 +84,7 @@ private slots:
 
 private:
 
-  AcquisitionPtr mBase;
+  AcquisitionServicePtr mAcquisitionService;
   QLabel* mInfoLabel;
   QPushButton* mStartStopButton;
   QPushButton* mCancelButton;

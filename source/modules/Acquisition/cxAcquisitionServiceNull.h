@@ -53,8 +53,24 @@ public:
 
 	virtual RecordSessionPtr getLatestSession();
 	virtual std::vector<RecordSessionPtr> getSessions();
+
+	virtual bool isReady() const;
+	virtual QString getInfoText() const;
+	virtual STATE getState() const;
+	virtual void toggleRecord();
+	virtual void startRecord();
+	virtual void stopRecord();
+	virtual void cancelRecord();
+	virtual void startPostProcessing();
+	virtual void stopPostProcessing();
+
+	virtual int getNumberOfSavingThreads() const;
+
+	virtual void addXml(QDomNode& dataNode);
+	virtual void parseXml(QDomNode& dataNode);
+
 private:
-	void printWarning();
+	void printWarning() const;
 };
 
 }//cx

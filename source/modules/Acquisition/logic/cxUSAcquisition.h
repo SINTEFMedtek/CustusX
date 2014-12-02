@@ -74,7 +74,7 @@ class cxPluginAcquisition_EXPORT USAcquisition : public QObject
 {
 	Q_OBJECT
 public:
-	USAcquisition(AcquisitionPtr base, QObject* parent = 0);
+	USAcquisition(AcquisitionPtr base, UsReconstructionServicePtr reconstructer, QObject* parent = 0);
 	virtual ~USAcquisition();
 	int getNumberOfSavingThreads() const;
 
@@ -94,6 +94,7 @@ private:
 	void sendAcquisitionDataToReconstructer();
 
 	AcquisitionPtr mBase;
+	UsReconstructionServicePtr mUsReconstructionService;
 	USSavingRecorderPtr mCore;
 };
 typedef boost::shared_ptr<USAcquisition> USAcquisitionPtr;

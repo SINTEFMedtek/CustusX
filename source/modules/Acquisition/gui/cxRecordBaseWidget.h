@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTool.h"
 #include "cxVideoRecorder.h"
 #include "cxRecordSession.h"
-#include "cxAcquisitionData.h"
+#include "cxAcquisitionService.h"
 
 class QLabel;
 class QVBoxLayout;
@@ -70,12 +70,11 @@ class cxPluginAcquisition_EXPORT  RecordBaseWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  RecordBaseWidget(AcquisitionDataPtr pluginData, QWidget* parent, QString description = "Record Session");
+  RecordBaseWidget(AcquisitionServicePtr acquisitionService, QWidget* parent, QString description = "Record Session");
   virtual ~RecordBaseWidget();
 
 protected:
-  AcquisitionDataPtr mPluginData;
-  AcquisitionPtr mBase;
+  AcquisitionServicePtr mAcquisitionService;
   QVBoxLayout* mLayout;
   RecordSessionWidget* mRecordSessionWidget;
 
@@ -93,7 +92,7 @@ class cxPluginAcquisition_EXPORT  TrackedRecordWidget : public RecordBaseWidget
 {
   Q_OBJECT
 public:
-  TrackedRecordWidget(AcquisitionDataPtr pluginData, QWidget* parent, QString description);
+  TrackedRecordWidget(AcquisitionServicePtr acquisitionService, QWidget* parent, QString description);
   virtual ~TrackedRecordWidget();
 
 signals:

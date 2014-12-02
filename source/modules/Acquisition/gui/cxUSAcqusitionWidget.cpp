@@ -58,24 +58,24 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-USAcqusitionWidget::USAcqusitionWidget(AcquisitionDataPtr pluginData, QWidget* parent) :
-	RecordBaseWidget(pluginData, parent, settings()->value("Ultrasound/acquisitionName").toString())
+USAcqusitionWidget::USAcqusitionWidget(AcquisitionServicePtr acquisitionService, UsReconstructionServicePtr usReconstructionService, QWidget* parent) :
+	RecordBaseWidget(acquisitionService, parent, settings()->value("Ultrasound/acquisitionName").toString()),
+	mUsReconstructionService(usReconstructionService)
 {
 	this->setObjectName("USAcqusitionWidget");
 	this->setWindowTitle("US Acquisition");
 
-	connect(mPluginData->getReconstructer().get(), &UsReconstructionService::reconstructAboutToStart, this, &USAcqusitionWidget::reconstructAboutToStartSlot);
-	connect(mPluginData->getReconstructer().get(), &UsReconstructionService::reconstructStarted, this, &USAcqusitionWidget::reconstructStartedSlot);
-	connect(mPluginData->getReconstructer().get(), &UsReconstructionService::reconstructFinished, this, &USAcqusitionWidget::reconstructFinishedSlot);
+	connect(mUsReconstructionService.get(), &UsReconstructionService::reconstructAboutToStart, this, &USAcqusitionWidget::reconstructAboutToStartSlot);
+	connect(mUsReconstructionService.get(), &UsReconstructionService::reconstructStarted, this, &USAcqusitionWidget::reconstructStartedSlot);
+	connect(mUsReconstructionService.get(), &UsReconstructionService::reconstructFinished, this, &USAcqusitionWidget::reconstructFinishedSlot);
 
-	mAcquisition.reset(new USAcquisition(mBase));
-	connect(mAcquisition.get(), &USAcquisition::acquisitionDataReady, this, &USAcqusitionWidget::acquisitionDataReadySlot);
+	connect(mAcquisitionService.get(), &AcquisitionService::stateChanged, this, &USAcqusitionWidget::acquisitionStateChangedSlot);
+	connect(mAcquisitionService.get(), &AcquisitionService::started, this, &USAcqusitionWidget::recordStarted);
+	connect(mAcquisitionService.get(), &AcquisitionService::acquisitionStopped, this, &USAcqusitionWidget::recordStopped, Qt::DirectConnection);
+	connect(mAcquisitionService.get(), &AcquisitionService::cancelled, this, &USAcqusitionWidget::recordCancelled);
 
-	connect(mBase.get(), &Acquisition::stateChanged, this, &USAcqusitionWidget::acquisitionStateChangedSlot);
-	connect(mBase.get(), &Acquisition::started, this, &USAcqusitionWidget::recordStarted);
-	connect(mBase.get(), &Acquisition::acquisitionStopped, this, &USAcqusitionWidget::recordStopped, Qt::DirectConnection);
-	connect(mBase.get(), &Acquisition::cancelled, this, &USAcqusitionWidget::recordCancelled);
-	connect(mAcquisition.get(), &USAcquisition::saveDataCompleted, mPluginData->getReconstructer().get(), &UsReconstructionService::newDataOnDisk);
+	connect(mAcquisitionService.get(), &AcquisitionService::acquisitionDataReady, this, &USAcqusitionWidget::acquisitionDataReadySlot);
+	connect(mAcquisitionService.get(), &AcquisitionService::saveDataCompleted, mUsReconstructionService.get(), &UsReconstructionService::newDataOnDisk);
 
 	mRecordSessionWidget->setDescriptionVisibility(false);
 
@@ -92,7 +92,7 @@ USAcqusitionWidget::USAcqusitionWidget(AcquisitionDataPtr pluginData, QWidget* p
 	editsLayout->setColumnStretch(1,1);
 	RecordBaseWidget::mLayout->addLayout(editsLayout);
 	new LabeledComboBoxWidget(this, ActiveProbeConfigurationStringDataAdapter::New(), editsLayout, 0);
-	sscCreateDataWidget(this, mPluginData->getReconstructer()->getParam("Preset"), editsLayout, 1);
+	sscCreateDataWidget(this, mUsReconstructionService->getParam("Preset"), editsLayout, 1);
 
 	QAction* optionsAction = this->createAction(this,
 	      QIcon(":/icons/open_icon_library/system-run-5.png"),
@@ -182,21 +182,21 @@ void USAcqusitionWidget::acquisitionDataReadySlot()
 {
 	if (settings()->value("Automation/autoReconstruct").toBool())
 	{
-		mPluginData->getReconstructer()->startReconstruction();
+		mUsReconstructionService->startReconstruction();
 	}
 }
 
 void USAcqusitionWidget::acquisitionStateChangedSlot()
 {
-	Acquisition::STATE state = mBase->getState();
+	AcquisitionService::STATE state = mAcquisitionService->getState();
 
 	switch (state)
 	{
-	case Acquisition::sRUNNING :
+	case AcquisitionService::sRUNNING :
 		break;
-	case Acquisition::sNOT_RUNNING :
+	case AcquisitionService::sNOT_RUNNING :
 		break;
-	case Acquisition::sPOST_PROCESSING :
+	case AcquisitionService::sPOST_PROCESSING :
 		break;
 	}
 }
@@ -216,20 +216,20 @@ void USAcqusitionWidget::recordCancelled()
 
 void USAcqusitionWidget::reconstructAboutToStartSlot()
 {
-	std::set<cx::TimedAlgorithmPtr> threads = mPluginData->getReconstructer()->getThreadedReconstruction();
+	std::set<cx::TimedAlgorithmPtr> threads = mUsReconstructionService->getThreadedReconstruction();
 	mTimedAlgorithmProgressBar->attach(threads);
 }
 
 void USAcqusitionWidget::reconstructStartedSlot()
 {
-	mBase->startPostProcessing();
+	mAcquisitionService->startPostProcessing();
 }
 
 void USAcqusitionWidget::reconstructFinishedSlot()
 {
-	std::set<cx::TimedAlgorithmPtr> threads = mPluginData->getReconstructer()->getThreadedReconstruction();
+	std::set<cx::TimedAlgorithmPtr> threads = mUsReconstructionService->getThreadedReconstruction();
 	mTimedAlgorithmProgressBar->detach(threads);
-	mBase->stopPostProcessing();
+	mAcquisitionService->stopPostProcessing();
 }
 
 }//namespace cx

@@ -52,6 +52,7 @@ namespace cx
 typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
 typedef boost::shared_ptr<class AcquisitionPlugin> AcquisitionPluginPtr;
 typedef boost::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
+typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
 
 
 /**
@@ -67,13 +68,9 @@ class cxPluginAcquisition_EXPORT  AcquisitionPlugin: public GUIExtenderService
 {
 Q_OBJECT
 public:
-	AcquisitionPlugin(UsReconstructionServicePtr reconstructer);
+	AcquisitionPlugin(UsReconstructionServicePtr reconstructer, AcquisitionServicePtr acquisitionService);
 	virtual ~AcquisitionPlugin();
 
-	AcquisitionDataPtr getAcquisitionData()
-	{
-		return mAcquisitionData;
-	}
 	virtual std::vector<CategorizedWidget> createWidgets() const;
 
 signals:
@@ -87,7 +84,8 @@ private:
 	void addXml(QDomNode& dataNode);
 	void parseXml(QDomNode& dataNode);
 
-	AcquisitionDataPtr mAcquisitionData;
+	UsReconstructionServicePtr mUsReconstructionService;
+	AcquisitionServicePtr mAcquisitionService;
 };
 
 /**

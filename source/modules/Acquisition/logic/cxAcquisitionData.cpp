@@ -157,7 +157,7 @@ QString AcquisitionData::getNewUid()
 ///--------------------------------------------------------
 
 Acquisition::Acquisition(AcquisitionDataPtr pluginData, QObject* parent) :
-    QObject(parent), mPluginData(pluginData), mCurrentState(sNOT_RUNNING),
+	QObject(parent), mPluginData(pluginData), mCurrentState(AcquisitionService::sNOT_RUNNING),
     mReady(true), mInfoText("")
 {
 }
@@ -171,7 +171,7 @@ void Acquisition::setReady(bool val, QString text)
 	mReady = val;
 	mInfoText = text;
 
-	if (!mReady && this->getState()==sRUNNING)
+	if (!mReady && this->getState()==AcquisitionService::sRUNNING)
 		this->cancelRecord();
 
 	emit readinessChanged();
@@ -179,7 +179,7 @@ void Acquisition::setReady(bool val, QString text)
 
 void Acquisition::toggleRecord()
 {
-	if (this->getState()==sRUNNING)
+	if (this->getState()==AcquisitionService::sRUNNING)
 		this->stopRecord();
 	else
 		this->startRecord();
@@ -187,7 +187,7 @@ void Acquisition::toggleRecord()
 
 void Acquisition::startRecord()
 {
-	if (this->getState()!=sNOT_RUNNING)
+	if (this->getState()!=AcquisitionService::sNOT_RUNNING)
 	{
 		report("Already recording a session, stop before trying to start a new record session.");
 		return;
@@ -196,12 +196,12 @@ void Acquisition::startRecord()
 	double startTime = getMilliSecondsSinceEpoch();
 	mLatestSession.reset(new cx::RecordSession(mPluginData->getNewUid(), startTime, startTime, settings()->value("Ultrasound/acquisitionName").toString()));
 	reporter()->playStartSound();
-	this->setState(sRUNNING);
+	this->setState(AcquisitionService::sRUNNING);
 }
 
 void Acquisition::stopRecord()
 {
-	if (this->getState()!=sRUNNING)
+	if (this->getState()!=AcquisitionService::sRUNNING)
 	{
 		return;
 	}
@@ -210,41 +210,41 @@ void Acquisition::stopRecord()
 	mPluginData->addRecordSession(mLatestSession);
 	trackingService()->savePositionHistory(); //asks all the tools to save their transforms and timestamps
 	reporter()->playStopSound();
-	this->setState(sNOT_RUNNING);
+	this->setState(AcquisitionService::sNOT_RUNNING);
 }
 
 void Acquisition::cancelRecord()
 {
-	if (this->getState()!=sRUNNING)
+	if (this->getState()!=AcquisitionService::sRUNNING)
 	{
 		return;
 	}
 	reporter()->playCancelSound();
 	mLatestSession.reset();
-	this->setState(sNOT_RUNNING);
+	this->setState(AcquisitionService::sNOT_RUNNING);
 }
 
 void Acquisition::startPostProcessing()
 {
-	this->setState(sPOST_PROCESSING);
+	this->setState(AcquisitionService::sPOST_PROCESSING);
 }
 
 void Acquisition::stopPostProcessing()
 {
-	this->setState(sNOT_RUNNING);
+	this->setState(AcquisitionService::sNOT_RUNNING);
 }
 
-void Acquisition::setState(STATE newState)
+void Acquisition::setState(AcquisitionService::STATE newState)
 {
-	STATE lastState = mCurrentState;
+	AcquisitionService::STATE lastState = mCurrentState;
 	mCurrentState = newState;
 
 	// emit some helper signals
-	if (lastState!=sRUNNING && newState==sRUNNING)
+	if (lastState!=AcquisitionService::sRUNNING && newState==AcquisitionService::sRUNNING)
 		emit started();
-	else if (lastState==sRUNNING && newState!=sRUNNING && mLatestSession)
+	else if (lastState==AcquisitionService::sRUNNING && newState!=AcquisitionService::sRUNNING && mLatestSession)
 		emit acquisitionStopped();
-	else if (lastState==sRUNNING && newState!=sRUNNING && !mLatestSession)
+	else if (lastState==AcquisitionService::sRUNNING && newState!=AcquisitionService::sRUNNING && !mLatestSession)
 		emit cancelled();
 
 	emit stateChanged();

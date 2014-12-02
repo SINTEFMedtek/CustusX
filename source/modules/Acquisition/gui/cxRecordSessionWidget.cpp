@@ -42,12 +42,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRecordSession.h"
 #include "cxTrackingService.h"
 #include "cxTypeConversions.h"
+#include "cxAcquisitionService.h"
 
 namespace cx
 {
-RecordSessionWidget::RecordSessionWidget(AcquisitionPtr base, QWidget* parent, QString defaultDescription) :
+RecordSessionWidget::RecordSessionWidget(AcquisitionServicePtr base, QWidget* parent, QString defaultDescription) :
     BaseWidget(parent, "RecordSessionWidget", "Record Session"),
-    mBase(base),
+	mAcquisitionService(base),
     mInfoLabel(new QLabel("")),
     mStartStopButton(new QPushButton(QIcon(":/icons/open_icon_library/media-record-3.png"), "Start")),
     mCancelButton(new QPushButton(QIcon(":/icons/open_icon_library/process-stop-7.png"), "Cancel")),
@@ -70,8 +71,8 @@ RecordSessionWidget::RecordSessionWidget(AcquisitionPtr base, QWidget* parent, Q
 	buttonLayout->addWidget(mCancelButton);
 	layout->addLayout(buttonLayout);
 
-	connect(mBase.get(), SIGNAL(stateChanged()), this, SLOT(recordStateChangedSlot()));
-	connect(mBase.get(), SIGNAL(readinessChanged()), this, SLOT(readinessChangedSlot()));
+	connect(mAcquisitionService.get(), SIGNAL(stateChanged()), this, SLOT(recordStateChangedSlot()));
+	connect(mAcquisitionService.get(), SIGNAL(readinessChanged()), this, SLOT(readinessChangedSlot()));
 
 	mStartStopButton->setCheckable(true);
 	connect(mStartStopButton, SIGNAL(clicked(bool)), this, SLOT(startStopSlot(bool)));
@@ -112,33 +113,33 @@ void RecordSessionWidget::setDescription(QString text)
 
 void RecordSessionWidget::readinessChangedSlot()
 {
-	this->setEnabled(mBase->isReady());
-    mInfoLabel->setText(mBase->getInfoText());
+	this->setEnabled(mAcquisitionService->isReady());
+	mInfoLabel->setText(mAcquisitionService->getInfoText());
 }
 
 void RecordSessionWidget::recordStateChangedSlot()
 {
-	Acquisition::STATE state = mBase->getState();
+	AcquisitionService::STATE state = mAcquisitionService->getState();
 
 	mStartStopButton->blockSignals(true);
 
 	switch (state)
 	{
-	case Acquisition::sRUNNING :
+	case AcquisitionService::sRUNNING :
 	    mStartStopButton->setChecked(true);
 		mStartStopButton->setText("Stop");
 		mStartStopButton->setIcon(QIcon(":/icons/open_icon_library/media-playback-stop.png"));
 	    mStartStopButton->setEnabled(true);
 	    mCancelButton->setEnabled(true);
 		break;
-	case Acquisition::sNOT_RUNNING :
+	case AcquisitionService::sNOT_RUNNING :
 	    mStartStopButton->setChecked(false);
 		mStartStopButton->setText("Start");
 		mStartStopButton->setIcon(QIcon(":/icons/open_icon_library/media-record-3.png"));
 	    mStartStopButton->setEnabled(true);
 		mCancelButton->setEnabled(false);
 		break;
-	case Acquisition::sPOST_PROCESSING :
+	case AcquisitionService::sPOST_PROCESSING :
 	    mStartStopButton->setChecked(false);
 		mStartStopButton->setText("Processing...");
 	    mStartStopButton->setIcon(QIcon(":/icons/open_icon_library/media-record-3.png"));
@@ -152,12 +153,12 @@ void RecordSessionWidget::recordStateChangedSlot()
 
 void RecordSessionWidget::startStopSlot(bool checked)
 {
-	mBase->toggleRecord();
+	mAcquisitionService->toggleRecord();
 }
 
 void RecordSessionWidget::cancelSlot()
 {
-	mBase->cancelRecord();
+	mAcquisitionService->cancelRecord();
 }
 
 }

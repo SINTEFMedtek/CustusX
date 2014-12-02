@@ -38,10 +38,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-CalibrationPlugin::CalibrationPlugin(/*RegistrationServicePtr registrationService, VisualizationServicePtr visualizationService, */PatientModelServicePtr patientModelService, AcquisitionDataPtr acquisitionData) :
-		mAcquisitionData(acquisitionData),
-//		mRegistrationService(registrationService),
-//		mVisualizationService(visualizationService),
+CalibrationPlugin::CalibrationPlugin(PatientModelServicePtr patientModelService, AcquisitionServicePtr acquisitionService) :
+		mAcquisitionService(acquisitionService),
 		mPatientModelService(patientModelService)
 {
 }
@@ -56,7 +54,7 @@ std::vector<GUIExtenderService::CategorizedWidget> CalibrationPlugin::createWidg
 	std::vector<CategorizedWidget> retval;
 
 	retval.push_back(GUIExtenderService::CategorizedWidget(
-			new CalibrationMethodsWidget(mPatientModelService, mAcquisitionData, NULL, "CalibrationMethodsWidget", "Calibration Methods"),
+			new CalibrationMethodsWidget(mPatientModelService, mAcquisitionService, NULL, "CalibrationMethodsWidget", "Calibration Methods"),
 			"Algorithms"));
 
 	return retval;

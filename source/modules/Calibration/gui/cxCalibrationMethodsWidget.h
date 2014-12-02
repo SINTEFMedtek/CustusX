@@ -36,10 +36,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxTabbedWidget.h"
 
-#include "cxAcquisitionData.h"
-
 namespace cx
 {
+typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
+
 /**
  * \file
  * \addtogroup cx_module_calibration
@@ -49,7 +49,7 @@ namespace cx
 class cxPluginCalibration_EXPORT CalibrationMethodsWidget : public TabbedWidget
 {
 public:
-  CalibrationMethodsWidget(PatientModelServicePtr patientModelService, AcquisitionDataPtr acquisitionData,
+  CalibrationMethodsWidget(PatientModelServicePtr patientModelService, AcquisitionServicePtr acquisitionService,
   		QWidget* parent, QString objectName, QString windowTitle);
   virtual ~CalibrationMethodsWidget(){};
   virtual QString defaultWhatsThis() const;

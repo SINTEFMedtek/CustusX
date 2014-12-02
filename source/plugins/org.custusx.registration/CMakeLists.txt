@@ -8,6 +8,7 @@ include_directories(
     ${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
     ${CustusX_SOURCE_DIR}/source/logic
     ${CustusX_SOURCE_DIR}/source/modules/Acquisition/logic
+    ${CustusX_SOURCE_DIR}/source/modules/Acquisition
     ${CustusX_SOURCE_DIR}/source/modules/Algorithm
 
     ${CustusX_BINARY_DIR}/source/logic
@@ -68,6 +69,7 @@ set(PLUGIN_target_libraries
 #TODO: Remove these dependencies
     cxLogicManager
     cxPluginAlgorithm
+    cxPluginAcquisition
     )
 
 set(PLUGIN_OUTPUT_DIR "")

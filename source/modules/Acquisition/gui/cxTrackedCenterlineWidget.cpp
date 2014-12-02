@@ -44,13 +44,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxView.h"
 #include "cxVisualizationService.h"
 #include "cxRepContainer.h"
+#include "cxAcquisitionService.h"
 
 #include "cxLegacySingletons.h"
 
 namespace cx
 {
-TrackedCenterlineWidget::TrackedCenterlineWidget(AcquisitionDataPtr pluginData, QWidget* parent) :
-    TrackedRecordWidget(pluginData, parent, "Tracked centerline")
+TrackedCenterlineWidget::TrackedCenterlineWidget(AcquisitionServicePtr acquisitionService, QWidget* parent) :
+	TrackedRecordWidget(acquisitionService, parent, "Tracked centerline")
 {
   this->setObjectName("TrackedCenterlineWidget");
   this->setWindowTitle("Tracked Centerline");
@@ -115,7 +116,7 @@ void TrackedCenterlineWidget::postProcessingSlot(QString sessionId)
 
 void TrackedCenterlineWidget::preprocessResampler()
 {
-	RecordSessionPtr session = mPluginData->getRecordSession(mSessionID);
+	RecordSessionPtr session = mAcquisitionService->getSession(mSessionID);
 
 	//get the transforms from the session
 	TimedTransformMap transforms_prMt = this->getRecording(session);

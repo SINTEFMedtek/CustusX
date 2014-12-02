@@ -39,11 +39,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QDomNode;
 #include <vector>
 #include "cxRecordSession.h"
+#include "cxAcquisitionService.h"
 
-namespace cx
-{
-//typedef boost::shared_ptr<class ReconstructionManager> ReconstructManagerPtr;
-}
 
 namespace cx
 {
@@ -75,8 +72,6 @@ public:
 	RecordSessionPtr getRecordSession(QString uid);
 	QString getNewUid();
 
-	UsReconstructionServicePtr getReconstructer() { return mReconstructer; };
-
 	//Interface for saving/loading
 	void addXml(QDomNode& dataNode);
 	void parseXml(QDomNode& dataNode);
@@ -105,13 +100,6 @@ class cxPluginAcquisition_EXPORT Acquisition : public QObject
 public:
 	Acquisition(AcquisitionDataPtr pluginData, QObject* parent = 0);
 	virtual ~Acquisition();
-
-	enum STATE
-	{
-		sRUNNING = 0,
-		sPOST_PROCESSING = 1,
-		sNOT_RUNNING = 2
-	};
 
 	/** Set ready status of acq.
 	  */
@@ -151,7 +139,7 @@ public:
 	RecordSessionPtr getLatestSession() { return mLatestSession; }
 	/** Return the current state
 	  */
-	STATE getState() const { return mCurrentState; }
+	AcquisitionService::STATE getState() const { return mCurrentState; }
 	AcquisitionDataPtr getPluginData() { return mPluginData; }
 
 signals:
@@ -176,8 +164,8 @@ signals:
 
 private:
 	RecordSessionPtr mLatestSession;
-	void setState(STATE newState);
-	STATE mCurrentState;
+	void setState(AcquisitionService::STATE newState);
+	AcquisitionService::STATE mCurrentState;
 	AcquisitionDataPtr mPluginData;
 
 	bool mReady;

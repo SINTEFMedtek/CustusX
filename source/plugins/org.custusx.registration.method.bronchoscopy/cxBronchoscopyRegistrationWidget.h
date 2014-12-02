@@ -80,10 +80,10 @@ private slots:
 	void acquisitionStopped();
     void obscuredSlot(bool obscured);
 
-	void duringSavePatientSlot();
-	void duringLoadPatientSlot();
+//	void duringSavePatientSlot();
+//	void duringLoadPatientSlot();
 	void acquisitionCancelled();
-	void duringClearPatientSlot();
+//	void duringClearPatientSlot();
 private:
 	QVBoxLayout* mVerticalLayout;
 	QLabel* mLabel;
@@ -93,7 +93,7 @@ private:
 	XmlOptionFile mOptions;
 	MeshPtr mMesh;
 
-	AcquisitionPtr mAcquisition;
+//	AcquisitionPtr mAcquisition;
 	RecordSessionWidgetPtr mRecordSessionWidget;
 	SelectMeshStringDataAdapterPtr mSelectMeshWidget;
 	StringDataAdapterXmlPtr mSessionSelector;
@@ -105,8 +105,8 @@ private:
 
     ToolRep3DPtr getToolRepIn3DView(ToolPtr tool);
 
-	void initSessionSelector(AcquisitionDataPtr acquisitionData);
-	QStringList getSessionList(AcquisitionDataPtr acquisitionData);
+	void initSessionSelector();
+	QStringList getSessionList();
 	void initializeTrackingService(RegServices services);
 
 	void createMaxNumberOfGenerations(QDomElement root);

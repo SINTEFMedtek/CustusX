@@ -58,7 +58,7 @@ class cxPluginAcquisition_EXPORT  TrackedCenterlineWidget : public TrackedRecord
 {
   Q_OBJECT
 public:
-  TrackedCenterlineWidget(AcquisitionDataPtr pluginData, QWidget* parent);
+  TrackedCenterlineWidget(AcquisitionServicePtr acquisitionService, QWidget* parent);
   virtual ~TrackedCenterlineWidget();
   virtual QString defaultWhatsThis() const;
 

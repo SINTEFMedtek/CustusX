@@ -60,6 +60,7 @@ include_directories(
 	${CustusX_BINARY_DIR}/source/logic
 
     ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
+    ${CustusX_SOURCE_DIR}/source/modules/Acquisition
     ${CustusX_SOURCE_DIR}/source/modules/Acquisition/gui
     ${CustusX_SOURCE_DIR}/source/modules/Acquisition/logic
     ${CustusX_SOURCE_DIR}/source/gui/utilities

@@ -36,15 +36,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPluginAcquisitionExport.h"
 
 #include "cxRecordBaseWidget.h"
-#include "cxUSAcquisition.h"
 
 namespace cx
 {
-	typedef boost::shared_ptr<class ThreadedTimedReconstructer> ThreadedTimedReconstructerPtr;
-}
-
-namespace cx
-{
+typedef boost::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
+typedef boost::shared_ptr<class ThreadedTimedReconstructer> ThreadedTimedReconstructerPtr;
 class TimedAlgorithmProgressBar;
 class DisplayTimerWidget;
 
@@ -66,7 +62,7 @@ class cxPluginAcquisition_EXPORT USAcqusitionWidget : public RecordBaseWidget
 {
 	Q_OBJECT
 public:
-	USAcqusitionWidget(AcquisitionDataPtr pluginData, QWidget* parent);
+	USAcqusitionWidget(AcquisitionServicePtr acquisitionService, UsReconstructionServicePtr usReconstructionService, QWidget* parent);
 	virtual ~USAcqusitionWidget();
 	virtual QString defaultWhatsThis() const;
 
@@ -83,7 +79,7 @@ private slots:
 	void recordCancelled();
 
 private:
-	USAcquisitionPtr mAcquisition;
+	UsReconstructionServicePtr mUsReconstructionService;
 	TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
 	DisplayTimerWidget* mDisplayTimerWidget;
 	QWidget* mOptionsWidget;

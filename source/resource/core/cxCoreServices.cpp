@@ -59,9 +59,9 @@ CoreServices CoreServices::getNullObjects()
 
 CoreServices::CoreServices()
 {
-	patientModelService	= cx::PatientModelService::getNullObject();
-	trackingService	= cx::TrackingService::getNullObject();
-	videoService	= cx::VideoService::getNullObject();
+	patientModelService	= PatientModelService::getNullObject();
+	trackingService		= TrackingService::getNullObject();
+	videoService		= VideoService::getNullObject();
 	spaceProvider.reset(new SpaceProviderImpl(trackingService, patientModelService));
 }
 } // cx

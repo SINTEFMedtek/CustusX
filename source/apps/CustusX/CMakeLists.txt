@@ -32,8 +32,11 @@ include_directories(
     ${CustusX_SOURCE_DIR}/source/modules/Registration/gui
     ${CustusX_BINARY_DIR}/source/modules/Registration
 
+    # To be removed when all old modules have been converted to plugins
     ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.usreconstruction
     ${CustusX_BINARY_DIR}/source/plugins/org.custusx.usreconstruction
+
+	${CustusX_SOURCE_DIR}/source/modules/Acquisition
 	)
 
 #------------------------------------------------------------------------------

@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include <vector>
 #include <boost/shared_ptr.hpp>
+class QDomNode;
 
 #define AcquisitionService_iid "cx::AcquisitionService"
 
@@ -59,6 +60,13 @@ class cxPluginAcquisition_EXPORT AcquisitionService : public QObject
 public:
 	virtual ~AcquisitionService() {}
 
+	enum STATE
+	{
+		sRUNNING = 0,
+		sPOST_PROCESSING = 1,
+		sNOT_RUNNING = 2
+	};
+
 	// Core interface
 
 	virtual bool isNull() = 0;
@@ -66,6 +74,21 @@ public:
 
 	virtual RecordSessionPtr getLatestSession() = 0;
 	virtual std::vector<RecordSessionPtr> getSessions() = 0;
+
+	virtual bool isReady() const = 0;
+	virtual QString getInfoText() const = 0;
+	virtual STATE getState() const = 0;
+	virtual void toggleRecord() = 0;
+	virtual void startRecord() = 0;
+	virtual void stopRecord() = 0;
+	virtual void cancelRecord() = 0;
+	virtual void startPostProcessing() = 0;
+	virtual void stopPostProcessing() = 0;
+
+	virtual int getNumberOfSavingThreads() const = 0;
+
+	virtual void addXml(QDomNode& dataNode) = 0;
+	virtual void parseXml(QDomNode& dataNode) = 0;
 
 	// Extented interface
 
@@ -77,6 +100,12 @@ signals:
 	void stateChanged();
 	void readinessChanged();
 	void acquisitionStopped();
+
+	void recordedSessionsChanged();
+
+	// From USAcquisition
+	void acquisitionDataReady(); ///< emitted when data is acquired and sent to the reconstruction module
+	void saveDataCompleted(QString mhdFilename);///< emitted when data has been saved to file
 };
 
 } // cx

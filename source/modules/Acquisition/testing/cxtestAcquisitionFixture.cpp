@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxStreamerServiceUtilities.h"
 #include "cxVideoSource.h"
+#include "cxAcquisitionServiceProxy.h"
 
 
 namespace cxtest
@@ -138,14 +139,12 @@ void AcquisitionFixture::initialize()
 
 	//Mock UsReconstructionService with null object
 	ctkPluginContext *pluginContext = cx::logicManager()->getPluginContext();
-	cx::UsReconstructionServicePtr reconstructer = cx::UsReconstructionServicePtr(new cx::UsReconstructionServiceProxy(pluginContext));
-	mAcquisitionData.reset(new cx::AcquisitionData(reconstructer));
+	mUsReconstructionService = cx::UsReconstructionServicePtr(new cx::UsReconstructionServiceProxy(pluginContext));
+	mAcquisitionService = cx::AcquisitionServicePtr(new cx::AcquisitionServiceProxy(pluginContext));
 
-	mAcquisitionBase.reset(new cx::Acquisition(mAcquisitionData));
-	mAcquisition.reset(new cx::USAcquisition(mAcquisitionBase));
-	connect(mAcquisitionBase.get(), SIGNAL(readinessChanged()), this, SLOT(readinessChangedSlot()));
-	connect(mAcquisition.get(), SIGNAL(saveDataCompleted(QString)), this, SLOT(saveDataCompletedSlot(QString)));
-	connect(mAcquisition.get(), SIGNAL(acquisitionDataReady()), this, SLOT(acquisitionDataReadySlot()));
+	connect(mAcquisitionService.get(), &cx::AcquisitionService::readinessChanged, this, &AcquisitionFixture::readinessChangedSlot);
+	connect(mAcquisitionService.get(), &cx::AcquisitionService::saveDataCompleted, this, &AcquisitionFixture::saveDataCompletedSlot);
+	connect(mAcquisitionService.get(), &cx::AcquisitionService::acquisitionDataReady, this, &AcquisitionFixture::acquisitionDataReadySlot);
 
 	// run setup of video, probe and start acquisition in series, each depending on the success of the previous:
 	QTimer::singleShot(0, this, SLOT(setupVideo()));
@@ -175,14 +174,14 @@ void AcquisitionFixture::start()
 		return;
 
 	SSC_LOG("");
-	mAcquisitionBase->startRecord();
+	mAcquisitionService->startRecord();
 	QTimer::singleShot(mRecordDuration, this, SLOT(stop()));
 }
 
 void AcquisitionFixture::stop()
 {
 	SSC_LOG("");
-	mAcquisitionBase->stopRecord();
+	mAcquisitionService->stopRecord();
 }
 
 void AcquisitionFixture::newFrameSlot()
@@ -193,20 +192,20 @@ void AcquisitionFixture::newFrameSlot()
 void AcquisitionFixture::readinessChangedSlot()
 {
 	std::cout << QString("Acquisition Ready Status %1: %2")
-	             .arg(mAcquisitionBase->isReady())
-	             .arg(mAcquisitionBase->getInfoText()) << std::endl;
+				 .arg(mAcquisitionService->isReady())
+				 .arg(mAcquisitionService->getInfoText()) << std::endl;
 }
 
 void AcquisitionFixture::acquisitionDataReadySlot()
 {
 	// read data and print info - this if the result of the memory pathway
-	mMemOutputData = mAcquisitionData->getReconstructer()->getSelectedFileData();
+	mMemOutputData = mUsReconstructionService->getSelectedFileData();
 }
 
 void AcquisitionFixture::saveDataCompletedSlot(QString path)
 {
 	// this is the last step: quit when finished
-	if (!mAcquisition->getNumberOfSavingThreads())
+	if (!mAcquisitionService->getNumberOfSavingThreads())
 		QTimer::singleShot(100,   qApp, SLOT(quit()) );
 
 	// read file and print info - this is the result of the file pathway
@@ -267,7 +266,7 @@ void AcquisitionFixture::verifyFileData(cx::USReconstructInputData fileData)
 
 void AcquisitionFixture::verify()
 {
-	CHECK(mAcquisition->getNumberOfSavingThreads()==0);
+	CHECK(mAcquisitionService->getNumberOfSavingThreads()==0);
 
 	QString msg = QString("Got %1 streams, expected %2").arg(mFileOutputData.size()).arg(mNumberOfExpectedStreams);
 	INFO(string_cast(msg));

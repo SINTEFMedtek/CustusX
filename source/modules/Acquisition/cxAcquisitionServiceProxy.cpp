@@ -40,6 +40,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
+AcquisitionServicePtr AcquisitionServiceProxy::create(ctkPluginContext *pluginContext)
+{
+	return AcquisitionServicePtr(new AcquisitionServiceProxy(pluginContext));
+}
+
 AcquisitionServiceProxy::AcquisitionServiceProxy(ctkPluginContext *context) :
 	mPluginContext(context),
 	mAcquisitionService(AcquisitionService::getNullObject())
@@ -66,6 +71,10 @@ void AcquisitionServiceProxy::onServiceAdded(AcquisitionService* service)
 	connect(service, &AcquisitionService::stateChanged, this, &AcquisitionService::stateChanged);
 	connect(service, &AcquisitionService::readinessChanged, this, &AcquisitionService::readinessChanged);
 	connect(service, &AcquisitionService::acquisitionStopped, this, &AcquisitionService::acquisitionStopped);
+	connect(service, &AcquisitionService::recordedSessionsChanged, this, &AcquisitionService::recordedSessionsChanged);
+
+	connect(service, &AcquisitionService::acquisitionDataReady, this, &AcquisitionService::acquisitionDataReady);
+	connect(service, &AcquisitionService::saveDataCompleted, this, &AcquisitionService::saveDataCompleted);
 
 	if(mAcquisitionService->isNull())
 		reportWarning("AcquisitionServiceProxy::onServiceAdded mAcquisitionService->isNull()");
@@ -78,6 +87,10 @@ void AcquisitionServiceProxy::onServiceRemoved(AcquisitionService *service)
 	disconnect(service, &AcquisitionService::stateChanged, this, &AcquisitionService::stateChanged);
 	disconnect(service, &AcquisitionService::readinessChanged, this, &AcquisitionService::readinessChanged);
 	disconnect(service, &AcquisitionService::acquisitionStopped, this, &AcquisitionService::acquisitionStopped);
+	disconnect(service, &AcquisitionService::recordedSessionsChanged, this, &AcquisitionService::recordedSessionsChanged);
+
+	disconnect(service, &AcquisitionService::acquisitionDataReady, this, &AcquisitionService::acquisitionDataReady);
+	disconnect(service, &AcquisitionService::saveDataCompleted, this, &AcquisitionService::saveDataCompleted);
 
 	mAcquisitionService = AcquisitionService::getNullObject();
 }
@@ -95,6 +108,66 @@ RecordSessionPtr AcquisitionServiceProxy::getLatestSession()
 std::vector<RecordSessionPtr> AcquisitionServiceProxy::getSessions()
 {
 	return mAcquisitionService->getSessions();
+}
+
+bool AcquisitionServiceProxy::isReady() const
+{
+	return mAcquisitionService->isReady();
+}
+
+QString AcquisitionServiceProxy::getInfoText() const
+{
+	return mAcquisitionService->getInfoText();
+}
+
+AcquisitionService::STATE AcquisitionServiceProxy::getState() const
+{
+	return mAcquisitionService->getState();
+}
+
+void AcquisitionServiceProxy::toggleRecord()
+{
+	mAcquisitionService->toggleRecord();
+}
+
+void AcquisitionServiceProxy::startRecord()
+{
+	mAcquisitionService->startRecord();
+}
+
+void AcquisitionServiceProxy::stopRecord()
+{
+	mAcquisitionService->stopRecord();
+}
+
+void AcquisitionServiceProxy::cancelRecord()
+{
+	mAcquisitionService->cancelRecord();
+}
+
+void AcquisitionServiceProxy::startPostProcessing()
+{
+	mAcquisitionService->startPostProcessing();
+}
+
+void AcquisitionServiceProxy::stopPostProcessing()
+{
+	mAcquisitionService->stopPostProcessing();
+}
+
+int AcquisitionServiceProxy::getNumberOfSavingThreads() const
+{
+	return mAcquisitionService->getNumberOfSavingThreads();
+}
+
+void AcquisitionServiceProxy::addXml(QDomNode &dataNode)
+{
+	mAcquisitionService->addXml(dataNode);
+}
+
+void AcquisitionServiceProxy::parseXml(QDomNode &dataNode)
+{
+	mAcquisitionService->parseXml(dataNode);
 }
 
 } //cx

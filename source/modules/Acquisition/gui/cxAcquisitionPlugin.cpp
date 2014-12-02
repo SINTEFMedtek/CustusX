@@ -47,9 +47,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-AcquisitionPlugin::AcquisitionPlugin(UsReconstructionServicePtr reconstructer)
+AcquisitionPlugin::AcquisitionPlugin(UsReconstructionServicePtr reconstructer, AcquisitionServicePtr acquisitionService) :
+	mUsReconstructionService(reconstructer),
+	mAcquisitionService(acquisitionService)
 {
-	mAcquisitionData.reset(new AcquisitionData(reconstructer));
 
 	connect(patientService().get(), SIGNAL(isSaving()), this, SLOT(duringSavePatientSlot()));
 	connect(patientService().get(), SIGNAL(isLoading()), this, SLOT(duringLoadPatientSlot()));
@@ -65,9 +66,9 @@ std::vector<GUIExtenderService::CategorizedWidget> AcquisitionPlugin::createWidg
 {
 	std::vector<CategorizedWidget> retval;
 
-	retval.push_back(GUIExtenderService::CategorizedWidget(new USAcqusitionWidget(mAcquisitionData, NULL), "Utility"));
+	retval.push_back(GUIExtenderService::CategorizedWidget(new USAcqusitionWidget(mAcquisitionService, mUsReconstructionService, NULL), "Utility"));
 
-	retval.push_back(GUIExtenderService::CategorizedWidget(new TrackedCenterlineWidget(mAcquisitionData, NULL), "Utility"));
+	retval.push_back(GUIExtenderService::CategorizedWidget(new TrackedCenterlineWidget(mAcquisitionService, NULL), "Utility"));
 
 	return retval;
 
@@ -75,12 +76,12 @@ std::vector<GUIExtenderService::CategorizedWidget> AcquisitionPlugin::createWidg
 
 void AcquisitionPlugin::addXml(QDomNode& parentNode)
 {
-	mAcquisitionData->addXml(parentNode);
+	mAcquisitionService->addXml(parentNode);
 }
 
 void AcquisitionPlugin::parseXml(QDomNode& dataNode)
 {
-	mAcquisitionData->parseXml(dataNode);
+	mAcquisitionService->parseXml(dataNode);
 }
 
 void AcquisitionPlugin::clearSlot()
