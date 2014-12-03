@@ -109,6 +109,7 @@ private slots:
 
 private:
 	QString getCommandLineStartupPatient();
+	void clearCache();
 
 	QDomDocument mWorkingDocument; ///< available during load and save, used to add/extract extra info from the file.
 	DataServicePtr mDataManager;

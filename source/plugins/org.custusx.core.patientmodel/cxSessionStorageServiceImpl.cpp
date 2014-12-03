@@ -37,19 +37,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTime.h"
 #include <QDir>
 #include "cxConfig.h"
-
+#include "cxFileHelpers.h"
+#include "cxDataLocations.h"
 
 namespace cx
 {
 
 SessionStorageServiceImpl::SessionStorageServiceImpl()
 {
+	this->clearCache();
 
 }
 
 SessionStorageServiceImpl::~SessionStorageServiceImpl()
 {
-
+	this->clearCache();
 }
 
 void SessionStorageServiceImpl::load(QString dir)
@@ -282,5 +284,11 @@ QString SessionStorageServiceImpl::getVersionName()
 	return QString("%1").arg(CustusX_VERSION_STRING);
 }
 
+void SessionStorageServiceImpl::clearCache()
+{
+//	std::cout << "DataLocations::getCachePath() " << DataLocations::getCachePath() << std::endl;
+	// clear the global cache used by app
+	removeNonemptyDirRecursively(DataLocations::getCachePath());
+}
 
 } // namespace cx

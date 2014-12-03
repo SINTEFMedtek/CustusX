@@ -13,7 +13,6 @@ set(PLUGIN_SRCS
   cxPatientModelImplService.cpp
   cxPatientModelImplService.h
     cxPatientData.cpp
-    cxPatientService.cpp
 	cxDataManager.cpp
 	cxDataManagerImpl.cpp
 	cxSessionStorageServiceImpl.cpp
@@ -23,7 +22,6 @@ set(PLUGIN_SRCS
 set(PLUGIN_MOC_SRCS
   cxPatientModelPluginActivator.h
     cxPatientData.h
-    cxPatientService.h
 	cxDataManager.h
 	cxDataManagerImpl.h
 	cxSessionStorageServiceImpl.h

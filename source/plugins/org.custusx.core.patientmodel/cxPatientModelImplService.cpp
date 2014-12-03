@@ -36,7 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxData.h"
 #include "cxReporter.h"
 #include "cxPatientData.h"
-#include "cxPatientService.h"
 #include "cxRegistrationTransform.h"
 #include "cxDataFactory.h"
 #include "cxDataManagerImpl.h"
@@ -85,13 +84,17 @@ void PatientModelImplService::createInterconnectedDataAndSpace()
 	mDataFactory.reset(new DataFactory(patientModelService, spaceProvider));
 	mDataService->setDataFactory(mDataFactory);
 
-	mPatientServiceOld = PatientService::create(mDataService);
+//	mPatientServiceOld = PatientService::create(mDataService);
+//	mPatientService = PatientService::create(mDataService);
+	mPatientData.reset(new PatientData(mDataService));
 }
 
 void PatientModelImplService::shutdownInterconnectedDataAndSpace()
 {
-	requireUnique(mPatientServiceOld, "PatientService");
-	mPatientServiceOld.reset();
+//	requireUnique(mPatientServiceOld, "PatientService");
+//	mPatientServiceOld.reset();
+	requireUnique(mPatientData, "PatientData");
+	mPatientData.reset();
 
 	// [HACK] break loop by removing connection to DataFactory and SpaceProvider
 	mDataService->setSpaceProvider(SpaceProviderPtr());
@@ -349,7 +352,7 @@ DataManagerImplPtr PatientModelImplService::dataService() const
 
 PatientDataPtr PatientModelImplService::patientData() const
 {
-	return mPatientServiceOld->getPatientData();
+	return mPatientData;
 }
 
 } /* namespace cx */

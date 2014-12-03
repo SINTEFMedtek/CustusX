@@ -42,8 +42,8 @@ namespace cx
 {
 typedef boost::shared_ptr<class DataManagerImpl> DataManagerImplPtr;
 typedef boost::shared_ptr<class PatientData> PatientDataPtr;
-typedef boost::shared_ptr<class PatientService> PatientServicePtr;
-typedef boost::shared_ptr<class DataManager> DataServicePtr;typedef boost::shared_ptr<class DataFactory> DataFactoryPtr;
+typedef boost::shared_ptr<class DataManager> DataServicePtr;
+typedef boost::shared_ptr<class DataFactory> DataFactoryPtr;
 
 /**
  * Implementation of PatientModelService.
@@ -123,7 +123,8 @@ private:
 	PatientDataPtr patientData() const;
 
 	DataManagerImplPtr mDataService;
-	PatientServicePtr mPatientServiceOld;
+	PatientDataPtr mPatientData;
+//	PatientServicePtr mPatientServiceOld;
 	DataFactoryPtr mDataFactory;
 };
 typedef boost::shared_ptr<PatientModelImplService> PatientModelImplServicePtr;

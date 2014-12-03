@@ -87,6 +87,7 @@ private:
 	QDomDocument readXmlFile(QString filename);
 	void writeXmlFile(QDomDocument doc, QString filename);
 	QString convertToValidFolderName(QString dir) const;
+	void clearCache(); ///< Clear the global cache used by the entire application (cx::DataLocations::getCachePath()).
 
 	QString mActivePatientFolder; ///< Folder for storing the files for the active patient. Path relative to globalPatientDataFolder.
 };
