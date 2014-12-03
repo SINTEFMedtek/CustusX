@@ -177,6 +177,8 @@ void Image::intitializeFromParentImage(ImagePtr parentImage)
 	this->setModality(parentImage->getModality());
 	this->setImageType(parentImage->getImageType());
 	this->setShading(parentImage->getShading());
+	mInitialWindowWidth = parentImage->getInitialWindowWidth();
+	mInitialWindowLevel = parentImage->getInitialWindowLevel();
 }
 
 DoubleBoundingBox3D Image::getInitialBoundingBox() const
@@ -236,12 +238,6 @@ void Image::resetTransferFunction(ImageTF3DPtr imageTransferFunctions3D, ImageLU
 
 void Image::resetTransferFunction(ImageLUT2DPtr imageLookupTable2D)
 {
-	if (!mBaseImageData)
-	{
-		reportWarning("Image has no image data");
-		return;
-	}
-
 	if (mImageLookupTable2D)
 	{
 		disconnect(mImageLookupTable2D.get(), SIGNAL(transferFunctionsChanged()), this,
@@ -260,12 +256,6 @@ void Image::resetTransferFunction(ImageLUT2DPtr imageLookupTable2D)
 
 void Image::resetTransferFunction(ImageTF3DPtr imageTransferFunctions3D)
 {
-	if (!mBaseImageData)
-	{
-		reportWarning("Image has no image data");
-		return;
-	}
-
 	if (mImageTransferFunctions3D)
 	{
 		disconnect(mImageTransferFunctions3D.get(), SIGNAL(transferFunctionsChanged()), this,
@@ -285,12 +275,6 @@ void Image::resetTransferFunction(ImageTF3DPtr imageTransferFunctions3D)
 
 void Image::transformChangedSlot()
 {
-//	if (mReferenceImageData)
-//	{
-//		Transform3D rMd = this->get_rMd();
-//		mOrientatorMatrix->DeepCopy(rMd.inv().getVtkMatrix());
-//		mReferenceImageData->Update();
-//	}
 }
 
 void Image::moveThisAndChildrenToThread(QThread* thread)
@@ -304,14 +288,8 @@ void Image::moveThisAndChildrenToThread(QThread* thread)
 
 void Image::setVtkImageData(const vtkImageDataPtr& data)
 {
-	//reportDebug("Image::setVtkImageData()");
 	mBaseImageData = data;
 	mBaseGrayScaleImageData = NULL;
-
-//	if (mOrientator)
-//	{
-//		mOrientator->SetInput(mBaseImageData);
-//	}
 
 	this->resetTransferFunctions();
 	emit vtkImageDataChanged();

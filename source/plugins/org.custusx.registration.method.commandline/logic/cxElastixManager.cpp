@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationTransform.h"
 #include "cxPatientModelService.h"
 #include "cxVisualizationService.h"
+#include "cxVolumeHelpers.h"
 
 namespace cx
 {
@@ -165,9 +166,10 @@ void ElastixManager::addNonlinearData()
 
 	QString uid = movingImage->getUid() + "_nl%1";
 	QString name = movingImage->getName()+" nl%1";
-	ImagePtr nlVolume = mServices.patientModelService->createSpecificData<Image>(uid, name);
-	nlVolume->setVtkImageData(raw->getBaseVtkImageData());
-	nlVolume->intitializeFromParentImage(movingImage);
+
+	ImagePtr nlVolume = createDerivedImage(mServices.patientModelService,
+										 uid, name,
+										 raw->getBaseVtkImageData(), movingImage);
 
 	// volume is resampled into the space of the fixed data:
 	nlVolume->get_rMd_History()->setRegistration(mServices.registrationService->getFixedData()->get_rMd());
