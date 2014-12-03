@@ -57,7 +57,8 @@ public:
 		return retval;
 	}
 
-	ViewLinkingViewWidget(ViewWidget* base, vtkRenderWindowPtr renderWindow) : ViewRepCollection(renderWindow, "")
+	ViewLinkingViewWidget(ViewWidget* base, vtkRenderWindowPtr renderWindow) :
+		ViewRepCollection(renderWindow, "")
 	{
 		mBase = base;
 
