@@ -124,15 +124,15 @@ void RegistrationWidget::onCurrentChanged(int index)
 
 void RegistrationWidget::indexChanged(QString registrationType)
 {
-	StringDataAdapterXmlPtr comboBox = mMethodsSelectorMap[registrationType];
+	StringDataAdapterXmlPtr methodSelector = mMethodsSelectorMap[registrationType];
 	QStackedWidget *stackedWidget = mRegistrationTypeMap[registrationType];
-	this->selectStackWidget(comboBox, stackedWidget);
+	this->selectStackWidget(methodSelector, stackedWidget);
 }
 
-void RegistrationWidget::selectStackWidget(StringDataAdapterXmlPtr comboBox, QStackedWidget *stackedWidget)
+void RegistrationWidget::selectStackWidget(StringDataAdapterXmlPtr methodSelector, QStackedWidget *stackedWidget)
 {
-	QString method = comboBox->getValue();
-	int pos = comboBox->getValueRange().indexOf(method);
+	QString method = methodSelector->getValue();
+	int pos = methodSelector->getValueRange().indexOf(method);
 	stackedWidget->setCurrentIndex(pos);
 }
 
@@ -152,16 +152,22 @@ void RegistrationWidget::onServiceAdded(RegistrationMethodService* service)
 	if(!this->knownType(service->getRegistrationType()))
 		return;
 
-	StringDataAdapterXmlPtr comboBox = mMethodsSelectorMap[service->getRegistrationType()];
+	StringDataAdapterXmlPtr methodSelector = mMethodsSelectorMap[service->getRegistrationType()];
 	QStackedWidget *stackedWidget = mRegistrationTypeMap[service->getRegistrationType()];
 
 	stackedWidget->addWidget(service->createWidget());
-	QStringList values = comboBox->getValueRange();
+	QStringList values = methodSelector->getValueRange();
 	values << service->getRegistrationMethod();
-	comboBox->setValueRange(values);
+	methodSelector->setValueRange(values);
 
-	if (comboBox->getValue() == service->getRegistrationMethod())
-		this->selectStackWidget(comboBox, stackedWidget);
+	// initialize if not set
+	if (methodSelector->getValue().isEmpty())
+	{
+		methodSelector->setValue(service->getRegistrationMethod());
+	}
+
+	if (methodSelector->getValue() == service->getRegistrationMethod())
+		this->selectStackWidget(methodSelector, stackedWidget);
 }
 
 bool RegistrationWidget::knownType(QString registrationType)

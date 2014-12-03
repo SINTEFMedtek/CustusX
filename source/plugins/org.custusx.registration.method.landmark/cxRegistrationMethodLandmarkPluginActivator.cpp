@@ -56,9 +56,9 @@ void RegistrationMethodLandmarkPluginActivator::start(ctkPluginContext* context)
 	RegistrationMethodLandmarkImageToPatientService* image2patientService = new RegistrationMethodLandmarkImageToPatientService(services);
 	RegistrationMethodFastLandmarkImageToPatientService* fastImage2patientService = new RegistrationMethodFastLandmarkImageToPatientService(services);
 
-	mRegistrationImageToImage = RegisteredServicePtr(new RegisteredService(context, image2imageService, RegistrationMethodService_iid));
-	mRegistrationImageToPatient = RegisteredServicePtr(new RegisteredService(context, image2patientService, RegistrationMethodService_iid));
-	mRegistrationFastImageToPatient = RegisteredServicePtr(new RegisteredService(context, fastImage2patientService, RegistrationMethodService_iid));
+	mRegistrationImageToImage = RegisteredService::create(context, image2imageService, RegistrationMethodService_iid);
+	mRegistrationImageToPatient = RegisteredService::create(context, image2patientService, RegistrationMethodService_iid);
+	mRegistrationFastImageToPatient = RegisteredService::create(context, fastImage2patientService, RegistrationMethodService_iid);
 }
 
 void RegistrationMethodLandmarkPluginActivator::stop(ctkPluginContext* context)
