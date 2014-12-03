@@ -39,10 +39,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString>
 #include <QObject>
 #include "cxForwardDeclarations.h"
-//#include "cxTransform3D.h"
-//#include <QDomDocument>
 
 class QDomElement;
+
+#define SessionStorageService_iid "cx::SessionStorageService"
 
 namespace cx
 {
@@ -71,6 +71,9 @@ public:
 	virtual bool isValid() const = 0;
 	virtual QString getRootFolder() const = 0;
 
+	virtual bool isNull() const = 0;
+	static SessionStorageServicePtr getNullObject();
+
 signals:
 	void cleared(); ///< emitted when session is cleared, before isLoading is called
 	void sessionChanged(); ///< emitted after change to a new session (new or loaded or cleared)
@@ -79,5 +82,7 @@ signals:
 };
 
 } // namespace cx
+
+Q_DECLARE_INTERFACE(cx::SessionStorageService, SessionStorageService_iid)
 
 #endif // CXSESSIONSTORAGESERVICE_H

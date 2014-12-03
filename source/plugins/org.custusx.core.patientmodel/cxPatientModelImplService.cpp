@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackingServiceProxy.h"
 #include "cxPatientModelServiceProxy.h"
 #include "cxSpaceProviderImpl.h"
+#include "cxSessionStorageServiceProxy.h"
 
 namespace cx
 {
@@ -86,7 +87,9 @@ void PatientModelImplService::createInterconnectedDataAndSpace()
 
 //	mPatientServiceOld = PatientService::create(mDataService);
 //	mPatientService = PatientService::create(mDataService);
-	mPatientData.reset(new PatientData(mDataService));
+	SessionStorageServicePtr session = SessionStorageServiceProxy::create(mContext);
+
+	mPatientData.reset(new PatientData(mDataService, session));
 }
 
 void PatientModelImplService::shutdownInterconnectedDataAndSpace()

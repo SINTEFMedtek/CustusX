@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-SessionStorageServiceImpl::SessionStorageServiceImpl()
+SessionStorageServiceImpl::SessionStorageServiceImpl(ctkPluginContext *context)
 {
 	this->clearCache();
 
@@ -53,6 +53,12 @@ SessionStorageServiceImpl::~SessionStorageServiceImpl()
 {
 	this->clearCache();
 }
+
+bool SessionStorageServiceImpl::isNull() const
+{
+	return false;
+}
+
 
 void SessionStorageServiceImpl::load(QString dir)
 {

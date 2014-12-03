@@ -54,16 +54,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImage.h"
 #include "cxTypeConversions.h"
 #include "cxConfig.h"
-#include "cxSessionStorageServiceImpl.h"
+#include "cxSessionStorageService.h"
 #include "cxXMLNodeWrapper.h"
 
 namespace cx
 {
 
 
-PatientData::PatientData(DataServicePtr dataManager) : mDataManager(dataManager)
+PatientData::PatientData(DataServicePtr dataManager, SessionStorageServicePtr session) :
+	mDataManager(dataManager),
+	mSession(session)
 {
-	mSession.reset(new SessionStorageServiceImpl());
 	connect(mSession.get(), &SessionStorageService::sessionChanged, this, &PatientData::patientChanged);
 	connect(mSession.get(), &SessionStorageService::cleared, this, &PatientData::onCleared);
 	connect(mSession.get(), &SessionStorageService::cleared, this, &PatientData::cleared);

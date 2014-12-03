@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 
 #include "cxPatientModelImplService.h"
+#include "cxSessionStorageServiceImpl.h"
 #include "cxRegisteredService.h"
 
 namespace cx
@@ -51,12 +52,14 @@ PatientModelPluginActivator::~PatientModelPluginActivator()
 
 void PatientModelPluginActivator::start(ctkPluginContext* context)
 {
-	mRegistration = RegisteredService::create<PatientModelImplService>(context, PatientModelService_iid);
+	mSessionStorage = RegisteredService::create<SessionStorageServiceImpl>(context, SessionStorageService_iid);
+	mPatientModel = RegisteredService::create<PatientModelImplService>(context, PatientModelService_iid);
 }
 
 void PatientModelPluginActivator::stop(ctkPluginContext* context)
 {
-	mRegistration.reset();
+	mPatientModel.reset();
+	mSessionStorage.reset();
 	Q_UNUSED(context);
 }
 

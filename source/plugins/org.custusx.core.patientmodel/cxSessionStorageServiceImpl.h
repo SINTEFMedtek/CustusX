@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSessionStorageService.h"
 #include <QDomDocument>
 class QDomDocument;
+class ctkPluginContext;
 
 namespace cx
 {
@@ -59,13 +60,14 @@ class cxResource_EXPORT SessionStorageServiceImpl : public SessionStorageService
 {
 	Q_OBJECT
 public:
-	SessionStorageServiceImpl();
+	SessionStorageServiceImpl(ctkPluginContext* context);
 	virtual ~SessionStorageServiceImpl();
 	virtual void load(QString dir); ///< load session from dir, or create new session in this location if none exist
 	virtual void save(); ///< Save all application data to XML file
 	virtual void clear();
 	virtual bool isValid() const;
 	virtual QString getRootFolder() const;
+	virtual bool isNull() const;
 
 private:
 	QString getNullFolder() const;

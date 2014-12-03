@@ -69,7 +69,7 @@ class org_custusx_core_patientmodel_EXPORT PatientData: public QObject
 {
 Q_OBJECT
 public:
-	explicit PatientData(DataServicePtr dataManager);
+	explicit PatientData(DataServicePtr dataManager, SessionStorageServicePtr session);
 	virtual ~PatientData();
 
 	QString getActivePatientFolder() const;

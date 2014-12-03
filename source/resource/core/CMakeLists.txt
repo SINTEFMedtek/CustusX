@@ -76,9 +76,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	settings/cxStateService
 	settings/cxStateServiceNull
 	settings/cxStateServiceProxy
-	settings/cxSessionStorageService.h
-	settings/cxSessionStorageServiceNull.h
-	settings/cxSessionStorageServiceProxy.h
+	settings/cxSessionStorageService
 
 	algorithms/cxTimedAlgorithm.h
     algorithms/cxThreadedTimedAlgorithm.h
@@ -178,7 +176,8 @@ cx_add_class(cxResource_SOURCE
 	
 	settings/cxDataLocations
 	settings/cxSettings
-			
+	settings/cxSessionStorageServiceProxy
+
 	vesselReg/SeansVesselReg.cxx
 	vesselReg/SeansVesselReg.hxx
 	vesselReg/HackTPSTransform.hxx
