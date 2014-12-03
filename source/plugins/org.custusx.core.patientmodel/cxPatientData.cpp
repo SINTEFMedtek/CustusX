@@ -54,41 +54,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImage.h"
 #include "cxTypeConversions.h"
 #include "cxConfig.h"
+#include "cxSessionStorageServiceImpl.h"
+#include "cxXMLNodeWrapper.h"
 
 namespace cx
 {
 
-/**given a root node, use the /-separated path to descend
- * into the root children recursively. Create elements if
- * necessary.
- *
- */
-QDomElement getElementForced(QDomNode root, QString path)
-{
-	QStringList pathList = path.split("/");
-	QDomElement current = root.toElement();
-
-	if (current.isNull())
-		return current;
-
-	for (int i = 0; i < pathList.size(); ++i)
-	{
-		QDomElement next = current.namedItem(pathList[i]).toElement();
-
-		if (next.isNull())
-		{
-			next = root.ownerDocument().createElement(pathList[i]);
-			current.appendChild(next);
-		}
-
-		current = next;
-	}
-
-	return current;
-}
 
 PatientData::PatientData(DataServicePtr dataManager) : mDataManager(dataManager)
 {
+	mSession.reset(new SessionStorageServiceImpl());
+	connect(mSession.get(), &SessionStorageService::sessionChanged, this, &PatientData::patientChanged);
+	connect(mSession.get(), &SessionStorageService::cleared, this, &PatientData::onCleared);
+	connect(mSession.get(), &SessionStorageService::cleared, this, &PatientData::cleared);
+	connect(mSession.get(), &SessionStorageService::isLoading, this, &PatientData::onSessionLoad);
+	connect(mSession.get(), &SessionStorageService::isSaving, this, &PatientData::onSessionSave);
+
 	QTimer::singleShot(100, this, SLOT(startupLoadPatient())); // make sure this is called after application state change
 }
 
@@ -97,17 +78,19 @@ PatientData::~PatientData()
 
 QString PatientData::getActivePatientFolder() const
 {
-	return mActivePatientFolder;
+	return mSession->getRootFolder();
 }
 
 bool PatientData::isPatientValid() const
 {
-	return !mActivePatientFolder.isEmpty() && (mActivePatientFolder != this->getNullFolder());
+	return mSession->isValid();
 }
 
 QDomElement PatientData::getCurrentWorkingElement(QString path)
 {
-	return getElementForced(mWorkingDocument.documentElement(), path);
+	XMLNodeAdder root(mWorkingDocument.documentElement());
+	return root.descend(path).node().toElement();
+//	return getElementForced(mWorkingDocument.documentElement(), path);
 }
 
 QDomDocument PatientData::getCurrentWorkingDocument()
@@ -115,29 +98,9 @@ QDomDocument PatientData::getCurrentWorkingDocument()
 	return mWorkingDocument;
 }
 
-void PatientData::reportActivePatient()
-{
-	report("Set Active Patient: " + mActivePatientFolder);
-}
-
-void PatientData::setActivePatient(const QString& activePatientFolder)
-{
-	if (activePatientFolder == mActivePatientFolder)
-		return;
-
-	mActivePatientFolder = activePatientFolder;
-
-	emit patientChanged();
-}
-
 void PatientData::newPatient(QString choosenDir)
 {
-	this->clearPatientSilent();
-	createPatientFolders(choosenDir);
-	this->setActivePatient(choosenDir);
-	this->savePatient();
-	this->reportActivePatient();
-	this->writeRecentPatientData();
+	mSession->load(choosenDir);
 }
 
 /**Remove all data referring to the current patient from the system,
@@ -145,22 +108,12 @@ void PatientData::newPatient(QString choosenDir)
  */
 void PatientData::clearPatient()
 {
-	this->clearPatientSilent();
-	this->reportActivePatient();
-	this->writeRecentPatientData();
+	mSession->clear();
 }
 
-void PatientData::clearPatientSilent()
+void PatientData::onCleared()
 {
 	mDataManager->clear();
-	this->setActivePatient(this->getNullFolder());
-	emit cleared();
-}
-
-QString PatientData::getNullFolder() const
-{
-	QString patientDatafolder = settings()->value("globalPatientDataFolder").toString();
-	return patientDatafolder + "/NoPatient";
 }
 
 /**Parse command line and return --load <patient folder> folder,
@@ -183,6 +136,7 @@ QString PatientData::getCommandLineStartupPatient()
  */
 void PatientData::startupLoadPatient()
 {
+
 	QString folder = this->getCommandLineStartupPatient();
 
 	if (!folder.isEmpty())
@@ -217,48 +171,47 @@ void PatientData::startupLoadPatient()
 	this->loadPatient(folder);
 }
 
-bool PatientData::isActivePatient(QString patient) const
-{
-	return (patient == mActivePatientFolder);
-}
-
 void PatientData::loadPatient(QString choosenDir)
 {
-	if (this->isActivePatient(choosenDir))
-		return;
-	this->loadPatientSilent(choosenDir);
-	this->reportActivePatient();
-	this->writeRecentPatientData();
+	mSession->load(choosenDir);
 }
 
-void PatientData::loadPatientSilent(QString choosenDir)
+void PatientData::onSessionLoad(QDomElement &node)
 {
-	if (this->isActivePatient(choosenDir))
-		return;
-	this->clearPatientSilent();
-	if (choosenDir == QString::null)
-		return; // On cancel
+	XMLNodeParser root(node);
+	QDomElement dataManagerNode = root.descend("managers/datamanager").node().toElement();
 
-	QFile file(choosenDir + "/custusdoc.xml");
-	if (file.open(QIODevice::ReadOnly))
+	if (!dataManagerNode.isNull())
 	{
-		QDomDocument doc;
-		QString emsg;
-		int eline, ecolumn;
-		// Read the file
-		if (!doc.setContent(&file, false, &emsg, &eline, &ecolumn))
-		{
-			reportError("Could not parse XML file :" + file.fileName() + " because: " + emsg + "");
-		}
-		else
-		{
-			//Read the xml
-			this->readLoadDoc(doc, choosenDir);
-		}
-		file.close();
+		mDataManager->parseXml(dataManagerNode, mSession->getRootFolder());
 	}
 
-	this->setActivePatient(choosenDir);
+	mWorkingDocument = node.ownerDocument();
+	emit isLoading();
+	mWorkingDocument = QDomDocument();
+}
+
+void PatientData::onSessionSave(QDomElement &node)
+{
+	XMLNodeAdder root(node);
+	QDomElement managerNode = root.descend("managers").node().toElement();
+
+	mDataManager->addXml(managerNode);
+
+	mWorkingDocument = node.ownerDocument();
+	emit isSaving();
+	mWorkingDocument = QDomDocument();
+
+	// save position transforms into the mhd files.
+	// This hack ensures data files can be used in external programs without an explicit export.
+	DataManager::ImagesMap images = mDataManager->getImages();
+	for (DataManager::ImagesMap::iterator iter = images.begin(); iter != images.end(); ++iter)
+	{
+		CustomMetaImagePtr customReader = CustomMetaImage::create(
+						mSession->getRootFolder() + "/" + iter->second->getFilename());
+		customReader->setTransform(iter->second->get_rMd());
+	}
+
 }
 
 void PatientData::autoSave()
@@ -269,61 +222,13 @@ void PatientData::autoSave()
 
 void PatientData::savePatient()
 {
-
-	if (mActivePatientFolder.isEmpty())
-		return;
-
-	//Gather all the information that needs to be saved
-	QDomDocument doc;
-	this->generateSaveDoc(doc);
-	mWorkingDocument = doc;
-	emit isSaving(); // give all listeners a chance to add to the document
-
-	QFile file(mActivePatientFolder + "/custusdoc.xml");
-	if (file.open(QIODevice::WriteOnly | QIODevice::Truncate))
-	{
-		QTextStream stream(&file);
-		stream << doc.toString(4);
-		file.close();
-	}
-	else
-	{
-		reportError("Could not open " + file.fileName() + " Error: " + file.errorString());
-	}
-
-	// save position transforms into the mhd files.
-	// This hack ensures data files can be used in external programs without an explicit export.
-	DataManager::ImagesMap images = mDataManager->getImages();
-	for (DataManager::ImagesMap::iterator iter = images.begin(); iter != images.end(); ++iter)
-	{
-		CustomMetaImagePtr customReader = CustomMetaImage::create(
-						mActivePatientFolder + "/" + iter->second->getFilename());
-		customReader->setTransform(iter->second->get_rMd());
-	}
-
-	//Write the data to file, fx modified images... etc...
-	//TODO Implement when we know what we want to save here...
-
-	mWorkingDocument = QDomDocument();
-
-	report("Saved patient " + mActivePatientFolder);
-	this->writeRecentPatientData();
-
-}
-
-/** Writes settings info describing the patient name and current time.
-  * Used for auto load.
-  */
-void PatientData::writeRecentPatientData()
-{
-	settings()->setValue("startup/lastPatient", mActivePatientFolder);
-	settings()->setValue("startup/lastPatientSaveTime", QDateTime::currentDateTime().toString(timestampSecondsFormat()));
+	mSession->save();
 }
 
 
 void PatientData::exportPatient(bool niftiFormat)
 {
-	QString targetFolder = mActivePatientFolder + "/Export/"
+	QString targetFolder = mSession->getRootFolder() + "/Export/"
 					+ QDateTime::currentDateTime().toString(timestampSecondsFormat());
 
 	DataManager::ImagesMap images = mDataManager->getImages();
@@ -353,64 +258,6 @@ void PatientData::exportPatient(bool niftiFormat)
 	report("Exported patient data to " + targetFolder + ".");
 }
 
-bool PatientData::copyFile(QString source, QString dest, QString &infoText)
-{
-	if (source == dest)
-		return true;
-
-	QFileInfo info(dest);
-
-	if (info.exists())
-	{
-		QString text = "File already exists: " + dest + ", copy skipped.";
-		infoText = "<font color=orange>" + text + "</font><br>";
-		reportWarning(text);
-		return true;
-	}
-
-	QDir().mkpath(info.path());
-
-	QFile toFile(dest);
-	QFile(source).copy(toFile.fileName());
-	if (!toFile.flush())
-	{
-		QString text = "Failed to copy file: " + source;
-		reportWarning(text);
-		infoText = "<font color=red>" + text + "</font><br>";
-		return false;
-	}
-	if (!toFile.exists())
-	{
-		QString text = "File not copied: " + source;
-		reportWarning(text);
-		infoText = "<font color=red>" + text + "</font><br>";
-		return false;
-	}
-
-	report("Copied " + source + " -> " + dest);
-
-	return true;
-}
-
-//bool PatientData::copyAllSimilarFiles(QString fileName, QString destFolder, QString &infoText)
-//{
-//	QDir sourceFolder(QFileInfo(fileName).path());
-//	QStringList filter;
-//	filter << QFileInfo(fileName).completeBaseName() + ".*";
-//	QStringList sourceFiles = sourceFolder.entryList(filter, QDir::Files);
-
-//	for (int i = 0; i < sourceFiles.size(); ++i)
-//	{
-//		QString sourceFile = sourceFolder.path() + "/" + sourceFiles[i];
-//		QString destFile = destFolder + "/" + QFileInfo(sourceFiles[i]).fileName();
-//		QString text;
-//		this->copyFile(sourceFile, destFile, text);
-//		infoText.append(text);
-//	}
-
-//	return true;
-//}
-
 DataPtr PatientData::importData(QString fileName, QString &infoText)
 {
 	if (fileName.isEmpty())
@@ -421,11 +268,8 @@ DataPtr PatientData::importData(QString fileName, QString &infoText)
 		return DataPtr();
 	}
 
-//	QString patientsImageFolder = mActivePatientFolder + "/Images/";
-
 	QFileInfo fileInfo(fileName);
 	QString fileType = fileInfo.suffix();
-//	QString pathToNewFile = patientsImageFolder + fileInfo.fileName();
 	QFile fromFile(fileName);
 	QString strippedFilename = changeExtension(fileInfo.fileName(), "");
 	QString uid = strippedFilename + "_" + QDateTime::currentDateTime().toString(timestampSecondsFormat());
@@ -451,12 +295,7 @@ DataPtr PatientData::importData(QString fileName, QString &infoText)
 
 	data->setShadingOn(true);
 
-//	QDir patientDataDir(mActivePatientFolder);
-
-//	data->setFilePath(patientDataDir.relativeFilePath(pathToNewFile)); // Update file path
-
-	mDataManager->saveData(data, mActivePatientFolder);
-//	this->copyAllSimilarFiles(fileName, patientsImageFolder, infoText);
+	mDataManager->saveData(data, mSession->getRootFolder());
 
 	// remove redundant line breaks
 	infoText = infoText.split("<br>", QString::SkipEmptyParts).join("<br>");
@@ -467,119 +306,6 @@ DataPtr PatientData::importData(QString fileName, QString &infoText)
 void PatientData::removeData(QString uid)
 {
 	mDataManager->removeData(uid, this->getActivePatientFolder());
-}
-
-void PatientData::createPatientFolders(QString choosenDir)
-{
-	if (!choosenDir.endsWith(".cx3"))
-		choosenDir.append(".cx3");
-
-	report("Selected a patient to work with.");
-
-	// Create folders
-	if (!QDir().exists(choosenDir))
-	{
-		QDir().mkdir(choosenDir);
-		report("Made a new patient folder: " + choosenDir);
-	}
-
-	QString newDir = choosenDir;
-	newDir.append("/Images");
-	if (!QDir().exists(newDir))
-	{
-		QDir().mkdir(newDir);
-		report("Made a new image folder: " + newDir);
-	}
-
-	newDir = choosenDir;
-	newDir.append("/Logs");
-	if (!QDir().exists(newDir))
-	{
-		QDir().mkdir(newDir);
-		report("Made a new logging folder: " + newDir);
-	}
-
-	newDir = choosenDir;
-	newDir.append("/US_Acq");
-	if (!QDir().exists(newDir))
-	{
-		QDir().mkdir(newDir);
-		report("Made a new ultrasound folder: " + newDir);
-	}
-
-//	this->savePatient();
-}
-
-QString PatientData::getVersionName()
-{
-    return QString("%1").arg(CustusX_VERSION_STRING);
-}
-
-/**
- * Xml version 1.0: Knows about the nodes: \n
- * \<managers\> \n
- *   \<datamanager\> \n
- *     \<image\> \n
- *        \<uid\> //an images unique id \n
- *        \<name\> //an images name \n
- *        \<transferfunctions\> //an images transferefunction \n
- *            \<alpha\> //a transferefunctions alpha values \n
- *            \<color\> //a transferefunctions color values
- */
-/**
- * Xml version 2.0: Knows about the nodes: \n
- * \<patient\> \n
- *  \<active_patient\> //relative path to this patients folder \n
- *  \<managers\> \n
- *     \<datamanager\> \n
- *       \<image\> \n
- *         \<uid\> //an images unique id \n
- *         \<name\> //an images name \n
- *         \<transferfunctions\> //an images transferefunction \n
- *            \<alpha\> //a transferefunctions alpha values \n
- *            \<color\> //a transferefunctions color values \n
- */
-void PatientData::generateSaveDoc(QDomDocument& doc)
-{
-	doc.appendChild(doc.createProcessingInstruction("xml version =", "'1.0'"));
-
-	QDomElement patientNode = doc.createElement("patient");
-
-	// note: all nodes must be below <patient>. XML requires only one root node per file.
-	QDomElement versionName = doc.createElement("version_name");
-	versionName.appendChild(doc.createTextNode(this->getVersionName()));
-	patientNode.appendChild(versionName);
-
-	QDomElement activePatientNode = doc.createElement("active_patient");
-	activePatientNode.appendChild(doc.createTextNode(mActivePatientFolder.toStdString().c_str()));
-	patientNode.appendChild(activePatientNode);
-	doc.appendChild(patientNode);
-
-	QDomElement managerNode = doc.createElement("managers");
-	patientNode.appendChild(managerNode);
-
-	mDataManager->addXml(managerNode);
-}
-
-void PatientData::readLoadDoc(QDomDocument& doc, QString patientFolder)
-{
-	mWorkingDocument = doc;
-	//Get all the nodes
-	QDomNode patientNode = doc.namedItem("patient");
-	QDomNode managerNode = patientNode.namedItem("managers");
-
-	//Evaluate the xml nodes and load what's needed
-	QDomNode dataManagerNode = managerNode.namedItem("datamanager");
-
-	if (!dataManagerNode.isNull())
-	{
-		mDataManager->parseXml(dataManagerNode, patientFolder);
-	}
-
-	emit
-	isLoading();
-
-	mWorkingDocument = QDomDocument();
 }
 
 } // namespace cx

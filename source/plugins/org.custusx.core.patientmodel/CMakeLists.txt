@@ -16,6 +16,7 @@ set(PLUGIN_SRCS
     cxPatientService.cpp
 	cxDataManager.cpp
 	cxDataManagerImpl.cpp
+	cxSessionStorageServiceImpl.cpp
 )
 
 # Files which should be processed by Qts moc
@@ -25,6 +26,7 @@ set(PLUGIN_MOC_SRCS
     cxPatientService.h
 	cxDataManager.h
 	cxDataManagerImpl.h
+	cxSessionStorageServiceImpl.h
 )
 
 # Qt Designer files which should be processed by Qts uic
