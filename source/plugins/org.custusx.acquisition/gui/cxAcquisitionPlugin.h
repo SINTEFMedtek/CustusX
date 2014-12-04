@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxGUIExtenderService.h"
 class QDomNode;
+class ctkPluginContext;
 
 /**
  * \defgroup cx_module_acquisition Acquisition Plugin
@@ -68,7 +69,7 @@ class org_custusx_acquisition_EXPORT  AcquisitionPlugin: public GUIExtenderServi
 {
 Q_OBJECT
 public:
-	AcquisitionPlugin(UsReconstructionServicePtr reconstructer, AcquisitionServicePtr acquisitionService);
+	AcquisitionPlugin(ctkPluginContext *context);
 	virtual ~AcquisitionPlugin();
 
 	virtual std::vector<CategorizedWidget> createWidgets() const;

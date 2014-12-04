@@ -67,8 +67,8 @@ set(PLUGIN_SRCS
     logic/cxUSAcquisition.cpp
 	logic/cxUSSavingRecorder.h
 	logic/cxUSSavingRecorder.cpp
-#    gui/cxAcquisitionPlugin.h
-#    gui/cxAcquisitionPlugin.cpp
+	gui/cxAcquisitionPlugin.h
+	gui/cxAcquisitionPlugin.cpp
     gui/cxUSAcqusitionWidget.h
     gui/cxUSAcqusitionWidget.cpp
     gui/cxSoundSpeedConversionWidget.h
@@ -92,7 +92,7 @@ set(PLUGIN_MOC_SRCS
     gui/cxSoundSpeedConversionWidget.h
     gui/cxUSAcqusitionWidget.h
     gui/cxSelectRecordSessionStringDataAdapter.h
-#    gui/cxAcquisitionPlugin.h
+    gui/cxAcquisitionPlugin.h
 )
 
 # Qt Designer files which should be processed by Qts uic

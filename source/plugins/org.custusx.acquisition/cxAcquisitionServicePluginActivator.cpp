@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxAcquisitionImplService.h"
 #include "cxRegisteredService.h"
+#include "cxAcquisitionPlugin.h"
 
 namespace cx
 {
@@ -50,12 +51,15 @@ AcquisitionServicePluginActivator::~AcquisitionServicePluginActivator()
 
 void AcquisitionServicePluginActivator::start(ctkPluginContext* context)
 {
-	mRegistration = RegisteredService::create<AcquisitionImplService>(context, AcquisitionService_iid);
+	mRegisteredAcquisitionService = RegisteredService::create<AcquisitionImplService>(context, AcquisitionService_iid);
+
+	mRegisteredAcquisitionGUIService = RegisteredService::create<AcquisitionPlugin>(context, GUIExtenderService_iid);
 }
 
 void AcquisitionServicePluginActivator::stop(ctkPluginContext* context)
 {
-	mRegistration.reset();
+	mRegisteredAcquisitionGUIService.reset();
+	mRegisteredAcquisitionService.reset();
 	Q_UNUSED(context);
 }
 
