@@ -46,7 +46,7 @@ ViewCollectionWidgetUsingViewContainer::ViewCollectionWidgetUsingViewContainer()
 	this->setLayout(layout);
 	layout->setSpacing(0);
 	layout->setMargin(0);
-	mViewContainer = new ViewContainer;
+	mViewContainer = new ViewContainer(this);
 	mViewContainer->getGridLayout()->setSpacing(2);
 	mViewContainer->getGridLayout()->setMargin(4);
 	layout->addWidget(mViewContainer);
