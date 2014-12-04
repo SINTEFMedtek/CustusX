@@ -64,7 +64,7 @@ ViewPtr LayoutWidgetUsingViewWidgets::addView(View::Type type, LayoutRegion regi
 
 	mLayout->addWidget(view, region.pos.row, region.pos.col, region.span.row, region.span.col);
 	view_utils::setStretchFactors(mLayout, region, 1);
-	view->show();
+//	view->show();
 
 	mViews.push_back(view);
 
