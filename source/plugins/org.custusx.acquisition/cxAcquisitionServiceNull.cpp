@@ -111,16 +111,6 @@ int AcquisitionServiceNull::getNumberOfSavingThreads() const
 	return 0;
 }
 
-void AcquisitionServiceNull::addXml(QDomNode &dataNode)
-{
-	printWarning();
-}
-
-void AcquisitionServiceNull::parseXml(QDomNode &dataNode)
-{
-	printWarning();
-}
-
 void AcquisitionServiceNull::printWarning() const
 {
 	reportWarning("Trying to use AcquisitionServiceNull. Is AcquisitionService (org.custusx.acquisition) disabled?");

@@ -66,9 +66,6 @@ public:
 
 	virtual int getNumberOfSavingThreads() const;
 
-	virtual void addXml(QDomNode& dataNode);
-	virtual void parseXml(QDomNode& dataNode);
-
 private:
 	void printWarning() const;
 };

@@ -74,8 +74,6 @@ public:
 
 	virtual int getNumberOfSavingThreads() const;
 
-	virtual void addXml(QDomNode& dataNode);
-	virtual void parseXml(QDomNode& dataNode);
 
 private slots:
 	void duringClearPatientSlot();
@@ -88,6 +86,9 @@ private:
 	UsReconstructionServicePtr mUsReconstructService;
 	USAcquisitionPtr mUsAcquisition;
 	PatientModelServicePtr mPatientModelService;
+
+	void addXml(QDomNode& dataNode);
+	void parseXml(QDomNode& dataNode);
 };
 
 typedef boost::shared_ptr<AcquisitionImplService> AcquisitionImplServicePtr;
