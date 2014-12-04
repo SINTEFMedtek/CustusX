@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxAlgorithmHelpers.h"
 #include "cxLegacySingletons.h"
 #include "cxPatientModelService.h"
+#include "cxVolumeHelpers.h"
 
 namespace cx
 {
@@ -187,9 +188,9 @@ bool BinaryThinningImageFilter3DFilter::postProcess()
 
 	ImagePtr input = this->getCopiedInputImage();
 
-	ImagePtr outImage = patientService()->createSpecificData<Image>(input->getUid() + "_cl_temp%1", input->getName()+" cl_temp%1");
-	outImage->intitializeFromParentImage(input);
-	outImage->setVtkImageData(mRawResult);
+	ImagePtr outImage = createDerivedImage(patientService(),
+										 input->getUid() + "_cl_temp%1", input->getName()+" cl_temp%1",
+										 mRawResult, input);
 
 	mRawResult = NULL;
 	outImage->resetTransferFunctions();

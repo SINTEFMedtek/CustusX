@@ -63,7 +63,7 @@ void PointMetricRep2D::setDynamicSize(bool on)
 	if (on)
 	{
 		mViewportListener.reset(new ViewportListener);
-		mViewportListener->setCallback(boost::bind(&PointMetricRep2D::rescale, this));
+//		mViewportListener->setCallback(boost::bind(&PointMetricRep2D::rescale, this));
 	}
 	else
 	{
@@ -135,10 +135,10 @@ double PointMetricRep2D::findSphereRadius()
 	return radius;
 }
 
-void PointMetricRep2D::rescale()
-{
-	this->setModified();
-}
+//void PointMetricRep2D::rescale()
+//{
+//	this->setModified();
+//}
 
 void PointMetricRep2D::setSliceProxy(SliceProxyPtr sliceProxy)
 {

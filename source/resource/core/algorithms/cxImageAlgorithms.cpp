@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationTransform.h"
 #include "cxReporter.h"
 #include "cxTime.h"
+#include "cxVolumeHelpers.h"
 
 
 namespace cx
@@ -78,10 +79,9 @@ ImagePtr resampleImage(PatientModelServicePtr dataManager, ImagePtr image, Trans
   QString name = image->getName()+" or%1";
 //  ImagePtr oriented = dataManager->createDerivedImage(rawResult, uid, name, image);
 
-  ImagePtr oriented = dataManager->createSpecificData<Image>(uid, name);
-  oriented->intitializeFromParentImage(image);
-  oriented->setVtkImageData(rawResult);
-
+  ImagePtr oriented = createDerivedImage(dataManager,
+									   uid, name,
+									   rawResult, image);
 
   oriented->get_rMd_History()->setRegistration(image->get_rMd() * qMd.inv());
   oriented->mergevtkSettingsIntosscTransform();
@@ -94,8 +94,6 @@ ImagePtr resampleImage(PatientModelServicePtr dataManager, ImagePtr image, Trans
  */
 ImagePtr resampleImage(PatientModelServicePtr dataManager, ImagePtr image, const Vector3D spacing, QString uid, QString name)
 {
-//  std::cout << "oldspacing: " << Vector3D(image->getBaseVtkImageData()->GetSpacing()) << std::endl;
-//  std::cout << "spacing: " << spacing << std::endl;
   vtkImageResamplePtr resampler = vtkImageResamplePtr::New();
   resampler->SetInputData(image->getBaseVtkImageData());
   resampler->SetAxisOutputSpacing(0, spacing[0]);
@@ -104,19 +102,15 @@ ImagePtr resampleImage(PatientModelServicePtr dataManager, ImagePtr image, const
   resampler->Update();
   vtkImageDataPtr rawResult = resampler->GetOutput();
 
-//  rawResult->Update();
-
   if (uid.isEmpty())
   {
     uid = image->getUid() + "_res%1";
     name = image->getName()+" res%1";
   }
-//  ImagePtr retval = dataManager->createDerivedImage(rawResult, uid, name, image);
 
-  ImagePtr retval = dataManager->createSpecificData<Image>(uid, name);
-  retval->intitializeFromParentImage(image);
-  retval->setVtkImageData(rawResult);
-
+  ImagePtr retval = createDerivedImage(dataManager,
+									   uid, name,
+									   rawResult, image);
   return retval;
 }
 
@@ -162,13 +156,9 @@ ImagePtr cropImage(PatientModelServicePtr dataManager, ImagePtr image)
 
   QString uid = image->getUid() + "_crop%1";
   QString name = image->getName()+" crop%1";
-//  ImagePtr result = dataManager->createDerivedImage(rawResult,uid, name, image);
-
-
-  ImagePtr result = dataManager->createSpecificData<Image>(uid, name);
-  result->intitializeFromParentImage(image);
-  result->setVtkImageData(rawResult);
-
+  ImagePtr result = createDerivedImage(dataManager,
+									   uid, name,
+									   rawResult, image);
   result->mergevtkSettingsIntosscTransform();
 
   return result;

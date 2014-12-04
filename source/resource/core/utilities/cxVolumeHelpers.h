@@ -63,6 +63,8 @@ cxResource_EXPORT vtkImageDataPtr generateVtkImageDataSignedShort(Eigen::Array3i
 									 int components = 1);
 cxResource_EXPORT vtkImageDataPtr generateVtkImageDataDouble(Eigen::Array3i dim, Vector3D spacing, double initValue);
 cxResource_EXPORT void fillShortImageDataWithGradient(vtkImageDataPtr data, int maxValue);
+cxResource_EXPORT ImagePtr createDerivedImage(PatientModelServicePtr dataManager, QString uid, QString name, vtkImageDataPtr raw, ImagePtr parent);
+
 
 /**
   * Convert an Image to its unsigned version.
