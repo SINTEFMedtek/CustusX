@@ -54,10 +54,6 @@ AcquisitionPlugin::AcquisitionPlugin(ctkPluginContext *context) :
 	mUsReconstructionService(new UsReconstructionServiceProxy(context)),
 	mAcquisitionService(new AcquisitionServiceProxy(context))
 {
-
-	connect(patientService().get(), SIGNAL(isSaving()), this, SLOT(duringSavePatientSlot()));
-	connect(patientService().get(), SIGNAL(isLoading()), this, SLOT(duringLoadPatientSlot()));
-	connect(patientService().get(), SIGNAL(cleared()), this, SLOT(clearSlot()));
 }
 
 AcquisitionPlugin::~AcquisitionPlugin()
@@ -75,34 +71,6 @@ std::vector<GUIExtenderService::CategorizedWidget> AcquisitionPlugin::createWidg
 
 	return retval;
 
-}
-
-void AcquisitionPlugin::addXml(QDomNode& parentNode)
-{
-	mAcquisitionService->addXml(parentNode);
-}
-
-void AcquisitionPlugin::parseXml(QDomNode& dataNode)
-{
-	mAcquisitionService->parseXml(dataNode);
-}
-
-void AcquisitionPlugin::clearSlot()
-{
-	// clear data?
-}
-
-void AcquisitionPlugin::duringSavePatientSlot()
-{
-	QDomElement managerNode = patientService()->getCurrentWorkingElement("managers");
-	this->addXml(managerNode);
-}
-
-void AcquisitionPlugin::duringLoadPatientSlot()
-{
-	QDomElement stateManagerNode =
-					patientService()->getCurrentWorkingElement("managers/stateManager");
-	this->parseXml(stateManagerNode);
 }
 
 }

@@ -88,14 +88,12 @@ bool AcquisitionImplService::isNull()
 
 void AcquisitionImplService::duringClearPatientSlot()
 {
-	std::cout << "AcquisitionImplService::duringClearPatientSlot()" << std::endl;
 	// clear data?
 	mAcquisitionData->clear();//TODO: Check if wee need this
 }
 
 void AcquisitionImplService::duringSavePatientSlot()
 {
-	std::cout << "AcquisitionImplService::duringSavePatientSlot()" << std::endl;
 	QDomElement managerNode = mPatientModelService->getCurrentWorkingElement("managers");
 	if(managerNode.isNull())
 		reportWarning("AcquisitionImplService::duringSavePatientSlot() Try managers node. Got null node");
@@ -104,7 +102,6 @@ void AcquisitionImplService::duringSavePatientSlot()
 
 void AcquisitionImplService::duringLoadPatientSlot()
 {
-	std::cout << "AcquisitionImplService::duringLoadPatientSlot()" << std::endl;
 	QDomElement stateManagerNode = mPatientModelService->getCurrentWorkingElement("managers/stateManager");
 	if(stateManagerNode.isNull())
 		reportWarning("AcquisitionImplService::duringSavePatientSlot() Try stateManagerNode node. Got null node");
