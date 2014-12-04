@@ -2626,8 +2626,8 @@
                     <Depth>563</Depth>
                     <Offset>0</Offset>
                     <Origin>
-                        <Col>509.5</Col>
-                        <Row>104</Row>
+                        <Col>512</Col>
+                        <Row>99</Row>
                     </Origin>
                     <NCorners>4</NCorners>
                     <Corner>
@@ -2647,13 +2647,13 @@
                         <Row>105</Row>
                     </Corner>
                     <CroppingEdges>
-                        <Left>239</Left>
-                        <Right>780</Right>
-                        <Top>104</Top>
-                        <Bottom>667</Bottom>
+                        <Left>222</Left>
+                        <Right>801</Right>
+                        <Top>99</Top>
+                        <Bottom>662</Bottom>
                     </CroppingEdges>
                     <PixelSize>
-                        <Width>0.071047957371225601</Width>
+                        <Width>0.066321244</Width>
                         <Height>0.071047957371225601</Height>
                     </PixelSize>
                 </Config>
@@ -2664,8 +2664,8 @@
                     <Depth>564</Depth>
                     <Offset>0</Offset>
                     <Origin>
-                        <Col>509.5</Col>
-                        <Row>104</Row>
+                        <Col>511.5</Col>
+                        <Row>99.28125</Row>
                     </Origin>
                     <NCorners>4</NCorners>
                     <Corner>
@@ -2685,13 +2685,13 @@
                         <Row>105</Row>
                     </Corner>
                     <CroppingEdges>
-                        <Left>293</Left>
-                        <Right>726</Right>
-                        <Top>104</Top>
-                        <Bottom>668</Bottom>
+                        <Left>281</Left>
+                        <Right>742</Right>
+                        <Top>99</Top>
+                        <Bottom>663</Bottom>
                     </CroppingEdges>
                     <PixelSize>
-                        <Width>0.088651924880248797</Width>
+                        <Width>0.08329718</Width>
                         <Height>0.088651924880248797</Height>
                     </PixelSize>
                 </Config>
@@ -2702,8 +2702,8 @@
                     <Depth>563</Depth>
                     <Offset>0</Offset>
                     <Origin>
-                        <Col>509.5</Col>
-                        <Row>104</Row>
+                        <Col>512</Col>
+                        <Row>99.28125</Row>
                     </Origin>
                     <NCorners>4</NCorners>
                     <Corner>
@@ -2723,146 +2723,70 @@
                         <Row>105</Row>
                     </Corner>
                     <CroppingEdges>
-                        <Left>329</Left>
-                        <Right>690</Right>
-                        <Top>104</Top>
-                        <Bottom>667</Bottom>
+                        <Left>320</Left>
+                        <Right>703</Right>
+                        <Top>99</Top>
+                        <Bottom>662</Bottom>
                     </CroppingEdges>
                     <PixelSize>
-                        <Width>0.106571936056838</Width>
+                        <Width>0.100261097</Width>
                         <Height>0.106571936056838</Height>
                     </PixelSize>
                 </Config>
                 <Config>
-                    <ID>AngioWidthMaxDepth3cm</ID>
-                    <Name>Angio, Width: Max, Depth: 3 cm</Name>
+                    <ID>AngioWidthMaxDepth4cm</ID>
+                    <Name>Angio Width: Max, Depth: 4 cm</Name>
                     <WidthDeg>0</WidthDeg>
                     <Origin>
-                        <Col>509.5</Col>
-                        <Row>104</Row>
+                        <Col>512</Col>
+                        <Row>99</Row>
                     </Origin>
                     <CroppingEdges>
-                        <Left>154</Left>
-                        <Right>865</Right>
-                        <Top>110</Top>
-                        <Bottom>661</Bottom>
+                        <Left>226</Left>
+                        <Right>798</Right>
+                        <Top>101</Top>
+                        <Bottom>660</Bottom>
                     </CroppingEdges>
                     <PixelSize>
-                        <Width>0.071047957371225601</Width>
-                        <Height>0.071047957371225601</Height>
+                        <Width>0.076038386999999999</Width>
+                        <Height>0.071047957371225615</Height>
                     </PixelSize>
                 </Config>
                 <Config>
-                    <ID>AngioWidthMaxDepth4</ID>
-                    <Name>Angio, Width: Max, Depth: 4 cm</Name>
+                    <ID>AngioWidthMaxDepth5cm</ID>
+                    <Name>Angio Width: Max, Depth: 5 cm</Name>
                     <WidthDeg>0</WidthDeg>
-                    <Depth>563</Depth>
-                    <Offset>0</Offset>
                     <Origin>
-                        <Col>509.5</Col>
-                        <Row>104</Row>
+                        <Col>511.5</Col>
+                        <Row>99.281249999999986</Row>
                     </Origin>
-                    <NCorners>4</NCorners>
-                    <Corner>
-                        <Col>242</Col>
-                        <Row>105</Row>
-                    </Corner>
-                    <Corner>
-                        <Col>242</Col>
-                        <Row>668</Row>
-                    </Corner>
-                    <Corner>
-                        <Col>783</Col>
-                        <Row>668</Row>
-                    </Corner>
-                    <Corner>
-                        <Col>783</Col>
-                        <Row>105</Row>
-                    </Corner>
                     <CroppingEdges>
-                        <Left>246</Left>
-                        <Right>775</Right>
-                        <Top>109</Top>
-                        <Bottom>662</Bottom>
+                        <Left>283</Left>
+                        <Right>739</Right>
+                        <Top>101</Top>
+                        <Bottom>659</Bottom>
                     </CroppingEdges>
                     <PixelSize>
-                        <Width>0.071047957371225601</Width>
-                        <Height>0.071047957371225601</Height>
-                    </PixelSize>
-                </Config>
-                <Config>
-                    <ID>AngioWidthMaxDepth5</ID>
-                    <Name>Angio, Width: Max, Depth: 5 cm</Name>
-                    <WidthDeg>0</WidthDeg>
-                    <Depth>564</Depth>
-                    <Offset>0</Offset>
-                    <Origin>
-                        <Col>509.5</Col>
-                        <Row>104</Row>
-                    </Origin>
-                    <NCorners>4</NCorners>
-                    <Corner>
-                        <Col>296</Col>
-                        <Row>105</Row>
-                    </Corner>
-                    <Corner>
-                        <Col>296</Col>
-                        <Row>669</Row>
-                    </Corner>
-                    <Corner>
-                        <Col>729</Col>
-                        <Row>669</Row>
-                    </Corner>
-                    <Corner>
-                        <Col>729</Col>
-                        <Row>105</Row>
-                    </Corner>
-                    <CroppingEdges>
-                        <Left>297</Left>
-                        <Right>722</Right>
-                        <Top>109</Top>
-                        <Bottom>663</Bottom>
-                    </CroppingEdges>
-                    <PixelSize>
-                        <Width>0.088651924880248797</Width>
+                        <Width>0.094384613000000006</Width>
                         <Height>0.088651924880248797</Height>
                     </PixelSize>
                 </Config>
                 <Config>
-                    <ID>AngioWidthMaxDepth6</ID>
-                    <Name>Angio, Width: Max, Depth: 6 cm</Name>
+                    <ID>AngioWidthMaxDepth6cm</ID>
+                    <Name>Angio Width: Max, Depth: 6 cm</Name>
                     <WidthDeg>0</WidthDeg>
-                    <Depth>563</Depth>
-                    <Offset>0</Offset>
                     <Origin>
-                        <Col>509.5</Col>
-                        <Row>104</Row>
+                        <Col>512</Col>
+                        <Row>99.281249999999986</Row>
                     </Origin>
-                    <NCorners>4</NCorners>
-                    <Corner>
-                        <Col>332</Col>
-                        <Row>105</Row>
-                    </Corner>
-                    <Corner>
-                        <Col>332</Col>
-                        <Row>668</Row>
-                    </Corner>
-                    <Corner>
-                        <Col>693</Col>
-                        <Row>668</Row>
-                    </Corner>
-                    <Corner>
-                        <Col>693</Col>
-                        <Row>105</Row>
-                    </Corner>
                     <CroppingEdges>
-                        <Left>334</Left>
-                        <Right>685</Right>
-                        <Top>109</Top>
-                        <Bottom>663</Bottom>
+                        <Left>322</Left>
+                        <Right>700</Right>
+                        <Top>102</Top>
+                        <Bottom>659</Bottom>
                     </CroppingEdges>
                     <PixelSize>
-                        <Width>0.106571936056838</Width>
+                        <Width>0.113066625</Width>
                         <Height>0.106571936056838</Height>
                     </PixelSize>
                 </Config>
@@ -3311,175 +3235,175 @@
             </RTSource>
         </USProbe>
     </USScanner>
-   <USScanner>
-      <Name>Philips - Red Cross Hospital</Name>
-      <USProbe>
-         <Name>C8-5</Name>
-         <Type>CurvedLinearArray</Type>
-         <DefaultRTSource>DVI</DefaultRTSource>
-         <Notes>Generated 20140411T091042</Notes>
-         <RTSource>
-            <Name>DVI</Name>
-            <TemporalCalibration>0</TemporalCalibration>
-            <DefaultConfig>WidthMaxDepth5</DefaultConfig>
-            <ImageSize>
-               <Width>1680</Width>
-               <Height>1050</Height>
-            </ImageSize>
-            <HorizontalOffset></HorizontalOffset>
-            <Config>
-               <ID>WidthMaxDepth3</ID>
-               <Name>Width: Max, Depth: 3 cm</Name>
-               <WidthDeg>91.19664</WidthDeg>
-               <Depth>469.983868717329</Depth>
-               <Offset>237.186439152229</Offset>
-               <Origin>
-                  <Col>744.409625129893</Col>
-                  <Row>90.0550591273387</Row>
-               </Origin>
-               <NCorners>4</NCorners>
-               <Corner>
-                  <Col>574.951260376471</Col>
-                  <Row>256.010684319166</Row>
-               </Corner>
-               <Corner>
-                  <Col>239.170268267516</Col>
-                  <Row>584.851013647602</Row>
-               </Corner>
-               <Corner>
-                  <Col>1249.17026826752</Col>
-                  <Row>585.339358769089</Row>
-               </Corner>
-               <Corner>
-                  <Col>912.951260376471</Col>
-                  <Row>256.941619719028</Row>
-               </Corner>
-               <CroppingEdges>
-                  <Left>282</Left>
-                  <Right>1089</Right>
-                  <Top>256</Top>
-                  <Bottom>797</Bottom>
-               </CroppingEdges>
-               <PixelSize>
-                  <Width>0.0638297872340425</Width>
-                  <Height>0.0638297872340425</Height>
-               </PixelSize>
-            </Config>
-            <Config>
-               <ID>WidthMaxDepth4</ID>
-               <Name>Width: Max, Depth: 4 cm</Name>
-               <WidthDeg>91.19664</WidthDeg>
-               <Depth>513.446791815228</Depth>
-               <Offset>193.650390877195</Offset>
-               <Origin>
-                  <Col>745.418958277092</Col>
-                  <Row>104.363617985479</Row>
-               </Origin>
-               <NCorners>4</NCorners>
-               <Corner>
-                  <Col>607.06501743122</Col>
-                  <Row>239.857754166006</Row>
-               </Corner>
-               <Corner>
-                  <Col>240.231845855772</Col>
-                  <Row>599.108407968122</Row>
-               </Corner>
-               <Corner>
-                  <Col>1250.23184585577</Col>
-                  <Row>599.490242502921</Row>
-               </Corner>
-               <Corner>
-                  <Col>883.06501743122</Col>
-                  <Row>240.576819571186</Row>
-               </Corner>
-               <CroppingEdges>
-                  <Left>282</Left>
-                  <Right>1089</Right>
-                  <Top>239</Top>
-                  <Bottom>811</Bottom>
-               </CroppingEdges>
-               <PixelSize>
-                  <Width>0.0779725614101826</Width>
-                  <Height>0.0779725614101826</Height>
-               </PixelSize>
-            </Config>
-            <Config>
-               <ID>WidthMaxDepth5</ID>
-               <Name>Width: Max, Depth: 5 cm</Name>
-               <WidthDeg>91.19664</WidthDeg>
-               <Depth>542.449356882916</Depth>
-               <Offset>164.013137765557</Offset>
-               <Origin>
-                  <Col>743.778882492092</Col>
-                  <Row>115.493914541345</Row>
-               </Origin>
-               <NCorners>4</NCorners>
-               <Corner>
-                  <Col>626.599341270552</Col>
-                  <Row>230.251330331405</Row>
-               </Corner>
-               <Corner>
-                  <Col>239.045224317317</Col>
-                  <Row>609.79462327081</Row>
-               </Corner>
-               <Corner>
-                  <Col>1248.04522431732</Col>
-                  <Row>610.271352231412</Row>
-               </Corner>
-               <Corner>
-                  <Col>860.599341270552</Col>
-                  <Row>230.616847836556</Row>
-               </Corner>
-               <CroppingEdges>
-                  <Left>282</Left>
-                  <Right>1089</Right>
-                  <Top>230</Top>
-                  <Bottom>821</Bottom>
-               </CroppingEdges>
-               <PixelSize>
-                  <Width>0.0920810313075506</Width>
-                  <Height>0.0920810313075506</Height>
-               </PixelSize>
-            </Config>
-            <Config>
-               <ID>WidthMaxDepth6</ID>
-               <Name>Width: Max, Depth: 6 cm</Name>
-               <WidthDeg>91.19664</WidthDeg>
-               <Depth>565.341603299004</Depth>
-               <Offset>142.018631038034</Offset>
-               <Origin>
-                  <Col>745.189956196863</Col>
-                  <Row>123.029313641222</Row>
-               </Origin>
-               <NCorners>4</NCorners>
-               <Corner>
-                  <Col>643.724437905664</Col>
-                  <Row>222.397518615528</Row>
-               </Corner>
-               <Corner>
-                  <Col>239.814905958772</Col>
-                  <Row>617.958156726968</Row>
-               </Corner>
-               <Corner>
-                  <Col>1249.81490595877</Col>
-                  <Row>618.722929899431</Row>
-               </Corner>
-               <Corner>
-                  <Col>845.724437905664</Col>
-                  <Row>223.339380680677</Row>
-               </Corner>
-               <CroppingEdges>
-                  <Left>282</Left>
-                  <Right>1089</Right>
-                  <Top>222</Top>
-                  <Bottom>830</Bottom>
-               </CroppingEdges>
-               <PixelSize>
-                  <Width>0.106761565836299</Width>
-                  <Height>0.106761565836299</Height>
-               </PixelSize>
-            </Config>
-         </RTSource>
-      </USProbe>
-   </USScanner>
+    <USScanner>
+        <Name>Philips - Red Cross Hospital</Name>
+        <USProbe>
+            <Name>C8-5</Name>
+            <Type>CurvedLinearArray</Type>
+            <DefaultRTSource>DVI</DefaultRTSource>
+            <Notes>Generated 20140411T091042</Notes>
+            <RTSource>
+                <Name>DVI</Name>
+                <TemporalCalibration>0</TemporalCalibration>
+                <DefaultConfig>WidthMaxDepth5</DefaultConfig>
+                <ImageSize>
+                    <Width>1680</Width>
+                    <Height>1050</Height>
+                </ImageSize>
+                <HorizontalOffset/>
+                <Config>
+                    <ID>WidthMaxDepth3</ID>
+                    <Name>Width: Max, Depth: 3 cm</Name>
+                    <WidthDeg>91.19664</WidthDeg>
+                    <Depth>469.983868717329</Depth>
+                    <Offset>237.186439152229</Offset>
+                    <Origin>
+                        <Col>744.409625129893</Col>
+                        <Row>90.0550591273387</Row>
+                    </Origin>
+                    <NCorners>4</NCorners>
+                    <Corner>
+                        <Col>574.951260376471</Col>
+                        <Row>256.010684319166</Row>
+                    </Corner>
+                    <Corner>
+                        <Col>239.170268267516</Col>
+                        <Row>584.851013647602</Row>
+                    </Corner>
+                    <Corner>
+                        <Col>1249.17026826752</Col>
+                        <Row>585.339358769089</Row>
+                    </Corner>
+                    <Corner>
+                        <Col>912.951260376471</Col>
+                        <Row>256.941619719028</Row>
+                    </Corner>
+                    <CroppingEdges>
+                        <Left>282</Left>
+                        <Right>1089</Right>
+                        <Top>256</Top>
+                        <Bottom>797</Bottom>
+                    </CroppingEdges>
+                    <PixelSize>
+                        <Width>0.0638297872340425</Width>
+                        <Height>0.0638297872340425</Height>
+                    </PixelSize>
+                </Config>
+                <Config>
+                    <ID>WidthMaxDepth4</ID>
+                    <Name>Width: Max, Depth: 4 cm</Name>
+                    <WidthDeg>91.19664</WidthDeg>
+                    <Depth>513.446791815228</Depth>
+                    <Offset>193.650390877195</Offset>
+                    <Origin>
+                        <Col>745.418958277092</Col>
+                        <Row>104.363617985479</Row>
+                    </Origin>
+                    <NCorners>4</NCorners>
+                    <Corner>
+                        <Col>607.06501743122</Col>
+                        <Row>239.857754166006</Row>
+                    </Corner>
+                    <Corner>
+                        <Col>240.231845855772</Col>
+                        <Row>599.108407968122</Row>
+                    </Corner>
+                    <Corner>
+                        <Col>1250.23184585577</Col>
+                        <Row>599.490242502921</Row>
+                    </Corner>
+                    <Corner>
+                        <Col>883.06501743122</Col>
+                        <Row>240.576819571186</Row>
+                    </Corner>
+                    <CroppingEdges>
+                        <Left>282</Left>
+                        <Right>1089</Right>
+                        <Top>239</Top>
+                        <Bottom>811</Bottom>
+                    </CroppingEdges>
+                    <PixelSize>
+                        <Width>0.0779725614101826</Width>
+                        <Height>0.0779725614101826</Height>
+                    </PixelSize>
+                </Config>
+                <Config>
+                    <ID>WidthMaxDepth5</ID>
+                    <Name>Width: Max, Depth: 5 cm</Name>
+                    <WidthDeg>91.19664</WidthDeg>
+                    <Depth>542.449356882916</Depth>
+                    <Offset>164.013137765557</Offset>
+                    <Origin>
+                        <Col>743.778882492092</Col>
+                        <Row>115.493914541345</Row>
+                    </Origin>
+                    <NCorners>4</NCorners>
+                    <Corner>
+                        <Col>626.599341270552</Col>
+                        <Row>230.251330331405</Row>
+                    </Corner>
+                    <Corner>
+                        <Col>239.045224317317</Col>
+                        <Row>609.79462327081</Row>
+                    </Corner>
+                    <Corner>
+                        <Col>1248.04522431732</Col>
+                        <Row>610.271352231412</Row>
+                    </Corner>
+                    <Corner>
+                        <Col>860.599341270552</Col>
+                        <Row>230.616847836556</Row>
+                    </Corner>
+                    <CroppingEdges>
+                        <Left>282</Left>
+                        <Right>1089</Right>
+                        <Top>230</Top>
+                        <Bottom>821</Bottom>
+                    </CroppingEdges>
+                    <PixelSize>
+                        <Width>0.0920810313075506</Width>
+                        <Height>0.0920810313075506</Height>
+                    </PixelSize>
+                </Config>
+                <Config>
+                    <ID>WidthMaxDepth6</ID>
+                    <Name>Width: Max, Depth: 6 cm</Name>
+                    <WidthDeg>91.19664</WidthDeg>
+                    <Depth>565.341603299004</Depth>
+                    <Offset>142.018631038034</Offset>
+                    <Origin>
+                        <Col>745.189956196863</Col>
+                        <Row>123.029313641222</Row>
+                    </Origin>
+                    <NCorners>4</NCorners>
+                    <Corner>
+                        <Col>643.724437905664</Col>
+                        <Row>222.397518615528</Row>
+                    </Corner>
+                    <Corner>
+                        <Col>239.814905958772</Col>
+                        <Row>617.958156726968</Row>
+                    </Corner>
+                    <Corner>
+                        <Col>1249.81490595877</Col>
+                        <Row>618.722929899431</Row>
+                    </Corner>
+                    <Corner>
+                        <Col>845.724437905664</Col>
+                        <Row>223.339380680677</Row>
+                    </Corner>
+                    <CroppingEdges>
+                        <Left>282</Left>
+                        <Right>1089</Right>
+                        <Top>222</Top>
+                        <Bottom>830</Bottom>
+                    </CroppingEdges>
+                    <PixelSize>
+                        <Width>0.106761565836299</Width>
+                        <Height>0.106761565836299</Height>
+                    </PixelSize>
+                </Config>
+            </RTSource>
+        </USProbe>
+    </USScanner>
 </root>

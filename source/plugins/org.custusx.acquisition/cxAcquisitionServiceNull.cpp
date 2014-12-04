@@ -29,41 +29,101 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXREGISTRATIONMETHODSERVICES_H
-#define CXREGISTRATIONMETHODSERVICES_H
 
-#include "org_custusx_registration_Export.h"
-
-#include "cxCoreServices.h"
+#include "cxAcquisitionServiceNull.h"
+#include "cxReporter.h"
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class RegistrationService> RegistrationServicePtr;
-typedef boost::shared_ptr<class VisualizationService> VisualizationServicePtr;
-typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
-
-/**
- * Convenience class combining all services used by registration methods.
- *
- * \ingroup org_custusx_registration
- *
- * \date Nov 14 2014
- * \author Ole Vegard Solberg, SINTEF
- */
-class org_custusx_registration_EXPORT RegServices : public CoreServices
+AcquisitionServiceNull::AcquisitionServiceNull()
 {
-public:
-	RegServices(ctkPluginContext* context);
-	static RegServices getNullObjects();
-
-	RegistrationServicePtr registrationService;
-	VisualizationServicePtr visualizationService;
-	AcquisitionServicePtr acquisitionService;
-private:
-	RegServices();
-};
-
 }
 
-#endif // CXREGISTRATIONMETHODSERVICES_H
+bool AcquisitionServiceNull::isNull()
+{
+	return true;
+}
+
+RecordSessionPtr AcquisitionServiceNull::getLatestSession()
+{
+	printWarning();
+	return RecordSessionPtr();
+}
+
+std::vector<RecordSessionPtr> AcquisitionServiceNull::getSessions()
+{
+	printWarning();
+	return std::vector<RecordSessionPtr>();
+}
+
+bool AcquisitionServiceNull::isReady() const
+{
+	printWarning();
+	return false;
+}
+
+QString AcquisitionServiceNull::getInfoText() const
+{
+	printWarning();
+	return QString();
+}
+
+AcquisitionService::STATE AcquisitionServiceNull::getState() const
+{
+	printWarning();
+	return AcquisitionService::sNOT_RUNNING;
+}
+
+void AcquisitionServiceNull::toggleRecord()
+{
+	printWarning();
+}
+
+void AcquisitionServiceNull::startRecord()
+{
+	printWarning();
+}
+
+void AcquisitionServiceNull::stopRecord()
+{
+	printWarning();
+}
+
+void AcquisitionServiceNull::cancelRecord()
+{
+	printWarning();
+}
+
+void AcquisitionServiceNull::startPostProcessing()
+{
+	printWarning();
+}
+
+void AcquisitionServiceNull::stopPostProcessing()
+{
+	printWarning();
+}
+
+int AcquisitionServiceNull::getNumberOfSavingThreads() const
+{
+	printWarning();
+	return 0;
+}
+
+void AcquisitionServiceNull::addXml(QDomNode &dataNode)
+{
+	printWarning();
+}
+
+void AcquisitionServiceNull::parseXml(QDomNode &dataNode)
+{
+	printWarning();
+}
+
+void AcquisitionServiceNull::printWarning() const
+{
+	reportWarning("Trying to use AcquisitionServiceNull. Is AcquisitionService (org.custusx.acquisition) disabled?");
+}
+
+} // cx

@@ -29,36 +29,68 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include <cxCalibrationMethodsWidget.h>
+#ifndef CXACQUISITIONPLUGIN_H_
+#define CXACQUISITIONPLUGIN_H_
 
-#include <cxToolTipSampleWidget.h>
-#include "cxToolTipCalibrationWidget.h"
-#include "cxToolManualCalibrationWidget.h"
-#include "cxTemporalCalibrationWidget.h"
-#include "cxLapFrameToolCalibrationWidget.h"
-#include "cxProbeConfigWidget.h"
+#include "org_custusx_acquisition_Export.h"
+
+#include "cxGUIExtenderService.h"
+class QDomNode;
+
+/**
+ * \defgroup cx_module_acquisition Acquisition Plugin
+ * \ingroup cx_modules
+ * \brief Handles the us acquisition process.
+ *
+ * See \ref cx::USAcquisition.
+ * See \ref cx::AcquisitionPlugin.
+ *
+ */
 
 namespace cx
 {
+typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
+typedef boost::shared_ptr<class AcquisitionPlugin> AcquisitionPluginPtr;
+typedef boost::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
+typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
 
-CalibrationMethodsWidget::CalibrationMethodsWidget(PatientModelServicePtr patientModelService, AcquisitionServicePtr acquisitionService, QWidget* parent, QString objectName, QString windowTitle) :
-  TabbedWidget(parent, objectName, windowTitle)
+
+/**
+* \file
+* \addtogroup cx_module_acquisition
+* @{
+*/
+
+/**
+ *
+ */
+class org_custusx_acquisition_EXPORT  AcquisitionPlugin: public GUIExtenderService
 {
-  this->addTab(new ToolTipCalibrateWidget(this), "Tool Tip");
-  this->addTab(new LapFrameToolCalibrationWidget(this), "Lap Frame");
-	this->addTab(new ToolTipSampleWidget(patientModelService, this), "Sample");
-  this->addTab(new TemporalCalibrationWidget(acquisitionService, this), "Temporal");
-  this->addTab(new ToolManualCalibrationWidget(this), "Tool Manual");
-  this->addTab(new ProbeConfigWidget(this), "Probe");
+Q_OBJECT
+public:
+	AcquisitionPlugin(UsReconstructionServicePtr reconstructer, AcquisitionServicePtr acquisitionService);
+	virtual ~AcquisitionPlugin();
+
+	virtual std::vector<CategorizedWidget> createWidgets() const;
+
+signals:
+
+private slots:
+	void clearSlot();
+	void duringSavePatientSlot();
+	void duringLoadPatientSlot();
+
+private:
+	void addXml(QDomNode& dataNode);
+	void parseXml(QDomNode& dataNode);
+
+	UsReconstructionServicePtr mUsReconstructionService;
+	AcquisitionServicePtr mAcquisitionService;
+};
+
+/**
+* @}
+*/
 }
 
-QString CalibrationMethodsWidget::defaultWhatsThis() const
-{
-  return"<html>"
-      "<h3>Calibration methods.</h3>"
-      "<p>These methods creates data structures that can be use in visualization.</p>"
-      "<p><i>Choose a method.</i></p>"
-      "</html>";
-}
-
-}
+#endif /* CXACQUISITIONPLUGIN_H_ */

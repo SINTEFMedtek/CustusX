@@ -29,41 +29,63 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXREGISTRATIONMETHODSERVICES_H
-#define CXREGISTRATIONMETHODSERVICES_H
 
-#include "org_custusx_registration_Export.h"
+#ifndef CXACQUISITIONSERVICEPROXY_H
+#define CXACQUISITIONSERVICEPROXY_H
 
-#include "cxCoreServices.h"
-
+#include "cxAcquisitionService.h"
+#include "cxServiceTrackerListener.h"
 namespace cx
 {
 
-typedef boost::shared_ptr<class RegistrationService> RegistrationServicePtr;
-typedef boost::shared_ptr<class VisualizationService> VisualizationServicePtr;
-typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
-
-/**
- * Convenience class combining all services used by registration methods.
+/** \brief Always provides an AcqusitionService
  *
- * \ingroup org_custusx_registration
+ * Use the Proxy design pattern.
+ * Uses ServiceTrackerListener to either provide an
+ * implementation of AcqusitionService or
+ * the null object (AcqusitionServiceNull)
  *
- * \date Nov 14 2014
- * \author Ole Vegard Solberg, SINTEF
+ *  \ingroup org_custusx_acqiusition
+ *  \date 2014-11-26
+ *  \author Ole Vegard Solberg, SINTEF
  */
-class org_custusx_registration_EXPORT RegServices : public CoreServices
+class org_custusx_acquisition_EXPORT AcquisitionServiceProxy : public AcquisitionService
 {
+	Q_OBJECT
 public:
-	RegServices(ctkPluginContext* context);
-	static RegServices getNullObjects();
+//	static AcquisitionServicePtr create(ctkPluginContext *pluginContext);
+	AcquisitionServiceProxy(ctkPluginContext *context);
+	~AcquisitionServiceProxy() {}
 
-	RegistrationServicePtr registrationService;
-	VisualizationServicePtr visualizationService;
-	AcquisitionServicePtr acquisitionService;
+	virtual bool isNull();
+
+	virtual RecordSessionPtr getLatestSession();
+	virtual std::vector<RecordSessionPtr> getSessions();
+
+	virtual bool isReady() const;
+	virtual QString getInfoText() const;
+	virtual STATE getState() const;
+	virtual void toggleRecord();
+	virtual void startRecord();
+	virtual void stopRecord();
+	virtual void cancelRecord();
+	virtual void startPostProcessing();
+	virtual void stopPostProcessing();
+
+	virtual int getNumberOfSavingThreads() const;
+
+	virtual void addXml(QDomNode& dataNode);
+	virtual void parseXml(QDomNode& dataNode);
+
 private:
-	RegServices();
+	ctkPluginContext *mPluginContext;
+	AcquisitionServicePtr mAcquisitionService;
+	boost::shared_ptr<ServiceTrackerListener<AcquisitionService> > mServiceListener;
+
+	void initServiceListener();
+	void onServiceAdded(AcquisitionService *service);
+	void onServiceRemoved(AcquisitionService *service);
 };
 
-}
-
-#endif // CXREGISTRATIONMETHODSERVICES_H
+} //cx
+#endif // CXACQUISITIONSERVICEPROXY_H

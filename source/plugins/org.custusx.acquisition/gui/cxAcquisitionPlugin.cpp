@@ -29,35 +29,77 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include "cxCalibrationPlugin.h"
+#include <cxAcquisitionPlugin.h>
 
-#include "cxCalibrationMethodsWidget.h"
-//#include "cxAcquisitionData.h"
+#include <vector>
+#include <QDomNode>
+#include <QDateTime>
+#include <QStringList>
+#include "cxTime.h"
+#include "cxAcquisitionData.h"
+
+#include "cxUSAcqusitionWidget.h"
+#include "cxTrackedCenterlineWidget.h"
+
+#include "cxLegacySingletons.h"
 #include "cxPatientModelService.h"
 
 namespace cx
 {
 
-CalibrationPlugin::CalibrationPlugin(PatientModelServicePtr patientModelService, AcquisitionServicePtr acquisitionService) :
-		mAcquisitionService(acquisitionService),
-		mPatientModelService(patientModelService)
-{
-}
-
-CalibrationPlugin::~CalibrationPlugin()
+AcquisitionPlugin::AcquisitionPlugin(UsReconstructionServicePtr reconstructer, AcquisitionServicePtr acquisitionService) :
+	mUsReconstructionService(reconstructer),
+	mAcquisitionService(acquisitionService)
 {
 
+	connect(patientService().get(), SIGNAL(isSaving()), this, SLOT(duringSavePatientSlot()));
+	connect(patientService().get(), SIGNAL(isLoading()), this, SLOT(duringLoadPatientSlot()));
+	connect(patientService().get(), SIGNAL(cleared()), this, SLOT(clearSlot()));
 }
 
-std::vector<GUIExtenderService::CategorizedWidget> CalibrationPlugin::createWidgets() const
+AcquisitionPlugin::~AcquisitionPlugin()
+{
+
+}
+
+std::vector<GUIExtenderService::CategorizedWidget> AcquisitionPlugin::createWidgets() const
 {
 	std::vector<CategorizedWidget> retval;
 
-	retval.push_back(GUIExtenderService::CategorizedWidget(
-			new CalibrationMethodsWidget(mPatientModelService, mAcquisitionService, NULL, "CalibrationMethodsWidget", "Calibration Methods"),
-			"Algorithms"));
+	retval.push_back(GUIExtenderService::CategorizedWidget(new USAcqusitionWidget(mAcquisitionService, mUsReconstructionService, NULL), "Utility"));
+
+	retval.push_back(GUIExtenderService::CategorizedWidget(new TrackedCenterlineWidget(mAcquisitionService, NULL), "Utility"));
 
 	return retval;
+
+}
+
+void AcquisitionPlugin::addXml(QDomNode& parentNode)
+{
+	mAcquisitionService->addXml(parentNode);
+}
+
+void AcquisitionPlugin::parseXml(QDomNode& dataNode)
+{
+	mAcquisitionService->parseXml(dataNode);
+}
+
+void AcquisitionPlugin::clearSlot()
+{
+	// clear data?
+}
+
+void AcquisitionPlugin::duringSavePatientSlot()
+{
+	QDomElement managerNode = patientService()->getCurrentWorkingElement("managers");
+	this->addXml(managerNode);
+}
+
+void AcquisitionPlugin::duringLoadPatientSlot()
+{
+	QDomElement stateManagerNode =
+					patientService()->getCurrentWorkingElement("managers/stateManager");
+	this->parseXml(stateManagerNode);
 }
 
 }

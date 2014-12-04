@@ -29,60 +29,93 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXTEMPORALCALIBRATIONWIDGET_H_
-#define CXTEMPORALCALIBRATIONWIDGET_H_
 
-#include "cxPluginCalibrationExport.h"
+#ifndef CXRECORDBASEWIDGET_H_
+#define CXRECORDBASEWIDGET_H_
 
+#include "org_custusx_acquisition_Export.h"
+
+#include <QWidget>
 #include "cxBaseWidget.h"
-#include "cxRecordSessionWidget.h"
-#include <QFuture>
-#include <QFutureWatcher>
-#include "cxFileSelectWidget.h"
-#include <cxTemporalCalibration.h>
-#include "cxUSAcqusitionWidget.h"
+#include "cxTool.h"
+#include "cxVideoRecorder.h"
+//#include "cxRecordSession.h"
+#include "cxAcquisitionService.h"
+
+class QLabel;
+class QVBoxLayout;
+class QDoubleSpinBox;
+class QPushButton;
 
 namespace cx
 {
 /**
- * \file
- * \addtogroup cx_module_calibration
- * @{
- */
+* \file
+* \addtogroup cx_module_acquisition
+* @{
+*/
 
-/** GUI for performing temporal calibration
+
+typedef boost::shared_ptr<class RecordSession> RecordSessionPtr;
+class RecordSessionWidget;
+/**
+ * RecordBaseWidget
  *
+ * \brief
+ *
+ * \date Dec 9, 2010
+ * \author Janne Beate Bakeng, SINTEF
  */
-class cxPluginCalibration_EXPORT TemporalCalibrationWidget : public BaseWidget
+class org_custusx_acquisition_EXPORT  RecordBaseWidget : public BaseWidget
+{
+  Q_OBJECT
+
+public:
+  RecordBaseWidget(AcquisitionServicePtr acquisitionService, QWidget* parent, QString description = "Record Session");
+  virtual ~RecordBaseWidget();
+
+protected:
+  AcquisitionServicePtr mAcquisitionService;
+  QVBoxLayout* mLayout;
+  RecordSessionWidget* mRecordSessionWidget;
+
+};
+
+/**
+ * TrackedRecordWidget
+ *
+ * \brief
+ *
+ * \date Dec 17, 2010
+ * \author Janne Beate Bakeng, SINTEF
+ */
+class org_custusx_acquisition_EXPORT  TrackedRecordWidget : public RecordBaseWidget
 {
   Q_OBJECT
 public:
-  TemporalCalibrationWidget(AcquisitionServicePtr acquisitionService, QWidget* parent);
-  virtual ~TemporalCalibrationWidget();
+  TrackedRecordWidget(AcquisitionServicePtr acquisitionService, QWidget* parent, QString description);
+  virtual ~TrackedRecordWidget();
 
-  virtual QString defaultWhatsThis() const;
+signals:
+  void toolChanged();
 
-private slots:
-  void patientChangedSlot();
-  void selectData(QString filename);
-  void calibrateSlot();
+protected slots:
+  virtual void checkIfReadySlot() = 0;
+  virtual void postProcessingSlot(QString sessionId) = 0;
+  virtual void startedSlot(QString sessionId) = 0;
+  virtual void stoppedSlot(bool) = 0;
 
 protected:
-  void showEvent(QShowEvent* event);
-private:
-  TemporalCalibrationPtr mAlgorithm;
+  virtual TimedTransformMap getRecording(RecordSessionPtr session) = 0; ///< gets the tracking data from all relevant tool for the given session
+  void setTool(ToolPtr tool);
+  ToolPtr getTool();
 
-  FileSelectWidget* mFileSelectWidget;
-  QLineEdit* mResult;
-  QCheckBox* mVerbose;
-  RecordSessionWidget* mRecordSessionWidget;
-  QLabel* mInfoLabel;
+private:
+  ToolPtr mTool;
 };
 
-
 /**
- * @}
- */
-}
-
-#endif /* CXTEMPORALCALIBRATIONWIDGET_H_ */
+* @}
+*/
+}//namespace cx
+#endif /* CXRECORDBASEWIDGET_H_ */

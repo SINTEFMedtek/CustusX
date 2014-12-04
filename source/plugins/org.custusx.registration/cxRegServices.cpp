@@ -34,14 +34,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ctkPluginContext.h>
 #include "cxRegistrationServiceProxy.h"
 #include "cxVisualizationServiceProxy.h"
+#include "cxAcquisitionServiceProxy.h"
 
 namespace cx {
 
 RegServices::RegServices(ctkPluginContext* context) :
 	CoreServices(context)
 {
-	registrationService	= RegistrationServicePtr(new RegistrationServiceProxy(context));
+	registrationService	 = RegistrationServicePtr(new RegistrationServiceProxy(context));
 	visualizationService = VisualizationServicePtr(new VisualizationServiceProxy(context));
+	acquisitionService	 = AcquisitionServicePtr(new AcquisitionServiceProxy(context));
 }
 
 RegServices RegServices::getNullObjects()
@@ -52,7 +54,8 @@ RegServices RegServices::getNullObjects()
 RegServices::RegServices() :
 	CoreServices()
 {
-	registrationService	= cx::RegistrationService::getNullObject();
-	visualizationService = cx::VisualizationService::getNullObject();
+	registrationService		= RegistrationService::getNullObject();
+	visualizationService	= VisualizationService::getNullObject();
+	acquisitionService		= AcquisitionService::getNullObject();
 }
 } // cx

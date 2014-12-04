@@ -29,36 +29,71 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include <cxCalibrationMethodsWidget.h>
 
-#include <cxToolTipSampleWidget.h>
-#include "cxToolTipCalibrationWidget.h"
-#include "cxToolManualCalibrationWidget.h"
-#include "cxTemporalCalibrationWidget.h"
-#include "cxLapFrameToolCalibrationWidget.h"
-#include "cxProbeConfigWidget.h"
+#ifndef CXRECORDSESSIONWIDGET_H_
+#define CXRECORDSESSIONWIDGET_H_
+
+#include "org_custusx_acquisition_Export.h"
+
+#include "cxBaseWidget.h"
+
+class QPushButton;
+class QLineEdit;
+class QLabel;
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cx_module_acquisition
+* @{
+*/
 
-CalibrationMethodsWidget::CalibrationMethodsWidget(PatientModelServicePtr patientModelService, AcquisitionServicePtr acquisitionService, QWidget* parent, QString objectName, QString windowTitle) :
-  TabbedWidget(parent, objectName, windowTitle)
+typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
+typedef boost::shared_ptr<class RecordSessionWidget> RecordSessionWidgetPtr;
+
+/**
+ * \class RecordSessionWidget
+ *
+ * \brief
+ *
+ * \date Dec 8, 2010
+ * \author Janne Beate Bakeng
+ */
+class org_custusx_acquisition_EXPORT  RecordSessionWidget : public BaseWidget
 {
-  this->addTab(new ToolTipCalibrateWidget(this), "Tool Tip");
-  this->addTab(new LapFrameToolCalibrationWidget(this), "Lap Frame");
-	this->addTab(new ToolTipSampleWidget(patientModelService, this), "Sample");
-  this->addTab(new TemporalCalibrationWidget(acquisitionService, this), "Temporal");
-  this->addTab(new ToolManualCalibrationWidget(this), "Tool Manual");
-  this->addTab(new ProbeConfigWidget(this), "Probe");
-}
+  Q_OBJECT
 
-QString CalibrationMethodsWidget::defaultWhatsThis() const
-{
-  return"<html>"
-      "<h3>Calibration methods.</h3>"
-      "<p>These methods creates data structures that can be use in visualization.</p>"
-      "<p><i>Choose a method.</i></p>"
-      "</html>";
-}
+public:
+  RecordSessionWidget(AcquisitionServicePtr base, QWidget* parent, QString defaultDescription = "Record Session");
+  virtual ~RecordSessionWidget();
 
-}
+  virtual QString defaultWhatsThis() const;
+
+  void setDescription(QString text);
+  void setDescriptionVisibility(bool value);
+
+public slots:
+	void setReady(bool val, QString text); ///< deprecated: use readinessChangedSlot instead.
+
+private slots:
+  void startStopSlot(bool);
+  void cancelSlot();
+  void recordStateChangedSlot();
+  void readinessChangedSlot();
+
+private:
+
+  AcquisitionServicePtr mAcquisitionService;
+  QLabel* mInfoLabel;
+  QPushButton* mStartStopButton;
+  QPushButton* mCancelButton;
+  QLabel* mDescriptionLabel;
+  QLineEdit* mDescriptionLine;
+};
+
+/**
+* @}
+*/
+}//namespace cx
+#endif /* CXRECORDSESSIONWIDGET_H_ */

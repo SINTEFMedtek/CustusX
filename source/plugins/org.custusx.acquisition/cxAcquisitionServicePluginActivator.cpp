@@ -29,41 +29,34 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXREGISTRATIONMETHODSERVICES_H
-#define CXREGISTRATIONMETHODSERVICES_H
 
-#include "org_custusx_registration_Export.h"
+#include "cxAcquisitionServicePluginActivator.h"
 
-#include "cxCoreServices.h"
+#include <QtPlugin>
+
+#include "cxAcquisitionImplService.h"
+#include "cxRegisteredService.h"
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class RegistrationService> RegistrationServicePtr;
-typedef boost::shared_ptr<class VisualizationService> VisualizationServicePtr;
-typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
-
-/**
- * Convenience class combining all services used by registration methods.
- *
- * \ingroup org_custusx_registration
- *
- * \date Nov 14 2014
- * \author Ole Vegard Solberg, SINTEF
- */
-class org_custusx_registration_EXPORT RegServices : public CoreServices
+AcquisitionServicePluginActivator::AcquisitionServicePluginActivator()
 {
-public:
-	RegServices(ctkPluginContext* context);
-	static RegServices getNullObjects();
-
-	RegistrationServicePtr registrationService;
-	VisualizationServicePtr visualizationService;
-	AcquisitionServicePtr acquisitionService;
-private:
-	RegServices();
-};
-
 }
 
-#endif // CXREGISTRATIONMETHODSERVICES_H
+AcquisitionServicePluginActivator::~AcquisitionServicePluginActivator()
+{
+}
+
+void AcquisitionServicePluginActivator::start(ctkPluginContext* context)
+{
+	mRegistration = RegisteredService::create<AcquisitionImplService>(context, AcquisitionService_iid);
+}
+
+void AcquisitionServicePluginActivator::stop(ctkPluginContext* context)
+{
+	mRegistration.reset();
+	Q_UNUSED(context);
+}
+
+} // cx

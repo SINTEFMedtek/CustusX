@@ -7,16 +7,20 @@ include_directories(
     ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
     ${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
     ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.registration
-    ${CustusX_SOURCE_DIR}/source/modules/Acquisition/gui
-    ${CustusX_SOURCE_DIR}/source/modules/Acquisition/logic
+#    ${CustusX_SOURCE_DIR}/source/modules/Acquisition
+#    ${CustusX_SOURCE_DIR}/source/modules/Acquisition/gui
+#    ${CustusX_SOURCE_DIR}/source/modules/Acquisition/logic
 	${CustusX_SOURCE_DIR}/source/gui/dataWidgets
     ${CustusX_SOURCE_DIR}/source/gui/dataAdapters
 	${CustusX_SOURCE_DIR}/source/logic
     ${CustusX_BINARY_DIR}/source/plugins/org.custusx.registration
-    ${CustusX_BINARY_DIR}/source/modules/Acquisition
+#    ${CustusX_BINARY_DIR}/source/modules/Acquisition
     ${CustusX_BINARY_DIR}/source/gui
     ${CustusX_BINARY_DIR}/source/logic
     ${CustusX_BINARY_DIR}/source/resource/visualization
+
+    ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.acquisition
+    ${CustusX_BINARY_DIR}/source/plugins/org.custusx.acquisition
 )
 
 set(PLUGIN_SRCS
@@ -53,9 +57,10 @@ set(PLUGIN_target_libraries
     ${PLUGIN_target_libraries}   
     cxResourceWidgets
 	cxPluginAlgorithm
-	cxPluginAcquisition
+#	cxPluginAcquisition
 	cxResourceVisualization
 	org_custusx_registration
+	org_custusx_acquisition
     )
 
 set(PLUGIN_OUTPUT_DIR "")

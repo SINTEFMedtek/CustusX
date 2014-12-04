@@ -29,41 +29,40 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXREGISTRATIONMETHODSERVICES_H
-#define CXREGISTRATIONMETHODSERVICES_H
 
-#include "org_custusx_registration_Export.h"
-
-#include "cxCoreServices.h"
+#ifndef CXACQUISITIONSERVICEPLUGINACTIVATOR_H
+#define CXACQUISITIONSERVICEPLUGINACTIVATOR_H
+#include <ctkPluginActivator.h>
+#include "boost/shared_ptr.hpp"
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class RegistrationService> RegistrationServicePtr;
-typedef boost::shared_ptr<class VisualizationService> VisualizationServicePtr;
-typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
+typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
 
 /**
- * Convenience class combining all services used by registration methods.
+ * Activator for the acquisition plugin
  *
- * \ingroup org_custusx_registration
+ * \ingroup org_custusx_acquisition
  *
- * \date Nov 14 2014
- * \author Ole Vegard Solberg, SINTEF
+ *  \date 2014-12-02
+ *  \author Ole Vegard Solberg, SINTEF
  */
-class org_custusx_registration_EXPORT RegServices : public CoreServices
+class AcquisitionServicePluginActivator :  public QObject, public ctkPluginActivator
 {
+	Q_OBJECT
+	Q_INTERFACES(ctkPluginActivator)
+	Q_PLUGIN_METADATA(IID "org_custusx_acquisition")
 public:
-	RegServices(ctkPluginContext* context);
-	static RegServices getNullObjects();
+	AcquisitionServicePluginActivator();
+	~AcquisitionServicePluginActivator();
 
-	RegistrationServicePtr registrationService;
-	VisualizationServicePtr visualizationService;
-	AcquisitionServicePtr acquisitionService;
+	void start(ctkPluginContext* context);
+	void stop(ctkPluginContext* context);
+
 private:
-	RegServices();
+	RegisteredServicePtr mRegistration;
 };
 
-}
-
-#endif // CXREGISTRATIONMETHODSERVICES_H
+} // cx
+#endif // CXACQUISITIONSERVICEPLUGINACTIVATOR_H

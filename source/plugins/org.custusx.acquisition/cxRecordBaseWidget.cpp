@@ -29,60 +29,64 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXTEMPORALCALIBRATIONWIDGET_H_
-#define CXTEMPORALCALIBRATIONWIDGET_H_
 
-#include "cxPluginCalibrationExport.h"
+#include "cxRecordBaseWidget.h"
 
-#include "cxBaseWidget.h"
+#include <QPushButton>
+#include <QFont>
+#include <QLabel>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QDoubleSpinBox>
+#include <vtkPolyData.h>
+#include "cxTrackingService.h"
+#include "cxReporter.h"
+#include "cxMesh.h"
+#include "cxTransform3D.h"
 #include "cxRecordSessionWidget.h"
-#include <QFuture>
-#include <QFutureWatcher>
-#include "cxFileSelectWidget.h"
-#include <cxTemporalCalibration.h>
-#include "cxUSAcqusitionWidget.h"
+#include "cxSoundSpeedConversionWidget.h"
 
 namespace cx
 {
-/**
- * \file
- * \addtogroup cx_module_calibration
- * @{
- */
 
-/** GUI for performing temporal calibration
- *
- */
-class cxPluginCalibration_EXPORT TemporalCalibrationWidget : public BaseWidget
+RecordBaseWidget::RecordBaseWidget(AcquisitionServicePtr acquisitionService, QWidget* parent, QString description):
+    BaseWidget(parent, "RecordBaseWidget", "Record Base"),
+	mAcquisitionService(acquisitionService),
+    mLayout(new QVBoxLayout(this))
 {
-  Q_OBJECT
-public:
-  TemporalCalibrationWidget(AcquisitionServicePtr acquisitionService, QWidget* parent);
-  virtual ~TemporalCalibrationWidget();
+	this->setObjectName("RecordBaseWidget");
+	this->setWindowTitle("Record Base");
 
-  virtual QString defaultWhatsThis() const;
-
-private slots:
-  void patientChangedSlot();
-  void selectData(QString filename);
-  void calibrateSlot();
-
-protected:
-  void showEvent(QShowEvent* event);
-private:
-  TemporalCalibrationPtr mAlgorithm;
-
-  FileSelectWidget* mFileSelectWidget;
-  QLineEdit* mResult;
-  QCheckBox* mVerbose;
-  RecordSessionWidget* mRecordSessionWidget;
-  QLabel* mInfoLabel;
-};
-
-
-/**
- * @}
- */
+	mRecordSessionWidget = new RecordSessionWidget(mAcquisitionService, this, description);
+	mLayout->addWidget(mRecordSessionWidget);
 }
 
-#endif /* CXTEMPORALCALIBRATIONWIDGET_H_ */
+RecordBaseWidget::~RecordBaseWidget()
+{}
+
+////----------------------------------------------------------------------------------------------------------------------
+////----------------------------------------------------------------------------------------------------------------------
+////----------------------------------------------------------------------------------------------------------------------
+
+TrackedRecordWidget::TrackedRecordWidget(AcquisitionServicePtr acquisitionService, QWidget* parent, QString description) :
+  RecordBaseWidget(acquisitionService, parent, description)
+{}
+
+TrackedRecordWidget::~TrackedRecordWidget()
+{}
+
+void TrackedRecordWidget::setTool(ToolPtr tool)
+{
+  if(mTool && tool && (mTool->getUid() == tool->getUid()))
+    return;
+
+  mTool = tool;
+  emit toolChanged();
+}
+
+ToolPtr TrackedRecordWidget::getTool()
+{
+  return mTool;
+}
+//----------------------------------------------------------------------------------------------------------------------
+}//namespace cx

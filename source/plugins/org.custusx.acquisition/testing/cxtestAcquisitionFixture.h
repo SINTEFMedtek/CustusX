@@ -29,36 +29,69 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include <cxCalibrationMethodsWidget.h>
+#ifndef CXTESTACQUISITIONFIXTURE_H_
+#define CXTESTACQUISITIONFIXTURE_H_
 
-#include <cxToolTipSampleWidget.h>
-#include "cxToolTipCalibrationWidget.h"
-#include "cxToolManualCalibrationWidget.h"
-#include "cxTemporalCalibrationWidget.h"
-#include "cxLapFrameToolCalibrationWidget.h"
-#include "cxProbeConfigWidget.h"
+#include "cxForwardDeclarations.h"
+#include "cxAcquisitionData.h"
+#include "cxUSAcquisition.h"
+#include "cxUSReconstructInputData.h"
+#include "cxXmlOptionItem.h"
 
-namespace cx
+namespace cxtest
 {
 
-CalibrationMethodsWidget::CalibrationMethodsWidget(PatientModelServicePtr patientModelService, AcquisitionServicePtr acquisitionService, QWidget* parent, QString objectName, QString windowTitle) :
-  TabbedWidget(parent, objectName, windowTitle)
+/**Helper object for automated control of the CustusX application.
+ *
+ */
+class AcquisitionFixture : public QObject
 {
-  this->addTab(new ToolTipCalibrateWidget(this), "Tool Tip");
-  this->addTab(new LapFrameToolCalibrationWidget(this), "Lap Frame");
-	this->addTab(new ToolTipSampleWidget(patientModelService, this), "Sample");
-  this->addTab(new TemporalCalibrationWidget(acquisitionService, this), "Temporal");
-  this->addTab(new ToolManualCalibrationWidget(this), "Tool Manual");
-  this->addTab(new ProbeConfigWidget(this), "Probe");
-}
+	Q_OBJECT
 
-QString CalibrationMethodsWidget::defaultWhatsThis() const
-{
-  return"<html>"
-      "<h3>Calibration methods.</h3>"
-      "<p>These methods creates data structures that can be use in visualization.</p>"
-      "<p><i>Choose a method.</i></p>"
-      "</html>";
-}
+public:
+	AcquisitionFixture(QObject* parent=NULL);
+	~AcquisitionFixture();
+	void initialize();
+	void verify();
+	cx::DataAdapterPtr getOption(QString uid);
 
-}
+//	QString mAdditionalGrabberArg;
+	int mNumberOfExpectedStreams;
+
+private slots:
+	void newFrameSlot();
+	void start();
+	void stop();
+
+	void saveDataCompletedSlot(QString name);
+	void acquisitionDataReadySlot();
+	void readinessChangedSlot();
+	void videoConnectedSlot();
+
+	void setupVideo();
+	void setupProbe();
+
+protected:
+	cx::XmlOptionFile mOptions;
+
+private:
+	void setUp();
+	void tearDown();
+
+	void initVideo();
+	void verifyFileData(cx::USReconstructInputData data);
+
+	cx::USReconstructInputData mMemOutputData;
+	std::vector<cx::USReconstructInputData> mFileOutputData;
+	QString mAcqDataFilename;
+	QString mConnectionMethod;
+
+	double mRecordDuration; ///< duration of recording in ms.
+	cx::VideoSourcePtr mVideoSource;
+	cx::UsReconstructionServicePtr mUsReconstructionService;
+	cx::AcquisitionServicePtr mAcquisitionService;
+};
+
+} // namespace cxtest
+
+#endif /* CXTESTACQUISITIONFIXTURE_H_ */

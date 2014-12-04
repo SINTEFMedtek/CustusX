@@ -29,36 +29,69 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include <cxCalibrationMethodsWidget.h>
 
-#include <cxToolTipSampleWidget.h>
-#include "cxToolTipCalibrationWidget.h"
-#include "cxToolManualCalibrationWidget.h"
-#include "cxTemporalCalibrationWidget.h"
-#include "cxLapFrameToolCalibrationWidget.h"
-#include "cxProbeConfigWidget.h"
+#ifndef CXUSACQUSITIONWIDGET_H_
+#define CXUSACQUSITIONWIDGET_H_
+
+#include "org_custusx_acquisition_Export.h"
+
+#include "cxRecordBaseWidget.h"
 
 namespace cx
 {
+typedef boost::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
+typedef boost::shared_ptr<class ThreadedTimedReconstructer> ThreadedTimedReconstructerPtr;
+class TimedAlgorithmProgressBar;
+class DisplayTimerWidget;
 
-CalibrationMethodsWidget::CalibrationMethodsWidget(PatientModelServicePtr patientModelService, AcquisitionServicePtr acquisitionService, QWidget* parent, QString objectName, QString windowTitle) :
-  TabbedWidget(parent, objectName, windowTitle)
+/**
+* \file
+* \addtogroup cx_module_acquisition
+* @{
+*/
+
+/**
+ * USAcqusitionWidget
+ *
+ * \brief
+ *
+ * \date Dec 9, 2010
+ * \author Janne Beate Bakeng, SINTEF
+ */
+class org_custusx_acquisition_EXPORT USAcqusitionWidget : public RecordBaseWidget
 {
-  this->addTab(new ToolTipCalibrateWidget(this), "Tool Tip");
-  this->addTab(new LapFrameToolCalibrationWidget(this), "Lap Frame");
-	this->addTab(new ToolTipSampleWidget(patientModelService, this), "Sample");
-  this->addTab(new TemporalCalibrationWidget(acquisitionService, this), "Temporal");
-  this->addTab(new ToolManualCalibrationWidget(this), "Tool Manual");
-  this->addTab(new ProbeConfigWidget(this), "Probe");
-}
+	Q_OBJECT
+public:
+	USAcqusitionWidget(AcquisitionServicePtr acquisitionService, UsReconstructionServicePtr usReconstructionService, QWidget* parent);
+	virtual ~USAcqusitionWidget();
+	virtual QString defaultWhatsThis() const;
 
-QString CalibrationMethodsWidget::defaultWhatsThis() const
-{
-  return"<html>"
-      "<h3>Calibration methods.</h3>"
-      "<p>These methods creates data structures that can be use in visualization.</p>"
-      "<p><i>Choose a method.</i></p>"
-      "</html>";
-}
+private slots:
+	void reconstructStartedSlot();
+	void reconstructFinishedSlot();
+	void toggleDetailsSlot();
+	void acquisitionDataReadySlot();
+	void reconstructAboutToStartSlot();
+	void acquisitionStateChangedSlot();
 
-}
+	void recordStarted();
+	void recordStopped();
+	void recordCancelled();
+
+private:
+	UsReconstructionServicePtr mUsReconstructionService;
+	TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
+	DisplayTimerWidget* mDisplayTimerWidget;
+	QWidget* mOptionsWidget;
+	QWidget* createOptionsWidget();
+	QWidget* wrapVerticalStretch(QWidget* input);
+	QWidget* wrapGroupBox(QWidget* input, QString name, QString tip);
+};
+
+
+/**
+* @}
+*/
+}//namespace cx
+
+#endif /* CXUSACQUSITIONWIDGET_H_ */

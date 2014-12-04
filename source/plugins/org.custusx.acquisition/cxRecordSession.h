@@ -29,36 +29,68 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include <cxCalibrationMethodsWidget.h>
 
-#include <cxToolTipSampleWidget.h>
-#include "cxToolTipCalibrationWidget.h"
-#include "cxToolManualCalibrationWidget.h"
-#include "cxTemporalCalibrationWidget.h"
-#include "cxLapFrameToolCalibrationWidget.h"
-#include "cxProbeConfigWidget.h"
+#ifndef CXRecordSession_H_
+#define CXRecordSession_H_
+
+#include "org_custusx_acquisition_Export.h"
+
+#include <QString>
+#include <map>
+#include "boost/shared_ptr.hpp"
+#include "cxForwardDeclarations.h"
+#include "cxTransform3D.h"
+
+class QDomNode;
 
 namespace cx
 {
+/**
+ * \file
+ * \addtogroup cx_module_acquisition
+ * @{
+ */
 
-CalibrationMethodsWidget::CalibrationMethodsWidget(PatientModelServicePtr patientModelService, AcquisitionServicePtr acquisitionService, QWidget* parent, QString objectName, QString windowTitle) :
-  TabbedWidget(parent, objectName, windowTitle)
+typedef boost::shared_ptr<class RecordSession> RecordSessionPtr;
+typedef std::map<double, Transform3D> TimedTransformMap;
+
+/**
+ * RecordSession
+ *
+ * \brief
+ *
+ * \date Dec 8, 2010
+ * \author Janne Beate Bakeng
+ */
+class org_custusx_acquisition_EXPORT RecordSession
 {
-  this->addTab(new ToolTipCalibrateWidget(this), "Tool Tip");
-  this->addTab(new LapFrameToolCalibrationWidget(this), "Lap Frame");
-	this->addTab(new ToolTipSampleWidget(patientModelService, this), "Sample");
-  this->addTab(new TemporalCalibrationWidget(acquisitionService, this), "Temporal");
-  this->addTab(new ToolManualCalibrationWidget(this), "Tool Manual");
-  this->addTab(new ProbeConfigWidget(this), "Probe");
-}
+public:
+	RecordSession(QString uid, double startTime, double stopTime, QString description);
+	virtual ~RecordSession();
 
-QString CalibrationMethodsWidget::defaultWhatsThis() const
-{
-  return"<html>"
-      "<h3>Calibration methods.</h3>"
-      "<p>These methods creates data structures that can be use in visualization.</p>"
-      "<p><i>Choose a method.</i></p>"
-      "</html>";
-}
+	QString getUid();
+	QString getDescription();
+	double getStartTime();
+	double getStopTime();
 
-}
+	void setStopTime(double val) { mStopTime = val; }
+
+	void addXml(QDomNode& dataNode);
+	void parseXml(QDomNode& dataNode);
+
+	static TimedTransformMap getToolHistory_prMt(ToolPtr tool, RecordSessionPtr session);
+
+protected:
+
+	QString mUid;
+	double mStartTime;
+	double mStopTime;
+	QString mDescription;
+};
+
+/**
+ * @}
+ */
+}//namespace cx
+
+#endif /* CXRecordSession_H_ */

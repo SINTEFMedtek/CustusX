@@ -36,7 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataSelectWidget.h"
 #include "cxTrackingService.h"
 #include "cxMesh.h"
-#include "cxAcquisitionData.h"
 #include "cxSelectDataStringDataAdapter.h"
 #include "cxTrackedCenterlineWidget.h"
 #include "cxRecordSessionWidget.h"
@@ -64,6 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewGroupData.h"
 #include "cxDataInterface.h"
 #include "cxHelperWidgets.h"
+#include "cxAcquisitionService.h"
 
 
 namespace cx
@@ -83,13 +83,6 @@ BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegServices servi
 	mSelectToolWidget = SelectToolStringDataAdapter::New();
 	//this->initializeTrackingService();
 
-	AcquisitionDataPtr mAcquisitionData;
-	mAcquisitionData.reset(new AcquisitionData());
-
-	connect(mServices.patientModelService.get(), &PatientModelService::isSaving, this, &BronchoscopyRegistrationWidget::duringSavePatientSlot);
-	connect(mServices.patientModelService.get(), &PatientModelService::isLoading, this, &BronchoscopyRegistrationWidget::duringLoadPatientSlot);
-	connect(mServices.patientModelService.get(), &PatientModelService::cleared, this, &BronchoscopyRegistrationWidget::duringClearPatientSlot);
-
 	mProcessCenterlineButton = new QPushButton("Process centerline");
 	connect(mProcessCenterlineButton, SIGNAL(clicked()), this, SLOT(processCenterlineSlot()));
 	mProcessCenterlineButton->setToolTip(this->defaultWhatsThis());
@@ -98,16 +91,16 @@ BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegServices servi
 	connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
 	mRegisterButton->setToolTip(this->defaultWhatsThis());
 
-	mAcquisition.reset(new Acquisition(mAcquisitionData, this));
-	this->initSessionSelector(mAcquisition->getPluginData());
+	this->initSessionSelector();
 
-	connect(mAcquisition.get(), &Acquisition::started, this, &BronchoscopyRegistrationWidget::acquisitionStarted);
-	connect(mAcquisition.get(), &Acquisition::acquisitionStopped, this, &BronchoscopyRegistrationWidget::acquisitionStopped, Qt::QueuedConnection);
-	connect(mAcquisition.get(), &Acquisition::cancelled, this, &BronchoscopyRegistrationWidget::acquisitionCancelled);
+	connect(services.acquisitionService.get(), &AcquisitionService::started, this, &BronchoscopyRegistrationWidget::acquisitionStarted);
+	connect(services.acquisitionService.get(), &AcquisitionService::acquisitionStopped, this, &BronchoscopyRegistrationWidget::acquisitionStopped, Qt::QueuedConnection);
+	connect(services.acquisitionService.get(), &AcquisitionService::cancelled, this, &BronchoscopyRegistrationWidget::acquisitionCancelled);
+	connect(services.acquisitionService.get(), &AcquisitionService::recordedSessionsChanged, this, &BronchoscopyRegistrationWidget::recordedSessionsChanged);
 
 //    mTrackedCenterLine = new TrackedCenterlineWidget(mAcquisitionData, this);
 
-	mRecordSessionWidget.reset(new RecordSessionWidget(mAcquisition, this, "Bronchoscope path"));
+	mRecordSessionWidget.reset(new RecordSessionWidget(services.acquisitionService, this, "Bronchoscope path"));
 
 	mVerticalLayout->setMargin(0);
 	mVerticalLayout->addWidget(new DataSelectWidget(mServices.visualizationService, mServices.patientModelService, this, mSelectMeshWidget));
@@ -143,10 +136,9 @@ BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegServices servi
 
 }
 
-
-void BronchoscopyRegistrationWidget::initSessionSelector(AcquisitionDataPtr acquisitionData)
+void BronchoscopyRegistrationWidget::initSessionSelector()
 {
-	QStringList sessionUids = getSessionList(acquisitionData);
+	QStringList sessionUids = getSessionList();
 	QString defaultValue;
 	if(!sessionUids.isEmpty())
 		defaultValue = sessionUids.last();
@@ -155,9 +147,9 @@ void BronchoscopyRegistrationWidget::initSessionSelector(AcquisitionDataPtr acqu
 	//TODO: Let mSessionSelector display displaynames instead of uids (StringDataAdapterXml::setDisplayNames)
 }
 
-QStringList BronchoscopyRegistrationWidget::getSessionList(AcquisitionDataPtr acquisitionData)
+QStringList BronchoscopyRegistrationWidget::getSessionList()
 {
-	std::vector<RecordSessionPtr> sessions = acquisitionData->getRecordSessions();
+	std::vector<RecordSessionPtr> sessions = mServices.acquisitionService->getSessions();
 	std::vector<RecordSessionPtr>::iterator it = sessions.begin();
 	QStringList sessionUids;
 
@@ -237,7 +229,7 @@ void BronchoscopyRegistrationWidget::registerSlot()
 	RecordSessionPtr session;
 	QString sessionUid = mSessionSelector->getValue();
 	if(!sessionUid.isEmpty())
-		session = mAcquisition->getPluginData()->getRecordSession(sessionUid);
+		session = mServices.acquisitionService->getSession(sessionUid);
 //	else
 //		session = mAcquisition->getLatestSession();
 
@@ -296,7 +288,7 @@ void BronchoscopyRegistrationWidget::acquisitionStopped()
     std::cout << "acquisitionStopped" << std::endl;
 
 	this->acquisitionCancelled();
-	QString newUid = mAcquisition->getLatestSession()->getUid();
+	QString newUid = mServices.acquisitionService->getLatestSession()->getUid();
 	QStringList range = mSessionSelector->getValueRange();
 	range << newUid;
 	mSessionSelector->setValueRange(range);
@@ -316,34 +308,13 @@ void BronchoscopyRegistrationWidget::acquisitionCancelled()
 	activeRep3D->getTracer()->stop();
 }
 
-void BronchoscopyRegistrationWidget::duringSavePatientSlot()
+void BronchoscopyRegistrationWidget::recordedSessionsChanged()
 {
-	QDomElement sessionsNode = mServices.patientModelService->getCurrentWorkingElement("bronchoscopySessions");
-	if(sessionsNode.isNull())
-		reportWarning("BronchoscopyRegistrationWidget::duringSavePatientSlot() Try bronchoscopySessions node. Got null node");
-
-	mAcquisition->getPluginData()->addXml(sessionsNode);
-}
-
-void BronchoscopyRegistrationWidget::duringLoadPatientSlot()
-{
-	mAcquisition->getPluginData()->clear();
-
-	QDomElement sessionsNode = mServices.patientModelService->getCurrentWorkingElement("bronchoscopySessions/stateManager");
-	mAcquisition->getPluginData()->parseXml(sessionsNode);
-
-	QStringList sessionUids = getSessionList(mAcquisition->getPluginData());
+	QStringList sessionUids = getSessionList();
 	mSessionSelector->setValueRange(sessionUids);
-
-	if(!sessionUids.isEmpty())
+	std::cout << "recordedSessionsChanged: "  << sessionUids.join(" ") << std::endl;
+	if(mSessionSelector->getValue().isEmpty() && !sessionUids.isEmpty())
 		mSessionSelector->setValue(sessionUids.last());
-}
-
-void BronchoscopyRegistrationWidget::duringClearPatientSlot()
-{
-	mAcquisition->getPluginData()->clear();
-	QStringList sessionUids = getSessionList(mAcquisition->getPluginData());
-	mSessionSelector->setValueRange(sessionUids);
 }
 
 ToolRep3DPtr BronchoscopyRegistrationWidget::getToolRepIn3DView(ToolPtr tool)

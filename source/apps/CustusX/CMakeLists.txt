@@ -23,8 +23,6 @@ include_directories(
     ${CustusX_BINARY_DIR}/source/logic
     ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
     ${CustusX_BINARY_DIR}/source/modules/GUIExtender
-    ${CustusX_SOURCE_DIR}/source/modules/Acquisition/gui
-    ${CustusX_BINARY_DIR}/source/modules/Acquisition
     ${CustusX_SOURCE_DIR}/source/modules/Calibration/gui
     ${CustusX_BINARY_DIR}/source/modules/Calibration
     ${CustusX_SOURCE_DIR}/source/modules/Algorithm/gui
@@ -32,8 +30,11 @@ include_directories(
     ${CustusX_SOURCE_DIR}/source/modules/Registration/gui
     ${CustusX_BINARY_DIR}/source/modules/Registration
 
+    # To be removed when all old modules have been converted to plugins
     ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.usreconstruction
     ${CustusX_BINARY_DIR}/source/plugins/org.custusx.usreconstruction
+    ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.acquisition
+    ${CustusX_BINARY_DIR}/source/plugins/org.custusx.acquisition
 	)
 
 #------------------------------------------------------------------------------
@@ -75,8 +76,8 @@ SET(LINK_LIBRARIES
     cxGui
     cxPluginCalibration
     cxPluginAlgorithm
-    cxPluginAcquisition
     org_custusx_usreconstruction
+    org_custusx_acquisition
 		)
 
 target_link_libraries(CustusX ${LINK_LIBRARIES} )

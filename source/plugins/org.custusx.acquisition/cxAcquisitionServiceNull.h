@@ -29,41 +29,50 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXREGISTRATIONMETHODSERVICES_H
-#define CXREGISTRATIONMETHODSERVICES_H
 
-#include "org_custusx_registration_Export.h"
+#ifndef CXACQUISITIONSERVICENULL_H
+#define CXACQUISITIONSERVICENULL_H
 
-#include "cxCoreServices.h"
+#include "cxAcquisitionService.h"
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class RegistrationService> RegistrationServicePtr;
-typedef boost::shared_ptr<class VisualizationService> VisualizationServicePtr;
-typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
-
-/**
- * Convenience class combining all services used by registration methods.
+/** \brief Null object pattern for Acqusition service
  *
- * \ingroup org_custusx_registration
- *
- * \date Nov 14 2014
- * \author Ole Vegard Solberg, SINTEF
+ *  \ingroup org_custusx_acqiusition
+ *  \date 2014-11-26
+ *  \author Ole Vegard Solberg, SINTEF
  */
-class org_custusx_registration_EXPORT RegServices : public CoreServices
+class org_custusx_acquisition_EXPORT AcquisitionServiceNull : public AcquisitionService
 {
 public:
-	RegServices(ctkPluginContext* context);
-	static RegServices getNullObjects();
+	AcquisitionServiceNull();
+	~AcquisitionServiceNull() {}
+	virtual bool isNull();
 
-	RegistrationServicePtr registrationService;
-	VisualizationServicePtr visualizationService;
-	AcquisitionServicePtr acquisitionService;
+	virtual RecordSessionPtr getLatestSession();
+	virtual std::vector<RecordSessionPtr> getSessions();
+
+	virtual bool isReady() const;
+	virtual QString getInfoText() const;
+	virtual STATE getState() const;
+	virtual void toggleRecord();
+	virtual void startRecord();
+	virtual void stopRecord();
+	virtual void cancelRecord();
+	virtual void startPostProcessing();
+	virtual void stopPostProcessing();
+
+	virtual int getNumberOfSavingThreads() const;
+
+	virtual void addXml(QDomNode& dataNode);
+	virtual void parseXml(QDomNode& dataNode);
+
 private:
-	RegServices();
+	void printWarning() const;
 };
 
-}
+}//cx
 
-#endif // CXREGISTRATIONMETHODSERVICES_H
+#endif // CXACQUISITIONSERVICENULL_H

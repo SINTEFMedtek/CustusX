@@ -29,36 +29,59 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include <cxCalibrationMethodsWidget.h>
 
-#include <cxToolTipSampleWidget.h>
-#include "cxToolTipCalibrationWidget.h"
-#include "cxToolManualCalibrationWidget.h"
-#include "cxTemporalCalibrationWidget.h"
-#include "cxLapFrameToolCalibrationWidget.h"
-#include "cxProbeConfigWidget.h"
+#ifndef CXTRACKEDCENTERLINEWIDGET_H_
+#define CXTRACKEDCENTERLINEWIDGET_H_
+
+#include "org_custusx_acquisition_Export.h"
+
+#include "cxRecordBaseWidget.h"
+#include "cxTool.h"
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cx_module_acquisition
+* @{
+*/
 
-CalibrationMethodsWidget::CalibrationMethodsWidget(PatientModelServicePtr patientModelService, AcquisitionServicePtr acquisitionService, QWidget* parent, QString objectName, QString windowTitle) :
-  TabbedWidget(parent, objectName, windowTitle)
+/**
+ * TrackedCenterlineWidget
+ *
+ * \brief NOT IN USE. TEST!!!
+ *
+ * \date Dec 9, 2010
+ * \author Janne Beate Bakeng, SINTEF
+ */
+class org_custusx_acquisition_EXPORT  TrackedCenterlineWidget : public TrackedRecordWidget
 {
-  this->addTab(new ToolTipCalibrateWidget(this), "Tool Tip");
-  this->addTab(new LapFrameToolCalibrationWidget(this), "Lap Frame");
-	this->addTab(new ToolTipSampleWidget(patientModelService, this), "Sample");
-  this->addTab(new TemporalCalibrationWidget(acquisitionService, this), "Temporal");
-  this->addTab(new ToolManualCalibrationWidget(this), "Tool Manual");
-  this->addTab(new ProbeConfigWidget(this), "Probe");
-}
+  Q_OBJECT
+public:
+  TrackedCenterlineWidget(AcquisitionServicePtr acquisitionService, QWidget* parent);
+  virtual ~TrackedCenterlineWidget();
+  virtual QString defaultWhatsThis() const;
 
-QString CalibrationMethodsWidget::defaultWhatsThis() const
-{
-  return"<html>"
-      "<h3>Calibration methods.</h3>"
-      "<p>These methods creates data structures that can be use in visualization.</p>"
-      "<p><i>Choose a method.</i></p>"
-      "</html>";
-}
+protected slots:
+  void checkIfReadySlot();
+  void postProcessingSlot(QString sessionId);
+  void startedSlot(QString sessionId);
+  void stoppedSlot(bool);
 
-}
+  void centerlineFinishedSlot();
+  void preprocessResampler();
+
+private:
+  virtual TimedTransformMap getRecording(RecordSessionPtr session); ///< gets the tracking data from all relevant tool for the given session
+  ToolPtr findTool(double startTime, double stopTime);
+
+//  Centerline  mCenterlineAlgorithm;
+  QString mSessionID;
+};
+
+/**
+* @}
+*/
+}//namespace cx
+
+#endif /* CXTRACKEDCENTERLINEWIDGET_H_ */
