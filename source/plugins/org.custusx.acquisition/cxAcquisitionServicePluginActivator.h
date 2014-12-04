@@ -61,7 +61,8 @@ public:
 	void stop(ctkPluginContext* context);
 
 private:
-	RegisteredServicePtr mRegistration;
+	RegisteredServicePtr mRegisteredAcquisitionService;
+	RegisteredServicePtr mRegisteredAcquisitionGUIService;
 };
 
 } // cx

@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDomNode>
 #include <QDateTime>
 #include <QStringList>
+#include <ctkPluginContext.h>
 #include "cxTime.h"
 #include "cxAcquisitionData.h"
 
@@ -43,13 +44,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxLegacySingletons.h"
 #include "cxPatientModelService.h"
+#include "cxUsReconstructionServiceProxy.h"
+#include "cxAcquisitionServiceProxy.h"
 
 namespace cx
 {
 
-AcquisitionPlugin::AcquisitionPlugin(UsReconstructionServicePtr reconstructer, AcquisitionServicePtr acquisitionService) :
-	mUsReconstructionService(reconstructer),
-	mAcquisitionService(acquisitionService)
+AcquisitionPlugin::AcquisitionPlugin(ctkPluginContext *context) :
+	mUsReconstructionService(new UsReconstructionServiceProxy(context)),
+	mAcquisitionService(new AcquisitionServiceProxy(context))
 {
 
 	connect(patientService().get(), SIGNAL(isSaving()), this, SLOT(duringSavePatientSlot()));
