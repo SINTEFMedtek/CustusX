@@ -834,6 +834,14 @@ void MainWindow::patientChangedSlot()
 
 void MainWindow::createMenus()
 {
+#ifdef CX_LINUX
+    // shortcuts defined on actions in the global menubar is not reachable on Qt5+Ubuntu14.04,
+    // solve by reverting to old style.
+    // This will create a double menubar: remove by autohiding menubar or using
+    //   sudo apt-get autoremove appmenu-gtk appmenu-gtk3 appmenu-qt
+    // and reboot
+    this->menuBar()->setNativeMenuBar(false);
+#endif
 	mFileMenu = new QMenu(tr("File"), this);
 	mWorkflowMenu = new QMenu(tr("Workflow"), this);
 	mToolMenu = new QMenu(tr("Tracking"), this);

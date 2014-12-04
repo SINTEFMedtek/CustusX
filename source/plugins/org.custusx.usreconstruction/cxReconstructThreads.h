@@ -103,7 +103,7 @@ private:
  * \date Jan 27, 2012
  * \author Christian Askeland, SINTEF
  */
-template class org_custusx_usreconstruction_EXPORT ThreadedTimedAlgorithm<void>;
+//template class org_custusx_usreconstruction_EXPORT ThreadedTimedAlgorithm<void>;
 class org_custusx_usreconstruction_EXPORT ThreadedTimedReconstructCore: public cx::ThreadedTimedAlgorithm<void>
 {
 Q_OBJECT
