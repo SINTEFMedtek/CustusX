@@ -599,7 +599,9 @@ void ViewManager::updateCameraStyleActions()
 	{
 		ViewGroupPtr group = this->getViewGroups()[index];
 		mCameraStyleInteractor->connectCameraStyle(group->getCameraStyle());
+		mCameraControl->setView(this->get3DView(index, 0));
 	}
+
 }
 
 /**Look for the index'th 3DView in given group.
