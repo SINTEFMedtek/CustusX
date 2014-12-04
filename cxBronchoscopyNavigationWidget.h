@@ -36,11 +36,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtWidgets>
 #include <QWidget>
 #include <QPushButton>
+#include "qdom.h"
 #include "cxRegistrationBaseWidget.h"
 #include "cxResourceWidgetsExport.h"
 #include "cxBaseWidget.h"
 #include "cxSelectDataStringDataAdapter.h"
 #include "cxMesh.h"
+#include "cxXmlOptionItem.h"
 
 class QVBoxLayout;
 
@@ -50,6 +52,7 @@ namespace cx
 
 typedef boost::shared_ptr<class TrackingSystemBronchoscopyService> TrackingSystemBronchoscopyServicePtr;
 typedef boost::shared_ptr<class SelectMeshStringDataAdapter> SelectMeshStringDataAdapterPtr;
+typedef boost::shared_ptr<class BronchoscopePositionProjection> BronchoscopePositionProjectionPtr;
 
 /**
  * Widget for use in the BronchoscopyNavigation
@@ -67,22 +70,30 @@ public:
 	virtual ~BronchoscopyNavigationWidget();
 
 private slots:
+	void processCenterlineSlot();
 	void enableSlot();
 	void disableSlot();
 
 private:
 	QString defaultWhatsThis() const;
+	void useAdvancedCenterlineProjection(QDomElement root);
 	QVBoxLayout*  mVerticalLayout;
+	BoolDataAdapterXmlPtr mUseAdvancedCenterlineProjection;
 
 	SelectMeshStringDataAdapterPtr mSelectMeshWidget;
+	QPushButton* mProcessCenterlineButton;
 	QPushButton* mEnableButton;
 	QPushButton* mDisableButton;
 	ToolPtr mTool;
 	TrackingSystemBronchoscopyServicePtr mTrackingSystem;
+	BronchoscopePositionProjectionPtr mProjectionCenterlinePtr;
+
 
 	PatientModelServicePtr mPatientModelService;
 	VisualizationServicePtr mVisualizationService;
 	TrackingServicePtr mTrackingService;
+
+	XmlOptionFile mOptions;
 };
 } /* namespace cx */
 

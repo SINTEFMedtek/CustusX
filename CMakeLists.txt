@@ -11,12 +11,15 @@ include_directories(
     ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
     ${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
     ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.registration
+    ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.registration.method.bronchoscopy
         ${CustusX_SOURCE_DIR}/source/service/tracking
         ${CustusX_SOURCE_DIR}/source/service/visualization
         ${CustusX_SOURCE_DIR}/source/gui/dataWidgets
+    ${CustusX_SOURCE_DIR}/source/gui/dataAdapters
         ${CustusX_SOURCE_DIR}/source/logic
 
     ${CustusX_BINARY_DIR}/source/plugins/org.custusx.registration
+    ${CustusX_BINARY_DIR}/source/plugins/org.custusx.registration.method.bronchoscopy
     ${CustusX_BINARY_DIR}/source/service/tracking
     ${CustusX_BINARY_DIR}/source/service/visualization
     ${CustusX_BINARY_DIR}/source/gui
@@ -64,6 +67,7 @@ set(PLUGIN_target_libraries
     cxPluginUtilities
     Qt5::Widgets
     cxGui
+    org_custusx_registration_method_bronchoscopy
     )
 
 ctkMacroBuildPlugin(
