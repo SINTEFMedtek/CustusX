@@ -312,7 +312,6 @@ void BronchoscopyRegistrationWidget::recordedSessionsChanged()
 {
 	QStringList sessionUids = getSessionList();
 	mSessionSelector->setValueRange(sessionUids);
-	std::cout << "recordedSessionsChanged: "  << sessionUids.join(" ") << std::endl;
 	if(mSessionSelector->getValue().isEmpty() && !sessionUids.isEmpty())
 		mSessionSelector->setValue(sessionUids.last());
 }
