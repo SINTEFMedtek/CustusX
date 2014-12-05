@@ -124,6 +124,8 @@ void LayoutRepository::load(XmlOptionFile file)
 	// load custom layouts:
 	mLayouts.clear();
 
+	this->blockSignals(true);
+
 	QDomElement layouts = file.getElement("layouts");
 	QDomNode layout = layouts.firstChild();
 	for (; !layout.isNull(); layout = layout.nextSibling())
@@ -135,14 +137,15 @@ void LayoutRepository::load(XmlOptionFile file)
 		data.parseXml(layout);
 
 		this->insert(data);
-//		unsigned pos = this->indexOf(data.getUid());
-//		if (pos == mLayouts.size())
-//			mLayouts.push_back(data);
-//		else
-//			mLayouts[pos] = data;
 	}
 
+	std::vector<QString> custom = this->getAvailable();
 	this->addDefaults(); // ensure we overwrite loaded layouts
+
+	this->blockSignals(false);
+
+	for (unsigned i=0; i<custom.size(); ++i)
+		emit layoutChanged(custom[i]);
 }
 
 void LayoutRepository::save(XmlOptionFile file)

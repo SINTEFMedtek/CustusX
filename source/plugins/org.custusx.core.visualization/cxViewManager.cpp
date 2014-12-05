@@ -98,7 +98,6 @@ ViewManager::ViewManager(/*PatientModelServicePtr patientModelService, */CoreSer
 
 	mSlicePlanesProxy.reset(new SlicePlanesProxy());
 	mLayoutRepository.reset(new LayoutRepository());
-	connect(mLayoutRepository.get(), &LayoutRepository::layoutChanged, this, &ViewManager::onLayoutRepositoryChanged);
 	mCameraControl.reset(new CameraControl());
 
 	mRenderLoop->setLogging(settings()->value("renderSpeedLogging").toBool());
@@ -127,7 +126,9 @@ ViewManager::ViewManager(/*PatientModelServicePtr patientModelService, */CoreSer
 	connect(this, SIGNAL(activeViewChanged()), this, SLOT(updateCameraStyleActions()));
 
     this->loadGlobalSettings();
-    this->initializeGlobal2DZoom();
+	// connect to layoutrepo after load of global
+	connect(mLayoutRepository.get(), &LayoutRepository::layoutChanged, this, &ViewManager::onLayoutRepositoryChanged);
+	this->initializeGlobal2DZoom();
     this->initializeActiveView();
     this->syncOrientationMode(SyncedValue::create(0));
 
@@ -564,7 +565,6 @@ void ViewManager::onLayoutRepositoryChanged(QString uid)
 	{
 		mActiveLayout[0] = ""; // hack: force trigger a change
 		this->setActiveLayout(uid, 0);
-//		emit activeLayoutChanged();
 	}
 }
 
@@ -599,7 +599,9 @@ void ViewManager::updateCameraStyleActions()
 	{
 		ViewGroupPtr group = this->getViewGroups()[index];
 		mCameraStyleInteractor->connectCameraStyle(group->getCameraStyle());
+		mCameraControl->setView(this->get3DView(index, 0));
 	}
+
 }
 
 /**Look for the index'th 3DView in given group.

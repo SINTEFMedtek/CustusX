@@ -57,7 +57,7 @@ class cxPluginCalibration_EXPORT TemporalCalibrationWidget : public BaseWidget
 {
   Q_OBJECT
 public:
-  TemporalCalibrationWidget(AcquisitionDataPtr acquisitionData, QWidget* parent);
+  TemporalCalibrationWidget(AcquisitionServicePtr acquisitionService, QWidget* parent);
   virtual ~TemporalCalibrationWidget();
 
   virtual QString defaultWhatsThis() const;
@@ -70,7 +70,6 @@ private slots:
 protected:
   void showEvent(QShowEvent* event);
 private:
-  USAcquisitionPtr mAcquisition;
   TemporalCalibrationPtr mAlgorithm;
 
   FileSelectWidget* mFileSelectWidget;

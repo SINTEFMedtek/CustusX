@@ -41,6 +41,7 @@ namespace cx
 
 typedef boost::shared_ptr<class RegistrationService> RegistrationServicePtr;
 typedef boost::shared_ptr<class VisualizationService> VisualizationServicePtr;
+typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
 
 /**
  * Convenience class combining all services used by registration methods.
@@ -58,6 +59,7 @@ public:
 
 	RegistrationServicePtr registrationService;
 	VisualizationServicePtr visualizationService;
+	AcquisitionServicePtr acquisitionService;
 private:
 	RegServices();
 };

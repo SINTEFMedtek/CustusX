@@ -134,8 +134,6 @@ protected slots:
 	void dockWidgetVisibilityChanged(bool val);
 	void focusChanged(QWidget * old, QWidget * now);
 
-//	void startupLoadPatient();
-
     void onPluginBaseAdded(GUIExtenderService* service);
     void onPluginBaseRemoved(GUIExtenderService* service);
 	void onPluginBaseModified(GUIExtenderService* service);
@@ -234,15 +232,9 @@ private:
 	QPointer<class SecondaryMainWindow> mControlPanel;
 	QPointer<class SecondaryViewLayoutWindow> mSecondaryViewLayoutWindow;
 
-	//Preferences
-	CameraControlPtr mCameraControl;
-
 	DockWidgets* mDockWidgets;
 	std::set<QToolBar*> mToolbars;
 
-//	PatientModelServicePtr mPatientModelService;
-//	VisualizationServicePtr mVisualizationService;
-//	VideoServicePtr mVideoService;
 	VisServicesPtr mServices;
 };
 

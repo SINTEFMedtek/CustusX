@@ -95,7 +95,7 @@ namespace cx
 {
 
 MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
-	mFullScreenAction(NULL), mStandard3DViewActions(NULL), mControlPanel(NULL), mDockWidgets(new DockWidgets(this))
+	mFullScreenAction(NULL), mStandard3DViewActions(new QActionGroup(this)), mControlPanel(NULL), mDockWidgets(new DockWidgets(this))
 {
 	this->setObjectName("MainWindow");
 
@@ -104,10 +104,8 @@ MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
 	qApp->setStyleSheet(stylesheet.readAll());
 
 	mServices = VisServices::create(logicManager()->getPluginContext());
-	mCameraControl = viewService()->getCameraControl();
 	mLayoutInteractor.reset(new LayoutInteractor());
 
-//	viewService()->initialize();
 	this->setCentralWidget(viewService()->getLayoutWidget(0));
 
 	this->createActions();
@@ -169,9 +167,6 @@ MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
 	if (settings()->value("gui/fullscreen").toBool())
 		this->setWindowState(this->windowState() | Qt::WindowFullScreen);
 
-//	this->setCentralWidget(viewService()->getLayoutWidget(0));
-
-//	QTimer::singleShot(0, this, SLOT(startupLoadPatient())); // make sure this is called after application state change
 	this->toggleDebugModeSlot(mDebugModeAction->isChecked());
 }
 
@@ -328,7 +323,9 @@ QMenu* MainWindow::createPopupMenu()
 
 void MainWindow::createActions()
 {
-	mStandard3DViewActions = mCameraControl->createStandard3DViewActions();
+	CameraControlPtr cameraControl = viewService()->getCameraControl();
+	if (cameraControl)
+		mStandard3DViewActions = cameraControl->createStandard3DViewActions();
 
 	// File
 	mNewPatientAction = new QAction(QIcon(":/icons/open_icon_library/document-new-8.png"), tr(
@@ -424,9 +421,8 @@ void MainWindow::createActions()
 	mShowPointPickerAction->setIcon(QIcon(":/icons/point_picker.png"));
 	connect(mShowPointPickerAction, SIGNAL(triggered()), this, SLOT(togglePointPickerActionSlot()));
 
-	connect(viewService()->getGroup(0).get(), SIGNAL(optionsChanged()), this,
-//	connect(mServices->visualizationService->getViewGroupData(0).get(), SIGNAL(optionsChanged()), this, //Too early?
-		SLOT(updatePointPickerActionSlot()));
+	if (viewService()->getGroup(0))
+		connect(viewService()->getGroup(0).get(), SIGNAL(optionsChanged()), this, SLOT(updatePointPickerActionSlot()));
 	this->updatePointPickerActionSlot();
 
 	//tool
@@ -606,6 +602,8 @@ void MainWindow::togglePointPickerActionSlot()
 }
 void MainWindow::updatePointPickerActionSlot()
 {
+	if (!viewService()->getGroup(0))
+		return;
 	bool show = viewService()->getGroup(0)->getOptions().mShowPointPickerProbe;
 //	bool show = mServices->visualizationService->getViewGroupData(0)->getOptions().mShowPointPickerProbe;//TOO early?
 	mShowPointPickerAction->setChecked(show);
@@ -944,6 +942,7 @@ void MainWindow::createToolBars()
 
 	mInteractorStyleToolBar = addToolBar("InteractorStyle");
 	mInteractorStyleToolBar->setObjectName("InteractorStyleToolBar");
+
 	mInteractorStyleToolBar->addActions(mInteractorStyleActionGroup->actions());
 	this->registerToolBar(mInteractorStyleToolBar, "Toolbar");
 

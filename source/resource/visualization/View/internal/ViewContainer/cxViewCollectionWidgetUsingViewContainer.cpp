@@ -46,7 +46,7 @@ ViewCollectionWidgetUsingViewContainer::ViewCollectionWidgetUsingViewContainer()
 	this->setLayout(layout);
 	layout->setSpacing(0);
 	layout->setMargin(0);
-	mViewContainer = new ViewContainer;
+	mViewContainer = new ViewContainer(this);
 	mViewContainer->getGridLayout()->setSpacing(2);
 	mViewContainer->getGridLayout()->setMargin(4);
 	layout->addWidget(mViewContainer);
@@ -58,6 +58,7 @@ ViewCollectionWidgetUsingViewContainer::~ViewCollectionWidgetUsingViewContainer(
 
 ViewPtr ViewCollectionWidgetUsingViewContainer::addView(View::Type type, LayoutRegion region)
 {
+	mViewContainer->show();
 	static int nameGenerator = 0;
 	QString uid = QString("view-%1-%2")
 			.arg(nameGenerator++)
@@ -74,6 +75,7 @@ ViewPtr ViewCollectionWidgetUsingViewContainer::addView(View::Type type, LayoutR
 void ViewCollectionWidgetUsingViewContainer::clearViews()
 {
 	mViews.clear();
+	mViewContainer->hide();
 	mViewContainer->clear();
 }
 
