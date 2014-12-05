@@ -74,6 +74,8 @@ public:
 	virtual bool isNull() const = 0;
 	static SessionStorageServicePtr getNullObject();
 
+	QString getSubFolder(QString relative); ///< return and create a folder/path relative to root. Created if necessary.
+
 signals:
 	void cleared(); ///< emitted when session is cleared, before isLoading is called
 	void sessionChanged(); ///< emitted after change to a new session (new or loaded or cleared)

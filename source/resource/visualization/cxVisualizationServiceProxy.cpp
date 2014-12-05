@@ -178,20 +178,4 @@ void VisualizationServiceProxy::removePreview()
 	mVisualizationService->removePreview();
 }
 
-void VisualizationServiceProxy::clear()
-{
-	mVisualizationService->clear();
-}
-
-void VisualizationServiceProxy::addXml(QDomNode& parentNode)
-{
-	mVisualizationService->addXml(parentNode);
-}
-
-void VisualizationServiceProxy::parseXml(QDomNode viewmanagerNode)
-{
-	mVisualizationService->parseXml(viewmanagerNode);
-}
-
-
 } //cx

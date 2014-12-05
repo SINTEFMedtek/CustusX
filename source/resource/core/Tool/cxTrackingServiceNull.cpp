@@ -110,46 +110,14 @@ void TrackingServiceNull::setPlaybackMode(PlaybackTimePtr controller)
 
 }
 
-void TrackingServiceNull::savePositionHistory()
-{
-
-}
-
-void TrackingServiceNull::loadPositionHistory()
-{
-
-}
-
-void TrackingServiceNull::addXml(QDomNode& parentNode)
-{
-
-}
-
-void TrackingServiceNull::parseXml(QDomNode& dataNode)
-{
-
-}
-
-void TrackingServiceNull::clear()
-{
-
-}
-
 SessionToolHistoryMap TrackingServiceNull::getSessionHistory(double startTime, double stopTime)
 {
 	return SessionToolHistoryMap();
 }
 
-void TrackingServiceNull::setLoggingFolder(QString loggingFolder)
-{
-
-}
-
 void TrackingServiceNull::runDummyTool(DummyToolPtr tool)
 {
-
 }
-
 
 TrackerConfigurationPtr TrackingServiceNull::getConfiguration()
 {

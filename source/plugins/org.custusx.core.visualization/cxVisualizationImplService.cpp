@@ -34,11 +34,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ctkPluginContext.h>
 #include "cxViewManager.h"
-#include "cxLegacySingletons.h"
 #include "cxViewGroup.h"
 #include "cxRepManager.h"
 #include "cxThresholdPreview.h"
 #include "cxCoreServices.h"
+#include "cxSessionStorageServiceProxy.h"
+#include "cxXMLNodeWrapper.h"
 
 namespace cx
 {
@@ -47,12 +48,18 @@ VisualizationImplService::VisualizationImplService(ctkPluginContext *context) :
 	mContext(context )
 {
 	CoreServicesPtr backend = CoreServices::create(context);
+	mSession = SessionStorageServiceProxy::create(mContext);
 	mBase = ViewManager::create(backend);
 
 	if(!viewManager())
 		std::cout << "VisualizationImplService got no viewManager" << std::endl;
 //	connect(viewManager(), SIGNAL(activeViewChanged()), this, SIGNAL(activeViewChanged()));
 //	connect(viewManager(), &ViewManager::renderingEnabledChanged, this, &VisualizationService::renderingEnabledChanged);
+
+	connect(mSession.get(), &SessionStorageService::sessionChanged, this, &VisualizationImplService::onSessionChanged);
+	connect(mSession.get(), &SessionStorageService::cleared, this, &VisualizationImplService::onSessionCleared);
+	connect(mSession.get(), &SessionStorageService::isLoading, this, &VisualizationImplService::onSessionLoad);
+	connect(mSession.get(), &SessionStorageService::isSaving, this, &VisualizationImplService::onSessionSave);
 
 	connect(viewManager(), &ViewManager::activeViewChanged, this, &VisualizationService::activeViewChanged);
 	connect(viewManager(), &ViewManager::fps, this, &VisualizationService::fps);
@@ -172,19 +179,25 @@ void VisualizationImplService::removePreview()
 //	mVisualizationService->removePreview();
 }
 
-void VisualizationImplService::clear()
+void VisualizationImplService::onSessionChanged()
+{
+}
+void VisualizationImplService::onSessionCleared()
 {
 	viewManager()->clear();
 }
-
-void VisualizationImplService::addXml(QDomNode& parentNode)
+void VisualizationImplService::onSessionLoad(QDomElement& node)
 {
-	viewManager()->addXml(parentNode);
+	XMLNodeParser root(node);
+	QDomElement viewManagerNode = root.descend("managers/viewManager").node().toElement();
+	if (!viewManagerNode.isNull())
+		viewManager()->parseXml(viewManagerNode);
 }
-
-void VisualizationImplService::parseXml(QDomNode viewmanagerNode)
+void VisualizationImplService::onSessionSave(QDomElement& node)
 {
-	viewManager()->parseXml(viewmanagerNode);
+	XMLNodeAdder root(node);
+	QDomElement managerNode = root.descend("managers").node().toElement();
+	viewManager()->addXml(managerNode);
 }
 
 

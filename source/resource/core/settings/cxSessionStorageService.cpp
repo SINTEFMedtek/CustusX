@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxSessionStorageService.h"
 #include "cxNullDeleter.h"
+#include <QDir>
 
 namespace cx
 {
@@ -58,5 +59,21 @@ SessionStorageServicePtr SessionStorageService::getNullObject()
 		mNull.reset(new SessionStorageServiceNull, null_deleter());
 	return mNull;
 }
+
+QString SessionStorageService::getSubFolder(QString relative)
+{
+	if (!this->isValid())
+		return "";
+	QString root = this->getRootFolder();
+	if (root.isEmpty())
+		return "";
+
+	QString path = root + "/" + relative;
+	QDir dir(path);
+	if (!dir.exists())
+		dir.mkpath(path);
+	return path;
+}
+
 
 } // cx

@@ -198,7 +198,7 @@ private:
 	QAction* mConfigureToolsAction; ///< action for configuring the toolmanager
 	QAction* mInitializeToolsAction; ///< action for initializing contact with the navigation system
 	QAction* mTrackingToolsAction; ///< action for asking the navigation system to start/stop tracking
-	QAction* mSaveToolsPositionsAction; ///< action for saving the tool positions
+//	QAction* mSaveToolsPositionsAction; ///< action for saving the tool positions
 	QAction* mStartStreamingAction; ///< start streaming of the default RT source.
 	QActionGroup* mToolsActionGroup; ///< grouping the actions for contacting the navigation system
 

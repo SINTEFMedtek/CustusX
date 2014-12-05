@@ -69,6 +69,8 @@ public:
 	virtual QString getRootFolder() const;
 	virtual bool isNull() const;
 
+private slots:
+	void onSessionChanged();
 private:
 	QString getNullFolder() const;
 	void reportActivePatient();

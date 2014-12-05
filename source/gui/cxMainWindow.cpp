@@ -431,7 +431,7 @@ void MainWindow::createActions()
 	mInitializeToolsAction = new QAction(tr("Initialize"), mToolsActionGroup);
 	mTrackingToolsAction = new QAction(tr("Start tracking"), mToolsActionGroup);
 	mTrackingToolsAction->setShortcut(tr("Ctrl+T"));
-	mSaveToolsPositionsAction = new QAction(tr("Save positions"), this);
+//	mSaveToolsPositionsAction = new QAction(tr("Save positions"), this);
 
 	mToolsActionGroup->setExclusive(false); // must turn off to get the checkbox independent.
 
@@ -448,8 +448,8 @@ void MainWindow::createActions()
 	boost::function<void()> finit = boost::bind(&TrackingService::setState, trackingService(), Tool::tsINITIALIZED);
 	connect(mInitializeToolsAction, &QAction::triggered, finit);
 	connect(mTrackingToolsAction, SIGNAL(triggered()), this, SLOT(toggleTrackingSlot()));
-	boost::function<void()> fsavetools = boost::bind(&TrackingService::savePositionHistory, trackingService());
-	connect(mSaveToolsPositionsAction, &QAction::triggered, fsavetools);
+//	boost::function<void()> fsavetools = boost::bind(&TrackingService::savePositionHistory, trackingService());
+//	connect(mSaveToolsPositionsAction, &QAction::triggered, fsavetools);
 	connect(trackingService().get(), SIGNAL(stateChanged()), this, SLOT(updateTrackingActionSlot()));
 	connect(trackingService().get(), SIGNAL(stateChanged()), this, SLOT(updateTrackingActionSlot()));
 	this->updateTrackingActionSlot();
@@ -896,8 +896,8 @@ void MainWindow::createMenus()
 	mToolMenu->addAction(mInitializeToolsAction);
 	mToolMenu->addAction(mTrackingToolsAction);
 	mToolMenu->addSeparator();
-	mToolMenu->addAction(mSaveToolsPositionsAction);
-	mToolMenu->addSeparator();
+//	mToolMenu->addAction(mSaveToolsPositionsAction);
+//	mToolMenu->addSeparator();
 	mToolMenu->addAction(mStartStreamingAction);
 	mToolMenu->addSeparator();
 

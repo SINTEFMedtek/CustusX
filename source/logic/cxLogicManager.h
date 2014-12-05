@@ -50,13 +50,10 @@ namespace cx
 */
 
 typedef boost::shared_ptr<class PluginFrameworkManager> PluginFrameworkManagerPtr;
-typedef boost::shared_ptr<class ServiceController> ServiceControllerPtr;
 
-/** \brief Responsible for the entire logic layer.
+/** \brief Control the custusx backend.
  *  \ingroup cx_logic
  *
- * All controllers in this layers are embedded in this class.
- * The service layer are managed via the ServiceController aggregate member.
  *
  */
 class cxLogicManager_EXPORT LogicManager : public QObject
@@ -108,8 +105,6 @@ private:
 
 	LogicManager(LogicManager const&); // not implemented
 	LogicManager& operator=(LogicManager const&); // not implemented
-
-	ServiceControllerPtr mServiceController;
 
 // services:
 	SpaceProviderPtr mSpaceProvider;

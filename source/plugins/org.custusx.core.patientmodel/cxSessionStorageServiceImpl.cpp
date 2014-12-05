@@ -46,7 +46,7 @@ namespace cx
 SessionStorageServiceImpl::SessionStorageServiceImpl(ctkPluginContext *context)
 {
 	this->clearCache();
-
+	connect(this, &SessionStorageServiceImpl::sessionChanged, this, &SessionStorageServiceImpl::onSessionChanged);
 }
 
 SessionStorageServiceImpl::~SessionStorageServiceImpl()
@@ -186,6 +186,11 @@ void SessionStorageServiceImpl::setActivePatient(const QString& activePatientFol
 	mActivePatientFolder = activePatientFolder;
 
 	emit sessionChanged();
+}
+
+void SessionStorageServiceImpl::onSessionChanged()
+{
+	reporter()->setLoggingFolder(this->getSubFolder("Logs/"));
 }
 
 void SessionStorageServiceImpl::clearPatientSilent()

@@ -5,14 +5,11 @@
 # definition of the cxLogicManager module:
 
 SET( CX_QT_MOC_HEADER_FILES
-	cxServiceController.h
 	cxLogicManager.h
 	cxPluginFramework.h
 )
 
 SET (cxLogicManager_SOURCE
-    cxServiceController.h
-    cxServiceController.cpp
     cxLogicManager.h
     cxLogicManager.cpp
     cxLegacySingletons.h

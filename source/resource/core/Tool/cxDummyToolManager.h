@@ -75,16 +75,16 @@ public:
 	virtual ToolPtr getReferenceTool() const;
 
 	virtual ToolPtr getManualTool() { return ToolPtr(); }
-	virtual void savePositionHistory() {}
-	virtual void loadPositionHistory() {}
-	virtual void addXml(QDomNode& parentNode) {}
-	virtual void parseXml(QDomNode& dataNode) {}
-	virtual void clear() {}
+//	virtual void savePositionHistory() {}
+//	virtual void loadPositionHistory() {}
+//	virtual void addXml(QDomNode& parentNode) {}
+//	virtual void parseXml(QDomNode& dataNode) {}
+//	virtual void clear() {}
 	virtual SessionToolHistoryMap getSessionHistory(double startTime, double stopTime) { return SessionToolHistoryMap(); }
 
 	virtual bool isPlaybackMode() const { return false; }
 	virtual void setPlaybackMode(PlaybackTimePtr controller) {}
-	virtual void setLoggingFolder(QString loggingFolder) {}
+//	virtual void setLoggingFolder(QString loggingFolder) {}
 	virtual void runDummyTool(DummyToolPtr tool) {}
 	virtual bool isNull() { return false; }
 

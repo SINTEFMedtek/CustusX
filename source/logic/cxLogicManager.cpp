@@ -32,7 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxLogicManager.h>
 
 #include <ctkPluginContext.h>
-#include "cxServiceController.h"
 #include "cxReporter.h"
 #include "cxVideoServiceProxy.h"
 #include "cxStateService.h"
@@ -123,7 +122,6 @@ void LogicManager::initializeServices()
 	mStateService = StateServiceProxy::create(pc);
 
 	mSpaceProvider.reset(new cx::SpaceProviderImpl(mTrackingService, mPatientModelService));
-	mServiceController.reset(new ServiceController);
 
 	mPluginFramework->loadState();
 }

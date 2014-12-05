@@ -67,23 +67,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackingSystemIGSTKService.h"
 #include "cxTrackingSystemDummyService.h"
 #include "cxTrackingSystemPlaybackService.h"
+#include "cxSessionStorageServiceProxy.h"
 
 namespace cx
 {
 
-//TrackingImplService::TrackingImplService TrackingImplService::create()
-//{
-//	TrackingImplService retval;
-//	retval.reset(new TrackingImplService());
-//	return retval;
-//}
-
 TrackingImplService::TrackingImplService(ctkPluginContext *context) :
-				mLoggingFolder(""),
+//				mLoggingFolder(""),
 				mLastLoadPositionHistory(0),
 				mContext(context),
 				mToolTipOffset(0)
 {
+	mSession = SessionStorageServiceProxy::create(mContext);
+	connect(mSession.get(), &SessionStorageService::sessionChanged, this, &TrackingImplService::onSessionChanged);
+	connect(mSession.get(), &SessionStorageService::cleared, this, &TrackingImplService::onSessionCleared);
+	connect(mSession.get(), &SessionStorageService::isLoading, this, &TrackingImplService::onSessionLoad);
+	connect(mSession.get(), &SessionStorageService::isSaving, this, &TrackingImplService::onSessionSave);
+
 	this->initializeManualTool(); // do this after setting self.
 
 	TrackingSystemServicePtr igstk(new TrackingSystemIGSTKService());
@@ -339,7 +339,7 @@ ToolPtr TrackingImplService::getReferenceTool() const
 
 void TrackingImplService::savePositionHistory()
 {
-	QString filename = mLoggingFolder + "/toolpositions.snwpos";
+	QString filename = this->getLoggingFolder() + "/toolpositions.snwpos";
 
 	PositionStorageWriter writer(filename);
 
@@ -368,7 +368,7 @@ void TrackingImplService::loadPositionHistory()
 	// save all position data acquired so far, in case of multiple calls.
 	this->savePositionHistory();
 
-	QString filename = mLoggingFolder + "/toolpositions.snwpos";
+	QString filename = this->getLoggingFolder()+ "/toolpositions.snwpos";
 
 	PositionStorageReader reader(filename);
 
@@ -407,15 +407,15 @@ void TrackingImplService::loadPositionHistory()
 	mLastLoadPositionHistory = getMilliSecondsSinceEpoch();
 }
 
-void TrackingImplService::setLoggingFolder(QString loggingFolder)
-{
-	if (mLoggingFolder == loggingFolder)
-		return;
+//void TrackingImplService::setLoggingFolder(QString loggingFolder)
+//{
+//	if (mLoggingFolder == loggingFolder)
+//		return;
 
-	for (unsigned i=0; i<mTrackingSystems.size(); ++i)
-		mTrackingSystems[i]->setLoggingFolder(loggingFolder);
-	mLoggingFolder = loggingFolder;
-}
+//	for (unsigned i=0; i<mTrackingSystems.size(); ++i)
+//		mTrackingSystems[i]->setLoggingFolder(loggingFolder);
+//	mLoggingFolder = loggingFolder;
+//}
 
 void TrackingImplService::globalConfigurationFileChangedSlot(QString key)
 {
@@ -533,6 +533,42 @@ bool toolTypeSort(const ToolPtr tool1, const ToolPtr tool2)
 	return getPriority(tool2) < getPriority(tool1);
 }
 
+QString TrackingImplService::getLoggingFolder()
+{
+	return mSession->getSubFolder("Logs/");
+}
+
+void TrackingImplService::onSessionChanged()
+{
+	QString loggingFolder = this->getLoggingFolder();
+
+	for (unsigned i=0; i<mTrackingSystems.size(); ++i)
+		mTrackingSystems[i]->setLoggingFolder(loggingFolder);
+}
+
+void TrackingImplService::onSessionCleared()
+{
+	mManualTool->set_prMt(Transform3D::Identity());
+}
+
+void TrackingImplService::onSessionLoad(QDomElement& node)
+{
+	XMLNodeParser root(node);
+	QDomElement toolManagerNode = root.descend("managers/toolManager").node().toElement();
+	if (!toolManagerNode.isNull())
+		this->parseXml(toolManagerNode);
+
+}
+
+void TrackingImplService::onSessionSave(QDomElement& node)
+{
+	XMLNodeAdder root(node);
+	QDomElement managerNode = root.descend("managers").node().toElement();
+	this->addXml(managerNode);
+
+	this->savePositionHistory();
+}
+
 void TrackingImplService::addXml(QDomNode& parentNode)
 {
 	XMLNodeAdder parent(parentNode);
@@ -555,11 +591,6 @@ void TrackingImplService::addXml(QDomNode& parentNode)
 	}
 }
 
-void TrackingImplService::clear()
-{
-	mManualTool->set_prMt(Transform3D::Identity());
-}
-
 void TrackingImplService::parseXml(QDomNode& dataNode)
 {
 	if (dataNode.isNull())
@@ -574,7 +605,6 @@ void TrackingImplService::parseXml(QDomNode& dataNode)
 
 	//Tools
 	ToolMap tools = this->getTools();
-//	QDomNode toolssNode = dataNode.namedItem("tools");
 	XMLNodeParser toolssNode(dataNode.namedItem("tools"));
 	std::vector<QDomElement> toolNodes = toolssNode.getDuplicateElements("tool");
 

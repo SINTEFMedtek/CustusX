@@ -69,9 +69,6 @@ public:
 	virtual QActionGroup* createInteractorStyleActionGroup();
 	virtual void setPreview(ImagePtr image, const std::vector<double>& threshold);
 	virtual void removePreview();
-	virtual void clear();
-	virtual void addXml(QDomNode& parentNode);
-	virtual void parseXml(QDomNode viewmanagerNode);
 
 	bool isNull();
 

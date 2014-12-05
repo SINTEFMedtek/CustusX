@@ -94,10 +94,6 @@ public:
 	virtual void setPreview(ImagePtr image, const std::vector<double>& threshold) = 0;
 	virtual void removePreview() = 0;
 
-	virtual void clear() = 0;
-	virtual void addXml(QDomNode& parentNode) = 0;
-	virtual void parseXml(QDomNode viewmanagerNode) = 0;
-
 	virtual bool isNull() = 0;
 	static VisualizationServicePtr getNullObject();
 
