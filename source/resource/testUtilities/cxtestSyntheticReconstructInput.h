@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTESTSYNTHETICRECONSTRUCTINPUT_H
 #define CXTESTSYNTHETICRECONSTRUCTINPUT_H
 
-#include "cxReconstructionMethodService.h"
+#include "cxtestUtilities_Export.h"
 #include "cxSimpleSyntheticVolume.h"
 #include "cxtestSyntheticVolumeComparer.h"
 
@@ -49,7 +49,7 @@ typedef boost::shared_ptr<class SyntheticReconstructInput> SyntheticReconstructI
  * \date 12.12.2013, 2013
  * \author christiana
  */
-class SyntheticReconstructInput
+class CXTESTUTILITIES_EXPORT SyntheticReconstructInput
 {
 public:
 	SyntheticReconstructInput();

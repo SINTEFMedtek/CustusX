@@ -59,7 +59,8 @@ set(CMAKE_BUILD_TYPE:STRING=Debug)
 
 
 cx_initialize_custusx_install()
-cx_catch_initialize()
+cx_clear_catch_cache()
+#cx_catch_initialize() # OLD -DELETE
 cx_initialize_coverage()
 
 include(Dart)

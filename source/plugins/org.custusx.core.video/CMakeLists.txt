@@ -77,7 +77,6 @@ set(PLUGIN_target_libraries
     cxPluginUtilities
     OpenIGTLink
     cxGrabber
-	cxResourceUsReconstructionTypes
     )
 
 set(PLUGIN_OUTPUT_DIR "")

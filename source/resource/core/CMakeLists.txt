@@ -91,6 +91,8 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	utilities/cxSpaceProvider
 
 	patientModel/cxPatientModelService
+
+    usReconstructionTypes/cxSavingVideoRecorder
 	)
 
      
@@ -182,10 +184,18 @@ cx_add_class(cxResource_SOURCE
 
 	patientModel/cxPatientModelServiceNull
 	patientModel/cxPatientModelServiceProxy
+
 	Video/cxVideoServiceNull
 	Video/cxVideoServiceProxy
+
 	Tool/cxTrackingServiceNull
 	Tool/cxTrackingServiceProxy
+
+    usReconstructionTypes/cxUsReconstructionFileMaker
+    usReconstructionTypes/cxUsReconstructionFileReader
+    usReconstructionTypes/cxUSFrameData
+    usReconstructionTypes/cxUSReconstructInputData
+    usReconstructionTypes/cxUSReconstructInputDataAlgoritms
 	
 	${CustusX_SOURCE_DIR}/source/ThirdParty/iir1/iir/Butterworth.cpp
 	${CustusX_SOURCE_DIR}/source/ThirdParty/iir1/iir/Cascade.cpp
@@ -223,11 +233,9 @@ vtkImagingColor
 vtkImagingMath
 vtkImagingGeneral
 vtkImagingCore
-#vtkImagingMorphological
 vtkFiltersCore
 vtkFiltersGeneral
 vtkFiltersSources
-#vtkFiltersParallel
 vtkRenderingFreeTypeOpenGL
 vtkRenderingFreeType
 vtkRenderingOpenGL
@@ -241,17 +249,6 @@ vtkInteractionStyle
 unset(SSC_DATA_ROOT)
 set (SSC_DATA_ROOT ${CustusX_SOURCE_DIR}/data CACHE INTERNAL "path to ssc data root")
 
-# Configure the USE_GLX_SHARED_CONTEXT - used in sscConfig.h
-#if(X11_FOUND)
-#    if(APPLE)
-#        option(USE_GLX_SHARED_CONTEXT "use shared glx contexts" OFF)
-#    else(APPLE)
-#        option(USE_GLX_SHARED_CONTEXT "use shared glx contexts" ON)
-#    endif(APPLE)
-#    include_directories( ${X11_INCLUDE_DIR} ) # needed by Mac 10.8+
-#else(X11_FOUND)
-#    option(USE_GLX_SHARED_CONTEXT "use shared glx contexts" OFF)
-#endif(X11_FOUND)
 
 configure_file(
   "${CustusX_SOURCE_DIR}/source/resource/core/utilities/sscConfig.h.in"
@@ -290,7 +287,6 @@ set(CX_RESOURCE_INCLUDE_DIRECTORIES
 
 set (CX_RESOURCE_LIBRARIES
     ${CX_RESOURCE_LIBRARIES}
-	#QVTK
     ${SSC_GCOV_LIBRARY}
     ${OPENGL_LIBRARIES}
     Qt5::Widgets
@@ -317,12 +313,26 @@ endif ()
 
 include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
 
+
+unset(CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES)
+set(CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES
+    ${CX_RESOURCE_INCLUDE_DIRECTORIES}
+    ${CustusX_SOURCE_DIR}/source/resource/core/usReconstructionTypes
+    ${CustusX_BINARY_DIR}/source/resource/core/usReconstructionTypes
+    CACHE INTERNAL "Include directories for resource US Reconstruction Types library")
+include_directories(${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES} )
+
 cx_create_export_header("cxResource")
 cx_remove_duplicate_include_directories()
 
 ADD_MSVC_PRECOMPILED_HEADER("cxPrecompiledHeader.h" "cxPrecompiledHeader.cpp" cxResource_SOURCE)
 
 add_library(cxResource ${cxResource_SOURCE})
+target_include_directories(cxResource
+    PUBLIC
+    ${CX_RESOURCE_INCLUDE_DIRECTORIES}
+    ${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
+)
 target_link_libraries(cxResource ${CX_RESOURCE_LIBRARIES} )
 
 add_subdirectory(testing)

@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXUSFRAMEDATA_H_
 #define CXUSFRAMEDATA_H_
 
-#include "cxResourceUsReconstructionTypesExport.h"
+#include "cxResourceExport.h"
 
 #include "cxProbeSector.h"
 #include "cxUSReconstructInputData.h"
@@ -62,7 +62,7 @@ typedef boost::shared_ptr<class USFrameData> USFrameDataPtr;
   *
   * Interface is thread-safe.
   */
-class cxResourceUsReconstructionTypes_EXPORT ProcessedUSInputData
+class cxResource_EXPORT ProcessedUSInputData
 {
 public:
 	ProcessedUSInputData(std::vector<vtkImageDataPtr> frames, std::vector<TimedPosition> pos, vtkImageDataPtr mask, QString path, QString uid);
@@ -105,7 +105,7 @@ typedef boost::shared_ptr<ProcessedUSInputData> ProcessedUSInputDataPtr;
  *  \author Ole Vegard Solberg
  *  \author christiana
  */
-class cxResourceUsReconstructionTypes_EXPORT USFrameData
+class cxResource_EXPORT USFrameData
 {
 public:
 	static USFrameDataPtr create(ImagePtr inputFrameData);

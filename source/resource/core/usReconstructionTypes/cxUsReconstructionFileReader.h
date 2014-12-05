@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXUSRECONSTRUCTIONFILEREADER_H_
 #define CXUSRECONSTRUCTIONFILEREADER_H_
 
-#include "cxResourceUsReconstructionTypesExport.h"
+#include "cxResourceExport.h"
 
 #include <boost/shared_ptr.hpp>
 #include <QString>
@@ -144,7 +144,7 @@ ProbeCalibration = <not used>
  * not read. It can be constructed from the probe data.
  *
  */
-class cxResourceUsReconstructionTypes_EXPORT UsReconstructionFileReader
+class cxResource_EXPORT UsReconstructionFileReader
 {
 public:
 

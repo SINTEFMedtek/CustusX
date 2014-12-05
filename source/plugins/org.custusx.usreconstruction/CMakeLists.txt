@@ -33,14 +33,10 @@ set(PLUGIN_SRCS
     cxReconstructCore.h
     cxReconstructPreprocessor.cpp
     cxReconstructPreprocessor.h
-    cxSyntheticVolume.h
-    cxSyntheticVolume.cpp
-    cxSimpleSyntheticVolume.h
-    cxSimpleSyntheticVolume.cpp
     cxReconstructionWidget.cpp
     cxReconstructOutputValueParamsInterfaces.cpp
     cxReconstructOutputValueParamsInterfaces.h
-
+    cxReconstructionMethodService.h
 )
 
 # Files which should be processed by Qts moc
@@ -76,7 +72,6 @@ set(PLUGIN_target_libraries
     cxGUIExtenderService
     cxResourceWidgets
     cxPluginUtilities
-    cxResourceUsReconstructionTypes
     cxPluginAlgorithm
     )
 

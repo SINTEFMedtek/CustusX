@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXUSRECONSTRUCTIONFILEMAKER_H_
 #define CXUSRECONSTRUCTIONFILEMAKER_H_
 
-#include "cxResourceUsReconstructionTypesExport.h"
+#include "cxResourceExport.h"
 
 class QTextStream;
 class QDir;
@@ -64,7 +64,7 @@ typedef boost::shared_ptr<class SavingVideoRecorder> SavingVideoRecorderPtr;
  * \date Dec 17, 2010
  * \author Janne Beate Bakeng, SINTEF
  */
-class cxResourceUsReconstructionTypes_EXPORT UsReconstructionFileMaker
+class cxResource_EXPORT UsReconstructionFileMaker
 {
 public:
 	/**

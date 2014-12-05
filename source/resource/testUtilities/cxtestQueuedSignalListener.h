@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTESTQUEUEDSIGNALLISTENER_H_
 #define CXTESTQUEUEDSIGNALLISTENER_H_
 
+#include "cxtestUtilities_Export.h"
 #include <QObject>
 
 class QTimer;
@@ -51,7 +52,7 @@ bool waitForQueuedSignal(QObject* object, const char* signal, int maxWaitMilliSe
  * \author Janne Beate Bakeng, SINTEF
  * \date May 15, 2013
  */
-class QueuedSignalListener : public QObject
+class CXTESTUTILITIES_EXPORT QueuedSignalListener : public QObject
 {
 	Q_OBJECT
 

@@ -30,31 +30,48 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef SIMPLESYNTHETICVOLUME_H
-#define SIMPLESYNTHETICVOLUME_H
+#ifndef CXTESTCATCHIMPL_H_
+#define CXTESTCATCHIMPL_H_
 
-#include "org_custusx_usreconstruction_Export.h"
+#include "boost/shared_ptr.hpp"
+#include "catch.hpp"
 
-#include "cxSyntheticVolume.h"
-//#include "cxTypeConversions.h"
+#include "cxCatch_export.h"
 
-namespace cx {
+namespace Catch
+{
+class Session;
+}
 
-class org_custusx_usreconstruction_EXPORT cxSimpleSyntheticVolume : public cxSyntheticVolume
+namespace cxtest
+{
+
+/**
+ * Wrapper for Catch framework.
+ *
+ * Contains a few addons:
+ * - if "--list-tests" AND "--reporter xml" is input,
+ *   override normal behaviour to output a xml-formatted name list.
+ *   (used in scripting - the default list format is not parse-friendly)
+ * - if no tests are run, return failure.
+ *   (required by ctest: a config error in ctest-catch should give a failure)
+ *
+ * \author christiana
+ * \date Jun 28, 2013
+ */
+class CXCATCH_EXPORT CatchImpl
 {
 public:
-    cxSimpleSyntheticVolume(Vector3D bounds);
+	CatchImpl();
+	int run(int argc, char* argv[]);
+private:
+	bool shouldListTestsInCustomXml();
+	void listTestsAsXml();
+	int countTests();
+	std::vector<Catch::TestCase> getMatchingTests();
 
-    virtual void printInfo() const;
-
-	virtual bool isOnLine(float x,
-	                      float y,
-	                      float thickness,
-	                      int n_lines,
-                          int axis) const;
-    virtual unsigned char evaluate(const cx::Vector3D &p) const;
-
+	boost::shared_ptr<Catch::Session> mSession;
 };
 
-}
-#endif
+} /* namespace cxtest */
+#endif /* CXTESTCATCHIMPL_H_ */

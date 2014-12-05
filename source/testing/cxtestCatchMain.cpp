@@ -29,44 +29,56 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXTESTDUMMYDATAMANAGER_H
-#define CXTESTDUMMYDATAMANAGER_H
 
-#include "cxForwardDeclarations.h"
-#include <QStringList>
-class ctkPluginContext;
+#include "cxtestCatchImpl.h"
 
-namespace cxtest
+#ifdef CX_WINDOWS
+#include <windows.h>
+#endif
+
+#include <QLibrary>
+
+void load_plugin(std::string path)
 {
 
-struct TestServicesType
+//#define WINDOWS_WAY
+#ifdef WINDOWS_WAY
+    HINSTANCE library = LoadLibrary(path.c_str());
+    bool loaded = library != 0;
+#else
+    QString libPath(path.c_str());
+    QLibrary library(libPath);
+    bool loaded = library.load();
+#endif
+
+    if(loaded)
+        printf("%s library loaded!\n", path.c_str());
+    else
+        printf("%s library failed to load!\n", path.c_str());
+}
+
+void load_plugins()
 {
-	cx::PatientModelServicePtr mPatientModelService;
-	cx::SpaceProviderPtr mSpaceProvider;
-	cx::TrackingServicePtr mTrackingService;
-};
+    std::vector<std::string> plugins;
+    plugins.push_back("cxtestResource"); //note: endings (dll/so) not needed
+    plugins.push_back("cxtestUtilities");
 
-TestServicesType createDummyCoreServices();
-void destroyDummyCoreServices(TestServicesType& services);
+    std::vector<std::string>::iterator it = plugins.begin();
+    for(; it != plugins.end(); it++)
+        load_plugin(*it);
 
-typedef boost::shared_ptr<class TestServices> TestServicesPtr;
+}
 
-/** A minimal set of services for test usage.
-  */
-class TestServices : public TestServicesType
+int main(int argc, char *argv[])
 {
-public:
-	static TestServicesPtr create();
-	~TestServices();
 
-	cx::PatientModelServicePtr patientModelService() { return mPatientModelService; }
-	cx::SpaceProviderPtr spaceProvider() { return mSpaceProvider; }
-	cx::TrackingServicePtr trackingService() { return mTrackingService; }
+#ifdef CX_WINDOWS
+	SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);
+#endif
 
-private:
-	TestServices();
-};
+    load_plugins();
+    int error_code = cxtest::CatchImpl().run(argc, argv);
 
-} // namespace cx
+    return error_code;
+}
 
-#endif // CXTESTDUMMYDATAMANAGER_H

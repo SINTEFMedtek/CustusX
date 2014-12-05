@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTESTSPHERESYNTETICVOLUME_H
 #define CXTESTSPHERESYNTETICVOLUME_H
 
+#include "cxtestUtilities_Export.h"
 #include "cxSyntheticVolume.h"
 
 namespace cxtest {
@@ -43,7 +44,7 @@ namespace cxtest {
  * \date 21.11.2013, 2013
  * \author christiana
  */
-class SphereSyntheticVolume : public cx::cxSyntheticVolume
+class CXTESTUTILITIES_EXPORT SphereSyntheticVolume : public cx::cxSyntheticVolume
 {
 public:
 	SphereSyntheticVolume(cx::Vector3D bounds);

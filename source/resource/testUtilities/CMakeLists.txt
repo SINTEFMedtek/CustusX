@@ -20,64 +20,45 @@
 # Add all system-wide test utilities here.
 ###########################################################
 	
-include_directories(
-    ${CX_RESOURCE_INCLUDE_DIRECTORIES}
-    )
-
 add_subdirectory(cisst_code)
 
-if (BUILD_TESTING)
-        # link statically on linux, see explanation in cx_catch__private_define_platform_specific_linker_options
-#        cx_catch__private_define_platform_specific_linker_options()
+if(BUILD_TESTING)
 
-        #cx_add_class_qt_moc( CX_TESTUTILITIES_SOURCE_FILES
-        #    cxtestQueuedSignalListener
-        #    cxtestDirectSignalListener
-        #    )
-        #cx_add_class(CX_TESTUTILITIES_SOURCE_FILES
-        #    cxtestUtilities
-        #    cxtestCatchImpl
-        #    cxtestCatchExamples.cpp
-        #    cxtestJenkinsMeasurement
-        #	cxtestDummyDataManager
-        #    )
-	include_directories(
-	    .
-	    ${CustusX_SOURCE_DIR}/source/ThirdParty/catch
-	    )
+    set(CX_TESTUTILITIES_FILES_TO_MOC
+        cxtestQueuedSignalListener.h
+        cxtestDirectSignalListener.h
+    )
 
-        set(CX_TESTUTILITIES_FILES_TO_MOC
-            cxtestQueuedSignalListener.h
-            cxtestDirectSignalListener.h
-        )
+    set(CX_TESTUTILITIES_SOURCE_FILES
+        cxtestUtilities.h
+        cxtestUtilities.cpp
+        cxtestJenkinsMeasurement.h
+        cxtestJenkinsMeasurement.cpp
+        cxtestQueuedSignalListener.cpp
+        cxtestDirectSignalListener.cpp
+        cxtestSyntheticVolumeComparer.h
+        cxtestSyntheticVolumeComparer.cpp
+        cxtestSphereSyntheticVolume.h
+        cxtestSphereSyntheticVolume.cpp
+        cxtestSyntheticReconstructInput.h
+        cxtestSyntheticReconstructInput.cpp
+        cxSyntheticVolume.h
+        cxSyntheticVolume.cpp
+        cxSimpleSyntheticVolume.h
+        cxSimpleSyntheticVolume.cpp
+    )
 
-        set(CX_TESTUTILITIES_SOURCE_FILES
-            cxtestUtilities.h
-            cxtestUtilities.cpp
-            cxtestCatchImpl.h
-            cxtestCatchImpl.cpp
-            cxtestJenkinsMeasurement.h
-            cxtestJenkinsMeasurement.cpp
-            cxtestDummyDataManager.h
-            cxtestDummyDataManager.cpp
-            cxtestQueuedSignalListener.cpp
-            cxtestDirectSignalListener.cpp
-            cxtestSyntheticVolumeComparer.h
-            cxtestSyntheticVolumeComparer.cpp
-            cxtestSphereSyntheticVolume.h
-            cxtestSphereSyntheticVolume.cpp
-            cxtestSyntheticReconstructInput.h
-            cxtestSyntheticReconstructInput.cpp
-        )
+    qt5_wrap_cpp(CX_TESTUTILITIES_FILES_TO_MOC ${CX_TESTUTILITIES_FILES_TO_MOC})
+    add_library(cxtestUtilities ${CX_TESTUTILITIES_SOURCE_FILES} ${CX_TESTUTILITIES_FILES_TO_MOC})
+    include(GenerateExportHeader)
+    generate_export_header(cxtestUtilities)
+    target_include_directories(cxtestUtilities
+        PUBLIC
+        .
+        ${CMAKE_CURRENT_BINARY_DIR}
+        ${CustusX_SOURCE_DIR}/source/resource/core/usReconstructionTypes
+    )
+    target_link_libraries(cxtestUtilities PUBLIC Qt5::Test cxResource cxCatch)
+    cx_add_tests_to_catch(cxtestUtilities)
 
-        set(DEPENDENT_ON_LIBS
-            Qt5::Test
-            cxResource
-        )
-
-        cx_remove_duplicate_include_directories()
-        cx_catch_add_lib_and_exe(""
-                "${CX_TESTUTILITIES_SOURCE_FILES}"
-                "${CX_TESTUTILITIES_FILES_TO_MOC}"
-                "${DEPENDENT_ON_LIBS}")
-endif (BUILD_TESTING)
+endif(BUILD_TESTING)

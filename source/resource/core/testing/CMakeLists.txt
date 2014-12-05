@@ -1,12 +1,12 @@
 
-if (BUILD_TESTING)	
+if(BUILD_TESTING)
 
     set(CXTEST_SOURCES_TO_MOC
     )
 
     set(RESOURCE_TEST_CATCH_SOURCE_FILES
-		cxtestXmlOptionFile.cpp
-		cxtestCatchStringHelpers.cpp
+        cxtestXmlOptionFile.cpp
+        cxtestCatchStringHelpers.cpp
         cxtestCatchSliceComputer.cpp
         cxtestCatchBoundingBox3D.cpp
         cxtestCatchFrame.cpp
@@ -30,28 +30,44 @@ if (BUILD_TESTING)
         cxtestCoreServices.cpp
         cxtestReporter.cpp
         cxtestImage.cpp
-		cxtestPatientModelServiceMock.cpp
-		cxtestPatientModelServiceMock.h
-		)
-	if (CX_USE_OPENCL_UTILITY)
-	   	set(RESOURCE_TEST_CATCH_SOURCE_FILES
-	   	    ${RESOURCE_TEST_CATCH_SOURCE_FILES}
-    		cxtestOpenCLPrinter.cpp
-		) 
-
-		set(OUL_RESOURCE_TEST_CATCH_SOURCE_FILES
-            ${OpenCLUtilityLibrary_SOURCE_DIR}/testing/tests.cpp
-            ${OpenCLUtilityLibrary_SOURCE_DIR}/testing/histogramPyramidTests.cpp
-            )	
-            cx_catch_add_lib_and_exe(OpenCLUtilityLibrary "${OUL_RESOURCE_TEST_CATCH_SOURCE_FILES}" "" "TestOpenCLUtilityLibrary")
-	endif(CX_USE_OPENCL_UTILITY)
-
-    include_directories(
-        .
-        ${CustusX_BINARY_DIR}/source/resource/testUtilities
+        cxtestPatientModelServiceMock.cpp
+        cxtestPatientModelServiceMock.h
+        cxtestDummyDataManager.h
+        cxtestDummyDataManager.cpp
     )
 
-    cx_catch_add_lib_and_exe(cxResource "${RESOURCE_TEST_CATCH_SOURCE_FILES}" "${CXTEST_SOURCES_TO_MOC}")
+    set(CX_TESTRESOURCE_LINK_LIBS
+        cxResource
+        cxtestUtilities
+    )
 
+    if(CX_USE_OPENCL_UTILITY)
+        set(RESOURCE_TEST_CATCH_SOURCE_FILES
+            ${RESOURCE_TEST_CATCH_SOURCE_FILES}
+            cxtestOpenCLPrinter.cpp
+        )
+
+        set(OUL_RESOURCE_TEST_CATCH_SOURCE_FILES
+            ${OpenCLUtilityLibrary_SOURCE_DIR}/testing/tests.cpp
+            ${OpenCLUtilityLibrary_SOURCE_DIR}/testing/histogramPyramidTests.cpp
+            )
+            #cx_catch_add_lib_and_exe(OpenCLUtilityLibrary "${OUL_RESOURCE_TEST_CATCH_SOURCE_FILES}" "" "TestOpenCLUtilityLibrary")
+        set(CX_TESTRESOURCE_LINK_LIBS
+            ${CX_TESTRESOURCE_LINK_LIBS}
+            TestOpenCLUtilityLibrary
+        )
+    endif(CX_USE_OPENCL_UTILITY)
+
+    qt5_wrap_cpp(CXTEST_SOURCES_TO_MOC ${CXTEST_SOURCES_TO_MOC})
+    add_library(cxtestResource ${RESOURCE_TEST_CATCH_SOURCE_FILES} ${CXTEST_SOURCES_TO_MOC})
+    include(GenerateExportHeader)
+    generate_export_header(cxtestResource)
+    target_include_directories(cxtestResource
+        PUBLIC
+        .
+        ${CMAKE_CURRENT_BINARY_DIR}
+    )
+    target_link_libraries(cxtestResource PRIVATE ${CX_TESTRESOURCE_LINK_LIBS} cxCatch)
+    cx_add_tests_to_catch(cxtestResource)
     
-endif (BUILD_TESTING)
+endif(BUILD_TESTING)
