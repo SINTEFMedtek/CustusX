@@ -160,14 +160,4 @@ int AcquisitionServiceProxy::getNumberOfSavingThreads() const
 	return mAcquisitionService->getNumberOfSavingThreads();
 }
 
-void AcquisitionServiceProxy::addXml(QDomNode &dataNode)
-{
-	mAcquisitionService->addXml(dataNode);
-}
-
-void AcquisitionServiceProxy::parseXml(QDomNode &dataNode)
-{
-	mAcquisitionService->parseXml(dataNode);
-}
-
 } //cx

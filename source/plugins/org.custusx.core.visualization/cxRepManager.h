@@ -100,10 +100,17 @@ public:
 		{
 			if (iter->first != uid)
 				continue;
+			int uc = iter->second.use_count();
+			if (uc >1)
+			{
+//				std::cout << "cached rep in use: " << uid.toStdString() << ", use count: " << uc << std::endl;
+				continue;
+			}
+
 			boost::shared_ptr<REP> retval = boost::dynamic_pointer_cast<REP>(iter->second);
 			if (retval)
 			{
-//  		  std::cout << "reusing cached rep: " << uid << std::endl;
+//				std::cout << "reusing cached rep: " << uid.toStdString() << ", use count: " << uc << std::endl;
 				return retval;
 			}
 		}

@@ -121,6 +121,8 @@ void LayoutInteractor::layoutChangedSlot()
 {
 	if (!mMenu)
 		return;
+	if (!this->getRepo())
+		return;
 	// reset list of available layouts
 
 	this->deepDeleteActionGroup(mLayoutActionGroup);
@@ -185,6 +187,9 @@ QActionGroup* LayoutInteractor::createLayoutActionGroup(int widgetIndex)
 {
 	QActionGroup* retval = new QActionGroup(this);
 	retval->setExclusive(true);
+	if (!this->getRepo())
+		return retval;
+
 
 	// add default layouts
 	std::vector<QString> layouts = this->getRepo()->getAvailable();

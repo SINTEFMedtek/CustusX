@@ -52,7 +52,6 @@ AcquisitionServicePluginActivator::~AcquisitionServicePluginActivator()
 void AcquisitionServicePluginActivator::start(ctkPluginContext* context)
 {
 	mRegisteredAcquisitionService = RegisteredService::create<AcquisitionImplService>(context, AcquisitionService_iid);
-
 	mRegisteredAcquisitionGUIService = RegisteredService::create<AcquisitionPlugin>(context, GUIExtenderService_iid);
 }
 

@@ -74,17 +74,7 @@ public:
 
 	virtual std::vector<CategorizedWidget> createWidgets() const;
 
-signals:
-
-private slots:
-	void clearSlot();
-	void duringSavePatientSlot();
-	void duringLoadPatientSlot();
-
 private:
-	void addXml(QDomNode& dataNode);
-	void parseXml(QDomNode& dataNode);
-
 	UsReconstructionServicePtr mUsReconstructionService;
 	AcquisitionServicePtr mAcquisitionService;
 };

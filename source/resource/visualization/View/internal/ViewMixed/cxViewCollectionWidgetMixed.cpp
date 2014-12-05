@@ -106,6 +106,7 @@ void ViewCollectionWidgetMixed::clearViews()
 
 	for (unsigned i=0; i<mOverlays.size(); ++i)
 	{
+		mOverlays[i]->hide();
 		mLayout->removeWidget(mOverlays[i]);
 		delete mOverlays[i];
 	}

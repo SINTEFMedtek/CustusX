@@ -58,6 +58,7 @@ ViewCollectionWidgetUsingViewContainer::~ViewCollectionWidgetUsingViewContainer(
 
 ViewPtr ViewCollectionWidgetUsingViewContainer::addView(View::Type type, LayoutRegion region)
 {
+	mViewContainer->show();
 	static int nameGenerator = 0;
 	QString uid = QString("view-%1-%2")
 			.arg(nameGenerator++)
@@ -74,6 +75,7 @@ ViewPtr ViewCollectionWidgetUsingViewContainer::addView(View::Type type, LayoutR
 void ViewCollectionWidgetUsingViewContainer::clearViews()
 {
 	mViews.clear();
+	mViewContainer->hide();
 	mViewContainer->clear();
 }
 

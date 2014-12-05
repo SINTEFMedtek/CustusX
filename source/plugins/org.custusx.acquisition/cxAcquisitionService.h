@@ -87,9 +87,6 @@ public:
 
 	virtual int getNumberOfSavingThreads() const = 0;
 
-	virtual void addXml(QDomNode& dataNode) = 0;
-	virtual void parseXml(QDomNode& dataNode) = 0;
-
 	// Extented interface
 
 	RecordSessionPtr getSession(QString uid);
