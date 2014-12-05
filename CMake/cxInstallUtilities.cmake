@@ -477,7 +477,6 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
             foreach(APP ${APPS_LOCAL})
                 string(REPLACE "./" "/" APP ${APP})
                 list(APPEND TEMP_APPS_LOCAL ${APP})
-                message(STATUS "========================== ${APP}")
             endforeach()
             set(APPS_LOCAL ${TEMP_APPS_LOCAL})
         endif(CX_WINDOWS)
@@ -515,7 +514,7 @@ set(PLUGINS_DESCRIPTION
 getListOfVarsStartingWith("CX_PLUGIN_" matchedVars)
 foreach (_var IN LISTS matchedVars)
 	string(REPLACE "CX_PLUGIN_" "" PLUGIN_NAME ${_var})
-	#message("${_var}=${${_var}} :: ${${${_var}}} :: ${PLUGIN_NAME}")
+    #message("${_var}=${${_var}} :: ${${${_var}}} :: ${PLUGIN_NAME}")
 	set(PLUGINS_DESCRIPTION ${PLUGINS_DESCRIPTION}
 "		${PLUGIN_NAME}: ${${_var}}
 ")

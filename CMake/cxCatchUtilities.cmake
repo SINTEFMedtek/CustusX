@@ -125,7 +125,8 @@ endfunction()
 ###############################################################################
 function(cx_catch_add_lib_and_exe LIB_TO_TEST SOURCES MOC_SOURCES)
 	set(ADDITIONAL_LIBS ${ARGV3}) # emulating optional argument
-#message(STATUS "========= " ${ADDITIONAL_LIBS} )
+
+    message(STATUS "*********************************** You need to convert: " ${LIB_TO_TEST} )
 
 #    if(CX_WINDOWS)
                 _cx_catch_save_info_in_globals("${LIB_TO_TEST}" "${SOURCES}" "${MOC_SOURCES}" "${ADDITIONAL_LIBS}")

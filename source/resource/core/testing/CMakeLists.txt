@@ -51,7 +51,7 @@ if(BUILD_TESTING)
             ${OpenCLUtilityLibrary_SOURCE_DIR}/testing/tests.cpp
             ${OpenCLUtilityLibrary_SOURCE_DIR}/testing/histogramPyramidTests.cpp
             )
-            #cx_catch_add_lib_and_exe(OpenCLUtilityLibrary "${OUL_RESOURCE_TEST_CATCH_SOURCE_FILES}" "" "TestOpenCLUtilityLibrary")
+        #cx_catch_add_lib_and_exe(OpenCLUtilityLibrary "${OUL_RESOURCE_TEST_CATCH_SOURCE_FILES}" "" "TestOpenCLUtilityLibrary")
         set(CX_TESTRESOURCE_LINK_LIBS
             ${CX_TESTRESOURCE_LINK_LIBS}
             TestOpenCLUtilityLibrary

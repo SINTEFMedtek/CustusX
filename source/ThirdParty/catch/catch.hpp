@@ -118,7 +118,7 @@
 
 namespace Catch {
 
-    class NonCopyable {
+    class CXCATCH_EXPORT NonCopyable {
         NonCopyable( NonCopyable const& );
         void operator = ( NonCopyable const& );
     protected:
@@ -347,7 +347,7 @@ namespace Catch {
         T* m_p;
     };
 
-    struct IShared : NonCopyable {
+    struct CXCATCH_EXPORT IShared : NonCopyable {
         virtual ~IShared();
         virtual void addRef() const = 0;
         virtual void release() const = 0;
@@ -426,7 +426,7 @@ namespace Catch {
 
     class TestCaseFilters;
 
-    struct ITestCase : IShared {
+    struct CXCATCH_EXPORT ITestCase : IShared {
         virtual void invoke () const = 0;
     protected:
         virtual ~ITestCase();
