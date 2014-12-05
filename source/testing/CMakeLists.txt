@@ -5,7 +5,8 @@
 # =========================================================
 
 
-if (BUILD_TESTING)
+if(BUILD_TESTING)
+
     set(CX_CATCH_SOURCES
         ${CustusX_SOURCE_DIR}/source/ThirdParty/catch/catch.hpp
         cxtestCatchImpl.h
@@ -22,6 +23,4 @@ if (BUILD_TESTING)
     target_link_libraries(cxCatch cxResource)
     cx_add_executable_catch(cxCatch)
 
-
-    #cx_catch_add_master_exe() #OLD - DELETE
-endif (BUILD_TESTING)
+endif(BUILD_TESTING)

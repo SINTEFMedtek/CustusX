@@ -26,6 +26,11 @@ function(cx_add_executable_catch CX_CATCH_LIB)
         message(STATUS "        ${LIBRARY}")
     endforeach()
 
+    configure_file(
+      "${CustusX_SOURCE_DIR}/source/testing/cxImportTests.h.in"
+      "${CustusX_BINARY_DIR}/source/testing/cxImportTests.h"
+      )
+
     set(TEST_EXE_NAME "Catch_test")
     set(cxtest_MAIN ${CustusX_SOURCE_DIR}/source/testing/cxtestCatchMain.cpp)
 

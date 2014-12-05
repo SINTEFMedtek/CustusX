@@ -32,24 +32,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxtestCatchImpl.h"
 
+#include "cxImportTests.h"
+
 #ifdef CX_WINDOWS
 #include <windows.h>
 #endif
 
 #include <QLibrary>
+#include <QString>
+#include <QStringList>
 
 void load_plugin(std::string path)
 {
-
-//#define WINDOWS_WAY
-#ifdef WINDOWS_WAY
-    HINSTANCE library = LoadLibrary(path.c_str());
-    bool loaded = library != 0;
-#else
     QString libPath(path.c_str());
     QLibrary library(libPath);
     bool loaded = library.load();
-#endif
 
     if(loaded)
         printf("%s library loaded!\n", path.c_str());
@@ -59,9 +56,15 @@ void load_plugin(std::string path)
 
 void load_plugins()
 {
+    QString str = QString(CX_SHARED_TEST_LIBRARIES);
+    QStringList list = str.split(";");
+
     std::vector<std::string> plugins;
-    plugins.push_back("cxtestResource"); //note: endings (dll/so) not needed
-    plugins.push_back("cxtestUtilities");
+    foreach(const QString &item, list)
+    {
+        std::cout << "Lib pushing back: " << item.toStdString() << std::endl;
+        plugins.push_back(item.toStdString());
+    }
 
     std::vector<std::string>::iterator it = plugins.begin();
     for(; it != plugins.end(); it++)
