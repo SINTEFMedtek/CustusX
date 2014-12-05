@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataLocations.h"
 #include "cxMehdiGPURayCastMultiVolumeRep.h"
 #include "cxConfig.h"
+#include "cxRepManager.h"
 
 namespace cx
 {
@@ -290,6 +291,9 @@ void MultiVolume3DRepProducer::buildSscImage2DRep3D(ImagePtr image)
 
 void MultiVolume3DRepProducer::buildVtkVolumeTextureMapper3D(ImagePtr image)
 {
+	// attempt to reuse this time-consuming rep:
+//	VolumetricRepPtr rep = RepManager::getInstance()->getCachedRep<VolumetricRep>(image->getUid());
+
 	VolumetricRepPtr rep = VolumetricRep::New();
 	rep->setUseVolumeTextureMapper();
 
