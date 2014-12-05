@@ -63,9 +63,6 @@ PatientModelImplService::PatientModelImplService(ctkPluginContext *context) :
 	connect(this->dataService().get(), &DataManager::centerChanged, this, &PatientModelService::centerChanged);
 	connect(this->dataService().get(), &DataManager::landmarkPropertiesChanged, this, &PatientModelService::landmarkPropertiesChanged);
 
-	connect(this->patientData().get(), &PatientData::cleared, this, &PatientModelService::cleared);
-	connect(this->patientData().get(), &PatientData::isSaving, this, &PatientModelService::isSaving);
-	connect(this->patientData().get(), &PatientData::isLoading, this, &PatientModelService::isLoading);
 	connect(this->patientData().get(), &PatientData::patientChanged, this, &PatientModelService::patientChanged);
 }
 
@@ -94,8 +91,6 @@ void PatientModelImplService::createInterconnectedDataAndSpace()
 
 void PatientModelImplService::shutdownInterconnectedDataAndSpace()
 {
-//	requireUnique(mPatientServiceOld, "PatientService");
-//	mPatientServiceOld.reset();
 	requireUnique(mPatientData, "PatientData");
 	mPatientData.reset();
 
@@ -107,11 +102,6 @@ void PatientModelImplService::shutdownInterconnectedDataAndSpace()
 	requireUnique(mDataFactory, "DataFactory");
 	mDataFactory.reset();
 
-//	LegacySingletons::mSpaceProvider.reset();
-//	requireUnique(mSpaceProvider, "SpaceProvider");
-//	mSpaceProvider.reset();
-
-//	LegacySingletons::mDataManager.reset();
 	requireUnique(mDataService, "DataService");
 	mDataService.reset();
 
@@ -130,9 +120,6 @@ PatientModelImplService::~PatientModelImplService()
 		disconnect(this->dataService().get(), &DataManager::streamLoaded, this, &PatientModelService::streamLoaded);
 		disconnect(this->dataService().get(), &DataManager::clinicalApplicationChanged, this, &PatientModelService::clinicalApplicationChanged);
 
-		disconnect(this->patientData().get(), &PatientData::cleared, this, &PatientModelService::cleared);
-		disconnect(this->patientData().get(), &PatientData::isSaving, this, &PatientModelService::isSaving);
-		disconnect(this->patientData().get(), &PatientData::isLoading, this, &PatientModelService::isLoading);
 		disconnect(this->patientData().get(), &PatientData::patientChanged, this, &PatientModelService::patientChanged);
 	}
 
@@ -285,27 +272,6 @@ void PatientModelImplService::exportPatient(bool niftiFormat)
 	this->patientData()->exportPatient(niftiFormat);
 }
 
-void PatientModelImplService::newPatient(QString choosenDir)
-{
-	this->patientData()->newPatient(choosenDir);
-}
-
-void PatientModelImplService::loadPatient(QString chosenDir)
-{
-	this->patientData()->loadPatient(chosenDir);
-}
-
-void PatientModelImplService::savePatient()
-{
-	this->patientData()->savePatient();
-}
-
-void PatientModelImplService::clearPatient()
-{
-	this->patientData()->clearPatient();
-}
-
-
 void PatientModelImplService::removeData(QString uid)
 {
 	this->patientData()->removeData(uid);
@@ -335,11 +301,6 @@ QString PatientModelImplService::addLandmark()
 void PatientModelImplService::setLandmarkActive(QString uid, bool active)
 {
 	dataService()->setLandmarkActive(uid, active);
-}
-
-QDomElement cx::PatientModelImplService::getCurrentWorkingElement(QString path)
-{
-	return this->patientData()->getCurrentWorkingElement(path);
 }
 
 RegistrationHistoryPtr PatientModelImplService::get_rMpr_History() const

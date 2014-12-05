@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "parameters.hpp"
 #include "tsf-config.h"
 #include "SIPL/Exceptions.hpp"
+#include "cxSessionStorageService.h"
 
 #include "catch.hpp"
 
@@ -180,7 +181,8 @@ void TestTubeSegmentationFramework::runFilter(QString preset)
 	//create a new patient
 	QString filename = cx::DataLocations::getExistingTestData("testing/TubeSegmentationFramework", preset+".mhd");
 //	QString filename = cx::DataLocations::getTestDataPath()+ "/testing/TubeSegmentationFramework/"+preset+".mhd";
-	cx::patientService()->newPatient(cx::DataLocations::getTestDataPath()+ "/temp/TubeSegmentationFramework/");
+	cx::sessionStorageService()->load(cx::DataLocations::getTestDataPath()+ "/temp/TubeSegmentationFramework/");
+//	cx::patientService()->newPatient(cx::DataLocations::getTestDataPath()+ "/temp/TubeSegmentationFramework/");
 	QString info;
 	cx::DataPtr data = cx::patientService()->importData(filename, info);
 	REQUIRE(data);

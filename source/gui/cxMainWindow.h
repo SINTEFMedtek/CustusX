@@ -160,6 +160,7 @@ private:
 
 	void closeEvent(QCloseEvent *event);///< Save geometry and window state at close
 	QDockWidget* addAsDockWidget(QWidget* widget, QString groupname);
+	QString getExistingSessionFolder();
 
 	//menus
 	QMenu* mFileMenu; ///< Menu for file operations (ex: save/load)

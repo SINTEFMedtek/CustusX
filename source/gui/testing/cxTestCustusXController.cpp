@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSettings.h"
 #include "cxPatientModelService.h"
 #include "cxVisualizationService.h"
+#include "cxSessionStorageService.h"
 
 CustusXController::CustusXController(QObject* parent) : QObject(parent)
 {
@@ -94,7 +95,7 @@ void CustusXController::stop()
 
 void CustusXController::loadPatientSlot()
 {
-  cx::patientService()->loadPatient(mPatientFolder);
+  cx::sessionStorageService()->load(mPatientFolder);
   cx::stateService()->setWorkFlowState("NavigationUid");
   mMainWindow->setGeometry( 0, 0, 2560, 1440);
 

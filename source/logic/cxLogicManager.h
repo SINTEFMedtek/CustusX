@@ -80,6 +80,7 @@ public:
   VideoServicePtr getVideoService();
   StateServicePtr getStateService();
   ViewServicePtr getViewService();
+  SessionStorageServicePtr getSessionStorageService();
 
 private:
   /**
@@ -113,6 +114,7 @@ private:
 	VideoServicePtr mVideoService;
 	StateServicePtr mStateService;
 	ViewServicePtr mViewService;
+	SessionStorageServicePtr mSessionStorageService;
 
 	PluginFrameworkManagerPtr mPluginFramework;
 };

@@ -40,12 +40,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLandmark.h"
 #include "vtkForwardDeclarations.h"
 class ctkPluginContext;
+class QDomElement;
 
 namespace cx
 {
 class RegistrationTransform;
 class PatientModelService;
 typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
+typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
+
 
 /**
  * Implementation of Registration service.
@@ -82,8 +85,8 @@ public:
 	virtual bool isNull();
 
 private slots:
-	void duringSavePatientSlot();
-	void duringLoadPatientSlot();
+	void duringSavePatientSlot(QDomElement &node);
+	void duringLoadPatientSlot(QDomElement &node);
 	void addXml(QDomNode &parentNode);
 	void parseXml(QDomNode &dataNode);
 	void clearSlot();
@@ -104,6 +107,7 @@ private:
 
 	ctkPluginContext* mContext;
 	PatientModelServicePtr mPatientModelService;
+	SessionStorageServicePtr mSession;
 };
 
 typedef boost::shared_ptr<RegistrationImplService> RegistrationImplServicePtr;

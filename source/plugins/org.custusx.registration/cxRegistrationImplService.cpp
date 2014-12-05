@@ -48,6 +48,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLandmark.h"
 #include "cxPatientModelServiceProxy.h"
 #include "cxLandmarkTranslationRegistration.h"
+#include "cxSessionStorageServiceProxy.h"
+#include "cxXmlNodeWrapper.h"
 
 namespace cx
 {
@@ -55,29 +57,42 @@ namespace cx
 RegistrationImplService::RegistrationImplService(ctkPluginContext *context) :
 	mLastRegistrationTime(QDateTime::currentDateTime()),
 	mContext(context),
-	mPatientModelService(new PatientModelServiceProxy(context))
+	mPatientModelService(new PatientModelServiceProxy(context)),
+	mSession(SessionStorageServiceProxy::create(context))
 {
 //	mLastRegistrationTime = QDateTime::currentDateTime();
 
-	connect(mPatientModelService.get(), &PatientModelService::isSaving, this, &RegistrationImplService::duringSavePatientSlot);
-	connect(mPatientModelService.get(), &PatientModelService::isLoading, this, &RegistrationImplService::duringLoadPatientSlot);
-	connect(mPatientModelService.get(), &PatientModelService::cleared, this, &RegistrationImplService::clearSlot);
+	connect(mSession.get(), &SessionStorageService::cleared, this, &RegistrationImplService::clearSlot);
+	connect(mSession.get(), &SessionStorageService::isLoading, this, &RegistrationImplService::duringLoadPatientSlot);
+	connect(mSession.get(), &SessionStorageService::isSaving, this, &RegistrationImplService::duringSavePatientSlot);
+
+//	connect(mPatientModelService.get(), &PatientModelService::isSaving, this, &RegistrationImplService::duringSavePatientSlot);
+//	connect(mPatientModelService.get(), &PatientModelService::isLoading, this, &RegistrationImplService::duringLoadPatientSlot);
+//	connect(mPatientModelService.get(), &PatientModelService::cleared, this, &RegistrationImplService::clearSlot);
 }
 
 RegistrationImplService::~RegistrationImplService()
 {
 }
 
-void RegistrationImplService::duringSavePatientSlot()
+void RegistrationImplService::duringSavePatientSlot(QDomElement& node)
 {
-	QDomElement managerNode = mPatientModelService->getCurrentWorkingElement("managers");
+	XMLNodeAdder root(node);
+	QDomElement managerNode = root.descend("managers").node().toElement();
 	this->addXml(managerNode);
+//	QDomElement managerNode = mPatientModelService->getCurrentWorkingElement("managers");
+//	this->addXml(managerNode);
 }
 
-void RegistrationImplService::duringLoadPatientSlot()
+void RegistrationImplService::duringLoadPatientSlot(QDomElement& node)
 {
-	QDomElement registrationManager = mPatientModelService->getCurrentWorkingElement("managers/registrationManager");
-	this->parseXml(registrationManager);
+	XMLNodeParser root(node);
+	QDomElement registrationManager = root.descend("managers/registrationManager").node().toElement();
+	if (!registrationManager.isNull())
+		this->parseXml(registrationManager);
+
+//	QDomElement registrationManager = mPatientModelService->getCurrentWorkingElement("managers/registrationManager");
+//	this->parseXml(registrationManager);
 }
 
 void RegistrationImplService::addXml(QDomNode& parentNode)

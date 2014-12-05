@@ -39,6 +39,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxConfig.h"
 #include "cxFileHelpers.h"
 #include "cxDataLocations.h"
+#include <QApplication>
+#include <QTimer>
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -46,7 +49,10 @@ namespace cx
 SessionStorageServiceImpl::SessionStorageServiceImpl(ctkPluginContext *context)
 {
 	this->clearCache();
+	mActivePatientFolder = this->getNullFolder();
 	connect(this, &SessionStorageServiceImpl::sessionChanged, this, &SessionStorageServiceImpl::onSessionChanged);
+
+	QTimer::singleShot(100, this, SLOT(startupLoadPatient())); // make sure this is called after application state change
 }
 
 SessionStorageServiceImpl::~SessionStorageServiceImpl()
@@ -108,7 +114,6 @@ void SessionStorageServiceImpl::initializeNewSession(QString dir)
 	this->save();
 	this->reportActivePatient();
 	this->writeRecentPatientData();
-
 }
 
 QString SessionStorageServiceImpl::getXmlFileName() const
@@ -118,8 +123,10 @@ QString SessionStorageServiceImpl::getXmlFileName() const
 
 void SessionStorageServiceImpl::save()
 {
-	if (mActivePatientFolder.isEmpty())
+	if (!this->isValid())
 		return;
+//	if (mActivePatientFolder.isEmpty())
+//		return;
 
 	//Gather all the information that needs to be saved
 	QDomDocument doc;
@@ -132,7 +139,7 @@ void SessionStorageServiceImpl::save()
 	this->writeXmlFile(doc, filename);
 
 	report("Saved patient " + mActivePatientFolder);
-	this->writeRecentPatientData();
+//	this->writeRecentPatientData();
 }
 
 void SessionStorageServiceImpl::writeXmlFile(QDomDocument doc, QString filename)
@@ -159,7 +166,8 @@ void SessionStorageServiceImpl::clear()
 
 bool SessionStorageServiceImpl::isValid() const
 {
-	return !mActivePatientFolder.isEmpty() && (mActivePatientFolder != this->getNullFolder());
+	return !mActivePatientFolder.isEmpty() &&
+			(mActivePatientFolder != this->getNullFolder());
 }
 
 QString SessionStorageServiceImpl::getRootFolder() const
@@ -300,6 +308,60 @@ void SessionStorageServiceImpl::clearCache()
 //	std::cout << "DataLocations::getCachePath() " << DataLocations::getCachePath() << std::endl;
 	// clear the global cache used by app
 	removeNonemptyDirRecursively(DataLocations::getCachePath());
+}
+
+/**Parse command line and return --load <patient folder> folder,
+ * if any.
+ */
+QString SessionStorageServiceImpl::getCommandLineStartupPatient()
+{
+	int doLoad = QApplication::arguments().indexOf("--load");
+	if (doLoad < 0)
+		return "";
+	if (doLoad + 1 >= QApplication::arguments().size())
+		return "";
+
+	QString folder = QApplication::arguments()[doLoad + 1];
+
+	return folder;
+}
+
+/**Parse the command line and load a patient if the switch --patient is found
+ */
+void SessionStorageServiceImpl::startupLoadPatient()
+{
+	QString folder = this->getCommandLineStartupPatient();
+
+	if (!folder.isEmpty())
+	{
+		report(QString("Startup Load [%1] from command line").arg(folder));
+	}
+
+	if (folder.isEmpty() && settings()->value("Automation/autoLoadRecentPatient").toBool())
+	{
+		folder = settings()->value("startup/lastPatient").toString();
+
+		QDateTime lastSaveTime = QDateTime::fromString(settings()->value("startup/lastPatientSaveTime").toString(), timestampSecondsFormat());
+		double minsSinceLastSave = lastSaveTime.secsTo(QDateTime::currentDateTime())/60;
+		double autoLoadRecentPatientWithinHours = settings()->value("Automation/autoLoadRecentPatientWithinHours").toDouble();
+		int allowedMinsSinceLastSave = autoLoadRecentPatientWithinHours*60;
+		if (minsSinceLastSave > allowedMinsSinceLastSave) // if less than 8 hours, accept
+		{
+			report(
+				QString("Startup Load: Ignored recent patient because %1 hours since last save, limit is %2")
+				.arg(int(minsSinceLastSave/60))
+				.arg(int(allowedMinsSinceLastSave/60)));
+			folder = "";
+		}
+
+		if (!folder.isEmpty())
+			report(QString("Startup Load [%1] as recent patient").arg(folder));
+	}
+
+	if (folder.isEmpty())
+		return;
+
+	this->load(folder);
 }
 
 } // namespace cx

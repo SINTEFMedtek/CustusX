@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelServiceProxy.h"
 #include "cxStateServiceProxy.h"
 #include "cxVisualizationServiceProxy.h"
+#include "cxSessionStorageServiceProxy.h"
 
 namespace cx
 {
@@ -76,6 +77,11 @@ ViewServicePtr viewService()
 {
 	return logicManager()->getViewService();
 }
+SessionStorageServicePtr sessionStorageService()
+{
+	return logicManager()->getSessionStorageService();
+}
+
 
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -120,6 +126,7 @@ void LogicManager::initializeServices()
 	mVideoService = VideoServiceProxy::create(pc);
 	mViewService = VisualizationServiceProxy::create(pc);
 	mStateService = StateServiceProxy::create(pc);
+	mSessionStorageService = SessionStorageServiceProxy::create(pc);
 
 	mSpaceProvider.reset(new cx::SpaceProviderImpl(mTrackingService, mPatientModelService));
 
@@ -136,6 +143,7 @@ void LogicManager::shutdownServices()
 	this->shutdownService(mTrackingService, "TrackingService");
 	this->shutdownService(mPatientModelService, "PatientModelService");
 	this->shutdownService(mVideoService, "VideoService");
+	this->shutdownService(mSessionStorageService, "SessionStorageService");
 
 	this->shutdownService(mPluginFramework, "PluginFramework");
 
@@ -174,6 +182,10 @@ SpaceProviderPtr LogicManager::getSpaceProvider()
 ViewServicePtr LogicManager::getViewService()
 {
 	return mViewService;
+}
+SessionStorageServicePtr LogicManager::getSessionStorageService()
+{
+	return mSessionStorageService;
 }
 PluginFrameworkManagerPtr LogicManager::getPluginFramework()
 {

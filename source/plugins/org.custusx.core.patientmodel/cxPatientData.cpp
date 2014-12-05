@@ -67,11 +67,9 @@ PatientData::PatientData(DataServicePtr dataManager, SessionStorageServicePtr se
 {
 	connect(mSession.get(), &SessionStorageService::sessionChanged, this, &PatientData::patientChanged);
 	connect(mSession.get(), &SessionStorageService::cleared, this, &PatientData::onCleared);
-	connect(mSession.get(), &SessionStorageService::cleared, this, &PatientData::cleared);
+//	connect(mSession.get(), &SessionStorageService::cleared, this, &PatientData::cleared);
 	connect(mSession.get(), &SessionStorageService::isLoading, this, &PatientData::onSessionLoad);
 	connect(mSession.get(), &SessionStorageService::isSaving, this, &PatientData::onSessionSave);
-
-	QTimer::singleShot(100, this, SLOT(startupLoadPatient())); // make sure this is called after application state change
 }
 
 PatientData::~PatientData()
@@ -87,94 +85,9 @@ bool PatientData::isPatientValid() const
 	return mSession->isValid();
 }
 
-QDomElement PatientData::getCurrentWorkingElement(QString path)
-{
-	XMLNodeAdder root(mWorkingDocument.documentElement());
-	return root.descend(path).node().toElement();
-//	return getElementForced(mWorkingDocument.documentElement(), path);
-}
-
-QDomDocument PatientData::getCurrentWorkingDocument()
-{
-	return mWorkingDocument;
-}
-
-void PatientData::newPatient(QString choosenDir)
-{
-	mSession->load(choosenDir);
-}
-
-/**Remove all data referring to the current patient from the system,
- * enabling us to load new patient data.
- */
-void PatientData::clearPatient()
-{
-	mSession->clear();
-}
-
 void PatientData::onCleared()
 {
 	mDataManager->clear();
-}
-
-/**Parse command line and return --load <patient folder> folder,
- * if any.
- */
-QString PatientData::getCommandLineStartupPatient()
-{
-	int doLoad = QApplication::arguments().indexOf("--load");
-	if (doLoad < 0)
-		return "";
-	if (doLoad + 1 >= QApplication::arguments().size())
-		return "";
-
-	QString folder = QApplication::arguments()[doLoad + 1];
-
-	return folder;
-}
-
-/**Parse the command line and load a patient if the switch --patient is found
- */
-void PatientData::startupLoadPatient()
-{
-
-	QString folder = this->getCommandLineStartupPatient();
-
-	if (!folder.isEmpty())
-	{
-		report(QString("Startup Load [%1] from command line").arg(folder));
-	}
-
-	if (folder.isEmpty() && settings()->value("Automation/autoLoadRecentPatient").toBool())
-	{
-		folder = settings()->value("startup/lastPatient").toString();
-
-		QDateTime lastSaveTime = QDateTime::fromString(settings()->value("startup/lastPatientSaveTime").toString(), timestampSecondsFormat());
-		double minsSinceLastSave = lastSaveTime.secsTo(QDateTime::currentDateTime())/60;
-		double autoLoadRecentPatientWithinHours = settings()->value("Automation/autoLoadRecentPatientWithinHours").toDouble();
-		int allowedMinsSinceLastSave = autoLoadRecentPatientWithinHours*60;
-		if (minsSinceLastSave > allowedMinsSinceLastSave) // if less than 8 hours, accept
-		{
-			report(
-				QString("Startup Load: Ignored recent patient because %1 hours since last save, limit is %2")
-				.arg(int(minsSinceLastSave/60))
-				.arg(int(allowedMinsSinceLastSave/60)));
-			folder = "";
-		}
-
-		if (!folder.isEmpty())
-			report(QString("Startup Load [%1] as recent patient").arg(folder));
-	}
-
-	if (folder.isEmpty())
-		return;
-
-	this->loadPatient(folder);
-}
-
-void PatientData::loadPatient(QString choosenDir)
-{
-	mSession->load(choosenDir);
 }
 
 void PatientData::onSessionLoad(QDomElement &node)
@@ -183,13 +96,7 @@ void PatientData::onSessionLoad(QDomElement &node)
 	QDomElement dataManagerNode = root.descend("managers/datamanager").node().toElement();
 
 	if (!dataManagerNode.isNull())
-	{
 		mDataManager->parseXml(dataManagerNode, mSession->getRootFolder());
-	}
-
-	mWorkingDocument = node.ownerDocument();
-	emit isLoading();
-	mWorkingDocument = QDomDocument();
 }
 
 void PatientData::onSessionSave(QDomElement &node)
@@ -198,10 +105,6 @@ void PatientData::onSessionSave(QDomElement &node)
 	QDomElement managerNode = root.descend("managers").node().toElement();
 
 	mDataManager->addXml(managerNode);
-
-	mWorkingDocument = node.ownerDocument();
-	emit isSaving();
-	mWorkingDocument = QDomDocument();
 
 	// save position transforms into the mhd files.
 	// This hack ensures data files can be used in external programs without an explicit export.
@@ -218,14 +121,8 @@ void PatientData::onSessionSave(QDomElement &node)
 void PatientData::autoSave()
 {
 	if (settings()->value("Automation/autoSave").toBool())
-		this->savePatient();
+		mSession->save();
 }
-
-void PatientData::savePatient()
-{
-	mSession->save();
-}
-
 
 void PatientData::exportPatient(bool niftiFormat)
 {

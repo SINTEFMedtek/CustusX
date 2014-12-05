@@ -71,6 +71,7 @@ public:
 
 private slots:
 	void onSessionChanged();
+	void startupLoadPatient();
 private:
 	QString getNullFolder() const;
 	void reportActivePatient();
@@ -92,6 +93,7 @@ private:
 	void writeXmlFile(QDomDocument doc, QString filename);
 	QString convertToValidFolderName(QString dir) const;
 	void clearCache(); ///< Clear the global cache used by the entire application (cx::DataLocations::getCachePath()).
+	QString getCommandLineStartupPatient();
 
 	QString mActivePatientFolder; ///< Folder for storing the files for the active patient. Path relative to globalPatientDataFolder.
 };

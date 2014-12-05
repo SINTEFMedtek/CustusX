@@ -62,8 +62,6 @@ SessionStorageServicePtr SessionStorageService::getNullObject()
 
 QString SessionStorageService::getSubFolder(QString relative)
 {
-	if (!this->isValid())
-		return "";
 	QString root = this->getRootFolder();
 	if (root.isEmpty())
 		return "";

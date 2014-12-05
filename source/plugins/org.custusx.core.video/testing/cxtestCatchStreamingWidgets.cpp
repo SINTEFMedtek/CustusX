@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVideoService.h"
 #include "cxUtilHelpers.h"
 #include "cxLogger.h"
+#include "cxSessionStorageService.h"
 #include "cxReporter.h"
 
 namespace cxtest
@@ -58,7 +59,8 @@ TEST_CASE("VideoConnectionWidget can stream", "[unit][gui][not_win32][widget][st
 	QString folder = cx::DataLocations::getTestDataPath() + "/temp/test.cx3";
 	cx::VisServicesPtr services = cx::VisServices::create(cx::logicManager()->getPluginContext());
 
-	services->patientModelService->newPatient(folder);
+	services->getSession()->load(folder);
+//	services->patientModelService->newPatient(folder);
 
 	cx::DummyToolPtr tool = cx::DummyToolTestUtilities::createDummyTool(cx::DummyToolTestUtilities::createProbeDataLinear());
 	services->trackingService->runDummyTool(tool);

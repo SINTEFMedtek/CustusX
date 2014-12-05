@@ -90,6 +90,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVisualizationServiceProxy.h"
 #include "cxVideoServiceProxy.h"
 #include "cxViewGroupData.h"
+#include "cxSessionStorageService.h"
 
 namespace cx
 {
@@ -641,14 +642,7 @@ QString timestampFormatFolderFriendly()
 
 void MainWindow::newPatientSlot()
 {
-	QString patientDatafolder = settings()->value("globalPatientDataFolder").toString();
-
-	// Create folders
-	if (!QDir().exists(patientDatafolder))
-	{
-		QDir().mkdir(patientDatafolder);
-		report("Made a new patient folder: " + patientDatafolder);
-	}
+	QString patientDatafolder = this->getExistingSessionFolder();
 
 	QString timestamp = QDateTime::currentDateTime().toString(timestampFormatFolderFriendly()) + "_";
 	QString postfix = settings()->value("globalApplicationName").toString() + "_" + settings()->value("globalPatientNumber").toString() + ".cx3";
@@ -670,13 +664,26 @@ void MainWindow::newPatientSlot()
 	int patientNumber = settings()->value("globalPatientNumber").toInt();
 	settings()->setValue("globalPatientNumber", ++patientNumber);
 
-	patientService()->newPatient(choosenDir);
+	mServices->getSession()->load(choosenDir);
+}
+
+QString MainWindow::getExistingSessionFolder()
+{
+	QString folder = settings()->value("globalPatientDataFolder").toString();
+
+	// Create folders
+	if (!QDir().exists(folder))
+	{
+		QDir().mkdir(folder);
+		report("Made a new patient folder: " + folder);
+	}
+
+	return folder;
 }
 
 void MainWindow::clearPatientSlot()
 {
-	patientService()->clearPatient();
-	reportWarning("Cleared current patient data");
+	mServices->getSession()->clear();
 }
 
 void MainWindow::savePatientFileSlot()
@@ -688,7 +695,7 @@ void MainWindow::savePatientFileSlot()
 		return;
 	}
 
-	patientService()->savePatient();
+	mServices->getSession()->save();
 }
 
 void MainWindow::onApplicationStateChangedSlot()
@@ -775,21 +782,14 @@ void MainWindow::showSecondaryViewLayoutWindowActionSlot()
 
 void MainWindow::loadPatientFileSlot()
 {
-	QString patientDatafolder = settings()->value("globalPatientDataFolder").toString();
-	// Create folder
-	if (!QDir().exists(patientDatafolder))
-	{
-		QDir().mkdir(patientDatafolder);
-		report("Made a new patient folder: " + patientDatafolder);
-	}
-	// Open file dialog
-//	std::cout << "dir: " << string_cast(patientDatafolder) << std::endl;
-	QString choosenDir = QFileDialog::getExistingDirectory(this, tr("Select patient"), patientDatafolder,
-		QFileDialog::ShowDirsOnly);
-	if (choosenDir == QString::null)
-		return; // On cancel
+	QString patientDatafolder = this->getExistingSessionFolder();
 
-	patientService()->loadPatient(choosenDir);
+	// Open file dialog
+	QString folder = QFileDialog::getExistingDirectory(this, "Select patient", patientDatafolder, QFileDialog::ShowDirsOnly);
+	if (folder.isEmpty())
+		return;
+
+	mServices->getSession()->load(folder);
 }
 
 void MainWindow::exportDataSlot()

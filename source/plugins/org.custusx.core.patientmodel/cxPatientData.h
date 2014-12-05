@@ -75,32 +75,19 @@ public:
 	QString getActivePatientFolder() const;
 	bool isPatientValid() const;
 
-	QDomElement getCurrentWorkingElement(QString path);
-	QDomDocument getCurrentWorkingDocument();  ///< use only during save/load.
-
-//	QString generateFilePath(QString folderName, QString ending); ///< Creates the folder in the active patient and returns the path to a (not existing) filename generated using the current timestamp
-
 public slots:
-	void newPatient(QString choosenDir);
-	void loadPatient(QString chosenDir);
 	/** \brief Import data into CustusX
 	 * \param fileName The file name of the imported file(s)
 	 * \param[out] infoText Information about any errors/warnings that occurred during import
 	 */
 	DataPtr importData(QString fileName, QString &infoText);
 	void removeData(QString uid);
-	void savePatient(); ///< Save all application data to XML file
-	void clearPatient();
 	void exportPatient(bool niftiFormat);
 	void autoSave();
-	void startupLoadPatient();
 
 signals:
 	void patientChanged();
-	void cleared();
-
-	void isSaving(); // deprecated, use sessionstorageservice
-	void isLoading(); // deprecated, use sessionstorageservice
+//	void cleared();
 
 private slots:
 	void onCleared();
@@ -108,10 +95,6 @@ private slots:
 	void onSessionSave(QDomElement& node);
 
 private:
-	QString getCommandLineStartupPatient();
-	void clearCache();
-
-	QDomDocument mWorkingDocument; ///< available during load and save, used to add/extract extra info from the file.
 	DataServicePtr mDataManager;
 	SessionStorageServicePtr mSession;
 };
