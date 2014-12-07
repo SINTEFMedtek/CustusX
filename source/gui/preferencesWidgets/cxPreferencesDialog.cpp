@@ -387,6 +387,7 @@ ToolConfigTab::ToolConfigTab(QWidget* parent) :
 {
   mToolConfigureGroupBox = new ToolConfigureGroupBox(this);
   mToolFilterGroupBox  = new ToolFilterGroupBox(this);
+  mToolFilterGroupBox->setTrackingSystemSelector(mToolConfigureGroupBox->getTrackingSystemSelector());
 
   connect(stateService().get(), &StateService::applicationStateChanged, this, &ToolConfigTab::applicationChangedSlot);
 
@@ -454,9 +455,9 @@ void ToolConfigTab::saveParametersSlot()
 void ToolConfigTab::applicationChangedSlot()
 {
   CLINICAL_APPLICATION clinicalApplication = string2enum<CLINICAL_APPLICATION>(stateService()->getApplicationStateName());
-  mToolConfigureGroupBox->setClinicalApplicationSlot(clinicalApplication);
+//  mToolConfigureGroupBox->setClinicalApplicationSlot(clinicalApplication);
   mToolFilterGroupBox->setClinicalApplicationSlot(clinicalApplication);
-  mToolFilterGroupBox->setTrackingSystemSlot(tsPOLARIS);
+ // mToolFilterGroupBox->setTrackingSystemSlot(tsPOLARIS);
 }
 
 void ToolConfigTab::globalConfigurationFileChangedSlot(QString key)

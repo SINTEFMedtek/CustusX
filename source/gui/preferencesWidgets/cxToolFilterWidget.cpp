@@ -40,6 +40,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSelectionGroupBox.h"
 #include "cxToolListWidget.h"
 #include "cxTrackerConfiguration.h"
+#include "cxStringDataAdapterXml.h"
+#include "cxDataAdapterHelper.h"
+#include "cxHelperWidgets.h"
+
 
 namespace cx
 {
@@ -47,53 +51,85 @@ namespace cx
 ToolFilterGroupBox::ToolFilterGroupBox(QWidget* parent) :
     QGroupBox(parent)
 {
-  this->setTitle("Tool filter");
+  this->setTitle("Available tools");
 
-  mApplicationGroupBox = new SelectionGroupBox("Applications", stateService()->getAllApplicationStateNames(), Qt::Vertical, false, NULL);
-  mApplicationGroupBox->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Expanding);
+	this->createAppSelector();
+//	this->createTrackingSystemSelector();
 
-  TrackerConfigurationPtr config = trackingService()->getConfiguration();
-  mTrackingSystemGroupBox = new SelectionGroupBox("Tracking systems", config->getSupportedTrackingSystems(), Qt::Horizontal, true, NULL);
   mToolListWidget = new FilteringToolListWidget(NULL);
   connect(mToolListWidget, SIGNAL(toolSelected(QString)), this, SIGNAL(toolSelected(QString)));
 
-  QGridLayout* layout = new QGridLayout(this);
-  layout->addWidget(mApplicationGroupBox);
-  connect(mApplicationGroupBox, SIGNAL(selectionChanged()), this, SLOT(filterSlot()));
-  layout->addWidget(mTrackingSystemGroupBox);
-  connect(mTrackingSystemGroupBox, SIGNAL(selectionChanged()), this, SLOT(filterSlot()));
+  QVBoxLayout* layout = new QVBoxLayout(this);
+  QGridLayout* gLayout = new QGridLayout;
+  gLayout->setMargin(0);
+  layout->addLayout(gLayout);
 
-  QGroupBox* toolGroupBox = new QGroupBox();
-  toolGroupBox->setTitle("Tools");
-  QVBoxLayout* toolLayout = new QVBoxLayout();
-  toolGroupBox->setLayout(toolLayout);
-  toolLayout->addWidget(mToolListWidget);
-
-  layout->addWidget(toolGroupBox);
+  sscCreateDataWidget(this, mAppSelector, gLayout, 0);
+//  sscCreateDataWidget(this, mTrackingSystemSelector, gLayout, 1);
+  layout->addWidget(mToolListWidget);
 }
+
+void ToolFilterGroupBox::createAppSelector()
+{
+	QString defaultValue = "All";
+	QStringList range = stateService()->getAllApplicationStateNames();
+	range.prepend("All");
+	mAppSelector = StringDataAdapterXml::initialize("applications", "Application",
+													"Display tools for a given applications",
+													defaultValue,
+													range,
+													QDomNode());
+	connect(mAppSelector.get(), SIGNAL(changed()), this, SLOT(filterSlot()));
+}
+
+//void ToolFilterGroupBox::createTrackingSystemSelector()
+//{
+//	QString defaultValue = "";
+//	TrackerConfigurationPtr config = trackingService()->getConfiguration();
+//	mTrackingSystemSelector = StringDataAdapterXml::initialize("trackingsystem", "Tracking System",
+//													"Display tools for a given tracking system",
+//													defaultValue,
+//													config->getSupportedTrackingSystems(),
+//													QDomNode());
+//	connect(mTrackingSystemSelector.get(), SIGNAL(changed()), this, SLOT(filterSlot()));
+//}
 
 ToolFilterGroupBox::~ToolFilterGroupBox()
 {}
 
-void ToolFilterGroupBox::setClinicalApplicationSlot(CLINICAL_APPLICATION clinicalApplication)
+void ToolFilterGroupBox::setTrackingSystemSelector(StringDataAdapterPtr selector)
 {
-  QStringList selectedApplication;
-  selectedApplication << enum2string(clinicalApplication);
-  mApplicationGroupBox->setSelected(selectedApplication);
+	if (mTrackingSystemSelector)
+		disconnect(mTrackingSystemSelector.get(), SIGNAL(changed()), this, SLOT(filterSlot()));
+
+	mTrackingSystemSelector = selector;
+
+	if (mTrackingSystemSelector)
+		connect(mTrackingSystemSelector.get(), SIGNAL(changed()), this, SLOT(filterSlot()));
 }
 
-void ToolFilterGroupBox::setTrackingSystemSlot(TRACKING_SYSTEM trackingSystem)
+void ToolFilterGroupBox::setClinicalApplicationSlot(CLINICAL_APPLICATION clinicalApplication)
 {
-  QStringList selectedTrackingSystem;
-  selectedTrackingSystem << enum2string(trackingSystem);
-  mTrackingSystemGroupBox->setSelected(selectedTrackingSystem);
+  QString val = enum2string(clinicalApplication);
+  mAppSelector->setValue(val);
 }
+
+//void ToolFilterGroupBox::setTrackingSystemSlot(TRACKING_SYSTEM trackingSystem)
+//{
+//  QString selectedTrackingSystem = enum2string(trackingSystem);
+//  mTrackingSystemSelector->setValue(selectedTrackingSystem);
+//}
 
 void ToolFilterGroupBox::filterSlot()
 {
-  QStringList applicationFilter = mApplicationGroupBox->getSelected();
-  QStringList trackingSystemFilter = mTrackingSystemGroupBox->getSelected();
+  QStringList applicationFilter;
+  if (mAppSelector->getValue() == "All")
+	  applicationFilter = stateService()->getAllApplicationStateNames();
+  else
+	  applicationFilter = QStringList() << mAppSelector->getValue();
+  QStringList trackingSystemFilter = QStringList() << mTrackingSystemSelector->getValue();
 
   mToolListWidget->filterSlot(applicationFilter, trackingSystemFilter);
 }
+
 }//namespace cx

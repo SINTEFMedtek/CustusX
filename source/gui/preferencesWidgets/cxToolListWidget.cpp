@@ -154,7 +154,7 @@ void FilteringToolListWidget::filterSlot(QStringList applicationsFilter, QString
 	TrackerConfigurationPtr config = trackingService()->getConfiguration();
 	QStringList filteredTools = config->getToolsGivenFilter(applicationsFilter,
 														  trackingsystemsFilter);
-
+//	filteredTools.sort(); // no good: we would like to sort on name, but the list is full paths
 	this->populate(filteredTools);
 }
 

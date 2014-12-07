@@ -11,11 +11,11 @@ modification, are permitted provided that the following conditions are met:
    this list of conditions and the following disclaimer.
 
 2. Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
+   this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
 
 3. Neither the name of the copyright holder nor the names of its contributors 
-   may be used to endorse or promote products derived from this software 
+   may be used to endorse or promote products derived from this software
    without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
@@ -45,80 +45,62 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSelectionGroupBox.h"
 #include "cxToolListWidget.h"
 #include "cxDataLocations.h"
+#include "cxHelperWidgets.h"
 #include "cxTrackerConfiguration.h"
 
 namespace cx
 {
 
 ToolConfigureGroupBox::ToolConfigureGroupBox(QWidget* parent) :
-    QGroupBox(parent),
-    mClinicalApplication(mdCOUNT),
-    mConfigFilesComboBox(new QComboBox()),
-    mConfigFilePathLineEdit(new QLineEdit()),
-    mConfigFileLineEdit(new QLineEdit()),
-    mReferenceComboBox(new QComboBox())
+	QGroupBox(parent),
+	mConfigFilesComboBox(new QComboBox()),
+	mConfigFileLineEdit(new QLineEdit()),
+	mReferenceComboBox(new QComboBox()),
+	mModified(false)
 {
-  Q_PROPERTY("userEdited")
+	connect(stateService().get(), &StateService::applicationStateChanged, this, &ToolConfigureGroupBox::onApplicationStateChanged);
 
-  mConfigFilesComboBox->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Expanding);
-  //mConfigFilesComboBox->setMinimumSize(200, 0);
-  //mConfigFilesComboBox->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+	mConfigFilesComboBox->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Expanding);
+	//mConfigFilesComboBox->setMinimumSize(200, 0);
+	//mConfigFilesComboBox->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
-  mApplicationGroupBox = new SelectionGroupBox("Applications", stateService()->getAllApplicationStateNames(), Qt::Vertical, true, NULL);
-  mApplicationGroupBox->setEnabledButtons(false); //< application application is determined by the application state chosen elsewhere in the system
-  mApplicationGroupBox->hide(); // large and redundant box - info is only used for path generation, which can be found in the "Save Path" box
-  mApplicationGroupBox->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Expanding);
-  TrackerConfigurationPtr config = trackingService()->getConfiguration();
-  mTrackingSystemGroupBox = new SelectionGroupBox("Tracking systems", config->getSupportedTrackingSystems(), Qt::Horizontal, true, NULL);
-  mToolListWidget = new ConfigToolListWidget(NULL);
+	mToolListWidget = new ConfigToolListWidget(NULL);
 
-  this->setClinicalApplicationSlot(string2enum<CLINICAL_APPLICATION>(stateService()->getApplicationStateName()));
+	this->createTrackingSystemSelector();
 
-  QGroupBox* toolGroupBox = new QGroupBox();
-  toolGroupBox->setTitle("Tools");
-  QVBoxLayout* toolLayout = new QVBoxLayout();
-  toolGroupBox->setLayout(toolLayout);
-  toolLayout->addWidget(mToolListWidget);
+	QGroupBox* toolGroupBox = new QGroupBox();
+	toolGroupBox->setTitle("Tools");
+	QVBoxLayout* toolLayout = new QVBoxLayout();
+	toolGroupBox->setLayout(toolLayout);
+	toolLayout->addWidget(mToolListWidget);
 
-  QGridLayout* layout = new QGridLayout(this);
-  int row=0;
-  layout->addWidget(new QLabel("Selected config: "), row, 0, 1, 1);
-  layout->addWidget(mConfigFilesComboBox, row, 1, 1, 1);
-  row++;
-  layout->addWidget(new QLabel("Save path: "), row, 0, 1, 1);
-  layout->addWidget(mConfigFilePathLineEdit, row, 1, 1, 1);
-  row++;
-  layout->addWidget(new QLabel("File name: "), row, 0, 1, 1);
-  layout->addWidget(mConfigFileLineEdit, row, 1, 1, 1);
-  row++;
-  layout->addWidget(mApplicationGroupBox, row, 0, 1, 2);
-  row++;
-  layout->addWidget(mTrackingSystemGroupBox, row, 0, 1, 2);
-  row++;
-  layout->addWidget(toolGroupBox, row, 0, 1, 2);
-  layout->setRowStretch(row, 1);
-  row++;
-  layout->addWidget(new QLabel("Reference: "), row, 0, 1, 1);
-  layout->addWidget(mReferenceComboBox, row, 1, 1, 1);
+	QGridLayout* layout = new QGridLayout(this);
+	int row=0;
+	layout->addWidget(new QLabel("Configuration: "), row, 0, 1, 1);
+	layout->addWidget(mConfigFilesComboBox, row, 1, 1, 1);
+	row++;
+	layout->addWidget(new QLabel("File name: "), row, 0, 1, 1);
+	layout->addWidget(mConfigFileLineEdit, row, 1, 1, 1);
+	row++;
+	sscCreateDataWidget(this, mTrackingSystemSelector, layout, row);
+	row++;
+	layout->addWidget(toolGroupBox, row, 0, 1, 2);
+	layout->setRowStretch(row, 1);
+	row++;
+	layout->addWidget(new QLabel("Reference: "), row, 0, 1, 1);
+	layout->addWidget(mReferenceComboBox, row, 1, 1, 1);
 
-  //changes due to programming actions
-  connect(mConfigFilesComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(configChangedSlot()));
-  connect(mToolListWidget, SIGNAL(listSizeChanged()), this, SLOT(toolsChangedSlot()));
-  connect(mTrackingSystemGroupBox, SIGNAL(selectionChanged()), this, SLOT(filterToolsSlot()));
-  connect(mToolListWidget, SIGNAL(toolSelected(QString)), this, SIGNAL(toolSelected(QString)));
+	//changes due to programming actions
+	connect(mConfigFilesComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(configChangedSlot()));
+	connect(mToolListWidget, SIGNAL(listSizeChanged()), this, SLOT(toolsChangedSlot()));
+	connect(mToolListWidget, SIGNAL(toolSelected(QString)), this, SIGNAL(toolSelected(QString)));
 
-  //changes due to user actions
-  connect(mConfigFilePathLineEdit, SIGNAL(textEdited(const QString&)), this, SLOT(pathEditedSlot()));
-  connect(mConfigFilePathLineEdit, SIGNAL(textEdited(const QString&)), this, SLOT(configEditedSlot()));
-  connect(mConfigFileLineEdit, SIGNAL(textEdited(const QString&)), this, SLOT(fileNameEditedSlot()));
-  connect(mConfigFileLineEdit, SIGNAL(textEdited(const QString&)), this, SLOT(configEditedSlot()));
-  connect(mConfigFileLineEdit, SIGNAL(editingFinished()), this, SLOT(filenameDoneEditingSlot()));
-  connect(mApplicationGroupBox, SIGNAL(userClicked()), this, SLOT(configEditedSlot()));
-  connect(mTrackingSystemGroupBox, SIGNAL(userClicked()), this, SLOT(configEditedSlot()));
-  connect(mToolListWidget, SIGNAL(userChangedList()), this, SLOT(configEditedSlot()));
-  connect(mReferenceComboBox, SIGNAL(activated(int)), this, SLOT(configEditedSlot()));
+	//changes due to user actions
+	connect(mConfigFileLineEdit, SIGNAL(textEdited(const QString&)), this, SLOT(configEditedSlot()));
+	connect(mToolListWidget, SIGNAL(userChangedList()), this, SLOT(configEditedSlot()));
+	connect(mReferenceComboBox, SIGNAL(activated(int)), this, SLOT(configEditedSlot()));
 
-  this->populateConfigurations();
+	this->onApplicationStateChanged();
 }
 
 ToolConfigureGroupBox::~ToolConfigureGroupBox()
@@ -127,206 +109,154 @@ ToolConfigureGroupBox::~ToolConfigureGroupBox()
 void ToolConfigureGroupBox::setCurrentlySelectedCofiguration(QString configAbsoluteFilePath)
 {
 	QString cleanPath = QDir(configAbsoluteFilePath).absolutePath();
-  int currentIndex = mConfigFilesComboBox->findData(cleanPath, Qt::ToolTipRole);
-  if(currentIndex < 0)
-  {
-    currentIndex = 0;
-    reportWarning("Tool configuration doesn't exist: " + cleanPath);
-  }
-  mConfigFilesComboBox->setCurrentIndex(currentIndex);
+	int currentIndex = mConfigFilesComboBox->findData(cleanPath, Qt::ToolTipRole);
+	if(currentIndex < 0)
+	{
+		currentIndex = 0;
+		reportWarning("Tool configuration doesn't exist: " + cleanPath);
+	}
+	mConfigFilesComboBox->setCurrentIndex(currentIndex);
+
+	mModified = false;
 }
 
 QString ToolConfigureGroupBox::getCurrenctlySelectedConfiguration() const
 {
-  QString retval;
-  retval = mConfigFilesComboBox->itemData(mConfigFilesComboBox->currentIndex(), Qt::ToolTipRole).toString();
-  return retval;
+	QString retval;
+	retval = mConfigFilesComboBox->itemData(mConfigFilesComboBox->currentIndex(), Qt::ToolTipRole).toString();
+	return retval;
+}
+
+void ToolConfigureGroupBox::createTrackingSystemSelector()
+{
+	QString defaultValue = "";
+	TrackerConfigurationPtr config = trackingService()->getConfiguration();
+	mTrackingSystemSelector = StringDataAdapterXml::initialize("trackingsystem", "Tracking System",
+															   "Select tracking system to use",
+															   defaultValue,
+															   config->getSupportedTrackingSystems(),
+															   QDomNode());
+	connect(mTrackingSystemSelector.get(), SIGNAL(changed()), this, SLOT(filterToolsSlot()));
+}
+
+StringDataAdapterPtr ToolConfigureGroupBox::getTrackingSystemSelector()
+{
+	return mTrackingSystemSelector;
 }
 
 QString ToolConfigureGroupBox::requestSaveConfigurationSlot()
 {
-  QString retval;
+	QString retval;
 
-  if(!mConfigFilesComboBox->itemData(mConfigFilesComboBox->currentIndex(), sEdited).toBool())
-    return retval;
+	if(!mModified)
+		return retval;
 
-  // deconfigure toolmanager in order to be able to reread config data
-  trackingService()->setState(Tool::tsNONE);
+	// deconfigure toolmanager in order to be able to reread config data
+	trackingService()->setState(Tool::tsNONE);
 
-  TrackerConfiguration::Configuration current = this->getCurrentConfiguration();
-  TrackerConfigurationPtr config = trackingService()->getConfiguration();
-  config->saveConfiguration(current);
+	TrackerConfiguration::Configuration current = this->getCurrentConfiguration();
+	TrackerConfigurationPtr config = trackingService()->getConfiguration();
+	config->saveConfiguration(current);
+	mModified = false;
 
-  retval = current.mUid;
+	this->populateConfigurations();
 
-  this->populateConfigurations();
-
-  return retval;
+	return current.mUid;
 }
 
-void ToolConfigureGroupBox::setClinicalApplicationSlot(CLINICAL_APPLICATION clinicalApplication)
+void ToolConfigureGroupBox::onApplicationStateChanged()
 {
-  mClinicalApplication = clinicalApplication;
-  this->setTitle("Tool configurations for "+enum2string(mClinicalApplication));
-
-  this->populateConfigurations();
+	QString application = stateService()->getApplicationStateName();
+	this->setTitle("Tool configurations for "+ application);
+	this->populateConfigurations();
 }
 
 void ToolConfigureGroupBox::configChangedSlot()
 {
-	QStringList selectedApplications;
-	QStringList selectedTrackingSystems;
-	QStringList selectedTools;
-	QString absoluteConfigFilePath = mConfigFilesComboBox->itemData(mConfigFilesComboBox->currentIndex(),
-					Qt::ToolTipRole).toString();
-	bool suggestDefaultNames;
+	QString uid = mConfigFilesComboBox->itemData(mConfigFilesComboBox->currentIndex(),
+												 Qt::ToolTipRole).toString();
+
 	TrackerConfigurationPtr config = trackingService()->getConfiguration();
+	TrackerConfiguration::Configuration data = config->getConfiguration(uid);
+	bool isNewConfig = 	mConfigFilesComboBox->currentText().contains("<new config>");
 
-	if (mConfigFilesComboBox->currentText().contains("<new config>"))
+	if (isNewConfig)
 	{
-		selectedApplications << enum2string(mClinicalApplication); // just want a default
-		selectedTrackingSystems << enum2string(tsPOLARIS); //just want a default
-		suggestDefaultNames = true;
-
-		absoluteConfigFilePath = config->getConfigurationApplicationsPath(enum2string(mClinicalApplication));
-	}
-	else
-	{
-		TrackerConfiguration::Configuration data = config->getConfiguration(absoluteConfigFilePath);
-
-		selectedApplications << data.mClinicalApplication;
-		selectedTrackingSystems << data.mTrackingSystem;
-		selectedTools = data.mTools;
-
-		suggestDefaultNames = false;
+		data.mTrackingSystem = enum2string(tsPOLARIS);
+		data.mName = "MyConfig";
 	}
 
-	QFile file(absoluteConfigFilePath);
-	QFileInfo info(file);
-	QString filePath = info.path();
-	QString fileName = info.fileName();
-
-	mConfigFilePathLineEdit->setText(filePath);
-	this->setState(mConfigFilePathLineEdit, !suggestDefaultNames);
-
-	mConfigFileLineEdit->setText(fileName);
-	this->setState(mConfigFileLineEdit, !suggestDefaultNames);
-
-	mApplicationGroupBox->setSelected(selectedApplications);
-	mTrackingSystemGroupBox->setSelected(selectedTrackingSystems);
-	mToolListWidget->configSlot(selectedTools);
+	mConfigFileLineEdit->setText(data.mName);
+	mConfigFileLineEdit->setEnabled(isNewConfig);
+	mConfigFileLineEdit->setToolTip(data.mUid);
+	mModified = true;
+	mTrackingSystemSelector->setValue(data.mTrackingSystem);
+	mToolListWidget->configSlot(data.mTools);
 }
 
 void ToolConfigureGroupBox::configEditedSlot()
 {
-  this->setState(mConfigFilesComboBox, mConfigFilesComboBox->currentIndex(), true);
+	mModified = true;
 }
 
 void ToolConfigureGroupBox::toolsChangedSlot()
 {
-  this->populateReference();
-  this->filterToolsSlot();
+	this->populateReference();
+	this->filterToolsSlot();
 }
 
 void ToolConfigureGroupBox::filterToolsSlot()
 {
-  QStringList trackingsystemFilter = mTrackingSystemGroupBox->getSelected();
-  mToolListWidget->filterSlot(trackingsystemFilter);
-}
-
-void ToolConfigureGroupBox::pathEditedSlot()
-{
-  this->setState(mConfigFilePathLineEdit, true);
-}
-
-void ToolConfigureGroupBox::fileNameEditedSlot()
-{
-  this->setState(mConfigFileLineEdit, true);
-}
-
-void ToolConfigureGroupBox::filenameDoneEditingSlot()
-{
-  if(mConfigFileLineEdit->text().contains(".xml", Qt::CaseInsensitive))
-    mConfigFileLineEdit->setText(mConfigFileLineEdit->text().remove(".xml"));
-
-  if(!mConfigFileLineEdit->text().endsWith(".xml", Qt::CaseInsensitive))
-    mConfigFileLineEdit->setText(mConfigFileLineEdit->text()+".xml");
+	QString ts = mTrackingSystemSelector->getValue();
+	mToolListWidget->filterSlot(QStringList() << ts);
+	mModified = true;
 }
 
 void ToolConfigureGroupBox::populateConfigurations()
 {
-  mConfigFilesComboBox->clear();
+	mConfigFilesComboBox->clear();
 
-  TrackerConfigurationPtr config = trackingService()->getConfiguration();
-  QStringList configurations = config->getConfigurationsGivenApplication(enum2string(mClinicalApplication));
+	TrackerConfigurationPtr config = trackingService()->getConfiguration();
+	QString application = stateService()->getApplicationStateName();
+	QStringList configurations = config->getConfigurationsGivenApplication(application);
 
-  foreach(QString filename, configurations)
-  {
-	  TrackerConfiguration::Configuration configuration = config->getConfiguration(filename);
-	  this->addConfigurationToComboBox(configuration.mName, configuration.mUid);
-  }
-	QString newConfig("<new config>");
-	this->addConfigurationToComboBox(newConfig, this->generateConfigName());
+	foreach(QString filename, configurations)
+	{
+		TrackerConfiguration::Configuration configuration = config->getConfiguration(filename);
+		this->addConfigurationToComboBox(configuration.mName, configuration.mUid);
+	}
+	QString newConfig = "<new config>";
+	this->addConfigurationToComboBox(newConfig, newConfig);
 
-  int currentIndex = mConfigFilesComboBox->findText(newConfig);
-  mConfigFilesComboBox->setCurrentIndex(currentIndex);
+	int currentIndex = mConfigFilesComboBox->findText(newConfig);
+	mConfigFilesComboBox->setCurrentIndex(currentIndex);
 }
 
 int ToolConfigureGroupBox::addConfigurationToComboBox(QString displayName, QString absoluteFilePath)
 {
-  mConfigFilesComboBox->addItem(displayName);
-  int index = mConfigFilesComboBox->findText(displayName);
-  mConfigFilesComboBox->setItemData(index, absoluteFilePath, Qt::ToolTipRole);
-  this->setState(mConfigFilesComboBox, index, false);
+	mConfigFilesComboBox->addItem(displayName);
+	int index = mConfigFilesComboBox->findText(displayName);
+	mConfigFilesComboBox->setItemData(index, absoluteFilePath, Qt::ToolTipRole);
 
-  return index;
-}
-
-void ToolConfigureGroupBox::setState(QComboBox* box, int index, bool edited)
-{
-  box->setItemData(index, edited, sEdited);
-
-  if(edited && !mConfigFilePathLineEdit->property("userEdited").toBool() && !mConfigFileLineEdit->property("userEdited").toBool())
-  {
-    QString absoluteConfigPaht = this->generateConfigName();
-    QFile file(absoluteConfigPaht);
-    QFileInfo info(file);
-    QString filename = info.fileName();
-    QString filepath = info.path();
-
-    mConfigFilePathLineEdit->setText(filepath);
-    mConfigFileLineEdit->setText(filename);
-  }
+	return index;
 }
 
 TrackerConfiguration::Configuration ToolConfigureGroupBox::getCurrentConfiguration()
 {
-  TrackerConfiguration::Configuration retval;
-  QString filename = mConfigFileLineEdit->text();
-  QString filepath = mConfigFilePathLineEdit->text();
-  retval.mUid = filepath+"/"+filename;
-  retval.mClinicalApplication = mApplicationGroupBox->getSelected()[0];
-  retval.mTrackingSystem = mTrackingSystemGroupBox->getSelected()[0];
-  retval.mTools = mToolListWidget->getTools();
-  retval.mReferenceTool = mReferenceComboBox->itemData(mReferenceComboBox->currentIndex(), Qt::ToolTipRole).toString();
-
-  return retval;
-}
-
-QString ToolConfigureGroupBox::generateConfigName()
-{
-	QStringList applicationFilter = mApplicationGroupBox->getSelected();
-	QString app = ((applicationFilter.size() >= 1) ? applicationFilter[0] : "");
+	TrackerConfiguration::Configuration retval;
 	TrackerConfigurationPtr config = trackingService()->getConfiguration();
-	QString root = config->getConfigurationApplicationsPath(app);
-	return root + "/MyConfig.xml";
-}
+	QString application = stateService()->getApplicationStateName();
 
+	QString filename = mConfigFileLineEdit->text();
+	QString filepath = config->getConfigurationApplicationsPath(application);
 
-void ToolConfigureGroupBox::setState(QLineEdit* line, bool userEdited)
-{
-  QVariant value(userEdited);
-  line->setProperty("userEdited", value);
+	retval.mUid = QString("%1/%2.xml").arg(filepath).arg(filename);
+	retval.mClinicalApplication = application;
+	retval.mTrackingSystem = mTrackingSystemSelector->getValue();
+	retval.mTools = mToolListWidget->getTools();
+	retval.mReferenceTool = mReferenceComboBox->itemData(mReferenceComboBox->currentIndex(), Qt::ToolTipRole).toString();
+
+	return retval;
 }
 
 void ToolConfigureGroupBox::populateReference()

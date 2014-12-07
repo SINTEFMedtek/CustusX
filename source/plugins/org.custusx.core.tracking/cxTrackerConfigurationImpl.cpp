@@ -76,7 +76,7 @@ TrackerConfigurationImpl::Configuration TrackerConfigurationImpl::getConfigurati
 
 	Configuration retval;
 	retval.mUid = uid;
-	retval.mName = QFileInfo(uid).fileName();
+	retval.mName = QFileInfo(uid).completeBaseName();
 
 	CLINICAL_APPLICATION application = parser.getApplicationapplication();
 	retval.mClinicalApplication = enum2string(application);
