@@ -76,19 +76,19 @@ ToolConfigureGroupBox::ToolConfigureGroupBox(QWidget* parent) :
 
 	QGridLayout* layout = new QGridLayout(this);
 	int row=0;
-	layout->addWidget(new QLabel("Configuration: "), row, 0, 1, 1);
-	layout->addWidget(mConfigFilesComboBox, row, 1, 1, 1);
-	row++;
-	layout->addWidget(new QLabel("File name: "), row, 0, 1, 1);
-	layout->addWidget(mConfigFileLineEdit, row, 1, 1, 1);
-	row++;
-	sscCreateDataWidget(this, mTrackingSystemSelector, layout, row);
-	row++;
-	layout->addWidget(toolGroupBox, row, 0, 1, 2);
-	layout->setRowStretch(row, 1);
-	row++;
-	layout->addWidget(new QLabel("Reference: "), row, 0, 1, 1);
-	layout->addWidget(mReferenceComboBox, row, 1, 1, 1);
+//	layout->addWidget(new QLabel("Configuration: "), row, 0, 1, 1);
+//	layout->addWidget(mConfigFilesComboBox, row, 1, 1, 1);
+//	row++;
+//	layout->addWidget(new QLabel("File name: "), row, 0, 1, 1);
+//	layout->addWidget(mConfigFileLineEdit, row, 1, 1, 1);
+//	row++;
+//	sscCreateDataWidget(this, mTrackingSystemSelector, layout, row);
+//	row++;
+//	layout->addWidget(toolGroupBox, row, 0, 1, 2);
+//	layout->setRowStretch(row, 1);
+//	row++;
+//	layout->addWidget(new QLabel("Reference: "), row, 0, 1, 1);
+//	layout->addWidget(mReferenceComboBox, row, 1, 1, 1);
 
 	//changes due to programming actions
 	connect(mConfigFilesComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(configChangedSlot()));
