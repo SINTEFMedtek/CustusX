@@ -414,12 +414,14 @@ void ToolConfigTab::init()
   filepreviewGroupBox->setTitle("Toolfile preview");
   QHBoxLayout* filepreviewLayout = new QHBoxLayout();
   filepreviewGroupBox->setLayout(filepreviewLayout);
+//  filepreviewLayout->setMargin(0);
   filepreviewLayout->addWidget(mFilePreviewWidget);
 
   QGroupBox* imagepreviewGroupBox = new QGroupBox(this);
   imagepreviewGroupBox->setTitle("Tool image preview");
   QVBoxLayout* imagepreviewLayout = new QVBoxLayout();
   imagepreviewGroupBox->setLayout(imagepreviewLayout);
+  imagepreviewLayout->setMargin(0);
   imagepreviewLayout->addWidget(mImagePreviewWidget);
 
   //layout

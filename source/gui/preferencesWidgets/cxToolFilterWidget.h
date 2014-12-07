@@ -76,17 +76,13 @@ signals:
 
 public slots:
   void setClinicalApplicationSlot(CLINICAL_APPLICATION clinicalApplication);
-//  void setTrackingSystemSlot(TRACKING_SYSTEM trackingSystem);
 
 private slots:
   void filterSlot();
 
 private:
   void createAppSelector();
-//  void createTrackingSystemSelector();
 
-  //  SelectionGroupBox* mApplicationGroupBox;
-//  SelectionGroupBox* mTrackingSystemGroupBox;
   StringDataAdapterXmlPtr mAppSelector;
   StringDataAdapterPtr mTrackingSystemSelector;
 

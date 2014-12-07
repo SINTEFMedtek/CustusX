@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QLabel>
 #include "cxEnumConverter.h"
 #include "cxStateService.h"
 #include "cxTrackingService.h"
@@ -54,18 +55,13 @@ ToolFilterGroupBox::ToolFilterGroupBox(QWidget* parent) :
   this->setTitle("Available tools");
 
 	this->createAppSelector();
-//	this->createTrackingSystemSelector();
 
   mToolListWidget = new FilteringToolListWidget(NULL);
   connect(mToolListWidget, SIGNAL(toolSelected(QString)), this, SIGNAL(toolSelected(QString)));
 
   QVBoxLayout* layout = new QVBoxLayout(this);
-  QGridLayout* gLayout = new QGridLayout;
-  gLayout->setMargin(0);
-  layout->addLayout(gLayout);
 
-  sscCreateDataWidget(this, mAppSelector, gLayout, 0);
-//  sscCreateDataWidget(this, mTrackingSystemSelector, gLayout, 1);
+  layout->addWidget(sscCreateDataWidget(this, mAppSelector));
   layout->addWidget(mToolListWidget);
 }
 
@@ -81,18 +77,6 @@ void ToolFilterGroupBox::createAppSelector()
 													QDomNode());
 	connect(mAppSelector.get(), SIGNAL(changed()), this, SLOT(filterSlot()));
 }
-
-//void ToolFilterGroupBox::createTrackingSystemSelector()
-//{
-//	QString defaultValue = "";
-//	TrackerConfigurationPtr config = trackingService()->getConfiguration();
-//	mTrackingSystemSelector = StringDataAdapterXml::initialize("trackingsystem", "Tracking System",
-//													"Display tools for a given tracking system",
-//													defaultValue,
-//													config->getSupportedTrackingSystems(),
-//													QDomNode());
-//	connect(mTrackingSystemSelector.get(), SIGNAL(changed()), this, SLOT(filterSlot()));
-//}
 
 ToolFilterGroupBox::~ToolFilterGroupBox()
 {}
@@ -113,12 +97,6 @@ void ToolFilterGroupBox::setClinicalApplicationSlot(CLINICAL_APPLICATION clinica
   QString val = enum2string(clinicalApplication);
   mAppSelector->setValue(val);
 }
-
-//void ToolFilterGroupBox::setTrackingSystemSlot(TRACKING_SYSTEM trackingSystem)
-//{
-//  QString selectedTrackingSystem = enum2string(trackingSystem);
-//  mTrackingSystemSelector->setValue(selectedTrackingSystem);
-//}
 
 void ToolFilterGroupBox::filterSlot()
 {

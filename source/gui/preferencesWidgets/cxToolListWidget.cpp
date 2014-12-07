@@ -118,6 +118,13 @@ FilteringToolListWidget::~FilteringToolListWidget()
 {
 }
 
+QSize FilteringToolListWidget::minimumSizeHint() const
+{
+	QFontMetrics metric(this->font());
+	int height = metric.lineSpacing() * 15; // approx 15 lines of text
+	return QSize(300,height); // the height here is important: the default is 150, which is too little
+}
+
 void FilteringToolListWidget::mousePressEvent(QMouseEvent *event)
 {
 	if (event->button() == Qt::LeftButton)
