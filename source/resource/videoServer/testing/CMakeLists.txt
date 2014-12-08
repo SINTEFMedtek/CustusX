@@ -1,19 +1,32 @@
 
-if (BUILD_TESTING)
+if(BUILD_TESTING)
 	cx_initialize_cppunit()
 
-	include_directories(
-            ${CustusX_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
-            ${CustusX_SOURCE_DIR}/source/resource/videoServer
-	)
+    #include_directories(
+    #        ${CustusX_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
+    #        ${CustusX_SOURCE_DIR}/source/resource/videoServer
+    #)
 
-	set(CXTEST_SOURCES_TO_MOC
+    set(CXTEST_SOURCES_TO_MOC
     )
 
-    cx_add_class(CX_TEST_SOURCE_FILES
-            cxtestSonixProbeFileReader.cpp
-	)
+    set(CX_TEST_SOURCE_FILES
+        cxtestSonixProbeFileReader.cpp
+        cxtestGrabberDummy.h
+        cxtestGrabberDummy.cpp
+    )
 
-    cx_catch_add_lib_and_exe(cxGrabber "${CX_TEST_SOURCE_FILES}" "${CXTEST_SOURCES_TO_MOC}")
+    #qt5_wrap_cpp(CXTEST_SOURCES_TO_MOC ${CXTEST_SOURCES_TO_MOC})
+    add_library(cxtestGrabber ${CX_TEST_SOURCE_FILES} ${CXTEST_SOURCES_TO_MOC})
+    include(GenerateExportHeader)
+    generate_export_header(cxtestGrabber)
+    target_include_directories(cxtestGrabber
+        PUBLIC
+        .
+        ..
+        ${CMAKE_CURRENT_BINARY_DIR}
+    )
+    target_link_libraries(cxtestGrabber PRIVATE cxGrabber cxCatch)
+    cx_add_tests_to_catch(cxtestGrabber)
 
-endif (BUILD_TESTING)
+endif(BUILD_TESTING)

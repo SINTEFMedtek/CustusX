@@ -2933,7 +2933,7 @@ typedef unsigned long long uint64_t;
 
 namespace Catch {
 
-    class Timer {
+    class CXCATCH_EXPORT Timer {
     public:
         Timer() : m_ticks( 0 ) {}
         void start();
