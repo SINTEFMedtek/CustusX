@@ -82,6 +82,8 @@ public:
 
 private:
 	void addWidgetToLayout(QGridLayout* layout, QWidget* widget, LayoutRegion region);
+	void initBaseLayout();
+	void deleteWidgetInLayout(QWidget* widget);
 	LayoutRegion mBaseRegion;
 	LayoutRegion mTotalRegion;
 	QGridLayout* mLayout;
