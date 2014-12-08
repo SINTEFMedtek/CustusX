@@ -15,10 +15,6 @@ if(BUILD_TESTING)
         cxtestRendering.cpp
     )
 
-    cx_catch_add_lib_and_exe(org_custusx_core_visualization 
-        "${CX_TEST_CATCH_org_custusx_core_visualization_SOURCE_FILES}" 
-        "${CX_TEST_CATCH_org_custusx_core_visualization_MOC_SOURCE_FILES}")
-
     qt5_wrap_cpp(CX_TEST_CATCH_org_custusx_core_visualization_MOC_SOURCE_FILES ${CX_TEST_CATCH_org_custusx_core_visualization_MOC_SOURCE_FILES})
     add_library(cxtest_org_custusx_core_visualization ${CX_TEST_CATCH_org_custusx_core_visualization_SOURCE_FILES} ${CX_TEST_CATCH_org_custusx_core_visualization_MOC_SOURCE_FILES})
     include(GenerateExportHeader)
