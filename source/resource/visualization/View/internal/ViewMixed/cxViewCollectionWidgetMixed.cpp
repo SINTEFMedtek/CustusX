@@ -121,57 +121,12 @@ void ViewCollectionWidgetMixed::clearViews()
 	view_utils::setStretchFactors(mLayout, mTotalRegion, 0);
 
 	for (unsigned i=0; i<mOverlays.size(); ++i)
-	{
-//		mOverlays[i]->hide();
-//		mLayout->removeWidget(mOverlays[i]);
-//		delete mOverlays[i];
 		this->deleteWidgetInLayout(mOverlays[i]);
-	}
 	mOverlays.clear();
 
 	this->deleteWidgetInLayout(mBaseLayout);
 	this->initBaseLayout();
-//	mBaseLayout->hide();
-//	mLayout->removeWidget(mBaseLayout);
-//	delete mBaseLayout;
-//	mBaseLayout = new ViewCollectionWidgetUsingViewContainer();
-//	this->addWidgetToLayout(mLayout, mBaseLayout, LayoutRegion(0,0));
-//	this->setGridMargin(4);
-//	this->setGridSpacing(2);
-
-//	mBaseRegion = LayoutRegion(-1,-1);
-//	mTotalRegion = LayoutRegion(-1,-1);
 }
-
-/*void ViewCollectionWidgetMixed::clearViews()
-{
-	std::cout << "----------------------ViewCollectionWidgetMixed::clearViews()" << std::endl;
-	mBaseLayout->clearViews();
-	for (unsigned i=0; i<mOverlays.size(); ++i)
-		mOverlays[i]->clearViews();
-	view_utils::setStretchFactors(mLayout, mTotalRegion, 0);
-
-//	mBaseLayout->hide();
-	mLayout->removeWidget(mBaseLayout);
-//	delete mBaseLayout;
-//	mBaseLayout = NULL;
-
-	this->addWidgetToLayout(mLayout, mBaseLayout, LayoutRegion(0,0));
-
-	for (unsigned i=0; i<mOverlays.size(); ++i)
-	{
-		mOverlays[i]->hide();
-		mLayout->removeWidget(mOverlays[i]);
-		delete mOverlays[i];
-	}
-	mOverlays.clear();
-
-//	mBaseLayout = new ViewCollectionWidgetUsingViewContainer();
-//	this->addWidgetToLayout(mLayout, mBaseLayout, LayoutRegion(0,0));
-	mBaseRegion = LayoutRegion(-1,-1);
-	mTotalRegion = LayoutRegion(-1,-1);
-}*/
-
 
 void ViewCollectionWidgetMixed::setModified()
 {
