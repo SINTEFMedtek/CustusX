@@ -1,31 +1,37 @@
 
-if (BUILD_TESTING)
-	include_directories(
-	    ${CustusX_SOURCE_DIR}/source/resource/testUtilities
-	    ${CustusX_BINARY_DIR}/source/resource/testUtilities
-	    ${CustusX_SOURCE_DIR}/source/ThirdParty/catch 
-	    )
+if(BUILD_TESTING)
 
-	set(CXTEST_SOURCES_TO_MOC
-		cxViewsWindow.h
-		cxViewsFixture.h
-	)
+    set(CXTEST_SOURCES_TO_MOC
+        cxViewsWindow.h
+        cxViewsFixture.h
+    )
 
-        set(CXTEST_SOURCES
-                cxtestRenderTester.h
-                cxtestRenderTester.cpp
-                cxTestRenderSpeed.h
-                cxTestRenderSpeed.cpp
-                cxViewsFixture.cpp
-                cxViewsWindow.cpp
-                cxtestVideoGraphicsFixture.cpp
-                cxtestVideoGraphics.cpp
-                cxtestVisualRendering.cpp
-                cxtestImageEnveloper.cpp
-        )
+    set(CXTEST_SOURCES
+            cxtestRenderTester.h
+            cxtestRenderTester.cpp
+            cxTestRenderSpeed.h
+            cxTestRenderSpeed.cpp
+            cxViewsFixture.cpp
+            cxViewsWindow.cpp
+            cxtestVideoGraphicsFixture.cpp
+            cxtestVideoGraphics.cpp
+            cxtestVisualRendering.cpp
+            cxtestImageEnveloper.cpp
+    )
 
-        cx_catch_add_lib_and_exe(""
-                "${CXTEST_SOURCES}"
-                "${CXTEST_SOURCES_TO_MOC}")
+    qt5_wrap_cpp(CXTEST_SOURCES_TO_MOC ${CXTEST_SOURCES_TO_MOC})
+    add_library(cxtestResourceVisualization ${CXTEST_SOURCES} ${CXTEST_SOURCES_TO_MOC})
+    include(GenerateExportHeader)
+    generate_export_header(cxtestResourceVisualization)
+    target_include_directories(cxtestResourceVisualization
+        PUBLIC
+        .
+        ..
+        ${CMAKE_CURRENT_BINARY_DIR}
+        ${CustusX_SOURCE_DIR}/source/resource/core/testing
+        ${CustusX_SOURCE_DIR}/source/resource/testUtilities
+    )
+    target_link_libraries(cxtestResourceVisualization PRIVATE cxtestUtilities cxtestResource cxResourceVisualization cxCatch)
+    cx_add_tests_to_catch(cxtestResourceVisualization)
     
-endif (BUILD_TESTING)
+endif(BUILD_TESTING)

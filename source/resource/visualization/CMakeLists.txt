@@ -108,40 +108,12 @@ set( CX_RESOURCE_VISUALIZATION_LIBRARIES ${CX_RESOURCE_VISUALIZATION_LIBRARIES}
 	vtkFiltersModeling
 	vtkInteractionWidgets
 	vtkFiltersTexture
-#    vtkIO
-#    vtkRendering
-#    vtkImaging
-#   vtkCommon
-#    vtkHybrid
-#    vtkWidgets
-#    vtkFiltering
-#    vtkVolumeRendering
     )
-
-# =========================================================
-#if(USE_GLX_SHARED_CONTEXT)
-#    SET( CX_RESOURCE_VISUALIZATION_LIBRARIES
-#        ${CX_RESOURCE_VISUALIZATION_LIBRARIES}
-#        GLU
-#        )
-#endif(USE_GLX_SHARED_CONTEXT)
-
-
 
 configure_file(Rep/Shaders/glsl/upscale.frag Rep COPYONLY)
 configure_file(Rep/Shaders/glsl/upscale.vert Rep COPYONLY)
 configure_file(Rep/Shaders/glsl/raycasting_shader.frag Rep COPYONLY)
 configure_file(Rep/Shaders/glsl/raycasting_shader.vert Rep COPYONLY)
-#configure_file(Rep/Shaders/glsl/Texture3DOverlay.frag Rep COPYONLY)
-
-#set(SHADER_FROM_PATH ${CustusX_SOURCE_DIR}/source/resource/ssc/Code/Rep/Shaders/glsl)
-#set(SHADER_TO_PATH ${CustusX_SOURCE_DIR}/config/shaders)
-#configure_file(${SHADER_FROM_PATH}/upscale.frag ${SHADER_TO_PATH} COPYONLY)
-#configure_file(${SHADER_FROM_PATH}/upscale.vert ${SHADER_TO_PATH} COPYONLY)
-#configure_file(${SHADER_FROM_PATH}/raycasting_shader.frag ${SHADER_TO_PATH} COPYONLY)
-#configure_file(${SHADER_FROM_PATH}/raycasting_shader.vert ${SHADER_TO_PATH} COPYONLY)
-
-
 
 unset(CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES)
 set(CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES

@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTESTVIDEOGRAPHICSFIXTURE_H_
 #define CXTESTVIDEOGRAPHICSFIXTURE_H_
 
+#include "cxtestresourcevisualization_export.h"
+
 #include "cxTransform3D.h"
 
 #include "cxVideoGraphics.h"
@@ -46,7 +48,7 @@ namespace cxtest
   * \date april 29, 2013
   * \author christiana
   */
-class VideoGraphicsFixture
+class CXTESTRESOURCEVISUALIZATION_EXPORT VideoGraphicsFixture
 {
 public:
 	VideoGraphicsFixture();

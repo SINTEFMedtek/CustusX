@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTESTRENDERSPEED_H_
 #define CXTESTRENDERSPEED_H_
 
+#include "cxtestresourcevisualization_export.h"
+
 #include "cxView.h"
 #include <QTime>
 #include "cxViewCollectionWidget.h"
@@ -47,7 +49,7 @@ typedef vtkSmartPointer<class vtkRenderWindowInteractor> vtkRenderWindowInteract
 namespace cxtest
 {
 
-class RenderSpeedCounter
+class CXTESTRESOURCEVISUALIZATION_EXPORT RenderSpeedCounter
 {
 public:
 	RenderSpeedCounter();
@@ -80,7 +82,7 @@ private:
  *  \date May 27, 2013
  *  \author Ole Vegard Solberg, SINTEF
  */
-class TestRenderSpeed
+class CXTESTRESOURCEVISUALIZATION_EXPORT TestRenderSpeed
 {
 public:
 	TestRenderSpeed();
@@ -107,7 +109,7 @@ public:
  *  \date May 27, 2013
  *  \author Ole Vegard Solberg, SINTEF
  */
-class TestRenderWindowSpeed
+class CXTESTRESOURCEVISUALIZATION_EXPORT TestRenderWindowSpeed
 {
 public:
 	TestRenderWindowSpeed();
