@@ -85,35 +85,44 @@ cx_add_class(cxGui_SRCS
 	)
 
 set(SUB_FOLDERS
-    dataAdapters
-    dataWidgets
-    infoWidgets
-    navigationWidgets
-    preferencesWidgets
-    streamingWidgets
-    toolWidgets
-    utilities
-    pluginFrameworkWidgets
+    ./dataAdapters
+    ./dataWidgets
+    ./infoWidgets
+    ./navigationWidgets
+    ./preferencesWidgets
+    ./streamingWidgets
+    ./toolWidgets
+    ./utilities
+    ./pluginFrameworkWidgets
     )
 
-# Use the include path and library for Qt that is used by VTK.
-INCLUDE_DIRECTORIES(
-  ${SUB_FOLDERS}
-  ${CMAKE_CURRENT_BINARY_DIR}
-  ${CMAKE_CURRENT_SOURCE_DIR}
-)
-include_directories(
+cx_create_export_header("cxGui")
+
+# generate rules for building source files from the resources
+qt5_add_resources(cxResources cxResources.qrc)
+if(CX_WINDOWS)
+    set(cxResources
+        ${cxResources}
+        cxResources.h
+    )
+endif(CX_WINDOWS)
+
+cx_remove_duplicate_include_directories()
+add_library( cxGui ${cxGui_SRCS} ${cxResources})
+target_include_directories(cxGui
+    PUBLIC
+    ${SUB_FOLDERS}
+    ${CMAKE_CURRENT_BINARY_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}
     ${CX_RESOURCE_INCLUDE_DIRECTORIES}
     ${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
     ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
     ${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
-    .
     ${CustusX_SOURCE_DIR}/source/resource/videoServer
     ${CustusX_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
     ${CustusX_SOURCE_DIR}/source/logic
     ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
     ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
-    
     ${CustusX_BINARY_DIR}/source/resource/widgets
     ${CustusX_BINARY_DIR}/source/resource/visualization
     ${CustusX_BINARY_DIR}/source/resource/usReconstructionTypes
@@ -123,23 +132,7 @@ include_directories(
     ${CustusX_BINARY_DIR}/source/modules/GUIExtender
     ${CustusX_BINARY_DIR}/source/resource/pluginUtilities
     )
-    
-set(CX_GUI_LIBRARIES cxLogicManager cxResourceWidgets)
-
-cx_create_export_header("cxGui")
-
-# generate rules for building source files from the resources
-QT5_ADD_RESOURCES(cxResources cxResources.qrc)
-if(CX_WINDOWS)
-    set(cxResources
-        ${cxResources}
-        cxResources.h
-    )
-endif()
-
-cx_remove_duplicate_include_directories()
-add_library( cxGui ${cxGui_SRCS} ${cxResources})
-target_link_libraries( cxGui ${CX_GUI_LIBRARIES} )
+target_link_libraries(cxGui cxLogicManager cxResourceWidgets)
 
 add_subdirectory(testing)
 

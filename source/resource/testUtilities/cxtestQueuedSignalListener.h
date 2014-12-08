@@ -42,7 +42,7 @@ class QEventLoop;
 namespace cxtest
 {
 
-bool waitForQueuedSignal(QObject* object, const char* signal, int maxWaitMilliSeconds = 100, bool silentAtArrive = false);
+bool CXTESTUTILITIES_EXPORT waitForQueuedSignal(QObject* object, const char* signal, int maxWaitMilliSeconds = 100, bool silentAtArrive = false);
 
 /**
  * \brief Object that waits for a signal to arrive from a given QObject. If

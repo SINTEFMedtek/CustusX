@@ -33,12 +33,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTESTMETRICFIXTURE_H_
 #define CXTESTMETRICFIXTURE_H_
 
+#include "cxtest_org_custusx_core_patientmodel_export.h"
+
 #include "cxFrameMetric.h"
 #include "cxToolMetric.h"
 #include "cxDistanceMetric.h"
 #include "cxPointMetric.h"
 #include "cxPlaneMetric.h"
-//#include "cxToolMetric.h"
 #include <QDomNode>
 #include "cxtestDummyDataManager.h"
 #include "cxMessageListener.h"
@@ -47,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cxtest {
 
-struct PlaneMetricWithInput
+struct CXTEST_ORG_CUSTUSX_CORE_PATIENTMODEL_EXPORT PlaneMetricWithInput
 {
 	typedef cx::PlaneMetric METRIC_TYPE;
 	cx::PlaneMetricPtr mMetric;
@@ -57,7 +58,7 @@ struct PlaneMetricWithInput
 	cx::CoordinateSystem mSpace;
 };
 
-struct PointMetricWithInput
+struct CXTEST_ORG_CUSTUSX_CORE_PATIENTMODEL_EXPORT PointMetricWithInput
 {
 	typedef cx::PointMetric METRIC_TYPE;
 	cx::PointMetricPtr mMetric;
@@ -70,7 +71,7 @@ struct PointMetricWithInput
   * Contains all data used to construct the metric,
   * along with a (possibly modified) metric.
   */
-struct DistanceMetricWithInput
+struct CXTEST_ORG_CUSTUSX_CORE_PATIENTMODEL_EXPORT DistanceMetricWithInput
 {
 	typedef cx::DistanceMetric METRIC_TYPE;
 	cx::DistanceMetricPtr mMetric;
@@ -78,7 +79,7 @@ struct DistanceMetricWithInput
     double mDistance;
 };
 
-struct FrameMetricWithInput
+struct CXTEST_ORG_CUSTUSX_CORE_PATIENTMODEL_EXPORT FrameMetricWithInput
 {
     typedef cx::FrameMetric METRIC_TYPE;
 	cx::FrameMetricPtr mMetric;
@@ -92,7 +93,7 @@ struct FrameMetricWithInput
   * Contains all data used to construct the metric,
   * along with a (possibly modified) metric.
   */
-struct ToolMetricWithInput
+struct CXTEST_ORG_CUSTUSX_CORE_PATIENTMODEL_EXPORT ToolMetricWithInput
 {
 	typedef cx::ToolMetric METRIC_TYPE;
 	cx::ToolMetricPtr mMetric;
@@ -111,7 +112,7 @@ struct ToolMetricWithInput
  * \author Ole Vegard Solberg, SINTEF
  * \author Christian Askeland, SINTEF
  */
-class MetricFixture {
+class CXTEST_ORG_CUSTUSX_CORE_PATIENTMODEL_EXPORT MetricFixture {
 public:
 	MetricFixture();
     ~MetricFixture();
