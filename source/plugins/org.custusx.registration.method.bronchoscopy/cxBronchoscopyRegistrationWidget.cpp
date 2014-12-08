@@ -281,7 +281,7 @@ void BronchoscopyRegistrationWidget::acquisitionStarted()
 	if (!activeRep3D)
 		return;
 
-    activeRep3D->getTracer()->start();
+//    activeRep3D->getTracer()->start();
 }
 void BronchoscopyRegistrationWidget::acquisitionStopped()
 {
@@ -305,7 +305,7 @@ void BronchoscopyRegistrationWidget::acquisitionCancelled()
 	if (!activeRep3D)
 		return;
 
-	activeRep3D->getTracer()->stop();
+//	activeRep3D->getTracer()->stop();
 }
 
 void BronchoscopyRegistrationWidget::recordedSessionsChanged()
@@ -334,7 +334,7 @@ void BronchoscopyRegistrationWidget::obscuredSlot(bool obscured)
     if (!activeRep3D)
         return;
     //std::cout << "Slot is cleared" << std::endl;
-    activeRep3D->getTracer()->clear();
+//    activeRep3D->getTracer()->clear();
 }
 
 void BronchoscopyRegistrationWidget::createMaxNumberOfGenerations(QDomElement root)
