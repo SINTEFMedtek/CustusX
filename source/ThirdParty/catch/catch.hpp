@@ -3444,7 +3444,7 @@ namespace Matchers {
             std::string m_substr;
         };
 
-        struct StartsWith : MatcherImpl<StartsWith, std::string> {
+        struct CXCATCH_EXPORT StartsWith : MatcherImpl<StartsWith, std::string> {
             StartsWith( std::string const& substr ) : m_substr( substr ){}
             StartsWith( StartsWith const& other ) : m_substr( other.m_substr ){}
 
@@ -3460,7 +3460,7 @@ namespace Matchers {
             std::string m_substr;
         };
 
-        struct EndsWith : MatcherImpl<EndsWith, std::string> {
+        struct CXCATCH_EXPORT EndsWith : MatcherImpl<EndsWith, std::string> {
             EndsWith( std::string const& substr ) : m_substr( substr ){}
             EndsWith( EndsWith const& other ) : m_substr( other.m_substr ){}
 

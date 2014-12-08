@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTESTTESTTRANSFERFUNCTIONS_H_
 #define CXTESTTESTTRANSFERFUNCTIONS_H_
 
+#include "cxtestgui_export.h"
+
 #include <vtkImageData.h>
 #include "cxImage.h"
 #include "cxImageTF3D.h"
@@ -48,11 +50,9 @@ namespace cxtest {
  * \date Jul 31, 2013
  * \author Ole Vegard Solberg, SINTEF
  */
-class TestTransferFunctions {
+class CXTESTGUI_EXPORT TestTransferFunctions {
 public:
 	TestTransferFunctions();
-//	bool hasValid3DTransferFunction();
-//	bool hasValid2DTransferFunction();
 	void Corrupt3DTransferFunctionWindowWidth();
 	void Corrupt3DTransferFunctionWindowLevel();
 	void Corrupt2DTransferFunctionWindowWidth();
