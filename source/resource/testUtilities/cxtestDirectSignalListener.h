@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTESTDIRECTSIGNALLISTENER_H
 #define CXTESTDIRECTSIGNALLISTENER_H
 
-#include "cxtestUtilities_Export.h"
+#include "cxtestutilities_export.h"
 #include <QObject>
 
 namespace cxtest

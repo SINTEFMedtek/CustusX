@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTESTUTILITIES_H_
 #define CXTESTUTILITIES_H_
 
-#include "cxtestUtilities_Export.h"
+#include "cxtestutilities_export.h"
 
 #include <vector>
 #include "vtkForwardDeclarations.h"

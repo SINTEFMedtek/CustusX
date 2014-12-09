@@ -31,14 +31,14 @@ function(cx_add_executable_catch CX_CATCH_LIB)
       "${CustusX_BINARY_DIR}/source/testing/cxImportTests.h"
       )
 
-    set(TEST_EXE_NAME "Catch_test")
+    set(TEST_EXE_NAME "Catch")
     set(cxtest_MAIN ${CustusX_SOURCE_DIR}/source/testing/cxtestCatchMain.cpp)
 
 
     set(BUNDLE_TYPE "")
     if(CX_APPLE)
         set(BUNDLE_TYPE "MACOSX_BUNDLE")
-        set(TEST_EXE_NAME "Catch.app/Contents/MacOS/Catch_test")
+        set(TEST_EXE_NAME "Catch.app/Contents/MacOS/Catch")
     endif()
 
     add_executable(${TEST_EXE_NAME} ${BUNDLE_TYPE} ${cxtest_MAIN})

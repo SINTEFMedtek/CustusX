@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTESTSYNTHETICRECONSTRUCTINPUT_H
 #define CXTESTSYNTHETICRECONSTRUCTINPUT_H
 
-#include "cxtestUtilities_Export.h"
+#include "cxtestutilities_export.h"
 #include "cxSimpleSyntheticVolume.h"
 #include "cxtestSyntheticVolumeComparer.h"
 

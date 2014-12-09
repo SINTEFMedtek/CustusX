@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTESTQUEUEDSIGNALLISTENER_H_
 #define CXTESTQUEUEDSIGNALLISTENER_H_
 
-#include "cxtestUtilities_Export.h"
+#include "cxtestutilities_export.h"
 #include <QObject>
 
 class QTimer;

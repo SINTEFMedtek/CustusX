@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTESTSPHERESYNTETICVOLUME_H
 #define CXTESTSPHERESYNTETICVOLUME_H
 
-#include "cxtestUtilities_Export.h"
+#include "cxtestutilities_export.h"
 #include "cxSyntheticVolume.h"
 
 namespace cxtest {

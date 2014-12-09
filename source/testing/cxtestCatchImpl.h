@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "boost/shared_ptr.hpp"
 #include "catch.hpp"
 
-#include "cxCatch_export.h"
+#include "cxcatch_export.h"
 
 namespace Catch
 {

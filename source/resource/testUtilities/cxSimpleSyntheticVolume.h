@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SIMPLESYNTHETICVOLUME_H
 #define SIMPLESYNTHETICVOLUME_H
 
-#include "cxtestUtilities_Export.h"
+#include "cxtestutilities_export.h"
 
 #include "cxSyntheticVolume.h"
 
