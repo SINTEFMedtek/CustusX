@@ -65,7 +65,7 @@ public:
 	virtual void enableRender(bool val);
 	virtual bool renderingIsEnabled() const;
 
-	virtual QWidget* getLayoutWidget(int index);
+	virtual QWidget* getLayoutWidget(QWidget *parent, int index);
 	virtual QString getActiveLayout(int widgetIndex) const;
 	virtual void setActiveLayout(const QString& uid, int widgetIndex);
 	virtual InteractiveClipperPtr getClipper();

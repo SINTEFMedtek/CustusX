@@ -40,7 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ViewCollectionWidgetUsingViewContainer::ViewCollectionWidgetUsingViewContainer()
+ViewCollectionWidgetUsingViewContainer::ViewCollectionWidgetUsingViewContainer(QWidget* parent) :
+	ViewCollectionWidget(parent)
 {
 	QVBoxLayout* layout = new QVBoxLayout(this);
 	this->setLayout(layout);

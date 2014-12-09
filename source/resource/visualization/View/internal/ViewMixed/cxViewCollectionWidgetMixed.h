@@ -70,7 +70,7 @@ class ViewCollectionWidgetMixed : public ViewCollectionWidget
 {
 	Q_OBJECT
 public:
-	ViewCollectionWidgetMixed();
+	ViewCollectionWidgetMixed(QWidget *parent);
     virtual ~ViewCollectionWidgetMixed();
 
 	ViewPtr addView(View::Type type, LayoutRegion region);

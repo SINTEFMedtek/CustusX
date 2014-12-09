@@ -183,7 +183,7 @@ NavigationPtr ViewManager::getNavigation()
 	return NavigationPtr(new Navigation(mBackend, mCameraControl));
 }
 
-QWidget *ViewManager::getLayoutWidget(int index)
+QWidget *ViewManager::getLayoutWidget(QWidget* parent, int index)
 {
 	SSC_ASSERT(index < mLayoutWidgets.size());
 	if (!mLayoutWidgets[index])

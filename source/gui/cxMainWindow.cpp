@@ -106,7 +106,7 @@ MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
 	mServices = VisServices::create(logicManager()->getPluginContext());
 	mLayoutInteractor.reset(new LayoutInteractor());
 
-	this->setCentralWidget(viewService()->getLayoutWidget(0));
+	this->setCentralWidget(viewService()->getLayoutWidget(this, 0));
 
 	this->createActions();
 	this->createMenus();

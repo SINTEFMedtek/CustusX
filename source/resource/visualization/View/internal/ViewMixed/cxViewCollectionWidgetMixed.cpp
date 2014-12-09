@@ -42,7 +42,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ViewCollectionWidgetMixed::ViewCollectionWidgetMixed()
+ViewCollectionWidgetMixed::ViewCollectionWidgetMixed(QWidget* parent) :
+	ViewCollectionWidget(parent)
 {
 	mLayout = new QGridLayout(this);
 	this->setLayout(mLayout);
@@ -57,7 +58,7 @@ ViewCollectionWidgetMixed::~ViewCollectionWidgetMixed()
 
 void ViewCollectionWidgetMixed::initBaseLayout()
 {
-	mBaseLayout = new ViewCollectionWidgetUsingViewContainer();
+	mBaseLayout = new ViewCollectionWidgetUsingViewContainer(this);
 	this->addWidgetToLayout(mLayout, mBaseLayout, LayoutRegion(0,0));
 	mBaseRegion = LayoutRegion(-1,-1);
 	mTotalRegion = LayoutRegion(-1,-1);

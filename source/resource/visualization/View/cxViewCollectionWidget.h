@@ -61,8 +61,8 @@ class cxResourceVisualization_EXPORT ViewCollectionWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	static QPointer<ViewCollectionWidget> createViewWidgetLayout();
-	static QPointer<ViewCollectionWidget> createOptimizedLayout();
+	static QPointer<ViewCollectionWidget> createViewWidgetLayout(QWidget* parent = NULL);
+	static QPointer<ViewCollectionWidget> createOptimizedLayout(QWidget* parent = NULL);
 
 	virtual ~ViewCollectionWidget() {}
 
@@ -74,7 +74,7 @@ public:
 	virtual void setGridMargin(int val) = 0;
 
 protected:
-	ViewCollectionWidget() {}
+	ViewCollectionWidget(QWidget* parent) : QWidget(parent) {}
 };
 
 

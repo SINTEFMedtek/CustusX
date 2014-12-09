@@ -79,7 +79,7 @@ public:
 	virtual void autoShowData(DataPtr data) = 0;
 	virtual void enableRender(bool val) = 0;
 	virtual bool renderingIsEnabled() const = 0;
-	virtual QWidget* getLayoutWidget(int index=0) = 0;
+	virtual QWidget* getLayoutWidget(QWidget* parent, int index=0) = 0;
 	virtual QString getActiveLayout(int widgetIndex=0) const = 0;
 	virtual void setActiveLayout(const QString& uid, int widgetIndex=0) = 0;
 	virtual void deactivateLayout();
