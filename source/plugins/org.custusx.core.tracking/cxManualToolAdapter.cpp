@@ -38,8 +38,10 @@ namespace cx
 ManualToolAdapter::ManualToolAdapter(QString uid) :
 				ManualTool(uid)
 {
-	mBase.reset(new ManualTool(uid + "base"));
-	connect(mBase.get(), SIGNAL(toolProbeSector()), this, SIGNAL(toolProbeSector()));
+	ToolPtr initial(new ManualTool(uid + "base"));
+	this->setBase(initial);
+//	mBase.reset(new ManualTool(uid + "base"));
+//	connect(mBase.get(), SIGNAL(toolProbeSector()), this, SIGNAL(toolProbeSector()));
 }
 
 ManualToolAdapter::ManualToolAdapter(ToolPtr base) :
@@ -53,11 +55,31 @@ ManualToolAdapter::~ManualToolAdapter()
 
 void ManualToolAdapter::setBase(ToolPtr base)
 {
-	disconnect(mBase.get(), SIGNAL(toolProbeSector()), this, SIGNAL(toolProbeSector()));
-	mBase = base;
-	connect(mBase.get(), SIGNAL(toolProbeSector()), this, SIGNAL(toolProbeSector()));
+	if (mBase)
+	{
+		disconnect(mBase.get(), &Tool::toolTransformAndTimestamp, this, &Tool::toolTransformAndTimestamp);
+		disconnect(mBase.get(), &Tool::toolVisible, this, &Tool::toolVisible);
+		disconnect(mBase.get(), &Tool::tooltipOffset, this, &Tool::tooltipOffset);
+		disconnect(mBase.get(), &Tool::toolProbeSector, this, &Tool::toolProbeSector);
+		disconnect(mBase.get(), &Tool::tps, this, &Tool::tps);
+	}
 
+	mBase = base;
+
+	if (mBase)
+	{
+		connect(mBase.get(), &Tool::toolTransformAndTimestamp, this, &Tool::toolTransformAndTimestamp);
+		connect(mBase.get(), &Tool::toolVisible, this, &Tool::toolVisible);
+		connect(mBase.get(), &Tool::tooltipOffset, this, &Tool::tooltipOffset);
+		connect(mBase.get(), &Tool::toolProbeSector, this, &Tool::toolProbeSector);
+		connect(mBase.get(), &Tool::tps, this, &Tool::tps);
+	}
+
+	emit toolVisible(this->getVisible());
+	emit toolTransformAndTimestamp(this->get_prMt(), this->getTimestamp());
+	emit tooltipOffset(this->getTooltipOffset());
 	emit toolProbeSector();
+	emit tps(0);
 }
 
 vtkPolyDataPtr ManualToolAdapter::getGraphicsPolyData() const

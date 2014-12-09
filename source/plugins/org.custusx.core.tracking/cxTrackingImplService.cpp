@@ -187,6 +187,7 @@ void TrackingImplService::initializeManualTool()
 		mManualTool->setVisible(true);
 		connect(mManualTool.get(), &Tool::toolVisible, this, &TrackingImplService::dominantCheckSlot);
 		connect(mManualTool.get(), &Tool::toolTransformAndTimestamp, this, &TrackingImplService::dominantCheckSlot);
+		connect(mManualTool.get(), &Tool::tooltipOffset, this, &TrackingImplService::onTooltipOffset);
 	}
 
 	Transform3D rMpr = Transform3D::Identity(); // not known: not really important either
@@ -261,6 +262,7 @@ void TrackingImplService::addToolsFrom(TrackingSystemServicePtr system)
 
 void TrackingImplService::onTooltipOffset(double val)
 {
+	mToolTipOffset = val;
 	for (ToolMap::iterator iter = mTools.begin(); iter != mTools.end(); ++iter)
 	{
 		iter->second->setTooltipOffset(val);
@@ -553,6 +555,7 @@ void TrackingImplService::addXml(QDomNode& parentNode)
 			toolsNode.addObjectToElement("tool", tool);
 		}
 	}
+
 }
 
 void TrackingImplService::clear()
@@ -571,6 +574,7 @@ void TrackingImplService::parseXml(QDomNode& dataNode)
 	mManualTool->set_prMt(Transform3D::fromString(manualToolText));
 
 	mToolTipOffset = base.parseDoubleFromElementWithDefault("toolTipOffset", 0.0);
+	this->onTooltipOffset(mToolTipOffset);
 
 	//Tools
 	ToolMap tools = this->getTools();
