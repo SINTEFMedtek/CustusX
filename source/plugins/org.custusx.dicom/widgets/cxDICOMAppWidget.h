@@ -118,7 +118,15 @@ protected Q_SLOTS:
     void onTreeExpanded(const QModelIndex& index);
     void onThumbnailWidthSliderValueChanged(int val);
 
+
+
+
 private Q_SLOTS:
+
+	void schemaUpdateStarted(int);
+	void schemaUpdateProgress(QString);
+	void schemaUpdateProgress(int);
+	void schemaUpdated();
 
 private:
   Q_DECLARE_PRIVATE(DICOMAppWidget);

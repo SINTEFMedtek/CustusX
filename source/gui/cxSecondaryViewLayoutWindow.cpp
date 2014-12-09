@@ -111,7 +111,7 @@ int SecondaryViewLayoutWindow::findSmallestSecondaryScreen()
 
 void SecondaryViewLayoutWindow::showEvent(QShowEvent* event)
 {
-	this->setCentralWidget(viewService()->getLayoutWidget(1));
+	this->setCentralWidget(viewService()->getLayoutWidget(this, 1));
 	if (viewService()->getActiveLayout(1).isEmpty())
 		viewService()->setActiveLayout("LAYOUT_OBLIQUE_3DAnyDual_x1", 1);
 }

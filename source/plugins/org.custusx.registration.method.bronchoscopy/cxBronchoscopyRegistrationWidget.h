@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-
+class WidgetObscuredListener;
 typedef boost::shared_ptr<class Acquisition> AcquisitionPtr;
 typedef boost::shared_ptr<class SelectMeshStringDataAdapter> SelectMeshStringDataAdapterPtr;
 typedef boost::shared_ptr<class ToolRep3D> ToolRep3DPtr;
@@ -101,6 +101,8 @@ private:
     ToolPtr mTool;
 	SelectToolStringDataAdapterPtr mSelectToolWidget;
 //    TrackedCenterlineWidget* mTrackedCenterLine;
+
+	boost::shared_ptr<WidgetObscuredListener> mObscuredListener;
 
     ToolRep3DPtr getToolRepIn3DView(ToolPtr tool);
 

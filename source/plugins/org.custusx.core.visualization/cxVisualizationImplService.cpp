@@ -115,9 +115,9 @@ bool VisualizationImplService::renderingIsEnabled() const
 	return viewManager()->renderingIsEnabled();
 }
 
-QWidget* VisualizationImplService::getLayoutWidget(int index)
+QWidget* VisualizationImplService::getLayoutWidget(QWidget* parent, int index)
 {
-	return viewManager()->getLayoutWidget(index);
+	return viewManager()->getLayoutWidget(parent, index);
 }
 
 QString VisualizationImplService::getActiveLayout(int widgetIndex) const
