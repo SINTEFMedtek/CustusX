@@ -32,7 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTESTRECONSTRUCTIONMANAGERFIXTURE_H
 #define CXTESTRECONSTRUCTIONMANAGERFIXTURE_H
 
-//#include "cxReconstructionManager.h"
+#include "cxtest_org_custusx_usreconstruction_export.h"
+
 #include "cxtestSyntheticVolumeComparer.h"
 #include "cxtestSyntheticReconstructInput.h"
 #include "cxUsReconstructionService.h"
@@ -47,7 +48,7 @@ namespace cxtest
  * \date june 25, 2013
  * \author christiana
  */
-class ReconstructionManagerTestFixture
+class CXTEST_ORG_CUSTUSX_USRECONSTRUCTION_EXPORT ReconstructionManagerTestFixture
 {
 public:
 	ReconstructionManagerTestFixture();

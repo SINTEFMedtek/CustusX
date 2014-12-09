@@ -15,31 +15,31 @@ project(org_custusx_acquisition)
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
-include_directories(
-    ${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
-    ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
-    ${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
-    .
-    ./logic
-    ./gui
-    ${CustusX_SOURCE_DIR}/source/logic
+#include_directories(
+#    ${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
+#    ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
+#    ${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
+#    .
+#    ./logic
+#    ./gui
+#    ${CustusX_SOURCE_DIR}/source/logic
 
-    ${CustusX_SOURCE_DIR}/source/modules/Algorithm/logic
-    ${CustusX_SOURCE_DIR}/source/modules/Algorithm/gui
-    ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
+#    ${CustusX_SOURCE_DIR}/source/modules/Algorithm/logic
+#    ${CustusX_SOURCE_DIR}/source/modules/Algorithm/gui
+#    ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
 
-    ${CustusX_SOURCE_DIR}/source/gui/utilities
-    ${CustusX_SOURCE_DIR}/source/gui/dataAdapters
-    ${CustusX_SOURCE_DIR}/source/gui/toolWidgets
+#    ${CustusX_SOURCE_DIR}/source/gui/utilities
+#    ${CustusX_SOURCE_DIR}/source/gui/dataAdapters
+#    ${CustusX_SOURCE_DIR}/source/gui/toolWidgets
 
-    ${CustusX_BINARY_DIR}/source/modules/Algorithm
-    ${CustusX_BINARY_DIR}/source/modules/GUIExtender
-    ${CustusX_BINARY_DIR}/source/gui
-    ${CustusX_BINARY_DIR}/source/logic
+#    ${CustusX_BINARY_DIR}/source/modules/Algorithm
+#    ${CustusX_BINARY_DIR}/source/modules/GUIExtender
+#    ${CustusX_BINARY_DIR}/source/gui
+#    ${CustusX_BINARY_DIR}/source/logic
 
-    ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.usreconstruction
-    ${CustusX_BINARY_DIR}/source/plugins/org.custusx.usreconstruction
-    )
+#    ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.usreconstruction
+#    ${CustusX_BINARY_DIR}/source/plugins/org.custusx.usreconstruction
+#    )
 
 cx_remove_duplicate_include_directories()
 #QT5_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
@@ -109,7 +109,8 @@ set(PLUGIN_target_libraries
     ${PLUGIN_target_libraries}
     cxPluginAlgorithm
     org_custusx_usreconstruction
-    cxGui)
+    cxGui
+)
 
 set(PLUGIN_OUTPUT_DIR "")
 if(CX_WINDOWS)
@@ -128,8 +129,31 @@ ctkMacroBuildPlugin(
   OUTPUT_DIR ${PLUGIN_OUTPUT_DIR}
 )
 
-
-
-
+target_include_directories( org_custusx_acquisition
+    PUBLIC
+    .
+    ./logic
+    ./gui
+    ${CMAKE_CURRENT_BINARY_DIR}
+    #${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
+    #${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
+    #${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
+#    .
+#    ./logic
+#    ./gui
+#    ${CustusX_SOURCE_DIR}/source/logic
+#    ${CustusX_SOURCE_DIR}/source/modules/Algorithm/logic
+#    ${CustusX_SOURCE_DIR}/source/modules/Algorithm/gui
+#    ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
+#    ${CustusX_SOURCE_DIR}/source/gui/utilities
+#    ${CustusX_SOURCE_DIR}/source/gui/dataAdapters
+#    ${CustusX_SOURCE_DIR}/source/gui/toolWidgets
+#    ${CustusX_BINARY_DIR}/source/modules/Algorithm
+#    ${CustusX_BINARY_DIR}/source/modules/GUIExtender
+#    ${CustusX_BINARY_DIR}/source/gui
+#    ${CustusX_BINARY_DIR}/source/logic
+#    ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.usreconstruction
+#    ${CustusX_BINARY_DIR}/source/plugins/org.custusx.usreconstruction
+)
 
 add_subdirectory(testing)

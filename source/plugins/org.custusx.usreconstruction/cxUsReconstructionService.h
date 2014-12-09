@@ -39,15 +39,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <set>
 #include <vector>
 #include <QObject>
-
 #include "cxForwardDeclarations.h"
-
-//#include "cxXmlOptionItem.h"
 #include "cxReconstructCore.h"
-//#include "cxUSReconstructInputData.h"
-//#include "cxReconstructedOutputVolumeParams.h"
-//#include "cxReconstructionMethodService.h"
-//#include "cxServiceTrackerListener.h"
 
 #define UsReconstructionService_iid "cx::UsReconstructionService"
 
@@ -64,7 +57,6 @@ typedef boost::shared_ptr<class ReconstructionManager> ReconstructionManagerPtr;
 typedef boost::shared_ptr<class ReconstructCore> ReconstructCorePtr;
 typedef boost::shared_ptr<class ReconstructParams> ReconstructParamsPtr;
 typedef boost::shared_ptr<class ReconstructPreprocessor> ReconstructPreprocessorPtr;
-//typedef boost::shared_ptr<class ReconstructionMethodService> ReconstructionMethodServicePtr;
 typedef boost::shared_ptr<class ThreadedTimedReconstructer> ThreadedTimedReconstructerPtr;
 typedef boost::shared_ptr<class ThreadedTimedReconstructPreprocessor> ThreadedTimedReconstructPreprocessorPtr;
 typedef boost::shared_ptr<class ThreadedTimedReconstructCore> ThreadedTimedReconstructCorePtr;
@@ -77,8 +69,6 @@ class org_custusx_usreconstruction_EXPORT UsReconstructionService : public QObje
 {
 	Q_OBJECT
 public:
-//	UsReconstructionService(XmlOptionFile settings);
-//	virtual ~UsReconstructionService();
 
 	virtual void selectData(QString filename, QString calFilesPath = "") = 0; ///< Set input data for reconstruction
 	virtual void selectData(USReconstructInputData data) = 0; ///< Set input data for reconstruction

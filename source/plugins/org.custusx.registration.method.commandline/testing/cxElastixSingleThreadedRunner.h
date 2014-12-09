@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXELASTIXSINGLETHREADEDRUNNER_H_
 #define CXELASTIXSINGLETHREADEDRUNNER_H_
 
+#include "cxtest_org_custusx_registration_method_commandline_export.h"
+
 #include <QObject>
 #include "cxTransform3D.h"
 #include "cxForwardDeclarations.h"
@@ -50,7 +52,7 @@ typedef boost::shared_ptr<class ElastixParameters> ElastixParametersPtr;
  *  \date Oct 8, 2012
  *  \author christiana
  */
-class ElastixSingleThreadedRunner : public QObject
+class CXTEST_ORG_CUSTUSX_REGISTRATION_METHOD_COMMANDLINE_EXPORT ElastixSingleThreadedRunner : public QObject
 {
 	Q_OBJECT
 public:

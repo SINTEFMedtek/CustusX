@@ -41,7 +41,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationTransform.h"
 #include "cxTypeConversions.h"
 #include <QDir>
-//#include "cxLogicManager.h"
 #include "cxtestPatientModelServiceMock.h"
 #include "cxReporter.h"
 
