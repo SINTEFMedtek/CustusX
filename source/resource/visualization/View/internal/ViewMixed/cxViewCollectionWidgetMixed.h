@@ -83,13 +83,14 @@ public:
 private:
 	void addWidgetToLayout(QGridLayout* layout, QWidget* widget, LayoutRegion region);
 	void initBaseLayout();
-	void deleteWidgetInLayout(QWidget* widget);
 	LayoutRegion mBaseRegion;
 	LayoutRegion mTotalRegion;
 	QGridLayout* mLayout;
     ViewCollectionWidget* mBaseLayout;
 	std::vector<LayoutRegion> mOverlayRegions;
-    std::vector<ViewCollectionWidget*> mOverlays;
+	std::vector<ViewWidget*> mOverlays;
+
+	boost::shared_ptr<ViewCache<ViewWidget> > mViewCacheOverlay;
 };
 
 

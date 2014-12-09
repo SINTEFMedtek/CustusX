@@ -35,6 +35,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewCollectionWidgetUsingViewContainer.h"
 #include "cxViewCollectionWidgetUsingViewWidgets.h"
 #include "cxViewUtilities.h"
+#include "vtkRenderWindow.h"
+#include "cxGLHelpers.h"
+
 
 namespace cx
 {
@@ -43,14 +46,9 @@ ViewCollectionWidgetMixed::ViewCollectionWidgetMixed()
 {
 	mLayout = new QGridLayout(this);
 	this->setLayout(mLayout);
+	mViewCacheOverlay.reset(new ViewCache<ViewWidget>(this, "Overlay"));
 
-	mBaseLayout = new ViewCollectionWidgetUsingViewContainer();
-	this->addWidgetToLayout(mLayout, mBaseLayout, LayoutRegion(0,0));
-	mBaseRegion = LayoutRegion(-1,-1);
-	mTotalRegion = LayoutRegion(-1,-1);
-
-	this->setGridMargin(4);
-	this->setGridSpacing(2);
+	this->initBaseLayout();
 }
 
 ViewCollectionWidgetMixed::~ViewCollectionWidgetMixed()
@@ -75,19 +73,15 @@ ViewPtr ViewCollectionWidgetMixed::addView(View::Type type, LayoutRegion region)
 
 	if (type==View::VIEW_3D)
 	{
-//        std::cout << "ViewCollectionWidgetMixed::addView(3D)" << std::endl;
-//        LayoutWidgetUsingViewWidgets* overlay = new LayoutWidgetUsingViewWidgets();
-        ViewCollectionWidget* overlay = new ViewCollectionWidgetUsingViewContainer();
-        overlay->setGridMargin(0);
-		overlay->setGridSpacing(0);
+		ViewWidget* overlay = this->mViewCacheOverlay->retrieveView();
+		overlay->show();
 		mOverlays.push_back(overlay);
 		mOverlayRegions.push_back(region);
-		view = overlay->addView(type, LayoutRegion(0,0,1,1));
+		view = overlay->getView();
 		this->addWidgetToLayout(mLayout, overlay, region);
 	}
 	else
 	{
-//        std::cout << "ViewCollectionWidgetMixed::addView(other)" << std::endl;
         mBaseRegion = merge(region, mBaseRegion);
 		view = mBaseLayout->addView(type, region);
 		// re-add the base widget with updated position in grid
@@ -105,27 +99,25 @@ void ViewCollectionWidgetMixed::addWidgetToLayout(QGridLayout* layout, QWidget* 
 					  region.span.row, region.span.col);
 }
 
-void ViewCollectionWidgetMixed::deleteWidgetInLayout(QWidget *widget)
-{
-	widget->hide();
-	mLayout->removeWidget(widget);
-	delete widget;
-	widget = NULL;
-}
-
 void ViewCollectionWidgetMixed::clearViews()
 {
-	mBaseLayout->clearViews();
-	for (unsigned i=0; i<mOverlays.size(); ++i)
-		mOverlays[i]->clearViews();
-	view_utils::setStretchFactors(mLayout, mTotalRegion, 0);
+	mViewCacheOverlay->clearUsedViews();
 
 	for (unsigned i=0; i<mOverlays.size(); ++i)
-		this->deleteWidgetInLayout(mOverlays[i]);
+	{
+		mOverlays[i]->hide();
+		mLayout->removeWidget(mOverlays[i]);
+	}
 	mOverlays.clear();
 
-	this->deleteWidgetInLayout(mBaseLayout);
-	this->initBaseLayout();
+	mBaseLayout->clearViews();
+	mLayout->removeWidget(mBaseLayout);
+
+	// rebuild to default state:
+	view_utils::setStretchFactors(mLayout, mTotalRegion, 0);
+	this->addWidgetToLayout(mLayout, mBaseLayout, LayoutRegion(0,0));
+	mBaseRegion = LayoutRegion(-1,-1);
+	mTotalRegion = LayoutRegion(-1,-1);
 }
 
 void ViewCollectionWidgetMixed::setModified()
@@ -137,11 +129,14 @@ void ViewCollectionWidgetMixed::setModified()
 
 void ViewCollectionWidgetMixed::render()
 {
-//    std::cout << "ViewCollectionWidgetMixed::render()" << std::endl;
-
 	mBaseLayout->render();
+	report_gl_error_text(cstring_cast(QString("During rendering of base view")));
+
 	for (unsigned i=0; i<mOverlays.size(); ++i)
+	{
 		mOverlays[i]->render();
+		report_gl_error_text(cstring_cast(QString("During rendering of: ") + mOverlays[i]->getView()->getName()));
+	}
 }
 
 void ViewCollectionWidgetMixed::setGridSpacing(int val)
