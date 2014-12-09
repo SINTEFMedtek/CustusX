@@ -69,8 +69,8 @@ void TrackingServiceProxy::onServiceAdded(TrackingService* service)
 	connect(mTrackingService.get(), &TrackingService::stateChanged, this, &TrackingService::stateChanged);
 	connect(mTrackingService.get(), &TrackingService::dominantToolChanged, this, &TrackingService::dominantToolChanged);
 
-	if(mTrackingService->isNull())
-		reportWarning("VideoServiceProxy::onServiceAdded mVideoService->isNull()");
+    emit stateChanged();
+    emit dominantToolChanged(mTrackingService->getActiveTool()->getUid());
 }
 
 void TrackingServiceProxy::onServiceRemoved(TrackingService *service)
