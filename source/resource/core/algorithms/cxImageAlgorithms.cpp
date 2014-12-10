@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImageTF3D.h"
 #include "cxImageLUT2D.h"
 #include "cxRegistrationTransform.h"
-#include "cxReporter.h"
+
 #include "cxTime.h"
 #include "cxVolumeHelpers.h"
 

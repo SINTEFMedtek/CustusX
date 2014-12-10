@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include "cxTypeConversions.h"
 #include <QFileSystemWatcher>
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "snwSyntaxHighlighter.h"
 
 namespace cx

@@ -38,10 +38,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkImageData.h>
 #include "cxImage.h"
 #include "cxBoundingBox3D.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxVolumeHelpers.h"
 #include "cxTypeConversions.h"
-#include "cxLogger.h"
+
 
 namespace cx
 {

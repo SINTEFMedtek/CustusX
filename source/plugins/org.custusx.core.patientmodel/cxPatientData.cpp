@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QApplication>
 
 #include "cxTime.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxUtilHelpers.h"
 #include "cxCustomMetaImage.h"
 #include "cxMesh.h"

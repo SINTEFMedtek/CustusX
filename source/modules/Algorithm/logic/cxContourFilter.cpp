@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkPolyDataNormals.h>
 #include <vtkImageData.h>
 
-#include "cxReporter.h"
+
 #include "cxRegistrationTransform.h"
 #include "cxTypeConversions.h"
 #include "cxImage.h"

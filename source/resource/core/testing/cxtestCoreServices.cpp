@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "catch.hpp"
 #include "cxtestDummyDataManager.h"
-#include "cxReporter.h"
+
 #include "cxMessageListener.h"
 
 namespace cx

@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxIGTLinkClientStreamer.h"
 #include "cxImageStreamerOpenCV.h"
 #include "cxUtilHelpers.h"
+#include "cxLogger.h"
 #include "cxReporter.h"
 #include "QApplication"
 #include <QDir>

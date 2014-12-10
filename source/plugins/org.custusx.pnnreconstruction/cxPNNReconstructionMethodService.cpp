@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPNNReconstructionMethodService.h"
 
 #include <QFileInfo>
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxTypeConversions.h"
 #include "cxVolumeHelpers.h"
 #include "cxTimeKeeper.h"
@@ -306,7 +306,7 @@ void PNNReconstructionMethodService::interpolate(ImagePtr inputData, vtkImageDat
 	int valid = 100*double(ignored)/double(total);
 	int outside = 100*double(removed)/double(total);
 	int holes = 100*double(total-ignored-removed)/double(total);
-	reporter()->sendDebug(
+	reportDebug(
 				QString("PNN: Size: %1Mb, Valid voxels: %2\%, Outside mask: %3\%  Filled holes [steps=%4, %5s]: %6\%")
 				.arg(total/1024/1024)
 				.arg(valid)

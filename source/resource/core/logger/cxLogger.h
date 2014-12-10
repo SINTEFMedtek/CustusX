@@ -35,32 +35,98 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXLOGGER_H_
 
 #include "cxResourceExport.h"
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif
+#include "cxDefinitions.h"
+#include "cxTypeConversions.h"
+#include "boost/shared_ptr.hpp"
 
 /**
 * \file
 *
-* The file sscLogger contains c-style logging functions and macros.
+* The file cxLogger contains logging functions and macros.
 *
  * \addtogroup cx_resource_core_logger
 *
 * @{
 */
 
+namespace cx
+{
 
-//int SSC_Logging_Init_Default(const char *busName); ///< Initialize SonoWand logging system and databus connection.
-//int SSC_Logging_Init(const char *busName, const char* applicationPath); ///< Initialize SonoWand logging system and databus connection.
-//void SSC_Logging_Done( void ); ///< Properly close down connection to databus.
-//void SSC_Logging( bool on ); ///< Turn logging on or off.
+/** Helper class for logging to a cx::Reporter
+ *
+ * Based on the Qt logger classes QDebug and QMessageLogger
+ */
+class cxResource_EXPORT MessageLogger
+{
+public:
+	MessageLogger(const char *file, int line, const char *function, const QString& channel, MESSAGE_LEVEL severity);
+	~MessageLogger();
 
-/** General low-level log function. */
-#define SSC_LOG( ... ) SSC_Log(__FILE__, __LINE__, __FUNCTION__, __VA_ARGS__ ) ///< log using printf-style. Example: SSC_LOG(s%, "Hello world!");
-#define SSC_WARNING( ... ) SSC_Warning(__FILE__, __LINE__, __FUNCTION__, __VA_ARGS__ ); ///< log using printf-style. Example: SSC_WARNING(s%, "Hello world!");
-#define SSC_ERROR( ... ) SSC_Error(__FILE__, __LINE__, __FUNCTION__, __VA_ARGS__ ); ///< log using printf-style. Example: SSC_ERROR(s%, "Hello world!");
+	MessageLogger logger() const;
+	MessageLogger logger(QString text) const;
+
+	template <class T>
+	MessageLogger& operator<<(T value)
+	{
+		this->getStream() << value;
+		return *this;
+	}
+
+private:
+	boost::shared_ptr<class MessageLoggerInternalData> mInternalData;
+	std::stringstream& getStream();
+};
+
+template <class T>
+cxResource_EXPORT MessageLogger& operator<<(MessageLogger& logger, const T& value)
+{
+	logger << value;
+	return logger;
+}
+
+cxResource_EXPORT void reportDebug(QString msg);
+cxResource_EXPORT void report(QString msg);
+cxResource_EXPORT void reportWarning(QString msg);
+cxResource_EXPORT void reportError(QString msg);
+cxResource_EXPORT void reportSuccess(QString msg);
+
+} //namespace cx
+
+
+#define CX_LOG_SEVERITY_INTERNAL(severity) \
+	cx::MessageLogger(__FILE__, __LINE__, Q_FUNC_INFO, "default", severity)
+
+#define CX_LOG_CHANNEL_SEVERITY_INTERNAL(channel, severity) \
+	cx::MessageLogger(__FILE__, __LINE__, Q_FUNC_INFO, channel, severity)
+
+
+
+/** Log to the default channel
+ * Usage: One of the following:
+ *          CX_LOG_INFO("Message to output");
+ *          CX_LOG_INFO() << "Message " << "to output";
+ */
+#define CX_LOG_DEBUG   CX_LOG_SEVERITY_INTERNAL(cx::mlDEBUG).logger
+#define CX_LOG_INFO    CX_LOG_SEVERITY_INTERNAL(cx::mlINFO).logger
+#define CX_LOG_SUCCESS CX_LOG_SEVERITY_INTERNAL(cx::mlSUCCESS).logger
+#define CX_LOG_WARNING CX_LOG_SEVERITY_INTERNAL(cx::mlWARNING).logger
+#define CX_LOG_ERROR   CX_LOG_SEVERITY_INTERNAL(cx::mlERROR).logger
+
+/** Log to a named channel
+ * Usage:
+ *          CX_LOG_INFO("channel_name") << "Message " << "to output";
+ * Will be written to the file channel_name.txt
+ */
+#define CX_LOG_CHANNEL_DEBUG(channel)   CX_LOG_CHANNEL_SEVERITY_INTERNAL(channel, cx::mlDEBUG).logger()
+#define CX_LOG_CHANNEL_INFO(channel)    CX_LOG_CHANNEL_SEVERITY_INTERNAL(channel, cx::mlINFO).logger()
+#define CX_LOG_CHANNEL_SUCCESS(channel) CX_LOG_CHANNEL_SEVERITY_INTERNAL(channel, cx::mlSUCCESS).logger()
+#define CX_LOG_CHANNEL_WARNING(channel) CX_LOG_CHANNEL_SEVERITY_INTERNAL(channel, cx::mlWARNING).logger()
+#define CX_LOG_CHANNEL_ERROR(channel)   CX_LOG_CHANNEL_SEVERITY_INTERNAL(channel, cx::mlERROR).logger()
+
+
+#define SSC_LOG(text) CX_LOG_CHANNEL_SEVERITY_INTERNAL("ssc", cx::mlDEBUG).logger() << text
+#define SSC_WARNING(text) CX_LOG_CHANNEL_SEVERITY_INTERNAL("ssc", cx::mlWARNING).logger() << text
+#define SSC_ERROR(text) CX_LOG_CHANNEL_SEVERITY_INTERNAL("ssc", cx::mlWARNING).logger() << text
 
 /**
   */
@@ -68,20 +134,8 @@ extern "C"
 {										\
 	if (!(STATEMENT))					\
 	{									\
-		SSC_ERROR("%s","Assert failure!");\
+		SSC_ERROR("Assert failure!");\
 	}									\
 }
-
-/**
-* @}
-*/
-
-cxResource_EXPORT void SSC_Log( const char *file, int line, const char *function, const char *format, ... ); ///< internal function. use SSC_LOG
-cxResource_EXPORT void SSC_Error( const char *file, int line, const char *function, const char *format, ...); ///< internal function. use SSC_ERROR
-cxResource_EXPORT void SSC_Warning( const char *file, int line, const char *function, const char *format, ...); ///< internal function. use SSC_WARNING
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

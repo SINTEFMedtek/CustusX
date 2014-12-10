@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <qapplication.h>
 #include "cxTime.h"
 #include "cxTypeConversions.h"
-#include "cxLogger.h"
+
 #include "cxElastixParameters.h"
 
 namespace cx

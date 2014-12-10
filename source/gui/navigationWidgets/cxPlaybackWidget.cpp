@@ -39,8 +39,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackingService.h"
 #include "cxHelperWidgets.h"
 #include "cxTime.h"
-#include "cxReporter.h"
 #include "cxLogger.h"
+
 #include "cxTypeConversions.h"
 #include "cxTimelineWidget.h"
 #include "cxData.h"

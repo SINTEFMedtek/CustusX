@@ -31,17 +31,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxMultiVolume3DRepProducer.h"
-#include "cxReporter.h"
+
 #include "cxVolumetricRep.h"
 #include <vtkImageData.h>
 #include "cxImage2DRep3D.h"
 #include "cxView.h"
 #include "cxTypeConversions.h"
-#include "cxLogger.h"
+
 #include "cxDataLocations.h"
 #include "cxMehdiGPURayCastMultiVolumeRep.h"
 #include "cxConfig.h"
 #include "cxRepManager.h"
+#include "cxLogger.h"
 
 namespace cx
 {

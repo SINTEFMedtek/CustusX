@@ -32,10 +32,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxPipelineWidget.h"
 #include "cxHelperWidgets.h"
-#include "cxReporter.h"
+
 #include "cxTimedAlgorithmProgressBar.h"
 #include <QtWidgets>
-
+#include "cxLogger.h"
 #include "cxTypeConversions.h"
 #include "cxDataSelectWidget.h"
 #include "cxSettings.h"

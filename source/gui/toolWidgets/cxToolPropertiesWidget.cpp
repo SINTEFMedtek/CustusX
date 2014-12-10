@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QGroupBox>
 #include <QCheckBox>
 
-#include "cxReporter.h"
+
 #include "cxTrackingService.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxTypeConversions.h"

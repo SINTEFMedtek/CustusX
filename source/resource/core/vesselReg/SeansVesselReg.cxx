@@ -15,7 +15,7 @@
 
 #include "vtkClipPolyData.h"
 #include "vtkPlanes.h"
-
+#include "cxLogger.h"
 #include "vtkPoints.h"
 #include "vtkPolyData.h"
 #include "vtkCellArray.h"

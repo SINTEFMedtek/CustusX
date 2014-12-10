@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxTrackingServiceNull.h"
-#include "cxReporter.h"
+
 #include "cxTrackerConfiguration.h"
 
 

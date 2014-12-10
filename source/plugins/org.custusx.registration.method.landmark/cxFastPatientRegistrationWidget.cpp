@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxFastPatientRegistrationWidget.h"
 
-#include "cxReporter.h"
+
 #include "cxRegistrationService.h"
 
 namespace cx

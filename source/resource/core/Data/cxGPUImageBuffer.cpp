@@ -57,8 +57,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkUnsignedShortArray.h>
 #include <boost/cstdint.hpp>
 #include "cxGLHelpers.h"
-
 #include "cxLogger.h"
+
+
 
 namespace cx
 {
@@ -173,7 +174,7 @@ public:
 			std::cout << "Bit size not supported!" << std::endl;
 			QString dataType(mTexture->GetScalarTypeAsString());
 			QString errorString = QString("Attempt to update 3D GL texture from type %1 failed. Only unsigned types supported").arg(dataType);
-			SSC_ERROR("%s", errorString.toStdString().data());
+			SSC_ERROR(errorString.toStdString());
 			break;
 		}
 

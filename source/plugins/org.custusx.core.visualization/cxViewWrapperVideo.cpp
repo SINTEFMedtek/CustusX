@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxView.h"
 #include "cxVideoRep.h"
 #include "cxDisplayTextRep.h"
-#include "cxReporter.h"
+
 #include "cxTypeConversions.h"
 
 #include "cxSettings.h"

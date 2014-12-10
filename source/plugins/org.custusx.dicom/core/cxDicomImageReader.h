@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkImageData.h"
 #include "cxRegistrationTransform.h"
 #include <vtkImageAppend.h>
-#include "cxReporter.h"
+
 
 #include "ctkDICOMItem.h"
 #include "dcfilefo.h" // DcmFileFormat

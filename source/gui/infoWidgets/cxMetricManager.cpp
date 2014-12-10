@@ -35,9 +35,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewGroupData.h"
 #include "cxTrackingService.h"
 #include <QFile>
-#include "cxReporter.h"
-#include "cxDataReaderWriter.h"
 
+#include "cxDataReaderWriter.h"
+#include "cxLogger.h"
 #include "cxRegistrationTransform.h"
 #include "cxPointMetric.h"
 #include "cxDistanceMetric.h"
@@ -53,6 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxPatientModelService.h"
 #include "cxVisualizationService.h"
+#include "cxReporter.h"
 
 
 namespace cx

@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkLookupTable.h"
 #include "vtkImageMapToColors.h"
 #include "vtkMetaImageWriter.h"
-#include "cxReporter.h"
+
 #include "cxTypeConversions.h"
 #include "cxCommandlineImageStreamerFactory.h"
 #include "cxStringHelpers.h"

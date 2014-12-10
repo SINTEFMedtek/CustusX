@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QFileInfo>
 #include "catch.hpp"
 #include "cxTypeConversions.h"
-#include "cxReporter.h"
+
 
 
 struct XmlOptionFileFixture

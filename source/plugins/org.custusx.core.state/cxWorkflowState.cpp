@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVideoService.h"
 #include "cxStateServiceBackend.h"
 #include "cxPatientModelService.h"
+#include "cxLogger.h"
 
 namespace cx
 {

@@ -34,12 +34,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QStringList>
 #include "cxVideoSource.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxProbeSector.h"
 #include "cxProbeAdapterRTSource.h"
 #include "cxTypeConversions.h"
 #include "cxVector3D.h"
-#include "cxLogger.h"
+
 #include "cxDataLocations.h"
 #include "cxCreateProbeDataFromConfiguration.h"
 

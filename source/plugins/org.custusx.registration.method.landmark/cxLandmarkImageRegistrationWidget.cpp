@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSlider>
 #include <vtkDoubleArray.h>
 #include <vtkImageData.h>
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxPickerRep.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxSettings.h"

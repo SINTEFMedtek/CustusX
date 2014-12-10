@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStringList>
 
 #include "cxTypeConversions.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxRegistrationDataAdapters.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxRegistrationService.h"

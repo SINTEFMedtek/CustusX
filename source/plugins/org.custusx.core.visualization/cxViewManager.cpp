@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "boost/bind.hpp"
 
 #include "cxVolumetricRep.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxXmlOptionItem.h"
 #include "cxTrackingService.h"
 #include "cxSlicePlanes3DRep.h"
@@ -70,7 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewCollectionWidget.h"
 #include "cxRenderLoop.h"
 #include "cxLayoutRepository.h"
-#include "cxLogger.h"
+
 #include "cxCoreServices.h"
 #include "cxXMLNodeWrapper.h"
 #include "cxCameraControl.h"

@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewCollectionWidgetUsingViewContainer.h"
 
 #include <QGridLayout>
-#include "cxLogger.h"
+
 #include "cxViewContainerItem.h"
 #include "cxViewContainer.h"
 

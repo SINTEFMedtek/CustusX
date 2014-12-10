@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkImageAppend.h"
 #include "vtkMetaImageWriter.h"
 #include "cxTypeConversions.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxDataLocations.h"
 #include "cxSettings.h"
 #include "cxXmlOptionItem.h"
@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImageDataContainer.h"
 #include "cxUSReconstructInputDataAlgoritms.h"
 #include "cxCustomMetaImage.h"
-#include "cxLogger.h"
+
 
 typedef vtkSmartPointer<vtkImageAppend> vtkImageAppendPtr;
 

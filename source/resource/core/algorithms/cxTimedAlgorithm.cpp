@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //#include "vtkMetaImageWriter.h"
 #include "cxSettings.h"
 #include "cxUtilHelpers.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 //#include "cxImage.h"
 
 namespace cx

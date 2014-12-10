@@ -32,8 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxtestUSSavingRecorderFixture.h"
 #include <QTimer>
+#include "cxReporter.h"
 
-#include "cxLogger.h"
 #include "cxTypeConversions.h"
 #include "cxTestVideoSource.h"
 #include "cxUsReconstructionFileReader.h"
@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTime.h"
 #include "catch.hpp"
 #include "cxFileHelpers.h"
-#include "cxReporter.h"
+
 
 #ifdef CX_WINDOWS
 #include <windows.h>

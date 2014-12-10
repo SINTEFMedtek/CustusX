@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkRenderWindow.h>
 #include "cxView.h"
 #include "cxLandmark.h"
-#include "cxReporter.h"
+
 #include "cxPatientModelService.h"
 #include "cxTypeConversions.h"
 #include "boost/bind.hpp"

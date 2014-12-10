@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ctkPluginContext.h>
 #include "cxData.h"
-#include "cxReporter.h"
+
 #include "cxPatientData.h"
 #include "cxRegistrationTransform.h"
 #include "cxDataFactory.h"

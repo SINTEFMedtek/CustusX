@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxMesh.h"
 #include "cxView.h"
-#include "cxReporter.h"
+
 #include "cxSliceProxy.h"
 #include "cxTypeConversions.h"
 

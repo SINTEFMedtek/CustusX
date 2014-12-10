@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "catch.hpp"
 
 #include "cxDicomConverter.h"
-
+#include "cxReporter.h"
 #include "cxDataReaderWriter.h"
 #include "cxImage.h"
 #include "cxTypeConversions.h"
@@ -49,8 +49,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataLocations.h"
 #include "cxVolumeHelpers.h"
 #include "org_custusx_dicom_Export.h"
-#include "cxLogger.h"
-#include "cxReporter.h"
+
+
 
 typedef vtkSmartPointer<vtkImageAccumulate> vtkImageAccumulatePtr;
 typedef vtkSmartPointer<vtkImageMathematics> vtkImageMathematicsPtr;

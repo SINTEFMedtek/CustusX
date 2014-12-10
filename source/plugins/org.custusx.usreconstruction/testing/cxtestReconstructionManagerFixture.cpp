@@ -43,13 +43,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReconstructPreprocessor.h"
 #include "cxReconstructionExecuter.h"
 #include "cxLogicManager.h"
-
+#include "cxLogger.h"
 #include "cxPatientModelService.h"
 #include "cxVisualizationService.h"
 #include "cxUsReconstructionServiceProxy.h"
 #include "cxPatientModelServiceProxy.h"
 #include "cxSessionStorageService.h"
-#include "cxLogger.h"
+
 
 namespace cxtest
 {

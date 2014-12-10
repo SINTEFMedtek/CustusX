@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRecordSessionWidget.h"
 #include "cxRecordSession.h"
 #include "cxTool.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxView.h"
 #include "cxVisualizationService.h"
 #include "cxRepContainer.h"

@@ -37,14 +37,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkImageData.h"
 #include "cxRegistrationTransform.h"
 #include <vtkImageAppend.h>
-#include "cxReporter.h"
 
+#include "cxLogger.h"
 #include "ctkDICOMItem.h"
 #include "dcfilefo.h" // DcmFileFormat
 #include "dcdeftag.h" // defines all dcm tags
 #include "dcmimage.h"
 #include <string.h>
-#include "cxLogger.h"
+
 #include "cxDicomImageReader.h"
 
 typedef vtkSmartPointer<vtkImageAppend> vtkImageAppendPtr;

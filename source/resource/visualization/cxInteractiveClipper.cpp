@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxInteractiveClipper.h"
 
 #include "cxVolumetricRep.h"
-#include "cxReporter.h"
+
 #include "cxSliceComputer.h"
 
 #include "cxSlicePlaneClipper.h"
@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSliceProxy.h"
 #include "cxImage.h"
 #include "cxTrackingService.h"
-#include "cxLogger.h"
+
 #include "cxCoreServices.h"
 
 

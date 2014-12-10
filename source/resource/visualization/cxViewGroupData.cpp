@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QMenu>
 #include "vtkCamera.h"
-#include "cxReporter.h"
+
 #include "cxPatientModelService.h"
 #include "cxMesh.h"
 #include "cxTypeConversions.h"
@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxXMLNodeWrapper.h"
 #include "cxSyncedValue.h"
 #include "cxCoreServices.h"
+#include "cxLogger.h"
 
 namespace cx
 {

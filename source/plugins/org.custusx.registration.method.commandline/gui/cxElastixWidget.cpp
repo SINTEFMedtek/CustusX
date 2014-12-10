@@ -35,9 +35,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPushButton>
 #include <QLabel>
 #include <QSpinBox>
-#include "cxLogger.h"
+
 #include "cxTypeConversions.h"
-#include "cxReporter.h"
+
 #include "cxTimedAlgorithm.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxDataInterface.h"

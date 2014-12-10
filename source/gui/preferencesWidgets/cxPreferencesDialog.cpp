@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxDoubleWidgets.h"
 #include "cxEnumConverter.h"
 #include "cxSettings.h"

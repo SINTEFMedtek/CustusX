@@ -36,9 +36,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxResourceWidgetsExport.h"
 
+#include "cxReporter.h"
 #include <QTextBrowser>
 #include <QTextCharFormat>
-#include "cxReporter.h"
+
 
 class QContextMenuEvent;
 class QAction;

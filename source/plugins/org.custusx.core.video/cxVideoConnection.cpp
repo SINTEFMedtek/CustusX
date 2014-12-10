@@ -33,13 +33,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkDataSetMapper.h>
 #include <vtkImageFlip.h>
-#include "cxReporter.h"
+
 #include "cxTrackingService.h"
 #include "cxBasicVideoSource.h"
 #include "cxVideoServiceBackend.h"
 #include "cxNullDeleter.h"
 #include "cxImageReceiverThread.h"
 #include "cxImage.h"
+#include "cxLogger.h"
 
 typedef vtkSmartPointer<vtkDataSetMapper> vtkDataSetMapperPtr;
 typedef vtkSmartPointer<vtkImageFlip> vtkImageFlipPtr;

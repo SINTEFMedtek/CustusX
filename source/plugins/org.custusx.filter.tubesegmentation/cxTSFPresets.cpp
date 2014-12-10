@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <QDir>
 #include <QTextStream>
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxDataLocations.h"
 #include "tsf-config.h"
 

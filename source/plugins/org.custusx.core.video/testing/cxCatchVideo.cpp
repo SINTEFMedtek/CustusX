@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMHDImageStreamer.h"
 
 #include "cxtestJenkinsMeasurement.h"
-#include "cxReporter.h"
+
 #include "cxSettings.h"
 #include "cxTypeConversions.h"
 //#include "cxtestSimulatedImageStreamerFixture.h"
