@@ -78,7 +78,8 @@ Message::Message(QString text, MESSAGE_LEVEL messageLevel, int timeoutTime) :
   mMessageLevel(messageLevel),
   mTimeoutTime(timeoutTime),
   mTimeStamp(QDateTime::currentDateTime()),
-  mMuted(false)
+  mMuted(false),
+  mChannel("console")
 {
 
 }
@@ -174,7 +175,8 @@ public:
         sentry.unlock();
 
 		Message msg(buffer, mMessageLevel);
-		msg.mChannel = qstring_cast(mMessageLevel);
+//		msg.mChannel = qstring_cast(mMessageLevel);
+		msg.mChannel = "stdout";
 		reporter()->sendMessage(msg);
       }
       else
@@ -303,23 +305,6 @@ void Reporter::shutdown()
   mTheInstance = NULL;
 }
 
-//bool Reporter::setLogFile(QString filename)
-//{
-//	mEnabled = true;
-//	mLogFile = filename;
-//	QFileInfo(mLogFile).absoluteDir().mkpath(".");
-
-//	QString timestamp = QDateTime::currentDateTime().toString(timestampMilliSecondsFormatNice());
-//	QString text = QString("-------> Logging initialized %1\n").arg(timestamp);
-//	bool success = this->appendToLogfile(text);
-//	if (!success)
-//	{
-//		this->sendError("Failed to open log file " + mLogFile);
-//		mLogFile = "";
-//	}
-//	return success;
-//}
-
 bool Reporter::initializeLogFile(QString filename)
 {
 	QString timestamp = QDateTime::currentDateTime().toString(timestampMilliSecondsFormatNice());
@@ -335,8 +320,8 @@ bool Reporter::initializeLogFile(QString filename)
 
 QString Reporter::getFilenameForChannel(QString channel) const
 {
-	if (channel=="default" || channel.isEmpty())
-		channel = "console";
+//	if (channel.isEmpty())
+//		channel = "console";
 
 	return QString("%1/org.custusx.log.%2.txt").arg(mLogPath).arg(channel);
 }
@@ -348,7 +333,7 @@ void Reporter::setLoggingFolder(QString absoluteLoggingFolderPath)
 	mEnabled = true;
 	QFileInfo(mLogPath+"/").absoluteDir().mkpath(".");
 
-	this->initializeLogFile(this->getFilenameForChannel(""));
+	this->initializeLogFile(this->getFilenameForChannel("console"));
 	this->initializeLogFile(this->getFilenameForChannel("all"));
 
 //	this->setLogFile(absoluteLoggingFolderPath + "/ConsoleLog.txt");
@@ -427,12 +412,14 @@ void Reporter::sendMessage(Message message)
 	if (message.mTimeoutTime<0)
 		message.mTimeoutTime = this->getDefaultTimeout(message.mMessageLevel);
 
+	if (message.mChannel.isEmpty())
+		message.mChannel = "console";
+
 	if (!this->isEnabled())
 	{
 		std::cout << message.getPrintableMessage() << std::endl;
 		return;
 	}
-
 
 	if (message.getMessageLevel()!=mlVOLATILE)
 	{

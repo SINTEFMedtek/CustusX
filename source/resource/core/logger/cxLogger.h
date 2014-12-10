@@ -94,7 +94,7 @@ cxResource_EXPORT void reportSuccess(QString msg);
 
 
 #define CX_LOG_SEVERITY_INTERNAL(severity) \
-	cx::MessageLogger(__FILE__, __LINE__, Q_FUNC_INFO, "default", severity)
+	cx::MessageLogger(__FILE__, __LINE__, Q_FUNC_INFO, "console", severity)
 
 #define CX_LOG_CHANNEL_SEVERITY_INTERNAL(channel, severity) \
 	cx::MessageLogger(__FILE__, __LINE__, Q_FUNC_INFO, channel, severity)
