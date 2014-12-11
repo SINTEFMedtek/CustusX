@@ -113,7 +113,7 @@ CachedImageDataContainer::CachedImageDataContainer(QString baseFilename, int siz
 
 	if (size>=0)
 	{
-		SSC_ASSERT(size == mImages.size());
+		CX_ASSERT(size == mImages.size());
 	}
 }
 
@@ -149,8 +149,8 @@ CachedImageDataContainer::~CachedImageDataContainer()
 
 vtkImageDataPtr CachedImageDataContainer::get(unsigned index)
 {
-	SSC_ASSERT(index < this->size());
-	SSC_ASSERT(mImages[index]);
+	CX_ASSERT(index < this->size());
+	CX_ASSERT(mImages[index]);
 
 	if (index >= this->size())
 	{

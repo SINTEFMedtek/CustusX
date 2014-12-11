@@ -38,7 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImageStreamerOpenCV.h"
 #include "cxUtilHelpers.h"
 #include "cxLogger.h"
-#include "cxReporter.h"
 #include "QApplication"
 #include <QDir>
 #include "cxDataLocations.h"
@@ -137,7 +136,7 @@ QStringList LocalServerStreamerArguments::getGrabberServer(QString filename, QSt
 	if (!result.isEmpty())
 		return result;
 	else
-		cx::reporter()->sendWarning("Failed to locate default grabber server");
+		reportWarning("Failed to locate default grabber server");
 
 	return result;
 }

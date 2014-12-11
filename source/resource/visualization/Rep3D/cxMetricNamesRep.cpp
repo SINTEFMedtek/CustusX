@@ -127,7 +127,7 @@ void MetricNamesRep::onModifiedStartRender()
 {
 	std::vector<std::pair<QColor, QString> > text;
 	text = this->getAllMetricTexts();
-	SSC_ASSERT(text.size()==mDisplayText.size());
+	CX_ASSERT(text.size()==mDisplayText.size());
 
 	for (unsigned i=0; i<mDisplayText.size(); ++i)
 	{

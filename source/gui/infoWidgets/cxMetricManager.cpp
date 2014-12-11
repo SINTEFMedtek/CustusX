@@ -53,8 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxPatientModelService.h"
 #include "cxVisualizationService.h"
-#include "cxReporter.h"
-
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -304,7 +303,7 @@ void MetricManager::loadReferencePointsSlot()
   ToolPtr refTool = trackingService()->getReferenceTool();
   if(!refTool) // we only load reference points from reference tools
   {
-	reporter()->sendDebug("No reference tool, cannot load reference points into the pointsampler");
+	reportDebug("No reference tool, cannot load reference points into the pointsampler");
 	return;
   }
 

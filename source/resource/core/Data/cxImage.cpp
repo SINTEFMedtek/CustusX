@@ -188,7 +188,7 @@ DoubleBoundingBox3D Image::getInitialBoundingBox() const
 
 ImagePtr Image::getUnsigned(ImagePtr self)
 {
-	SSC_ASSERT(this==self.get());
+	CX_ASSERT(this==self.get());
 
 	if (!mUnsigned)
 	{
@@ -442,7 +442,7 @@ int Image::getMax()
 			max = getRGBMax<unsigned short>(mBaseImageData);
 			break;
 		default:
-			SSC_ERROR("Unhandled RGB data type");
+			CX_LOG_ERROR() << "Unhandled RGB data type in image " << this->getUid();
 			break;
 		}
 		mMaxRGBIntensity = max;

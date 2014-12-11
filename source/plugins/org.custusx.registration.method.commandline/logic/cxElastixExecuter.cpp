@@ -85,7 +85,6 @@ bool ElastixExecuter::setInput(QString application,
 				QString outdir,
 				QStringList parameterfiles)
 {
-	SSC_LOG("");
 	mFixed = fixed;
 	mMoving = moving;
 

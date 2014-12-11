@@ -41,7 +41,7 @@ namespace cx
 ProcessReporter::ProcessReporter(QProcess* process, QString name) :
 		mName(name)
 {
-	SSC_ASSERT(process);
+	CX_ASSERT(process);
 	mProcess = process;
 
 	connect(mProcess, SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(processStateChanged(QProcess::ProcessState)));

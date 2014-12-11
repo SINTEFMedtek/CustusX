@@ -87,7 +87,6 @@ UnsignedDerivedImage::UnsignedDerivedImage(ImagePtr base) : Image(base->getUid()
 
 void UnsignedDerivedImage::testSlot()
 {
-//	SSC_LOG("");
 }
 
 void UnsignedDerivedImage::unsignedTransferFunctionsChangedSlot()

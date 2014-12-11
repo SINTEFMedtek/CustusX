@@ -106,7 +106,6 @@ double DoubleDataAdapterImageTFDataWindow::getValueInternal() const
 
 void DoubleDataAdapterImageTFDataWindow::setValueInternal(double val)
 {
-//	SSC_LOG("");
   mImageTFData->setWindow(val);
 }
 
@@ -128,7 +127,6 @@ double DoubleDataAdapterImageTFDataLevel::getValueInternal() const
 
 void DoubleDataAdapterImageTFDataLevel::setValueInternal(double val)
 {
-//	SSC_LOG("");
   mImageTFData->setLevel(val);
 }
 

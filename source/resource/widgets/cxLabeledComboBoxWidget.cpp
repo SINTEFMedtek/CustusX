@@ -45,7 +45,7 @@ LabeledComboBoxWidget::LabeledComboBoxWidget(QWidget* parent, StringDataAdapterP
 	QGridLayout* gridLayout, int row) :
     BaseWidget(parent, "LabeledComboBoxWidget", "LabeledComboBoxWidget")
 {
-	SSC_ASSERT(dataInterface->getAllowOnlyValuesInRange()==true);
+	CX_ASSERT(dataInterface->getAllowOnlyValuesInRange()==true);
 
 	this->setEnabled(dataInterface->getEnabled());
 

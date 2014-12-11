@@ -437,7 +437,6 @@ void TransferFunctionColorWidget::removeColorSlot()
 {
 	if(!this->mSelectedPoint.isValid())
 		return;
-	SSC_LOG("");
 
 	mImageTF->removeColorPoint(this->mSelectedPoint.intensity);
 

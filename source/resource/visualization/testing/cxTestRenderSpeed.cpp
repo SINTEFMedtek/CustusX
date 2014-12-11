@@ -155,7 +155,7 @@ void TestRenderSpeed::createViews(int num)
 
 void TestRenderSpeed::showViews()
 {
-	SSC_ASSERT(mMainWidget);
+	CX_ASSERT(mMainWidget);
 
 	mMainWidget->resize(1000,500);
 	mMainWidget->show();

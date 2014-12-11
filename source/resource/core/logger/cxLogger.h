@@ -77,12 +77,12 @@ private:
 	std::stringstream& getStream();
 };
 
-template <class T>
-cxResource_EXPORT MessageLogger& operator<<(MessageLogger& logger, const T& value)
-{
-	logger << value;
-	return logger;
-}
+//template <class T>
+//cxResource_EXPORT MessageLogger& operator<<(MessageLogger& logger, const T& value)
+//{
+//	logger << value;
+//	return logger;
+//}
 
 cxResource_EXPORT void reportDebug(QString msg);
 cxResource_EXPORT void report(QString msg);
@@ -123,18 +123,13 @@ cxResource_EXPORT void reportSuccess(QString msg);
 #define CX_LOG_CHANNEL_WARNING(channel) CX_LOG_CHANNEL_SEVERITY_INTERNAL(channel, cx::mlWARNING).logger()
 #define CX_LOG_CHANNEL_ERROR(channel)   CX_LOG_CHANNEL_SEVERITY_INTERNAL(channel, cx::mlERROR).logger()
 
-
-#define SSC_LOG(text) CX_LOG_CHANNEL_SEVERITY_INTERNAL("ssc", cx::mlDEBUG).logger() << text
-#define SSC_WARNING(text) CX_LOG_CHANNEL_SEVERITY_INTERNAL("ssc", cx::mlWARNING).logger() << text
-#define SSC_ERROR(text) CX_LOG_CHANNEL_SEVERITY_INTERNAL("ssc", cx::mlWARNING).logger() << text
-
 /**
   */
-#define SSC_ASSERT(STATEMENT)			\
+#define CX_ASSERT(statement)			\
 {										\
-	if (!(STATEMENT))					\
+	if (!(statement))					\
 	{									\
-		SSC_ERROR("Assert failure!");\
+		CX_LOG_ERROR("Assert failure!");\
 	}									\
 }
 

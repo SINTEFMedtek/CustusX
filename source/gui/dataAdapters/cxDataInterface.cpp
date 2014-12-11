@@ -134,7 +134,6 @@ double DoubleDataAdapter2DLevel::getValueInternal() const
 }
 void DoubleDataAdapter2DLevel::setValueInternal(double val)
 {
-	SSC_LOG("");
   mImage->getLookupTable2D()->setLevel(val);
 }
 DoubleRange DoubleDataAdapter2DLevel::getValueRange() const

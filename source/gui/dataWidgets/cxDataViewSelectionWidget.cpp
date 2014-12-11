@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxVisualizationService.h"
 #include "cxViewGroupData.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 
 
 //TODO: remove
@@ -351,7 +351,7 @@ void SelectedDataListWidget::deleteSlot()
 {
   if(!mItemToDelete)
   {
-    reporter()->sendDebug("Found no item to delete...");
+	reportDebug("Found no item to delete...");
     return;
   }
   this->deleteItemSlot(mItemToDelete);
@@ -375,7 +375,7 @@ void SelectedDataListWidget::contextMenuSlot(const QPoint& point)
   QListWidgetItem* item = this->itemAt(point);
   if(!item)
   {
-    reporter()->sendDebug("Found no item to delete...");
+	reportDebug("Found no item to delete...");
   }
   mItemToDelete = item;
 

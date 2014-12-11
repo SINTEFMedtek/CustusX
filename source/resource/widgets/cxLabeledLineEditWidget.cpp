@@ -46,7 +46,7 @@ LabeledLineEditWidget::LabeledLineEditWidget(QWidget* parent, StringDataAdapterP
 	QGridLayout* gridLayout, int row) :
     OptimizedUpdateWidget(parent)
 {
-	SSC_ASSERT(dataInterface->getAllowOnlyValuesInRange()==false);
+	CX_ASSERT(dataInterface->getAllowOnlyValuesInRange()==false);
 	mData = dataInterface;
     connect(mData.get(), SIGNAL(changed()), this, SLOT(setModified()));
 

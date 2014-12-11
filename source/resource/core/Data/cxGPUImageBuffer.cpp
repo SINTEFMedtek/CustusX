@@ -173,8 +173,7 @@ public:
 			internalType = 0;
 			std::cout << "Bit size not supported!" << std::endl;
 			QString dataType(mTexture->GetScalarTypeAsString());
-			QString errorString = QString("Attempt to update 3D GL texture from type %1 failed. Only unsigned types supported").arg(dataType);
-			SSC_ERROR(errorString.toStdString());
+			CX_LOG_ERROR() << QString("Attempt to update 3D GL texture from type %1 failed. Only unsigned types supported").arg(dataType);
 			break;
 		}
 

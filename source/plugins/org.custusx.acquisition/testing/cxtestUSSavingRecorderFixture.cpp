@@ -114,7 +114,6 @@ void USSavingRecorderFixture::addVideoSource(int width, int height)
 
 void USSavingRecorderFixture::startRecord()
 {
-	SSC_LOG("");
 	double start = QDateTime::currentMSecsSinceEpoch();
 	QString uid = QDateTime::currentDateTime().toString(cx::timestampSecondsFormat());
 	mSession.reset(new cx::RecordSession(uid, start, start, "session_0"));
@@ -123,31 +122,25 @@ void USSavingRecorderFixture::startRecord()
 
 void USSavingRecorderFixture::stopRecord()
 {
-	SSC_LOG("");
 	mSession->setStopTime(QDateTime::currentMSecsSinceEpoch());
 	mRecorder->stopRecord();
 }
 
 void USSavingRecorderFixture::wait(int time)
 {
-	SSC_LOG("begin");
 	double stop = QDateTime::currentMSecsSinceEpoch() + time;
 
 	while (QDateTime::currentMSecsSinceEpoch() < stop)
 	{
 		qApp->processEvents();
 	}
-	SSC_LOG("end");
 }
 
 void USSavingRecorderFixture::saveAndWaitForCompleted()
 {
-	SSC_LOG("begin");
-
 	bool compressImages = true;
 	QString baseFolder = this->getDataPath();
 	mRecorder->startSaveData(baseFolder, compressImages);
-	SSC_LOG("beginwait");
 
 	while (mRecorder->getNumberOfSavingThreads() > 0)
 	{
@@ -158,7 +151,6 @@ void USSavingRecorderFixture::saveAndWaitForCompleted()
 		Sleep(10);
 #endif
 	}
-	SSC_LOG("endwait");
 }
 
 QString USSavingRecorderFixture::getDataPath()
@@ -168,20 +160,18 @@ QString USSavingRecorderFixture::getDataPath()
 
 void USSavingRecorderFixture::dataSaved(QString filename)
 {
-	SSC_LOG("");
 	mSavedData << filename;
 }
 
 
 void USSavingRecorderFixture::verifyMemData(QString uid)
 {
-	SSC_LOG("");
 	cx::USReconstructInputData data = mRecorder->getDataForStream(uid);
 	double duration = mSession->getStopTime() - mSession->getStartTime();
 	int minFPS = 10;
 
-	std::cout << "filename " << data.mFilename << std::endl;
-	std::cout << "data.mFrames.size() " << data.mFrames.size() << std::endl;
+	CX_LOG_CHANNEL_INFO("test.acquisition") << "filename " << data.mFilename;
+	CX_LOG_CHANNEL_INFO("test.acquisition") << "data.mFrames.size() " << data.mFrames.size();
 
 	CHECK(!data.mFilename.isEmpty());
 	CHECK(data.mFrames.size() > duration/1000*minFPS);
@@ -189,8 +179,6 @@ void USSavingRecorderFixture::verifyMemData(QString uid)
 
 void USSavingRecorderFixture::verifySaveData()
 {
-	SSC_LOG("");
-
 	CHECK( mSavedData.size() == mVideo.size() );
 
 	for (int i=0; i<mSavedData.size(); ++i)
@@ -199,8 +187,6 @@ void USSavingRecorderFixture::verifySaveData()
 
 void USSavingRecorderFixture::verifySaveData(QString filename)
 {
-	SSC_LOG("");
-
 	cx::UsReconstructionFileReaderPtr fileReader(new cx::UsReconstructionFileReader());
 	cx::USReconstructInputData hasBeenRead = fileReader->readAllFiles(filename, "");
 

@@ -196,7 +196,7 @@ void ProbeImpl::setProbeSector(ProbeDefinition probeSector)
 
 void ProbeImpl::setRTSource(VideoSourcePtr source)
 {
-	SSC_ASSERT(source); // not handled after refactoring - add clear method??
+	CX_ASSERT(source); // not handled after refactoring - add clear method??
 	if (!source)
 		return;
 

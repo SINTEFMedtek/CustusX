@@ -115,7 +115,6 @@ void AcquisitionFixture::setupVideo()
 
 void AcquisitionFixture::setupProbe()
 {
-	SSC_LOG("");
 	cx::DummyToolPtr dummyTool(new cx::DummyTool());
 	dummyTool->setToolPositionMovement(dummyTool->createToolPositionMovementTranslationOnly(cx::DoubleBoundingBox3D(0,0,0,10,10,10)));
 	std::pair<QString, cx::ProbeDefinition> probedata = cx::UsReconstructionFileReader::readProbeDataFromFile(mAcqDataFilename);
@@ -157,8 +156,6 @@ void AcquisitionFixture::initialize()
 
 void AcquisitionFixture::videoConnectedSlot()
 {
-//	SSC_LOG("");
-
 	// make sure all sources have started streaming before running probe setup (there might be several sources)
 	if (cx::videoService()->getVideoSources().size() < mNumberOfExpectedStreams)
 	{
@@ -174,14 +171,12 @@ void AcquisitionFixture::start()
 	if (cx::trackingService()->getState() < cx::Tool::tsTRACKING)
 		return;
 
-	SSC_LOG("");
 	mAcquisitionService->startRecord();
 	QTimer::singleShot(mRecordDuration, this, SLOT(stop()));
 }
 
 void AcquisitionFixture::stop()
 {
-	SSC_LOG("");
 	mAcquisitionService->stopRecord();
 }
 

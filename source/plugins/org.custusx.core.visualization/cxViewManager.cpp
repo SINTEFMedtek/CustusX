@@ -185,7 +185,7 @@ NavigationPtr ViewManager::getNavigation()
 
 QWidget *ViewManager::getLayoutWidget(QWidget* parent, int index)
 {
-	SSC_ASSERT(index < mLayoutWidgets.size());
+	CX_ASSERT(index < mLayoutWidgets.size());
 	if (!mLayoutWidgets[index])
 	{
         bool optimizedViews = settings()->value("optimizedViews").toBool();
@@ -275,7 +275,7 @@ InteractiveCropperPtr ViewManager::getCropper()
 
 QString ViewManager::getActiveLayout(int widgetIndex) const
 {
-	SSC_ASSERT(mActiveLayout.size() > widgetIndex);
+	CX_ASSERT(mActiveLayout.size() > widgetIndex);
 	return mActiveLayout[widgetIndex];
 }
 
@@ -434,7 +434,7 @@ ViewGroupDataPtr ViewManager::getViewGroup(int groupIdx) const
  */
 void ViewManager::setActiveLayout(const QString& layout, int widgetIndex)
 {
-	SSC_ASSERT(mActiveLayout.size() > widgetIndex);
+	CX_ASSERT(mActiveLayout.size() > widgetIndex);
 
 	if (mActiveLayout[widgetIndex] == layout)
 		return;

@@ -300,7 +300,7 @@ void UsReconstructionFileMaker::report()
 
 void UsReconstructionFileMaker::writeUSImages(QString path, ImageDataContainerPtr images, bool compression, std::vector<TimedPosition> pos)
 {
-	SSC_ASSERT(images->size()==pos.size());
+	CX_ASSERT(images->size()==pos.size());
 	vtkMetaImageWriterPtr writer = vtkMetaImageWriterPtr::New();
 
 	for (unsigned i=0; i<images->size(); ++i)

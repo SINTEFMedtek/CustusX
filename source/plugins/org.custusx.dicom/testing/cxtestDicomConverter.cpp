@@ -178,15 +178,11 @@ TEST_CASE("DicomConverter: Open database", "[unit][plugins][org.custusx.dicom]")
 {
 	cx::Reporter::initialize();
 
-	SSC_LOG("");
 	DicomConverterTestFixture fixture;
 	fixture.eraseDatabase();
-	SSC_LOG("");
 	ctkDICOMDatabasePtr db = fixture.openDatabase();
-	SSC_LOG("");
 
 	CHECK(db->isOpen());
-	SSC_LOG("");
 
 	cx::Reporter::shutdown();
 }
@@ -194,7 +190,6 @@ TEST_CASE("DicomConverter: Open database", "[unit][plugins][org.custusx.dicom]")
 TEST_CASE("DicomConverter: Convert Kaisa", "[integration][plugins][org.custusx.dicom]")
 {
 	cx::Reporter::initialize();
-	SSC_LOG("");
 	bool verbose = true;
 	DicomConverterTestFixture fixture;
 	// input  I: kaisa dicom data -> pass dicom data through converter
@@ -205,15 +200,12 @@ TEST_CASE("DicomConverter: Convert Kaisa", "[integration][plugins][org.custusx.d
 	QString inputDicomDataDirectory = cx::DataLocations::getTestDataPath()+"/Phantoms/Kaisa/DICOM/";
 	QString referenceImageFilename = cx::DataLocations::getTestDataPath()+"/Phantoms/Kaisa/MetaImage/Kaisa.mhd";
 
-	SSC_LOG("");
 	ctkDICOMDatabasePtr db = fixture.loadDirectory(inputDicomDataDirectory);
-	SSC_LOG("");
 
 	QString patient = fixture.getOneFromList(db->patients());
 	QString study = fixture.getOneFromList(db->studiesForPatient(patient));
 	QString series = fixture.getOneFromList(db->seriesForStudy(study));
 	QStringList files = db->filesForSeries(series);
-	SSC_LOG("");
 
 	if (verbose)
 	{
@@ -224,11 +216,8 @@ TEST_CASE("DicomConverter: Convert Kaisa", "[integration][plugins][org.custusx.d
 	}
 
 	cx::DicomConverter converter;
-	SSC_LOG("");
 	converter.setDicomDatabase(db.data());
-	SSC_LOG("");
 	cx::ImagePtr convertedImage = converter.convertToImage(series);
-	SSC_LOG("");
 
 	cx::ImagePtr referenceImage = fixture.loadImageFromFile(referenceImageFilename, "reference");
 	referenceImage->setModality("SC"); // hack: "SC" is not supported by mhd, it is instead set to "OTHER"
