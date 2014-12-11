@@ -59,6 +59,14 @@ CustusXController::CustusXController(QObject* parent) : QObject(parent)
 	mMeasuredFPS = 0;
 	mEnableSlicing = false;
 }
+
+CustusXController::~CustusXController()
+{
+	if (mMainWindow)
+		this->stop();
+}
+
+
 void CustusXController::start()
 {
   qApp->setOrganizationName("SINTEF");
@@ -89,6 +97,7 @@ void CustusXController::start()
 void CustusXController::stop()
 {
   delete mMainWindow;
+	mMainWindow = NULL;
   cx::LogicManager::shutdown(); // shutdown all global resources, _after_ gui is deleted.
 }
 
