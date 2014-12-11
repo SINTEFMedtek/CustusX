@@ -75,6 +75,7 @@ ViewPtr ViewCollectionWidgetMixed::addView(View::Type type, LayoutRegion region)
 	if (type==View::VIEW_3D)
 	{
 		ViewWidget* overlay = this->mViewCacheOverlay->retrieveView();
+		overlay->getView()->setType(type);
 		overlay->show();
 		mOverlays.push_back(overlay);
 		mOverlayRegions.push_back(region);
