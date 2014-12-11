@@ -51,6 +51,7 @@ public:
 	bool mEnableSlicing;
 
   CustusXController(QObject* parent);
+  ~CustusXController();
   void start();
   void stop();
 
