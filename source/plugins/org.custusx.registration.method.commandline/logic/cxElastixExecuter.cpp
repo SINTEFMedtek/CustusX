@@ -36,14 +36,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QProcess>
 #include <QFile>
 #include <QDir>
-#include "cxReporter.h"
+
 #include "cxTypeConversions.h"
 #include "cxTime.h"
 #include "cxData.h"
 #include "cxBoundingBox3D.h"
 #include "cxTransformFile.h"
 #include "cxCustomMetaImage.h"
-#include "cxLogger.h"
+
 #include "cxPatientModelService.h"
 
 namespace cx

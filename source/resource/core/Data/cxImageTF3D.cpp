@@ -50,10 +50,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDomDocument>
 #include <QStringList>
 #include "cxVector3D.h"
-#include "cxReporter.h"
+
 #include "vtkForwardDeclarations.h"
 #include "cxImageTF3D.h"
-#include "cxLogger.h"
+
 #include "cxTypeConversions.h"
 
 namespace cx

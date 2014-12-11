@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkPiecewiseFunction.h>
 
 #include "cxVector3D.h"
-#include "cxLogger.h"
+
 
 namespace cx
 {

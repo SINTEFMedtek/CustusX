@@ -56,13 +56,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDummyTool.h"
 #include "cxSliceProxy.h"
 #include "cxSlicerRepSW.h"
-#include "cxLogger.h"
+
 
 
 #include "cxViewsFixture.h"
 #include "catch.hpp"
 #include "cxtestRenderTester.h"
-#include "cxReporter.h"
+
 #include "cxImageLUT2D.h"
 
 #include "QVTKWidget.h"

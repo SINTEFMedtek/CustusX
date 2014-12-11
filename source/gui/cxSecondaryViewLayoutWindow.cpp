@@ -32,14 +32,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxSecondaryViewLayoutWindow.h"
 
-#include "cxLogger.h"
+
 #include <QApplication>
 #include <QDesktopWidget>
 #include "cxTypeConversions.h"
-#include "cxReporter.h"
 #include "cxLegacySingletons.h"
 #include "cxVisualizationService.h"
-
+#include "cxLogger.h"
 
 namespace cx
 {

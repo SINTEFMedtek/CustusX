@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QLabel>
 #include "cxTypeConversions.h"
 #include "cxTrackingService.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxVisualizationService.h"
 #include "cxRegistrationService.h"
 #include "cxPatientModelService.h"
@@ -111,13 +111,13 @@ void PlateRegistrationWidget::plateRegistrationSlot()
   ToolPtr refTool = mServices.trackingService->getReferenceTool();
   if(!refTool)//cannot register without a reference tool
   {
-    reporter()->sendDebug("No refTool");
+	reportDebug("No refTool");
     return;
   }
   std::map<int, Vector3D> referencePoints = refTool->getReferencePoints();
   if(referencePoints.empty()) //cannot register without at least 1 reference point
   {
-    reporter()->sendDebug("No referenceppoints in reftool "+refTool->getName());
+	reportDebug("No referenceppoints in reftool "+refTool->getName());
     return;
   }
 

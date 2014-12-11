@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDomElement>
 #include <map>
 #include "cxImage.h"
-#include "cxReporter.h"
+
 #include "cxLandmark.h"
 #include "cxRegistrationTransform.h"
 

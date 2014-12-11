@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxReconstructPreprocessor.h"
 
-
+#include "cxLogger.h"
 #include "cxReconstructCore.h"
 #include <vtkImageData.h>
 #include <QFileInfo>
@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTransferFunctions3DPresets.h"
 #include "cxTimeKeeper.h"
 #include "cxUSFrameData.h"
-#include "cxLogger.h"
+
 #include "cxUSReconstructInputDataAlgoritms.h"
 #include "cxPatientModelService.h"
 

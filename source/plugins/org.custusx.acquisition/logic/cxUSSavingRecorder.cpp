@@ -36,17 +36,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "boost/bind.hpp"
 
 #include "cxTypeConversions.h"
-#include "cxReporter.h"
+
 #include "cxTime.h"
 #include "cxTool.h"
 #include "cxVideoSource.h"
-
+#include "cxLogger.h"
 #include "cxDataLocations.h"
 #include "cxSavingVideoRecorder.h"
 #include "cxImageDataContainer.h"
 #include "cxRecordSession.h"
 #include "cxUsReconstructionFileMaker.h"
-#include "cxLogger.h"
+
 
 namespace cx
 {

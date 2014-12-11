@@ -39,7 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 #include "cxDataLocations.h"
 #include "cxSettings.h"
-#include "cxLogger.h"
 #include "cxReporter.h"
 #include "vtkRenderWindowInteractor.h"
 #include "cxTypeConversions.h"

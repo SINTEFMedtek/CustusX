@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxTrackerConfigurationImpl.h"
 #include "cxDataLocations.h"
-#include "cxReporter.h"
+
 #include "cxDefinitionStrings.h"
 #include "cxToolConfigurationParser.h"
 #include "cxFileHelpers.h"

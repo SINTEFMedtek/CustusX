@@ -36,9 +36,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxResourceWidgetsExport.h"
 
+#include "cxBaseWidget.h"
+#include "cxReporter.h"
 #include <QTextBrowser>
 #include <QTextCharFormat>
-#include "cxReporter.h"
+#include "cxStringDataAdapterXml.h"
+
 
 class QContextMenuEvent;
 class QAction;
@@ -52,7 +55,7 @@ namespace cx
  *
  * \ingroup cx_resource_widgets
  */
-class cxResourceWidgets_EXPORT ConsoleWidget: public QTextBrowser
+class cxResourceWidgets_EXPORT ConsoleWidget: public BaseWidget
 {
 Q_OBJECT
 
@@ -66,14 +69,35 @@ protected slots:
 	virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
 
 private slots:
-	void printMessage(Message message); ///< prints the message into the console
 	void lineWrappingSlot(bool checked);
+	void onSeverityButtonsChanged();
+	void receivedMessage(Message message);
 
 private:
+	void printMessage(const Message& message); ///< prints the message into the console
 	void createTextCharFormats(); ///< sets up the formating rules for the message levels
-	void format(Message& message); ///< formats the text to suit the message level
+	void format(const Message &message); ///< formats the text to suit the message level
+	void addSeverityButtons(QBoxLayout* buttonLayout);
+	void addSeverityButton(QBoxLayout* buttonLayout, MESSAGE_LEVEL severity, QString iconname, QString text, QString help);
+	void addDetailsButton(QBoxLayout* buttonLayout);
+	QString getCompactMessage(Message message);
+	void createChannelSelector();
 
+	void saveSeverityVisibility(MESSAGE_LEVEL severity);
+	void loadSeverityVisibility(MESSAGE_LEVEL severity);
+
+	void updateSeverityButtons();
+	bool isActive(const Message &message);
+	bool isActiveChannel(const Message& message) const;
+
+	std::list<Message> mMessageHistory;
+	int mMessageHistorySize;
 	QAction* mLineWrappingAction;
+	QTextBrowser* mBrowser;
+	std::map<MESSAGE_LEVEL, QAction*> mSeverityActions;
+	QAction* mDetailsAction;
+	StringDataAdapterXmlPtr mChannelSelector;
+	QStringList mChannels;
 
 	std::map<MESSAGE_LEVEL, QTextCharFormat> mFormat;
 };

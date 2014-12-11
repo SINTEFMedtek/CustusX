@@ -38,10 +38,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QApplication>
 #include <QString>
 #include "cxImageServer.h"
-#include "cxReporter.h"
 #include "cxImageStreamerOpenCV.h"
 #include "cxCommandlineImageStreamerFactory.h"
 #include "cxStringHelpers.h"
+#include "cxLogger.h"
+#include "cxReporter.h"
+
 
 #ifdef WIN32
 #include <windows.h>

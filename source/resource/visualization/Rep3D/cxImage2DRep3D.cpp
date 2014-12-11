@@ -35,8 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkImageActor.h"
 #include "vtkImageData.h"
 #include "vtkMatrix4x4.h"
-
 #include "cxLogger.h"
+
 #include "cxSlicedImageProxy.h"
 #include "cxImage.h"
 #include "cxView.h"

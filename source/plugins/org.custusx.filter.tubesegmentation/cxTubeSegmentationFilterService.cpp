@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxTime.h"
 #include "cxTypeConversions.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxDataReaderWriter.h"
 #include "cxRegistrationTransform.h"
 #include "cxDoubleDataAdapterXml.h"

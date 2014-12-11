@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkLandmarkTransform.h>
 #include "cxTransform3D.h"
 #include "cxVector3D.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include <boost/math/special_functions/fpclassify.hpp> // isnan
 
 namespace cx

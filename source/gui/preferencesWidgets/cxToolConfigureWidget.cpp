@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDir>
 #include <QLineEdit>
 #include "cxEnumConverter.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxStateService.h"
 #include "cxTrackingService.h"
 #include "cxSelectionGroupBox.h"

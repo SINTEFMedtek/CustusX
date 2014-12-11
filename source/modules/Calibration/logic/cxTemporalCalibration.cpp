@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxUSFrameData.h"
 #include "cxImage.h"
 #include "cxUsReconstructionFileReader.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxTime.h"
 #include <vtkImageMask.h>
 

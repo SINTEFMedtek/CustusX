@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxVisualizationServiceNull.h"
-#include "cxReporter.h"
+
 #include <QActionGroup>
 #include <QDomNode>
 

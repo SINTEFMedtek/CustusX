@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVBoxLayout>
 #include <QEvent>
 #include "cxTime.h"
-#include "cxReporter.h"
+
 #include "cxRecordSession.h"
 #include "cxTrackingService.h"
 #include "cxTypeConversions.h"

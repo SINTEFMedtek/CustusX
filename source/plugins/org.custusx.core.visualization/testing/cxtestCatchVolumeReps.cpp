@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxtestRenderTester.h"
 #include "cxtestUtilities.h"
 #include "cxBoundingBox3D.h"
-#include "cxReporter.h"
+
 #include "cxImageEnveloper.h"
 
 typedef vtkSmartPointer<class vtkWindowToImageFilter> vtkWindowToImageFilterPtr;

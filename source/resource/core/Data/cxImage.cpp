@@ -50,8 +50,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImageLUT2D.h"
 #include "cxRegistrationTransform.h"
 #include "cxLandmark.h"
+
 #include "cxLogger.h"
-#include "cxReporter.h"
 #include "cxTypeConversions.h"
 #include "cxUtilHelpers.h"
 #include "cxVolumeHelpers.h"

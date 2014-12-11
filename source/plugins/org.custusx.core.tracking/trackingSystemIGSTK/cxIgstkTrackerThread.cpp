@@ -31,10 +31,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxIgstkTrackerThread.h"
-#include "cxReporter.h"
+
 #include "cxIgstkTool.h"
 #include "cxIgstkToolManager.h"
-#include "cxLogger.h"
+
 
 namespace cx
 {

@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImage.h"
 #include <QSet>
 #include "cxMesh.h"
-#include "cxReporter.h"
 #include "cxImageLUT2D.h"
 #include "cxTrackingService.h"
 #include "cxTypeConversions.h"

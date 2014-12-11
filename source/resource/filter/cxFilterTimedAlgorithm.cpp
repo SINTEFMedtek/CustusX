@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxFilterTimedAlgorithm.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxFilter.h"
 
 namespace cx

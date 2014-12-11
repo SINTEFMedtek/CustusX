@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkRenderer.h>
 #include <vtkCamera.h>
-#include "cxReporter.h"
+
 #include "cxTrackingService.h"
 #include "cxToolRep3D.h"
 #include "cxView.h"
@@ -44,11 +44,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkInteractorStyleTrackballCamera.h"
 #include "cxCoreServices.h"
 #include "cxViewportListener.h"
-#include "cxLogger.h"
+
 #include "cxTool.h"
 #include <vtkRenderWindowInteractor.h>
 #include "cxPatientModelService.h"
 #include "cxRepContainer.h"
+#include "cxLogger.h"
 
 SNW_DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, CAMERA_STYLE_TYPE, cstCOUNT)
 {

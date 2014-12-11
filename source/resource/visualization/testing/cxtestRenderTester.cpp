@@ -53,7 +53,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxDataReaderWriter.h"
 #include "cxtestUtilities.h"
-#include "cxLogger.h"
+#include "cxReporter.h"
+
 #include "cxUtilHelpers.h"
 
 

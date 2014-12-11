@@ -33,8 +33,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxVLCRecorder.h>
 
 #include <QFileInfo>
-#include "cxReporter.h"
+
 #include <QProcess>
+#include "cxLogger.h"
 
 namespace cx
 {

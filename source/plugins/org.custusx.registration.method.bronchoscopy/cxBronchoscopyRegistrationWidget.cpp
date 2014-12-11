@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxToolRep3D.h"
 #include "cxToolTracer.h"
 #include "cxBronchoscopyRegistration.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxTypeConversions.h"
 #include "cxPatientModelService.h"
 #include "cxRegistrationService.h"

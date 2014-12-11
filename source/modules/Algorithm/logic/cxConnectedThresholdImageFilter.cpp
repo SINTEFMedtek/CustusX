@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxConnectedThresholdImageFilter.h"
 
 #include "itkConnectedThresholdImageFilter.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxTypeConversions.h"
 #include "cxAlgorithmHelpers.h"
 #include "cxRegistrationTransform.h"

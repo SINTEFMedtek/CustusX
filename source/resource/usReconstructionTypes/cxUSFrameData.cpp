@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "cxUSFrameData.h"
-#include "cxReporter.h"
+
 #include <vtkImageData.h>
 #include <vtkImageLuminance.h>
 #include <vtkImageClip.h>
@@ -45,8 +45,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTimeKeeper.h"
 #include "cxImageDataContainer.h"
 #include "cxVolumeHelpers.h"
-
 #include "cxLogger.h"
+
 
 typedef vtkSmartPointer<vtkImageAppend> vtkImageAppendPtr;
 

@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //#include "cxRepManager.h"
 //#include <QTimer>
 #include "cxImage.h"
-#include "cxReporter.h"
+
 
 namespace cx
 {

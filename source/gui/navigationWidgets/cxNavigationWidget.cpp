@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QLabel>
 #include <QSlider>
 #include <QToolBar>
-#include "cxReporter.h"
+
 #include "cxTrackingService.h"
 #include "cxDoubleWidgets.h"
 #include "cxDataInterface.h"

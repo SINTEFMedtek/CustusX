@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDateTime>
 #include <QStringList>
 #include <QTextStream>
-#include "cxReporter.h"
+
 #include "cxTypeConversions.h"
 #include "cxProbeData.h"
 #include "cxProbeImpl.h"

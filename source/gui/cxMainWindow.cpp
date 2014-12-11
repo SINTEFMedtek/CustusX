@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "boost/scoped_ptr.hpp"
 #include "boost/bind.hpp"
 #include "cxTime.h"
-#include "cxReporter.h"
+
 #include "cxTrackingService.h"
 #include "cxStatusBar.h"
 #include "cxVolumePropertiesWidget.h"
@@ -75,11 +75,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVLCRecorder.h"
 #include "cxSecondaryViewLayoutWindow.h"
 //#include "cxRegistrationHistoryWidget.h"
-#include "cxLogger.h"
+
 #include "cxLayoutInteractor.h"
 #include "cxNavigation.h"
 #include "cxPluginFrameworkWidget.h"
 #include "cxImage.h"
+#include "cxLogger.h"
 
 #include "ctkServiceTracker.h"
 #include "cxLogicManager.h"
@@ -114,7 +115,7 @@ MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
 	this->createToolBars();
 	this->setStatusBar(new StatusBar());
 
-	reporter()->setLoggingFolder(DataLocations::getRootConfigPath());
+//	reporter()->setLoggingFolder(DataLocations::getRootConfigPath()+"/Logs");
 	reporter()->setAudioSource(AudioPtr(new AudioImpl()));
 
 	connect(stateService().get(), &StateService::applicationStateChanged, this, &MainWindow::onApplicationStateChangedSlot);

@@ -31,8 +31,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxtestProcessWrapperFixture.h"
-
+#include "cxLogger.h"
+#include <QFile>
 #include "cxReporter.h"
+
 
 namespace cxtest {
 

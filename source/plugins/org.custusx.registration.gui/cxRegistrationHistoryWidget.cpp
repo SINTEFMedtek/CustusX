@@ -37,11 +37,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStringList>
 #include <QVBoxLayout>
 #include "cxImage.h"
-#include "cxReporter.h"
+
 #include "cxTime.h"
 #include "cxTypeConversions.h"
 #include "cxPatientModelService.h"
-
+#include "cxLogger.h"
 #include "cxLegacySingletons.h"
 #include "cxTrackingService.h"
 

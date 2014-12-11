@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "catch.hpp"
 
-#include "cxLogger.h"
+
 #include "cxTime.h"
 #include "cxDataLocations.h"
 #include "cxElastixExecuter.h"
@@ -55,7 +55,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxElastixParameters.h"
 //#include "cxLogicManager.h"
 #include "cxRegServices.h"
+
 #include "cxReporter.h"
+
 #include "cxtestPatientModelServiceMock.h"
 
 namespace cxtest

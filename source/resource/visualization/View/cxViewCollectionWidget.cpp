@@ -32,10 +32,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxViewCollectionWidget.h"
 #include <QGridLayout>
-#include "cxLogger.h"
+
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
-#include "cxReporter.h"
+
 
 #include "cxViewCollectionWidgetUsingViewWidgets.h"
 #include "cxViewCollectionWidgetUsingViewContainer.h"

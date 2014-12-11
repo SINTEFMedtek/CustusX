@@ -41,13 +41,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QLabel>
 #include <QMenu>
 #include "cxEnumConverter.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxDataLocations.h"
 #include "cxImageAlgorithms.h"
 #include "cxImage.h"
 #include "cxPatientModelService.h"
 #include "cxVisualizationService.h"
 #include "cxViewGroupData.h"
+#include "cxReporter.h"
+
 
 //TODO: remove
 #include "cxLegacySingletons.h"

@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <QDomElement>
 #include <QStringList>
-#include "cxReporter.h"
+
 
 namespace cx
 {

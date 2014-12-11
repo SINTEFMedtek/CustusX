@@ -33,8 +33,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXMESSAGELISTENER_H
 
 #include "cxResourceExport.h"
-
 #include "cxReporter.h"
+
+
 #include <vector>
 #include <QPointer>
 

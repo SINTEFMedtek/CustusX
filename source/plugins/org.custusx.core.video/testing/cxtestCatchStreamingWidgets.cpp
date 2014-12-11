@@ -45,9 +45,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVisualizationService.h"
 #include "cxVideoService.h"
 #include "cxUtilHelpers.h"
-#include "cxLogger.h"
+
 #include "cxSessionStorageService.h"
-#include "cxReporter.h"
+
 
 namespace cxtest
 {

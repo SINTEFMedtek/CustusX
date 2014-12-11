@@ -38,10 +38,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDateTime>
 #include <QStringList>
 #include "cxTime.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxTrackingService.h"
 #include "cxSettings.h"
 #include "cxUsReconstructionService.h"
+#include "cxReporter.h"
 
 #include "cxLegacySingletons.h"
 

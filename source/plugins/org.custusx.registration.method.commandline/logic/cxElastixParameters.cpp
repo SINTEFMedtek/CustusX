@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxElastixParameters.h"
 
 #include <QDir>
-#include "cxLogger.h"
+
 #include "cxDataLocations.h"
 #include "cxSettings.h"
 #include "cxTypeConversions.h"

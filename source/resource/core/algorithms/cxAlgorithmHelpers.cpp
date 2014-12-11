@@ -30,7 +30,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxAlgorithmHelpers.h"
-#include "cxReporter.h"
+
 #include "cxImage.h"
 #include "cxTypeConversions.h"
 #include "itkImageFileReader.h"
@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDir>
 #include "cxUtilHelpers.h"
 #include "cxDataLocations.h"
-
+#include "cxLogger.h"
 #include <itkGrayscaleFillholeImageFilter.h>
 
 namespace cx

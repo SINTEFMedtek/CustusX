@@ -31,10 +31,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxFileWatcherWidget.h"
-
+#include "cxLogger.h"
 #include <QFileSystemWatcher>
 #include <QFileInfo>
-#include "cxReporter.h"
+
 
 namespace cx
 {

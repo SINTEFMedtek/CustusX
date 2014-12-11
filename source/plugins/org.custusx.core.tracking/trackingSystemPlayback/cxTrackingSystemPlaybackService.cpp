@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackingSystemPlaybackService.h"
 
 
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxTime.h"
 #include "cxPlaybackTime.h"
 #include "cxPlaybackTool.h"

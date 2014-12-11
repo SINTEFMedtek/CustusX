@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QFileInfo>
 #include <QStringList>
 #include <QDataStream>
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxTypeConversions.h"
 #include <vtkImageData.h>
 #include "cxImage.h"

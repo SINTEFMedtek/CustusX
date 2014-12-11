@@ -46,9 +46,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImageTFData.h"
 #include "cxUtilHelpers.h"
 #include "cxImageLUT2D.h"
-#include "cxReporter.h"
-#include "cxTypeConversions.h"
 #include "cxLogger.h"
+#include "cxTypeConversions.h"
+#include "cxReporter.h"
+
 
 namespace cx
 {

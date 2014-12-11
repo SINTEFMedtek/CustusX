@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fstream>
 #include "cxData.h"
 #include "cxLogicManager.h"
-#include "cxReporter.h"
+
 #include "cxDataInterface.h"
 #include "cxPatientData.h"
 #include "cxTubeSegmentationFilterService.h"

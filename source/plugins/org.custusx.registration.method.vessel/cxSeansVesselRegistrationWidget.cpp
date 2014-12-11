@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QGroupBox>
 #include <vtkCellArray.h>
 #include "cxTypeConversions.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxTimedAlgorithm.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxRegistrationDataAdapters.h"
@@ -148,11 +148,11 @@ void SeansVesselRegistrationWidget::registerSlot()
 
 	if (vesselReg.mt_auto_lts)
 	{
-		reporter()->sendDebug("Using automatic lts_ratio");
+		reportDebug("Using automatic lts_ratio");
 	}
 	else
 	{
-		reporter()->sendDebug("Using lts_ratio: " + qstring_cast(vesselReg.mt_ltsRatio));
+		reportDebug("Using lts_ratio: " + qstring_cast(vesselReg.mt_ltsRatio));
 	}
 
 	if(!mServices.registrationService->getMovingData())

@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxLogicManager.h>
 
 #include <ctkPluginContext.h>
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxVideoServiceProxy.h"
 #include "cxStateService.h"
 #include "cxGPUImageBuffer.h"
@@ -49,6 +49,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxStateServiceProxy.h"
 #include "cxVisualizationServiceProxy.h"
 #include "cxSessionStorageServiceProxy.h"
+#include "cxReporter.h"
+
 
 namespace cx
 {
@@ -131,6 +133,10 @@ void LogicManager::initializeServices()
 	mSpaceProvider.reset(new cx::SpaceProviderImpl(mTrackingService, mPatientModelService));
 
 	mPluginFramework->loadState();
+
+//	CX_LOG_CHANNEL_DEBUG("kanal") << "stream to channel";
+//	CX_LOG_DEBUG() << "stream to default";
+//	CX_LOG_DEBUG("stream to default old style");
 }
 
 void LogicManager::shutdownServices()

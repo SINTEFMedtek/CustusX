@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDateTime>
 #include <QStringList>
 #include <QTextStream>
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxTypeConversions.h"
 #include "cxSettings.h"
 #include "cxTransformFile.h"

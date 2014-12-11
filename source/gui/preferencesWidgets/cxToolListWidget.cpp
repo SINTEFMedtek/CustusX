@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMenu>
 #include <QDrag>
 #include "cxEnumConverter.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxDataLocations.h"
 //#include "cxToolConfigurationParser.h"
 #include "cxTrackerConfiguration.h"
@@ -258,7 +258,7 @@ void ConfigToolListWidget::deleteSlot()
 {
 	if (!mItemToDelete)
 	{
-		reporter()->sendDebug("Found no item to delete...");
+		reportDebug("Found no item to delete...");
 		return;
 	}
 	this->deleteItemSlot(mItemToDelete);
@@ -282,7 +282,7 @@ void ConfigToolListWidget::contextMenuSlot(const QPoint& point)
 	QListWidgetItem* item = this->itemAt(point);
 	if (!item)
 	{
-		reporter()->sendDebug("Found no item to delete...");
+		reportDebug("Found no item to delete...");
 		return;
 	}
 	mItemToDelete = item;

@@ -39,8 +39,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationTransform.h"
 #include "cxCoordinateSystemHelpers.h"
 #include "cxVolumeHelpers.h"
-#include "cxReporter.h"
 
+#include "cxLogger.h"
 #include "cxLegacySingletons.h"
 #include "cxSpaceProvider.h"
 

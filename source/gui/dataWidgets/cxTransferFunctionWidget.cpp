@@ -41,10 +41,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QToolButton>
 #include <QAction>
 #include <QMessageBox>
-#include "cxLogger.h"
+
 #include "cxImageTF3D.h"
 #include "cxImageLUT2D.h"
-#include "cxReporter.h"
+
 #include "cxTypeConversions.h"
 #include "cxTransferFunctionPresetWidget.h"
 #include "cxTransferFunctionAlphaWidget.h"

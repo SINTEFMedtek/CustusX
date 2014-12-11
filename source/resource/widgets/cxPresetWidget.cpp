@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QComboBox>
 #include <QInputDialog>
-#include "cxReporter.h"
+#include "cxLogger.h"
 
 namespace cx {
 
