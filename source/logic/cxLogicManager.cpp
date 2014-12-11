@@ -134,9 +134,9 @@ void LogicManager::initializeServices()
 
 	mPluginFramework->loadState();
 
-	CX_LOG_CHANNEL_DEBUG("kanal") << "stream to channel";
-	CX_LOG_DEBUG() << "stream to default";
-	CX_LOG_DEBUG("stream to default old style");
+//	CX_LOG_CHANNEL_DEBUG("kanal") << "stream to channel";
+//	CX_LOG_DEBUG() << "stream to default";
+//	CX_LOG_DEBUG("stream to default old style");
 }
 
 void LogicManager::shutdownServices()

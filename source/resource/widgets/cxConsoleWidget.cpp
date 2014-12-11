@@ -122,7 +122,7 @@ void ConsoleWidget::saveSeverityVisibility(MESSAGE_LEVEL severity)
 void ConsoleWidget::loadSeverityVisibility(MESSAGE_LEVEL severity)
 {
 	QString uid = QString("console/show%1").arg(enum2string<MESSAGE_LEVEL>(severity));
-	bool value = settings()->value(uid).toBool();
+	bool value = settings()->value(uid, true).toBool();
 
 	QAction* action = mSeverityActions[severity];
 	action->blockSignals(true);
