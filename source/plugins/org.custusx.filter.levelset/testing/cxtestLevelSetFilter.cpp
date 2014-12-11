@@ -38,7 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxData.h"
 #include "cxImage.h"
 #include "cxtestUtilities.h"
-#include "cxPatientService.h"
 #include "cxPatientData.h"
 #include "cxDataLocations.h"
 #include "cxSelectDataStringDataAdapter.h"
@@ -48,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationTransform.h"
 #include "cxDoubleDataAdapterXml.h"
 #include "cxPatientModelService.h"
+#include "cxSessionStorageService.h"
 
 namespace cxtest {
 
@@ -99,7 +99,7 @@ TEST_CASE("LevelSetFilter: execute", "[integration][modules][Algorithm][LevelSet
 
     //create a new patient
 	QString filename = cx::DataLocations::getTestDataPath()+ "/testing/TubeSegmentationFramework/Default.mhd";
-	cx::patientService()->newPatient(cx::DataLocations::getTestDataPath()+ "/temp/LevelSetFilter/");
+	cx::sessionStorageService()->load(cx::DataLocations::getTestDataPath()+ "/temp/LevelSetFilter/");
 	QString info;
 	cx::DataPtr data = cx::patientService()->importData(filename, info);
 	data->get_rMd_History()->setRegistration(cx::Transform3D::Identity());
