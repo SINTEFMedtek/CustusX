@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelServiceProxy.h"
 #include "cxLandmarkTranslationRegistration.h"
 #include "cxSessionStorageServiceProxy.h"
-#include "cxXmlNodeWrapper.h"
+#include "cxXMLNodeWrapper.h"
 
 namespace cx
 {

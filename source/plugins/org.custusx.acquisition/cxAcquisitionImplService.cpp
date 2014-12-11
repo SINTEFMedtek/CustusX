@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxUsReconstructionServiceProxy.h"
 #include "cxPatientModelServiceProxy.h"
 #include "cxSessionStorageServiceProxy.h"
-#include "cxXmlNodeWrapper.h"
+#include "cxXMLNodeWrapper.h"
 
 namespace cx
 {
