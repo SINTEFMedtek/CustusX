@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTextStream>
 #include <QDomElement>
 #include <QStringList>
+#include <QMutex>
 #include "cxLogger.h"
 #include "cxTypeConversions.h"
 
