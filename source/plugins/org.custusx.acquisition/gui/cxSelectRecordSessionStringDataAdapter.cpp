@@ -39,8 +39,8 @@ namespace cx
 SelectRecordSessionStringDataAdapter::SelectRecordSessionStringDataAdapter(AcquisitionDataPtr pluginData) :
 		SelectRecordSessionStringDataAdapterBase(pluginData)
 {
-  connect(mPluginData.get(), SIGNAL(recordedSessionsChanged()), this, SLOT(setDefaultSlot()));
-  this->setDefaultSlot();
+	connect(mPluginData.get(), &AcquisitionData::recordedSessionsChanged, this, &SelectRecordSessionStringDataAdapter::setDefaultSlot);
+	this->setDefaultSlot();
 }
 QString SelectRecordSessionStringDataAdapter::getDisplayName() const
 {
@@ -90,7 +90,7 @@ void SelectRecordSessionStringDataAdapter::setDefaultSlot()
 SelectRecordSessionStringDataAdapterBase::SelectRecordSessionStringDataAdapterBase(AcquisitionDataPtr pluginData) :
 		mPluginData(pluginData)
 {
-  connect(mPluginData.get(), SIGNAL(recordedSessionsChanged()), this, SIGNAL(changed()));
+	connect(mPluginData.get(), &AcquisitionData::recordedSessionsChanged, this, &SelectRecordSessionStringDataAdapterBase::changed);
 }
 QStringList SelectRecordSessionStringDataAdapterBase::getValueRange() const
 {

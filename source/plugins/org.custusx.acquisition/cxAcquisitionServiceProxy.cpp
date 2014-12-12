@@ -78,6 +78,10 @@ void AcquisitionServiceProxy::onServiceAdded(AcquisitionService* service)
 
 	if(mAcquisitionService->isNull())
 		reportWarning("AcquisitionServiceProxy::onServiceAdded mAcquisitionService->isNull()");
+
+	emit stateChanged();
+	emit readinessChanged();
+	emit recordedSessionsChanged();
 }
 
 void AcquisitionServiceProxy::onServiceRemoved(AcquisitionService *service)
@@ -93,6 +97,10 @@ void AcquisitionServiceProxy::onServiceRemoved(AcquisitionService *service)
 	disconnect(service, &AcquisitionService::saveDataCompleted, this, &AcquisitionService::saveDataCompleted);
 
 	mAcquisitionService = AcquisitionService::getNullObject();
+
+	emit stateChanged();
+	emit readinessChanged();
+	emit recordedSessionsChanged();
 }
 
 bool AcquisitionServiceProxy::isNull()
