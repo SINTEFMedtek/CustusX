@@ -88,6 +88,10 @@ public:
 	virtual bool isNull() = 0;
 	static RegistrationServicePtr getNullObject();
 
+	//Utility functions
+	QString getFixedDataUid();
+	QString getMovingDataUid();
+
 signals:
 	void fixedDataChanged(QString uid);
 	void movingDataChanged(QString uid);
