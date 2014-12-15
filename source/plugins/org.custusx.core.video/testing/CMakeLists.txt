@@ -23,6 +23,7 @@ if(BUILD_TESTING)
     )
     target_link_libraries(cxtest_org_custusx_core_video
         PRIVATE
+        Qt5::Test
         org_custusx_core_video
         cxGui
         cxResourceWidgets

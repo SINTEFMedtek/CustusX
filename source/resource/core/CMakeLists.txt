@@ -231,6 +231,7 @@ set(CX_PUBLIC_RESOURCE_LIBRARIES
     Qt5::Multimedia
     Qt5::Sql
     Qt5::Concurrent
+    CTKPluginFramework
     ${VTK_LIBRARIES}
 )
 set(CX_PRIVATE_RESOURCE_LIBRARIES
@@ -239,7 +240,6 @@ set(CX_PRIVATE_RESOURCE_LIBRARIES
     ${OPENGL_LIBRARIES}
     ${Boost_LIBRARIES}
     ${ITK_LIBRARIES}
-    CTKPluginFramework
     cxPluginUtilities
 )
 if(CX_USE_OPENCL_UTILITY)

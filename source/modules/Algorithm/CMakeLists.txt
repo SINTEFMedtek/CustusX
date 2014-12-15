@@ -85,6 +85,8 @@ target_link_libraries(cxPluginAlgorithm
     cxResourceVisualization
     cxLogicManager
     cxPluginUtilities
+    ${ITK_LIBRARIES}
+
 )
 
 add_subdirectory(testing)

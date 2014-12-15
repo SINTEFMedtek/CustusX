@@ -54,6 +54,8 @@ if(BUILD_TESTING)
         set(CX_TESTRESOURCE_LINK_LIBS
             ${CX_TESTRESOURCE_LINK_LIBS}
             TestOpenCLUtilityLibrary
+            OpenCLUtilityLibrary
+            ${OPENCL_LIBRARIES}
         )
     endif(CX_USE_OPENCL_UTILITY)
 
@@ -66,7 +68,11 @@ if(BUILD_TESTING)
         .
         ${CMAKE_CURRENT_BINARY_DIR}
     )
-    target_link_libraries(cxtestResource PRIVATE ${CX_TESTRESOURCE_LINK_LIBS} cxCatch)
+    target_link_libraries(cxtestResource
+        PRIVATE
+        ${CX_TESTRESOURCE_LINK_LIBS}
+        cxCatch
+    )
     cx_add_tests_to_catch(cxtestResource)
     
 endif(BUILD_TESTING)

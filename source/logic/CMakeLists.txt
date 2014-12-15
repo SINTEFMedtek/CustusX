@@ -38,7 +38,6 @@ target_link_libraries(cxLogicManager
 
     PRIVATE
     Qt5::Core
-    CTKPluginFramework
     cxResourceVisualization
     cxPluginUtilities
 )

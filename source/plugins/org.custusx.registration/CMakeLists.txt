@@ -51,6 +51,7 @@ set(PLUGIN_target_libraries
     cxResource
     cxResourceWidgets
     cxPluginUtilities
+    ${ITK_LIBRARIES}
 #TODO: Remove these dependencies
     cxLogicManager
     cxPluginAlgorithm

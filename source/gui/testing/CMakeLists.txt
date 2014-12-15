@@ -48,6 +48,7 @@ if(BUILD_TESTING)
         cxGrabber
         cxtestUtilities
         cxOpenIGTLinkUtilities
+        ${OPENCL_LIBRARIES}
         cxLogicManager
         cxResourceWidgets
         cxGUIExtenderService
