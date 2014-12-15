@@ -34,7 +34,9 @@ configure_file(
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
     ${PLUGIN_target_libraries}
+    ${OPENCL_LIBRARIES}
     cxPluginUtilities
+    OpenCLUtilityLibrary
     org_custusx_usreconstruction
     )
 

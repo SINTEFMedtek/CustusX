@@ -62,7 +62,6 @@ void load_plugins()
     std::vector<std::string> plugins;
     foreach(const QString &item, list)
     {
-        std::cout << "Lib pushing back: " << item.toStdString() << std::endl;
         plugins.push_back(item.toStdString());
     }
 

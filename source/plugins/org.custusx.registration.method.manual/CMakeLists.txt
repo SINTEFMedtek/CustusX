@@ -39,14 +39,13 @@ set(PLUGIN_UI_FORMS
 set(PLUGIN_resources
 )
 
-
 #Compute the plugin dependencies
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
     ${PLUGIN_target_libraries}
     cxResourceWidgets
-	cxLogicManager
-	org_custusx_registration
+    cxLogicManager
+    org_custusx_registration
 )
 
 set(PLUGIN_OUTPUT_DIR "")

@@ -5454,7 +5454,6 @@ namespace Catch {
                 oss << "Anonymous test case " << ++m_unnamedCount;
                 return registerTest( testCase.withName( oss.str() ) );
             }
-            std::cout << "Registering test: " << name << std::endl;
 
             if( m_functions.find( testCase ) == m_functions.end() ) {
                 m_functions.insert( testCase );
