@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPushButton>
 #include <QTextStream>
 //#include <QFileInfo>
+#include <QFile>
 #include <iostream>
 #include "cxTypeConversions.h"
 #include <QFileSystemWatcher>

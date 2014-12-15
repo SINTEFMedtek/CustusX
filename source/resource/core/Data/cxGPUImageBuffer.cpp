@@ -35,6 +35,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QString>
 
+#include <vector>
+#include <vtkImageData.h>
+#include <vtkPointData.h>
+#include <vtkUnsignedCharArray.h>
+#include <vtkUnsignedShortArray.h>
+#include <boost/cstdint.hpp>
+#include "cxGLHelpers.h"
+#include "cxLogger.h"
+
+
 #ifndef WIN32
 #define GL_GLEXT_PROTOTYPES
 #include <vtkgl.h>
@@ -49,16 +59,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <windows.h>
 #include <GL/glext.h>
 #endif
-
-#include <vector>
-#include <vtkImageData.h>
-#include <vtkPointData.h>
-#include <vtkUnsignedCharArray.h>
-#include <vtkUnsignedShortArray.h>
-#include <boost/cstdint.hpp>
-#include "cxGLHelpers.h"
-#include "cxLogger.h"
-
 
 
 namespace cx
