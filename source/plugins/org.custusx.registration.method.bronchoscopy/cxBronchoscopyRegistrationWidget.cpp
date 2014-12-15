@@ -284,7 +284,10 @@ void BronchoscopyRegistrationWidget::acquisitionStarted()
 {
     std::cout << "acquisitionStarted" << std::endl;
 
-	mTool = mServices.trackingService->getActiveTool();
+	mTool = mSelectToolWidget->getTool();
+	if(!mTool)
+		mTool = mServices.trackingService->getActiveTool();
+
     ToolRep3DPtr activeRep3D = this->getToolRepIn3DView(mTool);
 	if (!activeRep3D)
 		return;
