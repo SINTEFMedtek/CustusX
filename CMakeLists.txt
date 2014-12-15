@@ -46,7 +46,6 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
 
 
-
 message( STATUS "The " ${CMAKE_GENERATOR} " was used." )
 
 #------------------------------------------------------------------------------
@@ -57,10 +56,8 @@ cx_read_version()
 
 set(CMAKE_BUILD_TYPE:STRING=Debug)
 
-
 cx_initialize_custusx_install()
 cx_clear_catch_cache()
-#cx_catch_initialize() # OLD -DELETE
 cx_initialize_coverage()
 
 include(Dart)
@@ -75,13 +72,9 @@ include_directories( /opt/X11/include )
 #------------------------------------------------------------------------------
 # Add subdirectories
 #------------------------------------------------------------------------------
-#add_subdirectory( source/resource/ssc )
 add_subdirectory( doc )
 add_subdirectory( documentation )
 add_subdirectory( source )
-
-#message(STATUS "QT_QCOLLECTIONGENERATOR_EXECUTABLE " ${QT_QCOLLECTIONGENERATOR_EXECUTABLE})
-
 
 
 #------------------------------------------------------------------------------

@@ -12,8 +12,6 @@ if(BUILD_TESTING)
         cxtestReconstructRealData.cpp
     )
     
-    #cx_catch_add_lib_and_exe(org_custusx_usreconstruction "${CXTEST_PLUGIN_USRECONSTRUCTION_SOURCES}" "${CXTEST_SOURCES_TO_MOC}")
-
     qt5_wrap_cpp(CXTEST_SOURCES_TO_MOC ${CXTEST_SOURCES_TO_MOC})
     add_library(cxtest_org_custusx_usreconstruction ${CXTEST_PLUGIN_USRECONSTRUCTION_SOURCES} ${CXTEST_SOURCES_TO_MOC})
     include(GenerateExportHeader)

@@ -513,9 +513,8 @@ set(PLUGINS_DESCRIPTION
 ")
 getListOfVarsStartingWith("CX_PLUGIN_" matchedVars)
 foreach (_var IN LISTS matchedVars)
-	string(REPLACE "CX_PLUGIN_" "" PLUGIN_NAME ${_var})
-    #message("${_var}=${${_var}} :: ${${${_var}}} :: ${PLUGIN_NAME}")
-	set(PLUGINS_DESCRIPTION ${PLUGINS_DESCRIPTION}
+        string(REPLACE "CX_PLUGIN_" "" PLUGIN_NAME ${_var})
+        set(PLUGINS_DESCRIPTION ${PLUGINS_DESCRIPTION}
 "		${PLUGIN_NAME}: ${${_var}}
 ")
 endforeach()
@@ -558,5 +557,5 @@ Configuration for CustusX ${CustusX_VERSION_STRING}
 
 ${PLUGINS_DESCRIPTION}
 ")
-	set(CX_CONFIGURATION_DESCRIPTION ${CONFIGURATION_TEXT} PARENT_SCOPE)
+    set(CX_CONFIGURATION_DESCRIPTION ${CONFIGURATION_TEXT} PARENT_SCOPE)
 endfunction()
