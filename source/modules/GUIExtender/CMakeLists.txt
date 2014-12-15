@@ -1,15 +1,20 @@
 cx_add_class_qt_moc(GUIExtender_FILES
     cxGUIExtenderService
-	)
+)
 
 cx_add_class(GUIExtender_FILES
-    )
-
-set(GUIExtender_LIBRARIES
-    Qt5::Core
-    )
+)
 
 cx_create_export_header("cxGUIExtenderService")
-cx_remove_duplicate_include_directories()
+
 add_library( cxGUIExtenderService ${GUIExtender_FILES})
-target_link_libraries(cxGUIExtenderService ${GUIExtender_LIBRARIES} ${SSC_GCOV_LIBRARY})
+target_include_directories(cxGUIExtenderService
+    PUBLIC
+    .
+    ${CMAKE_CURRENT_BINARY_DIR}
+)
+target_link_libraries(cxGUIExtenderService
+    PRIVATE
+    Qt5::Core
+    ${SSC_GCOV_LIBRARY}
+)

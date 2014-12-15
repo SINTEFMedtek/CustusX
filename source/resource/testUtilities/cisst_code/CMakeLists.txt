@@ -15,17 +15,17 @@
 
 if(NOT CX_WINDOWS)
 
-cx_initialize_cppunit()
+    cx_initialize_cppunit()
 
-PROJECT(cisstTests)
+    project(cisstTests)
 
-# clipped from cisst/tests/CMakeLists.txt
-# Create the main library
-SET(CISST_TESTS_MAIN_SRC
-    cisstTestMain.cpp
-    cisstTestParameters.cpp
-    cisstTestParameters.h)
-ADD_LIBRARY(cisstTestsMain ${CISST_TESTS_MAIN_SRC})
-target_link_libraries(cisstTestsMain ${CPPUNIT_LIBRARIES} ${SSC_GCOV_LIBRARY} cxResource)
+    # clipped from cisst/tests/CMakeLists.txt
+    # Create the main library
+    set(CISST_TESTS_MAIN_SRC
+        cisstTestMain.cpp
+        cisstTestParameters.cpp
+        cisstTestParameters.h)
+    add_library(cisstTestsMain ${CISST_TESTS_MAIN_SRC})
+    target_link_libraries(cisstTestsMain PRIVATE ${CPPUNIT_LIBRARIES} ${SSC_GCOV_LIBRARY} cxResource)
 
 endif()

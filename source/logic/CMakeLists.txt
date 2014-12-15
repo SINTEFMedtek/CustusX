@@ -2,15 +2,13 @@
 ##               Logic Layer
 ###########################################################
 
-# definition of the cxLogicManager module:
-
-SET( CX_QT_MOC_HEADER_FILES
-	cxServiceController.h
-	cxLogicManager.h
-	cxPluginFramework.h
+set(CX_QT_MOC_HEADER_FILES
+    cxServiceController.h
+    cxLogicManager.h
+    cxPluginFramework.h
 )
 
-SET (cxLogicManager_SOURCE
+set(cxLogicManager_SOURCE
     cxServiceController.h
     cxServiceController.cpp
     cxLogicManager.h
@@ -23,26 +21,28 @@ SET (cxLogicManager_SOURCE
     cxPluginFrameworkUtilities.cpp
 )
 
-include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
-include_directories(
-    ${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
-	${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
-    .
-    )
-
-
 cx_remove_duplicate_include_directories()
-QT5_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
+qt5_wrap_cpp( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
 cx_create_export_header("cxLogicManager")
 
 add_library( cxLogicManager ${cxLogicManager_SOURCE} ${MOC_HEADER_FILES} )
+target_include_directories(cxLogicManager
+    PUBLIC
+    .
+    ${CMAKE_CURRENT_BINARY_DIR}
+)
 
 target_link_libraries(cxLogicManager
-	CTKPluginFramework
+    PUBLIC
     cxResource
-	cxResourceVisualization
-    )
+
+    PRIVATE
+    Qt5::Core
+    CTKPluginFramework
+    cxResourceVisualization
+    cxPluginUtilities
+)
 
 add_subdirectory(testing)
 

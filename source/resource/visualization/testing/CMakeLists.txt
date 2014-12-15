@@ -31,7 +31,14 @@ if(BUILD_TESTING)
         ${CustusX_SOURCE_DIR}/source/resource/core/testing
         ${CustusX_SOURCE_DIR}/source/resource/testUtilities
     )
-    target_link_libraries(cxtestResourceVisualization PRIVATE cxtestUtilities cxtestResource cxResourceVisualization cxCatch)
+    target_link_libraries(cxtestResourceVisualization
+        PRIVATE
+        cxtestUtilities
+        cxtestResource
+        cxResource
+        cxResourceVisualization
+        cxCatch
+    )
     cx_add_tests_to_catch(cxtestResourceVisualization)
     
 endif(BUILD_TESTING)

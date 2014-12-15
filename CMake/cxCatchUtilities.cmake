@@ -42,7 +42,7 @@ function(cx_add_executable_catch CX_CATCH_LIB)
     endif()
 
     add_executable(${TEST_EXE_NAME} ${BUNDLE_TYPE} ${cxtest_MAIN})
-    target_link_libraries(${TEST_EXE_NAME} PRIVATE ${CX_SHARED_TEST_LIBRARIES} ${CX_CATCH_LIB})
+    target_link_libraries(${TEST_EXE_NAME} PRIVATE cxResource ${CX_SHARED_TEST_LIBRARIES} ${CX_CATCH_LIB})
 
     cx_install_target(${TEST_EXE_NAME})
 

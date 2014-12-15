@@ -1,11 +1,6 @@
 
 if(BUILD_TESTING)
-	cx_initialize_cppunit()
-
-    #include_directories(
-    #        ${CustusX_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
-    #        ${CustusX_SOURCE_DIR}/source/resource/videoServer
-    #)
+    cx_initialize_cppunit()
 
     set(CXTEST_SOURCES_TO_MOC
     )
@@ -16,7 +11,7 @@ if(BUILD_TESTING)
         cxtestGrabberDummy.cpp
     )
 
-    #qt5_wrap_cpp(CXTEST_SOURCES_TO_MOC ${CXTEST_SOURCES_TO_MOC})
+    qt5_wrap_cpp(CXTEST_SOURCES_TO_MOC ${CXTEST_SOURCES_TO_MOC})
     add_library(cxtestGrabber ${CX_TEST_SOURCE_FILES} ${CXTEST_SOURCES_TO_MOC})
     include(GenerateExportHeader)
     generate_export_header(cxtestGrabber)

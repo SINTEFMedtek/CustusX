@@ -1,15 +1,52 @@
  
-IF(BUILD_TESTING)
+if(BUILD_TESTING)
 
-	PROJECT(DepthSortPolyData)
+    project(DepthSortPolyData)
 
-	FIND_PACKAGE(VTK REQUIRED)
-	INCLUDE(${VTK_USE_FILE})
+    find_package(VTK REQUIRED)
+    include(${VTK_USE_FILE})
 
-	set(TARGET_LIBRARIES vtkFiltersHybrid cxResource)
+    add_executable(CorrectlyRenderTranslucentGeometry CorrectlyRenderTranslucentGeometry.cxx)
+    target_include_directories(CorrectlyRenderTranslucentGeometry
+        PRIVATE
+        ${VTK_INCLUDE_DIRS}
+    )
+    target_link_libraries(CorrectlyRenderTranslucentGeometry
+        PRIVATE
+        vtkCommonCore
+        vtkCommonDataModel
+        vtkCommonExecutionModel
+        vtkCommonMath
+        vtkCommonMisc
+        vtkCommonSystem
+        vtkCommonTransforms
+        vtkIOCore
+        vtkIOImage
+        vtkIOGeometry
+        vtkIOLegacy
+        vtkIOVideo
+        vtkImagingStatistics
+        vtkImagingColor
+        vtkImagingMath
+        vtkImagingGeneral
+        vtkImagingCore
+        vtkFiltersCore
+        vtkFiltersGeneral
+        vtkFiltersSources
+        vtkRenderingFreeTypeOpenGL
+        vtkRenderingFreeType
+        vtkRenderingOpenGL
+        vtkRenderingCore
+        vtkRenderingVolume
+        vtkInteractionStyle
+        cxResource
+    )
 
-        cx_remove_duplicate_include_directories()
-	ADD_EXECUTABLE(CorrectlyRenderTranslucentGeometry CorrectlyRenderTranslucentGeometry.cxx)
-	TARGET_LINK_LIBRARIES(CorrectlyRenderTranslucentGeometry ${TARGET_LIBRARIES})
+endif(BUILD_TESTING)
 
-ENDIF(BUILD_TESTING)
+
+# Add include directories needed to use VTK.
+#include_directories(${VTK_INCLUDE_DIRS})
+
+# Add link directories needed to use VTK.
+#link_directories(${VTK_LIBRARY_DIRS})

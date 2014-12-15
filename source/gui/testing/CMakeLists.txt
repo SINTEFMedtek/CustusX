@@ -40,8 +40,20 @@ if(BUILD_TESTING)
         .
         ${CMAKE_CURRENT_BINARY_DIR}
     )
-    target_link_libraries(cxtestGui PRIVATE cxGui cxtestResourceVisualization cxtestUtilities cxOpenIGTLinkUtilities cxCatch)
+    target_link_libraries(cxtestGui
+        PRIVATE
+        cxGui
+        cxtestResourceVisualization
+        cxResourceVisualization
+        cxGrabber
+        cxtestUtilities
+        cxOpenIGTLinkUtilities
+        cxLogicManager
+        cxResourceWidgets
+        cxGUIExtenderService
+        cxPluginUtilities
+        cxCatch
+    )
     cx_add_tests_to_catch(cxtestGui)
-
 
 endif(BUILD_TESTING)

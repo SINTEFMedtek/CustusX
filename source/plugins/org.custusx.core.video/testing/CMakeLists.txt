@@ -21,7 +21,17 @@ if(BUILD_TESTING)
         .
         ${CMAKE_CURRENT_BINARY_DIR}
     )
-    target_link_libraries(cxtest_org_custusx_core_video PRIVATE org_custusx_core_video cxGui cxtestUtilities cxCatch)
+    target_link_libraries(cxtest_org_custusx_core_video
+        PRIVATE
+        org_custusx_core_video
+        cxGui
+        cxResourceWidgets
+        cxResourceVisualization
+        cxLogicManager
+        cxtestUtilities
+        cxGrabber
+        cxCatch
+    )
     cx_add_tests_to_catch(cxtest_org_custusx_core_video)
 
 endif(BUILD_TESTING)

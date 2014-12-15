@@ -10,7 +10,7 @@ if(BUILD_TESTING)
         cxtestDummyLogicManager.cpp
     )
 
-    #qt5_wrap_cpp(CX_TEST_CATCH_LOGIC_MOC_SOURCE_FILES ${CX_TEST_CATCH_LOGIC_MOC_SOURCE_FILES})
+    qt5_wrap_cpp(CX_TEST_CATCH_LOGIC_MOC_SOURCE_FILES ${CX_TEST_CATCH_LOGIC_MOC_SOURCE_FILES})
     add_library(cxtestLogicManager ${CX_TEST_CATCH_LOGIC_SOURCE_FILES} ${CX_TEST_CATCH_LOGIC_MOC_SOURCE_FILES})
     include(GenerateExportHeader)
     generate_export_header(cxtestLogicManager)

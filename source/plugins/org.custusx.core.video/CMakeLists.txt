@@ -3,9 +3,9 @@ project(org_custusx_core_video)
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
 set(PLUGIN_SRCS
-  cxVideoPluginActivator.cpp
-  cxVideoImplService.cpp
-  cxVideoImplService.h
+    cxVideoPluginActivator.cpp
+    cxVideoImplService.cpp
+    cxVideoImplService.h
 
     cxBasicVideoSource.h
     cxBasicVideoSource.cpp
@@ -58,8 +58,9 @@ set(PLUGIN_target_libraries
     ${PLUGIN_target_libraries}   
     cxResource
     cxPluginUtilities
-    OpenIGTLink
+    #OpenIGTLink
     cxGrabber
+    cxOpenIGTLinkUtilities
     )
 
 set(PLUGIN_OUTPUT_DIR "")
@@ -81,21 +82,8 @@ ctkMacroBuildPlugin(
 
 target_include_directories(org_custusx_core_video
     PUBLIC
-#    ${CX_RESOURCE_INCLUDE_DIRECTORIES}
-#    ${CustusX_SOURCE_DIR}/source/logic
-#    ${CustusX_BINARY_DIR}/source/logic
-
-#    ${CX_RESOURCE_INCLUDE_DIRECTORIES}
-#    ${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
     .
     ${CMAKE_CURRENT_BINARY_DIR}
-#    ${CustusX_SOURCE_DIR}/source/resource/videoServer
-#    ${CustusX_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
-#    ${CMAKE_CURRENT_BINARY_DIR}
-#    ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
-#    ${CustusX_BINARY_DIR}/source/resource/usReconstructionTypes
-#    ${CustusX_BINARY_DIR}/source/resource/videoServer
-#    ${CustusX_BINARY_DIR}/source/resource/OpenIGTLinkUtilities
 )
 
 add_subdirectory(testing)

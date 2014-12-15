@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxRegisteredService.h"
 #include <iostream>
-#include "cxTypeConversions.h"
+//#include "cxTypeConversions.h"
 
 namespace cx
 {

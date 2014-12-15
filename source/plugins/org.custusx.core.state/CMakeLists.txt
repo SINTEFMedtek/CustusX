@@ -7,39 +7,32 @@ project(org_custusx_core_state)
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
-include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
-include_directories(
-    .
-    ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
-    ${CustusX_BINARY_DIR}/source/resource/pluginUtilities
-    )
-
 set(PLUGIN_SRCS
-	cxStateServiceImpl.cpp
-	cxWorkflowStateMachine.h
-	cxWorkflowStateMachine.cpp
-	cxWorkflowState.h
-	cxWorkflowState.cpp
-	cxApplicationStateMachine.cpp
-	cxApplicationStateMachine.h
-	cxApplicationState.h
-	cxApplicationState.cpp
-	cxRequestEnterStateTransition.h
-	cxStateServiceBackend.cpp
-	cxStateServiceBackend.h
-	cxStatePluginActivator.cpp
-	cxApplicationsParser.h
-	cxApplicationsParser.cpp
+    cxStateServiceImpl.cpp
+    cxWorkflowStateMachine.h
+    cxWorkflowStateMachine.cpp
+    cxWorkflowState.h
+    cxWorkflowState.cpp
+    cxApplicationStateMachine.cpp
+    cxApplicationStateMachine.h
+    cxApplicationState.h
+    cxApplicationState.cpp
+    cxRequestEnterStateTransition.h
+    cxStateServiceBackend.cpp
+    cxStateServiceBackend.h
+    cxStatePluginActivator.cpp
+    cxApplicationsParser.h
+    cxApplicationsParser.cpp
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
-	cxWorkflowStateMachine.h
-	cxWorkflowState.h
-	cxApplicationStateMachine.h
-	cxApplicationState.h
-	cxStateServiceImpl.h
-	cxStatePluginActivator.h
+    cxWorkflowStateMachine.h
+    cxWorkflowState.h
+    cxApplicationStateMachine.h
+    cxApplicationState.h
+    cxStateServiceImpl.h
+    cxStatePluginActivator.h
 )
 
 # Qt Designer files which should be processed by Qts uic
@@ -50,12 +43,13 @@ set(PLUGIN_UI_FORMS
 set(PLUGIN_resources
 )
 
-
 #Compute the plugin dependencies
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
-    ${PLUGIN_target_libraries}   
+    ${PLUGIN_target_libraries}
     cxPluginUtilities
+    Qt5::Widgets
+    cxResource
     )
 
 set(PLUGIN_OUTPUT_DIR "")
@@ -74,4 +68,8 @@ ctkMacroBuildPlugin(
   TARGET_LIBRARIES ${PLUGIN_target_libraries}
   OUTPUT_DIR ${PLUGIN_OUTPUT_DIR}
 )
-
+target_include_directories(org_custusx_core_state
+    PUBLIC
+    .
+    ${CMAKE_CURRENT_BINARY_DIR}
+)

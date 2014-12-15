@@ -56,11 +56,14 @@ set(PLUGIN_resources
 #Compute the plugin dependencies
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
-    ${PLUGIN_target_libraries}   
+    ${PLUGIN_target_libraries}
     cxGUIExtenderService
+    cxResource
     cxResourceWidgets
+    cxResourceVisualization
     cxPluginUtilities
     cxPluginAlgorithm
+    cxLogicManager
     )
 
 set(PLUGIN_OUTPUT_DIR "")
@@ -84,15 +87,6 @@ target_include_directories(org_custusx_usreconstruction
     PUBLIC
     .
     ${CMAKE_CURRENT_BINARY_DIR}
-    #${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
-    #${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
-    #${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
-    #${CustusX_SOURCE_DIR}/source/modules/GUIExtender
-    #${CustusX_SOURCE_DIR}/source/logic
-    #${CustusX_SOURCE_DIR}/source/modules/Algorithm/gui
-    #${CustusX_BINARY_DIR}/source/modules/Algorithm
-    #${CustusX_BINARY_DIR}/source/modules/GUIExtender
-    #${CustusX_BINARY_DIR}/source/logic
 )
 
 add_subdirectory(testing)

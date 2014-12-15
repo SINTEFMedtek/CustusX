@@ -65,33 +65,26 @@ set( SOURCE_FILES
 
 qt5_wrap_cpp( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
 
-set(CX_ALGORITHM_LIBRARIES cxResource cxGui cxGUIExtenderService cxResourceFilter)
-
-#cx_remove_duplicate_include_directories()
 cx_create_export_header("cxPluginAlgorithm")
 
 add_library( cxPluginAlgorithm ${SOURCE_FILES} ${MOC_HEADER_FILES})
-target_link_libraries( cxPluginAlgorithm ${CX_ALGORITHM_LIBRARIES})
 target_include_directories(cxPluginAlgorithm
     PUBLIC
-#    ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
-#    ${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
     .
     ./logic
     ./gui
     ${CMAKE_CURRENT_BINARY_DIR}
-#    ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
-#    ${CustusX_BINARY_DIR}/source/resource/widgets
-#    ${CustusX_SOURCE_DIR}/source/logic
-#    ${CustusX_BINARY_DIR}/source/logic
-
-#    ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
-#    ${CustusX_BINARY_DIR}/source/modules/GUIExtender
-#    ${CustusX_SOURCE_DIR}/source/gui/utilities
-#    ${CustusX_SOURCE_DIR}/source/gui/dataAdapters
-#    ${CustusX_SOURCE_DIR}/source/gui/dataWidgets
-#    ${CustusX_BINARY_DIR}/source/gui
-#    ${CustusX_SOURCE_DIR}/source/resource/filter
+)
+target_link_libraries(cxPluginAlgorithm
+    PRIVATE
+    cxResource
+    cxGui
+    cxGUIExtenderService
+    cxResourceFilter
+    cxResourceWidgets
+    cxResourceVisualization
+    cxLogicManager
+    cxPluginUtilities
 )
 
 add_subdirectory(testing)

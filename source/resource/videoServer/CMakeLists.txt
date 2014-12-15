@@ -13,7 +13,6 @@ endif(CX_WIN32)
 set(ALL_LINK_LIBRARIES
     ${BOOST_LIBRARIES}
     OpenIGTLink
-    cxResource
     cxOpenIGTLinkUtilities
     )
 
@@ -98,7 +97,7 @@ set(cxOpenIGTLinkServer_FILES
 )
 
 cx_create_export_header("cxGrabber")
-cx_remove_duplicate_include_directories()
+
 add_library( cxGrabber
     ${cxOpenIGTLinkServer_FILES} 
     ${MOC_HEADER_FILES} 
@@ -108,10 +107,12 @@ target_include_directories(cxGrabber
     .
     ${CMAKE_CURRENT_BINARY_DIR}
     ${Boost_INCLUDE_DIRS}
-#    ${CustusX_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
-#    ${CustusX_BINARY_DIR}/source/resource/OpenIGTLinkUtilities
 )
 target_link_libraries(cxGrabber
+    PUBLIC
+    cxResource
+
+    PRIVATE
     ${LINK_LIBRARIES}
     )
 

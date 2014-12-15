@@ -32,7 +32,7 @@ cx_install_windows_runtime_libs(${CX_INSTALL_ROOT_DIR}/bin)
 #--------------------------------------------------------------------------------
 set(CUSTUSX_EXECUTABLE "${CX_INSTALL_BINARY_DIR}/${CX_BUNDLE_NAME}")
 if(CX_WINDOWS)
-	set( CUSTUSX_EXECUTABLE "${CUSTUSX_EXECUTABLE}.exe")
+    set( CUSTUSX_EXECUTABLE "${CUSTUSX_EXECUTABLE}.exe")
 endif()
 
 set(CX_ALL_LIBRARY_DIRS CACHE INTERNAL "List of dirs to look for libraries to use in fixup_bundle")
@@ -51,18 +51,17 @@ set(CX_ALL_LIBRARY_DIRS
     ${VTK_DIR}/lib
     ${VTK_DIR}/bin
     ${CTK_DIR}/CTK-build/bin
-	${CTK_DIR}/DCMTK-build/lib # remove?
-	${CTK_DCMTK_DIR}/lib
-	${CTK_DCMTK_DIR}/bin
+    ${CTK_DIR}/DCMTK-build/lib # remove?
+    ${CTK_DCMTK_DIR}/lib
+    ${CTK_DCMTK_DIR}/bin
     ${ITK_DIR}/lib
     ${ITK_DIR}/bin
     ${Level-Set-Segmentation_LIBRARY_DIRS}
     ${Tube-Segmentation-Framework_LIBRARY_DIRS}
     ${OpenCLUtilityLibrary_LIBRARY_DIRS}
-
-	${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
-	${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/plugins
-	)
+    ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
+    ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/plugins
+)
 
 if(CX_WINDOWS)
     find_qt_bin_dir(QT_BIN_DIR)
@@ -90,14 +89,13 @@ endif(CX_WINDOWS)
 cx_install_all_stored_targets(${CX_INSTALL_BINARY_DIR})
 
 cx_fixup_and_add_qtplugins_to_bundle(
-	"${CUSTUSX_EXECUTABLE}"
-	"${CX_INSTALL_BINARY_DIR}"
-	"${CX_ALL_LIBRARY_DIRS}"
+    "${CUSTUSX_EXECUTABLE}"
+    "${CX_INSTALL_BINARY_DIR}"
+    "${CX_ALL_LIBRARY_DIRS}"
 )
-
 
 include(CPack)
 
-  #hiding packages created by ctk: we install the plugins ourselves
-  cpack_add_component(Development HIDDEN DISABLED)
-  cpack_add_component(RuntimePlugins HIDDEN DISABLED)
+#hiding packages created by ctk: we install the plugins ourselves
+cpack_add_component(Development HIDDEN DISABLED)
+cpack_add_component(RuntimePlugins HIDDEN DISABLED)

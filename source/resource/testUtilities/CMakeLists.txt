@@ -58,7 +58,7 @@ if(BUILD_TESTING)
         ${CMAKE_CURRENT_BINARY_DIR}
         ${CustusX_SOURCE_DIR}/source/resource/core/usReconstructionTypes
     )
-    target_link_libraries(cxtestUtilities PUBLIC Qt5::Test cxResource cxCatch)
+    target_link_libraries(cxtestUtilities PRIVATE Qt5::Test cxResource cxCatch)
     cx_add_tests_to_catch(cxtestUtilities)
 
 endif(BUILD_TESTING)

@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReconstructionMethodService.h"
 #include "vtkPointData.h"
 #include "vtkDataArray.h"
-#include"cxPatientModelService.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
