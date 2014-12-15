@@ -2,22 +2,6 @@ project(org_custusx_pnnreconstruction)
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
-include_directories(
-    ${CX_RESOURCE_INCLUDE_DIRECTORIES}
-    ${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
-#    ${CustusX_SOURCE_DIR}/source/modules/UsReconstruction/logic
-#    ${CustusX_SOURCE_DIR}/source/resource/usReconstructionTypes
-    ${CustusX_SOURCE_DIR}/source/ThirdParty
-#    ${CustusX_BINARY_DIR}/source/modules/UsReconstruction
-#    ${CustusX_BINARY_DIR}/source/resource/core
-#    ${CustusX_BINARY_DIR}/source/resource/usReconstructionTypes
-    ${CustusX_BINARY_DIR}/source/ThirdParty
-    ${CustusX_SOURCE_DIR}/source/logic
-
-    ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.usreconstruction
-    ${CustusX_BINARY_DIR}/source/plugins/org.custusx.usreconstruction
-    )
-
 set(PLUGIN_SRCS
   cxPNNReconstructionPluginActivator.cpp
   cxPNNReconstructionMethodService.cpp
@@ -41,10 +25,9 @@ set(PLUGIN_resources
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
     ${PLUGIN_target_libraries}   
-#    cxPluginUSReconstruction
     cxPluginUtilities
     org_custusx_usreconstruction
-    )
+)
 
 set(PLUGIN_OUTPUT_DIR "")
 if(CX_WINDOWS)
@@ -61,6 +44,12 @@ ctkMacroBuildPlugin(
   RESOURCES ${PLUGIN_resources}
   TARGET_LIBRARIES ${PLUGIN_target_libraries}
   OUTPUT_DIR ${PLUGIN_OUTPUT_DIR}
+)
+
+target_include_directories(org_custusx_pnnreconstruction
+    PUBLIC
+    .
+    ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 add_subdirectory(testing)

@@ -2,14 +2,6 @@ project(org_custusx_example)
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
-include_directories(
-    ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
-    ${CustusX_BINARY_DIR}/source/modules/GUIExtender
-    ${CustusX_SOURCE_DIR}/source/logic
-    ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
-    ${CustusX_BINARY_DIR}/source/resource/pluginUtilities
-        )
-
 set(PLUGIN_SRCS
   cxExamplePluginActivator.cpp
   cxExampleGUIExtenderService.cpp
@@ -58,6 +50,13 @@ ctkMacroBuildPlugin(
   TARGET_LIBRARIES ${PLUGIN_target_libraries}
   OUTPUT_DIR ${PLUGIN_OUTPUT_DIR}
 )
+
+target_include_directories(org_custusx_example
+    PUBLIC
+    .
+    ${CMAKE_CURRENT_BINARY_DIR}
+)
+
 
 add_subdirectory(testing)
 

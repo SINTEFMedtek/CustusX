@@ -20,4 +20,7 @@ target_include_directories(cxResourceFilter
     ${CMAKE_CURRENT_BINARY_DIR}
     ${PROJECT_SOURCE_DIR}/source/ThirdParty
 )
-target_link_libraries(cxResourceFilter PRIVATE cxResource )
+target_link_libraries(cxResourceFilter
+    PRIVATE
+    cxResource
+)

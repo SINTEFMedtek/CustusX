@@ -2,19 +2,6 @@ project(org_custusx_registration)
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
-include_directories(
-    ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
-    ${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
-    ${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
-    ${CustusX_SOURCE_DIR}/source/logic
-    ${CustusX_SOURCE_DIR}/source/modules/Algorithm
-
-    ${CustusX_BINARY_DIR}/source/logic
-
-    ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.acquisition
-    ${CustusX_BINARY_DIR}/source/plugins/org.custusx.acquisition
-    )
-
 set(PLUGIN_SRCS
   cxRegistrationPluginActivator.cpp
   cxRegistrationImplService.cpp
@@ -85,6 +72,12 @@ ctkMacroBuildPlugin(
   RESOURCES ${PLUGIN_resources}
   TARGET_LIBRARIES ${PLUGIN_target_libraries}
   OUTPUT_DIR ${PLUGIN_OUTPUT_DIR}
+)
+
+target_include_directories(org_custusx_registration
+    PUBLIC
+    .
+    ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 add_subdirectory(testing)

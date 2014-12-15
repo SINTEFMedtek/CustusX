@@ -4,8 +4,8 @@ set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
 set(PLUGIN_SRCS
     cxUsReconstructionPluginActivator.cpp
-	cxUsReconstructionGUIExtenderService.h
-	cxUsReconstructionGUIExtenderService.cpp
+    cxUsReconstructionGUIExtenderService.h
+    cxUsReconstructionGUIExtenderService.cpp
     cxUsReconstructionImplService.cpp
     cxUsReconstructionService.cpp
     cxUsReconstructionServiceNull.cpp

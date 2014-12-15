@@ -17,7 +17,6 @@ SET ( cxOpenIGTLinkUtilities_FILES
     )
 
 cx_create_export_header("cxOpenIGTLinkUtilities")
-cx_remove_duplicate_include_directories()
 add_library( cxOpenIGTLinkUtilities
     ${cxOpenIGTLinkUtilities_FILES}
     ${MOC_HEADER_FILES}

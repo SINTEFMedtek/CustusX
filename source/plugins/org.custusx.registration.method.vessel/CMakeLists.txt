@@ -2,34 +2,16 @@ project(org_custusx_registration_method_vessel)
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
-include_directories(
-    ${CX_RESOURCE_INCLUDE_DIRECTORIES}
-    ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
-    ${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
-    ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.registration
-    ${CustusX_SOURCE_DIR}/source/logic
-	${CustusX_SOURCE_DIR}/source/modules/Algorithm/logic
-	${CustusX_SOURCE_DIR}/source/modules/Algorithm/gui
-	${CustusX_SOURCE_DIR}/source/gui/dataAdapters
-	${CustusX_SOURCE_DIR}/source/gui/infoWidgets
-
-	${CustusX_BINARY_DIR}/source/plugins/org.custusx.registration
-	${CustusX_BINARY_DIR}/source/logic
-	${CustusX_BINARY_DIR}/source/modules/Algorithm
-	${CustusX_BINARY_DIR}/source/gui
-
-)
-
 set(PLUGIN_SRCS
     cxRegistrationMethodVesselPluginActivator.cpp
-	cxRegistrationMethodVesselService.h
-	cxRegistrationMethodVesselService.cpp
+    cxRegistrationMethodVesselService.h
+    cxRegistrationMethodVesselService.cpp
     cxPrepareVesselsWidget.cpp
     cxSeansVesselRegistrationWidget.cpp
     cxRegisterI2IWidget.cpp
     cxPrepareVesselsWidget.cpp
-	cxImage2ImageRegistrationWidget.h
-	cxImage2ImageRegistrationWidget.cpp
+    cxImage2ImageRegistrationWidget.h
+    cxImage2ImageRegistrationWidget.cpp
 )
 
 # Files which should be processed by Qts moc
@@ -48,17 +30,16 @@ set(PLUGIN_UI_FORMS
 set(PLUGIN_resources
 )
 
-
 #Compute the plugin dependencies
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
-    ${PLUGIN_target_libraries}   
+    ${PLUGIN_target_libraries}
+    cxResourceFilter
     cxResourceWidgets
-	cxPluginAlgorithm
-	cxResourceVisualization
-	org_custusx_registration
-#	cxGUIExtenderService
-    )
+    cxPluginAlgorithm
+    cxResourceVisualization
+    org_custusx_registration
+)
 
 set(PLUGIN_OUTPUT_DIR "")
 if(CX_WINDOWS)
@@ -75,5 +56,12 @@ ctkMacroBuildPlugin(
   RESOURCES ${PLUGIN_resources}
   TARGET_LIBRARIES ${PLUGIN_target_libraries}
   OUTPUT_DIR ${PLUGIN_OUTPUT_DIR}
+)
+
+
+target_include_directories(org_custusx_registration_method_vessel
+    PUBLIC
+    .
+    ${CMAKE_CURRENT_BINARY_DIR}
 )
 

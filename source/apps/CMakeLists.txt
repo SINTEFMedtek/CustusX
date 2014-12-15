@@ -1,4 +1,4 @@
-#add_subdirectory(tests)
+add_subdirectory(tests)
 add_subdirectory(MemoryTester)
 add_subdirectory(OpenIGTLinkServer)
 add_subdirectory(PositionFileReader)

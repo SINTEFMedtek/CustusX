@@ -204,43 +204,11 @@ cx_add_class(cxResource_SOURCE
 
 if(WIN32)
     set( CX_PRIVATE_RESOURCE_LIBRARIES ${CX_PRIVATE_RESOURCE_LIBRARIES} )
-# needed on apple
 elseif(APPLE)
     set( CX_PRIVATE_RESOURCE_LIBRARIES ${CX_PRIVATE_RESOURCE_LIBRARIES} crypto )
-# needed on linux
 else(WIN32)
     set( CX_PRIVATE_RESOURCE_LIBRARIES ${CX_PRIVATE_RESOURCE_LIBRARIES} GLU crypto ssl)
 endif(WIN32)
-
-set(CX_PRIVATE_RESOURCE_LIBRARIES
-    ${CX_PRIVATE_RESOURCE_LIBRARIES}
-    vtkCommonCore
-    vtkCommonDataModel
-    vtkCommonExecutionModel
-    vtkCommonMath
-    vtkCommonMisc
-    vtkCommonSystem
-    vtkCommonTransforms
-    vtkIOCore
-    vtkIOImage
-    vtkIOGeometry
-    vtkIOLegacy
-    vtkIOVideo
-    vtkImagingStatistics
-    vtkImagingColor
-    vtkImagingMath
-    vtkImagingGeneral
-    vtkImagingCore
-    vtkFiltersCore
-    vtkFiltersGeneral
-    vtkFiltersSources
-    vtkRenderingFreeTypeOpenGL
-    vtkRenderingFreeType
-    vtkRenderingOpenGL
-    vtkRenderingCore
-    vtkRenderingVolume
-    vtkInteractionStyle
-)
 
 
 # Configure the default SSC_DATA_ROOT for the location of SSCData.
@@ -251,7 +219,7 @@ set(SSC_DATA_ROOT ${CustusX_SOURCE_DIR}/data CACHE INTERNAL "path to ssc data ro
 configure_file(
   "${CustusX_SOURCE_DIR}/source/resource/core/utilities/sscConfig.h.in"
   "${CustusX_BINARY_DIR}/source/resource/core/utilities/sscConfig.h"
-  )
+)
 
 # extra definitions:
 add_subdirectory(settings)
@@ -263,6 +231,7 @@ set(CX_PUBLIC_RESOURCE_LIBRARIES
     Qt5::Multimedia
     Qt5::Sql
     Qt5::Concurrent
+    ${VTK_LIBRARIES}
 )
 set(CX_PRIVATE_RESOURCE_LIBRARIES
     ${CX_PRIVATE_RESOURCE_LIBRARIES}
@@ -273,7 +242,6 @@ set(CX_PRIVATE_RESOURCE_LIBRARIES
     CTKPluginFramework
     cxPluginUtilities
 )
-
 if(CX_USE_OPENCL_UTILITY)
     cx_add_class(cxResource_SOURCE
         utilities/cxOpenCLPrinter

@@ -15,10 +15,8 @@ SET( MOC_HEADER_FILES
 #    gui/cxRegistrationMethodsWidget.h
     )
 
-cx_remove_duplicate_include_directories()
-QT5_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
+qt5_wrap_cpp( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
 
-# library
 SET( SOURCE_FILES
     ${MOC_HEADER_FILES}
 #    gui/cxRegistrationMethodsWidget.h
@@ -66,7 +64,6 @@ include_directories(
 
 
 # =========================================================
-cx_remove_duplicate_include_directories()
 cx_create_export_header("cxPluginRegistration")
 
 # create the target

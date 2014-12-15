@@ -5,7 +5,7 @@
 # - ulterius lib is only available on windows as 32 bit
 if(CX_WIN32)
     include_directories( ${ULTERIUS_INCLUDE_DIR} )
-    SET(WIN32_LINK_LIBRARIES
+    set(WIN32_LINK_LIBRARIES
          ${ULTERIUS_LIBRARY}
     )
 endif(CX_WIN32)
@@ -13,8 +13,7 @@ endif(CX_WIN32)
 set(ALL_LINK_LIBRARIES
     ${BOOST_LIBRARIES}
     OpenIGTLink
-    cxOpenIGTLinkUtilities
-    )
+)
 
 cx_initialize_opencv()
 
@@ -51,7 +50,6 @@ set(CX_QT_MOC_HEADER_FILES
     cxtestSender.h
 )
 
-cx_remove_duplicate_include_directories()
 if(CX_WINDOWS)
     qt5_wrap_cpp(MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} OPTIONS "-D_WINDOWS")
 else()
@@ -106,11 +104,11 @@ target_include_directories(cxGrabber
     PUBLIC
     .
     ${CMAKE_CURRENT_BINARY_DIR}
-    ${Boost_INCLUDE_DIRS}
 )
 target_link_libraries(cxGrabber
     PUBLIC
     cxResource
+    cxOpenIGTLinkUtilities
 
     PRIVATE
     ${LINK_LIBRARIES}

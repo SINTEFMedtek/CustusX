@@ -21,7 +21,6 @@ set(cxLogicManager_SOURCE
     cxPluginFrameworkUtilities.cpp
 )
 
-cx_remove_duplicate_include_directories()
 qt5_wrap_cpp( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
 cx_create_export_header("cxLogicManager")

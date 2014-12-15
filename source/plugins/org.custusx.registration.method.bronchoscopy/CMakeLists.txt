@@ -2,27 +2,6 @@ project(org_custusx_registration_method_bronchoscopy)
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
-include_directories(
-    ${CX_RESOURCE_INCLUDE_DIRECTORIES}
-    ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
-    ${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
-    ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.registration
-#    ${CustusX_SOURCE_DIR}/source/modules/Acquisition
-#    ${CustusX_SOURCE_DIR}/source/modules/Acquisition/gui
-#    ${CustusX_SOURCE_DIR}/source/modules/Acquisition/logic
-	${CustusX_SOURCE_DIR}/source/gui/dataWidgets
-    ${CustusX_SOURCE_DIR}/source/gui/dataAdapters
-	${CustusX_SOURCE_DIR}/source/logic
-    ${CustusX_BINARY_DIR}/source/plugins/org.custusx.registration
-#    ${CustusX_BINARY_DIR}/source/modules/Acquisition
-    ${CustusX_BINARY_DIR}/source/gui
-    ${CustusX_BINARY_DIR}/source/logic
-    ${CustusX_BINARY_DIR}/source/resource/visualization
-
-    ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.acquisition
-    ${CustusX_BINARY_DIR}/source/plugins/org.custusx.acquisition
-)
-
 set(PLUGIN_SRCS
   cxRegistrationMethodBronchoscopyPluginActivator.cpp
   cxRegistrationMethodBronchoscopyService.h
@@ -56,12 +35,11 @@ ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
     ${PLUGIN_target_libraries}   
     cxResourceWidgets
-	cxPluginAlgorithm
-#	cxPluginAcquisition
-	cxResourceVisualization
-	org_custusx_registration
-	org_custusx_acquisition
-    )
+    cxPluginAlgorithm
+    cxResourceVisualization
+    org_custusx_registration
+    org_custusx_acquisition
+)
 
 set(PLUGIN_OUTPUT_DIR "")
 if(CX_WINDOWS)
@@ -78,5 +56,11 @@ ctkMacroBuildPlugin(
   RESOURCES ${PLUGIN_resources}
   TARGET_LIBRARIES ${PLUGIN_target_libraries}
   OUTPUT_DIR ${PLUGIN_OUTPUT_DIR}
+)
+
+target_include_directories(org_custusx_registration_method_bronchoscopy
+    PUBLIC
+    .
+    ${CMAKE_CURRENT_BINARY_DIR}
 )
 

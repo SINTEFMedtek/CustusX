@@ -333,10 +333,9 @@ function(cx_add_class_qt_moc SOURCE_FILES_ARGUMENT)
     endforeach()
 
     # optimized: QT5_WRAP_CPP has large overhead: call once.
-    cx_remove_duplicate_include_directories()
-    QT5_WRAP_CPP( RESULT_add_class_qt_moc ${HEADER_NAMES} )
+    qt5_wrap_cpp( RESULT_add_class_qt_moc ${HEADER_NAMES} )
 
-set(${SOURCE_FILES_ARGUMENT} ${${SOURCE_FILES_ARGUMENT}} ${RESULT_add_class_qt_moc} PARENT_SCOPE)
+    set(${SOURCE_FILES_ARGUMENT} ${${SOURCE_FILES_ARGUMENT}} ${RESULT_add_class_qt_moc} PARENT_SCOPE)
 endfunction()
 
 ###############################################################################
@@ -346,17 +345,17 @@ endfunction()
 ###############################################################################
 macro(cx_opengl_version)
 
-    IF (OPENGL_FOUND AND NOT DEFINED CX_WINDOWS AND NOT DEFINED CX_APPLE)
-      execute_process(COMMAND glxinfo COMMAND grep "OpenGL version" OUTPUT_VARIABLE _OPENGL_VERSION_STRING)
-    
-      STRING (REGEX REPLACE "[^:]*:()" "\\1" OPENGL_VERSION "${_OPENGL_VERSION_STRING}")
-        
-      IF ("${OPENGL_VERSION}" STREQUAL "")
-        MESSAGE (WARNING "Cannot determine OpenGL's version")
-      ENDIF ("${OPENGL_VERSION}" STREQUAL "")
-    ELSE (OPENGL_FOUND AND NOT DEFINED CX_WINDOWS AND NOT DEFINED CX_APPLE)
-        SET(OPENGL_VERSION "<cannot_find_on_windows/mac>")
-    ENDIF (OPENGL_FOUND AND NOT DEFINED CX_WINDOWS AND NOT DEFINED CX_APPLE)
+    if(OPENGL_FOUND AND NOT DEFINED CX_WINDOWS AND NOT DEFINED CX_APPLE)
+        execute_process(COMMAND glxinfo COMMAND grep "OpenGL version" OUTPUT_VARIABLE _OPENGL_VERSION_STRING)
+
+        string(REGEX REPLACE "[^:]*:()" "\\1" OPENGL_VERSION "${_OPENGL_VERSION_STRING}")
+
+        if("${OPENGL_VERSION}" STREQUAL "")
+            message(WARNING "Cannot determine OpenGL's version")
+        endif("${OPENGL_VERSION}" STREQUAL "")
+    else(OPENGL_FOUND AND NOT DEFINED CX_WINDOWS AND NOT DEFINED CX_APPLE)
+        set(OPENGL_VERSION "<cannot_find_on_windows/mac>")
+    endif(OPENGL_FOUND AND NOT DEFINED CX_WINDOWS AND NOT DEFINED CX_APPLE)
     
 endmacro(cx_opengl_version)
 
@@ -365,10 +364,10 @@ endmacro(cx_opengl_version)
 # Get a list of all variables with _prefix, return in _varResult
 #
 ###############################################################################
-function (getListOfVarsStartingWith _prefix _varResult)
-	get_cmake_property(_vars VARIABLES)
-	string (REGEX MATCHALL "(^|;)${_prefix}[A-Za-z0-9/_\\.:]*" _matchedVars "${_vars}")
-	set (${_varResult} ${_matchedVars} PARENT_SCOPE)
+function(getListOfVarsStartingWith _prefix _varResult)
+    get_cmake_property(_vars VARIABLES)
+    string (REGEX MATCHALL "(^|;)${_prefix}[A-Za-z0-9/_\\.:]*" _matchedVars "${_vars}")
+    set (${_varResult} ${_matchedVars} PARENT_SCOPE)
 endfunction()
 
 
@@ -411,7 +410,7 @@ function(find_qt_bin_dir _varResult)
     find_package(Qt5Core REQUIRED)
     get_target_property(QtCore_location Qt5::Core LOCATION)
     get_filename_component(_QT_BIN_DIR ${QtCore_location} DIRECTORY)
-    set (${_varResult} ${_QT_BIN_DIR} PARENT_SCOPE)
+    set(${_varResult} ${_QT_BIN_DIR} PARENT_SCOPE)
 endfunction()
 
 
@@ -421,17 +420,17 @@ endfunction()
 # Return as list of paths relative to curdir. 
 #
 ###############################################################################
-MACRO(SUBDIRLIST result curdir)
-  FILE(GLOB children RELATIVE ${curdir} ${curdir}/*)
+macro(SUBDIRLIST result curdir)
+  file(GLOB children RELATIVE ${curdir} ${curdir}/*)
   #message(STATUS "children: " ${children})
-  SET(dirlist "")
-  FOREACH(child ${children})
-    IF(IS_DIRECTORY ${curdir}/${child})
-        LIST(APPEND dirlist ${child})
-    ENDIF()
-  ENDFOREACH()
-  SET(${result} ${dirlist})
-ENDMACRO()
+  set(dirlist "")
+  foreach(child ${children})
+    if(IS_DIRECTORY ${curdir}/${child})
+        list(APPEND dirlist ${child})
+    endif()
+  endforeach()
+  set(${result} ${dirlist})
+endmacro()
 
 
 ###############################################################################
@@ -465,9 +464,6 @@ macro(cx_create_export_header MY_LIBRARY_NAME)
         ${CTK_SOURCE_DIR}/Libs/ctkExport.h.in
         ${CMAKE_CURRENT_BINARY_DIR}/${MY_LIBRARY_NAME}Export.h
     )
-    include_directories(
-        ${CMAKE_CURRENT_BINARY_DIR}
-    )
 endmacro()
 
 ###############################################################################
@@ -480,11 +476,11 @@ endmacro()
 # directories are removed and thus not added to moc_<filename>.cpp_parameters (the -IC: tags)
 #
 ###############################################################################
-macro(cx_remove_duplicate_include_directories)
-    get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
-    list(REMOVE_DUPLICATES dirs)
-    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES ${dirs})
-endmacro()
+#macro(cx_remove_duplicate_include_directories)
+#    get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
+#    list(REMOVE_DUPLICATES dirs)
+#    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES ${dirs})
+#endmacro()
 
 
 ###############################################################################
@@ -492,20 +488,20 @@ endmacro()
 # http://stackoverflow.com/questions/148570/using-pre-compiled-headers-with-cmake
 #
 ###############################################################################
-MACRO(ADD_MSVC_PRECOMPILED_HEADER PrecompiledHeader PrecompiledSource SourcesVar)
-  IF(MSVC)
-    MESSAGE(STATUS "Generating precompiled headers.")
-    GET_FILENAME_COMPONENT(PrecompiledBasename ${PrecompiledHeader} NAME_WE)
-    SET(PrecompiledBinary "${CMAKE_CURRENT_BINARY_DIR}/${PrecompiledBasename}.pch")
-    SET(Sources ${${SourcesVar}})
+macro(ADD_MSVC_PRECOMPILED_HEADER PrecompiledHeader PrecompiledSource SourcesVar)
+  if(MSVC)
+    message(STATUS "Generating precompiled headers.")
+    get_filename_component(PrecompiledBasename ${PrecompiledHeader} NAME_WE)
+    set(PrecompiledBinary "${CMAKE_CURRENT_BINARY_DIR}/${PrecompiledBasename}.pch")
+    set(Sources ${${SourcesVar}})
 
-    SET_SOURCE_FILES_PROPERTIES(${PrecompiledSource}
+    set_source_files_properties(${PrecompiledSource}
                                 PROPERTIES COMPILE_FLAGS "/Yc\"${PrecompiledHeader}\" /Fp\"${PrecompiledBinary}\""
                                            OBJECT_OUTPUTS "${PrecompiledBinary}")
-    SET_SOURCE_FILES_PROPERTIES(${Sources}
+    set_source_files_properties(${Sources}
                                 PROPERTIES COMPILE_FLAGS "/Yu\"${PrecompiledHeader}\" /FI\"${PrecompiledHeader}\" /Fp\"${PrecompiledBinary}\""
                                            OBJECT_DEPENDS "${PrecompiledBinary}")
     # Add precompiled header to SourcesVar
-    LIST(APPEND ${SourcesVar} ${PrecompiledSource})
-  ENDIF(MSVC)
-ENDMACRO(ADD_MSVC_PRECOMPILED_HEADER)
+    list(APPEND ${SourcesVar} ${PrecompiledSource})
+  endif(MSVC)
+endmacro(ADD_MSVC_PRECOMPILED_HEADER)

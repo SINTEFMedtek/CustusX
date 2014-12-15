@@ -108,12 +108,6 @@ cx_create_export_header("cxResourceVisualization")
 qt5_wrap_cpp( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
 set(CX_RESOURCE_VISUALIZATION_LIBRARIES
-    vtkRenderingVolumeOpenGL
-    vtkGUISupportQt
-    vtkRenderingAnnotation
-    vtkFiltersModeling
-    vtkInteractionWidgets
-    vtkFiltersTexture
     cxResource
     cxPluginUtilities
     ${SSC_GCOV_LIBRARY}

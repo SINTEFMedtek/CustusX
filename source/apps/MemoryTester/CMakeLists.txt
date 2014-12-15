@@ -23,32 +23,6 @@ add_executable(cxMemoryTester MACOSX_BUNDLE
 target_link_libraries(cxMemoryTester
     PRIVATE
     cxResource
-    vtkCommonCore
-    vtkCommonDataModel
-    vtkCommonExecutionModel
-    vtkCommonMath
-    vtkCommonMisc
-    vtkCommonSystem
-    vtkCommonTransforms
-    vtkIOCore
-    vtkIOImage
-    vtkIOGeometry
-    vtkIOLegacy
-    vtkIOVideo
-    vtkImagingStatistics
-    vtkImagingColor
-    vtkImagingMath
-    vtkImagingGeneral
-    vtkImagingCore
-    vtkFiltersCore
-    vtkFiltersGeneral
-    vtkFiltersSources
-    vtkRenderingFreeTypeOpenGL
-    vtkRenderingFreeType
-    vtkRenderingOpenGL
-    vtkRenderingCore
-    vtkRenderingVolume
-    vtkInteractionStyle
 )
 
 
