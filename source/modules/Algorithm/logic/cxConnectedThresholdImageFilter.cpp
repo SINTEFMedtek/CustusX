@@ -33,13 +33,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxConnectedThresholdImageFilter.h"
 
 #include "itkConnectedThresholdImageFilter.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxTypeConversions.h"
 #include "cxAlgorithmHelpers.h"
 #include "cxRegistrationTransform.h"
 #include "cxImage.h"
 #include "cxPatientModelService.h"
-
+#include "cxVolumeHelpers.h"
 
 namespace cx
 {
@@ -87,9 +87,9 @@ void ConnectedThresholdImageFilter::postProcessingSlot()
 	QString name = mInput->getName()+" seg%1";
 
 	//create a Image
-	mOutput = patientService()->createSpecificData<Image>(uid, name);
-	mOutput->intitializeFromParentImage(mInput);
-	mOutput->setVtkImageData(rawResult);
+	ImagePtr result = createDerivedImage(patientService(),
+										 uid, name,
+										 rawResult, mInput);
 	mOutput->resetTransferFunctions();
 
 	patientService()->insertData(mOutput);

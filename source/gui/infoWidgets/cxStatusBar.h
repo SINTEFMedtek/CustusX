@@ -37,10 +37,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QStatusBar>
 #include <map>
-#include "cxReporter.h"
+
 #include "cxForwardDeclarations.h"
 #include "cxLegacySingletons.h"
-
+#include "cxReporter.h"
 
 class QLabel;
 class QPixmap;

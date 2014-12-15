@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataLocations.h"
 #include <QFileInfo>
 #include "cxTypeConversions.h"
+#include "cxLogger.h"
 #include "cxReporter.h"
 
 namespace cx

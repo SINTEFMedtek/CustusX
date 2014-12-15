@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxOrientationAnnotationRep.h"
 #include "cxOrientationAnnotation2DRep.h"
 #include "cxDisplayTextRep.h"
-#include "cxReporter.h"
+
 #include "cxManualTool.h"
 #include "cxViewManager.h"
 #include "cxTrackingService.h"
@@ -76,7 +76,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMesh.h"
 #include "cxImage.h"
 #include "cxPointMetricRep2D.h"
-#include "cxLogger.h"
+
 #include "cxViewFollower.h"
 #include "cxCoreServices.h"
 #include "cx2DZoomHandler.h"

@@ -44,7 +44,7 @@ SpaceEditWidget::SpaceEditWidget(QWidget* parent, SpaceDataAdapterPtr dataInterf
 	QGridLayout* gridLayout, int row) :
 	BaseWidget(parent, "SpaceEditWidget", "SpaceEditWidget")
 {
-	SSC_ASSERT(dataInterface->getAllowOnlyValuesInRange()==true);
+	CX_ASSERT(dataInterface->getAllowOnlyValuesInRange()==true);
 
 	this->setEnabled(dataInterface->getEnabled());
 

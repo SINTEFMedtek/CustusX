@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "cxApplication.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include <QThread>
 
 namespace cx

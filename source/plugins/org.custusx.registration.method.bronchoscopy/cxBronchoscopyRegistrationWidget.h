@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-
+class WidgetObscuredListener;
 typedef boost::shared_ptr<class Acquisition> AcquisitionPtr;
 typedef boost::shared_ptr<class SelectMeshStringDataAdapter> SelectMeshStringDataAdapterPtr;
 typedef boost::shared_ptr<class ToolRep3D> ToolRep3DPtr;
@@ -80,10 +80,8 @@ private slots:
 	void acquisitionStopped();
     void obscuredSlot(bool obscured);
 
-	void duringSavePatientSlot();
-	void duringLoadPatientSlot();
 	void acquisitionCancelled();
-	void duringClearPatientSlot();
+	void recordedSessionsChanged();
 private:
 	RegServices mServices;
 	QVBoxLayout* mVerticalLayout;
@@ -94,7 +92,7 @@ private:
 	XmlOptionFile mOptions;
 	MeshPtr mMesh;
 
-	AcquisitionPtr mAcquisition;
+//	AcquisitionPtr mAcquisition;
 	RecordSessionWidgetPtr mRecordSessionWidget;
 	SelectMeshStringDataAdapterPtr mSelectMeshWidget;
 	StringDataAdapterXmlPtr mSessionSelector;
@@ -104,10 +102,12 @@ private:
 	SelectToolStringDataAdapterPtr mSelectToolWidget;
 //    TrackedCenterlineWidget* mTrackedCenterLine;
 
+	boost::shared_ptr<WidgetObscuredListener> mObscuredListener;
+
     ToolRep3DPtr getToolRepIn3DView(ToolPtr tool);
 
-	void initSessionSelector(AcquisitionDataPtr acquisitionData);
-	QStringList getSessionList(AcquisitionDataPtr acquisitionData);
+	void initSessionSelector();
+	QStringList getSessionList();
 	void initializeTrackingService();
 
 	void createMaxNumberOfGenerations(QDomElement root);

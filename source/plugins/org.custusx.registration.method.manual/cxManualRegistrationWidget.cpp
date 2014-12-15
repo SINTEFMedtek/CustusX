@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/bind.hpp>
 #include <ctkPluginContext.h>
 #include "cxLabeledComboBoxWidget.h"
-#include "cxReporter.h"
+
 #include "cxRegistrationService.h"
 #include "cxData.h"
 #include "cxTransform3DWidget.h"

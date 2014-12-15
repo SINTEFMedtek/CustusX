@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include <iostream>
 #include "cxEnumConverter.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 
 namespace cx
 {

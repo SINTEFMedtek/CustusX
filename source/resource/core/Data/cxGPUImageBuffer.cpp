@@ -35,6 +35,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QString>
 
+#include <vector>
+#include <vtkImageData.h>
+#include <vtkPointData.h>
+#include <vtkUnsignedCharArray.h>
+#include <vtkUnsignedShortArray.h>
+#include <boost/cstdint.hpp>
+#include "cxGLHelpers.h"
+#include "cxLogger.h"
+
+
 #ifndef WIN32
 #define GL_GLEXT_PROTOTYPES
 #include <vtkgl.h>
@@ -50,15 +60,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <GL/glext.h>
 #endif
 
-#include <vector>
-#include <vtkImageData.h>
-#include <vtkPointData.h>
-#include <vtkUnsignedCharArray.h>
-#include <vtkUnsignedShortArray.h>
-#include <boost/cstdint.hpp>
-#include "cxGLHelpers.h"
-
-#include "cxLogger.h"
 
 namespace cx
 {
@@ -172,8 +173,7 @@ public:
 			internalType = 0;
 			std::cout << "Bit size not supported!" << std::endl;
 			QString dataType(mTexture->GetScalarTypeAsString());
-			QString errorString = QString("Attempt to update 3D GL texture from type %1 failed. Only unsigned types supported").arg(dataType);
-			SSC_ERROR("%s", errorString.toStdString().data());
+			CX_LOG_ERROR() << QString("Attempt to update 3D GL texture from type %1 failed. Only unsigned types supported").arg(dataType);
 			break;
 		}
 

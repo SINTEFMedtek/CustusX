@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include "cxTime.h"
 #include "cxTypeConversions.h"
-#include "cxReporter.h"
+
 #include "cxVector3D.h"
 
 namespace cx

@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImageTF3D.h"
 #include "cxImageLUT2D.h"
 #include "cxRegistrationTransform.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxEnumConverter.h"
 #include "cxTime.h"
 #include "cxCoordinateSystemHelpers.h"
@@ -163,6 +163,18 @@ void fillShortImageDataWithGradient(vtkImageDataPtr data, int maxValue)
 	setDeepModified(data);
 }
 
+/** Create a new image containing volume data from raw, but inheriting all
+ *  properties from parent.
+ *
+ */
+ImagePtr createDerivedImage(PatientModelServicePtr dataManager, QString uid, QString name, vtkImageDataPtr raw, ImagePtr parent)
+{
+	ImagePtr retval = dataManager->createSpecificData<Image>(uid, name);
+	retval->setVtkImageData(raw);
+	retval->intitializeFromParentImage(parent);
+	return retval;
+}
+
 /**Convert the input image to the smallest unsigned format.
  *
  * CT images are always shifted +1024 and converted.
@@ -220,15 +232,16 @@ ImagePtr convertImageToUnsigned(PatientModelServicePtr  dataManager, ImagePtr im
 		convertedImageData = cast->GetOutput();
 	}
 
-//	ImagePtr retval = dataManager->createDerivedImage(convertedImageData, image->getUid()+"_u", image->getName()+" u", image, "");
-	ImagePtr retval = dataManager->createSpecificData<Image>(image->getUid()+"_u", image->getName()+" u");
-	retval->intitializeFromParentImage(image);
-	retval->setVtkImageData(convertedImageData);
+	ImagePtr retval = createDerivedImage(dataManager,
+										 image->getUid()+"_u", image->getName()+" u",
+										 convertedImageData, image);
 
 	ImageTF3DPtr TF3D = retval->getTransferFunctions3D()->createCopy();
 	ImageLUT2DPtr LUT2D = retval->getLookupTable2D()->createCopy();
+
 	TF3D->shift(shift);
 	LUT2D->shift(shift);
+
 	retval->setLookupTable2D(LUT2D);
 	retval->setTransferFunctions3D(TF3D);
 

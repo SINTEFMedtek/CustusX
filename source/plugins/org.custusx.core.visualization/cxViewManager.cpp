@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "boost/bind.hpp"
 
 #include "cxVolumetricRep.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxXmlOptionItem.h"
 #include "cxTrackingService.h"
 #include "cxSlicePlanes3DRep.h"
@@ -70,7 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewCollectionWidget.h"
 #include "cxRenderLoop.h"
 #include "cxLayoutRepository.h"
-#include "cxLogger.h"
+
 #include "cxCoreServices.h"
 #include "cxXMLNodeWrapper.h"
 #include "cxCameraControl.h"
@@ -98,7 +98,6 @@ ViewManager::ViewManager(/*PatientModelServicePtr patientModelService, */CoreSer
 
 	mSlicePlanesProxy.reset(new SlicePlanesProxy());
 	mLayoutRepository.reset(new LayoutRepository());
-	connect(mLayoutRepository.get(), &LayoutRepository::layoutChanged, this, &ViewManager::onLayoutRepositoryChanged);
 	mCameraControl.reset(new CameraControl());
 
 	mRenderLoop->setLogging(settings()->value("renderSpeedLogging").toBool());
@@ -127,7 +126,9 @@ ViewManager::ViewManager(/*PatientModelServicePtr patientModelService, */CoreSer
 	connect(this, SIGNAL(activeViewChanged()), this, SLOT(updateCameraStyleActions()));
 
     this->loadGlobalSettings();
-    this->initializeGlobal2DZoom();
+	// connect to layoutrepo after load of global
+	connect(mLayoutRepository.get(), &LayoutRepository::layoutChanged, this, &ViewManager::onLayoutRepositoryChanged);
+	this->initializeGlobal2DZoom();
     this->initializeActiveView();
     this->syncOrientationMode(SyncedValue::create(0));
 
@@ -182,9 +183,9 @@ NavigationPtr ViewManager::getNavigation()
 	return NavigationPtr(new Navigation(mBackend, mCameraControl));
 }
 
-QWidget *ViewManager::getLayoutWidget(int index)
+QWidget *ViewManager::getLayoutWidget(QWidget* parent, int index)
 {
-	SSC_ASSERT(index < mLayoutWidgets.size());
+	CX_ASSERT(index < mLayoutWidgets.size());
 	if (!mLayoutWidgets[index])
 	{
         bool optimizedViews = settings()->value("optimizedViews").toBool();
@@ -274,7 +275,7 @@ InteractiveCropperPtr ViewManager::getCropper()
 
 QString ViewManager::getActiveLayout(int widgetIndex) const
 {
-	SSC_ASSERT(mActiveLayout.size() > widgetIndex);
+	CX_ASSERT(mActiveLayout.size() > widgetIndex);
 	return mActiveLayout[widgetIndex];
 }
 
@@ -433,7 +434,7 @@ ViewGroupDataPtr ViewManager::getViewGroup(int groupIdx) const
  */
 void ViewManager::setActiveLayout(const QString& layout, int widgetIndex)
 {
-	SSC_ASSERT(mActiveLayout.size() > widgetIndex);
+	CX_ASSERT(mActiveLayout.size() > widgetIndex);
 
 	if (mActiveLayout[widgetIndex] == layout)
 		return;
@@ -564,7 +565,6 @@ void ViewManager::onLayoutRepositoryChanged(QString uid)
 	{
 		mActiveLayout[0] = ""; // hack: force trigger a change
 		this->setActiveLayout(uid, 0);
-//		emit activeLayoutChanged();
 	}
 }
 
@@ -599,7 +599,9 @@ void ViewManager::updateCameraStyleActions()
 	{
 		ViewGroupPtr group = this->getViewGroups()[index];
 		mCameraStyleInteractor->connectCameraStyle(group->getCameraStyle());
+		mCameraControl->setView(this->get3DView(index, 0));
 	}
+
 }
 
 /**Look for the index'th 3DView in given group.

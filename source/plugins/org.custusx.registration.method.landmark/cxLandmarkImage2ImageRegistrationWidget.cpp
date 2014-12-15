@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QCheckBox>
 #include <vtkDoubleArray.h>
 #include <vtkImageData.h>
-#include "cxReporter.h"
+
 #include "cxLabeledComboBoxWidget.h"
 #include "cxSettings.h"
 #include "cxLandmarkRep.h"

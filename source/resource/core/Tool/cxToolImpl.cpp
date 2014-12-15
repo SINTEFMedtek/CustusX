@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxToolImpl.h"
+#include "cxTypeConversions.h"
 
 namespace cx
 {

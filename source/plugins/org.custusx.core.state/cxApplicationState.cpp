@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QAction>
 #include "cxTypeConversions.h"
 #include "cxRequestEnterStateTransition.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxStateService.h"
 #include "cxTrackingService.h"
 #include "cxWorkflowStateMachine.h"

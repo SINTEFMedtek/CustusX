@@ -60,34 +60,16 @@ DataPtr PatientModelService::getData(const QString& uid) const
 	return iter->second;
 }
 
-
 Transform3D PatientModelService::get_rMpr() const
 {
 	return this->get_rMpr_History()->getCurrentRegistration().mValue;
 }
-
 
 void PatientModelService::updateRegistration_rMpr(const QDateTime& oldTime, const RegistrationTransform& newTransform)
 {
 	this->get_rMpr_History()->updateRegistration(oldTime, newTransform);
 	this->autoSave();
 }
-
-
-
-
-
-
-
-//ImagePtr PatientModelService::getImage(const QString& uid) const
-//{
-//	return boost::dynamic_pointer_cast<Image>(this->getData(uid));
-//}
-
-//cx::MeshPtr cx::PatientModelService::getMesh(const QString &uid) const
-//{
-//	return boost::dynamic_pointer_cast<Mesh>(this->getData(uid));
-//}
 
 VideoSourcePtr PatientModelService::getStream(const QString& uid) const
 {
@@ -96,21 +78,6 @@ VideoSourcePtr PatientModelService::getStream(const QString& uid) const
 		return streams.find(uid)->second;
 	return VideoSourcePtr();
 }
-
-//void PatientModelService::saveData(DataPtr data)
-//{
-//	this->saveData(data, this->getActivePatientFolder());
-//}
-
-//void PatientModelService::saveImage(ImagePtr image)
-//{
-//	this->saveImage(image, this->getActivePatientFolder());
-//}
-
-//void PatientModelService::saveMesh(MeshPtr mesh)
-//{
-//	this->saveMesh(mesh, this->getActivePatientFolder());
-//}
 
 QString PatientModelService::generateFilePath(QString folderName, QString ending)
 {

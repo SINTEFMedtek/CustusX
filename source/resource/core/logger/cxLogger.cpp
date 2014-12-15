@@ -30,62 +30,66 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxReporter.h"
+
 #include <QFileInfo>
+
 #include "cxLogger.h"
+#include "cxReporter.h"
 
-#define MAX_LEN_LOG_LINE 500
-
-
-namespace // unnamed
+namespace cx
 {
-	QString mergeSourceInfo(const char *file, int line, const char *function)
+
+class MessageLoggerInternalData
+{
+public:
+	std::stringstream stream;
+	Message msg;
+};
+
+MessageLogger::MessageLogger(const char *file, int line, const char *function, const QString& channel, MESSAGE_LEVEL severity)
+{
+	Message msg;
+	msg.mChannel = channel;
+	msg.mMessageLevel = severity;
+	msg.mTimeStamp = QDateTime::currentDateTime();
+	msg.mTimeoutTime = 3000;
+	msg.mSourceFile = file;
+	msg.mSourceLine = line;
+	msg.mSourceFunction = function;
+
+	mInternalData.reset(new MessageLoggerInternalData);
+	mInternalData->msg = msg;
+}
+MessageLogger::~MessageLogger()
+{
+	if (mInternalData.use_count()==1)
 	{
-		QString filename = QFileInfo(file).fileName();
-		return QString("%1:%2/%3").arg(filename).arg(line).arg(function);
+		mInternalData->msg.mText = QString::fromStdString(mInternalData->stream.str());
+		reporter()->sendMessage(mInternalData->msg);
 	}
 }
 
-
-void SSC_Log( const char *file, int line, const char *function, const char *format, ... )
+MessageLogger MessageLogger::logger() const
 {
-//	if (!cx::reporter()->isEnabled())
-//		return;
-
-	va_list ap;
-	char buf[MAX_LEN_LOG_LINE];
-	va_start( ap, format );
-	vsnprintf(buf, MAX_LEN_LOG_LINE, format, ap);
-	va_end(ap);
-
-	cx::reporter()->sendMessage(buf, cx::mlINFO, 0, false, mergeSourceInfo(file, line, function));
+	return MessageLogger(*this);
 }
 
-void SSC_Error( const char *file, int line, const char *function, const char *format, ... )
+MessageLogger MessageLogger::logger(QString text) const
 {
-//	if (!cx::reporter()->isEnabled())
-//		return;
-
-	va_list ap;
-	char buf[MAX_LEN_LOG_LINE];
-	va_start( ap, format );
-	vsnprintf(buf, MAX_LEN_LOG_LINE, format, ap);
-	va_end( ap );
-
-	cx::reporter()->sendMessage(buf, cx::mlERROR, 0, false, mergeSourceInfo(file, line, function));
+	return MessageLogger(*this) << text;
 }
 
-void SSC_Warning( const char *file, int line, const char *function, const char *format, ... )
+std::stringstream& MessageLogger::getStream()
 {
-//	if (!cx::reporter()->isEnabled())
-//		return;
-
-	va_list ap;
-	char buf[MAX_LEN_LOG_LINE];
-	va_start( ap, format );
-	vsnprintf(buf, MAX_LEN_LOG_LINE, format, ap);
-	va_end( ap );
-
-	cx::reporter()->sendMessage(buf, cx::mlWARNING, 0, false, mergeSourceInfo(file, line, function));
+	return mInternalData->stream;
 }
 
+
+
+void reportDebug(QString msg) { reporter()->sendDebug(msg); }
+void report(QString msg) { reporter()->sendInfo(msg); }
+void reportWarning(QString msg) { reporter()->sendWarning(msg); }
+void reportError(QString msg) { reporter()->sendError(msg); }
+void reportSuccess(QString msg) { reporter()->sendSuccess(msg); }
+
+}

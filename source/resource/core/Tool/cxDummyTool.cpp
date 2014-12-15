@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTime>
 #include <vtkPlane.h>
 #include <vtkClipPolyData.h>
-#include "cxReporter.h"
+
 #include "cxTimeKeeper.h"
 
 namespace cx

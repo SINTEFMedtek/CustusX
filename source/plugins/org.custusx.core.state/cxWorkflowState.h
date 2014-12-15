@@ -42,7 +42,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QAction>
 #include "cxTypeConversions.h"
 #include "cxRequestEnterStateTransition.h"
-#include "cxReporter.h"
+#include "boost/shared_ptr.hpp"
+
 
 namespace cx
 {

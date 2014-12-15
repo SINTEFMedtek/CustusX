@@ -31,13 +31,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxImageReceiverThread.h"
-#include "cxReporter.h"
+
 #include "cxCyclicActionLogger.h"
 #include "cxXmlOptionItem.h"
 #include "cxDataLocations.h"
 #include "cxStreamer.h"
 #include "cxStreamerService.h"
 #include "cxDirectlyLinkedSender.h"
+#include "cxLogger.h"
 
 namespace cx
 {

@@ -36,10 +36,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxView.h"
 #include "vtkRenderWindow.h"
 #include "cxTypeConversions.h"
-//#include "cxGLHelpers.h"
-#include "cxReporter.h"
-#include "cxViewCollectionWidget.h"
 #include "cxLogger.h"
+#include "cxViewCollectionWidget.h"
+
 
 namespace cx
 {
@@ -202,7 +201,7 @@ void RenderLoop::dumpStatistics()
 
 	static int counter=0;
 	if (++counter%3==0) // every third event
-		reporter()->sendDebug(mCyclicLogger->dumpStatisticsSmall());
+		reportDebug(mCyclicLogger->dumpStatisticsSmall());
 }
 
 int RenderLoop::calculateTimeToNextRender()

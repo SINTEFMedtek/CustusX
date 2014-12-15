@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMetaObject>
 
 #include "cxTrackingService.h"
-#include "cxReporter.h"
+
 #include "cxTrackingService.h"
 #include "cxVideoService.h"
 #include "boost/bind.hpp"

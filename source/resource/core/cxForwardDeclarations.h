@@ -128,8 +128,6 @@ typedef boost::shared_ptr<class VolumetricRep> VolumetricRepPtr;
 
 // Services
 typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
-typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
-typedef boost::shared_ptr<class VideoService> VideoServicePtr;
 typedef boost::shared_ptr<class VisualizationService> ViewServicePtr;
 typedef boost::shared_ptr<class StateService> StateServicePtr;
 
@@ -139,10 +137,12 @@ typedef boost::weak_ptr<class ViewManager> VisualizationServiceWeakPtr;
 typedef boost::weak_ptr<class StateService> StateServiceWeakPtr;
 
 // Plugin Services
+typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
 typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
 typedef boost::shared_ptr<class RegistrationService> RegistrationServicePtr;
-typedef boost::shared_ptr<class VideoService> VideoServicePtr;
 typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
+typedef boost::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
+typedef boost::shared_ptr<class VideoService> VideoServicePtr;
 typedef boost::shared_ptr<class VisualizationService> VisualizationServicePtr;
 
 // data adapters

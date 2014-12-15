@@ -47,14 +47,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxTransform3D.h"
 #include "cxRegistrationTransform.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxTypeConversions.h"
 #include "cxUtilHelpers.h"
 #include "cxVideoSource.h"
 
 #include "cxImageLUT2D.h"
 #include "cxImageTF3D.h"
-#include "cxLogger.h"
+
 #include "cxDataReaderWriter.h"
 #include "cxSpaceProvider.h"
 #include "cxDataFactory.h"

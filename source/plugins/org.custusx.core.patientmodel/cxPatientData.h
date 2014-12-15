@@ -48,20 +48,9 @@ class QDomDocument;
 namespace cx
 {
 
+typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
 typedef boost::shared_ptr<class DataManager> DataServicePtr;
 
-/**
- * \file
- * \addtogroup cx_service_patient
- * @{
- */
-
-/**given a root node, use the /-separated path to descend
- * into the root children recursively. Create elements if
- * necessary.
- *
- */
-org_custusx_core_patientmodel_EXPORT QDomElement getElementForced(QDomNode root, QString path);
 
 /**
  * \brief Functionality for storing patient data in a folder on the disk
@@ -80,82 +69,38 @@ class org_custusx_core_patientmodel_EXPORT PatientData: public QObject
 {
 Q_OBJECT
 public:
-	explicit PatientData(DataServicePtr dataManager);
+	explicit PatientData(DataServicePtr dataManager, SessionStorageServicePtr session);
 	virtual ~PatientData();
 
 	QString getActivePatientFolder() const;
 	bool isPatientValid() const;
 
-	QDomElement getCurrentWorkingElement(QString path);
-	QDomDocument getCurrentWorkingDocument();  ///< use only during save/load.
-
-//	QString generateFilePath(QString folderName, QString ending); ///< Creates the folder in the active patient and returns the path to a (not existing) filename generated using the current timestamp
-
 public slots:
-	void newPatient(QString choosenDir);
-	void loadPatient(QString chosenDir);
 	/** \brief Import data into CustusX
 	 * \param fileName The file name of the imported file(s)
 	 * \param[out] infoText Information about any errors/warnings that occurred during import
 	 */
 	DataPtr importData(QString fileName, QString &infoText);
 	void removeData(QString uid);
-	void savePatient(); ///< Save all application data to XML file
-	void clearPatient();
 	void exportPatient(bool niftiFormat);
 	void autoSave();
-	void startupLoadPatient();
-	void writeRecentPatientData();
 
 signals:
 	void patientChanged();
-	void cleared();
+//	void cleared();
 
-	void isSaving();
-	void isLoading();
+private slots:
+	void onCleared();
+	void onSessionLoad(QDomElement& node);
+	void onSessionSave(QDomElement& node);
 
 private:
-	//patient
-	QString getNullFolder() const;
-	void setActivePatient(const QString& activePatientFolder); ///< set the activepatientfolder (absolute path)
-	void createPatientFolders(QString choosenDir); ///< Create patient folders and save xml for new patient and for load patient for a directory whitout xml file.
-	QString getCommandLineStartupPatient();
-	void clearPatientSilent();
-	void reportActivePatient();
-	void loadPatientSilent(QString choosenDir);
-	bool isActivePatient(QString patient) const;
-
-	//saving/loading
-	void generateSaveDoc(QDomDocument& doc);
-	void readLoadDoc(QDomDocument& loadDoc, QString patientFolder);
-
-	/** \brief Copy file (=source) dest folder.
-	 * \param source Name of file to be copied.
-	 * \param dest Destination of copy operation
-	 * \param[out] infoText Information about any errors/warnings that occurred during copy
-	 */
-	bool copyFile(QString source, QString dest, QString &infoText);
-
-	/** \brief Copy filename and all files with the same name (and different extension)
-	 * to destFolder.
-	 * \param fileName Name of file to be copied. All files with the same first name will be copied (all different extensions in the same folder as fineName)
-	 * \param destFolder Destination of copy operation
-	 * \param[out] infoText Information about any errors/warnings that occurred during copy
-	 */
-//	bool copyAllSimilarFiles(QString fileName, QString destFolder, QString &infoText);
-	static QString getVersionName();
-
-	//Patient
-	QString mActivePatientFolder; ///< Folder for storing the files for the active patient. Path relative to globalPatientDataFolder.
-	QDomDocument mWorkingDocument; ///< available during load and save, used to add/extract extra info from the file.
 	DataServicePtr mDataManager;
+	SessionStorageServicePtr mSession;
 };
 
 typedef boost::shared_ptr<PatientData> PatientDataPtr;
 
-/**
- * @}
- */
 } // namespace cx
 
 #endif /* CXPATIENTDATA_H_ */

@@ -45,6 +45,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "boost/shared_ptr.hpp"
 #include "cxDefinitions.h"
 #include "cxAudio.h"
+#include <sstream>
+#include "cxTypeConversions.h"
+#include "cxLogger.h"
 
 class QString;
 class QDomNode;
@@ -71,7 +74,7 @@ namespace cx
 class cxResource_EXPORT Message
 {
 public:
-  Message(QString text ="", MESSAGE_LEVEL messageLevel=mlDEBUG, int timeoutTime=0, QString sourceLocation="");
+  Message(QString text ="", MESSAGE_LEVEL messageLevel=mlDEBUG, int timeoutTime=-1);
   ~Message();
 
   QString getPrintableMessage() const; ///< Text containing  information appropriate to display
@@ -79,14 +82,20 @@ public:
   QString getText() const; ///< The raw message.
   QDateTime getTimeStamp() const; ///< The time at which the message was created.
   int getTimeout() const; ///< Timout tells the statusbar how long it should be displayed, this depends on the message level
-  QString getSourceLocation() const { return mSourceLocation; }
+  QString getSourceLocation() const;
 
-private:
+//private:
   QString mText;
   MESSAGE_LEVEL mMessageLevel;
   int mTimeoutTime;
   QDateTime mTimeStamp;
-  QString mSourceLocation; ///< file:line/function
+  bool mMuted;
+//  QString mSourceLocation; ///< file:line/function
+  QString mChannel;
+
+  QString mSourceFile;
+  QString mSourceFunction;
+  int mSourceLine;
 };
 
 /**\brief Logging service for SSC.
@@ -113,7 +122,7 @@ public:
   static Reporter* getInstance(); ///< Returns a reference to the only Reporter that exists.
 
   void setLoggingFolder(QString absoluteLoggingFolderPath); // deprecated
-  bool setLogFile(QString filename); ///< set a file to write messages to.
+//  bool setLogFile(QString filename); ///< set a file to write messages to.
   bool isEnabled() const;
 
   struct Format
@@ -137,25 +146,8 @@ public:
   void sendVolatile(QString volatile_msg); ///< Used to output volatile info that changes rapidly, not suited for logging.
   void sendRaw(QString raw); ///< Used to output messages without adding anything to them, can be used as cout when mangling needs to be avoided
 
-#ifdef SSC_PRINT_CALLER_INFO
-  void sendInfoRedefined(QString info);
-  void sendSuccessRedefined(QString success);
-  void sendWarningRedefined(QString warning);
-  void sendErrorRedefined(QString error);
-  void sendDebugRedefined(QString debug);
-  void sendVolatileRedefined(QString volatile_msg);
-  void sendRawRedefined(QString raw);
-  void sendCallerInformation(const std::string &caller, const std::string &file, int line);
-  void sendInfoWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line);
-  void sendSuccessWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line);
-  void sendWarningWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line);
-  void sendErrorWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line);
-  void sendDebugWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line);
-  void sendVolatileWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line);
-  void sendRawWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line);
-#endif
-
-  void sendMessage(QString text, MESSAGE_LEVEL messageLevel=mlDEBUG, int timeout=0, bool mute=false, QString sourceLocation="");
+  void sendMessage(QString text, MESSAGE_LEVEL messageLevel=mlDEBUG, int timeout=-1, bool mute=false);
+  void sendMessage(Message msg);
 
   //Audio
   void playStartSound(); ///< plays a sound signaling that something has started
@@ -181,9 +173,13 @@ private:
 
   void setEnabled(bool enabled); ///< enable/disable messaging.
 
-  bool appendToLogfile(QString text);
+  bool appendToLogfile(QString filename, QString text);
   void playSound(MESSAGE_LEVEL messageLevel);
   QString formatMessage(Message msg);
+  int getDefaultTimeout(MESSAGE_LEVEL messageLevel) const;
+
+  bool initializeLogFile(QString filename);
+  QString getFilenameForChannel(QString channel) const;
 
   typedef boost::shared_ptr<class SingleStreamerImpl> SingleStreamerImplPtr;
   SingleStreamerImplPtr mCout;
@@ -191,7 +187,8 @@ private:
 
   bool mEnabled;
   Format mFormat;
-  QString mLogFile;
+//  QString mLogFile;
+  QString mLogPath;
   AudioPtr mAudioSource;
 
   static Reporter *mTheInstance; // global variable
@@ -201,49 +198,8 @@ private:
  */
 cxResource_EXPORT Reporter* reporter();
 
-//#define reportMessage(msg, level)    \
-//{                                    \
-//	reporter()->sendMessage(msg, level, -1);    \
-//}
-
-//#define reportDebug(msg)   reportMessage(msg, mlDEBUG)
-//#define report(msg)        reportMessage(msg, mlINFO)
-//#define reportWarning(msg) reportMessage(msg, mlWARNING)
-//#define reportError(msg)   reportMessage(msg, mlERROR)
-//#define reportSuccess(msg) reportMessage(msg, mlSUCCESS)
-
-static void reportDebug(QString msg) { reporter()->sendDebug(msg); }
-static void report(QString msg) { reporter()->sendInfo(msg); }
-static void reportWarning(QString msg) { reporter()->sendWarning(msg); }
-static void reportError(QString msg) { reporter()->sendError(msg); }
-static void reportSuccess(QString msg) { reporter()->sendSuccess(msg); }
 
 } //namespace cx
-
-#ifdef SSC_PRINT_CALLER_INFO
-//	#ifndef __PRETTY_FUNCTION__
-//		#define __PRETTY_FUNCTION__ __FUNCTION__
-//	#endif
-
-	#undef sendInfo
-	#define sendInfo(msg) sendInfoWithCallerInfo(msg, __PRETTY_FUNCTION__, __FILE__, __LINE__)
-
-	#undef sendSuccess
-	#define sendSuccess(msg) sendSuccessWithCallerInfo(msg, __PRETTY_FUNCTION__, __FILE__, __LINE__)
-
-	#undef sendWarning
-	#define sendWarning(msg) sendWarningWithCallerInfo(msg, __PRETTY_FUNCTION__, __FILE__, __LINE__)
-
-	#undef sendError
-	#define sendError(msg) sendErrorWithCallerInfo(msg, __PRETTY_FUNCTION__, __FILE__, __LINE__)
-
-	#undef sendDebug
-	#define sendDebug(msg) sendDebugWithCallerInfo(msg, __PRETTY_FUNCTION__, __FILE__, __LINE__)
-
-	#undef sendVolatile
-	#define sendVolatile(msg) sendVolatileWithCallerInfo(msg, __PRETTY_FUNCTION__, __FILE__, __LINE__)
-
-#endif
 
 typedef cx::Message Message;
 Q_DECLARE_METATYPE(Message);
@@ -251,6 +207,8 @@ Q_DECLARE_METATYPE(Message);
 /**
  * @}
  */
+
+
 
 
 #endif /* CXREPORTER_H_ */

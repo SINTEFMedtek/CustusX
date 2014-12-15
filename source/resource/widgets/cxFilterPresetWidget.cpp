@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxFilterPresetWidget.h"
 
 #include <QMessageBox>
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxFilter.h"
 
 namespace cx {

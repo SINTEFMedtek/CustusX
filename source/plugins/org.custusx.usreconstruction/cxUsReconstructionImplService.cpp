@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <boost/bind.hpp>
 #include <ctkPluginContext.h>
-
+#include "cxLogger.h"
 #include "cxStringDataAdapterXml.h"
 #include "cxDoubleDataAdapterXml.h"
 #include "cxBoolDataAdapterXml.h"
@@ -137,21 +137,6 @@ void UsReconstructionImplService::setSettings()
 	emit paramsChanged();
 }
 
-//void UsReconstructionImplService::transferFunctionChangedSlot()
-//{
-//	//Use angio reconstruction also if only transfer function is set to angio
-//	if(mParams->mPresetTFAdapter->getValue() == "US Angio")
-//	{
-//		reportDebug("Reconstructing angio (Because of angio transfer function)");
-//		mParams->mAngioAdapter->setValue(true);
-//	}
-//	else if(mParams->mPresetTFAdapter->getValue() == "US B-Mode" && mParams->mAngioAdapter->getValue())
-//	{
-//		reportDebug("Not reconstructing angio (Because of B-Mode transfer function)");
-//		mParams->mAngioAdapter->setValue(false);
-//	}
-//}
-
 void UsReconstructionImplService::startReconstruction()
 {
 	if(!mOutputVolumeParams.isValid())
@@ -219,21 +204,6 @@ void UsReconstructionImplService::setOutputVolumeParams(const OutputVolumeParams
 	mOutputVolumeParams = par;
 	this->setSettings();
 }
-
-//void UsReconstructionImplService::setOutputRelativePath(QString path)
-//{
-//	mOutputRelativePath = path;
-//}
-
-//void UsReconstructionImplService::setOutputBasePath(QString path)
-//{
-//	mOutputBasePath = path;
-//}
-
-//ReconstructParamsPtr UsReconstructionImplService::getParams()
-//{
-//	return mParams;
-//}
 
 std::vector<DataAdapterPtr> UsReconstructionImplService::getAlgoOptions()
 {
@@ -306,8 +276,6 @@ ReconstructCore::InputParams UsReconstructionImplService::createCoreParameters()
 	ReconstructCore::InputParams par;
 	par.mAlgorithmUid = mParams->getAlgorithmAdapter()->getValue();
 	par.mAlgoSettings = mSettings.getElement("algorithms", par.mAlgorithmUid).cloneNode(true).toElement();
-//	par.mOutputBasePath = mOutputBasePath;
-//	par.mOutputRelativePath = mOutputRelativePath;
 	par.mShaderPath = mShaderPath;
 	par.mAngio = mParams->getAngioAdapter()->getValue();
 	par.mTransferFunctionPreset = mParams->getPresetTFAdapter()->getValue();
@@ -324,6 +292,11 @@ void UsReconstructionImplService::onServiceAdded(ReconstructionMethodService* se
 	QStringList range = mParams->getAlgorithmAdapter()->getValueRange();
 	range << service->getName();
 	mParams->getAlgorithmAdapter()->setValueRange(range);
+
+	// select algo if none selected
+	DataAdapterPtr algoName = mParams->getParameter("Algorithm");
+	if (algoName->getValueAsVariant().value<QString>().isEmpty())
+		algoName->setValueFromVariant(service->getName());
 }
 
 void UsReconstructionImplService::onServiceModified(ReconstructionMethodService* service)

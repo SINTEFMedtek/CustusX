@@ -41,6 +41,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //#include "cxToolConfigurationParser.h"
 #include "cxLegacySingletons.h"
 #include "cxTrackerConfiguration.h"
+#include "cxStringDataAdapterXml.h"
+
 
 class QComboBox;
 class QLineEdit;
@@ -76,51 +78,35 @@ public:
 
   void setCurrentlySelectedCofiguration(QString configAbsoluteFilePath);
   QString getCurrenctlySelectedConfiguration() const;
+  StringDataAdapterPtr getTrackingSystemSelector();
 
 signals:
   void toolSelected(QString absoluteFilePath);
 
 public slots:
   QString requestSaveConfigurationSlot(); ///< will save the currently selected configuration if its been edited
-  void setClinicalApplicationSlot(CLINICAL_APPLICATION clinicalApplication);
 
 private slots:
   void configChangedSlot();
   void configEditedSlot();
   void toolsChangedSlot();
   void filterToolsSlot();
-  void pathEditedSlot();
-  void fileNameEditedSlot();
-  void filenameDoneEditingSlot();
+  void onApplicationStateChanged();
 
 private:
-  enum state ///< state of a configuration file indicating whether or not its edited
-  {
-    sEdited = Qt::UserRole
-  };
-
+  void createTrackingSystemSelector();
   void populateConfigurations(); ///< populates the combobox with all config files from the current application application
 	int addConfigurationToComboBox(QString displayName, QString absoluteFilePath); ///< adds a new configuration file item to the combobox
-  void setState(QComboBox* box, int index, bool edited); ///< sets the state of a configuration file to be either edited or not, decides whether to save or not
-//  ConfigurationFileParser::Configuration getCurrentConfiguration();
   TrackerConfiguration::Configuration getCurrentConfiguration();
-  QString generateConfigName(); ///< generates a name based on the current configuration
-
-  void setState(QLineEdit* line, bool userEdited);
-
   void populateReference(); ///< populates the ref combobox
   int addRefrenceToComboBox(QString absoluteRefereneFilePath); ///< adds a new tool ref file item to the combobox
-  CLINICAL_APPLICATION       mClinicalApplication;
 
   QComboBox*                mConfigFilesComboBox;
-  QLineEdit*                mConfigFilePathLineEdit; ///< path to the folder where the xml should be
   QLineEdit*                mConfigFileLineEdit; ///< name of the xml file (example.xml)
   QComboBox*                mReferenceComboBox;
-
-  SelectionGroupBox*        mApplicationGroupBox;
-  SelectionGroupBox*        mTrackingSystemGroupBox;
-
   ConfigToolListWidget*     mToolListWidget;
+  bool mModified; // if set: content is modified: save on exit
+  StringDataAdapterXmlPtr mTrackingSystemSelector;
 
 };
 

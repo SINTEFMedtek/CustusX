@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxHelperWidgets.h"
 #include "cxLogger.h"
 
+
 namespace cx
 {
 
@@ -44,7 +45,7 @@ LabeledComboBoxWidget::LabeledComboBoxWidget(QWidget* parent, StringDataAdapterP
 	QGridLayout* gridLayout, int row) :
     BaseWidget(parent, "LabeledComboBoxWidget", "LabeledComboBoxWidget")
 {
-	SSC_ASSERT(dataInterface->getAllowOnlyValuesInRange()==true);
+	CX_ASSERT(dataInterface->getAllowOnlyValuesInRange()==true);
 
 	this->setEnabled(dataInterface->getEnabled());
 

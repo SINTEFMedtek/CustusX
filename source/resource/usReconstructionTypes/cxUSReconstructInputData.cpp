@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxUSReconstructInputData.h"
 #include "cxUSFrameData.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 
 namespace cx
 {

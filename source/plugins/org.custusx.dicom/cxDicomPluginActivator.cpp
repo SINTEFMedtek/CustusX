@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 
 #include "cxDicomGUIExtenderService.h"
-#include "cxReporter.h"
+
 #include "cxRegisteredService.h"
 
 

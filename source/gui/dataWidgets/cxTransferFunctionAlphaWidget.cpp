@@ -43,10 +43,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMouseEvent>
 #include "cxImageTF3D.h"
 #include "cxImageTFData.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxUtilHelpers.h"
 #include "cxTypeConversions.h"
 #include "vtkDataArray.h"
+#include "cxReporter.h"
+
 
 namespace cx
 {

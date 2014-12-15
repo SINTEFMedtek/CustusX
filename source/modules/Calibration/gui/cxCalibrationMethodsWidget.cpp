@@ -41,13 +41,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-CalibrationMethodsWidget::CalibrationMethodsWidget(PatientModelServicePtr patientModelService, AcquisitionDataPtr acquisitionData, QWidget* parent, QString objectName, QString windowTitle) :
+CalibrationMethodsWidget::CalibrationMethodsWidget(PatientModelServicePtr patientModelService, AcquisitionServicePtr acquisitionService, QWidget* parent, QString objectName, QString windowTitle) :
   TabbedWidget(parent, objectName, windowTitle)
 {
   this->addTab(new ToolTipCalibrateWidget(this), "Tool Tip");
   this->addTab(new LapFrameToolCalibrationWidget(this), "Lap Frame");
 	this->addTab(new ToolTipSampleWidget(patientModelService, this), "Sample");
-  this->addTab(new TemporalCalibrationWidget(acquisitionData, this), "Temporal");
+  this->addTab(new TemporalCalibrationWidget(acquisitionService, this), "Temporal");
   this->addTab(new ToolManualCalibrationWidget(this), "Tool Manual");
   this->addTab(new ProbeConfigWidget(this), "Probe");
 }

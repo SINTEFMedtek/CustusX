@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPointMetricRep.h"
 #include "cxView.h"
 #include "boost/bind.hpp"
-#include "cxLogger.h"
+
 
 namespace cx
 {

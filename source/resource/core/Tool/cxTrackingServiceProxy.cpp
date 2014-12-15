@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/bind.hpp>
 #include <ctkPluginContext.h>
 #include "cxNullDeleter.h"
-#include "cxReporter.h"
+
 
 namespace cx
 {
@@ -69,8 +69,8 @@ void TrackingServiceProxy::onServiceAdded(TrackingService* service)
 	connect(mTrackingService.get(), &TrackingService::stateChanged, this, &TrackingService::stateChanged);
 	connect(mTrackingService.get(), &TrackingService::dominantToolChanged, this, &TrackingService::dominantToolChanged);
 
-	if(mTrackingService->isNull())
-		reportWarning("VideoServiceProxy::onServiceAdded mVideoService->isNull()");
+    emit stateChanged();
+    emit dominantToolChanged(mTrackingService->getActiveTool()->getUid());
 }
 
 void TrackingServiceProxy::onServiceRemoved(TrackingService *service)
@@ -116,7 +116,6 @@ ToolPtr TrackingServiceProxy::getFirstProbe()
 	return mTrackingService->getFirstProbe();
 }
 
-
 ToolPtr TrackingServiceProxy::getReferenceTool() const
 {
 	return mTrackingService->getReferenceTool();
@@ -126,12 +125,6 @@ ToolPtr TrackingServiceProxy::getManualTool()
 {
 	return mTrackingService->getManualTool();
 }
-
-
-
-
-
-
 
 TrackingService::ToolMap TrackingServiceProxy::getTools()
 {
@@ -148,39 +141,9 @@ void TrackingServiceProxy::setPlaybackMode(PlaybackTimePtr controller)
 	mTrackingService->setPlaybackMode(controller);
 }
 
-void TrackingServiceProxy::savePositionHistory()
-{
-	mTrackingService->savePositionHistory();
-}
-
-void TrackingServiceProxy::loadPositionHistory()
-{
-	mTrackingService->loadPositionHistory();
-}
-
-void TrackingServiceProxy::addXml(QDomNode& parentNode)
-{
-	mTrackingService->addXml(parentNode);
-}
-
-void TrackingServiceProxy::parseXml(QDomNode& dataNode)
-{
-	mTrackingService->parseXml(dataNode);
-}
-
-void TrackingServiceProxy::clear()
-{
-	mTrackingService->clear();
-}
-
 SessionToolHistoryMap TrackingServiceProxy::getSessionHistory(double startTime, double stopTime)
 {
 	return mTrackingService->getSessionHistory(startTime, stopTime);
-}
-
-void TrackingServiceProxy::setLoggingFolder(QString loggingFolder)
-{
-	mTrackingService->setLoggingFolder(loggingFolder);
 }
 
 void TrackingServiceProxy::runDummyTool(DummyToolPtr tool)

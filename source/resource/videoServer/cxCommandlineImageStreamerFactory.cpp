@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxCommandlineImageStreamerFactory.h"
 
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxImageStreamerOpenCV.h"
 #include "cxMHDImageStreamer.h"
 #include "cxImageStreamerSonix.h"

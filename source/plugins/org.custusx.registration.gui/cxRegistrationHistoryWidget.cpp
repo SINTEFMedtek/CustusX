@@ -37,11 +37,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStringList>
 #include <QVBoxLayout>
 #include "cxImage.h"
-#include "cxReporter.h"
+
 #include "cxTime.h"
 #include "cxTypeConversions.h"
 #include "cxPatientModelService.h"
-
+#include "cxLogger.h"
 #include "cxLegacySingletons.h"
 #include "cxTrackingService.h"
 
@@ -55,9 +55,7 @@ RegistrationHistoryWidget::RegistrationHistoryWidget(RegServices services, QWidg
 	this->setToolTip(this->defaultWhatsThis());
 
 	mGroup = new QFrame;
-
-	mTextEdit = new QTextEdit;
-	mTextEdit->setLineWrapMode(QTextEdit::NoWrap);
+	mTextEdit = NULL;
 
 	QVBoxLayout* toptopLayout = new QVBoxLayout(this);
 	QHBoxLayout* topLayout = new QHBoxLayout;
@@ -67,7 +65,9 @@ RegistrationHistoryWidget::RegistrationHistoryWidget(RegServices services, QWidg
 	mGroup->setLayout(topLayout);
 	if (!compact)
 	{
-		mTextEdit->setVisible(true);
+		mTextEdit = new QTextEdit;
+		mTextEdit->setLineWrapMode(QTextEdit::NoWrap);
+//		mTextEdit->setVisible(true);
 		toptopLayout->addWidget(mTextEdit, 1);
 		toptopLayout->addStretch();
 		topLayout->addStretch();
@@ -432,7 +432,8 @@ void RegistrationHistoryWidget::updateSlot()
 
 	mGroup->setStyleSheet(color);
 
-	mTextEdit->setText(debugDump());
+	if (mTextEdit)
+		mTextEdit->setText(debugDump());
 }
 
 } //end namespace cx

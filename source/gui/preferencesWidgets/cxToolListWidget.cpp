@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMenu>
 #include <QDrag>
 #include "cxEnumConverter.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxDataLocations.h"
 //#include "cxToolConfigurationParser.h"
 #include "cxTrackerConfiguration.h"
@@ -118,6 +118,13 @@ FilteringToolListWidget::~FilteringToolListWidget()
 {
 }
 
+QSize FilteringToolListWidget::minimumSizeHint() const
+{
+	QFontMetrics metric(this->font());
+	int height = metric.lineSpacing() * 15; // approx 15 lines of text
+	return QSize(300,height); // the height here is important: the default is 150, which is too little
+}
+
 void FilteringToolListWidget::mousePressEvent(QMouseEvent *event)
 {
 	if (event->button() == Qt::LeftButton)
@@ -154,7 +161,7 @@ void FilteringToolListWidget::filterSlot(QStringList applicationsFilter, QString
 	TrackerConfigurationPtr config = trackingService()->getConfiguration();
 	QStringList filteredTools = config->getToolsGivenFilter(applicationsFilter,
 														  trackingsystemsFilter);
-
+//	filteredTools.sort(); // no good: we would like to sort on name, but the list is full paths
 	this->populate(filteredTools);
 }
 
@@ -251,7 +258,7 @@ void ConfigToolListWidget::deleteSlot()
 {
 	if (!mItemToDelete)
 	{
-		reporter()->sendDebug("Found no item to delete...");
+		reportDebug("Found no item to delete...");
 		return;
 	}
 	this->deleteItemSlot(mItemToDelete);
@@ -275,7 +282,7 @@ void ConfigToolListWidget::contextMenuSlot(const QPoint& point)
 	QListWidgetItem* item = this->itemAt(point);
 	if (!item)
 	{
-		reporter()->sendDebug("Found no item to delete...");
+		reportDebug("Found no item to delete...");
 		return;
 	}
 	mItemToDelete = item;

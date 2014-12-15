@@ -46,9 +46,14 @@ namespace cx
 
 ViewRepCollection::ViewRepCollection(vtkRenderWindowPtr renderWindow, const QString& uid, const QString& name)
 {
+	QString myuid = uid;
+	if (myuid.isEmpty())
+	{
+		myuid = QString::number(reinterpret_cast<long>(this));
+	}
 	mRenderWindow = renderWindow;
 	mBackgroundColor = QColor("black");
-	mUid = uid;
+	mUid = myuid;
 	mName = name;
 	mType = View::VIEW;
 

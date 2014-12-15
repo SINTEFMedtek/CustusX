@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "org_custusx_usreconstruction_Export.h"
 
 #include "cxTransform3D.h"
-#include "cxReporter.h"
+
 #include "cxXmlOptionItem.h"
 #include "cxTypeConversions.h"
 #include "cxImageParameters.h"

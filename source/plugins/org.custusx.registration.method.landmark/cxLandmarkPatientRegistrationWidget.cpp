@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSpinBox>
 #include <vtkDoubleArray.h>
 #include "cxVector3D.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxTypeConversions.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxLandmarkRep.h"
@@ -54,6 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewGroupData.h"
 #include "cxTrackingService.h"
 #include "cxRepContainer.h"
+#include "cxReporter.h"
 
 
 //TODO: remove

@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxUtilHelpers.h"
 #include "cxVolumeHelpers.h"
 #include "vtkImageCorrelation.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxPatientModelService.h"
 
 typedef vtkSmartPointer<vtkImageCorrelation> vtkImageCorrelationPtr;
@@ -62,21 +62,19 @@ namespace cx
 typedef unsigned char uchar;
 
 
-TemporalCalibrationWidget::TemporalCalibrationWidget(AcquisitionDataPtr acquisitionData, QWidget* parent) :
-    BaseWidget(parent, "TemporalCalibrationWidget", "Temporal Calibration"),
-		mInfoLabel(new QLabel(""))
+TemporalCalibrationWidget::TemporalCalibrationWidget(AcquisitionServicePtr acquisitionService, QWidget* parent) :
+	BaseWidget(parent, "TemporalCalibrationWidget", "Temporal Calibration"),
+	mInfoLabel(new QLabel(""))
 {
 
   mAlgorithm.reset(new TemporalCalibration);
   connect(patientService().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
 
-  AcquisitionPtr acquisitionBase(new Acquisition(acquisitionData));
-  mAcquisition.reset(new USAcquisition(acquisitionBase));
 //  connect(mAcquisition.get(), SIGNAL(ready(bool,QString)), mRecordSessionWidget, SLOT(setReady(bool,QString)));
-  connect(mAcquisition.get(), SIGNAL(saveDataCompleted(QString)), this, SLOT(selectData(QString)));
+  connect(acquisitionService.get(), SIGNAL(saveDataCompleted(QString)), this, SLOT(selectData(QString)));
 //  mAcquisition->checkIfReadySlot();
 
-  mRecordSessionWidget = new RecordSessionWidget(acquisitionBase, this, "temporal_calib");
+  mRecordSessionWidget = new RecordSessionWidget(acquisitionService, this, "temporal_calib");
 
 //  connect(mRecordSessionWidget, SIGNAL(newSession(QString)), mAcquisition.get(), SLOT(saveSession(QString)));
 //  connect(mRecordSessionWidget, SIGNAL(started(QString)), mAcquisition.get(), SLOT(startRecord(QString)));

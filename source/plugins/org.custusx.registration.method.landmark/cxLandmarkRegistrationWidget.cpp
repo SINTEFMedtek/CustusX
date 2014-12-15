@@ -42,13 +42,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSlider>
 #include <vtkDoubleArray.h>
 #include <vtkImageData.h>
-#include "cxReporter.h"
+
 #include "cxTypeConversions.h"
 #include "cxManualTool.h"
 #include "cxPatientModelService.h"
 #include "cxRegistrationService.h"
 #include"cxData.h"
-
+#include "cxLogger.h"
 #include "cxLandmark.h"
 #include "cxTrackingService.h"
 
@@ -85,7 +85,7 @@ void LandmarkRegistrationWidget::cellClickedSlot(int row, int column)
 		return;
 
 	if (!mLandmarkTableWidget)
-		reporter()->sendDebug("mLandmarkTableWidget is null");
+		reportDebug("mLandmarkTableWidget is null");
 
 	mActiveLandmark = mLandmarkTableWidget->item(row, column)->data(Qt::UserRole).toString();
 

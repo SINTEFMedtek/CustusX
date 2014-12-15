@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //#include <QString.h>
 
 //#include "cxUSReconstructInputData.h"
-
+#include "cxLogger.h"
 
 //#include <set>
 //#include "cxForwardDeclarations.h"

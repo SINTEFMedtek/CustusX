@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxVisualizationServiceNull.h"
-#include "cxReporter.h"
+
 #include <QActionGroup>
 #include <QDomNode>
 
@@ -84,7 +84,7 @@ bool VisualizationServiceNull::renderingIsEnabled() const
 	return false;
 }
 
-QWidget* VisualizationServiceNull::getLayoutWidget(int index) { return NULL; }
+QWidget* VisualizationServiceNull::getLayoutWidget(QWidget *parent, int index) { return NULL; }
 QString VisualizationServiceNull::getActiveLayout(int widgetIndex) const { return ""; }
 void VisualizationServiceNull::setActiveLayout(const QString& uid, int widgetIndex) {}
 InteractiveClipperPtr VisualizationServiceNull::getClipper() { return InteractiveClipperPtr(); }
@@ -96,9 +96,6 @@ CameraControlPtr VisualizationServiceNull::getCameraControl() { return CameraCon
 QActionGroup* VisualizationServiceNull::createInteractorStyleActionGroup() { return mActionGroup; }
 void VisualizationServiceNull::setPreview(ImagePtr image, const std::vector<double>& threshold) {}
 void VisualizationServiceNull::removePreview() {}
-void VisualizationServiceNull::clear() {}
-void VisualizationServiceNull::addXml(QDomNode& parentNode) {}
-void VisualizationServiceNull::parseXml(QDomNode viewmanagerNode) {}
 
 
 } //cx

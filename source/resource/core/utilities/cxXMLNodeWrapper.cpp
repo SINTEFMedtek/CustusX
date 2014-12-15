@@ -33,12 +33,42 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QDomNode>
 #include <QStringList>
+#include <iostream>
 
 namespace cx
 {
 
 XMLNodeAdder::XMLNodeAdder(QDomNode node) : mNode(node)
 {
+}
+
+XMLNodeAdder XMLNodeAdder::descend(QString path)
+{
+	QStringList pathList = path.split("/");
+	QDomElement current = mNode.toElement();
+
+	if (current.isNull())
+		return XMLNodeAdder(current);
+
+	for (int i = 0; i < pathList.size(); ++i)
+	{
+		QDomElement next = current.namedItem(pathList[i]).toElement();
+
+		if (next.isNull())
+		{
+			next = mNode.ownerDocument().createElement(pathList[i]);
+			current.appendChild(next);
+		}
+
+		current = next;
+	}
+
+	return XMLNodeAdder(current);
+}
+
+QDomNode XMLNodeAdder::node()
+{
+	return mNode;
 }
 
 QDomElement XMLNodeAdder::addTextToElement(QString name, QString text)
@@ -66,6 +96,27 @@ QDomDocument XMLNodeAdder::document()
 
 XMLNodeParser::XMLNodeParser(QDomNode node) : mNode(node)
 {
+}
+
+XMLNodeParser XMLNodeParser::descend(QString path)
+{
+	QStringList pathList = path.split("/");
+	QDomElement current = mNode.toElement();
+
+	if (current.isNull())
+		return XMLNodeParser(current);
+
+	for (int i = 0; i < pathList.size(); ++i)
+	{
+		QDomElement next = current.namedItem(pathList[i]).toElement();
+
+		if (next.isNull())
+			return XMLNodeParser(QDomNode());
+
+		current = next;
+	}
+
+	return XMLNodeParser(current);
 }
 
 QString XMLNodeParser::parseTextFromElement(QString name)
@@ -111,6 +162,11 @@ std::vector<QDomElement> XMLNodeParser::getDuplicateElements(QString name)
 QDomElement XMLNodeParser::parseElement(QString name)
 {
 	return mNode.namedItem(name).toElement();
+}
+
+QDomNode XMLNodeParser::node()
+{
+	return mNode;
 }
 
 

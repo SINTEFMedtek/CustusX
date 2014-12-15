@@ -45,8 +45,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataLocations.h"
 #include "cxTypeConversions.h"
 #include "cxDicomConverter.h"
-#include "cxReporter.h"
 #include "cxLogger.h"
+
 #include "cxPatientModelService.h"
 #include "cxDicomImageReader.h"
 

@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QGroupBox>
 #include "cxDefinitions.h"
 #include "cxLegacySingletons.h"
+#include "cxStringDataAdapterXml.h"
 
 class QComboBox;
 class QButtonGroup;
@@ -68,19 +69,22 @@ public:
   ToolFilterGroupBox(QWidget* parent = NULL);
   virtual ~ToolFilterGroupBox();
 
+  void setTrackingSystemSelector(StringDataAdapterPtr selector);
+
 signals:
   void toolSelected(QString absoluteFilePath);
 
 public slots:
   void setClinicalApplicationSlot(CLINICAL_APPLICATION clinicalApplication);
-  void setTrackingSystemSlot(TRACKING_SYSTEM trackingSystem);
 
 private slots:
   void filterSlot();
 
 private:
-  SelectionGroupBox* mApplicationGroupBox;
-  SelectionGroupBox* mTrackingSystemGroupBox;
+  void createAppSelector();
+
+  StringDataAdapterXmlPtr mAppSelector;
+  StringDataAdapterPtr mTrackingSystemSelector;
 
   FilteringToolListWidget*      mToolListWidget;
 };

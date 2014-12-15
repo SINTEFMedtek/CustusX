@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxFastImageRegistrationWidget.h"
 
-#include "cxReporter.h"
+
 #include "cxPatientModelService.h"
 #include "cxData.h"
 #include "cxImage.h"

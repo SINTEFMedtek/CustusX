@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "cxUSFrameData.h"
-#include "cxReporter.h"
+
 #include <vtkImageData.h>
 #include <vtkImageLuminance.h>
 #include <vtkImageClip.h>
@@ -45,8 +45,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTimeKeeper.h"
 #include "cxImageDataContainer.h"
 #include "cxVolumeHelpers.h"
-
 #include "cxLogger.h"
+
 
 typedef vtkSmartPointer<vtkImageAppend> vtkImageAppendPtr;
 
@@ -86,7 +86,7 @@ bool ProcessedUSInputData::validate() const
 
 unsigned char* ProcessedUSInputData::getFrame(unsigned int index) const
 {
-	SSC_ASSERT(index < mProcessedImage.size());
+	CX_ASSERT(index < mProcessedImage.size());
 
 	// Raw data pointer
 	unsigned char *inputPointer = static_cast<unsigned char*> (mProcessedImage[index]->GetScalarPointer());
@@ -222,7 +222,7 @@ USFrameData::~USFrameData()
  */
 void USFrameData::removeFrame(unsigned int index)
 {
-	SSC_ASSERT(index < mReducedToFull.size());
+	CX_ASSERT(index < mReducedToFull.size());
 	mReducedToFull.erase(mReducedToFull.begin()+index);
 }
 
@@ -372,13 +372,13 @@ vtkImageDataPtr USFrameData::useAngio(vtkImageDataPtr inData, vtkImageDataPtr gr
 
 	Eigen::Array<vtkIdType,3,1> inInc;
 	inData->GetContinuousIncrements(inData->GetExtent(), inInc[0], inInc[1], inInc[2]);
-	SSC_ASSERT(inInc[0]==0);
+	CX_ASSERT(inInc[0]==0);
 	// we assume (wholeextent == extent) for the outData in the algorithm below. assert here.
 	Eigen::Array<vtkIdType,3,1> outInc;
 	outData->GetContinuousIncrements(outData->GetExtent(), outInc[0], outInc[1], outInc[2]);
-	SSC_ASSERT(outInc[0]==0);
-	SSC_ASSERT(outInc[1]==0);
-	SSC_ASSERT(outInc[2]==0);
+	CX_ASSERT(outInc[0]==0);
+	CX_ASSERT(outInc[1]==0);
+	CX_ASSERT(outInc[2]==0);
 
 	for (int z=0; z<=maxZ; z++)
 	{
@@ -435,7 +435,7 @@ std::vector<std::vector<vtkImageDataPtr> > USFrameData::initializeFrames(std::ve
 	// apply cropping and angio
 	for (unsigned i=0; i<mReducedToFull.size(); ++i)
 	{
-		SSC_ASSERT(mImageContainer->size() > mReducedToFull[i]);
+		CX_ASSERT(mImageContainer->size() > mReducedToFull[i]);
 		vtkImageDataPtr current = mImageContainer->get(mReducedToFull[i]);
 
 		if (mCropbox.range()[0]!=0)

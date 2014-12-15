@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxTrackerConfigurationImpl.h"
 #include "cxDataLocations.h"
-#include "cxReporter.h"
+
 #include "cxDefinitionStrings.h"
 #include "cxToolConfigurationParser.h"
 #include "cxFileHelpers.h"
@@ -76,7 +76,7 @@ TrackerConfigurationImpl::Configuration TrackerConfigurationImpl::getConfigurati
 
 	Configuration retval;
 	retval.mUid = uid;
-	retval.mName = QFileInfo(uid).fileName();
+	retval.mName = QFileInfo(uid).completeBaseName();
 
 	CLINICAL_APPLICATION application = parser.getApplicationapplication();
 	retval.mClinicalApplication = enum2string(application);

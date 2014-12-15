@@ -31,8 +31,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "catch.hpp"
-#include "cxReporter.h"
+
 #include "cxtestDirectSignalListener.h"
+#include "cxReporter.h"
 
 namespace cx
 {

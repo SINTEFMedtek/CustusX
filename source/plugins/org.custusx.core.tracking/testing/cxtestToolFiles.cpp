@@ -32,9 +32,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "catch.hpp"
 
-#include "cxReporter.h"
-#include "cxtestTestToolMesh.h"
 
+#include "cxtestTestToolMesh.h"
+#include "cxReporter.h"
 #include <QStringList>
 #include "cxEnumConverter.h"
 #include "cxDefinitions.h"

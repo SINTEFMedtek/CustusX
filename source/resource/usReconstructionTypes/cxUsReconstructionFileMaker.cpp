@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkImageAppend.h"
 #include "vtkMetaImageWriter.h"
 #include "cxTypeConversions.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxDataLocations.h"
 #include "cxSettings.h"
 #include "cxXmlOptionItem.h"
@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImageDataContainer.h"
 #include "cxUSReconstructInputDataAlgoritms.h"
 #include "cxCustomMetaImage.h"
-#include "cxLogger.h"
+
 
 typedef vtkSmartPointer<vtkImageAppend> vtkImageAppendPtr;
 
@@ -300,7 +300,7 @@ void UsReconstructionFileMaker::report()
 
 void UsReconstructionFileMaker::writeUSImages(QString path, ImageDataContainerPtr images, bool compression, std::vector<TimedPosition> pos)
 {
-	SSC_ASSERT(images->size()==pos.size());
+	CX_ASSERT(images->size()==pos.size());
 	vtkMetaImageWriterPtr writer = vtkMetaImageWriterPtr::New();
 
 	for (unsigned i=0; i<images->size(); ++i)

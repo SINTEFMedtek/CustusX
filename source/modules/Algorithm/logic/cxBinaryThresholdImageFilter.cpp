@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLegacySingletons.h"
 #include "cxPatientModelService.h"
 #include "cxVisualizationService.h"
+#include "cxVolumeHelpers.h"
 
 namespace cx
 {
@@ -232,10 +233,9 @@ bool BinaryThresholdImageFilter::postProcess()
 
 	QString uid = input->getUid() + "_seg%1";
 	QString name = input->getName()+" seg%1";
-	ImagePtr output = patientService()->createSpecificData<Image>(uid, name);
-	output->intitializeFromParentImage(input);
-	output->setVtkImageData(mRawResult);
-
+	ImagePtr output = createDerivedImage(patientService(),
+										 uid, name,
+										 mRawResult, input);
 
 	mRawResult = NULL;
 

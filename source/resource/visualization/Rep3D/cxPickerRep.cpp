@@ -51,14 +51,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //#include <vtkCellPicker.h>
 #include "cxMesh.h"
 #include "cxPatientModelService.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxImage.h"
 #include "cxView.h"
 #include "cxTool.h"
 #include "cxRegistrationTransform.h"
 #include "cxGeometricRep.h"
 #include <vtkRenderWindowInteractor.h>
-
+#include "cxLogger.h"
 #include "vtkVolumePicker.h"
 
 #include "cxConfig.h"
@@ -426,7 +426,7 @@ void PickerRep::addRepActorsToViewRenderer(ViewPtr view)
 {
 	if (view == NULL)
 	{
-		reporter()->sendDebug("Cannot add rep actor to a NULL view.");
+		reportDebug("Cannot add rep actor to a NULL view.");
 		return;
 	}
 

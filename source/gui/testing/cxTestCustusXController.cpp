@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSettings.h"
 #include "cxPatientModelService.h"
 #include "cxVisualizationService.h"
+#include "cxSessionStorageService.h"
 
 CustusXController::CustusXController(QObject* parent) : QObject(parent)
 {
@@ -59,6 +60,14 @@ CustusXController::CustusXController(QObject* parent) : QObject(parent)
 	mMeasuredFPS = 0;
 	mEnableSlicing = false;
 }
+
+CustusXController::~CustusXController()
+{
+	if (mMainWindow)
+		this->stop();
+}
+
+
 void CustusXController::start()
 {
   qApp->setOrganizationName("SINTEF");
@@ -89,12 +98,13 @@ void CustusXController::start()
 void CustusXController::stop()
 {
   delete mMainWindow;
+	mMainWindow = NULL;
   cx::LogicManager::shutdown(); // shutdown all global resources, _after_ gui is deleted.
 }
 
 void CustusXController::loadPatientSlot()
 {
-  cx::patientService()->loadPatient(mPatientFolder);
+  cx::sessionStorageService()->load(mPatientFolder);
   cx::stateService()->setWorkFlowState("NavigationUid");
   mMainWindow->setGeometry( 0, 0, 2560, 1440);
 
