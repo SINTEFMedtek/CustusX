@@ -13,20 +13,6 @@ cx_initialize_level_set_segmentation()
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
-include_directories(
-    ${CX_RESOURCE_INCLUDE_DIRECTORIES}
-    ${CX_RESOURCE_FILTER_INCLUDE_DIRECTORIES}
-    ${CustusX_SOURCE_DIR}/source/service/patient
-    ${CustusX_SOURCE_DIR}/source/modules/Algorithm/logic
-    ${CustusX_SOURCE_DIR}/source/gui/dataAdapters
-	${CustusX_SOURCE_DIR}/source/logic
-
-    ${CustusX_BINARY_DIR}/source/service/patient
-    ${CustusX_BINARY_DIR}/source/modules/Algorithm
-    ${CustusX_BINARY_DIR}/source/gui
-    ${CustusX_BINARY_DIR}/source/logic
-    )
-
 set(PLUGIN_SRCS
     cxFilterLevelSetPluginActivator.cpp
     cxLevelSetFilterService.cpp
@@ -74,6 +60,12 @@ ctkMacroBuildPlugin(
   RESOURCES ${PLUGIN_resources}
   TARGET_LIBRARIES ${PLUGIN_target_libraries}
   OUTPUT_DIR ${PLUGIN_OUTPUT_DIR}
+)
+
+target_include_directories(org_custusx_filter_levelset
+    PUBLIC
+    .
+    ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 add_subdirectory(testing)

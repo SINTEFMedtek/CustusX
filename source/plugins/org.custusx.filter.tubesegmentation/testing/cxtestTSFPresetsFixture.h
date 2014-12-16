@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTESTTSFPRESETSFIXTURE_H_
 #define CXTESTTSFPRESETSFIXTURE_H_
 
+#include "cxtest_org_custusx_filter_tubesegmentation_export.h"
+
 #include <QDomElement>
 
 #include "cxTSFPresets.h"
@@ -44,7 +46,7 @@ namespace cxtest {
  *  Created on: Sep 26, 2013
  *      Author: jbake
  */
-class TSFPresetsFixture {
+class CXTEST_ORG_CUSTUSX_FILTER_TUBESEGMENTATION_EXPORT TSFPresetsFixture {
 
 public:
 	TSFPresetsFixture();

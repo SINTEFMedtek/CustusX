@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxBaseWidget.h"
 #include "cxFilter.h"
+#include "cxFilterGroup.h"
 #include "cxFilterTimedAlgorithm.h"
 #include "cxFilterWidget.h"
 #include "cxServiceTrackerListener.h"

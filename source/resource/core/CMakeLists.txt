@@ -280,7 +280,13 @@ target_include_directories(cxResource
     ${CMAKE_CURRENT_BINARY_DIR}/utilities
     ${PROJECT_SOURCE_DIR}/source/ThirdParty/iir1
 )
-target_link_libraries(cxResource PUBLIC ${CX_PUBLIC_RESOURCE_LIBRARIES} PRIVATE ${CX_PRIVATE_RESOURCE_LIBRARIES} )
+target_link_libraries(cxResource
+    PUBLIC
+    ${CX_PUBLIC_RESOURCE_LIBRARIES}
+
+    PRIVATE
+    ${CX_PRIVATE_RESOURCE_LIBRARIES}
+)
 
 add_subdirectory(testing)
 
