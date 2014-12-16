@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSlicePlaneClipper.h"
 #include "cxTypeConversions.h"
 #include "vtkForwardDeclarations.h"
-#include "cxReporter.h"
+
 #include "cxImageMapperMonitor.h"
 
 #include "cxVolumeProperty.h"

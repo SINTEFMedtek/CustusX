@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVector3D.h"
 #include "vtkCamera.h"
 #include "vtkCommand.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 
 namespace cx
 {

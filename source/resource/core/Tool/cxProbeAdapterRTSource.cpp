@@ -34,9 +34,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxProbeAdapterRTSource.h"
 #include <vtkImageChangeInformation.h>
 #include <vtkImageData.h>
-#include "cxReporter.h"
+
 #include "cxTool.h"
 #include "cxTypeConversions.h"
+#include "cxLogger.h"
+
 
 namespace cx
 {

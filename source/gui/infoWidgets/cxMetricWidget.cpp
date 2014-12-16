@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVBoxLayout>
 #include <QHeaderView>
 
-#include "cxReporter.h"
+
 #include "cxTypeConversions.h"
 #include "cxCoordinateSystemHelpers.h"
 #include "cxTrackingService.h"
@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxToolMetricWrapper.h"
 #include "cxTime.h"
 #include "cxMetricManager.h"
-#include "cxLogger.h"
+
 #include "cxPatientModelService.h"
 
 

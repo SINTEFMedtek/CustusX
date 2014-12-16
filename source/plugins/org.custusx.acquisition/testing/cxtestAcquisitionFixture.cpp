@@ -52,6 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxStreamerServiceUtilities.h"
 #include "cxVideoSource.h"
 #include "cxAcquisitionServiceProxy.h"
+#include "cxSessionStorageService.h"
 
 
 namespace cxtest
@@ -114,7 +115,6 @@ void AcquisitionFixture::setupVideo()
 
 void AcquisitionFixture::setupProbe()
 {
-	SSC_LOG("");
 	cx::DummyToolPtr dummyTool(new cx::DummyTool());
 	dummyTool->setToolPositionMovement(dummyTool->createToolPositionMovementTranslationOnly(cx::DoubleBoundingBox3D(0,0,0,10,10,10)));
 	std::pair<QString, cx::ProbeDefinition> probedata = cx::UsReconstructionFileReader::readProbeDataFromFile(mAcqDataFilename);
@@ -135,7 +135,7 @@ void AcquisitionFixture::initialize()
 	mAcqDataFilename = cx::DataLocations::getTestDataPath() + "/testing/us_videos/acq_256x192.mhd";
 
 	qApp->processEvents(); // wait for stateservice to finish init of application states - needed before load patient.
-	cx::patientService()->newPatient(cx::DataLocations::getTestDataPath() + "/temp/Acquisition/");
+	cx::sessionStorageService()->load(cx::DataLocations::getTestDataPath() + "/temp/Acquisition/");
 
 	//Mock UsReconstructionService with null object
 	ctkPluginContext *pluginContext = cx::logicManager()->getPluginContext();
@@ -156,8 +156,6 @@ void AcquisitionFixture::initialize()
 
 void AcquisitionFixture::videoConnectedSlot()
 {
-//	SSC_LOG("");
-
 	// make sure all sources have started streaming before running probe setup (there might be several sources)
 	if (cx::videoService()->getVideoSources().size() < mNumberOfExpectedStreams)
 	{
@@ -173,14 +171,12 @@ void AcquisitionFixture::start()
 	if (cx::trackingService()->getState() < cx::Tool::tsTRACKING)
 		return;
 
-	SSC_LOG("");
 	mAcquisitionService->startRecord();
 	QTimer::singleShot(mRecordDuration, this, SLOT(stop()));
 }
 
 void AcquisitionFixture::stop()
 {
-	SSC_LOG("");
 	mAcquisitionService->stopRecord();
 }
 

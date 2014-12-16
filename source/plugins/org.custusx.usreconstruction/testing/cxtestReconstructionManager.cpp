@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //#include "cxVisualizationService.h"
 #include "cxPatientModelService.h"
 #include "cxMessageListener.h"
-#include "cxLogger.h"
+
 
 namespace cxtest
 {

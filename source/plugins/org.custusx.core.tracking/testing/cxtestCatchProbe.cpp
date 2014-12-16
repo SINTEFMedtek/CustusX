@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxtestProbeFixture.h"
 
 #include <QString>
-#include "cxReporter.h"
+
 #include "ProbeXmlConfigParserMock.h"
 #include "cxProbeData.h"
 #include "cxTestVideoSource.h"

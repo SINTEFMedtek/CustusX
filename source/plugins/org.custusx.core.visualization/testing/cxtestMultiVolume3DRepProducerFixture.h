@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVolumeHelpers.h"
 #include "cxVolumetricRep.h"
 #include "cxtestUtilities.h"
-#include "cxReporter.h"
+
 #include "cxImage2DRep3D.h"
 
 #include "cxMultiVolume3DRepProducer.h"

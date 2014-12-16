@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkForwardDeclarations.h"
 
 class QDomNode;
+class QDomElement;
 class QDomDocument;
 class QDomNodeList;
 class QTimer;
@@ -47,12 +48,6 @@ class ctkPluginContext;
 
 namespace cx
 {
-/**
- * \file
- * \addtogroup cx_service_tracking
- * @{
- */
-
 typedef boost::shared_ptr<class TrackingImplService> TrackingImplServicePtr;
 
 typedef boost::shared_ptr<class ManualToolAdapter> ManualToolAdapterPtr;
@@ -61,10 +56,11 @@ typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
 
 typedef boost::shared_ptr<class TrackingSystemService> TrackingSystemServicePtr;
 typedef boost::shared_ptr<class TrackingSystemPlaybackService> TrackingSystemPlaybackServicePtr;
+typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
 
 /**
  * \brief Interface towards the navigation system.
- * \ingroup cx_service_tracking
+ * \ingroup org_custusx_core_tracking
  *
  * \image html tracking_simple.png "Tracking Service ideal design."
  *
@@ -113,15 +109,6 @@ public:
 
 	virtual ToolPtr getReferenceTool() const; ///< get the tool that is used as a reference, if any
 
-	virtual void savePositionHistory();
-	virtual void loadPositionHistory();
-
-	virtual void setLoggingFolder(QString loggingFolder); ///<\param loggingFolder path to the folder where logs should be saved
-
-	void addXml(QDomNode& parentNode); ///< write internal state to node
-	void parseXml(QDomNode& dataNode); ///< read internal state from node
-	virtual void clear(); ///< clear everything loaded from xml
-
 	virtual ToolPtr getManualTool(); ///< a mouse-controllable virtual tool that is available even when not tracking.
 
 	virtual SessionToolHistoryMap getSessionHistory(double startTime, double stopTime);
@@ -144,8 +131,12 @@ private slots:
 	void dominantCheckSlot(); ///< checks if the visible tool is going to be set as dominant tool
 	void onTooltipOffset(double val);
 
+	void onSessionChanged();
+	void onSessionCleared();
+	void onSessionLoad(QDomElement& node);
+	void onSessionSave(QDomElement& node);
+
 private:
-//	ToolManagerUsingIGSTK();
 	void rebuildCachedTools();
 	void initializeManualTool();
 	void setConfigurationFile(QString configurationFile); ///< Sets the configuration file to use, must be located in the resourcefolder \param configurationFile path to the configuration file to use
@@ -156,10 +147,14 @@ private:
 	bool manualToolHasMostRecentTimestamp();
 	std::vector<ToolPtr> getVisibleTools();
 
-	QString mLoggingFolder; ///< path to where logging should be saved
+	void addXml(QDomNode& parentNode); ///< write internal state to node
+	void parseXml(QDomNode& dataNode); ///< read internal state from node
+	virtual void savePositionHistory();
+	virtual void loadPositionHistory();
+
+	QString getLoggingFolder();
 
 	ToolMap mTools; ///< all tools
-
 	ToolPtr mDominantTool; ///< the tool with highest priority
 	ToolPtr mReferenceTool; ///< the tool which is used as patient reference tool
 	ManualToolAdapterPtr mManualTool; ///< a mouse-controllable virtual tool that is available even when not tracking.
@@ -169,19 +164,13 @@ private:
 	std::vector<TrackingSystemServicePtr> mTrackingSystems;
 	TrackingSystemPlaybackServicePtr mPlaybackSystem;
 	ctkPluginContext *mContext;
+	SessionStorageServicePtr mSession;
 
 	double mToolTipOffset; ///< Common tool tip offset for all tools
-
-//private:
-//	ToolManagerUsingIGSTK(ToolManagerUsingIGSTK const&);
-//	ToolManagerUsingIGSTK& operator=(ToolManagerUsingIGSTK const&);
 };
 
 bool toolTypeSort(const ToolPtr tool1, const ToolPtr tool2); ///< function for sorting tools by type
 
-/**
- * @}
- */
 } //namespace cx
 
 

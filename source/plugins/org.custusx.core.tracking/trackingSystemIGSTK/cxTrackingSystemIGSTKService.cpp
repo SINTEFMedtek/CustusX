@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QCoreApplication>
 
 #include "cxRegistrationTransform.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxTypeConversions.h"
 #include "cxPositionStorageFile.h"
 #include "cxTime.h"
@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataLocations.h"
 #include "cxIgstkTrackerThread.h"
 #include "cxPlaybackTool.h"
-#include "cxLogger.h"
+
 #include "cxPlaybackTime.h"
 #include "cxTrackingPositionFilter.h"
 #include "cxXMLNodeWrapper.h"
@@ -198,8 +198,7 @@ void TrackingSystemIGSTKService::trackerConfiguredSlot(bool on)
 
 	if (!mTrackerThread)
 	{
-		reporter()->sendDebug(
-						"Received a configured signal in ToolManager, but we don't have a mTrackerThread, this should never happen, contact programmer.");
+		reportDebug("Received a configured signal in ToolManager, but we don't have a mTrackerThread, this should never happen, contact programmer.");
 		return;
 	}
 

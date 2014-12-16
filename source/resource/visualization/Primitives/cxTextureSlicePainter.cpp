@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkUniformVariables.h>
 #include <vtkObjectFactory.h>
 #include <vtkOpenGLRenderWindow.h>
-#include "cxLogger.h"
+
 
 #ifdef __APPLE__
 #include <OpenGL/glu.h>

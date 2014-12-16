@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QProcess>
 #include "cxProcessWrapper.h"
 #include "cxtestProcessWrapperFixture.h"
-#include "cxReporter.h"
+
 
 namespace cxtest
 {

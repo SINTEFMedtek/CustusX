@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QMenu>
 #include "vtkCamera.h"
-#include "cxReporter.h"
+
 #include "cxPatientModelService.h"
 #include "cxViewGroup.h" //for class Navigation
 #include "cxMesh.h"

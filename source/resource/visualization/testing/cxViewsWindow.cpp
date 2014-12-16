@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QScreen>
-#include "cxLogger.h"
+
 
 namespace cxtest
 {

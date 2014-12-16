@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "catch.hpp"
 #include "cxImageParameters.h"
-#include "cxReporter.h"
+
 
 namespace cxtest
 {

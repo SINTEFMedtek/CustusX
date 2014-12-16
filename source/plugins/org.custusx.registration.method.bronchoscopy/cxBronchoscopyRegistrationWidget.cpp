@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxToolRep3D.h"
 #include "cxToolTracer.h"
 #include "cxBronchoscopyRegistration.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxTypeConversions.h"
 #include "cxPatientModelService.h"
 #include "cxRegistrationService.h"
@@ -269,7 +269,10 @@ void BronchoscopyRegistrationWidget::acquisitionStarted()
 {
     std::cout << "acquisitionStarted" << std::endl;
 
-	mTool = mServices.trackingService->getActiveTool();
+	mTool = mSelectToolWidget->getTool();
+	if(!mTool)
+		mTool = mServices.trackingService->getActiveTool();
+
     ToolRep3DPtr activeRep3D = this->getToolRepIn3DView(mTool);
 	if (!activeRep3D)
 		return;

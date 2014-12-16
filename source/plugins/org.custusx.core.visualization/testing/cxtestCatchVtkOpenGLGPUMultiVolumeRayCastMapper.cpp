@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkInteractorStyleTrackballCamera.h>
 #include "vtkMultiVolumePicker.h"
 #include <vtkCamera.h>
-#include "cxLogger.h"
+
 
 #include "cxVector3D.h" //Neeed to setup Eigen correctly
 

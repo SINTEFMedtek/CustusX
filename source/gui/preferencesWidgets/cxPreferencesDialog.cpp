@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxDoubleWidgets.h"
 #include "cxEnumConverter.h"
 #include "cxSettings.h"
@@ -387,6 +387,7 @@ ToolConfigTab::ToolConfigTab(QWidget* parent) :
 {
   mToolConfigureGroupBox = new ToolConfigureGroupBox(this);
   mToolFilterGroupBox  = new ToolFilterGroupBox(this);
+  mToolFilterGroupBox->setTrackingSystemSelector(mToolConfigureGroupBox->getTrackingSystemSelector());
 
   connect(stateService().get(), &StateService::applicationStateChanged, this, &ToolConfigTab::applicationChangedSlot);
 
@@ -413,12 +414,14 @@ void ToolConfigTab::init()
   filepreviewGroupBox->setTitle("Toolfile preview");
   QHBoxLayout* filepreviewLayout = new QHBoxLayout();
   filepreviewGroupBox->setLayout(filepreviewLayout);
+//  filepreviewLayout->setMargin(0);
   filepreviewLayout->addWidget(mFilePreviewWidget);
 
   QGroupBox* imagepreviewGroupBox = new QGroupBox(this);
   imagepreviewGroupBox->setTitle("Tool image preview");
   QVBoxLayout* imagepreviewLayout = new QVBoxLayout();
   imagepreviewGroupBox->setLayout(imagepreviewLayout);
+  imagepreviewLayout->setMargin(0);
   imagepreviewLayout->addWidget(mImagePreviewWidget);
 
   //layout
@@ -454,9 +457,9 @@ void ToolConfigTab::saveParametersSlot()
 void ToolConfigTab::applicationChangedSlot()
 {
   CLINICAL_APPLICATION clinicalApplication = string2enum<CLINICAL_APPLICATION>(stateService()->getApplicationStateName());
-  mToolConfigureGroupBox->setClinicalApplicationSlot(clinicalApplication);
+//  mToolConfigureGroupBox->setClinicalApplicationSlot(clinicalApplication);
   mToolFilterGroupBox->setClinicalApplicationSlot(clinicalApplication);
-  mToolFilterGroupBox->setTrackingSystemSlot(tsPOLARIS);
+ // mToolFilterGroupBox->setTrackingSystemSlot(tsPOLARIS);
 }
 
 void ToolConfigTab::globalConfigurationFileChangedSlot(QString key)

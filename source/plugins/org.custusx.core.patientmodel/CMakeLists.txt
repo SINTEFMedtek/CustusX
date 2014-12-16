@@ -4,8 +4,6 @@ set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
 include_directories(
     ${CX_RESOURCE_INCLUDE_DIRECTORIES}
-    ${CustusX_SOURCE_DIR}/source/logic
-    ${CustusX_BINARY_DIR}/source/logic
     )
 
 set(PLUGIN_SRCS
@@ -13,18 +11,18 @@ set(PLUGIN_SRCS
   cxPatientModelImplService.cpp
   cxPatientModelImplService.h
     cxPatientData.cpp
-    cxPatientService.cpp
 	cxDataManager.cpp
 	cxDataManagerImpl.cpp
+	cxSessionStorageServiceImpl.cpp
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
   cxPatientModelPluginActivator.h
     cxPatientData.h
-    cxPatientService.h
 	cxDataManager.h
 	cxDataManagerImpl.h
+	cxSessionStorageServiceImpl.h
 )
 
 # Qt Designer files which should be processed by Qts uic

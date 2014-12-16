@@ -46,6 +46,7 @@ typedef boost::shared_ptr<class VideoService> VideoServicePtr;
 typedef boost::shared_ptr<class StateService> StateServicePtr;
 typedef boost::shared_ptr<class VisualizationService> ViewServicePtr;
 typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
+typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
 
 /** 
  *
@@ -63,6 +64,7 @@ cxLogicManager_EXPORT VideoServicePtr videoService();
 cxLogicManager_EXPORT StateServicePtr stateService();
 cxLogicManager_EXPORT ViewServicePtr viewService();
 cxLogicManager_EXPORT AcquisitionServicePtr acquisitionService();
+cxLogicManager_EXPORT SessionStorageServicePtr sessionStorageService();
 
 } // namespace cx
 

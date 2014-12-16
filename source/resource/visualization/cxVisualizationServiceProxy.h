@@ -57,7 +57,7 @@ public:
 	virtual void enableRender(bool val);
 	virtual bool renderingIsEnabled() const;
 
-	virtual QWidget* getLayoutWidget(int index=0);
+	virtual QWidget* getLayoutWidget(QWidget* parent, int index);
 	virtual QString getActiveLayout(int widgetIndex=0) const;
 	virtual void setActiveLayout(const QString& uid, int widgetIndex);
 	virtual InteractiveClipperPtr getClipper();
@@ -69,9 +69,6 @@ public:
 	virtual QActionGroup* createInteractorStyleActionGroup();
 	virtual void setPreview(ImagePtr image, const std::vector<double>& threshold);
 	virtual void removePreview();
-	virtual void clear();
-	virtual void addXml(QDomNode& parentNode);
-	virtual void parseXml(QDomNode viewmanagerNode);
 
 	bool isNull();
 

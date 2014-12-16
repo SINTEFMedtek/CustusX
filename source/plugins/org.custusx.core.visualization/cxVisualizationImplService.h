@@ -36,10 +36,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVisualizationService.h"
 #include "org_custusx_core_visualization_Export.h"
 class ctkPluginContext;
+class QDomElement;
 
 namespace cx
 {
 typedef boost::shared_ptr<class ViewManager> VisualizationServiceOldPtr;
+typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
 
 /**
  * Implementation of VisualizationService.
@@ -65,7 +67,7 @@ public:
 	virtual void enableRender(bool val);
 	virtual bool renderingIsEnabled() const;
 
-	virtual QWidget* getLayoutWidget(int index);
+	virtual QWidget* getLayoutWidget(QWidget *parent, int index);
 	virtual QString getActiveLayout(int widgetIndex) const;
 	virtual void setActiveLayout(const QString& uid, int widgetIndex);
 	virtual InteractiveClipperPtr getClipper();
@@ -77,15 +79,20 @@ public:
 	virtual QActionGroup* createInteractorStyleActionGroup();
 	virtual void setPreview(ImagePtr image, const std::vector<double>& threshold);
 	virtual void removePreview();
-	virtual void clear();
-	virtual void addXml(QDomNode& parentNode);
-	virtual void parseXml(QDomNode viewmanagerNode);
 
 	virtual bool isNull();
+
+private slots:
+	void onSessionChanged();
+	void onSessionCleared();
+	void onSessionLoad(QDomElement& node);
+	void onSessionSave(QDomElement& node);
 
 private:
 	ctkPluginContext *mContext;
 	VisualizationServiceOldPtr mBase;
+	SessionStorageServicePtr mSession;
+
 	ViewManager* viewManager() const { return mBase.get(); }
 };
 typedef boost::shared_ptr<VisualizationImplService> VisualizationImplServicePtr;

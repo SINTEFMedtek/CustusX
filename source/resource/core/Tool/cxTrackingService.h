@@ -89,13 +89,7 @@ public:
 	virtual bool isPlaybackMode() const = 0;
 	virtual void setPlaybackMode(PlaybackTimePtr controller) = 0;
 
-	virtual void savePositionHistory() = 0;
-	virtual void loadPositionHistory() = 0;
-	virtual void addXml(QDomNode& parentNode) = 0;
-	virtual void parseXml(QDomNode& dataNode) = 0;
-	virtual void clear() = 0;
 	virtual SessionToolHistoryMap getSessionHistory(double startTime, double stopTime) = 0;
-	virtual void setLoggingFolder(QString loggingFolder) = 0;
 	virtual void runDummyTool(DummyToolPtr tool) = 0;
 	virtual TrackerConfigurationPtr getConfiguration() = 0;
 

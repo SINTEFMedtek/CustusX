@@ -34,8 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QFile>
 #include <QTextStream>
 #include <QStringList>
+#include "cxLogger.h"
 
-#include "cxReporter.h"
 #include "cxTypeConversions.h"
 
 namespace cx

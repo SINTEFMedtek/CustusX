@@ -49,9 +49,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImageTF3D.h"
 #include "cxImageLUT2D.h"
 #include "cxRegistrationTransform.h"
-#include "cxReporter.h"
-#include "cxLogger.h"
+
+
 #include "cxCoordinateSystemHelpers.h"
+#include "cxLogger.h"
 
 typedef vtkSmartPointer<vtkDoubleArray> vtkDoubleArrayPtr;
 
@@ -86,7 +87,6 @@ UnsignedDerivedImage::UnsignedDerivedImage(ImagePtr base) : Image(base->getUid()
 
 void UnsignedDerivedImage::testSlot()
 {
-//	SSC_LOG("");
 }
 
 void UnsignedDerivedImage::unsignedTransferFunctionsChangedSlot()

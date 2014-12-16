@@ -32,7 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QApplication>
 #include <iostream>
 #include "cxMainWindow.h"
-#include "cxReporter.h"
 
 #include "cxCalibrationPlugin.h"
 #include "cxAlgorithmPlugin.h"
@@ -48,7 +47,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #if !defined(WIN32)
 #include <langinfo.h>
 #include <locale>
-#include "cxReporter.h"
 
 void force_C_locale_decimalseparator()
 {

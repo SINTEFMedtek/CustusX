@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxGraphicalPrimitives.h"
 #include "cxView.h"
 #include "cxDataMetric.h"
-#include "cxLogger.h"
+
 #include "cxVtkHelperClasses.h"
 
 namespace cx

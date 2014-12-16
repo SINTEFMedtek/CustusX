@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTimer>
 #include <vtkImageData.h>
 #include "cxLabeledComboBoxWidget.h"
-#include "cxReporter.h"
+
 #include "cxTypeConversions.h"
 #include "cxData.h"
 #include "cxRegistrationTransform.h"

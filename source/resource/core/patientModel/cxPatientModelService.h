@@ -156,12 +156,6 @@ public:
 	virtual DataPtr importData(QString fileName, QString &infoText) = 0;
 	virtual void exportPatient(bool niftiFormat) = 0;
 
-	virtual void newPatient(QString choosenDir) = 0;
-	virtual void loadPatient(QString chosenDir) = 0;
-	virtual void savePatient() = 0; ///< Save all application data to XML file
-	virtual void clearPatient() = 0;
-
-
 	virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const = 0;
 
 	virtual void setCenter(const Vector3D& center) = 0;
@@ -170,7 +164,7 @@ public:
 	virtual CLINICAL_APPLICATION getClinicalApplication() const = 0;
 	virtual void setClinicalApplication(CLINICAL_APPLICATION application) = 0;
 
-	virtual QDomElement getCurrentWorkingElement(QString path) = 0;
+//	virtual QDomElement getCurrentWorkingElement(QString path) = 0;
 
 	virtual void autoSave() = 0;//TODO remove, and integrate into other functions
 	virtual bool isNull() = 0;
@@ -189,11 +183,6 @@ signals:
 	void clinicalApplicationChanged();
 	void rMprChanged();
 	void streamLoaded();
-
-	//From PatientData
-	void cleared();
-	void isSaving();
-	void isLoading();
 	void patientChanged();
 };
 

@@ -37,8 +37,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libQtSignalAdapters/Qt2Func.h"
 #include "libQtSignalAdapters/ConnectionFactories.h"
 
-#include "cxReporter.h"
 
+#include "cxLogger.h"
 #include "cxBoolDataAdapter.h"
 #include "cxDoubleDataAdapter.h"
 #include "cxColorDataAdapter.h"

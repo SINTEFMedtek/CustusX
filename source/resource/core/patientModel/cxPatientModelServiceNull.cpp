@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDomElement>
 #include <map>
 #include "cxImage.h"
-#include "cxReporter.h"
+
 #include "cxLandmark.h"
 #include "cxRegistrationTransform.h"
 
@@ -180,12 +180,6 @@ void PatientModelServiceNull::printWarning() const
 //	reportWarning("Trying to use PatientModelServiceNull. Is PatientModelService (org.custusx.patiemtmodel) disabled?");
 }
 
-QDomElement PatientModelServiceNull::getCurrentWorkingElement(QString path)
-{
-	printWarning();
-	return QDomElement();
-}
-
 RegistrationHistoryPtr PatientModelServiceNull::get_rMpr_History() const
 {
 	printWarning();	
@@ -200,22 +194,6 @@ CLINICAL_APPLICATION PatientModelServiceNull::getClinicalApplication() const
 void PatientModelServiceNull::setClinicalApplication(CLINICAL_APPLICATION application)
 {
 
-}
-
-void PatientModelServiceNull::newPatient(QString choosenDir)
-{
-}
-
-void PatientModelServiceNull::loadPatient(QString chosenDir)
-{
-}
-
-void PatientModelServiceNull::savePatient()
-{
-}
-
-void PatientModelServiceNull::clearPatient()
-{
 }
 
 } // cx

@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDefinitionStrings.h"
 
 #include "cxPatientModelService.h"
-#include "cxReporter.h"
+
 
 namespace cx
 {

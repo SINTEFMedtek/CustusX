@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDomElement>
 #include "cxPNNReconstructionMethodService.h"
 #include "cxDummyTool.h"
-#include "cxReporter.h"
+
 #include "cxtestReconstructionAlgorithmFixture.h"
 #include "cxtestUtilities.h"
 #include "cxLogicManager.h"

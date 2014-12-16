@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLabeledComboBoxWidget.h"
 #include "cxDefinitionStrings.h"
 #include "cxUtilHelpers.h"
-#include "cxReporter.h"
+
 #include "cxRegistrationTransform.h"
 #include "cxImageAlgorithms.h"
 #include "cxInteractiveCropper.h"

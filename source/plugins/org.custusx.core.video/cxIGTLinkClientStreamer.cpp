@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "igtlStatusMessage.h"
 
 #include "cxTypeConversions.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxIGTLinkConversion.h"
 #include "cxCyclicActionLogger.h"
 #include "cxUtilHelpers.h"

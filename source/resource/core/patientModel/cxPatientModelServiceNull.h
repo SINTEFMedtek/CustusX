@@ -74,10 +74,6 @@ public:
 	virtual DataPtr importData(QString fileName, QString &infoText);
 	virtual void exportPatient(bool niftiFormat);
 	virtual void removeData(QString uid);
-	void newPatient(QString choosenDir);
-	void loadPatient(QString chosenDir);
-	void savePatient();
-	void clearPatient();
 
 	virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const;
 
@@ -85,8 +81,6 @@ public:
 	virtual Vector3D getCenter() const;
 
 	virtual QString addLandmark();
-
-	virtual QDomElement getCurrentWorkingElement(QString path);
 
 	virtual void autoSave();
 	virtual bool isNull();

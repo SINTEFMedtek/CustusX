@@ -94,6 +94,8 @@ public:
   FilteringToolListWidget(QWidget* parent = NULL);
   virtual ~FilteringToolListWidget();
 
+  virtual QSize minimumSizeHint() const;
+
 public slots:
   void filterSlot(QStringList applicationsFilter, QStringList trackingsystemsFilter);
 

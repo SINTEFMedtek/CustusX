@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackingSystemDummyService.h"
 
 #include "cxDummyTool.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxTrackerConfiguration.h"
 
 namespace cx

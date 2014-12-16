@@ -39,7 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 #include "cxDataLocations.h"
 #include "cxSettings.h"
-#include "cxLogger.h"
 #include "cxReporter.h"
 #include "vtkRenderWindowInteractor.h"
 #include "cxTypeConversions.h"
@@ -156,7 +155,7 @@ void TestRenderSpeed::createViews(int num)
 
 void TestRenderSpeed::showViews()
 {
-	SSC_ASSERT(mMainWidget);
+	CX_ASSERT(mMainWidget);
 
 	mMainWidget->resize(1000,500);
 	mMainWidget->show();

@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSliceProxy.h"
 #include "cxView.h"
 #include "cxGraphicalDisk.h"
-#include "cxLogger.h"
+
 #include "cxSphereMetric.h"
 
 namespace cx

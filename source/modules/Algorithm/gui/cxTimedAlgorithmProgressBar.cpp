@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtWidgets>
 
 #include "cxTimedAlgorithm.h"
-#include "cxReporter.h"
+
 #include "cxDisplayTimerWidget.h"
 
 namespace cx

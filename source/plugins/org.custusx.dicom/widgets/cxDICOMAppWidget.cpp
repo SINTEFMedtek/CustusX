@@ -62,7 +62,7 @@
 #include <QToolBar>
 //#include "ctkDICOMThumbnailListWidget.h"
 #include "cxDICOMThumbnailListWidget.h"
-#include "cxReporter.h"
+
 
 #include "cxDicomImporter.h"
 

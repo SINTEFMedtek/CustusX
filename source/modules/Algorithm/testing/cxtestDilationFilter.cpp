@@ -39,64 +39,72 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImage.h"
 #include "cxLegacySingletons.h"
 #include "cxPatientModelService.h"
+#include "cxLogicManager.h"
+#include "cxSessionStorageService.h"
 
-TEST_CASE("DilationFilter: execute", "[modules][Algorithm][DilationFilter]")
+TEST_CASE("DilationFilter: execute", "[unit][modules][Algorithm][DilationFilter]")
 {
-	cx::PatientModelServicePtr patientModelService = cx::PatientModelService::getNullObject();//mock PatientModelService
-
-	// Setup filter
-	cx::DilationFilterPtr filter = cx::DilationFilterPtr(new cx::DilationFilter(patientModelService));
-	REQUIRE(filter);
-	filter->getInputTypes();
-	filter->getOutputTypes();
-	filter->getOptions();
-
-	QString filename = cx::DataLocations::getTestDataPath()+ "/testing/DilationFilter/helix_seg.mhd";
-	cx::patientService()->newPatient(cx::DataLocations::getTestDataPath()+ "/temp/DilationFilter/");
-	QString info;
-	cx::DataPtr data = cx::patientService()->importData(filename, info);
-	REQUIRE(data);
-
-	//set input
-	std::vector < cx::SelectDataStringDataAdapterBasePtr > input =filter->getInputTypes();
-	{
-		INFO("Number of inputs has changed.");
-		REQUIRE(input.size() == 1);
-	}
-	{
-		INFO("Could not set input to the filter.");
-		REQUIRE(input[0]->setValue(data->getUid()));
-	}
-	{
-		INFO("The name of the input data is not as we requested.");
-		REQUIRE(input[0]->getData()->getName() == "helix_seg");
-	}
-	// Execute
-	{
-		INFO("Preprocessing LevelSetFilter failed.");
-		REQUIRE(filter->preProcess());
-	}
+	cx::DataLocations::setTestMode();
+	cx::LogicManager::initialize();
 
 	{
-		REQUIRE(filter->execute());
-	}
-	{
-		INFO("Post processing data from Level Set Filter failed.");
-		REQUIRE(filter->postProcess());
+		cx::sessionStorageService()->load(cx::DataLocations::getTestDataPath()+ "/temp/DilationFilter");
+//		cx::PatientModelServicePtr patientModelService = cx::PatientModelService::getNullObject();//mock PatientModelService
+		// Setup filter
+		cx::DilationFilterPtr filter = cx::DilationFilterPtr(new cx::DilationFilter(cx::patientService()));
+		REQUIRE(filter);
+		filter->getInputTypes();
+		filter->getOutputTypes();
+		filter->getOptions();
+
+		QString filename = cx::DataLocations::getTestDataPath()+ "/testing/DilationFilter/helix_seg.mhd";
+		QString info;
+		cx::DataPtr data = cx::patientService()->importData(filename, info);
+		REQUIRE(data);
+
+		//set input
+		std::vector < cx::SelectDataStringDataAdapterBasePtr > input =filter->getInputTypes();
+		{
+			INFO("Number of inputs has changed.");
+			REQUIRE(input.size() == 1);
+		}
+		{
+			INFO("Could not set input to the filter.");
+			REQUIRE(input[0]->setValue(data->getUid()));
+		}
+		{
+			INFO("The name of the input data is not as we requested.");
+			REQUIRE(input[0]->getData()->getName() == "helix_seg");
+		}
+		// Execute
+		{
+			INFO("Preprocessing LevelSetFilter failed.");
+			REQUIRE(filter->preProcess());
+		}
+
+		{
+			REQUIRE(filter->execute());
+		}
+		{
+			INFO("Post processing data from Level Set Filter failed.");
+			REQUIRE(filter->postProcess());
+		}
+
+		// Check output
+		std::vector < cx::SelectDataStringDataAdapterBasePtr > output = filter->getOutputTypes();
+		{
+			INFO("Number of outputs has changed.");
+			REQUIRE(output.size() == 2);
+		}
+		{
+			INFO("Segmentation volume not generated.");
+			REQUIRE(output[0]->getData());
+		}
+		{
+			INFO("Surface/contour not generated.");
+			REQUIRE(output[1]->getData());
+		}
 	}
 
-	// Check output
-	std::vector < cx::SelectDataStringDataAdapterBasePtr > output = filter->getOutputTypes();
-	{
-		INFO("Number of outputs has changed.");
-		REQUIRE(output.size() == 2);
-	}
-	{
-		INFO("Segmentation volume not generated.");
-		REQUIRE(output[0]->getData());
-	}
-	{
-		INFO("Surface/contour not generated.");
-		REQUIRE(output[1]->getData());
-	}
+	cx::LogicManager::shutdown();
 }

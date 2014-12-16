@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxAcquisitionService.h"
 class ctkPluginContext;
-
+class QDomElement;
 
 namespace cx
 {
@@ -44,6 +44,7 @@ typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
 typedef boost::shared_ptr<class USAcquisition> USAcquisitionPtr;
 typedef boost::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
 typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
+typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
 
 /** \brief Implementation for Acqusition service
  *
@@ -77,8 +78,8 @@ public:
 
 private slots:
 	void duringClearPatientSlot();
-	void duringSavePatientSlot();
-	void duringLoadPatientSlot();
+	void duringSavePatientSlot(QDomElement& node);
+	void duringLoadPatientSlot(QDomElement& node);
 private:
 	ctkPluginContext* mContext;
 	AcquisitionDataPtr mAcquisitionData;
@@ -86,6 +87,7 @@ private:
 	UsReconstructionServicePtr mUsReconstructService;
 	USAcquisitionPtr mUsAcquisition;
 	PatientModelServicePtr mPatientModelService;
+	SessionStorageServicePtr mSession;
 
 	void addXml(QDomNode& dataNode);
 	void parseXml(QDomNode& dataNode);

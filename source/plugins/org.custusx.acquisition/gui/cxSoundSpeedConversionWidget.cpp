@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxTrackingService.h"
 #include "cxProbe.h"
 

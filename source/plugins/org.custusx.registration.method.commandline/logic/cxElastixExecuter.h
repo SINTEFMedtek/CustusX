@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QProcess>
 #include <QFile>
 #include "cxTimedAlgorithm.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxRegServices.h"
 #include "org_custusx_registration_method_commandline_Export.h"
 

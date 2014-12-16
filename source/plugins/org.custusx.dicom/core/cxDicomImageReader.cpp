@@ -31,9 +31,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxDicomImageReader.h"
-#include "cxLogger.h"
+
 #include "cxVolumeHelpers.h"
 #include "dcvrpn.h"
+#include "cxLogger.h"
 
 namespace cx
 {

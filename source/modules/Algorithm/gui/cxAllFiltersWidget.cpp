@@ -34,11 +34,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxStringDataAdapterXml.h"
 
-#include "cxReporter.h"
+
 #include "cxLabeledComboBoxWidget.h"
 #include "cxDataLocations.h"
 #include "cxTimedAlgorithmProgressBar.h"
-
+#include "cxLogger.h"
 #include "cxDummyFilter.h"
 #include "cxBinaryThresholdImageFilter.h"
 #include "cxBinaryThinningImageFilter3DFilter.h"

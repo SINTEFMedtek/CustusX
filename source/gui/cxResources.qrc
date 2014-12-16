@@ -93,5 +93,9 @@
         <file>icons/metric_torus.png</file>
         <file>icons/matrix_inverse.png</file>
         <file>icons/open_icon_library/view-list-tree.png</file>
+        <file>icons/message_levels/window-close-3.png</file>
+        <file>icons/message_levels/dialog-warning-panel.png</file>
+        <file>icons/message_levels/dialog-information-4.png</file>
+        <file>icons/message_levels/script-error.png</file>
     </qresource>
 </RCC>
