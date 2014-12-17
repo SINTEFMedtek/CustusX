@@ -79,6 +79,9 @@ void TrackingServiceProxy::onServiceRemoved(TrackingService *service)
 	disconnect(mTrackingService.get(), &TrackingService::dominantToolChanged, this, &TrackingService::dominantToolChanged);
 
 	mTrackingService = TrackingService::getNullObject();
+
+	emit stateChanged();
+	emit dominantToolChanged("");
 }
 
 bool TrackingServiceProxy::isNull()

@@ -71,12 +71,12 @@ RecordSessionWidget::RecordSessionWidget(AcquisitionServicePtr base, QWidget* pa
 	buttonLayout->addWidget(mCancelButton);
 	layout->addLayout(buttonLayout);
 
-	connect(mAcquisitionService.get(), SIGNAL(stateChanged()), this, SLOT(recordStateChangedSlot()));
-	connect(mAcquisitionService.get(), SIGNAL(readinessChanged()), this, SLOT(readinessChangedSlot()));
+	connect(mAcquisitionService.get(), &AcquisitionService::stateChanged, this, &RecordSessionWidget::recordStateChangedSlot);
+	connect(mAcquisitionService.get(), &AcquisitionService::readinessChanged, this, &RecordSessionWidget::readinessChangedSlot);
 
 	mStartStopButton->setCheckable(true);
-	connect(mStartStopButton, SIGNAL(clicked(bool)), this, SLOT(startStopSlot(bool)));
-	connect(mCancelButton, SIGNAL(clicked(bool)), this, SLOT(cancelSlot()));
+	connect(mStartStopButton, &QPushButton::clicked, this, &RecordSessionWidget::startStopSlot);
+	connect(mCancelButton, &QPushButton::clicked, this, &RecordSessionWidget::cancelSlot);
 
 	this->recordStateChangedSlot();
 	this->readinessChangedSlot();
