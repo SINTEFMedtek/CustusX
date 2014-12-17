@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMesh.h"
 #include "cxVector3D.h"
 #include <vtkPolyData.h>
+#include "org_custusx_registration_method_bronchoscopy_Export.h"
 
 
 namespace cx
@@ -44,7 +45,7 @@ namespace cx
 typedef std::vector< Eigen::Matrix4d > M4Vector;
 typedef boost::shared_ptr<class BranchList> BranchListPtr;
 
-class BranchList
+class org_custusx_registration_method_bronchoscopy_EXPORT BranchList
 {
 	std::vector<BranchPtr> mBranches;
 public:

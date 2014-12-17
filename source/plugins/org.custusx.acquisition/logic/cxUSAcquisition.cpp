@@ -116,7 +116,8 @@ void USAcquisition::checkIfReadySlot()
 		mWhatsMissing.append("<br>");
 
 	// do not require tracking to be present in order to perform an acquisition.
-	mBase->setReady(streaming, mWhatsMissing);
+    //mBase->setReady(streaming, mWhatsMissing);
+    mBase->setReady(true, mWhatsMissing);
 }
 
 int USAcquisition::getNumberOfSavingThreads() const
