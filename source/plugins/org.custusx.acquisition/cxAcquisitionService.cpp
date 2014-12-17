@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxAcquisitionServiceNull.h"
 #include "cxNullDeleter.h"
 #include "cxRecordSession.h"
+#include "cxReporter.h"
 
 namespace cx
 {
@@ -49,12 +50,15 @@ AcquisitionServicePtr AcquisitionService::getNullObject()
 RecordSessionPtr AcquisitionService::getSession(QString uid)
 {
 	RecordSessionPtr retval;
-	std::vector<RecordSessionPtr>::iterator it = this->getSessions().begin();
-	for(; it != this->getSessions().end(); ++it)
-	{
-		if((*it)->getUid() == uid)
-			retval = (*it);
-	}
+    std::vector<RecordSessionPtr> sessions = this->getSessions();
+    for(unsigned i = 0; i < sessions.size(); ++i)
+    {
+        if(sessions[i] && (sessions[i]->getUid() == uid))
+            retval = sessions[i];
+    }
+
+    if(!retval)
+        reporter()->sendError("Did not find an record session.");
 	return retval;
 }
 } //cx
