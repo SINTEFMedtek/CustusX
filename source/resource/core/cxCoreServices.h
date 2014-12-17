@@ -60,6 +60,7 @@ public:
 	static CoreServicesPtr create(ctkPluginContext* context);
 	CoreServices(ctkPluginContext* context);
 	static CoreServices getNullObjects();
+	static CoreServicesPtr getNull();
 
 	PatientModelServicePtr getPatientService() { return patientModelService; }
 	TrackingServicePtr getToolManager() { return trackingService; }

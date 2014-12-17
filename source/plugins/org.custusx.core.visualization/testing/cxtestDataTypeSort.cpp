@@ -11,11 +11,11 @@ modification, are permitted provided that the following conditions are met:
    this list of conditions and the following disclaimer.
 
 2. Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
+   this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
 
 3. Neither the name of the copyright holder nor the names of its contributors 
-   may be used to endorse or promote products derived from this software 
+   may be used to endorse or promote products derived from this software
    without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
@@ -39,8 +39,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewWrapper.h"
 #include "cxTypeConversions.h"
 #include "cxtestSpaceProviderMock.h"
+#include "cxCoreServices.h"
+#include "cxtestPatientModelServiceMock.h"
+#include "cxLogger.h"
 
-TEST_CASE("Sort cx::Data user-frindly using getPriority()", "[unit][service][visualization]")
+TEST_CASE("Sort cx::Data user-friendly using getPriority()", "[unit][service][visualization]")
 {
 	cx::MeshPtr mesh(new cx::Mesh("mesh1     "));
 	cx::ImagePtr image_mr(new cx::Image("image1_mr ", vtkImageDataPtr()));
@@ -84,11 +87,16 @@ TEST_CASE("Sort cx::Data user-frindly using getPriority()", "[unit][service][vis
 	for (unsigned i=0; i<sorted.size(); ++i)
 		CHECK(unsorted1[i]==sorted[i]);
 
-	// test cx::ViewGroupData::addDataSorted()
-	cx::CoreServicesPtr nullBackend;
+	cx::PatientModelServicePtr pms(new cxtest::PatientModelServiceMock());
+	cx::CoreServicesPtr nullBackend = cx::CoreServices::getNull();
+	nullBackend->patientModelService = pms;
+
+	for (unsigned i=0; i<unsorted2.size(); ++i)
+		pms->insertData(unsorted2[i]);
+
 	cx::ViewGroupData vgData(nullBackend);
 	for (unsigned i=0; i<unsorted2.size(); ++i)
-		vgData.addDataSorted(unsorted2[i]);
+		vgData.addDataSorted(unsorted2[i]->getUid());
 	std::vector<cx::DataPtr> sorted2 = vgData.getData();
 
 	// check sorting success

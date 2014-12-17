@@ -178,8 +178,8 @@ void EraserWidget::duplicateSlot()
 //	std::vector<ViewGroupPtr> viewGroups = viewService()->getViewGroupDatas();
 	for (unsigned i = 0; i < viewService()->groupCount(); ++i)
 	{
-		if (viewService()->getGroup(i)->removeData(original))
-			viewService()->getGroup(i)->addData(duplicate);
+		if (viewService()->getGroup(i)->removeData(original->getUid()))
+			viewService()->getGroup(i)->addData(duplicate->getUid());
 	}
 }
 

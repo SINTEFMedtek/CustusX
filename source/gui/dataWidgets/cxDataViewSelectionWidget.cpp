@@ -239,7 +239,7 @@ void SelectedDataListWidget::userChangedListSlot()
 	DataPtr current = patientService()->getData(data[i]);
     if (!current)
       continue;
-	mViewGroupData->addData(current);
+	mViewGroupData->addData(current->getUid());
   }
 }
 

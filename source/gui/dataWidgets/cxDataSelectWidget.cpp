@@ -223,11 +223,11 @@ void DataSelectWidget::toggleShowData()
 
     if (mToggleShowAction->isChecked())
     {
-		mCurrentViewGroup->addData(mData->getData());
+		mCurrentViewGroup->addData(mData->getData()->getUid());
     }
     else
     {
-		mCurrentViewGroup->removeData(mData->getData());
+		mCurrentViewGroup->removeData(mData->getData()->getUid());
     }
 }
 

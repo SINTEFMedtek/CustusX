@@ -415,6 +415,11 @@ void Reporter::sendMessage(Message message)
 	if (message.mChannel.isEmpty())
 		message.mChannel = "console";
 
+	if (!message.mSourceFile.isEmpty())
+	{
+		message.mSourceFile = message.mSourceFile.split("CustusX/").back();
+	}
+
 	if (!this->isEnabled())
 	{
 		std::cout << message.getPrintableMessage() << std::endl;

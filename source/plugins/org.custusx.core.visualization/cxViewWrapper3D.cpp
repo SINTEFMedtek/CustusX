@@ -572,7 +572,7 @@ void ViewWrapper3D::fillSlicePlanesActionSlot(bool checked)
 void ViewWrapper3D::dataViewPropertiesChangedSlot(QString uid)
 {
 	DataPtr data = mBackend->getPatientService()->getData(uid);
-	DataViewProperties properties = mGroupData->getProperties(data);
+	DataViewProperties properties = mGroupData->getProperties(uid);
 
 	if (properties.hasVolume3D())
 		this->addVolumeDataRep(data);
