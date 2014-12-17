@@ -127,6 +127,8 @@ public:
 		return boost::dynamic_pointer_cast<DATA>(retval);
 	}
 
+	QString getActiveImageUid();
+
 	// streams
 	virtual std::map<QString, VideoSourcePtr> getStreams() const = 0;
 	VideoSourcePtr getStream(const QString &uid) const; ///< Convenience function getting a specified stream

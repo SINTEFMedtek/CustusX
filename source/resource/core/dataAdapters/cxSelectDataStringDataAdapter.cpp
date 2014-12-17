@@ -59,9 +59,7 @@ bool ActiveImageStringDataAdapter::setValue(const QString& value)
 
 QString ActiveImageStringDataAdapter::getValue() const
 {
-  if (!mPatientModelService->getActiveImage())
-	return "";
-  return qstring_cast(mPatientModelService->getActiveImage()->getUid());
+	return mPatientModelService->getActiveImageUid();
 }
 
 //---------------------------------------------------------
