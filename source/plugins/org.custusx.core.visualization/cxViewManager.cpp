@@ -623,7 +623,7 @@ void ViewManager::autoShowData(DataPtr data)
 {
 	if (settings()->value("Automation/autoShowNewData").toBool())
 	{
-		this->getViewGroups()[0]->getData()->addDataSorted(data);
+		this->getViewGroups()[0]->getData()->addDataSorted(data->getUid());
 	}
 }
 

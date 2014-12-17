@@ -474,7 +474,7 @@ void ViewWrapper2D::imageRemoved(const QString& uid)
 void ViewWrapper2D::dataViewPropertiesChangedSlot(QString uid)
 {
 	DataPtr data = mBackend->getPatientService()->getData(uid);
-	DataViewProperties properties = mGroupData->getProperties(data);
+	DataViewProperties properties = mGroupData->getProperties(uid);
 
 	if (properties.hasSlice2D())
 		this->dataAdded(data);

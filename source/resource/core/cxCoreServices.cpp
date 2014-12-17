@@ -54,6 +54,11 @@ CoreServices::CoreServices(ctkPluginContext* context)
 	sessionStorageService = SessionStorageServiceProxy::create(context);
 }
 
+CoreServicesPtr CoreServices::getNull()
+{
+	return CoreServicesPtr(new CoreServices());
+}
+
 CoreServices CoreServices::getNullObjects()
 {
 	return CoreServices();

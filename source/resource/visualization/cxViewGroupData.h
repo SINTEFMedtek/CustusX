@@ -109,15 +109,15 @@ public:
 //	std::vector<DataPtr> getData() const;
 	std::vector<DataPtr> getData(DataViewProperties properties=DataViewProperties::createFull()) const;
 	QString getVideoSource() const;
-	void addData(DataPtr data);
-	void addDataSorted(DataPtr data); ///< add data in a predefined ordering: CT/MR/SC/US/USA/Mesh/Metrics
+	void addData(QString uid);
+	void addDataSorted(QString uid); ///< add data in a predefined ordering: CT/MR/SC/US/USA/Mesh/Metrics
 	void setVideoSource(QString uid);
-	bool removeData(DataPtr data);
+	bool removeData(QString uid);
 	void clearData();
 	std::vector<ImagePtr> getImages(DataViewProperties properties) const;
 	std::vector<MeshPtr> getMeshes(DataViewProperties properties) const;
-	DataViewProperties getProperties(DataPtr data);
-	void setProperties(DataPtr data, DataViewProperties properties);
+	DataViewProperties getProperties(QString uid);
+	void setProperties(QString uid, DataViewProperties properties);
 
 	void initializeGlobal2DZoom(SyncedValuePtr val);
 	SyncedValuePtr getGroup2DZoom();
@@ -151,8 +151,6 @@ private slots:
 
 signals:
 	void dataViewPropertiesChanged(QString uid);
-//	void dataAdded(QString uid);
-//	void dataRemoved(QString uid);
 	void videoSourceChanged(QString uid);
 	void initialized();
 	void optionsChanged();
@@ -160,28 +158,28 @@ signals:
 private:
 	CoreServicesPtr mBackend;
 	QString mVideoSource;
-//	std::vector<DataPtr> mData;
-	typedef std::pair<DataPtr, DataViewProperties> DataAndViewProperties;
+	typedef std::pair<QString, DataViewProperties> DataAndViewProperties;
 	std::vector<DataAndViewProperties> mData;
 	PlaneTypeCollection mSliceDefinitions;
 	CameraDataPtr mCamera3D;
 	Options mOptions;
 	SyncedValuePtr mGroup2DZoom;
 	SyncedValuePtr mGlobal2DZoom;
+	DataPtr getData(QString uid) const;
 
 	struct data_equals
 	{
-		data_equals(DataPtr data) : mData(data) {}
+		data_equals(QString uid) : mData(uid) {}
 		bool operator()(const DataAndViewProperties& right)
 		{
 			return mData == right.first;
 		}
-		DataPtr mData;
+		QString mData;
 	};
 
 	template<class DATA_TYPE>
 	std::vector<boost::shared_ptr<DATA_TYPE> > getDataOfType(DataViewProperties requiredProperties) const;
-	bool contains(DataPtr data) const;
+	bool contains(QString uid) const;
 };
 
 
