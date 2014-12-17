@@ -49,7 +49,7 @@ class org_custusx_registration_method_bronchoscopy_EXPORT BranchList
 {
 	std::vector<BranchPtr> mBranches;
 public:
-	BranchList();
+    BranchList();
 	virtual ~BranchList();
 	void addBranch(BranchPtr b);
 	void deleteBranch(BranchPtr b);
