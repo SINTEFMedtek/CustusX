@@ -63,6 +63,9 @@ class QTextStream;
 
 namespace cx
 {
+typedef boost::shared_ptr<class MessageListener> MessageListenerPtr;
+
+
 /**\brief A representation of a Reporter message.
  *
  * \author Janne Beate Lervik Bakeng, SINTEF
@@ -122,8 +125,6 @@ public:
   static Reporter* getInstance(); ///< Returns a reference to the only Reporter that exists.
 
   void setLoggingFolder(QString absoluteLoggingFolderPath); // deprecated
-//  bool setLogFile(QString filename); ///< set a file to write messages to.
-  bool isEnabled() const;
 
   struct Format
   {
@@ -133,9 +134,8 @@ public:
 	  bool mShowSourceLocation;
   };
 
-  void setFormat(Format format); ///< fine-tune messaging format
   void setAudioSource(AudioPtr audioSource); ///< define sounds to go with the messages.
-  bool hasAudioSource() const;
+  MessageListenerPtr createListener();
 
   //Text
   void sendInfo(QString info); ///< Used to report normal interesting activity, no sound associated
@@ -165,6 +165,9 @@ signals:
   void emittedMessage(Message message); ///< emitted for each new message, in addition to writing to file.
 
 private:
+  bool hasAudioSource() const;
+  bool isEnabled() const;
+  void setFormat(Format format); ///< fine-tune messaging format
   void initializeObject();
   Reporter();
   virtual ~Reporter();
@@ -190,6 +193,8 @@ private:
 //  QString mLogFile;
   QString mLogPath;
   AudioPtr mAudioSource;
+
+  MessageListenerPtr mListener;
 
   static Reporter *mTheInstance; // global variable
 };

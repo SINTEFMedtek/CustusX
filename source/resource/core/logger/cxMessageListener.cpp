@@ -30,6 +30,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxMessageListener.h"
+#include <iostream>
 
 namespace cx
 {
@@ -40,7 +41,20 @@ MessageListenerPtr MessageListener::create()
 	return MessageListenerPtr(new MessageListener);
 }
 
-MessageListener::MessageListener() : mManager(NULL)
+MessageListenerPtr MessageListener::clone()
+{
+	MessageListenerPtr retval(new MessageListener());
+	retval->mMessages = this->mMessages;
+	retval->mManager = this->mManager;
+	retval->mMessageHistoryMaxSize = this->mMessageHistoryMaxSize;
+	retval->mFilter = this->mFilter;
+	return retval;
+}
+
+
+MessageListener::MessageListener() :
+	mManager(NULL),
+	mMessageHistoryMaxSize(1000)
 {
 	mManager = reporter();
 	connect(mManager, SIGNAL(emittedMessage(Message)), this, SLOT(messageReceived(Message)));
@@ -57,6 +71,23 @@ MessageListener::~MessageListener()
 void MessageListener::messageReceived(Message message)
 {
 	mMessages.push_back(message);
+	this->limitQueueSize();
+	this->emitThroughFilter(message);
+}
+
+void MessageListener::limitQueueSize()
+{
+	if (mMessageHistoryMaxSize<0)
+		return;
+
+	while (mMessages.size() > mMessageHistoryMaxSize)
+		mMessages.pop_front();
+}
+
+void MessageListener::emitThroughFilter(const Message& message)
+{
+	if (this->testFilter(message))
+		emit newMessage(message);
 }
 
 bool MessageListener::isError(MESSAGE_LEVEL level) const
@@ -66,11 +97,42 @@ bool MessageListener::isError(MESSAGE_LEVEL level) const
 
 bool MessageListener::containsErrors() const
 {
-	for (unsigned i=0; i<mMessages.size(); ++i)
-		if (this->isError(mMessages[i].getMessageLevel()))
+	for (QList<Message>::const_iterator i=mMessages.begin(); i!=mMessages.end(); ++i)
+		if (this->isError(i->getMessageLevel()))
 			return true;
 	return false;
 }
+
+void MessageListener::restart()
+{
+	for (QList<Message>::iterator i=mMessages.begin(); i!=mMessages.end(); ++i)
+		this->emitThroughFilter(*i);
+}
+
+bool MessageListener::testFilter(const Message& msg) const
+{
+	if (!mFilter)
+		return true; // always succeed with no filter.
+	return (*mFilter)(msg);
+}
+
+void MessageListener::installFilter(MessageFilterPtr filter)
+{
+	mFilter = filter;
+}
+
+void MessageListener::setMessageQueueMaxSize(int count)
+{
+	mMessageHistoryMaxSize = count;
+}
+
+int MessageListener::getMessageQueueMaxSize() const
+{
+	return mMessageHistoryMaxSize;
+}
+
+
+
 
 } // namespace cx
 

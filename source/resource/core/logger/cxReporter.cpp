@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDefinitionStrings.h"
 #include "cxTime.h"
 #include "cxDataLocations.h"
+#include "cxMessageListener.h"
 
 namespace cx
 {
@@ -271,6 +272,8 @@ void Reporter::initialize()
 
 void Reporter::initializeObject()
 {
+	mListener = MessageListener::create();
+
 	// must clear both before reinit (in case of nested initializing)
 	// otherwise we get a segfault.
 	mCout.reset();
@@ -561,6 +564,12 @@ bool Reporter::appendToLogfile(QString filename, QString text)
 
 	return true;
 }
+
+MessageListenerPtr Reporter::createListener()
+{
+	return mListener->clone();
+}
+
 
 Reporter::Format::Format() :
 	mShowBrackets(true),

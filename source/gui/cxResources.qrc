@@ -97,5 +97,7 @@
         <file>icons/message_levels/dialog-warning-panel.png</file>
         <file>icons/message_levels/dialog-information-4.png</file>
         <file>icons/message_levels/script-error.png</file>
+        <file>icons/open_icon_library/zoom-in-3.png</file>
+        <file>icons/open_icon_library/zoom-out-3.png</file>
     </qresource>
 </RCC>

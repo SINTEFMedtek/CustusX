@@ -48,6 +48,8 @@ class QAction;
 
 namespace cx
 {
+typedef boost::shared_ptr<class MessageListener> MessageListenerPtr;
+
 /**\brief Widget for displaying status messages.
  *
  * \date 24. aug. 2010
@@ -70,34 +72,34 @@ protected slots:
 
 private slots:
 	void lineWrappingSlot(bool checked);
-	void onSeverityButtonsChanged();
+	void onChannelSelectorChanged();
 	void receivedMessage(Message message);
+
+	void onSeverityUp();
+	void onSeverityDown();
+	void onSeverityChange(int delta);
+	void updateUI();
 
 private:
 	void printMessage(const Message& message); ///< prints the message into the console
 	void createTextCharFormats(); ///< sets up the formating rules for the message levels
 	void format(const Message &message); ///< formats the text to suit the message level
 	void addSeverityButtons(QBoxLayout* buttonLayout);
-	void addSeverityButton(QBoxLayout* buttonLayout, MESSAGE_LEVEL severity, QString iconname, QString text, QString help);
 	void addDetailsButton(QBoxLayout* buttonLayout);
 	QString getCompactMessage(Message message);
 	void createChannelSelector();
+	void updateSeverityIndicator(QString iconname, QString help);
+	void addSeverityIndicator(QBoxLayout* buttonLayout);
+	void updateSeverityIndicator();
 
-	void saveSeverityVisibility(MESSAGE_LEVEL severity);
-	void loadSeverityVisibility(MESSAGE_LEVEL severity);
-
-	void updateSeverityButtons();
-	bool isActive(const Message &message);
-	bool isActiveChannel(const Message& message) const;
-
-	std::list<Message> mMessageHistory;
-	int mMessageHistorySize;
 	QAction* mLineWrappingAction;
+	QAction* mSeverityAction;
 	QTextBrowser* mBrowser;
-	std::map<MESSAGE_LEVEL, QAction*> mSeverityActions;
 	QAction* mDetailsAction;
 	StringDataAdapterXmlPtr mChannelSelector;
 	QStringList mChannels;
+	MessageListenerPtr mMessageListener;
+	boost::shared_ptr<class MessageFilterConsole> mMessageFilter;
 
 	std::map<MESSAGE_LEVEL, QTextCharFormat> mFormat;
 };
