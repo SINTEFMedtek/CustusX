@@ -51,8 +51,8 @@ TransferFunction2DOpacityWidget::TransferFunction2DOpacityWidget(PatientModelSer
   mDataLLR.reset(new DoubleDataAdapterImageTFDataLLR);
 
   mActiveImageProxy = ActiveImageProxy::New(patientModelService);
-  connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
-  connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(activeImageChangedSlot()));
+  connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &TransferFunction2DOpacityWidget::activeImageChangedSlot);
+  connect(mActiveImageProxy.get(), &ActiveImageProxy::transferFunctionsChanged, this, &TransferFunction2DOpacityWidget::activeImageChangedSlot);
 
   mTransferFunctionAlphaWidget->setSizePolicy(QSizePolicy::MinimumExpanding,
                                               QSizePolicy::MinimumExpanding);

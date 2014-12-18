@@ -68,7 +68,7 @@ void ShadingWidget::init()
 //  mShadingCheckBox->setEnabled(true);
 //
 
-  connect(mShadingCheckBox, SIGNAL(toggled(bool)), this, SLOT(shadingToggledSlot(bool)));
+  connect(mShadingCheckBox, &QCheckBox::toggled, this, &ShadingWidget::shadingToggledSlot);
 
   QGridLayout* shadingLayput = new QGridLayout();
 	shadingLayput->addWidget(mShadingCheckBox, 0,0);
@@ -83,8 +83,8 @@ void ShadingWidget::init()
   shadingSpecularPowerWidget->setEnabled(false);
 
   mActiveImageProxy = ActiveImageProxy::New(mPatientModelService);
-  connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
-  connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(activeImageChangedSlot()));
+  connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &ShadingWidget::activeImageChangedSlot);
+  connect(mActiveImageProxy.get(), &ActiveImageProxy::transferFunctionsChanged, this, &ShadingWidget::activeImageChangedSlot);
 
 	ImagePropertiesWidget* imagePropertiesWidget = new ImagePropertiesWidget(mPatientModelService, NULL);
 	shadingLayput->addWidget(imagePropertiesWidget, 5, 0, 1, 2);
