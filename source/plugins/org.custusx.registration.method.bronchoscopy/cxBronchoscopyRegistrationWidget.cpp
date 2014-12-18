@@ -255,7 +255,7 @@ void BronchoscopyRegistrationWidget::registerSlot()
             std::cout << display_rMpr.row(i) << std::endl;
 
     ToolRep3DPtr activeRep3D = getToolRepIn3DView(mTool);
-    if(activeRep3D->getTracer())
+	if(activeRep3D && activeRep3D->getTracer())
         activeRep3D->getTracer()->clear();
 
 	QColor colorGreen = QColor(0, 255, 0, 255);
@@ -314,10 +314,11 @@ void BronchoscopyRegistrationWidget::recordedSessionsChanged()
 
 ToolRep3DPtr BronchoscopyRegistrationWidget::getToolRepIn3DView(ToolPtr tool)
 {
-	ViewPtr view = mServices.visualizationService->get3DView();
-	ToolRep3DPtr retval = mServices.visualizationService->get3DReps(0, 0)->findFirst<ToolRep3D>(tool);
-//	ToolRep3DPtr retval = RepContainer::findFirstRep<ToolRep3D>(view->getReps(),tool);
-	return retval;
+	RepContainerPtr repContainer = mServices.visualizationService->get3DReps(0, 0);
+	if (repContainer)
+		return repContainer->findFirst<ToolRep3D>(tool);
+	else
+		return ToolRep3DPtr();
 }
 
 void BronchoscopyRegistrationWidget::obscuredSlot(bool obscured)

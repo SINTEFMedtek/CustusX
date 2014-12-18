@@ -40,6 +40,7 @@ if (BUILD_TESTING)
                 cxtestVideoGraphics.cpp
                 cxtestVisualRendering.cpp
                 cxtestImageEnveloper.cpp
+                cxtestVisualizationService.cpp
         )
 #	cx_add_class(RESOURCE_VISUALZATION_TEST_CATCH_SOURCE_FILES
 #		cxViewsFixture.cpp
