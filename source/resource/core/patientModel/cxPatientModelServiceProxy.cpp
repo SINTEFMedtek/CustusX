@@ -82,14 +82,17 @@ void PatientModelServiceProxy::onServiceAdded(PatientModelService* service)
 	connect(service, &PatientModelService::rMprChanged, this, &PatientModelService::rMprChanged);
 	connect(service, &PatientModelService::streamLoaded, this, &PatientModelService::streamLoaded);
 
-//	connect(service, &PatientModelService::cleared, this, &PatientModelService::cleared);
-//	connect(service, &PatientModelService::isSaving, this, &PatientModelService::isSaving);
-//	connect(service, &PatientModelService::isLoading, this, &PatientModelService::isLoading);
 	connect(service, &PatientModelService::patientChanged, this, &PatientModelService::patientChanged);
 
 	if(mPatientModelService->isNull())
 		reportWarning("PatientModelServiceProxy::onServiceAdded mPatientModelService->isNull()");
 
+	emit dataAddedOrRemoved();
+	emit activeImageChanged(service->getActiveImageUid());
+	emit landmarkPropertiesChanged();
+	emit debugModeChanged(service->getDebugMode());
+	emit clinicalApplicationChanged();
+	emit rMprChanged();
 	emit patientChanged();
 }
 
@@ -104,13 +107,16 @@ void PatientModelServiceProxy::onServiceRemoved(PatientModelService *service)
 	disconnect(service, &PatientModelService::rMprChanged, this, &PatientModelService::rMprChanged);
 	disconnect(service, &PatientModelService::streamLoaded, this, &PatientModelService::streamLoaded);
 
-//	disconnect(service, &PatientModelService::cleared, this, &PatientModelService::cleared);
-//	disconnect(service, &PatientModelService::isSaving, this, &PatientModelService::isSaving);
-//	disconnect(service, &PatientModelService::isLoading, this, &PatientModelService::isLoading);
 	disconnect(service, &PatientModelService::patientChanged, this, &PatientModelService::patientChanged);
 
 	mPatientModelService = PatientModelService::getNullObject();
 
+	emit dataAddedOrRemoved();
+	emit activeImageChanged("");
+	emit landmarkPropertiesChanged();
+	emit debugModeChanged(false);
+	emit clinicalApplicationChanged();
+	emit rMprChanged();
 	emit patientChanged();
 }
 

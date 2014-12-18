@@ -60,6 +60,15 @@ DataPtr PatientModelService::getData(const QString& uid) const
 	return iter->second;
 }
 
+QString PatientModelService::getActiveImageUid()
+{
+	ImagePtr image = this->getActiveImage();
+	if (image)
+		return image->getUid();
+	else
+		return "";
+}
+
 Transform3D PatientModelService::get_rMpr() const
 {
 	return this->get_rMpr_History()->getCurrentRegistration().mValue;

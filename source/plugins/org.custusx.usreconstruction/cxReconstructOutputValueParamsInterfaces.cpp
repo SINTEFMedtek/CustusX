@@ -40,7 +40,7 @@ namespace cx
 DoubleDataAdapterOutputValueParams::DoubleDataAdapterOutputValueParams(UsReconstructionServicePtr reconstructer) :
     mReconstructer(reconstructer)
 {
-  connect(mReconstructer.get(), SIGNAL(paramsChanged()), this, SIGNAL(changed()));
+	connect(mReconstructer.get(), &UsReconstructionService::paramsChanged, this, &DataAdapter::changed);
 }
 
 double DoubleDataAdapterOutputValueParams::getValue() const

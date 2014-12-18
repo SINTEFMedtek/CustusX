@@ -141,8 +141,8 @@ MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
 	this->addAsDockWidget(new ToolManagerWidget(this), "Debugging");
 	this->addAsDockWidget(new PluginFrameworkWidget(this), "Browsing");
 
-	connect(patientService().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
-	connect(qApp, SIGNAL(focusChanged(QWidget*, QWidget*)), this, SLOT(focusChanged(QWidget*, QWidget*)));
+	connect(patientService().get(), &PatientModelService::patientChanged, this, &MainWindow::patientChangedSlot);
+	connect(qApp, &QApplication::focusChanged, this, &MainWindow::focusChanged);
 
 	// insert all widgets from all guiExtenders
 	for (unsigned i = 0; i < guiExtenders.size(); ++i)
@@ -345,17 +345,17 @@ void MainWindow::createActions()
 	mClearPatientAction = new QAction(tr("&Clear Patient"), this);
 	mExportPatientAction = new QAction(tr("&Export Patient"), this);
 
-	connect(mNewPatientAction, SIGNAL(triggered()), this, SLOT(newPatientSlot()));
-	connect(mLoadFileAction, SIGNAL(triggered()), this, SLOT(loadPatientFileSlot()));
-	connect(mSaveFileAction, SIGNAL(triggered()), this, SLOT(savePatientFileSlot()));
-	connect(mSaveFileAction, SIGNAL(triggered()), this, SLOT(saveDesktopSlot()));
-	connect(mExportPatientAction, SIGNAL(triggered()), this, SLOT(exportDataSlot()));
-	connect(mClearPatientAction, SIGNAL(triggered()), this, SLOT(clearPatientSlot()));
+	connect(mNewPatientAction, &QAction::triggered, this, &MainWindow::newPatientSlot);
+	connect(mLoadFileAction, &QAction::triggered, this, &MainWindow::loadPatientFileSlot);
+	connect(mSaveFileAction, &QAction::triggered, this, &MainWindow::savePatientFileSlot);
+	connect(mSaveFileAction, &QAction::triggered, this, &MainWindow::saveDesktopSlot);
+	connect(mExportPatientAction, &QAction::triggered, this, &MainWindow::exportDataSlot);
+	connect(mClearPatientAction, &QAction::triggered, this, &MainWindow::clearPatientSlot);
 
 	mShowControlPanelAction = new QAction("Show Control Panel", this);
-	connect(mShowControlPanelAction, SIGNAL(triggered()), this, SLOT(showControlPanelActionSlot()));
+	connect(mShowControlPanelAction, &QAction::triggered, this, &MainWindow::showControlPanelActionSlot);
 	mSecondaryViewLayoutWindowAction = new QAction("Show Secondary View Layout Window", this);
-	connect(mSecondaryViewLayoutWindowAction, SIGNAL(triggered()), this, SLOT(showSecondaryViewLayoutWindowActionSlot()));
+	connect(mSecondaryViewLayoutWindowAction, &QAction::triggered, this, &MainWindow::showSecondaryViewLayoutWindowActionSlot);
 
 	// Application
 	mAboutAction = new QAction(tr("About"), this);
@@ -371,40 +371,40 @@ void MainWindow::createActions()
 	mDebugModeAction->setStatusTip(tr("Set debug mode, this enables lots of weird stuff."));
 	boost::function<void(bool)> setDebug = boost::bind(&PatientModelService::setDebugMode, patientService().get(), _1);
 	connect(mDebugModeAction, &QAction::triggered, setDebug);
-	connect(patientService().get(), SIGNAL(debugModeChanged(bool)), mDebugModeAction, SLOT(setChecked(bool)));
-	connect(mDebugModeAction, SIGNAL(toggled(bool)), this, SLOT(toggleDebugModeSlot(bool)));
+	connect(patientService().get(), &PatientModelService::debugModeChanged, mDebugModeAction, &QAction::setChecked);
+	connect(mDebugModeAction, &QAction::toggled, this, &MainWindow::toggleDebugModeSlot);
 
 	mFullScreenAction = new QAction(tr("Fullscreen"), this);
 	mFullScreenAction->setShortcut(tr("F11"));
 	mFullScreenAction->setStatusTip(tr("Toggle full screen"));
 	mFullScreenAction->setCheckable(true);
 	mFullScreenAction->setChecked(this->windowState() & Qt::WindowFullScreen);
-	connect(mFullScreenAction, SIGNAL(triggered()), this, SLOT(toggleFullScreenSlot()));
+	connect(mFullScreenAction, &QAction::triggered, this, &MainWindow::toggleFullScreenSlot);
 
 	mQuitAction = new QAction(tr("&Quit"), this);
 	mQuitAction->setShortcut(tr("Ctrl+Q"));
 	mQuitAction->setStatusTip(tr("Exit the application"));
 
-	connect(mAboutAction, SIGNAL(triggered()), this, SLOT(aboutSlot()));
-	connect(mPreferencesAction, SIGNAL(triggered()), this, SLOT(preferencesSlot()));
-	connect(mQuitAction, SIGNAL(triggered()), this, SLOT(quitSlot()));
+	connect(mAboutAction, &QAction::triggered, this, &MainWindow::aboutSlot);
+	connect(mPreferencesAction, &QAction::triggered, this, &MainWindow::preferencesSlot);
+	connect(mQuitAction, &QAction::triggered, this, &MainWindow::quitSlot);
 
 	mShootScreenAction = new QAction(tr("Shoot Screen"), this);
 	mShootScreenAction->setIcon(QIcon(":/icons/screenshot-screen.png"));
 	mShootScreenAction->setShortcut(tr("Ctrl+f"));
 	mShootScreenAction->setStatusTip(tr("Save a screenshot to the patient folder."));
-	connect(mShootScreenAction, SIGNAL(triggered()), this, SLOT(shootScreen()));
+	connect(mShootScreenAction, &QAction::triggered, this, &MainWindow::shootScreen);
 
 	mShootWindowAction = new QAction(tr("Shoot Window"), this);
 	mShootWindowAction->setIcon(QIcon(":/icons/screenshot-window.png"));
 	mShootWindowAction->setShortcut(tr("Ctrl+Shift+f"));
 	mShootWindowAction->setStatusTip(tr("Save an image of the application to the patient folder."));
-	connect(mShootWindowAction, SIGNAL(triggered()), this, SLOT(shootWindow()));
+	connect(mShootWindowAction, &QAction::triggered, this, &MainWindow::shootWindow);
 
 	mRecordFullscreenAction = new QAction(tr("Record Fullscreen"), this);
 	mRecordFullscreenAction->setShortcut(tr("F8"));
 	mRecordFullscreenAction->setStatusTip(tr("Record a video of the full screen."));
-	connect(mRecordFullscreenAction, SIGNAL(triggered()), this, SLOT(recordFullscreen()));
+	connect(mRecordFullscreenAction, &QAction::triggered, this, &MainWindow::recordFullscreen);
 
 	//data
 	mImportDataAction = new QAction(QIcon(":/icons/open_icon_library/document-import-2.png"), tr("&Import data"), this);
@@ -414,17 +414,17 @@ void MainWindow::createActions()
 	mDeleteDataAction = new QAction(tr("Delete current image"), this);
 	mDeleteDataAction->setStatusTip(tr("Delete selected volume"));
 
-	connect(mImportDataAction, SIGNAL(triggered()), this, SLOT(importDataSlot()));
-	connect(mDeleteDataAction, SIGNAL(triggered()), this, SLOT(deleteDataSlot()));
+	connect(mImportDataAction, &QAction::triggered, this, &MainWindow::importDataSlot);
+	connect(mDeleteDataAction, &QAction::triggered, this, &MainWindow::deleteDataSlot);
 
 	mShowPointPickerAction = new QAction(tr("Point Picker"), this);
 	mShowPointPickerAction->setCheckable(true);
 	mShowPointPickerAction->setToolTip("Activate the 3D Point Picker Probe");
 	mShowPointPickerAction->setIcon(QIcon(":/icons/point_picker.png"));
-	connect(mShowPointPickerAction, SIGNAL(triggered()), this, SLOT(togglePointPickerActionSlot()));
+	connect(mShowPointPickerAction, &QAction::triggered, this, &MainWindow::togglePointPickerActionSlot);
 
 	if (viewService()->getGroup(0))
-		connect(viewService()->getGroup(0).get(), SIGNAL(optionsChanged()), this, SLOT(updatePointPickerActionSlot()));
+		connect(viewService()->getGroup(0).get(), &ViewGroupData::optionsChanged, this, &MainWindow::updatePointPickerActionSlot);
 	this->updatePointPickerActionSlot();
 
 	//tool
@@ -439,36 +439,36 @@ void MainWindow::createActions()
 
 	mStartStreamingAction = new QAction(tr("Start Streaming"), mToolsActionGroup);
 	mStartStreamingAction->setShortcut(tr("Ctrl+V"));
-	connect(mStartStreamingAction, SIGNAL(triggered()), this, SLOT(toggleStreamingSlot()));
+	connect(mStartStreamingAction, &QAction::triggered, this, &MainWindow::toggleStreamingSlot);
 	connect(videoService().get(), &VideoService::connected, this, &MainWindow::updateStreamingActionSlot);
 	this->updateStreamingActionSlot();
 
 	mConfigureToolsAction->setChecked(true);
 
 //	connect(mConfigureToolsAction, &QAction::triggered, this, boost::bind(&MainWindow::setState, this, Tool::tsCONFIGURED));
-	connect(mConfigureToolsAction, SIGNAL(triggered()), this, SLOT(configureSlot()));
+	connect(mConfigureToolsAction, &QAction::triggered, this, &MainWindow::configureSlot);
 	boost::function<void()> finit = boost::bind(&TrackingService::setState, trackingService(), Tool::tsINITIALIZED);
 	connect(mInitializeToolsAction, &QAction::triggered, finit);
-	connect(mTrackingToolsAction, SIGNAL(triggered()), this, SLOT(toggleTrackingSlot()));
+	connect(mTrackingToolsAction, &QAction::triggered, this, &MainWindow::toggleTrackingSlot);
 //	boost::function<void()> fsavetools = boost::bind(&TrackingService::savePositionHistory, trackingService());
 //	connect(mSaveToolsPositionsAction, &QAction::triggered, fsavetools);
-	connect(trackingService().get(), SIGNAL(stateChanged()), this, SLOT(updateTrackingActionSlot()));
-	connect(trackingService().get(), SIGNAL(stateChanged()), this, SLOT(updateTrackingActionSlot()));
+	connect(trackingService().get(), &TrackingService::stateChanged, this, &MainWindow::updateTrackingActionSlot);
+	connect(trackingService().get(), &TrackingService::stateChanged, this, &MainWindow::updateTrackingActionSlot);
 	this->updateTrackingActionSlot();
 
 	mCenterToImageCenterAction = new QAction(tr("Center Image"), this);
 	mCenterToImageCenterAction->setIcon(QIcon(":/icons/center_image.png"));
-	connect(mCenterToImageCenterAction, SIGNAL(triggered()), this, SLOT(centerToImageCenterSlot()));
+	connect(mCenterToImageCenterAction, &QAction::triggered, this, &MainWindow::centerToImageCenterSlot);
 	mCenterToTooltipAction = new QAction(tr("Center Tool"), this);
 	mCenterToTooltipAction->setIcon(QIcon(":/icons/center_tool.png"));
-	connect(mCenterToTooltipAction, SIGNAL(triggered()), this, SLOT(centerToTooltipSlot()));
+	connect(mCenterToTooltipAction, &QAction::triggered, this, &MainWindow::centerToTooltipSlot);
 
 	mSaveDesktopAction = new QAction(QIcon(":/icons/workflow_state_save.png"), tr("Save desktop"), this);
 	mSaveDesktopAction->setToolTip("Save desktop for workflow step");
-	connect(mSaveDesktopAction, SIGNAL(triggered()), this, SLOT(saveDesktopSlot()));
+	connect(mSaveDesktopAction, &QAction::triggered, this, &MainWindow::saveDesktopSlot);
 	mResetDesktopAction = new QAction(QIcon(":/icons/workflow_state_revert.png"), tr("Reset desktop"), this);
 	mResetDesktopAction->setToolTip("Reset desktop for workflow step");
-	connect(mResetDesktopAction, SIGNAL(triggered()), this, SLOT(resetDesktopSlot()));
+	connect(mResetDesktopAction, &QAction::triggered, this, &MainWindow::resetDesktopSlot);
 
 	mInteractorStyleActionGroup = viewService()->createInteractorStyleActionGroup();
 }
@@ -1060,7 +1060,7 @@ void MainWindow::deleteDataSlot()
 	QString text = QString("Do you really want to delete data %1?").arg(patientService()->getActiveImage()->getName());
 	if (QMessageBox::question(this, "Data delete", text, QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel))!=QMessageBox::Ok)
 		return;
-	mServices->patientModelService->removeData(patientService()->getActiveImage()->getUid());
+	mServices->patientModelService->removeData(patientService()->getActiveImageUid());
 }
 
 void MainWindow::configureSlot()

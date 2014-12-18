@@ -138,7 +138,7 @@ void RegistrationImplService::clearSlot()
 void RegistrationImplService::setMovingData(DataPtr movingData)
 {
   mMovingData = movingData;
-  emit movingDataChanged( (mMovingData) ? qstring_cast(mMovingData->getUid()) : "");
+  emit movingDataChanged(this->getMovingDataUid());
 }
 
 void RegistrationImplService::setFixedData(DataPtr fixedData)
@@ -149,7 +149,7 @@ void RegistrationImplService::setFixedData(DataPtr fixedData)
   mFixedData = fixedData;
   if (mFixedData)
 	report("Registration fixed data set to "+mFixedData->getUid());
-  emit fixedDataChanged( (mFixedData) ? qstring_cast(mFixedData->getUid()) : "");
+  emit fixedDataChanged(this->getFixedDataUid());
 }
 
 DataPtr RegistrationImplService::getMovingData()

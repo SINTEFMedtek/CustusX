@@ -53,7 +53,7 @@ ImagePropertiesWidget::ImagePropertiesWidget(PatientModelServicePtr patientModel
 	connect(mInterpolationType, SIGNAL(currentIndexChanged(int)), this, SLOT(interpolationTypeChanged(int)));
 
 	mActiveImageProxy = ActiveImageProxy::New(patientModelService);
-	connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
+	connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &ImagePropertiesWidget::activeImageChangedSlot);
 
 	QLabel* interpolationTypeLabel = new QLabel("Volume interpolation type", this);
 

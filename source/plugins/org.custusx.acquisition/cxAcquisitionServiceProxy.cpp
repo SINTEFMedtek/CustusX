@@ -69,7 +69,7 @@ void AcquisitionServiceProxy::onServiceAdded(AcquisitionService* service)
 	connect(service, &AcquisitionService::started, this, &AcquisitionService::started);
 	connect(service, &AcquisitionService::cancelled, this, &AcquisitionService::cancelled);
 	connect(service, &AcquisitionService::stateChanged, this, &AcquisitionService::stateChanged);
-	connect(service, &AcquisitionService::readinessChanged, this, &AcquisitionService::readinessChanged);
+	connect(service, &AcquisitionService::usReadinessChanged, this, &AcquisitionService::usReadinessChanged);
 	connect(service, &AcquisitionService::acquisitionStopped, this, &AcquisitionService::acquisitionStopped);
 	connect(service, &AcquisitionService::recordedSessionsChanged, this, &AcquisitionService::recordedSessionsChanged);
 
@@ -78,6 +78,10 @@ void AcquisitionServiceProxy::onServiceAdded(AcquisitionService* service)
 
 	if(mAcquisitionService->isNull())
 		reportWarning("AcquisitionServiceProxy::onServiceAdded mAcquisitionService->isNull()");
+
+	emit stateChanged();
+	emit usReadinessChanged();
+	emit recordedSessionsChanged();
 }
 
 void AcquisitionServiceProxy::onServiceRemoved(AcquisitionService *service)
@@ -85,7 +89,7 @@ void AcquisitionServiceProxy::onServiceRemoved(AcquisitionService *service)
 	disconnect(service, &AcquisitionService::started, this, &AcquisitionService::started);
 	disconnect(service, &AcquisitionService::cancelled, this, &AcquisitionService::cancelled);
 	disconnect(service, &AcquisitionService::stateChanged, this, &AcquisitionService::stateChanged);
-	disconnect(service, &AcquisitionService::readinessChanged, this, &AcquisitionService::readinessChanged);
+	disconnect(service, &AcquisitionService::usReadinessChanged, this, &AcquisitionService::usReadinessChanged);
 	disconnect(service, &AcquisitionService::acquisitionStopped, this, &AcquisitionService::acquisitionStopped);
 	disconnect(service, &AcquisitionService::recordedSessionsChanged, this, &AcquisitionService::recordedSessionsChanged);
 
@@ -93,6 +97,10 @@ void AcquisitionServiceProxy::onServiceRemoved(AcquisitionService *service)
 	disconnect(service, &AcquisitionService::saveDataCompleted, this, &AcquisitionService::saveDataCompleted);
 
 	mAcquisitionService = AcquisitionService::getNullObject();
+
+	emit stateChanged();
+	emit usReadinessChanged();
+	emit recordedSessionsChanged();
 }
 
 bool AcquisitionServiceProxy::isNull()

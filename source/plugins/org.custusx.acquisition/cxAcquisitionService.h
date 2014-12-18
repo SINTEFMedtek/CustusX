@@ -95,7 +95,7 @@ signals:
 	void started();
 	void cancelled();
 	void stateChanged();
-	void readinessChanged();
+	void usReadinessChanged();
 	void acquisitionStopped();
 
 	void recordedSessionsChanged();

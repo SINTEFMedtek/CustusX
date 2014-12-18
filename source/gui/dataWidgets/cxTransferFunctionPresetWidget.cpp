@@ -63,10 +63,10 @@ TransferFunctionPresetWidget::TransferFunctionPresetWidget(PatientModelServicePt
 	this->updateToggles();
 
 	mActiveImageProxy = ActiveImageProxy::New(patientModelService);
-	connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this,
-			SLOT(populatePresetListSlot()));
-	connect(mActiveImageProxy.get(), SIGNAL(propertiesChanged()), this,
-			SLOT(populatePresetListSlot()));
+	connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this,
+			&TransferFunctionPresetWidget::populatePresetListSlot);
+	connect(mActiveImageProxy.get(), &ActiveImageProxy::propertiesChanged, this,
+			&TransferFunctionPresetWidget::populatePresetListSlot);
 }
 
 void TransferFunctionPresetWidget::toggleSlot() {

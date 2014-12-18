@@ -101,12 +101,6 @@ public:
 	Acquisition(AcquisitionDataPtr pluginData, QObject* parent = 0);
 	virtual ~Acquisition();
 
-	/** Set ready status of acq.
-	  */
-	void setReady(bool val, QString text);
-	bool isReady() const { return mReady; }
-	QString getInfoText() const { return mInfoText; }
-
 	/** Start or stop recording, depending on current state.
 	  */
 	void toggleRecord();
@@ -157,10 +151,6 @@ signals:
 	  * without valid recording data.
 	  */
 	void cancelled();
-	/** Emitted if the readiness of the acq is changed.
-	  * Use isReady() and getInfoText() get more info.
-	  */
-	void readinessChanged();
 
 private:
 	RecordSessionPtr mLatestSession;
@@ -168,8 +158,6 @@ private:
 	AcquisitionService::STATE mCurrentState;
 	AcquisitionDataPtr mPluginData;
 
-	bool mReady;
-	QString mInfoText;
 };
 typedef boost::shared_ptr<Acquisition> AcquisitionPtr;
 

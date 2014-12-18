@@ -29,36 +29,18 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#include "catch.hpp"
+#include "cxVisualizationService.h"
+#include "cxRepContainer.h"
 
-#include "cxRegistrationService.h"
-#include "cxRegistrationServiceNull.h"
-#include "cxNullDeleter.h"
-
-#include "cxData.h"
-
-namespace cx
+namespace cxtest
 {
-RegistrationServicePtr RegistrationService::getNullObject()
+
+TEST_CASE("VisualizationServiceNull: get3DReps() don't seg. fault", "[unit][resource][visualization]")
 {
-	static RegistrationServicePtr mNull;
-	if (!mNull)
-		mNull.reset(new RegistrationServiceNull, null_deleter());
-	return mNull;
+	cx::VisualizationServicePtr visualizationService = cx::VisualizationService::getNullObject(); //mock
+	cx::RepContainerPtr repContainer = visualizationService->get3DReps();
+	REQUIRE_FALSE(repContainer);
 }
 
-QString RegistrationService::getFixedDataUid()
-{
-	if (!this->getFixedData())
-		return "";
-	else
-		return this->getFixedData()->getUid();
-}
-
-QString RegistrationService::getMovingDataUid()
-{
-	if(!this->getMovingData())
-		return "";
-	else
-		return this->getMovingData()->getUid();
-}
-}
+} //cxtest

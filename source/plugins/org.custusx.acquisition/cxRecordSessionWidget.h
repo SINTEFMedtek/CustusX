@@ -65,7 +65,7 @@ class org_custusx_acquisition_EXPORT  RecordSessionWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  RecordSessionWidget(AcquisitionServicePtr base, QWidget* parent, QString defaultDescription = "Record Session");
+  RecordSessionWidget(AcquisitionServicePtr base, QWidget* parent, QString defaultDescription = "Record Session", bool requireUsReady = true);
   virtual ~RecordSessionWidget();
 
   virtual QString defaultWhatsThis() const;
@@ -80,7 +80,7 @@ private slots:
   void startStopSlot(bool);
   void cancelSlot();
   void recordStateChangedSlot();
-  void readinessChangedSlot();
+  void usReadinessChangedSlot();
 
 private:
 
@@ -90,6 +90,7 @@ private:
   QPushButton* mCancelButton;
   QLabel* mDescriptionLabel;
   QLineEdit* mDescriptionLine;
+  bool mRequireUsReady;
 };
 
 /**
