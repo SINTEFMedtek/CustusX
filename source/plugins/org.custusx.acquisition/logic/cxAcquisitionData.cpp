@@ -159,24 +159,12 @@ QString AcquisitionData::getNewUid()
 ///--------------------------------------------------------
 
 Acquisition::Acquisition(AcquisitionDataPtr pluginData, QObject* parent) :
-	QObject(parent), mPluginData(pluginData), mCurrentState(AcquisitionService::sNOT_RUNNING),
-    mReady(true), mInfoText("")
+	QObject(parent), mPluginData(pluginData), mCurrentState(AcquisitionService::sNOT_RUNNING)
 {
 }
 
 Acquisition::~Acquisition()
 {
-}
-
-void Acquisition::setReady(bool val, QString text)
-{
-	mReady = val;
-	mInfoText = text;
-
-	if (!mReady && this->getState()==AcquisitionService::sRUNNING)
-		this->cancelRecord();
-
-	emit readinessChanged();
 }
 
 void Acquisition::toggleRecord()

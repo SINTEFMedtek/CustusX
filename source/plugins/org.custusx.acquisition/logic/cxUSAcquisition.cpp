@@ -53,7 +53,9 @@ namespace cx
 USAcquisition::USAcquisition(AcquisitionPtr base, UsReconstructionServicePtr reconstructer, QObject* parent) :
 	QObject(parent),
 	mBase(base),
-	mUsReconstructionService(reconstructer)
+	mUsReconstructionService(reconstructer),
+	mReady(true),
+	mInfoText("")
 {
 	mCore.reset(new USSavingRecorder());
 	connect(mCore.get(), SIGNAL(saveDataCompleted(QString)), this, SLOT(checkIfReadySlot()));
@@ -116,8 +118,18 @@ void USAcquisition::checkIfReadySlot()
 		mWhatsMissing.append("<br>");
 
 	// do not require tracking to be present in order to perform an acquisition.
-    //mBase->setReady(streaming, mWhatsMissing);
-    mBase->setReady(true, mWhatsMissing);
+	this->setReady(streaming, mWhatsMissing);
+}
+
+void USAcquisition::setReady(bool val, QString text)
+{
+	mReady = val;
+	mInfoText = text;
+
+	if (!mReady && mBase->getState()==AcquisitionService::sRUNNING)
+		mBase->cancelRecord();
+
+	emit readinessChanged();
 }
 
 int USAcquisition::getNumberOfSavingThreads() const

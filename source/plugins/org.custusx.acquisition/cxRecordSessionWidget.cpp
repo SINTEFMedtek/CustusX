@@ -46,13 +46,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-RecordSessionWidget::RecordSessionWidget(AcquisitionServicePtr base, QWidget* parent, QString defaultDescription) :
+RecordSessionWidget::RecordSessionWidget(AcquisitionServicePtr base, QWidget* parent, QString defaultDescription, bool requireUsReady) :
     BaseWidget(parent, "RecordSessionWidget", "Record Session"),
 	mAcquisitionService(base),
     mInfoLabel(new QLabel("")),
     mStartStopButton(new QPushButton(QIcon(":/icons/open_icon_library/media-record-3.png"), "Start")),
     mCancelButton(new QPushButton(QIcon(":/icons/open_icon_library/process-stop-7.png"), "Cancel")),
-    mDescriptionLine(new QLineEdit(defaultDescription))
+	mDescriptionLine(new QLineEdit(defaultDescription)),
+	mRequireUsReady(requireUsReady)
 {
 	QVBoxLayout* layout = new QVBoxLayout(this);
 	layout->setMargin(0);
@@ -72,14 +73,18 @@ RecordSessionWidget::RecordSessionWidget(AcquisitionServicePtr base, QWidget* pa
 	layout->addLayout(buttonLayout);
 
 	connect(mAcquisitionService.get(), &AcquisitionService::stateChanged, this, &RecordSessionWidget::recordStateChangedSlot);
-	connect(mAcquisitionService.get(), &AcquisitionService::readinessChanged, this, &RecordSessionWidget::readinessChangedSlot);
 
 	mStartStopButton->setCheckable(true);
 	connect(mStartStopButton, &QPushButton::clicked, this, &RecordSessionWidget::startStopSlot);
 	connect(mCancelButton, &QPushButton::clicked, this, &RecordSessionWidget::cancelSlot);
 
 	this->recordStateChangedSlot();
-	this->readinessChangedSlot();
+
+	if (mRequireUsReady)
+	{
+		connect(mAcquisitionService.get(), &AcquisitionService::usReadinessChanged, this, &RecordSessionWidget::usReadinessChangedSlot);
+		this->usReadinessChangedSlot();
+	}
 }
 
 QString RecordSessionWidget::defaultWhatsThis() const
@@ -111,7 +116,7 @@ void RecordSessionWidget::setDescription(QString text)
   mDescriptionLine->setText(text);
 }
 
-void RecordSessionWidget::readinessChangedSlot()
+void RecordSessionWidget::usReadinessChangedSlot()
 {
 	this->setEnabled(mAcquisitionService->isReady());
 	mInfoLabel->setText(mAcquisitionService->getInfoText());

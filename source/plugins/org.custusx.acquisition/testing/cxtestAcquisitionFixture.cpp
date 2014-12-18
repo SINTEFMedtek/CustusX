@@ -142,7 +142,7 @@ void AcquisitionFixture::initialize()
 	mUsReconstructionService = cx::UsReconstructionServicePtr(new cx::UsReconstructionServiceProxy(pluginContext));
 	mAcquisitionService = cx::AcquisitionServicePtr(new cx::AcquisitionServiceProxy(pluginContext));
 
-	connect(mAcquisitionService.get(), &cx::AcquisitionService::readinessChanged, this, &AcquisitionFixture::readinessChangedSlot);
+	connect(mAcquisitionService.get(), &cx::AcquisitionService::usReadinessChanged, this, &AcquisitionFixture::readinessChangedSlot);
 	connect(mAcquisitionService.get(), &cx::AcquisitionService::saveDataCompleted, this, &AcquisitionFixture::saveDataCompletedSlot);
 	connect(mAcquisitionService.get(), &cx::AcquisitionService::acquisitionDataReady, this, &AcquisitionFixture::acquisitionDataReadySlot);
 

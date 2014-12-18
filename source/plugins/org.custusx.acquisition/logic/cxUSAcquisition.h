@@ -77,10 +77,17 @@ public:
 	USAcquisition(AcquisitionPtr base, UsReconstructionServicePtr reconstructer, QObject* parent = 0);
 	virtual ~USAcquisition();
 	int getNumberOfSavingThreads() const;
+	bool isReady() const { return mReady; }
+	QString getInfoText() const { return mInfoText; }
 
 signals:
 	void acquisitionDataReady(); ///< emitted when data is acquired and sent to the reconstruction module
 	void saveDataCompleted(QString mhdFilename); ///< emitted when data has been saved to file
+
+	/** Emitted if the readiness of the acq is changed.
+	  * Use isReady() and getInfoText() get more info.
+	  */
+	void readinessChanged();
 
 private slots:
 	void checkIfReadySlot();
@@ -92,10 +99,13 @@ private:
 	std::vector<VideoSourcePtr> getRecordingVideoSources(ToolPtr tool);
 	bool getWriteColor() const;
 	void sendAcquisitionDataToReconstructer();
+	void setReady(bool val, QString text);
 
 	AcquisitionPtr mBase;
 	UsReconstructionServicePtr mUsReconstructionService;
 	USSavingRecorderPtr mCore;
+	bool mReady;
+	QString mInfoText;
 };
 typedef boost::shared_ptr<USAcquisition> USAcquisitionPtr;
 

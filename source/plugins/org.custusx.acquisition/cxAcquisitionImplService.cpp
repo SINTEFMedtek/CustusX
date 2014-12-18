@@ -53,13 +53,13 @@ AcquisitionImplService::AcquisitionImplService(ctkPluginContext *context) :
 	connect(mAcquisition.get(), &Acquisition::started, this, &AcquisitionService::started);
 	connect(mAcquisition.get(), &Acquisition::cancelled, this, &AcquisitionService::cancelled);
 	connect(mAcquisition.get(), &Acquisition::stateChanged, this, &AcquisitionService::stateChanged);
-	connect(mAcquisition.get(), &Acquisition::readinessChanged, this, &AcquisitionService::readinessChanged);
 	connect(mAcquisition.get(), &Acquisition::acquisitionStopped, this, &AcquisitionService::acquisitionStopped);
 
 	connect(mAcquisitionData.get(), &AcquisitionData::recordedSessionsChanged, this, &AcquisitionService::recordedSessionsChanged);
 
 	connect(mUsAcquisition.get(), &USAcquisition::acquisitionDataReady, this, &AcquisitionService::acquisitionDataReady);
 	connect(mUsAcquisition.get(), &USAcquisition::saveDataCompleted, this, &AcquisitionService::saveDataCompleted);
+	connect(mUsAcquisition.get(), &USAcquisition::readinessChanged, this, &AcquisitionService::usReadinessChanged);
 
 	connect(mSession.get(), &SessionStorageService::cleared, this, &AcquisitionImplService::duringClearPatientSlot);
 	connect(mSession.get(), &SessionStorageService::isLoading, this, &AcquisitionImplService::duringLoadPatientSlot);
@@ -118,12 +118,12 @@ std::vector<RecordSessionPtr> AcquisitionImplService::getSessions()
 
 bool AcquisitionImplService::isReady() const
 {
-	return mAcquisition->isReady();
+	return mUsAcquisition->isReady();
 }
 
 QString AcquisitionImplService::getInfoText() const
 {
-	return mAcquisition->getInfoText();
+	return mUsAcquisition->getInfoText();
 }
 
 AcquisitionService::STATE AcquisitionImplService::getState() const
