@@ -112,8 +112,10 @@ void BronchoscopyNavigationWidget::processCenterlineSlot()
 	}
 	vtkPolyDataPtr centerline = mSelectMeshWidget->getMesh()->getVtkPolyData();//input
 	Transform3D rMd = mSelectMeshWidget->getMesh()->get_rMd();
+	Transform3D rMpr = mPatientModelService->get_rMpr();
+	Transform3D prMd = rMpr.inverse()*rMd;
 
-	mProjectionCenterlinePtr->processCenterline(centerline, rMd);
+	mProjectionCenterlinePtr->processCenterline(centerline, prMd);
 }
 
 void BronchoscopyNavigationWidget::enableSlot()

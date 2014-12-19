@@ -24,7 +24,7 @@ public:
 	void createMaxDistanceToCenterlineOption(QDomElement root);
 	DoubleDataAdapterXmlPtr getMaxDistanceToCenterlineOption();
     Eigen::MatrixXd getCenterlinePositions(vtkPolyDataPtr centerline, Transform3D prMd);
-	void processCenterline(vtkPolyDataPtr centerline, Transform3D rMd);
+	void processCenterline(vtkPolyDataPtr centerline, Transform3D prMd);
 	Transform3D findClosestPoint(Transform3D prMt, double maxDistance);
 	Transform3D findClosestPointInBranches(Transform3D prMd, double maxDistance);
 	Transform3D findClosestPointInSearchPositions(Transform3D prMd, double maxDistance);

@@ -45,7 +45,7 @@ DoubleDataAdapterXmlPtr BronchoscopePositionProjection::getMaxDistanceToCenterli
 	return mMaxDistanceToCenterline;
 }
 
-Eigen::MatrixXd BronchoscopePositionProjection::getCenterlinePositions(vtkPolyDataPtr centerline, Transform3D rMd)
+Eigen::MatrixXd BronchoscopePositionProjection::getCenterlinePositions(vtkPolyDataPtr centerline, Transform3D prMd)
 {
 
 	int N = centerline->GetNumberOfPoints();
@@ -56,26 +56,18 @@ Eigen::MatrixXd BronchoscopePositionProjection::getCenterlinePositions(vtkPolyDa
 		centerline->GetPoint(i,p);
 		Eigen::Vector3d position;
 		position(0) = p[0]; position(1) = p[1]; position(2) = p[2];
-		CLpoints.block(0 , i , 3 , 1) = rMd.coord(position);
+		CLpoints.block(0 , i , 3 , 1) = prMd.coord(position);
 		}
 	return CLpoints;
 }
 
-void BronchoscopePositionProjection::processCenterline(vtkPolyDataPtr centerline, Transform3D rMd)
+void BronchoscopePositionProjection::processCenterline(vtkPolyDataPtr centerline, Transform3D prMd)
 {
 	if (mBranchListPtr)
 		mBranchListPtr->deleteAllBranches();
 
-	int N = centerline->GetNumberOfPoints();
-	Eigen::MatrixXd CLpoints(3,N);
-	for(vtkIdType i = 0; i < N; i++)
-		{
-		double p[3];
-		centerline->GetPoint(i,p);
-		Eigen::Vector3d position;
-		position(0) = p[0]; position(1) = p[1]; position(2) = p[2];
-		CLpoints.block(0 , i , 3 , 1) = rMd.coord(position);
-		}
+	Eigen::MatrixXd CLpoints = getCenterlinePositions(centerline, prMd);
+
 	mBranchListPtr->findBranchesInCenterline(CLpoints);
 	mBranchListPtr->calculateOrientations();
 	mBranchListPtr->smoothOrientations();
