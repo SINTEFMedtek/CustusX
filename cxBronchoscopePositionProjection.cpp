@@ -154,7 +154,7 @@ Transform3D BronchoscopePositionProjection::findClosestPointInSearchPositions(Tr
 	{
 		Eigen::MatrixXd positions = mSearchBranchPtrVector[i]->getPositions();
 
-		double D = findDistance(positions.block(0,mSearchIndexVector[i],1,3), toolPos);
+        double D = findDistance(positions.block(0,mSearchIndexVector[i],3,1), toolPos);
 			if (D < minDistance)
 			{
 				minDistance = D;
@@ -232,7 +232,7 @@ void BronchoscopePositionProjection::searchBranchDown(BranchPtr searchBranchPtr,
 	mSearchIndexVector.push_back(startIndex);
 	for (int i = startIndex+1; i<positions.cols(); i++)
 	{
-		currentSearchDistance = currentSearchDistance + findDistance( positions.block(0,i,3,1), positions.block(0,i-11,3,1) );
+        currentSearchDistance = currentSearchDistance + findDistance( positions.block(0,i,3,1), positions.block(0,i-1,3,1) );
 		if (currentSearchDistance < maxSearchDistance)
 		{
 			mSearchBranchPtrVector.push_back(searchBranchPtr);
@@ -254,13 +254,10 @@ Transform3D BronchoscopePositionProjection::findProjectedPoint(Transform3D prMd,
 	{
 		findSearchPositions(maxSearchDistance);
 		new_prMd = findClosestPointInSearchPositions(prMd, maxDistance);
-		mPreviousProjectedPoint = new_prMd;
 	}
 	else
-	{
 		new_prMd = findClosestPointInBranches(prMd, maxDistance);
-		mPreviousProjectedPoint = new_prMd;
-	}
+
 	return new_prMd;
 }
 
