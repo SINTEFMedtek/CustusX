@@ -67,7 +67,7 @@ Reporter::Reporter() :
 
 Reporter::~Reporter()
 {
-	delete mThread;
+	this->stopThread();
 }
 
 Reporter* Reporter::getInstance()
@@ -88,14 +88,47 @@ void Reporter::initializeObject()
 {
 	mListener = MessageListener::create();
 
+	this->stopThread();
+	this->startThread();
+}
+
+void Reporter::startThread()
+{
 	if (mThread)
-	{
-		disconnect(mThread, &ReporterThread::emittedMessage, this, &Reporter::emittedMessage);
-		delete mThread;
-	}
+		return;
 
 	mThread = new ReporterThread();
+	if (!mLogPath.isEmpty())
+		mThread->setLoggingFolder(mLogPath);
 	connect(mThread, &ReporterThread::emittedMessage, this, &Reporter::emittedMessage);
+	mThread->start();
+}
+
+void Reporter::stopThread()
+{
+	if (!mThread)
+		return;
+
+	ReporterThread* victim = mThread;
+	mThread = NULL;
+
+	disconnect(victim, &ReporterThread::emittedMessage, this, &Reporter::emittedMessage);
+
+	victim->quit();
+	victim->wait(2000); // forever or until dead thread
+
+	if (victim->isRunning())
+	{
+		victim->terminate();
+		victim->wait(); // forever or until dead thread
+	}
+
+	if (victim->isRunning())
+	{
+		std::cerr << "failed to stop Reporter thread." << std::endl;
+	}
+
+	victim = NULL;
 }
 
 void Reporter::shutdown()
@@ -106,9 +139,12 @@ void Reporter::shutdown()
 
 void Reporter::setLoggingFolder(QString absoluteLoggingFolderPath)
 {
+	mLogPath = absoluteLoggingFolderPath;
+
 	if (mThread)
 	{
-		mThread->setLoggingFolder(absoluteLoggingFolderPath);
+		this->stopThread();
+		this->startThread();
 	}
 }
 
@@ -179,7 +215,7 @@ void Reporter::sendMessage(Message message)
 		return;
 	}
 
-	mThread->sendMessage(message);
+	mThread->logMessage(message);
 }
 
 void Reporter::playSound(MESSAGE_LEVEL messageLevel)

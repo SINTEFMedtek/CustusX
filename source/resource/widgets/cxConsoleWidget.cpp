@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMessageListener.h"
 #include "cxEnumConverter.h"
 #include "cxUtilHelpers.h"
+#include <QTimer>
 
 namespace cx
 {
@@ -248,14 +249,13 @@ void ConsoleWidget::updateUI()
 	// reset content of browser
 	mBrowser->clear();
 	mMessageListener->restart();
-
 }
 
 void ConsoleWidget::onChannelSelectorChanged()
 {
 	mMessageFilter->setActiveChannel(mChannelSelector->getValue());
 
-	this->updateUI();
+	QTimer::singleShot(0, this, SLOT(updateUI())); // break loop by delaying update
 }
 
 void ConsoleWidget::contextMenuEvent(QContextMenuEvent* event)

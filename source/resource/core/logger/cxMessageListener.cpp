@@ -106,7 +106,9 @@ bool MessageListener::containsErrors() const
 void MessageListener::restart()
 {
 	for (QList<Message>::iterator i=mMessages.begin(); i!=mMessages.end(); ++i)
+	{
 		this->emitThroughFilter(*i);
+	}
 }
 
 bool MessageListener::testFilter(const Message& msg) const

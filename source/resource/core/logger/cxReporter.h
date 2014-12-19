@@ -130,6 +130,8 @@ private:
   Reporter& operator=(const Reporter&);
 
   void playSound(MESSAGE_LEVEL messageLevel);
+  void startThread();
+  void stopThread();
 
   QString mLogPath;
   AudioPtr mAudioSource;

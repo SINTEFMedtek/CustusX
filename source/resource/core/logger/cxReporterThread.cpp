@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSound>
 #include <QDir>
 #include <QTextStream>
+#include <QTimer>
 #include "cxTypeConversions.h"
 #include "cxDefinitionStrings.h"
 #include "cxTime.h"
@@ -53,18 +54,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ReporterThread::ReporterThread()
+ReporterThread::ReporterThread(QObject *parent) :
+	QThread(parent)
 {
-  qInstallMessageHandler(convertQtMessagesToCxMessages);
-  qRegisterMetaType<Message>("Message");
+	qInstallMessageHandler(convertQtMessagesToCxMessages);
+	qRegisterMetaType<Message>("Message");
 
-  this->initialize();
+	this->initialize();
 }
 
 ReporterThread::~ReporterThread()
 {
-  mCout.reset();
-  mCerr.reset();
+	qInstallMessageHandler(0);
+	mCout.reset();
+	mCerr.reset();
 }
 
 void ReporterThread::initialize()
@@ -76,6 +79,17 @@ void ReporterThread::initialize()
 	mCerr.reset(new SingleStreamerImpl(std::cerr, mlCERR));
 
 	this->setLoggingFolder(DataLocations::getRootConfigPath()+"/Logs");
+}
+
+void ReporterThread::run()
+{
+	int interval = 200;
+	boost::shared_ptr<QTimer> timer(new QTimer);
+	timer->start(interval);
+	connect(timer.get(), &QTimer::timeout, this, &ReporterThread::onTimeout); // this signal will be executed in the thread of THIS, i.e. the main thread.
+	this->exec();
+
+	this->processMessageQueue();
 }
 
 void ReporterThread::setFormat(Format format)
@@ -90,7 +104,7 @@ bool ReporterThread::initializeLogFile(QString filename)
 	bool success = this->appendToLogfile(filename, text);
 	if (!success)
 	{
-		this->sendMessage("Failed to open log file " + filename, mlERROR);
+		this->sendMessage(Message("Failed to open log file " + filename, mlERROR));
 	}
 	return success;
 }
@@ -102,6 +116,12 @@ QString ReporterThread::getFilenameForChannel(QString channel) const
 
 void ReporterThread::setLoggingFolder(QString absoluteLoggingFolderPath)
 {
+	if (this->isRunning())
+	{
+		this->sendMessage(Message("Attempt to set logging folder while reporter thread running", mlERROR));
+		return;
+	}
+
 	mLogPath = absoluteLoggingFolderPath;
 
 	QFileInfo(mLogPath+"/").absoluteDir().mkpath(".");
@@ -124,11 +144,38 @@ int ReporterThread::getDefaultTimeout(MESSAGE_LEVEL messageLevel) const
 	}
 }
 
-void ReporterThread::sendMessage(QString text, MESSAGE_LEVEL messageLevel, int timeout, bool mute)
+void ReporterThread::logMessage(Message msg)
 {
-	Message message(text, messageLevel, timeout);
-	message.mMuted = mute;
-	this->sendMessage(message);
+	QMutexLocker sentry(&mMutex);
+	mMessageQueue.push_back(msg);
+	sentry.unlock();
+
+	this->processMessageQueue();
+}
+
+void ReporterThread::onTimeout()
+{
+	this->processMessageQueue();
+}
+
+void ReporterThread::processMessageQueue()
+{
+	while (this->popMessageQueue());
+}
+
+bool ReporterThread::popMessageQueue()
+{
+	QMutexLocker sentry(&mMutex);
+
+	if (mMessageQueue.isEmpty())
+		return false;
+
+	Message msg = mMessageQueue.front();
+	mMessageQueue.pop_front();
+	sentry.unlock();
+
+	this->sendMessage(msg);
+	return true;
 }
 
 void ReporterThread::sendMessage(Message message)
@@ -203,7 +250,7 @@ bool ReporterThread::appendToLogfile(QString filename, QString text)
 	}
 
 	//note: writing to cout here causes recursion: disable cout redirection first.
-//	std::cout << "writing: " << text << " to " << mLogFile << std::endl;
+	//	std::cout << "writing: " << text << " to " << mLogFile << std::endl;
 
 	stream.setDevice(&file);
 	stream << text;

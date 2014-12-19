@@ -49,6 +49,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxLogger.h"
 #include "cxLogMessage.h"
+#include <QList>
+#include <QThread>
 
 class QString;
 class QDomNode;
@@ -69,48 +71,57 @@ namespace cx
  *
  * \addtogroup cx_resource_core_logger
  */
-class ReporterThread : public QObject
+class ReporterThread : public QThread
 {
-  Q_OBJECT
+	Q_OBJECT
 
 public:
-	ReporterThread();
+	ReporterThread(QObject* parent = NULL);
 	virtual ~ReporterThread();
-  void setLoggingFolder(QString absoluteLoggingFolderPath); // deprecated
-
-  void sendMessage(QString text, MESSAGE_LEVEL messageLevel=mlDEBUG, int timeout=-1, bool mute=false);
-  void sendMessage(Message msg);
+	void setLoggingFolder(QString absoluteLoggingFolderPath); ///< call during startup, will fail if called when running
+	void logMessage(Message msg);
 
 signals:
-  void emittedMessage(Message message); ///< emitted for each new message, in addition to writing to file.
+	void emittedMessage(Message message); ///< emitted for each new message, in addition to writing to file.
 
+protected:
+	virtual void run();
+
+private slots:
+	void onTimeout();
 private:
-  struct Format
-  {
-	  Format();
-	  bool mShowBrackets;
-	  bool mShowLevel;
-	  bool mShowSourceLocation;
-  };
+	QMutex mMutex;
 
-  void setFormat(Format format); ///< fine-tune messaging format
-  void initialize();
+	struct Format
+	{
+		Format();
+		bool mShowBrackets;
+		bool mShowLevel;
+		bool mShowSourceLocation;
+	};
+	void processMessageQueue();
+	bool popMessageQueue();
 
-  bool appendToLogfile(QString filename, QString text);
-  QString formatMessage(Message msg);
-  int getDefaultTimeout(MESSAGE_LEVEL messageLevel) const;
+	void sendMessage(Message msg);
+	void setFormat(Format format); ///< fine-tune messaging format
+	void initialize();
 
-  bool initializeLogFile(QString filename);
-  QString getFilenameForChannel(QString channel) const;
+	bool appendToLogfile(QString filename, QString text);
+	QString formatMessage(Message msg);
+	int getDefaultTimeout(MESSAGE_LEVEL messageLevel) const;
 
-  typedef boost::shared_ptr<class SingleStreamerImpl> SingleStreamerImplPtr;
-  SingleStreamerImplPtr mCout;
-  SingleStreamerImplPtr mCerr;
+	bool initializeLogFile(QString filename);
+	QString getFilenameForChannel(QString channel) const;
 
-  Format mFormat;
-  QString mLogPath;
+	typedef boost::shared_ptr<class SingleStreamerImpl> SingleStreamerImplPtr;
+	SingleStreamerImplPtr mCout;
+	SingleStreamerImplPtr mCerr;
 
-//  MessageListenerPtr mListener;
+	Format mFormat;
+	QString mLogPath;
+	QList<Message> mMessageQueue;
+
+	//  MessageListenerPtr mListener;
 };
 
 } //namespace cx

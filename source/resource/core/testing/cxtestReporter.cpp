@@ -66,7 +66,8 @@ TEST_CASE("Reporter can be run nested", "[unit]")
 {
 	cx::Reporter::initialize();
 	cx::Reporter::initialize();
-	std::cout << "<test string>" << std::endl;
+	CX_LOG_CHANNEL_INFO("report test") << "test string";
+//	std::cout << "<test string>" << std::endl;
 	cx::Reporter::shutdown();
 	cx::Reporter::shutdown();
 
@@ -81,11 +82,14 @@ TEST_CASE("Reporter: MessageListener receives messages", "[unit]")
 
 	QString testString = "<test string>";
 	cxtest::DirectSignalListener slistener(listener.get(), SIGNAL(newMessage(Message)));
+	CX_LOG_CHANNEL_INFO("report test") << testString;
 	std::cout << testString << std::endl;
 	CHECK(slistener.isReceived());
 
-	CHECK(listener->getMessages().size()==1);
-	CHECK(listener->getMessages().front().getText().contains(testString));
+	CHECK(!listener->getMessages().isEmpty());
+
+	if (!listener->getMessages().isEmpty())
+		CHECK(listener->getMessages().front().getText().contains(testString));
 
 	QList<cx::Message> msg = listener->getMessages();
 	cx::Reporter::shutdown();
