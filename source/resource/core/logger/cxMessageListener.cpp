@@ -131,6 +131,10 @@ int MessageListener::getMessageQueueMaxSize() const
 	return mMessageHistoryMaxSize;
 }
 
+QList<Message> MessageListener::getMessages() const
+{
+	return mMessages;
+}
 
 
 

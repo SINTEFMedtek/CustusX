@@ -151,6 +151,7 @@ public:
 	MessageListener();
 	~MessageListener();
 	bool containsErrors() const;
+	QList<Message> getMessages() const;
 
 //	std::vector<Message> getMessages() const; // get all messages passing filter
 

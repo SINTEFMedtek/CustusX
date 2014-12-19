@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxtestDirectSignalListener.h"
 #include "cxReporter.h"
+#include "cxMessageListener.h"
 
 namespace cx
 {
@@ -71,6 +72,31 @@ TEST_CASE("Reporter can be run nested", "[unit]")
 
 	CHECK(true);
 }
+
+TEST_CASE("Reporter: MessageListener receives messages", "[unit]")
+{
+	cx::Reporter::initialize();
+	cx::MessageListenerPtr listener = cx::MessageListener::create();
+	CHECK(listener->getMessages().size()==0);
+
+	QString testString = "<test string>";
+	cxtest::DirectSignalListener slistener(listener.get(), SIGNAL(newMessage(Message)));
+	std::cout << testString << std::endl;
+	CHECK(slistener.isReceived());
+
+	CHECK(listener->getMessages().size()==1);
+	CHECK(listener->getMessages().front().getText().contains(testString));
+
+	QList<cx::Message> msg = listener->getMessages();
+	cx::Reporter::shutdown();
+
+//	for (int i=0; i<msg.size(); ++i)
+//	{
+//		std::cout << "m: " << msg[i].getText() << std::endl;
+//	}
+
+}
+
 
 
 } // namespace cx

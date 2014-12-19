@@ -35,8 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxResourceExport.h"
 
-//#define SSC_PRINT_CALLER_INFO
-
 #include <QMetaType>
 #include <QObject>
 #include <QMutex>
@@ -48,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 #include "cxTypeConversions.h"
 #include "cxLogger.h"
+#include "cxLogMessage.h"
 
 class QString;
 class QDomNode;
@@ -64,42 +63,6 @@ class QTextStream;
 namespace cx
 {
 typedef boost::shared_ptr<class MessageListener> MessageListenerPtr;
-
-
-/**\brief A representation of a Reporter message.
- *
- * \author Janne Beate Lervik Bakeng, SINTEF
- * \date 24.08.2010
- *
- * \sa Reporter
- * \addtogroup cx_resource_core_logger
- */
-class cxResource_EXPORT Message
-{
-public:
-  Message(QString text ="", MESSAGE_LEVEL messageLevel=mlDEBUG, int timeoutTime=-1);
-  ~Message();
-
-  QString getPrintableMessage() const; ///< Text containing  information appropriate to display
-  MESSAGE_LEVEL getMessageLevel() const; ///< The category of the message
-  QString getText() const; ///< The raw message.
-  QDateTime getTimeStamp() const; ///< The time at which the message was created.
-  int getTimeout() const; ///< Timout tells the statusbar how long it should be displayed, this depends on the message level
-  QString getSourceLocation() const;
-
-//private:
-  QString mText;
-  MESSAGE_LEVEL mMessageLevel;
-  int mTimeoutTime;
-  QDateTime mTimeStamp;
-  bool mMuted;
-//  QString mSourceLocation; ///< file:line/function
-  QString mChannel;
-
-  QString mSourceFile;
-  QString mSourceFunction;
-  int mSourceLine;
-};
 
 /**\brief Logging service for SSC.
  *
@@ -125,15 +88,6 @@ public:
   static Reporter* getInstance(); ///< Returns a reference to the only Reporter that exists.
 
   void setLoggingFolder(QString absoluteLoggingFolderPath); // deprecated
-
-  struct Format
-  {
-	  Format();
-	  bool mShowBrackets;
-	  bool mShowLevel;
-	  bool mShowSourceLocation;
-  };
-
   void setAudioSource(AudioPtr audioSource); ///< define sounds to go with the messages.
   MessageListenerPtr createListener();
 
@@ -164,36 +118,23 @@ public:
 signals:
   void emittedMessage(Message message); ///< emitted for each new message, in addition to writing to file.
 
+private slots:
+  void onEmittedMessage(Message message);
+
 private:
   bool hasAudioSource() const;
-  bool isEnabled() const;
-  void setFormat(Format format); ///< fine-tune messaging format
   void initializeObject();
   Reporter();
   virtual ~Reporter();
   Reporter(const Reporter&);
   Reporter& operator=(const Reporter&);
 
-  void setEnabled(bool enabled); ///< enable/disable messaging.
-
-  bool appendToLogfile(QString filename, QString text);
   void playSound(MESSAGE_LEVEL messageLevel);
-  QString formatMessage(Message msg);
-  int getDefaultTimeout(MESSAGE_LEVEL messageLevel) const;
 
-  bool initializeLogFile(QString filename);
-  QString getFilenameForChannel(QString channel) const;
-
-  typedef boost::shared_ptr<class SingleStreamerImpl> SingleStreamerImplPtr;
-  SingleStreamerImplPtr mCout;
-  SingleStreamerImplPtr mCerr;
-
-  bool mEnabled;
-  Format mFormat;
-//  QString mLogFile;
   QString mLogPath;
   AudioPtr mAudioSource;
 
+  class ReporterThread* mThread;
   MessageListenerPtr mListener;
 
   static Reporter *mTheInstance; // global variable
@@ -206,14 +147,9 @@ cxResource_EXPORT Reporter* reporter();
 
 } //namespace cx
 
-typedef cx::Message Message;
-Q_DECLARE_METATYPE(Message);
-
 /**
  * @}
  */
-
-
 
 
 #endif /* CXREPORTER_H_ */
