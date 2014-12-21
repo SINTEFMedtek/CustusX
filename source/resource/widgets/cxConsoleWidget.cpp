@@ -89,7 +89,8 @@ ConsoleWidget::ConsoleWidget(QWidget* parent) :
 
 	this->createTextCharFormats();
 
-	mMessageListener = reporter()->createListener();
+//	mMessageListener = reporter()->createListener();
+	mMessageListener = MessageListener::create();
 	mMessageFilter.reset(new MessageFilterConsole);
 	mMessageListener->setMessageQueueMaxSize(1000);
 	mMessageListener->installFilter(mMessageFilter);
@@ -100,6 +101,7 @@ ConsoleWidget::ConsoleWidget(QWidget* parent) :
 	mMessageFilter->setLowestSeverity(value);
 
 	mMessageFilter->setActiveChannel(mChannelSelector->getValue());
+	mMessageListener->installFilter(mMessageFilter);
 
 
 	mLineWrappingAction->setCheckable(true);
@@ -207,6 +209,7 @@ void ConsoleWidget::onSeverityChange(int delta)
 	severity = static_cast<LOG_SEVERITY>(val);
 
 	mMessageFilter->setLowestSeverity(severity);
+	mMessageListener->installFilter(mMessageFilter);
 	this->updateUI();
 }
 
@@ -253,9 +256,15 @@ void ConsoleWidget::updateUI()
 
 void ConsoleWidget::onChannelSelectorChanged()
 {
-	mMessageFilter->setActiveChannel(mChannelSelector->getValue());
+	mChannelSelector->blockSignals(true);
 
-	QTimer::singleShot(0, this, SLOT(updateUI())); // break loop by delaying update
+	mMessageFilter->setActiveChannel(mChannelSelector->getValue());
+	mMessageListener->installFilter(mMessageFilter);
+	this->updateUI();
+
+	mChannelSelector->blockSignals(false);
+
+//	QTimer::singleShot(0, this, SLOT(updateUI())); // break loop by delaying update
 }
 
 void ConsoleWidget::contextMenuEvent(QContextMenuEvent* event)

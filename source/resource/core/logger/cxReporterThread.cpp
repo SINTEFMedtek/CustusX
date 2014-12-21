@@ -72,6 +72,8 @@ ReporterThread::~ReporterThread()
 
 void ReporterThread::initialize()
 {
+	mRepository.reset(new MessageRepository());
+
 	mCout.reset();
 	mCerr.reset();
 
@@ -204,6 +206,8 @@ void ReporterThread::sendMessage(Message message)
 	}
 
 	emit emittedMessage(message);
+
+	this->sendMessageToRepository(message);
 }
 
 
@@ -265,6 +269,29 @@ ReporterThread::Format::Format() :
 	mShowSourceLocation(true)
 {}
 
+void ReporterThread::installObserver(MessageObserverPtr observer, bool resend)
+{
+	if (!mRepository)
+		return;
+	QMutexLocker sentry(&mRepositoryMutex);
+	mRepository->install(observer, resend);
+}
+
+void ReporterThread::uninstallObserver(MessageObserverPtr observer)
+{
+	if (!mRepository)
+		return;
+	QMutexLocker sentry(&mRepositoryMutex);
+	mRepository->uninstall(observer);
+}
+
+void ReporterThread::sendMessageToRepository(const Message& message)
+{
+	if (!mRepository)
+		return;
+	QMutexLocker sentry(&mRepositoryMutex);
+	mRepository->setMessage(message);
+}
 
 
 } //End namespace cx

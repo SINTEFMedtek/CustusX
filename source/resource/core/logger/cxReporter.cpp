@@ -86,7 +86,7 @@ void Reporter::initialize()
 
 void Reporter::initializeObject()
 {
-	mListener = MessageListener::create();
+//	mListener = MessageListener::create();
 
 	this->stopThread();
 	this->startThread();
@@ -284,10 +284,23 @@ void Reporter::playSampleSound()
     mAudioSource->playSampleSound();
 }
 
-MessageListenerPtr Reporter::createListener()
+//MessageListenerPtr Reporter::createListener()
+//{
+//	return mListener->clone();
+//}
+
+void Reporter::installObserver(MessageObserverPtr observer, bool resend)
 {
-	return mListener->clone();
+	if (mThread)
+		mThread->installObserver(observer, resend);
 }
+
+void Reporter::uninstallObserver(MessageObserverPtr observer)
+{
+	if (mThread)
+		mThread->uninstallObserver(observer);
+}
+
 
 
 } //End namespace cx

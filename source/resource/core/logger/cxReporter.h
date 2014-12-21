@@ -62,6 +62,7 @@ class QTextStream;
 
 namespace cx
 {
+typedef boost::shared_ptr<class MessageObserver> MessageObserverPtr;
 typedef boost::shared_ptr<class MessageListener> MessageListenerPtr;
 
 /**\brief Logging service for SSC.
@@ -89,7 +90,10 @@ public:
 
   void setLoggingFolder(QString absoluteLoggingFolderPath); // deprecated
   void setAudioSource(AudioPtr audioSource); ///< define sounds to go with the messages.
-  MessageListenerPtr createListener();
+//  MessageListenerPtr createListener();
+
+  void installObserver(MessageObserverPtr observer, bool resend);
+  void uninstallObserver(MessageObserverPtr observer);
 
   //Text
   void sendInfo(QString info); ///< Used to report normal interesting activity, no sound associated
@@ -137,7 +141,7 @@ private:
   AudioPtr mAudioSource;
 
   class ReporterThread* mThread;
-  MessageListenerPtr mListener;
+//  MessageListenerPtr mListener;
 
   static Reporter *mTheInstance; // global variable
 };

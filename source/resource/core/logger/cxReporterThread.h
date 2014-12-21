@@ -66,6 +66,8 @@ class QTextStream;
 
 namespace cx
 {
+typedef boost::shared_ptr<class MessageObserver> MessageObserverPtr;
+typedef boost::shared_ptr<class MessageRepository> MessageRepositoryPtr;
 
 /**\brief Thread for log handling. Used inside Reporter.
  *
@@ -79,6 +81,11 @@ public:
 	ReporterThread(QObject* parent = NULL);
 	virtual ~ReporterThread();
 	void setLoggingFolder(QString absoluteLoggingFolderPath); ///< call during startup, will fail if called when running
+
+	void installObserver(MessageObserverPtr observer, bool resend);
+	void uninstallObserver(MessageObserverPtr observer);
+
+public slots:
 	void logMessage(Message msg);
 
 signals:
@@ -91,6 +98,7 @@ private slots:
 	void onTimeout();
 private:
 	QMutex mMutex;
+	QMutex mRepositoryMutex;
 
 	struct Format
 	{
@@ -105,6 +113,7 @@ private:
 	void sendMessage(Message msg);
 	void setFormat(Format format); ///< fine-tune messaging format
 	void initialize();
+	void sendMessageToRepository(const Message& message);
 
 	bool appendToLogfile(QString filename, QString text);
 	QString formatMessage(Message msg);
@@ -120,6 +129,7 @@ private:
 	Format mFormat;
 	QString mLogPath;
 	QList<Message> mMessageQueue;
+	MessageRepositoryPtr mRepository;
 
 	//  MessageListenerPtr mListener;
 };
