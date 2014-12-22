@@ -62,7 +62,7 @@ Reporter* reporter()
 Reporter::Reporter()// :
 //	mThread(NULL)
 {	
-	connect(this, &Reporter::emittedMessage, this, &Reporter::onEmittedMessage);
+//	connect(this, &Reporter::emittedMessage, this, &Reporter::onEmittedMessage);
 }
 
 Reporter::~Reporter()
@@ -103,7 +103,7 @@ void Reporter::startThread()
 	mWorker->moveToThread(mThread.get());
 	if (!mLogPath.isEmpty())
 		mWorker->setLoggingFolder(mLogPath);
-	connect(mWorker.get(), &ReporterThread::emittedMessage, this, &Reporter::emittedMessage);
+	connect(mWorker.get(), &ReporterThread::emittedMessage, this, &Reporter::onEmittedMessage);
 
 	mThread->start();
 }
@@ -113,7 +113,7 @@ void Reporter::stopThread()
 	if (!mThread)
 		return;
 
-	disconnect(mWorker.get(), &ReporterThread::emittedMessage, this, &Reporter::emittedMessage);
+	disconnect(mWorker.get(), &ReporterThread::emittedMessage, this, &Reporter::onEmittedMessage);
 	boost::shared_ptr<class ReporterThread> tempWorker = mWorker;
 	mWorker.reset();
 
@@ -276,11 +276,6 @@ void Reporter::playSampleSound()
   if(this->hasAudioSource())
     mAudioSource->playSampleSound();
 }
-
-//MessageListenerPtr Reporter::createListener()
-//{
-//	return mListener->clone();
-//}
 
 void Reporter::installObserver(MessageObserverPtr observer, bool resend)
 {

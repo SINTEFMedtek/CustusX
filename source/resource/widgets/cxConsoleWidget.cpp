@@ -94,7 +94,7 @@ ConsoleWidget::ConsoleWidget(QWidget* parent) :
 //	mMessageListener = reporter()->createListener();
 	mMessageListener = MessageListener::create();
 	mMessageFilter.reset(new MessageFilterConsole);
-	mMessageListener->setMessageQueueMaxSize(1000);
+//	mMessageListener->setMessageQueueMaxSize(1000);
 	mMessageListener->installFilter(mMessageFilter);
 	connect(mMessageListener.get(), &MessageListener::newMessage, this, &ConsoleWidget::receivedMessage);
 

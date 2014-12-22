@@ -55,6 +55,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogicManager.h"
 #include "cxVisualizationService.h"
 
+#include "cxLogMessageFilter.h"
+#include "cxMessageListener.h"
+
 
 namespace cx
 {
@@ -63,7 +66,9 @@ StatusBar::StatusBar() :
 	mGrabbingInfoLabel(new QLabel(this)),
 	mTpsLabel(new QLabel(this))
 {
-	connect(reporter(), SIGNAL(emittedMessage(Message)), this, SLOT(showMessageSlot(Message)));
+	mMessageListener = MessageListener::create();
+	mMessageListener->installFilter(MessageFilterStatusBar::create());
+	connect(mMessageListener.get(), &MessageListener::newMessage, this, &StatusBar::showMessageSlot);
 
 	connect(trackingService().get(), &TrackingService::stateChanged, this, &StatusBar::resetToolManagerConnection);
 

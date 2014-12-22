@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxForwardDeclarations.h"
 #include "cxLegacySingletons.h"
 #include "cxReporter.h"
+#include "cxLogMessageFilter.h"
 
 class QLabel;
 class QPixmap;
@@ -51,6 +52,32 @@ namespace cx
 {
 
 typedef boost::shared_ptr<class DominantToolProxy> DominantToolProxyPtr;
+typedef boost::shared_ptr<class MessageFilterStatusBar> MessageFilterStatusBarPtr;
+
+/** Filter log messages for display in the StatusBar
+ */
+class MessageFilterStatusBar : public MessageFilter
+{
+public:
+	static MessageFilterStatusBarPtr create()
+	{
+		return MessageFilterStatusBarPtr(new MessageFilterStatusBar);
+	}
+	virtual bool operator()(const Message& msg) const
+	{
+		LOG_SEVERITY severity = level2severity(msg.getMessageLevel());
+
+		if (severity <= msWARNING)
+			return true;
+		if (msg.getMessageLevel()==mlVOLATILE)
+			return true;
+		return false;
+	}
+	virtual MessageFilterPtr clone()
+	{
+		return MessageFilterPtr(new MessageFilterStatusBar(*this));
+	}
+};
 
 
 /**
@@ -93,6 +120,7 @@ private:
 //  QLabel* mMessageLevelLabel;
   QToolButton* mMessageLevelLabel;
   DominantToolProxyPtr mActiveTool;
+  MessageListenerPtr mMessageListener;
 
   struct ToolData
   {

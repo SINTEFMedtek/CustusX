@@ -65,12 +65,14 @@ namespace cx
 typedef boost::shared_ptr<class MessageObserver> MessageObserverPtr;
 typedef boost::shared_ptr<class MessageListener> MessageListenerPtr;
 
-/**\brief Logging service for SSC.
+/** \brief Logging service.
  *
  * Send info in different error levels, and route
  * them to file, or to a console via qt signals.
  * Use the class ConsoleWidget for this.
  * Reporter also captures cout and cerr.
+ *
+ * Use the MessageListener to catch emitted log messages.
  *
  * \author Janne Beate Lervik Bakeng, SINTEF
  * \author Christian Askeland, SINTEF
@@ -90,7 +92,6 @@ public:
 
   void setLoggingFolder(QString absoluteLoggingFolderPath); // deprecated
   void setAudioSource(AudioPtr audioSource); ///< define sounds to go with the messages.
-//  MessageListenerPtr createListener();
 
   void installObserver(MessageObserverPtr observer, bool resend);
   void uninstallObserver(MessageObserverPtr observer);
@@ -118,9 +119,6 @@ public:
 
   void playScreenShotSound(); ///< plays a sound signaling that a screen shot has been taken
   void playSampleSound(); ///< plays a sound signaling that something has been sampled
-
-signals:
-  void emittedMessage(Message message); ///< emitted for each new message, in addition to writing to file.
 
 private slots:
   void onEmittedMessage(Message message);

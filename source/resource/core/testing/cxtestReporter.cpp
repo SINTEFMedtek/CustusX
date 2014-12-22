@@ -44,8 +44,21 @@ TEST_CASE("Reporter can catch cout", "[unit]")
 	cx::Reporter::initialize();
 
 	{
-		std::cout << "<test string>" << std::endl;
-		CHECK(cxtest::waitForQueuedSignal(cx::reporter(), SIGNAL(emittedMessage(Message)), 200, true));
+		// given
+		cx::MessageListenerPtr listener = cx::MessageListener::create();
+		listener->setMessageQueueMaxSize(100);
+		CHECK(listener->getMessages().size()==0);
+		QString testString = "<test string>";
+
+		// when
+		std::cout << testString << std::endl;
+
+		// then
+		REQUIRE(cxtest::waitForQueuedSignal(listener.get(), SIGNAL(newMessage(Message)), 200, true));
+
+		CHECK(!listener->getMessages().isEmpty());
+		if (!listener->getMessages().isEmpty())
+			CHECK(listener->getMessages().front().getText().contains(testString));
 	}
 
 	cx::Reporter::shutdown();
