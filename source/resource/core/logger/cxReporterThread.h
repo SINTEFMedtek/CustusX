@@ -97,15 +97,6 @@ private:
 	QMutex mMutex;
 	QMutex mRepositoryMutex;
 
-//	struct Format
-//	{
-//		Format();
-//		bool mShowBrackets;
-//		bool mShowLevel;
-//		bool mShowSourceLocation;
-//	};
-
-//	void setFormat(Format format); ///< fine-tune messaging format
 	void sendMessageToRepository(const Message& message);
 
 	bool appendToLogfile(QString filename, QString text);
@@ -123,7 +114,6 @@ private:
 	SingleStreamerImplPtr mCout;
 	SingleStreamerImplPtr mCerr;
 
-//	Format mFormat;
 	QString mLogPath;
 	MessageRepositoryPtr mRepository;
 };

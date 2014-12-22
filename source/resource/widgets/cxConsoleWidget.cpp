@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxUtilHelpers.h"
 #include <QTimer>
 #include <QThread>
+#include "cxLogMessageFilter.h"
 
 namespace cx
 {

@@ -32,14 +32,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMessageListener.h"
 #include <iostream>
 #include <QThread>
+#include "cxReporterMessageRepository.h"
 
 namespace cx
 {
 
-
 MessageListenerPtr MessageListener::create()
 {
 	return MessageListenerPtr(new MessageListener);
+}
+
+MessageListenerPtr MessageListener::createWithQueue(int size)
+{
+	MessageListenerPtr retval(new MessageListener);
+	retval->setMessageQueueMaxSize(size);
+	return retval;
 }
 
 MessageListenerPtr MessageListener::clone()
@@ -48,14 +55,13 @@ MessageListenerPtr MessageListener::clone()
 	retval->mMessages = this->mMessages;
 	retval->mManager = this->mManager;
 	retval->mMessageHistoryMaxSize = this->mMessageHistoryMaxSize;
-//	retval->mFilter = this->mFilter;
 	return retval;
 }
 
 
 MessageListener::MessageListener() :
 	mManager(NULL),
-	mMessageHistoryMaxSize(1000)
+	mMessageHistoryMaxSize(0)
 {
 	mManager = reporter();
 
@@ -105,23 +111,10 @@ bool MessageListener::containsErrors() const
 void MessageListener::restart()
 {
 	mManager->installObserver(mObserver, true);
-
-//	for (QList<Message>::iterator i=mMessages.begin(); i!=mMessages.end(); ++i)
-//	{
-//		this->emitThroughFilter(*i);
-//	}
 }
-
-//bool MessageListener::testFilter(const Message& msg) const
-//{
-//	if (!mFilter)
-//		return true; // always succeed with no filter.
-//	return (*mFilter)(msg);
-//}
 
 void MessageListener::installFilter(MessageFilterPtr filter)
 {
-//	mFilter = filter;
 	mObserver->installFilter(filter);
 	mManager->installObserver(mObserver, true);
 }
@@ -139,100 +132,6 @@ int MessageListener::getMessageQueueMaxSize() const
 QList<Message> MessageListener::getMessages() const
 {
 	return mMessages;
-}
-
-//---------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-MessageRepositoryPtr MessageRepository::create()
-{
-	return MessageRepositoryPtr(new MessageRepository);
-}
-
-MessageRepository::MessageRepository() :
-	mMessageHistoryMaxSize(3000)
-{
-}
-
-MessageRepository::~MessageRepository()
-{
-}
-
-void MessageRepository::setMessage(Message message)
-{
-	mMessages.push_back(message);
-	this->limitQueueSize();
-	this->emitThroughFilter(message);
-}
-
-void MessageRepository::limitQueueSize()
-{
-	if (mMessageHistoryMaxSize<0)
-		return;
-
-	while (mMessages.size() > mMessageHistoryMaxSize)
-		mMessages.pop_front();
-}
-
-void MessageRepository::emitThroughFilter(const Message& message)
-{
-	for (unsigned i=0; i<mObservers.size(); ++i)
-	{
-		this->emitThroughFilter(mObservers[i], message);
-	}
-}
-
-void MessageRepository::emitThroughFilter(MessageObserverPtr observer, const Message& message)
-{
-	if (observer->testFilter(message))
-		observer->sendMessage(message);
-}
-
-void MessageRepository::install(MessageObserverPtr observer, bool resend)
-{
-	this->uninstall(observer);
-
-	mObservers.push_back(observer);
-
-	if (resend)
-	{
-		for (QList<Message>::iterator i=mMessages.begin(); i!=mMessages.end(); ++i)
-			this->emitThroughFilter(observer, *i);
-	}
-}
-
-void MessageRepository::uninstall(MessageObserverPtr observer)
-{
-	if (!std::count(mObservers.begin(), mObservers.end(), observer))
-			return;
-	mObservers.erase(std::find(mObservers.begin(), mObservers.end(), observer));
-}
-
-void MessageRepository::setMessageQueueMaxSize(int count)
-{
-	mMessageHistoryMaxSize = count;
-}
-
-int MessageRepository::getMessageQueueMaxSize() const
-{
-	return mMessageHistoryMaxSize;
 }
 
 

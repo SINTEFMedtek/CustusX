@@ -72,6 +72,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	logger/cxReporter
 	logger/cxMessageListener
 	logger/cxReporterThread
+	logger/cxReporterMessageRepository
 
 	settings/cxSettings.h
 	settings/cxStateService
@@ -165,6 +166,7 @@ cx_add_class(cxResource_SOURCE
 	logger/cxLogMessage
 	logger/cxLogQDebugRedirecter
 	logger/cxLogIOStreamRedirecter
+	logger/cxLogMessageFilter
 
 	algorithms/ItkVtkGlue/itkImageToVTKImageFilter.h
 	algorithms/ItkVtkGlue/itkImageToVTKImageFilter.txx

@@ -50,6 +50,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxLogQDebugRedirecter.h"
 #include "cxLogIOStreamRedirecter.h"
+#include "cxReporterMessageRepository.h"
+#include "cxTime.h"
 
 namespace cx
 {
@@ -69,7 +71,9 @@ ReporterThread::ReporterThread(QObject *parent) :
 	mCout.reset(new SingleStreamerImpl(std::cout, mlCOUT));
 	mCerr.reset(new SingleStreamerImpl(std::cerr, mlCERR));
 
-	this->setLoggingFolder(DataLocations::getRootConfigPath()+"/Logs");
+	QString isoDateFormat("yyyy-MM-dd");
+	QString isoDate = QDateTime::currentDateTime().toString(isoDateFormat);
+	this->setLoggingFolder(DataLocations::getRootConfigPath()+"/Logs/"+isoDate);
 }
 
 ReporterThread::~ReporterThread()
@@ -78,11 +82,6 @@ ReporterThread::~ReporterThread()
 	mCout.reset();
 	mCerr.reset();
 }
-
-//void ReporterThread::setFormat(Format format)
-//{
-//	mFormat = format;
-//}
 
 bool ReporterThread::initializeLogFile(QString filename)
 {
@@ -185,24 +184,14 @@ QString ReporterThread::formatMessage(Message msg)
 {
 	QString retval;
 
-//	QString bra = (mFormat.mShowBrackets ? "[" : "");
-//	QString ket = (mFormat.mShowBrackets ? "]" : "");
-
 	// timestamp in front
-	retval += QString("[%1]").arg(msg.getTimeStamp().toString("[hh:mm:ss.zzz]"));
-//	retval += msg.getTimeStamp().toString("[hh:mm:ss.zzz]");
+	retval += QString("[%1]").arg(msg.getTimeStamp().toString("hh:mm:ss.zzz"));
 
 	// show source location
 	if (!msg.getSourceLocation().isEmpty())
 		retval += " " + QString("[%1]").arg(msg.getSourceLocation());
 
-	// show level if set, or anyway if one of error/warning/success
-//	if (mFormat.mShowLevel
-//			|| msg.getMessageLevel() == mlERROR
-//			|| msg.getMessageLevel() == mlWARNING
-//			|| msg.getMessageLevel() == mlSUCCESS)
 	retval += " " + QString("[%1]").arg(qstring_cast(msg.getMessageLevel()));
-//		retval += " " + bra + qstring_cast(msg.getMessageLevel()) + ket;
 
 	// add message text at end.
 	retval += " " + msg.getText();
@@ -234,12 +223,6 @@ bool ReporterThread::appendToLogfile(QString filename, QString text)
 
 	return true;
 }
-
-//ReporterThread::Format::Format() :
-//	mShowBrackets(true),
-//	mShowLevel(true),
-//	mShowSourceLocation(true)
-//{}
 
 void ReporterThread::installObserver(MessageObserverPtr observer, bool resend)
 {

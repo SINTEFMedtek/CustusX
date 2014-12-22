@@ -44,7 +44,7 @@ namespace cxtest {
 
 MetricFixture::MetricFixture()
 {
-	mMessageListener = cx::MessageListener::create();
+	mMessageListener = cx::MessageListener::createWithQueue();
 	mServices = TestServices::create();
 }
 

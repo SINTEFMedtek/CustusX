@@ -40,7 +40,7 @@ namespace cx
 
 TEST_CASE("Core test services correctly contructed/destructed", "[unit]")
 {
-	cx::MessageListenerPtr messageListener = cx::MessageListener::create();
+	cx::MessageListenerPtr messageListener = cx::MessageListener::createWithQueue();
 
 	cxtest::TestServicesPtr services = cxtest::TestServices::create();
 	services.reset();

@@ -54,7 +54,7 @@ namespace cxtest
 TEST_CASE("ReconstructManager: PNN on sphere","[unit][usreconstruction][synthetic][not_win32][pnn]")
 {
 	ReconstructionManagerTestFixture fixture;
-	cx::MessageListenerPtr messageListener = cx::MessageListener::create();
+	cx::MessageListenerPtr messageListener = cx::MessageListener::createWithQueue();
 	fixture.setVerbose(true);
 
 	SyntheticReconstructInputPtr input(new SyntheticReconstructInput);

@@ -82,6 +82,7 @@ TEST_CASE("Reporter: MessageListener receives messages", "[unit]")
 	{
 		// given
 		cx::MessageListenerPtr listener = cx::MessageListener::create();
+		listener->setMessageQueueMaxSize(100);
 		CHECK(listener->getMessages().size()==0);
 		QString testString = "<test string>";
 

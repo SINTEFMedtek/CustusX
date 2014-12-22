@@ -67,7 +67,7 @@ vtkLookupTablePtr getCreateLut(int tableRangeMin, int tableRangeMax, double hueR
 ViewsFixture::ViewsFixture(QString displayText)
 {
 	mServices = cxtest::TestServices::create();
-	mMessageListener = cx::MessageListener::create();
+	mMessageListener = cx::MessageListener::createWithQueue();
 
 	mShaderFolder = cx::DataLocations::getShaderPath();
 
