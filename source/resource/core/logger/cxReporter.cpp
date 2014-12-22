@@ -61,7 +61,7 @@ Reporter* reporter()
 
 Reporter::Reporter() :
 	mThread(NULL)
-{
+{	
 	connect(this, &Reporter::emittedMessage, this, &Reporter::onEmittedMessage);
 }
 
@@ -97,10 +97,14 @@ void Reporter::startThread()
 	if (mThread)
 		return;
 
-	mThread = new ReporterThread();
+	mThread = new QThread(this);
+
+	mWorker.reset(new ReporterThread());
+	mWorker->moveToThread(mThread);
 	if (!mLogPath.isEmpty())
-		mThread->setLoggingFolder(mLogPath);
-	connect(mThread, &ReporterThread::emittedMessage, this, &Reporter::emittedMessage);
+		mWorker->setLoggingFolder(mLogPath);
+	connect(mWorker.get(), &ReporterThread::emittedMessage, this, &Reporter::emittedMessage);
+
 	mThread->start();
 }
 
@@ -109,26 +113,26 @@ void Reporter::stopThread()
 	if (!mThread)
 		return;
 
-	ReporterThread* victim = mThread;
-	mThread = NULL;
+	disconnect(mWorker.get(), &ReporterThread::emittedMessage, this, &Reporter::emittedMessage);
+	boost::shared_ptr<class ReporterThread> tempWorker = mWorker;
+	mWorker.reset();
 
-	disconnect(victim, &ReporterThread::emittedMessage, this, &Reporter::emittedMessage);
+	mThread->quit();
+	mThread->wait(2000); // forever or until dead thread
 
-	victim->quit();
-	victim->wait(2000); // forever or until dead thread
-
-	if (victim->isRunning())
+	if (mThread->isRunning())
 	{
-		victim->terminate();
-		victim->wait(); // forever or until dead thread
+		mThread->terminate();
+		mThread->wait(); // forever or until dead thread
 	}
 
-	if (victim->isRunning())
+	if (mThread->isRunning())
 	{
 		std::cerr << "failed to stop Reporter thread." << std::endl;
 	}
 
-	victim = NULL;
+	mThread = NULL;
+	tempWorker.reset();
 }
 
 void Reporter::shutdown()
@@ -139,6 +143,7 @@ void Reporter::shutdown()
 
 void Reporter::setLoggingFolder(QString absoluteLoggingFolderPath)
 {
+	std::cout << "----------------- restart thread" << std::endl;
 	mLogPath = absoluteLoggingFolderPath;
 
 	if (mThread)
@@ -215,7 +220,7 @@ void Reporter::sendMessage(Message message)
 		return;
 	}
 
-	mThread->logMessage(message);
+	mWorker->logMessage(message);
 }
 
 void Reporter::playSound(MESSAGE_LEVEL messageLevel)
@@ -291,14 +296,14 @@ void Reporter::playSampleSound()
 
 void Reporter::installObserver(MessageObserverPtr observer, bool resend)
 {
-	if (mThread)
-		mThread->installObserver(observer, resend);
+	if (mWorker)
+		mWorker->installObserver(observer, resend);
 }
 
 void Reporter::uninstallObserver(MessageObserverPtr observer)
 {
-	if (mThread)
-		mThread->uninstallObserver(observer);
+	if (mWorker)
+		mWorker->uninstallObserver(observer);
 }
 
 

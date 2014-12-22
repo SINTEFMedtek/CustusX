@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxEnumConverter.h"
 #include "cxUtilHelpers.h"
 #include <QTimer>
+#include <QThread>
 
 namespace cx
 {
@@ -58,6 +59,7 @@ ConsoleWidget::ConsoleWidget(QWidget* parent) :
 	mLineWrappingAction(new QAction(tr("Line wrapping"), this)),
 	mSeverityAction(NULL)
 {
+	std::cout << "*** ConsoleWidget::ConsoleWidget threadid=" << QThread::currentThreadId() << std::endl;
 	this->setWhatsThis(this->defaultWhatsThis());
 
 	QVBoxLayout* layout = new QVBoxLayout;

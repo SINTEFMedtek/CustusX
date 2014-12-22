@@ -218,12 +218,10 @@ signals:
 private slots:
 	void messageReceived(Message message);
 private:
-//	bool testFilter(const Message &msg) const;
 	void emitThroughFilter(const Message& message);
 	bool isError(MESSAGE_LEVEL level) const;
 	void limitQueueSize();
 	QList<Message> mMessages;
-//	MessageFilterPtr mFilter;
 	QPointer<Reporter> mManager;
 	int mMessageHistoryMaxSize;
 

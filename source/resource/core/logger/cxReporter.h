@@ -140,8 +140,8 @@ private:
   QString mLogPath;
   AudioPtr mAudioSource;
 
-  class ReporterThread* mThread;
-//  MessageListenerPtr mListener;
+  class QThread* mThread;
+  boost::shared_ptr<class ReporterThread> mWorker;
 
   static Reporter *mTheInstance; // global variable
 };

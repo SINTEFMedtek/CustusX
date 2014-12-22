@@ -73,7 +73,7 @@ typedef boost::shared_ptr<class MessageRepository> MessageRepositoryPtr;
  *
  * \addtogroup cx_resource_core_logger
  */
-class ReporterThread : public QThread
+class ReporterThread : public QObject
 {
 	Q_OBJECT
 
@@ -81,6 +81,7 @@ public:
 	ReporterThread(QObject* parent = NULL);
 	virtual ~ReporterThread();
 	void setLoggingFolder(QString absoluteLoggingFolderPath); ///< call during startup, will fail if called when running
+	void initialize();
 
 	void installObserver(MessageObserverPtr observer, bool resend);
 	void uninstallObserver(MessageObserverPtr observer);
@@ -91,11 +92,8 @@ public slots:
 signals:
 	void emittedMessage(Message message); ///< emitted for each new message, in addition to writing to file.
 
-protected:
-	virtual void run();
-
 private slots:
-	void onTimeout();
+	void sendMessage(Message msg);
 private:
 	QMutex mMutex;
 	QMutex mRepositoryMutex;
@@ -107,12 +105,8 @@ private:
 		bool mShowLevel;
 		bool mShowSourceLocation;
 	};
-	void processMessageQueue();
-	bool popMessageQueue();
 
-	void sendMessage(Message msg);
 	void setFormat(Format format); ///< fine-tune messaging format
-	void initialize();
 	void sendMessageToRepository(const Message& message);
 
 	bool appendToLogfile(QString filename, QString text);
@@ -128,10 +122,7 @@ private:
 
 	Format mFormat;
 	QString mLogPath;
-	QList<Message> mMessageQueue;
 	MessageRepositoryPtr mRepository;
-
-	//  MessageListenerPtr mListener;
 };
 
 } //namespace cx

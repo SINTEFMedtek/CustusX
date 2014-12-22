@@ -55,8 +55,10 @@ namespace cx
 {
 
 ReporterThread::ReporterThread(QObject *parent) :
-	QThread(parent)
+	QObject(parent)
 {
+	std::cout << "ReporterThread::ReporterThread threadid=" << QThread::currentThreadId() << std::endl;
+
 	qInstallMessageHandler(convertQtMessagesToCxMessages);
 	qRegisterMetaType<Message>("Message");
 
@@ -77,21 +79,10 @@ void ReporterThread::initialize()
 	mCout.reset();
 	mCerr.reset();
 
-	mCout.reset(new SingleStreamerImpl(std::cout, mlCOUT));
-	mCerr.reset(new SingleStreamerImpl(std::cerr, mlCERR));
+//	mCout.reset(new SingleStreamerImpl(std::cout, mlCOUT));
+//	mCerr.reset(new SingleStreamerImpl(std::cerr, mlCERR));
 
 	this->setLoggingFolder(DataLocations::getRootConfigPath()+"/Logs");
-}
-
-void ReporterThread::run()
-{
-	int interval = 200;
-	boost::shared_ptr<QTimer> timer(new QTimer);
-	timer->start(interval);
-	connect(timer.get(), &QTimer::timeout, this, &ReporterThread::onTimeout); // this signal will be executed in the thread of THIS, i.e. the main thread.
-	this->exec();
-
-	this->processMessageQueue();
 }
 
 void ReporterThread::setFormat(Format format)
@@ -118,12 +109,6 @@ QString ReporterThread::getFilenameForChannel(QString channel) const
 
 void ReporterThread::setLoggingFolder(QString absoluteLoggingFolderPath)
 {
-	if (this->isRunning())
-	{
-		this->sendMessage(Message("Attempt to set logging folder while reporter thread running", mlERROR));
-		return;
-	}
-
 	mLogPath = absoluteLoggingFolderPath;
 
 	QFileInfo(mLogPath+"/").absoluteDir().mkpath(".");
@@ -148,36 +133,9 @@ int ReporterThread::getDefaultTimeout(MESSAGE_LEVEL messageLevel) const
 
 void ReporterThread::logMessage(Message msg)
 {
-	QMutexLocker sentry(&mMutex);
-	mMessageQueue.push_back(msg);
-	sentry.unlock();
-
-	this->processMessageQueue();
-}
-
-void ReporterThread::onTimeout()
-{
-	this->processMessageQueue();
-}
-
-void ReporterThread::processMessageQueue()
-{
-	while (this->popMessageQueue());
-}
-
-bool ReporterThread::popMessageQueue()
-{
-	QMutexLocker sentry(&mMutex);
-
-	if (mMessageQueue.isEmpty())
-		return false;
-
-	Message msg = mMessageQueue.front();
-	mMessageQueue.pop_front();
-	sentry.unlock();
-
-	this->sendMessage(msg);
-	return true;
+	QMetaObject::invokeMethod(this, "sendMessage",
+							  Qt::QueuedConnection,
+							  Q_ARG(Message, msg));
 }
 
 void ReporterThread::sendMessage(Message message)

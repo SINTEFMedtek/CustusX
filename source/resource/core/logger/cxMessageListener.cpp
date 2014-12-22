@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxMessageListener.h"
 #include <iostream>
+#include <QThread>
 
 namespace cx
 {
@@ -176,6 +177,7 @@ MessageRepository::~MessageRepository()
 
 void MessageRepository::setMessage(Message message)
 {
+	std::cout << "MessageRepository::setMessage threadid=" << QThread::currentThreadId() << std::endl;
 	mMessages.push_back(message);
 	this->limitQueueSize();
 	this->emitThroughFilter(message);
