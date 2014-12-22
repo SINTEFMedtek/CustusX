@@ -124,6 +124,8 @@ private:
 
 	QString mLogPath;
 	MessageRepositoryPtr mRepository;
+	QStringList mInitializedFiles;
+
 };
 
 } //namespace cx

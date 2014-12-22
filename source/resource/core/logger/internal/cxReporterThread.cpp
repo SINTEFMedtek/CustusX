@@ -86,8 +86,14 @@ ReporterThread::~ReporterThread()
 
 bool ReporterThread::initializeLogFile(QString filename)
 {
+	if (mInitializedFiles.contains(filename))
+		return true;
+
+	mInitializedFiles << filename;
+
 	QString timestamp = QDateTime::currentDateTime().toString(timestampMilliSecondsFormatNice());
-	QString text = QString("-------> Logging initialized %1\n").arg(timestamp);
+	QString formatInfo = "[timestamp][source info][severity][thread] <text> ";
+	QString text = QString("-------> Logging initialized [%1], format: %2\n").arg(timestamp).arg(formatInfo);
 	bool success = this->appendToLogfile(filename, text);
 	if (!success)
 	{
@@ -142,7 +148,6 @@ void ReporterThread::processMessage(Message message)
 	emit emittedMessage(message);
 
 	mRepository->setMessage(message);
-//	this->sendMessageToRepository(message);
 }
 
 void ReporterThread::sendToFile(Message message)
@@ -150,8 +155,12 @@ void ReporterThread::sendToFile(Message message)
 	if (message.getMessageLevel()==mlVOLATILE)
 		return;
 
-	this->appendToLogfile(this->getFilenameForChannel(message.mChannel), this->formatMessage(message) + "\n");
-	this->appendToLogfile(this->getFilenameForChannel("all"), this->formatMessage(message) + "\n");
+	QString text = this->formatMessage(message) + "\n";
+	QString channelFile = this->getFilenameForChannel(message.mChannel);
+
+	this->initializeLogFile(channelFile);
+	this->appendToLogfile(channelFile, text);
+	this->appendToLogfile(this->getFilenameForChannel("all"), text);
 }
 
 void ReporterThread::sendToCout(Message message)
@@ -228,42 +237,23 @@ bool ReporterThread::appendToLogfile(QString filename, QString text)
 
 void ReporterThread::installObserver(MessageObserverPtr observer, bool resend)
 {
-//	if (!mRepository)
-//		return;
 	QMutexLocker sentry(&mActionsMutex);
 	PendingActionType action = boost::bind(&MessageRepository::install, mRepository.get(), observer, resend);
 	mPendingActions.push_back(action);
 	sentry.unlock();
 
 	this->invokePendingAction();
-
-
-//	QMutexLocker sentry(&mRepositoryMutex);
-//	mRepository->install(observer, resend);
 }
 
 void ReporterThread::uninstallObserver(MessageObserverPtr observer)
 {
-//	if (!mRepository)
-//		return;
 	QMutexLocker sentry(&mActionsMutex);
 	PendingActionType action = boost::bind(&MessageRepository::uninstall, mRepository.get(), observer);
 	mPendingActions.push_back(action);
 	sentry.unlock();
 
 	this->invokePendingAction();
-
-//	QMutexLocker sentry(&mRepositoryMutex);
-//	mRepository->uninstall(observer);
 }
-
-//void ReporterThread::sendMessageToRepository(const Message& message)
-//{
-////	if (!mRepository)
-////		return;
-////	QMutexLocker sentry(&mRepositoryMutex);
-//	mRepository->setMessage(message);
-//}
 
 void ReporterThread::invokePendingAction()
 {
