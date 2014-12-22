@@ -65,6 +65,7 @@
 
 
 #include "cxDicomImporter.h"
+#include "cxLogger.h"
 
 //#include "ui_DICOMAppWidget.h"
 
@@ -416,11 +417,14 @@ void DICOMAppWidget::setDatabaseDirectory(const QString& directory)
   try
     {
     d->DICOMDatabase->openDatabase( databaseFileName );
-	std::cout << "open database " << databaseFileName.toStdString() << ", open= " << d->DICOMDatabase->isOpen() << std::endl;
+
+	CX_LOG_CHANNEL_INFO("dicom") << "open database " << databaseFileName.toStdString() << ", open= " << d->DICOMDatabase->isOpen();
+//	std::cout << "open database " << databaseFileName.toStdString() << ", open= " << d->DICOMDatabase->isOpen() << std::endl;
 	}
   catch (std::exception e)
     {
-    std::cerr << "Database error: " << qPrintable(d->DICOMDatabase->lastError()) << "\n";
+	  CX_LOG_CHANNEL_ERROR("dicom") << "Database error: " << qPrintable(d->DICOMDatabase->lastError());
+//    std::cerr << "Database error: " << qPrintable(d->DICOMDatabase->lastError()) << "\n";
     d->DICOMDatabase->closeDatabase();
     return;
     }

@@ -116,11 +116,13 @@ void DicomWidget::setupDatabaseDirectory()
 	{
 		if ( !qdir.mkpath(databaseDirectory) )
 		{
-			std::cerr << "Could not create database directory \"" << databaseDirectory.toLatin1().data() << "\".\n";
+			CX_LOG_CHANNEL_ERROR("dicom") << "Could not create database directory \"" << databaseDirectory;
+//			std::cerr << "Could not create database directory \"" << databaseDirectory.toLatin1().data() << "\".\n";
 		}
 	}
 
-	std::cout << "databaseDirectory: " << databaseDirectory << std::endl;
+	CX_LOG_CHANNEL_INFO("dicom") << "databaseDirectory: " << databaseDirectory;
+//	std::cout << "databaseDirectory: " << databaseDirectory << std::endl;
 	mBrowser->setDatabaseDirectory(databaseDirectory);
 }
 

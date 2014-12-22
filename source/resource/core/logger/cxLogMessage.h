@@ -93,10 +93,13 @@ public:
   bool mMuted;
 //  QString mSourceLocation; ///< file:line/function
   QString mChannel;
+  QString mThread;
 
   QString mSourceFile;
   QString mSourceFunction;
   int mSourceLine;
+private:
+  void setThreadName();
 };
 
 } //namespace cx

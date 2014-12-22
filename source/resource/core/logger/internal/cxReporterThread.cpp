@@ -165,14 +165,14 @@ void ReporterThread::sendToFile(Message message)
 
 void ReporterThread::sendToCout(Message message)
 {
-	if (!mCout)
-		return;
-	if (message.getMessageLevel()==mlVOLATILE)
-		return;
-	if (( message.getMessageLevel() == mlCOUT )||( message.getMessageLevel() == mlCERR ))
-		return;
+//	if (!mCout)
+//		return;
+//	if (message.getMessageLevel()==mlVOLATILE)
+//		return;
+//	if (( message.getMessageLevel() == mlCOUT )||( message.getMessageLevel() == mlCERR ))
+//		return;
 
-	mCout->sendUnredirected(message.getPrintableMessage()+"\n");
+//	mCout->sendUnredirected(message.getPrintableMessage()+"\n");
 }
 
 Message ReporterThread::cleanupMessage(Message message)

@@ -83,7 +83,8 @@ PluginFrameworkManager::~PluginFrameworkManager()
 {
 	if(mFramework->getState() == ctkPlugin::ACTIVE)//LogicManager calls stop() before the destructor is called
 	{
-		reportWarning("This should not happen: PluginFrameworkManager destructor stopping plugin framework");
+		CX_LOG_CHANNEL_WARNING("plugin") << "This should not happen: PluginFrameworkManager destructor stopping plugin framework";
+//		reportWarning("This should not happen: PluginFrameworkManager destructor stopping plugin framework");
 		this->stop();
 	}
 }
@@ -142,7 +143,7 @@ void PluginFrameworkManager::loadState()
 	std::vector<PluginLoadInfo> info = this->getPluginLoadInfo(names);
 
 	// install all plugins, must do this first in order to let FW handle dependencies.
-	report(QString("Installing all plugins..."));
+	CX_LOG_CHANNEL_INFO("plugin") << "Installing all plugins...";
 	for (unsigned i=0; i< info.size(); ++i)
 	{
 		if (info[i].targetState != ctkPlugin::UNINSTALLED)
@@ -156,15 +157,20 @@ void PluginFrameworkManager::loadState()
 		if (info[i].targetState == ctkPlugin::ACTIVE)
 		{
 			if (info[i].isNew)
-				report(QString("Autostarting plugin %1").arg(info[i].symbolicName));
+				CX_LOG_CHANNEL_INFO("plugin") << QString("Autostarting plugin %1").arg(info[i].symbolicName);
+//				report(QString("Autostarting plugin %1").arg(info[i].symbolicName));
 			else
-				report(QString("Starting plugin %1").arg(info[i].symbolicName));
+				CX_LOG_CHANNEL_INFO("plugin") << QString("Starting plugin %1").arg(info[i].symbolicName);
+//				report(QString("Starting plugin %1").arg(info[i].symbolicName));
 
 			this->start(info[i].symbolicName, ctkPlugin::START_TRANSIENT);
 		}
 		else
 		{
-			report(QString("Set plugin to state [%2]: %1").arg(info[i].symbolicName).arg(info[i].storedState));
+			CX_LOG_CHANNEL_INFO("plugin") << QString("Set plugin to state [%2]: %1")
+											 .arg(info[i].symbolicName)
+											 .arg(info[i].storedState);
+//			report(QString("Set plugin to state [%2]: %1").arg(info[i].symbolicName).arg(info[i].storedState));
 		}
 	}
 
@@ -298,11 +304,16 @@ void PluginFrameworkManager::install(const QString& symbolicName)
 	}
 	catch (const ctkPluginException& exc)
 	{
-		qWarning() << "Failed to install plugin:" << symbolicName << ", " << exc;
+//		qWarning() << "Failed to install plugin:" << symbolicName << ", " << exc;
+		CX_LOG_CHANNEL_ERROR("plugin") << "Failed to install plugin:" << symbolicName << ", " << exc.what();
 	}
 	catch (const ctkRuntimeException& exc)
 	{
-		reportError(QString("Failed to install plugin (runtime error): %1, %2").arg(symbolicName).arg(exc.what()));
+		CX_LOG_CHANNEL_ERROR("plugin")
+				<< QString("Failed to install plugin (runtime error): %1, %2")
+				   .arg(symbolicName)
+				   .arg(exc.what());
+//		reportError(QString("Failed to install plugin (runtime error): %1, %2").arg(symbolicName).arg(exc.what()));
 	}
 }
 
@@ -323,13 +334,15 @@ bool PluginFrameworkManager::stop()
 		ctkPluginFrameworkEvent fe = mFramework->waitForStop(5000);
 		if (fe.getType() == ctkPluginFrameworkEvent::FRAMEWORK_WAIT_TIMEDOUT)
 		{
-			reportWarning("Stopping the plugin framework timed out");
+			CX_LOG_CHANNEL_WARNING("plugin") << "Stopping the plugin framework timed out";
+//			reportWarning("Stopping the plugin framework timed out");
 			return false;
 		}
 	}
 	catch (const ctkRuntimeException& e)
 	{
-		reportWarning(QString("Stopping the plugin framework failed: %1").arg(e.what()));
+		CX_LOG_CHANNEL_WARNING("plugin") << QString("Stopping the plugin framework failed: %1").arg(e.what());
+//		reportWarning(QString("Stopping the plugin framework failed: %1").arg(e.what()));
 		return false;
 	}
 
@@ -349,7 +362,8 @@ void PluginFrameworkManager::uninstall(const QString& symbolicName)
 	}
 	catch (const ctkPluginException& exc)
 	{
-		reportWarning(QString("Failed to uninstall plugin: %1, %2").arg(symbolicName).arg(exc.what()));
+		CX_LOG_CHANNEL_WARNING("plugin") << QString("Failed to uninstall plugin: %1, %2").arg(symbolicName).arg(exc.what());
+//		reportWarning(QString("Failed to uninstall plugin: %1, %2").arg(symbolicName).arg(exc.what()));
 		return;
 	}
 
@@ -371,12 +385,14 @@ bool PluginFrameworkManager::start(const QString& symbolicName, ctkPlugin::Start
 	}
 	catch (const ctkPluginException& exc)
 	{
-		reportError(QString("Failed to start plugin (plugin error): %1, %2").arg(symbolicName).arg(exc.what()));
+		CX_LOG_CHANNEL_ERROR("plugin") << QString("Failed to start plugin (plugin error): %1, %2").arg(symbolicName).arg(exc.what());
+//		reportError(QString("Failed to start plugin (plugin error): %1, %2").arg(symbolicName).arg(exc.what()));
 		return false;
 	}
 	catch (const ctkRuntimeException& exc)
 	{
-		reportError(QString("Failed to start plugin (runtime error): %1, %2").arg(symbolicName).arg(exc.what()));
+		CX_LOG_CHANNEL_ERROR("plugin") << QString("Failed to start plugin (runtime error): %1, %2").arg(symbolicName).arg(exc.what());
+//		reportError(QString("Failed to start plugin (runtime error): %1, %2").arg(symbolicName).arg(exc.what()));
 		return false;
 	}
 
@@ -395,7 +411,8 @@ bool PluginFrameworkManager::stop(const QString& symbolicName, ctkPlugin::StopOp
 
 	if (!plugin)
 	{
-		reportWarning(QString("Plugin: %1 not found").arg(symbolicName));
+		CX_LOG_CHANNEL_WARNING("plugin") << QString("Plugin: %1 not found").arg(symbolicName);
+//		reportWarning(QString("Plugin: %1 not found").arg(symbolicName));
 		return false;
 	}
 
@@ -405,7 +422,8 @@ bool PluginFrameworkManager::stop(const QString& symbolicName, ctkPlugin::StopOp
 	}
 	catch (const ctkPluginException& exc)
 	{
-		reportWarning(QString("Failed to stop plugin %1: ").arg(symbolicName).arg(exc.what()));
+		CX_LOG_CHANNEL_WARNING("plugin") << QString("Failed to stop plugin %1: ").arg(symbolicName).arg(exc.what());
+//		reportWarning(QString("Failed to stop plugin %1: ").arg(symbolicName).arg(exc.what()));
 		return false;
 	}
 

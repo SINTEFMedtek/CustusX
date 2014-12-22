@@ -137,7 +137,7 @@ void ConsoleWidget::addSeverityButtons(QBoxLayout* buttonLayout)
 	QAction* actionUp = this->createAction(this,
 										 QIcon(":/icons/open_icon_library/zoom-in-3.png"),
 										 "More", "More detailed log output",
-										 SLOT(onSeverityUp()),
+										 SLOT(onSeverityDown()),
 										 buttonLayout, new CXSmallToolButton());
 
 	this->addSeverityIndicator(buttonLayout);
@@ -145,7 +145,7 @@ void ConsoleWidget::addSeverityButtons(QBoxLayout* buttonLayout)
 	QAction* actionDown = this->createAction(this,
 										 QIcon(":/icons/open_icon_library/zoom-out-3.png"),
 											 "Less ", "Less detailed log output",
-										   SLOT(onSeverityDown()),
+										   SLOT(onSeverityUp()),
 										 buttonLayout, new CXSmallToolButton());
 }
 

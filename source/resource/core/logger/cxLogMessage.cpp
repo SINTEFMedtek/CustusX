@@ -42,6 +42,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSound>
 #include <QDir>
 #include <QTextStream>
+#include <QThread>
+#include <QApplication>
 #include "cxTypeConversions.h"
 #include "cxDefinitionStrings.h"
 #include "cxTime.h"
@@ -59,7 +61,7 @@ Message::Message(QString text, MESSAGE_LEVEL messageLevel, int timeoutTime) :
   mMuted(false),
   mChannel("console")
 {
-
+	this->setThreadName();
 }
 
 Message::~Message()
@@ -67,6 +69,17 @@ Message::~Message()
 
 }
 
+void Message::setThreadName()
+{
+	if (QApplication::instance()->thread() == QThread::currentThread())
+		mThread = "main";
+	else
+	{
+		mThread = QThread::currentThread()->objectName();
+		if (mThread.isEmpty())
+			mThread = QString::number(reinterpret_cast<long>(QThread::currentThreadId()));
+	}
+}
 
 QString Message::getPrintableMessage() const
 {
@@ -76,11 +89,12 @@ QString Message::getPrintableMessage() const
 	if(mMessageLevel == mlRAW)
 		printableMessage = mText;
 	else
-		printableMessage = QString("[%1]%2[%3] %4")
-							.arg(mTimeStamp.toString("hh:mm:ss.zzz"))
-							.arg(source)
-							.arg(qstring_cast(mMessageLevel))
-							.arg(mText);
+		printableMessage = QString("[%1][%2][%3][%4] %5")
+				.arg(mTimeStamp.toString("hh:mm:ss.zzz"))
+				.arg(source)
+				.arg(mThread)
+				.arg(qstring_cast(mMessageLevel))
+				.arg(mText);
 
 	return printableMessage;
 }
