@@ -51,16 +51,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTimer>
 #include <QThread>
 #include "cxLogMessageFilter.h"
+#include "cxDataLocations.h"
 
 namespace cx
 {
 
-ConsoleWidget::ConsoleWidget(QWidget* parent) :
-	BaseWidget(parent, "ConsoleWidget", "Console"),
+ConsoleWidget::ConsoleWidget(QWidget* parent, QString uid, QString name) :
+	BaseWidget(parent, uid, name),
 	mLineWrappingAction(new QAction(tr("Line wrapping"), this)),
 	mSeverityAction(NULL)
 {
 	this->setWhatsThis(this->defaultWhatsThis());
+	mOptions = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend(this->objectName());
 
 	QVBoxLayout* layout = new QVBoxLayout;
 	layout->setMargin(0);
@@ -91,20 +93,18 @@ ConsoleWidget::ConsoleWidget(QWidget* parent) :
 
 	this->createTextCharFormats();
 
-//	mMessageListener = reporter()->createListener();
 	mMessageListener = MessageListener::create();
 	mMessageFilter.reset(new MessageFilterConsole);
-//	mMessageListener->setMessageQueueMaxSize(1000);
 	mMessageListener->installFilter(mMessageFilter);
 	connect(mMessageListener.get(), &MessageListener::newMessage, this, &ConsoleWidget::receivedMessage);
 
 	QString defVal = enum2string<LOG_SEVERITY>(msINFO);
-	LOG_SEVERITY value = string2enum<LOG_SEVERITY>(settings()->value("console/showLevel", defVal).toString());
+	XmlOptionItem showLevelItem("showLevel", mOptions.getElement());
+	LOG_SEVERITY value = string2enum<LOG_SEVERITY>(showLevelItem.readValue(defVal));
 	mMessageFilter->setLowestSeverity(value);
 
 	mMessageFilter->setActiveChannel(mChannelSelector->getValue());
 	mMessageListener->installFilter(mMessageFilter);
-
 
 	mLineWrappingAction->setCheckable(true);
 	connect(mLineWrappingAction, SIGNAL(triggered(bool)), this, SLOT(lineWrappingSlot(bool)));
@@ -115,9 +115,12 @@ ConsoleWidget::ConsoleWidget(QWidget* parent) :
 
 ConsoleWidget::~ConsoleWidget()
 {
+	XmlOptionItem showLevelItem("showLevel", mOptions.getElement());
 	QString levelString = enum2string<LOG_SEVERITY>(mMessageFilter->getLowestSeverity());
-	settings()->setValue("console/showLevel", levelString);
-	settings()->setValue("console/showDetails", mDetailsAction->isChecked());
+	showLevelItem.writeValue(levelString);
+
+	XmlOptionItem showDetailsItem("showDetails", mOptions.getElement());
+	showDetailsItem.writeVariant(mDetailsAction->isChecked());
 }
 
 QString ConsoleWidget::defaultWhatsThis() const
@@ -224,7 +227,7 @@ void ConsoleWidget::createChannelSelector()
 	StringDataAdapterXmlPtr retval;
 	retval = StringDataAdapterXml::initialize("ChannelSelector",
 											  "", "Log Channel to display",
-											  defval, mChannels, QDomNode());
+											  defval, mChannels, mOptions.getElement());
 	connect(retval.get(), &StringDataAdapter::changed, this, &ConsoleWidget::onChannelSelectorChanged);
 	mChannelSelector = retval;
 }
@@ -239,7 +242,8 @@ void ConsoleWidget::addDetailsButton(QBoxLayout* buttonLayout)
 										 buttonLayout, new CXSmallToolButton());
 	action->setCheckable(true);
 
-	bool value = settings()->value("console/showDetails").toBool();
+	XmlOptionItem showDetailsItem("showDetails", mOptions.getElement());
+	bool value = showDetailsItem.readVariant(false).toBool();
 	action->blockSignals(true);
 	action->setChecked(value);
 	action->blockSignals(false);
@@ -252,7 +256,9 @@ void ConsoleWidget::updateUI()
 	this->updateSeverityIndicator();
 
 	// reset content of browser
-	mBrowser->clear();
+//	mBrowser->clear();
+	QTimer::singleShot(0, mBrowser, SLOT(clear())); // let the messages recently emitted be processed before clearing
+
 	mMessageListener->restart();
 }
 
@@ -265,8 +271,6 @@ void ConsoleWidget::onChannelSelectorChanged()
 	this->updateUI();
 
 	mChannelSelector->blockSignals(false);
-
-//	QTimer::singleShot(0, this, SLOT(updateUI())); // break loop by delaying update
 }
 
 void ConsoleWidget::contextMenuEvent(QContextMenuEvent* event)

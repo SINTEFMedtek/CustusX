@@ -62,7 +62,7 @@ class cxResourceWidgets_EXPORT ConsoleWidget: public BaseWidget
 Q_OBJECT
 
 public:
-	ConsoleWidget(QWidget* parent);
+	ConsoleWidget(QWidget* parent, QString uid="ConsoleWidget", QString name="Console");
 	~ConsoleWidget();
 	virtual QString defaultWhatsThis() const;
 
@@ -100,6 +100,7 @@ private:
 	QStringList mChannels;
 	MessageListenerPtr mMessageListener;
 	boost::shared_ptr<class MessageFilterConsole> mMessageFilter;
+	XmlOptionFile mOptions;
 
 	std::map<MESSAGE_LEVEL, QTextCharFormat> mFormat;
 };

@@ -68,7 +68,7 @@ MessageListener::MessageListener() :
 	mObserver.reset(new MessageObserver());
 	connect(mObserver.get(), &MessageObserver::newMessage, this, &MessageListener::messageReceived);
 
-	mManager->installObserver(mObserver, true);
+	mManager->installObserver(mObserver, false);
 }
 
 MessageListener::~MessageListener()
@@ -116,7 +116,7 @@ void MessageListener::restart()
 void MessageListener::installFilter(MessageFilterPtr filter)
 {
 	mObserver->installFilter(filter);
-	mManager->installObserver(mObserver, true);
+	mManager->installObserver(mObserver, false);
 }
 
 void MessageListener::setMessageQueueMaxSize(int count)

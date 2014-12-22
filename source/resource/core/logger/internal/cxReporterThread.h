@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDateTime>
 #include <QFile>
 #include "boost/shared_ptr.hpp"
+#include "boost/function.hpp"
 #include "cxDefinitions.h"
 #include "cxAudio.h"
 #include <sstream>
@@ -87,6 +88,7 @@ public:
 
 public slots:
 	void logMessage(Message msg);
+	void pendingAction();
 
 signals:
 	void emittedMessage(Message message); ///< emitted for each new message, in addition to writing to file.
@@ -94,10 +96,16 @@ signals:
 private slots:
 	void processMessage(Message msg);
 private:
-	QMutex mMutex;
-	QMutex mRepositoryMutex;
+//	QMutex mMutex;
+	QMutex mActionsMutex;
 
-	void sendMessageToRepository(const Message& message);
+	typedef boost::function<void()> PendingActionType;
+	QList<PendingActionType> mPendingActions;
+	bool executeAction();
+	PendingActionType popAction();
+	void invokePendingAction();
+
+//	void sendMessageToRepository(const Message& message);
 
 	bool appendToLogfile(QString filename, QString text);
 	QString formatMessage(Message msg);

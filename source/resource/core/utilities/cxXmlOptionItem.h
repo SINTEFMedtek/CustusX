@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QString>
 #include <QDomElement>
+#include <QVariant>
 
 namespace cx
 {
@@ -64,6 +65,10 @@ public:
 	XmlOptionItem(const QString& uid, QDomElement root);
 	QString readValue(const QString& defval) const;
 	void writeValue(const QString& val);
+
+	QVariant readVariant(const QVariant& defval) const;
+	void writeVariant(const QVariant& val);
+
 private:
 	QDomElement findElemFromUid(const QString& uid, QDomNode root) const;
 	QString mUid;

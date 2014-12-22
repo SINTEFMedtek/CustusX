@@ -98,6 +98,7 @@ void Reporter::startThread()
 		return;
 
 	mThread.reset(new QThread());
+	mThread->setObjectName("org.custusx.resource.core.logger");
 
 	mWorker.reset(new ReporterThread());
 	mWorker->moveToThread(mThread.get());

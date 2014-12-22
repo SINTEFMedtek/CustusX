@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogger.h"
 #include <QtGlobal>
 #include <iostream>
+#include "boost/bind.hpp"
 #include "boost/shared_ptr.hpp"
 #include <QString>
 #include <QMutex>
@@ -140,7 +141,8 @@ void ReporterThread::processMessage(Message message)
 
 	emit emittedMessage(message);
 
-	this->sendMessageToRepository(message);
+	mRepository->setMessage(message);
+//	this->sendMessageToRepository(message);
 }
 
 void ReporterThread::sendToFile(Message message)
@@ -226,26 +228,74 @@ bool ReporterThread::appendToLogfile(QString filename, QString text)
 
 void ReporterThread::installObserver(MessageObserverPtr observer, bool resend)
 {
-	if (!mRepository)
-		return;
-	QMutexLocker sentry(&mRepositoryMutex);
-	mRepository->install(observer, resend);
+//	if (!mRepository)
+//		return;
+	QMutexLocker sentry(&mActionsMutex);
+	PendingActionType action = boost::bind(&MessageRepository::install, mRepository.get(), observer, resend);
+	mPendingActions.push_back(action);
+	sentry.unlock();
+
+	this->invokePendingAction();
+
+
+//	QMutexLocker sentry(&mRepositoryMutex);
+//	mRepository->install(observer, resend);
 }
 
 void ReporterThread::uninstallObserver(MessageObserverPtr observer)
 {
-	if (!mRepository)
-		return;
-	QMutexLocker sentry(&mRepositoryMutex);
-	mRepository->uninstall(observer);
+//	if (!mRepository)
+//		return;
+	QMutexLocker sentry(&mActionsMutex);
+	PendingActionType action = boost::bind(&MessageRepository::uninstall, mRepository.get(), observer);
+	mPendingActions.push_back(action);
+	sentry.unlock();
+
+	this->invokePendingAction();
+
+//	QMutexLocker sentry(&mRepositoryMutex);
+//	mRepository->uninstall(observer);
 }
 
-void ReporterThread::sendMessageToRepository(const Message& message)
+//void ReporterThread::sendMessageToRepository(const Message& message)
+//{
+////	if (!mRepository)
+////		return;
+////	QMutexLocker sentry(&mRepositoryMutex);
+//	mRepository->setMessage(message);
+//}
+
+void ReporterThread::invokePendingAction()
 {
-	if (!mRepository)
-		return;
-	QMutexLocker sentry(&mRepositoryMutex);
-	mRepository->setMessage(message);
+	QMetaObject::invokeMethod(this, "pendingAction", Qt::QueuedConnection);
+}
+
+void ReporterThread::pendingAction()
+{
+	while (this->executeAction());
+}
+
+bool ReporterThread::executeAction()
+{
+	PendingActionType action = this->popAction();
+	if (!action)
+		return false;
+
+	action();
+	return true;
+}
+
+ReporterThread::PendingActionType ReporterThread::popAction()
+{
+	QMutexLocker sentry(&mActionsMutex);
+	PendingActionType action;
+
+	if (mPendingActions.isEmpty())
+		return action;
+
+	action = mPendingActions.front();
+	mPendingActions.pop_front();
+	return action;
 }
 
 

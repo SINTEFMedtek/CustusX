@@ -144,6 +144,17 @@ XmlOptionItem::XmlOptionItem(const QString& uid, QDomElement root) :
 
 }
 
+QVariant XmlOptionItem::readVariant(const QVariant& defval) const
+{
+	QString text = this->readValue(defval.toString());
+	return QVariant::fromValue(text);
+}
+
+void XmlOptionItem::writeVariant(const QVariant& val)
+{
+	this->writeValue(val.toString());
+}
+
 QString XmlOptionItem::readValue(const QString& defval) const
 {
 	// read value is present
