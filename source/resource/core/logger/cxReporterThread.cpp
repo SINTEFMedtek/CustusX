@@ -57,12 +57,19 @@ namespace cx
 ReporterThread::ReporterThread(QObject *parent) :
 	QObject(parent)
 {
-	std::cout << "ReporterThread::ReporterThread threadid=" << QThread::currentThreadId() << std::endl;
-
 	qInstallMessageHandler(convertQtMessagesToCxMessages);
 	qRegisterMetaType<Message>("Message");
 
-	this->initialize();
+	mRepository.reset(new MessageRepository());
+
+	// make sure streams are closed properly before reconnecting.
+	mCout.reset();
+	mCerr.reset();
+
+	mCout.reset(new SingleStreamerImpl(std::cout, mlCOUT));
+	mCerr.reset(new SingleStreamerImpl(std::cerr, mlCERR));
+
+	this->setLoggingFolder(DataLocations::getRootConfigPath()+"/Logs");
 }
 
 ReporterThread::~ReporterThread()
@@ -72,23 +79,10 @@ ReporterThread::~ReporterThread()
 	mCerr.reset();
 }
 
-void ReporterThread::initialize()
-{
-	mRepository.reset(new MessageRepository());
-
-	mCout.reset();
-	mCerr.reset();
-
-//	mCout.reset(new SingleStreamerImpl(std::cout, mlCOUT));
-//	mCerr.reset(new SingleStreamerImpl(std::cerr, mlCERR));
-
-	this->setLoggingFolder(DataLocations::getRootConfigPath()+"/Logs");
-}
-
-void ReporterThread::setFormat(Format format)
-{
-	mFormat = format;
-}
+//void ReporterThread::setFormat(Format format)
+//{
+//	mFormat = format;
+//}
 
 bool ReporterThread::initializeLogFile(QString filename)
 {
@@ -97,7 +91,7 @@ bool ReporterThread::initializeLogFile(QString filename)
 	bool success = this->appendToLogfile(filename, text);
 	if (!success)
 	{
-		this->sendMessage(Message("Failed to open log file " + filename, mlERROR));
+		this->processMessage(Message("Failed to open log file " + filename, mlERROR));
 	}
 	return success;
 }
@@ -133,12 +127,45 @@ int ReporterThread::getDefaultTimeout(MESSAGE_LEVEL messageLevel) const
 
 void ReporterThread::logMessage(Message msg)
 {
-	QMetaObject::invokeMethod(this, "sendMessage",
+	QMetaObject::invokeMethod(this, "processMessage",
 							  Qt::QueuedConnection,
 							  Q_ARG(Message, msg));
 }
 
-void ReporterThread::sendMessage(Message message)
+void ReporterThread::processMessage(Message message)
+{
+	message = this->cleanupMessage(message);
+
+	this->sendToCout(message);
+	this->sendToFile(message);
+
+	emit emittedMessage(message);
+
+	this->sendMessageToRepository(message);
+}
+
+void ReporterThread::sendToFile(Message message)
+{
+	if (message.getMessageLevel()==mlVOLATILE)
+		return;
+
+	this->appendToLogfile(this->getFilenameForChannel(message.mChannel), this->formatMessage(message) + "\n");
+	this->appendToLogfile(this->getFilenameForChannel("all"), this->formatMessage(message) + "\n");
+}
+
+void ReporterThread::sendToCout(Message message)
+{
+	if (!mCout)
+		return;
+	if (message.getMessageLevel()==mlVOLATILE)
+		return;
+	if (( message.getMessageLevel() == mlCOUT )||( message.getMessageLevel() == mlCERR ))
+		return;
+
+	mCout->sendUnredirected(message.getPrintableMessage()+"\n");
+}
+
+Message ReporterThread::cleanupMessage(Message message)
 {
 	if (message.mTimeoutTime<0)
 		message.mTimeoutTime = this->getDefaultTimeout(message.mMessageLevel);
@@ -151,44 +178,31 @@ void ReporterThread::sendMessage(Message message)
 		message.mSourceFile = message.mSourceFile.split("CustusX/").back();
 	}
 
-	if (message.getMessageLevel()!=mlVOLATILE)
-	{
-		if (mCout)
-		{
-			if (message.getMessageLevel() != mlCOUT && message.getMessageLevel() != mlCERR)
-				mCout->sendUnredirected(message.getPrintableMessage()+"\n");
-		}
-
-		this->appendToLogfile(this->getFilenameForChannel(message.mChannel), this->formatMessage(message) + "\n");
-		this->appendToLogfile(this->getFilenameForChannel("all"), this->formatMessage(message) + "\n");
-	}
-
-	emit emittedMessage(message);
-
-	this->sendMessageToRepository(message);
+	return message;
 }
-
 
 QString ReporterThread::formatMessage(Message msg)
 {
 	QString retval;
 
-	QString bra = (mFormat.mShowBrackets ? "[" : "");
-	QString ket = (mFormat.mShowBrackets ? "]" : "");
+//	QString bra = (mFormat.mShowBrackets ? "[" : "");
+//	QString ket = (mFormat.mShowBrackets ? "]" : "");
 
 	// timestamp in front
-	retval += bra + msg.getTimeStamp().toString("hh:mm:ss.zzz") + ket;
+	retval += QString("[%1]").arg(msg.getTimeStamp().toString("[hh:mm:ss.zzz]"));
+//	retval += msg.getTimeStamp().toString("[hh:mm:ss.zzz]");
 
 	// show source location
 	if (!msg.getSourceLocation().isEmpty())
-		retval += " " + bra + msg.getSourceLocation() + ket;
+		retval += " " + QString("[%1]").arg(msg.getSourceLocation());
 
 	// show level if set, or anyway if one of error/warning/success
-	if (mFormat.mShowLevel
-			|| msg.getMessageLevel() == mlERROR
-			|| msg.getMessageLevel() == mlWARNING
-			|| msg.getMessageLevel() == mlSUCCESS)
-		retval += " " + bra + qstring_cast(msg.getMessageLevel()) + ket;
+//	if (mFormat.mShowLevel
+//			|| msg.getMessageLevel() == mlERROR
+//			|| msg.getMessageLevel() == mlWARNING
+//			|| msg.getMessageLevel() == mlSUCCESS)
+	retval += " " + QString("[%1]").arg(qstring_cast(msg.getMessageLevel()));
+//		retval += " " + bra + qstring_cast(msg.getMessageLevel()) + ket;
 
 	// add message text at end.
 	retval += " " + msg.getText();
@@ -221,11 +235,11 @@ bool ReporterThread::appendToLogfile(QString filename, QString text)
 	return true;
 }
 
-ReporterThread::Format::Format() :
-	mShowBrackets(true),
-	mShowLevel(true),
-	mShowSourceLocation(true)
-{}
+//ReporterThread::Format::Format() :
+//	mShowBrackets(true),
+//	mShowLevel(true),
+//	mShowSourceLocation(true)
+//{}
 
 void ReporterThread::installObserver(MessageObserverPtr observer, bool resend)
 {

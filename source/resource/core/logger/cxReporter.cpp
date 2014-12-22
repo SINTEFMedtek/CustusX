@@ -59,8 +59,8 @@ Reporter* reporter()
 	return Reporter::getInstance();
 }
 
-Reporter::Reporter() :
-	mThread(NULL)
+Reporter::Reporter()// :
+//	mThread(NULL)
 {	
 	connect(this, &Reporter::emittedMessage, this, &Reporter::onEmittedMessage);
 }
@@ -97,10 +97,10 @@ void Reporter::startThread()
 	if (mThread)
 		return;
 
-	mThread = new QThread(this);
+	mThread.reset(new QThread());
 
 	mWorker.reset(new ReporterThread());
-	mWorker->moveToThread(mThread);
+	mWorker->moveToThread(mThread.get());
 	if (!mLogPath.isEmpty())
 		mWorker->setLoggingFolder(mLogPath);
 	connect(mWorker.get(), &ReporterThread::emittedMessage, this, &Reporter::emittedMessage);
@@ -118,20 +118,9 @@ void Reporter::stopThread()
 	mWorker.reset();
 
 	mThread->quit();
-	mThread->wait(2000); // forever or until dead thread
+	mThread->wait(); // forever or until dead thread
 
-	if (mThread->isRunning())
-	{
-		mThread->terminate();
-		mThread->wait(); // forever or until dead thread
-	}
-
-	if (mThread->isRunning())
-	{
-		std::cerr << "failed to stop Reporter thread." << std::endl;
-	}
-
-	mThread = NULL;
+	mThread.reset();
 	tempWorker.reset();
 }
 
@@ -143,7 +132,6 @@ void Reporter::shutdown()
 
 void Reporter::setLoggingFolder(QString absoluteLoggingFolderPath)
 {
-	std::cout << "----------------- restart thread" << std::endl;
 	mLogPath = absoluteLoggingFolderPath;
 
 	if (mThread)

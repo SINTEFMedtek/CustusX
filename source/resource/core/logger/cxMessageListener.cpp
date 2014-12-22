@@ -177,7 +177,6 @@ MessageRepository::~MessageRepository()
 
 void MessageRepository::setMessage(Message message)
 {
-	std::cout << "MessageRepository::setMessage threadid=" << QThread::currentThreadId() << std::endl;
 	mMessages.push_back(message);
 	this->limitQueueSize();
 	this->emitThroughFilter(message);

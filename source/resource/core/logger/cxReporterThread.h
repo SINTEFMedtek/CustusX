@@ -81,7 +81,6 @@ public:
 	ReporterThread(QObject* parent = NULL);
 	virtual ~ReporterThread();
 	void setLoggingFolder(QString absoluteLoggingFolderPath); ///< call during startup, will fail if called when running
-	void initialize();
 
 	void installObserver(MessageObserverPtr observer, bool resend);
 	void uninstallObserver(MessageObserverPtr observer);
@@ -93,20 +92,20 @@ signals:
 	void emittedMessage(Message message); ///< emitted for each new message, in addition to writing to file.
 
 private slots:
-	void sendMessage(Message msg);
+	void processMessage(Message msg);
 private:
 	QMutex mMutex;
 	QMutex mRepositoryMutex;
 
-	struct Format
-	{
-		Format();
-		bool mShowBrackets;
-		bool mShowLevel;
-		bool mShowSourceLocation;
-	};
+//	struct Format
+//	{
+//		Format();
+//		bool mShowBrackets;
+//		bool mShowLevel;
+//		bool mShowSourceLocation;
+//	};
 
-	void setFormat(Format format); ///< fine-tune messaging format
+//	void setFormat(Format format); ///< fine-tune messaging format
 	void sendMessageToRepository(const Message& message);
 
 	bool appendToLogfile(QString filename, QString text);
@@ -116,11 +115,15 @@ private:
 	bool initializeLogFile(QString filename);
 	QString getFilenameForChannel(QString channel) const;
 
+	void sendToFile(Message message);
+	void sendToCout(Message message);
+	Message cleanupMessage(Message message);
+
 	typedef boost::shared_ptr<class SingleStreamerImpl> SingleStreamerImplPtr;
 	SingleStreamerImplPtr mCout;
 	SingleStreamerImplPtr mCerr;
 
-	Format mFormat;
+//	Format mFormat;
 	QString mLogPath;
 	MessageRepositoryPtr mRepository;
 };

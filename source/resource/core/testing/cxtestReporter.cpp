@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "catch.hpp"
 
-#include "cxtestDirectSignalListener.h"
+#include "cxtestQueuedSignalListener.h"
 #include "cxReporter.h"
 #include "cxMessageListener.h"
 
@@ -43,9 +43,10 @@ TEST_CASE("Reporter can catch cout", "[unit]")
 {
 	cx::Reporter::initialize();
 
-	cxtest::DirectSignalListener listener(cx::reporter(), SIGNAL(emittedMessage(Message)));
-	std::cout << "<test string>" << std::endl;
-	CHECK(listener.isReceived());
+	{
+		std::cout << "<test string>" << std::endl;
+		CHECK(cxtest::waitForQueuedSignal(cx::reporter(), SIGNAL(emittedMessage(Message)), 200, true));
+	}
 
 	cx::Reporter::shutdown();
 }
@@ -66,39 +67,37 @@ TEST_CASE("Reporter can be run nested", "[unit]")
 {
 	cx::Reporter::initialize();
 	cx::Reporter::initialize();
-	CX_LOG_CHANNEL_INFO("report test") << "test string";
-//	std::cout << "<test string>" << std::endl;
-	cx::Reporter::shutdown();
-	cx::Reporter::shutdown();
 
+	CX_LOG_CHANNEL_INFO("report test") << "test string";
 	CHECK(true);
+
+	cx::Reporter::shutdown();
+	cx::Reporter::shutdown();
 }
 
 TEST_CASE("Reporter: MessageListener receives messages", "[unit]")
 {
 	cx::Reporter::initialize();
-	cx::MessageListenerPtr listener = cx::MessageListener::create();
-	CHECK(listener->getMessages().size()==0);
 
-	QString testString = "<test string>";
-	cxtest::DirectSignalListener slistener(listener.get(), SIGNAL(newMessage(Message)));
-	CX_LOG_CHANNEL_INFO("report test") << testString;
-	std::cout << testString << std::endl;
-	CHECK(slistener.isReceived());
+	{
+		// given
+		cx::MessageListenerPtr listener = cx::MessageListener::create();
+		CHECK(listener->getMessages().size()==0);
+		QString testString = "<test string>";
 
-	CHECK(!listener->getMessages().isEmpty());
+		// when
+		CX_LOG_CHANNEL_INFO("report test") << testString;
+		//	std::cout << testString << std::endl;
 
-	if (!listener->getMessages().isEmpty())
-		CHECK(listener->getMessages().front().getText().contains(testString));
+		// then
+		REQUIRE(cxtest::waitForQueuedSignal(listener.get(), SIGNAL(newMessage(Message)), 200, true));
 
-	QList<cx::Message> msg = listener->getMessages();
+		CHECK(!listener->getMessages().isEmpty());
+		if (!listener->getMessages().isEmpty())
+			CHECK(listener->getMessages().front().getText().contains(testString));
+	}
+
 	cx::Reporter::shutdown();
-
-//	for (int i=0; i<msg.size(); ++i)
-//	{
-//		std::cout << "m: " << msg[i].getText() << std::endl;
-//	}
-
 }
 
 
