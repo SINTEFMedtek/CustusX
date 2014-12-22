@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataLocations.h"
 #include "cxMessageListener.h"
 
-#include "cxReporterThread.h"
+#include "internal/cxReporterThread.h"
 
 namespace cx
 {

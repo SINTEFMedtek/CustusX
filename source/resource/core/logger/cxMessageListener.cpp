@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMessageListener.h"
 #include <iostream>
 #include <QThread>
-#include "cxReporterMessageRepository.h"
+#include "internal/cxReporterMessageRepository.h"
 
 namespace cx
 {
