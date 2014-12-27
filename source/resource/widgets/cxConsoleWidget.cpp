@@ -50,16 +50,269 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxUtilHelpers.h"
 #include <QTimer>
 #include <QThread>
+#include <QTableWidget>
 #include "cxLogMessageFilter.h"
 #include "cxDataLocations.h"
+#include <QHeaderView>
+#include <QStackedLayout>
+#include <QApplication>
+#include <QClipboard>
 
 namespace cx
 {
 
+LogMessageDisplayWidget::LogMessageDisplayWidget(QWidget *parent)
+{
+	this->createTextCharFormats(); ///< sets up the formating rules for the message levels
+}
+
+void LogMessageDisplayWidget::createTextCharFormats()
+{
+	mFormat[mlINFO].setForeground(Qt::black);
+	mFormat[mlSUCCESS].setForeground(QColor(60, 179, 113)); // medium sea green
+	mFormat[mlWARNING].setForeground(QColor(255, 140, 0)); //dark orange
+	mFormat[mlERROR].setForeground(Qt::red);
+	mFormat[mlDEBUG].setForeground(QColor(135, 206, 250)); //sky blue
+	mFormat[mlCERR].setForeground(Qt::red);
+	mFormat[mlCOUT].setForeground(Qt::darkGray);
+}
+
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+
+class MyTableWidget : public QTableWidget
+{
+public:
+	MyTableWidget(QWidget* parent=NULL) : QTableWidget(parent) {}
+	virtual ~MyTableWidget() {}
+	virtual void keyPressEvent(QKeyEvent* event);
+};
+
+//source: http://stackoverflow.com/questions/3135737/copying-part-of-qtableview
+void MyTableWidget::keyPressEvent(QKeyEvent* event)
+{
+	// If Ctrl-C typed
+	// Or use event->matches(QKeySequence::Copy)
+	if (event->key() == Qt::Key_C && (event->modifiers() & Qt::ControlModifier))
+	{
+		QModelIndexList cells = selectedIndexes();
+		qSort(cells); // Necessary, otherwise they are in column order
+
+		QString text;
+		int currentRow = 0; // To determine when to insert newlines
+		foreach (const QModelIndex& cell, cells) {
+			if (text.length() == 0) {
+				// First item
+			} else if (cell.row() != currentRow) {
+				// New row
+				text += '\n';
+			} else {
+				// Next cell
+				text += '\t';
+			}
+			currentRow = cell.row();
+			text += cell.data().toString();
+		}
+
+		QApplication::clipboard()->setText(text);
+	}
+}
+
+///--------------------------------------------------------
+
+DetailedLogMessageDisplayWidget::DetailedLogMessageDisplayWidget(QWidget *parent, XmlOptionFile options) :
+	LogMessageDisplayWidget(parent),
+	mOptions(options)
+{
+	mTable = new MyTableWidget(this);
+	QVBoxLayout* layout = new QVBoxLayout(this);
+	layout->setMargin(0);
+	this->setLayout(layout);
+	layout->addWidget(mTable);
+
+	mTable->setShowGrid(false);
+	mTable->setTextElideMode(Qt::ElideLeft);
+	mTable->setWordWrap(false);
+
+	mTable->setColumnCount(6);
+	mTable->setRowCount(0);
+	mTable->setHorizontalHeaderLabels(QStringList() << "time" << "source" << "function" << "thread" << "level" << "description");
+	mTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+	mTable->verticalHeader()->hide();
+
+	QFontMetrics metric(this->font());
+	mTable->setColumnWidth(0, metric.width("00:00:00.000xx"));
+	mTable->setColumnWidth(1, metric.width("cxSourceFile.cpp:333xx"));
+	mTable->setColumnWidth(2, metric.width("function()xx"));
+	mTable->setColumnWidth(3, metric.width("mainxx"));
+	mTable->setColumnWidth(4, metric.width("WARNINGxx"));
+	mTable->horizontalHeader()->setStretchLastSection(true);
+
+	for (int i=0; i<mTable->horizontalHeader()->count(); ++i)
+	{
+		XmlOptionItem headerItem("headerwidth_"+QString::number(i), mOptions.getElement());
+		int value = headerItem.readValue("-1").toInt();
+		if (value<0)
+			continue;
+		mTable->setColumnWidth(i, value);
+	}
+}
+
+DetailedLogMessageDisplayWidget::~DetailedLogMessageDisplayWidget()
+{
+	for (int i=0; i<mTable->horizontalHeader()->count(); ++i)
+	{
+		XmlOptionItem headerItem("headerwidth_"+QString::number(i), mOptions.getElement());
+		headerItem.writeValue(QString::number(mTable->columnWidth(i)));
+	}
+}
+
+void DetailedLogMessageDisplayWidget::clear()
+{
+	mTable->setRowCount(0);
+}
+
+void DetailedLogMessageDisplayWidget::normalize()
+{
+	mTable->horizontalScrollBar()->setValue(mTable->horizontalScrollBar()->minimum());
+}
+
+void DetailedLogMessageDisplayWidget::add(const Message& message)
+{
+	QFontMetrics metric(this->font());
+	int textLineHeight = metric.lineSpacing();
+//	int h2 = mTable->rowHeight(0);
+
+	int row = mTable->rowCount();
+	mTable->insertRow(row);
+//	std::cout << "insert row " << row << std::endl;
+	mTable->setRowHeight(row, textLineHeight);
+
+//	this->addItem(0, QString::number(height), message);
+//	this->addItem(1, QString::number(h2), message);
+
+	QTableWidgetItem* item = NULL;
+
+	QString timestamp = message.getTimeStamp().toString("hh:mm:ss.zzz");
+	item = this->addItem(0, timestamp, message);
+
+	QString source;
+	if (!message.mSourceFile.isEmpty())
+		source = QString("%1:%2").arg(message.mSourceFile).arg(message.mSourceLine);
+	item = this->addItem(1, source, message);
+//	item->setTextAlignment(Qt::AlignRight);
+
+	QString function = message.mSourceFunction;
+	item = this->addItem(2, function, message);
+
+	QString thread = message.mThread;
+	item = this->addItem(3, thread, message);
+
+	QString level = enum2string(message.getMessageLevel());
+	item = this->addItem(4, level, message);
+
+	QString desc = message.getText();
+	item = this->addItem(5, desc, message);
+}
+
+QTableWidgetItem* DetailedLogMessageDisplayWidget::addItem(int column, QString text, const Message& message)
+{
+	int row = mTable->rowCount();
+
+	QTableWidgetItem* item = new QTableWidgetItem(text);
+	item->setStatusTip(text);
+	item->setToolTip(text);
+	item->setForeground(mFormat[message.getMessageLevel()].foreground());
+	item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+	mTable->setItem(row-1, column, item);
+	return item;
+}
+
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+
+SimpleLogMessageDisplayWidget::SimpleLogMessageDisplayWidget(QWidget *parent) :
+	LogMessageDisplayWidget(parent)
+{
+	mBrowser = new QTextBrowser(this);
+	mBrowser->setReadOnly(true);
+	mBrowser->setLineWrapMode(QTextEdit::NoWrap);
+	QVBoxLayout* layout = new QVBoxLayout(this);
+	layout->setMargin(0);
+	this->setLayout(layout);
+	layout->addWidget(mBrowser);
+	this->setTail();
+}
+
+void SimpleLogMessageDisplayWidget::clear()
+{
+	mBrowser->clear();
+	this->setTail();
+}
+
+void SimpleLogMessageDisplayWidget::normalize()
+{
+	mBrowser->horizontalScrollBar()->setValue(mBrowser->horizontalScrollBar()->minimum());
+}
+
+void SimpleLogMessageDisplayWidget::add(const Message& message)
+{
+	this->format(message);
+
+//	if (mDetailsAction->isChecked())
+//		mBrowser->append(message.getPrintableMessage());
+//	else
+
+	bool tail = this->isTailing();
+
+	mBrowser->append(this->getCompactMessage(message));
+
+//	mBrowser->horizontalScrollBar()->setValue(mBrowser->horizontalScrollBar()->minimum());
+	if (tail)
+		this->setTail();
+}
+
+bool SimpleLogMessageDisplayWidget::isTailing() const
+{
+	bool tail = mBrowser->verticalScrollBar()->maximum() == mBrowser->verticalScrollBar()->value();
+	return tail;
+}
+void SimpleLogMessageDisplayWidget::setTail()
+{
+	mBrowser->verticalScrollBar()->setValue(mBrowser->verticalScrollBar()->maximum());
+}
+
+
+QString SimpleLogMessageDisplayWidget::getCompactMessage(Message message)
+{
+	if(message.mMessageLevel == mlRAW)
+		return message.mText;
+
+	QString retval;
+	retval= QString("[%1] %2")
+			.arg(message.mTimeStamp.toString("hh:mm"))
+			.arg(message.mText);
+	return retval;
+}
+
+void SimpleLogMessageDisplayWidget::format(const Message& message)
+{
+	if (!mFormat.count(message.getMessageLevel()))
+		return;
+	mBrowser->setCurrentCharFormat(mFormat[message.getMessageLevel()]);
+}
+
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+
 ConsoleWidget::ConsoleWidget(QWidget* parent, QString uid, QString name) :
 	BaseWidget(parent, uid, name),
 	mLineWrappingAction(new QAction(tr("Line wrapping"), this)),
-	mSeverityAction(NULL)
+	mSeverityAction(NULL),
+	mMessagesWidget(NULL)
 {
 	this->setWhatsThis(this->defaultWhatsThis());
 	mOptions = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend(this->objectName());
@@ -87,11 +340,14 @@ ConsoleWidget::ConsoleWidget(QWidget* parent, QString uid, QString name) :
 
 	buttonLayout->addStretch(1);
 
-	mBrowser = new QTextBrowser(this);
-	mBrowser->setReadOnly(true);
-	layout->addWidget(mBrowser);
+	mStackedLayout = new QStackedLayout;
+	mStackedLayout->setMargin(0);
+	layout->addLayout(mStackedLayout);
 
-	this->createTextCharFormats();
+
+//	mMessagesWidget = new SimpleLogMessageDisplayWidget(this);
+//	mMessagesWidget = new DetailedLogMessageDisplayWidget(this);
+//	mStackedLayout->addWidget(mMessagesWidget);
 
 	mMessageListener = MessageListener::create();
 	mMessageFilter.reset(new MessageFilterConsole);
@@ -255,11 +511,49 @@ void ConsoleWidget::updateUI()
 {
 	this->updateSeverityIndicator();
 
+	this->selectMessagesWidget();
+
 	// reset content of browser
-//	mBrowser->clear();
-	QTimer::singleShot(0, mBrowser, SLOT(clear())); // let the messages recently emitted be processed before clearing
+	QTimer::singleShot(0, this, SLOT(clearTable())); // let the messages recently emitted be processed before clearing
 
 	mMessageListener->restart();
+}
+
+void ConsoleWidget::selectMessagesWidget()
+{
+	if (mMessagesWidget && (mMessagesWidget->getType()==this->getDetailTypeFromButton()))
+		return;
+
+	if (mMessagesWidget)
+	{
+		// remove
+		mStackedLayout->takeAt(0);
+		delete mMessagesWidget;
+	}
+
+	if (this->getDetailTypeFromButton()=="detail")
+	{
+		mMessagesWidget = new DetailedLogMessageDisplayWidget(this, mOptions);
+	}
+	else
+	{
+		mMessagesWidget = new SimpleLogMessageDisplayWidget(this);
+	}
+
+	mStackedLayout->addWidget(mMessagesWidget);
+}
+
+QString ConsoleWidget::getDetailTypeFromButton() const
+{
+	if (mDetailsAction->isChecked())
+		return "detail";
+	else
+		return "simple";
+}
+
+void ConsoleWidget::clearTable()
+{
+	mMessagesWidget->clear();
 }
 
 void ConsoleWidget::onChannelSelectorChanged()
@@ -275,16 +569,16 @@ void ConsoleWidget::onChannelSelectorChanged()
 
 void ConsoleWidget::contextMenuEvent(QContextMenuEvent* event)
 {
-	QMenu *menu = mBrowser->createStandardContextMenu();
-	menu->addSeparator();
-	menu->addAction(mLineWrappingAction);
-	menu->exec(event->globalPos());
-	delete menu;
+//	QMenu *menu = mBrowser->createStandardContextMenu();
+//	menu->addSeparator();
+//	menu->addAction(mLineWrappingAction);
+//	menu->exec(event->globalPos());
+//	delete menu;
 }
 
 void ConsoleWidget::showEvent(QShowEvent* event)
 {
-	mBrowser->horizontalScrollBar()->setValue(mBrowser->horizontalScrollBar()->minimum());
+	mMessagesWidget->normalize();
 }
 
 void ConsoleWidget::receivedMessage(Message message)
@@ -300,48 +594,12 @@ void ConsoleWidget::receivedMessage(Message message)
 
 void ConsoleWidget::printMessage(const Message& message)
 {
-	this->format(message);
-
-	if (mDetailsAction->isChecked())
-		mBrowser->append(message.getPrintableMessage());
-	else
-		mBrowser->append(this->getCompactMessage(message));
-}
-
-QString ConsoleWidget::getCompactMessage(Message message)
-{
-	if(message.mMessageLevel == mlRAW)
-		return message.mText;
-
-	QString retval;
-	retval= QString("[%1] %2")
-			.arg(message.mTimeStamp.toString("hh:mm"))
-			.arg(message.mText);
-	return retval;
+	mMessagesWidget->add(message);
 }
 
 void ConsoleWidget::lineWrappingSlot(bool checked)
 {
-	mBrowser->setLineWrapMode(checked ? QTextEdit::WidgetWidth : QTextEdit::NoWrap);
-}
-
-void ConsoleWidget::createTextCharFormats()
-{
-	mFormat[mlINFO].setForeground(Qt::black);
-	mFormat[mlSUCCESS].setForeground(QColor(60, 179, 113)); // medium sea green
-	mFormat[mlWARNING].setForeground(QColor(255, 140, 0)); //dark orange
-	mFormat[mlERROR].setForeground(Qt::red);
-	mFormat[mlDEBUG].setForeground(QColor(135, 206, 250)); //sky blue
-	mFormat[mlCERR].setForeground(Qt::red);
-	mFormat[mlCOUT].setForeground(Qt::darkGray);
-}
-
-void ConsoleWidget::format(const Message& message)
-{
-	if (!mFormat.count(message.getMessageLevel()))
-		return;
-	mBrowser->setCurrentCharFormat(mFormat[message.getMessageLevel()]);
-
+//	mBrowser->setLineWrapMode(checked ? QTextEdit::WidgetWidth : QTextEdit::NoWrap);
 }
 
 }//namespace cx

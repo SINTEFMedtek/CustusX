@@ -127,7 +127,10 @@ class cxResource_EXPORT DummyToolThread : public QThread
 {
 	Q_OBJECT
 public:
-	DummyToolThread(int interval, QObject* parent=NULL) : QThread(parent), mInterval(interval) {}
+	DummyToolThread(int interval, QObject* parent=NULL) : QThread(parent), mInterval(interval)
+	{
+		this->setObjectName("org.custusx.resource.core.tracking.dummytool"); // becomes the thread name
+	}
 protected:
 	void run()
 	{

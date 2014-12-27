@@ -77,7 +77,7 @@ void Message::setThreadName()
 	{
 		mThread = QThread::currentThread()->objectName();
 		if (mThread.isEmpty())
-			mThread = QString::number(reinterpret_cast<long>(QThread::currentThreadId()));
+			mThread = "0x"+QString::number(reinterpret_cast<long>(QThread::currentThreadId()), 16);
 	}
 }
 

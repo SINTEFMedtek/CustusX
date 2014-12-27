@@ -66,6 +66,7 @@ VideoRecorderSaveThread::VideoRecorderSaveThread(QObject* parent, QString saveFo
 	mCompressed(compressed),
 	mWriteColor(writeColor)
 {
+	this->setObjectName("org.custusx.resource.videorecordersave"); // becomes the thread name
 }
 
 VideoRecorderSaveThread::~VideoRecorderSaveThread()

@@ -134,12 +134,14 @@ void Reporter::shutdown()
 void Reporter::setLoggingFolder(QString absoluteLoggingFolderPath)
 {
 	mLogPath = absoluteLoggingFolderPath;
+	if (mWorker)
+		mWorker->setLoggingFolder(mLogPath);
 
-	if (mThread)
-	{
-		this->stopThread();
-		this->startThread();
-	}
+//	if (mThread)
+//	{
+//		this->stopThread();
+//		this->startThread();
+//	}
 }
 
 void Reporter::onEmittedMessage(Message message)

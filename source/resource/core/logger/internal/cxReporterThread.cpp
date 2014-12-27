@@ -63,7 +63,7 @@ ReporterThread::ReporterThread(QObject *parent) :
 	qInstallMessageHandler(convertQtMessagesToCxMessages);
 	qRegisterMetaType<Message>("Message");
 
-	mRepository.reset(new MessageRepository());
+	mRepository = MessageRepository::create();
 
 	// make sure streams are closed properly before reconnecting.
 	mCout.reset();
@@ -108,6 +108,17 @@ QString ReporterThread::getFilenameForChannel(QString channel) const
 }
 
 void ReporterThread::setLoggingFolder(QString absoluteLoggingFolderPath)
+{
+	QMutexLocker sentry(&mActionsMutex);
+	PendingActionType action = boost::bind(&ReporterThread::executeSetLoggingFolder, this, absoluteLoggingFolderPath);
+	mPendingActions.push_back(action);
+	sentry.unlock();
+
+	this->invokePendingAction();
+}
+
+
+void ReporterThread::executeSetLoggingFolder(QString absoluteLoggingFolderPath)
 {
 	mLogPath = absoluteLoggingFolderPath;
 

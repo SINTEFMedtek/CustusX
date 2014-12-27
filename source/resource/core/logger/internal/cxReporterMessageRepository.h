@@ -92,7 +92,6 @@ class MessageRepository : public QObject
 {
 public:
 	static MessageRepositoryPtr create();
-	MessageRepository();
 	~MessageRepository();
 	void setMessage(Message message);
 
@@ -102,6 +101,7 @@ public:
 	void setMessageQueueMaxSize(int count);
 	int getMessageQueueMaxSize() const; // <0 means infinite
 private:
+	MessageRepository();
 	void limitQueueSize();
 	void emitThroughFilter(const Message& message);
 	void emitThroughFilter(MessageObserverPtr observer, const Message& message);

@@ -41,14 +41,68 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTextBrowser>
 #include <QTextCharFormat>
 #include "cxStringDataAdapterXml.h"
+class QTableWidget;
+class QTableWidgetItem;
 
 
 class QContextMenuEvent;
 class QAction;
+class QStackedLayout;
 
 namespace cx
 {
 typedef boost::shared_ptr<class MessageListener> MessageListenerPtr;
+
+class LogMessageDisplayWidget : public QWidget
+{
+public:
+	LogMessageDisplayWidget(QWidget *parent);
+	virtual ~LogMessageDisplayWidget() {}
+	virtual void clear() = 0;
+	virtual void add(const Message& message) = 0;
+	virtual void normalize() = 0;
+	virtual QString getType() const = 0;
+protected:
+	void createTextCharFormats(); ///< sets up the formating rules for the message levels
+	std::map<MESSAGE_LEVEL, QTextCharFormat> mFormat;
+};
+
+class DetailedLogMessageDisplayWidget : public LogMessageDisplayWidget
+{
+public:
+	DetailedLogMessageDisplayWidget(QWidget* parent, XmlOptionFile options);
+	virtual ~DetailedLogMessageDisplayWidget();
+	virtual void clear();
+	virtual void add(const Message& message);
+	virtual void normalize();
+	virtual QString getType() const { return "detail";}
+
+protected:
+	XmlOptionFile mOptions;
+	QTableWidget* mTable;
+//	bool mColumnWidthsInitialized;
+	QTableWidgetItem *addItem(int column, QString text, const Message& message);
+
+};
+
+class SimpleLogMessageDisplayWidget : public LogMessageDisplayWidget
+{
+public:
+	SimpleLogMessageDisplayWidget(QWidget* parent=NULL);
+	virtual ~SimpleLogMessageDisplayWidget() {}
+	virtual void clear();
+	virtual void add(const Message& message);
+	virtual void normalize();
+	virtual QString getType() const { return "simple";}
+
+	QTextBrowser* mBrowser;
+	void format(const Message &message); ///< formats the text to suit the message level
+	QString getCompactMessage(Message message);
+private:
+	bool isTailing() const;
+	void setTail();
+
+};
 
 /**\brief Widget for displaying status messages.
  *
@@ -79,30 +133,30 @@ private slots:
 	void onSeverityDown();
 	void onSeverityChange(int delta);
 	void updateUI();
+	void clearTable();
 
 private:
 	void printMessage(const Message& message); ///< prints the message into the console
-	void createTextCharFormats(); ///< sets up the formating rules for the message levels
-	void format(const Message &message); ///< formats the text to suit the message level
 	void addSeverityButtons(QBoxLayout* buttonLayout);
 	void addDetailsButton(QBoxLayout* buttonLayout);
-	QString getCompactMessage(Message message);
 	void createChannelSelector();
 	void updateSeverityIndicator(QString iconname, QString help);
 	void addSeverityIndicator(QBoxLayout* buttonLayout);
 	void updateSeverityIndicator();
+	QString getDetailTypeFromButton() const;
+	void selectMessagesWidget();
 
 	QAction* mLineWrappingAction;
 	QAction* mSeverityAction;
-	QTextBrowser* mBrowser;
+	LogMessageDisplayWidget* mMessagesWidget;
+	QStackedLayout* mStackedLayout;
+
 	QAction* mDetailsAction;
 	StringDataAdapterXmlPtr mChannelSelector;
 	QStringList mChannels;
 	MessageListenerPtr mMessageListener;
 	boost::shared_ptr<class MessageFilterConsole> mMessageFilter;
 	XmlOptionFile mOptions;
-
-	std::map<MESSAGE_LEVEL, QTextCharFormat> mFormat;
 };
 } // namespace cx
 #endif /* CXCONSOLEWIDGET_H_ */

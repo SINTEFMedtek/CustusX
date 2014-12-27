@@ -43,7 +43,7 @@ IgstkTrackerThread::IgstkTrackerThread(IgstkTracker::InternalStructure trackerSt
 				std::vector<IgstkTool::InternalStructure> toolStructures,
 				IgstkTool::InternalStructure referenceToolStructure)
 {
-	this->setObjectName("org.custusx.core.tracking.igstk");
+	this->setObjectName("org.custusx.core.tracking.igstk"); // becomes the thread name
 	mInitTrackerStructure = trackerStructure;
 	mInitToolStructures = toolStructures;
 	mInitReferenceToolStructure = referenceToolStructure;

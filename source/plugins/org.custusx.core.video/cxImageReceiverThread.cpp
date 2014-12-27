@@ -64,6 +64,7 @@ ImageReceiverThread::ImageReceiverThread(StreamerServicePtr streamerInterface, Q
 		QThread(parent),
 		mStreamerInterface(streamerInterface)
 {
+	this->setObjectName("org.custusx.core.video.imagereceiver"); // becomes the thread name
 	mGeneratingTimeCalibration = false;
 	mLastReferenceTimestampDiff = 0.0;
 	mLastTimeStamps.reserve(20);

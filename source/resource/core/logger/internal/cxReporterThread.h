@@ -104,6 +104,7 @@ private:
 	bool executeAction();
 	PendingActionType popAction();
 	void invokePendingAction();
+	void executeSetLoggingFolder(QString absoluteLoggingFolderPath);
 
 //	void sendMessageToRepository(const Message& message);
 

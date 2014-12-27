@@ -39,6 +39,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 
 #include "cxEnumConverter.h"
+#include <iostream>
+#include "cxTypeConversions.h"
 
 namespace cx
 {
