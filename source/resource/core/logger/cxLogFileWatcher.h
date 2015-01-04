@@ -30,12 +30,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXREPORTERTHREAD_H
-#define CXREPORTERTHREAD_H
+#ifndef CXLOGFILEWATCHER_H
+#define CXLOGFILEWATCHER_H
 
 #include "cxResourceExport.h"
-
-//#define SSC_PRINT_CALLER_INFO
 
 #include <QMetaType>
 #include <QObject>
@@ -43,16 +41,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDateTime>
 #include <QFile>
 #include "boost/shared_ptr.hpp"
-#include "boost/function.hpp"
 #include "cxDefinitions.h"
 #include "cxAudio.h"
 #include <sstream>
 #include "cxTypeConversions.h"
 #include "cxLogger.h"
 #include "cxLogMessage.h"
-#include <QList>
-#include <QThread>
-#include "cxLogFileWatcherThread.h"
 
 class QString;
 class QDomNode;
@@ -69,61 +63,73 @@ class QTextStream;
 namespace cx
 {
 typedef boost::shared_ptr<class MessageObserver> MessageObserverPtr;
-typedef boost::shared_ptr<class MessageRepository> MessageRepositoryPtr;
+typedef boost::shared_ptr<class MessageListener> MessageListenerPtr;
+typedef boost::shared_ptr<class LogThread> LogThreadPtr;
+typedef boost::shared_ptr<class Log> LogPtr;
 
-/**\brief Thread for log handling. Used inside Reporter.
+/**
+ * \author Christian Askeland, SINTEF
+ * \date 2014-12-28
  *
  * \addtogroup cx_resource_core_logger
  */
-class ReporterThread : public LogThread
+class cxResource_EXPORT Log : public QObject
 {
-	Q_OBJECT
+  Q_OBJECT
 
 public:
-	ReporterThread(QObject* parent = NULL);
-	virtual ~ReporterThread();
-	virtual void setLoggingFolder(QString absoluteLoggingFolderPath); ///< call during startup, will fail if called when running
+  virtual ~Log();
 
-	virtual void installObserver(MessageObserverPtr observer, bool resend);
-	virtual void uninstallObserver(MessageObserverPtr observer);
+  void setLoggingFolder(QString absoluteLoggingFolderPath); // deprecated
 
-public slots:
-	virtual void logMessage(Message msg);
-	void pendingAction();
+  void installObserver(MessageObserverPtr observer, bool resend);
+  void uninstallObserver(MessageObserverPtr observer);
 
-signals:
-	void emittedMessage(Message message); ///< emitted for each new message, in addition to writing to file.
+protected:
+  virtual LogThreadPtr createWorker() = 0;
 
-private slots:
-	void processMessage(Message msg);
+protected slots:
+  void onEmittedMessage(Message message) {}
+
+protected:
+  Log();
+
+  void initializeObject();
+  void startThread();
+  void stopThread();
+
+  QString mLogPath;
+  boost::shared_ptr<class QThread> mThread;
+  LogThreadPtr mWorker;
 private:
-	QMutex mActionsMutex;
-
-	typedef boost::function<void()> PendingActionType;
-	QList<PendingActionType> mPendingActions;
-	bool executeAction();
-	PendingActionType popAction();
-	void invokePendingAction();
-	void executeSetLoggingFolder(QString absoluteLoggingFolderPath);
-
-	int getDefaultTimeout(MESSAGE_LEVEL messageLevel) const;
-
-	bool initializeLogFile(LogFile file);
-//	QString getFilenameForChannel(QString channel) const;
-
-	void sendToFile(Message message);
-	void sendToCout(Message message);
-	Message cleanupMessage(Message message);
-
-	typedef boost::shared_ptr<class SingleStreamerImpl> SingleStreamerImplPtr;
-	SingleStreamerImplPtr mCout;
-	SingleStreamerImplPtr mCerr;
-
-	QString mLogPath;
-	MessageRepositoryPtr mRepository;
-	QStringList mInitializedFiles;
-
+  Log(const Log&);
+  Log& operator=(const Log&);
 };
+
+typedef boost::shared_ptr<class LogFileWatcher> LogFileWatcherPtr;
+
+/**
+ * \author Christian Askeland, SINTEF
+ * \date 2014-12-28
+ *
+ * \addtogroup cx_resource_core_logger
+ */
+class cxResource_EXPORT LogFileWatcher : public Log
+{
+  Q_OBJECT
+
+public:
+  static LogFileWatcherPtr create();
+  virtual ~LogFileWatcher() {}
+
+protected:
+  virtual LogThreadPtr createWorker();
+private:
+  LogFileWatcher() {}
+  LogFileWatcher(const LogFileWatcher&);
+  LogFileWatcher& operator=(const LogFileWatcher&);
+};
+
 
 } //namespace cx
 
@@ -131,4 +137,4 @@ private:
  * @}
  */
 
-#endif // CXREPORTERTHREAD_H
+#endif // CXLOGFILEWATCHER_H

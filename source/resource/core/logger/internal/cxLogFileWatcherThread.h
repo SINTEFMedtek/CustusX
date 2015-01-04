@@ -30,8 +30,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXREPORTERTHREAD_H
-#define CXREPORTERTHREAD_H
+#ifndef CXLOGFILEWATCHERTHREAD_H
+#define CXLOGFILEWATCHERTHREAD_H
 
 #include "cxResourceExport.h"
 
@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogMessage.h"
 #include <QList>
 #include <QThread>
-#include "cxLogFileWatcherThread.h"
+#include <QFileSystemWatcher>
 
 class QString;
 class QDomNode;
@@ -70,32 +70,56 @@ namespace cx
 {
 typedef boost::shared_ptr<class MessageObserver> MessageObserverPtr;
 typedef boost::shared_ptr<class MessageRepository> MessageRepositoryPtr;
+class LogFile;
 
-/**\brief Thread for log handling. Used inside Reporter.
+/**\brief Thread for log handling. Used inside LogFileWatcher.
  *
  * \addtogroup cx_resource_core_logger
  */
-class ReporterThread : public LogThread
+class LogThread : public QObject
 {
 	Q_OBJECT
 
 public:
-	ReporterThread(QObject* parent = NULL);
-	virtual ~ReporterThread();
+	LogThread(QObject* parent = NULL) : QObject(parent) {}
+	virtual ~LogThread() {}
+	virtual void setLoggingFolder(QString absoluteLoggingFolderPath) = 0; ///< call during startup, will fail if called when running
+	virtual void installObserver(MessageObserverPtr observer, bool resend) = 0;
+	virtual void uninstallObserver(MessageObserverPtr observer) = 0;
+
+signals:
+	void emittedMessage(Message message); ///< emitted for each new message, in addition to writing to observer.
+public slots:
+	virtual void logMessage(Message msg) {} // default impl do nothing (should be removed)
+
+//public slots:
+//	void pendingAction();
+};
+
+/**\brief Thread for log handling. Used inside LogFileWatcher.
+ *
+ * \addtogroup cx_resource_core_logger
+ */
+class LogFileWatcherThread : public LogThread
+{
+	Q_OBJECT
+
+public:
+	LogFileWatcherThread(QObject* parent = NULL);
+	virtual ~LogFileWatcherThread();
 	virtual void setLoggingFolder(QString absoluteLoggingFolderPath); ///< call during startup, will fail if called when running
 
 	virtual void installObserver(MessageObserverPtr observer, bool resend);
 	virtual void uninstallObserver(MessageObserverPtr observer);
 
 public slots:
-	virtual void logMessage(Message msg);
+//	void logMessage(Message msg);
 	void pendingAction();
-
-signals:
-	void emittedMessage(Message message); ///< emitted for each new message, in addition to writing to file.
 
 private slots:
 	void processMessage(Message msg);
+	void onDirectoryChanged(const QString& path);
+	void onFileChanged(const QString& path);
 private:
 	QMutex mActionsMutex;
 
@@ -105,24 +129,19 @@ private:
 	PendingActionType popAction();
 	void invokePendingAction();
 	void executeSetLoggingFolder(QString absoluteLoggingFolderPath);
+//	QString readFileTail(const QString& path);
 
+//	QString formatMessage(Message msg);
 	int getDefaultTimeout(MESSAGE_LEVEL messageLevel) const;
 
-	bool initializeLogFile(LogFile file);
-//	QString getFilenameForChannel(QString channel) const;
-
-	void sendToFile(Message message);
-	void sendToCout(Message message);
 	Message cleanupMessage(Message message);
 
-	typedef boost::shared_ptr<class SingleStreamerImpl> SingleStreamerImplPtr;
-	SingleStreamerImplPtr mCout;
-	SingleStreamerImplPtr mCerr;
-
+	QFileSystemWatcher mWatcher;
 	QString mLogPath;
 	MessageRepositoryPtr mRepository;
 	QStringList mInitializedFiles;
-
+//	std::map<QString, int> mFilePositions;
+	std::map<QString, LogFile> mFiles;
 };
 
 } //namespace cx
@@ -131,4 +150,4 @@ private:
  * @}
  */
 
-#endif // CXREPORTERTHREAD_H
+#endif // CXLOGFILEWATCHERTHREAD_H

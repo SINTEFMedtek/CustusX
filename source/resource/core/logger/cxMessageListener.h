@@ -46,6 +46,7 @@ namespace cx
 typedef boost::shared_ptr<class MessageFilter> MessageFilterPtr;
 typedef boost::shared_ptr<class MessageObserver> MessageObserverPtr;
 typedef boost::shared_ptr<class MessageListener> MessageListenerPtr;
+typedef boost::shared_ptr<class Log> LogPtr;
 
 /** Utility for listening to the Reporter
   * and storing messages from it.
@@ -61,10 +62,10 @@ class cxResource_EXPORT MessageListener : public QObject
 {
 	Q_OBJECT
 public:
-	static MessageListenerPtr create();
-	static MessageListenerPtr createWithQueue(int size=1000);
+	static MessageListenerPtr create(LogPtr log=LogPtr());
+	static MessageListenerPtr createWithQueue(LogPtr log=LogPtr(), int size=1000);
 	MessageListenerPtr clone();
-	MessageListener();
+	MessageListener(LogPtr log);
 	~MessageListener();
 	bool containsErrors() const;
 	QList<Message> getMessages() const;
@@ -85,7 +86,7 @@ private:
 	bool isError(MESSAGE_LEVEL level) const;
 	void limitQueueSize();
 	QList<Message> mMessages;
-	QPointer<Reporter> mManager;
+	LogPtr mManager;
 	int mMessageHistoryMaxSize;
 
 	MessageObserverPtr mObserver;

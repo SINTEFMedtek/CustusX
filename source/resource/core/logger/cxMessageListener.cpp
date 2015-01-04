@@ -33,25 +33,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include <QThread>
 #include "internal/cxReporterMessageRepository.h"
+#include "cxLogFileWatcher.h"
+#include "cxNullDeleter.h"
+#include "cxReporter.h"
 
 namespace cx
 {
 
-MessageListenerPtr MessageListener::create()
+MessageListenerPtr MessageListener::create(LogPtr log)
 {
-	return MessageListenerPtr(new MessageListener);
+	return MessageListenerPtr(new MessageListener(log));
 }
 
-MessageListenerPtr MessageListener::createWithQueue(int size)
+MessageListenerPtr MessageListener::createWithQueue(LogPtr log, int size)
 {
-	MessageListenerPtr retval(new MessageListener);
+	MessageListenerPtr retval(new MessageListener(log));
 	retval->setMessageQueueMaxSize(size);
 	return retval;
 }
 
 MessageListenerPtr MessageListener::clone()
 {
-	MessageListenerPtr retval(new MessageListener());
+	MessageListenerPtr retval(new MessageListener(this->mManager));
 	retval->mMessages = this->mMessages;
 	retval->mManager = this->mManager;
 	retval->mMessageHistoryMaxSize = this->mMessageHistoryMaxSize;
@@ -59,11 +62,14 @@ MessageListenerPtr MessageListener::clone()
 }
 
 
-MessageListener::MessageListener() :
-	mManager(NULL),
+MessageListener::MessageListener(LogPtr log) :
+	mManager(log),
 	mMessageHistoryMaxSize(0)
 {
-	mManager = reporter();
+	mManager = log;
+	if (!mManager)
+		mManager = LogPtr(reporter(), null_deleter());
+//	mManager = reporter();
 
 	mObserver.reset(new MessageObserver());
 	connect(mObserver.get(), &MessageObserver::newMessage, this, &MessageListener::messageReceived);

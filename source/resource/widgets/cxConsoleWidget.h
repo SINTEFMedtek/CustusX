@@ -157,6 +157,8 @@ private:
 	MessageListenerPtr mMessageListener;
 	boost::shared_ptr<class MessageFilterConsole> mMessageFilter;
 	XmlOptionFile mOptions;
+
+//	LogFileWatcherPtr mLog;
 };
 } // namespace cx
 #endif /* CXCONSOLEWIDGET_H_ */

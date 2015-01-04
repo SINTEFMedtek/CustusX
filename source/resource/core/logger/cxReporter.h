@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxLogger.h"
 #include "cxLogMessage.h"
+#include "cxLogFileWatcher.h"
 
 class QString;
 class QDomNode;
@@ -80,7 +81,7 @@ typedef boost::shared_ptr<class MessageListener> MessageListenerPtr;
  *
  * \addtogroup cx_resource_core_logger
  */
-class cxResource_EXPORT Reporter : public QObject
+class cxResource_EXPORT Reporter : public Log
 {
   Q_OBJECT
 
@@ -90,11 +91,11 @@ public:
 
   static Reporter* getInstance(); ///< Returns a reference to the only Reporter that exists.
 
-  void setLoggingFolder(QString absoluteLoggingFolderPath); // deprecated
+//  virtual void setLoggingFolder(QString absoluteLoggingFolderPath); // deprecated
   void setAudioSource(AudioPtr audioSource); ///< define sounds to go with the messages.
 
-  void installObserver(MessageObserverPtr observer, bool resend);
-  void uninstallObserver(MessageObserverPtr observer);
+//  virtual void installObserver(MessageObserverPtr observer, bool resend);
+//  virtual void uninstallObserver(MessageObserverPtr observer);
 
   //Text
   void sendInfo(QString info); ///< Used to report normal interesting activity, no sound associated
@@ -121,26 +122,29 @@ public:
   void playSampleSound(); ///< plays a sound signaling that something has been sampled
 
 private slots:
-  void onEmittedMessage(Message message);
+  virtual void onEmittedMessage(Message message);
+
+protected:
+  virtual LogThreadPtr createWorker();
 
 private:
   bool hasAudioSource() const;
-  void initializeObject();
+//  void initializeObject();
   Reporter();
   virtual ~Reporter();
   Reporter(const Reporter&);
   Reporter& operator=(const Reporter&);
 
   void playSound(MESSAGE_LEVEL messageLevel);
-  void startThread();
-  void stopThread();
+//  void startThread();
+//  void stopThread();
 
-  QString mLogPath;
+//  QString mLogPath;
   AudioPtr mAudioSource;
 
 //  class QThread* mThread;
-  boost::shared_ptr<class QThread> mThread;
-  boost::shared_ptr<class ReporterThread> mWorker;
+//  boost::shared_ptr<class QThread> mThread;
+//  boost::shared_ptr<class ReporterThread> mWorker;
 
   static Reporter *mTheInstance; // global variable
 };

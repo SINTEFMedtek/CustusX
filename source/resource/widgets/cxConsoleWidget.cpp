@@ -349,6 +349,8 @@ ConsoleWidget::ConsoleWidget(QWidget* parent, QString uid, QString name) :
 //	mMessagesWidget = new DetailedLogMessageDisplayWidget(this);
 //	mStackedLayout->addWidget(mMessagesWidget);
 
+//	mLog = LogFileWatcher::create();
+
 	mMessageListener = MessageListener::create();
 	mMessageFilter.reset(new MessageFilterConsole);
 	mMessageListener->installFilter(mMessageFilter);
