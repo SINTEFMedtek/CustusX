@@ -2,6 +2,7 @@
 #include <QDockWidget>
 #include <QMainWindow>
 #include <QScrollArea>
+#include <iostream>
 
 namespace cx
 {
@@ -31,16 +32,36 @@ QDockWidget* DockWidgets::createDockWidget(QWidget* widget)
 {
 		QScrollArea* scroller = this->addVerticalScroller(widget);
 		QDockWidget* dockWidget = new QDockWidget(widget->windowTitle(), mParent);
+		connect(widget, &QWidget::windowTitleChanged, this, &DockWidgets::onConsoleWindowTitleChanged);
 		dockWidget->setObjectName(widget->objectName() + "DockWidget");
 		dockWidget->setFocusPolicy(Qt::StrongFocus); // we really want to focus on the embedded widget, see focusInsideDockWidget()
 		dockWidget->setWidget(scroller);
 		return dockWidget;
 }
 
+void DockWidgets::onConsoleWindowTitleChanged(const QString & title)
+{
+	QWidget* widget = dynamic_cast<QWidget*>(sender());
+
+	for (int i=0; i<3; ++i)
+	{
+		if (!widget)
+			return;
+		QDockWidget* dockWidget = dynamic_cast<QDockWidget*>(widget);
+		if (dockWidget)
+		{
+			dockWidget->setWindowTitle(title);
+			return;
+		}
+		widget = widget->parentWidget();
+	}
+}
+
 QScrollArea* DockWidgets::addVerticalScroller(QWidget *widget)
 {
 		QScrollArea* scroller = new QScrollArea(NULL);
 		scroller->setWidget(widget);
+		widget->setParent(scroller);
 		scroller->setWidgetResizable(true);
 		scroller->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 		QSizePolicy policy = scroller->sizePolicy();

@@ -50,6 +50,7 @@ private slots:
 	void onDockWidgetVisibilityChanged(bool val);
 	void onNewConsole();
 	void checkVisibility();
+	void onConsoleWindowTitleChanged(const QString & title);
 protected:
 	virtual QMenu* createPopupMenu();
 private:

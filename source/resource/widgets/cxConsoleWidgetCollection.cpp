@@ -136,10 +136,20 @@ QDockWidget* ConsoleWidgetCollection::addAsDockWidget(QWidget* widget)
 QDockWidget* ConsoleWidgetCollection::createDockWidget(QWidget* widget)
 {
 		QDockWidget* dockWidget = new QDockWidget(widget->windowTitle(), this);
+		connect(widget, &QWidget::windowTitleChanged, this, &ConsoleWidgetCollection::onConsoleWindowTitleChanged);
 		dockWidget->setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable);
 		dockWidget->setObjectName(widget->objectName() + "DockWidget");
 		dockWidget->setWidget(widget);
 		return dockWidget;
+}
+
+void ConsoleWidgetCollection::onConsoleWindowTitleChanged(const QString & title)
+{
+	QWidget* widget = dynamic_cast<QWidget*>(sender());
+	QDockWidget* dockWidget = dynamic_cast<QDockWidget*>(sender()->parent());
+	if (!widget || !dockWidget)
+		return;
+	dockWidget->setWindowTitle(widget->windowTitle());
 }
 
 void ConsoleWidgetCollection::deleteDockWidget(QDockWidget* dockWidget)

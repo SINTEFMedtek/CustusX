@@ -3,6 +3,7 @@
 
 #include <set>
 #include <QString>
+#include <QObject>
 class QMainWindow;
 class QDockWidget;
 class QScrollArea;
@@ -21,14 +22,17 @@ namespace cx
  * \date Sep 08, 2014
  * \author Ole Vegard Solberg, SINTEF
  */
-class DockWidgets
+class DockWidgets : public QObject
 {
+	Q_OBJECT
 public:
 	DockWidgets(QMainWindow* parent);
 	QDockWidget* addAsDockWidget(QWidget* widget, QString groupname = "");
 	void erase(QDockWidget* dockWidget);
 	void toggleDebug(QAction* action, bool checked);
 	void hideAll();
+private slots:
+	void onConsoleWindowTitleChanged(const QString & title);
 private:
 	QDockWidget* createDockWidget(QWidget* widget);
 	QScrollArea *addVerticalScroller(QWidget* widget);

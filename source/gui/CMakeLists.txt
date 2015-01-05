@@ -65,7 +65,8 @@ cx_add_class_qt_moc(cxGui_SRCS
     #----------------------
 	utilities/cxAudioImpl
 	utilities/cxToolImagePreviewWidget
-    #----------------------    
+	utilities/cxDockWidgets
+	#----------------------
     pluginFrameworkWidgets/cxPluginBrowser
     pluginFrameworkWidgets/cxPluginTableModel
     pluginFrameworkWidgets/cxPluginFrameworkWidget
@@ -81,7 +82,6 @@ cx_add_class_qt_moc(cxGui_SRCS
 cx_add_class(cxGui_SRCS
 	${cxGui_SRCS}
 	dataAdapters/cxDataAdapterHelper
-	utilities/cxDockWidgets
 	)
 
 set(SUB_FOLDERS
