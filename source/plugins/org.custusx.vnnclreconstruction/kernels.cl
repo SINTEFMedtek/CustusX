@@ -1,4 +1,4 @@
-#include "kernels.cl.h"
+ï»¿#include "kernels.cl.h"
 
 /**
  *  Original author Tord ¯ygard
