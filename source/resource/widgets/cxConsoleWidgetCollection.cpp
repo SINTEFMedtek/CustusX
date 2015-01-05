@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTimer>
 
 #include "cxSettings.h"
+#include "cxDataLocations.h"
 
 #include "cxConsoleWidget.h"
 
@@ -53,7 +54,12 @@ ConsoleWidgetCollection::ConsoleWidgetCollection(QWidget* parent, QString object
 	this->setDockNestingEnabled(true);
 	this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
 
-	int consoleCount = settings()->value("consoleCollection/consoleCount").toInt();
+	mOptions = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend(this->objectName());
+
+	XmlOptionItem consoleCountItem("consoleCount", mOptions.getElement());
+	int consoleCount = consoleCountItem.readVariant(-1).toInt();
+
+//	int consoleCount = settings()->value("consoleCollection/consoleCount").toInt();
 	for (int i=0; i<consoleCount; ++i)
 	{
 		this->onNewConsole();
@@ -76,7 +82,9 @@ ConsoleWidgetCollection::~ConsoleWidgetCollection()
 {
 	settings()->setValue("consoleCollection/geometry", saveGeometry());
 	settings()->setValue("consoleCollection/windowState", saveState());
-	settings()->setValue("consoleCollection/consoleCount", QVariant::fromValue<int>(mDockWidgets.size()));
+//	settings()->setValue("consoleCollection/consoleCount", QVariant::fromValue<int>(mDockWidgets.size()));
+	XmlOptionItem consoleCountItem("consoleCount", mOptions.getElement());
+	consoleCountItem.writeVariant(QVariant::fromValue<int>(mDockWidgets.size()));
 }
 
 void ConsoleWidgetCollection::onDockWidgetVisibilityChanged(bool val)

@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXCONSOLEWIDGETCOLLECTION_H
 
 #include <QMainWindow>
+#include "cxXmlOptionItem.h"
 class QMenu;
 
 namespace cx
@@ -59,6 +60,7 @@ private:
 
 	QString mObjectName;
 	QString mWindowTitle;
+	XmlOptionFile mOptions;
 
 	QList<QDockWidget*> mDockWidgets;
 };
