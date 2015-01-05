@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDomElement>
 #include <QStringList>
 #include <QMutex>
+#include <QBuffer>
 #include "cxLogger.h"
 #include "cxTypeConversions.h"
 
@@ -138,6 +139,41 @@ SharedDocuments* SharedDocuments::mInstance = NULL;
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
+QString XmlOptionItem::SerializeDataToB64String(const QVariant& data)
+{
+	QByteArray byteArray;
+	QBuffer writeBuffer(&byteArray);
+	writeBuffer.open(QIODevice::WriteOnly);
+	QDataStream out(&writeBuffer);
+
+	out << data;
+
+	writeBuffer.close();
+
+	QString s = QString(byteArray.toBase64());
+
+//	qDebug() << "array size when written:" << byteArray.size();
+
+	return s;
+}
+
+
+QVariant XmlOptionItem::DeserializeB64String(const QString& serializedVariant)
+{
+	QByteArray readArr = QByteArray::fromBase64(serializedVariant.toUtf8());
+	QBuffer readBuffer(&readArr);
+	readBuffer.open(QIODevice::ReadOnly);
+	QDataStream in(&readBuffer);
+
+	QVariant data;
+
+	in >> data;
+
+//	qDebug() << "array size when read:" << readArr.size();
+
+	return data;
+}
+
 XmlOptionItem::XmlOptionItem(const QString& uid, QDomElement root) :
 	mUid(uid), mRoot(root)
 {
@@ -146,13 +182,17 @@ XmlOptionItem::XmlOptionItem(const QString& uid, QDomElement root) :
 
 QVariant XmlOptionItem::readVariant(const QVariant& defval) const
 {
-	QString text = this->readValue(defval.toString());
-	return QVariant::fromValue(text);
+	QString text = this->readValue("");
+	if (text.isEmpty())
+		return defval;
+	QVariant val = DeserializeB64String(text);
+	return val;
 }
 
 void XmlOptionItem::writeVariant(const QVariant& val)
 {
-	this->writeValue(val.toString());
+	QString text = SerializeDataToB64String(val);
+	this->writeValue(text);
 }
 
 QString XmlOptionItem::readValue(const QString& defval) const

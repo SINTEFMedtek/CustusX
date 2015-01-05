@@ -61,6 +61,7 @@ private:
 	QString mObjectName;
 	QString mWindowTitle;
 	XmlOptionFile mOptions;
+	XmlOptionItem option(QString name);
 
 	QList<QDockWidget*> mDockWidgets;
 };

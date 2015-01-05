@@ -66,13 +66,16 @@ public:
 	QString readValue(const QString& defval) const;
 	void writeValue(const QString& val);
 
-	QVariant readVariant(const QVariant& defval) const;
+	QVariant readVariant(const QVariant& defval=QVariant()) const;
 	void writeVariant(const QVariant& val);
 
 private:
 	QDomElement findElemFromUid(const QString& uid, QDomNode root) const;
 	QString mUid;
 	QDomElement mRoot;
+
+	static QString SerializeDataToB64String(const QVariant& data);
+	static QVariant DeserializeB64String(const QString& serializedVariant);
 };
 
 /**\brief Helper class for xml files used to store ssc/cx data.

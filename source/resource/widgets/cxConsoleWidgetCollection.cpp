@@ -36,13 +36,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMenu>
 #include <QTimer>
 
-#include "cxSettings.h"
+//#include "cxSettings.h"
 #include "cxDataLocations.h"
+#include <QBuffer>
+#include <QDataStream>
 
 #include "cxConsoleWidget.h"
 
 namespace cx
 {
+
+
+
 
 ConsoleWidgetCollection::ConsoleWidgetCollection(QWidget* parent, QString objectName, QString windowTitle) :
 	QMainWindow(parent), mObjectName(objectName), mWindowTitle(windowTitle)
@@ -56,10 +61,8 @@ ConsoleWidgetCollection::ConsoleWidgetCollection(QWidget* parent, QString object
 
 	mOptions = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend(this->objectName());
 
-	XmlOptionItem consoleCountItem("consoleCount", mOptions.getElement());
-	int consoleCount = consoleCountItem.readVariant(-1).toInt();
+	int consoleCount = this->option("consoleCount").readVariant(-1).toInt();
 
-//	int consoleCount = settings()->value("consoleCollection/consoleCount").toInt();
 	for (int i=0; i<consoleCount; ++i)
 	{
 		this->onNewConsole();
@@ -67,8 +70,8 @@ ConsoleWidgetCollection::ConsoleWidgetCollection(QWidget* parent, QString object
 
 	// Restore saved window states
 	// Must be done after all DockWidgets are created
-	this->restoreGeometry(settings()->value("consoleCollection/geometry").toByteArray());
-	this->restoreState(settings()->value("consoleCollection/windowState").toByteArray());
+	this->restoreGeometry(this->option("geometry").readVariant().toByteArray());
+	this->restoreState(this->option("windowState").readVariant().toByteArray());
 
 	// default: add two consoles
 	if (mDockWidgets.empty())
@@ -78,13 +81,16 @@ ConsoleWidgetCollection::ConsoleWidgetCollection(QWidget* parent, QString object
 	}
 }
 
+XmlOptionItem ConsoleWidgetCollection::option(QString name)
+{
+	return XmlOptionItem(name, mOptions.getElement());
+}
+
 ConsoleWidgetCollection::~ConsoleWidgetCollection()
 {
-	settings()->setValue("consoleCollection/geometry", saveGeometry());
-	settings()->setValue("consoleCollection/windowState", saveState());
-//	settings()->setValue("consoleCollection/consoleCount", QVariant::fromValue<int>(mDockWidgets.size()));
-	XmlOptionItem consoleCountItem("consoleCount", mOptions.getElement());
-	consoleCountItem.writeVariant(QVariant::fromValue<int>(mDockWidgets.size()));
+	this->option("geometry").writeVariant(this->saveGeometry());
+	this->option("windowState").writeVariant(this->saveState());
+	this->option("consoleCount").writeVariant(QVariant::fromValue<int>(mDockWidgets.size()));
 }
 
 void ConsoleWidgetCollection::onDockWidgetVisibilityChanged(bool val)

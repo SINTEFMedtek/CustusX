@@ -131,3 +131,37 @@ TEST_CASE("XmlOptionFile: Writing to file using one instance, then loading using
 		CHECK(item3.readValue("none") == file3.value); //  second item contains same value as first
 	}
 }
+
+TEST_CASE("XmlOptionFile: Write and read QVariant<int>", "[unit][resource][core]")
+{
+	cx::DataLocations::setTestMode();
+	XmlOptionFileFixture file1;
+	file1.remove();
+	file1.open();
+
+	int value = 42;
+
+	cx::XmlOptionItem item = file1.item();
+//	CHECK(item.readValue("none") == "none"); // item doesnt exist at start
+	item.writeVariant(QVariant::fromValue<int>(value));
+
+	cx::XmlOptionItem item2 = file1.item();
+	CHECK(item2.readVariant("none").toInt() == value); //  second item contains same value as first
+}
+
+TEST_CASE("XmlOptionFile: Write and read QVariant<QColor>", "[unit][resource][core]")
+{
+	cx::DataLocations::setTestMode();
+	XmlOptionFileFixture file1;
+	file1.remove();
+	file1.open();
+
+	QColor value("red");
+
+	cx::XmlOptionItem item = file1.item();
+//	CHECK(item.readValue("none") == "none"); // item doesnt exist at start
+	item.writeVariant(QVariant::fromValue<QColor>(value));
+
+	cx::XmlOptionItem item2 = file1.item();
+	CHECK(item2.readVariant("none").value<QColor>() == value); //  second item contains same value as first
+}
