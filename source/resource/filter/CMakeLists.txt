@@ -12,11 +12,6 @@ cx_add_class_qt_moc(CX_RESOURCE_FILTER_FILES
 
 cx_create_export_header("cxResourceFilter")
 
-foreach(file in ${CX_RESOURCE_FILTER_FILES})
-    message(STATUS "*******: " ${file})
-    #message(STATUS "**: " )
-endforeach()
-
 add_library(cxResourceFilter ${CX_RESOURCE_FILTER_FILES})
 target_include_directories(cxResourceFilter
     PUBLIC
