@@ -100,7 +100,7 @@ void ReconstructCore::threadedReconstruct()
 {
 	if (!this->validInputData())
 		return;
-	SSC_ASSERT(mRawOutput);
+    CX_ASSERT(mRawOutput);
 
 	TimeKeeper timer;
 

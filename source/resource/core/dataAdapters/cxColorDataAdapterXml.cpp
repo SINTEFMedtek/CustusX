@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxColorDataAdapterXml.h"
 #include "cxVector3D.h"
 #include "cxTypeConversions.h"
-#include "cxReporter.h"
+
 
 namespace cx
 {

@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSlicerRepSW.h"
 #include "cxToolRep2D.h"
 #include "cxDisplayTextRep.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxSlicePlanes3DRep.h"
 #include "cxMesh.h"
 #include "cxPickerRep.h"
@@ -79,7 +79,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxEnumConverter.h"
 #include "cxManualTool.h"
 #include "cxImage2DRep3D.h"
-#include "cxLogger.h"
+
 #include "cxPatientModelService.h"
 #include "cxRepContainer.h"
 
@@ -572,7 +572,7 @@ void ViewWrapper3D::fillSlicePlanesActionSlot(bool checked)
 void ViewWrapper3D::dataViewPropertiesChangedSlot(QString uid)
 {
 	DataPtr data = mBackend->getPatientService()->getData(uid);
-	DataViewProperties properties = mGroupData->getProperties(data);
+	DataViewProperties properties = mGroupData->getProperties(uid);
 
 	if (properties.hasVolume3D())
 		this->addVolumeDataRep(data);

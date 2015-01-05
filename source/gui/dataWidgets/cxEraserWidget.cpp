@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLabeledComboBoxWidget.h"
 #include "cxDefinitionStrings.h"
 #include "cxUtilHelpers.h"
-#include "cxReporter.h"
+
 #include "cxRegistrationTransform.h"
 #include "cxImageAlgorithms.h"
 #include "cxDoubleWidgets.h"
@@ -178,8 +178,8 @@ void EraserWidget::duplicateSlot()
 //	std::vector<ViewGroupPtr> viewGroups = viewService()->getViewGroupDatas();
 	for (unsigned i = 0; i < viewService()->groupCount(); ++i)
 	{
-		if (viewService()->getGroup(i)->removeData(original))
-			viewService()->getGroup(i)->addData(duplicate);
+		if (viewService()->getGroup(i)->removeData(original->getUid()))
+			viewService()->getGroup(i)->addData(duplicate->getUid());
 	}
 }
 

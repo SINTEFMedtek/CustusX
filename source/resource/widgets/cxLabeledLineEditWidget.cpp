@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxLogger.h"
 
+
 namespace cx
 {
 
@@ -45,7 +46,7 @@ LabeledLineEditWidget::LabeledLineEditWidget(QWidget* parent, StringDataAdapterP
 	QGridLayout* gridLayout, int row) :
     OptimizedUpdateWidget(parent)
 {
-	SSC_ASSERT(dataInterface->getAllowOnlyValuesInRange()==false);
+	CX_ASSERT(dataInterface->getAllowOnlyValuesInRange()==false);
 	mData = dataInterface;
     connect(mData.get(), SIGNAL(changed()), this, SLOT(setModified()));
 

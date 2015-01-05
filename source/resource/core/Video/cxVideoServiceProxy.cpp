@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/bind.hpp>
 #include <ctkPluginContext.h>
 #include "cxNullDeleter.h"
-#include "cxReporter.h"
+
 #include "cxStreamerService.h"
 //#include "cxTypeConversions.h"
 
@@ -70,19 +70,24 @@ void VideoServiceProxy::onVideoServiceAdded(VideoService* service)
 	mVideoService.reset(service, null_deleter());
 
 	connect(service, &VideoService::connected, this, &VideoService::connected);
-	connect(service, &VideoService::connectionMethodChanged, this, &VideoService::connectionMethodChanged);
+//	connect(service, &VideoService::connectionMethodChanged, this, &VideoService::connectionMethodChanged);
 	connect(service, &VideoService::activeVideoSourceChanged, this, &VideoService::activeVideoSourceChanged);
 	connect(service, &VideoService::fps, this, &VideoService::fps);
+
+	emit activeVideoSourceChanged();
 }
 
 void VideoServiceProxy::onVideoServiceRemoved(VideoService *service)
 {
 	disconnect(service, &VideoService::connected, this, &VideoService::connected);
-	disconnect(service, &VideoService::connectionMethodChanged, this, &VideoService::connectionMethodChanged);
+//	disconnect(service, &VideoService::connectionMethodChanged, this, &VideoService::connectionMethodChanged);
 	disconnect(service, &VideoService::activeVideoSourceChanged, this, &VideoService::activeVideoSourceChanged);
 	disconnect(service, &VideoService::fps, this, &VideoService::fps);
 
 	mVideoService = VideoService::getNullObject();
+
+	emit connected(false);
+	emit activeVideoSourceChanged();
 }
 
 bool VideoServiceProxy::isNull()

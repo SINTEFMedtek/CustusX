@@ -35,7 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/bind.hpp>
 #include <ctkPluginContext.h>
 #include "cxNullDeleter.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
+#include <QDateTime>
 
 namespace cx
 {
@@ -64,6 +65,9 @@ void RegistrationServiceProxy::onServiceAdded(RegistrationService* service)
 	connect(mRegistrationService.get(), SIGNAL(movingDataChanged(QString)), this, SIGNAL(movingDataChanged(QString)));
 	if(mRegistrationService->isNull())
 		reportWarning("RegistrationServiceProxy::onServiceAdded mRegistrationService->isNull()");
+
+	emit fixedDataChanged(mRegistrationService->getFixedDataUid());
+	emit movingDataChanged(mRegistrationService->getMovingDataUid());
 }
 
 void RegistrationServiceProxy::onServiceRemoved(RegistrationService *service)
@@ -71,6 +75,9 @@ void RegistrationServiceProxy::onServiceRemoved(RegistrationService *service)
 	disconnect(service, SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
 	disconnect(service, SIGNAL(movingDataChanged(QString)), this, SIGNAL(movingDataChanged(QString)));
 	mRegistrationService = RegistrationService::getNullObject();
+
+	emit fixedDataChanged("");
+	emit movingDataChanged("");
 }
 
 void RegistrationServiceProxy::setMovingData(DataPtr data)

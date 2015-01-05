@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationServiceNull.h"
 #include "cxNullDeleter.h"
 
+#include "cxData.h"
+
 namespace cx
 {
 RegistrationServicePtr RegistrationService::getNullObject()
@@ -42,5 +44,21 @@ RegistrationServicePtr RegistrationService::getNullObject()
 	if (!mNull)
 		mNull.reset(new RegistrationServiceNull, null_deleter());
 	return mNull;
+}
+
+QString RegistrationService::getFixedDataUid()
+{
+	if (!this->getFixedData())
+		return "";
+	else
+		return this->getFixedData()->getUid();
+}
+
+QString RegistrationService::getMovingDataUid()
+{
+	if(!this->getMovingData())
+		return "";
+	else
+		return this->getMovingData()->getUid();
 }
 }

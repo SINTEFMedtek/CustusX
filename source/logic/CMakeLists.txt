@@ -3,14 +3,11 @@
 ###########################################################
 
 set(CX_QT_MOC_HEADER_FILES
-    cxServiceController.h
     cxLogicManager.h
     cxPluginFramework.h
 )
 
 set(cxLogicManager_SOURCE
-    cxServiceController.h
-    cxServiceController.cpp
     cxLogicManager.h
     cxLogicManager.cpp
     cxLegacySingletons.h

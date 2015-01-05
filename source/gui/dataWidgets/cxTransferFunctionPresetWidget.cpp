@@ -34,10 +34,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QInputDialog>
 #include <QMessageBox>
-#include "cxReporter.h"
+
 #include "cxSettings.h"
 #include "cxActiveImageProxy.h"
 #include "cxPatientModelService.h"
+#include "cxLogger.h"
 
 namespace cx {
 
@@ -62,10 +63,10 @@ TransferFunctionPresetWidget::TransferFunctionPresetWidget(PatientModelServicePt
 	this->updateToggles();
 
 	mActiveImageProxy = ActiveImageProxy::New(patientModelService);
-	connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this,
-			SLOT(populatePresetListSlot()));
-	connect(mActiveImageProxy.get(), SIGNAL(propertiesChanged()), this,
-			SLOT(populatePresetListSlot()));
+	connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this,
+			&TransferFunctionPresetWidget::populatePresetListSlot);
+	connect(mActiveImageProxy.get(), &ActiveImageProxy::propertiesChanged, this,
+			&TransferFunctionPresetWidget::populatePresetListSlot);
 }
 
 void TransferFunctionPresetWidget::toggleSlot() {

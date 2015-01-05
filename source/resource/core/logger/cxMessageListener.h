@@ -33,18 +33,110 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXMESSAGELISTENER_H
 
 #include "cxResourceExport.h"
-
 #include "cxReporter.h"
+
+
 #include <vector>
 #include <QPointer>
 
+#include "cxEnumConverter.h"
+
 namespace cx
 {
+
+static LOG_SEVERITY level2severity(MESSAGE_LEVEL level)
+{
+	switch (level)
+	{
+	// level 1
+	case mlCERR :
+	case mlERROR : return msERROR;
+
+	// level 2
+	case mlSUCCESS :
+	case mlWARNING : return msWARNING;
+
+	// level 3
+	case mlINFO : return msINFO;
+
+	// level 4
+	case mlCOUT :
+	case mlDEBUG : return msDEBUG;
+
+	default: return msCOUNT;
+	}
+}
+
+typedef boost::shared_ptr<class MessageFilter> MessageFilterPtr;
+
+class MessageFilter
+{
+public:
+	~MessageFilter() {}
+	virtual bool operator()(const Message& msg) const = 0;
+};
+
+class MessageFilterConsole : public MessageFilter
+{
+public:
+	virtual bool operator()(const Message& msg) const
+	{
+		if (!isActiveChannel(msg))
+			return false;
+		if (!isActiveSeverity(msg))
+			return false;
+		return true;
+	}
+
+	bool isActiveSeverity(const Message& msg) const
+	{
+		LOG_SEVERITY severity = level2severity(msg.getMessageLevel());
+		return severity <= mLowestSeverity;
+	}
+
+	bool isActiveChannel(const Message& msg) const
+	{
+		if (mChannel == "all")
+			return true;
+		if (msg.mChannel == mChannel)
+			return true;
+		return false;
+	}
+
+	void setActiveChannel(QString uid)
+	{
+		mChannel = uid;
+	}
+
+	void clearSeverity()
+	{
+		mLowestSeverity = msERROR;
+	}
+	void activateSeverity(LOG_SEVERITY severity)
+	{
+		mLowestSeverity = std::max(mLowestSeverity, severity);
+	}
+	void setLowestSeverity(LOG_SEVERITY severity)
+	{
+		mLowestSeverity = severity;
+	}
+	LOG_SEVERITY getLowestSeverity() const
+	{
+		return mLowestSeverity;
+	}
+
+private:
+	QString mChannel;
+	LOG_SEVERITY mLowestSeverity;
+};
 
 typedef boost::shared_ptr<class MessageListener> MessageListenerPtr;
 
 /** Utility for listening to the Reporter
   * and storing messages from it.
+  *
+  * Messages are passed throught MessageFilter before being
+  * emitted from this class.
   *
  * \ingroup cx_resource_core_logger
   * \date 2014-03-09
@@ -55,16 +147,34 @@ class cxResource_EXPORT MessageListener : public QObject
 	Q_OBJECT
 public:
 	static MessageListenerPtr create();
+	MessageListenerPtr clone();
 	MessageListener();
 	~MessageListener();
 	bool containsErrors() const;
 
+//	std::vector<Message> getMessages() const; // get all messages passing filter
+
+	void restart(); // emit all messages in queue, then continue emitting new incoming messages
+//	void stop(); // stop emitting messages.
+
+	void installFilter(MessageFilterPtr);
+	void setMessageQueueMaxSize(int count);
+	int getMessageQueueMaxSize() const; // <0 means infinite
+
+signals:
+	void newMessage(Message message);
+
 private slots:
 	void messageReceived(Message message);
 private:
+	bool testFilter(const Message &msg) const;
+	void emitThroughFilter(const Message& message);
 	bool isError(MESSAGE_LEVEL level) const;
-	std::vector<Message> mMessages;
+	void limitQueueSize();
+	QList<Message> mMessages;
+	MessageFilterPtr mFilter;
 	QPointer<Reporter> mManager;
+	int mMessageHistoryMaxSize;
 };
 
 

@@ -53,7 +53,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxDataReaderWriter.h"
 #include "cxtestUtilities.h"
-#include "cxLogger.h"
+#include "cxReporter.h"
+
 #include "cxUtilHelpers.h"
 
 
@@ -125,7 +126,7 @@ RenderTester::RenderTester(vtkRenderWindowPtr renderWindow) :
 	mImageErrorThreshold(100.0),
 	mBorderOffset(2)
 {
-	SSC_ASSERT(renderWindow->GetRenderers()->GetNumberOfItems()==1);
+	CX_ASSERT(renderWindow->GetRenderers()->GetNumberOfItems()==1);
 }
 
 RenderTester::RenderTester(vtkRenderWindowPtr renderWindow, vtkRendererPtr renderer) :

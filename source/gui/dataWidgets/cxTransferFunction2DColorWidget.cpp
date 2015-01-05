@@ -52,8 +52,8 @@ TransferFunction2DColorWidget::TransferFunction2DColorWidget(PatientModelService
   mDataLevel.reset(new DoubleDataAdapterImageTFDataLevel);
 
   mActiveImageProxy = ActiveImageProxy::New(patientModelService);
-  connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
-  connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(activeImageChangedSlot()));
+  connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &TransferFunction2DColorWidget::activeImageChangedSlot);
+  connect(mActiveImageProxy.get(), &ActiveImageProxy::transferFunctionsChanged, this, &TransferFunction2DColorWidget::activeImageChangedSlot);
 
   mTransferFunctionColorWidget->setSizePolicy(QSizePolicy::Expanding,
                                               QSizePolicy::Fixed);

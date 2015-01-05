@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkImageData.h>
 #include <vtkPainterPolyDataMapper.h>
 #include <vtkLookupTable.h>
-
+#include "cxLogger.h"
 #include "cxImage.h"
 #include "cxView.h"
 #include "cxImageLUT2D.h"
@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxGPUImageBuffer.h"
 #include "cxTexture3DSlicerProxy.h"
-#include "cxReporter.h"
+
 
 //---------------------------------------------------------
 namespace cx

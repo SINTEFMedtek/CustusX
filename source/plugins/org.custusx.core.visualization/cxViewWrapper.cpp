@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QMenu>
 #include "vtkCamera.h"
-#include "cxReporter.h"
+
 #include "cxPatientModelService.h"
 #include "cxViewGroup.h" //for class Navigation
 #include "cxMesh.h"
@@ -118,12 +118,12 @@ void DataViewPropertiesInteractor::dataActionSlot()
 
 	bool firstData = mGroupData->getData(DataViewProperties::createFull()).empty();
 
-	DataViewProperties old = mGroupData->getProperties(data);
+	DataViewProperties old = mGroupData->getProperties(uid);
 
 	if (theAction->isChecked())
 	{
 		DataViewProperties props = old.addFlagsIn(mProperties);
-		mGroupData->setProperties(data, props);
+		mGroupData->setProperties(uid, props);
 
 		if (image)
 			mBackend->getPatientService()->setActiveImage(image);
@@ -131,7 +131,7 @@ void DataViewPropertiesInteractor::dataActionSlot()
 	else
 	{
 		DataViewProperties props = old.removeFlagsIn(mProperties);
-		mGroupData->setProperties(data, props);
+		mGroupData->setProperties(uid, props);
 	}
 
 	if (firstData)

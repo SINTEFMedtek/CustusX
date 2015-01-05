@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxToolRep3D.h"
 #include "cxToolTracer.h"
 #include "cxBronchoscopyRegistration.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxTypeConversions.h"
 #include "cxPatientModelService.h"
 #include "cxRegistrationService.h"
@@ -93,14 +93,9 @@ BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegServices servi
 
 	this->initSessionSelector();
 
-	connect(services.acquisitionService.get(), &AcquisitionService::started, this, &BronchoscopyRegistrationWidget::acquisitionStarted);
-	connect(services.acquisitionService.get(), &AcquisitionService::acquisitionStopped, this, &BronchoscopyRegistrationWidget::acquisitionStopped, Qt::QueuedConnection);
-	connect(services.acquisitionService.get(), &AcquisitionService::cancelled, this, &BronchoscopyRegistrationWidget::acquisitionCancelled);
-	connect(services.acquisitionService.get(), &AcquisitionService::recordedSessionsChanged, this, &BronchoscopyRegistrationWidget::recordedSessionsChanged);
-
 //    mTrackedCenterLine = new TrackedCenterlineWidget(mAcquisitionData, this);
 
-	mRecordSessionWidget.reset(new RecordSessionWidget(services.acquisitionService, this, "Bronchoscope path"));
+	mRecordSessionWidget.reset(new RecordSessionWidget(services.acquisitionService, this, "Bronchoscope path", false));
 
 	mVerticalLayout->setMargin(0);
 	mVerticalLayout->addWidget(new DataSelectWidget(mServices.visualizationService, mServices.patientModelService, this, mSelectMeshWidget));
@@ -128,8 +123,6 @@ BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegServices servi
 	mVerticalLayout->addWidget(mRegisterButton);
 
 	mVerticalLayout->addStretch();
-
-	boost::shared_ptr<WidgetObscuredListener> mObscuredListener;
 
 	mObscuredListener.reset(new WidgetObscuredListener(this));
 	connect(mObscuredListener.get(), SIGNAL(obscured(bool)), this, SLOT(obscuredSlot(bool)));
@@ -262,7 +255,7 @@ void BronchoscopyRegistrationWidget::registerSlot()
             std::cout << display_rMpr.row(i) << std::endl;
 
     ToolRep3DPtr activeRep3D = getToolRepIn3DView(mTool);
-    if(activeRep3D->getTracer())
+	if(activeRep3D && activeRep3D->getTracer())
         activeRep3D->getTracer()->clear();
 
 	QColor colorGreen = QColor(0, 255, 0, 255);
@@ -276,12 +269,15 @@ void BronchoscopyRegistrationWidget::acquisitionStarted()
 {
     std::cout << "acquisitionStarted" << std::endl;
 
-	mTool = mServices.trackingService->getActiveTool();
+	mTool = mSelectToolWidget->getTool();
+	if(!mTool)
+		mTool = mServices.trackingService->getActiveTool();
+
     ToolRep3DPtr activeRep3D = this->getToolRepIn3DView(mTool);
 	if (!activeRep3D)
 		return;
 
-    activeRep3D->getTracer()->start();
+	activeRep3D->getTracer()->start();
 }
 void BronchoscopyRegistrationWidget::acquisitionStopped()
 {
@@ -318,23 +314,36 @@ void BronchoscopyRegistrationWidget::recordedSessionsChanged()
 
 ToolRep3DPtr BronchoscopyRegistrationWidget::getToolRepIn3DView(ToolPtr tool)
 {
-	ViewPtr view = mServices.visualizationService->get3DView();
-	ToolRep3DPtr retval = mServices.visualizationService->get3DReps(0, 0)->findFirst<ToolRep3D>(tool);
-//	ToolRep3DPtr retval = RepContainer::findFirstRep<ToolRep3D>(view->getReps(),tool);
-	return retval;
+	RepContainerPtr repContainer = mServices.visualizationService->get3DReps(0, 0);
+	if (repContainer)
+		return repContainer->findFirst<ToolRep3D>(tool);
+	else
+		return ToolRep3DPtr();
 }
 
 void BronchoscopyRegistrationWidget::obscuredSlot(bool obscured)
 {
-    //std::cout << "Checking slot" << std::endl;
+//	std::cout << "obscuredSlot: " << obscured << std::endl;
+
     if (!obscured)
+	{
+		connect(mServices.acquisitionService.get(), &AcquisitionService::started, this, &BronchoscopyRegistrationWidget::acquisitionStarted);
+		connect(mServices.acquisitionService.get(), &AcquisitionService::acquisitionStopped, this, &BronchoscopyRegistrationWidget::acquisitionStopped, Qt::QueuedConnection);
+		connect(mServices.acquisitionService.get(), &AcquisitionService::cancelled, this, &BronchoscopyRegistrationWidget::acquisitionCancelled);
+		connect(mServices.acquisitionService.get(), &AcquisitionService::recordedSessionsChanged, this, &BronchoscopyRegistrationWidget::recordedSessionsChanged);
         return;
+	}
+
+	disconnect(mServices.acquisitionService.get(), &AcquisitionService::started, this, &BronchoscopyRegistrationWidget::acquisitionStarted);
+	disconnect(mServices.acquisitionService.get(), &AcquisitionService::acquisitionStopped, this, &BronchoscopyRegistrationWidget::acquisitionStopped);
+	disconnect(mServices.acquisitionService.get(), &AcquisitionService::cancelled, this, &BronchoscopyRegistrationWidget::acquisitionCancelled);
+	disconnect(mServices.acquisitionService.get(), &AcquisitionService::recordedSessionsChanged, this, &BronchoscopyRegistrationWidget::recordedSessionsChanged);
 
     ToolRep3DPtr activeRep3D = this->getToolRepIn3DView(mTool);
     if (!activeRep3D)
         return;
     //std::cout << "Slot is cleared" << std::endl;
-    activeRep3D->getTracer()->clear();
+	activeRep3D->getTracer()->clear();
 }
 
 void BronchoscopyRegistrationWidget::createMaxNumberOfGenerations(QDomElement root)

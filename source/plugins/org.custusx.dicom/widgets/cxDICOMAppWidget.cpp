@@ -63,6 +63,7 @@
 //#include "ctkDICOMThumbnailListWidget.h"
 #include "cxDICOMThumbnailListWidget.h"
 
+
 #include "cxDicomImporter.h"
 
 //#include "ui_DICOMAppWidget.h"
@@ -191,44 +192,66 @@ void DICOMAppWidgetPrivate::setupUi(DICOMAppWidget* parent)
 void DICOMAppWidgetPrivate::showUpdateSchemaDialog()
 {
   Q_Q(DICOMAppWidget);
-  if (UpdateSchemaProgress == 0)
-    {
-    //
-    // Set up the Update Schema Progress Dialog
-    //
-    UpdateSchemaProgress = new QProgressDialog(
-        q->tr("DICOM Schema Update"), "Cancel", 0, 100, q,
-         Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
 
-    // We don't want the progress dialog to resize itself, so we bypass the label
-    // by creating our own
-    QLabel* progressLabel = new QLabel(q->tr("Initialization..."));
-    UpdateSchemaProgress->setLabel(progressLabel);
-    UpdateSchemaProgress->setWindowModality(Qt::ApplicationModal);
-    UpdateSchemaProgress->setMinimumDuration(0);
-    UpdateSchemaProgress->setValue(0);
+	ctkDICOMDatabase* db = DICOMDatabase.data();
+	q->connect(db, SIGNAL(schemaUpdateStarted(int)), q, SLOT(schemaUpdateStarted(int)));
+	q->connect(db, SIGNAL(schemaUpdateProgress(int)), q, SLOT(schemaUpdateProgress(int)));
+	q->connect(db, SIGNAL(schemaUpdateProgress(QString)), q, SLOT(schemaUpdateProgress(QString)));
+	q->connect(db, SIGNAL(schemaUpdated()), q, SLOT(schemaUpdated()));
 
-    //q->connect(UpdateSchemaProgress, SIGNAL(canceled()), 
-     //       DICOMIndexer.data(), SLOT(cancel()));
+//  if (UpdateSchemaProgress == 0)
+//    {
+//    //
+//    // Set up the Update Schema Progress Dialog
+//    //
+//    UpdateSchemaProgress = new QProgressDialog(
+//        q->tr("DICOM Schema Update"), "Cancel", 0, 100, q,
+//         Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
 
-    q->connect(DICOMDatabase.data(), SIGNAL(schemaUpdateStarted(int)),
-            UpdateSchemaProgress, SLOT(setMaximum(int)));
-    q->connect(DICOMDatabase.data(), SIGNAL(schemaUpdateProgress(int)),
-            UpdateSchemaProgress, SLOT(setValue(int)));
-    q->connect(DICOMDatabase.data(), SIGNAL(schemaUpdateProgress(QString)),
-            progressLabel, SLOT(setText(QString)));
+//	// We don't want the progress dialog to resize itself, so we bypass the label
+//	// by creating our own
+//	QLabel* progressLabel = new QLabel(q->tr("Initialization..."));
+//	UpdateSchemaProgress->setLabel(progressLabel);
+//	UpdateSchemaProgress->setWindowModality(Qt::ApplicationModal);
+//	UpdateSchemaProgress->setMinimumDuration(0);
+//	UpdateSchemaProgress->setValue(0);
 
-    // close the dialog
-    q->connect(DICOMDatabase.data(), SIGNAL(schemaUpdated()),
-            UpdateSchemaProgress, SLOT(close()));
-    // reset the database to show new data
-    q->connect(DICOMDatabase.data(), SIGNAL(schemaUpdated()),
-			&mDICOMModel, SLOT(reset()));
-    // reset the database if canceled
-    q->connect(UpdateSchemaProgress, SIGNAL(canceled()), 
-			&mDICOMModel, SLOT(reset()));
-    }
-  UpdateSchemaProgress->show();
+//	//q->connect(UpdateSchemaProgress, SIGNAL(canceled()),
+//	 //       DICOMIndexer.data(), SLOT(cancel()));
+//	ctkDICOMDatabase* db = DICOMDatabase.data();
+
+//	q->connect(db, SIGNAL(schemaUpdateStarted(int)), UpdateSchemaProgress, SLOT(setMaximum(int)));
+//	q->connect(db, SIGNAL(schemaUpdateProgress(int)), UpdateSchemaProgress, SLOT(setValue(int)));
+//	q->connect(db, SIGNAL(schemaUpdateProgress(QString)), progressLabel, SLOT(setText(QString)));
+//	// close the dialog
+////	q->connect(db, SIGNAL(schemaUpdated()), UpdateSchemaProgress, SLOT(close()));
+//	// reset the database to show new data
+//	q->connect(db, SIGNAL(schemaUpdated()), &mDICOMModel, SLOT(reset()));
+//	// reset the database if canceled
+//	q->connect(UpdateSchemaProgress, SIGNAL(canceled()), &mDICOMModel, SLOT(reset()));
+
+
+//	 q->connect(db, SIGNAL(schemaUpdateStarted(int)), q, SLOT(schemaUpdateStarted(int)));
+//	 q->connect(db, SIGNAL(schemaUpdateProgress(int)), q, SLOT(schemaUpdateProgress(int)));
+//	 q->connect(db, SIGNAL(schemaUpdateProgress(QString)), q, SLOT(schemaUpdateProgress(QString)));
+//	 q->connect(db, SIGNAL(schemaUpdated()), q, SLOT(schemaUpdated()));
+//  }
+//  UpdateSchemaProgress->show();
+}
+
+void DICOMAppWidget::schemaUpdateStarted(int)
+{
+//	report("DICOM schema update started...");
+}
+void DICOMAppWidget::schemaUpdateProgress(QString val)
+{
+}
+void DICOMAppWidget::schemaUpdateProgress(int val)
+{
+}
+void DICOMAppWidget::schemaUpdated()
+{
+//	report("DICOM schema updated");
 }
 
 void DICOMAppWidgetPrivate::removeSelection()
@@ -393,7 +416,8 @@ void DICOMAppWidget::setDatabaseDirectory(const QString& directory)
   try
     {
     d->DICOMDatabase->openDatabase( databaseFileName );
-    }
+	std::cout << "open database " << databaseFileName.toStdString() << ", open= " << d->DICOMDatabase->isOpen() << std::endl;
+	}
   catch (std::exception e)
     {
     std::cerr << "Database error: " << qPrintable(d->DICOMDatabase->lastError()) << "\n";

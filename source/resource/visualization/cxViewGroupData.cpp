@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QMenu>
 #include "vtkCamera.h"
-#include "cxReporter.h"
+
 #include "cxPatientModelService.h"
 #include "cxMesh.h"
 #include "cxTypeConversions.h"
@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxXMLNodeWrapper.h"
 #include "cxSyncedValue.h"
 #include "cxCoreServices.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -230,7 +231,7 @@ void ViewGroupData::dataAddedOrRemovedInManager()
 {
 	for (unsigned i = 0; i < mData.size(); )
 	{
-		if (!mBackend->patientModelService->getData(mData[i].first->getUid()))
+		if (!mBackend->patientModelService->getData(mData[i].first))
 			this->removeData(mData[i].first);
 		else
 			++i;
@@ -242,80 +243,76 @@ void ViewGroupData::requestInitialize()
 	emit initialized();
 }
 
-void ViewGroupData::addData(DataPtr data)
+void ViewGroupData::addData(QString uid)
 {
-	DataViewProperties properties = this->getProperties(data);
+	DataViewProperties properties = this->getProperties(uid);
 	properties = properties.addFlagsIn(DataViewProperties::createDefault());
-	this->setProperties(data, properties);
+	this->setProperties(uid, properties);
 }
 
-void ViewGroupData::addDataSorted(DataPtr data)
+void ViewGroupData::addDataSorted(QString uid)
 {
-	if (!data)
-		return;
-	if (this->contains(data))
+	if (this->contains(uid))
 		return;
 
 	DataViewProperties properties = DataViewProperties::createDefault();
-	DataAndViewProperties item(data, properties);
+	DataAndViewProperties item(uid, properties);
 
 	for (int i=int(mData.size())-1; i>=0; --i)
 	{
-		if (!dataTypeSort(data, mData[i].first))
+		if (!dataTypeSort(this->getData(uid), this->getData(mData[i].first)))
 		{
 			mData.insert(mData.begin()+i+1, item);
 			break;
 		}
 	}
-	if (!this->contains(data))
+	if (!this->contains(uid))
 		mData.insert(mData.begin(), item);
-	emit dataViewPropertiesChanged(data->getUid());
+	emit dataViewPropertiesChanged(uid);
 }
 
-DataViewProperties ViewGroupData::getProperties(DataPtr data)
+DataViewProperties ViewGroupData::getProperties(QString uid)
 {
-	if (this->contains(data))
-		return std::find_if(mData.begin(), mData.end(), data_equals(data))->second;
+	if (this->contains(uid))
+		return std::find_if(mData.begin(), mData.end(), data_equals(uid))->second;
 	return DataViewProperties();
 }
 
-void ViewGroupData::setProperties(DataPtr data, DataViewProperties properties)
+void ViewGroupData::setProperties(QString uid, DataViewProperties properties)
 {
-	if (!data)
+	if (uid.isEmpty())
 		return;
 
 	if (properties.empty())
 	{
-		this->removeData(data);
+		this->removeData(uid);
 		return;
 	}
 
-	if (!this->contains(data))
+	if (!this->contains(uid))
 	{
-		DataAndViewProperties item(data, properties);
+		DataAndViewProperties item(uid, properties);
 		mData.push_back(item);
 	}
 	else
 	{
-		std::find_if(mData.begin(), mData.end(), data_equals(data))->second = properties;
+		std::find_if(mData.begin(), mData.end(), data_equals(uid))->second = properties;
 	}
 
-	emit dataViewPropertiesChanged(data->getUid());
+	emit dataViewPropertiesChanged(uid);
 }
 
-bool ViewGroupData::contains(DataPtr data) const
+bool ViewGroupData::contains(QString uid) const
 {
-	return std::count_if(mData.begin(), mData.end(), data_equals(data));
+	return std::count_if(mData.begin(), mData.end(), data_equals(uid));
 }
 
-bool ViewGroupData::removeData(DataPtr data)
+bool ViewGroupData::removeData(QString uid)
 {
-	if (!data)
+	if (!this->contains(uid))
 		return false;
-	if (!this->contains(data))
-		return false;
-	mData.erase(std::find_if(mData.begin(), mData.end(), data_equals(data)));
-	emit dataViewPropertiesChanged(data->getUid());
+	mData.erase(std::find_if(mData.begin(), mData.end(), data_equals(uid)));
+	emit dataViewPropertiesChanged(uid);
 	return true;
 }
 
@@ -327,6 +324,17 @@ void ViewGroupData::clearData()
 
 	mGroup2DZoom->set(1.0);
 	mGlobal2DZoom->set(1.0);
+}
+
+DataPtr ViewGroupData::getData(QString uid) const
+{
+	DataPtr data = mBackend->patientModelService->getData(uid);
+	if (!data)
+	{
+		reportError("Couldn't find the data: [" + uid + "] in the datamanager.");
+		return DataPtr();
+	}
+	return data;
 }
 
 void ViewGroupData::setVideoSource(QString uid)
@@ -354,7 +362,7 @@ std::vector<boost::shared_ptr<DATA_TYPE> > ViewGroupData::getDataOfType(DataView
 	std::vector<DATA_PTR> retval;
 	for (unsigned i = 0; i < mData.size(); ++i)
 	{
-		DATA_PTR data = boost::dynamic_pointer_cast<DATA_TYPE>(mData[i].first);
+		DATA_PTR data = boost::dynamic_pointer_cast<DATA_TYPE>(this->getData(mData[i].first));
 		if (!data)
 			continue;
 		DataViewProperties properties = mData[i].second;
@@ -407,7 +415,7 @@ void ViewGroupData::addXml(QDomNode& dataNode)
 	for (unsigned i = 0; i < mData.size(); ++i)
 	{
 		QDomElement elem;
-		elem = base.addTextToElement("data", mData[i].first->getUid());
+		elem = base.addTextToElement("data", mData[i].first);
 		mData[i].second.addXml(elem);
 	}
 
@@ -427,17 +435,17 @@ void ViewGroupData::parseXml(QDomNode dataNode)
 	{
 		QDomElement elem = dataElems[i];
 		QString uid = elem.text();
-		DataPtr data = mBackend->patientModelService->getData(uid);
-		if (!data)
-		{
-			reportError("Couldn't find the data: [" + uid + "] in the datamanager.");
-			continue;
-		}
+//		DataPtr data = mBackend->patientModelService->getData(uid);
+//		if (!data)
+//		{
+//			reportError("Couldn't find the data: [" + uid + "] in the datamanager.");
+//			continue;
+//		}
 		DataViewProperties properties = DataViewProperties::createDefault();
 		properties.parseXml(elem);
 
-		this->addData(data);
-		this->setProperties(data, properties);
+		this->addData(uid);
+		this->setProperties(uid, properties);
 	}
 
 	base.parseObjectFromElement("camera3D", this->getCamera3D());

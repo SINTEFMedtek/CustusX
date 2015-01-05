@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QVBoxLayout>
 #include "cxImage.h"
-#include "cxReporter.h"
+
 #include "cxRegistrationTransform.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxLabeledLineEditWidget.h"
@@ -44,9 +44,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataInterface.h"
 #include "cxDataSelectWidget.h"
 #include "cxSelectDataStringDataAdapter.h"
-#include "cxLogger.h"
-#include "cxPatientModelService.h"
 
+#include "cxPatientModelService.h"
+#include "cxLogger.h"
 
 namespace cx
 {

@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cx2DZoomHandler.h"
 #include "cxViewGroup.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxUtilHelpers.h"
 #include "cxSyncedValue.h"
 

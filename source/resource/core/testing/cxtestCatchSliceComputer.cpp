@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSliceComputer.h"
 #include "cxTypeConversions.h"
 #include "catch.hpp"
-#include "cxLogger.h"
+
 
 TEST_CASE("SliceComputer is created", "[unit][resource][core]")
 {

@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImage.h"
 #include <QSet>
 #include "cxMesh.h"
-#include "cxReporter.h"
 #include "cxImageLUT2D.h"
 #include "cxTrackingService.h"
 #include "cxTypeConversions.h"
@@ -85,8 +84,8 @@ DoubleDataAdapterActiveImageBase::DoubleDataAdapterActiveImageBase(PatientModelS
 	mPatientModelService(patientModelService)
 {
 	mActiveImageProxy = ActiveImageProxy::New(patientModelService);
-  connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChanged()));
-  connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SIGNAL(changed()));
+	connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &DoubleDataAdapterActiveImageBase::activeImageChanged);
+	connect(mActiveImageProxy.get(), &ActiveImageProxy::transferFunctionsChanged, this, &DataAdapter::changed);
 }
 void DoubleDataAdapterActiveImageBase::activeImageChanged()
 {
@@ -135,7 +134,6 @@ double DoubleDataAdapter2DLevel::getValueInternal() const
 }
 void DoubleDataAdapter2DLevel::setValueInternal(double val)
 {
-	SSC_LOG("");
   mImage->getLookupTable2D()->setLevel(val);
 }
 DoubleRange DoubleDataAdapter2DLevel::getValueRange() const
@@ -154,12 +152,12 @@ DoubleRange DoubleDataAdapter2DLevel::getValueRange() const
 SelectRTSourceStringDataAdapterBase::SelectRTSourceStringDataAdapterBase(PatientModelServicePtr patientModelService) :
 	mPatientModelService(patientModelService)
 {
-	connect(mPatientModelService.get(), SIGNAL(streamLoaded()), this, SIGNAL(changed()));
+	connect(mPatientModelService.get(), &PatientModelService::streamLoaded, this, &DataAdapter::changed);
 }
 
 SelectRTSourceStringDataAdapterBase::~SelectRTSourceStringDataAdapterBase()
 {
-	disconnect(mPatientModelService.get(), SIGNAL(streamLoaded()), this, SIGNAL(changed()));
+	disconnect(mPatientModelService.get(), &PatientModelService::streamLoaded, this, &DataAdapter::changed);
 }
 
 QStringList SelectRTSourceStringDataAdapterBase::getValueRange() const
@@ -186,7 +184,7 @@ QString SelectRTSourceStringDataAdapterBase::convertInternal2Display(QString int
 
 ActiveVideoSourceStringDataAdapter::ActiveVideoSourceStringDataAdapter()
 {
-	connect(videoService().get(), SIGNAL(activeVideoSourceChanged()), this, SIGNAL(changed()));
+	connect(videoService().get(), &VideoService::activeVideoSourceChanged, this, &DataAdapter::changed);
 }
 
 QString ActiveVideoSourceStringDataAdapter::getDisplayName() const
@@ -228,7 +226,7 @@ QString ActiveVideoSourceStringDataAdapter::getHelp() const
 
 SelectToolStringDataAdapterBase::SelectToolStringDataAdapterBase()
 {
-	connect(trackingService().get(), &TrackingService::stateChanged, this, &SelectToolStringDataAdapterBase::changed);
+	connect(trackingService().get(), &TrackingService::stateChanged, this, &DataAdapter::changed);
 }
 
 QStringList SelectToolStringDataAdapterBase::getValueRange() const
@@ -300,8 +298,8 @@ SelectRTSourceStringDataAdapter::SelectRTSourceStringDataAdapter(PatientModelSer
 	SelectRTSourceStringDataAdapterBase(patientModelService),
     mValueName("Select Real Time Source")
 {
-  connect(patientModelService.get(), SIGNAL(streamLoaded()), this, SLOT(setDefaultSlot()));
-  this->setDefaultSlot();
+	connect(patientModelService.get(), &PatientModelService::streamLoaded, this, &SelectRTSourceStringDataAdapter::setDefaultSlot);
+	this->setDefaultSlot();
 }
 
 QString SelectRTSourceStringDataAdapter::getDisplayName() const
@@ -315,14 +313,14 @@ bool SelectRTSourceStringDataAdapter::setValue(const QString& value)
     return false;
 
   if(mRTSource)
-    disconnect(mRTSource.get(), SIGNAL(streaming(bool)), this, SIGNAL(changed()));
+	  disconnect(mRTSource.get(), &VideoSource::streaming, this, &DataAdapter::changed);
 
   VideoSourcePtr rtSource = mPatientModelService->getStream(value);
   if(!rtSource)
     return false;
 
   mRTSource = rtSource;
-  connect(mRTSource.get(), SIGNAL(streaming(bool)), this, SIGNAL(changed()));
+  connect(mRTSource.get(), &VideoSource::streaming, this, &DataAdapter::changed);
 
   emit changed();
   return true;
@@ -460,22 +458,22 @@ ToolPtr SelectToolStringDataAdapter::getTool() const
 ParentFrameStringDataAdapter::ParentFrameStringDataAdapter(PatientModelServicePtr patientModelService) :
 	mPatientModelService(patientModelService)
 {
-  connect(mPatientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SIGNAL(changed()));
+	connect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &DataAdapter::changed);
 }
 
 void ParentFrameStringDataAdapter::setData(DataPtr data)
 {
   if (mData)
-    disconnect(mData.get(), SIGNAL(transformChanged()), this, SIGNAL(changed()));
+	  disconnect(mData.get(), &Data::transformChanged, this, &DataAdapter::changed);
   mData = data;
   if (mData)
-    connect(mData.get(), SIGNAL(transformChanged()), this, SIGNAL(changed()));
+	  connect(mData.get(), &Data::transformChanged, this, &DataAdapter::changed);
   emit changed();
 }
 
 ParentFrameStringDataAdapter::~ParentFrameStringDataAdapter()
 {
-	disconnect(mPatientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SIGNAL(changed()));
+	disconnect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &DataAdapter::changed);
 }
 
 QString ParentFrameStringDataAdapter::getDisplayName() const
@@ -618,21 +616,21 @@ void DataUidEditableStringDataAdapter::setData(DataPtr data)
 DataModalityStringDataAdapter::DataModalityStringDataAdapter(PatientModelServicePtr patientModelService) :
 	mPatientModelService(patientModelService)
 {
-	connect(mPatientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SIGNAL(changed()));
+	connect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &DataAdapter::changed);
 }
 
 DataModalityStringDataAdapter::~DataModalityStringDataAdapter()
 {
-	disconnect(mPatientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SIGNAL(changed()));
+	disconnect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &DataAdapter::changed);
 }
 
 void DataModalityStringDataAdapter::setData(ImagePtr data)
 {
 	if (mData)
-		disconnect(mData.get(), SIGNAL(propertiesChanged()), this, SIGNAL(changed()));
+		disconnect(mData.get(), &Data::propertiesChanged, this, &DataAdapter::changed);
 	mData = data;
 	if (mData)
-		connect(mData.get(), SIGNAL(propertiesChanged()), this, SIGNAL(changed()));
+		connect(mData.get(), &Data::propertiesChanged, this, &DataAdapter::changed);
 	emit changed();
 }
 
@@ -680,22 +678,22 @@ QStringList DataModalityStringDataAdapter::getValueRange() const
 ImageTypeStringDataAdapter::ImageTypeStringDataAdapter(PatientModelServicePtr patientModelService) :
 	mPatientModelService(patientModelService)
 {
-	connect(mPatientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SIGNAL(changed()));
+	connect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &DataAdapter::changed);
 }
 
 void ImageTypeStringDataAdapter::setData(ImagePtr data)
 {
 	if (mData)
-		disconnect(mData.get(), SIGNAL(propertiesChanged()), this, SIGNAL(changed()));
+		disconnect(mData.get(), &Data::propertiesChanged, this, &DataAdapter::changed);
 	mData = data;
 	if (mData)
-		connect(mData.get(), SIGNAL(propertiesChanged()), this, SIGNAL(changed()));
+		connect(mData.get(), &Data::propertiesChanged, this, &DataAdapter::changed);
 	emit changed();
 }
 
 ImageTypeStringDataAdapter::~ImageTypeStringDataAdapter()
 {
-	disconnect(mPatientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SIGNAL(changed()));
+	disconnect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &DataAdapter::changed);
 }
 
 QString ImageTypeStringDataAdapter::getDisplayName() const

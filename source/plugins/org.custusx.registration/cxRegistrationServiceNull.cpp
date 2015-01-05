@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationServiceNull.h"
 #include "qdatetime.h"
 #include "cxRegistrationTransform.h"
-#include "cxReporter.h"
+
 
 namespace cx
 {

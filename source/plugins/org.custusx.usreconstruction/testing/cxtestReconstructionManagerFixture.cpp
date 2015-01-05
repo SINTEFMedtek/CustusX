@@ -43,18 +43,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReconstructPreprocessor.h"
 #include "cxReconstructionExecuter.h"
 #include "cxLogicManager.h"
-
+#include "cxLogger.h"
 #include "cxPatientModelService.h"
 #include "cxVisualizationService.h"
 #include "cxUsReconstructionServiceProxy.h"
 #include "cxPatientModelServiceProxy.h"
-#include "cxLogger.h"
+#include "cxSessionStorageService.h"
+
 
 namespace cxtest
 {
 
 ReconstructionManagerTestFixture::ReconstructionManagerTestFixture() :
-//	mPatientModelService(cx::PatientModelService::getNullObject()),
 	mVisualizationService(cx::VisualizationService::getNullObject())
 {
 	mVerbose = false;
@@ -62,7 +62,7 @@ ReconstructionManagerTestFixture::ReconstructionManagerTestFixture() :
 	cx::LogicManager::initialize();
 
 	QString folder = cx::DataLocations::getTestDataPath() + "/temp/test.cx3";
-	cx::logicManager()->getPatientModelService()->newPatient(folder);
+	cx::logicManager()->getSessionStorageService()->load(folder);
 
 	ctkPluginContext *pluginContext = cx::logicManager()->getPluginContext();
 	mPatientModelService = cx::PatientModelServiceProxy::create(pluginContext);

@@ -36,15 +36,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxResourceWidgetsExport.h"
 
+#include "cxBaseWidget.h"
+#include "cxReporter.h"
 #include <QTextBrowser>
 #include <QTextCharFormat>
-#include "cxReporter.h"
+#include "cxStringDataAdapterXml.h"
+
 
 class QContextMenuEvent;
 class QAction;
 
 namespace cx
 {
+typedef boost::shared_ptr<class MessageListener> MessageListenerPtr;
+
 /**\brief Widget for displaying status messages.
  *
  * \date 24. aug. 2010
@@ -52,7 +57,7 @@ namespace cx
  *
  * \ingroup cx_resource_widgets
  */
-class cxResourceWidgets_EXPORT ConsoleWidget: public QTextBrowser
+class cxResourceWidgets_EXPORT ConsoleWidget: public BaseWidget
 {
 Q_OBJECT
 
@@ -66,14 +71,35 @@ protected slots:
 	virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
 
 private slots:
-	void printMessage(Message message); ///< prints the message into the console
 	void lineWrappingSlot(bool checked);
+	void onChannelSelectorChanged();
+	void receivedMessage(Message message);
+
+	void onSeverityUp();
+	void onSeverityDown();
+	void onSeverityChange(int delta);
+	void updateUI();
 
 private:
+	void printMessage(const Message& message); ///< prints the message into the console
 	void createTextCharFormats(); ///< sets up the formating rules for the message levels
-	void format(Message& message); ///< formats the text to suit the message level
+	void format(const Message &message); ///< formats the text to suit the message level
+	void addSeverityButtons(QBoxLayout* buttonLayout);
+	void addDetailsButton(QBoxLayout* buttonLayout);
+	QString getCompactMessage(Message message);
+	void createChannelSelector();
+	void updateSeverityIndicator(QString iconname, QString help);
+	void addSeverityIndicator(QBoxLayout* buttonLayout);
+	void updateSeverityIndicator();
 
 	QAction* mLineWrappingAction;
+	QAction* mSeverityAction;
+	QTextBrowser* mBrowser;
+	QAction* mDetailsAction;
+	StringDataAdapterXmlPtr mChannelSelector;
+	QStringList mChannels;
+	MessageListenerPtr mMessageListener;
+	boost::shared_ptr<class MessageFilterConsole> mMessageFilter;
 
 	std::map<MESSAGE_LEVEL, QTextCharFormat> mFormat;
 };

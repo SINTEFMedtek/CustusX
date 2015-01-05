@@ -44,6 +44,7 @@ typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
 typedef boost::shared_ptr<class VideoService> VideoServicePtr;
 typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
 typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
+typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
 
 /**
  * Convenience class combining all services in resource/core.
@@ -59,16 +60,19 @@ public:
 	static CoreServicesPtr create(ctkPluginContext* context);
 	CoreServices(ctkPluginContext* context);
 	static CoreServices getNullObjects();
+	static CoreServicesPtr getNull();
 
 	PatientModelServicePtr getPatientService() { return patientModelService; }
 	TrackingServicePtr getToolManager() { return trackingService; }
 	VideoServicePtr getVideoService() { return videoService; }
 	SpaceProviderPtr getSpaceProvider() { return spaceProvider; }
+	SessionStorageServicePtr getSession() { return sessionStorageService; }
 
 	PatientModelServicePtr patientModelService;
 	TrackingServicePtr trackingService;
 	VideoServicePtr videoService;
 	SpaceProviderPtr spaceProvider;
+	SessionStorageServicePtr sessionStorageService;
 
 protected:
 	CoreServices();

@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSliceProxy.h"
 #include "cxTool.h"
 #include "cxView.h"
-#include "cxReporter.h"
+
 #include "cxTypeConversions.h"
 #include "cxProbeSector.h"
 #include "cxSpaceProvider.h"

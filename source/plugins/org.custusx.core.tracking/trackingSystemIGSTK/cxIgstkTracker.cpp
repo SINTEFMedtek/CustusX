@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxIgstkTracker.h"
 
 #include <QStringList>
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxTypeConversions.h"
 #include "cxEnumConverter.h"
 #include "cxToolUsingIGSTK.h"

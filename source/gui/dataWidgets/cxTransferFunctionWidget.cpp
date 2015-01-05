@@ -41,10 +41,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QToolButton>
 #include <QAction>
 #include <QMessageBox>
-#include "cxLogger.h"
+
 #include "cxImageTF3D.h"
 #include "cxImageLUT2D.h"
-#include "cxReporter.h"
+
 #include "cxTypeConversions.h"
 #include "cxTransferFunctionPresetWidget.h"
 #include "cxTransferFunctionAlphaWidget.h"
@@ -70,13 +70,13 @@ DoubleDataAdapterImageTFDataBase::DoubleDataAdapterImageTFDataBase()
 void DoubleDataAdapterImageTFDataBase::setImageTFData(ImageTFDataPtr tfData, ImagePtr image)
 {
   if (mImageTFData)
-	disconnect(mImageTFData.get(), SIGNAL(transferFunctionsChanged()), this, SIGNAL(changed()));
+	disconnect(mImageTFData.get(), &ImageTFData::transferFunctionsChanged, this, &DataAdapter::changed);
 
   mImageTFData = tfData;
   mImage = image;
 
   if (mImageTFData)
-	connect(mImageTFData.get(), SIGNAL(transferFunctionsChanged()), this, SIGNAL(changed()));
+	connect(mImageTFData.get(), &ImageTFData::transferFunctionsChanged, this, &DataAdapter::changed);
 
   emit changed();
 }
@@ -106,7 +106,6 @@ double DoubleDataAdapterImageTFDataWindow::getValueInternal() const
 
 void DoubleDataAdapterImageTFDataWindow::setValueInternal(double val)
 {
-//	SSC_LOG("");
   mImageTFData->setWindow(val);
 }
 
@@ -128,7 +127,6 @@ double DoubleDataAdapterImageTFDataLevel::getValueInternal() const
 
 void DoubleDataAdapterImageTFDataLevel::setValueInternal(double val)
 {
-//	SSC_LOG("");
   mImageTFData->setLevel(val);
 }
 
@@ -201,8 +199,8 @@ TransferFunction3DWidget::TransferFunction3DWidget(PatientModelServicePtr patien
 //  mDataLLR.reset(new DoubleDataAdapterImageTFDataLLR);
 
   mActiveImageProxy = ActiveImageProxy::New(patientModelService);
-  connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
-  connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(activeImageChangedSlot()));
+  connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &TransferFunction3DWidget::activeImageChangedSlot);
+  connect(mActiveImageProxy.get(), &ActiveImageProxy::transferFunctionsChanged, this, &TransferFunction3DWidget::activeImageChangedSlot);
 
   mTransferFunctionAlphaWidget->setSizePolicy(QSizePolicy::MinimumExpanding,
                                               QSizePolicy::MinimumExpanding);
@@ -268,8 +266,8 @@ TransferFunction2DWidget::TransferFunction2DWidget(PatientModelServicePtr patien
   mDataLLR.reset(new DoubleDataAdapterImageTFDataLLR);
 
   mActiveImageProxy = ActiveImageProxy::New(patientModelService);
-  connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
-  connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(activeImageChangedSlot()));
+  connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &TransferFunction2DWidget::activeImageChangedSlot);
+  connect(mActiveImageProxy.get(), &ActiveImageProxy::transferFunctionsChanged, this, &TransferFunction2DWidget::activeImageChangedSlot);
 
   mTransferFunctionAlphaWidget->setSizePolicy(QSizePolicy::MinimumExpanding,
                                               QSizePolicy::MinimumExpanding);

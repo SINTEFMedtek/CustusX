@@ -41,13 +41,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QLabel>
 #include <QMenu>
 #include "cxEnumConverter.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxDataLocations.h"
 #include "cxImageAlgorithms.h"
 #include "cxImage.h"
 #include "cxPatientModelService.h"
 #include "cxVisualizationService.h"
 #include "cxViewGroupData.h"
+#include "cxLogger.h"
+
 
 //TODO: remove
 #include "cxLegacySingletons.h"
@@ -237,7 +239,7 @@ void SelectedDataListWidget::userChangedListSlot()
 	DataPtr current = patientService()->getData(data[i]);
     if (!current)
       continue;
-	mViewGroupData->addData(current);
+	mViewGroupData->addData(current->getUid());
   }
 }
 
@@ -349,7 +351,7 @@ void SelectedDataListWidget::deleteSlot()
 {
   if(!mItemToDelete)
   {
-    reporter()->sendDebug("Found no item to delete...");
+	reportDebug("Found no item to delete...");
     return;
   }
   this->deleteItemSlot(mItemToDelete);
@@ -373,7 +375,7 @@ void SelectedDataListWidget::contextMenuSlot(const QPoint& point)
   QListWidgetItem* item = this->itemAt(point);
   if(!item)
   {
-    reporter()->sendDebug("Found no item to delete...");
+	reportDebug("Found no item to delete...");
   }
   mItemToDelete = item;
 

@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxReporter.h"
-
+#include "cxLogger.h"
 #include <QtGlobal>
 #include <iostream>
 #include "boost/shared_ptr.hpp"
@@ -43,47 +43,57 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxDefinitionStrings.h"
 #include "cxTime.h"
+#include "cxDataLocations.h"
+#include "cxMessageListener.h"
 
 namespace cx
 {
 
 
 void convertQtMessagesToCxMessages(QtMsgType type, const QMessageLogContext &, const QString &msg)
-//void convertQtMessagesToCxMessages(QtMsgType type, const char *msg)
 {
+	MESSAGE_LEVEL level = mlINFO;
 	switch (type)
 	{
 	case QtDebugMsg:
-		reportDebug(msg);
+		level = mlDEBUG;
 		break;
 	case QtWarningMsg:
-		reportWarning(msg);
+		level = mlWARNING;
 		break;
 	case QtCriticalMsg:
-		reportError(msg);
+		level = mlERROR;
 		break;
 	case QtFatalMsg:
-		reportError(msg);
+		level = mlERROR;
 		//abort(); here we hope for the best instead of aborting...
 	}
+
+	Message message(msg, level);
+	message.mChannel = "qdebug";
+	reporter()->sendMessage(message);
 }
 
-Message::Message(QString text, MESSAGE_LEVEL messageLevel, int timeoutTime, QString sourceLocation) :
+Message::Message(QString text, MESSAGE_LEVEL messageLevel, int timeoutTime) :
   mText(text),
   mMessageLevel(messageLevel),
   mTimeoutTime(timeoutTime),
   mTimeStamp(QDateTime::currentDateTime()),
-  mSourceLocation(sourceLocation)
-{};
+  mMuted(false),
+  mChannel("console")
+{
 
-Message::~Message(){};
+}
+
+Message::~Message()
+{
+
+}
 
 
 QString Message::getPrintableMessage() const
 {
-	QString source = QString("");
-	if (!mSourceLocation.isEmpty())
-		source = QString("[%1]").arg(mSourceLocation);
+	QString source = this->getSourceLocation();
 
 	QString printableMessage;
 	if(mMessageLevel == mlRAW)
@@ -116,6 +126,14 @@ int Message::getTimeout() const
 {
   return mTimeoutTime;
 }
+QString Message::getSourceLocation() const
+{
+	if (mSourceFile.isEmpty() && mSourceFunction.isEmpty())
+		return "";
+	return QString("%1:%2/%3").arg(mSourceFile).arg(mSourceLine).arg(mSourceFunction);
+}
+
+
 // --------------------------------------------------------
 // --------------------------------------------------------
 
@@ -157,7 +175,10 @@ public:
         mBuffer.clear();
         sentry.unlock();
 
-        reporter()->sendMessage(buffer, mMessageLevel, 0);
+		Message msg(buffer, mMessageLevel);
+//		msg.mChannel = qstring_cast(mMessageLevel);
+		msg.mChannel = "stdout";
+		reporter()->sendMessage(msg);
       }
       else
       {
@@ -251,6 +272,8 @@ void Reporter::initialize()
 
 void Reporter::initializeObject()
 {
+	mListener = MessageListener::create();
+
 	// must clear both before reinit (in case of nested initializing)
 	// otherwise we get a segfault.
 	mCout.reset();
@@ -259,6 +282,8 @@ void Reporter::initializeObject()
 	mCout.reset(new SingleStreamerImpl(std::cout, mlCOUT));
 	mCerr.reset(new SingleStreamerImpl(std::cerr, mlCERR));
 	mEnabled = true;
+
+	this->setLoggingFolder(DataLocations::getRootConfigPath()+"/Logs");
 }
 
 void Reporter::setFormat(Format format)
@@ -283,29 +308,38 @@ void Reporter::shutdown()
   mTheInstance = NULL;
 }
 
-bool Reporter::setLogFile(QString filename)
+bool Reporter::initializeLogFile(QString filename)
 {
-	mEnabled = true;
-	mLogFile = filename;
-	QFileInfo(mLogFile).absoluteDir().mkpath(".");
-
 	QString timestamp = QDateTime::currentDateTime().toString(timestampMilliSecondsFormatNice());
 	QString text = QString("-------> Logging initialized %1\n").arg(timestamp);
-	bool success = this->appendToLogfile(text);
+	bool success = this->appendToLogfile(filename, text);
 	if (!success)
 	{
-		this->sendError("Failed to open log file " + mLogFile);
-		mLogFile = "";
+		this->sendError("Failed to open log file " + filename);
+//		mLogFile = "";
 	}
 	return success;
 }
 
-/** Backwards compatibility only
- *
- */
+QString Reporter::getFilenameForChannel(QString channel) const
+{
+//	if (channel.isEmpty())
+//		channel = "console";
+
+	return QString("%1/org.custusx.log.%2.txt").arg(mLogPath).arg(channel);
+}
+
 void Reporter::setLoggingFolder(QString absoluteLoggingFolderPath)
 {
-	this->setLogFile(absoluteLoggingFolderPath + "/ConsoleLog.txt");
+	mLogPath = absoluteLoggingFolderPath;
+
+	mEnabled = true;
+	QFileInfo(mLogPath+"/").absoluteDir().mkpath(".");
+
+	this->initializeLogFile(this->getFilenameForChannel("console"));
+	this->initializeLogFile(this->getFilenameForChannel("all"));
+
+//	this->setLogFile(absoluteLoggingFolderPath + "/ConsoleLog.txt");
 }
 
 void Reporter::setAudioSource(AudioPtr audioSource)
@@ -318,122 +352,76 @@ bool Reporter::hasAudioSource() const
   return mAudioSource ? true : false;
 }
 
-#ifndef SSC_PRINT_CALLER_INFO
 void Reporter::sendInfo(QString info)
-#else
-void Reporter::sendInfoRedefined(QString info)
-#endif
 {
-  this->sendMessage(info, mlINFO, 1500);
+  this->sendMessage(info, mlINFO);
 }
 
-#ifndef SSC_PRINT_CALLER_INFO
 void Reporter::sendSuccess(QString success)
-#else
-void Reporter::sendSuccessRedefined(QString success)
-#endif
 {
-  this->sendMessage(success, mlSUCCESS, 1500);
+  this->sendMessage(success, mlSUCCESS);
 }
 
-#ifndef SSC_PRINT_CALLER_INFO
 void Reporter::sendWarning(QString warning)
-#else
-void Reporter::sendWarningRedefined(QString warning)
-#endif
 {
-  this->sendMessage(warning, mlWARNING, 3000);
+  this->sendMessage(warning, mlWARNING);
 }
 
-#ifndef SSC_PRINT_CALLER_INFO
 void Reporter::sendError(QString error)
-#else
-void Reporter::sendErrorRedefined(QString error)
-#endif
 {
-  this->sendMessage(error, mlERROR, 0);
+  this->sendMessage(error, mlERROR);
 }
 
-#ifndef SSC_PRINT_CALLER_INFO
 void Reporter::sendDebug(QString debug)
-#else
-void Reporter::sendDebugRedefined(QString debug)
-#endif
 {
-  this->sendMessage(debug, mlDEBUG, 0);
+  this->sendMessage(debug, mlDEBUG);
 }
 
-#ifndef SSC_PRINT_CALLER_INFO
 void Reporter::sendVolatile(QString volatile_msg)
-#else
-void Reporter::sendVolatileRedefined(QString volatile_msg)
-#endif
 {
-  this->sendMessage(volatile_msg, mlVOLATILE, 5000);
+  this->sendMessage(volatile_msg, mlVOLATILE);
 }
 
-#ifndef SSC_PRINT_CALLER_INFO
 void Reporter::sendRaw(QString raw)
-#else
-void Reporter::sendRawRedefined(QString raw)
-#endif
 {
-  this->sendMessage(raw, mlRAW, 0);
+  this->sendMessage(raw, mlRAW);
 }
 
-#ifdef SSC_PRINT_CALLER_INFO
-void Reporter::sendCallerInformation(const std::string &caller, const std::string &file, int line)
+int Reporter::getDefaultTimeout(MESSAGE_LEVEL messageLevel) const
 {
-	printf("\t\t[FUNCTION] %s\n",caller.c_str());
-	printf("\t\t[FILE] %s: %i\n",file.c_str(), line);
+	switch(messageLevel)
+	{
+	case mlDEBUG: return 0;
+	case mlINFO: return 1500;
+	case mlSUCCESS: return 1500;
+	case mlWARNING: return 3000;
+	case mlERROR: return 0;
+	case mlVOLATILE: return 5000;
+	default: return 0;
+	}
 }
 
-void Reporter::sendInfoWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line)
+
+void Reporter::sendMessage(QString text, MESSAGE_LEVEL messageLevel, int timeout, bool mute)
 {
-	this->sendInfoRedefined(info);
-	this->sendCallerInformation(caller, file, line);
-	printf("\n");
+	Message message(text, messageLevel, timeout);
+	message.mMuted = mute;
+	this->sendMessage(message);
 }
 
-void Reporter::sendSuccessWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line)
-{
-	this->sendSuccessRedefined(info);
-	this->sendCallerInformation(caller, file, line);
-	printf("\n");
-}
 
-void Reporter::sendWarningWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line)
+void Reporter::sendMessage(Message message)
 {
-	this->sendWarningRedefined(info);
-	this->sendCallerInformation(caller, file, line);
-	printf("\n");
-}
+	if (message.mTimeoutTime<0)
+		message.mTimeoutTime = this->getDefaultTimeout(message.mMessageLevel);
 
-void Reporter::sendErrorWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line)
-{
-	this->sendErrorRedefined(info);
-	this->sendCallerInformation(caller, file, line);
-	printf("\n");
-}
+	if (message.mChannel.isEmpty())
+		message.mChannel = "console";
 
-void Reporter::sendDebugWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line)
-{
-	this->sendDebugRedefined(info);
-	this->sendCallerInformation(caller, file, line);
-	printf("\n");
-}
-
-void Reporter::sendVolatileWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line)
-{
-	this->sendVolatileRedefined(info);
-	this->sendCallerInformation(caller, file, line);
-	printf("\n");
-}
-#endif
-
-void Reporter::sendMessage(QString text, MESSAGE_LEVEL messageLevel, int timeout, bool mute, QString sourceLocation)
-{
-	Message message(text, messageLevel, timeout, sourceLocation);
+	if (!message.mSourceFile.isEmpty())
+	{
+		message.mSourceFile = message.mSourceFile.split("CustusX/").back();
+	}
 
 	if (!this->isEnabled())
 	{
@@ -441,20 +429,20 @@ void Reporter::sendMessage(QString text, MESSAGE_LEVEL messageLevel, int timeout
 		return;
 	}
 
-
-	if (messageLevel!=mlVOLATILE)
+	if (message.getMessageLevel()!=mlVOLATILE)
 	{
 		if (mCout)
 		{
-			if (messageLevel != mlCOUT && messageLevel != mlCERR)
+			if (message.getMessageLevel() != mlCOUT && message.getMessageLevel() != mlCERR)
 				mCout->sendUnredirected(message.getPrintableMessage()+"\n");
 		}
 
-		this->appendToLogfile(this->formatMessage(message) + "\n");
+		this->appendToLogfile(this->getFilenameForChannel(message.mChannel), this->formatMessage(message) + "\n");
+		this->appendToLogfile(this->getFilenameForChannel("all"), this->formatMessage(message) + "\n");
 	}
 
-	if (!mute)
-		this->playSound(messageLevel);
+	if (!message.mMuted)
+		this->playSound(message.getMessageLevel());
 
 	emit emittedMessage(message);
 }
@@ -554,12 +542,12 @@ QString Reporter::formatMessage(Message msg)
 
 /** Open the logfile and append the input text to it
  */
-bool Reporter::appendToLogfile(QString text)
+bool Reporter::appendToLogfile(QString filename, QString text)
 {
-	if (mLogFile.isEmpty())
+	if (filename.isEmpty())
 		return false;
 
-	QFile file(mLogFile);
+	QFile file(filename);
 	QTextStream stream;
 
 	if (!file.open(QFile::WriteOnly | QFile::Append))
@@ -577,11 +565,18 @@ bool Reporter::appendToLogfile(QString text)
 	return true;
 }
 
+MessageListenerPtr Reporter::createListener()
+{
+	return mListener->clone();
+}
+
+
 Reporter::Format::Format() :
 	mShowBrackets(true),
 	mShowLevel(true),
 	mShowSourceLocation(true)
 {}
+
 
 
 } //End namespace cx

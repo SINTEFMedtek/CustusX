@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //#include <QString.h>
 
 //#include "cxUSReconstructInputData.h"
-
+#include "cxLogger.h"
 
 //#include <set>
 //#include "cxForwardDeclarations.h"
@@ -83,6 +83,9 @@ void UsReconstructionServiceProxy::onServiceAdded(UsReconstructionService* servi
 
 	if(mUsReconstructionService->isNull())
 		reportWarning("UsReconstructionServiceProxy::onServiceAdded mVideoService->isNull()");
+
+	emit paramsChanged();
+	emit algorithmChanged();
 }
 
 void UsReconstructionServiceProxy::onServiceRemoved(UsReconstructionService *service)
@@ -96,6 +99,9 @@ void UsReconstructionServiceProxy::onServiceRemoved(UsReconstructionService *ser
 	disconnect(service, &UsReconstructionService::newInputDataAvailable, this, &UsReconstructionService::newInputDataAvailable);
 	disconnect(service, &UsReconstructionService::newInputDataPath, this, &UsReconstructionService::newInputDataAvailable);
 	mUsReconstructionService = UsReconstructionService::getNullObject();
+
+	emit paramsChanged();
+	emit algorithmChanged();
 }
 
 bool UsReconstructionServiceProxy::isNull()

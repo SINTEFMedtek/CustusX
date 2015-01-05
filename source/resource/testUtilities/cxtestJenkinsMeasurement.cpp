@@ -34,7 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <iostream>
 #include "cxTypeConversions.h"
+#include "cxLogger.h"
 #include "cxReporter.h"
+
 
 namespace cxtest
 {

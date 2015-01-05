@@ -65,7 +65,8 @@ public:
   void stop(ctkPluginContext* context);
 
 private:
-	RegisteredServicePtr mRegistration;
+	RegisteredServicePtr mSessionStorage;
+	RegisteredServicePtr mPatientModel;
 };
 
 } // namespace cx

@@ -64,7 +64,12 @@ void VisualizationService::deactivateLayout()
 
 RepContainerPtr VisualizationService::get3DReps(int group, int index)
 {
-	return RepContainerPtr(new RepContainer(this->get3DView(group, index)->getReps()));
+	ViewPtr view = this->get3DView(group, index);
+
+	if(view)
+		return RepContainerPtr(new RepContainer(view->getReps()));
+	else
+		return RepContainerPtr();
 }
 
 

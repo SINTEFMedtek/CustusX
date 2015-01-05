@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReconstructionWidget.h"
 
 #include "cxReconstructOutputValueParamsInterfaces.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxHelperWidgets.h"
 #include "cxTypeConversions.h"
 #include "cxTimedAlgorithmProgressBar.h"

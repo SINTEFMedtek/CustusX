@@ -30,7 +30,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxDepthPeeling.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 
 /**
  * Generate a bunch of overlapping spheres within one poly data set:

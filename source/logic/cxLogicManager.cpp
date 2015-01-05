@@ -32,8 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxLogicManager.h>
 
 #include <ctkPluginContext.h>
-#include "cxServiceController.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxVideoServiceProxy.h"
 #include "cxStateService.h"
 #include "cxGPUImageBuffer.h"
@@ -49,6 +48,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelServiceProxy.h"
 #include "cxStateServiceProxy.h"
 #include "cxVisualizationServiceProxy.h"
+#include "cxSessionStorageServiceProxy.h"
+#include "cxReporter.h"
+
 
 namespace cx
 {
@@ -77,6 +79,11 @@ ViewServicePtr viewService()
 {
 	return logicManager()->getViewService();
 }
+SessionStorageServicePtr sessionStorageService()
+{
+	return logicManager()->getSessionStorageService();
+}
+
 
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -121,11 +128,15 @@ void LogicManager::initializeServices()
 	mVideoService = VideoServiceProxy::create(pc);
 	mViewService = VisualizationServiceProxy::create(pc);
 	mStateService = StateServiceProxy::create(pc);
+	mSessionStorageService = SessionStorageServiceProxy::create(pc);
 
 	mSpaceProvider.reset(new cx::SpaceProviderImpl(mTrackingService, mPatientModelService));
-	mServiceController.reset(new ServiceController);
 
 	mPluginFramework->loadState();
+
+//	CX_LOG_CHANNEL_DEBUG("kanal") << "stream to channel";
+//	CX_LOG_DEBUG() << "stream to default";
+//	CX_LOG_DEBUG("stream to default old style");
 }
 
 void LogicManager::shutdownServices()
@@ -138,6 +149,7 @@ void LogicManager::shutdownServices()
 	this->shutdownService(mTrackingService, "TrackingService");
 	this->shutdownService(mPatientModelService, "PatientModelService");
 	this->shutdownService(mVideoService, "VideoService");
+	this->shutdownService(mSessionStorageService, "SessionStorageService");
 
 	this->shutdownService(mPluginFramework, "PluginFramework");
 
@@ -176,6 +188,10 @@ SpaceProviderPtr LogicManager::getSpaceProvider()
 ViewServicePtr LogicManager::getViewService()
 {
 	return mViewService;
+}
+SessionStorageServicePtr LogicManager::getSessionStorageService()
+{
+	return mSessionStorageService;
 }
 PluginFrameworkManagerPtr LogicManager::getPluginFramework()
 {

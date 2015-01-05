@@ -35,9 +35,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewGroupData.h"
 #include "cxTrackingService.h"
 #include <QFile>
-#include "cxReporter.h"
-#include "cxDataReaderWriter.h"
 
+#include "cxDataReaderWriter.h"
+#include "cxLogger.h"
 #include "cxRegistrationTransform.h"
 #include "cxPointMetric.h"
 #include "cxDistanceMetric.h"
@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxPatientModelService.h"
 #include "cxVisualizationService.h"
-
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -130,7 +130,7 @@ PointMetricPtr MetricManager::addPoint(Vector3D point, CoordinateSystem space, Q
 	p1->setCoordinate(point);
 	patientService()->insertData(p1);
 
-	viewService()->getGroup(0)->addData(p1);
+	viewService()->getGroup(0)->addData(p1->getUid());
 	this->setActiveUid(p1->getUid());
 
 	return p1;
@@ -295,7 +295,7 @@ void MetricManager::installNewMetric(DataMetricPtr metric)
 {
 	patientService()->insertData(metric);
 	this->setActiveUid(metric->getUid());
-	viewService()->getGroup(0)->addData(metric);
+	viewService()->getGroup(0)->addData(metric->getUid());
 }
 
 void MetricManager::loadReferencePointsSlot()
@@ -303,7 +303,7 @@ void MetricManager::loadReferencePointsSlot()
   ToolPtr refTool = trackingService()->getReferenceTool();
   if(!refTool) // we only load reference points from reference tools
   {
-	reporter()->sendDebug("No reference tool, cannot load reference points into the pointsampler");
+	reportDebug("No reference tool, cannot load reference points into the pointsampler");
 	return;
   }
 

@@ -93,6 +93,15 @@ namespace cx
 		mlCOUNT
 	};
 
+	enum cxResource_EXPORT LOG_SEVERITY
+	{
+		msERROR=0,
+		msWARNING,
+		msINFO,
+		msDEBUG,
+		msCOUNT
+	};
+
 	enum cxResource_EXPORT COORDINATE_SYSTEM
 	{
 		csREF, ///< the data reference space (r)

@@ -56,7 +56,7 @@ class LayoutWidgetUsingViewWidgets : public ViewCollectionWidget
 {
 	Q_OBJECT
 public:
-	LayoutWidgetUsingViewWidgets();
+	LayoutWidgetUsingViewWidgets(QWidget *parent);
     virtual ~LayoutWidgetUsingViewWidgets();
 
 	virtual ViewPtr addView(View::Type type, LayoutRegion region);

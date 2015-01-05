@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSliceProxy.h"
 #include "cxImageLUT2D.h"
 #include "cxTypeConversions.h"
-#include "cxLogger.h"
+
 
 namespace cx
 {

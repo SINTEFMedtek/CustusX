@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStringList>
 #include "cxTypeConversions.h"
 #include <cmath>
-#include "cxReporter.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -191,7 +191,7 @@ int CyclicActionLogger::getTime(QString id)
 	std::vector<Entry>::iterator entry = getTimingVectorIterator(id);
 	if(entry == mTiming.end())
 	{
-		cx::reporter()->sendWarning("CyclicActionLogger::getTime() unknown id: " + id);
+		reportWarning("CyclicActionLogger::getTime() unknown id: " + id);
 		return 0;
 	}
 	return getMeanTime(entry->time);

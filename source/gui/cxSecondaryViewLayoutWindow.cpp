@@ -32,14 +32,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxSecondaryViewLayoutWindow.h"
 
-#include "cxLogger.h"
+
 #include <QApplication>
 #include <QDesktopWidget>
 #include "cxTypeConversions.h"
-#include "cxReporter.h"
 #include "cxLegacySingletons.h"
 #include "cxVisualizationService.h"
-
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -111,7 +110,7 @@ int SecondaryViewLayoutWindow::findSmallestSecondaryScreen()
 
 void SecondaryViewLayoutWindow::showEvent(QShowEvent* event)
 {
-	this->setCentralWidget(viewService()->getLayoutWidget(1));
+	this->setCentralWidget(viewService()->getLayoutWidget(this, 1));
 	if (viewService()->getActiveLayout(1).isEmpty())
 		viewService()->setActiveLayout("LAYOUT_OBLIQUE_3DAnyDual_x1", 1);
 }

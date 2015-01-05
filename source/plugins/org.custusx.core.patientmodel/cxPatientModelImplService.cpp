@@ -34,9 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ctkPluginContext.h>
 #include "cxData.h"
-#include "cxReporter.h"
+
 #include "cxPatientData.h"
-#include "cxPatientService.h"
 #include "cxRegistrationTransform.h"
 #include "cxDataFactory.h"
 #include "cxDataManagerImpl.h"
@@ -44,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackingServiceProxy.h"
 #include "cxPatientModelServiceProxy.h"
 #include "cxSpaceProviderImpl.h"
+#include "cxSessionStorageServiceProxy.h"
 
 namespace cx
 {
@@ -63,9 +63,6 @@ PatientModelImplService::PatientModelImplService(ctkPluginContext *context) :
 	connect(this->dataService().get(), &DataManager::centerChanged, this, &PatientModelService::centerChanged);
 	connect(this->dataService().get(), &DataManager::landmarkPropertiesChanged, this, &PatientModelService::landmarkPropertiesChanged);
 
-	connect(this->patientData().get(), &PatientData::cleared, this, &PatientModelService::cleared);
-	connect(this->patientData().get(), &PatientData::isSaving, this, &PatientModelService::isSaving);
-	connect(this->patientData().get(), &PatientData::isLoading, this, &PatientModelService::isLoading);
 	connect(this->patientData().get(), &PatientData::patientChanged, this, &PatientModelService::patientChanged);
 }
 
@@ -85,13 +82,17 @@ void PatientModelImplService::createInterconnectedDataAndSpace()
 	mDataFactory.reset(new DataFactory(patientModelService, spaceProvider));
 	mDataService->setDataFactory(mDataFactory);
 
-	mPatientServiceOld = PatientService::create(mDataService);
+//	mPatientServiceOld = PatientService::create(mDataService);
+//	mPatientService = PatientService::create(mDataService);
+	SessionStorageServicePtr session = SessionStorageServiceProxy::create(mContext);
+
+	mPatientData.reset(new PatientData(mDataService, session));
 }
 
 void PatientModelImplService::shutdownInterconnectedDataAndSpace()
 {
-	requireUnique(mPatientServiceOld, "PatientService");
-	mPatientServiceOld.reset();
+	requireUnique(mPatientData, "PatientData");
+	mPatientData.reset();
 
 	// [HACK] break loop by removing connection to DataFactory and SpaceProvider
 	mDataService->setSpaceProvider(SpaceProviderPtr());
@@ -101,11 +102,6 @@ void PatientModelImplService::shutdownInterconnectedDataAndSpace()
 	requireUnique(mDataFactory, "DataFactory");
 	mDataFactory.reset();
 
-//	LegacySingletons::mSpaceProvider.reset();
-//	requireUnique(mSpaceProvider, "SpaceProvider");
-//	mSpaceProvider.reset();
-
-//	LegacySingletons::mDataManager.reset();
 	requireUnique(mDataService, "DataService");
 	mDataService.reset();
 
@@ -124,9 +120,6 @@ PatientModelImplService::~PatientModelImplService()
 		disconnect(this->dataService().get(), &DataManager::streamLoaded, this, &PatientModelService::streamLoaded);
 		disconnect(this->dataService().get(), &DataManager::clinicalApplicationChanged, this, &PatientModelService::clinicalApplicationChanged);
 
-		disconnect(this->patientData().get(), &PatientData::cleared, this, &PatientModelService::cleared);
-		disconnect(this->patientData().get(), &PatientData::isSaving, this, &PatientModelService::isSaving);
-		disconnect(this->patientData().get(), &PatientData::isLoading, this, &PatientModelService::isLoading);
 		disconnect(this->patientData().get(), &PatientData::patientChanged, this, &PatientModelService::patientChanged);
 	}
 
@@ -279,27 +272,6 @@ void PatientModelImplService::exportPatient(bool niftiFormat)
 	this->patientData()->exportPatient(niftiFormat);
 }
 
-void PatientModelImplService::newPatient(QString choosenDir)
-{
-	this->patientData()->newPatient(choosenDir);
-}
-
-void PatientModelImplService::loadPatient(QString chosenDir)
-{
-	this->patientData()->loadPatient(chosenDir);
-}
-
-void PatientModelImplService::savePatient()
-{
-	this->patientData()->savePatient();
-}
-
-void PatientModelImplService::clearPatient()
-{
-	this->patientData()->clearPatient();
-}
-
-
 void PatientModelImplService::removeData(QString uid)
 {
 	this->patientData()->removeData(uid);
@@ -331,11 +303,6 @@ void PatientModelImplService::setLandmarkActive(QString uid, bool active)
 	dataService()->setLandmarkActive(uid, active);
 }
 
-QDomElement cx::PatientModelImplService::getCurrentWorkingElement(QString path)
-{
-	return this->patientData()->getCurrentWorkingElement(path);
-}
-
 RegistrationHistoryPtr PatientModelImplService::get_rMpr_History() const
 {
 	return this->dataService()->get_rMpr_History();
@@ -349,7 +316,7 @@ DataManagerImplPtr PatientModelImplService::dataService() const
 
 PatientDataPtr PatientModelImplService::patientData() const
 {
-	return mPatientServiceOld->getPatientData();
+	return mPatientData;
 }
 
 } /* namespace cx */

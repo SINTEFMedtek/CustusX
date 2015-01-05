@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxToolRep2D.h"
 #include "cxUtilHelpers.h"
 #include "cxSlicePlanes3DRep.h"
-#include "cxReporter.h"
+
 #include "cxTrackingService.h"
 #include "cxViewWrapper2D.h"
 #include "cxViewManager.h"

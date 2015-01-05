@@ -33,9 +33,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxCameraStyle.h"
 
 #include <QAction>
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxView.h"
 #include "cxViewGroup.h"
+#include "cxLogger.h"
 
 namespace cx
 {

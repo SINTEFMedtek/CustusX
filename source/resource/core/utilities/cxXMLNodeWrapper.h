@@ -57,6 +57,12 @@ class cxResource_EXPORT XMLNodeAdder
 public:
 	XMLNodeAdder(QDomNode node);
 
+	/**
+	 * Use the /-separated path to descend into the root children recursively.
+	 * Create elements if necessary.
+	 */
+	XMLNodeAdder descend(QString path);
+
 	QDomElement addTextToElement(QString name, QString text);
 
 	template<class T>
@@ -67,6 +73,7 @@ public:
 	}
 
 	QDomElement addElement(QString name);
+	QDomNode node();
 
 private:
 	QDomNode mNode;
@@ -82,6 +89,11 @@ class cxResource_EXPORT XMLNodeParser
 {
 public:
 	XMLNodeParser(QDomNode node);
+	/**
+	 * Use the /-separated path to descend into the root children recursively.
+	 */
+	XMLNodeParser descend(QString path);
+	QDomNode node();
 
 	QString parseTextFromElement(QString name);
 	double parseDoubleFromElementWithDefault(QString name, double defaultValue);

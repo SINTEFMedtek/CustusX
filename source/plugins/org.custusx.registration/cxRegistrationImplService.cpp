@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxData.h"
 #include "cxTypeConversions.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxRegistrationTransform.h"
 #include "cxFrameForest.h"
 #include "cxPatientModelService.h"
@@ -48,6 +48,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLandmark.h"
 #include "cxPatientModelServiceProxy.h"
 #include "cxLandmarkTranslationRegistration.h"
+#include "cxSessionStorageServiceProxy.h"
+#include "cxXMLNodeWrapper.h"
 
 namespace cx
 {
@@ -55,29 +57,42 @@ namespace cx
 RegistrationImplService::RegistrationImplService(ctkPluginContext *context) :
 	mLastRegistrationTime(QDateTime::currentDateTime()),
 	mContext(context),
-	mPatientModelService(new PatientModelServiceProxy(context))
+	mPatientModelService(new PatientModelServiceProxy(context)),
+	mSession(SessionStorageServiceProxy::create(context))
 {
 //	mLastRegistrationTime = QDateTime::currentDateTime();
 
-	connect(mPatientModelService.get(), &PatientModelService::isSaving, this, &RegistrationImplService::duringSavePatientSlot);
-	connect(mPatientModelService.get(), &PatientModelService::isLoading, this, &RegistrationImplService::duringLoadPatientSlot);
-	connect(mPatientModelService.get(), &PatientModelService::cleared, this, &RegistrationImplService::clearSlot);
+	connect(mSession.get(), &SessionStorageService::cleared, this, &RegistrationImplService::clearSlot);
+	connect(mSession.get(), &SessionStorageService::isLoading, this, &RegistrationImplService::duringLoadPatientSlot);
+	connect(mSession.get(), &SessionStorageService::isSaving, this, &RegistrationImplService::duringSavePatientSlot);
+
+//	connect(mPatientModelService.get(), &PatientModelService::isSaving, this, &RegistrationImplService::duringSavePatientSlot);
+//	connect(mPatientModelService.get(), &PatientModelService::isLoading, this, &RegistrationImplService::duringLoadPatientSlot);
+//	connect(mPatientModelService.get(), &PatientModelService::cleared, this, &RegistrationImplService::clearSlot);
 }
 
 RegistrationImplService::~RegistrationImplService()
 {
 }
 
-void RegistrationImplService::duringSavePatientSlot()
+void RegistrationImplService::duringSavePatientSlot(QDomElement& node)
 {
-	QDomElement managerNode = mPatientModelService->getCurrentWorkingElement("managers");
+	XMLNodeAdder root(node);
+	QDomElement managerNode = root.descend("managers").node().toElement();
 	this->addXml(managerNode);
+//	QDomElement managerNode = mPatientModelService->getCurrentWorkingElement("managers");
+//	this->addXml(managerNode);
 }
 
-void RegistrationImplService::duringLoadPatientSlot()
+void RegistrationImplService::duringLoadPatientSlot(QDomElement& node)
 {
-	QDomElement registrationManager = mPatientModelService->getCurrentWorkingElement("managers/registrationManager");
-	this->parseXml(registrationManager);
+	XMLNodeParser root(node);
+	QDomElement registrationManager = root.descend("managers/registrationManager").node().toElement();
+	if (!registrationManager.isNull())
+		this->parseXml(registrationManager);
+
+//	QDomElement registrationManager = mPatientModelService->getCurrentWorkingElement("managers/registrationManager");
+//	this->parseXml(registrationManager);
 }
 
 void RegistrationImplService::addXml(QDomNode& parentNode)
@@ -123,7 +138,7 @@ void RegistrationImplService::clearSlot()
 void RegistrationImplService::setMovingData(DataPtr movingData)
 {
   mMovingData = movingData;
-  emit movingDataChanged( (mMovingData) ? qstring_cast(mMovingData->getUid()) : "");
+  emit movingDataChanged(this->getMovingDataUid());
 }
 
 void RegistrationImplService::setFixedData(DataPtr fixedData)
@@ -134,7 +149,7 @@ void RegistrationImplService::setFixedData(DataPtr fixedData)
   mFixedData = fixedData;
   if (mFixedData)
 	report("Registration fixed data set to "+mFixedData->getUid());
-  emit fixedDataChanged( (mFixedData) ? qstring_cast(mFixedData->getUid()) : "");
+  emit fixedDataChanged(this->getFixedDataUid());
 }
 
 DataPtr RegistrationImplService::getMovingData()

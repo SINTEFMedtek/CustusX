@@ -66,14 +66,11 @@ void ThreadedTimedReconstructPreprocessor::preProcessingSlot()
 
 void ThreadedTimedReconstructPreprocessor::calculate()
 {
-//	mInput->initializeCores(mCores);
-
 	std::vector<bool> angio;
 	for (unsigned i=0; i<mCores.size(); ++i)
 		angio.push_back(mCores[i]->getInputParams().mAngio);
 
 	std::vector<cx::ProcessedUSInputDataPtr> processedInput = mInput->createProcessedInput(angio);
-//	SSC_ASSERT(mCores.size() == processedInput.size());
 
 	for (unsigned i=0; i<mCores.size(); ++i)
 	{

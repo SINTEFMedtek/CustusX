@@ -37,12 +37,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVBoxLayout>
 #include <QHeaderView>
 
-#include "cxReporter.h"
+
 #include "cxTypeConversions.h"
 #include "cxCoordinateSystemHelpers.h"
 #include "cxTrackingService.h"
 #include "cxManualTool.h"
-
+#include "cxLogger.h"
 #include "cxLegacySingletons.h"
 #include "cxSpaceProvider.h"
 #include "cxPatientModelService.h"
@@ -295,7 +295,7 @@ void PointSamplingWidget::loadReferencePointsSlot()
   ToolPtr refTool = trackingService()->getReferenceTool();
   if(!refTool) // we only load reference points from reference tools
   {
-    reporter()->sendDebug("No reference tool, cannot load reference points into the pointsampler");
+	reportDebug("No reference tool, cannot load reference points into the pointsampler");
     return;
   }
 

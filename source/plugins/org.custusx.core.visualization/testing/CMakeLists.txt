@@ -25,7 +25,7 @@ if(BUILD_TESTING)
          ..
         ${CMAKE_CURRENT_BINARY_DIR}
     )
-    target_link_libraries(cxtest_org_custusx_core_visualization PRIVATE org_custusx_core_visualization cxtestResourceVisualization cxtestUtilities cxCatch)
+    target_link_libraries(cxtest_org_custusx_core_visualization PRIVATE org_custusx_core_visualization cxtestResourceVisualization cxtestUtilities cxtestResource cxCatch)
     cx_add_tests_to_catch(cxtest_org_custusx_core_visualization)
 
 endif(BUILD_TESTING)

@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxUtilHelpers.h"
 #include "cxVolumeHelpers.h"
 #include "vtkImageCorrelation.h"
-#include "cxReporter.h"
+#include "cxLogger.h"
 #include "cxPatientModelService.h"
 
 typedef vtkSmartPointer<vtkImageCorrelation> vtkImageCorrelationPtr;

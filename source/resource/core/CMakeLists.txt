@@ -76,6 +76,8 @@ cx_add_class_qt_moc(cxResource_SOURCE
     settings/cxStateService
     settings/cxStateServiceNull
     settings/cxStateServiceProxy
+    settings/cxSessionStorageService
+    settings/cxSessionStorageServiceProxy
 
     algorithms/cxTimedAlgorithm.h
     algorithms/cxThreadedTimedAlgorithm.h

@@ -35,8 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkImageActor.h"
 #include "vtkImageData.h"
 #include "vtkMatrix4x4.h"
-
 #include "cxLogger.h"
+
 #include "cxSlicedImageProxy.h"
 #include "cxImage.h"
 #include "cxView.h"
@@ -94,7 +94,7 @@ void Image2DProxy::setImage(ImagePtr image)
 
 	if (mImage)
 	{
-		SSC_ASSERT(mImage->getBaseVtkImageData()->GetDimensions()[2]==1); // class only treats 2d images.
+		CX_ASSERT(mImage->getBaseVtkImageData()->GetDimensions()[2]==1); // class only treats 2d images.
 
 		mImageWithLUTProxy->setInputData(mImage->getBaseVtkImageData(), mImage->getLookupTable2D()->getOutputLookupTable());
 	}

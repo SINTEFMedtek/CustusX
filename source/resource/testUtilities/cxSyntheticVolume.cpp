@@ -245,8 +245,8 @@ void cxSyntheticVolume::fillVolume(cx::ImagePtr vol)
 
 double calculateRMSError(vtkImageDataPtr a, vtkImageDataPtr b)
 {
-	SSC_ASSERT(Eigen::Array3i(a->GetDimensions()).isApprox(Eigen::Array3i(b->GetDimensions())));
-	SSC_ASSERT(Eigen::Array3d(a->GetSpacing()).isApprox(Eigen::Array3d(b->GetSpacing())));
+	CX_ASSERT(Eigen::Array3i(a->GetDimensions()).isApprox(Eigen::Array3i(b->GetDimensions())));
+	CX_ASSERT(Eigen::Array3d(a->GetSpacing()).isApprox(Eigen::Array3d(b->GetSpacing())));
 
 	float sse = 0.0f;
 	Eigen::Array3i dims = Eigen::Array3i(a->GetDimensions());

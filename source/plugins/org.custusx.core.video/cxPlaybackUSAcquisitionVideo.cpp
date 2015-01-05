@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //#include "cxProbeImpl.h"
 #include "cxUSFrameData.h"
 #include "cxPlaybackTime.h"
-#include "cxLogger.h"
+
 #include "cxBasicVideoSource.h"
 #include "cxImage.h"
 #include "cxImageDataContainer.h"

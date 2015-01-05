@@ -11,11 +11,11 @@ modification, are permitted provided that the following conditions are met:
    this list of conditions and the following disclaimer.
 
 2. Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
+   this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
 
 3. Neither the name of the copyright holder nor the names of its contributors 
-   may be used to endorse or promote products derived from this software 
+   may be used to endorse or promote products derived from this software
    without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
@@ -39,46 +39,228 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QScrollBar>
 #include <QContextMenuEvent>
 #include "cxTypeConversions.h"
+#include "cxEnumConverter.h"
+#include "cxDefinitionStrings.h"
+#include "cxSettings.h"
+#include "cxStringDataAdapterXml.h"
+#include "cxHelperWidgets.h"
+#include "cxLabeledComboBoxWidget.h"
+#include "cxMessageListener.h"
+#include "cxEnumConverter.h"
+#include "cxUtilHelpers.h"
 
 namespace cx
 {
 
 ConsoleWidget::ConsoleWidget(QWidget* parent) :
-	QTextBrowser(parent), mLineWrappingAction(new QAction(tr("Line wrapping"), this))
+	BaseWidget(parent, "ConsoleWidget", "Console"),
+	mLineWrappingAction(new QAction(tr("Line wrapping"), this)),
+	mSeverityAction(NULL)
 {
-	this->setObjectName("ConsoleWidget");
-	this->setWindowTitle("Console");
 	this->setWhatsThis(this->defaultWhatsThis());
 
 	QVBoxLayout* layout = new QVBoxLayout;
+	layout->setMargin(0);
+	layout->setSpacing(0);
 	this->setLayout(layout);
 
-	this->setReadOnly(true);
+	QHBoxLayout* buttonLayout = new QHBoxLayout;
+	//	buttonLayout->setMargin(0);
+	layout->addLayout(buttonLayout);
+
+	this->addSeverityButtons(buttonLayout);
+	buttonLayout->addSpacing(8);
+	this->addDetailsButton(buttonLayout);
+
+	this->createChannelSelector();
+
+	LabeledComboBoxWidget* channelSelectorWidget = new LabeledComboBoxWidget(this, mChannelSelector);
+	channelSelectorWidget->showLabel(false);
+	buttonLayout->addSpacing(8);
+	buttonLayout->addWidget(channelSelectorWidget);
+	buttonLayout->setStretch(buttonLayout->count()-1, 0);
+
+	buttonLayout->addStretch(1);
+
+	mBrowser = new QTextBrowser(this);
+	mBrowser->setReadOnly(true);
+	layout->addWidget(mBrowser);
+
 	this->createTextCharFormats();
 
-    connect(reporter(), SIGNAL(emittedMessage(Message)), this, SLOT(printMessage(Message)));
+	mMessageListener = reporter()->createListener();
+	mMessageFilter.reset(new MessageFilterConsole);
+	mMessageListener->setMessageQueueMaxSize(1000);
+	mMessageListener->installFilter(mMessageFilter);
+	connect(mMessageListener.get(), &MessageListener::newMessage, this, &ConsoleWidget::receivedMessage);
+
+	QString defVal = enum2string<LOG_SEVERITY>(msINFO);
+	LOG_SEVERITY value = string2enum<LOG_SEVERITY>(settings()->value("console/showLevel", defVal).toString());
+	mMessageFilter->setLowestSeverity(value);
+
+	mMessageFilter->setActiveChannel(mChannelSelector->getValue());
+
 
 	mLineWrappingAction->setCheckable(true);
 	connect(mLineWrappingAction, SIGNAL(triggered(bool)), this, SLOT(lineWrappingSlot(bool)));
 	this->lineWrappingSlot(mLineWrappingAction->isChecked());
+
+	this->updateUI();
 }
 
 ConsoleWidget::~ConsoleWidget()
 {
+	QString levelString = enum2string<LOG_SEVERITY>(mMessageFilter->getLowestSeverity());
+	settings()->setValue("console/showLevel", levelString);
+	settings()->setValue("console/showDetails", mDetailsAction->isChecked());
 }
 
 QString ConsoleWidget::defaultWhatsThis() const
 {
 	return "<html>"
-		"<h3>CustusX console.</h3>"
-		"<p>Display device for system administration messages.</p>"
-		"<p><i>Right click for addition options.</i></p>"
-		"</html>";
+			"<h3>CustusX console.</h3>"
+			"<p>Display device for system administration messages.</p>"
+			"<p><i>Right click for addition options.</i></p>"
+			"</html>";
+}
+
+void ConsoleWidget::addSeverityButtons(QBoxLayout* buttonLayout)
+{
+	QAction* actionUp = this->createAction(this,
+										 QIcon(":/icons/open_icon_library/zoom-in-3.png"),
+										 "More", "More detailed log output",
+										 SLOT(onSeverityUp()),
+										 buttonLayout, new CXSmallToolButton());
+
+	this->addSeverityIndicator(buttonLayout);
+
+	QAction* actionDown = this->createAction(this,
+										 QIcon(":/icons/open_icon_library/zoom-out-3.png"),
+											 "Less ", "Less detailed log output",
+										   SLOT(onSeverityDown()),
+										 buttonLayout, new CXSmallToolButton());
+}
+
+void ConsoleWidget::addSeverityIndicator(QBoxLayout* buttonLayout)
+{
+	QAction* action = new QAction(QIcon(""), "Severity", this);
+	mSeverityAction = action;
+	QString help = "Lowest displayed log severity";
+	action->setStatusTip(help);
+	action->setWhatsThis(help);
+	action->setToolTip(help);
+	QToolButton* button = new CXSmallToolButton();
+	button->setDefaultAction(action);
+	buttonLayout->addWidget(button);
+}
+
+void ConsoleWidget::updateSeverityIndicator()
+{
+	LOG_SEVERITY severity = mMessageFilter->getLowestSeverity();
+
+	switch (severity)
+	{
+	case msERROR:
+		this->updateSeverityIndicator("window-close-3.png", "error");
+		break;
+	case msWARNING:
+		this->updateSeverityIndicator("dialog-warning-panel.png", "warning");
+		break;
+	case msINFO:
+		this->updateSeverityIndicator("dialog-information-4.png", "info");
+		break;
+	case msDEBUG:
+		this->updateSeverityIndicator("script-error.png", "debug");
+		break;
+	default:
+		this->updateSeverityIndicator("script-error.png", "");
+		break;
+	}
+}
+
+void ConsoleWidget::updateSeverityIndicator(QString iconname, QString help)
+{
+	QIcon icon(QString(":/icons/message_levels/%1").arg(iconname));
+	mSeverityAction->setIcon(icon);
+
+	help = QString("Current log level is %1").arg(help);
+	mSeverityAction->setStatusTip(help);
+	mSeverityAction->setToolTip(help);
+}
+
+void ConsoleWidget::onSeverityUp()
+{
+	this->onSeverityChange(-1);
+}
+
+void ConsoleWidget::onSeverityDown()
+{
+	this->onSeverityChange(+1);
+}
+
+void ConsoleWidget::onSeverityChange(int delta)
+{
+	LOG_SEVERITY severity = mMessageFilter->getLowestSeverity();
+	int val = (int)severity + delta;
+	val = constrainValue(val, 0, int(msCOUNT)-1);
+	severity = static_cast<LOG_SEVERITY>(val);
+
+	mMessageFilter->setLowestSeverity(severity);
+	this->updateUI();
+}
+
+void ConsoleWidget::createChannelSelector()
+{
+	QString defval = "console";
+	mChannels << "all";
+	mChannels << defval;
+
+	StringDataAdapterXmlPtr retval;
+	retval = StringDataAdapterXml::initialize("ChannelSelector",
+											  "", "Log Channel to display",
+											  defval, mChannels, QDomNode());
+	connect(retval.get(), &StringDataAdapter::changed, this, &ConsoleWidget::onChannelSelectorChanged);
+	mChannelSelector = retval;
+}
+
+void ConsoleWidget::addDetailsButton(QBoxLayout* buttonLayout)
+{
+	QIcon icon(":/icons/open_icon_library/system-run-5.png");
+	QAction* action = this->createAction(this,
+										 icon,
+										 "Details", "Show detailed info on each log entry",
+										 SLOT(updateUI()),
+										 buttonLayout, new CXSmallToolButton());
+	action->setCheckable(true);
+
+	bool value = settings()->value("console/showDetails").toBool();
+	action->blockSignals(true);
+	action->setChecked(value);
+	action->blockSignals(false);
+
+	mDetailsAction = action;
+}
+
+void ConsoleWidget::updateUI()
+{
+	this->updateSeverityIndicator();
+
+	// reset content of browser
+	mBrowser->clear();
+	mMessageListener->restart();
+
+}
+
+void ConsoleWidget::onChannelSelectorChanged()
+{
+	mMessageFilter->setActiveChannel(mChannelSelector->getValue());
+
+	this->updateUI();
 }
 
 void ConsoleWidget::contextMenuEvent(QContextMenuEvent* event)
 {
-	QMenu *menu = createStandardContextMenu();
+	QMenu *menu = mBrowser->createStandardContextMenu();
 	menu->addSeparator();
 	menu->addAction(mLineWrappingAction);
 	menu->exec(event->globalPos());
@@ -87,22 +269,45 @@ void ConsoleWidget::contextMenuEvent(QContextMenuEvent* event)
 
 void ConsoleWidget::showEvent(QShowEvent* event)
 {
-	this->horizontalScrollBar()->setValue(this->horizontalScrollBar()->minimum());
+	mBrowser->horizontalScrollBar()->setValue(mBrowser->horizontalScrollBar()->minimum());
 }
 
-void ConsoleWidget::printMessage(Message message)
+void ConsoleWidget::receivedMessage(Message message)
 {
-	if (message.getMessageLevel()==mlVOLATILE)
-		return;
+	if (!mChannels.count(message.mChannel))
+	{
+		mChannels.append(message.mChannel);
+		mChannelSelector->setValueRange(mChannels);
+	}
 
+	this->printMessage(message);
+}
+
+void ConsoleWidget::printMessage(const Message& message)
+{
 	this->format(message);
-	this->append(message.getPrintableMessage());
+
+	if (mDetailsAction->isChecked())
+		mBrowser->append(message.getPrintableMessage());
+	else
+		mBrowser->append(this->getCompactMessage(message));
+}
+
+QString ConsoleWidget::getCompactMessage(Message message)
+{
+	if(message.mMessageLevel == mlRAW)
+		return message.mText;
+
+	QString retval;
+	retval= QString("[%1] %2")
+			.arg(message.mTimeStamp.toString("hh:mm"))
+			.arg(message.mText);
+	return retval;
 }
 
 void ConsoleWidget::lineWrappingSlot(bool checked)
 {
-	this->setLineWrapMode(checked ? QTextEdit::WidgetWidth : QTextEdit::NoWrap);
-	//reportDebug("LineWrapping: " + qstring_cast(checked));
+	mBrowser->setLineWrapMode(checked ? QTextEdit::WidgetWidth : QTextEdit::NoWrap);
 }
 
 void ConsoleWidget::createTextCharFormats()
@@ -116,11 +321,11 @@ void ConsoleWidget::createTextCharFormats()
 	mFormat[mlCOUT].setForeground(Qt::darkGray);
 }
 
-void ConsoleWidget::format(Message& message)
+void ConsoleWidget::format(const Message& message)
 {
 	if (!mFormat.count(message.getMessageLevel()))
 		return;
-	this->setCurrentCharFormat(mFormat[message.getMessageLevel()]);
+	mBrowser->setCurrentCharFormat(mFormat[message.getMessageLevel()]);
 
 }
 

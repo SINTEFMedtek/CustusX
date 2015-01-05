@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxVector3D.h"
 #include "cxImageTF3D.h"
-#include "cxLogger.h"
+
 #include "cxTypeConversions.h"
 
 namespace cx

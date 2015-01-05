@@ -48,9 +48,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSettings.h"
 #include "cxDataLocations.h"
 #include "cxPluginFrameworkUtilities.h"
-#include "cxReporter.h"
-#include "cxFileHelpers.h"
 
+#include "cxFileHelpers.h"
+#include "cxLogger.h"
 #include <iostream>
 #include "cxTypeConversions.h"
 

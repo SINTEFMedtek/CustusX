@@ -37,8 +37,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStringList>
 #include <algorithm>
 #include <qfileinfo.h>
-#include "cxReporter.h"
+
 #include "cxTypeConversions.h"
+#include "cxLogger.h"
+
 
 ProbeXmlConfigParserImpl::ProbeXmlConfigParserImpl(QString& pathToXml)
 {

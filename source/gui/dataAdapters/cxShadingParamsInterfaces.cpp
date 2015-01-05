@@ -40,8 +40,8 @@ DoubleDataAdapterShadingBase::DoubleDataAdapterShadingBase(PatientModelServicePt
 	mPatientModelService(patientModelService)
 {
 	mActiveImageProxy = ActiveImageProxy::New(patientModelService);
-	connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChanged()));
-	connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SIGNAL(changed()));
+	connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &DoubleDataAdapterShadingBase::activeImageChanged);
+	connect(mActiveImageProxy.get(), &ActiveImageProxy::transferFunctionsChanged, this, &DataAdapter::changed);
 }
 
 void DoubleDataAdapterShadingBase::activeImageChanged()

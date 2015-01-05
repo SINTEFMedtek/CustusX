@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxElastixManager.h"
 
 #include <QDir>
-#include "cxLogger.h"
+
 #include "cxTime.h"
 #include "cxDataLocations.h"
 #include "cxElastixExecuter.h"
@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxVisualizationService.h"
 #include "cxVolumeHelpers.h"
+#include "cxLogger.h"
 
 namespace cx
 {

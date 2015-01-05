@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/bind.hpp>
 #include <ctkPluginContext.h>
 #include "cxNullDeleter.h"
-#include "cxReporter.h"
+
 #include <QDomNode>
 
 namespace cx
@@ -118,9 +118,9 @@ bool VisualizationServiceProxy::renderingIsEnabled() const
 	return mVisualizationService->renderingIsEnabled();
 }
 
-QWidget* VisualizationServiceProxy::getLayoutWidget(int index)
+QWidget* VisualizationServiceProxy::getLayoutWidget(QWidget* parent, int index)
 {
-	return mVisualizationService->getLayoutWidget(index);
+	return mVisualizationService->getLayoutWidget(parent, index);
 }
 
 QString VisualizationServiceProxy::getActiveLayout(int widgetIndex) const
@@ -177,21 +177,5 @@ void VisualizationServiceProxy::removePreview()
 {
 	mVisualizationService->removePreview();
 }
-
-void VisualizationServiceProxy::clear()
-{
-	mVisualizationService->clear();
-}
-
-void VisualizationServiceProxy::addXml(QDomNode& parentNode)
-{
-	mVisualizationService->addXml(parentNode);
-}
-
-void VisualizationServiceProxy::parseXml(QDomNode viewmanagerNode)
-{
-	mVisualizationService->parseXml(viewmanagerNode);
-}
-
 
 } //cx

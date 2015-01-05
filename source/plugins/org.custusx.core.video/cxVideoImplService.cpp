@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ctkPluginContext.h>
 #include "boost/bind.hpp"
 #include "cxData.h"
-#include "cxReporter.h"
+
 #include "cxRegistrationTransform.h"
 
 #include "cxPlaybackUSAcquisitionVideo.h"
@@ -44,8 +44,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxTrackingService.h"
 #include "cxVideoServiceBackend.h"
-#include "cxReporter.h"
 
+#include "cxLogger.h"
 #include "cxTrackingServiceProxy.h"
 #include "cxPatientModelServiceProxy.h"
 #include "cxSpaceProviderImpl.h"
@@ -246,12 +246,12 @@ void VideoImplService::setConnectionMethod(QString connectionMethod)
 
 	if(connectionMethod.isEmpty())
 	{
-		reporter()->sendWarning("Trying to set connection method to empty string");
+		reportWarning("Trying to set connection method to empty string");
 		return;
 	}
 
 	mConnectionMethod = connectionMethod;
-	emit connectionMethodChanged();
+//	emit connectionMethodChanged();
 }
 
 std::vector<TimelineEvent> VideoImplService::getPlaybackEvents()

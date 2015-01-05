@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPushButton>
 #include <QCheckBox>
 #include <QVBoxLayout>
-#include "cxReporter.h"
+
 #include "cxTrackingService.h"
 #include "cxPatientModelService.h"
 #include "cxRegistrationService.h"
