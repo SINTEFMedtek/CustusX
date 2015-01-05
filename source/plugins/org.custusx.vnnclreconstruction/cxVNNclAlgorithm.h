@@ -1,4 +1,4 @@
-﻿/*=========================================================================
+/*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
 
 Copyright (c) 2008-2014, SINTEF Department of Medical Technology
@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 /**
- *  Original author Tord �ygard
+ *  Original author Tord Øygard
  */
 class VNNclAlgorithm
 {

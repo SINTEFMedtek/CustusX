@@ -1,4 +1,4 @@
-﻿project(org_custusx_vnnclreconstruction)
+project(org_custusx_vnnclreconstruction)
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 

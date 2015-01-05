@@ -1,4 +1,4 @@
-﻿/*
+/*
  * cxtestDummyVNNclReconstruction.cpp
  *
  *  Created on: Dec 9, 2014
