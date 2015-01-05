@@ -120,6 +120,8 @@ public:
 	~ConsoleWidget();
 	virtual QString defaultWhatsThis() const;
 
+	void setDetails(bool on);
+
 protected slots:
 	void contextMenuEvent(QContextMenuEvent* event);
 	virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget

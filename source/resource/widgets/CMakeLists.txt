@@ -7,6 +7,7 @@ set(QXT_FOLDER ${CustusX_SOURCE_DIR}/source/ThirdParty/qxt)
 cx_add_class_qt_moc(CX_RESOURCE_WIDGETS_FILES
 	cxOptimizedUpdateWidget
 	cxConsoleWidget
+	cxConsoleWidgetCollection
 	cxDoubleWidgets
 	cxLabeledComboBoxWidget
 	cxDetailedLabeledComboBoxWidget

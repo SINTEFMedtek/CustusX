@@ -390,6 +390,11 @@ QString ConsoleWidget::defaultWhatsThis() const
 			"</html>";
 }
 
+void ConsoleWidget::setDetails(bool on)
+{
+	mDetailsAction->setChecked(on);
+}
+
 void ConsoleWidget::addSeverityButtons(QBoxLayout* buttonLayout)
 {
 	QAction* actionUp = this->createAction(this,
@@ -513,6 +518,7 @@ void ConsoleWidget::updateUI()
 {
 	this->updateSeverityIndicator();
 
+	this->setWindowTitle("Console: " + mChannelSelector->getValue());
 	this->selectMessagesWidget();
 
 	// reset content of browser
