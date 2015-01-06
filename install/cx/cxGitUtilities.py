@@ -39,22 +39,33 @@ def findGitRepositories(path):
 class GitRepository(object):
     def __init__(self, path):
         self.path = path
-        self.name = os.path.basename(self.path)
         self.clean = False
         self.modified_files = False
         self.deleted_files = False
         self.untracked_files = False
         self.renamed_files = False
+        #self.branch_is_ahead = False
         
-    def get_name(self):
-        return self.name
+    def get_branch_name(self):
+        text = self.__run_git_command('rev-parse --abbrev-ref HEAD').stdout
+        text = text.strip() #removing newline
+        return text
         
-    def status(self):
-        return_value = self.__run_git_command('status', True)
+    def checkout_branch(self, branch_name):
+        return_value = self.__run_git_command('checkout %s' % branch_name)
+        
+    def pull(self):
+        return_value = self.__run_git_command('pull')
+        
+    def push(self):
+        return_value = self._run_git_command('push')
+        
+    def query_status(self):
+        return_value = self.__run_git_command('status')
         self.__evaluate(return_value)
         
-    def branch_info(self):
-        text = self.__run_git_command('status --porcelain -b', True).stdout
+    def query_branch_info(self):
+        text = self.__run_git_command('status --porcelain -b').stdout
         hit = re.match(r'##(.*)\n', text)
         if hit:
             if hit.group(1):
@@ -66,10 +77,9 @@ class GitRepository(object):
             branch_ahead = hit.group(1)
         
         text = text.split('...')[0]
-        self.branch_name = text
         self.branch_ahead = branch_ahead
         
-    def __run_git_command(self, command, silent):
+    def __run_git_command(self, command, silent=True):
         shell.setSilent(silent)
         shell.changeDir(self.path)
         return shell.run('git '+command, keep_output=True, silent=silent)
@@ -130,9 +140,9 @@ class Reporter(object):
             return
             
         for repo in self.git_repositories:
-            repo.status()
-            repo.branch_info()
-            b = repo.branch_name 
+            repo.query_status()
+            repo.query_branch_info()
+            b = repo.get_branch_name() 
             p = self.__get_repo_path(repo)
             d = self.__get_repo_details(repo)
             a = '*'
@@ -185,9 +195,20 @@ class Reporter(object):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Display condensed git status for all projects.')
     parser.add_argument('root_path', help='the top directory to recursively look for git repositories in (abs or rel)') 
+    parser.add_argument('-c', '--command', help='specify what you want to do', action='append', choices=['status', 'pull', 'push', 'checkout'], default=[])
+    parser.add_argument('-b', '--branch', help='specify which branch you want', default='master')
     args = parser.parse_args()
+    
+    print args
     
     root_path = os.path.abspath(args.root_path)
     reporter = Reporter(root_path)
-    reporter.print_status()
     
+    if('checkout' in args.command):
+        pass
+    if(not args.command or 'status' in args.command):
+        reporter.print_status()
+    if('pull' in args.command):
+        pass
+    if('push' in args.command):
+        pass
