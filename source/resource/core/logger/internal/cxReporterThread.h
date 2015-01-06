@@ -109,7 +109,6 @@ private:
 	int getDefaultTimeout(MESSAGE_LEVEL messageLevel) const;
 
 	bool initializeLogFile(LogFile file);
-//	QString getFilenameForChannel(QString channel) const;
 
 	void sendToFile(Message message);
 	void sendToCout(Message message);

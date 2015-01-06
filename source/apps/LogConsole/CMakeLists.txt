@@ -52,3 +52,5 @@ cx_remove_duplicate_include_directories()
 
 add_executable(LogConsole ${SOURCES})
 target_link_libraries(LogConsole ${LINK_LIBRARIES} )
+
+cx_install_target(LogConsole)

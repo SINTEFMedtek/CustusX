@@ -58,6 +58,8 @@ class DockWidgets;
 typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
 typedef boost::shared_ptr<class LayoutInteractor> LayoutInteractorPtr;
 typedef boost::shared_ptr<class VisServices> VisServicesPtr;
+typedef boost::shared_ptr<class ProcessWrapper> ProcessWrapperPtr;
+
 
 /**
  * \class MainWindow
@@ -130,6 +132,7 @@ protected slots:
 	void shootWindow();
 	void recordFullscreen();
 
+	void onStartLogConsole();
 	void toggleDebugModeSlot(bool checked);
 	void dockWidgetVisibilityChanged(bool val);
 	void focusChanged(QWidget * old, QWidget * now);
@@ -174,6 +177,7 @@ private:
 	//actions and actiongroups
 	QAction* mAboutAction;
 	QAction* mPreferencesAction;
+	QAction* mStartLogConsoleAction;
 	QAction* mDebugModeAction;
 	QAction* mFullScreenAction;
 	QAction* mQuitAction;
@@ -232,6 +236,7 @@ private:
 	//widgets
 	QPointer<class SecondaryMainWindow> mControlPanel;
 	QPointer<class SecondaryViewLayoutWindow> mSecondaryViewLayoutWindow;
+	ProcessWrapperPtr mLocalVideoServerProcess;
 
 	DockWidgets* mDockWidgets;
 	std::set<QToolBar*> mToolbars;

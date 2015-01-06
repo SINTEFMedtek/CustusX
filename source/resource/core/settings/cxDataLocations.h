@@ -70,13 +70,13 @@ public:
 	static QString getExistingConfigPath(QString pathRelativeToConfigRoot, QString alternativeAbsolutePath, QString filename=""); ///< Return folder path. Path is typically either relative to config root (created during installation), or an alternative absolute path (typically in the source tree)
 
   static void setTestMode(); ///< set a testing mode that changes location of settings files to a temp folder.
+  static QString findExecutableInStandardLocations(QString filename); ///< look for an exe in the same folder as the executable or bundle.
 
 private:
   static bool mTestMode;
   static QString readTestDataPathFromFile(QString filename);
   static QStringList appendStringToAllElements(QStringList root, QString suffix);
-//  static DataLocations* mInstance;
-//  static DataLocations getInstance();
+  static QString checkExecutableExist(QString path, QString filename);
 
 };
 

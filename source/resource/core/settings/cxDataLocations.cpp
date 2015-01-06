@@ -266,4 +266,30 @@ QString DataLocations::getExistingConfigPath(QString pathRelativeToConfigRoot, Q
 	return "";
 }
 
+QString DataLocations::checkExecutableExist(QString path, QString filename)
+{
+	QStringList retval;
+	path = QDir::cleanPath(path);
+	if (QDir(path).exists(filename))
+		return QDir(DataLocations::getBundlePath()).absoluteFilePath(path + "/" + filename);
+	return "";
+}
+
+QString DataLocations::findExecutableInStandardLocations(QString filename)
+{
+	QString result;
+#ifdef __APPLE__
+	// run from installed folder on mac
+	result = DataLocations::checkExecutableExist(qApp->applicationDirPath(), filename);
+	if (!result.isEmpty())
+		return result;
+#endif
+	// run from installed or build bin folder
+	result = DataLocations::checkExecutableExist(DataLocations::getBundlePath(), filename);
+	if (!result.isEmpty())
+		return result;
+
+	return result;
+}
+
 } // namespace cx

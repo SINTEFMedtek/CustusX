@@ -158,6 +158,9 @@ DetailedLogMessageDisplayWidget::DetailedLogMessageDisplayWidget(QWidget *parent
 			continue;
 		mTable->setColumnWidth(i, value);
 	}
+
+	int textLineHeight = metric.lineSpacing();
+	mTable->verticalHeader()->setDefaultSectionSize(textLineHeight);
 }
 
 DetailedLogMessageDisplayWidget::~DetailedLogMessageDisplayWidget()
@@ -181,17 +184,12 @@ void DetailedLogMessageDisplayWidget::normalize()
 
 void DetailedLogMessageDisplayWidget::add(const Message& message)
 {
-	QFontMetrics metric(this->font());
-	int textLineHeight = metric.lineSpacing();
-//	int h2 = mTable->rowHeight(0);
+//	QFontMetrics metric(this->font());
+//	int textLineHeight = metric.lineSpacing();
 
 	int row = mTable->rowCount();
 	mTable->insertRow(row);
-//	std::cout << "insert row " << row << std::endl;
-	mTable->setRowHeight(row, textLineHeight);
-
-//	this->addItem(0, QString::number(height), message);
-//	this->addItem(1, QString::number(h2), message);
+//	mTable->setRowHeight(row, textLineHeight);
 
 	QTableWidgetItem* item = NULL;
 

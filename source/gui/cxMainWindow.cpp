@@ -367,8 +367,12 @@ void MainWindow::createActions()
 	mPreferencesAction->setShortcut(tr("Ctrl+,"));
 	mPreferencesAction->setStatusTip(tr("Show the preferences dialog"));
 
+	mStartLogConsoleAction = new QAction(tr("&Start Log Console"), this);
+	mStartLogConsoleAction->setShortcut(tr("Ctrl+D"));
+	mStartLogConsoleAction->setStatusTip(tr("Open Log Console as external application"));
+	connect(mStartLogConsoleAction, &QAction::triggered, this, &MainWindow::onStartLogConsole);
+
 	mDebugModeAction = new QAction(tr("&Debug Mode"), this);
-	mDebugModeAction->setShortcut(tr("Ctrl+D"));
 	mDebugModeAction->setCheckable(true);
 	mDebugModeAction->setChecked(patientService()->getDebugMode());
 	mDebugModeAction->setStatusTip(tr("Set debug mode, this enables lots of weird stuff."));
@@ -517,6 +521,15 @@ void MainWindow::recordFullscreen()
 	else
 		vlc()->startRecording(path);
 
+}
+
+void MainWindow::onStartLogConsole()
+{
+	QString fullname = DataLocations::findExecutableInStandardLocations("LogConsole");
+	std::cout << "MainWindow::onStartLogConsole() " << fullname << std::endl;
+//	ProcessWrapperPtr mLocalVideoServerProcess;
+	mLocalVideoServerProcess.reset(new ProcessWrapper(QString("LogConsole")));
+	mLocalVideoServerProcess->launchWithRelativePath(fullname, QStringList());
 }
 
 void MainWindow::toggleDebugModeSlot(bool checked)
@@ -864,6 +877,7 @@ void MainWindow::createMenus()
 	mFileMenu->addAction(mDeleteDataAction);
 	mFileMenu->addSeparator();
 	mFileMenu->addAction(mFullScreenAction);
+	mFileMenu->addAction(mStartLogConsoleAction);
 	mFileMenu->addAction(mDebugModeAction);
 	mFileMenu->addAction(mShootScreenAction);
 	mFileMenu->addAction(mShootWindowAction);
