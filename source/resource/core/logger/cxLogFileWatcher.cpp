@@ -54,11 +54,19 @@ namespace cx
 
 Log::Log()
 {
+	mLogPath = this->getDefaultLogPath();
 }
 
 Log::~Log()
 {
 	this->stopThread();
+}
+
+QString Log::getDefaultLogPath() const
+{
+	QString isoDateFormat("yyyy-MM-dd");
+	QString isoDate = QDateTime::currentDateTime().toString(isoDateFormat);
+	return DataLocations::getRootConfigPath()+"/Logs/"+isoDate;
 }
 
 void Log::initializeObject()

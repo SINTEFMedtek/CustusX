@@ -60,17 +60,12 @@ Reporter* reporter()
 	return Reporter::getInstance();
 }
 
-Reporter::Reporter()// :
-//	mThread(NULL)
+Reporter::Reporter()
 {	
-//	connect(this, &Reporter::emittedMessage, this, &Reporter::onEmittedMessage);
-//	this->stopThread();
-//	this->startThread();
 }
 
 Reporter::~Reporter()
 {
-//	this->stopThread();
 }
 
 Reporter* Reporter::getInstance()
@@ -84,74 +79,19 @@ Reporter* Reporter::getInstance()
 
 void Reporter::initialize()
 {
-//	Reporter::getInstance();
 	Reporter::getInstance()->initializeObject();
 }
-
-//void Reporter::initializeObject()
-//{
-////	mListener = MessageListener::create();
-
-//	this->stopThread();
-//	this->startThread();
-//}
 
 LogThreadPtr Reporter::createWorker()
 {
 	return LogThreadPtr(new ReporterThread());
 }
 
-//void Reporter::startThread()
-//{
-//	if (mThread)
-//		return;
-
-//	mThread.reset(new QThread());
-//	mThread->setObjectName("org.custusx.resource.core.logger");
-
-//	mWorker.reset(new ReporterThread());
-//	mWorker->moveToThread(mThread.get());
-//	if (!mLogPath.isEmpty())
-//		mWorker->setLoggingFolder(mLogPath);
-//	connect(mWorker.get(), &ReporterThread::emittedMessage, this, &Reporter::onEmittedMessage);
-
-//	mThread->start();
-//}
-
-//void Reporter::stopThread()
-//{
-//	if (!mThread)
-//		return;
-
-//	disconnect(mWorker.get(), &ReporterThread::emittedMessage, this, &Reporter::onEmittedMessage);
-//	boost::shared_ptr<class ReporterThread> tempWorker = mWorker;
-//	mWorker.reset();
-
-//	mThread->quit();
-//	mThread->wait(); // forever or until dead thread
-
-//	mThread.reset();
-//	tempWorker.reset();
-//}
-
 void Reporter::shutdown()
 {
   delete mTheInstance;
   mTheInstance = NULL;
 }
-
-//void Reporter::setLoggingFolder(QString absoluteLoggingFolderPath)
-//{
-//	mLogPath = absoluteLoggingFolderPath;
-//	if (mWorker)
-//		mWorker->setLoggingFolder(mLogPath);
-
-////	if (mThread)
-////	{
-////		this->stopThread();
-////		this->startThread();
-////	}
-//}
 
 void Reporter::onEmittedMessage(Message message)
 {
@@ -210,7 +150,6 @@ void Reporter::sendMessage(QString text, MESSAGE_LEVEL messageLevel, int timeout
 	message.mMuted = mute;
 	this->sendMessage(message);
 }
-
 
 void Reporter::sendMessage(Message message)
 {
@@ -288,19 +227,5 @@ void Reporter::playSampleSound()
   if(this->hasAudioSource())
     mAudioSource->playSampleSound();
 }
-
-//void Reporter::installObserver(MessageObserverPtr observer, bool resend)
-//{
-//	if (mWorker)
-//		mWorker->installObserver(observer, resend);
-//}
-
-//void Reporter::uninstallObserver(MessageObserverPtr observer)
-//{
-//	if (mWorker)
-//		mWorker->uninstallObserver(observer);
-//}
-
-
 
 } //End namespace cx

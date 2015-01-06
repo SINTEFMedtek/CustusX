@@ -89,12 +89,16 @@ QString Message::getPrintableMessage() const
 	if(mMessageLevel == mlRAW)
 		printableMessage = mText;
 	else
-		printableMessage = QString("[%1][%2][%3][%4] %5")
+		printableMessage = QString("[%1][%2] %3")
 				.arg(mTimeStamp.toString("hh:mm:ss.zzz"))
-				.arg(source)
-				.arg(mThread)
 				.arg(qstring_cast(mMessageLevel))
 				.arg(mText);
+//		printableMessage = QString("[%1][%2][%3][%4] %5")
+//				.arg(mTimeStamp.toString("hh:mm:ss.zzz"))
+//				.arg(source)
+//				.arg(mThread)
+//				.arg(qstring_cast(mMessageLevel))
+//				.arg(mText);
 
 	return printableMessage;
 }

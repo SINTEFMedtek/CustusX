@@ -98,6 +98,7 @@ protected:
   void startThread();
   void stopThread();
 
+  QString getDefaultLogPath() const;
   QString mLogPath;
   boost::shared_ptr<class QThread> mThread;
   LogThreadPtr mWorker;

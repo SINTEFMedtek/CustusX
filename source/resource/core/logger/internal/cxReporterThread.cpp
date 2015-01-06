@@ -73,9 +73,9 @@ ReporterThread::ReporterThread(QObject *parent) :
 	mCout.reset(new SingleStreamerImpl(std::cout, mlCOUT));
 	mCerr.reset(new SingleStreamerImpl(std::cerr, mlCERR));
 
-	QString isoDateFormat("yyyy-MM-dd");
-	QString isoDate = QDateTime::currentDateTime().toString(isoDateFormat);
-	this->setLoggingFolder(DataLocations::getRootConfigPath()+"/Logs/"+isoDate);
+//	QString isoDateFormat("yyyy-MM-dd");
+//	QString isoDate = QDateTime::currentDateTime().toString(isoDateFormat);
+//	this->setLoggingFolder(DataLocations::getRootConfigPath()+"/Logs/"+isoDate);
 }
 
 ReporterThread::~ReporterThread()

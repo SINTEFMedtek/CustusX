@@ -57,6 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStackedLayout>
 #include <QApplication>
 #include <QClipboard>
+#include "cxNullDeleter.h"
 
 namespace cx
 {
@@ -308,14 +309,34 @@ void SimpleLogMessageDisplayWidget::format(const Message& message)
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
+ConsoleWidget::ConsoleWidget(QWidget* parent, QString uid, QString name, XmlOptionFile options, LogPtr log) :
+	BaseWidget(parent, uid, name)
+{
+	mOptions = options;
+	mLog = log;
+
+	this->setupUI();
+}
+
 ConsoleWidget::ConsoleWidget(QWidget* parent, QString uid, QString name) :
 	BaseWidget(parent, uid, name),
 	mLineWrappingAction(new QAction(tr("Line wrapping"), this)),
 	mSeverityAction(NULL),
 	mMessagesWidget(NULL)
 {
-	this->setWhatsThis(this->defaultWhatsThis());
 	mOptions = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend(this->objectName());
+	mLog = LogPtr(reporter(), null_deleter());
+
+	this->setupUI();
+}
+
+void ConsoleWidget::setupUI()
+{
+	mLineWrappingAction = new QAction(tr("Line wrapping"), this);
+	mSeverityAction = NULL;
+	mMessagesWidget = NULL;
+
+	this->setWhatsThis(this->defaultWhatsThis());
 
 	QVBoxLayout* layout = new QVBoxLayout;
 	layout->setMargin(0);
@@ -344,21 +365,13 @@ ConsoleWidget::ConsoleWidget(QWidget* parent, QString uid, QString name) :
 	mStackedLayout->setMargin(0);
 	layout->addLayout(mStackedLayout);
 
-
-//	mMessagesWidget = new SimpleLogMessageDisplayWidget(this);
-//	mMessagesWidget = new DetailedLogMessageDisplayWidget(this);
-//	mStackedLayout->addWidget(mMessagesWidget);
-
-//	mLog = LogFileWatcher::create();
-
-	mMessageListener = MessageListener::create();
+	mMessageListener = MessageListener::create(mLog);
 	mMessageFilter.reset(new MessageFilterConsole);
 	mMessageListener->installFilter(mMessageFilter);
 	connect(mMessageListener.get(), &MessageListener::newMessage, this, &ConsoleWidget::receivedMessage);
 
 	QString defVal = enum2string<LOG_SEVERITY>(msINFO);
-	XmlOptionItem showLevelItem("showLevel", mOptions.getElement());
-	LOG_SEVERITY value = string2enum<LOG_SEVERITY>(showLevelItem.readValue(defVal));
+	LOG_SEVERITY value = string2enum<LOG_SEVERITY>(this->option("showLevel").readValue(defVal));
 	mMessageFilter->setLowestSeverity(value);
 
 	mMessageFilter->setActiveChannel(mChannelSelector->getValue());
@@ -371,14 +384,17 @@ ConsoleWidget::ConsoleWidget(QWidget* parent, QString uid, QString name) :
 	this->updateUI();
 }
 
+XmlOptionItem ConsoleWidget::option(QString name)
+{
+	return XmlOptionItem(name, mOptions.getElement());
+}
+
 ConsoleWidget::~ConsoleWidget()
 {
-	XmlOptionItem showLevelItem("showLevel", mOptions.getElement());
 	QString levelString = enum2string<LOG_SEVERITY>(mMessageFilter->getLowestSeverity());
-	showLevelItem.writeValue(levelString);
+	this->option("showLevel").writeValue(levelString);
 
-	XmlOptionItem showDetailsItem("showDetails", mOptions.getElement());
-	showDetailsItem.writeVariant(mDetailsAction->isChecked());
+	this->option("showDetails").writeVariant(mDetailsAction->isChecked());
 }
 
 QString ConsoleWidget::defaultWhatsThis() const
@@ -505,8 +521,7 @@ void ConsoleWidget::addDetailsButton(QBoxLayout* buttonLayout)
 										 buttonLayout, new CXSmallToolButton());
 	action->setCheckable(true);
 
-	XmlOptionItem showDetailsItem("showDetails", mOptions.getElement());
-	bool value = showDetailsItem.readVariant(false).toBool();
+	bool value = this->option("showDetails").readVariant(false).toBool();
 	action->blockSignals(true);
 	action->setChecked(value);
 	action->blockSignals(false);

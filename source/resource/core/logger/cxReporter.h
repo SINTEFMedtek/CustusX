@@ -91,11 +91,7 @@ public:
 
   static Reporter* getInstance(); ///< Returns a reference to the only Reporter that exists.
 
-//  virtual void setLoggingFolder(QString absoluteLoggingFolderPath); // deprecated
   void setAudioSource(AudioPtr audioSource); ///< define sounds to go with the messages.
-
-//  virtual void installObserver(MessageObserverPtr observer, bool resend);
-//  virtual void uninstallObserver(MessageObserverPtr observer);
 
   //Text
   void sendInfo(QString info); ///< Used to report normal interesting activity, no sound associated
@@ -129,22 +125,14 @@ protected:
 
 private:
   bool hasAudioSource() const;
-//  void initializeObject();
   Reporter();
   virtual ~Reporter();
   Reporter(const Reporter&);
   Reporter& operator=(const Reporter&);
 
   void playSound(MESSAGE_LEVEL messageLevel);
-//  void startThread();
-//  void stopThread();
 
-//  QString mLogPath;
   AudioPtr mAudioSource;
-
-//  class QThread* mThread;
-//  boost::shared_ptr<class QThread> mThread;
-//  boost::shared_ptr<class ReporterThread> mWorker;
 
   static Reporter *mTheInstance; // global variable
 };

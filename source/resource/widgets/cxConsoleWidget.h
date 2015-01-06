@@ -117,6 +117,7 @@ Q_OBJECT
 
 public:
 	ConsoleWidget(QWidget* parent, QString uid="ConsoleWidget", QString name="Console");
+	ConsoleWidget(QWidget* parent, QString uid, QString name, XmlOptionFile options, LogPtr log);
 	~ConsoleWidget();
 	virtual QString defaultWhatsThis() const;
 
@@ -138,6 +139,8 @@ private slots:
 	void clearTable();
 
 private:
+	XmlOptionItem option(QString name);
+	void setupUI();
 	void printMessage(const Message& message); ///< prints the message into the console
 	void addSeverityButtons(QBoxLayout* buttonLayout);
 	void addDetailsButton(QBoxLayout* buttonLayout);
@@ -160,7 +163,7 @@ private:
 	boost::shared_ptr<class MessageFilterConsole> mMessageFilter;
 	XmlOptionFile mOptions;
 
-//	LogFileWatcherPtr mLog;
+	LogPtr mLog;
 };
 } // namespace cx
 #endif /* CXCONSOLEWIDGET_H_ */

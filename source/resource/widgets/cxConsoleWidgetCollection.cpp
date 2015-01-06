@@ -42,15 +42,30 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDataStream>
 
 #include "cxConsoleWidget.h"
+#include "cxNullDeleter.h"
 
 namespace cx
 {
 
+ConsoleWidgetCollection::ConsoleWidgetCollection(QWidget* parent, QString objectName, QString windowTitle, XmlOptionFile options, LogPtr log) :
+	QMainWindow(parent), mObjectName(objectName), mWindowTitle(windowTitle)
+{
+	mOptions = options;
+	mLog = log;
 
-
+	this->setupUI();
+}
 
 ConsoleWidgetCollection::ConsoleWidgetCollection(QWidget* parent, QString objectName, QString windowTitle) :
 	QMainWindow(parent), mObjectName(objectName), mWindowTitle(windowTitle)
+{
+	mOptions = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend(this->objectName());
+	mLog = LogPtr(reporter(), null_deleter());
+
+	this->setupUI();
+}
+
+void ConsoleWidgetCollection::setupUI()
 {
 	this->setFocusPolicy(Qt::StrongFocus); // needed for help system: focus is used to display help text
 	this->setObjectName(mObjectName);
@@ -59,7 +74,7 @@ ConsoleWidgetCollection::ConsoleWidgetCollection(QWidget* parent, QString object
 	this->setDockNestingEnabled(true);
 	this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
 
-	mOptions = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend(this->objectName());
+//	mOptions = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend(this->objectName());
 
 	int consoleCount = this->option("consoleCount").readVariant(-1).toInt();
 
@@ -173,7 +188,7 @@ void ConsoleWidgetCollection::deleteDockWidget(QDockWidget* dockWidget)
 void ConsoleWidgetCollection::onNewConsole()
 {
 	QString uid = QString("ConsoleWidget%1").arg(mDockWidgets.size());
-	ConsoleWidget* console = new ConsoleWidget(this, uid, "Console");
+	ConsoleWidget* console = new ConsoleWidget(this, uid, "Console", mOptions.descend(uid), mLog);
 	console->setDetails(true);
 	this->addAsDockWidget(console);
 }

@@ -29,50 +29,53 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#include <QApplication>
+#include <iostream>
 
-#ifndef CXCONSOLEWIDGETCOLLECTION_H
-#define CXCONSOLEWIDGETCOLLECTION_H
+#include "cxTypeConversions.h"
+#include "cxLogicManager.h"
+#include "cxApplication.h"
+#include "cxPluginFramework.h"
+#include "cxDataLocations.h"
+#include "cxLogFileWatcher.h"
 
-#include <QMainWindow>
-#include "cxXmlOptionItem.h"
-#include <boost/shared_ptr.hpp>
-class QMenu;
+#include "cxConsoleWidgetCollection.h"
 
-namespace cx
+
+int main(int argc, char *argv[])
 {
-typedef boost::shared_ptr<class Log> LogPtr;
 
-class ConsoleWidgetCollection : public QMainWindow
-{
-	Q_OBJECT
-public:
-	ConsoleWidgetCollection(QWidget* parent, QString objectName, QString windowTitle, XmlOptionFile options, LogPtr log);
-	ConsoleWidgetCollection(QWidget* parent, QString objectName, QString windowTitle);
-	virtual ~ConsoleWidgetCollection();
-private slots:
-	void onDockWidgetVisibilityChanged(bool val);
-	void onNewConsole();
-	void checkVisibility();
-	void onConsoleWindowTitleChanged(const QString & title);
-protected:
-	virtual QMenu* createPopupMenu();
-private:
-	QDockWidget* addAsDockWidget(QWidget* widget);
-	QDockWidget* createDockWidget(QWidget* widget);
-	void deleteDockWidget(QDockWidget* dockWidget);
-	void removeHiddenConsoles();
+#if !defined(WIN32)
+	//for some reason this does not work with dynamic linking on windows
+	//instead we solve the problem by adding a handmade header for the cxResources.qrc file
+	Q_INIT_RESOURCE(cxResources);
+#endif
 
-	QString mObjectName;
-	QString mWindowTitle;
-	XmlOptionFile mOptions;
-	LogPtr mLog;
-	XmlOptionItem option(QString name);
-	void setupUI();
-
-	QList<QDockWidget*> mDockWidgets;
-};
-
-} //namespace cx
+	cx::Application app(argc, argv);
+	app.setOrganizationName("SINTEF");
+	app.setOrganizationDomain("www.sintef.no");
+	app.setApplicationName("LogConsole");
+	app.setWindowIcon(QIcon(":/icons/CustusX.png"));
+	app.setAttribute(Qt::AA_DontShowIconsInMenus, false);
 
 
-#endif // CXCONSOLEWIDGETCOLLECTION_H
+	QString optionsFile = cx::DataLocations::getSettingsPath()+"/logconsole.xml";
+	cx::XmlOptionFile options = cx::XmlOptionFile(optionsFile);
+//	std::cout << "Options file: " << optionsFile << std::endl;
+	CX_LOG_INFO() << "Options file: " << optionsFile;
+	cx::LogPtr log = cx::LogFileWatcher::create();
+	cx::ConsoleWidgetCollection*  mainWin = new cx::ConsoleWidgetCollection(NULL, "ConsoleWidgets", "Log Console", options, log);
+	mainWin->show();
+
+#ifdef __APPLE__ // needed on mac for bringing to front: does the opposite on linux
+	mainWin->activateWindow();
+#endif
+	mainWin->raise();
+
+	int retVal = app.exec();
+
+	delete mainWin;
+	options.save();
+
+	return retVal;
+}
