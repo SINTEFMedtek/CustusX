@@ -61,10 +61,12 @@ int main(int argc, char *argv[])
 
 	QString optionsFile = cx::DataLocations::getSettingsPath()+"/logconsole.xml";
 	cx::XmlOptionFile options = cx::XmlOptionFile(optionsFile);
-//	std::cout << "Options file: " << optionsFile << std::endl;
 	CX_LOG_INFO() << "Options file: " << optionsFile;
 	cx::LogPtr log = cx::LogFileWatcher::create();
-	cx::ConsoleWidgetCollection*  mainWin = new cx::ConsoleWidgetCollection(NULL, "ConsoleWidgets", "Log Console", options, log);
+	CX_LOG_INFO() << "Log folder: " << log->getLoggingFolder();
+	QString title = QString("Log Console [%1]").arg(log->getLoggingFolder());
+
+	cx::ConsoleWidgetCollection*  mainWin = new cx::ConsoleWidgetCollection(NULL, "ConsoleWidgets", title, options, log);
 	mainWin->show();
 
 #ifdef __APPLE__ // needed on mac for bringing to front: does the opposite on linux

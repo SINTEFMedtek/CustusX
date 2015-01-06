@@ -44,7 +44,6 @@ namespace cx
 {
 
 LogFile::LogFile() :
-//	mFilename(filename),
 	mFilePosition(0)
 {
 
@@ -70,11 +69,6 @@ LogFile LogFile::fromFilename(QString filename)
 	retval.mChannel = QFileInfo(filename).completeBaseName().split(".").back();
 	return retval;
 }
-
-//QString LogFile::getChannelName() const
-//{
-//	return QFileInfo(mFilename).completeBaseName();
-//}
 
 void LogFile::writeHeader()
 {
@@ -114,10 +108,6 @@ QString LogFile::formatMessage(Message msg)
 	// timestamp in front
 	retval += QString("[%1]").arg(msg.getTimeStamp().toString(this->timestampFormat()));
 
-//	// show source location
-//	if (!msg.getSourceLocation().isEmpty())
-//		retval += " " + QString("[%1]").arg(msg.getSourceLocation());
-
 	retval += "\t";
 	if (!msg.mThread.isEmpty())
 		retval += QString("[%1]").arg(msg.mThread);
@@ -152,9 +142,6 @@ bool LogFile::appendToLogfile(QString filename, QString text)
 	{
 		return false;
 	}
-
-	//note: writing to cout here causes recursion: disable cout redirection first.
-	//	std::cout << "writing: " << text << " to " << mLogFile << std::endl;
 
 	stream.setDevice(&file);
 	stream << text;
@@ -238,16 +225,12 @@ QString LogFile::getIndex(const QStringList& list, int index)
 
 void LogFile::parseTimestamp(QString text, Message* retval)
 {
-	QRegExp rx_ts = this->getRX_Timestamp();
+	if (text.isEmpty())
+		return;
 
-	if (!text.isEmpty() && rx_ts.indexIn(text)>=0)
-	{
-		QString format = QString("'['%1']'").arg(this->timestampFormat());
-
-		retval->mTimeStamp = mInitTimestamp; // reuse date from init, as this is not part of each line
-		QTime time = QTime::fromString(rx_ts.cap(1), this->timestampFormat());
-		retval->mTimeStamp.setTime(time);
-	}
+	retval->mTimeStamp = mInitTimestamp; // reuse date from init, as this is not part of each line
+	QTime time = QTime::fromString(text, this->timestampFormat());
+	retval->mTimeStamp.setTime(time);
 }
 
 void LogFile::parseThread(QString text, Message* retval)
@@ -281,13 +264,10 @@ MESSAGE_LEVEL LogFile::readMessageLevel(QString line)
 	QStringList levels;
 	for (int i=0; i<mlCOUNT; ++i)
 		levels << enum2string<MESSAGE_LEVEL>((MESSAGE_LEVEL)(i));
-//	std::cout << "LEVELS: " << levels.join("-") << std::endl;
 	QRegExp rx_level(QString("\\[(%1)\\]").arg(levels.join("|")));
 
 	int pos = rx_level.indexIn(line);
 	QStringList hits = rx_level.capturedTexts();
-//	std::cout << "HIT{\n"<<hits.join("\n")<<"\n}"<<std::endl;
-//	QString levelSymbol = "\t"+hits[1]+"\t";
 
 	if (hits.size()<2)
 		return mlCOUNT;
@@ -302,14 +282,12 @@ QString LogFile::removeEarlierSessionsAndSetStartTime(QString text)
 	{
 		int startpos = text.lastIndexOf(sessionStartSymbol);
 		int endpos = text.indexOf("\n", startpos); // pos of endline in last startline
-//		QString sessionStartLine = text.s;
 		QRegExp rx_ts_start("\\[([^\\]]*)");
 		if (text.indexOf(rx_ts_start))
 		{
 			QString rawTime = rx_ts_start.cap(1);
 			QString format = timestampMilliSecondsFormatNice();
 			QDateTime ts = QDateTime::fromString(rawTime, format);
-//			std::cout << "--------------TS-- " << mInitTimestamp.toString(timestampMilliSecondsFormatNice()) << std::endl;
 			if (ts.isValid())
 			mInitTimestamp = ts;
 		}
@@ -317,7 +295,6 @@ QString LogFile::removeEarlierSessionsAndSetStartTime(QString text)
 		text.remove(0, endpos+1);
 	}
 
-//	std::cout << "READ{"<<text<<"}"<<std::endl;
 	return text;
 }
 

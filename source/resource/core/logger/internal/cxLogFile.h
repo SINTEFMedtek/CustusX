@@ -59,7 +59,6 @@ public:
 	std::vector<Message> readMessages();
 
 private:
-//	QString mFilename;
 	QString mPath;
 	QString mChannel;
 	int mFilePosition;

@@ -115,6 +115,11 @@ void Log::setLoggingFolder(QString absoluteLoggingFolderPath)
 		mWorker->setLoggingFolder(mLogPath);
 }
 
+QString Log::getLoggingFolder() const
+{
+	return mLogPath;
+}
+
 void Log::installObserver(MessageObserverPtr observer, bool resend)
 {
 	if (mWorker)

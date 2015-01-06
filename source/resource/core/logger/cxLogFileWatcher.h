@@ -80,7 +80,8 @@ class cxResource_EXPORT Log : public QObject
 public:
   virtual ~Log();
 
-  void setLoggingFolder(QString absoluteLoggingFolderPath); // deprecated
+  QString getLoggingFolder() const;
+  void setLoggingFolder(QString absoluteLoggingFolderPath);
 
   void installObserver(MessageObserverPtr observer, bool resend);
   void uninstallObserver(MessageObserverPtr observer);

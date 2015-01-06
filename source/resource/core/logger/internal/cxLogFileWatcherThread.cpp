@@ -65,10 +65,6 @@ LogFileWatcherThread::LogFileWatcherThread(QObject *parent) :
 
 	connect(&mWatcher, &QFileSystemWatcher::directoryChanged, this, &LogFileWatcherThread::onDirectoryChanged);
 	connect(&mWatcher, &QFileSystemWatcher::fileChanged, this, &LogFileWatcherThread::onFileChanged);
-
-	QString isoDateFormat("yyyy-MM-dd");
-	QString isoDate = QDateTime::currentDateTime().toString(isoDateFormat);
-	this->setLoggingFolder(DataLocations::getRootConfigPath()+"/Logs/"+isoDate);
 }
 
 LogFileWatcherThread::~LogFileWatcherThread()
@@ -77,7 +73,6 @@ LogFileWatcherThread::~LogFileWatcherThread()
 
 void LogFileWatcherThread::onDirectoryChanged(const QString& path)
 {
-//	std::cout << "modified DIR: " << path << std::endl;
 	QDir info(mLogPath);
 	QStringList nameFilters;
 	nameFilters << "org.custusx.*";
@@ -124,6 +119,10 @@ void LogFileWatcherThread::executeSetLoggingFolder(QString absoluteLoggingFolder
 {
 	mLogPath = absoluteLoggingFolderPath;
 	mWatcher.addPath(mLogPath);
+
+	mWatcher.removePaths(mWatcher.directories());
+	mWatcher.removePaths(mWatcher.files());
+	this->onDirectoryChanged(mLogPath);
 }
 
 int LogFileWatcherThread::getDefaultTimeout(MESSAGE_LEVEL messageLevel) const
