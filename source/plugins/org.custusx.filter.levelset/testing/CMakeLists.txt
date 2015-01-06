@@ -32,7 +32,13 @@ if(BUILD_TESTING)
         .
         ${CMAKE_CURRENT_BINARY_DIR}
     )
-    target_link_libraries(cxtest_org_custusx_filter_levelset PRIVATE org_custusx_filter_levelset cxCatch)
+    target_link_libraries(cxtest_org_custusx_filter_levelset
+        PRIVATE
+        org_custusx_filter_levelset
+        org_custusx_core_patientmodel
+        cxtestUtilities
+        cxCatch
+    )
     cx_add_tests_to_catch(cxtest_org_custusx_filter_levelset)
 
 endif(BUILD_TESTING)
