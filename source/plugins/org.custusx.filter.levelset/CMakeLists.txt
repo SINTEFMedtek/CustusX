@@ -38,6 +38,9 @@ set(PLUGIN_target_libraries
     cxPluginAlgorithm
     levelSetSegLib
     cxResourceFilter
+    cxResource
+    cxLogicManager
+    cxPluginUtilities
     )
 
 if (CX_USE_OPENCL_UTILITY)
