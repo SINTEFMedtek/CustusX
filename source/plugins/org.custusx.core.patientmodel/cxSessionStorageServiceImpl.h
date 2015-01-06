@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSESSIONSTORAGESERVICEIMPL_H
 #define CXSESSIONSTORAGESERVICEIMPL_H
 
-#include "cxResourceExport.h"
+#include "org_custusx_core_patientmodel_Export.h"
 
 #include "cxSessionStorageService.h"
 #include <QDomDocument>
@@ -56,7 +56,7 @@ namespace cx
  * \date 2014-12-03
  * \author Christian Askeland
  */
-class cxResource_EXPORT SessionStorageServiceImpl : public SessionStorageService
+class org_custusx_core_patientmodel_EXPORT SessionStorageServiceImpl : public SessionStorageService
 {
 	Q_OBJECT
 public:

@@ -47,7 +47,7 @@ namespace cx
 class cxResource_EXPORT SessionStorageServiceProxy : public SessionStorageService
 {
 public:
-    static SessionStorageServicePtr cxResource_EXPORT create(ctkPluginContext *pluginContext);
+    static SessionStorageServicePtr create(ctkPluginContext *pluginContext);
 	SessionStorageServiceProxy(ctkPluginContext *pluginContext);
 
 	virtual ~SessionStorageServiceProxy() {}
