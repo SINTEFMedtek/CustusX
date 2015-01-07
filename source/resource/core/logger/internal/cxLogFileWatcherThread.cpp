@@ -120,8 +120,10 @@ void LogFileWatcherThread::executeSetLoggingFolder(QString absoluteLoggingFolder
 	mLogPath = absoluteLoggingFolderPath;
 	mWatcher.addPath(mLogPath);
 
-	mWatcher.removePaths(mWatcher.directories());
-	mWatcher.removePaths(mWatcher.files());
+	if (!mWatcher.directories().isEmpty())
+		mWatcher.removePaths(mWatcher.directories());
+	if (!mWatcher.files().isEmpty())
+		mWatcher.removePaths(mWatcher.files());
 	this->onDirectoryChanged(mLogPath);
 }
 

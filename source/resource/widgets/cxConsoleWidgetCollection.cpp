@@ -50,6 +50,8 @@ namespace cx
 ConsoleWidgetCollection::ConsoleWidgetCollection(QWidget* parent, QString objectName, QString windowTitle, XmlOptionFile options, LogPtr log) :
 	QMainWindow(parent), mObjectName(objectName), mWindowTitle(windowTitle)
 {
+	this->setObjectName(mObjectName);
+	this->setWindowTitle(mWindowTitle);
 	mOptions = options;
 	mLog = log;
 
@@ -59,6 +61,8 @@ ConsoleWidgetCollection::ConsoleWidgetCollection(QWidget* parent, QString object
 ConsoleWidgetCollection::ConsoleWidgetCollection(QWidget* parent, QString objectName, QString windowTitle) :
 	QMainWindow(parent), mObjectName(objectName), mWindowTitle(windowTitle)
 {
+	this->setObjectName(mObjectName);
+	this->setWindowTitle(mWindowTitle);
 	mOptions = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend(this->objectName());
 	mLog = LogPtr(reporter(), null_deleter());
 
@@ -68,19 +72,15 @@ ConsoleWidgetCollection::ConsoleWidgetCollection(QWidget* parent, QString object
 void ConsoleWidgetCollection::setupUI()
 {
 	this->setFocusPolicy(Qt::StrongFocus); // needed for help system: focus is used to display help text
-	this->setObjectName(mObjectName);
-	this->setWindowTitle(mWindowTitle);
 
 	this->setDockNestingEnabled(true);
 	this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
-
-//	mOptions = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend(this->objectName());
 
 	int consoleCount = this->option("consoleCount").readVariant(-1).toInt();
 
 	for (int i=0; i<consoleCount; ++i)
 	{
-		this->onNewConsole();
+		this->addConsole();
 	}
 
 	// Restore saved window states
@@ -185,12 +185,18 @@ void ConsoleWidgetCollection::deleteDockWidget(QDockWidget* dockWidget)
 	}
 }
 
-void ConsoleWidgetCollection::onNewConsole()
+ConsoleWidget* ConsoleWidgetCollection::addConsole()
 {
 	QString uid = QString("ConsoleWidget%1").arg(mDockWidgets.size());
 	ConsoleWidget* console = new ConsoleWidget(this, uid, "Console", mOptions.descend(uid), mLog);
-	console->setDetails(true);
 	this->addAsDockWidget(console);
+	return console;
+}
+
+void ConsoleWidgetCollection::onNewConsole()
+{
+	ConsoleWidget* console = this->addConsole();
+	console->setDetails(true);
 }
 
 QMenu* ConsoleWidgetCollection::createPopupMenu()

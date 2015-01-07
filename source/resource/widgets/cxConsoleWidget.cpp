@@ -118,13 +118,20 @@ void MyTableWidget::keyPressEvent(QKeyEvent* event)
 
 		QApplication::clipboard()->setText(text);
 	}
+	else
+	{
+		event->ignore();
+	}
+
+	QTableWidget::keyPressEvent(event);
 }
 
 ///--------------------------------------------------------
 
 DetailedLogMessageDisplayWidget::DetailedLogMessageDisplayWidget(QWidget *parent, XmlOptionFile options) :
 	LogMessageDisplayWidget(parent),
-	mOptions(options)
+	mOptions(options),
+	mScrollToBottomEnabled(true)
 {
 	mTable = new MyTableWidget(this);
 	QVBoxLayout* layout = new QVBoxLayout(this);
@@ -184,12 +191,8 @@ void DetailedLogMessageDisplayWidget::normalize()
 
 void DetailedLogMessageDisplayWidget::add(const Message& message)
 {
-//	QFontMetrics metric(this->font());
-//	int textLineHeight = metric.lineSpacing();
-
 	int row = mTable->rowCount();
 	mTable->insertRow(row);
-//	mTable->setRowHeight(row, textLineHeight);
 
 	QTableWidgetItem* item = NULL;
 
@@ -213,6 +216,19 @@ void DetailedLogMessageDisplayWidget::add(const Message& message)
 
 	QString desc = message.getText();
 	item = this->addItem(5, desc, message);
+
+	this->scrollToBottom();
+}
+
+void DetailedLogMessageDisplayWidget::setScrollToBottom(bool on)
+{
+	mScrollToBottomEnabled = on;
+	this->scrollToBottom();
+}
+void DetailedLogMessageDisplayWidget::scrollToBottom()
+{
+	if (mScrollToBottomEnabled)
+		QTimer::singleShot(0, mTable, SLOT(scrollToBottom()));
 }
 
 QTableWidgetItem* DetailedLogMessageDisplayWidget::addItem(int column, QString text, const Message& message)
@@ -233,7 +249,8 @@ QTableWidgetItem* DetailedLogMessageDisplayWidget::addItem(int column, QString t
 ///--------------------------------------------------------
 
 SimpleLogMessageDisplayWidget::SimpleLogMessageDisplayWidget(QWidget *parent) :
-	LogMessageDisplayWidget(parent)
+	LogMessageDisplayWidget(parent),
+	mScrollToBottomEnabled(true)
 {
 	mBrowser = new QTextBrowser(this);
 	mBrowser->setReadOnly(true);
@@ -242,13 +259,13 @@ SimpleLogMessageDisplayWidget::SimpleLogMessageDisplayWidget(QWidget *parent) :
 	layout->setMargin(0);
 	this->setLayout(layout);
 	layout->addWidget(mBrowser);
-	this->setTail();
+	this->scrollToBottom();
 }
 
 void SimpleLogMessageDisplayWidget::clear()
 {
 	mBrowser->clear();
-	this->setTail();
+	this->scrollToBottom();
 }
 
 void SimpleLogMessageDisplayWidget::normalize()
@@ -260,29 +277,22 @@ void SimpleLogMessageDisplayWidget::add(const Message& message)
 {
 	this->format(message);
 
-//	if (mDetailsAction->isChecked())
-//		mBrowser->append(message.getPrintableMessage());
-//	else
-
-	bool tail = this->isTailing();
-
 	mBrowser->append(this->getCompactMessage(message));
 
-//	mBrowser->horizontalScrollBar()->setValue(mBrowser->horizontalScrollBar()->minimum());
-	if (tail)
-		this->setTail();
+	this->scrollToBottom();
 }
 
-bool SimpleLogMessageDisplayWidget::isTailing() const
+void SimpleLogMessageDisplayWidget::setScrollToBottom(bool on)
 {
-	bool tail = mBrowser->verticalScrollBar()->maximum() == mBrowser->verticalScrollBar()->value();
-	return tail;
-}
-void SimpleLogMessageDisplayWidget::setTail()
-{
-	mBrowser->verticalScrollBar()->setValue(mBrowser->verticalScrollBar()->maximum());
+	mScrollToBottomEnabled = on;
+	this->scrollToBottom();
 }
 
+void SimpleLogMessageDisplayWidget::scrollToBottom()
+{
+	if (mScrollToBottomEnabled)
+		mBrowser->verticalScrollBar()->setValue(mBrowser->verticalScrollBar()->maximum());
+}
 
 QString SimpleLogMessageDisplayWidget::getCompactMessage(Message message)
 {
@@ -308,27 +318,40 @@ void SimpleLogMessageDisplayWidget::format(const Message& message)
 ///--------------------------------------------------------
 
 ConsoleWidget::ConsoleWidget(QWidget* parent, QString uid, QString name, XmlOptionFile options, LogPtr log) :
-	BaseWidget(parent, uid, name)
+	BaseWidget(parent, uid, name),
+  mLineWrappingAction(new QAction(tr("Line wrapping"), this)),
+  mSeverityAction(NULL),
+  mMessagesWidget(NULL),
+  mStackedLayout(NULL)
 {
 	mOptions = options;
 	mLog = log;
 
-	this->setupUI();
+	this->setModified();
 }
 
 ConsoleWidget::ConsoleWidget(QWidget* parent, QString uid, QString name) :
 	BaseWidget(parent, uid, name),
 	mLineWrappingAction(new QAction(tr("Line wrapping"), this)),
 	mSeverityAction(NULL),
-	mMessagesWidget(NULL)
+	mMessagesWidget(NULL),
+	mStackedLayout(NULL)
 {
 	mOptions = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend(this->objectName());
 	mLog = LogPtr(reporter(), null_deleter());
 
-	this->setupUI();
+	this->setModified();
 }
 
-void ConsoleWidget::setupUI()
+void ConsoleWidget::prePaintEvent()
+{
+	if (!mStackedLayout)
+	{
+		this->createUI();
+	}
+}
+
+void ConsoleWidget::createUI()
 {
 	mLineWrappingAction = new QAction(tr("Line wrapping"), this);
 	mSeverityAction = NULL;
@@ -406,7 +429,15 @@ QString ConsoleWidget::defaultWhatsThis() const
 
 void ConsoleWidget::setDetails(bool on)
 {
-	mDetailsAction->setChecked(on);
+	if (mDetailsAction)
+	{
+		mDetailsAction->setChecked(on);
+		this->updateUI();
+	}
+	else
+	{
+		this->option("showDetails").writeVariant(on);
+	}
 }
 
 void ConsoleWidget::addSeverityButtons(QBoxLayout* buttonLayout)
@@ -599,7 +630,8 @@ void ConsoleWidget::contextMenuEvent(QContextMenuEvent* event)
 
 void ConsoleWidget::showEvent(QShowEvent* event)
 {
-	mMessagesWidget->normalize();
+	if (mMessagesWidget)
+		mMessagesWidget->normalize();
 }
 
 void ConsoleWidget::receivedMessage(Message message)

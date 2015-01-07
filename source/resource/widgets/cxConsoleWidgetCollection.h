@@ -61,6 +61,7 @@ private:
 	QDockWidget* createDockWidget(QWidget* widget);
 	void deleteDockWidget(QDockWidget* dockWidget);
 	void removeHiddenConsoles();
+	class ConsoleWidget* addConsole();
 
 	QString mObjectName;
 	QString mWindowTitle;

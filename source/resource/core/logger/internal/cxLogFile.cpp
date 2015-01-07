@@ -180,6 +180,7 @@ std::vector<Message> LogFile::readMessages()
 		}
 		else
 		{
+			if (!retval.empty())
 			retval.back().mText += "\n"+line;
 		}
 	}
@@ -294,6 +295,9 @@ QString LogFile::removeEarlierSessionsAndSetStartTime(QString text)
 
 		text.remove(0, endpos+1);
 	}
+
+	if (text.endsWith("\n"))
+		text.chop(1); // remove endline at end of text, in order to get false linebreaks after each file
 
 	return text;
 }

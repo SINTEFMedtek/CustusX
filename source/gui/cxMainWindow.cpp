@@ -526,8 +526,7 @@ void MainWindow::recordFullscreen()
 void MainWindow::onStartLogConsole()
 {
 	QString fullname = DataLocations::findExecutableInStandardLocations("LogConsole");
-	std::cout << "MainWindow::onStartLogConsole() " << fullname << std::endl;
-//	ProcessWrapperPtr mLocalVideoServerProcess;
+//	std::cout << "MainWindow::onStartLogConsole() " << fullname << std::endl;
 	mLocalVideoServerProcess.reset(new ProcessWrapper(QString("LogConsole")));
 	mLocalVideoServerProcess->launchWithRelativePath(fullname, QStringList());
 }

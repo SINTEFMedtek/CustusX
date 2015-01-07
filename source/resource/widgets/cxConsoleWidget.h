@@ -62,6 +62,7 @@ public:
 	virtual void add(const Message& message) = 0;
 	virtual void normalize() = 0;
 	virtual QString getType() const = 0;
+	virtual void setScrollToBottom(bool on) = 0;
 protected:
 	void createTextCharFormats(); ///< sets up the formating rules for the message levels
 	std::map<MESSAGE_LEVEL, QTextCharFormat> mFormat;
@@ -76,13 +77,14 @@ public:
 	virtual void add(const Message& message);
 	virtual void normalize();
 	virtual QString getType() const { return "detail";}
+	virtual void setScrollToBottom(bool on);
 
 protected:
 	XmlOptionFile mOptions;
 	QTableWidget* mTable;
-//	bool mColumnWidthsInitialized;
 	QTableWidgetItem *addItem(int column, QString text, const Message& message);
-
+	void scrollToBottom();
+	bool mScrollToBottomEnabled;
 };
 
 class SimpleLogMessageDisplayWidget : public LogMessageDisplayWidget
@@ -94,14 +96,14 @@ public:
 	virtual void add(const Message& message);
 	virtual void normalize();
 	virtual QString getType() const { return "simple";}
+	virtual void setScrollToBottom(bool on);
 
 	QTextBrowser* mBrowser;
 	void format(const Message &message); ///< formats the text to suit the message level
 	QString getCompactMessage(Message message);
 private:
-	bool isTailing() const;
-	void setTail();
-
+	void scrollToBottom();
+	bool mScrollToBottomEnabled;
 };
 
 /**\brief Widget for displaying status messages.
@@ -127,6 +129,9 @@ protected slots:
 	void contextMenuEvent(QContextMenuEvent* event);
 	virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
 
+protected:
+	virtual void prePaintEvent();
+
 private slots:
 	void lineWrappingSlot(bool checked);
 	void onChannelSelectorChanged();
@@ -140,7 +145,7 @@ private slots:
 
 private:
 	XmlOptionItem option(QString name);
-	void setupUI();
+	void createUI();
 	void printMessage(const Message& message); ///< prints the message into the console
 	void addSeverityButtons(QBoxLayout* buttonLayout);
 	void addDetailsButton(QBoxLayout* buttonLayout);
