@@ -59,8 +59,6 @@ PlaybackWidget::PlaybackWidget(QWidget* parent) :
 	mOpen = false;
 	this->setToolTip(this->defaultWhatsThis());
 
-	connect(trackingService().get(), &TrackingService::stateChanged, this, &PlaybackWidget::toolManagerInitializedSlot);
-
 	mTimer.reset(new PlaybackTime());
 	mTimer->initialize(QDateTime::currentDateTime(), 100000);
 	connect(mTimer.get(), SIGNAL(changed()), SLOT(timeChangedSlot()));
@@ -176,14 +174,18 @@ void PlaybackWidget::toggleOpenSlot()
 	}
 	else
 	{
-		trackingService()->setPlaybackMode(mTimer);
-		videoService()->setPlaybackMode(mTimer);
+        trackingService()->setPlaybackMode(mTimer);
 		if (!trackingService()->isPlaybackMode())
+        {
+            reportError("trackingService is not in playback mode");
 			return;
+        }
+        videoService()->setPlaybackMode(mTimer);
 		report(QString("Started Playback with start time [%1] and end time [%2]")
 						.arg(mTimer->getStartTime().toString(timestampMilliSecondsFormatNice()))
 						.arg(mTimer->getStartTime().addMSecs(mTimer->getLength()).toString(timestampMilliSecondsFormatNice())));
 
+        this->toolManagerInitializedSlot();
 	}
 }
 
