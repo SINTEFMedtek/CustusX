@@ -70,5 +70,6 @@ function(cx_add_tests_to_catch SHARED_LIBRARY_WITH_TESTS)
         CACHE INTERNAL
         "List of all shared libraries containing catch tests."
     )
+    cx_install_target(${SHARED_LIBRARY_WITH_TESTS})
 endfunction(cx_add_tests_to_catch)
 
