@@ -48,9 +48,7 @@ void load_plugin(std::string path)
     QLibrary library(libPath);
     bool loaded = library.load();
 
-    if(loaded)
-        printf("%s library loaded!\n", path.c_str());
-    else
+    if(!loaded)
         printf("%s library failed to load!\n", path.c_str());
 }
 
