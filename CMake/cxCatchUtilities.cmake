@@ -38,7 +38,6 @@ function(cx_add_executable_catch CX_CATCH_LIB)
     set(BUNDLE_TYPE "")
     if(CX_APPLE)
         set(BUNDLE_TYPE "MACOSX_BUNDLE")
-        set(TEST_EXE_NAME "Catch.app/Contents/MacOS/Catch")
     endif()
 
     add_executable(${TEST_EXE_NAME} ${BUNDLE_TYPE} ${cxtest_MAIN})
