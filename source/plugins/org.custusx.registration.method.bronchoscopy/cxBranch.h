@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include "cxMesh.h"
 #include "cxVector3D.h"
+#include "org_custusx_registration_method_bronchoscopy_Export.h"
 
 typedef std::vector<double> dVector;
 typedef std::vector<dVector> dVectors;
@@ -43,7 +44,7 @@ typedef std::vector<dVector> dVectors;
 namespace cx
 {
 
-class Branch;
+class org_custusx_registration_method_bronchoscopy_EXPORT Branch;
 typedef boost::shared_ptr<class Branch> BranchPtr;
 typedef std::vector<BranchPtr> branchVector;
 
