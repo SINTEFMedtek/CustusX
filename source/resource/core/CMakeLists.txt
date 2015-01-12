@@ -49,25 +49,25 @@ cx_add_class_qt_moc(cxResource_SOURCE
     Tool/cxDominantToolProxy
     Tool/cxTrackingSystemService.h
 
-    dataAdapters/cxProperty
-    dataAdapters/cxPropertyNull.h
-    dataAdapters/cxDoublePropertyBase.h
-    dataAdapters/cxStringPropertyBase.h
-    dataAdapters/cxDoubleProperty
-    dataAdapters/cxStringProperty
-    dataAdapters/cxBoolPropertyBase.h
-    dataAdapters/cxBoolProperty
-    dataAdapters/cxVector3DPropertyBase.h
-    dataAdapters/cxVector3DProperty
-    dataAdapters/cxColorPropertyBase.h
-    dataAdapters/cxColorProperty
-    dataAdapters/cxVector3DComponentProperty
-    dataAdapters/cxDoublePairPropertyBase.h
-    dataAdapters/cxDoublePairProperty
-    dataAdapters/cxSelectDataStringPropertyBase
-    dataAdapters/cxSelectDataStringProperty
-    dataAdapters/cxSpacePropertyBase
-    dataAdapters/cxSpaceProperty
+	properties/cxProperty
+	properties/cxPropertyNull.h
+	properties/cxDoublePropertyBase.h
+	properties/cxStringPropertyBase.h
+	properties/cxDoubleProperty
+	properties/cxStringProperty
+	properties/cxBoolPropertyBase.h
+	properties/cxBoolProperty
+	properties/cxVector3DPropertyBase.h
+	properties/cxVector3DProperty
+	properties/cxColorPropertyBase.h
+	properties/cxColorProperty
+	properties/cxVector3DComponentProperty
+	properties/cxDoublePairPropertyBase.h
+	properties/cxDoublePairProperty
+	properties/cxSelectDataStringPropertyBase
+	properties/cxSelectDataStringProperty
+	properties/cxSpacePropertyBase
+	properties/cxSpaceProperty
 
     logger/cxReporter
     logger/cxMessageListener
@@ -281,7 +281,7 @@ target_include_directories(cxResource
     ./Data
     ./Video
     ./Tool
-    ./dataAdapters
+	./properties
     ./algorithms
     ./algorithms/ItkVtkGlue
     ./settings
