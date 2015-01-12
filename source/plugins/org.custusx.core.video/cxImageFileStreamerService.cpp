@@ -31,9 +31,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxImageFileStreamerService.h"
 
-#include "cxStringDataAdapterXml.h"
-#include "cxDoubleDataAdapterXml.h"
-#include "cxBoolDataAdapterXml.h"
+#include "cxStringProperty.h"
+#include "cxDoubleProperty.h"
+#include "cxBoolProperty.h"
 #include "cxIGTLinkClientStreamer.h"
 #include "cxMHDImageStreamer.h"
 #include "cxLocalServerStreamerServer.h"

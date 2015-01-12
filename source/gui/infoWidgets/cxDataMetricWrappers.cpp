@@ -48,11 +48,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationTransform.h"
 #include "cxPropertyHelper.h"
 #include "cxBaseWidget.h"
-#include "cxBoolDataAdapterXml.h"
+#include "cxBoolProperty.h"
 #include "cxSpaceProvider.h"
 #include "cxPatientModelService.h"
 #include "cxSpaceEditWidget.h"
-#include "cxSpaceDataAdapterXml.h"
+#include "cxSpaceProperty.h"
 
 //TODO :remove
 #include "cxLegacySingletons.h"

@@ -38,8 +38,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *      Author: christiana
  */
 
-#ifndef CXDOUBLEDATAADAPTERXML_H_
-#define CXDOUBLEDATAADAPTERXML_H_
+#ifndef CXDOUBLEPROPERTY_H_
+#define CXDOUBLEPROPERTY_H_
 
 #include "cxResourceExport.h"
 
@@ -114,4 +114,4 @@ private:
 
 } // namespace cx
 
-#endif /* CXDOUBLEDATAADAPTERXML_H_ */
+#endif /* CXDOUBLEPROPERTY_H_ */

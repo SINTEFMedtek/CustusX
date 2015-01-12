@@ -34,10 +34,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "catch.hpp"
 #include <QApplication>
-#include "cxDoubleDataAdapterXml.h"
+#include "cxDoubleProperty.h"
 #include "cxTimedAlgorithm.h"
 
-#include "cxBoolDataAdapterXml.h"
+#include "cxBoolProperty.h"
 
 #include "cxDataLocations.h"
 #include "cxReconstructPreprocessor.h"

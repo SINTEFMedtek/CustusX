@@ -34,9 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxSelectDataStringProperty.h"
 #include "cxData.h"
-#include "cxDoubleDataAdapterXml.h"
-#include "cxStringDataAdapterXml.h"
-#include "cxBoolDataAdapterXml.h"
+#include "cxDoubleProperty.h"
+#include "cxStringProperty.h"
+#include "cxBoolProperty.h"
 
 namespace cx
 {

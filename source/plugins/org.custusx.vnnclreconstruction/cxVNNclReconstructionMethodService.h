@@ -37,8 +37,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxReconstructionMethodService.h"
 #include "cxUSFrameData.h"
-#include "cxStringDataAdapterXml.h"
-#include "cxDoubleDataAdapterXml.h"
+#include "cxStringProperty.h"
+#include "cxDoubleProperty.h"
 #include "cxVNNclAlgorithm.h"
 class ctkPluginContext;
 

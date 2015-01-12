@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSelectionGroupBox.h"
 #include "cxToolListWidget.h"
 #include "cxTrackerConfiguration.h"
-#include "cxStringDataAdapterXml.h"
+#include "cxStringProperty.h"
 #include "cxPropertyHelper.h"
 #include "cxHelperWidgets.h"
 

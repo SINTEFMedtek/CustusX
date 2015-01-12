@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *      Author: christiana
  */
 
-#include "cxVector3DDataAdapterXml.h"
+#include "cxVector3DProperty.h"
 
 #include <iostream>
 #include <QDomElement>

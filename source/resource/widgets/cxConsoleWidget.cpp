@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxEnumConverter.h"
 #include "cxDefinitionStrings.h"
 #include "cxSettings.h"
-#include "cxStringDataAdapterXml.h"
+#include "cxStringProperty.h"
 #include "cxHelperWidgets.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxMessageListener.h"

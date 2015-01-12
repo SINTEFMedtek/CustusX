@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxUSFrameData.h"
 #include <vtkImageData.h>
 #include "cxImage.h"
-#include "cxDoubleDataAdapterXml.h"
+#include "cxDoubleProperty.h"
 
 namespace cx
 {

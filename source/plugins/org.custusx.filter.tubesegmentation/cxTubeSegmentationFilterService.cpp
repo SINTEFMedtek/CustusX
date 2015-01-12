@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogger.h"
 #include "cxDataReaderWriter.h"
 #include "cxRegistrationTransform.h"
-#include "cxDoubleDataAdapterXml.h"
+#include "cxDoubleProperty.h"
 #include "cxContourFilter.h"
 #include "cxDataLocations.h"
 #include "cxSelectDataStringProperty.h"

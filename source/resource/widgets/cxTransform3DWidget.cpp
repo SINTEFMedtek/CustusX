@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxTypeConversions.h"
 
-#include "cxDoubleDataAdapterXml.h"
+#include "cxDoubleProperty.h"
 #include "cxDoubleWidgets.h"
 #include <cmath>
 #include "cxMousePadWidget.h"

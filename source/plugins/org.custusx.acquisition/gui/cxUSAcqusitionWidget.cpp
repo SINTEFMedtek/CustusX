@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDisplayTimerWidget.h"
 #include "cxTimedAlgorithm.h"
 #include "cxLabeledComboBoxWidget.h"
-#include "cxStringDataAdapterXml.h"
+#include "cxStringProperty.h"
 #include "cxUsReconstructionService.h"
 #include "cxHelperWidgets.h"
 

@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxProperty.h"
 #include "cxDoublePropertyBase.h"
 #include "cxRegistrationTransform.h"
-#include "cxDoubleDataAdapterXml.h"
+#include "cxDoubleProperty.h"
 #include "cxPatientModelService.h"
 #include "cxSessionStorageService.h"
 

@@ -32,71 +32,128 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /*
- * sscBoolDataAdapterXml.cpp
+ * sscStringDataAdapterXml.cpp
  *
- *  Created on: Feb 7, 2011
+ *  Created on: Jun 27, 2010
  *      Author: christiana
  */
+#include "cxStringProperty.h"
 
-#include "cxBoolDataAdapterXml.h"
 #include <iostream>
+#include <QDomElement>
+#include <QStringList>
 #include "cxTypeConversions.h"
 
 namespace cx
 {
 
+StringDataAdapterXml::StringDataAdapterXml() : 	mIsReadOnly(false)
+{
+
+}
+
 /** Make sure one given option exists witin root.
  * If not present, fill inn the input defaults.
  */
-BoolDataAdapterXmlPtr BoolDataAdapterXml::initialize(const QString& uid, QString name, QString help, bool value,
-	QDomNode root)
+StringDataAdapterXmlPtr StringDataAdapterXml::initialize(const QString& uid, QString name, QString help, QString value, QStringList range, QDomNode root)
 {
-	BoolDataAdapterXmlPtr retval(new BoolDataAdapterXml());
+	StringDataAdapterXmlPtr retval(new StringDataAdapterXml());
 	retval->mUid = uid;
 	retval->mName = name.isEmpty() ? uid : name;
 	retval->mHelp = help;
+	retval->mRange = range;
 	retval->mStore = XmlOptionItem(uid, root.toElement());
-	retval->mValue = retval->mStore.readValue(QString::number(value)).toInt();
+	retval->mValue = retval->mStore.readValue(value);
+	retval->mAllowOnlyValuesInRange = true;
 	return retval;
 }
 
-QString BoolDataAdapterXml::getDisplayName() const
+StringDataAdapterXmlPtr StringDataAdapterXml::initialize(const QString& uid, QString name, QString help, QString value, QDomNode root)
+{
+	StringDataAdapterXmlPtr retval(new StringDataAdapterXml());
+	retval->mUid = uid;
+	retval->mName = name.isEmpty() ? uid : name;
+	retval->mHelp = help;
+	//retval->mRange = range;
+	retval->mStore = XmlOptionItem(uid, root.toElement());
+	retval->mValue = retval->mStore.readValue(value);
+	retval->mAllowOnlyValuesInRange = false;
+	return retval;
+}
+
+void StringDataAdapterXml::setReadOnly(bool val)
+{
+	mIsReadOnly = val;
+	emit changed();
+}
+
+QString StringDataAdapterXml::getDisplayName() const
 {
 	return mName;
 }
 
-
-QString BoolDataAdapterXml::getUid() const
+QString StringDataAdapterXml::getUid() const
 {
 	return mUid;
 }
 
-QString BoolDataAdapterXml::getHelp() const
+QString StringDataAdapterXml::getHelp() const
 {
 	return mHelp;
 }
 
-void BoolDataAdapterXml::setHelp(QString val)
+void StringDataAdapterXml::setHelp(QString val)
 {
+    if (val == mHelp)
+        return;
+
     mHelp = val;
     emit changed();
 }
 
-bool BoolDataAdapterXml::getValue() const
+
+QString StringDataAdapterXml::getValue() const
 {
 	return mValue;
 }
 
-bool BoolDataAdapterXml::setValue(bool val)
+bool StringDataAdapterXml::setValue(const QString& val)
 {
 	if (val == mValue)
 		return false;
 
 	mValue = val;
-	mStore.writeValue(QString::number(val));
+	mStore.writeValue(val);
 	emit valueWasSet();
 	emit changed();
 	return true;
 }
 
+QStringList StringDataAdapterXml::getValueRange() const
+{
+	return mRange;
 }
+
+void StringDataAdapterXml::setValueRange(QStringList range)
+{
+	mRange = range;
+	emit changed();
+}
+
+/**If a mapping from internal name to display name has been set, use it.
+ * Otherwise return the input.
+ */
+QString StringDataAdapterXml::convertInternal2Display(QString internal)
+{
+	if (mDisplayNames.count(internal))
+		return mDisplayNames[internal];
+	return internal;
+}
+
+void StringDataAdapterXml::setDisplayNames(std::map<QString, QString> names)
+{
+	mDisplayNames = names;
+	emit changed();
+}
+
+} // namespace cx

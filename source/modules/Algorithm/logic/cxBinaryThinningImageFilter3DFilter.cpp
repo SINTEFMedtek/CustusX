@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationTransform.h"
 #include "cxMesh.h"
 #include "cxImage.h"
-#include "cxColorDataAdapterXml.h"
+#include "cxColorProperty.h"
 #include "vesselReg/SeansVesselReg.hxx"
 #include "cxSelectDataStringProperty.h"
 #include "cxAlgorithmHelpers.h"

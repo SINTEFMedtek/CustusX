@@ -50,8 +50,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxCommandlineImageStreamerFactory.h"
 #include "cxStringHelpers.h"
-#include "cxDoubleDataAdapterXml.h"
-#include "cxBoolDataAdapterXml.h"
+#include "cxDoubleProperty.h"
+#include "cxBoolProperty.h"
 
 #ifdef CX_USE_OpenCV
 #include <opencv2/highgui/highgui.hpp>

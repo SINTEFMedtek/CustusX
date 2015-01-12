@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxVector3D.h"
 #include "vtkForwardDeclarations.h"
-#include "cxDoubleDataAdapterXml.h"
+#include "cxDoubleProperty.h"
 #include "cxLegacySingletons.h"
 typedef vtkSmartPointer<class vtkSphereWidget> vtkSphereWidgetPtr;
 

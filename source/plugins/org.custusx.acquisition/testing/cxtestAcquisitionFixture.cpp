@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxUSFrameData.h"
 #include "cxUsReconstructionFileReader.h"
 #include "cxImageDataContainer.h"
-#include "cxStringDataAdapterXml.h"
+#include "cxStringProperty.h"
 #include "cxProbeImpl.h"
 #include "cxTrackingService.h"
 #include "cxLogicManager.h"

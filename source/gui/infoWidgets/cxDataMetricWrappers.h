@@ -45,11 +45,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPlaneMetric.h"
 #include "cxSphereMetric.h"
 #include "cxShapedMetric.h"
-#include "cxStringDataAdapterXml.h"
-#include "cxVector3DDataAdapterXml.h"
-#include "cxColorDataAdapterXml.h"
-#include "cxDoubleDataAdapterXml.h"
-#include "cxSpaceDataAdapterXml.h"
+#include "cxStringProperty.h"
+#include "cxVector3DProperty.h"
+#include "cxColorProperty.h"
+#include "cxDoubleProperty.h"
+#include "cxSpaceProperty.h"
 
 class QVBoxLayout;
 class QTableWidget;

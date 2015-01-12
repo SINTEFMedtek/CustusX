@@ -38,9 +38,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPreferenceTab.h"
 #include "cxGeneralTab.h"
 #include <QDialog>
-#include "cxDoubleDataAdapterXml.h"
-#include "cxBoolDataAdapterXml.h"
-#include "cxStringDataAdapterXml.h"
+#include "cxDoubleProperty.h"
+#include "cxBoolProperty.h"
+#include "cxStringProperty.h"
 #include "cxLegacySingletons.h"
 
 class QTabWidget;

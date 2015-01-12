@@ -31,60 +31,72 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 
-#include "cxColorDataAdapterXml.h"
-#include "cxVector3D.h"
-#include "cxTypeConversions.h"
 
+/*
+ * sscBoolDataAdapterXml.h
+ *
+ *  Created on: Feb 7, 2011
+ *      Author: christiana
+ */
+
+#ifndef CXBOOLPROPERTY_H_
+#define CXBOOLPROPERTY_H_
+
+#include "cxResourceExport.h"
+
+#include <QDomElement>
+
+#include "cxBoolPropertyBase.h"
+#include "cxXmlOptionItem.h"
 
 namespace cx
 {
 
-/** Make sure one given option exists witin root.
- * If not present, fill inn the input defaults.
+typedef boost::shared_ptr<class BoolDataAdapterXml> BoolDataAdapterXmlPtr;
+
+/**\brief DataAdapter for boolean values.
+ *
+ * \ingroup cx_resource_core_dataadapters
  */
-ColorDataAdapterXmlPtr ColorDataAdapterXml::initialize(const QString& uid, QString name, QString help, QColor value,
-    QDomNode root)
+class cxResource_EXPORT BoolDataAdapterXml: public BoolDataAdapter
 {
-    ColorDataAdapterXmlPtr retval(new ColorDataAdapterXml());
-    retval->mUid = uid;
-    retval->mName = name.isEmpty() ? uid : name;
-    retval->mHelp = help;
-    retval->mStore = XmlOptionItem(uid, root.toElement());
-	retval->mValue = string2color(retval->mStore.readValue(color2string(value)));
-    return retval;
+Q_OBJECT
+public:
+	virtual ~BoolDataAdapterXml()
+	{
+	}
+
+	/** Make sure one given option exists witin root.
+	 * If not present, fill inn the input defaults.
+	 */
+	static BoolDataAdapterXmlPtr initialize(const QString& uid, QString name, QString help, bool value, QDomNode root =
+		QDomNode());
+
+public:
+	// basic methods
+	virtual QString getDisplayName() const; ///< name of data entity. Used for display to user.
+	virtual QString getUid() const;
+	virtual bool setValue(bool value); ///< set the data value.
+	virtual bool getValue() const; ///< get the data value.
+
+public:
+	// optional methods
+	virtual QString getHelp() const; ///< return a descriptive help string for the data, used for example as a tool tip.
+    void setHelp(QString val);
+
+signals:
+	void valueWasSet(); /// emitted when the value is set using setValue() (similar to changed(), but more constrained)
+
+private:
+	BoolDataAdapterXml() {}
+	QString mName;
+	QString mUid;
+	QString mHelp;
+	bool mValue;
+	XmlOptionItem mStore;
+
+};
+
 }
 
-QString ColorDataAdapterXml::getDisplayName() const
-{
-    return mName;
-}
-
-QString ColorDataAdapterXml::getUid() const
-{
-    return mUid;
-}
-
-QString ColorDataAdapterXml::getHelp() const
-{
-    return mHelp;
-}
-
-QColor ColorDataAdapterXml::getValue() const
-{
-    return mValue;
-}
-
-bool ColorDataAdapterXml::setValue(QColor val)
-{
-    if (val == mValue)
-        return false;
-
-    mValue = val;
-	mStore.writeValue(color2string(val));
-    emit valueWasSet();
-    emit changed();
-    return true;
-}
-
-} // namespace cx
-
+#endif /* CXBOOLPROPERTY_H_ */

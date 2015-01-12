@@ -30,130 +30,86 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-
-/*
- * sscStringDataAdapterXml.cpp
- *
- *  Created on: Jun 27, 2010
- *      Author: christiana
- */
-#include "cxStringDataAdapterXml.h"
-
-#include <iostream>
-#include <QDomElement>
-#include <QStringList>
+#include "cxDoublePairProperty.h"
 #include "cxTypeConversions.h"
+#include "cxVector3D.h"
 
 namespace cx
 {
 
-StringDataAdapterXml::StringDataAdapterXml() : 	mIsReadOnly(false)
-{
-
-}
-
 /** Make sure one given option exists witin root.
  * If not present, fill inn the input defaults.
  */
-StringDataAdapterXmlPtr StringDataAdapterXml::initialize(const QString& uid, QString name, QString help, QString value, QStringList range, QDomNode root)
+DoublePairDataAdapterXmlPtr DoublePairDataAdapterXml::initialize(const QString& uid, QString name, QString help,
+	DoubleRange range, int decimals, QDomNode root)
 {
-	StringDataAdapterXmlPtr retval(new StringDataAdapterXml());
+	DoublePairDataAdapterXmlPtr retval(new DoublePairDataAdapterXml());
 	retval->mUid = uid;
 	retval->mName = name.isEmpty() ? uid : name;
 	retval->mHelp = help;
 	retval->mRange = range;
 	retval->mStore = XmlOptionItem(uid, root.toElement());
-	retval->mValue = retval->mStore.readValue(value);
-	retval->mAllowOnlyValuesInRange = true;
+	retval->mValue = fromString(retval->mStore.readValue(qstring_cast(Eigen::Vector2d(0, 0))));
+	retval->mDecimals = decimals;
 	return retval;
 }
 
-StringDataAdapterXmlPtr StringDataAdapterXml::initialize(const QString& uid, QString name, QString help, QString value, QDomNode root)
+DoublePairDataAdapterXml::DoublePairDataAdapterXml()
 {
-	StringDataAdapterXmlPtr retval(new StringDataAdapterXml());
-	retval->mUid = uid;
-	retval->mName = name.isEmpty() ? uid : name;
-	retval->mHelp = help;
-	//retval->mRange = range;
-	retval->mStore = XmlOptionItem(uid, root.toElement());
-	retval->mValue = retval->mStore.readValue(value);
-	retval->mAllowOnlyValuesInRange = false;
-	return retval;
+	mFactor = 1.0;
 }
 
-void StringDataAdapterXml::setReadOnly(bool val)
+void DoublePairDataAdapterXml::setInternal2Display(double factor)
 {
-	mIsReadOnly = val;
-	emit changed();
+	mFactor = factor;
 }
 
-QString StringDataAdapterXml::getDisplayName() const
+QString DoublePairDataAdapterXml::getDisplayName() const
 {
 	return mName;
 }
 
-QString StringDataAdapterXml::getUid() const
+QString DoublePairDataAdapterXml::getUid() const
 {
 	return mUid;
 }
 
-QString StringDataAdapterXml::getHelp() const
+QString DoublePairDataAdapterXml::getHelp() const
 {
 	return mHelp;
 }
 
-void StringDataAdapterXml::setHelp(QString val)
-{
-    if (val == mHelp)
-        return;
-
-    mHelp = val;
-    emit changed();
-}
-
-
-QString StringDataAdapterXml::getValue() const
+Eigen::Vector2d DoublePairDataAdapterXml::getValue() const
 {
 	return mValue;
 }
 
-bool StringDataAdapterXml::setValue(const QString& val)
+bool DoublePairDataAdapterXml::setValue(const Eigen::Vector2d& val)
 {
 	if (val == mValue)
 		return false;
 
 	mValue = val;
-	mStore.writeValue(val);
+	mStore.writeValue(qstring_cast(val));
 	emit valueWasSet();
 	emit changed();
 	return true;
 }
 
-QStringList StringDataAdapterXml::getValueRange() const
+DoubleRange DoublePairDataAdapterXml::getValueRange() const
 {
 	return mRange;
 }
 
-void StringDataAdapterXml::setValueRange(QStringList range)
+void DoublePairDataAdapterXml::setValueRange(DoubleRange range)
 {
 	mRange = range;
 	emit changed();
 }
 
-/**If a mapping from internal name to display name has been set, use it.
- * Otherwise return the input.
- */
-QString StringDataAdapterXml::convertInternal2Display(QString internal)
+int DoublePairDataAdapterXml::getValueDecimals() const
 {
-	if (mDisplayNames.count(internal))
-		return mDisplayNames[internal];
-	return internal;
-}
-
-void StringDataAdapterXml::setDisplayNames(std::map<QString, QString> names)
-{
-	mDisplayNames = names;
-	emit changed();
+	return mDecimals;
 }
 
 } // namespace cx

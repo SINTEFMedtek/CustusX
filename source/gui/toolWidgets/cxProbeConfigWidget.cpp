@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDoubleSpanSlider.h"
 #include "cxHelperWidgets.h"
 #include "cxTypeConversions.h"
-#include "cxDoublePairDataAdapterXml.h"
+#include "cxDoublePairProperty.h"
 
 namespace cx
 {

@@ -35,8 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxGuiExport.h"
 
-#include "cxDoubleDataAdapterXml.h"
-#include "cxStringDataAdapterXml.h"
+#include "cxDoubleProperty.h"
+#include "cxStringProperty.h"
 
 class QLabel;
 class QSpinBox;

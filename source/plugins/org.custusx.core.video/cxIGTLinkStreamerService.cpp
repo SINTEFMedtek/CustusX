@@ -31,8 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxIGTLinkStreamerService.h"
 
-#include "cxStringDataAdapterXml.h"
-#include "cxDoubleDataAdapterXml.h"
+#include "cxStringProperty.h"
+#include "cxDoubleProperty.h"
 #include "cxIGTLinkClientStreamer.h"
 
 namespace cx

@@ -30,88 +30,79 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-
-/*
- * sscStringDataAdapterXml.h
- *
- *  Created on: Jun 27, 2010
- *      Author: christiana
- */
-
-#ifndef CXSTRINGDATAADAPTERXML_H_
-#define CXSTRINGDATAADAPTERXML_H_
+#ifndef CXDOUBLEPAIRPROPERTY_H_
+#define CXDOUBLEPAIRPROPERTY_H_
 
 #include "cxResourceExport.h"
 
-#include <QDomElement>
-#include <QStringList>
-#include "cxStringPropertyBase.h"
+#include "cxDoublePairPropertyBase.h"
 #include "cxXmlOptionItem.h"
 
 namespace cx
 {
+typedef boost::shared_ptr<class DoublePairDataAdapterXml> DoublePairDataAdapterXmlPtr;
 
-typedef boost::shared_ptr<class StringDataAdapterXml> StringDataAdapterXmlPtr;
-
-/**\brief Represents one option of the string type.
+/**
+ * \brief Implementation of DoublePairDataAdapter.
+ *
+ *  Represents one option of the double type.
  *  The data are stored within a xml document.
  *
  *  The option node has this layout:
-   \verbatim
-    <option id="Processor" value="3.14"/>
-   \endverbatim
+	 \verbatim
+		<option id="Processor" value="3.14"/>
+	 \endverbatim
  *
  * \ingroup cx_resource_core_dataadapters
+ *
+ * \date Juli 31, 2014
+ * \author Ole Vegard Solberg, SINTEF
  */
-class cxResource_EXPORT StringDataAdapterXml: public StringDataAdapter
+class cxResource_EXPORT DoublePairDataAdapterXml : public DoublePairDataAdapter
 {
 Q_OBJECT
 public:
 	/** Make sure one given option exists witin root.
 	 * If not present, fill inn the input defaults.
 	 */
-	static StringDataAdapterXmlPtr initialize(const QString& uid, QString name, QString help, QString value,
-		QStringList range, QDomNode root = QDomNode());
-	static StringDataAdapterXmlPtr initialize(const QString& uid, QString name, QString help, QString value, QDomNode root = QDomNode());
+	static DoublePairDataAdapterXmlPtr initialize(const QString& uid, QString name, QString help,
+																								DoubleRange range, int decimals, QDomNode root = QDomNode());
+	void setInternal2Display(double factor);
 
 public:
 	// inherited interface
 	virtual QString getDisplayName() const;///< name of data entity. Used for display to user.
 	virtual QString getUid() const;
-	virtual bool setValue(const QString& value); ///< set the data value.
-	virtual QString getValue() const; ///< get the data value.
+	virtual bool setValue(const Eigen::Vector2d& value); ///< set the data value.
+	virtual Eigen::Vector2d getValue() const; ///< get the data value.
 	virtual QString getHelp() const; ///< return a descriptive help string for the data, used for example as a tool tip.
-    virtual void setHelp(QString val);
-	virtual QStringList getValueRange() const; /// range of value. Use if data is constrained to a set.
-	virtual void setValueRange(QStringList range);
-	virtual QString convertInternal2Display(QString internal); ///< conversion from internal value to display value
-	virtual void setDisplayNames(std::map<QString, QString> names);
-
-	virtual bool isReadOnly() const { return mIsReadOnly; }
-	virtual bool getAllowOnlyValuesInRange() const { return mAllowOnlyValuesInRange; }
-	void setReadOnly(bool val);
+	virtual DoubleRange getValueRange() const; /// range of value. Use if data is constrained to a set.
+	virtual void setValueRange(DoubleRange range);
+	virtual int getValueDecimals() const; ///< number of relevant decimals in value
+	virtual double convertInternal2Display(double internal)
+	{
+		return mFactor * internal;
+	} ///< conversion from internal value to display value (for example between 0..1 and percent)
+	virtual double convertDisplay2Internal(double display)
+	{
+		return display / mFactor;
+	} ///< conversion from internal value to display value
 
 
 signals:
 	void valueWasSet(); /// emitted when the value is set using setValue() (similar to changed(), but more constrained)
 
 private:
-	StringDataAdapterXml();
+	DoublePairDataAdapterXml();
 	QString mName;
 	QString mUid;
 	QString mHelp;
-	QString mValue;
-	QStringList mRange;
+	Eigen::Vector2d mValue;
+	double mDecimals;
+	DoubleRange mRange;
 	XmlOptionItem mStore;
-	std::map<QString, QString> mDisplayNames;
-	bool mIsReadOnly;
-	bool mAllowOnlyValuesInRange;
+	double mFactor;
 };
 
-// --------------------------------------------------------
-// --------------------------------------------------------
-
-
 } // namespace cx
-
-#endif /* CXSTRINGDATAADAPTERXML_H_ */
+#endif // CXDOUBLEPAIRPROPERTY_H_

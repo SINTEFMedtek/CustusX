@@ -36,9 +36,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/bind.hpp>
 #include <ctkPluginContext.h>
 #include "cxLogger.h"
-#include "cxStringDataAdapterXml.h"
-#include "cxDoubleDataAdapterXml.h"
-#include "cxBoolDataAdapterXml.h"
+#include "cxStringProperty.h"
+#include "cxDoubleProperty.h"
+#include "cxBoolProperty.h"
 #include "cxCompositeTimedAlgorithm.h"
 #include "cxReconstructThreads.h"
 #include "cxUSFrameData.h"

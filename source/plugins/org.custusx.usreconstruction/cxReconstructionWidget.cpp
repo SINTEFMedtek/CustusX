@@ -38,9 +38,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTimedAlgorithmProgressBar.h"
 #include "cxSettings.h"
 #include "cxTimedAlgorithm.h"
-#include "cxStringDataAdapterXml.h"
-#include "cxDoubleDataAdapterXml.h"
-#include "cxBoolDataAdapterXml.h"
+#include "cxStringProperty.h"
+#include "cxDoubleProperty.h"
+#include "cxBoolProperty.h"
 #include "cxUsReconstructionService.h"
 
 namespace cx

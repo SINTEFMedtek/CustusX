@@ -40,8 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include "cxForwardDeclarations.h"
 #include "cxDoubleWidgets.h"
-#include "cxSpaceDataAdapterXml.h"
-#include "cxStringDataAdapterXml.h"
+#include "cxSpaceProperty.h"
+#include "cxStringProperty.h"
 #include "cxTransform3DWidget.h"
 #include "cxPointMetric.h"
 

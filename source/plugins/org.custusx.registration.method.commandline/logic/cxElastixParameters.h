@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include "cxForwardDeclarations.h"
 #include "cxXmlOptionItem.h"
-#include "cxStringDataAdapterXml.h"
+#include "cxStringProperty.h"
 #include "org_custusx_registration_method_commandline_Export.h"
 
 namespace cx

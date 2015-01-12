@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLabeledComboBoxWidget.h"
 #include "cxRegistrationService.h"
 #include "cxPatientModelService.h"
-#include "cxStringDataAdapterXml.h"
+#include "cxStringProperty.h"
 #include "cxDataLocations.h"
 
 namespace cx

@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxBoundingBoxWidget.h>
 #include "cxBoundingBox3D.h"
 #include "cxDoubleSpanSlider.h"
-#include "cxDoublePairDataAdapterXml.h"
+#include "cxDoublePairProperty.h"
 
 namespace cx
 {

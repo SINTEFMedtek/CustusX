@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QGroupBox>
 #include "cxDefinitions.h"
 #include "cxLegacySingletons.h"
-#include "cxStringDataAdapterXml.h"
+#include "cxStringProperty.h"
 
 class QComboBox;
 class QButtonGroup;

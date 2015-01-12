@@ -34,9 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxImage.h"
 #include "cxSelectDataStringProperty.h"
-#include "cxDoubleDataAdapterXml.h"
-#include "cxDoublePairDataAdapterXml.h"
-#include "cxStringDataAdapterXml.h"
+#include "cxDoubleProperty.h"
+#include "cxDoublePairProperty.h"
+#include "cxStringProperty.h"
 #include "cxPatientModelService.h"
 
 namespace cx

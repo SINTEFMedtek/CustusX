@@ -38,8 +38,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxBaseWidget.h"
 #include "cxBoundingBoxWidget.h"
 #include "cxToolProperty.h"
-#include "cxVector3DDataAdapterXml.h"
-#include "cxDoubleDataAdapterXml.h"
+#include "cxVector3DProperty.h"
+#include "cxDoubleProperty.h"
 
 namespace cx
 {

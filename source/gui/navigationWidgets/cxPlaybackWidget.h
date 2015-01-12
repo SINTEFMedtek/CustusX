@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxGuiExport.h"
 
 #include "cxBaseWidget.h"
-#include "cxDoubleDataAdapterXml.h"
+#include "cxDoubleProperty.h"
 #include "vtkForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
 #include "cxVector3D.h"

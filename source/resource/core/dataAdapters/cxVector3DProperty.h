@@ -30,51 +30,58 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXDOUBLEPAIRDATAADAPTERXML_H
-#define CXDOUBLEPAIRDATAADAPTERXML_H
+
+/*
+ * sscVector3DDataAdapterXml.h
+ *
+ *  Created on: Jul 25, 2011
+ *      Author: christiana
+ */
+
+#ifndef CXVECTOR3DPROPERTY_H_
+#define CXVECTOR3DPROPERTY_H_
 
 #include "cxResourceExport.h"
 
-#include "cxDoublePairPropertyBase.h"
+#include <QDomElement>
+#include <QStringList>
+#include "cxDoubleRange.h"
+#include "cxVector3DPropertyBase.h"
 #include "cxXmlOptionItem.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class DoublePairDataAdapterXml> DoublePairDataAdapterXmlPtr;
 
-/**
- * \brief Implementation of DoublePairDataAdapter.
+typedef boost::shared_ptr<class Vector3DDataAdapterXml> Vector3DDataAdapterXmlPtr;
+
+/**\brief Represents one option of the double type.
  *
- *  Represents one option of the double type.
  *  The data are stored within a xml document.
  *
  *  The option node has this layout:
-	 \verbatim
-		<option id="Processor" value="3.14"/>
-	 \endverbatim
+   \verbatim
+    <option id="Processor" value="3.14"/>
+   \endverbatim
  *
  * \ingroup cx_resource_core_dataadapters
- *
- * \date Juli 31, 2014
- * \author Ole Vegard Solberg, SINTEF
  */
-class cxResource_EXPORT DoublePairDataAdapterXml : public DoublePairDataAdapter
+class cxResource_EXPORT Vector3DDataAdapterXml: public Vector3DDataAdapter
 {
 Q_OBJECT
 public:
 	/** Make sure one given option exists witin root.
 	 * If not present, fill inn the input defaults.
 	 */
-	static DoublePairDataAdapterXmlPtr initialize(const QString& uid, QString name, QString help,
-																								DoubleRange range, int decimals, QDomNode root = QDomNode());
+	static Vector3DDataAdapterXmlPtr initialize(const QString& uid, QString name, QString help, Vector3D value,
+		DoubleRange range, int decimals, QDomNode root = QDomNode());
 	void setInternal2Display(double factor);
 
 public:
 	// inherited interface
 	virtual QString getDisplayName() const;///< name of data entity. Used for display to user.
 	virtual QString getUid() const;
-	virtual bool setValue(const Eigen::Vector2d& value); ///< set the data value.
-	virtual Eigen::Vector2d getValue() const; ///< get the data value.
+	virtual bool setValue(const Vector3D& value); ///< set the data value.
+	virtual Vector3D getValue() const; ///< get the data value.
 	virtual QString getHelp() const; ///< return a descriptive help string for the data, used for example as a tool tip.
 	virtual DoubleRange getValueRange() const; /// range of value. Use if data is constrained to a set.
 	virtual void setValueRange(DoubleRange range);
@@ -93,11 +100,11 @@ signals:
 	void valueWasSet(); /// emitted when the value is set using setValue() (similar to changed(), but more constrained)
 
 private:
-	DoublePairDataAdapterXml();
+	Vector3DDataAdapterXml();
 	QString mName;
 	QString mUid;
 	QString mHelp;
-	Eigen::Vector2d mValue;
+	Vector3D mValue;
 	double mDecimals;
 	DoubleRange mRange;
 	XmlOptionItem mStore;
@@ -105,4 +112,5 @@ private:
 };
 
 } // namespace cx
-#endif // CXDOUBLEPAIRDATAADAPTERXML_H
+
+#endif /* CXVECTOR3DPROPERTY_H_ */

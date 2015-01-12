@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //#include "cxToolConfigurationParser.h"
 #include "cxLegacySingletons.h"
 #include "cxTrackerConfiguration.h"
-#include "cxStringDataAdapterXml.h"
+#include "cxStringProperty.h"
 
 
 class QComboBox;

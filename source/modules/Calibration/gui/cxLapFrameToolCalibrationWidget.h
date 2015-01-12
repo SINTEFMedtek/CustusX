@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxCoordinateSystemHelpers.h"
 #include "cxForwardDeclarations.h"
 #include "cxDataInterface.h"
-#include "cxDoubleDataAdapterXml.h"
+#include "cxDoubleProperty.h"
 
 class QPushButton;
 class QGroupBox;

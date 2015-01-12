@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReporter.h"
 #include "cxVNNclAlgorithm.h"
 #include "cxVNNclReconstructionMethodService.h"
-#include "cxBoolDataAdapterXml.h"
+#include "cxBoolProperty.h"
 #include "cxtestUtilities.h"
 #include "cxtestReconstructRealData.h"
 #include "cxtestJenkinsMeasurement.h"

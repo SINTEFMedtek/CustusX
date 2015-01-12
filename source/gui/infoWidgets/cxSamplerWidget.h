@@ -36,8 +36,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxBaseWidget.h"
 
-#include "cxSpaceDataAdapterXml.h"
-#include "cxVector3DDataAdapterXml.h"
+#include "cxSpaceProperty.h"
+#include "cxVector3DProperty.h"
 #include "cxDominantToolProxy.h"
 #include "cxPointMetric.h"
 

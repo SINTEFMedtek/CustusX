@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QComboBox>
 #include "cxPreferenceTab.h"
-#include "cxBoolDataAdapterXml.h"
+#include "cxBoolProperty.h"
 #include "cxLegacySingletons.h"
 
 namespace cx

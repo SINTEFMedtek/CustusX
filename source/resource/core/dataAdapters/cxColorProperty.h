@@ -30,73 +30,64 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-
-
-/*
- * sscBoolDataAdapterXml.h
- *
- *  Created on: Feb 7, 2011
- *      Author: christiana
- */
-
-#ifndef CXBOOLDATAADAPTERXML_H_
-#define CXBOOLDATAADAPTERXML_H_
+#ifndef CXCOLORPROPERTY_H_
+#define CXCOLORPROPERTY_H_
 
 #include "cxResourceExport.h"
 
-#include <QDomElement>
-
-#include "cxBoolPropertyBase.h"
+#include "cxColorPropertyBase.h"
 #include "cxXmlOptionItem.h"
+
 
 namespace cx
 {
+typedef boost::shared_ptr<class ColorDataAdapterXml> ColorDataAdapterXmlPtr;
 
-typedef boost::shared_ptr<class BoolDataAdapterXml> BoolDataAdapterXmlPtr;
-
-/**\brief DataAdapter for boolean values.
+/** DataAdapter for QColor values.
+ *
  *
  * \ingroup cx_resource_core_dataadapters
+ * \date Nov 22, 2012
+ * \author christiana
  */
-class cxResource_EXPORT BoolDataAdapterXml: public BoolDataAdapter
+class cxResource_EXPORT ColorDataAdapterXml: public ColorDataAdapter
 {
 Q_OBJECT
 public:
-	virtual ~BoolDataAdapterXml()
-	{
-	}
+    virtual ~ColorDataAdapterXml()
+    {
+    }
 
-	/** Make sure one given option exists witin root.
-	 * If not present, fill inn the input defaults.
-	 */
-	static BoolDataAdapterXmlPtr initialize(const QString& uid, QString name, QString help, bool value, QDomNode root =
-		QDomNode());
-
-public:
-	// basic methods
-	virtual QString getDisplayName() const; ///< name of data entity. Used for display to user.
-	virtual QString getUid() const;
-	virtual bool setValue(bool value); ///< set the data value.
-	virtual bool getValue() const; ///< get the data value.
+    /** Make sure one given option exists witin root.
+     * If not present, fill inn the input defaults.
+     */
+    static ColorDataAdapterXmlPtr initialize(const QString& uid, QString name, QString help, QColor value, QDomNode root =
+        QDomNode());
 
 public:
-	// optional methods
-	virtual QString getHelp() const; ///< return a descriptive help string for the data, used for example as a tool tip.
-    void setHelp(QString val);
+    // basic methods
+    virtual QString getDisplayName() const; ///< name of data entity. Used for display to user.
+    virtual QString getUid() const;
+    virtual bool setValue(QColor value); ///< set the data value.
+    virtual QColor getValue() const; ///< get the data value.
+
+public:
+    // optional methods
+    virtual QString getHelp() const; ///< return a descriptive help string for the data, used for example as a tool tip.
 
 signals:
-	void valueWasSet(); /// emitted when the value is set using setValue() (similar to changed(), but more constrained)
+    void valueWasSet(); /// emitted when the value is set using setValue() (similar to changed(), but more constrained)
 
 private:
-	BoolDataAdapterXml() {}
-	QString mName;
-	QString mUid;
-	QString mHelp;
-	bool mValue;
-	XmlOptionItem mStore;
+    QString mName;
+    QString mUid;
+    QString mHelp;
+    QColor mValue;
+    XmlOptionItem mStore;
 
 };
 
-}
+} // namespace cx
 
-#endif /* CXBOOLDATAADAPTERXML_H_ */
+
+#endif // CXCOLORPROPERTY_H_

@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogger.h"
 #include "cxProbeSector.h"
 #include "cxRegistrationTransform.h"
-#include "cxStringDataAdapterXml.h"
+#include "cxStringProperty.h"
 #include "cxHelperWidgets.h"
 #include "cxDataLocations.h"
 #include "cxDataInterface.h"

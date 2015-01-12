@@ -32,9 +32,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxReconstructParams.h"
 
-#include "cxStringDataAdapterXml.h"
-#include "cxDoubleDataAdapterXml.h"
-#include "cxBoolDataAdapterXml.h"
+#include "cxStringProperty.h"
+#include "cxDoubleProperty.h"
+#include "cxBoolProperty.h"
 #include "cxTransferFunctions3DPresets.h"
 #include "cxDoubleRange.h"
 #include "cxPatientModelService.h"

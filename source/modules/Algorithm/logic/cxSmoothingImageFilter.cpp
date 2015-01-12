@@ -38,9 +38,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxUtilHelpers.h"
 #include "cxRegistrationTransform.h"
-#include "cxStringDataAdapterXml.h"
-#include "cxDoubleDataAdapterXml.h"
-#include "cxBoolDataAdapterXml.h"
+#include "cxStringProperty.h"
+#include "cxDoubleProperty.h"
+#include "cxBoolProperty.h"
 #include "cxTypeConversions.h"
 #include "cxImage.h"
 

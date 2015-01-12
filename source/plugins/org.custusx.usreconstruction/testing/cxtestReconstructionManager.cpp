@@ -30,7 +30,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxBoolDataAdapterXml.h"
+#include "cxBoolProperty.h"
 #include "catch.hpp"
 #include "cxtestReconstructionManagerFixture.h"
 #include "cxtestReconstructRealData.h"
@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDummyTool.h"
 #include "cxReconstructPreprocessor.h"
 #include <vtkImageData.h>
-#include "cxStringDataAdapterXml.h"
+#include "cxStringProperty.h"
 #include "cxReconstructionExecuter.h"
 #include "cxDataLocations.h"
 

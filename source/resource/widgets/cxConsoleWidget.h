@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReporter.h"
 #include <QTextBrowser>
 #include <QTextCharFormat>
-#include "cxStringDataAdapterXml.h"
+#include "cxStringProperty.h"
 class QTableWidget;
 class QTableWidgetItem;
 

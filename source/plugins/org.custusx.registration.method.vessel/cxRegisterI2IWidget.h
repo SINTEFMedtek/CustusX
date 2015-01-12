@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include <QtWidgets>
 
-#include "cxDoubleDataAdapterXml.h"
+#include "cxDoubleProperty.h"
 #include "cxDoubleWidgets.h"
 #include "cxRegistrationBaseWidget.h"
 #include "cxBinaryThresholdImageFilter.h"

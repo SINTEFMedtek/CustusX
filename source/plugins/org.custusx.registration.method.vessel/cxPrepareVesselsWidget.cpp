@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxPipelineWidget.h"
 #include "cxHelperWidgets.h"
-#include "cxColorDataAdapterXml.h"
+#include "cxColorProperty.h"
 
 #include "cxResampleImageFilter.h"
 #include "cxSmoothingImageFilter.h"

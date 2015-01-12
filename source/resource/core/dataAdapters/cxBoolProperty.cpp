@@ -30,9 +30,17 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxDoublePairDataAdapterXml.h"
+
+/*
+ * sscBoolDataAdapterXml.cpp
+ *
+ *  Created on: Feb 7, 2011
+ *      Author: christiana
+ */
+
+#include "cxBoolProperty.h"
+#include <iostream>
 #include "cxTypeConversions.h"
-#include "cxVector3D.h"
 
 namespace cx
 {
@@ -40,76 +48,55 @@ namespace cx
 /** Make sure one given option exists witin root.
  * If not present, fill inn the input defaults.
  */
-DoublePairDataAdapterXmlPtr DoublePairDataAdapterXml::initialize(const QString& uid, QString name, QString help,
-	DoubleRange range, int decimals, QDomNode root)
+BoolDataAdapterXmlPtr BoolDataAdapterXml::initialize(const QString& uid, QString name, QString help, bool value,
+	QDomNode root)
 {
-	DoublePairDataAdapterXmlPtr retval(new DoublePairDataAdapterXml());
+	BoolDataAdapterXmlPtr retval(new BoolDataAdapterXml());
 	retval->mUid = uid;
 	retval->mName = name.isEmpty() ? uid : name;
 	retval->mHelp = help;
-	retval->mRange = range;
 	retval->mStore = XmlOptionItem(uid, root.toElement());
-	retval->mValue = fromString(retval->mStore.readValue(qstring_cast(Eigen::Vector2d(0, 0))));
-	retval->mDecimals = decimals;
+	retval->mValue = retval->mStore.readValue(QString::number(value)).toInt();
 	return retval;
 }
 
-DoublePairDataAdapterXml::DoublePairDataAdapterXml()
-{
-	mFactor = 1.0;
-}
-
-void DoublePairDataAdapterXml::setInternal2Display(double factor)
-{
-	mFactor = factor;
-}
-
-QString DoublePairDataAdapterXml::getDisplayName() const
+QString BoolDataAdapterXml::getDisplayName() const
 {
 	return mName;
 }
 
-QString DoublePairDataAdapterXml::getUid() const
+
+QString BoolDataAdapterXml::getUid() const
 {
 	return mUid;
 }
 
-QString DoublePairDataAdapterXml::getHelp() const
+QString BoolDataAdapterXml::getHelp() const
 {
 	return mHelp;
 }
 
-Eigen::Vector2d DoublePairDataAdapterXml::getValue() const
+void BoolDataAdapterXml::setHelp(QString val)
+{
+    mHelp = val;
+    emit changed();
+}
+
+bool BoolDataAdapterXml::getValue() const
 {
 	return mValue;
 }
 
-bool DoublePairDataAdapterXml::setValue(const Eigen::Vector2d& val)
+bool BoolDataAdapterXml::setValue(bool val)
 {
 	if (val == mValue)
 		return false;
 
 	mValue = val;
-	mStore.writeValue(qstring_cast(val));
+	mStore.writeValue(QString::number(val));
 	emit valueWasSet();
 	emit changed();
 	return true;
 }
 
-DoubleRange DoublePairDataAdapterXml::getValueRange() const
-{
-	return mRange;
 }
-
-void DoublePairDataAdapterXml::setValueRange(DoubleRange range)
-{
-	mRange = range;
-	emit changed();
-}
-
-int DoublePairDataAdapterXml::getValueDecimals() const
-{
-	return mDecimals;
-}
-
-} // namespace cx

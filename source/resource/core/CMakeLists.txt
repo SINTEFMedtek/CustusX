@@ -53,21 +53,21 @@ cx_add_class_qt_moc(cxResource_SOURCE
     dataAdapters/cxPropertyNull.h
     dataAdapters/cxDoublePropertyBase.h
     dataAdapters/cxStringPropertyBase.h
-    dataAdapters/cxDoubleDataAdapterXml
-    dataAdapters/cxStringDataAdapterXml
+    dataAdapters/cxDoubleProperty
+    dataAdapters/cxStringProperty
     dataAdapters/cxBoolPropertyBase.h
-    dataAdapters/cxBoolDataAdapterXml
+    dataAdapters/cxBoolProperty
     dataAdapters/cxVector3DPropertyBase.h
-    dataAdapters/cxVector3DDataAdapterXml
+    dataAdapters/cxVector3DProperty
     dataAdapters/cxColorPropertyBase.h
-    dataAdapters/cxColorDataAdapterXml
+    dataAdapters/cxColorProperty
     dataAdapters/cxVector3DComponentProperty
     dataAdapters/cxDoublePairPropertyBase.h
-    dataAdapters/cxDoublePairDataAdapterXml
+    dataAdapters/cxDoublePairProperty
     dataAdapters/cxSelectDataStringPropertyBase
     dataAdapters/cxSelectDataStringProperty
     dataAdapters/cxSpacePropertyBase
-    dataAdapters/cxSpaceDataAdapterXml
+    dataAdapters/cxSpaceProperty
 
     logger/cxReporter
     logger/cxMessageListener

@@ -31,88 +31,60 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 
-#include "cxDoubleDataAdapterXml.h"
-
-#include <iostream>
-#include <QDomElement>
-#include <QStringList>
+#include "cxColorProperty.h"
+#include "cxVector3D.h"
+#include "cxTypeConversions.h"
 
 
 namespace cx
 {
-DoubleDataAdapterXml::DoubleDataAdapterXml()
-{
-	mFactor = 1.0;
-}
 
 /** Make sure one given option exists witin root.
  * If not present, fill inn the input defaults.
  */
-DoubleDataAdapterXmlPtr DoubleDataAdapterXml::initialize(const QString& uid, QString name, QString help, double value,
-	DoubleRange range, int decimals, QDomNode root)
+ColorDataAdapterXmlPtr ColorDataAdapterXml::initialize(const QString& uid, QString name, QString help, QColor value,
+    QDomNode root)
 {
-	DoubleDataAdapterXmlPtr retval(new DoubleDataAdapterXml());
-	retval->mUid = uid;
-	retval->mName = name.isEmpty() ? uid : name;
-	retval->mHelp = help;
-	retval->mRange = range;
-	retval->mStore = XmlOptionItem(uid, root.toElement());
-	retval->mValue = retval->mStore.readValue(QString::number(value)).toDouble();
-	retval->mDecimals = decimals;
-	return retval;
+    ColorDataAdapterXmlPtr retval(new ColorDataAdapterXml());
+    retval->mUid = uid;
+    retval->mName = name.isEmpty() ? uid : name;
+    retval->mHelp = help;
+    retval->mStore = XmlOptionItem(uid, root.toElement());
+	retval->mValue = string2color(retval->mStore.readValue(color2string(value)));
+    return retval;
 }
 
-void DoubleDataAdapterXml::setInternal2Display(double factor)
+QString ColorDataAdapterXml::getDisplayName() const
 {
-	mFactor = factor;
+    return mName;
 }
 
-QString DoubleDataAdapterXml::getDisplayName() const
+QString ColorDataAdapterXml::getUid() const
 {
-	return mName;
+    return mUid;
 }
 
-QString DoubleDataAdapterXml::getUid() const
+QString ColorDataAdapterXml::getHelp() const
 {
-	return mUid;
+    return mHelp;
 }
 
-QString DoubleDataAdapterXml::getHelp() const
+QColor ColorDataAdapterXml::getValue() const
 {
-	return mHelp;
+    return mValue;
 }
 
-double DoubleDataAdapterXml::getValue() const
+bool ColorDataAdapterXml::setValue(QColor val)
 {
-	return mValue;
-}
+    if (val == mValue)
+        return false;
 
-bool DoubleDataAdapterXml::setValue(double val)
-{
-	if (val == mValue)
-		return false;
-
-	mValue = val;
-	mStore.writeValue(QString::number(val));
+    mValue = val;
+	mStore.writeValue(color2string(val));
     emit valueWasSet();
     emit changed();
-	return true;
-}
-
-DoubleRange DoubleDataAdapterXml::getValueRange() const
-{
-	return mRange;
-}
-
-void DoubleDataAdapterXml::setValueRange(DoubleRange range)
-{
-	mRange = range;
-	emit changed();
-}
-
-int DoubleDataAdapterXml::getValueDecimals() const
-{
-	return mDecimals;
+    return true;
 }
 
 } // namespace cx
+

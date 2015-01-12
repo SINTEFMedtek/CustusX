@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxFileSelectWidget.h"
 #include "cxElastixManager.h"
 #include "cxFilePreviewWidget.h"
-#include "cxBoolDataAdapterXml.h"
+#include "cxBoolProperty.h"
 
 class QSpinBox;
 class QPushButton;
