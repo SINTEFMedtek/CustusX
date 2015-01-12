@@ -200,7 +200,7 @@ bool DicomConverter::slicesFormRegularGrid(std::map<double, ImagePtr> sorted, Ve
 	return true;
 }
 
-bool DicomConverter::getMeanSliceDistance(std::map<double, ImagePtr> sorted) const
+double DicomConverter::getMeanSliceDistance(std::map<double, ImagePtr> sorted) const
 {
 	if (sorted.size()==0)
 		return 0;
