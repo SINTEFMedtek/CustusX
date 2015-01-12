@@ -59,6 +59,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QClipboard>
 #include "cxNullDeleter.h"
 
+#include "ctkPopupWidget.h"
+#include "ctkExpandButton.h"
+#include <QPushButton>
+
 namespace cx
 {
 
@@ -225,6 +229,12 @@ void DetailedLogMessageDisplayWidget::setScrollToBottom(bool on)
 	mScrollToBottomEnabled = on;
 	this->scrollToBottom();
 }
+
+void DetailedLogMessageDisplayWidget::showHeader(bool on)
+{
+	mTable->horizontalHeader()->setVisible(on);
+}
+
 void DetailedLogMessageDisplayWidget::scrollToBottom()
 {
 	if (mScrollToBottomEnabled)
@@ -317,9 +327,79 @@ void SimpleLogMessageDisplayWidget::format(const Message& message)
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
+//class MyExpandButton : public ctkExpandButton
+//{
+//public:
+//	MyExpandButton(QWidget* parent) : ctkExpandButton(parent) {}
+//	virtual QSize sizeHint() const
+//	{
+//		int ext = this->style()->pixelMetric(QStyle::PM_ToolBarExtensionExtent);
+//		std::cout << "ext: " << ext << std::endl;
+////		ext = ext * 2 / 3;
+//		return QSize(ext, ext * 2 / 3);
+//	}
+//};
+
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+
+PopupButton::PopupButton(QWidget* parent)
+{
+//	this->setMouseTracking(true);
+	//	this->setFrameStyle(QFrame::Box);
+
+	QVBoxLayout* layout = new QVBoxLayout(this);
+	layout->setMargin(0);
+	this->setLayout(layout);
+
+	//	QToolButton* expandButton = new QToolButton(this);
+	QToolButton* expandButton = new CXSmallToolButton(this);
+	mShowHeaderButton = expandButton;
+	this->setFixedSize(expandButton->sizeHint());
+
+	QAction* action = new QAction(QIcon(":icons/open_icon_library/layer-lower-3.png"), "Controls", this);
+	QString tip = "Show Controls";
+	action->setStatusTip(tip);
+	action->setWhatsThis(tip);
+	action->setToolTip(tip);
+	connect(action, SIGNAL(triggered()), this, SLOT(onTriggered()));
+	mAction = action;
+
+	mShowHeaderButton->setDefaultAction(action);
+	layout->addWidget(mShowHeaderButton);
+
+	action->setCheckable(true);
+}
+
+//void PopupButton::mouseMoveEvent(QMouseEvent* event)
+//{
+//	std::cout << "mouse move" << std::endl;
+//}
+
+bool PopupButton::getShowPopup() const
+{
+	return mShowHeaderButton->isChecked();
+}
+
+void PopupButton::onTriggered()
+{
+	if (this->getShowPopup())
+		mAction->setIcon(QIcon(":icons/open_icon_library/layer-raise-3.png"));
+	else
+		mAction->setIcon(QIcon(":icons/open_icon_library/layer-lower-3.png"));
+
+	emit popup(this->getShowPopup());
+}
+
+
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+
 ConsoleWidget::ConsoleWidget(QWidget* parent, QString uid, QString name, XmlOptionFile options, LogPtr log) :
 	BaseWidget(parent, uid, name),
-  mLineWrappingAction(new QAction(tr("Line wrapping"), this)),
+//  mLineWrappingAction(new QAction(tr("Line wrapping"), this)),
   mSeverityAction(NULL),
   mMessagesWidget(NULL),
   mStackedLayout(NULL)
@@ -332,7 +412,7 @@ ConsoleWidget::ConsoleWidget(QWidget* parent, QString uid, QString name, XmlOpti
 
 ConsoleWidget::ConsoleWidget(QWidget* parent, QString uid, QString name) :
 	BaseWidget(parent, uid, name),
-	mLineWrappingAction(new QAction(tr("Line wrapping"), this)),
+//	mLineWrappingAction(new QAction(tr("Line wrapping"), this)),
 	mSeverityAction(NULL),
 	mMessagesWidget(NULL),
 	mStackedLayout(NULL)
@@ -353,7 +433,7 @@ void ConsoleWidget::prePaintEvent()
 
 void ConsoleWidget::createUI()
 {
-	mLineWrappingAction = new QAction(tr("Line wrapping"), this);
+//	mLineWrappingAction = new QAction(tr("Line wrapping"), this);
 	mSeverityAction = NULL;
 	mMessagesWidget = NULL;
 
@@ -364,23 +444,24 @@ void ConsoleWidget::createUI()
 	layout->setSpacing(0);
 	this->setLayout(layout);
 
-	QHBoxLayout* buttonLayout = new QHBoxLayout;
-	//	buttonLayout->setMargin(0);
-	layout->addLayout(buttonLayout);
+	mControlLayout = new QHBoxLayout;
+	mControlLayout->setMargin(0);
+	layout->addLayout(mControlLayout);
 
-	this->addSeverityButtons(buttonLayout);
-	buttonLayout->addSpacing(8);
-	this->addDetailsButton(buttonLayout);
+	mShowControlsButton = new PopupButton(this);
+	mControlLayout->addWidget(mShowControlsButton);
+	connect(mShowControlsButton, &PopupButton::popup, this, &ConsoleWidget::updateShowHeader);
 
-	this->createChannelSelector();
+	this->createButtonWidget();
 
-	LabeledComboBoxWidget* channelSelectorWidget = new LabeledComboBoxWidget(this, mChannelSelector);
-	channelSelectorWidget->showLabel(false);
-	buttonLayout->addSpacing(8);
-	buttonLayout->addWidget(channelSelectorWidget);
-	buttonLayout->setStretch(buttonLayout->count()-1, 0);
+	mControlLayout->addStretch(1);
 
-	buttonLayout->addStretch(1);
+//	ctkPopupWidget* popup = new ctkPopupWidget(pushButton);
+//	popup->setAlignment(Qt::AlignRight | Qt::AlignTop | Qt::AlignBottom);
+//	popup->setOrientation(Qt::Horizontal);
+//	QHBoxLayout* popupLayout = new QHBoxLayout(popup);
+//	QSlider* popupSlider = new QSlider(popup);
+//	popupLayout->addWidget(popupSlider);
 
 	mStackedLayout = new QStackedLayout;
 	mStackedLayout->setMargin(0);
@@ -398,12 +479,62 @@ void ConsoleWidget::createUI()
 	mMessageFilter->setActiveChannel(mChannelSelector->getValue());
 	mMessageListener->installFilter(mMessageFilter);
 
-	mLineWrappingAction->setCheckable(true);
-	connect(mLineWrappingAction, SIGNAL(triggered(bool)), this, SLOT(lineWrappingSlot(bool)));
-	this->lineWrappingSlot(mLineWrappingAction->isChecked());
+//	mLineWrappingAction->setCheckable(true);
+//	connect(mLineWrappingAction, SIGNAL(triggered(bool)), this, SLOT(lineWrappingSlot(bool)));
+//	this->lineWrappingSlot(mLineWrappingAction->isChecked());
 
 	this->updateUI();
+	this->updateShowHeader();
 }
+
+void ConsoleWidget::createButtonWidget()
+{
+	mButtonWidget = new QWidget(this);
+	mControlLayout->addWidget(mButtonWidget);
+
+	QHBoxLayout* buttonLayout = new QHBoxLayout;
+	buttonLayout->setMargin(0);
+	buttonLayout->setSpacing(0);
+
+	mButtonWidget->setLayout(buttonLayout);
+
+	this->addSeverityButtons(buttonLayout);
+	buttonLayout->addSpacing(8);
+	this->addDetailsButton(buttonLayout);
+
+	this->createChannelSelector();
+
+	LabeledComboBoxWidget* channelSelectorWidget = new LabeledComboBoxWidget(this, mChannelSelector);
+	channelSelectorWidget->showLabel(false);
+	buttonLayout->addSpacing(8);
+	buttonLayout->addWidget(channelSelectorWidget);
+	buttonLayout->setStretch(buttonLayout->count()-1, 0);
+
+	buttonLayout->addStretch(1);
+}
+
+void ConsoleWidget::updateShowHeader()
+{
+	bool show = mShowControlsButton->getShowPopup();
+
+	mMessagesWidget->showHeader(show);
+	mButtonWidget->setVisible(show);
+
+	if (show)
+	{
+		mControlLayout->insertWidget(0, mShowControlsButton);
+	}
+	else
+	{
+		// remove from layout, add to top of this
+		mControlLayout->removeWidget(mShowControlsButton);
+		mShowControlsButton->setParent(NULL);
+		mShowControlsButton->setParent(this);
+		mShowControlsButton->setVisible(true);
+
+	}
+}
+
 
 XmlOptionItem ConsoleWidget::option(QString name)
 {
@@ -650,9 +781,9 @@ void ConsoleWidget::printMessage(const Message& message)
 	mMessagesWidget->add(message);
 }
 
-void ConsoleWidget::lineWrappingSlot(bool checked)
-{
-//	mBrowser->setLineWrapMode(checked ? QTextEdit::WidgetWidth : QTextEdit::NoWrap);
-}
+//void ConsoleWidget::lineWrappingSlot(bool checked)
+//{
+////	mBrowser->setLineWrapMode(checked ? QTextEdit::WidgetWidth : QTextEdit::NoWrap);
+//}
 
 }//namespace cx

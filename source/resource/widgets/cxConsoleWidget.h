@@ -63,6 +63,7 @@ public:
 	virtual void normalize() = 0;
 	virtual QString getType() const = 0;
 	virtual void setScrollToBottom(bool on) = 0;
+	virtual void showHeader(bool on) = 0;
 protected:
 	void createTextCharFormats(); ///< sets up the formating rules for the message levels
 	std::map<MESSAGE_LEVEL, QTextCharFormat> mFormat;
@@ -78,6 +79,7 @@ public:
 	virtual void normalize();
 	virtual QString getType() const { return "detail";}
 	virtual void setScrollToBottom(bool on);
+	virtual void showHeader(bool on);
 
 protected:
 	XmlOptionFile mOptions;
@@ -97,6 +99,7 @@ public:
 	virtual void normalize();
 	virtual QString getType() const { return "simple";}
 	virtual void setScrollToBottom(bool on);
+	virtual void showHeader(bool on) {}
 
 	QTextBrowser* mBrowser;
 	void format(const Message &message); ///< formats the text to suit the message level
@@ -104,6 +107,25 @@ public:
 private:
 	void scrollToBottom();
 	bool mScrollToBottomEnabled;
+};
+
+class PopupButton : public QFrame
+{
+	Q_OBJECT
+public:
+	PopupButton(QWidget *parent = NULL);
+	bool getShowPopup() const;
+
+signals:
+	void popup(bool show);
+private slots:
+	void onTriggered();
+protected:
+//	void mouseMoveEvent(QMouseEvent* event);
+private:
+	QAction* mAction;
+	QToolButton* mShowHeaderButton;
+
 };
 
 /**\brief Widget for displaying status messages.
@@ -133,7 +155,7 @@ protected:
 	virtual void prePaintEvent();
 
 private slots:
-	void lineWrappingSlot(bool checked);
+//	void lineWrappingSlot(bool checked);
 	void onChannelSelectorChanged();
 	void receivedMessage(Message message);
 
@@ -142,6 +164,7 @@ private slots:
 	void onSeverityChange(int delta);
 	void updateUI();
 	void clearTable();
+	void updateShowHeader();
 
 private:
 	XmlOptionItem option(QString name);
@@ -155,8 +178,9 @@ private:
 	void updateSeverityIndicator();
 	QString getDetailTypeFromButton() const;
 	void selectMessagesWidget();
+	void createButtonWidget();
 
-	QAction* mLineWrappingAction;
+//	QAction* mLineWrappingAction;
 	QAction* mSeverityAction;
 	LogMessageDisplayWidget* mMessagesWidget;
 	QStackedLayout* mStackedLayout;
@@ -167,6 +191,10 @@ private:
 	MessageListenerPtr mMessageListener;
 	boost::shared_ptr<class MessageFilterConsole> mMessageFilter;
 	XmlOptionFile mOptions;
+	QWidget* mButtonWidget;
+	QHBoxLayout* mControlLayout;
+	PopupButton* mShowControlsButton;
+
 
 	LogPtr mLog;
 };

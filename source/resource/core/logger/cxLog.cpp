@@ -30,9 +30,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxLogFileWatcher.h"
+#include "cxLog.h"
+
 #include "cxLogger.h"
 #include <QtGlobal>
+#include <QThread>
 #include <iostream>
 #include "boost/shared_ptr.hpp"
 #include <QString>
@@ -45,22 +47,91 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTime.h"
 #include "cxDataLocations.h"
 #include "cxMessageListener.h"
-
-#include "internal/cxLogFileWatcherThread.h"
+#include "internal/cxLogThread.h"
 
 namespace cx
 {
 
-LogFileWatcherPtr LogFileWatcher::create()
+
+Log::Log()
 {
-	LogFileWatcherPtr retval(new LogFileWatcher());
-	retval->initializeObject();
-	return retval;
+	mLogPath = this->getDefaultLogPath();
 }
 
-LogThreadPtr LogFileWatcher::createWorker()
+Log::~Log()
 {
-	return LogThreadPtr(new LogFileWatcherThread());
+	this->stopThread();
 }
+
+QString Log::getDefaultLogPath() const
+{
+	QString isoDateFormat("yyyy-MM-dd");
+	QString isoDate = QDateTime::currentDateTime().toString(isoDateFormat);
+	return DataLocations::getRootConfigPath()+"/Logs/"+isoDate;
+}
+
+void Log::initializeObject()
+{
+	this->stopThread();
+	this->startThread();
+}
+
+void Log::startThread()
+{
+	if (mThread)
+		return;
+
+	mThread.reset(new QThread());
+	mThread->setObjectName("org.custusx.resource.core.logger");
+
+	mWorker = this->createWorker();
+	mWorker->moveToThread(mThread.get());
+	if (!mLogPath.isEmpty())
+		mWorker->setLoggingFolder(mLogPath);
+	connect(mWorker.get(), &LogThread::emittedMessage, this, &Log::onEmittedMessage);
+
+	mThread->start();
+}
+
+void Log::stopThread()
+{
+	if (!mThread)
+		return;
+
+	disconnect(mWorker.get(), &LogThread::emittedMessage, this, &Log::onEmittedMessage);
+	LogThreadPtr tempWorker = mWorker;
+	mWorker.reset();
+
+	mThread->quit();
+	mThread->wait(); // forever or until dead thread
+
+	mThread.reset();
+	tempWorker.reset();
+}
+
+void Log::setLoggingFolder(QString absoluteLoggingFolderPath)
+{
+	mLogPath = absoluteLoggingFolderPath;
+	if (mWorker)
+		mWorker->setLoggingFolder(mLogPath);
+}
+
+QString Log::getLoggingFolder() const
+{
+	return mLogPath;
+}
+
+void Log::installObserver(MessageObserverPtr observer, bool resend)
+{
+	if (mWorker)
+		mWorker->installObserver(observer, resend);
+}
+
+void Log::uninstallObserver(MessageObserverPtr observer)
+{
+	if (mWorker)
+		mWorker->uninstallObserver(observer);
+}
+
 
 } //End namespace cx

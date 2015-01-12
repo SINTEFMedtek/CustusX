@@ -69,11 +69,13 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	dataAdapters/cxSpaceDataAdapter
 	dataAdapters/cxSpaceDataAdapterXml
 
+	logger/cxLog
 	logger/cxReporter
 	logger/cxMessageListener
+	logger/cxLogFileWatcher
+	logger/internal/cxLogThread
 	logger/internal/cxReporterThread
 	logger/internal/cxReporterMessageRepository
-	logger/cxLogFileWatcher
 	logger/internal/cxLogFileWatcherThread
 
 	settings/cxSettings.h
@@ -166,9 +168,9 @@ cx_add_class(cxResource_SOURCE
 	logger/cxAudio.h
 	logger/cxLogger
 	logger/cxLogMessage
+	logger/cxLogMessageFilter
 	logger/internal/cxLogQDebugRedirecter
 	logger/internal/cxLogIOStreamRedirecter
-	logger/cxLogMessageFilter
 	logger/internal/cxLogFile
 
 	algorithms/ItkVtkGlue/itkImageToVTKImageFilter.h

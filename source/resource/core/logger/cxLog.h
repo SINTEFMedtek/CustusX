@@ -30,12 +30,23 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXLOGFILEWATCHER_H
-#define CXLOGFILEWATCHER_H
+#ifndef CXLOG_H
+#define CXLOG_H
 
 #include "cxResourceExport.h"
 
-#include "cxLog.h"
+#include <QMetaType>
+#include <QObject>
+#include <QMutex>
+#include <QDateTime>
+#include <QFile>
+#include "boost/shared_ptr.hpp"
+#include "cxDefinitions.h"
+#include "cxAudio.h"
+#include <sstream>
+#include "cxTypeConversions.h"
+#include "cxLogger.h"
+#include "cxLogMessage.h"
 
 class QString;
 class QDomNode;
@@ -51,8 +62,10 @@ class QTextStream;
 
 namespace cx
 {
-
-typedef boost::shared_ptr<class LogFileWatcher> LogFileWatcherPtr;
+typedef boost::shared_ptr<class MessageObserver> MessageObserverPtr;
+typedef boost::shared_ptr<class MessageListener> MessageListenerPtr;
+typedef boost::shared_ptr<class LogThread> LogThreadPtr;
+typedef boost::shared_ptr<class Log> LogPtr;
 
 /**
  * \author Christian Askeland, SINTEF
@@ -60,20 +73,39 @@ typedef boost::shared_ptr<class LogFileWatcher> LogFileWatcherPtr;
  *
  * \addtogroup cx_resource_core_logger
  */
-class cxResource_EXPORT LogFileWatcher : public Log
+class cxResource_EXPORT Log : public QObject
 {
   Q_OBJECT
 
 public:
-  static LogFileWatcherPtr create();
-  virtual ~LogFileWatcher() {}
+  virtual ~Log();
+
+  QString getLoggingFolder() const;
+  void setLoggingFolder(QString absoluteLoggingFolderPath);
+
+  void installObserver(MessageObserverPtr observer, bool resend);
+  void uninstallObserver(MessageObserverPtr observer);
 
 protected:
-  virtual LogThreadPtr createWorker();
+  virtual LogThreadPtr createWorker() = 0;
+
+protected slots:
+  void onEmittedMessage(Message message) {}
+
+protected:
+  Log();
+
+  void initializeObject();
+  void startThread();
+  void stopThread();
+
+  QString getDefaultLogPath() const;
+  QString mLogPath;
+  boost::shared_ptr<class QThread> mThread;
+  LogThreadPtr mWorker;
 private:
-  LogFileWatcher() {}
-  LogFileWatcher(const LogFileWatcher&);
-  LogFileWatcher& operator=(const LogFileWatcher&);
+  Log(const Log&);
+  Log& operator=(const Log&);
 };
 
 
@@ -83,4 +115,4 @@ private:
  * @}
  */
 
-#endif // CXLOGFILEWATCHER_H
+#endif // CXLOG_H

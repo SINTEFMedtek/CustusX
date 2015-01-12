@@ -30,12 +30,27 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXLOGFILEWATCHER_H
-#define CXLOGFILEWATCHER_H
+#ifndef CXLOGTHREAD_H
+#define CXLOGTHREAD_H
 
 #include "cxResourceExport.h"
 
-#include "cxLog.h"
+#include <QMetaType>
+#include <QObject>
+#include <QMutex>
+#include <QDateTime>
+#include <QFile>
+#include "boost/shared_ptr.hpp"
+#include "boost/function.hpp"
+#include "cxDefinitions.h"
+#include "cxAudio.h"
+#include <sstream>
+#include "cxTypeConversions.h"
+#include "cxLogger.h"
+#include "cxLogMessage.h"
+#include <QList>
+#include <QThread>
+#include <QFileSystemWatcher>
 
 class QString;
 class QDomNode;
@@ -51,31 +66,30 @@ class QTextStream;
 
 namespace cx
 {
+typedef boost::shared_ptr<class MessageObserver> MessageObserverPtr;
+typedef boost::shared_ptr<class MessageRepository> MessageRepositoryPtr;
+class LogFile;
 
-typedef boost::shared_ptr<class LogFileWatcher> LogFileWatcherPtr;
-
-/**
- * \author Christian Askeland, SINTEF
- * \date 2014-12-28
+/**\brief Thread for log handling. Used inside Log.
  *
  * \addtogroup cx_resource_core_logger
  */
-class cxResource_EXPORT LogFileWatcher : public Log
+class LogThread : public QObject
 {
-  Q_OBJECT
+	Q_OBJECT
 
 public:
-  static LogFileWatcherPtr create();
-  virtual ~LogFileWatcher() {}
+	LogThread(QObject* parent = NULL) : QObject(parent) {}
+	virtual ~LogThread() {}
+	virtual void setLoggingFolder(QString absoluteLoggingFolderPath) = 0; ///< call during startup, will fail if called when running
+	virtual void installObserver(MessageObserverPtr observer, bool resend) = 0;
+	virtual void uninstallObserver(MessageObserverPtr observer) = 0;
 
-protected:
-  virtual LogThreadPtr createWorker();
-private:
-  LogFileWatcher() {}
-  LogFileWatcher(const LogFileWatcher&);
-  LogFileWatcher& operator=(const LogFileWatcher&);
+signals:
+	void emittedMessage(Message message); ///< emitted for each new message, in addition to writing to observer.
+public slots:
+	virtual void logMessage(Message msg) {} // default impl do nothing (should be removed)
 };
-
 
 } //namespace cx
 
@@ -83,4 +97,4 @@ private:
  * @}
  */
 
-#endif // CXLOGFILEWATCHER_H
+#endif // CXLOGTHREAD_H

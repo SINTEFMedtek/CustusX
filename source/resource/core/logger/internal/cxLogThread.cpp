@@ -30,57 +30,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXLOGFILEWATCHER_H
-#define CXLOGFILEWATCHER_H
-
-#include "cxResourceExport.h"
-
-#include "cxLog.h"
-
-class QString;
-class QDomNode;
-class QDomDocument;
-class QFile;
-class QTextStream;
-
-/**
- * \file
- * \addtogroup cx_resource_core_logger
- * @{
- */
+#include "cxLogThread.h"
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class LogFileWatcher> LogFileWatcherPtr;
 
-/**
- * \author Christian Askeland, SINTEF
- * \date 2014-12-28
- *
- * \addtogroup cx_resource_core_logger
- */
-class cxResource_EXPORT LogFileWatcher : public Log
-{
-  Q_OBJECT
-
-public:
-  static LogFileWatcherPtr create();
-  virtual ~LogFileWatcher() {}
-
-protected:
-  virtual LogThreadPtr createWorker();
-private:
-  LogFileWatcher() {}
-  LogFileWatcher(const LogFileWatcher&);
-  LogFileWatcher& operator=(const LogFileWatcher&);
-};
-
-
-} //namespace cx
-
-/**
- * @}
- */
-
-#endif // CXLOGFILEWATCHER_H
+} //End namespace cx

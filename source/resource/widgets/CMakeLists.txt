@@ -60,6 +60,7 @@ set(CX_RESOURCE_WIDGETS_LIBRARIES
     ${CX_RESOURCE_WIDGETS_LIBRARIES}
     cxResource
 	cxResourceFilter
+	CTKDICOMWidgets
     )
 
 cx_create_export_header("cxResourceWidgets")

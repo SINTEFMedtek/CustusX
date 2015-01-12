@@ -53,6 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QList>
 #include <QThread>
 #include <QFileSystemWatcher>
+#include "cxLogThread.h"
 
 class QString;
 class QDomNode;
@@ -71,30 +72,6 @@ namespace cx
 typedef boost::shared_ptr<class MessageObserver> MessageObserverPtr;
 typedef boost::shared_ptr<class MessageRepository> MessageRepositoryPtr;
 class LogFile;
-
-/**\brief Thread for log handling. Used inside LogFileWatcher.
- *
- * \addtogroup cx_resource_core_logger
- */
-class LogThread : public QObject
-{
-	Q_OBJECT
-
-public:
-	LogThread(QObject* parent = NULL) : QObject(parent) {}
-	virtual ~LogThread() {}
-	virtual void setLoggingFolder(QString absoluteLoggingFolderPath) = 0; ///< call during startup, will fail if called when running
-	virtual void installObserver(MessageObserverPtr observer, bool resend) = 0;
-	virtual void uninstallObserver(MessageObserverPtr observer) = 0;
-
-signals:
-	void emittedMessage(Message message); ///< emitted for each new message, in addition to writing to observer.
-public slots:
-	virtual void logMessage(Message msg) {} // default impl do nothing (should be removed)
-
-//public slots:
-//	void pendingAction();
-};
 
 /**\brief Thread for log handling. Used inside LogFileWatcher.
  *
