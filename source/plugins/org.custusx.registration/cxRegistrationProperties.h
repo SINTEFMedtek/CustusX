@@ -29,10 +29,10 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXREGISTRATIONDATAADAPTERS_H_
-#define CXREGISTRATIONDATAADAPTERS_H_
+#ifndef CXREGISTRATIONPROPERTIES_H_
+#define CXREGISTRATIONPROPERTIES_H_
 
-#include "cxSelectDataStringDataAdapterBase.h"
+#include "cxSelectDataStringPropertyBase.h"
 #include "org_custusx_registration_Export.h"
 
 namespace cx
@@ -90,4 +90,4 @@ private:
  */
 }
 
-#endif /* CXREGISTRATIONDATAADAPTERS_H_ */
+#endif /* CXREGISTRATIONPROPERTIES_H_ */

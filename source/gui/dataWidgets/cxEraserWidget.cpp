@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkImageData.h>
 
 #include "cxMesh.h"
-#include "cxStringDataAdapter.h"
+#include "cxStringPropertyBase.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxDefinitionStrings.h"
 #include "cxUtilHelpers.h"

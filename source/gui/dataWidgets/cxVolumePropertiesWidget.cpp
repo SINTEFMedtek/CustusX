@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxShadingWidget.h"
 #include "cxDataInterface.h"
 #include "cxDataSelectWidget.h"
-#include "cxSelectDataStringDataAdapter.h"
+#include "cxSelectDataStringProperty.h"
 #include "cxVolumeInfoWidget.h"
 #include "cxVolumeHelpers.h"
 #include "cxTypeConversions.h"

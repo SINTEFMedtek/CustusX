@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxDataInterface.h"
 #include "cxVolumeInfoWidget.h"
-#include "cxSelectDataStringDataAdapter.h"
+#include "cxSelectDataStringProperty.h"
 #include "cxDataSelectWidget.h"
 #include "cxOverlayWidget.h"
 #include "cxColorWidget.h"

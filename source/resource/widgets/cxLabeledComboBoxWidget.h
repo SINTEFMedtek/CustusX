@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QLineEdit>
 #include <QLabel>
 #include <QGridLayout>
-#include "cxStringDataAdapter.h"
+#include "cxStringPropertyBase.h"
 #include "cxBaseWidget.h"
 
 namespace cx

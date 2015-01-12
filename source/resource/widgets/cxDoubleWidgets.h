@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDial>
 
 #include "cxDoubleRange.h"
-#include "cxDoubleDataAdapter.h"
+#include "cxDoublePropertyBase.h"
 #include "cxOptimizedUpdateWidget.h"
 
 namespace cx

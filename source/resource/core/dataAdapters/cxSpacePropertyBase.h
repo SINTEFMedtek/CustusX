@@ -29,8 +29,8 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXSPACEDATAADAPTER_H
-#define CXSPACEDATAADAPTER_H
+#ifndef CXSPACEPROPERTYBASE_H_
+#define CXSPACEPROPERTYBASE_H_
 
 #include "cxResourceExport.h"
 
@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString>
 #include <QStringList>
 #include <QComboBox>
-#include "cxDataAdapter.h"
+#include "cxProperty.h"
 #include "cxCoordinateSystemHelpers.h"
 
 namespace cx
@@ -105,4 +105,4 @@ typedef boost::shared_ptr<SpaceDataAdapter> SpaceDataAdapterPtr;
 
 } // namespace cx
 
-#endif // CXSPACEDATAADAPTER_H
+#endif // CXSPACEPROPERTYBASE_H_

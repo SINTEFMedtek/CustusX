@@ -36,8 +36,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxGuiExport.h"
 
 #include <QStackedLayout>
-#include "cxDataAdapter.h"
-#include "cxSelectDataStringDataAdapter.h"
+#include "cxProperty.h"
+#include "cxSelectDataStringProperty.h"
 
 namespace cx {
 

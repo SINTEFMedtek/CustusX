@@ -30,78 +30,51 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXTOOLDATAADAPTERS_H_
-#define CXTOOLDATAADAPTERS_H_
+#ifndef CXVECTOR3DCOMPONENTPROPERTY_H_
+#define CXVECTOR3DCOMPONENTPROPERTY_H_
 
-#include "cxGuiExport.h"
+#include "cxResourceExport.h"
 
-#include "cxStringDataAdapter.h"
-#include "cxTool.h"
-#include "cxLegacySingletons.h"
+#include "cxDoublePropertyBase.h"
+#include "cxVector3DPropertyBase.h"
 
 namespace cx
 {
-
 /**
  * \file
- * \addtogroup cx_gui
+ * \addtogroup cx_resource_core_dataadapters
  * @{
  */
 
-/** Adapter that connects to the current active tool.
+/**A data adapter that links to one component of a Vector3DDataAdapter.
+ * Useful for displaying widgets for vector components.
+ *
  */
-class cxGui_EXPORT ActiveToolStringDataAdapter : public StringDataAdapter
+class cxResource_EXPORT Vector3DComponentDataAdapter : public DoubleDataAdapter
 {
   Q_OBJECT
 public:
-  static StringDataAdapterPtr New() { return StringDataAdapterPtr(new ActiveToolStringDataAdapter()); }
-  ActiveToolStringDataAdapter();
-  virtual ~ActiveToolStringDataAdapter() {}
+  Vector3DComponentDataAdapter(Vector3DDataAdapterPtr base, int index, QString name, QString help);
+  virtual ~Vector3DComponentDataAdapter() {}
 
 public: // basic methods
-  virtual QString getDisplayName() const;
-  virtual bool setValue(const QString& value);
-  virtual QString getValue() const;
+	virtual QString getDisplayName() const;
+	virtual bool setValue(double value);
+	virtual double getValue() const;
 
 public: // optional methods
   virtual QString getHelp() const;
-  virtual QStringList getValueRange() const;
-  virtual QString convertInternal2Display(QString internal);
+  virtual DoubleRange getValueRange() const;
+  virtual double convertInternal2Display(double internal);
+  virtual double convertDisplay2Internal(double display);
+  virtual int getValueDecimals() const;
+
+  Vector3DDataAdapterPtr mBase;
+  int mIndex;
+  QString mName;
+  QString mHelp;
 };
-
-
-typedef boost::shared_ptr<class ActiveProbeConfigurationStringDataAdapter> ActiveProbeConfigurationStringDataAdapterPtr;
-
-/** Adapter that connects to the current active probe.
- *  It will stick to the probe as much as possible,
- *  i.e. ignore hiding and showing of other non-probes.
- */
-class cxGui_EXPORT ActiveProbeConfigurationStringDataAdapter : public StringDataAdapter
-{
-  Q_OBJECT
-public:
-  static ActiveProbeConfigurationStringDataAdapterPtr New() { return ActiveProbeConfigurationStringDataAdapterPtr(new ActiveProbeConfigurationStringDataAdapter()); }
-  ActiveProbeConfigurationStringDataAdapter();
-  virtual ~ActiveProbeConfigurationStringDataAdapter() {}
-
-public: // basic methods
-  virtual QString getDisplayName() const;
-  virtual bool setValue(const QString& value);
-  virtual QString getValue() const;
-
-public: // optional methods
-  virtual QString getHelp() const;
-  virtual QStringList getValueRange() const;
-  virtual QString convertInternal2Display(QString internal);
-
-  // extensions
-  ToolPtr getTool() { return mTool; }
-
-private slots:
-  void dominantToolChanged();
-private:
-  ToolPtr mTool;
-};
+typedef boost::shared_ptr<Vector3DComponentDataAdapter> Vector3DComponentDataAdapterPtr;
 
 
 /**
@@ -109,4 +82,4 @@ private:
  */
 }
 
-#endif /* CXTOOLDATAADAPTERS_H_ */
+#endif /* CXVECTOR3DCOMPONENTPROPERTY_H_ */

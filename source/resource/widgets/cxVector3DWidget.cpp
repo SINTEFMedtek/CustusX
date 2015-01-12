@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxTypeConversions.h"
 
-#include "cxVector3DComponentDataAdapter.h"
+#include "cxVector3DComponentProperty.h"
 #include "cxDoubleWidgets.h"
 
 namespace cx

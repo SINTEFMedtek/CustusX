@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataInterface.h"
 #include "cxTrackingService.h"
 #include "cxTool.h"
-#include "cxToolDataAdapters.h"
+#include "cxToolProperty.h"
 #include "cxActiveToolWidget.h"
 #include "cxManualTool.h"
 #include "cxLegacySingletons.h"

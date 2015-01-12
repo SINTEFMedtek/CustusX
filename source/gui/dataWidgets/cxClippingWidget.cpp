@@ -35,11 +35,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPushButton>
 #include <QCheckBox>
 #include <QGroupBox>
-#include "cxStringDataAdapter.h"
+#include "cxStringPropertyBase.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxDefinitionStrings.h"
 #include "cxInteractiveClipper.h"
-#include "cxSelectDataStringDataAdapter.h"
+#include "cxSelectDataStringProperty.h"
 #include "cxImage.h"
 #include "cxLegacySingletons.h"
 #include "cxPatientModelService.h"

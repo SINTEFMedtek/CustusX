@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataViewSelectionWidget.h"
 #include "cxTransferFunction2DOpacityWidget.h"
 #include "cxDataSelectWidget.h"
-#include "cxSelectDataStringDataAdapter.h"
+#include "cxSelectDataStringProperty.h"
 
 namespace cx {
 

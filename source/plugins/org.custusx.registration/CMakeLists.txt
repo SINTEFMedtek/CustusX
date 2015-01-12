@@ -19,7 +19,7 @@ set(PLUGIN_SRCS
   cxRegistrationServiceNull.h
   cxRegistrationService.cpp
   cxRegistrationServiceProxy.cpp
-  cxRegistrationDataAdapters.cpp
+  cxRegistrationProperties.cpp
 
   cxRegistrationBaseWidget.cpp
   cxRegistrationBaseWidget.h
@@ -32,7 +32,7 @@ set(PLUGIN_MOC_SRCS
   cxRegistrationService.h
   cxRegistrationServiceProxy.h
   cxRegistrationMethodService.h
-  cxRegistrationDataAdapters.h
+  cxRegistrationProperties.h
 )
 
 # Qt Designer files which should be processed by Qts uic

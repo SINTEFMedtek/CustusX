@@ -29,48 +29,33 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXDOUBLEDATAADAPTERTEMPORALCALIBRATION_H_
-#define CXDOUBLEDATAADAPTERTEMPORALCALIBRATION_H_
+#include "cxPropertyHelper.h"
 
-#include "cxGuiExport.h"
+#include "cxHelperWidgets.h"
+#include "cxLabeledLineEditWidget.h"
+#include "cxDataSelectWidget.h"
+#include "cxSelectDataStringProperty.h"
 
-#include "cxDoubleDataAdapter.h"
-#include "cxForwardDeclarations.h"
-#include "cxLegacySingletons.h"
+namespace cx {
 
-namespace cx
+
+QWidget* createDataWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent, DataAdapterPtr data, QGridLayout* gridLayout, int row)
 {
-/**
- * \file
- * \addtogroup cx_gui
- * @{
- */
+	QWidget* retval = NULL;
 
-/** Interface to the tool offset of the dominant tool
- */
-class cxGui_EXPORT DoubleDataAdapterTimeCalibration : public DoubleDataAdapter
-{
-  Q_OBJECT
-public:
-  static DoubleDataAdapterPtr New();
-  DoubleDataAdapterTimeCalibration();
-  virtual ~DoubleDataAdapterTimeCalibration() {}
-  virtual QString getDisplayName() const { return "Temporal Calibration"; }
-  virtual double getValue() const;
-  virtual QString getHelp() const;
-  virtual bool setValue(double val);
-  DoubleRange getValueRange() const;
+	//make cx widgets
+	SelectDataStringDataAdapterBasePtr dsda = boost::dynamic_pointer_cast<SelectDataStringDataAdapterBase>(data);
+	if (dsda)
+	{
+		retval = new DataSelectWidget(visualizationService, patientModelService, parent, dsda, gridLayout, row);
+		return retval;
+	}
+	if(retval != NULL)
+		return retval;
 
-private slots:
-  void dominantToolChanged();
-
-private:
-  ToolPtr mTool;
-};
-
-/**
- * @}
- */
+	retval = sscCreateDataWidget(parent, data, gridLayout, row);
+	return retval;
 }
 
-#endif /* CXDOUBLEDATAADAPTERTEMPORALCALIBRATION_H_ */
+
+} /* namespace cx */

@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVector3D.h"
 #include <QWidget>
 class QBoxLayout;
-#include "cxVector3DDataAdapter.h"
+#include "cxVector3DPropertyBase.h"
 #include "cxDoubleDataAdapterXml.h"
 
 namespace cx

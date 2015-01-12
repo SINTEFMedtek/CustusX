@@ -30,8 +30,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXDATAADAPTER_H_
-#define CXDATAADAPTER_H_
+#ifndef CXPROPERTY_H_
+#define CXPROPERTY_H_
 
 #include "cxResourceExport.h"
 
@@ -97,4 +97,4 @@ protected:
 };
 } //namespace cx
 
-#endif /* CXDATAADAPTER_H_ */
+#endif /* CXPROPERTY_H_ */

@@ -29,61 +29,48 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXDOUBLEPROPERTYTEMPORALCALIBRATION_H_
+#define CXDOUBLEPROPERTYTEMPORALCALIBRATION_H_
 
-#include <cxVector3DComponentDataAdapter.h>
+#include "cxGuiExport.h"
+
+#include "cxDoublePropertyBase.h"
+#include "cxForwardDeclarations.h"
+#include "cxLegacySingletons.h"
 
 namespace cx
 {
+/**
+ * \file
+ * \addtogroup cx_gui
+ * @{
+ */
 
-Vector3DComponentDataAdapter::Vector3DComponentDataAdapter(Vector3DDataAdapterPtr base, int index, QString name, QString help) :
-		mBase(base), mIndex(index), mName(name), mHelp(help)
+/** Interface to the tool offset of the dominant tool
+ */
+class cxGui_EXPORT DoubleDataAdapterTimeCalibration : public DoubleDataAdapter
 {
-	connect(mBase.get(), SIGNAL(changed()), this, SIGNAL(changed()));
+  Q_OBJECT
+public:
+  static DoubleDataAdapterPtr New();
+  DoubleDataAdapterTimeCalibration();
+  virtual ~DoubleDataAdapterTimeCalibration() {}
+  virtual QString getDisplayName() const { return "Temporal Calibration"; }
+  virtual double getValue() const;
+  virtual QString getHelp() const;
+  virtual bool setValue(double val);
+  DoubleRange getValueRange() const;
+
+private slots:
+  void dominantToolChanged();
+
+private:
+  ToolPtr mTool;
+};
+
+/**
+ * @}
+ */
 }
 
-QString Vector3DComponentDataAdapter::getDisplayName() const
-{
-	return mName.isEmpty() ? mBase->getDisplayName() : mName;
-}
-
-bool Vector3DComponentDataAdapter::setValue(double value)
-{
-	Vector3D vec = mBase->getValue();
-	vec[mIndex] = value;
-//	std::cout << "set val for comp " << "  " << value << "  " << mIndex << std::endl;
-	return mBase->setValue(vec);
-}
-
-double Vector3DComponentDataAdapter::getValue() const
-{
-	return mBase->getValue()[mIndex];
-}
-
-QString Vector3DComponentDataAdapter::getHelp() const
-{
-	return mHelp.isEmpty() ? mBase->getHelp() : mHelp;
-}
-
-DoubleRange Vector3DComponentDataAdapter::getValueRange() const
-{
-	return mBase->getValueRange();
-}
-
-double Vector3DComponentDataAdapter::convertInternal2Display(double internal)
-{
-	return mBase->convertInternal2Display(internal);
-}
-
-double Vector3DComponentDataAdapter::convertDisplay2Internal(double display)
-{
-	return mBase->convertDisplay2Internal(display);
-}
-
-int Vector3DComponentDataAdapter::getValueDecimals() const
-{
-	return mBase->getValueDecimals();
-}
-
-
-
-}
+#endif /* CXDOUBLEPROPERTYTEMPORALCALIBRATION_H_ */

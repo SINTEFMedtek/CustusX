@@ -30,56 +30,78 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXVECTOR3DCOMPONENTDATAADAPTER_H_
-#define CXVECTOR3DCOMPONENTDATAADAPTER_H_
 
-#include "cxResourceExport.h"
-
-#include "cxDoubleDataAdapter.h"
-#include "cxVector3DDataAdapter.h"
+#include "cxProperty.h"
 
 namespace cx
 {
-/**
- * \file
- * \addtogroup cx_resource_core_dataadapters
- * @{
- */
 
-/**A data adapter that links to one component of a Vector3DDataAdapter.
- * Useful for displaying widgets for vector components.
- *
- */
-class cxResource_EXPORT Vector3DComponentDataAdapter : public DoubleDataAdapter
+DataAdapter::DataAdapter() :
+		QObject(), mEnabled(true), mAdvanced(false), mGroup("")
+{}
+
+
+DataAdapterPtr DataAdapter::findAdapter(std::vector<DataAdapterPtr> adapters, QString id)
 {
-  Q_OBJECT
-public:
-  Vector3DComponentDataAdapter(Vector3DDataAdapterPtr base, int index, QString name, QString help);
-  virtual ~Vector3DComponentDataAdapter() {}
-
-public: // basic methods
-	virtual QString getDisplayName() const;
-	virtual bool setValue(double value);
-	virtual double getValue() const;
-
-public: // optional methods
-  virtual QString getHelp() const;
-  virtual DoubleRange getValueRange() const;
-  virtual double convertInternal2Display(double internal);
-  virtual double convertDisplay2Internal(double display);
-  virtual int getValueDecimals() const;
-
-  Vector3DDataAdapterPtr mBase;
-  int mIndex;
-  QString mName;
-  QString mHelp;
-};
-typedef boost::shared_ptr<Vector3DComponentDataAdapter> Vector3DComponentDataAdapterPtr;
-
-
-/**
- * @}
- */
+	for(int i=0; i<adapters.size(); ++i)
+	{
+		DataAdapterPtr adapter = adapters[i];
+		if(QString::compare(adapter->getUid(), id) == 0)
+		{
+			return adapter;
+		}
+	}
+	return DataAdapterPtr();
 }
 
-#endif /* CXVECTOR3DCOMPONENTDATAADAPTER_H_ */
+bool DataAdapter::getEnabled() const
+{
+	return mEnabled;
+}
+
+bool DataAdapter::getAdvanced() const
+{
+	return mAdvanced;
+}
+
+QString DataAdapter::getGroup() const
+{
+	return mGroup;
+}
+
+bool DataAdapter::setEnabled(bool enabling)
+{
+
+	if(mEnabled == enabling)
+		return false;
+
+	mEnabled = enabling;
+	emit changed();
+
+	return true;
+}
+
+bool DataAdapter::setAdvanced(bool advanced)
+{
+	if(advanced == mAdvanced)
+		return false;
+
+	mAdvanced = advanced;
+	emit changed();
+
+	return true;
+}
+
+bool DataAdapter::setGroup(QString name)
+{
+	if(name == mGroup)
+		return false;
+
+	mGroup = name;
+	emit changed();
+
+	return true;
+}
+
+
+} //namespace cx

@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXSEANSVESSELREGISTRATIONWIDGET_H_
 
 #include "cxRegistrationBaseWidget.h"
-#include "cxStringDataAdapter.h"
+#include "cxStringPropertyBase.h"
 
 class QSpinBox;
 class QPushButton;

@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QCheckBox>
 #include "cxLabeledComboBoxWidget.h"
 #include "cxDoubleWidgets.h"
-#include "cxToolDataAdapters.h"
+#include "cxToolProperty.h"
 #include "cxVector3DWidget.h"
 //#include "cxProbeImpl.h"
 #include "cxDoubleSpanSlider.h"

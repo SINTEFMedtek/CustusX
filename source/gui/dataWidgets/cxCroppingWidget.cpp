@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QGroupBox>
 #include <QLabel>
 #include <vtkImageData.h>
-#include "cxStringDataAdapter.h"
+#include "cxStringPropertyBase.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxDefinitionStrings.h"
 #include "cxUtilHelpers.h"

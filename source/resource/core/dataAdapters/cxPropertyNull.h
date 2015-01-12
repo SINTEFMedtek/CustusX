@@ -30,11 +30,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXDATAADAPTERNULL_H
-#define CXDATAADAPTERNULL_H
+#ifndef CXPROPERTYNULL_H_
+#define CXPROPERTYNULL_H_
 
 #include "cxResourceExport.h"
-#include "cxDataAdapter.h"
+#include "cxProperty.h"
 
 namespace cx {
 
@@ -70,4 +70,4 @@ public:
 } //namespace cx
 
 
-#endif // CXDATAADAPTERNULL_H
+#endif // CXPROPERTYNULL_H_

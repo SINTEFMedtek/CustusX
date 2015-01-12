@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include <QObject>
 #include <vtkSmartPointer.h>
-#include "cxDataAdapter.h"
+#include "cxProperty.h"
 #include  "boost/shared_ptr.hpp"
 
 

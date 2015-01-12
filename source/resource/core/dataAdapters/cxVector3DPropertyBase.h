@@ -32,13 +32,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /*
- * sscDoubleDataAdapter.h
+ * sscVector3DDataAdapter.h
  *
- *  Created on: Jun 23, 2010
+ *  Created on: Jul 25, 2011
  *      Author: christiana
  */
-#ifndef CXDOUBLEDATAADAPTER_H_
-#define CXDOUBLEDATAADAPTER_H_
+
+#ifndef CXVECTOR3DPROPERTYBASE_H_
+#define CXVECTOR3DPROPERTYBASE_H_
 
 #include "cxResourceExport.h"
 
@@ -46,82 +47,44 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString>
 #include <QObject>
 #include "cxDoubleRange.h"
-#include "cxDataAdapter.h"
+#include "cxProperty.h"
+#include "cxVector3D.h"
 
 namespace cx
 {
 
-/**\brief Abstract interface for interaction with internal double-valued data
+/**\brief Abstract interface for interaction with internal Vector3D-valued data
  *
- * The class provides a bridge between general user interface code and specific
- * data structures. An implementation connects to a single data value.
- *
- *
- * Minimal implementation:
-   \verbatim
-       virtual QString getDisplayName() const;
-       virtual bool setValue(double value);
-       virtual double getValue() const;
-       void changed();
-   \endverbatim
- * By implementing these methods you can set and get values, and the data has a name.
- * The changed() signal is used to make sure the user interface is updated even when
- * data is changed by some other source.
- *
- *
- * For more control use the methods:
-   \verbatim
-       virtual DoubleRange getValueRange() const;
-       virtual int getValueDecimals() const;
-   \endverbatim
- *
- *
- * If there is a difference between the internal data representation and
- * how you want to present them, use:
-   \verbatim
-       virtual double convertInternal2Display(double internal);
-       virtual double convertDisplay2Internal(double display);
-   \endverbatim
- *
- * When testing, or during development, you can use the DoubleDataAdapterNull
- * as a dummy implementation.
+ *  Refer to DoubleDataAdapter for a description.
  *
  * \ingroup cx_resource_core_dataadapters
  */
-class cxResource_EXPORT DoubleDataAdapter: public DataAdapter
+class cxResource_EXPORT Vector3DDataAdapter: public DataAdapter
 {
 Q_OBJECT
 public:
-	DoubleDataAdapter() : mGuiRepresentation(grSPINBOX){}
-	virtual ~DoubleDataAdapter(){}
+	virtual ~Vector3DDataAdapter()
+	{
+	}
 
 public:
-	enum GuiRepresentation
-	{
-		grSPINBOX,
-		grSLIDER,
-		grDIAL
-	};
-
 	// basic methods
 	virtual QString getDisplayName() const = 0; ///< name of data entity. Used for display to user.
+	virtual bool setValue(const Vector3D& value) = 0; ///< set the data value.
+	virtual Vector3D getValue() const = 0; ///< get the data value.
 
 	virtual QVariant getValueAsVariant() const
 	{
-		return QVariant(this->getValue());
+		QString val = prettyFormat(this->getValue(), this->getValueDecimals());
+		return QVariant(val);
+	//	return QVariant(this->getValue());
 	}
-	virtual void setValueFromVariant(QVariant val)
+
+	virtual void setValueFromVariant(QVariant value)
 	{
-		this->setValue(val.toDouble());
+		Vector3D val = Vector3D::fromString(value.toString());
+		this->setValue(val);
 	}
-
-
-	virtual QString getUid() const { return this->getDisplayName()+"_uid"; }
-	virtual bool setValue(double value) = 0; ///< set the data value.
-	virtual double getValue() const = 0; ///< get the data value.
-
-	virtual void setGuiRepresentation(GuiRepresentation type) { mGuiRepresentation = type; };
-	virtual GuiRepresentation getGuiRepresentation() { return mGuiRepresentation; };
 
 public:
 	// optional methods
@@ -131,7 +94,7 @@ public:
 	} ///< return a descriptive help string for the data, used for example as a tool tip.
 	virtual DoubleRange getValueRange() const
 	{
-		return DoubleRange(0, 1, 0.01);
+		return DoubleRange(-1000, 1000, 0.1);
 	} /// range of value
 	virtual double convertInternal2Display(double internal)
 	{
@@ -145,33 +108,29 @@ public:
 	{
 		return 0;
 	} ///< number of relevant decimals in value
-
-protected:
-    GuiRepresentation mGuiRepresentation;
-
 };
-typedef boost::shared_ptr<DoubleDataAdapter> DoubleDataAdapterPtr;
+typedef boost::shared_ptr<Vector3DDataAdapter> Vector3DDataAdapterPtr;
 
 /** Dummy implementation */
-class cxResource_EXPORT DoubleDataAdapterNull: public DoubleDataAdapter
+class cxResource_EXPORT Vector3DDataAdapterNull: public Vector3DDataAdapter
 {
 Q_OBJECT
 
 public:
-	virtual ~DoubleDataAdapterNull()
+	virtual ~Vector3DDataAdapterNull()
 	{
 	}
 	virtual QString getDisplayName() const
 	{
 		return "dummy";
 	}
-	virtual bool setValue(double value)
+	virtual bool setValue(const Vector3D& value)
 	{
 		return false;
 	}
-	virtual double getValue() const
+	virtual Vector3D getValue() const
 	{
-		return 0;
+		return Vector3D(0, 0, 0);
 	}
 	virtual void connectValueSignals(bool on)
 	{
@@ -180,4 +139,4 @@ public:
 
 }
 
-#endif /* CXDOUBLEDATAADAPTER_H_ */
+#endif /* CXVECTOR3DPROPERTYBASE_H_ */

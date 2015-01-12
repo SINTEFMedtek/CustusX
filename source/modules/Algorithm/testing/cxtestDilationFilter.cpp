@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ctkPluginContext.h>
 #include "cxDilationFilter.h"
 #include "cxDataLocations.h"
-#include "cxSelectDataStringDataAdapter.h"
+#include "cxSelectDataStringProperty.h"
 #include "cxData.h"
 #include "cxImage.h"
 #include "cxLegacySingletons.h"

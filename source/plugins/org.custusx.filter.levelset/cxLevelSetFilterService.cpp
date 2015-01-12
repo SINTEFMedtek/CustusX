@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationTransform.h"
 #include "cxStringDataAdapterXml.h"
 #include "cxDoubleDataAdapterXml.h"
-#include "cxSelectDataStringDataAdapter.h"
+#include "cxSelectDataStringProperty.h"
 #include "cxCoordinateSystemHelpers.h"
 #include "cxData.h"
 #include "cxImage.h"

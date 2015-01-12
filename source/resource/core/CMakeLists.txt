@@ -49,24 +49,24 @@ cx_add_class_qt_moc(cxResource_SOURCE
     Tool/cxDominantToolProxy
     Tool/cxTrackingSystemService.h
 
-    dataAdapters/cxDataAdapter
-    dataAdapters/cxDataAdapterNull.h
-    dataAdapters/cxDoubleDataAdapter.h
-    dataAdapters/cxStringDataAdapter.h
+    dataAdapters/cxProperty
+    dataAdapters/cxPropertyNull.h
+    dataAdapters/cxDoublePropertyBase.h
+    dataAdapters/cxStringPropertyBase.h
     dataAdapters/cxDoubleDataAdapterXml
     dataAdapters/cxStringDataAdapterXml
-    dataAdapters/cxBoolDataAdapter.h
+    dataAdapters/cxBoolPropertyBase.h
     dataAdapters/cxBoolDataAdapterXml
-    dataAdapters/cxVector3DDataAdapter.h
+    dataAdapters/cxVector3DPropertyBase.h
     dataAdapters/cxVector3DDataAdapterXml
-    dataAdapters/cxColorDataAdapter.h
+    dataAdapters/cxColorPropertyBase.h
     dataAdapters/cxColorDataAdapterXml
-    dataAdapters/cxVector3DComponentDataAdapter
-    dataAdapters/cxDoublePairDataAdapter.h
+    dataAdapters/cxVector3DComponentProperty
+    dataAdapters/cxDoublePairPropertyBase.h
     dataAdapters/cxDoublePairDataAdapterXml
-    dataAdapters/cxSelectDataStringDataAdapterBase
-    dataAdapters/cxSelectDataStringDataAdapter
-    dataAdapters/cxSpaceDataAdapter
+    dataAdapters/cxSelectDataStringPropertyBase
+    dataAdapters/cxSelectDataStringProperty
+    dataAdapters/cxSpacePropertyBase
     dataAdapters/cxSpaceDataAdapterXml
 
     logger/cxReporter

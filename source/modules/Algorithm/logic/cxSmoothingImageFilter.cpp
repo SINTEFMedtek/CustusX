@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxAlgorithmHelpers.h"
 #include <itkSmoothingRecursiveGaussianImageFilter.h>
-#include "cxSelectDataStringDataAdapter.h"
+#include "cxSelectDataStringProperty.h"
 
 #include "cxUtilHelpers.h"
 #include "cxRegistrationTransform.h"

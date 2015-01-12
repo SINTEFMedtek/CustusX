@@ -29,33 +29,65 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include "cxDataAdapterHelper.h"
-
-#include "cxHelperWidgets.h"
-#include "cxLabeledLineEditWidget.h"
-#include "cxDataSelectWidget.h"
-#include "cxSelectDataStringDataAdapter.h"
-
-namespace cx {
 
 
-QWidget* createDataWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent, DataAdapterPtr data, QGridLayout* gridLayout, int row)
+/*
+ * sscBoolDataAdapter.h
+ *
+ *  Created on: Feb 7, 2011
+ *      Author: christiana
+ */
+
+#ifndef CXBOOLPROPERTYBASE_H_
+#define CXBOOLPROPERTYBASE_H_
+
+#include "cxResourceExport.h"
+
+#include "cxProperty.h"
+
+namespace cx
 {
-	QWidget* retval = NULL;
 
-	//make cx widgets
-	SelectDataStringDataAdapterBasePtr dsda = boost::dynamic_pointer_cast<SelectDataStringDataAdapterBase>(data);
-	if (dsda)
+/**\brief DataAdapter interface for boolean values.
+ *
+ * \ingroup cx_resource_core_dataadapters
+ */
+class cxResource_EXPORT BoolDataAdapter: public DataAdapter
+{
+Q_OBJECT
+public:
+	virtual ~BoolDataAdapter()
 	{
-		retval = new DataSelectWidget(visualizationService, patientModelService, parent, dsda, gridLayout, row);
-		return retval;
 	}
-	if(retval != NULL)
-		return retval;
 
-	retval = sscCreateDataWidget(parent, data, gridLayout, row);
-	return retval;
+public:
+	// basic methods
+	virtual QString getDisplayName() const = 0; ///< name of data entity. Used for display to user.
+	virtual bool setValue(bool value) = 0; ///< set the data value.
+	virtual bool getValue() const = 0; ///< get the data value.
+
+	virtual QVariant getValueAsVariant() const
+	{
+		return QVariant(this->getValue());
+	}
+	virtual void setValueFromVariant(QVariant val)
+	{
+		this->setValue(val.toBool());
+	}
+
+public:
+	// optional methods
+	virtual QString getHelp() const
+	{
+		return QString();
+	} ///< return a descriptive help string for the data, used for example as a tool tip.
+	//virtual void connectValueSignals(bool on) {} ///< set object to emit changed() when applicable
+
+	//signals:
+	//  void changed(); ///< emit when the underlying data value is changed: The user interface will be updated.
+};
+typedef boost::shared_ptr<BoolDataAdapter> BoolDataAdapterPtr;
+
 }
 
-
-} /* namespace cx */
+#endif /* CXBOOLPROPERTYBASE_H_ */

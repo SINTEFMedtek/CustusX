@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDomElement>
 #include <QStringList>
 #include "cxDoubleRange.h"
-#include "cxVector3DDataAdapter.h"
+#include "cxVector3DPropertyBase.h"
 #include "cxXmlOptionItem.h"
 
 namespace cx

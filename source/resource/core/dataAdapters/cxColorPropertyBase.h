@@ -30,64 +30,56 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-
-/*
- * sscBoolDataAdapter.h
- *
- *  Created on: Feb 7, 2011
- *      Author: christiana
- */
-
-#ifndef CXBOOLDATAADAPTER_H_
-#define CXBOOLDATAADAPTER_H_
+#ifndef CXCOLORPROPERTYBASE_H_
+#define CXCOLORPROPERTYBASE_H_
 
 #include "cxResourceExport.h"
 
-#include "cxDataAdapter.h"
+#include <QColor>
+#include "cxProperty.h"
+
 
 namespace cx
 {
 
-/**\brief DataAdapter interface for boolean values.
+/** DataAdapter interface for QColor
+ *
  *
  * \ingroup cx_resource_core_dataadapters
+ * \date Nov 22, 2012
+ * \author christiana
  */
-class cxResource_EXPORT BoolDataAdapter: public DataAdapter
+class cxResource_EXPORT ColorDataAdapter: public DataAdapter
 {
 Q_OBJECT
 public:
-	virtual ~BoolDataAdapter()
-	{
-	}
+    virtual ~ColorDataAdapter() {}
 
 public:
-	// basic methods
-	virtual QString getDisplayName() const = 0; ///< name of data entity. Used for display to user.
-	virtual bool setValue(bool value) = 0; ///< set the data value.
-	virtual bool getValue() const = 0; ///< get the data value.
+    // basic methods
+    virtual QString getDisplayName() const = 0; ///< name of data entity. Used for display to user.
+    virtual bool setValue(QColor value) = 0; ///< set the data value.
+    virtual QColor getValue() const = 0; ///< get the data value.
 
 	virtual QVariant getValueAsVariant() const
 	{
 		return QVariant(this->getValue());
 	}
-	virtual void setValueFromVariant(QVariant val)
+
+	virtual void setValueFromVariant(QVariant value)
 	{
-		this->setValue(val.toBool());
+		this->setValue(value.value<QColor>());
 	}
 
 public:
-	// optional methods
-	virtual QString getHelp() const
-	{
-		return QString();
-	} ///< return a descriptive help string for the data, used for example as a tool tip.
-	//virtual void connectValueSignals(bool on) {} ///< set object to emit changed() when applicable
-
-	//signals:
-	//  void changed(); ///< emit when the underlying data value is changed: The user interface will be updated.
+    // optional methods
+    virtual QString getHelp() const
+    {
+        return QString();
+    } ///< return a descriptive help string for the data, used for example as a tool tip.
 };
-typedef boost::shared_ptr<BoolDataAdapter> BoolDataAdapterPtr;
+typedef boost::shared_ptr<ColorDataAdapter> ColorDataAdapterPtr;
 
-}
+} // namespace cx
 
-#endif /* CXBOOLDATAADAPTER_H_ */
+#endif // CXCOLORPROPERTYBASE_H_

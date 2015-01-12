@@ -39,10 +39,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "cxLogger.h"
-#include "cxBoolDataAdapter.h"
-#include "cxDoubleDataAdapter.h"
-#include "cxColorDataAdapter.h"
-#include "cxStringDataAdapter.h"
+#include "cxBoolPropertyBase.h"
+#include "cxDoublePropertyBase.h"
+#include "cxColorPropertyBase.h"
+#include "cxStringPropertyBase.h"
 #include "cxCompositeTimedAlgorithm.h"
 #include "cxFilterTimedAlgorithm.h"
 

@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxUsReconstructionServiceNull.h"
-#include "cxDataAdapterNull.h"
+#include "cxPropertyNull.h"
 #include "cxUSReconstructInputData.h"
 
 namespace cx {

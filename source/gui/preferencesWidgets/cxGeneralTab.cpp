@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSettings.h"
 #include "cxStateService.h"
 #include "cxVLCRecorder.h"
-#include "cxDataAdapterHelper.h"
+#include "cxPropertyHelper.h"
 #include <QAction>
 
 namespace cx

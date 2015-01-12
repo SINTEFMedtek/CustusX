@@ -30,24 +30,17 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXCROPPINGWIDGET_H_
-#define CXCROPPINGWIDGET_H_
+#ifndef CXTOOLPROPERTY_H_
+#define CXTOOLPROPERTY_H_
 
 #include "cxGuiExport.h"
 
-#include "cxForwardDeclarations.h"
 #include "cxStringPropertyBase.h"
-#include "cxBaseWidget.h"
+#include "cxTool.h"
 #include "cxLegacySingletons.h"
-
-#include "cxBoundingBoxWidget.h"
-
-class QCheckBox;
-class QLabel;
 
 namespace cx
 {
-typedef boost::shared_ptr<class InteractiveCropper> InteractiveCropperPtr;
 
 /**
  * \file
@@ -55,37 +48,65 @@ typedef boost::shared_ptr<class InteractiveCropper> InteractiveCropperPtr;
  * @{
  */
 
-/**
- * \class CroppingWidget
- *
- * \date  Aug 20, 2010
- * \author Christian Askeland, SINTEF
+/** Adapter that connects to the current active tool.
  */
-class cxGui_EXPORT CroppingWidget : public BaseWidget
+class cxGui_EXPORT ActiveToolStringDataAdapter : public StringDataAdapter
 {
   Q_OBJECT
-
 public:
-  CroppingWidget(QWidget* parent);
-  virtual QString defaultWhatsThis() const;
+  static StringDataAdapterPtr New() { return StringDataAdapterPtr(new ActiveToolStringDataAdapter()); }
+  ActiveToolStringDataAdapter();
+  virtual ~ActiveToolStringDataAdapter() {}
 
-private:
-  InteractiveCropperPtr mInteractiveCropper;
-  BoundingBoxWidget* mBBWidget;
-  QCheckBox* mUseCropperCheckBox;
-  QCheckBox* mShowBoxCheckBox;
-  QLabel* mBoundingBoxDimensions;
+public: // basic methods
+  virtual QString getDisplayName() const;
+  virtual bool setValue(const QString& value);
+  virtual QString getValue() const;
+
+public: // optional methods
+  virtual QString getHelp() const;
+  virtual QStringList getValueRange() const;
+  virtual QString convertInternal2Display(QString internal);
+};
+
+
+typedef boost::shared_ptr<class ActiveProbeConfigurationStringDataAdapter> ActiveProbeConfigurationStringDataAdapterPtr;
+
+/** Adapter that connects to the current active probe.
+ *  It will stick to the probe as much as possible,
+ *  i.e. ignore hiding and showing of other non-probes.
+ */
+class cxGui_EXPORT ActiveProbeConfigurationStringDataAdapter : public StringDataAdapter
+{
+  Q_OBJECT
+public:
+  static ActiveProbeConfigurationStringDataAdapterPtr New() { return ActiveProbeConfigurationStringDataAdapterPtr(new ActiveProbeConfigurationStringDataAdapter()); }
+  ActiveProbeConfigurationStringDataAdapter();
+  virtual ~ActiveProbeConfigurationStringDataAdapter() {}
+
+public: // basic methods
+  virtual QString getDisplayName() const;
+  virtual bool setValue(const QString& value);
+  virtual QString getValue() const;
+
+public: // optional methods
+  virtual QString getHelp() const;
+  virtual QStringList getValueRange() const;
+  virtual QString convertInternal2Display(QString internal);
+
+  // extensions
+  ToolPtr getTool() { return mTool; }
 
 private slots:
-  void boxValuesChanged();
-  void cropperChangedSlot();
-  ImagePtr cropClipButtonClickedSlot();///< Crete a new image based on the images crop and clip values
+  void dominantToolChanged();
+private:
+  ToolPtr mTool;
 };
+
 
 /**
  * @}
  */
-}//namespace cx
+}
 
-
-#endif /* CXCROPPINGWIDGET_H_ */
+#endif /* CXTOOLPROPERTY_H_ */

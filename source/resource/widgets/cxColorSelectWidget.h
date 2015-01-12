@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QLabel>
 #include <QGridLayout>
 #include "cxOptimizedUpdateWidget.h"
-#include "cxColorDataAdapter.h"
+#include "cxColorPropertyBase.h"
 #include "cxColorSelectButton.h"
 
 namespace cx

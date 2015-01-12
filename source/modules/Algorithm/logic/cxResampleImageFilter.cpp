@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImageAlgorithms.h"
 #include "cxImage.h"
 #include "vtkImageData.h"
-#include "cxSelectDataStringDataAdapter.h"
+#include "cxSelectDataStringProperty.h"
 #include "cxDoubleDataAdapterXml.h"
 #include "cxPatientModelService.h"
 

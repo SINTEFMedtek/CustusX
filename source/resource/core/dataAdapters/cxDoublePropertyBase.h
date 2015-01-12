@@ -30,55 +30,98 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXDOUBLESPANSLIDERADAPTER_H
-#define CXDOUBLESPANSLIDERADAPTER_H
+
+/*
+ * sscDoubleDataAdapter.h
+ *
+ *  Created on: Jun 23, 2010
+ *      Author: christiana
+ */
+#ifndef CXDOUBLEPROPERTYBASE_H_
+#define CXDOUBLEPROPERTYBASE_H_
 
 #include "cxResourceExport.h"
 
-#include "cxDataAdapter.h"
+#include <boost/shared_ptr.hpp>
+#include <QString>
+#include <QObject>
 #include "cxDoubleRange.h"
-#include "cxMathBase.h"
-#include "cxTypeConversions.h"
-#include "cxVector3D.h"
+#include "cxProperty.h"
 
 namespace cx
 {
-/**
+
+/**\brief Abstract interface for interaction with internal double-valued data
  *
- * \brief Abstract interface for interaction with internal data structure: A pair of doubles
+ * The class provides a bridge between general user interface code and specific
+ * data structures. An implementation connects to a single data value.
+ *
+ *
+ * Minimal implementation:
+   \verbatim
+       virtual QString getDisplayName() const;
+       virtual bool setValue(double value);
+       virtual double getValue() const;
+       void changed();
+   \endverbatim
+ * By implementing these methods you can set and get values, and the data has a name.
+ * The changed() signal is used to make sure the user interface is updated even when
+ * data is changed by some other source.
+ *
+ *
+ * For more control use the methods:
+   \verbatim
+       virtual DoubleRange getValueRange() const;
+       virtual int getValueDecimals() const;
+   \endverbatim
+ *
+ *
+ * If there is a difference between the internal data representation and
+ * how you want to present them, use:
+   \verbatim
+       virtual double convertInternal2Display(double internal);
+       virtual double convertDisplay2Internal(double display);
+   \endverbatim
+ *
+ * When testing, or during development, you can use the DoubleDataAdapterNull
+ * as a dummy implementation.
+ *
  * \ingroup cx_resource_core_dataadapters
- *
- * \date Juli 31, 2014
- * \author Ole Vegard Solberg, SINTEF
  */
-class cxResource_EXPORT DoublePairDataAdapter : public DataAdapter
+class cxResource_EXPORT DoubleDataAdapter: public DataAdapter
 {
 Q_OBJECT
 public:
-	virtual ~DoublePairDataAdapter() {}
-//	DoubleSpanSliderAdapter();
+	DoubleDataAdapter() : mGuiRepresentation(grSPINBOX){}
+	virtual ~DoubleDataAdapter(){}
 
 public:
+	enum GuiRepresentation
+	{
+		grSPINBOX,
+		grSLIDER,
+		grDIAL
+	};
+
 	// basic methods
 	virtual QString getDisplayName() const = 0; ///< name of data entity. Used for display to user.
-//	virtual bool setValue(const std::pair<double,double>& value) = 0; ///< set the data value.
-	virtual bool setValue(const Eigen::Vector2d& value) = 0; ///< set the data value.
-//	virtual std::pair<double,double> getValue() const = 0; ///< get the data value.
-	virtual Eigen::Vector2d getValue() const = 0; ///< get the data value.
-
-	virtual void setValueRange(DoubleRange range) = 0;
 
 	virtual QVariant getValueAsVariant() const
 	{
-		QString val = qstring_cast(this->getValue());
-		return QVariant(val);
+		return QVariant(this->getValue());
+	}
+	virtual void setValueFromVariant(QVariant val)
+	{
+		this->setValue(val.toDouble());
 	}
 
-	virtual void setValueFromVariant(QVariant value)
-	{
-		Eigen::Vector2d val = fromString(value.toString());
-		this->setValue(val);
-	}
+
+	virtual QString getUid() const { return this->getDisplayName()+"_uid"; }
+	virtual bool setValue(double value) = 0; ///< set the data value.
+	virtual double getValue() const = 0; ///< get the data value.
+
+	virtual void setGuiRepresentation(GuiRepresentation type) { mGuiRepresentation = type; };
+	virtual GuiRepresentation getGuiRepresentation() { return mGuiRepresentation; };
 
 public:
 	// optional methods
@@ -88,7 +131,7 @@ public:
 	} ///< return a descriptive help string for the data, used for example as a tool tip.
 	virtual DoubleRange getValueRange() const
 	{
-		return DoubleRange(-1000, 1000, 0.1);
+		return DoubleRange(0, 1, 0.01);
 	} /// range of value
 	virtual double convertInternal2Display(double internal)
 	{
@@ -103,37 +146,38 @@ public:
 		return 0;
 	} ///< number of relevant decimals in value
 
+protected:
+    GuiRepresentation mGuiRepresentation;
+
 };
-typedef boost::shared_ptr<DoublePairDataAdapter> DoublePairDataAdapterPtr;
+typedef boost::shared_ptr<DoubleDataAdapter> DoubleDataAdapterPtr;
 
 /** Dummy implementation */
-class cxResource_EXPORT DoubleSpanSliderAdapterNull: public DoublePairDataAdapter
+class cxResource_EXPORT DoubleDataAdapterNull: public DoubleDataAdapter
 {
 Q_OBJECT
 
 public:
-	virtual ~DoubleSpanSliderAdapterNull()
+	virtual ~DoubleDataAdapterNull()
 	{
 	}
 	virtual QString getDisplayName() const
 	{
 		return "dummy";
 	}
-//	virtual bool setValue(const std::pair<double,double>& value)
-	virtual bool setValue(const Eigen::Vector2d& value)
+	virtual bool setValue(double value)
 	{
 		return false;
 	}
-//	virtual std::pair<double,double> getValue() const
-	virtual Eigen::Vector2d getValue() const
+	virtual double getValue() const
 	{
-//		return std::make_pair(0,0);
-		return Eigen::Vector2d(0, 0);
+		return 0;
 	}
 	virtual void connectValueSignals(bool on)
 	{
 	}
 };
 
-} // namespace cx
-#endif // CXDOUBLESPANSLIDERADAPTER_H
+}
+
+#endif /* CXDOUBLEPROPERTYBASE_H_ */

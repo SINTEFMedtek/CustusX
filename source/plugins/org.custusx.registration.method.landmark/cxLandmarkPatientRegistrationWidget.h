@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXLANDMARKPATIENTREGISTRATIONWIDGET_H_
 
 #include "cxLandmarkRegistrationWidget.h"
-#include "cxRegistrationDataAdapters.h"
+#include "cxRegistrationProperties.h"
 
 #include "cxImage.h"
 #include "cxTransform3D.h"

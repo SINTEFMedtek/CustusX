@@ -30,11 +30,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXSELECTDATASTRINGDATAADAPTERBASE_H
-#define CXSELECTDATASTRINGDATAADAPTERBASE_H
+#ifndef CXSELECTDATASTRINGPROPERTYBASE_H_
+#define CXSELECTDATASTRINGPROPERTYBASE_H_
 
 #include "cxResourceExport.h"
-#include "cxStringDataAdapter.h"
+#include "cxStringPropertyBase.h"
 #include "cxForwardDeclarations.h"
 
 namespace cx
@@ -85,4 +85,4 @@ protected:
 };
 
 } // cx
-#endif // CXSELECTDATASTRINGDATAADAPTERBASE_H
+#endif // CXSELECTDATASTRINGPROPERTYBASE_H_

@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxResourceExport.h"
 
-#include "cxColorDataAdapter.h"
+#include "cxColorPropertyBase.h"
 #include "cxXmlOptionItem.h"
 
 

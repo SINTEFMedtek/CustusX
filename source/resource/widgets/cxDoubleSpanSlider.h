@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDoubleRange.h"
 #include "qxtspanslider.h"
 #include "cxDoubleWidgets.h"
-#include "cxDoublePairDataAdapter.h"
+#include "cxDoublePairPropertyBase.h"
 #include "cxOptimizedUpdateWidget.h"
 class QDoubleSpinBox;
 

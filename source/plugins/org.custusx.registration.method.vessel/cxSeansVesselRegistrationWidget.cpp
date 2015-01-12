@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogger.h"
 #include "cxTimedAlgorithm.h"
 #include "cxLabeledComboBoxWidget.h"
-#include "cxRegistrationDataAdapters.h"
+#include "cxRegistrationProperties.h"
 #include "vesselReg/SeansVesselReg.hxx"
 #include "cxMesh.h"
 #include "cxView.h"

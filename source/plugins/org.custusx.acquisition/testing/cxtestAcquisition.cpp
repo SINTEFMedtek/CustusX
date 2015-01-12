@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QApplication>
 
 #include "catch.hpp"
-#include "cxDataAdapter.h"
+#include "cxProperty.h"
 
 TEST_CASE_METHOD(cxtest::AcquisitionFixture, "Acquisition: Create fixture", "[integration][modules][Acquisition][not_win32]")
 {

@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationService.h"
 #include "cxData.h"
 
-#include "cxRegistrationDataAdapters.h"
+#include "cxRegistrationProperties.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxRegistrationTransform.h"
 

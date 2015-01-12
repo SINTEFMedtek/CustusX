@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxToolListWidget.h"
 #include "cxTrackerConfiguration.h"
 #include "cxStringDataAdapterXml.h"
-#include "cxDataAdapterHelper.h"
+#include "cxPropertyHelper.h"
 #include "cxHelperWidgets.h"
 
 

@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXPREPAREVESSELSWIDGET_H
 
 #include "cxRegistrationBaseWidget.h"
-#include "cxColorDataAdapter.h"
+#include "cxColorPropertyBase.h"
 #include "cxPipeline.h"
 #include "cxFilter.h"
 

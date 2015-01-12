@@ -34,8 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxGuiExport.h"
 
-#include "cxDoubleDataAdapter.h"
-#include "cxStringDataAdapter.h"
+#include "cxDoublePropertyBase.h"
+#include "cxStringPropertyBase.h"
 #include "cxForwardDeclarations.h"
 #include "cxCoordinateSystemHelpers.h"
 

@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDoubleDataAdapterXml.h"
 #include "cxContourFilter.h"
 #include "cxDataLocations.h"
-#include "cxSelectDataStringDataAdapter.h"
+#include "cxSelectDataStringProperty.h"
 #include "cxTSFPresets.h"
 #include "vtkForwardDeclarations.h"
 #include "cxPatientModelServiceProxy.h"

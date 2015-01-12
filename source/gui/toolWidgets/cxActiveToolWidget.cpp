@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QVBoxLayout>
 #include "cxLabeledComboBoxWidget.h"
-#include "cxToolDataAdapters.h"
+#include "cxToolProperty.h"
 
 namespace cx
 {

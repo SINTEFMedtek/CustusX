@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "org_custusx_registration_method_landmarkExport.h"
 
 #include "cxLandmarkRegistrationWidget.h"
-#include "cxRegistrationDataAdapters.h"
+#include "cxRegistrationProperties.h"
 #include "cxDominantToolProxy.h"
 
 class QVBoxLayout;

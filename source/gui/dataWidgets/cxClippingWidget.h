@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxBaseWidget.h"
 #include "cxForwardDeclarations.h"
-#include "cxStringDataAdapter.h"
+#include "cxStringPropertyBase.h"
 class QCheckBox;
 
 namespace cx

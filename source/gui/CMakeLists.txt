@@ -6,8 +6,8 @@ cx_add_class_qt_moc(cxGui_SRCS
     #----------------------
     dataAdapters/cxDataInterface
     dataAdapters/cxShadingParamsInterfaces
-    dataAdapters/cxToolDataAdapters
-    dataAdapters/cxDoubleDataAdapterTemporalCalibration
+    dataAdapters/cxToolProperty
+    dataAdapters/cxDoublePropertyTemporalCalibration
     dataAdapters/cxOptionsWidget
     #----------------------
     dataWidgets/cxVolumePropertiesWidget
@@ -80,7 +80,7 @@ cx_add_class_qt_moc(cxGui_SRCS
 
 cx_add_class(cxGui_SRCS
 	${cxGui_SRCS}
-	dataAdapters/cxDataAdapterHelper
+	dataAdapters/cxPropertyHelper
 )
 
 cx_create_export_header("cxGui")

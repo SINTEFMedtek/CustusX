@@ -29,28 +29,61 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXDATAADAPTERHELPER_H_
-#define CXDATAADAPTERHELPER_H_
 
-#include "cxGuiExport.h"
+#include "cxVector3DComponentProperty.h"
 
-#include "cxDataAdapter.h"
+namespace cx
+{
 
-class QWidget;
-class QGridLayout;
+Vector3DComponentDataAdapter::Vector3DComponentDataAdapter(Vector3DDataAdapterPtr base, int index, QString name, QString help) :
+		mBase(base), mIndex(index), mName(name), mHelp(help)
+{
+	connect(mBase.get(), SIGNAL(changed()), this, SIGNAL(changed()));
+}
 
-namespace cx {
-typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
-typedef boost::shared_ptr<class VisualizationService> VisualizationServicePtr;
+QString Vector3DComponentDataAdapter::getDisplayName() const
+{
+	return mName.isEmpty() ? mBase->getDisplayName() : mName;
+}
 
-/**\brief Create a widget capable of displaying the input data.
- *
- * If a gridLayout is provided, the widget will insert its components
- * into a row in that layout
- *
- * \ingroup cx_gui
- */
-cxGui_EXPORT QWidget* createDataWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent, cx::DataAdapterPtr data, QGridLayout* gridLayout = 0, int row = 0);
+bool Vector3DComponentDataAdapter::setValue(double value)
+{
+	Vector3D vec = mBase->getValue();
+	vec[mIndex] = value;
+//	std::cout << "set val for comp " << "  " << value << "  " << mIndex << std::endl;
+	return mBase->setValue(vec);
+}
 
-} /* namespace cx */
-#endif /* CXDATAADAPTERHELPER_H_ */
+double Vector3DComponentDataAdapter::getValue() const
+{
+	return mBase->getValue()[mIndex];
+}
+
+QString Vector3DComponentDataAdapter::getHelp() const
+{
+	return mHelp.isEmpty() ? mBase->getHelp() : mHelp;
+}
+
+DoubleRange Vector3DComponentDataAdapter::getValueRange() const
+{
+	return mBase->getValueRange();
+}
+
+double Vector3DComponentDataAdapter::convertInternal2Display(double internal)
+{
+	return mBase->convertInternal2Display(internal);
+}
+
+double Vector3DComponentDataAdapter::convertDisplay2Internal(double display)
+{
+	return mBase->convertDisplay2Internal(display);
+}
+
+int Vector3DComponentDataAdapter::getValueDecimals() const
+{
+	return mBase->getValueDecimals();
+}
+
+
+
+}

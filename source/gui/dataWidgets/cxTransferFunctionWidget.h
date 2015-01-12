@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDomElement>
 #include "cxImage.h"
 #include "cxTransferFunctions3DPresets.h"
-#include "cxDoubleDataAdapter.h"
+#include "cxDoublePropertyBase.h"
 #include "cxActiveImageProxy.h"
 
 class QVBoxLayout;

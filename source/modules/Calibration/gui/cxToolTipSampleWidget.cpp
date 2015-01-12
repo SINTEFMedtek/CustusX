@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDefinitionStrings.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxDataLocations.h"
-#include "cxSelectDataStringDataAdapter.h"
+#include "cxSelectDataStringProperty.h"
 #include "cxSpaceProvider.h"
 #include "cxPatientModelService.h"
 #include "cxReporter.h"

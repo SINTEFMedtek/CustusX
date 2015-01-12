@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxTypeConversions.h"
 #include "cxLogger.h"
-#include "cxRegistrationDataAdapters.h"
+#include "cxRegistrationProperties.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxRegistrationService.h"
 #include "cxPatientModelService.h"

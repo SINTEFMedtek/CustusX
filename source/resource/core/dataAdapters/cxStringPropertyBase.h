@@ -31,8 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 
-#ifndef CXSTRINGDATAADAPTER_H_
-#define CXSTRINGDATAADAPTER_H_
+#ifndef CXSTRINGPROPERTYBASE_H_
+#define CXSTRINGPROPERTYBASE_H_
 
 #include "cxResourceExport.h"
 
@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString>
 #include <QStringList>
 #include <QComboBox>
-#include "cxDataAdapter.h"
+#include "cxProperty.h"
 
 namespace cx
 {
@@ -147,4 +147,4 @@ typedef boost::shared_ptr<StringDataAdapter> StringDataAdapterPtr;
 
 } // namespace cx
 
-#endif /* CXSTRINGDATAADAPTER_H_ */
+#endif /* CXSTRINGPROPERTYBASE_H_ */

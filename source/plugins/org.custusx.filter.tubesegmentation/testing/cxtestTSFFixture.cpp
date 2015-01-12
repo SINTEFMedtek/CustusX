@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTubeSegmentationFilterService.h"
 #include "cxDataLocations.h"
 #include "cxFilterTimedAlgorithm.h"
-#include "cxSelectDataStringDataAdapter.h"
+#include "cxSelectDataStringProperty.h"
 
 #include "parameters.hpp"
 #include "tsf-config.h"

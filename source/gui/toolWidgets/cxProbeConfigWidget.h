@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxBaseWidget.h"
 #include "cxBoundingBoxWidget.h"
-#include "cxToolDataAdapters.h"
+#include "cxToolProperty.h"
 #include "cxVector3DDataAdapterXml.h"
 #include "cxDoubleDataAdapterXml.h"
 

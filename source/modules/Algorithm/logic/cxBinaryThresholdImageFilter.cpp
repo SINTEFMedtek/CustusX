@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxContourFilter.h"
 #include "cxMesh.h"
 #include "cxImage.h"
-#include "cxSelectDataStringDataAdapter.h"
+#include "cxSelectDataStringProperty.h"
 #include "cxLegacySingletons.h"
 #include "cxPatientModelService.h"
 #include "cxVisualizationService.h"

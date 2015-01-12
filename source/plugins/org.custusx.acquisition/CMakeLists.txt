@@ -44,8 +44,8 @@ set(PLUGIN_SRCS
     gui/cxUSAcqusitionWidget.cpp
     gui/cxSoundSpeedConversionWidget.h
     gui/cxSoundSpeedConversionWidget.cpp
-    gui/cxSelectRecordSessionStringDataAdapter.h
-    gui/cxSelectRecordSessionStringDataAdapter.cpp
+	gui/cxStringPropertySelectRecordSession.h
+	gui/cxStringPropertySelectRecordSession.cpp
 )
 
 # Files which should be processed by Qts moc
@@ -62,7 +62,7 @@ set(PLUGIN_MOC_SRCS
     logic/cxUSSavingRecorder.h
     gui/cxSoundSpeedConversionWidget.h
     gui/cxUSAcqusitionWidget.h
-    gui/cxSelectRecordSessionStringDataAdapter.h
+	gui/cxStringPropertySelectRecordSession.h
     gui/cxAcquisitionPlugin.h
 )
 

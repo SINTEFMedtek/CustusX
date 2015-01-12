@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxDummyFilter.h"
 #include "cxTypeConversions.h"
-#include "cxSelectDataStringDataAdapter.h"
+#include "cxSelectDataStringProperty.h"
 #include "cxData.h"
 #include "cxDoubleDataAdapterXml.h"
 #include "cxStringDataAdapterXml.h"

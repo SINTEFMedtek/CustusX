@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxColorDataAdapterXml.h"
 #include "cxBoolDataAdapterXml.h"
 #include "cxStringDataAdapterXml.h"
-#include "cxSelectDataStringDataAdapter.h"
+#include "cxSelectDataStringProperty.h"
 
 #include <itkBinaryDilateImageFilter.h>
 #include <itkBinaryBallStructuringElement.h>

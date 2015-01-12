@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QDomElement>
 #include <QStringList>
-#include "cxStringDataAdapter.h"
+#include "cxStringPropertyBase.h"
 #include "cxXmlOptionItem.h"
 
 namespace cx

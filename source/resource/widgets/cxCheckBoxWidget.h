@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxResourceWidgetsExport.h"
 
-#include "cxBoolDataAdapter.h"
+#include "cxBoolPropertyBase.h"
 
 #include <QWidget>
 #include <QCheckBox>

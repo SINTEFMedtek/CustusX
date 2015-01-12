@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXELASTIXWIDGET_H_
 
 #include "cxRegistrationBaseWidget.h"
-#include "cxStringDataAdapter.h"
+#include "cxStringPropertyBase.h"
 #include "cxFileSelectWidget.h"
 #include "cxElastixManager.h"
 #include "cxFilePreviewWidget.h"

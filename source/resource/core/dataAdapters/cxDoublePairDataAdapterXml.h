@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxResourceExport.h"
 
-#include "cxDoublePairDataAdapter.h"
+#include "cxDoublePairPropertyBase.h"
 #include "cxXmlOptionItem.h"
 
 namespace cx

@@ -30,59 +30,53 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-
-/*
- * sscVector3DDataAdapter.h
- *
- *  Created on: Jul 25, 2011
- *      Author: christiana
- */
-
-#ifndef CXVECTOR3DDATAADAPTER_H_
-#define CXVECTOR3DDATAADAPTER_H_
+#ifndef CXDOUBLEPAIRPROPERTYBASE_H_
+#define CXDOUBLEPAIRPROPERTYBASE_H_
 
 #include "cxResourceExport.h"
 
-#include <boost/shared_ptr.hpp>
-#include <QString>
-#include <QObject>
+#include "cxProperty.h"
 #include "cxDoubleRange.h"
-#include "cxDataAdapter.h"
+#include "cxMathBase.h"
+#include "cxTypeConversions.h"
 #include "cxVector3D.h"
 
 namespace cx
 {
-
-/**\brief Abstract interface for interaction with internal Vector3D-valued data
+/**
  *
- *  Refer to DoubleDataAdapter for a description.
- *
+ * \brief Abstract interface for interaction with internal data structure: A pair of doubles
  * \ingroup cx_resource_core_dataadapters
+ *
+ * \date Juli 31, 2014
+ * \author Ole Vegard Solberg, SINTEF
  */
-class cxResource_EXPORT Vector3DDataAdapter: public DataAdapter
+class cxResource_EXPORT DoublePairDataAdapter : public DataAdapter
 {
 Q_OBJECT
 public:
-	virtual ~Vector3DDataAdapter()
-	{
-	}
+	virtual ~DoublePairDataAdapter() {}
+//	DoubleSpanSliderAdapter();
 
 public:
 	// basic methods
 	virtual QString getDisplayName() const = 0; ///< name of data entity. Used for display to user.
-	virtual bool setValue(const Vector3D& value) = 0; ///< set the data value.
-	virtual Vector3D getValue() const = 0; ///< get the data value.
+//	virtual bool setValue(const std::pair<double,double>& value) = 0; ///< set the data value.
+	virtual bool setValue(const Eigen::Vector2d& value) = 0; ///< set the data value.
+//	virtual std::pair<double,double> getValue() const = 0; ///< get the data value.
+	virtual Eigen::Vector2d getValue() const = 0; ///< get the data value.
+
+	virtual void setValueRange(DoubleRange range) = 0;
 
 	virtual QVariant getValueAsVariant() const
 	{
-		QString val = prettyFormat(this->getValue(), this->getValueDecimals());
+		QString val = qstring_cast(this->getValue());
 		return QVariant(val);
-	//	return QVariant(this->getValue());
 	}
 
 	virtual void setValueFromVariant(QVariant value)
 	{
-		Vector3D val = Vector3D::fromString(value.toString());
+		Eigen::Vector2d val = fromString(value.toString());
 		this->setValue(val);
 	}
 
@@ -108,35 +102,38 @@ public:
 	{
 		return 0;
 	} ///< number of relevant decimals in value
+
 };
-typedef boost::shared_ptr<Vector3DDataAdapter> Vector3DDataAdapterPtr;
+typedef boost::shared_ptr<DoublePairDataAdapter> DoublePairDataAdapterPtr;
 
 /** Dummy implementation */
-class cxResource_EXPORT Vector3DDataAdapterNull: public Vector3DDataAdapter
+class cxResource_EXPORT DoubleSpanSliderAdapterNull: public DoublePairDataAdapter
 {
 Q_OBJECT
 
 public:
-	virtual ~Vector3DDataAdapterNull()
+	virtual ~DoubleSpanSliderAdapterNull()
 	{
 	}
 	virtual QString getDisplayName() const
 	{
 		return "dummy";
 	}
-	virtual bool setValue(const Vector3D& value)
+//	virtual bool setValue(const std::pair<double,double>& value)
+	virtual bool setValue(const Eigen::Vector2d& value)
 	{
 		return false;
 	}
-	virtual Vector3D getValue() const
+//	virtual std::pair<double,double> getValue() const
+	virtual Eigen::Vector2d getValue() const
 	{
-		return Vector3D(0, 0, 0);
+//		return std::make_pair(0,0);
+		return Eigen::Vector2d(0, 0);
 	}
 	virtual void connectValueSignals(bool on)
 	{
 	}
 };
 
-}
-
-#endif /* CXVECTOR3DDATAADAPTER_H_ */
+} // namespace cx
+#endif // CXDOUBLEPAIRPROPERTYBASE_H_

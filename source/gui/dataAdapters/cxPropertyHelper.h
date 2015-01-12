@@ -29,57 +29,28 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXPROPERTYHELPER_H_
+#define CXPROPERTYHELPER_H_
 
-#ifndef CXCOLORDATAADAPTER_H_
-#define CXCOLORDATAADAPTER_H_
+#include "cxGuiExport.h"
 
-#include "cxResourceExport.h"
+#include "cxProperty.h"
 
-#include <QColor>
-#include "cxDataAdapter.h"
+class QWidget;
+class QGridLayout;
 
+namespace cx {
+typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
+typedef boost::shared_ptr<class VisualizationService> VisualizationServicePtr;
 
-namespace cx
-{
-
-/** DataAdapter interface for QColor
+/**\brief Create a widget capable of displaying the input data.
  *
+ * If a gridLayout is provided, the widget will insert its components
+ * into a row in that layout
  *
- * \ingroup cx_resource_core_dataadapters
- * \date Nov 22, 2012
- * \author christiana
+ * \ingroup cx_gui
  */
-class cxResource_EXPORT ColorDataAdapter: public DataAdapter
-{
-Q_OBJECT
-public:
-    virtual ~ColorDataAdapter() {}
+cxGui_EXPORT QWidget* createDataWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent, cx::DataAdapterPtr data, QGridLayout* gridLayout = 0, int row = 0);
 
-public:
-    // basic methods
-    virtual QString getDisplayName() const = 0; ///< name of data entity. Used for display to user.
-    virtual bool setValue(QColor value) = 0; ///< set the data value.
-    virtual QColor getValue() const = 0; ///< get the data value.
-
-	virtual QVariant getValueAsVariant() const
-	{
-		return QVariant(this->getValue());
-	}
-
-	virtual void setValueFromVariant(QVariant value)
-	{
-		this->setValue(value.value<QColor>());
-	}
-
-public:
-    // optional methods
-    virtual QString getHelp() const
-    {
-        return QString();
-    } ///< return a descriptive help string for the data, used for example as a tool tip.
-};
-typedef boost::shared_ptr<ColorDataAdapter> ColorDataAdapterPtr;
-
-} // namespace cx
-
-#endif // CXCOLORDATAADAPTER_H_
+} /* namespace cx */
+#endif /* CXPROPERTYHELPER_H_ */

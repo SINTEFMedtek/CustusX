@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSettings.h"
 #include "cxLandmarkRep.h"
 #include "cxView.h"
-#include "cxRegistrationDataAdapters.h"
+#include "cxRegistrationProperties.h"
 #include "cxRegistrationService.h"
 #include "cxVisualizationService.h"
 #include "cxViewGroupData.h"

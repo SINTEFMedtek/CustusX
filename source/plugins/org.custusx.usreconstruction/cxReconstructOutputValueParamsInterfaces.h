@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "org_custusx_usreconstruction_Export.h"
 
-#include "cxDoubleDataAdapter.h"
+#include "cxDoublePropertyBase.h"
 
 namespace cx
 {

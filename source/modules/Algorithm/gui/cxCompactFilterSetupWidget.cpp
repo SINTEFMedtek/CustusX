@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxCompactFilterSetupWidget.h"
 
 #include <QGroupBox>
-#include "cxSelectDataStringDataAdapter.h"
+#include "cxSelectDataStringProperty.h"
 #include "cxWidgetObscuredListener.h"
 
 namespace cx {
