@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTESTTESTTOOLMESH_H_
 #define CXTESTTESTTOOLMESH_H_
 
+#include "cxtest_org_custusx_core_tracking_export.h"
+
 #include "cxMesh.h"
 #include <QString>
 
@@ -44,7 +46,7 @@ namespace cxtest {
  * \date Aug 8, 2013
  * \author Ole Vegard Solberg, SINTEF
  */
-class TestToolMesh {
+class CXTEST_ORG_CUSTUSX_CORE_TRACKING_EXPORT  TestToolMesh {
 public:
 	TestToolMesh();
 	void setToolPath(QString path);

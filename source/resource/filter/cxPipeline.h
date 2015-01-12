@@ -34,8 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxResourceFilterExport.h"
 
-//#include <QObject>
 #include "cxFilter.h"
+#include "cxFilterGroup.h"
 #include "cxXmlOptionItem.h"
 #include "cxSelectDataStringDataAdapter.h"
 

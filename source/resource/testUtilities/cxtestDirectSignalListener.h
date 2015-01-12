@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTESTDIRECTSIGNALLISTENER_H
 #define CXTESTDIRECTSIGNALLISTENER_H
 
+#include "cxtestutilities_export.h"
 #include <QObject>
 
 namespace cxtest
@@ -44,7 +45,7 @@ namespace cxtest
  * \author Christian Askeland, SINTEF
  * \date Sep 5, 2013
  */
-class DirectSignalListener : public QObject
+class CXTESTUTILITIES_EXPORT DirectSignalListener : public QObject
 {
 	Q_OBJECT
 public:

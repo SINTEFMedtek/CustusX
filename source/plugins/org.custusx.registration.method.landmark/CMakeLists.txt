@@ -2,34 +2,21 @@ project(org_custusx_registration_method_landmark)
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
-include_directories(
-    ${CX_RESOURCE_INCLUDE_DIRECTORIES}
-    ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
-    ${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
-    ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.registration
-	${CustusX_SOURCE_DIR}/source/gui/infoWidgets
-	${CustusX_SOURCE_DIR}/source/logic
-
-	${CustusX_BINARY_DIR}/source/plugins/org.custusx.registration
-	${CustusX_BINARY_DIR}/source/gui
-	${CustusX_BINARY_DIR}/source/logic
-)
-
 set(PLUGIN_SRCS
     cxRegistrationMethodLandmarkPluginActivator.cpp
-	cxRegistrationMethodLandmarkService.h
-	cxRegistrationMethodLandmarkService.cpp
-	cxFastImageRegistrationWidget.cpp
+    cxRegistrationMethodLandmarkService.h
+    cxRegistrationMethodLandmarkService.cpp
+    cxFastImageRegistrationWidget.cpp
     cxFastRegistrationsWidget.cpp
     cxFastRegistrationsWidget.h
-	cxLandmarkRegistrationsWidget.h
-	cxLandmarkRegistrationsWidget.cpp
+    cxLandmarkRegistrationsWidget.h
+    cxLandmarkRegistrationsWidget.cpp
     cxLandmarkImageRegistrationWidget.cpp
     cxLandmarkRegistrationWidget.cpp
     cxLandmarkPatientRegistrationWidget.cpp
     cxLandmarkImage2ImageRegistrationWidget.cpp
-	cxFastPatientRegistrationWidget.h
-	cxFastPatientRegistrationWidget.cpp
+    cxFastPatientRegistrationWidget.h
+    cxFastPatientRegistrationWidget.cpp
     cxFastOrientationRegistrationWidget.cpp
 )
 
@@ -46,7 +33,6 @@ set(PLUGIN_MOC_SRCS
 
 
 cx_create_export_header(${PROJECT_NAME})
-cx_remove_duplicate_include_directories()
 
 # Qt Designer files which should be processed by Qts uic
 set(PLUGIN_UI_FORMS
@@ -80,4 +66,10 @@ ctkMacroBuildPlugin(
   RESOURCES ${PLUGIN_resources}
   TARGET_LIBRARIES ${PLUGIN_target_libraries}
   OUTPUT_DIR ${PLUGIN_OUTPUT_DIR}
+)
+
+target_include_directories(org_custusx_registration_method_landmark
+    PUBLIC
+    .
+    ${CMAKE_CURRENT_BINARY_DIR}
 )

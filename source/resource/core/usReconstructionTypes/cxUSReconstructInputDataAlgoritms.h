@@ -29,60 +29,65 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXUSRECONSTRUCTINPUTDATA_H
-#define CXUSRECONSTRUCTINPUTDATA_H
+#ifndef CXUSRECONSTRUCTINPUTDATAALGORITMS_H
+#define CXUSRECONSTRUCTINPUTDATAALGORITMS_H
 
-#include "cxResourceUsReconstructionTypesExport.h"
+#include "cxResourceExport.h"
 
-#include <vector>
-#include "cxProbeSector.h"
+#include "cxUSReconstructInputData.h"
 
 namespace cx
 {
-
-typedef boost::shared_ptr<class USFrameData> USFrameDataPtr;
-typedef boost::shared_ptr<class Image> ImagePtr;
 
 /**
  * \addtogroup cx_resource_usreconstructiontypes
  * \{
  */
 
-typedef boost::shared_ptr<class TimedPosition> TimedPositionPtr;
-
-/** \brief One position with timestamp
- */
-class cxResourceUsReconstructionTypes_EXPORT TimedPosition
+/** Collection of operations on USReconstructInputData
+  *
+  * \date Mar 07, 2013
+  * \author Christian Askeland, SINTEF
+  */
+struct cxResource_EXPORT USReconstructInputDataAlgorithm
 {
-public:
-	double mTime;// Should always be in ms
-	Transform3D mPos;
+    /**
+     * Pre:  mPos is prMt
+     * Post: mPos is prMu
+     */
+    static void transformTrackingPositionsTo_prMu(USReconstructInputData* data);
+	/**
+     * Pre:  mFrames is prMt
+     * Post: mFrames is rMu
+     */
+    static void transformFramePositionsTo_rMu(USReconstructInputData* data);
+
+    /** Find frame positions based on the existing tool positions and timestamps for both
+      * tools and frames.
+      * Return a vector containing an error measure for each frame. The error is the max
+      * temporal distance from the frame to the two neighbouring tool positions.
+      *
+      */
+    static std::vector<double> interpolateFramePositionsFromTracking(USReconstructInputData *data);
+    /**
+     * Interpolation between a and b
+     * Spherical interpolation of the rotation, and linear interpolation of the position.
+     * Uses Quaternion Slerp, so the rotational part of the matrix have to be converted to
+     * Quaternion before the interpolation (and back again afterwards).
+     */
+    static Transform3D slerpInterpolate(const Transform3D& a, const Transform3D& b, double t);
+
+    /**
+     * Linear interpolation between a and b. t = 1 means use only b;
+     */
+    Transform3D interpolate(const Transform3D& a, const Transform3D& b, double t);
+
 };
-cxResourceUsReconstructionTypes_EXPORT inline bool operator<(const TimedPosition& lhs, const TimedPosition& rhs)
-{
-	return lhs.mTime < rhs.mTime;
-}
 
-struct cxResourceUsReconstructionTypes_EXPORT USReconstructInputData
-{
-	QString mFilename; ///< filename used for current data read
-
-	USFrameDataPtr mUsRaw;///<All imported US data frames with pointers to each frame
-	std::vector<TimedPosition> mFrames;
-	std::vector<TimedPosition> mPositions;
-	ProbeSector mProbeData;
-	QString mProbeUid;
-	Transform3D rMpr; ///< patient registration
-
-	vtkImageDataPtr getMask();
-	bool isValid() const;
-};
 
 /**
  * \}
  */
 
 }//namespace cx
-
-
-#endif // CXUSRECONSTRUCTINPUTDATA_H
+#endif // CXUSRECONSTRUCTINPUTDATAALGORITMS_H

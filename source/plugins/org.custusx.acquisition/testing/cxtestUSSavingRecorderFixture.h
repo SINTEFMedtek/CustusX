@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTESTUSSAVINGRECORDERFIXTURE_H
 #define CXTESTUSSAVINGRECORDERFIXTURE_H
 
+#include "cxtest_org_custusx_acquisition_export.h"
+
 #include <QApplication>
 #include "boost/function.hpp"
 #include "cxForwardDeclarations.h"
@@ -49,7 +51,7 @@ namespace cxtest
  * \date April 17, 2013
  * \author christiana
  */
-class USSavingRecorderFixture : public QObject
+class CXTEST_ORG_CUSTUSX_ACQUISITION_EXPORT USSavingRecorderFixture : public QObject
 {
 	Q_OBJECT
 

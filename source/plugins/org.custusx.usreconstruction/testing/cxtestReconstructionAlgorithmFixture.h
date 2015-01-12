@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTESTRECONSTRUCTIONALGORITHMFIXTURE_H
 #define CXTESTRECONSTRUCTIONALGORITHMFIXTURE_H
 
+#include "cxtest_org_custusx_usreconstruction_export.h"
+
 #include "cxReconstructionMethodService.h"
 #include "cxtestSyntheticVolumeComparer.h"
 #include "cxtestSyntheticReconstructInput.h"
@@ -53,7 +55,7 @@ namespace cxtest
  *          dMf = dMr*rMf, where rMf is the plane position on ref space.
  *
  */
-class ReconstructionAlgorithmFixture
+class CXTEST_ORG_CUSTUSX_USRECONSTRUCTION_EXPORT ReconstructionAlgorithmFixture
 {
 public:
 	ReconstructionAlgorithmFixture();

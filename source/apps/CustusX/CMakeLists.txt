@@ -5,37 +5,9 @@
 #------------------------------------------------------------------------------
 # Variables
 #-----------------------------------------------------------------------------
-set(SOURCES cxMain.cpp)
-
-#------------------------------------------------------------------------------
-# Include
-#-----------------------------------------------------------------------------
-
-include_directories( ${CX_RESOURCE_INCLUDE_DIRECTORIES} )
-include_directories(
-    .
-    ${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
-    ${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
-    ${CustusX_SOURCE_DIR}/source/gui
-    ${CustusX_BINARY_DIR}/source/gui
-    ${CustusX_SOURCE_DIR}/source/gui/utilities
-    ${CustusX_SOURCE_DIR}/source/logic
-    ${CustusX_BINARY_DIR}/source/logic
-    ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
-    ${CustusX_BINARY_DIR}/source/modules/GUIExtender
-    ${CustusX_SOURCE_DIR}/source/modules/Calibration/gui
-    ${CustusX_BINARY_DIR}/source/modules/Calibration
-    ${CustusX_SOURCE_DIR}/source/modules/Algorithm/gui
-    ${CustusX_BINARY_DIR}/source/modules/Algorithm
-    ${CustusX_SOURCE_DIR}/source/modules/Registration/gui
-    ${CustusX_BINARY_DIR}/source/modules/Registration
-
-    # To be removed when all old modules have been converted to plugins
-    ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.usreconstruction
-    ${CustusX_BINARY_DIR}/source/plugins/org.custusx.usreconstruction
-    ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.acquisition
-    ${CustusX_BINARY_DIR}/source/plugins/org.custusx.acquisition
-	)
+set(SOURCES
+    cxMain.cpp
+)
 
 #------------------------------------------------------------------------------
 # Set variables
@@ -56,7 +28,6 @@ endif(APPLE)
 #------------------------------------------------------------------------------
 # Executable
 #-----------------------------------------------------------------------------
-cx_remove_duplicate_include_directories()
 if(APPLE)
     add_executable(CustusX MACOSX_BUNDLE ${SOURCES} ) #APPLE
 else(APPLE)
@@ -71,33 +42,32 @@ endif(APPLE)
 #------------------------------------------------------------------------------
 # Linking
 #------------------------------------------------------------------------------
-# Add link directories needed to use IGSTK.
-SET(LINK_LIBRARIES
+
+target_link_libraries(CustusX
+    PRIVATE
     cxGui
     cxPluginCalibration
     cxPluginAlgorithm
     org_custusx_usreconstruction
     org_custusx_acquisition
-		)
+)
 
-target_link_libraries(CustusX ${LINK_LIBRARIES} )
-
+#------------------------------------------------------------------------------
 # Install CustusX
+#------------------------------------------------------------------------------
 
 #Needed to make sure all users get write permissions on the folder CustusX is installed in
 #To make this tric work an empty CustusX dir is needed in source/apps/CustusX
 install(DIRECTORY CustusX
-	DESTINATION ${CX_INSTALL_ROOT_DIR}/..
-	DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS})
+    DESTINATION ${CX_INSTALL_ROOT_DIR}/..
+    DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS}
+)
 
 install(TARGETS CustusX
-	BUNDLE DESTINATION ${CX_INSTALL_ROOT_DIR}
-	RUNTIME DESTINATION ${CX_INSTALL_ROOT_DIR}/bin)
+    BUNDLE DESTINATION ${CX_INSTALL_ROOT_DIR}
+    RUNTIME DESTINATION ${CX_INSTALL_ROOT_DIR}/bin
+)
+
 # Perform full install of package, including config and docs:
 include(cxInstallCustusX)
-
-
-#execute_process(COMMAND ${QT_QCOLLECTIONGENERATOR_EXECUTABLE}
-#				${CustusX_SOURCE_DIR}/documentation/wateringmachine.qhcp -o ${CustusX_BINARY_DIR}/documentation/wateringmachine.qhc
-#				WORKING_DIRECTORY ${CustusX_SOURCE_DIR}/documentation)
 

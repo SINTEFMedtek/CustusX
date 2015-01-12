@@ -1,0 +1,2 @@
+// list of shared libraries to load into Catch
+#define CX_SHARED_TEST_LIBRARIES "@CX_SHARED_TEST_LIBRARIES@"

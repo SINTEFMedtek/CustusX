@@ -33,10 +33,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTESTTSFFIXTURE_H_
 #define CXTESTTSFFIXTURE_H_
 
+#include "cxtest_org_custusx_filter_tubesegmentation_export.h"
+
 class QString;
 class paramList;
 
-class TestTubeSegmentationFramework
+class CXTEST_ORG_CUSTUSX_FILTER_TUBESEGMENTATION_EXPORT TestTubeSegmentationFramework
 {
 public:
 	TestTubeSegmentationFramework();

@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTESTMULTIVOLUME3DREPPRODUCERFIXTURE_H
 #define CXTESTMULTIVOLUME3DREPPRODUCERFIXTURE_H
 
+#include "cxtest_org_custusx_core_visualization_export.h"
+
 #include <vtkGPUVolumeRayCastMapper.h>
 #include <vtkVolumeTextureMapper3D.h>
 #include <vtkVolume.h>
@@ -49,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cxtest
 {
 
-class MultiVolume3DRepProducerFixture
+class CXTEST_ORG_CUSTUSX_CORE_VISUALIZATION_EXPORT MultiVolume3DRepProducerFixture
 {
 public:
 	MultiVolume3DRepProducerFixture();

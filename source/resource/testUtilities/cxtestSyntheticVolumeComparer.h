@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTESTSYNTHETICVOLUMECOMPARER_H
 #define CXTESTSYNTHETICVOLUMECOMPARER_H
 
+#include "cxtestutilities_export.h"
 #include "cxSimpleSyntheticVolume.h"
 
 namespace cxtest
@@ -50,7 +51,7 @@ typedef boost::shared_ptr<class SyntheticVolumeComparer> SyntheticVolumeComparer
  * \date 28.11.2013
  * \author christiana
  */
-class SyntheticVolumeComparer
+class CXTESTUTILITIES_EXPORT SyntheticVolumeComparer
 {
 public:
 	SyntheticVolumeComparer();

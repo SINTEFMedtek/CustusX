@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTESTPROBEFIXTURE_H
 #define CXTESTPROBEFIXTURE_H
 
+#include "cxtest_org_custusx_core_tracking_export.h"
+
 #include "cxTool.h"
 #include "cxProbeImpl.h"
 
@@ -47,7 +49,7 @@ namespace cxtest
  * \date Jun 3, 2013
  * \author Ole Vegard Solberg, SINTEF
  */
-class ProbeFixture
+class CXTEST_ORG_CUSTUSX_CORE_TRACKING_EXPORT ProbeFixture
 {
 public:
 	ProbeFixture();

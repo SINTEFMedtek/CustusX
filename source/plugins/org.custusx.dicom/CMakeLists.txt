@@ -2,16 +2,6 @@ project(org_custusx_dicom)
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
-include_directories(
-    ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
-    ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
-    ${CustusX_BINARY_DIR}/source/modules/GUIExtender
-    ${CustusX_BINARY_DIR}/source/resource/widgets
-	${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
-	./core
-    ./widgets
-    )
-
 set(PLUGIN_SRCS
   cxDicomPluginActivator.cpp
   cxDicomGUIExtenderService.cpp
@@ -35,7 +25,6 @@ set(PLUGIN_SRCS
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
   cxDicomPluginActivator.h
-
   widgets/cxDicomImporter.h
   widgets/cxDICOMAppWidget.h
   widgets/cxDICOMModel.h
@@ -75,15 +64,15 @@ set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} ${CTK_DCMTK_DIR}/lib)
 #Compute the plugin dependencies
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
-    ${PLUGIN_target_libraries}   
+    ${PLUGIN_target_libraries}
     cxGUIExtenderService
-	cxResourceWidgets
-	CTKDICOMWidgets
-	CTKDICOMCore
-	cxPluginUtilities
-#	${TEST_VALUE}
-${CTK_EXTERNAL_LIBRARIES}
-	)
+    cxResourceWidgets
+    cxResource
+    CTKDICOMWidgets
+    CTKDICOMCore
+    cxPluginUtilities
+    ${CTK_EXTERNAL_LIBRARIES}
+)
 
 set(PLUGIN_OUTPUT_DIR "")
 if(CX_WINDOWS)
@@ -100,6 +89,14 @@ ctkMacroBuildPlugin(
   RESOURCES ${PLUGIN_resources}
   TARGET_LIBRARIES ${PLUGIN_target_libraries}
   OUTPUT_DIR ${PLUGIN_OUTPUT_DIR}
+)
+
+target_include_directories(org_custusx_dicom
+    PUBLIC
+    .
+    ./core
+    ./widgets
+    ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 add_subdirectory(testing)

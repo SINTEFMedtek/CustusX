@@ -12,96 +12,81 @@
 ##
 ###########################################################
 
-SET( MOC_HEADER_FILES
-	logic/cxDummyFilter.h
+set( MOC_HEADER_FILES
+    logic/cxDummyFilter.h
     logic/cxBinaryThresholdImageFilter.h
     logic/cxConnectedThresholdImageFilter.h
-	logic/cxContourFilter.h
-	logic/cxBinaryThinningImageFilter3DFilter.h
-	logic/cxSmoothingImageFilter.h
-	logic/cxResampleImageFilter.h
-	logic/cxDilationFilter.h
+    logic/cxContourFilter.h
+    logic/cxBinaryThinningImageFilter3DFilter.h
+    logic/cxSmoothingImageFilter.h
+    logic/cxResampleImageFilter.h
+    logic/cxDilationFilter.h
     gui/cxAlgorithmPlugin.h
     gui/cxTimedAlgorithmProgressBar.h
-	gui/cxFilterWidget.h
-	gui/cxPipelineWidget.h
-	gui/cxAllFiltersWidget.h
-	gui/cxCompactFilterSetupWidget.h
-	)
+    gui/cxFilterWidget.h
+    gui/cxPipelineWidget.h
+    gui/cxAllFiltersWidget.h
+    gui/cxCompactFilterSetupWidget.h
+)
 
-cx_remove_duplicate_include_directories()
-QT5_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
-
-# library
-SET( SOURCE_FILES
-	${MOC_HEADER_FILES}
-	logic/cxDummyFilter.h
-	logic/cxDummyFilter.cpp
-	logic/cxDilationFilter.h
-	logic/cxDilationFilter.cpp
-	logic/cxTrackingDataToVolume.h
+set( SOURCE_FILES
+    ${MOC_HEADER_FILES}
+    logic/cxDummyFilter.h
+    logic/cxDummyFilter.cpp
+    logic/cxDilationFilter.h
+    logic/cxDilationFilter.cpp
+    logic/cxTrackingDataToVolume.h
     logic/cxTrackingDataToVolume.cpp
     logic/cxBinaryThresholdImageFilter.h
     logic/cxBinaryThresholdImageFilter.cpp
     logic/cxConnectedThresholdImageFilter.h
     logic/cxConnectedThresholdImageFilter.cpp
-	logic/cxContourFilter.h
-	logic/cxContourFilter.cpp
-	logic/cxBinaryThinningImageFilter3DFilter.h
-	logic/cxBinaryThinningImageFilter3DFilter.cpp
-	logic/cxSmoothingImageFilter.h
-	logic/cxSmoothingImageFilter.cpp
-	logic/cxResampleImageFilter.h
-	logic/cxResampleImageFilter.cpp
+    logic/cxContourFilter.h
+    logic/cxContourFilter.cpp
+    logic/cxBinaryThinningImageFilter3DFilter.h
+    logic/cxBinaryThinningImageFilter3DFilter.cpp
+    logic/cxSmoothingImageFilter.h
+    logic/cxSmoothingImageFilter.cpp
+    logic/cxResampleImageFilter.h
+    logic/cxResampleImageFilter.cpp
     gui/cxAlgorithmPlugin.h
     gui/cxAlgorithmPlugin.cpp
     gui/cxTimedAlgorithmProgressBar.h
     gui/cxTimedAlgorithmProgressBar.cpp
-	gui/cxFilterWidget.h
-	gui/cxFilterWidget.cpp
-	gui/cxPipelineWidget.h
-	gui/cxPipelineWidget.cpp
-	gui/cxAllFiltersWidget.h
-	gui/cxAllFiltersWidget.cpp
-	gui/cxCompactFilterSetupWidget.h
-	gui/cxCompactFilterSetupWidget.cpp
-  )
+    gui/cxFilterWidget.h
+    gui/cxFilterWidget.cpp
+    gui/cxPipelineWidget.h
+    gui/cxPipelineWidget.cpp
+    gui/cxAllFiltersWidget.h
+    gui/cxAllFiltersWidget.cpp
+    gui/cxCompactFilterSetupWidget.h
+    gui/cxCompactFilterSetupWidget.cpp
+)
 
-# =========================================================
+qt5_wrap_cpp( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
 
-include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
-
-include_directories(
-    ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
-	${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
-	.
-    ./logic
-    ./gui
-	${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
-	${CustusX_BINARY_DIR}/source/resource/widgets
-	${CustusX_SOURCE_DIR}/source/logic
-	${CustusX_BINARY_DIR}/source/logic
-
-    ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
-    ${CustusX_BINARY_DIR}/source/modules/GUIExtender
-    ${CustusX_SOURCE_DIR}/source/gui/utilities
-    ${CustusX_SOURCE_DIR}/source/gui/dataAdapters
-	${CustusX_SOURCE_DIR}/source/gui/dataWidgets
-	${CustusX_BINARY_DIR}/source/gui
-	${CustusX_SOURCE_DIR}/source/resource/filter
-	)
-
-set(CX_ALGORITHM_LIBRARIES cxResource cxGui cxGUIExtenderService cxResourceFilter)
-
-
-
-
-# =========================================================
-cx_remove_duplicate_include_directories()
 cx_create_export_header("cxPluginAlgorithm")
 
-# create the target
-add_library( cxPluginAlgorithm ${SOURCE_FILES} )
-target_link_libraries( cxPluginAlgorithm ${CX_ALGORITHM_LIBRARIES})
+add_library( cxPluginAlgorithm ${SOURCE_FILES} ${MOC_HEADER_FILES})
+target_include_directories(cxPluginAlgorithm
+    PUBLIC
+    .
+    ./logic
+    ./gui
+    ${CMAKE_CURRENT_BINARY_DIR}
+)
+target_link_libraries(cxPluginAlgorithm
+    PRIVATE
+    cxResource
+    cxGui
+    cxGUIExtenderService
+    cxResourceFilter
+    cxResourceWidgets
+    cxResourceVisualization
+    cxLogicManager
+    cxPluginUtilities
+    ${ITK_LIBRARIES}
+
+)
 
 add_subdirectory(testing)

@@ -3,143 +3,122 @@
 ###########################################################
 
 cx_add_class_qt_moc(cxGui_SRCS
-	#----------------------
-	dataAdapters/cxDataInterface
-	dataAdapters/cxShadingParamsInterfaces
-	dataAdapters/cxToolDataAdapters
-	dataAdapters/cxDoubleDataAdapterTemporalCalibration
-	dataAdapters/cxOptionsWidget
     #----------------------
-	dataWidgets/cxVolumePropertiesWidget
-	dataWidgets/cxVolumeInfoWidget
-	dataWidgets/cxShadingWidget
-	dataWidgets/cxCroppingWidget
-	dataWidgets/cxClippingWidget
-	dataWidgets/cxSlicePropertiesWidget
-	dataWidgets/cxMeshInfoWidget
-	dataWidgets/cxImportDataDialog
-	dataWidgets/cxExportDataDialog
-	dataWidgets/cxDataViewSelectionWidget
-	dataWidgets/cxTransferFunctionWidget
-	dataWidgets/cxTransferFunctionAlphaWidget
-	dataWidgets/cxTransferFunctionColorWidget
-	dataWidgets/cxEraserWidget
-	dataWidgets/cxDataSelectWidget
-	dataWidgets/cxInfoWidget
-	dataWidgets/cxTransferFunctionPresetWidget
-	dataWidgets/cxOverlayWidget
-	dataWidgets/cxColorWidget
-	dataWidgets/cxTransferFunction2DColorWidget
-	dataWidgets/cxTransferFunction2DOpacityWidget
-	dataWidgets/cxImagePropertiesWidget
+    dataAdapters/cxDataInterface
+    dataAdapters/cxShadingParamsInterfaces
+    dataAdapters/cxToolDataAdapters
+    dataAdapters/cxDoubleDataAdapterTemporalCalibration
+    dataAdapters/cxOptionsWidget
     #----------------------
-	infoWidgets/cxStatusBar
-	infoWidgets/cxPointSamplingWidget
-	infoWidgets/cxMetricWidget
-	infoWidgets/cxFrameTreeWidget
-	infoWidgets/cxDataMetricWrappers
-	infoWidgets/cxSamplerWidget
-	infoWidgets/cxFrameMetricWrapper
-	infoWidgets/cxToolMetricWrapper
-	infoWidgets/cxMetricManager
+    dataWidgets/cxVolumePropertiesWidget
+    dataWidgets/cxVolumeInfoWidget
+    dataWidgets/cxShadingWidget
+    dataWidgets/cxCroppingWidget
+    dataWidgets/cxClippingWidget
+    dataWidgets/cxSlicePropertiesWidget
+    dataWidgets/cxMeshInfoWidget
+    dataWidgets/cxImportDataDialog
+    dataWidgets/cxExportDataDialog
+    dataWidgets/cxDataViewSelectionWidget
+    dataWidgets/cxTransferFunctionWidget
+    dataWidgets/cxTransferFunctionAlphaWidget
+    dataWidgets/cxTransferFunctionColorWidget
+    dataWidgets/cxEraserWidget
+    dataWidgets/cxDataSelectWidget
+    dataWidgets/cxInfoWidget
+    dataWidgets/cxTransferFunctionPresetWidget
+    dataWidgets/cxOverlayWidget
+    dataWidgets/cxColorWidget
+    dataWidgets/cxTransferFunction2DColorWidget
+    dataWidgets/cxTransferFunction2DOpacityWidget
+    dataWidgets/cxImagePropertiesWidget
+    #----------------------
+    infoWidgets/cxStatusBar
+    infoWidgets/cxPointSamplingWidget
+    infoWidgets/cxMetricWidget
+    infoWidgets/cxFrameTreeWidget
+    infoWidgets/cxDataMetricWrappers
+    infoWidgets/cxSamplerWidget
+    infoWidgets/cxFrameMetricWrapper
+    infoWidgets/cxToolMetricWrapper
+    infoWidgets/cxMetricManager
 
     #----------------------
-	navigationWidgets/cxNavigationWidget
-	navigationWidgets/cxTrackPadWidget
-	navigationWidgets/cxPlaybackWidget
+    navigationWidgets/cxNavigationWidget
+    navigationWidgets/cxTrackPadWidget
+    navigationWidgets/cxPlaybackWidget
     #----------------------
-	preferencesWidgets/cxPreferencesDialog
-	preferencesWidgets/cxToolFilterWidget
-	preferencesWidgets/cxToolListWidget
-	preferencesWidgets/cxToolConfigureWidget
-	preferencesWidgets/cxLayoutEditorWidget
-	preferencesWidgets/cxGeneralTab
-	preferencesWidgets/cxPreferenceTab
+    preferencesWidgets/cxPreferencesDialog
+    preferencesWidgets/cxToolFilterWidget
+    preferencesWidgets/cxToolListWidget
+    preferencesWidgets/cxToolConfigureWidget
+    preferencesWidgets/cxLayoutEditorWidget
+    preferencesWidgets/cxGeneralTab
+    preferencesWidgets/cxPreferenceTab
     #----------------------
-        streamingWidgets/cxVideoConnectionWidget
+    streamingWidgets/cxVideoConnectionWidget
     #----------------------
-	toolWidgets/cxToolPropertiesWidget
-	toolWidgets/cxActiveToolWidget
-	toolWidgets/cxToolManagerWidget
-	toolWidgets/cxProbeConfigWidget
+    toolWidgets/cxToolPropertiesWidget
+    toolWidgets/cxActiveToolWidget
+    toolWidgets/cxToolManagerWidget
+    toolWidgets/cxProbeConfigWidget
     #----------------------
-	utilities/cxAudioImpl
-	utilities/cxToolImagePreviewWidget
+    utilities/cxAudioImpl
+    utilities/cxToolImagePreviewWidget
 	utilities/cxDockWidgets
 	#----------------------
     pluginFrameworkWidgets/cxPluginBrowser
     pluginFrameworkWidgets/cxPluginTableModel
     pluginFrameworkWidgets/cxPluginFrameworkWidget
-    #----------------------    
-	cxMainWindow
-	cxSecondaryMainWindow
-	cxSecondaryViewLayoutWindow
-	cxLayoutInteractor
+    #----------------------
+    cxMainWindow
+    cxSecondaryMainWindow
+    cxSecondaryViewLayoutWindow
+    cxLayoutInteractor
     #----------------------
 )
-
 
 cx_add_class(cxGui_SRCS
 	${cxGui_SRCS}
 	dataAdapters/cxDataAdapterHelper
-	)
-
-set(SUB_FOLDERS
-    dataAdapters
-    dataWidgets
-    infoWidgets
-    navigationWidgets
-    preferencesWidgets
-    streamingWidgets
-    toolWidgets
-    utilities
-    pluginFrameworkWidgets
-    )
-
-# Use the include path and library for Qt that is used by VTK.
-INCLUDE_DIRECTORIES(
-  ${SUB_FOLDERS}
-  ${CMAKE_CURRENT_BINARY_DIR}
-  ${CMAKE_CURRENT_SOURCE_DIR}
 )
-include_directories(
-    ${CX_RESOURCE_INCLUDE_DIRECTORIES}
-    ${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
-    ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
-    ${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
-    .
-    ${CustusX_SOURCE_DIR}/source/resource/videoServer
-    ${CustusX_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
-    ${CustusX_SOURCE_DIR}/source/logic
-    ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
-    ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
-    
-    ${CustusX_BINARY_DIR}/source/resource/widgets
-    ${CustusX_BINARY_DIR}/source/resource/visualization
-    ${CustusX_BINARY_DIR}/source/resource/usReconstructionTypes
-    ${CustusX_BINARY_DIR}/source/resource/videoServer
-    ${CustusX_BINARY_DIR}/source/resource/OpenIGTLinkUtilities
-    ${CustusX_BINARY_DIR}/source/logic
-    ${CustusX_BINARY_DIR}/source/modules/GUIExtender
-    ${CustusX_BINARY_DIR}/source/resource/pluginUtilities
-    )
-    
-set(CX_GUI_LIBRARIES cxLogicManager cxResourceWidgets)
 
 cx_create_export_header("cxGui")
 
 # generate rules for building source files from the resources
-QT5_ADD_RESOURCES(cxResources cxResources.qrc)
+qt5_add_resources(cxResources cxResources.qrc)
 if(CX_WINDOWS)
     set(cxResources
         ${cxResources}
         cxResources.h
     )
-endif()
+endif(CX_WINDOWS)
 
-cx_remove_duplicate_include_directories()
 add_library( cxGui ${cxGui_SRCS} ${cxResources})
-target_link_libraries( cxGui ${CX_GUI_LIBRARIES} )
+target_include_directories(cxGui
+    PUBLIC
+    .
+    ./dataAdapters
+    ./dataWidgets
+    ./infoWidgets
+    ./navigationWidgets
+    ./preferencesWidgets
+    ./streamingWidgets
+    ./toolWidgets
+    ./utilities
+    ./pluginFrameworkWidgets
+    ${CMAKE_CURRENT_BINARY_DIR}
+    ${CustusX_SOURCE_DIR}/source/ThirdParty
+)
+target_link_libraries(cxGui
+    PRIVATE
+    cxResource
+    cxLogicManager
+    cxResourceWidgets
+    cxResourceVisualization
+    cxGUIExtenderService
+    cxPluginUtilities
+)
 
 add_subdirectory(testing)
 

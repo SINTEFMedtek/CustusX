@@ -1,7 +1,5 @@
 cx_initialize_OpenIGTLink()
 
-include_directories( ${CX_RESOURCE_INCLUDE_DIRECTORIES} )
-
 SET(LINK_LIBRARIES
         cxResource
         OpenIGTLink
@@ -19,11 +17,15 @@ SET ( cxOpenIGTLinkUtilities_FILES
     )
 
 cx_create_export_header("cxOpenIGTLinkUtilities")
-cx_remove_duplicate_include_directories()
 add_library( cxOpenIGTLinkUtilities
     ${cxOpenIGTLinkUtilities_FILES}
     ${MOC_HEADER_FILES}
     )
+target_include_directories(cxOpenIGTLinkUtilities
+    PUBLIC
+    .
+    ${CMAKE_CURRENT_BINARY_DIR}
+)
 target_link_libraries(cxOpenIGTLinkUtilities
     ${LINK_LIBRARIES}
     )

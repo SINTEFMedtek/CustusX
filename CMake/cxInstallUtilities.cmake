@@ -251,7 +251,7 @@ function(cx_install_target TARGET_ID)
         cx_assert_variable_exists(${CX_INSTALL_ROOT_DIR})
 
 	if(CX_APPLE)
-		set( NEW_ENTRY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TARGET_ID}" )
+                set( NEW_ENTRY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TARGET_ID}.app/Contents/MacOS/${TARGET_ID}" )
 		#set( NEW_ENTRY "${CMAKE_CURRENT_BINARY_DIR}/${TARGET_ID}" )
 		list(FIND CX_APPLE_TARGETS_TO_COPY ${NEW_ENTRY} PREEXISTING)
 		if( ${PREEXISTING} EQUAL -1 )
@@ -477,7 +477,6 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
             foreach(APP ${APPS_LOCAL})
                 string(REPLACE "./" "/" APP ${APP})
                 list(APPEND TEMP_APPS_LOCAL ${APP})
-                message(STATUS "========================== ${APP}")
             endforeach()
             set(APPS_LOCAL ${TEMP_APPS_LOCAL})
         endif(CX_WINDOWS)
@@ -514,9 +513,8 @@ set(PLUGINS_DESCRIPTION
 ")
 getListOfVarsStartingWith("CX_PLUGIN_" matchedVars)
 foreach (_var IN LISTS matchedVars)
-	string(REPLACE "CX_PLUGIN_" "" PLUGIN_NAME ${_var})
-	#message("${_var}=${${_var}} :: ${${${_var}}} :: ${PLUGIN_NAME}")
-	set(PLUGINS_DESCRIPTION ${PLUGINS_DESCRIPTION}
+        string(REPLACE "CX_PLUGIN_" "" PLUGIN_NAME ${_var})
+        set(PLUGINS_DESCRIPTION ${PLUGINS_DESCRIPTION}
 "		${PLUGIN_NAME}: ${${_var}}
 ")
 endforeach()
@@ -559,5 +557,5 @@ Configuration for CustusX ${CustusX_VERSION_STRING}
 
 ${PLUGINS_DESCRIPTION}
 ")
-	set(CX_CONFIGURATION_DESCRIPTION ${CONFIGURATION_TEXT} PARENT_SCOPE)
+    set(CX_CONFIGURATION_DESCRIPTION ${CONFIGURATION_TEXT} PARENT_SCOPE)
 endfunction()

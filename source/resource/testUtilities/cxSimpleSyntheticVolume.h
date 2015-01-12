@@ -30,34 +30,30 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
+#ifndef SIMPLESYNTHETICVOLUME_H
+#define SIMPLESYNTHETICVOLUME_H
 
-// Warning:
-//
-// This main function is intended to be included by the cmake macro
-// cx_catch_add_lib_and_exe(). Do not add to any libs!
+#include "cxtestutilities_export.h"
 
-#include "cxtestCatchImpl.h"
+#include "cxSyntheticVolume.h"
 
-#ifdef CX_WINDOWS
-#include <windows.h>
-#endif
+namespace cx {
 
-int main(int argc, char *argv[])
+class CXTESTUTILITIES_EXPORT cxSimpleSyntheticVolume : public cxSyntheticVolume
 {
+public:
+    cxSimpleSyntheticVolume(Vector3D bounds);
 
-#ifdef CX_WINDOWS
-	SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);
-#endif
+    virtual void printInfo() const;
 
-	int error_code = cxtest::CatchImpl().run(argc, argv);
-//	if(error_code >0)
-//		return 0;
+	virtual bool isOnLine(float x,
+	                      float y,
+	                      float thickness,
+	                      int n_lines,
+                          int axis) const;
+    virtual unsigned char evaluate(const cx::Vector3D &p) const;
 
-//	int* fail = NULL;
-//	*fail = 5;
-//	return 2;
-//	return -1;
+};
 
-	return error_code;
 }
-
+#endif

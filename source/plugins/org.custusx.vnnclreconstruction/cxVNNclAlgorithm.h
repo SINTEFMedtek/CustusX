@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 /**
- *  Original author Tord ¯ygard
+ *  Original author Tord Ã˜ygard
  */
 class VNNclAlgorithm
 {

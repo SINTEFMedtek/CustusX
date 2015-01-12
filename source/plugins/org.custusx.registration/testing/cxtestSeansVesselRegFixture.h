@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTESTSEANSVESSELREGFIXTURE_H_
 #define CXTESTSEANSVESSELREGFIXTURE_H_
 
+#include "cxtest_org_custusx_registration_export.h"
+
 #include <vector>
 #include "cxTransform3D.h"
 #include "cxForwardDeclarations.h"
@@ -46,7 +48,7 @@ namespace cxtest {
  * \author Janne Beate Bakeng, SINTEF
  */
 
-class SeansVesselRegFixture {
+class CXTEST_ORG_CUSTUSX_REGISTRATION_EXPORT SeansVesselRegFixture {
 
 public:
 	SeansVesselRegFixture();

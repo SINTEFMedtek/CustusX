@@ -21,11 +21,9 @@ SET( MOC_HEADER_FILES
    gui/cxLapFrameToolCalibrationWidget.h
     )
 
-cx_remove_duplicate_include_directories()
-QT5_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
+qt5_wrap_cpp( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
 
-# library
-SET( SOURCE_FILES
+set( SOURCE_FILES
     ${MOC_HEADER_FILES}
   logic/cxTemporalCalibration.h
   logic/cxTemporalCalibration.cpp
@@ -47,42 +45,20 @@ SET( SOURCE_FILES
   )
 
 # =========================================================
-
-
-include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
-include_directories(
-    ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
-    ${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
-    .
-    ./logic
-    ./gui
-	${CustusX_SOURCE_DIR}/source/logic
-	${CustusX_BINARY_DIR}/source/logic
-
-    ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
-    ${CustusX_SOURCE_DIR}/source/gui/utilities
-    ${CustusX_SOURCE_DIR}/source/gui/dataAdapters
-    ${CustusX_SOURCE_DIR}/source/gui/toolWidgets
-    ${CustusX_BINARY_DIR}/source/modules/GUIExtender
-    ${CustusX_BINARY_DIR}/source/resource/widgets
-    ${CustusX_BINARY_DIR}/source/resource/usReconstructionTypes
-    ${CustusX_BINARY_DIR}/source/gui
-
-    ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.acquisition
-    ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.acquisition/gui
-    ${CustusX_BINARY_DIR}/source/plugins/org.custusx.acquisition
-    )
-
-# =========================================================
-cx_remove_duplicate_include_directories()
 cx_create_export_header("cxPluginCalibration")
-# create the target
 add_library( cxPluginCalibration ${SOURCE_FILES} )
 set(LINK_LIBRARIES
     cxResource
     cxResourceWidgets
     org_custusx_acquisition
-      )
+)
 target_link_libraries( cxPluginCalibration ${LINK_LIBRARIES} )
+target_include_directories(cxPluginCalibration
+    PUBLIC
+    .
+    ./gui
+    ./logic
+    ${CMAKE_CURRENT_BINARY_DIR}
+)
 
 add_subdirectory(testing)

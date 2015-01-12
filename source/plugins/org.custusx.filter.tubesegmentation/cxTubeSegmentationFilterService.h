@@ -33,6 +33,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTUBESEGMENTATIONFILTERSERVICE_H_
 #define CXTUBESEGMENTATIONFILTERSERVICE_H_
 
+#include "org_custusx_filter_tubesegmentation_Export.h"
+
+//#include "C:\Dev\cx\CustusX\CustusX\source\resource\filter\cxFilter.h"
+//#include "C:\Dev\cx\CustusX\CustusX\source\resource\filter\cxFilterImpl.h"
+#include "cxFilter.h"
 #include "cxFilterImpl.h"
 
 #include <boost/unordered_map.hpp>
@@ -40,11 +45,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "parameters.hpp"
 #include "cxPatientModelService.h"
-class TSFOutput;
 
 #include "cxStringDataAdapterXml.h"
 #include "cxBoolDataAdapterXml.h"
-#include "org_custusx_filter_tubesegmentation_Export.h"
+
+class TSFOutput;
 class ctkPluginContext;
 
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
@@ -67,8 +72,8 @@ typedef boost::shared_ptr<class TSFPresets> TSFPresetsPtr;
  */
 class org_custusx_filter_tubesegmentation_EXPORT TubeSegmentationFilter : public FilterImpl
 {
-	Q_OBJECT
-	Q_INTERFACES(cx::Filter)
+Q_OBJECT
+Q_INTERFACES(cx::Filter)
 
 public:
 	TubeSegmentationFilter(ctkPluginContext *pluginContext);

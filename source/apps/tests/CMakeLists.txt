@@ -1,15 +1,19 @@
  
-IF(BUILD_TESTING)
+if(BUILD_TESTING)
 
-	PROJECT(DepthSortPolyData)
+    project(DepthSortPolyData)
 
-	FIND_PACKAGE(VTK REQUIRED)
-	INCLUDE(${VTK_USE_FILE})
+    find_package(VTK REQUIRED)
+    include(${VTK_USE_FILE})
 
-	set(TARGET_LIBRARIES vtkFiltersHybrid cxResource)
+    add_executable(CorrectlyRenderTranslucentGeometry CorrectlyRenderTranslucentGeometry.cxx)
+    target_include_directories(CorrectlyRenderTranslucentGeometry
+        PRIVATE
+        ${VTK_INCLUDE_DIRS}
+    )
+    target_link_libraries(CorrectlyRenderTranslucentGeometry
+        PRIVATE
+        cxResource
+    )
 
-        cx_remove_duplicate_include_directories()
-	ADD_EXECUTABLE(CorrectlyRenderTranslucentGeometry CorrectlyRenderTranslucentGeometry.cxx)
-	TARGET_LINK_LIBRARIES(CorrectlyRenderTranslucentGeometry ${TARGET_LIBRARIES})
-
-ENDIF(BUILD_TESTING)
+endif(BUILD_TESTING)

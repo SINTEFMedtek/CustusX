@@ -37,10 +37,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 #include <QObject>
-#include "cxXmlOptionItem.h"
+
 #include "cxPresets.h"
 #include "cxForwardDeclarations.h"
 class QDomElement;
+
+#define FilterService_iid "cx::Filter"
 
 namespace cx
 {
@@ -48,7 +50,6 @@ typedef boost::shared_ptr<class SelectDataStringDataAdapterBase> SelectDataStrin
 
 typedef boost::shared_ptr<class Filter> FilterPtr;
 
-#define FilterService_iid "cx::Filter"
 
 /** Base class for CustusX filters/algorithms
  *
@@ -72,7 +73,7 @@ class cxResourceFilter_EXPORT Filter : public QObject
 	Q_OBJECT
 
 public:
-	explicit Filter();
+    Filter();
 	virtual ~Filter() {}
 
 	/**
@@ -180,50 +181,6 @@ signals:
 	void changed();
 
 };
-
-
-/** Collection of filters.
-  *
-  * Connects them by giving them unique id's.
-  *
-  */
-class cxResourceFilter_EXPORT FilterGroup
-{
-public:
-	FilterGroup(XmlOptionFile options);
-	/**
-	  * Get the option node for this pipeline
-	  */
-	XmlOptionFile getOptions();
-	/**
-	  * Get all filters in pipeline
-	  */
-	std::vector<FilterPtr> getFilters() const;
-	/**
-	  * Append a filter to group
-	  */
-	void append(FilterPtr filter);
-	void remove(Filter* filter);
-
-	size_t size() const { return mFilters.size(); }
-	bool empty() const { return mFilters.empty(); }
-	//    FilterPtr& operator[](size_t index) { return mFilters[index]; }
-	//    const FilterPtr& operator[](size_t index) const { return mFilters[index]; }
-	FilterPtr get(int index) { return mFilters[index]; }
-	FilterPtr get(QString uid)
-	{
-		for (unsigned i=0; i<mFilters.size(); ++i)
-			if (mFilters[i]->getUid()==uid)
-				return mFilters[i];
-		return FilterPtr();
-	}
-
-private:
-	std::vector<FilterPtr> mFilters;
-	XmlOptionFile mOptions;
-};
-typedef boost::shared_ptr<FilterGroup> FilterGroupPtr;
-
 
 } // namespace cx
 

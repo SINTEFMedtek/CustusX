@@ -40,11 +40,11 @@ endfunction()
 # Use to check prerequisites in code.
 ###############################################################################
 function(cx_assert_variable_exists)
-	if( ${ARGC} EQUAL 0)
-		message(SEND_ERROR "ERROR: Input variable does not exist")
-	else()
-		#message(STATUS "FOUND VARIABLE [${ARGC}]  [${ARGV}]")
-	endif()
+    if( ${ARGC} EQUAL 0)
+            message(SEND_ERROR "ERROR: Input variable does not exist")
+    else()
+            #message(STATUS "FOUND VARIABLE [${ARGC}]  [${ARGV}]")
+    endif()
 endfunction()
 
 ###############################################################################
@@ -59,16 +59,16 @@ endfunction()
 #
 ###############################################################################
 function( cx_define_option_from_boolean NAME DESCRIPTION)
-	set( BOOLEAN_VALUE False)
-	if( ARGC GREATER 2 )
-		set( BOOLEAN_VALUE ${ARGV2})
-	endif()
+    set( BOOLEAN_VALUE False)
+    if( ARGC GREATER 2 )
+            set( BOOLEAN_VALUE ${ARGV2})
+    endif()
 
-	if(${BOOLEAN_VALUE})
-		option(${NAME} ${DESCRIPTION} ON)
-	else()
-		option(${NAME} ${DESCRIPTION} OFF)
-	endif()
+    if(${BOOLEAN_VALUE})
+            option(${NAME} ${DESCRIPTION} ON)
+    else()
+            option(${NAME} ${DESCRIPTION} OFF)
+    endif()
 endfunction()
 
 ###############################################################################
@@ -124,15 +124,13 @@ MACRO(cx_get_today RESULT)
             COMMAND "cmd" "/C date /T"
             OUTPUT_VARIABLE ${RESULT}
             )
-	ELSEIF(UNIX)
-
+    ELSEIF(UNIX)
         EXECUTE_PROCESS(
             COMMAND "date" "+%d/%m/%Y" 
             OUTPUT_VARIABLE ${RESULT}
             )
         string(REGEX REPLACE "(..)/(..)/(....).*" "\\3-\\2-\\1" ${RESULT} ${${RESULT}})
-#        EXECUTE_PROCESS(COMMAND "date" "+%Y-%m-%d" OUTPUT_VARIABLE ${RESULT})
-        ELSE(WIN32)
+    ELSE(WIN32)
         MESSAGE(SEND_ERROR "date not implemented")
         SET(${RESULT} 000000)
     ENDIF(WIN32)
@@ -146,22 +144,22 @@ ENDMACRO()
 #
 ###############################################################################
 MACRO(cx_get_git_build_description RESULT)
-	find_package(Git REQUIRED)
-	IF(WIN32)
-	    execute_process(
-		    COMMAND "git.exe" describe --tags
-		    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-		    OUTPUT_VARIABLE ${RESULT}
-		    )
-	ELSEIF(UNIX)	
-		execute_process(
-		    COMMAND git describe --tags
-		    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-		    OUTPUT_VARIABLE ${RESULT}
-		    )
+    find_package(Git REQUIRED)
+    IF(WIN32)
+        execute_process(
+                COMMAND "git.exe" describe --tags
+                WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+                OUTPUT_VARIABLE ${RESULT}
+                )
+    ELSEIF(UNIX)
+            execute_process(
+                COMMAND git describe --tags
+                WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+                OUTPUT_VARIABLE ${RESULT}
+                )
     ENDIF(WIN32)
-	# remove first character - should always be a "v" as first in f.ex. "v3.5.3"
-	string(SUBSTRING ${${RESULT}} 1 -1 ${RESULT})
+    # remove first character - should always be a "v" as first in f.ex. "v3.5.3"
+    string(SUBSTRING ${${RESULT}} 1 -1 ${RESULT})
 ENDMACRO()
 
 ###############################################################################
@@ -186,66 +184,57 @@ ENDMACRO()
 #
 ###############################################################################
 MACRO(cx_define_version major minor patch type)
-	set(${PROJECT_NAME}_VERSION_MAJOR  ${major})
-	set(${PROJECT_NAME}_VERSION_MINOR  ${minor})
-	set(${PROJECT_NAME}_VERSION_PATCH  ${patch})
+    set(${PROJECT_NAME}_VERSION_MAJOR  ${major})
+    set(${PROJECT_NAME}_VERSION_MINOR  ${minor})
+    set(${PROJECT_NAME}_VERSION_PATCH  ${patch})
 
-	cx_get_git_build_description(GIT_DESCRIBE)
+    cx_get_git_build_description(GIT_DESCRIBE)
 
-	if(${type} STREQUAL ALPHA)
-		cx_get_today(TODAY_DATE)
-		set(GIT_DESCRIBE "${GIT_DESCRIBE}.${TODAY_DATE}")
-		set(POSTFIX ".alpha")
-	elseif(${type} STREQUAL BETA)
-		set(POSTFIX ".beta")
-	elseif(${type} STREQUAL RELEASE)
-		set(POSTFIX "")
-	else()
-		set(POSTFIX "." ${type})
-	endif()
-	
-	#on windows this string contains newlines and whitespaces that needs to be removed
-	STRING(REGEX REPLACE "\r|\n" "" GIT_DESCRIBE ${GIT_DESCRIBE})
-	STRING(REGEX REPLACE " " "" GIT_DESCRIBE ${GIT_DESCRIBE})
+    if(${type} STREQUAL ALPHA)
+            cx_get_today(TODAY_DATE)
+            set(GIT_DESCRIBE "${GIT_DESCRIBE}.${TODAY_DATE}")
+            set(POSTFIX ".alpha")
+    elseif(${type} STREQUAL BETA)
+            set(POSTFIX ".beta")
+    elseif(${type} STREQUAL RELEASE)
+            set(POSTFIX "")
+    else()
+            set(POSTFIX "." ${type})
+    endif()
 
-	set(${PROJECT_NAME}_VERSION_POSTFIX ${POSTFIX})
-	set(GENERATED_VERSION_STRING ${major}.${minor}.${patch}${POSTFIX})
-	string(REGEX MATCH ${GENERATED_VERSION_STRING} MATCHING_STRING ${GIT_DESCRIBE})
-	if("${MATCHING_STRING}" STREQUAL "")
-		message("Warning:
-		Version string extracted from git: ${GIT_DESCRIBE}
-		Version string generated: ${GENERATED_VERSION_STRING}
-		The generated string should be contained in the git string.
-		Reverting to generated string, setting dirty tag.")
-		set(${PROJECT_NAME}_VERSION_STRING ${GENERATED_VERSION_STRING}.dirty)
-	else()
-		set(${PROJECT_NAME}_VERSION_STRING ${GIT_DESCRIBE})
-	endif()
-#	set(${PROJECT_NAME}_VERSION_STRING ${major}.${minor}.${patch}${${PROJECT_NAME}_VERSION_POSTFIX})
+    #on windows this string contains newlines and whitespaces that needs to be removed
+    STRING(REGEX REPLACE "\r|\n" "" GIT_DESCRIBE ${GIT_DESCRIBE})
+    STRING(REGEX REPLACE " " "" GIT_DESCRIBE ${GIT_DESCRIBE})
 
-# no good - leads to full rebuild for every commit. Moved to resource/settings/cxConfig.h
-#	add_definitions(
-#		-D${PROJECT_NAME}_VERSION_STRING="${${PROJECT_NAME}_VERSION_STRING}"
-#		-D${PROJECT_NAME}_VERSION_MAJOR=${${PROJECT_NAME}_VERSION_MAJOR}
-#		-D${PROJECT_NAME}_VERSION_MINOR=${${PROJECT_NAME}_VERSION_MINOR}
-#		-D${PROJECT_NAME}_VERSION_PATCH=${${PROJECT_NAME}_VERSION_PATCH}
-#	)
+    set(${PROJECT_NAME}_VERSION_POSTFIX ${POSTFIX})
+    set(GENERATED_VERSION_STRING ${major}.${minor}.${patch}${POSTFIX})
+    string(REGEX MATCH ${GENERATED_VERSION_STRING} MATCHING_STRING ${GIT_DESCRIBE})
+    if("${MATCHING_STRING}" STREQUAL "")
+            message("Warning:
+            Version string extracted from git: ${GIT_DESCRIBE}
+            Version string generated: ${GENERATED_VERSION_STRING}
+            The generated string should be contained in the git string.
+            Reverting to generated string, setting dirty tag.")
+            set(${PROJECT_NAME}_VERSION_STRING ${GENERATED_VERSION_STRING}.dirty)
+    else()
+            set(${PROJECT_NAME}_VERSION_STRING ${GIT_DESCRIBE})
+    endif()
 ENDMACRO()
 
 ###############################################################################
 #
 ###############################################################################
 MACRO(cx_read_version)
-	file(READ ${PROJECT_SOURCE_DIR}/version.ini CX_VERSION_FILE_DATA)
+    file(READ ${PROJECT_SOURCE_DIR}/version.ini CX_VERSION_FILE_DATA)
 
-	string(REGEX REPLACE ".*major[ ]*=[ ]*([0-9]+).*" "\\1" VERSION_MAJOR ${CX_VERSION_FILE_DATA})
-	string(REGEX REPLACE ".*minor[ ]*=[ ]*([0-9]+).*" "\\1" VERSION_MINOR ${CX_VERSION_FILE_DATA})
-	string(REGEX REPLACE ".*patch[ ]*=[ ]*([0-9]+).*" "\\1" VERSION_PATCH ${CX_VERSION_FILE_DATA})
-	string(REGEX REPLACE ".*type[ ]*=[ ]*([^$]*).*" "\\1" VERSION_TYPE ${CX_VERSION_FILE_DATA})
-	STRING(REGEX REPLACE "(\r?\n)+$" "" VERSION_TYPE "${VERSION_TYPE}")
+    string(REGEX REPLACE ".*major[ ]*=[ ]*([0-9]+).*" "\\1" VERSION_MAJOR ${CX_VERSION_FILE_DATA})
+    string(REGEX REPLACE ".*minor[ ]*=[ ]*([0-9]+).*" "\\1" VERSION_MINOR ${CX_VERSION_FILE_DATA})
+    string(REGEX REPLACE ".*patch[ ]*=[ ]*([0-9]+).*" "\\1" VERSION_PATCH ${CX_VERSION_FILE_DATA})
+    string(REGEX REPLACE ".*type[ ]*=[ ]*([^$]*).*" "\\1" VERSION_TYPE ${CX_VERSION_FILE_DATA})
+    STRING(REGEX REPLACE "(\r?\n)+$" "" VERSION_TYPE "${VERSION_TYPE}")
 
-	cx_define_version(${VERSION_MAJOR} ${VERSION_MINOR} ${VERSION_PATCH} ${VERSION_TYPE})
-	message(STATUS "Version: ${CustusX_VERSION_STRING}")
+    cx_define_version(${VERSION_MAJOR} ${VERSION_MINOR} ${VERSION_PATCH} ${VERSION_TYPE})
+    message(STATUS "Version: ${CustusX_VERSION_STRING}")
 
 ENDMACRO()
 
@@ -256,54 +245,54 @@ ENDMACRO()
 # Usage: print_list_verbose(LIST_VAR "Header text")
 ###############################################################################
 function(cx_print_list_verbose LIST_VAR HEADER_TEXT)
-	message(STATUS "-----------------------------------------")
-	message(STATUS "---- " ${HEADER_TEXT} " ----")
-	message(STATUS "{" )
-	foreach(VAR ${${LIST_VAR}})
-		message(STATUS "    " ${VAR})
-	endforeach()
-	message(STATUS "}" )
-	message(STATUS "-----------------------------------------" )
+    message(STATUS "-----------------------------------------")
+    message(STATUS "---- " ${HEADER_TEXT} " ----")
+    message(STATUS "{" )
+    foreach(VAR ${${LIST_VAR}})
+            message(STATUS "    " ${VAR})
+    endforeach()
+    message(STATUS "}" )
+    message(STATUS "-----------------------------------------" )
 endfunction()
 
 ###############################################################################
 # private
 ###############################################################################
 macro(_cx_query_is_full_filename RESULT CLASS_NAME_WITH_PATH)
-	STRING(REGEX MATCH "(\\.h|\\.cpp|\\.cxx|\\.qrc|\\.hxx|\\.hpp|\\.txx)$" VALID_SUFFIX ${CLASS_NAME_WITH_PATH})
-	if("${VALID_SUFFIX}" STREQUAL "")
-		set(${RESULT} "False")
-	else()
-		set(${RESULT} "True")
-	endif()
+    STRING(REGEX MATCH "(\\.h|\\.cpp|\\.cxx|\\.qrc|\\.hxx|\\.hpp|\\.txx)$" VALID_SUFFIX ${CLASS_NAME_WITH_PATH})
+    if("${VALID_SUFFIX}" STREQUAL "")
+            set(${RESULT} "False")
+    else()
+            set(${RESULT} "True")
+    endif()
 endmacro()
 
 ###############################################################################
 # private
 ###############################################################################
 function(_cx_add_one_class SOURCE_FILES CLASS_NAME_WITH_PATH)
-	_cx_query_is_full_filename(IS_FULL_FILENAME ${CLASS_NAME_WITH_PATH})
-	if(${IS_FULL_FILENAME} MATCHES "False")
-		set(RESULT_add_one_class ${CLASS_NAME_WITH_PATH}.h ${CLASS_NAME_WITH_PATH}.cpp)
-	else()
-		set(RESULT_add_one_class ${CLASS_NAME_WITH_PATH})
-	endif()
+    _cx_query_is_full_filename(IS_FULL_FILENAME ${CLASS_NAME_WITH_PATH})
+    if(${IS_FULL_FILENAME} MATCHES "False")
+            set(RESULT_add_one_class ${CLASS_NAME_WITH_PATH}.h ${CLASS_NAME_WITH_PATH}.cpp)
+    else()
+            set(RESULT_add_one_class ${CLASS_NAME_WITH_PATH})
+    endif()
 
-	set(${SOURCE_FILES} ${${SOURCE_FILES}} ${RESULT_add_one_class} PARENT_SCOPE)
+    set(${SOURCE_FILES} ${${SOURCE_FILES}} ${RESULT_add_one_class} PARENT_SCOPE)
 endfunction()
 
 ###############################################################################
 # private
 ###############################################################################
 function(_cx_add_header_name SOURCE_FILES CLASS_NAME_WITH_PATH)
-	_cx_query_is_full_filename(IS_FULL_FILENAME ${CLASS_NAME_WITH_PATH})
-	if(${IS_FULL_FILENAME} MATCHES "False")
-		set(RESULT_cx_add_header_name ${CLASS_NAME_WITH_PATH}.h)
-	else()
-		set(RESULT_cx_add_header_name ${CLASS_NAME_WITH_PATH})
-	endif()
+    _cx_query_is_full_filename(IS_FULL_FILENAME ${CLASS_NAME_WITH_PATH})
+    if(${IS_FULL_FILENAME} MATCHES "False")
+            set(RESULT_cx_add_header_name ${CLASS_NAME_WITH_PATH}.h)
+    else()
+            set(RESULT_cx_add_header_name ${CLASS_NAME_WITH_PATH})
+    endif()
 
-	set(${SOURCE_FILES} ${${SOURCE_FILES}} ${RESULT_cx_add_header_name} PARENT_SCOPE) # set retval
+    set(${SOURCE_FILES} ${${SOURCE_FILES}} ${RESULT_cx_add_header_name} PARENT_SCOPE) # set retval
 endfunction()
 
 ###############################################################################
@@ -316,14 +305,14 @@ endfunction()
 # Usage: add_class(SOURCE_FILES class1 class2 folder/class3 file1.h ...)
 ###############################################################################
 function(cx_add_class SOURCE_FILES_ARGUMENT)
-	set(CLASS_NAME_WITH_PATH ${ARGV})
-	list(REMOVE_AT CLASS_NAME_WITH_PATH 0)
+    set(CLASS_NAME_WITH_PATH ${ARGV})
+    list(REMOVE_AT CLASS_NAME_WITH_PATH 0)
 
-	foreach(CLASS_NAME ${CLASS_NAME_WITH_PATH})
-		_cx_add_one_class(RESULT_add_class ${CLASS_NAME})
-	endforeach()
+    foreach(CLASS_NAME ${CLASS_NAME_WITH_PATH})
+            _cx_add_one_class(RESULT_add_class ${CLASS_NAME})
+    endforeach()
 
-        set(${SOURCE_FILES_ARGUMENT} ${${SOURCE_FILES_ARGUMENT}} ${RESULT_add_class} PARENT_SCOPE)
+    set(${SOURCE_FILES_ARGUMENT} ${${SOURCE_FILES_ARGUMENT}} ${RESULT_add_class} PARENT_SCOPE)
 endfunction()
 
 ###############################################################################
@@ -332,20 +321,19 @@ endfunction()
 # As add_class(), but the class is run through the Qt Moc system as well.
 ###############################################################################
 function(cx_add_class_qt_moc SOURCE_FILES_ARGUMENT)
-	set(CLASS_NAME_WITH_PATH ${ARGV})
-	list(REMOVE_AT CLASS_NAME_WITH_PATH 0)
+    set(CLASS_NAME_WITH_PATH ${ARGV})
+    list(REMOVE_AT CLASS_NAME_WITH_PATH 0)
 
-	foreach(CLASS_NAME ${CLASS_NAME_WITH_PATH})
-		_cx_add_one_class(RESULT_add_class_qt_moc ${CLASS_NAME})
-	endforeach()
+    foreach(CLASS_NAME ${CLASS_NAME_WITH_PATH})
+            _cx_add_one_class(RESULT_add_class_qt_moc ${CLASS_NAME})
+    endforeach()
 
-	foreach(CLASS_NAME ${CLASS_NAME_WITH_PATH})
-		_cx_add_header_name(HEADER_NAMES ${CLASS_NAME})
-	endforeach()
-	
-	# optimized: QT5_WRAP_CPP has large overhead: call once.
-        cx_remove_duplicate_include_directories()
-	QT5_WRAP_CPP( RESULT_add_class_qt_moc ${HEADER_NAMES} )
+    foreach(CLASS_NAME ${CLASS_NAME_WITH_PATH})
+            _cx_add_header_name(HEADER_NAMES ${CLASS_NAME})
+    endforeach()
+
+    # optimized: QT5_WRAP_CPP has large overhead: call once.
+    qt5_wrap_cpp( RESULT_add_class_qt_moc ${HEADER_NAMES} )
 
     set(${SOURCE_FILES_ARGUMENT} ${${SOURCE_FILES_ARGUMENT}} ${RESULT_add_class_qt_moc} PARENT_SCOPE)
 endfunction()
@@ -357,17 +345,17 @@ endfunction()
 ###############################################################################
 macro(cx_opengl_version)
 
-    IF (OPENGL_FOUND AND NOT DEFINED CX_WINDOWS AND NOT DEFINED CX_APPLE)
-      execute_process(COMMAND glxinfo COMMAND grep "OpenGL version" OUTPUT_VARIABLE _OPENGL_VERSION_STRING)
-    
-      STRING (REGEX REPLACE "[^:]*:()" "\\1" OPENGL_VERSION "${_OPENGL_VERSION_STRING}")
-        
-      IF ("${OPENGL_VERSION}" STREQUAL "")
-        MESSAGE (WARNING "Cannot determine OpenGL's version")
-      ENDIF ("${OPENGL_VERSION}" STREQUAL "")
-    ELSE (OPENGL_FOUND AND NOT DEFINED CX_WINDOWS AND NOT DEFINED CX_APPLE)
-        SET(OPENGL_VERSION "<cannot_find_on_windows/mac>")
-    ENDIF (OPENGL_FOUND AND NOT DEFINED CX_WINDOWS AND NOT DEFINED CX_APPLE)
+    if(OPENGL_FOUND AND NOT DEFINED CX_WINDOWS AND NOT DEFINED CX_APPLE)
+        execute_process(COMMAND glxinfo COMMAND grep "OpenGL version" OUTPUT_VARIABLE _OPENGL_VERSION_STRING)
+
+        string(REGEX REPLACE "[^:]*:()" "\\1" OPENGL_VERSION "${_OPENGL_VERSION_STRING}")
+
+        if("${OPENGL_VERSION}" STREQUAL "")
+            message(WARNING "Cannot determine OpenGL's version")
+        endif("${OPENGL_VERSION}" STREQUAL "")
+    else(OPENGL_FOUND AND NOT DEFINED CX_WINDOWS AND NOT DEFINED CX_APPLE)
+        set(OPENGL_VERSION "<cannot_find_on_windows/mac>")
+    endif(OPENGL_FOUND AND NOT DEFINED CX_WINDOWS AND NOT DEFINED CX_APPLE)
     
 endmacro(cx_opengl_version)
 
@@ -376,10 +364,10 @@ endmacro(cx_opengl_version)
 # Get a list of all variables with _prefix, return in _varResult
 #
 ###############################################################################
-function (getListOfVarsStartingWith _prefix _varResult)
-	get_cmake_property(_vars VARIABLES)
-	string (REGEX MATCHALL "(^|;)${_prefix}[A-Za-z0-9/_\\.:]*" _matchedVars "${_vars}")
-	set (${_varResult} ${_matchedVars} PARENT_SCOPE)
+function(getListOfVarsStartingWith _prefix _varResult)
+    get_cmake_property(_vars VARIABLES)
+    string (REGEX MATCHALL "(^|;)${_prefix}[A-Za-z0-9/_\\.:]*" _matchedVars "${_vars}")
+    set (${_varResult} ${_matchedVars} PARENT_SCOPE)
 endfunction()
 
 
@@ -422,7 +410,7 @@ function(find_qt_bin_dir _varResult)
     find_package(Qt5Core REQUIRED)
     get_target_property(QtCore_location Qt5::Core LOCATION)
     get_filename_component(_QT_BIN_DIR ${QtCore_location} DIRECTORY)
-    set (${_varResult} ${_QT_BIN_DIR} PARENT_SCOPE)
+    set(${_varResult} ${_QT_BIN_DIR} PARENT_SCOPE)
 endfunction()
 
 
@@ -432,17 +420,17 @@ endfunction()
 # Return as list of paths relative to curdir. 
 #
 ###############################################################################
-MACRO(SUBDIRLIST result curdir)
-  FILE(GLOB children RELATIVE ${curdir} ${curdir}/*)
+macro(SUBDIRLIST result curdir)
+  file(GLOB children RELATIVE ${curdir} ${curdir}/*)
   #message(STATUS "children: " ${children})
-  SET(dirlist "")
-  FOREACH(child ${children})
-    IF(IS_DIRECTORY ${curdir}/${child})
-        LIST(APPEND dirlist ${child})
-    ENDIF()
-  ENDFOREACH()
-  SET(${result} ${dirlist})
-ENDMACRO()
+  set(dirlist "")
+  foreach(child ${children})
+    if(IS_DIRECTORY ${curdir}/${child})
+        list(APPEND dirlist ${child})
+    endif()
+  endforeach()
+  set(${result} ${dirlist})
+endmacro()
 
 
 ###############################################################################
@@ -476,9 +464,6 @@ macro(cx_create_export_header MY_LIBRARY_NAME)
         ${CTK_SOURCE_DIR}/Libs/ctkExport.h.in
         ${CMAKE_CURRENT_BINARY_DIR}/${MY_LIBRARY_NAME}Export.h
     )
-    include_directories(
-        ${CMAKE_CURRENT_BINARY_DIR}
-    )
 endmacro()
 
 ###############################################################################
@@ -491,11 +476,11 @@ endmacro()
 # directories are removed and thus not added to moc_<filename>.cpp_parameters (the -IC: tags)
 #
 ###############################################################################
-macro(cx_remove_duplicate_include_directories)
-    get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
-    list(REMOVE_DUPLICATES dirs)
-    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES ${dirs})
-endmacro()
+#macro(cx_remove_duplicate_include_directories)
+#    get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
+#    list(REMOVE_DUPLICATES dirs)
+#    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES ${dirs})
+#endmacro()
 
 
 ###############################################################################
@@ -503,20 +488,20 @@ endmacro()
 # http://stackoverflow.com/questions/148570/using-pre-compiled-headers-with-cmake
 #
 ###############################################################################
-MACRO(ADD_MSVC_PRECOMPILED_HEADER PrecompiledHeader PrecompiledSource SourcesVar)
-  IF(MSVC)
-    MESSAGE(STATUS "Generating precompiled headers.")
-    GET_FILENAME_COMPONENT(PrecompiledBasename ${PrecompiledHeader} NAME_WE)
-    SET(PrecompiledBinary "${CMAKE_CURRENT_BINARY_DIR}/${PrecompiledBasename}.pch")
-    SET(Sources ${${SourcesVar}})
+macro(ADD_MSVC_PRECOMPILED_HEADER PrecompiledHeader PrecompiledSource SourcesVar)
+  if(MSVC)
+    message(STATUS "Generating precompiled headers.")
+    get_filename_component(PrecompiledBasename ${PrecompiledHeader} NAME_WE)
+    set(PrecompiledBinary "${CMAKE_CURRENT_BINARY_DIR}/${PrecompiledBasename}.pch")
+    set(Sources ${${SourcesVar}})
 
-    SET_SOURCE_FILES_PROPERTIES(${PrecompiledSource}
+    set_source_files_properties(${PrecompiledSource}
                                 PROPERTIES COMPILE_FLAGS "/Yc\"${PrecompiledHeader}\" /Fp\"${PrecompiledBinary}\""
                                            OBJECT_OUTPUTS "${PrecompiledBinary}")
-    SET_SOURCE_FILES_PROPERTIES(${Sources}
+    set_source_files_properties(${Sources}
                                 PROPERTIES COMPILE_FLAGS "/Yu\"${PrecompiledHeader}\" /FI\"${PrecompiledHeader}\" /Fp\"${PrecompiledBinary}\""
                                            OBJECT_DEPENDS "${PrecompiledBinary}")
     # Add precompiled header to SourcesVar
-    LIST(APPEND ${SourcesVar} ${PrecompiledSource})
-  ENDIF(MSVC)
-ENDMACRO(ADD_MSVC_PRECOMPILED_HEADER)
+    list(APPEND ${SourcesVar} ${PrecompiledSource})
+  endif(MSVC)
+endmacro(ADD_MSVC_PRECOMPILED_HEADER)

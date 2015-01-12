@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTESTACQUISITIONFIXTURE_H_
 #define CXTESTACQUISITIONFIXTURE_H_
 
+#include "cxtest_org_custusx_acquisition_export.h"
+
 #include "cxForwardDeclarations.h"
 #include "cxAcquisitionData.h"
 #include "cxUSAcquisition.h"
@@ -44,7 +46,7 @@ namespace cxtest
 /**Helper object for automated control of the CustusX application.
  *
  */
-class AcquisitionFixture : public QObject
+class CXTEST_ORG_CUSTUSX_ACQUISITION_EXPORT AcquisitionFixture : public QObject
 {
 	Q_OBJECT
 

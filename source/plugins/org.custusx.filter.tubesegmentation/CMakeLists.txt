@@ -20,17 +20,6 @@ cx_initialize_TSF()
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
-include_directories(
-    ${CX_RESOURCE_FILTER_INCLUDE_DIRECTORIES}
-    ${CustusX_SOURCE_DIR}/source/modules/Algorithm/logic
-    ${CustusX_SOURCE_DIR}/source/gui/dataAdapters
-	${CustusX_SOURCE_DIR}/source/logic
-
-    ${CustusX_BINARY_DIR}/source/modules/Algorithm
-    ${CustusX_BINARY_DIR}/source/gui
-    ${CustusX_BINARY_DIR}/source/logic
-    )
-
 set(PLUGIN_SRCS
     cxFilterTubeSegmentationPluginActivator.cpp
     cxTSFPresets.cpp
@@ -52,13 +41,13 @@ set(PLUGIN_resources
 )
 
 install(FILES
-		${Tube-Segmentation-Framework_KERNELS_DIR}/kernels.cl
-		${Tube-Segmentation-Framework_KERNELS_DIR}/kernels_no_3d_write.cl
-		DESTINATION ${CX_INSTALL_ROOT_DIR}/config/tsf/)
+        ${Tube-Segmentation-Framework_KERNELS_DIR}/kernels.cl
+        ${Tube-Segmentation-Framework_KERNELS_DIR}/kernels_no_3d_write.cl
+        DESTINATION ${CX_INSTALL_ROOT_DIR}/config/tsf/)
 install(DIRECTORY ${Tube-Segmentation-Framework_PARAMETERS_DIR}
-		DESTINATION ${CX_INSTALL_ROOT_DIR}/config/tsf/
-		FILE_PERMISSIONS ${CX_FULL_PERMISSIONS}
-		DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS})
+        DESTINATION ${CX_INSTALL_ROOT_DIR}/config/tsf/
+        FILE_PERMISSIONS ${CX_FULL_PERMISSIONS}
+        DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS})
 
 #Compute the plugin dependencies
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
@@ -66,14 +55,17 @@ set(PLUGIN_target_libraries
     PUBLIC
     ${PLUGIN_target_libraries}
     cxPluginAlgorithm
+
     PRIVATE
     tubeSegmentationLib
     SIPL
+    cxResource
+    cxResourceFilter
     cxPluginUtilities
-	cxResourceFilter
-    )    
+    cxLogicManager
+)
 
-if (CX_USE_OPENCL_UTILITY)
+if(CX_USE_OPENCL_UTILITY)
     set(PLUGIN_target_libraries ${PLUGIN_target_libraries} OpenCLUtilityLibrary ${OPENCL_LIBRARIES})
     include_directories(${OpenCLUtilityLibrary_INCLUDE_DIRS})
 endif(CX_USE_OPENCL_UTILITY)
@@ -93,6 +85,12 @@ ctkMacroBuildPlugin(
   RESOURCES ${PLUGIN_resources}
   TARGET_LIBRARIES ${PLUGIN_target_libraries}
   OUTPUT_DIR ${PLUGIN_OUTPUT_DIR}
+)
+
+target_include_directories(org_custusx_filter_tubesegmentation
+    PUBLIC
+    .
+    ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 add_subdirectory(testing)

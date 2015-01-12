@@ -64,7 +64,9 @@ class cxResource_EXPORT SessionStorageService : public QObject
 {
 	Q_OBJECT
 public:
-	virtual ~SessionStorageService() {}
+    SessionStorageService();
+    virtual ~SessionStorageService();
+
 	virtual void load(QString dir) = 0; ///< load session from dir, or create new session in this location if none exist
 	virtual void save() = 0; ///< Save all application data to XML file
 	virtual void clear() = 0;

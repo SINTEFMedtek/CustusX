@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTESTTESTTRANSFERFUNCTIONCOLORWIDGET_H_
 #define CXTESTTESTTRANSFERFUNCTIONCOLORWIDGET_H_
 
+#include "cxtestgui_export.h"
+
 #include "cxTransferFunctionColorWidget.h"
 
 namespace cxtest {
@@ -42,7 +44,7 @@ namespace cxtest {
  *  \date Jul 29, 2013
  *  \author Ole Vegard Solberg, SINTEF
  */
-class TestTransferFunctionColorWidget : public cx::TransferFunctionColorWidget
+class CXTESTGUI_EXPORT TestTransferFunctionColorWidget : public cx::TransferFunctionColorWidget
 {
 	Q_OBJECT
 public:

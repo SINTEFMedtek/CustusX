@@ -39,13 +39,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVolumeHelpers.h"
 #include "cxTransferFunctions3DPresets.h"
 #include "cxTimeKeeper.h"
-
+#include "cxLogger.h"
 #include "cxUSFrameData.h"
 #include "cxReconstructionMethodService.h"
 #include "vtkPointData.h"
 #include "vtkDataArray.h"
-#include"cxPatientModelService.h"
-#include "cxLogger.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
@@ -101,7 +100,7 @@ void ReconstructCore::threadedReconstruct()
 {
 	if (!this->validInputData())
 		return;
-	CX_ASSERT(mRawOutput);
+    CX_ASSERT(mRawOutput);
 
 	TimeKeeper timer;
 

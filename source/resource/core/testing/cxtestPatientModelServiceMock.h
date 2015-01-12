@@ -32,12 +32,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTESTPATIENTMODELSERVICEMOCK_H
 #define CXTESTPATIENTMODELSERVICEMOCK_H
 
+#include "cxtestresource_export.h"
+
 #include "cxPatientModelServiceNull.h"
 
 namespace cxtest
 {
 
-class PatientModelServiceMock : public cx::PatientModelServiceNull
+class CXTESTRESOURCE_EXPORT PatientModelServiceMock : public cx::PatientModelServiceNull
 {
 public:
 	PatientModelServiceMock();

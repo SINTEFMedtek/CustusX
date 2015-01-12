@@ -2,18 +2,6 @@ project(org_custusx_help)
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
-include_directories(
-    ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
-	${CustusX_BINARY_DIR}/source/modules/GUIExtender
-	${CustusX_SOURCE_DIR}/source/resource/core/help
-    ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
-    ${CX_RESOURCE_INCLUDE_DIRECTORIES}
-    ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
-	${CMAKE_CURRENT_SOURCE_DIR}
-	${CMAKE_CURRENT_SOURCE_DIR}/widgets
-	${CMAKE_CURRENT_SOURCE_DIR}/core
-	)
-
 set(PLUGIN_SRCS
   cxHelpPluginActivator.cpp
   cxHelpGUIExtenderService.h
@@ -43,7 +31,6 @@ set(PLUGIN_UI_FORMS
 set(PLUGIN_resources
 )
 
-
 #Compute the plugin dependencies
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
@@ -51,8 +38,10 @@ set(PLUGIN_target_libraries
     cxGUIExtenderService
     cxResourceWidgets
     Qt5::Help
+    Qt5::Xml
     cxPluginUtilities
-    )
+    cxResource
+)
 
 set(PLUGIN_OUTPUT_DIR "")
 if(CX_WINDOWS)
@@ -69,6 +58,12 @@ ctkMacroBuildPlugin(
   RESOURCES ${PLUGIN_resources}
   TARGET_LIBRARIES ${PLUGIN_target_libraries}
   OUTPUT_DIR ${PLUGIN_OUTPUT_DIR}
+)
+target_include_directories(org_custusx_help
+    PUBLIC
+    .
+    ./widgets
+    ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 add_subdirectory(testing)

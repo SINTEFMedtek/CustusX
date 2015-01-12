@@ -37,8 +37,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-/**
- */
+SessionStorageService::SessionStorageService()
+{
+
+}
+
+SessionStorageService::~SessionStorageService()
+{
+
+}
+
 class SessionStorageServiceNull : public SessionStorageService
 {
 public:

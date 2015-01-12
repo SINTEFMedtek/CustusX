@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTESTRECONSTRUCTREALDATA_H
 #define CXTESTRECONSTRUCTREALDATA_H
 
+#include "cxtest_org_custusx_usreconstruction_export.h"
+
 #include "cxImage.h"
 
 namespace cxtest
@@ -45,7 +47,7 @@ namespace cxtest
  * \date 12.12.2013, 2013
  * \author christiana
  */
-class ReconstructRealTestData
+class CXTEST_ORG_CUSTUSX_USRECONSTRUCTION_EXPORT ReconstructRealTestData
 {
 public:
 	QString getSourceFilename() const;

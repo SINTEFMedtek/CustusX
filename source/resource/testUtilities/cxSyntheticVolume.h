@@ -33,13 +33,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SYNTHETIC_VOLUME_HPP
 #define SYNTHETIC_VOLUME_HPP
 
-#include "org_custusx_usreconstruction_Export.h"
+#include "cxtestutilities_export.h"
 
 #include "cxUSFrameData.h"
 #include <vector>
-#include "cxMathBase.h"
 #include <cstdlib>
 #include <time.h>
+#include "cxMathBase.h"
 
 
 namespace cx {
@@ -54,7 +54,7 @@ namespace cx {
  *      from this class.
  */
 
-class org_custusx_usreconstruction_EXPORT cxSyntheticVolume {
+class CXTESTUTILITIES_EXPORT cxSyntheticVolume {
 public:
 
 	cxSyntheticVolume(Vector3D bounds)
@@ -137,9 +137,9 @@ protected:
 
 typedef boost::shared_ptr<cxSyntheticVolume> cxSyntheticVolumePtr;
 
-org_custusx_usreconstruction_EXPORT double calculateRMSError(vtkImageDataPtr a, vtkImageDataPtr b);
-org_custusx_usreconstruction_EXPORT cx::Vector3D calculateCentroid(cx::ImagePtr image);
-org_custusx_usreconstruction_EXPORT double calculateMass(cx::ImagePtr image);
+CXTESTUTILITIES_EXPORT double calculateRMSError(vtkImageDataPtr a, vtkImageDataPtr b);
+CXTESTUTILITIES_EXPORT cx::Vector3D calculateCentroid(cx::ImagePtr image);
+CXTESTUTILITIES_EXPORT double calculateMass(cx::ImagePtr image);
 
 }
 #endif

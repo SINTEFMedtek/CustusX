@@ -2,22 +2,16 @@ project(org_custusx_core_visualization)
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
-include_directories(
-	${CX_RESOURCE_INCLUDE_DIRECTORIES}
-    ${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
-    )
-
 set(PLUGIN_SRCS
-  cxVisualizationPluginActivator.cpp
-  cxVisualizationImplService.cpp
-  cxVisualizationImplService.h
-  
+    cxVisualizationPluginActivator.cpp
+    cxVisualizationImplService.cpp
+    cxVisualizationImplService.h
     cxAxisConnector.cpp
-	cx2DZoomHandler.cpp
+    cx2DZoomHandler.cpp
     cxCameraStyle.cpp
-	cxCameraStyleForView.cpp
+    cxCameraStyleForView.cpp
     cxMultiVolume3DRepProducer.cpp
-	cxRenderLoop.cpp
+    cxRenderLoop.cpp
     cxRepManager.cpp
     cxThresholdPreview.cpp
     cxViewGroup.cpp
@@ -25,21 +19,20 @@ set(PLUGIN_SRCS
     cxViewWrapper.cpp
     cxViewWrapper2D.cpp
     cxViewWrapper3D.cpp
-    cxViewWrapperVideo.cpp  
+    cxViewWrapperVideo.cpp
     cxDataRepContainer.h
     cxDataRepContainer.cpp
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
-  cxVisualizationPluginActivator.h
-
+    cxVisualizationPluginActivator.h
     cxAxisConnector.h
-	cx2DZoomHandler.h
+    cx2DZoomHandler.h
     cxCameraStyle.h
-	cxCameraStyleForView.h
+    cxCameraStyleForView.h
     cxMultiVolume3DRepProducer.h
-	cxRenderLoop.h
+    cxRenderLoop.h
     cxRepManager.h
     cxThresholdPreview.h
     cxViewGroup.h
@@ -64,6 +57,7 @@ ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
     ${PLUGIN_target_libraries}   
     cxResource
+    cxResourceVisualization
     cxLogicManager
     cxPluginUtilities
     )
@@ -84,6 +78,13 @@ ctkMacroBuildPlugin(
   TARGET_LIBRARIES ${PLUGIN_target_libraries}
   OUTPUT_DIR ${PLUGIN_OUTPUT_DIR}
 )
+
+target_include_directories(org_custusx_core_visualization
+    PUBLIC
+    .
+    ${CMAKE_CURRENT_BINARY_DIR}
+)
+
 
 add_subdirectory(testing)
 

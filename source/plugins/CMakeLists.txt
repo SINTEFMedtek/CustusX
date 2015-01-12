@@ -13,30 +13,20 @@ set(CX_PLUGINS
   org.custusx.core.video:ON
   org.custusx.core.state:ON
   org.custusx.dicom:ON
-#  org.custusx.example:OFF
   org.custusx.vnnclreconstruction:ON
   org.custusx.pnnreconstruction:ON
-#  org.custusx.filter.tubesegmentation:OFF
   org.custusx.registration:ON
   org.custusx.registration.gui:ON
   org.custusx.registration.method.manual:ON
-#  org.custusx.registration.method.modelToUS:OFF
   org.custusx.registration.method.landmark:ON
   org.custusx.registration.method.bronchoscopy:ON
   org.custusx.registration.method.vessel:ON
   org.custusx.registration.method.commandline:ON
   org.custusx.registration.method.plate:ON
   org.custusx.usreconstruction:ON
-#  org.custusx.calibration:ON
   org.custusx.acquisition:ON
   org.custusx.help:ON
 )
-if(CX_WINDOWS)
-    set(CX_PLUGINS
-      ${CX_PLUGINS}
-      org.custusx.vnnclreconstruction:OFF
-      )
-endif(CX_WINDOWS)
 
 # Add plugins defined externally, i.e defined outside CustusX core.
 # Why: Enables enabling of external plugins,
@@ -61,8 +51,6 @@ cx_append_plugins_already_present(CX_PLUGINS ${CX_PLUGIN_BUILD_OPTION_PREFIX})
 if(NOT QT_QMAKE_EXECUTABLE)
     get_target_property(QT_QMAKE_EXECUTABLE Qt5::qmake LOCATION)
 endif(NOT QT_QMAKE_EXECUTABLE)
-
-cx_remove_duplicate_include_directories()
 
 ctkMacroSetupPlugins(
     ${CX_PLUGINS} 

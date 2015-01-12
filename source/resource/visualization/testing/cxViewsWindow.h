@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVIEWSWINDOW_H_
 #define CXVIEWSWINDOW_H_
 
+#include "cxtestresourcevisualization_export.h"
+
 #include <QMainWindow>
 #include "cxView.h"
 #include "cxViewCollectionWidget.h"
@@ -44,7 +46,7 @@ namespace cxtest
 
 /** MainWindow for testing of Views and Reps.
  */
-class ViewsWindow : public QMainWindow
+class CXTESTRESOURCEVISUALIZATION_EXPORT ViewsWindow : public QMainWindow
 {
 	Q_OBJECT
 

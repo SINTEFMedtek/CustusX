@@ -2,22 +2,10 @@ project(org_custusx_usreconstruction)
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
-include_directories(
-    ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
-    ${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
-    ${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
-    ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
-    ${CustusX_SOURCE_DIR}/source/logic
-    ${CustusX_SOURCE_DIR}/source/modules/Algorithm/gui
-    ${CustusX_BINARY_DIR}/source/modules/Algorithm
-    ${CustusX_BINARY_DIR}/source/modules/GUIExtender
-    ${CustusX_BINARY_DIR}/source/logic
-)
-
 set(PLUGIN_SRCS
     cxUsReconstructionPluginActivator.cpp
-	cxUsReconstructionGUIExtenderService.h
-	cxUsReconstructionGUIExtenderService.cpp
+    cxUsReconstructionGUIExtenderService.h
+    cxUsReconstructionGUIExtenderService.cpp
     cxUsReconstructionImplService.cpp
     cxUsReconstructionService.cpp
     cxUsReconstructionServiceNull.cpp
@@ -33,14 +21,10 @@ set(PLUGIN_SRCS
     cxReconstructCore.h
     cxReconstructPreprocessor.cpp
     cxReconstructPreprocessor.h
-    cxSyntheticVolume.h
-    cxSyntheticVolume.cpp
-    cxSimpleSyntheticVolume.h
-    cxSimpleSyntheticVolume.cpp
     cxReconstructionWidget.cpp
     cxReconstructOutputValueParamsInterfaces.cpp
     cxReconstructOutputValueParamsInterfaces.h
-
+    cxReconstructionMethodService.h
 )
 
 # Files which should be processed by Qts moc
@@ -72,12 +56,14 @@ set(PLUGIN_resources
 #Compute the plugin dependencies
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
-    ${PLUGIN_target_libraries}   
+    ${PLUGIN_target_libraries}
     cxGUIExtenderService
+    cxResource
     cxResourceWidgets
+    cxResourceVisualization
     cxPluginUtilities
-    cxResourceUsReconstructionTypes
     cxPluginAlgorithm
+    cxLogicManager
     )
 
 set(PLUGIN_OUTPUT_DIR "")
@@ -95,6 +81,12 @@ ctkMacroBuildPlugin(
   RESOURCES ${PLUGIN_resources}
   TARGET_LIBRARIES ${PLUGIN_target_libraries}
   OUTPUT_DIR ${PLUGIN_OUTPUT_DIR}
+)
+
+target_include_directories(org_custusx_usreconstruction
+    PUBLIC
+    .
+    ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 add_subdirectory(testing)

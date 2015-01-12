@@ -30,62 +30,55 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXREGISTRATIONPLUGIN_H_
-#define CXREGISTRATIONPLUGIN_H_
+#include "cxtestCatchImpl.h"
 
-#include "cxPluginRegistrationExport.h"
+#include "cxImportTests.h"
 
-#include "cxGUIExtenderService.h"
+#ifdef CX_WINDOWS
+#include <windows.h>
+#endif
 
-/**
- * \defgroup cx_module_registration Registration Plugin
- * \ingroup cx_modules
- * \brief Registration collection with widgets.
- *
- * See \ref cx::RegistrationPlugin.
- *
- */
+#include <QLibrary>
+#include <QString>
+#include <QStringList>
 
-namespace cx
+void load_plugin(std::string path)
 {
-typedef boost::shared_ptr<class RegistrationPlugin> RegistrationPluginPtr;
-typedef boost::shared_ptr<class RegistrationManager> RegistrationManagerPtr;
-typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
+    QString libPath(path.c_str());
+    QLibrary library(libPath);
+    bool loaded = library.load();
 
-/**
- * \file
- * \addtogroup cx_module_registration
- * @{
- */
-
-/**
- *
- *  \date Jun 16, 2011
- *  \author christiana
- */
-class cxPluginRegistration_EXPORT RegistrationPlugin : public GUIExtenderService
-{
-	Q_OBJECT
-public:
-	RegistrationPlugin(cx::RegistrationServicePtr registrationService, VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, AcquisitionDataPtr acquisitionData);
-	virtual ~RegistrationPlugin() {}
-
-	virtual std::vector<CategorizedWidget> createWidgets() const;
-signals:
-
-private slots:
-
-private:
-	RegistrationManagerPtr mRegistrationManager;
-	AcquisitionDataPtr mAquisitionData;
-	RegistrationServicePtr mRegistrationService;
-	VisualizationServicePtr mVisualizationService;
-	PatientModelServicePtr mPatientModelService;
-};
-
-/**
- * @}
- */
+    if(!loaded)
+        printf("%s library failed to load!\n", path.c_str());
 }
 
-#endif /* CXREGISTRATIONPLUGIN_H_ */
+void load_plugins()
+{
+    QString str = QString(CX_SHARED_TEST_LIBRARIES);
+    QStringList list = str.split(";");
+
+    std::vector<std::string> plugins;
+    foreach(const QString &item, list)
+    {
+        plugins.push_back(item.toStdString());
+    }
+
+    std::vector<std::string>::iterator it = plugins.begin();
+    for(; it != plugins.end(); it++)
+        load_plugin(*it);
+
+}
+
+int main(int argc, char *argv[])
+{
+
+#ifdef CX_WINDOWS
+	SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);
+#endif
+
+    load_plugins();
+    int error_code = cxtest::CatchImpl().run(argc, argv);
+
+    return error_code;
+}
+

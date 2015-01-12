@@ -2,27 +2,24 @@ project(org_custusx_core_patientmodel)
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
-include_directories(
-    ${CX_RESOURCE_INCLUDE_DIRECTORIES}
-    )
 
 set(PLUGIN_SRCS
-  cxPatientModelPluginActivator.cpp
-  cxPatientModelImplService.cpp
-  cxPatientModelImplService.h
+    cxPatientModelPluginActivator.cpp
+    cxPatientModelImplService.cpp
+    cxPatientModelImplService.h
     cxPatientData.cpp
-	cxDataManager.cpp
-	cxDataManagerImpl.cpp
-	cxSessionStorageServiceImpl.cpp
+    cxDataManager.cpp
+    cxDataManagerImpl.cpp
+    cxSessionStorageServiceImpl.cpp
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
-  cxPatientModelPluginActivator.h
+    cxPatientModelPluginActivator.h
     cxPatientData.h
-	cxDataManager.h
-	cxDataManagerImpl.h
-	cxSessionStorageServiceImpl.h
+    cxDataManager.h
+    cxDataManagerImpl.h
+    cxSessionStorageServiceImpl.h
 )
 
 # Qt Designer files which should be processed by Qts uic
@@ -40,7 +37,7 @@ set(PLUGIN_target_libraries
     ${PLUGIN_target_libraries}   
     cxResource
     cxPluginUtilities
-    )
+)
 
 set(PLUGIN_OUTPUT_DIR "")
 if(CX_WINDOWS)
@@ -57,6 +54,12 @@ ctkMacroBuildPlugin(
   RESOURCES ${PLUGIN_resources}
   TARGET_LIBRARIES ${PLUGIN_target_libraries}
   OUTPUT_DIR ${PLUGIN_OUTPUT_DIR}
+)
+
+target_include_directories(org_custusx_core_patientmodel
+    PUBLIC
+    .
+    ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 add_subdirectory(testing)

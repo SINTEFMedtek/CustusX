@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTESTRENDERTESTER_H
 #define CXTESTRENDERTESTER_H
 
+#include "cxtestresourcevisualization_export.h"
+
 #include <vtkForwardDeclarations.h>
 #include <boost/shared_ptr.hpp>
 #include <QString>
@@ -52,7 +54,7 @@ typedef boost::shared_ptr<class RenderTester> RenderTesterPtr;
 	* \date april 29, 2013
 	* \author christiana
 	*/
-class RenderTester
+class CXTESTRESOURCEVISUALIZATION_EXPORT RenderTester
 {
 public:
 	static RenderTesterPtr create();

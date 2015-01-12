@@ -32,37 +32,38 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTESTCUSTUSXCONTROLLER_H_
 #define CXTESTCUSTUSXCONTROLLER_H_
 
+#include "cxtestgui_export.h"
+
 #include <QApplication>
 #include "cxMainWindow.h"
 
 /**Helper object for automated control of the CustusX application.
  *
  */
-class CustusXController : public QObject
+class CXTESTGUI_EXPORT CustusXController : public QObject
 {
   Q_OBJECT
 
 public:
-  cx::MainWindow* mMainWindow;
-  QString mPatientFolder;
-  QString mTestData;
-  int mBaseTime;
-  double mMeasuredFPS;
-	bool mEnableSlicing;
+    cx::MainWindow* mMainWindow;
+    QString mPatientFolder;
+    QString mTestData;
+    int mBaseTime;
+    double mMeasuredFPS;
+    bool mEnableSlicing;
 
-  CustusXController(QObject* parent);
+    CustusXController(QObject* parent);
   ~CustusXController();
-  void start();
-  void stop();
+    void start();
+    void stop();
 
 public slots:
-  void loadPatientSlot();
-	void enableSlicingSlot();
-  void initialBeginCheckRenderSlot();
-  void initialEndCheckRenderSlot();
-//  void secondBeginCheckRenderSlot();
-  void secondEndCheckRenderSlot();
-  void displayResultsSlot();
+    void loadPatientSlot();
+    void enableSlicingSlot();
+    void initialBeginCheckRenderSlot();
+    void initialEndCheckRenderSlot();
+    void secondEndCheckRenderSlot();
+    void displayResultsSlot();
 
 private:
 };

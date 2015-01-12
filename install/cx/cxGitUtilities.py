@@ -19,11 +19,12 @@ import os.path
 
 #################################################
 #
-# Finds all directories containging a .git folder
-# NB: Timeconsuming. 
+# Finds all directories containing a .git folder
+# NB: Time consuming. 
 #
 #################################################
 def findGitRepositories(path):
+    print "Looking for git repositories in \""+root_path+"\""
     repositories = []
     for root, dirnames, filenames in os.walk(path):
         for dirname in fnmatch.filter(dirnames, '.git'):
@@ -39,22 +40,42 @@ def findGitRepositories(path):
 class GitRepository(object):
     def __init__(self, path):
         self.path = path
-        self.name = os.path.basename(self.path)
         self.clean = False
         self.modified_files = False
         self.deleted_files = False
         self.untracked_files = False
         self.renamed_files = False
+        self.branch_name = ""
+        self.branch_ahead = ""
         
-    def get_name(self):
-        return self.name
+    def checkout_branch(self, branch_name):
+        return_value = self.__run_git_command('checkout %s' % branch_name)
         
-    def status(self):
-        return_value = self.__run_git_command('status', True)
-        self.__evaluate(return_value)
+    def pull(self):
+        return_value = self.__run_git_command('pull')
         
-    def branch_info(self):
-        text = self.__run_git_command('status --porcelain -b', True).stdout
+    def push(self):
+        return_value = self._run_git_command('push')
+        
+    def update_status(self):
+        #status
+        text = self.__run_git_command('status').stdout
+        
+        if 'working directory clean' in text:
+            self.clean = True
+        if 'modified:' in text:
+            self.modified_files = True
+        if 'deleted:' in text:
+            self.deleted_files = True
+        if 'Untracked files:' in text:
+            self.untracked_files = True
+        if 'renamed:' in text:
+            self.renamed_files = True
+            
+        #TODO the next two git commands are not needed, the same info can be found in 'git status'
+        
+        #branch_ahead
+        text = self.__run_git_command('status --porcelain -b').stdout
         hit = re.match(r'##(.*)\n', text)
         if hit:
             if hit.group(1):
@@ -66,25 +87,15 @@ class GitRepository(object):
             branch_ahead = hit.group(1)
         
         text = text.split('...')[0]
-        self.branch_name = text
         self.branch_ahead = branch_ahead
         
-    def __run_git_command(self, command, silent):
+        #branch_name
+        self.branch_name = self.__run_git_command('rev-parse --abbrev-ref HEAD').stdout.strip()
+        
+    def __run_git_command(self, command, silent=True):
         shell.setSilent(silent)
         shell.changeDir(self.path)
         return shell.run('git '+command, keep_output=True, silent=silent)
-    
-    def __evaluate(self, return_value):
-        if 'working directory clean' in return_value.stdout:
-            self.clean = True
-        if 'modified:' in return_value.stdout:
-            self.modified_files = True
-        if 'deleted:' in return_value.stdout:
-            self.deleted_files = True
-        if 'Untracked files:' in return_value.stdout:
-            self.untracked_files = True
-        if 'renamed:' in return_value.stdout:
-            self.renamed_files = True
         
 
 #################################################
@@ -115,30 +126,25 @@ class TextColor:
 
 #################################################
 #
-# Provides pretty formated information. 
+# Provides pretty formatted information. 
 #
 #################################################      
 class Reporter(object):
     def __init__(self, root_path):
         self.root_path = root_path
-        self.__print_info("Looking for git repositories in \""+root_path+"\"")
-        self.git_repositories = findGitRepositories(root_path)
 
-    def print_status(self):
-        if(not self.git_repositories):
-            self.__print_no_repositories_found()
+    def print_status(self, repo):
+        if(not repo):
             return
             
-        for repo in self.git_repositories:
-            repo.status()
-            repo.branch_info()
-            b = repo.branch_name 
-            p = self.__get_repo_path(repo)
-            d = self.__get_repo_details(repo)
-            a = '*'
-            if('[]' in d):
-                a = ''
-            print '{0:<1}  {1:<70}  {2:<30}  {3}'.format(a, p, b, d)
+        repo.update_status()
+        b = repo.branch_name
+        p = self.__get_repo_path(repo)
+        d = self.__get_repo_details(repo)
+        a = '*'
+        if('[]' in d):
+            a = ''
+        print '{0:<1}  {1:<70}  {2:<30}  {3}'.format(a, p, b, d)
     
     def __get_repo_path(self, repo):
         path = os.path.relpath(repo.path, self.root_path)        
@@ -185,9 +191,22 @@ class Reporter(object):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Display condensed git status for all projects.')
     parser.add_argument('root_path', help='the top directory to recursively look for git repositories in (abs or rel)') 
+    parser.add_argument('-c', '--command', help='specify what you want to do', action='append', choices=['status', 'pull', 'push', 'checkout'], default=[])
+    parser.add_argument('-b', '--branch', help='specify which branch you want', default='master')
     args = parser.parse_args()
     
-    root_path = os.path.abspath(args.root_path)
-    reporter = Reporter(root_path)
-    reporter.print_status()
+    print args
     
+    root_path = os.path.abspath(args.root_path)
+    git_repositories = findGitRepositories(root_path)
+    reporter = Reporter(args.root_path)
+    
+    if('checkout' in args.command):
+        pass
+    if(not args.command or 'status' in args.command):
+        for repo in git_repositories:
+            reporter.print_status(repo)
+    if('pull' in args.command):
+        pass
+    if('push' in args.command):
+        pass

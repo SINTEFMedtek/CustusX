@@ -29,32 +29,46 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXTESTDUMMYDATAMANAGER_H
+#define CXTESTDUMMYDATAMANAGER_H
 
-#ifndef SIMPLESYNTHETICVOLUME_H
-#define SIMPLESYNTHETICVOLUME_H
+#include "cxtestresource_export.h"
 
-#include "org_custusx_usreconstruction_Export.h"
+#include "cxForwardDeclarations.h"
+#include <QStringList>
+class ctkPluginContext;
 
-#include "cxSyntheticVolume.h"
-//#include "cxTypeConversions.h"
-
-namespace cx {
-
-class org_custusx_usreconstruction_EXPORT cxSimpleSyntheticVolume : public cxSyntheticVolume
+namespace cxtest
 {
-public:
-    cxSimpleSyntheticVolume(Vector3D bounds);
 
-    virtual void printInfo() const;
-
-	virtual bool isOnLine(float x,
-	                      float y,
-	                      float thickness,
-	                      int n_lines,
-                          int axis) const;
-    virtual unsigned char evaluate(const cx::Vector3D &p) const;
-
+struct CXTESTRESOURCE_EXPORT TestServicesType
+{
+	cx::PatientModelServicePtr mPatientModelService;
+	cx::SpaceProviderPtr mSpaceProvider;
+	cx::TrackingServicePtr mTrackingService;
 };
 
-}
-#endif
+TestServicesType createDummyCoreServices();
+void destroyDummyCoreServices(TestServicesType& services);
+
+typedef boost::shared_ptr<class TestServices> TestServicesPtr;
+
+/** A minimal set of services for test usage.
+  */
+class CXTESTRESOURCE_EXPORT TestServices : public TestServicesType
+{
+public:
+	static TestServicesPtr create();
+	~TestServices();
+
+	cx::PatientModelServicePtr patientModelService() { return mPatientModelService; }
+	cx::SpaceProviderPtr spaceProvider() { return mSpaceProvider; }
+	cx::TrackingServicePtr trackingService() { return mTrackingService; }
+
+private:
+	TestServices();
+};
+
+} // namespace cx
+
+#endif // CXTESTDUMMYDATAMANAGER_H

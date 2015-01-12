@@ -2,47 +2,32 @@ project(org_custusx_core_video)
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
-include_directories(
-    ${CX_RESOURCE_INCLUDE_DIRECTORIES}
-
-	${CX_RESOURCE_INCLUDE_DIRECTORIES}
-	${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
-	.
-	${CustusX_SOURCE_DIR}/source/resource/videoServer
-	${CustusX_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
-	${CMAKE_CURRENT_BINARY_DIR}
-	${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
-	${CustusX_BINARY_DIR}/source/resource/usReconstructionTypes
-	${CustusX_BINARY_DIR}/source/resource/videoServer
-	${CustusX_BINARY_DIR}/source/resource/OpenIGTLinkUtilities
-	)
-
 set(PLUGIN_SRCS
-  cxVideoPluginActivator.cpp
-  cxVideoImplService.cpp
-  cxVideoImplService.h
+    cxVideoPluginActivator.cpp
+    cxVideoImplService.cpp
+    cxVideoImplService.h
 
     cxBasicVideoSource.h
-	cxBasicVideoSource.cpp
+    cxBasicVideoSource.cpp
     cxVideoConnection.h
     cxVideoConnection.cpp
     cxPlaybackUSAcquisitionVideo.cpp
 
     cxImageReceiverThread.h
     cxImageReceiverThread.cpp
-    
+
     cxVideoServiceBackend.h
     cxVideoServiceBackend.cpp
     cxStreamerServiceUtilities.h
     cxStreamerServiceUtilities.cpp
-	cxIGTLinkStreamerService.cpp
-	cxIGTLinkClientStreamer.cpp
+    cxIGTLinkStreamerService.cpp
+    cxIGTLinkClientStreamer.cpp
 
-	cxOpenCVStreamerService.h
-	cxOpenCVStreamerService.cpp
-	cxImageFileStreamerService.h
-	cxImageFileStreamerService.cpp
-	cxLocalServerStreamerServer.cpp
+    cxOpenCVStreamerService.h
+    cxOpenCVStreamerService.cpp
+    cxImageFileStreamerService.h
+    cxImageFileStreamerService.cpp
+    cxLocalServerStreamerServer.cpp
 )
 
 # Files which should be processed by Qts moc
@@ -53,9 +38,9 @@ set(PLUGIN_MOC_SRCS
     cxBasicVideoSource.h
     cxVideoConnection.h
     cxImageReceiverThread.h
-	cxIGTLinkStreamerService.h
-	cxIGTLinkClientStreamer.h
-	cxLocalServerStreamerServer.h
+    cxIGTLinkStreamerService.h
+    cxIGTLinkClientStreamer.h
+    cxLocalServerStreamerServer.h
 )
 
 # Qt Designer files which should be processed by Qts uic
@@ -73,9 +58,9 @@ set(PLUGIN_target_libraries
     ${PLUGIN_target_libraries}   
     cxResource
     cxPluginUtilities
-    OpenIGTLink
+    #OpenIGTLink
     cxGrabber
-	cxResourceUsReconstructionTypes
+    cxOpenIGTLinkUtilities
     )
 
 set(PLUGIN_OUTPUT_DIR "")
@@ -93,6 +78,12 @@ ctkMacroBuildPlugin(
   RESOURCES ${PLUGIN_resources}
   TARGET_LIBRARIES ${PLUGIN_target_libraries}
   OUTPUT_DIR ${PLUGIN_OUTPUT_DIR}
+)
+
+target_include_directories(org_custusx_core_video
+    PUBLIC
+    .
+    ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 add_subdirectory(testing)

@@ -29,44 +29,49 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXTESTDUMMYDATAMANAGER_H
-#define CXTESTDUMMYDATAMANAGER_H
 
-#include "cxForwardDeclarations.h"
-#include <QStringList>
-class ctkPluginContext;
+#ifndef CXTESTCATCHIMPL_H_
+#define CXTESTCATCHIMPL_H_
+
+#include "boost/shared_ptr.hpp"
+#include "catch.hpp"
+
+#include "cxcatch_export.h"
+
+namespace Catch
+{
+class Session;
+}
 
 namespace cxtest
 {
 
-struct TestServicesType
-{
-	cx::PatientModelServicePtr mPatientModelService;
-	cx::SpaceProviderPtr mSpaceProvider;
-	cx::TrackingServicePtr mTrackingService;
-};
-
-TestServicesType createDummyCoreServices();
-void destroyDummyCoreServices(TestServicesType& services);
-
-typedef boost::shared_ptr<class TestServices> TestServicesPtr;
-
-/** A minimal set of services for test usage.
-  */
-class TestServices : public TestServicesType
+/**
+ * Wrapper for Catch framework.
+ *
+ * Contains a few addons:
+ * - if "--list-tests" AND "--reporter xml" is input,
+ *   override normal behaviour to output a xml-formatted name list.
+ *   (used in scripting - the default list format is not parse-friendly)
+ * - if no tests are run, return failure.
+ *   (required by ctest: a config error in ctest-catch should give a failure)
+ *
+ * \author christiana
+ * \date Jun 28, 2013
+ */
+class CXCATCH_EXPORT CatchImpl
 {
 public:
-	static TestServicesPtr create();
-	~TestServices();
-
-	cx::PatientModelServicePtr patientModelService() { return mPatientModelService; }
-	cx::SpaceProviderPtr spaceProvider() { return mSpaceProvider; }
-	cx::TrackingServicePtr trackingService() { return mTrackingService; }
-
+	CatchImpl();
+	int run(int argc, char* argv[]);
 private:
-	TestServices();
+	bool shouldListTestsInCustomXml();
+	void listTestsAsXml();
+	int countTests();
+	std::vector<Catch::TestCase> getMatchingTests();
+
+	boost::shared_ptr<Catch::Session> mSession;
 };
 
-} // namespace cx
-
-#endif // CXTESTDUMMYDATAMANAGER_H
+} /* namespace cxtest */
+#endif /* CXTESTCATCHIMPL_H_ */

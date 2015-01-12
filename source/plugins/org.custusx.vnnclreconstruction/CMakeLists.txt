@@ -2,15 +2,6 @@ project(org_custusx_vnnclreconstruction)
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
-include_directories(
-    ${CX_RESOURCE_INCLUDE_DIRECTORIES}
-    ${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
-    ${CustusX_BINARY_DIR}/source/ThirdParty
-    ${CustusX_SOURCE_DIR}/source/logic
-
-    ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.usreconstruction
-    ${CustusX_BINARY_DIR}/source/plugins/org.custusx.usreconstruction
-    )
 
 set(PLUGIN_SRCS
   cxVNNclPluginActivator.cpp
@@ -43,7 +34,9 @@ configure_file(
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
     ${PLUGIN_target_libraries}
+    ${OPENCL_LIBRARIES}
     cxPluginUtilities
+    OpenCLUtilityLibrary
     org_custusx_usreconstruction
     )
 
@@ -62,6 +55,12 @@ ctkMacroBuildPlugin(
   RESOURCES ${PLUGIN_resources}
   TARGET_LIBRARIES ${PLUGIN_target_libraries}
   OUTPUT_DIR ${PLUGIN_OUTPUT_DIR}
+)
+
+target_include_directories(org_custusx_vnnclreconstruction
+    PUBLIC
+    .
+    ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 add_subdirectory(testing)

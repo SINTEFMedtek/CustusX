@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSAVINGVIDEORECORDER_H
 #define CXSAVINGVIDEORECORDER_H
 
-#include "cxResourceUsReconstructionTypesExport.h"
+#include "cxResourceExport.h"
 
 #include <vector>
 #include <QFile>
@@ -65,7 +65,7 @@ typedef boost::shared_ptr<class CachedImageDataContainer> CachedImageDataContain
   * \author christiana
   * \ingroup cx_resource_usreconstructiontypes
   */
-class cxResourceUsReconstructionTypes_EXPORT VideoRecorderSaveThread : public QThread
+class cxResource_EXPORT VideoRecorderSaveThread : public QThread
 {
 	Q_OBJECT
 public:
@@ -120,7 +120,7 @@ protected:
   * \author christiana
   * \ingroup cx_resource_usreconstructiontypes
  */
-class cxResourceUsReconstructionTypes_EXPORT SavingVideoRecorder : public QObject
+class cxResource_EXPORT SavingVideoRecorder : public QObject
 {
 	Q_OBJECT
 

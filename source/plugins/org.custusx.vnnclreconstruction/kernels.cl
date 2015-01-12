@@ -1,7 +1,7 @@
 #include "kernels.cl.h"
 
 /**
- *  Original author Tord ¯ygard
+ *  Original author Tord Ã˜ygard
  */
 
 //---------------------DEBUGGING-FUNCTIONALITY---------------------

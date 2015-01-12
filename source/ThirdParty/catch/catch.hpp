@@ -8,6 +8,9 @@
  *  Distributed under the Boost Software License, Version 1.0. (See accompanying
  *  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
  */
+
+#include "cxcatch_export.h"
+
 #ifndef TWOBLUECUBES_SINGLE_INCLUDE_CATCH_HPP_INCLUDED
 #define TWOBLUECUBES_SINGLE_INCLUDE_CATCH_HPP_INCLUDED
 
@@ -115,7 +118,7 @@
 
 namespace Catch {
 
-    class NonCopyable {
+    class CXCATCH_EXPORT NonCopyable {
         NonCopyable( NonCopyable const& );
         void operator = ( NonCopyable const& );
     protected:
@@ -344,7 +347,7 @@ namespace Catch {
         T* m_p;
     };
 
-    struct IShared : NonCopyable {
+    struct CXCATCH_EXPORT IShared : NonCopyable {
         virtual ~IShared();
         virtual void addRef() const = 0;
         virtual void release() const = 0;
@@ -404,7 +407,7 @@ namespace Catch {
         virtual void setConfig( Ptr<IConfig const> const& config ) = 0;
     };
 
-    IContext& getCurrentContext();
+    IContext CXCATCH_EXPORT & getCurrentContext();
     IMutableContext& getCurrentMutableContext();
     void cleanUpContext();
     Stream createStream( std::string const& streamName );
@@ -423,7 +426,7 @@ namespace Catch {
 
     class TestCaseFilters;
 
-    struct ITestCase : IShared {
+    struct CXCATCH_EXPORT ITestCase : IShared {
         virtual void invoke () const = 0;
     protected:
         virtual ~ITestCase();
@@ -468,7 +471,7 @@ struct NameAndDesc {
     const char* description;
 };
 
-struct AutoReg {
+struct CXCATCH_EXPORT AutoReg {
 
     AutoReg(    TestFunction function,
                 SourceLineInfo const& lineInfo,
@@ -920,7 +923,7 @@ namespace Catch {
 
 namespace Catch {
 
-    struct AssertionInfo
+    struct CXCATCH_EXPORT AssertionInfo
     {
         AssertionInfo() {}
         AssertionInfo(  std::string const& _macroName,
@@ -1144,7 +1147,7 @@ struct STATIC_ASSERT_Expression_Too_Complex_Please_Rewrite_As_Binary_Comparison;
 
 // Wraps the (stringised versions of) the lhs, operator and rhs of an expression - as well as
 // the result of evaluating it. This is used to build an AssertionResult object
-class ExpressionResultBuilder {
+class CXCATCH_EXPORT ExpressionResultBuilder {
 public:
 
     ExpressionResultBuilder( ResultWas::OfType resultType = ResultWas::Unknown );
@@ -1292,7 +1295,7 @@ public:
 
 namespace Catch {
 
-    struct MessageInfo {
+    struct CXCATCH_EXPORT MessageInfo {
         MessageInfo(    std::string const& _macroName,
                         SourceLineInfo const& _lineInfo,
                         ResultWas::OfType _type );
@@ -1330,7 +1333,7 @@ namespace Catch {
         std::ostringstream m_stream;
     };
 
-    class ScopedMessage {
+    class CXCATCH_EXPORT ScopedMessage {
     public:
         ScopedMessage( MessageBuilder const& builder );
         ~ScopedMessage();
@@ -2760,7 +2763,7 @@ namespace Catch {
     IRegistryHub& getRegistryHub();
     IMutableRegistryHub& getMutableRegistryHub();
     void cleanUp();
-    std::string translateActiveException();
+    std::string CXCATCH_EXPORT translateActiveException();
 
 }
 
@@ -2930,7 +2933,7 @@ typedef unsigned long long uint64_t;
 
 namespace Catch {
 
-    class Timer {
+    class CXCATCH_EXPORT Timer {
     public:
         Timer() : m_ticks( 0 ) {}
         void start();
@@ -3441,7 +3444,7 @@ namespace Matchers {
             std::string m_substr;
         };
 
-        struct StartsWith : MatcherImpl<StartsWith, std::string> {
+        struct CXCATCH_EXPORT StartsWith : MatcherImpl<StartsWith, std::string> {
             StartsWith( std::string const& substr ) : m_substr( substr ){}
             StartsWith( StartsWith const& other ) : m_substr( other.m_substr ){}
 
@@ -3457,7 +3460,7 @@ namespace Matchers {
             std::string m_substr;
         };
 
-        struct EndsWith : MatcherImpl<EndsWith, std::string> {
+        struct CXCATCH_EXPORT EndsWith : MatcherImpl<EndsWith, std::string> {
             EndsWith( std::string const& substr ) : m_substr( substr ){}
             EndsWith( EndsWith const& other ) : m_substr( other.m_substr ){}
 
