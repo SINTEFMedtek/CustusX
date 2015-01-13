@@ -36,33 +36,33 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-DoubleDataAdapterShadingBase::DoubleDataAdapterShadingBase(PatientModelServicePtr patientModelService) :
+DoublePropertyShadingBase::DoublePropertyShadingBase(PatientModelServicePtr patientModelService) :
 	mPatientModelService(patientModelService)
 {
 	mActiveImageProxy = ActiveImageProxy::New(patientModelService);
-	connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &DoubleDataAdapterShadingBase::activeImageChanged);
+	connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &DoublePropertyShadingBase::activeImageChanged);
 	connect(mActiveImageProxy.get(), &ActiveImageProxy::transferFunctionsChanged, this, &Property::changed);
 }
 
-void DoubleDataAdapterShadingBase::activeImageChanged()
+void DoublePropertyShadingBase::activeImageChanged()
 {  
   mImage = mPatientModelService->getActiveImage();
   emit changed();
 }
 
-DoubleDataAdapterShadingAmbient::DoubleDataAdapterShadingAmbient(PatientModelServicePtr patientModelService) :
-	DoubleDataAdapterShadingBase(patientModelService)
+DoublePropertyShadingAmbient::DoublePropertyShadingAmbient(PatientModelServicePtr patientModelService) :
+	DoublePropertyShadingBase(patientModelService)
 {
 }
 
-double DoubleDataAdapterShadingAmbient::getValue() const
+double DoublePropertyShadingAmbient::getValue() const
 {
   if (!mImage)
     return 0.0;
   return mImage->getShadingAmbient();
 }
 
-bool DoubleDataAdapterShadingAmbient::setValue(double val)
+bool DoublePropertyShadingAmbient::setValue(double val)
 { 
   if (!mImage)
     return false;
@@ -73,19 +73,19 @@ bool DoubleDataAdapterShadingAmbient::setValue(double val)
 }
 
 
-DoubleDataAdapterShadingDiffuse::DoubleDataAdapterShadingDiffuse(PatientModelServicePtr patientModelService) :
-	DoubleDataAdapterShadingBase(patientModelService)
+DoublePropertyShadingDiffuse::DoublePropertyShadingDiffuse(PatientModelServicePtr patientModelService) :
+	DoublePropertyShadingBase(patientModelService)
 {
 
 }
 
-double DoubleDataAdapterShadingDiffuse::getValue() const
+double DoublePropertyShadingDiffuse::getValue() const
 {
   if (!mImage)
     return 0.0;
   return mImage->getShadingDiffuse();
 }
-bool DoubleDataAdapterShadingDiffuse::setValue(double val)
+bool DoublePropertyShadingDiffuse::setValue(double val)
 { 
   if (!mImage)
     return false;
@@ -96,19 +96,19 @@ bool DoubleDataAdapterShadingDiffuse::setValue(double val)
 }
 
 
-DoubleDataAdapterShadingSpecular::DoubleDataAdapterShadingSpecular(PatientModelServicePtr patientModelService) :
-	DoubleDataAdapterShadingBase(patientModelService)
+DoublePropertyShadingSpecular::DoublePropertyShadingSpecular(PatientModelServicePtr patientModelService) :
+	DoublePropertyShadingBase(patientModelService)
 {
 
 }
 
-double DoubleDataAdapterShadingSpecular::getValue() const
+double DoublePropertyShadingSpecular::getValue() const
 { 
   if (!mImage)
     return 0.0;
   return mImage->getShadingSpecular();
 }
-bool DoubleDataAdapterShadingSpecular::setValue(double val)
+bool DoublePropertyShadingSpecular::setValue(double val)
 { 
   if (!mImage)
     return false;
@@ -119,18 +119,18 @@ bool DoubleDataAdapterShadingSpecular::setValue(double val)
 }
 
 
-DoubleDataAdapterShadingSpecularPower::DoubleDataAdapterShadingSpecularPower(PatientModelServicePtr patientModelService) :
-	DoubleDataAdapterShadingBase(patientModelService)
+DoublePropertyShadingSpecularPower::DoublePropertyShadingSpecularPower(PatientModelServicePtr patientModelService) :
+	DoublePropertyShadingBase(patientModelService)
 {
 }
 
-double DoubleDataAdapterShadingSpecularPower::getValue() const
+double DoublePropertyShadingSpecularPower::getValue() const
 { 
   if (!mImage)
     return 0.0;
   return mImage->getShadingSpecularPower();
 }
-bool DoubleDataAdapterShadingSpecularPower::setValue(double val)
+bool DoublePropertyShadingSpecularPower::setValue(double val)
 { 
   if (!mImage)
     return false;

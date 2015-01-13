@@ -48,8 +48,8 @@ TransferFunction2DColorWidget::TransferFunction2DColorWidget(PatientModelService
   mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(patientModelService, this);
   mTransferFunctionAlphaWidget->setReadOnly(true);
 
-  mDataWindow.reset(new DoubleDataAdapterImageTFDataWindow);
-  mDataLevel.reset(new DoubleDataAdapterImageTFDataLevel);
+  mDataWindow.reset(new DoublePropertyImageTFDataWindow);
+  mDataLevel.reset(new DoublePropertyImageTFDataLevel);
 
   mActiveImageProxy = ActiveImageProxy::New(patientModelService);
   connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &TransferFunction2DColorWidget::activeImageChangedSlot);

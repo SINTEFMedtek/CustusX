@@ -37,43 +37,42 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-DoubleDataAdapterOutputValueParams::DoubleDataAdapterOutputValueParams(UsReconstructionServicePtr reconstructer) :
+DoublePropertyOutputValueParams::DoublePropertyOutputValueParams(UsReconstructionServicePtr reconstructer) :
     mReconstructer(reconstructer)
 {
 	connect(mReconstructer.get(), &UsReconstructionService::paramsChanged, this, &Property::changed);
 }
 
-double DoubleDataAdapterOutputValueParams::getValue() const
+double DoublePropertyOutputValueParams::getValue() const
 {
   OutputVolumeParams par = mReconstructer->getOutputVolumeParams();
   return this->getValue(&par);
 }
 
-bool DoubleDataAdapterOutputValueParams::setValue(double val)
+bool DoublePropertyOutputValueParams::setValue(double val)
 {
   OutputVolumeParams par = mReconstructer->getOutputVolumeParams();
   if (similar(val, this->getValue(&par)))
     return false;
-  //std::cout << "DoubleDataAdapterOutputValueParams::setValue():" << this->getDisplayName() << std::endl;
   this->setValue(&par, val);
   mReconstructer->setOutputVolumeParams(par);
   return true;
 }
 
-double DoubleDataAdapterSpacing::getValue(OutputVolumeParams *params) const { return params->getSpacing(); }
+double DoublePropertySpacing::getValue(OutputVolumeParams *params) const { return params->getSpacing(); }
 
-void DoubleDataAdapterSpacing::setValue(OutputVolumeParams *params, double val) { params->setSpacing(val); }
+void DoublePropertySpacing::setValue(OutputVolumeParams *params, double val) { params->setSpacing(val); }
 
-double DoubleDataAdapterXDim::getValue(OutputVolumeParams *params) const { return params->getDim()[0]; }
+double DoublePropertyXDim::getValue(OutputVolumeParams *params) const { return params->getDim()[0]; }
 
-void DoubleDataAdapterXDim::setValue(OutputVolumeParams *params, double val) { params->setDim(0, val); }
+void DoublePropertyXDim::setValue(OutputVolumeParams *params, double val) { params->setDim(0, val); }
 
-double DoubleDataAdapterYDim::getValue(OutputVolumeParams *params) const { return params->getDim()[1]; }
+double DoublePropertyYDim::getValue(OutputVolumeParams *params) const { return params->getDim()[1]; }
 
-void DoubleDataAdapterYDim::setValue(OutputVolumeParams *params, double val) { params->setDim(1, val); }
+void DoublePropertyYDim::setValue(OutputVolumeParams *params, double val) { params->setDim(1, val); }
 
-double DoubleDataAdapterZDim::getValue(OutputVolumeParams *params) const { return params->getDim()[2]; }
+double DoublePropertyZDim::getValue(OutputVolumeParams *params) const { return params->getDim()[2]; }
 
-void DoubleDataAdapterZDim::setValue(OutputVolumeParams *params, double val) { params->setDim(2, val); }
+void DoublePropertyZDim::setValue(OutputVolumeParams *params, double val) { params->setDim(2, val); }
 
 } // namespace cx

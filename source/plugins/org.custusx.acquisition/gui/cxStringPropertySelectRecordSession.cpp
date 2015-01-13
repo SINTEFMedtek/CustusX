@@ -36,17 +36,17 @@ namespace cx
 {
 
 
-SelectRecordSessionStringDataAdapter::SelectRecordSessionStringDataAdapter(AcquisitionDataPtr pluginData) :
-		SelectRecordSessionStringDataAdapterBase(pluginData)
+StringPropertySelectRecordSession::StringPropertySelectRecordSession(AcquisitionDataPtr pluginData) :
+		StringPropertySelectRecordSessionBase(pluginData)
 {
-	connect(mPluginData.get(), &AcquisitionData::recordedSessionsChanged, this, &SelectRecordSessionStringDataAdapter::setDefaultSlot);
+	connect(mPluginData.get(), &AcquisitionData::recordedSessionsChanged, this, &StringPropertySelectRecordSession::setDefaultSlot);
 	this->setDefaultSlot();
 }
-QString SelectRecordSessionStringDataAdapter::getDisplayName() const
+QString StringPropertySelectRecordSession::getDisplayName() const
 {
   return "Select a record session";
 }
-bool SelectRecordSessionStringDataAdapter::setValue(const QString& value)
+bool StringPropertySelectRecordSession::setValue(const QString& value)
 {
   if(mRecordSession && value==mRecordSession->getUid())
     return false;
@@ -58,21 +58,21 @@ bool SelectRecordSessionStringDataAdapter::setValue(const QString& value)
   emit changed();
   return true;
 }
-QString SelectRecordSessionStringDataAdapter::getValue() const
+QString StringPropertySelectRecordSession::getValue() const
 {
   if(!mRecordSession)
     return "<no session>";
   return mRecordSession->getUid();
 }
-QString SelectRecordSessionStringDataAdapter::getHelp() const
+QString StringPropertySelectRecordSession::getHelp() const
 {
   return "Select a session";
 }
-RecordSessionPtr SelectRecordSessionStringDataAdapter::getRecordSession()
+RecordSessionPtr StringPropertySelectRecordSession::getRecordSession()
 {
   return mRecordSession;
 }
-void SelectRecordSessionStringDataAdapter::setDefaultSlot()
+void StringPropertySelectRecordSession::setDefaultSlot()
 {
   std::vector<RecordSessionPtr> sessions = mPluginData->getRecordSessions();
 	if(!sessions.empty())
@@ -87,12 +87,12 @@ void SelectRecordSessionStringDataAdapter::setDefaultSlot()
 
 
 
-SelectRecordSessionStringDataAdapterBase::SelectRecordSessionStringDataAdapterBase(AcquisitionDataPtr pluginData) :
+StringPropertySelectRecordSessionBase::StringPropertySelectRecordSessionBase(AcquisitionDataPtr pluginData) :
 		mPluginData(pluginData)
 {
-	connect(mPluginData.get(), &AcquisitionData::recordedSessionsChanged, this, &SelectRecordSessionStringDataAdapterBase::changed);
+	connect(mPluginData.get(), &AcquisitionData::recordedSessionsChanged, this, &StringPropertySelectRecordSessionBase::changed);
 }
-QStringList SelectRecordSessionStringDataAdapterBase::getValueRange() const
+QStringList StringPropertySelectRecordSessionBase::getValueRange() const
 {
   std::vector<RecordSessionPtr> sessions =  mPluginData->getRecordSessions();
   QStringList retval;
@@ -101,7 +101,7 @@ QStringList SelectRecordSessionStringDataAdapterBase::getValueRange() const
     retval << qstring_cast(sessions[i]->getUid());
   return retval;
 }
-QString SelectRecordSessionStringDataAdapterBase::convertInternal2Display(QString internal)
+QString StringPropertySelectRecordSessionBase::convertInternal2Display(QString internal)
 {
   RecordSessionPtr session = mPluginData->getRecordSession(internal);
   if(!session)

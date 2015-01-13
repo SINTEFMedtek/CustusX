@@ -46,14 +46,14 @@ namespace cx
 * @{
 */
 
-/** Base class for all DataAdapters that selects a record session.
+/** Base class for all Properties that selects a record session.
  */
-class org_custusx_acquisition_EXPORT SelectRecordSessionStringDataAdapterBase : public StringPropertyBase
+class org_custusx_acquisition_EXPORT StringPropertySelectRecordSessionBase : public StringPropertyBase
 {
   Q_OBJECT
 public:
-  SelectRecordSessionStringDataAdapterBase(AcquisitionDataPtr pluginData);
-  virtual ~SelectRecordSessionStringDataAdapterBase() {}
+  StringPropertySelectRecordSessionBase(AcquisitionDataPtr pluginData);
+  virtual ~StringPropertySelectRecordSessionBase() {}
 
 public: // basic methods
 
@@ -64,23 +64,23 @@ public: // optional methods
 protected:
   AcquisitionDataPtr mPluginData;
 };
-typedef boost::shared_ptr<class SelectRecordSessionStringDataAdapterBase> SelectRecordSessionStringDataAdapterBasePtr;
+typedef boost::shared_ptr<class StringPropertySelectRecordSessionBase> StringPropertySelectRecordSessionBasePtr;
 
 
-typedef boost::shared_ptr<class SelectRecordSessionStringDataAdapter> SelectRecordSessionStringDataAdapterPtr;
+typedef boost::shared_ptr<class StringPropertySelectRecordSession> StringPropertySelectRecordSessionPtr;
 
 /** Adapter that selects and stores a tool.
  * The tool is stored internally in the adapter.
  * Use setValue/getValue plus changed() to access it.
  *
  */
-class org_custusx_acquisition_EXPORT  SelectRecordSessionStringDataAdapter : public SelectRecordSessionStringDataAdapterBase
+class org_custusx_acquisition_EXPORT  StringPropertySelectRecordSession : public StringPropertySelectRecordSessionBase
 {
   Q_OBJECT
 public:
-  static SelectRecordSessionStringDataAdapterPtr New(AcquisitionDataPtr pluginData) { return SelectRecordSessionStringDataAdapterPtr(new SelectRecordSessionStringDataAdapter(pluginData)); }
-  SelectRecordSessionStringDataAdapter(AcquisitionDataPtr pluginData);
-  virtual ~SelectRecordSessionStringDataAdapter() {}
+  static StringPropertySelectRecordSessionPtr New(AcquisitionDataPtr pluginData) { return StringPropertySelectRecordSessionPtr(new StringPropertySelectRecordSession(pluginData)); }
+  StringPropertySelectRecordSession(AcquisitionDataPtr pluginData);
+  virtual ~StringPropertySelectRecordSession() {}
 
 public: // basic methods
   virtual QString getDisplayName() const;

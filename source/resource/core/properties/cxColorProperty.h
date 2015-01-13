@@ -46,7 +46,7 @@ typedef boost::shared_ptr<class ColorProperty> ColorPropertyPtr;
 /** Property for QColor values.
  *
  *
- * \ingroup cx_resource_core_dataadapters
+ * \ingroup cx_resource_core_properties
  * \date Nov 22, 2012
  * \author christiana
  */

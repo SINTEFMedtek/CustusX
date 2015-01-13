@@ -48,13 +48,13 @@ namespace cx
 
 /** Interface to the tool offset of the dominant tool
  */
-class cxGui_EXPORT DoubleDataAdapterTimeCalibration : public DoublePropertyBase
+class cxGui_EXPORT DoublePropertyTimeCalibration : public DoublePropertyBase
 {
   Q_OBJECT
 public:
   static DoublePropertyBasePtr New();
-  DoubleDataAdapterTimeCalibration();
-  virtual ~DoubleDataAdapterTimeCalibration() {}
+  DoublePropertyTimeCalibration();
+  virtual ~DoublePropertyTimeCalibration() {}
   virtual QString getDisplayName() const { return "Temporal Calibration"; }
   virtual double getValue() const;
   virtual QString getHelp() const;

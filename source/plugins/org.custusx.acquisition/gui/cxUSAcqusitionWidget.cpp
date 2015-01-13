@@ -145,7 +145,7 @@ QWidget* USAcqusitionWidget::createOptionsWidget()
 	ProbeConfigWidget* probeWidget = new ProbeConfigWidget(this);
 	probeWidget->getActiveProbeConfigWidget()->setVisible(false);
 
-	SpinBoxGroupWidget* temporalCalibrationWidget = new SpinBoxGroupWidget(this, DoubleDataAdapterTimeCalibration::New());
+	SpinBoxGroupWidget* temporalCalibrationWidget = new SpinBoxGroupWidget(this, DoublePropertyTimeCalibration::New());
 
 	int line = 0;
 	layout->addWidget(this->createHorizontalLine(), line++, 0, 1, 1);

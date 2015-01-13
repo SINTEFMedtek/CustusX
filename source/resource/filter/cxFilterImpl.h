@@ -82,7 +82,7 @@ protected:
 	  * Return zero if not available (as image). */
 	ImagePtr getCopiedInputImage(int index = 0);
 	/** Helper:
-      * Call if you have an image threshold dataAdapter that need update from an image change.
+	  * Call if you have an image threshold Property that need update from an image change.
 	  */
 	void updateThresholdFromImageChange(QString uid, DoublePropertyPtr threshold);
 	void updateThresholdPairFromImageChange(QString uid, DoublePairPropertyPtr threshold);

@@ -67,8 +67,8 @@ LandmarkImageRegistrationWidget::LandmarkImageRegistrationWidget(RegServices ser
 	QString objectName, QString windowTitle) :
 	LandmarkRegistrationWidget(services, parent, objectName, windowTitle)
 {
-	mCurrentDataAdapter = StringPropertySelectData::New(mServices.patientModelService);
-	connect(mCurrentDataAdapter.get(), SIGNAL(changed()), this, SLOT(onCurrentImageChanged()));
+	mCurrentProperty = StringPropertySelectData::New(mServices.patientModelService);
+	connect(mCurrentProperty.get(), SIGNAL(changed()), this, SLOT(onCurrentImageChanged()));
 	mImageLandmarkSource = ImageLandmarksSource::New();
 
 	mDominantToolProxy = DominantToolProxy::New(trackingService());
@@ -92,7 +92,7 @@ LandmarkImageRegistrationWidget::LandmarkImageRegistrationWidget(RegServices ser
 	connect(mRemoveLandmarkButton, SIGNAL(clicked()), this, SLOT(removeLandmarkButtonClickedSlot()));
 
 	//layout
-	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mCurrentDataAdapter));
+	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mCurrentProperty));
 	mVerticalLayout->addWidget(mLandmarkTableWidget);
 	mVerticalLayout->addWidget(mAvarageAccuracyLabel);
 
@@ -119,7 +119,7 @@ QString LandmarkImageRegistrationWidget::defaultWhatsThis() const
 
 void LandmarkImageRegistrationWidget::onCurrentImageChanged()
 {
-	DataPtr data = mCurrentDataAdapter->getData();
+	DataPtr data = mCurrentProperty->getData();
 
 	mImageLandmarkSource->setData(data);
 	this->enableButtons();
@@ -230,7 +230,7 @@ void LandmarkImageRegistrationWidget::showEvent(QShowEvent* event)
 
 	ImagePtr image = mServices.patientModelService->getActiveImage();
 	if (image)
-		mCurrentDataAdapter->setValue(image->getUid());
+		mCurrentProperty->setValue(image->getUid());
 //	if (image && !mManager->getFixedData())
 //		mManager->setFixedData(image);
 //	if (image && !mImageLandmarkSource->getData())

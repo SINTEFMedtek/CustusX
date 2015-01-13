@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx {
 
 /**
- * \ingroup cx_resource_core_dataadapters
+ * \ingroup cx_resource_core_properties
  * \author Christian Askeland, SINTEF
  * \date 2014-10-23
  *

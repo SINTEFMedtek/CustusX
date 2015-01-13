@@ -52,12 +52,12 @@ class OutputVolumeParams;
 /** Abstract interface to setting one of the values in class OutputValueParams.
  *  Sublass to get a concrete class.
  */
-class org_custusx_usreconstruction_EXPORT DoubleDataAdapterOutputValueParams : public DoublePropertyBase
+class org_custusx_usreconstruction_EXPORT DoublePropertyOutputValueParams : public DoublePropertyBase
 {
   Q_OBJECT
 public:
-  DoubleDataAdapterOutputValueParams(UsReconstructionServicePtr reconstructer);
-  virtual ~DoubleDataAdapterOutputValueParams() {}
+  DoublePropertyOutputValueParams(UsReconstructionServicePtr reconstructer);
+  virtual ~DoublePropertyOutputValueParams() {}
   virtual double getValue() const;
   virtual bool setValue(double val);
   virtual void connectValueSignals(bool on) {}
@@ -73,12 +73,12 @@ protected:
 
 /** Interface to setting spacing in output volume
  */
-class org_custusx_usreconstruction_EXPORT DoubleDataAdapterSpacing : public DoubleDataAdapterOutputValueParams
+class org_custusx_usreconstruction_EXPORT DoublePropertySpacing : public DoublePropertyOutputValueParams
 {
   Q_OBJECT
 public:
-  DoubleDataAdapterSpacing(UsReconstructionServicePtr reconstructer) : DoubleDataAdapterOutputValueParams(reconstructer) {}
-  virtual ~DoubleDataAdapterSpacing() {}
+  DoublePropertySpacing(UsReconstructionServicePtr reconstructer) : DoublePropertyOutputValueParams(reconstructer) {}
+  virtual ~DoublePropertySpacing() {}
   virtual QString getDisplayName() const { return "Spacing Out"; }
   virtual QString getHelp() const { return "Output Volume Spacing (mm)"; }
   DoubleRange getValueRange() const {  return DoubleRange(0.001,10,0.001); }
@@ -91,12 +91,12 @@ protected:
 
 /** Interface to setting dim in output volume
  */
-class org_custusx_usreconstruction_EXPORT DoubleDataAdapterXDim : public DoubleDataAdapterOutputValueParams
+class org_custusx_usreconstruction_EXPORT DoublePropertyXDim : public DoublePropertyOutputValueParams
 {
   Q_OBJECT
 public:
-  DoubleDataAdapterXDim(UsReconstructionServicePtr reconstructer) : DoubleDataAdapterOutputValueParams(reconstructer) {}
-  virtual ~DoubleDataAdapterXDim() {}
+  DoublePropertyXDim(UsReconstructionServicePtr reconstructer) : DoublePropertyOutputValueParams(reconstructer) {}
+  virtual ~DoublePropertyXDim() {}
   virtual QString getDisplayName() const { return "X"; }
   virtual QString getHelp() const { return "X dimension"; }
   DoubleRange getValueRange() const {  return DoubleRange(1,1000,1); }
@@ -106,12 +106,12 @@ protected:
 };
 /** Interface to setting dim in output volume
  */
-class org_custusx_usreconstruction_EXPORT DoubleDataAdapterYDim : public DoubleDataAdapterOutputValueParams
+class org_custusx_usreconstruction_EXPORT DoublePropertyYDim : public DoublePropertyOutputValueParams
 {
   Q_OBJECT
 public:
-  DoubleDataAdapterYDim(UsReconstructionServicePtr reconstructer) : DoubleDataAdapterOutputValueParams(reconstructer) {}
-  virtual ~DoubleDataAdapterYDim() {}
+  DoublePropertyYDim(UsReconstructionServicePtr reconstructer) : DoublePropertyOutputValueParams(reconstructer) {}
+  virtual ~DoublePropertyYDim() {}
   virtual QString getDisplayName() const { return "Y"; }
   virtual QString getHelp() const { return "Y dimension"; }
   DoubleRange getValueRange() const {  return DoubleRange(1,1000,1); }
@@ -121,12 +121,12 @@ protected:
 };
 /** Interface to setting dim in output volume
  */
-class org_custusx_usreconstruction_EXPORT DoubleDataAdapterZDim : public DoubleDataAdapterOutputValueParams
+class org_custusx_usreconstruction_EXPORT DoublePropertyZDim : public DoublePropertyOutputValueParams
 {
   Q_OBJECT
 public:
-  DoubleDataAdapterZDim(UsReconstructionServicePtr reconstructer) : DoubleDataAdapterOutputValueParams(reconstructer) {}
-  virtual ~DoubleDataAdapterZDim() {}
+  DoublePropertyZDim(UsReconstructionServicePtr reconstructer) : DoublePropertyOutputValueParams(reconstructer) {}
+  virtual ~DoublePropertyZDim() {}
   virtual QString getDisplayName() const { return "Z"; }
   virtual QString getHelp() const { return "Z dimension"; }
   DoubleRange getValueRange() const {  return DoubleRange(1,1000,1); }

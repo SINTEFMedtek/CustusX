@@ -50,15 +50,15 @@ namespace cx
 {
 
 
-FusedInputOutputSelectDataStringDataAdapterPtr FusedInputOutputSelectDataStringDataAdapter::create(PatientModelServicePtr patientModelService,
+StringPropertyFusedInputOutputSelectDataPtr StringPropertyFusedInputOutputSelectData::create(PatientModelServicePtr patientModelService,
 																								   SelectDataStringPropertyBasePtr base,
 																								   SelectDataStringPropertyBasePtr input)
 {
-	FusedInputOutputSelectDataStringDataAdapterPtr retval(new FusedInputOutputSelectDataStringDataAdapter(patientModelService, base, input));
+	StringPropertyFusedInputOutputSelectDataPtr retval(new StringPropertyFusedInputOutputSelectData(patientModelService, base, input));
 	return retval;
 }
 
-FusedInputOutputSelectDataStringDataAdapter::FusedInputOutputSelectDataStringDataAdapter(PatientModelServicePtr patientModelService,
+StringPropertyFusedInputOutputSelectData::StringPropertyFusedInputOutputSelectData(PatientModelServicePtr patientModelService,
 																						 SelectDataStringPropertyBasePtr base,
 																						 SelectDataStringPropertyBasePtr input) :
 	SelectDataStringPropertyBase(patientModelService)
@@ -73,34 +73,34 @@ FusedInputOutputSelectDataStringDataAdapter::FusedInputOutputSelectDataStringDat
 }
 
 
-bool FusedInputOutputSelectDataStringDataAdapter::setValue(const QString& value)
+bool StringPropertyFusedInputOutputSelectData::setValue(const QString& value)
 {
 	return mBase->setValue(value);
 }
 
-QString FusedInputOutputSelectDataStringDataAdapter::getValue() const
+QString StringPropertyFusedInputOutputSelectData::getValue() const
 {
 	return mBase->getValue();
 }
 
-QString FusedInputOutputSelectDataStringDataAdapter::getDisplayName() const
+QString StringPropertyFusedInputOutputSelectData::getDisplayName() const
 {
 	if (mValueName.isEmpty())
 		return mBase->getDisplayName();
 	return mValueName;
 }
 
-QStringList FusedInputOutputSelectDataStringDataAdapter::getValueRange() const
+QStringList StringPropertyFusedInputOutputSelectData::getValueRange() const
 {
 	return mBase->getValueRange();
 }
 
-QString FusedInputOutputSelectDataStringDataAdapter::convertInternal2Display(QString internal)
+QString StringPropertyFusedInputOutputSelectData::convertInternal2Display(QString internal)
 {
 	return mBase->convertInternal2Display(internal);
 }
 
-QString FusedInputOutputSelectDataStringDataAdapter::getHelp() const
+QString StringPropertyFusedInputOutputSelectData::getHelp() const
 {
 //	return mBase->getHelp();
 	return QString("<html>"
@@ -111,12 +111,12 @@ QString FusedInputOutputSelectDataStringDataAdapter::getHelp() const
 	        .arg("Output").arg(mBase->getHelp());
 }
 
-DataPtr FusedInputOutputSelectDataStringDataAdapter::getData() const
+DataPtr StringPropertyFusedInputOutputSelectData::getData() const
 {
 	return mBase->getData();
 }
 
-void FusedInputOutputSelectDataStringDataAdapter::setValueName(const QString name)
+void StringPropertyFusedInputOutputSelectData::setValueName(const QString name)
 {
 	if (name==mValueName)
 		return;
@@ -125,12 +125,12 @@ void FusedInputOutputSelectDataStringDataAdapter::setValueName(const QString nam
 	emit changed();
 }
 
-void FusedInputOutputSelectDataStringDataAdapter::setHelp(QString text)
+void StringPropertyFusedInputOutputSelectData::setHelp(QString text)
 {
 	mBase->setHelp(text);
 }
 
-void FusedInputOutputSelectDataStringDataAdapter::changedSlot()
+void StringPropertyFusedInputOutputSelectData::changedSlot()
 {
 	// this sync helps the pipeline behaving when the output is changed.
 	this->blockSignals(true);
@@ -138,7 +138,7 @@ void FusedInputOutputSelectDataStringDataAdapter::changedSlot()
 	this->blockSignals(false);
 }
 
-void FusedInputOutputSelectDataStringDataAdapter::inputDataChangedSlot()
+void StringPropertyFusedInputOutputSelectData::inputDataChangedSlot()
 {
 	// the entire point of the class: update mBase when mInput is changed:
 	mBase->setValue(mInput->getValue());
@@ -263,8 +263,8 @@ std::vector<SelectDataStringPropertyBasePtr> Pipeline::createNodes()
 	{
 		SelectDataStringPropertyBasePtr output = mFilters->get(i-1)->getOutputTypes()[0];
 		SelectDataStringPropertyBasePtr base  = mFilters->get(i)->getInputTypes()[0];
-		FusedInputOutputSelectDataStringDataAdapterPtr node;
-		node = FusedInputOutputSelectDataStringDataAdapter::create(mPatientModelService, base, output);
+		StringPropertyFusedInputOutputSelectDataPtr node;
+		node = StringPropertyFusedInputOutputSelectData::create(mPatientModelService, base, output);
 		node->setValueName(QString("Node %1").arg(i));
 		retval.push_back(node);
 	}

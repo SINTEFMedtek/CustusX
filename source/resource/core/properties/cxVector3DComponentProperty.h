@@ -42,7 +42,7 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup cx_resource_core_dataadapters
+ * \addtogroup cx_resource_core_properties
  * @{
  */
 

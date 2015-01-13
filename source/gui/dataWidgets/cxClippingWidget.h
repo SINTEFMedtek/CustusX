@@ -54,16 +54,16 @@ typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
 
 /** Adapter that connects to the current active image.
  */
-class cxGui_EXPORT ClipPlaneStringDataAdapter: public StringPropertyBase
+class cxGui_EXPORT StringPropertyClipPlane: public StringPropertyBase
 {
 Q_OBJECT
 public:
 	static StringPropertyBasePtr New(InteractiveClipperPtr clipper)
 	{
-		return StringPropertyBasePtr(new ClipPlaneStringDataAdapter(clipper));
+		return StringPropertyBasePtr(new StringPropertyClipPlane(clipper));
 	}
-	ClipPlaneStringDataAdapter(InteractiveClipperPtr clipper);
-	virtual ~ClipPlaneStringDataAdapter() {}
+	StringPropertyClipPlane(InteractiveClipperPtr clipper);
+	virtual ~StringPropertyClipPlane() {}
 
 public:
 	// basic methods

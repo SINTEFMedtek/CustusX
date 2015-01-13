@@ -114,10 +114,10 @@ private:
 	paramList getParametersFromOptions(); ///< fetches the parameters set by the user
 	void setParamtersToOptions(paramList& parameters); ///< set the options to a given set of parameters
 
-	StringPropertyPtr getStringOption(QString valueName); ///< get string dataadapter with give name
-	BoolPropertyPtr getBoolOption(QString valueName); ///< get bool dataadapter with give name
-	DoublePropertyPtr getDoubleOption(QString valueName); ///< get double dataadapter with give name
-	PropertyPtr getOption(QString valueName); ///< get option/dataadapter with given name
+	StringPropertyPtr getStringOption(QString valueName); ///< get string Property with given name
+	BoolPropertyPtr getBoolOption(QString valueName); ///< get bool Property with given name
+	DoublePropertyPtr getDoubleOption(QString valueName); ///< get double Property with given name
+	PropertyPtr getOption(QString valueName); ///< get option/Property with given name
 	void setOptionAdvanced(QString valueName, bool advanced); ///< set one option to be advanced or not
 	void setOptionValue(QString valueName, QString value); ///< set one option to a specific value
 

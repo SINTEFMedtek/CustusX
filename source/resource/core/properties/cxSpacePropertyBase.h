@@ -46,7 +46,7 @@ namespace cx
 {
 
 /**
- * \ingroup cx_resource_core_dataadapters
+ * \ingroup cx_resource_core_properties
  */
 class cxResource_EXPORT SpacePropertyBase: public Property
 {

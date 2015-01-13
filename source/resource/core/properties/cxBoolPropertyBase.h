@@ -42,7 +42,7 @@ namespace cx
 
 /**\brief Property interface for boolean values.
  *
- * \ingroup cx_resource_core_dataadapters
+ * \ingroup cx_resource_core_properties
  */
 class cxResource_EXPORT BoolPropertyBase: public Property
 {

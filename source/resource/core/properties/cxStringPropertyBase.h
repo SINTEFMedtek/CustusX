@@ -81,7 +81,7 @@ namespace cx
  * When testing, or during development, you can use the StringPropertyNull
  * as a dummy implementation.
  *
- * \ingroup cx_resource_core_dataadapters
+ * \ingroup cx_resource_core_properties
  */
 class cxResource_EXPORT StringPropertyBase: public Property
 {

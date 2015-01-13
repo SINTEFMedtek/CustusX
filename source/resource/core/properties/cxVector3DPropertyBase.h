@@ -50,7 +50,7 @@ namespace cx
  *
  *  Refer to DoubleProperty for a description.
  *
- * \ingroup cx_resource_core_dataadapters
+ * \ingroup cx_resource_core_properties
  */
 class cxResource_EXPORT Vector3DPropertyBase: public Property
 {

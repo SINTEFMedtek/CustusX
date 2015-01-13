@@ -55,7 +55,7 @@ typedef boost::shared_ptr<class Vector3DProperty> Vector3DPropertyPtr;
     <option id="Processor" value="3.14"/>
    \endverbatim
  *
- * \ingroup cx_resource_core_dataadapters
+ * \ingroup cx_resource_core_properties
  */
 class cxResource_EXPORT Vector3DProperty: public Vector3DPropertyBase
 {

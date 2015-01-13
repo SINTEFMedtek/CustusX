@@ -45,7 +45,7 @@ namespace cx
 /** Property interface for QColor
  *
  *
- * \ingroup cx_resource_core_dataadapters
+ * \ingroup cx_resource_core_properties
  * \date Nov 22, 2012
  * \author christiana
  */

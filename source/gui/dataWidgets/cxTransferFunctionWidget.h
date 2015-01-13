@@ -62,12 +62,12 @@ class TransferFunctionColorWidget;
 
 /** Superclass for all doubles interacting with a ImageTFData.
  */
-class cxGui_EXPORT DoubleDataAdapterImageTFDataBase : public DoublePropertyBase
+class cxGui_EXPORT DoublePropertyImageTFDataBase : public DoublePropertyBase
 {
   Q_OBJECT
 public:
-  DoubleDataAdapterImageTFDataBase();
-  virtual ~DoubleDataAdapterImageTFDataBase() {}
+  DoublePropertyImageTFDataBase();
+  virtual ~DoublePropertyImageTFDataBase() {}
   virtual double getValue() const;
   virtual bool setValue(double val);
   virtual void connectValueSignals(bool on) {}
@@ -80,15 +80,15 @@ protected:
   ImageTFDataPtr mImageTFData;
   ImagePtr mImage;
 };
-typedef boost::shared_ptr<DoubleDataAdapterImageTFDataBase> DoubleDataAdapterImageTFDataBasePtr;
+typedef boost::shared_ptr<DoublePropertyImageTFDataBase> DoublePropertyImageTFDataBasePtr;
 
 
 /**DataInterface implementation for the tf window value
  */
-class cxGui_EXPORT DoubleDataAdapterImageTFDataWindow : public DoubleDataAdapterImageTFDataBase
+class cxGui_EXPORT DoublePropertyImageTFDataWindow : public DoublePropertyImageTFDataBase
 {
 public:
-  virtual ~DoubleDataAdapterImageTFDataWindow() {}
+  virtual ~DoublePropertyImageTFDataWindow() {}
   virtual QString getDisplayName() const { return "Window width"; }
   virtual double getValueInternal() const;
   virtual void setValueInternal(double val);
@@ -97,11 +97,11 @@ public:
 
 /**DataInterface implementation for the tf level value
  */
-class cxGui_EXPORT DoubleDataAdapterImageTFDataLevel : public DoubleDataAdapterImageTFDataBase
+class cxGui_EXPORT DoublePropertyImageTFDataLevel : public DoublePropertyImageTFDataBase
 {
   Q_OBJECT
 public:
-  virtual ~DoubleDataAdapterImageTFDataLevel() {}
+  virtual ~DoublePropertyImageTFDataLevel() {}
   virtual QString getDisplayName() const { return "Window level"; }
   virtual double getValueInternal() const;
   virtual void setValueInternal(double val);
@@ -110,11 +110,11 @@ public:
 
 /**DataInterface implementation for the tf llr value
  */
-class cxGui_EXPORT DoubleDataAdapterImageTFDataLLR : public DoubleDataAdapterImageTFDataBase
+class cxGui_EXPORT DoublePropertyImageTFDataLLR : public DoublePropertyImageTFDataBase
 {
   Q_OBJECT
 public:
-  virtual ~DoubleDataAdapterImageTFDataLLR() {}
+  virtual ~DoublePropertyImageTFDataLLR() {}
   virtual QString getDisplayName() const { return "LLR"; }
   virtual double getValueInternal() const;
   virtual void setValueInternal(double val);
@@ -123,11 +123,11 @@ public:
 
 /**DataInterface implementation for the tf alpha value
  */
-class cxGui_EXPORT DoubleDataAdapterImageTFDataAlpha : public DoubleDataAdapterImageTFDataBase
+class cxGui_EXPORT DoublePropertyImageTFDataAlpha : public DoublePropertyImageTFDataBase
 {
   Q_OBJECT
 public:
-  virtual ~DoubleDataAdapterImageTFDataAlpha() {}
+  virtual ~DoublePropertyImageTFDataAlpha() {}
   virtual QString getDisplayName() const { return "Alpha"; }
   virtual double getValueInternal() const;
   virtual void setValueInternal(double val);
@@ -150,7 +150,6 @@ protected:
   QVBoxLayout* mLayout;
   TransferFunctionAlphaWidget* mTransferFunctionAlphaWidget;
   TransferFunctionColorWidget* mTransferFunctionColorWidget;
-//  DoubleDataAdapterImageTFDataBasePtr mDataWindow, mDataAlpha, mDataLLR, mDataLevel;
 
   ActiveImageProxyPtr mActiveImageProxy;
   PatientModelServicePtr mPatientModelService;
@@ -172,7 +171,7 @@ protected:
   QVBoxLayout* mLayout;
   TransferFunctionAlphaWidget* mTransferFunctionAlphaWidget;
   TransferFunctionColorWidget* mTransferFunctionColorWidget;
-  DoubleDataAdapterImageTFDataBasePtr mDataWindow, mDataAlpha, mDataLLR, mDataLevel;
+  DoublePropertyImageTFDataBasePtr mDataWindow, mDataAlpha, mDataLLR, mDataLevel;
 
   ActiveImageProxyPtr mActiveImageProxy;
   PatientModelServicePtr mPatientModelService;

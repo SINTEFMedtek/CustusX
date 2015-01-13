@@ -87,7 +87,7 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, UsReconstructionServ
 	sizesLayout->addWidget(inputSpacingLabel, 0, 0);
 	sizesLayout->addWidget(mInputSpacingLineEdit, 0, 1);
 	sizesLayout->addLayout(extentLayout, 0, 2);
-	mSpacingWidget = new SpinBoxGroupWidget(this, DoublePropertyBasePtr(new DoubleDataAdapterSpacing(mReconstructer)), sizesLayout, 1);
+	mSpacingWidget = new SpinBoxGroupWidget(this, DoublePropertyBasePtr(new DoublePropertySpacing(mReconstructer)), sizesLayout, 1);
 	sizesLayout->addWidget(maxVolSizeWidget, 1, 2);
 
 	QHBoxLayout* runLayout = new QHBoxLayout;
@@ -163,9 +163,9 @@ QWidget* ReconstructionWidget::createOptionsWidget()
 	sscCreateDataWidget(this, mReconstructer->getParam("Orientation"), layout, line++);
 	layout->addWidget(this->createHorizontalLine(), line++, 0, 1, 2);
 
-	mDimXWidget = new SpinBoxGroupWidget(this, DoublePropertyBasePtr(new DoubleDataAdapterXDim(mReconstructer)));
-	mDimYWidget = new SpinBoxGroupWidget(this, DoublePropertyBasePtr(new DoubleDataAdapterYDim(mReconstructer)));
-	mDimZWidget = new SpinBoxGroupWidget(this, DoublePropertyBasePtr(new DoubleDataAdapterZDim(mReconstructer)));
+	mDimXWidget = new SpinBoxGroupWidget(this, DoublePropertyBasePtr(new DoublePropertyXDim(mReconstructer)));
+	mDimYWidget = new SpinBoxGroupWidget(this, DoublePropertyBasePtr(new DoublePropertyYDim(mReconstructer)));
+	mDimZWidget = new SpinBoxGroupWidget(this, DoublePropertyBasePtr(new DoublePropertyZDim(mReconstructer)));
 	QHBoxLayout* outputVolDimLayout = new QHBoxLayout;
 	outputVolDimLayout->addWidget(mDimXWidget);
 	outputVolDimLayout->addWidget(mDimYWidget);

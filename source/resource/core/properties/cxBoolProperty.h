@@ -56,7 +56,7 @@ typedef boost::shared_ptr<class BoolProperty> BoolPropertyPtr;
 
 /**\brief Property for boolean values.
  *
- * \ingroup cx_resource_core_dataadapters
+ * \ingroup cx_resource_core_properties
  */
 class cxResource_EXPORT BoolProperty: public BoolPropertyBase
 {

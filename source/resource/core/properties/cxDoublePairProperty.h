@@ -53,7 +53,7 @@ typedef boost::shared_ptr<class DoublePairProperty> DoublePairPropertyPtr;
 		<option id="Processor" value="3.14"/>
 	 \endverbatim
  *
- * \ingroup cx_resource_core_dataadapters
+ * \ingroup cx_resource_core_properties
  *
  * \date Juli 31, 2014
  * \author Ole Vegard Solberg, SINTEF

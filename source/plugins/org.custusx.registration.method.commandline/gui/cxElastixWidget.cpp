@@ -82,8 +82,6 @@ ElastixWidget::ElastixWidget(RegServices services, QWidget* parent) :
 	mMovingImage.reset(new StringPropertyRegistrationMovingImage(services.registrationService, services.patientModelService));
 	new LabeledComboBoxWidget(this, mMovingImage, entryLayout, 1);
 
-//	StringDataAdapterXmlPtr mSettings;
-//	mSettings = StringDataAdapterXml::initialize("elastixSettings", "Setting", "Current Elastix Settings", "mysettings", QStringList(), QDomNode());
 	new LabeledComboBoxWidget(this, mElastixManager->getParameters()->getCurrentPreset(), entryLayout, 2);
 
 	QHBoxLayout* buttonsLayout = new QHBoxLayout;
@@ -97,8 +95,6 @@ ElastixWidget::ElastixWidget(RegServices services, QWidget* parent) :
 
 	topLayout->addLayout(entryLayout);
 	topLayout->addLayout(buttonsLayout);
-//	topLayout->addSpacing(topLayout->spacing()*2);
-//	topLayout->addWidget(this->createHorizontalLine());
 	topLayout->addWidget(mOptionsWidget, 1);
 	topLayout->addStretch();
 	topLayout->addWidget(mTimedAlgorithmProgressBar);

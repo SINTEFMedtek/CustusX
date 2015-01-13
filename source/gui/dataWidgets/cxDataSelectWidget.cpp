@@ -55,7 +55,7 @@ DataSelectWidget::DataSelectWidget(VisualizationServicePtr visualizationService,
     layout->setMargin(0);
     layout->setSpacing(0);
 
-	QWidget* dataAdapter = sscCreateDataWidget(this, mData, gridLayout, row);
+	QWidget* widget = sscCreateDataWidget(this, mData, gridLayout, row);
 
     mToggleShowAction = this->createAction(this,
                     QIcon(":/icons/open_icon_library/eye.png.png"),
@@ -88,7 +88,7 @@ DataSelectWidget::DataSelectWidget(VisualizationServicePtr visualizationService,
     	gridLayout->addLayout(lay, row, 2);
     }else
     {
-		layout->addWidget(dataAdapter);
+		layout->addWidget(widget);
 		layout->addWidget(toggleShowButton);
 		layout->addWidget(removeButton);
     }

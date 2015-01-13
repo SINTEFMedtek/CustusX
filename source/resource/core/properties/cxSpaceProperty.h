@@ -46,7 +46,7 @@ namespace cx
 typedef boost::shared_ptr<class SpaceProperty> SpacePropertyPtr;
 
 /**
- * \ingroup cx_resource_core_dataadapters
+ * \ingroup cx_resource_core_properties
  */
 class cxResource_EXPORT SpaceProperty: public SpacePropertyBase
 {

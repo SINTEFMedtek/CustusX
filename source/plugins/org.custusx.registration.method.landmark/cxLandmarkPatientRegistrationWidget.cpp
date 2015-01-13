@@ -68,7 +68,7 @@ LandmarkPatientRegistrationWidget::LandmarkPatientRegistrationWidget(RegServices
 		"Sample Tool", this))
 {
 	mImageLandmarkSource = ImageLandmarksSource::New();
-	mFixedDataAdapter.reset(new StringPropertyRegistrationFixedImage(services.registrationService, services.patientModelService));
+	mFixedProperty.reset(new StringPropertyRegistrationFixedImage(services.registrationService, services.patientModelService));
 	connect(services.registrationService.get(), &RegistrationService::fixedDataChanged,
 			this, &LandmarkPatientRegistrationWidget::fixedDataChanged);
 	connect(services.patientModelService.get(), &PatientModelService::rMprChanged, this, &LandmarkPatientRegistrationWidget::setModified);
@@ -93,7 +93,7 @@ LandmarkPatientRegistrationWidget::LandmarkPatientRegistrationWidget(RegServices
 	connect(services.patientModelService.get(), &PatientModelService::debugModeChanged, this, &LandmarkPatientRegistrationWidget::updateToolSampleButton);
 
 	//layout
-	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mFixedDataAdapter));
+	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mFixedProperty));
 	mVerticalLayout->addWidget(mLandmarkTableWidget);
 	mVerticalLayout->addWidget(mToolSampleButton);
 	mVerticalLayout->addWidget(mAvarageAccuracyLabel);
