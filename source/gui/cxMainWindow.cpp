@@ -1020,7 +1020,7 @@ void MainWindow::registerToolBar(QToolBar* toolbar, QString groupname)
 void MainWindow::aboutSlot()
 {
 	QString doc_path = DataLocations::getDocPath();
-	QString url_github("https://github.com/SINTEFMedisinskTeknologi/CustusX3");
+	QString url_github("https://github.com/SINTEFMedisinskTeknologi/CustusX");
 	QString url_license = QString("file://%1/license.txt").arg(doc_path);
 	QString url_config = QString("file://%1/cxConfigDescription.txt").arg(doc_path);
 
