@@ -132,7 +132,7 @@ TEST_CASE("XmlOptionFile: Writing to file using one instance, then loading using
 	}
 }
 
-TEST_CASE("XmlOptionFile: Write and read QVariant<int>", "[unit][resource][core]")
+TEST_CASE("XmlOptionFile: Write and read QVariant-int", "[unit][resource][core]")
 {
 	cx::DataLocations::setTestMode();
 	XmlOptionFileFixture file1;
@@ -149,7 +149,7 @@ TEST_CASE("XmlOptionFile: Write and read QVariant<int>", "[unit][resource][core]
 	CHECK(item2.readVariant("none").toInt() == value); //  second item contains same value as first
 }
 
-TEST_CASE("XmlOptionFile: Write and read QVariant<QColor>", "[unit][resource][core]")
+TEST_CASE("XmlOptionFile: Write and read QVariant-QColor", "[unit][resource][core]")
 {
 	cx::DataLocations::setTestMode();
 	XmlOptionFileFixture file1;
