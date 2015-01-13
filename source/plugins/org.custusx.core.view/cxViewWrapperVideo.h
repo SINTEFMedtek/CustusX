@@ -29,87 +29,78 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXMULTIVOLUME3DREPPRODUCER_H
-#define CXMULTIVOLUME3DREPPRODUCER_H
 
-#include "org_custusx_core_visualization_Export.h"
+#ifndef CXVIEWWRAPPERRTSTREAM_H_
+#define CXVIEWWRAPPERRTSTREAM_H_
 
-#include <QObject>
+#include "org_custusx_core_view_Export.h"
+
+#include <vector>
 #include <QPointer>
-#include <boost/shared_ptr.hpp>
-#include "cxImage.h"
-#include "cxRep.h"
+#include "cxForwardDeclarations.h"
+#include "cxDefinitions.h"
+
+#include "cxViewWrapper.h"
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cx_service_visualization
+* @{
+*/
 
-typedef boost::shared_ptr<class MultiVolume3DRepProducer> MultiVolume3DVisualizerPtr;
-
-/** 
+/** Wrapper for a View that displays a RealTimeStream.
+ *  Handles the connections between specific reps and the view.
  *
+ *  The view displays either a raw rt source or a us probe, depending on
+ *  whats available.
  *
- * \ingroup cx_service_visualization
- * \date 4 Sep 2013
- * \author Christian Askeland, SINTEF
- * \author Ole Vegard Solberg, SINTEF
  */
-class org_custusx_core_visualization_EXPORT MultiVolume3DRepProducer : public QObject
+class org_custusx_core_view_EXPORT ViewWrapperVideo: public ViewWrapper
 {
-	Q_OBJECT
+Q_OBJECT
 public:
-	MultiVolume3DRepProducer();
-	~MultiVolume3DRepProducer();
-
-	void setView(ViewPtr view);
-	void setMaxRenderSize(int voxels);
-	int getMaxRenderSize() const;
-	void setVisualizerType(QString type);
-	void addImage(ImagePtr image);
-	void removeImage(QString uid);
-	std::vector<RepPtr> getAllReps();
-//	static QStringList getAvailableVisualizers();
-//	static std::map<QString, QString> getAvailableVisualizerDisplayNames();
-	void removeRepsFromView();
-
-signals:
-	void imagesChanged();
+	ViewWrapperVideo(ViewPtr view, CoreServicesPtr backend);
+	virtual ~ViewWrapperVideo();
+	virtual ViewPtr getView();
+	virtual void setSlicePlanesProxy(SlicePlanesProxyPtr proxy) {}
+	virtual void updateView() {}
+	virtual void setViewGroup(ViewGroupDataPtr group);
 
 private slots:
-	void clearReps();
+	void updateSlot();
+	void showSectorActionSlot(bool checked);
+	void connectStream();
+	void streamActionSlot();
+protected slots:
+	virtual void dataViewPropertiesChangedSlot(QString uid) {}
+
+protected:
+//	virtual void dataAdded(DataPtr data) {}
+//	virtual void dataRemoved(const QString& uid) {}
+	virtual void videoSourceChangedSlot(QString uid);
 
 private:
-	QString mVisualizerType;
-	std::vector<ImagePtr> m2DImages;
-	std::vector<ImagePtr> m3DImages;
-	std::vector<RepPtr> mReps;
-	int mMaxRenderSize;
+	VideoSourcePtr getSourceFromService(QString uid);
+	void addStreamAction(QString uid, QMenu* contextMenu);
+	void loadStream();
+	virtual void appendToContextMenu(QMenu& contextMenu);
+	void addReps();
+	void setupRep(VideoSourcePtr source, ToolPtr tool);
+
+	VideoFixedPlaneRepPtr mStreamRep;
+	VideoSourcePtr mSource;
+	DisplayTextRepPtr mPlaneTypeText;
+	DisplayTextRepPtr mDataNameText;
 	ViewPtr mView;
-
-	void updateRepsInView();
-	void fillReps();
-	bool contains(ImagePtr image) const;
-
-	void rebuildReps();
-	void rebuild2DReps();
-	void rebuild3DReps();
-
-	void addRepsToView();
-
-	ImagePtr removeImageFromVector(QString uid, std::vector<ImagePtr> &images);
-
-	void buildVtkOpenGLGPUMultiVolumeRayCastMapper();
-	void buildVtkVolumeTextureMapper3D(ImagePtr image);
-	void buildVtkGPUVolumeRayCastMapper(ImagePtr image);
-	bool is2DImage(ImagePtr image) const;
-	void buildSscImage2DRep3D(ImagePtr image);
-
-	void buildSingleVolumeRenderer(ImagePtr image);
-	bool isSingleVolumeRenderer() const;
-
+	ToolPtr mTool;
 };
+typedef boost::shared_ptr<ViewWrapperVideo> ViewWrapperVideoPtr;
 
+/**
+* @}
+*/
 } // namespace cx
 
-
-
-#endif // CXMULTIVOLUME3DREPPRODUCER_H
+#endif /* CXVIEWWRAPPERRTSTREAM_H_ */

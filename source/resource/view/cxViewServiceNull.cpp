@@ -66,7 +66,7 @@ bool VisualizationServiceNull::isNull()
 
 void VisualizationServiceNull::printWarning() const
 {
-//	reportWarning("Trying to use VideoServiceNull. Is VideoService (org.custusx.core.visualization) disabled?");
+//	reportWarning("Trying to use VideoServiceNull. Is VideoService (org.custusx.core.view) disabled?");
 }
 
 void VisualizationServiceNull::autoShowData(cx::DataPtr data)

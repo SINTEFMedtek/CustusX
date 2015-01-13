@@ -29,85 +29,84 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXRENDERLOOP_H
-#define CXRENDERLOOP_H
 
-#include "org_custusx_core_visualization_Export.h"
+#ifndef CXVIEWGROUP_H_
+#define CXVIEWGROUP_H_
 
+#include "org_custusx_core_view_Export.h"
+
+#include <vector>
 #include <QObject>
+#include <QDomDocument>
+#include "cxDefinitions.h"
 #include "cxForwardDeclarations.h"
-class QTimer;
-#include <QDateTime>
-#include <set>
+#include "cxVector3D.h"
+
+class QMenu;
+class QPoint;
 
 namespace cx
 {
-typedef boost::shared_ptr<class CyclicActionLogger> CyclicActionLoggerPtr;
-class ViewCollectionWidget;
+typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
+typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
+typedef boost::shared_ptr<class CameraStyle> CameraStylePtr;
+typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
+typedef boost::shared_ptr<class Navigation> NavigationPtr;
 
-/** Render a set of Views in a loop.
- *
- * This is the main render loop in Custus.
- *
- * \ingroup cx_service_visualization
- * \date 2014-02-06
- * \author christiana
+/**
+ * \file
+ * \addtogroup cx_service_visualization
+ * @{
  */
-class org_custusx_core_visualization_EXPORT RenderLoop : public QObject
+
+
+/**
+ * \brief
+ *
+ * \date 18. mars 2010
+ * \\author jbake
+ */
+class org_custusx_core_view_EXPORT ViewGroup: public QObject
 {
-	Q_OBJECT
+Q_OBJECT
 public:
-	RenderLoop();
-	void start();
-	void stop();
-	bool isRunning() const;
-	void setRenderingInterval(int interval);
-	void setSmartRender(bool val); ///< If set: Render only views with modified props using the given interval, render nonmodified at a slower pace.
-	void setLogging(bool on);
+	explicit ViewGroup(CoreServicesPtr backend);
+	virtual ~ViewGroup();
 
-	void clearViews();
-	void addLayout(ViewCollectionWidget* layout);
+	void addView(ViewWrapperPtr wrapper);
+	void removeViews();
+	ViewWrapperPtr getViewWrapperFromViewUid(QString viewUid);
+	std::vector<ViewWrapperPtr> getWrappers() const { return mViewWrappers; }
+	std::vector<ViewPtr> getViews() const;
+	ViewGroupDataPtr getData() { return mViewGroupData; }
+	virtual void addXml(QDomNode& dataNode); ///< store internal state info in dataNode
+	virtual void parseXml(QDomNode dataNode); ///< load internal state info from dataNode
+	void clearPatientData();
+	CameraStylePtr getCameraStyle() { return mCameraStyle; }
 
-	CyclicActionLoggerPtr getRenderTimer() { return mCyclicLogger; }
-
-public slots:
-	void requestPreRenderSignal();
-
-signals:
-	void preRender();
-	void fps(int number); ///< Emits number of frames per second
+	bool contains3DView() const;
+	void syncOrientationMode(SyncedValuePtr val);
+	void initializeActiveView(SyncedValuePtr val);
 
 private slots:
-	void timeoutSlot();
+//	void activateManualToolSlot();
+	void mouseClickInViewGroupSlot();
 
-private:
-	void sendRenderIntervalToTimer(int interval);
-	void emitPreRenderIfRequested();
-	void renderViews();
-	bool pollForSmartRenderingThisCycle();
-	int calculateTimeToNextRender();
-	void emitFPSIfRequired();
-	void dumpStatistics();
+protected:
+	std::vector<ViewPtr> mViews;
 
-	QTimer* mTimer; ///< timer that drives rendering
-	QDateTime mLastFullRender;
-	QDateTime mLastBeginRender;
-
-	CyclicActionLoggerPtr mCyclicLogger;
-
-	bool mSmartRender;
-	bool mPreRenderSignalRequested;
-	int mBaseRenderInterval;
-	bool mLogging;
-
-//	typedef std::set<ViewPtr> ViewSet;
-//	ViewSet mViews;
-	std::vector<QPointer<ViewCollectionWidget> > mLayoutWidgets;
+	ViewGroupDataPtr mViewGroupData;
+	std::vector<ViewWrapperPtr> mViewWrappers;
+	CameraStylePtr mCameraStyle;
+	CoreServicesPtr mBackend;
+	SyncedValuePtr mActiveView;
 };
 
-typedef boost::shared_ptr<RenderLoop> RenderLoopPtr;
+bool isViewWrapper2D(ViewWrapperPtr wrapper);
 
+/**
+ * @}
+ */
 } // namespace cx
 
-
-#endif // CXRENDERLOOP_H
+#endif /* CXVIEWGROUP_H_ */

@@ -29,53 +29,85 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXRENDERLOOP_H
+#define CXRENDERLOOP_H
 
-#ifndef CX2DZOOMHANDLER_H
-#define CX2DZOOMHANDLER_H
+#include "org_custusx_core_view_Export.h"
 
-#include "org_custusx_core_visualization_Export.h"
-
-#include "cxViewGroupData.h"
-#include <QMenu>
+#include <QObject>
+#include "cxForwardDeclarations.h"
+class QTimer;
+#include <QDateTime>
+#include <set>
 
 namespace cx
 {
-typedef boost::shared_ptr<class Zoom2DHandler> Zoom2DHandlerPtr;
+typedef boost::shared_ptr<class CyclicActionLogger> CyclicActionLoggerPtr;
+class ViewCollectionWidget;
 
-/** 
+/** Render a set of Views in a loop.
+ *
+ * This is the main render loop in Custus.
  *
  * \ingroup cx_service_visualization
- * \date 2014-02-26
+ * \date 2014-02-06
  * \author christiana
  */
-class org_custusx_core_visualization_EXPORT Zoom2DHandler : public QObject
+class org_custusx_core_view_EXPORT RenderLoop : public QObject
 {
 	Q_OBJECT
 public:
-	Zoom2DHandler();
+	RenderLoop();
+	void start();
+	void stop();
+	bool isRunning() const;
+	void setRenderingInterval(int interval);
+	void setSmartRender(bool val); ///< If set: Render only views with modified props using the given interval, render nonmodified at a slower pace.
+	void setLogging(bool on);
 
-	void addActionsToMenu(QMenu* contextMenu);
-	void setGroupData(ViewGroupDataPtr group);
-	double getFactor();
-	void setFactor(double factor);
+	void clearViews();
+	void addLayout(ViewCollectionWidget* layout);
+
+	CyclicActionLoggerPtr getRenderTimer() { return mCyclicLogger; }
+
+public slots:
+	void requestPreRenderSignal();
+
+signals:
+	void preRender();
+	void fps(int number); ///< Emits number of frames per second
 
 private slots:
-	void zoom2DActionSlot();
-signals:
-	void zoomChanged();
-private:
-	void setConnectivityFromType(QString type);
-	QString getConnectivityType();
-	void addConnectivityAction(QString type, QString text, QMenu *contextMenu);
-	void set(SyncedValuePtr value);
+	void timeoutSlot();
 
-	SyncedValuePtr mZoom2D;
-	ViewGroupDataPtr mGroupData;
+private:
+	void sendRenderIntervalToTimer(int interval);
+	void emitPreRenderIfRequested();
+	void renderViews();
+	bool pollForSmartRenderingThisCycle();
+	int calculateTimeToNextRender();
+	void emitFPSIfRequired();
+	void dumpStatistics();
+
+	QTimer* mTimer; ///< timer that drives rendering
+	QDateTime mLastFullRender;
+	QDateTime mLastBeginRender;
+
+	CyclicActionLoggerPtr mCyclicLogger;
+
+	bool mSmartRender;
+	bool mPreRenderSignalRequested;
+	int mBaseRenderInterval;
+	bool mLogging;
+
+//	typedef std::set<ViewPtr> ViewSet;
+//	ViewSet mViews;
+	std::vector<QPointer<ViewCollectionWidget> > mLayoutWidgets;
 };
 
+typedef boost::shared_ptr<RenderLoop> RenderLoopPtr;
 
 } // namespace cx
 
 
-
-#endif // CX2DZOOMHANDLER_H
+#endif // CXRENDERLOOP_H

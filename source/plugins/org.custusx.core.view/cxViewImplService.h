@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXVIEWIMPLSERVICE_H_
 
 #include "cxViewService.h"
-#include "org_custusx_core_visualization_Export.h"
+#include "org_custusx_core_view_Export.h"
 class ctkPluginContext;
 class QDomElement;
 
@@ -46,12 +46,12 @@ typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
 /**
  * Implementation of VisualizationService.
  *
- * \ingroup org_custusx_core_visualization
+ * \ingroup org_custusx_core_view
  *
  * \date 2014-09-19
  * \author Ole Vegard Solberg
  */
-class org_custusx_core_visualization_EXPORT VisualizationImplService : public VisualizationService
+class org_custusx_core_view_EXPORT VisualizationImplService : public VisualizationService
 {
 	Q_INTERFACES(cx::VisualizationService)
 public:

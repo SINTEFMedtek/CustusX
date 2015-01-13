@@ -30,51 +30,9 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXTHRESHOLDPREVIEW_H_
-#define CXTHRESHOLDPREVIEW_H_
+#include "catch.hpp"
 
-#include "org_custusx_core_visualization_Export.h"
-
-#include <QObject>
-class QTimer;
-#include "cxForwardDeclarations.h"
-#include "cxMathBase.h"
-
-namespace cx
+TEST_CASE("VisualizationPlugin: Check nothing", "[unit][plugins][org.custusx.core.view][hide]")
 {
-
-typedef boost::shared_ptr<class ThresholdPreview> ThresholdPreviewPtr;
-
-/**
- * \brief Use transfer function to preview a threshold in the selected volume. Used by widgets: segmentation and surface generation
- * \ingroup cx_service_visualization
- *
- * \ingroup cx_service_visualization
- * \date 12. okt. 2011
- * \author Ole Vegard Solberg, SINTEF
- */
-class org_custusx_core_visualization_EXPORT ThresholdPreview: public QObject
-{
-Q_OBJECT
-public:
-	ThresholdPreview();
-
-		void setPreview(ImagePtr image, double lower);
-		void setPreview(ImagePtr image, const Eigen::Vector2d &threshold);
-    void removePreview();
-
-private:
-	void revertTransferFunctions();
-	void storeOriginalTransferfunctions(ImagePtr image);
-
-	ImagePtr mModifiedImage; ///< image that have its TF changed temporarily
-//	QWidget* mFromWidget; ///< The calling widget
-    ImageTF3DPtr mTF3D_original; ///< original TF of modified image.
-	ImageLUT2DPtr mTF2D_original; ///< original TF of modified image.
-	bool mShadingOn_original; ///< Was shading originally enabled in image
-//	QTimer *mRemoveTimer; ///< Timer for removing segmentation preview coloring if widget is not visible
-};
-
+	CHECK(true);
 }
-
-#endif /* CXTHRESHOLDPREVIEW_H_ */

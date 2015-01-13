@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXCAMERASTYLE_H_
 #define CXCAMERASTYLE_H_
 
-#include "org_custusx_core_visualization_Export.h"
+#include "org_custusx_core_view_Export.h"
 
 #include <QPointer>
 #include "cxTransform3D.h"
@@ -74,7 +74,7 @@ typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
  * \author Janne Beate Bakeng, SINTEF
  * \author Christian Askeland, SINTEF
  */
-class org_custusx_core_visualization_EXPORT CameraStyle: public QObject
+class org_custusx_core_view_EXPORT CameraStyle: public QObject
 {
 Q_OBJECT
 public:
@@ -103,7 +103,7 @@ private:
  * \author Janne Beate Bakeng, SINTEF
  * \author Christian Askeland, SINTEF
  */
-class org_custusx_core_visualization_EXPORT CameraStyleInteractor: public QObject
+class org_custusx_core_view_EXPORT CameraStyleInteractor: public QObject
 {
 Q_OBJECT
 public:

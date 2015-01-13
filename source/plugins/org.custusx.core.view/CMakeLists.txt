@@ -1,4 +1,4 @@
-project(org_custusx_core_visualization)
+project(org_custusx_core_view)
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
@@ -79,7 +79,7 @@ ctkMacroBuildPlugin(
   OUTPUT_DIR ${PLUGIN_OUTPUT_DIR}
 )
 
-target_include_directories(org_custusx_core_visualization
+target_include_directories(org_custusx_core_view
     PUBLIC
     .
     ${CMAKE_CURRENT_BINARY_DIR}

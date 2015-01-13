@@ -13,7 +13,7 @@ endif()
 
 
 add_subdirectory(core)
-add_subdirectory(visualization)
+add_subdirectory(view)
 add_subdirectory(OpenIGTLinkUtilities)
 add_subdirectory(testUtilities)
 add_subdirectory(widgets)

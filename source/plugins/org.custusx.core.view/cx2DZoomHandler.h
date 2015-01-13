@@ -30,77 +30,52 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXVIEWWRAPPERRTSTREAM_H_
-#define CXVIEWWRAPPERRTSTREAM_H_
+#ifndef CX2DZOOMHANDLER_H
+#define CX2DZOOMHANDLER_H
 
-#include "org_custusx_core_visualization_Export.h"
+#include "org_custusx_core_view_Export.h"
 
-#include <vector>
-#include <QPointer>
-#include "cxForwardDeclarations.h"
-#include "cxDefinitions.h"
-
-#include "cxViewWrapper.h"
+#include "cxViewGroupData.h"
+#include <QMenu>
 
 namespace cx
 {
-/**
-* \file
-* \addtogroup cx_service_visualization
-* @{
-*/
+typedef boost::shared_ptr<class Zoom2DHandler> Zoom2DHandlerPtr;
 
-/** Wrapper for a View that displays a RealTimeStream.
- *  Handles the connections between specific reps and the view.
+/** 
  *
- *  The view displays either a raw rt source or a us probe, depending on
- *  whats available.
- *
+ * \ingroup cx_service_visualization
+ * \date 2014-02-26
+ * \author christiana
  */
-class org_custusx_core_visualization_EXPORT ViewWrapperVideo: public ViewWrapper
+class org_custusx_core_view_EXPORT Zoom2DHandler : public QObject
 {
-Q_OBJECT
+	Q_OBJECT
 public:
-	ViewWrapperVideo(ViewPtr view, CoreServicesPtr backend);
-	virtual ~ViewWrapperVideo();
-	virtual ViewPtr getView();
-	virtual void setSlicePlanesProxy(SlicePlanesProxyPtr proxy) {}
-	virtual void updateView() {}
-	virtual void setViewGroup(ViewGroupDataPtr group);
+	Zoom2DHandler();
+
+	void addActionsToMenu(QMenu* contextMenu);
+	void setGroupData(ViewGroupDataPtr group);
+	double getFactor();
+	void setFactor(double factor);
 
 private slots:
-	void updateSlot();
-	void showSectorActionSlot(bool checked);
-	void connectStream();
-	void streamActionSlot();
-protected slots:
-	virtual void dataViewPropertiesChangedSlot(QString uid) {}
-
-protected:
-//	virtual void dataAdded(DataPtr data) {}
-//	virtual void dataRemoved(const QString& uid) {}
-	virtual void videoSourceChangedSlot(QString uid);
-
+	void zoom2DActionSlot();
+signals:
+	void zoomChanged();
 private:
-	VideoSourcePtr getSourceFromService(QString uid);
-	void addStreamAction(QString uid, QMenu* contextMenu);
-	void loadStream();
-	virtual void appendToContextMenu(QMenu& contextMenu);
-	void addReps();
-	void setupRep(VideoSourcePtr source, ToolPtr tool);
+	void setConnectivityFromType(QString type);
+	QString getConnectivityType();
+	void addConnectivityAction(QString type, QString text, QMenu *contextMenu);
+	void set(SyncedValuePtr value);
 
-	VideoFixedPlaneRepPtr mStreamRep;
-	VideoSourcePtr mSource;
-	DisplayTextRepPtr mPlaneTypeText;
-	DisplayTextRepPtr mDataNameText;
-	ViewPtr mView;
-	ToolPtr mTool;
+	SyncedValuePtr mZoom2D;
+	ViewGroupDataPtr mGroupData;
 };
-typedef boost::shared_ptr<ViewWrapperVideo> ViewWrapperVideoPtr;
 
-/**
-* @}
-*/
+
 } // namespace cx
 
-#endif /* CXVIEWWRAPPERRTSTREAM_H_ */
+
+
+#endif // CX2DZOOMHANDLER_H

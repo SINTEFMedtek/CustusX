@@ -8,7 +8,7 @@ cmake_policy(SET CMP0012 NEW)
 set(CX_PLUGINS
   ${CX_PLUGINS}
   org.custusx.core.patientmodel:ON
-  org.custusx.core.visualization:ON
+  org.custusx.core.view:ON
   org.custusx.core.tracking:ON
   org.custusx.core.video:ON
   org.custusx.core.state:ON

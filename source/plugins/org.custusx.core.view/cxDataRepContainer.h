@@ -29,46 +29,54 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXTESTMULTIVOLUME3DREPPRODUCERFIXTURE_H
-#define CXTESTMULTIVOLUME3DREPPRODUCERFIXTURE_H
 
-#include "cxtest_org_custusx_core_visualization_export.h"
+#ifndef CXDATAREPCONTAINER_H
+#define CXDATAREPCONTAINER_H
 
-#include <vtkGPUVolumeRayCastMapper.h>
-#include <vtkVolumeTextureMapper3D.h>
-#include <vtkVolume.h>
+#include "org_custusx_core_view_Export.h"
 
-#include "catch.hpp"
+#include "cxForwardDeclarations.h"
+#include "cxSettings.h"
 
-#include "cxVolumeHelpers.h"
-#include "cxVolumetricRep.h"
-#include "cxtestUtilities.h"
-
-#include "cxImage2DRep3D.h"
-
-#include "cxMultiVolume3DRepProducer.h"
-
-namespace cxtest
+namespace cx
 {
+typedef boost::shared_ptr<class SphereMetric> SphereMetricPtr;
 
-class CXTEST_ORG_CUSTUSX_CORE_VISUALIZATION_EXPORT MultiVolume3DRepProducerFixture
+/** Creates and manages a list of reps based on input Data objects.
+ *
+ *
+ * \ingroup cx_service_visualization
+ * \date 2014-03-27
+ * \author christiana
+ */
+typedef boost::shared_ptr<class DataRepContainer> DataRepContainerPtr;
+/** Creates and manages a list of reps based on input Data objects.
+  *
+  */
+class org_custusx_core_view_EXPORT DataRepContainer
 {
 public:
-	MultiVolume3DRepProducerFixture();
-	~MultiVolume3DRepProducerFixture();
-	void initializeVisualizerAndImages(QString type, int imageCount=1);
+	void setSliceProxy(SliceProxyPtr sliceProxy);
+	void setView(ViewPtr view);
 
-	template<class REP>
-	boost::shared_ptr<REP> downcastRep(int i)
-	{
-		return boost::dynamic_pointer_cast<REP>(mBase.getAllReps()[i]);
-	}
+	void updateSettings();
 
-	cx::MultiVolume3DRepProducer mBase;
-	std::vector<cx::ImagePtr> mImages;
+	void addData(DataPtr data);
+	void removeData(QString uid);
+private:
+	virtual void meshAdded(MeshPtr mesh);
+	virtual void pointMetricAdded(PointMetricPtr mesh);
+	void updateSettings(RepPtr rep);
+	void sphereMetricAdded(SphereMetricPtr mesh);
+
+	SliceProxyPtr mSliceProxy;
+	ViewPtr mView;
+
+	typedef std::map<QString, RepPtr> RepMap;
+	RepMap mDataReps;
 };
 
-} // namespace cxtest
 
+} // namespace cx
 
-#endif // CXTESTMULTIVOLUME3DREPPRODUCERFIXTURE_H
+#endif // CXDATAREPCONTAINER_H

@@ -29,43 +29,46 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXTESTMULTIVOLUME3DREPPRODUCERFIXTURE_H
+#define CXTESTMULTIVOLUME3DREPPRODUCERFIXTURE_H
 
-#ifndef CXVIEWPLUGINACTIVATOR_H_
-#define CXVIEWPLUGINACTIVATOR_H_
+#include "cxtest_org_custusx_core_view_export.h"
 
-#include <ctkPluginActivator.h>
-#include "boost/shared_ptr.hpp"
+#include <vtkGPUVolumeRayCastMapper.h>
+#include <vtkVolumeTextureMapper3D.h>
+#include <vtkVolume.h>
 
-namespace cx
+#include "catch.hpp"
+
+#include "cxVolumeHelpers.h"
+#include "cxVolumetricRep.h"
+#include "cxtestUtilities.h"
+
+#include "cxImage2DRep3D.h"
+
+#include "cxMultiVolume3DRepProducer.h"
+
+namespace cxtest
 {
 
-typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
-
-/**
- * Activator for the Visualization plugin
- *
- * \ingroup org_custusx_core_visualization
- * \date 2014-09-19
- * \author Ole Vegard Solberg
- */
-class VisualizationPluginActivator :  public QObject, public ctkPluginActivator
+class CXTEST_ORG_CUSTUSX_CORE_VIEW_EXPORT MultiVolume3DRepProducerFixture
 {
-	Q_OBJECT
-	Q_INTERFACES(ctkPluginActivator)
-	Q_PLUGIN_METADATA(IID "org_custusx_core_visualization")
-
 public:
+	MultiVolume3DRepProducerFixture();
+	~MultiVolume3DRepProducerFixture();
+	void initializeVisualizerAndImages(QString type, int imageCount=1);
 
-  VisualizationPluginActivator();
-  ~VisualizationPluginActivator();
+	template<class REP>
+	boost::shared_ptr<REP> downcastRep(int i)
+	{
+		return boost::dynamic_pointer_cast<REP>(mBase.getAllReps()[i]);
+	}
 
-  void start(ctkPluginContext* context);
-  void stop(ctkPluginContext* context);
-
-private:
-	RegisteredServicePtr mRegistration;
+	cx::MultiVolume3DRepProducer mBase;
+	std::vector<cx::ImagePtr> mImages;
 };
 
-} // namespace cx
+} // namespace cxtest
 
-#endif /* CXVIEWPLUGINACTIVATOR_H_ */
+
+#endif // CXTESTMULTIVOLUME3DREPPRODUCERFIXTURE_H

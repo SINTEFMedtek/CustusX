@@ -30,9 +30,42 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "catch.hpp"
+#ifndef CXVIEWPLUGINACTIVATOR_H_
+#define CXVIEWPLUGINACTIVATOR_H_
 
-TEST_CASE("VisualizationPlugin: Check nothing", "[unit][plugins][org.custusx.core.visualization][hide]")
+#include <ctkPluginActivator.h>
+#include "boost/shared_ptr.hpp"
+
+namespace cx
 {
-	CHECK(true);
-}
+
+typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
+
+/**
+ * Activator for the Visualization plugin
+ *
+ * \ingroup org_custusx_core_view
+ * \date 2014-09-19
+ * \author Ole Vegard Solberg
+ */
+class VisualizationPluginActivator :  public QObject, public ctkPluginActivator
+{
+	Q_OBJECT
+	Q_INTERFACES(ctkPluginActivator)
+	Q_PLUGIN_METADATA(IID "org_custusx_core_view")
+
+public:
+
+  VisualizationPluginActivator();
+  ~VisualizationPluginActivator();
+
+  void start(ctkPluginContext* context);
+  void stop(ctkPluginContext* context);
+
+private:
+	RegisteredServicePtr mRegistration;
+};
+
+} // namespace cx
+
+#endif /* CXVIEWPLUGINACTIVATOR_H_ */

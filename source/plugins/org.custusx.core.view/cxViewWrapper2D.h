@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVIEWWRAPPER2D_H_
 #define CXVIEWWRAPPER2D_H_
 
-#include "org_custusx_core_visualization_Export.h"
+#include "org_custusx_core_view_Export.h"
 
 #include <vector>
 #include <QPointer>
@@ -74,7 +74,7 @@ namespace cx
  *  Handles the connections between specific reps and the view.
  *
  */
-class org_custusx_core_visualization_EXPORT ViewWrapper2D: public ViewWrapper
+class org_custusx_core_view_EXPORT ViewWrapper2D: public ViewWrapper
 {
 Q_OBJECT
 public:

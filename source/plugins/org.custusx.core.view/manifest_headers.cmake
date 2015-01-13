@@ -1,5 +1,5 @@
 set(Require-Plugin org.custusx.core.patientmodel)
-set(Plugin-Name org.custusx.core.visualization)
+set(Plugin-Name org.custusx.core.view)
 set(Plugin-Version "0.1.0")
 set(Plugin-Vendor "SINTEF")
 set(Plugin-Category "org.custusx.core")

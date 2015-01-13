@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXREPMANAGER_H_
 #define CXREPMANAGER_H_
 
-#include "org_custusx_core_visualization_Export.h"
+#include "org_custusx_core_view_Export.h"
 
 #include <QObject>
 #include <map>
@@ -70,7 +70,7 @@ class Reporter;
  * \\author Janne Beate Bakeng, SINTEF
  * \\author Christian Askeland, SINTEF
  */
-class org_custusx_core_visualization_EXPORT RepManager: public QObject
+class org_custusx_core_view_EXPORT RepManager: public QObject
 {
 Q_OBJECT
 

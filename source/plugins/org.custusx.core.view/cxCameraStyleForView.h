@@ -29,29 +29,26 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXCameraStyleForViewFORVIEW_H
+#define CXCameraStyleForViewFORVIEW_H
 
-#ifndef CXVIEWGROUP_H_
-#define CXVIEWGROUP_H_
+#include "org_custusx_core_view_Export.h"
 
-#include "org_custusx_core_visualization_Export.h"
-
-#include <vector>
-#include <QObject>
-#include <QDomDocument>
-#include "cxDefinitions.h"
+#include "cxTransform3D.h"
 #include "cxForwardDeclarations.h"
-#include "cxVector3D.h"
-
+#include "cxEnumConverter.h"
+class QIcon;
+class QWidget;
 class QMenu;
-class QPoint;
+class QActionGroup;
 
 namespace cx
 {
-typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
-typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
-typedef boost::shared_ptr<class CameraStyle> CameraStylePtr;
+typedef boost::shared_ptr<class ViewportPreRenderListener> ViewportPreRenderListenerPtr;
 typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
-typedef boost::shared_ptr<class Navigation> NavigationPtr;
+
+typedef boost::shared_ptr<class CameraStyleForView> CameraStyleForViewPtr;
+using cx::Transform3D;
 
 /**
  * \file
@@ -60,53 +57,67 @@ typedef boost::shared_ptr<class Navigation> NavigationPtr;
  */
 
 
+enum org_custusx_core_view_EXPORT CAMERA_STYLE_TYPE
+{
+	cstDEFAULT_STYLE, cstTOOL_STYLE, cstANGLED_TOOL_STYLE, cstUNICAM_STYLE, cstCOUNT
+};
+
+
 /**
- * \brief
+ * \class CameraStyleForView
  *
- * \date 18. mars 2010
- * \\author jbake
+ * Controls the current camera style of the 3d view.
+ * Refactored from class View3D.
+ * Refactored from class CameraStyle.
+ *
+ * \date Dec 9, 2008
+ * \author Janne Beate Bakeng, SINTEF
+ * \author Christian Askeland, SINTEF
  */
-class org_custusx_core_visualization_EXPORT ViewGroup: public QObject
+class org_custusx_core_view_EXPORT CameraStyleForView: public QObject
 {
 Q_OBJECT
 public:
-	explicit ViewGroup(CoreServicesPtr backend);
-	virtual ~ViewGroup();
+	explicit CameraStyleForView(CoreServicesPtr backend);
+	void setView(ViewPtr widget);
 
-	void addView(ViewWrapperPtr wrapper);
-	void removeViews();
-	ViewWrapperPtr getViewWrapperFromViewUid(QString viewUid);
-	std::vector<ViewWrapperPtr> getWrappers() const { return mViewWrappers; }
-	std::vector<ViewPtr> getViews() const;
-	ViewGroupDataPtr getData() { return mViewGroupData; }
-	virtual void addXml(QDomNode& dataNode); ///< store internal state info in dataNode
-	virtual void parseXml(QDomNode dataNode); ///< load internal state info from dataNode
-	void clearPatientData();
-	CameraStylePtr getCameraStyle() { return mCameraStyle; }
-
-	bool contains3DView() const;
-	void syncOrientationMode(SyncedValuePtr val);
-	void initializeActiveView(SyncedValuePtr val);
+	/** Select tool style. This replaces the vtkInteractor Style.
+	  */
+	void setCameraStyle(CAMERA_STYLE_TYPE style);
 
 private slots:
-//	void activateManualToolSlot();
-	void mouseClickInViewGroupSlot();
+	void setModified();
+	void activeToolChangedSlot();
 
-protected:
-	std::vector<ViewPtr> mViews;
+private:
+	ViewPtr getView() const;
+	vtkRendererPtr getRenderer() const;
+	vtkCameraPtr getCamera() const;
+	ToolRep3DPtr getToolRep() const;
+	bool isToolFollowingStyle(CAMERA_STYLE_TYPE style) const;
+	void onPreRender();
+	void moveCameraToolStyleSlot(Transform3D prMt, double timestamp); ///< receives transforms from the tool which the camera should follow
 
-	ViewGroupDataPtr mViewGroupData;
-	std::vector<ViewWrapperPtr> mViewWrappers;
-	CameraStylePtr mCameraStyle;
+	void connectTool();
+	void disconnectTool();
+	void viewportChangedSlot();
+	void updateCamera();
+
+	CAMERA_STYLE_TYPE mCameraStyleForView; ///< the current CameraStyleForView
+	ToolPtr mFollowingTool; ///< the tool the camera is following
+	ViewportListenerPtr mViewportListener;
+	ViewportPreRenderListenerPtr mPreRenderListener;
+	bool mBlockCameraUpdate; ///< for breaking a camera update loop
+
+	ViewPtr mView;
 	CoreServicesPtr mBackend;
-	SyncedValuePtr mActiveView;
 };
-
-bool isViewWrapper2D(ViewWrapperPtr wrapper);
 
 /**
  * @}
  */
-} // namespace cx
+} //namespace cx
 
-#endif /* CXVIEWGROUP_H_ */
+SNW_DECLARE_ENUM_STRING_CONVERTERS(cx, CAMERA_STYLE_TYPE);
+
+#endif // CXCameraStyleForViewFORVIEW_H

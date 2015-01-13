@@ -29,54 +29,87 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXMULTIVOLUME3DREPPRODUCER_H
+#define CXMULTIVOLUME3DREPPRODUCER_H
 
-#ifndef CXDATAREPCONTAINER_H
-#define CXDATAREPCONTAINER_H
+#include "org_custusx_core_view_Export.h"
 
-#include "org_custusx_core_visualization_Export.h"
-
-#include "cxForwardDeclarations.h"
-#include "cxSettings.h"
+#include <QObject>
+#include <QPointer>
+#include <boost/shared_ptr.hpp>
+#include "cxImage.h"
+#include "cxRep.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class SphereMetric> SphereMetricPtr;
 
-/** Creates and manages a list of reps based on input Data objects.
+typedef boost::shared_ptr<class MultiVolume3DRepProducer> MultiVolume3DVisualizerPtr;
+
+/** 
  *
  *
  * \ingroup cx_service_visualization
- * \date 2014-03-27
- * \author christiana
+ * \date 4 Sep 2013
+ * \author Christian Askeland, SINTEF
+ * \author Ole Vegard Solberg, SINTEF
  */
-typedef boost::shared_ptr<class DataRepContainer> DataRepContainerPtr;
-/** Creates and manages a list of reps based on input Data objects.
-  *
-  */
-class org_custusx_core_visualization_EXPORT DataRepContainer
+class org_custusx_core_view_EXPORT MultiVolume3DRepProducer : public QObject
 {
+	Q_OBJECT
 public:
-	void setSliceProxy(SliceProxyPtr sliceProxy);
+	MultiVolume3DRepProducer();
+	~MultiVolume3DRepProducer();
+
 	void setView(ViewPtr view);
+	void setMaxRenderSize(int voxels);
+	int getMaxRenderSize() const;
+	void setVisualizerType(QString type);
+	void addImage(ImagePtr image);
+	void removeImage(QString uid);
+	std::vector<RepPtr> getAllReps();
+//	static QStringList getAvailableVisualizers();
+//	static std::map<QString, QString> getAvailableVisualizerDisplayNames();
+	void removeRepsFromView();
 
-	void updateSettings();
+signals:
+	void imagesChanged();
 
-	void addData(DataPtr data);
-	void removeData(QString uid);
+private slots:
+	void clearReps();
+
 private:
-	virtual void meshAdded(MeshPtr mesh);
-	virtual void pointMetricAdded(PointMetricPtr mesh);
-	void updateSettings(RepPtr rep);
-	void sphereMetricAdded(SphereMetricPtr mesh);
-
-	SliceProxyPtr mSliceProxy;
+	QString mVisualizerType;
+	std::vector<ImagePtr> m2DImages;
+	std::vector<ImagePtr> m3DImages;
+	std::vector<RepPtr> mReps;
+	int mMaxRenderSize;
 	ViewPtr mView;
 
-	typedef std::map<QString, RepPtr> RepMap;
-	RepMap mDataReps;
-};
+	void updateRepsInView();
+	void fillReps();
+	bool contains(ImagePtr image) const;
 
+	void rebuildReps();
+	void rebuild2DReps();
+	void rebuild3DReps();
+
+	void addRepsToView();
+
+	ImagePtr removeImageFromVector(QString uid, std::vector<ImagePtr> &images);
+
+	void buildVtkOpenGLGPUMultiVolumeRayCastMapper();
+	void buildVtkVolumeTextureMapper3D(ImagePtr image);
+	void buildVtkGPUVolumeRayCastMapper(ImagePtr image);
+	bool is2DImage(ImagePtr image) const;
+	void buildSscImage2DRep3D(ImagePtr image);
+
+	void buildSingleVolumeRenderer(ImagePtr image);
+	bool isSingleVolumeRenderer() const;
+
+};
 
 } // namespace cx
 
-#endif // CXDATAREPCONTAINER_H
+
+
+#endif // CXMULTIVOLUME3DREPPRODUCER_H

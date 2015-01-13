@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVIEWWRAPPER_H_
 #define CXVIEWWRAPPER_H_
 
-#include "org_custusx_core_visualization_Export.h"
+#include "org_custusx_core_view_Export.h"
 
 #include <vector>
 #include <QVariant>
@@ -65,7 +65,7 @@ typedef boost::shared_ptr<class DataViewPropertiesInteractor> DataViewProperties
 /** Provide an action list for showing data in views.
   *
   */
-class org_custusx_core_visualization_EXPORT DataViewPropertiesInteractor : public QObject
+class org_custusx_core_view_EXPORT DataViewPropertiesInteractor : public QObject
 {
 	Q_OBJECT
 public:
@@ -91,7 +91,7 @@ private:
  * \date 6. apr. 2010
  * \\author jbake
  */
-class org_custusx_core_visualization_EXPORT ViewWrapper: public QObject
+class org_custusx_core_view_EXPORT ViewWrapper: public QObject
 {
 Q_OBJECT
 public:

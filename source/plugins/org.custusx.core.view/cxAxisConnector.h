@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXAXISCONNECTOR_H
 #define CXAXISCONNECTOR_H
 
-#include "org_custusx_core_visualization_Export.h"
+#include "org_custusx_core_view_Export.h"
 
 #include <QObject>
 #include "cxForwardDeclarations.h"
@@ -51,7 +51,7 @@ typedef boost::shared_ptr<class SpaceListener> SpaceListenerPtr;
  * \date 5 Sep 2013, 2013
  * \author christiana
  */
-class org_custusx_core_visualization_EXPORT AxisConnector : public QObject
+class org_custusx_core_view_EXPORT AxisConnector : public QObject
 {
 	Q_OBJECT
 	public:
