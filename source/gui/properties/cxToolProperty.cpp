@@ -42,7 +42,7 @@ namespace cx
 
 StringPropertyActiveTool::StringPropertyActiveTool()
 {
-  connect(trackingService().get(), SIGNAL(dominantToolChanged(const QString&)), this, SIGNAL(changed()));
+  connect(trackingService().get(), SIGNAL(activeToolChanged(const QString&)), this, SIGNAL(changed()));
   connect(trackingService().get(), &TrackingService::stateChanged, this, &StringPropertyActiveTool::changed);
 }
 
@@ -71,7 +71,7 @@ QString StringPropertyActiveTool::getValue() const
 
 QString StringPropertyActiveTool::getHelp() const
 {
-  return "select the active (dominant) tool";
+  return "select the active tool";
 }
 
 QStringList StringPropertyActiveTool::getValueRange() const
@@ -105,12 +105,12 @@ QString StringPropertyActiveTool::convertInternal2Display(QString internal)
 
 StringPropertyActiveProbeConfiguration::StringPropertyActiveProbeConfiguration()
 {
-  connect(trackingService().get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChanged()));
-  connect(trackingService().get(), &TrackingService::stateChanged, this, &StringPropertyActiveProbeConfiguration::dominantToolChanged);
-  this->dominantToolChanged();
+  connect(trackingService().get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(activeToolChanged()));
+  connect(trackingService().get(), &TrackingService::stateChanged, this, &StringPropertyActiveProbeConfiguration::activeToolChanged);
+  this->activeToolChanged();
 }
 
-void StringPropertyActiveProbeConfiguration::dominantToolChanged()
+void StringPropertyActiveProbeConfiguration::activeToolChanged()
 {
 	// ignore tool changes to something non-probeish.
 	// This gives the user a chance to use the widget without having to show the probe.

@@ -44,22 +44,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLegacySingletons.h"
 #include "cxPatientModelService.h"
 #include "cxLogicManager.h"
-#include "cxVisualizationService.h"
+#include "cxViewService.h"
 
 namespace cx
 {
 
-ClipPlaneStringDataAdapter::ClipPlaneStringDataAdapter(InteractiveClipperPtr clipper) :
+StringPropertyClipPlane::StringPropertyClipPlane(InteractiveClipperPtr clipper) :
 	mInteractiveClipper(clipper)
 {
 	connect(mInteractiveClipper.get(), SIGNAL(changed()), this, SIGNAL(changed()));
 }
 
-QString ClipPlaneStringDataAdapter::getDisplayName() const
+QString StringPropertyClipPlane::getDisplayName() const
 {
 	return "Slice Plane";
 }
-bool ClipPlaneStringDataAdapter::setValue(const QString& value)
+bool StringPropertyClipPlane::setValue(const QString& value)
 {
 	PLANE_TYPE plane = string2enum<PLANE_TYPE> (value);
 	if (plane == mInteractiveClipper->getSlicePlane())
@@ -67,15 +67,15 @@ bool ClipPlaneStringDataAdapter::setValue(const QString& value)
 	mInteractiveClipper->setSlicePlane(plane);
 	return true;
 }
-QString ClipPlaneStringDataAdapter::getValue() const
+QString StringPropertyClipPlane::getValue() const
 {
 	return qstring_cast(mInteractiveClipper->getSlicePlane());
 }
-QString ClipPlaneStringDataAdapter::getHelp() const
+QString StringPropertyClipPlane::getHelp() const
 {
 	return "Chose the slice plane to clip with.";
 }
-QStringList ClipPlaneStringDataAdapter::getValueRange() const
+QStringList StringPropertyClipPlane::getValueRange() const
 {
 	std::vector<PLANE_TYPE> planes = mInteractiveClipper->getAvailableSlicePlanes();
 	QStringList retval;
@@ -109,7 +109,7 @@ ClippingWidget::ClippingWidget(PatientModelServicePtr patientModelService, QWidg
 	layout->addWidget(activeClipGroupBox);
 	QVBoxLayout* activeClipLayout = new QVBoxLayout(activeClipGroupBox);
 
-	mPlaneAdapter = ClipPlaneStringDataAdapter::New(mInteractiveClipper);
+	mPlaneAdapter = StringPropertyClipPlane::New(mInteractiveClipper);
 	LabeledComboBoxWidget* combo = new LabeledComboBoxWidget(this, mPlaneAdapter);
 
 	mUseClipperCheckBox = new QCheckBox("Use Clipper");

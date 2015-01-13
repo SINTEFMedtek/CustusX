@@ -45,7 +45,7 @@ typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
 
 /** Base class for all Properties that selects a Data or descendants.
  *
- *  \ingroup cx_resource_core_dataAdapters
+ *  \ingroup cx_resource_core_properties
  *  \date 2014-09-11
  *  \author Christian Askeland, SINTEF
  *  \author Ole Vegard Solberg, SINTEF

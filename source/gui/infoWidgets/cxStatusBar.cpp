@@ -51,9 +51,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxManualTool.h"
 #include "cxTypeConversions.h"
 #include "cxDefinitionStrings.h"
-#include "cxDominantToolProxy.h"
+#include "cxActiveToolProxy.h"
 #include "cxLogicManager.h"
-#include "cxVisualizationService.h"
+#include "cxViewService.h"
 
 #include "cxLogMessageFilter.h"
 #include "cxMessageListener.h"
@@ -73,10 +73,10 @@ StatusBar::StatusBar() :
 	connect(trackingService().get(), &TrackingService::stateChanged, this, &StatusBar::resetToolManagerConnection);
 
 	cx::TrackingServicePtr ts = cx::logicManager()->getTrackingService();
-	mActiveTool = DominantToolProxy::New(ts);
-	connect(mActiveTool.get(), &DominantToolProxy::tps, this, &StatusBar::tpsSlot);
+	mActiveTool = ActiveToolProxy::New(ts);
+	connect(mActiveTool.get(), &ActiveToolProxy::tps, this, &StatusBar::tpsSlot);
 
-	connect(trackingService().get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(updateToolButtons()));
+	connect(trackingService().get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(updateToolButtons()));
 
 	connect(viewService().get(), SIGNAL(fps(int)), this, SLOT(renderingFpsSlot(int)));
 
@@ -156,18 +156,18 @@ void StatusBar::activateTool(QString uid)
 
 void StatusBar::updateToolButtons()
 {
-	ToolPtr dominant = trackingService()->getActiveTool();
+	ToolPtr activeTool = trackingService()->getActiveTool();
 
 	for (unsigned i = 0; i < mToolData.size(); ++i)
 	{
 		ToolData current = mToolData[i];
 		ToolPtr tool = current.mTool;
-		QString color = this->getToolStyle(tool->getVisible(), tool->isInitialized(), dominant == tool);
+		QString color = this->getToolStyle(tool->getVisible(), tool->isInitialized(), activeTool == tool);
 		current.mButton->setStyleSheet(QString("QToolButton { %1; }").arg(color));
 
 		if (!tool->isInitialized())
 			current.mAction->setToolTip("Tool is not Initialized");
-		else if (dominant == tool)
+		else if (activeTool == tool)
 			current.mAction->setToolTip("Active Tool");
 		else if (tool->getVisible())
 			current.mAction->setToolTip("Tool not visible/not tracking");
@@ -176,14 +176,14 @@ void StatusBar::updateToolButtons()
 	}
 }
 
-QString StatusBar::getToolStyle(bool visible, bool initialized, bool dominant)
+QString StatusBar::getToolStyle(bool visible, bool initialized, bool active)
 {
 	if (!initialized)
 		return QString("background-color: silver");
 
 	if (visible)
 	{
-		if (dominant)
+		if (active)
 			return QString("background-color: lime");
 		else
 			return QString("background-color: green");

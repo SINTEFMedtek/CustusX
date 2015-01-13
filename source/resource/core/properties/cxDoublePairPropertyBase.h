@@ -46,7 +46,7 @@ namespace cx
 /**
  *
  * \brief Abstract interface for interaction with internal data structure: A pair of doubles
- * \ingroup cx_resource_core_dataadapters
+ * \ingroup cx_resource_core_properties
  *
  * \date Juli 31, 2014
  * \author Ole Vegard Solberg, SINTEF

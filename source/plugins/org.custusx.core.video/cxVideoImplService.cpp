@@ -74,7 +74,7 @@ VideoImplService::VideoImplService(ctkPluginContext *context) :
 	connect(mVideoConnection.get(), &VideoConnection::connected, this, &VideoImplService::autoSelectActiveVideoSource);
 	connect(mVideoConnection.get(), &VideoConnection::videoSourcesChanged, this, &VideoImplService::autoSelectActiveVideoSource);
 	connect(mVideoConnection.get(), &VideoConnection::fps, this, &VideoImplService::fpsSlot);
-	connect(mBackend->getToolManager().get(), &TrackingService::dominantToolChanged, this, &VideoImplService::autoSelectActiveVideoSource);
+	connect(mBackend->getToolManager().get(), &TrackingService::activeToolChanged, this, &VideoImplService::autoSelectActiveVideoSource);
 	connect(mVideoConnection.get(), &VideoConnection::connected, this, &VideoImplService::connected);
 
 	this->initServiceListener();

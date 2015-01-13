@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxView.h"
 #include "cxRegistrationProperties.h"
 #include "cxRegistrationService.h"
-#include "cxVisualizationService.h"
+#include "cxViewService.h"
 #include "cxViewGroupData.h"
 #include "cxRepContainer.h"
 //TODO: remove
@@ -71,8 +71,8 @@ LandmarkImage2ImageRegistrationWidget::LandmarkImage2ImageRegistrationWidget(Reg
 	connect(services.registrationService.get(), &RegistrationService::movingDataChanged,
 			this, &LandmarkImage2ImageRegistrationWidget::updateRep);
 
-	mFixedDataAdapter.reset(new StringPropertyRegistrationFixedImage(services.registrationService, services.patientModelService));
-	mMovingDataAdapter.reset(new StringPropertyRegistrationMovingImage(services.registrationService, services.patientModelService));
+	mFixedProperty.reset(new StringPropertyRegistrationFixedImage(services.registrationService, services.patientModelService));
+	mMovingProperty.reset(new StringPropertyRegistrationMovingImage(services.registrationService, services.patientModelService));
 
 	mTranslationCheckBox = new QCheckBox("Translation only", this);
 	mTranslationCheckBox->setChecked(settings()->value("registration/I2ILandmarkTranslation", false).toBool());
@@ -82,8 +82,8 @@ LandmarkImage2ImageRegistrationWidget::LandmarkImage2ImageRegistrationWidget(Reg
 	mRegisterButton->setToolTip("Perform registration");
 	connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
 
-	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mFixedDataAdapter));
-	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mMovingDataAdapter));
+	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mFixedProperty));
+	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mMovingProperty));
 	mVerticalLayout->addWidget(mTranslationCheckBox);
 	mVerticalLayout->addWidget(mAvarageAccuracyLabel);
 

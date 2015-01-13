@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxSpaceProperty.h"
 #include "cxVector3DProperty.h"
-#include "cxDominantToolProxy.h"
+#include "cxActiveToolProxy.h"
 #include "cxPointMetric.h"
 
 namespace cx
@@ -71,7 +71,7 @@ private:
 	QHBoxLayout* mLayout;
 	SpacePropertyPtr mSpaceSelector;
 	SpaceListenerPtr mListener;
-	DominantToolProxyPtr mActiveTool;
+	ActiveToolProxyPtr mActiveTool;
 	QLineEdit* mCoordLineEdit;
 	QAction* mAdvancedAction;
 	QHBoxLayout* mAdvancedLayout;

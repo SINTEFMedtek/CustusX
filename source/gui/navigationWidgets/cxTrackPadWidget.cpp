@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxCameraControl.h"
 #include "cxBoundingBox3D.h"
 #include "cxView.h"
-#include "cxVisualizationService.h"
+#include "cxViewService.h"
 
 //TODO: remove
 #include "cxLegacySingletons.h"

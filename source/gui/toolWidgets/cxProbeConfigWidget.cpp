@@ -90,8 +90,8 @@ ProbeConfigWidget::ProbeConfigWidget(QWidget* parent) : BaseWidget(parent, "Prob
 	topLayout->addWidget(sectorGroupBox);
 
 	sectorLayout->addWidget(mOriginWidget);
-	DoublePairPropertyPtr dataAdapter = DoublePairProperty::initialize("Depth", "Depth", "Define probe depth.\nUnits in pixels.", DoubleRange(0, 1000, 1), 1);
-	mDepthWidget = new SliderRangeGroupWidget(this, dataAdapter);
+	DoublePairPropertyPtr depthProperty = DoublePairProperty::initialize("Depth", "Depth", "Define probe depth.\nUnits in pixels.", DoubleRange(0, 1000, 1), 1);
+	mDepthWidget = new SliderRangeGroupWidget(this, depthProperty);
 	connect(mDepthWidget, SIGNAL(valueChanged(double, double)), this, SLOT(guiProbeSectorChanged()));
 	sectorLayout->addWidget(mDepthWidget);
 

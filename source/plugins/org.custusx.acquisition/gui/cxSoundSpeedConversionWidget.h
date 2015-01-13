@@ -75,7 +75,7 @@ public:
 
 public slots:
   void applySoundSpeedCompensationFactorSlot(); ///< sets the sounds speed conversion factor on the rt source
-  void setToolSlot(const QString& uid); ///< convenient slot for connecting to the toolmanagers dominantToolChanged signal
+  void setToolSlot(const QString& uid); ///< convenient slot for connecting to the toolmanagers activeToolChanged signal
 
 private slots:
   void waterSoundSpeedChangedSlot();

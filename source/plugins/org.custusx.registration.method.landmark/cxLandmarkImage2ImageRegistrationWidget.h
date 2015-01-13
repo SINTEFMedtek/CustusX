@@ -87,8 +87,8 @@ protected:
 	ImageLandmarksSourcePtr mMovingLandmarkSource;
 
 	//gui
-	StringPropertyRegistrationFixedImagePtr mFixedDataAdapter;
-	StringPropertyRegistrationMovingImagePtr mMovingDataAdapter;
+	StringPropertyRegistrationFixedImagePtr mFixedProperty;
+	StringPropertyRegistrationMovingImagePtr mMovingProperty;
 
 	QPushButton* mRegisterButton;
 	QCheckBox* mTranslationCheckBox;

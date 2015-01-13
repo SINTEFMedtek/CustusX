@@ -104,7 +104,7 @@ public:
 	virtual ToolMap getTools(); ///< get all configured and initialized tools
 	virtual ToolPtr getTool(const QString& uid); ///< get a specific tool
 
-	virtual ToolPtr getActiveTool(); ///< get the dominant tool
+	virtual ToolPtr getActiveTool();
 	virtual void setActiveTool(const QString& uid); ///< can be set to either a connected or configured tool
 
 	virtual ToolPtr getReferenceTool() const; ///< get the tool that is used as a reference, if any
@@ -128,7 +128,7 @@ public:
 private slots:
 	void globalConfigurationFileChangedSlot(QString key);
 	void onSystemStateChanged();
-	void dominantCheckSlot(); ///< checks if the visible tool is going to be set as dominant tool
+	void activeCheckSlot(); ///< checks if the visible tool is going to be set as active tool
 	void onTooltipOffset(double val);
 
 	void onSessionChanged();
@@ -155,7 +155,7 @@ private:
 	QString getLoggingFolder();
 
 	ToolMap mTools; ///< all tools
-	ToolPtr mDominantTool; ///< the tool with highest priority
+	ToolPtr mActiveTool; ///< the tool with highest priority
 	ToolPtr mReferenceTool; ///< the tool which is used as patient reference tool
 	ManualToolAdapterPtr mManualTool; ///< a mouse-controllable virtual tool that is available even when not tracking.
 

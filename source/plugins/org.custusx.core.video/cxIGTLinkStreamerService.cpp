@@ -68,8 +68,6 @@ StringPropertyBasePtr IGTLinkStreamerService::getIPOption(QDomElement root)
 	retval = StringProperty::initialize("ip_scanner", "Address", "TCP/IP Address",
 											  defaultValue, root);
 	retval->setGroup("Connection");
-	//		connect(retval.get(), &StringDataAdapterXml::valueWasSet,
-	//		        this, &IGTLinkStreamerService::sendOptions);
 	return retval;
 }
 
@@ -82,8 +80,6 @@ DoublePropertyBasePtr IGTLinkStreamerService::getStreamPortOption(QDomElement ro
 	retval->setGuiRepresentation(DoublePropertyBase::grSPINBOX);
 	retval->setAdvanced(true);
 	retval->setGroup("Connection");
-	//		connect(retval.get(), &DoubleProperty::valueWasSet,
-	//		        this, &IGTLinkStreamerService::sendOptions);
 	return retval;
 }
 

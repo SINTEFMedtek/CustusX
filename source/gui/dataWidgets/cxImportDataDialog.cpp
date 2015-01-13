@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImageLUT2D.h"
 #include "cxPatientModelService.h"
 #include "cxMesh.h"
-#include "cxVisualizationService.h"
+#include "cxViewService.h"
 
 
 //TODO: remove

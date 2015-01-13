@@ -51,7 +51,7 @@ class QToolButton;
 namespace cx
 {
 
-typedef boost::shared_ptr<class DominantToolProxy> DominantToolProxyPtr;
+typedef boost::shared_ptr<class ActiveToolProxy> ActiveToolProxyPtr;
 typedef boost::shared_ptr<class MessageFilterStatusBar> MessageFilterStatusBarPtr;
 
 /** Filter log messages for display in the StatusBar
@@ -100,8 +100,6 @@ public:
 private slots:
   void connectToToolSignals(); ///< connect to all available tools
   void disconnectFromToolSignals(); ///< disconnect from all tool
-//  void receiveToolVisible(); ///< updates the color label for a tool
-//  void receiveToolDominant(); ///< updates the color label for a tool
   void renderingFpsSlot(int numFps); ///< Show rendered frames per seconds
   void grabbingFpsSlot(int numFps); ///< Show grabbed frames per seconds
   void grabberConnectedSlot(bool connected);
@@ -112,14 +110,14 @@ private slots:
 
 private:
   void activateTool(QString uid);
-  QString getToolStyle(bool visible, bool initialized, bool dominant);
+  QString getToolStyle(bool visible, bool initialized, bool active);
 
   QLabel* mRenderingFpsLabel; ///< Label for showing rendering FPS
   QLabel* mGrabbingInfoLabel; ///< Label for showing info about the grabber
   QLabel* mTpsLabel; ///< Label for showing TPS
 //  QLabel* mMessageLevelLabel;
   QToolButton* mMessageLevelLabel;
-  DominantToolProxyPtr mActiveTool;
+  ActiveToolProxyPtr mActiveTool;
   MessageListenerPtr mMessageListener;
 
   struct ToolData

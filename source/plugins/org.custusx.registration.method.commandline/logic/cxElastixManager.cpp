@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationService.h"
 #include "cxRegistrationTransform.h"
 #include "cxPatientModelService.h"
-#include "cxVisualizationService.h"
+#include "cxViewService.h"
 #include "cxVolumeHelpers.h"
 #include "cxLogger.h"
 

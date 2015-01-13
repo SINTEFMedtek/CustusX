@@ -97,8 +97,8 @@ void SpaceListenerImpl::doConnect()
 
 			if (mSpace.mRefObject == "active")
 			{
-//				connect(mTrackingService.get(), SIGNAL(dominantToolChanged(const QString&)), this, SIGNAL(changed()));
-				connect(mTrackingService.get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(reconnect()));
+//				connect(mTrackingService.get(), SIGNAL(activeToolChanged(const QString&)), this, SIGNAL(changed()));
+				connect(mTrackingService.get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(reconnect()));
 			}
 			connect(mDataManager.get(), SIGNAL(rMprChanged()), this, SIGNAL(changed()));
 		}
@@ -132,8 +132,8 @@ void SpaceListenerImpl::doDisconnect()
 
 			if (mSpace.mRefObject == "active")
 			{
-				disconnect(mTrackingService.get(), SIGNAL(dominantToolChanged(const QString&)), this, SIGNAL(changed()));
-				disconnect(mTrackingService.get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(reconnect()));
+				disconnect(mTrackingService.get(), SIGNAL(activeToolChanged(const QString&)), this, SIGNAL(changed()));
+				disconnect(mTrackingService.get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(reconnect()));
 			}
 			disconnect(mDataManager.get(), SIGNAL(rMprChanged()), this, SIGNAL(changed()));
 		}

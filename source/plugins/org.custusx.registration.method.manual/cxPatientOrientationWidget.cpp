@@ -62,9 +62,9 @@ PatientOrientationWidget::PatientOrientationWidget(RegServices services, QWidget
   connect(services.patientModelService.get(), &PatientModelService::debugModeChanged,
 		  this, &PatientOrientationWidget::enableToolSampleButtonSlot);
 
-  mDominantToolProxy =  DominantToolProxy::New(trackingService());
-  connect(mDominantToolProxy.get(), SIGNAL(toolVisible(bool)), this, SLOT(enableToolSampleButtonSlot()));
-  connect(mDominantToolProxy.get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(enableToolSampleButtonSlot()));
+  mActiveToolProxy =  ActiveToolProxy::New(trackingService());
+  connect(mActiveToolProxy.get(), SIGNAL(toolVisible(bool)), this, SLOT(enableToolSampleButtonSlot()));
+  connect(mActiveToolProxy.get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(enableToolSampleButtonSlot()));
   this->enableToolSampleButtonSlot();
 
 }

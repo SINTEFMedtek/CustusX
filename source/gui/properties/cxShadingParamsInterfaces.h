@@ -50,12 +50,12 @@ namespace cx
 
 /** Superclass for all shading parameters
  */
-class cxGui_EXPORT DoubleDataAdapterShadingBase : public DoublePropertyBase
+class cxGui_EXPORT DoublePropertyShadingBase : public DoublePropertyBase
 {
   Q_OBJECT 
 public:
-  DoubleDataAdapterShadingBase(PatientModelServicePtr patientModelService);
-  virtual ~DoubleDataAdapterShadingBase() {}
+  DoublePropertyShadingBase(PatientModelServicePtr patientModelService);
+  virtual ~DoublePropertyShadingBase() {}
   //virtual double getValue() const;
   //virtual bool setValue(double val);
   virtual void connectValueSignals(bool on) {}  
@@ -69,12 +69,12 @@ protected:
   
 /** Interface for setting the ambient parameter for the shading.
  */
-class cxGui_EXPORT DoubleDataAdapterShadingAmbient : public DoubleDataAdapterShadingBase
+class cxGui_EXPORT DoublePropertyShadingAmbient : public DoublePropertyShadingBase
 {
   Q_OBJECT
 public:
-  DoubleDataAdapterShadingAmbient(PatientModelServicePtr patientModelService);
-  virtual ~DoubleDataAdapterShadingAmbient() {}
+  DoublePropertyShadingAmbient(PatientModelServicePtr patientModelService);
+  virtual ~DoublePropertyShadingAmbient() {}
   virtual QString getDisplayName() const { return "Ambient"; }
   DoubleRange getValueRange() const  { return DoubleRange(0.0, 1.0, 0.01); }
   virtual double getValue() const;
@@ -83,12 +83,12 @@ public:
 
 /** Interface for setting the diffuse parameter for the shading.
  */
-class cxGui_EXPORT DoubleDataAdapterShadingDiffuse : public DoubleDataAdapterShadingBase
+class cxGui_EXPORT DoublePropertyShadingDiffuse : public DoublePropertyShadingBase
 {
   Q_OBJECT
 public:
-  DoubleDataAdapterShadingDiffuse(PatientModelServicePtr patientModelService);
-  virtual ~DoubleDataAdapterShadingDiffuse() {}
+  DoublePropertyShadingDiffuse(PatientModelServicePtr patientModelService);
+  virtual ~DoublePropertyShadingDiffuse() {}
   virtual QString getDisplayName() const { return "Diffuse"; }
   DoubleRange getValueRange() const  { return DoubleRange(0.0, 1.0, 0.01); }
   virtual double getValue() const;
@@ -97,12 +97,12 @@ public:
 
 /** Interface for setting the specular parameter for the shading.
  */
-class cxGui_EXPORT DoubleDataAdapterShadingSpecular : public DoubleDataAdapterShadingBase
+class cxGui_EXPORT DoublePropertyShadingSpecular : public DoublePropertyShadingBase
 {
   Q_OBJECT
 public:
-  DoubleDataAdapterShadingSpecular(PatientModelServicePtr patientModelService);
-  virtual ~DoubleDataAdapterShadingSpecular() {}
+  DoublePropertyShadingSpecular(PatientModelServicePtr patientModelService);
+  virtual ~DoublePropertyShadingSpecular() {}
   virtual QString getDisplayName() const { return "Specular"; }
   DoubleRange getValueRange() const  { return DoubleRange(0.0, 4.0, 0.01); }
   virtual double getValue() const;
@@ -111,12 +111,12 @@ public:
 
 /** Interface for setting the specular power parameter for the shading.
   */
-class cxGui_EXPORT DoubleDataAdapterShadingSpecularPower : public DoubleDataAdapterShadingBase
+class cxGui_EXPORT DoublePropertyShadingSpecularPower : public DoublePropertyShadingBase
 {
   Q_OBJECT
 public:
-  DoubleDataAdapterShadingSpecularPower(PatientModelServicePtr patientModelService);
-  virtual ~DoubleDataAdapterShadingSpecularPower() {}
+  DoublePropertyShadingSpecularPower(PatientModelServicePtr patientModelService);
+  virtual ~DoublePropertyShadingSpecularPower() {}
   virtual QString getDisplayName() const { return "Specular Power"; }
   DoubleRange getValueRange() const  { return DoubleRange(0.0, 50.0, 0.01); }
   virtual double getValue() const;

@@ -123,12 +123,12 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
 
   connect(trackingService().get(), &TrackingService::stateChanged, this, &ToolPropertiesWidget::referenceToolChangedSlot);
 
-  connect(trackingService().get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
+  connect(trackingService().get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(activeToolChangedSlot()));
 
   connect(trackingService().get(), &TrackingService::stateChanged, this, &ToolPropertiesWidget::updateSlot);
-  connect(trackingService().get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(updateSlot()));
+  connect(trackingService().get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(updateSlot()));
 
-  this->dominantToolChangedSlot();
+  this->activeToolChangedSlot();
   this->referenceToolChangedSlot();
   this->updateSlot();
   this->manualToolChanged();
@@ -188,7 +188,7 @@ void ToolPropertiesWidget::spacesChangedSlot()
 	this->manualToolChanged();
 }
 
-void ToolPropertiesWidget::dominantToolChangedSlot()
+void ToolPropertiesWidget::activeToolChangedSlot()
 {
   if (mActiveTool)
     disconnect(mActiveTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateSlot()));

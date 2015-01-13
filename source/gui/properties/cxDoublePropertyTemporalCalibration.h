@@ -46,15 +46,15 @@ namespace cx
  * @{
  */
 
-/** Interface to the tool offset of the dominant tool
+/** Interface to the tool offset of the active tool
  */
-class cxGui_EXPORT DoubleDataAdapterTimeCalibration : public DoublePropertyBase
+class cxGui_EXPORT DoublePropertyTimeCalibration : public DoublePropertyBase
 {
   Q_OBJECT
 public:
   static DoublePropertyBasePtr New();
-  DoubleDataAdapterTimeCalibration();
-  virtual ~DoubleDataAdapterTimeCalibration() {}
+  DoublePropertyTimeCalibration();
+  virtual ~DoublePropertyTimeCalibration() {}
   virtual QString getDisplayName() const { return "Temporal Calibration"; }
   virtual double getValue() const;
   virtual QString getHelp() const;
@@ -62,7 +62,7 @@ public:
   DoubleRange getValueRange() const;
 
 private slots:
-  void dominantToolChanged();
+  void activeToolChanged();
 
 private:
   ToolPtr mTool;

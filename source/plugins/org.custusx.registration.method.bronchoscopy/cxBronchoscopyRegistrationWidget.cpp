@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxPatientModelService.h"
 #include "cxRegistrationService.h"
-#include "cxVisualizationService.h"
+#include "cxViewService.h"
 #include "cxStringProperty.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxTrackingService.h"

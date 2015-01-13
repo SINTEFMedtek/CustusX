@@ -35,17 +35,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-DoubleDataAdapterTimeCalibration::DoubleDataAdapterTimeCalibration()
+DoublePropertyTimeCalibration::DoublePropertyTimeCalibration()
 {
-  connect(trackingService().get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChanged()));
-  connect(trackingService().get(), &TrackingService::stateChanged, this, &DoubleDataAdapterTimeCalibration::dominantToolChanged);
-  this->dominantToolChanged();
+  connect(trackingService().get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(activeToolChanged()));
+  connect(trackingService().get(), &TrackingService::stateChanged, this, &DoublePropertyTimeCalibration::activeToolChanged);
+  this->activeToolChanged();
 }
 
-void DoubleDataAdapterTimeCalibration::dominantToolChanged()
+void DoublePropertyTimeCalibration::activeToolChanged()
 {
-//  std::cout << "DoubleDataAdapterTimeCalibration::dominantToolChanged()" << std::endl;
-
   // ignore tool changes to something non-probeish.
   // This gives the user a chance to use the widget without having to show the probe.
   ToolPtr newTool = trackingService()->getActiveTool();
@@ -60,31 +58,28 @@ void DoubleDataAdapterTimeCalibration::dominantToolChanged()
   if (mTool)
     connect(mTool->getProbe().get(), SIGNAL(sectorChanged()), this, SIGNAL(changed()));
 
-//  std::cout << "DoubleDataAdapterTimeCalibration::dominantToolChanged() .. " << mTool.get() << std::endl;
   emit changed();
 }
 
-DoublePropertyBasePtr DoubleDataAdapterTimeCalibration::New()
+DoublePropertyBasePtr DoublePropertyTimeCalibration::New()
 {
-  return DoublePropertyBasePtr(new DoubleDataAdapterTimeCalibration());
+  return DoublePropertyBasePtr(new DoublePropertyTimeCalibration());
 }
 
-double DoubleDataAdapterTimeCalibration::getValue() const
+double DoublePropertyTimeCalibration::getValue() const
 {
-//  std::cout << "DoubleDataAdapterTimeCalibration::getValue()" << std::endl;
   if (!mTool)
     return 0;
-//  std::cout << "mTool->getProbe()->getData().mTemporalCalibration " << mTool->getProbe()->getData().getTemporalCalibration() << std::endl;
   return mTool->getProbe()->getProbeData().getTemporalCalibration();
 }
 
-QString DoubleDataAdapterTimeCalibration::getHelp() const
+QString DoublePropertyTimeCalibration::getHelp() const
 {
 	return "Set a temporal shift to add to input probe frames (the frames will be stored with this shift applied).\n"
 		"Changes done here will NOT be saved.";
 }
 
-bool DoubleDataAdapterTimeCalibration::setValue(double val)
+bool DoublePropertyTimeCalibration::setValue(double val)
 {
   if (!mTool)
     return 0;
@@ -92,7 +87,7 @@ bool DoubleDataAdapterTimeCalibration::setValue(double val)
   return true;
 }
 
-DoubleRange DoubleDataAdapterTimeCalibration::getValueRange() const
+DoubleRange DoublePropertyTimeCalibration::getValueRange() const
 {
   return DoubleRange(-50000,50000,1);
 }

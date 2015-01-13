@@ -54,7 +54,7 @@ typedef boost::shared_ptr<class VisualizationService> VisualizationServicePtr;
  * manner, thus enabling us to write generic widgets for displaying
  * and changing them.
  *
- * \ingroup cx_resource_core_dataadapters
+ * \ingroup cx_resource_core_properties
  * \author Christian Askeland, SINTEF
  * \author Janne Beate Bakeng, SINTEF
  * \date Jun 27, 2010
@@ -78,12 +78,12 @@ public:
 	virtual QVariant getValueAsVariant() const = 0;
 	virtual void setValueFromVariant(QVariant val) = 0;
 
-	virtual bool getEnabled() const; ///< Get the enabled/disabled state of the dataadapter.
+	virtual bool getEnabled() const; ///< Get the enabled/disabled state of the Property.
 	virtual bool getAdvanced() const; ///< Set the advanced flag of the adapter
 	virtual QString getGroup() const; ///< Flag the adapter as part of a group
 
 public slots:
-	virtual bool setEnabled(bool enabled); ///< Set the enabled/disabled state of the dataadapter.
+	virtual bool setEnabled(bool enabled); ///< Set the enabled/disabled state of the Property.
 	virtual bool setAdvanced(bool advanced); ///< Set the advanced flag of the adapter
 	virtual bool setGroup(QString name); ///< Flag the adapter as part of a group
 

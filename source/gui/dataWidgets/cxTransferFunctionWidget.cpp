@@ -63,11 +63,11 @@ namespace cx
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-DoubleDataAdapterImageTFDataBase::DoubleDataAdapterImageTFDataBase()
+DoublePropertyImageTFDataBase::DoublePropertyImageTFDataBase()
 {
 }
 
-void DoubleDataAdapterImageTFDataBase::setImageTFData(ImageTFDataPtr tfData, ImagePtr image)
+void DoublePropertyImageTFDataBase::setImageTFData(ImageTFDataPtr tfData, ImagePtr image)
 {
   if (mImageTFData)
 	disconnect(mImageTFData.get(), &ImageTFData::transferFunctionsChanged, this, &Property::changed);
@@ -81,14 +81,14 @@ void DoubleDataAdapterImageTFDataBase::setImageTFData(ImageTFDataPtr tfData, Ima
   emit changed();
 }
 
-double DoubleDataAdapterImageTFDataBase::getValue() const
+double DoublePropertyImageTFDataBase::getValue() const
 {
   if (!mImageTFData)
     return 0.0;
   return this->getValueInternal();
 }
 
-bool DoubleDataAdapterImageTFDataBase::setValue(double val)
+bool DoublePropertyImageTFDataBase::setValue(double val)
 {
   if (!mImageTFData)
     return false;
@@ -99,17 +99,17 @@ bool DoubleDataAdapterImageTFDataBase::setValue(double val)
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-double DoubleDataAdapterImageTFDataWindow::getValueInternal() const
+double DoublePropertyImageTFDataWindow::getValueInternal() const
 {
   return mImageTFData->getWindow();
 }
 
-void DoubleDataAdapterImageTFDataWindow::setValueInternal(double val)
+void DoublePropertyImageTFDataWindow::setValueInternal(double val)
 {
   mImageTFData->setWindow(val);
 }
 
-DoubleRange DoubleDataAdapterImageTFDataWindow::getValueRange() const
+DoubleRange DoublePropertyImageTFDataWindow::getValueRange() const
 {
   if (!mImage)
     return DoubleRange();
@@ -120,17 +120,17 @@ DoubleRange DoubleDataAdapterImageTFDataWindow::getValueRange() const
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-double DoubleDataAdapterImageTFDataLevel::getValueInternal() const
+double DoublePropertyImageTFDataLevel::getValueInternal() const
 {
   return mImageTFData->getLevel();
 }
 
-void DoubleDataAdapterImageTFDataLevel::setValueInternal(double val)
+void DoublePropertyImageTFDataLevel::setValueInternal(double val)
 {
   mImageTFData->setLevel(val);
 }
 
-DoubleRange DoubleDataAdapterImageTFDataLevel::getValueRange() const
+DoubleRange DoublePropertyImageTFDataLevel::getValueRange() const
 {
   if (!mImageTFData)
     return DoubleRange();
@@ -143,15 +143,15 @@ DoubleRange DoubleDataAdapterImageTFDataLevel::getValueRange() const
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-double DoubleDataAdapterImageTFDataLLR::getValueInternal() const
+double DoublePropertyImageTFDataLLR::getValueInternal() const
 {
   return mImageTFData->getLLR();
 }
-void DoubleDataAdapterImageTFDataLLR::setValueInternal(double val)
+void DoublePropertyImageTFDataLLR::setValueInternal(double val)
 {
   mImageTFData->setLLR(val);
 }
-DoubleRange DoubleDataAdapterImageTFDataLLR::getValueRange() const
+DoubleRange DoublePropertyImageTFDataLLR::getValueRange() const
 {
   if (!mImageTFData)
     return DoubleRange();
@@ -165,15 +165,15 @@ DoubleRange DoubleDataAdapterImageTFDataLLR::getValueRange() const
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-double DoubleDataAdapterImageTFDataAlpha::getValueInternal() const
+double DoublePropertyImageTFDataAlpha::getValueInternal() const
 {
   return mImageTFData->getAlpha();
 }
-void DoubleDataAdapterImageTFDataAlpha::setValueInternal(double val)
+void DoublePropertyImageTFDataAlpha::setValueInternal(double val)
 {
   mImageTFData->setAlpha(val);
 }
-DoubleRange DoubleDataAdapterImageTFDataAlpha::getValueRange() const
+DoubleRange DoublePropertyImageTFDataAlpha::getValueRange() const
 {
   if (!mImageTFData)
     return DoubleRange();
@@ -193,11 +193,6 @@ TransferFunction3DWidget::TransferFunction3DWidget(PatientModelServicePtr patien
   mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(patientModelService, this);
   mTransferFunctionColorWidget = new TransferFunctionColorWidget(patientModelService, this);
 
-//  mDataWindow.reset(new DoubleDataAdapterImageTFDataWindow);
-//  mDataLevel.reset(new DoubleDataAdapterImageTFDataLevel);
-//  mDataAlpha.reset(new DoubleDataAdapterImageTFDataAlpha);
-//  mDataLLR.reset(new DoubleDataAdapterImageTFDataLLR);
-
   mActiveImageProxy = ActiveImageProxy::New(patientModelService);
   connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &TransferFunction3DWidget::activeImageChangedSlot);
   connect(mActiveImageProxy.get(), &ActiveImageProxy::transferFunctionsChanged, this, &TransferFunction3DWidget::activeImageChangedSlot);
@@ -209,13 +204,6 @@ TransferFunction3DWidget::TransferFunction3DWidget(PatientModelServicePtr patien
 
   mLayout->addWidget(mTransferFunctionAlphaWidget);
   mLayout->addWidget(mTransferFunctionColorWidget);
-
-//  QGridLayout* gridLayout = new QGridLayout;
-//  mLayout->addLayout(gridLayout);
-//  new SliderGroupWidget(this, mDataWindow, gridLayout, 0);
-//  new SliderGroupWidget(this, mDataLevel,  gridLayout, 1);
-//  new SliderGroupWidget(this, mDataAlpha,  gridLayout, 2);
-//  new SliderGroupWidget(this, mDataLLR,    gridLayout, 3);
 
   this->setLayout(mLayout);
 }
@@ -260,10 +248,10 @@ TransferFunction2DWidget::TransferFunction2DWidget(PatientModelServicePtr patien
   mTransferFunctionAlphaWidget->setReadOnly(true);
   mTransferFunctionColorWidget = new TransferFunctionColorWidget(patientModelService, this);
 
-  mDataWindow.reset(new DoubleDataAdapterImageTFDataWindow);
-  mDataLevel.reset(new DoubleDataAdapterImageTFDataLevel);
-  mDataAlpha.reset(new DoubleDataAdapterImageTFDataAlpha);
-  mDataLLR.reset(new DoubleDataAdapterImageTFDataLLR);
+  mDataWindow.reset(new DoublePropertyImageTFDataWindow);
+  mDataLevel.reset(new DoublePropertyImageTFDataLevel);
+  mDataAlpha.reset(new DoublePropertyImageTFDataAlpha);
+  mDataLLR.reset(new DoublePropertyImageTFDataLLR);
 
   mActiveImageProxy = ActiveImageProxy::New(patientModelService);
   connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &TransferFunction2DWidget::activeImageChangedSlot);

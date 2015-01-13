@@ -70,7 +70,7 @@ public slots:
 protected:
   TransferFunctionAlphaWidget* mTransferFunctionAlphaWidget;
   TransferFunctionColorWidget* mTransferFunctionColorWidget;
-  DoubleDataAdapterImageTFDataBasePtr mDataWindow, mDataLevel;
+  DoublePropertyImageTFDataBasePtr mDataWindow, mDataLevel;
   ActiveImageProxyPtr mActiveImageProxy;
   PatientModelServicePtr mPatientModelService;
 };

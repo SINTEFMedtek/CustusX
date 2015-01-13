@@ -121,9 +121,9 @@ Vector3D SpaceProviderImpl::getActiveToolTipPoint(CoordinateSystem to, bool useO
 
 CoordinateSystem SpaceProviderImpl::getToolCoordinateSystem(ToolPtr tool)
 {
-	QString dominantToolUid = tool->getUid();
+	QString uid = tool->getUid();
 
-	CoordinateSystem retval(csTOOL, dominantToolUid);
+	CoordinateSystem retval(csTOOL, uid);
 	return retval;
 }
 

@@ -47,8 +47,8 @@ TransferFunction2DOpacityWidget::TransferFunction2DOpacityWidget(PatientModelSer
   mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(patientModelService, this);
   mTransferFunctionAlphaWidget->setReadOnly(true);
 
-  mDataAlpha.reset(new DoubleDataAdapterImageTFDataAlpha);
-  mDataLLR.reset(new DoubleDataAdapterImageTFDataLLR);
+  mDataAlpha.reset(new DoublePropertyImageTFDataAlpha);
+  mDataLLR.reset(new DoublePropertyImageTFDataLLR);
 
   mActiveImageProxy = ActiveImageProxy::New(patientModelService);
   connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &TransferFunction2DOpacityWidget::activeImageChangedSlot);

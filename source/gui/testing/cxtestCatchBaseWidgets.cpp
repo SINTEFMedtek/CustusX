@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxLogicManager.h"
 #include "cxPatientModelService.h"
-#include "cxVisualizationService.h"
+#include "cxViewService.h"
 #include "cxVideoService.h"
 
 //cxBaseWidget children in alphabetical order

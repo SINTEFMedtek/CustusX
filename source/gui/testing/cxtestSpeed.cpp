@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxtestRenderTester.h"
 #include "cxLegacySingletons.h"
 #include "cxMessageListener.h"
-#include "cxVisualizationService.h"
+#include "cxViewService.h"
 
 namespace cxtest
 {

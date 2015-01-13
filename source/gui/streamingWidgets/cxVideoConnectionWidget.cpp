@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDetailedLabeledComboBoxWidget.h"
 #include "cxStreamerService.h"
 #include "cxVideoSource.h"
-#include "cxVisualizationService.h"
+#include "cxViewService.h"
 #include "cxImage.h"
 
 namespace cx

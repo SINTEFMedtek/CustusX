@@ -48,10 +48,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 typedef boost::shared_ptr<class ActiveImageProxy> ActiveImageProxyPtr;
-typedef boost::shared_ptr<class DominantToolProxy> DominantToolProxyPtr;
+typedef boost::shared_ptr<class ActiveToolProxy> ActiveToolProxyPtr;
 
 /**
- * \brief Interface to the tool offset of the dominant tool
+ * \brief Interface to the tool offset of the active tool
  */
 class cxGui_EXPORT DoublePropertyActiveToolOffset : public DoublePropertyBase
 {
@@ -75,7 +75,7 @@ public:
   DoubleRange getValueRange() const;
 
 protected:
-  DominantToolProxyPtr mActiveTool;
+  ActiveToolProxyPtr mActiveTool;
 };
 
 /**

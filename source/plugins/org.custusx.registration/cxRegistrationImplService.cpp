@@ -246,7 +246,7 @@ void RegistrationImplService::doFastRegistration_Translation()
 	this->applyPatientRegistration(rMpr_old*pr_oldMpr_new, "Fast Translation");
 }
 
-/**Perform a fast orientation by setting the patient registration equal to the current dominant
+/**Perform a fast orientation by setting the patient registration equal to the current active
  * tool position.
  * Input is an additional transform tMtm that modifies the tool position. Use this to
  * define DICOM-ish spaces relative to the tool.

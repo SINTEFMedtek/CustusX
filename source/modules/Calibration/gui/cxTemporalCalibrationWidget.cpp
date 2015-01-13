@@ -90,7 +90,7 @@ TemporalCalibrationWidget::TemporalCalibrationWidget(AcquisitionServicePtr acqui
   topLayout->addWidget(mInfoLabel);
   topLayout->addWidget(mRecordSessionWidget);
   topLayout->addWidget(new LabeledComboBoxWidget(this, StringPropertyActiveProbeConfiguration::New()));
-  topLayout->addWidget(new SpinBoxGroupWidget(this, DoubleDataAdapterTimeCalibration::New()));
+  topLayout->addWidget(new SpinBoxGroupWidget(this, DoublePropertyTimeCalibration::New()));
 
   topLayout->addWidget(this->createHorizontalLine());
 

@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxUsReconstructionGUIExtenderService.h"
 #include "cxRegisteredService.h"
 #include "cxPatientModelServiceProxy.h"
-#include "cxVisualizationServiceProxy.h"
+#include "cxViewServiceProxy.h"
 #include "cxUsReconstructionImplService.h"
 #include "cxXmlOptionItem.h"
 #include "cxDataLocations.h"

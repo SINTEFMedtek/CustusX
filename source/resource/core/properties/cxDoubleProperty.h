@@ -64,7 +64,7 @@ typedef boost::shared_ptr<class DoubleProperty> DoublePropertyPtr;
     <option id="Processor" value="3.14"/>
    \endverbatim
  *
- * \ingroup cx_resource_core_dataadapters
+ * \ingroup cx_resource_core_properties
  */
 class cxResource_EXPORT DoubleProperty: public DoublePropertyBase
 {

@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLandmarkRep.h"
 #include "cxView.h"
 #include "cxRegistrationService.h"
-#include "cxVisualizationService.h"
+#include "cxViewService.h"
 #include "cxPatientModelService.h"
 #include "cxViewGroupData.h"
 #include "cxTrackingService.h"
@@ -68,7 +68,7 @@ LandmarkPatientRegistrationWidget::LandmarkPatientRegistrationWidget(RegServices
 		"Sample Tool", this))
 {
 	mImageLandmarkSource = ImageLandmarksSource::New();
-	mFixedDataAdapter.reset(new StringPropertyRegistrationFixedImage(services.registrationService, services.patientModelService));
+	mFixedProperty.reset(new StringPropertyRegistrationFixedImage(services.registrationService, services.patientModelService));
 	connect(services.registrationService.get(), &RegistrationService::fixedDataChanged,
 			this, &LandmarkPatientRegistrationWidget::fixedDataChanged);
 	connect(services.patientModelService.get(), &PatientModelService::rMprChanged, this, &LandmarkPatientRegistrationWidget::setModified);
@@ -87,13 +87,13 @@ LandmarkPatientRegistrationWidget::LandmarkPatientRegistrationWidget(RegServices
 	connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
 
 	//toolmanager
-	mDominantToolProxy = DominantToolProxy::New(trackingService());
-	connect(mDominantToolProxy.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateToolSampleButton()));
-	connect(mDominantToolProxy.get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(updateToolSampleButton()));
+	mActiveToolProxy = ActiveToolProxy::New(trackingService());
+	connect(mActiveToolProxy.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateToolSampleButton()));
+	connect(mActiveToolProxy.get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(updateToolSampleButton()));
 	connect(services.patientModelService.get(), &PatientModelService::debugModeChanged, this, &LandmarkPatientRegistrationWidget::updateToolSampleButton);
 
 	//layout
-	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mFixedDataAdapter));
+	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mFixedProperty));
 	mVerticalLayout->addWidget(mLandmarkTableWidget);
 	mVerticalLayout->addWidget(mToolSampleButton);
 	mVerticalLayout->addWidget(mAvarageAccuracyLabel);

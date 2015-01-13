@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackingServiceProxy.h"
 #include "cxPatientModelServiceProxy.h"
 #include "cxStateServiceProxy.h"
-#include "cxVisualizationServiceProxy.h"
+#include "cxViewServiceProxy.h"
 #include "cxSessionStorageServiceProxy.h"
 #include "cxReporter.h"
 

@@ -54,7 +54,7 @@ typedef boost::shared_ptr<class StringProperty> StringPropertyPtr;
     <option id="Processor" value="3.14"/>
    \endverbatim
  *
- * \ingroup cx_resource_core_dataadapters
+ * \ingroup cx_resource_core_properties
  */
 class cxResource_EXPORT StringProperty: public StringPropertyBase
 {

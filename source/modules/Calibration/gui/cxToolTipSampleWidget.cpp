@@ -96,7 +96,7 @@ QString ToolTipSampleWidget::defaultWhatsThis() const
 {
   return "<html>"
      "<h3>Tool tip sampling.</h3>"
-     "<p>You can sample the dominant(active) tools tooltip in any coordinate system and get the results written to file.</p>"
+	 "<p>You can sample the active tools tooltip in any coordinate system and get the results written to file.</p>"
      "</html>";
 }
 

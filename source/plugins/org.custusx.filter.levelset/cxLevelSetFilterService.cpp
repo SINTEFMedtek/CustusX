@@ -92,7 +92,7 @@ QString LevelSetFilter::getHelp() const
 Vector3D LevelSetFilter::getSeedPointFromTool(DataPtr data)
 {
 	// Retrieve position of tooltip and use it as seed point
-	Vector3D point = spaceProvider()->getDominantToolTipPoint(
+	Vector3D point = spaceProvider()->getActiveToolTipPoint(
 			spaceProvider()->getD(data));
 
 	// Have to multiply by the inverse of the spacing to get the voxel position

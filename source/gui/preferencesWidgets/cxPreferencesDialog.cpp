@@ -246,7 +246,7 @@ void VisualizationTab::setBackgroundColorSlot(QColor color)
 AutomationTab::AutomationTab(QWidget *parent) :
 		PreferenceTab(parent)
 {
-	mAutoSelectDominantToolCheckBox = NULL;
+	mAutoSelectActiveToolCheckBox = NULL;
 	mAutoStartTrackingCheckBox = NULL;
 	mAutoStartStreamingCheckBox = NULL;
 	mAutoReconstructCheckBox = NULL;
@@ -270,11 +270,11 @@ void AutomationTab::init()
   mAutoReconstructCheckBox = new QCheckBox("Auto Reconstruct");
   mAutoReconstructCheckBox->setChecked(autoReconstruct);
 
-  bool autoSelectDominantTool = settings()->value("Automation/autoSelectDominantTool").toBool();
-  mAutoSelectDominantToolCheckBox = new QCheckBox("Auto Select Active Tool");
-  mAutoSelectDominantToolCheckBox->setToolTip(""
+  bool autoSelectActiveTool = settings()->value("Automation/autoSelectActiveTool").toBool();
+  mAutoSelectActiveToolCheckBox = new QCheckBox("Auto Select Active Tool");
+  mAutoSelectActiveToolCheckBox->setToolTip(""
 	  "Automatically select an active tool when a tool becomes visible");
-  mAutoSelectDominantToolCheckBox->setChecked(autoSelectDominantTool);
+  mAutoSelectActiveToolCheckBox->setChecked(autoSelectActiveTool);
 
   bool autoSave = settings()->value("Automation/autoSave").toBool();
   mAutoSaveCheckBox = new QCheckBox("Auto Save");
@@ -304,7 +304,7 @@ void AutomationTab::init()
   mMainLayout->addWidget(mAutoStartTrackingCheckBox);
   mMainLayout->addWidget(mAutoStartStreamingCheckBox);
   mMainLayout->addWidget(mAutoReconstructCheckBox);
-  mMainLayout->addWidget(mAutoSelectDominantToolCheckBox);
+  mMainLayout->addWidget(mAutoSelectActiveToolCheckBox);
   mMainLayout->addWidget(mAutoSaveCheckBox);
   mMainLayout->addWidget(mAutoShowNewDataCheckBox);
   mMainLayout->addWidget(mAutoLoadPatientCheckBox);
@@ -319,7 +319,7 @@ void AutomationTab::saveParametersSlot()
   settings()->setValue("Automation/autoStartTracking", mAutoStartTrackingCheckBox->isChecked());
   settings()->setValue("Automation/autoStartStreaming", mAutoStartStreamingCheckBox->isChecked());
   settings()->setValue("Automation/autoReconstruct", mAutoReconstructCheckBox->isChecked());
-  settings()->setValue("Automation/autoSelectDominantTool", mAutoSelectDominantToolCheckBox->isChecked());
+  settings()->setValue("Automation/autoSelectActiveTool", mAutoSelectActiveToolCheckBox->isChecked());
   settings()->setValue("Automation/autoSave", mAutoSaveCheckBox->isChecked());
   settings()->setValue("Automation/autoShowNewData", mAutoShowNewDataCheckBox->isChecked());
   settings()->setValue("Automation/autoLoadRecentPatient", mAutoLoadPatientCheckBox->isChecked());

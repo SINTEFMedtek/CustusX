@@ -44,9 +44,9 @@ namespace cx
 typedef boost::shared_ptr<class TimedBaseAlgorithm> TimedAlgorithmPtr;
 typedef boost::shared_ptr<class CompositeTimedAlgorithm> CompositeTimedAlgorithmPtr;
 
-typedef boost::shared_ptr<class FusedInputOutputSelectDataStringDataAdapter> FusedInputOutputSelectDataStringDataAdapterPtr;
+typedef boost::shared_ptr<class StringPropertyFusedInputOutputSelectData> StringPropertyFusedInputOutputSelectDataPtr;
 
-/** Data-DataAdapter that fuses two Data-DataAdapters.
+/** Data-Property that fuses two Data-Properties.
   *
   * There are two arguments: input and output.
   * The output is wrapped by this adapter,
@@ -54,12 +54,12 @@ typedef boost::shared_ptr<class FusedInputOutputSelectDataStringDataAdapter> Fus
   *
   *
   */
-class cxResourceFilter_EXPORT FusedInputOutputSelectDataStringDataAdapter : public SelectDataStringPropertyBase
+class cxResourceFilter_EXPORT StringPropertyFusedInputOutputSelectData : public SelectDataStringPropertyBase
 {
 	Q_OBJECT
 public:
-	virtual ~FusedInputOutputSelectDataStringDataAdapter() {}
-	static FusedInputOutputSelectDataStringDataAdapterPtr create(PatientModelServicePtr patientModelService, SelectDataStringPropertyBasePtr base, SelectDataStringPropertyBasePtr input);
+	virtual ~StringPropertyFusedInputOutputSelectData() {}
+	static StringPropertyFusedInputOutputSelectDataPtr create(PatientModelServicePtr patientModelService, SelectDataStringPropertyBasePtr base, SelectDataStringPropertyBasePtr input);
 
 public: // basic methods
 	virtual QString getDisplayName() const;
@@ -81,7 +81,7 @@ protected slots:
 	void changedSlot();
 
 protected:
-	FusedInputOutputSelectDataStringDataAdapter(PatientModelServicePtr patientModelService, SelectDataStringPropertyBasePtr base, SelectDataStringPropertyBasePtr input);
+	StringPropertyFusedInputOutputSelectData(PatientModelServicePtr patientModelService, SelectDataStringPropertyBasePtr base, SelectDataStringPropertyBasePtr input);
 	SelectDataStringPropertyBasePtr mInput;
 	SelectDataStringPropertyBasePtr mBase;
 	QString mValueName;

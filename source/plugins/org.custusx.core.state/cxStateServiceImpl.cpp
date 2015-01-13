@@ -161,7 +161,7 @@ void StateServiceImpl::fillDefaultSettings()
 	this->fillDefault("Automation/autoStartTracking", true);
 	this->fillDefault("Automation/autoStartStreaming", true);
 	this->fillDefault("Automation/autoReconstruct", true);
-	this->fillDefault("Automation/autoSelectDominantTool", true);
+	this->fillDefault("Automation/autoSelectActiveTool", true);
 	this->fillDefault("Automation/autoSave", true);
 	this->fillDefault("Automation/autoLoadRecentPatient", true);
 	this->fillDefault("Automation/autoLoadRecentPatientWithinHours", 8);
