@@ -106,7 +106,7 @@ TEST_CASE("LevelSetFilter: execute", "[integration][modules][Algorithm][LevelSet
 	REQUIRE(data);
 
 	//set input
-	std::vector < cx::SelectDataStringDataAdapterBasePtr > input =lsf->getInputTypes();
+	std::vector < cx::SelectDataStringPropertyBasePtr > input =lsf->getInputTypes();
 	{
 		INFO("Number of inputs has changed.");
 		REQUIRE(input.size() == 1);
@@ -145,7 +145,7 @@ TEST_CASE("LevelSetFilter: execute", "[integration][modules][Algorithm][LevelSet
 	}
 
 	// Check output
-	std::vector < cx::SelectDataStringDataAdapterBasePtr > output = lsf->getOutputTypes();
+	std::vector < cx::SelectDataStringPropertyBasePtr > output = lsf->getOutputTypes();
 	{
 		INFO("Number of outputs has changed.");
 		REQUIRE(output.size() == 2);

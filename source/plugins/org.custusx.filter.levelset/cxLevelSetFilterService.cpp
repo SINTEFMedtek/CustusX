@@ -320,9 +320,9 @@ QDomElement LevelSetFilter::getmOptions()
 
 void LevelSetFilter::createInputTypes()
 {
-	SelectDataStringDataAdapterBasePtr temp;
+	SelectDataStringPropertyBasePtr temp;
 
-	temp = SelectImageStringDataAdapter::New(mPatientModelService);
+	temp = StringPropertySelectImage::New(mPatientModelService);
 	temp->setValueName("Input");
 	temp->setHelp("Select image input for thresholding");
 	mInputTypes.push_back(temp);
@@ -330,14 +330,14 @@ void LevelSetFilter::createInputTypes()
 
 void LevelSetFilter::createOutputTypes()
 {
-	SelectDataStringDataAdapterBasePtr temp;
+	SelectDataStringPropertyBasePtr temp;
 
-	temp = SelectDataStringDataAdapter::New(mPatientModelService);
+	temp = StringPropertySelectData::New(mPatientModelService);
 	temp->setValueName("Output");
 	temp->setHelp("Output segmented binary image");
 	mOutputTypes.push_back(temp);
 
-	temp = SelectDataStringDataAdapter::New(mPatientModelService);
+	temp = StringPropertySelectData::New(mPatientModelService);
 	temp->setValueName("Contour");
 	temp->setHelp("Output contour generated from thresholded binary image.");
 	mOutputTypes.push_back(temp);
@@ -396,42 +396,42 @@ vtkImageDataPtr LevelSetFilter::importRawImageData(void * data, int size_x,
 	return retval;
 }
 
-DoubleDataAdapterXmlPtr LevelSetFilter::getThresholdOption(QDomElement root)
+DoublePropertyPtr LevelSetFilter::getThresholdOption(QDomElement root)
 {
-	DoubleDataAdapterXmlPtr retval = DoubleDataAdapterXml::initialize(
+	DoublePropertyPtr retval = DoubleProperty::initialize(
 			"Threshold", "", "Select threshold for the segmentation", 1,
 			DoubleRange(-5000, 5000, 0.0000001), 0, root);
 	return retval;
 
 }
 
-DoubleDataAdapterXmlPtr LevelSetFilter::getEpsilonOption(QDomElement root)
+DoublePropertyPtr LevelSetFilter::getEpsilonOption(QDomElement root)
 {
-	DoubleDataAdapterXmlPtr retval = DoubleDataAdapterXml::initialize("Epsilon",
+	DoublePropertyPtr retval = DoubleProperty::initialize("Epsilon",
 			"", "Select epsilon for the segmentation", 1,
 			DoubleRange(-5000, 5000, 0.0000001), 0, root);
 	return retval;
 
 }
 
-DoubleDataAdapterXmlPtr LevelSetFilter::getAlphaOption(QDomElement root)
+DoublePropertyPtr LevelSetFilter::getAlphaOption(QDomElement root)
 {
-	DoubleDataAdapterXmlPtr retval = DoubleDataAdapterXml::initialize("Alpha",
+	DoublePropertyPtr retval = DoubleProperty::initialize("Alpha",
 			"", "Select alpha for the segmentation", 0.1,
 			DoubleRange(0, 1, 0.01), 2, root);
-	retval->setGuiRepresentation(DoubleDataAdapter::grSLIDER);
+	retval->setGuiRepresentation(DoubleProperty::grSLIDER);
 	return retval;
 
 }
 
-DoubleDataAdapterXmlPtr LevelSetFilter::getRadiusOption(QDomElement root)
+DoublePropertyPtr LevelSetFilter::getRadiusOption(QDomElement root)
 {
-	DoubleDataAdapterXmlPtr retval =
-			DoubleDataAdapterXml::initialize("Radius for morphological closing",
+	DoublePropertyPtr retval =
+			DoubleProperty::initialize("Radius for morphological closing",
 					"",
 					"Select radius (in mm) for the morphological closing of the final result. Radius at 0 will skip this process.",
 					0.0, DoubleRange(0, 20, 0.5), 2, root);
-	retval->setGuiRepresentation(DoubleDataAdapter::grSLIDER);
+	retval->setGuiRepresentation(DoubleProperty::grSLIDER);
 	return retval;
 
 }

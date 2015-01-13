@@ -63,10 +63,10 @@ public:
 	virtual bool postProcess();
 
 	// extensions:
-	DoubleDataAdapterXmlPtr getThresholdOption(QDomElement root);
-	DoubleDataAdapterXmlPtr getEpsilonOption(QDomElement root);
-	DoubleDataAdapterXmlPtr getAlphaOption(QDomElement root);
-	DoubleDataAdapterXmlPtr getRadiusOption(QDomElement root);
+	DoublePropertyPtr getThresholdOption(QDomElement root);
+	DoublePropertyPtr getEpsilonOption(QDomElement root);
+	DoublePropertyPtr getAlphaOption(QDomElement root);
+	DoublePropertyPtr getRadiusOption(QDomElement root);
 
 	static Vector3D getSeedPointFromTool(DataPtr image);
 	static bool isSeedPointInsideImage(Vector3D, DataPtr);
