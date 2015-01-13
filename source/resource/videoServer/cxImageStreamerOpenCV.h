@@ -60,9 +60,9 @@ namespace cv
 
 namespace cx
 {
-typedef boost::shared_ptr<class DataAdapter> DataAdapterPtr;
-typedef boost::shared_ptr<class DoubleDataAdapter> DoubleDataAdapterPtr;
-typedef boost::shared_ptr<class BoolDataAdapter> BoolDataAdapterPtr;
+typedef boost::shared_ptr<class Property> PropertyPtr;
+typedef boost::shared_ptr<class DoublePropertyBase> DoublePropertyBasePtr;
+typedef boost::shared_ptr<class BoolPropertyBase> BoolPropertyBasePtr;
 
 typedef boost::shared_ptr<cv::VideoCapture> VideoCapturePtr;
 
@@ -72,11 +72,11 @@ class cxGrabber_EXPORT ImageStreamerOpenCVArguments
 {
 public:
 	QStringList getArgumentDescription();
-	virtual std::vector<DataAdapterPtr> getSettings(QDomElement root);
+	virtual std::vector<PropertyPtr> getSettings(QDomElement root);
 	StringMap convertToCommandLineArguments(QDomElement root);
 
-	DoubleDataAdapterPtr getVideoPortOption(QDomElement root);
-	BoolDataAdapterPtr getPrintPropertiesOption(QDomElement root);
+	DoublePropertyBasePtr getVideoPortOption(QDomElement root);
+	BoolPropertyBasePtr getPrintPropertiesOption(QDomElement root);
 };
 
 /**

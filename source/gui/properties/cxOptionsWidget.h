@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx {
 
-/** Widget for displaying a list of DataAdapter instances.
+/** Widget for displaying a list of Property instances.
  * A stack of widgets is created if the setOptions() is called with different uids.
  *
  * \ingroup cx_module_algorithm
@@ -59,8 +59,8 @@ public:
 	  * Set options for a given uid. Setting different uid will change the widget
 	  * content but store the previous contents, making it easy to swap between uids.
 	  */
-	void setOptions(QString uid, std::vector<DataAdapterPtr> options, bool showAdvanced);
-	void setOptions(QString uid, std::vector<SelectDataStringDataAdapterBasePtr> options, bool showAdvanced);
+	void setOptions(QString uid, std::vector<PropertyPtr> options, bool showAdvanced);
+	void setOptions(QString uid, std::vector<SelectDataStringPropertyBasePtr> options, bool showAdvanced);
 	QString getCurrentUid();
 	void showAdvanced(bool show); //whether or not to display adapters marked as advanced
 	void rebuild();
@@ -74,7 +74,7 @@ private:
 	QWidget* createGroupHeaderWidget(QString title);
 
 	QStackedLayout* mStackedLayout;
-	std::vector<DataAdapterPtr> mOptions;
+	std::vector<PropertyPtr> mOptions;
 	QString mUid;
 	bool mShowAdvanced;
 	VisualizationServicePtr mVisualizationService;

@@ -82,7 +82,7 @@ private:
   QComboBox* mToolConfigFolderComboBox;
   QComboBox* mChooseApplicationComboBox;
 
-  BoolDataAdapterXmlPtr mFilterToolPositions;
+  BoolPropertyPtr mFilterToolPositions;
 
   QString mGlobalPatientDataFolder;
   QString mVLCPath;

@@ -36,19 +36,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-typedef boost::shared_ptr<class ActiveImageStringDataAdapter> ActiveImageStringDataAdapterPtr;
+typedef boost::shared_ptr<class StringPropertyActiveImage> StringPropertyActiveImagePtr;
 /** Adapter that connects to the current active image.
  * Example: Active image: [DataName]
  * where active image is the value
  * and DataName is taken from the valuerange
  */
-class cxResource_EXPORT ActiveImageStringDataAdapter : public SelectDataStringDataAdapterBase
+class cxResource_EXPORT StringPropertyActiveImage : public SelectDataStringPropertyBase
 {
   Q_OBJECT
 public:
-	static ActiveImageStringDataAdapterPtr New(PatientModelServicePtr patientModelService) { return ActiveImageStringDataAdapterPtr(new ActiveImageStringDataAdapter(patientModelService)); }
-	ActiveImageStringDataAdapter(PatientModelServicePtr patientModelService);
-  virtual ~ActiveImageStringDataAdapter() {}
+	static StringPropertyActiveImagePtr New(PatientModelServicePtr patientModelService) { return StringPropertyActiveImagePtr(new StringPropertyActiveImage(patientModelService)); }
+	StringPropertyActiveImage(PatientModelServicePtr patientModelService);
+  virtual ~StringPropertyActiveImage() {}
 
 public: // basic methods
   virtual bool setValue(const QString& value);
@@ -56,17 +56,17 @@ public: // basic methods
 };
 
 
-typedef boost::shared_ptr<class SelectImageStringDataAdapter> SelectImageStringDataAdapterPtr;
+typedef boost::shared_ptr<class StringPropertySelectImage> StringPropertySelectImagePtr;
 /** Adapter that selects and stores an image.
  * The image is stored internally in the adapter.
  * Use setValue/getValue plus changed() to access it.
  */
-class cxResource_EXPORT SelectImageStringDataAdapter : public SelectDataStringDataAdapterBase
+class cxResource_EXPORT StringPropertySelectImage : public SelectDataStringPropertyBase
 {
   Q_OBJECT
 public:
-	static SelectImageStringDataAdapterPtr New(PatientModelServicePtr patientModelService) { return SelectImageStringDataAdapterPtr(new SelectImageStringDataAdapter(patientModelService)); }
-  virtual ~SelectImageStringDataAdapter() {}
+	static StringPropertySelectImagePtr New(PatientModelServicePtr patientModelService) { return StringPropertySelectImagePtr(new StringPropertySelectImage(patientModelService)); }
+  virtual ~StringPropertySelectImage() {}
 
 public: // basic methods
   virtual bool setValue(const QString& value);
@@ -76,22 +76,22 @@ public: // interface extension
   ImagePtr getImage();
 
 protected:
-	SelectImageStringDataAdapter(PatientModelServicePtr patientModelService);
+	StringPropertySelectImage(PatientModelServicePtr patientModelService);
 private:
   QString mImageUid;
 };
 
-typedef boost::shared_ptr<class SelectDataStringDataAdapter> SelectDataStringDataAdapterPtr;
+typedef boost::shared_ptr<class StringPropertySelectData> StringPropertySelectDataPtr;
 /** Adapter that selects and stores a data.
  * The data is stored internally in the adapter.
  * Use setValue/getValue plus changed() to access it.
  */
-class cxResource_EXPORT SelectDataStringDataAdapter : public SelectDataStringDataAdapterBase
+class cxResource_EXPORT StringPropertySelectData : public SelectDataStringPropertyBase
 {
   Q_OBJECT
 public:
-	static SelectDataStringDataAdapterPtr New(PatientModelServicePtr patientModelService) { return SelectDataStringDataAdapterPtr(new SelectDataStringDataAdapter(patientModelService)); }
-  virtual ~SelectDataStringDataAdapter() {}
+	static StringPropertySelectDataPtr New(PatientModelServicePtr patientModelService) { return StringPropertySelectDataPtr(new StringPropertySelectData(patientModelService)); }
+  virtual ~StringPropertySelectData() {}
 
 public: // basic methods
   virtual bool setValue(const QString& value);
@@ -101,24 +101,24 @@ public: // interface extension
   virtual DataPtr getData() const;
 
 protected:
-	SelectDataStringDataAdapter(PatientModelServicePtr patientModelService);
+	StringPropertySelectData(PatientModelServicePtr patientModelService);
 private:
 //  DataPtr mData;
   QString mUid;
 
 };
 
-typedef boost::shared_ptr<class SelectMeshStringDataAdapter> SelectMeshStringDataAdapterPtr;
+typedef boost::shared_ptr<class StringPropertySelectMesh> StringPropertySelectMeshPtr;
 /** Adapter that selects and stores an mesh.
  * The image is stored internally in the adapter.
  * Use setValue/getValue plus changed() to access it.
  */
-class cxResource_EXPORT SelectMeshStringDataAdapter : public SelectDataStringDataAdapterBase
+class cxResource_EXPORT StringPropertySelectMesh : public SelectDataStringPropertyBase
 {
   Q_OBJECT
 public:
-	static SelectMeshStringDataAdapterPtr New(PatientModelServicePtr patientModelService) { return SelectMeshStringDataAdapterPtr(new SelectMeshStringDataAdapter(patientModelService)); }
-  virtual ~SelectMeshStringDataAdapter() {}
+	static StringPropertySelectMeshPtr New(PatientModelServicePtr patientModelService) { return StringPropertySelectMeshPtr(new StringPropertySelectMesh(patientModelService)); }
+  virtual ~StringPropertySelectMesh() {}
 
 public: // basic methods
   virtual bool setValue(const QString& value);
@@ -128,7 +128,7 @@ public: // interface extension
   MeshPtr getMesh();
 
 protected:
-	SelectMeshStringDataAdapter(PatientModelServicePtr patientModelService);
+	StringPropertySelectMesh(PatientModelServicePtr patientModelService);
 private:
   QString mMeshUid;
 };

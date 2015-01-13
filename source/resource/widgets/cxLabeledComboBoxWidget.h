@@ -50,7 +50,7 @@ namespace cx
 /**\brief Composite widget for string selection.
  *
  * Consists of <namelabel, combobox>.
- * Insert a subclass of StringDataAdStringDataAdapter to connect to data.
+ * Insert a subclass of StringPropertyBasePtr to connect to data.
  *
  * \ingroup cx_resource_widgets
  */
@@ -58,7 +58,7 @@ class cxResourceWidgets_EXPORT LabeledComboBoxWidget: public BaseWidget
 {
 Q_OBJECT
 public:
-	LabeledComboBoxWidget(QWidget* parent, StringDataAdapterPtr, QGridLayout* gridLayout = 0, int row = 0);
+	LabeledComboBoxWidget(QWidget* parent, StringPropertyBasePtr, QGridLayout* gridLayout = 0, int row = 0);
 	virtual ~LabeledComboBoxWidget(){};
 
 	virtual QString defaultWhatsThis() const;
@@ -75,7 +75,7 @@ private slots:
 private:
 	QLabel* mLabel;
 	QComboBox* mCombo;
-	StringDataAdapterPtr mData;
+	StringPropertyBasePtr mData;
 };
 
 } // namespace cx

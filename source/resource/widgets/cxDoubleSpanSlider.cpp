@@ -44,7 +44,7 @@ void SliderRangeGroupWidget::addToGridLayout(QGridLayout* gridLayout, int row)
   gridLayout->addWidget(mSpanSlider, row, 2);
 }
 
-SliderRangeGroupWidget::SliderRangeGroupWidget(QWidget* parent, DoublePairDataAdapterPtr dataInterface, QGridLayout* gridLayout, int row) : OptimizedUpdateWidget(parent)
+SliderRangeGroupWidget::SliderRangeGroupWidget(QWidget* parent, DoublePairPropertyBasePtr dataInterface, QGridLayout* gridLayout, int row) : OptimizedUpdateWidget(parent)
 {
 	mData = dataInterface;
 	this->init(gridLayout, row);

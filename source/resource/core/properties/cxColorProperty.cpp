@@ -42,10 +42,10 @@ namespace cx
 /** Make sure one given option exists witin root.
  * If not present, fill inn the input defaults.
  */
-ColorDataAdapterXmlPtr ColorDataAdapterXml::initialize(const QString& uid, QString name, QString help, QColor value,
+ColorPropertyPtr ColorProperty::initialize(const QString& uid, QString name, QString help, QColor value,
     QDomNode root)
 {
-    ColorDataAdapterXmlPtr retval(new ColorDataAdapterXml());
+    ColorPropertyPtr retval(new ColorProperty());
     retval->mUid = uid;
     retval->mName = name.isEmpty() ? uid : name;
     retval->mHelp = help;
@@ -54,27 +54,27 @@ ColorDataAdapterXmlPtr ColorDataAdapterXml::initialize(const QString& uid, QStri
     return retval;
 }
 
-QString ColorDataAdapterXml::getDisplayName() const
+QString ColorProperty::getDisplayName() const
 {
     return mName;
 }
 
-QString ColorDataAdapterXml::getUid() const
+QString ColorProperty::getUid() const
 {
     return mUid;
 }
 
-QString ColorDataAdapterXml::getHelp() const
+QString ColorProperty::getHelp() const
 {
     return mHelp;
 }
 
-QColor ColorDataAdapterXml::getValue() const
+QColor ColorProperty::getValue() const
 {
     return mValue;
 }
 
-bool ColorDataAdapterXml::setValue(QColor val)
+bool ColorProperty::setValue(QColor val)
 {
     if (val == mValue)
         return false;

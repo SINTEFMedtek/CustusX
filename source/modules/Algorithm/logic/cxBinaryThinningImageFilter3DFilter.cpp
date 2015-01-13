@@ -92,9 +92,9 @@ QString BinaryThinningImageFilter3DFilter::getHelp() const
 	        "</p></html>";
 }
 
-ColorDataAdapterPtr BinaryThinningImageFilter3DFilter::getColorOption(QDomElement root)
+ColorPropertyBasePtr BinaryThinningImageFilter3DFilter::getColorOption(QDomElement root)
 {
-	return ColorDataAdapterXml::initialize("Color", "",
+	return ColorProperty::initialize("Color", "",
 	                                            "Color of output model.",
 	                                            QColor("green"), root);
 }
@@ -106,9 +106,9 @@ void BinaryThinningImageFilter3DFilter::createOptions()
 
 void BinaryThinningImageFilter3DFilter::createInputTypes()
 {
-	SelectDataStringDataAdapterBasePtr temp;
+	SelectDataStringPropertyBasePtr temp;
 
-	temp = SelectImageStringDataAdapter::New(mPatientModelService);
+	temp = StringPropertySelectImage::New(mPatientModelService);
 	temp->setValueName("Input");
 	temp->setHelp("Select binary volume input for thinning");
 	//    connect(temp.get(), SIGNAL(dataChanged(QString)), this, SLOT(imageChangedSlot(QString)));
@@ -117,9 +117,9 @@ void BinaryThinningImageFilter3DFilter::createInputTypes()
 
 void BinaryThinningImageFilter3DFilter::createOutputTypes()
 {
-	SelectDataStringDataAdapterBasePtr temp;
+	SelectDataStringPropertyBasePtr temp;
 
-	temp = SelectMeshStringDataAdapter::New((mPatientModelService));
+	temp = StringPropertySelectMesh::New((mPatientModelService));
 	temp->setValueName("Output");
 	temp->setHelp("Output centerline model");
 	mOutputTypes.push_back(temp);
@@ -184,7 +184,7 @@ bool BinaryThinningImageFilter3DFilter::postProcess()
 	if(!mRawResult)
 		return success;
 
-	ColorDataAdapterPtr outputColor = this->getColorOption(mCopiedOptions);
+	ColorPropertyBasePtr outputColor = this->getColorOption(mCopiedOptions);
 
 	ImagePtr input = this->getCopiedInputImage();
 

@@ -64,9 +64,9 @@ void DoubleDataAdapterTimeCalibration::dominantToolChanged()
   emit changed();
 }
 
-DoubleDataAdapterPtr DoubleDataAdapterTimeCalibration::New()
+DoublePropertyBasePtr DoubleDataAdapterTimeCalibration::New()
 {
-  return DoubleDataAdapterPtr(new DoubleDataAdapterTimeCalibration());
+  return DoublePropertyBasePtr(new DoubleDataAdapterTimeCalibration());
 }
 
 double DoubleDataAdapterTimeCalibration::getValue() const

@@ -79,11 +79,11 @@ class cxGrabber_EXPORT ImageStreamerDummyArguments
 {
 public:
 	QStringList getArgumentDescription();
-	virtual std::vector<DataAdapterPtr> getSettings(QDomElement root);
+	virtual std::vector<PropertyPtr> getSettings(QDomElement root);
 	StringMap convertToCommandLineArguments(QDomElement root);
 
-	StringDataAdapterPtr getFilenameOption(QDomElement root);
-	BoolDataAdapterPtr getSecondaryOption(QDomElement root);
+	StringPropertyBasePtr getFilenameOption(QDomElement root);
+	BoolPropertyBasePtr getSecondaryOption(QDomElement root);
 };
 
 

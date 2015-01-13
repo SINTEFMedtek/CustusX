@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-DataSelectWidget::DataSelectWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget *parent, SelectDataStringDataAdapterBasePtr data, QGridLayout* gridLayout, int row) :
+DataSelectWidget::DataSelectWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget *parent, SelectDataStringPropertyBasePtr data, QGridLayout* gridLayout, int row) :
     BaseWidget(parent, "DataSelectWidget", "DataSelectWidget"),
 	mData(data),
 	mVisualizationService(visualizationService),

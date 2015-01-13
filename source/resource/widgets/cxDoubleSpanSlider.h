@@ -123,7 +123,7 @@ class cxResourceWidgets_EXPORT SliderRangeGroupWidget : public OptimizedUpdateWi
 {
   Q_OBJECT
 public:
-	SliderRangeGroupWidget(QWidget* parent, DoublePairDataAdapterPtr dataInterface, QGridLayout* gridLayout = 0, int row = 0);
+	SliderRangeGroupWidget(QWidget* parent, DoublePairPropertyBasePtr dataInterface, QGridLayout* gridLayout = 0, int row = 0);
 
 	void addToGridLayout(QGridLayout* gridLayout, int row);
   void setRange(const DoubleRange& range);
@@ -148,7 +148,7 @@ private:
   QDoubleSpinBox* mUpperEdit;
 	DoubleSpanSlider* mSpanSlider;
 
-	DoublePairDataAdapterPtr mData;
+	DoublePairPropertyBasePtr mData;
 };
 
 

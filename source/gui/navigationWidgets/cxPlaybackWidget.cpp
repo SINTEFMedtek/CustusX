@@ -111,7 +111,7 @@ PlaybackWidget::PlaybackWidget(QWidget* parent) :
 	      SLOT(toggleDetailsSlot()),
 	      playButtonsLayout);
 
-	mSpeedAdapter = DoubleDataAdapterXml::initialize(
+	mSpeedAdapter = DoubleProperty::initialize(
 					"speed",
 					"Speed",
 					"Set speed of playback, 0 is normal speed.", 0, DoubleRange(-5,5,1),0);

@@ -62,9 +62,9 @@ ToolTipSampleWidget::ToolTipSampleWidget(PatientModelServicePtr patientModelServ
 {
   QVBoxLayout* toplayout = new QVBoxLayout(this);
 
-  mCoordinateSystems = SelectCoordinateSystemStringDataAdapter::New();
-  mTools = SelectToolStringDataAdapter::New();
-	mData = SelectDataStringDataAdapter::New(patientModelService);
+  mCoordinateSystems = StringPropertySelectCoordinateSystem::New();
+  mTools = StringPropertySelectTool::New();
+	mData = StringPropertySelectData::New(patientModelService);
 
   mCoordinateSystemComboBox = new LabeledComboBoxWidget(this, mCoordinateSystems);
   mToolComboBox = new LabeledComboBoxWidget(this, mTools);

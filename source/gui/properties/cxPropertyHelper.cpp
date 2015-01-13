@@ -39,12 +39,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx {
 
 
-QWidget* createDataWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent, DataAdapterPtr data, QGridLayout* gridLayout, int row)
+QWidget* createDataWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent, PropertyPtr data, QGridLayout* gridLayout, int row)
 {
 	QWidget* retval = NULL;
 
 	//make cx widgets
-	SelectDataStringDataAdapterBasePtr dsda = boost::dynamic_pointer_cast<SelectDataStringDataAdapterBase>(data);
+	SelectDataStringPropertyBasePtr dsda = boost::dynamic_pointer_cast<SelectDataStringPropertyBase>(data);
 	if (dsda)
 	{
 		retval = new DataSelectWidget(visualizationService, patientModelService, parent, dsda, gridLayout, row);

@@ -56,31 +56,31 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-std::vector<DataAdapterPtr> ImageStreamerDummyArguments::getSettings(QDomElement root)
+std::vector<PropertyPtr> ImageStreamerDummyArguments::getSettings(QDomElement root)
 {
-	std::vector<DataAdapterPtr> retval;
+	std::vector<PropertyPtr> retval;
 	retval.push_back(this->getFilenameOption(root));
 	retval.push_back(this->getSecondaryOption(root));
 	return retval;
 }
 
-StringDataAdapterPtr ImageStreamerDummyArguments::getFilenameOption(QDomElement root)
+StringPropertyBasePtr ImageStreamerDummyArguments::getFilenameOption(QDomElement root)
 {
-	StringDataAdapterXmlPtr retval;
-	retval = StringDataAdapterXml::initialize("filename", "Filename",
+	StringPropertyPtr retval;
+	retval = StringProperty::initialize("filename", "Filename",
 											  "Select a 3D image file to stream from",
 											  "",
 											  root);
-	retval->setGuiRepresentation(StringDataAdapter::grFILENAME);
+	retval->setGuiRepresentation(StringPropertyBase::grFILENAME);
 	retval->setGroup("File");
 	return retval;
 }
 
-BoolDataAdapterPtr ImageStreamerDummyArguments::getSecondaryOption(QDomElement root)
+BoolPropertyBasePtr ImageStreamerDummyArguments::getSecondaryOption(QDomElement root)
 {
-	BoolDataAdapterXmlPtr retval;
+	BoolPropertyPtr retval;
 	bool defaultValue = false;
-	retval = BoolDataAdapterXml::initialize("secondary", "Secondary",
+	retval = BoolProperty::initialize("secondary", "Secondary",
 											"Create two streams, the second one a dummy color image",
 											defaultValue, root);
 	retval->setAdvanced(true);

@@ -68,10 +68,10 @@ VisualizationTab::VisualizationTab(QWidget *parent) :
 void VisualizationTab::init()
 {
   double sphereRadius = settings()->value("View3D/sphereRadius").toDouble();
-  mSphereRadius = DoubleDataAdapterXml::initialize("SphereRadius", "Sphere Radius", "Radius of sphere markers in the 3D scene.", sphereRadius, DoubleRange(0.1,10,0.1), 1, QDomNode());
+  mSphereRadius = DoubleProperty::initialize("SphereRadius", "Sphere Radius", "Radius of sphere markers in the 3D scene.", sphereRadius, DoubleRange(0.1,10,0.1), 1, QDomNode());
 
   double labelSize = settings()->value("View3D/labelSize").toDouble();
-  mLabelSize = DoubleDataAdapterXml::initialize("LabelSize", "Label Size", "Size of text labels in the 3D scene.", labelSize, DoubleRange(0.1,100,0.1), 1, QDomNode());
+  mLabelSize = DoubleProperty::initialize("LabelSize", "Label Size", "Size of text labels in the 3D scene.", labelSize, DoubleRange(0.1,100,0.1), 1, QDomNode());
 
   ColorSelectButton* backgroundColorButton = new ColorSelectButton("Background Color");
   backgroundColorButton->setColor(settings()->value("backgroundColor").value<QColor>());
@@ -79,22 +79,22 @@ void VisualizationTab::init()
   connect(backgroundColorButton, SIGNAL(colorChanged(QColor)), this, SLOT(setBackgroundColorSlot(QColor)));
 
   bool showDataText = settings()->value("View/showDataText").value<bool>();
-  mShowDataText = BoolDataAdapterXml::initialize("Show Data Text", "",
+  mShowDataText = BoolProperty::initialize("Show Data Text", "",
                                                  "Show the name of each data set in the views.",
                                                  showDataText);
   bool showLabels = settings()->value("View/showLabels").value<bool>();
-  mShowLabels = BoolDataAdapterXml::initialize("Show Labels", "",
+  mShowLabels = BoolProperty::initialize("Show Labels", "",
                                                  "Attach name labels to entities in the views.",
                                                  showLabels);
 
   bool showMetricNamesInCorner = settings()->value("View/showMetricNamesInCorner").value<bool>();
-  mShowMetricNamesInCorner = BoolDataAdapterXml::initialize("Corner Metrics", "",
+  mShowMetricNamesInCorner = BoolProperty::initialize("Corner Metrics", "",
 												 "Show the metric data in the upper right corner of the view instead of in the scene.",
 												 showMetricNamesInCorner);
 
 
   double annotationModelSize = settings()->value("View3D/annotationModelSize").toDouble();
-  mAnnotationModelSize = DoubleDataAdapterXml::initialize("AnnotationModelSize", "Annotation Model Size", "Size (0..1) of the annotation model in the 3D scene.", annotationModelSize, DoubleRange(0.01,1,0.01), 2, QDomNode());
+  mAnnotationModelSize = DoubleProperty::initialize("AnnotationModelSize", "Annotation Model Size", "Size (0..1) of the annotation model in the 3D scene.", annotationModelSize, DoubleRange(0.01,1,0.01), 2, QDomNode());
   QStringList annotationModelRange;
   foreach(QString path, DataLocations::getRootConfigPaths())
   {
@@ -102,7 +102,7 @@ void VisualizationTab::init()
   }
   annotationModelRange.prepend("<default>");
   QString annotationModel = settings()->value("View3D/annotationModel").toString();
-  mAnnotationModel = StringDataAdapterXml::initialize("AnnotationModel", "Annotation Model", "Name of annotation model in the 3D scene.", annotationModel, annotationModelRange, QDomNode());
+  mAnnotationModel = StringProperty::initialize("AnnotationModel", "Annotation Model", "Name of annotation model in the 3D scene.", annotationModel, annotationModelRange, QDomNode());
 
   //Stereoscopic visualization (3D view)
   QGroupBox* stereoGroupBox = new QGroupBox("Stereoscopic visualization");
@@ -110,24 +110,24 @@ void VisualizationTab::init()
   connect(mStereoTypeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(stereoTypeChangedSlot(int)));
   this->initStereoTypeComboBox();
   double eyeAngle = settings()->value("View3D/eyeAngle").toDouble();
-  mEyeAngleAdapter = DoubleDataAdapterXml::initialize("Eye angle (degrees)", "",
+  mEyeAngleAdapter = DoubleProperty::initialize("Eye angle (degrees)", "",
       "Separation between eyes in degrees",
 	  eyeAngle, DoubleRange(0, 25, 0.1), 1);
   connect(mEyeAngleAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(eyeAngleSlot()));
 
   double anyplaneViewOffset = settings()->value("Navigation/anyplaneViewOffset").toDouble();
-  mAnyplaneViewOffset = DoubleDataAdapterXml::initialize("AnyplaneViewOffset",
+  mAnyplaneViewOffset = DoubleProperty::initialize("AnyplaneViewOffset",
 														 "View Offset",
 														 "Position of virtual tool tip in anyplane view, % from top.",
 														 anyplaneViewOffset, DoubleRange(0.1,0.5,0.05), 2, QDomNode());
   mAnyplaneViewOffset->setInternal2Display(100);
 
   bool followTooltip = settings()->value("Navigation/followTooltip").value<bool>();
-  mFollowTooltip = BoolDataAdapterXml::initialize("Views Follow Tool", "",
+  mFollowTooltip = BoolProperty::initialize("Views Follow Tool", "",
 												 "ACS Views follow the virtual tool tip",
 												 followTooltip);
   double followTooltipBoundary = settings()->value("Navigation/followTooltipBoundary").toDouble();
-  mFollowTooltipBoundary = DoubleDataAdapterXml::initialize("FollowTooltipBoundary",
+  mFollowTooltipBoundary = DoubleProperty::initialize("FollowTooltipBoundary",
 														 "Follow Tool Boundary",
 														 "Boundary in ACS Views where follow tool tip is applied. % of view size",
 														 followTooltipBoundary, DoubleRange(0.0,0.5,0.05), 2, QDomNode());
@@ -296,7 +296,7 @@ void AutomationTab::init()
   mAutoLoadPatientCheckBox->setChecked(autoLoadPatient);
 
   double autoLoadPatientWithinHours = settings()->value("Automation/autoLoadRecentPatientWithinHours").toDouble();
-  mAutoLoadPatientWithinHours = DoubleDataAdapterXml::initialize("Auto load within hours", "Auto load within hours", "Load the last patient if within this number of hours (and auto load is enabled)", autoLoadPatientWithinHours, DoubleRange(0.1,1000,0.1), 1, QDomNode());
+  mAutoLoadPatientWithinHours = DoubleProperty::initialize("Auto load within hours", "Auto load within hours", "Load the last patient if within this number of hours (and auto load is enabled)", autoLoadPatientWithinHours, DoubleRange(0.1,1000,0.1), 1, QDomNode());
 
 
   //Layout

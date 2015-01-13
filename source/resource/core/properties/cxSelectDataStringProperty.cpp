@@ -40,15 +40,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ActiveImageStringDataAdapter::ActiveImageStringDataAdapter(PatientModelServicePtr patientModelService) :
-	SelectDataStringDataAdapterBase(patientModelService, "image")
+StringPropertyActiveImage::StringPropertyActiveImage(PatientModelServicePtr patientModelService) :
+	SelectDataStringPropertyBase(patientModelService, "image")
 {
 	mValueName = "Active Volume";
 	mHelp = "Select the active volume";
 	connect(mPatientModelService.get(), SIGNAL(activeImageChanged(QString)), this, SIGNAL(changed()));
 }
 
-bool ActiveImageStringDataAdapter::setValue(const QString& value)
+bool StringPropertyActiveImage::setValue(const QString& value)
 {
   ImagePtr newImage = mPatientModelService->getData<Image>(value);
   if (newImage==mPatientModelService->getActiveImage())
@@ -57,7 +57,7 @@ bool ActiveImageStringDataAdapter::setValue(const QString& value)
   return true;
 }
 
-QString ActiveImageStringDataAdapter::getValue() const
+QString StringPropertyActiveImage::getValue() const
 {
 	return mPatientModelService->getActiveImageUid();
 }
@@ -66,14 +66,14 @@ QString ActiveImageStringDataAdapter::getValue() const
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-SelectImageStringDataAdapter::SelectImageStringDataAdapter(PatientModelServicePtr patientModelService) :
-	SelectDataStringDataAdapterBase(patientModelService, "image")
+StringPropertySelectImage::StringPropertySelectImage(PatientModelServicePtr patientModelService) :
+	SelectDataStringPropertyBase(patientModelService, "image")
 {
 	mValueName = "Select volume";
 	mHelp = "Select a volume";
 }
 
-bool SelectImageStringDataAdapter::setValue(const QString& value)
+bool StringPropertySelectImage::setValue(const QString& value)
 {
   if (value==mImageUid)
 	return false;
@@ -83,12 +83,12 @@ bool SelectImageStringDataAdapter::setValue(const QString& value)
   return true;
 }
 
-QString SelectImageStringDataAdapter::getValue() const
+QString StringPropertySelectImage::getValue() const
 {
   return mImageUid;
 }
 
-ImagePtr SelectImageStringDataAdapter::getImage()
+ImagePtr StringPropertySelectImage::getImage()
 {
   return mPatientModelService->getData<Image>(mImageUid);
 }
@@ -98,12 +98,12 @@ ImagePtr SelectImageStringDataAdapter::getImage()
 //---------------------------------------------------------
 
 
-SelectDataStringDataAdapter::SelectDataStringDataAdapter(PatientModelServicePtr patientModelService) :
-	SelectDataStringDataAdapterBase(patientModelService, ".*")
+StringPropertySelectData::StringPropertySelectData(PatientModelServicePtr patientModelService) :
+	SelectDataStringPropertyBase(patientModelService, ".*")
 {
 }
 
-bool SelectDataStringDataAdapter::setValue(const QString& value)
+bool StringPropertySelectData::setValue(const QString& value)
 {
   if (value==mUid)
 	return false;
@@ -117,7 +117,7 @@ bool SelectDataStringDataAdapter::setValue(const QString& value)
   return true;
 }
 
-QString SelectDataStringDataAdapter::getValue() const
+QString StringPropertySelectData::getValue() const
 {
 	return mUid;
 //  if(!mData)
@@ -125,7 +125,7 @@ QString SelectDataStringDataAdapter::getValue() const
 //  return mData->getUid();
 }
 
-DataPtr SelectDataStringDataAdapter::getData() const
+DataPtr StringPropertySelectData::getData() const
 {
 	return mPatientModelService->getData(mUid);
 //  return mData;
@@ -135,14 +135,14 @@ DataPtr SelectDataStringDataAdapter::getData() const
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-SelectMeshStringDataAdapter::SelectMeshStringDataAdapter(PatientModelServicePtr patientModelService) :
-	SelectDataStringDataAdapterBase(patientModelService, "mesh")
+StringPropertySelectMesh::StringPropertySelectMesh(PatientModelServicePtr patientModelService) :
+	SelectDataStringPropertyBase(patientModelService, "mesh")
 {
 	mValueName = "Select mesh";
 	mHelp = "Select a mesh";
 }
 
-bool SelectMeshStringDataAdapter::setValue(const QString& value)
+bool StringPropertySelectMesh::setValue(const QString& value)
 {
   if (value==mMeshUid)
 	return false;
@@ -152,12 +152,12 @@ bool SelectMeshStringDataAdapter::setValue(const QString& value)
   return true;
 }
 
-QString SelectMeshStringDataAdapter::getValue() const
+QString StringPropertySelectMesh::getValue() const
 {
   return mMeshUid;
 }
 
-MeshPtr SelectMeshStringDataAdapter::getMesh()
+MeshPtr StringPropertySelectMesh::getMesh()
 {
   return mPatientModelService->getData<Mesh>(mMeshUid);
 }

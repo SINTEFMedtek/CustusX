@@ -40,10 +40,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-typedef boost::shared_ptr<class DoublePairDataAdapterXml> DoublePairDataAdapterXmlPtr;
+typedef boost::shared_ptr<class DoublePairProperty> DoublePairPropertyPtr;
 
 /**
- * \brief Implementation of DoublePairDataAdapter.
+ * \brief Implementation of DoublePairPropertyBase.
  *
  *  Represents one option of the double type.
  *  The data are stored within a xml document.
@@ -58,14 +58,14 @@ typedef boost::shared_ptr<class DoublePairDataAdapterXml> DoublePairDataAdapterX
  * \date Juli 31, 2014
  * \author Ole Vegard Solberg, SINTEF
  */
-class cxResource_EXPORT DoublePairDataAdapterXml : public DoublePairDataAdapter
+class cxResource_EXPORT DoublePairProperty : public DoublePairPropertyBase
 {
 Q_OBJECT
 public:
 	/** Make sure one given option exists witin root.
 	 * If not present, fill inn the input defaults.
 	 */
-	static DoublePairDataAdapterXmlPtr initialize(const QString& uid, QString name, QString help,
+	static DoublePairPropertyPtr initialize(const QString& uid, QString name, QString help,
 																								DoubleRange range, int decimals, QDomNode root = QDomNode());
 	void setInternal2Display(double factor);
 
@@ -93,7 +93,7 @@ signals:
 	void valueWasSet(); /// emitted when the value is set using setValue() (similar to changed(), but more constrained)
 
 private:
-	DoublePairDataAdapterXml();
+	DoublePairProperty();
 	QString mName;
 	QString mUid;
 	QString mHelp;

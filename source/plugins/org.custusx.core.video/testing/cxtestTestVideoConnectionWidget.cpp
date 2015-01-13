@@ -79,12 +79,12 @@ bool TestVideoConnectionWidget::canStream(QString filename)
 	return canStream;
 }
 
-cx::DataAdapterPtr TestVideoConnectionWidget::getOption(QString uid, QString method)
+cx::PropertyPtr TestVideoConnectionWidget::getOption(QString uid, QString method)
 {
 	cx::XmlOptionFile options = cx::XmlOptionFile(cx::DataLocations::getXmlSettingsFile()).descend("video");
 	QDomElement element = options.getElement("video");
 	cx::StreamerService* streamer = mServices->videoService->getStreamerService(method);
-	cx::DataAdapterPtr option = cx::DataAdapter::findAdapter(streamer->getSettings(element), uid);
+	cx::PropertyPtr option = cx::Property::findProperty(streamer->getSettings(element), uid);
 	return option;
 }
 

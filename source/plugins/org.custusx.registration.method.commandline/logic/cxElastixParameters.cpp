@@ -45,7 +45,7 @@ ElastixParameters::ElastixParameters(XmlOptionFile options)
 {
     mOptions = options;
 
-    mCurrentPreset = StringDataAdapterXml::initialize("currentPreset", "Preset", "Current Elastix Preset", "Select Preset...", QStringList(), mOptions.getElement());
+    mCurrentPreset = StringProperty::initialize("currentPreset", "Preset", "Current Elastix Preset", "Select Preset...", QStringList(), mOptions.getElement());
     connect(mCurrentPreset.get(), SIGNAL(changed()), this, SLOT(currentPresetChangedSlot()));
 
     this->currentPresetChangedSlot();
@@ -109,7 +109,7 @@ QStringList ElastixParameters::getParameterFilesDir() const
 	return folders;
 }
 
-StringDataAdapterPtr ElastixParameters::getCurrentPreset()
+StringPropertyBasePtr ElastixParameters::getCurrentPreset()
 {
     return mCurrentPreset;
 }

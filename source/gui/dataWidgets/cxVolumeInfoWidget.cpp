@@ -62,11 +62,11 @@ VolumeInfoWidget::~VolumeInfoWidget()
 
 void VolumeInfoWidget::addWidgets()
 {
-	mParentFrameAdapter = ParentFrameStringDataAdapter::New(mPatientModelService);
-	mNameAdapter = DataNameEditableStringDataAdapter::New();
-	mUidAdapter = DataUidEditableStringDataAdapter::New();
-	mModalityAdapter = DataModalityStringDataAdapter::New(mPatientModelService);
-	mImageTypeAdapter = ImageTypeStringDataAdapter::New(mPatientModelService);
+	mParentFrameAdapter = StringPropertyParentFrame::New(mPatientModelService);
+	mNameAdapter = StringPropertyDataNameEditable::New();
+	mUidAdapter = StringPropertyDataUidEditable::New();
+	mModalityAdapter = StringPropertyDataModality::New(mPatientModelService);
+	mImageTypeAdapter = StringPropertyImageType::New(mPatientModelService);
 
 	int i=0;
 	new LabeledLineEditWidget(this, mUidAdapter, gridLayout, i++);

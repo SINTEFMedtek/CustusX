@@ -44,7 +44,7 @@ namespace cx
 ManualImageTransformRegistrationWidget::ManualImageTransformRegistrationWidget(RegServices services, QWidget *parent, QString objectName) :
 	ManualImageRegistrationWidget(services, parent, objectName, "Manual Image Transform Registration")
 {
-	StringDataAdapterPtr movingImage(new RegistrationMovingImageStringDataAdapter(services.registrationService, services.patientModelService));
+	StringPropertyBasePtr movingImage(new StringPropertyRegistrationMovingImage(services.registrationService, services.patientModelService));
 
 	LabeledComboBoxWidget* moving = new LabeledComboBoxWidget(this, movingImage);
 

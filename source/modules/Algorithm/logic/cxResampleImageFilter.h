@@ -62,7 +62,7 @@ public:
 	virtual bool postProcess();
 
 	// extensions:
-	DoubleDataAdapterXmlPtr getMarginOption(QDomElement root);
+	DoublePropertyPtr getMarginOption(QDomElement root);
 
 protected:
 	virtual void createOptions();

@@ -66,12 +66,12 @@ public:
 	virtual bool postProcess();
 
 	// extensions:
-	BoolDataAdapterXmlPtr getReduceResolutionOption(QDomElement root);
-	BoolDataAdapterXmlPtr getSmoothingOption(QDomElement root);
-	BoolDataAdapterXmlPtr getPreserveTopologyOption(QDomElement root);
-	DoubleDataAdapterXmlPtr getSurfaceThresholdOption(QDomElement root);
-	DoubleDataAdapterXmlPtr getDecimationOption(QDomElement root);
-	ColorDataAdapterXmlPtr getColorOption(QDomElement root);
+	BoolPropertyPtr getReduceResolutionOption(QDomElement root);
+	BoolPropertyPtr getSmoothingOption(QDomElement root);
+	BoolPropertyPtr getPreserveTopologyOption(QDomElement root);
+	DoublePropertyPtr getSurfaceThresholdOption(QDomElement root);
+	DoublePropertyPtr getDecimationOption(QDomElement root);
+	ColorPropertyPtr getColorOption(QDomElement root);
 
 	/** This is the core algorithm, call this if you dont need all the filter stuff.
 	    Generate a contour from a vtkImageData.
@@ -99,8 +99,8 @@ private slots:
 	void thresholdSlot();
 
 private:
-	BoolDataAdapterXmlPtr mReduceResolutionOption;
-	DoubleDataAdapterXmlPtr mSurfaceThresholdOption;
+	BoolPropertyPtr mReduceResolutionOption;
+	DoublePropertyPtr mSurfaceThresholdOption;
 	vtkPolyDataPtr mRawResult;
 };
 typedef boost::shared_ptr<class ContourFilter> ContourFilterPtr;

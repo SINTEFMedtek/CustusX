@@ -80,8 +80,8 @@ void ReconstructionManagerTestFixture::setPNN_InterpolationSteps(int value)
 	cx::ReconstructionMethodService* algorithm = manager->createAlgorithm();
 	REQUIRE(algorithm);
 
-	std::vector<cx::DataAdapterPtr> adaptors = algorithm->getSettings(algo);
-	cx::DataAdapterPtr adapter = cx::DataAdapter::findAdapter(adaptors, "interpolationSteps");
+	std::vector<cx::PropertyPtr> adaptors = algorithm->getSettings(algo);
+	cx::PropertyPtr adapter = cx::Property::findProperty(adaptors, "interpolationSteps");
 	if(adapter)
 		adapter->setValueFromVariant(value);
 	else

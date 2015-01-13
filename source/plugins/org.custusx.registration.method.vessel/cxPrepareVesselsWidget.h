@@ -77,7 +77,7 @@ private slots:
 protected:
   class PipelineWidget* mPipelineWidget;
   PipelinePtr mPipeline;
-  ColorDataAdapterPtr mColorDataAdapter;
+  ColorPropertyBasePtr mColorProperty;
 };
 
 

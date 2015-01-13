@@ -50,7 +50,7 @@ typedef boost::shared_ptr<class VisualizationService> VisualizationServicePtr;
  *
  * \ingroup cx_gui
  */
-cxGui_EXPORT QWidget* createDataWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent, cx::DataAdapterPtr data, QGridLayout* gridLayout = 0, int row = 0);
+cxGui_EXPORT QWidget* createDataWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent, cx::PropertyPtr data, QGridLayout* gridLayout = 0, int row = 0);
 
 } /* namespace cx */
 #endif /* CXPROPERTYHELPER_H_ */

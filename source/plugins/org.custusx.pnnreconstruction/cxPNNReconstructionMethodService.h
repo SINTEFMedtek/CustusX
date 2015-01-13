@@ -63,12 +63,12 @@ public:
 
 	virtual QString getName() const;
 
-	virtual std::vector<DataAdapterPtr> getSettings(QDomElement root);
+	virtual std::vector<PropertyPtr> getSettings(QDomElement root);
 	virtual bool reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr outputData, QDomElement settings);
 
 
 private:
-	DoubleDataAdapterXmlPtr getInterpolationStepsOption(QDomElement root);
+	DoublePropertyPtr getInterpolationStepsOption(QDomElement root);
 	bool validPixel(int x, int y, const Eigen::Array3i& dims, unsigned char* rawPointer)
 	{
 		return (x >= 0) && (x < dims[0]) && (y >= 0) && (y < dims[1]) && (rawPointer[x + y * dims[0]] != 0);

@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-typedef boost::shared_ptr<class SelectToolStringDataAdapter> SelectToolStringDataAdapterPtr;
+typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
 /**
  * \file
  * \addtogroup cx_module_calibration
@@ -65,7 +65,7 @@ private slots:
 private:
   QGroupBox* mGroup;
   Transform3DWidget* mMatrixWidget;
-  SelectToolStringDataAdapterPtr mTool;
+  StringPropertySelectToolPtr mTool;
 };
 
 

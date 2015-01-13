@@ -47,17 +47,17 @@ namespace cx
 {
 
 
-std::vector<DataAdapterPtr> LocalServerStreamerArguments::getSettings(QDomElement root)
+std::vector<PropertyPtr> LocalServerStreamerArguments::getSettings(QDomElement root)
 {
-	std::vector<DataAdapterPtr> retval;
+	std::vector<PropertyPtr> retval;
 	retval.push_back(this->getRunLocalServerOption(root));
 	retval.push_back(this->getLocalServerNameOption(root));
 	return retval;
 }
 
-BoolDataAdapterPtr LocalServerStreamerArguments::getRunLocalServerOption(QDomElement root)
+BoolPropertyBasePtr LocalServerStreamerArguments::getRunLocalServerOption(QDomElement root)
 {
-	BoolDataAdapterXmlPtr retval;
+	BoolPropertyPtr retval;
 
 #ifdef __APPLE__
 	bool defaultValue = true; // problems with opencv on mac - cannot close
@@ -66,21 +66,21 @@ BoolDataAdapterPtr LocalServerStreamerArguments::getRunLocalServerOption(QDomEle
 #endif
 
 
-	retval = BoolDataAdapterXml::initialize("runlocalserver", "Run as separate process",
+	retval = BoolProperty::initialize("runlocalserver", "Run as separate process",
 											"Run streamer in a separate process",
 											defaultValue, root);
 	retval->setAdvanced(false);
 	retval->setGroup("Connection");
 	return retval;
 }
-StringDataAdapterPtr LocalServerStreamerArguments::getLocalServerNameOption(QDomElement root)
+StringPropertyBasePtr LocalServerStreamerArguments::getLocalServerNameOption(QDomElement root)
 {
-	StringDataAdapterXmlPtr retval;
+	StringPropertyPtr retval;
 	QString defaultValue = this->getOpenIGTLinkServer().join(" ");
-	retval = StringDataAdapterXml::initialize("localservername", "Server Name",
+	retval = StringProperty::initialize("localservername", "Server Name",
 											  "Name of server executable, used only if Run Local Server is set.",
 											  defaultValue, root);
-	retval->setGuiRepresentation(StringDataAdapter::grFILENAME);
+	retval->setGuiRepresentation(StringPropertyBase::grFILENAME);
 	retval->setAdvanced(false);
 	retval->setGroup("Connection");
 	return retval;

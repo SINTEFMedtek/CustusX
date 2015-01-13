@@ -73,7 +73,7 @@ private:
 	QCheckBox* mContinousEraseCheckBox;
 	vtkSphereSourcePtr mSphere;
 	QCheckBox* mShowEraserCheckBox;
-	DoubleDataAdapterXmlPtr mSphereSizeAdapter;
+	DoublePropertyPtr mSphereSizeAdapter;
 	QAction* mDuplicateAction;
 	QAction* mSaveAction;
 	QAction* mRemoveAction;

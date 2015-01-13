@@ -67,9 +67,9 @@ QString ResampleImageFilter::getHelp() const
 	        "</html>";
 }
 
-DoubleDataAdapterXmlPtr ResampleImageFilter::getMarginOption(QDomElement root)
+DoublePropertyPtr ResampleImageFilter::getMarginOption(QDomElement root)
 {
-	return DoubleDataAdapterXml::initialize("Margin", "",
+	return DoubleProperty::initialize("Margin", "",
 	                                             "mm Margin added to ref image bounding box",
 	                                             5.0, DoubleRange(0, 50, 1), 1, root);
 }
@@ -81,14 +81,14 @@ void ResampleImageFilter::createOptions()
 
 void ResampleImageFilter::createInputTypes()
 {
-	SelectDataStringDataAdapterBasePtr temp;
+	SelectDataStringPropertyBasePtr temp;
 
-	temp = SelectImageStringDataAdapter::New(mPatientModelService);
+	temp = StringPropertySelectImage::New(mPatientModelService);
 	temp->setValueName("Input");
 	temp->setHelp("Select input to be resampled");
 	mInputTypes.push_back(temp);
 
-	temp = SelectImageStringDataAdapter::New(mPatientModelService);
+	temp = StringPropertySelectImage::New(mPatientModelService);
 	temp->setValueName("Reference");
 	temp->setHelp("Select reference. Resample input into this coordinate system and bounding box");
 	mInputTypes.push_back(temp);
@@ -96,9 +96,9 @@ void ResampleImageFilter::createInputTypes()
 
 void ResampleImageFilter::createOutputTypes()
 {
-	SelectDataStringDataAdapterBasePtr temp;
+	SelectDataStringPropertyBasePtr temp;
 
-	temp = SelectDataStringDataAdapter::New(mPatientModelService);
+	temp = StringPropertySelectData::New(mPatientModelService);
 	temp->setValueName("Output");
 	temp->setHelp("Output thresholded binary image");
 	mOutputTypes.push_back(temp);
@@ -121,7 +121,7 @@ bool ResampleImageFilter::execute()
 	if (!input || !reference)
 		return false;
 
-	DoubleDataAdapterXmlPtr marginOption = this->getMarginOption(mCopiedOptions);
+	DoublePropertyPtr marginOption = this->getMarginOption(mCopiedOptions);
 	double margin = marginOption->getValue();
 
 	Transform3D refMi = reference->get_rMd().inv() * input->get_rMd();

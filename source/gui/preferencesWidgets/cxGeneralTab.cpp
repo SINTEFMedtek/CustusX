@@ -91,7 +91,7 @@ void GeneralTab::init()
   this->applicationStateChangedSlot();
 
   bool filterToolPositions = settings()->value("TrackingPositionFilter/enabled").value<bool>();
-  mFilterToolPositions = BoolDataAdapterXml::initialize("Tool smoothing", "",
+  mFilterToolPositions = BoolProperty::initialize("Tool smoothing", "",
 												 "Smooth the tool tracking positions using a low-pass filter.",
 												 filterToolPositions);
 

@@ -51,17 +51,17 @@ namespace cx
 
 
 FusedInputOutputSelectDataStringDataAdapterPtr FusedInputOutputSelectDataStringDataAdapter::create(PatientModelServicePtr patientModelService,
-																								   SelectDataStringDataAdapterBasePtr base,
-																								   SelectDataStringDataAdapterBasePtr input)
+																								   SelectDataStringPropertyBasePtr base,
+																								   SelectDataStringPropertyBasePtr input)
 {
 	FusedInputOutputSelectDataStringDataAdapterPtr retval(new FusedInputOutputSelectDataStringDataAdapter(patientModelService, base, input));
 	return retval;
 }
 
 FusedInputOutputSelectDataStringDataAdapter::FusedInputOutputSelectDataStringDataAdapter(PatientModelServicePtr patientModelService,
-																						 SelectDataStringDataAdapterBasePtr base,
-																						 SelectDataStringDataAdapterBasePtr input) :
-	SelectDataStringDataAdapterBase(patientModelService)
+																						 SelectDataStringPropertyBasePtr base,
+																						 SelectDataStringPropertyBasePtr input) :
+	SelectDataStringPropertyBase(patientModelService)
 {
 	mBase = base;
 	mInput = input;
@@ -193,7 +193,7 @@ void Pipeline::setOption(QString valueName, QVariant value)
 	for (unsigned i=0; i<mFilters->size(); ++i)
 	{
 		FilterPtr filter = mFilters->get(i);
-		std::vector<DataAdapterPtr> options = filter->getOptions();
+		std::vector<PropertyPtr> options = filter->getOptions();
 
 		for (unsigned j=0; j<options.size(); ++j)
 		{
@@ -203,29 +203,29 @@ void Pipeline::setOption(QString valueName, QVariant value)
 	}
 }
 
-void Pipeline::setOption(DataAdapterPtr adapter, QVariant value)
+void Pipeline::setOption(PropertyPtr adapter, QVariant value)
 {
 	if (value.canConvert<bool>())
 	{
-		BoolDataAdapterPtr specific = boost::dynamic_pointer_cast<BoolDataAdapter>(adapter);
+		BoolPropertyBasePtr specific = boost::dynamic_pointer_cast<BoolPropertyBase>(adapter);
 		if (specific)
 			specific->setValue(qvariant_cast<bool>(value));
 	}
 	else if (value.canConvert<double>())
 	{
-		DoubleDataAdapterPtr specific = boost::dynamic_pointer_cast<DoubleDataAdapter>(adapter);
+		DoublePropertyBasePtr specific = boost::dynamic_pointer_cast<DoublePropertyBase>(adapter);
 		if (specific)
 			specific->setValue(qvariant_cast<double>(value));
 	}
 	else if (value.canConvert<QColor>())
 	{
-		ColorDataAdapterPtr specific = boost::dynamic_pointer_cast<ColorDataAdapter>(adapter);
+		ColorPropertyBasePtr specific = boost::dynamic_pointer_cast<ColorPropertyBase>(adapter);
 		if (specific)
 			specific->setValue(qvariant_cast<QColor>(value));
 	}
 	else if (value.canConvert<QString>())
 	{
-		StringDataAdapterPtr specific = boost::dynamic_pointer_cast<StringDataAdapter>(adapter);
+		StringPropertyBasePtr specific = boost::dynamic_pointer_cast<StringPropertyBase>(adapter);
 		if (specific)
 			specific->setValue(qvariant_cast<QString>(value));
 	}
@@ -236,7 +236,7 @@ void Pipeline::setOption(DataAdapterPtr adapter, QVariant value)
 }
 
 
-std::vector<SelectDataStringDataAdapterBasePtr> Pipeline::getNodes()
+std::vector<SelectDataStringPropertyBasePtr> Pipeline::getNodes()
 {
 	// TODO: create getMainXXType() in filters instead of using zero.
 
@@ -245,12 +245,12 @@ std::vector<SelectDataStringDataAdapterBasePtr> Pipeline::getNodes()
 	return mNodes;
 }
 
-std::vector<SelectDataStringDataAdapterBasePtr> Pipeline::createNodes()
+std::vector<SelectDataStringPropertyBasePtr> Pipeline::createNodes()
 {
 	// TODO: create fused nodes: input+output
 	// TODO: create getMainXXType() in filters instead of using zero.
 
-	std::vector<SelectDataStringDataAdapterBasePtr> retval;
+	std::vector<SelectDataStringPropertyBasePtr> retval;
 
 	if (mFilters->empty())
 		return retval;
@@ -261,8 +261,8 @@ std::vector<SelectDataStringDataAdapterBasePtr> Pipeline::createNodes()
 	// intermediate nodes are fusions between output and input
 	for (unsigned i=1; i<mFilters->size(); ++i)
 	{
-		SelectDataStringDataAdapterBasePtr output = mFilters->get(i-1)->getOutputTypes()[0];
-		SelectDataStringDataAdapterBasePtr base  = mFilters->get(i)->getInputTypes()[0];
+		SelectDataStringPropertyBasePtr output = mFilters->get(i-1)->getOutputTypes()[0];
+		SelectDataStringPropertyBasePtr base  = mFilters->get(i)->getInputTypes()[0];
 		FusedInputOutputSelectDataStringDataAdapterPtr node;
 		node = FusedInputOutputSelectDataStringDataAdapter::create(mPatientModelService, base, output);
 		node->setValueName(QString("Node %1").arg(i));

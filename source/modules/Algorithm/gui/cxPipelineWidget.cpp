@@ -113,7 +113,7 @@ PipelineWidget::PipelineWidget(VisualizationServicePtr visualizationService, Pat
     mPipeline(pipeline)
 {
 	FilterGroupPtr filters = mPipeline->getFilters();
-	std::vector<SelectDataStringDataAdapterBasePtr> nodes = mPipeline->getNodes();
+	std::vector<SelectDataStringPropertyBasePtr> nodes = mPipeline->getNodes();
 	if (filters->size()+1 != nodes.size())
 		reportError("Filter/Node mismatch");
 

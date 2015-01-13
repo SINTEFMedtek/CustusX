@@ -72,9 +72,9 @@ private:
   QLabel* mUidLabel;
   QLabel* mNameLabel;
   QLabel* mErrorLabel;
-  SetParentFrameStringDataAdapterPtr mParentFrameAdapter;
-  DataModalityStringDataAdapterPtr mModalityAdapter;
-  ImageTypeStringDataAdapterPtr mImageTypeAdapter;
+  StringPropertySetParentFramePtr mParentFrameAdapter;
+  StringPropertyDataModalityPtr mModalityAdapter;
+  StringPropertyImageTypePtr mImageTypeAdapter;
   QWidget* mParentFrameCombo;
   QWidget* mImageTypeCombo;
   QWidget* mModalityCombo;

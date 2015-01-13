@@ -69,7 +69,7 @@ VideoConnectionWidget::VideoConnectionWidget(VisServicesPtr services, QWidget* p
 	mOptions = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("video");
 
 	QString defaultConnection = mServices->videoService->getConnectionMethod();
-	mConnectionSelector = StringDataAdapterXml::initialize("Connection", "", "Method for connecting to Video Server", defaultConnection, QStringList(), mOptions.getElement("video"));
+	mConnectionSelector = StringProperty::initialize("Connection", "", "Method for connecting to Video Server", defaultConnection, QStringList(), mOptions.getElement("video"));
 	connect(mConnectionSelector.get(), SIGNAL(changed()), this, SLOT(selectGuiForConnectionMethodSlot()));
 
 	connect(mServices->videoService.get(), &VideoService::connected, this, &VideoConnectionWidget::serverStatusChangedSlot);
@@ -129,7 +129,7 @@ QWidget* VideoConnectionWidget::createStreamerWidget(StreamerService* service)
 {
 	QString serviceName = service->getName();
 	QDomElement element = mOptions.getElement("video");
-	std::vector<DataAdapterPtr> adapters = service->getSettings(element);
+	std::vector<PropertyPtr> adapters = service->getSettings(element);
 
 	OptionsWidget* widget = new OptionsWidget(mServices->visualizationService, mServices->patientModelService, this);
 	widget->setOptions(serviceName, adapters, false);
@@ -171,9 +171,9 @@ void VideoConnectionWidget::removeServiceWidget(QString name)
 	mStreamerServiceWidgets.erase(name);
 }
 
-ActiveVideoSourceStringDataAdapterPtr VideoConnectionWidget::initializeActiveVideoSourceSelector()
+StringPropertyActiveVideoSourcePtr VideoConnectionWidget::initializeActiveVideoSourceSelector()
 {
-	return ActiveVideoSourceStringDataAdapter::New();
+	return StringPropertyActiveVideoSource::New();
 }
 
 QFrame* VideoConnectionWidget::wrapStackedWidgetInAFrame()

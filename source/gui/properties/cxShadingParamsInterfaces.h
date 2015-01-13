@@ -50,7 +50,7 @@ namespace cx
 
 /** Superclass for all shading parameters
  */
-class cxGui_EXPORT DoubleDataAdapterShadingBase : public DoubleDataAdapter
+class cxGui_EXPORT DoubleDataAdapterShadingBase : public DoublePropertyBase
 {
   Q_OBJECT 
 public:

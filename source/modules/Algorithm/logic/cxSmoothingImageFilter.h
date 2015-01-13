@@ -62,7 +62,7 @@ public:
 	virtual bool postProcess();
 
 	// extensions:
-	DoubleDataAdapterXmlPtr getSigma(QDomElement root);
+	DoublePropertyPtr getSigma(QDomElement root);
 
 protected:
 	virtual void createOptions();

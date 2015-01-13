@@ -38,9 +38,9 @@ class ctkPluginContext;
 
 namespace cx
 {
-typedef boost::shared_ptr<class StringDataAdapter> StringDataAdapterPtr;
-typedef boost::shared_ptr<class DoubleDataAdapter> DoubleDataAdapterPtr;
-typedef boost::shared_ptr<class BoolDataAdapter> BoolDataAdapterPtr;
+typedef boost::shared_ptr<class StringPropertyBase> StringPropertyBasePtr;
+typedef boost::shared_ptr<class DoublePropertyBase> DoublePropertyBasePtr;
+typedef boost::shared_ptr<class BoolPropertyBase> BoolPropertyBasePtr;
 
 
 /**
@@ -55,7 +55,7 @@ public:
 	ImageFileStreamerService(ctkPluginContext *context) {}
 	virtual ~ImageFileStreamerService() {}
 	virtual QString getName();
-	virtual std::vector<DataAdapterPtr> getSettings(QDomElement root);
+	virtual std::vector<PropertyPtr> getSettings(QDomElement root);
 	virtual StreamerPtr createStreamer(QDomElement root);
 private:
 };

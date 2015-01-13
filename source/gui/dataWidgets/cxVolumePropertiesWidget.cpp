@@ -63,7 +63,7 @@ ActiveVolumeWidget::ActiveVolumeWidget(PatientModelServicePtr patientModelServic
 {
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->setMargin(0);
-	layout->addWidget(new DataSelectWidget(visualizationService, patientModelService, this, ActiveImageStringDataAdapter::New(patientModelService)));
+	layout->addWidget(new DataSelectWidget(visualizationService, patientModelService, this, StringPropertyActiveImage::New(patientModelService)));
 }
 
 QString ActiveVolumeWidget::defaultWhatsThis() const

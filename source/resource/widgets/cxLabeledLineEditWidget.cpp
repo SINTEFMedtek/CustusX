@@ -42,7 +42,7 @@ namespace cx
 
 ///----------------
 
-LabeledLineEditWidget::LabeledLineEditWidget(QWidget* parent, StringDataAdapterPtr dataInterface,
+LabeledLineEditWidget::LabeledLineEditWidget(QWidget* parent, StringPropertyBasePtr dataInterface,
 	QGridLayout* gridLayout, int row) :
     OptimizedUpdateWidget(parent)
 {

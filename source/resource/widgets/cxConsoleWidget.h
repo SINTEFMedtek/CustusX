@@ -186,7 +186,7 @@ private:
 	QStackedLayout* mStackedLayout;
 
 	QAction* mDetailsAction;
-	StringDataAdapterXmlPtr mChannelSelector;
+	StringPropertyPtr mChannelSelector;
 	QStringList mChannels;
 	MessageListenerPtr mMessageListener;
 	boost::shared_ptr<class MessageFilterConsole> mMessageFilter;

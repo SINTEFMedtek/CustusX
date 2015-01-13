@@ -42,7 +42,7 @@ namespace cx
 
 ///----------------
 
-FilenameWidget::FilenameWidget(QWidget* parent, StringDataAdapterPtr dataInterface,
+FilenameWidget::FilenameWidget(QWidget* parent, StringPropertyBasePtr dataInterface,
 	QGridLayout* gridLayout, int row) :
 	OptimizedUpdateWidget(parent)
 {

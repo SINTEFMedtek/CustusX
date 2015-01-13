@@ -84,14 +84,14 @@ AllFiltersWidget::AllFiltersWidget(VisualizationServicePtr visualizationService,
 		names[mFilters->get(i)->getUid()] = mFilters->get(i)->getName();
 	}
 
-	mFilterSelector = StringDataAdapterXml::initialize("filterSelector",
+	mFilterSelector = StringProperty::initialize("filterSelector",
 	                                                        "Filter",
 	                                                        "Select which filter to use.",
 	                                                        availableFilters[0],
 	                                                        availableFilters,
 	                                                        options.getElement());
 	mFilterSelector->setDisplayNames(names);
-	connect(mFilterSelector.get(), &StringDataAdapterXml::valueWasSet,
+	connect(mFilterSelector.get(), &StringProperty::valueWasSet,
 			this, &AllFiltersWidget::filterChangedSlot);
 
 	QVBoxLayout* topLayout = new QVBoxLayout(this);

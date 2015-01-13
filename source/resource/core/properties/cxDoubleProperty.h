@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /*
- * sscDoubleDataAdapterXml.h
+ * sscDoubleProperty.h
  *
  *  Created on: Jun 27, 2010
  *      Author: christiana
@@ -52,9 +52,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-typedef boost::shared_ptr<class DoubleDataAdapterXml> DoubleDataAdapterXmlPtr;
+typedef boost::shared_ptr<class DoubleProperty> DoublePropertyPtr;
 
-/**\brief Implementation of DoubleDataAdapter.
+/**\brief Implementation of DoublePropertyBase.
  *
  *  Represents one option of the double type.
  *  The data are stored within a xml document.
@@ -66,7 +66,7 @@ typedef boost::shared_ptr<class DoubleDataAdapterXml> DoubleDataAdapterXmlPtr;
  *
  * \ingroup cx_resource_core_dataadapters
  */
-class cxResource_EXPORT DoubleDataAdapterXml: public DoubleDataAdapter
+class cxResource_EXPORT DoubleProperty: public DoublePropertyBase
 {
 
 	Q_OBJECT
@@ -74,7 +74,7 @@ public:
 	/** Make sure one given option exists witin root.
 	 * If not present, fill inn the input defaults.
 	 */
-	static DoubleDataAdapterXmlPtr initialize(const QString& uid, QString name, QString help, double value, DoubleRange range, int decimals, QDomNode root = QDomNode());
+	static DoublePropertyPtr initialize(const QString& uid, QString name, QString help, double value, DoubleRange range, int decimals, QDomNode root = QDomNode());
 	void setInternal2Display(double factor);
 
 public:
@@ -101,7 +101,7 @@ signals:
 	void valueWasSet(); /// emitted when the value is set using setValue() (similar to changed(), but more constrained)
 
 private:
-	DoubleDataAdapterXml();
+	DoubleProperty();
 	QString mName;
 	QString mUid;
 	QString mHelp;

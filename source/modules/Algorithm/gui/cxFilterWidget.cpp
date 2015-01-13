@@ -143,9 +143,9 @@ void FilterSetupWidget::setFilter(FilterPtr filter)
 	{
 		mCurrentFilter->setActive(!mObscuredListener->isObscured());
 
-		std::vector<SelectDataStringDataAdapterBasePtr> inputTypes = mCurrentFilter->getInputTypes();
-		std::vector<SelectDataStringDataAdapterBasePtr> outputTypes = mCurrentFilter->getOutputTypes();
-		std::vector<DataAdapterPtr> options = mCurrentFilter->getOptions();
+		std::vector<SelectDataStringPropertyBasePtr> inputTypes = mCurrentFilter->getInputTypes();
+		std::vector<SelectDataStringPropertyBasePtr> outputTypes = mCurrentFilter->getOutputTypes();
+		std::vector<PropertyPtr> options = mCurrentFilter->getOptions();
 
 		mInputsWidget->setOptions(mCurrentFilter->getUid(), mCurrentFilter->getInputTypes(), false);
 		mOutputsWidget->setOptions(mCurrentFilter->getUid(), mCurrentFilter->getOutputTypes(), false);
@@ -164,9 +164,9 @@ void FilterSetupWidget::setFilter(FilterPtr filter)
 	}
 	else
 	{
-		mInputsWidget->setOptions("", std::vector<DataAdapterPtr>(), false);
-		mOutputsWidget->setOptions("", std::vector<DataAdapterPtr>(), false);
-		mOptionsWidget->setOptions("", std::vector<DataAdapterPtr>(), false);
+		mInputsWidget->setOptions("", std::vector<PropertyPtr>(), false);
+		mOutputsWidget->setOptions("", std::vector<PropertyPtr>(), false);
+		mOptionsWidget->setOptions("", std::vector<PropertyPtr>(), false);
 	}
 }
 

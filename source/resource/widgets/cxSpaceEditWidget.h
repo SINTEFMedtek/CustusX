@@ -49,7 +49,7 @@ namespace cx
 /**\brief Composite widget for string selection.
  *
  * Consists of <namelabel, combobox>.
- * Insert a subclass of SpaceDataAdapter to connect to data.
+ * Insert a subclass of SpaceProperty to connect to data.
  *
  * \ingroup cx_resource_widgets
  */
@@ -57,7 +57,7 @@ class cxResourceWidgets_EXPORT SpaceEditWidget: public BaseWidget
 {
 Q_OBJECT
 public:
-	SpaceEditWidget(QWidget* parent, SpaceDataAdapterPtr, QGridLayout* gridLayout = 0, int row = 0);
+	SpaceEditWidget(QWidget* parent, SpacePropertyBasePtr, QGridLayout* gridLayout = 0, int row = 0);
 	virtual ~SpaceEditWidget() {}
 
 	virtual QString defaultWhatsThis() const;
@@ -81,7 +81,7 @@ private:
 	QLabel* mLabel;
 	QComboBox* mIdCombo;
 	QComboBox* mRefCombo;
-	SpaceDataAdapterPtr mData;
+	SpacePropertyBasePtr mData;
 
 };
 

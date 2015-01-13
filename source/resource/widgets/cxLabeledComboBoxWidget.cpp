@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-LabeledComboBoxWidget::LabeledComboBoxWidget(QWidget* parent, StringDataAdapterPtr dataInterface,
+LabeledComboBoxWidget::LabeledComboBoxWidget(QWidget* parent, StringPropertyBasePtr dataInterface,
 	QGridLayout* gridLayout, int row) :
     BaseWidget(parent, "LabeledComboBoxWidget", "LabeledComboBoxWidget")
 {
@@ -50,7 +50,7 @@ LabeledComboBoxWidget::LabeledComboBoxWidget(QWidget* parent, StringDataAdapterP
 	this->setEnabled(dataInterface->getEnabled());
 
 	mData = dataInterface;
-	connect(mData.get(), &DataAdapter::changed, this, &LabeledComboBoxWidget::setModified);
+	connect(mData.get(), &Property::changed, this, &LabeledComboBoxWidget::setModified);
 
 	mLabel = new QLabel(this);
 	mLabel->setText(mData->getDisplayName());

@@ -41,10 +41,10 @@ class ctkPluginContext;
 
 namespace cx
 {
-typedef boost::shared_ptr<class StringDataAdapter> StringDataAdapterPtr;
-typedef boost::shared_ptr<class DoubleDataAdapter> DoubleDataAdapterPtr;
-typedef boost::shared_ptr<class DataAdapter> DataAdapterPtr;
-typedef boost::shared_ptr<class BoolDataAdapter> BoolDataAdapterPtr;
+typedef boost::shared_ptr<class StringPropertyBase> StringPropertyBasePtr;
+typedef boost::shared_ptr<class DoublePropertyBase> DoublePropertyBasePtr;
+typedef boost::shared_ptr<class Property> PropertyPtr;
+typedef boost::shared_ptr<class BoolPropertyBase> BoolPropertyBasePtr;
 
 /** Options for LocalServerStreamer
  *
@@ -56,10 +56,10 @@ typedef boost::shared_ptr<class BoolDataAdapter> BoolDataAdapterPtr;
 class org_custusx_core_video_EXPORT LocalServerStreamerArguments
 {
 public:
-	std::vector<DataAdapterPtr> getSettings(QDomElement root);
+	std::vector<PropertyPtr> getSettings(QDomElement root);
 
-	BoolDataAdapterPtr getRunLocalServerOption(QDomElement root);
-	StringDataAdapterPtr getLocalServerNameOption(QDomElement root);
+	BoolPropertyBasePtr getRunLocalServerOption(QDomElement root);
+	StringPropertyBasePtr getLocalServerNameOption(QDomElement root);
 
 private:
 	QStringList checkGrabberServerExist(QString path, QString filename, QString args);

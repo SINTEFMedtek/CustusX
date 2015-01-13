@@ -63,7 +63,7 @@ public:
 	virtual bool execute();
 	virtual bool postProcess();
 
-	ColorDataAdapterPtr getColorOption(QDomElement root);
+	ColorPropertyBasePtr getColorOption(QDomElement root);
 
 protected:
 	virtual void createOptions();

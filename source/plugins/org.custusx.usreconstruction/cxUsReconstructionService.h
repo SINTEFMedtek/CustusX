@@ -76,8 +76,8 @@ public:
 	virtual QString getSelectedFilename() const = 0; ///< Get the currently selected filename
 	virtual USReconstructInputData getSelectedFileData() = 0; ///< Return the currently selected input data
 //	virtual ReconstructParamsPtr getParams() = 0; ///< Return control parameters that can be adjusted by the GUI or similar prior to reconstruction
-	virtual DataAdapterPtr getParam(QString uid) = 0; ///< Return one of the standard parameters
-	virtual std::vector<DataAdapterPtr> getAlgoOptions() = 0; ///< Return control parameters for the currently selected algorithm, adjustable like getParams()
+	virtual PropertyPtr getParam(QString uid) = 0; ///< Return one of the standard parameters
+	virtual std::vector<PropertyPtr> getAlgoOptions() = 0; ///< Return control parameters for the currently selected algorithm, adjustable like getParams()
 	virtual XmlOptionFile getSettings() = 0; ///< Return the settings xml file where parameters are stored
 	virtual OutputVolumeParams getOutputVolumeParams() const = 0; ///< Return params controlling the output data. These are data-dependent.
 

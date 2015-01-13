@@ -75,7 +75,7 @@ void RegistrationWidget::initRegistrationTypesWidgets()
 {
 	mRegistrationTypes << "ImageToPatient" << "ImageToImage" << "ImageTransform";
 
-	mTypeSelector = StringDataAdapterXml::initialize("RegistrationTypes",
+	mTypeSelector = StringProperty::initialize("RegistrationTypes",
 													 "Registration Types",
 													 "Select registration type",
 													 "",
@@ -92,7 +92,7 @@ void RegistrationWidget::initRegistrationTypesWidgets()
 		QVBoxLayout *layoutV = new QVBoxLayout(widget);
 //		layoutV->setMargin(0);
 
-		StringDataAdapterXmlPtr methodSelector = StringDataAdapterXml::initialize(mRegistrationTypes[i],
+		StringPropertyPtr methodSelector = StringProperty::initialize(mRegistrationTypes[i],
 																				  "Method",
 																				  "Select registration method",
 																				  "",
@@ -100,7 +100,7 @@ void RegistrationWidget::initRegistrationTypesWidgets()
 																				  mOptions.getElement());
 		mMethodsSelectorMap[mRegistrationTypes[i]] = methodSelector;
 		boost::function<void()> f = boost::bind(&RegistrationWidget::indexChanged, this, mRegistrationTypes[i]);
-		connect(methodSelector.get(), &StringDataAdapterXml::valueWasSet, f);
+		connect(methodSelector.get(), &StringProperty::valueWasSet, f);
 
 		layoutV->addWidget(new LabeledComboBoxWidget(this, methodSelector));
 		layoutV->addWidget(registrationTypeWidget);
@@ -124,12 +124,12 @@ void RegistrationWidget::onCurrentChanged(int index)
 
 void RegistrationWidget::indexChanged(QString registrationType)
 {
-	StringDataAdapterXmlPtr methodSelector = mMethodsSelectorMap[registrationType];
+	StringPropertyPtr methodSelector = mMethodsSelectorMap[registrationType];
 	QStackedWidget *stackedWidget = mRegistrationTypeMap[registrationType];
 	this->selectStackWidget(methodSelector, stackedWidget);
 }
 
-void RegistrationWidget::selectStackWidget(StringDataAdapterXmlPtr methodSelector, QStackedWidget *stackedWidget)
+void RegistrationWidget::selectStackWidget(StringPropertyPtr methodSelector, QStackedWidget *stackedWidget)
 {
 	QString method = methodSelector->getValue();
 	int pos = methodSelector->getValueRange().indexOf(method);
@@ -152,7 +152,7 @@ void RegistrationWidget::onServiceAdded(RegistrationMethodService* service)
 	if(!this->knownType(service->getRegistrationType()))
 		return;
 
-	StringDataAdapterXmlPtr methodSelector = mMethodsSelectorMap[service->getRegistrationType()];
+	StringPropertyPtr methodSelector = mMethodsSelectorMap[service->getRegistrationType()];
 	QStackedWidget *stackedWidget = mRegistrationTypeMap[service->getRegistrationType()];
 
 	stackedWidget->addWidget(service->createWidget());
@@ -185,7 +185,7 @@ void RegistrationWidget::onServiceRemoved(RegistrationMethodService *service)
 	QStackedWidget *stackedWidget = mRegistrationTypeMap[service->getRegistrationType()];
 	this->removeWidgetFromStackedWidget(service->getWidgetName(), stackedWidget);
 
-	StringDataAdapterXmlPtr comboBox = mMethodsSelectorMap[service->getRegistrationType()];
+	StringPropertyPtr comboBox = mMethodsSelectorMap[service->getRegistrationType()];
 	QStringList values = comboBox->getValueRange();
 	if (!values.removeOne(service->getRegistrationMethod()))
 		reportWarning("RegistrationWidget::onServiceRemoved: Cannot find and remove service from combobox: "+ service->getRegistrationMethod());

@@ -75,10 +75,10 @@ PrepareVesselsWidget::PrepareVesselsWidget(RegServices services, QWidget* parent
   mPipelineWidget = new PipelineWidget(services.visualizationService, services.patientModelService, NULL, mPipeline);
   mLayout->addWidget(mPipelineWidget);
 
-  mColorDataAdapter = ColorDataAdapterXml::initialize("Color", "",
+  mColorProperty = ColorProperty::initialize("Color", "",
                                               "Color of all generated data.",
                                               QColor("green"), options.getElement());
-  connect(mColorDataAdapter.get(), SIGNAL(changed()), this, SLOT(setColorSlot()));
+  connect(mColorProperty.get(), SIGNAL(changed()), this, SLOT(setColorSlot()));
 
   QPushButton* fixedButton = new QPushButton("Set as Fixed");
   fixedButton->setToolTip("Set output of centerline generation as the Fixed Volume in Registration");
@@ -91,7 +91,7 @@ PrepareVesselsWidget::PrepareVesselsWidget(RegServices services, QWidget* parent
   buttonsLayout->addWidget(fixedButton);
   buttonsLayout->addWidget(movingButton);
 
-	mLayout->addWidget(sscCreateDataWidget(this, mColorDataAdapter));
+	mLayout->addWidget(sscCreateDataWidget(this, mColorProperty));
   mLayout->addWidget(mPipelineWidget);
   mLayout->addStretch();
   mLayout->addLayout(buttonsLayout);
@@ -103,7 +103,7 @@ PrepareVesselsWidget::PrepareVesselsWidget(RegServices services, QWidget* parent
 
 void PrepareVesselsWidget::setColorSlot()
 {
-  mPipeline->setOption(mColorDataAdapter->getDisplayName(), QVariant(mColorDataAdapter->getValue()));
+  mPipeline->setOption(mColorProperty->getDisplayName(), QVariant(mColorProperty->getValue()));
 }
 
 void PrepareVesselsWidget::toMovingSlot()

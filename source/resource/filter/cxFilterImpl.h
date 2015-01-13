@@ -63,9 +63,9 @@ public:
 
 	virtual QString getUid() const;
 	virtual void initialize(QDomElement root, QString uid = "");
-	virtual std::vector<DataAdapterPtr> getOptions();
-	virtual std::vector<SelectDataStringDataAdapterBasePtr> getInputTypes();
-	virtual std::vector<SelectDataStringDataAdapterBasePtr> getOutputTypes();
+	virtual std::vector<PropertyPtr> getOptions();
+	virtual std::vector<SelectDataStringPropertyBasePtr> getInputTypes();
+	virtual std::vector<SelectDataStringPropertyBasePtr> getOutputTypes();
 	virtual bool hasPresets(){return false;};
 	virtual PresetsPtr getPresets(){ return PresetsPtr();};
 	virtual QDomElement generatePresetFromCurrentlySetOptions(QString name){return QDomElement();};
@@ -84,16 +84,16 @@ protected:
 	/** Helper:
       * Call if you have an image threshold dataAdapter that need update from an image change.
 	  */
-	void updateThresholdFromImageChange(QString uid, DoubleDataAdapterXmlPtr threshold);
-	void updateThresholdPairFromImageChange(QString uid, DoublePairDataAdapterXmlPtr threshold);
+	void updateThresholdFromImageChange(QString uid, DoublePropertyPtr threshold);
+	void updateThresholdPairFromImageChange(QString uid, DoublePairPropertyPtr threshold);
 
 	virtual void createOptions() = 0;
 	virtual void createInputTypes() = 0;
 	virtual void createOutputTypes() = 0;
 
-	std::vector<SelectDataStringDataAdapterBasePtr> mInputTypes;
-	std::vector<SelectDataStringDataAdapterBasePtr> mOutputTypes;
-	std::vector<DataAdapterPtr> mOptionsAdapters;
+	std::vector<SelectDataStringPropertyBasePtr> mInputTypes;
+	std::vector<SelectDataStringPropertyBasePtr> mOutputTypes;
+	std::vector<PropertyPtr> mOptionsAdapters;
 	QDomElement mOptions;
 
 	// data used by execute - copied for thread safety purposes

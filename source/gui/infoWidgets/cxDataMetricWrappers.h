@@ -82,7 +82,7 @@ public:
 private slots:
   void colorSelected();
 protected:
-  ColorDataAdapterXmlPtr mColorSelector;
+  ColorPropertyPtr mColorSelector;
   void addColorWidget(QVBoxLayout* layout);
   VisualizationServicePtr mVisualizationService;
   PatientModelServicePtr mPatientModelService;
@@ -107,7 +107,7 @@ private slots:
   void dataChangedSlot();
 private:
 	MetricReferenceArgumentListPtr mArguments;
-	std::vector<StringDataAdapterXmlPtr> mPSelector;
+	std::vector<StringPropertyPtr> mPSelector;
 	bool mInternalUpdate;
 	bool mModified;
 	void getAvailableArgumentMetrics(QStringList* uid, std::map<QString,QString>* namemap);
@@ -132,11 +132,11 @@ private slots:
   void dataChangedSlot();
 private:
   QWidget* createSampleButton(QWidget* parent) const;
-  SpaceDataAdapterXmlPtr createSpaceSelector() const;
-  Vector3DDataAdapterXmlPtr createCoordinateSelector() const;
+  SpacePropertyPtr createSpaceSelector() const;
+  Vector3DPropertyPtr createCoordinateSelector() const;
   PointMetricPtr mData;
-  SpaceDataAdapterXmlPtr mSpaceSelector;
-  Vector3DDataAdapterXmlPtr mCoordinate;
+  SpacePropertyPtr mSpaceSelector;
+  Vector3DPropertyPtr mCoordinate;
   bool mInternalUpdate;
 };
 
@@ -200,9 +200,9 @@ private slots:
 private:
   AngleMetricPtr mData;
   MetricReferenceArgumentListGui mArguments;
-  BoolDataAdapterXmlPtr mUseSimpleVisualization;
+  BoolPropertyPtr mUseSimpleVisualization;
   bool mInternalUpdate;
-  BoolDataAdapterXmlPtr createUseSimpleVisualizationSelector() const;
+  BoolPropertyPtr createUseSimpleVisualizationSelector() const;
 
 };
 
@@ -224,16 +224,16 @@ private slots:
   void guiChanged();
 
 private:
-  DoubleDataAdapterXmlPtr createRadiusSelector() const;
-  DoubleDataAdapterXmlPtr createThicknessSelector() const;
-  DoubleDataAdapterXmlPtr createHeightSelector() const;
-  BoolDataAdapterXmlPtr createFlatSelector() const;
+  DoublePropertyPtr createRadiusSelector() const;
+  DoublePropertyPtr createThicknessSelector() const;
+  DoublePropertyPtr createHeightSelector() const;
+  BoolPropertyPtr createFlatSelector() const;
 
   DonutMetricPtr mData;
-  DoubleDataAdapterXmlPtr mRadius;
-  DoubleDataAdapterXmlPtr mThickness;
-  DoubleDataAdapterXmlPtr mHeight;
-  BoolDataAdapterXmlPtr mFlat;
+  DoublePropertyPtr mRadius;
+  DoublePropertyPtr mThickness;
+  DoublePropertyPtr mHeight;
+  BoolPropertyPtr mFlat;
   bool mInternalUpdate;
   MetricReferenceArgumentListGui mArguments;
 
@@ -257,10 +257,10 @@ private slots:
   void guiChanged();
 
 private:
-  DoubleDataAdapterXmlPtr createRadiusSelector() const;
+  DoublePropertyPtr createRadiusSelector() const;
 
   SphereMetricPtr mData;
-  DoubleDataAdapterXmlPtr mRadius;
+  DoublePropertyPtr mRadius;
   bool mInternalUpdate;
   MetricReferenceArgumentListGui mArguments;
 };

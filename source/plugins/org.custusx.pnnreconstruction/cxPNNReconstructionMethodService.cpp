@@ -56,17 +56,17 @@ QString PNNReconstructionMethodService::getName() const
 	return "PNN";
 }
 
-std::vector<DataAdapterPtr> PNNReconstructionMethodService::getSettings(QDomElement root)
+std::vector<PropertyPtr> PNNReconstructionMethodService::getSettings(QDomElement root)
 {
-	std::vector<DataAdapterPtr> retval;
+	std::vector<PropertyPtr> retval;
 	retval.push_back(this->getInterpolationStepsOption(root));
 	return retval;
 }
 
-DoubleDataAdapterXmlPtr PNNReconstructionMethodService::getInterpolationStepsOption(QDomElement root)
+DoublePropertyPtr PNNReconstructionMethodService::getInterpolationStepsOption(QDomElement root)
 {
-	DoubleDataAdapterXmlPtr retval;
-	retval = DoubleDataAdapterXml::initialize("interpolationSteps", "Distance (voxels)",
+	DoublePropertyPtr retval;
+	retval = DoubleProperty::initialize("interpolationSteps", "Distance (voxels)",
 		"Interpolation steps in voxels", 3, DoubleRange(1, 10, 1), 0, root);
 	return retval;
 }
@@ -251,7 +251,7 @@ vtkImageDataPtr PNNReconstructionMethodService::createMask(vtkImageDataPtr input
 void PNNReconstructionMethodService::interpolate(ImagePtr inputData, vtkImageDataPtr outputData, QDomElement settings)
 {
 	TimeKeeper timer;
-	DoubleDataAdapterXmlPtr interpolationStepsOption = this->getInterpolationStepsOption(settings);
+	DoublePropertyPtr interpolationStepsOption = this->getInterpolationStepsOption(settings);
 	int interpolationSteps = static_cast<int> (interpolationStepsOption->getValue());
 
 	vtkImageDataPtr input = inputData->getBaseVtkImageData();

@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-typedef boost::shared_ptr<class SelectMeshStringDataAdapter> SelectMeshStringDataAdapterPtr;
+typedef boost::shared_ptr<class StringPropertySelectMesh> StringPropertySelectMeshPtr;
 
 /**
  * \class MeshInfoWidget
@@ -79,11 +79,11 @@ private:
 	void addWidgets(cx::PatientModelServicePtr patientModelService);
 
   MeshPtr mMesh;
-  ParentFrameStringDataAdapterPtr mParentFrameAdapter;
-  DataNameEditableStringDataAdapterPtr mNameAdapter;
-  DataUidEditableStringDataAdapterPtr mUidAdapter;
-  SelectMeshStringDataAdapterPtr mSelectMeshWidget;
-  ColorDataAdapterXmlPtr mColorAdapter;
+  StringPropertyParentFramePtr mParentFrameAdapter;
+  StringPropertyDataNameEditablePtr mNameAdapter;
+  StringPropertyDataUidEditablePtr mUidAdapter;
+  StringPropertySelectMeshPtr mSelectMeshWidget;
+  ColorPropertyPtr mColorAdapter;
   QCheckBox* mBackfaceCullingCheckBox;
   QCheckBox* mFrontfaceCullingCheckBox;
   PatientModelServicePtr mPatientModelService;

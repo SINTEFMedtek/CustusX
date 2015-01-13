@@ -77,11 +77,11 @@ public:
     virtual QString getName() const;
 
     /**
-     * Return a set of DataAdapters describing the algorithm settings.
+	 * Return a set of Properties describing the algorithm settings.
      * @param root The root element of the settings for this algorithm
      * @return A vector containing all the settings for this algorithm
      */
-    virtual std::vector<DataAdapterPtr> getSettings(QDomElement root);
+    virtual std::vector<PropertyPtr> getSettings(QDomElement root);
 
     /**
      * Reconstruction entry point.
@@ -98,14 +98,14 @@ public:
      * @param root The root of the configuration ui
      * @return List of available methods - with the selected one available by ->getValue()
      */
-    virtual StringDataAdapterXmlPtr getMethodOption(QDomElement root);
+    virtual StringPropertyPtr getMethodOption(QDomElement root);
 
     /**
      * Make radius option for the UI
      * @param root The root of the configuration ui
      * @return Radius data adapter - with selected value available by ->getValue()
      */
-    virtual DoubleDataAdapterXmlPtr getRadiusOption(QDomElement root);
+    virtual DoublePropertyPtr getRadiusOption(QDomElement root);
 
 
     /**
@@ -113,35 +113,35 @@ public:
      * @param root The root of the configuration ui
      * @return List of available methods - with the selected one available by ->getValue()
      */
-    virtual StringDataAdapterXmlPtr getPlaneMethodOption(QDomElement root);
+    virtual StringPropertyPtr getPlaneMethodOption(QDomElement root);
 
     /**
      * Make max planes option for the UI
      * @param root The root of the configuration ui
      * @return List of available methods - with the selected one available by ->getValue()
      */
-    virtual DoubleDataAdapterXmlPtr getMaxPlanesOption(QDomElement root);
+    virtual DoublePropertyPtr getMaxPlanesOption(QDomElement root);
 
     /**
      * Make number of starts for multistart search option for the UI
      * @param root The root of the configuration ui
      * @return Number of multistart search starts option
      */
-    virtual DoubleDataAdapterXmlPtr getNStartsOption(QDomElement root);
+    virtual DoublePropertyPtr getNStartsOption(QDomElement root);
 
     /**
      * Make brightness weight(anisotropic method only) option for the UI
      * @param root The root of the configuration ui
      * @return Number of multistart search starts option
      */
-    virtual DoubleDataAdapterXmlPtr getBrightnessWeightOption(QDomElement root);
+    virtual DoublePropertyPtr getBrightnessWeightOption(QDomElement root);
 
         /**
      * Make Newness weight(anisotropic method only) option for the UI
      * @param root The root of the configuration ui
      * @return Number of multistart search starts option
      */
-    virtual DoubleDataAdapterXmlPtr getNewnessWeightOption(QDomElement root);
+    virtual DoublePropertyPtr getNewnessWeightOption(QDomElement root);
 
 protected:
 

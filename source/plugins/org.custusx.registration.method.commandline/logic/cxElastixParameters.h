@@ -57,7 +57,7 @@ class org_custusx_registration_method_commandline_EXPORT ElastixParameters : pub
     Q_OBJECT
 public:
     ElastixParameters(XmlOptionFile options);
-    StringDataAdapterPtr getCurrentPreset();
+    StringPropertyBasePtr getCurrentPreset();
     void removeCurrentPreset(); ///< Remove the currently selected preset. Reload.
     void saveCurrentPreset(QString newName);
 
@@ -85,7 +85,7 @@ private:
     void addDefaultPreset(QString name, QString executable, QStringList parameterFiles);
     void addDefaultPresets();
 
-    StringDataAdapterXmlPtr mCurrentPreset;
+    StringPropertyPtr mCurrentPreset;
     QString mActiveExecutable;
     QString mActiveParameterFile0;
     QString mActiveParameterFile1;

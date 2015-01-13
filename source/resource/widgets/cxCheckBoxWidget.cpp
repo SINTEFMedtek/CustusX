@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-CheckBoxWidget::CheckBoxWidget(QWidget* parent, BoolDataAdapterPtr dataInterface, QGridLayout* gridLayout, int row) :
+CheckBoxWidget::CheckBoxWidget(QWidget* parent, BoolPropertyBasePtr dataInterface, QGridLayout* gridLayout, int row) :
     OptimizedUpdateWidget(parent)
 {
 	this->setEnabled(dataInterface->getEnabled());

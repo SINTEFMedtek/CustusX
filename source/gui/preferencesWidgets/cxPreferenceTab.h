@@ -93,9 +93,9 @@ protected:
 //  QCheckBox* mGPU3DDepthPeelingCheckBox;
   QCheckBox* mShadingCheckBox;
   QGridLayout* mMainLayout;
-  DoubleDataAdapterXmlPtr mMaxRenderSize;
-  DoubleDataAdapterXmlPtr mStillUpdateRate;
-  StringDataAdapterXmlPtr m3DVisualizer;
+  DoublePropertyPtr mMaxRenderSize;
+  DoublePropertyPtr mStillUpdateRate;
+  StringPropertyPtr m3DVisualizer;
 
 private slots:
   void renderingIntervalSlot(int interval);

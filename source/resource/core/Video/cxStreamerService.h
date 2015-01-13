@@ -71,7 +71,7 @@ public:
 	 *  Input is the root node for this algo, filled with stored settings (if any).
 	 *  On completion, the root is filled with default values for settings.
 	 */
-	virtual std::vector<DataAdapterPtr> getSettings(QDomElement root) = 0;
+	virtual std::vector<PropertyPtr> getSettings(QDomElement root) = 0;
 	/**
 	 * Return a streamer that can emit image data.
 	 */

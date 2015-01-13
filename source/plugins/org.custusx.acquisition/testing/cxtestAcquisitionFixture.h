@@ -55,7 +55,7 @@ public:
 	~AcquisitionFixture();
 	void initialize();
 	void verify();
-	cx::DataAdapterPtr getOption(QString uid);
+	cx::PropertyPtr getOption(QString uid);
 
 //	QString mAdditionalGrabberArg;
 	int mNumberOfExpectedStreams;

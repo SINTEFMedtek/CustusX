@@ -62,7 +62,7 @@ ToolTipCalibrateWidget::ToolTipCalibrateWidget(QWidget* parent) :
 {
   QVBoxLayout* toplayout = new QVBoxLayout(this);
 
-  mTools = SelectToolStringDataAdapter::New();
+  mTools = StringPropertySelectTool::New();
   mTools->setValueName("Reference tool");
   mTools->setHelp("Select a tool with a known reference point");
   mCalibrateToolComboBox = new LabeledComboBoxWidget(this, mTools);

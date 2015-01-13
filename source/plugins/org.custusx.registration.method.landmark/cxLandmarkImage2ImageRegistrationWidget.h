@@ -44,8 +44,8 @@ class QSlider;
 namespace cx
 {
 typedef boost::shared_ptr<class ImageLandmarksSource> ImageLandmarksSourcePtr;
-typedef boost::shared_ptr<class RegistrationFixedImageStringDataAdapter> RegistrationFixedImageStringDataAdapterPtr;
-typedef boost::shared_ptr<class RegistrationMovingImageStringDataAdapter> RegistrationMovingImageStringDataAdapterPtr;
+typedef boost::shared_ptr<class StringPropertyRegistrationFixedImage> StringPropertyRegistrationFixedImagePtr;
+typedef boost::shared_ptr<class StringPropertyRegistrationMovingImage> StringPropertyRegistrationMovingImagePtr;
 
 /**
  * \file
@@ -87,8 +87,8 @@ protected:
 	ImageLandmarksSourcePtr mMovingLandmarkSource;
 
 	//gui
-	RegistrationFixedImageStringDataAdapterPtr mFixedDataAdapter;
-	RegistrationMovingImageStringDataAdapterPtr mMovingDataAdapter;
+	StringPropertyRegistrationFixedImagePtr mFixedDataAdapter;
+	StringPropertyRegistrationMovingImagePtr mMovingDataAdapter;
 
 	QPushButton* mRegisterButton;
 	QCheckBox* mTranslationCheckBox;

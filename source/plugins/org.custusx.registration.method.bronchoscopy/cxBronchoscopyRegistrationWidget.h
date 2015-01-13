@@ -44,13 +44,13 @@ namespace cx
 {
 class WidgetObscuredListener;
 typedef boost::shared_ptr<class Acquisition> AcquisitionPtr;
-typedef boost::shared_ptr<class SelectMeshStringDataAdapter> SelectMeshStringDataAdapterPtr;
+typedef boost::shared_ptr<class StringPropertySelectMesh> StringPropertySelectMeshPtr;
 typedef boost::shared_ptr<class ToolRep3D> ToolRep3DPtr;
 typedef boost::shared_ptr<class RecordSessionWidget> RecordSessionWidgetPtr;
 typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
 typedef boost::shared_ptr<class BronchoscopyRegistration> BronchoscopyRegistrationPtr;
 typedef std::map<QString, ToolPtr> ToolMap;
-typedef boost::shared_ptr<class SelectToolStringDataAdapter> SelectToolStringDataAdapterPtr;
+typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
 
 /**
  * BronchoscopyRegistrationWidget
@@ -86,20 +86,20 @@ private:
 	RegServices mServices;
 	QVBoxLayout* mVerticalLayout;
 	QLabel* mLabel;
-	BoolDataAdapterXmlPtr mUseLocalRegistration;
-	BoolDataAdapterXmlPtr mUseSubsetOfGenerations;
-	DoubleDataAdapterXmlPtr mMaxNumberOfGenerations;
+	BoolPropertyPtr mUseLocalRegistration;
+	BoolPropertyPtr mUseSubsetOfGenerations;
+	DoublePropertyPtr mMaxNumberOfGenerations;
 	XmlOptionFile mOptions;
 	MeshPtr mMesh;
 
 //	AcquisitionPtr mAcquisition;
 	RecordSessionWidgetPtr mRecordSessionWidget;
-	SelectMeshStringDataAdapterPtr mSelectMeshWidget;
-	StringDataAdapterXmlPtr mSessionSelector;
+	StringPropertySelectMeshPtr mSelectMeshWidget;
+	StringPropertyPtr mSessionSelector;
 	QPushButton* mProcessCenterlineButton;
 	QPushButton* mRegisterButton;
     ToolPtr mTool;
-	SelectToolStringDataAdapterPtr mSelectToolWidget;
+	StringPropertySelectToolPtr mSelectToolWidget;
 //    TrackedCenterlineWidget* mTrackedCenterLine;
 
 	boost::shared_ptr<WidgetObscuredListener> mObscuredListener;

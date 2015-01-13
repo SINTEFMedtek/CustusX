@@ -43,9 +43,9 @@ QString IGTLinkStreamerService::getName()
 	return "Remote Server";
 }
 
-std::vector<DataAdapterPtr> IGTLinkStreamerService::getSettings(QDomElement root)
+std::vector<PropertyPtr> IGTLinkStreamerService::getSettings(QDomElement root)
 {
-	std::vector<DataAdapterPtr> retval;
+	std::vector<PropertyPtr> retval;
 	retval.push_back(this->getIPOption(root));
 	retval.push_back(this->getStreamPortOption(root));
 	return retval;
@@ -61,11 +61,11 @@ StreamerPtr IGTLinkStreamerService::createStreamer(QDomElement root)
 }
 
 
-StringDataAdapterPtr IGTLinkStreamerService::getIPOption(QDomElement root)
+StringPropertyBasePtr IGTLinkStreamerService::getIPOption(QDomElement root)
 {
-	StringDataAdapterXmlPtr retval;
+	StringPropertyPtr retval;
 	QString defaultValue = "127.0.0.1";
-	retval = StringDataAdapterXml::initialize("ip_scanner", "Address", "TCP/IP Address",
+	retval = StringProperty::initialize("ip_scanner", "Address", "TCP/IP Address",
 											  defaultValue, root);
 	retval->setGroup("Connection");
 	//		connect(retval.get(), &StringDataAdapterXml::valueWasSet,
@@ -74,15 +74,15 @@ StringDataAdapterPtr IGTLinkStreamerService::getIPOption(QDomElement root)
 }
 
 
-DoubleDataAdapterPtr IGTLinkStreamerService::getStreamPortOption(QDomElement root)
+DoublePropertyBasePtr IGTLinkStreamerService::getStreamPortOption(QDomElement root)
 {
-	DoubleDataAdapterXmlPtr retval;
-	retval = DoubleDataAdapterXml::initialize("ip_port", "Port", "TCP/IP Port (default 18333)",
+	DoublePropertyPtr retval;
+	retval = DoubleProperty::initialize("ip_port", "Port", "TCP/IP Port (default 18333)",
 											  18333, DoubleRange(1024, 49151, 1), 0, root);
-	retval->setGuiRepresentation(DoubleDataAdapter::grSPINBOX);
+	retval->setGuiRepresentation(DoublePropertyBase::grSPINBOX);
 	retval->setAdvanced(true);
 	retval->setGroup("Connection");
-	//		connect(retval.get(), &DoubleDataAdapterXml::valueWasSet,
+	//		connect(retval.get(), &DoubleProperty::valueWasSet,
 	//		        this, &IGTLinkStreamerService::sendOptions);
 	return retval;
 }

@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /*
- * sscDoubleDataAdapter.h
+ * sscDoubleProperty.h
  *
  *  Created on: Jun 23, 2010
  *      Author: christiana
@@ -83,17 +83,17 @@ namespace cx
        virtual double convertDisplay2Internal(double display);
    \endverbatim
  *
- * When testing, or during development, you can use the DoubleDataAdapterNull
+ * When testing, or during development, you can use the DoublePropertyNull
  * as a dummy implementation.
  *
  * \ingroup cx_resource_core_dataadapters
  */
-class cxResource_EXPORT DoubleDataAdapter: public DataAdapter
+class cxResource_EXPORT DoublePropertyBase: public Property
 {
 Q_OBJECT
 public:
-	DoubleDataAdapter() : mGuiRepresentation(grSPINBOX){}
-	virtual ~DoubleDataAdapter(){}
+	DoublePropertyBase() : mGuiRepresentation(grSPINBOX){}
+	virtual ~DoublePropertyBase(){}
 
 public:
 	enum GuiRepresentation
@@ -150,15 +150,15 @@ protected:
     GuiRepresentation mGuiRepresentation;
 
 };
-typedef boost::shared_ptr<DoubleDataAdapter> DoubleDataAdapterPtr;
+typedef boost::shared_ptr<DoublePropertyBase> DoublePropertyBasePtr;
 
 /** Dummy implementation */
-class cxResource_EXPORT DoubleDataAdapterNull: public DoubleDataAdapter
+class cxResource_EXPORT DoublePropertyNull: public DoublePropertyBase
 {
 Q_OBJECT
 
 public:
-	virtual ~DoubleDataAdapterNull()
+	virtual ~DoublePropertyNull()
 	{
 	}
 	virtual QString getDisplayName() const

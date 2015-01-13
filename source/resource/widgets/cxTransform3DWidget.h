@@ -47,7 +47,7 @@ namespace cx
 {
 
 class MatrixTextEdit;
-typedef boost::shared_ptr<class DoubleDataAdapterXml> DoubleDataAdapterXmlPtr;
+typedef boost::shared_ptr<class DoubleProperty> DoublePropertyPtr;
 
 /**
  * \brief Widget for displaying and manipulating an affine matrix,
@@ -86,15 +86,15 @@ private:
   void addTranslationControls(QString uid, QString name, int index, QVBoxLayout* layout);
   void rotateSlot(QPointF delta, int index);
   void translateSlot(QPointF delta, int index);
-  void updateAdapter(DoubleDataAdapterXmlPtr adapter, double value);
+  void updateAdapter(DoublePropertyPtr adapter, double value);
   void setActionText(QAction* action, QString text, QString tip);
   Transform3D convertToFromExternal(const Transform3D& M) const;
   void updateInvertAction();
 
 //  Frame3D mFrame;
   MatrixTextEdit* mTextEdit;
-  boost::array<DoubleDataAdapterXmlPtr, 3> mAngleAdapter;
-  boost::array<DoubleDataAdapterXmlPtr, 3> mTranslationAdapter;
+  boost::array<DoublePropertyPtr, 3> mAngleAdapter;
+  boost::array<DoublePropertyPtr, 3> mTranslationAdapter;
   bool recursive;
   bool mBlockChanges;
   QAction* mEditAction;
@@ -102,13 +102,6 @@ private:
   QFrame* aGroupBox;
   QFrame* tGroupBox;
   DecomposedTransform3D mDecomposition;
-
-//  //  Vector3DWidget(QWidget* parent, Vector3DDataAdapterPtr data)
-//    Vector3DDataAdapterPtr mAngleAdapter;
-//    Vector3DDataAdapterPtr mTranslationAdapter;
-
-//  template<class T>
-//  QAction* createAction(QLayout* layout, QString iconName, QString text, QString tip, T slot);
 };
 
 }

@@ -44,7 +44,7 @@ class QStackedWidget;
 
 namespace cx
 {
-typedef boost::shared_ptr<class StringDataAdapter> StringDataAdapterPtr;
+typedef boost::shared_ptr<class StringPropertyBase> StringPropertyBasePtr;
 
 /**
  * Widget for use in the Registration GUI plugin
@@ -74,14 +74,14 @@ private:
 	bool knownType(QString registrationType);
 	void removeWidgetFromStackedWidget(QString widgetName, QStackedWidget *stackedWidget);
 	void indexChanged(QString registrationType);
-	void selectStackWidget(StringDataAdapterXmlPtr comboBox, QStackedWidget *stackedWidget);
+	void selectStackWidget(StringPropertyPtr comboBox, QStackedWidget *stackedWidget);
 
 	ctkPluginContext* mPluginContext;
 	QVBoxLayout*  mVerticalLayout;
 	boost::shared_ptr<ServiceTrackerListener<RegistrationMethodService> > mServiceListener;
 
-	StringDataAdapterXmlPtr mTypeSelector;
-	std::map<QString, StringDataAdapterXmlPtr> mMethodsSelectorMap;
+	StringPropertyPtr mTypeSelector;
+	std::map<QString, StringPropertyPtr> mMethodsSelectorMap;
 	std::map<QString, QStackedWidget*> mRegistrationTypeMap;
 	QStringList mRegistrationTypes;
 	XmlOptionFile mOptions;

@@ -46,15 +46,15 @@ namespace cx
 typedef boost::shared_ptr<class RegistrationService> RegistrationServicePtr;
 typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
 
-typedef boost::shared_ptr<class RegistrationFixedImageStringDataAdapter> RegistrationFixedImageStringDataAdapterPtr;
+typedef boost::shared_ptr<class StringPropertyRegistrationFixedImage> StringPropertyRegistrationFixedImagePtr;
 /** Adapter that connects to the fixed image in the registration manager.
  */
-class org_custusx_registration_EXPORT RegistrationFixedImageStringDataAdapter : public SelectDataStringDataAdapterBase
+class org_custusx_registration_EXPORT StringPropertyRegistrationFixedImage : public SelectDataStringPropertyBase
 {
   Q_OBJECT
 public:
-	RegistrationFixedImageStringDataAdapter(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService);
-  virtual ~RegistrationFixedImageStringDataAdapter() {}
+	StringPropertyRegistrationFixedImage(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService);
+  virtual ~StringPropertyRegistrationFixedImage() {}
 
 public: // basic methods
   virtual bool setValue(const QString& value);
@@ -66,15 +66,15 @@ private:
 };
 
 
-typedef boost::shared_ptr<class RegistrationMovingImageStringDataAdapter> RegistrationMovingImageStringDataAdapterPtr;
+typedef boost::shared_ptr<class StringPropertyRegistrationMovingImage> StringPropertyRegistrationMovingImagePtr;
 /** Adapter that connects to the fixed image in the registration manager.
  */
-class org_custusx_registration_EXPORT RegistrationMovingImageStringDataAdapter : public SelectDataStringDataAdapterBase
+class org_custusx_registration_EXPORT StringPropertyRegistrationMovingImage : public SelectDataStringPropertyBase
 {
   Q_OBJECT
 public:
-	RegistrationMovingImageStringDataAdapter(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService);
-  virtual ~RegistrationMovingImageStringDataAdapter() {}
+	StringPropertyRegistrationMovingImage(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService);
+  virtual ~StringPropertyRegistrationMovingImage() {}
 
 public: // basic methods
   virtual bool setValue(const QString& value);

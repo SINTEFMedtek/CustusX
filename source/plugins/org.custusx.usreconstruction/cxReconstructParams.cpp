@@ -82,34 +82,34 @@ void ReconstructParams::createParameters()
 
 	mSettings.getElement("algorithms");
 
-	mOrientationAdapter = StringDataAdapterXml::initialize("Orientation", "",
+	mOrientationAdapter = StringProperty::initialize("Orientation", "",
 		"Algorithm to use for output volume orientation", "MiddleFrame",
 		QString("PatientReference MiddleFrame").split(" "),
 		mSettings.getElement());
-	connect(mOrientationAdapter.get(), &StringDataAdapterXml::valueWasSet, this, &ReconstructParams::changedInputSettings);
+	connect(mOrientationAdapter.get(), &StringProperty::valueWasSet, this, &ReconstructParams::changedInputSettings);
 	this->add(mOrientationAdapter);
 
 	// note: value range initialized by onPatientChanged()
-	mPresetTFAdapter = StringDataAdapterXml::initialize("Preset", "",
+	mPresetTFAdapter = StringProperty::initialize("Preset", "",
 		"Preset transfer function to apply to the reconstructed volume", "US B-Mode", QStringList(),
 		mSettings.getElement());
-	connect(mPresetTFAdapter.get(), &StringDataAdapterXml::valueWasSet, this, &ReconstructParams::transferFunctionChangedSlot);
+	connect(mPresetTFAdapter.get(), &StringProperty::valueWasSet, this, &ReconstructParams::transferFunctionChangedSlot);
 	this->add(mPresetTFAdapter);
 
-	mMaskReduce = StringDataAdapterXml::initialize("Reduce mask (% in 1D)", "",
+	mMaskReduce = StringProperty::initialize("Reduce mask (% in 1D)", "",
 		"Speedup by reducing mask size", "3",
 		QString("0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15").split(" "),
 		mSettings.getElement());
-	connect(mMaskReduce.get(), &StringDataAdapterXml::valueWasSet, this, &ReconstructParams::changedInputSettings);
+	connect(mMaskReduce.get(), &StringProperty::valueWasSet, this, &ReconstructParams::changedInputSettings);
 	this->add(mMaskReduce);
 
-	mAlignTimestamps = BoolDataAdapterXml::initialize("Align timestamps", "",
+	mAlignTimestamps = BoolProperty::initialize("Align timestamps", "",
 		"Align the first of tracker and frame timestamps, ignoring lags.", false,
 		mSettings.getElement());
 	connect(mAlignTimestamps.get(), SIGNAL(valueWasSet()), this, SIGNAL(changedInputSettings()));
 	this->add(mAlignTimestamps);
 
-	mTimeCalibration = DoubleDataAdapterXml::initialize("Extra Temporal Calib", "",
+	mTimeCalibration = DoubleProperty::initialize("Extra Temporal Calib", "",
 		"Set an offset in the frame timestamps, in addition to the one used in acquisition", 0.0,
 		DoubleRange(-1000, 1000, 10), 0,
 		mSettings.getElement());
@@ -117,7 +117,7 @@ void ReconstructParams::createParameters()
 	this->add(mTimeCalibration);
 
 	double maxVolumeSizeFactor = 1024*1024;
-	mMaxVolumeSize = DoubleDataAdapterXml::initialize("Volume Size", "",
+	mMaxVolumeSize = DoubleProperty::initialize("Volume Size", "",
 		"Output Volume Size (Mb)", 32*maxVolumeSizeFactor,
 		DoubleRange(maxVolumeSizeFactor, maxVolumeSizeFactor*500, maxVolumeSizeFactor), 0,
 		mSettings.getElement());
@@ -125,44 +125,44 @@ void ReconstructParams::createParameters()
 	connect(mMaxVolumeSize.get(), SIGNAL(valueWasSet()), this, SIGNAL(changedInputSettings()));
 	this->add(mMaxVolumeSize);
 
-	mAngioAdapter = BoolDataAdapterXml::initialize("Angio data", "",
+	mAngioAdapter = BoolProperty::initialize("Angio data", "",
 		"Ultrasound angio data is used as input", false,
 		mSettings.getElement());
 	connect(mAngioAdapter.get(), SIGNAL(valueWasSet()), this, SIGNAL(changedInputSettings()));
 	this->add(mAngioAdapter);
 
-	mCreateBModeWhenAngio = BoolDataAdapterXml::initialize("Dual Angio", "",
+	mCreateBModeWhenAngio = BoolProperty::initialize("Dual Angio", "",
 		"If angio requested, also create a B-mode reconstruction based on the same data set.", true,
 		mSettings.getElement());
 	connect(mCreateBModeWhenAngio.get(), SIGNAL(valueWasSet()), this, SIGNAL(changedInputSettings()));
 	this->add(mCreateBModeWhenAngio);
 
-	mAlgorithmAdapter = StringDataAdapterXml::initialize("Algorithm", "", "Choose algorithm to use for reconstruction",
+	mAlgorithmAdapter = StringProperty::initialize("Algorithm", "", "Choose algorithm to use for reconstruction",
 			QString(), QStringList(), mSettings.getElement());
-	connect(mAlgorithmAdapter.get(), &StringDataAdapterXml::valueWasSet, this, &ReconstructParams::changedInputSettings);
+	connect(mAlgorithmAdapter.get(), &StringProperty::valueWasSet, this, &ReconstructParams::changedInputSettings);
 	this->add(mAlgorithmAdapter);
 
 	this->onPatientChanged();
 }
 
-void ReconstructParams::add(DataAdapterPtr param)
+void ReconstructParams::add(PropertyPtr param)
 {
 	mParameters[param->getUid()] = param;
 }
 
-DataAdapterPtr ReconstructParams::getParameter(QString uid)
+PropertyPtr ReconstructParams::getParameter(QString uid)
 {
 	if (mParameters.empty())
 		this->createParameters();
 	if (mParameters.count(uid))
 			return mParameters[uid];
-	return DataAdapterPtr();
+	return PropertyPtr();
 }
 
 QStringList ReconstructParams::getParameterUids() const
 {
 	QStringList retval;
-	for (std::map<QString, DataAdapterPtr>::const_iterator iter=mParameters.begin(); iter!=mParameters.end(); ++iter)
+	for (std::map<QString, PropertyPtr>::const_iterator iter=mParameters.begin(); iter!=mParameters.end(); ++iter)
 		retval << iter->first;
 	return retval;
 }

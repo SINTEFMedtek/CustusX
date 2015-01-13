@@ -1003,7 +1003,7 @@ void MainWindow::createToolBars()
 
 	QToolBar* toolOffsetToolBar = addToolBar("Tool Offset");
 	toolOffsetToolBar->setObjectName("ToolOffsetToolBar");
-	toolOffsetToolBar->addWidget(createDataWidget(mServices->visualizationService, mServices->patientModelService, this, DoubleDataAdapterActiveToolOffset::create()));
+	toolOffsetToolBar->addWidget(createDataWidget(mServices->visualizationService, mServices->patientModelService, this, DoublePropertyActiveToolOffset::create()));
 	this->registerToolBar(toolOffsetToolBar, "Toolbar");
 }
 

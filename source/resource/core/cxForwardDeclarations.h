@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx {
 
-typedef boost::shared_ptr<class DataAdapter> DataAdapterPtr;
+typedef boost::shared_ptr<class Property> PropertyPtr;
 
 class View;
 class ViewItem;
@@ -146,16 +146,16 @@ typedef boost::shared_ptr<class VideoService> VideoServicePtr;
 typedef boost::shared_ptr<class VisualizationService> VisualizationServicePtr;
 
 // data adapters
-typedef boost::shared_ptr<class StringDataAdapter> StringDataAdapterPtr;
-typedef boost::shared_ptr<class DoubleDataAdapter> DoubleDataAdapterPtr;
-typedef boost::shared_ptr<class BoolDataAdapter> BoolDataAdapterPtr;
-typedef boost::shared_ptr<class ColorDataAdapter> ColorDataAdapterPtr;
+typedef boost::shared_ptr<class StringPropertyBase> StringPropertyBasePtr;
+typedef boost::shared_ptr<class DoublePropertyBase> DoublePropertyBasePtr;
+typedef boost::shared_ptr<class BoolPropertyBase> BoolPropertyBasePtr;
+typedef boost::shared_ptr<class ColorPropertyBase> ColorPropertyBasePtr;
 
-typedef boost::shared_ptr<class StringDataAdapterXml> StringDataAdapterXmlPtr;
-typedef boost::shared_ptr<class DoubleDataAdapterXml> DoubleDataAdapterXmlPtr;
-typedef boost::shared_ptr<class BoolDataAdapterXml> BoolDataAdapterXmlPtr;
-typedef boost::shared_ptr<class ColorDataAdapterXml> ColorDataAdapterXmlPtr;
-typedef boost::shared_ptr<class DoublePairDataAdapterXml> DoublePairDataAdapterXmlPtr;
+typedef boost::shared_ptr<class StringProperty> StringPropertyPtr;
+typedef boost::shared_ptr<class DoubleProperty> DoublePropertyPtr;
+typedef boost::shared_ptr<class BoolProperty> BoolPropertyPtr;
+typedef boost::shared_ptr<class ColorProperty> ColorPropertyPtr;
+typedef boost::shared_ptr<class DoublePairProperty> DoublePairPropertyPtr;
 
 // other stuff
 typedef boost::shared_ptr<class Presets> PresetsPtr;

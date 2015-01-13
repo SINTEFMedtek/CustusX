@@ -60,7 +60,7 @@ ToolMetricWrapper::~ToolMetricWrapper()
 
 QWidget* ToolMetricWrapper::createWidget()
 {
-	this->initializeDataAdapters();
+	this->initializeProperties();
 
 	QWidget* widget = new QWidget;
 
@@ -96,23 +96,23 @@ QWidget* ToolMetricWrapper::createWidget()
 	return widget;
 }
 
-void ToolMetricWrapper::initializeDataAdapters()
+void ToolMetricWrapper::initializeProperties()
 {
-	mSpaceSelector = SpaceDataAdapterXml::initialize("selectSpace",
+	mSpaceSelector = SpaceProperty::initialize("selectSpace",
 											  "Space",
 											  "Select coordinate system to store position in.");
 
 	mSpaceSelector->setSpaceProvider(spaceProvider());
 	connect(mSpaceSelector.get(), SIGNAL(valueWasSet()), this, SLOT(spaceSelected()));
 
-	mToolNameSelector = StringDataAdapterXml::initialize("selectToolName",
+	mToolNameSelector = StringProperty::initialize("selectToolName",
 															  "Tool Name",
 															  "The name of the tool",
 															  "",
 															  QDomNode());
 	connect(mToolNameSelector.get(), SIGNAL(valueWasSet()), this, SLOT(toolNameSet()));
 
-	mToolOffsetSelector = DoubleDataAdapterXml::initialize("selectToolOffset",
+	mToolOffsetSelector = DoubleProperty::initialize("selectToolOffset",
 																"Tool Offset",
 																"Tool Offset",
 																0,

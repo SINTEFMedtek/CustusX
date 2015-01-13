@@ -104,7 +104,7 @@ protected:
 
 	//data
 	ImageLandmarksSourcePtr mImageLandmarkSource;
-	RegistrationFixedImageStringDataAdapterPtr mFixedDataAdapter;
+	StringPropertyRegistrationFixedImagePtr mFixedDataAdapter;
 	DominantToolProxyPtr mDominantToolProxy;
 
 private:

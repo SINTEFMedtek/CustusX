@@ -95,7 +95,7 @@ private:
 	PlaybackTimePtr mTimer;
 	QAction* mPlayAction;
 	QAction* mOpenAction;
-	DoubleDataAdapterXmlPtr mSpeedAdapter;
+	DoublePropertyPtr mSpeedAdapter;
 	TimelineWidget* mToolTimelineWidget;
 };
 

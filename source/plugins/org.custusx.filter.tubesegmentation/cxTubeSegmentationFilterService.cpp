@@ -96,17 +96,17 @@ PresetsPtr TubeSegmentationFilter::getPresets()
 
 QDomElement TubeSegmentationFilter::generatePresetFromCurrentlySetOptions(QString name)
 {
-	std::vector<DataAdapterPtr> newPresetOptions = this->getNotDefaultOptions();
+	std::vector<PropertyPtr> newPresetOptions = this->getNotDefaultOptions();
 
 	std::map<QString, QString> newPresetMap;
-	std::vector<DataAdapterPtr>::iterator it;
+	std::vector<PropertyPtr>::iterator it;
 	for(it = newPresetOptions.begin(); it != newPresetOptions.end(); ++it){
-		DataAdapterPtr option = *it;
+		PropertyPtr option = *it;
 		QString valuename = option->getDisplayName();
 		QString value;
-		StringDataAdapterXmlPtr stringOption = boost::dynamic_pointer_cast<StringDataAdapterXml>(option);
-		BoolDataAdapterXmlPtr boolOption = boost::dynamic_pointer_cast<BoolDataAdapterXml>(option);
-		DoubleDataAdapterXmlPtr doubleOption = boost::dynamic_pointer_cast<DoubleDataAdapterXml>(option);
+		StringPropertyPtr stringOption = boost::dynamic_pointer_cast<StringProperty>(option);
+		BoolPropertyPtr boolOption = boost::dynamic_pointer_cast<BoolProperty>(option);
+		DoublePropertyPtr doubleOption = boost::dynamic_pointer_cast<DoubleProperty>(option);
 		if(stringOption)
 			value = stringOption->getValue();
 		else if(boolOption)
@@ -117,7 +117,7 @@ QDomElement TubeSegmentationFilter::generatePresetFromCurrentlySetOptions(QStrin
 			reportError("Could not determine what kind of option to get the value for.");
 		newPresetMap[valuename] = value;
 	}
-	StringDataAdapterPtr centerlineMethod = this->getStringOption("centerline-method");
+	StringPropertyBasePtr centerlineMethod = this->getStringOption("centerline-method");
 	newPresetMap[centerlineMethod->getDisplayName()] = centerlineMethod->getValue();
 
 	//create xml
@@ -137,7 +137,7 @@ void TubeSegmentationFilter::requestSetPresetSlot(QString name)
 	}
 	this->loadNewParametersSlot();
 
-	StringDataAdapterXmlPtr centerlineMethodOption = this->getStringOption("centerline-method");
+	StringPropertyPtr centerlineMethodOption = this->getStringOption("centerline-method");
 	centerlineMethodOption->setValue(centerLineMethod);
 }
 
@@ -375,24 +375,24 @@ void TubeSegmentationFilter::createOptions()
 {
 	this->createDefaultOptions(mOptions);
 
-	std::vector<StringDataAdapterXmlPtr>::iterator stringIt;
+	std::vector<StringPropertyPtr>::iterator stringIt;
 	for(stringIt = mStringOptions.begin(); stringIt != mStringOptions.end(); ++stringIt)
 		mOptionsAdapters.push_back(*stringIt);
 
-	std::vector<BoolDataAdapterXmlPtr>::iterator boolIt;
+	std::vector<BoolPropertyPtr>::iterator boolIt;
 	for(boolIt = mBoolOptions.begin(); boolIt != mBoolOptions.end(); ++boolIt)
 		mOptionsAdapters.push_back(*boolIt);
 
-	std::vector<DoubleDataAdapterXmlPtr>::iterator doubleIt;
+	std::vector<DoublePropertyPtr>::iterator doubleIt;
 	for(doubleIt = mDoubleOptions.begin(); doubleIt != mDoubleOptions.end(); ++doubleIt)
 		mOptionsAdapters.push_back(*doubleIt);
 }
 
 void TubeSegmentationFilter::createInputTypes()
 {
-	SelectDataStringDataAdapterBasePtr temp;
+	SelectDataStringPropertyBasePtr temp;
 
-	temp = SelectImageStringDataAdapter::New(mPatientModelService);
+	temp = StringPropertySelectImage::New(mPatientModelService);
 	temp->setValueName("Input");
 	temp->setHelp("Select input to run Tube segmentation on.");
 	mInputTypes.push_back(temp);
@@ -402,35 +402,35 @@ void TubeSegmentationFilter::createInputTypes()
 
 void TubeSegmentationFilter::createOutputTypes()
 {
-	SelectDataStringDataAdapterBasePtr tempDataStringAdapter;
-	SelectMeshStringDataAdapterPtr tempMeshStringAdapter;
+	SelectDataStringPropertyBasePtr tempDataStringAdapter;
+	StringPropertySelectMeshPtr tempMeshStringAdapter;
 
 	//0
-	tempDataStringAdapter = SelectDataStringDataAdapter::New(mPatientModelService);
+	tempDataStringAdapter = StringPropertySelectData::New(mPatientModelService);
 	tempDataStringAdapter->setValueName("Centerline volume");
 	tempDataStringAdapter->setHelp("Generated centerline volume.");
 	mOutputTypes.push_back(tempDataStringAdapter);
 
 	//1
-	tempMeshStringAdapter = SelectMeshStringDataAdapter::New(mPatientModelService);
+	tempMeshStringAdapter = StringPropertySelectMesh::New(mPatientModelService);
 	tempMeshStringAdapter->setValueName("Centerline mesh");
 	tempMeshStringAdapter->setHelp("Generated centerline mesh (vtk-format).");
 	mOutputTypes.push_back(tempMeshStringAdapter);
 
 	//2
-	tempDataStringAdapter = SelectDataStringDataAdapter::New(mPatientModelService);
+	tempDataStringAdapter = StringPropertySelectData::New(mPatientModelService);
 	tempDataStringAdapter->setValueName("Segmented centerline");
 	tempDataStringAdapter->setHelp("Grown segmentation from the centerline.");
 	mOutputTypes.push_back(tempDataStringAdapter);
 
 	//3
-	tempMeshStringAdapter = SelectMeshStringDataAdapter::New(mPatientModelService);
+	tempMeshStringAdapter = StringPropertySelectMesh::New(mPatientModelService);
 	tempMeshStringAdapter->setValueName("Segmented centerlines surface");
 	tempMeshStringAdapter->setHelp("Generated surface of the segmented volume.");
 	mOutputTypes.push_back(tempMeshStringAdapter);
 
 	//4
-	tempDataStringAdapter = SelectDataStringDataAdapter::New(mPatientModelService);
+	tempDataStringAdapter = StringPropertySelectData::New(mPatientModelService);
 	tempDataStringAdapter->setValueName("TDF volume");
 	tempDataStringAdapter->setHelp("Volume showing the probability of a voxel being part of a tubular structure.");
 	mOutputTypes.push_back(tempDataStringAdapter);
@@ -440,7 +440,7 @@ void TubeSegmentationFilter::patientChangedSlot()
 {
 	QString activePatientFolder = patientService()->getActivePatientFolder()+"/Images/";
 
-	StringDataAdapterXmlPtr option = this->getStringOption("storage-dir");
+	StringPropertyPtr option = this->getStringOption("storage-dir");
 	if(option)
 		option->setValue(activePatientFolder);
 }
@@ -450,7 +450,7 @@ void TubeSegmentationFilter::inputChangedSlot()
 	QString activePatientFolder = patientService()->getActivePatientFolder()+"/Images/";
 	QString inputsValue = mInputTypes.front()->getValue();
 
-	StringDataAdapterXmlPtr option = this->getStringOption("centerline-vtk-file");
+	StringPropertyPtr option = this->getStringOption("centerline-vtk-file");
 	if(option)
 		option->setValue(activePatientFolder+inputsValue+QDateTime::currentDateTime().toString(timestampSecondsFormat())+"_tsf_vtk.vtk");
 }
@@ -489,10 +489,10 @@ void TubeSegmentationFilter::loadNewParametersSlot()
 
 void TubeSegmentationFilter::resetOptionsAdvancedSlot()
 {
-	std::vector<StringDataAdapterXmlPtr>::iterator stringIt;
+	std::vector<StringPropertyPtr>::iterator stringIt;
 	for(stringIt = mStringOptions.begin(); stringIt != mStringOptions.end(); ++stringIt)
 	{
-		StringDataAdapterXmlPtr adapter = *stringIt;
+		StringPropertyPtr adapter = *stringIt;
 		if(adapter->getDisplayName() == "parameters")
 		{
 			adapter->setAdvanced(false);
@@ -501,17 +501,17 @@ void TubeSegmentationFilter::resetOptionsAdvancedSlot()
 			adapter->setAdvanced(true);
 	}
 
-	std::vector<BoolDataAdapterXmlPtr>::iterator boolIt;
+	std::vector<BoolPropertyPtr>::iterator boolIt;
 	for(boolIt = mBoolOptions.begin(); boolIt != mBoolOptions.end(); ++boolIt)
 	{
-		BoolDataAdapterXmlPtr adapter = *boolIt;
+		BoolPropertyPtr adapter = *boolIt;
 		adapter->setAdvanced(true);
 	}
 
-	std::vector<DoubleDataAdapterXmlPtr>::iterator doubleIt;
+	std::vector<DoublePropertyPtr>::iterator doubleIt;
 	for(doubleIt = mDoubleOptions.begin(); doubleIt != mDoubleOptions.end(); ++doubleIt)
 	{
-		DoubleDataAdapterXmlPtr adapter = *doubleIt;
+		DoublePropertyPtr adapter = *doubleIt;
 		adapter->setAdvanced(true);
 	}
 }
@@ -607,7 +607,7 @@ void TubeSegmentationFilter::createDefaultOptions(QDomElement root)
     boost::unordered_map<std::string, StringParameter>::iterator stringIt;
     for(stringIt = defaultOptions.strings.begin(); stringIt != defaultOptions.strings.end(); ++stringIt )
 		{
-    	StringDataAdapterXmlPtr option = this->makeStringOption(root, stringIt->first, stringIt->second);
+    	StringPropertyPtr option = this->makeStringOption(root, stringIt->first, stringIt->second);
     	option->setAdvanced(true);
     	option->setGroup(qstring_cast(stringIt->second.getGroup()));
     	mStringOptions.push_back(option);
@@ -620,7 +620,7 @@ void TubeSegmentationFilter::createDefaultOptions(QDomElement root)
     boost::unordered_map<std::string, BoolParameter>::iterator boolIt;
     for(boolIt = defaultOptions.bools.begin(); boolIt != defaultOptions.bools.end(); ++boolIt )
 		{
-    	BoolDataAdapterXmlPtr option = this->makeBoolOption(root, boolIt->first, boolIt->second);
+    	BoolPropertyPtr option = this->makeBoolOption(root, boolIt->first, boolIt->second);
     	option->setAdvanced(true);
     	option->setGroup(qstring_cast(boolIt->second.getGroup()));
     	mBoolOptions.push_back(option);
@@ -630,7 +630,7 @@ void TubeSegmentationFilter::createDefaultOptions(QDomElement root)
     boost::unordered_map<std::string, NumericParameter>::iterator numericIt;
     for(numericIt = defaultOptions.numerics.begin(); numericIt != defaultOptions.numerics.end(); ++numericIt )
 		{
-    	DoubleDataAdapterXmlPtr option = this->makeDoubleOption(root, numericIt->first, numericIt->second);
+    	DoublePropertyPtr option = this->makeDoubleOption(root, numericIt->first, numericIt->second);
     	option->setAdvanced(true);
     	option->setGroup(qstring_cast(numericIt->second.getGroup()));
     	mDoubleOptions.push_back(option);
@@ -641,7 +641,7 @@ paramList TubeSegmentationFilter::getParametersFromOptions()
 {
 	paramList retval = this->getDefaultParameters();
 
-	std::vector<StringDataAdapterXmlPtr>::iterator stringIt;
+	std::vector<StringPropertyPtr>::iterator stringIt;
 	for(stringIt = mStringOptions.begin(); stringIt != mStringOptions.end(); ++stringIt)
 	{
 		try{
@@ -653,7 +653,7 @@ paramList TubeSegmentationFilter::getParametersFromOptions()
 		}
 	}
 
-	std::vector<BoolDataAdapterXmlPtr>::iterator boolIt;
+	std::vector<BoolPropertyPtr>::iterator boolIt;
 	for(boolIt = mBoolOptions.begin(); boolIt != mBoolOptions.end(); ++boolIt)
 	{
 		try{
@@ -666,7 +666,7 @@ paramList TubeSegmentationFilter::getParametersFromOptions()
 		}
 	}
 
-	std::vector<DoubleDataAdapterXmlPtr>::iterator doubleIt;
+	std::vector<DoublePropertyPtr>::iterator doubleIt;
 	for(doubleIt = mDoubleOptions.begin(); doubleIt != mDoubleOptions.end(); ++doubleIt)
 	{
 		try{
@@ -699,10 +699,10 @@ void TubeSegmentationFilter::setParamtersToOptions(paramList& parameters)
     	this->setOptionValue(qstring_cast(numericIt->first),qstring_cast(numericIt->second.get()));
 }
 
-StringDataAdapterXmlPtr TubeSegmentationFilter::getStringOption(QString valueName)
+StringPropertyPtr TubeSegmentationFilter::getStringOption(QString valueName)
 {
-	StringDataAdapterXmlPtr retval;
-	std::vector<StringDataAdapterXmlPtr>::iterator stringIt;
+	StringPropertyPtr retval;
+	std::vector<StringPropertyPtr>::iterator stringIt;
 	for(stringIt = mStringOptions.begin(); stringIt != mStringOptions.end(); ++stringIt)
 	{
 		if(stringIt->get()->getDisplayName().compare(valueName) == 0)
@@ -714,10 +714,10 @@ StringDataAdapterXmlPtr TubeSegmentationFilter::getStringOption(QString valueNam
 	return retval;
 }
 
-BoolDataAdapterXmlPtr TubeSegmentationFilter::getBoolOption(QString valueName)
+BoolPropertyPtr TubeSegmentationFilter::getBoolOption(QString valueName)
 {
-	BoolDataAdapterXmlPtr retval;
-	std::vector<BoolDataAdapterXmlPtr>::iterator boolIt;
+	BoolPropertyPtr retval;
+	std::vector<BoolPropertyPtr>::iterator boolIt;
 	for(boolIt = mBoolOptions.begin(); boolIt != mBoolOptions.end(); ++boolIt)
 	{
 		if(boolIt->get()->getDisplayName().compare(valueName) == 0)
@@ -729,10 +729,10 @@ BoolDataAdapterXmlPtr TubeSegmentationFilter::getBoolOption(QString valueName)
 	return retval;
 }
 
-DoubleDataAdapterXmlPtr TubeSegmentationFilter::getDoubleOption(QString valueName)
+DoublePropertyPtr TubeSegmentationFilter::getDoubleOption(QString valueName)
 {
-	DoubleDataAdapterXmlPtr retval;
-	std::vector<DoubleDataAdapterXmlPtr>::iterator doubleIt;
+	DoublePropertyPtr retval;
+	std::vector<DoublePropertyPtr>::iterator doubleIt;
 	for(doubleIt = mDoubleOptions.begin(); doubleIt != mDoubleOptions.end(); ++doubleIt)
 	{
 		if(doubleIt->get()->getDisplayName().compare(valueName) == 0)
@@ -744,9 +744,9 @@ DoubleDataAdapterXmlPtr TubeSegmentationFilter::getDoubleOption(QString valueNam
 	return retval;
 }
 
-DataAdapterPtr TubeSegmentationFilter::getOption(QString valueName)
+PropertyPtr TubeSegmentationFilter::getOption(QString valueName)
 {
-	DataAdapterPtr retval;
+	PropertyPtr retval;
 
 	retval = getStringOption(valueName);
 	if(retval)
@@ -763,19 +763,19 @@ DataAdapterPtr TubeSegmentationFilter::getOption(QString valueName)
 
 void TubeSegmentationFilter::setOptionAdvanced(QString valueName, bool advanced)
 {
-	DataAdapterPtr option = this->getOption(valueName);
+	PropertyPtr option = this->getOption(valueName);
 	option->setAdvanced(advanced);
 }
 
 void TubeSegmentationFilter::setOptionValue(QString valueName, QString value)
 {
-	DataAdapterPtr option = this->getOption(valueName);
+	PropertyPtr option = this->getOption(valueName);
 	if(!option)
 		return;
 
-	StringDataAdapterXmlPtr stringOption = boost::dynamic_pointer_cast<StringDataAdapterXml>(option);
-	BoolDataAdapterXmlPtr boolOption = boost::dynamic_pointer_cast<BoolDataAdapterXml>(option);
-	DoubleDataAdapterXmlPtr doubleOption = boost::dynamic_pointer_cast<DoubleDataAdapterXml>(option);
+	StringPropertyPtr stringOption = boost::dynamic_pointer_cast<StringProperty>(option);
+	BoolPropertyPtr boolOption = boost::dynamic_pointer_cast<BoolProperty>(option);
+	DoublePropertyPtr doubleOption = boost::dynamic_pointer_cast<DoubleProperty>(option);
 	if(stringOption)
 	{
 		stringOption->setValue(value);
@@ -834,14 +834,14 @@ std::vector<std::string> TubeSegmentationFilter::getDifference(paramList list1, 
 
 }
 
-std::vector<DataAdapterPtr> TubeSegmentationFilter::getNotDefaultOptions()
+std::vector<PropertyPtr> TubeSegmentationFilter::getNotDefaultOptions()
 {
-	std::vector<DataAdapterPtr> retval;
+	std::vector<PropertyPtr> retval;
 
 	//get list with default options
 	paramList defaultOptions = this->getDefaultParameters();
 
-	std::vector<StringDataAdapterXmlPtr>::iterator stringDAIt;
+	std::vector<StringPropertyPtr>::iterator stringDAIt;
 	for(stringDAIt = mStringOptions.begin(); stringDAIt != mStringOptions.end(); ++stringDAIt)
 	{
 	    boost::unordered_map<std::string, StringParameter>::iterator stringIt;
@@ -855,7 +855,7 @@ std::vector<DataAdapterPtr> TubeSegmentationFilter::getNotDefaultOptions()
 	    }
 	}
 
-	std::vector<BoolDataAdapterXmlPtr>::iterator boolDAIt;
+	std::vector<BoolPropertyPtr>::iterator boolDAIt;
 	for(boolDAIt = mBoolOptions.begin(); boolDAIt != mBoolOptions.end(); ++boolDAIt)
 	{
 	    boost::unordered_map<std::string, BoolParameter>::iterator boolIt;
@@ -869,7 +869,7 @@ std::vector<DataAdapterPtr> TubeSegmentationFilter::getNotDefaultOptions()
 	    }
 	}
 
-	std::vector<DoubleDataAdapterXmlPtr>::iterator doubleDAIt;
+	std::vector<DoublePropertyPtr>::iterator doubleDAIt;
 	for(doubleDAIt = mDoubleOptions.begin(); doubleDAIt != mDoubleOptions.end(); ++doubleDAIt)
 	{
 	    boost::unordered_map<std::string, NumericParameter>::iterator numericIt;
@@ -923,7 +923,7 @@ void TubeSegmentationFilter::printParameters(paramList parameters)
     std::cout << "\n" << std::endl;
 }
 
-StringDataAdapterXmlPtr TubeSegmentationFilter::makeStringOption(QDomElement root, std::string name, StringParameter parameter)
+StringPropertyPtr TubeSegmentationFilter::makeStringOption(QDomElement root, std::string name, StringParameter parameter)
 {
 	QString helptext = qstring_cast(parameter.getDescription());
 	std::vector<std::string> possibilities = parameter.getPossibilities();
@@ -940,22 +940,22 @@ StringDataAdapterXmlPtr TubeSegmentationFilter::makeStringOption(QDomElement roo
 	}
 
 	if(!possibilities.empty())
-		return StringDataAdapterXml::initialize(qstring_cast("tsf_"+name), qstring_cast(name), helptext, value, list, root);
+		return StringProperty::initialize(qstring_cast("tsf_"+name), qstring_cast(name), helptext, value, list, root);
 	else
 	{
 		//NB. hvis en string type ikke har noen possibilities betyr det at det er fritekst
-		return  StringDataAdapterXml::initialize(qstring_cast("tsf_"+name), qstring_cast(name), helptext, value, root);
+		return  StringProperty::initialize(qstring_cast("tsf_"+name), qstring_cast(name), helptext, value, root);
 	}
 }
 
-BoolDataAdapterXmlPtr TubeSegmentationFilter::makeBoolOption(QDomElement root, std::string name, BoolParameter parameter)
+BoolPropertyPtr TubeSegmentationFilter::makeBoolOption(QDomElement root, std::string name, BoolParameter parameter)
 {
 	QString helptext = qstring_cast(parameter.getDescription());
 	bool value = parameter.get();
-	return BoolDataAdapterXml::initialize(qstring_cast("tsf_"+name), qstring_cast(name), helptext, value, root);
+	return BoolProperty::initialize(qstring_cast("tsf_"+name), qstring_cast(name), helptext, value, root);
 }
 
-DoubleDataAdapterXmlPtr TubeSegmentationFilter::makeDoubleOption(QDomElement root, std::string name, NumericParameter parameter)
+DoublePropertyPtr TubeSegmentationFilter::makeDoubleOption(QDomElement root, std::string name, NumericParameter parameter)
 {
 	QString helptext = qstring_cast(parameter.getDescription());
 	double value = parameter.get();
@@ -966,8 +966,8 @@ DoubleDataAdapterXmlPtr TubeSegmentationFilter::makeDoubleOption(QDomElement roo
 	DoubleRange range(min, max, step);
 	int decimals = 2;
 
-	DoubleDataAdapterXmlPtr retval = DoubleDataAdapterXml::initialize(qstring_cast("tsf_"+name), qstring_cast(name), helptext, value, range, decimals, root);
-	retval->setGuiRepresentation(DoubleDataAdapter::grSLIDER);
+	DoublePropertyPtr retval = DoubleProperty::initialize(qstring_cast("tsf_"+name), qstring_cast(name), helptext, value, range, decimals, root);
+	retval->setGuiRepresentation(DoublePropertyBase::grSLIDER);
 	return retval;
 }
 

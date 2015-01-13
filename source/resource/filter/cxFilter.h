@@ -46,7 +46,7 @@ class QDomElement;
 
 namespace cx
 {
-typedef boost::shared_ptr<class SelectDataStringDataAdapterBase> SelectDataStringDataAdapterBasePtr;
+typedef boost::shared_ptr<class SelectDataStringPropertyBase> SelectDataStringPropertyBasePtr;
 
 typedef boost::shared_ptr<class Filter> FilterPtr;
 
@@ -105,15 +105,15 @@ public:
 	  *  Fill options for this algorithm.
 	  *  The options use the input xml noe from init to fill.
 	  */
-	virtual std::vector<DataAdapterPtr> getOptions() = 0;
+	virtual std::vector<PropertyPtr> getOptions() = 0;
 	/**
 	  *  List of input arguments.
 	  */
-	virtual std::vector<SelectDataStringDataAdapterBasePtr> getInputTypes() = 0;
+	virtual std::vector<SelectDataStringPropertyBasePtr> getInputTypes() = 0;
 	/**
 	  *  Return a help text describing algorithm usage.
 	  */
-	virtual std::vector<SelectDataStringDataAdapterBasePtr> getOutputTypes() = 0;
+	virtual std::vector<SelectDataStringPropertyBasePtr> getOutputTypes() = 0;
 
 	/**
 	 * Checks wheter the filter has defined a set of presets.

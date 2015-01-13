@@ -97,7 +97,7 @@ protected:
 	PickerRepPtr getPickerRep();
 
 	//gui
-	SelectDataStringDataAdapterBasePtr mCurrentDataAdapter;
+	SelectDataStringPropertyBasePtr mCurrentDataAdapter;
 	ImageLandmarksSourcePtr mImageLandmarkSource;
 	DominantToolProxyPtr mDominantToolProxy;
 

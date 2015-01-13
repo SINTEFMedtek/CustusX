@@ -145,7 +145,7 @@ void MeshInfoWidget::hideEvent(QCloseEvent* event)
 
 void MeshInfoWidget::addWidgets(PatientModelServicePtr patientModelService)
 {
-	mSelectMeshWidget = SelectMeshStringDataAdapter::New(patientModelService);
+	mSelectMeshWidget = StringPropertySelectMesh::New(patientModelService);
 	mSelectMeshWidget->setValueName("Surface: ");
 	connect(mSelectMeshWidget.get(), SIGNAL(changed()), this, SLOT(meshSelectedSlot()));
 
@@ -158,16 +158,16 @@ void MeshInfoWidget::addWidgets(PatientModelServicePtr patientModelService)
 	if(mSelectMeshWidget->getMesh())
 		color = mSelectMeshWidget->getMesh()->getColor();
 
-	mColorAdapter = ColorDataAdapterXml::initialize(uid, name, help, color, options.getElement());
+	mColorAdapter = ColorProperty::initialize(uid, name, help, color, options.getElement());
 	connect(mColorAdapter.get(), SIGNAL(changed()), this, SLOT(setColorSlot()));
 
 	QPushButton* importTransformButton = new QPushButton("Import Transform from Parent", this);
 	importTransformButton->setToolTip("Replace data transform with that of the parent data.");
 	connect(importTransformButton, SIGNAL(clicked()), this, SLOT(importTransformSlot()));
 
-	mUidAdapter = DataUidEditableStringDataAdapter::New();
-	mNameAdapter = DataNameEditableStringDataAdapter::New();
-	mParentFrameAdapter = ParentFrameStringDataAdapter::New(mPatientModelService);
+	mUidAdapter = StringPropertyDataUidEditable::New();
+	mNameAdapter = StringPropertyDataNameEditable::New();
+	mParentFrameAdapter = StringPropertyParentFrame::New(mPatientModelService);
 
 	QWidget* optionsWidget = new QWidget(this);
 	QHBoxLayout* optionsLayout = new QHBoxLayout(optionsWidget);

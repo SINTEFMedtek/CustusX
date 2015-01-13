@@ -78,17 +78,17 @@ namespace cx
        virtual QString convertInternal2Display(QString internal);
   \endverbatim
  *
- * When testing, or during development, you can use the StringDataAdapterNull
+ * When testing, or during development, you can use the StringPropertyNull
  * as a dummy implementation.
  *
  * \ingroup cx_resource_core_dataadapters
  */
-class cxResource_EXPORT StringDataAdapter: public DataAdapter
+class cxResource_EXPORT StringPropertyBase: public Property
 {
 	Q_OBJECT
 public:
-	StringDataAdapter() : mGuiRepresentation(grSTRING) {}
-	virtual ~StringDataAdapter(){}
+	StringPropertyBase() : mGuiRepresentation(grSTRING) {}
+	virtual ~StringPropertyBase(){}
 
 public:
 	enum GuiRepresentation
@@ -143,7 +143,7 @@ protected:
 	GuiRepresentation mGuiRepresentation;
 
 };
-typedef boost::shared_ptr<StringDataAdapter> StringDataAdapterPtr;
+typedef boost::shared_ptr<StringPropertyBase> StringPropertyBasePtr;
 
 } // namespace cx
 

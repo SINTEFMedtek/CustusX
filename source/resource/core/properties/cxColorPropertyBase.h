@@ -42,18 +42,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-/** DataAdapter interface for QColor
+/** Property interface for QColor
  *
  *
  * \ingroup cx_resource_core_dataadapters
  * \date Nov 22, 2012
  * \author christiana
  */
-class cxResource_EXPORT ColorDataAdapter: public DataAdapter
+class cxResource_EXPORT ColorPropertyBase: public Property
 {
 Q_OBJECT
 public:
-    virtual ~ColorDataAdapter() {}
+	virtual ~ColorPropertyBase() {}
 
 public:
     // basic methods
@@ -78,7 +78,7 @@ public:
         return QString();
     } ///< return a descriptive help string for the data, used for example as a tool tip.
 };
-typedef boost::shared_ptr<ColorDataAdapter> ColorDataAdapterPtr;
+typedef boost::shared_ptr<ColorPropertyBase> ColorPropertyBasePtr;
 
 } // namespace cx
 

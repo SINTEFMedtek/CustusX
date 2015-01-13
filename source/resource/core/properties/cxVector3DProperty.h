@@ -30,14 +30,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-
-/*
- * sscVector3DDataAdapterXml.h
- *
- *  Created on: Jul 25, 2011
- *      Author: christiana
- */
-
 #ifndef CXVECTOR3DPROPERTY_H_
 #define CXVECTOR3DPROPERTY_H_
 
@@ -52,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-typedef boost::shared_ptr<class Vector3DDataAdapterXml> Vector3DDataAdapterXmlPtr;
+typedef boost::shared_ptr<class Vector3DProperty> Vector3DPropertyPtr;
 
 /**\brief Represents one option of the double type.
  *
@@ -65,14 +57,14 @@ typedef boost::shared_ptr<class Vector3DDataAdapterXml> Vector3DDataAdapterXmlPt
  *
  * \ingroup cx_resource_core_dataadapters
  */
-class cxResource_EXPORT Vector3DDataAdapterXml: public Vector3DDataAdapter
+class cxResource_EXPORT Vector3DProperty: public Vector3DPropertyBase
 {
 Q_OBJECT
 public:
 	/** Make sure one given option exists witin root.
 	 * If not present, fill inn the input defaults.
 	 */
-	static Vector3DDataAdapterXmlPtr initialize(const QString& uid, QString name, QString help, Vector3D value,
+	static Vector3DPropertyPtr initialize(const QString& uid, QString name, QString help, Vector3D value,
 		DoubleRange range, int decimals, QDomNode root = QDomNode());
 	void setInternal2Display(double factor);
 
@@ -100,7 +92,7 @@ signals:
 	void valueWasSet(); /// emitted when the value is set using setValue() (similar to changed(), but more constrained)
 
 private:
-	Vector3DDataAdapterXml();
+	Vector3DProperty();
 	QString mName;
 	QString mUid;
 	QString mHelp;

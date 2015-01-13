@@ -66,16 +66,16 @@ LapFrameToolCalibrationWidget::LapFrameToolCalibrationWidget(QWidget* parent) :
 {
   QVBoxLayout* toplayout = new QVBoxLayout(this);
 
-  mCameraAngleAdapter = DoubleDataAdapterXml::initialize("Camera Angle", "",
+  mCameraAngleAdapter = DoubleProperty::initialize("Camera Angle", "",
       "Additional tilt of calibration around tool y-axis,\nfor use with cameras tilted relative to tool direction",
       0.0, DoubleRange(-M_PI/2, M_PI/2, M_PI/180), 0);
   mCameraAngleAdapter->setInternal2Display(180.0/M_PI);
 
-  mCalibRefTool = SelectToolStringDataAdapter::New();
+  mCalibRefTool = StringPropertySelectTool::New();
   mCalibRefTool->setValueName("Calibration Frame");
   mCalibRefTool->setHelp("Select Calibration Reference Frame");
 
-  mCalibratingTool = SelectToolStringDataAdapter::New();
+  mCalibratingTool = StringPropertySelectTool::New();
   mCalibratingTool->setValueName("Tool");
   mCalibratingTool->setHelp("Select which Tool to calibrate");
 

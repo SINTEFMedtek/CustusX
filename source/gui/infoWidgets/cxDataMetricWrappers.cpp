@@ -81,7 +81,7 @@ QString MetricBase::getValue() const
 
 void MetricBase::addColorWidget(QVBoxLayout* layout)
 {
-	mColorSelector = ColorDataAdapterXml::initialize("color", "Color",
+	mColorSelector = ColorProperty::initialize("color", "Color",
 													 "Set color of metric",
 													 this->getData()->getColor(), QDomNode());
 	QHBoxLayout* line = new QHBoxLayout;
@@ -115,7 +115,7 @@ void MetricReferenceArgumentListGui::addWidgets(QBoxLayout* layout)
 	mPSelector.resize(mArguments->getCount());
 	for (unsigned i=0; i<mPSelector.size(); ++i)
 	{
-		mPSelector[i] = StringDataAdapterXml::initialize(QString("p%1").arg(i),
+		mPSelector[i] = StringProperty::initialize(QString("p%1").arg(i),
 														 QString("p%1").arg(i),
 														 mArguments->getDescription(i),
 														 mArguments->get(i) ? mArguments->get(i)->getUid() : "",
@@ -236,10 +236,10 @@ QWidget* PointMetricWrapper::createWidget()
 	return widget;
 }
 
-SpaceDataAdapterXmlPtr PointMetricWrapper::createSpaceSelector() const
+SpacePropertyPtr PointMetricWrapper::createSpaceSelector() const
 {
-	SpaceDataAdapterXmlPtr retval;
-	retval = SpaceDataAdapterXml::initialize("selectSpace",
+	SpacePropertyPtr retval;
+	retval = SpaceProperty::initialize("selectSpace",
 											  "Space",
 											  "Select coordinate system to store position in.");
 	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(spaceSelected()));
@@ -247,10 +247,10 @@ SpaceDataAdapterXmlPtr PointMetricWrapper::createSpaceSelector() const
 	return retval;
 }
 
-Vector3DDataAdapterXmlPtr PointMetricWrapper::createCoordinateSelector() const
+Vector3DPropertyPtr PointMetricWrapper::createCoordinateSelector() const
 {
-	Vector3DDataAdapterXmlPtr retval;
-	retval = Vector3DDataAdapterXml::initialize("selectCoordinate",
+	Vector3DPropertyPtr retval;
+	retval = Vector3DProperty::initialize("selectCoordinate",
 												"Coord",
 												"Coordinate values.",
 												Vector3D(0,0,0),
@@ -521,10 +521,10 @@ void AngleMetricWrapper::guiChanged()
 	mData->setUseSimpleVisualization(mUseSimpleVisualization->getValue());
 }
 
-BoolDataAdapterXmlPtr AngleMetricWrapper::createUseSimpleVisualizationSelector() const
+BoolPropertyPtr AngleMetricWrapper::createUseSimpleVisualizationSelector() const
 {
-	BoolDataAdapterXmlPtr retval;
-	retval = BoolDataAdapterXml::initialize("Simple Visualization", "",
+	BoolPropertyPtr retval;
+	retval = BoolProperty::initialize("Simple Visualization", "",
 											  "Simple Visualization",
 											  mData->getUseSimpleVisualization());
 
@@ -629,10 +629,10 @@ void DonutMetricWrapper::guiChanged()
 }
 
 
-DoubleDataAdapterXmlPtr DonutMetricWrapper::createRadiusSelector() const
+DoublePropertyPtr DonutMetricWrapper::createRadiusSelector() const
 {
-	DoubleDataAdapterXmlPtr retval;
-	retval = DoubleDataAdapterXml::initialize("selectRadius",
+	DoublePropertyPtr retval;
+	retval = DoubleProperty::initialize("selectRadius",
 											  "Radius",
 											  "Donut Radius",
 											  mData->getRadius(),
@@ -644,10 +644,10 @@ DoubleDataAdapterXmlPtr DonutMetricWrapper::createRadiusSelector() const
 	return retval;
 }
 
-DoubleDataAdapterXmlPtr DonutMetricWrapper::createThicknessSelector() const
+DoublePropertyPtr DonutMetricWrapper::createThicknessSelector() const
 {
-	DoubleDataAdapterXmlPtr retval;
-	retval = DoubleDataAdapterXml::initialize("selectThickness",
+	DoublePropertyPtr retval;
+	retval = DoubleProperty::initialize("selectThickness",
 											  "Thickness",
 											  "Donut Thickness",
 											  mData->getThickness(),
@@ -659,10 +659,10 @@ DoubleDataAdapterXmlPtr DonutMetricWrapper::createThicknessSelector() const
 	return retval;
 }
 
-DoubleDataAdapterXmlPtr DonutMetricWrapper::createHeightSelector() const
+DoublePropertyPtr DonutMetricWrapper::createHeightSelector() const
 {
-	DoubleDataAdapterXmlPtr retval;
-	retval = DoubleDataAdapterXml::initialize("selectHeight",
+	DoublePropertyPtr retval;
+	retval = DoubleProperty::initialize("selectHeight",
 											  "Height",
 											  "Disc height, NA to torus",
 											  mData->getHeight(),
@@ -674,10 +674,10 @@ DoubleDataAdapterXmlPtr DonutMetricWrapper::createHeightSelector() const
 	return retval;
 }
 
-BoolDataAdapterXmlPtr DonutMetricWrapper::createFlatSelector() const
+BoolPropertyPtr DonutMetricWrapper::createFlatSelector() const
 {
-	BoolDataAdapterXmlPtr retval;
-	retval = BoolDataAdapterXml::initialize("selectFlat",
+	BoolPropertyPtr retval;
+	retval = BoolProperty::initialize("selectFlat",
 											  "Flat",
 											  "Flat disk or torus",
 											  mData->getFlat(),
@@ -755,10 +755,10 @@ void SphereMetricWrapper::guiChanged()
 	mData->setRadius(mRadius->getValue());
 }
 
-DoubleDataAdapterXmlPtr SphereMetricWrapper::createRadiusSelector() const
+DoublePropertyPtr SphereMetricWrapper::createRadiusSelector() const
 {
-	DoubleDataAdapterXmlPtr retval;
-	retval = DoubleDataAdapterXml::initialize("selectRadius",
+	DoublePropertyPtr retval;
+	retval = DoubleProperty::initialize("selectRadius",
 											  "Radius",
 											  "Sphere Radius",
 											  mData->getRadius(),

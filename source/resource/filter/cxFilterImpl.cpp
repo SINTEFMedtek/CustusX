@@ -62,7 +62,7 @@ void FilterImpl::initialize(QDomElement root, QString uid)
 	mOptions = root;
 }
 
-std::vector<DataAdapterPtr> FilterImpl::getOptions()
+std::vector<PropertyPtr> FilterImpl::getOptions()
 {
 	if (mOptionsAdapters.empty())
 	{
@@ -71,7 +71,7 @@ std::vector<DataAdapterPtr> FilterImpl::getOptions()
 	return mOptionsAdapters;
 }
 
-std::vector<SelectDataStringDataAdapterBasePtr> FilterImpl::getInputTypes()
+std::vector<SelectDataStringPropertyBasePtr> FilterImpl::getInputTypes()
 {
 	if (mInputTypes.empty())
 	{
@@ -81,7 +81,7 @@ std::vector<SelectDataStringDataAdapterBasePtr> FilterImpl::getInputTypes()
 	return mInputTypes;
 }
 
-std::vector<SelectDataStringDataAdapterBasePtr> FilterImpl::getOutputTypes()
+std::vector<SelectDataStringPropertyBasePtr> FilterImpl::getOutputTypes()
 {
 	if (mOutputTypes.empty())
 	{
@@ -123,7 +123,7 @@ ImagePtr FilterImpl::getCopiedInputImage(int index)
 	return boost::dynamic_pointer_cast<Image>(mCopiedInput[index]);
 }
 
-void FilterImpl::updateThresholdFromImageChange(QString uid, DoubleDataAdapterXmlPtr threshold)
+void FilterImpl::updateThresholdFromImageChange(QString uid, DoublePropertyPtr threshold)
 {
 	ImagePtr image = mPatientModelService->getData<Image>(uid);
 	if(!image)
@@ -141,7 +141,7 @@ void FilterImpl::updateThresholdFromImageChange(QString uid, DoubleDataAdapterXm
 //	std::cout << "            imageChangedSlot() " << threshold->getValue() << std::endl;
 }
 
-void FilterImpl::updateThresholdPairFromImageChange(QString uid, DoublePairDataAdapterXmlPtr threshold)
+void FilterImpl::updateThresholdPairFromImageChange(QString uid, DoublePairPropertyPtr threshold)
 {
 	ImagePtr image = mPatientModelService->getData<Image>(uid);
 	if(!image)

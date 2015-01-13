@@ -84,9 +84,9 @@ private:
   QPushButton* mTestButton;
   QLabel* mCalibrationLabel;
   QLabel* mDeltaLabel;
-  SelectToolStringDataAdapterPtr mCalibRefTool;
-  SelectToolStringDataAdapterPtr mCalibratingTool;
-  DoubleDataAdapterXmlPtr mCameraAngleAdapter;
+  StringPropertySelectToolPtr mCalibRefTool;
+  StringPropertySelectToolPtr mCalibratingTool;
+  DoublePropertyPtr mCameraAngleAdapter;
 };
 
 /**

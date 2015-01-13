@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ColorSelectWidget::ColorSelectWidget(QWidget* parent, ColorDataAdapterPtr dataInterface, QGridLayout* gridLayout, int row) :
+ColorSelectWidget::ColorSelectWidget(QWidget* parent, ColorPropertyBasePtr dataInterface, QGridLayout* gridLayout, int row) :
     OptimizedUpdateWidget(parent)
 {
 	this->setEnabled(dataInterface->getEnabled());

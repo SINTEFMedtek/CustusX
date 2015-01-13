@@ -31,13 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 
-/*
- * sscStringDataAdapterXml.h
- *
- *  Created on: Jun 27, 2010
- *      Author: christiana
- */
-
 #ifndef CXSTRINGPROPERTY_H_
 #define CXSTRINGPROPERTY_H_
 
@@ -51,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-typedef boost::shared_ptr<class StringDataAdapterXml> StringDataAdapterXmlPtr;
+typedef boost::shared_ptr<class StringProperty> StringPropertyPtr;
 
 /**\brief Represents one option of the string type.
  *  The data are stored within a xml document.
@@ -63,16 +56,16 @@ typedef boost::shared_ptr<class StringDataAdapterXml> StringDataAdapterXmlPtr;
  *
  * \ingroup cx_resource_core_dataadapters
  */
-class cxResource_EXPORT StringDataAdapterXml: public StringDataAdapter
+class cxResource_EXPORT StringProperty: public StringPropertyBase
 {
 Q_OBJECT
 public:
 	/** Make sure one given option exists witin root.
 	 * If not present, fill inn the input defaults.
 	 */
-	static StringDataAdapterXmlPtr initialize(const QString& uid, QString name, QString help, QString value,
+	static StringPropertyPtr initialize(const QString& uid, QString name, QString help, QString value,
 		QStringList range, QDomNode root = QDomNode());
-	static StringDataAdapterXmlPtr initialize(const QString& uid, QString name, QString help, QString value, QDomNode root = QDomNode());
+	static StringPropertyPtr initialize(const QString& uid, QString name, QString help, QString value, QDomNode root = QDomNode());
 
 public:
 	// inherited interface
@@ -96,7 +89,7 @@ signals:
 	void valueWasSet(); /// emitted when the value is set using setValue() (similar to changed(), but more constrained)
 
 private:
-	StringDataAdapterXml();
+	StringProperty();
 	QString mName;
 	QString mUid;
 	QString mHelp;

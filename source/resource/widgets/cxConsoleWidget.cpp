@@ -663,11 +663,11 @@ void ConsoleWidget::createChannelSelector()
 	mChannels << "all";
 	mChannels << defval;
 
-	StringDataAdapterXmlPtr retval;
-	retval = StringDataAdapterXml::initialize("ChannelSelector",
+	StringPropertyPtr retval;
+	retval = StringProperty::initialize("ChannelSelector",
 											  "", "Log Channel to display",
 											  defval, mChannels, mOptions.getElement());
-	connect(retval.get(), &StringDataAdapter::changed, this, &ConsoleWidget::onChannelSelectorChanged);
+	connect(retval.get(), &StringPropertyBase::changed, this, &ConsoleWidget::onChannelSelectorChanged);
 	mChannelSelector = retval;
 }
 

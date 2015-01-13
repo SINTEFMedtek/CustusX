@@ -98,7 +98,7 @@ private:
   QVBoxLayout* mToptopLayout;
   QGroupBox* mManualGroup;
   Transform3DWidget* mManualToolWidget;
-  SpaceDataAdapterXmlPtr mSpaceSelector;
+  SpacePropertyPtr mSpaceSelector;
 
 //  SliderGroupWidget* mToolOffsetWidget;
   QLabel* mActiveToolVisibleLabel;

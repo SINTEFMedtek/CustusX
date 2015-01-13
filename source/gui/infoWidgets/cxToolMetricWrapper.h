@@ -68,12 +68,12 @@ private slots:
   void frameWidgetChangedSlot();
 private:
   cx::ToolMetricPtr mData;
-  SpaceDataAdapterXmlPtr mSpaceSelector;
-  StringDataAdapterXmlPtr mToolNameSelector;
-  DoubleDataAdapterXmlPtr mToolOffsetSelector;
+  SpacePropertyPtr mSpaceSelector;
+  StringPropertyPtr mToolNameSelector;
+  DoublePropertyPtr mToolOffsetSelector;
   bool mInternalUpdate;
   Transform3DWidget* mFrameWidget;
-  void initializeDataAdapters();
+  void initializeProperties();
 };
 
 } //namespace cx

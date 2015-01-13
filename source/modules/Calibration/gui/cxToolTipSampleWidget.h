@@ -45,7 +45,7 @@ class QLineEdit;
 
 namespace cx
 {
-typedef boost::shared_ptr<class SelectDataStringDataAdapter> SelectDataStringDataAdapterPtr;
+typedef boost::shared_ptr<class StringPropertySelectData> StringPropertySelectDataPtr;
 class LabeledComboBoxWidget;
 
 /**
@@ -77,9 +77,9 @@ private:
   QPushButton* mSampleButton;
   QLabel*      mSaveToFileNameLabel;
   QPushButton* mSaveFileButton;
-  SelectCoordinateSystemStringDataAdapterPtr mCoordinateSystems;
-  SelectToolStringDataAdapterPtr mTools;
-  SelectDataStringDataAdapterPtr mData;
+  StringPropertySelectCoordinateSystemPtr mCoordinateSystems;
+  StringPropertySelectToolPtr mTools;
+  StringPropertySelectDataPtr mData;
   LabeledComboBoxWidget* mCoordinateSystemComboBox;
   LabeledComboBoxWidget* mToolComboBox;
   LabeledComboBoxWidget* mDataComboBox;

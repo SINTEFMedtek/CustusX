@@ -36,40 +36,40 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-DataAdapter::DataAdapter() :
+Property::Property() :
 		QObject(), mEnabled(true), mAdvanced(false), mGroup("")
 {}
 
 
-DataAdapterPtr DataAdapter::findAdapter(std::vector<DataAdapterPtr> adapters, QString id)
+PropertyPtr Property::findProperty(std::vector<PropertyPtr> properties, QString id)
 {
-	for(int i=0; i<adapters.size(); ++i)
+	for(int i=0; i<properties.size(); ++i)
 	{
-		DataAdapterPtr adapter = adapters[i];
+		PropertyPtr adapter = properties[i];
 		if(QString::compare(adapter->getUid(), id) == 0)
 		{
 			return adapter;
 		}
 	}
-	return DataAdapterPtr();
+	return PropertyPtr();
 }
 
-bool DataAdapter::getEnabled() const
+bool Property::getEnabled() const
 {
 	return mEnabled;
 }
 
-bool DataAdapter::getAdvanced() const
+bool Property::getAdvanced() const
 {
 	return mAdvanced;
 }
 
-QString DataAdapter::getGroup() const
+QString Property::getGroup() const
 {
 	return mGroup;
 }
 
-bool DataAdapter::setEnabled(bool enabling)
+bool Property::setEnabled(bool enabling)
 {
 
 	if(mEnabled == enabling)
@@ -81,7 +81,7 @@ bool DataAdapter::setEnabled(bool enabling)
 	return true;
 }
 
-bool DataAdapter::setAdvanced(bool advanced)
+bool Property::setAdvanced(bool advanced)
 {
 	if(advanced == mAdvanced)
 		return false;
@@ -92,7 +92,7 @@ bool DataAdapter::setAdvanced(bool advanced)
 	return true;
 }
 
-bool DataAdapter::setGroup(QString name)
+bool Property::setGroup(QString name)
 {
 	if(name == mGroup)
 		return false;

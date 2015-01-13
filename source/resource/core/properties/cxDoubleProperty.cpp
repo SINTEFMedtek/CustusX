@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-DoubleDataAdapterXml::DoubleDataAdapterXml()
+DoubleProperty::DoubleProperty()
 {
 	mFactor = 1.0;
 }
@@ -48,10 +48,10 @@ DoubleDataAdapterXml::DoubleDataAdapterXml()
 /** Make sure one given option exists witin root.
  * If not present, fill inn the input defaults.
  */
-DoubleDataAdapterXmlPtr DoubleDataAdapterXml::initialize(const QString& uid, QString name, QString help, double value,
+DoublePropertyPtr DoubleProperty::initialize(const QString& uid, QString name, QString help, double value,
 	DoubleRange range, int decimals, QDomNode root)
 {
-	DoubleDataAdapterXmlPtr retval(new DoubleDataAdapterXml());
+	DoublePropertyPtr retval(new DoubleProperty());
 	retval->mUid = uid;
 	retval->mName = name.isEmpty() ? uid : name;
 	retval->mHelp = help;
@@ -62,32 +62,32 @@ DoubleDataAdapterXmlPtr DoubleDataAdapterXml::initialize(const QString& uid, QSt
 	return retval;
 }
 
-void DoubleDataAdapterXml::setInternal2Display(double factor)
+void DoubleProperty::setInternal2Display(double factor)
 {
 	mFactor = factor;
 }
 
-QString DoubleDataAdapterXml::getDisplayName() const
+QString DoubleProperty::getDisplayName() const
 {
 	return mName;
 }
 
-QString DoubleDataAdapterXml::getUid() const
+QString DoubleProperty::getUid() const
 {
 	return mUid;
 }
 
-QString DoubleDataAdapterXml::getHelp() const
+QString DoubleProperty::getHelp() const
 {
 	return mHelp;
 }
 
-double DoubleDataAdapterXml::getValue() const
+double DoubleProperty::getValue() const
 {
 	return mValue;
 }
 
-bool DoubleDataAdapterXml::setValue(double val)
+bool DoubleProperty::setValue(double val)
 {
 	if (val == mValue)
 		return false;
@@ -99,18 +99,18 @@ bool DoubleDataAdapterXml::setValue(double val)
 	return true;
 }
 
-DoubleRange DoubleDataAdapterXml::getValueRange() const
+DoubleRange DoubleProperty::getValueRange() const
 {
 	return mRange;
 }
 
-void DoubleDataAdapterXml::setValueRange(DoubleRange range)
+void DoubleProperty::setValueRange(DoubleRange range)
 {
 	mRange = range;
 	emit changed();
 }
 
-int DoubleDataAdapterXml::getValueDecimals() const
+int DoubleProperty::getValueDecimals() const
 {
 	return mDecimals;
 }

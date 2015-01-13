@@ -49,7 +49,7 @@ BoundingBoxWidget::BoundingBoxWidget(QWidget* parent) :
 
 	for (int i=0; i<caption.size(); ++i)
 	{
-		DoublePairDataAdapterXmlPtr dataAdapter = DoublePairDataAdapterXml::initialize(caption[i], caption[i], caption[i], DoubleRange(-2000, 2000, 1), 0);
+		DoublePairPropertyPtr dataAdapter = DoublePairProperty::initialize(caption[i], caption[i], caption[i], DoubleRange(-2000, 2000, 1), 0);
 		mRange[i] = new SliderRangeGroupWidget(this, dataAdapter);
 		connect(mRange[i], SIGNAL(valueChanged(double,double)), this, SIGNAL(changed()));
 		layout->addWidget(mRange[i]);

@@ -50,7 +50,7 @@ class cxResourceWidgets_EXPORT DetailedLabeledComboBoxWidget : public LabeledCom
 	Q_OBJECT
 
 public:
-	DetailedLabeledComboBoxWidget(QWidget* parent, StringDataAdapterPtr, QGridLayout* gridLayout = 0, int row = 0);
+	DetailedLabeledComboBoxWidget(QWidget* parent, StringPropertyBasePtr, QGridLayout* gridLayout = 0, int row = 0);
 	virtual ~DetailedLabeledComboBoxWidget();
 
 signals:

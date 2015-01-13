@@ -88,8 +88,8 @@ private:
 	QPushButton* mVesselRegOptionsButton;
 	QGroupBox* mVesselRegOptionsWidget;
 
-  StringDataAdapterPtr mFixedImage;
-  StringDataAdapterPtr mMovingImage;
+  StringPropertyBasePtr mFixedImage;
+  StringPropertyBasePtr mMovingImage;
 };
 
 /**

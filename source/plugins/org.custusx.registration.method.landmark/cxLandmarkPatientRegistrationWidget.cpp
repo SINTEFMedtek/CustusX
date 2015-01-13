@@ -68,7 +68,7 @@ LandmarkPatientRegistrationWidget::LandmarkPatientRegistrationWidget(RegServices
 		"Sample Tool", this))
 {
 	mImageLandmarkSource = ImageLandmarksSource::New();
-	mFixedDataAdapter.reset(new RegistrationFixedImageStringDataAdapter(services.registrationService, services.patientModelService));
+	mFixedDataAdapter.reset(new StringPropertyRegistrationFixedImage(services.registrationService, services.patientModelService));
 	connect(services.registrationService.get(), &RegistrationService::fixedDataChanged,
 			this, &LandmarkPatientRegistrationWidget::fixedDataChanged);
 	connect(services.patientModelService.get(), &PatientModelService::rMprChanged, this, &LandmarkPatientRegistrationWidget::setModified);

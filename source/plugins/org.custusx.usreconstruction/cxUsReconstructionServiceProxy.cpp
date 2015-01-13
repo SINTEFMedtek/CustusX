@@ -131,7 +131,7 @@ USReconstructInputData UsReconstructionServiceProxy::getSelectedFileData()
 	return mUsReconstructionService->getSelectedFileData();
 }
 
-DataAdapterPtr UsReconstructionServiceProxy::getParam(QString uid)
+PropertyPtr UsReconstructionServiceProxy::getParam(QString uid)
 {
 	return mUsReconstructionService->getParam(uid);
 }
@@ -141,7 +141,7 @@ DataAdapterPtr UsReconstructionServiceProxy::getParam(QString uid)
 //	return mUsReconstructionService->getParams();
 //}
 
-std::vector<DataAdapterPtr> UsReconstructionServiceProxy::getAlgoOptions()
+std::vector<PropertyPtr> UsReconstructionServiceProxy::getAlgoOptions()
 {
 	return mUsReconstructionService->getAlgoOptions();
 }

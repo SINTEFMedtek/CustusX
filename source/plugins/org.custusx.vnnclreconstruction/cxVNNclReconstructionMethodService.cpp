@@ -69,9 +69,9 @@ QString VNNclReconstructionMethodService::getName() const
     return "VNNcl";
 }
 
-std::vector<DataAdapterPtr> VNNclReconstructionMethodService::getSettings(QDomElement root)
+std::vector<PropertyPtr> VNNclReconstructionMethodService::getSettings(QDomElement root)
 {
-    std::vector<DataAdapterPtr> retval;
+    std::vector<PropertyPtr> retval;
 
     retval.push_back(this->getMethodOption(root));
     retval.push_back(this->getRadiusOption(root));
@@ -106,7 +106,7 @@ bool VNNclReconstructionMethodService::reconstruct(ProcessedUSInputDataPtr input
     return ret;
 }
 
-StringDataAdapterXmlPtr VNNclReconstructionMethodService::getMethodOption(QDomElement root)
+StringPropertyPtr VNNclReconstructionMethodService::getMethodOption(QDomElement root)
 {
     QStringList methods;
     for (std::vector<QString>::iterator it = mMethods.begin(); it != mMethods.end(); ++it)
@@ -114,23 +114,23 @@ StringDataAdapterXmlPtr VNNclReconstructionMethodService::getMethodOption(QDomEl
         QString method = *it;
         methods << method;
     }
-    return StringDataAdapterXml::initialize("Method", "", "Which algorithm to use for reconstruction", methods[0],
+    return StringProperty::initialize("Method", "", "Which algorithm to use for reconstruction", methods[0],
             methods, root);
 }
 
-DoubleDataAdapterXmlPtr VNNclReconstructionMethodService::getNewnessWeightOption(QDomElement root)
+DoublePropertyPtr VNNclReconstructionMethodService::getNewnessWeightOption(QDomElement root)
 {
-    return DoubleDataAdapterXml::initialize("Newness weight", "", "Newness weight", 0, DoubleRange(0.0, 10, 0.1), 1,
+    return DoubleProperty::initialize("Newness weight", "", "Newness weight", 0, DoubleRange(0.0, 10, 0.1), 1,
             root);
 }
 
-DoubleDataAdapterXmlPtr VNNclReconstructionMethodService::getBrightnessWeightOption(QDomElement root)
+DoublePropertyPtr VNNclReconstructionMethodService::getBrightnessWeightOption(QDomElement root)
 {
-    return DoubleDataAdapterXml::initialize("Brightness weight", "", "Brightness weight", 0, DoubleRange(0.0, 10, 0.1),
+    return DoubleProperty::initialize("Brightness weight", "", "Brightness weight", 0, DoubleRange(0.0, 10, 0.1),
             1, root);
 }
 
-StringDataAdapterXmlPtr VNNclReconstructionMethodService::getPlaneMethodOption(QDomElement root)
+StringPropertyPtr VNNclReconstructionMethodService::getPlaneMethodOption(QDomElement root)
 {
     QStringList methods;
     for (std::vector<QString>::iterator it = mPlaneMethods.begin(); it != mPlaneMethods.end(); ++it)
@@ -138,25 +138,25 @@ StringDataAdapterXmlPtr VNNclReconstructionMethodService::getPlaneMethodOption(Q
         QString method = *it;
         methods << method;
     }
-    return StringDataAdapterXml::initialize("Plane method", "", "Which method to use for finding close planes",
+    return StringProperty::initialize("Plane method", "", "Which method to use for finding close planes",
             methods[0], methods, root);
 }
 
-DoubleDataAdapterXmlPtr VNNclReconstructionMethodService::getRadiusOption(QDomElement root)
+DoublePropertyPtr VNNclReconstructionMethodService::getRadiusOption(QDomElement root)
 {
-    return DoubleDataAdapterXml::initialize("Radius (mm)", "", "Radius of kernel. mm.", 1, DoubleRange(0.1, 10, 0.1), 1,
+    return DoubleProperty::initialize("Radius (mm)", "", "Radius of kernel. mm.", 1, DoubleRange(0.1, 10, 0.1), 1,
             root);
 }
 
-DoubleDataAdapterXmlPtr VNNclReconstructionMethodService::getMaxPlanesOption(QDomElement root)
+DoublePropertyPtr VNNclReconstructionMethodService::getMaxPlanesOption(QDomElement root)
 {
-    return DoubleDataAdapterXml::initialize("nPlanes", "", "Number of planes to include in closest planes", 8,
+    return DoubleProperty::initialize("nPlanes", "", "Number of planes to include in closest planes", 8,
             DoubleRange(1, 200, 1), 0, root);
 }
 
-DoubleDataAdapterXmlPtr VNNclReconstructionMethodService::getNStartsOption(QDomElement root)
+DoublePropertyPtr VNNclReconstructionMethodService::getNStartsOption(QDomElement root)
 {
-    return DoubleDataAdapterXml::initialize("nStarts", "", "Number of starts for multistart searchs", 3,
+    return DoubleProperty::initialize("nStarts", "", "Number of starts for multistart searchs", 3,
             DoubleRange(1, 16, 1), 0, root);
 }
 

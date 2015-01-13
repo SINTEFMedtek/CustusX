@@ -78,7 +78,7 @@ public:
 
   void setCurrentlySelectedCofiguration(QString configAbsoluteFilePath);
   QString getCurrenctlySelectedConfiguration() const;
-  StringDataAdapterPtr getTrackingSystemSelector();
+  StringPropertyBasePtr getTrackingSystemSelector();
 
 signals:
   void toolSelected(QString absoluteFilePath);
@@ -106,7 +106,7 @@ private:
   QComboBox*                mReferenceComboBox;
   ConfigToolListWidget*     mToolListWidget;
   bool mModified; // if set: content is modified: save on exit
-  StringDataAdapterXmlPtr mTrackingSystemSelector;
+  StringPropertyPtr mTrackingSystemSelector;
 
 };
 

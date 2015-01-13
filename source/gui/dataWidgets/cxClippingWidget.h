@@ -42,7 +42,7 @@ class QCheckBox;
 
 namespace cx
 {
-typedef boost::shared_ptr<class SelectImageStringDataAdapter> SelectImageStringDataAdapterPtr;
+typedef boost::shared_ptr<class StringPropertySelectImage> StringPropertySelectImagePtr;
 
 typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
 
@@ -54,13 +54,13 @@ typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
 
 /** Adapter that connects to the current active image.
  */
-class cxGui_EXPORT ClipPlaneStringDataAdapter: public StringDataAdapter
+class cxGui_EXPORT ClipPlaneStringDataAdapter: public StringPropertyBase
 {
 Q_OBJECT
 public:
-	static StringDataAdapterPtr New(InteractiveClipperPtr clipper)
+	static StringPropertyBasePtr New(InteractiveClipperPtr clipper)
 	{
-		return StringDataAdapterPtr(new ClipPlaneStringDataAdapter(clipper));
+		return StringPropertyBasePtr(new ClipPlaneStringDataAdapter(clipper));
 	}
 	ClipPlaneStringDataAdapter(InteractiveClipperPtr clipper);
 	virtual ~ClipPlaneStringDataAdapter() {}
@@ -99,8 +99,8 @@ private:
 
 	QCheckBox* mUseClipperCheckBox;
 	QCheckBox* mInvertPlaneCheckBox;
-	StringDataAdapterPtr mPlaneAdapter;
-	SelectImageStringDataAdapterPtr mImageAdapter;
+	StringPropertyBasePtr mPlaneAdapter;
+	StringPropertySelectImagePtr mImageAdapter;
 	PatientModelServicePtr mPatientModelService;
 private slots:
 	void clipperChangedSlot();

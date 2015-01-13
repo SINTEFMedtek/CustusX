@@ -101,23 +101,23 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   connect(trackingService()->getManualTool().get(), SIGNAL(toolVisible(bool)), this, SLOT(manualToolChanged()));
   connect(mManualToolWidget, SIGNAL(changed()), this, SLOT(manualToolWidgetChanged()));
 
-  mSpaceSelector = SpaceDataAdapterXml::initialize("selectSpace",
+  mSpaceSelector = SpaceProperty::initialize("selectSpace",
       "Space",
 	  "Select coordinate system to store position in.");
   mSpaceSelector->setSpaceProvider(spaceProvider());
-  connect(mSpaceSelector.get(), &SpaceDataAdapterXml::valueWasSet, this, &ToolPropertiesWidget::spacesChangedSlot);
-  connect(mSpaceSelector.get(), &SpaceDataAdapterXml::valueWasSet, this, &ToolPropertiesWidget::setModified);
+  connect(mSpaceSelector.get(), &SpaceProperty::valueWasSet, this, &ToolPropertiesWidget::spacesChangedSlot);
+  connect(mSpaceSelector.get(), &SpaceProperty::valueWasSet, this, &ToolPropertiesWidget::setModified);
   mSpaceSelector->setValue(spaceProvider()->getPr());
   manualGroupLayout->addWidget(new SpaceEditWidget(this, mSpaceSelector));
 
-  mUSSectorConfigBox = new LabeledComboBoxWidget(this, ActiveProbeConfigurationStringDataAdapter::New());
+  mUSSectorConfigBox = new LabeledComboBoxWidget(this, StringPropertyActiveProbeConfiguration::New());
   mToptopLayout->addWidget(mUSSectorConfigBox);
   mUSSectorConfigBox->hide();
 
   QGridLayout* gridLayout = new QGridLayout;
   activeGroupLayout->addLayout(gridLayout);
 
-  new SpinBoxAndSliderGroupWidget(this, DoubleDataAdapterPtr(new DoubleDataAdapterActiveToolOffset), gridLayout, 0);
+  new SpinBoxAndSliderGroupWidget(this, DoublePropertyBasePtr(new DoublePropertyActiveToolOffset), gridLayout, 0);
 
   mToptopLayout->addStretch();
 

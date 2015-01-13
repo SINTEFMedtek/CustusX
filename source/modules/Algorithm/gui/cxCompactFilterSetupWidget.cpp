@@ -100,11 +100,11 @@ void CompactFilterSetupWidget::setFilter(FilterPtr filter)
 	{
 		mCurrentFilter->setActive(!mObscuredListener->isObscured());
 
-		std::vector<SelectDataStringDataAdapterBasePtr> inputTypes = mCurrentFilter->getInputTypes();
-		std::vector<SelectDataStringDataAdapterBasePtr> outputTypes = mCurrentFilter->getOutputTypes();
-		std::vector<DataAdapterPtr> options = mCurrentFilter->getOptions();
+		std::vector<SelectDataStringPropertyBasePtr> inputTypes = mCurrentFilter->getInputTypes();
+		std::vector<SelectDataStringPropertyBasePtr> outputTypes = mCurrentFilter->getOutputTypes();
+		std::vector<PropertyPtr> options = mCurrentFilter->getOptions();
 
-		std::vector<DataAdapterPtr> all;
+		std::vector<PropertyPtr> all;
 		std::remove_copy(inputTypes.begin(), inputTypes.end(), std::back_inserter(all), inputTypes[0]);
 		std::remove_copy(outputTypes.begin(), outputTypes.end(), std::back_inserter(all), outputTypes[0]);
 		std::copy(options.begin(), options.end(), std::back_inserter(all));
@@ -112,6 +112,6 @@ void CompactFilterSetupWidget::setFilter(FilterPtr filter)
 		mOptionsWidget->setOptions(mCurrentFilter->getUid(), all, false);
 	}
 	else
-		mOptionsWidget->setOptions("", std::vector<DataAdapterPtr>(), false);
+		mOptionsWidget->setOptions("", std::vector<PropertyPtr>(), false);
 }
 } /* namespace cx */

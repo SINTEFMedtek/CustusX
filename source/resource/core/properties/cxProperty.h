@@ -42,14 +42,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVariant>
 
 namespace cx {
-typedef boost::shared_ptr<class DataAdapter> DataAdapterPtr;
+typedef boost::shared_ptr<class Property> PropertyPtr;
 typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
 typedef boost::shared_ptr<class VisualizationService> VisualizationServicePtr;
 
 /**\brief Superclass for all data adapters.
  *
- * The data adapters are an abstraction mechanism that separates
- * data values from the user interface. Data adapters for strings,
+ * The Property are an abstraction mechanism that separates
+ * data values from the user interface. Properties for strings,
  * doubles, booleans and so on publish their value in a generic
  * manner, thus enabling us to write generic widgets for displaying
  * and changing them.
@@ -61,15 +61,15 @@ typedef boost::shared_ptr<class VisualizationService> VisualizationServicePtr;
  *
  */
 
-class cxResource_EXPORT DataAdapter: public QObject
+class cxResource_EXPORT Property: public QObject
 {
 	Q_OBJECT
 
 public:
-	DataAdapter();
-	virtual ~DataAdapter(){}
+	Property();
+	virtual ~Property(){}
 
-	static DataAdapterPtr findAdapter(std::vector<DataAdapterPtr> adapters, QString id);
+	static PropertyPtr findProperty(std::vector<PropertyPtr> properties, QString id);
 
 public:
 	virtual QString getDisplayName() const = 0; ///< name of data entity. Used for display to user.
@@ -91,9 +91,9 @@ signals:
 	void changed(); ///< emit when the underlying data value is changed: The user interface will be updated.
 
 protected:
-	bool mEnabled; //< a dataadaapter can be in either a enabled or disabled state
-	bool mAdvanced; //< flag marking this adapters value as a advanced option
-	QString mGroup; //< tag marking this adapter as part of a group with this name
+	bool mEnabled; //< a property can be in either a enabled or disabled state
+	bool mAdvanced; //< flag marking this property value as a advanced option
+	QString mGroup; //< tag marking this property as part of a group with this name
 };
 } //namespace cx
 

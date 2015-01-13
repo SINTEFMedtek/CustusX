@@ -40,18 +40,18 @@ namespace cx
 {
 
 
-ActiveToolStringDataAdapter::ActiveToolStringDataAdapter()
+StringPropertyActiveTool::StringPropertyActiveTool()
 {
   connect(trackingService().get(), SIGNAL(dominantToolChanged(const QString&)), this, SIGNAL(changed()));
-  connect(trackingService().get(), &TrackingService::stateChanged, this, &ActiveToolStringDataAdapter::changed);
+  connect(trackingService().get(), &TrackingService::stateChanged, this, &StringPropertyActiveTool::changed);
 }
 
-QString ActiveToolStringDataAdapter::getDisplayName() const
+QString StringPropertyActiveTool::getDisplayName() const
 {
   return "Active Tool";
 }
 
-bool ActiveToolStringDataAdapter::setValue(const QString& value)
+bool StringPropertyActiveTool::setValue(const QString& value)
 {
   ToolPtr newTool = trackingService()->getTool(value);
   if (!newTool)
@@ -62,19 +62,19 @@ bool ActiveToolStringDataAdapter::setValue(const QString& value)
   return true;
 }
 
-QString ActiveToolStringDataAdapter::getValue() const
+QString StringPropertyActiveTool::getValue() const
 {
   if (!trackingService()->getActiveTool())
     return "";
   return qstring_cast(trackingService()->getActiveTool()->getUid());
 }
 
-QString ActiveToolStringDataAdapter::getHelp() const
+QString StringPropertyActiveTool::getHelp() const
 {
   return "select the active (dominant) tool";
 }
 
-QStringList ActiveToolStringDataAdapter::getValueRange() const
+QStringList StringPropertyActiveTool::getValueRange() const
 {
 	TrackingService::ToolMap tools = trackingService()->getTools();
 
@@ -84,7 +84,7 @@ QStringList ActiveToolStringDataAdapter::getValueRange() const
 	return retval;
 }
 
-QString ActiveToolStringDataAdapter::convertInternal2Display(QString internal)
+QString StringPropertyActiveTool::convertInternal2Display(QString internal)
 {
   ToolPtr tool = trackingService()->getTool(internal);
   if (!tool)
@@ -103,14 +103,14 @@ QString ActiveToolStringDataAdapter::convertInternal2Display(QString internal)
 /// -------------------------------------------------------
 
 
-ActiveProbeConfigurationStringDataAdapter::ActiveProbeConfigurationStringDataAdapter()
+StringPropertyActiveProbeConfiguration::StringPropertyActiveProbeConfiguration()
 {
   connect(trackingService().get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChanged()));
-  connect(trackingService().get(), &TrackingService::stateChanged, this, &ActiveProbeConfigurationStringDataAdapter::dominantToolChanged);
+  connect(trackingService().get(), &TrackingService::stateChanged, this, &StringPropertyActiveProbeConfiguration::dominantToolChanged);
   this->dominantToolChanged();
 }
 
-void ActiveProbeConfigurationStringDataAdapter::dominantToolChanged()
+void StringPropertyActiveProbeConfiguration::dominantToolChanged()
 {
 	// ignore tool changes to something non-probeish.
 	// This gives the user a chance to use the widget without having to show the probe.
@@ -129,12 +129,12 @@ void ActiveProbeConfigurationStringDataAdapter::dominantToolChanged()
 	emit changed();
 }
 
-QString ActiveProbeConfigurationStringDataAdapter::getDisplayName() const
+QString StringPropertyActiveProbeConfiguration::getDisplayName() const
 {
   return "Probe Config";
 }
 
-bool ActiveProbeConfigurationStringDataAdapter::setValue(const QString& value)
+bool StringPropertyActiveProbeConfiguration::setValue(const QString& value)
 {
   if (!mTool)
     return false;
@@ -142,26 +142,26 @@ bool ActiveProbeConfigurationStringDataAdapter::setValue(const QString& value)
   return true;
 }
 
-QString ActiveProbeConfigurationStringDataAdapter::getValue() const
+QString StringPropertyActiveProbeConfiguration::getValue() const
 {
   if (!mTool)
     return "";
   return mTool->getProbe()->getConfigId();
 }
 
-QString ActiveProbeConfigurationStringDataAdapter::getHelp() const
+QString StringPropertyActiveProbeConfiguration::getHelp() const
 {
   return "Select a probe configuration for the active probe.";
 }
 
-QStringList ActiveProbeConfigurationStringDataAdapter::getValueRange() const
+QStringList StringPropertyActiveProbeConfiguration::getValueRange() const
 {
   if (!mTool)
     return QStringList();
   return mTool->getProbe()->getConfigIdList();
 }
 
-QString ActiveProbeConfigurationStringDataAdapter::convertInternal2Display(QString internal)
+QString StringPropertyActiveProbeConfiguration::convertInternal2Display(QString internal)
 {
   if (!mTool)
     return "<no tool>";

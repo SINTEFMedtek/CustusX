@@ -60,8 +60,8 @@ class StreamerService;
 class XmlOptionFile;
 class DetailedLabeledComboBoxWidget;
 typedef boost::shared_ptr<class VideoConnectionManager> VideoConnectionManagerPtr;
-typedef boost::shared_ptr<class ActiveVideoSourceStringDataAdapter> ActiveVideoSourceStringDataAdapterPtr;
-typedef boost::shared_ptr<class StringDataAdapterXml> StringDataAdapterXmlPtr;
+typedef boost::shared_ptr<class StringPropertyActiveVideoSource> StringPropertyActiveVideoSourcePtr;
+typedef boost::shared_ptr<class StringProperty> StringPropertyPtr;
 typedef boost::shared_ptr<class Tool> ToolPtr;
 typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 
@@ -93,7 +93,7 @@ protected slots:
 	void onServiceRemoved(StreamerService *service);
 
 protected:
-	ActiveVideoSourceStringDataAdapterPtr initializeActiveVideoSourceSelector();
+	StringPropertyActiveVideoSourcePtr initializeActiveVideoSourceSelector();
 	QFrame* wrapStackedWidgetInAFrame();
 	QPushButton* initializeConnectButton();
 	QPushButton* initializeImportStreamImageButton();
@@ -106,8 +106,8 @@ protected:
 	QPushButton* mImportStreamImageButton;
 	QVBoxLayout* mToptopLayout;
 	QStackedWidget* mStackedWidget;
-	StringDataAdapterXmlPtr mConnectionSelector;
-	ActiveVideoSourceStringDataAdapterPtr mActiveVideoSourceSelector;
+	StringPropertyPtr mConnectionSelector;
+	StringPropertyActiveVideoSourcePtr mActiveVideoSourceSelector;
 	XmlOptionFile mOptions;
 	DetailedLabeledComboBoxWidget* mConnectionSelectionWidget;
 

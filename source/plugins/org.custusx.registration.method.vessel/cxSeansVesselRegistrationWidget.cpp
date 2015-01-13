@@ -84,9 +84,9 @@ SeansVesselRegistrationWidget::SeansVesselRegistrationWidget(RegServices service
 	QGridLayout* entryLayout = new QGridLayout;
 	entryLayout->setColumnStretch(1, 1);
 
-	mFixedImage.reset(new RegistrationFixedImageStringDataAdapter(services.registrationService, services.patientModelService));
+	mFixedImage.reset(new StringPropertyRegistrationFixedImage(services.registrationService, services.patientModelService));
 	new LabeledComboBoxWidget(this, mFixedImage, entryLayout, 0);
-	mMovingImage.reset(new RegistrationMovingImageStringDataAdapter(services.registrationService, services.patientModelService));
+	mMovingImage.reset(new StringPropertyRegistrationMovingImage(services.registrationService, services.patientModelService));
 	new LabeledComboBoxWidget(this, mMovingImage, entryLayout, 1);
 
 	layout->addLayout(entryLayout, 0, 0, 2, 2);

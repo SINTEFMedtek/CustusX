@@ -205,7 +205,7 @@ void UsReconstructionImplService::setOutputVolumeParams(const OutputVolumeParams
 	this->setSettings();
 }
 
-std::vector<DataAdapterPtr> UsReconstructionImplService::getAlgoOptions()
+std::vector<PropertyPtr> UsReconstructionImplService::getAlgoOptions()
 {
 	return mAlgoOptions;
 }
@@ -225,7 +225,7 @@ USReconstructInputData UsReconstructionImplService::getSelectedFileData()
 	return mOriginalFileData;
 }
 
-DataAdapterPtr UsReconstructionImplService::getParam(QString uid)
+PropertyPtr UsReconstructionImplService::getParam(QString uid)
 {
 	return mParams->getParameter(uid);
 }
@@ -294,7 +294,7 @@ void UsReconstructionImplService::onServiceAdded(ReconstructionMethodService* se
 	mParams->getAlgorithmAdapter()->setValueRange(range);
 
 	// select algo if none selected
-	DataAdapterPtr algoName = mParams->getParameter("Algorithm");
+	PropertyPtr algoName = mParams->getParameter("Algorithm");
 	if (algoName->getValueAsVariant().value<QString>().isEmpty())
 		algoName->setValueFromVariant(service->getName());
 }

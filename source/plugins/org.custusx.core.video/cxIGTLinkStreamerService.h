@@ -38,8 +38,8 @@ class ctkPluginContext;
 
 namespace cx
 {
-typedef boost::shared_ptr<class StringDataAdapter> StringDataAdapterPtr;
-typedef boost::shared_ptr<class DoubleDataAdapter> DoubleDataAdapterPtr;
+typedef boost::shared_ptr<class StringPropertyBase> StringPropertyBasePtr;
+typedef boost::shared_ptr<class DoublePropertyBase> DoublePropertyBasePtr;
 
 /**
  * \ingroup cx_service_video
@@ -54,11 +54,11 @@ public:
 	IGTLinkStreamerService(ctkPluginContext *context) {}
 	virtual ~IGTLinkStreamerService() {}
 	virtual QString getName();
-	virtual std::vector<DataAdapterPtr> getSettings(QDomElement root);
+	virtual std::vector<PropertyPtr> getSettings(QDomElement root);
 	virtual StreamerPtr createStreamer(QDomElement root);
 private:
-	StringDataAdapterPtr getIPOption(QDomElement root);
-	DoubleDataAdapterPtr getStreamPortOption(QDomElement root);
+	StringPropertyBasePtr getIPOption(QDomElement root);
+	DoublePropertyBasePtr getStreamPortOption(QDomElement root);
 };
 
 } //end namespace cx

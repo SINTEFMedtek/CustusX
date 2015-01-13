@@ -51,7 +51,7 @@ ToolManualCalibrationWidget::ToolManualCalibrationWidget(QWidget* parent) :
   QVBoxLayout* mToptopLayout = new QVBoxLayout(this);
   //toptopLayout->setMargin(0);
 
-  mTool = SelectToolStringDataAdapter::New();
+  mTool = StringPropertySelectTool::New();
   mToptopLayout->addWidget(sscCreateDataWidget(this, mTool));
 
   mToptopLayout->addWidget(new QLabel("<font color=red>Caution: sMt is changed directly by this control.</font>"));

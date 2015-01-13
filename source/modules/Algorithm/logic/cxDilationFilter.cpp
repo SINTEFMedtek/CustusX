@@ -77,26 +77,26 @@ QString DilationFilter::getHelp() const
 	        "</html>";
 }
 
-DoubleDataAdapterXmlPtr DilationFilter::getDilationRadiusOption(QDomElement root)
+DoublePropertyPtr DilationFilter::getDilationRadiusOption(QDomElement root)
 {
-	DoubleDataAdapterXmlPtr retval = DoubleDataAdapterXml::initialize("Dilation radius (mm)", "",
+	DoublePropertyPtr retval = DoubleProperty::initialize("Dilation radius (mm)", "",
     "Set dilation radius in mm", 1, DoubleRange(1, 20, 1), 0,
                     root);
-	retval->setGuiRepresentation(DoubleDataAdapter::grSLIDER);
+	retval->setGuiRepresentation(DoublePropertyBase::grSLIDER);
 	return retval;
 }
 
-BoolDataAdapterXmlPtr DilationFilter::getGenerateSurfaceOption(QDomElement root)
+BoolPropertyPtr DilationFilter::getGenerateSurfaceOption(QDomElement root)
 {
-	BoolDataAdapterXmlPtr retval = BoolDataAdapterXml::initialize("Generate Surface", "",
+	BoolPropertyPtr retval = BoolProperty::initialize("Generate Surface", "",
 	                                                                        "Generate a surface of the output volume", true,
 	                                                                            root);
 	return retval;
 }
 
-ColorDataAdapterXmlPtr DilationFilter::getColorOption(QDomElement root)
+ColorPropertyPtr DilationFilter::getColorOption(QDomElement root)
 {
-	return ColorDataAdapterXml::initialize("Color", "",
+	return ColorProperty::initialize("Color", "",
 	                                            "Color of output model.",
 	                                            QColor("green"), root);
 }
@@ -111,9 +111,9 @@ void DilationFilter::createOptions()
 
 void DilationFilter::createInputTypes()
 {
-	SelectDataStringDataAdapterBasePtr temp;
+	SelectDataStringPropertyBasePtr temp;
 
-	temp = SelectImageStringDataAdapter::New(mPatientModelService);
+	temp = StringPropertySelectImage::New(mPatientModelService);
 	temp->setValueName("Input");
 	temp->setHelp("Select segmentation input for dilation");
 	mInputTypes.push_back(temp);
@@ -121,14 +121,14 @@ void DilationFilter::createInputTypes()
 
 void DilationFilter::createOutputTypes()
 {
-	SelectDataStringDataAdapterBasePtr temp;
+	SelectDataStringPropertyBasePtr temp;
 
-	temp = SelectDataStringDataAdapter::New(mPatientModelService);
+	temp = StringPropertySelectData::New(mPatientModelService);
 	temp->setValueName("Output");
 	temp->setHelp("Dilated segmentation image");
 	mOutputTypes.push_back(temp);
 
-	temp = SelectDataStringDataAdapter::New(mPatientModelService);
+	temp = StringPropertySelectData::New(mPatientModelService);
 	temp->setValueName("Contour");
 	temp->setHelp("Output contour generated from dilated segmentation image.");
 	mOutputTypes.push_back(temp);
@@ -188,7 +188,7 @@ bool DilationFilter::execute() {
 
 	mRawResult =  rawResult;
 
-	BoolDataAdapterXmlPtr generateSurface = this->getGenerateSurfaceOption(mCopiedOptions);
+	BoolPropertyPtr generateSurface = this->getGenerateSurfaceOption(mCopiedOptions);
 	if (generateSurface->getValue())
 	{
         double threshold = 1;/// because the segmented image is 0..1
@@ -226,7 +226,7 @@ bool DilationFilter::postProcess()
 	// set contour output
 	if (mRawContour!=NULL)
 	{
-		ColorDataAdapterXmlPtr colorOption = this->getColorOption(mOptions);
+		ColorPropertyPtr colorOption = this->getColorOption(mOptions);
 		MeshPtr contour = ContourFilter::postProcess(mRawContour, output, colorOption->getValue());
 		mOutputTypes[1]->setValue(contour->getUid());
 		mRawContour = vtkPolyDataPtr();

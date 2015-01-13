@@ -75,10 +75,10 @@ public:
 /** Create a layout with zero margin/spacing
   * containing the input widgets.
   *
-  * This is used in a hack for the DataAdapter
+  * This is used in a hack for the Property
   * widgets that add to a QGridLayout.
   *
-  * The DataAdapter Widget itself, which is invisible
+  * The Property Widget itself, which is invisible
   * if a gridlayout is used, is added to the
   * gridlayout this way. See ScalarInteractionWidget for
   * an example.
@@ -101,7 +101,7 @@ cxResourceWidgets_EXPORT QWidget* addDummyMargin(QWidget* widget);
  * into a row in that layout
  *
  */
-cxResourceWidgets_EXPORT QWidget* sscCreateDataWidget(QWidget* parent, DataAdapterPtr data, QGridLayout* gridLayout = 0, int row = 0);
+cxResourceWidgets_EXPORT QWidget* sscCreateDataWidget(QWidget* parent, PropertyPtr data, QGridLayout* gridLayout = 0, int row = 0);
 }
 
 /**

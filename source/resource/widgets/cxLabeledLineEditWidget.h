@@ -49,7 +49,7 @@ namespace cx
 
 /**\brief Composite widget for string edit.
  *
- *  Accepts a StringDataAdapterPtr that has getAllowOnlyValuesInRange()==false
+ *  Accepts a StringPropertyBasePtr that has getAllowOnlyValuesInRange()==false
  *
  * \ingroup cx_resource_widgets
  */
@@ -57,14 +57,14 @@ class cxResourceWidgets_EXPORT LabeledLineEditWidget: public OptimizedUpdateWidg
 {
 Q_OBJECT
 public:
-	LabeledLineEditWidget(QWidget* parent, StringDataAdapterPtr, QGridLayout* gridLayout = 0, int row = 0);
+	LabeledLineEditWidget(QWidget* parent, StringPropertyBasePtr, QGridLayout* gridLayout = 0, int row = 0);
 private slots:
     virtual void prePaintEvent();
 	void editingFinished();
 private:
 	QLabel* mLabel;
 	QLineEdit* mLine;
-	StringDataAdapterPtr mData;
+	StringPropertyBasePtr mData;
 };
 
 } // namespace cx

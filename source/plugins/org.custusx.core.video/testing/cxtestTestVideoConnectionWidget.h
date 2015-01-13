@@ -56,7 +56,7 @@ public:
 
 private:
 	void setupWidgetToRunStreamer(QString filename);
-	cx::DataAdapterPtr getOption(QString uid, QString method);
+	cx::PropertyPtr getOption(QString uid, QString method);
 };
 
 } /* namespace cxtest */

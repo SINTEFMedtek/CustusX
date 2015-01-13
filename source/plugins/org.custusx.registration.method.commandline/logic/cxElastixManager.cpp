@@ -58,13 +58,13 @@ ElastixManager::ElastixManager(RegServices services) :
 	mParameters.reset(new ElastixParameters(mOptions));
 	connect(mParameters.get(), SIGNAL(elastixParametersChanged()), this, SIGNAL(elastixChanged()));
 
-	mDisplayProcessMessages = BoolDataAdapterXml::initialize("displayProcessMessages",
+	mDisplayProcessMessages = BoolProperty::initialize("displayProcessMessages",
 		"Show Messages",
 		"Display messages from the running registration process in CustusX",
 		false,
 		mOptions.getElement());
 
-	mDisableRendering = BoolDataAdapterXml::initialize("disableRendering",
+	mDisableRendering = BoolProperty::initialize("disableRendering",
 		"Disable Rendering",
 		"Disable rendering while running process.\n"
 		"Can be used to avoid clash in GPU usage.",

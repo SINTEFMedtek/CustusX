@@ -98,11 +98,11 @@ void PerformanceTab::init()
   double maxRenderSize = settings()->value("View3D/maxRenderSize").toDouble(&ok);
   if (!ok)
     maxRenderSize = 10 * Mb;
-  mMaxRenderSize = DoubleDataAdapterXml::initialize("MaxRenderSize", "Max Render Size (Mb)", "Maximum size of volumes used in volume rendering. Applies to new volumes.", maxRenderSize, DoubleRange(1*Mb,300*Mb,1*Mb), 0, QDomNode());
+  mMaxRenderSize = DoubleProperty::initialize("MaxRenderSize", "Max Render Size (Mb)", "Maximum size of volumes used in volume rendering. Applies to new volumes.", maxRenderSize, DoubleRange(1*Mb,300*Mb,1*Mb), 0, QDomNode());
   mMaxRenderSize->setInternal2Display(1.0/Mb);
 
   double stillUpdateRate = settings()->value("stillUpdateRate").value<double>();
-	mStillUpdateRate = DoubleDataAdapterXml::initialize("StillUpdateRate", "Still Update Rate",
+	mStillUpdateRate = DoubleProperty::initialize("StillUpdateRate", "Still Update Rate",
 																											"<p>Still Update Rate in vtkRenderWindow. "
 																											"Increasing the value may improve rendering speed "
 																											"at the cost of render quality.</p> "
@@ -115,7 +115,7 @@ void PerformanceTab::init()
   mSmartRenderCheckBox->setChecked(settings()->value("smartRender", true).toBool());
   mSmartRenderCheckBox->setToolTip("Render only when scene has changed, plus once per second.");
 
-  m3DVisualizer = StringDataAdapterXml::initialize("ImageRender3DVisualizer",
+  m3DVisualizer = StringProperty::initialize("ImageRender3DVisualizer",
 	  "3D Renderer",
 	  "Select 3D visualization method for images",
 	  settings()->value("View3D/ImageRender3DVisualizer").toString(),

@@ -47,7 +47,7 @@ namespace cx
 SlicePropertiesWidget::SlicePropertiesWidget(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget* parent) :
 		TabbedWidget(parent, "SlicePropertiesWidget", "Slice Properties")
 {
-	this->insertWidgetAtTop(new DataSelectWidget(visualizationService, patientModelService, this, ActiveImageStringDataAdapter::New(patientModelService)));
+	this->insertWidgetAtTop(new DataSelectWidget(visualizationService, patientModelService, this, StringPropertyActiveImage::New(patientModelService)));
   this->addTab(new VolumeInfoWidget(patientModelService, this), "Info");
   this->addTab(new ColorWidget(patientModelService, this), "Color");
   this->addTab(new OverlayWidget(patientModelService, this), "Overlay");

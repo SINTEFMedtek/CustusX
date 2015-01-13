@@ -114,30 +114,30 @@ private:
 	paramList getParametersFromOptions(); ///< fetches the parameters set by the user
 	void setParamtersToOptions(paramList& parameters); ///< set the options to a given set of parameters
 
-	StringDataAdapterXmlPtr getStringOption(QString valueName); ///< get string dataadapter with give name
-	BoolDataAdapterXmlPtr getBoolOption(QString valueName); ///< get bool dataadapter with give name
-	DoubleDataAdapterXmlPtr getDoubleOption(QString valueName); ///< get double dataadapter with give name
-	DataAdapterPtr getOption(QString valueName); ///< get option/dataadapter with given name
+	StringPropertyPtr getStringOption(QString valueName); ///< get string dataadapter with give name
+	BoolPropertyPtr getBoolOption(QString valueName); ///< get bool dataadapter with give name
+	DoublePropertyPtr getDoubleOption(QString valueName); ///< get double dataadapter with give name
+	PropertyPtr getOption(QString valueName); ///< get option/dataadapter with given name
 	void setOptionAdvanced(QString valueName, bool advanced); ///< set one option to be advanced or not
 	void setOptionValue(QString valueName, QString value); ///< set one option to a specific value
 
 	std::vector<std::string> getNotDefault(paramList list); ///< gets the parameters that are not in the default list
 	std::vector<std::string> getDifference(paramList list1, paramList list2); ///< returns the parameter names of the parameters that has different values
-	std::vector<DataAdapterPtr> getNotDefaultOptions(); ///< gets the options that are not set to default values
+	std::vector<PropertyPtr> getNotDefaultOptions(); ///< gets the options that are not set to default values
 	paramList getDefaultParameters(); ///< returns a list with the default parameters
 	void printParameters(paramList params); ///< helper function
 
-	StringDataAdapterXmlPtr makeStringOption(QDomElement root, std::string name, StringParameter parameter); ///< constructs a string option
-	BoolDataAdapterXmlPtr makeBoolOption(QDomElement root, std::string name, BoolParameter parameter); ///< constructs a bool option
-	DoubleDataAdapterXmlPtr makeDoubleOption(QDomElement root, std::string name, NumericParameter parameter); ///< constructs a double option
+	StringPropertyPtr makeStringOption(QDomElement root, std::string name, StringParameter parameter); ///< constructs a string option
+	BoolPropertyPtr makeBoolOption(QDomElement root, std::string name, BoolParameter parameter); ///< constructs a bool option
+	DoublePropertyPtr makeDoubleOption(QDomElement root, std::string name, NumericParameter parameter); ///< constructs a double option
 
 	TSFPresetsPtr populatePresets(); ///< converts the parameters files to internal presets
 
 	QString mParameterFile; ///< the last selected parameter file
 
-	std::vector<StringDataAdapterXmlPtr> mStringOptions; ///< string options to be displayed to the user
-	std::vector<BoolDataAdapterXmlPtr> mBoolOptions; ///< bool options to be displayed to the user
-	std::vector<DoubleDataAdapterXmlPtr> mDoubleOptions; ///< double options to be displayed to the user
+	std::vector<StringPropertyPtr> mStringOptions; ///< string options to be displayed to the user
+	std::vector<BoolPropertyPtr> mBoolOptions; ///< bool options to be displayed to the user
+	std::vector<DoublePropertyPtr> mDoubleOptions; ///< double options to be displayed to the user
 
 	TSFOutput* mOutput; ///< output from last execution
 	paramList mParameters; ///< the parameters used in last execution

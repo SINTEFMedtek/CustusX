@@ -63,7 +63,7 @@ TEST_CASE("DilationFilter: execute", "[unit][modules][Algorithm][DilationFilter]
 		REQUIRE(data);
 
 		//set input
-		std::vector < cx::SelectDataStringDataAdapterBasePtr > input =filter->getInputTypes();
+		std::vector < cx::SelectDataStringPropertyBasePtr > input =filter->getInputTypes();
 		{
 			INFO("Number of inputs has changed.");
 			REQUIRE(input.size() == 1);
@@ -91,7 +91,7 @@ TEST_CASE("DilationFilter: execute", "[unit][modules][Algorithm][DilationFilter]
 		}
 
 		// Check output
-		std::vector < cx::SelectDataStringDataAdapterBasePtr > output = filter->getOutputTypes();
+		std::vector < cx::SelectDataStringPropertyBasePtr > output = filter->getOutputTypes();
 		{
 			INFO("Number of outputs has changed.");
 			REQUIRE(output.size() == 2);

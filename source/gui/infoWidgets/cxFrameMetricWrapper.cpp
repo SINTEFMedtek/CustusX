@@ -64,7 +64,7 @@ QWidget* FrameMetricWrapper::createWidget()
 	topLayout->setMargin(0);
 	topLayout->addLayout(hLayout);
 
-	mSpaceSelector = SpaceDataAdapterXml::initialize("selectSpace",
+	mSpaceSelector = SpaceProperty::initialize("selectSpace",
 											  "Space",
 											  "Select coordinate system to store position in.");
 	mSpaceSelector->setSpaceProvider(spaceProvider());

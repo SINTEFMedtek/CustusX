@@ -46,16 +46,16 @@ namespace cx
  * @{
  */
 
-/**A data adapter that links to one component of a Vector3DDataAdapter.
+/**A property that links to one component of a Vector3DProperty.
  * Useful for displaying widgets for vector components.
  *
  */
-class cxResource_EXPORT Vector3DComponentDataAdapter : public DoubleDataAdapter
+class cxResource_EXPORT Vector3DComponentProperty : public DoublePropertyBase
 {
   Q_OBJECT
 public:
-  Vector3DComponentDataAdapter(Vector3DDataAdapterPtr base, int index, QString name, QString help);
-  virtual ~Vector3DComponentDataAdapter() {}
+  Vector3DComponentProperty(Vector3DPropertyBasePtr base, int index, QString name, QString help);
+  virtual ~Vector3DComponentProperty() {}
 
 public: // basic methods
 	virtual QString getDisplayName() const;
@@ -69,12 +69,12 @@ public: // optional methods
   virtual double convertDisplay2Internal(double display);
   virtual int getValueDecimals() const;
 
-  Vector3DDataAdapterPtr mBase;
+  Vector3DPropertyBasePtr mBase;
   int mIndex;
   QString mName;
   QString mHelp;
 };
-typedef boost::shared_ptr<Vector3DComponentDataAdapter> Vector3DComponentDataAdapterPtr;
+typedef boost::shared_ptr<Vector3DComponentProperty> Vector3DComponentPropertyPtr;
 
 
 /**

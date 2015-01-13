@@ -72,10 +72,10 @@ void ShadingWidget::init()
 
   QGridLayout* shadingLayput = new QGridLayout();
 	shadingLayput->addWidget(mShadingCheckBox, 0,0);
-  SliderGroupWidget* shadingAmbientWidget = new SliderGroupWidget(this, DoubleDataAdapterPtr(new DoubleDataAdapterShadingAmbient(mPatientModelService)), shadingLayput, 1);
-  SliderGroupWidget* shadingDiffuseWidget = new SliderGroupWidget(this, DoubleDataAdapterPtr(new DoubleDataAdapterShadingDiffuse(mPatientModelService)), shadingLayput, 2);
-  SliderGroupWidget* shadingSpecularWidget = new SliderGroupWidget(this, DoubleDataAdapterPtr(new DoubleDataAdapterShadingSpecular(mPatientModelService)), shadingLayput, 3);
-  SliderGroupWidget* shadingSpecularPowerWidget = new SliderGroupWidget(this, DoubleDataAdapterPtr(new DoubleDataAdapterShadingSpecularPower(mPatientModelService)), shadingLayput, 4);
+  SliderGroupWidget* shadingAmbientWidget = new SliderGroupWidget(this, DoublePropertyBasePtr(new DoubleDataAdapterShadingAmbient(mPatientModelService)), shadingLayput, 1);
+  SliderGroupWidget* shadingDiffuseWidget = new SliderGroupWidget(this, DoublePropertyBasePtr(new DoubleDataAdapterShadingDiffuse(mPatientModelService)), shadingLayput, 2);
+  SliderGroupWidget* shadingSpecularWidget = new SliderGroupWidget(this, DoublePropertyBasePtr(new DoubleDataAdapterShadingSpecular(mPatientModelService)), shadingLayput, 3);
+  SliderGroupWidget* shadingSpecularPowerWidget = new SliderGroupWidget(this, DoublePropertyBasePtr(new DoubleDataAdapterShadingSpecularPower(mPatientModelService)), shadingLayput, 4);
 
   shadingAmbientWidget->setEnabled(false);
   shadingDiffuseWidget->setEnabled(false);

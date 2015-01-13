@@ -69,7 +69,7 @@ private:
 	void showAdvanced();
 
 	QHBoxLayout* mLayout;
-	SpaceDataAdapterXmlPtr mSpaceSelector;
+	SpacePropertyPtr mSpaceSelector;
 	SpaceListenerPtr mListener;
 	DominantToolProxyPtr mActiveTool;
 	QLineEdit* mCoordLineEdit;

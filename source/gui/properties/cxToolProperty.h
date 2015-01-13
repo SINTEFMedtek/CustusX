@@ -50,13 +50,13 @@ namespace cx
 
 /** Adapter that connects to the current active tool.
  */
-class cxGui_EXPORT ActiveToolStringDataAdapter : public StringDataAdapter
+class cxGui_EXPORT StringPropertyActiveTool : public StringPropertyBase
 {
   Q_OBJECT
 public:
-  static StringDataAdapterPtr New() { return StringDataAdapterPtr(new ActiveToolStringDataAdapter()); }
-  ActiveToolStringDataAdapter();
-  virtual ~ActiveToolStringDataAdapter() {}
+  static StringPropertyBasePtr New() { return StringPropertyBasePtr(new StringPropertyActiveTool()); }
+  StringPropertyActiveTool();
+  virtual ~StringPropertyActiveTool() {}
 
 public: // basic methods
   virtual QString getDisplayName() const;
@@ -70,19 +70,19 @@ public: // optional methods
 };
 
 
-typedef boost::shared_ptr<class ActiveProbeConfigurationStringDataAdapter> ActiveProbeConfigurationStringDataAdapterPtr;
+typedef boost::shared_ptr<class StringPropertyActiveProbeConfiguration> StringPropertyActiveProbeConfigurationPtr;
 
 /** Adapter that connects to the current active probe.
  *  It will stick to the probe as much as possible,
  *  i.e. ignore hiding and showing of other non-probes.
  */
-class cxGui_EXPORT ActiveProbeConfigurationStringDataAdapter : public StringDataAdapter
+class cxGui_EXPORT StringPropertyActiveProbeConfiguration : public StringPropertyBase
 {
   Q_OBJECT
 public:
-  static ActiveProbeConfigurationStringDataAdapterPtr New() { return ActiveProbeConfigurationStringDataAdapterPtr(new ActiveProbeConfigurationStringDataAdapter()); }
-  ActiveProbeConfigurationStringDataAdapter();
-  virtual ~ActiveProbeConfigurationStringDataAdapter() {}
+  static StringPropertyActiveProbeConfigurationPtr New() { return StringPropertyActiveProbeConfigurationPtr(new StringPropertyActiveProbeConfiguration()); }
+  StringPropertyActiveProbeConfiguration();
+  virtual ~StringPropertyActiveProbeConfiguration() {}
 
 public: // basic methods
   virtual QString getDisplayName() const;

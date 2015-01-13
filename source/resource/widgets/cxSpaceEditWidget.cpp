@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-SpaceEditWidget::SpaceEditWidget(QWidget* parent, SpaceDataAdapterPtr dataInterface,
+SpaceEditWidget::SpaceEditWidget(QWidget* parent, SpacePropertyBasePtr dataInterface,
 	QGridLayout* gridLayout, int row) :
 	BaseWidget(parent, "SpaceEditWidget", "SpaceEditWidget")
 {

@@ -83,45 +83,45 @@ QString ContourFilter::getHelp() const
 	        "</html>";
 }
 
-BoolDataAdapterXmlPtr ContourFilter::getReduceResolutionOption(QDomElement root)
+BoolPropertyPtr ContourFilter::getReduceResolutionOption(QDomElement root)
 {
-	return BoolDataAdapterXml::initialize("Reduce input", "",
+	return BoolProperty::initialize("Reduce input", "",
 	                                           "Reduce input volumes resolution by a factor of 2 in all directions.", false, root);
 }
 
-BoolDataAdapterXmlPtr ContourFilter::getSmoothingOption(QDomElement root)
+BoolPropertyPtr ContourFilter::getSmoothingOption(QDomElement root)
 {
-	return BoolDataAdapterXml::initialize("Smoothing", "",
+	return BoolProperty::initialize("Smoothing", "",
 	                                           "Smooth the output contour", true, root);
 }
 
-BoolDataAdapterXmlPtr ContourFilter::getPreserveTopologyOption(QDomElement root)
+BoolPropertyPtr ContourFilter::getPreserveTopologyOption(QDomElement root)
 {
-	return BoolDataAdapterXml::initialize("Preserve mesh topology", "",
+	return BoolProperty::initialize("Preserve mesh topology", "",
 	                                           "Preserve mesh topology during reduction", true, root);
 }
 
-DoubleDataAdapterXmlPtr ContourFilter::getSurfaceThresholdOption(QDomElement root)
+DoublePropertyPtr ContourFilter::getSurfaceThresholdOption(QDomElement root)
 {
-	DoubleDataAdapterXmlPtr retval = DoubleDataAdapterXml::initialize("Threshold", "",
+	DoublePropertyPtr retval = DoubleProperty::initialize("Threshold", "",
 	                                                                            "Values from this threshold and above will be included",
 	                                                                            100.0, DoubleRange(-1000, 1000, 1), 0, root);
-	retval->setGuiRepresentation(DoubleDataAdapter::grSLIDER);
+	retval->setGuiRepresentation(DoublePropertyBase::grSLIDER);
 	return retval;
 }
 
-DoubleDataAdapterXmlPtr ContourFilter::getDecimationOption(QDomElement root)
+DoublePropertyPtr ContourFilter::getDecimationOption(QDomElement root)
 {
-	DoubleDataAdapterXmlPtr retval = DoubleDataAdapterXml::initialize("Decimation %", "",
+	DoublePropertyPtr retval = DoubleProperty::initialize("Decimation %", "",
 	                                                                            "Reduce number of triangles in output surface",
 	                                                                            0.2, DoubleRange(0, 1, 0.01), 0, root);
 	retval->setInternal2Display(100);
 	return retval;
 }
 
-ColorDataAdapterXmlPtr ContourFilter::getColorOption(QDomElement root)
+ColorPropertyPtr ContourFilter::getColorOption(QDomElement root)
 {
-	return ColorDataAdapterXml::initialize("Color", "",
+	return ColorProperty::initialize("Color", "",
 	                                            "Color of output model.",
 	                                            QColor("green"), root);
 }
@@ -144,9 +144,9 @@ void ContourFilter::createOptions()
 
 void ContourFilter::createInputTypes()
 {
-	SelectDataStringDataAdapterBasePtr temp;
+	SelectDataStringPropertyBasePtr temp;
 
-	temp = SelectImageStringDataAdapter::New(mPatientModelService);
+	temp = StringPropertySelectImage::New(mPatientModelService);
 	temp->setValueName("Input");
 	temp->setHelp("Select image input for contouring");
 	connect(temp.get(), SIGNAL(dataChanged(QString)), this, SLOT(imageChangedSlot(QString)));
@@ -155,9 +155,9 @@ void ContourFilter::createInputTypes()
 
 void ContourFilter::createOutputTypes()
 {
-	SelectDataStringDataAdapterBasePtr temp;
+	SelectDataStringPropertyBasePtr temp;
 
-	temp = SelectMeshStringDataAdapter::New(mPatientModelService);
+	temp = StringPropertySelectMesh::New(mPatientModelService);
 	temp->setValueName("Output");
 	temp->setHelp("Output contour");
 	mOutputTypes.push_back(temp);
@@ -213,11 +213,11 @@ bool ContourFilter::execute()
 
 	//    std::cout << "ContourFilter::execute : " << mCopiedOptions.ownerDocument().toString() << std::endl;
 
-	BoolDataAdapterXmlPtr reduceResolutionOption = this->getReduceResolutionOption(mCopiedOptions);
-	BoolDataAdapterXmlPtr smoothingOption = this->getSmoothingOption(mCopiedOptions);
-	BoolDataAdapterXmlPtr preserveTopologyOption = this->getPreserveTopologyOption(mCopiedOptions);
-	DoubleDataAdapterXmlPtr surfaceThresholdOption = this->getSurfaceThresholdOption(mCopiedOptions);
-	DoubleDataAdapterXmlPtr decimationOption = this->getDecimationOption(mCopiedOptions);
+	BoolPropertyPtr reduceResolutionOption = this->getReduceResolutionOption(mCopiedOptions);
+	BoolPropertyPtr smoothingOption = this->getSmoothingOption(mCopiedOptions);
+	BoolPropertyPtr preserveTopologyOption = this->getPreserveTopologyOption(mCopiedOptions);
+	DoublePropertyPtr surfaceThresholdOption = this->getSurfaceThresholdOption(mCopiedOptions);
+	DoublePropertyPtr decimationOption = this->getDecimationOption(mCopiedOptions);
 
 	//    report(QString("Creating contour from \"%1\"...").arg(input->getName()));
 
@@ -316,7 +316,7 @@ bool ContourFilter::postProcess()
 	if (!input)
 		return false;
 
-	ColorDataAdapterXmlPtr colorOption = this->getColorOption(mOptions);
+	ColorPropertyPtr colorOption = this->getColorOption(mOptions);
 	MeshPtr output = this->postProcess(mRawResult, input, colorOption->getValue());
 	mRawResult = NULL;
 

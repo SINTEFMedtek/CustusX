@@ -71,8 +71,8 @@ LandmarkImage2ImageRegistrationWidget::LandmarkImage2ImageRegistrationWidget(Reg
 	connect(services.registrationService.get(), &RegistrationService::movingDataChanged,
 			this, &LandmarkImage2ImageRegistrationWidget::updateRep);
 
-	mFixedDataAdapter.reset(new RegistrationFixedImageStringDataAdapter(services.registrationService, services.patientModelService));
-	mMovingDataAdapter.reset(new RegistrationMovingImageStringDataAdapter(services.registrationService, services.patientModelService));
+	mFixedDataAdapter.reset(new StringPropertyRegistrationFixedImage(services.registrationService, services.patientModelService));
+	mMovingDataAdapter.reset(new StringPropertyRegistrationMovingImage(services.registrationService, services.patientModelService));
 
 	mTranslationCheckBox = new QCheckBox("Translation only", this);
 	mTranslationCheckBox->setChecked(settings()->value("registration/I2ILandmarkTranslation", false).toBool());

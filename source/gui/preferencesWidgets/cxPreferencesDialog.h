@@ -88,20 +88,20 @@ signals:
 
 protected:
   QGridLayout *mMainLayout;
-  DoubleDataAdapterXmlPtr mSphereRadius;
-  DoubleDataAdapterXmlPtr mLabelSize;
-  BoolDataAdapterXmlPtr mShowDataText;
-  BoolDataAdapterXmlPtr mShowLabels;
-  BoolDataAdapterXmlPtr mShowMetricNamesInCorner;
-  StringDataAdapterXmlPtr mAnnotationModel;
-  DoubleDataAdapterXmlPtr mAnnotationModelSize;
-  DoubleDataAdapterXmlPtr mAnyplaneViewOffset;
-  BoolDataAdapterXmlPtr mFollowTooltip;
-  DoubleDataAdapterXmlPtr mFollowTooltipBoundary;
+  DoublePropertyPtr mSphereRadius;
+  DoublePropertyPtr mLabelSize;
+  BoolPropertyPtr mShowDataText;
+  BoolPropertyPtr mShowLabels;
+  BoolPropertyPtr mShowMetricNamesInCorner;
+  StringPropertyPtr mAnnotationModel;
+  DoublePropertyPtr mAnnotationModelSize;
+  DoublePropertyPtr mAnyplaneViewOffset;
+  BoolPropertyPtr mFollowTooltip;
+  DoublePropertyPtr mFollowTooltipBoundary;
 
   //Stereo
   QComboBox* mStereoTypeComboBox;
-  DoubleDataAdapterXmlPtr mEyeAngleAdapter;
+  DoublePropertyPtr mEyeAngleAdapter;
   QActionGroup* mStereoTypeActionGroup;
   void initStereoTypeComboBox();
 
@@ -146,7 +146,7 @@ protected:
   QCheckBox* mAutoSaveCheckBox;
   QCheckBox* mAutoShowNewDataCheckBox;
   QCheckBox* mAutoLoadPatientCheckBox;
-  DoubleDataAdapterXmlPtr mAutoLoadPatientWithinHours;
+  DoublePropertyPtr mAutoLoadPatientWithinHours;
   QVBoxLayout *mMainLayout;
 };
 

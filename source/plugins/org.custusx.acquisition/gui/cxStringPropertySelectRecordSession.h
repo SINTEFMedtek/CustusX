@@ -48,7 +48,7 @@ namespace cx
 
 /** Base class for all DataAdapters that selects a record session.
  */
-class org_custusx_acquisition_EXPORT SelectRecordSessionStringDataAdapterBase : public StringDataAdapter
+class org_custusx_acquisition_EXPORT SelectRecordSessionStringDataAdapterBase : public StringPropertyBase
 {
   Q_OBJECT
 public:

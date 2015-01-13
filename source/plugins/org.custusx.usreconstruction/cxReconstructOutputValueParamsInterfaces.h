@@ -52,7 +52,7 @@ class OutputVolumeParams;
 /** Abstract interface to setting one of the values in class OutputValueParams.
  *  Sublass to get a concrete class.
  */
-class org_custusx_usreconstruction_EXPORT DoubleDataAdapterOutputValueParams : public DoubleDataAdapter
+class org_custusx_usreconstruction_EXPORT DoubleDataAdapterOutputValueParams : public DoublePropertyBase
 {
   Q_OBJECT
 public:

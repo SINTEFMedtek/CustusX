@@ -43,19 +43,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-typedef boost::shared_ptr<class SpaceDataAdapterXml> SpaceDataAdapterXmlPtr;
+typedef boost::shared_ptr<class SpaceProperty> SpacePropertyPtr;
 
 /**
  * \ingroup cx_resource_core_dataadapters
  */
-class cxResource_EXPORT SpaceDataAdapterXml: public SpaceDataAdapter
+class cxResource_EXPORT SpaceProperty: public SpacePropertyBase
 {
 Q_OBJECT
 public:
 	/** Make sure one given option exists witin root.
 	 * If not present, fill inn the input defaults.
 	 */
-	static SpaceDataAdapterXmlPtr initialize(const QString& uid, QString name, QString help, Space value=Space(),
+	static SpacePropertyPtr initialize(const QString& uid, QString name, QString help, Space value=Space(),
 		std::vector<Space> range=std::vector<Space>(), QDomNode root = QDomNode());
 	void setSpaceProvider(SpaceProviderPtr provider);
 
@@ -83,7 +83,7 @@ signals:
 private slots:
 	void providerChangedSlot();
 private:
-	SpaceDataAdapterXml();
+	SpaceProperty();
 	QString mName;
 	QString mUid;
 	QString mHelp;

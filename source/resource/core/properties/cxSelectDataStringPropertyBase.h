@@ -40,21 +40,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-typedef boost::shared_ptr<class SelectDataStringDataAdapterBase> SelectDataStringDataAdapterBasePtr;
+typedef boost::shared_ptr<class SelectDataStringPropertyBase> SelectDataStringPropertyBasePtr;
 typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
 
-/** Base class for all DataAdapters that selects a Data or descendants.
+/** Base class for all Properties that selects a Data or descendants.
  *
  *  \ingroup cx_resource_core_dataAdapters
  *  \date 2014-09-11
  *  \author Christian Askeland, SINTEF
  *  \author Ole Vegard Solberg, SINTEF
  */
-class cxResource_EXPORT SelectDataStringDataAdapterBase : public StringDataAdapter
+class cxResource_EXPORT SelectDataStringPropertyBase : public StringPropertyBase
 {
 	Q_OBJECT
 public:
-	virtual ~SelectDataStringDataAdapterBase() {}
+	virtual ~SelectDataStringPropertyBase() {}
 
 public: // basic methods
 	virtual QString getDisplayName() const;
@@ -75,7 +75,7 @@ protected:
 	/** Construct base with a filter that determined allowed Data types based
 		* on their getType() return value. The default of ".*" means any type.
 		*/
-	explicit SelectDataStringDataAdapterBase(PatientModelServicePtr patientModelService, QString typeRegexp = ".*");
+	explicit SelectDataStringPropertyBase(PatientModelServicePtr patientModelService, QString typeRegexp = ".*");
 	std::map<QString, DataPtr> filterOnType(std::map<QString, DataPtr> input, QString regexp) const;
 	QString mTypeRegexp;
 	QString mValueName;

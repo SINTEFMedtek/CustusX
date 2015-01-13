@@ -61,18 +61,18 @@ public:
 	ReconstructParams(PatientModelServicePtr patientModelService, XmlOptionFile settings);
 	virtual ~ReconstructParams();
 
-	DataAdapterPtr getParameter(QString uid);
+	PropertyPtr getParameter(QString uid);
 	QStringList getParameterUids() const;
 
-	StringDataAdapterXmlPtr getOrientationAdapter() { this->createParameters(); return mOrientationAdapter; }
-	StringDataAdapterXmlPtr getPresetTFAdapter() { this->createParameters(); return mPresetTFAdapter; }
-	StringDataAdapterXmlPtr getAlgorithmAdapter() { this->createParameters(); return mAlgorithmAdapter; }
-	StringDataAdapterXmlPtr getMaskReduce() { this->createParameters(); return mMaskReduce; }
-	BoolDataAdapterXmlPtr getAlignTimestamps() { this->createParameters(); return mAlignTimestamps; }
-	DoubleDataAdapterXmlPtr getTimeCalibration() { this->createParameters(); return mTimeCalibration; }
-	DoubleDataAdapterXmlPtr getMaxVolumeSize() { this->createParameters(); return mMaxVolumeSize; }
-	BoolDataAdapterXmlPtr getAngioAdapter() { this->createParameters(); return mAngioAdapter; }
-	BoolDataAdapterXmlPtr getCreateBModeWhenAngio() { this->createParameters(); return mCreateBModeWhenAngio; }
+	StringPropertyPtr getOrientationAdapter() { this->createParameters(); return mOrientationAdapter; }
+	StringPropertyPtr getPresetTFAdapter() { this->createParameters(); return mPresetTFAdapter; }
+	StringPropertyPtr getAlgorithmAdapter() { this->createParameters(); return mAlgorithmAdapter; }
+	StringPropertyPtr getMaskReduce() { this->createParameters(); return mMaskReduce; }
+	BoolPropertyPtr getAlignTimestamps() { this->createParameters(); return mAlignTimestamps; }
+	DoublePropertyPtr getTimeCalibration() { this->createParameters(); return mTimeCalibration; }
+	DoublePropertyPtr getMaxVolumeSize() { this->createParameters(); return mMaxVolumeSize; }
+	BoolPropertyPtr getAngioAdapter() { this->createParameters(); return mAngioAdapter; }
+	BoolPropertyPtr getCreateBModeWhenAngio() { this->createParameters(); return mCreateBModeWhenAngio; }
 
 signals:
 	void changedInputSettings();
@@ -83,22 +83,22 @@ private slots:
 	void onPatientChanged();
 
 private:
-	std::map<QString, DataAdapterPtr> mParameters;
+	std::map<QString, PropertyPtr> mParameters;
 	void createParameters();
 
-	StringDataAdapterXmlPtr mOrientationAdapter;
-	StringDataAdapterXmlPtr mPresetTFAdapter;
-	StringDataAdapterXmlPtr mAlgorithmAdapter;
-	StringDataAdapterXmlPtr mMaskReduce;//Reduce mask size in % in each direction
-	BoolDataAdapterXmlPtr mAlignTimestamps; ///align track and frame timestamps to each other automatically
-	DoubleDataAdapterXmlPtr mTimeCalibration; ///set a offset in the frame timestamps
-	DoubleDataAdapterXmlPtr mMaxVolumeSize; ///< Set max size of output volume.
-	BoolDataAdapterXmlPtr mAngioAdapter; ///US angio data is used as input
-	BoolDataAdapterXmlPtr mCreateBModeWhenAngio; /// If angio requested, create a B-mode reoconstruction based on the same data set.
+	StringPropertyPtr mOrientationAdapter;
+	StringPropertyPtr mPresetTFAdapter;
+	StringPropertyPtr mAlgorithmAdapter;
+	StringPropertyPtr mMaskReduce;//Reduce mask size in % in each direction
+	BoolPropertyPtr mAlignTimestamps; ///align track and frame timestamps to each other automatically
+	DoublePropertyPtr mTimeCalibration; ///set a offset in the frame timestamps
+	DoublePropertyPtr mMaxVolumeSize; ///< Set max size of output volume.
+	BoolPropertyPtr mAngioAdapter; ///US angio data is used as input
+	BoolPropertyPtr mCreateBModeWhenAngio; /// If angio requested, create a B-mode reoconstruction based on the same data set.
 
 	PatientModelServicePtr mPatientModelService;
 	XmlOptionFile mSettings;
-	void add(DataAdapterPtr param);
+	void add(PropertyPtr param);
 };
 typedef boost::shared_ptr<class ReconstructParams> ReconstructParamsPtr;
 

@@ -51,13 +51,13 @@ QString OpenCVStreamerService::getName()
 	return "OpenCV";
 }
 
-std::vector<DataAdapterPtr> OpenCVStreamerService::getSettings(QDomElement root)
+std::vector<PropertyPtr> OpenCVStreamerService::getSettings(QDomElement root)
 {
-	std::vector<DataAdapterPtr> retval;
-	std::vector<DataAdapterPtr> opencvArgs = ImageStreamerOpenCVArguments().getSettings(root);
+	std::vector<PropertyPtr> retval;
+	std::vector<PropertyPtr> opencvArgs = ImageStreamerOpenCVArguments().getSettings(root);
 	std::copy(opencvArgs.begin(), opencvArgs.end(), back_inserter(retval));
 
-	std::vector<DataAdapterPtr> localsvrArgs = LocalServerStreamerArguments().getSettings(root);
+	std::vector<PropertyPtr> localsvrArgs = LocalServerStreamerArguments().getSettings(root);
 	std::copy(localsvrArgs.begin(), localsvrArgs.end(), back_inserter(retval));
 
 	return retval;

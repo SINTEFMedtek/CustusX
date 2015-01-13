@@ -52,14 +52,14 @@ QString ImageFileStreamerService::getName()
 	return "ImageFile";
 }
 
-std::vector<DataAdapterPtr> ImageFileStreamerService::getSettings(QDomElement root)
+std::vector<PropertyPtr> ImageFileStreamerService::getSettings(QDomElement root)
 {
-	std::vector<DataAdapterPtr> retval;
+	std::vector<PropertyPtr> retval;
 
-	std::vector<DataAdapterPtr> opencvArgs = ImageStreamerDummyArguments().getSettings(root);
+	std::vector<PropertyPtr> opencvArgs = ImageStreamerDummyArguments().getSettings(root);
 	std::copy(opencvArgs.begin(), opencvArgs.end(), back_inserter(retval));
 
-	std::vector<DataAdapterPtr> localsvrArgs = LocalServerStreamerArguments().getSettings(root);
+	std::vector<PropertyPtr> localsvrArgs = LocalServerStreamerArguments().getSettings(root);
 	std::copy(localsvrArgs.begin(), localsvrArgs.end(), back_inserter(retval));
 
 	return retval;

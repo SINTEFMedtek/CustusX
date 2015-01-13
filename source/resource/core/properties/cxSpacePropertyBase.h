@@ -48,12 +48,12 @@ namespace cx
 /**
  * \ingroup cx_resource_core_dataadapters
  */
-class cxResource_EXPORT SpaceDataAdapter: public DataAdapter
+class cxResource_EXPORT SpacePropertyBase: public Property
 {
 	Q_OBJECT
 public:
-	SpaceDataAdapter() {}
-	virtual ~SpaceDataAdapter(){}
+	SpacePropertyBase() {}
+	virtual ~SpacePropertyBase(){}
 
 public:
 	// basic methods
@@ -101,7 +101,7 @@ public:
 
 
 };
-typedef boost::shared_ptr<SpaceDataAdapter> SpaceDataAdapterPtr;
+typedef boost::shared_ptr<SpacePropertyBase> SpacePropertyBasePtr;
 
 } // namespace cx
 

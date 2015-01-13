@@ -53,24 +53,24 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-DoubleDataAdapterActiveToolOffset::DoubleDataAdapterActiveToolOffset()
+DoublePropertyActiveToolOffset::DoublePropertyActiveToolOffset()
 {
   mActiveTool = DominantToolProxy::New(trackingService());
-  connect(mActiveTool.get(), &DominantToolProxy::tooltipOffset, this, &DataAdapter::changed);
+  connect(mActiveTool.get(), &DominantToolProxy::tooltipOffset, this, &Property::changed);
 }
 
-double DoubleDataAdapterActiveToolOffset::getValue() const
+double DoublePropertyActiveToolOffset::getValue() const
 {
 	return mActiveTool->getTool()->getTooltipOffset();
 }
 
-bool DoubleDataAdapterActiveToolOffset::setValue(double val)
+bool DoublePropertyActiveToolOffset::setValue(double val)
 {
   mActiveTool->getTool()->setTooltipOffset(val);
   return true;
 }
 
-DoubleRange DoubleDataAdapterActiveToolOffset::getValueRange() const
+DoubleRange DoublePropertyActiveToolOffset::getValueRange() const
 {
   double range = 200;
   return DoubleRange(0,range,1);
@@ -80,25 +80,25 @@ DoubleRange DoubleDataAdapterActiveToolOffset::getValueRange() const
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-DoubleDataAdapterActiveImageBase::DoubleDataAdapterActiveImageBase(PatientModelServicePtr patientModelService) :
+DoublePropertyActiveImageBase::DoublePropertyActiveImageBase(PatientModelServicePtr patientModelService) :
 	mPatientModelService(patientModelService)
 {
 	mActiveImageProxy = ActiveImageProxy::New(patientModelService);
-	connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &DoubleDataAdapterActiveImageBase::activeImageChanged);
-	connect(mActiveImageProxy.get(), &ActiveImageProxy::transferFunctionsChanged, this, &DataAdapter::changed);
+	connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &DoublePropertyActiveImageBase::activeImageChanged);
+	connect(mActiveImageProxy.get(), &ActiveImageProxy::transferFunctionsChanged, this, &Property::changed);
 }
-void DoubleDataAdapterActiveImageBase::activeImageChanged()
+void DoublePropertyActiveImageBase::activeImageChanged()
 {
   mImage = mPatientModelService->getActiveImage();
   emit changed();
 }
-double DoubleDataAdapterActiveImageBase::getValue() const
+double DoublePropertyActiveImageBase::getValue() const
 {
   if (!mImage)
     return 0.0;
   return getValueInternal();
 }
-bool DoubleDataAdapterActiveImageBase::setValue(double val)
+bool DoublePropertyActiveImageBase::setValue(double val)
 {
   if (!mImage)
     return false;
@@ -109,15 +109,15 @@ bool DoubleDataAdapterActiveImageBase::setValue(double val)
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-double DoubleDataAdapter2DWindow::getValueInternal() const
+double DoubleProperty2DWindow::getValueInternal() const
 {
   return mImage->getLookupTable2D()->getWindow();
 }
-void DoubleDataAdapter2DWindow::setValueInternal(double val)
+void DoubleProperty2DWindow::setValueInternal(double val)
 {
   mImage->getLookupTable2D()->setWindow(val);
 }
-DoubleRange DoubleDataAdapter2DWindow::getValueRange() const
+DoubleRange DoubleProperty2DWindow::getValueRange() const
 {
   if (!mImage)
     return DoubleRange();
@@ -128,15 +128,15 @@ DoubleRange DoubleDataAdapter2DWindow::getValueRange() const
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-double DoubleDataAdapter2DLevel::getValueInternal() const
+double DoubleProperty2DLevel::getValueInternal() const
 {
   return mImage->getLookupTable2D()->getLevel();
 }
-void DoubleDataAdapter2DLevel::setValueInternal(double val)
+void DoubleProperty2DLevel::setValueInternal(double val)
 {
   mImage->getLookupTable2D()->setLevel(val);
 }
-DoubleRange DoubleDataAdapter2DLevel::getValueRange() const
+DoubleRange DoubleProperty2DLevel::getValueRange() const
 {
   if (!mImage)
     return DoubleRange();
@@ -149,18 +149,18 @@ DoubleRange DoubleDataAdapter2DLevel::getValueRange() const
 ////---------------------------------------------------------
 ////---------------------------------------------------------
 
-SelectRTSourceStringDataAdapterBase::SelectRTSourceStringDataAdapterBase(PatientModelServicePtr patientModelService) :
+StringPropertySelectRTSourceBase::StringPropertySelectRTSourceBase(PatientModelServicePtr patientModelService) :
 	mPatientModelService(patientModelService)
 {
-	connect(mPatientModelService.get(), &PatientModelService::streamLoaded, this, &DataAdapter::changed);
+	connect(mPatientModelService.get(), &PatientModelService::streamLoaded, this, &Property::changed);
 }
 
-SelectRTSourceStringDataAdapterBase::~SelectRTSourceStringDataAdapterBase()
+StringPropertySelectRTSourceBase::~StringPropertySelectRTSourceBase()
 {
-	disconnect(mPatientModelService.get(), &PatientModelService::streamLoaded, this, &DataAdapter::changed);
+	disconnect(mPatientModelService.get(), &PatientModelService::streamLoaded, this, &Property::changed);
 }
 
-QStringList SelectRTSourceStringDataAdapterBase::getValueRange() const
+QStringList StringPropertySelectRTSourceBase::getValueRange() const
 {
   std::map<QString, VideoSourcePtr> streams = mPatientModelService->getStreams();
   QStringList retval;
@@ -171,7 +171,7 @@ QStringList SelectRTSourceStringDataAdapterBase::getValueRange() const
   return retval;
 }
 
-QString SelectRTSourceStringDataAdapterBase::convertInternal2Display(QString internal)
+QString StringPropertySelectRTSourceBase::convertInternal2Display(QString internal)
 {
   VideoSourcePtr rtSource = mPatientModelService->getStream(internal);
   if (!rtSource)
@@ -182,17 +182,17 @@ QString SelectRTSourceStringDataAdapterBase::convertInternal2Display(QString int
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-ActiveVideoSourceStringDataAdapter::ActiveVideoSourceStringDataAdapter()
+StringPropertyActiveVideoSource::StringPropertyActiveVideoSource()
 {
-	connect(videoService().get(), &VideoService::activeVideoSourceChanged, this, &DataAdapter::changed);
+	connect(videoService().get(), &VideoService::activeVideoSourceChanged, this, &Property::changed);
 }
 
-QString ActiveVideoSourceStringDataAdapter::getDisplayName() const
+QString StringPropertyActiveVideoSource::getDisplayName() const
 {
 	return "Stream";
 }
 
-bool ActiveVideoSourceStringDataAdapter::setValue(const QString& value)
+bool StringPropertyActiveVideoSource::setValue(const QString& value)
 {
 	if (value == this->getValue())
 		return false;
@@ -201,12 +201,12 @@ bool ActiveVideoSourceStringDataAdapter::setValue(const QString& value)
 	return true;
 }
 
-QString ActiveVideoSourceStringDataAdapter::getValue() const
+QString StringPropertyActiveVideoSource::getValue() const
 {
 	return videoService()->getActiveVideoSource()->getUid();
 }
 
-QStringList ActiveVideoSourceStringDataAdapter::getValueRange() const
+QStringList StringPropertyActiveVideoSource::getValueRange() const
 {
 	std::vector<VideoSourcePtr> sources = videoService()->getVideoSources();
 	QStringList retval;
@@ -215,7 +215,7 @@ QStringList ActiveVideoSourceStringDataAdapter::getValueRange() const
 	return retval;
 }
 
-QString ActiveVideoSourceStringDataAdapter::getHelp() const
+QString StringPropertyActiveVideoSource::getHelp() const
 {
 	return "Select the active video source.";
 }
@@ -224,12 +224,12 @@ QString ActiveVideoSourceStringDataAdapter::getHelp() const
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-SelectToolStringDataAdapterBase::SelectToolStringDataAdapterBase()
+StringPropertySelectToolBase::StringPropertySelectToolBase()
 {
-	connect(trackingService().get(), &TrackingService::stateChanged, this, &DataAdapter::changed);
+	connect(trackingService().get(), &TrackingService::stateChanged, this, &Property::changed);
 }
 
-QStringList SelectToolStringDataAdapterBase::getValueRange() const
+QStringList StringPropertySelectToolBase::getValueRange() const
 {
 	TrackingService::ToolMap tools = trackingService()->getTools();
 
@@ -239,7 +239,7 @@ QStringList SelectToolStringDataAdapterBase::getValueRange() const
 	return retval;
 }
 
-QString SelectToolStringDataAdapterBase::convertInternal2Display(QString internal)
+QString StringPropertySelectToolBase::convertInternal2Display(QString internal)
 {
   ToolPtr tool = trackingService()->getTool(internal);
   if (!tool)
@@ -253,11 +253,11 @@ QString SelectToolStringDataAdapterBase::convertInternal2Display(QString interna
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-SelectCoordinateSystemStringDataAdapterBase::SelectCoordinateSystemStringDataAdapterBase()
+StringPropertySelectCoordinateSystemBase::StringPropertySelectCoordinateSystemBase()
 {
 }
 
-QStringList SelectCoordinateSystemStringDataAdapterBase::getValueRange() const
+QStringList StringPropertySelectCoordinateSystemBase::getValueRange() const
 {
   QStringList retval;
   retval << "";
@@ -269,7 +269,7 @@ QStringList SelectCoordinateSystemStringDataAdapterBase::getValueRange() const
   return retval;
 }
 
-QString SelectCoordinateSystemStringDataAdapterBase::convertInternal2Display(QString internal)
+QString StringPropertySelectCoordinateSystemBase::convertInternal2Display(QString internal)
 {
   if (internal.isEmpty())
     return "<no coordinate system>";
@@ -294,61 +294,61 @@ QString SelectCoordinateSystemStringDataAdapterBase::convertInternal2Display(QSt
 //---------------------------------------------------------
 
 
-SelectRTSourceStringDataAdapter::SelectRTSourceStringDataAdapter(PatientModelServicePtr patientModelService) :
-	SelectRTSourceStringDataAdapterBase(patientModelService),
+StringPropertySelectRTSource::StringPropertySelectRTSource(PatientModelServicePtr patientModelService) :
+	StringPropertySelectRTSourceBase(patientModelService),
     mValueName("Select Real Time Source")
 {
-	connect(patientModelService.get(), &PatientModelService::streamLoaded, this, &SelectRTSourceStringDataAdapter::setDefaultSlot);
+	connect(patientModelService.get(), &PatientModelService::streamLoaded, this, &StringPropertySelectRTSource::setDefaultSlot);
 	this->setDefaultSlot();
 }
 
-QString SelectRTSourceStringDataAdapter::getDisplayName() const
+QString StringPropertySelectRTSource::getDisplayName() const
 {
   return mValueName;
 }
 
-bool SelectRTSourceStringDataAdapter::setValue(const QString& value)
+bool StringPropertySelectRTSource::setValue(const QString& value)
 {
   if(mRTSource && (mRTSource->getUid() == value))
     return false;
 
   if(mRTSource)
-	  disconnect(mRTSource.get(), &VideoSource::streaming, this, &DataAdapter::changed);
+	  disconnect(mRTSource.get(), &VideoSource::streaming, this, &Property::changed);
 
   VideoSourcePtr rtSource = mPatientModelService->getStream(value);
   if(!rtSource)
     return false;
 
   mRTSource = rtSource;
-  connect(mRTSource.get(), &VideoSource::streaming, this, &DataAdapter::changed);
+  connect(mRTSource.get(), &VideoSource::streaming, this, &Property::changed);
 
   emit changed();
   return true;
 }
 
-QString SelectRTSourceStringDataAdapter::getValue() const
+QString StringPropertySelectRTSource::getValue() const
 {
   if(!mRTSource)
     return "<no real time source>";
   return mRTSource->getUid();
 }
 
-QString SelectRTSourceStringDataAdapter::getHelp() const
+QString StringPropertySelectRTSource::getHelp() const
 {
   return "Select a real time source";
 }
 
-VideoSourcePtr SelectRTSourceStringDataAdapter::getRTSource()
+VideoSourcePtr StringPropertySelectRTSource::getRTSource()
 {
   return mRTSource;
 }
 
-void SelectRTSourceStringDataAdapter::setValueName(const QString name)
+void StringPropertySelectRTSource::setValueName(const QString name)
 {
   mValueName = name;
 }
 
-void SelectRTSourceStringDataAdapter::setDefaultSlot()
+void StringPropertySelectRTSource::setDefaultSlot()
 {
   std::map<QString, VideoSourcePtr> streams = mPatientModelService->getStreams();
   std::map<QString, VideoSourcePtr>::iterator it = streams.begin();
@@ -362,35 +362,35 @@ void SelectRTSourceStringDataAdapter::setDefaultSlot()
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-SelectCoordinateSystemStringDataAdapter::SelectCoordinateSystemStringDataAdapter()
+StringPropertySelectCoordinateSystem::StringPropertySelectCoordinateSystem()
 {
 	mCoordinateSystem = csCOUNT;
-  connect(trackingService().get(), &TrackingService::stateChanged, this, &SelectCoordinateSystemStringDataAdapter::setDefaultSlot);
+  connect(trackingService().get(), &TrackingService::stateChanged, this, &StringPropertySelectCoordinateSystem::setDefaultSlot);
 }
 
-QString SelectCoordinateSystemStringDataAdapter::getDisplayName() const
+QString StringPropertySelectCoordinateSystem::getDisplayName() const
 {
   return "Select coordinate system";
 }
 
-bool SelectCoordinateSystemStringDataAdapter::setValue(const QString& value)
+bool StringPropertySelectCoordinateSystem::setValue(const QString& value)
 {
   mCoordinateSystem = string2enum<COORDINATE_SYSTEM>(value);
   emit changed();
   return true;
 }
 
-QString SelectCoordinateSystemStringDataAdapter::getValue() const
+QString StringPropertySelectCoordinateSystem::getValue() const
 {
   return qstring_cast(mCoordinateSystem);
 }
 
-QString SelectCoordinateSystemStringDataAdapter::getHelp() const
+QString StringPropertySelectCoordinateSystem::getHelp() const
 {
   return "Select a coordinate system";
 }
 
-void SelectCoordinateSystemStringDataAdapter::setDefaultSlot()
+void StringPropertySelectCoordinateSystem::setDefaultSlot()
 {
   this->setValue(qstring_cast(csPATIENTREF));
 }
@@ -399,28 +399,28 @@ void SelectCoordinateSystemStringDataAdapter::setDefaultSlot()
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-SelectToolStringDataAdapter::SelectToolStringDataAdapter()
+StringPropertySelectTool::StringPropertySelectTool()
 {
 	mValueName = "Select a tool";
 	mHelp = mValueName;
 }
 
-void SelectToolStringDataAdapter::setHelp(QString help)
+void StringPropertySelectTool::setHelp(QString help)
 {
   mHelp = help;
 }
 
-void SelectToolStringDataAdapter::setValueName(QString name)
+void StringPropertySelectTool::setValueName(QString name)
 {
   mValueName = name;
 }
 
-QString SelectToolStringDataAdapter::getDisplayName() const
+QString StringPropertySelectTool::getDisplayName() const
 {
   return mValueName;
 }
 
-bool SelectToolStringDataAdapter::setValue(const QString& value)
+bool StringPropertySelectTool::setValue(const QString& value)
 {
   if(mTool && value==mTool->getUid())
     return false;
@@ -433,19 +433,19 @@ bool SelectToolStringDataAdapter::setValue(const QString& value)
   return true;
 }
 
-QString SelectToolStringDataAdapter::getValue() const
+QString StringPropertySelectTool::getValue() const
 {
   if(!mTool)
     return "<no tool>";
   return mTool->getUid();
 }
 
-QString SelectToolStringDataAdapter::getHelp() const
+QString StringPropertySelectTool::getHelp() const
 {
   return mHelp;
 }
 
-ToolPtr SelectToolStringDataAdapter::getTool() const
+ToolPtr StringPropertySelectTool::getTool() const
 {
   return mTool;
 }
@@ -455,33 +455,33 @@ ToolPtr SelectToolStringDataAdapter::getTool() const
 //---------------------------------------------------------
 
 
-ParentFrameStringDataAdapter::ParentFrameStringDataAdapter(PatientModelServicePtr patientModelService) :
+StringPropertyParentFrame::StringPropertyParentFrame(PatientModelServicePtr patientModelService) :
 	mPatientModelService(patientModelService)
 {
-	connect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &DataAdapter::changed);
+	connect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &Property::changed);
 }
 
-void ParentFrameStringDataAdapter::setData(DataPtr data)
+void StringPropertyParentFrame::setData(DataPtr data)
 {
   if (mData)
-	  disconnect(mData.get(), &Data::transformChanged, this, &DataAdapter::changed);
+	  disconnect(mData.get(), &Data::transformChanged, this, &Property::changed);
   mData = data;
   if (mData)
-	  connect(mData.get(), &Data::transformChanged, this, &DataAdapter::changed);
+	  connect(mData.get(), &Data::transformChanged, this, &Property::changed);
   emit changed();
 }
 
-ParentFrameStringDataAdapter::~ParentFrameStringDataAdapter()
+StringPropertyParentFrame::~StringPropertyParentFrame()
 {
-	disconnect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &DataAdapter::changed);
+	disconnect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &Property::changed);
 }
 
-QString ParentFrameStringDataAdapter::getDisplayName() const
+QString StringPropertyParentFrame::getDisplayName() const
 {
   return "Parent Frame";
 }
 
-bool ParentFrameStringDataAdapter::setValue(const QString& value)
+bool StringPropertyParentFrame::setValue(const QString& value)
 {
   if (!mData)
     return false;
@@ -489,21 +489,21 @@ bool ParentFrameStringDataAdapter::setValue(const QString& value)
   return true;
 }
 
-QString ParentFrameStringDataAdapter::getValue() const
+QString StringPropertyParentFrame::getValue() const
 {
   if (!mData)
     return "";
   return qstring_cast(mData->getParentSpace());
 }
 
-QString ParentFrameStringDataAdapter::getHelp() const
+QString StringPropertyParentFrame::getHelp() const
 {
   if (!mData)
     return "";
   return "Select the parent frame for " + qstring_cast(mData->getName()) + ".";
 }
 
-QStringList ParentFrameStringDataAdapter::getValueRange() const
+QStringList StringPropertyParentFrame::getValueRange() const
 {
   QStringList retval;
   retval << "";
@@ -519,7 +519,7 @@ QStringList ParentFrameStringDataAdapter::getValueRange() const
   return retval;
 }
 
-QString ParentFrameStringDataAdapter::convertInternal2Display(QString internal)
+QString StringPropertyParentFrame::convertInternal2Display(QString internal)
 {
   DataPtr data = mPatientModelService->getData(internal);
   if (!data)
@@ -531,12 +531,12 @@ QString ParentFrameStringDataAdapter::convertInternal2Display(QString internal)
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-SetParentFrameStringDataAdapter::SetParentFrameStringDataAdapter(PatientModelServicePtr patientModelService) :
-	ParentFrameStringDataAdapter(patientModelService)
+StringPropertySetParentFrame::StringPropertySetParentFrame(PatientModelServicePtr patientModelService) :
+	StringPropertyParentFrame(patientModelService)
 {
 }
 
-bool SetParentFrameStringDataAdapter::setValue(const QString& value)
+bool StringPropertySetParentFrame::setValue(const QString& value)
 {
   if (!mData)
     return false;
@@ -548,16 +548,16 @@ bool SetParentFrameStringDataAdapter::setValue(const QString& value)
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-DataNameEditableStringDataAdapter::DataNameEditableStringDataAdapter()
+StringPropertyDataNameEditable::StringPropertyDataNameEditable()
 {
 }
 
-QString DataNameEditableStringDataAdapter::getDisplayName() const
+QString StringPropertyDataNameEditable::getDisplayName() const
 {
   return "Name";
 }
 
-bool DataNameEditableStringDataAdapter::setValue(const QString& value)
+bool StringPropertyDataNameEditable::setValue(const QString& value)
 {
   if (!mData)
     return false;
@@ -565,14 +565,14 @@ bool DataNameEditableStringDataAdapter::setValue(const QString& value)
   return true;
 }
 
-QString DataNameEditableStringDataAdapter::getValue() const
+QString StringPropertyDataNameEditable::getValue() const
 {
   if (mData)
     return mData->getName();
   return "";
 }
 
-void DataNameEditableStringDataAdapter::setData(DataPtr data)
+void StringPropertyDataNameEditable::setData(DataPtr data)
 {
   mData = data;
   emit changed();
@@ -582,28 +582,28 @@ void DataNameEditableStringDataAdapter::setData(DataPtr data)
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-DataUidEditableStringDataAdapter::DataUidEditableStringDataAdapter()
+StringPropertyDataUidEditable::StringPropertyDataUidEditable()
 {
 }
 
-QString DataUidEditableStringDataAdapter::getDisplayName() const
+QString StringPropertyDataUidEditable::getDisplayName() const
 {
   return "Uid";
 }
 
-bool DataUidEditableStringDataAdapter::setValue(const QString& value)
+bool StringPropertyDataUidEditable::setValue(const QString& value)
 {
   return false;
 }
 
-QString DataUidEditableStringDataAdapter::getValue() const
+QString StringPropertyDataUidEditable::getValue() const
 {
   if (mData)
     return mData->getUid();
   return "";
 }
 
-void DataUidEditableStringDataAdapter::setData(DataPtr data)
+void StringPropertyDataUidEditable::setData(DataPtr data)
 {
   mData = data;
   emit changed();
@@ -613,33 +613,33 @@ void DataUidEditableStringDataAdapter::setData(DataPtr data)
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-DataModalityStringDataAdapter::DataModalityStringDataAdapter(PatientModelServicePtr patientModelService) :
+StringPropertyDataModality::StringPropertyDataModality(PatientModelServicePtr patientModelService) :
 	mPatientModelService(patientModelService)
 {
-	connect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &DataAdapter::changed);
+	connect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &Property::changed);
 }
 
-DataModalityStringDataAdapter::~DataModalityStringDataAdapter()
+StringPropertyDataModality::~StringPropertyDataModality()
 {
-	disconnect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &DataAdapter::changed);
+	disconnect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &Property::changed);
 }
 
-void DataModalityStringDataAdapter::setData(ImagePtr data)
+void StringPropertyDataModality::setData(ImagePtr data)
 {
 	if (mData)
-		disconnect(mData.get(), &Data::propertiesChanged, this, &DataAdapter::changed);
+		disconnect(mData.get(), &Data::propertiesChanged, this, &Property::changed);
 	mData = data;
 	if (mData)
-		connect(mData.get(), &Data::propertiesChanged, this, &DataAdapter::changed);
+		connect(mData.get(), &Data::propertiesChanged, this, &Property::changed);
 	emit changed();
 }
 
-QString DataModalityStringDataAdapter::getDisplayName() const
+QString StringPropertyDataModality::getDisplayName() const
 {
 	return "Modality";
 }
 
-bool DataModalityStringDataAdapter::setValue(const QString& value)
+bool StringPropertyDataModality::setValue(const QString& value)
 {
 	if (!mData)
 		return false;
@@ -647,21 +647,21 @@ bool DataModalityStringDataAdapter::setValue(const QString& value)
 	return true;
 }
 
-QString DataModalityStringDataAdapter::getValue() const
+QString StringPropertyDataModality::getValue() const
 {
 	if (!mData)
 		return "";
 	return mData->getModality();
 }
 
-QString DataModalityStringDataAdapter::getHelp() const
+QString StringPropertyDataModality::getHelp() const
 {
 	if (!mData)
 		return "";
 	return "Select the modality for " + qstring_cast(mData->getName()) + ".";
 }
 
-QStringList DataModalityStringDataAdapter::getValueRange() const
+QStringList StringPropertyDataModality::getValueRange() const
 {
 	QStringList retval;
 	retval << "";
@@ -675,33 +675,33 @@ QStringList DataModalityStringDataAdapter::getValueRange() const
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-ImageTypeStringDataAdapter::ImageTypeStringDataAdapter(PatientModelServicePtr patientModelService) :
+StringPropertyImageType::StringPropertyImageType(PatientModelServicePtr patientModelService) :
 	mPatientModelService(patientModelService)
 {
-	connect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &DataAdapter::changed);
+	connect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &Property::changed);
 }
 
-void ImageTypeStringDataAdapter::setData(ImagePtr data)
+void StringPropertyImageType::setData(ImagePtr data)
 {
 	if (mData)
-		disconnect(mData.get(), &Data::propertiesChanged, this, &DataAdapter::changed);
+		disconnect(mData.get(), &Data::propertiesChanged, this, &Property::changed);
 	mData = data;
 	if (mData)
-		connect(mData.get(), &Data::propertiesChanged, this, &DataAdapter::changed);
+		connect(mData.get(), &Data::propertiesChanged, this, &Property::changed);
 	emit changed();
 }
 
-ImageTypeStringDataAdapter::~ImageTypeStringDataAdapter()
+StringPropertyImageType::~StringPropertyImageType()
 {
-	disconnect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &DataAdapter::changed);
+	disconnect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &Property::changed);
 }
 
-QString ImageTypeStringDataAdapter::getDisplayName() const
+QString StringPropertyImageType::getDisplayName() const
 {
 	return "Image Type";
 }
 
-bool ImageTypeStringDataAdapter::setValue(const QString& value)
+bool StringPropertyImageType::setValue(const QString& value)
 {
 	if (!mData)
 		return false;
@@ -709,21 +709,21 @@ bool ImageTypeStringDataAdapter::setValue(const QString& value)
 	return true;
 }
 
-QString ImageTypeStringDataAdapter::getValue() const
+QString StringPropertyImageType::getValue() const
 {
 	if (!mData)
 		return "";
 	return mData->getImageType();
 }
 
-QString ImageTypeStringDataAdapter::getHelp() const
+QString StringPropertyImageType::getHelp() const
 {
 	if (!mData)
 		return "";
 	return "Select the image type for " + qstring_cast(mData->getName()) + ".";
 }
 
-QStringList ImageTypeStringDataAdapter::getValueRange() const
+QStringList StringPropertyImageType::getValueRange() const
 {
 	QStringList retval;
 	retval << "";

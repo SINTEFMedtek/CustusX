@@ -54,19 +54,19 @@ class cxResourceWidgets_EXPORT Vector3DWidget: public QWidget
 {
 Q_OBJECT
 public:
-	Vector3DWidget(QWidget* parent, Vector3DDataAdapterPtr data);
+	Vector3DWidget(QWidget* parent, Vector3DPropertyBasePtr data);
 	virtual ~Vector3DWidget() {}
 
-	static Vector3DWidget* createSmallHorizontal(QWidget* parent, Vector3DDataAdapterPtr data);
-	static Vector3DWidget* createVerticalWithSliders(QWidget* parent, Vector3DDataAdapterPtr data);
+	static Vector3DWidget* createSmallHorizontal(QWidget* parent, Vector3DPropertyBasePtr data);
+	static Vector3DWidget* createVerticalWithSliders(QWidget* parent, Vector3DPropertyBasePtr data);
 	void showDim(int dim, bool visible);
 
 private:
 	void addSliderControlsForIndex(QString name, QString help, int index, QBoxLayout* layout);
 	void addSmallControlsForIndex(QString name, QString help, int index, QBoxLayout* layout);
 
-	Vector3DDataAdapterPtr mData;
-	boost::array<DoubleDataAdapterPtr, 3> mDoubleAdapter;
+	Vector3DPropertyBasePtr mData;
+	boost::array<DoublePropertyBasePtr, 3> mDoubleAdapter;
 	boost::array<QWidget*, 3> mWidgets;
 };
 

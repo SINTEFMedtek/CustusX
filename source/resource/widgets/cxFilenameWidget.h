@@ -48,7 +48,7 @@ class FileInputWidget;
 
 /**\brief Composite widget for filename edit.
  *
- *  Accepts a StringDataAdapterPtr
+ *  Accepts a StringPropertyBasePtr
  *
  * \ingroup cx_resource_widgets
  */
@@ -56,13 +56,13 @@ class cxResourceWidgets_EXPORT FilenameWidget: public OptimizedUpdateWidget
 {
 Q_OBJECT
 public:
-	FilenameWidget(QWidget* parent, StringDataAdapterPtr, QGridLayout* gridLayout = 0, int row = 0);
+	FilenameWidget(QWidget* parent, StringPropertyBasePtr, QGridLayout* gridLayout = 0, int row = 0);
 private slots:
 	virtual void prePaintEvent();
 	void editingFinished();
 private:
 	FileInputWidget* mFileInput;
-	StringDataAdapterPtr mData;
+	StringPropertyBasePtr mData;
 };
 
 } // namespace cx

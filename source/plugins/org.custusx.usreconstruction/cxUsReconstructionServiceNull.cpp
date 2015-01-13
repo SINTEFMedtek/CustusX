@@ -66,10 +66,10 @@ USReconstructInputData UsReconstructionServiceNull::getSelectedFileData()
 	return USReconstructInputData();
 }
 
-DataAdapterPtr UsReconstructionServiceNull::getParam(QString uid)
+PropertyPtr UsReconstructionServiceNull::getParam(QString uid)
 {
 	printWarning();
-	return DataAdapterNull::create();
+	return PropertyNull::create();
 }
 
 //ReconstructParamsPtr UsReconstructionServiceNull::getParams()
@@ -78,10 +78,10 @@ DataAdapterPtr UsReconstructionServiceNull::getParam(QString uid)
 //	return ReconstructParamsPtr();
 //}
 
-std::vector<DataAdapterPtr> UsReconstructionServiceNull::getAlgoOptions()
+std::vector<PropertyPtr> UsReconstructionServiceNull::getAlgoOptions()
 {
 	printWarning();
-	return std::vector<DataAdapterPtr>();
+	return std::vector<PropertyPtr>();
 }
 
 XmlOptionFile UsReconstructionServiceNull::getSettings()

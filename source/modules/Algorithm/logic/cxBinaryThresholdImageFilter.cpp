@@ -81,25 +81,25 @@ QString BinaryThresholdImageFilter::getHelp() const
 	        "</html>";
 }
 
-DoublePairDataAdapterXmlPtr BinaryThresholdImageFilter::getThresholdOption(QDomElement root)
+DoublePairPropertyPtr BinaryThresholdImageFilter::getThresholdOption(QDomElement root)
 {
-	DoublePairDataAdapterXmlPtr retval = DoublePairDataAdapterXml::initialize("Thresholds", "",
+	DoublePairPropertyPtr retval = DoublePairProperty::initialize("Thresholds", "",
 																			  "Select lower and upper threshold for the segmentation", DoubleRange(0, 100, 1), 0,
 																			  root);
 	return retval;
 }
 
-BoolDataAdapterXmlPtr BinaryThresholdImageFilter::getGenerateSurfaceOption(QDomElement root)
+BoolPropertyPtr BinaryThresholdImageFilter::getGenerateSurfaceOption(QDomElement root)
 {
-	BoolDataAdapterXmlPtr retval = BoolDataAdapterXml::initialize("Generate Surface", "",
+	BoolPropertyPtr retval = BoolProperty::initialize("Generate Surface", "",
 																  "Generate a surface of the output volume", true,
 																  root);
 	return retval;
 }
 
-ColorDataAdapterXmlPtr BinaryThresholdImageFilter::getColorOption(QDomElement root)
+ColorPropertyPtr BinaryThresholdImageFilter::getColorOption(QDomElement root)
 {
-	return ColorDataAdapterXml::initialize("Color", "",
+	return ColorProperty::initialize("Color", "",
 	                                            "Color of output model.",
 	                                            QColor("green"), root);
 }
@@ -115,9 +115,9 @@ void BinaryThresholdImageFilter::createOptions()
 
 void BinaryThresholdImageFilter::createInputTypes()
 {
-	SelectDataStringDataAdapterBasePtr temp;
+	SelectDataStringPropertyBasePtr temp;
 
-	temp = SelectImageStringDataAdapter::New(mPatientModelService);
+	temp = StringPropertySelectImage::New(mPatientModelService);
 	temp->setValueName("Input");
 	temp->setHelp("Select image input for thresholding");
 	connect(temp.get(), SIGNAL(dataChanged(QString)), this, SLOT(imageChangedSlot(QString)));
@@ -126,14 +126,14 @@ void BinaryThresholdImageFilter::createInputTypes()
 
 void BinaryThresholdImageFilter::createOutputTypes()
 {
-	SelectDataStringDataAdapterBasePtr temp;
+	SelectDataStringPropertyBasePtr temp;
 
-	temp = SelectDataStringDataAdapter::New(mPatientModelService);
+	temp = StringPropertySelectData::New(mPatientModelService);
 	temp->setValueName("Output");
 	temp->setHelp("Output thresholded binary image");
 	mOutputTypes.push_back(temp);
 
-	temp = SelectDataStringDataAdapter::New(mPatientModelService);
+	temp = StringPropertySelectData::New(mPatientModelService);
 	temp->setValueName("Contour");
 	temp->setHelp("Output contour generated from thresholded binary image.");
 	mOutputTypes.push_back(temp);
@@ -178,8 +178,8 @@ bool BinaryThresholdImageFilter::execute()
 	if (!input)
 		return false;
 
-	DoublePairDataAdapterXmlPtr thresholds = this->getThresholdOption(mCopiedOptions);
-	BoolDataAdapterXmlPtr generateSurface = this->getGenerateSurfaceOption(mCopiedOptions);
+	DoublePairPropertyPtr thresholds = this->getThresholdOption(mCopiedOptions);
+	BoolPropertyPtr generateSurface = this->getGenerateSurfaceOption(mCopiedOptions);
 
 	itkImageType::ConstPointer itkImage = AlgorithmHelper::getITKfromSSCImage(input);
 
@@ -248,7 +248,7 @@ bool BinaryThresholdImageFilter::postProcess()
 	// set contour output
 	if (mRawContour!=NULL)
 	{
-		ColorDataAdapterXmlPtr colorOption = this->getColorOption(mOptions);
+		ColorPropertyPtr colorOption = this->getColorOption(mOptions);
 		MeshPtr contour = ContourFilter::postProcess(mRawContour, output, colorOption->getValue());
 		mOutputTypes[1]->setValue(contour->getUid());
 		mRawContour = vtkPolyDataPtr();

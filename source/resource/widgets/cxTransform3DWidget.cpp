@@ -232,7 +232,7 @@ void Transform3DWidget::addAngleControls(QString uid, QString name, int index, Q
 {
   QHBoxLayout* hLayout = new QHBoxLayout;
 
-  DoubleDataAdapterXmlPtr adapter = DoubleDataAdapterXml::initialize(uid, name, "", 0, DoubleRange(-M_PI,M_PI,M_PI/180),1);
+  DoublePropertyPtr adapter = DoubleProperty::initialize(uid, name, "", 0, DoubleRange(-M_PI,M_PI,M_PI/180),1);
   connect(adapter.get(), SIGNAL(changed()), this, SLOT(changedSlot()));
   adapter->setInternal2Display(180/M_PI);
   hLayout->addWidget(new SpinBoxGroupWidget(this, adapter));
@@ -254,7 +254,7 @@ void Transform3DWidget::addTranslationControls(QString uid, QString name, int in
 {
   QHBoxLayout* hLayout = new QHBoxLayout;
 
-  DoubleDataAdapterXmlPtr adapter = DoubleDataAdapterXml::initialize(uid, name, "", 0, DoubleRange(-10000,10000,0.1),1);
+  DoublePropertyPtr adapter = DoubleProperty::initialize(uid, name, "", 0, DoubleRange(-10000,10000,0.1),1);
   connect(adapter.get(), SIGNAL(changed()), this, SLOT(changedSlot()));
   adapter->setInternal2Display(1.0);
   hLayout->addWidget(new SpinBoxGroupWidget(this, adapter));

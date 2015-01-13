@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-SelectDataStringDataAdapterBase::SelectDataStringDataAdapterBase(PatientModelServicePtr patientModelService, QString typeRegexp) :
+SelectDataStringPropertyBase::SelectDataStringPropertyBase(PatientModelServicePtr patientModelService, QString typeRegexp) :
 	mTypeRegexp(typeRegexp),
 	mPatientModelService(patientModelService)
 {
@@ -50,7 +50,7 @@ SelectDataStringDataAdapterBase::SelectDataStringDataAdapterBase(PatientModelSer
 /**
 	* Erase all data with type not conforming to input regexp.
 	*/
-std::map<QString, DataPtr> SelectDataStringDataAdapterBase::filterOnType(std::map<QString, DataPtr> input, QString regexp) const
+std::map<QString, DataPtr> SelectDataStringPropertyBase::filterOnType(std::map<QString, DataPtr> input, QString regexp) const
 {
 	QRegExp reg(regexp);
 
@@ -66,7 +66,7 @@ std::map<QString, DataPtr> SelectDataStringDataAdapterBase::filterOnType(std::ma
 	return input;
 }
 
-QStringList SelectDataStringDataAdapterBase::getValueRange() const
+QStringList SelectDataStringPropertyBase::getValueRange() const
 {
 	std::map<QString, DataPtr> data = mPatientModelService->getData();
 	data = this->filterOnType(data, mTypeRegexp);
@@ -78,7 +78,7 @@ QStringList SelectDataStringDataAdapterBase::getValueRange() const
 	return retval;
 }
 
-QString SelectDataStringDataAdapterBase::convertInternal2Display(QString internal)
+QString SelectDataStringPropertyBase::convertInternal2Display(QString internal)
 {
 	DataPtr data = mPatientModelService->getData(internal);
 	if (!data)
@@ -86,28 +86,28 @@ QString SelectDataStringDataAdapterBase::convertInternal2Display(QString interna
 	return qstring_cast(data->getName());
 }
 
-QString SelectDataStringDataAdapterBase::getHelp() const
+QString SelectDataStringPropertyBase::getHelp() const
 {
 	return mHelp;
 }
 
-QString SelectDataStringDataAdapterBase::getDisplayName() const
+QString SelectDataStringPropertyBase::getDisplayName() const
 {
 	return mValueName;
 }
 
-void SelectDataStringDataAdapterBase::setHelp(QString text)
+void SelectDataStringPropertyBase::setHelp(QString text)
 {
 	mHelp = text;
 	emit changed();
 }
-void SelectDataStringDataAdapterBase::setValueName(QString val)
+void SelectDataStringPropertyBase::setValueName(QString val)
 {
 	mValueName = val;
 	emit changed();
 }
 
-DataPtr SelectDataStringDataAdapterBase::getData() const
+DataPtr SelectDataStringPropertyBase::getData() const
 {
 	return mPatientModelService->getData(this->getValue());
 }

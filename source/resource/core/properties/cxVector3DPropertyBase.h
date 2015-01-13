@@ -31,13 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 
-/*
- * sscVector3DDataAdapter.h
- *
- *  Created on: Jul 25, 2011
- *      Author: christiana
- */
-
 #ifndef CXVECTOR3DPROPERTYBASE_H_
 #define CXVECTOR3DPROPERTYBASE_H_
 
@@ -55,15 +48,15 @@ namespace cx
 
 /**\brief Abstract interface for interaction with internal Vector3D-valued data
  *
- *  Refer to DoubleDataAdapter for a description.
+ *  Refer to DoubleProperty for a description.
  *
  * \ingroup cx_resource_core_dataadapters
  */
-class cxResource_EXPORT Vector3DDataAdapter: public DataAdapter
+class cxResource_EXPORT Vector3DPropertyBase: public Property
 {
 Q_OBJECT
 public:
-	virtual ~Vector3DDataAdapter()
+	virtual ~Vector3DPropertyBase()
 	{
 	}
 
@@ -109,15 +102,15 @@ public:
 		return 0;
 	} ///< number of relevant decimals in value
 };
-typedef boost::shared_ptr<Vector3DDataAdapter> Vector3DDataAdapterPtr;
+typedef boost::shared_ptr<Vector3DPropertyBase> Vector3DPropertyBasePtr;
 
 /** Dummy implementation */
-class cxResource_EXPORT Vector3DDataAdapterNull: public Vector3DDataAdapter
+class cxResource_EXPORT Vector3DPropertyNull: public Vector3DPropertyBase
 {
 Q_OBJECT
 
 public:
-	virtual ~Vector3DDataAdapterNull()
+	virtual ~Vector3DPropertyNull()
 	{
 	}
 	virtual QString getDisplayName() const

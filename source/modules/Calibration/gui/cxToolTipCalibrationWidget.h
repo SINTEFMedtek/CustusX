@@ -83,7 +83,7 @@ private:
   QPushButton* mTestButton;
   QLabel* mCalibrationLabel;
   QLabel* mDeltaLabel;
-  SelectToolStringDataAdapterPtr mTools;
+  StringPropertySelectToolPtr mTools;
 };
 
 

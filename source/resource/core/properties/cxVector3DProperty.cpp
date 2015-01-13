@@ -30,14 +30,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-
-/*
- * sscVector3DDataAdapterXml.cpp
- *
- *  Created on: Jul 25, 2011
- *      Author: christiana
- */
-
 #include "cxVector3DProperty.h"
 
 #include <iostream>
@@ -51,10 +43,10 @@ namespace cx
 /** Make sure one given option exists witin root.
  * If not present, fill inn the input defaults.
  */
-Vector3DDataAdapterXmlPtr Vector3DDataAdapterXml::initialize(const QString& uid, QString name, QString help,
+Vector3DPropertyPtr Vector3DProperty::initialize(const QString& uid, QString name, QString help,
 	Vector3D value, DoubleRange range, int decimals, QDomNode root)
 {
-	Vector3DDataAdapterXmlPtr retval(new Vector3DDataAdapterXml());
+	Vector3DPropertyPtr retval(new Vector3DProperty());
 	retval->mUid = uid;
 	retval->mName = name.isEmpty() ? uid : name;
 	retval->mHelp = help;
@@ -65,37 +57,37 @@ Vector3DDataAdapterXmlPtr Vector3DDataAdapterXml::initialize(const QString& uid,
 	return retval;
 }
 
-Vector3DDataAdapterXml::Vector3DDataAdapterXml()
+Vector3DProperty::Vector3DProperty()
 {
 	mFactor = 1.0;
 }
 
-void Vector3DDataAdapterXml::setInternal2Display(double factor)
+void Vector3DProperty::setInternal2Display(double factor)
 {
 	mFactor = factor;
 }
 
-QString Vector3DDataAdapterXml::getDisplayName() const
+QString Vector3DProperty::getDisplayName() const
 {
 	return mName;
 }
 
-QString Vector3DDataAdapterXml::getUid() const
+QString Vector3DProperty::getUid() const
 {
 	return mUid;
 }
 
-QString Vector3DDataAdapterXml::getHelp() const
+QString Vector3DProperty::getHelp() const
 {
 	return mHelp;
 }
 
-Vector3D Vector3DDataAdapterXml::getValue() const
+Vector3D Vector3DProperty::getValue() const
 {
 	return mValue;
 }
 
-bool Vector3DDataAdapterXml::setValue(const Vector3D& val)
+bool Vector3DProperty::setValue(const Vector3D& val)
 {
 	if (similar(val, mValue))
 		return false;
@@ -111,18 +103,18 @@ bool Vector3DDataAdapterXml::setValue(const Vector3D& val)
 	return true;
 }
 
-DoubleRange Vector3DDataAdapterXml::getValueRange() const
+DoubleRange Vector3DProperty::getValueRange() const
 {
 	return mRange;
 }
 
-void Vector3DDataAdapterXml::setValueRange(DoubleRange range)
+void Vector3DProperty::setValueRange(DoubleRange range)
 {
 	mRange = range;
 	emit changed();
 }
 
-int Vector3DDataAdapterXml::getValueDecimals() const
+int Vector3DProperty::getValueDecimals() const
 {
 	return mDecimals;
 }

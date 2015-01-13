@@ -104,9 +104,9 @@ public:
 	virtual QString getSelectedFilename() const; ///< Get the currently selected filename
 	virtual USReconstructInputData getSelectedFileData(); ///< Return the currently selected input data
 //	virtual ReconstructParamsPtr getParams(); ///< Return control parameters that can be adjusted by the GUI or similar prior to reconstruction
-	virtual DataAdapterPtr getParam(QString uid); ///< Return one of the standard parameters
+	virtual PropertyPtr getParam(QString uid); ///< Return one of the standard parameters
 
-	virtual std::vector<DataAdapterPtr> getAlgoOptions(); ///< Return control parameters for the currently selected algorithm, adjustable like getParams()
+	virtual std::vector<PropertyPtr> getAlgoOptions(); ///< Return control parameters for the currently selected algorithm, adjustable like getParams()
 	virtual XmlOptionFile getSettings(); ///< Return the settings xml file where parameters are stored
 	virtual OutputVolumeParams getOutputVolumeParams() const; ///< Return params controlling the output data. These are data-dependent.
 
@@ -154,7 +154,7 @@ private:
 	void onServiceRemoved(ReconstructionMethodService* service);
 
 	ReconstructParamsPtr mParams;
-	std::vector<DataAdapterPtr> mAlgoOptions;
+	std::vector<PropertyPtr> mAlgoOptions;
 	USReconstructInputData mOriginalFileData; ///< original version of loaded data. Use as basis when recalculating due to changed params.
 
 	OutputVolumeParams mOutputVolumeParams;

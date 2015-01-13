@@ -46,7 +46,7 @@ ActiveToolWidget::ActiveToolWidget(QWidget* parent) :
   this->setObjectName("ActiveToolWidget");
   layout->setMargin(0);
 
-  LabeledComboBoxWidget*  combo = new LabeledComboBoxWidget(this, ActiveToolStringDataAdapter::New());
+  LabeledComboBoxWidget*  combo = new LabeledComboBoxWidget(this, StringPropertyActiveTool::New());
   layout->addWidget(combo);
 }
 

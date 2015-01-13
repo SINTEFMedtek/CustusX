@@ -62,7 +62,7 @@ class TransferFunctionColorWidget;
 
 /** Superclass for all doubles interacting with a ImageTFData.
  */
-class cxGui_EXPORT DoubleDataAdapterImageTFDataBase : public DoubleDataAdapter
+class cxGui_EXPORT DoubleDataAdapterImageTFDataBase : public DoublePropertyBase
 {
   Q_OBJECT
 public:

@@ -137,7 +137,7 @@ void ToolConfigureGroupBox::createTrackingSystemSelector()
 {
 	QString defaultValue = "";
 	TrackerConfigurationPtr config = trackingService()->getConfiguration();
-	mTrackingSystemSelector = StringDataAdapterXml::initialize("trackingsystem", "Tracking System",
+	mTrackingSystemSelector = StringProperty::initialize("trackingsystem", "Tracking System",
 															   "Select tracking system to use",
 															   defaultValue,
 															   config->getSupportedTrackingSystems(),
@@ -145,7 +145,7 @@ void ToolConfigureGroupBox::createTrackingSystemSelector()
 	connect(mTrackingSystemSelector.get(), SIGNAL(changed()), this, SLOT(filterToolsSlot()));
 }
 
-StringDataAdapterPtr ToolConfigureGroupBox::getTrackingSystemSelector()
+StringPropertyBasePtr ToolConfigureGroupBox::getTrackingSystemSelector()
 {
 	return mTrackingSystemSelector;
 }

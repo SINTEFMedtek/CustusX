@@ -53,12 +53,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-QWidget* sscCreateDataWidget(QWidget* parent, DataAdapterPtr data, QGridLayout* gridLayout, int row)
+QWidget* sscCreateDataWidget(QWidget* parent, PropertyPtr data, QGridLayout* gridLayout, int row)
 {
-	StringDataAdapterPtr str = boost::dynamic_pointer_cast<StringDataAdapter>(data);
+	StringPropertyBasePtr str = boost::dynamic_pointer_cast<StringPropertyBase>(data);
 	if (str)
 	{
-		if (str->getGuiRepresentation()==StringDataAdapter::grFILENAME)
+		if (str->getGuiRepresentation()==StringPropertyBase::grFILENAME)
 			return new FilenameWidget(parent, str, gridLayout, row);
 		else if (str->getAllowOnlyValuesInRange())
 			return new LabeledComboBoxWidget(parent, str, gridLayout, row);
@@ -66,35 +66,35 @@ QWidget* sscCreateDataWidget(QWidget* parent, DataAdapterPtr data, QGridLayout* 
 			return new LabeledLineEditWidget(parent, str, gridLayout, row);
 	}
 
-	DoubleDataAdapterPtr dbl = boost::dynamic_pointer_cast<DoubleDataAdapter>(data);
+	DoublePropertyBasePtr dbl = boost::dynamic_pointer_cast<DoublePropertyBase>(data);
 	if (dbl)
 	{
-		DoubleDataAdapter::GuiRepresentation gui = dbl->getGuiRepresentation();
+		DoublePropertyBase::GuiRepresentation gui = dbl->getGuiRepresentation();
         switch(gui)
         {
-        case DoubleDataAdapter::grSLIDER:
+        case DoublePropertyBase::grSLIDER:
             return new SpinBoxAndSliderGroupWidget(parent, dbl, gridLayout, row);
             break;
-        case DoubleDataAdapter::grSPINBOX:
+        case DoublePropertyBase::grSPINBOX:
             return new SpinBoxGroupWidget(parent, dbl, gridLayout, row);
             break;
-        case DoubleDataAdapter::grDIAL:
+        case DoublePropertyBase::grDIAL:
         	return new SpinBoxAndDialGroupWidget(parent, dbl, gridLayout, row);
         }
 	}
 
-	BoolDataAdapterPtr bl = boost::dynamic_pointer_cast<BoolDataAdapter>(data);
+	BoolPropertyBasePtr bl = boost::dynamic_pointer_cast<BoolPropertyBase>(data);
 	if (bl)
 	{
 		return new CheckBoxWidget(parent, bl, gridLayout, row);
 	}
 
-	ColorDataAdapterPtr cl = boost::dynamic_pointer_cast<ColorDataAdapter>(data);
+	ColorPropertyBasePtr cl = boost::dynamic_pointer_cast<ColorPropertyBase>(data);
 	if (cl)
 	{
 		return new ColorSelectWidget(parent, cl, gridLayout, row);
 	}
-	DoublePairDataAdapterPtr doublepair = boost::dynamic_pointer_cast<DoublePairDataAdapter>(data);
+	DoublePairPropertyBasePtr doublepair = boost::dynamic_pointer_cast<DoublePairPropertyBase>(data);
 	if (doublepair)
 	{
 		return new SliderRangeGroupWidget(parent, doublepair, gridLayout, row);

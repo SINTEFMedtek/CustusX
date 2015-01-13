@@ -104,7 +104,7 @@ EraserWidget::EraserWidget(QWidget* parent) :
 
 
 	double sphereRadius = 10;
-	mSphereSizeAdapter = DoubleDataAdapterXml::initialize("SphereSize", "Sphere Size", "Radius of Eraser Sphere", sphereRadius, DoubleRange(1,200,1), 0, QDomNode());
+	mSphereSizeAdapter = DoubleProperty::initialize("SphereSize", "Sphere Size", "Radius of Eraser Sphere", sphereRadius, DoubleRange(1,200,1), 0, QDomNode());
 	connect(mSphereSizeAdapter.get(), SIGNAL(changed()), this, SLOT(sphereSizeChangedSlot()));
 	mSphereSize = new SpinBoxAndSliderGroupWidget(this, mSphereSizeAdapter);
 	layout->addWidget(mSphereSize);

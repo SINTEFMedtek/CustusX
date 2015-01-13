@@ -54,12 +54,12 @@ ProbeConfigWidget::ProbeConfigWidget(QWidget* parent) : BaseWidget(parent, "Prob
 	this->setToolTip(this->defaultWhatsThis());
 
 	QVBoxLayout* topLayout = new QVBoxLayout(this);
-	mActiveProbeConfig = ActiveProbeConfigurationStringDataAdapter::New();
+	mActiveProbeConfig = StringPropertyActiveProbeConfiguration::New();
 	connect(mActiveProbeConfig.get(), SIGNAL(changed()), this, SLOT(activeProbeConfigurationChangedSlot()));
 	mActiveProbeConfigWidget = new LabeledComboBoxWidget(this, mActiveProbeConfig);
 	topLayout->addWidget(mActiveProbeConfigWidget);
 
-	mOrigin = Vector3DDataAdapterXml::initialize("Origin",
+	mOrigin = Vector3DProperty::initialize("Origin",
 		"Origin",
 		"Origin of tool space in the probe image.\nUnits in pixels.",
 		Vector3D(0,0,0),
@@ -90,12 +90,12 @@ ProbeConfigWidget::ProbeConfigWidget(QWidget* parent) : BaseWidget(parent, "Prob
 	topLayout->addWidget(sectorGroupBox);
 
 	sectorLayout->addWidget(mOriginWidget);
-	DoublePairDataAdapterXmlPtr dataAdapter = DoublePairDataAdapterXml::initialize("Depth", "Depth", "Define probe depth.\nUnits in pixels.", DoubleRange(0, 1000, 1), 1);
+	DoublePairPropertyPtr dataAdapter = DoublePairProperty::initialize("Depth", "Depth", "Define probe depth.\nUnits in pixels.", DoubleRange(0, 1000, 1), 1);
 	mDepthWidget = new SliderRangeGroupWidget(this, dataAdapter);
 	connect(mDepthWidget, SIGNAL(valueChanged(double, double)), this, SLOT(guiProbeSectorChanged()));
 	sectorLayout->addWidget(mDepthWidget);
 
-	mWidth = DoubleDataAdapterXml::initialize("width", "Width", "Width of probe sector", 0,
+	mWidth = DoubleProperty::initialize("width", "Width", "Width of probe sector", 0,
 						DoubleRange(0, M_PI, M_PI/180), 0);
 	mWidth->setInternal2Display(180.0/M_PI);
 	connect(mWidth.get(), SIGNAL(changed()), this, SLOT(guiProbeSectorChanged()));

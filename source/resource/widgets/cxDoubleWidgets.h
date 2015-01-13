@@ -136,7 +136,7 @@ public:
 /**\brief Composite widget for scalar data manipulation.
  *
  * Consists of <namelabel, valueedit, slider>.
- * Insert a subclass of DoubDoubleDataAdapter order to connect to data.
+ * Insert a subclass of DoublePropertyBasePtr in order to connect to data.
  *
  * Before use: enable the widgets you need, then add either to Own layout, in case you wish to
  * use the widget normally, or add to grid, in case you wish to integrate the elements into a
@@ -148,7 +148,7 @@ class cxResourceWidgets_EXPORT ScalarInteractionWidget: public OptimizedUpdateWi
 {
 Q_OBJECT
 public:
-	ScalarInteractionWidget(QWidget* parent, DoubleDataAdapterPtr);
+	ScalarInteractionWidget(QWidget* parent, DoublePropertyBasePtr);
 
 	void enableLabel();
 	void enableSlider();
@@ -170,7 +170,7 @@ private slots:
 
 protected:
     virtual void prePaintEvent();
-	DoubleDataAdapterPtr mData;
+	DoublePropertyBasePtr mData;
 
 private:
 	void enableAll(bool);
@@ -186,7 +186,7 @@ private:
 /**\brief Composite widget for scalar data manipulation.
  *
  * Consists of <namelabel, valueedit, slider>.
- * Insert a subclass of DoubDoubleDataAdapter order to connect to data.
+ * Insert a subclass of DoublePropertyBasePtr in order to connect to data.
  *
  * \ingroup cx_resource_widgets
  */
@@ -194,13 +194,13 @@ class cxResourceWidgets_EXPORT SliderGroupWidget: public ScalarInteractionWidget
 {
 Q_OBJECT
 public:
-	SliderGroupWidget(QWidget* parent, DoubleDataAdapterPtr, QGridLayout* gridLayout = 0, int row = 0);
+	SliderGroupWidget(QWidget* parent, DoublePropertyBasePtr, QGridLayout* gridLayout = 0, int row = 0);
 };
 
 /**\brief Composite widget for scalar data manipulation.
  *
  * Consists of <namelabel, valueedit, slider>.
- * Insert a subclass of DoubDoubleDataAdapter order to connect to data.
+ * Insert a subclass of DoublePropertyBasePtr in order to connect to data.
  *
  * Uses a QDoubleSpinBox instead of a slider - this gives a more compact widget.
  *
@@ -210,13 +210,13 @@ class cxResourceWidgets_EXPORT SpinBoxGroupWidget: public ScalarInteractionWidge
 {
 Q_OBJECT
 public:
-	SpinBoxGroupWidget(QWidget* parent, DoubleDataAdapterPtr, QGridLayout* gridLayout = 0, int row = 0);
+	SpinBoxGroupWidget(QWidget* parent, DoublePropertyBasePtr, QGridLayout* gridLayout = 0, int row = 0);
 };
 
 /**\brief Composite widget for scalar data manipulation.
  *
  * Consists of <namelabel, valueedit, slider>.
- * Insert a subclass of DoubDoubleDataAdapter in order to connect to data.
+ * Insert a subclass of DoublePropertyBasePtr in order to connect to data.
  *
  * Uses both a slider and a spin box
  *
@@ -226,14 +226,14 @@ class cxResourceWidgets_EXPORT SpinBoxAndSliderGroupWidget: public ScalarInterac
 {
 Q_OBJECT
 public:
-	SpinBoxAndSliderGroupWidget(QWidget* parent, DoubleDataAdapterPtr, QGridLayout* gridLayout = 0, int row = 0);
+	SpinBoxAndSliderGroupWidget(QWidget* parent, DoublePropertyBasePtr, QGridLayout* gridLayout = 0, int row = 0);
 };
 typedef boost::shared_ptr<SpinBoxAndSliderGroupWidget> SpinBoxAndSliderGroupWidgetPtr;
 
 /**\brief Composite widget for scalar data manipulation.
  *
  * Consists of <namelabel, valueedit, dial>.
- * Insert a subclass of DoubDoubleDataAdapter in order to connect to data.
+ * Insert a subclass of DoublePropertyBasePtr in order to connect to data.
  *
  * Uses both a dial and a spin box
  *
@@ -243,7 +243,7 @@ class cxResourceWidgets_EXPORT SpinBoxAndDialGroupWidget: public ScalarInteracti
 {
 Q_OBJECT
 public:
-SpinBoxAndDialGroupWidget(QWidget* parent, DoubleDataAdapterPtr, QGridLayout* gridLayout = 0, int row = 0);
+SpinBoxAndDialGroupWidget(QWidget* parent, DoublePropertyBasePtr, QGridLayout* gridLayout = 0, int row = 0);
 };
 typedef boost::shared_ptr<SpinBoxAndDialGroupWidget> SpinBoxAndDialGroupWidgetPtr;
 
@@ -251,7 +251,7 @@ typedef boost::shared_ptr<SpinBoxAndDialGroupWidget> SpinBoxAndDialGroupWidgetPt
 /**\brief Composite widget for scalar data manipulation.
  *
  * Consists of <namelabel, valueedit, slider>.
- * Insert a subclass of DoubDoubleDataAdapter order to connect to data.
+ * Insert a subclass of DoublePropertyBasePtr order to connect to data.
  *
  * This slider is custom-made and infinitely long.
  *
@@ -261,7 +261,7 @@ class cxResourceWidgets_EXPORT SpinBoxInfiniteSliderGroupWidget: public ScalarIn
 {
 Q_OBJECT
 public:
-	SpinBoxInfiniteSliderGroupWidget(QWidget* parent, DoubleDataAdapterPtr, QGridLayout* gridLayout = 0, int row = 0);
+	SpinBoxInfiniteSliderGroupWidget(QWidget* parent, DoublePropertyBasePtr, QGridLayout* gridLayout = 0, int row = 0);
 };
 
 } //namespace cx

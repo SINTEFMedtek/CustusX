@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-SpaceDataAdapterXml::SpaceDataAdapterXml() : 	mIsReadOnly(false)
+SpaceProperty::SpaceProperty() : 	mIsReadOnly(false)
 {
 
 }
@@ -48,9 +48,9 @@ SpaceDataAdapterXml::SpaceDataAdapterXml() : 	mIsReadOnly(false)
 /** Make sure one given option exists witin root.
  * If not present, fill inn the input defaults.
  */
-SpaceDataAdapterXmlPtr SpaceDataAdapterXml::initialize(const QString& uid, QString name, QString help, Space value, std::vector<Space> range, QDomNode root)
+SpacePropertyPtr SpaceProperty::initialize(const QString& uid, QString name, QString help, Space value, std::vector<Space> range, QDomNode root)
 {
-	SpaceDataAdapterXmlPtr retval(new SpaceDataAdapterXml());
+	SpacePropertyPtr retval(new SpaceProperty());
 	retval->mUid = uid;
 	retval->mName = name.isEmpty() ? uid : name;
 	retval->mHelp = help;
@@ -61,14 +61,14 @@ SpaceDataAdapterXmlPtr SpaceDataAdapterXml::initialize(const QString& uid, QStri
 	return retval;
 }
 
-void SpaceDataAdapterXml::setSpaceProvider(SpaceProviderPtr provider)
+void SpaceProperty::setSpaceProvider(SpaceProviderPtr provider)
 {
 	mProvider = provider;
-	connect(mProvider.get(), &SpaceProvider::spaceAddedOrRemoved, this, &SpaceDataAdapterXml::providerChangedSlot);
+	connect(mProvider.get(), &SpaceProvider::spaceAddedOrRemoved, this, &SpaceProperty::providerChangedSlot);
 	this->providerChangedSlot();
 }
 
-void SpaceDataAdapterXml::providerChangedSlot()
+void SpaceProperty::providerChangedSlot()
 {
 	std::map<QString, QString> names = mProvider->getDisplayNamesForCoordRefObjects();
 	this->setRefObjectDisplayNames(names);
@@ -78,28 +78,28 @@ void SpaceDataAdapterXml::providerChangedSlot()
 }
 
 
-void SpaceDataAdapterXml::setReadOnly(bool val)
+void SpaceProperty::setReadOnly(bool val)
 {
 	mIsReadOnly = val;
 	emit changed();
 }
 
-QString SpaceDataAdapterXml::getDisplayName() const
+QString SpaceProperty::getDisplayName() const
 {
 	return mName;
 }
 
-QString SpaceDataAdapterXml::getUid() const
+QString SpaceProperty::getUid() const
 {
 	return mUid;
 }
 
-QString SpaceDataAdapterXml::getHelp() const
+QString SpaceProperty::getHelp() const
 {
 	return mHelp;
 }
 
-void SpaceDataAdapterXml::setHelp(QString val)
+void SpaceProperty::setHelp(QString val)
 {
 	if (val == mHelp)
 		return;
@@ -109,12 +109,12 @@ void SpaceDataAdapterXml::setHelp(QString val)
 }
 
 
-Space SpaceDataAdapterXml::getValue() const
+Space SpaceProperty::getValue() const
 {
 	return mValue;
 }
 
-bool SpaceDataAdapterXml::setValue(const Space& val)
+bool SpaceProperty::setValue(const Space& val)
 {
 	if (val == mValue)
 		return false;
@@ -126,12 +126,12 @@ bool SpaceDataAdapterXml::setValue(const Space& val)
 	return true;
 }
 
-std::vector<Space> SpaceDataAdapterXml::getValueRange() const
+std::vector<Space> SpaceProperty::getValueRange() const
 {
 	return mRange;
 }
 
-void SpaceDataAdapterXml::setValueRange(std::vector<Space> range)
+void SpaceProperty::setValueRange(std::vector<Space> range)
 {
 	mRange = range;
 	emit changed();
@@ -140,14 +140,14 @@ void SpaceDataAdapterXml::setValueRange(std::vector<Space> range)
 /**If a mapping from internal name to display name has been set, use it.
  * Otherwise return the input.
  */
-QString SpaceDataAdapterXml::convertRefObjectInternal2Display(QString internal)
+QString SpaceProperty::convertRefObjectInternal2Display(QString internal)
 {
 	if (mDisplayNames.count(internal))
 		return mDisplayNames[internal];
 	return internal;
 }
 
-void SpaceDataAdapterXml::setRefObjectDisplayNames(std::map<QString, QString> names)
+void SpaceProperty::setRefObjectDisplayNames(std::map<QString, QString> names)
 {
 	mDisplayNames = names;
 	emit changed();

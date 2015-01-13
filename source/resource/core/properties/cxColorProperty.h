@@ -41,27 +41,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-typedef boost::shared_ptr<class ColorDataAdapterXml> ColorDataAdapterXmlPtr;
+typedef boost::shared_ptr<class ColorProperty> ColorPropertyPtr;
 
-/** DataAdapter for QColor values.
+/** Property for QColor values.
  *
  *
  * \ingroup cx_resource_core_dataadapters
  * \date Nov 22, 2012
  * \author christiana
  */
-class cxResource_EXPORT ColorDataAdapterXml: public ColorDataAdapter
+class cxResource_EXPORT ColorProperty: public ColorPropertyBase
 {
 Q_OBJECT
 public:
-    virtual ~ColorDataAdapterXml()
+	virtual ~ColorProperty()
     {
     }
 
     /** Make sure one given option exists witin root.
      * If not present, fill inn the input defaults.
      */
-    static ColorDataAdapterXmlPtr initialize(const QString& uid, QString name, QString help, QColor value, QDomNode root =
+	static ColorPropertyPtr initialize(const QString& uid, QString name, QString help, QColor value, QDomNode root =
         QDomNode());
 
 public:

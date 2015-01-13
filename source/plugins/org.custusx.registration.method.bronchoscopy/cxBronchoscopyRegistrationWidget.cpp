@@ -77,10 +77,10 @@ BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegServices servi
 	mVerticalLayout = new QVBoxLayout(this);
 	mOptions = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("bronchoscopyregistrationwidget");
 
-	mSelectMeshWidget = SelectMeshStringDataAdapter::New(mServices.patientModelService);
+	mSelectMeshWidget = StringPropertySelectMesh::New(mServices.patientModelService);
 	mSelectMeshWidget->setValueName("Centerline: ");
 
-	mSelectToolWidget = SelectToolStringDataAdapter::New();
+	mSelectToolWidget = StringPropertySelectTool::New();
 	//this->initializeTrackingService();
 
 	mProcessCenterlineButton = new QPushButton("Process centerline");
@@ -135,7 +135,7 @@ void BronchoscopyRegistrationWidget::initSessionSelector()
 	QString defaultValue;
 	if(!sessionUids.isEmpty())
 		defaultValue = sessionUids.last();
-	mSessionSelector = StringDataAdapterXml::initialize("bronchoscopy_session", "Bronchoscope path", "Select bronchoscope path for registration", defaultValue, sessionUids, QDomNode());
+	mSessionSelector = StringProperty::initialize("bronchoscopy_session", "Bronchoscope path", "Select bronchoscope path for registration", defaultValue, sessionUids, QDomNode());
 
 	//TODO: Let mSessionSelector display displaynames instead of uids (StringDataAdapterXml::setDisplayNames)
 }
@@ -348,22 +348,22 @@ void BronchoscopyRegistrationWidget::obscuredSlot(bool obscured)
 
 void BronchoscopyRegistrationWidget::createMaxNumberOfGenerations(QDomElement root)
 {
-	mMaxNumberOfGenerations = DoubleDataAdapterXml::initialize("Max number of generations in centerline", "",
+	mMaxNumberOfGenerations = DoubleProperty::initialize("Max number of generations in centerline", "",
 	"Set max number of generations centerline", 4, DoubleRange(0, 10, 1), 0,
 					root);
-	mMaxNumberOfGenerations->setGuiRepresentation(DoubleDataAdapter::grSLIDER);
+	mMaxNumberOfGenerations->setGuiRepresentation(DoublePropertyBase::grSLIDER);
 }
 
 void BronchoscopyRegistrationWidget::selectSubsetOfBranches(QDomElement root)
 {
-	mUseSubsetOfGenerations = BoolDataAdapterXml::initialize("Select branch generations to be used in registration", "",
+	mUseSubsetOfGenerations = BoolProperty::initialize("Select branch generations to be used in registration", "",
 																			"Select branch generations to be used in registration", false,
 																				root);
 }
 
 void BronchoscopyRegistrationWidget::useLocalRegistration(QDomElement root)
 {
-	mUseLocalRegistration = BoolDataAdapterXml::initialize("Use local registration", "",
+	mUseLocalRegistration = BoolProperty::initialize("Use local registration", "",
 																			"Use local registration", false,
 																				root);
 }

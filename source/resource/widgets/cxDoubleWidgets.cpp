@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ScalarInteractionWidget::ScalarInteractionWidget(QWidget* parent, DoubleDataAdapterPtr dataInterface) :
+ScalarInteractionWidget::ScalarInteractionWidget(QWidget* parent, DoublePropertyBasePtr dataInterface) :
     OptimizedUpdateWidget(parent), mSlider(NULL), mDial(NULL), mSpinBox(NULL), mLabel(NULL), mEdit(NULL), mInfiniteSlider(NULL)
 {
 	mData = dataInterface;
@@ -299,7 +299,7 @@ QSize DoubleLineEdit::minimumSizeHint() const
 // --------------------------------------------------------
 // --------------------------------------------------------
 
-SliderGroupWidget::SliderGroupWidget(QWidget* parent, DoubleDataAdapterPtr dataInterface, QGridLayout* gridLayout,
+SliderGroupWidget::SliderGroupWidget(QWidget* parent, DoublePropertyBasePtr dataInterface, QGridLayout* gridLayout,
 	int row) :
 	ScalarInteractionWidget(parent, dataInterface)
 {
@@ -313,7 +313,7 @@ SliderGroupWidget::SliderGroupWidget(QWidget* parent, DoubleDataAdapterPtr dataI
 // --------------------------------------------------------
 // --------------------------------------------------------
 
-SpinBoxGroupWidget::SpinBoxGroupWidget(QWidget* parent, DoubleDataAdapterPtr dataInterface,
+SpinBoxGroupWidget::SpinBoxGroupWidget(QWidget* parent, DoublePropertyBasePtr dataInterface,
 	QGridLayout* gridLayout, int row) :
 	ScalarInteractionWidget(parent, dataInterface)
 {
@@ -325,7 +325,7 @@ SpinBoxGroupWidget::SpinBoxGroupWidget(QWidget* parent, DoubleDataAdapterPtr dat
 
 // --------------------------------------------------------
 
-SpinBoxAndSliderGroupWidget::SpinBoxAndSliderGroupWidget(QWidget* parent, DoubleDataAdapterPtr dataInterface,
+SpinBoxAndSliderGroupWidget::SpinBoxAndSliderGroupWidget(QWidget* parent, DoublePropertyBasePtr dataInterface,
 	QGridLayout* gridLayout, int row) :
 	ScalarInteractionWidget(parent, dataInterface)
 {
@@ -336,7 +336,7 @@ SpinBoxAndSliderGroupWidget::SpinBoxAndSliderGroupWidget(QWidget* parent, Double
 	this->build(gridLayout, row);
 }
 // --------------------------------------------------------
-SpinBoxAndDialGroupWidget::SpinBoxAndDialGroupWidget(QWidget* parent, DoubleDataAdapterPtr dataInterface,
+SpinBoxAndDialGroupWidget::SpinBoxAndDialGroupWidget(QWidget* parent, DoublePropertyBasePtr dataInterface,
 	QGridLayout* gridLayout, int row) :
 	ScalarInteractionWidget(parent, dataInterface)
 {
@@ -350,7 +350,7 @@ SpinBoxAndDialGroupWidget::SpinBoxAndDialGroupWidget(QWidget* parent, DoubleData
 // --------------------------------------------------------
 
 SpinBoxInfiniteSliderGroupWidget::SpinBoxInfiniteSliderGroupWidget(QWidget* parent,
-	DoubleDataAdapterPtr dataInterface, QGridLayout* gridLayout, int row) :
+	DoublePropertyBasePtr dataInterface, QGridLayout* gridLayout, int row) :
 	ScalarInteractionWidget(parent, dataInterface)
 {
 	this->enableLabel();

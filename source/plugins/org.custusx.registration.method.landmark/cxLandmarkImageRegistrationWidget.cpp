@@ -67,7 +67,7 @@ LandmarkImageRegistrationWidget::LandmarkImageRegistrationWidget(RegServices ser
 	QString objectName, QString windowTitle) :
 	LandmarkRegistrationWidget(services, parent, objectName, windowTitle)
 {
-	mCurrentDataAdapter = SelectDataStringDataAdapter::New(mServices.patientModelService);
+	mCurrentDataAdapter = StringPropertySelectData::New(mServices.patientModelService);
 	connect(mCurrentDataAdapter.get(), SIGNAL(changed()), this, SLOT(onCurrentImageChanged()));
 	mImageLandmarkSource = ImageLandmarksSource::New();
 

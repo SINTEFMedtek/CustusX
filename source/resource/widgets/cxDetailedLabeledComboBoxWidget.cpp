@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-DetailedLabeledComboBoxWidget::DetailedLabeledComboBoxWidget(QWidget* parent, StringDataAdapterPtr adapter, QGridLayout* gridLayout, int row) :
+DetailedLabeledComboBoxWidget::DetailedLabeledComboBoxWidget(QWidget* parent, StringPropertyBasePtr adapter, QGridLayout* gridLayout, int row) :
 		LabeledComboBoxWidget(parent, adapter, gridLayout, row)
 {
 	//Add detailed button

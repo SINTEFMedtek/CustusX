@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-/**\brief Widget for the BoolDataAdapter.
+/**\brief Widget for the ColorPropertyBase.
  *
  * \ingroup cx_resource_widgets
  * \date 11/22/2012, 2012
@@ -55,7 +55,7 @@ class cxResourceWidgets_EXPORT ColorSelectWidget: public OptimizedUpdateWidget
 {
 Q_OBJECT
 public:
-    ColorSelectWidget(QWidget* parent, ColorDataAdapterPtr data, QGridLayout* gridLayout = 0, int row = 0);
+    ColorSelectWidget(QWidget* parent, ColorPropertyBasePtr data, QGridLayout* gridLayout = 0, int row = 0);
 
 private slots:
     void prePaintEvent();
@@ -64,7 +64,7 @@ private slots:
 private:
     QLabel* mLabel;
     cx::ColorSelectButton* mColorButton;
-    ColorDataAdapterPtr mData;
+    ColorPropertyBasePtr mData;
 };
 
 } // namespace cx

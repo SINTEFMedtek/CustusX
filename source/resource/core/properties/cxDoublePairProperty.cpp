@@ -40,10 +40,10 @@ namespace cx
 /** Make sure one given option exists witin root.
  * If not present, fill inn the input defaults.
  */
-DoublePairDataAdapterXmlPtr DoublePairDataAdapterXml::initialize(const QString& uid, QString name, QString help,
+DoublePairPropertyPtr DoublePairProperty::initialize(const QString& uid, QString name, QString help,
 	DoubleRange range, int decimals, QDomNode root)
 {
-	DoublePairDataAdapterXmlPtr retval(new DoublePairDataAdapterXml());
+	DoublePairPropertyPtr retval(new DoublePairProperty());
 	retval->mUid = uid;
 	retval->mName = name.isEmpty() ? uid : name;
 	retval->mHelp = help;
@@ -54,37 +54,37 @@ DoublePairDataAdapterXmlPtr DoublePairDataAdapterXml::initialize(const QString& 
 	return retval;
 }
 
-DoublePairDataAdapterXml::DoublePairDataAdapterXml()
+DoublePairProperty::DoublePairProperty()
 {
 	mFactor = 1.0;
 }
 
-void DoublePairDataAdapterXml::setInternal2Display(double factor)
+void DoublePairProperty::setInternal2Display(double factor)
 {
 	mFactor = factor;
 }
 
-QString DoublePairDataAdapterXml::getDisplayName() const
+QString DoublePairProperty::getDisplayName() const
 {
 	return mName;
 }
 
-QString DoublePairDataAdapterXml::getUid() const
+QString DoublePairProperty::getUid() const
 {
 	return mUid;
 }
 
-QString DoublePairDataAdapterXml::getHelp() const
+QString DoublePairProperty::getHelp() const
 {
 	return mHelp;
 }
 
-Eigen::Vector2d DoublePairDataAdapterXml::getValue() const
+Eigen::Vector2d DoublePairProperty::getValue() const
 {
 	return mValue;
 }
 
-bool DoublePairDataAdapterXml::setValue(const Eigen::Vector2d& val)
+bool DoublePairProperty::setValue(const Eigen::Vector2d& val)
 {
 	if (val == mValue)
 		return false;
@@ -96,18 +96,18 @@ bool DoublePairDataAdapterXml::setValue(const Eigen::Vector2d& val)
 	return true;
 }
 
-DoubleRange DoublePairDataAdapterXml::getValueRange() const
+DoubleRange DoublePairProperty::getValueRange() const
 {
 	return mRange;
 }
 
-void DoublePairDataAdapterXml::setValueRange(DoubleRange range)
+void DoublePairProperty::setValueRange(DoubleRange range)
 {
 	mRange = range;
 	emit changed();
 }
 
-int DoublePairDataAdapterXml::getValueDecimals() const
+int DoublePairProperty::getValueDecimals() const
 {
 	return mDecimals;
 }

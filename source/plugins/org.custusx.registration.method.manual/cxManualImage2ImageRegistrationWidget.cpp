@@ -43,8 +43,8 @@ namespace cx
 ManualImage2ImageRegistrationWidget::ManualImage2ImageRegistrationWidget(RegServices services, QWidget *parent, QString objectName) :
 	ManualImageRegistrationWidget(services, parent, objectName, "Manual Image to Image Registration")
 {
-	StringDataAdapterPtr fixedImage(new RegistrationFixedImageStringDataAdapter(services.registrationService, services.patientModelService));
-	StringDataAdapterPtr movingImage(new RegistrationMovingImageStringDataAdapter(services.registrationService, services.patientModelService));
+	StringPropertyBasePtr fixedImage(new StringPropertyRegistrationFixedImage(services.registrationService, services.patientModelService));
+	StringPropertyBasePtr movingImage(new StringPropertyRegistrationMovingImage(services.registrationService, services.patientModelService));
 
 	LabeledComboBoxWidget* fixed = new LabeledComboBoxWidget(this, fixedImage);
 	LabeledComboBoxWidget* moving = new LabeledComboBoxWidget(this, movingImage);

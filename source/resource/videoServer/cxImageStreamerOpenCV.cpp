@@ -61,28 +61,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-std::vector<DataAdapterPtr> ImageStreamerOpenCVArguments::getSettings(QDomElement root)
+std::vector<PropertyPtr> ImageStreamerOpenCVArguments::getSettings(QDomElement root)
 {
-	std::vector<DataAdapterPtr> retval;
+	std::vector<PropertyPtr> retval;
 	retval.push_back(this->getVideoPortOption(root));
 	retval.push_back(this->getPrintPropertiesOption(root));
 	return retval;
 }
 
-DoubleDataAdapterPtr ImageStreamerOpenCVArguments::getVideoPortOption(QDomElement root)
+DoublePropertyBasePtr ImageStreamerOpenCVArguments::getVideoPortOption(QDomElement root)
 {
-	DoubleDataAdapterXmlPtr retval;
-	retval = DoubleDataAdapterXml::initialize("videoport", "Video Port", "Select video source as an integer from 0 and up.", 0, DoubleRange(0, 10, 1), 0, root);
-	retval->setGuiRepresentation(DoubleDataAdapter::grSPINBOX);
+	DoublePropertyPtr retval;
+	retval = DoubleProperty::initialize("videoport", "Video Port", "Select video source as an integer from 0 and up.", 0, DoubleRange(0, 10, 1), 0, root);
+	retval->setGuiRepresentation(DoublePropertyBase::grSPINBOX);
 	retval->setGroup("OpenCV");
 	return retval;
 }
 
-BoolDataAdapterPtr ImageStreamerOpenCVArguments::getPrintPropertiesOption(QDomElement root)
+BoolPropertyBasePtr ImageStreamerOpenCVArguments::getPrintPropertiesOption(QDomElement root)
 {
-	BoolDataAdapterXmlPtr retval;
+	BoolPropertyPtr retval;
 	bool defaultValue = false;
-	retval = BoolDataAdapterXml::initialize("properties", "Print Properties",
+	retval = BoolProperty::initialize("properties", "Print Properties",
 											"When starting OpenCV, print properties to console",
 											defaultValue, root);
 	retval->setAdvanced(true);

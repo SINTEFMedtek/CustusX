@@ -96,7 +96,7 @@ ClippingWidget::ClippingWidget(PatientModelServicePtr patientModelService, QWidg
 	mInteractiveClipper = viewService()->getClipper();
 	connect(mInteractiveClipper.get(), SIGNAL(changed()), this, SLOT(clipperChangedSlot()));
 
-	mImageAdapter = SelectImageStringDataAdapter::New(patientModelService);
+	mImageAdapter = StringPropertySelectImage::New(patientModelService);
 	LabeledComboBoxWidget* imageCombo = new LabeledComboBoxWidget(this, mImageAdapter);
 	connect(mImageAdapter.get(), SIGNAL(changed()), this, SLOT(imageChangedSlot()));
 

@@ -70,7 +70,7 @@ private slots:
 private:
 	FilterGroupPtr mFilters;
 	FilterPtr mCurrentFilter;
-	StringDataAdapterXmlPtr mFilterSelector;
+	StringPropertyPtr mFilterSelector;
 	FilterTimedAlgorithmPtr mThread;
 
 	FilterSetupWidget* mSetupWidget;

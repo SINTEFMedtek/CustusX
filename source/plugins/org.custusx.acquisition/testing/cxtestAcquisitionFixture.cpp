@@ -83,14 +83,14 @@ AcquisitionFixture::~AcquisitionFixture()
 	this->tearDown();
 }
 
-cx::DataAdapterPtr AcquisitionFixture::getOption(QString uid)
+cx::PropertyPtr AcquisitionFixture::getOption(QString uid)
 {
 	QDomElement element = mOptions.getElement("video");
 	cx::StreamerService* streamer;
 	streamer = cx::StreamerServiceUtilities::getStreamerService(mConnectionMethod,
 																cx::logicManager()->getPluginContext());
 	REQUIRE(streamer);
-	cx::DataAdapterPtr option = cx::DataAdapter::findAdapter(streamer->getSettings(element), uid);
+	cx::PropertyPtr option = cx::Property::findProperty(streamer->getSettings(element), uid);
 	REQUIRE(option.get());
 	return option;
 }

@@ -35,18 +35,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-Vector3DComponentDataAdapter::Vector3DComponentDataAdapter(Vector3DDataAdapterPtr base, int index, QString name, QString help) :
+Vector3DComponentProperty::Vector3DComponentProperty(Vector3DPropertyBasePtr base, int index, QString name, QString help) :
 		mBase(base), mIndex(index), mName(name), mHelp(help)
 {
 	connect(mBase.get(), SIGNAL(changed()), this, SIGNAL(changed()));
 }
 
-QString Vector3DComponentDataAdapter::getDisplayName() const
+QString Vector3DComponentProperty::getDisplayName() const
 {
 	return mName.isEmpty() ? mBase->getDisplayName() : mName;
 }
 
-bool Vector3DComponentDataAdapter::setValue(double value)
+bool Vector3DComponentProperty::setValue(double value)
 {
 	Vector3D vec = mBase->getValue();
 	vec[mIndex] = value;
@@ -54,32 +54,32 @@ bool Vector3DComponentDataAdapter::setValue(double value)
 	return mBase->setValue(vec);
 }
 
-double Vector3DComponentDataAdapter::getValue() const
+double Vector3DComponentProperty::getValue() const
 {
 	return mBase->getValue()[mIndex];
 }
 
-QString Vector3DComponentDataAdapter::getHelp() const
+QString Vector3DComponentProperty::getHelp() const
 {
 	return mHelp.isEmpty() ? mBase->getHelp() : mHelp;
 }
 
-DoubleRange Vector3DComponentDataAdapter::getValueRange() const
+DoubleRange Vector3DComponentProperty::getValueRange() const
 {
 	return mBase->getValueRange();
 }
 
-double Vector3DComponentDataAdapter::convertInternal2Display(double internal)
+double Vector3DComponentProperty::convertInternal2Display(double internal)
 {
 	return mBase->convertInternal2Display(internal);
 }
 
-double Vector3DComponentDataAdapter::convertDisplay2Internal(double display)
+double Vector3DComponentProperty::convertDisplay2Internal(double display)
 {
 	return mBase->convertDisplay2Internal(display);
 }
 
-int Vector3DComponentDataAdapter::getValueDecimals() const
+int Vector3DComponentProperty::getValueDecimals() const
 {
 	return mBase->getValueDecimals();
 }

@@ -51,7 +51,7 @@ typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 
 namespace cx
 {
-typedef boost::shared_ptr<class DoubleDataAdapterXml> DoubleDataAdapterXmlPtr;
+typedef boost::shared_ptr<class DoubleProperty> DoublePropertyPtr;
 typedef boost::shared_ptr<class Image> ImagePtr;
 typedef boost::shared_ptr<class ProcessedUSInputData> ProcessedUSInputDataPtr;
 
@@ -83,7 +83,7 @@ public:
 	 *  Input is the root node for this algo, filled with stored settings (if any).
 	 *  On completion, the root is filled with default values for settings.
 	 */
-	virtual std::vector<DataAdapterPtr> getSettings(QDomElement root) = 0;
+	virtual std::vector<PropertyPtr> getSettings(QDomElement root) = 0;
 	/**
 	 * \param frameInfo Timetags and positions for the input frames
 	 * \param frameData The frame data. Assumes that the transfrom is identity.

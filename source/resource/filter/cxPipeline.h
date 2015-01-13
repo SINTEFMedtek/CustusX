@@ -54,12 +54,12 @@ typedef boost::shared_ptr<class FusedInputOutputSelectDataStringDataAdapter> Fus
   *
   *
   */
-class cxResourceFilter_EXPORT FusedInputOutputSelectDataStringDataAdapter : public SelectDataStringDataAdapterBase
+class cxResourceFilter_EXPORT FusedInputOutputSelectDataStringDataAdapter : public SelectDataStringPropertyBase
 {
 	Q_OBJECT
 public:
 	virtual ~FusedInputOutputSelectDataStringDataAdapter() {}
-	static FusedInputOutputSelectDataStringDataAdapterPtr create(PatientModelServicePtr patientModelService, SelectDataStringDataAdapterBasePtr base, SelectDataStringDataAdapterBasePtr input);
+	static FusedInputOutputSelectDataStringDataAdapterPtr create(PatientModelServicePtr patientModelService, SelectDataStringPropertyBasePtr base, SelectDataStringPropertyBasePtr input);
 
 public: // basic methods
 	virtual QString getDisplayName() const;
@@ -81,9 +81,9 @@ protected slots:
 	void changedSlot();
 
 protected:
-	FusedInputOutputSelectDataStringDataAdapter(PatientModelServicePtr patientModelService, SelectDataStringDataAdapterBasePtr base, SelectDataStringDataAdapterBasePtr input);
-	SelectDataStringDataAdapterBasePtr mInput;
-	SelectDataStringDataAdapterBasePtr mBase;
+	FusedInputOutputSelectDataStringDataAdapter(PatientModelServicePtr patientModelService, SelectDataStringPropertyBasePtr base, SelectDataStringPropertyBasePtr input);
+	SelectDataStringPropertyBasePtr mInput;
+	SelectDataStringPropertyBasePtr mBase;
 	QString mValueName;
 };
 
@@ -124,7 +124,7 @@ public:
 	  * Setting of an output will autoset the input of the next filter
 	  * through this mechanism.
 	  */
-	std::vector<SelectDataStringDataAdapterBasePtr> getNodes();
+	std::vector<SelectDataStringPropertyBasePtr> getNodes();
 	/**
 	  * Get the TimedAlgorithm for a given filter.
 	  * Do not run this directly: Rather use the execute() method
@@ -155,11 +155,11 @@ public slots:
 	void nodeValueChanged(QString uid, int index);
 
 private:
-	void setOption(DataAdapterPtr adapter, QVariant value);
-	std::vector<SelectDataStringDataAdapterBasePtr> createNodes();
+	void setOption(PropertyPtr adapter, QVariant value);
+	std::vector<SelectDataStringPropertyBasePtr> createNodes();
 
 	FilterGroupPtr mFilters;
-	std::vector<SelectDataStringDataAdapterBasePtr> mNodes;
+	std::vector<SelectDataStringPropertyBasePtr> mNodes;
 	std::map<QString, TimedAlgorithmPtr> mTimedAlgorithm;
 	CompositeTimedAlgorithmPtr mCompositeTimedAlgorithm;
 	PatientModelServicePtr mPatientModelService;

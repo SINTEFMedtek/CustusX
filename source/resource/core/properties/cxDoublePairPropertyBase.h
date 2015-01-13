@@ -51,11 +51,11 @@ namespace cx
  * \date Juli 31, 2014
  * \author Ole Vegard Solberg, SINTEF
  */
-class cxResource_EXPORT DoublePairDataAdapter : public DataAdapter
+class cxResource_EXPORT DoublePairPropertyBase : public Property
 {
 Q_OBJECT
 public:
-	virtual ~DoublePairDataAdapter() {}
+	virtual ~DoublePairPropertyBase() {}
 //	DoubleSpanSliderAdapter();
 
 public:
@@ -104,10 +104,10 @@ public:
 	} ///< number of relevant decimals in value
 
 };
-typedef boost::shared_ptr<DoublePairDataAdapter> DoublePairDataAdapterPtr;
+typedef boost::shared_ptr<DoublePairPropertyBase> DoublePairPropertyBasePtr;
 
 /** Dummy implementation */
-class cxResource_EXPORT DoubleSpanSliderAdapterNull: public DoublePairDataAdapter
+class cxResource_EXPORT DoubleSpanSliderAdapterNull: public DoublePairPropertyBase
 {
 Q_OBJECT
 

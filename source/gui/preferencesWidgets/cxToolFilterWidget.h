@@ -69,7 +69,7 @@ public:
   ToolFilterGroupBox(QWidget* parent = NULL);
   virtual ~ToolFilterGroupBox();
 
-  void setTrackingSystemSelector(StringDataAdapterPtr selector);
+  void setTrackingSystemSelector(StringPropertyBasePtr selector);
 
 signals:
   void toolSelected(QString absoluteFilePath);
@@ -83,8 +83,8 @@ private slots:
 private:
   void createAppSelector();
 
-  StringDataAdapterXmlPtr mAppSelector;
-  StringDataAdapterPtr mTrackingSystemSelector;
+  StringPropertyPtr mAppSelector;
+  StringPropertyBasePtr mTrackingSystemSelector;
 
   FilteringToolListWidget*      mToolListWidget;
 };

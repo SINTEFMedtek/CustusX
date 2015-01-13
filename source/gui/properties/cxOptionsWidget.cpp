@@ -48,14 +48,14 @@ OptionsWidget::OptionsWidget(VisualizationServicePtr visualizationService, Patie
 	mStackedLayout->setMargin(0);
 }
 
-void OptionsWidget::setOptions(QString uid, std::vector<SelectDataStringDataAdapterBasePtr> options, bool showAdvanced)
+void OptionsWidget::setOptions(QString uid, std::vector<SelectDataStringPropertyBasePtr> options, bool showAdvanced)
 {
-	std::vector<DataAdapterPtr> converted;
+	std::vector<PropertyPtr> converted;
 	std::copy(options.begin(), options.end(), std::back_inserter(converted));
 	this->setOptions(uid, converted, showAdvanced);
 }
 
-void OptionsWidget::setOptions(QString uid, std::vector<DataAdapterPtr> options, bool showAdvanced)
+void OptionsWidget::setOptions(QString uid, std::vector<PropertyPtr> options, bool showAdvanced)
 {
 	// return if already on uid
 	if (mStackedLayout->currentWidget() && (uid == mStackedLayout->currentWidget()->objectName()))

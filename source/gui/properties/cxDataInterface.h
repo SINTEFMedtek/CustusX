@@ -53,17 +53,17 @@ typedef boost::shared_ptr<class DominantToolProxy> DominantToolProxyPtr;
 /**
  * \brief Interface to the tool offset of the dominant tool
  */
-class cxGui_EXPORT DoubleDataAdapterActiveToolOffset : public DoubleDataAdapter
+class cxGui_EXPORT DoublePropertyActiveToolOffset : public DoublePropertyBase
 {
   Q_OBJECT
 public:
-	static boost::shared_ptr<DoubleDataAdapterActiveToolOffset> create()
+	static boost::shared_ptr<DoublePropertyActiveToolOffset> create()
 	{
-		return boost::shared_ptr<DoubleDataAdapterActiveToolOffset>(new DoubleDataAdapterActiveToolOffset());
+		return boost::shared_ptr<DoublePropertyActiveToolOffset>(new DoublePropertyActiveToolOffset());
 	}
 
-  DoubleDataAdapterActiveToolOffset();
-  virtual ~DoubleDataAdapterActiveToolOffset() {}
+  DoublePropertyActiveToolOffset();
+  virtual ~DoublePropertyActiveToolOffset() {}
   virtual QString getDisplayName() const { return "Offset"; }
   virtual QString getHelp() const
   {
@@ -81,12 +81,12 @@ protected:
 /**
  * \brief Superclass for all doubles interacting with the active image.
  */
-class cxGui_EXPORT DoubleDataAdapterActiveImageBase : public DoubleDataAdapter
+class cxGui_EXPORT DoublePropertyActiveImageBase : public DoublePropertyBase
 {
   Q_OBJECT
 public:
-  DoubleDataAdapterActiveImageBase(PatientModelServicePtr patientModelService);
-  virtual ~DoubleDataAdapterActiveImageBase() {}
+  DoublePropertyActiveImageBase(PatientModelServicePtr patientModelService);
+  virtual ~DoublePropertyActiveImageBase() {}
   virtual double getValue() const;
   virtual bool setValue(double val);
   virtual void connectValueSignals(bool on) {}
@@ -104,10 +104,10 @@ protected:
 /**
  * \brief DataInterface implementation for the LUT 2D window value
  */
-class cxGui_EXPORT DoubleDataAdapter2DWindow : public DoubleDataAdapterActiveImageBase
+class cxGui_EXPORT DoubleProperty2DWindow : public DoublePropertyActiveImageBase
 {
 public:
-  virtual ~DoubleDataAdapter2DWindow() {}
+  virtual ~DoubleProperty2DWindow() {}
   virtual QString getDisplayName() const { return "Window"; }
   virtual double getValueInternal() const;
   virtual void setValueInternal(double val);
@@ -117,11 +117,11 @@ public:
 /**
  * \brief DataInterface implementation for the LUT 2D level value
  */
-class cxGui_EXPORT DoubleDataAdapter2DLevel : public DoubleDataAdapterActiveImageBase
+class cxGui_EXPORT DoubleProperty2DLevel : public DoublePropertyActiveImageBase
 {
   Q_OBJECT
 public:
-  virtual ~DoubleDataAdapter2DLevel() {}
+  virtual ~DoubleProperty2DLevel() {}
   virtual QString getDisplayName() const { return "Level"; }
   virtual double getValueInternal() const;
   virtual void setValueInternal(double val);
@@ -129,14 +129,14 @@ public:
 };
 
 /**
- * \brief Base class for all DataAdapters that selects a real time source.
+ * \brief Base class for all Properties that selects a real time source.
  */
-class cxGui_EXPORT SelectRTSourceStringDataAdapterBase : public StringDataAdapter
+class cxGui_EXPORT StringPropertySelectRTSourceBase : public StringPropertyBase
 {
   Q_OBJECT
 public:
-  SelectRTSourceStringDataAdapterBase(PatientModelServicePtr patientModelService);
-  virtual ~SelectRTSourceStringDataAdapterBase();
+  StringPropertySelectRTSourceBase(PatientModelServicePtr patientModelService);
+  virtual ~StringPropertySelectRTSourceBase();
 
 public: // optional methods
   virtual QStringList getValueRange() const;
@@ -145,17 +145,17 @@ public: // optional methods
 protected:
   PatientModelServicePtr mPatientModelService;
 };
-typedef boost::shared_ptr<class SelectRTSourceStringDataAdapterBase> SelectRTSourceStringDataAdapterBasePtr;
+typedef boost::shared_ptr<class StringPropertySelectRTSourceBase> StringPropertySelectRTSourceBasePtr;
 
 /**
- * \brief Base class for all DataAdapters that selects a tool.
+ * \brief Base class for all Properties that selects a tool.
  */
-class cxGui_EXPORT SelectToolStringDataAdapterBase : public StringDataAdapter
+class cxGui_EXPORT StringPropertySelectToolBase : public StringPropertyBase
 {
   Q_OBJECT
 public:
-  SelectToolStringDataAdapterBase();
-  virtual ~SelectToolStringDataAdapterBase() {}
+  StringPropertySelectToolBase();
+  virtual ~StringPropertySelectToolBase() {}
 
 public: // basic methods
 
@@ -163,17 +163,17 @@ public: // optional methods
   virtual QStringList getValueRange() const;
   virtual QString convertInternal2Display(QString internal);
 };
-typedef boost::shared_ptr<class SelectToolStringDataAdapterBase> SelectToolStringDataAdapterBasePtr;
+typedef boost::shared_ptr<class StringPropertySelectToolBase> StringPropertySelectToolBasePtr;
 
 
-/** Base class for all DataAdapters that selects a coordinatesystem.
+/** Base class for all Properties that selects a coordinatesystem.
  */
-class cxGui_EXPORT SelectCoordinateSystemStringDataAdapterBase : public StringDataAdapter
+class cxGui_EXPORT StringPropertySelectCoordinateSystemBase : public StringPropertyBase
 {
   Q_OBJECT
 public:
-  SelectCoordinateSystemStringDataAdapterBase();
-  virtual ~SelectCoordinateSystemStringDataAdapterBase() {}
+  StringPropertySelectCoordinateSystemBase();
+  virtual ~StringPropertySelectCoordinateSystemBase() {}
 
 public: // basic methods
 
@@ -181,23 +181,23 @@ public: // optional methods
   virtual QStringList getValueRange() const;
   virtual QString convertInternal2Display(QString internal);
 };
-typedef boost::shared_ptr<class SelectCoordinateSystemStringDataAdapterBase> SelectCoordinateSystemStringDataAdapterBasePtr;
+typedef boost::shared_ptr<class StringPropertySelectCoordinateSystemBase> StringPropertySelectCoordinateSystemBasePtr;
 
 
-typedef boost::shared_ptr<class SelectRTSourceStringDataAdapter> SelectRTSourceStringDataAdapterPtr;
+typedef boost::shared_ptr<class StringPropertySelectRTSource> StringPropertySelectRTSourcePtr;
 
 /**
  * \brief Adapter that selects and stores an rtsource.
  * The rtsource is stored internally in the adapter.
  * Use setValue/getValue plus changed() to access it.
  */
-class cxGui_EXPORT SelectRTSourceStringDataAdapter : public SelectRTSourceStringDataAdapterBase
+class cxGui_EXPORT StringPropertySelectRTSource : public StringPropertySelectRTSourceBase
 {
   Q_OBJECT
 public:
-  static SelectRTSourceStringDataAdapterPtr New(PatientModelServicePtr patientModelService) { return SelectRTSourceStringDataAdapterPtr(new SelectRTSourceStringDataAdapter(patientModelService)); }
-  SelectRTSourceStringDataAdapter(PatientModelServicePtr patientModelService);
-  virtual ~SelectRTSourceStringDataAdapter() {}
+  static StringPropertySelectRTSourceBasePtr New(PatientModelServicePtr patientModelService) { return StringPropertySelectRTSourceBasePtr(new StringPropertySelectRTSource(patientModelService)); }
+  StringPropertySelectRTSource(PatientModelServicePtr patientModelService);
+  virtual ~StringPropertySelectRTSource() {}
 
 public: // basic methods
   virtual QString getDisplayName() const;
@@ -219,17 +219,17 @@ private:
   QString mValueName;
 };
 
-typedef boost::shared_ptr<class ActiveVideoSourceStringDataAdapter> ActiveVideoSourceStringDataAdapterPtr;
+typedef boost::shared_ptr<class StringPropertyActiveVideoSource> StringPropertyActiveVideoSourcePtr;
 /**
  * \brief Adapter for controlling the active video source in cx::VideoServiceOld
  */
-class cxGui_EXPORT ActiveVideoSourceStringDataAdapter : public StringDataAdapter
+class cxGui_EXPORT StringPropertyActiveVideoSource : public StringPropertyBase
 {
   Q_OBJECT
 public:
-  static ActiveVideoSourceStringDataAdapterPtr New() { return ActiveVideoSourceStringDataAdapterPtr(new ActiveVideoSourceStringDataAdapter()); }
-  ActiveVideoSourceStringDataAdapter();
-  virtual ~ActiveVideoSourceStringDataAdapter() {}
+  static StringPropertyActiveVideoSourcePtr New() { return StringPropertyActiveVideoSourcePtr(new StringPropertyActiveVideoSource()); }
+  StringPropertyActiveVideoSource();
+  virtual ~StringPropertyActiveVideoSource() {}
 
 public: // basic methods
   virtual QString getDisplayName() const;
@@ -239,7 +239,7 @@ public: // basic methods
   virtual QString getHelp() const;
 };
 
-typedef boost::shared_ptr<class SelectCoordinateSystemStringDataAdapter> SelectCoordinateSystemStringDataAdapterPtr;
+typedef boost::shared_ptr<class StringPropertySelectCoordinateSystem> StringPropertySelectCoordinateSystemPtr;
 
 /**
  * \brief Adapter that selects and stores a coordinate systems.
@@ -248,13 +248,13 @@ typedef boost::shared_ptr<class SelectCoordinateSystemStringDataAdapter> SelectC
  *
  * Class reacts to toolmanagers configurerd signal and automatically sets patientref as default
  */
-class cxGui_EXPORT SelectCoordinateSystemStringDataAdapter : public SelectCoordinateSystemStringDataAdapterBase
+class cxGui_EXPORT StringPropertySelectCoordinateSystem : public StringPropertySelectCoordinateSystemBase
 {
   Q_OBJECT
 public:
-  static SelectCoordinateSystemStringDataAdapterPtr New() { return SelectCoordinateSystemStringDataAdapterPtr(new SelectCoordinateSystemStringDataAdapter()); }
-  SelectCoordinateSystemStringDataAdapter();
-  virtual ~SelectCoordinateSystemStringDataAdapter() {}
+  static StringPropertySelectCoordinateSystemPtr New() { return StringPropertySelectCoordinateSystemPtr(new StringPropertySelectCoordinateSystem()); }
+  StringPropertySelectCoordinateSystem();
+  virtual ~StringPropertySelectCoordinateSystem() {}
 
 public: // basic methods
   virtual QString getDisplayName() const;
@@ -275,7 +275,7 @@ private:
   QString mValueName;
 };
 
-typedef boost::shared_ptr<class SelectToolStringDataAdapter> SelectToolStringDataAdapterPtr;
+typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
 
 /**
  * \brief Adapter that selects and stores a tool.
@@ -283,13 +283,13 @@ typedef boost::shared_ptr<class SelectToolStringDataAdapter> SelectToolStringDat
  * Use setValue/getValue plus changed() to access it.
  *
  */
-class cxGui_EXPORT SelectToolStringDataAdapter : public SelectToolStringDataAdapterBase
+class cxGui_EXPORT StringPropertySelectTool : public StringPropertySelectToolBase
 {
   Q_OBJECT
 public:
-  static SelectToolStringDataAdapterPtr New() { return SelectToolStringDataAdapterPtr(new SelectToolStringDataAdapter()); }
-  SelectToolStringDataAdapter();
-  virtual ~SelectToolStringDataAdapter() {}
+  static StringPropertySelectToolPtr New() { return StringPropertySelectToolPtr(new StringPropertySelectTool()); }
+  StringPropertySelectTool();
+  virtual ~StringPropertySelectTool() {}
 
   void setHelp(QString help);
   void setValueName(QString name);
@@ -312,19 +312,19 @@ private:
 };
 
 
-typedef boost::shared_ptr<class ParentFrameStringDataAdapter> ParentFrameStringDataAdapterPtr;
+typedef boost::shared_ptr<class StringPropertyParentFrame> StringPropertyParentFramePtr;
 
 /**
  * \brief Adapter that selects the parent frame of the given Data.
  */
-class cxGui_EXPORT ParentFrameStringDataAdapter : public StringDataAdapter
+class cxGui_EXPORT StringPropertyParentFrame : public StringPropertyBase
 {
   Q_OBJECT
 public:
-  static ParentFrameStringDataAdapterPtr New(PatientModelServicePtr patientModelService) { return ParentFrameStringDataAdapterPtr(new ParentFrameStringDataAdapter(patientModelService)); }
-  ParentFrameStringDataAdapter(PatientModelServicePtr patientModelService);
+  static StringPropertyParentFramePtr New(PatientModelServicePtr patientModelService) { return StringPropertyParentFramePtr(new StringPropertyParentFrame(patientModelService)); }
+  StringPropertyParentFrame(PatientModelServicePtr patientModelService);
   void setData(DataPtr data);
-  virtual ~ParentFrameStringDataAdapter();
+  virtual ~StringPropertyParentFrame();
 
 public: // basic methods
   virtual QString getDisplayName() const;
@@ -341,37 +341,37 @@ protected:
   PatientModelServicePtr mPatientModelService;
 };
 
-typedef boost::shared_ptr<class SetParentFrameStringDataAdapter> SetParentFrameStringDataAdapterPtr;
+typedef boost::shared_ptr<class StringPropertySetParentFrame> StringPropertySetParentFramePtr;
 
 /**
  * \brief Adapter that force sets the parent frame of the given Data,
  * i.e. overwriting history. Nice for initial definition
  */
-class cxGui_EXPORT SetParentFrameStringDataAdapter : public ParentFrameStringDataAdapter
+class cxGui_EXPORT StringPropertySetParentFrame : public StringPropertyParentFrame
 {
   Q_OBJECT
 public:
-  static SetParentFrameStringDataAdapterPtr New(PatientModelServicePtr patientModelService) { return SetParentFrameStringDataAdapterPtr(new SetParentFrameStringDataAdapter(patientModelService)); }
-  SetParentFrameStringDataAdapter(PatientModelServicePtr patientModelService);
-  virtual ~SetParentFrameStringDataAdapter() {}
+  static StringPropertySetParentFramePtr New(PatientModelServicePtr patientModelService) { return StringPropertySetParentFramePtr(new StringPropertySetParentFrame(patientModelService)); }
+  StringPropertySetParentFrame(PatientModelServicePtr patientModelService);
+  virtual ~StringPropertySetParentFrame() {}
 public: // basic methods
   virtual bool setValue(const QString& value);
 };
 
 
-typedef boost::shared_ptr<class DataNameEditableStringDataAdapter> DataNameEditableStringDataAdapterPtr;
+typedef boost::shared_ptr<class StringPropertyDataNameEditable> StringPropertyDataNameEditablePtr;
 
 /**
  * \brief Adapter for displaying and changing name of a Data.
  */
-class cxGui_EXPORT DataNameEditableStringDataAdapter : public StringDataAdapter
+class cxGui_EXPORT StringPropertyDataNameEditable : public StringPropertyBase
 {
   Q_OBJECT
 public:
-  static DataNameEditableStringDataAdapterPtr New() { return DataNameEditableStringDataAdapterPtr(new DataNameEditableStringDataAdapter()); }
-  DataNameEditableStringDataAdapter();
+  static StringPropertyDataNameEditablePtr New() { return StringPropertyDataNameEditablePtr(new StringPropertyDataNameEditable()); }
+  StringPropertyDataNameEditable();
   virtual void setData(DataPtr data);
-  virtual ~DataNameEditableStringDataAdapter() {}
+  virtual ~StringPropertyDataNameEditable() {}
 
 public: // basic methods
   virtual QString getDisplayName() const;
@@ -386,19 +386,19 @@ private:
   DataPtr mData;
 };
 
-typedef boost::shared_ptr<class DataUidEditableStringDataAdapter> DataUidEditableStringDataAdapterPtr;
+typedef boost::shared_ptr<class StringPropertyDataUidEditable> StringPropertyDataUidEditablePtr;
 
 /**
  * \brief Adapter for displaying and changing name of a Data.
  */
-class cxGui_EXPORT DataUidEditableStringDataAdapter : public StringDataAdapter
+class cxGui_EXPORT StringPropertyDataUidEditable : public StringPropertyBase
 {
   Q_OBJECT
 public:
-  static DataUidEditableStringDataAdapterPtr New() { return DataUidEditableStringDataAdapterPtr(new DataUidEditableStringDataAdapter()); }
-  DataUidEditableStringDataAdapter();
+  static StringPropertyDataUidEditablePtr New() { return StringPropertyDataUidEditablePtr(new StringPropertyDataUidEditable()); }
+  StringPropertyDataUidEditable();
   virtual void setData(DataPtr data);
-  virtual ~DataUidEditableStringDataAdapter() {}
+  virtual ~StringPropertyDataUidEditable() {}
 
 public: // basic methods
   virtual QString getDisplayName() const;
@@ -411,18 +411,18 @@ public: // basic methods
 private:
   DataPtr mData;
 };
-typedef boost::shared_ptr<class DataModalityStringDataAdapter> DataModalityStringDataAdapterPtr;
+typedef boost::shared_ptr<class StringPropertyDataModality> StringPropertyDataModalityPtr;
 
 /**
  * \brief Adapter that selects the modality of the given Data.
  */
-class cxGui_EXPORT DataModalityStringDataAdapter : public StringDataAdapter
+class cxGui_EXPORT StringPropertyDataModality : public StringPropertyBase
 {
   Q_OBJECT
 public:
-  static DataModalityStringDataAdapterPtr New(PatientModelServicePtr patientModelService) { return DataModalityStringDataAdapterPtr(new DataModalityStringDataAdapter(patientModelService)); }
-  DataModalityStringDataAdapter(PatientModelServicePtr patientModelService);
-  virtual ~DataModalityStringDataAdapter();
+  static StringPropertyDataModalityPtr New(PatientModelServicePtr patientModelService) { return StringPropertyDataModalityPtr(new StringPropertyDataModality(patientModelService)); }
+  StringPropertyDataModality(PatientModelServicePtr patientModelService);
+  virtual ~StringPropertyDataModality();
   void setData(ImagePtr data);
 
 public: // basic methods
@@ -439,19 +439,19 @@ protected:
   PatientModelServicePtr mPatientModelService;
 };
 
-typedef boost::shared_ptr<class ImageTypeStringDataAdapter> ImageTypeStringDataAdapterPtr;
+typedef boost::shared_ptr<class StringPropertyImageType> StringPropertyImageTypePtr;
 
 /**
  * \brief Adapter that selects the image type of the given Data.
  */
-class cxGui_EXPORT ImageTypeStringDataAdapter : public StringDataAdapter
+class cxGui_EXPORT StringPropertyImageType : public StringPropertyBase
 {
   Q_OBJECT
 public:
-  static ImageTypeStringDataAdapterPtr New(PatientModelServicePtr patientModelService) { return ImageTypeStringDataAdapterPtr(new ImageTypeStringDataAdapter(patientModelService)); }
-  ImageTypeStringDataAdapter(PatientModelServicePtr patientModelService);
+  static StringPropertyImageTypePtr New(PatientModelServicePtr patientModelService) { return StringPropertyImageTypePtr(new StringPropertyImageType(patientModelService)); }
+  StringPropertyImageType(PatientModelServicePtr patientModelService);
   void setData(ImagePtr data);
-  virtual ~ImageTypeStringDataAdapter();
+  virtual ~StringPropertyImageType();
 
 public: // basic methods
   virtual QString getDisplayName() const;

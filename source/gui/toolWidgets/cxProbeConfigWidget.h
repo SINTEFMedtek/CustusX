@@ -74,12 +74,12 @@ private:
 
 	QWidget* mActiveProbeConfigWidget;
 	BoundingBoxWidget* mBBWidget;
-	Vector3DDataAdapterPtr mOrigin;
+	Vector3DPropertyBasePtr mOrigin;
 	SliderRangeGroupWidget* mDepthWidget;
-	DoubleDataAdapterXmlPtr mWidth;
+	DoublePropertyPtr mWidth;
 	QCheckBox* mSyncBoxToSector;
 
-	ActiveProbeConfigurationStringDataAdapterPtr mActiveProbeConfig;
+	StringPropertyActiveProbeConfigurationPtr mActiveProbeConfig;
 	QString mLastKnownProbeConfigName; ///< used for suggesting save names for new config
 	bool mUpdating;
 };

@@ -30,13 +30,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-
-/*
- * sscStringDataAdapterXml.cpp
- *
- *  Created on: Jun 27, 2010
- *      Author: christiana
- */
 #include "cxStringProperty.h"
 
 #include <iostream>
@@ -47,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-StringDataAdapterXml::StringDataAdapterXml() : 	mIsReadOnly(false)
+StringProperty::StringProperty() : 	mIsReadOnly(false)
 {
 
 }
@@ -55,9 +48,9 @@ StringDataAdapterXml::StringDataAdapterXml() : 	mIsReadOnly(false)
 /** Make sure one given option exists witin root.
  * If not present, fill inn the input defaults.
  */
-StringDataAdapterXmlPtr StringDataAdapterXml::initialize(const QString& uid, QString name, QString help, QString value, QStringList range, QDomNode root)
+StringPropertyPtr StringProperty::initialize(const QString& uid, QString name, QString help, QString value, QStringList range, QDomNode root)
 {
-	StringDataAdapterXmlPtr retval(new StringDataAdapterXml());
+	StringPropertyPtr retval(new StringProperty());
 	retval->mUid = uid;
 	retval->mName = name.isEmpty() ? uid : name;
 	retval->mHelp = help;
@@ -68,9 +61,9 @@ StringDataAdapterXmlPtr StringDataAdapterXml::initialize(const QString& uid, QSt
 	return retval;
 }
 
-StringDataAdapterXmlPtr StringDataAdapterXml::initialize(const QString& uid, QString name, QString help, QString value, QDomNode root)
+StringPropertyPtr StringProperty::initialize(const QString& uid, QString name, QString help, QString value, QDomNode root)
 {
-	StringDataAdapterXmlPtr retval(new StringDataAdapterXml());
+	StringPropertyPtr retval(new StringProperty());
 	retval->mUid = uid;
 	retval->mName = name.isEmpty() ? uid : name;
 	retval->mHelp = help;
@@ -81,28 +74,28 @@ StringDataAdapterXmlPtr StringDataAdapterXml::initialize(const QString& uid, QSt
 	return retval;
 }
 
-void StringDataAdapterXml::setReadOnly(bool val)
+void StringProperty::setReadOnly(bool val)
 {
 	mIsReadOnly = val;
 	emit changed();
 }
 
-QString StringDataAdapterXml::getDisplayName() const
+QString StringProperty::getDisplayName() const
 {
 	return mName;
 }
 
-QString StringDataAdapterXml::getUid() const
+QString StringProperty::getUid() const
 {
 	return mUid;
 }
 
-QString StringDataAdapterXml::getHelp() const
+QString StringProperty::getHelp() const
 {
 	return mHelp;
 }
 
-void StringDataAdapterXml::setHelp(QString val)
+void StringProperty::setHelp(QString val)
 {
     if (val == mHelp)
         return;
@@ -112,12 +105,12 @@ void StringDataAdapterXml::setHelp(QString val)
 }
 
 
-QString StringDataAdapterXml::getValue() const
+QString StringProperty::getValue() const
 {
 	return mValue;
 }
 
-bool StringDataAdapterXml::setValue(const QString& val)
+bool StringProperty::setValue(const QString& val)
 {
 	if (val == mValue)
 		return false;
@@ -129,12 +122,12 @@ bool StringDataAdapterXml::setValue(const QString& val)
 	return true;
 }
 
-QStringList StringDataAdapterXml::getValueRange() const
+QStringList StringProperty::getValueRange() const
 {
 	return mRange;
 }
 
-void StringDataAdapterXml::setValueRange(QStringList range)
+void StringProperty::setValueRange(QStringList range)
 {
 	mRange = range;
 	emit changed();
@@ -143,14 +136,14 @@ void StringDataAdapterXml::setValueRange(QStringList range)
 /**If a mapping from internal name to display name has been set, use it.
  * Otherwise return the input.
  */
-QString StringDataAdapterXml::convertInternal2Display(QString internal)
+QString StringProperty::convertInternal2Display(QString internal)
 {
 	if (mDisplayNames.count(internal))
 		return mDisplayNames[internal];
 	return internal;
 }
 
-void StringDataAdapterXml::setDisplayNames(std::map<QString, QString> names)
+void StringProperty::setDisplayNames(std::map<QString, QString> names)
 {
 	mDisplayNames = names;
 	emit changed();

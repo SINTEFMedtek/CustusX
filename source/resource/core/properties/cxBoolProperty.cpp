@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /*
- * sscBoolDataAdapterXml.cpp
+ * sscBoolProperty.cpp
  *
  *  Created on: Feb 7, 2011
  *      Author: christiana
@@ -48,10 +48,10 @@ namespace cx
 /** Make sure one given option exists witin root.
  * If not present, fill inn the input defaults.
  */
-BoolDataAdapterXmlPtr BoolDataAdapterXml::initialize(const QString& uid, QString name, QString help, bool value,
+BoolPropertyPtr BoolProperty::initialize(const QString& uid, QString name, QString help, bool value,
 	QDomNode root)
 {
-	BoolDataAdapterXmlPtr retval(new BoolDataAdapterXml());
+	BoolPropertyPtr retval(new BoolProperty());
 	retval->mUid = uid;
 	retval->mName = name.isEmpty() ? uid : name;
 	retval->mHelp = help;
@@ -60,34 +60,34 @@ BoolDataAdapterXmlPtr BoolDataAdapterXml::initialize(const QString& uid, QString
 	return retval;
 }
 
-QString BoolDataAdapterXml::getDisplayName() const
+QString BoolProperty::getDisplayName() const
 {
 	return mName;
 }
 
 
-QString BoolDataAdapterXml::getUid() const
+QString BoolProperty::getUid() const
 {
 	return mUid;
 }
 
-QString BoolDataAdapterXml::getHelp() const
+QString BoolProperty::getHelp() const
 {
 	return mHelp;
 }
 
-void BoolDataAdapterXml::setHelp(QString val)
+void BoolProperty::setHelp(QString val)
 {
     mHelp = val;
     emit changed();
 }
 
-bool BoolDataAdapterXml::getValue() const
+bool BoolProperty::getValue() const
 {
 	return mValue;
 }
 
-bool BoolDataAdapterXml::setValue(bool val)
+bool BoolProperty::setValue(bool val)
 {
 	if (val == mValue)
 		return false;

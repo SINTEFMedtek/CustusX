@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /*
- * sscBoolDataAdapterXml.h
+ * sscBoolProperty.h
  *
  *  Created on: Feb 7, 2011
  *      Author: christiana
@@ -52,24 +52,24 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-typedef boost::shared_ptr<class BoolDataAdapterXml> BoolDataAdapterXmlPtr;
+typedef boost::shared_ptr<class BoolProperty> BoolPropertyPtr;
 
-/**\brief DataAdapter for boolean values.
+/**\brief Property for boolean values.
  *
  * \ingroup cx_resource_core_dataadapters
  */
-class cxResource_EXPORT BoolDataAdapterXml: public BoolDataAdapter
+class cxResource_EXPORT BoolProperty: public BoolPropertyBase
 {
 Q_OBJECT
 public:
-	virtual ~BoolDataAdapterXml()
+	virtual ~BoolProperty()
 	{
 	}
 
 	/** Make sure one given option exists witin root.
 	 * If not present, fill inn the input defaults.
 	 */
-	static BoolDataAdapterXmlPtr initialize(const QString& uid, QString name, QString help, bool value, QDomNode root =
+	static BoolPropertyPtr initialize(const QString& uid, QString name, QString help, bool value, QDomNode root =
 		QDomNode());
 
 public:
@@ -88,7 +88,7 @@ signals:
 	void valueWasSet(); /// emitted when the value is set using setValue() (similar to changed(), but more constrained)
 
 private:
-	BoolDataAdapterXml() {}
+	BoolProperty() {}
 	QString mName;
 	QString mUid;
 	QString mHelp;

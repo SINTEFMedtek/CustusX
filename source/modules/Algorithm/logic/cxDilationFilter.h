@@ -55,9 +55,9 @@ public:
 	virtual bool postProcess();
 
 	// extensions:
-	DoubleDataAdapterXmlPtr getDilationRadiusOption(QDomElement root);
-	ColorDataAdapterXmlPtr getColorOption(QDomElement root);
-	BoolDataAdapterXmlPtr getGenerateSurfaceOption(QDomElement root);
+	DoublePropertyPtr getDilationRadiusOption(QDomElement root);
+	ColorPropertyPtr getColorOption(QDomElement root);
+	BoolPropertyPtr getGenerateSurfaceOption(QDomElement root);
 
 protected:
 	virtual void createOptions();
@@ -65,7 +65,7 @@ protected:
 	virtual void createOutputTypes();
 
 private:
-	DoubleDataAdapterXmlPtr mDilationRadiusOption;
+	DoublePropertyPtr mDilationRadiusOption;
 	vtkImageDataPtr mRawResult;
 	vtkPolyDataPtr mRawContour;
 };

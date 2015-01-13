@@ -77,9 +77,9 @@ QString SmoothingImageFilter::getHelp() const
 	        "</html>";
 }
 
-DoubleDataAdapterXmlPtr SmoothingImageFilter::getSigma(QDomElement root)
+DoublePropertyPtr SmoothingImageFilter::getSigma(QDomElement root)
 {
-	return DoubleDataAdapterXml::initialize("Smoothing sigma", "",
+	return DoubleProperty::initialize("Smoothing sigma", "",
 	                                             "Used for smoothing the segmented volume. Measured in units of image spacing.",
 	                                             0.10, DoubleRange(0, 5, 0.01), 2, root);
 }
@@ -91,9 +91,9 @@ void SmoothingImageFilter::createOptions()
 
 void SmoothingImageFilter::createInputTypes()
 {
-	SelectDataStringDataAdapterBasePtr temp;
+	SelectDataStringPropertyBasePtr temp;
 
-	temp = SelectImageStringDataAdapter::New(mPatientModelService);
+	temp = StringPropertySelectImage::New(mPatientModelService);
 	temp->setValueName("Input");
 	temp->setHelp("Select image input for smoothing");
 	mInputTypes.push_back(temp);
@@ -101,9 +101,9 @@ void SmoothingImageFilter::createInputTypes()
 
 void SmoothingImageFilter::createOutputTypes()
 {
-	SelectDataStringDataAdapterBasePtr temp;
+	SelectDataStringPropertyBasePtr temp;
 
-	temp = SelectDataStringDataAdapter::New(mPatientModelService);
+	temp = StringPropertySelectData::New(mPatientModelService);
 	temp->setValueName("Output");
 	temp->setHelp("Output smoothed image");
 	mOutputTypes.push_back(temp);
@@ -115,7 +115,7 @@ bool SmoothingImageFilter::execute()
 	if (!input)
 		return false;
 
-	DoubleDataAdapterXmlPtr sigma = this->getSigma(mCopiedOptions);
+	DoublePropertyPtr sigma = this->getSigma(mCopiedOptions);
 
 	itkImageType::ConstPointer itkImage = AlgorithmHelper::getITKfromSSCImage(input);
 

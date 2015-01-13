@@ -44,12 +44,12 @@ namespace cx {
  * \date 2014-10-23
  *
  */
-class cxResource_EXPORT DataAdapterNull: public DataAdapter
+class cxResource_EXPORT PropertyNull: public Property
 {
 	Q_OBJECT
 public:
-    virtual ~DataAdapterNull(){}
-    static DataAdapterPtr create() { return DataAdapterPtr(new DataAdapterNull()); }
+	virtual ~PropertyNull(){}
+	static PropertyPtr create() { return PropertyPtr(new PropertyNull()); }
 
 public:
     virtual QString getDisplayName() const { return ""; }

@@ -58,24 +58,24 @@ QString DummyFilter::getHelp() const
 	        "Can also be used as a template for new filters.";
 }
 
-StringDataAdapterPtr DummyFilter::getStringOption(QDomElement root)
+StringPropertyBasePtr DummyFilter::getStringOption(QDomElement root)
 {
 	QStringList list;
 	list << "String0" << "String1";
-	return StringDataAdapterXml::initialize("String", "", "dummy string option",
+	return StringProperty::initialize("String", "", "dummy string option",
 												 list[0], list, root);
 }
 
-DoubleDataAdapterPtr DummyFilter::getDoubleOption(QDomElement root)
+DoublePropertyBasePtr DummyFilter::getDoubleOption(QDomElement root)
 {
-	return DoubleDataAdapterXml::initialize("Value", "",
+	return DoubleProperty::initialize("Value", "",
 	                                             "dummy double value.", 1, DoubleRange(0.1, 10, 0.01), 2,
 												 root);
 }
 
-BoolDataAdapterPtr DummyFilter::getBoolOption(QDomElement root)
+BoolPropertyBasePtr DummyFilter::getBoolOption(QDomElement root)
 {
-	return BoolDataAdapterXml::initialize("Bool0", "",
+	return BoolProperty::initialize("Bool0", "",
 	                                           "Dummy bool value.", false, root);
 }
 
@@ -88,19 +88,19 @@ void DummyFilter::createOptions()
 
 void DummyFilter::createInputTypes()
 {
-	SelectDataStringDataAdapterBasePtr temp;
+	SelectDataStringPropertyBasePtr temp;
 
-	temp = SelectDataStringDataAdapter::New(mPatientModelService);
+	temp = StringPropertySelectData::New(mPatientModelService);
 	temp->setValueName("Input");
 	temp->setHelp("Dummy data input for a dummy algorithm");
 	mInputTypes.push_back(temp);
 
-	temp = SelectImageStringDataAdapter::New(mPatientModelService);
+	temp = StringPropertySelectImage::New(mPatientModelService);
 	temp->setValueName("Image");
 	temp->setHelp("Dummy image input for a dummy algorithm");
 	mInputTypes.push_back(temp);
 
-	temp = SelectMeshStringDataAdapter::New(mPatientModelService);
+	temp = StringPropertySelectMesh::New(mPatientModelService);
 	temp->setValueName("Mesh");
 	temp->setHelp("Dummy mesh input for a dummy algorithm");
 	mInputTypes.push_back(temp);
@@ -108,9 +108,9 @@ void DummyFilter::createInputTypes()
 
 void DummyFilter::createOutputTypes()
 {
-	SelectDataStringDataAdapterBasePtr temp;
+	SelectDataStringPropertyBasePtr temp;
 
-	temp = SelectDataStringDataAdapter::New(mPatientModelService);
+	temp = StringPropertySelectData::New(mPatientModelService);
 	temp->setValueName("Output");
 	temp->setHelp("Dummy output from the dummy algorithm");
 	mOutputTypes.push_back(temp);
@@ -118,9 +118,9 @@ void DummyFilter::createOutputTypes()
 
 bool DummyFilter::execute()
 {
-	StringDataAdapterPtr stringOption = this->getStringOption(mCopiedOptions);
-	DoubleDataAdapterPtr doubleOption = this->getDoubleOption(mCopiedOptions);
-	BoolDataAdapterPtr boolOption = this->getBoolOption(mCopiedOptions);
+	StringPropertyBasePtr stringOption = this->getStringOption(mCopiedOptions);
+	DoublePropertyBasePtr doubleOption = this->getDoubleOption(mCopiedOptions);
+	BoolPropertyBasePtr boolOption = this->getBoolOption(mCopiedOptions);
 
 	std::cout << "Running dummy algorithm..." << std::endl;
 	std::cout << QString("  String option [%1]: %2").arg(stringOption->getDisplayName()).arg(stringOption->getValue()) << std::endl;

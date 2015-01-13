@@ -39,8 +39,8 @@ namespace cx
 {
 
 
-RegistrationFixedImageStringDataAdapter::RegistrationFixedImageStringDataAdapter(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService) :
-	SelectDataStringDataAdapterBase(patientModelService),
+StringPropertyRegistrationFixedImage::StringPropertyRegistrationFixedImage(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService) :
+	SelectDataStringPropertyBase(patientModelService),
 	mRegistrationService(registrationService),
 	mPatientModelService(patientModelService)
 {
@@ -49,7 +49,7 @@ RegistrationFixedImageStringDataAdapter::RegistrationFixedImageStringDataAdapter
 	connect(mRegistrationService.get(), SIGNAL(fixedDataChanged(QString)), this, SIGNAL(changed()));
 }
 
-bool RegistrationFixedImageStringDataAdapter::setValue(const QString& value)
+bool StringPropertyRegistrationFixedImage::setValue(const QString& value)
 {
 	DataPtr newImage = mPatientModelService->getData(value);
 	if (newImage == mRegistrationService->getFixedData())
@@ -57,7 +57,7 @@ bool RegistrationFixedImageStringDataAdapter::setValue(const QString& value)
 	mRegistrationService->setFixedData(newImage);
   return true;
 }
-QString RegistrationFixedImageStringDataAdapter::getValue() const
+QString StringPropertyRegistrationFixedImage::getValue() const
 {
 	DataPtr image = mRegistrationService->getFixedData();
   if (!image)
@@ -69,8 +69,8 @@ QString RegistrationFixedImageStringDataAdapter::getValue() const
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-RegistrationMovingImageStringDataAdapter::RegistrationMovingImageStringDataAdapter(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService) :
-	SelectDataStringDataAdapterBase(patientModelService),
+StringPropertyRegistrationMovingImage::StringPropertyRegistrationMovingImage(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService) :
+	SelectDataStringPropertyBase(patientModelService),
 	mRegistrationService(registrationService),
 	mPatientModelService(patientModelService)
 {
@@ -79,7 +79,7 @@ RegistrationMovingImageStringDataAdapter::RegistrationMovingImageStringDataAdapt
 	connect(mRegistrationService.get(), SIGNAL(movingDataChanged(QString)), this, SIGNAL(changed()));
 }
 
-bool RegistrationMovingImageStringDataAdapter::setValue(const QString& value)
+bool StringPropertyRegistrationMovingImage::setValue(const QString& value)
 {
 	DataPtr newImage = mPatientModelService->getData(value);
 	if (newImage == mRegistrationService->getMovingData())
@@ -88,7 +88,7 @@ bool RegistrationMovingImageStringDataAdapter::setValue(const QString& value)
   return true;
 }
 
-QString RegistrationMovingImageStringDataAdapter::getValue() const
+QString StringPropertyRegistrationMovingImage::getValue() const
 {
 	DataPtr image = mRegistrationService->getMovingData();
   if (!image)

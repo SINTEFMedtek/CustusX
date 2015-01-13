@@ -188,7 +188,7 @@ void TestTubeSegmentationFramework::runFilter(QString preset)
 	REQUIRE(data);
 
 	//set input
-	std::vector < cx::SelectDataStringDataAdapterBasePtr > input =tsf->getInputTypes();
+	std::vector < cx::SelectDataStringPropertyBasePtr > input =tsf->getInputTypes();
 	{
 		INFO("Number of inputs has changed.");
 		REQUIRE(input.size() == 1);
@@ -219,7 +219,7 @@ void TestTubeSegmentationFramework::runFilter(QString preset)
 	}
 
 	//check output
-	std::vector < cx::SelectDataStringDataAdapterBasePtr > output = tsf->getOutputTypes();
+	std::vector < cx::SelectDataStringPropertyBasePtr > output = tsf->getOutputTypes();
 	{
 		INFO("Number of outputs has changed.");
 		REQUIRE(output.size() == 5);

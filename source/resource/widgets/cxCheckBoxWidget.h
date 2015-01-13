@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-/**\brief Widget for the BoolDataAdapter.
+/**\brief Widget for the BoolPropertyBase.
  *
  * \ingroup cx_resource_widgets
  */
@@ -63,7 +63,7 @@ class cxResourceWidgets_EXPORT CheckBoxWidget: public OptimizedUpdateWidget
 {
 Q_OBJECT
 public:
-	CheckBoxWidget(QWidget* parent, BoolDataAdapterPtr data, QGridLayout* gridLayout = 0, int row = 0);
+	CheckBoxWidget(QWidget* parent, BoolPropertyBasePtr data, QGridLayout* gridLayout = 0, int row = 0);
 
 private slots:
     void prePaintEvent();
@@ -72,7 +72,7 @@ private slots:
 private:
     QLabel* mLabel;
     QCheckBox* mCheckBox;
-	BoolDataAdapterPtr mData;
+	BoolPropertyBasePtr mData;
 };
 
 }

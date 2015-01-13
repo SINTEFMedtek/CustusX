@@ -70,7 +70,7 @@ void ToolFilterGroupBox::createAppSelector()
 	QString defaultValue = "All";
 	QStringList range = stateService()->getAllApplicationStateNames();
 	range.prepend("All");
-	mAppSelector = StringDataAdapterXml::initialize("applications", "Application",
+	mAppSelector = StringProperty::initialize("applications", "Application",
 													"Display tools for a given applications",
 													defaultValue,
 													range,
@@ -81,7 +81,7 @@ void ToolFilterGroupBox::createAppSelector()
 ToolFilterGroupBox::~ToolFilterGroupBox()
 {}
 
-void ToolFilterGroupBox::setTrackingSystemSelector(StringDataAdapterPtr selector)
+void ToolFilterGroupBox::setTrackingSystemSelector(StringPropertyBasePtr selector)
 {
 	if (mTrackingSystemSelector)
 		disconnect(mTrackingSystemSelector.get(), SIGNAL(changed()), this, SLOT(filterSlot()));

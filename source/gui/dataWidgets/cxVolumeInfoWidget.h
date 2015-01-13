@@ -68,11 +68,11 @@ protected slots:
 private:
   void addWidgets();
 
-  ParentFrameStringDataAdapterPtr mParentFrameAdapter;
-  DataNameEditableStringDataAdapterPtr mNameAdapter;
-  DataUidEditableStringDataAdapterPtr mUidAdapter;
-  DataModalityStringDataAdapterPtr mModalityAdapter;
-  ImageTypeStringDataAdapterPtr mImageTypeAdapter;
+  StringPropertyParentFramePtr mParentFrameAdapter;
+  StringPropertyDataNameEditablePtr mNameAdapter;
+  StringPropertyDataUidEditablePtr mUidAdapter;
+  StringPropertyDataModalityPtr mModalityAdapter;
+  StringPropertyImageTypePtr mImageTypeAdapter;
   ActiveImageProxyPtr mActiveImageProxy;
   PatientModelServicePtr mPatientModelService;
 };

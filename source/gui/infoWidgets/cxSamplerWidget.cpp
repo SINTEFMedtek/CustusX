@@ -76,13 +76,13 @@ SamplerWidget::SamplerWidget(QWidget* parent) :
 	mAdvancedLayout->setMargin(0);
 	mLayout->addWidget(mAdvancedWidget);
 
-	mSpaceSelector = SpaceDataAdapterXml::initialize("selectSpace",
+	mSpaceSelector = SpaceProperty::initialize("selectSpace",
 											  "Space",
 											  "Select coordinate system to store position in.");
 	mSpaceSelector->setSpaceProvider(spaceProvider());
 
-	connect(mSpaceSelector.get(), &SpaceDataAdapterXml::valueWasSet, this, &SamplerWidget::spacesChangedSlot);
-	connect(mSpaceSelector.get(), &SpaceDataAdapterXml::valueWasSet, this, &SamplerWidget::setModified);
+	connect(mSpaceSelector.get(), &SpaceProperty::valueWasSet, this, &SamplerWidget::spacesChangedSlot);
+	connect(mSpaceSelector.get(), &SpaceProperty::valueWasSet, this, &SamplerWidget::setModified);
 	Space space = Space::fromString(settings()->value("sampler/Space", Space(csREF).toString()).toString());
 	mSpaceSelector->setValue(space);
 	SpaceEditWidget* spaceSelectorWidget = new SpaceEditWidget(this, mSpaceSelector);

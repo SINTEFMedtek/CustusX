@@ -30,14 +30,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-
-/*
- * sscBoolDataAdapter.h
- *
- *  Created on: Feb 7, 2011
- *      Author: christiana
- */
-
 #ifndef CXBOOLPROPERTYBASE_H_
 #define CXBOOLPROPERTYBASE_H_
 
@@ -48,15 +40,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-/**\brief DataAdapter interface for boolean values.
+/**\brief Property interface for boolean values.
  *
  * \ingroup cx_resource_core_dataadapters
  */
-class cxResource_EXPORT BoolDataAdapter: public DataAdapter
+class cxResource_EXPORT BoolPropertyBase: public Property
 {
 Q_OBJECT
 public:
-	virtual ~BoolDataAdapter()
+	virtual ~BoolPropertyBase()
 	{
 	}
 
@@ -86,7 +78,7 @@ public:
 	//signals:
 	//  void changed(); ///< emit when the underlying data value is changed: The user interface will be updated.
 };
-typedef boost::shared_ptr<BoolDataAdapter> BoolDataAdapterPtr;
+typedef boost::shared_ptr<BoolPropertyBase> BoolPropertyBasePtr;
 
 }
 

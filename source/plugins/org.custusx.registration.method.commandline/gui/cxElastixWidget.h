@@ -87,8 +87,8 @@ private:
 	QPushButton* mRegisterButton;
 	ElastixManagerPtr mElastixManager;
 
-	StringDataAdapterPtr mFixedImage;
-	StringDataAdapterPtr mMovingImage;
+	StringPropertyBasePtr mFixedImage;
+	StringPropertyBasePtr mMovingImage;
 	FileSelectWidget* mParameterFileWidget0;
 	FilePreviewWidget* mFilePreviewWidget;
 	QLineEdit* mExecutableEdit;
