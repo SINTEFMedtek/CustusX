@@ -121,14 +121,14 @@ ViewWrapper2D::ViewWrapper2D(ViewPtr view, CoreServicesPtr backend) :
 	connect(mZoom2D.get(), SIGNAL(zoomChanged()), this, SLOT(viewportChanged()));
 	setOrientationMode(SyncedValue::create(0)); // must set after addreps()
 
-	connect(mBackend->getToolManager().get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
+	connect(mBackend->getToolManager().get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(activeToolChangedSlot()));
 	connect(mView.get(), SIGNAL(resized(QSize)), this, SLOT(viewportChanged()));
 	connect(mView.get(), SIGNAL(shown()), this, SLOT(showSlot()));
 	connect(mView.get(), SIGNAL(mousePress(int, int, Qt::MouseButtons)), this, SLOT(mousePressSlot(int, int, Qt::MouseButtons)));
 	connect(mView.get(), SIGNAL(mouseMove(int, int, Qt::MouseButtons)), this, SLOT(mouseMoveSlot(int, int, Qt::MouseButtons)));
 	connect(mView.get(), SIGNAL(mouseWheel(int, int, int, int, Qt::MouseButtons)), this, SLOT(mouseWheelSlot(int, int, int, int, Qt::MouseButtons)));
 
-	this->dominantToolChangedSlot();
+	this->activeToolChangedSlot();
 	this->updateView();
 }
 
@@ -326,7 +326,7 @@ DoubleBoundingBox3D ViewWrapper2D::getViewport() const
 
 void ViewWrapper2D::showSlot()
 {
-	dominantToolChangedSlot();
+	activeToolChangedSlot();
 	viewportChanged();
 }
 
@@ -502,10 +502,10 @@ void ViewWrapper2D::dataRemoved(const QString& uid)
 	this->updateView();
 }
 
-void ViewWrapper2D::dominantToolChangedSlot()
+void ViewWrapper2D::activeToolChangedSlot()
 {
-	ToolPtr dominantTool = mBackend->getToolManager()->getActiveTool();
-	mSliceProxy->setTool(dominantTool);
+	ToolPtr activeTool = mBackend->getToolManager()->getActiveTool();
+	mSliceProxy->setTool(activeTool);
 }
 
 void ViewWrapper2D::setOrientationMode(SyncedValuePtr value)

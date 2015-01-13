@@ -68,9 +68,9 @@ InteractiveClipper::InteractiveClipper(CoreServicesPtr backend) :
 
 	connect(mSlicePlaneClipper.get(), SIGNAL(slicePlaneChanged()), this, SLOT(changedSlot()));
 	connect(this, SIGNAL(changed()), this, SLOT(changedSlot()));
-	connect(mBackend->trackingService.get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
+	connect(mBackend->trackingService.get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(activeToolChangedSlot()));
 
-	this->dominantToolChangedSlot();
+	this->activeToolChangedSlot();
 	this->changedSlot();
 }
 
@@ -192,14 +192,14 @@ std::vector<PLANE_TYPE> InteractiveClipper::getAvailableSlicePlanes() const
 	return retval;
 }
 
-void InteractiveClipper::dominantToolChangedSlot()
+void InteractiveClipper::activeToolChangedSlot()
 {
-	ToolPtr dominantTool = mBackend->trackingService->getActiveTool();
+	ToolPtr activTool = mBackend->trackingService->getActiveTool();
 
 	SlicePlanesProxy::DataMap data = mSlicePlanesProxy->getData();
 	for (SlicePlanesProxy::DataMap::iterator iter = data.begin(); iter != data.end(); ++iter)
 	{
-		iter->second.mSliceProxy->setTool(dominantTool);
+		iter->second.mSliceProxy->setTool(activTool);
 	}
 }
 

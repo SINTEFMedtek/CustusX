@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxRegistrationBaseWidget.h"
 #include "cxTransform3D.h"
-#include "cxDominantToolProxy.h"
+#include "cxActiveToolProxy.h"
 #include "cxPatientModelService.h"
 
 class QPushButton;
@@ -77,7 +77,7 @@ private:
   QPushButton* mPatientOrientationButton;
   QCheckBox* mInvertButton;
 
-  DominantToolProxyPtr mDominantToolProxy;
+  ActiveToolProxyPtr mActiveToolProxy;
 };
 
 /**

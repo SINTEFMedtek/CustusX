@@ -91,7 +91,7 @@ public:
 protected slots:
 	virtual void dataViewPropertiesChangedSlot(QString uid);
 private slots:
-	void dominantToolChangedSlot(); ///< makes sure the reps are connected to the right tool
+	void activeToolChangedSlot(); ///< makes sure the reps are connected to the right tool
 	void viewportChanged();
 	void showSlot();
 	void mousePressSlot(int x, int y, Qt::MouseButtons buttons);

@@ -138,8 +138,8 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ViewPtr view, CoreServicesPtr backe
 	mPickerRep->setSphereRadius(settings()->value("View3D/sphereRadius").toDouble());
 	mPickerRep->setEnabled(false);
 	mView->addRep(mPickerRep);
-	connect(mBackend->getToolManager().get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
-	this->dominantToolChangedSlot();
+	connect(mBackend->getToolManager().get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(activeToolChangedSlot()));
+	this->activeToolChangedSlot();
 
 	// plane type text rep
 	mPlaneTypeText = DisplayTextRep::New();
@@ -764,12 +764,12 @@ ViewPtr ViewWrapper3D::getView()
 	return mView;
 }
 
-void ViewWrapper3D::dominantToolChangedSlot()
+void ViewWrapper3D::activeToolChangedSlot()
 {
-	ToolPtr dominantTool = mBackend->getToolManager()->getActiveTool();
-	mPickerRep->setTool(dominantTool);
+	ToolPtr activeTool = mBackend->getToolManager()->getActiveTool();
+	mPickerRep->setTool(activeTool);
 	if (mSlices3DRep)
-		mSlices3DRep->setTool(dominantTool);
+		mSlices3DRep->setTool(activeTool);
 }
 
 void ViewWrapper3D::toolsAvailableSlot()

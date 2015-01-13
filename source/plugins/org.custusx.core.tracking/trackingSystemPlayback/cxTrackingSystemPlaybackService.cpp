@@ -172,7 +172,7 @@ TrackerConfigurationPtr TrackingSystemPlaybackService::getConfiguration()
 void TrackingSystemPlaybackService::onToolPositionChanged(Transform3D matrix, double timestamp)
 {
 	// Overwrite manual tool pos, set timestamp to 1ms previous.
-	// This makes sure manual tool is not picked as dominant.
+	// This makes sure manual tool is not picked as active.
 	mManual->set_prMt(matrix, timestamp-1);
 //	mManual->setVisible(false);
 //	mManual->setVisible(true);

@@ -70,7 +70,7 @@ ViewWrapperVideo::ViewWrapperVideo(ViewPtr view, CoreServicesPtr backend) :
 
 	connect(mBackend->getToolManager().get(), &TrackingService::stateChanged, this, &ViewWrapperVideo::connectStream);
 	connect(mBackend->getVideoService().get(), SIGNAL(activeVideoSourceChanged()), this, SLOT(connectStream()));
-	connect(mBackend->getToolManager().get(), SIGNAL(dominantToolChanged(QString)), this, SLOT(connectStream()));
+	connect(mBackend->getToolManager().get(), SIGNAL(activeToolChanged(QString)), this, SLOT(connectStream()));
 
 	addReps();
 

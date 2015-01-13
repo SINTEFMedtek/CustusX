@@ -103,7 +103,7 @@ private:
 	DummyToolManager();
 
 	DummyToolMap mDummyTools;
-	DummyToolPtr mDominantTool;
+	DummyToolPtr mActiveTool;
 	DummyToolPtr mReferenceTool;
 
 	virtual void startTracking();

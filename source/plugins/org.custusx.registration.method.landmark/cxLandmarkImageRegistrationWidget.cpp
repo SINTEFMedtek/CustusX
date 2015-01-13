@@ -71,9 +71,9 @@ LandmarkImageRegistrationWidget::LandmarkImageRegistrationWidget(RegServices ser
 	connect(mCurrentProperty.get(), SIGNAL(changed()), this, SLOT(onCurrentImageChanged()));
 	mImageLandmarkSource = ImageLandmarksSource::New();
 
-	mDominantToolProxy = DominantToolProxy::New(trackingService());
-	connect(mDominantToolProxy.get(), SIGNAL(toolVisible(bool)), this, SLOT(enableButtons()));
-	connect(mDominantToolProxy.get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(enableButtons()));
+	mActiveToolProxy = ActiveToolProxy::New(trackingService());
+	connect(mActiveToolProxy.get(), SIGNAL(toolVisible(bool)), this, SLOT(enableButtons()));
+	connect(mActiveToolProxy.get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(enableButtons()));
 
 	//pushbuttons
 	mAddLandmarkButton = new QPushButton("Add", this);

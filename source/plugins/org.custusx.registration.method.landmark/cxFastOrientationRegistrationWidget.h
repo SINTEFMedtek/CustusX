@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationBaseWidget.h"
 #include "cxForwardDeclarations.h"
 #include "cxTransform3D.h"
-#include "cxDominantToolProxy.h"
+#include "cxActiveToolProxy.h"
 
 class QPushButton;
 class QCheckBox;
@@ -78,7 +78,7 @@ private:
   Transform3D get_tMtm() const;
   QPushButton* mSetOrientationButton;
   QCheckBox* mInvertButton;
-  DominantToolProxyPtr mDominantToolProxy;
+  ActiveToolProxyPtr mActiveToolProxy;
 };
 
 /**

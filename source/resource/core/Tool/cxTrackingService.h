@@ -78,7 +78,7 @@ public:
 
 	virtual ToolPtr getTool(const QString& uid) = 0; ///< get a tool
 	virtual ToolPtr getActiveTool() = 0; ///< get the tool that has higest priority when tracking
-	virtual void setActiveTool(const QString& uid) = 0; ///< set a tool to be the dominant tool
+	virtual void setActiveTool(const QString& uid) = 0; ///< set a tool to be the active tool
 	virtual ToolPtr getFirstProbe() = 0; ///< get the active probe or any if none active
 
 	virtual ToolPtr getReferenceTool() const = 0; ///< tool used as patient reference
@@ -102,7 +102,7 @@ public:
 
 signals:
 	void stateChanged();
-	void dominantToolChanged(const QString& uId);
+	void activeToolChanged(const QString& uId);
 
 public slots:
 

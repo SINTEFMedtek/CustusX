@@ -58,7 +58,6 @@ public:
 	virtual std::map<QString, QString> getDisplayNamesForCoordRefObjects() { return std::map<QString, QString>(); }
 	virtual cx::SpaceListenerPtr createListener() { return SpaceListenerMock::create(); }
 
-    virtual cx::Vector3D getDominantToolTipPoint(cx::CoordinateSystem to, bool useOffset = false) { return this->getActiveToolTipPoint(to, useOffset); }
     virtual cx::Vector3D getActiveToolTipPoint(cx::CoordinateSystem to, bool useOffset = false) { return cx::Vector3D::Zero(); }
 	virtual cx::Transform3D getActiveToolTipTransform(cx::CoordinateSystem to, bool useOffset = false) { return cx::Transform3D::Identity(); }
 	virtual cx::Transform3D get_rMpr() { return cx::Transform3D::Identity(); }

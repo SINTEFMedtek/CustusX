@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxImage.h"
 #include "cxTransform3D.h"
-#include "cxDominantToolProxy.h"
+#include "cxActiveToolProxy.h"
 
 class QVBoxLayout;
 class QComboBox;
@@ -105,7 +105,7 @@ protected:
 	//data
 	ImageLandmarksSourcePtr mImageLandmarkSource;
 	StringPropertyRegistrationFixedImagePtr mFixedProperty;
-	DominantToolProxyPtr mDominantToolProxy;
+	ActiveToolProxyPtr mActiveToolProxy;
 
 private:
 	LandmarkPatientRegistrationWidget(); ///< not implemented

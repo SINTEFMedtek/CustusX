@@ -30,8 +30,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXDOMINANTTOOLPROXY_H_
-#define CXDOMINANTTOOLPROXY_H_
+#ifndef CXACTIVETOOLPROXY_H_
+#define CXACTIVETOOLPROXY_H_
 
 #include "cxResourceExport.h"
 #include "cxTool.h"
@@ -45,36 +45,36 @@ namespace cx
  * @{
  */
 
-typedef boost::shared_ptr<class DominantToolProxy> DominantToolProxyPtr;
+typedef boost::shared_ptr<class ActiveToolProxy> ActiveToolProxyPtr;
 class ToolManager;
 
 /**
- * \brief Helper class for connecting to the dominant tool.
+ * \brief Helper class for connecting to the active tool.
  * \ingroup cx_service_tracking
  *
  * By listening to this class, you will always listen
- * to the dominant tool.
+ * to the active tool.
  *
  *  \date Sep 9, 2011
  *  \author christiana
  */
-class cxResource_EXPORT DominantToolProxy: public QObject
+class cxResource_EXPORT ActiveToolProxy: public QObject
 {
 Q_OBJECT
 
 public:
-	static DominantToolProxyPtr New(TrackingServicePtr trackingService)
+	static ActiveToolProxyPtr New(TrackingServicePtr trackingService)
 	{
-		return DominantToolProxyPtr(new DominantToolProxy(trackingService));
+		return ActiveToolProxyPtr(new ActiveToolProxy(trackingService));
 	}
 
 	ToolPtr getTool() { return mTool; }
 
 signals:
 	// the original tool change signal
-	void dominantToolChanged(const QString&);
+	void activeToolChanged(const QString&);
 
-	// forwarding of dominant tool signals
+	// forwarding of active tool signals
 	void toolTransformAndTimestamp(Transform3D matrix, double timestamp);
 	void toolVisible(bool visible);
 	void tooltipOffset(double offset);
@@ -83,9 +83,9 @@ signals:
 
 
 private slots:
-	void dominantToolChangedSlot(const QString&);
+	void activeToolChangedSlot(const QString&);
 private:
-	DominantToolProxy(TrackingServicePtr trackingService);
+	ActiveToolProxy(TrackingServicePtr trackingService);
 	ToolPtr mTool;
 	TrackingServicePtr mTrackingService;
 };
@@ -95,4 +95,4 @@ private:
  */
 }
 
-#endif /* CXDOMINANTTOOLPROXY_H_ */
+#endif /* CXACTIVETOOLPROXY_H_ */

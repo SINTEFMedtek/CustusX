@@ -63,7 +63,7 @@ USAcquisition::USAcquisition(AcquisitionPtr base, UsReconstructionServicePtr rec
 
 
 	connect(trackingService().get(), &TrackingService::stateChanged, this, &USAcquisition::checkIfReadySlot);
-	connect(trackingService().get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(checkIfReadySlot()));
+	connect(trackingService().get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(checkIfReadySlot()));
 	connect(videoService().get(), SIGNAL(activeVideoSourceChanged()), this, SLOT(checkIfReadySlot()));
 	connect(videoService().get(), &VideoService::connected, this, &USAcquisition::checkIfReadySlot);
 

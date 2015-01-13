@@ -46,7 +46,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
     Tool/cxSlicedImageProxy
     Tool/cxToolImpl
     Tool/cxTrackingService
-    Tool/cxDominantToolProxy
+    Tool/cxActiveToolProxy
     Tool/cxTrackingSystemService.h
 
 	properties/cxProperty
@@ -85,7 +85,6 @@ cx_add_class_qt_moc(cxResource_SOURCE
     settings/cxStateServiceNull
     settings/cxStateServiceProxy
     settings/cxSessionStorageService
-    settings/cxSessionStorageServiceProxy
 
     algorithms/cxTimedAlgorithm.h
     algorithms/cxThreadedTimedAlgorithm.h
@@ -190,6 +189,7 @@ cx_add_class(cxResource_SOURCE
 
     settings/cxDataLocations
     settings/cxSettings
+    settings/cxSessionStorageServiceProxy
 
     vesselReg/SeansVesselReg.cxx
     vesselReg/SeansVesselReg.hxx

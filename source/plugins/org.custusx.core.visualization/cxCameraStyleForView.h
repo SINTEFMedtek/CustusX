@@ -87,7 +87,7 @@ public:
 
 private slots:
 	void setModified();
-	void dominantToolChangedSlot();
+	void activeToolChangedSlot();
 
 private:
 	ViewPtr getView() const;

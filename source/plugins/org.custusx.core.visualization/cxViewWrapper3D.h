@@ -99,7 +99,7 @@ protected slots:
 	virtual void dataViewPropertiesChangedSlot(QString uid);
 private slots:
 	void showSlices();
-	void dominantToolChangedSlot(); ///< makes sure the reps are connected to the right tool
+	void activeToolChangedSlot(); ///< makes sure the reps are connected to the right tool
 	void toolsAvailableSlot(); ///< add all tools when configured
 	void showSlicePlanesActionSlot(bool checked);
 	void fillSlicePlanesActionSlot(bool checked);

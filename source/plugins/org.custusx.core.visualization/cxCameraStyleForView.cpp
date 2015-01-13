@@ -74,7 +74,7 @@ CameraStyleForView::CameraStyleForView(CoreServicesPtr backend) :
 	mPreRenderListener.reset(new ViewportPreRenderListener);
 	mPreRenderListener->setCallback(boost::bind(&CameraStyleForView::onPreRender, this));
 
-	connect(mBackend->getToolManager().get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
+	connect(mBackend->getToolManager().get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(activeToolChangedSlot()));
 }
 
 void CameraStyleForView::setView(ViewPtr widget)
@@ -189,7 +189,7 @@ void CameraStyleForView::moveCameraToolStyleSlot(Transform3D prMt, double timest
 	mBlockCameraUpdate = false;
 }
 
-void CameraStyleForView::dominantToolChangedSlot()
+void CameraStyleForView::activeToolChangedSlot()
 {
 	ToolPtr newTool = mBackend->getToolManager()->getActiveTool();
 	if (newTool == mFollowingTool)

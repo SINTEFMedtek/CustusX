@@ -37,12 +37,12 @@ namespace cx
 
 DoublePropertyTimeCalibration::DoublePropertyTimeCalibration()
 {
-  connect(trackingService().get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChanged()));
-  connect(trackingService().get(), &TrackingService::stateChanged, this, &DoublePropertyTimeCalibration::dominantToolChanged);
-  this->dominantToolChanged();
+  connect(trackingService().get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(activeToolChanged()));
+  connect(trackingService().get(), &TrackingService::stateChanged, this, &DoublePropertyTimeCalibration::activeToolChanged);
+  this->activeToolChanged();
 }
 
-void DoublePropertyTimeCalibration::dominantToolChanged()
+void DoublePropertyTimeCalibration::activeToolChanged()
 {
   // ignore tool changes to something non-probeish.
   // This gives the user a chance to use the widget without having to show the probe.

@@ -30,26 +30,26 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxDominantToolProxy.h"
+#include "cxActiveToolProxy.h"
 #include "cxTrackingService.h"
 #include "cxTool.h"
 
 namespace cx
 {
 
-DominantToolProxy::DominantToolProxy(TrackingServicePtr trackingService) :
+ActiveToolProxy::ActiveToolProxy(TrackingServicePtr trackingService) :
 	mTrackingService(trackingService)
 {
-	connect(mTrackingService.get(), SIGNAL(dominantToolChanged(const QString&)), this,
-					SLOT(dominantToolChangedSlot(const QString&)));
-	connect(mTrackingService.get(), SIGNAL(dominantToolChanged(const QString&)), this,
-					SIGNAL(dominantToolChanged(const QString&)));
+	connect(mTrackingService.get(), SIGNAL(activeToolChanged(const QString&)), this,
+					SLOT(activeToolChangedSlot(const QString&)));
+	connect(mTrackingService.get(), SIGNAL(activeToolChanged(const QString&)), this,
+					SIGNAL(activeToolChanged(const QString&)));
 
 	if (mTrackingService->getActiveTool())
-		this->dominantToolChangedSlot(mTrackingService->getActiveTool()->getUid());
+		this->activeToolChangedSlot(mTrackingService->getActiveTool()->getUid());
 }
 
-void DominantToolProxy::dominantToolChangedSlot(const QString& uid)
+void ActiveToolProxy::activeToolChangedSlot(const QString& uid)
 {
 	if (mTool && mTool->getUid() == uid)
 		return;

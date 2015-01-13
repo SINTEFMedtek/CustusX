@@ -140,7 +140,7 @@ QWidget* USAcqusitionWidget::createOptionsWidget()
 	layout->setMargin(0);
 
 	SoundSpeedConverterWidget* soundSpeedWidget = new SoundSpeedConverterWidget(this);
-	connect(trackingService().get(), &TrackingService::dominantToolChanged, soundSpeedWidget, &SoundSpeedConverterWidget::setToolSlot);
+	connect(trackingService().get(), &TrackingService::activeToolChanged, soundSpeedWidget, &SoundSpeedConverterWidget::setToolSlot);
 
 	ProbeConfigWidget* probeWidget = new ProbeConfigWidget(this);
 	probeWidget->getActiveProbeConfigWidget()->setVisible(false);

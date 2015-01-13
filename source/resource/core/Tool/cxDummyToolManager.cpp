@@ -53,7 +53,7 @@ DummyToolManager::DummyToolManager() :
 {
 	DummyToolPtr tool1(new DummyTool());
 
-	mDominantTool = tool1;
+	mActiveTool = tool1;
 	mReferenceTool = tool1;
 
 	mDummyTools.insert(std::pair<QString, DummyToolPtr>(tool1->getUid(), tool1));
@@ -114,13 +114,13 @@ ToolPtr DummyToolManager::getTool(const QString& uid)
 
 ToolPtr DummyToolManager::getActiveTool()
 {
-	return mDominantTool;
+	return mActiveTool;
 }
 void DummyToolManager::setActiveTool(const QString& uid)
 {
 	DummyToolMapConstIter it = mDummyTools.find(uid);
-	mDominantTool = (*it).second;
-	emit dominantToolChanged(uid);
+	mActiveTool = (*it).second;
+	emit activeToolChanged(uid);
 }
 
 Transform3D DummyToolManager::get_rMpr() const

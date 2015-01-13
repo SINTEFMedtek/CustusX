@@ -98,7 +98,7 @@ public: // optional methods
   ToolPtr getTool() { return mTool; }
 
 private slots:
-  void dominantToolChanged();
+  void activeToolChanged();
 private:
   ToolPtr mTool;
 };

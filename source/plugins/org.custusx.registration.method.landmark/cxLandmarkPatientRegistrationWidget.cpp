@@ -87,9 +87,9 @@ LandmarkPatientRegistrationWidget::LandmarkPatientRegistrationWidget(RegServices
 	connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
 
 	//toolmanager
-	mDominantToolProxy = DominantToolProxy::New(trackingService());
-	connect(mDominantToolProxy.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateToolSampleButton()));
-	connect(mDominantToolProxy.get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(updateToolSampleButton()));
+	mActiveToolProxy = ActiveToolProxy::New(trackingService());
+	connect(mActiveToolProxy.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateToolSampleButton()));
+	connect(mActiveToolProxy.get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(updateToolSampleButton()));
 	connect(services.patientModelService.get(), &PatientModelService::debugModeChanged, this, &LandmarkPatientRegistrationWidget::updateToolSampleButton);
 
 	//layout

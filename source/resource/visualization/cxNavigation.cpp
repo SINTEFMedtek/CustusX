@@ -114,7 +114,7 @@ void Navigation::centerToGlobalDataCenter()
 }
 
 /**Place the global center at the current position of the
- * tooltip of the dominant tool.
+ * tooltip of the active tool.
  */
 void Navigation::centerToTooltip()
 {

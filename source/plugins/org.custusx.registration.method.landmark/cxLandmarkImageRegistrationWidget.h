@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxLandmarkRegistrationWidget.h"
 #include "cxRegistrationProperties.h"
-#include "cxDominantToolProxy.h"
+#include "cxActiveToolProxy.h"
 
 class QVBoxLayout;
 class QComboBox;
@@ -99,7 +99,7 @@ protected:
 	//gui
 	SelectDataStringPropertyBasePtr mCurrentProperty;
 	ImageLandmarksSourcePtr mImageLandmarkSource;
-	DominantToolProxyPtr mDominantToolProxy;
+	ActiveToolProxyPtr mActiveToolProxy;
 
 	QPushButton* mAddLandmarkButton; ///< the Add Landmark button
 	QPushButton* mEditLandmarkButton; ///< the Edit Landmark button

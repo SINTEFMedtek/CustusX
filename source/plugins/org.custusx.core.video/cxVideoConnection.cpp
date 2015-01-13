@@ -55,7 +55,7 @@ VideoConnection::VideoConnection(VideoServiceBackendPtr backend)
 	mUnsusedProbeDataVector.clear();
 
 	connect(mBackend->getToolManager().get(), &TrackingService::stateChanged, this, &VideoConnection::connectVideoToProbe);
-	connect(mBackend->getToolManager().get(), SIGNAL(dominantToolChanged(QString)), this, SLOT(connectVideoToProbe()));
+	connect(mBackend->getToolManager().get(), SIGNAL(activeToolChanged(QString)), this, SLOT(connectVideoToProbe()));
 }
 
 VideoConnection::~VideoConnection()

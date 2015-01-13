@@ -46,7 +46,7 @@ namespace cx
  * @{
  */
 
-/** Interface to the tool offset of the dominant tool
+/** Interface to the tool offset of the active tool
  */
 class cxGui_EXPORT DoublePropertyTimeCalibration : public DoublePropertyBase
 {
@@ -62,7 +62,7 @@ public:
   DoubleRange getValueRange() const;
 
 private slots:
-  void dominantToolChanged();
+  void activeToolChanged();
 
 private:
   ToolPtr mTool;

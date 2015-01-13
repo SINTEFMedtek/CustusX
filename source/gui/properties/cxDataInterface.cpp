@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVideoSource.h"
 #include "cxVideoService.h"
 #include "cxPatientModelService.h"
-#include "cxDominantToolProxy.h"
+#include "cxActiveToolProxy.h"
 
 //TODO: remove
 #include "cxLegacySingletons.h"
@@ -55,8 +55,8 @@ namespace cx
 {
 DoublePropertyActiveToolOffset::DoublePropertyActiveToolOffset()
 {
-  mActiveTool = DominantToolProxy::New(trackingService());
-  connect(mActiveTool.get(), &DominantToolProxy::tooltipOffset, this, &Property::changed);
+  mActiveTool = ActiveToolProxy::New(trackingService());
+  connect(mActiveTool.get(), &ActiveToolProxy::tooltipOffset, this, &Property::changed);
 }
 
 double DoublePropertyActiveToolOffset::getValue() const

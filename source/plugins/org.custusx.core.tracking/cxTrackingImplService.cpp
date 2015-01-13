@@ -185,15 +185,15 @@ void TrackingImplService::initializeManualTool()
 		mManualTool.reset(new ManualToolAdapter("ManualTool"));
 		mTools["ManualTool"] = mManualTool;
 		mManualTool->setVisible(true);
-		connect(mManualTool.get(), &Tool::toolVisible, this, &TrackingImplService::dominantCheckSlot);
-		connect(mManualTool.get(), &Tool::toolTransformAndTimestamp, this, &TrackingImplService::dominantCheckSlot);
+		connect(mManualTool.get(), &Tool::toolVisible, this, &TrackingImplService::activeCheckSlot);
+		connect(mManualTool.get(), &Tool::toolTransformAndTimestamp, this, &TrackingImplService::activeCheckSlot);
 		connect(mManualTool.get(), &Tool::tooltipOffset, this, &TrackingImplService::onTooltipOffset);
 	}
 
 	Transform3D rMpr = Transform3D::Identity(); // not known: not really important either
 	Transform3D prMt = rMpr.inv() * createTransformRotateY(M_PI) * createTransformRotateZ(M_PI/2);
 	mManualTool->set_prMt(prMt);
-	this->dominantCheckSlot();
+	this->activeCheckSlot();
 }
 
 Tool::State TrackingImplService::getState() const
@@ -251,8 +251,8 @@ void TrackingImplService::addToolsFrom(TrackingSystemServicePtr system)
 	{
 		ToolPtr tool = tools[i];
 		mTools[tool->getUid()] = tool;
-		connect(tool.get(), SIGNAL(toolVisible(bool)), this, SLOT(dominantCheckSlot()));
-		connect(tool.get(), &Tool::toolTransformAndTimestamp, this, &TrackingImplService::dominantCheckSlot);
+		connect(tool.get(), SIGNAL(toolVisible(bool)), this, SLOT(activeCheckSlot()));
+		connect(tool.get(), &Tool::toolTransformAndTimestamp, this, &TrackingImplService::activeCheckSlot);
 		connect(tool.get(), &Tool::tooltipOffset, this, &TrackingImplService::onTooltipOffset);
 
 		if (tool->hasType(Tool::TOOL_REFERENCE))
@@ -305,19 +305,19 @@ ToolPtr TrackingImplService::getTool(const QString& uid)
 
 ToolPtr TrackingImplService::getActiveTool()
 {
-	return mDominantTool;
+	return mActiveTool;
 }
 
 void TrackingImplService::setActiveTool(const QString& uid)
 {
-	if (mDominantTool && mDominantTool->getUid() == uid)
+	if (mActiveTool && mActiveTool->getUid() == uid)
 		return;
 
 	ToolPtr newTool;
 	newTool = this->getTool(uid);
 
-	ToolPtr oldTool = mDominantTool;
-	mDominantTool = newTool; // set dominant before calling setters, which possibly can emit signal and cause cycles.
+	ToolPtr oldTool = mActiveTool;
+	mActiveTool = newTool; // set active before calling setters, which possibly can emit signal and cause cycles.
 
 	// special case for manual tool
 	if (newTool && newTool->hasType(Tool::TOOL_MANUAL) && mManualTool)
@@ -331,7 +331,7 @@ void TrackingImplService::setActiveTool(const QString& uid)
 		mManualTool->setVisible(false);
 	}
 
-	emit dominantToolChanged(uid);
+	emit activeToolChanged(uid);
 }
 
 ToolPtr TrackingImplService::getReferenceTool() const
@@ -440,7 +440,7 @@ void TrackingImplService::resetTrackingPositionFilters()
 	}
 }
 
-void TrackingImplService::dominantCheckSlot()
+void TrackingImplService::activeCheckSlot()
 {
 	if (this->manualToolHasMostRecentTimestamp() && mManualTool->getVisible())
 	{
@@ -448,7 +448,7 @@ void TrackingImplService::dominantCheckSlot()
 		return;
 	}
 
-	bool use = settings()->value("Automation/autoSelectDominantTool").toBool();
+	bool use = settings()->value("Automation/autoSelectActiveTool").toBool();
 	if (!use)
 		return;
 
@@ -470,7 +470,7 @@ bool TrackingImplService::manualToolHasMostRecentTimestamp()
 	// original comment (was wrapped in an ifplayblack):
 	// In static playback mode, tools does not turn invisible since
 	// time dont move. Here we check whether manual tool has a newer
-	// timestamp than the playback tools. If it has, make it dominant.
+	// timestamp than the playback tools. If it has, make it active.
 	// This enables automatic change to manual tool if the user
 	// manipulates the manual tool in some way.
 

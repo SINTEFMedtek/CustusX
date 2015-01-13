@@ -61,9 +61,8 @@ public:
 	virtual std::map<QString, QString> getDisplayNamesForCoordRefObjects() = 0;
 	virtual SpaceListenerPtr createListener() = 0;
 
-    virtual Vector3D getDominantToolTipPoint(CoordinateSystem to, bool useOffset = false) = 0; ///< obsolete, use active instead
-    virtual Vector3D getActiveToolTipPoint(CoordinateSystem to, bool useOffset = false) = 0; ///< P_to, dominant tools current point in coord
-	virtual Transform3D getActiveToolTipTransform(CoordinateSystem to, bool useOffset = false) = 0;///< Get toMt, where t is dominant tool
+	virtual Vector3D getActiveToolTipPoint(CoordinateSystem to, bool useOffset = false) = 0; ///< P_to, active tools current point in coord
+	virtual Transform3D getActiveToolTipTransform(CoordinateSystem to, bool useOffset = false) = 0;///< Get toMt, where t is active tool
 	virtual Transform3D get_rMpr() = 0;
 
 	virtual CoordinateSystem getS(ToolPtr tool) = 0; ///<tools sensor coordinate system

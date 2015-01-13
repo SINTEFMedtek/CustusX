@@ -78,7 +78,7 @@ public slots:
 	void invertPlane(bool on);
 private slots:
 	void changedSlot();
-	void dominantToolChangedSlot();
+	void activeToolChangedSlot();
 
 private:
 	PLANE_TYPE getPlaneType();
