@@ -467,7 +467,7 @@ void ConsoleWidget::createUI()
 	mStackedLayout->setMargin(0);
 	layout->addLayout(mStackedLayout);
 
-	mMessageListener = MessageListener::create(mLog);
+	mMessageListener = MessageListener::create(mLog.get());
 	mMessageFilter.reset(new MessageFilterConsole);
 	mMessageListener->installFilter(mMessageFilter);
 	connect(mMessageListener.get(), &MessageListener::newMessage, this, &ConsoleWidget::receivedMessage);

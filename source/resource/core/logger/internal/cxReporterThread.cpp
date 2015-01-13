@@ -140,6 +140,10 @@ int ReporterThread::getDefaultTimeout(MESSAGE_LEVEL messageLevel) const
 
 void ReporterThread::logMessage(Message msg)
 {
+	// send in calling thread- this helps if the app
+	// is about to crash and we need debug info.
+	this->sendToCout(msg);
+
 	QMetaObject::invokeMethod(this, "processMessage",
 							  Qt::QueuedConnection,
 							  Q_ARG(Message, msg));
@@ -149,7 +153,7 @@ void ReporterThread::processMessage(Message message)
 {
 	message = this->cleanupMessage(message);
 
-	this->sendToCout(message);
+//	this->sendToCout(message);
 	this->sendToFile(message);
 
 	emit emittedMessage(message);
@@ -174,14 +178,14 @@ void ReporterThread::sendToFile(Message message)
 
 void ReporterThread::sendToCout(Message message)
 {
-//	if (!mCout)
-//		return;
-//	if (message.getMessageLevel()==mlVOLATILE)
-//		return;
-//	if (( message.getMessageLevel() == mlCOUT )||( message.getMessageLevel() == mlCERR ))
-//		return;
+	if (!mCout)
+		return;
+	if (message.getMessageLevel()==mlVOLATILE)
+		return;
+	if (( message.getMessageLevel() == mlCOUT )||( message.getMessageLevel() == mlCERR ))
+		return;
 
-//	mCout->sendUnredirected(message.getPrintableMessage()+"\n");
+	mCout->sendUnredirected(message.getPrintableMessage()+"\n");
 }
 
 Message ReporterThread::cleanupMessage(Message message)

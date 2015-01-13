@@ -40,12 +40,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-MessageListenerPtr MessageListener::create(LogPtr log)
+MessageListenerPtr MessageListener::create(LogQPointer log)
 {
 	return MessageListenerPtr(new MessageListener(log));
 }
 
-MessageListenerPtr MessageListener::createWithQueue(LogPtr log, int size)
+MessageListenerPtr MessageListener::createWithQueue(LogQPointer log, int size)
 {
 	MessageListenerPtr retval(new MessageListener(log));
 	retval->setMessageQueueMaxSize(size);
@@ -62,14 +62,13 @@ MessageListenerPtr MessageListener::clone()
 }
 
 
-MessageListener::MessageListener(LogPtr log) :
+MessageListener::MessageListener(LogQPointer log) :
 	mManager(log),
 	mMessageHistoryMaxSize(0)
 {
 	mManager = log;
 	if (!mManager)
-		mManager = LogPtr(reporter(), null_deleter());
-//	mManager = reporter();
+		mManager = reporter();
 
 	mObserver.reset(new MessageObserver());
 	connect(mObserver.get(), &MessageObserver::newMessage, this, &MessageListener::messageReceived);

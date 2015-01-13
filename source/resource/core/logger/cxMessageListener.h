@@ -47,6 +47,7 @@ typedef boost::shared_ptr<class MessageFilter> MessageFilterPtr;
 typedef boost::shared_ptr<class MessageObserver> MessageObserverPtr;
 typedef boost::shared_ptr<class MessageListener> MessageListenerPtr;
 typedef boost::shared_ptr<class Log> LogPtr;
+typedef QPointer<class Log> LogQPointer;
 
 /** Utility for listening to the Reporter
   * and storing messages from it.
@@ -62,10 +63,10 @@ class cxResource_EXPORT MessageListener : public QObject
 {
 	Q_OBJECT
 public:
-	static MessageListenerPtr create(LogPtr log=LogPtr());
-	static MessageListenerPtr createWithQueue(LogPtr log=LogPtr(), int size=1000);
+	static MessageListenerPtr create(LogQPointer log=LogQPointer());
+	static MessageListenerPtr createWithQueue(LogQPointer log=LogQPointer(), int size=1000);
 	MessageListenerPtr clone();
-	MessageListener(LogPtr log);
+	MessageListener(LogQPointer log);
 	~MessageListener();
 	bool containsErrors() const;
 	QList<Message> getMessages() const;
@@ -86,7 +87,7 @@ private:
 	bool isError(MESSAGE_LEVEL level) const;
 	void limitQueueSize();
 	QList<Message> mMessages;
-	LogPtr mManager;
+	LogQPointer mManager;
 	int mMessageHistoryMaxSize;
 
 	MessageObserverPtr mObserver;
