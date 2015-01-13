@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxDefinitionStrings.h"
 #include "cxUtilHelpers.h"
-#include "cxVisualizationService.h"
+#include "cxViewService.h"
 
 namespace cx
 {

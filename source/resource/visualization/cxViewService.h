@@ -30,8 +30,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXVISUALIZATIONSERVICE_H
-#define CXVISUALIZATIONSERVICE_H
+#ifndef CXVIEWSERVICE_H_
+#define CXVIEWSERVICE_H_
 
 #include "cxResourceVisualizationExport.h"
 
@@ -112,4 +112,4 @@ typedef VisualizationService ViewService;
 } //cx
 Q_DECLARE_INTERFACE(cx::VisualizationService, VisualizationService_iid)
 
-#endif // CXVISUALIZATIONSERVICE_H
+#endif // CXVIEWSERVICE_H_

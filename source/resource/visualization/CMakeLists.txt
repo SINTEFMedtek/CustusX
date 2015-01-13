@@ -59,7 +59,7 @@ cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
 
     RepVideo/cxVideoRep
 
-    cxVisualizationService
+    cxViewService
     cxViewGroupData
     cxLayoutRepository
     cxInteractiveClipper
@@ -80,8 +80,8 @@ cx_add_class( CX_RESOURCE_VISUALIZATION_FILES
     View/internal/ViewWidget/cxViewCache.h
     View/internal/ViewWidget/cxViewLinkingViewWidget
     View/internal/ViewContainer/cxViewLinkingViewContainerItem
-    cxVisualizationServiceNull
-    cxVisualizationServiceProxy
+    cxViewServiceNull
+    cxViewServiceProxy
     cxVisServices
     cxNavigation
     Primitives/cxDepthPeeling

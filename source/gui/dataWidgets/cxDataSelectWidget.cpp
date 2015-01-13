@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataInterface.h"
 #include "cxSelectDataStringProperty.h"
 #include "cxTypeConversions.h"
-#include "cxVisualizationService.h"
+#include "cxViewService.h"
 #include "cxPatientModelService.h"
 #include "cxData.h"
 #include "cxViewGroupData.h"

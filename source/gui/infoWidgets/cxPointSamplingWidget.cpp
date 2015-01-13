@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSpaceProvider.h"
 #include "cxPatientModelService.h"
 #include "cxViewGroupData.h"
-#include "cxVisualizationService.h"
+#include "cxViewService.h"
 
 
 namespace cx

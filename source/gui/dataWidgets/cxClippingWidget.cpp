@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLegacySingletons.h"
 #include "cxPatientModelService.h"
 #include "cxLogicManager.h"
-#include "cxVisualizationService.h"
+#include "cxViewService.h"
 
 namespace cx
 {

@@ -29,18 +29,49 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include "catch.hpp"
-#include "cxVisualizationService.h"
-#include "cxRepContainer.h"
 
-namespace cxtest
+#ifndef CXVIEWSERVICENULL_H_
+#define CXVIEWSERVICENULL_H_
+
+#include "cxResourceVisualizationExport.h"
+
+#include "cxViewService.h"
+
+namespace cx
 {
-
-TEST_CASE("VisualizationServiceNull: get3DReps() don't seg. fault", "[unit][resource][visualization]")
+class cxResourceVisualization_EXPORT VisualizationServiceNull : public VisualizationService
 {
-	cx::VisualizationServicePtr visualizationService = cx::VisualizationService::getNullObject(); //mock
-	cx::RepContainerPtr repContainer = visualizationService->get3DReps();
-	REQUIRE_FALSE(repContainer);
-}
+public:
+	VisualizationServiceNull();
 
-} //cxtest
+	virtual ViewPtr get3DView(int group = 0, int index = 0);
+
+	virtual int getActiveGroup() const;
+	virtual ViewGroupDataPtr getGroup(int groupIdx) const;
+
+	virtual void autoShowData(DataPtr data);
+	virtual void enableRender(bool val);
+	virtual bool renderingIsEnabled() const;
+
+	virtual QWidget* getLayoutWidget(QWidget* parent, int index);
+	virtual QString getActiveLayout(int widgetIndex) const;
+	virtual void setActiveLayout(const QString& uid, int widgetIndex);
+	virtual InteractiveClipperPtr getClipper();
+	virtual InteractiveCropperPtr getCropper();
+	virtual CyclicActionLoggerPtr getRenderTimer();
+	virtual NavigationPtr getNavigation();
+	virtual LayoutRepositoryPtr getLayoutRepository();
+	virtual CameraControlPtr getCameraControl();
+	virtual QActionGroup* createInteractorStyleActionGroup();
+
+	virtual void setPreview(ImagePtr image, const std::vector<double>& threshold);
+	virtual void removePreview();
+
+	virtual bool isNull();
+private:
+	void printWarning() const;
+	QActionGroup* mActionGroup;
+
+};
+} //cx
+#endif // CXVIEWSERVICENULL_H_

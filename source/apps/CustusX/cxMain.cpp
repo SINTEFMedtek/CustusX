@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxApplication.h"
 #include "cxPluginFramework.h"
 #include "cxPatientModelServiceProxy.h"
-#include "cxVisualizationServiceProxy.h"
+#include "cxViewServiceProxy.h"
 #include "cxAcquisitionServiceProxy.h"
 
 #if !defined(WIN32)

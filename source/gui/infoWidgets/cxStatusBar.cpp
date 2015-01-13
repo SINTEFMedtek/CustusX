@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDefinitionStrings.h"
 #include "cxActiveToolProxy.h"
 #include "cxLogicManager.h"
-#include "cxVisualizationService.h"
+#include "cxViewService.h"
 
 #include "cxLogMessageFilter.h"
 #include "cxMessageListener.h"

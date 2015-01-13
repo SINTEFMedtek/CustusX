@@ -30,12 +30,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXVISUALIZATIONSERVICEPROXY_H
-#define CXVISUALIZATIONSERVICEPROXY_H
+#ifndef CXVIEWSERVICEPROXY_H_
+#define CXVIEWSERVICEPROXY_H_
 
 #include "cxResourceVisualizationExport.h"
 
-#include "cxVisualizationService.h"
+#include "cxViewService.h"
 #include "cxServiceTrackerListener.h"
 class ctkPluginContext;
 
@@ -82,4 +82,4 @@ private:
 	boost::shared_ptr<ServiceTrackerListener<VisualizationService> > mServiceListener;
 };
 } //cx
-#endif // CXVISUALIZATIONSERVICEPROXY_H
+#endif // CXVIEWSERVICEPROXY_H_

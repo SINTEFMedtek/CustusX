@@ -29,50 +29,18 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-
-#include "cxVisualizationService.h"
-#include "cxVisualizationServiceNull.h"
-#include "cxNullDeleter.h"
-
+#include "catch.hpp"
+#include "cxViewService.h"
 #include "cxRepContainer.h"
-#include "cxView.h"
 
-namespace cx
+namespace cxtest
 {
-VisualizationServicePtr VisualizationService::getNullObject()
+
+TEST_CASE("VisualizationServiceNull: get3DReps() don't seg. fault", "[unit][resource][visualization]")
 {
-	static VisualizationServicePtr mNull;
-	if (!mNull)
-		mNull.reset(new VisualizationServiceNull, null_deleter());
-	return mNull;
+	cx::VisualizationServicePtr visualizationService = cx::VisualizationService::getNullObject(); //mock
+	cx::RepContainerPtr repContainer = visualizationService->get3DReps();
+	REQUIRE_FALSE(repContainer);
 }
 
-
-unsigned VisualizationService::groupCount() const
-{
-	int count = 0;
-	while(this->getGroup(count))
-		++count;
-	return count;
-}
-
-void VisualizationService::deactivateLayout()
-{
-	this->setActiveLayout("", 0);
-	this->setActiveLayout("", 1);
-}
-
-RepContainerPtr VisualizationService::get3DReps(int group, int index)
-{
-	ViewPtr view = this->get3DView(group, index);
-
-	if(view)
-		return RepContainerPtr(new RepContainer(view->getReps()));
-	else
-		return RepContainerPtr();
-}
-
-
-} //cx
-
-
+} //cxtest

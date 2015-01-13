@@ -30,10 +30,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXVISUALIZATIONIMPLSERVICE_H_
-#define CXVISUALIZATIONIMPLSERVICE_H_
+#ifndef CXVIEWIMPLSERVICE_H_
+#define CXVIEWIMPLSERVICE_H_
 
-#include "cxVisualizationService.h"
+#include "cxViewService.h"
 #include "org_custusx_core_visualization_Export.h"
 class ctkPluginContext;
 class QDomElement;
@@ -99,5 +99,5 @@ typedef boost::shared_ptr<VisualizationImplService> VisualizationImplServicePtr;
 
 } /* namespace cx */
 
-#endif /* CXVISUALIZATIONIMPLSERVICE_H_ */
+#endif /* CXVIEWIMPLSERVICE_H_ */
 

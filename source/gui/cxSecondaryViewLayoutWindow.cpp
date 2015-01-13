@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDesktopWidget>
 #include "cxTypeConversions.h"
 #include "cxLegacySingletons.h"
-#include "cxVisualizationService.h"
+#include "cxViewService.h"
 #include "cxLogger.h"
 
 namespace cx

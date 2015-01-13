@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReconstructPreprocessor.h"
 #include "cxReconstructCore.h"
 #include "cxPatientModelService.h"
-#include "cxVisualizationService.h"
+#include "cxViewService.h"
 
 //Windows fix
 #ifndef M_PI

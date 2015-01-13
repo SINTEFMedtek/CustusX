@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTool.h"
 #include "cxLogger.h"
 #include "cxView.h"
-#include "cxVisualizationService.h"
+#include "cxViewService.h"
 #include "cxRepContainer.h"
 #include "cxAcquisitionService.h"
 

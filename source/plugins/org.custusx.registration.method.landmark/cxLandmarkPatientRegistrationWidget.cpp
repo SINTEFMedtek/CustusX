@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLandmarkRep.h"
 #include "cxView.h"
 #include "cxRegistrationService.h"
-#include "cxVisualizationService.h"
+#include "cxViewService.h"
 #include "cxPatientModelService.h"
 #include "cxViewGroupData.h"
 #include "cxTrackingService.h"

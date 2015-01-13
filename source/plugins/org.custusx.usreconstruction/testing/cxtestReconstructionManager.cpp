@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReconstructionExecuter.h"
 #include "cxDataLocations.h"
 
-//#include "cxVisualizationService.h"
+//#include "cxViewService.h"
 #include "cxPatientModelService.h"
 #include "cxMessageListener.h"
 

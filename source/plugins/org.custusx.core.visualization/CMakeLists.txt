@@ -3,9 +3,9 @@ project(org_custusx_core_visualization)
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
 set(PLUGIN_SRCS
-    cxVisualizationPluginActivator.cpp
-    cxVisualizationImplService.cpp
-    cxVisualizationImplService.h
+    cxViewPluginActivator.cpp
+    cxViewImplService.cpp
+    cxViewImplService.h
     cxAxisConnector.cpp
     cx2DZoomHandler.cpp
     cxCameraStyle.cpp
@@ -26,7 +26,7 @@ set(PLUGIN_SRCS
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
-    cxVisualizationPluginActivator.h
+    cxViewPluginActivator.h
     cxAxisConnector.h
     cx2DZoomHandler.h
     cxCameraStyle.h

@@ -30,34 +30,42 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxVisualizationPluginActivator.h"
+#ifndef CXVIEWPLUGINACTIVATOR_H_
+#define CXVIEWPLUGINACTIVATOR_H_
 
-#include <QtPlugin>
-#include <iostream>
-
-#include "cxVisualizationImplService.h"
-#include "cxRegisteredService.h"
+#include <ctkPluginActivator.h>
+#include "boost/shared_ptr.hpp"
 
 namespace cx
 {
 
-VisualizationPluginActivator::VisualizationPluginActivator()
-{
-}
+typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
 
-VisualizationPluginActivator::~VisualizationPluginActivator()
+/**
+ * Activator for the Visualization plugin
+ *
+ * \ingroup org_custusx_core_visualization
+ * \date 2014-09-19
+ * \author Ole Vegard Solberg
+ */
+class VisualizationPluginActivator :  public QObject, public ctkPluginActivator
 {
-}
+	Q_OBJECT
+	Q_INTERFACES(ctkPluginActivator)
+	Q_PLUGIN_METADATA(IID "org_custusx_core_visualization")
 
-void VisualizationPluginActivator::start(ctkPluginContext* context)
-{
-	mRegistration = RegisteredService::create<VisualizationImplService>(context, VisualizationService_iid);
-}
+public:
 
-void VisualizationPluginActivator::stop(ctkPluginContext* context)
-{
-	mRegistration.reset();
-	Q_UNUSED(context);
-}
+  VisualizationPluginActivator();
+  ~VisualizationPluginActivator();
+
+  void start(ctkPluginContext* context);
+  void stop(ctkPluginContext* context);
+
+private:
+	RegisteredServicePtr mRegistration;
+};
 
 } // namespace cx
+
+#endif /* CXVIEWPLUGINACTIVATOR_H_ */

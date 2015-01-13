@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxView.h"
 #include "cxRegistrationProperties.h"
 #include "cxRegistrationService.h"
-#include "cxVisualizationService.h"
+#include "cxViewService.h"
 #include "cxViewGroupData.h"
 #include "cxRepContainer.h"
 //TODO: remove

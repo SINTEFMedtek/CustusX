@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSelectDataStringProperty.h"
 #include "cxLegacySingletons.h"
 #include "cxPatientModelService.h"
-#include "cxVisualizationService.h"
+#include "cxViewService.h"
 
 namespace cx
 {

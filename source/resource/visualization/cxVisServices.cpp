@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxVisServices.h"
 
-#include "cxVisualizationServiceProxy.h"
+#include "cxViewServiceProxy.h"
 
 namespace cx {
 

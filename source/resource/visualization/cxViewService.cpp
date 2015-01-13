@@ -30,48 +30,49 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXVISUALIZATIONSERVICENULL_H
-#define CXVISUALIZATIONSERVICENULL_H
+#include "cxViewService.h"
+#include "cxViewServiceNull.h"
+#include "cxNullDeleter.h"
 
-#include "cxResourceVisualizationExport.h"
-
-#include "cxVisualizationService.h"
+#include "cxRepContainer.h"
+#include "cxView.h"
 
 namespace cx
 {
-class cxResourceVisualization_EXPORT VisualizationServiceNull : public VisualizationService
+VisualizationServicePtr VisualizationService::getNullObject()
 {
-public:
-	VisualizationServiceNull();
+	static VisualizationServicePtr mNull;
+	if (!mNull)
+		mNull.reset(new VisualizationServiceNull, null_deleter());
+	return mNull;
+}
 
-	virtual ViewPtr get3DView(int group = 0, int index = 0);
 
-	virtual int getActiveGroup() const;
-	virtual ViewGroupDataPtr getGroup(int groupIdx) const;
+unsigned VisualizationService::groupCount() const
+{
+	int count = 0;
+	while(this->getGroup(count))
+		++count;
+	return count;
+}
 
-	virtual void autoShowData(DataPtr data);
-	virtual void enableRender(bool val);
-	virtual bool renderingIsEnabled() const;
+void VisualizationService::deactivateLayout()
+{
+	this->setActiveLayout("", 0);
+	this->setActiveLayout("", 1);
+}
 
-	virtual QWidget* getLayoutWidget(QWidget* parent, int index);
-	virtual QString getActiveLayout(int widgetIndex) const;
-	virtual void setActiveLayout(const QString& uid, int widgetIndex);
-	virtual InteractiveClipperPtr getClipper();
-	virtual InteractiveCropperPtr getCropper();
-	virtual CyclicActionLoggerPtr getRenderTimer();
-	virtual NavigationPtr getNavigation();
-	virtual LayoutRepositoryPtr getLayoutRepository();
-	virtual CameraControlPtr getCameraControl();
-	virtual QActionGroup* createInteractorStyleActionGroup();
+RepContainerPtr VisualizationService::get3DReps(int group, int index)
+{
+	ViewPtr view = this->get3DView(group, index);
 
-	virtual void setPreview(ImagePtr image, const std::vector<double>& threshold);
-	virtual void removePreview();
+	if(view)
+		return RepContainerPtr(new RepContainer(view->getReps()));
+	else
+		return RepContainerPtr();
+}
 
-	virtual bool isNull();
-private:
-	void printWarning() const;
-	QActionGroup* mActionGroup;
 
-};
 } //cx
-#endif // CXVISUALIZATIONSERVICENULL_H
+
+

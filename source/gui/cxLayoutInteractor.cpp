@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "libQtSignalAdapters/ConnectionFactories.h"
 #include <QVBoxLayout>
 #include "cxLayoutRepository.h"
-#include "cxVisualizationService.h"
+#include "cxViewService.h"
 
 namespace cx
 {

@@ -4,7 +4,7 @@ if(BUILD_TESTING)
     set(CX_TEST_CATCH_org_custusx_core_visualization_MOC_SOURCE_FILES
     )
     set(CX_TEST_CATCH_org_custusx_core_visualization_SOURCE_FILES
-        cxtestVisualizationPlugin.cpp
+        cxtestViewPlugin.cpp
         cxtestCatchMultiVolume3DRepProducer.cpp
         cxtestMultiVolume3DRepProducerFixture.h
         cxtestMultiVolume3DRepProducerFixture.cpp

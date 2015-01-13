@@ -89,7 +89,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ctkPluginContext.h"
 #include "cxDockWidgets.h"
 #include "cxPatientModelServiceProxy.h"
-#include "cxVisualizationServiceProxy.h"
+#include "cxViewServiceProxy.h"
 #include "cxVideoServiceProxy.h"
 #include "cxViewGroupData.h"
 #include "cxSessionStorageService.h"
