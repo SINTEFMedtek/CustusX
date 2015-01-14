@@ -14,10 +14,10 @@ import sys
 import argparse   
 import pprint     
 
-from cxShell import *
-import cxInstallData
-import cxComponents
-import cxComponentAssembly
+from cx.utils.cxShell import *
+import cx.build.cxInstallData
+import cx.build.cxComponents
+import cx.build.cxComponentAssembly
 #import cx.cxCustusXBuilder
 
 class BuildScript(object):
@@ -30,7 +30,7 @@ class BuildScript(object):
         if assembly:
             self.assembly = assembly
         else:
-            self.assembly = cxComponentAssembly.LibraryAssembly()
+            self.assembly = cx.build.cxComponentAssembly.LibraryAssembly()
 
         self.setDefaults()
         

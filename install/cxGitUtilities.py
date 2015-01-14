@@ -13,7 +13,7 @@
 import argparse
 import os
 import fnmatch
-from cxShell import *
+from cx.utils.cxShell import *
 import re
 import os.path
 

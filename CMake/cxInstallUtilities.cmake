@@ -324,7 +324,7 @@ endif ()
 			PATTERN ${CONFIG_EXCLUDE_PATTERN} EXCLUDE)
 
 	# Install OpenCL kernels into bundle
-	install(FILES ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.vnnclreconstruction/kernels.cl
+	install(FILES ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.usreconstruction.vnncl/kernels.cl
 			DESTINATION ${CX_INSTALL_ROOT_DIR}/config/shaders/)
 	
 	if(CX_USE_OPENCL_UTILITY)

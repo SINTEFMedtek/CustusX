@@ -20,8 +20,8 @@ import getpass
 import platform
 import time
 
-from cxShell import *
-from cxPrintFormatter import PrintFormatter
+from cx.utils.cxShell import *
+from cx.utils.cxPrintFormatter import PrintFormatter
 import cxInstallData
 import cxComponents
 

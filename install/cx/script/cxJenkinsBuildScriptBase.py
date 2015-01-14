@@ -1,0 +1,127 @@
+#!/usr/bin/env python
+
+#####################################################
+# Unix jenkins script
+# Author: Christian Askeland, SINTEF Medical Technology
+# Date:   2013.09.08
+#
+# Description:
+#
+#
+#####################################################
+
+import logging
+import time    
+import subprocess
+import sys
+import argparse        
+
+#import cxsetup.cxUpdateToLatestCustusX
+
+from cx.utils.cxShell import *
+from cx.utils.cxPrintFormatter import PrintFormatter
+import cx.build.cxInstallData
+import cx.build.cxComponents
+import cx.build.cxCustusXBuilder
+import cx.build.cxCustusXTestInstallation
+import cxBuildScript
+
+class Controller(cxBuildScript.BuildScript):
+    '''
+    Base script for all jenkins scripts. 
+    All jenkins operations is included here, subclasses can pick elements.
+    '''
+    def __init__(self, assembly=None):
+        ''                
+        if not assembly:
+            assembly = cx.build.cxComponentAssembly.LibraryAssembly()
+        self.cxBuilder = cx.build.cxCustusXBuilder.CustusXBuilder(assembly)
+        super(Controller, self).__init__(assembly)
+
+     
+    def setDefaults(self):                
+        super(Controller, self).setDefaults()
+        self.controlData().setBuildType("Release")
+        self.controlData().force_connect_sublibraries = True
+        shell.setRedirectOutput(True)
+           
+    def addArgParsers(self):
+        super(Controller, self).addArgParsers()
+        self.additionalParsers.append(self.controlData().getArgParser_core_build())
+        
+    def applyArgumentParsers(self, arguments):
+        arguments = super(Controller, self).applyArgumentParsers(arguments)
+
+        self._initializeInstallationObjects()
+        return arguments
+ 
+    def _initializeInstallationObjects(self):
+        '''
+        Initialize Installer and Installation objects 
+        with data from the build process.
+        '''
+        assembly = self.cxBuilder.assembly                
+        custusxdata = assembly.getComponent(cx.build.cxComponents.CustusXData)
+        custusx = assembly.getComponent(cx.build.cxComponents.CustusX)
+        
+        self.cxInstaller = self.cxBuilder.createInstallerObject()
+
+        self.cxInstallation = cx.build.cxCustusXTestInstallation.CustusXTestInstallation(
+                target_platform=self.controlData().getTargetPlatform(),                                                                    
+                root_dir=assembly.controlData.getRootDir(),
+                install_root=self.cxInstaller.getInstalledRoot(),
+                test_data_path=custusxdata.sourcePath())
+
+    def resetInstallerStep(self):
+        self.cxBuilder.removePreviousInstaller()
+        self.cxInstaller.removePreviousJob()
+
+    def createUnitTestedPackageStep(self, 
+                                    skip_build=False, 
+                                    skip_unit_tests=False, 
+                                    skip_package=False):
+        if not skip_build:
+            self.cxBuilder.buildAllComponents()
+        if not skip_unit_tests:
+            self.cxBuilder.runUnitTests()
+        if not skip_package:
+            self.cxBuilder.createInstallerPackage()   
+        
+    def integrationTestPackageStep(self, 
+                                   skip_extra_install_step_checkout=False, 
+                                   skip_install=False, 
+                                   skip_installation_test=False, 
+                                   skip_integration_test=False):
+        if not skip_extra_install_step_checkout:
+            self.checkoutCustusXAndData()
+        if not skip_install:
+            self.cxInstaller.installPackage()
+        if not skip_installation_test:            
+            self.cxInstallation.testInstallation()
+        if not skip_integration_test:
+            self.cxInstallation.runIntegrationTests()
+
+    def unstableTestPackageStep(self, 
+                                   skip_extra_install_step_checkout=False, 
+                                   skip_install=False):
+        if not skip_extra_install_step_checkout:
+            self.checkoutCustusXAndData()
+        if not skip_install:
+            self.cxInstaller.installPackage()
+        self.cxInstallation.runUnstableTests()
+
+    def createReleaseStep(self, 
+                          skip_publish_release=False):
+        folder = self.cxInstaller.createReleaseFolder()
+        if not skip_publish_release:
+            self.cxInstaller.publishReleaseFolder(folder)
+    
+    def checkoutCustusXAndData(self):
+        'checkout only CustusX and data. Required if the first build step was not run, f.ex. during integration tests'
+        assembly = self.cxBuilder.assembly
+        PrintFormatter.printHeader('Checkout CustusX and CustusXData', level=2)
+        custusx = assembly.getComponent(cx.build.cxComponents.CustusX)
+        cxdata = assembly.getComponent(cx.build.cxComponents.CustusXData)
+
+        assembly.selectLibraries([custusx.name(), cxdata.name()])
+        assembly.process(checkout=True)

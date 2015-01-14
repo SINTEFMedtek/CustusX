@@ -57,8 +57,9 @@ import getpass
 import platform
 import argparse
 import pprint
-import cxArgParse
-import cxUtilities
+
+import cx.utils.cxArgParse
+import cx.utils.cxUtilities
         
 class Common(object):
     '''
@@ -123,14 +124,14 @@ class Common(object):
         print ''
 
     def getArgParser_root_dir(self):
-        p = cxArgParse.ArgumentParser(add_help=False)
+        p = cx.utils.cxArgParse.ArgumentParser(add_help=False)
         p.add_argument('--root_dir', default=self.root_dir, help='specify root folder, default=%s' % self.root_dir)
         p.add_argument('--print_control_data', action='store_true', default=False, help='Print all control data at startup')
         p.add_argument('--use_old_directory_structure', action='store_true', default=False, help='use obsolete external/working folder structure')
         return p
 
     def getArgParser_core_build(self):
-        p = cxArgParse.ArgumentParser(add_help=False)
+        p = cx.utils.cxArgParse.ArgumentParser(add_help=False)
         p.add_argument('-j', '--threads', type=int, default=1, dest='threads', help='Number of make threads')
         p.add_argument('-g', '--git_tag', default=None, metavar='TAG', dest='git_tag', help='Git tag to use when checking out CustusX. None means checkout master branch.')
         p.add_argument('-t', '--build_type', default=self.build_type, dest='build_type', choices=self._getAllowedBuildTypes(), help='Build type')
@@ -149,7 +150,7 @@ class Common(object):
         return p
 
     def getArgParser_extended_build(self):
-        p = cxArgParse.ArgumentParser(add_help=False)
+        p = cx.utils.cxArgParse.ArgumentParser(add_help=False)
         p.add_boolean_inverter('--coverage', default=self.mCoverage, dest='mCoverage', help='gcov code coverage')
         p.add_boolean_inverter('--doxygen', default=self.mDoxygen, dest='mDoxygen', help='Build doxygen documentation')
         return p
@@ -182,7 +183,7 @@ class Common(object):
         self.m32bit = value        
                         
     def getTargetPlatform(self):
-        return cxUtilities.PlatformInfo(platform.system(), self.m32bit)
+        return cx.utils.cxUtilities.PlatformInfo(platform.system(), self.m32bit)
     
     def _getAllowedBuildTypes(self):
         return ['Debug', 'Release', 'RelWithDebInfo', 'MinSizeRel']
@@ -275,7 +276,7 @@ class Common(object):
         return self.git_tag
 
     def ninja_installed(self):
-        spawn = cxUtilities.try_module_import('distutils.spawn')
+        spawn = cx.utils.cxUtilities.try_module_import('distutils.spawn')
         if not spawn:
             return False
         ninja_found = spawn.find_executable('ninja')

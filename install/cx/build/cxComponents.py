@@ -19,9 +19,9 @@ import urllib
 import getpass
 import platform
 
-from cxShell import *    
-import cxCppBuilder
-from cxPrintFormatter import PrintFormatter
+from cx.utils.cxShell import *    
+from cx.utils.cxPrintFormatter import PrintFormatter
+import cx.utils.cxCppBuilder
 
 class Component(object):
     '''
@@ -81,7 +81,7 @@ class Component(object):
     def buildConfigurations(self):
         return []
     def _getBuilder(self):
-        builder = cxCppBuilder.CppBuilder()
+        builder = cx.utils.cxCppBuilder.CppBuilder()
         builder.setPaths(base=self.path(), build=self.buildPath(), source=self.sourcePath())
         builder.setBuildType(self.getBuildType())
         builder.setControlData(self.controlData)
@@ -332,6 +332,10 @@ class OpenIGTLink(CppComponent):
         add('BUILD_TESTING:BOOL', False)
         add('BUILD_EXAMPLES:BOOL', False)
         builder.configureCMake()
+    def addConfigurationToDownstreamLib(self, builder):
+        add = builder.addCMakeOption
+        if self.controlData.force_connect_sublibraries:
+            add('BUILD_OPEN_IGTLINK_SERVER:BOOL', True);
 # ---------------------------------------------------------
 
 
@@ -410,25 +414,10 @@ class CustusX(CppComponent):
             if lib.pluginPath() and os.path.exists(lib.pluginPath()):
                 add('CX_EXTERNAL_PLUGIN_%s'%lib.name(), lib.pluginPath())
         
-        if(platform.system() == 'Linux'):
-            add('CX_PLUGIN_org.custusx.ussimulator:BOOL', False);
-
-        if self.controlData.force_connect_sublibraries:
-            self.forceConnectSublibraries(add)
         cmakeOptions = ''
         if self.controlData.mGraphviz:
             cmakeOptions = '--graphviz=graph.dot'
         builder.configureCMake(cmakeOptions)
-    def forceConnectSublibraries(self, add):
-        print 'CustusX force connect sublibraries.'
-        add('BUILD_OPEN_IGTLINK_SERVER:BOOL', True);
-#        add('CX_USE_LEVEL_SET:BOOL', platform.system() == 'Linux')
-#        add('CX_USE_TSF:BOOL', platform.system() != 'Windows');
-        add('CX_PLUGIN_org.custusx.filter.levelset:BOOL', platform.system() == 'Linux');
-        add('CX_PLUGIN_org.custusx.filter.tubesegmentation:BOOL', platform.system() != 'Windows');
-#        add('CX_PLUGIN_org.custusx.ussimulator:BOOL', platform.system() != 'Linux');
-        add('CX_USE_ISB_GE:BOOL', platform.system() != 'Windows');
-        add('CX_BUILD_MEHDI_VTKMULTIVOLUME:BOOL', False);
         
 # ---------------------------------------------------------
 
@@ -457,6 +446,10 @@ class TubeSegmentationFramework(CppComponent):
         if(platform.system() == 'Windows'):
             add('BUILD_SHARED_LIBS:BOOL', False) #On windows we build TSF as static, because TSF and SIPL does not export symbols
         builder.configureCMake()
+    def addConfigurationToDownstreamLib(self, builder):
+        add = builder.addCMakeOption
+        if self.controlData.force_connect_sublibraries:
+            add('CX_PLUGIN_org.custusx.filter.tubesegmentation:BOOL', platform.system() != 'Windows');
 
  # ---------------------------------------------------------
 
@@ -478,6 +471,10 @@ class LevelSetSegmentation(CppComponent):
         add('LS_USE_EXTRNAL_OUL:BOOL', True)
         add('LS_EXTERNAL_OUL_PATH:PATH', self._createSibling(OpenCLUtilityLibrary).findPackagePath())
         builder.configureCMake()
+    def addConfigurationToDownstreamLib(self, builder):
+        add = builder.addCMakeOption
+        if self.controlData.force_connect_sublibraries:
+            add('CX_PLUGIN_org.custusx.filter.levelset:BOOL', platform.system() == 'Linux');
         
 # ---------------------------------------------------------
 

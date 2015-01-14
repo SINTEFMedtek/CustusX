@@ -12,28 +12,6 @@
 #
 # See CustusX_License.txt for more information.
 
-###############################################################################
-# Initialize GEStreamer library
-#
-# Find the package and run the include USE file.
-#
-# Define variables:
-#
-###############################################################################
-macro(cx_initialize_ISB_GE)
-    if(CX_WINDOWS)
-        #not working on windows atm
-    else(CX_WINDOWS)
-        find_package( GEStreamer REQUIRED)
-    
-        if(GEStreamer_FOUND)
-            include(${GEStreamer_USE_FILE})
-        endif(GEStreamer_FOUND)
-    endif(CX_WINDOWS)
-    
-endmacro(cx_initialize_ISB_GE)
-###############################################################################
-
 
 ###############################################################################
 # Initialize cppunit library
