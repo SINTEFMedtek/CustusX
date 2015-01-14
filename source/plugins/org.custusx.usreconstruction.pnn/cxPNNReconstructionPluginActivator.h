@@ -44,7 +44,7 @@ typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
 /**
  * Activator for the PNN reconstruction plugin
  *
- * \ingroup org_custusx_pnnreconstruction
+ * \ingroup org_custusx_usreconstruction_pnn
  *
  * \date 2014-06-12
  * \author Janne Beate Bakeng, SINTEF
@@ -54,7 +54,7 @@ class PNNReconstructionPluginActivator :  public QObject, public ctkPluginActiva
 {
   Q_OBJECT
   Q_INTERFACES(ctkPluginActivator)
-  Q_PLUGIN_METADATA(IID "org_custusx_pnnreconstruction")
+  Q_PLUGIN_METADATA(IID "org_custusx_usreconstruction_pnn")
 
 public:
 

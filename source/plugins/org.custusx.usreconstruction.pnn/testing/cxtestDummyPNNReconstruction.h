@@ -33,12 +33,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTESTDUMMYPNNRECONSTRUCTION_H_
 #define CXTESTDUMMYPNNRECONSTRUCTION_H_
 
-#include "cxtest_org_custusx_pnnreconstruction_export.h"
+#include "cxtest_org_custusx_usreconstruction_pnn_export.h"
 
 namespace cxtest
 {
 
-class CXTEST_ORG_CUSTUSX_PNNRECONSTRUCTION_EXPORT DummyPNNReconstruction
+class CXTEST_ORG_CUSTUSX_USRECONSTRUCTION_PNN_EXPORT DummyPNNReconstruction
 {
 };
 

@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXPNNRECONSTRUCTIONMETHODSERVICE_H_
 
 #include "cxReconstructionMethodService.h"
-#include "org_custusx_pnnreconstruction_Export.h"
+#include "org_custusx_usreconstruction_pnn_Export.h"
 #include "cxTransform3D.h"
 class ctkPluginContext;
 
@@ -46,13 +46,13 @@ namespace cx
  * A specialization of ReconstructAlgorithm that implements
  * a simple PNN (pixel-nearest-neighbour) algorithm.
  *
- * \ingroup org_custusx_pnnreconstruction
+ * \ingroup org_custusx_usreconstruction_pnn
  *
  * \date 2014-06-12
  * \author Janne Beate Bakeng, SINTEF
  * \author Ole Vegard Solberg, SINTEF
  */
-class org_custusx_pnnreconstruction_EXPORT PNNReconstructionMethodService : public ReconstructionMethodService
+class org_custusx_usreconstruction_pnn_EXPORT PNNReconstructionMethodService : public ReconstructionMethodService
 {
 	Q_INTERFACES(cx::ReconstructionMethodService)
 public:

@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVNNCLRECONSTRUCTIONMETHODSERVICE_H_
 #define CXVNNCLRECONSTRUCTIONMETHODSERVICE_H_
 
-#include "org_custusx_vnnclreconstruction_Export.h"
+#include "org_custusx_usreconstruction_vnncl_Export.h"
 
 #include "cxReconstructionMethodService.h"
 #include "cxUSFrameData.h"
@@ -57,7 +57,7 @@ namespace cx
  * \date 2014-05-09
  * \author Janne Beate Bakeng
  */
-class org_custusx_vnnclreconstruction_EXPORT VNNclReconstructionMethodService : public ReconstructionMethodService
+class org_custusx_usreconstruction_vnncl_EXPORT VNNclReconstructionMethodService : public ReconstructionMethodService
 {
 	Q_INTERFACES(cx::ReconstructionMethodService)
 public:

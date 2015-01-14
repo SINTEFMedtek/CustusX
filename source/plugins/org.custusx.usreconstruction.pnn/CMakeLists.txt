@@ -1,22 +1,18 @@
-project(org_custusx_vnnclreconstruction)
+project(org_custusx_usreconstruction_pnn)
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
-
 set(PLUGIN_SRCS
-  cxVNNclPluginActivator.cpp
-  cxVNNclReconstructionMethodService.cpp
-  cxVNNclReconstructionMethodService.h
-  cxVNNclAlgorithm.h
-  cxVNNclAlgorithm.cpp
+  cxPNNReconstructionPluginActivator.cpp
+  cxPNNReconstructionMethodService.cpp
+  cxPNNReconstructionMethodService.h
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
-  cxVNNclPluginActivator.h
+  cxPNNReconstructionPluginActivator.h
 )
 
-# Qt Designer files which should be processed by Qts uic
 set(PLUGIN_UI_FORMS
 )
 
@@ -24,21 +20,14 @@ set(PLUGIN_UI_FORMS
 set(PLUGIN_resources
 )
 
-SET(VNNCL_KERNEL_PATH ${CMAKE_CURRENT_SOURCE_DIR})
-configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/recConfig.h.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/recConfig.h"
-  )
-  
+
 #Compute the plugin dependencies
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
-    ${PLUGIN_target_libraries}
-    ${OPENCL_LIBRARIES}
+    ${PLUGIN_target_libraries}   
     cxPluginUtilities
-    OpenCLUtilityLibrary
     org_custusx_usreconstruction
-    )
+)
 
 set(PLUGIN_OUTPUT_DIR "")
 if(CX_WINDOWS)
@@ -57,7 +46,7 @@ ctkMacroBuildPlugin(
   OUTPUT_DIR ${PLUGIN_OUTPUT_DIR}
 )
 
-target_include_directories(org_custusx_vnnclreconstruction
+target_include_directories(org_custusx_usreconstruction_pnn
     PUBLIC
     .
     ${CMAKE_CURRENT_BINARY_DIR}

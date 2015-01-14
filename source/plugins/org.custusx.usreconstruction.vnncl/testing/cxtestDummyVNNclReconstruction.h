@@ -33,11 +33,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTESTDUMMYVNNCLRECONSTRUCTION_H_
 #define CXTESTDUMMYVNNCLRECONSTRUCTION_H_
 
-#include "cxtest_org_custusx_vnnclreconstruction_export.h"
+#include "cxtest_org_custusx_usreconstruction_vnncl_export.h"
 
 namespace cxtest {
 
-class CXTEST_ORG_CUSTUSX_VNNCLRECONSTRUCTION_EXPORT DummyVNNclReconstruction {
+class CXTEST_ORG_CUSTUSX_USRECONSTRUCTION_VNNCL_EXPORT DummyVNNclReconstruction {
 };
 
 } /* namespace cxtest */

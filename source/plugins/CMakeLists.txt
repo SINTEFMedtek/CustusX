@@ -13,8 +13,8 @@ set(CX_PLUGINS
   org.custusx.core.video:ON
   org.custusx.core.state:ON
   org.custusx.dicom:ON
-  org.custusx.vnnclreconstruction:ON
-  org.custusx.pnnreconstruction:ON
+  org.custusx.usreconstruction.vnncl:ON
+  org.custusx.usreconstruction.pnn:ON
   org.custusx.registration:ON
   org.custusx.registration.gui:ON
   org.custusx.registration.method.manual:ON
