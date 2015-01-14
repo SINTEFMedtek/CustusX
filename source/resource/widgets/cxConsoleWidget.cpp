@@ -543,9 +543,11 @@ XmlOptionItem ConsoleWidget::option(QString name)
 
 ConsoleWidget::~ConsoleWidget()
 {
+	if (!mMessageFilter)
+		return;
+
 	QString levelString = enum2string<LOG_SEVERITY>(mMessageFilter->getLowestSeverity());
 	this->option("showLevel").writeValue(levelString);
-
 	this->option("showDetails").writeVariant(mDetailsAction->isChecked());
 }
 
