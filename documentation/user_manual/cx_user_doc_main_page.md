@@ -8,7 +8,7 @@ Overview {#mainpage_overview}
 
 An IGT Library
 
-<https://github.com/SINTEFMedisinskTeknologi/CustusX3>
+<https://github.com/SINTEFMedisinskTeknologi/CustusX>
 
 CustusX is an application for research in image-guided therapy with a focus on intraoperative use 
 and ultrasound imaging.
@@ -24,7 +24,7 @@ at the \ref definitions for short descriptions of key concepts.
 Build
 ------------------------
 
-Build instructions can be found on <https://github.com/SINTEFMedisinskTeknologi/CustusX3>.
+Build instructions can be found on <https://github.com/SINTEFMedisinskTeknologi/CustusX>.
 
 Licensing 
 ------------------------

@@ -1,7 +1,7 @@
 NDI Installation {#install_ndi_driver}
 ===================
 
-CustusX supports the NDI Polaris and Aurora tracking systems though IGSTK, <www.igstk.com>. CustusX requires that
+CustusX supports the NDI Polaris and Aurora tracking systems though IGSTK, <http://www.igstk.com>. CustusX requires that
 you first install the NDI Track application (available from <http://www.ndigital.com/>) following the NDI 
 install instructions. Load the tool ROM-files into Track and verify that they work correctly. There should
 be no warnings in the Track application: This will cause CustusX to fail silently by not receiving tracking

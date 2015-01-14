@@ -14,26 +14,7 @@ The code is free to download and use under a BSD-3 license. However, the code ba
 
 ### Build instructions
 
-CustusX uses a Python-based superbuild. Select a root folder, then all libs will be downloaded and built in separate folders beneath it, as follows:
-
-|        |          |                |
-| ------ | ----     | -------------- |
-| root   | CustusX  | CustusX        |
-|        |          | build_Release  |
-|        | VTK      | VTK            |
-|        |          | build_Release  |
-|        | CTK      | CTK            |
-|        |          | build_Release  |
-|        | some_lib | some_lib       |
-|        |          | build_Release  |
-
-Run the following lines to get it right:
-```bash
-cd <root_dir>
-git clone git@github.com:SINTEFMedisinskTeknologi/CustusX.git CustusX/CustusX
-./CustusX/CustusX/install/cxInstaller.py --root_dir . --full --all
-```
-The default root_dir is ~/dev/cx. Run cxInstaller.py -h for more options.
+[Build instructions available here.](cx_user_build_instructions.md)
 
 ## Structure
 

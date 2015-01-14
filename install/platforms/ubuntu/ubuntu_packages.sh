@@ -1,0 +1,70 @@
+#!/bin/bash
+
+#####################################################
+# Ubuntu setup script
+# Author: Christian Askeland, SINTEF Medical Technology
+# Author: Janne Beate Bakeng, SINTEF Medical Technology
+# Date:   2012.05.19
+#         2014.09.09
+#
+# Description:
+#   Install all packages needed to:
+#     * Develop in C++/Eclipse
+#     * Run CustusX
+#     * Several nice-to-have utilities.
+#
+#
+#####################################################
+
+#Ubuntu 14.04 NVidia hacks: - check out ubuntu_nvidia script
+
+sudo apt-get -y update
+sudo apt-get -y upgrade
+# developer stuff
+sudo apt-get install -y build-essential opencl-headers libssl-dev 
+sudo apt-get install -y qt4-dev-tools qt4-designer libboost-all-dev libcppunit-dev
+sudo apt-get install -y qttools5-dev qttools5-dev-tools qttools5-doc qt5-doc libqt5webkit5-dev libqt5xmlpatterns5-dev qtmultimedia5-dev
+sudo apt-get install -y ninja-build
+# developer IDE's and apps
+sudo apt-get install -y eclipse-cdt cmake-qt-gui qtcreator
+# doxygen
+sudo apt-get install -y doxygen gnuplot
+# coverage testing
+sudo apt-get install -y lcov
+# compatibility pack for all 32 bit libs
+sudo apt-get install -y ia32-libs
+# source control systems
+sudo apt-get install -y subversion cvs git-gui
+# v4l
+sudo apt-get install -y libv4l-dev
+# used by jenkins
+sudo apt-get install -y cppcheck sloccount vnc4server
+# run x11 unit tests on jenkins user:
+sudo apt-get install -y xvfb
+# Dynamic Kernel Module Support (Ephiphan dependency)
+sudo apt-get install -y dkms
+# python libs
+sudo apt-get install -y python-pip libxml2-dev libxslt-dev python-numpy
+sudo easy_install lxml
+sudo easy_install paramiko
+#used by IMFusion
+sudo apt-get install -y libcrypto++-dev libnlopt0
+
+# utilities
+sudo apt-get install -y synaptic aptitude apt-file dia gimp mesa-utils
+# vlc
+sudo apt-get install -y vlc browser-plugin-vlc
+# medical image processing app
+sudo apt-get install -y itksnap
+# webcams
+sudo apt-get install -y guvcview cheese qv4l2
+# unity tweak tool
+sudo apt-get install -y compizconfig-settings-manager
+# vpn cisco plugin
+sudo apt-get install -y network-manager-vpnc-gnome
+# connect via ssh (also remember to enable firewall ufw and open port 22)
+sudo apt-get install -y openssh-server
+
+
+
+
