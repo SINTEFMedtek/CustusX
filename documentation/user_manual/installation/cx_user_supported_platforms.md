@@ -1,7 +1,7 @@
 Supported Platforms {#supported_platforms}
 ===================
 
-CustusX is built continously on the following platforms, and are guaranteed to work there:
+CustusX is built continously on the following platforms:
 
 | Name                    | Description
 | ----------------------- | -----------------------------
