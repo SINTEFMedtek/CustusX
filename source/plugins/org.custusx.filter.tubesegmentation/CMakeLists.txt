@@ -10,10 +10,7 @@ macro(cx_initialize_TSF)
     find_package( Tube-Segmentation-Framework REQUIRED)
     include(${Tube-Segmentation-Framework_USE_FILE})
 
-    set(CX_ALL_LIBRARY_DIRS
-        ${CX_ALL_LIBRARY_DIRS}
-        ${Tube-Segmentation-Framework_LIBRARY_DIRS}
-        CACHE INTERNAL "List of dirs to look for libraries to use in fixup_bundle")
+    cx_install_add_library_dirs(${Tube-Segmentation-Framework_LIBRARY_DIRS})
 endmacro()
 
 cx_initialize_TSF()

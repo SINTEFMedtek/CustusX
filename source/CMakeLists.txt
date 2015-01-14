@@ -12,10 +12,6 @@ cx_initialize_Eigen()
 cx_initialize_VTK()
 cx_initialize_ITK()
 
-#if(CX_WINDOWS)
-#    cx_initialize_IGSTK()
-#endif()
-
 cx_initialize_OpenIGTLink()
 cx_initialize_CTK()
 

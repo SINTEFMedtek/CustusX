@@ -239,6 +239,19 @@ endmacro()
 
 ###############################################################################
 #
+# Add library directories that should be parsed for libs during the install/fixup_bundle step.
+#
+###############################################################################
+macro(cx_install_add_library_dirs)
+	message(STATUS "adding: "${ARGV})
+    set(CX_ALL_LIBRARY_DIRS
+        ${CX_ALL_LIBRARY_DIRS}
+        ${ARGV}
+        CACHE INTERNAL "List of dirs to look for libraries to use in fixup_bundle")
+endmacro()
+
+###############################################################################
+#
 # Install one target to the default location.
 #
 # If the platform is APPLE, the target is stored in a variable for later

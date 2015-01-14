@@ -35,9 +35,7 @@ if(CX_WINDOWS)
     set( CUSTUSX_EXECUTABLE "${CUSTUSX_EXECUTABLE}.exe")
 endif()
 
-set(CX_ALL_LIBRARY_DIRS CACHE INTERNAL "List of dirs to look for libraries to use in fixup_bundle")
-set(CX_ALL_LIBRARY_DIRS
-    ${CX_ALL_LIBRARY_DIRS}
+cx_install_add_library_dirs(
     ${ULTERIUS_BIN_DIR}
     ${QT_LIBRARY_DIRS} #remove?
     ${QT_BINARY_DIR} #remove?
