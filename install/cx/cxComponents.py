@@ -380,7 +380,7 @@ class CustusX(CppComponent):
     def path(self):
         return self.controlData.getWorkingPath() + "/CustusX"    
     def _rawCheckout(self):
-        self._getBuilder().gitClone('git@github.com:SINTEFMedisinskTeknologi/CustusX3.git', 'CustusX')
+        self._getBuilder().gitClone('git@github.com:SINTEFMedisinskTeknologi/CustusX.git', 'CustusX')
     def update(self):
         self._getBuilder().gitCheckoutDefaultBranch(submodules=True)    
         #self._getBuilder().gitUpdate('master', tag=self.controlData.getGitTag(), submodules=True)    

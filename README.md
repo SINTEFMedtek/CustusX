@@ -30,7 +30,7 @@ CustusX uses a Python-based superbuild. Select a root folder, then all libs will
 Run the following lines to get it right:
 ```bash
 cd <root_dir>
-git clone git@github.com:SINTEFMedisinskTeknologi/CustusX3.git CustusX/CustusX
+git clone git@github.com:SINTEFMedisinskTeknologi/CustusX.git CustusX/CustusX
 ./CustusX/CustusX/install/cxInstaller.py --root_dir . --full --all
 ```
 The default root_dir is ~/dev/cx. Run cxInstaller.py -h for more options.
