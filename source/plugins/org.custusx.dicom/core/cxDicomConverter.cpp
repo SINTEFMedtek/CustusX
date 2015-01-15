@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkImageData.h"
 #include "cxRegistrationTransform.h"
 #include <vtkImageAppend.h>
+#include <vtkImageCast.h>
 #include "cxReporter.h"
 
 #include "ctkDICOMItem.h"
@@ -178,9 +179,9 @@ bool DicomConverter::slicesFormRegularGrid(std::map<double, ImagePtr> sorted, Ve
 			distances.push_back(dist);
 
 			Vector3D tilt = cross(p1-p0, e_sort);
-			if (!similar(tilt.length(), 0.0))
+			if (!similar(tilt.length(), 0.0, 0.001))
 			{
-				reportError("Dicom convert: found gantry tilt, cannot create image.");
+				reportError(QString("Dicom convert: found gantry tilt: %1, cannot create image.").arg(tilt.length()));
 				return false;
 			}
 		}
@@ -189,9 +190,9 @@ bool DicomConverter::slicesFormRegularGrid(std::map<double, ImagePtr> sorted, Ve
 		{
 			double d0 = distances[distances.size()-2];
 			double d1 = distances[distances.size()-1];
-			if (!similar(d0, d1))
+			if (!similar(d0, d1, 0.001))
 			{
-				reportError("Dicom convert: found uneven slice spacing, cannot create image.");
+				reportError(QString("Dicom convert: found uneven slice spacing: %1 != %2, cannot create image.").arg(d0).arg(d1));
 				return false;
 			}
 		}
@@ -226,7 +227,14 @@ ImagePtr DicomConverter::mergeSlices(std::map<double, ImagePtr> sorted) const
 	for (std::map<double, ImagePtr>::iterator iter=sorted.begin(); iter!=sorted.end(); ++iter)
 	{
 		ImagePtr current = iter->second;
-		appender->AddInputData(current->getBaseVtkImageData());
+
+		//Convert all slices to same format
+		vtkImageCastPtr imageCast = vtkImageCastPtr::New();
+		imageCast->SetInputData(current->getBaseVtkImageData());
+		imageCast->SetOutputScalarTypeToUnsignedShort();
+		imageCast->Update();
+
+		appender->AddInputData(imageCast->GetOutput());
 	}
 	appender->Update();
 
