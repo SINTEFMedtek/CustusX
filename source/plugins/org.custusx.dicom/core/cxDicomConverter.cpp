@@ -179,7 +179,8 @@ bool DicomConverter::slicesFormRegularGrid(std::map<double, ImagePtr> sorted, Ve
 			distances.push_back(dist);
 
 			Vector3D tilt = cross(p1-p0, e_sort);
-			if (!similar(tilt.length(), 0.0, 0.001))
+			double sliceGantryTiltTolerance = 0.001;
+			if (!similar(tilt.length(), 0.0, sliceGantryTiltTolerance))
 			{
 				reportError(QString("Dicom convert: found gantry tilt: %1, cannot create image.").arg(tilt.length()));
 				return false;
@@ -190,7 +191,8 @@ bool DicomConverter::slicesFormRegularGrid(std::map<double, ImagePtr> sorted, Ve
 		{
 			double d0 = distances[distances.size()-2];
 			double d1 = distances[distances.size()-1];
-			if (!similar(d0, d1, 0.001))
+			double sliceSpacingTolerance = 0.01;
+			if (!similar(d0, d1, sliceSpacingTolerance))
 			{
 				reportError(QString("Dicom convert: found uneven slice spacing: %1 != %2, cannot create image.").arg(d0).arg(d1));
 				return false;
@@ -224,14 +226,24 @@ ImagePtr DicomConverter::mergeSlices(std::map<double, ImagePtr> sorted) const
 {
 	vtkImageAppendPtr appender = vtkImageAppendPtr::New();
 	appender->SetAppendAxis(2);
+
+	ImagePtr retval = sorted.begin()->second;
+
+	int i = 0;
+
 	for (std::map<double, ImagePtr>::iterator iter=sorted.begin(); iter!=sorted.end(); ++iter)
 	{
 		ImagePtr current = iter->second;
 
+		// Set window width and level to the values of the middle frame
+		if (i == sorted.size() / 2)
+			retval->setInitialWindowLevel(current->getInitialWindowWidth(), current->getInitialWindowLevel());
+		++i;
+
 		//Convert all slices to same format
 		vtkImageCastPtr imageCast = vtkImageCastPtr::New();
 		imageCast->SetInputData(current->getBaseVtkImageData());
-		imageCast->SetOutputScalarTypeToUnsignedShort();
+		imageCast->SetOutputScalarTypeToShort();
 		imageCast->Update();
 
 		appender->AddInputData(imageCast->GetOutput());
@@ -243,7 +255,6 @@ ImagePtr DicomConverter::mergeSlices(std::map<double, ImagePtr> sorted) const
 	spacing[2] = this->getMeanSliceDistance(sorted);
 	wholeImage->SetSpacing(spacing.data());
 
-	ImagePtr retval = sorted.begin()->second;
 	retval->setVtkImageData(wholeImage);
 
 	return retval;
