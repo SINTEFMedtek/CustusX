@@ -65,7 +65,8 @@ private:
 	ImagePtr mergeSlices(std::map<double, ImagePtr> sorted) const;
 	double getMeanSliceDistance(std::map<double, ImagePtr> sorted) const;
 	bool slicesFormRegularGrid(std::map<double, ImagePtr> sorted, Vector3D e_sort) const;
-	ImagePtr createCxImageFromDicomFile(QString filename);
+	// ignoreLocalizerImages is a tag to ignore special images. For now only localizer images are ignored
+	ImagePtr createCxImageFromDicomFile(QString filename, bool ignoreLocalizerImages);
 	std::vector<ImagePtr> createImages(QStringList files);
 	QString convertToValidFilename(QString text) const;
 

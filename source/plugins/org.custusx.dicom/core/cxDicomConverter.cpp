@@ -95,12 +95,18 @@ QString DicomConverter::generateName(DicomImageReaderPtr reader)
 	return name;
 }
 
-ImagePtr DicomConverter::createCxImageFromDicomFile(QString filename)
+ImagePtr DicomConverter::createCxImageFromDicomFile(QString filename, bool ignoreLocalizerImages)
 {
 	DicomImageReaderPtr reader = DicomImageReader::createFromFile(filename);
 	if (!reader)
 	{
 		reportWarning(QString("File not found: %1").arg(filename));
+		return ImagePtr();
+	}
+
+	if(ignoreLocalizerImages && reader->isLocalizerImage())
+	{
+		reportWarning(QString("Localizer image removed from series: %1").arg(filename));
 		return ImagePtr();
 	}
 
@@ -140,7 +146,8 @@ std::vector<ImagePtr> DicomConverter::createImages(QStringList files)
 	std::vector<ImagePtr> retval;
 	for (int i=0; i<files.size(); ++i)
 	{
-		ImagePtr image = this->createCxImageFromDicomFile(files[i]);
+		bool ignoreSpesialImages = true;
+		ImagePtr image = this->createCxImageFromDicomFile(files[i], ignoreSpesialImages);
 		if (image)
 			retval.push_back(image);
 	}
