@@ -79,6 +79,7 @@ public:
 	WindowLevel getWindowLevel() const;
 	int getNumberOfFrames() const;
 	QString getPatientName() const;
+	bool isLocalizerImage() const;
 
 private:
 	DcmFileFormat mFileFormat;

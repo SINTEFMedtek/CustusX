@@ -92,6 +92,24 @@ DicomImageReader::WindowLevel DicomImageReader::getWindowLevel() const
 	return retval;
 }
 
+bool DicomImageReader::isLocalizerImage() const
+{
+	//DICOM standard PS3.3 section C.7.6.1.1.2 Image Type
+	//http://dicom.nema.org/medical/dicom/current/output/html/part03.html#sect_C.7.6.1.1.2
+	bool retval = false;
+
+	OFCondition condition;
+	OFString value;
+	condition = mDataset->findAndGetOFString(DCM_ImageType, value, 2, OFTrue);
+	if (condition.good())
+	{
+		QString imageSpesialization(value.c_str());
+		if (imageSpesialization.compare("LOCALIZER", Qt::CaseSensitive) == 0)
+			retval = true;
+	}
+	return retval;
+}
+
 int DicomImageReader::getNumberOfFrames() const
 {
 	int numberOfFrames = this->item()->GetElementAsInteger(DCM_NumberOfFrames);
