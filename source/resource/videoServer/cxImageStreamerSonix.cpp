@@ -253,7 +253,6 @@ IGTLinkUSStatusMessage::Pointer ImageStreamerSonix::getFrameStatus(Frame& frame)
 
   //Path to probes.xml on on ultrasonix scanner:
   QString probeFile = "C:/Program Files/Ultrasonix/Exam/config/probes.xml";
-  //QString probeFile = cx::DataLocations::getRootConfigPath() + "/ultrasonix/probes.xml";
   cx::SonixProbeFileReader reader(probeFile);
   if(!reader.init())
   {

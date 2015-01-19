@@ -96,7 +96,6 @@ QStringList LocalServerStreamerArguments::checkGrabberServerExist(QString path, 
 	path = QDir::cleanPath(path);
 	if (QDir(path).exists(filename))
 		retval << QDir(DataLocations::getBundlePath()).absoluteFilePath(path + "/" + filename) << args;
-//		retval << QDir(DataLocations::getBundlePath()).relativeFilePath(path + "/" + filename) << args;
 	return retval;
 }
 

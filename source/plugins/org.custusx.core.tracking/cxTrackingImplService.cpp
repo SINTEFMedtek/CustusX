@@ -54,7 +54,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxToolConfigurationParser.h"
 #include "cxManualToolAdapter.h"
 #include "cxSettings.h"
-#include "cxDataLocations.h"
 #include "cxIgstkTrackerThread.h"
 #include "cxPlaybackTool.h"
 
