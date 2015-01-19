@@ -61,6 +61,10 @@ cx_install_add_library_dirs(
     ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/plugins
 )
 
+#message(STATUS "QT_LIB: "   ${QT_LIBRARY_DIRS}) - empty
+#message(STATUS "QT_BIN: "   ${QT_BINARY_DIR}) - empty
+
+
 if(CX_WINDOWS)
     find_qt_bin_dir(QT_BIN_DIR)
     find_qt_plugin_dir(QT_PLUGINS_DIR)

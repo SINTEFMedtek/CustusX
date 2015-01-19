@@ -243,7 +243,7 @@ endmacro()
 #
 ###############################################################################
 macro(cx_install_add_library_dirs)
-	message(STATUS "adding: "${ARGV})
+#	message(STATUS "adding: "${ARGV})
     set(CX_ALL_LIBRARY_DIRS
         ${CX_ALL_LIBRARY_DIRS}
         ${ARGV}
@@ -499,7 +499,10 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
         install(CODE "
                 # Begin inserted fixup_bundle snippet
                 ${LIB_PATTERN_CODE}
-                include(BundleUtilities)
+				set(CMAKE_MODULE_PATH
+					${CMAKE_MODULE_PATH}
+					${PROJECT_SOURCE_DIR}/CMake)
+				include(cxBundleUtilities)
                 fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/${APPS_LOCAL}\"   \"\${PLUGINS}\"   \"${DIRS_LOCAL}\") "
                 # End inserted fixup_bundle snippet
                 )

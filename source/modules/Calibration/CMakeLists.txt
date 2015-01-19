@@ -50,7 +50,9 @@ add_library( cxPluginCalibration ${SOURCE_FILES} )
 set(LINK_LIBRARIES
     cxResource
     cxResourceWidgets
-    org_custusx_acquisition
+	cxGui
+	cxGUIExtenderService
+	org_custusx_acquisition
 )
 target_link_libraries( cxPluginCalibration ${LINK_LIBRARIES} )
 target_include_directories(cxPluginCalibration
