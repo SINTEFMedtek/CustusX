@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkImageData.h"
 #include "cxRegistrationTransform.h"
 #include <vtkImageAppend.h>
+#include <vtkImageCast.h>
 
 #include "cxLogger.h"
 #include "ctkDICOMItem.h"
@@ -94,12 +95,18 @@ QString DicomConverter::generateName(DicomImageReaderPtr reader)
 	return name;
 }
 
-ImagePtr DicomConverter::createCxImageFromDicomFile(QString filename)
+ImagePtr DicomConverter::createCxImageFromDicomFile(QString filename, bool ignoreLocalizerImages)
 {
 	DicomImageReaderPtr reader = DicomImageReader::createFromFile(filename);
 	if (!reader)
 	{
 		reportWarning(QString("File not found: %1").arg(filename));
+		return ImagePtr();
+	}
+
+	if(ignoreLocalizerImages && reader->isLocalizerImage())
+	{
+		reportWarning(QString("Localizer image removed from series: %1").arg(filename));
 		return ImagePtr();
 	}
 
@@ -139,7 +146,8 @@ std::vector<ImagePtr> DicomConverter::createImages(QStringList files)
 	std::vector<ImagePtr> retval;
 	for (int i=0; i<files.size(); ++i)
 	{
-		ImagePtr image = this->createCxImageFromDicomFile(files[i]);
+		bool ignoreSpesialImages = true;
+		ImagePtr image = this->createCxImageFromDicomFile(files[i], ignoreSpesialImages);
 		if (image)
 			retval.push_back(image);
 	}
@@ -178,9 +186,10 @@ bool DicomConverter::slicesFormRegularGrid(std::map<double, ImagePtr> sorted, Ve
 			distances.push_back(dist);
 
 			Vector3D tilt = cross(p1-p0, e_sort);
-			if (!similar(tilt.length(), 0.0))
+			double sliceGantryTiltTolerance = 0.001;
+			if (!similar(tilt.length(), 0.0, sliceGantryTiltTolerance))
 			{
-				reportError("Dicom convert: found gantry tilt, cannot create image.");
+				reportError(QString("Dicom convert: found gantry tilt: %1, cannot create image.").arg(tilt.length()));
 				return false;
 			}
 		}
@@ -189,9 +198,10 @@ bool DicomConverter::slicesFormRegularGrid(std::map<double, ImagePtr> sorted, Ve
 		{
 			double d0 = distances[distances.size()-2];
 			double d1 = distances[distances.size()-1];
-			if (!similar(d0, d1))
+			double sliceSpacingTolerance = 0.01;
+			if (!similar(d0, d1, sliceSpacingTolerance))
 			{
-				reportError("Dicom convert: found uneven slice spacing, cannot create image.");
+				reportError(QString("Dicom convert: found uneven slice spacing: %1 != %2, cannot create image.").arg(d0).arg(d1));
 				return false;
 			}
 		}
@@ -223,10 +233,27 @@ ImagePtr DicomConverter::mergeSlices(std::map<double, ImagePtr> sorted) const
 {
 	vtkImageAppendPtr appender = vtkImageAppendPtr::New();
 	appender->SetAppendAxis(2);
+
+	ImagePtr retval = sorted.begin()->second;
+
+	int i = 0;
+
 	for (std::map<double, ImagePtr>::iterator iter=sorted.begin(); iter!=sorted.end(); ++iter)
 	{
 		ImagePtr current = iter->second;
-		appender->AddInputData(current->getBaseVtkImageData());
+
+		// Set window width and level to the values of the middle frame
+		if (i == sorted.size() / 2)
+			retval->setInitialWindowLevel(current->getInitialWindowWidth(), current->getInitialWindowLevel());
+		++i;
+
+		//Convert all slices to same format
+		vtkImageCastPtr imageCast = vtkImageCastPtr::New();
+		imageCast->SetInputData(current->getBaseVtkImageData());
+		imageCast->SetOutputScalarTypeToShort();
+		imageCast->Update();
+
+		appender->AddInputData(imageCast->GetOutput());
 	}
 	appender->Update();
 
@@ -235,7 +262,6 @@ ImagePtr DicomConverter::mergeSlices(std::map<double, ImagePtr> sorted) const
 	spacing[2] = this->getMeanSliceDistance(sorted);
 	wholeImage->SetSpacing(spacing.data());
 
-	ImagePtr retval = sorted.begin()->second;
 	retval->setVtkImageData(wholeImage);
 
 	return retval;
