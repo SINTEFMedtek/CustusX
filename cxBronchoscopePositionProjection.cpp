@@ -116,7 +116,7 @@ Transform3D BronchoscopePositionProjection::findClosestPointInBranches(Transform
 		Eigen::MatrixXd positions = branches[i]->getPositions();
 		for (int j = 0; j < positions.cols(); j++)
 		{
-			double D = findDistance(positions.block(0,j,1,3), toolPos);
+            double D = findDistance(positions.col(j), toolPos);
 			if (D < minDistance)
 			{
 				minDistance = D;
@@ -129,7 +129,7 @@ Transform3D BronchoscopePositionProjection::findClosestPointInBranches(Transform
 		if (minDistance < maxDistance)
 		{
 			Eigen::MatrixXd positions = minDistanceBranch->getPositions();
-			new_prMd.matrix().topRightCorner(3 , 1) = positions.block(0,minDistancePositionIndex,3,1);
+            new_prMd.matrix().topRightCorner(3 , 1) = positions.col(minDistancePositionIndex);
 			mProjectedBranchPtr = minDistanceBranch;
 			mProjectedIndex = minDistancePositionIndex;
 			isPreviousProjectedPointSet = true;
@@ -154,11 +154,11 @@ Transform3D BronchoscopePositionProjection::findClosestPointInSearchPositions(Tr
 	{
 		Eigen::MatrixXd positions = mSearchBranchPtrVector[i]->getPositions();
 
-        double D = findDistance(positions.block(0,mSearchIndexVector[i],3,1), toolPos);
+        double D = findDistance(positions.col(mSearchIndexVector[i]), toolPos);
 			if (D < minDistance)
 			{
 				minDistance = D;
-				minDistanceBranch = mSearchBranchPtrVector[i];
+                minDistanceBranch = mSearchBranchPtrVector[i];
 				minDistancePositionIndex = mSearchIndexVector[i];
 			}
 	}
@@ -166,7 +166,7 @@ Transform3D BronchoscopePositionProjection::findClosestPointInSearchPositions(Tr
 	if (minDistance < maxDistance)
 	{
 		Eigen::MatrixXd positions = minDistanceBranch->getPositions();
-		new_prMd.matrix().topRightCorner(3 , 1) = positions.block(0,minDistancePositionIndex,3,1);
+        new_prMd.matrix().topRightCorner(3 , 1) = positions.col(minDistancePositionIndex);
 		mProjectedBranchPtr = minDistanceBranch;
 		mProjectedIndex = minDistancePositionIndex;
 		isPreviousProjectedPointSet = true;
@@ -191,12 +191,12 @@ void BronchoscopePositionProjection::findSearchPositions(double maxSearchDistanc
 	Eigen::MatrixXd positions = mProjectedBranchPtr->getPositions();
 	if (mProjectedIndex < positions.cols() - 1)
 	{
-		currentSearchDistance = findDistance( positions.block(0,mProjectedIndex,3,1), positions.block(0,mProjectedIndex-1,3,1) );
+        currentSearchDistance = findDistance( positions.col(mProjectedIndex), positions.col(mProjectedIndex+1) );
 		searchBranchDown(mProjectedBranchPtr, mProjectedIndex + 1, currentSearchDistance, maxSearchDistance);
 	}
 	if (mProjectedIndex > 0)
 	{
-		currentSearchDistance = findDistance( positions.block(0,mProjectedIndex,3,1), positions.block(0,mProjectedIndex+1,3,1) );
+        currentSearchDistance = findDistance( positions.col(mProjectedIndex), positions.col(mProjectedIndex-1) );
 		searchBranchUp(mProjectedBranchPtr, mProjectedIndex - 1, currentSearchDistance, maxSearchDistance);
 	}
 
@@ -209,7 +209,7 @@ void BronchoscopePositionProjection::searchBranchUp(BranchPtr searchBranchPtr, i
 	mSearchIndexVector.push_back(startIndex);
 	for (int i = startIndex-1; i>=0; i--)
 	{
-		currentSearchDistance = currentSearchDistance + findDistance( positions.block(0,i+1,3,1), positions.block(0,i,3,1) );
+        currentSearchDistance = currentSearchDistance + findDistance( positions.col(i+1), positions.col(i) );
 		if (currentSearchDistance < maxSearchDistance)
 		{
 			mSearchBranchPtrVector.push_back(searchBranchPtr);
@@ -219,10 +219,15 @@ void BronchoscopePositionProjection::searchBranchUp(BranchPtr searchBranchPtr, i
 			return;
 	}
 	BranchPtr parentBranchPtr = searchBranchPtr->getParentBranch();
-	std::vector<BranchPtr> childBranches = parentBranchPtr->getChildBranches();
-	searchBranchUp(parentBranchPtr, parentBranchPtr->getPositions().cols()-1, currentSearchDistance, maxSearchDistance);
-	for (int i = 0; i < childBranches.size(); i++)
-		searchBranchDown(childBranches[i], 0, currentSearchDistance, maxSearchDistance);
+
+    if (parentBranchPtr)
+    {
+        std::vector<BranchPtr> childBranches = parentBranchPtr->getChildBranches();
+        searchBranchUp(parentBranchPtr, parentBranchPtr->getPositions().cols()-1, currentSearchDistance, maxSearchDistance);
+        for (int i = 0; i < childBranches.size(); i++)
+            if (childBranches[i] != searchBranchPtr)
+                searchBranchDown(childBranches[i], 0, currentSearchDistance, maxSearchDistance);
+    }
 }
 
 void BronchoscopePositionProjection::searchBranchDown(BranchPtr searchBranchPtr, int startIndex, double currentSearchDistance, double maxSearchDistance)
@@ -232,7 +237,7 @@ void BronchoscopePositionProjection::searchBranchDown(BranchPtr searchBranchPtr,
 	mSearchIndexVector.push_back(startIndex);
 	for (int i = startIndex+1; i<positions.cols(); i++)
 	{
-        currentSearchDistance = currentSearchDistance + findDistance( positions.block(0,i,3,1), positions.block(0,i-1,3,1) );
+        currentSearchDistance = currentSearchDistance + findDistance( positions.col(i), positions.col(i-1) );
 		if (currentSearchDistance < maxSearchDistance)
 		{
 			mSearchBranchPtrVector.push_back(searchBranchPtr);
@@ -248,7 +253,7 @@ void BronchoscopePositionProjection::searchBranchDown(BranchPtr searchBranchPtr,
 
 Transform3D BronchoscopePositionProjection::findProjectedPoint(Transform3D prMd, double maxDistance)
 {
-	double maxSearchDistance = 40; //mm
+    double maxSearchDistance = 25; //mm
 	Transform3D new_prMd;
 	if (isPreviousProjectedPointSet)
 	{
@@ -256,7 +261,7 @@ Transform3D BronchoscopePositionProjection::findProjectedPoint(Transform3D prMd,
 		new_prMd = findClosestPointInSearchPositions(prMd, maxDistance);
 	}
 	else
-		new_prMd = findClosestPointInBranches(prMd, maxDistance);
+        new_prMd = findClosestPointInBranches(prMd, maxDistance);
 
 	return new_prMd;
 }
