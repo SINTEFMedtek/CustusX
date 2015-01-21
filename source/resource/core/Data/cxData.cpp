@@ -110,14 +110,7 @@ Transform3D Data::get_rMd() const
 {
 	return m_rMd_History->getCurrentRegistration().mValue;
 }
-//void Data::connectToRep(const RepWeakPtr& rep)
-//{
-//	mReps.insert(rep);
-//}
-//void Data::disconnectFromRep(const RepWeakPtr& rep)
-//{
-//	mReps.erase(rep);
-//}
+
 RegistrationHistoryPtr Data::get_rMd_History()
 {
 	return m_rMd_History;
