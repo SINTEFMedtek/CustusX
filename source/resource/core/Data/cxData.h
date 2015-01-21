@@ -76,16 +76,12 @@ public:
 	void setUid(const QString& uid);
 	void setName(const QString& name);
 	void setAcquisitionTime(QDateTime time);
-	void setRegistrationStatus(REGISTRATION_STATUS regStat);
 	virtual RegistrationHistoryPtr get_rMd_History();
 	LandmarksPtr getLandmarks();
 
 	virtual QString getUid() const; ///< \return unique id for this instance
 	virtual QString getName() const; /// \return a descriptive name for this instance
-	virtual REGISTRATION_STATUS getRegistrationStatus() const; ///< \return what kind of registration that has been performed on this data object.
 	virtual Transform3D get_rMd() const; ///< \return the transform M_rd from the data object's space (d) to the reference space (r).
-	virtual void setShadingOn(bool on);
-	virtual bool getShadingOn() const;
 	virtual QDateTime getAcquisitionTime() const;
 	virtual QString getType() const
 	{
