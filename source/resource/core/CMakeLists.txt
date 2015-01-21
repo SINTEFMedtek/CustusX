@@ -33,6 +33,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
     Video/cxTestVideoSource
     Video/cxVideoService
     Video/cxStreamerService
+    Video/cxStream
 
     Tool/cxTool
     Tool/cxToolProxy
