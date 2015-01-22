@@ -84,10 +84,10 @@ QString StateServiceProxy::getVersionName()
 	return mService->getVersionName();
 }
 
-QActionGroup* StateServiceProxy::getApplicationActions()
-{
-	return mService->getApplicationActions();
-}
+//QActionGroup* StateServiceProxy::getApplicationActions()
+//{
+//	return mService->getApplicationActions();
+//}
 
 QString StateServiceProxy::getApplicationStateName() const
 {

@@ -30,7 +30,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxSettings.h"
-#include "cxDataLocations.h"
+//#include "cxDataLocations.h"
+#include "cxProfile.h"
 
 namespace cx
 {
@@ -58,6 +59,7 @@ void Settings::destroyInstance()
 
 Settings::Settings()
 {
+	connect(ProfileManager::getInstance(), &ProfileManager::activeProfileChanged, this, &Settings::initialize);
 }
 
 Settings::~Settings()
@@ -66,9 +68,15 @@ Settings::~Settings()
 
 void Settings::initialize()
 {
-	QString filename = cx::DataLocations::getSettingsPath() + "/settings.ini";
+	QString filename = profile()->getSettingsFile();
+//	QString filename = cx::DataLocations::getSettingsPath() + "/settings.ini";
 	mSettings.reset(new QSettings(filename, QSettings::IniFormat));
 }
+
+//Settings::Settings(QString filename)
+//{
+//	mSettings.reset(new QSettings(filename, QSettings::IniFormat));
+//}
 
 void Settings::setValue(const QString& key, const QVariant& value)
 {

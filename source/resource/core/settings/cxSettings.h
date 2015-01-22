@@ -73,15 +73,17 @@ public:
   void sync();
 
   //additional functionality
+//  explicit Settings(QString filename);
 
 signals:
   void valueChangedFor(QString key);
 
+private slots:
+  void initialize();
 private:
   Settings();
   virtual ~Settings();
 
-  void initialize();
 
   QSettingsPtr mSettings;
 

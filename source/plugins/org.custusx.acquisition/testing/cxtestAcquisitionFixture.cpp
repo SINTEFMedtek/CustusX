@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVideoSource.h"
 #include "cxAcquisitionServiceProxy.h"
 #include "cxSessionStorageService.h"
-
+#include "cxProfile.h"
 
 namespace cxtest
 {
@@ -74,7 +74,7 @@ AcquisitionFixture::AcquisitionFixture(QObject* parent) :
 	mRecordDuration(3000)
 {
 	this->setUp();
-	mOptions = cx::XmlOptionFile(cx::DataLocations::getXmlSettingsFile()).descend("video");
+	mOptions = cx::profile()->getXmlSettings().descend("video");
 	mNumberOfExpectedStreams = 1;
 }
 

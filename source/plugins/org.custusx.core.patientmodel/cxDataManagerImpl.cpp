@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxUtilHelpers.h"
 #include "cxVideoSource.h"
+#include "cxDataLocations.h"
 
 #include "cxImageLUT2D.h"
 #include "cxImageTF3D.h"
@@ -60,8 +61,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataFactory.h"
 
 #include "cxXmlOptionItem.h"
-#include "cxDataLocations.h"
 #include "cxTransferFunctions3DPresets.h"
+#include "cxProfile.h"
+
 
 namespace cx
 {
@@ -765,7 +767,7 @@ PresetTransferFunctions3DPtr DataManagerImpl::getPresetTransferFunctions3D() con
 	///< create from filename, create trivial document of type name and root node if no file exists.
 	XmlOptionFile preset = XmlOptionFile(
 					DataLocations::getRootConfigPath() + "/transferFunctions/presets.xml");
-	XmlOptionFile custom = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend(
+	XmlOptionFile custom = profile()->getXmlSettings().descend(
 					"presetTransferFunctions");
 
 	if (!mPresetTransferFunctions3D)

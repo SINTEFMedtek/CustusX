@@ -47,7 +47,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationTransform.h"
 #include "cxStringProperty.h"
 #include "cxHelperWidgets.h"
-#include "cxDataLocations.h"
 #include "cxDataInterface.h"
 #include "cxTrackingService.h"
 #include "cxOptionsWidget.h"
@@ -58,6 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVideoSource.h"
 #include "cxViewService.h"
 #include "cxImage.h"
+#include "cxProfile.h"
 
 namespace cx
 {
@@ -66,7 +66,7 @@ VideoConnectionWidget::VideoConnectionWidget(VisServicesPtr services, QWidget* p
 	BaseWidget(parent, "IGTLinkWidget", "Video Connection"),
 	mServices(services)
 {
-	mOptions = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("video");
+	mOptions = profile()->getXmlSettings().descend("video");
 
 	QString defaultConnection = mServices->videoService->getConnectionMethod();
 	mConnectionSelector = StringProperty::initialize("Connection", "", "Method for connecting to Video Server", defaultConnection, QStringList(), mOptions.getElement("video"));

@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVector3D.h"
 #include "cxDefinitionStrings.h"
 #include "cxLabeledComboBoxWidget.h"
-#include "cxDataLocations.h"
+#include "cxProfile.h"
 #include "cxSelectDataStringProperty.h"
 #include "cxSpaceProvider.h"
 #include "cxPatientModelService.h"
@@ -102,7 +102,7 @@ QString ToolTipSampleWidget::defaultWhatsThis() const
 
 void ToolTipSampleWidget::saveFileSlot()
 {
-  QString configPath = DataLocations::getRootConfigPath();
+  QString configPath = profile()->getPath();
   if(mPatientModelService->isPatientValid())
 	configPath = mPatientModelService->getActivePatientFolder();
 

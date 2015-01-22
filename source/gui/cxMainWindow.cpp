@@ -116,7 +116,6 @@ MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
 	this->createToolBars();
 	this->setStatusBar(new StatusBar());
 
-//	reporter()->setLoggingFolder(DataLocations::getRootConfigPath()+"/Logs");
 	reporter()->setAudioSource(AudioPtr(new AudioImpl()));
 
 	connect(stateService().get(), &StateService::applicationStateChanged, this, &MainWindow::onApplicationStateChangedSlot);

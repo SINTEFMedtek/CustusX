@@ -36,11 +36,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMenu>
 #include <QTimer>
 
-//#include "cxSettings.h"
-#include "cxDataLocations.h"
 #include <QBuffer>
 #include <QDataStream>
-
+#include "cxProfile.h"
 #include "cxConsoleWidget.h"
 #include "cxNullDeleter.h"
 
@@ -63,7 +61,7 @@ ConsoleWidgetCollection::ConsoleWidgetCollection(QWidget* parent, QString object
 {
 	this->setObjectName(mObjectName);
 	this->setWindowTitle(mWindowTitle);
-	mOptions = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend(this->objectName());
+	mOptions = profile()->getXmlSettings().descend(this->objectName());
 	mLog = LogPtr(reporter(), null_deleter());
 
 	this->setupUI();

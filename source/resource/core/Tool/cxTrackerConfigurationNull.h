@@ -43,11 +43,11 @@ class cxResource_EXPORT TrackerConfigurationNull : public TrackerConfiguration
 public:
 	TrackerConfigurationNull() {}
 
-	virtual QString getConfigurationApplicationsPath(QString application) { return ""; }
+	virtual QString getConfigurationApplicationsPath() { return ""; }
 	virtual void saveConfiguration(const Configuration& config) {}
 	virtual Configuration getConfiguration(QString uid) { return Configuration(); }
 
-	virtual QStringList getConfigurationsGivenApplication(QString application) { return QStringList(); }
+	virtual QStringList getConfigurationsGivenApplication() { return QStringList(); }
 	virtual QStringList getAllConfigurations() { return QStringList(); }
 
 	virtual QStringList getSupportedTrackingSystems() { return QStringList(); }

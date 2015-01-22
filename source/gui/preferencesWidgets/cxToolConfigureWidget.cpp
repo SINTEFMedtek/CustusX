@@ -118,7 +118,8 @@ void ToolConfigureGroupBox::setCurrentlySelectedCofiguration(QString configAbsol
 	if(currentIndex < 0)
 	{
 		currentIndex = 0;
-		reportWarning("Tool configuration doesn't exist: " + cleanPath);
+		if (!configAbsoluteFilePath.isEmpty())
+			reportWarning("Tool configuration doesn't exist: " + cleanPath);
 	}
 	mConfigFilesComboBox->setCurrentIndex(currentIndex);
 
@@ -222,8 +223,8 @@ void ToolConfigureGroupBox::populateConfigurations()
 	mConfigFilesComboBox->clear();
 
 	TrackerConfigurationPtr config = trackingService()->getConfiguration();
-	QString application = stateService()->getApplicationStateName();
-	QStringList configurations = config->getConfigurationsGivenApplication(application);
+//	QString application = stateService()->getApplicationStateName();
+	QStringList configurations = config->getConfigurationsGivenApplication();
 
 	foreach(QString filename, configurations)
 	{
@@ -253,7 +254,7 @@ TrackerConfiguration::Configuration ToolConfigureGroupBox::getCurrentConfigurati
 	QString application = stateService()->getApplicationStateName();
 
 	QString filename = mConfigFileLineEdit->text();
-	QString filepath = config->getConfigurationApplicationsPath(application);
+	QString filepath = config->getConfigurationApplicationsPath();
 
 	retval.mUid = QString("%1/%2.xml").arg(filepath).arg(filename);
 	retval.mClinicalApplication = application;

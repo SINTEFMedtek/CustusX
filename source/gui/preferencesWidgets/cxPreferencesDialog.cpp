@@ -53,6 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxDummyTool.h"
 #include "cxImage.h"
+#include "cxProfile.h"
 
 namespace cx
 {
@@ -435,7 +436,7 @@ void ToolConfigTab::init()
 //  layout->setRowStretch(0, 1);
 //  layout->setRowStretch(2, 1);
 
-  mToolConfigureGroupBox->setCurrentlySelectedCofiguration(DataLocations::getToolConfigFilePath());
+  mToolConfigureGroupBox->setCurrentlySelectedCofiguration(profile()->getToolConfigFilePath());
 }
 
 void ToolConfigTab::saveParametersSlot()
@@ -451,6 +452,7 @@ void ToolConfigTab::saveParametersSlot()
   if(!configFile.exists())
     return;
 
+//  profile()->setToolConfigFilePath(info.fileName());
   settings()->setValue("toolConfigFile", info.fileName());
 }
 
@@ -467,7 +469,7 @@ void ToolConfigTab::globalConfigurationFileChangedSlot(QString key)
   if(key != "toolConfigFile")
     return;
 
-  mToolConfigureGroupBox->setCurrentlySelectedCofiguration(DataLocations::getToolConfigFilePath());
+  mToolConfigureGroupBox->setCurrentlySelectedCofiguration(profile()->getToolConfigFilePath());
 }
 
 //==============================================================================

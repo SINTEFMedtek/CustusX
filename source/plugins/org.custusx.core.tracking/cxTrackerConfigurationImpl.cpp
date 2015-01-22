@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDefinitionStrings.h"
 #include "cxToolConfigurationParser.h"
 #include "cxFileHelpers.h"
+#include "cxProfile.h"
 
 namespace cx
 {
@@ -44,7 +45,7 @@ void TrackerConfigurationImpl::saveConfiguration(const Configuration& config)
 {
 	ConfigurationFileParser::Configuration data;
 	data.mFileName = config.mUid;
-	data.mClinical_app = string2enum<CLINICAL_APPLICATION>(config.mClinicalApplication);
+	data.mClinical_app = config.mClinicalApplication;
 
 	QStringList selectedTools = config.mTools;
 	QString referencePath = config.mReferenceTool;
@@ -180,25 +181,26 @@ bool TrackerConfigurationImpl::verifyTool(QString uid)
 	return internal.verify();
 }
 
-QString TrackerConfigurationImpl::getConfigurationApplicationsPath(QString application)
+QString TrackerConfigurationImpl::getConfigurationApplicationsPath()
 {
-	QStringList path;
-	path << DataLocations::getRootConfigPath() << "tool" << application;
-	return path.join("/");
+	return profile()->getPath() + "/tool";
 }
 
-QStringList TrackerConfigurationImpl::getConfigurationsGivenApplication(QString application)
+QStringList TrackerConfigurationImpl::getConfigurationsGivenApplication()
 {
-	QStringList retval;
+	QString path = this->getConfigurationApplicationsPath();
+	return cx::getAbsolutePathToXmlFiles(path);
 
-	QStringList configPaths = DataLocations::getRootConfigPaths();
+//	        QStringList retval;
 
-	for (int i=0; i< configPaths.size(); ++i)
-	{
-		QDir dir(configPaths[i]+"/tool/"+application);
-		retval << cx::getAbsolutePathToXmlFiles(dir.absolutePath());
-	}
-	return retval;
+//	QStringList configPaths = DataLocations::getRootConfigPaths();
+
+//	for (int i=0; i< configPaths.size(); ++i)
+//	{
+//		QDir dir(configPaths[i]+"/tool/"+application);
+//		retval << cx::getAbsolutePathToXmlFiles(dir.absolutePath());
+//	}
+//	return retval;
 }
 
 QStringList TrackerConfigurationImpl::getAllConfigurations()
@@ -208,10 +210,10 @@ QStringList TrackerConfigurationImpl::getAllConfigurations()
 
 	for (int i=0; i< rootPaths.size(); ++i)
 	{
-		QString configFilePath = rootPaths[i] + "/tool/";
+		QString configFilePath = rootPaths[i] + "/profiles";
 		foreach(QFileInfo dir, cx::getDirs(configFilePath))
 		{
-			retval << cx::getAbsolutePathToXmlFiles(dir.absoluteFilePath());
+			retval << cx::getAbsolutePathToXmlFiles(dir.absoluteFilePath()+"/tool");
 		}
 	}
 	return retval;
@@ -219,11 +221,15 @@ QStringList TrackerConfigurationImpl::getAllConfigurations()
 
 QStringList TrackerConfigurationImpl::getAllTools()
 {
-	bool includeSubDirs = true;
-	QStringList toolFilePath = cx::DataLocations::getToolsPaths();
+	QStringList root = profile()->getAllRootConfigPaths();
+	QString suffix("/tool/Tools/");
 	QStringList retval;
-	for (int i=0; i<toolFilePath.size(); ++i)
-		retval << getAbsolutePathToXmlFiles(toolFilePath[i], includeSubDirs);
+	bool includeSubDirs = true;
+	for (int i=0; i<root.size(); ++i)
+	{
+		QString toolPath = root[i]+suffix;
+		retval << getAbsolutePathToXmlFiles(toolPath, includeSubDirs);
+	}
 	return retval;
 }
 

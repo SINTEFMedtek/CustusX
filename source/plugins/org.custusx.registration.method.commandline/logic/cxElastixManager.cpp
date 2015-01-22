@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDir>
 
 #include "cxTime.h"
-#include "cxDataLocations.h"
+#include "cxProfile.h"
 #include "cxElastixExecuter.h"
 #include "cxSettings.h"
 #include "cxDataReaderWriter.h"
@@ -53,7 +53,7 @@ namespace cx
 ElastixManager::ElastixManager(RegServices services) :
 	mServices(services)
 {
-	mOptions = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("elastix");
+	mOptions = profile()->getXmlSettings().descend("elastix");
 
 	mParameters.reset(new ElastixParameters(mOptions));
 	connect(mParameters.get(), SIGNAL(elastixParametersChanged()), this, SIGNAL(elastixChanged()));

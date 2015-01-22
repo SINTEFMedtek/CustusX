@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataLocations.h"
 #include "cxStreamerServiceUtilities.h"
 //#include "cxLogicManager.h"
+#include "cxProfile.h"
 
 ////TODO: remove
 //#include "cxLegacySingletons.h"
@@ -81,7 +82,7 @@ bool TestVideoConnectionWidget::canStream(QString filename)
 
 cx::PropertyPtr TestVideoConnectionWidget::getOption(QString uid, QString method)
 {
-	cx::XmlOptionFile options = cx::XmlOptionFile(cx::DataLocations::getXmlSettingsFile()).descend("video");
+	cx::XmlOptionFile options = cx::profile()->getXmlSettings().descend("video");
 	QDomElement element = options.getElement("video");
 	cx::StreamerService* streamer = mServices->videoService->getStreamerService(method);
 	cx::PropertyPtr option = cx::Property::findProperty(streamer->getSettings(element), uid);

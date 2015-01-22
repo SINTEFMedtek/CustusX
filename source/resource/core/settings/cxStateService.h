@@ -140,7 +140,7 @@ public:
 	virtual ~StateService() {}
 
 	virtual QString getVersionName() = 0;
-	virtual QActionGroup* getApplicationActions() = 0;
+//	virtual QActionGroup* getApplicationActions() = 0;
 	virtual QString getApplicationStateName() const = 0;
 	virtual QStringList getAllApplicationStateNames() const = 0;
 

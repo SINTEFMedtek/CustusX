@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPreferenceTab.h"
 #include "cxBoolProperty.h"
 #include "cxLegacySingletons.h"
+class QToolButton;
 
 namespace cx
 {
@@ -68,19 +69,21 @@ public slots:
 private slots:
   void browsePatientDataFolderSlot();
   void browseVLCPathSlot();
+  void onAddProfile();
 
-  void currentApplicationChangedSlot(int index);
-  void applicationStateChangedSlot();
+//  void currentApplicationChangedSlot(int index);
+//  void applicationStateChangedSlot();
 
 private:
-  void setApplicationComboBox();
+//  void setApplicationComboBox();
   void searchForVLC(QStringList searchPaths = QStringList());
+  QToolButton* createAddProfileButton();
 
   QComboBox* mPatientDataFolderComboBox;
   QComboBox* mVLCPathComboBox;
 
   QComboBox* mToolConfigFolderComboBox;
-  QComboBox* mChooseApplicationComboBox;
+//  QComboBox* mChooseApplicationComboBox;
 
   BoolPropertyPtr mFilterToolPositions;
 

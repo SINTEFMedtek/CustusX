@@ -38,6 +38,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSettings.h"
 #include "cxFileHelpers.h"
 #include "cxTypeConversions.h"
+#include "cxXmlOptionItem.h"
+
 
 namespace cx
 {
@@ -105,13 +107,20 @@ QString DataLocations::readTestDataPathFromFile(QString filename)
 	return cxDataRoot;
 }
 
-QString DataLocations::getSettingsPath()
+//QString DataLocations::getSettingsPath()
+//{
+//	QString retval = cx::DataLocations::getRootConfigPath() + "/settings";
+//	if (mTestMode)
+//		retval = getTestDataPath() + "/temp/settings";
+//	return retval;
+//}
+
+QString DataLocations::getPersistentWritablePath()
 {
-	QString retval = cx::DataLocations::getRootConfigPath() + "/settings";
-	if (mTestMode)
-		retval = getTestDataPath() + "/temp/settings";
-	return retval;
+	QString homepath = QDir::homePath() + "/cx_settings";
+	return homepath;
 }
+
 
 QString DataLocations::getBundlePath()
 {
@@ -195,26 +204,13 @@ QStringList DataLocations::appendStringToAllElements(QStringList root, QString s
 	return retval;
 }
 
-QStringList DataLocations::getToolsPaths()
-{
-	QString suffix("/tool/Tools/");
-	QStringList root = getRootConfigPaths();
-	return appendStringToAllElements(root, "/tool/Tools/");
-}
   
-QStringList DataLocations::getApplicationToolConfigPaths()
-{
-	QString suffix("/tool/" + settings()->value("globalApplicationName").toString());
-	QStringList root = getRootConfigPaths();
-	return appendStringToAllElements(root, suffix);
-}
-  
-QString DataLocations::getToolConfigFilePath()
-{
-	QString relPath("/tool/" + settings()->value("globalApplicationName").toString());
-	QString filename = settings()->value("toolConfigFile").toString();
-	return getExistingConfigPath(relPath, "", filename);
-}
+//QString DataLocations::getToolConfigFilePath()
+//{
+//	QString relPath("/tool/" + settings()->value("globalApplicationName").toString());
+//	QString filename = settings()->value("toolConfigFile").toString();
+//	return getExistingConfigPath(relPath, "", filename);
+//}
 
 QString DataLocations::getAudioConfigFilePath()
 {
@@ -240,14 +236,14 @@ QString changeExtension(QString name, QString ext)
 }
 }
 
-QString DataLocations::getXmlSettingsFile()
-{
-	return getSettingsPath() + "/settings.xml";
-}
+//QString DataLocations::getXmlSettingsFile()
+//{
+//	return getSettingsPath() + "/settings.xml";
+//}
 
 QString DataLocations::getCachePath()
 {
-	QString path(getRootConfigPath()+"/cache/");
+	QString path(getPersistentWritablePath()+"/cache/");
     return path;
 }
 
