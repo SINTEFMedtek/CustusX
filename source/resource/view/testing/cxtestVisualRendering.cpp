@@ -199,7 +199,7 @@ TEST_CASE("Visual rendering: Several empty views in a sequence.",
 }
 
 TEST_CASE("Visual rendering: Show 3D volume - vtkGPU render",
-		  "[unit][resource][visualization][not_win32][not_win64]")
+		  "[unit][resource][visualization][not_win32][not_win64][not_mavericks]")
 {
 	cxtest::ViewsFixture fixture;
 	ImageTestList imagenames;
@@ -212,7 +212,7 @@ TEST_CASE("Visual rendering: Show 3D volume - vtkGPU render",
 }
 
 TEST_CASE("Visual rendering: Show ACS+3D, centered hidden tool",
-		  "[unit][resource][visualization][not_win32][not_win64]")
+		  "[unit][resource][visualization][not_win32][not_win64][not_mavericks]")
 {
 	cxtest::ViewsFixture fixture;
 	ImageTestList imagenames;
@@ -274,7 +274,7 @@ TEST_CASE("Visual rendering: Show layout, clear, show new layout",
 }
 
 TEST_CASE("Visual rendering: Show AnyDual+3D, centered hidden tool",
-		  "[unit][resource][visualization][not_win32][not_win64]")
+		  "[unit][resource][visualization][not_win32][not_win64][not_mavericks]")
 {
 	cxtest::ViewsFixture fixture;
 	ImageTestList imagenames;
@@ -293,7 +293,7 @@ TEST_CASE("Visual rendering: Show AnyDual+3D, centered hidden tool",
 }
 
 TEST_CASE("Visual rendering: Show 3D+AnyDual, centered hidden tool",
-		  "[unit][resource][visualization][not_win32][not_win64]")
+		  "[unit][resource][visualization][not_win32][not_win64][not_mavericks]")
 {
 	cxtest::ViewsFixture fixture;
 	ImageTestList imagenames;
