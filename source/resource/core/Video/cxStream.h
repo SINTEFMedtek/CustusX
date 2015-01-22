@@ -47,8 +47,17 @@ namespace cx
  */
 class Stream : public Data
 {
+	Q_OBJECT
 public:
 	Stream(const QString &uid, const QString &name, const VideoSourcePtr &videoSource);
+
+	void setVideoSource(const VideoSourcePtr &videoSource);
+
+	virtual DoubleBoundingBox3D boundingBox() const;
+	virtual bool load(QString path) { return false;} ///< Not used
+
+signals:
+	void streamChanged();
 
 private:
 	VideoSourcePtr mVideoSource;

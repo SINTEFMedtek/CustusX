@@ -32,12 +32,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxStream.h"
 
+#include <vtkImageData.h>
+
 namespace cx
 {
 
 Stream::Stream(const QString& uid, const QString& name, const VideoSourcePtr &videosource) :
 	Data(uid, name), mVideoSource(videosource)
 {
+}
+
+void Stream::setVideoSource(const VideoSourcePtr &videoSource)
+{
+	mVideoSource = videoSource;
+	emit streamChanged();
+}
+
+DoubleBoundingBox3D Stream::boundingBox() const
+{
+	DoubleBoundingBox3D bounds(mVideoSource->getVtkImageData()->GetBounds());
+	return bounds;
 }
 
 } //cx
