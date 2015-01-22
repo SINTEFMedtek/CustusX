@@ -98,7 +98,6 @@ QString DataLocations::getExistingTestData(QString pathRelativeToTestDataRoot, Q
 	return "";
 }
 
-
 QString DataLocations::readTestDataPathFromFile(QString filename)
 {
 	QFile file(filename);
@@ -107,17 +106,20 @@ QString DataLocations::readTestDataPathFromFile(QString filename)
 	return cxDataRoot;
 }
 
-//QString DataLocations::getSettingsPath()
-//{
-//	QString retval = cx::DataLocations::getRootConfigPath() + "/settings";
-//	if (mTestMode)
-//		retval = getTestDataPath() + "/temp/settings";
-//	return retval;
-//}
-
 QString DataLocations::getPersistentWritablePath()
 {
 	QString homepath = QDir::homePath() + "/cx_settings";
+
+	if (mTestMode)
+	{
+//		QString bundlepath = getBundlePath();
+//		bundlepath.replace(":","_");
+//		if (bundlepath.startsWith("/"))
+//			bundlepath.remove(0, 1);
+//		homepath += "/test/" + bundlepath;
+		homepath = getTestDataPath() + "/temp";
+	}
+
 	return homepath;
 }
 
@@ -127,7 +129,6 @@ QString DataLocations::getBundlePath()
 #ifdef __APPLE__
   QString path(qApp->applicationDirPath()+"/../../..");
   QString bundle = QDir(qApp->applicationDirPath()+"/../..").canonicalPath();
-//  std::cout << "check bundle: " << bundle << ", isbundle=" << QFileInfo(bundle).isBundle() << std::endl;
   if (QFileInfo(bundle).isBundle())
 	  return path;
   else
@@ -144,12 +145,10 @@ QStringList DataLocations::getDefaultPluginsPath()
 	QString bundlePath = DataLocations::getBundlePath();
 	QString appPath(qApp->applicationDirPath());
 
-//	QString buildLocation = appPath + "/plugins";
 	QString buildLocation = bundlePath + "/plugins";
 	if (QFile(buildLocation).exists())
 		retval <<  buildLocation;
 
-//	QString installLocation = bundlePath + "/plugins";
 	QString installLocation = appPath + "/plugins";
 	if (QFile(installLocation).exists())
 		retval << installLocation;
@@ -204,14 +203,6 @@ QStringList DataLocations::appendStringToAllElements(QStringList root, QString s
 	return retval;
 }
 
-  
-//QString DataLocations::getToolConfigFilePath()
-//{
-//	QString relPath("/tool/" + settings()->value("globalApplicationName").toString());
-//	QString filename = settings()->value("toolConfigFile").toString();
-//	return getExistingConfigPath(relPath, "", filename);
-//}
-
 QString DataLocations::getAudioConfigFilePath()
 {
   QString path(getRootConfigPath()+"/audio/");
@@ -235,11 +226,6 @@ QString changeExtension(QString name, QString ext)
   return splitName.join(".");
 }
 }
-
-//QString DataLocations::getXmlSettingsFile()
-//{
-//	return getSettingsPath() + "/settings.xml";
-//}
 
 QString DataLocations::getCachePath()
 {
