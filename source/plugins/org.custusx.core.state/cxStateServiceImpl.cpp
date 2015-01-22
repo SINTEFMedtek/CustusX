@@ -56,6 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVideoServiceProxy.h"
 #include "cxApplicationsParser.h"
 #include "cxProfile.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -209,8 +210,7 @@ void StateServiceImpl::setWorkFlowState(QString uid)
 template<class T>
 void StateServiceImpl::fillDefault(QString name, T value)
 {
-	if (!settings()->contains(name))
-		settings()->setValue(name, value);
+	settings()->fillDefault(name, value);
 }
 
 /**Enter all default Settings here.
@@ -231,7 +231,6 @@ void StateServiceImpl::fillDefaultSettings()
 
 	this->fillDefault("renderingInterval", 33);
 	this->fillDefault("backgroundColor", QColor("black"));
-	this->fillDefault("globalPatientDataFolder", QDir::homePath() + "/Patients");
 	this->fillDefault("vlcPath", vlc()->getVLCPath());
 	this->fillDefault("globalPatientNumber", 1);
 	this->fillDefault("Ultrasound/acquisitionName", "US-Acq");

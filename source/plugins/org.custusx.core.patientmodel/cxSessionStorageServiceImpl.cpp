@@ -49,6 +49,8 @@ namespace cx
 
 SessionStorageServiceImpl::SessionStorageServiceImpl(ctkPluginContext *context)
 {
+	settings()->fillDefault("globalPatientDataFolder", QDir::homePath() + "/Patients");
+
 	this->clearCache();
 	mActivePatientFolder = this->getNullFolder();
 	connect(this, &SessionStorageServiceImpl::sessionChanged, this, &SessionStorageServiceImpl::onSessionChanged);

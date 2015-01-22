@@ -95,10 +95,18 @@ QStringList LocalServerStreamerArguments::checkGrabberServerExist(QString path, 
 	QStringList retval;
 	path = QDir::cleanPath(path);
 	if (QDir(path).exists(filename))
-		retval << QDir(DataLocations::getBundlePath()).absoluteFilePath(path + "/" + filename) << args;
+		retval << QDir(DataLocations::getBundlePath()).relativeFilePath(path + "/" + filename) << args;
+#ifdef __APPLE__
+	if (retval.isEmpty())
+	{
+		QString bundledPath = QString("%1/%2.app/Contents/MacOS").arg(path).arg(filename);
+		if (QDir(bundledPath).exists(filename))
+			retval << QDir(DataLocations::getBundlePath()).relativeFilePath(bundledPath + "/" + filename) << args;
+	}
+
+#endif
 	return retval;
 }
-
 
 QStringList LocalServerStreamerArguments::getOpenIGTLinkServer()
 {
@@ -109,15 +117,6 @@ QStringList LocalServerStreamerArguments::getOpenIGTLinkServer()
 	postfix = "--in_width 800 --in_height 600";
 #endif
 	return this->getGrabberServer(filename, postfix);
-}
-
-/**Return the location of external video grabber application that
- * can be used as a local server controlled by CustusX.
- *
- */
-QStringList LocalServerStreamerArguments::getDefaultGrabberServer()
-{
-	return this->getOpenIGTLinkServer();
 }
 
 QStringList LocalServerStreamerArguments::getGrabberServer(QString filename, QString postfix)

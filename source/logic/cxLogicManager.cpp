@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewServiceProxy.h"
 #include "cxSessionStorageServiceProxy.h"
 #include "cxReporter.h"
+#include "cxProfile.h"
 
 
 namespace cx
@@ -114,6 +115,7 @@ void LogicManager::shutdown()
 void LogicManager::initializeServices()
 {
 	// resources layer
+	ProfileManager::initialize();
 	Reporter::initialize();
 
 	mPluginFramework = PluginFrameworkManager::create();
@@ -155,7 +157,7 @@ void LogicManager::shutdownServices()
 
 	GPUImageBufferRepository::shutdown();
 	Reporter::shutdown();
-	Settings::destroyInstance();
+	ProfileManager::shutdown();
 }
 
 template<class T>

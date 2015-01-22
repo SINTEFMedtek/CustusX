@@ -154,7 +154,6 @@ protected:
 //	DataPtr readData(const QString& uid, const QString& path, const QString& type);
 	int findUniqueUidNumber(QString uidBase) const;
 
-	void settingsChangedSlot(QString key);
 	void readClinicalView();
 
 	LandmarkPropertyMap mLandmarkProperties; ///< uid and name
@@ -168,6 +167,8 @@ protected:
 
 public slots:
 	void vtkImageDataChangedSlot();
+private slots:
+	void settingsChangedSlot(QString key);
 };
 
 } // namespace cx

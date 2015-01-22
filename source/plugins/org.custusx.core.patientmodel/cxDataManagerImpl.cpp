@@ -611,7 +611,6 @@ CLINICAL_VIEW DataManagerImpl::getClinicalApplication() const
 
 void DataManagerImpl::setClinicalApplication(CLINICAL_VIEW application)
 {
-	std::cout << "DataManagerImpl::setClinicalApplication " << enum2string<CLINICAL_VIEW>(application) << std::endl;
 	if (mClinicalApplication == application)
 		return;
 	mClinicalApplication = application;
@@ -793,10 +792,8 @@ RegistrationHistoryPtr DataManagerImpl::get_rMpr_History() const
 PresetTransferFunctions3DPtr DataManagerImpl::getPresetTransferFunctions3D() const
 {
 	///< create from filename, create trivial document of type name and root node if no file exists.
-	XmlOptionFile preset = XmlOptionFile(
-					DataLocations::getRootConfigPath() + "/transferFunctions/presets.xml");
-	XmlOptionFile custom = profile()->getXmlSettings().descend(
-					"presetTransferFunctions");
+	XmlOptionFile preset(DataLocations::getExistingConfigPath("/transferFunctions", "", "presets.xml"));
+	XmlOptionFile custom = profile()->getXmlSettings().descend("presetTransferFunctions");
 
 	if (!mPresetTransferFunctions3D)
 		mPresetTransferFunctions3D.reset(new TransferFunctions3DPresets(preset, custom));

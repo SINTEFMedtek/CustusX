@@ -60,7 +60,8 @@ typedef boost::shared_ptr<class Profile> ProfilePtr;
 class cxResource_EXPORT Profile : public QObject
 {
 public:
-	Profile(QString path);
+	Profile(QString path, SettingsPtr settings);
+	void activate(); /// internal use
 
 	/**
 	 * Return settings xml file.
@@ -71,11 +72,6 @@ public:
 	 * Return settings ini file.
 	 */
 	Settings* getSettings();
-
-	/**
-	 * Return name of settings ini file. Use getSettings() instead!
-	 */
-	QString getSettingsFile();
 
 	/**
 	 * Return the user-friendly name of profile.
@@ -118,6 +114,7 @@ public:
 private:
 	QString mPath;
 	SettingsPtr mSettings;
+	QString getSettingsFile();
 };
 
 /** Manager for the collection of profiles.
@@ -155,6 +152,7 @@ private:
 	StringPropertyPtr mSelector;
 	QSettingsPtr getGenericSettings();
 
+	SettingsPtr mSettings; ///< used by Profile, changes content for each profile change
 
 	QString getDefaultProfileUid();
 	void profilesChanged();

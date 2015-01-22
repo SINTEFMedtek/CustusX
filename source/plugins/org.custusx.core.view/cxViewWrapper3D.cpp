@@ -934,8 +934,9 @@ void ViewWrapper3D::setTranslucentRenderingToDepthPeeling(bool setDepthPeeling)
 		  settings()->setValue("View3D/depthPeeling", false);
 	} else
 	{
-		if (TurnOffDepthPeeling(mView->getRenderWindow(), mView->getRenderer()))
-			report("Depth peeling turned off");
+		TurnOffDepthPeeling(mView->getRenderWindow(), mView->getRenderer());
+//		if (TurnOffDepthPeeling(mView->getRenderWindow(), mView->getRenderer()))
+//			report("Depth peeling turned off");
 	}
 }
 

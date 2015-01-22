@@ -48,45 +48,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-//https://qt.gitorious.org/qt-creator/qt-creator/source/1a37da73abb60ad06b7e33983ca51b266be5910e:src/app/main.cpp#L13-189
-// taken from utils/fileutils.cpp. We can not use utils here since that depends app_version.h.
-static bool copyRecursively(const QString &srcFilePath,
-							const QString &tgtFilePath)
-{
-	QFileInfo srcFileInfo(srcFilePath);
-	if (srcFileInfo.isDir())
-	{
-		QDir targetDir(tgtFilePath);
-		if (!targetDir.mkpath("."))
-			return false;
-//		targetDir.cdUp();
-//		if (!targetDir.mkdir(QFileInfo(tgtFilePath).fileName()))
-//			return false;
-		QDir sourceDir(srcFilePath);
-		QStringList fileNames = sourceDir.entryList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot | QDir::Hidden | QDir::System);
-		foreach (const QString &fileName, fileNames)
-		{
-			const QString newSrcFilePath = srcFilePath + QLatin1Char('/') + fileName;
-			const QString newTgtFilePath = tgtFilePath + QLatin1Char('/') + fileName;
-			if (!copyRecursively(newSrcFilePath, newTgtFilePath))
-				return false;
-		}
-	} else
-	{
-		if (!QFile::copy(srcFilePath, tgtFilePath))
-			return false;
-	}
-	return true;
-}
-
 //---------------------------------------------------------
 //---------------------------------------------------------
 //---------------------------------------------------------
 
 
-Profile::Profile(QString path)
+Profile::Profile(QString path, SettingsPtr settings)
 {
 	mPath = path;
+	mSettings = settings;
+}
+
+void Profile::activate()
+{
+	// this will trigger lots of change signals. Do after Profile object is in place.
+	mSettings->resetFile(this->getSettingsFile());
 }
 
 XmlOptionFile Profile::getXmlSettings()
@@ -97,11 +73,7 @@ XmlOptionFile Profile::getXmlSettings()
 
 Settings* Profile::getSettings()
 {
-	return Settings::getInstance();
-//	QString filename = this->getSettingsPath() + "/settings.ini";
-//	if (!mSettings)
-//		mSettings.reset(new Settings(filename));
-//	return mSettings.get();
+	return mSettings.get();
 }
 
 QString Profile::getSettingsFile()
@@ -128,9 +100,6 @@ QString Profile::getPath()
 QStringList Profile::getApplicationToolConfigPaths()
 {
 	return QStringList() << this->getPath() + "/tool/";
-//	QString suffix("/tool/" + settings()->value("globalApplicationName").toString());
-//	QStringList root = getRootConfigPaths();
-//	return appendStringToAllElements(root, suffix);
 }
 
 void Profile::setToolConfigFilePath(QString path)
@@ -151,9 +120,6 @@ QString Profile::getToolConfigFilePath()
 	if (filename.isEmpty())
 		return "";
 	return path + "/" + filename;
-//	QString relPath("/tool/" + settings()->value("globalApplicationName").toString());
-//	QString filename = settings()->value("toolConfigFile").toString();
-//	return getExistingConfigPath(relPath, "", filename);
 }
 
 QString Profile::getSettingsPath()
@@ -175,16 +141,11 @@ QStringList Profile::getAllRootConfigPaths()
 
 ProfileManager *ProfileManager::mInstance = NULL;
 
-//Settings* profile()
-//{
-//	return Settings::getInstance();
-//}
 ProfileManager* ProfileManager::getInstance()
 {
 	if (mInstance == NULL)
 	{
 		mInstance = new ProfileManager();
-		mInstance->initialize();
 	}
 	return mInstance;
 }
@@ -204,6 +165,8 @@ ProfileManager::ProfileManager()
 {
 	QString defaultProfile = this->getDefaultProfileUid();
 	defaultProfile = this->getGenericSettings()->value("profile", defaultProfile).toString();
+
+	mSettings.reset(new Settings());
 
 	this->setActiveProfile(defaultProfile);
 }
@@ -237,7 +200,7 @@ QString ProfileManager::getSettingsPath()
 
 QSettingsPtr ProfileManager::getGenericSettings()
 {
-	QString filename = this->getCustomPath() + "/settings.ini";
+	QString filename = this->getCustomPath() + "/generic_settings.ini";
 	return QSettingsPtr(new QSettings(filename, QSettings::IniFormat));
 }
 
@@ -247,7 +210,6 @@ QStringList ProfileManager::getInstalledProfiles()
 	QStringList profiles;
 	for (int i=0; i< configPaths.size(); ++i)
 		profiles << getProfilesInFolder(configPaths[i]+"/profiles");
-//	CX_LOG_CHANNEL_DEBUG("profile") << profiles.join("-");
 	return profiles;
 }
 QStringList ProfileManager::getCustomProfiles()
@@ -260,8 +222,6 @@ QStringList ProfileManager::getCustomProfiles()
 QString ProfileManager::getCustomPath()
 {
 	return DataLocations::getPersistentWritablePath() + "/profiles";
-//	QString homepath = QDir::homePath() + "/cx_settings/profiles";
-//	return homepath;
 }
 
 QStringList ProfileManager::getProfilesInFolder(QString folder)
@@ -273,16 +233,13 @@ QStringList ProfileManager::getProfilesInFolder(QString folder)
 QStringList ProfileManager::getProfiles()
 {
 	QStringList profiles = this->getInstalledProfiles();
-//	CX_LOG_CHANNEL_DEBUG("profile")  << profiles.join(" - ");
 	profiles << getProfilesInFolder(this->getCustomPath());
-//	CX_LOG_CHANNEL_DEBUG("profile") << profiles.join(" - ");
 	profiles.removeDuplicates();
 	return profiles;
 }
 
 void ProfileManager::newProfile(QString uid)
 {
-//	CX_LOG_CHANNEL_DEBUG("profile") << " new: " << uid;
 	QString path = this->getPathForCustom(uid);
 
 	QDir dir(path);
@@ -295,11 +252,9 @@ void ProfileManager::newProfile(QString uid)
 void ProfileManager::copyProfile(QString base, QString uid)
 {
 	QString newPath = this->getPathForCustom(uid);
-//	CX_LOG_CHANNEL_DEBUG("profile") << base << " copy to " << newPath;
 
 	if (!copyRecursively(base, newPath))
 		CX_LOG_WARNING() << "Failed to copy profile " << base << " to " << newPath;
-
 
 	this->profilesChanged();
 }
@@ -329,8 +284,6 @@ QString ProfileManager::getPathForCustom(QString uid)
 
 void ProfileManager::setActiveProfile(QString uid)
 {
-//	CX_LOG_CHANNEL_DEBUG("profile") << " set: " << uid;
-
 	if (mActive && mActive->getUid()==uid)
 		return;
 
@@ -339,13 +292,13 @@ void ProfileManager::setActiveProfile(QString uid)
 		this->createCustomProfile(uid);
 	}
 
-//	CX_LOG_CHANNEL_DEBUG("profile") << " set2: " << uid;
 	// uid now is guaranteed to exist in the custom folder
 
-	mActive.reset(new Profile(this->getPathForCustom(uid)));
+	mActive.reset(new Profile(this->getPathForCustom(uid), mSettings));
 	this->getGenericSettings()->setValue("profile", mActive->getUid());
 	if (mSelector)
 		mSelector->setValue(mActive->getUid());
+	mActive->activate();
 	emit activeProfileChanged();
 }
 
@@ -354,7 +307,6 @@ void ProfileManager::createCustomProfile(QString uid)
 	if (this->getInstalledProfiles().contains(uid))
 	{
 		QString path = this->getPathForInstalled(uid);
-//		CX_LOG_CHANNEL_DEBUG("profile") << "getpathforisntalled: " << uid << " path " << path;
 		this->copyProfile(path, uid);
 	}
 	else
@@ -386,10 +338,6 @@ StringPropertyPtr ProfileManager::getProfileSelector()
 {
 	if (!mSelector)
 	{
-//		static StringPropertyPtr initialize(const QString& uid, QString name, QString help, QString value,
-//		                                    QStringList range, QDomNode root = QDomNode());
-
-//		StringPropertyPtr retval;
 		QString defaultValue = mActive->getUid();
 		mSelector = StringProperty::initialize("profile", "Profile",
 											"Choose profile, containing settings and configuration",

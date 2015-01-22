@@ -30,53 +30,63 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxSettings.h"
+#include "cxTypeConversions.h"
+#include <iostream>
 //#include "cxDataLocations.h"
 #include "cxProfile.h"
 
 namespace cx
 {
 
-Settings *Settings::mInstance = NULL;
+//Settings *Settings::mInstance = NULL;
 Settings* settings()
 {
-	return Settings::getInstance();
+	return profile()->getSettings();
+//	return Settings::getInstance();
 }
-Settings* Settings::getInstance()
-{
-	if (mInstance == NULL)
-	{
-		mInstance = new Settings();
-		mInstance->initialize();
-	}
-	return mInstance;
-}
+//Settings* Settings::getInstance()
+//{
+//	return profile()->getSettings();
+////	if (mInstance == NULL)
+////	{
+////		mInstance = new Settings();
+////		mInstance->initialize();
+////	}
+////	return mInstance;
+//}
 
-void Settings::destroyInstance()
-{
-	delete mInstance;
-	mInstance = NULL;
-}
+//void Settings::destroyInstance()
+//{
+////	delete mInstance;
+////	mInstance = NULL;
+//}
 
 Settings::Settings()
 {
-	connect(ProfileManager::getInstance(), &ProfileManager::activeProfileChanged, this, &Settings::initialize);
+//	connect(ProfileManager::getInstance(), &ProfileManager::activeProfileChanged, this, &Settings::initialize);
 }
 
 Settings::~Settings()
 {
 }
 
-void Settings::initialize()
+void Settings::resetFile(QString filename)
 {
-	QString filename = profile()->getSettingsFile();
-//	QString filename = cx::DataLocations::getSettingsPath() + "/settings.ini";
-	mSettings.reset(new QSettings(filename, QSettings::IniFormat));
-}
+	QStringList keys;
+	if (mSettings)
+		keys << mSettings->allKeys();
 
-//Settings::Settings(QString filename)
-//{
-//	mSettings.reset(new QSettings(filename, QSettings::IniFormat));
-//}
+//	QString filename = profile()->getSettingsFile();
+	mSettings.reset(new QSettings(filename, QSettings::IniFormat));
+
+	if (mSettings)
+		keys << mSettings->allKeys();
+
+	keys.removeDuplicates();
+
+	foreach (QString key, keys)
+		emit valueChangedFor(key);
+}
 
 void Settings::setValue(const QString& key, const QVariant& value)
 {
