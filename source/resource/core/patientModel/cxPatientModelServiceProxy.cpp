@@ -245,12 +245,12 @@ RegistrationHistoryPtr PatientModelServiceProxy::get_rMpr_History() const
 	return mPatientModelService->get_rMpr_History();
 }
 
-CLINICAL_APPLICATION PatientModelServiceProxy::getClinicalApplication() const
+CLINICAL_VIEW PatientModelServiceProxy::getClinicalApplication() const
 {
 	return mPatientModelService->getClinicalApplication();
 }
 
-void PatientModelServiceProxy::setClinicalApplication(CLINICAL_APPLICATION application)
+void PatientModelServiceProxy::setClinicalApplication(CLINICAL_VIEW application)
 {
 	mPatientModelService->setClinicalApplication(application);
 }

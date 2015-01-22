@@ -163,8 +163,8 @@ public:
 	virtual void setCenter(const Vector3D& center) = 0;
 	virtual Vector3D getCenter() const = 0; ///< current common center point for user viewing.
 
-	virtual CLINICAL_APPLICATION getClinicalApplication() const = 0;
-	virtual void setClinicalApplication(CLINICAL_APPLICATION application) = 0;
+	virtual CLINICAL_VIEW getClinicalApplication() const = 0;
+	virtual void setClinicalApplication(CLINICAL_VIEW application) = 0;
 
 //	virtual QDomElement getCurrentWorkingElement(QString path) = 0;
 

@@ -63,6 +63,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxXmlOptionItem.h"
 #include "cxTransferFunctions3DPresets.h"
 #include "cxProfile.h"
+#include "cxSettings.h"
+#include "cxDefinitionStrings.h"
 
 
 namespace cx
@@ -78,10 +80,13 @@ DataManagerImplPtr DataManagerImpl::create()
 DataManagerImpl::DataManagerImpl() :
 	mDebugMode(false)
 {
-	mClinicalApplication = mdLABORATORY;
 	m_rMpr_History.reset(new RegistrationHistory());
 	connect(m_rMpr_History.get(), SIGNAL(currentChanged()), this, SIGNAL(rMprChanged()));
 	mPatientLandmarks = Landmarks::create();
+
+	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(settingsChangedSlot(QString)));
+	this->readClinicalView();
+
 	this->clear();
 }
 
@@ -599,18 +604,41 @@ void DataManagerImpl::vtkImageDataChangedSlot()
 		uid = mActiveImage->getUid();
 }
 
-CLINICAL_APPLICATION DataManagerImpl::getClinicalApplication() const
+CLINICAL_VIEW DataManagerImpl::getClinicalApplication() const
 {
 	return mClinicalApplication;
 }
 
-void DataManagerImpl::setClinicalApplication(CLINICAL_APPLICATION application)
+void DataManagerImpl::setClinicalApplication(CLINICAL_VIEW application)
 {
+	std::cout << "DataManagerImpl::setClinicalApplication " << enum2string<CLINICAL_VIEW>(application) << std::endl;
 	if (mClinicalApplication == application)
 		return;
 	mClinicalApplication = application;
+
+	QString val = enum2string<CLINICAL_VIEW>(mClinicalApplication);
+	settings()->setValue("View/clinicalView", val);
+
 	emit clinicalApplicationChanged();
 }
+
+void DataManagerImpl::settingsChangedSlot(QString key)
+{
+	if (key == "View/clinicalView")
+	{
+		this->readClinicalView();
+	}
+}
+
+void DataManagerImpl::readClinicalView()
+{
+	QString defVal = enum2string<CLINICAL_VIEW>(mdNEUROLOGICAL);
+	QString val = settings()->value("View/clinicalView", defVal).toString();
+	CLINICAL_VIEW view = string2enum<CLINICAL_VIEW>(val);
+
+	this->setClinicalApplication(view);
+}
+
 
 int DataManagerImpl::findUniqueUidNumber(QString uidBase) const
 {

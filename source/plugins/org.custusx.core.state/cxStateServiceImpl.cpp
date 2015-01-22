@@ -45,7 +45,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSettings.h"
 #include "cxDataLocations.h"
 #include "cxWorkflowStateMachine.h"
-#include "cxApplicationStateMachine.h"
 #include "cxDataLocations.h"
 #include "cxConfig.h"
 #include "cxVLCRecorder.h"
@@ -234,7 +233,6 @@ void StateServiceImpl::fillDefaultSettings()
 	this->fillDefault("backgroundColor", QColor("black"));
 	this->fillDefault("globalPatientDataFolder", QDir::homePath() + "/Patients");
 	this->fillDefault("vlcPath", vlc()->getVLCPath());
-	this->fillDefault("globalApplicationName", enum2string(mdLABORATORY));
 	this->fillDefault("globalPatientNumber", 1);
 	this->fillDefault("Ultrasound/acquisitionName", "US-Acq");
 	this->fillDefault("Ultrasound/8bitAcquisitionData", false);

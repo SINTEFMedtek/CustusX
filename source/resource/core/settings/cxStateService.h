@@ -82,7 +82,7 @@ struct cxResource_EXPORT Desktop
  *
  *
  *
- * \section cx_section_clinical_application_state Clinical Application State
+ * \section cx_section_CLINICAL_VIEW_state Clinical Application State
  *
  * The active clinical application is known to the entire system.
  * The options are:

@@ -59,17 +59,13 @@ ConfigurationFileParser::~ConfigurationFileParser()
 {
 }
 
-CLINICAL_APPLICATION ConfigurationFileParser::getApplicationapplication()
+QString ConfigurationFileParser::getApplicationapplication()
 {
-	CLINICAL_APPLICATION retval = mdCOUNT;
-
 	if (!this->isConfigFileValid())
-		return retval;
+		return "";
 
 	QDomNode configNode = mConfigureDoc.elementsByTagName(mConfigTag).at(0);
-	QString applicationapplication = configNode.toElement().attribute(mClinicalAppAttribute);
-	retval = string2enum<CLINICAL_APPLICATION>(applicationapplication);
-
+	QString retval = configNode.toElement().attribute(mClinicalAppAttribute);
 	return retval;
 }
 
@@ -372,13 +368,7 @@ IgstkTool::InternalStructure ToolFileParser::getTool()
 		if (string.isEmpty())
 			continue;
 		string = string.toLower();
-		CLINICAL_APPLICATION application = string2enum<CLINICAL_APPLICATION>(string);
-		if (application != mdCOUNT)
-			internalStructure.mClinicalApplications.push_back(application);
-		else
-			reportWarning(
-							"Did not understand the tag <clinical_app>, " + string + " is invalid in tool "
-											+ mToolFilePath);
+		internalStructure.mClinicalApplications.push_back(string);
 	}
 
 	QDomElement toolGeofileElement = toolNode.firstChildElement(mToolGeoFileTag);

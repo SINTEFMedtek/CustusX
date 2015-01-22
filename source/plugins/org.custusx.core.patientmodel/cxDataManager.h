@@ -116,8 +116,8 @@ public:
 	virtual void setLandmarkName(QString uid, QString name) = 0;
 	virtual void setLandmarkActive(QString uid, bool active) = 0;
 	virtual LandmarkPropertyMap getLandmarkProperties() const = 0;
-	virtual CLINICAL_APPLICATION getClinicalApplication() const = 0;
-	virtual void setClinicalApplication(CLINICAL_APPLICATION application) = 0;
+	virtual CLINICAL_VIEW getClinicalApplication() const = 0;
+	virtual void setClinicalApplication(CLINICAL_VIEW application) = 0;
 	virtual void clear() = 0; ///< remove all stuff from manager
 	virtual ImagePtr createImage(vtkImageDataPtr data, QString uidBase, QString nameBase, QString filePath = "Images") = 0;
 	virtual ImagePtr createDerivedImage(vtkImageDataPtr data, QString uid, QString name, ImagePtr parentImage, QString filePath = "Images") = 0;

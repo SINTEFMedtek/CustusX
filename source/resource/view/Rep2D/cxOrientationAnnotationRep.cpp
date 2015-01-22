@@ -138,15 +138,12 @@ void OrientationAnnotationRep::setPlaneType(PLANE_TYPE type)
 {
 	switch (mDataManager->getClinicalApplication())
 	{
-	case mdLAPAROSCOPY:
-	case mdBRONCHOSCOPY:
-	case mdENDOVASCULAR:
+	case mdRADIOLOGICAL:
 	{
 		this->setPlaneTypeRadiology(type);
 		break;
 	}
-	case mdLABORATORY:
-	case mdNEUROLOGY:
+	case mdNEUROLOGICAL:
 	default:
 	{
 		this->setPlaneTypeNeurology(type);

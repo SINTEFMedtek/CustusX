@@ -58,9 +58,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-VisualizationTab::VisualizationTab(QWidget *parent) :
+VisualizationTab::VisualizationTab(PatientModelServicePtr patientModelService, QWidget *parent) :
 		PreferenceTab(parent), mStereoTypeActionGroup(NULL)
 {
+	mPatientModelService = patientModelService;
 	mMainLayout = NULL;
 	mStereoTypeComboBox = NULL;
 	mStereoTypeActionGroup = NULL;
@@ -134,6 +135,16 @@ void VisualizationTab::init()
 														 followTooltipBoundary, DoubleRange(0.0,0.5,0.05), 2, QDomNode());
   mFollowTooltipBoundary->setInternal2Display(100);
 
+
+  QStringList clinicalViews;
+  for (unsigned i=0; i<mdCOUNT; ++i)
+	  clinicalViews << enum2string<CLINICAL_VIEW>(CLINICAL_VIEW(i));
+  mClinicalView = StringProperty::initialize("ClinicalView", "Clinical View",
+											 "Type of clinical view",
+											 enum2string<CLINICAL_VIEW>(mPatientModelService->getClinicalApplication()),
+											 clinicalViews, QDomNode());
+
+
   QVBoxLayout* stereoLayout = new QVBoxLayout();
   stereoLayout->addWidget(mStereoTypeComboBox);
   stereoLayout->addWidget(new SpinBoxAndSliderGroupWidget(this, mEyeAngleAdapter));
@@ -142,6 +153,7 @@ void VisualizationTab::init()
   //Layout
   mMainLayout = new QGridLayout;
   mMainLayout->addWidget(backgroundColorButton, 0, 0);
+  mMainLayout->addWidget(sscCreateDataWidget(this, mClinicalView));
   mMainLayout->addWidget(new SpinBoxGroupWidget(this, mSphereRadius));
   mMainLayout->addWidget(sscCreateDataWidget(this, mShowDataText));
   mMainLayout->addWidget(sscCreateDataWidget(this, mShowLabels));
@@ -224,6 +236,7 @@ void VisualizationTab::eyeAngleSlot()
 
 void VisualizationTab::saveParametersSlot()
 {
+	mPatientModelService->setClinicalApplication(string2enum<CLINICAL_VIEW>(mClinicalView->getValue()));
   settings()->setValue("View3D/sphereRadius", mSphereRadius->getValue());
   settings()->setValue("View/showDataText", mShowDataText->getValue());
   settings()->setValue("View/showLabels", mShowLabels->getValue());
@@ -458,10 +471,7 @@ void ToolConfigTab::saveParametersSlot()
 
 void ToolConfigTab::applicationChangedSlot()
 {
-  CLINICAL_APPLICATION clinicalApplication = string2enum<CLINICAL_APPLICATION>(stateService()->getApplicationStateName());
-//  mToolConfigureGroupBox->setClinicalApplicationSlot(clinicalApplication);
-  mToolFilterGroupBox->setClinicalApplicationSlot(clinicalApplication);
- // mToolFilterGroupBox->setTrackingSystemSlot(tsPOLARIS);
+  mToolFilterGroupBox->setClinicalApplicationSlot(stateService()->getApplicationStateName());
 }
 
 void ToolConfigTab::globalConfigurationFileChangedSlot(QString key)
@@ -490,7 +500,7 @@ PreferencesDialog::PreferencesDialog(VisualizationServicePtr visualizationServic
   this->addTab(new GeneralTab(visualizationService, patientModelService), tr("General"));
   this->addTab(new PerformanceTab, tr("Performance"));
   this->addTab(new AutomationTab, tr("Automation"));
-  this->addTab(new VisualizationTab, tr("Visualization"));
+  this->addTab(new VisualizationTab(patientModelService), tr("Visualization"));
   this->addTab(new VideoTab, tr("Video"));
   this->addTab(new ToolConfigTab, tr("Tool Configuration"));
   this->addTab(new DebugTab, tr("Debug"));

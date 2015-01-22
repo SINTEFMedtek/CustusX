@@ -71,7 +71,7 @@ public:
 	ConfigurationFileParser(QString absoluteConfigFilePath, QString loggingFolder = "");
 	~ConfigurationFileParser();
 
-	CLINICAL_APPLICATION getApplicationapplication();
+	QString getApplicationapplication();
 	std::vector<IgstkTracker::InternalStructure> getTrackers();
 	std::vector<QString> getAbsoluteToolFilePaths();
 	QString getAbsoluteReferenceFilePath();

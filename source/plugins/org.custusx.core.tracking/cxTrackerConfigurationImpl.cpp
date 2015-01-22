@@ -79,8 +79,7 @@ TrackerConfigurationImpl::Configuration TrackerConfigurationImpl::getConfigurati
 	retval.mUid = uid;
 	retval.mName = QFileInfo(uid).completeBaseName();
 
-	CLINICAL_APPLICATION application = parser.getApplicationapplication();
-	retval.mClinicalApplication = enum2string(application);
+	retval.mClinicalApplication = parser.getApplicationapplication();
 
 	std::vector<IgstkTracker::InternalStructure> trackers = parser.getTrackers();
 	for (unsigned i = 0; i < trackers.size(); ++i)
@@ -145,10 +144,10 @@ QStringList TrackerConfigurationImpl::filter(QStringList toolsToFilter, QStringL
 
 		//check applications
 		bool passedApplicationFilter = false;
-		std::vector<CLINICAL_APPLICATION>::iterator it = internal.mClinicalApplications.begin();
+		std::vector<QString>::iterator it = internal.mClinicalApplications.begin();
 		while(it != internal.mClinicalApplications.end() && !passedApplicationFilter)
 		{
-			QString applicationName = enum2string(*it);
+			QString applicationName = *it;
 			if(applicationsFilter.contains(applicationName, Qt::CaseInsensitive))
 			{
 				passedApplicationFilter = true;

@@ -58,7 +58,7 @@ bool similar(const SlicePlane& a, const SlicePlane& b)
 /**Initialize the computer with reasonable defaults.
  */
 SliceComputer::SliceComputer() :
-	mClinicalApplication(mdLABORATORY),
+	mClinicalApplication(mdNEUROLOGICAL),
 	mOrientType(otORTHOGONAL),
 	mPlaneType(ptAXIAL),
 	mFollowType(ftFIXED_CENTER),
@@ -80,7 +80,7 @@ SliceComputer::~SliceComputer()
 
 /**Group the typical plane definition uses together.
  */
-void SliceComputer::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset, CLINICAL_APPLICATION application, bool useConstrainedViewOffset)
+void SliceComputer::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset, CLINICAL_VIEW application, bool useConstrainedViewOffset)
 {
 	setPlaneType(plane);
 	mClinicalApplication = application;
@@ -137,7 +137,7 @@ void SliceComputer::switchOrientationMode(ORIENTATION_TYPE type)
 	initializeFromPlane(newType, mUseGravity, mGravityDirection, mUseViewOffset, mViewportHeight, mViewOffset, mClinicalApplication);
 }
 
-void SliceComputer::setClinicalApplication(CLINICAL_APPLICATION application)
+void SliceComputer::setClinicalApplication(CLINICAL_VIEW application)
 {
 	mClinicalApplication = application;
 }
@@ -325,12 +325,9 @@ std::pair<Vector3D,Vector3D> SliceComputer::generateBasisVectors() const
 {
 	switch (mClinicalApplication)
 	{
-	case mdLAPAROSCOPY:
-	case mdBRONCHOSCOPY:
-	case mdENDOVASCULAR:
+	case mdRADIOLOGICAL:
 		return this->generateBasisVectorsRadiology();
-	case mdLABORATORY:
-	case mdNEUROLOGY:
+	case mdNEUROLOGICAL:
 	default:
 		return this->generateBasisVectorsNeurology();
 	}

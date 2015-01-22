@@ -75,7 +75,7 @@ signals:
   void toolSelected(QString absoluteFilePath);
 
 public slots:
-  void setClinicalApplicationSlot(CLINICAL_APPLICATION clinicalApplication);
+  void setClinicalApplicationSlot(QString val);
 
 private slots:
   void filterSlot();
