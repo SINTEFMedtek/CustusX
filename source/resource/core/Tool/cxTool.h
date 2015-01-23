@@ -70,16 +70,8 @@ class cxResource_EXPORT Tool: public QObject
 {
 	Q_OBJECT
 public:
-	Tool(const QString& uid="", const QString& name = "") :
-		mUid(uid), mName(name)
-	{
-		if (name.isEmpty())
-			mName = uid;
-	}
-
-	virtual ~Tool()
-	{
-	}
+	Tool(const QString& uid="", const QString& name = "");
+	virtual ~Tool()	{}
 
 	/**Enumerates the state of the tool
 	 */

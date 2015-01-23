@@ -36,6 +36,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
+Tool::Tool(const QString &uid, const QString &name) :
+	mUid(uid), mName(name)
+{
+	if (name.isEmpty())
+		mName = uid;
+}
+
 ToolPtr Tool::getNullObject()
 {
 	static ToolPtr mNull;
