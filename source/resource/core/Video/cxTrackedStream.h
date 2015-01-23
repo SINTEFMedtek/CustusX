@@ -30,28 +30,52 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxStream.h"
+#ifndef CXTRACKEDSTREAM_H
+#define CXTRACKEDSTREAM_H
 
-#include <vtkImageData.h>
+#include "cxImage.h"
+#include "cxVideoSource.h"
 
 namespace cx
 {
 
-Stream::Stream(const QString& uid, const QString& name, const VideoSourcePtr &videosource) :
-	Data(uid, name), mVideoSource(videosource)
+/**\brief A data set for video streams (2D/3D).
+ *
+ * Allowing video stream as a data type
+ *
+ * \ingroup cx_resource_core_video
+ */
+class TrackedStream : public Data
 {
-}
+	Q_OBJECT
+public:
+	static TrackedStreamPtr create(const QString& uid, const QString& name = "");
+	TrackedStream(const QString &uid, const QString &name, const ToolPtr probe, const VideoSourcePtr &videoSource);
 
-void Stream::setVideoSource(const VideoSourcePtr &videoSource)
-{
-	mVideoSource = videoSource;
-	emit streamChanged();
-}
+	void setProbe(const ToolPtr &probe);
+	ToolPtr getProbe();
+	void setVideoSource(const VideoSourcePtr &videoSource);
+	VideoSourcePtr getVideoSource();
 
-DoubleBoundingBox3D Stream::boundingBox() const
-{
-	DoubleBoundingBox3D bounds(mVideoSource->getVtkImageData()->GetBounds());
-	return bounds;
-}
+//	virtual void addXml(QDomNode& dataNode);
+//	virtual void parseXml(QDomNode& dataNode);
+
+	virtual DoubleBoundingBox3D boundingBox() const;
+	virtual bool load(QString path) { return false;} ///< Not used
+
+	virtual QString getType() const;
+	static QString getTypeName();
+
+signals:
+	void streamChanged();
+
+private:
+	ToolPtr mProbe;
+	VideoSourcePtr mVideoSource;
+};
+
+typedef boost::shared_ptr<TrackedStream> TrackedStreamPtr;
 
 } //cx
+
+#endif // CXTRACKEDSTREAM_H

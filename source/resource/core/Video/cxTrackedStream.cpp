@@ -30,39 +30,58 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXSTREAM_H
-#define CXSTREAM_H
+#include "cxTrackedStream.h"
 
-#include "cxImage.h"
-#include "cxVideoSource.h"
+#include <vtkImageData.h>
 
 namespace cx
 {
 
-/**\brief A data set for video streams (2D/3D).
- *
- * Allowing video stream as a data type
- *
- * \ingroup cx_resource_core_video
- */
-class Stream : public Data
+TrackedStreamPtr TrackedStream::create(const QString &uid, const QString &name)
 {
-	Q_OBJECT
-public:
-	Stream(const QString &uid, const QString &name, const VideoSourcePtr &videoSource);
+	return TrackedStreamPtr(new TrackedStream(uid, name, ToolPtr(), VideoSourcePtr()));
+}
 
-	void setVideoSource(const VideoSourcePtr &videoSource);
+TrackedStream::TrackedStream(const QString& uid, const QString& name, const ToolPtr probe, const VideoSourcePtr &videosource) :
+	Data(uid, name), mProbe(probe), mVideoSource(videosource)
+{
+}
 
-	virtual DoubleBoundingBox3D boundingBox() const;
-	virtual bool load(QString path) { return false;} ///< Not used
+void TrackedStream::setProbe(const ToolPtr &probe)
+{
+	mProbe = probe;
+}
 
-signals:
-	void streamChanged();
+ToolPtr TrackedStream::getProbe()
+{
+	return mProbe;
+}
 
-private:
-	VideoSourcePtr mVideoSource;
-};
+void TrackedStream::setVideoSource(const VideoSourcePtr &videoSource)
+{
+	mVideoSource = videoSource;
+	emit streamChanged();
+}
+
+VideoSourcePtr TrackedStream::getVideoSource()
+{
+	return mVideoSource;
+}
+
+DoubleBoundingBox3D TrackedStream::boundingBox() const
+{
+	DoubleBoundingBox3D bounds(mVideoSource->getVtkImageData()->GetBounds());
+	return bounds;
+}
+
+QString TrackedStream::getType() const
+{
+	return getTypeName();
+}
+
+QString TrackedStream::getTypeName()
+{
+	return "TrackedStream";
+}
 
 } //cx
-
-#endif // CXSTREAM_H
