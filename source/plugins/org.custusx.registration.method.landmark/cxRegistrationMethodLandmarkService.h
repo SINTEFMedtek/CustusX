@@ -97,7 +97,7 @@ public:
 		RegistrationMethodService(services) {}
 	virtual ~RegistrationMethodFastLandmarkImageToPatientService() {}
 	virtual QString getRegistrationType() {return QString("ImageToPatient");}
-	virtual QString getRegistrationMethod() {return QString("Fast Landmark");}
+	virtual QString getRegistrationMethod() {return QString("Fast");}
 	virtual QString getWidgetName() {return QString("FastLandmarkImage2PatientRegistrationWidget");}
 	virtual QWidget* createWidget();
 };

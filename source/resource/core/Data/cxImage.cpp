@@ -68,7 +68,7 @@ namespace cx
 
 Image::ShadingStruct::ShadingStruct()
 {
-	on = false;
+	on = true;
 	ambient = 0.2;
 	diffuse = 0.9;
 	specular = 0.3;

@@ -75,11 +75,6 @@ void Data::setName(const QString& name)
 	emit propertiesChanged();
 }
 
-void Data::setRegistrationStatus(REGISTRATION_STATUS regStat)
-{
-	mRegistrationStatus = regStat;
-}
-
 QString Data::getUid() const
 {
 	return mUid;
@@ -99,10 +94,6 @@ void Data::setFilename(QString val)
 	mFilename = val;
 }
 
-REGISTRATION_STATUS Data::getRegistrationStatus() const
-{
-	return mRegistrationStatus;
-}
 /**
  * @return Transform from local data space to (data-)ref space
  */
@@ -110,26 +101,10 @@ Transform3D Data::get_rMd() const
 {
 	return m_rMd_History->getCurrentRegistration().mValue;
 }
-//void Data::connectToRep(const RepWeakPtr& rep)
-//{
-//	mReps.insert(rep);
-//}
-//void Data::disconnectFromRep(const RepWeakPtr& rep)
-//{
-//	mReps.erase(rep);
-//}
+
 RegistrationHistoryPtr Data::get_rMd_History()
 {
 	return m_rMd_History;
-}
-
-void Data::setShadingOn(bool on)
-{
-}
-
-bool Data::getShadingOn() const
-{
-	return false;
 }
 
 QString Data::getSpace()

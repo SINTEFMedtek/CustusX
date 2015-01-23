@@ -101,7 +101,6 @@ std::map<std::string, std::string> getDisplayFriendlyInfo(MeshPtr mesh)
 	retval["Coordinate system"] = mesh->getCoordinateSystem().toString().toStdString();
 	retval["Name"] = mesh->getName().toStdString();
 	retval["Parent space"] = mesh->getParentSpace().toStdString();
-	retval["Shading"] = mesh->getShadingOn() ? "on" : "off";
 	retval["Space"] = mesh->getSpace().toStdString();
 	retval["Type"] = mesh->getType().toStdString();
 	retval["Uid"] = mesh->getUid().toStdString();

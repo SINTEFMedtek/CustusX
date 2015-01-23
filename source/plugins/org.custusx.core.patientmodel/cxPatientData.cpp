@@ -191,8 +191,6 @@ DataPtr PatientData::importData(QString fileName, QString &infoText)
 	}
 	data->setAcquisitionTime(QDateTime::currentDateTime());
 
-	data->setShadingOn(true);
-
 	mDataManager->saveData(data, mSession->getRootFolder());
 
 	// remove redundant line breaks
