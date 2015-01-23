@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxImage.h"
 #include "cxMesh.h"
+#include "cxTrackedStream.h"
 #include "cxPointMetric.h"
 #include "cxDistanceMetric.h"
 #include "cxPlaneMetric.h"
@@ -71,6 +72,7 @@ DataPtr DataFactory::createRaw(QString type, QString uid)
 {
 	CREATE_IF_MATCH(type, Image);
 	CREATE_IF_MATCH(type, Mesh);
+	CREATE_IF_MATCH(type, TrackedStream);
 	CREATE_METRIC_IF_MATCH(type, PointMetric);
 	CREATE_METRIC_IF_MATCH(type, PlaneMetric);
 	CREATE_METRIC_IF_MATCH(type, DistanceMetric);

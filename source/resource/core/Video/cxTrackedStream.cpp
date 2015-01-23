@@ -37,9 +37,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
+TrackedStreamPtr TrackedStream::create(const QString &uid, const QString &name)
+{
+	return TrackedStreamPtr(new TrackedStream(uid, name, ToolPtr(), VideoSourcePtr()));
+}
+
 TrackedStream::TrackedStream(const QString& uid, const QString& name, const ToolPtr probe, const VideoSourcePtr &videosource) :
 	Data(uid, name), mProbe(probe), mVideoSource(videosource)
 {
+}
+
+void TrackedStream::setProbe(const ToolPtr &probe)
+{
+	mProbe = probe;
 }
 
 void TrackedStream::setVideoSource(const VideoSourcePtr &videoSource)

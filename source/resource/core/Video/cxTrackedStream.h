@@ -49,20 +49,34 @@ class TrackedStream : public Data
 {
 	Q_OBJECT
 public:
+	static TrackedStreamPtr create(const QString& uid, const QString& name = "");
 	TrackedStream(const QString &uid, const QString &name, const ToolPtr probe, const VideoSourcePtr &videoSource);
 
+
+	void setProbe(const ToolPtr &probe);
 	void setVideoSource(const VideoSourcePtr &videoSource);
 
 	virtual DoubleBoundingBox3D boundingBox() const;
 	virtual bool load(QString path) { return false;} ///< Not used
 
+	virtual QString getType() const
+	{
+		return getTypeName();
+	}
+	static QString getTypeName()
+	{
+		return "TrackedStream";
+	}
+
 signals:
 	void streamChanged();
 
 private:
-	VideoSourcePtr mVideoSource;
 	ToolPtr mProbe;
+	VideoSourcePtr mVideoSource;
 };
+
+typedef boost::shared_ptr<TrackedStream> TrackedStreamPtr;
 
 } //cx
 
