@@ -52,16 +52,36 @@ void TrackedStream::setProbe(const ToolPtr &probe)
 	mProbe = probe;
 }
 
+ToolPtr TrackedStream::getProbe()
+{
+	return mProbe;
+}
+
 void TrackedStream::setVideoSource(const VideoSourcePtr &videoSource)
 {
 	mVideoSource = videoSource;
 	emit streamChanged();
 }
 
+VideoSourcePtr TrackedStream::getVideoSource()
+{
+	return mVideoSource;
+}
+
 DoubleBoundingBox3D TrackedStream::boundingBox() const
 {
 	DoubleBoundingBox3D bounds(mVideoSource->getVtkImageData()->GetBounds());
 	return bounds;
+}
+
+QString TrackedStream::getType() const
+{
+	return getTypeName();
+}
+
+QString TrackedStream::getTypeName()
+{
+	return "TrackedStream";
 }
 
 } //cx

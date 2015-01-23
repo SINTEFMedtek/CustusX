@@ -30,8 +30,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXSTREAM_H
-#define CXSTREAM_H
+#ifndef CXTRACKEDSTREAM_H
+#define CXTRACKEDSTREAM_H
 
 #include "cxImage.h"
 #include "cxVideoSource.h"
@@ -52,21 +52,19 @@ public:
 	static TrackedStreamPtr create(const QString& uid, const QString& name = "");
 	TrackedStream(const QString &uid, const QString &name, const ToolPtr probe, const VideoSourcePtr &videoSource);
 
-
 	void setProbe(const ToolPtr &probe);
+	ToolPtr getProbe();
 	void setVideoSource(const VideoSourcePtr &videoSource);
+	VideoSourcePtr getVideoSource();
+
+//	virtual void addXml(QDomNode& dataNode);
+//	virtual void parseXml(QDomNode& dataNode);
 
 	virtual DoubleBoundingBox3D boundingBox() const;
 	virtual bool load(QString path) { return false;} ///< Not used
 
-	virtual QString getType() const
-	{
-		return getTypeName();
-	}
-	static QString getTypeName()
-	{
-		return "TrackedStream";
-	}
+	virtual QString getType() const;
+	static QString getTypeName();
 
 signals:
 	void streamChanged();
@@ -80,4 +78,4 @@ typedef boost::shared_ptr<TrackedStream> TrackedStreamPtr;
 
 } //cx
 
-#endif // CXSTREAM_H
+#endif // CXTRACKEDSTREAM_H
