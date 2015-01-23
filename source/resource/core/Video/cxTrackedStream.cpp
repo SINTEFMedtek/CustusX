@@ -30,25 +30,25 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxStream.h"
+#include "cxTrackedStream.h"
 
 #include <vtkImageData.h>
 
 namespace cx
 {
 
-Stream::Stream(const QString& uid, const QString& name, const VideoSourcePtr &videosource) :
-	Data(uid, name), mVideoSource(videosource)
+TrackedStream::TrackedStream(const QString& uid, const QString& name, const ToolPtr probe, const VideoSourcePtr &videosource) :
+	Data(uid, name), mProbe(probe), mVideoSource(videosource)
 {
 }
 
-void Stream::setVideoSource(const VideoSourcePtr &videoSource)
+void TrackedStream::setVideoSource(const VideoSourcePtr &videoSource)
 {
 	mVideoSource = videoSource;
 	emit streamChanged();
 }
 
-DoubleBoundingBox3D Stream::boundingBox() const
+DoubleBoundingBox3D TrackedStream::boundingBox() const
 {
 	DoubleBoundingBox3D bounds(mVideoSource->getVtkImageData()->GetBounds());
 	return bounds;

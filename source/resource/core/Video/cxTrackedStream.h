@@ -45,11 +45,11 @@ namespace cx
  *
  * \ingroup cx_resource_core_video
  */
-class Stream : public Data
+class TrackedStream : public Data
 {
 	Q_OBJECT
 public:
-	Stream(const QString &uid, const QString &name, const VideoSourcePtr &videoSource);
+	TrackedStream(const QString &uid, const QString &name, const ToolPtr probe, const VideoSourcePtr &videoSource);
 
 	void setVideoSource(const VideoSourcePtr &videoSource);
 
@@ -61,6 +61,7 @@ signals:
 
 private:
 	VideoSourcePtr mVideoSource;
+	ToolPtr mProbe;
 };
 
 } //cx
