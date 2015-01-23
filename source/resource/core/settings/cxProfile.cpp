@@ -139,6 +139,11 @@ QStringList Profile::getAllRootConfigPaths()
 //---------------------------------------------------------
 //---------------------------------------------------------
 
+cxResource_EXPORT ProfilePtr profile()
+{
+	return ProfileManager::getInstance()->activeProfile();
+}
+
 ProfileManager *ProfileManager::mInstance = NULL;
 
 ProfileManager* ProfileManager::getInstance()

@@ -168,10 +168,7 @@ private:
 	void createCustomProfile(QString uid);
 };
 
-static ProfilePtr cxResource_EXPORT profile()
-{
-	return ProfileManager::getInstance()->activeProfile();
-}
+cxResource_EXPORT ProfilePtr profile();
 
 
 
