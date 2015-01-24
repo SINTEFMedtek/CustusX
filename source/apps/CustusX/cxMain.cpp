@@ -116,6 +116,7 @@ public:
 //		qApp->processEvents();
 //		std::cout << "Mainwindow.isnull: " << mMainWindow.isNull() << std::endl;
 		delete mMainWindow;
+		std::cout << "post del main win" << std::endl;
 		mPlugins.clear();
 	}
 
