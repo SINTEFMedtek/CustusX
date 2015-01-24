@@ -99,9 +99,11 @@ LogicManager* logicManager()
 	return LogicManager::getInstance();
 }
 
-void LogicManager::initialize()
+void LogicManager::initialize(ApplicationComponentPtr component)
 {
 	LogicManager::getInstance()->initializeServices();
+	LogicManager::getInstance()->setApplicationComponent(component);
+
 }
 
 void LogicManager::shutdown()
@@ -114,6 +116,7 @@ void LogicManager::shutdown()
 
 void LogicManager::initializeServices()
 {
+	CX_LOG_DEBUG() << " --- Begin initialize services";
 	// resources layer
 	ProfileManager::initialize();
 	Reporter::initialize();
@@ -136,13 +139,44 @@ void LogicManager::initializeServices()
 
 	mPluginFramework->loadState();
 
-//	CX_LOG_CHANNEL_DEBUG("kanal") << "stream to channel";
-//	CX_LOG_DEBUG() << "stream to default";
-//	CX_LOG_DEBUG("stream to default old style");
+	if (mComponent)
+		mComponent->create();
+	CX_LOG_DEBUG() << " --- End initialize services";
+}
+
+void LogicManager::setApplicationComponent(ApplicationComponentPtr component)
+{
+	if (mComponent)
+		mComponent->destroy();
+
+	mComponent = component;
+
+	if (mComponent)
+		mComponent->create();
+}
+
+void LogicManager::restartWithNewProfile(QString uid)
+{
+	QMetaObject::invokeMethod(this, "onRestartWithNewProfile",
+							  Qt::QueuedConnection,
+							  Q_ARG(QString, uid));
+}
+
+void LogicManager::onRestartWithNewProfile(QString uid)
+{
+	if (profile()->getUid()==uid)
+		return;
+	this->shutdownServices();
+	ProfileManager::getInstance()->setActiveProfile(uid);
+	this->initializeServices();
 }
 
 void LogicManager::shutdownServices()
 {
+	CX_LOG_DEBUG() << " --- Begin shutdown services";
+	if (mComponent)
+		mComponent->destroy();
+
 	mPluginFramework->stop();
 
 	this->shutdownService(mSpaceProvider, "SpaceProvider"); // remove before patmodel and track
@@ -158,6 +192,7 @@ void LogicManager::shutdownServices()
 	GPUImageBufferRepository::shutdown();
 	Reporter::shutdown();
 	ProfileManager::shutdown();
+	CX_LOG_DEBUG() << " --- End shutdown services";
 }
 
 template<class T>

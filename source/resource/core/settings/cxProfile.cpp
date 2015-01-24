@@ -301,10 +301,11 @@ void ProfileManager::setActiveProfile(QString uid)
 
 	mActive.reset(new Profile(this->getPathForCustom(uid), mSettings));
 	this->getGenericSettings()->setValue("profile", mActive->getUid());
-	if (mSelector)
-		mSelector->setValue(mActive->getUid());
+//	if (mSelector)
+//		mSelector->setValue(mActive->getUid());
 	mActive->activate();
 	emit activeProfileChanged();
+//	CX_LOG_INFO() << "Set profile " << mActive->getName();
 }
 
 void ProfileManager::createCustomProfile(QString uid)
@@ -335,30 +336,10 @@ void ProfileManager::createCustomProfile(QString uid)
 
 void ProfileManager::profilesChanged()
 {
-	if (mSelector)
-		mSelector->setValueRange(this->getProfiles());
+//	if (mSelector)
+//		mSelector->setValueRange(this->getProfiles());
 }
 
-StringPropertyPtr ProfileManager::getProfileSelector()
-{
-	if (!mSelector)
-	{
-		QString defaultValue = mActive->getUid();
-		mSelector = StringProperty::initialize("profile", "Profile",
-											"Choose profile, containing settings and configuration",
-											defaultValue, this->getProfiles(), QDomNode());
-
-		connect(mSelector.get(), &StringProperty::valueWasSet, this, &ProfileManager::onProfileSelected);
-		mSelector->setValueRange(this->getProfiles());
-	}
-
-	return mSelector;
-}
-
-void ProfileManager::onProfileSelected()
-{
-	this->setActiveProfile(mSelector->getValue());
-}
 
 
 } // namespace cx

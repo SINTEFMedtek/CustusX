@@ -70,20 +70,18 @@ private slots:
   void browsePatientDataFolderSlot();
   void browseVLCPathSlot();
   void onAddProfile();
-
-//  void currentApplicationChangedSlot(int index);
-//  void applicationStateChangedSlot();
+	void onProfileSelected();
+	void onProfileChanged();
 
 private:
-//  void setApplicationComboBox();
   void searchForVLC(QStringList searchPaths = QStringList());
   QToolButton* createAddProfileButton();
+  StringPropertyPtr getProfileSelector();
 
   QComboBox* mPatientDataFolderComboBox;
   QComboBox* mVLCPathComboBox;
 
   QComboBox* mToolConfigFolderComboBox;
-//  QComboBox* mChooseApplicationComboBox;
 
   BoolPropertyPtr mFilterToolPositions;
 
@@ -91,6 +89,7 @@ private:
   QString mVLCPath;
   VisualizationServicePtr mVisualizationService;
   PatientModelServicePtr mPatientModelService;
+  StringPropertyPtr mSelector;
 };
 } /* namespace cx */
 #endif /* CXGENERALTAB_H_ */

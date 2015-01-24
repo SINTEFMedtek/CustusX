@@ -129,7 +129,7 @@ public:
 	static void shutdown();
 
 	QStringList getProfiles();
-	StringPropertyPtr getProfileSelector();
+//	StringPropertyPtr getProfileSelector();
 
 	ProfilePtr activeProfile();
 	void setActiveProfile(QString uid);
@@ -142,14 +142,14 @@ public:
 signals:
 	void activeProfileChanged();
 
-private slots:
-	void onProfileSelected();
+//private slots:
+//	void onProfileSelected();
 private:
 	ProfileManager();
 	~ProfileManager();
 	static ProfileManager* mInstance; ///< The only instance of this class that can exist.
 	ProfilePtr mActive;
-	StringPropertyPtr mSelector;
+//	StringPropertyPtr mSelector;
 	QSettingsPtr getGenericSettings();
 
 	SettingsPtr mSettings; ///< used by Profile, changes content for each profile change

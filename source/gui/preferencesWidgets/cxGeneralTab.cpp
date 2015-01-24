@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QAction>
 #include <QInputDialog>
 #include "cxProfile.h"
+#include "cxLogicManager.h"
 
 namespace cx
 {
@@ -87,7 +88,7 @@ void GeneralTab::init()
 
   // Choose application name
 
-  StringPropertyPtr profileSelector = ProfileManager::getInstance()->getProfileSelector();
+  StringPropertyPtr profileSelector = this->getProfileSelector();
 
 //  QLabel* chooseApplicationLabel = new QLabel(tr("Choose application:"));
 //  mChooseApplicationComboBox = new QComboBox();
@@ -158,7 +159,8 @@ void GeneralTab::onAddProfile()
 	if (!ok || text.isEmpty())
 		return;
 
-	ProfileManager::getInstance()->setActiveProfile(text);
+	LogicManager::getInstance()->restartWithNewProfile(text);
+//	ProfileManager::getInstance()->setActiveProfile(text);
 }
 
 void GeneralTab::browsePatientDataFolderSlot()
@@ -183,6 +185,36 @@ void GeneralTab::browseVLCPathSlot()
 		mVLCPathComboBox->setCurrentIndex( mVLCPathComboBox->currentIndex() + 1 );
 	}
 }
+
+StringPropertyPtr GeneralTab::getProfileSelector()
+{
+	if (!mSelector)
+	{
+		ProfileManager* manager = ProfileManager::getInstance();
+		QString defaultValue = profile()->getUid();
+		mSelector = StringProperty::initialize("profile", "Profile",
+											"Choose profile, containing settings and configuration",
+											defaultValue, manager->getProfiles(), QDomNode());
+
+		connect(mSelector.get(), &StringProperty::valueWasSet, this, &GeneralTab::onProfileSelected);
+		connect(manager, &ProfileManager::activeProfileChanged, this, &GeneralTab::onProfileChanged);
+	}
+
+	return mSelector;
+}
+
+void GeneralTab::onProfileChanged()
+{
+	mSelector->setValueRange(ProfileManager::getInstance()->getProfiles());
+	mSelector->setValue(profile()->getUid());
+}
+
+void GeneralTab::onProfileSelected()
+{
+	LogicManager::getInstance()->restartWithNewProfile(mSelector->getValue());
+//	this->setActiveProfile(mSelector->getValue());
+}
+
 
 //void GeneralTab::setApplicationComboBox()
 //{

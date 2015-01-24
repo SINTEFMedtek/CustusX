@@ -71,12 +71,61 @@ void force_C_locale_decimalseparator()
 #endif
 
 
-#ifdef WIN32
-//int WinMain(int argc, char *argv[]) //add WIN32 to add_executable and use this entrypoint if you want CustusX not to have a console
-int main(int argc, char *argv[])
-#else
-int main(int argc, char *argv[])
+namespace cx
+{
+
+/**
+ * Class holding the CustusX MainWindow
+ */
+class CustusXMainWindowFactory : public ApplicationComponent
+{
+public:
+	virtual void create()
+	{
+		if (this->exists())
+			return;
+
+		PatientModelServicePtr patientModelService = PatientModelServicePtr(new PatientModelServiceProxy(LogicManager::getInstance()->getPluginContext()));
+		VisualizationServicePtr visualizationService = VisualizationServicePtr(new VisualizationServiceProxy(LogicManager::getInstance()->getPluginContext()));
+		AcquisitionServicePtr acquisitionService = AcquisitionServicePtr(new AcquisitionServiceProxy(LogicManager::getInstance()->getPluginContext()));
+
+		CalibrationPluginPtr calibrationPlugin(new CalibrationPlugin(patientModelService, acquisitionService));
+		AlgorithmPluginPtr algorithmPlugin(new AlgorithmPlugin(visualizationService, patientModelService));
+
+		mPlugins.push_back(calibrationPlugin);
+		mPlugins.push_back(algorithmPlugin);
+
+		mMainWindow = new cx::MainWindow(mPlugins);
+
+#ifdef __APPLE__ // needed on mac for bringing to front: does the opposite on linux
+		mMainWindow->activateWindow();
 #endif
+		mMainWindow->raise();
+	}
+
+	virtual bool exists() const
+	{
+		return mMainWindow != 0;
+	}
+
+	virtual void destroy()
+	{
+		if (!this->exists())
+			return;
+
+//		qApp->processEvents();
+//		std::cout << "Mainwindow.isnull: " << mMainWindow.isNull() << std::endl;
+		delete mMainWindow;
+		mPlugins.clear();
+	}
+
+private:
+	QPointer<MainWindow> mMainWindow;
+	std::vector<GUIExtenderServicePtr> mPlugins;
+};
+}
+
+int main(int argc, char *argv[])
 {
 
 #if !defined(WIN32)
@@ -84,7 +133,7 @@ int main(int argc, char *argv[])
   //instead we solve the problem by adding a handmade header for the cxResources.qrc file
   Q_INIT_RESOURCE(cxResources);
 #endif
-  
+
   cx::Application app(argc, argv);
   app.setOrganizationName("SINTEF");
   app.setOrganizationDomain("www.sintef.no");
@@ -96,37 +145,12 @@ int main(int argc, char *argv[])
   force_C_locale_decimalseparator();
 #endif
 
-  cx::LogicManager::initialize();
-
-	std::vector<cx::GUIExtenderServicePtr> plugins;
-
-
-	cx::PatientModelServicePtr patientModelService = cx::PatientModelServicePtr(new cx::PatientModelServiceProxy(cx::LogicManager::getInstance()->getPluginContext()));
-	cx::VisualizationServicePtr visualizationService = cx::VisualizationServicePtr(new cx::VisualizationServiceProxy(cx::LogicManager::getInstance()->getPluginContext()));
-	cx::AcquisitionServicePtr acquisitionService = cx::AcquisitionServicePtr(new cx::AcquisitionServiceProxy(cx::LogicManager::getInstance()->getPluginContext()));
-
-	cx::CalibrationPluginPtr calibrationPlugin(new cx::CalibrationPlugin(patientModelService, acquisitionService));
-	cx::AlgorithmPluginPtr algorithmPlugin(new cx::AlgorithmPlugin(visualizationService, patientModelService));
-
-	plugins.push_back(calibrationPlugin);
-	plugins.push_back(algorithmPlugin);
-
-	//Need to remove local variables so that plugins.clear() will trigger the destructors before LogicManager destroys the plugin framework
-	calibrationPlugin.reset();
-	algorithmPlugin.reset();
-
-	cx::MainWindow* mainWin = new cx::MainWindow(plugins);
-
-#ifdef __APPLE__ // needed on mac for bringing to front: does the opposite on linux
-  mainWin->activateWindow();
-#endif
-  mainWin->raise();
+  cx::ApplicationComponentPtr mainwindow(new cx::CustusXMainWindowFactory());
+  cx::LogicManager::initialize(mainwindow);
 
   int retVal = app.exec();
 
-	plugins.clear();
-	delete mainWin;
   cx::LogicManager::shutdown(); // shutdown all global resources, _after_ gui is deleted.
+
   return retVal;
-  
 }

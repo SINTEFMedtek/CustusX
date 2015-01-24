@@ -45,7 +45,7 @@ class CXTESTGUI_EXPORT CustusXController : public QObject
   Q_OBJECT
 
 public:
-    cx::MainWindow* mMainWindow;
+//    cx::MainWindow* mMainWindow;
     QString mPatientFolder;
     QString mTestData;
     int mBaseTime;
@@ -64,9 +64,9 @@ public slots:
     void initialEndCheckRenderSlot();
     void secondEndCheckRenderSlot();
     void displayResultsSlot();
+	void changeToNewProfile();
 
 private:
 };
-
 
 #endif /* CXTESTCUSTUSXCONTROLLER_H_ */
