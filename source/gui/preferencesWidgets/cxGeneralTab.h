@@ -72,8 +72,10 @@ private slots:
   void onAddProfile();
 	void onProfileSelected();
 	void onProfileChanged();
+	void selectProfile(QString uid);
 
 private:
+	void rejectDialog();
   void searchForVLC(QStringList searchPaths = QStringList());
   QToolButton* createAddProfileButton();
   StringPropertyPtr getProfileSelector();

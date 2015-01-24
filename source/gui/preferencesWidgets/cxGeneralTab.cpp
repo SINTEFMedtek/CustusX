@@ -159,8 +159,7 @@ void GeneralTab::onAddProfile()
 	if (!ok || text.isEmpty())
 		return;
 
-	LogicManager::getInstance()->restartWithNewProfile(text);
-//	ProfileManager::getInstance()->setActiveProfile(text);
+	this->selectProfile(text);
 }
 
 void GeneralTab::browsePatientDataFolderSlot()
@@ -211,25 +210,29 @@ void GeneralTab::onProfileChanged()
 
 void GeneralTab::onProfileSelected()
 {
-	LogicManager::getInstance()->restartWithNewProfile(mSelector->getValue());
-//	this->setActiveProfile(mSelector->getValue());
+	this->selectProfile(mSelector->getValue());
 }
 
+void GeneralTab::selectProfile(QString uid)
+{
+	this->rejectDialog();
+	LogicManager::getInstance()->restartWithNewProfile(uid);
+}
 
-//void GeneralTab::setApplicationComboBox()
-//{
-//  mChooseApplicationComboBox->blockSignals(true);
-//  mChooseApplicationComboBox->clear();
-//  QList<QAction*> actions = stateService()->getApplicationActions()->actions();
-//  for (int i=0; i<actions.size(); ++i)
-//  {
-//    mChooseApplicationComboBox->insertItem(i, QIcon(), actions[i]->text(), actions[i]->data());
-//    if (actions[i]->isChecked())
-//      mChooseApplicationComboBox->setCurrentIndex(i);
-//  }
-
-//  mChooseApplicationComboBox->blockSignals(false);
-//}
+void GeneralTab::rejectDialog()
+{
+	QObject* item = this;
+	while (item)
+	{
+		QDialog* dialog = dynamic_cast<QDialog*>(item);
+		if (dialog)
+		{
+			dialog->reject();
+			break;
+		}
+		item = item->parent();
+	}
+}
 
 void GeneralTab::searchForVLC(QStringList searchPaths)
 {
@@ -237,27 +240,6 @@ void GeneralTab::searchForVLC(QStringList searchPaths)
 	if(vlc()->hasVLCApplication())
 	  mVLCPath = vlc()->getVLCPath();
 }
-
-//void GeneralTab::applicationStateChangedSlot()
-//{
-//  mChooseApplicationComboBox->blockSignals(true);
-//  QList<QAction*> actions = stateService()->getApplicationActions()->actions();
-//  for (int i=0; i<actions.size(); ++i)
-//  {
-//    if (actions[i]->isChecked())
-//      mChooseApplicationComboBox->setCurrentIndex(i);
-//  }
-
-//  mChooseApplicationComboBox->blockSignals(false);
-//}
-
-//void GeneralTab::currentApplicationChangedSlot(int index)
-//{
-//  QList<QAction*> actions = stateService()->getApplicationActions()->actions();
-//  if (index<0 || index>=actions.size())
-//    return;
-//  actions[index]->trigger();
-//}
 
 void GeneralTab::saveParametersSlot()
 {
