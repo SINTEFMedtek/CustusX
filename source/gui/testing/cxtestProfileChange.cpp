@@ -59,8 +59,8 @@ TEST_CASE("Profile change with running gui", "[gui][integration]")
 	CustusXController custusX(NULL);
 	custusX.start();
 
-	QTimer::singleShot(2*1000, &custusX, SLOT(changeToNewProfile()));
-	QTimer::singleShot(4*1000,   qApp, SLOT(quit()) );
+	QTimer::singleShot(200, &custusX, SLOT(changeToNewProfile()));
+	QTimer::singleShot(400,   qApp, SLOT(quit()) );
 
 	qApp->exec();
 	custusX.stop();
