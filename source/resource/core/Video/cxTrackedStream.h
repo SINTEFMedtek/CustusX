@@ -45,7 +45,7 @@ namespace cx
  *
  * \ingroup cx_resource_core_video
  */
-class TrackedStream : public Data
+class cxResource_EXPORT TrackedStream : public Data
 {
 	Q_OBJECT
 public:
