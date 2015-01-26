@@ -87,6 +87,7 @@ public:
 signals:
 	void sectorChanged();
 	void activeConfigChanged();
+	void videoSourceAdded(VideoSourcePtr source);
 };
 
 typedef boost::shared_ptr<Probe> ProbePtr;

@@ -44,6 +44,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelServiceProxy.h"
 #include "cxSpaceProviderImpl.h"
 #include "cxSessionStorageServiceProxy.h"
+#include "cxTrackedStream.h"
+#include "cxReporter.h"
 
 namespace cx
 {
@@ -64,19 +66,21 @@ PatientModelImplService::PatientModelImplService(ctkPluginContext *context) :
 	connect(this->dataService().get(), &DataManager::landmarkPropertiesChanged, this, &PatientModelService::landmarkPropertiesChanged);
 
 	connect(this->patientData().get(), &PatientData::patientChanged, this, &PatientModelService::patientChanged);
+
+	connect(mTrackingService.get(), &TrackingService::newProbe, this, &PatientModelImplService::newProbe);
 }
 
 void PatientModelImplService::createInterconnectedDataAndSpace()
 {
 	// prerequisites:
-	TrackingServicePtr trackingService = TrackingServiceProxy::create(mContext);
+	mTrackingService = TrackingServiceProxy::create(mContext);
 
 	// build object(s):
 	PatientModelServicePtr patientModelService = PatientModelServiceProxy::create(mContext);
 
 	mDataService = DataManagerImpl::create();
 
-	SpaceProviderPtr spaceProvider(new cx::SpaceProviderImpl(trackingService, patientModelService));
+	SpaceProviderPtr spaceProvider(new cx::SpaceProviderImpl(mTrackingService, patientModelService));
 	mDataService->setSpaceProvider(spaceProvider);
 
 	mDataFactory.reset(new DataFactory(patientModelService, spaceProvider));
@@ -212,21 +216,6 @@ void PatientModelImplService::setClinicalApplication(CLINICAL_APPLICATION applic
 	dataService()->setClinicalApplication(application);
 }
 
-cx::ImagePtr PatientModelImplService::createDerivedImage(vtkImageDataPtr data, QString uid, QString name, cx::ImagePtr parentImage, QString filePath)
-{
-	return dataService()->createDerivedImage(data, uid, name, parentImage, filePath);
-}
-
-MeshPtr PatientModelImplService::createMesh(vtkPolyDataPtr data, QString uidBase, QString nameBase, QString filePath)
-{
-	return dataService()->createMesh(data, uidBase, nameBase, filePath);
-}
-
-ImagePtr PatientModelImplService::createImage(vtkImageDataPtr data, QString uidBase, QString nameBase, QString filePath)
-{
-	return dataService()->createImage(data, uidBase, nameBase, filePath);
-}
-
 void PatientModelImplService::loadData(DataPtr data)
 {
 	dataService()->loadData(data);
@@ -317,6 +306,50 @@ DataManagerImplPtr PatientModelImplService::dataService() const
 PatientDataPtr PatientModelImplService::patientData() const
 {
 	return mPatientData;
+}
+
+void PatientModelImplService::newProbe(const ToolPtr tool)
+{
+	ProbePtr probe = tool->getProbe();
+	if(!probe)
+	{
+		reportWarning("PatientModelImplService::newProbe: Tool is not a probe");
+		return;
+	}
+	//Move mProbeTools to DataManager?
+	mProbeTools[tool->getUid()] = tool;
+
+	connect(probe.get(), &Probe::videoSourceAdded, this, &PatientModelImplService::videoSourceAdded);
+}
+
+void PatientModelImplService::videoSourceAdded(VideoSourcePtr source)
+{
+
+	ToolPtr tool = this->getProbeTool(source->getUid());
+	if(!tool)
+		return;
+
+	QString uid = source->getUid() + tool->getUid();
+	QString name = source->getName() + " - " + tool->getName();
+	TrackedStreamPtr trackedStream = this->createSpecificData<TrackedStream>(uid, name);
+	trackedStream->setProbe(tool);
+	trackedStream->setVideoSource(source);
+
+	//Only load trackedStream, don't save it
+	this->dataService()->loadData(trackedStream);
+//	this->insertData(trackedStream);
+}
+
+ToolPtr PatientModelImplService::getProbeTool(QString videoSourceUid)
+{
+	for (std::map<QString, ToolPtr>::const_iterator iter = mProbeTools.begin(); iter != mProbeTools.end(); ++iter)
+	{
+		ToolPtr tool = iter->second;
+		ProbePtr probe = tool->getProbe();
+		if(probe && probe->getAvailableVideoSources().contains(videoSourceUid))
+			return tool;
+	}
+	return ToolPtr();
 }
 
 } /* namespace cx */

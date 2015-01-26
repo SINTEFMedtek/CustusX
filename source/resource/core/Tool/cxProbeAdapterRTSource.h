@@ -92,6 +92,8 @@ private:
 	vtkImageChangeInformationPtr mRedirecter;
 };
 
-}
+typedef boost::shared_ptr<ProbeAdapterRTSource> ProbeAdapterRTSourcePtr;
+
+} // cx
 
 #endif /* CXPROBEADAPTERRTSOURCE_H_ */

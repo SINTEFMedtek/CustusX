@@ -205,7 +205,7 @@ void ProbeImpl::setRTSource(VideoSourcePtr source)
 	{
 		VideoSourcePtr old = mSource.find(source->getUid())->second;
 
-		boost::shared_ptr<ProbeAdapterRTSource> oldAdapter;
+		ProbeAdapterRTSourcePtr oldAdapter;
 		oldAdapter = boost::dynamic_pointer_cast<ProbeAdapterRTSource>(old);
 		// check for identity, ignore if no change
 		if (oldAdapter && (source==oldAdapter->getBaseSource()))
@@ -215,6 +215,8 @@ void ProbeImpl::setRTSource(VideoSourcePtr source)
 	// must have same uid as original: the uid identifies the video source
 	mSource[source->getUid()].reset(new ProbeAdapterRTSource(source->getUid(), mSelf.lock(), source));
 	emit sectorChanged();
+
+	emit videoSourceAdded(mSource[source->getUid()]);
 }
 
 void ProbeImpl::removeRTSource(VideoSourcePtr source)

@@ -103,6 +103,7 @@ public:
 signals:
 	void stateChanged();
 	void activeToolChanged(const QString& uId);
+	void newProbe(const ToolPtr probe);
 
 public slots:
 

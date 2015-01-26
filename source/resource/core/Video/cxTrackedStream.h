@@ -50,7 +50,7 @@ class TrackedStream : public Data
 	Q_OBJECT
 public:
 	static TrackedStreamPtr create(const QString& uid, const QString& name = "");
-	TrackedStream(const QString &uid, const QString &name, const ToolPtr probe, const VideoSourcePtr &videoSource);
+	TrackedStream(const QString &uid, const QString &name, const ToolPtr &probe, const VideoSourcePtr &videoSource);
 
 	void setProbe(const ToolPtr &probe);
 	ToolPtr getProbe();

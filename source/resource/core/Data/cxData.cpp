@@ -45,7 +45,7 @@ namespace cx
 {
 
 Data::Data(const QString& uid, const QString& name) :
-	mUid(uid), mRegistrationStatus(rsNOT_REGISTRATED)//, mParentFrame("")
+	mUid(uid), mFilename(""), mRegistrationStatus(rsNOT_REGISTRATED)//, mParentFrame("")
 {
 	mAcquisitionTime = QDateTime::currentDateTime();
 

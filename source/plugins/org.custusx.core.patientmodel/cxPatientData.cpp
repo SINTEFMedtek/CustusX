@@ -56,6 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxConfig.h"
 #include "cxSessionStorageService.h"
 #include "cxXMLNodeWrapper.h"
+#include "cxDataFactory.h"
 
 namespace cx
 {
@@ -149,7 +150,9 @@ void PatientData::exportPatient(bool niftiFormat)
 
 		vtkPolyDataPtr poly = mesh->getTransformedPolyData(rMd);
 		// create a copy with the SAME UID as the original. Do not load this one into the datamanager!
-		mesh = mDataManager->createMesh(poly, mesh->getUid(), mesh->getName(), "Images");
+		mesh = mDataManager->getDataFactory()->createSpecific<Mesh>(mesh->getUid(), mesh->getName());
+		mesh->setVtkPolyData(poly);
+		mesh->setFilename("Images");
 		mDataManager->saveMesh(mesh, targetFolder);
 	}
 

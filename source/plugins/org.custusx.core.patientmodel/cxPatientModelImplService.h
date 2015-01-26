@@ -79,10 +79,6 @@ public:
 	virtual CLINICAL_APPLICATION getClinicalApplication() const;
 	virtual void setClinicalApplication(CLINICAL_APPLICATION application);
 
-	virtual ImagePtr createDerivedImage(vtkImageDataPtr data, QString uid, QString name, ImagePtr parentImage, QString filePath);
-	virtual MeshPtr createMesh(vtkPolyDataPtr data, QString uidBase, QString nameBase, QString filePath);
-	virtual ImagePtr createImage(vtkImageDataPtr data, QString uidBase, QString nameBase, QString filePath);
-
 	virtual void loadData(DataPtr data);
 	virtual void saveData(DataPtr data, const QString& basePath); ///< Save data to file
 	virtual void saveImage(ImagePtr image, const QString& basePath);///< Save image to file \param image Image to save \param basePath Absolute path to patient data folder
@@ -94,10 +90,6 @@ public:
 	virtual DataPtr importData(QString fileName, QString &infoText);
 	virtual void exportPatient(bool niftiFormat);
 	virtual void removeData(QString uid);
-//	virtual void newPatient(QString choosenDir);
-//	virtual void loadPatient(QString chosenDir);
-//	virtual void savePatient();
-//	virtual void clearPatient();
 	virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const;
 
 	virtual void setCenter(const Vector3D& center);
@@ -105,14 +97,15 @@ public:
 
 	virtual QString addLandmark();
 
-//	virtual QDomElement getCurrentWorkingElement(QString path);
-
 	virtual void autoSave();
 	virtual bool isNull();
 
 	virtual bool getDebugMode() const;
 	virtual void setDebugMode(bool on);
 
+private slots:
+	void newProbe(const ToolPtr tool);
+	void videoSourceAdded(VideoSourcePtr source);
 private:
 	ctkPluginContext *mContext;
 
@@ -124,8 +117,12 @@ private:
 
 	DataManagerImplPtr mDataService;
 	PatientDataPtr mPatientData;
-//	PatientServicePtr mPatientServiceOld;
 	DataFactoryPtr mDataFactory;
+
+	TrackingServicePtr mTrackingService;
+
+	std::map<QString, ToolPtr> mProbeTools;
+	ToolPtr getProbeTool(QString videoSourceUid);
 };
 typedef boost::shared_ptr<PatientModelImplService> PatientModelImplServicePtr;
 
