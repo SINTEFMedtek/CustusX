@@ -14,6 +14,7 @@ if(BUILD_TESTING)
     target_link_libraries(CorrectlyRenderTranslucentGeometry
         PRIVATE
         cxResource
+        ${SSC_GCOV_LIBRARY}
     )
 
 endif(BUILD_TESTING)
