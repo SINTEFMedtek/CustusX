@@ -4,5 +4,5 @@
 # =========================================================
 
 add_executable(sscPositionFileReader main.cpp)
-target_link_libraries(sscPositionFileReader cxResource)
+target_link_libraries(sscPositionFileReader cxResource ${SSC_GCOV_LIBRARY})
 

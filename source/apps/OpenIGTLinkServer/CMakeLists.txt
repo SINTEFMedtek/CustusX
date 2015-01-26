@@ -13,7 +13,7 @@ add_executable( ${ExecutableName} ${BUNDLE_TYPE} main.cpp)
 target_link_libraries(${ExecutableName}
     PUBLIC
     cxGrabber
-)
+    )
 
 cx_install_target(${ExecutableName})
 

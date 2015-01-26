@@ -106,12 +106,12 @@ target_include_directories(cxGrabber
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 target_link_libraries(cxGrabber
-    PUBLIC
-    cxResource
-    cxOpenIGTLinkUtilities
-
     PRIVATE
     ${LINK_LIBRARIES}
+
+    PUBLIC
+    cxOpenIGTLinkUtilities
+    cxResource
     )
 
 add_subdirectory(testing)

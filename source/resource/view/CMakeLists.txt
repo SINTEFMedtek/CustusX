@@ -110,7 +110,6 @@ qt5_wrap_cpp( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 set(CX_RESOURCE_VISUALIZATION_LIBRARIES
     cxResource
     cxPluginUtilities
-    ${SSC_GCOV_LIBRARY}
     ${OPENGL_LIBRARIES}
     ${Boost_LIBRARIES}
     ${ITK_LIBRARIES}
