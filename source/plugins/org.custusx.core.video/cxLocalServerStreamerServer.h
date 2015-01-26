@@ -64,7 +64,6 @@ public:
 private:
 	QStringList checkGrabberServerExist(QString path, QString filename, QString args);
 	QStringList getOpenIGTLinkServer();
-	QStringList getDefaultGrabberServer();
 	QStringList getGrabberServer(QString filename, QString postfix);
 
 };

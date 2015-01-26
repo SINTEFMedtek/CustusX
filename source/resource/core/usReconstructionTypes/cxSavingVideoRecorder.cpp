@@ -45,7 +45,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxTypeConversions.h"
 #include "cxLogger.h"
-#include "cxDataLocations.h"
 #include "cxSettings.h"
 #include "cxXmlOptionItem.h"
 #include "cxImageDataContainer.h"

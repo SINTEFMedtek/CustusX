@@ -42,7 +42,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ctkDICOMObjectListWidget.h"
 #include "ctkPluginContext.h"
 #include "cxDicomWidget.h"
-#include "cxDataLocations.h"
+//#include "cxDataLocations.h"
+#include "cxProfile.h"
 #include "cxTypeConversions.h"
 #include "cxDicomConverter.h"
 #include "cxLogger.h"
@@ -109,7 +110,7 @@ QString DicomWidget::defaultWhatsThis() const
 
 void DicomWidget::setupDatabaseDirectory()
 {
-	QString databaseDirectory = DataLocations::getSettingsPath() + "/DICOMDatabase";
+	QString databaseDirectory = profile()->getSettingsPath() + "/DICOMDatabase";
 
 	QDir qdir(databaseDirectory);
 	if ( !qdir.exists(databaseDirectory) )

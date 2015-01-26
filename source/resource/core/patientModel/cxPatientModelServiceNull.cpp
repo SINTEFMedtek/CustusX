@@ -186,12 +186,12 @@ RegistrationHistoryPtr PatientModelServiceNull::get_rMpr_History() const
 	return RegistrationHistory::getNullObject();
 }
 
-CLINICAL_APPLICATION PatientModelServiceNull::getClinicalApplication() const
+CLINICAL_VIEW PatientModelServiceNull::getClinicalApplication() const
 {
 	return mdCOUNT;
 }
 
-void PatientModelServiceNull::setClinicalApplication(CLINICAL_APPLICATION application)
+void PatientModelServiceNull::setClinicalApplication(CLINICAL_VIEW application)
 {
 
 }

@@ -76,8 +76,8 @@ public:
 	virtual ImagePtr getActiveImage() const; ///< used for system state
 	virtual void setActiveImage(ImagePtr activeImage); ///< used for system state
 
-	virtual CLINICAL_APPLICATION getClinicalApplication() const;
-	virtual void setClinicalApplication(CLINICAL_APPLICATION application);
+	virtual CLINICAL_VIEW getClinicalApplication() const;
+	virtual void setClinicalApplication(CLINICAL_VIEW application);
 
 	virtual void loadData(DataPtr data);
 	virtual void saveData(DataPtr data, const QString& basePath); ///< Save data to file

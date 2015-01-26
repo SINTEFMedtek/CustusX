@@ -53,6 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogger.h"
 #include <iostream>
 #include "cxTypeConversions.h"
+#include "cxProfile.h"
 
 namespace cx
 {
@@ -63,7 +64,7 @@ PluginFrameworkManager::PluginFrameworkManager()
 	mSettingsSearchPaths = mSettingsBase + "/searchPaths";
 
 	ctkProperties fwProps;
-	QString storagePath = DataLocations::getSettingsPath() + "/pluginFramework";
+	QString storagePath = ProfileManager::getInstance()->getSettingsPath() + "/pluginFramework";
 
 	// remove settings as stored by CTK, because full paths are stored here, causing
 	// problems when running both debug and release on the same machine (and similar).

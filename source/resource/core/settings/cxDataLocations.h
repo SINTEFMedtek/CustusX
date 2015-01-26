@@ -35,6 +35,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxResourceExport.h"
 
 #include <QString>
+#include <QObject>
+#include "boost/shared_ptr.hpp"
+
+class QSettings;
 
 namespace cx
 {
@@ -57,13 +61,9 @@ public:
   static QString getExistingTestData(QString pathRelativeToTestDataRoot, QString filename=""); ///< Return full path to test data, both normal and large repositories are searched.
 
   static QString getDocPath(); ///< return path to folder containing documentation files
-  static QStringList getToolsPaths(); ///< return path to folder containing all defined tools
-  static QStringList getApplicationToolConfigPaths(); ///< return path to tool config folder, based on choosen application
-  static QString getToolConfigFilePath(); ///< return users path to tool config file
   static QString getAudioConfigFilePath(); ///< return users path to audio config file
   static QString getShaderPath(); ///< return the path to installed shaders. empty string if not installed.
-  static QString getSettingsPath(); ///< return path where settings are to be stored.
-  static QString getXmlSettingsFile(); ///< return a filename for a xml file containing global custusX data (equal to settings above)
+  static QString getPersistentWritablePath(); ///< Path to location usable for persistent and temporary storage of config. Do not use directly, prefer to create methods displaying subpaths.
 	static QString getCachePath(); ///< return path to a folder that is used during execution, will be cleared at start and stop.
 	static QStringList getDefaultPluginsPath(); ///< return the folder where plugins should be located, by default.
 
@@ -72,10 +72,11 @@ public:
   static void setTestMode(); ///< set a testing mode that changes location of settings files to a temp folder.
   static QString findExecutableInStandardLocations(QString filename); ///< look for an exe in the same folder as the executable or bundle.
 
+  static QStringList appendStringToAllElements(QStringList root, QString suffix);
+
 private:
   static bool mTestMode;
   static QString readTestDataPathFromFile(QString filename);
-  static QStringList appendStringToAllElements(QStringList root, QString suffix);
   static QString checkExecutableExist(QString path, QString filename);
 
 };

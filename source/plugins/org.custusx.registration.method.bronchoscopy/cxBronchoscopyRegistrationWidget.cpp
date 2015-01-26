@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackingService.h"
 #include "cxDoubleProperty.h"
 #include "cxLegacySingletons.h"
-#include "cxDataLocations.h"
+#include "cxProfile.h"
 #include "cxPropertyHelper.h"
 #include "cxBoolProperty.h"
 #include "cxCheckBoxWidget.h"
@@ -75,7 +75,7 @@ BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegServices servi
 	mServices(services)
 {
 	mVerticalLayout = new QVBoxLayout(this);
-	mOptions = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("bronchoscopyregistrationwidget");
+	mOptions = profile()->getXmlSettings().descend("bronchoscopyregistrationwidget");
 
 	mSelectMeshWidget = StringPropertySelectMesh::New(mServices.patientModelService);
 	mSelectMeshWidget->setValueName("Centerline: ");

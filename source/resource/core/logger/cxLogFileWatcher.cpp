@@ -43,7 +43,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxDefinitionStrings.h"
 #include "cxTime.h"
-#include "cxDataLocations.h"
 #include "cxMessageListener.h"
 
 #include "internal/cxLogFileWatcherThread.h"

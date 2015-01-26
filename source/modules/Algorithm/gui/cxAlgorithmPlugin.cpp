@@ -40,7 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxBinaryThresholdImageFilter.h"
 #include "cxBinaryThinningImageFilter3DFilter.h"
 #include "cxAllFiltersWidget.h"
-#include "cxDataLocations.h"
 
 namespace cx
 {

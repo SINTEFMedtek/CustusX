@@ -78,7 +78,7 @@ class cxGui_EXPORT VisualizationTab : public PreferenceTab
 {
     Q_OBJECT
 public:
-  VisualizationTab(QWidget *parent = 0);
+  VisualizationTab(PatientModelServicePtr patientModelService, QWidget *parent = 0);
   void init();
 
   public slots:
@@ -87,6 +87,7 @@ public:
 signals:
 
 protected:
+  PatientModelServicePtr mPatientModelService;
   QGridLayout *mMainLayout;
   DoublePropertyPtr mSphereRadius;
   DoublePropertyPtr mLabelSize;
@@ -98,6 +99,7 @@ protected:
   DoublePropertyPtr mAnyplaneViewOffset;
   BoolPropertyPtr mFollowTooltip;
   DoublePropertyPtr mFollowTooltipBoundary;
+  StringPropertyPtr mClinicalView;
 
   //Stereo
   QComboBox* mStereoTypeComboBox;

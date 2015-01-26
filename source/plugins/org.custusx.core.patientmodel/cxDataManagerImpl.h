@@ -117,8 +117,8 @@ public:
 	virtual void addXml(QDomNode& parentNode); ///< adds xml information about the datamanger and its variabels
 	virtual void parseXml(QDomNode& datamangerNode, QString absolutePath = QString());///< Use a XML node to load data. \param datamangerNode A XML data representation of the DataManager. \param absolutePath Absolute path to the data elements. Used together with the relative paths stored in the filePath elements.
 
-	virtual CLINICAL_APPLICATION getClinicalApplication() const;
-	virtual void setClinicalApplication(CLINICAL_APPLICATION application);
+	virtual CLINICAL_VIEW getClinicalApplication() const;
+	virtual void setClinicalApplication(CLINICAL_VIEW application);
 
 	virtual Transform3D get_rMpr() const; ///< get the patient registration transform
 	virtual void set_rMpr(const Transform3D& val); ///<  set the transform from patient to reference space
@@ -140,7 +140,7 @@ protected:
 	std::map<QString, VideoSourcePtr> mStreams;
 	DataMap mData;
 	Vector3D mCenter;
-	CLINICAL_APPLICATION mClinicalApplication;
+	CLINICAL_VIEW mClinicalApplication;
 	void deleteFiles(DataPtr data, QString basePath);
 
 	//state
@@ -150,6 +150,8 @@ protected:
 	DataPtr loadData(QDomElement node, QString rootPath);
 //	DataPtr readData(const QString& uid, const QString& path, const QString& type);
 	int findUniqueUidNumber(QString uidBase) const;
+
+	void readClinicalView();
 
 	LandmarkPropertyMap mLandmarkProperties; ///< uid and name
 	RegistrationHistoryPtr m_rMpr_History; ///< transform from the patient reference to the reference, along with historical data.
@@ -162,6 +164,8 @@ protected:
 
 public slots:
 	void vtkImageDataChangedSlot();
+private slots:
+	void settingsChangedSlot(QString key);
 };
 
 } // namespace cx

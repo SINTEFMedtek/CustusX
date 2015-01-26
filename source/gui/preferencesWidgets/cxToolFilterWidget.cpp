@@ -92,9 +92,8 @@ void ToolFilterGroupBox::setTrackingSystemSelector(StringPropertyBasePtr selecto
 		connect(mTrackingSystemSelector.get(), SIGNAL(changed()), this, SLOT(filterSlot()));
 }
 
-void ToolFilterGroupBox::setClinicalApplicationSlot(CLINICAL_APPLICATION clinicalApplication)
+void ToolFilterGroupBox::setClinicalApplicationSlot(QString val)
 {
-  QString val = enum2string(clinicalApplication);
   mAppSelector->setValue(val);
 }
 

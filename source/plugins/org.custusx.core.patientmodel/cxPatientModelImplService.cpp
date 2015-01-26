@@ -206,12 +206,12 @@ void PatientModelImplService::setActiveImage(ImagePtr activeImage)
 	dataService()->setActiveImage(activeImage);
 }
 
-CLINICAL_APPLICATION PatientModelImplService::getClinicalApplication() const
+CLINICAL_VIEW PatientModelImplService::getClinicalApplication() const
 {
 	return dataService()->getClinicalApplication();
 }
 
-void PatientModelImplService::setClinicalApplication(CLINICAL_APPLICATION application)
+void PatientModelImplService::setClinicalApplication(CLINICAL_VIEW application)
 {
 	dataService()->setClinicalApplication(application);
 }

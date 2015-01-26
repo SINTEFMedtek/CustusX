@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxUtilHelpers.h"
 #include "cxVideoSource.h"
+#include "cxDataLocations.h"
 
 #include "cxImageLUT2D.h"
 #include "cxImageTF3D.h"
@@ -60,8 +61,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataFactory.h"
 
 #include "cxXmlOptionItem.h"
-#include "cxDataLocations.h"
 #include "cxTransferFunctions3DPresets.h"
+#include "cxProfile.h"
+#include "cxSettings.h"
+#include "cxDefinitionStrings.h"
+
 
 namespace cx
 {
@@ -76,10 +80,13 @@ DataManagerImplPtr DataManagerImpl::create()
 DataManagerImpl::DataManagerImpl() :
 	mDebugMode(false)
 {
-	mClinicalApplication = mdLABORATORY;
 	m_rMpr_History.reset(new RegistrationHistory());
 	connect(m_rMpr_History.get(), SIGNAL(currentChanged()), this, SIGNAL(rMprChanged()));
 	mPatientLandmarks = Landmarks::create();
+
+	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(settingsChangedSlot(QString)));
+	this->readClinicalView();
+
 	this->clear();
 }
 
@@ -597,18 +604,40 @@ void DataManagerImpl::vtkImageDataChangedSlot()
 		uid = mActiveImage->getUid();
 }
 
-CLINICAL_APPLICATION DataManagerImpl::getClinicalApplication() const
+CLINICAL_VIEW DataManagerImpl::getClinicalApplication() const
 {
 	return mClinicalApplication;
 }
 
-void DataManagerImpl::setClinicalApplication(CLINICAL_APPLICATION application)
+void DataManagerImpl::setClinicalApplication(CLINICAL_VIEW application)
 {
 	if (mClinicalApplication == application)
 		return;
 	mClinicalApplication = application;
+
+	QString val = enum2string<CLINICAL_VIEW>(mClinicalApplication);
+	settings()->setValue("View/clinicalView", val);
+
 	emit clinicalApplicationChanged();
 }
+
+void DataManagerImpl::settingsChangedSlot(QString key)
+{
+	if (key == "View/clinicalView")
+	{
+		this->readClinicalView();
+	}
+}
+
+void DataManagerImpl::readClinicalView()
+{
+	QString defVal = enum2string<CLINICAL_VIEW>(mdNEUROLOGICAL);
+	QString val = settings()->value("View/clinicalView", defVal).toString();
+	CLINICAL_VIEW view = string2enum<CLINICAL_VIEW>(val);
+
+	this->setClinicalApplication(view);
+}
+
 
 int DataManagerImpl::findUniqueUidNumber(QString uidBase) const
 {
@@ -710,10 +739,8 @@ RegistrationHistoryPtr DataManagerImpl::get_rMpr_History() const
 PresetTransferFunctions3DPtr DataManagerImpl::getPresetTransferFunctions3D() const
 {
 	///< create from filename, create trivial document of type name and root node if no file exists.
-	XmlOptionFile preset = XmlOptionFile(
-					DataLocations::getRootConfigPath() + "/transferFunctions/presets.xml");
-	XmlOptionFile custom = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend(
-					"presetTransferFunctions");
+	XmlOptionFile preset(DataLocations::getExistingConfigPath("/transferFunctions", "", "presets.xml"));
+	XmlOptionFile custom = profile()->getXmlSettings().descend("presetTransferFunctions");
 
 	if (!mPresetTransferFunctions3D)
 		mPresetTransferFunctions3D.reset(new TransferFunctions3DPresets(preset, custom));

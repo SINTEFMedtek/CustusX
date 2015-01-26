@@ -41,8 +41,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewServiceProxy.h"
 #include "cxUsReconstructionImplService.h"
 #include "cxXmlOptionItem.h"
-#include "cxDataLocations.h"
 #include "cxUsReconstructionServiceProxy.h"
+#include "cxProfile.h"
+
 
 namespace cx
 {
@@ -61,7 +62,7 @@ void UsReconstructionPluginActivator::start(ctkPluginContext* context)
 	PatientModelServicePtr patientModelService = PatientModelServicePtr(new PatientModelServiceProxy(context));
 	VisualizationServicePtr visualizationService = VisualizationServicePtr(new VisualizationServiceProxy(context));
 
-	XmlOptionFile xmlFile = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("usReconstruction");
+	XmlOptionFile xmlFile = profile()->getXmlSettings().descend("usReconstruction");
 	UsReconstructionImplService *usReconstructionService = new UsReconstructionImplService(context, patientModelService, visualizationService, xmlFile);
 
 	mUsReconstruction = RegisteredServicePtr(new RegisteredService(context, usReconstructionService, UsReconstructionService_iid));

@@ -29,54 +29,45 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include "cxOpenCVStreamerService.h"
 
-#include "cxStringProperty.h"
-#include "cxDoubleProperty.h"
-#include "cxBoolProperty.h"
-#include "cxIGTLinkClientStreamer.h"
-#include "cxImageStreamerOpenCV.h"
-#include "cxUtilHelpers.h"
+#include "catch.hpp"
 
-#include "QApplication"
-#include <QDir>
-#include "cxLocalServerStreamerServer.h"
+#include "cxTestCustusXController.h"
+#include "cxDataLocations.h"
+#include "cxLogicManager.h"
+#include <QTimer>
+#include "boost/function.hpp"
+#include "boost/bind.hpp"
 
-namespace cx
+namespace cxtest
 {
 
-QString OpenCVStreamerService::getName()
+namespace
 {
-	return "OpenCV";
+
+void initTest()
+{
+	cx::DataLocations::setTestMode();
 }
 
-std::vector<PropertyPtr> OpenCVStreamerService::getSettings(QDomElement root)
-{
-	std::vector<PropertyPtr> retval;
-	std::vector<PropertyPtr> opencvArgs = ImageStreamerOpenCVArguments().getSettings(root);
-	std::copy(opencvArgs.begin(), opencvArgs.end(), back_inserter(retval));
-
-	std::vector<PropertyPtr> localsvrArgs = LocalServerStreamerArguments().getSettings(root);
-	std::copy(localsvrArgs.begin(), localsvrArgs.end(), back_inserter(retval));
-
-	return retval;
 }
 
-StreamerPtr OpenCVStreamerService::createStreamer(QDomElement root)
+TEST_CASE("Profile change with running gui", "[gui][integration]")
 {
-	StringMap args = ImageStreamerOpenCVArguments().convertToCommandLineArguments(root);
-	StreamerPtr localServerStreamer = LocalServerStreamer::createStreamerIfEnabled(root, args);
-	if (localServerStreamer)
-	{
-		return localServerStreamer;
-	}
+	initTest();
 
-	else
-	{
-		boost::shared_ptr<ImageStreamerOpenCV> streamer(new ImageStreamerOpenCV());
-		streamer->initialize(args);
-		return streamer;
-	}
+	CustusXController custusX(NULL);
+	custusX.start();
+
+	QTimer::singleShot(200, &custusX, SLOT(changeToNewProfile()));
+	QTimer::singleShot(400,   qApp, SLOT(quit()) );
+
+	qApp->exec();
+	custusX.stop();
+
+	CHECK(true);
 }
 
-} // namespace cx
+
+}//namespace cx
+

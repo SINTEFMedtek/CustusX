@@ -34,11 +34,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxCyclicActionLogger.h"
 #include "cxXmlOptionItem.h"
-#include "cxDataLocations.h"
 #include "cxStreamer.h"
 #include "cxStreamerService.h"
 #include "cxDirectlyLinkedSender.h"
 #include "cxLogger.h"
+#include "cxProfile.h"
 
 namespace cx
 {
@@ -72,7 +72,7 @@ ImageReceiverThread::ImageReceiverThread(StreamerServicePtr streamerInterface, Q
 
 void ImageReceiverThread::run()
 {
-	XmlOptionFile xmlFile = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("video");
+	XmlOptionFile xmlFile = profile()->getXmlSettings().descend("video");
 	QDomElement element = xmlFile.getElement("video");
 	mImageStreamer = mStreamerInterface->createStreamer(element);
 	report(QString("Starting streamer: [%1]").arg(mImageStreamer->getType()));

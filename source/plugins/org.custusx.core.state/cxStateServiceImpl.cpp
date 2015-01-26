@@ -45,7 +45,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSettings.h"
 #include "cxDataLocations.h"
 #include "cxWorkflowStateMachine.h"
-#include "cxApplicationStateMachine.h"
 #include "cxDataLocations.h"
 #include "cxConfig.h"
 #include "cxVLCRecorder.h"
@@ -56,6 +55,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSpaceProviderImpl.h"
 #include "cxVideoServiceProxy.h"
 #include "cxApplicationsParser.h"
+#include "cxProfile.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -92,8 +93,10 @@ void StateServiceImpl::initialize(StateServiceBackendPtr backend)
 	mBackend = backend;
 	this->fillDefaultSettings();
 
-	mApplicationStateMachine.reset(new ApplicationStateMachine(mBackend));
-	mApplicationStateMachine->start();
+	ProfileManager::initialize();
+
+//	mApplicationStateMachine.reset(new ApplicationStateMachine(mBackend));
+//	mApplicationStateMachine->start();
 
 	mWorkflowStateMachine.reset(new WorkflowStateMachine(mBackend));
 	mWorkflowStateMachine->start();
@@ -101,24 +104,82 @@ void StateServiceImpl::initialize(StateServiceBackendPtr backend)
 	connect(mWorkflowStateMachine.get(), &WorkflowStateMachine::activeStateChanged, this, &StateServiceImpl::workflowStateChanged);
 	connect(mWorkflowStateMachine.get(), &WorkflowStateMachine::activeStateAboutToChange, this, &StateServiceImpl::workflowStateAboutToChange);
 
-	connect(mApplicationStateMachine.get(), &ApplicationStateMachine::activeStateChanged, this, &StateServiceImpl::applicationStateChanged);
+	connect(ProfileManager::getInstance(), &ProfileManager::activeProfileChanged, this, &StateServiceImpl::applicationStateChanged);
+//	connect(mApplicationStateMachine.get(), &ApplicationStateMachine::activeStateChanged, this, &StateServiceImpl::applicationStateChanged);
 }
 
-QActionGroup* StateServiceImpl::getApplicationActions()
-{
-	return mApplicationStateMachine->getActionGroup();
-}
+//QActionGroup* StateServiceImpl::getApplicationActions()
+//{
+//	mActionGroup = new QActionGroup(this);
+
+
+//	return mApplicationStateMachine->getActionGroup();
+//}
+
+//QActionGroup* ApplicationStateMachine::getActionGroup()
+//{
+//	QString active = this->getActiveUidState();
+//	mActionGroup->setExclusive(true);
+//	//TODO rebuild action list when we need dynamic lists. Must rethink memory management then.
+//	for (ApplicationStateMap::iterator iter = mStates.begin(); iter != mStates.end(); ++iter)
+//	{
+//		iter->second->createAction(mActionGroup);
+//	}
+
+//	return mActionGroup;
+//}
+
+//QAction* ApplicationState::createAction(QActionGroup* group)
+//{
+//	if (mAction)
+//		return mAction;
+
+//	mAction = new QAction(this->getName(), group);
+//	mAction->setCheckable(true);
+//	mAction->setChecked(mActive);
+//	mAction->setData(QVariant(this->getUid()));
+
+//	connect(mAction, SIGNAL(triggered()), this, SLOT(setActionSlot()));
+
+//	return mAction;
+//}
+
+//QString PresetWidget::getNewPresetName(bool withoutSpaces = false)
+//{
+//	QString retval;
+
+//	// generate a name suggestion: identical if custom, appended by index if default.
+//	QString newName = PresetWidget::getCurrentPreset();
+//	if (!mPresets->getPresetList("").contains(newName))
+//		newName = "custom preset";
+//	if (mPresets->isDefaultPreset(newName))
+//		newName += "(2)";
+
+//	bool ok;
+//	QString text = QInputDialog::getText(this, "Save Preset",
+//			"Custom Preset Name", QLineEdit::Normal, newName, &ok);
+//	if (!ok || text.isEmpty())
+//		text = newName;
+
+//	retval = text;
+//	if(withoutSpaces)
+//		retval = retval.replace(" ", "-");
+
+//	return retval;
+//}
 
 QString StateServiceImpl::getApplicationStateName() const
 {
-	if (!mApplicationStateMachine)
-		return "";
-	return mApplicationStateMachine->getActiveStateName();
+	return ProfileManager::getInstance()->activeProfile()->getUid();
+//	if (!mApplicationStateMachine)
+//		return "";
+//	return mApplicationStateMachine->getActiveStateName();
 }
 
 QStringList StateServiceImpl::getAllApplicationStateNames() const
 {
-	return mApplicationStateMachine->getAllApplicationNames();
+	return ProfileManager::getInstance()->getProfiles();
+//	return mApplicationStateMachine->getAllApplicationNames();
 }
 
 QString StateServiceImpl::getVersionName()
@@ -141,16 +202,15 @@ void StateServiceImpl::setWorkFlowState(QString uid)
 	mWorkflowStateMachine->setActiveState(uid);
 }
 
-ApplicationStateMachinePtr StateServiceImpl::getApplication()
-{
-	return mApplicationStateMachine;
-}
+//ApplicationStateMachinePtr StateServiceImpl::getApplication()
+//{
+//	return mApplicationStateMachine;
+//}
 
 template<class T>
 void StateServiceImpl::fillDefault(QString name, T value)
 {
-	if (!settings()->contains(name))
-		settings()->setValue(name, value);
+	settings()->fillDefault(name, value);
 }
 
 /**Enter all default Settings here.
@@ -171,9 +231,7 @@ void StateServiceImpl::fillDefaultSettings()
 
 	this->fillDefault("renderingInterval", 33);
 	this->fillDefault("backgroundColor", QColor("black"));
-	this->fillDefault("globalPatientDataFolder", QDir::homePath() + "/Patients");
 	this->fillDefault("vlcPath", vlc()->getVLCPath());
-	this->fillDefault("globalApplicationName", enum2string(mdLABORATORY));
 	this->fillDefault("globalPatientNumber", 1);
 	this->fillDefault("Ultrasound/acquisitionName", "US-Acq");
 	this->fillDefault("Ultrasound/8bitAcquisitionData", false);
@@ -239,23 +297,20 @@ void StateServiceImpl::fillDefaultSettings()
 Desktop StateServiceImpl::getActiveDesktop()
 {
 	ApplicationsParser parser;
-	return parser.getDesktop(mApplicationStateMachine->getActiveUidState(),
-							 mWorkflowStateMachine->getActiveUidState());
+	return parser.getDesktop(mWorkflowStateMachine->getActiveUidState());
 }
 
 void StateServiceImpl::saveDesktop(Desktop desktop)
 {
 	ApplicationsParser parser;
-	parser.setDesktop(mApplicationStateMachine->getActiveUidState(),
-					  mWorkflowStateMachine->getActiveUidState(),
+	parser.setDesktop(mWorkflowStateMachine->getActiveUidState(),
 					  desktop);
 }
 
 void StateServiceImpl::resetDesktop()
 {
 	ApplicationsParser parser;
-	parser.resetDesktop(mApplicationStateMachine->getActiveUidState(),
-						mWorkflowStateMachine->getActiveUidState());
+	parser.resetDesktop(mWorkflowStateMachine->getActiveUidState());
 }
 
 } //namespace cx

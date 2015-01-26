@@ -93,6 +93,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVideoServiceProxy.h"
 #include "cxViewGroupData.h"
 #include "cxSessionStorageService.h"
+#include "cxProfile.h"
 
 namespace cx
 {
@@ -116,7 +117,6 @@ MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
 	this->createToolBars();
 	this->setStatusBar(new StatusBar());
 
-//	reporter()->setLoggingFolder(DataLocations::getRootConfigPath()+"/Logs");
 	reporter()->setAudioSource(AudioPtr(new AudioImpl()));
 
 	connect(stateService().get(), &StateService::applicationStateChanged, this, &MainWindow::onApplicationStateChangedSlot);
@@ -660,15 +660,18 @@ void MainWindow::newPatientSlot()
 {
 	QString patientDatafolder = this->getExistingSessionFolder();
 
-	QString timestamp = QDateTime::currentDateTime().toString(timestampFormatFolderFriendly()) + "_";
-	QString postfix = settings()->value("globalApplicationName").toString() + "_" + settings()->value("globalPatientNumber").toString() + ".cx3";
+	QString timestamp = QDateTime::currentDateTime().toString(timestampFormatFolderFriendly());
+	QString filename = QString("%1_%2_%3.cx3")
+			.arg(timestamp)
+			.arg(profile()->getName())
+			.arg(settings()->value("globalPatientNumber").toString());
 
-	QString choosenDir = patientDatafolder + "/" + timestamp + postfix;
+	QString choosenDir = patientDatafolder + "/" + filename;
 
 	QFileDialog dialog(this, tr("Select directory to save patient in"), patientDatafolder + "/");
 	dialog.setOption(QFileDialog::DontUseNativeDialog, true);
 	dialog.setOption(QFileDialog::ShowDirsOnly, true);
-	dialog.selectFile(timestamp + postfix);
+	dialog.selectFile(filename);
 	if (!dialog.exec())
 		return;
 	choosenDir = dialog.selectedFiles().front();

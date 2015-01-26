@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxPatientModelService.h"
 #include "cxLogger.h"
+#include "cxProfile.h"
 
 namespace cx
 {
@@ -149,7 +150,7 @@ void MeshInfoWidget::addWidgets(PatientModelServicePtr patientModelService)
 	mSelectMeshWidget->setValueName("Surface: ");
 	connect(mSelectMeshWidget.get(), SIGNAL(changed()), this, SLOT(meshSelectedSlot()));
 
-	XmlOptionFile options = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("MeshInfoWidget");
+	XmlOptionFile options = profile()->getXmlSettings().descend("MeshInfoWidget");
 	QString uid("Color");
 	QString name("");
 	QString help("Color of the mesh.");

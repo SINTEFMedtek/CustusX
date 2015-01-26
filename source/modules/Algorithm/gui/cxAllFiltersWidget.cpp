@@ -36,7 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "cxLabeledComboBoxWidget.h"
-#include "cxDataLocations.h"
 #include "cxTimedAlgorithmProgressBar.h"
 #include "cxLogger.h"
 #include "cxDummyFilter.h"
@@ -53,13 +52,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/shared_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 #include "cxNullDeleter.h"
+#include "cxProfile.h"
 
 namespace cx {
 
 AllFiltersWidget::AllFiltersWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent) :
     BaseWidget(parent, "FilterWidget", "Configurable Filter")
 {
-	XmlOptionFile options = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("filterwidget");
+	XmlOptionFile options = profile()->getXmlSettings().descend("filterwidget");
 	mFilters.reset(new FilterGroup(options));
 	mFilters->append(FilterPtr(new BinaryThresholdImageFilter(patientModelService)));
 	mFilters->append(FilterPtr(new BinaryThinningImageFilter3DFilter(patientModelService)));

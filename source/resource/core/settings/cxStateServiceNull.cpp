@@ -42,7 +42,7 @@ StateServiceNull::StateServiceNull()
 }
 
 QString StateServiceNull::getVersionName() { return ""; }
-QActionGroup* StateServiceNull::getApplicationActions() { return mActionGroup; }
+//QActionGroup* StateServiceNull::getApplicationActions() { return mActionGroup; }
 QString StateServiceNull::getApplicationStateName() const { return ""; }
 QStringList StateServiceNull::getAllApplicationStateNames() const { return QStringList(); }
 

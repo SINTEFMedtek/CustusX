@@ -221,9 +221,6 @@ void ViewWrapper3D::settingsChangedSlot(QString key)
 	{
 		QString annotationFile = settings()->value("View3D/annotationModel").toString();
 		mAnnotationMarker->setMarkerFilename(DataLocations::getExistingConfigPath("/models", "", annotationFile));
-//		mAnnotationMarker->setMarkerFilename(
-//					DataLocations::getRootConfigPath() + "/models/"
-//					+ settings()->value("View3D/annotationModel").toString());
 		mAnnotationMarker->setSize(settings()->value("View3D/annotationModelSize").toDouble());
 	}
 	if (key == "showManualTool")
@@ -937,8 +934,9 @@ void ViewWrapper3D::setTranslucentRenderingToDepthPeeling(bool setDepthPeeling)
 		  settings()->setValue("View3D/depthPeeling", false);
 	} else
 	{
-		if (TurnOffDepthPeeling(mView->getRenderWindow(), mView->getRenderer()))
-			report("Depth peeling turned off");
+		TurnOffDepthPeeling(mView->getRenderWindow(), mView->getRenderer());
+//		if (TurnOffDepthPeeling(mView->getRenderWindow(), mView->getRenderer()))
+//			report("Depth peeling turned off");
 	}
 }
 

@@ -52,7 +52,7 @@ public:
 	virtual ~StateServiceProxy() {}
 
 	virtual QString getVersionName();
-	virtual QActionGroup* getApplicationActions();
+//	virtual QActionGroup* getApplicationActions();
 	virtual QString getApplicationStateName() const;
 	virtual QStringList getAllApplicationStateNames() const;
 

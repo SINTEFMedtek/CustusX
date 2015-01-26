@@ -63,16 +63,15 @@ public:
 	struct Configuration
 	{
 		QString mFileName; ///< absolute path and filename for the new config file
-		CLINICAL_APPLICATION mClinical_app; ///< the clinical application this config is made for
+		QString mClinical_app; ///< the clinical application this config is made for
 		TrackersAndToolsMap mTrackersAndTools; ///< the trackers and tools (relative path) that should be used in the config
-		Configuration() : mClinical_app(mdCOUNT) {}
 	};
 
 public:
 	ConfigurationFileParser(QString absoluteConfigFilePath, QString loggingFolder = "");
 	~ConfigurationFileParser();
 
-	CLINICAL_APPLICATION getApplicationapplication();
+	QString getApplicationapplication();
 	std::vector<IgstkTracker::InternalStructure> getTrackers();
 	std::vector<QString> getAbsoluteToolFilePaths();
 	QString getAbsoluteReferenceFilePath();
@@ -87,7 +86,7 @@ private:
 	QString findXmlFileWithDirNameInPath(QString path);
 	QString searchForExistingToolFilePath(QString relativeToolFilePath);
 	static QString convertToRelativeToolFilePath(QString configFilename, QString absoluteToolFilePath);
-	static QString compactVirtualPath(QString filepath);
+	static QString getToolPathFromRoot(QString root);
 
 	QString mConfigurationFilePath; ///< absolute path to the configuration file
 	QString mLoggingFolder; ///< absolutepath to the logging folder

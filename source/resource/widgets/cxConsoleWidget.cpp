@@ -52,7 +52,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QThread>
 #include <QTableWidget>
 #include "cxLogMessageFilter.h"
-#include "cxDataLocations.h"
 #include <QHeaderView>
 #include <QStackedLayout>
 #include <QApplication>
@@ -62,6 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ctkPopupWidget.h"
 #include "ctkExpandButton.h"
 #include <QPushButton>
+#include "cxProfile.h"
 
 namespace cx
 {
@@ -417,7 +417,7 @@ ConsoleWidget::ConsoleWidget(QWidget* parent, QString uid, QString name) :
 	mMessagesWidget(NULL),
 	mStackedLayout(NULL)
 {
-	mOptions = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend(this->objectName());
+	mOptions = profile()->getXmlSettings().descend(this->objectName());
 	mLog = LogPtr(reporter(), null_deleter());
 
 	this->setModified();
