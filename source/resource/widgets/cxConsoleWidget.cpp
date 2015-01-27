@@ -402,7 +402,8 @@ ConsoleWidget::ConsoleWidget(QWidget* parent, QString uid, QString name, XmlOpti
 //  mLineWrappingAction(new QAction(tr("Line wrapping"), this)),
   mSeverityAction(NULL),
   mMessagesWidget(NULL),
-  mStackedLayout(NULL)
+  mStackedLayout(NULL),
+  mDetailsAction(NULL)
 {
 	mOptions = options;
 	mLog = log;
@@ -415,7 +416,8 @@ ConsoleWidget::ConsoleWidget(QWidget* parent, QString uid, QString name) :
 //	mLineWrappingAction(new QAction(tr("Line wrapping"), this)),
 	mSeverityAction(NULL),
 	mMessagesWidget(NULL),
-	mStackedLayout(NULL)
+	mStackedLayout(NULL),
+	mDetailsAction(NULL)
 {
 	mOptions = profile()->getXmlSettings().descend(this->objectName());
 	mLog = LogPtr(reporter(), null_deleter());

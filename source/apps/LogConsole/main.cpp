@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
 	app.setAttribute(Qt::AA_DontShowIconsInMenus, false);
 
 
-	QString optionsFile = cx::DataLocations::getSettingsPath()+"/logconsole.xml";
+    QString optionsFile = cx::DataLocations::getPersistentWritablePath()+"/logconsole.xml";
 	cx::XmlOptionFile options = cx::XmlOptionFile(optionsFile);
 	CX_LOG_INFO() << "Options file: " << optionsFile;
 	cx::LogPtr log = cx::LogFileWatcher::create();
