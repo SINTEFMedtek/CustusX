@@ -23,6 +23,6 @@ target_link_libraries(cxPluginUtilities
     CTKPluginFramework
 
     PRIVATE
-    ${SSC_GCOV_LIBRARY}
     Qt5::Widgets
+    ${SSC_GCOV_LIBRARY}
 )

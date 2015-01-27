@@ -658,43 +658,6 @@ int DataManagerImpl::findUniqueUidNumber(QString uidBase) const
 	return recNumber;
 }
 
-/** Create an image with unique uid. The input uidBase may contain %1 as a placeholder for a running integer that
- *  data manager can increment in order to obtain an unique uid. The same integer will be inserted into nameBase
- *  if %1 is found there
- *
- */
-ImagePtr DataManagerImpl::createImage(vtkImageDataPtr data, QString uid, QString name, QString filePath)
-{
-	this->generateUidAndName(&uid, &name);
-
-	ImagePtr retval = ImagePtr(new Image(uid, data, name));
-	retval->setAcquisitionTime(QDateTime::currentDateTime());
-	retval->setFilename(filePath);
-
-	return retval;
-}
-
-/**
- * Create a new image that inherits parameters from a parent
- */
-ImagePtr DataManagerImpl::createDerivedImage(vtkImageDataPtr data, QString uid, QString name, ImagePtr parentImage, QString filePath)
-{
-	ImagePtr retval = this->createImage(data, uid, name, filePath);
-	retval->get_rMd_History()->setRegistration(parentImage->get_rMd());
-	retval->get_rMd_History()->setParentSpace(parentImage->getUid());
-	ImageTF3DPtr transferFunctions = parentImage->getTransferFunctions3D()->createCopy();
-	ImageLUT2DPtr LUT2D = parentImage->getLookupTable2D()->createCopy();
-	retval->setLookupTable2D(LUT2D);
-	retval->setTransferFunctions3D(transferFunctions);
-	retval->setModality(parentImage->getModality());
-	retval->setImageType(parentImage->getImageType());
-	retval->setShading(parentImage->getShading());
-
-	retval->setAcquisitionTime(QDateTime::currentDateTime());
-
-	return retval;
-}
-
 /**Insert uid and name containing %1 placeholders for insertion of unique integers.
  * Return unique values.
  * If input does not contain %1, nothing happens.
@@ -718,22 +681,6 @@ void DataManagerImpl::generateUidAndName(QString* _uid, QString* _name)
 		else
 			name = name.arg(recNumber);
 	}
-}
-
-/** Create an image with unique uid. The input uidBase may contain %1 as a placeholder for a running integer that
- *  data manager can increment in order to obtain an unique uid. The same integer will be inserted into nameBase
- *  if %1 is found there
- *
- */
-MeshPtr DataManagerImpl::createMesh(vtkPolyDataPtr data, QString uid, QString name, QString filePath)
-{
-	this->generateUidAndName(&uid, &name);
-
-	MeshPtr retval = MeshPtr(new Mesh(uid, name, data));
-	retval->setAcquisitionTime(QDateTime::currentDateTime());
-	retval->setFilename(filePath);
-
-	return retval;
 }
 
 void DataManagerImpl::removeData(const QString& uid, QString basePath)

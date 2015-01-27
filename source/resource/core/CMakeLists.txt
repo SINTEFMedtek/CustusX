@@ -26,6 +26,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
     Data/cxMetricReferenceArgumentList
     Data/cxLandmark
     Data/cxActiveImageProxy
+    Data/cxTrackedStream
 
     Video/cxVideoSource.h
     Video/cxVideoRecorder
@@ -33,7 +34,6 @@ cx_add_class_qt_moc(cxResource_SOURCE
     Video/cxTestVideoSource
     Video/cxVideoService
     Video/cxStreamerService
-    Video/cxTrackedStream
 
     Tool/cxTool
     Tool/cxToolProxy
@@ -249,11 +249,10 @@ set(CX_PUBLIC_RESOURCE_LIBRARIES
     Qt5::Concurrent
     CTKPluginFramework
     ${VTK_LIBRARIES}
+    ${OPENGL_LIBRARIES}
 )
 set(CX_PRIVATE_RESOURCE_LIBRARIES
     ${CX_PRIVATE_RESOURCE_LIBRARIES}
-    ${SSC_GCOV_LIBRARY}
-    ${OPENGL_LIBRARIES}
     ${Boost_LIBRARIES}
     ${ITK_LIBRARIES}
     cxPluginUtilities
@@ -299,9 +298,10 @@ target_include_directories(cxResource
 target_link_libraries(cxResource
     PUBLIC
     ${CX_PUBLIC_RESOURCE_LIBRARIES}
-
     PRIVATE
     ${CX_PRIVATE_RESOURCE_LIBRARIES}
+    PUBLIC
+    ${SSC_GCOV_LIBRARY} # add gcov LAST in the link sequence! (http://stackoverflow.com/questions/566472/where-are-the-gcov-symbols)
 )
 
 add_subdirectory(testing)

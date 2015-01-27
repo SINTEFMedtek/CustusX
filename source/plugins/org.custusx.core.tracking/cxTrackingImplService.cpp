@@ -153,6 +153,7 @@ void TrackingImplService::installTrackingSystem(TrackingSystemServicePtr system)
 {
 	mTrackingSystems.push_back(system);
 	connect(system.get(), &TrackingSystemService::stateChanged, this, &TrackingImplService::onSystemStateChanged);
+	connect(system.get(), &TrackingSystemService::newProbe, this, &TrackingImplService::newProbe);
 	this->onSystemStateChanged();
 }
 

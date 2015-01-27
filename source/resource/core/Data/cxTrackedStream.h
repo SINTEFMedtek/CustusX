@@ -43,14 +43,14 @@ namespace cx
  *
  * Allowing video stream as a data type
  *
- * \ingroup cx_resource_core_video
+ * \ingroup cx_resource_core_data
  */
-class TrackedStream : public Data
+class cxResource_EXPORT TrackedStream : public Data
 {
 	Q_OBJECT
 public:
 	static TrackedStreamPtr create(const QString& uid, const QString& name = "");
-	TrackedStream(const QString &uid, const QString &name, const ToolPtr probe, const VideoSourcePtr &videoSource);
+	TrackedStream(const QString &uid, const QString &name, const ToolPtr &probe, const VideoSourcePtr &videoSource);
 
 	void setProbe(const ToolPtr &probe);
 	ToolPtr getProbe();

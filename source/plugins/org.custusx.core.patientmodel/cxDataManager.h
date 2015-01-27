@@ -81,7 +81,6 @@ public:
 
 	// images
 	virtual ImagePtr loadImage(const QString& uid, const QString& filename) = 0;
-	//virtual void loadImage(ImagePtr image) = 0; ///< load an image generated outside the manager.
 	virtual void saveImage(ImagePtr image, const QString& basePath) = 0; ///< Save image to file
 	virtual ImagePtr getImage(const QString& uid) const = 0;
 	virtual std::map<QString, ImagePtr> getImages() const = 0;
@@ -119,9 +118,6 @@ public:
 	virtual CLINICAL_VIEW getClinicalApplication() const = 0;
 	virtual void setClinicalApplication(CLINICAL_VIEW application) = 0;
 	virtual void clear() = 0; ///< remove all stuff from manager
-	virtual ImagePtr createImage(vtkImageDataPtr data, QString uidBase, QString nameBase, QString filePath = "Images") = 0;
-	virtual ImagePtr createDerivedImage(vtkImageDataPtr data, QString uid, QString name, ImagePtr parentImage, QString filePath = "Images") = 0;
-	virtual MeshPtr createMesh(vtkPolyDataPtr data, QString uidBase, QString nameBase, QString filePath) = 0;
 	virtual void removeData(const QString& uid, QString basePath) = 0; ///< remove data from datamanger, emit signal
 
 	virtual void addXml(QDomNode& parentNode) = 0; ///< adds xml information about the datamanger and its variabels
