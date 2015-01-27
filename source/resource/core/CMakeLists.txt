@@ -26,6 +26,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
     Data/cxMetricReferenceArgumentList
     Data/cxLandmark
     Data/cxActiveImageProxy
+    Data/cxTrackedStream
 
     Video/cxVideoSource.h
     Video/cxVideoRecorder
@@ -33,7 +34,6 @@ cx_add_class_qt_moc(cxResource_SOURCE
     Video/cxTestVideoSource
     Video/cxVideoService
     Video/cxStreamerService
-    Video/cxTrackedStream
 
     Tool/cxTool
     Tool/cxToolProxy

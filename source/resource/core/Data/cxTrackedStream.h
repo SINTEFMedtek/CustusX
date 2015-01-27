@@ -43,7 +43,7 @@ namespace cx
  *
  * Allowing video stream as a data type
  *
- * \ingroup cx_resource_core_video
+ * \ingroup cx_resource_core_data
  */
 class cxResource_EXPORT TrackedStream : public Data
 {
