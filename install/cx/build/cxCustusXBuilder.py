@@ -265,7 +265,7 @@ class CustusXBuilder:
         
         cleaned_results_file = '%s/sloccount.sc' % rootDir 
         filter = '--remove="3rdParty/ config/ install/ /data/"'
-        cxClean_sloccount.clean_sloccount(results_file, cleaned_results_file, filter)
+        cx.utils.cxClean_sloccount.clean_sloccount(results_file, cleaned_results_file, filter)
 
 #        shell.run(['%s/install/Shared/script/clean_sloccount.py' % sourceDir,
 #                '--remove="3rdParty/ config/ install/ /data/"',
