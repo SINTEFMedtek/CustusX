@@ -155,12 +155,13 @@ QRegExp LogFile::getRX_Timestamp() const
 	return QRegExp("\\[(\\d\\d:\\d\\d:\\d\\d\\.\\d\\d\\d)\\]");
 }
 
-
 std::vector<Message> LogFile::readMessages()
 {
 	QString text = this->readFileTail();
 
-	text = this->removeEarlierSessionsAndSetStartTime(text);
+//	text = this->removeEarlierSessionsAndSetStartTime(text);
+	if (text.endsWith("\n"))
+		text.chop(1); // remove endline at end of text, in order to get false linebreaks after each file
 
 	QStringList lines = text.split("\n");
 
@@ -172,6 +173,18 @@ std::vector<Message> LogFile::readMessages()
 	{
 		QString line = lines[i];
 
+		QDateTime timestamp = this->readTimestampFromSessionStartLine(lines[i]);
+		if (timestamp.isValid())
+		{
+			mInitTimestamp = timestamp;
+			Message msg(QString("Session initialized: %1").arg(mChannel), mlSUCCESS);
+			msg.mChannel = mChannel;
+			msg.mTimeStamp = timestamp;
+			msg.mThread = "";
+			retval.push_back(msg);
+			continue;
+		}
+
 		if (line.count(rx_ts))
 		{
 			Message msg = this->readMessageFirstLine(lines[i]);
@@ -181,7 +194,7 @@ std::vector<Message> LogFile::readMessages()
 		else
 		{
 			if (!retval.empty())
-			retval.back().mText += "\n"+line;
+				retval.back().mText += "\n"+line;
 		}
 	}
 
@@ -276,30 +289,21 @@ MESSAGE_LEVEL LogFile::readMessageLevel(QString line)
 	return string2enum<MESSAGE_LEVEL>(hits[1]);
 }
 
-QString LogFile::removeEarlierSessionsAndSetStartTime(QString text)
+QDateTime LogFile::readTimestampFromSessionStartLine(QString text)
 {
 	QString sessionStartSymbol("------->");
-	if (text.startsWith(sessionStartSymbol))
-	{
-		int startpos = text.lastIndexOf(sessionStartSymbol);
-		int endpos = text.indexOf("\n", startpos); // pos of endline in last startline
-		QRegExp rx_ts_start("\\[([^\\]]*)");
-		if (text.indexOf(rx_ts_start))
-		{
-			QString rawTime = rx_ts_start.cap(1);
-			QString format = timestampMilliSecondsFormatNice();
-			QDateTime ts = QDateTime::fromString(rawTime, format);
-			if (ts.isValid())
-			mInitTimestamp = ts;
-		}
+	if (!text.startsWith(sessionStartSymbol))
+		return QDateTime();
 
-		text.remove(0, endpos+1);
-	}
+	QRegExp rx_ts_start("\\[([^\\]]*)");
+	if (text.indexOf(rx_ts_start) < 0)
+		return QDateTime();
 
-	if (text.endsWith("\n"))
-		text.chop(1); // remove endline at end of text, in order to get false linebreaks after each file
+	QString rawTime = rx_ts_start.cap(1);
+	QString format = timestampMilliSecondsFormatNice();
+	QDateTime ts = QDateTime::fromString(rawTime, format);
 
-	return text;
+	return ts;
 }
 
 QString LogFile::readFileTail()

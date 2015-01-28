@@ -70,8 +70,10 @@ private:
 	QString formatMessage(Message msg);
 	bool appendToLogfile(QString filename, QString text);
 	QString readFileTail();
-	QString removeEarlierSessionsAndSetStartTime(QString text);
+//	QString removeEarlierSessionsAndSetStartTime(QString text);
+//	std::vector<std::pair<QDateTime, QString> > splitIntoSessions(QString text);
 	QString timestampFormat() const;
+	QDateTime readTimestampFromSessionStartLine(QString text);
 
 	void parseTimestamp(QString text, Message* retval);
 	void parseThread(QString text, Message* retval);
