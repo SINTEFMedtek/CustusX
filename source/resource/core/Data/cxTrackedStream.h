@@ -57,11 +57,11 @@ public:
 	void setVideoSource(const VideoSourcePtr &videoSource);
 	VideoSourcePtr getVideoSource();
 
-//	virtual void addXml(QDomNode& dataNode);
-//	virtual void parseXml(QDomNode& dataNode);
+	virtual void addXml(QDomNode& dataNode);
+	virtual void parseXml(QDomNode& dataNode);
 
 	virtual DoubleBoundingBox3D boundingBox() const;
-	virtual bool load(QString path) { return false;} ///< Not used
+	virtual bool load(QString path) { return true;} ///< Not used
 
 	virtual QString getType() const;
 	static QString getTypeName();

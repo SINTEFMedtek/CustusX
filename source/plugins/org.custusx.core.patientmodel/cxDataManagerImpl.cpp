@@ -303,6 +303,7 @@ MeshPtr DataManagerImpl::loadMesh(const QString& uid, const QString& fileName)
 
 void DataManagerImpl::saveData(DataPtr data, const QString& basePath)
 {
+	//TODO: Save should be moved to Data or DataFactory
     if (!data)
         return;
 
@@ -319,9 +320,6 @@ void DataManagerImpl::saveData(DataPtr data, const QString& basePath)
         this->saveMesh(mesh, basePath);
         return;
     }
-
-    // no other implementations..
-    reportWarning(QString("Could not save %1 - not implemented").arg(data->getName()));
 }
 
 
@@ -522,13 +520,12 @@ void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString rootPath)
 
 DataPtr DataManagerImpl::loadData(QDomElement node, QString rootPath)
 {
-	//  QString uidNodeString = node.namedItem("uid").toElement().text();
-	//  QDomElement nameNode = node.namedItem("name").toElement();
-	QDomElement filePathNode = node.namedItem("filePath").toElement();
-
 	QString uid = node.toElement().attribute("uid");
 	QString name = node.toElement().attribute("name");
 	QString type = node.toElement().attribute("type");
+
+	QDir relativePath = this->findRelativePath(node, rootPath);
+	QString absolutePath = this->findAbsolutePath(relativePath, rootPath);
 
 	// backwards compatibility 20110306CA
 	if (!node.namedItem("uid").toElement().isNull())
@@ -536,47 +533,20 @@ DataPtr DataManagerImpl::loadData(QDomElement node, QString rootPath)
 	if (!node.namedItem("name").toElement().isNull())
 		name = node.namedItem("name").toElement().text();
 
-	if (filePathNode.isNull())
-	{
-		reportWarning("Warning: DataManager::parseXml() found no filePath for data");
-		return DataPtr();
-	}
-
-	QString path = filePathNode.text();
-	QDir relativePath = QDir(QString(path));
-	if (!rootPath.isEmpty())
-	{
-		if (relativePath.isRelative())
-			path = rootPath + "/" + path;
-		else //Make relative
-		{
-			QDir patientDataDir(rootPath);
-			relativePath.setPath(patientDataDir.relativeFilePath(relativePath.path()));
-		}
-	}
-
-	if (path.isEmpty())
-	{
-		reportWarning("Warning: DataManager::parseXml() empty filePath for data");
-		return DataPtr();
-	}
-
-//	DataPtr data = this->readData(uid, path, type);
-
 	if (mData.count(uid)) // dont load same image twice
 		return mData[uid];
 
 	DataPtr data = mDataFactory->create(type, uid, name);
 	if (!data)
 	{
-		reportWarning(QString("Unknown type: %1 for file %2").arg(type).arg(path));
+		reportWarning(QString("Unknown type: %1 for file %2").arg(type).arg(absolutePath));
 		return DataPtr();
 	}
-	bool loaded = data->load(path);
+	bool loaded = data->load(absolutePath);
 
 	if (!data || !loaded)
 	{
-		reportWarning("Unknown file: " + path);
+		reportWarning("Unknown file: " + absolutePath);
 		return DataPtr();
 	}
 
@@ -588,13 +558,56 @@ DataPtr DataManagerImpl::loadData(QDomElement node, QString rootPath)
 
 	// conversion for change in format 2013-10-29
 	QString newPath = rootPath+"/"+data->getFilename();
-	if (QDir::cleanPath(path) != QDir::cleanPath(newPath))
+	if (QDir::cleanPath(absolutePath) != QDir::cleanPath(newPath))
 	{
-		reportWarning(QString("Detected old data format, converting from %1 to %2").arg(path).arg(newPath));
+		reportWarning(QString("Detected old data format, converting from %1 to %2").arg(absolutePath).arg(newPath));
 		this->saveData(data, rootPath);
 	}
 
 	return data;
+}
+
+QDir DataManagerImpl::findRelativePath(QDomElement node, QString rootPath)
+{
+	QString path = this->findPath(node);
+	QDir relativePath = QDir(QString(path));
+
+	QDir patientDataDir(rootPath);
+	relativePath.setPath(patientDataDir.relativeFilePath(relativePath.path()));
+
+	return relativePath;
+}
+
+QString DataManagerImpl::findPath(QDomElement node)
+{
+	QDomElement filePathNode = node.namedItem("filePath").toElement();
+	QString uid = node.toElement().attribute("uid");
+	QString type = node.toElement().attribute("type");
+
+	if(type.contains("TrackedStream", Qt::CaseInsensitive))
+		return QString();
+
+	if (filePathNode.isNull())
+	{
+		reportWarning("Warning: DataManager::parseXml() found no filePath for data: " + uid);
+		return QString();
+	}
+
+	QString path = filePathNode.text();
+	if (path.isEmpty())
+	{
+		reportWarning("Warning: DataManager::parseXml() empty filePath for data: " + uid);
+		return QString();
+	}
+	return path;
+}
+
+QString DataManagerImpl::findAbsolutePath(QDir relativePath, QString rootPath)
+{
+	QString absolutePath = relativePath.path();
+	if (!rootPath.isEmpty())
+		absolutePath = rootPath + "/" + relativePath.path();
+	return absolutePath;
 }
 
 void DataManagerImpl::vtkImageDataChangedSlot()

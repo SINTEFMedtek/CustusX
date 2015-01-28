@@ -162,6 +162,10 @@ protected:
 	SpaceProviderPtr mSpaceProvider;
 	DataFactoryPtr mDataFactory;
 
+private:
+	QDir findRelativePath(QDomElement node, QString rootPath);
+	QString findPath(QDomElement node);
+	QString findAbsolutePath(QDir relativePath, QString rootPath);
 public slots:
 	void vtkImageDataChangedSlot();
 private slots:
