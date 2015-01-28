@@ -86,8 +86,6 @@ void PatientModelImplService::createInterconnectedDataAndSpace()
 	mDataFactory.reset(new DataFactory(patientModelService, spaceProvider));
 	mDataService->setDataFactory(mDataFactory);
 
-//	mPatientServiceOld = PatientService::create(mDataService);
-//	mPatientService = PatientService::create(mDataService);
 	SessionStorageServicePtr session = SessionStorageServiceProxy::create(mContext);
 
 	mPatientData.reset(new PatientData(mDataService, session));
@@ -135,7 +133,7 @@ void PatientModelImplService::insertData(DataPtr data)
 	QString outputBasePath = this->patientData()->getActivePatientFolder();
 
 	this->dataService()->loadData(data);
-	this->dataService()->saveData(data, outputBasePath);
+	data->save(outputBasePath);
 }
 
 DataPtr PatientModelImplService::createData(QString type, QString uid, QString name)
@@ -219,21 +217,6 @@ void PatientModelImplService::setClinicalApplication(CLINICAL_VIEW application)
 void PatientModelImplService::loadData(DataPtr data)
 {
 	dataService()->loadData(data);
-}
-
-void PatientModelImplService::saveData(DataPtr data, const QString &basePath)
-{
-	dataService()->saveData(data, basePath);
-}
-
-void PatientModelImplService::saveImage(ImagePtr image, const QString &basePath)
-{
-	dataService()->saveImage(image, basePath);
-}
-
-void PatientModelImplService::saveMesh(MeshPtr mesh, const QString &basePath)
-{
-	dataService()->saveMesh(mesh, basePath);
 }
 
 std::map<QString, VideoSourcePtr> PatientModelImplService::getStreams() const

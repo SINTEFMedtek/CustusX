@@ -70,7 +70,6 @@ Q_OBJECT
 public:
 	static DataManagerImplPtr create();
 	virtual ~DataManagerImpl();
-//	static void initialize();
 	void setSpaceProvider(SpaceProviderPtr spaceProvider);
 	void setDataFactory(DataFactoryPtr dataFactory);
 
@@ -80,20 +79,17 @@ public:
 	virtual void loadStream(VideoSourcePtr stream);
 
 	// images
-	virtual void saveImage(ImagePtr image, const QString& basePath);///< Save image to file \param image Image to save \param basePath Absolute path to patient data folder
 	virtual ImagePtr getImage(const QString& uid) const;
 	virtual std::map<QString, ImagePtr> getImages() const;
 
 	void loadData(DataPtr data);
 	DataPtr loadData(const QString& uid, const QString& path);
-    virtual void saveData(DataPtr data, const QString& basePath); ///< Save data to file
     std::map<QString, DataPtr> getData() const;
 	DataPtr getData(const QString& uid) const;
 	virtual SpaceProviderPtr getSpaceProvider();
 	virtual DataFactoryPtr getDataFactory();
 
 	// meshes
-	virtual void saveMesh(MeshPtr mesh, const QString& basePath);///< Save mesh to file \param mesh to save \param basePath Absolute path to patient data folder
 	virtual MeshPtr getMesh(const QString& uid) const;
 	virtual std::map<QString, MeshPtr> getMeshes() const;
 
@@ -134,7 +130,6 @@ public:
 
 protected:
 	DataManagerImpl();
-//	virtual void verifyParentFrame(DataPtr data); ///< checks if data has a valid frameOfReferenceUid, generates and adds it if not
 
 protected:
 	std::map<QString, VideoSourcePtr> mStreams;
@@ -145,10 +140,7 @@ protected:
 
 	//state
 	ImagePtr mActiveImage;
-	virtual ImagePtr loadImage(const QString& uid, const QString& filename);
-	virtual MeshPtr loadMesh(const QString& uid, const QString& fileName);
 	DataPtr loadData(QDomElement node, QString rootPath);
-//	DataPtr readData(const QString& uid, const QString& path, const QString& type);
 	int findUniqueUidNumber(QString uidBase) const;
 
 	void readClinicalView();

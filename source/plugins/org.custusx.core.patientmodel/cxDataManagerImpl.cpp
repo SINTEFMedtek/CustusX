@@ -33,11 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxDataManagerImpl.h"
 
-#include <vtkImageData.h>
-
-#include <vtkPolyData.h>
-#include <vtkPolyDataWriter.h>
-
 #include <QtCore>
 #include <QDomDocument>
 #include <QFileInfo>
@@ -231,17 +226,6 @@ void DataManagerImpl::setLandmarkActive(QString uid, bool active)
 	emit landmarkPropertiesChanged();
 }
 
-ImagePtr DataManagerImpl::loadImage(const QString& uid, const QString& filename)
-{
-	DataPtr data = this->loadData(uid, filename);
-	if (!data)
-		{
-			reportError("Error with image file: " + filename);
-			return ImagePtr();
-		}
-	return this->getImage(uid);
-}
-
 DataPtr DataManagerImpl::loadData(const QString& uid, const QString& path)
 {
 	if (mData.count(uid)) // dont load same image twice
@@ -281,60 +265,6 @@ void DataManagerImpl::loadData(DataPtr data)
 	}
 }
 
-void DataManagerImpl::saveImage(ImagePtr image, const QString& basePath)
-{
-	QString filename = basePath + "/Images/" + image->getUid() + ".mhd";
-	image->setFilename(QDir(basePath).relativeFilePath(filename));
-
-	MetaImageReader().saveImage(image, filename);
-}
-
-// meshes
-MeshPtr DataManagerImpl::loadMesh(const QString& uid, const QString& fileName)
-{
-	DataPtr data = this->loadData(uid, fileName);
-	if (!data)
-		{
-			reportError("Error with mesh file: " + fileName);
-			return MeshPtr();
-		}
-	return this->getMesh(uid);
-}
-
-void DataManagerImpl::saveData(DataPtr data, const QString& basePath)
-{
-	//TODO: Save should be moved to Data or DataFactory
-    if (!data)
-        return;
-
-    ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
-    if (image)
-    {
-        this->saveImage(image, basePath);
-        return;
-    }
-
-    MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(data);
-    if (mesh)
-    {
-        this->saveMesh(mesh, basePath);
-        return;
-    }
-}
-
-
-void DataManagerImpl::saveMesh(MeshPtr mesh, const QString& basePath)
-{
-	vtkPolyDataWriterPtr writer = vtkPolyDataWriterPtr::New();
-	writer->SetInputData(mesh->getVtkPolyData());
-	QString filename = basePath + "/Images/" + mesh->getUid() + ".vtk";
-	mesh->setFilename(QDir(basePath).relativeFilePath(filename));
-	writer->SetFileName(cstring_cast(filename));
-
-	writer->Update();
-	writer->Write();
-}
-
 DataPtr DataManagerImpl::getData(const QString& uid) const
 {
 	DataMap::const_iterator iter = mData.find(uid);
@@ -342,25 +272,6 @@ DataPtr DataManagerImpl::getData(const QString& uid) const
 		return DataPtr();
 	return iter->second;
 }
-
-//void DataManagerImpl::verifyParentFrame(DataPtr data)
-//{
-//	if (data->getParentSpace().isEmpty())
-//	{
-//		int max = 0;
-//		std::map<QString, DataPtr>::iterator iter;
-//		for (iter = mData.begin(); iter != mData.end(); ++iter)
-//		{
-//			//max = std::max(max, qstring_cast(iter->first).toInt());
-//			QStringList parentList = qstring_cast(iter->second->getParentSpace()).split("_");
-//			if (parentList.size() < 2)
-//				continue;
-//			max = std::max(max, parentList[1].toInt());
-//		}
-//		QString parentFrame = "frame_" + qstring_cast(max + 1);
-//		data->get_rMd_History()->setParentSpace(parentFrame);
-//	}
-//}
 
 ImagePtr DataManagerImpl::getImage(const QString& uid) const
 {
@@ -561,7 +472,7 @@ DataPtr DataManagerImpl::loadData(QDomElement node, QString rootPath)
 	if (QDir::cleanPath(absolutePath) != QDir::cleanPath(newPath))
 	{
 		reportWarning(QString("Detected old data format, converting from %1 to %2").arg(absolutePath).arg(newPath));
-		this->saveData(data, rootPath);
+		data->save(rootPath);
 	}
 
 	return data;
