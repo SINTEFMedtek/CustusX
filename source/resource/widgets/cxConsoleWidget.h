@@ -183,7 +183,7 @@ private:
 //	QAction* mLineWrappingAction;
 	QAction* mSeverityAction;
 	LogMessageDisplayWidget* mMessagesWidget;
-	QStackedLayout* mStackedLayout;
+	QVBoxLayout* mMessagesLayout;
 
 	QAction* mDetailsAction;
 	StringPropertyPtr mChannelSelector;
