@@ -438,12 +438,6 @@ DataPtr DataManagerImpl::loadData(QDomElement node, QString rootPath)
 	QDir relativePath = this->findRelativePath(node, rootPath);
 	QString absolutePath = this->findAbsolutePath(relativePath, rootPath);
 
-	// backwards compatibility 20110306CA
-	if (!node.namedItem("uid").toElement().isNull())
-		uid = node.namedItem("uid").toElement().text();
-	if (!node.namedItem("name").toElement().isNull())
-		name = node.namedItem("name").toElement().text();
-
 	if (mData.count(uid)) // dont load same image twice
 		return mData[uid];
 
@@ -455,7 +449,7 @@ DataPtr DataManagerImpl::loadData(QDomElement node, QString rootPath)
 	}
 	bool loaded = data->load(absolutePath);
 
-	if (!data || !loaded)
+	if (!loaded)
 	{
 		reportWarning("Unknown file: " + absolutePath);
 		return DataPtr();
@@ -492,24 +486,13 @@ QDir DataManagerImpl::findRelativePath(QDomElement node, QString rootPath)
 QString DataManagerImpl::findPath(QDomElement node)
 {
 	QDomElement filePathNode = node.namedItem("filePath").toElement();
-	QString uid = node.toElement().attribute("uid");
-	QString type = node.toElement().attribute("type");
-
-	if(type.contains("TrackedStream", Qt::CaseInsensitive))
-		return QString();
 
 	if (filePathNode.isNull())
-	{
-		reportWarning("Warning: DataManager::parseXml() found no filePath for data: " + uid);
 		return QString();
-	}
 
 	QString path = filePathNode.text();
 	if (path.isEmpty())
-	{
-		reportWarning("Warning: DataManager::parseXml() empty filePath for data: " + uid);
 		return QString();
-	}
 	return path;
 }
 
