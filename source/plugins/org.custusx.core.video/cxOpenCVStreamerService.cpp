@@ -40,7 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "QApplication"
 #include <QDir>
-#include "cxDataLocations.h"
 #include "cxLocalServerStreamerServer.h"
 
 namespace cx

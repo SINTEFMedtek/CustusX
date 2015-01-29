@@ -30,25 +30,68 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxTool.h"
-#include "cxToolNull.h"
-#include "cxNullDeleter.h"
+#include "cxTrackedStream.h"
+
+#include <vtkImageData.h>
 
 namespace cx
 {
-Tool::Tool(const QString &uid, const QString &name) :
-	mUid(uid), mName(name)
+
+TrackedStreamPtr TrackedStream::create(const QString &uid, const QString &name)
 {
-	if (name.isEmpty())
-		mName = uid;
+	return TrackedStreamPtr(new TrackedStream(uid, name, ToolPtr(), VideoSourcePtr()));
 }
 
-ToolPtr Tool::getNullObject()
+TrackedStream::TrackedStream(const QString& uid, const QString& name, const ToolPtr &probe, const VideoSourcePtr &videosource) :
+	Data(uid, name), mProbe(probe), mVideoSource(videosource)
 {
-	static ToolPtr mNull;
-	if (!mNull)
-		mNull.reset(new ToolNull, null_deleter());
-	return mNull;
 }
+
+void TrackedStream::setProbe(const ToolPtr &probe)
+{
+	mProbe = probe;
+}
+
+ToolPtr TrackedStream::getProbe()
+{
+	return mProbe;
+}
+
+void TrackedStream::setVideoSource(const VideoSourcePtr &videoSource)
+{
+	mVideoSource = videoSource;
+	emit streamChanged();
+}
+
+VideoSourcePtr TrackedStream::getVideoSource()
+{
+	return mVideoSource;
+}
+
+void TrackedStream::addXml(QDomNode &dataNode)
+{
+	Data::addXml(dataNode);
+}
+
+void TrackedStream::parseXml(QDomNode &dataNode)
+{
+	Data::parseXml(dataNode);
+}
+
+DoubleBoundingBox3D TrackedStream::boundingBox() const
+{
+	DoubleBoundingBox3D bounds(mVideoSource->getVtkImageData()->GetBounds());
+	return bounds;
+}
+
+QString TrackedStream::getType() const
+{
+	return getTypeName();
+}
+
+QString TrackedStream::getTypeName()
+{
+	return "TrackedStream";
+}
+
 } //cx
-

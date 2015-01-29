@@ -52,7 +52,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QThread>
 #include <QTableWidget>
 #include "cxLogMessageFilter.h"
-#include "cxDataLocations.h"
 #include <QHeaderView>
 #include <QStackedLayout>
 #include <QApplication>
@@ -62,6 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ctkPopupWidget.h"
 #include "ctkExpandButton.h"
 #include <QPushButton>
+#include "cxProfile.h"
 
 namespace cx
 {
@@ -402,7 +402,8 @@ ConsoleWidget::ConsoleWidget(QWidget* parent, QString uid, QString name, XmlOpti
 //  mLineWrappingAction(new QAction(tr("Line wrapping"), this)),
   mSeverityAction(NULL),
   mMessagesWidget(NULL),
-  mStackedLayout(NULL)
+  mMessagesLayout(NULL),
+  mDetailsAction(NULL)
 {
 	mOptions = options;
 	mLog = log;
@@ -415,9 +416,10 @@ ConsoleWidget::ConsoleWidget(QWidget* parent, QString uid, QString name) :
 //	mLineWrappingAction(new QAction(tr("Line wrapping"), this)),
 	mSeverityAction(NULL),
 	mMessagesWidget(NULL),
-	mStackedLayout(NULL)
+	mMessagesLayout(NULL),
+	mDetailsAction(NULL)
 {
-	mOptions = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend(this->objectName());
+	mOptions = profile()->getXmlSettings().descend(this->objectName());
 	mLog = LogPtr(reporter(), null_deleter());
 
 	this->setModified();
@@ -425,10 +427,11 @@ ConsoleWidget::ConsoleWidget(QWidget* parent, QString uid, QString name) :
 
 void ConsoleWidget::prePaintEvent()
 {
-	if (!mStackedLayout)
+	if (!mMessagesLayout)
 	{
 		this->createUI();
 	}
+
 }
 
 void ConsoleWidget::createUI()
@@ -463,9 +466,9 @@ void ConsoleWidget::createUI()
 //	QSlider* popupSlider = new QSlider(popup);
 //	popupLayout->addWidget(popupSlider);
 
-	mStackedLayout = new QStackedLayout;
-	mStackedLayout->setMargin(0);
-	layout->addLayout(mStackedLayout);
+	mMessagesLayout = new QVBoxLayout;
+	mMessagesLayout->setMargin(0);
+	layout->addLayout(mMessagesLayout);
 
 	mMessageListener = MessageListener::create(mLog.get());
 	mMessageFilter.reset(new MessageFilterConsole);
@@ -484,7 +487,6 @@ void ConsoleWidget::createUI()
 //	this->lineWrappingSlot(mLineWrappingAction->isChecked());
 
 	this->updateUI();
-	this->updateShowHeader();
 }
 
 void ConsoleWidget::createButtonWidget()
@@ -697,6 +699,7 @@ void ConsoleWidget::updateUI()
 
 	this->setWindowTitle("Console: " + mChannelSelector->getValue());
 	this->selectMessagesWidget();
+	this->updateShowHeader();
 
 	// reset content of browser
 	QTimer::singleShot(0, this, SLOT(clearTable())); // let the messages recently emitted be processed before clearing
@@ -712,7 +715,7 @@ void ConsoleWidget::selectMessagesWidget()
 	if (mMessagesWidget)
 	{
 		// remove
-		mStackedLayout->takeAt(0);
+		mMessagesLayout->takeAt(0);
 		delete mMessagesWidget;
 	}
 
@@ -725,7 +728,7 @@ void ConsoleWidget::selectMessagesWidget()
 		mMessagesWidget = new SimpleLogMessageDisplayWidget(this);
 	}
 
-	mStackedLayout->addWidget(mMessagesWidget);
+	mMessagesLayout->addWidget(mMessagesWidget);
 }
 
 QString ConsoleWidget::getDetailTypeFromButton() const
@@ -738,7 +741,8 @@ QString ConsoleWidget::getDetailTypeFromButton() const
 
 void ConsoleWidget::clearTable()
 {
-	mMessagesWidget->clear();
+	if (mMessagesWidget)
+		mMessagesWidget->clear();
 }
 
 void ConsoleWidget::onChannelSelectorChanged()
@@ -780,7 +784,8 @@ void ConsoleWidget::receivedMessage(Message message)
 
 void ConsoleWidget::printMessage(const Message& message)
 {
-	mMessagesWidget->add(message);
+	if (mMessagesWidget)
+		mMessagesWidget->add(message);
 }
 
 //void ConsoleWidget::lineWrappingSlot(bool checked)

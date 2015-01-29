@@ -23,6 +23,7 @@ add_executable(cxMemoryTester MACOSX_BUNDLE
 target_link_libraries(cxMemoryTester
     PRIVATE
     cxResource
-)
+    ${SSC_GCOV_LIBRARY}
+    )
 
 

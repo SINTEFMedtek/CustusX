@@ -39,7 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString>
 #include <QObject>
 #include "cxForwardDeclarations.h"
-#include "cxForwardDeclarations.h"
 #include "cxTransform3D.h"
 #include <QDomDocument>
 
@@ -87,7 +86,6 @@ public slots:
 
 signals:
 	void patientChanged();
-//	void cleared();
 
 private slots:
 	void onCleared();

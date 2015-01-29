@@ -43,7 +43,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataInterface.h"
 #include "cxRegistrationProperties.h"
 #include "cxFileSelectWidget.h"
-#include "cxDataLocations.h"
 #include "cxElastixSyntaxHighlighter.h"
 #include "cxCheckBoxWidget.h"
 #include "cxSettings.h"

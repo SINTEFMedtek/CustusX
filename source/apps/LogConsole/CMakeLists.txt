@@ -53,4 +53,4 @@ SET(LINK_LIBRARIES
 add_executable(LogConsole ${SOURCES})
 target_link_libraries(LogConsole ${LINK_LIBRARIES} )
 
-#cx_install_target(LogConsole)
+cx_install_target(LogConsole)

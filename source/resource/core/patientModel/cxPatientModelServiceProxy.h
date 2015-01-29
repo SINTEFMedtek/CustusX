@@ -76,8 +76,8 @@ public:
 	virtual ImagePtr getActiveImage() const;
 	virtual void setActiveImage(ImagePtr activeImage);
 
-	virtual CLINICAL_APPLICATION getClinicalApplication() const;
-	virtual void setClinicalApplication(CLINICAL_APPLICATION application);
+	virtual CLINICAL_VIEW getClinicalApplication() const;
+	virtual void setClinicalApplication(CLINICAL_VIEW application);
 
 	virtual std::map<QString, VideoSourcePtr> getStreams() const;
 

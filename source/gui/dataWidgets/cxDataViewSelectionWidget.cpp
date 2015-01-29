@@ -42,7 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMenu>
 #include "cxEnumConverter.h"
 #include "cxLogger.h"
-#include "cxDataLocations.h"
 #include "cxImageAlgorithms.h"
 #include "cxImage.h"
 #include "cxPatientModelService.h"

@@ -26,6 +26,6 @@ if(NOT CX_WINDOWS)
         cisstTestParameters.cpp
         cisstTestParameters.h)
     add_library(cisstTestsMain ${CISST_TESTS_MAIN_SRC})
-    target_link_libraries(cisstTestsMain PRIVATE ${CPPUNIT_LIBRARIES} ${SSC_GCOV_LIBRARY} cxResource)
+    target_link_libraries(cisstTestsMain PRIVATE ${CPPUNIT_LIBRARIES} cxResource)
 
 endif()

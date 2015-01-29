@@ -31,7 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxFilenameWidget.h"
 #include "cxFileInputWidget.h"
-#include "cxDataLocations.h"
 #include <QFileInfo>
 #include <QDir>
 #include "cxTypeConversions.h"

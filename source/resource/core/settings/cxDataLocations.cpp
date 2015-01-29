@@ -38,6 +38,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSettings.h"
 #include "cxFileHelpers.h"
 #include "cxTypeConversions.h"
+#include "cxXmlOptionItem.h"
+
 
 namespace cx
 {
@@ -96,7 +98,6 @@ QString DataLocations::getExistingTestData(QString pathRelativeToTestDataRoot, Q
 	return "";
 }
 
-
 QString DataLocations::readTestDataPathFromFile(QString filename)
 {
 	QFile file(filename);
@@ -105,20 +106,29 @@ QString DataLocations::readTestDataPathFromFile(QString filename)
 	return cxDataRoot;
 }
 
-QString DataLocations::getSettingsPath()
+QString DataLocations::getPersistentWritablePath()
 {
-	QString retval = cx::DataLocations::getRootConfigPath() + "/settings";
+	QString homepath = QDir::homePath() + "/cx_settings";
+
 	if (mTestMode)
-		retval = getTestDataPath() + "/temp/settings";
-	return retval;
+	{
+//		QString bundlepath = getBundlePath();
+//		bundlepath.replace(":","_");
+//		if (bundlepath.startsWith("/"))
+//			bundlepath.remove(0, 1);
+//		homepath += "/test/" + bundlepath;
+		homepath = getTestDataPath() + "/temp";
+	}
+
+	return homepath;
 }
+
 
 QString DataLocations::getBundlePath()
 {
 #ifdef __APPLE__
   QString path(qApp->applicationDirPath()+"/../../..");
   QString bundle = QDir(qApp->applicationDirPath()+"/../..").canonicalPath();
-//  std::cout << "check bundle: " << bundle << ", isbundle=" << QFileInfo(bundle).isBundle() << std::endl;
   if (QFileInfo(bundle).isBundle())
 	  return path;
   else
@@ -135,12 +145,10 @@ QStringList DataLocations::getDefaultPluginsPath()
 	QString bundlePath = DataLocations::getBundlePath();
 	QString appPath(qApp->applicationDirPath());
 
-//	QString buildLocation = appPath + "/plugins";
 	QString buildLocation = bundlePath + "/plugins";
 	if (QFile(buildLocation).exists())
 		retval <<  buildLocation;
 
-//	QString installLocation = bundlePath + "/plugins";
 	QString installLocation = appPath + "/plugins";
 	if (QFile(installLocation).exists())
 		retval << installLocation;
@@ -195,27 +203,6 @@ QStringList DataLocations::appendStringToAllElements(QStringList root, QString s
 	return retval;
 }
 
-QStringList DataLocations::getToolsPaths()
-{
-	QString suffix("/tool/Tools/");
-	QStringList root = getRootConfigPaths();
-	return appendStringToAllElements(root, "/tool/Tools/");
-}
-  
-QStringList DataLocations::getApplicationToolConfigPaths()
-{
-	QString suffix("/tool/" + settings()->value("globalApplicationName").toString());
-	QStringList root = getRootConfigPaths();
-	return appendStringToAllElements(root, suffix);
-}
-  
-QString DataLocations::getToolConfigFilePath()
-{
-	QString relPath("/tool/" + settings()->value("globalApplicationName").toString());
-	QString filename = settings()->value("toolConfigFile").toString();
-	return getExistingConfigPath(relPath, "", filename);
-}
-
 QString DataLocations::getAudioConfigFilePath()
 {
   QString path(getRootConfigPath()+"/audio/");
@@ -240,14 +227,9 @@ QString changeExtension(QString name, QString ext)
 }
 }
 
-QString DataLocations::getXmlSettingsFile()
-{
-	return getSettingsPath() + "/settings.xml";
-}
-
 QString DataLocations::getCachePath()
 {
-	QString path(getRootConfigPath()+"/cache/");
+	QString path(getPersistentWritablePath()+"/cache/");
     return path;
 }
 

@@ -55,8 +55,8 @@ public:
 	virtual Tool getTool(QString uid);
 	virtual bool verifyTool(QString uid);
 
-	virtual QString getConfigurationApplicationsPath(QString application);
-	virtual QStringList getConfigurationsGivenApplication(QString application);
+	virtual QString getConfigurationApplicationsPath();
+	virtual QStringList getConfigurationsGivenApplication();
 	virtual QStringList getAllConfigurations();
 	virtual QStringList getAllTools();
 

@@ -82,7 +82,7 @@ struct cxResource_EXPORT Desktop
  *
  *
  *
- * \section cx_section_clinical_application_state Clinical Application State
+ * \section cx_section_CLINICAL_VIEW_state Clinical Application State
  *
  * The active clinical application is known to the entire system.
  * The options are:
@@ -140,7 +140,7 @@ public:
 	virtual ~StateService() {}
 
 	virtual QString getVersionName() = 0;
-	virtual QActionGroup* getApplicationActions() = 0;
+//	virtual QActionGroup* getApplicationActions() = 0;
 	virtual QString getApplicationStateName() const = 0;
 	virtual QStringList getAllApplicationStateNames() const = 0;
 

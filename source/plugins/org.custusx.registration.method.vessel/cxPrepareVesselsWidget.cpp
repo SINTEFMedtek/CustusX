@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxColorSelectButton.h"
 #include "cxMesh.h"
-#include "cxDataLocations.h"
+#include "cxProfile.h"
 
 #include "cxPipelineWidget.h"
 #include "cxHelperWidgets.h"
@@ -56,7 +56,7 @@ namespace cx
 PrepareVesselsWidget::PrepareVesselsWidget(RegServices services, QWidget* parent) :
 		RegistrationBaseWidget(services, parent, "PrepareVesselsWidget", "PrepareVesselsWidget")
 {  
-	XmlOptionFile options = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("registration").descend("PrepareVesselsWidget");
+	XmlOptionFile options = profile()->getXmlSettings().descend("registration").descend("PrepareVesselsWidget");
   // fill the pipeline with filters:
 	mPipeline.reset(new Pipeline(services.patientModelService));
   FilterGroupPtr filters(new FilterGroup(options.descend("pipeline")));

@@ -93,6 +93,7 @@ public:
 	vtkPolyDataPtr getTransformedPolyData(Transform3D tranform);///< Create a new transformed polydata
 	bool isFiberBundle() const;
 
+	virtual void save(const QString &basePath);
 signals:
 	void meshChanged();
 public slots:

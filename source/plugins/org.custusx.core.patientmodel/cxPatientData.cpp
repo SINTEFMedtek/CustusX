@@ -56,6 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxConfig.h"
 #include "cxSessionStorageService.h"
 #include "cxXMLNodeWrapper.h"
+#include "cxDataFactory.h"
 
 namespace cx
 {
@@ -132,7 +133,7 @@ void PatientData::exportPatient(bool niftiFormat)
 	DataManager::ImagesMap images = mDataManager->getImages();
 	for (DataManager::ImagesMap::iterator iter = images.begin(); iter != images.end(); ++iter)
 	{
-		mDataManager->saveImage(iter->second, targetFolder);
+		iter->second->save(targetFolder);
 	}
 
 	DataManager::MeshMap meshes = mDataManager->getMeshes();
@@ -149,8 +150,10 @@ void PatientData::exportPatient(bool niftiFormat)
 
 		vtkPolyDataPtr poly = mesh->getTransformedPolyData(rMd);
 		// create a copy with the SAME UID as the original. Do not load this one into the datamanager!
-		mesh = mDataManager->createMesh(poly, mesh->getUid(), mesh->getName(), "Images");
-		mDataManager->saveMesh(mesh, targetFolder);
+		mesh = mDataManager->getDataFactory()->createSpecific<Mesh>(mesh->getUid(), mesh->getName());
+		mesh->setVtkPolyData(poly);
+		mesh->setFilename("Images");
+		mesh->save(targetFolder);
 	}
 
 	report("Exported patient data to " + targetFolder + ".");
@@ -167,8 +170,6 @@ DataPtr PatientData::importData(QString fileName, QString &infoText)
 	}
 
 	QFileInfo fileInfo(fileName);
-	QString fileType = fileInfo.suffix();
-	QFile fromFile(fileName);
 	QString strippedFilename = changeExtension(fileInfo.fileName(), "");
 	QString uid = strippedFilename + "_" + QDateTime::currentDateTime().toString(timestampSecondsFormat());
 
@@ -191,9 +192,7 @@ DataPtr PatientData::importData(QString fileName, QString &infoText)
 	}
 	data->setAcquisitionTime(QDateTime::currentDateTime());
 
-	data->setShadingOn(true);
-
-	mDataManager->saveData(data, mSession->getRootFolder());
+	data->save(mSession->getRootFolder());
 
 	// remove redundant line breaks
 	infoText = infoText.split("<br>", QString::SkipEmptyParts).join("<br>");

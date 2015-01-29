@@ -41,8 +41,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDrag>
 #include "cxEnumConverter.h"
 #include "cxLogger.h"
-#include "cxDataLocations.h"
-//#include "cxToolConfigurationParser.h"
 #include "cxTrackerConfiguration.h"
 #include "cxLegacySingletons.h"
 #include "cxTrackingService.h"

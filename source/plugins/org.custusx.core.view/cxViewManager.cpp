@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewWrapper3D.h"
 #include "cxViewWrapperVideo.h"
 #include "cxSettings.h"
-#include "cxDataLocations.h"
+#include "cxProfile.h"
 #include "cxInteractiveCropper.h"
 #include "vtkForwardDeclarations.h"
 #include "cxInteractiveClipper.h"
@@ -570,13 +570,13 @@ void ViewManager::onLayoutRepositoryChanged(QString uid)
 
 void ViewManager::loadGlobalSettings()
 {
-	XmlOptionFile file = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("viewmanager");
+	XmlOptionFile file = profile()->getXmlSettings().descend("viewmanager");
 	mLayoutRepository->load(file);
 }
 
 void ViewManager::saveGlobalSettings()
 {
-	XmlOptionFile file = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("viewmanager");
+	XmlOptionFile file = profile()->getXmlSettings().descend("viewmanager");
 	mLayoutRepository->save(file);
 	file.save();
 }

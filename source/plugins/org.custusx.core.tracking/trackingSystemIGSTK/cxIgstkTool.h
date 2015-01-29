@@ -90,7 +90,7 @@ public:
 //    Tool::Type   mType;                  ///< the tools type
 		QString mName; ///< the tools name
 		QString mUid; ///< the tools unique id
-		std::vector<CLINICAL_APPLICATION> mClinicalApplications; ///< the tools clinical application applications
+		std::vector<QString> mClinicalApplications; ///< the tools clinical application applications
 		TRACKING_SYSTEM mTrackerType; ///< what product the tool belongs to
 		QString mSROMFilename; ///< path to the tools SROM file
 		unsigned int mPortNumber; ///< the port number the tool is connected to

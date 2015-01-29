@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationService.h"
 #include "cxPatientModelService.h"
 #include "cxStringProperty.h"
-#include "cxDataLocations.h"
+#include "cxProfile.h"
 
 namespace cx
 {
@@ -56,7 +56,7 @@ RegistrationWidget::RegistrationWidget(ctkPluginContext *pluginContext, QWidget*
 	mPluginContext(pluginContext),
 	QTabWidget(parent),
 	mVerticalLayout(new QVBoxLayout(this)),
-	mOptions(XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("RegistrationWidget"))
+	mOptions(profile()->getXmlSettings().descend("RegistrationWidget"))
 {
 	this->setObjectName("RegistrationWidget");
 	this->setWindowTitle("Registration");

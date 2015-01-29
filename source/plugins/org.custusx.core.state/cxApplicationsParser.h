@@ -51,14 +51,15 @@ public:
 	ApplicationsParser();
 	~ApplicationsParser() {}
 
-	void addDefaultDesktops(QString workflowStateUid, QString layoutUid, QString mainwindowstate);
-	Desktop getDefaultDesktop(QString applicationName, QString workflowName);
-	Desktop getDesktop(QString applicationName, QString workflowName);
-	void setDesktop(QString applicationName, QString workflowName, Desktop desktop);
-	void resetDesktop(QString applicationName, QString workflowName);
+	Desktop getDefaultDesktop(QString workflowName);
+	Desktop getDesktop(QString workflowName);
+	void setDesktop(QString workflowName, Desktop desktop);
+	void resetDesktop(QString workflowName);
 
 private:
-	XmlOptionFile mXmlFile;
+	void addDefaultDesktops(QString workflowStateUid, QString layoutUid, QString mainwindowstate);
+	XmlOptionFile getSettings();
+//	XmlOptionFile mXmlFile;
 	std::map<QString, Desktop> mWorkflowDefaultDesktops;
 };
 

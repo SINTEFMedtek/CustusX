@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ctkServiceTracker.h>
 #include <ctkPluginContext.h>
 #include "cxLogicManager.h"
+#include "cxProfile.h"
 #include "cxDataLocations.h"
 #include "cxStreamerService.h"
 #include "cxXmlOptionItem.h"
@@ -60,7 +61,7 @@ TEST_CASE("StreamerService: Service available", "[streaming][service][unit]")
 	QList<cx::StreamerService*> serviceList = tracker.getServices();
 	REQUIRE(serviceList.size() > 0);
 
-	cx::XmlOptionFile options = cx::XmlOptionFile(cx::DataLocations::getXmlSettingsFile()).descend("video");
+	cx::XmlOptionFile options = cx::profile()->getXmlSettings().descend("video");
 
 	for(int i = 0; i < serviceList.size(); ++i)
 	{

@@ -50,6 +50,7 @@ target_link_libraries(CustusX
     cxPluginAlgorithm
     org_custusx_usreconstruction
     org_custusx_acquisition
+    ${SSC_GCOV_LIBRARY}
 )
 
 #------------------------------------------------------------------------------

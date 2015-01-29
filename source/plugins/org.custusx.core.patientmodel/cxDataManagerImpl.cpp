@@ -33,11 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxDataManagerImpl.h"
 
-#include <vtkImageData.h>
-
-#include <vtkPolyData.h>
-#include <vtkPolyDataWriter.h>
-
 #include <QtCore>
 #include <QDomDocument>
 #include <QFileInfo>
@@ -51,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxUtilHelpers.h"
 #include "cxVideoSource.h"
+#include "cxDataLocations.h"
 
 #include "cxImageLUT2D.h"
 #include "cxImageTF3D.h"
@@ -60,8 +56,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataFactory.h"
 
 #include "cxXmlOptionItem.h"
-#include "cxDataLocations.h"
 #include "cxTransferFunctions3DPresets.h"
+#include "cxProfile.h"
+#include "cxSettings.h"
+#include "cxDefinitionStrings.h"
+
 
 namespace cx
 {
@@ -76,10 +75,13 @@ DataManagerImplPtr DataManagerImpl::create()
 DataManagerImpl::DataManagerImpl() :
 	mDebugMode(false)
 {
-	mClinicalApplication = mdLABORATORY;
 	m_rMpr_History.reset(new RegistrationHistory());
 	connect(m_rMpr_History.get(), SIGNAL(currentChanged()), this, SIGNAL(rMprChanged()));
 	mPatientLandmarks = Landmarks::create();
+
+	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(settingsChangedSlot(QString)));
+	this->readClinicalView();
+
 	this->clear();
 }
 
@@ -224,17 +226,6 @@ void DataManagerImpl::setLandmarkActive(QString uid, bool active)
 	emit landmarkPropertiesChanged();
 }
 
-ImagePtr DataManagerImpl::loadImage(const QString& uid, const QString& filename)
-{
-	DataPtr data = this->loadData(uid, filename);
-	if (!data)
-		{
-			reportError("Error with image file: " + filename);
-			return ImagePtr();
-		}
-	return this->getImage(uid);
-}
-
 DataPtr DataManagerImpl::loadData(const QString& uid, const QString& path)
 {
 	if (mData.count(uid)) // dont load same image twice
@@ -274,62 +265,6 @@ void DataManagerImpl::loadData(DataPtr data)
 	}
 }
 
-void DataManagerImpl::saveImage(ImagePtr image, const QString& basePath)
-{
-	QString filename = basePath + "/Images/" + image->getUid() + ".mhd";
-	image->setFilename(QDir(basePath).relativeFilePath(filename));
-
-	MetaImageReader().saveImage(image, filename);
-}
-
-// meshes
-MeshPtr DataManagerImpl::loadMesh(const QString& uid, const QString& fileName)
-{
-	DataPtr data = this->loadData(uid, fileName);
-	if (!data)
-		{
-			reportError("Error with mesh file: " + fileName);
-			return MeshPtr();
-		}
-	return this->getMesh(uid);
-}
-
-void DataManagerImpl::saveData(DataPtr data, const QString& basePath)
-{
-    if (!data)
-        return;
-
-    ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
-    if (image)
-    {
-        this->saveImage(image, basePath);
-        return;
-    }
-
-    MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(data);
-    if (mesh)
-    {
-        this->saveMesh(mesh, basePath);
-        return;
-    }
-
-    // no other implementations..
-    reportWarning(QString("Could not save %1 - not implemented").arg(data->getName()));
-}
-
-
-void DataManagerImpl::saveMesh(MeshPtr mesh, const QString& basePath)
-{
-	vtkPolyDataWriterPtr writer = vtkPolyDataWriterPtr::New();
-	writer->SetInputData(mesh->getVtkPolyData());
-	QString filename = basePath + "/Images/" + mesh->getUid() + ".vtk";
-	mesh->setFilename(QDir(basePath).relativeFilePath(filename));
-	writer->SetFileName(cstring_cast(filename));
-
-	writer->Update();
-	writer->Write();
-}
-
 DataPtr DataManagerImpl::getData(const QString& uid) const
 {
 	DataMap::const_iterator iter = mData.find(uid);
@@ -337,25 +272,6 @@ DataPtr DataManagerImpl::getData(const QString& uid) const
 		return DataPtr();
 	return iter->second;
 }
-
-//void DataManagerImpl::verifyParentFrame(DataPtr data)
-//{
-//	if (data->getParentSpace().isEmpty())
-//	{
-//		int max = 0;
-//		std::map<QString, DataPtr>::iterator iter;
-//		for (iter = mData.begin(); iter != mData.end(); ++iter)
-//		{
-//			//max = std::max(max, qstring_cast(iter->first).toInt());
-//			QStringList parentList = qstring_cast(iter->second->getParentSpace()).split("_");
-//			if (parentList.size() < 2)
-//				continue;
-//			max = std::max(max, parentList[1].toInt());
-//		}
-//		QString parentFrame = "frame_" + qstring_cast(max + 1);
-//		data->get_rMd_History()->setParentSpace(parentFrame);
-//	}
-//}
 
 ImagePtr DataManagerImpl::getImage(const QString& uid) const
 {
@@ -515,46 +431,12 @@ void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString rootPath)
 
 DataPtr DataManagerImpl::loadData(QDomElement node, QString rootPath)
 {
-	//  QString uidNodeString = node.namedItem("uid").toElement().text();
-	//  QDomElement nameNode = node.namedItem("name").toElement();
-	QDomElement filePathNode = node.namedItem("filePath").toElement();
-
 	QString uid = node.toElement().attribute("uid");
 	QString name = node.toElement().attribute("name");
 	QString type = node.toElement().attribute("type");
 
-	// backwards compatibility 20110306CA
-	if (!node.namedItem("uid").toElement().isNull())
-		uid = node.namedItem("uid").toElement().text();
-	if (!node.namedItem("name").toElement().isNull())
-		name = node.namedItem("name").toElement().text();
-
-	if (filePathNode.isNull())
-	{
-		reportWarning("Warning: DataManager::parseXml() found no filePath for data");
-		return DataPtr();
-	}
-
-	QString path = filePathNode.text();
-	QDir relativePath = QDir(QString(path));
-	if (!rootPath.isEmpty())
-	{
-		if (relativePath.isRelative())
-			path = rootPath + "/" + path;
-		else //Make relative
-		{
-			QDir patientDataDir(rootPath);
-			relativePath.setPath(patientDataDir.relativeFilePath(relativePath.path()));
-		}
-	}
-
-	if (path.isEmpty())
-	{
-		reportWarning("Warning: DataManager::parseXml() empty filePath for data");
-		return DataPtr();
-	}
-
-//	DataPtr data = this->readData(uid, path, type);
+	QDir relativePath = this->findRelativePath(node, rootPath);
+	QString absolutePath = this->findAbsolutePath(relativePath, rootPath);
 
 	if (mData.count(uid)) // dont load same image twice
 		return mData[uid];
@@ -562,14 +444,14 @@ DataPtr DataManagerImpl::loadData(QDomElement node, QString rootPath)
 	DataPtr data = mDataFactory->create(type, uid, name);
 	if (!data)
 	{
-		reportWarning(QString("Unknown type: %1 for file %2").arg(type).arg(path));
+		reportWarning(QString("Unknown type: %1 for file %2").arg(type).arg(absolutePath));
 		return DataPtr();
 	}
-	bool loaded = data->load(path);
+	bool loaded = data->load(absolutePath);
 
-	if (!data || !loaded)
+	if (!loaded)
 	{
-		reportWarning("Unknown file: " + path);
+		reportWarning("Unknown file: " + absolutePath);
 		return DataPtr();
 	}
 
@@ -581,13 +463,45 @@ DataPtr DataManagerImpl::loadData(QDomElement node, QString rootPath)
 
 	// conversion for change in format 2013-10-29
 	QString newPath = rootPath+"/"+data->getFilename();
-	if (QDir::cleanPath(path) != QDir::cleanPath(newPath))
+	if (QDir::cleanPath(absolutePath) != QDir::cleanPath(newPath))
 	{
-		reportWarning(QString("Detected old data format, converting from %1 to %2").arg(path).arg(newPath));
-		this->saveData(data, rootPath);
+		reportWarning(QString("Detected old data format, converting from %1 to %2").arg(absolutePath).arg(newPath));
+		data->save(rootPath);
 	}
 
 	return data;
+}
+
+QDir DataManagerImpl::findRelativePath(QDomElement node, QString rootPath)
+{
+	QString path = this->findPath(node);
+	QDir relativePath = QDir(QString(path));
+
+	QDir patientDataDir(rootPath);
+	relativePath.setPath(patientDataDir.relativeFilePath(relativePath.path()));
+
+	return relativePath;
+}
+
+QString DataManagerImpl::findPath(QDomElement node)
+{
+	QDomElement filePathNode = node.namedItem("filePath").toElement();
+
+	if (filePathNode.isNull())
+		return QString();
+
+	QString path = filePathNode.text();
+	if (path.isEmpty())
+		return QString();
+	return path;
+}
+
+QString DataManagerImpl::findAbsolutePath(QDir relativePath, QString rootPath)
+{
+	QString absolutePath = relativePath.path();
+	if (!rootPath.isEmpty())
+		absolutePath = rootPath + "/" + relativePath.path();
+	return absolutePath;
 }
 
 void DataManagerImpl::vtkImageDataChangedSlot()
@@ -597,18 +511,40 @@ void DataManagerImpl::vtkImageDataChangedSlot()
 		uid = mActiveImage->getUid();
 }
 
-CLINICAL_APPLICATION DataManagerImpl::getClinicalApplication() const
+CLINICAL_VIEW DataManagerImpl::getClinicalApplication() const
 {
 	return mClinicalApplication;
 }
 
-void DataManagerImpl::setClinicalApplication(CLINICAL_APPLICATION application)
+void DataManagerImpl::setClinicalApplication(CLINICAL_VIEW application)
 {
 	if (mClinicalApplication == application)
 		return;
 	mClinicalApplication = application;
+
+	QString val = enum2string<CLINICAL_VIEW>(mClinicalApplication);
+	settings()->setValue("View/clinicalView", val);
+
 	emit clinicalApplicationChanged();
 }
+
+void DataManagerImpl::settingsChangedSlot(QString key)
+{
+	if (key == "View/clinicalView")
+	{
+		this->readClinicalView();
+	}
+}
+
+void DataManagerImpl::readClinicalView()
+{
+	QString defVal = enum2string<CLINICAL_VIEW>(mdNEUROLOGICAL);
+	QString val = settings()->value("View/clinicalView", defVal).toString();
+	CLINICAL_VIEW view = string2enum<CLINICAL_VIEW>(val);
+
+	this->setClinicalApplication(view);
+}
+
 
 int DataManagerImpl::findUniqueUidNumber(QString uidBase) const
 {
@@ -627,43 +563,6 @@ int DataManagerImpl::findUniqueUidNumber(QString uidBase) const
 		}
 	}
 	return recNumber;
-}
-
-/** Create an image with unique uid. The input uidBase may contain %1 as a placeholder for a running integer that
- *  data manager can increment in order to obtain an unique uid. The same integer will be inserted into nameBase
- *  if %1 is found there
- *
- */
-ImagePtr DataManagerImpl::createImage(vtkImageDataPtr data, QString uid, QString name, QString filePath)
-{
-	this->generateUidAndName(&uid, &name);
-
-	ImagePtr retval = ImagePtr(new Image(uid, data, name));
-	retval->setAcquisitionTime(QDateTime::currentDateTime());
-	retval->setFilename(filePath);
-
-	return retval;
-}
-
-/**
- * Create a new image that inherits parameters from a parent
- */
-ImagePtr DataManagerImpl::createDerivedImage(vtkImageDataPtr data, QString uid, QString name, ImagePtr parentImage, QString filePath)
-{
-	ImagePtr retval = this->createImage(data, uid, name, filePath);
-	retval->get_rMd_History()->setRegistration(parentImage->get_rMd());
-	retval->get_rMd_History()->setParentSpace(parentImage->getUid());
-	ImageTF3DPtr transferFunctions = parentImage->getTransferFunctions3D()->createCopy();
-	ImageLUT2DPtr LUT2D = parentImage->getLookupTable2D()->createCopy();
-	retval->setLookupTable2D(LUT2D);
-	retval->setTransferFunctions3D(transferFunctions);
-	retval->setModality(parentImage->getModality());
-	retval->setImageType(parentImage->getImageType());
-	retval->setShading(parentImage->getShading());
-
-	retval->setAcquisitionTime(QDateTime::currentDateTime());
-
-	return retval;
 }
 
 /**Insert uid and name containing %1 placeholders for insertion of unique integers.
@@ -689,22 +588,6 @@ void DataManagerImpl::generateUidAndName(QString* _uid, QString* _name)
 		else
 			name = name.arg(recNumber);
 	}
-}
-
-/** Create an image with unique uid. The input uidBase may contain %1 as a placeholder for a running integer that
- *  data manager can increment in order to obtain an unique uid. The same integer will be inserted into nameBase
- *  if %1 is found there
- *
- */
-MeshPtr DataManagerImpl::createMesh(vtkPolyDataPtr data, QString uid, QString name, QString filePath)
-{
-	this->generateUidAndName(&uid, &name);
-
-	MeshPtr retval = MeshPtr(new Mesh(uid, name, data));
-	retval->setAcquisitionTime(QDateTime::currentDateTime());
-	retval->setFilename(filePath);
-
-	return retval;
 }
 
 void DataManagerImpl::removeData(const QString& uid, QString basePath)
@@ -763,10 +646,8 @@ RegistrationHistoryPtr DataManagerImpl::get_rMpr_History() const
 PresetTransferFunctions3DPtr DataManagerImpl::getPresetTransferFunctions3D() const
 {
 	///< create from filename, create trivial document of type name and root node if no file exists.
-	XmlOptionFile preset = XmlOptionFile(
-					DataLocations::getRootConfigPath() + "/transferFunctions/presets.xml");
-	XmlOptionFile custom = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend(
-					"presetTransferFunctions");
+	XmlOptionFile preset(DataLocations::getExistingConfigPath("/transferFunctions", "", "presets.xml"));
+	XmlOptionFile custom = profile()->getXmlSettings().descend("presetTransferFunctions");
 
 	if (!mPresetTransferFunctions3D)
 		mPresetTransferFunctions3D.reset(new TransferFunctions3DPresets(preset, custom));

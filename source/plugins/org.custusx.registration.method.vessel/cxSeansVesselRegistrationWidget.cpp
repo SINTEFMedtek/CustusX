@@ -61,7 +61,7 @@ SeansVesselRegistrationWidget::SeansVesselRegistrationWidget(RegServices service
 	mRegisterButton(new QPushButton("Register"))
 {
 	mRegisterButton->setEnabled(false);
-	connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
+	connect(mRegisterButton, &QPushButton::clicked, this, &SeansVesselRegistrationWidget::registerSlot);
 
 	connect(mServices.registrationService.get(), &RegistrationService::fixedDataChanged,
 			this, &SeansVesselRegistrationWidget::inputChanged);

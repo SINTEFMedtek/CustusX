@@ -54,7 +54,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxToolConfigurationParser.h"
 #include "cxManualToolAdapter.h"
 #include "cxSettings.h"
-#include "cxDataLocations.h"
 #include "cxIgstkTrackerThread.h"
 #include "cxPlaybackTool.h"
 
@@ -154,6 +153,7 @@ void TrackingImplService::installTrackingSystem(TrackingSystemServicePtr system)
 {
 	mTrackingSystems.push_back(system);
 	connect(system.get(), &TrackingSystemService::stateChanged, this, &TrackingImplService::onSystemStateChanged);
+	connect(system.get(), &TrackingSystemService::newProbe, this, &TrackingImplService::newProbe);
 	this->onSystemStateChanged();
 }
 

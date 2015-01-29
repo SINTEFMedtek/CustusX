@@ -30,25 +30,44 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxTool.h"
-#include "cxToolNull.h"
-#include "cxNullDeleter.h"
+#include "catch.hpp"
 
-namespace cx
+#include "cxTestCustusXController.h"
+#include "cxDataLocations.h"
+#include "cxLogicManager.h"
+#include <QTimer>
+#include "boost/function.hpp"
+#include "boost/bind.hpp"
+
+namespace cxtest
 {
-Tool::Tool(const QString &uid, const QString &name) :
-	mUid(uid), mName(name)
+
+namespace
 {
-	if (name.isEmpty())
-		mName = uid;
+
+void initTest()
+{
+	cx::DataLocations::setTestMode();
 }
 
-ToolPtr Tool::getNullObject()
-{
-	static ToolPtr mNull;
-	if (!mNull)
-		mNull.reset(new ToolNull, null_deleter());
-	return mNull;
 }
-} //cx
+
+TEST_CASE("Profile change with running gui", "[gui][integration]")
+{
+	initTest();
+
+	CustusXController custusX(NULL);
+	custusX.start();
+
+	QTimer::singleShot(200, &custusX, SLOT(changeToNewProfile()));
+	QTimer::singleShot(400,   qApp, SLOT(quit()) );
+
+	qApp->exec();
+	custusX.stop();
+
+	CHECK(true);
+}
+
+
+}//namespace cx
 

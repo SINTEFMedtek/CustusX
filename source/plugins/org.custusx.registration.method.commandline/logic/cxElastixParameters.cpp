@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataLocations.h"
 #include "cxSettings.h"
 #include "cxTypeConversions.h"
+#include "cxProfile.h"
 
 namespace cx
 {
@@ -53,19 +54,7 @@ ElastixParameters::ElastixParameters(XmlOptionFile options)
 
 void ElastixParameters::addDefaultPresets()
 {
-//test code - inject into jenkins
-	QString pathRelativeToConfigRoot = "/elastix/bin";
-	QString filename = "run_elastix.sh";
-	foreach (QString root, DataLocations::getRootConfigPaths())
-	{
-		QString path = root + "/" + pathRelativeToConfigRoot + "/" + filename;
-//		std::cout << "+++ ELASTIX: attempting: " << path << std::endl;
-//		std::cout << "+++ ELASTIX:  exists:" << QFileInfo(path).exists() << std::endl;
-	}
-
 	QString defaultExecutable = cx::DataLocations::getExistingConfigPath("/elastix/bin", "", "run_elastix.sh");
-//	std::cout << "+++ ELASTIX:  defaultExecutable:" << defaultExecutable << std::endl;
-
     this->addDefaultPreset("elastix/p_Rigid", defaultExecutable, QStringList() << "p_Rigid.txt");
 }
 
@@ -103,7 +92,7 @@ QString ElastixParameters::getFullParameterFilename(QString filename)
 
 QStringList ElastixParameters::getParameterFilesDir() const
 {
-	QStringList folders = DataLocations::getRootConfigPaths();
+	QStringList folders = profile()->getAllRootConfigPaths();
 	for(int i=0; i<folders.size(); ++i)
 		folders[i] = folders[i] + "/elastix/parameterFiles";
 	return folders;

@@ -39,12 +39,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 
 
-
 struct XmlOptionFileFixture
 {
 	XmlOptionFileFixture()
 	{
-		filename = cx::DataLocations::getXmlSettingsFile();
+		filename = cx::DataLocations::getRootConfigPath() + "/test.xml";
 		value = "myvalue";
 		uid = "myuid";
 		node = "mynode";

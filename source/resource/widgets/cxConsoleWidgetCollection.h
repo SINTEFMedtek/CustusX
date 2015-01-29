@@ -38,11 +38,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/shared_ptr.hpp>
 class QMenu;
 
+#include "cxResourceWidgetsExport.h"
+
 namespace cx
 {
 typedef boost::shared_ptr<class Log> LogPtr;
 
-class ConsoleWidgetCollection : public QMainWindow
+class cxResourceWidgets_EXPORT ConsoleWidgetCollection : public QMainWindow
 {
 	Q_OBJECT
 public:

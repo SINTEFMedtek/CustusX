@@ -62,6 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackingPositionFilter.h"
 #include "cxXMLNodeWrapper.h"
 #include "cxTrackerConfigurationImpl.h"
+#include "cxProfile.h"
 
 namespace cx
 {
@@ -80,7 +81,7 @@ TrackingSystemIGSTKService::TrackingSystemIGSTKService() :
 {
 	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(globalConfigurationFileChangedSlot(QString)));
 	// initialize config file
-	this->setConfigurationFile(DataLocations::getToolConfigFilePath());
+	this->setConfigurationFile(profile()->getToolConfigFilePath());
 }
 
 TrackingSystemIGSTKService::~TrackingSystemIGSTKService()
@@ -214,6 +215,8 @@ void TrackingSystemIGSTKService::trackerConfiguredSlot(bool on)
 		if (tool->isValid())
 		{
 			mTools.push_back(tool);
+			if (tool->getProbe())
+				emit newProbe(tool);
 		}
 		else
 			reportWarning("Creation of the cxTool " + it->second->getUid() + " failed.");
@@ -513,7 +516,7 @@ void TrackingSystemIGSTKService::globalConfigurationFileChangedSlot(QString key)
 {
 	if (key == "toolConfigFile")
 	{
-		this->setConfigurationFile(DataLocations::getToolConfigFilePath());
+		this->setConfigurationFile(profile()->getToolConfigFilePath());
 	}
 }
 

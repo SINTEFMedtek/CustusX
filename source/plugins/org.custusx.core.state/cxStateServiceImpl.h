@@ -58,7 +58,7 @@ public:
 	StateServiceImpl(ctkPluginContext* context);
 
 	virtual QString getVersionName();
-	virtual QActionGroup* getApplicationActions();
+//	virtual QActionGroup* getApplicationActions();
 	virtual QString getApplicationStateName() const;
 	virtual QStringList getAllApplicationStateNames() const;
 
@@ -73,7 +73,7 @@ public:
 
 private:
 	WorkflowStateMachinePtr getWorkflow();
-	ApplicationStateMachinePtr getApplication();
+//	ApplicationStateMachinePtr getApplication();
 	void initialize(StateServiceBackendPtr backend);
 	void fillDefaultSettings();
 	template<class T>
@@ -81,7 +81,7 @@ private:
 	StateServiceBackendPtr createBackend(ctkPluginContext* context);
 
 	WorkflowStateMachinePtr mWorkflowStateMachine;
-	ApplicationStateMachinePtr mApplicationStateMachine;
+//	ApplicationStateMachinePtr mApplicationStateMachine;
 	StateServiceBackendPtr mBackend;
 };
 

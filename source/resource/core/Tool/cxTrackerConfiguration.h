@@ -72,11 +72,11 @@ public:
 
 	virtual ~TrackerConfiguration() {}
 
-	virtual QString getConfigurationApplicationsPath(QString application) = 0;
+	virtual QString getConfigurationApplicationsPath() = 0;
 	virtual void saveConfiguration(const Configuration& config) = 0;
 	virtual Configuration getConfiguration(QString uid) = 0;
 
-	virtual QStringList getConfigurationsGivenApplication(QString application) = 0;
+	virtual QStringList getConfigurationsGivenApplication() = 0;
 	virtual QStringList getAllConfigurations() = 0;
 
 	virtual QStringList getSupportedTrackingSystems() = 0;

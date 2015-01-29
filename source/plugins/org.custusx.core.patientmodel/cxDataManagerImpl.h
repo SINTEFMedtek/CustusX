@@ -70,7 +70,6 @@ Q_OBJECT
 public:
 	static DataManagerImplPtr create();
 	virtual ~DataManagerImpl();
-//	static void initialize();
 	void setSpaceProvider(SpaceProviderPtr spaceProvider);
 	void setDataFactory(DataFactoryPtr dataFactory);
 
@@ -80,20 +79,17 @@ public:
 	virtual void loadStream(VideoSourcePtr stream);
 
 	// images
-	virtual void saveImage(ImagePtr image, const QString& basePath);///< Save image to file \param image Image to save \param basePath Absolute path to patient data folder
 	virtual ImagePtr getImage(const QString& uid) const;
 	virtual std::map<QString, ImagePtr> getImages() const;
 
 	void loadData(DataPtr data);
 	DataPtr loadData(const QString& uid, const QString& path);
-    virtual void saveData(DataPtr data, const QString& basePath); ///< Save data to file
     std::map<QString, DataPtr> getData() const;
 	DataPtr getData(const QString& uid) const;
 	virtual SpaceProviderPtr getSpaceProvider();
 	virtual DataFactoryPtr getDataFactory();
 
 	// meshes
-	virtual void saveMesh(MeshPtr mesh, const QString& basePath);///< Save mesh to file \param mesh to save \param basePath Absolute path to patient data folder
 	virtual MeshPtr getMesh(const QString& uid) const;
 	virtual std::map<QString, MeshPtr> getMeshes() const;
 
@@ -117,11 +113,8 @@ public:
 	virtual void addXml(QDomNode& parentNode); ///< adds xml information about the datamanger and its variabels
 	virtual void parseXml(QDomNode& datamangerNode, QString absolutePath = QString());///< Use a XML node to load data. \param datamangerNode A XML data representation of the DataManager. \param absolutePath Absolute path to the data elements. Used together with the relative paths stored in the filePath elements.
 
-	virtual CLINICAL_APPLICATION getClinicalApplication() const;
-	virtual void setClinicalApplication(CLINICAL_APPLICATION application);
-	virtual ImagePtr createImage(vtkImageDataPtr data, QString uidBase, QString nameBase, QString filePath);
-	virtual ImagePtr createDerivedImage(vtkImageDataPtr data, QString uid, QString name, ImagePtr parentImage, QString filePath);
-	virtual MeshPtr createMesh(vtkPolyDataPtr data, QString uidBase, QString nameBase, QString filePath);
+	virtual CLINICAL_VIEW getClinicalApplication() const;
+	virtual void setClinicalApplication(CLINICAL_VIEW application);
 
 	virtual Transform3D get_rMpr() const; ///< get the patient registration transform
 	virtual void set_rMpr(const Transform3D& val); ///<  set the transform from patient to reference space
@@ -137,22 +130,20 @@ public:
 
 protected:
 	DataManagerImpl();
-//	virtual void verifyParentFrame(DataPtr data); ///< checks if data has a valid frameOfReferenceUid, generates and adds it if not
 
 protected:
 	std::map<QString, VideoSourcePtr> mStreams;
 	DataMap mData;
 	Vector3D mCenter;
-	CLINICAL_APPLICATION mClinicalApplication;
+	CLINICAL_VIEW mClinicalApplication;
 	void deleteFiles(DataPtr data, QString basePath);
 
 	//state
 	ImagePtr mActiveImage;
-	virtual ImagePtr loadImage(const QString& uid, const QString& filename);
-	virtual MeshPtr loadMesh(const QString& uid, const QString& fileName);
 	DataPtr loadData(QDomElement node, QString rootPath);
-//	DataPtr readData(const QString& uid, const QString& path, const QString& type);
 	int findUniqueUidNumber(QString uidBase) const;
+
+	void readClinicalView();
 
 	LandmarkPropertyMap mLandmarkProperties; ///< uid and name
 	RegistrationHistoryPtr m_rMpr_History; ///< transform from the patient reference to the reference, along with historical data.
@@ -163,8 +154,14 @@ protected:
 	SpaceProviderPtr mSpaceProvider;
 	DataFactoryPtr mDataFactory;
 
+private:
+	QDir findRelativePath(QDomElement node, QString rootPath);
+	QString findPath(QDomElement node);
+	QString findAbsolutePath(QDir relativePath, QString rootPath);
 public slots:
 	void vtkImageDataChangedSlot();
+private slots:
+	void settingsChangedSlot(QString key);
 };
 
 } // namespace cx

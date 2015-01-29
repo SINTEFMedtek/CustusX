@@ -115,9 +115,14 @@ class CppBuilder:
         #if branch contains only '' set as empty .... todo
 
         runShell('git fetch')
-	# if the branch doesnt exist, this might be ok: only a subset of the repos need have the branch defined.
-        runShell('git checkout %s' % branch, ignoreFailure=True)
-        runShell('git pull origin %s' % branch, ignoreFailure=True)
+	# If the branch doesn't exist, this might be ok: 
+	# only a subset of the repos need have the branch defined.
+	# In this case, checkout the latest stuff on the master branch.
+        if runShell('git checkout %s' % branch, ignoreFailure=True):
+                runShell('git pull origin %s' % branch, ignoreFailure=True)
+        else:
+                runShell('git checkout master', ignoreFailure=True)
+                runShell('git pull origin master', ignoreFailure=True)
         if submodules:
             self._gitSubmoduleUpdate()
 
@@ -130,7 +135,8 @@ class CppBuilder:
         if self._checkGitIsAtTag(tag):
             return        
         runShell('git fetch')
-        runShell('git checkout %s' % tag)
+        if not runShell('git checkout %s' % tag):
+            runShell('git checkout master')
         if submodules:
             self._gitSubmoduleUpdate()
         

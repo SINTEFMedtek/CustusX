@@ -264,8 +264,13 @@ function(cx_install_target TARGET_ID)
         cx_assert_variable_exists(${CX_INSTALL_ROOT_DIR})
 
 	if(CX_APPLE)
-                set( NEW_ENTRY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TARGET_ID}.app/Contents/MacOS/${TARGET_ID}" )
-		#set( NEW_ENTRY "${CMAKE_CURRENT_BINARY_DIR}/${TARGET_ID}" )
+		get_property(is_bundle TARGET ${TARGET_ID} PROPERTY MACOSX_BUNDLE SET)
+		if(${is_bundle})
+			set( NEW_ENTRY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TARGET_ID}.app/Contents/MacOS/${TARGET_ID}" )
+		else()
+			set( NEW_ENTRY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TARGET_ID}" )
+		endif()
+
 		list(FIND CX_APPLE_TARGETS_TO_COPY ${NEW_ENTRY} PREEXISTING)
 		if( ${PREEXISTING} EQUAL -1 )
 			set(CX_APPLE_TARGETS_TO_COPY

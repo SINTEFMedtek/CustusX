@@ -51,6 +51,20 @@ namespace cx
 
 typedef boost::shared_ptr<class PluginFrameworkManager> PluginFrameworkManagerPtr;
 
+typedef boost::shared_ptr<class ApplicationComponent> ApplicationComponentPtr;
+/**
+ * Class holding anything that can be created/destroyed and exist meanwhile.
+ */
+class ApplicationComponent
+{
+public:
+	virtual ~ApplicationComponent() {}
+
+	virtual void create() = 0;
+	virtual bool exists() const = 0;
+	virtual void destroy() = 0;
+};
+
 /** \brief Control the custusx backend.
  *  \ingroup cx_logic
  *
@@ -65,11 +79,19 @@ public:
   /**
 	* Initialize the manager, including all services (calls initializeServices() ).
 	*/
-  static void initialize();
+  static void initialize(ApplicationComponentPtr component=ApplicationComponentPtr());
   /**
 	* Shutdown the manager, including all services (calls shutdownServices() ).
 	*/
   static void shutdown();
+
+  /**
+   * Do a complete restart of the system:
+   *   Shutdown all components,
+   *   Then restart all of them.
+   * This is done asynchronolusly.
+   */
+  void restartWithNewProfile(QString uid);
 
   PluginFrameworkManagerPtr getPluginFramework();
   ctkPluginContext* getPluginContext();
@@ -82,11 +104,21 @@ public:
   ViewServicePtr getViewService();
   SessionStorageServicePtr getSessionStorageService();
 
+private slots:
+  void onRestartWithNewProfile(QString uid);
+
 private:
   /**
 	* Initialize all system services, resources and other static objects.
 	*/
   void initializeServices();
+  /**
+   * Set an application component, intended to encapsulate the application's
+   * main window or similar. Must be called after initialize.
+   *
+   * Component will be created here and destroyed in shutdown.
+   */
+  void setApplicationComponent(ApplicationComponentPtr component);
   /**
 	* Shutdown all system services, resources and other static objects.
 	*
@@ -117,6 +149,7 @@ private:
 	SessionStorageServicePtr mSessionStorageService;
 
 	PluginFrameworkManagerPtr mPluginFramework;
+	ApplicationComponentPtr mComponent;
 };
 
 cxLogicManager_EXPORT LogicManager* logicManager(); // access the singleton

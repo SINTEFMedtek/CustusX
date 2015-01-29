@@ -72,7 +72,6 @@ public:
 //    virtual QString getUid() const                   { CALL_IN_WEAK_PTR(mBase, getUid, QString()); }
     virtual QString getName() const                  { CALL_IN_WEAK_PTR(mBase, getName, QString()); }
 	virtual QString getFilename() const              { CALL_IN_WEAK_PTR(mBase, getFilename, QString()); }
-    virtual REGISTRATION_STATUS getRegistrationStatus() const { CALL_IN_WEAK_PTR(mBase, getRegistrationStatus, REGISTRATION_STATUS()); }
     virtual Transform3D get_rMd() const              { CALL_IN_WEAK_PTR(mBase, get_rMd, Transform3D()); }
     virtual Image::ShadingStruct getShading() const  { CALL_IN_WEAK_PTR(mBase, getShading, Image::ShadingStruct()); }
     virtual QDateTime getAcquisitionTime() const     { CALL_IN_WEAK_PTR(mBase, getAcquisitionTime, QDateTime()); }

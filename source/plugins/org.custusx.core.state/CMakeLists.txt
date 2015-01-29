@@ -13,10 +13,6 @@ set(PLUGIN_SRCS
     cxWorkflowStateMachine.cpp
     cxWorkflowState.h
     cxWorkflowState.cpp
-    cxApplicationStateMachine.cpp
-    cxApplicationStateMachine.h
-    cxApplicationState.h
-    cxApplicationState.cpp
     cxRequestEnterStateTransition.h
     cxStateServiceBackend.cpp
     cxStateServiceBackend.h
@@ -29,8 +25,6 @@ set(PLUGIN_SRCS
 set(PLUGIN_MOC_SRCS
     cxWorkflowStateMachine.h
     cxWorkflowState.h
-    cxApplicationStateMachine.h
-    cxApplicationState.h
     cxStateServiceImpl.h
     cxStatePluginActivator.h
 )

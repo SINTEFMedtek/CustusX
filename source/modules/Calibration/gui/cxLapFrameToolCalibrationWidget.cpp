@@ -43,7 +43,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVector3D.h"
 #include "cxDefinitionStrings.h"
 #include "cxLabeledComboBoxWidget.h"
-#include "cxDataLocations.h"
 #include "cxTool.h"
 #include "cxTrackingService.h"
 #include <cxActiveToolWidget.h>

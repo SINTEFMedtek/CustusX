@@ -38,6 +38,7 @@ public:
 //	static TrackingSystemServicePtr getNullObject();
 signals:
 	void stateChanged();
+	void newProbe(const ToolPtr probe);
 public slots:
 };
 
