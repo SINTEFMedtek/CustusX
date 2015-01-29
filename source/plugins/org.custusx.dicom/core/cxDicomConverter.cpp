@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationTransform.h"
 #include <vtkImageAppend.h>
 #include <vtkImageCast.h>
+#include "cxReporter.h"
 
 #include "cxLogger.h"
 #include "ctkDICOMItem.h"
