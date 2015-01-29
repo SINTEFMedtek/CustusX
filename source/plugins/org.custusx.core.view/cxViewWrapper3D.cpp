@@ -103,6 +103,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxCoreServices.h"
 #include "cxNavigation.h"
 
+#include "cxTrackedStream.h"
+#include "cxStreamRep3D.h"
+
 namespace cx
 {
 
@@ -626,11 +629,17 @@ RepPtr ViewWrapper3D::createDataRep3D(DataPtr data)
 		rep->setMesh(boost::dynamic_pointer_cast<Mesh>(data));
 		return rep;
 	}
+	else if (boost::dynamic_pointer_cast<TrackedStream>(data))
+	{
+		StreamRep3DPtr rep = StreamRep3D::New();
+		rep->setTrackedStream(boost::dynamic_pointer_cast<TrackedStream>(data));
+		return rep;
+	}
     else
     {
-        DataMetricRepPtr rep = this->createDataMetricRep3D(data);
-        if (rep)
-            return rep;
+		DataMetricRepPtr rep = this->createDataMetricRep3D(data);
+		if (rep)
+			return rep;
     }
 
     return RepPtr();

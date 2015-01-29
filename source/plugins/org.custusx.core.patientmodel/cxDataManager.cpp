@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataManager.h"
 
 #include "cxTransferFunctions3DPresets.h"
+#include "cxMesh.h"
+#include "cxTrackedStream.h"
 
 namespace cx
 {
@@ -49,6 +51,21 @@ DataManager::~DataManager()
 PresetTransferFunctions3DPtr DataManager::getPresetTransferFunctions3D() const
 {
 	return PresetTransferFunctions3DPtr(new TransferFunctions3DPresets(XmlOptionFile(), XmlOptionFile()));
+}
+
+ImagePtr DataManager::getImage(const QString &uid) const
+{
+	return boost::dynamic_pointer_cast<Image>(this->getData(uid));
+}
+
+MeshPtr DataManager::getMesh(const QString &uid) const
+{
+	return boost::dynamic_pointer_cast<Mesh>(this->getData(uid));
+}
+
+TrackedStreamPtr DataManager::getTrackedStream(const QString &uid) const
+{
+	return boost::dynamic_pointer_cast<TrackedStream>(this->getData(uid));
 }
 
 ImagePtr DataManager::getActiveImage() const

@@ -69,9 +69,33 @@ void StreamRep3D::setTrackedStream(TrackedStreamPtr trackedStream)
 {
 	mTrackedStream = trackedStream;
 
-	ToolPtr tool = mTrackedStream->getProbeTool();
+	connect(mTrackedStream.get(), &TrackedStream::newTool, this, &StreamRep3D::newTool);
+	connect(mTrackedStream.get(), &TrackedStream::newVideoSource, this, &StreamRep3D::newVideoSource);
 
-	connect(tool.get(), &Tool::toolTransformAndTimestamp, this, &StreamRep3D::newTransform);
+	this->newTool(mTrackedStream->getProbeTool());
+	this->newVideoSource(mTrackedStream->getVideoSource());
+}
+
+void StreamRep3D::newTool(ToolPtr tool)
+{
+	if(tool)
+		connect(tool.get(), &Tool::toolTransformAndTimestamp, this, &StreamRep3D::newTransform);
+}
+
+void StreamRep3D::newVideoSource(VideoSourcePtr videoSource)
+{
+	if(videoSource)
+	{
+		mPipeline->setInputVideo(videoSource->getVtkImageData());
+		connect(videoSource.get(), &VideoSource::newFrame, this, &StreamRep3D::newFrame);
+	}
+}
+
+void StreamRep3D::newFrame()
+{
+	//TODO: See VideoSourceGraphics::newDataSlot()
+	mPipeline->update();
+	mPipeline->setVisibility(true);
 }
 
 TrackedStreamPtr StreamRep3D::getTrackedStream()

@@ -45,11 +45,14 @@ TrackedStreamPtr TrackedStream::create(const QString &uid, const QString &name)
 TrackedStream::TrackedStream(const QString& uid, const QString& name, const ToolPtr &probe, const VideoSourcePtr &videosource) :
 	Data(uid, name), mProbeTool(probe), mVideoSource(videosource)
 {
+	if(mProbeTool)
+		emit newTool(mProbeTool);
 }
 
 void TrackedStream::setProbeTool(const ToolPtr &probeTool)
 {
 	mProbeTool = probeTool;
+	emit newTool(mProbeTool);
 }
 
 ToolPtr TrackedStream::getProbeTool()
@@ -61,6 +64,7 @@ void TrackedStream::setVideoSource(const VideoSourcePtr &videoSource)
 {
 	mVideoSource = videoSource;
 	emit streamChanged();
+	emit newVideoSource(mVideoSource);
 }
 
 VideoSourcePtr TrackedStream::getVideoSource()

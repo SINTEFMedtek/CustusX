@@ -56,6 +56,9 @@ protected:
 	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
 private slots:
 	void newTransform(Transform3D prMt, double timestamp);
+	void newTool(ToolPtr tool);
+	void newVideoSource(VideoSourcePtr videoSource);
+	void newFrame();
 private:
 	StreamRep3D();
 

@@ -314,7 +314,9 @@ void PatientModelImplService::videoSourceAdded(VideoSourcePtr source)
 
 	QString uid = source->getUid() + tool->getUid();
 	QString name = source->getName() + " - " + tool->getName();
-	TrackedStreamPtr trackedStream = this->createSpecificData<TrackedStream>(uid, name);
+	TrackedStreamPtr trackedStream = this->dataService()->getTrackedStream(uid);
+	if (!trackedStream)
+		trackedStream = this->createSpecificData<TrackedStream>(uid, name);
 	trackedStream->setProbeTool(tool);
 	trackedStream->setVideoSource(source);
 

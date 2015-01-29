@@ -273,11 +273,6 @@ DataPtr DataManagerImpl::getData(const QString& uid) const
 	return iter->second;
 }
 
-ImagePtr DataManagerImpl::getImage(const QString& uid) const
-{
-	return boost::dynamic_pointer_cast<Image>(this->getData(uid));
-}
-
 std::map<QString, DataPtr> DataManagerImpl::getData() const
 {
 	return mData;
@@ -294,11 +289,6 @@ std::map<QString, ImagePtr> DataManagerImpl::getImages() const
 		retval[iter->first] = image;
 	}
 	return retval;
-}
-
-MeshPtr DataManagerImpl::getMesh(const QString& uid) const
-{
-	return boost::dynamic_pointer_cast<Mesh>(this->getData(uid));
 }
 
 std::map<QString, MeshPtr> DataManagerImpl::getMeshes() const

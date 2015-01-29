@@ -68,6 +68,8 @@ public:
 
 signals:
 	void streamChanged();
+	void newTool(ToolPtr tool);
+	void newVideoSource(VideoSourcePtr videoSource);
 
 private:
 	ToolPtr mProbeTool;

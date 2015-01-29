@@ -80,11 +80,9 @@ public:
 	virtual void loadStream(VideoSourcePtr stream) = 0;
 
 	// images
-	virtual ImagePtr getImage(const QString& uid) const = 0;
 	virtual std::map<QString, ImagePtr> getImages() const = 0;
 
 	// meshes
-	virtual MeshPtr getMesh(const QString& uid) const = 0;
 	virtual std::map<QString, MeshPtr> getMeshes() const = 0;
 
 	// data
@@ -125,6 +123,11 @@ public:
 	virtual void generateUidAndName(QString* _uid, QString* _name) = 0;
 
 	virtual bool getDebugMode() const = 0;
+
+	//
+	virtual ImagePtr getImage(const QString& uid) const;
+	virtual MeshPtr getMesh(const QString& uid) const;
+	virtual TrackedStreamPtr getTrackedStream(const QString& uid) const;
 
 signals:
 	void centerChanged(); ///< emitted when center is changed.

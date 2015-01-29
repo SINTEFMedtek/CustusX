@@ -79,7 +79,6 @@ public:
 	virtual void loadStream(VideoSourcePtr stream);
 
 	// images
-	virtual ImagePtr getImage(const QString& uid) const;
 	virtual std::map<QString, ImagePtr> getImages() const;
 
 	void loadData(DataPtr data);
@@ -90,7 +89,6 @@ public:
 	virtual DataFactoryPtr getDataFactory();
 
 	// meshes
-	virtual MeshPtr getMesh(const QString& uid) const;
 	virtual std::map<QString, MeshPtr> getMeshes() const;
 
 	// global data (move to separate class if list grows)
