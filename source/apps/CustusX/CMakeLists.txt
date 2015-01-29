@@ -33,7 +33,7 @@ if(APPLE)
 else(APPLE)
     if(CX_WINDOWS)
         add_executable(CustusX ${SOURCES} CustusX.rc) #WINDOWS
-        set_target_properties(CustusX PROPERTIES LINK_FLAGS    "/MANIFESTUAC:\"level='requireAdministrator' uiAccess='false'\"")
+        set_target_properties(CustusX PROPERTIES LINK_FLAGS    "/MANIFESTUAC:\"level='asInvoker' uiAccess='false'\"")
     else()
         add_executable(CustusX ${SOURCES} ) #LINUX
     endif()
