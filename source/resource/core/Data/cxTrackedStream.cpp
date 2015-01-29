@@ -43,18 +43,18 @@ TrackedStreamPtr TrackedStream::create(const QString &uid, const QString &name)
 }
 
 TrackedStream::TrackedStream(const QString& uid, const QString& name, const ToolPtr &probe, const VideoSourcePtr &videosource) :
-	Data(uid, name), mProbe(probe), mVideoSource(videosource)
+	Data(uid, name), mProbeTool(probe), mVideoSource(videosource)
 {
 }
 
-void TrackedStream::setProbe(const ToolPtr &probe)
+void TrackedStream::setProbeTool(const ToolPtr &probeTool)
 {
-	mProbe = probe;
+	mProbeTool = probeTool;
 }
 
-ToolPtr TrackedStream::getProbe()
+ToolPtr TrackedStream::getProbeTool()
 {
-	return mProbe;
+	return mProbeTool;
 }
 
 void TrackedStream::setVideoSource(const VideoSourcePtr &videoSource)

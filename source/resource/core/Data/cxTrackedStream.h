@@ -52,8 +52,8 @@ public:
 	static TrackedStreamPtr create(const QString& uid, const QString& name = "");
 	TrackedStream(const QString &uid, const QString &name, const ToolPtr &probe, const VideoSourcePtr &videoSource);
 
-	void setProbe(const ToolPtr &probe);
-	ToolPtr getProbe();
+	void setProbeTool(const ToolPtr &probeTool);
+	ToolPtr getProbeTool();
 	void setVideoSource(const VideoSourcePtr &videoSource);
 	VideoSourcePtr getVideoSource();
 
@@ -70,7 +70,7 @@ signals:
 	void streamChanged();
 
 private:
-	ToolPtr mProbe;
+	ToolPtr mProbeTool;
 	VideoSourcePtr mVideoSource;
 };
 

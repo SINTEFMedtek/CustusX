@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxRepImpl.h"
 #include "cxForwardDeclarations.h"
+#include "cxTransform3D.h"
 
 namespace cx
 {
@@ -53,6 +54,8 @@ public:
 protected:
 	virtual void addRepActorsToViewRenderer(ViewPtr view);
 	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
+private slots:
+	void newTransform(Transform3D prMt, double timestamp);
 private:
 	StreamRep3D();
 

@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackedStream.h"
 #include "cxVideoGraphics.h"
 #include "cxView.h"
+#include "cxTool.h"
 
 
 namespace cx
@@ -64,11 +65,13 @@ void StreamRep3D::removeRepActorsFromViewRenderer(ViewPtr view)
 	view->getRenderer()->RemoveActor(mPipeline->getActor());
 }
 
-
-
 void StreamRep3D::setTrackedStream(TrackedStreamPtr trackedStream)
 {
 	mTrackedStream = trackedStream;
+
+	ToolPtr tool = mTrackedStream->getProbeTool();
+
+	connect(tool.get(), &Tool::toolTransformAndTimestamp, this, &StreamRep3D::newTransform);
 }
 
 TrackedStreamPtr StreamRep3D::getTrackedStream()
@@ -79,6 +82,12 @@ TrackedStreamPtr StreamRep3D::getTrackedStream()
 QString StreamRep3D::getType() const
 {
 	return "StreamRep3D";
+}
+
+void StreamRep3D::newTransform(Transform3D prMt, double timestamp)
+{
+	//TODO: Calculate correct transform. See VideoSourceGraphics::receiveTransforms
+	mPipeline->setActorUserMatrix(prMt.getVtkMatrix());
 }
 
 } //cx
