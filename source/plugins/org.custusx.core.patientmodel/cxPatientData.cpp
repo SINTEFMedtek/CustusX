@@ -133,7 +133,7 @@ void PatientData::exportPatient(bool niftiFormat)
 	DataManager::ImagesMap images = mDataManager->getImages();
 	for (DataManager::ImagesMap::iterator iter = images.begin(); iter != images.end(); ++iter)
 	{
-		mDataManager->saveImage(iter->second, targetFolder);
+		iter->second->save(targetFolder);
 	}
 
 	DataManager::MeshMap meshes = mDataManager->getMeshes();
@@ -153,7 +153,7 @@ void PatientData::exportPatient(bool niftiFormat)
 		mesh = mDataManager->getDataFactory()->createSpecific<Mesh>(mesh->getUid(), mesh->getName());
 		mesh->setVtkPolyData(poly);
 		mesh->setFilename("Images");
-		mDataManager->saveMesh(mesh, targetFolder);
+		mesh->save(targetFolder);
 	}
 
 	report("Exported patient data to " + targetFolder + ".");
@@ -170,8 +170,6 @@ DataPtr PatientData::importData(QString fileName, QString &infoText)
 	}
 
 	QFileInfo fileInfo(fileName);
-	QString fileType = fileInfo.suffix();
-	QFile fromFile(fileName);
 	QString strippedFilename = changeExtension(fileInfo.fileName(), "");
 	QString uid = strippedFilename + "_" + QDateTime::currentDateTime().toString(timestampSecondsFormat());
 
@@ -194,7 +192,7 @@ DataPtr PatientData::importData(QString fileName, QString &infoText)
 	}
 	data->setAcquisitionTime(QDateTime::currentDateTime());
 
-	mDataManager->saveData(data, mSession->getRootFolder());
+	data->save(mSession->getRootFolder());
 
 	// remove redundant line breaks
 	infoText = infoText.split("<br>", QString::SkipEmptyParts).join("<br>");

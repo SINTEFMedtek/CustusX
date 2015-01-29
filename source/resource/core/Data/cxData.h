@@ -103,6 +103,8 @@ public:
 
 	virtual CoordinateSystem getCoordinateSystem();
 
+	virtual void save(const QString& basePath) {}
+
 signals:
 	void transformChanged(); ///< emitted when transform is changed
 	void propertiesChanged(); ///< emitted when one of the metadata properties (uid, name etc) changes

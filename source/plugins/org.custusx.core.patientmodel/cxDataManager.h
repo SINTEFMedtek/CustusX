@@ -80,21 +80,16 @@ public:
 	virtual void loadStream(VideoSourcePtr stream) = 0;
 
 	// images
-	virtual ImagePtr loadImage(const QString& uid, const QString& filename) = 0;
-	virtual void saveImage(ImagePtr image, const QString& basePath) = 0; ///< Save image to file
 	virtual ImagePtr getImage(const QString& uid) const = 0;
 	virtual std::map<QString, ImagePtr> getImages() const = 0;
 
 	// meshes
-	virtual void saveMesh(MeshPtr mesh, const QString& basePath) = 0; ///< Save mesh to file
-	virtual MeshPtr loadMesh(const QString& uid, const QString& fileName) = 0;
 	virtual MeshPtr getMesh(const QString& uid) const = 0;
 	virtual std::map<QString, MeshPtr> getMeshes() const = 0;
 
 	// data
 	virtual void loadData(DataPtr data) = 0;
 	virtual DataPtr loadData(const QString& uid, const QString& path) = 0;
-    virtual void saveData(DataPtr data, const QString& basePath) = 0; ///< Save data to file
     virtual std::map<QString, DataPtr> getData() const = 0;
 	virtual DataPtr getData(const QString& uid) const = 0;
 	virtual SpaceProviderPtr getSpaceProvider() = 0;

@@ -80,9 +80,6 @@ public:
 	virtual void setClinicalApplication(CLINICAL_VIEW application);
 
 	virtual void loadData(DataPtr data);
-	virtual void saveData(DataPtr data, const QString& basePath); ///< Save data to file
-	virtual void saveImage(ImagePtr image, const QString& basePath);///< Save image to file \param image Image to save \param basePath Absolute path to patient data folder
-	virtual void saveMesh(MeshPtr mesh, const QString& basePath);///< Save mesh to file \param mesh to save \param basePath Absolute path to patient data folder
 	virtual std::map<QString, VideoSourcePtr> getStreams() const;
 
 	virtual QString getActivePatientFolder() const;

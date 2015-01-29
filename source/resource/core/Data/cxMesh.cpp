@@ -35,8 +35,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkCellArray.h>
 #include <vtkPolyData.h>
+#include <vtkPolyDataWriter.h>
 #include <QDomDocument>
 #include <QColor>
+#include <QDir>
 #include "cxTypeConversions.h"
 #include "cxRegistrationTransform.h"
 #include "cxBoundingBox3D.h"
@@ -247,6 +249,18 @@ bool Mesh::isFiberBundle() const
 {
 	vtkPolyDataPtr poly = getVtkPolyData();
 	return poly->GetLines()->GetNumberOfCells() > 0 && poly->GetPolys()->GetNumberOfCells() == 0 && poly->GetStrips()->GetNumberOfCells() == 0;
+}
+
+void Mesh::save(const QString& basePath)
+{
+	vtkPolyDataWriterPtr writer = vtkPolyDataWriterPtr::New();
+	writer->SetInputData(this->getVtkPolyData());
+	QString filename = basePath + "/Images/" + this->getUid() + ".vtk";
+	this->setFilename(QDir(basePath).relativeFilePath(filename));
+	writer->SetFileName(cstring_cast(filename));
+
+	writer->Update();
+	writer->Write();
 }
 
 } // namespace cx

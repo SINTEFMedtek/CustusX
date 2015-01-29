@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImage.h"
 
 #include <QDomDocument>
+#include <QDir>
 #include <vtkImageAccumulate.h>
 #include <vtkImageReslice.h>
 #include <vtkImageData.h>
@@ -913,6 +914,14 @@ double Image::computeResampleFactor(long maxVoxels)
 		return factor;
 	}
 	return 1.0;
+}
+
+void Image::saveImage(const QString& basePath)
+{
+	QString filename = basePath + "/Images/" + this->getUid() + ".mhd";
+	this->setFilename(QDir(basePath).relativeFilePath(filename));
+
+	MetaImageReader().saveImage(ImagePtr(this), filename);
 }
 
 } // namespace cx

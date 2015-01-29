@@ -68,6 +68,16 @@ VideoSourcePtr TrackedStream::getVideoSource()
 	return mVideoSource;
 }
 
+void TrackedStream::addXml(QDomNode &dataNode)
+{
+	Data::addXml(dataNode);
+}
+
+void TrackedStream::parseXml(QDomNode &dataNode)
+{
+	Data::parseXml(dataNode);
+}
+
 DoubleBoundingBox3D TrackedStream::boundingBox() const
 {
 	DoubleBoundingBox3D bounds(mVideoSource->getVtkImageData()->GetBounds());

@@ -79,7 +79,7 @@ public:
 
 	void addXml(QDomNode& dataNode);
 	void parseXml(QDomNode& dataNode);
-	virtual bool load(QString path) { return true; } ///< metrics dont store info in file, xml only.
+	virtual bool load(QString path) { return true; } ///< metrics don't store info in file, xml only.
 
 protected:
 	PatientModelServicePtr mDataManager;
