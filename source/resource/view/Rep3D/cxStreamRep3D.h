@@ -39,7 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-//typedef boost::shared_ptr<class VideoGraphics> VideoGraphicsPtr;
 typedef boost::shared_ptr<class VideoSourceGraphics> VideoSourceGraphicsPtr;
 
 /** \brief Display a stream (2D/3D) in 3D
@@ -64,10 +63,8 @@ protected:
 	virtual void addRepActorsToViewRenderer(ViewPtr view);
 	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
 private slots:
-//	void newTransform(Transform3D prMt, double timestamp);
 	void newTool(ToolPtr tool);
 	void newVideoSource(VideoSourcePtr videoSource);
-//	void newFrame();
 private:
 	StreamRep3D(SpaceProviderPtr spaceProvider);
 
@@ -75,8 +72,6 @@ private:
 
 	SpaceProviderPtr mSpaceProvider;
 	VideoSourceGraphicsPtr mRTStream;
-
-//	VideoGraphicsPtr mPipeline;
 };
 
 } //cx
