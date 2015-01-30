@@ -39,13 +39,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-typedef boost::shared_ptr<class VideoGraphics> VideoGraphicsPtr;
+//typedef boost::shared_ptr<class VideoGraphics> VideoGraphicsPtr;
+typedef boost::shared_ptr<class VideoSourceGraphics> VideoSourceGraphicsPtr;
 
+/** \brief Display a stream (2D/3D) in 3D
+ *
+ * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_visualization_rep3D
+ *
+ * \date jan 29, 2015
+ * \author Ole Vegard Solberg, SINTEF
+ */
 class cxResourceVisualization_EXPORT StreamRep3D : public RepImpl
 {
 	Q_OBJECT
 public:
-	static StreamRep3DPtr New(QString uid="");
+	static StreamRep3DPtr New(SpaceProviderPtr spaceProvider, const QString &uid="");
 	virtual QString getType() const;
 
 	void setTrackedStream(TrackedStreamPtr trackedStream);
@@ -55,15 +64,19 @@ protected:
 	virtual void addRepActorsToViewRenderer(ViewPtr view);
 	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
 private slots:
-	void newTransform(Transform3D prMt, double timestamp);
+//	void newTransform(Transform3D prMt, double timestamp);
 	void newTool(ToolPtr tool);
 	void newVideoSource(VideoSourcePtr videoSource);
-	void newFrame();
+//	void newFrame();
 private:
-	StreamRep3D();
+	StreamRep3D(SpaceProviderPtr spaceProvider);
 
 	TrackedStreamPtr mTrackedStream;
-	VideoGraphicsPtr mPipeline;
+
+	SpaceProviderPtr mSpaceProvider;
+	VideoSourceGraphicsPtr mRTStream;
+
+//	VideoGraphicsPtr mPipeline;
 };
 
 } //cx

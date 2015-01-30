@@ -36,7 +36,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxStreamRep3D.h"
 #include "cxTrackedStream.h"
-#include "cxVideoGraphics.h"
+//#include "cxVideoGraphics.h"
+#include "cxVideoSourceGraphics.h"
 #include "cxView.h"
 #include "cxTool.h"
 
@@ -44,25 +45,30 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-StreamRep3DPtr StreamRep3D::New(QString uid)
+StreamRep3DPtr StreamRep3D::New(SpaceProviderPtr spaceProvider, const QString& uid)
 {
-	return wrap_new(new StreamRep3D(), uid);
+	return wrap_new(new StreamRep3D(spaceProvider), uid);
 }
 
-StreamRep3D::StreamRep3D() :
-	RepImpl(), mTrackedStream(TrackedStreamPtr())
+StreamRep3D::StreamRep3D(SpaceProviderPtr spaceProvider) :
+	RepImpl(),
+	mTrackedStream(TrackedStreamPtr()),
+	mSpaceProvider(spaceProvider)
 {
-	mPipeline.reset(new VideoGraphics());
+//	mPipeline.reset(new VideoGraphics());
+	mRTStream.reset(new VideoSourceGraphics(mSpaceProvider));
 }
 
 void StreamRep3D::addRepActorsToViewRenderer(ViewPtr view)
 {
-	view->getRenderer()->AddActor(mPipeline->getActor());
+//	view->getRenderer()->AddActor(mPipeline->getActor());
+	view->getRenderer()->AddActor(mRTStream->getActor());
 }
 
 void StreamRep3D::removeRepActorsFromViewRenderer(ViewPtr view)
 {
-	view->getRenderer()->RemoveActor(mPipeline->getActor());
+//	view->getRenderer()->RemoveActor(mPipeline->getActor());
+	view->getRenderer()->RemoveActor(mRTStream->getActor());
 }
 
 void StreamRep3D::setTrackedStream(TrackedStreamPtr trackedStream)
@@ -78,25 +84,27 @@ void StreamRep3D::setTrackedStream(TrackedStreamPtr trackedStream)
 
 void StreamRep3D::newTool(ToolPtr tool)
 {
-	if(tool)
-		connect(tool.get(), &Tool::toolTransformAndTimestamp, this, &StreamRep3D::newTransform);
+	mRTStream->setTool(tool);
+//	if(tool)
+//		connect(tool.get(), &Tool::toolTransformAndTimestamp, this, &StreamRep3D::newTransform);
 }
 
 void StreamRep3D::newVideoSource(VideoSourcePtr videoSource)
 {
 	if(videoSource)
 	{
-		mPipeline->setInputVideo(videoSource->getVtkImageData());
-		connect(videoSource.get(), &VideoSource::newFrame, this, &StreamRep3D::newFrame);
+		mRTStream->setRealtimeStream(videoSource);
+//		mPipeline->setInputVideo(videoSource->getVtkImageData());
+//		connect(videoSource.get(), &VideoSource::newFrame, this, &StreamRep3D::newFrame);
 	}
 }
 
-void StreamRep3D::newFrame()
-{
-	//TODO: See VideoSourceGraphics::newDataSlot()
-	mPipeline->update();
-	mPipeline->setVisibility(true);
-}
+//void StreamRep3D::newFrame()
+//{
+//	//TODO: See VideoSourceGraphics::newDataSlot()
+//	mPipeline->update();
+//	mPipeline->setVisibility(true);
+//}
 
 TrackedStreamPtr StreamRep3D::getTrackedStream()
 {
@@ -108,10 +116,10 @@ QString StreamRep3D::getType() const
 	return "StreamRep3D";
 }
 
-void StreamRep3D::newTransform(Transform3D prMt, double timestamp)
-{
-	//TODO: Calculate correct transform. See VideoSourceGraphics::receiveTransforms
-	mPipeline->setActorUserMatrix(prMt.getVtkMatrix());
-}
+//void StreamRep3D::newTransform(Transform3D prMt, double timestamp)
+//{
+//	//TODO: Calculate correct transform. See VideoSourceGraphics::receiveTransforms
+//	mPipeline->setActorUserMatrix(prMt.getVtkMatrix());
+//}
 
 } //cx

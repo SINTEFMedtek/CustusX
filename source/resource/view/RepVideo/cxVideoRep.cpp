@@ -61,7 +61,7 @@ VideoFixedPlaneRep::VideoFixedPlaneRep(const QString& uid, const QString& name) 
 	SpaceProviderPtr nullProvider;
 
 	mRTGraphics.reset(new VideoSourceGraphics(nullProvider));
-	connect(mRTGraphics.get(), SIGNAL(newData()), this, SLOT(newDataSlot()));
+	connect(mRTGraphics.get(), &VideoSourceGraphics::newData, this, &VideoFixedPlaneRep::newDataSlot);
 	mRTGraphics->setShowInToolSpace(false);
 	mRTGraphics->setClipToSector(false);
 

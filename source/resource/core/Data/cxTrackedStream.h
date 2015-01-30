@@ -39,11 +39,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-/**\brief A data set for video streams (2D/3D).
+/** \brief A data set for video streams (2D/3D).
  *
  * Allowing video stream as a data type
  *
  * \ingroup cx_resource_core_data
+ *
+ * \date jan 28, 2015
+ * \author Ole Vegard Solberg, SINTEF
  */
 class cxResource_EXPORT TrackedStream : public Data
 {
