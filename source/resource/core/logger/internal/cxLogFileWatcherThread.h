@@ -110,6 +110,7 @@ private:
 
 //	QString formatMessage(Message msg);
 	int getDefaultTimeout(MESSAGE_LEVEL messageLevel) const;
+	std::vector<Message> readMessages(const QString& path);
 
 	Message cleanupMessage(Message message);
 

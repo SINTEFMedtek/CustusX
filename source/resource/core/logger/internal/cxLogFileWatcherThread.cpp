@@ -86,22 +86,39 @@ void LogFileWatcherThread::onDirectoryChanged(const QString& path)
 		mWatcher.removePaths(mWatcher.files());
 
 	mInitializedFiles = current;
+	std::multimap<QDateTime, Message> messages;
 	for (int i=0; i<mInitializedFiles.size(); ++i)
 	{
 		QString filename = info.absoluteFilePath(mInitializedFiles[i]);
 		mWatcher.addPath(filename);
+		std::vector<Message> msg = this->readMessages(filename);
+		for (unsigned i=0; i<msg.size(); ++i)
+			messages.insert(std::make_pair(msg[i].mTimeStamp, msg[i]));
 		this->onFileChanged(filename);
 	}
+
+	for (std::multimap<QDateTime, Message>::iterator i=messages.begin(); i!=messages.end(); ++i)
+		this->processMessage(i->second);
 }
 
 void LogFileWatcherThread::onFileChanged(const QString& path)
+{
+//	if (!mFiles.count(path))
+//		mFiles[path] = LogFile::fromFilename(path);
+
+//	std::vector<Message> messages = mFiles[path].readMessages();
+	std::vector<Message> messages = this->readMessages(path);
+	for (unsigned i=0; i<messages.size(); ++i)
+		this->processMessage(messages[i]);
+}
+
+std::vector<Message> LogFileWatcherThread::readMessages(const QString& path)
 {
 	if (!mFiles.count(path))
 		mFiles[path] = LogFile::fromFilename(path);
 
 	std::vector<Message> messages = mFiles[path].readMessages();
-	for (unsigned i=0; i<messages.size(); ++i)
-		this->processMessage(messages[i]);
+	return messages;
 }
 
 void LogFileWatcherThread::setLoggingFolder(QString absoluteLoggingFolderPath)
