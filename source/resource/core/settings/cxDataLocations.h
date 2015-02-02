@@ -74,6 +74,7 @@ public:
 
   static QStringList appendStringToAllElements(QStringList root, QString suffix);
 
+  static QString findShaderFile(QString file, QString additionalLocation);
 private:
   static bool mTestMode;
   static QString readTestDataPathFromFile(QString filename);

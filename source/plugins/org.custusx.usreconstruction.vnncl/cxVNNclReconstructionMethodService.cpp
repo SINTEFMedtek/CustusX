@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVNNclReconstructionMethodService.h"
 #include "cxLogger.h"
 #include "recConfig.h"
+#include "cxDataLocations.h"
 
 namespace cx
 {
@@ -98,7 +99,8 @@ bool VNNclReconstructionMethodService::reconstruct(ProcessedUSInputDataPtr input
             QString("Method: %1, radius: %2, planeMethod: %3, nClosePlanes: %4, nPlanes: %5, nStarts: %6 ").arg(method).arg(
                     radius).arg(planeMethod).arg(nClosePlanes).arg(input->getDimensions()[2]).arg(nStarts));
 
-    if (!mAlgorithm->initCL(QString(VNNCL_KERNEL_PATH) + "/kernels.cl", nClosePlanes, input->getDimensions()[2], method, planeMethod, nStarts, newnessWeight, brightnessWeight))
+	QString kernel = DataLocations::findShaderFile("/kernels.cl", VNNCL_KERNEL_PATH);
+	if (!mAlgorithm->initCL(kernel, nClosePlanes, input->getDimensions()[2], method, planeMethod, nStarts, newnessWeight, brightnessWeight))
         return false;
 
     bool ret = mAlgorithm->reconstruct(input, outputData, radius, nClosePlanes);
