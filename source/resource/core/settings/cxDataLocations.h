@@ -71,6 +71,7 @@ public:
 
   static void setTestMode(); ///< set a testing mode that changes location of settings files to a temp folder.
 
+  static QString findShaderFile(QString file, QString additionalLocation);
 private:
   static bool mTestMode;
   static QString readTestDataPathFromFile(QString filename);

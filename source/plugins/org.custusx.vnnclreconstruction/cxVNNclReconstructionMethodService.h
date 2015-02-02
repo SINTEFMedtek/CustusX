@@ -165,8 +165,6 @@ protected:
     std::vector<QString> mPlaneMethods;
 
     VNNclAlgorithmPtr mAlgorithm;
-
-
 };
 typedef boost::shared_ptr<VNNclReconstructionMethodService> VNNclReconstructionMethodServicePtr;
 

@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSettings.h"
 #include "cxFileHelpers.h"
 #include "cxTypeConversions.h"
+#include "cxReporter.h"
 
 namespace cx
 {
@@ -228,6 +229,26 @@ QString DataLocations::getShaderPath()
   if (QDir(path).exists())
     return path;
   return "";
+}
+
+QString DataLocations::findShaderFile(QString file, QString additionalLocation)
+{
+	QString retval;
+	QStringList paths;
+	paths << additionalLocation << DataLocations::getShaderPath();
+
+	QFileInfo path;
+
+	for (unsigned i = 0; i < paths.size(); ++i)
+	{
+		path = QFileInfo(paths[i] + file);
+		if(path.exists())
+			retval = path.absoluteFilePath();
+	}
+	if (retval.isEmpty())
+		reportError("DataLocations::findShaderFile. Error: Can't find " + file + " in any of\n" + paths.join("  \n"));
+
+	return retval;
 }
 
 namespace
