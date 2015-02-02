@@ -636,7 +636,7 @@ RegistrationHistoryPtr DataManagerImpl::get_rMpr_History() const
 PresetTransferFunctions3DPtr DataManagerImpl::getPresetTransferFunctions3D() const
 {
 	///< create from filename, create trivial document of type name and root node if no file exists.
-	XmlOptionFile preset(DataLocations::getExistingConfigPath("/transferFunctions", "", "presets.xml"));
+	XmlOptionFile preset(DataLocations::findConfigFile("presets.xml", "/transferFunctions"));
 	XmlOptionFile custom = profile()->getXmlSettings().descend("presetTransferFunctions");
 
 	if (!mPresetTransferFunctions3D)

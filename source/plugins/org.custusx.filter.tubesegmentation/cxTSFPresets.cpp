@@ -45,7 +45,7 @@ namespace cx
 TSFPresets::TSFPresets() :
 		Presets(XmlOptionFile("Preset"), XmlOptionFile("Custom"))
 {
-	mPresetPath = cx::DataLocations::getExistingConfigPath("/tsf", QString(KERNELS_DIR)) + "/parameters";
+	mPresetPath = cx::DataLocations::findConfigFile("", "/tsf", QString(KERNELS_DIR)) + "/parameters";
 	this->loadPresetsFromFiles();
 }
 

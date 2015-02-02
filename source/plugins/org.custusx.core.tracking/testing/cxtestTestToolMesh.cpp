@@ -43,7 +43,7 @@ TestToolMesh::TestToolMesh()
 
 void TestToolMesh::setToolPath(QString path)
 {
-	mCurrentToolPath = cx::DataLocations::getExistingConfigPath("/tool/Tools/"+path, "");
+	mCurrentToolPath = cx::DataLocations::findConfigFile("", "/tool/Tools/"+path);
 //	mCurrentToolPath = mToolToolPath + path;
 }
 

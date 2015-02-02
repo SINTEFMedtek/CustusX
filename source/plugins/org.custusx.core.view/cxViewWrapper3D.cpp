@@ -223,7 +223,7 @@ void ViewWrapper3D::settingsChangedSlot(QString key)
 	if ((key == "View3D/annotationModelSize" )||( key == "View3D/annotationModel"))
 	{
 		QString annotationFile = settings()->value("View3D/annotationModel").toString();
-		mAnnotationMarker->setMarkerFilename(DataLocations::getExistingConfigPath("/models", "", annotationFile));
+		mAnnotationMarker->setMarkerFilename(DataLocations::findConfigFile(annotationFile, "/models"));
 		mAnnotationMarker->setSize(settings()->value("View3D/annotationModelSize").toDouble());
 	}
 	if (key == "showManualTool")

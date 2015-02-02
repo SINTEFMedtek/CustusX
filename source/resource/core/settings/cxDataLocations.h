@@ -67,14 +67,12 @@ public:
 	static QString getCachePath(); ///< return path to a folder that is used during execution, will be cleared at start and stop.
 	static QStringList getDefaultPluginsPath(); ///< return the folder where plugins should be located, by default.
 
-	static QString getExistingConfigPath(QString pathRelativeToConfigRoot, QString alternativeAbsolutePath, QString filename=""); ///< Return folder path. Path is typically either relative to config root (created during installation), or an alternative absolute path (typically in the source tree)
-
   static void setTestMode(); ///< set a testing mode that changes location of settings files to a temp folder.
   static QString findExecutableInStandardLocations(QString filename); ///< look for an exe in the same folder as the executable or bundle.
 
   static QStringList appendStringToAllElements(QStringList root, QString suffix);
 
-  static QString findShaderFile(QString file, QString additionalLocation);
+  static QString findConfigFile(QString fileName, QString pathRelativeToConfigRoot, QString alternativeAbsolutePath = "");
 private:
   static bool mTestMode;
   static QString readTestDataPathFromFile(QString filename);

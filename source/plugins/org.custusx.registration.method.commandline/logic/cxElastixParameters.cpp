@@ -54,7 +54,7 @@ ElastixParameters::ElastixParameters(XmlOptionFile options)
 
 void ElastixParameters::addDefaultPresets()
 {
-	QString defaultExecutable = cx::DataLocations::getExistingConfigPath("/elastix/bin", "", "run_elastix.sh");
+	QString defaultExecutable = cx::DataLocations::findConfigFile("run_elastix.sh", "/elastix/bin");
     this->addDefaultPreset("elastix/p_Rigid", defaultExecutable, QStringList() << "p_Rigid.txt");
 }
 
@@ -87,7 +87,7 @@ void ElastixParameters::currentPresetChangedSlot()
 
 QString ElastixParameters::getFullParameterFilename(QString filename)
 {
-	return DataLocations::getExistingConfigPath("elastix/parameterFiles", "", filename);
+	return DataLocations::findConfigFile(filename, "elastix/parameterFiles");
 }
 
 QStringList ElastixParameters::getParameterFilesDir() const

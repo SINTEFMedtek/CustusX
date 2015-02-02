@@ -99,7 +99,7 @@ bool VNNclReconstructionMethodService::reconstruct(ProcessedUSInputDataPtr input
             QString("Method: %1, radius: %2, planeMethod: %3, nClosePlanes: %4, nPlanes: %5, nStarts: %6 ").arg(method).arg(
                     radius).arg(planeMethod).arg(nClosePlanes).arg(input->getDimensions()[2]).arg(nStarts));
 
-	QString kernel = DataLocations::findShaderFile("/kernels.cl", VNNCL_KERNEL_PATH);
+	QString kernel = DataLocations::findConfigFile("/kernels.cl", "/shaders", VNNCL_KERNEL_PATH);
 	if (!mAlgorithm->initCL(kernel, nClosePlanes, input->getDimensions()[2], method, planeMethod, nStarts, newnessWeight, brightnessWeight))
         return false;
 

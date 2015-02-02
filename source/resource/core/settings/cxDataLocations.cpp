@@ -216,26 +216,6 @@ QString DataLocations::getShaderPath()
   return "";
 }
 
-QString DataLocations::findShaderFile(QString file, QString additionalLocation)
-{
-	QString retval;
-	QStringList paths;
-	paths << additionalLocation << DataLocations::getShaderPath();
-
-	QFileInfo path;
-
-	for (unsigned i = 0; i < paths.size(); ++i)
-	{
-		path = QFileInfo(paths[i] + file);
-		if(path.exists())
-			retval = path.absoluteFilePath();
-	}
-	if (retval.isEmpty())
-		reportError("DataLocations::findShaderFile. Error: Can't find " + file + " in any of\n" + paths.join("  \n"));
-
-	return retval;
-}
-
 namespace
 {
 QString changeExtension(QString name, QString ext)
@@ -252,18 +232,23 @@ QString DataLocations::getCachePath()
     return path;
 }
 
-QString DataLocations::getExistingConfigPath(QString pathRelativeToConfigRoot, QString alternativeAbsolutePath, QString filename)
+QString DataLocations::findConfigFile(QString fileName, QString pathRelativeToConfigRoot, QString alternativeAbsolutePath)
 {
+	QStringList paths;
 	foreach (QString root, getRootConfigPaths())
 	{
-		QString path = root + "/" + pathRelativeToConfigRoot + "/" + filename;
+		QString path = root + "/" + pathRelativeToConfigRoot + "/" + fileName;
+		paths << path;
 		if (QFileInfo(path).exists())
 			return path;
 	}
 
-	if (QFileInfo(alternativeAbsolutePath + "/" + filename).exists())
+	QString path = QString(alternativeAbsolutePath + "/" + fileName);
+	paths << path;
+	if (QFileInfo(path).exists())
 		return alternativeAbsolutePath;
 
+	reportWarning("DataLocations::findConfigFile. Error: Can't find " + fileName + " in any of\n" + paths.join("  \n"));
 	return "";
 }
 
