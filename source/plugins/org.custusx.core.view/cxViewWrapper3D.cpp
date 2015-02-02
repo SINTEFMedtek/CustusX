@@ -631,7 +631,8 @@ RepPtr ViewWrapper3D::createDataRep3D(DataPtr data)
 	}
 	else if (boost::dynamic_pointer_cast<TrackedStream>(data))
 	{
-		StreamRep3DPtr rep = StreamRep3D::New(mBackend->getSpaceProvider());
+		StreamRep3DPtr rep = StreamRep3D::New(mBackend->getSpaceProvider(), mBackend->getPatientService());
+		rep->setUseVolumeTextureMapper();//Test
 		rep->setTrackedStream(boost::dynamic_pointer_cast<TrackedStream>(data));
 		return rep;
 	}

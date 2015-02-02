@@ -98,4 +98,12 @@ QString TrackedStream::getTypeName()
 	return "TrackedStream";
 }
 
+ImagePtr TrackedStream::createImage()
+{
+	if(!mVideoSource)
+		return ImagePtr();
+	ImagePtr image(new Image(this->getUid()+"_test", mVideoSource->getVtkImageData(), this->getName()));
+	return image;
+}
+
 } //cx

@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //#include "boost/shared_ptr.hpp"
 #include <vtkRenderer.h>
+#include <vtkVolumeMapper.h>
+#include <vtkImageData.h>
 
 #include "cxStreamRep3D.h"
 #include "cxTrackedStream.h"
@@ -40,33 +42,39 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVideoSourceGraphics.h"
 #include "cxView.h"
 #include "cxTool.h"
+#include "cxPatientModelService.h"
 
 
 namespace cx
 {
 
-StreamRep3DPtr StreamRep3D::New(SpaceProviderPtr spaceProvider, const QString& uid)
+StreamRep3DPtr StreamRep3D::New(SpaceProviderPtr spaceProvider, PatientModelServicePtr patientModelService, const QString& uid)
 {
-	return wrap_new(new StreamRep3D(spaceProvider), uid);
+	return wrap_new(new StreamRep3D(spaceProvider, patientModelService), uid);
 }
 
-StreamRep3D::StreamRep3D(SpaceProviderPtr spaceProvider) :
-	RepImpl(),
+StreamRep3D::StreamRep3D(SpaceProviderPtr spaceProvider, PatientModelServicePtr patientModelService) :
+//	RepImpl(),
+	VolumetricRep(),
 	mTrackedStream(TrackedStreamPtr()),
-	mSpaceProvider(spaceProvider)
+	mPatientModelService(patientModelService)
+//	mSpaceProvider(spaceProvider),
 {
-	mRTStream.reset(new VideoSourceGraphics(mSpaceProvider));
+//	mRTStream.reset(new VideoSourceGraphics(mSpaceProvider));
 }
 
-void StreamRep3D::addRepActorsToViewRenderer(ViewPtr view)
-{
-	view->getRenderer()->AddActor(mRTStream->getActor());
-}
 
-void StreamRep3D::removeRepActorsFromViewRenderer(ViewPtr view)
-{
-	view->getRenderer()->RemoveActor(mRTStream->getActor());
-}
+//void StreamRep3D::addRepActorsToViewRenderer(ViewPtr view)
+//{
+////	view->getRenderer()->AddActor(mRTStream->getActor());
+//	view->getRenderer()->AddVolume(mVolume);
+//}
+
+//void StreamRep3D::removeRepActorsFromViewRenderer(ViewPtr view)
+//{
+////	view->getRenderer()->RemoveActor(mRTStream->getActor());
+//	view->getRenderer()->RemoveVolume(mVolume);
+//}
 
 void StreamRep3D::setTrackedStream(TrackedStreamPtr trackedStream)
 {
@@ -81,13 +89,26 @@ void StreamRep3D::setTrackedStream(TrackedStreamPtr trackedStream)
 
 void StreamRep3D::newTool(ToolPtr tool)
 {
-	mRTStream->setTool(tool);
+//	mRTStream->setTool(tool);
 }
 
 void StreamRep3D::newVideoSource(VideoSourcePtr videoSource)
 {
-	mRTStream->setRealtimeStream(videoSource);
+	if(!videoSource)
+		return;
+//	mRTStream->setRealtimeStream(videoSource);
 
+//	if(videoSource)
+//	{
+//		vtkImageDataPtr vtkImage = videoSource->getVtkImageData();
+//		mMapper->SetInputData(vtkImage);
+//		ImagePtr image(new Image(mTrackedStream->getUid(), vtkImage, mTrackedStream->getName()));
+//		this->setImage(image);
+//		patientService()->insertData(retval);
+//	}
+	ImagePtr image = mTrackedStream->createImage();//TODO:
+	this->setImage(image);
+	mPatientModelService->insertData(image);
 }
 
 TrackedStreamPtr StreamRep3D::getTrackedStream()

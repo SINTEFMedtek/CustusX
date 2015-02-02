@@ -69,6 +69,7 @@ public:
 	virtual QString getType() const;
 	static QString getTypeName();
 
+	ImagePtr createImage();
 signals:
 	void streamChanged();
 	void newTool(ToolPtr tool);

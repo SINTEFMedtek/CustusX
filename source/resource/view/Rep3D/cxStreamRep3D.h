@@ -33,7 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSTREAMREP3D_H
 #define CXSTREAMREP3D_H
 
-#include "cxRepImpl.h"
+//#include "cxRepImpl.h"
+#include "cxVolumetricRep.h"
 #include "cxForwardDeclarations.h"
 #include "cxTransform3D.h"
 
@@ -49,29 +50,31 @@ typedef boost::shared_ptr<class VideoSourceGraphics> VideoSourceGraphicsPtr;
  * \date jan 29, 2015
  * \author Ole Vegard Solberg, SINTEF
  */
-class cxResourceVisualization_EXPORT StreamRep3D : public RepImpl
+class cxResourceVisualization_EXPORT StreamRep3D : public VolumetricRep
 {
 	Q_OBJECT
 public:
-	static StreamRep3DPtr New(SpaceProviderPtr spaceProvider, const QString &uid="");
+	static StreamRep3DPtr New(SpaceProviderPtr spaceProvider, PatientModelServicePtr patientModelService, const QString &uid="");
 	virtual QString getType() const;
 
 	void setTrackedStream(TrackedStreamPtr trackedStream);
 	TrackedStreamPtr getTrackedStream();
 
 protected:
-	virtual void addRepActorsToViewRenderer(ViewPtr view);
-	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
+//	virtual void addRepActorsToViewRenderer(ViewPtr view);
+//	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
 private slots:
 	void newTool(ToolPtr tool);
 	void newVideoSource(VideoSourcePtr videoSource);
 private:
-	StreamRep3D(SpaceProviderPtr spaceProvider);
+	StreamRep3D(SpaceProviderPtr spaceProvider, PatientModelServicePtr patientModelService);
 
 	TrackedStreamPtr mTrackedStream;
 
-	SpaceProviderPtr mSpaceProvider;
-	VideoSourceGraphicsPtr mRTStream;
+//	SpaceProviderPtr mSpaceProvider;
+//	VideoSourceGraphicsPtr mRTStream;
+
+	PatientModelServicePtr mPatientModelService;
 };
 
 } //cx
