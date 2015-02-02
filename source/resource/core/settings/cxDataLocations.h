@@ -70,7 +70,8 @@ public:
 
   static QStringList appendStringToAllElements(QStringList root, QString suffix);
 
-  static QString findConfigFile(QString fileName, QString pathRelativeToConfigRoot, QString alternativeAbsolutePath = "");
+  static QString findConfigFilePath(QString fileName, QString pathRelativeToConfigRoot, QString alternativeAbsolutePath = "");
+  static QString findConfigPath(QString fileName, QString pathRelativeToConfigRoot, QString alternativeAbsolutePath = "");
 private:
   static bool mTestMode;
   static QString readTestDataPathFromFile(QString filename);

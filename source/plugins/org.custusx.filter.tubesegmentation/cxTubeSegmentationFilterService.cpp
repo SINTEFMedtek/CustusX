@@ -155,8 +155,8 @@ bool TubeSegmentationFilter::execute()
 		std::cout << "Input: " <<  input->getName().toStdString() << std::endl;
 		std::cout << "Preset: " <<  getParamStr(mParameters, "parameters") << std::endl;
 		std::cout << "Centerline-method: " <<  getParamStr(mParameters, "centerline-method") << std::endl;
-		QString kernelDir = cx::DataLocations::findConfigFile("", "/tsf", KERNELS_DIR);
-		QString oulDir = cx::DataLocations::findConfigFile("", "/tsf", OUL_DIR);
+		QString kernelDir = cx::DataLocations::findConfigFilePath("", "/tsf", KERNELS_DIR);
+		QString oulDir = cx::DataLocations::findConfigFilePath("", "/tsf", OUL_DIR);
 		std::cout << "Kernel paths: " << kernelDir.toStdString();
 		std::cout << " and " << oulDir.toStdString() << std::endl;
 		std::cout << "--------------" << std::endl;
@@ -464,7 +464,7 @@ void TubeSegmentationFilter::loadNewParametersSlot()
 		try
 		{
 			setParameter(list, "parameters", mParameterFile.toStdString());
-			loadParameterPreset(list, cx::DataLocations::findConfigFile("", "/tsf", QString(KERNELS_DIR)).toStdString()+"/parameters");
+			loadParameterPreset(list, cx::DataLocations::findConfigFilePath("", "/tsf", QString(KERNELS_DIR)).toStdString()+"/parameters");
 		} catch (SIPL::SIPLException& e)
 		{
 			reportWarning("Error when loading a parameter file. Preset is corrupt. "+QString(e.what()));
@@ -891,7 +891,7 @@ paramList TubeSegmentationFilter::getDefaultParameters()
 	//get list with default options
 	paramList defaultOptions;
 	try{
-		defaultOptions = initParameters(cx::DataLocations::findConfigFile("", "/tsf", QString(KERNELS_DIR)).toStdString() + "/parameters");
+		defaultOptions = initParameters(cx::DataLocations::findConfigFilePath("", "/tsf", QString(KERNELS_DIR)).toStdString() + "/parameters");
 	} catch (SIPL::SIPLException& e){
 		std::string message = "When creating default options, could not init parameters. \""+std::string(e.what())+"\"";
 		reportError(qstring_cast(message));

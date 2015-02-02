@@ -223,7 +223,7 @@ void ViewWrapper3D::settingsChangedSlot(QString key)
 	if ((key == "View3D/annotationModelSize" )||( key == "View3D/annotationModel"))
 	{
 		QString annotationFile = settings()->value("View3D/annotationModel").toString();
-		mAnnotationMarker->setMarkerFilename(DataLocations::findConfigFile(annotationFile, "/models"));
+		mAnnotationMarker->setMarkerFilename(DataLocations::findConfigFilePath(annotationFile, "/models"));
 		mAnnotationMarker->setSize(settings()->value("View3D/annotationModelSize").toDouble());
 	}
 	if (key == "showManualTool")
@@ -759,7 +759,7 @@ void ViewWrapper3D::updateSlices()
 	mSlices3DRep = Slices3DRep::New("MultiSliceRep_" + mView->getName());
 	for (unsigned i=0; i<planes.size(); ++i)
 		mSlices3DRep->addPlane(planes[i], mBackend->getPatientService());
-	mSlices3DRep->setShaderPath(DataLocations::findConfigFile("", "/shaders"));
+	mSlices3DRep->setShaderPath(DataLocations::findConfigFilePath("", "/shaders"));
 	mSlices3DRep->setImages(images);
 	mSlices3DRep->setTool(mBackend->getToolManager()->getActiveTool());
 
