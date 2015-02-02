@@ -232,7 +232,7 @@ QString DataLocations::findConfigFile(QString fileName, QString pathRelativeToCo
 	QString path = QString(alternativeAbsolutePath + "/" + fileName);
 	paths << path;
 	if (QFileInfo(path).exists())
-		return alternativeAbsolutePath;
+		return path;
 
 	reportWarning("DataLocations::findConfigFile. Error: Can't find " + fileName + " in any of\n" + paths.join("  \n"));
 	return "";
