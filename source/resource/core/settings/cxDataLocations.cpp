@@ -202,20 +202,6 @@ QStringList DataLocations::appendStringToAllElements(QStringList root, QString s
 	return retval;
 }
 
-QString DataLocations::getAudioConfigFilePath()
-{
-  QString path(getRootConfigPath()+"/audio/");
-  return path;
-}
-  
-QString DataLocations::getShaderPath()
-{
-  QString path = getRootConfigPath()+"/shaders";
-  if (QDir(path).exists())
-    return path;
-  return "";
-}
-
 namespace
 {
 QString changeExtension(QString name, QString ext)

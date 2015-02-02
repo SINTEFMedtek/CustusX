@@ -61,8 +61,6 @@ public:
   static QString getExistingTestData(QString pathRelativeToTestDataRoot, QString filename=""); ///< Return full path to test data, both normal and large repositories are searched.
 
   static QString getDocPath(); ///< return path to folder containing documentation files
-  static QString getAudioConfigFilePath(); ///< return users path to audio config file
-  static QString getShaderPath(); ///< return the path to installed shaders. empty string if not installed.
   static QString getPersistentWritablePath(); ///< Path to location usable for persistent and temporary storage of config. Do not use directly, prefer to create methods displaying subpaths.
 	static QString getCachePath(); ///< return path to a folder that is used during execution, will be cleared at start and stop.
 	static QStringList getDefaultPluginsPath(); ///< return the folder where plugins should be located, by default.
