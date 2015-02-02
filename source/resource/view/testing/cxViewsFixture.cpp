@@ -69,7 +69,7 @@ ViewsFixture::ViewsFixture(QString displayText)
 	mServices = cxtest::TestServices::create();
 	mMessageListener = cx::MessageListener::createWithQueue();
 
-	mShaderFolder = cx::DataLocations::findConfigFilePath("", "/shaders");
+	mShaderFolder = cx::DataLocations::findConfigFolder("/shaders");
 
 	// Initialize dummy toolmanager.
 	mServices->trackingService()->setState(cx::Tool::tsTRACKING);

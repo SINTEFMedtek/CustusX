@@ -73,7 +73,7 @@ void AudioInternal::playSoundSlot(QString file)
 		return;
 
 	if (!QFileInfo(file).isAbsolute())
-		file = QString("%1/%2").arg(DataLocations::findConfigFilePath("", "/audio/")).arg(file);
+		file = QString("%1/%2").arg(DataLocations::findConfigFolder("/audio/")).arg(file);
 
 	if (!QFileInfo(file).exists())
 	{

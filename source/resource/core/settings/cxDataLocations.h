@@ -70,6 +70,7 @@ public:
 
   static QStringList appendStringToAllElements(QStringList root, QString suffix);
 
+  static QString findConfigFolder(QString pathRelativeToConfigRoot, QString alternativeAbsolutePath = "");
   static QString findConfigFilePath(QString fileName, QString pathRelativeToConfigRoot, QString alternativeAbsolutePath = "");
   static QString findConfigPath(QString fileName, QString pathRelativeToConfigRoot, QString alternativeAbsolutePath = "");
 private:

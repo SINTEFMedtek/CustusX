@@ -218,10 +218,15 @@ QString DataLocations::getCachePath()
     return path;
 }
 
+QString DataLocations::findConfigFolder(QString pathRelativeToConfigRoot, QString alternativeAbsolutePath)
+{
+	return findConfigPath("", pathRelativeToConfigRoot, alternativeAbsolutePath);
+}
+
 QString DataLocations::findConfigPath(QString fileName, QString pathRelativeToConfigRoot, QString alternativeAbsolutePath)
 {
 	QFileInfo filePath(findConfigFilePath(fileName, pathRelativeToConfigRoot, alternativeAbsolutePath));
-	return filePath.absolutePath();
+	return filePath.absolutePath() + "/";
 }
 
 QString DataLocations::findConfigFilePath(QString fileName, QString pathRelativeToConfigRoot, QString alternativeAbsolutePath)

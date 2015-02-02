@@ -759,7 +759,7 @@ void ViewWrapper3D::updateSlices()
 	mSlices3DRep = Slices3DRep::New("MultiSliceRep_" + mView->getName());
 	for (unsigned i=0; i<planes.size(); ++i)
 		mSlices3DRep->addPlane(planes[i], mBackend->getPatientService());
-	mSlices3DRep->setShaderPath(DataLocations::findConfigFilePath("", "/shaders"));
+	mSlices3DRep->setShaderPath(DataLocations::findConfigFolder("/shaders"));
 	mSlices3DRep->setImages(images);
 	mSlices3DRep->setTool(mBackend->getToolManager()->getActiveTool());
 
