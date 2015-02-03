@@ -158,6 +158,7 @@ private slots:
 //	void lineWrappingSlot(bool checked);
 	void onChannelSelectorChanged();
 	void receivedMessage(Message message);
+	void receivedChannel(QString channel);
 
 	void onSeverityUp();
 	void onSeverityDown();

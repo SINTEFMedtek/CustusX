@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogMessage.h"
 #include <QList>
 #include <QThread>
-#include "cxLogFileWatcherThread.h"
+#include "cxLogThread.h"
 
 class QString;
 class QDomNode;
@@ -68,8 +68,6 @@ class QTextStream;
 
 namespace cx
 {
-typedef boost::shared_ptr<class MessageObserver> MessageObserverPtr;
-typedef boost::shared_ptr<class MessageRepository> MessageRepositoryPtr;
 
 /**\brief Thread for log handling. Used inside Reporter.
  *

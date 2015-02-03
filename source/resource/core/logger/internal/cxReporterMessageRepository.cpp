@@ -39,16 +39,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
+void MessageObserver::sendMessage(const Message& message)
+{
+	if (!mChannels.contains(message.mChannel))
+	{
+		mChannels.append(message.mChannel);
+		emit newChannel(message.mChannel);
+	}
+
+	if (this->testFilter(message))
+		emit newMessage(message);
+}
+
 bool MessageObserver::testFilter(const Message &msg) const
 {
 	if (!mFilter)
 		return true; // always succeed with no filter.
 	return (*mFilter)(msg);
 }
-void MessageObserver::sendMessage(Message message)
-{
-	emit newMessage(message);
-}
+
 void MessageObserver::installFilter(MessageFilterPtr filter)
 {
 	// Clone to ensure filter is standalone
@@ -95,15 +104,7 @@ void MessageRepository::limitQueueSize()
 void MessageRepository::emitThroughFilter(const Message& message)
 {
 	for (unsigned i=0; i<mObservers.size(); ++i)
-	{
-		this->emitThroughFilter(mObservers[i], message);
-	}
-}
-
-void MessageRepository::emitThroughFilter(MessageObserverPtr observer, const Message& message)
-{
-	if (observer->testFilter(message))
-		observer->sendMessage(message);
+		mObservers[i]->sendMessage(message);
 }
 
 void MessageRepository::install(MessageObserverPtr observer, bool resend)
@@ -115,7 +116,7 @@ void MessageRepository::install(MessageObserverPtr observer, bool resend)
 	if (resend)
 	{
 		for (QList<Message>::iterator i=mMessages.begin(); i!=mMessages.end(); ++i)
-			this->emitThroughFilter(observer, *i);
+			observer->sendMessage(*i);
 	}
 }
 

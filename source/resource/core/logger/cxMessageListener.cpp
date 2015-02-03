@@ -72,6 +72,7 @@ MessageListener::MessageListener(LogQPointer log) :
 
 	mObserver.reset(new MessageObserver());
 	connect(mObserver.get(), &MessageObserver::newMessage, this, &MessageListener::messageReceived);
+	connect(mObserver.get(), &MessageObserver::newChannel, this, &MessageListener::newChannel);
 
 	mManager->installObserver(mObserver, false);
 }

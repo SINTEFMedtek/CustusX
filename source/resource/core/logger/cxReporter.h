@@ -63,8 +63,6 @@ class QTextStream;
 
 namespace cx
 {
-typedef boost::shared_ptr<class MessageObserver> MessageObserverPtr;
-typedef boost::shared_ptr<class MessageListener> MessageListenerPtr;
 
 /** \brief Logging service.
  *

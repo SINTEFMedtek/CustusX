@@ -69,8 +69,6 @@ class QTextStream;
 
 namespace cx
 {
-typedef boost::shared_ptr<class MessageObserver> MessageObserverPtr;
-typedef boost::shared_ptr<class MessageRepository> MessageRepositoryPtr;
 class LogFile;
 
 /**\brief Thread for log handling. Used inside LogFileWatcher.
@@ -90,7 +88,6 @@ public:
 	virtual void uninstallObserver(MessageObserverPtr observer);
 
 public slots:
-//	void logMessage(Message msg);
 	void pendingAction();
 
 private slots:
@@ -106,9 +103,7 @@ private:
 	PendingActionType popAction();
 	void invokePendingAction();
 	void executeSetLoggingFolder(QString absoluteLoggingFolderPath);
-//	QString readFileTail(const QString& path);
 
-//	QString formatMessage(Message msg);
 	int getDefaultTimeout(MESSAGE_LEVEL messageLevel) const;
 	std::vector<Message> readMessages(const QString& path);
 
@@ -118,7 +113,6 @@ private:
 	QString mLogPath;
 	MessageRepositoryPtr mRepository;
 	QStringList mInitializedFiles;
-//	std::map<QString, int> mFilePositions;
 	std::map<QString, LogFile> mFiles;
 };
 

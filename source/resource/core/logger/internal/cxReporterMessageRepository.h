@@ -57,10 +57,9 @@ class MessageObserver : public QObject
 	Q_OBJECT
 public:
 	/** Required by MessageRepository
-	 *  return true if msg is accepted by filter.
+	 *  Send message/channel changes to listeners.
 	 */
-	bool testFilter(const Message &msg) const;
-	void sendMessage(Message message);
+	void sendMessage(const Message& message);
 	/** Install a filter for use in the reporter.
 	 *  The filter will be cloned, i.e. call after every modification of filter.
 	 *
@@ -70,8 +69,12 @@ public:
 
 signals:
 	void newMessage(Message message);
+	void newChannel(QString channel);
 private:
+	bool testFilter(const Message &msg) const;
+
 	MessageFilterPtr mFilter;
+	QStringList mChannels;
 };
 
 typedef boost::shared_ptr<class MessageObserver> MessageObserverPtr;
@@ -81,7 +84,7 @@ typedef boost::shared_ptr<class MessageRepository> MessageRepositoryPtr;
 /** Utility for listening to the Reporter
   * and storing messages from it.
   *
-  * Messages are passed throught MessageFilter before being
+  * Messages are passed through MessageFilter before being
   * emitted from this class.
   *
  * \ingroup cx_resource_core_logger
@@ -104,7 +107,6 @@ private:
 	MessageRepository();
 	void limitQueueSize();
 	void emitThroughFilter(const Message& message);
-	void emitThroughFilter(MessageObserverPtr observer, const Message& message);
 	QList<Message> mMessages;
 	std::vector<MessageObserverPtr> mObservers;
 	int mMessageHistoryMaxSize;

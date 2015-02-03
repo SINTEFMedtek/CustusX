@@ -474,6 +474,7 @@ void ConsoleWidget::createUI()
 	mMessageFilter.reset(new MessageFilterConsole);
 	mMessageListener->installFilter(mMessageFilter);
 	connect(mMessageListener.get(), &MessageListener::newMessage, this, &ConsoleWidget::receivedMessage);
+	connect(mMessageListener.get(), &MessageListener::newChannel, this, &ConsoleWidget::receivedChannel);
 
 	QString defVal = enum2string<LOG_SEVERITY>(msINFO);
 	LOG_SEVERITY value = string2enum<LOG_SEVERITY>(this->option("showLevel").readValue(defVal));
@@ -771,13 +772,23 @@ void ConsoleWidget::showEvent(QShowEvent* event)
 		mMessagesWidget->normalize();
 }
 
-void ConsoleWidget::receivedMessage(Message message)
+void ConsoleWidget::receivedChannel(QString channel)
 {
-	if (!mChannels.count(message.mChannel))
+	if (!mChannels.count(channel))
 	{
-		mChannels.append(message.mChannel);
+		mChannels.append(channel);
 		mChannelSelector->setValueRange(mChannels);
 	}
+}
+
+void ConsoleWidget::receivedMessage(Message message)
+{
+	this->receivedChannel(message.mChannel);
+//	if (!mChannels.count(message.mChannel))
+//	{
+//		mChannels.append(message.mChannel);
+//		mChannelSelector->setValueRange(mChannels);
+//	}
 
 	this->printMessage(message);
 }
