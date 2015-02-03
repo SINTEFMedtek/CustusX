@@ -177,7 +177,7 @@ public:
 
 	vtkImageDataPtr resample(long maxVoxels);
 
-	virtual void saveImage(const QString &basePath);
+	virtual void save(const QString &basePath);
 signals:
 	void vtkImageDataChanged(); ///< emitted when the vktimagedata are invalidated and must be retrieved anew.
 	void transferFunctionsChanged(); ///< emitted when image transfer functions in 2D or 3D are changed.

@@ -916,7 +916,7 @@ double Image::computeResampleFactor(long maxVoxels)
 	return 1.0;
 }
 
-void Image::saveImage(const QString& basePath)
+void Image::save(const QString& basePath)
 {
 	QString filename = basePath + "/Images/" + this->getUid() + ".mhd";
 	this->setFilename(QDir(basePath).relativeFilePath(filename));
