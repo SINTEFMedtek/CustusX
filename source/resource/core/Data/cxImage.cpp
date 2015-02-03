@@ -921,7 +921,8 @@ void Image::save(const QString& basePath)
 	QString filename = basePath + "/Images/" + this->getUid() + ".mhd";
 	this->setFilename(QDir(basePath).relativeFilePath(filename));
 
-	MetaImageReader().saveImage(ImagePtr(this), filename);
+	ImagePtr self = ImagePtr(this, null_deleter());
+	MetaImageReader().saveImage(self, filename);
 }
 
 } // namespace cx

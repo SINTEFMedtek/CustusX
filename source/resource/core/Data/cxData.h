@@ -98,12 +98,12 @@ public:
 	virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels
 	virtual void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
 
-	//Consider removing this, as it is only implemented in Mesh and Image
+	//Consider removing this, as these are only implemented in Mesh and Image
 	virtual bool load(QString path) = 0;
+	virtual void save(const QString& basePath) = 0;
 
 	virtual CoordinateSystem getCoordinateSystem();
 
-	virtual void save(const QString& basePath) {}
 
 signals:
 	void transformChanged(); ///< emitted when transform is changed
