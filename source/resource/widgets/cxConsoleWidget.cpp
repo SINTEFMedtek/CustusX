@@ -57,11 +57,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QApplication>
 #include <QClipboard>
 #include "cxNullDeleter.h"
-
-#include "ctkPopupWidget.h"
-#include "ctkExpandButton.h"
 #include <QPushButton>
 #include "cxProfile.h"
+#include "cxTime.h"
 
 namespace cx
 {
@@ -311,6 +309,7 @@ QString SimpleLogMessageDisplayWidget::getCompactMessage(Message message)
 
 	QString retval;
 	retval= QString("[%1] %2")
+//			.arg(message.mTimeStamp.toString(timestampSecondsFormatNice()))
 			.arg(message.mTimeStamp.toString("hh:mm"))
 			.arg(message.mText);
 	return retval;
@@ -399,7 +398,6 @@ void PopupButton::onTriggered()
 
 ConsoleWidget::ConsoleWidget(QWidget* parent, QString uid, QString name, XmlOptionFile options, LogPtr log) :
 	BaseWidget(parent, uid, name),
-//  mLineWrappingAction(new QAction(tr("Line wrapping"), this)),
   mSeverityAction(NULL),
   mMessagesWidget(NULL),
   mMessagesLayout(NULL),
@@ -407,13 +405,13 @@ ConsoleWidget::ConsoleWidget(QWidget* parent, QString uid, QString name, XmlOpti
 {
 	mOptions = options;
 	mLog = log;
+	connect(mLog.get(), &Log::loggingFolderChanged, this, &ConsoleWidget::onLoggingFolderChanged);
 
 	this->setModified();
 }
 
 ConsoleWidget::ConsoleWidget(QWidget* parent, QString uid, QString name) :
 	BaseWidget(parent, uid, name),
-//	mLineWrappingAction(new QAction(tr("Line wrapping"), this)),
 	mSeverityAction(NULL),
 	mMessagesWidget(NULL),
 	mMessagesLayout(NULL),
@@ -436,7 +434,6 @@ void ConsoleWidget::prePaintEvent()
 
 void ConsoleWidget::createUI()
 {
-//	mLineWrappingAction = new QAction(tr("Line wrapping"), this);
 	mSeverityAction = NULL;
 	mMessagesWidget = NULL;
 
@@ -459,13 +456,6 @@ void ConsoleWidget::createUI()
 
 	mControlLayout->addStretch(1);
 
-//	ctkPopupWidget* popup = new ctkPopupWidget(pushButton);
-//	popup->setAlignment(Qt::AlignRight | Qt::AlignTop | Qt::AlignBottom);
-//	popup->setOrientation(Qt::Horizontal);
-//	QHBoxLayout* popupLayout = new QHBoxLayout(popup);
-//	QSlider* popupSlider = new QSlider(popup);
-//	popupLayout->addWidget(popupSlider);
-
 	mMessagesLayout = new QVBoxLayout;
 	mMessagesLayout->setMargin(0);
 	layout->addLayout(mMessagesLayout);
@@ -482,10 +472,6 @@ void ConsoleWidget::createUI()
 
 	mMessageFilter->setActiveChannel(mChannelSelector->getValue());
 	mMessageListener->installFilter(mMessageFilter);
-
-//	mLineWrappingAction->setCheckable(true);
-//	connect(mLineWrappingAction, SIGNAL(triggered(bool)), this, SLOT(lineWrappingSlot(bool)));
-//	this->lineWrappingSlot(mLineWrappingAction->isChecked());
 
 	this->updateUI();
 }
@@ -744,6 +730,12 @@ void ConsoleWidget::clearTable()
 {
 	if (mMessagesWidget)
 		mMessagesWidget->clear();
+}
+
+void ConsoleWidget::onLoggingFolderChanged()
+{
+	mMessageListener->installFilter(mMessageFilter);
+	this->updateUI();
 }
 
 void ConsoleWidget::onChannelSelectorChanged()

@@ -114,6 +114,7 @@ void Log::setLoggingFolder(QString absoluteLoggingFolderPath)
 	mLogPath = absoluteLoggingFolderPath;
 	if (mWorker)
 		mWorker->setLoggingFolder(mLogPath);
+	emit loggingFolderChanged();
 }
 
 QString Log::getLoggingFolder() const

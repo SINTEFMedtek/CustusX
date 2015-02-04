@@ -60,8 +60,6 @@ LogFileWatcherThread::LogFileWatcherThread(QObject *parent) :
 {
 	qRegisterMetaType<Message>("Message");
 
-	mRepository = MessageRepository::create();
-
 	connect(&mWatcher, &QFileSystemWatcher::directoryChanged, this, &LogFileWatcherThread::onDirectoryChanged);
 	connect(&mWatcher, &QFileSystemWatcher::fileChanged, this, &LogFileWatcherThread::onFileChanged);
 }
@@ -121,19 +119,16 @@ std::vector<Message> LogFileWatcherThread::readMessages(const QString& path)
 	return messages;
 }
 
-void LogFileWatcherThread::setLoggingFolder(QString absoluteLoggingFolderPath)
-{
-	QMutexLocker sentry(&mActionsMutex);
-	PendingActionType action = boost::bind(&LogFileWatcherThread::executeSetLoggingFolder, this, absoluteLoggingFolderPath);
-	mPendingActions.push_back(action);
-	sentry.unlock();
-
-	this->invokePendingAction();
-}
-
 void LogFileWatcherThread::executeSetLoggingFolder(QString absoluteLoggingFolderPath)
 {
+	if (mLogPath == absoluteLoggingFolderPath)
+		return;
+
 	mLogPath = absoluteLoggingFolderPath;
+
+	mInitializedFiles.clear();
+	mRepository->clearQueue();
+
 	mWatcher.addPath(mLogPath);
 
 	if (!mWatcher.directories().isEmpty())
@@ -141,98 +136,6 @@ void LogFileWatcherThread::executeSetLoggingFolder(QString absoluteLoggingFolder
 	if (!mWatcher.files().isEmpty())
 		mWatcher.removePaths(mWatcher.files());
 	this->onDirectoryChanged(mLogPath);
-}
-
-int LogFileWatcherThread::getDefaultTimeout(MESSAGE_LEVEL messageLevel) const
-{
-	switch(messageLevel)
-	{
-	case mlDEBUG: return 0;
-	case mlINFO: return 1500;
-	case mlSUCCESS: return 1500;
-	case mlWARNING: return 3000;
-	case mlERROR: return 0;
-	case mlVOLATILE: return 5000;
-	default: return 0;
-	}
-}
-
-void LogFileWatcherThread::processMessage(Message message)
-{
-	message = this->cleanupMessage(message);
-
-	emit emittedMessage(message);
-
-	mRepository->setMessage(message);
-}
-
-Message LogFileWatcherThread::cleanupMessage(Message message)
-{
-	if (message.mTimeoutTime<0)
-		message.mTimeoutTime = this->getDefaultTimeout(message.mMessageLevel);
-
-	if (message.mChannel.isEmpty())
-		message.mChannel = "console";
-
-	if (!message.mSourceFile.isEmpty())
-	{
-		message.mSourceFile = message.mSourceFile.split("CustusX/").back();
-	}
-
-	return message;
-}
-
-void LogFileWatcherThread::installObserver(MessageObserverPtr observer, bool resend)
-{
-	QMutexLocker sentry(&mActionsMutex);
-	PendingActionType action = boost::bind(&MessageRepository::install, mRepository.get(), observer, resend);
-	mPendingActions.push_back(action);
-	sentry.unlock();
-
-	this->invokePendingAction();
-}
-
-void LogFileWatcherThread::uninstallObserver(MessageObserverPtr observer)
-{
-	QMutexLocker sentry(&mActionsMutex);
-	PendingActionType action = boost::bind(&MessageRepository::uninstall, mRepository.get(), observer);
-	mPendingActions.push_back(action);
-	sentry.unlock();
-
-	this->invokePendingAction();
-}
-
-void LogFileWatcherThread::invokePendingAction()
-{
-	QMetaObject::invokeMethod(this, "pendingAction", Qt::QueuedConnection);
-}
-
-void LogFileWatcherThread::pendingAction()
-{
-	while (this->executeAction());
-}
-
-bool LogFileWatcherThread::executeAction()
-{
-	PendingActionType action = this->popAction();
-	if (!action)
-		return false;
-
-	action();
-	return true;
-}
-
-LogFileWatcherThread::PendingActionType LogFileWatcherThread::popAction()
-{
-	QMutexLocker sentry(&mActionsMutex);
-	PendingActionType action;
-
-	if (mPendingActions.isEmpty())
-		return action;
-
-	action = mPendingActions.front();
-	mPendingActions.pop_front();
-	return action;
 }
 
 

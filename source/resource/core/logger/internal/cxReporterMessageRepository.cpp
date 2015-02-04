@@ -130,12 +130,19 @@ void MessageRepository::uninstall(MessageObserverPtr observer)
 void MessageRepository::setMessageQueueMaxSize(int count)
 {
 	mMessageHistoryMaxSize = count;
+	this->limitQueueSize();
 }
 
 int MessageRepository::getMessageQueueMaxSize() const
 {
 	return mMessageHistoryMaxSize;
 }
+
+void MessageRepository::clearQueue()
+{
+	mMessages.clear();
+}
+
 
 
 } // namespace cx

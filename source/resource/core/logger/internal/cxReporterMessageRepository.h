@@ -103,6 +103,8 @@ public:
 
 	void setMessageQueueMaxSize(int count);
 	int getMessageQueueMaxSize() const; // <0 means infinite
+	void clearQueue();
+
 private:
 	MessageRepository();
 	void limitQueueSize();

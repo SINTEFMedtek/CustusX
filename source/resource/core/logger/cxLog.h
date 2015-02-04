@@ -86,6 +86,9 @@ public:
   void installObserver(MessageObserverPtr observer, bool resend);
   void uninstallObserver(MessageObserverPtr observer);
 
+signals:
+  void loggingFolderChanged();
+
 protected:
   virtual LogThreadPtr createWorker() = 0;
 

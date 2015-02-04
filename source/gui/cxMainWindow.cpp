@@ -103,10 +103,6 @@ MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
 {
 	this->setObjectName("MainWindow");
 
-	QFile stylesheet(":/cxStyleSheet.ss");
-	stylesheet.open(QIODevice::ReadOnly);
-	qApp->setStyleSheet(stylesheet.readAll());
-
 	mServices = VisServices::create(logicManager()->getPluginContext());
 	mLayoutInteractor.reset(new LayoutInteractor());
 

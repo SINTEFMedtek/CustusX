@@ -63,7 +63,7 @@ ReporterThread::ReporterThread(QObject *parent) :
 	qInstallMessageHandler(convertQtMessagesToCxMessages);
 	qRegisterMetaType<Message>("Message");
 
-	mRepository = MessageRepository::create();
+	connect(this, &LogThread::emittedMessage, this, &ReporterThread::onMessageEmitted);
 
 	// make sure streams are closed properly before reconnecting.
 	mCout.reset();
@@ -99,17 +99,6 @@ bool ReporterThread::initializeLogFile(LogFile file)
 	return true;
 }
 
-void ReporterThread::setLoggingFolder(QString absoluteLoggingFolderPath)
-{
-	QMutexLocker sentry(&mActionsMutex);
-	PendingActionType action = boost::bind(&ReporterThread::executeSetLoggingFolder, this, absoluteLoggingFolderPath);
-	mPendingActions.push_back(action);
-	sentry.unlock();
-
-	this->invokePendingAction();
-}
-
-
 void ReporterThread::executeSetLoggingFolder(QString absoluteLoggingFolderPath)
 {
 	mLogPath = absoluteLoggingFolderPath;
@@ -123,20 +112,6 @@ void ReporterThread::executeSetLoggingFolder(QString absoluteLoggingFolderPath)
 	this->initializeLogFile(LogFile::fromChannel(mLogPath, "all"));
 }
 
-int ReporterThread::getDefaultTimeout(MESSAGE_LEVEL messageLevel) const
-{
-	switch(messageLevel)
-	{
-	case mlDEBUG: return 0;
-	case mlINFO: return 1500;
-	case mlSUCCESS: return 1500;
-	case mlWARNING: return 3000;
-	case mlERROR: return 0;
-	case mlVOLATILE: return 5000;
-	default: return 0;
-	}
-}
-
 void ReporterThread::logMessage(Message msg)
 {
 	// send in calling thread- this helps if the app
@@ -148,16 +123,10 @@ void ReporterThread::logMessage(Message msg)
 							  Q_ARG(Message, msg));
 }
 
-void ReporterThread::processMessage(Message message)
+void ReporterThread::onMessageEmitted(Message msg)
 {
-	message = this->cleanupMessage(message);
-
-//	this->sendToCout(message);
-	this->sendToFile(message);
-
-	emit emittedMessage(message);
-
-	mRepository->setMessage(message);
+	//	this->sendToCout(message);
+	this->sendToFile(msg);
 }
 
 void ReporterThread::sendToFile(Message message)
@@ -186,75 +155,5 @@ void ReporterThread::sendToCout(Message message)
 
 	mCout->sendUnredirected(message.getPrintableMessage()+"\n");
 }
-
-Message ReporterThread::cleanupMessage(Message message)
-{
-	if (message.mTimeoutTime<0)
-		message.mTimeoutTime = this->getDefaultTimeout(message.mMessageLevel);
-
-	if (message.mChannel.isEmpty())
-		message.mChannel = "console";
-
-	if (!message.mSourceFile.isEmpty())
-	{
-		message.mSourceFile = message.mSourceFile.split("CustusX/").back();
-	}
-
-	return message;
-}
-
-void ReporterThread::installObserver(MessageObserverPtr observer, bool resend)
-{
-	QMutexLocker sentry(&mActionsMutex);
-	PendingActionType action = boost::bind(&MessageRepository::install, mRepository.get(), observer, resend);
-	mPendingActions.push_back(action);
-	sentry.unlock();
-
-	this->invokePendingAction();
-}
-
-void ReporterThread::uninstallObserver(MessageObserverPtr observer)
-{
-	QMutexLocker sentry(&mActionsMutex);
-	PendingActionType action = boost::bind(&MessageRepository::uninstall, mRepository.get(), observer);
-	mPendingActions.push_back(action);
-	sentry.unlock();
-
-	this->invokePendingAction();
-}
-
-void ReporterThread::invokePendingAction()
-{
-	QMetaObject::invokeMethod(this, "pendingAction", Qt::QueuedConnection);
-}
-
-void ReporterThread::pendingAction()
-{
-	while (this->executeAction());
-}
-
-bool ReporterThread::executeAction()
-{
-	PendingActionType action = this->popAction();
-	if (!action)
-		return false;
-
-	action();
-	return true;
-}
-
-ReporterThread::PendingActionType ReporterThread::popAction()
-{
-	QMutexLocker sentry(&mActionsMutex);
-	PendingActionType action;
-
-	if (mPendingActions.isEmpty())
-		return action;
-
-	action = mPendingActions.front();
-	mPendingActions.pop_front();
-	return action;
-}
-
 
 } //End namespace cx

@@ -82,36 +82,17 @@ class LogFileWatcherThread : public LogThread
 public:
 	LogFileWatcherThread(QObject* parent = NULL);
 	virtual ~LogFileWatcherThread();
-	virtual void setLoggingFolder(QString absoluteLoggingFolderPath); ///< call during startup, will fail if called when running
-
-	virtual void installObserver(MessageObserverPtr observer, bool resend);
-	virtual void uninstallObserver(MessageObserverPtr observer);
-
-public slots:
-	void pendingAction();
 
 private slots:
-	void processMessage(Message msg);
 	void onDirectoryChanged(const QString& path);
 	void onFileChanged(const QString& path);
 private:
-	QMutex mActionsMutex;
+	virtual void executeSetLoggingFolder(QString absoluteLoggingFolderPath);
 
-	typedef boost::function<void()> PendingActionType;
-	QList<PendingActionType> mPendingActions;
-	bool executeAction();
-	PendingActionType popAction();
-	void invokePendingAction();
-	void executeSetLoggingFolder(QString absoluteLoggingFolderPath);
-
-	int getDefaultTimeout(MESSAGE_LEVEL messageLevel) const;
 	std::vector<Message> readMessages(const QString& path);
-
-	Message cleanupMessage(Message message);
 
 	QFileSystemWatcher mWatcher;
 	QString mLogPath;
-	MessageRepositoryPtr mRepository;
 	QStringList mInitializedFiles;
 	std::map<QString, LogFile> mFiles;
 };

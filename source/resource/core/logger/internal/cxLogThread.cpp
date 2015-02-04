@@ -31,9 +31,121 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxLogThread.h"
+#include "cxReporterMessageRepository.h"
+#include "boost/bind.hpp"
 
 namespace cx
 {
+
+LogThread::LogThread(QObject* parent) :
+	QObject(parent)
+{
+	mRepository = MessageRepository::create();
+}
+
+void LogThread::installObserver(MessageObserverPtr observer, bool resend)
+{
+	QMutexLocker sentry(&mActionsMutex);
+	PendingActionType action = boost::bind(&MessageRepository::install, mRepository.get(), observer, resend);
+	mPendingActions.push_back(action);
+	sentry.unlock();
+
+	this->invokePendingAction();
+}
+
+void LogThread::uninstallObserver(MessageObserverPtr observer)
+{
+	QMutexLocker sentry(&mActionsMutex);
+	PendingActionType action = boost::bind(&MessageRepository::uninstall, mRepository.get(), observer);
+	mPendingActions.push_back(action);
+	sentry.unlock();
+
+	this->invokePendingAction();
+}
+
+void LogThread::setLoggingFolder(QString absoluteLoggingFolderPath)
+{
+	QMutexLocker sentry(&mActionsMutex);
+	PendingActionType action = boost::bind(&LogThread::executeSetLoggingFolder, this, absoluteLoggingFolderPath);
+	mPendingActions.push_back(action);
+	sentry.unlock();
+
+	this->invokePendingAction();
+}
+
+void LogThread::invokePendingAction()
+{
+	QMetaObject::invokeMethod(this, "pendingAction", Qt::QueuedConnection);
+}
+
+void LogThread::pendingAction()
+{
+	while (this->executeAction());
+}
+
+bool LogThread::executeAction()
+{
+	PendingActionType action = this->popAction();
+	if (!action)
+		return false;
+
+	action();
+	return true;
+}
+
+LogThread::PendingActionType LogThread::popAction()
+{
+	QMutexLocker sentry(&mActionsMutex);
+	PendingActionType action;
+
+	if (mPendingActions.isEmpty())
+		return action;
+
+	action = mPendingActions.front();
+	mPendingActions.pop_front();
+	return action;
+}
+
+void LogThread::processMessage(Message message)
+{
+	message = this->cleanupMessage(message);
+
+	emit emittedMessage(message);
+
+	mRepository->setMessage(message);
+}
+
+
+Message LogThread::cleanupMessage(Message message)
+{
+	if (message.mTimeoutTime<0)
+		message.mTimeoutTime = this->getDefaultTimeout(message.mMessageLevel);
+
+	if (message.mChannel.isEmpty())
+		message.mChannel = "console";
+
+	if (!message.mSourceFile.isEmpty())
+	{
+		message.mSourceFile = message.mSourceFile.split("CustusX/").back();
+	}
+
+	return message;
+}
+
+int LogThread::getDefaultTimeout(MESSAGE_LEVEL messageLevel) const
+{
+	switch(messageLevel)
+	{
+	case mlDEBUG: return 0;
+	case mlINFO: return 1500;
+	case mlSUCCESS: return 1500;
+	case mlWARNING: return 3000;
+	case mlERROR: return 0;
+	case mlVOLATILE: return 5000;
+	default: return 0;
+	}
+}
+
 
 
 } //End namespace cx

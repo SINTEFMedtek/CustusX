@@ -34,12 +34,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxApplication.h"
 #include "cxLogger.h"
 #include <QThread>
+#include <QWidget>
+#include <QFile>
+
+#include <iostream>
+
+#if !defined(WIN32)
+#include <langinfo.h>
+#include <locale>
+#endif
 
 namespace cx
 {
 
 Application::Application(int& argc, char** argv) : QApplication(argc, argv)
 {
+	this->force_C_locale_decimalseparator();
+
+	QFile stylesheet(":/cxStyleSheet.ss");
+	stylesheet.open(QIODevice::ReadOnly);
+	this->setStyleSheet(stylesheet.readAll());
 }
 
 void Application::reportException(QString text)
@@ -75,6 +89,41 @@ bool Application::notify(QObject *rec, QEvent *ev)
 		exit(0);
 	}
 	return false;
+}
+
+
+void Application::force_C_locale_decimalseparator()
+{
+#if !defined(WIN32)
+	QString radixChar = nl_langinfo(RADIXCHAR);
+	QString C_radixChar = ".";
+
+	if (radixChar != C_radixChar)
+	{
+		QLocale::setDefault(QLocale::c());
+		setlocale(LC_NUMERIC,"C");
+
+		std::cout << QString("Detected non-standard decimal separator [%1], changing to standard [%2].")
+				.arg(radixChar)
+				.arg(C_radixChar)
+				<< std::endl;
+
+		QString number = QString("%1").arg(0.5);
+		if (!number.contains(C_radixChar))
+			std::cout << "Failed to set decimal separator." << std::endl;
+	}
+#endif
+}
+
+void bringWindowToFront(QWidget* window)
+{
+	if (!window->isVisible())
+		window->show();
+
+#ifdef __APPLE__ // needed on mac for bringing to front: does the opposite on linux
+	window->activateWindow();
+#endif
+	window->raise();
 }
 
 } // namespace cx
