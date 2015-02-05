@@ -424,7 +424,7 @@ class CustusX(CppComponent):
         add('BUILD_OPEN_IGTLINK_SERVER:BOOL', True);
 #        add('CX_USE_LEVEL_SET:BOOL', platform.system() == 'Linux')
 #        add('CX_USE_TSF:BOOL', platform.system() != 'Windows');
-        add('CX_PLUGIN_org.custusx.filter.levelset:BOOL', platform.system() == 'Linux');
+        add('CX_PLUGIN_org.custusx.filter.levelset:BOOL', False);
         add('CX_PLUGIN_org.custusx.filter.tubesegmentation:BOOL', platform.system() != 'Windows');
 #        add('CX_PLUGIN_org.custusx.ussimulator:BOOL', platform.system() != 'Linux');
         add('CX_USE_ISB_GE:BOOL', platform.system() != 'Windows');
