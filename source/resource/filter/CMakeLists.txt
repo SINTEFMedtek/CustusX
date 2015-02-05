@@ -2,12 +2,14 @@
 ##               Resource filter library
 ###########################################################
 
+cx_add_class(CX_RESOURCE_FILTER_FILES
+	cxFilterGroup
+)
 cx_add_class_qt_moc(CX_RESOURCE_FILTER_FILES
     cxFilter
     cxFilterImpl
     cxFilterTimedAlgorithm
     cxPipeline
-    cxFilterGroup
 )
 
 cx_create_export_header("cxResourceFilter")
