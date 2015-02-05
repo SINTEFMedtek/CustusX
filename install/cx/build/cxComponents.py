@@ -460,9 +460,13 @@ class LevelSetSegmentation(CppComponent):
     def path(self):
         return self.controlData.getWorkingPath() + "/Level-Set-Segmentation"
     def _rawCheckout(self):
-        self._getBuilder().gitClone('git@github.com:smistad/Level-Set-Segmentation')
+        self._getBuilder().gitClone('git@github.com:SINTEFMedisinskTeknologi/Level-Set-Segmentation')
     def update(self):
-        self._getBuilder().gitCheckout('6bf9277ac604ecf6f10c0a70d9e04ae5489c2060', submodules=True)
+        # this fix should rebase repo from the original smistad/LSS to our own fork on GitHub.
+        repo = 'git@github.com:SINTEFMedisinskTeknologi/Level-Set-Segmentation'
+        self._getBuilder().gitSetRemoteURL(repo, branch="master")
+        self._getBuilder().gitCheckoutDefaultBranch(submodules=True)            
+#        self._getBuilder().gitCheckout('6bf9277ac604ecf6f10c0a70d9e04ae5489c2060', submodules=True)
         self._getBuilder()._gitSubmoduleUpdate()
     def configure(self):
         builder = self._getBuilder()
