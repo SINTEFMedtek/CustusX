@@ -65,6 +65,10 @@ ctkMacroBuildPlugin(
   OUTPUT_DIR ${PLUGIN_OUTPUT_DIR}
 )
 
+install(FILES
+        ${Level-Set-Segmentation_KERNELS_DIR}/kernels.cl
+        DESTINATION ${CX_INSTALL_ROOT_DIR}/config/lss/)
+
 target_include_directories(org_custusx_filter_levelset
     PUBLIC
     .

@@ -79,16 +79,35 @@ class LogThread : public QObject
 	Q_OBJECT
 
 public:
-	LogThread(QObject* parent = NULL) : QObject(parent) {}
+	LogThread(QObject* parent = NULL);
 	virtual ~LogThread() {}
-	virtual void setLoggingFolder(QString absoluteLoggingFolderPath) = 0; ///< call during startup, will fail if called when running
-	virtual void installObserver(MessageObserverPtr observer, bool resend) = 0;
-	virtual void uninstallObserver(MessageObserverPtr observer) = 0;
+	virtual void setLoggingFolder(QString absoluteLoggingFolderPath); ///< call during startup, will fail if called when running
+	virtual void installObserver(MessageObserverPtr observer, bool resend);
+	virtual void uninstallObserver(MessageObserverPtr observer);
 
 signals:
 	void emittedMessage(Message message); ///< emitted for each new message, in addition to writing to observer.
 public slots:
+	void pendingAction();
 	virtual void logMessage(Message msg) {} // default impl do nothing (should be removed)
+
+protected:
+	virtual void executeSetLoggingFolder(QString absoluteLoggingFolderPath) = 0;
+	Message cleanupMessage(Message message);
+	MessageRepositoryPtr mRepository;
+
+protected slots:
+	void processMessage(Message msg);
+
+private:
+	QMutex mActionsMutex;
+	typedef boost::function<void()> PendingActionType;
+	QList<PendingActionType> mPendingActions;
+
+	bool executeAction();
+	PendingActionType popAction();
+	void invokePendingAction();
+	int getDefaultTimeout(MESSAGE_LEVEL messageLevel) const;
 };
 
 } //namespace cx

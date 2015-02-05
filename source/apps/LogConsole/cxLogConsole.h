@@ -29,29 +29,39 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include <QApplication>
 
-#include "cxApplication.h"
-#include "cxLogConsole.h"
+#ifndef CXLOGCONSOLE_H
+#define CXLOGCONSOLE_H
 
-int main(int argc, char *argv[])
+#include <QMainWindow>
+#include "cxXmlOptionItem.h"
+#include "cxLog.h"
+
+namespace cx
 {
 
-#if !defined(WIN32)
-	//for some reason this does not work with dynamic linking on windows
-	//instead we solve the problem by adding a handmade header for the cxResources.qrc file
-	Q_INIT_RESOURCE(cxResources);
-#endif
+class LogConsole: public QMainWindow
+{
+	Q_OBJECT
 
-	cx::Application app(argc, argv);
-	app.setOrganizationName("SINTEF");
-	app.setOrganizationDomain("www.sintef.no");
-	app.setApplicationName("LogConsole");
-	app.setWindowIcon(QIcon(":/icons/CustusX.png"));
-	app.setAttribute(Qt::AA_DontShowIconsInMenus, false);
+public:
+	LogConsole();
+	~LogConsole();
 
-	cx::LogConsole console;
-	cx::bringWindowToFront(&console);
+private slots:
+	void onSelectFolder();
+private:
+	cx::XmlOptionFile mOptions;
+	cx::LogPtr mLog;
 
-	return app.exec();
-}
+	XmlOptionItem getGeometryOption();
+	void setDefaultGeometry();
+	void initializeGeometry();
+	void createMenus();
+	void updateWindowTitle();
+};
+
+} // namespace cx
+
+
+#endif // CXLOGCONSOLE_H

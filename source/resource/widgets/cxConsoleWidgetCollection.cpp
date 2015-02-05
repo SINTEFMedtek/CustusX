@@ -35,9 +35,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDockWidget>
 #include <QMenu>
 #include <QTimer>
-#include <QApplication>
+//#include <QApplication>
 #include <QDebug>
-#include <QDesktopWidget>
+//#include <QDesktopWidget>
 #include <QBuffer>
 #include <QDataStream>
 #include "cxProfile.h"
@@ -86,16 +86,6 @@ void ConsoleWidgetCollection::setupUI()
 	// Restore saved window states
 	// Must be done after all DockWidgets are created
 
-	if (!this->restoreGeometry(this->option("geometry").readVariant().toByteArray()))
-	{
-		QDesktopWidget* desktop = dynamic_cast<QApplication*>(QApplication::instance())->desktop();
-		QScreen* screen__ = qApp->screens()[0];
-		QRect screen = desktop->screenGeometry(desktop->primaryScreen());
-		double f = 0.25;
-		screen.adjust(screen.width()*f, screen.height()*f, -screen.width()*f, -screen.height()*f);
-		this->setGeometry(screen);
-	}
-
 	this->restoreState(this->option("windowState").readVariant().toByteArray());
 
 	// default: add two consoles
@@ -113,7 +103,6 @@ XmlOptionItem ConsoleWidgetCollection::option(QString name)
 
 ConsoleWidgetCollection::~ConsoleWidgetCollection()
 {
-	this->option("geometry").writeVariant(this->saveGeometry());
 	this->option("windowState").writeVariant(this->saveState());
 	this->option("consoleCount").writeVariant(QVariant::fromValue<int>(mDockWidgets.size()));
 }

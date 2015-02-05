@@ -64,6 +64,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSpaceProvider.h"
 #include "cxPatientModelServiceProxy.h"
 
+#include "level-set-segmentation-config.h"
+#include "OulConfig.hpp"
+
 namespace cx
 {
 
@@ -172,9 +175,12 @@ bool LevelSetFilter::execute()
 	SIPL::int3 seed(seedPoint(0), seedPoint(1), seedPoint(2));
 	try
 	{
+		QString kernelDir = cx::DataLocations::findConfigFolder("/lss", KERNELS_DIR);
+		QString oulDir = cx::DataLocations::findConfigFolder("/tsf", OUL_DIR);
+
 		SIPL::Volume<char> * result = runLevelSet(filename.c_str(), seed, 10, // seed radius
 				1000, // iterations per narrow band
-				threshold, epsilon, alpha);
+				threshold, epsilon, alpha, kernelDir.toStdString(), oulDir.toStdString());
 		SIPL::int3 size = result->getSize();
 		rawSegmentation = this->convertToVtkImageData(
 				(char *) result->getData(), size.x, size.y, size.z, image);

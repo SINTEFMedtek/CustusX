@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogMessage.h"
 #include <QList>
 #include <QThread>
-#include "cxLogFileWatcherThread.h"
+#include "cxLogThread.h"
 
 class QString;
 class QDomNode;
@@ -68,8 +68,6 @@ class QTextStream;
 
 namespace cx
 {
-typedef boost::shared_ptr<class MessageObserver> MessageObserverPtr;
-typedef boost::shared_ptr<class MessageRepository> MessageRepositoryPtr;
 
 /**\brief Thread for log handling. Used inside Reporter.
  *
@@ -82,44 +80,29 @@ class ReporterThread : public LogThread
 public:
 	ReporterThread(QObject* parent = NULL);
 	virtual ~ReporterThread();
-	virtual void setLoggingFolder(QString absoluteLoggingFolderPath); ///< call during startup, will fail if called when running
-
-	virtual void installObserver(MessageObserverPtr observer, bool resend);
-	virtual void uninstallObserver(MessageObserverPtr observer);
 
 public slots:
 	virtual void logMessage(Message msg);
-	void pendingAction();
 
 signals:
 	void emittedMessage(Message message); ///< emitted for each new message, in addition to writing to file.
 
+protected:
+	virtual void executeSetLoggingFolder(QString absoluteLoggingFolderPath);
+
 private slots:
-	void processMessage(Message msg);
+	void onMessageEmitted(Message msg);
 private:
-	QMutex mActionsMutex;
-
-	typedef boost::function<void()> PendingActionType;
-	QList<PendingActionType> mPendingActions;
-	bool executeAction();
-	PendingActionType popAction();
-	void invokePendingAction();
-	void executeSetLoggingFolder(QString absoluteLoggingFolderPath);
-
-	int getDefaultTimeout(MESSAGE_LEVEL messageLevel) const;
-
 	bool initializeLogFile(LogFile file);
 
 	void sendToFile(Message message);
 	void sendToCout(Message message);
-	Message cleanupMessage(Message message);
 
 	typedef boost::shared_ptr<class SingleStreamerImpl> SingleStreamerImplPtr;
 	SingleStreamerImplPtr mCout;
 	SingleStreamerImplPtr mCerr;
 
 	QString mLogPath;
-	MessageRepositoryPtr mRepository;
 	QStringList mInitializedFiles;
 
 };

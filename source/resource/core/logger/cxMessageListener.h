@@ -79,6 +79,7 @@ public:
 
 signals:
 	void newMessage(Message message);
+	void newChannel(QString channel);
 
 private slots:
 	void messageReceived(Message message);

@@ -58,7 +58,10 @@ public:
 	virtual bool notify(QObject *rec, QEvent *ev);
 private:
 	void reportException(QString text);
+	void force_C_locale_decimalseparator();
 };
+
+void cxResource_EXPORT bringWindowToFront(QWidget* window);
 
 } // namespace cx
 

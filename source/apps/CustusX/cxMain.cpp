@@ -44,33 +44,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewServiceProxy.h"
 #include "cxAcquisitionServiceProxy.h"
 
-#if !defined(WIN32)
-#include <langinfo.h>
-#include <locale>
-
-void force_C_locale_decimalseparator()
-{
-	QString radixChar = nl_langinfo(RADIXCHAR);
-	QString C_radixChar = ".";
-
-	if (radixChar != C_radixChar)
-	{
-		QLocale::setDefault(QLocale::c());
-		setlocale(LC_NUMERIC,"C");
-
-		std::cout << QString("Detected non-standard decimal separator [%1], changing to standard [%2].")
-				.arg(radixChar)
-				.arg(C_radixChar)
-				<< std::endl;
-
-		QString number = QString("%1").arg(0.5);
-		if (!number.contains(C_radixChar))
-			std::cout << "Failed to set decimal separator." << std::endl;
-	}
-}
-#endif
-
-
 namespace cx
 {
 
@@ -138,10 +111,6 @@ int main(int argc, char *argv[])
   app.setApplicationName("CustusX");
   app.setWindowIcon(QIcon(":/icons/CustusX.png"));
   app.setAttribute(Qt::AA_DontShowIconsInMenus, false);
-
-#if !defined(WIN32)
-  force_C_locale_decimalseparator();
-#endif
 
   cx::ApplicationComponentPtr mainwindow(new cx::CustusXMainWindowFactory());
   cx::LogicManager::initialize(mainwindow);
