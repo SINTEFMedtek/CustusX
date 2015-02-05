@@ -287,12 +287,13 @@ void Image::moveThisAndChildrenToThread(QThread* thread)
 	  this->get_rMd_History()->moveToThread(thread);
 }
 
-void Image::setVtkImageData(const vtkImageDataPtr& data)
+void Image::setVtkImageData(const vtkImageDataPtr& data, bool resetTransferFunctions)
 {
 	mBaseImageData = data;
 	mBaseGrayScaleImageData = NULL;
 
-	this->resetTransferFunctions();
+	if (resetTransferFunctions)
+		this->resetTransferFunctions();
 	emit vtkImageDataChanged();
 }
 

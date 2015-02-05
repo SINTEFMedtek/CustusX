@@ -102,7 +102,7 @@ ImagePtr TrackedStream::createImage()
 {
 	if(!mVideoSource)
 		return ImagePtr();
-	ImagePtr image(new Image(this->getUid()+"_test", mVideoSource->getVtkImageData(), this->getName()));
+	ImagePtr image(new Image(this->getUid()+"_TrackedStreamHelper", mVideoSource->getVtkImageData(), this->getName()+"_TrackedStreamHelper"));
 	return image;
 }
 

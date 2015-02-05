@@ -31,18 +31,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 
-//#include "boost/shared_ptr.hpp"
 #include <vtkRenderer.h>
 #include <vtkVolumeMapper.h>
 #include <vtkImageData.h>
 
 #include "cxStreamRep3D.h"
 #include "cxTrackedStream.h"
-//#include "cxVideoGraphics.h"
 #include "cxVideoSourceGraphics.h"
 #include "cxView.h"
 #include "cxTool.h"
 #include "cxPatientModelService.h"
+#include "cxVolumeProperty.h"
+
+//Transfer function test code
+#include "cxImageTF3D.h"
 
 
 namespace cx
@@ -54,27 +56,11 @@ StreamRep3DPtr StreamRep3D::New(SpaceProviderPtr spaceProvider, PatientModelServ
 }
 
 StreamRep3D::StreamRep3D(SpaceProviderPtr spaceProvider, PatientModelServicePtr patientModelService) :
-//	RepImpl(),
 	VolumetricRep(),
 	mTrackedStream(TrackedStreamPtr()),
 	mPatientModelService(patientModelService)
-//	mSpaceProvider(spaceProvider),
 {
-//	mRTStream.reset(new VideoSourceGraphics(mSpaceProvider));
 }
-
-
-//void StreamRep3D::addRepActorsToViewRenderer(ViewPtr view)
-//{
-////	view->getRenderer()->AddActor(mRTStream->getActor());
-//	view->getRenderer()->AddVolume(mVolume);
-//}
-
-//void StreamRep3D::removeRepActorsFromViewRenderer(ViewPtr view)
-//{
-////	view->getRenderer()->RemoveActor(mRTStream->getActor());
-//	view->getRenderer()->RemoveVolume(mVolume);
-//}
 
 void StreamRep3D::setTrackedStream(TrackedStreamPtr trackedStream)
 {
@@ -96,19 +82,38 @@ void StreamRep3D::newVideoSource(VideoSourcePtr videoSource)
 {
 	if(!videoSource)
 		return;
-//	mRTStream->setRealtimeStream(videoSource);
 
-//	if(videoSource)
-//	{
-//		vtkImageDataPtr vtkImage = videoSource->getVtkImageData();
-//		mMapper->SetInputData(vtkImage);
-//		ImagePtr image(new Image(mTrackedStream->getUid(), vtkImage, mTrackedStream->getName()));
-//		this->setImage(image);
-//		patientService()->insertData(retval);
-//	}
-	ImagePtr image = mTrackedStream->createImage();//TODO:
+	ImagePtr image = mTrackedStream->createImage();//TODO: Implement transfer functions in TrackedStream
 	this->setImage(image);
-	mPatientModelService->insertData(image);
+//	mPatientModelService->insertData(image);
+
+	this->initTransferFunction(image);
+
+	if(mVideoSource)
+		disconnect(videoSource.get(), &VideoSource::newFrame, this, &StreamRep3D::newFrame);
+	mVideoSource = videoSource;
+
+	connect(videoSource.get(), &VideoSource::newFrame, this, &StreamRep3D::newFrame);
+}
+
+//Test: Set transfer function so that we can see the volume change
+void StreamRep3D::initTransferFunction(ImagePtr image)
+{
+	ImageTF3DPtr tf3D = image->getTransferFunctions3D();
+	IntIntMap opacity;
+	opacity[90] = 0;
+	opacity[100] = 5;
+	opacity[200] = image->getMaxAlphaValue();
+	tf3D->resetAlpha(opacity);
+	image->setTransferFunctions3D(tf3D);
+}
+
+void StreamRep3D::newFrame()
+{
+	mImage->setVtkImageData(mVideoSource->getVtkImageData(), false);
+	vtkImageDataPtr volume = mImage->resample(this->mMaxVoxels);
+
+	mMapper->SetInputData(volume);
 }
 
 TrackedStreamPtr StreamRep3D::getTrackedStream()

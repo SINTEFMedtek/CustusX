@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSTREAMREP3D_H
 #define CXSTREAMREP3D_H
 
-//#include "cxRepImpl.h"
 #include "cxVolumetricRep.h"
 #include "cxForwardDeclarations.h"
 #include "cxTransform3D.h"
@@ -60,21 +59,18 @@ public:
 	void setTrackedStream(TrackedStreamPtr trackedStream);
 	TrackedStreamPtr getTrackedStream();
 
-protected:
-//	virtual void addRepActorsToViewRenderer(ViewPtr view);
-//	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
 private slots:
 	void newTool(ToolPtr tool);
 	void newVideoSource(VideoSourcePtr videoSource);
+	void newFrame();
 private:
 	StreamRep3D(SpaceProviderPtr spaceProvider, PatientModelServicePtr patientModelService);
 
 	TrackedStreamPtr mTrackedStream;
-
-//	SpaceProviderPtr mSpaceProvider;
-//	VideoSourceGraphicsPtr mRTStream;
+	VideoSourcePtr mVideoSource;
 
 	PatientModelServicePtr mPatientModelService;
+	void initTransferFunction(ImagePtr image);
 };
 
 } //cx

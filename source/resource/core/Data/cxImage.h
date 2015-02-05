@@ -92,7 +92,7 @@ public:
 	/** Initialize image with properties from parent image, but with separate vtkImageData and name.
 	 */
 	virtual void intitializeFromParentImage(ImagePtr parentImage);
-	virtual void setVtkImageData(const vtkImageDataPtr& data);
+	virtual void setVtkImageData(const vtkImageDataPtr& data, bool resetTransferFunctions = true);
 
 	virtual vtkImageDataPtr getBaseVtkImageData(); ///< \return the vtkimagedata in the data coordinate space
 	virtual vtkImageDataPtr getGrayScaleVtkImageData(); ///< as getBaseVtkImageData(), but constrained to 1 component if multicolor.
