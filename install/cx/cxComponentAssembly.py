@@ -43,8 +43,8 @@ class LibraryAssembly(object):
         self.addComponent(cxComponents.CTK())
         self.addComponent(cxComponents.OpenCLUtilityLibrary())
         self.addComponent(cxComponents.TubeSegmentationFramework());
-        if (platform.system() == 'Linux'):
-            self.addComponent(cxComponents.LevelSetSegmentation());
+            #if (platform.system() == 'Linux'):
+            #self.addComponent(cxComponents.LevelSetSegmentation());
         self.addComponent(self.custusx)
         self.addComponent(cxComponents.CustusXData())
         
