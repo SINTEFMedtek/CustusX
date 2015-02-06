@@ -70,15 +70,19 @@ public:
 	virtual QString getType() const;
 	static QString getTypeName();
 
-	ImagePtr createImage();
+	ImagePtr getChangingImage();
 signals:
 	void streamChanged();
 	void newTool(ToolPtr tool);
 	void newVideoSource(VideoSourcePtr videoSource);
+	void newFrame();
 
+private slots:
+	void newFrameSlot();
 private:
 	ToolPtr mProbeTool;
 	VideoSourcePtr mVideoSource;
+	ImagePtr mImage;
 };
 
 typedef boost::shared_ptr<TrackedStream> TrackedStreamPtr;

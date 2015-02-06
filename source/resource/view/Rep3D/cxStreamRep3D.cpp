@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxVolumeProperty.h"
 
-//Transfer function test code
+//To be removed
 #include "cxImageTF3D.h"
 
 
@@ -64,18 +64,27 @@ StreamRep3D::StreamRep3D(SpaceProviderPtr spaceProvider, PatientModelServicePtr 
 
 void StreamRep3D::setTrackedStream(TrackedStreamPtr trackedStream)
 {
+	if(mTrackedStream)
+	{
+		disconnect(mTrackedStream.get(), &TrackedStream::newTool, this, &StreamRep3D::newTool);
+		disconnect(mTrackedStream.get(), &TrackedStream::newVideoSource, this, &StreamRep3D::newVideoSource);
+		disconnect(mTrackedStream.get(), &TrackedStream::newFrame, this, &StreamRep3D::newFrame);
+	}
+
 	mTrackedStream = trackedStream;
 
-	connect(mTrackedStream.get(), &TrackedStream::newTool, this, &StreamRep3D::newTool);
-	connect(mTrackedStream.get(), &TrackedStream::newVideoSource, this, &StreamRep3D::newVideoSource);
-
-	this->newTool(mTrackedStream->getProbeTool());
-	this->newVideoSource(mTrackedStream->getVideoSource());
+	if(mTrackedStream)
+	{
+		connect(mTrackedStream.get(), &TrackedStream::newTool, this, &StreamRep3D::newTool);
+		connect(mTrackedStream.get(), &TrackedStream::newVideoSource, this, &StreamRep3D::newVideoSource);
+		connect(mTrackedStream.get(), &TrackedStream::newFrame, this, &StreamRep3D::newFrame);
+		this->newTool(mTrackedStream->getProbeTool());
+		this->newVideoSource(mTrackedStream->getVideoSource());
+	}
 }
 
 void StreamRep3D::newTool(ToolPtr tool)
 {
-//	mRTStream->setTool(tool);
 }
 
 void StreamRep3D::newVideoSource(VideoSourcePtr videoSource)
@@ -83,7 +92,7 @@ void StreamRep3D::newVideoSource(VideoSourcePtr videoSource)
 	if(!videoSource)
 		return;
 
-	ImagePtr image = mTrackedStream->createImage();//TODO: Implement transfer functions in TrackedStream
+	ImagePtr image = mTrackedStream->getChangingImage();
 	this->setImage(image);
 //	mPatientModelService->insertData(image);
 
@@ -92,11 +101,10 @@ void StreamRep3D::newVideoSource(VideoSourcePtr videoSource)
 	if(mVideoSource)
 		disconnect(videoSource.get(), &VideoSource::newFrame, this, &StreamRep3D::newFrame);
 	mVideoSource = videoSource;
-
-	connect(videoSource.get(), &VideoSource::newFrame, this, &StreamRep3D::newFrame);
 }
 
-//Test: Set transfer function so that we can see the volume change
+// Set transfer function so that we can see the volume change.
+// Should be replaced with GUI for TrackedStream
 void StreamRep3D::initTransferFunction(ImagePtr image)
 {
 	ImageTF3DPtr tf3D = image->getTransferFunctions3D();
@@ -110,9 +118,7 @@ void StreamRep3D::initTransferFunction(ImagePtr image)
 
 void StreamRep3D::newFrame()
 {
-	mImage->setVtkImageData(mVideoSource->getVtkImageData(), false);
 	vtkImageDataPtr volume = mImage->resample(this->mMaxVoxels);
-
 	mMapper->SetInputData(volume);
 }
 

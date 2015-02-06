@@ -43,10 +43,13 @@ TrackedStreamPtr TrackedStream::create(const QString &uid, const QString &name)
 }
 
 TrackedStream::TrackedStream(const QString& uid, const QString& name, const ToolPtr &probe, const VideoSourcePtr &videosource) :
-	Data(uid, name), mProbeTool(probe), mVideoSource(videosource)
+	Data(uid, name), mProbeTool(probe), //mVideoSource(videosource)
+	mImage(ImagePtr())
 {
 	if(mProbeTool)
 		emit newTool(mProbeTool);
+
+	setVideoSource(videosource);
 }
 
 void TrackedStream::setProbeTool(const ToolPtr &probeTool)
@@ -62,9 +65,25 @@ ToolPtr TrackedStream::getProbeTool()
 
 void TrackedStream::setVideoSource(const VideoSourcePtr &videoSource)
 {
+	if(mVideoSource)
+		disconnect(mVideoSource.get(), &VideoSource::newFrame, this, &TrackedStream::newFrame);
+
 	mVideoSource = videoSource;
 	emit streamChanged();
 	emit newVideoSource(mVideoSource);
+
+	if(mVideoSource)
+		connect(mVideoSource.get(), &VideoSource::newFrame, this, &TrackedStream::newFrameSlot);
+}
+
+void TrackedStream::newFrameSlot()
+{
+	//TODO: Check if we need to turn this on/off
+	if (mImage)
+	{
+		mImage->setVtkImageData(mVideoSource->getVtkImageData(), false);
+		emit newFrame();
+	}
 }
 
 VideoSourcePtr TrackedStream::getVideoSource()
@@ -98,12 +117,13 @@ QString TrackedStream::getTypeName()
 	return "TrackedStream";
 }
 
-ImagePtr TrackedStream::createImage()
+ImagePtr TrackedStream::getChangingImage()
 {
 	if(!mVideoSource)
 		return ImagePtr();
-	ImagePtr image(new Image(this->getUid()+"_TrackedStreamHelper", mVideoSource->getVtkImageData(), this->getName()+"_TrackedStreamHelper"));
-	return image;
+	if (!mImage)
+		mImage = ImagePtr(new Image(this->getUid()+"_TrackedStreamHelper", mVideoSource->getVtkImageData(), this->getName()+"_TrackedStreamHelper"));
+	return mImage;
 }
 
 } //cx
