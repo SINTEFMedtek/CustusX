@@ -20,6 +20,7 @@ include(cxUtilities)
 include(cxInstallUtilities)
 include(cxInitializeLibraries)
 include(cxCatchUtilities)
+include(cxGetVersion)
 
 #------------------------------------------------------------------------------
 # Add some compiler flags (preprocessor definitions)

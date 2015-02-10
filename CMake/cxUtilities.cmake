@@ -1,16 +1,35 @@
+# =========================================================================
 # This file is part of CustusX, an Image Guided Therapy Application.
 #
-# Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+# Copyright (c) 2008-2014, SINTEF Department of Medical Technology
+# All rights reserved.
 #
-# CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
-# code and binaries can only be used by SMT and those with explicit permission
-# from SMT. CustusX shall not be distributed to anyone else.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
 #
-# CustusX is a research tool. It is NOT intended for use or certified for use
-# in a normal clinical setting. SMT does not take responsibility for its use
-# in any way.
+# 1. Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
 #
-# See CustusX_License.txt for more information.
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+# 3. Neither the name of the copyright holder nor the names of its contributors
+#    may be used to endorse or promote products derived from this software
+#    without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# =========================================================================
+
 
 ###############################################################################
 # Make file path absolute if needed. Assuming
@@ -134,108 +153,6 @@ MACRO(cx_get_today RESULT)
         MESSAGE(SEND_ERROR "date not implemented")
         SET(${RESULT} 000000)
     ENDIF(WIN32)
-ENDMACRO()
-
-###############################################################################
-# Get a description of the current build from git.
-#
-# http://stackoverflow.com/questions/1435953/how-can-i-pass-git-sha1-to-compiler-as-definition-using-cmake
-# use the entire output of git describe here instead.
-#
-###############################################################################
-MACRO(cx_get_git_build_description RESULT)
-    find_package(Git REQUIRED)
-    IF(WIN32)
-        execute_process(
-                COMMAND "git.exe" describe --tags
-                WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-                OUTPUT_VARIABLE ${RESULT}
-                )
-    ELSEIF(UNIX)
-            execute_process(
-                COMMAND git describe --tags
-                WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-                OUTPUT_VARIABLE ${RESULT}
-                )
-    ENDIF(WIN32)
-    # remove first character - should always be a "v" as first in f.ex. "v3.5.3"
-    string(SUBSTRING ${${RESULT}} 1 -1 ${RESULT})
-ENDMACRO()
-
-###############################################################################
-# Define variables for the current version.
-# Input (major, minor, patch) define the version,
-# while the type determines additional info:
-#
-# type==ALPHA:
-#   add detailed information to the postfix, such as git sha and date.
-# type==RELEASE:
-#   add no extra information.
-# type==<other>:
-#   the postfix is set to <other>
-#
-# The following variables are defined:
-#
-#	${PROJECT_NAME}_VERSION_MAJOR
-#	${PROJECT_NAME}_VERSION_MINOR
-#	${PROJECT_NAME}_VERSION_PATCH
-#	${PROJECT_NAME}_VERSION_POSTFIX
-#	${PROJECT_NAME}_VERSION_STRING
-#
-###############################################################################
-MACRO(cx_define_version major minor patch type)
-    set(${PROJECT_NAME}_VERSION_MAJOR  ${major})
-    set(${PROJECT_NAME}_VERSION_MINOR  ${minor})
-    set(${PROJECT_NAME}_VERSION_PATCH  ${patch})
-
-    cx_get_git_build_description(GIT_DESCRIBE)
-
-    if(${type} STREQUAL ALPHA)
-            cx_get_today(TODAY_DATE)
-            set(GIT_DESCRIBE "${GIT_DESCRIBE}.${TODAY_DATE}")
-            set(POSTFIX ".alpha")
-    elseif(${type} STREQUAL BETA)
-            set(POSTFIX ".beta")
-    elseif(${type} STREQUAL RELEASE)
-            set(POSTFIX "")
-    else()
-            set(POSTFIX "." ${type})
-    endif()
-
-    #on windows this string contains newlines and whitespaces that needs to be removed
-    STRING(REGEX REPLACE "\r|\n" "" GIT_DESCRIBE ${GIT_DESCRIBE})
-    STRING(REGEX REPLACE " " "" GIT_DESCRIBE ${GIT_DESCRIBE})
-
-    set(${PROJECT_NAME}_VERSION_POSTFIX ${POSTFIX})
-    set(GENERATED_VERSION_STRING ${major}.${minor}.${patch}${POSTFIX})
-    string(REGEX MATCH ${GENERATED_VERSION_STRING} MATCHING_STRING ${GIT_DESCRIBE})
-    if("${MATCHING_STRING}" STREQUAL "")
-            message("Warning:
-            Version string extracted from git: ${GIT_DESCRIBE}
-            Version string generated: ${GENERATED_VERSION_STRING}
-            The generated string should be contained in the git string.
-            Reverting to generated string, setting dirty tag.")
-            set(${PROJECT_NAME}_VERSION_STRING ${GENERATED_VERSION_STRING}.dirty)
-    else()
-            set(${PROJECT_NAME}_VERSION_STRING ${GIT_DESCRIBE})
-    endif()
-ENDMACRO()
-
-###############################################################################
-#
-###############################################################################
-MACRO(cx_read_version)
-    file(READ ${PROJECT_SOURCE_DIR}/version.ini CX_VERSION_FILE_DATA)
-
-    string(REGEX REPLACE ".*major[ ]*=[ ]*([0-9]+).*" "\\1" VERSION_MAJOR ${CX_VERSION_FILE_DATA})
-    string(REGEX REPLACE ".*minor[ ]*=[ ]*([0-9]+).*" "\\1" VERSION_MINOR ${CX_VERSION_FILE_DATA})
-    string(REGEX REPLACE ".*patch[ ]*=[ ]*([0-9]+).*" "\\1" VERSION_PATCH ${CX_VERSION_FILE_DATA})
-    string(REGEX REPLACE ".*type[ ]*=[ ]*([^$]*).*" "\\1" VERSION_TYPE ${CX_VERSION_FILE_DATA})
-    STRING(REGEX REPLACE "(\r?\n)+$" "" VERSION_TYPE "${VERSION_TYPE}")
-
-    cx_define_version(${VERSION_MAJOR} ${VERSION_MINOR} ${VERSION_PATCH} ${VERSION_TYPE})
-    message(STATUS "Version: ${CustusX_VERSION_STRING}")
-
 ENDMACRO()
 
 
