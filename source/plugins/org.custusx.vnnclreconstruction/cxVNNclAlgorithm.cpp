@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVNNclAlgorithm.h"
 
 #include "cxReporter.h"
+#include <QFileInfo>
 #include "cxTypeConversions.h"
 #include "HelperFunctions.hpp"
 #include <vtkImageData.h>
@@ -56,14 +57,17 @@ VNNclAlgorithm::VNNclAlgorithm() :
 VNNclAlgorithm::~VNNclAlgorithm()
 {}
 
-bool VNNclAlgorithm::initCL(QString kernelPath, int nMaxPlanes, int nPlanes, int method, int planeMethod, int nStarts, float brightnessWeight, float newnessWeight)
+bool VNNclAlgorithm::initCL(QString kernelFilePath, int nMaxPlanes, int nPlanes, int method, int planeMethod, int nStarts, float brightnessWeight, float newnessWeight)
 {
 	// READ KERNEL FILE
-	report(QString("Kernel path: %1").arg(kernelPath));
-	std::string source = oul::readFile(kernelPath.toStdString());
+	report(QString("Kernel path: %1").arg(kernelFilePath));
+	std::string source = oul::readFile(kernelFilePath.toStdString());
+
+	QFileInfo path(kernelFilePath);
+	path.absolutePath();
 
 	// BUILD PROGRAM
-	cl::Program clprogram = this->buildCLProgram(source, nMaxPlanes, nPlanes, method, planeMethod, nStarts,brightnessWeight, newnessWeight);
+	cl::Program clprogram = this->buildCLProgram(source, path.absolutePath().toStdString(), nMaxPlanes, nPlanes, method, planeMethod, nStarts,brightnessWeight, newnessWeight);
 
 	// CREATE KERNEL
 	mKernel = mOulContex->createKernel(clprogram, "voxel_methods");
@@ -71,7 +75,7 @@ bool VNNclAlgorithm::initCL(QString kernelPath, int nMaxPlanes, int nPlanes, int
 	return true;
 }
 
-cl::Program VNNclAlgorithm::buildCLProgram(std::string program_src, int nMaxPlanes, int nPlanes, int method, int planeMethod, int nStarts, float newnessWeight, float brightnessWeight)
+cl::Program VNNclAlgorithm::buildCLProgram(std::string program_src, std::string kernelPath, int nMaxPlanes, int nPlanes, int method, int planeMethod, int nStarts, float newnessWeight, float brightnessWeight)
 {
 	cl::Program retval;
 	cl_int err = 0;
@@ -81,7 +85,7 @@ cl::Program VNNclAlgorithm::buildCLProgram(std::string program_src, int nMaxPlan
 		QString define = "-D MAX_PLANES=%1 -D N_PLANES=%2 -D METHOD=%3 -D PLANE_METHOD=%4 -D MAX_MULTISTART_STARTS=%5 -D NEWNESS_FACTOR=%6 -D BRIGHTNESS_FACTOR=%7";
 		define = define.arg(nMaxPlanes).arg(nPlanes).arg(method).arg(planeMethod).arg(nStarts).arg(newnessWeight).arg(brightnessWeight);
 
-		int programID = mOulContex->createProgramFromString(program_src, "-I " + std::string(VNNCL_KERNEL_PATH) + " " + define.toStdString());
+		int programID = mOulContex->createProgramFromString(program_src, "-I " + std::string(kernelPath) + " " + define.toStdString());
 		retval = mOulContex->getProgram(programID);
 
 	} catch (cl::Error &error)

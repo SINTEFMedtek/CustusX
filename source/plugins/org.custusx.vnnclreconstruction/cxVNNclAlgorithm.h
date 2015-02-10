@@ -99,7 +99,7 @@ public:
 	 * @param newnessWeight The extra weight to give pixels newer than mean
 	 * @return True on suc
 	 */
-	virtual cl::Program buildCLProgram(std::string program_src,
+	virtual cl::Program buildCLProgram(std::string program_src, std::string kernelPath,
 	                                  int nMaxPlanes,
 	                                  int nPlanes,
 	                                  int method,
