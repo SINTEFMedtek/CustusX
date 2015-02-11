@@ -120,7 +120,7 @@ void StreamRep3D::onModifiedStartRender()
 //	this->update();
 	if (mImage && mTrackedStream->getProbeTool())
 	{
-		std::cout << "StreamRep3D::onModifiedStartRender() prMt: " << mTrackedStream->getProbeTool()->get_prMt() << " tool: "<< mTrackedStream->getProbeTool().get() << std::endl;
+//		std::cout << "StreamRep3D::onModifiedStartRender() prMt: " << mTrackedStream->getProbeTool()->get_prMt() << " tool: "<< mTrackedStream->getProbeTool().get() << std::endl;
 		mImage->get_rMd_History()->setRegistration(mTrackedStream->getProbeTool()->get_prMt());
 	}
 }
