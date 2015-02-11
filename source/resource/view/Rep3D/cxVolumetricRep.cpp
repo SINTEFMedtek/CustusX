@@ -172,6 +172,8 @@ void VolumetricRep::transformChangedSlot()
 		return;
 	}
 	mVolume->SetUserMatrix(mImage->get_rMd().getVtkMatrix());
+//	std::cout << "VolumetricRep::transformChangedSlot() rMd: " << mImage->get_rMd() << std::endl;
+	this->setModified();
 }
 
 void VolumetricRep::setMaxVolumeSize(long maxVoxels)

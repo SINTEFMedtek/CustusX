@@ -239,6 +239,8 @@ void TrackingImplService::imbueManualToolWithRealProperties()
 		if (iter->second->hasType(Tool::TOOL_REFERENCE))
 			continue;
 		mManualTool->setBase(iter->second);
+		//Test: Update tool with positions from manual tool
+//		connect(mManualTool.get(), &Tool::toolTransformAndTimestamp, iter->second.get(), &Tool::toolTransformAndTimestamp);//Crash
 		report("Manual tool imbued with properties from " + iter->first);
 		break;
 	}

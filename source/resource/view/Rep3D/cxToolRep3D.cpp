@@ -303,6 +303,8 @@ void ToolRep3D::update()
 		prMt = mTool->get_prMt();
 	Transform3D rMpr = mSpaceProvider->get_rMpr();
 
+	std::cout << " ToolRep3D::update() prMt: " << prMt << " mTool: " << mTool.get() << std::endl;
+
 	Transform3D rMt = rMpr * prMt;
 	mToolActor->SetUserMatrix(rMt.getVtkMatrix());
 

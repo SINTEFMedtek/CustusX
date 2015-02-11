@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //To be removed
 #include "cxImageTF3D.h"
+#include "cxRegistrationTransform.h"
 
 
 namespace cx
@@ -68,7 +69,7 @@ void StreamRep3D::setTrackedStream(TrackedStreamPtr trackedStream)
 	{
 		disconnect(mTrackedStream.get(), &TrackedStream::newTool, this, &StreamRep3D::newTool);
 		disconnect(mTrackedStream.get(), &TrackedStream::newVideoSource, this, &StreamRep3D::newVideoSource);
-		disconnect(mTrackedStream.get(), &TrackedStream::newFrame, this, &StreamRep3D::newFrame);
+		disconnect(mTrackedStream.get(), &TrackedStream::newFrame, this, &StreamRep3D::vtkImageDataChangedSlot);
 	}
 
 	mTrackedStream = trackedStream;
@@ -77,7 +78,7 @@ void StreamRep3D::setTrackedStream(TrackedStreamPtr trackedStream)
 	{
 		connect(mTrackedStream.get(), &TrackedStream::newTool, this, &StreamRep3D::newTool);
 		connect(mTrackedStream.get(), &TrackedStream::newVideoSource, this, &StreamRep3D::newVideoSource);
-		connect(mTrackedStream.get(), &TrackedStream::newFrame, this, &StreamRep3D::newFrame);
+		connect(mTrackedStream.get(), &TrackedStream::newFrame, this, &StreamRep3D::vtkImageDataChangedSlot);
 		this->newTool(mTrackedStream->getProbeTool());
 		this->newVideoSource(mTrackedStream->getVideoSource());
 	}
@@ -98,8 +99,6 @@ void StreamRep3D::newVideoSource(VideoSourcePtr videoSource)
 
 	this->initTransferFunction(image);
 
-	if(mVideoSource)
-		disconnect(videoSource.get(), &VideoSource::newFrame, this, &StreamRep3D::newFrame);
 	mVideoSource = videoSource;
 }
 
@@ -116,11 +115,16 @@ void StreamRep3D::initTransferFunction(ImagePtr image)
 	image->setTransferFunctions3D(tf3D);
 }
 
-void StreamRep3D::newFrame()
+void StreamRep3D::onModifiedStartRender()
 {
-	vtkImageDataPtr volume = mImage->resample(this->mMaxVoxels);
-	mMapper->SetInputData(volume);
+//	this->update();
+	if (mImage && mTrackedStream->getProbeTool())
+	{
+		std::cout << "StreamRep3D::onModifiedStartRender() prMt: " << mTrackedStream->getProbeTool()->get_prMt() << " tool: "<< mTrackedStream->getProbeTool().get() << std::endl;
+		mImage->get_rMd_History()->setRegistration(mTrackedStream->getProbeTool()->get_prMt());
+	}
 }
+
 
 TrackedStreamPtr StreamRep3D::getTrackedStream()
 {

@@ -334,6 +334,7 @@ ToolPtr PatientModelImplService::getProbeTool(QString videoSourceUid)
 		if(probe && probe->getAvailableVideoSources().contains(videoSourceUid))
 			return tool;
 	}
+	reportWarning("Found no probe for stream" + videoSourceUid);
 	return ToolPtr();
 }
 

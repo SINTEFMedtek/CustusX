@@ -34,6 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkImageData.h>
 
+#include "cxTool.h"
+#include "cxRegistrationTransform.h"
+
 namespace cx
 {
 
@@ -54,8 +57,21 @@ TrackedStream::TrackedStream(const QString& uid, const QString& name, const Tool
 
 void TrackedStream::setProbeTool(const ToolPtr &probeTool)
 {
+	if(mProbeTool)
+		disconnect(mProbeTool.get(), &Tool::toolTransformAndTimestamp, this, &TrackedStream::toolTransformAndTimestamp);
+
 	mProbeTool = probeTool;
 	emit newTool(mProbeTool);
+
+	if(mProbeTool)
+		connect(mProbeTool.get(), &Tool::toolTransformAndTimestamp, this, &TrackedStream::toolTransformAndTimestamp);
+}
+
+void TrackedStream::toolTransformAndTimestamp(Transform3D prMt, double timestamp)
+{
+//	std::cout << "TrackedStream::toolTransformAndTimestamp prMt: " << prMt << std::endl;
+	if (mImage)
+		mImage->get_rMd_History()->setRegistration(prMt);
 }
 
 ToolPtr TrackedStream::getProbeTool()
@@ -79,7 +95,7 @@ void TrackedStream::setVideoSource(const VideoSourcePtr &videoSource)
 void TrackedStream::newFrameSlot()
 {
 	//TODO: Check if we need to turn this on/off
-	if (mImage)
+	if (mImage && mVideoSource)
 	{
 		mImage->setVtkImageData(mVideoSource->getVtkImageData(), false);
 		emit newFrame();

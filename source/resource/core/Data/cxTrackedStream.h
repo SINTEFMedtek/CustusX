@@ -79,6 +79,7 @@ signals:
 
 private slots:
 	void newFrameSlot();
+	void toolTransformAndTimestamp(Transform3D prMt, double timestamp);
 private:
 	ToolPtr mProbeTool;
 	VideoSourcePtr mVideoSource;
