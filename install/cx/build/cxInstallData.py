@@ -140,7 +140,7 @@ class Common(object):
         p.add_boolean_inverter('--static', default=self.static, dest='static', help='Link statically.')        
         if platform.system() == 'Windows':
             p.add_boolean_inverter('--jom', default=self.jom, dest='jom', help='Use jom to build.')
-        p.add_boolean_inverter('--ninja', default=self.jom, dest='ninja', help='Use ninja to build.')
+        p.add_boolean_inverter('--ninja', default=self.ninja, dest='ninja', help='Use ninja to build.')
         if platform.system() == 'Darwin':
             p.add_boolean_inverter('--xcode', default=self.xcode, dest='xcode', help='Generate xcode targets')
         p.add_boolean_inverter('--force_connect_sublibraries', default=self.force_connect_sublibraries, dest='force_connect_sublibraries', help='Force libs such as gestreamer and tsf to be connected to cx, during configuration step.')        
