@@ -632,15 +632,7 @@ RepPtr ViewWrapper3D::createDataRep3D(DataPtr data)
 	else if (boost::dynamic_pointer_cast<TrackedStream>(data))
 	{
 		TrackedStreamPtr trackedStream = boost::dynamic_pointer_cast<TrackedStream>(data);
-		if(trackedStream->is3D())
-		{
-			StreamRep3DPtr rep = StreamRep3D::New(mBackend->getSpaceProvider(), mBackend->getPatientService());
-			rep->setUseVolumeTextureMapper();//Test
-			rep->setTrackedStream(trackedStream);
-			return rep;
-		}
-		else
-			return RepPtr();
+		return this->createTrackedStreamRep(trackedStream);
 	}
     else
     {
@@ -650,6 +642,30 @@ RepPtr ViewWrapper3D::createDataRep3D(DataPtr data)
     }
 
     return RepPtr();
+}
+
+RepPtr ViewWrapper3D::createTrackedStreamRep(TrackedStreamPtr trackedStream)
+{
+	if(!trackedStream->hasVideo())
+	{
+		connect(trackedStream.get(), &TrackedStream::streamChanged, this, &ViewWrapper3D::dataViewPropertiesChangedSlot);
+		return RepPtr();
+	}
+	else
+		disconnect(trackedStream.get(), &TrackedStream::streamChanged, this, &ViewWrapper3D::dataViewPropertiesChangedSlot);
+	if(trackedStream->is3D())
+	{
+//		std::cout << "ViewWrapper3D::createDataRep3D. Create StreamRep3D" << std::endl;
+		StreamRep3DPtr rep = StreamRep3D::New(mBackend->getSpaceProvider(), mBackend->getPatientService());
+		rep->setUseVolumeTextureMapper();//Test
+		rep->setTrackedStream(trackedStream);
+		return rep;
+	}
+	else
+	{
+		std::cout << "ViewWrapper3D::createDataRep3D. StreamRep2D not implemented yet" << std::endl;
+		return RepPtr();
+	}
 }
 
 DataMetricRepPtr ViewWrapper3D::createDataMetricRep3D(DataPtr data)

@@ -73,6 +73,7 @@ void TrackedStream::setProbeTool(const ToolPtr &probeTool)
 
 void TrackedStream::toolTransformAndTimestamp(Transform3D prMt, double timestamp)
 {
+	//tMu calculation in ProbeSector differ from the one used here
 //	Transform3D tMu = mProbeData.get_tMu();
 	Transform3D tMu = this->get_tMu();
 	Transform3D rMpr = mSpaceProvider->get_rMpr();
@@ -110,7 +111,7 @@ void TrackedStream::setVideoSource(const VideoSourcePtr &videoSource)
 		disconnect(mVideoSource.get(), &VideoSource::newFrame, this, &TrackedStream::newFrame);
 
 	mVideoSource = videoSource;
-	emit streamChanged();
+	emit streamChanged(this->getUid());
 	emit newVideoSource(mVideoSource);
 
 	if(mVideoSource)
@@ -174,12 +175,17 @@ ImagePtr TrackedStream::getChangingImage()
 
 bool TrackedStream::is3D()
 {
-	if(!mVideoSource || !mVideoSource->getVtkImageData())
-		return false;
-	if(mVideoSource->getVtkImageData()->GetDataDimension() == 3)
+	if(this->hasVideo() && ( mVideoSource->getVtkImageData()->GetDataDimension() == 3) )
 		return true;
 	else
 		return false;
+}
+
+bool TrackedStream::hasVideo()
+{
+	if(!mVideoSource || !mVideoSource->getVtkImageData())
+		return false;
+	return true;
 }
 
 } //cx

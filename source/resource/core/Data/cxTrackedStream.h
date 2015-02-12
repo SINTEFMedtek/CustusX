@@ -73,8 +73,9 @@ public:
 
 	ImagePtr getChangingImage();
 	bool is3D();
+	bool hasVideo();
 signals:
-	void streamChanged();
+	void streamChanged(QString uid);
 	void newTool(ToolPtr tool);
 	void newVideoSource(VideoSourcePtr videoSource);
 	void newFrame();

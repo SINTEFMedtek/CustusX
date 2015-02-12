@@ -161,6 +161,7 @@ private:
 	OrientationAnnotation3DRepPtr mAnnotationMarker;
 
 	ViewPtr mView;
+	RepPtr createTrackedStreamRep(TrackedStreamPtr trackedStream);
 };
 typedef boost::shared_ptr<ViewWrapper3D> ViewWrapper3DPtr;
 
