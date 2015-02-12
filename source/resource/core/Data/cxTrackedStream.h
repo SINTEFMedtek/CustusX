@@ -59,6 +59,7 @@ public:
 	ToolPtr getProbeTool();
 	void setVideoSource(const VideoSourcePtr &videoSource);
 	VideoSourcePtr getVideoSource();
+	void setSpaceProvider(SpaceProviderPtr spaceProvider);
 
 	virtual void addXml(QDomNode& dataNode);
 	virtual void parseXml(QDomNode& dataNode);
@@ -84,6 +85,9 @@ private:
 	ToolPtr mProbeTool;
 	VideoSourcePtr mVideoSource;
 	ImagePtr mImage;
+
+	SpaceProviderPtr mSpaceProvider;
+	Transform3D get_tMu();
 };
 
 typedef boost::shared_ptr<TrackedStream> TrackedStreamPtr;

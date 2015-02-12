@@ -319,6 +319,7 @@ void PatientModelImplService::videoSourceAdded(VideoSourcePtr source)
 		trackedStream = this->createSpecificData<TrackedStream>(uid, name);
 	trackedStream->setProbeTool(tool);
 	trackedStream->setVideoSource(source);
+	trackedStream->setSpaceProvider(mDataService->getSpaceProvider());
 
 	//Only load trackedStream, don't save it
 	this->dataService()->loadData(trackedStream);

@@ -37,6 +37,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTool.h"
 #include "cxRegistrationTransform.h"
 
+#include "cxProbeSector.h"
+#include "cxSpaceProvider.h"
+
 namespace cx
 {
 
@@ -47,7 +50,8 @@ TrackedStreamPtr TrackedStream::create(const QString &uid, const QString &name)
 
 TrackedStream::TrackedStream(const QString& uid, const QString& name, const ToolPtr &probe, const VideoSourcePtr &videosource) :
 	Data(uid, name), mProbeTool(probe), //mVideoSource(videosource)
-	mImage(ImagePtr())
+	mImage(ImagePtr()),
+	mSpaceProvider(SpaceProviderPtr())
 {
 	if(mProbeTool)
 		emit newTool(mProbeTool);
@@ -69,9 +73,30 @@ void TrackedStream::setProbeTool(const ToolPtr &probeTool)
 
 void TrackedStream::toolTransformAndTimestamp(Transform3D prMt, double timestamp)
 {
-//	std::cout << "TrackedStream::toolTransformAndTimestamp prMt: " << prMt << std::endl;
+//	Transform3D tMu = mProbeData.get_tMu();
+	Transform3D tMu = this->get_tMu();
+	Transform3D rMpr = mSpaceProvider->get_rMpr();
+	Transform3D rMu = rMpr * prMt * tMu;
+
 	if (mImage)
-		mImage->get_rMd_History()->setRegistration(prMt);
+		mImage->get_rMd_History()->setRegistration(rMu);
+}
+
+Transform3D TrackedStream::get_tMu()
+{
+	//Made tMu by copying and modifying code from ProbeSector::get_tMu()
+	ProbeDefinition probeDefinition = mProbeTool->getProbe()->getProbeData();
+	Vector3D origin_p = probeDefinition.getOrigin_p();
+	Vector3D spacing = probeDefinition.getSpacing();
+	Vector3D origin_u(origin_p[0]*spacing[0], origin_p[1]*spacing[1], origin_p[2]*spacing[2]);
+
+	Transform3D Rx = createTransformRotateX(M_PI / 2.0);
+	Transform3D Rz = createTransformRotateY(M_PI / 2.0);
+	Transform3D R = (Rx * Rz);
+	Transform3D T = createTransformTranslate(-origin_u);
+
+	Transform3D tMu = R * T;
+	return tMu;
 }
 
 ToolPtr TrackedStream::getProbeTool()
@@ -105,6 +130,11 @@ void TrackedStream::newFrameSlot()
 VideoSourcePtr TrackedStream::getVideoSource()
 {
 	return mVideoSource;
+}
+
+void TrackedStream::setSpaceProvider(SpaceProviderPtr spaceProvider)
+{
+	mSpaceProvider = spaceProvider;
 }
 
 void TrackedStream::addXml(QDomNode &dataNode)

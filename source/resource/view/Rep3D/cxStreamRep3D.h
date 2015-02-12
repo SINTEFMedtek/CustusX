@@ -59,8 +59,6 @@ public:
 	void setTrackedStream(TrackedStreamPtr trackedStream);
 	TrackedStreamPtr getTrackedStream();
 
-protected:
-	virtual void onModifiedStartRender();
 private slots:
 	void newTool(ToolPtr tool);
 	void newVideoSource(VideoSourcePtr videoSource);
