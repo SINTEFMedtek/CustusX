@@ -92,8 +92,8 @@ Transform3D TrackedStream::get_tMu()
 	Vector3D origin_u(origin_p[0]*spacing[0], origin_p[1]*spacing[1], origin_p[2]*spacing[2]);
 
 	Transform3D Rx = createTransformRotateX(M_PI / 2.0);
-	Transform3D Rz = createTransformRotateY(M_PI / 2.0);
-	Transform3D R = (Rx * Rz);
+	Transform3D Ry = createTransformRotateY(-M_PI / 2.0);
+	Transform3D R = (Rx * Ry);
 	Transform3D T = createTransformTranslate(-origin_u);
 
 	Transform3D tMu = R * T;
