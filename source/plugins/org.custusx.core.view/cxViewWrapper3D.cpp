@@ -657,7 +657,16 @@ RepPtr ViewWrapper3D::createTrackedStreamRep(TrackedStreamPtr trackedStream)
 	{
 //		std::cout << "ViewWrapper3D::createDataRep3D. Create StreamRep3D" << std::endl;
 		StreamRep3DPtr rep = StreamRep3D::New(mBackend->getSpaceProvider(), mBackend->getPatientService());
-		rep->setUseVolumeTextureMapper();//Test
+		QString visualizerType = settings()->value("View3D/ImageRender3DVisualizer").toString();
+		if(visualizerType == "vtkVolumeTextureMapper3D")
+			rep->setUseVolumeTextureMapper();
+		else if(visualizerType == "vtkGPUVolumeRayCastMapper")
+			rep->setUseGPUVolumeRayCastMapper();
+		else
+		{
+			reportError(QString("No visualizer found for string=%1").arg(visualizerType));
+				return RepPtr();
+		}
 		rep->setTrackedStream(trackedStream);
 		return rep;
 	}
