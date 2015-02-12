@@ -86,7 +86,6 @@ private:
 	ProbeSector mProbeData;
 	VideoSourcePtr mData;
 	SpaceProviderPtr mSpaceProvider;
-//	ImagePtr mImage;//Can be used instead of mTexture. This allows visualization of rt 3D
 };
 
 } // namespace cx

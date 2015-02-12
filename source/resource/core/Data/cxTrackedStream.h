@@ -72,6 +72,7 @@ public:
 	static QString getTypeName();
 
 	ImagePtr getChangingImage();
+	bool is3D();
 signals:
 	void streamChanged();
 	void newTool(ToolPtr tool);

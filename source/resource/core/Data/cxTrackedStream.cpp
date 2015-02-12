@@ -49,7 +49,7 @@ TrackedStreamPtr TrackedStream::create(const QString &uid, const QString &name)
 }
 
 TrackedStream::TrackedStream(const QString& uid, const QString& name, const ToolPtr &probe, const VideoSourcePtr &videosource) :
-	Data(uid, name), mProbeTool(probe), //mVideoSource(videosource)
+	Data(uid, name), mProbeTool(probe), mVideoSource(VideoSourcePtr()),
 	mImage(ImagePtr()),
 	mSpaceProvider(SpaceProviderPtr())
 {
@@ -170,6 +170,16 @@ ImagePtr TrackedStream::getChangingImage()
 	if (!mImage)
 		mImage = ImagePtr(new Image(this->getUid()+"_TrackedStreamHelper", mVideoSource->getVtkImageData(), this->getName()+"_TrackedStreamHelper"));
 	return mImage;
+}
+
+bool TrackedStream::is3D()
+{
+	if(!mVideoSource || !mVideoSource->getVtkImageData())
+		return false;
+	if(mVideoSource->getVtkImageData()->GetDataDimension() == 3)
+		return true;
+	else
+		return false;
 }
 
 } //cx
