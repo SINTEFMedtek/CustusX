@@ -59,6 +59,7 @@ public:
 	ToolPtr getProbeTool();
 	void setVideoSource(const VideoSourcePtr &videoSource);
 	VideoSourcePtr getVideoSource();
+	void setSpaceProvider(SpaceProviderPtr spaceProvider);
 
 	virtual void addXml(QDomNode& dataNode);
 	virtual void parseXml(QDomNode& dataNode);
@@ -71,18 +72,24 @@ public:
 	static QString getTypeName();
 
 	ImagePtr getChangingImage();
+	bool is3D();
+	bool hasVideo();
 signals:
-	void streamChanged();
+	void streamChanged(QString uid);
 	void newTool(ToolPtr tool);
 	void newVideoSource(VideoSourcePtr videoSource);
 	void newFrame();
 
 private slots:
 	void newFrameSlot();
+	void toolTransformAndTimestamp(Transform3D prMt, double timestamp);
 private:
 	ToolPtr mProbeTool;
 	VideoSourcePtr mVideoSource;
 	ImagePtr mImage;
+
+	SpaceProviderPtr mSpaceProvider;
+	Transform3D get_tMu();
 };
 
 typedef boost::shared_ptr<TrackedStream> TrackedStreamPtr;

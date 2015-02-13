@@ -38,7 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "cxTool.h"
-#include "cxImage.h"
 #include "cxRegistrationTransform.h"
 #include "cxVideoGraphics.h"
 #include "cxVideoSource.h"
@@ -53,7 +52,6 @@ VideoSourceGraphics::VideoSourceGraphics(SpaceProviderPtr spaceProvider, bool us
 	mClipToSector = true;
 	mPipeline.reset(new VideoGraphics());
 	mShowInToolSpace = true;
-//	mImage = ImagePtr();
 }
 
 VideoSourceGraphics::~VideoSourceGraphics()
@@ -105,9 +103,6 @@ void VideoSourceGraphics::setTool(ToolPtr tool)
 	}
 
 	this->probeSectorChanged();
-
-//	if(mTool && mImage)
-//		mImage->setName(mTool->getName());
 }
 
 void VideoSourceGraphics::setClipToSector(bool on)
@@ -166,13 +161,6 @@ void VideoSourceGraphics::receiveTransforms(Transform3D prMt, double timestamp)
 	Transform3D tMu = mProbeData.get_tMu();
 	Transform3D rMu = rMpr * prMt * tMu;
 	mPipeline->setActorUserMatrix(rMu.getVtkMatrix());
-
-//	//TODO: Set correct position and orientation on mImage
-//	//std::cout << "rMu: " << rMu << std::endl;
-//	if (mImage)
-//	{
-//		mImage->get_rMd_History()->setRegistration(rMu);
-//	}
 }
 
 void VideoSourceGraphics::newDataSlot()
@@ -185,11 +173,6 @@ void VideoSourceGraphics::newDataSlot()
 	}
 
 	mPipeline->update();
-
-//	if (mImage)
-//	{
-//		mImage->setVtkImageData(mData->getVtkImageData());//Update pointer to 4D image
-//	}
 
 	bool visible = mData->validData();
 	if (mShowInToolSpace)

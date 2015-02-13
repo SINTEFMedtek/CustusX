@@ -62,7 +62,6 @@ public:
 private slots:
 	void newTool(ToolPtr tool);
 	void newVideoSource(VideoSourcePtr videoSource);
-	void newFrame();
 private:
 	StreamRep3D(SpaceProviderPtr spaceProvider, PatientModelServicePtr patientModelService);
 

@@ -34,6 +34,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkImageData.h>
 
+#include "cxTool.h"
+#include "cxRegistrationTransform.h"
+
+#include "cxProbeSector.h"
+#include "cxSpaceProvider.h"
+
 namespace cx
 {
 
@@ -43,8 +49,9 @@ TrackedStreamPtr TrackedStream::create(const QString &uid, const QString &name)
 }
 
 TrackedStream::TrackedStream(const QString& uid, const QString& name, const ToolPtr &probe, const VideoSourcePtr &videosource) :
-	Data(uid, name), mProbeTool(probe), //mVideoSource(videosource)
-	mImage(ImagePtr())
+	Data(uid, name), mProbeTool(probe), mVideoSource(VideoSourcePtr()),
+	mImage(ImagePtr()),
+	mSpaceProvider(SpaceProviderPtr())
 {
 	if(mProbeTool)
 		emit newTool(mProbeTool);
@@ -54,8 +61,43 @@ TrackedStream::TrackedStream(const QString& uid, const QString& name, const Tool
 
 void TrackedStream::setProbeTool(const ToolPtr &probeTool)
 {
+	if(mProbeTool)
+		disconnect(mProbeTool.get(), &Tool::toolTransformAndTimestamp, this, &TrackedStream::toolTransformAndTimestamp);
+
 	mProbeTool = probeTool;
 	emit newTool(mProbeTool);
+
+	if(mProbeTool)
+		connect(mProbeTool.get(), &Tool::toolTransformAndTimestamp, this, &TrackedStream::toolTransformAndTimestamp);
+}
+
+void TrackedStream::toolTransformAndTimestamp(Transform3D prMt, double timestamp)
+{
+	//tMu calculation in ProbeSector differ from the one used here
+//	Transform3D tMu = mProbeData.get_tMu();
+	Transform3D tMu = this->get_tMu();
+	Transform3D rMpr = mSpaceProvider->get_rMpr();
+	Transform3D rMu = rMpr * prMt * tMu;
+
+	if (mImage)
+		mImage->get_rMd_History()->setRegistration(rMu);
+}
+
+Transform3D TrackedStream::get_tMu()
+{
+	//Made tMu by copying and modifying code from ProbeSector::get_tMu()
+	ProbeDefinition probeDefinition = mProbeTool->getProbe()->getProbeData();
+	Vector3D origin_p = probeDefinition.getOrigin_p();
+	Vector3D spacing = probeDefinition.getSpacing();
+	Vector3D origin_u(origin_p[0]*spacing[0], origin_p[1]*spacing[1], origin_p[2]*spacing[2]);
+
+	Transform3D Rx = createTransformRotateX(M_PI / 2.0);
+	Transform3D Ry = createTransformRotateY(-M_PI / 2.0);
+	Transform3D R = (Rx * Ry);
+	Transform3D T = createTransformTranslate(-origin_u);
+
+	Transform3D tMu = R * T;
+	return tMu;
 }
 
 ToolPtr TrackedStream::getProbeTool()
@@ -69,7 +111,7 @@ void TrackedStream::setVideoSource(const VideoSourcePtr &videoSource)
 		disconnect(mVideoSource.get(), &VideoSource::newFrame, this, &TrackedStream::newFrame);
 
 	mVideoSource = videoSource;
-	emit streamChanged();
+	emit streamChanged(this->getUid());
 	emit newVideoSource(mVideoSource);
 
 	if(mVideoSource)
@@ -79,7 +121,7 @@ void TrackedStream::setVideoSource(const VideoSourcePtr &videoSource)
 void TrackedStream::newFrameSlot()
 {
 	//TODO: Check if we need to turn this on/off
-	if (mImage)
+	if (mImage && mVideoSource)
 	{
 		mImage->setVtkImageData(mVideoSource->getVtkImageData(), false);
 		emit newFrame();
@@ -89,6 +131,11 @@ void TrackedStream::newFrameSlot()
 VideoSourcePtr TrackedStream::getVideoSource()
 {
 	return mVideoSource;
+}
+
+void TrackedStream::setSpaceProvider(SpaceProviderPtr spaceProvider)
+{
+	mSpaceProvider = spaceProvider;
 }
 
 void TrackedStream::addXml(QDomNode &dataNode)
@@ -124,6 +171,21 @@ ImagePtr TrackedStream::getChangingImage()
 	if (!mImage)
 		mImage = ImagePtr(new Image(this->getUid()+"_TrackedStreamHelper", mVideoSource->getVtkImageData(), this->getName()+"_TrackedStreamHelper"));
 	return mImage;
+}
+
+bool TrackedStream::is3D()
+{
+	if(this->hasVideo() && ( mVideoSource->getVtkImageData()->GetDataDimension() == 3) )
+		return true;
+	else
+		return false;
+}
+
+bool TrackedStream::hasVideo()
+{
+	if(!mVideoSource || !mVideoSource->getVtkImageData())
+		return false;
+	return true;
 }
 
 } //cx

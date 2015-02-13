@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //To be removed
 #include "cxImageTF3D.h"
+#include "cxRegistrationTransform.h"
 
 
 namespace cx
@@ -68,7 +69,7 @@ void StreamRep3D::setTrackedStream(TrackedStreamPtr trackedStream)
 	{
 		disconnect(mTrackedStream.get(), &TrackedStream::newTool, this, &StreamRep3D::newTool);
 		disconnect(mTrackedStream.get(), &TrackedStream::newVideoSource, this, &StreamRep3D::newVideoSource);
-		disconnect(mTrackedStream.get(), &TrackedStream::newFrame, this, &StreamRep3D::newFrame);
+		disconnect(mTrackedStream.get(), &TrackedStream::newFrame, this, &StreamRep3D::vtkImageDataChangedSlot);
 	}
 
 	mTrackedStream = trackedStream;
@@ -77,7 +78,7 @@ void StreamRep3D::setTrackedStream(TrackedStreamPtr trackedStream)
 	{
 		connect(mTrackedStream.get(), &TrackedStream::newTool, this, &StreamRep3D::newTool);
 		connect(mTrackedStream.get(), &TrackedStream::newVideoSource, this, &StreamRep3D::newVideoSource);
-		connect(mTrackedStream.get(), &TrackedStream::newFrame, this, &StreamRep3D::newFrame);
+		connect(mTrackedStream.get(), &TrackedStream::newFrame, this, &StreamRep3D::vtkImageDataChangedSlot);
 		this->newTool(mTrackedStream->getProbeTool());
 		this->newVideoSource(mTrackedStream->getVideoSource());
 	}
@@ -98,8 +99,6 @@ void StreamRep3D::newVideoSource(VideoSourcePtr videoSource)
 
 	this->initTransferFunction(image);
 
-	if(mVideoSource)
-		disconnect(videoSource.get(), &VideoSource::newFrame, this, &StreamRep3D::newFrame);
 	mVideoSource = videoSource;
 }
 
@@ -114,12 +113,6 @@ void StreamRep3D::initTransferFunction(ImagePtr image)
 	opacity[200] = image->getMaxAlphaValue();
 	tf3D->resetAlpha(opacity);
 	image->setTransferFunctions3D(tf3D);
-}
-
-void StreamRep3D::newFrame()
-{
-	vtkImageDataPtr volume = mImage->resample(this->mMaxVoxels);
-	mMapper->SetInputData(volume);
 }
 
 TrackedStreamPtr StreamRep3D::getTrackedStream()

@@ -239,6 +239,10 @@ void TrackingImplService::imbueManualToolWithRealProperties()
 		if (iter->second->hasType(Tool::TOOL_REFERENCE))
 			continue;
 		mManualTool->setBase(iter->second);
+
+		if(iter->second->hasType(Tool::TOOL_US_PROBE))
+			emit newProbe(mManualTool);
+
 		report("Manual tool imbued with properties from " + iter->first);
 		break;
 	}

@@ -319,6 +319,7 @@ void PatientModelImplService::videoSourceAdded(VideoSourcePtr source)
 		trackedStream = this->createSpecificData<TrackedStream>(uid, name);
 	trackedStream->setProbeTool(tool);
 	trackedStream->setVideoSource(source);
+	trackedStream->setSpaceProvider(mDataService->getSpaceProvider());
 
 	//Only load trackedStream, don't save it
 	this->dataService()->loadData(trackedStream);
@@ -334,6 +335,7 @@ ToolPtr PatientModelImplService::getProbeTool(QString videoSourceUid)
 		if(probe && probe->getAvailableVideoSources().contains(videoSourceUid))
 			return tool;
 	}
+	reportWarning("Found no probe for stream" + videoSourceUid);
 	return ToolPtr();
 }
 

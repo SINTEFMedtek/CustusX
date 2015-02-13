@@ -118,7 +118,7 @@ protected:
 	ImagePtr mImage;
 	cx::ImageMapperMonitorPtr mMonitor; ///< helper object for visualizing clipping/cropping
 
-private slots:
+protected slots:
 	void transformChangedSlot();
 	void vtkImageDataChangedSlot();
 };
