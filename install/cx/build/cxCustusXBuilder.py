@@ -34,7 +34,6 @@ class CustusXBuilder:
     def __init__(self, assembly):
         ''
         self.assembly = assembly
-        #self.assembly = cxComponentAssembly.LibraryAssembly()
     
     def buildAllComponents(self):
         self.assembly.controlData.printSettings()
@@ -167,13 +166,28 @@ class CustusXBuilder:
                 return '%s\\_CPack_Packages\\win64\\NSIS' % build_path
         else:
             return custusx.buildPath()
+
+    def publishDocumentation(self, targetFolder):
+        '''
+        Publish both user and developer documentation to remote server.
+        targetFolder is relative to the default path
+        '''
+        self.publishUserDocs(targetFolder)
+        self.publishDeveloperDocs(targetFolder)
         
-    def publishDoxygen(self):
-        PrintFormatter.printHeader('copy/publish doxygen to medtek server (link from wiki)', level=2)
-        remoteServerPath = "/Volumes/medtek_HD/Library/Server/Web/Data/Sites/Default/custusx_doxygen"
+    def publishDeveloperDocs(self, targetFolder):
+        PrintFormatter.printHeader('Publish Developer Docs to server', level=2)
+        target = self.assembly.controlData.publish_developer_documentation_target
         custusx = self._createComponent(cxComponents.CustusX)
-        cmd = 'scp -r %s/doc/doxygen/html/* medtek.sintef.no:%s'
-        shell.run(cmd % (custusx.buildPath(), remoteServerPath))
+        cmd = 'scp -r %s/doc/doxygen/html/ %s'
+        shell.run(cmd % (custusx.buildPath(), target.get_scp_target_string()+"/"+targetFolder))
+
+    def publishUserDocs(self, targetFolder):
+        PrintFormatter.printHeader('Publish User Docs to server', level=2)
+        target = self.assembly.controlData.publish_user_documentation_target
+        custusx = self._createComponent(cxComponents.CustusX)
+        cmd = 'scp -r %s/documentation/html_pure/ %s'
+        shell.run(cmd % (custusx.buildPath(), target.get_scp_target_string()+"/"+targetFolder))
 
     def resetCoverage(self):
         '''

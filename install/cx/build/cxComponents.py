@@ -178,7 +178,8 @@ class VTK(CppComponent):
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def _rawCheckout(self):
-        self._getBuilder().gitClone('git@github.com:SINTEFMedisinskTeknologi/VTK')
+        base = self.controlData.gitrepo_open_site_base
+        self._getBuilder().gitClone('%s/VTK' % base)
     def update(self):
         # this fix should rebase repo from the original Kitware/VTK to our own fork on GitHub.
         repo = 'git@github.com:SINTEFMedisinskTeknologi/VTK'
@@ -231,7 +232,8 @@ class CTK(CppComponent):
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def _getRepo(self):
-        return 'git@github.com:SINTEFMedisinskTeknologi/CTK.git'
+        base = self.controlData.gitrepo_open_site_base
+        return '%s/CTK.git' % base
     def _rawCheckout(self):
         self._getBuilder().gitClone(self._getRepo())
     def update(self):
@@ -353,7 +355,8 @@ class IGSTK(CppComponent):
     def update(self):
         #self._getBuilder().gitCheckout('v5.2', patch='IGSTK-5-2.patch')
         # this fix should rebase repo from the original Kitware/IGSTK to our own fork on GitHub.
-        repo = 'git@github.com:SINTEFMedisinskTeknologi/IGSTK'
+        base = self.controlData.gitrepo_open_site_base
+        repo = '%s/IGSTK' % base
         branch = 'IGSTK-CX-modifications'
         #tag = 'IGSTK-5-2.cx_patch_3-6-0'
         self._getBuilder().gitSetRemoteURL(repo, branch=branch)
@@ -384,7 +387,8 @@ class CustusX(CppComponent):
     def path(self):
         return self.controlData.getWorkingPath() + "/CustusX"    
     def _rawCheckout(self):
-        self._getBuilder().gitClone('git@github.com:SINTEFMedisinskTeknologi/CustusX.git', 'CustusX')
+        base = self.controlData.gitrepo_open_site_base
+        self._getBuilder().gitClone('%s/CustusX.git' % base, 'CustusX')
     def update(self):
         self._getBuilder().gitCheckoutDefaultBranch(submodules=True)    
         #self._getBuilder().gitUpdate('master', tag=self.controlData.getGitTag(), submodules=True)    
@@ -403,7 +407,8 @@ class CustusX(CppComponent):
         add('Tube-Segmentation-Framework_DIR:PATH', self._createSibling(TubeSegmentationFramework).configPath())
         add('Level-Set-Segmentation_DIR:PATH', self._createSibling(LevelSetSegmentation).configPath())
         add('OpenCLUtilityLibrary_DIR:PATH', self._createSibling(OpenCLUtilityLibrary).configPath())
-        add('BUILD_DOCUMENTATION:BOOL', self.controlData.mDoxygen)            
+        add('BUILD_DOCUMENTATION:BOOL', self.controlData.build_developer_doc)            
+        add('CX_BUILD_USER_DOCUMENTATION:BOOL', self.controlData.build_user_doc)            
         add('SSC_BUILD_EXAMPLES:BOOL', self.controlData.mBuildSSCExamples);
         add('BUILD_TESTING:BOOL', self.controlData.mBuildTesting);
         add('SSC_USE_GCOV:BOOL', self.controlData.mCoverage);
@@ -430,7 +435,8 @@ class TubeSegmentationFramework(CppComponent):
     def path(self):
         return self.controlData.getWorkingPath() + "/Tube-Segmentation-Framework"
     def _rawCheckout(self):
-        self._getBuilder().gitClone('git@github.com:SINTEFMedisinskTeknologi/Tube-Segmentation-Framework.git')
+        base = self.controlData.gitrepo_open_site_base
+        self._getBuilder().gitClone('%s/Tube-Segmentation-Framework.git' % base)
     def update(self):
         self._getBuilder().gitCheckoutDefaultBranch(submodules=True)    
         self._getBuilder()._gitSubmoduleUpdate()
@@ -460,7 +466,8 @@ class LevelSetSegmentation(CppComponent):
     def path(self):
         return self.controlData.getWorkingPath() + "/Level-Set-Segmentation"
     def _rawCheckout(self):
-        self._getBuilder().gitClone('git@github.com:SINTEFMedisinskTeknologi/Level-Set-Segmentation')
+        base = self.controlData.gitrepo_open_site_base
+        self._getBuilder().gitClone('%s/Level-Set-Segmentation' % base)
     def update(self):
         # this fix should rebase repo from the original smistad/LSS to our own fork on GitHub.
         repo = 'git@github.com:SINTEFMedisinskTeknologi/Level-Set-Segmentation'
@@ -522,8 +529,8 @@ class CustusXData(CppComponent):
     def build(self):
         pass
     def gitRepository(self):
-        return 'git@github.com:SINTEFMedisinskTeknologi/CustusXData.git'
-        #return 'medtek.sintef.no//Volumes/medtek_HD/git/Data.git'
+        base = self.controlData.gitrepo_open_site_base
+        return '%s/CustusXData.git' % base
     def makeClean(self):
         pass
     def isPubliclyAvailable(self):

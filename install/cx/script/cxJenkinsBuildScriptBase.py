@@ -48,6 +48,7 @@ class Controller(cxBuildScript.BuildScript):
     def addArgParsers(self):
         super(Controller, self).addArgParsers()
         self.additionalParsers.append(self.controlData().getArgParser_core_build())
+        self.additionalParsers.append(self.controlData().getArgParser_extended_build())
         
     def applyArgumentParsers(self, arguments):
         arguments = super(Controller, self).applyArgumentParsers(arguments)
@@ -110,11 +111,46 @@ class Controller(cxBuildScript.BuildScript):
             self.cxInstaller.installPackage()
         self.cxInstallation.runUnstableTests()
 
-    def createReleaseStep(self, 
-                          skip_publish_release=False):
-        folder = self.cxInstaller.createReleaseFolder()
-        if not skip_publish_release:
-            self.cxInstaller.publishReleaseFolder(folder)
+    def publishTaggedReleaseStep(self, 
+                          skip_publish_exe=False,
+                          skip_publish_docs=False):
+        if not skip_publish_exe:
+            self.publishTaggedRelease()
+        if not skip_publish_docs:
+            self.publishTaggedDocumentation()
+
+    def publishNightlyReleaseStep(self, 
+                          skip_publish_exe=False,
+                          skip_publish_docs=False):
+        if not skip_publish_exe:
+            self.publishNightlyRelease()
+        if not skip_publish_docs:
+            self.publishNightlyDocumentation()
+
+    def publishTaggedRelease(self):
+        '''
+        '''
+        targetFolder = self.cxInstaller.getTaggedFolderName()
+        self._publishRelease(remoteTargetFolder=targetFolder)
+
+    def publishNightlyRelease(self):
+        '''
+        '''
+        self._publishRelease(remoteTargetFolder="nightly")
+
+    def _publishRelease(self, remoteTargetFolder):
+        '''
+        '''
+        source = self.cxInstaller.createReleaseFolder() # get path to folder containing releasable files
+        target = self.controlData().publish_release_target
+        # install files in source to <release_server>/<targetFolder>/<platform>
+        self.cxInstaller.publishReleaseFolder(source, remoteTargetFolder, target)  
+
+    def publishTaggedDocumentation(self):
+        self.cxBuilder.publishDocumentation(targetFolder = self.cxInstaller.getTaggedFolderName())        
+
+    def publishNightlyDocumentation(self):
+        self.cxBuilder.publishDocumentation(targetFolder = "nightly")        
     
     def checkoutCustusXAndData(self):
         'checkout only CustusX and data. Required if the first build step was not run, f.ex. during integration tests'

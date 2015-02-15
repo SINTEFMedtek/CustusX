@@ -29,8 +29,12 @@ class LibraryAssembly(object):
     '''
     Manages the work of all libraries
     '''
-    def __init__(self):
-        self.controlData = cxInstallData.Common()
+    def __init__(self, controlData=None):
+        if (controlData==None):
+            self.controlData = cxInstallData.Common()
+        else:
+            self.controlData = controlData
+            
         self.libraries = []
         self.custusx = cxComponents.CustusX()
 
