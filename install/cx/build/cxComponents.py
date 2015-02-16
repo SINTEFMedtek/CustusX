@@ -241,7 +241,7 @@ class CTK(CppComponent):
         branch = 'CTK-CX-modifications'
         self._getBuilder().gitSetRemoteURL(repo, branch=branch)
         #latestTestedSHA = '3fe3cdbe9d0ef95b3810a12484f035ae1f66524c'
-        self._getBuilder().gitCheckoutBranch(branch)
+        #self._getBuilder().gitCheckoutBranch(branch)
         self._getBuilder().gitCheckout('1056228ab4aeefa9bf6db4fc32a8826db283475a')
     def configure(self):
         builder = self._getBuilder()
@@ -328,7 +328,7 @@ class OpenIGTLink(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git://github.com/openigtlink/OpenIGTLink.git')
     def update(self):
-        self._getBuilder().gitCheckoutBranch('master')
+        #self._getBuilder().gitCheckoutBranch('master')
         self._getBuilder().gitCheckout('5a501817c2da52e81db4db3eca6dd5111f94fed9')
     def configure(self):
         builder = self._getBuilder()
@@ -362,7 +362,7 @@ class IGSTK(CppComponent):
         branch = 'IGSTK-CX-modifications'
         #tag = 'IGSTK-5-2.cx_patch_3-6-0'
         self._getBuilder().gitSetRemoteURL(repo, branch=branch)
-        self._getBuilder().gitCheckoutBranch(branch)
+        #self._getBuilder().gitCheckoutBranch(branch)
         self._getBuilder().gitCheckout('6213b8b258d60b0a3ee03952a4341d71233397fb')
     def configure(self):        
         builder = self._getBuilder()
@@ -502,7 +502,7 @@ class OpenCLUtilityLibrary(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git@github.com:smistad/OpenCLUtilityLibrary')
     def update(self):
-        self._getBuilder().gitCheckoutBranch('custusx', submodules=False)
+        #self._getBuilder().gitCheckoutBranch('custusx', submodules=False)
         self._getBuilder().gitCheckout('43614718f7667dd5013af9300fcc63ae30bf244c')
     def configure(self):
         builder = self._getBuilder()
