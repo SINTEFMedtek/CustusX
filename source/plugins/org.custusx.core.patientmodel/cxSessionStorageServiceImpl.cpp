@@ -52,7 +52,7 @@ SessionStorageServiceImpl::SessionStorageServiceImpl(ctkPluginContext *context)
 	settings()->fillDefault("globalPatientDataFolder", QDir::homePath() + "/Patients");
 
 	this->clearCache();
-	mActivePatientFolder = this->getNullFolder();
+	mActivePatientFolder = DataLocations::getNoPatientFolder();
 	connect(this, &SessionStorageServiceImpl::sessionChanged, this, &SessionStorageServiceImpl::onSessionChanged);
 
 	QTimer::singleShot(100, this, SLOT(startupLoadPatient())); // make sure this is called after application state change
@@ -170,18 +170,12 @@ void SessionStorageServiceImpl::clear()
 bool SessionStorageServiceImpl::isValid() const
 {
 	return !mActivePatientFolder.isEmpty() &&
-			(mActivePatientFolder != this->getNullFolder());
+			(mActivePatientFolder != DataLocations::getNoPatientFolder());
 }
 
 QString SessionStorageServiceImpl::getRootFolder() const
 {
 	return mActivePatientFolder;
-}
-
-QString SessionStorageServiceImpl::getNullFolder() const
-{
-	QString patientDatafolder = settings()->value("globalPatientDataFolder").toString();
-	return patientDatafolder + "/NoPatient";
 }
 
 void SessionStorageServiceImpl::reportActivePatient()
@@ -206,7 +200,7 @@ void SessionStorageServiceImpl::onSessionChanged()
 
 void SessionStorageServiceImpl::clearPatientSilent()
 {
-	this->setActivePatient(this->getNullFolder());
+	this->setActivePatient(DataLocations::getNoPatientFolder());
 	emit cleared();
 }
 

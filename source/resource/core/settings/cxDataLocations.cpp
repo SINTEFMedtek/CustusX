@@ -51,7 +51,7 @@ void DataLocations::setTestMode()
 {
 	mTestMode = true;
 	cx::removeNonemptyDirRecursively(getTestDataPath() + "/temp");
-//	cx::removeNonemptyDirRecursively(getTestDataPath() + "/temp/settings");
+	cx::removeNonemptyDirRecursively(getNoPatientFolder());
 }
 
 QString DataLocations::getTestDataPath()
@@ -66,6 +66,12 @@ QString DataLocations::getTestDataPath()
 	{
 		return CX_DATA_ROOT;
 	}
+}
+
+QString DataLocations::getNoPatientFolder()
+{
+	QString patientDatafolder = settings()->value("globalPatientDataFolder").toString();
+	return patientDatafolder + "/NoPatient";
 }
 
 QString DataLocations::getLargeTestDataPath()

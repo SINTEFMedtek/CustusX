@@ -73,7 +73,6 @@ private slots:
 	void onSessionChanged();
 	void startupLoadPatient();
 private:
-	QString getNullFolder() const;
 	void reportActivePatient();
 	void setActivePatient(const QString& activePatientFolder); ///< set the activepatientfolder (absolute path)
 	QString getXmlFileName() const;
