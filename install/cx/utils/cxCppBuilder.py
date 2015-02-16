@@ -69,6 +69,17 @@ class CppBuilder:
         runShell('git clone %s %s' % (repository, folder))
         self._changeDirToSource()
         
+    def gitCloneIntoExistingDirectory(self, repository):
+        '''
+        Use in the case that the source folder already contains stuff,
+        http://stackoverflow.com/questions/2411031/how-do-i-clone-into-a-non-empty-directory
+        '''
+        self._changeDirToSource()    
+        runShell('git init')
+        runShell('git remote add origin %s' % repository)
+        runShell('git fetch')
+        runShell('git checkout -t origin/master')        
+
     def gitSetRemoteURL(self, new_remote_origin_repository, branch):
         self._changeDirToSource()
         runShell('git remote set-url origin %s' % new_remote_origin_repository)

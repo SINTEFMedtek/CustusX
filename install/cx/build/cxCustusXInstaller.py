@@ -178,7 +178,7 @@ class CustusXInstaller:
         
 #        targetFolder = os.path.split(path)[1]
         target_path = '%s/%s/%s' % (remoteServerPath, targetFolder, self._getUserFriendlyPlatformName())
-        PrintFormatter.printInfo('Publishing contents of [%s] to remote path [%s]' % (source, target))
+        PrintFormatter.printInfo('Publishing contents of [%s] to server [%s], remote path [%s]' % (source, target.server, target_path))
         targetBasePath = '%s/%s' % (remoteServerPath, targetFolder) # need to create parent folder explicitly
 
         transfer = cx.utils.cxSSH.RemoteFileTransfer()

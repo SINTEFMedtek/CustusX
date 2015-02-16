@@ -16,8 +16,6 @@ import subprocess
 import sys
 import argparse        
 
-#import cxsetup.cxUpdateToLatestCustusX
-
 from cx.utils.cxShell import *
 from cx.utils.cxPrintFormatter import PrintFormatter
 import cx.build.cxInstallData
