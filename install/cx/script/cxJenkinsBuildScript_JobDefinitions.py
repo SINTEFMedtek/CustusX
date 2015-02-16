@@ -48,20 +48,36 @@ class Controller(cxJenkinsBuildScriptBase.Controller):
         jobargs.add_argument('--target', default=None, metavar='TARGET', dest='target', help='Jenkins build target, i.e. TARGET var. REQUIRED!')
         
         runs = p.add_argument_group('Job Selection')
+        # nightly
         runs.add_argument('--job_nightly_I', action='store_true', default=False, help='nightly build, up to test evaluation')
         runs.add_argument('--job_nightly_II', action='store_true', default=False, help='nightly build, after successful test evaluation')
+        # analysis
         runs.add_argument('--job_analysis', action='store_true', default=False, help='analysis build, perform static analysis actions')
-
+        # unit
+        runs.add_argument('--job_unit', action='store_true', default=False, help='unit test build')
+        # integration
+        runs.add_argument('--job_integration_I_clean', action='store_true', default=False, help='integration test build, clean at startup')
+        runs.add_argument('--job_integration_II_build', action='store_true', default=False, help='integration test build')
+        # unstable
+        runs.add_argument('--job_unstable_I_clean', action='store_true', default=False, help='unstable test build, clean at startup')
+        runs.add_argument('--job_unstable_II_build', action='store_true', default=False, help='unstable test build')
+        # release
         runs.add_argument('--job_release_I', action='store_true', default=False, help='release build, up to test evaluation')
         runs.add_argument('--job_release_II', action='store_true', default=False, help='release build, after successful test evaluation')
 
         return p
  
     def run(self):
-        
-        self.try_nightly_build()
-        self.try_analysis_build()
-        self.try_release_build()
+        '''
+        Try all jobs. Only those with corresponding
+        command-line arguments are run.
+        '''
+        self.try_job_unit_test()
+        self.try_job_integration_test()
+        self.try_job_unstable_test()
+        self.try_job_nightly()
+        self.try_job_analysis()
+        self.try_job_release()
         # .. add more builds here
                         
         self.cxBuilder.finish()
@@ -69,7 +85,37 @@ class Controller(cxJenkinsBuildScriptBase.Controller):
     def is_main_build(self):
         return self.options.target == "ubuntu.12.04.x64"
 
-    def try_nightly_build(self):
+    def try_job_unit_test(self):
+        '''
+        Run the unit test job
+        '''
+        if self.options.job_unit:
+            self.createUnitTestedPackageStep()
+            self.cxBuilder.finish()                     
+
+    def try_job_integration_test(self):
+        '''
+        Run the integration test job
+        '''
+        if self.options.job_integration_I_clean:
+            self.resetInstallerStep()
+            self.cxBuilder.finish()
+        if self.options.job_integration_II_build:
+            self.integrationTestPackageStep()
+            self.cxBuilder.finish()
+
+    def try_job_unstable_test(self):
+        '''
+        Run the integration test job
+        '''
+        if self.options.job_unstable_I_clean:
+            self.resetInstallerStep()
+            self.cxBuilder.finish()
+        if self.options.job_unstable_II_build:
+            self.unstableTestPackageStep()
+            self.cxBuilder.finish()
+
+    def try_job_nightly(self):
         '''
         Run the nightly builds, which does everything from scratch
         and publishes binaries and documentation to the web server.
@@ -88,7 +134,7 @@ class Controller(cxJenkinsBuildScriptBase.Controller):
                 self.publishNightlyDocumentation()
             self.cxBuilder.finish()
                 
-    def try_analysis_build(self):
+    def try_job_analysis(self):
         '''
         Run the nightly builds, which does everything from scratch
         and publishes binaries and documentation to the web server.
@@ -105,7 +151,7 @@ class Controller(cxJenkinsBuildScriptBase.Controller):
             self.cxBuilder.runLineCounter()
             self.cxBuilder.finish()
 
-    def try_release_build(self):
+    def try_job_release(self):
         '''
         Create a tagged release and publish to server.
         Build, run all tests, publish binaries and 
