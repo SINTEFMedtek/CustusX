@@ -242,6 +242,7 @@ class CTK(CppComponent):
         self._getBuilder().gitSetRemoteURL(repo, branch=branch)
         #latestTestedSHA = '3fe3cdbe9d0ef95b3810a12484f035ae1f66524c'
         self._getBuilder().gitCheckoutBranch(branch)
+        self._getBuilder().gitCheckout('1056228ab4aeefa9bf6db4fc32a8826db283475a')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -328,6 +329,7 @@ class OpenIGTLink(CppComponent):
         self._getBuilder().gitClone('git://github.com/openigtlink/OpenIGTLink.git')
     def update(self):
         self._getBuilder().gitCheckoutBranch('master')
+        self._getBuilder().gitCheckout('5a501817c2da52e81db4db3eca6dd5111f94fed9')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -361,6 +363,7 @@ class IGSTK(CppComponent):
         #tag = 'IGSTK-5-2.cx_patch_3-6-0'
         self._getBuilder().gitSetRemoteURL(repo, branch=branch)
         self._getBuilder().gitCheckoutBranch(branch)
+        self._getBuilder().gitCheckout('6213b8b258d60b0a3ee03952a4341d71233397fb')
     def configure(self):        
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -438,7 +441,8 @@ class TubeSegmentationFramework(CppComponent):
         base = self.controlData.gitrepo_open_site_base
         self._getBuilder().gitClone('%s/Tube-Segmentation-Framework.git' % base)
     def update(self):
-        self._getBuilder().gitCheckoutDefaultBranch(submodules=True)    
+#        self._getBuilder().gitCheckoutDefaultBranch(submodules=True)    
+        self._getBuilder().gitCheckout('9faceef98c6ee943a1301b0d57f9db0deb7e59e9')
         self._getBuilder()._gitSubmoduleUpdate()
     def configure(self):
         builder = self._getBuilder()
@@ -472,8 +476,7 @@ class LevelSetSegmentation(CppComponent):
         # this fix should rebase repo from the original smistad/LSS to our own fork on GitHub.
         repo = 'git@github.com:SINTEFMedisinskTeknologi/Level-Set-Segmentation'
         self._getBuilder().gitSetRemoteURL(repo, branch="master")
-        self._getBuilder().gitCheckoutDefaultBranch(submodules=True)            
-#        self._getBuilder().gitCheckout('6bf9277ac604ecf6f10c0a70d9e04ae5489c2060', submodules=True)
+        self._getBuilder().gitCheckout('096f0beb014c4961bf2defaff9cc657d5f136014')
         self._getBuilder()._gitSubmoduleUpdate()
     def configure(self):
         builder = self._getBuilder()
@@ -500,6 +503,7 @@ class OpenCLUtilityLibrary(CppComponent):
         self._getBuilder().gitClone('git@github.com:smistad/OpenCLUtilityLibrary')
     def update(self):
         self._getBuilder().gitCheckoutBranch('custusx', submodules=False)
+        self._getBuilder().gitCheckout('43614718f7667dd5013af9300fcc63ae30bf244c')
     def configure(self):
         builder = self._getBuilder()
         builder.configureCMake()
