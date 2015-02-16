@@ -61,9 +61,16 @@ IF (CX_BUILD_USER_DOCUMENTATION)
     ADD_DEPENDENCIES(UserDoc CustusX)
 
     find_package(Qt5Help)
+    # works on mac
     get_target_property(CX_QT_QCOLLECTIONGENERATOR_EXECUTABLE Qt5::qcollectiongenerator LOCATION)
-#    get_target_property(CX_QT_QMAKE_EXECUTABLE Qt5::qmake LOCATION)
-#    message(STATUS "CX_QT_QMAKE_EXECUTABLE " ${CX_QT_QMAKE_EXECUTABLE})
+    if (NOT TARGET Qt5::qcollectiongenerator)
+      # required on ubuntu
+      set(CX_QT_QCOLLECTIONGENERATOR_EXECUTABLE qcollectiongenerator)
+    endif()
+    # .. not tested on win
+
+    #get_target_property(CX_QT_QMAKE_EXECUTABLE Qt5::qmake LOCATION)
+    #message(STATUS "CX_QT_QCOLLECTIONGENERATOR_EXECUTABLE " ${CX_QT_QCOLLECTIONGENERATOR_EXECUTABLE})
 
     add_custom_command(TARGET UserDoc
                POST_BUILD
