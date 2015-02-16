@@ -41,14 +41,20 @@ class Controller(cxJenkinsBuildScriptBase.Controller):
         jobargs.add_argument('--target', default=None, metavar='TARGET', dest='target', help='Jenkins build target, i.e. TARGET var. REQUIRED!')
         
         runs = p.add_argument_group('Job Selection')
-        runs.add_argument('--nightly_I', action='store_true', default=False, help='nightly build, up to test evaluation')
-        runs.add_argument('--nightly_II', action='store_true', default=False, help='nightly build, after successful test evaluation')
+        runs.add_argument('--job_nightly_I', action='store_true', default=False, help='nightly build, up to test evaluation')
+        runs.add_argument('--job_nightly_II', action='store_true', default=False, help='nightly build, after successful test evaluation')
+        runs.add_argument('--job_analysis', action='store_true', default=False, help='analysis build, perform static analysis actions')
+
+        runs.add_argument('--job_release_I', action='store_true', default=False, help='release build, up to test evaluation')
+        runs.add_argument('--job_release_II', action='store_true', default=False, help='release build, after successful test evaluation')
 
         return p
  
     def run(self):
         
         self.try_nightly_build()
+        self.try_analysis_build()
+        self.try_release_build()
         # .. add more builds here
                         
         self.cxBuilder.finish()
@@ -61,14 +67,63 @@ class Controller(cxJenkinsBuildScriptBase.Controller):
         Run the nightly builds, which does everything from scratch
         and publishes binaries and documentation to the web server.
         '''
-        if self.options.nightly_I:
-            self.controlData().build_developer_doc = True
-            self.controlData().build_user_doc = True
+        if self.options.job_nightly_I:
+            if self.is_main_build():
+                self.controlData().build_developer_doc = True
+                self.controlData().build_user_doc = True
             self.resetInstallerStep()
             self.createUnitTestedPackageStep()
-            self.integrationTestPackageStep(skip_extra_install_step_checkout=options.skip_extra_install_step_checkout)
-        if self.options.nightly_II:
+            self.integrationTestPackageStep(skip_extra_install_step_checkout=True)
+            self.cxBuilder.finish()
+        if self.options.job_nightly_II:
             self.publishNightlyRelease()
             if self.is_main_build():
                 self.publishNightlyDocumentation()
+            self.cxBuilder.finish()
+                
+    def try_analysis_build(self):
+        '''
+        Run the nightly builds, which does everything from scratch
+        and publishes binaries and documentation to the web server.
+        '''
+        if self.options.job_analysis:
+            self.controlData().setBuildType("Debug")
+            self.controlData().mCoverage = True
+
+            self.cxBuilder.buildAllComponents()
+            self.cxBuilder.resetCoverage()
+            self.cxBuilder.runUnitTests()
+            self.cxBuilder.generateCoverageReport()
+            self.cxBuilder.runCppCheck()
+            self.cxBuilder.runLineCounter()
+            self.cxBuilder.finish()
+
+    def try_release_build(self):
+        '''
+        Create a tagged release and publish to server.
+        Build, run all tests, publish binaries and 
+        documentation to the web server.
+        
+        Requires a git_tag as input.
+        Assumed to be run on the release branch (should work OK on others as well)
+        '''
+        if self.options.job_release_I:
+            PrintFormatter.printHeader('Building release for tag "%s"' % self.controlData().git_tag, 1);
+            if self.is_main_build():
+                self.controlData().build_developer_doc = True
+                self.controlData().build_user_doc = True
+            self.resetInstallerStep()
+            self.createUnitTestedPackageStep()
+            self.integrationTestPackageStep(skip_extra_install_step_checkout=True)
+            self.cxBuilder.finish()
+        if self.options.job_release_II:
+            targetFolder = self.cxInstaller.getTaggedFolderName()
+            PrintFormatter.printHeader('Creating and publishing release for tag "%s"' % self.controlData().git_tag, 1);
+            if targetFolder != self.controlData().git_tag:
+                PrintFormatter.printInfo("Warning: Target folder [%s] not equal to controldata tag [%s]" % (targetFolder, self.controlData().git_tag) )
+            self.publishTaggedRelease()
+            if self.is_main_build():
+                self.publishTaggedDocumentation()
+            self.cxBuilder.finish()
+                                
         
