@@ -58,7 +58,9 @@ class Controller(cxJenkinsBuildScriptBase.Controller):
         runs.add_argument('--create_unit_tested_package', action='store_true', default=False, help='run checkout/configure/build, unit test, package')
         runs.add_argument('--integration_test_package', action='store_true', default=False, help='install package, installation tests, integration tests')
         runs.add_argument('--unstable_test_package', action='store_true', default=False, help='install package, unstable tests')
-        runs.add_argument('--create_release', action='store_true', default=False, help='create release folder, publish to server')
+
+        runs.add_argument('--create_tagged_release', action='store_true', default=False, help='create release folder, publish package and docs to server using git tag')
+        runs.add_argument('--create_nightly_release', action='store_true', default=False, help='create release folder, publish package and docs to server using nightly tag')
 
         skips = p.add_argument_group('Skip options')
         skips.add_argument('--skip_build', action='store_true', default=False, help='Skip the checkout/configure/build step.')
@@ -70,7 +72,8 @@ class Controller(cxJenkinsBuildScriptBase.Controller):
         skips.add_argument('--skip_installation_test', action='store_true', default=False, help='Skip testing the installed package')
         skips.add_argument('--skip_integration_test', action='store_true', default=False, help='Skip integration testing the installed package')
 
-        skips.add_argument('--skip_publish_release', action='store_true', default=False, help='Skip the create_release:publish_to_server step')
+        skips.add_argument('--skip_publish_exe', action='store_true', default=False, help='Skip the publish_(tagged|nightly)_release:publish_exe step')
+        skips.add_argument('--skip_publish_docs', action='store_true', default=False, help='Skip the publish_(tagged|nightly)_release:publish_docs step')        
         
         return p
  
@@ -90,9 +93,14 @@ class Controller(cxJenkinsBuildScriptBase.Controller):
                                             skip_integration_test=options.skip_integration_test)
         if options.unstable_test_package:
             self.unstableTestPackageStep(skip_extra_install_step_checkout=options.skip_extra_install_step_checkout,
-                                            skip_install=options.skip_install)
-        if options.create_release:
-            self.createReleaseStep(skip_publish_release=options.skip_publish_release)
+                                         skip_install=options.skip_install)
+        if options.create_tagged_release:
+            self.publishTaggedReleaseStep(skip_publish_exe=options.skip_publish_exe, 
+                                          skip_publish_docs=options.skip_publish_docs)
+        if options.create_nightly_release:
+            self.publishNightlyReleaseStep(skip_publish_exe=options.skip_publish_exe, 
+                                           skip_publish_docs=options.skip_publish_docs)
+                        
         self.cxBuilder.finish()
         
 if __name__ == '__main__':

@@ -78,6 +78,7 @@ IF (CX_BUILD_USER_DOCUMENTATION)
     # generate pure html doc
     # =====================================================
     SET(CX_DOXYGEN_GENERATE_QHP NO)
+#	SET(CX_DOXYGEN_INPUT "${CX_DOC_INPUT_DIRECTORY} ${CustusX_SOURCE_DIR}/doc/doxygen")
     SET(CX_DOXYGEN_HTML_OUTPUT html_pure)
     SET(CX_DOXYGEN_DISABLE_INDEX NO)
     SET(CX_DOXYGEN_GENERATE_TREEVIEW YES)

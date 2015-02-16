@@ -12,19 +12,40 @@ import platform
 import getpass
 import pkg_resources
 
+class RemoteServerID:
+    '''
+    Information about a remote server
+    '''
+    def __init__(self, server=None, path=None, user=None):
+        self.server = server
+        self.path = path
+        self.user = user
+    def get_scp_target_string(self):
+        '''
+        return the target part of a scp call:
+          user@server:path
+        '''
+        retval = self.server
+        if self.user!=None:
+            retval = "%s@%s" % (self.user, retval)
+        if self.path!=None:
+            retval = "%s:%s" % (retval, self.path)
+        return retval
+
 
 class RemoteFileTransfer:
     def __init__(self):
         self.paramiko = cxUtilities.try_paramiko_import()
         print 'paramiko version:', pkg_resources.get_distribution("paramiko").version
 
-    def connect(self, remoteServer):
+    def connect(self, remoteServer, user=None):
         self.host_name = remoteServer
 
         self.transport = self.paramiko.Transport((remoteServer, 22))
         self.transport.start_client()
-        if not self._authenticate():
-            return False
+        if not self._authenticate(user):
+            if not self._authenticate(self._getUsername()):
+                return False
         
         self.sftp = self.transport.open_sftp_client()
         return True
@@ -47,24 +68,28 @@ class RemoteFileTransfer:
             return host['user']
         else:
             return getpass.getuser()
-    
-    def _authenticate(self):
+
+    def _authenticate(self, user):
+        if not user:
+            return False
         agent = self.paramiko.Agent()
         rsa_private_key = self._getPrivateKey()
-        username = self._getUsername()
-        print 'Username ', username
         agent_keys = agent.get_keys() + (rsa_private_key,)
         success = False
         if len(agent_keys) == 0:
-            print 'failed to authenticate, no keys'
+            print 'failed to authenticate with user %s, no keys' % user
             return False
         for key in agent_keys:
-            success = self._authenticate_using_key(username, key)
+            success = self._authenticate_using_key(user, key)
             if success:
                 break
         if success:
-            print "Authenticated successfully"
+            print "Authenticated successfully with user %s" % user
         return success
+    
+#    def _authenticate(self):
+#        username = self._getUsername()
+#        success = self._authenticate(username)
 
     def _authenticate_using_key(self, username, key):
         print 'Trying ssh-agent key %s' % key.get_fingerprint().encode('hex'),

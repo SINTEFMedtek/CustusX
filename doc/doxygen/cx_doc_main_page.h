@@ -35,7 +35,7 @@ namespace cx
 {
 
 /**
- * \mainpage
+ * \page
  *
  * \brief An IGT library.
  *

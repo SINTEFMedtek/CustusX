@@ -1,9 +1,13 @@
 Build instructions {#build_instructions}
 ===================
 
-CustusX runs on these [Supported Platforms](cx_user_supported_platforms.md).
+Text {#build_instructions2}
+===================
 
-## Prerequisites 
+CustusX runs on these \subpage supported_platforms.
+
+Prerequisites {#prerequisites}
+------------------------
 
  * [CMake](http://www.cmake.org/)
  * [Qt5](http://qt-project.org/)
@@ -15,7 +19,7 @@ CustusX runs on these [Supported Platforms](cx_user_supported_platforms.md).
 
 These must be installed prior to installing CustusX.
 
-CustusX depends on a lot of other libraries, which is part of the \superbuild,
+CustusX depends on a lot of other libraries, which is part of the \ref superbuild,
 and thus does not need to be installed separately. 
 
 For convenience, setup scripts for some platforms are available in the 
@@ -41,7 +45,7 @@ will be downloaded and built in separate folders beneath it, as follows:
 
 Run the following lines to get it right:
 ```bash
-cd <root_dir>
+cd \<root_dir\>
 git clone git@github.com:SINTEFMedisinskTeknologi/CustusX.git CustusX/CustusX
 ./CustusX/CustusX/install/cxInstaller.py --root_dir . --full --all
 ```

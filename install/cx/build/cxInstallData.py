@@ -60,6 +60,7 @@ import pprint
 
 import cx.utils.cxArgParse
 import cx.utils.cxUtilities
+import cx.utils.cxSSH
         
 class Common(object):
     '''
@@ -69,7 +70,6 @@ class Common(object):
     def __init__(self):
         self.root_dir = None
         self.m32bit = False
-        self.use_old_directory_structure = False
         self._initPaths()
         self.main_branch = "master"
         self.static = False # build as shared or static libraries
@@ -93,10 +93,18 @@ class Common(object):
             self.mGEStreamerUseOpenCL = False # Turn off OpenCL for Mac as Jenkins tests are run on olevs mac, and OpenCL code don't work there yet
         self.mBuildExAndTest = False
         self.mCoverage = False
-        self.mDoxygen = False
+        self.build_developer_doc = False
+        self.build_user_doc = False
         self.mGraphviz = False
         self.git_tag = None # if none, use branch master
         self.force_connect_sublibraries = False
+
+        self.publish_release_target                 = cx.utils.cxSSH.RemoteServerID("example.com", "/path/to/folder")
+        self.publish_developer_documentation_target = cx.utils.cxSSH.RemoteServerID("example.com", "/path/to/folder")
+        self.publish_user_documentation_target      = cx.utils.cxSSH.RemoteServerID("example.com", "/path/to/folder") 
+
+        self.gitrepo_internal_site_base = "user@example.com/path/to/folder" #intended for use with "git checkout ssh://%s"
+        self.gitrepo_open_site_base = "git@github.com:SINTEFMedisinskTeknologi"  
 
     def printSettings(self):
         print ''
@@ -127,7 +135,6 @@ class Common(object):
         p = cx.utils.cxArgParse.ArgumentParser(add_help=False)
         p.add_argument('--root_dir', default=self.root_dir, help='specify root folder, default=%s' % self.root_dir)
         p.add_argument('--print_control_data', action='store_true', default=False, help='Print all control data at startup')
-        p.add_argument('--use_old_directory_structure', action='store_true', default=False, help='use obsolete external/working folder structure')
         return p
 
     def getArgParser_core_build(self):
@@ -152,7 +159,8 @@ class Common(object):
     def getArgParser_extended_build(self):
         p = cx.utils.cxArgParse.ArgumentParser(add_help=False)
         p.add_boolean_inverter('--coverage', default=self.mCoverage, dest='mCoverage', help='gcov code coverage')
-        p.add_boolean_inverter('--doxygen', default=self.mDoxygen, dest='mDoxygen', help='Build doxygen documentation')
+        p.add_boolean_inverter('--developer_doc', default=self.build_developer_doc, dest='build_developer_doc', help='Build developer documentation')
+        p.add_boolean_inverter('--user_doc', default=self.build_user_doc, dest='build_user_doc', help='Build user documentation')
         return p
 
     def applyCommandLine(self, arguments):
@@ -212,13 +220,9 @@ class Common(object):
         return self.root_dir
     
     def getWorkingPath(self):
-        if self.use_old_directory_structure:
-            return "%s/%s" % (self.root_dir, self._getWorkingFolder())
         return self.root_dir
     
     def getExternalPath(self):
-        if self.use_old_directory_structure:
-            return "%s/%s" % (self.root_dir, self._getExternalFolder())                        
         return self.root_dir
     
     def setBuildShared(self, value):
@@ -251,16 +255,10 @@ class Common(object):
             return long_name
             
     def _initPaths(self):        
-        if self.use_old_directory_structure:                
-            if platform.system() == 'Windows':
-                self.root_dir = "C:/Dev"
-            else:
-                self.root_dir = os.path.expanduser("~") + "/dev" #+ getpass.getuser() - use new default
+        if platform.system() == 'Windows':
+            self.root_dir = "C:/Dev/cx"
         else:
-            if platform.system() == 'Windows':
-                self.root_dir = "C:/Dev/cx"
-            else:
-                self.root_dir = os.path.expanduser("~") + "/dev/cx" #+ getpass.getuser() - use new default
+            self.root_dir = os.path.expanduser("~") + "/dev/cx" #+ getpass.getuser() - use new default
         
     def _getExternalFolder(self):
         '''external dir: Used as base dir for all externals, such as VTK, ITK, ...'''

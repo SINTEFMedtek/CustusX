@@ -84,7 +84,7 @@ class CustusXInstaller:
         shell.makeDirs(targetPath)
         installerFile = self.findInstallerFile()
         self._copyFile(installerFile, targetPath)
-        self.copyReleaseFiles(targetPath)                        
+#        self.copyReleaseFiles(targetPath)                        
         return targetPath
 
     def _removeLocalTags(self):    
@@ -102,12 +102,15 @@ class CustusXInstaller:
     def _getDateString(self):
         return '%s' % datetime.date.today().isoformat()
         
-    def _generateReleaseFolderName(self):
+    def getTaggedFolderName(self):
         '''
-        Generate a name for the folder to insert release files into.
-        Use the CustusX tags to generate. This might cause inconsistencies 
-        if a release is created based solely on changes in CustusXSetup,
-        but at least matches the name of the installer.
+        Generate a folder name based on the current git tag.
+        If not on a tag, create something similar but .dirty.
+        Use the CustusX tags to generate - we assume that all
+        repos are in syn i.e. have the same tag.
+        
+        Examples: v15-04                (version 15-04)
+                  v15-04-245.dtq2-dirty (untagged git checkout)
         '''
         shell.changeDir(self.source_custusx_path) 
         self._removeLocalTags()    
@@ -118,30 +121,37 @@ class CustusXInstaller:
         else:
             output = shell.evaluate('git describe --tags')
             name = output.stdout.strip() 
-            name = '%s.%s' % (name, self._getDateString())
-        name = 'CustusX_%s' % name
+            name = '%s.%s-dirty' % (self._getDateString(), name)
+        #name = 'CustusX_%s' % name
+        return name
 
-        targetPath = '%s/Release/%s' % (self.installer_path, name)
+    def _generateReleaseFolderName(self):
+        '''
+        Generate a name for the folder to insert release files into.
+        This is a temporary folder that can be used to publish the release.
+        '''
+        taggedFolderName = self.getTaggedFolderName()
+        targetPath = '%s/Release/CustusX_%s' % (self.installer_path, taggedFolderName)
         return targetPath
     
-#    def copyReleaseFiles(self, targetPath):
-#        'Copy files into release folder in addition to the installer.'
-#        source = self.source_custusxsetup_path
-#        self._copyFile('%s/doc/ChangeLog.rtf' % source, targetPath)
-#        self._copyFile('%s/doc/CustusX_Specifications.pdf' % source, targetPath)
-#        self._copyFile('%s/doc/CustusX_Tutorial.pdf' % source, targetPath)
-#        if platform.system() == 'Darwin':
-#            self._copyFolder('%s/install/Apple/drivers' % source, targetPath)
-#            self._copyFile('%s/install/Apple/apple_install_readme.rtf' % source, targetPath)
-#        if platform.system() == 'Linux':
-#            linux_distro = 'Ubuntu'
-##            self._copyFolder('%s/install/Linux/script/vga2usb' % source, targetPath)
-#            if linux_distro == 'Ubuntu':
-#                self._copyFolder('%s/install/Linux/script/Ubuntu12.04' % source, targetPath)
-#            if linux_distro == 'Fedora':
-#                self._copyFolder('%s/install/Linux/script/Fedora14' % source, targetPath)
-#        if platform.system() == 'Windows':
-#            self._copyFile('%s/install/Windows/Windows_Install_ReadMe.rtf' % source, targetPath)
+    def copyReleaseFiles(self, targetPath):
+        'Copy files into release folder in addition to the installer.'
+        source = self.source_custusxsetup_path
+        self._copyFile('%s/doc/ChangeLog.rtf' % source, targetPath)
+        self._copyFile('%s/doc/CustusX_Specifications.pdf' % source, targetPath)
+        self._copyFile('%s/doc/CustusX_Tutorial.pdf' % source, targetPath)
+        if platform.system() == 'Darwin':
+            self._copyFolder('%s/install/Apple/drivers' % source, targetPath)
+            self._copyFile('%s/install/Apple/apple_install_readme.rtf' % source, targetPath)
+        if platform.system() == 'Linux':
+            linux_distro = 'Ubuntu'
+#            self._copyFolder('%s/install/Linux/script/vga2usb' % source, targetPath)
+            if linux_distro == 'Ubuntu':
+                self._copyFolder('%s/install/Linux/script/Ubuntu12.04' % source, targetPath)
+            if linux_distro == 'Fedora':
+                self._copyFolder('%s/install/Linux/script/Fedora14' % source, targetPath)
+        if platform.system() == 'Windows':
+            self._copyFile('%s/install/Windows/Windows_Install_ReadMe.rtf' % source, targetPath)
         
     def _copyFolder(self, source, targetPath):
         targetFolder = os.path.split(source)[1]
@@ -154,43 +164,33 @@ class CustusXInstaller:
         shutil.copy2(source, targetPath)
         PrintFormatter.printInfo("copied file %s into %s" % (source, targetPath))
 
-    def publishReleaseFolder(self, path):
+#        self.cxInstaller.publishReleaseFolder(source, targetFolder)  
+#    def publishReleaseFolder(self, path, target):
+    def publishReleaseFolder(self, source, targetFolder, target):
         '''
-        Copy a release folder to medtek.sintef.no
+        Copy a release folder to server
         '''
         PrintFormatter.printHeader('copy/publish package to medtek server', level=2)
-        remoteServer = "medtek.sintef.no"
-        remoteServerPath = "/Volumes/MedTekEksternDisk/Software/CustusX/AutomatedReleases"
-        #remoteServerPath = "/Users/christiana/publish_test" # test while server is down...
-        targetFolder = os.path.split(path)[1]
-#        source = '%s/*' % path
-        target = '%s/%s/%s' % (remoteServerPath, targetFolder, self._getUserFriendlyPlatformName())
- #       cmd1 = 'ssh %s "mkdir -p %s"' % (remoteServer, target)
- #       cmd2 = 'scp -r %s/* %s:%s' % (path, remoteServer, target)
-        PrintFormatter.printInfo('Publishing contents of [%s] to remote path [%s]' % (path, target))
-#        shell.run(cmd1)
-#        shell.run(cmd2)
+        remoteServer = target.server
+        remoteServerPath = target.path
+#        remoteServer = "medtek.sintef.no"
+#        remoteServerPath = "/Volumes/MedTekEksternDisk/Software/CustusX/AutomatedReleases"
+        
+#        targetFolder = os.path.split(path)[1]
+        target_path = '%s/%s/%s' % (remoteServerPath, targetFolder, self._getUserFriendlyPlatformName())
+        PrintFormatter.printInfo('Publishing contents of [%s] to remote path [%s]' % (source, target))
         targetBasePath = '%s/%s' % (remoteServerPath, targetFolder) # need to create parent folder explicitly
 
         transfer = cx.utils.cxSSH.RemoteFileTransfer()
-        transfer.connect(remoteServer)
+        transfer.connect(remoteServer, target.user)
         transfer.remote_mkdir(targetBasePath)
-        transfer.copyFolderContentsToRemoteServer(path, target);
+        transfer.copyFolderContentsToRemoteServer(source, target_path);
         transfer.close()
-#        cxSSH.copyFolderContentsToRemoteServer(remoteServer, path, target);
         
     def _getUserFriendlyPlatformName(self):
         'generate a platform name understandable for users.'
         name = self.target_platform.get_target_platform()
         return name.title()
-#        name = platform.system()
-#        if platform.system() == 'Darwin':
-#            # return name + platform.mac_ver() ??
-#            return 'Apple'
-#        elif platform.system() == 'Linux':
-#            return platform.linux_distribution()[0]
-#        else:
-#            return platform.system()
 
     def installPackage(self):
         '''
