@@ -112,7 +112,7 @@ class Common(object):
         self.publish_user_documentation_target      = cx.utils.cxSSH.RemoteServerID(server, "%s/user_doc"%root_folder, user) 
 
         self.gitrepo_internal_site_base = "user@example.com/path/to/folder" #intended for use with "git checkout ssh://%s"
-        self.gitrepo_open_site_base = "git@github.com:SINTEFMedisinskTeknologi"  
+        self.gitrepo_open_site_base = "git@github.com:SINTEFMedtek"  
 
     def printSettings(self):
         print ''

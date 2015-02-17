@@ -182,7 +182,7 @@ class VTK(CppComponent):
         self._getBuilder().gitClone('%s/VTK' % base)
     def update(self):
         # this fix should rebase repo from the original Kitware/VTK to our own fork on GitHub.
-        repo = 'git@github.com:SINTEFMedisinskTeknologi/VTK'
+        repo = '%s/VTK' % self.controlData().gitrepo_open_site_base
         branch = 'VTK-CX-modifications'
         tag = 'VTK-6-1-0.cx_patch_2'
         self._getBuilder().gitSetRemoteURL(repo, branch=branch)
@@ -475,7 +475,7 @@ class LevelSetSegmentation(CppComponent):
         self._getBuilder().gitClone('%s/Level-Set-Segmentation' % base)
     def update(self):
         # this fix should rebase repo from the original smistad/LSS to our own fork on GitHub.
-        repo = 'git@github.com:SINTEFMedisinskTeknologi/Level-Set-Segmentation'
+        repo = '%s/Level-Set-Segmentation' % self.controlData().gitrepo_open_site_base
         self._getBuilder().gitSetRemoteURL(repo, branch="master")
         self._getBuilder().gitCheckout('096f0beb014c4961bf2defaff9cc657d5f136014')
         self._getBuilder()._gitSubmoduleUpdate()
