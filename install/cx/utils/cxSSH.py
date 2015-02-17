@@ -134,7 +134,16 @@ class RemoteFileTransfer:
         try:
             self.sftp.mkdir(path)
         except IOError:
-            print "%s already exists...(failed to create)"  % path
+            print "Failed to create %s (already exists?)"  % path
+            
+    def remote_rmdir(self, path):
+        path = path.replace('\\', '/')
+        print 'remote_rmdir %s' % path
+        try:
+            self.sftp.rmdir(path)
+        except IOError:
+            print "Failed to remove %s (did not exist?)"  % path
+
                 
 def copyFolderContentsToRemoteServer(remoteServer, sourcePath, destPath):
     '''
