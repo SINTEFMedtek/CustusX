@@ -237,11 +237,7 @@ void BronchoscopePositionProjection::searchBranchDown(BranchPtr searchBranchPtr,
 	mSearchIndexVector.push_back(startIndex);
 	for (int i = startIndex+1; i<positions.cols(); i++)
 	{
-<<<<<<< HEAD
-		currentSearchDistance = currentSearchDistance + findDistance( positions.block(0,i,3,1), positions.block(0,i-1,3,1) );
-=======
         currentSearchDistance = currentSearchDistance + findDistance( positions.col(i), positions.col(i-1) );
->>>>>>> 0e0ecd078962addd87092ba415af47c601c03cb7
 		if (currentSearchDistance < maxSearchDistance)
 		{
 			mSearchBranchPtrVector.push_back(searchBranchPtr);
