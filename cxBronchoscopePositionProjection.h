@@ -35,7 +35,6 @@ public:
 	bool isAdvancedCenterlineProjectionSelected();
 
 private:
-	Transform3D mPreviousProjectedPoint;
 	bool isPreviousProjectedPointSet;
 	Eigen::MatrixXd mCLpoints;
 	DoubleDataAdapterXmlPtr mMaxDistanceToCenterline;
