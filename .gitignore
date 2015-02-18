@@ -20,3 +20,7 @@ config/settings/
 CMakeLists.txt.user*
 *~
 MyConfig.xml
+org.custusx.log.all.txt
+org.custusx.log.console.txt
+org.custusx.log.qdebug.txt
+org.custusx.log.stdout.txt

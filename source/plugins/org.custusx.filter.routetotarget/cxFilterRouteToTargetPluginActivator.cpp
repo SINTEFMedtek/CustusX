@@ -51,12 +51,12 @@ FilterRouteToTargetPluginActivator::~FilterRouteToTargetPluginActivator()
 
 void FilterRouteToTargetPluginActivator::start(ctkPluginContext* context)
 {
-	//mRegistration = RegisteredService::create<RouteToTargetFilter>(context, FilterService_iid);
+    mRegistration = RegisteredService::create<RouteToTargetFilter>(context, FilterService_iid);
 }
 
 void FilterRouteToTargetPluginActivator::stop(ctkPluginContext* context)
 {
-	//mRegistration.reset();
+    mRegistration.reset();
 	Q_UNUSED(context);
 }
 

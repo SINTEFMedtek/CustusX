@@ -34,7 +34,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxPluginAlgorithmExport.h"
 
+#include "cxPatientModelService.h"
 #include "cxFilterImpl.h"
+
+class ctkPluginContext;
 
 namespace cx
 {
@@ -56,7 +59,7 @@ class cxPluginAlgorithm_EXPORT RouteToTargetFilter : public FilterImpl
 	Q_INTERFACES(cx::Filter)
 
 public:
-	RouteToTargetFilter(PatientModelServicePtr patientModelService);
+    RouteToTargetFilter(ctkPluginContext *pluginContext);
 	virtual ~RouteToTargetFilter() {}
 
 	virtual QString getType() const;
