@@ -378,7 +378,7 @@ vtkImageDataPtr convertImageDataToGrayScale(vtkImageDataPtr image)
 vtkImageDataPtr convertImageDataTo8Bit(vtkImageDataPtr image, double windowWidth, double windowLevel)
 {
 	vtkImageDataPtr retval = image;
-	if (image->GetScalarSize() > 8)
+	if (image->GetScalarSize() > 1)
 		{
 			vtkImageShiftScalePtr imageCast = vtkImageShiftScalePtr::New();
 			imageCast->SetInputData(image);
