@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackingService.h"
 #include "cxStatusBar.h"
 #include "cxVolumePropertiesWidget.h"
+#include "cxStreamPropertiesWidget.h"
 #include "cxNavigationWidget.h"
 #include "cxTabbedWidget.h"
 #include "cxToolPropertiesWidget.h"
@@ -130,6 +131,7 @@ MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
 	this->addAsDockWidget(new SlicePropertiesWidget(mServices->patientModelService, mServices->visualizationService, this), "Properties");
 	this->addAsDockWidget(new VolumePropertiesWidget(mServices->patientModelService, mServices->visualizationService, this), "Properties");
 	this->addAsDockWidget(new MeshInfoWidget(mServices->patientModelService, mServices->visualizationService, this), "Properties");
+	this->addAsDockWidget(new StreamPropertiesWidget(mServices->patientModelService, mServices->visualizationService, this), "Properties");
 	this->addAsDockWidget(new TrackPadWidget(this), "Utility");
 	this->addAsDockWidget(new ToolPropertiesWidget(this), "Properties");
 	this->addAsDockWidget(new NavigationWidget(this), "Properties");
