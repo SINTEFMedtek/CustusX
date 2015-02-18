@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 typedef boost::shared_ptr<class StringPropertyActiveImage> StringPropertyActiveImagePtr;
-/** Adapter that connects to the current active image.
+/** Property that connects to the current active image.
  * Example: Active image: [DataName]
  * where active image is the value
  * and DataName is taken from the valuerange
@@ -57,8 +57,8 @@ public: // basic methods
 
 
 typedef boost::shared_ptr<class StringPropertySelectImage> StringPropertySelectImagePtr;
-/** Adapter that selects and stores an image.
- * The image is stored internally in the adapter.
+/** Property that selects and stores an image.
+ * The image is stored internally in the property.
  * Use setValue/getValue plus changed() to access it.
  */
 class cxResource_EXPORT StringPropertySelectImage : public SelectDataStringPropertyBase
@@ -82,8 +82,8 @@ private:
 };
 
 typedef boost::shared_ptr<class StringPropertySelectData> StringPropertySelectDataPtr;
-/** Adapter that selects and stores a data.
- * The data is stored internally in the adapter.
+/** Property that selects and stores a data.
+ * The data is stored internally in the property.
  * Use setValue/getValue plus changed() to access it.
  */
 class cxResource_EXPORT StringPropertySelectData : public SelectDataStringPropertyBase
@@ -109,8 +109,8 @@ private:
 };
 
 typedef boost::shared_ptr<class StringPropertySelectMesh> StringPropertySelectMeshPtr;
-/** Adapter that selects and stores an mesh.
- * The image is stored internally in the adapter.
+/** Property that selects and stores an mesh.
+ * The mesh is stored internally in the property.
  * Use setValue/getValue plus changed() to access it.
  */
 class cxResource_EXPORT StringPropertySelectMesh : public SelectDataStringPropertyBase
@@ -132,6 +132,32 @@ protected:
 private:
   QString mMeshUid;
 };
+
+typedef boost::shared_ptr<class StringPropertySelectTrackedStream> StringPropertySelectTrackedStreamPtr;
+/** Property that selects and stores a TrackedStream.
+ * The stream is stored internally in the property.
+ * Use setValue/getValue plus changed() to access it.
+ */
+class cxResource_EXPORT StringPropertySelectTrackedStream : public SelectDataStringPropertyBase
+{
+  Q_OBJECT
+public:
+	static StringPropertySelectTrackedStreamPtr New(PatientModelServicePtr patientModelService) { return StringPropertySelectTrackedStreamPtr(new StringPropertySelectTrackedStream(patientModelService)); }
+  virtual ~StringPropertySelectTrackedStream() {}
+
+public: // basic methods
+  virtual bool setValue(const QString& value);
+  virtual QString getValue() const;
+
+public: // interface extension
+  TrackedStreamPtr getTrackedStream();
+
+protected:
+	StringPropertySelectTrackedStream(PatientModelServicePtr patientModelService);
+private:
+  QString mStreamUid;
+};
+
 
 
 } // namespace cx

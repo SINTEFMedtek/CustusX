@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxImage.h"
 #include "cxMesh.h"
+#include "cxTrackedStream.h"
 #include "cxTypeConversions.h"
 #include "cxPatientModelServiceProxy.h"
 
@@ -166,6 +167,36 @@ MeshPtr StringPropertySelectMesh::getMesh()
 //---------------------------------------------------------
 //---------------------------------------------------------
 
+StringPropertySelectTrackedStream::StringPropertySelectTrackedStream(PatientModelServicePtr patientModelService) :
+	SelectDataStringPropertyBase(patientModelService, "TrackedStream")
+{
+	mValueName = "Select stream";
+	mHelp = "Select a tracked stream";
+}
+
+bool StringPropertySelectTrackedStream::setValue(const QString& value)
+{
+  if (value==mStreamUid)
+	return false;
+  mStreamUid = value;
+  emit changed();
+  emit dataChanged(mStreamUid);
+  return true;
+}
+
+QString StringPropertySelectTrackedStream::getValue() const
+{
+  return mStreamUid;
+}
+
+TrackedStreamPtr StringPropertySelectTrackedStream::getTrackedStream()
+{
+  return mPatientModelService->getData<TrackedStream>(mStreamUid);
+}
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
 
 } // namespace cx
 
