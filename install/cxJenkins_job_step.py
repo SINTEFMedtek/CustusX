@@ -3,7 +3,7 @@
 #####################################################
 # Unix jenkins script
 # Author: Christian Askeland, SINTEF Medical Technology
-# Date:   2013.10.13
+# Date:   2015.02.16
 #
 # Description:
 #

@@ -103,12 +103,15 @@ class CustusXBuilder:
         self.removePreviousInstaller()
         custusx = self._createComponent(cxComponents.CustusX)
         shell.changeDir(custusx.buildPath())
-        if(self.assembly.controlData.getCMakeGenerator() == 'Eclipse CDT4 - Ninja'):
-            shell.run('ninja package')
-        elif(platform.system() == 'Windows'):
-            shell.run('jom package')
-        else:
-            shell.run('make package')
+        # run cpack directly instead of make package: this avoids the overhead of a extra make, 
+        # which can be time-consuming for f.ex. doxygen genersaion
+        shell.run('cpack')
+        #if(self.assembly.controlData.getCMakeGenerator() == 'Eclipse CDT4 - Ninja'):
+        #    shell.run('ninja package')
+        #elif(platform.system() == 'Windows'):
+        #    shell.run('jom package')
+        #else:
+        #    shell.run('make package')
 
         self._movePackageToStandardLocation()        
 

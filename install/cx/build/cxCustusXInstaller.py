@@ -184,6 +184,7 @@ class CustusXInstaller:
         transfer = cx.utils.cxSSH.RemoteFileTransfer()
         transfer.connect(remoteServer, target.user)
         transfer.remote_mkdir(targetBasePath)
+        transfer.remote_rmdir(target_path) # remove old content if any
         transfer.copyFolderContentsToRemoteServer(source, target_path);
         transfer.close()
         

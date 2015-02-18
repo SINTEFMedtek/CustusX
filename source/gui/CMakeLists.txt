@@ -32,6 +32,7 @@ cx_add_class_qt_moc(cxGui_SRCS
     dataWidgets/cxTransferFunction2DColorWidget
     dataWidgets/cxTransferFunction2DOpacityWidget
     dataWidgets/cxImagePropertiesWidget
+    dataWidgets/cxStreamPropertiesWidget
     #----------------------
     infoWidgets/cxStatusBar
     infoWidgets/cxPointSamplingWidget
