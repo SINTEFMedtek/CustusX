@@ -146,14 +146,16 @@ public:
 public slots:
   void activeImageChangedSlot();
 
+  void imageChangedSlot(ImagePtr image);
 protected:
   QVBoxLayout* mLayout;
   TransferFunctionAlphaWidget* mTransferFunctionAlphaWidget;
   TransferFunctionColorWidget* mTransferFunctionColorWidget;
 
-  ActiveImageProxyPtr mActiveImageProxy;
   PatientModelServicePtr mPatientModelService;
 };
+
+typedef boost::shared_ptr<class TransferFunction3DWidget> TransferFunction3DWidgetPtr;
 
 class cxGui_EXPORT TransferFunction2DWidget : public BaseWidget
 {
@@ -195,6 +197,9 @@ public:
   TransferFunctionWidget(PatientModelServicePtr patientModelService, QWidget* parent);
   virtual ~TransferFunctionWidget() {}
   virtual QString defaultWhatsThis() const;
+
+private:
+  ActiveImageProxyPtr mActiveImageProxy;
 };
 
 /**

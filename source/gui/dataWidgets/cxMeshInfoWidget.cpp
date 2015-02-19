@@ -148,7 +148,7 @@ void MeshInfoWidget::addWidgets(PatientModelServicePtr patientModelService)
 {
 	mSelectMeshWidget = StringPropertySelectMesh::New(patientModelService);
 	mSelectMeshWidget->setValueName("Surface: ");
-	connect(mSelectMeshWidget.get(), SIGNAL(changed()), this, SLOT(meshSelectedSlot()));
+	connect(mSelectMeshWidget.get(), &Property::changed, this, &MeshInfoWidget::meshSelectedSlot);
 
 	XmlOptionFile options = profile()->getXmlSettings().descend("MeshInfoWidget");
 	QString uid("Color");
