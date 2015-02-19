@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxRouteToTargetFilterService.h"
 
+#include <ctkPluginContext.h>
+
 #include "cxAlgorithmHelpers.h"
 #include "cxSelectDataStringProperty.h"
 
@@ -47,13 +49,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPointMetric.h"
 #include "cxLogicManager.h"
 #include "cxStringPropertySelectPointMetric.h"
+#include "cxPatientModelServiceProxy.h"
 
 
 namespace cx
 {
 
-RouteToTargetFilter::RouteToTargetFilter(PatientModelServicePtr patientModelService) :
-	FilterImpl(patientModelService)
+RouteToTargetFilter::RouteToTargetFilter(ctkPluginContext *pluginContext) :
+    FilterImpl(PatientModelServicePtr(new PatientModelServiceProxy(pluginContext)))
 {
 }
 
