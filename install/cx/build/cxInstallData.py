@@ -27,23 +27,6 @@
 #            |--------build_Release
 #            |--------build32_Debug
 #
-#
-# old, deprecated structure:
-# 
-# --root---external---ITK---ITK
-#    |         |       |----build_Debug  
-#    |         |       |----build_Release
-#    |         |       |----build32_Debug
-#    |         |
-#    |         |------VTK---VTK
-#    |                 |----build_Debug  
-#    |                 |----build_Release
-#    |                 |----build32_Debug
-#    |-----working
-#              |------CustusX---CustusX
-#                      |--------build_Debug  
-#                      |--------build_Release
-#                      |--------build32_Debug
 #             
 #################################################             
 
@@ -113,10 +96,14 @@ class Common(object):
 
         self.gitrepo_internal_site_base = "user@example.com/path/to/folder" #intended for use with "git checkout ssh://%s"
         self.gitrepo_open_site_base = "git@github.com:SINTEFMedtek"  
+        
+#        self.system_base_name = "CaPlatform"
+        self.system_base_name = "CustusX"
 
     def printSettings(self):
         print ''
         print 'Settings:'
+        print '    system_base_name:', self.system_base_name
         print '    User:', getpass.getuser()
         print '    platform:', platform.system()
         print '    RootDir:', self.getRootDir()

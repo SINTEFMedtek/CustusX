@@ -116,7 +116,7 @@ endmacro()
 #
 ###############################################################################
 macro(cx_install_set_generator_filename)
-	set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}_${${PROJECT_NAME}_VERSION_STRING}")
+	set(CPACK_PACKAGE_FILE_NAME "${CX_SYSTEM_BASE_NAME}_${${PROJECT_NAME}_VERSION_STRING}")
 	# append build type to name if not Release:
 	if(NOT ${CMAKE_BUILD_TYPE} STREQUAL "Release")
 		set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_FILE_NAME}_${CMAKE_BUILD_TYPE})
@@ -186,15 +186,16 @@ endmacro()
 macro(cx_install_set_folder_structure)
 
 	set(CX_BUNDLE_NAME "CustusX")
+	cx_assert_variable_exists(${CX_SYSTEM_BASE_NAME})
 
 	set(CX_INSTALL_ROOT_DIR .)
 	if(APPLE)
 		set(CPACK_PACKAGING_INSTALL_PREFIX "/")
-		set(CX_INSTALL_ROOT_DIR "Applications/${CX_BUNDLE_NAME}")
+		set(CX_INSTALL_ROOT_DIR "Applications/${CX_SYSTEM_BASE_NAME}")
 	endif(APPLE)
 	if(CX_LINUX)
 		set(CPACK_PACKAGING_INSTALL_PREFIX "/")
-		set(CX_INSTALL_ROOT_DIR ${CX_BUNDLE_NAME})
+		set(CX_INSTALL_ROOT_DIR ${CX_SYSTEM_BASE_NAME})
 	endif(CX_LINUX)
         if(CX_WINDOWS)
             set(CPACK_PACKAGING_INSTALL_PREFIX "/")
@@ -541,6 +542,7 @@ foreach (_var IN LISTS matchedVars)
 ")
 endforeach()
 
+	cx_assert_variable_exists(${CX_SYSTEM_BASE_NAME})
 	cx_assert_variable_exists(${CustusX_VERSION_STRING})
 	cx_assert_variable_exists(${SSC_USE_GCOV})
 	cx_assert_variable_exists(${CX_USE_OPENCL_UTILITY})
@@ -548,9 +550,10 @@ endforeach()
 	# this text can be inserted into the about box with some effort...
 	set(CONFIGURATION_TEXT
 "
-Configuration for CustusX ${CustusX_VERSION_STRING}
+Configuration for ${CX_SYSTEM_BASE_NAME} ${CustusX_VERSION_STRING}
 
 	Build Settings:
+		System Base Name: ${CX_SYSTEM_BASE_NAME}
 		Built on system: ${CMAKE_SYSTEM} ${CMAKE_ARCHITECTURE} ${CMAKE_SYSTEM_PROCESSOR}
 		Build type: ${CMAKE_BUILD_TYPE}
 		Shared Libraries: ${BUILD_SHARED_LIBRARIES}

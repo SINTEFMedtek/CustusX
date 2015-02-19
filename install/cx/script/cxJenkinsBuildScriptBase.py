@@ -68,7 +68,7 @@ class Controller(cxBuildScript.BuildScript):
         self.cxInstallation = cx.build.cxCustusXTestInstallation.CustusXTestInstallation(
                 target_platform=self.controlData().getTargetPlatform(),                                                                    
                 root_dir=assembly.controlData.getRootDir(),
-                install_root=self.cxInstaller.getInstalledRoot(),
+                install_root=self.cxInstaller.getInstalledFolder(),
                 test_data_path=custusxdata.sourcePath())
 
     def resetInstallerStep(self):

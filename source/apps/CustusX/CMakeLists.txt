@@ -59,7 +59,8 @@ target_link_libraries(CustusX
 
 #Needed to make sure all users get write permissions on the folder CustusX is installed in
 #To make this tric work an empty CustusX dir is needed in source/apps/CustusX
-install(DIRECTORY CustusX
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${CX_SYSTEM_BASE_NAME})
+install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${CX_SYSTEM_BASE_NAME}
     DESTINATION ${CX_INSTALL_ROOT_DIR}/..
     DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS}
 )

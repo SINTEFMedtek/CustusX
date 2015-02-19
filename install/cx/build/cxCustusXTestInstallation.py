@@ -37,25 +37,13 @@ class CustusXTestInstallation:
         '''
         target_platform: cxUtilities.PlatformInfo instance describing target platform
         root_dir: root dir for user data. Test results can be placed here.
-        install_root: path to base of installed package, i.e. where the CustusX folder is located.
+        install_root: path to base of installed package, i.e. the path to the CustusX folder or similar.
         test_data_path: location of test data
         '''
         self.target_platform = target_platform
         self.root_dir = root_dir
         self.install_root = install_root
         self.test_data_path = test_data_path
-
-#    def setRootDir(self, root_dir):
-#        'root dir for user data. Test results can be placed here.'
-#        self.root_dir = root_dir
-
-#    def setInstalledRoot(self, install_root):
-#        'path to base of installed package, i.e. where the CustusX folder is located.'
-#        self.install_root = install_root
-
-#    def setTestDataPath(self, path):
-#        'location of test data'
-#        self.test_data_path = path
         
     def getTestDataPath(self):
         return self.test_data_path
@@ -103,9 +91,9 @@ class CustusXTestInstallation:
     def _getInstalledBinaryPath(self):
         'path to binary files / executables in install'
         if platform.system() == 'Darwin':
-            retval = '%s/CustusX/CustusX.app/Contents/MacOS' % self.install_root
+            retval = '%s/CustusX.app/Contents/MacOS' % self.install_root
         if (platform.system() == 'Linux') or (platform.system() == 'Windows') :
-            retval = '%s/CustusX/bin' % self.install_root
+            retval = '%s/bin' % self.install_root
 
         return retval        
 
@@ -153,7 +141,7 @@ class CustusXTestInstallation:
         cx.utils.cxUtilities.assertTrue(os.path.exists(self.getTestDataPath()), 'Looking for installed data path.')
     
     def _getInstalledSettingsPath(self):
-        return '%s/CustusX/config/settings' % self.install_root
+        return '%s/config/settings' % self.install_root
 
 
 

@@ -53,6 +53,9 @@ message( STATUS "The " ${CMAKE_GENERATOR} " was used." )
 # Set CustusX version
 #------------------------------------------------------------------------------
 
+set(CX_SYSTEM_BASE_NAME "CustusX" CACHE STRING "base name of the installed system, use for root folder, version, installer..")
+message(STATUS "Setting CX_SYSTEM_BASE_NAME=[${CX_SYSTEM_BASE_NAME}]")
+
 cx_read_version()
 
 set(CMAKE_BUILD_TYPE:STRING=Debug)
