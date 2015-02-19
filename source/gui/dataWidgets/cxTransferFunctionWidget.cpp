@@ -193,10 +193,6 @@ TransferFunction3DWidget::TransferFunction3DWidget(PatientModelServicePtr patien
   mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(patientModelService, this);
   mTransferFunctionColorWidget = new TransferFunctionColorWidget(patientModelService, this);
 
-  mActiveImageProxy = ActiveImageProxy::New(patientModelService);
-  connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &TransferFunction3DWidget::activeImageChangedSlot);
-  connect(mActiveImageProxy.get(), &ActiveImageProxy::transferFunctionsChanged, this, &TransferFunction3DWidget::activeImageChangedSlot);
-
   mTransferFunctionAlphaWidget->setSizePolicy(QSizePolicy::MinimumExpanding,
                                               QSizePolicy::MinimumExpanding);
   mTransferFunctionColorWidget->setSizePolicy(QSizePolicy::Expanding,
@@ -220,19 +216,19 @@ QString TransferFunction3DWidget::defaultWhatsThis() const
 void TransferFunction3DWidget::activeImageChangedSlot()
 {
   ImagePtr image = mPatientModelService->getActiveImage();
-  ImageTFDataPtr tf;
-  if (image)
-    tf = image->getTransferFunctions3D();
-  else
-    image.reset();
+  this->imageChangedSlot(image);
+}
 
-  mTransferFunctionAlphaWidget->setData(image, tf);
-  mTransferFunctionColorWidget->setData(image, tf);
+void TransferFunction3DWidget::imageChangedSlot(ImagePtr image)
+{
+	ImageTFDataPtr tf;
+	if (image)
+	  tf = image->getTransferFunctions3D();
+	else
+	  image.reset();
 
-//  mDataWindow->setImageTFData(tf);
-//  mDataLevel->setImageTFData(tf);
-//  mDataAlpha->setImageTFData(tf);
-//  mDataLLR->setImageTFData(tf);
+	mTransferFunctionAlphaWidget->setData(image, tf);
+	mTransferFunctionColorWidget->setData(image, tf);
 }
 
 //---------------------------------------------------------
@@ -308,13 +304,19 @@ void TransferFunction2DWidget::activeImageChangedSlot()
 //---------------------------------------------------------
 
 TransferFunctionWidget::TransferFunctionWidget(PatientModelServicePtr patientModelService, QWidget* parent) :
-  BaseWidget(parent, "TransferFunctionWidget", "Transfer Function")
+  BaseWidget(parent, "TransferFunctionWidget", "Transfer Function"),
+  mActiveImageProxy(ActiveImageProxy::New(patientModelService))
 {
   QVBoxLayout* mLayout = new QVBoxLayout(this);
 
+  TransferFunction3DWidget* transferFunctionWidget = new TransferFunction3DWidget(patientModelService, this);
+
   mLayout->setMargin(0);
-  mLayout->addWidget(new TransferFunction3DWidget(patientModelService, this));
+  mLayout->addWidget(transferFunctionWidget);
   mLayout->addWidget(new TransferFunctionPresetWidget(patientModelService, this, true));
+
+  connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, transferFunctionWidget, &TransferFunction3DWidget::activeImageChangedSlot);
+  connect(mActiveImageProxy.get(), &ActiveImageProxy::transferFunctionsChanged, transferFunctionWidget, &TransferFunction3DWidget::activeImageChangedSlot);
 
   this->setLayout(mLayout);
 }

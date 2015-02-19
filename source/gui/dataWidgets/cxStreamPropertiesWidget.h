@@ -37,6 +37,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
+typedef boost::shared_ptr<class StringPropertySelectTrackedStream> StringPropertySelectTrackedStreamPtr;
+typedef boost::shared_ptr<class TransferFunction3DWidget> TransferFunction3DWidgetPtr;
+
 /**
  * \brief Widget for displaying and manipulating TrackedStream properties.
  * \ingroup cx_gui
@@ -49,6 +52,12 @@ class cxGui_EXPORT StreamPropertiesWidget : public TabbedWidget
 public:
 	StreamPropertiesWidget(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget* parent);
 	virtual QString defaultWhatsThis() const;
+
+private slots:
+	void meshSelectedSlot();
+private:
+	StringPropertySelectTrackedStreamPtr mSelectStream;
+	TransferFunction3DWidgetPtr mTransferFunctionWidget;
 };
 } //cx
 

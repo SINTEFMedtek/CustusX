@@ -109,7 +109,7 @@ private:
 };
 
 typedef boost::shared_ptr<class StringPropertySelectMesh> StringPropertySelectMeshPtr;
-/** Property that selects and stores an mesh.
+/** Property that selects and stores a mesh.
  * The mesh is stored internally in the property.
  * Use setValue/getValue plus changed() to access it.
  */
