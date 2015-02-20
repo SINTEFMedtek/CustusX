@@ -76,6 +76,7 @@ function(cx_get_git_build_description _varResult)
 
 	STRING(REGEX REPLACE "\r|\n" "" RESULT ${RESULT})
 	STRING(REGEX REPLACE " " "" RESULT ${RESULT})
+	string(REPLACE "/" "_" RESULT ${RESULT}) # make filename-friendly
 
 	set (${_varResult} ${RESULT} PARENT_SCOPE)
 endfunction()
@@ -97,6 +98,7 @@ function(cx_get_git_sha _varResult)
 		)
 	STRING(REGEX REPLACE "\r|\n" "" RESULT ${RESULT})
 	STRING(REGEX REPLACE " " "" RESULT ${RESULT})
+	string(REPLACE "/" "_" RESULT ${RESULT}) # make filename-friendly
 
 	set (${_varResult} ${RESULT} PARENT_SCOPE)
 endfunction()
@@ -114,6 +116,7 @@ function(cx_get_git_branch _varResult)
 		)
 	STRING(REGEX REPLACE "\r|\n" "" RESULT ${RESULT})
 	STRING(REGEX REPLACE " " "" RESULT ${RESULT})
+	string(REPLACE "/" "_" RESULT ${RESULT}) # make filename-friendly
 
 	set (${_varResult} ${RESULT} PARENT_SCOPE)
 endfunction()

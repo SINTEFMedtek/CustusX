@@ -10,22 +10,10 @@
 #
 #####################################################
 
-#import logging
-#import time    
-#import subprocess
 import sys
 import argparse        
 
 import cxJenkinsBuildScriptBase
-
-#from cx.utils.cxShell import *
-#from cx.utils.cxPrintFormatter import PrintFormatter
-#import cx.build.cxInstallData
-#import cx.build.cxComponents
-#import cx.build.cxComponentAssembly
-#import cx.build.cxCustusXBuilder
-#import cxsetup.cxCustusXInstaller
-#import cx.build.cxCustusXTestInstallation
 
 
 
