@@ -56,6 +56,7 @@ class QStringList;
 
 namespace cx
 {
+typedef boost::shared_ptr<class ImagePropertiesWidget> ImagePropertiesWidgetPtr;
 
 /**
  * \ingroup cx_gui
@@ -65,24 +66,27 @@ class cxGui_EXPORT ShadingWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  ShadingWidget(PatientModelServicePtr patientModelService, QWidget* parent);
+  ShadingWidget(PatientModelServicePtr patientModelService, QWidget* parent, bool connectToActiveImage = true);
   ~ShadingWidget();
 
 public slots:
   void activeImageChangedSlot(); ///< listens to the contextdockwidget for when the current image is changed
+  void imageChangedSlot(ImagePtr image);
   void shadingToggledSlot(bool val);
   virtual QString defaultWhatsThis() const;
 
 protected:
-  void init();///< Initialize TransferFunctionWidget. Create members
+  void init(bool connectToActiveImage);///< Initialize TransferFunctionWidget. Create members
   //gui
   QVBoxLayout* mLayout;
   QCheckBox* mShadingCheckBox;
 
   //ImagePtr mCurrentImage;
   bool mInitialized;///< Is TransferFunctionWidget initialized
-  ActiveImageProxyPtr mActiveImageProxy;
   PatientModelServicePtr mPatientModelService;
+  ActiveImageProxyPtr mActiveImageProxy;
+  ImagePtr mImage;
+  ImagePropertiesWidgetPtr mImagePropertiesWidget;
 };
 }
 

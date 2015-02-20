@@ -50,23 +50,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ShadingWidget::ShadingWidget(PatientModelServicePtr patientModelService, QWidget* parent) :
+ShadingWidget::ShadingWidget(PatientModelServicePtr patientModelService, QWidget* parent,  bool connectToActiveImage) :
 	BaseWidget(parent, "ShadingWidget", "Shading"),
 	mLayout(new QVBoxLayout(this)),
-	mPatientModelService(patientModelService)
+	mPatientModelService(patientModelService),
+	mActiveImageProxy(ActiveImageProxyPtr()),
+	mImage(ImagePtr()),
+	mImagePropertiesWidget(ImagePropertiesWidgetPtr())
 {
-  this->init();
+  this->init(connectToActiveImage);
 }
 
 ShadingWidget::~ShadingWidget()
 {}
 
-void ShadingWidget::init()
+void ShadingWidget::init(bool connectToActiveImage)
 {
   mShadingCheckBox = new QCheckBox("Shading", this);
-//  mLayout->addWidget(mShadingCheckBox);
-//  mShadingCheckBox->setEnabled(true);
-//
 
   connect(mShadingCheckBox, &QCheckBox::toggled, this, &ShadingWidget::shadingToggledSlot);
 
@@ -82,37 +82,41 @@ void ShadingWidget::init()
   shadingSpecularWidget->setEnabled(false);
   shadingSpecularPowerWidget->setEnabled(false);
 
-  mActiveImageProxy = ActiveImageProxy::New(mPatientModelService);
-  connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &ShadingWidget::activeImageChangedSlot);
-  connect(mActiveImageProxy.get(), &ActiveImageProxy::transferFunctionsChanged, this, &ShadingWidget::activeImageChangedSlot);
+	if (connectToActiveImage)
+	{
+		mActiveImageProxy = ActiveImageProxy::New(mPatientModelService);
+		connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &ShadingWidget::activeImageChangedSlot);
+		connect(mActiveImageProxy.get(), &ActiveImageProxy::transferFunctionsChanged, this, &ShadingWidget::activeImageChangedSlot);
+	}
 
-	ImagePropertiesWidget* imagePropertiesWidget = new ImagePropertiesWidget(mPatientModelService, NULL);
-	shadingLayput->addWidget(imagePropertiesWidget, 5, 0, 1, 2);
-  mLayout->addLayout(shadingLayput);
+	mImagePropertiesWidget = ImagePropertiesWidgetPtr(new ImagePropertiesWidget(NULL));
+	shadingLayput->addWidget(mImagePropertiesWidget.get(), 5, 0, 1, 2);
+	mLayout->addLayout(shadingLayput);
 	mLayout->addStretch(1);
-
-//  this->setLayout(mLayout);
 }
 
 void ShadingWidget::shadingToggledSlot(bool val)
 {
-  ImagePtr image = mPatientModelService->getActiveImage();
-  if (image)
-  {
-    image->setShadingOn(val);
-  }
+	if (mImage)
+		mImage->setShadingOn(val);
 }
 
 void ShadingWidget::activeImageChangedSlot()
 {
-  ImagePtr activeImage = mPatientModelService->getActiveImage();
-
-  if (activeImage)
-  {
-    //std::cout << "shading updated to " << activeImage->getShadingOn() << std::endl;
-    mShadingCheckBox->setChecked(activeImage->getShadingOn());
-  }
+	ImagePtr activeImage = mPatientModelService->getActiveImage();
+	this->imageChangedSlot(activeImage);
 }
+
+void ShadingWidget::imageChangedSlot(ImagePtr image)
+{
+	mImage = image;
+	if (mImage)
+	{
+		mShadingCheckBox->setChecked(mImage->getShadingOn());
+		mImagePropertiesWidget->imageChanged(image);
+	}
+}
+
 
 QString ShadingWidget::defaultWhatsThis() const
 {

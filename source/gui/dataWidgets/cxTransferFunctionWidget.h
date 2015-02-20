@@ -139,7 +139,7 @@ class cxGui_EXPORT TransferFunction3DWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  TransferFunction3DWidget(PatientModelServicePtr patientModelService, QWidget* parent);
+  TransferFunction3DWidget(PatientModelServicePtr patientModelService, QWidget* parent, bool connectToActiveImage = true);
   virtual ~TransferFunction3DWidget() {}
   virtual QString defaultWhatsThis() const;
 
@@ -153,16 +153,15 @@ protected:
   TransferFunctionColorWidget* mTransferFunctionColorWidget;
 
   PatientModelServicePtr mPatientModelService;
+  ActiveImageProxyPtr mActiveImageProxy;
 };
-
-typedef boost::shared_ptr<class TransferFunction3DWidget> TransferFunction3DWidgetPtr;
 
 class cxGui_EXPORT TransferFunction2DWidget : public BaseWidget
 {
   Q_OBJECT
 
 public:
-  TransferFunction2DWidget(PatientModelServicePtr patientModelService, QWidget* parent);
+  TransferFunction2DWidget(PatientModelServicePtr patientModelService, QWidget* parent, bool connectToActiveImage = true);
   virtual ~TransferFunction2DWidget() {}
   virtual QString defaultWhatsThis() const;
 
@@ -194,12 +193,9 @@ class cxGui_EXPORT TransferFunctionWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  TransferFunctionWidget(PatientModelServicePtr patientModelService, QWidget* parent);
+  TransferFunctionWidget(PatientModelServicePtr patientModelService, QWidget* parent, bool connectToActiveImage = true);
   virtual ~TransferFunctionWidget() {}
   virtual QString defaultWhatsThis() const;
-
-private:
-  ActiveImageProxyPtr mActiveImageProxy;
 };
 
 /**
