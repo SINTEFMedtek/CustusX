@@ -416,6 +416,9 @@ class CustusX(CppComponent):
         add('SSC_BUILD_EXAMPLES:BOOL', self.controlData.mBuildSSCExamples);
         add('BUILD_TESTING:BOOL', self.controlData.mBuildTesting);
         add('SSC_USE_GCOV:BOOL', self.controlData.mCoverage);
+        add('CX_SYSTEM_BASE_NAME:STRING', self.controlData.system_base_name)
+        add('CX_SYSTEM_DEFAULT_APPLICATION:STRING', self.controlData.system_base_name)
+        
         
         libs = self.assembly.libraries
         for lib in libs:

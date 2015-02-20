@@ -352,7 +352,7 @@ endmacro()
 
 ###############################################################################
 #
-# Utility funciton for printing all variables known to CMake at a given point.
+# Utility for printing all variables known to CMake at a given point.
 #
 ###############################################################################
 function(cx_print_variables REGEX_TO_MATCH)
@@ -422,3 +422,42 @@ macro(ADD_MSVC_PRECOMPILED_HEADER PrecompiledHeader PrecompiledSource SourcesVar
     list(APPEND ${SourcesVar} ${PrecompiledSource})
   endif(MSVC)
 endmacro(ADD_MSVC_PRECOMPILED_HEADER)
+
+###############################################################################
+#
+# Define the option CX_APP_${APP_NAME}, default value ON
+# If the option is ON, add the subdirectory APP_NAME.
+#
+###############################################################################
+macro(cx_add_optional_app_subdirectory APP_NAME)
+  option(CX_APP_${APP_NAME} "Build the application ${APP_NAME}" ON)
+  if(${CX_APP_${APP_NAME}})
+	add_subdirectory(${APP_NAME})
+  endif()
+endmacro()
+
+###############################################################################
+#
+# Set some default values for the MACOSX_BUNDLE variable family
+# Customize for each application,
+# in particular the icon, which must have the resource installed int
+#
+###############################################################################
+macro(cx_initialize_macosx_bundle)
+	set(CX_COPYRIGHT_TEXT "Copyright SINTEF Medical Technology. BSD licence")
+
+	if(APPLE) # For Apple set the icns file containing icons
+		set(MACOSX_BUNDLE_ICON_FILE "application.icns") # set how it shows up in the Info.plist file
+		#set_source_files_properties(${CustusX_SOURCE_DIR}/source/gui/icons/application.icns
+		#						PROPERTIES MACOSX_PACKAGE_LOCATION Resources)  # set where in the bundle to put the icns file
+		#set(SOURCES ${SOURCES} ${CustusX_SOURCE_DIR}/source/gui/icons/application.icns)  # include the icns file in the target
+
+		set(MACOSX_BUNDLE_INFO_STRING ${CX_SYSTEM_DEFAULT_APPLICATION})
+		set(MACOSX_BUNDLE_BUNDLE_NAME ${CX_SYSTEM_DEFAULT_APPLICATION})
+		set(MACOSX_BUNDLE_BUNDLE_VERSION "${CustusX_VERSION_STRING}")
+		set(MACOSX_BUNDLE_SHORT_VERSION_STRING "${MACOSX_BUNDLE_BUNDLE_VERSION}")
+		set(MACOSX_BUNDLE_LONG_VERSION_STRING "${CX_SYSTEM_DEFAULT_APPLICATION} ${MACOSX_BUNDLE_BUNDLE_VERSION}")
+		set(MACOSX_BUNDLE_COPYRIGHT ${CX_COPYRIGHT_TEXT})
+	endif(APPLE)
+endmacro()
+

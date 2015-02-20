@@ -76,13 +76,15 @@ cx_add_class_qt_moc(cxGui_SRCS
     cxSecondaryMainWindow
     cxSecondaryViewLayoutWindow
     cxLayoutInteractor
-    #----------------------
+	#----------------------
 )
 
 cx_add_class(cxGui_SRCS
 	${cxGui_SRCS}
 	properties/cxPropertyHelper
 )
+
+#set(cxGui_SRCS ${cxGui_SRCS} ${CustusX_SOURCE_DIR}/source/gui/icons/application.icns) # needed at least on apple to display icon
 
 cx_create_export_header("cxGui")
 

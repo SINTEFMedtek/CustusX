@@ -33,14 +33,29 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxSelectDataStringProperty.h"
 #include "cxDataSelectWidget.h"
+#include "cxTransferFunctionWidget.h"
+#include "cxTrackedStream.h"
 
 namespace cx
 {
 
 StreamPropertiesWidget::StreamPropertiesWidget(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget *parent) :
-	TabbedWidget(parent, "StreamPropertiesWidget", "Stream Properties")
+	TabbedWidget(parent, "StreamPropertiesWidget", "Stream Properties"),
+	mSelectStream(StringPropertySelectTrackedStream::New(patientModelService))
 {
-	this->insertWidgetAtTop(new DataSelectWidget(visualizationService, patientModelService, this, StringPropertySelectTrackedStream::New(patientModelService)));
+	mTransferFunctionWidget = TransferFunction3DWidgetPtr(new TransferFunction3DWidget(patientModelService, this));
+
+	this->insertWidgetAtTop(new DataSelectWidget(visualizationService, patientModelService, this, mSelectStream));
+	this->addTab(mTransferFunctionWidget.get(), QString("Transfer Functions"));
+
+	connect(mSelectStream.get(), &Property::changed, this, &StreamPropertiesWidget::meshSelectedSlot);
+}
+
+void StreamPropertiesWidget::meshSelectedSlot()
+{
+	TrackedStreamPtr trackedStream = mSelectStream->getTrackedStream();
+	if(trackedStream && trackedStream->getChangingImage())
+		mTransferFunctionWidget->imageChangedSlot(trackedStream->getChangingImage());
 }
 
 QString StreamPropertiesWidget::defaultWhatsThis() const

@@ -53,11 +53,17 @@ message( STATUS "The " ${CMAKE_GENERATOR} " was used." )
 # Set CustusX version
 #------------------------------------------------------------------------------
 
+set(CX_SYSTEM_BASE_NAME "CustusX" CACHE STRING "base name of the installed system, use for root folder, version, installer..")
+set(CX_SYSTEM_DEFAULT_APPLICATION "CustusX" CACHE STRING "The application to set as main installed app, must match an exe TARGET")
+message(STATUS "Setting CX_SYSTEM_BASE_NAME=[${CX_SYSTEM_BASE_NAME}]")
+message(STATUS "Setting CX_SYSTEM_DEFAULT_APPLICATION=[${CX_SYSTEM_DEFAULT_APPLICATION}]")
+
 cx_read_version()
 
 set(CMAKE_BUILD_TYPE:STRING=Debug)
 
 cx_initialize_custusx_install()
+cx_initialize_macosx_bundle()
 cx_clear_catch_cache()
 cx_initialize_coverage()
 

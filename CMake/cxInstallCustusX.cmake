@@ -13,15 +13,16 @@
 # See CustusX_License.txt for more information.
 
 ###############################################################################
-## Installation script for CustusX
 #
-# Include into CustusX app dir.
+# Installation script.
+# Run this after all other actions. Requires that the bundle has been created.
 #
 ###############################################################################
 
 
 include(cxInstallUtilities)
 
+cx_install_apply_customizable_properties()
 cx_install_configuration_files()
 cx_install_documentation_files()
 
@@ -30,9 +31,9 @@ cx_install_windows_runtime_libs(${CX_INSTALL_ROOT_DIR}/bin)
 #--------------------------------------------------------------------------------
 # Bundle utilities
 #--------------------------------------------------------------------------------
-set(CUSTUSX_EXECUTABLE "${CX_INSTALL_BINARY_DIR}/${CX_BUNDLE_NAME}")
+set(CX_MAIN_EXECUTABLE "${CX_INSTALL_BINARY_DIR}/${CX_BUNDLE_NAME}")
 if(CX_WINDOWS)
-    set( CUSTUSX_EXECUTABLE "${CUSTUSX_EXECUTABLE}.exe")
+	set( CX_MAIN_EXECUTABLE "${CX_MAIN_EXECUTABLE}.exe")
 endif()
 
 cx_install_add_library_dirs(
@@ -64,7 +65,6 @@ cx_install_add_library_dirs(
 #message(STATUS "QT_LIB: "   ${QT_LIBRARY_DIRS}) - empty
 #message(STATUS "QT_BIN: "   ${QT_BINARY_DIR}) - empty
 
-
 if(CX_WINDOWS)
     find_qt_bin_dir(QT_BIN_DIR)
     find_qt_plugin_dir(QT_PLUGINS_DIR)
@@ -91,7 +91,7 @@ endif(CX_WINDOWS)
 cx_install_all_stored_targets(${CX_INSTALL_BINARY_DIR})
 
 cx_fixup_and_add_qtplugins_to_bundle(
-    "${CUSTUSX_EXECUTABLE}"
+	"${CX_MAIN_EXECUTABLE}"
     "${CX_INSTALL_BINARY_DIR}"
     "${CX_ALL_LIBRARY_DIRS}"
 )
@@ -101,3 +101,4 @@ include(CPack)
 #hiding packages created by ctk: we install the plugins ourselves
 cpack_add_component(Development HIDDEN DISABLED)
 cpack_add_component(RuntimePlugins HIDDEN DISABLED)
+

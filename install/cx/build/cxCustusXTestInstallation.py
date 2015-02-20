@@ -33,29 +33,18 @@ class CustusXTestInstallation:
     Represents one installed version of CustusX,
     along with functionality for testing it.
     '''
-    def __init__(self, target_platform, root_dir, install_root, test_data_path):
+    def __init__(self, target_platform, root_dir, install_root, test_data_path, system_base_name):
         '''
         target_platform: cxUtilities.PlatformInfo instance describing target platform
         root_dir: root dir for user data. Test results can be placed here.
-        install_root: path to base of installed package, i.e. where the CustusX folder is located.
+        install_root: path to base of installed package, i.e. the path to the CustusX folder or similar.
         test_data_path: location of test data
         '''
         self.target_platform = target_platform
         self.root_dir = root_dir
         self.install_root = install_root
         self.test_data_path = test_data_path
-
-#    def setRootDir(self, root_dir):
-#        'root dir for user data. Test results can be placed here.'
-#        self.root_dir = root_dir
-
-#    def setInstalledRoot(self, install_root):
-#        'path to base of installed package, i.e. where the CustusX folder is located.'
-#        self.install_root = install_root
-
-#    def setTestDataPath(self, path):
-#        'location of test data'
-#        self.test_data_path = path
+        self.system_base_name = system_base_name
         
     def getTestDataPath(self):
         return self.test_data_path
@@ -63,26 +52,11 @@ class CustusXTestInstallation:
     def testInstallation(self):
         PrintFormatter.printHeader('Test installation', level=2)
         appPath = self._getInstalledBinaryPath()
-        target = self.target_platform.get_target_platform()
-     
-        if target == 'linux':
-            self._testExecutable(appPath, 'Catch', '-h')
-            self._testExecutable(appPath, 'CustusX')
-            self._testExecutable(appPath, 'OpenIGTLinkServer')
-        elif target == 'apple':
-            self._testExecutable(appPath, 'Catch', '-h')
-            self._testExecutable(appPath, 'CustusX')
-            self._testExecutable(appPath, 'OpenIGTLinkServer')
-        elif target == 'win32':
-            self._testExecutable(appPath, 'Catch.exe', '-h')
-            self._testExecutable(appPath, 'UltrasonixServer.exe')
-        elif target == 'win64':
-            self._testExecutable(appPath, 'Catch.exe', '-h')
-            self._testExecutable(appPath, 'CustusX.exe')
-            self._testExecutable(appPath, 'OpenIGTLinkServer.exe')
-        else:
-            PrintFormatter.printInfo('Error in Test Installation: Unknown platform  %s.' % target)
-                
+        self._testExecutable(appPath, 'Catch', '-h')
+        self._testExecutable(appPath, self.system_base_name) # defaults to CustusX
+        self._testExecutable(appPath, 'OpenIGTLinkServer')
+        self._testExecutable(appPath, 'LogConsole')
+                     
     def runUnstableTests(self):
         PrintFormatter.printHeader('Run unstable tests', level=2)
         self._runCatchTestsWrappedInCTestOnInstalled('[unstable]')
@@ -103,18 +77,23 @@ class CustusXTestInstallation:
     def _getInstalledBinaryPath(self):
         'path to binary files / executables in install'
         if platform.system() == 'Darwin':
-            retval = '%s/CustusX/CustusX.app/Contents/MacOS' % self.install_root
+            retval = '%s/%s.app/Contents/MacOS' % (self.install_root, self.system_base_name)
         if (platform.system() == 'Linux') or (platform.system() == 'Windows') :
-            retval = '%s/CustusX/bin' % self.install_root
+            retval = '%s/bin' % self.install_root
 
         return retval        
 
     def _testExecutable(self, path, filename, arguments=''):
         PrintFormatter.printHeader('Test executable %s' % filename, level=3)
-        fullname = '%s/%s' % (path, filename)
+        fullname = '%s/%s%s' % (path, filename, self._getExecutableSuffix())
         cx.utils.cxUtilities.assertTrue(os.path.exists(fullname), 'Checking existence of installed executable %s' % fullname)
         cmd = '%s %s' % (fullname, arguments)
         self._runApplicationForDuration(cmd, timeout=3)
+
+    def _getExecutableSuffix(self):
+        if self.target_platform.get_target_platform() == 'win64':
+            return '.exe'
+        return ''
 
     def _runApplicationForDuration(self, application, timeout):
         '''
@@ -153,7 +132,7 @@ class CustusXTestInstallation:
         cx.utils.cxUtilities.assertTrue(os.path.exists(self.getTestDataPath()), 'Looking for installed data path.')
     
     def _getInstalledSettingsPath(self):
-        return '%s/CustusX/config/settings' % self.install_root
+        return '%s/config/settings' % self.install_root
 
 
 
