@@ -65,7 +65,8 @@ macro(cx_install_initialize_customizable_properties)
 
 	cx_install_set_generator_filename()
 
-	set_property(GLOBAL PROPERTY CX_LICENSE_FILE "${CustusX_SOURCE_DIR}/License.txt")
+	set(CX_LICENSE_FILE "${CustusX_SOURCE_DIR}/License.txt")
+	set_property(GLOBAL PROPERTY CX_LICENSE_FILE "${CX_LICENSE_FILE}")
 
 	set_property(GLOBAL PROPERTY CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/source/gui/icons/CustusX.png")
 	set_property(GLOBAL PROPERTY CPACK_PACKAGE_VENDOR "SINTEF Medical Technology")
@@ -109,40 +110,6 @@ macro(cx_install_apply_customizable_properties)
 
 	endif (CX_WINDOWS)
 endmacro()
-
-###############################################################################
-#
-# Define variables used by various installer generators to customize
-# the installer look&feel.
-#
-###############################################################################
-#macro(cx_install_decorate_generators)
-
-#	cx_install_set_generator_filename()
-#	set(CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/source/gui/icons/CustusX.png")
-#    set(CPACK_PACKAGE_VENDOR "SINTEF Medical Technology")
-#	set(CPACK_RESOURCE_FILE_WELCOME "${PROJECT_SOURCE_DIR}/install/install_text/install_welcome.txt")
-#	set(CPACK_RESOURCE_FILE_README "${PROJECT_SOURCE_DIR}/install/install_text/install_readme.rtf")
-#	set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/License.txt")
-
-##	if(CX_LINUX)
-##		set(CPACK_RESOURCE_FILE_README "${PROJECT_SOURCE_DIR}/install/Linux/copy/linux_install_readme.txt")
-##	endif(CX_LINUX)
-
-#	if(CX_WINDOWS)
-#		set(CPACK_NSIS_MUI_ICON "${PROJECT_SOURCE_DIR}/source/gui/icons\\\\CustusX.ico")
-#        set(CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/source/gui/icons\\\\CustusX.png")
-##		set(CPACK_RESOURCE_FILE_README "${PROJECT_SOURCE_DIR}/install/Windows\\\\Windows_Install_ReadMe.rtf")
-#		set(CPACK_NSIS_INSTALLED_ICON_NAME "bin/${CX_SYSTEM_DEFAULT_APPLICATION}.exe")
-#		set(CPACK_NSIS_MENU_LINKS "doc/Windows_Install_ReadMe.rtf" "README")
-
-#		set(CPACK_PACKAGE_EXECUTABLES
-#			"${CX_SYSTEM_DEFAULT_APPLICATION}" "${CX_SYSTEM_DEFAULT_APPLICATION}"
-#			"OpenIGTLinkServer" "OpenIGTLinkServer"
-#			)
-
-#	endif (CX_WINDOWS)
-#endmacro()
 
 ###############################################################################
 #
@@ -300,7 +267,6 @@ macro(cx_initialize_custusx_install)
 	cx_install_set_relative_path()
 
 	cx_install_set_generators()
-	#cx_install_decorate_generators()
 	cx_install_initialize_customizable_properties()
 
 	cx_install_set_folder_structure()
