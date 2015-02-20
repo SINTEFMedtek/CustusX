@@ -33,8 +33,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxSelectDataStringProperty.h"
 #include "cxDataSelectWidget.h"
-#include "cxTransferFunctionWidget.h"
 #include "cxTrackedStream.h"
+#include "cxTransferFunctionWidget.h"
+#include "cxShadingWidget.h"
 
 namespace cx
 {
@@ -43,19 +44,25 @@ StreamPropertiesWidget::StreamPropertiesWidget(PatientModelServicePtr patientMod
 	TabbedWidget(parent, "StreamPropertiesWidget", "Stream Properties"),
 	mSelectStream(StringPropertySelectTrackedStream::New(patientModelService))
 {
-	mTransferFunctionWidget = TransferFunction3DWidgetPtr(new TransferFunction3DWidget(patientModelService, this));
+	bool connectToActiveImage = false;
+	mTransferFunctionWidget = TransferFunction3DWidgetPtr(new TransferFunction3DWidget(patientModelService, this, connectToActiveImage));
+	mShadingWidget = ShadingWidgetPtr(new ShadingWidget(patientModelService, this, connectToActiveImage));
 
 	this->insertWidgetAtTop(new DataSelectWidget(visualizationService, patientModelService, this, mSelectStream));
 	this->addTab(mTransferFunctionWidget.get(), QString("Transfer Functions"));
+	this->addTab(mShadingWidget.get(), "Shading");
 
-	connect(mSelectStream.get(), &Property::changed, this, &StreamPropertiesWidget::meshSelectedSlot);
+	connect(mSelectStream.get(), &Property::changed, this, &StreamPropertiesWidget::streamSelectedSlot);
 }
 
-void StreamPropertiesWidget::meshSelectedSlot()
+void StreamPropertiesWidget::streamSelectedSlot()
 {
 	TrackedStreamPtr trackedStream = mSelectStream->getTrackedStream();
 	if(trackedStream && trackedStream->getChangingImage())
+	{
 		mTransferFunctionWidget->imageChangedSlot(trackedStream->getChangingImage());
+		mShadingWidget->imageChangedSlot(trackedStream->getChangingImage());
+	}
 }
 
 QString StreamPropertiesWidget::defaultWhatsThis() const

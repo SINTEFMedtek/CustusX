@@ -39,6 +39,7 @@ namespace cx
 {
 typedef boost::shared_ptr<class StringPropertySelectTrackedStream> StringPropertySelectTrackedStreamPtr;
 typedef boost::shared_ptr<class TransferFunction3DWidget> TransferFunction3DWidgetPtr;
+typedef boost::shared_ptr<class ShadingWidget> ShadingWidgetPtr;
 
 /**
  * \brief Widget for displaying and manipulating TrackedStream properties.
@@ -54,10 +55,11 @@ public:
 	virtual QString defaultWhatsThis() const;
 
 private slots:
-	void meshSelectedSlot();
+	void streamSelectedSlot();
 private:
 	StringPropertySelectTrackedStreamPtr mSelectStream;
 	TransferFunction3DWidgetPtr mTransferFunctionWidget;
+	ShadingWidgetPtr mShadingWidget;
 };
 } //cx
 

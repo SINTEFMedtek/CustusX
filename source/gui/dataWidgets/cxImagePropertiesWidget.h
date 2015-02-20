@@ -50,19 +50,18 @@ class cxGui_EXPORT ImagePropertiesWidget : public BaseWidget
 	Q_OBJECT
 
 public:
-	ImagePropertiesWidget(PatientModelServicePtr patientModelService, QWidget* parent);
+	ImagePropertiesWidget(QWidget* parent);
 
+	void imageChanged(ImagePtr image);
 public slots:
 	virtual QString defaultWhatsThis() const;
 
 private slots:
 	void interpolationTypeChanged(int index);
-	void activeImageChangedSlot();
 
 private:
 	QComboBox* mInterpolationType;
-	ActiveImageProxyPtr mActiveImageProxy;
-	PatientModelServicePtr mPatientModelService;
+	ImagePtr mImage;
 };
 
 }//end namespace cx
