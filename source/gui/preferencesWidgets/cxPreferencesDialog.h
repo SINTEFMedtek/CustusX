@@ -196,7 +196,7 @@ protected:
  * |                FilePreviewWidget           |
  * |____________________________________________|
  *
- * /endverbatim
+ * \endverbatim
  *
  * Tools are available as a filered list from ToolFilterGroupBox,
  * and can be added to a configuration in ToolConfigureGroupBox.

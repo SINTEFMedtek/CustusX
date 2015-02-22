@@ -133,4 +133,8 @@ cxResource_EXPORT void reportSuccess(QString msg);
 	}									\
 }
 
+/**
+ * @}
+ */
+
 #endif
