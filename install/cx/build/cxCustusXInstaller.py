@@ -161,6 +161,11 @@ class CustusXInstaller:
         return targetPath
     
     def copyReleaseFiles(self, targetPath):
+        # currently not in use (2015-02-22/CA): These files are mostly redundant (replaced by online docs), 
+        # and are located in the private repos.
+        # If we need to publish files along with the binaries, solve by letting cmake copy these to a specific folder, then
+        # python can look there, thus moving logic to cmake and using the system-polymorphism there.
+        #
         'Copy files into release folder in addition to the installer.'
         source = self.source_custusxsetup_path
         self._copyFile('%s/doc/ChangeLog.rtf' % source, targetPath)

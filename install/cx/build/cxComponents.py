@@ -86,8 +86,6 @@ class Component(object):
         builder.setBuildType(self.getBuildType())
         builder.setControlData(self.controlData)
         return builder
-    def isPubliclyAvailable(self):
-        return True
     def pluginPath(self):
         'if this component contains a plugin: return path to plugin, absolute or relative to CustusX/source'
         return None
@@ -541,8 +539,6 @@ class CustusXData(CppComponent):
         return '%s/CustusXData.git' % base
     def makeClean(self):
         pass
-    def isPubliclyAvailable(self):
-        return False
 # ---------------------------------------------------------
 
 

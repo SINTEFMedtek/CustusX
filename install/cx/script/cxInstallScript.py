@@ -92,8 +92,7 @@ Available components are:
         p.add_argument('--configure_clean', action='store_true', help='delete build folder(s), configure all selected components')
         p.add_argument('--configure', '--conf', action='store_true', help='configure all selected components')
         p.add_argument('-b', '--build', '--make', action='store_true', help='build all selected components')
-        p.add_argument('-a', '--all_public', action='store_true', help='select all publicly available components')
-        p.add_argument('--all', action='store_true', help='select all components')
+        p.add_argument('-a', '--all', action='store_true', help='select all components')
         p.add_argument('-f', '--full', action='store_true', help='checkout, configure, make')
         p.add_argument('-c', '--clean', action='store_true', help='make clean')
         p.add_argument('-s', '--silent_mode', action='store_true', help='execute script without user interaction')
@@ -110,8 +109,6 @@ Available components are:
                 
         if options.all:
             assembly.selectAllLibraries()
-        elif options.all_public:
-            assembly.selectAllPublicLibraries()
         else:
             assembly.selectLibraries(options.components)
 
