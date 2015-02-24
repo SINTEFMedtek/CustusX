@@ -59,7 +59,7 @@ public:
 
 	VisualizationServicePtr visualizationService;
 
-private:
+protected:
 	VisServices();
 };
 

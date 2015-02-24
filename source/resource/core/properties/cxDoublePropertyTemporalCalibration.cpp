@@ -35,9 +35,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-DoublePropertyTimeCalibration::DoublePropertyTimeCalibration(TrackingServicePtr trackingService)
+DoublePropertyTimeCalibration::DoublePropertyTimeCalibration(TrackingServicePtr trackingService) :
+	mTrackingService(trackingService)
 {
-  connect(mTrackingService.get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(activeToolChanged()));
+  connect(mTrackingService.get(), &TrackingService::activeToolChanged, this, &DoublePropertyTimeCalibration::activeToolChanged);
   connect(mTrackingService.get(), &TrackingService::stateChanged, this, &DoublePropertyTimeCalibration::activeToolChanged);
   this->activeToolChanged();
 }

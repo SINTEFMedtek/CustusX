@@ -29,56 +29,46 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXSMOOTHINGIMAGEFILTER_H
-#define CXSMOOTHINGIMAGEFILTER_H
 
-#include "cxPluginAlgorithmExport.h"
+#ifndef CX_DILATION_FILTER_H
+#define CX_DILATION_FILTER_H
 
 #include "cxFilterImpl.h"
 
-namespace cx
-{
-
-/** Filter for smoothing a volume.
- *
- *
- * \ingroup cx_module_algorithm
- * \date Nov 26, 2012
- * \author christiana
- */
-class cxPluginAlgorithm_EXPORT SmoothingImageFilter : public FilterImpl
+namespace cx {
+class cxResourceFilter_EXPORT DilationFilter : public FilterImpl
 {
 	Q_OBJECT
 
 public:
-	SmoothingImageFilter(PatientModelServicePtr patientModelService);
-	virtual ~SmoothingImageFilter() {}
+	DilationFilter(VisServicesPtr services);
+	virtual ~DilationFilter() {}
 
 	virtual QString getType() const;
 	virtual QString getName() const;
 	virtual QString getHelp() const;
 
+	bool preProcess();
 	virtual bool execute();
 	virtual bool postProcess();
 
 	// extensions:
-	DoublePropertyPtr getSigma(QDomElement root);
+	DoublePropertyPtr getDilationRadiusOption(QDomElement root);
+	ColorPropertyPtr getColorOption(QDomElement root);
+	BoolPropertyPtr getGenerateSurfaceOption(QDomElement root);
 
 protected:
 	virtual void createOptions();
 	virtual void createInputTypes();
 	virtual void createOutputTypes();
 
-private slots:
-
 private:
+	DoublePropertyPtr mDilationRadiusOption;
 	vtkImageDataPtr mRawResult;
+	vtkPolyDataPtr mRawContour;
 };
-typedef boost::shared_ptr<class SmoothingImageFilter> SmoothingImageFilterPtr;
-
+typedef boost::shared_ptr<class DilationFilter> DilationFilterPtr;
 
 } // namespace cx
 
-
-
-#endif // CXSMOOTHINGIMAGEFILTER_H
+#endif

@@ -8,11 +8,11 @@
 #ifndef CXTESTDUMMYALGORITHM_H_
 #define CXTESTDUMMYALGORITHM_H_
 
-#include "cxtestpluginalgorithm_export.h"
+#include "cxtestfilter_export.h"
 
 namespace cxtest {
 
-class CXTESTPLUGINALGORITHM_EXPORT DummyAlgorithm {
+class CXTESTFILTER_EXPORT DummyAlgorithm {
 };
 
 } /* namespace cxtest */

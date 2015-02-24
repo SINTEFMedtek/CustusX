@@ -30,51 +30,47 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXBINARYTHINNINGIMAGEFILTER3DFILTER_H
-#define CXBINARYTHINNINGIMAGEFILTER3DFILTER_H
+#ifndef CXCOMPACTFILTERSETUPWIDGET_H_
+#define CXCOMPACTFILTERSETUPWIDGET_H_
 
-#include "cxPluginAlgorithmExport.h"
+#include "cxResourceWidgetsExport.h"
 
-#include "cxFilterImpl.h"
+#include "cxBaseWidget.h"
+//#include "cxFilterWidget.h"
+#include "cxFilter.h"
 
-namespace cx
-{
 
-/** Filter implementation of the itk::BinaryThinningImageFilter3D
- *
+namespace cx {
+
+class OptionsWidget;
+class WidgetObscuredListener;
+
+/**
+ * \brief Helper widget for displaying the input/output/options part of a Filter.
+ * Intended to be included in other Filter widgets.
  *
  * \ingroup cx_module_algorithm
- * \date 11 22, 2012
- * \author christiana
+ * \date Dec 13, 2012
+ * \author Christian Askeland, SINTEF
  */
-class cxPluginAlgorithm_EXPORT BinaryThinningImageFilter3DFilter : public FilterImpl
+class cxResourceWidgets_EXPORT CompactFilterSetupWidget : public BaseWidget
 {
 	Q_OBJECT
 
 public:
-	BinaryThinningImageFilter3DFilter(PatientModelServicePtr patientModelService);
-	virtual ~BinaryThinningImageFilter3DFilter() {}
+	CompactFilterSetupWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent, XmlOptionFile options, bool addFrame);
+	void setFilter(FilterPtr filter);
+	QString defaultWhatsThis() const;
 
-	virtual QString getType() const;
-	virtual QString getName() const;
-	virtual QString getHelp() const;
-
-	virtual bool preProcess();
-	virtual bool execute();
-	virtual bool postProcess();
-
-	ColorPropertyBasePtr getColorOption(QDomElement root);
-
-protected:
-	virtual void createOptions();
-	virtual void createInputTypes();
-	virtual void createOutputTypes();
+private slots:
+	void obscuredSlot(bool obscured);
 
 private:
-	vtkImageDataPtr mRawResult;
+	XmlOptionFile mOptions;
+	FilterPtr mCurrentFilter;
+	OptionsWidget* mOptionsWidget;
+	QGroupBox* mFrame;
+	boost::shared_ptr<WidgetObscuredListener> mObscuredListener;
 };
-
-
-} // namespace cx
-
-#endif // CXBINARYTHINNINGIMAGEFILTER3DFILTER_H
+} /* namespace cx */
+#endif /* CXCOMPACTFILTERSETUPWIDGET_H_ */

@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxServiceTrackerListener.h"
 
 namespace cx {
+typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 
 /** Widget for selecting and running a Filter.
  *
@@ -59,7 +60,7 @@ class cxPluginAlgorithm_EXPORT AllFiltersWidget : public BaseWidget
 {
 	Q_OBJECT
 public:
-	AllFiltersWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent);
+	AllFiltersWidget(VisServicesPtr services, QWidget* parent);
 	QString defaultWhatsThis() const;
 
 private slots:

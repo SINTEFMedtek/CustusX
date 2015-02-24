@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDoubleProperty.h"
 #include "cxDoubleWidgets.h"
 #include "cxRegistrationBaseWidget.h"
-#include "cxBinaryThresholdImageFilter.h"
+//#include "cxBinaryThresholdImageFilter.h"
 
 
 namespace cx

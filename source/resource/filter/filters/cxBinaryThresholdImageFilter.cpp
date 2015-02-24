@@ -46,16 +46,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMesh.h"
 #include "cxImage.h"
 #include "cxSelectDataStringProperty.h"
-#include "cxLegacySingletons.h"
 #include "cxPatientModelService.h"
 #include "cxViewService.h"
 #include "cxVolumeHelpers.h"
+#include "cxVisServices.h"
 
 namespace cx
 {
 
-BinaryThresholdImageFilter::BinaryThresholdImageFilter(PatientModelServicePtr patientModelService) :
-	FilterImpl(patientModelService)
+BinaryThresholdImageFilter::BinaryThresholdImageFilter(VisServicesPtr services) :
+	FilterImpl(services)
 {
 }
 
@@ -117,7 +117,7 @@ void BinaryThresholdImageFilter::createInputTypes()
 {
 	SelectDataStringPropertyBasePtr temp;
 
-	temp = StringPropertySelectImage::New(mPatientModelService);
+	temp = StringPropertySelectImage::New(mServices->getPatientService());
 	temp->setValueName("Input");
 	temp->setHelp("Select image input for thresholding");
 	connect(temp.get(), SIGNAL(dataChanged(QString)), this, SLOT(imageChangedSlot(QString)));
@@ -128,12 +128,12 @@ void BinaryThresholdImageFilter::createOutputTypes()
 {
 	SelectDataStringPropertyBasePtr temp;
 
-	temp = StringPropertySelectData::New(mPatientModelService);
+	temp = StringPropertySelectData::New(mServices->getPatientService());
 	temp->setValueName("Output");
 	temp->setHelp("Output thresholded binary image");
 	mOutputTypes.push_back(temp);
 
-	temp = StringPropertySelectData::New(mPatientModelService);
+	temp = StringPropertySelectData::New(mServices->getPatientService());
 	temp->setValueName("Contour");
 	temp->setHelp("Output contour generated from thresholded binary image.");
 	mOutputTypes.push_back(temp);
@@ -144,13 +144,13 @@ void BinaryThresholdImageFilter::setActive(bool on)
 	FilterImpl::setActive(on);
 
 	if (!mActive)
-		viewService()->removePreview();
+		mServices->visualizationService->removePreview();
 }
 
 void BinaryThresholdImageFilter::imageChangedSlot(QString uid)
 {
 	this->updateThresholdPairFromImageChange(uid, mThresholdOption);
-	viewService()->removePreview();
+	mServices->visualizationService->removePreview();
 }
 
 void BinaryThresholdImageFilter::thresholdSlot()
@@ -161,13 +161,13 @@ void BinaryThresholdImageFilter::thresholdSlot()
 		std::vector<double> threshold;
 		threshold.push_back(mThresholdOption->getValue()[0]);
 		threshold.push_back(mThresholdOption->getValue()[1]);
-		viewService()->setPreview(image, threshold);
+		mServices->visualizationService->setPreview(image, threshold);
 	}
 }
 
 bool BinaryThresholdImageFilter::preProcess()
 {
-	viewService()->removePreview();
+	mServices->visualizationService->removePreview();
 	return FilterImpl::preProcess();
 
 }
@@ -233,14 +233,14 @@ bool BinaryThresholdImageFilter::postProcess()
 
 	QString uid = input->getUid() + "_seg%1";
 	QString name = input->getName()+" seg%1";
-	ImagePtr output = createDerivedImage(patientService(),
+	ImagePtr output = createDerivedImage(mServices->getPatientService(),
 										 uid, name,
 										 mRawResult, input);
 
 	mRawResult = NULL;
 
 	output->resetTransferFunctions();
-	patientService()->insertData(output);
+	mServices->getPatientService()->insertData(output);
 
 	// set output
 	mOutputTypes.front()->setValue(output->getUid());
@@ -249,7 +249,7 @@ bool BinaryThresholdImageFilter::postProcess()
 	if (mRawContour!=NULL)
 	{
 		ColorPropertyPtr colorOption = this->getColorOption(mOptions);
-		MeshPtr contour = ContourFilter::postProcess(mRawContour, output, colorOption->getValue());
+		MeshPtr contour = ContourFilter::postProcess(mServices->getPatientService(), mRawContour, output, colorOption->getValue());
 		mOutputTypes[1]->setValue(contour->getUid());
 		mRawContour = vtkPolyDataPtr();
 	}

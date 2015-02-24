@@ -30,47 +30,81 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CX_DILATION_FILTER_H
-#define CX_DILATION_FILTER_H
-
-#include "cxPluginAlgorithmExport.h"
+#ifndef CXCONTOURFILTER_H
+#define CXCONTOURFILTER_H
 
 #include "cxFilterImpl.h"
+class QColor;
 
-namespace cx {
-class cxPluginAlgorithm_EXPORT DilationFilter : public FilterImpl
+namespace cx
+{
+
+/** Marching cubes surface generation.
+ *
+ *
+ * \ingroup cx
+ * \date Nov 25, 2012
+ * \author christiana
+ */
+class cxResourceFilter_EXPORT ContourFilter : public FilterImpl
 {
 	Q_OBJECT
 
 public:
-	DilationFilter(PatientModelServicePtr patientModelService);
-	virtual ~DilationFilter() {}
+	ContourFilter(VisServicesPtr services);
+	virtual ~ContourFilter() {}
 
 	virtual QString getType() const;
 	virtual QString getName() const;
 	virtual QString getHelp() const;
+	virtual void setActive(bool on);
 
 	bool preProcess();
 	virtual bool execute();
 	virtual bool postProcess();
 
 	// extensions:
-	DoublePropertyPtr getDilationRadiusOption(QDomElement root);
+	BoolPropertyPtr getReduceResolutionOption(QDomElement root);
+	BoolPropertyPtr getSmoothingOption(QDomElement root);
+	BoolPropertyPtr getPreserveTopologyOption(QDomElement root);
+	DoublePropertyPtr getSurfaceThresholdOption(QDomElement root);
+	DoublePropertyPtr getDecimationOption(QDomElement root);
 	ColorPropertyPtr getColorOption(QDomElement root);
-	BoolPropertyPtr getGenerateSurfaceOption(QDomElement root);
+
+	/** This is the core algorithm, call this if you dont need all the filter stuff.
+	    Generate a contour from a vtkImageData.
+	  */
+	static vtkPolyDataPtr execute(vtkImageDataPtr input,
+			                              double threshold,
+	                                      bool reduceResolution=false,
+	                                      bool smoothing=true,
+	                                      bool preserveTopology=true,
+	                                      double decimation=0.2);
+	/** Generate a mesh from the contour using base to generate name.
+	  * Save to dataManager.
+	  */
+	static MeshPtr postProcess(PatientModelServicePtr patient, vtkPolyDataPtr contour, ImagePtr base, QColor color);
 
 protected:
 	virtual void createOptions();
 	virtual void createInputTypes();
 	virtual void createOutputTypes();
 
+private slots:
+	/** Set new value+range of the threshold option.
+	  */
+	void imageChangedSlot(QString uid);
+	void thresholdSlot();
+
 private:
-	DoublePropertyPtr mDilationRadiusOption;
-	vtkImageDataPtr mRawResult;
-	vtkPolyDataPtr mRawContour;
+	VisServicesPtr mServices;
+	BoolPropertyPtr mReduceResolutionOption;
+	DoublePropertyPtr mSurfaceThresholdOption;
+	vtkPolyDataPtr mRawResult;
 };
-typedef boost::shared_ptr<class DilationFilter> DilationFilterPtr;
+typedef boost::shared_ptr<class ContourFilter> ContourFilterPtr;
+
 
 } // namespace cx
 
-#endif
+#endif // CXCONTOURFILTER_H

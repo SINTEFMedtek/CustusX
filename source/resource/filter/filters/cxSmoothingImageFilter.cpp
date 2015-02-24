@@ -44,15 +44,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxImage.h"
 
-#include "cxLegacySingletons.h"
 #include "cxPatientModelService.h"
 #include "cxVolumeHelpers.h"
+#include "cxVisServices.h"
 
 namespace cx
 {
 
-SmoothingImageFilter::SmoothingImageFilter(PatientModelServicePtr patientModelService) :
-	FilterImpl(patientModelService)
+SmoothingImageFilter::SmoothingImageFilter(VisServicesPtr services) :
+	FilterImpl(services)
 {
 }
 
@@ -93,7 +93,7 @@ void SmoothingImageFilter::createInputTypes()
 {
 	SelectDataStringPropertyBasePtr temp;
 
-	temp = StringPropertySelectImage::New(mPatientModelService);
+	temp = StringPropertySelectImage::New(mServices->getPatientService());
 	temp->setValueName("Input");
 	temp->setHelp("Select image input for smoothing");
 	mInputTypes.push_back(temp);
@@ -103,7 +103,7 @@ void SmoothingImageFilter::createOutputTypes()
 {
 	SelectDataStringPropertyBasePtr temp;
 
-	temp = StringPropertySelectData::New(mPatientModelService);
+	temp = StringPropertySelectData::New(mServices->getPatientService());
 	temp->setValueName("Output");
 	temp->setHelp("Output smoothed image");
 	mOutputTypes.push_back(temp);
@@ -151,7 +151,7 @@ bool SmoothingImageFilter::postProcess()
 
 	QString uid = input->getUid() + "_sm%1";
 	QString name = input->getName()+" sm%1";
-	ImagePtr output = createDerivedImage(patientService(),
+	ImagePtr output = createDerivedImage(mServices->getPatientService(),
 										 uid, name,
 										 mRawResult, input);
 
@@ -159,7 +159,7 @@ bool SmoothingImageFilter::postProcess()
 	if (!output)
 		return false;
 
-	patientService()->insertData(output);
+	mServices->getPatientService()->insertData(output);
 
 	// set output
 	mOutputTypes.front()->setValue(output->getUid());

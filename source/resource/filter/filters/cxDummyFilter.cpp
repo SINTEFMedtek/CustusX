@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDoubleProperty.h"
 #include "cxStringProperty.h"
 #include "cxBoolProperty.h"
+#include "cxVisServices.h"
 
 namespace cx
 {
@@ -90,17 +91,17 @@ void DummyFilter::createInputTypes()
 {
 	SelectDataStringPropertyBasePtr temp;
 
-	temp = StringPropertySelectData::New(mPatientModelService);
+	temp = StringPropertySelectData::New(mServices->getPatientService());
 	temp->setValueName("Input");
 	temp->setHelp("Dummy data input for a dummy algorithm");
 	mInputTypes.push_back(temp);
 
-	temp = StringPropertySelectImage::New(mPatientModelService);
+	temp = StringPropertySelectImage::New(mServices->getPatientService());
 	temp->setValueName("Image");
 	temp->setHelp("Dummy image input for a dummy algorithm");
 	mInputTypes.push_back(temp);
 
-	temp = StringPropertySelectMesh::New(mPatientModelService);
+	temp = StringPropertySelectMesh::New(mServices->getPatientService());
 	temp->setValueName("Mesh");
 	temp->setHelp("Dummy mesh input for a dummy algorithm");
 	mInputTypes.push_back(temp);
@@ -110,7 +111,7 @@ void DummyFilter::createOutputTypes()
 {
 	SelectDataStringPropertyBasePtr temp;
 
-	temp = StringPropertySelectData::New(mPatientModelService);
+	temp = StringPropertySelectData::New(mServices->getPatientService());
 	temp->setValueName("Output");
 	temp->setHelp("Dummy output from the dummy algorithm");
 	mOutputTypes.push_back(temp);

@@ -29,76 +29,50 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXPIPELINEWIDGET_H
-#define CXPIPELINEWIDGET_H
 
-#include "cxPluginAlgorithmExport.h"
+#ifndef CXBINARYTHINNINGIMAGEFILTER3DFILTER_H
+#define CXBINARYTHINNINGIMAGEFILTER3DFILTER_H
 
-#include "cxBaseWidget.h"
-#include "cxPipeline.h"
-class QButtonGroup;
-class QRadioButton;
-class QAction;
-#include "cxFilterWidget.h"
-#include "cxCompactFilterSetupWidget.h"
+#include "cxFilterImpl.h"
 
 namespace cx
 {
-class TimedAlgorithmProgressBar;
 
-
-class cxPluginAlgorithm_EXPORT PipelineWidgetFilterLine : public BaseWidget
-{
-	Q_OBJECT
-public:
-	PipelineWidgetFilterLine(QWidget* parent, FilterPtr filter, QButtonGroup *buttonGroup);
-	QString defaultWhatsThis() const;
-
-	QRadioButton* mRadioButton;
-	QLabel* mAlgoNameLabel;
-	QAction* mAction;
-//	QAction* mDetailsAction;
-	TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
-	FilterPtr mFilter;
-
-signals:
-	void requestRunFilter();
-	void filterSelected(QString uid);
-//	void showDetails();
-
-private slots:
-	void radioButtonSelectedSlot(bool on);
-	void requestRunFilterSlot();
-protected:
-	virtual void mousePressEvent(QMouseEvent* event);
-};
-
-/** GUI for sequential execution of Filters.
+/** Filter implementation of the itk::BinaryThinningImageFilter3D
  *
- * \ingroup cxPluginAlgorithms
- * \date Nov 22, 2012
+ *
+ * \ingroup cx_module_algorithm
+ * \date 11 22, 2012
  * \author christiana
- * \author Janne Beate Bakeng, SINTEF
  */
-class cxPluginAlgorithm_EXPORT PipelineWidget : public BaseWidget
+class cxResourceFilter_EXPORT BinaryThinningImageFilter3DFilter : public FilterImpl
 {
 	Q_OBJECT
+
 public:
-	PipelineWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent, PipelinePtr pipeline);
-	QString defaultWhatsThis() const;
-private slots:
-	void runFilterSlot();
-	void filterSelectedSlot(QString uid);
-//	void toggleDetailsSlot();
+	BinaryThinningImageFilter3DFilter(VisServicesPtr services);
+	virtual ~BinaryThinningImageFilter3DFilter() {}
+
+	virtual QString getType() const;
+	virtual QString getName() const;
+	virtual QString getHelp() const;
+
+	virtual bool preProcess();
+	virtual bool execute();
+	virtual bool postProcess();
+
+	ColorPropertyBasePtr getColorOption(QDomElement root);
+
+protected:
+	virtual void createOptions();
+	virtual void createInputTypes();
+	virtual void createOutputTypes();
+
 private:
-	void selectFilter(int index);
-	PipelinePtr mPipeline;
-	QButtonGroup* mButtonGroup;
-	std::vector<PipelineWidgetFilterLine*> mAlgoLines;
-	CompactFilterSetupWidget* mSetupWidget;
+	vtkImageDataPtr mRawResult;
 };
 
 
 } // namespace cx
 
-#endif // CXPIPELINEWIDGET_H
+#endif // CXBINARYTHINNINGIMAGEFILTER3DFILTER_H

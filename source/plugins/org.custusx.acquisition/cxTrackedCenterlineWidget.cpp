@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMeshHelpers.h"
 #include "cxToolRep3D.h"
 #include "cxToolTracer.h"
-#include "cxTrackingDataToVolume.h"
+//#include "cxTrackingDataToVolume.h"
 #include "cxRecordSessionWidget.h"
 #include "cxRecordSession.h"
 #include "cxTool.h"
@@ -132,10 +132,10 @@ void TrackedCenterlineWidget::preprocessResampler()
 	loadMeshFromToolTransforms(mServices->getPatientService(), transforms_prMt);
 
 	//convert the transforms into a binary image
-	TrackingDataToVolume converter;
-	int padding = 10;
-	converter.setInput(transforms_prMt, padding);
-	ImagePtr image_d = converter.getOutput();
+//	TrackingDataToVolume converter;
+//	int padding = 10;
+//	converter.setInput(transforms_prMt, padding);
+//	ImagePtr image_d = converter.getOutput();
 
 	//extract the centerline
 //	QString savepath = patientService()->getPatientData()->getActivePatientFolder();

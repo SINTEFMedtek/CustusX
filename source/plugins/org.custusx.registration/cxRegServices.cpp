@@ -39,10 +39,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx {
 
 RegServices::RegServices(ctkPluginContext* context) :
-	CoreServices(context)
+	VisServices(context)
 {
 	registrationService	 = RegistrationServicePtr(new RegistrationServiceProxy(context));
-	visualizationService = VisualizationServicePtr(new VisualizationServiceProxy(context));
+//	visualizationService = VisualizationServicePtr(new VisualizationServiceProxy(context));
 	acquisitionService	 = AcquisitionServicePtr(new AcquisitionServiceProxy(context));
 }
 
@@ -51,11 +51,10 @@ RegServices RegServices::getNullObjects()
 	return RegServices();
 }
 
-RegServices::RegServices() :
-	CoreServices()
+RegServices::RegServices()
 {
 	registrationService		= RegistrationService::getNullObject();
-	visualizationService	= VisualizationService::getNullObject();
+//	visualizationService	= VisualizationService::getNullObject();
 	acquisitionService		= AcquisitionService::getNullObject();
 }
 } // cx

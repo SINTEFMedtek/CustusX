@@ -6,10 +6,6 @@
 ##  Description: Acquisition of tracking and image data, in particular ultrasound recordings.
 ##
 ##
-##  Dependencies: USReconstruction Plugin
-##                Service Layer  
-##                Resource Layer 
-##
 ###########################################################
 project(org_custusx_acquisition)
 
@@ -78,7 +74,6 @@ set(PLUGIN_resources
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries
     ${PLUGIN_target_libraries}
-    cxPluginAlgorithm
     org_custusx_usreconstruction
 )
 

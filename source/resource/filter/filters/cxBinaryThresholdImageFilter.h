@@ -33,8 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSBINARYTHRESHOLDIMAGEFILTER_H_
 #define CXSBINARYTHRESHOLDIMAGEFILTER_H_
 
-#include "cxPluginAlgorithmExport.h"
-
 #include "cxFilterImpl.h"
 
 namespace cx
@@ -51,12 +49,12 @@ namespace cx
  * \date Nov 21, 2012
  * \author christiana
  */
-class cxPluginAlgorithm_EXPORT BinaryThresholdImageFilter : public FilterImpl
+class cxResourceFilter_EXPORT BinaryThresholdImageFilter : public FilterImpl
 {
 	Q_OBJECT
 
 public:
-	BinaryThresholdImageFilter(PatientModelServicePtr patientModelService);
+	BinaryThresholdImageFilter(VisServicesPtr services);
 	virtual ~BinaryThresholdImageFilter() {}
 
 	virtual QString getType() const;

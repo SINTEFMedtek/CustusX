@@ -37,21 +37,29 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSelectDataStringProperty.h"
 #include "cxData.h"
 #include "cxImage.h"
-#include "cxLegacySingletons.h"
+//#include "cxLegacySingletons.h"
 #include "cxPatientModelService.h"
-#include "cxLogicManager.h"
+//#include "cxLogicManager.h"
 #include "cxSessionStorageService.h"
+#include "cxVisServices.h"
+#include "cxtestDummyDataManager.h"
 
 TEST_CASE("DilationFilter: execute", "[unit][modules][Algorithm][DilationFilter]")
 {
 	cx::DataLocations::setTestMode();
-	cx::LogicManager::initialize();
+//	cx::LogicManager::initialize();
 
 	{
-		cx::sessionStorageService()->load(cx::DataLocations::getTestDataPath()+ "/temp/DilationFilter");
+		cxtest::TestServicesType dummyservices = cxtest::createDummyCoreServices();
+
+		cx::VisServicesPtr vs(new cx::VisServices(cx::VisServices::getNullObjects()));
+		vs->patientModelService = dummyservices.mPatientModelService;
+		vs->trackingService = dummyservices.mTrackingService;
+		vs->spaceProvider = dummyservices.mSpaceProvider;
+//		cx::sessionStorageService()->load(cx::DataLocations::getTestDataPath()+ "/temp/DilationFilter");
 //		cx::PatientModelServicePtr patientModelService = cx::PatientModelService::getNullObject();//mock PatientModelService
 		// Setup filter
-		cx::DilationFilterPtr filter = cx::DilationFilterPtr(new cx::DilationFilter(cx::patientService()));
+		cx::DilationFilterPtr filter(new cx::DilationFilter(vs));
 		REQUIRE(filter);
 		filter->getInputTypes();
 		filter->getOutputTypes();
@@ -59,7 +67,7 @@ TEST_CASE("DilationFilter: execute", "[unit][modules][Algorithm][DilationFilter]
 
 		QString filename = cx::DataLocations::getTestDataPath()+ "/testing/DilationFilter/helix_seg.mhd";
 		QString info;
-		cx::DataPtr data = cx::patientService()->importData(filename, info);
+		cx::DataPtr data = vs->patientModelService->importData(filename, info);
 		REQUIRE(data);
 
 		//set input
@@ -106,5 +114,5 @@ TEST_CASE("DilationFilter: execute", "[unit][modules][Algorithm][DilationFilter]
 		}
 	}
 
-	cx::LogicManager::shutdown();
+//	cx::LogicManager::shutdown();
 }

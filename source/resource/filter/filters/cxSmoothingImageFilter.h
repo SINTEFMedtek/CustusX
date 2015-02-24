@@ -29,65 +29,54 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXSMOOTHINGIMAGEFILTER_H
+#define CXSMOOTHINGIMAGEFILTER_H
 
-#ifndef CXCONNECTEDTHRESHOLDIMAGEFILTER_H_
-#define CXCONNECTEDTHRESHOLDIMAGEFILTER_H_
-
-#include "cxPluginAlgorithmExport.h"
-
-#include "cxThreadedTimedAlgorithm.h"
-#include "cxAlgorithmHelpers.h"
-#include "cxLegacySingletons.h"
+#include "cxFilterImpl.h"
 
 namespace cx
 {
-/**
- * \file
- * \addtogroup cx_module_algorithm
- * @{
- */
 
-/**
- * \class ConnectedThresholdImageFilter
+/** Filter for smoothing a volume.
  *
- * \brief Segmenting using region growing.
  *
- * \warning Class used for course, not tested.
- *
- * \date Apr 26, 2011
- * \author Janne Beate Bakeng, SINTEF
+ * \ingroup cx_module_algorithm
+ * \date Nov 26, 2012
+ * \author christiana
  */
-class cxPluginAlgorithm_EXPORT ConnectedThresholdImageFilter : public ThreadedTimedAlgorithm<vtkImageDataPtr>
+class cxResourceFilter_EXPORT SmoothingImageFilter : public FilterImpl
 {
 	Q_OBJECT
 
 public:
-	ConnectedThresholdImageFilter();
-	virtual ~ConnectedThresholdImageFilter();
+	SmoothingImageFilter(VisServicesPtr services);
+	virtual ~SmoothingImageFilter() {}
 
-	void setInput(ImagePtr image, QString outputBasePath, float lowerThreshold, float upperThreshold, int replaceValue, itkImageType::IndexType seed);
-	virtual void execute() { throw "not implemented!!"; }
-	ImagePtr getOutput();
+	virtual QString getType() const;
+	virtual QString getName() const;
+	virtual QString getHelp() const;
+
+	virtual bool execute();
+	virtual bool postProcess();
+
+	// extensions:
+	DoublePropertyPtr getSigma(QDomElement root);
+
+protected:
+	virtual void createOptions();
+	virtual void createInputTypes();
+	virtual void createOutputTypes();
 
 private slots:
-	virtual void postProcessingSlot();
 
 private:
-	virtual vtkImageDataPtr calculate();
-
-	QString       mOutputBasePath;
-	ImagePtr mInput;
-	ImagePtr mOutput;
-
-	float           mLowerThreshold;
-	float           mUpperTheshold;
-	int             mReplaceValue;
-	itkImageType::IndexType mSeed;
+	vtkImageDataPtr mRawResult;
 };
+typedef boost::shared_ptr<class SmoothingImageFilter> SmoothingImageFilterPtr;
 
-/**
- * @}
- */
-}
 
-#endif /* CXCONNECTEDTHRESHOLDIMAGEFILTER_H_ */
+} // namespace cx
+
+
+
+#endif // CXSMOOTHINGIMAGEFILTER_H

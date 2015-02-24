@@ -29,44 +29,76 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXPIPELINEWIDGET_H
+#define CXPIPELINEWIDGET_H
 
-#ifndef CXCOMPACTFILTERSETUPWIDGET_H_
-#define CXCOMPACTFILTERSETUPWIDGET_H_
-
-#include "cxPluginAlgorithmExport.h"
+#include "cxResourceWidgetsExport.h"
 
 #include "cxBaseWidget.h"
-#include "cxFilterWidget.h"
-#include "cxFilter.h"
+#include "cxPipeline.h"
+class QButtonGroup;
+class QRadioButton;
+class QAction;
+//#include "cxFilterWidget.h"
+#include "cxCompactFilterSetupWidget.h"
 
-namespace cx {
+namespace cx
+{
+class TimedAlgorithmProgressBar;
 
-/**
- * \brief Helper widget for displaying the input/output/options part of a Filter.
- * Intended to be included in other Filter widgets.
- *
- * \ingroup cx_module_algorithm
- * \date Dec 13, 2012
- * \author Christian Askeland, SINTEF
- */
-class cxPluginAlgorithm_EXPORT CompactFilterSetupWidget : public BaseWidget
+
+class cxResourceWidgets_EXPORT PipelineWidgetFilterLine : public BaseWidget
 {
 	Q_OBJECT
-
 public:
-	CompactFilterSetupWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent, XmlOptionFile options, bool addFrame);
-	void setFilter(FilterPtr filter);
+	PipelineWidgetFilterLine(QWidget* parent, FilterPtr filter, QButtonGroup *buttonGroup);
 	QString defaultWhatsThis() const;
 
-private slots:
-	void obscuredSlot(bool obscured);
+	QRadioButton* mRadioButton;
+	QLabel* mAlgoNameLabel;
+	QAction* mAction;
+//	QAction* mDetailsAction;
+	TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
+	FilterPtr mFilter;
 
-private:
-	XmlOptionFile mOptions;
-	FilterPtr mCurrentFilter;
-	OptionsWidget* mOptionsWidget;
-	QGroupBox* mFrame;
-	boost::shared_ptr<WidgetObscuredListener> mObscuredListener;
+signals:
+	void requestRunFilter();
+	void filterSelected(QString uid);
+//	void showDetails();
+
+private slots:
+	void radioButtonSelectedSlot(bool on);
+	void requestRunFilterSlot();
+protected:
+	virtual void mousePressEvent(QMouseEvent* event);
 };
-} /* namespace cx */
-#endif /* CXCOMPACTFILTERSETUPWIDGET_H_ */
+
+/** GUI for sequential execution of Filters.
+ *
+ * \ingroup cxPluginAlgorithms
+ * \date Nov 22, 2012
+ * \author christiana
+ * \author Janne Beate Bakeng, SINTEF
+ */
+class cxResourceWidgets_EXPORT PipelineWidget : public BaseWidget
+{
+	Q_OBJECT
+public:
+	PipelineWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent, PipelinePtr pipeline);
+	QString defaultWhatsThis() const;
+private slots:
+	void runFilterSlot();
+	void filterSelectedSlot(QString uid);
+//	void toggleDetailsSlot();
+private:
+	void selectFilter(int index);
+	PipelinePtr mPipeline;
+	QButtonGroup* mButtonGroup;
+	std::vector<PipelineWidgetFilterLine*> mAlgoLines;
+	CompactFilterSetupWidget* mSetupWidget;
+};
+
+
+} // namespace cx
+
+#endif // CXPIPELINEWIDGET_H

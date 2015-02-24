@@ -56,17 +56,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx {
 
-AllFiltersWidget::AllFiltersWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent) :
+AllFiltersWidget::AllFiltersWidget(VisServicesPtr services, QWidget* parent) :
     BaseWidget(parent, "FilterWidget", "Configurable Filter")
 {
 	XmlOptionFile options = profile()->getXmlSettings().descend("filterwidget");
 	mFilters.reset(new FilterGroup(options));
-	mFilters->append(FilterPtr(new BinaryThresholdImageFilter(patientModelService)));
-	mFilters->append(FilterPtr(new BinaryThinningImageFilter3DFilter(patientModelService)));
-	mFilters->append(FilterPtr(new ContourFilter(patientModelService)));
-	mFilters->append(FilterPtr(new SmoothingImageFilter(patientModelService)));
-	mFilters->append(FilterPtr(new ResampleImageFilter(patientModelService)));
-	mFilters->append(FilterPtr(new DilationFilter(patientModelService)));
+	mFilters->append(FilterPtr(new BinaryThresholdImageFilter(services)));
+	mFilters->append(FilterPtr(new BinaryThinningImageFilter3DFilter(services)));
+	mFilters->append(FilterPtr(new ContourFilter(services)));
+	mFilters->append(FilterPtr(new SmoothingImageFilter(services)));
+	mFilters->append(FilterPtr(new ResampleImageFilter(services)));
+	mFilters->append(FilterPtr(new DilationFilter(services)));
 
 	mServiceListener.reset(
 			new ServiceTrackerListener<Filter>(
@@ -129,7 +129,7 @@ AllFiltersWidget::AllFiltersWidget(VisualizationServicePtr visualizationService,
 	mTimedAlgorithmProgressBar = new cx::TimedAlgorithmProgressBar;
 	topLayout->addWidget(mTimedAlgorithmProgressBar);
 
-	mSetupWidget = new FilterSetupWidget(visualizationService, patientModelService, this, options, false);
+	mSetupWidget = new FilterSetupWidget(services, this, options, false);
 	topLayout->addWidget(mSetupWidget);
 
 	topLayout->addStretch();

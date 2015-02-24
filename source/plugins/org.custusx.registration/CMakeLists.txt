@@ -54,7 +54,6 @@ set(PLUGIN_target_libraries
     ${ITK_LIBRARIES}
 #TODO: Remove these dependencies
     cxLogicManager
-    cxPluginAlgorithm
     org_custusx_acquisition
     )
 

@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 typedef boost::shared_ptr<class WidgetObscuredListener> WidgetObscuredListenerPtr;
+typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 class TimedAlgorithmProgressBar;
 class FilterPresetWidget;
 
@@ -57,7 +58,7 @@ class cxPluginAlgorithm_EXPORT FilterSetupWidget : public BaseWidget
 {
 	Q_OBJECT
 public:
-	FilterSetupWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent, XmlOptionFile options, bool addFrame);
+	FilterSetupWidget(VisServicesPtr services, QWidget* parent, XmlOptionFile options, bool addFrame);
 	void setFilter(FilterPtr filter);
 	QString defaultWhatsThis() const;
 	/** Compact Mode: one group, hide main input/output
@@ -72,6 +73,7 @@ private slots:
 
 private:
 
+	VisServicesPtr mServices;
 	XmlOptionFile mOptions;
 	FilterPtr mCurrentFilter;
 
@@ -83,8 +85,6 @@ private:
 	QCheckBox*	   mAdvancedButton;
 	QGroupBox* 	   mFrame;
 	boost::shared_ptr<WidgetObscuredListener> mObscuredListener;
-	VisualizationServicePtr mVisualizationService;
-	PatientModelServicePtr mPatientModelService;
 };
 
 }

@@ -29,63 +29,37 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-
-#ifndef CXCONTOURFILTER_H
-#define CXCONTOURFILTER_H
-
-#include "cxPluginAlgorithmExport.h"
+#ifndef CXRESAMPLEIMAGEFILTER_H
+#define CXRESAMPLEIMAGEFILTER_H
 
 #include "cxFilterImpl.h"
-class QColor;
 
 namespace cx
 {
 
-/** Marching cubes surface generation.
+/** Filter for resampling and cropping a volume into the space of another.
  *
  *
- * \ingroup cx
- * \date Nov 25, 2012
+ * \ingroup cx_module_algorithm
+ * \date Nov 26, 2012
  * \author christiana
  */
-class cxPluginAlgorithm_EXPORT ContourFilter : public FilterImpl
+class cxResourceFilter_EXPORT ResampleImageFilter : public FilterImpl
 {
 	Q_OBJECT
 
 public:
-	ContourFilter(PatientModelServicePtr patientModelService);
-	virtual ~ContourFilter() {}
+	ResampleImageFilter(VisServicesPtr services);
+	virtual ~ResampleImageFilter() {}
 
 	virtual QString getType() const;
 	virtual QString getName() const;
 	virtual QString getHelp() const;
-	virtual void setActive(bool on);
-
-	bool preProcess();
 	virtual bool execute();
 	virtual bool postProcess();
 
 	// extensions:
-	BoolPropertyPtr getReduceResolutionOption(QDomElement root);
-	BoolPropertyPtr getSmoothingOption(QDomElement root);
-	BoolPropertyPtr getPreserveTopologyOption(QDomElement root);
-	DoublePropertyPtr getSurfaceThresholdOption(QDomElement root);
-	DoublePropertyPtr getDecimationOption(QDomElement root);
-	ColorPropertyPtr getColorOption(QDomElement root);
-
-	/** This is the core algorithm, call this if you dont need all the filter stuff.
-	    Generate a contour from a vtkImageData.
-	  */
-	static vtkPolyDataPtr execute(vtkImageDataPtr input,
-			                              double threshold,
-	                                      bool reduceResolution=false,
-	                                      bool smoothing=true,
-	                                      bool preserveTopology=true,
-	                                      double decimation=0.2);
-	/** Generate a mesh from the contour using base to generate name.
-	  * Save to dataManager.
-	  */
-	static MeshPtr postProcess(vtkPolyDataPtr contour, ImagePtr base, QColor color);
+	DoublePropertyPtr getMarginOption(QDomElement root);
 
 protected:
 	virtual void createOptions();
@@ -93,19 +67,15 @@ protected:
 	virtual void createOutputTypes();
 
 private slots:
-	/** Set new value+range of the threshold option.
-	  */
-	void imageChangedSlot(QString uid);
-	void thresholdSlot();
 
 private:
-	BoolPropertyPtr mReduceResolutionOption;
-	DoublePropertyPtr mSurfaceThresholdOption;
-	vtkPolyDataPtr mRawResult;
+	ImagePtr mRawResult;
 };
-typedef boost::shared_ptr<class ContourFilter> ContourFilterPtr;
+typedef boost::shared_ptr<class ResampleImageFilter> ResampleImageFilterPtr;
 
 
 } // namespace cx
 
-#endif // CXCONTOURFILTER_H
+
+
+#endif // CXRESAMPLEIMAGEFILTER_H

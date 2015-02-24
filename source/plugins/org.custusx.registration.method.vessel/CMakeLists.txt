@@ -36,7 +36,6 @@ set(PLUGIN_target_libraries
     ${PLUGIN_target_libraries}
     cxResourceFilter
     cxResourceWidgets
-    cxPluginAlgorithm
     cxResourceVisualization
     org_custusx_registration
 )

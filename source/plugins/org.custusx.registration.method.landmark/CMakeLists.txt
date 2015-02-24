@@ -47,7 +47,6 @@ ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
     ${PLUGIN_target_libraries}   
     cxResourceWidgets
-	cxPluginAlgorithm
 	org_custusx_registration
     )
 

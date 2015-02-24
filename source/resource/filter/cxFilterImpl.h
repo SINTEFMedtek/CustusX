@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
+typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 
 /** Helper implementation for Filter.
  *
@@ -76,7 +76,7 @@ public slots:
 	virtual void requestSetPresetSlot(QString name){};
 
 protected:
-	explicit FilterImpl(PatientModelServicePtr patientModelService);
+	explicit FilterImpl(VisServicesPtr services);
 
 	/** Helper: Return the index'th input type as an image.
 	  * Return zero if not available (as image). */
@@ -100,7 +100,8 @@ protected:
 	std::vector<DataPtr> mCopiedInput;
 	QDomElement mCopiedOptions;
 	bool mActive;
-	PatientModelServicePtr mPatientModelService;
+//	PatientModelServicePtr mPatientModelService;
+	VisServicesPtr mServices;
 
 private:
 	QString mUid;

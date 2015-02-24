@@ -42,14 +42,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vesselReg/SeansVesselReg.hxx"
 #include "cxSelectDataStringProperty.h"
 #include "cxAlgorithmHelpers.h"
-#include "cxLegacySingletons.h"
 #include "cxPatientModelService.h"
 #include "cxVolumeHelpers.h"
+#include "cxVisServices.h"
 
 namespace cx
 {
-BinaryThinningImageFilter3DFilter::BinaryThinningImageFilter3DFilter(PatientModelServicePtr patientModelService) :
-	FilterImpl(patientModelService)
+BinaryThinningImageFilter3DFilter::BinaryThinningImageFilter3DFilter(VisServicesPtr services) :
+	FilterImpl(services)
 {
 }
 
@@ -108,7 +108,7 @@ void BinaryThinningImageFilter3DFilter::createInputTypes()
 {
 	SelectDataStringPropertyBasePtr temp;
 
-	temp = StringPropertySelectImage::New(mPatientModelService);
+	temp = StringPropertySelectImage::New(mServices->getPatientService());
 	temp->setValueName("Input");
 	temp->setHelp("Select binary volume input for thinning");
 	//    connect(temp.get(), SIGNAL(dataChanged(QString)), this, SLOT(imageChangedSlot(QString)));
@@ -119,7 +119,7 @@ void BinaryThinningImageFilter3DFilter::createOutputTypes()
 {
 	SelectDataStringPropertyBasePtr temp;
 
-	temp = StringPropertySelectMesh::New((mPatientModelService));
+	temp = StringPropertySelectMesh::New((mServices->getPatientService()));
 	temp->setValueName("Output");
 	temp->setHelp("Output centerline model");
 	mOutputTypes.push_back(temp);
@@ -188,7 +188,7 @@ bool BinaryThinningImageFilter3DFilter::postProcess()
 
 	ImagePtr input = this->getCopiedInputImage();
 
-	ImagePtr outImage = createDerivedImage(patientService(),
+	ImagePtr outImage = createDerivedImage(mServices->getPatientService(),
 										 input->getUid() + "_cl_temp%1", input->getName()+" cl_temp%1",
 										 mRawResult, input);
 
@@ -200,11 +200,11 @@ bool BinaryThinningImageFilter3DFilter::postProcess()
 
 	QString uid = input->getUid() + "_cl%1";
 	QString name = input->getName()+" cl%1";
-	MeshPtr mesh = patientService()->createSpecificData<Mesh>(uid, name);
+	MeshPtr mesh = mServices->getPatientService()->createSpecificData<Mesh>(uid, name);
 	mesh->setVtkPolyData(centerlinePolyData);
 	mesh->setColor(outputColor->getValue());
 	mesh->get_rMd_History()->setParentSpace(input->getUid());
-	patientService()->insertData(mesh);
+	mServices->getPatientService()->insertData(mesh);
 
 	// set output
 	mOutputTypes.front()->setValue(mesh->getUid());

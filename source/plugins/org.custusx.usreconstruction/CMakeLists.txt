@@ -62,8 +62,6 @@ set(PLUGIN_target_libraries
     cxResourceWidgets
     cxResourceVisualization
     cxPluginUtilities
-#	cxPluginAlgorithm
-#	cxLogicManager
     )
 
 set(PLUGIN_OUTPUT_DIR "")

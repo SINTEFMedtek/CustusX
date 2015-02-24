@@ -36,14 +36,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QCheckBox>
 #include "cxFilterPresetWidget.h"
 #include "cxWidgetObscuredListener.h"
-
+#include "cxVisServices.h"
 
 namespace cx
 {
-FilterSetupWidget::FilterSetupWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent, XmlOptionFile options, bool addFrame) :
+FilterSetupWidget::FilterSetupWidget(VisServicesPtr services, QWidget* parent, XmlOptionFile options, bool addFrame) :
 	BaseWidget(parent, "FilterSetupWidget", "FilterSetup"),
-	mVisualizationService(visualizationService),
-	mPatientModelService(patientModelService)
+	mServices(services)
 {
 	mFrame = NULL;
 
@@ -69,9 +68,9 @@ FilterSetupWidget::FilterSetupWidget(VisualizationServicePtr visualizationServic
 
 	mOptions = options;
 
-	mInputsWidget = new OptionsWidget(mVisualizationService, mPatientModelService, this);
-	mOutputsWidget = new OptionsWidget(mVisualizationService, mPatientModelService, this);
-	mOptionsWidget = new OptionsWidget(mVisualizationService, mPatientModelService, this);
+	mInputsWidget = new OptionsWidget(mServices->visualizationService, mServices->getPatientService(), this);
+	mOutputsWidget = new OptionsWidget(mServices->visualizationService, mServices->getPatientService(), this);
+	mOptionsWidget = new OptionsWidget(mServices->visualizationService, mServices->getPatientService(), this);
 	mPresetWidget = new FilterPresetWidget(this);
 	mAdvancedButton = new QCheckBox("Show &advanced options", this);
 	connect(mAdvancedButton, SIGNAL(stateChanged(int)), this, SLOT(showAdvancedOptions(int)));

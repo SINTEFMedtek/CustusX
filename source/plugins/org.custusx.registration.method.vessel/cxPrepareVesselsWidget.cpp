@@ -56,14 +56,16 @@ namespace cx
 PrepareVesselsWidget::PrepareVesselsWidget(RegServices services, QWidget* parent) :
 		RegistrationBaseWidget(services, parent, "PrepareVesselsWidget", "PrepareVesselsWidget")
 {  
+	VisServicesPtr vs(new VisServices(services));
+
 	XmlOptionFile options = profile()->getXmlSettings().descend("registration").descend("PrepareVesselsWidget");
   // fill the pipeline with filters:
 	mPipeline.reset(new Pipeline(services.patientModelService));
   FilterGroupPtr filters(new FilterGroup(options.descend("pipeline")));
-	filters->append(FilterPtr(new ResampleImageFilter(services.patientModelService)));
-	filters->append(FilterPtr(new SmoothingImageFilter(services.patientModelService)));
-	filters->append(FilterPtr(new BinaryThresholdImageFilter(services.patientModelService)));
-	filters->append(FilterPtr(new BinaryThinningImageFilter3DFilter(services.patientModelService)));
+	filters->append(FilterPtr(new ResampleImageFilter(vs)));
+	filters->append(FilterPtr(new SmoothingImageFilter(vs)));
+	filters->append(FilterPtr(new BinaryThresholdImageFilter(vs)));
+	filters->append(FilterPtr(new BinaryThinningImageFilter3DFilter(vs)));
   mPipeline->initialize(filters);
 
 //  mPipeline->getNodes()[0]->setValueName("US Image:");

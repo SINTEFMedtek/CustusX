@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "org_custusx_registration_Export.h"
 
-#include "cxCoreServices.h"
+#include "cxVisServices.h"
 
 namespace cx
 {
@@ -51,16 +51,16 @@ typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
  * \date Nov 14 2014
  * \author Ole Vegard Solberg, SINTEF
  */
-class org_custusx_registration_EXPORT RegServices : public CoreServices
+class org_custusx_registration_EXPORT RegServices : public VisServices
 {
 public:
 	RegServices(ctkPluginContext* context);
 	static RegServices getNullObjects();
 
 	RegistrationServicePtr registrationService;
-	VisualizationServicePtr visualizationService;
+//	VisualizationServicePtr visualizationService;
 	AcquisitionServicePtr acquisitionService;
-private:
+protected:
 	RegServices();
 };
 

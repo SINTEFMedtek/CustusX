@@ -40,12 +40,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImage.h"
 #include "cxPatientModelService.h"
 #include "cxVolumeHelpers.h"
+#include "cxVisServices.h"
 
 namespace cx
 {
 
-ConnectedThresholdImageFilter::ConnectedThresholdImageFilter() :
-    ThreadedTimedAlgorithm<vtkImageDataPtr>("segmenting", 10)
+ConnectedThresholdImageFilter::ConnectedThresholdImageFilter(VisServicesPtr services) :
+	ThreadedTimedAlgorithm<vtkImageDataPtr>("segmenting", 10),
+	mServices(services)
 {
 }
 
@@ -87,12 +89,12 @@ void ConnectedThresholdImageFilter::postProcessingSlot()
 	QString name = mInput->getName()+" seg%1";
 
 	//create a Image
-	ImagePtr result = createDerivedImage(patientService(),
+	ImagePtr result = createDerivedImage(mServices->getPatientService(),
 										 uid, name,
 										 rawResult, mInput);
 	mOutput->resetTransferFunctions();
 
-	patientService()->insertData(mOutput);
+	mServices->getPatientService()->insertData(mOutput);
 
 	//let the user know you are finished
 	reportSuccess("Done segmenting: \"" + mOutput->getName()+"\"");

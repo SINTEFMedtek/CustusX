@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxCalibrationPlugin.h"
 
 #include "cxCalibrationMethodsWidget.h"
-//#include "cxAcquisitionData.h"
+#include "cxLogger.h"
 #include "cxPatientModelService.h"
 #include "cxLogicManager.h"
 #include "cxVisServices.h"

@@ -49,15 +49,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxBoolProperty.h"
 #include "cxColorProperty.h"
 #include "cxSelectDataStringProperty.h"
-#include "cxLegacySingletons.h"
 #include "cxPatientModelService.h"
 #include "cxViewService.h"
+#include "cxVisServices.h"
 
 namespace cx
 {
 
-ContourFilter::ContourFilter(PatientModelServicePtr patientModelService) :
-	FilterImpl(patientModelService)
+ContourFilter::ContourFilter(VisServicesPtr services) :
+	FilterImpl(services)
 {
 }
 
@@ -146,7 +146,7 @@ void ContourFilter::createInputTypes()
 {
 	SelectDataStringPropertyBasePtr temp;
 
-	temp = StringPropertySelectImage::New(mPatientModelService);
+	temp = StringPropertySelectImage::New(mServices->getPatientService());
 	temp->setValueName("Input");
 	temp->setHelp("Select image input for contouring");
 	connect(temp.get(), SIGNAL(dataChanged(QString)), this, SLOT(imageChangedSlot(QString)));
@@ -157,7 +157,7 @@ void ContourFilter::createOutputTypes()
 {
 	SelectDataStringPropertyBasePtr temp;
 
-	temp = StringPropertySelectMesh::New(mPatientModelService);
+	temp = StringPropertySelectMesh::New(mServices->getPatientService());
 	temp->setValueName("Output");
 	temp->setHelp("Output contour");
 	mOutputTypes.push_back(temp);
@@ -168,17 +168,17 @@ void ContourFilter::setActive(bool on)
 	FilterImpl::setActive(on);
 
 	if (!mActive)
-		viewService()->removePreview();
+		mServices->visualizationService->removePreview();
 }
 
 void ContourFilter::imageChangedSlot(QString uid)
 {
-	ImagePtr image = patientService()->getData<Image>(uid);
+	ImagePtr image = mServices->getPatientService()->getData<Image>(uid);
 	if(!image)
 		return;
 
 	this->updateThresholdFromImageChange(uid, mSurfaceThresholdOption);
-	viewService()->removePreview();
+	mServices->visualizationService->removePreview();
 
 	int extent[6];
 	image->getBaseVtkImageData()->GetExtent(extent);
@@ -195,13 +195,13 @@ void ContourFilter::thresholdSlot()
 		ImagePtr image = boost::dynamic_pointer_cast<Image>(mInputTypes[0]->getData());
 		std::vector<double> threshold;
 		threshold.push_back(mSurfaceThresholdOption->getValue());
-		viewService()->setPreview(image, threshold);
+		mServices->visualizationService->setPreview(image, threshold);
 	}
 }
 
 bool ContourFilter::preProcess()
 {
-	viewService()->removePreview();
+	mServices->visualizationService->removePreview();
 	return FilterImpl::preProcess();
 }
 
@@ -317,7 +317,7 @@ bool ContourFilter::postProcess()
 		return false;
 
 	ColorPropertyPtr colorOption = this->getColorOption(mOptions);
-	MeshPtr output = this->postProcess(mRawResult, input, colorOption->getValue());
+	MeshPtr output = this->postProcess(mServices->getPatientService(), mRawResult, input, colorOption->getValue());
 	mRawResult = NULL;
 
 	if (output)
@@ -326,14 +326,14 @@ bool ContourFilter::postProcess()
 	return true;
 }
 
-MeshPtr ContourFilter::postProcess(vtkPolyDataPtr contour, ImagePtr base, QColor color)
+MeshPtr ContourFilter::postProcess(PatientModelServicePtr patient, vtkPolyDataPtr contour, ImagePtr base, QColor color)
 {
 	if (!contour || !base)
 		return MeshPtr();
 
 	QString uid = base->getUid() + "_ge%1";
 	QString name = base->getName()+" ge%1";
-	MeshPtr output = patientService()->createSpecificData<Mesh>(uid, name);
+	MeshPtr output = patient->createSpecificData<Mesh>(uid, name);
 	output->setVtkPolyData(contour);
 	if (!output)
 		return MeshPtr();
@@ -343,7 +343,7 @@ MeshPtr ContourFilter::postProcess(vtkPolyDataPtr contour, ImagePtr base, QColor
 
 	output->setColor(color);
 
-	patientService()->insertData(output);
+	patient->insertData(output);
 
 	return output;
 }

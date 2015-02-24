@@ -40,6 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxBinaryThresholdImageFilter.h"
 #include "cxBinaryThinningImageFilter3DFilter.h"
 #include "cxAllFiltersWidget.h"
+#include "cxVisServices.h"
+#include "cxLogicManager.h"
 
 namespace cx
 {
@@ -54,10 +56,12 @@ AlgorithmPlugin::~AlgorithmPlugin()
 
 std::vector<GUIExtenderService::CategorizedWidget> AlgorithmPlugin::createWidgets() const
 {
+	VisServicesPtr services = VisServices::create(logicManager()->getPluginContext());
+
 	std::vector<CategorizedWidget> retval;
 
 	retval.push_back(GUIExtenderService::CategorizedWidget(
-						 new AllFiltersWidget(mVisualizationService,  mPatientModelService, NULL),
+						 new AllFiltersWidget(services, NULL),
 	                     "Algorithms"));
 
 	return retval;

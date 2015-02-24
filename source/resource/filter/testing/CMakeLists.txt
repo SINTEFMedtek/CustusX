@@ -23,22 +23,24 @@ if(BUILD_TESTING)
     )
 
     qt5_wrap_cpp(CXTEST_SOURCES_TO_MOC ${CXTEST_SOURCES_TO_MOC})
-    add_library(cxtestPluginAlgorithm ${CXTEST_PLUGINALGORITHM_SOURCES} ${CXTEST_SOURCES_TO_MOC})
+    add_library(cxtestFilter ${CXTEST_PLUGINALGORITHM_SOURCES} ${CXTEST_SOURCES_TO_MOC})
     include(GenerateExportHeader)
-    generate_export_header(cxtestPluginAlgorithm)
-    target_include_directories(cxtestPluginAlgorithm
+    generate_export_header(cxtestFilter)
+    target_include_directories(cxtestFilter
         PUBLIC
         .
         ${CMAKE_CURRENT_BINARY_DIR}
     )
-    target_link_libraries(cxtestPluginAlgorithm
+    target_link_libraries(cxtestFilter
         PRIVATE
         cxResource
-        cxPluginAlgorithm
+		cxtestResource
+#        cxPluginAlgorithm
         cxResourceFilter
-        cxLogicManager
+#        cxLogicManager
+		cxResourceVisualization
         cxCatch
     )
-    cx_add_tests_to_catch(cxtestPluginAlgorithm)
+    cx_add_tests_to_catch(cxtestFilter)
 
 endif(BUILD_TESTING)

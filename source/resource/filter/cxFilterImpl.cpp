@@ -38,12 +38,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDoublePairProperty.h"
 #include "cxStringProperty.h"
 #include "cxPatientModelService.h"
+#include "cxVisServices.h"
 
 namespace cx
 {
 
-FilterImpl::FilterImpl(PatientModelServicePtr patientModelService) :
-	mActive(false), mPatientModelService(patientModelService)
+FilterImpl::FilterImpl(VisServicesPtr services) :
+	mActive(false), mServices(services)
 {
 }
 
@@ -125,7 +126,7 @@ ImagePtr FilterImpl::getCopiedInputImage(int index)
 
 void FilterImpl::updateThresholdFromImageChange(QString uid, DoublePropertyPtr threshold)
 {
-	ImagePtr image = mPatientModelService->getData<Image>(uid);
+	ImagePtr image = mServices->getPatientService()->getData<Image>(uid);
 	if(!image)
 		return;
 	threshold->setValueRange(DoubleRange(image->getMin(), image->getMax(), 1));
@@ -143,7 +144,7 @@ void FilterImpl::updateThresholdFromImageChange(QString uid, DoublePropertyPtr t
 
 void FilterImpl::updateThresholdPairFromImageChange(QString uid, DoublePairPropertyPtr threshold)
 {
-	ImagePtr image = mPatientModelService->getData<Image>(uid);
+	ImagePtr image = mServices->getPatientService()->getData<Image>(uid);
 	if(!image)
 		return;
 	threshold->setValueRange(DoubleRange(image->getMin(), image->getMax(), 1));

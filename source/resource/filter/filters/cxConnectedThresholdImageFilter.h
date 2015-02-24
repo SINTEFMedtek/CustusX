@@ -29,56 +29,66 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXRESAMPLEIMAGEFILTER_H
-#define CXRESAMPLEIMAGEFILTER_H
 
-#include "cxPluginAlgorithmExport.h"
+#ifndef CXCONNECTEDTHRESHOLDIMAGEFILTER_H_
+#define CXCONNECTEDTHRESHOLDIMAGEFILTER_H_
 
-#include "cxFilterImpl.h"
-#include "cxLegacySingletons.h"
+#include "cxThreadedTimedAlgorithm.h"
+#include "cxResourceFilterExport.h"
+#include "cxAlgorithmHelpers.h"
 
 namespace cx
 {
+typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 
-/** Filter for resampling and cropping a volume into the space of another.
- *
- *
- * \ingroup cx_module_algorithm
- * \date Nov 26, 2012
- * \author christiana
+/**
+ * \file
+ * \addtogroup cx_module_algorithm
+ * @{
  */
-class cxPluginAlgorithm_EXPORT ResampleImageFilter : public FilterImpl
+
+/**
+ * \class ConnectedThresholdImageFilter
+ *
+ * \brief Segmenting using region growing.
+ *
+ * \warning Class used for course, not tested.
+ *
+ * \date Apr 26, 2011
+ * \author Janne Beate Bakeng, SINTEF
+ */
+class cxResourceFilter_EXPORT ConnectedThresholdImageFilter : public ThreadedTimedAlgorithm<vtkImageDataPtr>
 {
 	Q_OBJECT
 
 public:
-	ResampleImageFilter(PatientModelServicePtr patientModelService);
-	virtual ~ResampleImageFilter() {}
+	ConnectedThresholdImageFilter(VisServicesPtr services);
+	virtual ~ConnectedThresholdImageFilter();
 
-	virtual QString getType() const;
-	virtual QString getName() const;
-	virtual QString getHelp() const;
-	virtual bool execute();
-	virtual bool postProcess();
-
-	// extensions:
-	DoublePropertyPtr getMarginOption(QDomElement root);
-
-protected:
-	virtual void createOptions();
-	virtual void createInputTypes();
-	virtual void createOutputTypes();
+	void setInput(ImagePtr image, QString outputBasePath, float lowerThreshold, float upperThreshold, int replaceValue, itkImageType::IndexType seed);
+	virtual void execute() { throw "not implemented!!"; }
+	ImagePtr getOutput();
 
 private slots:
+	virtual void postProcessingSlot();
 
 private:
-	ImagePtr mRawResult;
+	virtual vtkImageDataPtr calculate();
+
+	VisServicesPtr mServices;
+	QString       mOutputBasePath;
+	ImagePtr mInput;
+	ImagePtr mOutput;
+
+	float           mLowerThreshold;
+	float           mUpperTheshold;
+	int             mReplaceValue;
+	itkImageType::IndexType mSeed;
 };
-typedef boost::shared_ptr<class ResampleImageFilter> ResampleImageFilterPtr;
 
+/**
+ * @}
+ */
+}
 
-} // namespace cx
-
-
-
-#endif // CXRESAMPLEIMAGEFILTER_H
+#endif /* CXCONNECTEDTHRESHOLDIMAGEFILTER_H_ */

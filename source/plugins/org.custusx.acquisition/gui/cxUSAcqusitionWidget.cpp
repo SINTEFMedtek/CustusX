@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxUsReconstructionService.h"
 #include "cxHelperWidgets.h"
 #include "cxVisServices.h"
-
+#include "cxLogger.h"
 
 #include "cxToolProperty.h"
 #include "cxDoublePropertyTemporalCalibration.h"
