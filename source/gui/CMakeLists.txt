@@ -8,7 +8,6 @@ cx_add_class_qt_moc(cxGui_SRCS
 	properties/cxShadingParamsInterfaces
 	properties/cxToolProperty
 	properties/cxDoublePropertyTemporalCalibration
-	properties/cxOptionsWidget
     #----------------------
     dataWidgets/cxVolumePropertiesWidget
     dataWidgets/cxVolumeInfoWidget
@@ -24,7 +23,6 @@ cx_add_class_qt_moc(cxGui_SRCS
     dataWidgets/cxTransferFunctionAlphaWidget
     dataWidgets/cxTransferFunctionColorWidget
     dataWidgets/cxEraserWidget
-    dataWidgets/cxDataSelectWidget
     dataWidgets/cxInfoWidget
     dataWidgets/cxTransferFunctionPresetWidget
     dataWidgets/cxOverlayWidget
@@ -81,7 +79,6 @@ cx_add_class_qt_moc(cxGui_SRCS
 
 cx_add_class(cxGui_SRCS
 	${cxGui_SRCS}
-	properties/cxPropertyHelper
 )
 
 #set(cxGui_SRCS ${cxGui_SRCS} ${CustusX_SOURCE_DIR}/source/gui/icons/application.icns) # needed at least on apple to display icon

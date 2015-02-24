@@ -248,14 +248,15 @@ set(CX_PUBLIC_RESOURCE_LIBRARIES
     Qt5::Multimedia
     Qt5::Sql
     Qt5::Concurrent
-    CTKPluginFramework
-    ${VTK_LIBRARIES}
-    ${OPENGL_LIBRARIES}
+	CTKPluginFramework
+	${VTK_LIBRARIES}
+	${OPENGL_LIBRARIES}
 )
+
 set(CX_PRIVATE_RESOURCE_LIBRARIES
     ${CX_PRIVATE_RESOURCE_LIBRARIES}
     ${Boost_LIBRARIES}
-    ${ITK_LIBRARIES}
+	${ITK_LIBRARIES}
     cxPluginUtilities
 )
 if(CX_USE_OPENCL_UTILITY)
@@ -297,12 +298,12 @@ target_include_directories(cxResource
     ${PROJECT_SOURCE_DIR}/source/ThirdParty/iir1
 )
 target_link_libraries(cxResource
-    PUBLIC
-    ${CX_PUBLIC_RESOURCE_LIBRARIES}
-    PRIVATE
-    ${CX_PRIVATE_RESOURCE_LIBRARIES}
-    PUBLIC
-    ${SSC_GCOV_LIBRARY} # add gcov LAST in the link sequence! (http://stackoverflow.com/questions/566472/where-are-the-gcov-symbols)
+	PUBLIC
+	${CX_PUBLIC_RESOURCE_LIBRARIES}
+	PRIVATE
+	${CX_PRIVATE_RESOURCE_LIBRARIES}
+	PUBLIC
+	${SSC_GCOV_LIBRARY} # add gcov LAST in the link sequence! (http://stackoverflow.com/questions/566472/where-are-the-gcov-symbols)
 )
 
 add_subdirectory(testing)

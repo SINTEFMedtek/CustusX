@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackingService.h"
 #include "cxDoubleWidgets.h"
 #include "cxDataInterface.h"
-#include "cxPropertyHelper.h"
+#include "cxHelperWidgets.h"
 #include "cxViewService.h"
 
 //TODO: remove

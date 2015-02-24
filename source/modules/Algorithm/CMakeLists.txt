@@ -78,12 +78,12 @@ target_include_directories(cxPluginAlgorithm
 target_link_libraries(cxPluginAlgorithm
     PRIVATE
     cxResource
-    cxGui
+	#cxGui
     cxGUIExtenderService
     cxResourceFilter
     cxResourceWidgets
     cxResourceVisualization
-    cxLogicManager
+	cxLogicManager
     cxPluginUtilities
     ${ITK_LIBRARIES}
 

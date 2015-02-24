@@ -37,7 +37,9 @@ cx_add_class_qt_moc(CX_RESOURCE_WIDGETS_FILES
     cxTabbedWidget
     cxSpaceEditWidget
     cxWidgetObscuredListener
-    ${QXT_FOLDER}/qxtspanslider_p.h
+	cxOptionsWidget
+	cxDataSelectWidget
+	${QXT_FOLDER}/qxtspanslider_p.h
     ${QXT_FOLDER}/qxtspanslider
 )
 
@@ -58,4 +60,5 @@ target_link_libraries(cxResourceWidgets
     PRIVATE
     cxResource
     cxResourceFilter
+	cxResourceVisualization
 )

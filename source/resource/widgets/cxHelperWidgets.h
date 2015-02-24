@@ -102,7 +102,22 @@ cxResourceWidgets_EXPORT QWidget* addDummyMargin(QWidget* widget);
  *
  */
 cxResourceWidgets_EXPORT QWidget* sscCreateDataWidget(QWidget* parent, PropertyPtr data, QGridLayout* gridLayout = 0, int row = 0);
-}
+
+typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
+typedef boost::shared_ptr<class VisualizationService> VisualizationServicePtr;
+
+/**\brief Create a widget capable of displaying the input data.
+ *
+ * If a gridLayout is provided, the widget will insert its components
+ * into a row in that layout
+ *
+ * \ingroup cx_gui
+ */
+cxResourceWidgets_EXPORT QWidget* createDataWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent, cx::PropertyPtr data, QGridLayout* gridLayout = 0, int row = 0);
+
+
+} // namespace cx
+
 
 /**
 * @}

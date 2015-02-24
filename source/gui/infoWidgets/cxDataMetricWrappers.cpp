@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLabeledComboBoxWidget.h"
 #include "cxVector3DWidget.h"
 #include "cxRegistrationTransform.h"
-#include "cxPropertyHelper.h"
+#include "cxHelperWidgets.h"
 #include "cxBaseWidget.h"
 #include "cxBoolProperty.h"
 #include "cxSpaceProvider.h"

@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDoubleProperty.h"
 #include "cxLegacySingletons.h"
 #include "cxProfile.h"
-#include "cxPropertyHelper.h"
+#include "cxHelperWidgets.h"
 #include "cxBoolProperty.h"
 #include "cxCheckBoxWidget.h"
 #include "cxRepContainer.h"

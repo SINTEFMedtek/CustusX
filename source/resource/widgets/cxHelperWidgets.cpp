@@ -49,9 +49,30 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLabeledLineEditWidget.h"
 #include "cxDoubleSpanSlider.h"
 #include "cxFilenameWidget.h"
+#include "cxLabeledLineEditWidget.h"
+#include "cxDataSelectWidget.h"
+#include "cxSelectDataStringProperty.h"
 
 namespace cx
 {
+
+QWidget* createDataWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent, PropertyPtr data, QGridLayout* gridLayout, int row)
+{
+	QWidget* retval = NULL;
+
+	//make cx widgets
+	SelectDataStringPropertyBasePtr dsda = boost::dynamic_pointer_cast<SelectDataStringPropertyBase>(data);
+	if (dsda)
+	{
+		retval = new DataSelectWidget(visualizationService, patientModelService, parent, dsda, gridLayout, row);
+		return retval;
+	}
+	if(retval != NULL)
+		return retval;
+
+	retval = sscCreateDataWidget(parent, data, gridLayout, row);
+	return retval;
+}
 
 QWidget* sscCreateDataWidget(QWidget* parent, PropertyPtr data, QGridLayout* gridLayout, int row)
 {

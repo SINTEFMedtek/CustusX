@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataSelectWidget.h"
 
 #include "cxHelperWidgets.h"
-#include "cxDataInterface.h"
 #include "cxSelectDataStringProperty.h"
 #include "cxTypeConversions.h"
 #include "cxViewService.h"

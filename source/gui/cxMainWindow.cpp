@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPlaybackWidget.h"
 #include "cxEraserWidget.h"
 #include "cxSamplerWidget.h"
-#include "cxPropertyHelper.h"
+#include "cxHelperWidgets.h"
 #include "cxConfig.h"
 #include "cxVLCRecorder.h"
 #include "cxSecondaryViewLayoutWindow.h"

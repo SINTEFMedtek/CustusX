@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDATASELECTWIDGET_H
 #define CXDATASELECTWIDGET_H
 
-#include "cxGuiExport.h"
+#include "cxResourceWidgetsExport.h"
 
 #include "boost/shared_ptr.hpp"
 #include "cxBaseWidget.h"
@@ -55,7 +55,7 @@ typedef boost::shared_ptr<class VisualizationService> VisualizationServicePtr;
   * \date Nov 25, 2012
   * \author christiana
   */
-class cxGui_EXPORT DataSelectWidget : public BaseWidget
+class cxResourceWidgets_EXPORT DataSelectWidget : public BaseWidget
 {
     Q_OBJECT
 public:
@@ -94,7 +94,7 @@ private:
   * \date Nov 25, 2012
   * \author christiana
   */
-class cxGui_EXPORT EraseDataToolButton : public CXSmallToolButton
+class cxResourceWidgets_EXPORT EraseDataToolButton : public CXSmallToolButton
 {
     Q_OBJECT
 public:

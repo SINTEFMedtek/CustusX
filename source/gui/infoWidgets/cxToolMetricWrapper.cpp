@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxToolMetricWrapper.h"
 #include <QHBoxLayout>
 #include "cxSpaceEditWidget.h"
-#include "cxPropertyHelper.h"
+#include "cxHelperWidgets.h"
 #include "cxTrackingService.h"
 #include "cxSpaceProvider.h"
 #include "cxPatientModelService.h"

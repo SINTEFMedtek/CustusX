@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QLabel>
 #include "cxBaseWidget.h"
-#include "cxPropertyHelper.h"
+#include "cxHelperWidgets.h"
 
 namespace cx {
 
