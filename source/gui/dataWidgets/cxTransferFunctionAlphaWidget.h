@@ -59,7 +59,8 @@ namespace cx
 class cxGui_EXPORT TransferFunctionAlphaWidget : public BaseWidget
 {    
   Q_OBJECT
-  
+
+	void clearBackground(QPainter &painter);
 public:
   TransferFunctionAlphaWidget(PatientModelServicePtr patientModelService, QWidget* parent);
   virtual ~TransferFunctionAlphaWidget();

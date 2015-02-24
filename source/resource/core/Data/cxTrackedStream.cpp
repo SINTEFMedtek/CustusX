@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxTool.h"
 #include "cxRegistrationTransform.h"
+#include "cxVideoSource.h"
 
 #include "cxProbeSector.h"
 #include "cxSpaceProvider.h"
@@ -108,14 +109,20 @@ ToolPtr TrackedStream::getProbeTool()
 void TrackedStream::setVideoSource(const VideoSourcePtr &videoSource)
 {
 	if(mVideoSource)
+	{
 		disconnect(mVideoSource.get(), &VideoSource::newFrame, this, &TrackedStream::newFrame);
+		disconnect(mVideoSource.get(), &VideoSource::streaming, this, &TrackedStream::streaming);
+	}
 
 	mVideoSource = videoSource;
 	emit streamChanged(this->getUid());
 	emit newVideoSource(mVideoSource);
 
 	if(mVideoSource)
+	{
 		connect(mVideoSource.get(), &VideoSource::newFrame, this, &TrackedStream::newFrameSlot);
+		connect(mVideoSource.get(), &VideoSource::streaming, this, &TrackedStream::streaming);
+	}
 }
 
 void TrackedStream::newFrameSlot()

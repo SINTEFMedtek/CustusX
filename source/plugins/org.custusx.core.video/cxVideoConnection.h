@@ -106,6 +106,7 @@ private:
 	void resetProbe();///< Tell probe it is no longer connected to a digital interface
 	void updateStatus(ProbeDefinitionPtr message);
 	void startAllSources();
+	void stopAllSources();
 	void removeSourceFromProbe(ToolPtr tool);
 
 	ImageReceiverThreadPtr mClient;

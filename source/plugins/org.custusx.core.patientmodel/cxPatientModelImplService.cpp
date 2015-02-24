@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSessionStorageServiceProxy.h"
 #include "cxTrackedStream.h"
 #include "cxReporter.h"
+#include "cxVideoSource.h"
 
 namespace cx
 {

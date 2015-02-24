@@ -200,23 +200,25 @@ void TransferFunctionAlphaWidget::updateTooltip(AlphaPoint point)
 
 void TransferFunctionAlphaWidget::paintEvent(QPaintEvent* event)
 {
-  // Don't do anything before we have an image
-  // May also be fixed by not calling TransferFunctionAlphaWidget constructor till we have an image
-  if (!mImage)
-    return;
-  
   QWidget::paintEvent(event);
-
   QPainter painter(this);
-  
-  // Fill with white global background color and grey plot area background color
-  const QBrush frameBrush = QBrush(QColor(170, 170, 170));
-  const QBrush backgroundBrush = QBrush(QColor(200, 200, 200));
-  painter.fillRect(this->mFullArea, frameBrush);
-  painter.fillRect(this->mPlotArea, backgroundBrush);
+  this->clearBackground(painter);
+
+  if (!mImage)
+	  return;
 
   this->paintHistogram(painter);
   this->paintOpacityGraph(painter);
+}
+
+void TransferFunctionAlphaWidget::clearBackground(QPainter& painter)
+{
+	// Fill with white global background color and grey plot area background color
+	const QBrush frameBrush = QBrush(QColor(170, 170, 170));
+	const QBrush backgroundBrush = QBrush(QColor(200, 200, 200));
+	painter.fillRect(this->mFullArea, frameBrush);
+	painter.fillRect(this->mPlotArea, backgroundBrush);
+
 }
 
 void TransferFunctionAlphaWidget::paintOpacityGraph(QPainter& painter)

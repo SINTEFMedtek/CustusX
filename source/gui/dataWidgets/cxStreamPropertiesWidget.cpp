@@ -58,11 +58,29 @@ StreamPropertiesWidget::StreamPropertiesWidget(PatientModelServicePtr patientMod
 void StreamPropertiesWidget::streamSelectedSlot()
 {
 	TrackedStreamPtr trackedStream = mSelectStream->getTrackedStream();
-	if(trackedStream && trackedStream->getChangingImage())
+	if(mTrackedStream == trackedStream)
+		return;
+	if(mTrackedStream)
+		disconnect(trackedStream.get(), &TrackedStream::streaming, this, &StreamPropertiesWidget::streamingSlot);
+
+	mTrackedStream = trackedStream;
+
+	if(mTrackedStream)
 	{
-		mTransferFunctionWidget->imageChangedSlot(trackedStream->getChangingImage());
-		mShadingWidget->imageChangedSlot(trackedStream->getChangingImage());
+		connect(trackedStream.get(), &TrackedStream::streaming, this, &StreamPropertiesWidget::streamingSlot);
+		streamingSlot(true);
 	}
+	else
+		streamingSlot(false);
+}
+
+void StreamPropertiesWidget::streamingSlot(bool isStreaming)
+{
+	ImagePtr image = ImagePtr();
+	if(isStreaming && mTrackedStream)
+		image = mTrackedStream->getChangingImage();
+	mTransferFunctionWidget->imageChangedSlot(image);
+	mShadingWidget->imageChangedSlot(image);
 }
 
 QString StreamPropertiesWidget::defaultWhatsThis() const

@@ -34,7 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXTRACKEDSTREAM_H
 
 #include "cxImage.h"
-#include "cxVideoSource.h"
 
 namespace cx
 {
@@ -79,6 +78,7 @@ signals:
 	void newTool(ToolPtr tool);
 	void newVideoSource(VideoSourcePtr videoSource);
 	void newFrame();
+	void streaming(bool on); ///< emitted when streaming started/stopped
 
 private slots:
 	void newFrameSlot();
