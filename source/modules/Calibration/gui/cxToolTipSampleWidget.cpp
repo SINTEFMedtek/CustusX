@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxReporter.h"
 #include "cxVisServices.h"
+#include "cxStringPropertySelectTool.h"
 
 namespace cx
 {
@@ -61,7 +62,7 @@ ToolTipSampleWidget::ToolTipSampleWidget(VisServicesPtr services, QWidget* paren
   QVBoxLayout* toplayout = new QVBoxLayout(this);
 
   mCoordinateSystems = StringPropertySelectCoordinateSystem::New();
-  mTools = StringPropertySelectTool::New();
+  mTools = StringPropertySelectTool::New(mServices->getToolManager());
 	mData = StringPropertySelectData::New(mServices->getPatientService());
 
   mCoordinateSystemComboBox = new LabeledComboBoxWidget(this, mCoordinateSystems);

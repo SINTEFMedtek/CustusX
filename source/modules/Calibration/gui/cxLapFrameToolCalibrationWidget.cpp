@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxActiveToolWidget.h>
 #include "cxDoubleWidgets.h"
 #include "cxVisServices.h"
+#include "cxStringPropertySelectTool.h"
 
 namespace cx
 {
@@ -69,11 +70,11 @@ LapFrameToolCalibrationWidget::LapFrameToolCalibrationWidget(VisServicesPtr serv
       0.0, DoubleRange(-M_PI/2, M_PI/2, M_PI/180), 0);
   mCameraAngleAdapter->setInternal2Display(180.0/M_PI);
 
-  mCalibRefTool = StringPropertySelectTool::New();
+  mCalibRefTool = StringPropertySelectTool::New(mServices->getToolManager());
   mCalibRefTool->setValueName("Calibration Frame");
   mCalibRefTool->setHelp("Select Calibration Reference Frame");
 
-  mCalibratingTool = StringPropertySelectTool::New();
+  mCalibratingTool = StringPropertySelectTool::New(mServices->getToolManager());
   mCalibratingTool->setValueName("Tool");
   mCalibratingTool->setHelp("Select which Tool to calibrate");
 

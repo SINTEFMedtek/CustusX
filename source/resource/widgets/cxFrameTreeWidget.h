@@ -30,62 +30,56 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXPROBECONFIGWIDGET_H_
-#define CXPROBECONFIGWIDGET_H_
+#ifndef CXFRAMETREEWIDGET_H_
+#define CXFRAMETREEWIDGET_H_
 
-#include "cxGuiExport.h"
+#include "cxResourceWidgetsExport.h"
 
 #include "cxBaseWidget.h"
-#include "cxBoundingBoxWidget.h"
-#include "cxToolProperty.h"
-#include "cxVector3DProperty.h"
-#include "cxDoubleProperty.h"
+
+#include <map>
+#include <string>
+#include <QWidget>
+#include "cxForwardDeclarations.h"
+class QTreeWidget;
+class QTreeWidgetItem;
+class QDomNode;
 
 namespace cx
 {
-typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 
 /**
+ * \class FrameTreeWidget
  *
- * \brief Widget that displays/edits a probe configuration
+ *\brief Widget for displaying the FrameForest object
  * \ingroup cx_gui
  *
- * \date Mar 16, 2012
- * \author Christian Askeland, SINTEF
+ *\date Sep 23, 2010
+ *\\author Christian Askeland, SINTEF
  */
-class cxGui_EXPORT ProbeConfigWidget : public BaseWidget
+class cxResourceWidgets_EXPORT FrameTreeWidget : public BaseWidget
 {
-	Q_OBJECT
+  Q_OBJECT
 public:
-	ProbeConfigWidget(VisServicesPtr services, QWidget* parent=NULL);
-	virtual ~ProbeConfigWidget();
-	QWidget* getActiveProbeConfigWidget() { return mActiveProbeConfigWidget; }
+  FrameTreeWidget(PatientModelServicePtr patientService, QWidget* parent);
+  ~FrameTreeWidget() {}
+
+  virtual QString defaultWhatsThis() const;
+
+protected:
+  virtual void prePaintEvent();
+private:
+  PatientModelServicePtr mPatientService;
+  QTreeWidget* mTreeWidget;
+  void fill(QTreeWidgetItem* parent, QDomNode node);
+  std::map<QString, DataPtr> mConnectedData;
 
 private slots:
-	void activeProbeConfigurationChangedSlot();
-	void savePresetSlot();
-	void deletePresetSlot();
-	void guiImageSettingsChanged();
-	void guiProbeSectorChanged();
-	void guiOriginSettingsChanged();
-	void syncBoxToSectorChanged();
-
-private:
-	virtual QString defaultWhatsThis() const;
-
-	VisServicesPtr mServices;
-	QWidget* mActiveProbeConfigWidget;
-	BoundingBoxWidget* mBBWidget;
-	Vector3DPropertyBasePtr mOrigin;
-	SliderRangeGroupWidget* mDepthWidget;
-	DoublePropertyPtr mWidth;
-	QCheckBox* mSyncBoxToSector;
-
-	StringPropertyActiveProbeConfigurationPtr mActiveProbeConfig;
-	QString mLastKnownProbeConfigName; ///< used for suggesting save names for new config
-	bool mUpdating;
+  void dataLoadedSlot();
+  void rebuild(); // TODO this must also listen to all changed() in all data
 };
+
 
 }
 
-#endif /* CXPROBECONFIGWIDGET_H_ */
+#endif /* CXFRAMETREEWIDGET_H_ */

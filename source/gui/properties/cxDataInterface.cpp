@@ -220,34 +220,6 @@ QString StringPropertyActiveVideoSource::getHelp() const
 	return "Select the active video source.";
 }
 
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
-
-StringPropertySelectToolBase::StringPropertySelectToolBase()
-{
-	connect(trackingService().get(), &TrackingService::stateChanged, this, &Property::changed);
-}
-
-QStringList StringPropertySelectToolBase::getValueRange() const
-{
-	TrackingService::ToolMap tools = trackingService()->getTools();
-
-	QStringList retval;
-	for (TrackingService::ToolMap::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
-		retval << iter->second->getUid();
-	return retval;
-}
-
-QString StringPropertySelectToolBase::convertInternal2Display(QString internal)
-{
-  ToolPtr tool = trackingService()->getTool(internal);
-  if (!tool)
-  {
-    return "<no tool>";
-  }
-  return qstring_cast(tool->getName());
-}
 
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -393,61 +365,6 @@ QString StringPropertySelectCoordinateSystem::getHelp() const
 void StringPropertySelectCoordinateSystem::setDefaultSlot()
 {
   this->setValue(qstring_cast(csPATIENTREF));
-}
-
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
-
-StringPropertySelectTool::StringPropertySelectTool()
-{
-	mValueName = "Select a tool";
-	mHelp = mValueName;
-}
-
-void StringPropertySelectTool::setHelp(QString help)
-{
-  mHelp = help;
-}
-
-void StringPropertySelectTool::setValueName(QString name)
-{
-  mValueName = name;
-}
-
-QString StringPropertySelectTool::getDisplayName() const
-{
-  return mValueName;
-}
-
-bool StringPropertySelectTool::setValue(const QString& value)
-{
-  if(mTool && value==mTool->getUid())
-    return false;
-  ToolPtr temp = trackingService()->getTool(value);
-  if(!temp)
-    return false;
-
-  mTool = temp;
-  emit changed();
-  return true;
-}
-
-QString StringPropertySelectTool::getValue() const
-{
-  if(!mTool)
-    return "<no tool>";
-  return mTool->getUid();
-}
-
-QString StringPropertySelectTool::getHelp() const
-{
-  return mHelp;
-}
-
-ToolPtr StringPropertySelectTool::getTool() const
-{
-  return mTool;
 }
 
 //---------------------------------------------------------

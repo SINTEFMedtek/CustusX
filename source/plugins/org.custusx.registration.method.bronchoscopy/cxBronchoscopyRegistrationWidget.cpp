@@ -61,9 +61,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRepContainer.h"
 #include "cxWidgetObscuredListener.h"
 #include "cxViewGroupData.h"
-#include "cxDataInterface.h"
+#include "cxStringPropertySelectTool.h"
+//#include "cxDataInterface.h"
 #include "cxHelperWidgets.h"
 #include "cxAcquisitionService.h"
+#include "cxRegServices.h"
 
 
 namespace cx
@@ -80,7 +82,7 @@ BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegServices servi
 	mSelectMeshWidget = StringPropertySelectMesh::New(mServices.patientModelService);
 	mSelectMeshWidget->setValueName("Centerline: ");
 
-	mSelectToolWidget = StringPropertySelectTool::New();
+	mSelectToolWidget = StringPropertySelectTool::New(services.getToolManager());
 	//this->initializeTrackingService();
 
 	mProcessCenterlineButton = new QPushButton("Process centerline");

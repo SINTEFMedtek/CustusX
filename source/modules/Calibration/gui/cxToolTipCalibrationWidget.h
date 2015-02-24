@@ -50,6 +50,7 @@ namespace cx
 {
 class LabeledComboBoxWidget;
 typedef boost::shared_ptr<class VisServices> VisServicesPtr;
+typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
 
 /**
  * \file

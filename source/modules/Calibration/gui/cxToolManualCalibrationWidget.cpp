@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataInterface.h"
 #include "cxHelperWidgets.h"
 #include "cxVisServices.h"
+#include "cxStringPropertySelectTool.h"
 
 namespace cx
 {
@@ -50,7 +51,7 @@ ToolManualCalibrationWidget::ToolManualCalibrationWidget(VisServicesPtr services
   QVBoxLayout* mToptopLayout = new QVBoxLayout(this);
   //toptopLayout->setMargin(0);
 
-  mTool = StringPropertySelectTool::New();
+  mTool = StringPropertySelectTool::New(mServices->getToolManager());
   mToptopLayout->addWidget(sscCreateDataWidget(this, mTool));
 
   mToptopLayout->addWidget(new QLabel("<font color=red>Caution: sMt is changed directly by this control.</font>"));

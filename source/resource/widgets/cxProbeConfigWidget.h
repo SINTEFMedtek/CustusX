@@ -29,47 +29,63 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXDOUBLEPROPERTYTEMPORALCALIBRATION_H_
-#define CXDOUBLEPROPERTYTEMPORALCALIBRATION_H_
 
-#include "cxGuiExport.h"
+#ifndef CXPROBECONFIGWIDGET_H_
+#define CXPROBECONFIGWIDGET_H_
 
-#include "cxDoublePropertyBase.h"
-#include "cxForwardDeclarations.h"
+#include "cxResourceWidgetsExport.h"
+
+#include "cxBaseWidget.h"
+#include "cxBoundingBoxWidget.h"
+#include "cxToolProperty.h"
+#include "cxVector3DProperty.h"
+#include "cxDoubleProperty.h"
 
 namespace cx
 {
-/**
- * \file
- * \addtogroup cx_gui
- * @{
- */
+typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 
-/** Interface to the tool offset of the active tool
+/**
+ *
+ * \brief Widget that displays/edits a probe configuration
+ * \ingroup cx_gui
+ *
+ * \date Mar 16, 2012
+ * \author Christian Askeland, SINTEF
  */
-class cxGui_EXPORT DoublePropertyTimeCalibration : public DoublePropertyBase
+class cxResourceWidgets_EXPORT ProbeConfigWidget : public BaseWidget
 {
-  Q_OBJECT
+	Q_OBJECT
 public:
-  static DoublePropertyBasePtr New();
-  DoublePropertyTimeCalibration();
-  virtual ~DoublePropertyTimeCalibration() {}
-  virtual QString getDisplayName() const { return "Temporal Calibration"; }
-  virtual double getValue() const;
-  virtual QString getHelp() const;
-  virtual bool setValue(double val);
-  DoubleRange getValueRange() const;
+	ProbeConfigWidget(VisServicesPtr services, QWidget* parent=NULL);
+	virtual ~ProbeConfigWidget();
+	QWidget* getActiveProbeConfigWidget() { return mActiveProbeConfigWidget; }
 
 private slots:
-  void activeToolChanged();
+	void activeProbeConfigurationChangedSlot();
+	void savePresetSlot();
+	void deletePresetSlot();
+	void guiImageSettingsChanged();
+	void guiProbeSectorChanged();
+	void guiOriginSettingsChanged();
+	void syncBoxToSectorChanged();
 
 private:
-  ToolPtr mTool;
+	virtual QString defaultWhatsThis() const;
+
+	VisServicesPtr mServices;
+	QWidget* mActiveProbeConfigWidget;
+	BoundingBoxWidget* mBBWidget;
+	Vector3DPropertyBasePtr mOrigin;
+	SliderRangeGroupWidget* mDepthWidget;
+	DoublePropertyPtr mWidth;
+	QCheckBox* mSyncBoxToSector;
+
+	StringPropertyActiveProbeConfigurationPtr mActiveProbeConfig;
+	QString mLastKnownProbeConfigName; ///< used for suggesting save names for new config
+	bool mUpdating;
 };
 
-/**
- * @}
- */
 }
 
-#endif /* CXDOUBLEPROPERTYTEMPORALCALIBRATION_H_ */
+#endif /* CXPROBECONFIGWIDGET_H_ */

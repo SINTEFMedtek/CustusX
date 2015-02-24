@@ -147,25 +147,6 @@ protected:
 };
 typedef boost::shared_ptr<class StringPropertySelectRTSourceBase> StringPropertySelectRTSourceBasePtr;
 
-/**
- * \brief Base class for all Properties that selects a tool.
- */
-class cxGui_EXPORT StringPropertySelectToolBase : public StringPropertyBase
-{
-  Q_OBJECT
-public:
-  StringPropertySelectToolBase();
-  virtual ~StringPropertySelectToolBase() {}
-
-public: // basic methods
-
-public: // optional methods
-  virtual QStringList getValueRange() const;
-  virtual QString convertInternal2Display(QString internal);
-};
-typedef boost::shared_ptr<class StringPropertySelectToolBase> StringPropertySelectToolBasePtr;
-
-
 /** Base class for all Properties that selects a coordinatesystem.
  */
 class cxGui_EXPORT StringPropertySelectCoordinateSystemBase : public StringPropertyBase
@@ -274,43 +255,6 @@ private:
   COORDINATE_SYSTEM mCoordinateSystem;
   QString mValueName;
 };
-
-typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
-
-/**
- * \brief Adapter that selects and stores a tool.
- * The tool is stored internally in the adapter.
- * Use setValue/getValue plus changed() to access it.
- *
- */
-class cxGui_EXPORT StringPropertySelectTool : public StringPropertySelectToolBase
-{
-  Q_OBJECT
-public:
-  static StringPropertySelectToolPtr New() { return StringPropertySelectToolPtr(new StringPropertySelectTool()); }
-  StringPropertySelectTool();
-  virtual ~StringPropertySelectTool() {}
-
-  void setHelp(QString help);
-  void setValueName(QString name);
-
-public: // basic methods
-  virtual QString getDisplayName() const;
-  virtual bool setValue(const QString& value);
-  virtual QString getValue() const;
-
-public: // optional methods
-  virtual QString getHelp() const;
-
-public: // interface extension
-  ToolPtr getTool() const;
-
-private:
-  QString mValueName;
-  QString mHelp;
-  ToolPtr mTool;
-};
-
 
 typedef boost::shared_ptr<class StringPropertyParentFrame> StringPropertyParentFramePtr;
 

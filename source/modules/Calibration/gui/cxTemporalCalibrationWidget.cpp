@@ -92,7 +92,7 @@ TemporalCalibrationWidget::TemporalCalibrationWidget(VisServicesPtr services, Ac
   topLayout->addWidget(mInfoLabel);
   topLayout->addWidget(mRecordSessionWidget);
   topLayout->addWidget(new LabeledComboBoxWidget(this, StringPropertyActiveProbeConfiguration::New(mServices->getToolManager())));
-  topLayout->addWidget(new SpinBoxGroupWidget(this, DoublePropertyTimeCalibration::New()));
+  topLayout->addWidget(new SpinBoxGroupWidget(this, DoublePropertyTimeCalibration::New(mServices->getToolManager())));
 
   topLayout->addWidget(this->createHorizontalLine());
 

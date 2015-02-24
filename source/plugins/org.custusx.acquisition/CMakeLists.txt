@@ -80,7 +80,6 @@ set(PLUGIN_target_libraries
     ${PLUGIN_target_libraries}
     cxPluginAlgorithm
     org_custusx_usreconstruction
-    cxGui
 )
 
 set(PLUGIN_OUTPUT_DIR "")

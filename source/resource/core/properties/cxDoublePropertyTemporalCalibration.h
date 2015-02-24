@@ -29,57 +29,48 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXDOUBLEPROPERTYTEMPORALCALIBRATION_H_
+#define CXDOUBLEPROPERTYTEMPORALCALIBRATION_H_
 
-#ifndef CXFRAMETREEWIDGET_H_
-#define CXFRAMETREEWIDGET_H_
+#include "cxResourceExport.h"
 
-#include "cxGuiExport.h"
-
-#include "cxBaseWidget.h"
-
-#include <map>
-#include <string>
-#include <QWidget>
+#include "cxDoublePropertyBase.h"
 #include "cxForwardDeclarations.h"
-#include "cxLegacySingletons.h"
-class QTreeWidget;
-class QTreeWidgetItem;
-class QDomNode;
 
 namespace cx
 {
-
 /**
- * \class FrameTreeWidget
- *
- *\brief Widget for displaying the FrameForest object
- * \ingroup cx_gui
- *
- *\date Sep 23, 2010
- *\\author Christian Askeland, SINTEF
+ * \file
+ * \addtogroup cx_gui
+ * @{
  */
-class cxGui_EXPORT FrameTreeWidget : public BaseWidget
+
+/** Interface to the tool offset of the active tool
+ */
+class cxResource_EXPORT DoublePropertyTimeCalibration : public DoublePropertyBase
 {
   Q_OBJECT
 public:
-  FrameTreeWidget(QWidget* parent);
-  ~FrameTreeWidget() {}
-
-  virtual QString defaultWhatsThis() const;
-
-protected:
-  virtual void prePaintEvent();
-private:
-  QTreeWidget* mTreeWidget;
-  void fill(QTreeWidgetItem* parent, QDomNode node);
-  std::map<QString, DataPtr> mConnectedData;
+  static DoublePropertyBasePtr New(TrackingServicePtr trackingService);
+  DoublePropertyTimeCalibration(TrackingServicePtr trackingService);
+  virtual ~DoublePropertyTimeCalibration() {}
+  virtual QString getDisplayName() const { return "Temporal Calibration"; }
+  virtual double getValue() const;
+  virtual QString getHelp() const;
+  virtual bool setValue(double val);
+  DoubleRange getValueRange() const;
 
 private slots:
-  void dataLoadedSlot();
-  void rebuild(); // TODO this must also listen to all changed() in all data
+  void activeToolChanged();
+
+private:
+  TrackingServicePtr mTrackingService;
+  ToolPtr mTool;
 };
 
-
+/**
+ * @}
+ */
 }
 
-#endif /* CXFRAMETREEWIDGET_H_ */
+#endif /* CXDOUBLEPROPERTYTEMPORALCALIBRATION_H_ */

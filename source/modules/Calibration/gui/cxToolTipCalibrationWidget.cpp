@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLabeledComboBoxWidget.h"
 #include "cxTool.h"
 #include "cxVisServices.h"
-
+#include "cxStringPropertySelectTool.h"
 #include "cxSpaceProvider.h"
 
 namespace cx
@@ -62,7 +62,7 @@ ToolTipCalibrateWidget::ToolTipCalibrateWidget(VisServicesPtr services, QWidget*
 {
   QVBoxLayout* toplayout = new QVBoxLayout(this);
 
-  mTools = StringPropertySelectTool::New();
+  mTools = StringPropertySelectTool::New(mServices->getToolManager());
   mTools->setValueName("Reference tool");
   mTools->setHelp("Select a tool with a known reference point");
   mCalibrateToolComboBox = new LabeledComboBoxWidget(this, mTools);

@@ -31,15 +31,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxDoublePropertyTemporalCalibration.h"
 #include "cxTrackingService.h"
-#include "cxLegacySingletons.h"
 
 namespace cx
 {
 
-DoublePropertyTimeCalibration::DoublePropertyTimeCalibration()
+DoublePropertyTimeCalibration::DoublePropertyTimeCalibration(TrackingServicePtr trackingService)
 {
-  connect(trackingService().get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(activeToolChanged()));
-  connect(trackingService().get(), &TrackingService::stateChanged, this, &DoublePropertyTimeCalibration::activeToolChanged);
+  connect(mTrackingService.get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(activeToolChanged()));
+  connect(mTrackingService.get(), &TrackingService::stateChanged, this, &DoublePropertyTimeCalibration::activeToolChanged);
   this->activeToolChanged();
 }
 
@@ -47,14 +46,14 @@ void DoublePropertyTimeCalibration::activeToolChanged()
 {
   // ignore tool changes to something non-probeish.
   // This gives the user a chance to use the widget without having to show the probe.
-  ToolPtr newTool = trackingService()->getActiveTool();
+  ToolPtr newTool = mTrackingService->getActiveTool();
   if (!newTool || !newTool->hasType(Tool::TOOL_US_PROBE))
     return;
 
   if (mTool)
     disconnect(mTool->getProbe().get(), SIGNAL(sectorChanged()), this, SIGNAL(changed()));
 
-  mTool = trackingService()->getActiveTool();
+  mTool = mTrackingService->getActiveTool();
 
   if (mTool)
     connect(mTool->getProbe().get(), SIGNAL(sectorChanged()), this, SIGNAL(changed()));
@@ -62,9 +61,9 @@ void DoublePropertyTimeCalibration::activeToolChanged()
   emit changed();
 }
 
-DoublePropertyBasePtr DoublePropertyTimeCalibration::New()
+DoublePropertyBasePtr DoublePropertyTimeCalibration::New(TrackingServicePtr trackingService)
 {
-  return DoublePropertyBasePtr(new DoublePropertyTimeCalibration());
+  return DoublePropertyBasePtr(new DoublePropertyTimeCalibration(trackingService));
 }
 
 double DoublePropertyTimeCalibration::getValue() const

@@ -43,10 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSoundSpeedConversionWidget.h"
 #include "cxRecordSessionWidget.h"
 #include "cxSettings.h"
-#include "cxToolProperty.h"
-#include "cxDoublePropertyTemporalCalibration.h"
 #include "cxTimedAlgorithmProgressBar.h"
-#include "cxProbeConfigWidget.h"
 #include "cxDisplayTimerWidget.h"
 #include "cxTimedAlgorithm.h"
 #include "cxLabeledComboBoxWidget.h"
@@ -54,6 +51,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxUsReconstructionService.h"
 #include "cxHelperWidgets.h"
 #include "cxVisServices.h"
+
+
+#include "cxToolProperty.h"
+#include "cxDoublePropertyTemporalCalibration.h"
+#include "cxProbeConfigWidget.h"
 
 
 namespace cx
@@ -146,7 +148,7 @@ QWidget* USAcqusitionWidget::createOptionsWidget()
 	ProbeConfigWidget* probeWidget = new ProbeConfigWidget(mServices, this);
 	probeWidget->getActiveProbeConfigWidget()->setVisible(false);
 
-	SpinBoxGroupWidget* temporalCalibrationWidget = new SpinBoxGroupWidget(this, DoublePropertyTimeCalibration::New());
+	SpinBoxGroupWidget* temporalCalibrationWidget = new SpinBoxGroupWidget(this, DoublePropertyTimeCalibration::New(mServices->getToolManager()));
 
 	int line = 0;
 	layout->addWidget(this->createHorizontalLine(), line++, 0, 1, 1);

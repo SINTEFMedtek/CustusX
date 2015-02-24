@@ -34,9 +34,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "org_custusx_acquisition_Export.h"
 
-#include "cxDataInterface.h"
+//#include "cxDataInterface.h"
 #include "cxRecordSession.h"
 #include "cxAcquisitionData.h"
+#include "cxStringPropertyBase.h"
 
 namespace cx
 {

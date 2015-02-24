@@ -42,8 +42,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-FrameTreeWidget::FrameTreeWidget(QWidget* parent) :
-  BaseWidget(parent, "FrameTreeWidget", "Frame Tree")
+FrameTreeWidget::FrameTreeWidget(PatientModelServicePtr patientService, QWidget* parent) :
+  BaseWidget(parent, "FrameTreeWidget", "Frame Tree"),
+  mPatientService(patientService)
 {
   QVBoxLayout* layout = new QVBoxLayout(this);
 
@@ -53,7 +54,7 @@ FrameTreeWidget::FrameTreeWidget(QWidget* parent) :
   mTreeWidget->setHeaderLabels(QStringList() << "Frame");
 
   // TODO this must also listen to all changed() in all data
-  connect(patientService().get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataLoadedSlot()));
+  connect(mPatientService.get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataLoadedSlot()));
 }
 
 QString FrameTreeWidget::defaultWhatsThis() const
@@ -72,7 +73,7 @@ void FrameTreeWidget::dataLoadedSlot()
 	disconnect(iter->second.get(), SIGNAL(transformChanged()), this, SLOT(setModified()));
   }
 
-  mConnectedData = patientService()->getData();
+  mConnectedData = mPatientService->getData();
 
   for (std::map<QString, DataPtr>::iterator iter=mConnectedData.begin(); iter!=mConnectedData.end(); ++iter)
   {
@@ -91,7 +92,7 @@ void FrameTreeWidget::rebuild()
 {
   mTreeWidget->clear();
 
-  FrameForest forest(patientService()->getData());
+  FrameForest forest(mPatientService->getData());
   QDomElement root = forest.getDocument().documentElement();
 
   this->fill(mTreeWidget->invisibleRootItem(), root);
@@ -107,7 +108,7 @@ void FrameTreeWidget::fill(QTreeWidgetItem* parent, QDomNode node)
     QString frameName = child.toElement().tagName();
 
     // if frame refers to a data, use its name instead.
-	DataPtr data = patientService()->getData(frameName);
+	DataPtr data = mPatientService->getData(frameName);
     if (data)
       frameName = data->getName();
 

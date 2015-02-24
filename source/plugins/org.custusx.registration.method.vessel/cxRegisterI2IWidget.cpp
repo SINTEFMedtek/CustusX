@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImage.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxFrameTreeWidget.h"
-#include "cxDataInterface.h"
+//#include "cxDataInterface.h"
 #include "cxSeansVesselRegistrationWidget.h"
 
 namespace cx
@@ -57,7 +57,7 @@ RegisterI2IWidget::RegisterI2IWidget(RegServices services, QWidget* parent) :
 
   layout->addWidget(mSeansVesselRegsitrationWidget);
   layout->addWidget(new QLabel("Parent frame tree status:"), 3, 0);
-  layout->addWidget(new FrameTreeWidget(this), 4, 0);
+  layout->addWidget(new FrameTreeWidget(services.patientModelService, this), 4, 0);
 }
 
 RegisterI2IWidget::~RegisterI2IWidget()

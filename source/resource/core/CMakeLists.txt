@@ -69,7 +69,10 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	properties/cxSelectDataStringProperty
 	properties/cxSpacePropertyBase
 	properties/cxSpaceProperty
-        properties/cxStringPropertySelectPointMetric
+	properties/cxStringPropertySelectPointMetric
+	properties/cxToolProperty
+	properties/cxDoublePropertyTemporalCalibration
+	properties/cxStringPropertySelectTool
 
     logger/cxReporter
     logger/cxMessageListener

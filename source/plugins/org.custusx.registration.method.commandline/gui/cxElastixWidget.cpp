@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxTimedAlgorithm.h"
 #include "cxLabeledComboBoxWidget.h"
-#include "cxDataInterface.h"
+//#include "cxDataInterface.h"
 #include "cxRegistrationProperties.h"
 #include "cxFileSelectWidget.h"
 #include "cxElastixSyntaxHighlighter.h"

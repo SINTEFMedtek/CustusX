@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTOOLPROPERTY_H_
 #define CXTOOLPROPERTY_H_
 
-#include "cxGuiExport.h"
+#include "cxResourceExport.h"
 
 #include "cxStringPropertyBase.h"
 #include "cxTool.h"
@@ -50,7 +50,7 @@ typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
 
 /** Adapter that connects to the current active tool.
  */
-class cxGui_EXPORT StringPropertyActiveTool : public StringPropertyBase
+class cxResource_EXPORT StringPropertyActiveTool : public StringPropertyBase
 {
   Q_OBJECT
 public:
@@ -79,7 +79,7 @@ typedef boost::shared_ptr<class StringPropertyActiveProbeConfiguration> StringPr
  *  It will stick to the probe as much as possible,
  *  i.e. ignore hiding and showing of other non-probes.
  */
-class cxGui_EXPORT StringPropertyActiveProbeConfiguration : public StringPropertyBase
+class cxResource_EXPORT StringPropertyActiveProbeConfiguration : public StringPropertyBase
 {
   Q_OBJECT
 public:

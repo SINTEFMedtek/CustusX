@@ -6,8 +6,6 @@ cx_add_class_qt_moc(cxGui_SRCS
     #----------------------
 	properties/cxDataInterface
 	properties/cxShadingParamsInterfaces
-	properties/cxToolProperty
-	properties/cxDoublePropertyTemporalCalibration
     #----------------------
     dataWidgets/cxVolumePropertiesWidget
     dataWidgets/cxVolumeInfoWidget
@@ -35,7 +33,6 @@ cx_add_class_qt_moc(cxGui_SRCS
     infoWidgets/cxStatusBar
     infoWidgets/cxPointSamplingWidget
     infoWidgets/cxMetricWidget
-    infoWidgets/cxFrameTreeWidget
     infoWidgets/cxDataMetricWrappers
     infoWidgets/cxSamplerWidget
     infoWidgets/cxFrameMetricWrapper
@@ -60,7 +57,6 @@ cx_add_class_qt_moc(cxGui_SRCS
     toolWidgets/cxToolPropertiesWidget
     toolWidgets/cxActiveToolWidget
     toolWidgets/cxToolManagerWidget
-    toolWidgets/cxProbeConfigWidget
     #----------------------
     utilities/cxAudioImpl
     utilities/cxToolImagePreviewWidget
