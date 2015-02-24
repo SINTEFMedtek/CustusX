@@ -27,23 +27,6 @@
 #            |--------build_Release
 #            |--------build32_Debug
 #
-#
-# old, deprecated structure:
-# 
-# --root---external---ITK---ITK
-#    |         |       |----build_Debug  
-#    |         |       |----build_Release
-#    |         |       |----build32_Debug
-#    |         |
-#    |         |------VTK---VTK
-#    |                 |----build_Debug  
-#    |                 |----build_Release
-#    |                 |----build32_Debug
-#    |-----working
-#              |------CustusX---CustusX
-#                      |--------build_Debug  
-#                      |--------build_Release
-#                      |--------build32_Debug
 #             
 #################################################             
 
@@ -81,16 +64,12 @@ class Common(object):
         self.xcode = False
         self.mBuildSSCExamples = True
         self.mBuildTesting = True
-        self.mGEStreamerUseOpenCL = True
-        self.mOSX_DEPLOYMENT_TARGET = "10.6" # Deploy for OSX 10.6 Snow Leopard and later
         self.short_pathnames = False
         if (platform.system() == 'Windows'):
             self.ninja = True
             self.short_pathnames = True
             self.mBuildSSCExamples = False
             self.mBuildTesting = True
-        if (platform.system() == "Darwin"):
-            self.mGEStreamerUseOpenCL = False # Turn off OpenCL for Mac as Jenkins tests are run on olevs mac, and OpenCL code don't work there yet
         self.mBuildExAndTest = False
         self.mCoverage = False
         self.build_developer_doc = False
@@ -113,10 +92,13 @@ class Common(object):
 
         self.gitrepo_internal_site_base = "user@example.com/path/to/folder" #intended for use with "git checkout ssh://%s"
         self.gitrepo_open_site_base = "git@github.com:SINTEFMedtek"  
+        
+        self.system_base_name = "CustusX"
 
     def printSettings(self):
         print ''
         print 'Settings:'
+        print '    system_base_name:', self.system_base_name
         print '    User:', getpass.getuser()
         print '    platform:', platform.system()
         print '    RootDir:', self.getRootDir()
@@ -134,7 +116,6 @@ class Common(object):
         print '    Threads:', self.threads
         print '    32 bit:', self.m32bit
         print '    git tag:', self.git_tag
-        print '    GEStreamerOpenCL:', self.mGEStreamerUseOpenCL
         print '    force_connect_sublibraries:', self.force_connect_sublibraries
         print '    short_pathnames:', self.short_pathnames
         print ''

@@ -48,12 +48,15 @@ class CustusXInstaller:
     def setTargetPlatform(self, target_platform):
         self.target_platform = target_platform  
 
-    def getInstalledRoot(self):
+    def set_system_base_name(self, system_base_name):
+        self.system_base_name = system_base_name # ='CustusX' in the default case
+        
+    def getInstalledFolder(self):
         '''
         Return path to base of the installation 
         performed by installPackage().
         '''
-        return self.install_root
+        return self.install_root+"/" + self.system_base_name
     
     def setInstallerPath(self, path):
         'set location of installer package (dmg, msi, gz) that should be installed'
@@ -66,12 +69,12 @@ class CustusXInstaller:
         
     def removePreviousJob(self):
         'remove all stuff from previous run of the installer'
-        PrintFormatter.printHeader('Removing files from previous install', 3);
-        shell.rm_r('%s/CustusX' % self.install_root)
-        shell.rm_r('%s/CustusX*.%s' % (self.installer_path, self._getInstallerPackageSuffix()))
+        PrintFormatter.printHeader('Removing files from previous install', 3)
+        shell.rm_r('%s/%s' % (self.install_root, self.system_base_name))
+        shell.rm_r('%s/%s*.%s' % (self.installer_path, self.system_base_name, self._getInstallerPackageSuffix()))
         shell.removeTree('%s/temp/Install' % self.root_dir)
-        shell.removeTree('%s/CustusX' % self.install_root)
-        
+        shell.removeTree('%s/%s' % (self.install_root, self.system_base_name))
+                         
     def createReleaseFolder(self):
         '''
         Create a folder containing all the files required for a Release.
@@ -104,6 +107,13 @@ class CustusXInstaller:
         
     def getTaggedFolderName(self):
         '''
+        Generate a folder name based on the current detected 
+        installer file.
+        It is assumed to be on the form 
+          <system_name>_<tag>.<suffix>
+        The tagged folder name equals the <tag>.
+        
+        Old, discarded implementation:
         Generate a folder name based on the current git tag.
         If not on a tag, create something similar but .dirty.
         Use the CustusX tags to generate - we assume that all
@@ -112,18 +122,33 @@ class CustusXInstaller:
         Examples: v15-04                (version 15-04)
                   v15-04-245.dtq2-dirty (untagged git checkout)
         '''
-        shell.changeDir(self.source_custusx_path) 
-        self._removeLocalTags()    
+        installerFile = self.findInstallerFile()
+        prefix = self.system_base_name + "_"
+        suffix = "." + self._getInstallerPackageSuffix()
         
-        output = shell.evaluate('git describe --tags --exact-match')
-        if output:
-            name = output.stdout.strip() 
-        else:
-            output = shell.evaluate('git describe --tags')
-            name = output.stdout.strip() 
-            name = '%s.%s-dirty' % (self._getDateString(), name)
-        #name = 'CustusX_%s' % name
-        return name
+        retval = os.path.basename(installerFile)
+
+        print "retval:", retval
+        if retval.startswith(prefix):
+            retval = retval[len(prefix): ] # remove prefix from start
+        print "retval:", retval
+        if retval.endswith(suffix):
+            retval = retval[ : -len(suffix)] # remove suffix from end
+        print "retval:", retval
+        return retval
+
+#        shell.changeDir(self.source_custusx_path) 
+#        self._removeLocalTags()    
+        
+#        output = shell.evaluate('git describe --tags --exact-match')
+#        if output:
+#            name = output.stdout.strip() 
+#        else:
+#            output = shell.evaluate('git describe --tags')
+#            name = output.stdout.strip() 
+#            name = '%s-dirty-%s' % (self._getDateString(), name)
+#        #name = 'CustusX_%s' % name
+#        return name
 
     def _generateReleaseFolderName(self):
         '''
@@ -131,10 +156,16 @@ class CustusXInstaller:
         This is a temporary folder that can be used to publish the release.
         '''
         taggedFolderName = self.getTaggedFolderName()
-        targetPath = '%s/Release/CustusX_%s' % (self.installer_path, taggedFolderName)
+        targetPath = '%s/Release/%s' % (self.installer_path, taggedFolderName)
+#        targetPath = '%s/Release/%s_%s' % (self.installer_path, self.system_base_name, taggedFolderName)
         return targetPath
     
     def copyReleaseFiles(self, targetPath):
+        # currently not in use (2015-02-22/CA): These files are mostly redundant (replaced by online docs), 
+        # and are located in the private repos.
+        # If we need to publish files along with the binaries, solve by letting cmake copy these to a specific folder, then
+        # python can look there, thus moving logic to cmake and using the system-polymorphism there.
+        #
         'Copy files into release folder in addition to the installer.'
         source = self.source_custusxsetup_path
         self._copyFile('%s/doc/ChangeLog.rtf' % source, targetPath)
@@ -226,7 +257,7 @@ class CustusXInstaller:
     
     def _getInstallerPackagePattern(self):
         suffix = self._getInstallerPackageSuffix()
-        return '%s/CustusX*.%s' % (self.installer_path, suffix)
+        return '%s/%s*.%s' % (self.installer_path, self.system_base_name, suffix)
         
     def _getInstallerPackageSuffix(self):
         if platform.system() == 'Darwin':
@@ -238,7 +269,7 @@ class CustusXInstaller:
         cx.utils.cxUtilities.assertTrue(False, 'suffix not found for OS=%s' % platform.system())
         
     def _installWindowsNSISExe(self, filename):
-        installfolder = '%s\CustusX' % self.install_root
+        installfolder = '%s\%s' % (self.install_root, self.system_base_name)
         installfolder = installfolder.replace("/", "\\")
         filename = filename.replace("/", "\\")
         cmd = ["%s" % filename, "/S", "/D=%s" % installfolder]

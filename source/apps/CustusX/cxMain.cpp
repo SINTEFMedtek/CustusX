@@ -106,8 +106,8 @@ int main(int argc, char *argv[])
 #endif
 
   cx::Application app(argc, argv);
-  app.setOrganizationName("SINTEF");
-  app.setOrganizationDomain("www.sintef.no");
+  app.setOrganizationName("CustusX");
+  app.setOrganizationDomain("www.custusx.org");
   app.setApplicationName("CustusX");
   app.setWindowIcon(QIcon(":/icons/CustusX.png"));
   app.setAttribute(Qt::AA_DontShowIconsInMenus, false);

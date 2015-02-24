@@ -325,6 +325,15 @@ endfunction()
 function(get_bundle_and_executable app bundle_var executable_var valid_var)
   set(valid 0)
 
+#  message(STATUS "app: " "${app}")
+#  if(EXISTS "${app}")
+#	message(STATUS "FOUND app: " "${app}")
+#  else()
+#	message(STATUS "NOT FOUND app: " "${app}")
+#  endif()
+
+#  message(FATAL_ERROR "exiting..")
+
   if(EXISTS "${app}")
     # Is it a directory ending in .app?
     if(IS_DIRECTORY "${app}")
@@ -363,7 +372,7 @@ function(get_bundle_and_executable app bundle_var executable_var valid_var)
       endif()
     endif()
   else()
-    message(STATUS "warning: *NOT* handled - directory/file does not exist...")
+	message(STATUS "warning: *NOT* handled - directory/file does not exist: " "${app}")
   endif()
 
   if(NOT valid)

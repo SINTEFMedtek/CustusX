@@ -722,7 +722,7 @@ void MainWindow::onApplicationStateChangedSlot()
 
 void MainWindow::updateWindowTitle()
 {
-	QString appName = stateService()->getApplicationStateName();
+	QString profileName = stateService()->getApplicationStateName();
 	QString versionName = stateService()->getVersionName();
 
 	QString activePatientFolder = patientService()->getActivePatientFolder();
@@ -736,7 +736,15 @@ void MainWindow::updateWindowTitle()
 		patientName = info.completeBaseName();
 	}
 
-	this->setWindowTitle("CustusX " + versionName + " - " + appName + " - " + patientName);
+	QString format("%1 %2 - %3 - %4  (not approved for medical use)");
+	QString title = format
+			.arg(qApp->applicationDisplayName())
+			.arg(versionName)
+			.arg(profileName)
+			.arg(patientName);
+	this->setWindowTitle(title);
+
+//	this->setWindowTitle("CustusX " + versionName + " - " + profileName + " - " + patientName);
 }
 
 void MainWindow::onWorkflowStateChangedSlot()
@@ -1021,21 +1029,23 @@ void MainWindow::registerToolBar(QToolBar* toolbar, QString groupname)
 void MainWindow::aboutSlot()
 {
 	QString doc_path = DataLocations::getDocPath();
+	QString appName = qApp->applicationDisplayName();
 	QString url_github("https://github.com/SINTEFMedtek/CustusX");
 	QString url_license = QString("file://%1/license.txt").arg(doc_path);
 	QString url_config = QString("file://%1/cxConfigDescription.txt").arg(doc_path);
 
 	QString text(""
-	"<h2>CustusX</h2>"
-	"<h4>%1</h4>"
+	"<h2>%1</h2>"
+	"<h4>%2</h4>"
 	"<p>A Research Platform for Image-Guided Therapy<p>"
-	"<p>CustusX is NOT approved for medical use.<p>"
+	"<p>%1 is NOT approved for medical use.<p>"
 	""
-	"<p><a href=%2> website </a><p>"
-	"<p><a href=%3> license </a><p>"
-	"<p><a href=%4> configuration </a><p>");
+	"<p><a href=%3> website </a><p>"
+	"<p><a href=%4> license </a><p>"
+	"<p><a href=%5> configuration </a><p>");
 
-	QMessageBox::about(this, tr("About CustusX"), text
+	QMessageBox::about(this, tr("About %s").arg(appName), text
+			.arg(appName)
 			.arg(CustusX_VERSION_STRING)
 			.arg(url_github)
 			.arg(url_license)

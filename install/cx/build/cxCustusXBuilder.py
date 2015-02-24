@@ -134,6 +134,7 @@ class CustusXBuilder:
         retval.setInstallerPath(installer_path)
         retval.setSourcePath(custusx.sourcePath())  
         retval.setTargetPlatform(self.assembly.controlData.getTargetPlatform())  
+        retval.set_system_base_name(self.assembly.controlData.system_base_name)
         
         return retval      
     

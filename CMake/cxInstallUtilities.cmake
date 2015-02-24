@@ -50,44 +50,63 @@ macro(cx_install_set_generators)
 
 endmacro()
 
+
 ###############################################################################
 #
-# Define variables used by various installer generators to customize
-# the installer look&feel.
+# Initialize a few properties to be used during package generation.
+#
+# These properties can be overriden anywhere in the system, and will
+# be converted to normal variable prior to package generation.
+#
+# Matched by cx_install_apply_customizable_properties()
 #
 ###############################################################################
-macro(cx_install_decorate_generators)
+macro(cx_install_initialize_customizable_properties)
 
 	cx_install_set_generator_filename()
-	set(CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/source/gui/icons/CustusX.png")
-    set(CPACK_PACKAGE_VENDOR "SINTEF Medical Technology")
-	set(CPACK_RESOURCE_FILE_WELCOME "${PROJECT_SOURCE_DIR}/install/install_text/install_welcome.txt")
-	set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/install/install_text/install_license.txt")
 
-#	if(APPLE)
-#		set(CPACK_RESOURCE_FILE_README "${PROJECT_SOURCE_DIR}/install/Apple/apple_install_readme.rtf")
-#	endif(APPLE)
+	set(CX_LICENSE_FILE "${CustusX_SOURCE_DIR}/License.txt")
+	set_property(GLOBAL PROPERTY CX_LICENSE_FILE "${CX_LICENSE_FILE}")
 
-#	if(CX_LINUX)
-#		set(CPACK_RESOURCE_FILE_README "${PROJECT_SOURCE_DIR}/install/Linux/copy/linux_install_readme.txt")
-#	endif(CX_LINUX)
+	set_property(GLOBAL PROPERTY CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/source/gui/icons/CustusX.png")
+	set_property(GLOBAL PROPERTY CPACK_PACKAGE_VENDOR "SINTEF Medical Technology")
+	set_property(GLOBAL PROPERTY CPACK_RESOURCE_FILE_WELCOME "${PROJECT_SOURCE_DIR}/install/install_text/install_welcome.txt")
+	set_property(GLOBAL PROPERTY CPACK_RESOURCE_FILE_README "${PROJECT_SOURCE_DIR}/install/install_text/install_readme.rtf")
+	set_property(GLOBAL PROPERTY CPACK_RESOURCE_FILE_LICENSE "${CX_LICENSE_FILE}")
 
 	if(CX_WINDOWS)
-		set(CPACK_NSIS_MUI_ICON "${PROJECT_SOURCE_DIR}/source/gui/icons\\\\CustusX.ico")
-        set(CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/source/gui/icons\\\\CustusX.png")
-#		set(CPACK_RESOURCE_FILE_README "${PROJECT_SOURCE_DIR}/install/Windows\\\\Windows_Install_ReadMe.rtf")
-		set(CPACK_NSIS_INSTALLED_ICON_NAME "bin/CustusX.exe")
+		set_property(GLOBAL PROPERTY CPACK_NSIS_MUI_ICON "${PROJECT_SOURCE_DIR}/source/gui/icons\\\\CustusX.ico")
+		set_property(GLOBAL PROPERTY CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/source/gui/icons\\\\CustusX.png")
+	endif (CX_WINDOWS)
+endmacro()
+
+###############################################################################
+#
+# Initialize a few properties to be used during package generation.
+#
+# These properties can be overriden anywhere in the system, and will
+# be converted to normal variable prior to package generation.
+#
+###############################################################################
+macro(cx_install_apply_customizable_properties)
+
+	get_property(CPACK_PACKAGE_ICON          GLOBAL PROPERTY CPACK_PACKAGE_ICON)
+	get_property(CPACK_PACKAGE_VENDOR        GLOBAL PROPERTY CPACK_PACKAGE_VENDOR)
+	get_property(CPACK_RESOURCE_FILE_WELCOME GLOBAL PROPERTY CPACK_RESOURCE_FILE_WELCOME)
+	get_property(CPACK_RESOURCE_FILE_README  GLOBAL PROPERTY CPACK_RESOURCE_FILE_README)
+	get_property(CPACK_RESOURCE_FILE_LICENSE GLOBAL PROPERTY CPACK_RESOURCE_FILE_LICENSE)
+
+	if(CX_WINDOWS)
+		get_property(CPACK_NSIS_MUI_ICON     GLOBAL PROPERTY CPACK_NSIS_MUI_ICON)
+		get_property(CPACK_PACKAGE_ICON      GLOBAL PROPERTY CPACK_PACKAGE_ICON)
+
+		set(CPACK_NSIS_INSTALLED_ICON_NAME "bin/${CX_SYSTEM_DEFAULT_APPLICATION}.exe")
 		set(CPACK_NSIS_MENU_LINKS "doc/Windows_Install_ReadMe.rtf" "README")
 
-		set(OpenIGTLinkServerName OpenIGTLinkServer)
-		if(CX_WIN32)
-			set(OpenIGTLinkServerName UltrasonixServer)
-		endif()
 		set(CPACK_PACKAGE_EXECUTABLES
-			"CustusX" "CustusX")
-		set(CPACK_PACKAGE_EXECUTABLES
-			${CPACK_PACKAGE_EXECUTABLES}
-			"${OpenIGTLinkServerName}" "${OpenIGTLinkServerName}")
+			"${CX_SYSTEM_DEFAULT_APPLICATION}" "${CX_SYSTEM_DEFAULT_APPLICATION}"
+			"OpenIGTLinkServer" "OpenIGTLinkServer"
+			)
 
 	endif (CX_WINDOWS)
 endmacro()
@@ -116,7 +135,7 @@ endmacro()
 #
 ###############################################################################
 macro(cx_install_set_generator_filename)
-	set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}_${${PROJECT_NAME}_VERSION_STRING}")
+	set(CPACK_PACKAGE_FILE_NAME "${CX_SYSTEM_BASE_NAME}_${${PROJECT_NAME}_VERSION_STRING}")
 	# append build type to name if not Release:
 	if(NOT ${CMAKE_BUILD_TYPE} STREQUAL "Release")
 		set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_FILE_NAME}_${CMAKE_BUILD_TYPE})
@@ -185,16 +204,19 @@ endmacro()
 ###############################################################################
 macro(cx_install_set_folder_structure)
 
-	set(CX_BUNDLE_NAME "CustusX")
+	cx_assert_variable_exists(${CX_SYSTEM_DEFAULT_APPLICATION})
+	cx_assert_variable_exists(${CX_SYSTEM_BASE_NAME})
+
+	set(CX_BUNDLE_NAME ${CX_SYSTEM_DEFAULT_APPLICATION})
 
 	set(CX_INSTALL_ROOT_DIR .)
 	if(APPLE)
 		set(CPACK_PACKAGING_INSTALL_PREFIX "/")
-		set(CX_INSTALL_ROOT_DIR "Applications/${CX_BUNDLE_NAME}")
+		set(CX_INSTALL_ROOT_DIR "Applications/${CX_SYSTEM_BASE_NAME}")
 	endif(APPLE)
 	if(CX_LINUX)
 		set(CPACK_PACKAGING_INSTALL_PREFIX "/")
-		set(CX_INSTALL_ROOT_DIR ${CX_BUNDLE_NAME})
+		set(CX_INSTALL_ROOT_DIR ${CX_SYSTEM_BASE_NAME})
 	endif(CX_LINUX)
         if(CX_WINDOWS)
             set(CPACK_PACKAGING_INSTALL_PREFIX "/")
@@ -211,6 +233,21 @@ macro(cx_install_set_folder_structure)
 
 endmacro()
 
+###############################################################################
+#
+# Needed to make sure all users get write permissions on the folder CustusX is installed in
+#
+# Note: might not be necessary any more as settings have been moved to ~/cx_settings folder.
+#
+###############################################################################
+#macro(cx_install_root_directory_full_permissions)
+#	set(TEMP_INSTALL_ROOT_DIR_SOURCE ${CMAKE_CURRENT_BINARY_DIR}/tmp/${CX_SYSTEM_BASE_NAME})
+#	file(MAKE_DIRECTORY ${TEMP_INSTALL_ROOT_DIR_SOURCE})
+#	install(DIRECTORY ${TEMP_INSTALL_ROOT_DIR_SOURCE}
+#		DESTINATION ${CX_INSTALL_ROOT_DIR}/..
+#		DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS}
+#		)
+#endmacro()
 
 
 ###############################################################################
@@ -220,6 +257,9 @@ endmacro()
 #
 ###############################################################################
 macro(cx_initialize_custusx_install)
+
+#	cx_install_root_directory_full_permissions()
+
 	set(CMAKE_INSTALL_DEFAULT_COMPONENT_NAME "Core")
 
 	cx_install_set_version_info()
@@ -227,7 +267,7 @@ macro(cx_initialize_custusx_install)
 	cx_install_set_relative_path()
 
 	cx_install_set_generators()
-	cx_install_decorate_generators()
+	cx_install_initialize_customizable_properties()
 
 	cx_install_set_folder_structure()
 
@@ -340,11 +380,6 @@ endif ()
 			DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS}
 			PATTERN "settings/*" EXCLUDE
 			PATTERN ${CONFIG_EXCLUDE_PATTERN} EXCLUDE)
-
-	# Install OpenCL kernels into bundle
-	install(FILES ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.usreconstruction.vnncl/kernels.cl
-               	  ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.usreconstruction.vnncl/kernels.cl.h
-			DESTINATION ${CX_INSTALL_ROOT_DIR}/config/shaders/)
 	
 	if(CX_USE_OPENCL_UTILITY)
 		install(FILES
@@ -541,6 +576,7 @@ foreach (_var IN LISTS matchedVars)
 ")
 endforeach()
 
+	cx_assert_variable_exists(${CX_SYSTEM_BASE_NAME})
 	cx_assert_variable_exists(${CustusX_VERSION_STRING})
 	cx_assert_variable_exists(${SSC_USE_GCOV})
 	cx_assert_variable_exists(${CX_USE_OPENCL_UTILITY})
@@ -548,9 +584,10 @@ endforeach()
 	# this text can be inserted into the about box with some effort...
 	set(CONFIGURATION_TEXT
 "
-Configuration for CustusX ${CustusX_VERSION_STRING}
+Configuration for ${CX_SYSTEM_BASE_NAME} ${CustusX_VERSION_STRING}
 
 	Build Settings:
+		System Base Name: ${CX_SYSTEM_BASE_NAME}
 		Built on system: ${CMAKE_SYSTEM} ${CMAKE_ARCHITECTURE} ${CMAKE_SYSTEM_PROCESSOR}
 		Build type: ${CMAKE_BUILD_TYPE}
 		Shared Libraries: ${BUILD_SHARED_LIBRARIES}

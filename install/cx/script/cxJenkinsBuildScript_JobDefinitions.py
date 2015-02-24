@@ -18,7 +18,6 @@ from cx.utils.cxPrintFormatter import PrintFormatter
 import cx.build.cxInstallData
 import cx.build.cxComponents
 import cx.build.cxCustusXBuilder
-import cx.build.cxCustusXTestInstallation
 
 import cxJenkinsBuildScriptBase
 
