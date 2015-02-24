@@ -167,7 +167,18 @@ endmacro()
 # Find the package and run the include USE file.
 ###############################################################################
 macro(cx_initialize_VTK)
-    find_package(VTK REQUIRED)
+	# this path add should be automatic, but fails at least on ca/macosx10.8
+	set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} ${VTK_DIR}/lib)
+	# vtk consist of (as of 6.1) 120 libs. This explicit inclusion brings is down to about half.
+	# gives about 15% compile speed increase
+	find_package(VTK COMPONENTS
+		vtkCommonCore vtkRenderingQt vtkRenderingOpenGL
+		vtkIOGeometry vtkIOLegacy vtkImagingStatistics
+		vtkImagingColor vtkIOMINC vtkFiltersModeling
+		vtkRenderingVolume vtkInteractionWidgets vtkParallelCore
+		vtkImagingMorphological vtkFiltersParallel vtkImagingMath
+		NO_MODULE)
+	#find_package(VTK REQUIRED) # import all libs
     include(${VTK_USE_FILE})
 endmacro()
 
@@ -175,8 +186,12 @@ endmacro()
 # Initialize ITK library
 # Find the package and run the include USE file.
 ###############################################################################
-macro(cx_initialize_ITK)
-    find_package(ITK REQUIRED)
+macro(cx_initialize_ITK )
+	find_package(ITK COMPONENTS
+		ITKCommon ITKIOVTK ITKVTK ITKIOImageBase ITKMathematicalMorphology
+		ITKSmoothing ITKRegionGrowing ITKBinaryMathematicalMorphology
+		ITKRegistrationCommon ITKQuadEdgeMesh ITKIOMesh ITKQuadEdgeMeshFiltering
+		)
     include(${ITK_USE_FILE})
 endmacro()
 
