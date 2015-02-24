@@ -40,6 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
+typedef boost::shared_ptr<class VisServices> VisServicesPtr;
+
 /**
 * \file
 * \addtogroup cx_module_acquisition
@@ -58,7 +60,7 @@ class org_custusx_acquisition_EXPORT  TrackedCenterlineWidget : public TrackedRe
 {
   Q_OBJECT
 public:
-  TrackedCenterlineWidget(AcquisitionServicePtr acquisitionService, QWidget* parent);
+  TrackedCenterlineWidget(AcquisitionServicePtr acquisitionService, VisServicesPtr services, QWidget* parent);
   virtual ~TrackedCenterlineWidget();
   virtual QString defaultWhatsThis() const;
 
@@ -77,6 +79,7 @@ private:
 
 //  Centerline  mCenterlineAlgorithm;
   QString mSessionID;
+  VisServicesPtr mServices;
 };
 
 /**

@@ -42,10 +42,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxUSAcqusitionWidget.h"
 #include "cxTrackedCenterlineWidget.h"
 
-#include "cxLegacySingletons.h"
 #include "cxPatientModelService.h"
 #include "cxUsReconstructionServiceProxy.h"
 #include "cxAcquisitionServiceProxy.h"
+#include "cxVisServices.h"
 
 namespace cx
 {
@@ -54,6 +54,7 @@ AcquisitionPlugin::AcquisitionPlugin(ctkPluginContext *context) :
 	mUsReconstructionService(new UsReconstructionServiceProxy(context)),
 	mAcquisitionService(new AcquisitionServiceProxy(context))
 {
+	mServices = VisServices::create(context);
 }
 
 AcquisitionPlugin::~AcquisitionPlugin()
@@ -65,9 +66,9 @@ std::vector<GUIExtenderService::CategorizedWidget> AcquisitionPlugin::createWidg
 {
 	std::vector<CategorizedWidget> retval;
 
-	retval.push_back(GUIExtenderService::CategorizedWidget(new USAcqusitionWidget(mAcquisitionService, mUsReconstructionService, NULL), "Utility"));
+	retval.push_back(GUIExtenderService::CategorizedWidget(new USAcqusitionWidget(mAcquisitionService, mServices, mUsReconstructionService, NULL), "Utility"));
 
-	retval.push_back(GUIExtenderService::CategorizedWidget(new TrackedCenterlineWidget(mAcquisitionService, NULL), "Utility"));
+	retval.push_back(GUIExtenderService::CategorizedWidget(new TrackedCenterlineWidget(mAcquisitionService, mServices, NULL), "Utility"));
 
 	return retval;
 

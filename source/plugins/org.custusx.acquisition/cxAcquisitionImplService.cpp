@@ -37,19 +37,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelServiceProxy.h"
 #include "cxSessionStorageServiceProxy.h"
 #include "cxXMLNodeWrapper.h"
+#include "cxVisServices.h"
 
 namespace cx
 {
 
 AcquisitionImplService::AcquisitionImplService(ctkPluginContext *context) :
 	mContext(context),
-	mAcquisitionData(new AcquisitionData()),
-	mAcquisition(new Acquisition(mAcquisitionData)),
-	mUsReconstructService(new UsReconstructionServiceProxy(context)),
-	mUsAcquisition(new USAcquisition(mAcquisition, mUsReconstructService)),
-	mPatientModelService(new PatientModelServiceProxy(context)),
-	mSession(SessionStorageServiceProxy::create(context))
+	mUsReconstructService(new UsReconstructionServiceProxy(context))
+//	mPatientModelService(new PatientModelServiceProxy(context)),
+//	mSession(SessionStorageServiceProxy::create(context))
 {
+	mServices = VisServices::create(context);
+	mAcquisitionData.reset(new AcquisitionData(mServices, mUsReconstructService));
+	mAcquisition.reset(new Acquisition(mAcquisitionData));
+	mUsAcquisition.reset(new USAcquisition(mAcquisition));
+
 	connect(mAcquisition.get(), &Acquisition::started, this, &AcquisitionService::started);
 	connect(mAcquisition.get(), &Acquisition::cancelled, this, &AcquisitionService::cancelled);
 	connect(mAcquisition.get(), &Acquisition::stateChanged, this, &AcquisitionService::stateChanged);

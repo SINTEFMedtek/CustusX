@@ -37,10 +37,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxStringPropertyBase.h"
 #include "cxTool.h"
-#include "cxLegacySingletons.h"
 
 namespace cx
 {
+typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
 
 /**
  * \file
@@ -54,8 +54,8 @@ class cxGui_EXPORT StringPropertyActiveTool : public StringPropertyBase
 {
   Q_OBJECT
 public:
-  static StringPropertyBasePtr New() { return StringPropertyBasePtr(new StringPropertyActiveTool()); }
-  StringPropertyActiveTool();
+  static StringPropertyBasePtr New(TrackingServicePtr trackingService) { return StringPropertyBasePtr(new StringPropertyActiveTool(trackingService)); }
+  explicit StringPropertyActiveTool(TrackingServicePtr trackingService);
   virtual ~StringPropertyActiveTool() {}
 
 public: // basic methods
@@ -67,6 +67,9 @@ public: // optional methods
   virtual QString getHelp() const;
   virtual QStringList getValueRange() const;
   virtual QString convertInternal2Display(QString internal);
+
+private:
+  TrackingServicePtr mTrackingService;
 };
 
 
@@ -80,8 +83,8 @@ class cxGui_EXPORT StringPropertyActiveProbeConfiguration : public StringPropert
 {
   Q_OBJECT
 public:
-  static StringPropertyActiveProbeConfigurationPtr New() { return StringPropertyActiveProbeConfigurationPtr(new StringPropertyActiveProbeConfiguration()); }
-  StringPropertyActiveProbeConfiguration();
+  static StringPropertyActiveProbeConfigurationPtr New(TrackingServicePtr trackingService) { return StringPropertyActiveProbeConfigurationPtr(new StringPropertyActiveProbeConfiguration(trackingService)); }
+  explicit StringPropertyActiveProbeConfiguration(TrackingServicePtr trackingService);
   virtual ~StringPropertyActiveProbeConfiguration() {}
 
 public: // basic methods
@@ -101,6 +104,7 @@ private slots:
   void activeToolChanged();
 private:
   ToolPtr mTool;
+  TrackingServicePtr mTrackingService;
 };
 
 

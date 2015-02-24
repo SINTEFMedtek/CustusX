@@ -51,6 +51,7 @@ set(LINK_LIBRARIES
     cxResource
     cxResourceWidgets
 	cxGui
+	cxLogicManager
 	cxGUIExtenderService
 	org_custusx_acquisition
 )

@@ -47,16 +47,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackingService.h"
 #include <cxActiveToolWidget.h>
 #include "cxDoubleWidgets.h"
-
-//TODO: remove
-#include "cxLegacySingletons.h"
+#include "cxVisServices.h"
 
 namespace cx
 {
 
 //------------------------------------------------------------------------------
-LapFrameToolCalibrationWidget::LapFrameToolCalibrationWidget(QWidget* parent) :
+LapFrameToolCalibrationWidget::LapFrameToolCalibrationWidget(VisServicesPtr services, QWidget* parent) :
     BaseWidget(parent, "LapFrameToolCalibrationWidget", "LapFrame Calibrate"),
+	mServices(services),
     mCalibrateButton(new QPushButton("Calibrate")),
     mReferencePointLabel(new QLabel("Ref. point:")),
     mTestButton(new QPushButton("Test calibration")),
@@ -104,7 +103,7 @@ LapFrameToolCalibrationWidget::LapFrameToolCalibrationWidget(QWidget* parent) :
   //setting default state
   this->toolSelectedSlot();
 
-  connect(cx::trackingService().get(), &cx::TrackingService::stateChanged, this, &LapFrameToolCalibrationWidget::trackingStartedSlot);
+  connect(mServices->getToolManager().get(), &cx::TrackingService::stateChanged, this, &LapFrameToolCalibrationWidget::trackingStartedSlot);
 }
 
 LapFrameToolCalibrationWidget::~LapFrameToolCalibrationWidget()
@@ -197,7 +196,7 @@ void LapFrameToolCalibrationWidget::toolSelectedSlot()
 
 void LapFrameToolCalibrationWidget::trackingStartedSlot()
 {
-	ToolPtr ref = trackingService()->getTool("calibration_tool");
+	ToolPtr ref = mServices->getToolManager()->getTool("calibration_tool");
 	if (ref)
 		mCalibRefTool->setValue(ref->getUid());
 }

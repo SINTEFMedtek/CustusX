@@ -41,6 +41,7 @@ namespace cx
 {
 typedef boost::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
 typedef boost::shared_ptr<class ThreadedTimedReconstructer> ThreadedTimedReconstructerPtr;
+typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 class TimedAlgorithmProgressBar;
 class DisplayTimerWidget;
 
@@ -62,7 +63,7 @@ class org_custusx_acquisition_EXPORT USAcqusitionWidget : public RecordBaseWidge
 {
 	Q_OBJECT
 public:
-	USAcqusitionWidget(AcquisitionServicePtr acquisitionService, UsReconstructionServicePtr usReconstructionService, QWidget* parent);
+	USAcqusitionWidget(AcquisitionServicePtr acquisitionService, VisServicesPtr services, UsReconstructionServicePtr usReconstructionService, QWidget* parent);
 	virtual ~USAcqusitionWidget();
 	virtual QString defaultWhatsThis() const;
 
@@ -80,6 +81,7 @@ private slots:
 
 private:
 	UsReconstructionServicePtr mUsReconstructionService;
+	VisServicesPtr mServices;
 	TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
 	DisplayTimerWidget* mDisplayTimerWidget;
 	QWidget* mOptionsWidget;

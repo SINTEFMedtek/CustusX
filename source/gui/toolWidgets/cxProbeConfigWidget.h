@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
+typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 
 /**
  *
@@ -56,7 +57,7 @@ class cxGui_EXPORT ProbeConfigWidget : public BaseWidget
 {
 	Q_OBJECT
 public:
-	ProbeConfigWidget(QWidget* parent=NULL);
+	ProbeConfigWidget(VisServicesPtr services, QWidget* parent=NULL);
 	virtual ~ProbeConfigWidget();
 	QWidget* getActiveProbeConfigWidget() { return mActiveProbeConfigWidget; }
 
@@ -72,6 +73,7 @@ private slots:
 private:
 	virtual QString defaultWhatsThis() const;
 
+	VisServicesPtr mServices;
 	QWidget* mActiveProbeConfigWidget;
 	BoundingBoxWidget* mBBWidget;
 	Vector3DPropertyBasePtr mOrigin;

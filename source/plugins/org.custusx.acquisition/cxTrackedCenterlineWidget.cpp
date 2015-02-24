@@ -46,21 +46,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewService.h"
 #include "cxRepContainer.h"
 #include "cxAcquisitionService.h"
-
-#include "cxLegacySingletons.h"
+#include "cxVisServices.h"
 
 namespace cx
 {
-TrackedCenterlineWidget::TrackedCenterlineWidget(AcquisitionServicePtr acquisitionService, QWidget* parent) :
+
+TrackedCenterlineWidget::TrackedCenterlineWidget(AcquisitionServicePtr acquisitionService, VisServicesPtr services, QWidget* parent) :
 	TrackedRecordWidget(acquisitionService, parent, "Tracked centerline")
 {
-  this->setObjectName("TrackedCenterlineWidget");
-  this->setWindowTitle("Tracked Centerline");
+	this->setObjectName("TrackedCenterlineWidget");
+	this->setWindowTitle("Tracked Centerline");
 
-	connect(trackingService().get(), &TrackingService::stateChanged, this, &TrackedCenterlineWidget::checkIfReadySlot);
-  mLayout->addStretch();
+	mServices = services;
+	connect(mServices->getToolManager().get(), &TrackingService::stateChanged, this, &TrackedCenterlineWidget::checkIfReadySlot);
+	mLayout->addStretch();
 
-  this->checkIfReadySlot();
+	this->checkIfReadySlot();
 }
 
 TrackedCenterlineWidget::~TrackedCenterlineWidget()
@@ -76,7 +77,7 @@ QString TrackedCenterlineWidget::defaultWhatsThis() const
 
 void TrackedCenterlineWidget::checkIfReadySlot()
 {
-  if(trackingService()->getState()>=Tool::tsTRACKING)
+  if(mServices->getToolManager()->getState()>=Tool::tsTRACKING)
   {
     mRecordSessionWidget->setReady(true, "<font color=green>Ready to record!</font>\n");
   }
@@ -128,7 +129,7 @@ void TrackedCenterlineWidget::preprocessResampler()
 	}
 
 	//visualize the tracked data as a mesh
-	loadMeshFromToolTransforms(patientService(), transforms_prMt);
+	loadMeshFromToolTransforms(mServices->getPatientService(), transforms_prMt);
 
 	//convert the transforms into a binary image
 	TrackingDataToVolume converter;
@@ -151,13 +152,13 @@ void TrackedCenterlineWidget::centerlineFinishedSlot()
 void TrackedCenterlineWidget::startedSlot(QString sessionId)
 {
   //show preview of tool path
-  TrackingService::ToolMap tools = trackingService()->getTools();
+  TrackingService::ToolMap tools = mServices->getToolManager()->getTools();
   TrackingService::ToolMap::iterator toolIt = tools.begin();
 
   ToolRep3DPtr activeRep3D;
   for(; toolIt != tools.end(); ++toolIt)
   {
-	  activeRep3D = viewService()->get3DReps()->findFirst<ToolRep3D>(toolIt->second);
+	  activeRep3D = mServices->visualizationService->get3DReps()->findFirst<ToolRep3D>(toolIt->second);
     if(!activeRep3D)
       continue;
     activeRep3D->getTracer()->clear();
@@ -168,13 +169,13 @@ void TrackedCenterlineWidget::startedSlot(QString sessionId)
 void TrackedCenterlineWidget::stoppedSlot(bool)
 {
   //hide preview of tool path
-  TrackingService::ToolMap tools = trackingService()->getTools();
+  TrackingService::ToolMap tools = mServices->getToolManager()->getTools();
   TrackingService::ToolMap::iterator toolIt = tools.begin();
 
   ToolRep3DPtr activeRep3D;
   for(; toolIt != tools.end(); ++toolIt)
   {
-	activeRep3D = viewService()->get3DReps()->findFirst<ToolRep3D>(toolIt->second);
+	activeRep3D = mServices->visualizationService->get3DReps()->findFirst<ToolRep3D>(toolIt->second);
     if(!activeRep3D)
       continue;
     if (activeRep3D->getTracer()->isRunning())
@@ -207,7 +208,7 @@ ToolPtr TrackedCenterlineWidget::findTool(double startTime, double stopTime)
 {
   ToolPtr retval;
 
-  SessionToolHistoryMap toolTransformMap = trackingService()->getSessionHistory(startTime, stopTime);
+  SessionToolHistoryMap toolTransformMap = mServices->getToolManager()->getSessionHistory(startTime, stopTime);
   if(toolTransformMap.size() == 1)
   {
 	report("Found one tool("+toolTransformMap.begin()->first->getName()+") with relevant data.");

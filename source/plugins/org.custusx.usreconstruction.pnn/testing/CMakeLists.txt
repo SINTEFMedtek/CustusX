@@ -17,7 +17,11 @@ if(BUILD_TESTING)
         .
         ${CMAKE_CURRENT_BINARY_DIR}
     )
-    target_link_libraries(cxtest_org_custusx_usreconstruction_pnn PRIVATE org_custusx_usreconstruction_pnn cxtest_org_custusx_usreconstruction cxtestUtilities cxCatch)
+	target_link_libraries(cxtest_org_custusx_usreconstruction_pnn
+		PRIVATE
+		org_custusx_usreconstruction_pnn
+		cxtest_org_custusx_usreconstruction cxtestUtilities cxCatch
+		cxLogicManager)
     cx_add_tests_to_catch(cxtest_org_custusx_usreconstruction_pnn)
 
 endif(BUILD_TESTING)

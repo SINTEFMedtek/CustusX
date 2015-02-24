@@ -53,6 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLegacySingletons.h"
 #include "cxSpaceProvider.h"
 #include "cxSpaceEditWidget.h"
+#include "cxLegacySingletons.h"
 
 namespace cx
 {
@@ -110,7 +111,8 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   mSpaceSelector->setValue(spaceProvider()->getPr());
   manualGroupLayout->addWidget(new SpaceEditWidget(this, mSpaceSelector));
 
-  mUSSectorConfigBox = new LabeledComboBoxWidget(this, StringPropertyActiveProbeConfiguration::New());
+  TrackingServicePtr ts = trackingService();
+  mUSSectorConfigBox = new LabeledComboBoxWidget(this, StringPropertyActiveProbeConfiguration::New(ts));
   mToptopLayout->addWidget(mUSSectorConfigBox);
   mUSSectorConfigBox->hide();
 

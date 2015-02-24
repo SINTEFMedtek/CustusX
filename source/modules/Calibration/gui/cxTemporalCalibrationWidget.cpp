@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkImageCorrelation.h"
 #include "cxLogger.h"
 #include "cxPatientModelService.h"
+#include "cxVisServices.h"
 
 typedef vtkSmartPointer<vtkImageCorrelation> vtkImageCorrelationPtr;
 typedef vtkSmartPointer<vtkDoubleArray> vtkDoubleArrayPtr;
@@ -62,13 +63,14 @@ namespace cx
 typedef unsigned char uchar;
 
 
-TemporalCalibrationWidget::TemporalCalibrationWidget(AcquisitionServicePtr acquisitionService, QWidget* parent) :
+TemporalCalibrationWidget::TemporalCalibrationWidget(VisServicesPtr services, AcquisitionServicePtr acquisitionService, QWidget* parent) :
 	BaseWidget(parent, "TemporalCalibrationWidget", "Temporal Calibration"),
 	mInfoLabel(new QLabel(""))
 {
+	mServices = services;
 
   mAlgorithm.reset(new TemporalCalibration);
-  connect(patientService().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
+  connect(mServices->getPatientService().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
 
 //  connect(mAcquisition.get(), SIGNAL(ready(bool,QString)), mRecordSessionWidget, SLOT(setReady(bool,QString)));
   connect(acquisitionService.get(), SIGNAL(saveDataCompleted(QString)), this, SLOT(selectData(QString)));
@@ -89,7 +91,7 @@ TemporalCalibrationWidget::TemporalCalibrationWidget(AcquisitionServicePtr acqui
   acqLabel->setToolTip(this->defaultWhatsThis());
   topLayout->addWidget(mInfoLabel);
   topLayout->addWidget(mRecordSessionWidget);
-  topLayout->addWidget(new LabeledComboBoxWidget(this, StringPropertyActiveProbeConfiguration::New()));
+  topLayout->addWidget(new LabeledComboBoxWidget(this, StringPropertyActiveProbeConfiguration::New(mServices->getToolManager())));
   topLayout->addWidget(new SpinBoxGroupWidget(this, DoublePropertyTimeCalibration::New()));
 
   topLayout->addWidget(this->createHorizontalLine());
@@ -149,7 +151,7 @@ void TemporalCalibrationWidget::showEvent(QShowEvent* event)
 void TemporalCalibrationWidget::patientChangedSlot()
 {
 //  std::cout << "TemporalCalibrationWidget::patientChangedSlot() "  << std::endl;
-  QString filename = patientService()->getActivePatientFolder() + "/US_Acq/";
+  QString filename = mServices->getPatientService()->getActivePatientFolder() + "/US_Acq/";
   mFileSelectWidget->setPath(filename);
 //  this->selectData(filename);
 }
@@ -168,7 +170,7 @@ void TemporalCalibrationWidget::selectData(QString filename)
 void TemporalCalibrationWidget::calibrateSlot()
 {
   if (mVerbose->isChecked())
-	mAlgorithm->setDebugFolder(patientService()->getActivePatientFolder()+"/Logs/");
+	mAlgorithm->setDebugFolder(mServices->getPatientService()->getActivePatientFolder()+"/Logs/");
   else
     mAlgorithm->setDebugFolder("");
 

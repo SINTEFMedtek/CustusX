@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVBoxLayout>
 #include "cxLabeledComboBoxWidget.h"
 #include "cxToolProperty.h"
+#include "cxLegacySingletons.h"
 
 namespace cx
 {
@@ -46,7 +47,8 @@ ActiveToolWidget::ActiveToolWidget(QWidget* parent) :
   this->setObjectName("ActiveToolWidget");
   layout->setMargin(0);
 
-  LabeledComboBoxWidget*  combo = new LabeledComboBoxWidget(this, StringPropertyActiveTool::New());
+  TrackingServicePtr ts = trackingService();
+  LabeledComboBoxWidget*  combo = new LabeledComboBoxWidget(this, StringPropertyActiveTool::New(ts));
   layout->addWidget(combo);
 }
 

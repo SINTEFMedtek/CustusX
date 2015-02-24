@@ -43,16 +43,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDefinitionStrings.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxTool.h"
+#include "cxVisServices.h"
 
-#include "cxLegacySingletons.h"
 #include "cxSpaceProvider.h"
 
 namespace cx
 {
 
 //------------------------------------------------------------------------------
-ToolTipCalibrateWidget::ToolTipCalibrateWidget(QWidget* parent) :
+ToolTipCalibrateWidget::ToolTipCalibrateWidget(VisServicesPtr services, QWidget* parent) :
     BaseWidget(parent, "ToolTipCalibrateWidget", "ToolTip Calibrate"),
+	mServices(services),
     mCalibrateButton(new QPushButton("Calibrate")),
     mReferencePointLabel(new QLabel("Ref. point:")),
     mTestButton(new QPushButton("Test calibration")),
@@ -106,11 +107,11 @@ void ToolTipCalibrateWidget::calibrateSlot()
   if(!refTool || !refTool->hasReferencePointWithId(1))
     return;
 
-  ToolPtr tool = trackingService()->getActiveTool();
-  CoordinateSystem to = spaceProvider()->getT(tool);
-  Vector3D P_t = spaceProvider()->getActiveToolTipPoint(to);
+  ToolPtr tool = mServices->getToolManager()->getActiveTool();
+  CoordinateSystem to = mServices->getSpaceProvider()->getT(tool);
+  Vector3D P_t = mServices->getSpaceProvider()->getActiveToolTipPoint(to);
 
-  ToolTipCalibrationCalculator calc(tool, refTool, P_t);
+  ToolTipCalibrationCalculator calc(mServices->getSpaceProvider(), tool, refTool, P_t);
   Transform3D calibration = calc.get_calibration_sMt();
 
   QMessageBox msgBox;
@@ -133,10 +134,10 @@ void ToolTipCalibrateWidget::testCalibrationSlot()
   if(!selectedTool || !selectedTool->hasReferencePointWithId(1))
     return;
 
-  CoordinateSystem to = spaceProvider()->getT(trackingService()->getActiveTool());
-  Vector3D sampledPoint = spaceProvider()->getActiveToolTipPoint(to);
+  CoordinateSystem to = mServices->getSpaceProvider()->getT(mServices->getToolManager()->getActiveTool());
+  Vector3D sampledPoint = mServices->getSpaceProvider()->getActiveToolTipPoint(to);
 
-  ToolTipCalibrationCalculator calc(trackingService()->getActiveTool(), selectedTool, sampledPoint);
+  ToolTipCalibrationCalculator calc(mServices->getSpaceProvider(), mServices->getToolManager()->getActiveTool(), selectedTool, sampledPoint);
   Vector3D delta_selectedTool = calc.get_delta_ref();
 
   mDeltaLabel->setText("<b>Delta:</b> "+qstring_cast(delta_selectedTool)+" <br> <b>Length:</b>  "+qstring_cast(delta_selectedTool.length()));
@@ -173,8 +174,8 @@ void ToolTipCalibrateWidget::toolSelectedSlot()
 
 
 
-ToolTipCalibrationCalculator::ToolTipCalibrationCalculator(ToolPtr tool, ToolPtr ref, Vector3D p_t) :
-    mTool(tool), mRef(ref), mP_t(p_t)
+ToolTipCalibrationCalculator::ToolTipCalibrationCalculator(SpaceProviderPtr spaces, ToolPtr tool, ToolPtr ref, Vector3D p_t) :
+	mTool(tool), mRef(ref), mP_t(p_t), mSpaces(spaces)
 {}
 
 ToolTipCalibrationCalculator::~ToolTipCalibrationCalculator()
@@ -197,10 +198,10 @@ Vector3D ToolTipCalibrationCalculator::get_sampledPoint_t()
 
 Vector3D ToolTipCalibrationCalculator::get_sampledPoint_ref()
 {
-  CoordinateSystem csT = spaceProvider()->getT(mTool); //from
-  CoordinateSystem csRef = spaceProvider()->getT(mRef); //to
+  CoordinateSystem csT = mSpaces->getT(mTool); //from
+  CoordinateSystem csRef = mSpaces->getT(mRef); //to
 
-  Transform3D refMt = spaceProvider()->get_toMfrom(csT, csRef);
+  Transform3D refMt = mSpaces->get_toMfrom(csT, csRef);
 
   Vector3D P_ref = refMt.coord(mP_t);
 
@@ -216,9 +217,9 @@ Transform3D ToolTipCalibrationCalculator::get_sMt_new()
 {
   Transform3D sMt_old = mTool->getCalibration_sMt();
 
-  CoordinateSystem csT = spaceProvider()->getT(mTool); //to
-  CoordinateSystem csRef = spaceProvider()->getT(mRef); //from
-  Transform3D tMref = spaceProvider()->get_toMfrom(csRef, csT);
+  CoordinateSystem csT = mSpaces->getT(mTool); //to
+  CoordinateSystem csRef = mSpaces->getT(mRef); //from
+  Transform3D tMref = mSpaces->get_toMfrom(csRef, csT);
 
   Vector3D delta_t = tMref.vector(this->get_delta_ref());
   Transform3D T_delta_t = createTransformTranslate(delta_t);

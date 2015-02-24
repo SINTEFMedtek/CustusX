@@ -45,15 +45,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVideoSource.h"
 #include "cxAcquisitionService.h"
 #include "cxUsReconstructionService.h"
+#include "cxVisServices.h"
 
 
 namespace cx
 {
 
-USAcquisition::USAcquisition(AcquisitionPtr base, UsReconstructionServicePtr reconstructer, QObject* parent) :
+USAcquisition::USAcquisition(AcquisitionPtr base, QObject* parent) :
 	QObject(parent),
 	mBase(base),
-	mUsReconstructionService(reconstructer),
 	mReady(true),
 	mInfoText("")
 {
@@ -62,10 +62,10 @@ USAcquisition::USAcquisition(AcquisitionPtr base, UsReconstructionServicePtr rec
 	connect(mCore.get(), SIGNAL(saveDataCompleted(QString)), this, SIGNAL(saveDataCompleted(QString)));
 
 
-	connect(trackingService().get(), &TrackingService::stateChanged, this, &USAcquisition::checkIfReadySlot);
-	connect(trackingService().get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(checkIfReadySlot()));
-	connect(videoService().get(), SIGNAL(activeVideoSourceChanged()), this, SLOT(checkIfReadySlot()));
-	connect(videoService().get(), &VideoService::connected, this, &USAcquisition::checkIfReadySlot);
+	connect(this->getServices()->getToolManager().get(), &TrackingService::stateChanged, this, &USAcquisition::checkIfReadySlot);
+	connect(this->getServices()->getToolManager().get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(checkIfReadySlot()));
+	connect(this->getServices()->getVideoService().get(), SIGNAL(activeVideoSourceChanged()), this, SLOT(checkIfReadySlot()));
+	connect(this->getServices()->getVideoService().get(), &VideoService::connected, this, &USAcquisition::checkIfReadySlot);
 
 	connect(mBase.get(), SIGNAL(started()), this, SLOT(recordStarted()));
 	connect(mBase.get(), SIGNAL(acquisitionStopped()), this, SLOT(recordStopped()), Qt::QueuedConnection);
@@ -79,11 +79,21 @@ USAcquisition::~USAcquisition()
 
 }
 
+VisServicesPtr USAcquisition::getServices()
+{
+	return mBase->getPluginData()->getServices();
+}
+
+UsReconstructionServicePtr USAcquisition::getReconstructer()
+{
+	return mBase->getPluginData()->getReconstructer();
+}
+
 void USAcquisition::checkIfReadySlot()
 {
-	bool tracking = trackingService()->getState()>=Tool::tsTRACKING;
-	bool streaming = videoService()->isConnected();
-	ToolPtr tool = trackingService()->getFirstProbe();
+	bool tracking = this->getServices()->getToolManager()->getState()>=Tool::tsTRACKING;
+	bool streaming = this->getServices()->getVideoService()->isConnected();
+	ToolPtr tool = this->getServices()->getToolManager()->getFirstProbe();
 
 	QString mWhatsMissing;
 	mWhatsMissing.clear();
@@ -139,9 +149,9 @@ int USAcquisition::getNumberOfSavingThreads() const
 
 void USAcquisition::recordStarted()
 {
-	mUsReconstructionService->selectData(USReconstructInputData()); // clear old data in reconstructeer
+	this->getReconstructer()->selectData(USReconstructInputData()); // clear old data in reconstructeer
 
-	ToolPtr tool = trackingService()->getFirstProbe();
+	ToolPtr tool = this->getServices()->getToolManager()->getFirstProbe();
 	mCore->setWriteColor(this->getWriteColor());
 	mCore->startRecord(mBase->getLatestSession(), tool, this->getRecordingVideoSources(tool));
 }
@@ -152,9 +162,9 @@ void USAcquisition::recordStopped()
 
 	this->sendAcquisitionDataToReconstructer();
 
-	mCore->set_rMpr(patientService()->get_rMpr());
+	mCore->set_rMpr(this->getServices()->getPatientService()->get_rMpr());
 	bool compress = settings()->value("Ultrasound/CompressAcquisition", true).toBool();
-	QString baseFolder = patientService()->getActivePatientFolder();
+	QString baseFolder = this->getServices()->getPatientService()->getActivePatientFolder();
 	mCore->startSaveData(baseFolder, compress);
 
 	mCore->clearRecording();
@@ -169,13 +179,13 @@ void USAcquisition::recordCancelled()
 
 void USAcquisition::sendAcquisitionDataToReconstructer()
 {
-	mCore->set_rMpr(patientService()->get_rMpr());
+	mCore->set_rMpr(this->getServices()->getPatientService()->get_rMpr());
 
-	VideoSourcePtr activeVideoSource = videoService()->getActiveVideoSource();
+	VideoSourcePtr activeVideoSource = this->getServices()->getVideoService()->getActiveVideoSource();
 	if (activeVideoSource)
 	{
 		USReconstructInputData data = mCore->getDataForStream(activeVideoSource->getUid());
-		mUsReconstructionService->selectData(data);
+		this->getReconstructer()->selectData(data);
 		emit acquisitionDataReady();
 	}
 }
@@ -193,15 +203,15 @@ std::vector<VideoSourcePtr> USAcquisition::getRecordingVideoSources(ToolPtr tool
 	}
 	else
 	{
-		retval = videoService()->getVideoSources();
+		retval = this->getServices()->getVideoService()->getVideoSources();
 	}
 
 	return retval;
 }
 
-bool USAcquisition::getWriteColor() const
+bool USAcquisition::getWriteColor()
 {
-	PropertyPtr angio = mUsReconstructionService->getParam("Angio data");
+	PropertyPtr angio = this->getReconstructer()->getParam("Angio data");
 	bool writeColor = angio->getValueAsVariant().toBool()
 	        ||  !settings()->value("Ultrasound/8bitAcquisitionData").toBool();
 	return writeColor;

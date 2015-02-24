@@ -40,10 +40,11 @@ namespace cx
 {
 
 
-StringPropertyActiveTool::StringPropertyActiveTool()
+StringPropertyActiveTool::StringPropertyActiveTool(TrackingServicePtr trackingService)
 {
-  connect(trackingService().get(), SIGNAL(activeToolChanged(const QString&)), this, SIGNAL(changed()));
-  connect(trackingService().get(), &TrackingService::stateChanged, this, &StringPropertyActiveTool::changed);
+	mTrackingService = trackingService;
+  connect(mTrackingService.get(), SIGNAL(activeToolChanged(const QString&)), this, SIGNAL(changed()));
+  connect(mTrackingService.get(), &TrackingService::stateChanged, this, &StringPropertyActiveTool::changed);
 }
 
 QString StringPropertyActiveTool::getDisplayName() const
@@ -53,20 +54,20 @@ QString StringPropertyActiveTool::getDisplayName() const
 
 bool StringPropertyActiveTool::setValue(const QString& value)
 {
-  ToolPtr newTool = trackingService()->getTool(value);
+  ToolPtr newTool = mTrackingService->getTool(value);
   if (!newTool)
 	  return false;
-  if(newTool == trackingService()->getActiveTool())
+  if(newTool == mTrackingService->getActiveTool())
     return false;
-  trackingService()->setActiveTool(newTool->getUid());
+  mTrackingService->setActiveTool(newTool->getUid());
   return true;
 }
 
 QString StringPropertyActiveTool::getValue() const
 {
-  if (!trackingService()->getActiveTool())
+  if (!mTrackingService->getActiveTool())
     return "";
-  return qstring_cast(trackingService()->getActiveTool()->getUid());
+  return qstring_cast(mTrackingService->getActiveTool()->getUid());
 }
 
 QString StringPropertyActiveTool::getHelp() const
@@ -76,7 +77,7 @@ QString StringPropertyActiveTool::getHelp() const
 
 QStringList StringPropertyActiveTool::getValueRange() const
 {
-	TrackingService::ToolMap tools = trackingService()->getTools();
+	TrackingService::ToolMap tools = mTrackingService->getTools();
 
 	QStringList retval;
 	for (TrackingService::ToolMap::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
@@ -86,7 +87,7 @@ QStringList StringPropertyActiveTool::getValueRange() const
 
 QString StringPropertyActiveTool::convertInternal2Display(QString internal)
 {
-  ToolPtr tool = trackingService()->getTool(internal);
+  ToolPtr tool = mTrackingService->getTool(internal);
   if (!tool)
     return "<no tool>";
   return qstring_cast(tool->getName());
@@ -103,10 +104,11 @@ QString StringPropertyActiveTool::convertInternal2Display(QString internal)
 /// -------------------------------------------------------
 
 
-StringPropertyActiveProbeConfiguration::StringPropertyActiveProbeConfiguration()
+StringPropertyActiveProbeConfiguration::StringPropertyActiveProbeConfiguration(TrackingServicePtr trackingService)
 {
-  connect(trackingService().get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(activeToolChanged()));
-  connect(trackingService().get(), &TrackingService::stateChanged, this, &StringPropertyActiveProbeConfiguration::activeToolChanged);
+	mTrackingService = trackingService;
+  connect(mTrackingService.get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(activeToolChanged()));
+  connect(mTrackingService.get(), &TrackingService::stateChanged, this, &StringPropertyActiveProbeConfiguration::activeToolChanged);
   this->activeToolChanged();
 }
 
@@ -114,7 +116,7 @@ void StringPropertyActiveProbeConfiguration::activeToolChanged()
 {
 	// ignore tool changes to something non-probeish.
 	// This gives the user a chance to use the widget without having to show the probe.
-	ToolPtr newTool = trackingService()->getFirstProbe();
+	ToolPtr newTool = mTrackingService->getFirstProbe();
 	if (!newTool || !newTool->getProbe())
 		return;
 

@@ -44,13 +44,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-SoundSpeedConverterWidget::SoundSpeedConverterWidget(QWidget* parent) :
+SoundSpeedConverterWidget::SoundSpeedConverterWidget(TrackingServicePtr trackingService, QWidget* parent) :
     BaseWidget(parent, "SoundSpeedConverterWidget", "Sound Speed Converter"),
     mScannerSoundSpeed(1540.0),
     mApplyButton(new QPushButton("Apply compensation")),
     mResetButton(new QPushButton("Reset")),
     mSoundSpeedSpinBox(new QDoubleSpinBox()),
-    mWaterDegreeSpinBox(new QDoubleSpinBox())
+	mWaterDegreeSpinBox(new QDoubleSpinBox()),
+	mTrackingService(trackingService)
 {
   QVBoxLayout* vLayout = new QVBoxLayout(this);
 
@@ -78,6 +79,8 @@ SoundSpeedConverterWidget::SoundSpeedConverterWidget(QWidget* parent) :
 
   this->resetSlot();
   this->updateButtons();
+
+  connect(mTrackingService.get(), &TrackingService::activeToolChanged, this, &SoundSpeedConverterWidget::setToolSlot);
 }
 
 SoundSpeedConverterWidget::~SoundSpeedConverterWidget()
@@ -106,7 +109,7 @@ void SoundSpeedConverterWidget::applySoundSpeedCompensationFactorSlot()
 
 void SoundSpeedConverterWidget::setToolSlot(const QString& uid)
 {
-  ToolPtr tool = trackingService()->getTool(uid);
+  ToolPtr tool = mTrackingService->getTool(uid);
   ProbePtr probe = tool->getProbe();
   if(!probe)
     return;

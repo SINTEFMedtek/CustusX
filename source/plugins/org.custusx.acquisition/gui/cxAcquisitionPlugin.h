@@ -54,6 +54,7 @@ typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
 typedef boost::shared_ptr<class AcquisitionPlugin> AcquisitionPluginPtr;
 typedef boost::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
 typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
+typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 
 
 /**
@@ -77,6 +78,7 @@ public:
 private:
 	UsReconstructionServicePtr mUsReconstructionService;
 	AcquisitionServicePtr mAcquisitionService;
+	VisServicesPtr mServices;
 };
 
 /**

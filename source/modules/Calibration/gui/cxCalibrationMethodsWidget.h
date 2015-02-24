@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
+typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
 
 /**
@@ -49,9 +50,9 @@ typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
 class cxPluginCalibration_EXPORT CalibrationMethodsWidget : public TabbedWidget
 {
 public:
-  CalibrationMethodsWidget(PatientModelServicePtr patientModelService, AcquisitionServicePtr acquisitionService,
+  CalibrationMethodsWidget(VisServicesPtr services, AcquisitionServicePtr acquisitionService,
   		QWidget* parent, QString objectName, QString windowTitle);
-  virtual ~CalibrationMethodsWidget(){};
+  virtual ~CalibrationMethodsWidget() {}
   virtual QString defaultWhatsThis() const;
 };
 //------------------------------------------------------------------------------

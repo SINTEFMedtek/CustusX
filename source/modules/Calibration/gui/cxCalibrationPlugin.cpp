@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxCalibrationMethodsWidget.h"
 //#include "cxAcquisitionData.h"
 #include "cxPatientModelService.h"
+#include "cxLogicManager.h"
+#include "cxVisServices.h"
 
 namespace cx
 {
@@ -42,6 +44,7 @@ CalibrationPlugin::CalibrationPlugin(PatientModelServicePtr patientModelService,
 		mAcquisitionService(acquisitionService),
 		mPatientModelService(patientModelService)
 {
+	mServices = VisServices::create(logicManager()->getPluginContext());
 }
 
 CalibrationPlugin::~CalibrationPlugin()
@@ -54,7 +57,7 @@ std::vector<GUIExtenderService::CategorizedWidget> CalibrationPlugin::createWidg
 	std::vector<CategorizedWidget> retval;
 
 	retval.push_back(GUIExtenderService::CategorizedWidget(
-			new CalibrationMethodsWidget(mPatientModelService, mAcquisitionService, NULL, "CalibrationMethodsWidget", "Calibration Methods"),
+			new CalibrationMethodsWidget(mServices, mAcquisitionService, NULL, "CalibrationMethodsWidget", "Calibration Methods"),
 			"Algorithms"));
 
 	return retval;

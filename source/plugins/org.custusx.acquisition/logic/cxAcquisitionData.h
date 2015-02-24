@@ -45,6 +45,8 @@ class QDomNode;
 namespace cx
 {
 typedef boost::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
+typedef boost::shared_ptr<class VisServices> VisServicesPtr;
+
 /**
 * \file
 * \addtogroup cx_module_acquisition
@@ -63,7 +65,7 @@ class org_custusx_acquisition_EXPORT AcquisitionData : public QObject
 
 public:
 	AcquisitionData();
-	AcquisitionData(UsReconstructionServicePtr reconstructer);
+	AcquisitionData(VisServicesPtr services, UsReconstructionServicePtr reconstructer);
 	virtual ~AcquisitionData();
 
 	void addRecordSession(RecordSessionPtr session);
@@ -71,6 +73,9 @@ public:
 	std::vector<RecordSessionPtr> getRecordSessions();
 	RecordSessionPtr getRecordSession(QString uid);
 	QString getNewUid();
+
+	VisServicesPtr getServices() { return mServices; }
+	UsReconstructionServicePtr getReconstructer() { return mReconstructer; }
 
 	//Interface for saving/loading
 	void addXml(QDomNode& dataNode);
@@ -84,6 +89,7 @@ private:
 	std::vector<RecordSessionPtr> mRecordSessions;
 
 	// referenced plugins:
+	VisServicesPtr mServices;
 	UsReconstructionServicePtr mReconstructer;
 };
 typedef boost::shared_ptr<AcquisitionData> AcquisitionDataPtr;

@@ -22,7 +22,6 @@ set( MOC_HEADER_FILES
     logic/cxResampleImageFilter.h
     logic/cxDilationFilter.h
     gui/cxAlgorithmPlugin.h
-    gui/cxTimedAlgorithmProgressBar.h
     gui/cxFilterWidget.h
     gui/cxPipelineWidget.h
     gui/cxAllFiltersWidget.h
@@ -51,8 +50,6 @@ set( SOURCE_FILES
     logic/cxResampleImageFilter.cpp
     gui/cxAlgorithmPlugin.h
     gui/cxAlgorithmPlugin.cpp
-    gui/cxTimedAlgorithmProgressBar.h
-    gui/cxTimedAlgorithmProgressBar.cpp
     gui/cxFilterWidget.h
     gui/cxFilterWidget.cpp
     gui/cxPipelineWidget.h

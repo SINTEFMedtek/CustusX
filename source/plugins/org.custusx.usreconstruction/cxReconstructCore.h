@@ -38,7 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxBoundingBox3D.h"
 #include "cxForwardDeclarations.h"
 #include "cxReconstructedOutputVolumeParams.h"
-#include "cxLegacySingletons.h"
 
 namespace cx
 {

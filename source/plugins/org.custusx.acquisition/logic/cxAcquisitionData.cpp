@@ -44,14 +44,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxUsReconstructionService.h"
 #include "cxReporter.h"
 
-#include "cxLegacySingletons.h"
-
 namespace cx
 {
 AcquisitionData::AcquisitionData()
 {}
 
-AcquisitionData::AcquisitionData(UsReconstructionServicePtr reconstructer) :
+AcquisitionData::AcquisitionData(VisServicesPtr services, UsReconstructionServicePtr reconstructer) :
+	mServices(services),
 	mReconstructer(reconstructer)
 {
 

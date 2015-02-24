@@ -45,26 +45,24 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSpaceProvider.h"
 #include "cxPatientModelService.h"
 #include "cxReporter.h"
-
-//TODO: remove
-#include "cxLegacySingletons.h"
+#include "cxVisServices.h"
 
 namespace cx
 {
 
-ToolTipSampleWidget::ToolTipSampleWidget(PatientModelServicePtr patientModelService, QWidget* parent) :
+ToolTipSampleWidget::ToolTipSampleWidget(VisServicesPtr services, QWidget* parent) :
     BaseWidget(parent, "ToolTipSampleWidget", "ToolTip Sample"),
+	mServices(services),
     mSampleButton(new QPushButton("Sample")),
     mSaveToFileNameLabel(new QLabel("<font color=red> No file selected </font>")),
     mSaveFileButton(new QPushButton("Save to...")),
-	mTruncateFile(false),
-	mPatientModelService(patientModelService)
+	mTruncateFile(false)
 {
   QVBoxLayout* toplayout = new QVBoxLayout(this);
 
   mCoordinateSystems = StringPropertySelectCoordinateSystem::New();
   mTools = StringPropertySelectTool::New();
-	mData = StringPropertySelectData::New(patientModelService);
+	mData = StringPropertySelectData::New(mServices->getPatientService());
 
   mCoordinateSystemComboBox = new LabeledComboBoxWidget(this, mCoordinateSystems);
   mToolComboBox = new LabeledComboBoxWidget(this, mTools);
@@ -103,8 +101,8 @@ QString ToolTipSampleWidget::defaultWhatsThis() const
 void ToolTipSampleWidget::saveFileSlot()
 {
   QString configPath = profile()->getPath();
-  if(mPatientModelService->isPatientValid())
-	configPath = mPatientModelService->getActivePatientFolder();
+  if(mServices->getPatientService()->isPatientValid())
+	configPath = mServices->getPatientService()->getActivePatientFolder();
 
   QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"),
                              configPath+"/SampledPoints.txt",
@@ -122,7 +120,7 @@ void ToolTipSampleWidget::sampleSlot()
   QFile samplingFile(mSaveToFileNameLabel->text());
 
   CoordinateSystem to = this->getSelectedCoordinateSystem();
-  Vector3D toolPoint = spaceProvider()->getActiveToolTipPoint(to, false);
+  Vector3D toolPoint = mServices->getSpaceProvider()->getActiveToolTipPoint(to, false);
 
   if(!samplingFile.open(QIODevice::WriteOnly | (mTruncateFile ? QIODevice::Truncate : QIODevice::Append)))
   {
@@ -178,13 +176,13 @@ CoordinateSystem ToolTipSampleWidget::getSelectedCoordinateSystem()
   switch (retval.mId)
   {
   case csDATA:
-	retval = spaceProvider()->getD(mData->getData());
+	retval = mServices->getSpaceProvider()->getD(mData->getData());
     break;
   case csTOOL:
-	retval = spaceProvider()->getT(mTools->getTool());
+	retval = mServices->getSpaceProvider()->getT(mTools->getTool());
     break;
   case csSENSOR:
-	retval = spaceProvider()->getT(mTools->getTool());
+	retval = mServices->getSpaceProvider()->getT(mTools->getTool());
     break;
   default:
     retval.mRefObject = "";

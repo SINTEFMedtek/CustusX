@@ -45,6 +45,7 @@ typedef boost::shared_ptr<class USAcquisition> USAcquisitionPtr;
 typedef boost::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
 typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
 typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
+typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 
 /** \brief Implementation for Acqusition service
  *
@@ -88,6 +89,7 @@ private:
 	USAcquisitionPtr mUsAcquisition;
 	PatientModelServicePtr mPatientModelService;
 	SessionStorageServicePtr mSession;
+	VisServicesPtr mServices;
 
 	void addXml(QDomNode& dataNode);
 	void parseXml(QDomNode& dataNode);

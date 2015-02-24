@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
+typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
 /**
  * \file
@@ -54,7 +55,7 @@ class cxPluginCalibration_EXPORT ToolManualCalibrationWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  ToolManualCalibrationWidget(QWidget* parent);
+  ToolManualCalibrationWidget(VisServicesPtr services, QWidget* parent);
   virtual ~ToolManualCalibrationWidget() {}
   virtual QString defaultWhatsThis() const;
 
@@ -66,6 +67,7 @@ private:
   QGroupBox* mGroup;
   Transform3DWidget* mMatrixWidget;
   StringPropertySelectToolPtr mTool;
+  VisServicesPtr mServices;
 };
 
 

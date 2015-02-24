@@ -37,15 +37,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackingService.h"
 #include "cxDataInterface.h"
 #include "cxHelperWidgets.h"
-
-//TODO: remove
-#include "cxLegacySingletons.h"
+#include "cxVisServices.h"
 
 namespace cx
 {
 
-ToolManualCalibrationWidget::ToolManualCalibrationWidget(QWidget* parent) :
-    BaseWidget(parent, "ToolManualCalibrationWidget", "Tool Manual Calibrate")
+ToolManualCalibrationWidget::ToolManualCalibrationWidget(VisServicesPtr services, QWidget* parent) :
+	BaseWidget(parent, "ToolManualCalibrationWidget", "Tool Manual Calibrate"),
+	mServices(services)
 {
   //layout
   QVBoxLayout* mToptopLayout = new QVBoxLayout(this);
@@ -71,7 +70,7 @@ ToolManualCalibrationWidget::ToolManualCalibrationWidget(QWidget* parent) :
 
   mToptopLayout->addStretch();
 
-  connect(trackingService().get(), &TrackingService::stateChanged, this, &ToolManualCalibrationWidget::toolCalibrationChanged);
+  connect(mServices->getToolManager().get(), &TrackingService::stateChanged, this, &ToolManualCalibrationWidget::toolCalibrationChanged);
 }
 
 

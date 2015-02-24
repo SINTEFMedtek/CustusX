@@ -47,6 +47,10 @@ typedef boost::shared_ptr<class UsReconstructionFileMaker> UsReconstructionFileM
 typedef boost::shared_ptr<class SavingVideoRecorder> SavingVideoRecorderPtr;
 typedef boost::shared_ptr<class USSavingRecorder> USSavingRecorderPtr;
 typedef boost::shared_ptr<class Acquisition> AcquisitionPtr;
+typedef boost::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
+typedef boost::shared_ptr<class VisServices> VisServicesPtr;
+typedef boost::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
+typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 
 
 /**
@@ -74,7 +78,7 @@ class org_custusx_acquisition_EXPORT USAcquisition : public QObject
 {
 	Q_OBJECT
 public:
-	USAcquisition(AcquisitionPtr base, UsReconstructionServicePtr reconstructer, QObject* parent = 0);
+	USAcquisition(AcquisitionPtr base, QObject* parent = 0);
 	virtual ~USAcquisition();
 	int getNumberOfSavingThreads() const;
 	bool isReady() const { return mReady; }
@@ -97,12 +101,14 @@ private slots:
 
 private:
 	std::vector<VideoSourcePtr> getRecordingVideoSources(ToolPtr tool);
-	bool getWriteColor() const;
+	bool getWriteColor();
 	void sendAcquisitionDataToReconstructer();
 	void setReady(bool val, QString text);
 
+	VisServicesPtr getServices();
+	UsReconstructionServicePtr getReconstructer();
+
 	AcquisitionPtr mBase;
-	UsReconstructionServicePtr mUsReconstructionService;
 	USSavingRecorderPtr mCore;
 	bool mReady;
 	QString mInfoText;

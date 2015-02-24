@@ -45,6 +45,7 @@ class QLineEdit;
 
 namespace cx
 {
+typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 typedef boost::shared_ptr<class StringPropertySelectData> StringPropertySelectDataPtr;
 class LabeledComboBoxWidget;
 
@@ -62,7 +63,7 @@ class cxPluginCalibration_EXPORT ToolTipSampleWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  ToolTipSampleWidget(PatientModelServicePtr patientModelService, QWidget* parent);
+  ToolTipSampleWidget(VisServicesPtr services, QWidget* parent);
   ~ToolTipSampleWidget();
   virtual QString defaultWhatsThis() const;
 
@@ -74,6 +75,7 @@ private slots:
 private:
   CoordinateSystem getSelectedCoordinateSystem();
 
+  VisServicesPtr mServices;
   QPushButton* mSampleButton;
   QLabel*      mSaveToFileNameLabel;
   QPushButton* mSaveFileButton;
@@ -84,7 +86,6 @@ private:
   LabeledComboBoxWidget* mToolComboBox;
   LabeledComboBoxWidget* mDataComboBox;
   bool mTruncateFile;
-  PatientModelServicePtr mPatientModelService;
 };
 
 

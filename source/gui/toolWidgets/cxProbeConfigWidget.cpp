@@ -44,17 +44,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxHelperWidgets.h"
 #include "cxTypeConversions.h"
 #include "cxDoublePairProperty.h"
+//#include "cxLegacySingletons.h"
+#include "cxVisServices.h"
 
 namespace cx
 {
 
-ProbeConfigWidget::ProbeConfigWidget(QWidget* parent) : BaseWidget(parent, "ProbeConfigWidget", "Probe Configuration")
+ProbeConfigWidget::ProbeConfigWidget(VisServicesPtr services, QWidget* parent) : BaseWidget(parent, "ProbeConfigWidget", "Probe Configuration")
 {
+	mServices = services;
 	mUpdating = false;
 	this->setToolTip(this->defaultWhatsThis());
 
 	QVBoxLayout* topLayout = new QVBoxLayout(this);
-	mActiveProbeConfig = StringPropertyActiveProbeConfiguration::New();
+	TrackingServicePtr ts = mServices->getToolManager();
+	mActiveProbeConfig = StringPropertyActiveProbeConfiguration::New(ts);
 	connect(mActiveProbeConfig.get(), SIGNAL(changed()), this, SLOT(activeProbeConfigurationChangedSlot()));
 	mActiveProbeConfigWidget = new LabeledComboBoxWidget(this, mActiveProbeConfig);
 	topLayout->addWidget(mActiveProbeConfigWidget);

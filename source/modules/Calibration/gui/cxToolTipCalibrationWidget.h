@@ -49,6 +49,7 @@ class QLineEdit;
 namespace cx
 {
 class LabeledComboBoxWidget;
+typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 
 /**
  * \file
@@ -67,7 +68,7 @@ class cxPluginCalibration_EXPORT ToolTipCalibrateWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  ToolTipCalibrateWidget(QWidget* parent);
+  ToolTipCalibrateWidget(VisServicesPtr services, QWidget* parent);
   ~ToolTipCalibrateWidget();
   virtual QString defaultWhatsThis() const;
 
@@ -77,6 +78,7 @@ private slots:
   void toolSelectedSlot();
 
 private:
+  VisServicesPtr mServices;
   QPushButton* mCalibrateButton;
   LabeledComboBoxWidget* mCalibrateToolComboBox;
   QLabel* mReferencePointLabel;
@@ -93,7 +95,7 @@ private:
 class cxPluginCalibration_EXPORT ToolTipCalibrationCalculator
 {
 public:
-  ToolTipCalibrationCalculator(ToolPtr tool, ToolPtr ref, Vector3D p_t = Vector3D());
+  ToolTipCalibrationCalculator(SpaceProviderPtr spaces, ToolPtr tool, ToolPtr ref, Vector3D p_t = Vector3D());
   ~ToolTipCalibrationCalculator();
 
   Vector3D get_delta_ref(); ///< how far from the reference point the sampled point is, in pr's coord
@@ -105,6 +107,7 @@ private:
   Vector3D get_referencePoint_ref(); ///< the ref tools reference point in ref space
   Transform3D get_sMt_new(); ///< the new calibration
 
+  SpaceProviderPtr mSpaces;
   ToolPtr mTool; ///< the tool the sampled point is taken from
   ToolPtr mRef; ///< the tool that contains the reference point we are going to calibrate against
   Vector3D mP_t; ///< the sampled point we are working on

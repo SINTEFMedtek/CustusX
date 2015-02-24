@@ -36,7 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxDoublePropertyBase.h"
 #include "cxForwardDeclarations.h"
-#include "cxLegacySingletons.h"
 
 namespace cx
 {

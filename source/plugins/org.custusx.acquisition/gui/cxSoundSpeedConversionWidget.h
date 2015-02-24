@@ -37,7 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxBaseWidget.h"
 #include "cxTool.h"
-#include "cxLegacySingletons.h"
 
 class QPushButton;
 class QDoubleSpinBox;
@@ -63,34 +62,34 @@ class org_custusx_acquisition_EXPORT  SoundSpeedConverterWidget : public BaseWid
   Q_OBJECT
 
 public:
-  SoundSpeedConverterWidget(QWidget* parent);
+  SoundSpeedConverterWidget(TrackingServicePtr trackingService, QWidget* parent=NULL);
   ~SoundSpeedConverterWidget();
 
   virtual QString defaultWhatsThis() const;
 
-  double getSoundSpeedCompensationFactor(); ///< calculates the sound speed conversion factor
-  double getWaterSoundSpeed(); ///< the sound speed in water given a temperatur
-
-  void setProbe(ProbePtr probe);
-
 public slots:
   void applySoundSpeedCompensationFactorSlot(); ///< sets the sounds speed conversion factor on the rt source
-  void setToolSlot(const QString& uid); ///< convenient slot for connecting to the toolmanagers activeToolChanged signal
 
 private slots:
   void waterSoundSpeedChangedSlot();
   void waterDegreeChangedSlot();
   void resetSlot();
+  void setToolSlot(const QString& uid); ///< convenient slot for connecting to the toolmanagers activeToolChanged signal
 
 private:
   void setSoundSpeed(double soundspeed);
   void setWaterDegree(double degree);
   void updateButtons();
 
+  double getSoundSpeedCompensationFactor(); ///< calculates the sound speed conversion factor
+  double getWaterSoundSpeed(); ///< the sound speed in water given a temperatur
+  void setProbe(ProbePtr probe);
+
   const double mScannerSoundSpeed; //m/s
   double mToSoundSpeed; //m/s
 
   ProbePtr mProbe;
+  TrackingServicePtr mTrackingService;
 
   QPushButton*    mApplyButton; ///< applies the compensation on the rt source
   QPushButton*    mResetButton; ///< resets the sound speed to scanner sound speed

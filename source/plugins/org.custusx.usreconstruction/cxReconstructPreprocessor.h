@@ -39,7 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReconstructedOutputVolumeParams.h"
 #include "cxReconstructCore.h"
 #include "cxUSReconstructInputData.h"
-#include "cxLegacySingletons.h"
 
 namespace cx
 {

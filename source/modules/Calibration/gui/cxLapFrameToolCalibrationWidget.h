@@ -49,6 +49,8 @@ class QLineEdit;
 
 namespace cx
 {
+typedef boost::shared_ptr<class VisServices> VisServicesPtr;
+
 /**
  * \file
  * \addtogroup cx_module_calibration
@@ -67,7 +69,7 @@ class cxPluginCalibration_EXPORT LapFrameToolCalibrationWidget : public BaseWidg
   Q_OBJECT
 
 public:
-  LapFrameToolCalibrationWidget(QWidget* parent);
+  LapFrameToolCalibrationWidget(VisServicesPtr services, QWidget* parent);
   virtual ~LapFrameToolCalibrationWidget();
   virtual QString defaultWhatsThis() const;
 
@@ -78,6 +80,7 @@ private slots:
   void trackingStartedSlot();
 
 private:
+  VisServicesPtr mServices;
   QPushButton* mCalibrateButton;
 //  LabeledComboBoxWidget* mCalibrateToolComboBox;
   QLabel* mReferencePointLabel;

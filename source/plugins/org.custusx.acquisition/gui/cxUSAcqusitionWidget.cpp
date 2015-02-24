@@ -53,18 +53,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxStringProperty.h"
 #include "cxUsReconstructionService.h"
 #include "cxHelperWidgets.h"
+#include "cxVisServices.h"
 
 
 namespace cx
 {
 
-USAcqusitionWidget::USAcqusitionWidget(AcquisitionServicePtr acquisitionService, UsReconstructionServicePtr usReconstructionService, QWidget* parent) :
+USAcqusitionWidget::USAcqusitionWidget(AcquisitionServicePtr acquisitionService, VisServicesPtr services, UsReconstructionServicePtr usReconstructionService, QWidget* parent) :
 	RecordBaseWidget(acquisitionService, parent, settings()->value("Ultrasound/acquisitionName").toString()),
 	mUsReconstructionService(usReconstructionService)
 {
 	this->setObjectName("USAcqusitionWidget");
 	this->setWindowTitle("US Acquisition");
 
+	mServices = services;
 	connect(mUsReconstructionService.get(), &UsReconstructionService::reconstructAboutToStart, this, &USAcqusitionWidget::reconstructAboutToStartSlot);
 	connect(mUsReconstructionService.get(), &UsReconstructionService::reconstructStarted, this, &USAcqusitionWidget::reconstructStartedSlot);
 	connect(mUsReconstructionService.get(), &UsReconstructionService::reconstructFinished, this, &USAcqusitionWidget::reconstructFinishedSlot);
@@ -91,7 +93,7 @@ USAcqusitionWidget::USAcqusitionWidget(AcquisitionServicePtr acquisitionService,
 	editsLayout->setColumnStretch(0,0);
 	editsLayout->setColumnStretch(1,1);
 	RecordBaseWidget::mLayout->addLayout(editsLayout);
-	new LabeledComboBoxWidget(this, StringPropertyActiveProbeConfiguration::New(), editsLayout, 0);
+	new LabeledComboBoxWidget(this, StringPropertyActiveProbeConfiguration::New(mServices->getToolManager()), editsLayout, 0);
 	sscCreateDataWidget(this, mUsReconstructionService->getParam("Preset"), editsLayout, 1);
 
 	QAction* optionsAction = this->createAction(this,
@@ -139,10 +141,9 @@ QWidget* USAcqusitionWidget::createOptionsWidget()
 	QGridLayout* layout = new QGridLayout(retval);
 	layout->setMargin(0);
 
-	SoundSpeedConverterWidget* soundSpeedWidget = new SoundSpeedConverterWidget(this);
-	connect(trackingService().get(), &TrackingService::activeToolChanged, soundSpeedWidget, &SoundSpeedConverterWidget::setToolSlot);
+	SoundSpeedConverterWidget* soundSpeedWidget = new SoundSpeedConverterWidget(mServices->getToolManager(), this);
 
-	ProbeConfigWidget* probeWidget = new ProbeConfigWidget(this);
+	ProbeConfigWidget* probeWidget = new ProbeConfigWidget(mServices, this);
 	probeWidget->getActiveProbeConfigWidget()->setVisible(false);
 
 	SpinBoxGroupWidget* temporalCalibrationWidget = new SpinBoxGroupWidget(this, DoublePropertyTimeCalibration::New());

@@ -50,6 +50,7 @@ namespace cx
 {
 typedef boost::shared_ptr<class CalibrationPlugin> CalibrationPluginPtr;
 typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
+typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 
 /**
  * \file
@@ -76,7 +77,9 @@ private slots:
 private:
 	AcquisitionServicePtr mAcquisitionService;
 	PatientModelServicePtr mPatientModelService;
+	VisServicesPtr mServices;
 };
+
 /**
  * @}
  */

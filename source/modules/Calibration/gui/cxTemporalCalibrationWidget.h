@@ -44,6 +44,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
+typedef boost::shared_ptr<class VisServices> VisServicesPtr;
+
 /**
  * \file
  * \addtogroup cx_module_calibration
@@ -57,7 +59,7 @@ class cxPluginCalibration_EXPORT TemporalCalibrationWidget : public BaseWidget
 {
   Q_OBJECT
 public:
-  TemporalCalibrationWidget(AcquisitionServicePtr acquisitionService, QWidget* parent);
+  TemporalCalibrationWidget(VisServicesPtr services, AcquisitionServicePtr acquisitionService, QWidget* parent);
   virtual ~TemporalCalibrationWidget();
 
   virtual QString defaultWhatsThis() const;
@@ -72,6 +74,7 @@ protected:
 private:
   TemporalCalibrationPtr mAlgorithm;
 
+  VisServicesPtr mServices;
   FileSelectWidget* mFileSelectWidget;
   QLineEdit* mResult;
   QCheckBox* mVerbose;
