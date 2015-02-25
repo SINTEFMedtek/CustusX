@@ -58,6 +58,7 @@ namespace cx
 RouteToTargetFilter::RouteToTargetFilter(ctkPluginContext *pluginContext) :
     FilterImpl(PatientModelServicePtr(new PatientModelServiceProxy(pluginContext)))
 {
+	mRouteToTarget = RouteToTargetPtr(new RouteToTarget());
 }
 
 QString RouteToTargetFilter::getName() const
@@ -83,20 +84,20 @@ QString RouteToTargetFilter::getHelp() const
 
 void RouteToTargetFilter::createOptions()
 {
-	//mOptionsAdapters.push_back(this->getSigma(mOptions));
+
 }
 
 void RouteToTargetFilter::createInputTypes()
 {
-	SelectDataStringPropertyBasePtr centerline;
+	StringPropertySelectMeshPtr centerline;
 	centerline = StringPropertySelectMesh::New(mPatientModelService);
-	centerline->setValueName("Input");
+	centerline->setValueName("Centerline");
 	centerline->setHelp("Select centerline");
 	mInputTypes.push_back(centerline);
 
 	StringPropertySelectPointMetricPtr targetPoint;
 	targetPoint = StringPropertySelectPointMetric::New(mPatientModelService);
-	targetPoint->setValueName("Input");
+	targetPoint->setValueName("Target point");
 	targetPoint->setHelp("Select point metric input");
 	connect(targetPoint.get(), SIGNAL(dataChanged(QString)), this, SLOT(pointMetricChangedSlot(QString)));
 	mInputTypes.push_back(targetPoint);
@@ -107,12 +108,6 @@ void RouteToTargetFilter::createInputTypes()
 
 void RouteToTargetFilter::createOutputTypes()
 {
-//	SelectDataStringPropertyBasePtr temp;
-
-//	temp = StringPropertySelectData::New(mPatientModelService);
-//	temp->setValueName("Output");
-//	temp->setHelp("Output smoothed image");
-//	mOutputTypes.push_back(temp);
 
 	StringPropertySelectMeshPtr tempMeshStringAdapter;
 
@@ -123,23 +118,18 @@ void RouteToTargetFilter::createOutputTypes()
 
 }
 
+
 bool RouteToTargetFilter::execute()
 {
-	MeshPtr mesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mCopiedInput[0])->getMesh();
+	MeshPtr mesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[0])->getMesh();
+
 	vtkPolyDataPtr centerline = mesh->getVtkPolyData();
 
-	//PointMetricPtr targetPoint = PointMetricPtr(new PointMetric());
-	PointMetricPtr targetPoint = PointMetric::create("point1    ", "", PatientModelServicePtr(), spaceProvider());
-	Vector3D testTargetCoordinate(0, 0, 0);
-	targetPoint->setCoordinate(testTargetCoordinate);
+	PointMetricPtr targetPoint = boost::dynamic_pointer_cast<StringPropertySelectPointMetric>(mInputTypes[1])->getPointMetric();
+
 	Vector3D targetCoordinate = targetPoint->getCoordinate();
 
-	Transform3D rMd = mesh->get_rMd();
-	Transform3D rMpr = mPatientModelService->get_rMpr();
-	Transform3D prMd = rMpr.inverse()*rMd;
-
-
-	mRouteToTarget->processCenterline(centerline, prMd);
+	mRouteToTarget->processCenterline(centerline);
 	mOutput = mRouteToTarget->findRouteToTarget(targetCoordinate);
 
 	return true;
@@ -148,13 +138,13 @@ bool RouteToTargetFilter::execute()
 bool RouteToTargetFilter::postProcess()
 {
 
-	MeshPtr inputMesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mCopiedInput[0])->getMesh();
+	MeshPtr inputMesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[0])->getMesh();
 
 	QString uidCenterline = inputMesh->getUid() + "_rtt_cl%1";
 	QString nameCenterline = inputMesh->getName()+"_rtt_cl%1";
 
 	MeshPtr outputCenterline = patientService()->createSpecificData<Mesh>(uidCenterline, nameCenterline);
-	//outputCenterline->intitializeFromParentMesh(inputMesh);
+
 	outputCenterline->setVtkPolyData(mOutput);
 
 	if (!outputCenterline)

@@ -46,12 +46,12 @@ namespace cx
 ProbeAdapterRTSource::ProbeAdapterRTSource(QString uid, ProbePtr probe, VideoSourcePtr source) :
 	mUid(uid), mBase(source), mProbe(probe)
 {
-	connect(probe.get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));
+	connect(probe.get(), &Probe::sectorChanged, this, &ProbeAdapterRTSource::probeChangedSlot);
 
-	connect(mBase.get(), SIGNAL(streaming(bool)), this, SIGNAL(streaming(bool)));
-	connect(mBase.get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool)));
-	connect(mBase.get(), SIGNAL(newFrame()), this, SIGNAL(newFrame()));
-	connect(mBase.get(), SIGNAL(newFrame()), this, SLOT(newFrameSlot()));
+	connect(mBase.get(), &VideoSource::streaming, this, &VideoSource::streaming);
+	connect(mBase.get(), &VideoSource::connected, this, &VideoSource::connected);
+	connect(mBase.get(), &VideoSource::newFrame, this, &VideoSource::newFrame);
+	connect(mBase.get(), &VideoSource::newFrame, this, &ProbeAdapterRTSource::newFrameSlot);
 
 	mRedirecter = vtkImageChangeInformationPtr::New();
 	mRedirecter->SetInputData(mBase->getVtkImageData());

@@ -158,6 +158,7 @@ void VideoConnection::stopClient()
 void VideoConnection::disconnectServer()
 {
 	this->stopClient();
+	this->stopAllSources();
 
 	for (unsigned i=0; i<mSources.size(); ++i)
 		mSources[i]->setInput(ImagePtr());
@@ -242,6 +243,12 @@ void VideoConnection::startAllSources()
 {
 	for (unsigned i=0; i<mSources.size(); ++i)
 		mSources[i]->start();
+}
+
+void VideoConnection::stopAllSources()
+{
+	for (unsigned i=0; i<mSources.size(); ++i)
+		mSources[i]->stop();
 }
 
 void VideoConnection::removeSourceFromProbe(ToolPtr tool)
