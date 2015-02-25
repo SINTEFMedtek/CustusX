@@ -9,4 +9,9 @@
 
 namespace cxtest {
 
+DummyCalibration::DummyCalibration()
+{
+
+}
+
 } /* namespace cxtest */

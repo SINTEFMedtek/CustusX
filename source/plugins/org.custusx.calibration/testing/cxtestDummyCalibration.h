@@ -37,7 +37,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cxtest {
 
-class CXTEST_ORG_CUSTUSX_CALIBRATION_EXPORT_H DummyCalibration {
+class CXTEST_ORG_CUSTUSX_CALIBRATION_EXPORT DummyCalibration
+{
+	DummyCalibration();
 };
 
 } /* namespace cxtest */
