@@ -15,21 +15,17 @@ RouteToTarget::RouteToTarget():
 {
 }
 
-RouteToTarget::RouteToTarget(vtkPolyDataPtr centerline, Transform3D prMd)
-{
-    mCLpoints = this->getCenterlinePositions(centerline, prMd);
-}
 
 RouteToTarget::~RouteToTarget()
 {
 }
 
-void RouteToTarget::setCenterline(vtkPolyDataPtr centerline, Transform3D prMd)
+void RouteToTarget::setCenterline(vtkPolyDataPtr centerline)
 {
-	mCLpoints = this->getCenterlinePositions(centerline, prMd);
+	mCLpoints = this->getCenterlinePositions(centerline);
 }
 
-Eigen::MatrixXd RouteToTarget::getCenterlinePositions(vtkPolyDataPtr centerline, Transform3D prMd)
+Eigen::MatrixXd RouteToTarget::getCenterlinePositions(vtkPolyDataPtr centerline)
 {
 
 	int N = centerline->GetNumberOfPoints();
@@ -40,17 +36,17 @@ Eigen::MatrixXd RouteToTarget::getCenterlinePositions(vtkPolyDataPtr centerline,
 		centerline->GetPoint(i,p);
 		Eigen::Vector3d position;
 		position(0) = p[0]; position(1) = p[1]; position(2) = p[2];
-		CLpoints.block(0 , i , 3 , 1) = prMd.coord(position);
+		CLpoints.block(0 , i , 3 , 1) = position;
 		}
 	return CLpoints;
 }
 
-void RouteToTarget::processCenterline(vtkPolyDataPtr centerline, Transform3D prMd)
+void RouteToTarget::processCenterline(vtkPolyDataPtr centerline)
 {
 	if (mBranchListPtr)
 		mBranchListPtr->deleteAllBranches();
 
-	Eigen::MatrixXd CLpoints = getCenterlinePositions(centerline, prMd);
+	Eigen::MatrixXd CLpoints = getCenterlinePositions(centerline);
 
 	mBranchListPtr->findBranchesInCenterline(CLpoints);
 	mBranchListPtr->calculateOrientations();
@@ -72,7 +68,7 @@ void RouteToTarget::findClosestPointInBranches(Vector3D targetCoordinate)
 		Eigen::MatrixXd positions = branches[i]->getPositions();
 		for (int j = 0; j < positions.cols(); j++)
 		{
-			double D = findDistance(positions.block(0,j,1,3), targetCoordinate);
+			double D = findDistance(positions.col(j), targetCoordinate);
 			if (D < minDistance)
 			{
 				minDistance = D;
@@ -84,14 +80,12 @@ void RouteToTarget::findClosestPointInBranches(Vector3D targetCoordinate)
 
 		mProjectedBranchPtr = minDistanceBranch;
 		mProjectedIndex = minDistancePositionIndex;
-
 }
 
 
 void RouteToTarget::findRoutePositions()
 {
 	mRoutePositions.clear();
-	Eigen::MatrixXd positions = mProjectedBranchPtr->getPositions();
 
 	searchBranchUp(mProjectedBranchPtr, mProjectedIndex);
 }
@@ -99,16 +93,13 @@ void RouteToTarget::findRoutePositions()
 void RouteToTarget::searchBranchUp(BranchPtr searchBranchPtr, int startIndex)
 {
 	Eigen::MatrixXd positions = searchBranchPtr->getPositions();
+
 	for (int i = startIndex; i>=0; i--)
-	{
-		mRoutePositions.push_back(positions.block(0,i,3,1));
-	}
+		mRoutePositions.push_back(positions.col(i));
+
 	BranchPtr parentBranchPtr = searchBranchPtr->getParentBranch();
 	if (parentBranchPtr)
-	{
 		searchBranchUp(parentBranchPtr, parentBranchPtr->getPositions().cols()-1);
-	}
-
 }
 
 
@@ -149,5 +140,6 @@ double findDistance(Eigen::MatrixXd p1, Eigen::MatrixXd p2)
 
 	return D;
 }
+
 
 } /* namespace cx */
