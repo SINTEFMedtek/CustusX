@@ -175,7 +175,7 @@ void LogicManager::shutdownServices()
 {
 	CX_LOG_DEBUG() << " --- Begin shutdown services";
 	if (mComponent)
-		mComponent->destroy();
+		mComponent->destroy(); // this is the GUI - delete first
 
 	mPluginFramework->stop();
 

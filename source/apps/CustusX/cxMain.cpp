@@ -29,72 +29,12 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include <QApplication>
+
 #include <iostream>
 #include "cxMainWindow.h"
-
-//#include "cxCalibrationPlugin.h"
-//#include "cxAlgorithmPlugin.h"
-
-#include "cxTypeConversions.h"
+#include "cxMainWindowApplicationComponent.h"
 #include "cxLogicManager.h"
 #include "cxApplication.h"
-#include "cxPluginFramework.h"
-#include "cxPatientModelServiceProxy.h"
-#include "cxViewServiceProxy.h"
-#include "cxAcquisitionServiceProxy.h"
-
-namespace cx
-{
-
-/**
- * Class holding the CustusX MainWindow
- */
-class CustusXMainWindowFactory : public ApplicationComponent
-{
-public:
-	virtual void create()
-	{
-		if (this->exists())
-			return;
-
-//		PatientModelServicePtr patientModelService = PatientModelServicePtr(new PatientModelServiceProxy(LogicManager::getInstance()->getPluginContext()));
-//		VisualizationServicePtr visualizationService = VisualizationServicePtr(new VisualizationServiceProxy(LogicManager::getInstance()->getPluginContext()));
-//		AcquisitionServicePtr acquisitionService = AcquisitionServicePtr(new AcquisitionServiceProxy(LogicManager::getInstance()->getPluginContext()));
-//
-//		CalibrationPluginPtr calibrationPlugin(new CalibrationPlugin(patientModelService, acquisitionService));
-//		AlgorithmPluginPtr algorithmPlugin(new AlgorithmPlugin(visualizationService, patientModelService));
-//
-//		mPlugins.push_back(calibrationPlugin);
-//		mPlugins.push_back(algorithmPlugin);
-
-		mMainWindow = new cx::MainWindow(mPlugins);
-
-#ifdef __APPLE__ // needed on mac for bringing to front: does the opposite on linux
-		mMainWindow->activateWindow();
-#endif
-		mMainWindow->raise();
-	}
-
-	virtual bool exists() const
-	{
-		return mMainWindow != 0;
-	}
-
-	virtual void destroy()
-	{
-		if (!this->exists())
-			return;
-
-		delete mMainWindow;
-		mPlugins.clear();
-	}
-
-private:
-	QPointer<MainWindow> mMainWindow;
-	std::vector<GUIExtenderServicePtr> mPlugins;
-};
-}
 
 int main(int argc, char *argv[])
 {
@@ -112,7 +52,7 @@ int main(int argc, char *argv[])
   app.setWindowIcon(QIcon(":/icons/CustusX.png"));
   app.setAttribute(Qt::AA_DontShowIconsInMenus, false);
 
-  cx::ApplicationComponentPtr mainwindow(new cx::CustusXMainWindowFactory());
+  cx::ApplicationComponentPtr mainwindow(new cx::MainWindowApplicationComponent<cx::MainWindow>());
   cx::LogicManager::initialize(mainwindow);
 
   int retVal = app.exec();

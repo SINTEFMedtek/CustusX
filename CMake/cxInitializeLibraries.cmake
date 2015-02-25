@@ -171,14 +171,21 @@ macro(cx_initialize_VTK)
 	set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} ${VTK_DIR}/lib)
 	# vtk consist of (as of 6.1) 120 libs. This explicit inclusion brings is down to about half.
 	# gives about 15% compile speed increase
+	#
+	# See http://www.vtk.org/Wiki/VTK/Build_System_Migration
+	#
 	find_package(VTK COMPONENTS
-		vtkCommonCore vtkRenderingQt vtkRenderingOpenGL
-		vtkIOGeometry vtkIOLegacy vtkImagingStatistics
-		vtkImagingColor vtkIOMINC vtkFiltersModeling
-		vtkRenderingVolume vtkInteractionWidgets vtkParallelCore
-		vtkImagingMorphological vtkFiltersParallel vtkImagingMath
+		vtkCommonCore
+		vtkRenderingCore vtkRenderingQt vtkRenderingOpenGL vtkRenderingFreeTypeOpenGL vtkInteractionStyle
+		vtkRenderingVolume vtkRenderingVolumeOpenGL
+		vtkIOGeometry vtkIOLegacy vtkIOMINC
+		vtkFiltersModeling
+		vtkInteractionWidgets
+		vtkParallelCore
+		vtkFiltersParallel
+		vtkImagingMath vtkImagingMorphological vtkImagingColor vtkImagingStatistics
 		NO_MODULE)
-	#find_package(VTK REQUIRED) # import all libs
+	#find_package(VTK REQUIRED) # import all libs - try this for debugging lib includes
     include(${VTK_USE_FILE})
 endmacro()
 
@@ -187,12 +194,16 @@ endmacro()
 # Find the package and run the include USE file.
 ###############################################################################
 macro(cx_initialize_ITK )
+	# we use only a small part of ITK. Adding only a few libs reduces cmd-line-
+	# length problems on Win, and reduces built time:
 	find_package(ITK COMPONENTS
 		ITKCommon ITKIOVTK ITKVTK ITKIOImageBase ITKMathematicalMorphology
 		ITKSmoothing ITKRegionGrowing ITKBinaryMathematicalMorphology
 		ITKRegistrationCommon ITKQuadEdgeMesh ITKIOMesh ITKQuadEdgeMeshFiltering
+		ITKMetaIO ITKIOMeta
 		)
     include(${ITK_USE_FILE})
+	#find_package(ITK REQUIRED) # import all libs - try this for debugging lib includes
 endmacro()
 
 ###############################################################################

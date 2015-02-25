@@ -1,3 +1,7 @@
+#ifndef CXMAINWINDOWAPPLICATIONCOMPONENT_H
+#define CXMAINWINDOWAPPLICATIONCOMPONENT_H
+
+
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
 
@@ -29,29 +33,47 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include <QApplication>
 
+#include "cxLogicManager.h"
 #include "cxApplication.h"
-#include "cxLogConsole.h"
 
-int main(int argc, char *argv[])
+namespace cx
 {
 
-#if !defined(WIN32)
-	//for some reason this does not work with dynamic linking on windows
-	//instead we solve the problem by adding a handmade header for the cxResources.qrc file
-	Q_INIT_RESOURCE(cxResources);
-#endif
+/**
+ * An ApplicationComponent adding a Widget as MainWindow to
+ * the LogicManager.
+ */
+template<class MAIN_WINDOW>
+class MainWindowApplicationComponent : public ApplicationComponent
+{
+public:
+	virtual void create()
+	{
+		if (this->exists())
+			return;
+		mMainWindow = new MAIN_WINDOW;
+		cx::bringWindowToFront(mMainWindow);
+	}
 
-	cx::Application app(argc, argv);
-	app.setOrganizationName("CustusX");
-	app.setOrganizationDomain("www.custusx.org");
-	app.setApplicationName("LogConsole");
-	app.setWindowIcon(QIcon(":/icons/CustusX.png"));
-	app.setAttribute(Qt::AA_DontShowIconsInMenus, false);
+	virtual bool exists() const
+	{
+		return mMainWindow != 0;
+	}
 
-	cx::LogConsole console;
-	cx::bringWindowToFront(&console);
+	virtual void destroy()
+	{
+		if (!this->exists())
+			return;
 
-	return app.exec();
-}
+		delete mMainWindow;
+	}
+
+private:
+	QPointer<MAIN_WINDOW> mMainWindow;
+};
+
+} // namespace cx
+
+
+#endif // CXMAINWINDOWAPPLICATIONCOMPONENT_H

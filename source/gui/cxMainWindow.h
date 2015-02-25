@@ -55,6 +55,7 @@ class LayoutData;
 class GUIExtenderService;
 class ConsoleWidget;
 class DockWidgets;
+
 typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
 typedef boost::shared_ptr<class LayoutInteractor> LayoutInteractorPtr;
 typedef boost::shared_ptr<class VisServices> VisServicesPtr;
@@ -77,7 +78,7 @@ class cxGui_EXPORT MainWindow: public QMainWindow
 	Q_OBJECT
 
 public:
-	MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders);
+	MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders=std::vector<GUIExtenderServicePtr>());
 	virtual ~MainWindow();
 
 	virtual QMenu* createPopupMenu();
