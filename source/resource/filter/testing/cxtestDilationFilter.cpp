@@ -37,9 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSelectDataStringProperty.h"
 #include "cxData.h"
 #include "cxImage.h"
-//#include "cxLegacySingletons.h"
 #include "cxPatientModelService.h"
-//#include "cxLogicManager.h"
 #include "cxSessionStorageService.h"
 #include "cxVisServices.h"
 #include "cxtestDummyDataManager.h"
@@ -47,7 +45,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 TEST_CASE("DilationFilter: execute", "[unit][modules][Algorithm][DilationFilter]")
 {
 	cx::DataLocations::setTestMode();
-//	cx::LogicManager::initialize();
 
 	{
 		cxtest::TestServicesType dummyservices = cxtest::createDummyCoreServices();
@@ -56,8 +53,6 @@ TEST_CASE("DilationFilter: execute", "[unit][modules][Algorithm][DilationFilter]
 		vs->patientModelService = dummyservices.mPatientModelService;
 		vs->trackingService = dummyservices.mTrackingService;
 		vs->spaceProvider = dummyservices.mSpaceProvider;
-//		cx::sessionStorageService()->load(cx::DataLocations::getTestDataPath()+ "/temp/DilationFilter");
-//		cx::PatientModelServicePtr patientModelService = cx::PatientModelService::getNullObject();//mock PatientModelService
 		// Setup filter
 		cx::DilationFilterPtr filter(new cx::DilationFilter(vs));
 		REQUIRE(filter);
@@ -113,6 +108,4 @@ TEST_CASE("DilationFilter: execute", "[unit][modules][Algorithm][DilationFilter]
 			REQUIRE(output[1]->getData());
 		}
 	}
-
-//	cx::LogicManager::shutdown();
 }

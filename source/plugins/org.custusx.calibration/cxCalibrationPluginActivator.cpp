@@ -29,60 +29,37 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXCALIBRATIONPLUGIN_H_
-#define CXCALIBRATIONPLUGIN_H_
 
-#include "cxPluginCalibrationExport.h"
+#include "cxCalibrationPluginActivator.h"
 
-#include "cxGUIExtenderService.h"
+#include <QtPlugin>
+#include <iostream>
 
-/**
- * \defgroup cx_module_calibration Calibration Plugin
- * \ingroup cx_modules
- * \brief Calibration collection with widgets.
- *
- * See \ref cx::CalibrationPlugin.
- *
- */
-
+#include "cxCalibrationGUIExtenderService.h"
+#include "cxRegisteredService.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class CalibrationPlugin> CalibrationPluginPtr;
-typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
-typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 
-/**
- * \file
- * \addtogroup cx_module_calibration
- * @{
- */
-
-/**
- *
- */
-class cxPluginCalibration_EXPORT CalibrationPlugin : public GUIExtenderService
+CalibrationPluginActivator::CalibrationPluginActivator()
 {
-	Q_OBJECT
-public:
-	CalibrationPlugin(PatientModelServicePtr patientModelService, AcquisitionServicePtr acquisitionService);
-	virtual ~CalibrationPlugin();
+}
 
-	virtual std::vector<CategorizedWidget> createWidgets() const;
+CalibrationPluginActivator::~CalibrationPluginActivator()
+{}
 
-signals:
+void CalibrationPluginActivator::start(ctkPluginContext* context)
+{
+	mGUIExtender = RegisteredService::create<CalibrationGUIExtenderService>(context, GUIExtenderService_iid);
+}
 
-private slots:
+void CalibrationPluginActivator::stop(ctkPluginContext* context)
+{
+	mGUIExtender.reset();
+	Q_UNUSED(context);
+}
 
-private:
-	AcquisitionServicePtr mAcquisitionService;
-	PatientModelServicePtr mPatientModelService;
-	VisServicesPtr mServices;
-};
+} // namespace cx
 
-/**
- * @}
- */
-}//cx
 
-#endif /* CXCALIBRATIONPLUGIN_H_ */
+

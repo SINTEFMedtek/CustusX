@@ -25,6 +25,7 @@ set(CX_PLUGINS
   org.custusx.registration.method.plate:ON
   org.custusx.usreconstruction:ON
   org.custusx.acquisition:ON
+  org.custusx.calibration:ON
   org.custusx.help:ON
 )
 

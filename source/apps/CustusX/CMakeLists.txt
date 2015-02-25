@@ -47,10 +47,12 @@ endif(APPLE)
 target_link_libraries(CustusX
     PRIVATE
     cxGui
-    cxPluginCalibration
-    cxPluginAlgorithm
-    org_custusx_usreconstruction
-    org_custusx_acquisition
+	cxLogicManager
+    cxGUIExtenderService
+#    cxPluginCalibration
+#    cxPluginAlgorithm
+#    org_custusx_usreconstruction
+#    org_custusx_acquisition
     ${SSC_GCOV_LIBRARY}
 )
 

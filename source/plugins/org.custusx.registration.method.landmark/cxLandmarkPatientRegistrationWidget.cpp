@@ -56,10 +56,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRepContainer.h"
 #include "cxReporter.h"
 
-
-//TODO: remove
-#include "cxLegacySingletons.h"
-
 namespace cx
 {
 LandmarkPatientRegistrationWidget::LandmarkPatientRegistrationWidget(RegServices services,
@@ -87,7 +83,7 @@ LandmarkPatientRegistrationWidget::LandmarkPatientRegistrationWidget(RegServices
 	connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
 
 	//toolmanager
-	mActiveToolProxy = ActiveToolProxy::New(trackingService());
+	mActiveToolProxy = ActiveToolProxy::New(services.trackingService);
 	connect(mActiveToolProxy.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateToolSampleButton()));
 	connect(mActiveToolProxy.get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(updateToolSampleButton()));
 	connect(services.patientModelService.get(), &PatientModelService::debugModeChanged, this, &LandmarkPatientRegistrationWidget::updateToolSampleButton);
@@ -182,7 +178,7 @@ void LandmarkPatientRegistrationWidget::showEvent(QShowEvent* event)
 	if (rep)
 	{
 		rep->setPrimarySource(mImageLandmarkSource);
-		rep->setSecondarySource(PatientLandmarksSource::New(patientService()));
+		rep->setSecondarySource(PatientLandmarksSource::New(mServices.patientModelService));
 		rep->setSecondaryColor(QColor::fromRgbF(0, 0.6, 0.8));
 	}
 }

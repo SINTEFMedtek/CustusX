@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTEMPORALCALIBRATION_H_
 #define CXTEMPORALCALIBRATION_H_
 
-#include "cxPluginCalibrationExport.h"
+#include "org_custusx_calibration_Export.h"
 
 #include <sstream>
 #include "cxVideoRecorder.h"
@@ -61,7 +61,7 @@ typedef std::map<double,double> TimeSeriesType;
  *   frames = tracking + shift
  *
  */
-class cxPluginCalibration_EXPORT TemporalCalibration
+class org_custusx_calibration_EXPORT TemporalCalibration
 {
 public:
 	TemporalCalibration();

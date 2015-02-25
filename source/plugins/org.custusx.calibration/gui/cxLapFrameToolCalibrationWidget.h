@@ -33,14 +33,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXLAPFRAMETOOLCALIBRATIONWIDGET_H_
 #define CXLAPFRAMETOOLCALIBRATIONWIDGET_H_
 
-#include "cxPluginCalibrationExport.h"
+#include "org_custusx_calibration_Export.h"
 
 #include "cxTransform3D.h"
 #include "cxVector3D.h"
 #include "cxBaseWidget.h"
 #include "cxCoordinateSystemHelpers.h"
 #include "cxForwardDeclarations.h"
-#include "cxDataInterface.h"
 #include "cxDoubleProperty.h"
 
 class QPushButton;
@@ -65,7 +64,7 @@ typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectTo
  * \date Feb 8, 2012
  * \author Christian Askeland, SINTEF
  */
-class cxPluginCalibration_EXPORT LapFrameToolCalibrationWidget : public BaseWidget
+class org_custusx_calibration_EXPORT LapFrameToolCalibrationWidget : public BaseWidget
 {
   Q_OBJECT
 
@@ -102,7 +101,7 @@ private:
  *  - q: Position (matrix) of calibration position on the calibration frame.
  *  - pr: patient reference
  */
-class cxPluginCalibration_EXPORT LapFrameToolCalibrationCalculator
+class org_custusx_calibration_EXPORT LapFrameToolCalibrationCalculator
 {
 public:
   LapFrameToolCalibrationCalculator(ToolPtr tool, ToolPtr calRef, double cameraAngle);

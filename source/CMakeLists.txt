@@ -30,7 +30,6 @@ add_subdirectory(ThirdParty)
 
 add_subdirectory(resource)
 add_subdirectory(logic)
-add_subdirectory(modules)
 add_subdirectory(gui)
 
 add_subdirectory(plugins)
@@ -38,7 +37,7 @@ add_subdirectory(plugins)
 # Testing for CustusX
 add_subdirectory(testing)
 
-# Applications: add last (create bundle last).
+# Applications: add last
 add_subdirectory(apps)
 
 # perform global installation tasks last, such as install bundle (must be in subdir to ensure correct calling order)

@@ -29,36 +29,71 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXTOOLTIPSAMPLEWIDGET_H_
+#define CXTOOLTIPSAMPLEWIDGET_H_
 
-#include <cxActiveToolWidget.h>
+#include "org_custusx_calibration_Export.h"
 
-#include <QVBoxLayout>
-#include "cxLabeledComboBoxWidget.h"
-#include "cxToolProperty.h"
-#include "cxLegacySingletons.h"
+#include "cxBaseWidget.h"
+#include "cxCoordinateSystemHelpers.h"
+#include "cxForwardDeclarations.h"
+//#include "cxDataInterface.h"
+
+class QPushButton;
+class QGroupBox;
+class QLineEdit;
 
 namespace cx
 {
+typedef boost::shared_ptr<class VisServices> VisServicesPtr;
+typedef boost::shared_ptr<class StringPropertySelectData> StringPropertySelectDataPtr;
+typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
+typedef boost::shared_ptr<class StringPropertySelectCoordinateSystem> StringPropertySelectCoordinateSystemPtr;
+class LabeledComboBoxWidget;
 
-ActiveToolWidget::ActiveToolWidget(QWidget* parent) :
-    BaseWidget(parent, "ActiveToolWidget", "Active Tool")
+/**
+ * \file
+ * \addtogroup cx_module_calibration
+ * @{
+ */
+
+/**
+ * Class for sampling points in a chosable coordinate system and then saving them to file.
+ */
+class org_custusx_calibration_EXPORT ToolTipSampleWidget : public BaseWidget
 {
-  QVBoxLayout* layout = new QVBoxLayout(this);
-  this->setObjectName("ActiveToolWidget");
-  layout->setMargin(0);
+  Q_OBJECT
 
-  TrackingServicePtr ts = trackingService();
-  LabeledComboBoxWidget*  combo = new LabeledComboBoxWidget(this, StringPropertyActiveTool::New(ts));
-  layout->addWidget(combo);
+public:
+  ToolTipSampleWidget(VisServicesPtr services, QWidget* parent);
+  ~ToolTipSampleWidget();
+  virtual QString defaultWhatsThis() const;
+
+private slots:
+  void saveFileSlot();
+  void sampleSlot();
+  void coordinateSystemChanged();
+
+private:
+  CoordinateSystem getSelectedCoordinateSystem();
+
+  VisServicesPtr mServices;
+  QPushButton* mSampleButton;
+  QLabel*      mSaveToFileNameLabel;
+  QPushButton* mSaveFileButton;
+  StringPropertySelectCoordinateSystemPtr mCoordinateSystems;
+  StringPropertySelectToolPtr mTools;
+  StringPropertySelectDataPtr mData;
+  LabeledComboBoxWidget* mCoordinateSystemComboBox;
+  LabeledComboBoxWidget* mToolComboBox;
+  LabeledComboBoxWidget* mDataComboBox;
+  bool mTruncateFile;
+};
+
+
+/**
+ * @}
+ */
 }
 
-QString ActiveToolWidget::defaultWhatsThis() const
-{
-  return "<html>"
-      "<h3>Select active tool.</h3>"
-      "<p>Lets you select which tool should be the active tool.</p>"
-      "<p><i></i></p>"
-      "</html>";
-}
-
-}
+#endif /* CXTOOLTIPSAMPLEWIDGET_H_ */

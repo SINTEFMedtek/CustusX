@@ -35,9 +35,7 @@ if(BUILD_TESTING)
         PRIVATE
         cxResource
 		cxtestResource
-#        cxPluginAlgorithm
         cxResourceFilter
-#        cxLogicManager
 		cxResourceVisualization
         cxCatch
     )

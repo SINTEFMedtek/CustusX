@@ -29,51 +29,58 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXTOOLMANUALCALIBRATIONWIDGET_H_
-#define CXTOOLMANUALCALIBRATIONWIDGET_H_
 
-#include "cxPluginCalibrationExport.h"
+#ifndef CXALLFILTERSWIDGET_H_
+#define CXALLFILTERSWIDGET_H_
+
+#include "cxGuiExport.h"
 
 #include "cxBaseWidget.h"
-#include "cxTransform3DWidget.h"
+#include "cxFilter.h"
+#include "cxFilterGroup.h"
+#include "cxFilterTimedAlgorithm.h"
+#include "cxFilterWidget.h"
+#include "cxServiceTrackerListener.h"
 
-namespace cx
-{
+namespace cx {
 typedef boost::shared_ptr<class VisServices> VisServicesPtr;
-typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
-/**
- * \file
- * \addtogroup cx_module_calibration
- * @{
- */
 
-/**Widget for manually changing the tool calibration matrix sMt.
+/** Widget for selecting and running a Filter.
  *
+ *  Select one filter from a drop-down list, then set it up
+ *  and run it. All available filters in the system should be
+ *  in this widget.
+ *
+ * \ingroup cx_module_algorithm
+ * \date Nov 18, 2012
+ * \author Christian Askeland, SINTEF
+ * \author Janne Beate Bakeng, SINTEF
  */
-class cxPluginCalibration_EXPORT ToolManualCalibrationWidget : public BaseWidget
+class cxGui_EXPORT AllFiltersWidget : public BaseWidget
 {
-  Q_OBJECT
-
+	Q_OBJECT
 public:
-  ToolManualCalibrationWidget(VisServicesPtr services, QWidget* parent);
-  virtual ~ToolManualCalibrationWidget() {}
-  virtual QString defaultWhatsThis() const;
+	AllFiltersWidget(VisServicesPtr services, QWidget* parent);
+	QString defaultWhatsThis() const;
 
 private slots:
-  void toolCalibrationChanged();
-  void matrixWidgetChanged();
-
+	void filterChangedSlot();
+	void toggleDetailsSlot();
+	void runFilterSlot();
+	void finishedSlot();
 private:
-  QGroupBox* mGroup;
-  Transform3DWidget* mMatrixWidget;
-  StringPropertySelectToolPtr mTool;
-  VisServicesPtr mServices;
+	FilterGroupPtr mFilters;
+	FilterPtr mCurrentFilter;
+	StringPropertyPtr mFilterSelector;
+	FilterTimedAlgorithmPtr mThread;
+
+	FilterSetupWidget* mSetupWidget;
+	TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
+
+	boost::shared_ptr<ServiceTrackerListener<Filter> > mServiceListener;
+	void onServiceAdded(Filter* service);
+	void onServiceRemoved(Filter *service);
 };
 
-
-/**
- * @}
- */
-}
-
-#endif /* CXTOOLMANUALCALIBRATIONWIDGET_H_ */
+} /* namespace cx */
+#endif /* CXALLFILTERSWIDGET_H_ */

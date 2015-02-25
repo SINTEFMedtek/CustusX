@@ -29,70 +29,36 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXTOOLTIPSAMPLEWIDGET_H_
-#define CXTOOLTIPSAMPLEWIDGET_H_
 
-#include "cxPluginCalibrationExport.h"
+#ifndef CXACTIVETOOLWIDGET_H_
+#define CXACTIVETOOLWIDGET_H_
+
+#include "cxResourceWidgetsExport.h"
 
 #include "cxBaseWidget.h"
-#include "cxCoordinateSystemHelpers.h"
 #include "cxForwardDeclarations.h"
-#include "cxDataInterface.h"
-
-class QPushButton;
-class QGroupBox;
-class QLineEdit;
 
 namespace cx
 {
-typedef boost::shared_ptr<class VisServices> VisServicesPtr;
-typedef boost::shared_ptr<class StringPropertySelectData> StringPropertySelectDataPtr;
-typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
-class LabeledComboBoxWidget;
-
 /**
- * \file
- * \addtogroup cx_module_calibration
- * @{
+ * \class ActiveToolWidget
+ *
+ * \brief Widget that contains a select active tool combo box
+ * \ingroup cx_gui
+ *
+ * \date May 4, 2011
+ * \author Christian Askeland, SINTEF
  */
-
-/**
- * Class for sampling points in a chosable coordinate system and then saving them to file.
- */
-class cxPluginCalibration_EXPORT ToolTipSampleWidget : public BaseWidget
+class cxResourceWidgets_EXPORT ActiveToolWidget : public BaseWidget
 {
   Q_OBJECT
-
 public:
-  ToolTipSampleWidget(VisServicesPtr services, QWidget* parent);
-  ~ToolTipSampleWidget();
+  ActiveToolWidget(TrackingServicePtr trackingService, QWidget* parent);
+  virtual ~ActiveToolWidget() {}
+
   virtual QString defaultWhatsThis() const;
-
-private slots:
-  void saveFileSlot();
-  void sampleSlot();
-  void coordinateSystemChanged();
-
-private:
-  CoordinateSystem getSelectedCoordinateSystem();
-
-  VisServicesPtr mServices;
-  QPushButton* mSampleButton;
-  QLabel*      mSaveToFileNameLabel;
-  QPushButton* mSaveFileButton;
-  StringPropertySelectCoordinateSystemPtr mCoordinateSystems;
-  StringPropertySelectToolPtr mTools;
-  StringPropertySelectDataPtr mData;
-  LabeledComboBoxWidget* mCoordinateSystemComboBox;
-  LabeledComboBoxWidget* mToolComboBox;
-  LabeledComboBoxWidget* mDataComboBox;
-  bool mTruncateFile;
 };
 
-
-/**
- * @}
- */
 }
 
-#endif /* CXTOOLTIPSAMPLEWIDGET_H_ */
+#endif /* CXACTIVETOOLWIDGET_H_ */

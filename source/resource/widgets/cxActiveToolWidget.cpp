@@ -30,57 +30,33 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXALLFILTERSWIDGET_H_
-#define CXALLFILTERSWIDGET_H_
+#include <cxActiveToolWidget.h>
 
-#include "cxPluginAlgorithmExport.h"
+#include <QVBoxLayout>
+#include "cxLabeledComboBoxWidget.h"
+#include "cxToolProperty.h"
 
-#include "cxBaseWidget.h"
-#include "cxFilter.h"
-#include "cxFilterGroup.h"
-#include "cxFilterTimedAlgorithm.h"
-#include "cxFilterWidget.h"
-#include "cxServiceTrackerListener.h"
-
-namespace cx {
-typedef boost::shared_ptr<class VisServices> VisServicesPtr;
-
-/** Widget for selecting and running a Filter.
- *
- *  Select one filter from a drop-down list, then set it up
- *  and run it. All available filters in the system should be
- *  in this widget.
- *
- * \ingroup cx_module_algorithm
- * \date Nov 18, 2012
- * \author Christian Askeland, SINTEF
- * \author Janne Beate Bakeng, SINTEF
- */
-class cxPluginAlgorithm_EXPORT AllFiltersWidget : public BaseWidget
+namespace cx
 {
-	Q_OBJECT
-public:
-	AllFiltersWidget(VisServicesPtr services, QWidget* parent);
-	QString defaultWhatsThis() const;
 
-private slots:
-	void filterChangedSlot();
-	void toggleDetailsSlot();
-	void runFilterSlot();
-	void finishedSlot();
-private:
-	FilterGroupPtr mFilters;
-	FilterPtr mCurrentFilter;
-	StringPropertyPtr mFilterSelector;
-	FilterTimedAlgorithmPtr mThread;
+ActiveToolWidget::ActiveToolWidget(TrackingServicePtr trackingService, QWidget* parent) :
+    BaseWidget(parent, "ActiveToolWidget", "Active Tool")
+{
+  QVBoxLayout* layout = new QVBoxLayout(this);
+  this->setObjectName("ActiveToolWidget");
+  layout->setMargin(0);
 
-	FilterSetupWidget* mSetupWidget;
-	TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
+  LabeledComboBoxWidget*  combo = new LabeledComboBoxWidget(this, StringPropertyActiveTool::New(trackingService));
+  layout->addWidget(combo);
+}
 
-	boost::shared_ptr<ServiceTrackerListener<Filter> > mServiceListener;
-	void onServiceAdded(Filter* service);
-	void onServiceRemoved(Filter *service);
-};
+QString ActiveToolWidget::defaultWhatsThis() const
+{
+  return "<html>"
+      "<h3>Select active tool.</h3>"
+      "<p>Lets you select which tool should be the active tool.</p>"
+      "<p><i></i></p>"
+      "</html>";
+}
 
-} /* namespace cx */
-#endif /* CXALLFILTERSWIDGET_H_ */
+}

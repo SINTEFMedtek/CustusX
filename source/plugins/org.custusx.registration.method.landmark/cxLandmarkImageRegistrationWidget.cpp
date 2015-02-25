@@ -55,11 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewService.h"
 #include "cxViewGroupData.h"
 #include "cxRepContainer.h"
-
-
-//TODO: remove
 #include "cxTrackingService.h"
-#include "cxLegacySingletons.h"
 
 namespace cx
 {
@@ -71,7 +67,7 @@ LandmarkImageRegistrationWidget::LandmarkImageRegistrationWidget(RegServices ser
 	connect(mCurrentProperty.get(), SIGNAL(changed()), this, SLOT(onCurrentImageChanged()));
 	mImageLandmarkSource = ImageLandmarksSource::New();
 
-	mActiveToolProxy = ActiveToolProxy::New(trackingService());
+	mActiveToolProxy = ActiveToolProxy::New(services.trackingService);
 	connect(mActiveToolProxy.get(), SIGNAL(toolVisible(bool)), this, SLOT(enableButtons()));
 	connect(mActiveToolProxy.get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(enableButtons()));
 

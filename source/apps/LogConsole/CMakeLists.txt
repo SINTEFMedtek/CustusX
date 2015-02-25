@@ -44,8 +44,8 @@ include_directories(
 
 SET(LINK_LIBRARIES
 	cxGui
-	cxPluginCalibration
-	cxPluginAlgorithm
+#	cxPluginCalibration
+#	cxPluginAlgorithm
 	org_custusx_usreconstruction
 	org_custusx_acquisition
 	cxResource

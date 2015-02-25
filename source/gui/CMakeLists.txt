@@ -3,7 +3,9 @@
 ###########################################################
 
 cx_add_class_qt_moc(cxGui_SRCS
-    #----------------------
+	filterWidgets/cxFilterWidget
+	filterWidgets/cxAllFiltersWidget
+	#----------------------
 	properties/cxDataInterface
 	properties/cxShadingParamsInterfaces
     #----------------------
@@ -55,7 +57,6 @@ cx_add_class_qt_moc(cxGui_SRCS
     streamingWidgets/cxVideoConnectionWidget
     #----------------------
     toolWidgets/cxToolPropertiesWidget
-    toolWidgets/cxActiveToolWidget
     toolWidgets/cxToolManagerWidget
     #----------------------
     utilities/cxAudioImpl
@@ -94,6 +95,7 @@ add_library( cxGui ${cxGui_SRCS} ${cxResources})
 target_include_directories(cxGui
     PUBLIC
     .
+	./filterWidgets
 	./properties
     ./dataWidgets
     ./infoWidgets
@@ -114,7 +116,8 @@ target_link_libraries(cxGui
     cxResourceVisualization
     cxGUIExtenderService
     cxPluginUtilities
-)
+	cxResourceFilter
+	)
 
 add_subdirectory(testing)
 

@@ -30,54 +30,44 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXALGORITHMPLUGIN_H_
-#define CXALGORITHMPLUGIN_H_
+#ifndef CXCALIBRATIONPLUGINACTIVATOR_H_
+#define CXCALIBRATIONPLUGINACTIVATOR_H_
 
-#include "cxPluginAlgorithmExport.h"
-
-#include "cxGUIExtenderService.h"
+#include <ctkPluginActivator.h>
+#include "boost/shared_ptr.hpp"
 
 namespace cx
 {
 
-/**
- * \defgroup cx_module_algorithm Algorithm Plugin
- * \ingroup cx_modules
- * \brief Algorithm collection with widgets.
- *
- * See \ref cx::AlgorithmPlugin.
- *
- */
+typedef boost::shared_ptr<class CalibrationGUIExtenderService> CalibrationGUIExtenderServicePtr;
+typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
 
 /**
- * \file
- * \addtogroup cx_module_algorithm
- * @{
- */
-
-/**
- * \class AlgorithmPlugin
+ * Activator for the calibration plugin
  *
- * \date Jun 15, 2011
- * \author christiana
+ * \ingroup org_custusx_calibration
+ *
+ * \date 2015-02-24
+ * \author Christian Askeland
  */
-class cxPluginAlgorithm_EXPORT AlgorithmPlugin : public GUIExtenderService
+class CalibrationPluginActivator :  public QObject, public ctkPluginActivator
 {
 	Q_OBJECT
+	Q_INTERFACES(ctkPluginActivator)
+	Q_PLUGIN_METADATA(IID "org_custusx_calibration")
+
 public:
-	AlgorithmPlugin(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService);
-	virtual ~AlgorithmPlugin();
 
-	virtual std::vector<CategorizedWidget> createWidgets() const;
+	CalibrationPluginActivator();
+	~CalibrationPluginActivator();
+
+	void start(ctkPluginContext* context);
+	void stop(ctkPluginContext* context);
+
 private:
-	PatientModelServicePtr mPatientModelService;
-	VisualizationServicePtr mVisualizationService;
+	RegisteredServicePtr mGUIExtender;
 };
-typedef boost::shared_ptr<class AlgorithmPlugin> AlgorithmPluginPtr;
 
-/**
- * @}
- */
-}
+} // namespace cx
 
-#endif /* CXALGORITHMPLUGIN_H_ */
+#endif /* CXCALIBRATIONPLUGINACTIVATOR_H_ */

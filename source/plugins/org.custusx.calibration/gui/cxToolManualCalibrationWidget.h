@@ -29,93 +29,51 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXTOOLMANUALCALIBRATIONWIDGET_H_
+#define CXTOOLMANUALCALIBRATIONWIDGET_H_
 
-#ifndef CXTOOLTIPCALIBRATIONWIDGET_H_
-#define CXTOOLTIPCALIBRATIONWIDGET_H_
+#include "org_custusx_calibration_Export.h"
 
-#include "cxPluginCalibrationExport.h"
-
-#include "cxTransform3D.h"
-#include "cxVector3D.h"
 #include "cxBaseWidget.h"
-#include "cxCoordinateSystemHelpers.h"
-#include "cxForwardDeclarations.h"
-#include "cxDataInterface.h"
-
-class QPushButton;
-class QGroupBox;
-class QLineEdit;
+#include "cxTransform3DWidget.h"
 
 namespace cx
 {
-class LabeledComboBoxWidget;
 typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
-
 /**
  * \file
  * \addtogroup cx_module_calibration
  * @{
  */
 
-/**
- * Class that handles the tooltip calibration.
+/**Widget for manually changing the tool calibration matrix sMt.
  *
- * \date 3. nov. 2010
- * \author Janne Beate Bakeng, SINTEF
  */
-class cxPluginCalibration_EXPORT ToolTipCalibrateWidget : public BaseWidget
+class org_custusx_calibration_EXPORT ToolManualCalibrationWidget : public BaseWidget
 {
   Q_OBJECT
 
 public:
-  ToolTipCalibrateWidget(VisServicesPtr services, QWidget* parent);
-  ~ToolTipCalibrateWidget();
+  ToolManualCalibrationWidget(VisServicesPtr services, QWidget* parent);
+  virtual ~ToolManualCalibrationWidget() {}
   virtual QString defaultWhatsThis() const;
 
 private slots:
-  void calibrateSlot();
-  void testCalibrationSlot();
-  void toolSelectedSlot();
+  void toolCalibrationChanged();
+  void matrixWidgetChanged();
 
 private:
+  QGroupBox* mGroup;
+  Transform3DWidget* mMatrixWidget;
+  StringPropertySelectToolPtr mTool;
   VisServicesPtr mServices;
-  QPushButton* mCalibrateButton;
-  LabeledComboBoxWidget* mCalibrateToolComboBox;
-  QLabel* mReferencePointLabel;
-  QPushButton* mTestButton;
-  QLabel* mCalibrationLabel;
-  QLabel* mDeltaLabel;
-  StringPropertySelectToolPtr mTools;
 };
 
-
-/**
- * Class that calibrates the tool using a reference point in ref.
- */
-class cxPluginCalibration_EXPORT ToolTipCalibrationCalculator
-{
-public:
-  ToolTipCalibrationCalculator(SpaceProviderPtr spaces, ToolPtr tool, ToolPtr ref, Vector3D p_t = Vector3D());
-  ~ToolTipCalibrationCalculator();
-
-  Vector3D get_delta_ref(); ///< how far from the reference point the sampled point is, in pr's coord
-  Transform3D get_calibration_sMt(); ///<
-
-private:
-  Vector3D get_sampledPoint_t(); ///< the tools sampled point in tool space
-  Vector3D get_sampledPoint_ref(); ///< the tools sampled point in ref space
-  Vector3D get_referencePoint_ref(); ///< the ref tools reference point in ref space
-  Transform3D get_sMt_new(); ///< the new calibration
-
-  SpaceProviderPtr mSpaces;
-  ToolPtr mTool; ///< the tool the sampled point is taken from
-  ToolPtr mRef; ///< the tool that contains the reference point we are going to calibrate against
-  Vector3D mP_t; ///< the sampled point we are working on
-};
 
 /**
  * @}
  */
-}//namespace cx
-#endif /* CXTOOLTIPCALIBRATIONWIDGET_H_ */
+}
+
+#endif /* CXTOOLMANUALCALIBRATIONWIDGET_H_ */

@@ -33,8 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include "cxMainWindow.h"
 
-#include "cxCalibrationPlugin.h"
-#include "cxAlgorithmPlugin.h"
+//#include "cxCalibrationPlugin.h"
+//#include "cxAlgorithmPlugin.h"
 
 #include "cxTypeConversions.h"
 #include "cxLogicManager.h"
@@ -58,15 +58,15 @@ public:
 		if (this->exists())
 			return;
 
-		PatientModelServicePtr patientModelService = PatientModelServicePtr(new PatientModelServiceProxy(LogicManager::getInstance()->getPluginContext()));
-		VisualizationServicePtr visualizationService = VisualizationServicePtr(new VisualizationServiceProxy(LogicManager::getInstance()->getPluginContext()));
-		AcquisitionServicePtr acquisitionService = AcquisitionServicePtr(new AcquisitionServiceProxy(LogicManager::getInstance()->getPluginContext()));
-
-		CalibrationPluginPtr calibrationPlugin(new CalibrationPlugin(patientModelService, acquisitionService));
-		AlgorithmPluginPtr algorithmPlugin(new AlgorithmPlugin(visualizationService, patientModelService));
-
-		mPlugins.push_back(calibrationPlugin);
-		mPlugins.push_back(algorithmPlugin);
+//		PatientModelServicePtr patientModelService = PatientModelServicePtr(new PatientModelServiceProxy(LogicManager::getInstance()->getPluginContext()));
+//		VisualizationServicePtr visualizationService = VisualizationServicePtr(new VisualizationServiceProxy(LogicManager::getInstance()->getPluginContext()));
+//		AcquisitionServicePtr acquisitionService = AcquisitionServicePtr(new AcquisitionServiceProxy(LogicManager::getInstance()->getPluginContext()));
+//
+//		CalibrationPluginPtr calibrationPlugin(new CalibrationPlugin(patientModelService, acquisitionService));
+//		AlgorithmPluginPtr algorithmPlugin(new AlgorithmPlugin(visualizationService, patientModelService));
+//
+//		mPlugins.push_back(calibrationPlugin);
+//		mPlugins.push_back(algorithmPlugin);
 
 		mMainWindow = new cx::MainWindow(mPlugins);
 

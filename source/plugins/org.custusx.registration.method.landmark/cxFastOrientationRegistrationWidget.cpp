@@ -42,8 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationService.h"
 #include "cxTrackingService.h"
 
-#include "cxLegacySingletons.h"
-
 namespace cx
 {
 FastOrientationRegistrationWidget::FastOrientationRegistrationWidget(RegServices services, QWidget* parent) :
@@ -61,7 +59,7 @@ FastOrientationRegistrationWidget::FastOrientationRegistrationWidget(RegServices
   connect(services.patientModelService.get(), &PatientModelService::debugModeChanged,
 		  this, &FastOrientationRegistrationWidget::enableToolSampleButtonSlot);
 
-  mActiveToolProxy =  ActiveToolProxy::New(trackingService());
+  mActiveToolProxy =  ActiveToolProxy::New(services.trackingService);
   connect(mActiveToolProxy.get(), SIGNAL(toolVisible(bool)), this, SLOT(enableToolSampleButtonSlot()));
   connect(mActiveToolProxy.get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(enableToolSampleButtonSlot()));
   this->enableToolSampleButtonSlot();

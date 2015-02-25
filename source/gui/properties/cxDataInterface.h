@@ -147,23 +147,6 @@ protected:
 };
 typedef boost::shared_ptr<class StringPropertySelectRTSourceBase> StringPropertySelectRTSourceBasePtr;
 
-/** Base class for all Properties that selects a coordinatesystem.
- */
-class cxGui_EXPORT StringPropertySelectCoordinateSystemBase : public StringPropertyBase
-{
-  Q_OBJECT
-public:
-  StringPropertySelectCoordinateSystemBase();
-  virtual ~StringPropertySelectCoordinateSystemBase() {}
-
-public: // basic methods
-
-public: // optional methods
-  virtual QStringList getValueRange() const;
-  virtual QString convertInternal2Display(QString internal);
-};
-typedef boost::shared_ptr<class StringPropertySelectCoordinateSystemBase> StringPropertySelectCoordinateSystemBasePtr;
-
 
 typedef boost::shared_ptr<class StringPropertySelectRTSource> StringPropertySelectRTSourcePtr;
 
@@ -220,41 +203,6 @@ public: // basic methods
   virtual QString getHelp() const;
 };
 
-typedef boost::shared_ptr<class StringPropertySelectCoordinateSystem> StringPropertySelectCoordinateSystemPtr;
-
-/**
- * \brief Adapter that selects and stores a coordinate systems.
- * The coordinatesystem is stored internally in the adapter.
- * Use setValue/getValue plus changed() to access it.
- *
- * Class reacts to toolmanagers configurerd signal and automatically sets patientref as default
- */
-class cxGui_EXPORT StringPropertySelectCoordinateSystem : public StringPropertySelectCoordinateSystemBase
-{
-  Q_OBJECT
-public:
-  static StringPropertySelectCoordinateSystemPtr New() { return StringPropertySelectCoordinateSystemPtr(new StringPropertySelectCoordinateSystem()); }
-  StringPropertySelectCoordinateSystem();
-  virtual ~StringPropertySelectCoordinateSystem() {}
-
-public: // basic methods
-  virtual QString getDisplayName() const;
-  virtual bool setValue(const QString& value);
-  virtual QString getValue() const;
-
-public: // optional methods
-  virtual QString getHelp() const;
-
-public: // interface extension
-  COORDINATE_SYSTEM getCoordinateSystem();
-
-private slots: //interface extension
-  void setDefaultSlot();
-
-private:
-  COORDINATE_SYSTEM mCoordinateSystem;
-  QString mValueName;
-};
 
 typedef boost::shared_ptr<class StringPropertyParentFrame> StringPropertyParentFramePtr;
 

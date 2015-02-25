@@ -41,7 +41,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationService.h"
 #include "cxPatientModelService.h"
 #include "cxTrackingService.h"
-#include "cxLegacySingletons.h"
 #include "cxLandmark.h"
 #include "cxViewGroupData.h"
 

@@ -40,7 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationService.h"
 #include "cxPatientModelService.h"
 
-#include "cxLegacySingletons.h"
 #include "cxTrackingService.h"
 
 namespace cx
@@ -62,7 +61,7 @@ PatientOrientationWidget::PatientOrientationWidget(RegServices services, QWidget
   connect(services.patientModelService.get(), &PatientModelService::debugModeChanged,
 		  this, &PatientOrientationWidget::enableToolSampleButtonSlot);
 
-  mActiveToolProxy =  ActiveToolProxy::New(trackingService());
+  mActiveToolProxy =  ActiveToolProxy::New(services.trackingService);
   connect(mActiveToolProxy.get(), SIGNAL(toolVisible(bool)), this, SLOT(enableToolSampleButtonSlot()));
   connect(mActiveToolProxy.get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(enableToolSampleButtonSlot()));
   this->enableToolSampleButtonSlot();

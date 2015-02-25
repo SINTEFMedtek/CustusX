@@ -33,11 +33,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTESTDUMMYCALIBRATION_H_
 #define CXTESTDUMMYCALIBRATION_H_
 
-#include "cxtestplugincalibration_export.h"
+#include "cxtest_org_custusx_calibration_export.h"
 
 namespace cxtest {
 
-class CXTESTPLUGINCALIBRATION_EXPORT DummyCalibration {
+class CXTEST_ORG_CUSTUSX_CALIBRATION_EXPORT_H DummyCalibration {
 };
 
 } /* namespace cxtest */

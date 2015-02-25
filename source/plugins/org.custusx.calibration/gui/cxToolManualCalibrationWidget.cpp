@@ -35,7 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QGroupBox>
 #include "cxActiveToolWidget.h"
 #include "cxTrackingService.h"
-#include "cxDataInterface.h"
 #include "cxHelperWidgets.h"
 #include "cxVisServices.h"
 #include "cxStringPropertySelectTool.h"

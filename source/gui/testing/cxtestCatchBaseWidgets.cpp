@@ -74,6 +74,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //cxTabbedWidgets
 #include "cxSlicePropertiesWidget.h"
 #include "cxVolumePropertiesWidget.h"
+#include "cxTrackingService.h"
 
 //All these widgets in the plugins folder should also be tested
 //#include "cxAllFiltersWidget.h"
@@ -149,8 +150,9 @@ TEST_CASE("BaseWidget's children in gui/dataWidgets correctly constructed", "[un
 	QWidget* testParent = new QWidget();
 	cx::PatientModelServicePtr patientModelService = cx::PatientModelService::getNullObject(); //mock PatientModelService with the null object
 	cx::VisualizationServicePtr visualizationService = cx::VisualizationService::getNullObject(); //mock
+	cx::TrackingServicePtr trackingService = cx::TrackingService::getNullObject(); //mock
 
-	testAndDeleteBaseWidgetChild(new cx::ActiveToolWidget(testParent));
+	testAndDeleteBaseWidgetChild(new cx::ActiveToolWidget(trackingService, testParent));
 	testAndDeleteBaseWidgetChild(new cx::ActiveVolumeWidget(patientModelService, visualizationService, testParent));
 	testAndDeleteBaseWidgetChild(new cx::ClippingWidget(patientModelService, testParent));
 	testAndDeleteBaseWidgetChild(new cx::ColorWidget(patientModelService, testParent));

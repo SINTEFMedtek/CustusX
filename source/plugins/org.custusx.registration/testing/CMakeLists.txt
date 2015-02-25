@@ -21,7 +21,11 @@ if(BUILD_TESTING)
         .
         ${CMAKE_CURRENT_BINARY_DIR}
     )
-    target_link_libraries(cxtest_org_custusx_registration PRIVATE org_custusx_registration cxtestUtilities cxtestResource cxCatch)
+	target_link_libraries(cxtest_org_custusx_registration
+		PRIVATE
+		org_custusx_registration
+		cxLogicManager
+		cxtestUtilities cxtestResource cxCatch)
     cx_add_tests_to_catch(cxtest_org_custusx_registration)
 
 endif(BUILD_TESTING)

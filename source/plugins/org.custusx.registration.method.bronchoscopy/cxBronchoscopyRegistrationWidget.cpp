@@ -53,7 +53,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLabeledComboBoxWidget.h"
 #include "cxTrackingService.h"
 #include "cxDoubleProperty.h"
-#include "cxLegacySingletons.h"
 #include "cxProfile.h"
 #include "cxHelperWidgets.h"
 #include "cxBoolProperty.h"
@@ -62,7 +61,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxWidgetObscuredListener.h"
 #include "cxViewGroupData.h"
 #include "cxStringPropertySelectTool.h"
-//#include "cxDataInterface.h"
 #include "cxHelperWidgets.h"
 #include "cxAcquisitionService.h"
 #include "cxRegServices.h"
@@ -190,7 +188,7 @@ void BronchoscopyRegistrationWidget::processCenterlineSlot()
 	{
 		QString uid = mSelectMeshWidget->getMesh()->getUid() + "_cl%1";
 		QString name = mSelectMeshWidget->getMesh()->getName()+" cl_processed%1";
-		mMesh = patientService()->createSpecificData<Mesh>(uid, name);
+		mMesh = mServices.patientModelService->createSpecificData<Mesh>(uid, name);
 	}
 	mMesh->setVtkPolyData(processedCenterline);
 	mMesh->setColor(QColor(0, 0, 255, 255));

@@ -42,7 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxPatientModelService.h"
 #include "cxLogger.h"
-#include "cxLegacySingletons.h"
 #include "cxTrackingService.h"
 
 namespace cx

@@ -225,46 +225,6 @@ QString StringPropertyActiveVideoSource::getHelp() const
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-StringPropertySelectCoordinateSystemBase::StringPropertySelectCoordinateSystemBase()
-{
-}
-
-QStringList StringPropertySelectCoordinateSystemBase::getValueRange() const
-{
-  QStringList retval;
-  retval << "";
-  retval << qstring_cast(csREF);
-  retval << qstring_cast(csDATA);
-  retval << qstring_cast(csPATIENTREF);
-  retval << qstring_cast(csTOOL);
-  retval << qstring_cast(csSENSOR);
-  return retval;
-}
-
-QString StringPropertySelectCoordinateSystemBase::convertInternal2Display(QString internal)
-{
-  if (internal.isEmpty())
-    return "<no coordinate system>";
-
-  //as requested by Frank
-  if(internal == "reference")
-    return "data reference";
-  if(internal == "data")
-    return "data (image/mesh)";
-  if(internal == "patient reference")
-    return "patient/tool reference";
-  if(internal == "tool")
-    return "tool";
-  if(internal == "sensor")
-    return "tools sensor";
-
-  return internal;
-}
-
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
-
 
 StringPropertySelectRTSource::StringPropertySelectRTSource(PatientModelServicePtr patientModelService) :
 	StringPropertySelectRTSourceBase(patientModelService),
@@ -330,42 +290,6 @@ void StringPropertySelectRTSource::setDefaultSlot()
   }
 }
 
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
-
-StringPropertySelectCoordinateSystem::StringPropertySelectCoordinateSystem()
-{
-	mCoordinateSystem = csCOUNT;
-  connect(trackingService().get(), &TrackingService::stateChanged, this, &StringPropertySelectCoordinateSystem::setDefaultSlot);
-}
-
-QString StringPropertySelectCoordinateSystem::getDisplayName() const
-{
-  return "Select coordinate system";
-}
-
-bool StringPropertySelectCoordinateSystem::setValue(const QString& value)
-{
-  mCoordinateSystem = string2enum<COORDINATE_SYSTEM>(value);
-  emit changed();
-  return true;
-}
-
-QString StringPropertySelectCoordinateSystem::getValue() const
-{
-  return qstring_cast(mCoordinateSystem);
-}
-
-QString StringPropertySelectCoordinateSystem::getHelp() const
-{
-  return "Select a coordinate system";
-}
-
-void StringPropertySelectCoordinateSystem::setDefaultSlot()
-{
-  this->setValue(qstring_cast(csPATIENTREF));
-}
 
 //---------------------------------------------------------
 //---------------------------------------------------------

@@ -29,22 +29,27 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXTEMPORALCALIBRATIONWIDGET_H_
-#define CXTEMPORALCALIBRATIONWIDGET_H_
 
-#include "cxPluginCalibrationExport.h"
+#ifndef CXTOOLTIPCALIBRATIONWIDGET_H_
+#define CXTOOLTIPCALIBRATIONWIDGET_H_
 
+#include "org_custusx_calibration_Export.h"
+
+#include "cxTransform3D.h"
+#include "cxVector3D.h"
 #include "cxBaseWidget.h"
-#include "cxRecordSessionWidget.h"
-#include <QFuture>
-#include <QFutureWatcher>
-#include "cxFileSelectWidget.h"
-#include <cxTemporalCalibration.h>
-#include "cxUSAcqusitionWidget.h"
+#include "cxCoordinateSystemHelpers.h"
+#include "cxForwardDeclarations.h"
+
+class QPushButton;
+class QGroupBox;
+class QLineEdit;
 
 namespace cx
 {
+class LabeledComboBoxWidget;
 typedef boost::shared_ptr<class VisServices> VisServicesPtr;
+typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
 
 /**
  * \file
@@ -52,40 +57,64 @@ typedef boost::shared_ptr<class VisServices> VisServicesPtr;
  * @{
  */
 
-/** GUI for performing temporal calibration
+/**
+ * Class that handles the tooltip calibration.
  *
+ * \date 3. nov. 2010
+ * \author Janne Beate Bakeng, SINTEF
  */
-class cxPluginCalibration_EXPORT TemporalCalibrationWidget : public BaseWidget
+class org_custusx_calibration_EXPORT ToolTipCalibrateWidget : public BaseWidget
 {
   Q_OBJECT
-public:
-  TemporalCalibrationWidget(VisServicesPtr services, AcquisitionServicePtr acquisitionService, QWidget* parent);
-  virtual ~TemporalCalibrationWidget();
 
+public:
+  ToolTipCalibrateWidget(VisServicesPtr services, QWidget* parent);
+  ~ToolTipCalibrateWidget();
   virtual QString defaultWhatsThis() const;
 
 private slots:
-  void patientChangedSlot();
-  void selectData(QString filename);
   void calibrateSlot();
+  void testCalibrationSlot();
+  void toolSelectedSlot();
 
-protected:
-  void showEvent(QShowEvent* event);
 private:
-  TemporalCalibrationPtr mAlgorithm;
-
   VisServicesPtr mServices;
-  FileSelectWidget* mFileSelectWidget;
-  QLineEdit* mResult;
-  QCheckBox* mVerbose;
-  RecordSessionWidget* mRecordSessionWidget;
-  QLabel* mInfoLabel;
+  QPushButton* mCalibrateButton;
+  LabeledComboBoxWidget* mCalibrateToolComboBox;
+  QLabel* mReferencePointLabel;
+  QPushButton* mTestButton;
+  QLabel* mCalibrationLabel;
+  QLabel* mDeltaLabel;
+  StringPropertySelectToolPtr mTools;
 };
 
 
 /**
+ * Class that calibrates the tool using a reference point in ref.
+ */
+class org_custusx_calibration_EXPORT ToolTipCalibrationCalculator
+{
+public:
+  ToolTipCalibrationCalculator(SpaceProviderPtr spaces, ToolPtr tool, ToolPtr ref, Vector3D p_t = Vector3D());
+  ~ToolTipCalibrationCalculator();
+
+  Vector3D get_delta_ref(); ///< how far from the reference point the sampled point is, in pr's coord
+  Transform3D get_calibration_sMt(); ///<
+
+private:
+  Vector3D get_sampledPoint_t(); ///< the tools sampled point in tool space
+  Vector3D get_sampledPoint_ref(); ///< the tools sampled point in ref space
+  Vector3D get_referencePoint_ref(); ///< the ref tools reference point in ref space
+  Transform3D get_sMt_new(); ///< the new calibration
+
+  SpaceProviderPtr mSpaces;
+  ToolPtr mTool; ///< the tool the sampled point is taken from
+  ToolPtr mRef; ///< the tool that contains the reference point we are going to calibrate against
+  Vector3D mP_t; ///< the sampled point we are working on
+};
+
+/**
  * @}
  */
-}
-
-#endif /* CXTEMPORALCALIBRATIONWIDGET_H_ */
+}//namespace cx
+#endif /* CXTOOLTIPCALIBRATIONWIDGET_H_ */

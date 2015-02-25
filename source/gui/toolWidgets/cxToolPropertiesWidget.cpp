@@ -65,7 +65,7 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   mToptopLayout = new QVBoxLayout(this);
   //toptopLayout->setMargin(0);
 
-  mToptopLayout->addWidget(new ActiveToolWidget(this));
+  mToptopLayout->addWidget(new ActiveToolWidget(trackingService(), this));
   
   QHBoxLayout* generalLayout = new QHBoxLayout;
   mReferenceStatusLabel = new QLabel("Reference frame <undefined>", this);

@@ -58,7 +58,6 @@ set(PLUGIN_target_libraries
     ${PLUGIN_target_libraries}   
     cxResource
     cxResourceVisualization
-    cxLogicManager
     cxPluginUtilities
     )
 

@@ -52,8 +52,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewService.h"
 #include "cxViewGroupData.h"
 #include "cxRepContainer.h"
-//TODO: remove
-#include "cxLogicManager.h"
 
 namespace cx
 {

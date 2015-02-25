@@ -45,7 +45,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxProbeImpl.h"
 #include "cxTrackingService.h"
 #include "cxLogicManager.h"
-#include "cxLegacySingletons.h"
 #include "cxVideoService.h"
 #include "cxUsReconstructionServiceProxy.h"
 #include "cxPatientModelService.h"

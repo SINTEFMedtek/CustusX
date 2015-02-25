@@ -30,41 +30,40 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxAlgorithmPlugin.h"
+#ifndef CXCALIBRATIONGUIEXTENDERSERVICE_H_
+#define CXCALIBRATIONGUIEXTENDERSERVICE_H_
 
-#include <ctkPluginContext.h>
-#include <vector>
-#include "cxFilterWidget.h"
-#include "cxPipeline.h"
-#include "cxPipelineWidget.h"
-#include "cxBinaryThresholdImageFilter.h"
-#include "cxBinaryThinningImageFilter3DFilter.h"
-#include "cxAllFiltersWidget.h"
-#include "cxVisServices.h"
-#include "cxLogicManager.h"
+#include "cxGUIExtenderService.h"
+#include "org_custusx_calibration_Export.h"
+class ctkPluginContext;
 
 namespace cx
 {
 
-AlgorithmPlugin::AlgorithmPlugin(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService) :
-	mPatientModelService(patientModelService),
-	mVisualizationService(visualizationService)
-{}
-
-AlgorithmPlugin::~AlgorithmPlugin()
-{}
-
-std::vector<GUIExtenderService::CategorizedWidget> AlgorithmPlugin::createWidgets() const
+/**
+ * Implementation of Calibration service.
+ *
+ * \ingroup org_custusx_calibration
+ *
+ * \date 2015-02-24
+ * \author Christian Askeland
+ */
+class org_custusx_calibration_EXPORT CalibrationGUIExtenderService : public GUIExtenderService
 {
-	VisServicesPtr services = VisServices::create(logicManager()->getPluginContext());
+	Q_INTERFACES(cx::GUIExtenderService)
+public:
+	CalibrationGUIExtenderService(ctkPluginContext *context);
+	virtual ~CalibrationGUIExtenderService() {};
 
-	std::vector<CategorizedWidget> retval;
+	std::vector<CategorizedWidget> createWidgets() const;
 
-	retval.push_back(GUIExtenderService::CategorizedWidget(
-						 new AllFiltersWidget(services, NULL),
-	                     "Algorithms"));
+private:
+  ctkPluginContext* mContext;
 
-	return retval;
-}
+};
+typedef boost::shared_ptr<CalibrationGUIExtenderService> CalibrationGUIExtenderServicePtr;
 
-}//namespace cx
+} /* namespace cx */
+
+#endif /* CXCALIBRATIONGUIEXTENDERSERVICE_H_ */
+

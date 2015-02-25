@@ -29,38 +29,34 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include "cxCalibrationPlugin.h"
 
+#include "cxCalibrationGUIExtenderService.h"
+#include "ctkPluginContext.h"
 #include "cxCalibrationMethodsWidget.h"
-#include "cxLogger.h"
-#include "cxPatientModelService.h"
-#include "cxLogicManager.h"
 #include "cxVisServices.h"
+#include "cxAcquisitionServiceProxy.h"
 
 namespace cx
 {
 
-CalibrationPlugin::CalibrationPlugin(PatientModelServicePtr patientModelService, AcquisitionServicePtr acquisitionService) :
-		mAcquisitionService(acquisitionService),
-		mPatientModelService(patientModelService)
+CalibrationGUIExtenderService::CalibrationGUIExtenderService(ctkPluginContext *context) :
+  mContext(context)
 {
-	mServices = VisServices::create(logicManager()->getPluginContext());
 }
 
-CalibrationPlugin::~CalibrationPlugin()
+std::vector<GUIExtenderService::CategorizedWidget> CalibrationGUIExtenderService::createWidgets() const
 {
+	VisServicesPtr services = VisServices::create(mContext);
+	AcquisitionServicePtr acquisitionService(new AcquisitionServiceProxy(mContext));
 
-}
-
-std::vector<GUIExtenderService::CategorizedWidget> CalibrationPlugin::createWidgets() const
-{
 	std::vector<CategorizedWidget> retval;
 
 	retval.push_back(GUIExtenderService::CategorizedWidget(
-			new CalibrationMethodsWidget(mServices, mAcquisitionService, NULL, "CalibrationMethodsWidget", "Calibration Methods"),
+			new CalibrationMethodsWidget(services, acquisitionService, NULL, "CalibrationMethodsWidget", "Calibration Methods"),
 			"Algorithms"));
 
 	return retval;
 }
 
-}
+
+} /* namespace cx */

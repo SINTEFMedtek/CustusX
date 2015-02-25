@@ -44,11 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxDataLocations.h"
 #include "cxStreamerServiceUtilities.h"
-//#include "cxLogicManager.h"
 #include "cxProfile.h"
-
-////TODO: remove
-//#include "cxLegacySingletons.h"
 
 namespace cxtest
 {

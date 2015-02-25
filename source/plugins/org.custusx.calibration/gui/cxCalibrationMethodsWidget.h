@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXCALIBRATIONMETHODSWIDGET_H_
 #define CXCALIBRATIONMETHODSWIDGET_H_
 
-#include "cxPluginCalibrationExport.h"
+#include "org_custusx_calibration_Export.h"
 
 #include "cxTabbedWidget.h"
 
@@ -47,7 +47,7 @@ typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
  * @{
  */
 
-class cxPluginCalibration_EXPORT CalibrationMethodsWidget : public TabbedWidget
+class org_custusx_calibration_EXPORT CalibrationMethodsWidget : public TabbedWidget
 {
 public:
   CalibrationMethodsWidget(VisServicesPtr services, AcquisitionServicePtr acquisitionService,

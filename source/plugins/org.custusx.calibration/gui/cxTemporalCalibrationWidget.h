@@ -29,35 +29,63 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXTEMPORALCALIBRATIONWIDGET_H_
+#define CXTEMPORALCALIBRATIONWIDGET_H_
 
-#ifndef CXACTIVETOOLWIDGET_H_
-#define CXACTIVETOOLWIDGET_H_
-
-#include "cxGuiExport.h"
+#include "org_custusx_calibration_Export.h"
 
 #include "cxBaseWidget.h"
+#include "cxRecordSessionWidget.h"
+#include <QFuture>
+#include <QFutureWatcher>
+#include "cxFileSelectWidget.h"
+#include <cxTemporalCalibration.h>
+#include "cxUSAcqusitionWidget.h"
 
 namespace cx
 {
+typedef boost::shared_ptr<class VisServices> VisServicesPtr;
+
 /**
- * \class ActiveToolWidget
- *
- * \brief Widget that contains a select active tool combo box
- * \ingroup cx_gui
- *
- * \date May 4, 2011
- * \author Christian Askeland, SINTEF
+ * \file
+ * \addtogroup cx_module_calibration
+ * @{
  */
-class cxGui_EXPORT ActiveToolWidget : public BaseWidget
+
+/** GUI for performing temporal calibration
+ *
+ */
+class org_custusx_calibration_EXPORT TemporalCalibrationWidget : public BaseWidget
 {
   Q_OBJECT
 public:
-  ActiveToolWidget(QWidget* parent);
-  virtual ~ActiveToolWidget() {}
+  TemporalCalibrationWidget(VisServicesPtr services, AcquisitionServicePtr acquisitionService, QWidget* parent);
+  virtual ~TemporalCalibrationWidget();
 
   virtual QString defaultWhatsThis() const;
+
+private slots:
+  void patientChangedSlot();
+  void selectData(QString filename);
+  void calibrateSlot();
+
+protected:
+  void showEvent(QShowEvent* event);
+private:
+  TemporalCalibrationPtr mAlgorithm;
+
+  VisServicesPtr mServices;
+  FileSelectWidget* mFileSelectWidget;
+  QLineEdit* mResult;
+  QCheckBox* mVerbose;
+  RecordSessionWidget* mRecordSessionWidget;
+  QLabel* mInfoLabel;
 };
 
+
+/**
+ * @}
+ */
 }
 
-#endif /* CXACTIVETOOLWIDGET_H_ */
+#endif /* CXTEMPORALCALIBRATIONWIDGET_H_ */

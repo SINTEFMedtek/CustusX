@@ -39,12 +39,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDoubleWidgets.h"
 #include "cxToolProperty.h"
 #include "cxVector3DWidget.h"
-//#include "cxProbeImpl.h"
 #include "cxDoubleSpanSlider.h"
 #include "cxHelperWidgets.h"
 #include "cxTypeConversions.h"
 #include "cxDoublePairProperty.h"
-//#include "cxLegacySingletons.h"
 #include "cxVisServices.h"
 
 namespace cx
