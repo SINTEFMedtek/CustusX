@@ -87,8 +87,6 @@ private:
 	AcquisitionPtr mAcquisition;
 	UsReconstructionServicePtr mUsReconstructService;
 	USAcquisitionPtr mUsAcquisition;
-	PatientModelServicePtr mPatientModelService;
-	SessionStorageServicePtr mSession;
 	VisServicesPtr mServices;
 
 	void addXml(QDomNode& dataNode);
