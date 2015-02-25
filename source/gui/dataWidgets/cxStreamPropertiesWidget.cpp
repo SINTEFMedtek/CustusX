@@ -57,17 +57,14 @@ StreamPropertiesWidget::StreamPropertiesWidget(PatientModelServicePtr patientMod
 
 void StreamPropertiesWidget::streamSelectedSlot()
 {
-	TrackedStreamPtr trackedStream = mSelectStream->getTrackedStream();
-	if(mTrackedStream == trackedStream)
-		return;
 	if(mTrackedStream)
-		disconnect(trackedStream.get(), &TrackedStream::streaming, this, &StreamPropertiesWidget::streamingSlot);
+		disconnect(mTrackedStream.get(), &TrackedStream::streaming, this, &StreamPropertiesWidget::streamingSlot);
 
-	mTrackedStream = trackedStream;
+	mTrackedStream = mSelectStream->getTrackedStream();
 
 	if(mTrackedStream)
 	{
-		connect(trackedStream.get(), &TrackedStream::streaming, this, &StreamPropertiesWidget::streamingSlot);
+		connect(mTrackedStream.get(), &TrackedStream::streaming, this, &StreamPropertiesWidget::streamingSlot);
 		streamingSlot(true);
 	}
 	else
@@ -77,10 +74,22 @@ void StreamPropertiesWidget::streamSelectedSlot()
 void StreamPropertiesWidget::streamingSlot(bool isStreaming)
 {
 	ImagePtr image = ImagePtr();
-	if(isStreaming && mTrackedStream)
-		image = mTrackedStream->getChangingImage();
 	mTransferFunctionWidget->imageChangedSlot(image);
 	mShadingWidget->imageChangedSlot(image);
+
+	if(isStreaming && mTrackedStream)
+		connect(mTrackedStream.get(), &TrackedStream::newFrame, this, &StreamPropertiesWidget::firstFrame);
+}
+
+void StreamPropertiesWidget::firstFrame()
+{
+	ImagePtr image = mTrackedStream->getChangingImage();
+	if(image)
+	{
+		disconnect(mTrackedStream.get(), &TrackedStream::newFrame, this, &StreamPropertiesWidget::firstFrame);
+		mTransferFunctionWidget->imageChangedSlot(image);
+		mShadingWidget->imageChangedSlot(image);
+	}
 }
 
 QString StreamPropertiesWidget::defaultWhatsThis() const

@@ -58,6 +58,7 @@ public:
 private slots:
 	void streamSelectedSlot();
 	void streamingSlot(bool isStreaming);
+	void firstFrame();
 private:
 	StringPropertySelectTrackedStreamPtr mSelectStream;
 	TransferFunction3DWidgetPtr mTransferFunctionWidget;
