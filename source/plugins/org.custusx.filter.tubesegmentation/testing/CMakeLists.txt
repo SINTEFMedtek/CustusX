@@ -24,11 +24,9 @@ if(BUILD_TESTING)
         cxResource
         cxResourceFilter
         cxLogicManager
-        cxGui
         tubeSegmentationLib
         SIPL
         org_custusx_filter_tubesegmentation
-        org_custusx_core_patientmodel
         cxCatch
     )
     cx_add_tests_to_catch(cxtest_org_custusx_filter_tubesegmentation)

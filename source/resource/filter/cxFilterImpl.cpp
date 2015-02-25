@@ -48,6 +48,11 @@ FilterImpl::FilterImpl(VisServicesPtr services) :
 {
 }
 
+PatientModelServicePtr FilterImpl::patientService()
+{
+	return mServices->getPatientService();
+}
+
 QString FilterImpl::getUid() const
 {
 	if (mUid.isEmpty())

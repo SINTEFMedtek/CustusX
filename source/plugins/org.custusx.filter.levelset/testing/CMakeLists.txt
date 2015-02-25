@@ -35,7 +35,7 @@ if(BUILD_TESTING)
     target_link_libraries(cxtest_org_custusx_filter_levelset
         PRIVATE
         org_custusx_filter_levelset
-        org_custusx_core_patientmodel
+		cxLogicManager
         cxtestUtilities
         cxCatch
     )

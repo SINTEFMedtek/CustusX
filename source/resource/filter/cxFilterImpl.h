@@ -102,6 +102,7 @@ protected:
 	bool mActive;
 //	PatientModelServicePtr mPatientModelService;
 	VisServicesPtr mServices;
+	PatientModelServicePtr patientService();
 
 private:
 	QString mUid;

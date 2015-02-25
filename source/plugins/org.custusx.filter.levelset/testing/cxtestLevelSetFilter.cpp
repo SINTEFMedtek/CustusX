@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxData.h"
 #include "cxImage.h"
 #include "cxtestUtilities.h"
-#include "cxPatientData.h"
+//#include "cxPatientData.h"
 #include "cxDataLocations.h"
 #include "cxSelectDataStringProperty.h"
 #include "cxLogicManager.h"
@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDoubleProperty.h"
 #include "cxPatientModelService.h"
 #include "cxSessionStorageService.h"
+#include "cxVisServices.h"
 
 namespace cxtest {
 
@@ -65,7 +66,9 @@ TEST_CASE("LevelSetFilter: getSeedPointFromTool", "[unit][modules][Algorithm][Le
     toolTipPoint.setRandom();
 	setSeedPoint(toolTipPoint);
 	cx::ImagePtr image = cxtest::Utilities::create3DImage();
-	cx::Vector3D point = cx::LevelSetFilter::getSeedPointFromTool(image);
+
+	cx::VisServicesPtr vs = cx::VisServices::create(cx::logicManager()->getPluginContext());
+	cx::Vector3D point = cx::LevelSetFilter::getSeedPointFromTool(vs->getSpaceProvider(), image);
 	REQUIRE(toolTipPoint(0) == point(0));
     REQUIRE(toolTipPoint(1) == point(1));
     REQUIRE(toolTipPoint(2) == point(2));

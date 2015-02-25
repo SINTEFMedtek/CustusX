@@ -62,13 +62,11 @@ class Common(object):
         self.setBuildType("Debug") 
         self.threads = 1
         self.xcode = False
-        self.mBuildSSCExamples = True
         self.mBuildTesting = True
         self.short_pathnames = False
         if (platform.system() == 'Windows'):
             self.ninja = True
             self.short_pathnames = True
-            self.mBuildSSCExamples = False
             self.mBuildTesting = True
         self.mBuildExAndTest = False
         self.mCoverage = False

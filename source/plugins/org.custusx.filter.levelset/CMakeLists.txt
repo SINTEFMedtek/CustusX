@@ -34,14 +34,16 @@ set(PLUGIN_resources
 #Compute the plugin dependencies
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
+	PUBLIC
+	cxResource
+	cxResourceFilter
+	cxResourceVisualization
+	PRIVATE
     ${PLUGIN_target_libraries}   
-    cxPluginAlgorithm
     levelSetSegLib
-    cxResourceFilter
-    cxResource
-    cxLogicManager
-    cxPluginUtilities
-    )
+	cxPluginUtilities
+	${ITK_LIBRARIES}
+	)
 
 if (CX_USE_OPENCL_UTILITY)
     set(PLUGIN_target_libraries ${PLUGIN_target_libraries} OpenCLUtilityLibrary ${OPENCL_LIBRARIES})

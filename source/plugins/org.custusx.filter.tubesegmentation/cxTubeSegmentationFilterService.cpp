@@ -55,12 +55,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTSFPresets.h"
 #include "vtkForwardDeclarations.h"
 #include "cxPatientModelServiceProxy.h"
-#include "cxLegacySingletons.h"
+#include "cxVisServices.h"
 
 namespace cx {
 
 TubeSegmentationFilter::TubeSegmentationFilter(ctkPluginContext *pluginContext) :
-	FilterImpl(PatientModelServicePtr(new PatientModelServiceProxy(pluginContext))), mOutput(NULL)
+	FilterImpl(VisServices::create(pluginContext)), mOutput(NULL)
 {
 	connect(patientService().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
 	mPresets = this->populatePresets();
@@ -309,7 +309,7 @@ bool TubeSegmentationFilter::postProcess()
 //		dataManager()->saveImage(outputSegmentation, patientService()->getPatientData()->getActivePatientFolder());
 
 		//add contour internally to cx
-		MeshPtr contour = ContourFilter::postProcess(rawContour, inputImage, QColor("blue"));
+		MeshPtr contour = ContourFilter::postProcess(patientService(), rawContour, inputImage, QColor("blue"));
 		contour->get_rMd_History()->setRegistration(rMd_c);
 
 		//set output
@@ -392,7 +392,7 @@ void TubeSegmentationFilter::createInputTypes()
 {
 	SelectDataStringPropertyBasePtr temp;
 
-	temp = StringPropertySelectImage::New(mPatientModelService);
+	temp = StringPropertySelectImage::New(patientService());
 	temp->setValueName("Input");
 	temp->setHelp("Select input to run Tube segmentation on.");
 	mInputTypes.push_back(temp);
@@ -406,31 +406,31 @@ void TubeSegmentationFilter::createOutputTypes()
 	StringPropertySelectMeshPtr tempMeshStringAdapter;
 
 	//0
-	tempDataStringAdapter = StringPropertySelectData::New(mPatientModelService);
+	tempDataStringAdapter = StringPropertySelectData::New(patientService());
 	tempDataStringAdapter->setValueName("Centerline volume");
 	tempDataStringAdapter->setHelp("Generated centerline volume.");
 	mOutputTypes.push_back(tempDataStringAdapter);
 
 	//1
-	tempMeshStringAdapter = StringPropertySelectMesh::New(mPatientModelService);
+	tempMeshStringAdapter = StringPropertySelectMesh::New(patientService());
 	tempMeshStringAdapter->setValueName("Centerline mesh");
 	tempMeshStringAdapter->setHelp("Generated centerline mesh (vtk-format).");
 	mOutputTypes.push_back(tempMeshStringAdapter);
 
 	//2
-	tempDataStringAdapter = StringPropertySelectData::New(mPatientModelService);
+	tempDataStringAdapter = StringPropertySelectData::New(patientService());
 	tempDataStringAdapter->setValueName("Segmented centerline");
 	tempDataStringAdapter->setHelp("Grown segmentation from the centerline.");
 	mOutputTypes.push_back(tempDataStringAdapter);
 
 	//3
-	tempMeshStringAdapter = StringPropertySelectMesh::New(mPatientModelService);
+	tempMeshStringAdapter = StringPropertySelectMesh::New(patientService());
 	tempMeshStringAdapter->setValueName("Segmented centerlines surface");
 	tempMeshStringAdapter->setHelp("Generated surface of the segmented volume.");
 	mOutputTypes.push_back(tempMeshStringAdapter);
 
 	//4
-	tempDataStringAdapter = StringPropertySelectData::New(mPatientModelService);
+	tempDataStringAdapter = StringPropertySelectData::New(patientService());
 	tempDataStringAdapter->setValueName("TDF volume");
 	tempDataStringAdapter->setHelp("Volume showing the probability of a voxel being part of a tubular structure.");
 	mOutputTypes.push_back(tempDataStringAdapter);

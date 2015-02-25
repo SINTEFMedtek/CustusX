@@ -60,18 +60,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "levelSet.hpp"
 #include "OpenCLManager.hpp"
 #include "HelperFunctions.hpp"
-#include "cxLegacySingletons.h"
 #include "cxSpaceProvider.h"
 #include "cxPatientModelServiceProxy.h"
 
 #include "level-set-segmentation-config.h"
 #include "OulConfig.hpp"
+#include "cxVisServices.h"
 
 namespace cx
 {
 
 LevelSetFilter::LevelSetFilter(ctkPluginContext *pluginContext) :
-	FilterImpl(PatientModelServicePtr(new PatientModelServiceProxy(pluginContext)))
+	FilterImpl(VisServices::create(pluginContext))
 {
 }
 
@@ -92,11 +92,11 @@ QString LevelSetFilter::getHelp() const
 			"</html>";
 }
 
-Vector3D LevelSetFilter::getSeedPointFromTool(DataPtr data)
+Vector3D LevelSetFilter::getSeedPointFromTool(SpaceProviderPtr spaceProvider, DataPtr data)
 {
 	// Retrieve position of tooltip and use it as seed point
-	Vector3D point = spaceProvider()->getActiveToolTipPoint(
-			spaceProvider()->getD(data));
+	Vector3D point = spaceProvider->getActiveToolTipPoint(
+			spaceProvider->getD(data));
 
 	// Have to multiply by the inverse of the spacing to get the voxel position
 	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
@@ -149,7 +149,7 @@ bool LevelSetFilter::preProcess()
 	filename = (patientService()->getActivePatientFolder()
 			+ "/" + inputImage->getFilename()).toStdString();
 
-	seedPoint = getSeedPointFromTool(inputImage);
+	seedPoint = getSeedPointFromTool(mServices->getSpaceProvider(), inputImage);
 	if (!isSeedPointInsideImage(seedPoint, inputImage))
 	{
 		std::cout << "Seed point is not inside image!" << std::endl;
@@ -300,7 +300,7 @@ bool LevelSetFilter::postProcess()
 	patientService()->insertData(outputSegmentation);
 
 	//add contour internally to cx
-	MeshPtr contour = ContourFilter::postProcess(rawContour, image,
+	MeshPtr contour = ContourFilter::postProcess(patientService(), rawContour, image,
 			QColor("blue"));
 	contour->get_rMd_History()->setRegistration(rMd_i);
 
@@ -328,7 +328,7 @@ void LevelSetFilter::createInputTypes()
 {
 	SelectDataStringPropertyBasePtr temp;
 
-	temp = StringPropertySelectImage::New(mPatientModelService);
+	temp = StringPropertySelectImage::New(patientService());
 	temp->setValueName("Input");
 	temp->setHelp("Select image input for thresholding");
 	mInputTypes.push_back(temp);
@@ -338,12 +338,12 @@ void LevelSetFilter::createOutputTypes()
 {
 	SelectDataStringPropertyBasePtr temp;
 
-	temp = StringPropertySelectData::New(mPatientModelService);
+	temp = StringPropertySelectData::New(patientService());
 	temp->setValueName("Output");
 	temp->setHelp("Output segmented binary image");
 	mOutputTypes.push_back(temp);
 
-	temp = StringPropertySelectData::New(mPatientModelService);
+	temp = StringPropertySelectData::New(patientService());
 	temp->setValueName("Contour");
 	temp->setHelp("Output contour generated from thresholded binary image.");
 	mOutputTypes.push_back(temp);

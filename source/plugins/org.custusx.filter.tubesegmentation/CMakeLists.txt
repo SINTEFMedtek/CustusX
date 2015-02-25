@@ -51,15 +51,14 @@ ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries
     PUBLIC
     ${PLUGIN_target_libraries}
-    cxPluginAlgorithm
 
     PRIVATE
     tubeSegmentationLib
     SIPL
     cxResource
     cxResourceFilter
+	cxResourceVisualization
     cxPluginUtilities
-    cxLogicManager
 )
 
 if(CX_USE_OPENCL_UTILITY)

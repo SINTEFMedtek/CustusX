@@ -411,7 +411,6 @@ class CustusX(CppComponent):
         add('OpenCLUtilityLibrary_DIR:PATH', self._createSibling(OpenCLUtilityLibrary).configPath())
         add('BUILD_DOCUMENTATION:BOOL', self.controlData.build_developer_doc)            
         add('CX_BUILD_USER_DOCUMENTATION:BOOL', self.controlData.build_user_doc)            
-        add('SSC_BUILD_EXAMPLES:BOOL', self.controlData.mBuildSSCExamples);
         add('BUILD_TESTING:BOOL', self.controlData.mBuildTesting);
         add('SSC_USE_GCOV:BOOL', self.controlData.mCoverage);
         add('CX_SYSTEM_BASE_NAME:STRING', self.controlData.system_base_name)
@@ -478,7 +477,7 @@ class LevelSetSegmentation(CppComponent):
         # this fix should rebase repo from the original smistad/LSS to our own fork on GitHub.
         repo = '%s/Level-Set-Segmentation' % self.controlData.gitrepo_open_site_base
         self._getBuilder().gitSetRemoteURL(repo, branch="master")
-        self._getBuilder().gitCheckout('096f0beb014c4961bf2defaff9cc657d5f136014')
+        self._getBuilder().gitCheckout('e49217188925845be9b336adcb2b9e81c26ea784')
         self._getBuilder()._gitSubmoduleUpdate()
     def configure(self):
         builder = self._getBuilder()

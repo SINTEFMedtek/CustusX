@@ -68,7 +68,7 @@ public:
 	DoublePropertyPtr getAlphaOption(QDomElement root);
 	DoublePropertyPtr getRadiusOption(QDomElement root);
 
-	static Vector3D getSeedPointFromTool(DataPtr image);
+	static Vector3D getSeedPointFromTool(SpaceProviderPtr spaceProvider, DataPtr image);
 	static bool isSeedPointInsideImage(Vector3D, DataPtr);
 	QDomElement getmOptions();
 
