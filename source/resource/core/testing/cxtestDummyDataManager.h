@@ -48,8 +48,8 @@ struct CXTESTRESOURCE_EXPORT TestServicesType
 	cx::TrackingServicePtr mTrackingService;
 };
 
-TestServicesType createDummyCoreServices();
-void destroyDummyCoreServices(TestServicesType& services);
+TestServicesType CXTESTRESOURCE_EXPORT createDummyCoreServices();
+void CXTESTRESOURCE_EXPORT destroyDummyCoreServices(TestServicesType& services);
 
 typedef boost::shared_ptr<class TestServices> TestServicesPtr;
 
