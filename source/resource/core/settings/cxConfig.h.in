@@ -4,7 +4,7 @@
 
 // location of configuration folders during compilation
 #define CX_CONFIG_ROOT "@CX_CONFIG_ROOT@"
-#define CX__OPTIONAL_CONFIG_ROOT "@CX__OPTIONAL_CONFIG_ROOT@"
+#define CX_OPTIONAL_CONFIG_ROOT "@CX_OPTIONAL_CONFIG_ROOT@"
 
 #define CustusX_VERSION_STRING "@CustusX_VERSION_STRING@"
 #define CustusX_VERSION_MAJOR "@CustusX_VERSION_MAJOR@"

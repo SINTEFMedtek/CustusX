@@ -182,8 +182,8 @@ QStringList DataLocations::getRootConfigPaths()
   QStringList retval;
   if (QDir(CX_CONFIG_ROOT).exists()) // look for folder in source code
 	retval << QDir(CX_CONFIG_ROOT).canonicalPath();
-  if (QDir(CX__OPTIONAL_CONFIG_ROOT).exists()) // look for folder in source code
-	retval << QDir(CX__OPTIONAL_CONFIG_ROOT).canonicalPath();
+  if (QDir(CX_OPTIONAL_CONFIG_ROOT).exists()) // look for folder in source code
+	retval << QDir(CX_OPTIONAL_CONFIG_ROOT).canonicalPath();
 
   return retval;
 }
