@@ -127,6 +127,7 @@ Message LogThread::cleanupMessage(Message message)
 	if (!message.mSourceFile.isEmpty())
 	{
 		message.mSourceFile = message.mSourceFile.split("CustusX/").back();
+		message.mSourceFile = message.mSourceFile.split("CX/").back();
 	}
 
 	return message;

@@ -384,9 +384,11 @@ class CustusX(CppComponent):
     def name(self):
         return "CustusX"
     def help(self):
-        return 'CustusX from SINTEF'
+        return 'custusx.org'
     def path(self):
-        return self.controlData.getWorkingPath() + "/CustusX"    
+        return '%s/%s' % (self.controlData.getWorkingPath(), self.sourceFolder())    
+    def sourceFolder(self):
+        return self.controlData.getRepoFolderName()
     def _rawCheckout(self):
         base = self.controlData.gitrepo_open_site_base    
         repo = '%s/CustusX.git' % base

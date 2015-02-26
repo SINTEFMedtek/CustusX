@@ -137,19 +137,6 @@ class CustusXInstaller:
         print "retval:", retval
         return retval
 
-#        shell.changeDir(self.source_custusx_path) 
-#        self._removeLocalTags()    
-        
-#        output = shell.evaluate('git describe --tags --exact-match')
-#        if output:
-#            name = output.stdout.strip() 
-#        else:
-#            output = shell.evaluate('git describe --tags')
-#            name = output.stdout.strip() 
-#            name = '%s-dirty-%s' % (self._getDateString(), name)
-#        #name = 'CustusX_%s' % name
-#        return name
-
     def _generateReleaseFolderName(self):
         '''
         Generate a name for the folder to insert release files into.

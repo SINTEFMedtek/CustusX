@@ -267,5 +267,18 @@ class Common(object):
         ninja_found = spawn.find_executable('ninja')
         return ninja_found is not None
 
+    def getRepoFolderName(self):
+        '''
+        Look at the file system, find the name of the folder the repo resides in.
+        '''
+        # alternatively use  sys.argv[0] ?? 
+        moduleFile = os.path.realpath(__file__)
+        modulePath = os.path.dirname(moduleFile)
+        repoPath = '%s/../../..' % modulePath 
+        repoPath = os.path.abspath(repoPath)
+        repoFolder = os.path.split(repoPath)[1]
+        #print "********* Found path: %s, folder=%s" % (repoPath, repoFolder)
+        return repoFolder
+
 # ---------------------------------------------------------
 
