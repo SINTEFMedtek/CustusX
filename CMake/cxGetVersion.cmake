@@ -186,10 +186,7 @@ MACRO(cx_set_version_today_alpha)
 	cx_get_git_sha(GIT_SHA)
 	cx_get_git_branch(GIT_BRANCH)
 
-message(STATUS "TODAY_DATE: " ${TODAY_DATE})
-
 	string(REPLACE "-" ";" TODAY_DATE_LIST ${TODAY_DATE})
-message(STATUS "TODAY_DATE2: " ${TODAY_DATE})
 
 	list(GET TODAY_DATE_LIST 0 YEAR)
 	list(GET TODAY_DATE_LIST 1 MONTH)

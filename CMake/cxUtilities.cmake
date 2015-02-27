@@ -133,26 +133,11 @@ macro(cx_set_os_identifiers)
 endmacro()
 
 ###############################################################################
-# Find date for latest cmake rebuild
+# Find date for latest cmake rebuild, in ISO 8601 format
 #
-# Inspired by http://marc.info/?l=cmake&m=129077863120656&w=2
 ###############################################################################
 MACRO(cx_get_today RESULT)
-    IF(WIN32)
-        EXECUTE_PROCESS(
-            COMMAND "cmd" "/C date /T"
-            OUTPUT_VARIABLE ${RESULT}
-            )
-    ELSEIF(UNIX)
-        EXECUTE_PROCESS(
-            COMMAND "date" "+%d/%m/%Y" 
-            OUTPUT_VARIABLE ${RESULT}
-            )
-        string(REGEX REPLACE "(..)/(..)/(....).*" "\\3-\\2-\\1" ${RESULT} ${${RESULT}})
-    ELSE(WIN32)
-        MESSAGE(SEND_ERROR "date not implemented")
-        SET(${RESULT} 000000)
-    ENDIF(WIN32)
+	string(TIMESTAMP ${RESULT} "%Y-%m-%d")
 ENDMACRO()
 
 
