@@ -44,7 +44,7 @@ namespace cx
 
 /** Simple 1:1 conflation of SSC Views and Qt Widgets
   *
-  * \ingroup cx_resource_visualization_internal
+  * \ingroup cx_resource_view_internal
   */
 class ViewWidget : public QVTKWidget
 {

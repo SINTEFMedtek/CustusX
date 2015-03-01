@@ -42,6 +42,9 @@ class ctkPluginContext;
 namespace cx
 {
 
+/**
+ * \ingroup org_custusx_usreconstruction
+ */
 class org_custusx_usreconstruction_EXPORT UsReconstructionServiceProxy : public UsReconstructionService
 {
 

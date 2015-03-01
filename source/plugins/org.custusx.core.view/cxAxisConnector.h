@@ -47,7 +47,7 @@ typedef boost::shared_ptr<class SpaceListener> SpaceListenerPtr;
  * Ad-hoc class for connecting axis reps to coord spaces.
  * Used by ViewWrapper3D.
  *
- * \ingroup cx_service_visualization
+ * \ingroup org_custusx_core_view
  * \date 5 Sep 2013, 2013
  * \author christiana
  */

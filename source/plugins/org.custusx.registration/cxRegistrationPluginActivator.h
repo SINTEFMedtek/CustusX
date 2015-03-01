@@ -38,6 +38,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
+/**
+ * \defgroup org_custusx_registration
+ * \ingroup cx_plugins
+ *
+ * \see cx::RegistrationService.
+ *
+ */
 
 typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
 

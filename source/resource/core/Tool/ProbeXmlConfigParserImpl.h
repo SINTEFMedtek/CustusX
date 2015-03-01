@@ -37,8 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ProbeXmlConfigParser.h>
 
-/*
- * probeXmlConfigParserImpl.h
+/**
  *
  *  \brief Implementation of abstract interface ProbeXmlConfigParser
  *  Interface to ProbeCalibConfigs.xml

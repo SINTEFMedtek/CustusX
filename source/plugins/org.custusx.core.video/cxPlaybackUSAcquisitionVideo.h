@@ -50,14 +50,14 @@ typedef boost::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
 
 /**
  * \file
- * \addtogroup cx_service_video
+ * \addtogroup org_custusx_core_video
  * @{
  */
 
 /**\brief Handler for playback of US image data
  * from a US recording session.
  *
- * \ingroup cx_service_video
+ * \ingroup org_custusx_core_video
  * \date Apr 11, 2012
  * \author Christian Askeland, SINTEF
  *

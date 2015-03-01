@@ -46,7 +46,7 @@ typedef boost::shared_ptr<class ViewFollower> ViewFollowerPtr;
 /**
  * Ensure the tool is inside a given viewport, by moving the global center.
  *
- * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_view
  * \date 2014-01-14
  * \author christiana
  */

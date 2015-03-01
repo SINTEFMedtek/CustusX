@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-/**\brief Abstract interface for interaction with internal double-valued data
+/** Abstract interface for interaction with internal double-valued data
  *
  * The class provides a bridge between general user interface code and specific
  * data structures. An implementation connects to a single data value.

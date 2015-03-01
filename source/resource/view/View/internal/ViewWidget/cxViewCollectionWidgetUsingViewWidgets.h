@@ -48,7 +48,7 @@ namespace cx
  * Widget for displaying Views, Containing a QGridLayout of QVTKWidgets,
  * one for each view.
  *
- * \ingroup cx_resource_visualization_internal
+ * \ingroup cx_resource_view_internal
  * \date 2013-11-05
  * \author Christian Askeland
  */

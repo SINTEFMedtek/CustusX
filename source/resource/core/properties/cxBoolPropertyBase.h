@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-/**\brief Property interface for boolean values.
+/** Property interface for boolean values.
  *
  * \ingroup cx_resource_core_properties
  */

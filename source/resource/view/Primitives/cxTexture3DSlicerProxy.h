@@ -61,7 +61,7 @@ typedef boost::shared_ptr<class Texture3DSlicerProxy> Texture3DSlicerProxyPtr;
  *
  * \sa Texture3DSlicerProxyImpl for the real implementation.
  *
- * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_view
  */
 class cxResourceVisualization_EXPORT Texture3DSlicerProxy: public QObject
 {
@@ -97,7 +97,7 @@ public:
  *  Created on: Oct 13, 2011
  *      Author: christiana
  *
- * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_view
  */
 class cxResourceVisualization_EXPORT Texture3DSlicerProxyImpl: public Texture3DSlicerProxy
 {

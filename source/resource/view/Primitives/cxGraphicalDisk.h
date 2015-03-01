@@ -46,7 +46,7 @@ namespace cx
 /** Render a flat disk in 2D/3D
  *
  *
- * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_view
  * \date 2014-02-25
  * \author christiana
  */

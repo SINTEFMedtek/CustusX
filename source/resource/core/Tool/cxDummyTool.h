@@ -54,7 +54,7 @@ class ToolManager;
 /** Minimal implementation of the Probe interface.
   * Use setData() and setRTSource() to initialize.
   *
- * \ingroup cx_resource_core_tool
+  * \ingroup cx_resource_core_tool
   */
 class cxResource_EXPORT DummyProbe: public Probe
 {

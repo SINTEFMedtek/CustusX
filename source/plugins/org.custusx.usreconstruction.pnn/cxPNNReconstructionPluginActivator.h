@@ -38,6 +38,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
+/**
+ * \defgroup org_custusx_usreconstruction_pnn
+ * \ingroup cx_plugins
+ *
+ * \see cx::PNNReconstructionMethodService
+ *
+ */
 
 typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
 

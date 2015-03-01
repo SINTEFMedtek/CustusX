@@ -63,7 +63,7 @@ typedef boost::shared_ptr<class Rep> RepPtr;
  * one of these three modes.
  *
  *
- * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_view
  */
 class View : public QObject
 {

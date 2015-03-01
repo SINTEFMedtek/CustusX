@@ -49,8 +49,8 @@ typedef boost::shared_ptr<class PointMetricRep2D> PointMetricRep2DPtr;
 
 /**Rep for visualizing a PointMetric in 2D views.
  *
- * \ingroup cx_resource_visualization
- * \ingroup cx_resource_visualization_rep2D
+ * \ingroup cx_resource_view
+ * \ingroup cx_resource_view_rep2D
  *
  * \date Jun 14, 2012
  * \author Sigmund Augdal, SonoWand AS

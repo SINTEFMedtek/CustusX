@@ -72,7 +72,7 @@ typedef boost::shared_ptr<class AxisConnector> AxisConnectorPtr;
 
 /**
  * \file
- * \addtogroup cx_service_visualization
+ * \addtogroup org_custusx_core_view
  * @{
  */
 

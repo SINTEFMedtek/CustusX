@@ -63,7 +63,7 @@ typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
  *
  * Used by CustusX.
  *
- * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_view
  */
 class cxResourceVisualization_EXPORT ToolTracer : QObject
 {

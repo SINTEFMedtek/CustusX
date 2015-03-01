@@ -42,7 +42,7 @@ typedef boost::shared_ptr<class StringPropertyBase> StringPropertyBasePtr;
 typedef boost::shared_ptr<class DoublePropertyBase> DoublePropertyBasePtr;
 
 /**
- * \ingroup cx_service_video
+ * \ingroup org_custusx_core_video
  *
  * \date 2014-11-20
  * \author Christian Askeland, SINTEF

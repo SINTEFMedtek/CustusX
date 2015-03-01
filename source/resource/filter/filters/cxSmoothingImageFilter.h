@@ -40,7 +40,7 @@ namespace cx
 /** Filter for smoothing a volume.
  *
  *
- * \ingroup cx_module_algorithm
+ * \ingroup cx_resource_filter
  * \date Nov 26, 2012
  * \author christiana
  */

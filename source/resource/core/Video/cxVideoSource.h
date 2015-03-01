@@ -52,7 +52,7 @@ typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 namespace cx
 {
 
-/**\brief video source interface.
+/** \brief video source interface.
  *
  * Synchronize data with source,
  * provide data as a vtkImageData.

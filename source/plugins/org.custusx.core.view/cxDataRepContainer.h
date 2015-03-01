@@ -45,7 +45,7 @@ typedef boost::shared_ptr<class SphereMetric> SphereMetricPtr;
 /** Creates and manages a list of reps based on input Data objects.
  *
  *
- * \ingroup cx_service_visualization
+ * \ingroup org_custusx_core_view
  * \date 2014-03-27
  * \author christiana
  */

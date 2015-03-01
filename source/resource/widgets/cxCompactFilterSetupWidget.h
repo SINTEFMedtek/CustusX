@@ -49,7 +49,7 @@ class WidgetObscuredListener;
  * \brief Helper widget for displaying the input/output/options part of a Filter.
  * Intended to be included in other Filter widgets.
  *
- * \ingroup cx_module_algorithm
+ * \ingroup cx_resource_widgets
  * \date Dec 13, 2012
  * \author Christian Askeland, SINTEF
  */

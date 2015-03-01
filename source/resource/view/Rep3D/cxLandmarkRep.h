@@ -55,7 +55,7 @@ class Reporter;
 typedef boost::shared_ptr<class LandmarkRep> LandmarkRepPtr;
 
 /**
- * \addtogroup cx_resource_visualization
+ * \addtogroup cx_resource_view
  * @{
  */
 
@@ -111,7 +111,7 @@ private:
  * \class LandmarkRep
  *
  * \brief
- * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_view
  * \date Dec 10, 2008
  * \\author Janne Beate Bakeng, SINTEF
  * \\author Christian Askeland, SINTEF

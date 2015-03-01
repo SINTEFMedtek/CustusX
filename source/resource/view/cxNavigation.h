@@ -45,7 +45,7 @@ typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
 
 /** Functions for navigating in the visualization scene(s).
  *
- * \ingroup cx_service_visualization
+ * \ingroup cx_resource_view
  */
 class cxResourceVisualization_EXPORT Navigation
 {

@@ -65,7 +65,7 @@ typedef boost::shared_ptr<class IgstkTool> IgstkToolPtr;
 
 /**
  * \file
- * \addtogroup cx_service_tracking
+ * \addtogroup org_custusx_core_tracking
  * @{
  */
 
@@ -73,7 +73,7 @@ typedef boost::shared_ptr<class ProbeImpl> ProbeImplPtr;
 
 /**
  * \brief Class representing the tools a navigation system can recognize.
- * \ingroup cx_service_tracking
+ * \ingroup org_custusx_core_tracking
  *
  * \date Nov 6, 2008
  * \author Janne Beate Bakeng, SINTEF

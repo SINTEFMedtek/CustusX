@@ -38,13 +38,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
+/**
+ * \defgroup org_custusx_registration_method_vessel
+ * \ingroup cx_plugins
+ *
+ * \see cx::RegistrationMethodVesselImageToImageService
+ *
+ */
 
 typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
 
 /**
  * Activator for Registration method Vessel service
  *
- * \ingroup org_custusx_registration_method_Vessel
+ * \ingroup org_custusx_registration_method_vessel
  *
  * \date 2014-10-01
  * \author Ole Vegard Solberg, SINTEF

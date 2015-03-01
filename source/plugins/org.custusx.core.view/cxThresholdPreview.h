@@ -47,9 +47,9 @@ typedef boost::shared_ptr<class ThresholdPreview> ThresholdPreviewPtr;
 
 /**
  * \brief Use transfer function to preview a threshold in the selected volume. Used by widgets: segmentation and surface generation
- * \ingroup cx_service_visualization
+ * \ingroup org_custusx_core_view
  *
- * \ingroup cx_service_visualization
+ * \ingroup org_custusx_core_view
  * \date 12. okt. 2011
  * \author Ole Vegard Solberg, SINTEF
  */

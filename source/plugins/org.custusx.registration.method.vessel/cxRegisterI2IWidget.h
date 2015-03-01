@@ -38,8 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDoubleProperty.h"
 #include "cxDoubleWidgets.h"
 #include "cxRegistrationBaseWidget.h"
-//#include "cxBinaryThresholdImageFilter.h"
-
 
 namespace cx
 {
@@ -47,18 +45,13 @@ typedef boost::shared_ptr<class StringPropertySelectImage> StringPropertySelectI
 class SeansVesselRegistrationWidget;
 
 /**
- * \file
- * \addtogroup cx_module_registration
- * @{
- */
-
-/**
  * \class RegisterI2IWidget
  *
  * \brief Widget for performing the registration between two vessel segments.
  *
+ * \ingroup org_custusx_registration_method_vessel
  * \date 13. okt. 2010
- * \\author Janne Beate Bakeng
+ * \author Janne Beate Bakeng
  */
 class RegisterI2IWidget : public RegistrationBaseWidget
 {
@@ -69,19 +62,12 @@ public:
   ~RegisterI2IWidget();
   virtual QString defaultWhatsThis() const;
 
-//public slots:
-//  void fixedImageSlot(QString uid);
-//  void movingImageSlot(QString uid);
-
 private:
   RegisterI2IWidget();
 
   SeansVesselRegistrationWidget* mSeansVesselRegsitrationWidget;
 };
 
-/**
- * @}
- */
 }
 
 #endif /* CXREGISTERI2IWIDGET_H_ */

@@ -43,7 +43,7 @@ class QSettings;
 namespace cx
 {
 
-/**Helper functions for accessing file paths and similar stuff.
+/** Helper functions for accessing file paths and similar stuff.
  * \ingroup cx_resource_core_settings
  *  \date Jun 22, 2010
  *  \author christiana

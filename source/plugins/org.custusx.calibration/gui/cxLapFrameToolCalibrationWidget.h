@@ -53,7 +53,7 @@ typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectTo
 
 /**
  * \file
- * \addtogroup cx_module_calibration
+ * \addtogroup org_custusx_calibration
  * @{
  */
 

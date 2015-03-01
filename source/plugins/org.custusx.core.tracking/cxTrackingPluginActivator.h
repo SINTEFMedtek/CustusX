@@ -39,6 +39,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
+/**
+ * \defgroup org_custusx_core_tracking
+ * \ingroup cx_plugins
+ *
+ *
+ * See \ref cx::TrackingImplService.
+ *
+ */
+
+
 typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
 
 /**

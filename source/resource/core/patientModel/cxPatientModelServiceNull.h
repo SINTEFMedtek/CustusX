@@ -42,7 +42,7 @@ namespace cx
 /** \brief Null Object Pattern for Registration service
  *
  *
- *  \ingroup cx_resource_core_patientModel
+ *  \ingroup cx_resource_core_data
  *  \date 2014-09-10
  *  \author Ole Vegard Solberg, SINTEF
  */

@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx {
 
-/*
+/**
  * \brief Abstract base class for frame metric.
  *
  * \ingroup cx_resource_core_data

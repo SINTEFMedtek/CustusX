@@ -53,7 +53,7 @@ namespace cx
 
 typedef boost::shared_ptr<class AngleMetric> AngleMetricPtr;
 
-/**\brief Data class that represents an angle between two lines.
+/** \brief Data class that represents an angle between two lines.
  *
  * The lines are defined by four points ABCD. The computed
  * angle is from vector BA to vector CD.

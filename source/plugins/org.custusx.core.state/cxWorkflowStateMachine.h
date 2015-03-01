@@ -52,7 +52,7 @@ class WorkflowState;
  *
  *  See StateService for a description.
  *
- * \ingroup cx_custusx_core_state
+ * \ingroup org_custusx_core_state
  * \date 4. aug. 2010
  * \author Janne Beate Bakeng, SINTEF
  */

@@ -52,7 +52,7 @@ namespace cx
 
 typedef boost::shared_ptr<class ProbeSector> ProbeSectorPtr;
 
-/**\brief Utility functions for drawing an US Probe sector
+/** \brief Utility functions for drawing an US Probe sector
  *
  * \ingroup cx_resource_core_tool
  */

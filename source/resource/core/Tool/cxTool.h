@@ -54,7 +54,7 @@ typedef std::map<double, Transform3D> TimedTransformMap;
 typedef boost::shared_ptr<TimedTransformMap> TimedTransformMapPtr;
 typedef boost::shared_ptr<class TrackingPositionFilter> TrackingPositionFilterPtr;
 
-/**\brief Interface to a tool,
+/** \brief Interface to a tool,
  * i.e. a pointer, US probe or similar.
  *
  * The tool position is defined in its own space (as given

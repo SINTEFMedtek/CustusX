@@ -39,15 +39,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-/**
-* \file
-* \addtogroup cx_service_tracking
-* @{
-*/
 
 /**
  * \brief Adapter class for ManualTool.
- * \ingroup cx_service_tracking
+ * \ingroup org_custusx_core_tracking
  *
  * A ManualToolAdapter inherits from manual tool, but also
  * contains a cx::Tool that is requests shape and probe info from.
@@ -84,10 +79,6 @@ private:
 
 typedef boost::shared_ptr<ManualToolAdapter> ManualToolAdapterPtr;
 
-
-/**
-* @}
-*/
 }
 
 #endif /* CXMANUALTOOLADAPTER_H_ */

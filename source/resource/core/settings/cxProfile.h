@@ -56,6 +56,8 @@ typedef boost::shared_ptr<class Profile> ProfilePtr;
  *  A profile is a collection of configuration data that
  *  is selectable by the user. Several profiles can exist,
  *  but only one can be active at a time.
+ *
+ * \ingroup cx_resource_core_settings
  */
 class cxResource_EXPORT Profile : public QObject
 {
@@ -119,6 +121,7 @@ private:
 
 /** Manager for the collection of profiles.
  *
+ * \ingroup cx_resource_core_settings
  */
 class cxResource_EXPORT ProfileManager : public QObject
 {

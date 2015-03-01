@@ -51,7 +51,7 @@ typedef boost::shared_ptr<class VisServices> VisServicesPtr;
  *  and run it. All available filters in the system should be
  *  in this widget.
  *
- * \ingroup cx_module_algorithm
+ * \ingroup cx_gui
  * \date Nov 18, 2012
  * \author Christian Askeland, SINTEF
  * \author Janne Beate Bakeng, SINTEF

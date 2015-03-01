@@ -80,7 +80,6 @@ include_directories( /opt/X11/include )
 # Add subdirectories
 #------------------------------------------------------------------------------
 add_subdirectory( doc )
-add_subdirectory( documentation )
 add_subdirectory( source )
 
 

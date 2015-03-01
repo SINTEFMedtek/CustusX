@@ -51,7 +51,7 @@ typedef boost::shared_ptr<class StateServiceBackend> StateServiceBackendPtr;
 
 /**
  * \file
- * \addtogroup cx_custusx_core_state
+ * \addtogroup org_custusx_core_state
  * @{
  */
 

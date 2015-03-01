@@ -53,9 +53,8 @@ class QDomDocument;
 
 namespace cx
 {
-//typedef boost::shared_ptr<class Landmarks> LandmarksPtr;
 
-/**\brief A volumetric data set.
+/** \brief A volumetric data set.
  *
  * One volumetric data set, represented as a vtkImageData,
  * along with auxiliary data.

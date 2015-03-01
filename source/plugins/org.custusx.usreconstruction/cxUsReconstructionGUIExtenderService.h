@@ -42,11 +42,9 @@ namespace cx
 typedef boost::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
 
 /**
- * \defgroup cx_module_usreconstruction UsReconstruction Plugin
- * \ingroup cx_modules
  * \brief Us Reconstruction framework with widgets.
  *
- * See \ref cx::UsReconstructionGUIExtenderService.
+ * \ingroup org_custusx_usreconstruction
  *
  */
 class org_custusx_usreconstruction_EXPORT UsReconstructionGUIExtenderService : public GUIExtenderService

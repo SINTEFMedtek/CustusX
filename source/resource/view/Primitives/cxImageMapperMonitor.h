@@ -51,7 +51,7 @@ typedef boost::shared_ptr<class ImageMapperMonitor> ImageMapperMonitorPtr;
  *
  * Used internally by VolumetricRep - No need to use this elsewhere!
  *
- * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_view
  * \author christiana
  */
 class cxResourceVisualization_EXPORT ImageMapperMonitor : public QObject

@@ -51,7 +51,7 @@ namespace cx
  * This is the main class for displaying visualizations.
  * Add Views using addView(), then add Reps to the Views.
  *
- * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_view
  * \date 2013-11-05
  * \date 2014-09-26
  * \author christiana

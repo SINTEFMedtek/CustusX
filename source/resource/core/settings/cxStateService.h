@@ -47,7 +47,7 @@ namespace cx
 
 /**
  * \file
- * \addtogroup cx_service_state
+ * \addtogroup cx_resource_core_settings
  * @{
  */
 

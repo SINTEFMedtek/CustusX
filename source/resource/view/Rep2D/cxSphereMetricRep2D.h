@@ -48,8 +48,8 @@ typedef boost::shared_ptr<class SphereMetric> SphereMetricPtr;
 
 /**
  *
- * \ingroup cx_resource_visualization
- * \ingroup cx_resource_visualization_rep2D
+ * \ingroup cx_resource_view
+ * \ingroup cx_resource_view_rep2D
  * \date 2014-03-27
  * \author christiana
  */

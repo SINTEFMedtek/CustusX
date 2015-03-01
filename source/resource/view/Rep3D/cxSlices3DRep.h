@@ -70,8 +70,8 @@ typedef boost::shared_ptr<class Texture3DSlicerProxy> Texture3DSlicerProxyPtr;
  *
  * \sa Texture3DSlicerProxy
  *
- * \ingroup cx_resource_visualization
- * \ingroup cx_resource_visualization_rep3D
+ * \ingroup cx_resource_view
+ * \ingroup cx_resource_view_rep3D
  */
 class cxResourceVisualization_EXPORT Slices3DRep: public RepImpl
 {

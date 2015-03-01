@@ -42,6 +42,9 @@ class ctkPluginContext;
 namespace cx
 {
 
+/**
+ * \ingroup cx_resource_core_video
+ */
 class cxResource_EXPORT VideoServiceProxy : public VideoService
 {
 public:

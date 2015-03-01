@@ -44,7 +44,7 @@ namespace cx {
 /** Widget for displaying a list of Property instances.
  * A stack of widgets is created if the setOptions() is called with different uids.
  *
- * \ingroup cx_module_algorithm
+ * \ingroup cx_resource_widgets
  * \date Nov 20, 2012
  * \author Christian Askeland, SINTEF
  * \author Janne Beate Bakeng, SINTEF

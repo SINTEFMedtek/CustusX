@@ -40,7 +40,7 @@ namespace cx
 
 /**
  * \brief Interface towards a dummy tracking system.
- * \ingroup cx_service_tracking
+ * \ingroup org_custusx_core_tracking
  *
  * \date 2014-11-01
  * \author Christian Askeland, SINTEF

@@ -38,6 +38,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
+/**
+ * \defgroup org_custusx_registration_method_landmark
+ * \ingroup cx_plugins
+ *
+ * \see cx::RegistrationMethodLandmarkImageToImageService
+ * \see cx::RegistrationMethodLandmarkImageToPatientService
+ * \see cx::RegistrationMethodFastLandmarkImageToPatientService
+ *
+ */
 
 //typedef boost::shared_ptr<class RegistrationMethodLandmarkService> RegistrationMethodLandmarkServicePtr;
 typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;

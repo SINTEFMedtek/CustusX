@@ -39,8 +39,13 @@ class QGridLayout;
 namespace cx
 {
 /**
+* \defgroup cx_resource_view_internal
+* \ingroup cx_resource_view
+*/
+
+/**
 * \file
-* \addtogroup cx_resource_visualization_internal
+* \addtogroup cx_resource_view_internal
 * @{
 */
 

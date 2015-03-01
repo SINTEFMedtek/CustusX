@@ -54,7 +54,7 @@ namespace cx
 
 typedef boost::shared_ptr<class DoubleProperty> DoublePropertyPtr;
 
-/**\brief Implementation of DoublePropertyBase.
+/** Implementation of DoublePropertyBase.
  *
  *  Represents one option of the double type.
  *  The data are stored within a xml document.

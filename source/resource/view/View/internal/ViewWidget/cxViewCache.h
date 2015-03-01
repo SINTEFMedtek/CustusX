@@ -44,7 +44,7 @@ namespace cx
 {
 /**
  * \file
- * \ingroup cx_resource_visualization_internal
+ * \ingroup cx_resource_view_internal
  * @{
  */
 
@@ -58,7 +58,7 @@ namespace cx
  *
  * \date 2010-07-29
  * \author christiana
- * \ingroup cx_resource_visualization_internal
+ * \ingroup cx_resource_view_internal
  */
 template<class VIEW_TYPE>
 class cxResourceVisualization_EXPORT ViewCache

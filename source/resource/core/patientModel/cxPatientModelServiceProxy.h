@@ -50,7 +50,7 @@ namespace cx
  * implementation of PatientModelService or
  * the null object (PatientModelServiceNull)
  *
- *  \ingroup cx_resource_core_registration
+ *  \ingroup cx_resource_core_data
  *  \date 2014-09-10
  *  \author Ole Vegard Solberg, SINTEF
  */

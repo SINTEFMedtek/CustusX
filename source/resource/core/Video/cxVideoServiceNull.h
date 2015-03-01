@@ -39,6 +39,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
+
+/**
+ * \ingroup cx_resource_core_video
+ */
 class cxResource_EXPORT VideoServiceNull : public VideoService
 {
 public:

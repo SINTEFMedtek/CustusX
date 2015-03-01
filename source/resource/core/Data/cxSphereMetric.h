@@ -49,7 +49,7 @@ namespace cx
 
 typedef boost::shared_ptr<class SphereMetric> SphereMetricPtr;
 
-/**\brief Data class that represents a donut.
+/** \brief Data class that represents a donut.
  *
  *
  * \date 2014-02-11

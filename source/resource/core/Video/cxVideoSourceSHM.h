@@ -64,7 +64,7 @@ class QTimer;
 namespace cx
 {
 
-/**\brief VideoSource for connecting to shared memory.
+/** \brief VideoSource for connecting to shared memory.
  *
  * Contains data assosiated with a shared memory video stream
  *

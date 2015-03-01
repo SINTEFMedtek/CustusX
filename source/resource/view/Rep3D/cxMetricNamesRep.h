@@ -54,9 +54,9 @@ typedef boost::shared_ptr<class DataMetric> DataMetricPtr;
 
 /** 
  *
- * \ingroup cx_resource_visualization
- * \ingroup cx_resource_visualization_rep2D
- * \ingroup cx_resource_visualization_rep3D
+ * \ingroup cx_resource_view
+ * \ingroup cx_resource_view_rep2D
+ * \ingroup cx_resource_view_rep3D
  *
  * \date 2014-02-13
  * \author christiana

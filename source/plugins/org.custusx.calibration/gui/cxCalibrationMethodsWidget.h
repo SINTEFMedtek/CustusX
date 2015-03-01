@@ -43,7 +43,7 @@ typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
 
 /**
  * \file
- * \addtogroup cx_module_calibration
+ * \addtogroup org_custusx_calibration
  * @{
  */
 

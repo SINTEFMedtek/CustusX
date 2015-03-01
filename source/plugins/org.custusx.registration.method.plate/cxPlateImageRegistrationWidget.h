@@ -42,7 +42,7 @@ namespace cx
  * Widget for performing plate (landmark based) image registration using only the
  * translation part of the matrix.
  *
- * \ingroup org_custusx_registration_method_Plate
+ * \ingroup org_custusx_registration_method_plate
  *
  * \date 2014-10-09
  * \author Ole Vegard Solberg, SINTEF

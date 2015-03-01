@@ -59,7 +59,7 @@ typedef boost::shared_ptr<ColorMap> ColorMapPtr;
 typedef boost::shared_ptr<class ImageTFData> ImageTFDataPtr;
 
 
-/**\brief Data class for Transfer Function info, either 2D or 3D.
+/** \brief Data class for Transfer Function info, either 2D or 3D.
  *
  * Used as base for ImageTF3D and ImageLUT2D.
  *

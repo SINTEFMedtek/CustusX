@@ -60,7 +60,7 @@ typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
 
 /**
  * \file
- * \addtogroup cx_service_visualization
+ * \addtogroup org_custusx_core_view
  * @{
  */
 

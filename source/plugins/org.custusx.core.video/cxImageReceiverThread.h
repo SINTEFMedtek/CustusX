@@ -55,7 +55,7 @@ typedef boost::shared_ptr<class ProbeDefinition> ProbeDefinitionPtr;
 
 /**
  * \file
- * \addtogroup cx_service_video
+ * \addtogroup org_custusx_core_video
  * @{
  */
 
@@ -69,7 +69,7 @@ typedef boost::shared_ptr<class ImageReceiverThread> ImageReceiverThreadPtr;
  *  - Image : contains vtkImageData, timestamp, uid, all else is discarded.
  *  - ProbeData : contains sector and image definition, temporal cal is discarded.
  *
- * \ingroup cx_service_video
+ * \ingroup org_custusx_core_video
  * \date Oct 11, 2012
  * \author Christian Askeland, SINTEF
  */

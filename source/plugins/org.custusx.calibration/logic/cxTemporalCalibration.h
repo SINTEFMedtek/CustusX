@@ -44,7 +44,7 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup cx_module_calibration
+ * \addtogroup org_custusx_calibration
  * @{
  */
 

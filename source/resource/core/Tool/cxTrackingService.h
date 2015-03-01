@@ -59,11 +59,13 @@ typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
 typedef boost::shared_ptr<class DummyTool> DummyToolPtr;
 typedef boost::shared_ptr<class ManualTool> ManualToolPtr;
 
-/** \brief Tracking services
+/**
+ * \brief Service providing tools and tracking systems.
+ *
+ * Links the navigation system to the physical world.
+ * Devices with a physical position are realized by tracking hardware.
  *
  *  \ingroup cx_resource_core_tool
- *  \date 2014-09-19
- *  \author Ole Vegard Solberg, SINTEF
  */
 class cxResource_EXPORT TrackingService : public QObject
 {

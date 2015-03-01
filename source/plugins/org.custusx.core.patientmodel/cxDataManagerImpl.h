@@ -56,11 +56,11 @@ namespace cx
 typedef boost::shared_ptr<class DataManager> DataServicePtr;
 typedef boost::shared_ptr<class DataManagerImpl> DataManagerImplPtr;
 
-/**\brief Default implementation of DataManager.
+/** Default implementation of DataManager.
  *
  * Used by CustusX.
  *
- * \ingroup cx_resource_core_data
+ * \ingroup org_custusx_core_patientmodel
  * \date Jan 6, 2009
  * \author christiana
  */

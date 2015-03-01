@@ -69,9 +69,7 @@ typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
  *
  * The tracking module is an implementation of the Tool module.
  * ToolManager and Tool are implemented using IGSTK, and communicates with
- * the Polaris and Aurora tracking systems. All interaction with the module
- * should go through the SSC interfaces. The ToolManager should be
- * considered equal to the \ref cx_service_tracking.
+ * the Polaris and Aurora tracking systems.
  *
  * \image html cxArchitecture_tracking.png "Tracking Service Implementation."
  *

@@ -43,7 +43,7 @@ namespace cx
 
 typedef boost::shared_ptr<class FrameMetric> FrameMetricPtr;
 
-/**\brief Data class that represents a single frame (transform).
+/** \brief Data class that represents a single frame (transform).
  *
  * The transform is attached to a specific coordinate system / frame.
  *

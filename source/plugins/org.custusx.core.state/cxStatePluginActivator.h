@@ -37,6 +37,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
+/**
+ * \defgroup org_custusx_core_state
+ * \ingroup cx_plugins
+ *
+ * \see cx::StateServiceImpl.
+ *
+ */
 
 typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
 

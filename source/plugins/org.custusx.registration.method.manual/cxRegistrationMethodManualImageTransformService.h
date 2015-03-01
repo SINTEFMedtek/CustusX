@@ -38,6 +38,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
+/**
+ * \ingroup org_custusx_registration_method_manual
+ */
 class org_custusx_registration_method_manual_EXPORT RegistrationMethodManualImageTransformService : public RegistrationMethodManualService
 {
 	Q_INTERFACES(cx::RegistrationMethodService)

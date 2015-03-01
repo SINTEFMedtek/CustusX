@@ -51,14 +51,14 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup cx_service_tracking
+ * \addtogroup cx_resource_core_tool
  * @{
  */
 
 typedef boost::shared_ptr<class ProbeImpl> ProbeImplPtr;
 
 /**
- * \ingroup cx_service_tracking
+ * \ingroup cx_resource_core_tool
  */
 class cxResource_EXPORT ProbeImpl: public Probe
 {

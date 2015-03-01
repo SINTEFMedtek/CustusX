@@ -57,8 +57,8 @@ namespace cx
  * This abstract interface is implemented by VolumetricRep
  * Previously: ProgressiveLODVolumetricRep, which is removed.
  * 
- * \ingroup cx_resource_visualization
- * \ingroup cx_resource_visualization_rep3D
+ * \ingroup cx_resource_view
+ * \ingroup cx_resource_view_rep3D
  */
 class cxResourceVisualization_EXPORT VolumetricBaseRep : public RepImpl
 {
@@ -86,8 +86,8 @@ protected:
  * Used by Sonowand.
  * Used by CustusX.
  *
- * \ingroup cx_resource_visualization
- * \ingroup cx_resource_visualization_rep3D
+ * \ingroup cx_resource_view
+ * \ingroup cx_resource_view_rep3D
  */
 class cxResourceVisualization_EXPORT VolumetricRep : public VolumetricBaseRep
 {

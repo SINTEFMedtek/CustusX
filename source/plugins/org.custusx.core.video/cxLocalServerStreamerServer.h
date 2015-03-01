@@ -48,7 +48,7 @@ typedef boost::shared_ptr<class BoolPropertyBase> BoolPropertyBasePtr;
 
 /** Options for LocalServerStreamer
  *
- * \ingroup cx_service_video
+ * \ingroup org_custusx_core_video
  *
  * \date 2014-11-21
  * \author Christian Askeland, SINTEF
@@ -70,7 +70,7 @@ private:
 
 /** Streamer wrapping another Streamer, but also runs an executable as a local process.
  *
- * \ingroup cx_service_video
+ * \ingroup org_custusx_core_video
  *
  * \date 2014-11-21
  * \author Christian Askeland, SINTEF

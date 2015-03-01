@@ -52,7 +52,7 @@ namespace cx
  * @{
  */
 
-/**\brief Helper class for sharing GPU memory over several Views (GL contexts).
+/** \brief Helper class for sharing GPU memory over several Views (GL contexts).
  *
  * This one stores 3D volume texture in the form of a vtkImageDataPtr
  *

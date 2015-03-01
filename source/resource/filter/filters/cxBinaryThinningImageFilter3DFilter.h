@@ -41,7 +41,7 @@ namespace cx
 /** Filter implementation of the itk::BinaryThinningImageFilter3D
  *
  *
- * \ingroup cx_module_algorithm
+ * \ingroup cx_resource_filter
  * \date 11 22, 2012
  * \author christiana
  */

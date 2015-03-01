@@ -51,7 +51,7 @@ class QDomDocument;
 namespace cx
 {
 
-/**\brief A mesh data set.
+/** \brief A mesh data set.
  *
  * A mesh is implemented as a vtkPolyData, and
  * thus can represent whatever that class can.

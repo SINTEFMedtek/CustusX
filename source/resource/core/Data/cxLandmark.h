@@ -46,17 +46,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class QDomNode;
 
-/*
- * sscLandmark.h
- *
- *  Created on: Apr 19, 2010
- *      Author: jbake
- */
 namespace cx
 {
 
 
-/**\brief One landmark, or fiducial, coordinate.
+/** \brief One landmark, or fiducial, coordinate.
  *
  * The ssc Landmark concept is one point with an unique uid that
  * can exist in several coordinate spaces. This class represent

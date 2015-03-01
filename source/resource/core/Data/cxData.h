@@ -60,7 +60,7 @@ typedef boost::shared_ptr<class RegistrationHistory> RegistrationHistoryPtr;
 typedef boost::shared_ptr<class Landmarks> LandmarksPtr;
 
 
-/**\brief Superclass for all data objects.
+/** \brief Superclass for all data objects.
  *
  * Example suclasses: Image and Mesh.
  *

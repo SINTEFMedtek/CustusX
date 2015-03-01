@@ -47,7 +47,7 @@ typedef boost::shared_ptr<class ReconstructCore> ReconstructCorePtr;
 
 /**
  * \file
- * \addtogroup cx_module_usreconstruction
+ * \addtogroup org_custusx_usreconstruction
  * @{
  */
 

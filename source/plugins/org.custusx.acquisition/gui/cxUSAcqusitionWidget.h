@@ -47,7 +47,7 @@ class DisplayTimerWidget;
 
 /**
 * \file
-* \addtogroup cx_module_acquisition
+* \addtogroup org_custusx_acquisition
 * @{
 */
 

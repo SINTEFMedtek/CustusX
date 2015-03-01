@@ -54,7 +54,7 @@ typedef boost::shared_ptr<class DataManager> DataServicePtr;
 /**
  * \brief Functionality for storing patient data in a folder on the disk
  * and access to these data.
- * \ingroup cx_service_patient
+ * \ingroup org_custusx_core_patientmodel
  *
  * Keeps track of a single active patient (patient folder).
  * Only one such patient can be active at a time, since the

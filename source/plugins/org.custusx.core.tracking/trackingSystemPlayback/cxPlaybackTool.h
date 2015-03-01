@@ -49,7 +49,7 @@ typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
  * \date Mar 29, 2012
  * \author Christian Askeland, SINTEF
  *
- * \ingroup cx_service_tracking
+ * \ingroup org_custusx_core_tracking
  */
 class org_custusx_core_tracking_EXPORT PlaybackTool: public ToolImpl
 {

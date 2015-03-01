@@ -40,6 +40,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
+/**
+ * \defgroup org_custusx_dicom
+ * \ingroup cx_plugins
+ *
+ * \see cx::DicomGUIExtenderService.
+ *
+ */
+
 typedef boost::shared_ptr<class DicomGUIExtenderService> DicomGUIExtenderServicePtr;
 typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
 

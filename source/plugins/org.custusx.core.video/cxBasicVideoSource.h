@@ -58,7 +58,7 @@ namespace cx
  * Use the interface extensions to control the input:
  * Set a vtkImageData and
  *
- * \ingroup cx_service_video
+ * \ingroup org_custusx_core_video
  * \date April 26, 2013
  * \author Christian Askeland, SINTEF
  */

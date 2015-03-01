@@ -59,7 +59,7 @@ typedef boost::shared_ptr<class View> ViewPtr;
  * The default implementation can be found in RepImpl. Inherit from that when
  * implementing concrete classes.
  *
- * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_view
  */
 class cxResourceVisualization_EXPORT Rep :public QObject
 {

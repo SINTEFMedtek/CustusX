@@ -42,14 +42,14 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup cx_service_patient
+ * \addtogroup cx_resource_core_data
  * @{
  */
 
 typedef boost::shared_ptr<class ActiveImageProxy> ActiveImageProxyPtr;
 /**
  * \brief Helper class for connection the active image.
- * \ingroup cx_service_patient
+ * \ingroup cx_resource_core_data
  *
  * By listening to this class, you will always listen
  * to the active image.

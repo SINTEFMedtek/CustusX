@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx {
 
-/*
+/**
  * \class Presets
  *
  * \brief Base class for a group of presets in the system.

@@ -49,7 +49,7 @@ typedef boost::shared_ptr<class ImageEnveloper> ImageEnveloperPtr;
 /**
  * Generate a total bounding volume from a set of volumes.
  *
- * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_view
  * \date 3 Oct 2013
  * \author Christian Askeland, SINTEF
  * \author Ole Vegard Solberg, SINTEF

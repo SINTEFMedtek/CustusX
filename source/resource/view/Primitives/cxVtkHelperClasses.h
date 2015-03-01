@@ -57,7 +57,7 @@ Vector3D getColorAsVector3D(QColor color) ;
 
 /**\brief RGB color data.
  *
- * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_view
  */
 class cxResourceVisualization_EXPORT RGBColor : public boost::array<double,3>
 {
@@ -74,7 +74,7 @@ public:
 
 /**\brief Helper for drawing a point in 2D.
  *
- * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_view
  */
 class cxResourceVisualization_EXPORT OffsetPoint
 {
@@ -96,7 +96,7 @@ typedef boost::shared_ptr<OffsetPoint> OffsetPointPtr;
 
 /**\brief Helper for drawing a line in 2D.
  *
- * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_view
  */
 class cxResourceVisualization_EXPORT LineSegment
 {
@@ -120,7 +120,7 @@ class cxResourceVisualization_EXPORT LineSegment
 
 /**\brief Helper for drawing text in 2D.
  *
- * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_view
  */
 class cxResourceVisualization_EXPORT TextDisplay
 {
@@ -156,7 +156,7 @@ typedef boost::shared_ptr<class TextDisplay> TextDisplayPtr;
 
 /**\brief Helper for drawing a crosshair in 2D.
  *
- * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_view
  */
 class cxResourceVisualization_EXPORT CrossHair2D
 {
@@ -181,7 +181,7 @@ typedef boost::shared_ptr<class CrossHair2D> CrossHair2DPtr;
  * Wrapper class for a vtkAxes. Sets up some nice defaults and draws the
  * axes in the world coordinate system.
  *
- * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_view
  */
 class cxResourceVisualization_EXPORT Axes3D
 {

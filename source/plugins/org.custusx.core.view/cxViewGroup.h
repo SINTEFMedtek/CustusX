@@ -55,7 +55,7 @@ typedef boost::shared_ptr<class Navigation> NavigationPtr;
 
 /**
  * \file
- * \addtogroup cx_service_visualization
+ * \addtogroup org_custusx_core_view
  * @{
  */
 

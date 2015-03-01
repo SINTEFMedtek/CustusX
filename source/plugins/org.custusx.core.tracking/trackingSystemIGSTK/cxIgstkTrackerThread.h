@@ -49,13 +49,13 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup cx_service_tracking
+ * \addtogroup org_custusx_core_tracking
  * @{
  */
 
 /**
  * \brief Thread containing all of IGSTK
- * \ingroup cx_service_tracking
+ * \ingroup org_custusx_core_tracking
  *
  * \sa ToolManager
  *

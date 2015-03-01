@@ -54,7 +54,7 @@ typedef boost::shared_ptr<class Rep> RepPtr;
  *
  * \date 2014-09-26
  * \author Christian Askeland
- * \ingroup cx_resource_visualization_internal
+ * \ingroup cx_resource_view_internal
  */
 class ViewItem : public QObject, public QLayoutItem
 {

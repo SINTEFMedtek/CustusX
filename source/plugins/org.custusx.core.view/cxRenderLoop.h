@@ -49,7 +49,7 @@ class ViewCollectionWidget;
  *
  * This is the main render loop in Custus.
  *
- * \ingroup cx_service_visualization
+ * \ingroup org_custusx_core_view
  * \date 2014-02-06
  * \author christiana
  */

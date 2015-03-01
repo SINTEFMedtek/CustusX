@@ -65,6 +65,9 @@ typedef boost::shared_ptr<class ReconstructionExecuter> ReconstructionExecuterPt
 
 typedef boost::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
 
+/**
+ * \ingroup org_custusx_usreconstruction
+ */
 class org_custusx_usreconstruction_EXPORT UsReconstructionService : public QObject
 {
 	Q_OBJECT

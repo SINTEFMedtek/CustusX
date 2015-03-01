@@ -43,8 +43,8 @@ typedef boost::shared_ptr<class VideoSourceGraphics> VideoSourceGraphicsPtr;
 
 /** \brief Display a stream (2D/3D) in 3D
  *
- * \ingroup cx_resource_visualization
- * \ingroup cx_resource_visualization_rep3D
+ * \ingroup cx_resource_view
+ * \ingroup cx_resource_view_rep3D
  *
  * \date jan 29, 2015
  * \author Ole Vegard Solberg, SINTEF

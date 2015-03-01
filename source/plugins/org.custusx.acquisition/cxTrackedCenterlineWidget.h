@@ -44,7 +44,7 @@ typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 
 /**
 * \file
-* \addtogroup cx_module_acquisition
+* \addtogroup org_custusx_acquisition
 * @{
 */
 

@@ -74,8 +74,6 @@ typedef boost::shared_ptr<class RegistrationHistory> RegistrationHistoryPtr;
  *   - relations between entities in space, time and structure
  *   - load/save
  *
- * This service replaces the old DataManager and PatientData classes. They
- * are deprecated.
  *
  *  \ingroup cx_resource_core_data
  *  \date 2014-05-15

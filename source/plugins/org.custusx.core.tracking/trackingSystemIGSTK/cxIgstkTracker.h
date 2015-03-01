@@ -57,7 +57,7 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup cx_service_tracking
+ * \addtogroup org_custusx_core_tracking
  * @{
  */
 
@@ -69,7 +69,7 @@ typedef boost::weak_ptr<IgstkTool> IgstkToolWeakPtr;
 
 /**
  * \brief Class representing the navigation system.
- * \ingroup cx_service_tracking
+ * \ingroup org_custusx_core_tracking
  *
  * \date Nov 7, 2008
  * \author Janne Beate Bakeng, SINTEF

@@ -45,7 +45,7 @@ typedef boost::shared_ptr<class VisualizationService> VisualizationServicePtr;
 /**
  * Convenience class combining all services used by visualization.
  *
- * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_view
  *
  * \date Nov 14 2014
  * \author Ole Vegard Solberg, SINTEF

@@ -45,7 +45,7 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup cx_module_registration
+ * \addtogroup org_custusx_registration_method_landmark
  * @{
  */
 

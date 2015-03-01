@@ -38,16 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QDomNode;
 class ctkPluginContext;
 
-/**
- * \defgroup cx_module_acquisition Acquisition Plugin
- * \ingroup cx_modules
- * \brief Handles the us acquisition process.
- *
- * See \ref cx::USAcquisition.
- * See \ref cx::AcquisitionPlugin.
- *
- */
-
 namespace cx
 {
 typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
@@ -59,7 +49,7 @@ typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 
 /**
 * \file
-* \addtogroup cx_module_acquisition
+* \addtogroup org_custusx_acquisition
 * @{
 */
 

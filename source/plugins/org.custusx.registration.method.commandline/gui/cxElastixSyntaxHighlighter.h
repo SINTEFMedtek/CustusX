@@ -39,8 +39,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-/**\brief Provides syntax highlighting for ElastiX parameter files.
- * \ingroup cx_module_registration
+/** Provides syntax highlighting for ElastiX parameter files.
+ *
+ * \ingroup org_custusx_registration_method_commandline
  *
  *  \date Feb 14, 2012
  *  \author christiana

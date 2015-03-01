@@ -47,7 +47,7 @@ namespace cx
  * Streamer that listens to an IGTLink connection, then
  * streams the incoming data.
  *
- * \addtogroup cx_service_video
+ * \addtogroup org_custusx_core_video
  * \author Christian Askeland, SINTEF
  * \date 2014-11-20
  */

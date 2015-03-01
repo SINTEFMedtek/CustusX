@@ -39,12 +39,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-/**\brief Direct setting of patient registration
+/** Direct setting of patient registration
  *
  * Manipulate the image matrix rMpr via a matrix
  * or xyz+angles. The writing of the matrix is handled
  * exactly like an image registration.
  *
+ *  \ingroup org_custusx_registration_method_manual
  *  \date Feb 16, 2012
  *  \author Christian Askeland, SINTEF
  *  \author Ole Vegard Solberg, SINTEF

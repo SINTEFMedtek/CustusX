@@ -48,7 +48,7 @@ typedef boost::shared_ptr<class MultiVolume3DRepProducer> MultiVolume3DVisualize
 /** 
  *
  *
- * \ingroup cx_service_visualization
+ * \ingroup org_custusx_core_view
  * \date 4 Sep 2013
  * \author Christian Askeland, SINTEF
  * \author Ole Vegard Solberg, SINTEF

@@ -44,7 +44,7 @@ typedef boost::shared_ptr<class StateServiceBackend> StateServiceBackendPtr;
 
 
 /**
- * \ingroup cx_custusx_core_state
+ * \ingroup org_custusx_core_state
  * \date 4. aug. 2010
  * \author Janne Beate Bakeng, SINTEF
  */

@@ -60,7 +60,7 @@ typedef boost::shared_ptr<class Image2DProxy> Image2DProxyPtr;
  *  Created on: Oct 13, 2011
  *      Author: christiana
  *
- * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_view
  */
 class cxResourceVisualization_EXPORT Image2DProxy : public QObject
 {
@@ -100,7 +100,7 @@ typedef boost::shared_ptr<class Image2DRep3D> Image2DRep3DPtr;
  * because the vtkVolume does not handle it.
  * This rep handles it though the use of a vtkImageActor.
  *
- * \ingroup cx_service_visualization
+ * \ingroup cx_resource_view
  * \date March 12, 2013
  * \author christiana
  */

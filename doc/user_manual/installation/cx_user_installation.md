@@ -2,7 +2,7 @@ Installation {#installation}
 ===================
 
 If you can get hold of an installer from the webpage (TBD), installation should be straightforward
-on all supported platforms. Check out the \subpage supported_platforms.
+on all supported platforms. Check out the \ref supported_platforms.
 
 Tracking System
 -----------------------------------------------------------

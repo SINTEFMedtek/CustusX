@@ -68,7 +68,7 @@ typedef vtkSmartPointer<vtkPolyData> vtkPolyDataPtr;
  *
  * Adapted from same-named class in CustusX1
  *
- * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_view
  */
 class cxResourceVisualization_EXPORT UltrasoundSectorSource : public vtkPolyDataAlgorithm
 {

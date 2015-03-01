@@ -38,6 +38,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
+/**
+ * \ingroup org_custusx_registration_method_vessel
+ */
 class Image2ImageRegistrationWidget : public TabbedWidget
 {
 public:

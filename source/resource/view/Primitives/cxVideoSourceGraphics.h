@@ -49,7 +49,7 @@ typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
  *
  * Used for Video display in VideoFixedPlaneRep and ToolRep3D.
  *
- * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_view
  *
  * \date Oct 31, 2010
  * \date april 26, 2013

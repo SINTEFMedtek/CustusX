@@ -48,6 +48,9 @@ namespace cx
 typedef boost::shared_ptr<class TimedBaseAlgorithm> TimedAlgorithmPtr;
 typedef boost::shared_ptr<class ReconstructionExecuter> ReconstructionExecuterPtr;
 
+/**
+ * \ingroup org_custusx_usreconstruction
+ */
 class org_custusx_usreconstruction_EXPORT ReconstructionExecuter : public QObject
 {
 	Q_OBJECT

@@ -38,6 +38,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
+/**
+ * \defgroup org_custusx_help
+ * \ingroup cx_plugins
+ *
+ * \see cx::HelpGUIExtenderService.
+ *
+ */
 
 typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
 typedef boost::shared_ptr<class HelpEngine> HelpEnginePtr;

@@ -42,16 +42,12 @@ class QVBoxLayout;
 
 namespace cx
 {
-/**
- * \file
- * \addtogroup cx_module_registration
- * @{
- */
 
 /**
  * \brief Widget for extracting a segment from a image and finding a centerline
  * from that segment.
  *
+ * \ingroup org_custusx_registration_method_vessel
  * \date 12. okt. 2010
  * \date 29. nov  2012
  * \author Janne Beate Bakeng
@@ -80,10 +76,6 @@ protected:
   ColorPropertyBasePtr mColorProperty;
 };
 
-
-/**
- * @}
- */
 }//namespace cx
 
 #endif // CXPREPAREVESSELSWIDGET_H

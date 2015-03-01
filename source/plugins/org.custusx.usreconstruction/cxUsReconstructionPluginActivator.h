@@ -38,13 +38,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
+/**
+ * \defgroup org_custusx_usreconstruction
+ * \ingroup cx_plugins
+ *
+ * \see cx::UsReconstructionGUIExtenderService
+ *
+ */
 
 typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
 
 /**
  * Activator for the UsReconstruction GUI plugin
  *
- * \ingroup org_custusx_calibration
+ * \ingroup org_custusx_usreconstruction
  *
  * \date Oct 15 2014
  * \author Ole Vegard Solberg, SINTEF

@@ -42,6 +42,9 @@ class ctkPluginContext;
 namespace cx
 {
 
+/**
+ *  \ingroup cx_resource_core_tool
+ */
 class cxResource_EXPORT TrackingServiceProxy : public TrackingService
 {
 public:

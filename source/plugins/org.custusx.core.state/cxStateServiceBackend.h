@@ -47,9 +47,8 @@ typedef boost::shared_ptr<class StateServiceBackend> StateServiceBackendPtr;
 
 /**
  *
- * \ingroup cx_custusx_core_state
+ * \ingroup org_custusx_core_state
  *
- * \ingroup cx_service_state
  * \date 2014-03-06
  * \author christiana
  */

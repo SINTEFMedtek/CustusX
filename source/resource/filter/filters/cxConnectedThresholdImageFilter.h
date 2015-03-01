@@ -43,7 +43,7 @@ typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 
 /**
  * \file
- * \addtogroup cx_module_algorithm
+ * \addtogroup cx_resource_filter
  * @{
  */
 

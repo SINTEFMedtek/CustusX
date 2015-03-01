@@ -47,7 +47,7 @@ namespace cx
 
 /** \brief Helper for rendering a torus in 3D
  *
- * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_view
  * \date 12.02.2014-02-12
  * \author christiana
  */

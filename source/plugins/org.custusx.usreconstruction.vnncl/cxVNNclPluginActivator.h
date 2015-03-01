@@ -38,13 +38,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
+/**
+ * \defgroup org_custusx_usreconstruction_vnncl
+ * \ingroup cx_plugins
+ *
+ * \see cx::VNNclReconstructionMethodService
+ *
+ */
 
 typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
 
 /**
  * Activator for the Tord Øygard reconstruction service
  *
- * \ingroup org_custusx_vnnclreconstruction
+ * \ingroup org_custusx_usreconstruction_vnncl
  *
  * \date 2014-05-09
  * \author Janne Beate Bakeng

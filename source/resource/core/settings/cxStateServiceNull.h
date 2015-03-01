@@ -38,7 +38,7 @@ namespace cx
 {
 
 /**
- * \ingroup org_custusx_core_state
+ * \ingroup cx_resource_core_settings
  */
 class cxResource_EXPORT StateServiceNull: public StateService
 {

@@ -43,6 +43,7 @@ namespace cx
 {
 
 /**
+ * \ingroup cx_resource_core_settings
  */
 class cxResource_EXPORT SessionStorageServiceProxy : public SessionStorageService
 {

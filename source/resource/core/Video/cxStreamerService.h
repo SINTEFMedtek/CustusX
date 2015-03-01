@@ -55,7 +55,7 @@ typedef boost::shared_ptr<class Receiver> ReceiverPtr;
 /**
  * \brief Abstract class. Interface to Streamers
  *
- * \ingroup cx_service_video
+ * \ingroup cx_resource_core_video
  *
  * \date May 20, 2014
  * \author Ole Vegard Solberg, SINTEF

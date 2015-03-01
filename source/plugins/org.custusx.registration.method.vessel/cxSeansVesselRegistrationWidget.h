@@ -45,17 +45,12 @@ namespace cx
 typedef boost::shared_ptr<class SeansVesselRegistrationDebugger> SeansVesselRegistrationDebuggerPtr;
 
 /**
- * \file
- * \addtogroup cx_module_registration
- * @{
- */
-
-/**
  * SeansVesselRegistrationWidget.h
  *
  * \brief Widget for controlling input to
  * Seans Vessel Registration
  *
+ * \ingroup org_custusx_registration_method_vessel
  * \date Feb 21, 2011
  * \author Janne Beate Bakeng, SINTEF
  */
@@ -92,9 +87,7 @@ private:
   StringPropertyBasePtr mMovingImage;
 };
 
-/**
- * @}
- */
+
 }//namespace cx
 
 #endif /* CXSEANSVESSELREGISTRATIONWIDGET_H_ */

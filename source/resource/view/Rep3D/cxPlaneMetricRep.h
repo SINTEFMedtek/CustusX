@@ -48,8 +48,8 @@ typedef boost::shared_ptr<class PlaneMetricRep> PlaneMetricRepPtr;
 
 /** \brief Rep for visualizing a PlaneMetric.
  *
- * \ingroup cx_resource_visualization
- * \ingroup cx_resource_visualization_rep3D
+ * \ingroup cx_resource_view
+ * \ingroup cx_resource_view_rep3D
  *
  * \date Jul 27, 2011
  * \author Christian Askeland, SINTEF

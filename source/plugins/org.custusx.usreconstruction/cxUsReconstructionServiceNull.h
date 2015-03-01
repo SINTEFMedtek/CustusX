@@ -39,6 +39,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
+/**
+ * \ingroup org_custusx_usreconstruction
+ */
 class org_custusx_usreconstruction_EXPORT UsReconstructionServiceNull : public UsReconstructionService
 {
 Q_OBJECT

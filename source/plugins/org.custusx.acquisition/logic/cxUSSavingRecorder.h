@@ -51,14 +51,14 @@ typedef boost::shared_ptr<class RecordSession> RecordSessionPtr;
 
 /**
  * \file
- * \addtogroup cx_module_acquisition
+ * \addtogroup org_custusx_acquisition
  * @{
  */
 
 
 /**
  * \brief Record and save ultrasound data.
- * \ingroup cx_module_acquisition
+ * \ingroup org_custusx_acquisition
  *
  * Use the start/stop pair to record video from the input streams
  * during that period. A cancel instead of stop will clear the recording.

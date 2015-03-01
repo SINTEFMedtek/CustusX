@@ -51,7 +51,7 @@ namespace cx
 typedef boost::shared_ptr<class ImageLUT2D> ImageLUT2DPtr;
 
 
-/**\brief Handling of color and opacity for 2D slices.
+/** \brief Handling of color and opacity for 2D slices.
  *
  * Set the basic lut using either setLut() or setColorMap(), then modify it with window and level.
  * The alpha channel in this lut is ignored.

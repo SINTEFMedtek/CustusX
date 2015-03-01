@@ -39,6 +39,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
+
+/**
+ *
+ *  \ingroup cx_resource_core_tool
+ */
 class cxResource_EXPORT TrackingServiceNull : public TrackingService
 {
 public:

@@ -42,7 +42,7 @@ typedef boost::shared_ptr<class PlaybackTool> PlaybackToolPtr;
 
 /**
  * \brief Interface towards a playback tracking system.
- * \ingroup cx_service_tracking
+ * \ingroup org_custusx_core_tracking
  *
  * Wraps another tracking system, enabling playback of the tools in that system
  *

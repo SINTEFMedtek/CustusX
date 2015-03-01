@@ -50,7 +50,7 @@ class ToolManager;
 
 /**
  * \brief Helper class for connecting to the active tool.
- * \ingroup cx_service_tracking
+ * \ingroup cx_resource_core_tool
  *
  * By listening to this class, you will always listen
  * to the active tool.

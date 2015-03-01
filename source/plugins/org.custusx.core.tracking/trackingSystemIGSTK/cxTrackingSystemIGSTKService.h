@@ -48,7 +48,7 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup cx_service_tracking
+ * \addtogroup org_custusx_core_tracking
  * @{
  */
 
@@ -58,7 +58,7 @@ typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
 
 /**
  * \brief Interface towards one tracking system.
- * \ingroup cx_service_tracking
+ * \ingroup org_custusx_core_tracking
  *
  * \image html tracking_simple.png "Tracking Service ideal design."
  *

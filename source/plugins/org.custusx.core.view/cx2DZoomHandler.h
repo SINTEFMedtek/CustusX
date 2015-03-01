@@ -44,7 +44,7 @@ typedef boost::shared_ptr<class Zoom2DHandler> Zoom2DHandlerPtr;
 
 /** 
  *
- * \ingroup cx_service_visualization
+ * \ingroup org_custusx_core_view
  * \date 2014-02-26
  * \author christiana
  */

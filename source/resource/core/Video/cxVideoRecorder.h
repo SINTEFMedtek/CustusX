@@ -55,7 +55,7 @@ typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 namespace cx
 {
 
-/**\brief Recorder for a VideoSource.
+/** \brief Recorder for a VideoSource.
  *
  * The class has an autosync feature that is useful if the realtimestream clock
  * is unsynced with the master clock. The first received frame is used to estimate

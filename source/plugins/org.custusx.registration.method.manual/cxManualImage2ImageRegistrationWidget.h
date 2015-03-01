@@ -38,10 +38,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-/**\brief Direct setting of image registration
+/** Direct setting of image registration
  *
  * The matrix is the fMm transform, i.e. from moving to fixed image
  *
+ *  \ingroup org_custusx_registration_method_manual
  *  \date 2014-06-13
  *  \author Christian Askeland, SINTEF
  *  \author Ole Vegard Solberg, SINTEF

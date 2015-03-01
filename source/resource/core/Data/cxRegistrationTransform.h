@@ -50,7 +50,7 @@ class QDomNode;
 namespace cx
 {
 
-/**\brief A registration event and its transform.
+/** \brief A registration event and its transform.
  *
  * Encapsulation of a transform and the registration event,
  * i.e the time and kind of registration.

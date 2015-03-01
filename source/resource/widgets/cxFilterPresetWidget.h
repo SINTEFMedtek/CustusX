@@ -42,11 +42,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx {
 
 /**
- * \class FilterPresetWidget
  *
- * \brief
- *
- * \ingroup cx_module_algorithm
+ * \ingroup cx_resource_widgets
  *
  * \date Mar 18, 2013
  * \author Janne Beate Bakeng, SINTEF

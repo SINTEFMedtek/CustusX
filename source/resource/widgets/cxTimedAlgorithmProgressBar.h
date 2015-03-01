@@ -48,7 +48,7 @@ class DisplayTimerWidget;
 
 /**
  * \file
- * \addtogroup cx_module_algorithm
+ * \addtogroup cx_resource_widgets
  * @{
  */
 

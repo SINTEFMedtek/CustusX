@@ -52,7 +52,7 @@ typedef boost::shared_ptr<class RepContainer> RepContainerPtr;
 /**
  *  - Utility functions for accessing reps,
  *
- * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_view
  *
  * \date Dec 10, 2008
  * \author Janne Beate Bakeng, SINTEF

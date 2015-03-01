@@ -49,23 +49,11 @@ class ctkPluginContext;
 
 namespace cx
 {
-//typedef boost::shared_ptr<class TimedBaseAlgorithm> TimedAlgorithmPtr;
-//typedef boost::shared_ptr<class CompositeTimedAlgorithm> CompositeTimedAlgorithmPtr;
-//typedef boost::shared_ptr<class ReconstructionManager> ReconstructionManagerPtr;
-//typedef boost::shared_ptr<class ReconstructCore> ReconstructCorePtr;
-//typedef boost::shared_ptr<class ReconstructParams> ReconstructParamsPtr;
-//typedef boost::shared_ptr<class ReconstructPreprocessor> ReconstructPreprocessorPtr;
-////typedef boost::shared_ptr<class ReconstructionMethodService> ReconstructionMethodServicePtr;
-//typedef boost::shared_ptr<class ThreadedTimedReconstructer> ThreadedTimedReconstructerPtr;
-//typedef boost::shared_ptr<class ThreadedTimedReconstructPreprocessor> ThreadedTimedReconstructPreprocessorPtr;
-//typedef boost::shared_ptr<class ThreadedTimedReconstructCore> ThreadedTimedReconstructCorePtr;
-
-//typedef boost::shared_ptr<class ReconstructionExecuter> ReconstructionExecuterPtr;
 
 
 /**
  * \file
- * \addtogroup cx_module_usreconstruction
+ * \addtogroup org_custusx_usreconstruction
  * @{
  */
 

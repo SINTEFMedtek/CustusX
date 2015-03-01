@@ -40,7 +40,7 @@ namespace cx
 /** Filter for resampling and cropping a volume into the space of another.
  *
  *
- * \ingroup cx_module_algorithm
+ * \ingroup cx_resource_filter
  * \date Nov 26, 2012
  * \author christiana
  */

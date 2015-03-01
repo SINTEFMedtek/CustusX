@@ -57,8 +57,8 @@ typedef boost::shared_ptr<class VideoFixedPlaneRep> VideoFixedPlaneRepPtr;
  *
  * Used by CustusX.
  *
- * \ingroup cx_resource_visualization
- * \ingroup cx_resource_visualization_repvideo
+ * \ingroup cx_resource_view
+ * \ingroup cx_resource_view_repvideo
  *
  * \date Oct 31, 2010
  * \author christiana

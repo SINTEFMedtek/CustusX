@@ -51,7 +51,7 @@ namespace cx
  *
  * \date 2014-09-26
  * \author Christian Askeland
- * \ingroup cx_resource_visualization_internal
+ * \ingroup cx_resource_view_internal
  */
 class cxResourceVisualization_EXPORT ViewCollectionWidgetUsingViewContainer : public ViewCollectionWidget
 {

@@ -56,7 +56,7 @@ typedef boost::shared_ptr<class TransferFunctions3DPresets> TransferFunctions3DP
  * \author: Janne Beate Bakeng, SINTEF
  */
 
-/**\brief Handles transfer function presets
+/** \brief Handles transfer function presets
  *
  * \ingroup cx_resource_core_data
  */

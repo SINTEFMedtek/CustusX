@@ -48,13 +48,13 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup cx_service_tracking
+ * \addtogroup org_custusx_core_tracking
  * @{
  */
 
 /**
  * \brief Manager for IGSTK interface.
- * \ingroup cx_service_tracking
+ * \ingroup org_custusx_core_tracking
  *
  * The manager exists inside IgstkTrackerThread .
  *

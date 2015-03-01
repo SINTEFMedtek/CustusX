@@ -1,10 +1,10 @@
 Build instructions {#build_instructions}
 ===================
 
-Text {#build_instructions2}
+Overview {#build_instructions2}
 ===================
 
-CustusX runs on these \subpage supported_platforms.
+CustusX runs on these \ref supported_platforms.
 
 Prerequisites {#prerequisites}
 ------------------------
@@ -34,7 +34,7 @@ will be downloaded and built in separate folders beneath it, as follows:
 
 |        |          |                |
 | ------ | ----     | -------------- |
-| root   | CustusX  | CustusX        |
+| root   | CX       | CX             |
 |        |          | build_Release  |
 |        | VTK      | VTK            |
 |        |          | build_Release  |
@@ -44,9 +44,10 @@ will be downloaded and built in separate folders beneath it, as follows:
 |        |          | build_Release  |
 
 Run the following lines to get it right:
-```bash
-cd \<root_dir\>
-git clone git@github.com:SINTEFMedisinskTeknologi/CustusX.git CustusX/CustusX
-./CustusX/CustusX/install/cxInstaller.py --root_dir . --full --all
-```
-The default root_dir is ~/dev/cx. Run cxInstaller.py -h for more options.
+
+	bash
+	cd \<root_dir\>
+	git clone git@github.com:SINTEFMedisinskTeknologi/CustusX.git CX/CX
+	./CX/CX/install/cxInstaller.py --root_dir . --full --all
+
+The default root_dir i`~/dev/cx`. Run `cxInstaller.py -h` for more options.

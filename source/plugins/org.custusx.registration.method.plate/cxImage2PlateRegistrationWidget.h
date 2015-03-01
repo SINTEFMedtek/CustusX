@@ -6,6 +6,9 @@
 namespace cx
 {
 
+/**
+ * \ingroup org_custusx_registration_method_plate
+ */
 class Image2PlateRegistrationWidget : public TabbedWidget
 {
 public:

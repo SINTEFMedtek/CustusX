@@ -87,7 +87,7 @@ public:
  * \sa Texture3DSlicerProxyImpl
  *
  *
- * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_view
  */
 class cxResourceVisualization_EXPORT TextureSlicePainter : public vtkOpenGLRepresentationPainter
 {

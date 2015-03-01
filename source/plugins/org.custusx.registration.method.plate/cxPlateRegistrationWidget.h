@@ -40,11 +40,6 @@ class QLabel;
 
 namespace cx
 {
-/**
- * \file
- * \addtogroup cx_module_registration
- * @{
- */
 
 /**
  * \class PlateRegistrationWidget
@@ -52,8 +47,9 @@ namespace cx
  * \brief Widget for performing registration between a (dyna-CT) volume and a
  * predefined aurora tool with ct markers.
  *
+ * \ingroup org_custusx_registration_method_plate
  * \date 10. nov. 2010
- * \\author Janne Beate Bakeng, SINTEF
+ * \author Janne Beate Bakeng, SINTEF
  */
 class PlateRegistrationWidget : public RegistrationBaseWidget
 {
@@ -75,8 +71,5 @@ private:
 	QLabel*      mReferenceToolInfoLabel;
 };
 
-/**
- * @}
- */
 }
 #endif /* CXPLATEREGISTRATIONWIDGET_H_ */

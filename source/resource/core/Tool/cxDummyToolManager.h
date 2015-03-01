@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-/**\brief Implementation of a ToolManager used for testing.
+/** \brief Implementation of a ToolManager used for testing.
  *
  * \date Oct 29, 2008
  * \author: jbake

@@ -44,7 +44,7 @@ typedef boost::shared_ptr<class BoolPropertyBase> BoolPropertyBasePtr;
 
 
 /**
- * \ingroup cx_service_video
+ * \ingroup org_custusx_core_video
  *
  * \date 2014-11-21
  * \author Christian Askeland, SINTEF

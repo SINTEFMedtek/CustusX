@@ -51,8 +51,8 @@ typedef boost::shared_ptr<class ViewportListener> ViewportListenerPtr;
  *
  * Set the position using setTransform().
  *
- * \ingroup cx_resource_visualization
- * \ingroup cx_resource_visualization_rep3D
+ * \ingroup cx_resource_view
+ * \ingroup cx_resource_view_rep3D
  */
 class cxResourceVisualization_EXPORT AxesRep: public RepImpl
 {

@@ -47,6 +47,7 @@ typedef boost::shared_ptr<class ReconstructPreprocessor> ReconstructPreprocessor
 /** \brief Algorithm part of reconstruction -
  * no dependencies on parameter classes.
  *
+ * \ingroup org_custusx_usreconstruction
  *  \date Oct 29, 2012
  *  \author christiana
  */

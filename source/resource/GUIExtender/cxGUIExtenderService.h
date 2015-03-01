@@ -53,6 +53,9 @@ typedef boost::shared_ptr<class VideoService> VideoServicePtr;
 
 /** Interface for service that extends the user interface with more widgets.
  *
+ * Provide a collection of widgets and toolbars that can be added to for
+ * example the MainWindow. This is the most generic extension point and can
+ * be used for anything that can be accessed from a GUI.
  */
 class cxGUIExtenderService_EXPORT GUIExtenderService : public QObject
 {

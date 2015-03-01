@@ -39,13 +39,13 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup cx_module_algorithm
+ * \addtogroup cx_resource_filter
  * @{
  */
 
 /** Filter wrapping a itk::BinaryThresholdImageFilter.
  *
- * \ingroup cx_module_algorithm
+ * \ingroup cx_resource_filter
  * \date Nov 21, 2012
  * \author christiana
  */

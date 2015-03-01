@@ -49,7 +49,7 @@ namespace cx
 
 /**
  * \brief Class for reading the files defining a CustusX tool
- * \ingroup cx_service_tracking
+ * \ingroup org_custusx_core_tracking
  *
  * \date 21. march 2011
  * \author Janne Beate Bakeng, SINTEF
@@ -98,7 +98,7 @@ private:
 
 /**
  * \brief Class for reading the files defining a CustusX tool
- * \ingroup cx_service_tracking
+ * \ingroup org_custusx_core_tracking
  *
  * \date 21. march 2011
  * \author Janne Beate Bakeng, SINTEF

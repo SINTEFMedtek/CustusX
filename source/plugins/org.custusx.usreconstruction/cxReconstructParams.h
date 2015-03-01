@@ -43,7 +43,7 @@ namespace cx
 
 /**
  * \file
- * \addtogroup cx_module_usreconstruction
+ * \addtogroup org_custusx_usreconstruction
  * @{
  */
 

@@ -91,7 +91,7 @@ private:
  * Used by Sonowand 2.1
  * Used by CustusX
  *
- * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_view
  */
 class cxResource_EXPORT SlicedImageProxy : public QObject
 {

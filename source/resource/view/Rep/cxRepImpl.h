@@ -58,7 +58,7 @@ typedef boost::weak_ptr<class View> ViewWeakPtr;
  * - addRepActorsToViewRenderer()
  * - removeRepActorsFromViewRenderer().
  *
- * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_view
  */
 class cxResourceVisualization_EXPORT RepImpl : public Rep
 {

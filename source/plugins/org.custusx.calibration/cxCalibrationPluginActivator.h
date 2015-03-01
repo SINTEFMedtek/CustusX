@@ -39,6 +39,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
+/**
+ * \defgroup org_custusx_calibration
+ * \ingroup cx_plugins
+ *
+ * \see cx::CalibrationGUIExtenderService.
+ *
+ */
+
+
 typedef boost::shared_ptr<class CalibrationGUIExtenderService> CalibrationGUIExtenderServicePtr;
 typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
 

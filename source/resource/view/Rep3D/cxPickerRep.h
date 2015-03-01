@@ -64,8 +64,8 @@ typedef boost::shared_ptr<class Tool> ToolPtr;
  * Used by CustusX.
  * Not used by Sonowand.
  *
- * \ingroup cx_resource_visualization
- * \ingroup cx_resource_visualization_rep3D
+ * \ingroup cx_resource_view
+ * \ingroup cx_resource_view_rep3D
  */
 class cxResourceVisualization_EXPORT PickerRep: public RepImpl
 {

@@ -61,7 +61,7 @@ typedef boost::shared_ptr<class RepContainer> RepContainerPtr;
 
 /** \brief Visualization services
  *
- *  \ingroup cx_resource_visualization
+ *  \ingroup cx_resource_view
  *  \date 2014-09-19
  *  \author Ole Vegard Solberg, SINTEF
  */

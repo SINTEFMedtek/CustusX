@@ -55,13 +55,13 @@ typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 
 /**
  * \file
- * \addtogroup cx_module_acquisition
+ * \addtogroup org_custusx_acquisition
  * @{
  */
 
 /**
  * \brief Handles the us acquisition process.
- * \ingroup cx_module_acquisition
+ * \ingroup org_custusx_acquisition
  *
  * The USAcquisition object attaches itself to an
  * input Acquisition object and records ultrasound

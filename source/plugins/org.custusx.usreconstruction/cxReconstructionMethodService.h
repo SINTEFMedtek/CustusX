@@ -56,7 +56,7 @@ typedef boost::shared_ptr<class Image> ImagePtr;
 typedef boost::shared_ptr<class ProcessedUSInputData> ProcessedUSInputDataPtr;
 
 /**
- * \addtogroup cx_module_usreconstruction
+ * \addtogroup org_custusx_usreconstruction
  * \{
  */
 

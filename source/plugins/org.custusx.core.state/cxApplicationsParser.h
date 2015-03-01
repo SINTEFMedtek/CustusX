@@ -40,7 +40,7 @@ namespace cx
 {
 
 /**
- * \ingroup cx_custusx_core_state
+ * \ingroup org_custusx_core_state
  * \date 2010-08-04
  * \author Christian Askeland, SINTEF
  *

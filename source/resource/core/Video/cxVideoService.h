@@ -54,7 +54,7 @@ typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
 /**
  * \brief Provides access to all video sources in the
  * system, and connection stuff for the sources.
- * \ingroup cx_service_video
+ * \ingroup cx_resource_core_video
  *
  * \image html videoservice_simple.png "VideoService Overview"
  *

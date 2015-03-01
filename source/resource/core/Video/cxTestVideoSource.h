@@ -49,7 +49,7 @@ class QTimer;
 namespace cx
 {
 
-/**\brief test video source generator
+/** \brief test video source generator
  *
  * This class implements the VideoSource interface and generates
  * a moving test pattern. The color change front moves diagonally from

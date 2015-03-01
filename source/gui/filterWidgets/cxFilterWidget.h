@@ -49,7 +49,7 @@ class FilterPresetWidget;
 /** Helper widget for displaying the input/output/options part of a Filter.
  * Intended to be included in other Filter widgets.
  *
- * \ingroup cx_module_algorithm
+ * \ingroup cx_gui
  * \date Nov 18, 2012
  * \author Christian Askeland, SINTEF
  * \author Janne Beate Bakeng, SINTEF

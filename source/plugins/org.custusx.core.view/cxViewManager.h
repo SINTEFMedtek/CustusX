@@ -73,7 +73,7 @@ typedef boost::shared_ptr<class ViewManager> VisualizationServiceOldPtr;
 
 /**
  * \file
- * \addtogroup cx_service_visualization
+ * \addtogroup org_custusx_core_view
  * @{
  */
 

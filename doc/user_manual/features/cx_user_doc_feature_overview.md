@@ -95,5 +95,3 @@ Several features can be fine-tuned in the preferences widget.
 - The *Visualization Tab* fine-tune some of the graphics.
 - The *Tool Configuration Tab* let you configure tracking tools.
 
-
-blabla

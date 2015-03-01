@@ -43,20 +43,14 @@ class QCheckBox;
 
 namespace cx
 {
-/**
- * \file
- * \addtogroup cx_module_registration
- * @{
- */
 
 /**
- * \class PatientOrientationWidget
- *
  * \brief Widget for setting reference space to current tool orientation,
  * without changing absolute position of data.
  *
+ * \ingroup org_custusx_registration_method_manual
  * \date 24. sep. 2012
- * \\author Christian Askeland
+ * \author Christian Askeland
  */
 
 class PatientOrientationWidget : public RegistrationBaseWidget
@@ -80,8 +74,5 @@ private:
   ActiveToolProxyPtr mActiveToolProxy;
 };
 
-/**
- * @}
- */
 }
 #endif /* CXPATIENTORIENTATIONWIDGET_H_ */

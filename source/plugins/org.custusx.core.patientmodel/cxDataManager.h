@@ -58,12 +58,12 @@ typedef boost::shared_ptr<class RegistrationHistory> RegistrationHistoryPtr;
 typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
 typedef boost::shared_ptr<class DataFactory> DataFactoryPtr;
 
-/**\brief Interface for a manager of data objects.
+/** Interface for a manager of data objects.
  *
  * Simply calling instance() will instantiate the default manager DataManagerImpl.
  * It is also possible to subclass and use setInstance() to set another type.
  *
- * \ingroup cx_resource_core_data
+ * \ingroup org_custusx_core_patientmodel
  */
 class org_custusx_core_patientmodel_EXPORT DataManager: public QObject
 {

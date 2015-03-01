@@ -55,7 +55,7 @@ namespace cx
 typedef boost::shared_ptr<class ImageTF3D> ImageTF3DPtr;
 
 
-/**\brief Handler for the transfer functions used in 3d image volumes.
+/** \brief Handler for the transfer functions used in 3d image volumes.
  *
  * Used by Image.
  *

@@ -41,6 +41,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
+/**
+ * \ingroup org_custusx_core_tracking
+ */
 class org_custusx_core_tracking_EXPORT TrackerConfigurationImpl : public TrackerConfiguration
 {
 public:

@@ -52,7 +52,7 @@ typedef boost::shared_ptr<class SpaceListener> SpaceListenerPtr;
  * @{
  */
 
-/**\brief Base class for all Data Metrics
+/** \brief Base class for all Data Metrics
  *
  * Data Metrics are Data subclasses that aims to add
  * measurements to the system, such as points, angles and

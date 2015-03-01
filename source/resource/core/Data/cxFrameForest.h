@@ -66,13 +66,13 @@ namespace cx
 
 /**
 * \file
-* \addtogroup cx_service_patient
+* \addtogroup cx_resource_core_data
 * @{
 */
 
 /**
  * \brief A graph combining Space dependencies between all Data.
- * \ingroup cx_service_patient
+ * \ingroup cx_resource_core_data
  *
  * Relations between coordinate spaces among Data are created by
  * this class.

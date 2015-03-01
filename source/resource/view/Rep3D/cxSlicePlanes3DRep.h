@@ -58,7 +58,7 @@ namespace cx
  *
  * \sa SlicePlanes3DRep SlicePlanes3DMarkerIn2DRep
  *
- * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_view
  */
 class cxResourceVisualization_EXPORT SlicePlanesProxy : public QObject
 {
@@ -125,9 +125,9 @@ typedef boost::shared_ptr<class SlicePlanes3DRep> SlicePlanes3DRepPtr;
  *
  * \sa SlicePlanesProxy SlicePlanes3DMarkerIn2DRep
  *
- * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_view
 
- * \ingroup cx_resource_visualization_rep3D
+ * \ingroup cx_resource_view_rep3D
  */
 class cxResourceVisualization_EXPORT SlicePlanes3DRep : public RepImpl
 {
@@ -175,9 +175,9 @@ typedef boost::shared_ptr<class SlicePlanes3DMarkerIn2DRep> SlicePlanes3DMarkerI
  *
  * \sa SlicePlanesProxy SlicePlanes3DRep
  *
- * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_view
 
- * \ingroup cx_resource_visualization_rep2D
+ * \ingroup cx_resource_view_rep2D
  */
 class cxResourceVisualization_EXPORT SlicePlanes3DMarkerIn2DRep : public RepImpl
 {

@@ -42,7 +42,7 @@ namespace cx
 /**
  * Registration method: Plate image to patient service implementation
  *
- * \ingroup org_custusx_registration_method_Plate
+ * \ingroup org_custusx_registration_method_plate
  *
  * \date 2014-10-09
  * \author Ole Vegard Solberg, SINTEF
