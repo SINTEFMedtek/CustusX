@@ -10,6 +10,7 @@ set(PLUGIN_SRCS
   cxRegistrationHistoryGUIExtenderService.cpp
   cxRegistrationHistoryGUIExtenderService.h
   cxRegistrationHistoryWidget.cpp
+#  cxWirePhantomWidget.cpp
 )
 
 # Files which should be processed by Qts moc
@@ -17,6 +18,7 @@ set(PLUGIN_MOC_SRCS
   cxRegistrationGUIPluginActivator.h
   cxRegistrationWidget.h
   cxRegistrationHistoryWidget.h
+#  cxWirePhantomWidget.h
 )
 
 # Qt Designer files which should be processed by Qts uic
