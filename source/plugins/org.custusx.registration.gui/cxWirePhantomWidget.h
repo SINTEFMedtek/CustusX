@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXWIREPHANTOMWIDGET_H_
 #define CXWIREPHANTOMWIDGET_H_
 
+#include "org_custusx_registration_gui_Export.h"
 #include "cxRegistrationBaseWidget.h"
 #include "cxPipeline.h"
 #include "cxFilter.h"
@@ -61,7 +62,7 @@ class org_custusx_registration_gui_EXPORT WirePhantomWidget: public Registration
 Q_OBJECT
 
 public:
-	WirePhantomWidget(regServices services, AcquisitionDataPtr aquisitionData, QWidget* parent);
+	WirePhantomWidget(ctkPluginContext *pluginContext, QWidget* parent = 0);
 	virtual ~WirePhantomWidget();
 	virtual QString defaultWhatsThis() const;
 
@@ -86,7 +87,7 @@ private:
 	QPushButton* mCalibrationButton;
 	QTextEdit* mResults;
 	Transform3D mLastRegistration;
-	AcquisitionDataPtr mAquisitionData;
+	UsReconstructionServicePtr mUsReconstructionService;
 };
 
 } /* namespace cx */

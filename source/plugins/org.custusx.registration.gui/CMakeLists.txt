@@ -10,7 +10,7 @@ set(PLUGIN_SRCS
   cxRegistrationHistoryGUIExtenderService.cpp
   cxRegistrationHistoryGUIExtenderService.h
   cxRegistrationHistoryWidget.cpp
-#  cxWirePhantomWidget.cpp
+  cxWirePhantomWidget.cpp
 )
 
 # Files which should be processed by Qts moc
@@ -18,7 +18,7 @@ set(PLUGIN_MOC_SRCS
   cxRegistrationGUIPluginActivator.h
   cxRegistrationWidget.h
   cxRegistrationHistoryWidget.h
-#  cxWirePhantomWidget.h
+  cxWirePhantomWidget.h
 )
 
 # Qt Designer files which should be processed by Qts uic
@@ -36,6 +36,7 @@ set(PLUGIN_target_libraries
     cxGUIExtenderService
     cxResourceWidgets
     cxPluginUtilities
+    cxResourceFilter#test
 )
 
 set(PLUGIN_OUTPUT_DIR "")

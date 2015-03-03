@@ -36,52 +36,51 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTextEdit>
 #include <vtkPolyData.h>
 #include <vtkPoints.h>
-#include "cxDataManager.h"
 #include "cxMesh.h"
 #include "cxDataLocations.h"
-//#include "cxPatientData.h"
-//#include "cxPatientService.h"
 #include "vesselReg/SeansVesselReg.hxx"
-//#include "cxViewManager.h"
 #include "cxPointMetric.h"
 #include "cxDistanceMetric.h"
-//#include "cxViewGroup.h"
-//#include "cxViewWrapper.h"
 #include "cxTool.h"
-#include "cxToolManager.h"
 #include "cxTypeConversions.h"
-#include "cxAcquisitionData.h"
-#include "cxReconstructionManager.h"
 #include "cxPipelineWidget.h"
 #include "cxDataReaderWriter.h"
-#include "cxDataFactory.h"
 #include "cxSmoothingImageFilter.h"
 #include "cxBinaryThinningImageFilter3DFilter.h"
 #include "cxBinaryThresholdImageFilter.h"
 #include "cxSpaceProvider.h"
 #include "cxReporter.h"
-#include "cxVisualizationService.h"
 #include "cxRegistrationService.h"
 #include "cxRegistrationTransform.h"
 #include "cxPatientModelService.h"
 #include "cxViewGroupData.h"
 
+#include "cxProfile.h"
+#include "cxViewService.h"
+#include "cxCompositeTimedAlgorithm.h"
+#include "cxUSReconstructInputData.h"
+#include "cxTrackingService.h"
+#include "cxUsReconstructionServiceProxy.h"
+
 namespace cx
 {
 
-WirePhantomWidget::WirePhantomWidget(regServices services, AcquisitionDataPtr aquisitionData, QWidget* parent) :
-	RegistrationBaseWidget(services, parent, "WirePhantomWidget", "Wire Phantom Test"),
-	mAquisitionData(aquisitionData)
+WirePhantomWidget::WirePhantomWidget(ctkPluginContext *pluginContext, QWidget* parent) :
+	RegistrationBaseWidget(RegServices(pluginContext), parent, "WirePhantomWidget", "Wire Phantom Test"),
+	mUsReconstructionService(new UsReconstructionServiceProxy(pluginContext))
 {
     mLastRegistration = Transform3D::Identity();
 
+
+	VisServicesPtr vs(new VisServices(mServices));
+
     // fill the pipeline with filters:
 		mPipeline.reset(new Pipeline(mServices.patientModelService));
-	XmlOptionFile options = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("registration").descend("WirePhantomWidget");
+	XmlOptionFile options = profile()->getXmlSettings().descend("registration").descend("WirePhantomWidget");
     FilterGroupPtr filters(new FilterGroup(options));
-		filters->append(FilterPtr(new SmoothingImageFilter(mServices.patientModelService)));
-		filters->append(FilterPtr(new BinaryThresholdImageFilter(mServices.patientModelService)));
-		filters->append(FilterPtr(new BinaryThinningImageFilter3DFilter(mServices.patientModelService)));
+		filters->append(FilterPtr(new SmoothingImageFilter(vs)));
+		filters->append(FilterPtr(new BinaryThresholdImageFilter(vs)));
+		filters->append(FilterPtr(new BinaryThinningImageFilter3DFilter(vs)));
     mPipeline->initialize(filters);
 
     mPipeline->getNodes()[0]->setValueName("US Image:");
@@ -142,7 +141,7 @@ MeshPtr WirePhantomWidget::loadNominalCross()
     QString nominalCrossFilename = DataLocations::getRootConfigPath()+"/models/wire_phantom_cross_pts.vtk";
     MeshPtr retval;
 
-    std::map<QString, MeshPtr> meshes = dataManager()->getMeshes();
+	std::map<QString, MeshPtr> meshes = mServices.patientModelService->getDataOfType<Mesh>();
     for (std::map<QString, MeshPtr>::iterator iter=meshes.begin(); iter!=meshes.end(); ++iter)
         if (iter->first.contains("wire_phantom_cross_pts"))
             retval = iter->second;
@@ -166,7 +165,7 @@ MeshPtr WirePhantomWidget::loadNominalCross()
 
 void WirePhantomWidget::showData(DataPtr data)
 {
-	mServices.visualizationService->getViewGroupData(0)->addData(data);
+	mServices.visualizationService->getGroup(0)->addData(data->getUid());
 }
 
 void WirePhantomWidget::measureSlot()
@@ -305,39 +304,42 @@ void WirePhantomWidget::registration()
 void WirePhantomWidget::showDataMetrics(Vector3D cross_r)
 {
     // add metrics displaying the distance from cross in the nominal and us spaces:
-	Transform3D usMnom = spaceProvider()->get_toMfrom(
-				spaceProvider()->getD(mServices.registrationService->getFixedData()),
-				spaceProvider()->getD(mServices.registrationService->getMovingData()));
+	Transform3D usMnom = mServices.getSpaceProvider()->get_toMfrom(
+				mServices.getSpaceProvider()->getD(mServices.registrationService->getFixedData()),
+				mServices.getSpaceProvider()->getD(mServices.registrationService->getMovingData()));
     Vector3D cross_us = usMnom.coord(cross_r);
 
-    PointMetricPtr p1 = boost::dynamic_pointer_cast<PointMetric>(dataManager()->getData("cross_nominal"));
+	PointMetricPtr p1 = boost::dynamic_pointer_cast<PointMetric>(mServices.patientModelService->getData("cross_nominal"));
     if (!p1)
-		p1 = dataManager()->getDataFactory()->createSpecific<PointMetric>("cross_nominal");
+		p1 = mServices.patientModelService->createSpecificData<PointMetric>("cross_nominal");
 //		p1 = PointMetric::create("cross_nominal", "cross_nominal");
 		p1->get_rMd_History()->setParentSpace(mServices.registrationService->getFixedData()->getUid());
-	p1->setSpace(spaceProvider()->getD(mServices.registrationService->getFixedData()));
+	p1->setSpace(mServices.getSpaceProvider()->getD(mServices.registrationService->getFixedData()));
     p1->setCoordinate(cross_r);
-    dataManager()->loadData(p1);
+//    dataManager()->loadData(p1);
+	mServices.patientModelService->insertData(p1);
     //this->showData(p1);
 
-    PointMetricPtr p2 = boost::dynamic_pointer_cast<PointMetric>(dataManager()->getData("cross_us"));
+	PointMetricPtr p2 = mServices.patientModelService->getData<PointMetric>("cross_us");
     if (!p2)
-		p2 = dataManager()->getDataFactory()->createSpecific<PointMetric>("cross_us");
+		p2 = mServices.patientModelService->createSpecificData<PointMetric>("cross_us");
 //		p2 = PointMetric::create("cross_us", "cross_us");
 		p2->get_rMd_History()->setParentSpace(mServices.registrationService->getMovingData()->getUid());
-	p2->setSpace(spaceProvider()->getD(mServices.registrationService->getMovingData()));
+	p2->setSpace(mServices.getSpaceProvider()->getD(mServices.registrationService->getMovingData()));
     p2->setCoordinate(cross_us);
-    dataManager()->loadData(p2);
+//    dataManager()->loadData(p2);
+	mServices.patientModelService->insertData(p2);
     //this->showData(p2);
 
-    DistanceMetricPtr d0 = boost::dynamic_pointer_cast<DistanceMetric>(dataManager()->getData("accuracy"));
+	DistanceMetricPtr d0 = mServices.patientModelService->getData<DistanceMetric>("accuracy");
     if (!d0)
-		d0 = dataManager()->getDataFactory()->createSpecific<DistanceMetric>("accuracy");
+		d0 = mServices.patientModelService->createSpecificData<DistanceMetric>("accuracy");
 //        d0.reset(new DistanceMetric("accuracy", "accuracy"));
     d0->get_rMd_History()->setParentSpace("reference");
 	d0->getArguments()->set(0, p1);
 	d0->getArguments()->set(1, p2);
-    dataManager()->loadData(d0);
+//    dataManager()->loadData(d0);
+	mServices.patientModelService->insertData(d0);
     this->showData(d0);
 }
 
@@ -350,12 +352,11 @@ void WirePhantomWidget::showDataMetrics(Vector3D cross_r)
 std::pair<QString, Transform3D> WirePhantomWidget::getLastProbePosition()
 {
     // find transform to probe space t_us, i.e. the middle position from the us acquisition
-		USReconstructInputData usData = mAquisitionData->getReconstructer()->getSelectedFileData();
+		USReconstructInputData usData = mUsReconstructionService->getSelectedFileData();
     Transform3D prMt_us = Transform3D::Identity();
     if (usData.mPositions.empty())
         return std::make_pair("", Transform3D::Identity());
     prMt_us = usData.mPositions[usData.mPositions.size()/2].mPos;
-	Transform3D rMt_us = dataManager()->get_rMpr() * prMt_us;
     return std::make_pair(usData.mFilename, prMt_us);
 }
 
@@ -372,8 +373,8 @@ void WirePhantomWidget::generate_sMt()
         return;
     }
 
-		USReconstructInputData usData = mAquisitionData->getReconstructer()->getSelectedFileData();
-    ToolPtr probe = toolManager()->getTool(usData.mProbeUid);
+		USReconstructInputData usData = mUsReconstructionService->getSelectedFileData();
+	ToolPtr probe = mServices.trackingService->getTool(usData.mProbeUid);
     if (!probe || !probe->hasType(Tool::TOOL_US_PROBE))
     {
         reportWarning("Cannot find probe, aborting calibration test.");
@@ -426,7 +427,7 @@ void WirePhantomWidget::generate_sMt()
         Transform3D prMt = rMt_us;
         Transform3D sMt = probe->getCalibration_sMt();
         Transform3D prMs = prMt * sMt.inv();
-		Transform3D usMpr = mServices.registrationService->getMovingData()->get_rMd().inv() * dataManager()->get_rMpr();
+		Transform3D usMpr = mServices.registrationService->getMovingData()->get_rMd().inv() * mServices.patientModelService->get_rMpr();
         Transform3D nomMus = mLastRegistration.inv();
 
         Transform3D sQt; // Q is the new calibration matrix.
