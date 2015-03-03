@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "org_custusx_core_tracking_Export.h"
 #include "cxTrackingService.h"
 #include "vtkForwardDeclarations.h"
+#include "cxServiceTrackerListener.h"
 
 class QDomNode;
 class QDomElement;
@@ -135,6 +136,12 @@ private slots:
 	void onSessionSave(QDomElement& node);
 
 private:
+    void listenForTrackingSystemServices(ctkPluginContext *context);
+    void onTrackingSystemAdded(TrackingSystemService* service);
+    void onTrackingSystemRemoved(TrackingSystemService* service);
+    void onTrackingSystemModified(TrackingSystemService* service);
+
+
 	void rebuildCachedTools();
 	void initializeManualTool();
 	void setConfigurationFile(QString configurationFile); ///< Sets the configuration file to use, must be located in the resourcefolder \param configurationFile path to the configuration file to use
@@ -165,6 +172,8 @@ private:
 	SessionStorageServicePtr mSession;
 
 	double mToolTipOffset; ///< Common tool tip offset for all tools
+
+    boost::shared_ptr<ServiceTrackerListener<TrackingSystemService> > mServiceListener;
 };
 
 bool toolTypeSort(const ToolPtr tool1, const ToolPtr tool2); ///< function for sorting tools by type

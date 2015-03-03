@@ -10,6 +10,7 @@ set(CX_PLUGINS
   org.custusx.core.patientmodel:ON
   org.custusx.core.view:ON
   org.custusx.core.tracking:ON
+  org.custusx.core.tracking.system.openigtlink:ON
   org.custusx.core.video:ON
   org.custusx.core.state:ON
   org.custusx.dicom:ON

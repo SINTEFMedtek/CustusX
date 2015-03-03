@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxTrackingImplService.h"
 
+#include "boost/bind.hpp"
+
 #include <QTimer>
 #include <QDir>
 #include <QList>
@@ -72,7 +74,6 @@ namespace cx
 {
 
 TrackingImplService::TrackingImplService(ctkPluginContext *context) :
-//				mLoggingFolder(""),
 				mLastLoadPositionHistory(0),
 				mContext(context),
 				mToolTipOffset(0)
@@ -89,6 +90,8 @@ TrackingImplService::TrackingImplService(ctkPluginContext *context) :
 	this->installTrackingSystem(igstk);
 
 	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(globalConfigurationFileChangedSlot(QString)));
+
+    this->listenForTrackingSystemServices(context);
 }
 
 TrackingImplService::~TrackingImplService()
@@ -208,6 +211,32 @@ void TrackingImplService::setState(const Tool::State val)
 {
 	for (unsigned i=0; i<mTrackingSystems.size(); ++i)
 		mTrackingSystems[i]->setState(val);
+}
+
+void TrackingImplService::listenForTrackingSystemServices(ctkPluginContext *context)
+{
+    mServiceListener.reset(new ServiceTrackerListener<TrackingSystemService>(
+                                context,
+                                boost::bind(&TrackingImplService::onTrackingSystemAdded, this, _1),
+                                boost::bind(&TrackingImplService::onTrackingSystemModified, this, _1),
+                                boost::bind(&TrackingImplService::onTrackingSystemRemoved, this, _1)
+                               ));
+    mServiceListener->open();
+}
+
+void TrackingImplService::onTrackingSystemAdded(TrackingSystemService* service)
+{
+    CX_LOG_CHANNEL_DEBUG("janne beate ") << "Added TrackinsSystemService: " << service->getUid();
+}
+
+void TrackingImplService::onTrackingSystemRemoved(TrackingSystemService* service)
+{
+    CX_LOG_CHANNEL_DEBUG("janne beate ") << "Removed TrackinsSystemService: " << service->getUid();
+}
+
+void TrackingImplService::onTrackingSystemModified(TrackingSystemService* service)
+{
+    CX_LOG_CHANNEL_DEBUG("janne beate ") << "Modified TrackinsSystemService: " << service->getUid();
 }
 
 void TrackingImplService::rebuildCachedTools()
