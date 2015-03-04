@@ -95,14 +95,9 @@ class Common(object):
 
     def printSettings(self):
         print ''
-        print '*************************************************************'
-        print 'The superbuild will check out and build in [repo/../..], expanded to:'
-        print '    [%s]' % self.getRootDir()
-        print '*************************************************************'
-        print ''
         print 'Settings:'
         print '    system_base_name:', self.system_base_name
-        print '    root path [repo/../..]: %s ' % self.getRootDir()
+        print '    root path: %s ' % self.getRootDir()
         #print '    ExternalDir:', self.getExternalPath()
         #print '    WorkingDir:', self.getWorkingPath()
         print '    build type:', self.getBuildType()
