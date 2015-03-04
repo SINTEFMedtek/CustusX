@@ -1048,7 +1048,7 @@ void MainWindow::aboutSlot()
 	"<p><a href=%4> license </a><p>"
 	"<p><a href=%5> configuration </a><p>");
 
-	QMessageBox::about(this, tr("About %s").arg(appName), text
+	QMessageBox::about(this, tr("About %1").arg(appName), text
 			.arg(appName)
 			.arg(CustusX_VERSION_STRING)
 			.arg(url_github)
