@@ -51,9 +51,9 @@ class Common(object):
     Modify these to change behaviour
     '''
     def __init__(self):
-        self.root_dir = None
+        #self.root_dir = None
         self.m32bit = False
-        self._initPaths()
+        #self._initPaths()
         self.main_branch = "master"
         self.static = False # build as shared or static libraries
         self.jom = False
@@ -97,30 +97,33 @@ class Common(object):
         print ''
         print 'Settings:'
         print '    system_base_name:', self.system_base_name
-        print '    User:', getpass.getuser()
+        print '    root path: %s ' % self.getRootDir()
+        #print '    ExternalDir:', self.getExternalPath()
+        #print '    WorkingDir:', self.getWorkingPath()
+        print '    build type:', self.getBuildType()
         print '    platform:', platform.system()
-        print '    RootDir:', self.getRootDir()
-        print '    ExternalDir:', self.getExternalPath()
-        print '    WorkingDir:', self.getWorkingPath()
+        print '    git tag:', self.git_tag
+        print '    git branch:', self.main_branch
+        print ''
+        #print '    User:', getpass.getuser()
         print '    CMakeGenerator:', self.getCMakeGenerator()
-        if('Eclipse' in self.getCMakeGenerator()):
-            print '    Eclipse version:', self.getEclipseVersion()
-        print '    BuildShared:', self.getBuildShared()
-        print '    BuildType:', self.getBuildType()
-        print '    BuildExternalsType:', self.getBuildExternalsType()
+        #if('Eclipse' in self.getCMakeGenerator()):
+        #    print '    Eclipse version:', self.getEclipseVersion()
+        #print '    BuildShared:', self.getBuildShared()
+        #print '    BuildExternalsType:', self.getBuildExternalsType()
         print '    BuildTesting:', self.mBuildTesting
         print '    Coverage:', self.mCoverage
         print '    Make dependency graph:', self.mGraphviz
-        print '    Threads:', self.threads
-        print '    32 bit:', self.m32bit
-        print '    git tag:', self.git_tag
-        print '    force_connect_sublibraries:', self.force_connect_sublibraries
-        print '    short_pathnames:', self.short_pathnames
+        #print '    Threads:', self.threads
+        #print '    32 bit:', self.m32bit
+        if self.force_connect_sublibraries:
+            print '    force_connect_sublibraries:', self.force_connect_sublibraries
+        #print '    short_pathnames:', self.short_pathnames
         print ''
 
     def getArgParser_root_dir(self):
         p = cx.utils.cxArgParse.ArgumentParser(add_help=False)
-        p.add_argument('--root_dir', default=self.root_dir, help='specify root folder, default=%s' % self.root_dir)
+        p.add_argument('--root_dir', default=None, help='root folder [deprecated, will always use cxrepo/../.. = %s]' % self.getRootDir())
         p.add_argument('--print_control_data', action='store_true', default=False, help='Print all control data at startup')
         return p
 
@@ -157,8 +160,17 @@ class Common(object):
         if self.print_control_data:
             #self.printSettings()
             pprint.pprint(vars(self))
-        self.root_dir = os.path.abspath(self.root_dir)
+        self._verifyDeprecatedRootDirArgumentIsConsistentWithNewDefault()
         return arguments
+
+    def _verifyDeprecatedRootDirArgumentIsConsistentWithNewDefault(self):
+        if not hasattr(self, 'root_dir'):
+            return
+        if not self.root_dir:
+            return
+        input = os.path.abspath(self.root_dir)
+        if self.getRootDir() != input:
+            print "!!! WARNING: deprecated input root path=[%s] is different from generated value [%s]" % (input, self.getRootDir())
 
     def getCMakeGenerator(self):
         if self.xcode:
@@ -199,18 +211,15 @@ class Common(object):
             return self.build_type            
         return "Release" # used for all non-cx libs, this because we want speed even in debug...
     
-    def setRootDir(self, root_dir):
-        if root_dir:
-            self.root_dir = root_dir
-            
     def getRootDir(self):
-        return self.root_dir
+        loc = self.getCustusXRepositoryLocation()
+        return loc[0]
     
     def getWorkingPath(self):
-        return self.root_dir
+        return self.getRootDir()
     
     def getExternalPath(self):
-        return self.root_dir
+        return self.getRootDir()
     
     def setBuildShared(self, value):
         self.static = not value
@@ -240,13 +249,7 @@ class Common(object):
             return short_name
         else:
             return long_name
-            
-    def _initPaths(self):        
-        if platform.system() == 'Windows':
-            self.root_dir = "C:/Dev/cx"
-        else:
-            self.root_dir = os.path.expanduser("~") + "/dev/cx" #+ getpass.getuser() - use new default
-        
+                    
     def _getExternalFolder(self):
         '''external dir: Used as base dir for all externals, such as VTK, ITK, ...'''
         return self._addLongOrShortPathID("external", "ext")
@@ -271,14 +274,27 @@ class Common(object):
         '''
         Look at the file system, find the name of the folder the repo resides in.
         '''
-        # alternatively use  sys.argv[0] ?? 
+        loc = self.getCustusXRepositoryLocation()
+        repoFolder = loc[2]
+        return repoFolder
+
+    def getCustusXRepositoryLocation(self):
+        '''
+        Look at the file system, find the name of the folder the repo resides in.
+        Return a list containing:
+        r = [root_dir, custusx_base, custusx_repo]
+        such that the full path to the private repo is
+        p = '/'.join(r)
+        '''
+        # assuming module path is root/base/repo/install/cx/build
         moduleFile = os.path.realpath(__file__)
         modulePath = os.path.dirname(moduleFile)
         repoPath = '%s/../../..' % modulePath 
-        repoPath = os.path.abspath(repoPath)
-        repoFolder = os.path.split(repoPath)[1]
-        #print "********* Found path: %s, folder=%s" % (repoPath, repoFolder)
-        return repoFolder
+        repoPath = os.path.abspath(repoPath) # root/base/repo
+        (basePath, repoFolder) = os.path.split(repoPath)
+        (rootPath, baseFolder) = os.path.split(basePath)
+        return [rootPath, baseFolder, repoFolder] # [root, base, repo]
+
 
 # ---------------------------------------------------------
 

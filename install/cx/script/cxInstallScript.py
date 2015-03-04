@@ -121,6 +121,16 @@ Available components are:
         # info + verification
         assembly.controlData.printSettings()
         print 'Use the following components:\n ', '\n  '.join(assembly.getSelectedLibraries())
+        
+        print ''
+        print '*********************************************************************'
+        print 'The superbuild will check out and build in [repo/../..], expanded to:'
+        print ''
+        print '    %s' % assembly.controlData.getRootDir()
+        print ''
+        print '*********************************************************************'
+        print ''
+        
         self._promptToContinue(options.silent_mode)
         
         assembly.process(checkout = options.full or options.checkout, 

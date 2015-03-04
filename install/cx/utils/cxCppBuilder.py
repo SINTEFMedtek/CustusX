@@ -86,6 +86,7 @@ class CppBuilder:
         runShell('git fetch')
         # old (1.7) syntax - update if needed to 'git branch --set-upstream-to origin/<branch>' 
         runShell('git branch --set-upstream %s origin/%s' % (branch, branch))
+        #runShell('git branch -u origin/%s' % branch)
 
     def _gitSubmoduleUpdate(self):
         self._changeDirToSource()
