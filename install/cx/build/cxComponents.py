@@ -361,7 +361,7 @@ class IGSTK(CppComponent):
         #tag = 'IGSTK-5-2.cx_patch_3-6-0'
         self._getBuilder().gitSetRemoteURL(repo, branch=branch)
         #self._getBuilder().gitCheckoutBranch(branch)
-        self._getBuilder().gitCheckout('6213b8b258d60b0a3ee03952a4341d71233397fb')
+        self._getBuilder().gitCheckout('d29479aa7a5e2679a879105b7c11c8a9c8eaa7cf')
     def configure(self):        
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -386,7 +386,9 @@ class CustusX(CppComponent):
     def help(self):
         return 'custusx.org'
     def path(self):
-        return '%s/%s' % (self.controlData.getWorkingPath(), self.sourceFolder())    
+        loc = self.controlData.getCustusXRepositoryLocation()
+        return '%s/%s' % (loc[0], loc[1])    
+        #return '%s/%s' % (self.controlData.getWorkingPath(), self.sourceFolder())    
     def sourceFolder(self):
         return self.controlData.getRepoFolderName()
     def _rawCheckout(self):
