@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationGUIExtenderService.h"
 #include "ctkPluginContext.h"
 #include "cxRegistrationWidget.h"
+#include "cxWirePhantomWidget.h"
 
 namespace cx
 {
@@ -53,6 +54,9 @@ std::vector<GUIExtenderService::CategorizedWidget> RegistrationGUIExtenderServic
 
 	retval.push_back(GUIExtenderService::CategorizedWidget(
 										 new RegistrationWidget(mContext), "Algorithms"));
+
+	retval.push_back(GUIExtenderService::CategorizedWidget(
+										 new WirePhantomWidget(mContext), "Utility"));
 
 	return retval;
 }
