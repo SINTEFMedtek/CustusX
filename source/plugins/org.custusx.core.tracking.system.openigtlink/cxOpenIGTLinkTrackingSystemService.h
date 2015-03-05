@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXOPENIGTLINKTRACKINGSYSTEMSERVICE_H_
 #define CXOPENIGTLINKTRACKINGSYSTEMSERVICE_H_
 
+#include <QThread>
+
 #include "cxTrackingSystemService.h"
 #include "org_custusx_core_tracking_system_openigtlink_Export.h"
 class ctkPluginContext;
@@ -50,6 +52,7 @@ namespace cx
  */
 class org_custusx_core_tracking_system_openigtlink_EXPORT OpenIGTLinkTrackingSystemService : public TrackingSystemService
 {
+    Q_OBJECT
     Q_INTERFACES(cx::TrackingSystemService)
 
 public:
@@ -64,6 +67,16 @@ public:
     virtual ToolPtr getReference(); ///< reference tool used by entire tracking service - NOTE: system fails if several TrackingSystemServices define this tool
 
     virtual void setLoggingFolder(QString loggingFolder); ///<\param loggingFolder path to the folder where logs should be saved
+
+signals:
+    void connectToServer();
+    void listenToServer();
+
+private slots:
+    void getPackage();
+
+private:
+    QThread mOpenIGTLinkThread;
 
 };
 typedef boost::shared_ptr<OpenIGTLinkTrackingSystemService> OpenIGTLinkTrackingSystemServicePtr;

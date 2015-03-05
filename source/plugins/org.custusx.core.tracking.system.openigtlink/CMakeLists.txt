@@ -3,14 +3,18 @@ project(org_custusx_core_tracking_system_openigtlink)
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
 set(PLUGIN_SRCS
-  cxOpenIGTLinkTrackingSystemPluginActivator.cpp
-  cxOpenIGTLinkTrackingSystemService.cpp
+    cxOpenIGTLinkTrackingSystemPluginActivator.cpp
+    cxOpenIGTLinkTrackingSystemService.cpp
+    cxOpenIGTLinkClient.cpp
+    cxOpenIGTLinkSessionManager.cpp
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
-  cxOpenIGTLinkTrackingSystemPluginActivator.h
-  cxOpenIGTLinkTrackingSystemService.h
+    cxOpenIGTLinkTrackingSystemPluginActivator.h
+    cxOpenIGTLinkTrackingSystemService.h
+    cxOpenIGTLinkClient.h
+    cxOpenIGTLinkSessionManager.h
 )
 
 # Qt Designer files which should be processed by Qts uic
@@ -28,6 +32,7 @@ set(PLUGIN_target_libraries
     ${PLUGIN_target_libraries}
     cxResource
     cxPluginUtilities
+    OpenIGTLink
     )
 
 set(PLUGIN_OUTPUT_DIR "")

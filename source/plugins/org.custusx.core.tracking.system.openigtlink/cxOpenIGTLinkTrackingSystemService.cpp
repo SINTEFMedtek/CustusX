@@ -31,15 +31,48 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxOpenIGTLinkTrackingSystemService.h"
+
 #include "ctkPluginContext.h"
+#include "cxLogger.h"
+#include "cxOpenIGTLinkClient.h"
+#include "cxOpenIGTLinkSessionManager.h"
 
 namespace cx
 {
 OpenIGTLinkTrackingSystemService::OpenIGTLinkTrackingSystemService()
-{}
+{
+    // CLIENT START
+    /*
+    OpenIGTLinkClient *client = new OpenIGTLinkClient;
+    client->moveToThread(&mOpenIGTLinkThread);
+    connect(&mOpenIGTLinkThread, &QThread::finished, client, &QObject::deleteLater);
+    connect(this, &OpenIGTLinkTrackingSystemService::connectToServer, client, &OpenIGTLinkClient::establishConnectionToServer);
+    connect(this, &OpenIGTLinkTrackingSystemService::listenToServer, client, &OpenIGTLinkClient::listen);
+    connect(client, &OpenIGTLinkClient::packageArrived, this, &OpenIGTLinkTrackingSystemService::getPackage);
+    */
+    //CLIENT END
+
+    //SESSIONMANAGER START
+
+    OpenIGTLinkSessionManager *session = new OpenIGTLinkSessionManager;
+
+    session->moveToThread(&mOpenIGTLinkThread);
+    connect(&mOpenIGTLinkThread, &QThread::finished, session, &QObject::deleteLater);
+    connect(this, &OpenIGTLinkTrackingSystemService::listenToServer, session, &OpenIGTLinkSessionManager::connectAndListen);
+
+    //SESSIONMANAGER END
+
+    mOpenIGTLinkThread.start();
+
+    emit connectToServer();
+    emit listenToServer();
+}
 
 OpenIGTLinkTrackingSystemService::~OpenIGTLinkTrackingSystemService()
-{}
+{
+    mOpenIGTLinkThread.quit();
+    mOpenIGTLinkThread.wait();
+}
 
 QString OpenIGTLinkTrackingSystemService::getUid() const
 {
@@ -58,7 +91,6 @@ std::vector<ToolPtr> OpenIGTLinkTrackingSystemService::getTools()
 {
     std::vector<ToolPtr> retval;
     return retval;
-
 }
 
 TrackerConfigurationPtr OpenIGTLinkTrackingSystemService::getConfiguration()
@@ -75,5 +107,10 @@ ToolPtr OpenIGTLinkTrackingSystemService::getReference()
 
 void OpenIGTLinkTrackingSystemService::setLoggingFolder(QString loggingFolder)
 {}
+
+void OpenIGTLinkTrackingSystemService::getPackage()
+{
+    CX_LOG_CHANNEL_DEBUG("janne beate ") << "Package arrived in CustusX.";
+}
 
 } /* namespace cx */

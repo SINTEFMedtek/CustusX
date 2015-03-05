@@ -42,9 +42,7 @@ namespace cx
 {
 
 OpenIGTLinkTrackingSystemPluginActivator::OpenIGTLinkTrackingSystemPluginActivator()
-{
-    std::cout << "Created OpenIGTLinkTrackerPluginActivator" << std::endl;
-}
+{}
 
 OpenIGTLinkTrackingSystemPluginActivator::~OpenIGTLinkTrackingSystemPluginActivator()
 {}
