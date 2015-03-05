@@ -33,12 +33,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxThresholdPreview.h"
 #include <vtkVolume.h>
 #include <vtkVolumeProperty.h>
-//#include <QWidget>
 #include "cxImageTF3D.h"
 #include "cxImageLUT2D.h"
 #include "cxVolumetricRep.h"
-//#include "cxRepManager.h"
-//#include <QTimer>
 #include "cxImage.h"
 
 

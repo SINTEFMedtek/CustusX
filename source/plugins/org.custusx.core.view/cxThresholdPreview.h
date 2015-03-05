@@ -36,7 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "org_custusx_core_view_Export.h"
 
 #include <QObject>
-class QTimer;
 #include "cxForwardDeclarations.h"
 #include "cxMathBase.h"
 
@@ -72,7 +71,6 @@ private:
     ImageTF3DPtr mTF3D_original; ///< original TF of modified image.
 	ImageLUT2DPtr mTF2D_original; ///< original TF of modified image.
 	bool mShadingOn_original; ///< Was shading originally enabled in image
-//	QTimer *mRemoveTimer; ///< Timer for removing segmentation preview coloring if widget is not visible
 };
 
 }

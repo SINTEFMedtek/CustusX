@@ -34,7 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxTrackingSystemIGSTKService.h"
 
-#include <QTimer>
 #include <QDir>
 #include <QList>
 #include <QMetaType>
