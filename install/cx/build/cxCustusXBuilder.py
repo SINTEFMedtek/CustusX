@@ -183,14 +183,14 @@ class CustusXBuilder:
         PrintFormatter.printHeader('Publish Developer Docs to server', level=2)
         target = self.assembly.controlData.publish_developer_documentation_target
         custusx = self._createComponent(cxComponents.CustusX)
-        cmd = 'scp -r %s/doc/html_dev/ %s'
+        cmd = 'scp -r %s/doc/html_dev/* %s'
         shell.run(cmd % (custusx.buildPath(), target.get_scp_target_string()+"/"+targetFolder))
 
     def publishUserDocs(self, targetFolder):
         PrintFormatter.printHeader('Publish User Docs to server', level=2)
         target = self.assembly.controlData.publish_user_documentation_target
         custusx = self._createComponent(cxComponents.CustusX)
-        cmd = 'scp -r %s/doc/html_pure/ %s'
+        cmd = 'scp -r %s/doc/html_pure/* %s'
         shell.run(cmd % (custusx.buildPath(), target.get_scp_target_string()+"/"+targetFolder))
 
     def resetCoverage(self):
