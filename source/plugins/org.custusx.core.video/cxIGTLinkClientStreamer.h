@@ -79,7 +79,6 @@ private slots:
 
 private:
 	SenderPtr mSender;
-//	QTimer* mTestTimer;
 
 	virtual QString hostDescription() const; // threadsafe
 	bool ReceiveImage(QTcpSocket* socket, igtl::MessageHeader::Pointer& header);

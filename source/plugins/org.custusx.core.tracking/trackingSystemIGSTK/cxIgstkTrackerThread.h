@@ -38,7 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 #include <vector>
 #include <QThread>
-#include <QTimer>
 #include "cxIgstkTracker.h"
 #include "cxIgstkTrackerThread.h"
 #include "cxToolUsingIGSTK.h"
