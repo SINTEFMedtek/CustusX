@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "catch.hpp"
+#include "cxConfig.h"
 
 #include "cxtestTSFFixture.h"
 
@@ -69,6 +70,7 @@ TEST_CASE("TubeSegmentationFramework SyntheticVascusynthPreset works", "[integra
 	helper.testSyntheticVascusynthPreset();
 }
 
+#ifdef CX_CUSTUS_SINTEF
 TEST_CASE("TubeSegmentationFramework PhantomAccUSPreset works", "[integration][not_apple][broken][tsf]")
 {
 	TestTubeSegmentationFramework helper;
@@ -92,5 +94,6 @@ TEST_CASE("TubeSegmentationFramework testLungAirwaysCTPreset works", "[integrati
 	TestTubeSegmentationFramework helper;
 	helper.testLungAirwaysCTPreset();
 }
+#endif
 
 } // namespace cxtest

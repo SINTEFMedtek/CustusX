@@ -326,7 +326,6 @@ class OpenIGTLink(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git://github.com/openigtlink/OpenIGTLink.git')
     def update(self):
-        #self._getBuilder().gitCheckoutBranch('master')
         self._getBuilder().gitCheckout('5a501817c2da52e81db4db3eca6dd5111f94fed9')
     def configure(self):
         builder = self._getBuilder()
@@ -353,14 +352,10 @@ class IGSTK(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git://igstk.org/IGSTK.git')
     def update(self):
-        #self._getBuilder().gitCheckout('v5.2', patch='IGSTK-5-2.patch')
-        # this fix should rebase repo from the original Kitware/IGSTK to our own fork on GitHub.
         base = self.controlData.gitrepo_open_site_base
         repo = '%s/IGSTK' % base
         branch = 'IGSTK-CX-modifications'
-        #tag = 'IGSTK-5-2.cx_patch_3-6-0'
         self._getBuilder().gitSetRemoteURL(repo, branch=branch)
-        #self._getBuilder().gitCheckoutBranch(branch)
         self._getBuilder().gitCheckout('d29479aa7a5e2679a879105b7c11c8a9c8eaa7cf')
     def configure(self):        
         builder = self._getBuilder()
@@ -394,14 +389,12 @@ class CustusX(CppComponent):
     def _rawCheckout(self):
         base = self.controlData.gitrepo_open_site_base    
         repo = '%s/CustusX.git' % base
-        self._getBuilder().gitCloneIntoExistingDirectory(repo)
+        self._getBuilder().gitCloneIntoExistingDirectory(repo, self.controlData.main_branch)
     def update(self):
         self._getBuilder().gitCheckoutDefaultBranch(submodules=True)    
-        #self._getBuilder().gitUpdate('master', tag=self.controlData.getGitTag(), submodules=True)    
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
-        #add('EIGEN_DIR:PATH', '%s/CMake' % self._createSibling(Eigen).configPath())
         add('EIGEN_INCLUDE_DIR:PATH', '%s' % self._createSibling(Eigen).sourcePath())
         add('ITK_DIR:PATH', self._createSibling(ITK).configPath())
         add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
@@ -446,7 +439,6 @@ class TubeSegmentationFramework(CppComponent):
         base = self.controlData.gitrepo_open_site_base
         self._getBuilder().gitClone('%s/Tube-Segmentation-Framework.git' % base)
     def update(self):
-#        self._getBuilder().gitCheckoutDefaultBranch(submodules=True)    
         self._getBuilder().gitCheckout('9faceef98c6ee943a1301b0d57f9db0deb7e59e9')
         self._getBuilder()._gitSubmoduleUpdate()
     def configure(self):
@@ -530,9 +522,8 @@ class CustusXData(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone(self.gitRepository(), self.sourceFolder())
     def update(self):
-        self._getBuilder().gitSetRemoteURL(self.gitRepository(), 'master')
+        self._getBuilder().gitSetRemoteURL(self.gitRepository(), self.controlData.main_branch)
         self._getBuilder().gitCheckoutDefaultBranch(submodules=True)    
-        #self._getBuilder().gitUpdate('master', tag=self.controlData.getGitTag())    
     def configure(self):
         pass
     def build(self):
