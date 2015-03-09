@@ -14,7 +14,7 @@ The code is free to download and use under a BSD-3 license. However, the code ba
 
 ### Build instructions
 
-[Build instructions available here.](documentation/user_manual/installation/cx_user_build_instructions.md)
+[Build instructions available here.](doc/dev_manual/cx_dev_build_instructions.md)
 
 ## Structure
 

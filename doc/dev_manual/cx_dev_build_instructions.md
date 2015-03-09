@@ -25,7 +25,7 @@ and thus does not need to be installed separately.
 For convenience, setup scripts for some platforms are available in the 
 repository. They will help setup a machine from scratch, but might give 
 you more than you expected. Look for your platform in 
-[install/platforms](../../../install/platforms).
+[install/platforms](../../install/platforms).
 
 ## Superbuild {#superbuild}
 
@@ -47,7 +47,7 @@ Run the following lines to get it right:
 
 	bash
 	cd \<root_dir\>
-	git clone git@github.com:SINTEFMedisinskTeknologi/CustusX.git CX/CX
-	./CX/CX/install/cxInstaller.py --root_dir . --full --all
+	git clone git@github.com:SINTEFMedTek/CustusX.git CX/CX
+	./CX/CX/install/cxInstaller.py --full --all
 
-The default root_dir i`~/dev/cx`. Run `cxInstaller.py -h` for more options.
+Run `cxInstaller.py -h` for more options.
