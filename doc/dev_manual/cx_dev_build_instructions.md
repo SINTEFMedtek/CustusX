@@ -47,7 +47,7 @@ Run the following lines to get it right:
 
 	bash
 	cd \<root_dir\>
-	git clone git@github.com:SINTEFMedisinskTeknologi/CustusX.git CX/CX
-	./CX/CX/install/cxInstaller.py --root_dir . --full --all
+	git clone git@github.com:SINTEFMedTek/CustusX.git CX/CX
+	./CX/CX/install/cxInstaller.py --full --all
 
-The default root_dir i`~/dev/cx`. Run `cxInstaller.py -h` for more options.
+Run `cxInstaller.py -h` for more options.
