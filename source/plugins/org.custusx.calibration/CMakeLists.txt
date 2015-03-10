@@ -5,6 +5,7 @@ set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 set(PLUGIN_SRCS
   cxCalibrationPluginActivator.cpp
   cxCalibrationGUIExtenderService.cpp
+  cxCalibrationGUIExtenderService.h
   logic/cxTemporalCalibration.h
   logic/cxTemporalCalibration.cpp
    gui/cxToolTipSampleWidget.h
@@ -24,7 +25,6 @@ set(PLUGIN_SRCS
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
   cxCalibrationPluginActivator.h
-  cxCalibrationGUIExtenderService.h
 
    gui/cxToolTipSampleWidget.h
    gui/cxToolManualCalibrationWidget.h
