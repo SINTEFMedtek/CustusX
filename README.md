@@ -10,7 +10,7 @@ DISCLAIMER: CustusX is a research tool: It is not intended for normal clinical u
 
 The code is free to download and use under a BSD-3 license. However, the code base is currently undergoing large changes, thus there is no guarantee that internal interfaces will be stable.
 
-Binaries and documentation can be found here: [custusx.org](custusx.org)
+Binaries and documentation can be found here: [custusx.org](http://custusx.org)
 
 ### Build instructions
 
@@ -22,4 +22,5 @@ CustusX is written in C++ using CMake, Qt, CTK, VTK, ITK, Eigen, OpenCV, IGSTK, 
 
 ## Contributors
 
-CustusX is maintained by SINTEF Medical Technology, in cooperation with the Norwegian National Competence Services for Ultrasound and Image-Guided Therapy (St. Olavs Hospital, SINTEF, NTNU). 
+CustusX is maintained by [SINTEF Medical Technology](http://www.sintef.no/home/Technology-and-Society/departments/medical-technology/#/), in cooperation with the [Norwegian National Competence Services for Ultrasound and Image-Guided Therapy](http://www.usigt.org/index.php/the-custusx-navigation-system) ([St. Olavs Hospital](http://www.stolav.no/en/), [SINTEF](http://www.sintef.no/home/Technology-and-Society/departments/medical-technology/#/), [NTNU](http://www.ntnu.edu/)). 
+
