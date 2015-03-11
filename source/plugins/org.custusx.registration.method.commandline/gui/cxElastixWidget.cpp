@@ -55,7 +55,20 @@ namespace cx
 ElastixWidget::ElastixWidget(RegServices services, QWidget* parent) :
 	RegistrationBaseWidget(services, parent, "ElastiXWidget", "ElastiX Registration")
 {
-	mElastixManager.reset(new ElastixManager(services));
+	this->setModified();
+}
+
+void ElastixWidget::prePaintEvent()
+{
+	if (!mElastixManager)
+	{
+		this->createUI();
+	}
+}
+
+void ElastixWidget::createUI()
+{
+	mElastixManager.reset(new ElastixManager(mServices));
 	connect(mElastixManager.get(), SIGNAL(elastixChanged()), this, SLOT(elastixChangedSlot()));
 
 	mRegisterButton = new QPushButton("Register");
@@ -74,9 +87,9 @@ ElastixWidget::ElastixWidget(RegServices services, QWidget* parent) :
 	QGridLayout* entryLayout = new QGridLayout;
 	entryLayout->setColumnStretch(1, 1);
 
-	mFixedImage.reset(new StringPropertyRegistrationFixedImage(services.registrationService, services.patientModelService));
+	mFixedImage.reset(new StringPropertyRegistrationFixedImage(mServices.registrationService, mServices.patientModelService));
 	new LabeledComboBoxWidget(this, mFixedImage, entryLayout, 0);
-	mMovingImage.reset(new StringPropertyRegistrationMovingImage(services.registrationService, services.patientModelService));
+	mMovingImage.reset(new StringPropertyRegistrationMovingImage(mServices.registrationService, mServices.patientModelService));
 	new LabeledComboBoxWidget(this, mMovingImage, entryLayout, 1);
 
 	new LabeledComboBoxWidget(this, mElastixManager->getParameters()->getCurrentPreset(), entryLayout, 2);
@@ -85,10 +98,10 @@ ElastixWidget::ElastixWidget(RegServices services, QWidget* parent) :
 	buttonsLayout->addWidget(mRegisterButton);
 
 	this->createAction(this,
-	      QIcon(":/icons/open_icon_library/system-run-5.png"),
-	      "Details", "Show Elastix Settings Details",
-	      SLOT(toggleDetailsSlot()),
-	      buttonsLayout);
+		  QIcon(":/icons/open_icon_library/system-run-5.png"),
+		  "Details", "Show Elastix Settings Details",
+		  SLOT(toggleDetailsSlot()),
+		  buttonsLayout);
 
 	topLayout->addLayout(entryLayout);
 	topLayout->addLayout(buttonsLayout);
