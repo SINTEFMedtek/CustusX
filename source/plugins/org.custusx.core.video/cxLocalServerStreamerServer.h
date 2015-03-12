@@ -62,9 +62,9 @@ public:
 	StringPropertyBasePtr getLocalServerNameOption(QDomElement root);
 
 private:
-	QStringList checkGrabberServerExist(QString path, QString filename, QString args);
+    QStringList checkGrabberServerExist(QString path, QString filename);
 	QStringList getOpenIGTLinkServer();
-	QStringList getGrabberServer(QString filename, QString postfix);
+    QStringList getGrabberServer(QString filename);
 
 };
 

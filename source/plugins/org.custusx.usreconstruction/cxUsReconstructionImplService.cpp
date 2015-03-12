@@ -60,7 +60,6 @@ namespace cx
 
 
 UsReconstructionImplService::UsReconstructionImplService(ctkPluginContext *pluginContext, PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, XmlOptionFile settings) :
-//	UsReconstructionService(settings),
 	mPatientModelService(patientModelService),
 	mVisualizationService(visualizationService)
 {
@@ -69,7 +68,6 @@ UsReconstructionImplService::UsReconstructionImplService(ctkPluginContext *plugi
 
 	mParams.reset(new ReconstructParams(patientModelService, settings));
 	connect(mParams.get(), SIGNAL(changedInputSettings()), this, SLOT(setSettings()));
-//	connect(mParams.get(), SIGNAL(transferFunctionChanged()), this, SLOT(transferFunctionChangedSlot()));
 	connect(patientModelService.get(), &PatientModelService::patientChanged, this, &UsReconstructionImplService::patientChangedSlot);
 
 	mServiceListener = boost::shared_ptr<ServiceTrackerListener<ReconstructionMethodService> >(new ServiceTrackerListener<ReconstructionMethodService>(
@@ -80,7 +78,6 @@ UsReconstructionImplService::UsReconstructionImplService(ctkPluginContext *plugi
 	));
 
 	mServiceListener->open();
-	this->initAlgorithm();
 }
 
 UsReconstructionImplService::~UsReconstructionImplService()
@@ -95,45 +92,23 @@ bool UsReconstructionImplService::isNull()
 void UsReconstructionImplService::patientChangedSlot()
 {
 	this->selectData(mPatientModelService->getActivePatientFolder() + "/US_Acq/");
-//	this->setOutputBasePath(mPatientModelService->getActivePatientFolder());
-//	this->setOutputRelativePath("Images");
 	emit newInputDataPath(this->getSelectedFileData().mFilename);
 }
 
 ReconstructionMethodService *UsReconstructionImplService::createAlgorithm()
 {
-//	QString name = mParams->mAlgorithmAdapter->getValue();
 	QString name = mParams->getParameter("Algorithm")->getValueAsVariant().toString();
-
 	if(name.isEmpty())
 		return NULL;
-
 	return mServiceListener->getService(name);
-}
-
-void UsReconstructionImplService::initAlgorithm()
-{
-	ReconstructionMethodService* algo = this->createAlgorithm();
-
-	// generate settings for new algo
-	if (algo)
-	{
-		QDomElement element = mSettings.getElement("algorithms", algo->getName());
-		mAlgoOptions = algo->getSettings(element);
-	}
-	else
-	{
-		mAlgoOptions.clear();
-	}
-
-	emit algorithmChanged();
 }
 
 void UsReconstructionImplService::setSettings()
 {
-	this->initAlgorithm();
+	mAlgoOptions.clear();
 	this->updateFromOriginalFileData();
 	emit paramsChanged();
+	emit algorithmChanged();
 }
 
 void UsReconstructionImplService::startReconstruction()
@@ -206,6 +181,16 @@ void UsReconstructionImplService::setOutputVolumeParams(const OutputVolumeParams
 
 std::vector<PropertyPtr> UsReconstructionImplService::getAlgoOptions()
 {
+	if (mAlgoOptions.empty())
+	{
+		ReconstructionMethodService* algo = this->createAlgorithm();
+		if (algo)
+		{
+			QDomElement element = mSettings.getElement("algorithms", algo->getName());
+			mAlgoOptions = algo->getSettings(element);
+		}
+	}
+
 	return mAlgoOptions;
 }
 
@@ -308,6 +293,10 @@ void UsReconstructionImplService::onServiceRemoved(ReconstructionMethodService* 
 	QStringList range = mParams->getAlgorithmAdapter()->getValueRange();
 	range.removeAll(service->getName());
 	mParams->getAlgorithmAdapter()->setValueRange(range);
+
+	QString algoname = mParams->getParameter("Algorithm")->getValueAsVariant().toString();
+	if (algoname==service->getName())
+		this->setSettings();
 }
 
 void UsReconstructionImplService::newDataOnDisk(QString mhdFilename)

@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxXmlOptionItem.h"
 #include "cxUsReconstructionServiceProxy.h"
 #include "cxProfile.h"
+#include "cxLogger.h"
 
 
 namespace cx
@@ -68,10 +69,10 @@ void UsReconstructionPluginActivator::start(ctkPluginContext* context)
 	mUsReconstruction = RegisteredServicePtr(new RegisteredService(context, usReconstructionService, UsReconstructionService_iid));
 
 	UsReconstructionServicePtr usReconstructionServiceProxy = UsReconstructionServicePtr(new UsReconstructionServiceProxy(context));
+
 	UsReconstructionGUIExtenderService *guiService = new UsReconstructionGUIExtenderService(usReconstructionServiceProxy, patientModelService);
 	mRegisteredGui = RegisteredServicePtr(new RegisteredService(context, guiService, GUIExtenderService_iid));
 
-	//	mRegisteredBackend = RegisteredService::create<UsReconstructionImplService>(context, UsReconstructionService_iid);
 }
 
 void UsReconstructionPluginActivator::stop(ctkPluginContext* context)

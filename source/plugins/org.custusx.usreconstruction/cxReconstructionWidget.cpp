@@ -149,10 +149,12 @@ QWidget* ReconstructionWidget::createOptionsWidget()
 	mAlgorithmGroup->setSizePolicy(mAlgorithmGroup->sizePolicy().horizontalPolicy(),QSizePolicy::Fixed);
 
 	QVBoxLayout* algoOuterLayout = new QVBoxLayout(mAlgorithmGroup);
+	//algoOuterLayout->setMargin(0);
 	QWidget* algorithmWidget = sscCreateDataWidget(this, mReconstructer->getParam("Algorithm"));
 	algoOuterLayout->addWidget(algorithmWidget);
 	mAlgoLayout = new QStackedLayout;
 	this->repopulateAlgorithmGroup();
+	mAlgoLayout->setMargin(0);
 	algoOuterLayout->addLayout(mAlgoLayout);
 	//algoOuterLayout->addStretch();
 	layout->addWidget(mAlgorithmGroup, line, 0, 1, 2);
@@ -194,6 +196,18 @@ void ReconstructionWidget::repopulateAlgorithmGroup()
 			return;
 		}
 	}
+
+	// Remove previous widget: this ensures that the widget wraps tightly around the current
+	// widget instead of wrapping all algorithms.
+	QLayoutItem *child;
+	while ((child = mAlgoLayout->takeAt(0)) != 0)
+	{
+		// delete both the layoutitem AND the widget. Not auto done because layoutitem is no QObject.
+		QWidget* widget = child->widget();
+		delete child;
+		delete widget;
+	}
+
 	this->createNewStackedWidget(algoName);
 }
 
