@@ -173,8 +173,6 @@ MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
 
 	if (settings()->value("gui/fullscreen").toBool())
 		this->setWindowState(this->windowState() | Qt::WindowFullScreen);
-
-	this->toggleDebugModeSlot(mDebugModeAction->isChecked());
 }
 
 void MainWindow::changeEvent(QEvent * event)
@@ -374,15 +372,6 @@ void MainWindow::createActions()
 	mStartLogConsoleAction->setStatusTip(tr("Open Log Console as external application"));
 	connect(mStartLogConsoleAction, &QAction::triggered, this, &MainWindow::onStartLogConsole);
 
-	mDebugModeAction = new QAction(tr("&Debug Mode"), this);
-	mDebugModeAction->setCheckable(true);
-	mDebugModeAction->setChecked(patientService()->getDebugMode());
-	mDebugModeAction->setStatusTip(tr("Set debug mode, this enables lots of weird stuff."));
-	boost::function<void(bool)> setDebug = boost::bind(&PatientModelService::setDebugMode, patientService().get(), _1);
-	connect(mDebugModeAction, &QAction::triggered, setDebug);
-	connect(patientService().get(), &PatientModelService::debugModeChanged, mDebugModeAction, &QAction::setChecked);
-	connect(mDebugModeAction, &QAction::toggled, this, &MainWindow::toggleDebugModeSlot);
-
 	mFullScreenAction = new QAction(tr("Fullscreen"), this);
 	mFullScreenAction->setShortcut(tr("F11"));
 	mFullScreenAction->setStatusTip(tr("Toggle full screen"));
@@ -533,24 +522,6 @@ void MainWindow::onStartLogConsole()
 	mLocalVideoServerProcess->launchWithRelativePath(fullname, QStringList());
 }
 
-void MainWindow::toggleDebugModeSlot(bool checked)
-{
-	QActionGroup* debugActionGroup;
-	if (mWidgetGroupsMap.find("Debugging") != mWidgetGroupsMap.end())
-	{
-		debugActionGroup = mWidgetGroupsMap["Debugging"];
-	}
-	else
-		return;
-
-	QList<QAction*> debugActions = debugActionGroup->actions();
-	QAction* action;
-	foreach(action, debugActions)
-		{
-			action->setVisible(checked);
-			this->mDockWidgets->toggleDebug(action, checked);
-		}
-}
 void MainWindow::saveScreenShot(QPixmap pixmap, QString id)
 {
 	QString ending = "png";
@@ -890,7 +861,6 @@ void MainWindow::createMenus()
 	mFileMenu->addSeparator();
 	mFileMenu->addAction(mFullScreenAction);
 	mFileMenu->addAction(mStartLogConsoleAction);
-	mFileMenu->addAction(mDebugModeAction);
 	mFileMenu->addAction(mShootScreenAction);
 	mFileMenu->addAction(mShootWindowAction);
 	mFileMenu->addAction(mRecordFullscreenAction);

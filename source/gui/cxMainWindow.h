@@ -134,7 +134,6 @@ protected slots:
 	void recordFullscreen();
 
 	void onStartLogConsole();
-	void toggleDebugModeSlot(bool checked);
 	void dockWidgetVisibilityChanged(bool val);
 	void focusChanged(QWidget * old, QWidget * now);
 
@@ -179,7 +178,6 @@ private:
 	QAction* mAboutAction;
 	QAction* mPreferencesAction;
 	QAction* mStartLogConsoleAction;
-	QAction* mDebugModeAction;
 	QAction* mFullScreenAction;
 	QAction* mQuitAction;
 

@@ -107,6 +107,8 @@ protected:
 	StringPropertyRegistrationFixedImagePtr mFixedProperty;
 	ActiveToolProxyPtr mActiveToolProxy;
 
+private slots:
+	void globalConfigurationFileChangedSlot(QString key);
 private:
 	LandmarkPatientRegistrationWidget(); ///< not implemented
 };

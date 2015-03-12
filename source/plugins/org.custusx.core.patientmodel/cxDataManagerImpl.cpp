@@ -72,8 +72,7 @@ DataManagerImplPtr DataManagerImpl::create()
 	return retval;
 }
 
-DataManagerImpl::DataManagerImpl() :
-	mDebugMode(false)
+DataManagerImpl::DataManagerImpl()
 {
 	m_rMpr_History.reset(new RegistrationHistory());
 	connect(m_rMpr_History.get(), SIGNAL(currentChanged()), this, SIGNAL(rMprChanged()));
@@ -643,19 +642,6 @@ PresetTransferFunctions3DPtr DataManagerImpl::getPresetTransferFunctions3D() con
 		mPresetTransferFunctions3D.reset(new TransferFunctions3DPresets(preset, custom));
 
 	return mPresetTransferFunctions3D;
-}
-
-bool DataManagerImpl::getDebugMode() const
-{
-	return mDebugMode;
-}
-void DataManagerImpl::setDebugMode(bool on)
-{
-	if (mDebugMode == on)
-		return;
-	std::cout << "Setting DEBUG MODE = " << on << std::endl;
-	mDebugMode = on;
-	emit debugModeChanged(mDebugMode);
 }
 
 } // namespace cx

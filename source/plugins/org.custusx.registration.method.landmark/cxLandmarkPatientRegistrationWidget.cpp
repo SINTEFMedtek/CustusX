@@ -55,6 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackingService.h"
 #include "cxRepContainer.h"
 #include "cxReporter.h"
+#include "cxSettings.h"
 
 namespace cx
 {
@@ -86,7 +87,8 @@ LandmarkPatientRegistrationWidget::LandmarkPatientRegistrationWidget(RegServices
 	mActiveToolProxy = ActiveToolProxy::New(services.trackingService);
 	connect(mActiveToolProxy.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateToolSampleButton()));
 	connect(mActiveToolProxy.get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(updateToolSampleButton()));
-	connect(services.patientModelService.get(), &PatientModelService::debugModeChanged, this, &LandmarkPatientRegistrationWidget::updateToolSampleButton);
+
+	connect(settings(), &Settings::valueChangedFor, this, &LandmarkPatientRegistrationWidget::globalConfigurationFileChangedSlot);
 
 	//layout
 	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mFixedProperty));
@@ -116,6 +118,12 @@ QString LandmarkPatientRegistrationWidget::defaultWhatsThis() const
 		"</html>";
 }
 
+void LandmarkPatientRegistrationWidget::globalConfigurationFileChangedSlot(QString key)
+{
+	if (key == "giveManualToolPhysicalProperties")
+		this->updateToolSampleButton();
+}
+
 void LandmarkPatientRegistrationWidget::registerSlot()
 {
 	this->performRegistration();
@@ -131,7 +139,7 @@ void LandmarkPatientRegistrationWidget::updateToolSampleButton()
 	ToolPtr tool = mServices.trackingService->getActiveTool();
 
 	bool enabled = false;
-	enabled = tool && tool->getVisible() && (!tool->hasType(Tool::TOOL_MANUAL) || mServices.patientModelService->getDebugMode()); // enable only for non-manual tools. ignore this in debug mode.
+	enabled = tool && tool->getVisible() && (!tool->hasType(Tool::TOOL_MANUAL) || settings()->value("giveManualToolPhysicalProperties").toBool()); // enable only for non-manual tools.
 	mToolSampleButton->setEnabled(enabled);
 
 	if (mServices.trackingService->getActiveTool())

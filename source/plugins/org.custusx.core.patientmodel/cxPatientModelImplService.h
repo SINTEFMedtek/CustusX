@@ -97,9 +97,6 @@ public:
 	virtual void autoSave();
 	virtual bool isNull();
 
-	virtual bool getDebugMode() const;
-	virtual void setDebugMode(bool on);
-
 private slots:
 	void newProbe(const ToolPtr tool);
 	void videoSourceAdded(VideoSourcePtr source);
