@@ -157,7 +157,9 @@ void TrackedStream::parseXml(QDomNode &dataNode)
 
 DoubleBoundingBox3D TrackedStream::boundingBox() const
 {
-	DoubleBoundingBox3D bounds(mVideoSource->getVtkImageData()->GetBounds());
+	DoubleBoundingBox3D bounds;
+	if(this->hasVideo())
+		bounds = DoubleBoundingBox3D(mVideoSource->getVtkImageData()->GetBounds());
 	return bounds;
 }
 
@@ -188,7 +190,7 @@ bool TrackedStream::is3D()
 		return false;
 }
 
-bool TrackedStream::hasVideo()
+bool TrackedStream::hasVideo() const
 {
 	if(!mVideoSource || !mVideoSource->getVtkImageData())
 		return false;
