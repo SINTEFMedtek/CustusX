@@ -86,6 +86,10 @@ void VisualizationServiceProxy::onServiceAdded(VisualizationService* service)
 	connect(service, &VisualizationService::fps, this, &VisualizationService::fps);
 	connect(service, &VisualizationService::activeLayoutChanged, this, &VisualizationService::activeLayoutChanged);
 	connect(service, &VisualizationService::renderingEnabledChanged, this, &VisualizationService::renderingEnabledChanged);
+
+	emit activeLayoutChanged();
+	emit activeViewChanged();
+	emit renderingEnabledChanged();
 }
 
 void VisualizationServiceProxy::onServiceRemoved(VisualizationService *service)
@@ -96,6 +100,10 @@ void VisualizationServiceProxy::onServiceRemoved(VisualizationService *service)
 	disconnect(service, &VisualizationService::renderingEnabledChanged, this, &VisualizationService::renderingEnabledChanged);
 
 	mVisualizationService = VisualizationService::getNullObject();
+
+	emit activeLayoutChanged();
+	emit activeViewChanged();
+	emit renderingEnabledChanged();
 }
 
 bool VisualizationServiceProxy::isNull()
