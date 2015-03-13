@@ -129,7 +129,6 @@ void LogicManager::initializeServices()
 
 	mTrackingService = TrackingServiceProxy::create(pc);
 	mPatientModelService = PatientModelServiceProxy::create(pc);
-	mPatientModelService = PatientModelServiceProxy::create(pc);
 	mVideoService = VideoServiceProxy::create(pc);
 	mViewService = VisualizationServiceProxy::create(pc);
 	mStateService = StateServiceProxy::create(pc);

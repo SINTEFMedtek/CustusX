@@ -133,6 +133,7 @@ void VideoConnection::stopClient()
 {
 	if (mClient)
 	{
+        QString hostdescription = mClient->hostDescription();
 		mClient->quit();
 		mClient->wait(2000);
 
@@ -140,7 +141,7 @@ void VideoConnection::stopClient()
 		{
 			mClient->terminate();
 			mClient->wait(); // forever or until dead thread
-			reportWarning(QString("Video Client [%1] did not quit normally - terminated.").arg(mClient->hostDescription()));
+            reportWarning(QString("Video Client [%1] did not quit normally - terminated.").arg(hostdescription));
 		}
 
 		disconnect(mClient.get(), SIGNAL(finished()), this, SLOT(clientFinishedSlot()));
