@@ -77,6 +77,7 @@ class LogFile;
 class LogThread : public QObject
 {
 	Q_OBJECT
+	typedef boost::function<void()> PendingActionType;
 
 public:
 	LogThread(QObject* parent = NULL);
@@ -93,6 +94,7 @@ public slots:
 
 protected:
 	virtual void executeSetLoggingFolder(QString absoluteLoggingFolderPath) = 0;
+	void callInLogThread(PendingActionType& action);
 	Message cleanupMessage(Message message);
 	MessageRepositoryPtr mRepository;
 
@@ -101,7 +103,6 @@ protected slots:
 
 private:
 	QMutex mActionsMutex;
-	typedef boost::function<void()> PendingActionType;
 	QList<PendingActionType> mPendingActions;
 
 	bool executeAction();

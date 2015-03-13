@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDateTime>
 #include <QFile>
 #include "boost/shared_ptr.hpp"
+#include "boost/weak_ptr.hpp"
 #include "cxDefinitions.h"
 #include "cxAudio.h"
 #include <sstream>
@@ -63,6 +64,7 @@ class QTextStream;
 
 namespace cx
 {
+typedef boost::shared_ptr<class Reporter> ReporterPtr;
 
 /** \brief Logging service.
  *
@@ -84,10 +86,12 @@ class cxResource_EXPORT Reporter : public Log
   Q_OBJECT
 
 public:
-  static void initialize(); ///< initialize service. must be called before use.
-  static void shutdown(); ///< shutdown service.
+	virtual ~Reporter();
 
-  static Reporter* getInstance(); ///< Returns a reference to the only Reporter that exists.
+  static void initialize(); ///< Initialize logging, static object is guaranteed to exist at least until shutdown.
+  static void shutdown(); ///< shutdown service, destroy static object if none holds a reference.
+
+  static ReporterPtr getInstance(); ///< Returns a reference to the only Reporter that exists.
 
   void setAudioSource(AudioPtr audioSource); ///< define sounds to go with the messages.
 
@@ -124,7 +128,6 @@ protected:
 private:
   bool hasAudioSource() const;
   Reporter();
-  virtual ~Reporter();
   Reporter(const Reporter&);
   Reporter& operator=(const Reporter&);
 
@@ -132,12 +135,14 @@ private:
 
   AudioPtr mAudioSource;
 
-  static Reporter *mTheInstance; // global variable
+//  static Reporter *mTheInstance; // global variable
+  static boost::weak_ptr<Reporter> mWeakInstance; // global variable
+  static boost::shared_ptr<Reporter> mPersistentInstance; // global variable
 };
 
 /**Shortcut for accessing the message manager instance.
  */
-cxResource_EXPORT Reporter* reporter();
+cxResource_EXPORT ReporterPtr reporter();
 
 
 } //namespace cx
