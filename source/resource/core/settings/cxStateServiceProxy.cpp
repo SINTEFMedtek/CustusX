@@ -66,6 +66,10 @@ void StateServiceProxy::onServiceAdded(StateService* service)
 	connect(mService.get(), &StateService::workflowStateChanged, this, &StateService::workflowStateChanged);
 	connect(mService.get(), &StateService::workflowStateAboutToChange, this, &StateService::workflowStateAboutToChange);
 	connect(mService.get(), &StateService::applicationStateChanged, this, &StateService::applicationStateChanged);
+
+	emit workflowStateAboutToChange();
+	emit workflowStateChanged();
+	emit applicationStateChanged();
 }
 
 void StateServiceProxy::onServiceRemoved(StateService *service)
@@ -75,6 +79,10 @@ void StateServiceProxy::onServiceRemoved(StateService *service)
 	disconnect(mService.get(), &StateService::applicationStateChanged, this, &StateService::applicationStateChanged);
 
 	mService = StateService::getNullObject();
+
+	emit workflowStateAboutToChange();
+	emit workflowStateChanged();
+	emit applicationStateChanged();
 }
 
 
