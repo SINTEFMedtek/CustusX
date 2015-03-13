@@ -264,7 +264,7 @@ void LandmarkPatientRegistrationWidget::performRegistration()
 
 	mServices.registrationService->doPatientRegistration();
 
-	this->updateAvarageAccuracyLabel();
+	this->updateAverageAccuracyLabel();
 }
 
 QString LandmarkPatientRegistrationWidget::getTargetName() const

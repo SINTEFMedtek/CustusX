@@ -75,7 +75,7 @@ protected slots:
 
 	void cellChangedSlot(int row, int column); ///< reacts when the user types in a (landmark) name
 	void landmarkUpdatedSlot();
-	void updateAvarageAccuracyLabel();
+	void updateAverageAccuracyLabel();
 
 protected:
 	virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
@@ -93,7 +93,7 @@ protected:
 	std::vector<Landmark> getAllLandmarks() const; ///< get all the landmarks from the image and the datamanager
 	QString getLandmarkName(QString uid);
 	double getAccuracy(QString uid);
-	double getAvarageAccuracy();
+	double getAverageAccuracy();
 
 	//gui
 	QVBoxLayout* mVerticalLayout; ///< vertical layout is used
@@ -105,6 +105,8 @@ protected:
 
 private:
 	LandmarkRegistrationWidget(); ///< not implemented
+	bool isAverageAccuracyValid();
+	double getAverageAccuracy(int &numActiveLandmarks);
 };
 
 /**

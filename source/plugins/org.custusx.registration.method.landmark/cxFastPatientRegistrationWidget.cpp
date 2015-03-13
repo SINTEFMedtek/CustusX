@@ -58,7 +58,7 @@ QString FastPatientRegistrationWidget::defaultWhatsThis() const
 void FastPatientRegistrationWidget::performRegistration()
 {
 	mServices.registrationService->doFastRegistration_Translation();
-	this->updateAvarageAccuracyLabel();
+	this->updateAverageAccuracyLabel();
 }
 
 }//namespace cx

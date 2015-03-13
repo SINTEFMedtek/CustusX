@@ -205,7 +205,7 @@ void LandmarkRegistrationWidget::prePaintEvent()
 		}
 	}
 
-	this->updateAvarageAccuracyLabel();
+	this->updateAverageAccuracyLabel();
 	mLandmarkTableWidget->blockSignals(false);
 }
 
@@ -294,23 +294,46 @@ void LandmarkRegistrationWidget::landmarkUpdatedSlot()
     this->setModified();
 }
 
-void LandmarkRegistrationWidget::updateAvarageAccuracyLabel()
+void LandmarkRegistrationWidget::updateAverageAccuracyLabel()
 {
 	QString fixedName;
 	DataPtr fixedData = boost::dynamic_pointer_cast<Data>(mServices.registrationService->getFixedData());
 	if (fixedData)
 		fixedName = fixedData->getName();
 
-	mAvarageAccuracyLabel->setText(tr("Mean accuracy %1 mm").arg(this->getAvarageAccuracy()));
-	mAvarageAccuracyLabel->setToolTip(QString("Average landmark accuracy from target [%1] to fixed [%2].").arg(this->getTargetName()).arg(fixedName));
+	if(this->isAverageAccuracyValid())
+	{
+		mAvarageAccuracyLabel->setText(tr("Mean accuracy %1 mm").arg(this->getAverageAccuracy(), 0, 'f', 2));
+		mAvarageAccuracyLabel->setToolTip(QString("Average landmark accuracy from target [%1] to fixed [%2].").arg(this->getTargetName()).arg(fixedName));
+	}
+	else
+	{
+		mAvarageAccuracyLabel->setText(" ");
+		mAvarageAccuracyLabel->setToolTip("");
+	}
 }
 
-double LandmarkRegistrationWidget::getAvarageAccuracy()
+bool LandmarkRegistrationWidget::isAverageAccuracyValid()
+{
+	int numActiveLandmarks = 0;
+	this->getAverageAccuracy(numActiveLandmarks);
+	if(numActiveLandmarks < 3)
+		return false;
+	return true;
+}
+
+double LandmarkRegistrationWidget::getAverageAccuracy()
+{
+	int numActiveLandmarks = 0;
+	return this->getAverageAccuracy(numActiveLandmarks);
+}
+
+double LandmarkRegistrationWidget::getAverageAccuracy(int& numActiveLandmarks)
 {
 	std::map<QString, LandmarkProperty> props = mServices.patientModelService->getLandmarkProperties();
 
 	double sum = 0;
-	int count = 0;
+	numActiveLandmarks = 0;
 	std::map<QString, LandmarkProperty>::iterator it = props.begin();
 	for (; it != props.end(); ++it)
 	{
@@ -321,12 +344,12 @@ double LandmarkRegistrationWidget::getAvarageAccuracy()
 		if (!similar(val, 1000.0))
 		{
 			sum = sum + val;
-			count++;
+			numActiveLandmarks++;
 		}
 	}
-	if (count == 0)
+	if (numActiveLandmarks == 0)
 		return 1000;
-	return sum / count;
+	return sum / numActiveLandmarks;
 }
 
 double LandmarkRegistrationWidget::getAccuracy(QString uid)
