@@ -36,16 +36,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogFileWatcher.h"
 #include "cxNullDeleter.h"
 #include "cxReporter.h"
+#include <QApplication>
 
 namespace cx
 {
 
-MessageListenerPtr MessageListener::create(LogQPointer log)
+MessageListenerPtr MessageListener::create(LogPtr log)
 {
 	return MessageListenerPtr(new MessageListener(log));
 }
 
-MessageListenerPtr MessageListener::createWithQueue(LogQPointer log, int size)
+MessageListenerPtr MessageListener::createWithQueue(LogPtr log, int size)
 {
 	MessageListenerPtr retval(new MessageListener(log));
 	retval->setMessageQueueMaxSize(size);
@@ -62,7 +63,7 @@ MessageListenerPtr MessageListener::clone()
 }
 
 
-MessageListener::MessageListener(LogQPointer log) :
+MessageListener::MessageListener(LogPtr log) :
 	mManager(log),
 	mMessageHistoryMaxSize(0)
 {
@@ -98,7 +99,9 @@ void MessageListener::limitQueueSize()
 		return;
 
 	while (mMessages.size() > mMessageHistoryMaxSize)
+	{
 		mMessages.pop_front();
+	}
 }
 
 bool MessageListener::isError(MESSAGE_LEVEL level) const
@@ -108,9 +111,13 @@ bool MessageListener::isError(MESSAGE_LEVEL level) const
 
 bool MessageListener::containsErrors() const
 {
+	QApplication::processEvents();
+
 	for (QList<Message>::const_iterator i=mMessages.begin(); i!=mMessages.end(); ++i)
+	{
 		if (this->isError(i->getMessageLevel()))
 			return true;
+	}
 	return false;
 }
 

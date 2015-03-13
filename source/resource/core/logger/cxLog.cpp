@@ -48,9 +48,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxProfile.h"
 #include "cxMessageListener.h"
 #include "internal/cxLogThread.h"
+#include "QApplication"
 
 namespace cx
 {
+
+class EventProcessingThread : public QThread
+{
+public:
+	EventProcessingThread()
+	{
+	}
+	virtual ~EventProcessingThread()
+	{
+
+	}
+
+	virtual void run()
+	{
+		this->exec();
+		qApp->processEvents(); // exec() docs doesn't guarantee that the posted events are processed. - do that here.
+	}
+};
 
 
 Log::Log()
@@ -67,11 +86,15 @@ QString Log::getDefaultLogPath() const
 {
 	QString isoDateFormat("yyyy-MM-dd");
 	QString isoDate = QDateTime::currentDateTime().toString(isoDateFormat);
-	return ProfileManager::getInstance()->getSettingsPath()+"/Logs/"+isoDate;
+	QString retval = ProfileManager::getInstance()->getSettingsPath()+"/Logs/"+isoDate;
+	return retval;
 }
 
 void Log::initializeObject()
 {
+	if (mThread)
+		return;
+
 	this->stopThread();
 	this->startThread();
 }
@@ -81,7 +104,7 @@ void Log::startThread()
 	if (mThread)
 		return;
 
-	mThread.reset(new QThread());
+	mThread.reset(new EventProcessingThread());
 	mThread->setObjectName("org.custusx.resource.core.logger");
 
 	mWorker = this->createWorker();

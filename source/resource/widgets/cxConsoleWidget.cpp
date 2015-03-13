@@ -418,7 +418,8 @@ ConsoleWidget::ConsoleWidget(QWidget* parent, QString uid, QString name) :
 	mDetailsAction(NULL)
 {
 	mOptions = profile()->getXmlSettings().descend(this->objectName());
-	mLog = LogPtr(reporter(), null_deleter());
+	mLog = reporter();
+	connect(mLog.get(), &Log::loggingFolderChanged, this, &ConsoleWidget::onLoggingFolderChanged);
 
 	this->setModified();
 }
@@ -460,7 +461,7 @@ void ConsoleWidget::createUI()
 	mMessagesLayout->setMargin(0);
 	layout->addLayout(mMessagesLayout);
 
-	mMessageListener = MessageListener::create(mLog.get());
+	mMessageListener = MessageListener::create(mLog);
 	mMessageFilter.reset(new MessageFilterConsole);
 	mMessageListener->installFilter(mMessageFilter);
 	connect(mMessageListener.get(), &MessageListener::newMessage, this, &ConsoleWidget::receivedMessage);
@@ -734,6 +735,8 @@ void ConsoleWidget::clearTable()
 
 void ConsoleWidget::onLoggingFolderChanged()
 {
+	if (!mMessageFilter)
+		return;
 	mMessageListener->installFilter(mMessageFilter);
 	this->updateUI();
 }
