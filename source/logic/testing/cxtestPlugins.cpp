@@ -36,6 +36,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPluginFramework.h"
 #include <ctkServiceTracker.h>
 #include "cxPatientModelService.h"
+#include "cxViewService.h"
+#include "cxMessageListener.h"
+#include "cxReporter.h"
 
 /** Test that one plugin can be sucessfully loaded, both in the unit (build folder)
   * and the integration (install folder) step.
@@ -53,5 +56,17 @@ TEST_CASE("LogicManager: Load one core plugin (PatientModelService)", "[integrat
 	CHECK(service);
 
 	cx::LogicManager::shutdown();
+}
+
+TEST_CASE("LogicManager: init and shutdown without it posting the warning: \"QObject::killTimer: timers cannot be stopped from another thread\"", "[integration][unit][plugins]")
+{
+    cx::reporter()->initialize();
+    cx::MessageListenerPtr messageListener = cx::MessageListener::createWithQueue();
+
+    cx::DataLocations::setTestMode();
+    cx::LogicManager::initialize();
+
+    cx::LogicManager::shutdown();
+    REQUIRE(!messageListener->containsText("QObject::killTimer: timers cannot be stopped from another thread"));
 }
 

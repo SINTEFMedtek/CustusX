@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxCoreServices.h"
 #include "cxSessionStorageServiceProxy.h"
 #include "cxXMLNodeWrapper.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -69,11 +70,6 @@ VisualizationImplService::VisualizationImplService(ctkPluginContext *context) :
 
 VisualizationImplService::~VisualizationImplService()
 {
-//	if(viewManager())
-//	{
-//		disconnect(viewManager(), SIGNAL(activeViewChanged()), this, SIGNAL(activeViewChanged()));
-//		disconnect(viewManager(), &ViewManager::renderingEnabledChanged, this, &VisualizationService::renderingEnabledChanged);
-//	}
 }
 
 ViewPtr VisualizationImplService::get3DView(int group, int index)
@@ -88,16 +84,17 @@ int VisualizationImplService::getActiveGroup() const
 ViewGroupDataPtr VisualizationImplService::getGroup(int groupIdx) const
 {
 	return viewManager()->getViewGroup(groupIdx);
-//	std::vector<ViewGroupPtr> viewGroups = viewManager()->getViewGroups();
-//	if (!viewGroups.empty())
-//		return viewGroups[groupIdx]->getData();
-//	else
-//		return ViewGroupDataPtr();
 }
 
 bool VisualizationImplService::isNull()
 {
 	return false;
+}
+
+void VisualizationImplService::aboutToStop()
+{
+    CX_LOG_DEBUG() << "About to destruct the visualizationservice and viewmanager, making sure timers are stopped.";
+    viewManager()->enableRender(false);
 }
 
 void VisualizationImplService::autoShowData(cx::DataPtr data)
@@ -176,7 +173,6 @@ void VisualizationImplService::setPreview(ImagePtr image, const std::vector<doub
 void VisualizationImplService::removePreview()
 {
 	RepManager::getInstance()->getThresholdPreview()->removePreview();
-//	mVisualizationService->removePreview();
 }
 
 void VisualizationImplService::onSessionChanged()

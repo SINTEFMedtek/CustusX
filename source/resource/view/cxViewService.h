@@ -104,6 +104,7 @@ signals:
 	void renderingEnabledChanged(); ///< emitted then rendering is enabled/disabled
 
 public slots:
+    virtual void aboutToStop() = 0;
 
 };
 

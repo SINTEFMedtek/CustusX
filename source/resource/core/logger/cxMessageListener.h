@@ -67,6 +67,7 @@ public:
 	MessageListenerPtr clone();
 	~MessageListener();
 	bool containsErrors() const;
+    bool containsText(const QString text) const;
 	QList<Message> getMessages() const;
 
 	void restart(); // emit all messages in queue, then continue emitting new incoming messages

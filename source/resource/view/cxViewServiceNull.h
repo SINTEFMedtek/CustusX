@@ -68,6 +68,10 @@ public:
 	virtual void removePreview();
 
 	virtual bool isNull();
+
+public slots:
+    virtual void aboutToStop(){}
+
 private:
 	void printWarning() const;
 	QActionGroup* mActionGroup;
