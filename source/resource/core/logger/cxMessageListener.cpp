@@ -121,6 +121,18 @@ bool MessageListener::containsErrors() const
 	return false;
 }
 
+bool MessageListener::containsText(const QString text) const
+{
+    QApplication::processEvents();
+    for (QList<Message>::const_iterator i=mMessages.begin(); i!=mMessages.end(); ++i)
+    {
+        QString message = i->getText();
+        if(i->getText().contains(text, Qt::CaseInsensitive))
+            return true;
+    }
+    return false;
+}
+
 void MessageListener::restart()
 {
 	mManager->installObserver(mObserver, true);
