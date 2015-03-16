@@ -58,7 +58,7 @@ TEST_CASE("LogicManager: Load one core plugin (PatientModelService)", "[integrat
 	cx::LogicManager::shutdown();
 }
 
-TEST_CASE("LogicManager: init and shutdown without it posting the warning: \"QObject::killTimer: timers cannot be stopped from another thread\"", "[integration][unit][plugins]")
+TEST_CASE("LogicManager: init and shutdown without it posting the warning: QObject::killTimer: timers cannot be stopped from another thread", "[integration][unit][plugins]")
 {
     cx::reporter()->initialize();
     cx::MessageListenerPtr messageListener = cx::MessageListener::createWithQueue();
