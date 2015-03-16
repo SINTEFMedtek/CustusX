@@ -58,7 +58,6 @@ PatientModelImplService::PatientModelImplService(ctkPluginContext *context) :
 
 	connect(this->dataService().get(), &DataManager::dataAddedOrRemoved, this, &PatientModelService::dataAddedOrRemoved);
 	connect(this->dataService().get(), &DataManager::activeImageChanged, this, &PatientModelService::activeImageChanged);
-	connect(this->dataService().get(), &DataManager::debugModeChanged, this, &PatientModelService::debugModeChanged);
 	connect(this->dataService().get(), &DataManager::rMprChanged, this, &PatientModelService::rMprChanged);
 	connect(this->dataService().get(), &DataManager::streamLoaded, this, &PatientModelService::streamLoaded);
 	connect(this->dataService().get(), &DataManager::clinicalApplicationChanged, this, &PatientModelService::clinicalApplicationChanged);
@@ -118,7 +117,6 @@ PatientModelImplService::~PatientModelImplService()
 	{
 		disconnect(this->dataService().get(), &DataManager::dataAddedOrRemoved, this, &PatientModelService::dataAddedOrRemoved);
 		disconnect(this->dataService().get(), &DataManager::activeImageChanged, this, &PatientModelService::activeImageChanged);
-		disconnect(this->dataService().get(), &DataManager::debugModeChanged, this, &PatientModelService::debugModeChanged);
 		disconnect(this->dataService().get(), &DataManager::rMprChanged, this, &PatientModelService::rMprChanged);
 		disconnect(this->dataService().get(), &DataManager::streamLoaded, this, &PatientModelService::streamLoaded);
 		disconnect(this->dataService().get(), &DataManager::clinicalApplicationChanged, this, &PatientModelService::clinicalApplicationChanged);
@@ -184,15 +182,6 @@ void PatientModelImplService::autoSave()
 bool PatientModelImplService::isNull()
 {
 	return false;
-}
-
-bool PatientModelImplService::getDebugMode() const
-{
-	return dataService()->getDebugMode();
-}
-void PatientModelImplService::setDebugMode(bool on)
-{
-	dataService()->setDebugMode(on);
 }
 
 ImagePtr PatientModelImplService::getActiveImage() const

@@ -29,72 +29,66 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXMESSAGELISTENER_H
-#define CXMESSAGELISTENER_H
 
-#include "cxResourceExport.h"
-#include "cxReporter.h"
+#ifndef CXWIREPHANTOMWIDGET_H_
+#define CXWIREPHANTOMWIDGET_H_
 
-#include <vector>
-#include <QPointer>
+#include "org_custusx_registration_gui_Export.h"
+#include "cxRegistrationBaseWidget.h"
+#include "cxPipeline.h"
+#include "cxFilter.h"
+#include "cxVector3D.h"
+#include "cxTransform3D.h"
+#include "cxBoundingBox3D.h"
 
-#include "cxEnumConverter.h"
+class QPushButton;
+class QVBoxLayout;
+class QTextEdit;
 
 namespace cx
 {
+typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
 
-typedef boost::shared_ptr<class MessageFilter> MessageFilterPtr;
-typedef boost::shared_ptr<class MessageObserver> MessageObserverPtr;
-typedef boost::shared_ptr<class MessageListener> MessageListenerPtr;
-typedef boost::shared_ptr<class Log> LogPtr;
-
-/** Utility for listening to the Reporter
-  * and storing messages from it.
-  *
-  * Messages are passed throught MessageFilter before being
-  * emitted from this class.
-  *
- * \ingroup cx_resource_core_logger
-  * \date 2014-03-09
-  * \author christiana
-  */
-class cxResource_EXPORT MessageListener : public QObject
+/**
+ * \brief Probe accuracy measurements using the Wire Phantom.
+ * \ingroup cx_module_registration
+ *
+ *  \date Jun 21, 2012
+ *  \date Nov 28, 2012
+ *  \author christiana
+ */
+class org_custusx_registration_gui_EXPORT WirePhantomWidget: public RegistrationBaseWidget
 {
-	Q_OBJECT
+Q_OBJECT
+
 public:
-	static MessageListenerPtr create(LogPtr log=LogPtr());
-	static MessageListenerPtr createWithQueue(LogPtr log=LogPtr(), int size=1000);
-	MessageListenerPtr clone();
-	~MessageListener();
-	bool containsErrors() const;
-    bool containsText(const QString text) const;
-	QList<Message> getMessages() const;
+	WirePhantomWidget(ctkPluginContext *pluginContext, QWidget* parent = 0);
+	virtual ~WirePhantomWidget();
+	virtual QString defaultWhatsThis() const;
 
-	void restart(); // emit all messages in queue, then continue emitting new incoming messages
-
-	void installFilter(MessageFilterPtr);
-	void setMessageQueueMaxSize(int count);
-	int getMessageQueueMaxSize() const; // <0 means infinite
-
-signals:
-	void newMessage(Message message);
-	void newChannel(QString channel);
+protected:
+	QVBoxLayout* mLayout;
 
 private slots:
-	void messageReceived(Message message);
-private:
-	MessageListener(LogPtr log);
-	bool isError(MESSAGE_LEVEL level) const;
-	void limitQueueSize();
-	QList<Message> mMessages;
-	LogPtr mManager;
-	int mMessageHistoryMaxSize;
+	void measureSlot();
+	MeshPtr loadNominalCross();
+	void registration();
+	void generate_sMt();
 
-	MessageObserverPtr mObserver;
+private:
+    void showDataMetrics(Vector3D cross_r);
+    std::pair<QString, Transform3D> getLastProbePosition();
+	void showData(DataPtr data);
+	Vector3D findCentroid(MeshPtr mesh);
+
+    class PipelineWidget* mPipelineWidget;
+    PipelinePtr mPipeline;
+	QPushButton* mMeasureButton;
+	QPushButton* mCalibrationButton;
+	QTextEdit* mResults;
+	Transform3D mLastRegistration;
+	UsReconstructionServicePtr mUsReconstructionService;
 };
 
-
-} // namespace cx
-
-
-#endif // CXMESSAGELISTENER_H
+} /* namespace cx */
+#endif /* CXWIREPHANTOMWIDGET_H_ */

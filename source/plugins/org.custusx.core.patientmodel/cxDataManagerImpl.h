@@ -121,9 +121,6 @@ public:
 	virtual LandmarksPtr getPatientLandmarks();
 	virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const;
 
-	virtual bool getDebugMode() const;
-	virtual void setDebugMode(bool on);
-
 	virtual void generateUidAndName(QString* _uid, QString* _name);
 
 protected:
@@ -146,7 +143,6 @@ protected:
 	LandmarkPropertyMap mLandmarkProperties; ///< uid and name
 	RegistrationHistoryPtr m_rMpr_History; ///< transform from the patient reference to the reference, along with historical data.
 	LandmarksPtr mPatientLandmarks; ///< in space patient reference.
-	bool mDebugMode; ///< if set: allow lots of weird debug stuff.
 	mutable PresetTransferFunctions3DPtr mPresetTransferFunctions3D;
 
 	SpaceProviderPtr mSpaceProvider;

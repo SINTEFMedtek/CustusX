@@ -69,7 +69,7 @@ class CppBuilder:
         runShell('git clone %s %s' % (repository, folder))
         self._changeDirToSource()
         
-    def gitCloneIntoExistingDirectory(self, repository):
+    def gitCloneIntoExistingDirectory(self, repository, branch):
         '''
         Use in the case that the source folder already contains stuff,
         http://stackoverflow.com/questions/2411031/how-do-i-clone-into-a-non-empty-directory
@@ -78,7 +78,7 @@ class CppBuilder:
         runShell('git init')
         runShell('git remote add origin %s' % repository)
         runShell('git fetch')
-        runShell('git checkout -t origin/master')        
+        runShell('git checkout -t origin/%s' % branch)        
 
     def gitSetRemoteURL(self, new_remote_origin_repository, branch):
         self._changeDirToSource()
@@ -86,6 +86,7 @@ class CppBuilder:
         runShell('git fetch')
         # old (1.7) syntax - update if needed to 'git branch --set-upstream-to origin/<branch>' 
         runShell('git branch --set-upstream %s origin/%s' % (branch, branch))
+        #runShell('git branch -u origin/%s' % branch)
 
     def _gitSubmoduleUpdate(self):
         self._changeDirToSource()
@@ -96,27 +97,12 @@ class CppBuilder:
         '''
         checkout the default branch as set by default or user.
         '''
-        #self.gitCheckoutBranch(self.main_branch, submodules)
         tag = self.controlData.getGitTag()
         branch = self.controlData.main_branch
         if (tag==None) or (tag=="\"\""):
             self.gitCheckoutBranch(branch, submodules)
         else:
             self.gitCheckoutTag(tag, submodules=submodules)
-
-#    def gitUpdate(self, branch='master', tag=None, submodules=False):
-#        '''
-#        pull latest version of branch, include submodules if asked.
-#        '''
-#        if tag!=None:
-#            print "--------- gitUpdate tag [%s], length=%i" % (tag, len(tag))
-#        else:
-#            print "--------- gitUpdate tag None"
-#
-#        if (tag==None) or (tag=="\"\""):
-#            self.gitCheckoutBranch(self, branch, submodules)
-#        else:
-#            self.gitCheckoutTag(tag, submodules=submodules)
 
     def gitCheckoutBranch(self, branch, submodules=False):
         '''
@@ -128,12 +114,17 @@ class CppBuilder:
         runShell('git fetch')
 	# If the branch doesn't exist, this might be ok: 
 	# only a subset of the repos need have the branch defined.
-	# In this case, checkout the latest stuff on the master branch.
+	# In this case, checkout the latest stuff on the master branch. - changed - see discussion below.
         if runShell('git checkout %s' % branch, ignoreFailure=True):
                 runShell('git pull origin %s' % branch, ignoreFailure=True)
         else:
-                runShell('git checkout master', ignoreFailure=True)
-                runShell('git pull origin master', ignoreFailure=True)
+                # This fallback is becoming problematic: if input branch is fex feature/something, and this
+                # undefined in some repos, we would like to fallback to the develop branch, IF using git flow,
+                # but if working on a release, we want master. 
+                # Best guess: develop.
+                print "* Warning: checkout branch %s failed: guessing at branch develop as fallback:" % branch
+                runShell('git checkout develop', ignoreFailure=True)
+                runShell('git pull origin develop', ignoreFailure=True)
         if submodules:
             self._gitSubmoduleUpdate()
 
@@ -147,7 +138,9 @@ class CppBuilder:
             return        
         runShell('git fetch')
         if not runShell('git checkout %s' % tag):
-            runShell('git checkout master')
+            # fallback: this is a guess only
+            print "* Warning: checkout tag %s failed: guessing at branch develop as fallback:" % tag
+            runShell('git checkout develop')
         if submodules:
             self._gitSubmoduleUpdate()
         

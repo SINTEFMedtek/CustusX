@@ -5,9 +5,9 @@ Superbuild
 -----------------------------------------------------------
 
 CustusX depends on several other libraries, and those libraries must be of 
-specific versions. The superbuild is implemented in Python, and works on top 
-of CMake. It downloads, configures and builds CustusX and the libraries it 
-depends upon. 
+specific versions. The superbuild handles these issues. It is implemented in 
+Python, and works on top of CMake. It downloads, configures and builds CustusX 
+and the libraries it 	depends upon. 
 
 Structure: 
 

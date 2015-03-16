@@ -42,9 +42,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackingSystemIGSTKService.h"
 #include "cxFileHelpers.h"
 #include "cxDataLocations.h"
+#include "cxConfig.h"
 
 namespace cxtest
 {
+
+#ifdef CX_CUSTUS_SINTEF
 TEST_CASE("Sonowand planning navigator STL file are readable", "[unit][tool]")
 {
 	cx::Reporter::initialize();
@@ -66,6 +69,7 @@ TEST_CASE("Sonowand intraop navigator STL file are readable", "[unit][tool]")
 
 	cx::Reporter::shutdown();
 }
+#endif
 
 TEST_CASE("Tool xml files use tracking systems supported by ToolManagerUsingIGSTK", "[unit][tool][xml]")
 {

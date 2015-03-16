@@ -64,7 +64,7 @@ ConsoleWidgetCollection::ConsoleWidgetCollection(QWidget* parent, QString object
 	this->setObjectName(mObjectName);
 	this->setWindowTitle(mWindowTitle);
 	mOptions = profile()->getXmlSettings().descend(this->objectName());
-	mLog = LogPtr(reporter(), null_deleter());
+	mLog = reporter();
 
 	this->setupUI();
 }

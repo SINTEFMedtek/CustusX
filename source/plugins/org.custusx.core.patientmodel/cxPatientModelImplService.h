@@ -79,7 +79,7 @@ public:
 	virtual CLINICAL_VIEW getClinicalApplication() const;
 	virtual void setClinicalApplication(CLINICAL_VIEW application);
 
-	virtual void loadData(DataPtr data);
+	virtual void loadData(DataPtr data);//Not used?
 	virtual std::map<QString, VideoSourcePtr> getStreams() const;
 
 	virtual QString getActivePatientFolder() const;
@@ -96,9 +96,6 @@ public:
 
 	virtual void autoSave();
 	virtual bool isNull();
-
-	virtual bool getDebugMode() const;
-	virtual void setDebugMode(bool on);
 
 private slots:
 	void newProbe(const ToolPtr tool);

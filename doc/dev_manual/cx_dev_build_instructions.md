@@ -1,10 +1,20 @@
 Build instructions {#build_instructions}
 ===================
 
-Overview {#build_instructions2}
+Recommended build procedure {#build_instructions2}
 ===================
 
-CustusX runs on these \ref supported_platforms.
+* Ensure you are on a \ref supported_platforms. 
+* Fulfill the \ref prerequisites. 
+* Choose a root folder for the project. It will be populated as described in \ref build_instructions_folder_structure.
+
+Then run the following commands:
+
+	cd \<root_dir\>
+	git clone git@github.com:SINTEFMedTek/CustusX.git CX/CX
+	./CX/CX/install/cxInstaller.py --full --all -t Release
+
+Run `cxInstaller.py -h` for more options.
 
 Prerequisites {#prerequisites}
 ------------------------
@@ -25,12 +35,17 @@ and thus does not need to be installed separately.
 For convenience, setup scripts for some platforms are available in the 
 repository. They will help setup a machine from scratch, but might give 
 you more than you expected. Look for your platform in 
-[install/platforms](../../../install/platforms).
+[install/platforms](../../install/platforms).
 
-## Superbuild {#superbuild}
+## Superbuild Folder Structure {#build_instructions_folder_structure}
 
-CustusX uses a Python-based superbuild. Select a root folder, then all libs 
-will be downloaded and built in separate folders beneath it, as follows:
+The default CustusX folder structure differs from the standard CMake source+build 
+structure. All libraries, CustusX included, are placed within a root folder,
+with source and build folders grouped according to library.
+
+The CustusX \ref dev_superbuild defines and sets up this structure. It is fully
+possible to use a different structure, in that case you must configure cmake 
+yourself.
 
 |        |          |                |
 | ------ | ----     | -------------- |
@@ -43,11 +58,3 @@ will be downloaded and built in separate folders beneath it, as follows:
 |        | some_lib | some_lib       |
 |        |          | build_Release  |
 
-Run the following lines to get it right:
-
-	bash
-	cd \<root_dir\>
-	git clone git@github.com:SINTEFMedisinskTeknologi/CustusX.git CX/CX
-	./CX/CX/install/cxInstaller.py --root_dir . --full --all
-
-The default root_dir i`~/dev/cx`. Run `cxInstaller.py -h` for more options.

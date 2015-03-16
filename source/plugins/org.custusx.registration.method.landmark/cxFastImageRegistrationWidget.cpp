@@ -70,7 +70,7 @@ void FastImageRegistrationWidget::performRegistration()
 		mServices.registrationService->setFixedData(fixedData);
 	}
 
-	this->updateAvarageAccuracyLabel();
+	this->updateAverageAccuracyLabel();
 }
 
 }//namespace cx

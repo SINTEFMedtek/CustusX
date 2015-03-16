@@ -129,9 +129,9 @@ void LogicManager::initializeServices()
 
 	mTrackingService = TrackingServiceProxy::create(pc);
 	mPatientModelService = PatientModelServiceProxy::create(pc);
-	mPatientModelService = PatientModelServiceProxy::create(pc);
 	mVideoService = VideoServiceProxy::create(pc);
 	mViewService = VisualizationServiceProxy::create(pc);
+    connect(mPluginFramework.get(), &PluginFrameworkManager::aboutToStop, mViewService.get(), &VisualizationService::aboutToStop);
 	mStateService = StateServiceProxy::create(pc);
 	mSessionStorageService = SessionStorageServiceProxy::create(pc);
 

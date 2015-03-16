@@ -97,9 +97,6 @@ public:
 	virtual void autoSave();
 	virtual bool isNull();
 
-	virtual bool getDebugMode() const;
-	virtual void setDebugMode(bool on);
-
 private:
 	void initServiceListener();
 	void onServiceAdded(PatientModelService* service);

@@ -48,7 +48,9 @@ void MessageObserver::sendMessage(const Message& message)
 	}
 
 	if (this->testFilter(message))
+	{
 		emit newMessage(message);
+	}
 }
 
 bool MessageObserver::testFilter(const Message &msg) const
@@ -104,7 +106,9 @@ void MessageRepository::limitQueueSize()
 void MessageRepository::emitThroughFilter(const Message& message)
 {
 	for (unsigned i=0; i<mObservers.size(); ++i)
+	{
 		mObservers[i]->sendMessage(message);
+	}
 }
 
 void MessageRepository::install(MessageObserverPtr observer, bool resend)

@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogThread.h"
 #include "cxReporterMessageRepository.h"
 #include "boost/bind.hpp"
+#include <iostream>
 
 namespace cx
 {
@@ -45,28 +46,25 @@ LogThread::LogThread(QObject* parent) :
 
 void LogThread::installObserver(MessageObserverPtr observer, bool resend)
 {
-	QMutexLocker sentry(&mActionsMutex);
 	PendingActionType action = boost::bind(&MessageRepository::install, mRepository.get(), observer, resend);
-	mPendingActions.push_back(action);
-	sentry.unlock();
-
-	this->invokePendingAction();
+	this->callInLogThread(action);
 }
 
 void LogThread::uninstallObserver(MessageObserverPtr observer)
 {
-	QMutexLocker sentry(&mActionsMutex);
 	PendingActionType action = boost::bind(&MessageRepository::uninstall, mRepository.get(), observer);
-	mPendingActions.push_back(action);
-	sentry.unlock();
-
-	this->invokePendingAction();
+	this->callInLogThread(action);
 }
 
 void LogThread::setLoggingFolder(QString absoluteLoggingFolderPath)
 {
-	QMutexLocker sentry(&mActionsMutex);
 	PendingActionType action = boost::bind(&LogThread::executeSetLoggingFolder, this, absoluteLoggingFolderPath);
+	this->callInLogThread(action);
+}
+
+void LogThread::callInLogThread(PendingActionType& action)
+{
+	QMutexLocker sentry(&mActionsMutex);
 	mPendingActions.push_back(action);
 	sentry.unlock();
 

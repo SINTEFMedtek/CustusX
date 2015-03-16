@@ -36,12 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "org_custusx_usreconstruction_Export.h"
 #include "cxUsReconstructionService.h"
 
-//#include <set>
-//#include "cxForwardDeclarations.h"
-//#include "cxXmlOptionItem.h"
-//#include "cxReconstructCore.h"
 #include "cxUSReconstructInputData.h"
-//#include "cxReconstructedOutputVolumeParams.h"
 #include "cxReconstructionMethodService.h"
 #include "cxServiceTrackerListener.h"
 
@@ -91,7 +86,6 @@ public:
 
 	virtual QString getSelectedFilename() const; ///< Get the currently selected filename
 	virtual USReconstructInputData getSelectedFileData(); ///< Return the currently selected input data
-//	virtual ReconstructParamsPtr getParams(); ///< Return control parameters that can be adjusted by the GUI or similar prior to reconstruction
 	virtual PropertyPtr getParam(QString uid); ///< Return one of the standard parameters
 
 	virtual std::vector<PropertyPtr> getAlgoOptions(); ///< Return control parameters for the currently selected algorithm, adjustable like getParams()
@@ -99,8 +93,6 @@ public:
 	virtual OutputVolumeParams getOutputVolumeParams() const; ///< Return params controlling the output data. These are data-dependent.
 
 	virtual void setOutputVolumeParams(const OutputVolumeParams& par); ///< Control the output volume
-//	virtual void setOutputRelativePath(QString path); ///< Set location of output relative to base
-//	virtual void setOutputBasePath(QString path); ///< Set base location of output
 
 	/** Execute the reconstruction in another thread.
 	  *
@@ -131,7 +123,6 @@ private slots:
 private:
 	void clearAll();
 
-	void initAlgorithm();
 	/** Use the mOriginalFileData structure to rebuild all internal data.
 	 *  Useful when settings have changed or data is loaded.
 	 */
@@ -147,8 +138,6 @@ private:
 
 	OutputVolumeParams mOutputVolumeParams;
 	XmlOptionFile mSettings;
-//	QString mOutputRelativePath;///< Relative path to the output image
-//	QString mOutputBasePath;///< Global path where the relative path starts, for the output image
 	QString mShaderPath; ///< name of shader folder
 
 	boost::shared_ptr<ServiceTrackerListener<ReconstructionMethodService> > mServiceListener;

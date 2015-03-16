@@ -14,6 +14,7 @@
 // location of configuration folders after install, relative to executable.
 #define CX_CONFIG_ROOT_RELATIVE_INSTALLED "@CX_CONFIG_ROOT_RELATIVE_INSTALLED@"
 
+#cmakedefine CX_CUSTUS_SINTEF
 #cmakedefine CX_USE_OpenCV
 #cmakedefine CX_BUILD_MEHDI_VTKMULTIVOLUME
 #cmakedefine CX_BUILD_US_SIMULATOR

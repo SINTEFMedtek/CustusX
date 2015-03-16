@@ -103,17 +103,6 @@ bool PatientModelServiceNull::isNull()
 	return true;
 }
 
-bool PatientModelServiceNull::getDebugMode() const
-{
-	return false;
-}
-
-void PatientModelServiceNull::setDebugMode(bool on)
-{
-	printWarning();
-}
-
-
 std::map<QString, VideoSourcePtr> PatientModelServiceNull::getStreams() const
 {
 	printWarning();

@@ -41,7 +41,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QDomNode;
 class QDomDocument;
 class QDomNodeList;
-class QTimer;
 class QFileInfo;
 
 namespace cx

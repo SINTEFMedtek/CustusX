@@ -113,7 +113,7 @@ void VideoSourceGraphics::setClipToSector(bool on)
 
 void VideoSourceGraphics::probeSectorChanged()
 {
-	if (!mTool)
+	if (!mTool && !mTool->getProbe())
 		return;
 
 	mProbeData.setData(mTool->getProbe()->getProbeData());

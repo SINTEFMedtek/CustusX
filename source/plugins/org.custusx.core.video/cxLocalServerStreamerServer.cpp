@@ -90,18 +90,18 @@ StringPropertyBasePtr LocalServerStreamerArguments::getLocalServerNameOption(QDo
  *  If found, return filename with args relative to bundle dir.
  *
  */
-QStringList LocalServerStreamerArguments::checkGrabberServerExist(QString path, QString filename, QString args)
+QStringList LocalServerStreamerArguments::checkGrabberServerExist(QString path, QString filename)
 {
 	QStringList retval;
 	path = QDir::cleanPath(path);
 	if (QDir(path).exists(filename))
-		retval << QDir(DataLocations::getBundlePath()).relativeFilePath(path + "/" + filename) << args;
+        retval << QDir(DataLocations::getBundlePath()).relativeFilePath(path + "/" + filename);
 #ifdef __APPLE__
 	if (retval.isEmpty())
 	{
 		QString bundledPath = QString("%1/%2.app/Contents/MacOS").arg(path).arg(filename);
 		if (QDir(bundledPath).exists(filename))
-			retval << QDir(DataLocations::getBundlePath()).relativeFilePath(bundledPath + "/" + filename) << args;
+            retval << QDir(DataLocations::getBundlePath()).relativeFilePath(bundledPath + "/" + filename);
 	}
 
 #endif
@@ -111,26 +111,25 @@ QStringList LocalServerStreamerArguments::checkGrabberServerExist(QString path, 
 QStringList LocalServerStreamerArguments::getOpenIGTLinkServer()
 {
 	QString filename = "OpenIGTLinkServer";
-	QString postfix = "";
 #ifdef WIN32
 	filename = "OpenIGTLinkServer.exe";
-	postfix = "--in_width 800 --in_height 600";
+//	postfix = "--in_width 800 --in_height 600"; // if needed, add as gui options in the openCV group
 #endif
-	return this->getGrabberServer(filename, postfix);
+    return this->getGrabberServer(filename);
 }
 
-QStringList LocalServerStreamerArguments::getGrabberServer(QString filename, QString postfix)
+QStringList LocalServerStreamerArguments::getGrabberServer(QString filename)
 {
 
 	QStringList result;
 #ifdef __APPLE__
 	// run from installed folder on mac
-	result = this->checkGrabberServerExist(qApp->applicationDirPath(), filename, postfix);
+    result = this->checkGrabberServerExist(qApp->applicationDirPath(), filename);
 	if (!result.isEmpty())
 		return result;
 #endif
 	// run from installed or build bin folder
-	result = this->checkGrabberServerExist(DataLocations::getBundlePath(), filename, postfix);
+    result = this->checkGrabberServerExist(DataLocations::getBundlePath(), filename);
 	if (!result.isEmpty())
 		return result;
 	else

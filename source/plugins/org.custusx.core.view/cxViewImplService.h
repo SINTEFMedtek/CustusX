@@ -82,6 +82,9 @@ public:
 
 	virtual bool isNull();
 
+public slots:
+    virtual void aboutToStop();
+
 private slots:
 	void onSessionChanged();
 	void onSessionCleared();

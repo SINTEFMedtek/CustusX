@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QFileInfo>
 #include <QDir>
 #include "cxXmlOptionItem.h"
-
+#include "cxConfig.h"
 #include "catch.hpp"
 
 
@@ -115,7 +115,7 @@ public:
 };
 
 
-
+#ifdef CX_CUSTUS_SINTEF
 TEST_CASE("ElastiX should register kaisa to a translated+resampled version of same", "[pluginRegistration][integration][not_win32][not_win64]")
 {
 	ElastiXFixture fixture;
@@ -155,7 +155,7 @@ TEST_CASE("ElastiX should register kaisa to a translated+resampled version of sa
 
 	REQUIRE(fixture.compareTransforms(result, solution) == true);
 }
-
+#endif
 
 } // namespace cxtest
 

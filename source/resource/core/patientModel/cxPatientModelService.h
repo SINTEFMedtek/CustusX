@@ -169,9 +169,6 @@ public:
 	virtual void autoSave() = 0;//TODO remove, and integrate into other functions
 	virtual bool isNull() = 0;
 
-	virtual bool getDebugMode() const = 0;
-	virtual void setDebugMode(bool on) = 0;
-
 	static PatientModelServicePtr getNullObject();
 
 signals:
@@ -179,7 +176,6 @@ signals:
 	void dataAddedOrRemoved();
 	void activeImageChanged(const QString& uId);
 	void landmarkPropertiesChanged(); ///< emitted when global info about a landmark changed
-	void debugModeChanged(bool on);
 	void clinicalApplicationChanged();
 	void rMprChanged();
 	void streamLoaded();

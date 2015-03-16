@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString>
 #include "cxSonixProbeFileReader.h"
 #include "cxDataLocations.h"
-
+#include "cxConfig.h"
 namespace cxtest
 {
 
@@ -70,6 +70,8 @@ void testLinearProbe(cx::SonixProbeFileReader &reader)
 
 } //empty namespace
 
+
+#ifdef CX_CUSTUS_SINTEF
 TEST_CASE("SonixProbeFileReader can process XML file", "[resource][sonix][unit]")
 {
 	QString probeFile = cx::DataLocations::findConfigFilePath("probes.xml", "/ultrasonix");
@@ -82,5 +84,5 @@ TEST_CASE("SonixProbeFileReader can process XML file", "[resource][sonix][unit]"
 	SECTION("Linear probe")
 			testLinearProbe(reader);
 }
-
+#endif
 }

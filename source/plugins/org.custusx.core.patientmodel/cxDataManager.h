@@ -122,8 +122,6 @@ public:
 	virtual LandmarksPtr getPatientLandmarks() = 0;
 	virtual void generateUidAndName(QString* _uid, QString* _name) = 0;
 
-	virtual bool getDebugMode() const = 0;
-
 	//
 	virtual ImagePtr getImage(const QString& uid) const;
 	virtual MeshPtr getMesh(const QString& uid) const;
@@ -137,10 +135,6 @@ signals:
 	void clinicalApplicationChanged();
 	void streamLoaded();
 	void rMprChanged(); ///< emitted when the transformation between patient reference and (data) reference is set
-	void debugModeChanged(bool on);
-
-public slots:
-	virtual void setDebugMode(bool on) = 0;
 
 protected:
 	DataManager();

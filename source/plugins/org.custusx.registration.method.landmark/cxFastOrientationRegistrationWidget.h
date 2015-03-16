@@ -74,6 +74,7 @@ protected:
 private slots:
   void setOrientationSlot();
   void enableToolSampleButtonSlot();
+  void globalConfigurationFileChangedSlot(QString key);
 private:
   Transform3D get_tMtm() const;
   QPushButton* mSetOrientationButton;

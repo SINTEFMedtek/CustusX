@@ -48,7 +48,6 @@ class QActionGroup;
 class QAction;
 class QGridLayout;
 class QWidget;
-class QTimer;
 class QTime;
 
 namespace cx

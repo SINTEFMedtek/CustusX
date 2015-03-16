@@ -2,9 +2,7 @@ CustusX
 ========
 ### A Research Platform for Image-Guided Therapy
 
-
-
-The system aids surgeons during interventions, enabling the surgeon to navigate 3D image data using tracked instruments. Focus is on use of ultrasound in surgery.
+CustusX is a Navigation System for Image-Guided Surgery. The intended audience is clinical and technological researchers in the fields of medical imaging and navigation. The platform can be used both as a customizable navigation system and as a toolkit for developing new applications.  The main focus of CustusX is the use of intraoperative Ultrasound. See [custusx.org](custusx.org) for more.
 
 ## Usage
 
@@ -12,9 +10,11 @@ DISCLAIMER: CustusX is a research tool: It is not intended for normal clinical u
 
 The code is free to download and use under a BSD-3 license. However, the code base is currently undergoing large changes, thus there is no guarantee that internal interfaces will be stable.
 
+Binaries and documentation can be found here: [custusx.org](http://custusx.org)
+
 ### Build instructions
 
-[Build instructions available here.](documentation/user_manual/installation/cx_user_build_instructions.md)
+[Build instructions available here.](doc/dev_manual/cx_dev_build_instructions.md)
 
 ## Structure
 
@@ -22,19 +22,5 @@ CustusX is written in C++ using CMake, Qt, CTK, VTK, ITK, Eigen, OpenCV, IGSTK, 
 
 ## Contributors
 
-CustusX is maintained by SINTEF Medical Technology, in cooperation with the Norwegian National Competence Services for Ultrasound and Image-Guided Therapy (St. Olavs Hospital, SINTEF, NTNU). The platform is used daily in research at St. Olavs Hospital and partners.
-
-### Financial Contributors:
-
- - Norwegian National Competence Centre for Ultrasound and Image-Guided Therapy (Norwegian Ministry of Health and Care Services)
- - SINTEF
- - NorMIT – Norwegian Centre for Minimally Invasive Image Guided Therapy and Medical Technologies (The Research Council of Norway)
- - NorMIT-mini (Samarbeidsorganet Helse Midt-Norge - NTNU)
- - eMIT  (The Research Council of Norway)
-
-## Links
-
-- USIGT: http://www.usigt.no/index.php/the-custusx-navigation-system
-- Midas Journal: http://hdl.handle.net/10380/3273
-- SINTEF: http://www.sintef.no/SINTEF-Teknologi-og-samfunn/Om-oss/Medisinsk-teknologi/Ultralyd/Navigasjonssystemet-CustusX/
+CustusX is maintained by [SINTEF Medical Technology](http://www.sintef.no/home/Technology-and-Society/departments/medical-technology/#/), in cooperation with the [Norwegian National Competence Services for Ultrasound and Image-Guided Therapy](http://www.usigt.org/index.php/the-custusx-navigation-system) ([St. Olavs Hospital](http://www.stolav.no/en/), [SINTEF](http://www.sintef.no/home/Technology-and-Society/departments/medical-technology/#/), [NTNU](http://www.ntnu.edu/)). 
 

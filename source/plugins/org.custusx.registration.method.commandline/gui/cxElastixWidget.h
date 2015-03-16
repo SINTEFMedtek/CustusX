@@ -81,7 +81,10 @@ private slots:
 	void savePresetSlot();
 	void deletePresetSlot();
 
+protected:
+	virtual void prePaintEvent();
 private:
+	void createUI();
 	QWidget* createOptionsWidget();
 
 	QPushButton* mRegisterButton;

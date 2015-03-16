@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxRegistrationService.h"
 #include "cxTrackingService.h"
+#include "cxSettings.h"
 
 namespace cx
 {
@@ -56,8 +57,7 @@ FastOrientationRegistrationWidget::FastOrientationRegistrationWidget(RegServices
 
   mSetOrientationButton->setToolTip(this->defaultWhatsThis());
 
-  connect(services.patientModelService.get(), &PatientModelService::debugModeChanged,
-		  this, &FastOrientationRegistrationWidget::enableToolSampleButtonSlot);
+  connect(settings(), &Settings::valueChangedFor, this, &FastOrientationRegistrationWidget::globalConfigurationFileChangedSlot);
 
   mActiveToolProxy =  ActiveToolProxy::New(services.trackingService);
   connect(mActiveToolProxy.get(), SIGNAL(toolVisible(bool)), this, SLOT(enableToolSampleButtonSlot()));
@@ -83,6 +83,12 @@ QString FastOrientationRegistrationWidget::defaultWhatsThis() const
 			"<b>Tip:</b> If the patient is orientated with the nose down towards the table, try using <i>back face</i>."
 			"</p>"
 			"</html>";
+}
+
+void FastOrientationRegistrationWidget::globalConfigurationFileChangedSlot(QString key)
+{
+	if (key == "giveManualToolPhysicalProperties")
+		this->enableToolSampleButtonSlot();
 }
 
 void FastOrientationRegistrationWidget::showEvent(QShowEvent* event)
@@ -123,7 +129,7 @@ void FastOrientationRegistrationWidget::enableToolSampleButtonSlot()
   bool enabled = false;
   enabled = tool &&
 	  tool->getVisible() &&
-	  (!tool->hasType(Tool::TOOL_MANUAL) || mServices.patientModelService->getDebugMode()); // enable only for non-manual tools. ignore this in debug mode.
+	  (!tool->hasType(Tool::TOOL_MANUAL) || settings()->value("giveManualToolPhysicalProperties").toBool()); // enable only for non-manual tools.
 
   mSetOrientationButton->setEnabled(enabled);
 }

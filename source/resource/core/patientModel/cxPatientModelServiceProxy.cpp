@@ -77,7 +77,6 @@ void PatientModelServiceProxy::onServiceAdded(PatientModelService* service)
 	connect(service, &PatientModelService::dataAddedOrRemoved, this, &PatientModelService::dataAddedOrRemoved);
 	connect(service, &PatientModelService::activeImageChanged, this, &PatientModelService::activeImageChanged);
 	connect(service, &PatientModelService::landmarkPropertiesChanged, this, &PatientModelService::landmarkPropertiesChanged);
-	connect(service, &PatientModelService::debugModeChanged, this, &PatientModelService::debugModeChanged);
 	connect(service, &PatientModelService::clinicalApplicationChanged, this, &PatientModelService::clinicalApplicationChanged);
 	connect(service, &PatientModelService::rMprChanged, this, &PatientModelService::rMprChanged);
 	connect(service, &PatientModelService::streamLoaded, this, &PatientModelService::streamLoaded);
@@ -90,7 +89,6 @@ void PatientModelServiceProxy::onServiceAdded(PatientModelService* service)
 	emit dataAddedOrRemoved();
 	emit activeImageChanged(service->getActiveImageUid());
 	emit landmarkPropertiesChanged();
-	emit debugModeChanged(service->getDebugMode());
 	emit clinicalApplicationChanged();
 	emit rMprChanged();
 	emit patientChanged();
@@ -102,7 +100,6 @@ void PatientModelServiceProxy::onServiceRemoved(PatientModelService *service)
 	disconnect(service, &PatientModelService::dataAddedOrRemoved, this, &PatientModelService::dataAddedOrRemoved);
 	disconnect(service, &PatientModelService::activeImageChanged, this, &PatientModelService::activeImageChanged);
 	disconnect(service, &PatientModelService::landmarkPropertiesChanged, this, &PatientModelService::landmarkPropertiesChanged);
-	disconnect(service, &PatientModelService::debugModeChanged, this, &PatientModelService::debugModeChanged);
 	disconnect(service, &PatientModelService::clinicalApplicationChanged, this, &PatientModelService::clinicalApplicationChanged);
 	disconnect(service, &PatientModelService::rMprChanged, this, &PatientModelService::rMprChanged);
 	disconnect(service, &PatientModelService::streamLoaded, this, &PatientModelService::streamLoaded);
@@ -114,7 +111,6 @@ void PatientModelServiceProxy::onServiceRemoved(PatientModelService *service)
 	emit dataAddedOrRemoved();
 	emit activeImageChanged("");
 	emit landmarkPropertiesChanged();
-	emit debugModeChanged(false);
 	emit clinicalApplicationChanged();
 	emit rMprChanged();
 	emit patientChanged();
@@ -173,16 +169,6 @@ void PatientModelServiceProxy::autoSave()
 bool PatientModelServiceProxy::isNull()
 {
 	return mPatientModelService->isNull();
-}
-
-bool PatientModelServiceProxy::getDebugMode() const
-{
-	return mPatientModelService->getDebugMode();
-}
-
-void PatientModelServiceProxy::setDebugMode(bool on)
-{
-	mPatientModelService->setDebugMode(on);
 }
 
 std::map<QString, VideoSourcePtr> PatientModelServiceProxy::getStreams() const

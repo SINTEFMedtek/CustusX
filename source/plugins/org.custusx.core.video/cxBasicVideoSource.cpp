@@ -68,7 +68,6 @@ BasicVideoSource::BasicVideoSource(QString uid)
 BasicVideoSource::~BasicVideoSource()
 {
 	stop();
-	delete mTimeoutTimer;
 }
 
 void BasicVideoSource::overrideTimeout(bool timeout)

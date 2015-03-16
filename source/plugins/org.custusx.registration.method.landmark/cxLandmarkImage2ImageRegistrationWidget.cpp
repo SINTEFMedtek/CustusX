@@ -168,7 +168,7 @@ LandmarkMap LandmarkImage2ImageRegistrationWidget::getTargetLandmarks() const
 void LandmarkImage2ImageRegistrationWidget::performRegistration()
 {
 	mServices.registrationService->doImageRegistration(mTranslationCheckBox->isChecked());
-	this->updateAvarageAccuracyLabel();
+	this->updateAverageAccuracyLabel();
 }
 
 /** Return transform from target space to reference space

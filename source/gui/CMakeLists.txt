@@ -71,12 +71,12 @@ cx_add_class_qt_moc(cxGui_SRCS
     cxSecondaryMainWindow
     cxSecondaryViewLayoutWindow
     cxLayoutInteractor
-	cxMainWindowApplicationComponent.h
 	#----------------------
 )
 
 cx_add_class(cxGui_SRCS
 	${cxGui_SRCS}
+        cxMainWindowApplicationComponent.h
 )
 
 #set(cxGui_SRCS ${cxGui_SRCS} ${CustusX_SOURCE_DIR}/source/gui/icons/application.icns) # needed at least on apple to display icon
