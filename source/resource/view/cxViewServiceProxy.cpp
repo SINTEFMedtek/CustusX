@@ -111,6 +111,11 @@ bool VisualizationServiceProxy::isNull()
 	return mVisualizationService->isNull();
 }
 
+void VisualizationServiceProxy::aboutToStop()
+{
+    mVisualizationService->aboutToStop();
+}
+
 void VisualizationServiceProxy::autoShowData(cx::DataPtr data)
 {
 	mVisualizationService->autoShowData(data);

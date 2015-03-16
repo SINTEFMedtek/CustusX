@@ -95,6 +95,7 @@ public:
 
 signals:
 	void pluginPoolChanged();
+    void aboutToStop();
 
 private:
 	QString getPluginPath(const QString& symbolicName);
