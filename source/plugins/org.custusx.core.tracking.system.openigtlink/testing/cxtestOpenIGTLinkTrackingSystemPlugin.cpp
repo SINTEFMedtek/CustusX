@@ -31,7 +31,40 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "catch.hpp"
 
-TEST_CASE("OpenIGTLinkTrackingSystemService: Check nothing", "[unit][plugins][org.custusx.core.tracking.system.openigtlink][hide]")
+#include "cxOpenIGTLinkTrackingSystemService.h"
+#include "cxtestQueuedSignalListener.h"
+#include "cxUtilHelpers.h"
+#include "cxReporter.h"
+
+TEST_CASE("OpenIGTLinkTrackingSystemService: Check that the service can be created and destroyed", "[unit][plugins][org.custusx.core.tracking.system.openigtlink]")
 {
-	CHECK(true);
+    cx::OpenIGTLinkTrackingSystemServicePtr service = cx::OpenIGTLinkTrackingSystemServicePtr(new cx::OpenIGTLinkTrackingSystemService());
+    REQUIRE(service);
+    CHECK(service.unique());
+    service.reset();
+}
+
+TEST_CASE("OpenIGTLinkTrackingSystemService: Check that the can connect and stream from a server", "[manual][plugins][org.custusx.core.tracking.system.openigtlink]")
+{
+    cx::OpenIGTLinkTrackingSystemServicePtr service = cx::OpenIGTLinkTrackingSystemServicePtr(new cx::OpenIGTLinkTrackingSystemService());
+    REQUIRE(service);
+    CHECK(service.unique());
+
+    REQUIRE(service->getState() == cx::Tool::tsCONFIGURED);
+
+    service->setState(cx::Tool::tsINITIALIZED);
+    REQUIRE(cxtest::waitForQueuedSignal(service.get(), SIGNAL(stateChanged())));
+    REQUIRE(service->getState() == cx::Tool::tsINITIALIZED);
+
+    service->setState(cx::Tool::tsTRACKING);
+    REQUIRE(cxtest::waitForQueuedSignal(service.get(), SIGNAL(stateChanged())));
+
+    //TODO change to get a packages signal????
+    cx::sleep_ms(1000); //just let some packages arrive
+
+    service->setState(cx::Tool::tsINITIALIZED);
+    REQUIRE(cxtest::waitForQueuedSignal(service.get(), SIGNAL(stateChanged())));
+
+    //service->setState(cx::Tool::tsNONE);
+    //REQUIRE(cxtest::waitForQueuedSignal(service.get(), SIGNAL(stateChanged())));
 }

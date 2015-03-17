@@ -7,6 +7,8 @@ if(BUILD_TESTING)
     )
     set(SOURCE_FILES
         ${MOC_SOURCE_FILES}
+        cxtestExportHack.h
+        cxtestExportHack.cpp
         cxtestOpenIGTLinkTrackingSystemPlugin.cpp
     )
 
@@ -19,7 +21,7 @@ if(BUILD_TESTING)
         .
         ${CMAKE_CURRENT_BINARY_DIR}
     )
-    target_link_libraries(${TEST_LIB_NAME} PRIVATE ${PROJECT_NAME} cxCatch)
+    target_link_libraries(${TEST_LIB_NAME} PRIVATE ${PROJECT_NAME} cxtestUtilities cxCatch)
     cx_add_tests_to_catch(${TEST_LIB_NAME})
 
 endif(BUILD_TESTING)

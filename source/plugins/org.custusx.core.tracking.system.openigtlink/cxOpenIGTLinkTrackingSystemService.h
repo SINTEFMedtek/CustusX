@@ -69,14 +69,36 @@ public:
     virtual void setLoggingFolder(QString loggingFolder); ///<\param loggingFolder path to the folder where logs should be saved
 
 signals:
-    void connectToServer();
-    void listenToServer();
+    void connectToServer(QString ip, int port);
+    void disconnectFromServer();
+    void startListenToServer();
+    void stopListenToServer();
+
 
 private slots:
     void getPackage();
 
+    void configure(); ///< sets up the software like the xml file suggests
+    virtual void deconfigure(); ///< deconfigures the software
+    void initialize(); ///< connects to the hardware
+    void uninitialize(); ///< disconnects from the hardware
+    void startTracking(); ///< starts tracking
+    void stopTracking(); ///< stops tracking
+
+    void serverIsConfigured();
+    void serverIsDeconfigured();
+    void serverIsConnected();
+    void serverIsDisconnected();
+    void serverStartedProcessingMessages();
+    void serverStoppedProcessingMessages();
+
 private:
+    void internalSetState(Tool::State state);
+
     QThread mOpenIGTLinkThread;
+    Tool::State mState;
+    QString mIp;
+    int mPort;
 
 };
 typedef boost::shared_ptr<OpenIGTLinkTrackingSystemService> OpenIGTLinkTrackingSystemServicePtr;

@@ -70,6 +70,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackingSystemPlaybackService.h"
 #include "cxSessionStorageServiceProxy.h"
 
+#include "cxNullDeleter.h"
+
 namespace cx
 {
 
@@ -86,8 +88,9 @@ TrackingImplService::TrackingImplService(ctkPluginContext *context) :
 
 	this->initializeManualTool(); // do this after setting self.
 
-	TrackingSystemServicePtr igstk(new TrackingSystemIGSTKService());
-	this->installTrackingSystem(igstk);
+    CX_LOG_WARNING() << "IGSTK tracking is temporarly disabled in this version";
+    //TrackingSystemServicePtr igstk(new TrackingSystemIGSTKService());
+    //this->installTrackingSystem(igstk);
 
 	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(globalConfigurationFileChangedSlot(QString)));
 
@@ -227,11 +230,13 @@ void TrackingImplService::listenForTrackingSystemServices(ctkPluginContext *cont
 void TrackingImplService::onTrackingSystemAdded(TrackingSystemService* service)
 {
     CX_LOG_CHANNEL_DEBUG("janne beate ") << "Added TrackinsSystemService: " << service->getUid();
+    this->installTrackingSystem(TrackingSystemServicePtr(service, null_deleter()));
 }
 
 void TrackingImplService::onTrackingSystemRemoved(TrackingSystemService* service)
 {
     CX_LOG_CHANNEL_DEBUG("janne beate ") << "Removed TrackinsSystemService: " << service->getUid();
+    this->unInstallTrackingSystem(TrackingSystemServicePtr(service, null_deleter()));
 }
 
 void TrackingImplService::onTrackingSystemModified(TrackingSystemService* service)

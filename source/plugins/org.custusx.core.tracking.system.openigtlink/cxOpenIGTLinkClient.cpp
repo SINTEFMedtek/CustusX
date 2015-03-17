@@ -1,5 +1,6 @@
 #include "cxOpenIGTLinkClient.h"
 
+#include <QCoreApplication>
 #include "cxLogger.h"
 
 namespace cx
@@ -8,33 +9,50 @@ namespace cx
 OpenIGTLinkClient::OpenIGTLinkClient(QObject *parent) :
     QObject(parent), mState(Idle)
 {
+    mSocket = igtl::ClientSocket::New();
 }
 
-void OpenIGTLinkClient::establishConnectionToServer()
+void OpenIGTLinkClient::requestConnect(QString ip, int port)
 {
-    if(mState == Idle)
+    if(mState != Idle)
     {
-        const char* hostname = "10.218.140.127";
-        int port = 18944;
-
-        mSocket = igtl::ClientSocket::New();
-        int r = mSocket->ConnectToServer(hostname, port);
-
-        if (r != 0)
-        {
-          CX_LOG_CHANNEL_DEBUG("janne beate ") << "Cannot connect to the server.";
-        }
-        mState = Connected;
-
-    } else {
-        CX_LOG_CHANNEL_DEBUG("janne beate ") << "Unhandled state transition...";
+        CX_LOG_CHANNEL_DEBUG("janne beate ") << "You need to be in state idle to connect";
+        return;
     }
-    CX_LOG_CHANNEL_INFO("janne beate ") << "Connection established.";
+
+    int r = mSocket->ConnectToServer(ip.toStdString().c_str(), port);
+    if (r != 0)
+    {
+      CX_LOG_CHANNEL_DEBUG("janne beate ") << "Cannot connect to the server.";
+    }
+    this->internalConnected();
 }
 
-void OpenIGTLinkClient::listen()
+void OpenIGTLinkClient::requestDisconnect()
 {
-    mState = Listening;
+    if(mState != Connected)
+    {
+        CX_LOG_CHANNEL_DEBUG("janne beate ") << "You need to be in state connected to disconnect";
+        return;
+    }
+
+    if(this->connectionIsOk())
+    {
+        //Is this the right way to disconnect???
+        mSocket = NULL;
+    }
+    this->internalDisconnected();
+}
+
+void OpenIGTLinkClient::requestStartProcessingMessages()
+{
+    if(mState != Connected)
+    {
+        CX_LOG_CHANNEL_DEBUG("janne beate ") << "You need to be in state connected to start processing";
+        return;
+    }
+
+    this->internalStartedProcessingMessages();
 
     // Create a message buffer to receive header
     igtl::MessageHeader::Pointer headerMsg;
@@ -51,7 +69,22 @@ void OpenIGTLinkClient::listen()
 
         if(!this->receiveBody(headerMsg))
             break;
+
+        //TODO
+        //emit packages
+        QCoreApplication::processEvents();
     }
+    this->internalStoppedProcessingMessages();
+}
+
+void OpenIGTLinkClient::requestStopProcessingMessages()
+{
+    if(mState != Listening)
+    {
+        CX_LOG_CHANNEL_DEBUG("janne beate ") << "You need to be in state listening to stop processing";
+        return;
+    }
+    this->internalStoppedProcessingMessages();
 }
 
 bool OpenIGTLinkClient::connectionIsOk()
@@ -86,13 +119,37 @@ bool OpenIGTLinkClient::receiveHeader(igtl::MessageHeader::Pointer headerMsg)
 
     mSocket->Skip(headerMsg->GetBodySizeToRead(), 0);
 
-    emit packageArrived();
     return true;
 }
 
 bool OpenIGTLinkClient::receiveBody(igtl::MessageBase::Pointer headerMsg)
 {
-    return false;
+    //TODO implement
+    return true;
+}
+
+void OpenIGTLinkClient::internalConnected()
+{
+    mState = Connected;
+    emit connected();
+}
+
+void OpenIGTLinkClient::internalDisconnected()
+{
+    mState = Idle;
+    emit disconnected();
+}
+
+void OpenIGTLinkClient::internalStartedProcessingMessages()
+{
+    mState = Listening;
+    emit startedProcessingMessages();
+}
+
+void OpenIGTLinkClient::internalStoppedProcessingMessages()
+{
+    mState = Connected;
+    emit stoppedProcessingMessages();
 }
 
 

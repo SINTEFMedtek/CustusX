@@ -18,16 +18,26 @@ public:
     explicit OpenIGTLinkClient(QObject *parent = 0);
 
 public slots:
-    void establishConnectionToServer();
-    void listen();
+    void requestConnect(QString ip, int port);
+    void requestDisconnect();
+    void requestStartProcessingMessages();
+    void requestStopProcessingMessages();
 
 signals:
-    void packageArrived();
+    void connected();
+    void disconnected();
+    void startedProcessingMessages();
+    void stoppedProcessingMessages();
 
 private:
     bool connectionIsOk();
     bool receiveHeader(igtl::MessageHeader::Pointer headerMsg);
     bool receiveBody(igtl::MessageHeader::Pointer headerMsg);
+
+    void internalConnected();
+    void internalDisconnected();
+    void internalStartedProcessingMessages();
+    void internalStoppedProcessingMessages();
 
     State mState;
     igtl::ClientSocket::Pointer mSocket;
