@@ -41,7 +41,7 @@ class Controller(cxBuildScript.BuildScript):
         super(Controller, self).setDefaults()
         self.controlData().setBuildType("Release")
         self.controlData().force_connect_sublibraries = True
-        self.controlData().build_user_doc = True
+        #self.controlData().build_user_doc = True
         shell.setRedirectOutput(True)
            
     def addArgParsers(self):
