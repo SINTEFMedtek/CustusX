@@ -393,14 +393,15 @@ endfunction()
 #
 # Install all documentation files for CustusX
 #
+# The qt help collection files are sufficient for in-app help.
+# Other help is available on the web site.
+#
 ###############################################################################
 function(cx_install_documentation_files)
-	install(DIRECTORY
-		${CustusX_BINARY_DIR}/documentation/
-		DESTINATION ${CX_INSTALL_ROOT_DIR}/documentation
-		DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS}
-		FILE_PERMISSIONS ${CX_FULL_PERMISSIONS})
-
+	install(FILES
+			${CustusX_BINARY_DIR}/doc/cx_user_doc.qhc
+			${CustusX_BINARY_DIR}/doc/cx_user_doc.qch
+			DESTINATION ${CX_INSTALL_ROOT_DIR}/doc/)
 endfunction()
 
 ###############################################################################
