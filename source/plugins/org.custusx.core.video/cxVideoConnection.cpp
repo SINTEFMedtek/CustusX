@@ -94,7 +94,7 @@ StreamerServicePtr VideoConnection::getStreamerInterface()
 void VideoConnection::runDirectLinkClient(StreamerService* service)
 {
 	mStreamerInterface.reset(service, null_deleter());//Can't allow boost to delete service
-	ImageReceiverThreadPtr imageReceiverThread(new ImageReceiverThread(mStreamerInterface, this));
+	ImageReceiverThreadPtr imageReceiverThread(new ImageReceiverThread(mStreamerInterface));
 	this->runClient(imageReceiverThread);
 }
 
