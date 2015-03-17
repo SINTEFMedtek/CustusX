@@ -102,7 +102,6 @@ void ApplyLUTToImage2DProxy::setInput(vtkImageAlgorithmPtr input, vtkLookupTable
 				}
 
 				merger->AddInputConnection(compWindowLevel->GetOutputPort());
-//				merger->AddInputConnection(i, compWindowLevel->GetOutputPort());
 			}
 
 			mRedirecter->SetInputConnection(merger->GetOutputPort());
@@ -113,7 +112,6 @@ void ApplyLUTToImage2DProxy::setInput(vtkImageAlgorithmPtr input, vtkLookupTable
 			windowLevel->SetOutputFormatToRGBA();
 			windowLevel->SetInputConnection(input->GetOutputPort());
 			windowLevel->SetLookupTable(lut);
-//			windowLevel->Update();
 			mRedirecter->SetInputConnection(windowLevel->GetOutputPort());
 		}
 	}
@@ -268,7 +266,6 @@ void SlicedImageProxy::update()
 	Transform3D M = iMr * rMs;
 
 	mMatrixAxes->DeepCopy(M.getVtkMatrix());
-//	mReslicer->Update();
 }
 
 void SlicedImageProxy::transformChangedSlot()

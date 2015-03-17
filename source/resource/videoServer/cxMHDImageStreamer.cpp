@@ -116,16 +116,6 @@ QStringList ImageStreamerDummyArguments::getArgumentDescription()
 namespace cx
 {
 
-//vtkImageDataPtr loadImage(QString filename)
-//{
-//	vtkMetaImageReaderPtr reader = vtkMetaImageReaderPtr::New();
-//	reader->SetFileName(filename.toStdString().c_str());
-//	reader->ReleaseDataFlagOn();
-//	reader->Update();
-
-//	return reader->GetOutput();
-//}
-
 vtkLookupTablePtr createLookupTable(int numberOfTableValues)
 {
 	vtkLookupTablePtr lut = vtkLookupTablePtr::New();
@@ -205,7 +195,6 @@ ImageTestData ImageTestData::initializeSecondaryData(vtkImageDataPtr source, QSt
 		luminance->SetInputData(source);
 		luminance->Update();
 		vtkImageDataPtr outData = luminance->GetOutput();
-//		outData->Update();
 		retval.mImageData = outData;
 		colorFormat = "R";
 	}
@@ -258,7 +247,6 @@ vtkImageDataPtr DummyImageStreamer::internalLoadImage(QString filename)
 {
 	vtkImageDataPtr source = MetaImageReader().loadVtkImageData(filename);
 
-//	vtkImageDataPtr source = loadImage(filename);
 	if (source)
 		std::cout << "DummyImageStreamer: Initialized with source file: " << getFileName().toStdString() << std::endl;
 	else
