@@ -15,6 +15,21 @@ endif()
 
 ###############################################################################
 #
+# Install all documentation files for CustusX
+#
+# The qt help collection files are sufficient for in-app help.
+# Other help is available on the web site.
+#
+###############################################################################
+function(cx_install_documentation_files)
+	install(FILES
+			${CustusX_BINARY_DIR}/doc/cx_user_doc.qhc
+			${CustusX_BINARY_DIR}/doc/cx_user_doc.qch
+			DESTINATION ${CX_INSTALL_ROOT_DIR}/doc/)
+endfunction()
+
+###############################################################################
+#
 # Generate CustusX user documentation on Qt QHP format.
 #
 ###############################################################################
@@ -220,4 +235,5 @@ ENDIF (BUILD_DOCUMENTATION)
 if(CX_BUILD_USER_DOCUMENTATION)
     cx_build_user_documentation_qt_help()
     cx_build_user_documentation_html()
+	cx_install_documentation_files()
 endif()
