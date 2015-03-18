@@ -32,10 +32,10 @@ target_include_directories(cxLogicManager
 target_link_libraries(cxLogicManager
     PUBLIC
     cxResource
+    cxResourceVisualization
 
     PRIVATE
     Qt5::Core
-    cxResourceVisualization
     cxPluginUtilities
 )
 

@@ -24,7 +24,6 @@ include(cxInstallUtilities)
 
 cx_install_apply_customizable_properties()
 cx_install_configuration_files()
-cx_install_documentation_files()
 
 cx_install_windows_runtime_libs(${CX_INSTALL_ROOT_DIR}/bin)
 

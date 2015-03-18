@@ -197,6 +197,7 @@ void ImageLUT2D::refreshOutputLUT()
 	// crash in vtkImageMapToColors. Seen when upgrading vtk6.1->6.2
 	// This line hacks away the problem....
 	// http://vtk.1045678.n5.nabble.com/Crash-in-vtkImageMapToColors-when-upgrading-6-1-gt-6-2-td5730804.html
+	// Update: added fix in VTK head -> will be fixed in 6.3
 	unsigned char input = 0;
 	lut->MapScalarsThroughTable2(&input, &input, VTK_UNSIGNED_CHAR, 1, 1, 1);
 	// HACK END

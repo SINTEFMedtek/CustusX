@@ -33,70 +33,55 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMainWindow.h"
 
 #include <QtWidgets>
-#include <QtConcurrent>
-#include <QWhatsThis>
-#include <QDesktopWidget>
-#include "boost/scoped_ptr.hpp"
 #include "boost/bind.hpp"
-#include "cxTime.h"
 
+#include "cxConfig.h"
+#include "cxDataLocations.h"
+#include "cxProfile.h"
+#include "cxLogicManager.h"
 #include "cxTrackingService.h"
+#include "cxSettings.h"
+#include "cxVideoService.h"
+#include "cxStateService.h"
+#include "cxNavigation.h"
+#include "cxImage.h"
+#include "cxPatientModelService.h"
+#include "cxViewService.h"
+#include "cxViewGroupData.h"
+#include "cxSessionStorageService.h"
+#include "cxVisServices.h"
+#include "cxAudioImpl.h"
+#include "cxLayoutInteractor.h"
+#include "cxVLCRecorder.h"
+#include "cxCameraControl.h"
+
+#include "cxDockWidgets.h"
 #include "cxStatusBar.h"
-#include "cxVolumePropertiesWidget.h"
+#include "cxImportDataDialog.h"
+#include "cxExportDataDialog.h"
+#include "cxSecondaryMainWindow.h"
+#include "cxSecondaryViewLayoutWindow.h"
+#include "cxSamplerWidget.h"
+#include "cxHelperWidgets.h"
+
 #include "cxStreamPropertiesWidget.h"
+#include "cxVideoConnectionWidget.h"
+#include "cxToolManagerWidget.h"
+#include "cxFrameTreeWidget.h"
 #include "cxNavigationWidget.h"
-#include "cxTabbedWidget.h"
+#include "cxVolumePropertiesWidget.h"
 #include "cxToolPropertiesWidget.h"
 #include "cxPreferencesDialog.h"
 #include "cxSlicePropertiesWidget.h"
-#include "cxDataLocations.h"
 #include "cxMeshInfoWidget.h"
-#include "cxFrameForest.h"
-#include "cxFrameTreeWidget.h"
-#include "cxImportDataDialog.h"
 #include "cxTrackPadWidget.h"
-#include "cxCameraControl.h"
-#include "cxSecondaryMainWindow.h"
-#include "cxVideoConnectionWidget.h"
-#include "cxAudioImpl.h"
-#include "cxSettings.h"
-#include "cxToolManagerWidget.h"
-#include "cxVideoService.h"
-#include "cxExportDataDialog.h"
-#include "cxGPUImageBuffer.h"
-#include "cxData.h"
 #include "cxConsoleWidget.h"
-#include "cxStateService.h"
 #include "cxMetricWidget.h"
 #include "cxPlaybackWidget.h"
 #include "cxEraserWidget.h"
-#include "cxSamplerWidget.h"
-#include "cxHelperWidgets.h"
-#include "cxConfig.h"
-#include "cxVLCRecorder.h"
-#include "cxSecondaryViewLayoutWindow.h"
-//#include "cxRegistrationHistoryWidget.h"
-#include "cxConsoleWidgetCollection.h"
-
-#include "cxLayoutInteractor.h"
-#include "cxNavigation.h"
-#include "cxPluginFrameworkWidget.h"
-#include "cxImage.h"
-#include "cxLogger.h"
-
-#include "ctkServiceTracker.h"
-#include "cxLogicManager.h"
-#include "cxPluginFramework.h"
-#include "ctkPluginContext.h"
-#include "cxDockWidgets.h"
-#include "cxPatientModelServiceProxy.h"
-#include "cxViewServiceProxy.h"
-#include "cxVideoServiceProxy.h"
-#include "cxViewGroupData.h"
-#include "cxSessionStorageService.h"
-#include "cxProfile.h"
 #include "cxAllFiltersWidget.h"
-#include "cxVisServices.h"
+#include "cxPluginFrameworkWidget.h"
+
 
 namespace cx
 {
@@ -209,7 +194,6 @@ void MainWindow::addGUIExtender(GUIExtenderService* service)
 	std::vector<QToolBar*> toolBars = service->createToolBars();
 	for(unsigned j = 0; j < toolBars.size(); ++j)
 	{
-//		toolBars[j]->setParent(this);
 		addToolBar(toolBars[j]);
 		this->registerToolBar(toolBars[j], "Toolbar");
 	}
@@ -283,8 +267,6 @@ void MainWindow::focusInsideDockWidget(QObject *dockWidget)
 	if (!sa)
 		return;
 	QTimer::singleShot(0, sa->widget(), SLOT(setFocus())); // avoid loops etc by send async event.
-
-//	std::cout << "**** new widget focus: " << sa->widget()->objectName() << std::endl;
 }
 
 
@@ -431,7 +413,6 @@ void MainWindow::createActions()
 	mInitializeToolsAction = new QAction(tr("Initialize"), mToolsActionGroup);
 	mTrackingToolsAction = new QAction(tr("Start tracking"), mToolsActionGroup);
 	mTrackingToolsAction->setShortcut(tr("Ctrl+T"));
-//	mSaveToolsPositionsAction = new QAction(tr("Save positions"), this);
 
 	mToolsActionGroup->setExclusive(false); // must turn off to get the checkbox independent.
 
@@ -443,13 +424,10 @@ void MainWindow::createActions()
 
 	mConfigureToolsAction->setChecked(true);
 
-//	connect(mConfigureToolsAction, &QAction::triggered, this, boost::bind(&MainWindow::setState, this, Tool::tsCONFIGURED));
 	connect(mConfigureToolsAction, &QAction::triggered, this, &MainWindow::configureSlot);
 	boost::function<void()> finit = boost::bind(&TrackingService::setState, trackingService(), Tool::tsINITIALIZED);
 	connect(mInitializeToolsAction, &QAction::triggered, finit);
 	connect(mTrackingToolsAction, &QAction::triggered, this, &MainWindow::toggleTrackingSlot);
-//	boost::function<void()> fsavetools = boost::bind(&TrackingService::savePositionHistory, trackingService());
-//	connect(mSaveToolsPositionsAction, &QAction::triggered, fsavetools);
 	connect(trackingService().get(), &TrackingService::stateChanged, this, &MainWindow::updateTrackingActionSlot);
 	connect(trackingService().get(), &TrackingService::stateChanged, this, &MainWindow::updateTrackingActionSlot);
 	this->updateTrackingActionSlot();
@@ -491,8 +469,6 @@ void MainWindow::shootScreen()
 		QString name = "";
 		if (desktop->screenCount()>1)
 			name = screens[i]->name().split(" ").join("");
-//		std::cout << "screen id " << screens[i]->name() << std::endl;
-//		std::cout << "screen get " << geo.left() <<","<< geo.top() <<","<< geo.width() <<","<< geo.height() << std::endl;
 		this->saveScreenShot(screens[i]->grabWindow(screenWinId, geo.left(), geo.top(), geo.width(), geo.height()), name);
 	}
 }
@@ -571,7 +547,6 @@ void MainWindow::centerToImageCenterSlot()
 		nav->centerToData(patientService()->getActiveImage());
 	else if (!viewService()->groupCount())
 		nav->centerToView(viewService()->getGroup(0)->getData());
-//		nav->centerToView(mServices->visualizationService->getViewGroupData(0)->getData());//Too early?
 	else
 		nav->centerToGlobalDataCenter();
 }
@@ -585,7 +560,6 @@ void MainWindow::centerToTooltipSlot()
 void MainWindow::togglePointPickerActionSlot()
 {
 	ViewGroupDataPtr data = viewService()->getGroup(0);
-//	ViewGroupDataPtr data = mServices->visualizationService->getViewGroupData(0); //Too early?
 	ViewGroupData::Options options = data->getOptions();
 	options.mShowPointPickerProbe = !options.mShowPointPickerProbe;
 	data->setOptions(options);
@@ -595,7 +569,6 @@ void MainWindow::updatePointPickerActionSlot()
 	if (!viewService()->getGroup(0))
 		return;
 	bool show = viewService()->getGroup(0)->getOptions().mShowPointPickerProbe;
-//	bool show = mServices->visualizationService->getViewGroupData(0)->getOptions().mShowPointPickerProbe;//TOO early?
 	mShowPointPickerAction->setChecked(show);
 }
 
@@ -718,8 +691,6 @@ void MainWindow::updateWindowTitle()
 			.arg(profileName)
 			.arg(patientName);
 	this->setWindowTitle(title);
-
-//	this->setWindowTitle("CustusX " + versionName + " - " + profileName + " - " + patientName);
 }
 
 void MainWindow::onWorkflowStateChangedSlot()
@@ -878,14 +849,6 @@ void MainWindow::createMenus()
 		mWorkflowMenu->addAction(actions[i]);
 	}
 
-//	stateService()->getWorkflow()->fillMenu(mWorkflowMenu);
-
-//	QList<QAction *> actions = mWorkflowMenu->actions();
-//	for (int i = 1; i <= actions.size(); ++i)
-//	{
-//		QString shortcut = "Ctrl+" + QString::number(i);
-//		actions[i - 1]->setShortcut(shortcut);
-//	}
 	mWorkflowMenu->addSeparator();
 	mWorkflowMenu->addAction(mSaveDesktopAction);
 	mWorkflowMenu->addAction(mResetDesktopAction);
@@ -896,8 +859,6 @@ void MainWindow::createMenus()
 	mToolMenu->addAction(mInitializeToolsAction);
 	mToolMenu->addAction(mTrackingToolsAction);
 	mToolMenu->addSeparator();
-//	mToolMenu->addAction(mSaveToolsPositionsAction);
-//	mToolMenu->addSeparator();
 	mToolMenu->addAction(mStartStreamingAction);
 	mToolMenu->addSeparator();
 
@@ -955,7 +916,6 @@ void MainWindow::createToolBars()
 		mWorkflowToolBar->addAction(actions[i]);
 	}
 
-//	stateService()->getWorkflow()->fillToolBar(mWorkflowToolBar);
 	this->registerToolBar(mWorkflowToolBar, "Toolbar");
 
 	mDesktopToolBar = addToolBar("Desktop");
@@ -1025,12 +985,6 @@ void MainWindow::aboutSlot()
 			.arg(url_license)
 			.arg(url_config)
 			);
-
-//	QMessageBox::about(this, tr("About CustusX"), tr("<h2>CustusX version %1</h2> "
-//		"<p>Created by SINTEF Medical Technology."
-//		"<p><a href=http://www.sintef.no/Home/Technology-and-Society/Medical-technology> www.sintef.no </a>"
-//		"<p>An application for Image Guided Surgery."
-//		"<p>Created using Qt, VTK, ITK, IGSTK, CTK.").arg(CustusX_VERSION_STRING));
 }
 
 void MainWindow::preferencesSlot()

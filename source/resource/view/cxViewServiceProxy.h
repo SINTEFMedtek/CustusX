@@ -72,13 +72,16 @@ public:
 
 	bool isNull();
 
+public slots:
+    virtual void aboutToStop();
+
 private:
 	void initServiceListener();
 	void onServiceAdded(VisualizationService* service);
 	void onServiceRemoved(VisualizationService *service);
 
 	ctkPluginContext *mPluginContext;
-	VisualizationServicePtr mVisualizationService;
+    VisualizationServicePtr mVisualizationService;
 	boost::shared_ptr<ServiceTrackerListener<VisualizationService> > mServiceListener;
 };
 } //cx
