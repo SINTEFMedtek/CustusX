@@ -20,6 +20,7 @@ set(CX_PLUGINS
   org.custusx.registration.method.manual:ON
   org.custusx.registration.method.landmark:ON
   org.custusx.registration.method.bronchoscopy:ON
+  org.custusx.filter.routetotarget:ON
   org.custusx.registration.method.vessel:ON
   org.custusx.registration.method.commandline:ON
   org.custusx.registration.method.plate:ON
