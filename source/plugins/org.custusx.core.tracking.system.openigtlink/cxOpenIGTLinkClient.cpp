@@ -1,6 +1,7 @@
 #include "cxOpenIGTLinkClient.h"
 
 #include <QCoreApplication>
+#include "igtlTransformMessage.h"
 #include "cxLogger.h"
 
 namespace cx
@@ -9,7 +10,8 @@ namespace cx
 OpenIGTLinkClient::OpenIGTLinkClient(QObject *parent) :
     QObject(parent), mState(Idle)
 {
-    mSocket = igtl::ClientSocket::New();
+    qRegisterMetaType<Transform3D>("Transform3D");
+    mSocket = Socket::New();
 }
 
 void OpenIGTLinkClient::requestConnect(QString ip, int port)
@@ -20,7 +22,8 @@ void OpenIGTLinkClient::requestConnect(QString ip, int port)
         return;
     }
 
-    int r = mSocket->ConnectToServer(ip.toStdString().c_str(), port);
+    CX_LOG_CHANNEL_DEBUG("janne beate ") << "trying to connect to " << ip << ":" << port;
+    int r = mSocket->connectToHost(ip, port);
     if (r != 0)
     {
       CX_LOG_CHANNEL_DEBUG("janne beate ") << "Cannot connect to the server.";
@@ -61,6 +64,7 @@ void OpenIGTLinkClient::requestStartProcessingMessages()
     CX_LOG_CHANNEL_INFO("janne beate ") << "Listening.";
     while(mState == Listening)
     {
+        QCoreApplication::processEvents();
         if(!this->connectionIsOk())
             break;
 
@@ -70,9 +74,6 @@ void OpenIGTLinkClient::requestStartProcessingMessages()
         if(!this->receiveBody(headerMsg))
             break;
 
-        //TODO
-        //emit packages
-        QCoreApplication::processEvents();
     }
     this->internalStoppedProcessingMessages();
 }
@@ -89,12 +90,8 @@ void OpenIGTLinkClient::requestStopProcessingMessages()
 
 bool OpenIGTLinkClient::connectionIsOk()
 {
-    if(mSocket.IsNull() || mSocket->GetConnected() == 0) //server have disconnected...
-    {
-        CX_LOG_CHANNEL_WARNING("janne beate ") << "Server disconnected... Listening -> Idle";
+    if(!mSocket->connectionIsOk())
         mState = Idle;
-        return false;
-    }
     return true;
 }
 
@@ -102,29 +99,73 @@ bool OpenIGTLinkClient::receiveHeader(igtl::MessageHeader::Pointer headerMsg)
 {
     headerMsg->InitPack();
 
-    int r = mSocket->Receive(headerMsg->GetPackPointer(), headerMsg->GetPackSize());
-    if (r == 0)
-    {
-      mSocket->CloseSocket();
-      return false;
-    }
-    if (r != headerMsg->GetPackSize())
-    {
-      return false;
-    }
+   if(!this->socketReceive(headerMsg->GetPackPointer(), headerMsg->GetPackSize()))
+   {
+       CX_LOG_ERROR() << "Could not receive header";
+       return false;
+   }
     headerMsg->Unpack();
 
     std::string deviceType = std::string(headerMsg->GetDeviceType());
     CX_LOG_CHANNEL_DEBUG("janne beate ") << "Received header of type: " << deviceType;
-
-    mSocket->Skip(headerMsg->GetBodySizeToRead(), 0);
 
     return true;
 }
 
 bool OpenIGTLinkClient::receiveBody(igtl::MessageBase::Pointer headerMsg)
 {
-    //TODO implement
+    if(strcmp(headerMsg->GetDeviceType(), "TRANSFORM") == 0)
+    {
+        CX_LOG_CHANNEL_DEBUG("janne beate ") << "Body TRANSFORM";
+        igtl::TransformMessage::Pointer body = igtl::TransformMessage::New();
+        body->SetMessageHeader(headerMsg);
+        body->AllocatePack();
+        if(!this->socketReceive(body->GetPackBodyPointer(), body->GetPackBodySize()))
+        {
+            CX_LOG_ERROR() << "Could not receive body";
+            return false;
+        }
+
+        int c = body->Unpack(1);
+        if (c & igtl::MessageHeader::UNPACK_BODY)
+        {
+            // if CRC check is OK. Read transform data.
+            igtl::Matrix4x4 matrix;
+            body->GetMatrix(matrix);
+            CX_LOG_CHANNEL_DEBUG("janne beate ") << "Device name: " << body->GetDeviceName();
+            //igtl::PrintMatrix(matrix);
+            QString deviceName = body->GetDeviceName();
+            Transform3D transform3D = Transform3D::fromFloatArray(matrix);
+            igtl::TimeStamp::Pointer ts = igtl::TimeStamp::New();
+            body->GetTimeStamp(ts);
+            igtlUint64 timestamp = ts->GetTimeStampInNanoseconds(); //since epoc
+
+            emit transform(deviceName, transform3D, timestamp);
+        }
+        else
+        {
+            CX_LOG_ERROR() << "Could  not unpack the body.";
+        }
+    }
+    else
+    {
+        mSocket->skip(headerMsg->GetBodySizeToRead());
+    }
+    return true;
+}
+
+const bool OpenIGTLinkClient::socketReceive(void *packPointer, int packSize)
+{
+    int r = mSocket->receive(packPointer, packSize);
+    if (r == 0)
+    {
+      mSocket->close();
+      return false;
+    }
+    if (r != packSize)
+    {
+      return false;
+    }
     return true;
 }
 

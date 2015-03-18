@@ -37,10 +37,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxTrackingSystemService.h"
 #include "org_custusx_core_tracking_system_openigtlink_Export.h"
-class ctkPluginContext;
+//class ctkPluginContext;
 
 namespace cx
 {
+
+typedef boost::shared_ptr<class OpenIGTLinkTool> OpenIGTLinkToolPtr;
 
 /**
  * Tracking system service that gets tracking information from an OpenIGTLink source
@@ -92,13 +94,18 @@ private slots:
     void serverStartedProcessingMessages();
     void serverStoppedProcessingMessages();
 
+    void receiveTransform(QString devicename, Transform3D transform, double timestamp);
+
 private:
     void internalSetState(Tool::State state);
+    OpenIGTLinkToolPtr getTool(QString devicename);
 
     QThread mOpenIGTLinkThread;
     Tool::State mState;
     QString mIp;
     int mPort;
+    std::map<QString, OpenIGTLinkToolPtr> mTools;
+    ToolPtr mReference;
 
 };
 typedef boost::shared_ptr<OpenIGTLinkTrackingSystemService> OpenIGTLinkTrackingSystemServicePtr;

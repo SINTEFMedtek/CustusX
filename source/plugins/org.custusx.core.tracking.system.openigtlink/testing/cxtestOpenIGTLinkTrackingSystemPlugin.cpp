@@ -44,12 +44,15 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: Check that the service can be creat
     service.reset();
 }
 
-TEST_CASE("OpenIGTLinkTrackingSystemService: Check that the can connect and stream from a server", "[manual][plugins][org.custusx.core.tracking.system.openigtlink]")
+TEST_CASE("OpenIGTLinkTrackingSystemService: Check that the plugin can connect and stream from a server", "[manual][plugins][org.custusx.core.tracking.system.openigtlink]")
 {
     cx::OpenIGTLinkTrackingSystemServicePtr service = cx::OpenIGTLinkTrackingSystemServicePtr(new cx::OpenIGTLinkTrackingSystemService());
     REQUIRE(service);
-    CHECK(service.unique());
 
+    REQUIRE(service->getState() == cx::Tool::tsNONE);
+
+    service->setState(cx::Tool::tsCONFIGURED);
+    REQUIRE(cxtest::waitForQueuedSignal(service.get(), SIGNAL(stateChanged())));
     REQUIRE(service->getState() == cx::Tool::tsCONFIGURED);
 
     service->setState(cx::Tool::tsINITIALIZED);

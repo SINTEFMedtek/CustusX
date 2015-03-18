@@ -36,9 +36,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogger.h"
 #include "cxOpenIGTLinkClient.h"
 #include "cxOpenIGTLinkSessionManager.h"
+#include "cxOpenIGTLinkTool.h"
 
 namespace cx
 {
+
+std::vector<ToolPtr> toVector(std::map<QString, OpenIGTLinkToolPtr> map)
+{
+    std::vector<ToolPtr> retval;
+    std::map<QString, OpenIGTLinkToolPtr>::iterator it = map.begin();
+    for(; it!= map.end(); ++it)
+    {
+        retval.push_back(it->second);
+    }
+    return retval;
+}
+
 OpenIGTLinkTrackingSystemService::OpenIGTLinkTrackingSystemService() :
     mState(Tool::tsNONE),
     mIp("10.218.140.127"),
@@ -48,7 +61,6 @@ OpenIGTLinkTrackingSystemService::OpenIGTLinkTrackingSystemService() :
     OpenIGTLinkClient *client = new OpenIGTLinkClient;
     client->moveToThread(&mOpenIGTLinkThread);
     connect(&mOpenIGTLinkThread, &QThread::finished, client, &QObject::deleteLater);
-    //TODO implement this
     connect(this, &OpenIGTLinkTrackingSystemService::connectToServer, client, &OpenIGTLinkClient::requestConnect);
     connect(this, &OpenIGTLinkTrackingSystemService::disconnectFromServer, client, &OpenIGTLinkClient::requestDisconnect);
     connect(this, &OpenIGTLinkTrackingSystemService::startListenToServer, client, &OpenIGTLinkClient::requestStartProcessingMessages);
@@ -57,10 +69,7 @@ OpenIGTLinkTrackingSystemService::OpenIGTLinkTrackingSystemService() :
     connect(client, &OpenIGTLinkClient::disconnected, this, &OpenIGTLinkTrackingSystemService::serverIsDisconnected);
     connect(client, &OpenIGTLinkClient::startedProcessingMessages, this, &OpenIGTLinkTrackingSystemService::serverStartedProcessingMessages);
     connect(client, &OpenIGTLinkClient::stoppedProcessingMessages, this, &OpenIGTLinkTrackingSystemService::serverStoppedProcessingMessages);
-
-    //connect(this, &OpenIGTLinkTrackingSystemService::connectToServer, client, &OpenIGTLinkClient::establishConnectionToServer);
-    //connect(this, &OpenIGTLinkTrackingSystemService::listenToServer, client, &OpenIGTLinkClient::listen);
-    //connect(client, &OpenIGTLinkClient::packageArrived, this, &OpenIGTLinkTrackingSystemService::getPackage);
+    connect(client, &OpenIGTLinkClient::transform, this, &OpenIGTLinkTrackingSystemService::receiveTransform);
     //CLIENT END
 
     //SESSIONMANAGER START
@@ -80,8 +89,6 @@ OpenIGTLinkTrackingSystemService::OpenIGTLinkTrackingSystemService() :
     connect(session, &OpenIGTLinkSessionManager::stoppedProcessingMessages, this, &OpenIGTLinkTrackingSystemService::serverStoppedProcessingMessages);
     */
     //SESSIONMANAGER END
-
-    this->configure();
 }
 
 OpenIGTLinkTrackingSystemService::~OpenIGTLinkTrackingSystemService()
@@ -129,8 +136,7 @@ void OpenIGTLinkTrackingSystemService::setState(const Tool::State val)
 
 std::vector<ToolPtr> OpenIGTLinkTrackingSystemService::getTools()
 {
-    std::vector<ToolPtr> retval;
-    return retval;
+    return toVector(mTools);
 }
 
 TrackerConfigurationPtr OpenIGTLinkTrackingSystemService::getConfiguration()
@@ -141,8 +147,7 @@ TrackerConfigurationPtr OpenIGTLinkTrackingSystemService::getConfiguration()
 
 ToolPtr OpenIGTLinkTrackingSystemService::getReference()
 {
-    ToolPtr retval;
-    return retval;
+    return mReference;
 }
 
 void OpenIGTLinkTrackingSystemService::setLoggingFolder(QString loggingFolder)
@@ -165,6 +170,8 @@ void OpenIGTLinkTrackingSystemService::deconfigure()
     CX_LOG_CHANNEL_DEBUG("janne beate ") << "deconfigure";
     mOpenIGTLinkThread.quit();
     mOpenIGTLinkThread.wait();
+    mTools.clear();
+    mReference.reset();
     this->serverIsDeconfigured();
 }
 
@@ -222,10 +229,41 @@ void OpenIGTLinkTrackingSystemService::serverStoppedProcessingMessages()
     this->internalSetState(Tool::tsINITIALIZED);
 }
 
+void OpenIGTLinkTrackingSystemService::receiveTransform(QString devicename, Transform3D transform, double timestamp)
+{
+    CX_LOG_CHANNEL_DEBUG("janne beate ") << "*******";
+    CX_LOG_CHANNEL_DEBUG("janne beate ") << "DeviceName " << devicename;
+    CX_LOG_CHANNEL_DEBUG("janne beate ") << "Transform " << transform;
+    CX_LOG_CHANNEL_DEBUG("janne beate ") << "Timestamp " << timestamp;
+    OpenIGTLinkToolPtr tool = this->getTool(devicename);
+    tool->toolTransformAndTimestampSlot(transform, timestamp);
+
+}
+
 void OpenIGTLinkTrackingSystemService::internalSetState(Tool::State state)
 {
     mState = state;
     emit stateChanged();
 }
+
+OpenIGTLinkToolPtr OpenIGTLinkTrackingSystemService::getTool(QString devicename)
+{
+    OpenIGTLinkToolPtr retval;
+    std::map<QString, OpenIGTLinkToolPtr>::iterator it = mTools.find(devicename);
+    if(it == mTools.end())
+    {
+        retval = OpenIGTLinkToolPtr(new OpenIGTLinkTool(devicename));
+        mTools[devicename] = retval;
+        //todo: will this work?
+        emit stateChanged();
+    }
+    else
+    {
+        retval = it->second;
+    }
+
+    return retval;
+}
+
 
 } /* namespace cx */

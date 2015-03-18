@@ -2,8 +2,9 @@
 #define CXOPENIGTLINKCLIENT_H
 
 #include <QObject>
-#include "igtlClientSocket.h"
 #include "igtlMessageHeader.h"
+#include "cxSocket.h"
+#include "cxTransform3D.h"
 
 namespace cx {
 
@@ -29,10 +30,13 @@ signals:
     void startedProcessingMessages();
     void stoppedProcessingMessages();
 
+    void transform(QString devicename, Transform3D transform, double timestamp);
+
 private:
     bool connectionIsOk();
     bool receiveHeader(igtl::MessageHeader::Pointer headerMsg);
     bool receiveBody(igtl::MessageHeader::Pointer headerMsg);
+    bool const socketReceive(void *packPointer, int packSize);
 
     void internalConnected();
     void internalDisconnected();
@@ -40,7 +44,7 @@ private:
     void internalStoppedProcessingMessages();
 
     State mState;
-    igtl::ClientSocket::Pointer mSocket;
+    SocketPtr mSocket;
 };
 
 } //namespace cx

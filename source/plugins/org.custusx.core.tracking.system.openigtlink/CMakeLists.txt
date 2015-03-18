@@ -7,6 +7,9 @@ set(PLUGIN_SRCS
     cxOpenIGTLinkTrackingSystemService.cpp
     cxOpenIGTLinkClient.cpp
     cxOpenIGTLinkSessionManager.cpp
+    cxOpenIGTLinkTool.cpp
+    cxSocket.h
+    cxSocket.cpp
 )
 
 # Files which should be processed by Qts moc
@@ -15,6 +18,7 @@ set(PLUGIN_MOC_SRCS
     cxOpenIGTLinkTrackingSystemService.h
     cxOpenIGTLinkClient.h
     cxOpenIGTLinkSessionManager.h
+    cxOpenIGTLinkTool.h
 )
 
 # Qt Designer files which should be processed by Qts uic
