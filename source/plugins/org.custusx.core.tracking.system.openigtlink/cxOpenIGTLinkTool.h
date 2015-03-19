@@ -37,12 +37,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxToolImpl.h"
 
-#include <limits.h>
 #include <QTimer>
 #include <boost/shared_ptr.hpp>
 #include "cxTransform3D.h"
-#include "cxDefinitions.h"
-#include "vtkForwardDeclarations.h"
 
 class QStringList;
 
@@ -85,7 +82,6 @@ public:
     virtual bool isInitialized() const;
     virtual QString getUid() const;
     virtual QString getName() const;
-    virtual int getIndex() const;
     virtual ProbePtr getProbe() const;
     virtual double getTimestamp() const;
     virtual double getTooltipOffset() const; ///< get a virtual offset extending from the tool tip.
@@ -94,23 +90,9 @@ public:
     virtual bool isCalibrated() const; ///< true if calibration is different from identity
     virtual Transform3D getCalibration_sMt() const; ///< get the calibration transform from tool space to sensor space (where the spheres or similar live)
     virtual void setCalibration_sMt(Transform3D calibration); ///< requests to use the calibration and replaces the tools calibration file
-    //QString getCalibrationFileName() const; ///< returns the path to the tools calibration file
-
-    //TRACKING_SYSTEM getTrackerType(); ///< the type of tracker this tool belongs to
-
-    virtual std::map<int, Vector3D> getReferencePoints() const; ///< Get the optional reference points from this tool
-    virtual bool hasReferencePointWithId(int id);
-
-    //bool isValid() const; ///< whether this tool is constructed correctly or not
 
     virtual void set_prMt(const Transform3D& prMt, double timestamp);
     virtual void setVisible(bool vis);
-
-    //void addXml(QDomNode& dataNode);
-    //void parseXml(QDomNode& dataNode);
-
-signals:
-    void attachedToTracker(bool);
 
 private slots:
     void toolTransformAndTimestampSlot(Transform3D matrix, double timestamp); ///< timestamp is in milliseconds
@@ -118,17 +100,15 @@ private slots:
     void toolVisibleSlot(bool);
 
 private:
+    std::set<Type> determineTypesBasedOnUid(const QString uid) const;
+    bool isProbe() const;
     void createPolyData(); ///< creates the polydata either from file or a vtkConeSource
 
-    void printInternalStructure(); ///< FOR DEBUGGING
-
     vtkPolyDataPtr mPolyData; ///< the polydata used to represent the tool graphically
-    bool mValid; ///< whether this tool is constructed correctly or not
-    bool mConfigured; ///< whether or not the tool is properly configured
-    bool mTracked; ///< whether the tool is being tracked or not
     ProbePtr mProbe;
     QTimer mTpsTimer;
     double mTimestamp;
+    std::set<Type> mTypes;
 };
 typedef boost::shared_ptr<OpenIGTLinkTool> OpenIGTLinkToolPtr;
 

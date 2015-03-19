@@ -37,7 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxTrackingSystemService.h"
 #include "org_custusx_core_tracking_system_openigtlink_Export.h"
-//class ctkPluginContext;
 
 namespace cx
 {
@@ -78,9 +77,7 @@ signals:
 
 
 private slots:
-    void getPackage();
-
-    void configure(); ///< sets up the software like the xml file suggests
+    void configure(); ///< sets up the software
     virtual void deconfigure(); ///< deconfigures the software
     void initialize(); ///< connects to the hardware
     void uninitialize(); ///< disconnects from the hardware

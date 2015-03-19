@@ -5,10 +5,13 @@
 #include <QString>
 #include "igtlClientSocket.h"
 
-namespace cx {
+namespace cx
+{
+
 typedef boost::shared_ptr<class Socket> SocketPtr;
+
 /**
- * @brief The Socket class
+ * @brief The Socket class socket functionallity
  * @date 18.03.2015
  * @author Janne Beate Bakeng, SINTEF
  */
@@ -19,12 +22,12 @@ public:
 
     Socket();
 
-    bool connectToHost(QString ip, int port);
-    bool getConnected();
-    void skip(int bytes);
-    int receive(void *packPointer, int packSize);
-    bool connectionIsOk();
-    void close();
+    bool connectToHost(QString ip, int port) const;
+    bool connectionIsOk() const;
+    void closeConnection() const;
+
+    int receive(void *packPointer, int packSize) const;
+    void skip(int bytes) const;
 
 private:
     typedef igtl::ClientSocket SocketBase;

@@ -39,7 +39,7 @@ void OpenIGTLinkClient::requestDisconnect()
         return;
     }
 
-    if(this->connectionIsOk())
+    if(this->socketIsConnected())
     {
         //Is this the right way to disconnect???
         mSocket = NULL;
@@ -65,7 +65,7 @@ void OpenIGTLinkClient::requestStartProcessingMessages()
     while(mState == Listening)
     {
         QCoreApplication::processEvents();
-        if(!this->connectionIsOk())
+        if(!this->socketIsConnected())
             break;
 
         if(!this->receiveHeader(headerMsg))
@@ -88,14 +88,14 @@ void OpenIGTLinkClient::requestStopProcessingMessages()
     this->internalStoppedProcessingMessages();
 }
 
-bool OpenIGTLinkClient::connectionIsOk()
+bool OpenIGTLinkClient::socketIsConnected()
 {
     if(!mSocket->connectionIsOk())
         mState = Idle;
     return true;
 }
 
-bool OpenIGTLinkClient::receiveHeader(igtl::MessageHeader::Pointer headerMsg)
+bool OpenIGTLinkClient::receiveHeader(const igtl::MessageHeader::Pointer headerMsg) const
 {
     headerMsg->InitPack();
 
@@ -112,11 +112,10 @@ bool OpenIGTLinkClient::receiveHeader(igtl::MessageHeader::Pointer headerMsg)
     return true;
 }
 
-bool OpenIGTLinkClient::receiveBody(igtl::MessageBase::Pointer headerMsg)
+bool OpenIGTLinkClient::receiveBody(const igtl::MessageBase::Pointer headerMsg)
 {
     if(strcmp(headerMsg->GetDeviceType(), "TRANSFORM") == 0)
     {
-        CX_LOG_CHANNEL_DEBUG("janne beate ") << "Body TRANSFORM";
         igtl::TransformMessage::Pointer body = igtl::TransformMessage::New();
         body->SetMessageHeader(headerMsg);
         body->AllocatePack();
@@ -132,8 +131,7 @@ bool OpenIGTLinkClient::receiveBody(igtl::MessageBase::Pointer headerMsg)
             // if CRC check is OK. Read transform data.
             igtl::Matrix4x4 matrix;
             body->GetMatrix(matrix);
-            CX_LOG_CHANNEL_DEBUG("janne beate ") << "Device name: " << body->GetDeviceName();
-            //igtl::PrintMatrix(matrix);
+
             QString deviceName = body->GetDeviceName();
             Transform3D transform3D = Transform3D::fromFloatArray(matrix);
             igtl::TimeStamp::Pointer ts = igtl::TimeStamp::New();
@@ -154,12 +152,12 @@ bool OpenIGTLinkClient::receiveBody(igtl::MessageBase::Pointer headerMsg)
     return true;
 }
 
-const bool OpenIGTLinkClient::socketReceive(void *packPointer, int packSize)
+bool OpenIGTLinkClient::socketReceive(void *packPointer, int packSize) const
 {
     int r = mSocket->receive(packPointer, packSize);
     if (r == 0)
     {
-      mSocket->close();
+      mSocket->closeConnection();
       return false;
     }
     if (r != packSize)

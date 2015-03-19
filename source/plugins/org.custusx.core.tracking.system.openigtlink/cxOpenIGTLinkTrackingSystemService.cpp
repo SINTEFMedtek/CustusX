@@ -32,10 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxOpenIGTLinkTrackingSystemService.h"
 
-#include "ctkPluginContext.h"
 #include "cxLogger.h"
 #include "cxOpenIGTLinkClient.h"
-#include "cxOpenIGTLinkSessionManager.h"
 #include "cxOpenIGTLinkTool.h"
 
 namespace cx
@@ -57,7 +55,6 @@ OpenIGTLinkTrackingSystemService::OpenIGTLinkTrackingSystemService() :
     mIp("10.218.140.127"),
     mPort(18944)
 {
-    // CLIENT START
     OpenIGTLinkClient *client = new OpenIGTLinkClient;
     client->moveToThread(&mOpenIGTLinkThread);
     connect(&mOpenIGTLinkThread, &QThread::finished, client, &QObject::deleteLater);
@@ -70,25 +67,6 @@ OpenIGTLinkTrackingSystemService::OpenIGTLinkTrackingSystemService() :
     connect(client, &OpenIGTLinkClient::startedProcessingMessages, this, &OpenIGTLinkTrackingSystemService::serverStartedProcessingMessages);
     connect(client, &OpenIGTLinkClient::stoppedProcessingMessages, this, &OpenIGTLinkTrackingSystemService::serverStoppedProcessingMessages);
     connect(client, &OpenIGTLinkClient::transform, this, &OpenIGTLinkTrackingSystemService::receiveTransform);
-    //CLIENT END
-
-    //SESSIONMANAGER START
-    //I think the session manager might be buggy, not changed since 2012... try client instead
-    /*
-    OpenIGTLinkSessionManager *session = new OpenIGTLinkSessionManager;
-
-    session->moveToThread(&mOpenIGTLinkThread);
-    connect(&mOpenIGTLinkThread, &QThread::finished, session, &QObject::deleteLater);
-    connect(this, &OpenIGTLinkTrackingSystemService::connectToServer, session, &OpenIGTLinkSessionManager::requestConnect);
-    connect(this, &OpenIGTLinkTrackingSystemService::disconnectFromServer, session, &OpenIGTLinkSessionManager::requestDisconnect);
-    connect(this, &OpenIGTLinkTrackingSystemService::startListenToServer, session, &OpenIGTLinkSessionManager::requestStartProcessingMessages);
-    connect(this, &OpenIGTLinkTrackingSystemService::stopListenToServer, session, &OpenIGTLinkSessionManager::requestStopProcessingMessages);
-    connect(session, &OpenIGTLinkSessionManager::connected, this, &OpenIGTLinkTrackingSystemService::serverIsConnected);
-    connect(session, &OpenIGTLinkSessionManager::disconnected, this, &OpenIGTLinkTrackingSystemService::serverIsDisconnected);
-    connect(session, &OpenIGTLinkSessionManager::startedProcessingMessages, this, &OpenIGTLinkTrackingSystemService::serverStartedProcessingMessages);
-    connect(session, &OpenIGTLinkSessionManager::stoppedProcessingMessages, this, &OpenIGTLinkTrackingSystemService::serverStoppedProcessingMessages);
-    */
-    //SESSIONMANAGER END
 }
 
 OpenIGTLinkTrackingSystemService::~OpenIGTLinkTrackingSystemService()
@@ -152,11 +130,6 @@ ToolPtr OpenIGTLinkTrackingSystemService::getReference()
 
 void OpenIGTLinkTrackingSystemService::setLoggingFolder(QString loggingFolder)
 {}
-
-void OpenIGTLinkTrackingSystemService::getPackage()
-{
-    CX_LOG_CHANNEL_DEBUG("janne beate ") << "Package arrived in CustusX.";
-}
 
 void OpenIGTLinkTrackingSystemService::configure()
 {
@@ -231,13 +204,8 @@ void OpenIGTLinkTrackingSystemService::serverStoppedProcessingMessages()
 
 void OpenIGTLinkTrackingSystemService::receiveTransform(QString devicename, Transform3D transform, double timestamp)
 {
-    CX_LOG_CHANNEL_DEBUG("janne beate ") << "*******";
-    CX_LOG_CHANNEL_DEBUG("janne beate ") << "DeviceName " << devicename;
-    CX_LOG_CHANNEL_DEBUG("janne beate ") << "Transform " << transform;
-    CX_LOG_CHANNEL_DEBUG("janne beate ") << "Timestamp " << timestamp;
     OpenIGTLinkToolPtr tool = this->getTool(devicename);
     tool->toolTransformAndTimestampSlot(transform, timestamp);
-
 }
 
 void OpenIGTLinkTrackingSystemService::internalSetState(Tool::State state)

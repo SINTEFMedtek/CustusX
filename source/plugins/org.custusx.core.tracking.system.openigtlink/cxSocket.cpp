@@ -13,24 +13,13 @@ Socket::Socket()
     mSocket = SocketBase::New();
 }
 
-bool Socket::connectToHost(QString ip, int port)
+bool Socket::connectToHost(QString ip, int port) const
 {
     int r = mSocket->ConnectToServer(ip.toStdString().c_str(), port);
     return (r ? true : false);
 }
 
-void Socket::skip(int bytes)
-{
-    mSocket->Skip(bytes, 0);
-}
-
-int Socket::receive(void *packPointer, int packSize)
-{
-    int r = mSocket->Receive(packPointer, packSize);
-    return r;
-}
-
-bool Socket::connectionIsOk()
+bool Socket::connectionIsOk() const
 {
     if(mSocket.IsNull() || mSocket->GetConnected() == 0) //server have disconnected...
     {
@@ -40,9 +29,19 @@ bool Socket::connectionIsOk()
     return true;
 }
 
-void Socket::close()
+void Socket::closeConnection() const
 {
     mSocket->CloseSocket();
 }
 
+int Socket::receive(void *packPointer, int packSize) const
+{
+    int r = mSocket->Receive(packPointer, packSize);
+    return r;
+}
+
+void Socket::skip(int bytes) const
+{
+    mSocket->Skip(bytes, 0);
+}
 }//namespace cx

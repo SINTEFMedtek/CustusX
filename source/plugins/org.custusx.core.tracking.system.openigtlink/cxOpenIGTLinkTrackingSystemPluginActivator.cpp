@@ -55,8 +55,8 @@ void OpenIGTLinkTrackingSystemPluginActivator::start(ctkPluginContext* context)
 
 void OpenIGTLinkTrackingSystemPluginActivator::stop(ctkPluginContext* context)
 {
-	mRegistration.reset();
-	Q_UNUSED(context);
+    mRegistration.reset();
+    Q_UNUSED(context);
 }
 
 } // namespace cx

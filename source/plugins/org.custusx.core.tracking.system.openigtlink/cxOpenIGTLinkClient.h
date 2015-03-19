@@ -33,10 +33,10 @@ signals:
     void transform(QString devicename, Transform3D transform, double timestamp);
 
 private:
-    bool connectionIsOk();
-    bool receiveHeader(igtl::MessageHeader::Pointer headerMsg);
-    bool receiveBody(igtl::MessageHeader::Pointer headerMsg);
-    bool const socketReceive(void *packPointer, int packSize);
+    bool socketIsConnected();
+    bool receiveHeader(const igtl::MessageHeader::Pointer headerMsg) const;
+    bool receiveBody(const igtl::MessageHeader::Pointer headerMsg);
+    bool socketReceive(void *packPointer, int packSize) const;
 
     void internalConnected();
     void internalDisconnected();

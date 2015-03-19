@@ -30,22 +30,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-//#define _USE_MATH_DEFINES
 #include "cxOpenIGTLinkTool.h"
 
-#include <vtkPolyData.h>
 #include <vtkConeSource.h>
-#include <vtkSTLReader.h>
-#include <QDir>
-#include <QDateTime>
-#include <QStringList>
-#include <QTextStream>
-
-#include "cxTypeConversions.h"
-#include "cxProbeData.h"
-#include "cxProbeImpl.h"
 #include "cxTrackingPositionFilter.h"
 #include "cxLogger.h"
+#include "cxProbeImpl.h"
 
 namespace cx
 {
@@ -53,32 +43,20 @@ namespace cx
 OpenIGTLinkTool::OpenIGTLinkTool(QString uid) :
     ToolImpl(uid, uid),
     mPolyData(NULL),
-    mValid(false),
-    mConfigured(false),
-    mTracked(false)
+    mTimestamp(0)
 {
-    mTimestamp = 0;
-//    Tool::mUid = mTool->getInternalStructure().mUid;
-//    Tool::mName = mTool->getInternalStructure().mName;
-//    mValid = igstkTool->isValid();
-    mValid = true;
-
-    this->createPolyData();
-
-    /*
-    connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(toolTransformAndTimestampSlot(Transform3D, double)));
-    connect(mTool.get(), SIGNAL(attachedToTracker(bool)), this, SIGNAL(attachedToTracker(bool)));
-    connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(toolVisibleSlot(bool)));
-    connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SIGNAL(toolVisible(bool)));
     connect(&mTpsTimer, SIGNAL(timeout()), this, SLOT(calculateTpsSlot()));
 
-    if (mTool->getInternalStructure().mIsProbe)
+
+    mTypes = this->determineTypesBasedOnUid(Tool::mUid);
+    if (this->isProbe())
     {
-        mProbe = ProbeImpl::New(mTool->getInternalStructure().mInstrumentId,
-                        mTool->getInternalStructure().mInstrumentScannerId);
+        mProbe = ProbeImpl::New(Tool::mUid, "OpenIGTLink");
         connect(mProbe.get(), SIGNAL(sectorChanged()), this, SIGNAL(toolProbeSector()));
     }
-    */
+
+    this->createPolyData();
+    this->toolVisibleSlot(true);
 }
 
 OpenIGTLinkTool::~OpenIGTLinkTool()
@@ -87,18 +65,7 @@ OpenIGTLinkTool::~OpenIGTLinkTool()
 
 std::set<Tool::Type> OpenIGTLinkTool::getTypes() const
 {
-    std::set<Type> retval;
-    //TODO remove hardcoded type
-    retval.insert(Tool::TOOL_POINTER);
-
-//    if (mTool->getInternalStructure().mIsReference)
-//        retval.insert(OpenIGTLinkTool::TOOL_REFERENCE);
-//    if (mTool->getInternalStructure().mIsPointer)
-//        retval.insert(OpenIGTLinkTool::TOOL_POINTER);
-//    if (mTool->getInternalStructure().mIsProbe)
-//        retval.insert(OpenIGTLinkTool::TOOL_US_PROBE);
-
-    return retval;
+    return mTypes;
 }
 
 vtkPolyDataPtr OpenIGTLinkTool::getGraphicsPolyData() const
@@ -138,12 +105,6 @@ QString OpenIGTLinkTool::getName() const
     return Tool::mName;
 }
 
-int OpenIGTLinkTool::getIndex() const
-{
-    //TODO what is this??
-    return 0;
-}
-
 double OpenIGTLinkTool::getTooltipOffset() const
 {
     if(this->getProbe())
@@ -158,53 +119,49 @@ void OpenIGTLinkTool::setTooltipOffset(double val)
     ToolImpl::setTooltipOffset(val);
 }
 
-//bool OpenIGTLinkTool::isValid() const
-//{
-//    return mValid;
-//}
+std::set<Tool::Type> OpenIGTLinkTool::determineTypesBasedOnUid(const QString uid) const
+{
+    std::set<Type> retval;
+    retval.insert(TOOL_POINTER);
+    if(uid.contains("probe", Qt::CaseInsensitive))
+    {
+        retval.insert(TOOL_US_PROBE);
+    }
+    return retval;
+}
+
+bool OpenIGTLinkTool::isProbe() const
+{
+    return (mTypes.find(TOOL_US_PROBE) != mTypes.end()) ? true : false;
+}
 
 void OpenIGTLinkTool::createPolyData()
 {
-//    QDir dir;
-//    if (!mTool->getInternalStructure().mGraphicsFileName.isEmpty()
-//                    && dir.exists(mTool->getInternalStructure().mGraphicsFileName))
-//    {
-//        vtkSTLReaderPtr reader = vtkSTLReaderPtr::New();
-//        reader->SetFileName(cstring_cast(mTool->getInternalStructure().mGraphicsFileName));
-//        reader->Update();
-//        mPolyData = reader->GetOutput();
-//    }
-//    else
-//    {
-        //TODO this is copy paste from IGSTK tool: refactor out
-        vtkConeSourcePtr coneSource = vtkConeSourcePtr::New();
-        coneSource->SetResolution(25);
-        coneSource->SetRadius(10);
-        coneSource->SetHeight(100);
+    //TODO this is copy paste from IGSTK tool: refactor out
+    vtkConeSourcePtr coneSource = vtkConeSourcePtr::New();
+    coneSource->SetResolution(25);
+    coneSource->SetRadius(10);
+    coneSource->SetHeight(100);
 
-        coneSource->SetDirection(0, 0, 1);
-        double newCenter[3];
-        coneSource->GetCenter(newCenter);
-        newCenter[2] = newCenter[2] - coneSource->GetHeight() / 2;
-        coneSource->SetCenter(newCenter);
+    coneSource->SetDirection(0, 0, 1);
+    double newCenter[3];
+    coneSource->GetCenter(newCenter);
+    newCenter[2] = newCenter[2] - coneSource->GetHeight() / 2;
+    coneSource->SetCenter(newCenter);
 
-        coneSource->Update();
-        mPolyData = coneSource->GetOutput();
-//    }
+    coneSource->Update();
+    mPolyData = coneSource->GetOutput();
 }
 
 bool OpenIGTLinkTool::isCalibrated() const
 {
     //TODO how to know if an openigtlink tool is calibrated??
-//    Transform3D identity = Transform3D::Identity();
-//    Transform3D sMt = mTool->getInternalStructure().getCalibrationAsSSC();
-//    return !similar(sMt, identity);
+    CX_LOG_WARNING() << "OpenIGTLinkTool types are hardcoded to always be calibrated. Is this correct?.";
     return true;
 }
 
 Transform3D OpenIGTLinkTool::getCalibration_sMt() const
 {
-    //Transform3D sMt = mTool->getInternalStructure().getCalibrationAsSSC();
     Transform3D identity = Transform3D::Identity();
     return identity;
 }
@@ -212,61 +169,8 @@ Transform3D OpenIGTLinkTool::getCalibration_sMt() const
 void OpenIGTLinkTool::setCalibration_sMt(Transform3D calibration)
 {
     Q_UNUSED(calibration);
-    //mTool->updateCalibration(calibration);
     CX_LOG_WARNING() << "Cannot set calibration on a openigtlink tool";
 }
-
-/*QString OpenIGTLinkTool::getCalibrationFileName() const
-{
-    return mTool->getInternalStructure().mCalibrationFilename;
-}*/
-
-//TRACKING_SYSTEM OpenIGTLinkTool::getTrackerType()
-//{
-//    return mTool->getInternalStructure().mTrackerType;
-//}
-
-void OpenIGTLinkTool::printInternalStructure()
-{
-    //TODO make a print self function
-    CX_LOG_DEBUG() << "OpenIGTLinkTool is not able to print itself atm.";
-    //mTool->printInternalStructure();
-}
-
-std::map<int, Vector3D> OpenIGTLinkTool::getReferencePoints() const
-{
-    std::map<int, Vector3D> retval;
-//    return mTool->getInternalStructure().mReferencePoints;
-    return retval;
-}
-
-bool OpenIGTLinkTool::hasReferencePointWithId(int id)
-{
-  return this->getReferencePoints().count(id);
-}
-
-//void OpenIGTLinkTool::addXml(QDomNode& dataNode)
-//{
-//    QDomDocument doc = dataNode.ownerDocument();
-//    dataNode.toElement().setAttribute("uid", qstring_cast(this->getUid()));
-//    if (mProbe && mProbe->isValid())
-//    {
-//        QDomElement probeNode = doc.createElement("probe");
-//        mProbe->addXml(probeNode);
-//        dataNode.appendChild(probeNode);
-//    }
-//}
-
-//void OpenIGTLinkTool::parseXml(QDomNode& dataNode)
-//{
-//    if (dataNode.isNull())
-//        return;
-//    if (mProbe)
-//    {
-//        QDomNode probeNode = dataNode.namedItem("probe");
-//        mProbe->parseXml(probeNode);
-//    }
-//}
 
 void OpenIGTLinkTool::toolTransformAndTimestampSlot(Transform3D matrix, double timestamp)
 {
@@ -283,6 +187,7 @@ void OpenIGTLinkTool::toolTransformAndTimestampSlot(Transform3D matrix, double t
     m_prMt = prMt_filtered;
     emit toolTransformAndTimestamp(m_prMt, timestamp);
 
+    //TODO is this needed?
 //	ToolImpl::set_prMt(matrix, timestamp);
 }
 
@@ -320,13 +225,12 @@ void OpenIGTLinkTool::toolVisibleSlot(bool on)
 
 void OpenIGTLinkTool::set_prMt(const Transform3D& prMt, double timestamp)
 {
-
+    CX_LOG_WARNING() << "Cannot set prMt on a openigtlink tool.";
 }
 
 void OpenIGTLinkTool::setVisible(bool vis)
 {
-
+    CX_LOG_WARNING() << "Cannot set visible on a openigtlink tool.";
 }
-
 
 }//namespace cx

@@ -6,7 +6,6 @@ set(PLUGIN_SRCS
     cxOpenIGTLinkTrackingSystemPluginActivator.cpp
     cxOpenIGTLinkTrackingSystemService.cpp
     cxOpenIGTLinkClient.cpp
-    cxOpenIGTLinkSessionManager.cpp
     cxOpenIGTLinkTool.cpp
     cxSocket.h
     cxSocket.cpp
@@ -17,7 +16,6 @@ set(PLUGIN_MOC_SRCS
     cxOpenIGTLinkTrackingSystemPluginActivator.h
     cxOpenIGTLinkTrackingSystemService.h
     cxOpenIGTLinkClient.h
-    cxOpenIGTLinkSessionManager.h
     cxOpenIGTLinkTool.h
 )
 
