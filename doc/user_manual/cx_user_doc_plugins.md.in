@@ -1,0 +1,18 @@
+Plugins {#plugins}
+========================
+
+\addindex plugins
+
+Available Plugins {#plugins_overview}
+========================
+
+The following plugins are available:
+
+@PLUGIN_SUBPAGES_TEXT@
+
+Other Plugins {#plugins_undocumented}
+========================
+
+The following plugins are available, but have no user documentation:
+
+@UNDOCUMENTED_PLUGINS_TEXT@

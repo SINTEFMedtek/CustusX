@@ -19,7 +19,7 @@ Feature Documentation
 ------------------------
 
 Here is an overview of the workings and features of CustusX: \ref feature_overview. Take a look
-at the \ref definitions for short descriptions of key concepts.
+at the \ref definitions for short descriptions of key concepts. The \ref plugins contain additional features.
 
 Build
 ------------------------

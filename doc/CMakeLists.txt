@@ -30,11 +30,70 @@ endfunction()
 
 ###############################################################################
 #
-# Generate CustusX user documentation on Qt QHP format.
+# Generate plugin page cx_user_doc_plugins.md 
+# based on info about active plugins.
 #
 ###############################################################################
-function(cx_build_user_documentation_qt_help)
-    message(STATUS " **** Generating user qthelp documentation...")
+function(cx_doc_generate_plugin_page)
+    get_property(PLUGIN_DOC_NAMES GLOBAL PROPERTY CX_PLUGIN_DOC_NAMES)    
+
+    # Generate PLUGIN_SUBPAGES_TEXT containing \subpage refs to all documented plugins
+    # ready to insert into markdown.
+    foreach(_var ${PLUGIN_DOC_NAMES})
+        set(PLUGIN_SUBPAGES_TEXT "${PLUGIN_SUBPAGES_TEXT}\n\\subpage ${_var} (${_var})" )
+    endforeach()
+    #message(STATUS "PLUGIN_SUBPAGES_TEXT : " ${PLUGIN_SUBPAGES_TEXT})
+
+    # Generate ALL_ACTIVE_PLUGIN_NAMES containing all plugins found in the system
+    getListOfVarsStartingWith(CX_PLUGIN_ ALL_PLUGINS)
+    #message(STATUS "ALL_PLUGINS: " )
+    foreach(_var ${ALL_PLUGINS})
+        if(${_var})
+            #message(STATUS "ON    " "${_var}" )
+            string(REGEX REPLACE "CX_PLUGIN_(.+):.+" "\\1" plugin_name ${_var})
+            string(REPLACE "CX_PLUGIN_" "" plugin_name ${_var})
+            string(REPLACE "." "_" plugin_name ${plugin_name})
+            #message(STATUS "  plugin_name: " ${plugin_name})
+            set(ALL_ACTIVE_PLUGIN_NAMES ${ALL_ACTIVE_PLUGIN_NAMES} ${plugin_name})
+         else()
+            #message(STATUS "OFF    " "${_var}" )
+         endif()
+    endforeach()
+
+    # Generate UNDOCUMENTED_PLUGIN_NAMES containing all plugins not documented
+    foreach(_var ${ALL_ACTIVE_PLUGIN_NAMES})
+        list(FIND PLUGIN_DOC_NAMES ${_var} FOUND_IN_DOCS)
+            if(${FOUND_IN_DOCS} EQUAL -1)
+                set(UNDOCUMENTED_PLUGIN_NAMES ${UNDOCUMENTED_PLUGIN_NAMES} ${_var})               
+            endif()
+    endforeach()
+
+    #message(STATUS "UNDOCUMENTED_PLUGIN_NAMES: " )
+    #foreach(_var ${UNDOCUMENTED_PLUGIN_NAMES})
+    #    message(STATUS UNDOCUMENTED_PLUGIN_NAMES "${_var}" )
+    #endforeach()
+
+    # Generate UNDOCUMENTED_PLUGINS_TEXT containing \list of all undocumented plugins,
+    # ready to insert into markdown.
+    foreach(_var ${UNDOCUMENTED_PLUGIN_NAMES})
+        set(UNDOCUMENTED_PLUGINS_TEXT "${UNDOCUMENTED_PLUGINS_TEXT}\n* ${_var}" )
+    endforeach()
+    #message(STATUS "UNDOCUMENTED_PLUGINS_TEXT : " ${UNDOCUMENTED_PLUGINS_TEXT})
+
+    CONFIGURE_FILE(
+        ${CX_DOC_INPUT_DIRECTORY}/user_manual/cx_user_doc_plugins.md.in
+        ${CX_DOC_OUTPUT_DIRECTORY}/cx_user_doc_plugins.md)
+    #PLUGIN_SUBPAGES_TEXT
+endfunction()
+
+
+###############################################################################
+#
+# Set common defines
+# for user doc.
+#
+###############################################################################
+macro(cx_doc_set_common_userdoc_definitions)
 
     SET(CX_DOC_INPUT_DIRECTORY ${CustusX_SOURCE_DIR}/doc)
     SET(CX_DOC_OUTPUT_DIRECTORY ${CustusX_BINARY_DIR}/doc)
@@ -43,17 +102,54 @@ function(cx_build_user_documentation_qt_help)
     SET(CX_DOXYGEN_USE_SHORT_NAMES NO)
     SET(CX_DOXYGEN_HAVE_DOT_YESNO NO)
     
-    SET(CX_DOXYGEN_HTML_OUTPUT html_qhp)
     SET(CX_DOXYGEN_OUTPUT_DIRECTORY ${CX_DOC_OUTPUT_DIRECTORY})
     SET(CX_DOXYGEN_PROJECT_LOGO ${CustusX_SOURCE_DIR}/source/gui/icons/CustusX_64x64.png)
-    SET(CX_DOXYGEN_INPUT "${CX_DOC_INPUT_DIRECTORY}/user_manual ${CX_DOC_INPUT_DIRECTORY}/shared_manual")
+
+    get_property(PLUGIN_DOC_FOLDERS GLOBAL PROPERTY CX_PLUGIN_DOC_FOLDERS)
+
+    # set image folders
+    SET(CX_DOXYGEN_IMAGE_PATH 
+        ${CX_DOC_INPUT_DIRECTORY}/images 
+        ${PLUGIN_DOC_FOLDERS})
+    TO_LIST_SPACES(CX_DOXYGEN_IMAGE_PATH CX_DOXYGEN_IMAGE_PATH)
+
+    # set input files
+    SET(CX_DOXYGEN_INPUT 
+        ${CX_DOC_INPUT_DIRECTORY}/user_manual 
+        ${CX_DOC_INPUT_DIRECTORY}/shared_manual
+        ${CX_DOC_OUTPUT_DIRECTORY}/cx_user_doc_plugins.md
+        ${PLUGIN_DOC_FOLDERS})
+    TO_LIST_SPACES(CX_DOXYGEN_INPUT CX_DOXYGEN_INPUT)
+
+    cx_doc_generate_plugin_page()
+
     SET(CX_DOXYGEN_EXCLUDE )
     SET(CX_DOXYGEN_EXCLUDE_PATTERNS "*/.git/* */testing/*")   
-    SET(CX_DOXYGEN_IMAGE_PATH "${CustusX_SOURCE_DIR}/doc/images")
     SET(CX_DOXYGEN_HTML_EXTRA_FILES )
+    set(CX_USE_MDFILE_AS_MAINPAGE {CX_DOC_INPUT_DIRECTORY}/user_manual/cx_user_doc_main_page.md)
+
+    # tweaks that remove source code stuff
+    SET(CX_DOXYGEN_SOURCE_BROWSER NO)
+    SET(CX_DOXYGEN_EXTRACT_ALL NO)
+    SET(CX_DOXYGEN_BUILTIN_STL_SUPPORT NO) # when NO this one disables lots of std::stuff in the TOC.
+    # end tweaks
+    
+endmacro()
+
+
+###############################################################################
+#
+# Generate CustusX user documentation on Qt QHP format.
+#
+###############################################################################
+function(cx_build_user_documentation_qt_help)
+    message(STATUS " **** Generating user qthelp documentation...")
+
+    cx_doc_set_common_userdoc_definitions()
+    
+    SET(CX_DOXYGEN_HTML_OUTPUT html_qhp)    
     SET(CX_DOXYGEN_GENERATE_QHP YES)
     SET(CX_DOXYGEN_QHP_NAMESPACE org.custusx.core)
-    set(CX_USE_MDFILE_AS_MAINPAGE {CX_DOC_INPUT_DIRECTORY}/user_manual/cx_user_doc_main_page.md)
      
      # tweaks that make pages more fitting in the internal help system
     SET(CX_DOXYGEN_HTML_HEADER ${CX_DOC_INPUT_DIRECTORY}/doxy_header_empty.html)
@@ -62,10 +158,8 @@ function(cx_build_user_documentation_qt_help)
     SET(CX_DOXYGEN_GENERATE_TREEVIEW NO)
     SET(CX_DOXYGEN_SEARCHENGINE NO)
     SET(CX_DOXYGEN_ALPHABETICAL_INDEX NO)
-    SET(CX_DOXYGEN_SOURCE_BROWSER NO)
-    SET(CX_DOXYGEN_EXTRACT_ALL NO)
-    SET(CX_DOXYGEN_BUILTIN_STL_SUPPORT NO) # when NO this one disables lots of std::stuff in the TOC.
-
+    # end tweaks
+    
     CONFIGURE_FILE(
         ${CX_DOC_INPUT_DIRECTORY}/cx_doxyfile.dox.in
         ${CX_DOC_OUTPUT_DIRECTORY}/cx_doxyfile_qhp.dox)
@@ -89,9 +183,6 @@ function(cx_build_user_documentation_qt_help)
     endif()
     # .. not tested on win
 
-    #get_target_property(CX_QT_QMAKE_EXECUTABLE Qt5::qmake LOCATION)
-    #message(STATUS "CX_QT_QCOLLECTIONGENERATOR_EXECUTABLE " ${CX_QT_QCOLLECTIONGENERATOR_EXECUTABLE})
-
     add_custom_command(TARGET UserDoc
                POST_BUILD
                COMMAND ${CX_QT_QCOLLECTIONGENERATOR_EXECUTABLE}
@@ -102,6 +193,7 @@ function(cx_build_user_documentation_qt_help)
                VERBATIM)
 endfunction()
 
+
 ###############################################################################
 #
 # Generate CustusX user documentation on HTML format.
@@ -110,36 +202,15 @@ endfunction()
 function(cx_build_user_documentation_html)
     message(STATUS " **** Generating user html documentation...")
 
-    SET(CX_DOC_INPUT_DIRECTORY ${CustusX_SOURCE_DIR}/doc)
-    SET(CX_DOC_OUTPUT_DIRECTORY ${CustusX_BINARY_DIR}/doc)
+    cx_doc_set_common_userdoc_definitions()
 
-    SET(CX_DOXYGEN_USE_WARNINGS YES)
-    SET(CX_DOXYGEN_USE_SHORT_NAMES NO)
-    SET(CX_DOXYGEN_HAVE_DOT_YESNO NO)
-    
-    SET(CX_DOXYGEN_OUTPUT_DIRECTORY ${CX_DOC_OUTPUT_DIRECTORY})
-    SET(CX_DOXYGEN_PROJECT_LOGO ${CustusX_SOURCE_DIR}/source/gui/icons/CustusX_64x64.png)
-    SET(CX_DOXYGEN_INPUT "${CX_DOC_INPUT_DIRECTORY}/user_manual ${CX_DOC_INPUT_DIRECTORY}/shared_manual")
-    SET(CX_DOXYGEN_EXCLUDE )
-    SET(CX_DOXYGEN_EXCLUDE_PATTERNS "*/.git/* */testing/*")   
-    SET(CX_DOXYGEN_IMAGE_PATH "${CustusX_SOURCE_DIR}/doc/images")
-    SET(CX_DOXYGEN_HTML_EXTRA_FILES )
-     
-    # tweaks that make pages more fitting in the internal help system
-    SET(CX_DOXYGEN_SOURCE_BROWSER NO)
-    SET(CX_DOXYGEN_EXTRACT_ALL NO)
-    SET(CX_DOXYGEN_BUILTIN_STL_SUPPORT NO) # when NO this one disables lots of std::stuff in the TOC.
-    # end tweaks
+    SET(CX_DOXYGEN_GENERATE_QHP NO)
+    SET(CX_DOXYGEN_HTML_OUTPUT html_pure)
 
     SET(CX_DOXYGEN_DISABLE_INDEX NO)
     SET(CX_DOXYGEN_GENERATE_TREEVIEW YES)
     SET(CX_DOXYGEN_SEARCHENGINE YES)
     SET(CX_DOXYGEN_ALPHABETICAL_INDEX YES)
-
-    SET(CX_DOXYGEN_GENERATE_QHP NO)
-#	SET(CX_DOXYGEN_INPUT "${CX_DOC_INPUT_DIRECTORY} ${CustusX_SOURCE_DIR}/doc/doxygen")
-    SET(CX_DOXYGEN_HTML_OUTPUT html_pure)
-    set(CX_USE_MDFILE_AS_MAINPAGE {CX_DOC_INPUT_DIRECTORY}/user_manual/cx_user_doc_main_page.md)
     
     CONFIGURE_FILE(
         ${CX_DOC_INPUT_DIRECTORY}/cx_doxyfile.dox.in
@@ -153,6 +224,7 @@ function(cx_build_user_documentation_html)
         VERBATIM)
 	ADD_DEPENDENCIES(UserDoc ${CX_SYSTEM_DEFAULT_APPLICATION})
 endfunction()
+
 
 ###############################################################################
 #
@@ -176,12 +248,17 @@ function(cx_build_dev_documentation_html)
       GET_FILENAME_COMPONENT(DOT_PATH ${DOT} PATH)
     ENDIF(NOT DOT_PATH)
   ENDIF(DOT)
-    
-    
+        
     SET(CX_DOXYGEN_OUTPUT_DIRECTORY ${CX_DOC_OUTPUT_DIRECTORY})
     SET(CX_DOXYGEN_PROJECT_LOGO ${CustusX_SOURCE_DIR}/source/gui/icons/CustusX_64x64.png)
-#    SET(CX_DOXYGEN_INPUT "${CX_DOC_INPUT_DIRECTORY}/dev_manual")
-    SET(CX_DOXYGEN_INPUT "${CX_DOC_INPUT_DIRECTORY}/dev_manual ${CX_DOC_INPUT_DIRECTORY}/shared_manual ${CustusX_SOURCE_DIR}/source ${CustusX_SOURCE_DIR}/CMake")
+
+    SET(CX_DOXYGEN_INPUT 
+        ${CX_DOC_INPUT_DIRECTORY}/dev_manual 
+        ${CX_DOC_INPUT_DIRECTORY}/shared_manual 
+        ${CustusX_SOURCE_DIR}/source 
+        ${CustusX_SOURCE_DIR}/CMake)
+    TO_LIST_SPACES(CX_DOXYGEN_INPUT CX_DOXYGEN_INPUT)
+    
     SET(CX_DOXYGEN_EXCLUDE )
     SET(CX_DOXYGEN_EXCLUDE_PATTERNS "*/.git/* */testing/* */ThirdParty/*")   
     SET(CX_DOXYGEN_IMAGE_PATH "${CustusX_SOURCE_DIR}/doc/images")
