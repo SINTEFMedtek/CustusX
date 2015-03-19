@@ -61,16 +61,17 @@ public:
 ///--------------------------------------------------------
 
 ImageReceiverThread::ImageReceiverThread(StreamerServicePtr streamerInterface, QObject* parent) :
-		QThread(parent),
+		QObject(parent),
 		mStreamerInterface(streamerInterface)
 {
-	this->setObjectName("org.custusx.core.video.imagereceiver"); // becomes the thread name
+	this->setObjectName("imagereceiver worker");
+//	this->setObjectName("org.custusx.core.video.imagereceiver"); // becomes the thread name
 	mGeneratingTimeCalibration = false;
 	mLastReferenceTimestampDiff = 0.0;
 	mLastTimeStamps.reserve(20);
 }
 
-void ImageReceiverThread::run()
+void ImageReceiverThread::initialize()
 {
 	XmlOptionFile xmlFile = profile()->getXmlSettings().descend("video");
 	QDomElement element = xmlFile.getElement("video");
@@ -79,7 +80,7 @@ void ImageReceiverThread::run()
 
 	if(!mImageStreamer)
 	{
-		this->quit();
+		emit failedToStart();
 		return;
 	}
 	mSender.reset(new DirectlyLinkedSender());
@@ -88,17 +89,54 @@ void ImageReceiverThread::run()
 	connect(mSender.get(), SIGNAL(newUSStatus()), this, SLOT(addSonixStatusToQueueSlot()), Qt::DirectConnection);
 
 	if(!mImageStreamer->startStreaming(mSender))
-		this->quit();
+	{
+		emit failedToStart();
+		return;
+	}
 	emit connected(true);
-
-	this->exec();
-
-	report(QString("Stopping streamer: [%1]").arg(mImageStreamer->getType()));
-	mImageStreamer->stopStreaming();
-	mImageStreamer.reset();
-	mSender.reset();
-	emit connected(false);
 }
+
+void ImageReceiverThread::shutdown()
+{
+	if (mImageStreamer)
+	{
+		report(QString("Stopping streamer: [%1]").arg(mImageStreamer->getType()));
+		mImageStreamer->stopStreaming();
+		mImageStreamer.reset();
+		mSender.reset();
+		emit connected(false);
+	}
+}
+
+//void ImageReceiverThread::run()
+//{
+//	XmlOptionFile xmlFile = profile()->getXmlSettings().descend("video");
+//	QDomElement element = xmlFile.getElement("video");
+//	mImageStreamer = mStreamerInterface->createStreamer(element);
+//	report(QString("Starting streamer: [%1]").arg(mImageStreamer->getType()));
+
+//	if(!mImageStreamer)
+//	{
+//		this->quit();
+//		return;
+//	}
+//	mSender.reset(new DirectlyLinkedSender());
+
+//	connect(mSender.get(), SIGNAL(newImage()), this, SLOT(addImageToQueueSlot()), Qt::DirectConnection);
+//	connect(mSender.get(), SIGNAL(newUSStatus()), this, SLOT(addSonixStatusToQueueSlot()), Qt::DirectConnection);
+
+//	if(!mImageStreamer->startStreaming(mSender))
+//		this->quit();
+//	emit connected(true);
+
+//	this->exec();
+
+//	report(QString("Stopping streamer: [%1]").arg(mImageStreamer->getType()));
+//	mImageStreamer->stopStreaming();
+//	mImageStreamer.reset();
+//	mSender.reset();
+//	emit connected(false);
+//}
 
 void ImageReceiverThread::addImageToQueueSlot()
 {

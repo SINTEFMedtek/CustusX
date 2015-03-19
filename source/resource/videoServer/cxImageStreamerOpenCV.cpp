@@ -152,10 +152,10 @@ void GetRandomTestMatrix(igtl::Matrix4x4& matrix)
 
 namespace cx
 {
-ImageStreamerOpenCV::ImageStreamerOpenCV() :
+ImageStreamerOpenCV::ImageStreamerOpenCV()
 //	ImageStreamer(parent),
 //	mSendTimer(0),
-	mGrabTimer(0)
+//	mGrabTimer(0)
 {
 	mGrabbing = false;
 	mAvailableImage = false;
@@ -164,8 +164,8 @@ ImageStreamerOpenCV::ImageStreamerOpenCV() :
 #ifdef CX_USE_OpenCV
 	mVideoCapture.reset(new cv::VideoCapture());
 #endif
-	mGrabTimer = new QTimer(this);
-	connect(mGrabTimer, SIGNAL(timeout()), this, SLOT(grab())); // this signal will be executed in the thread of THIS, i.e. the main thread.
+//	mGrabTimer = new QTimer(this);
+//	connect(mGrabTimer, SIGNAL(timeout()), this, SLOT(grab())); // this signal will be executed in the thread of THIS, i.e. the main thread.
 	mSendTimer = new QTimer(this);
 	connect(mSendTimer, SIGNAL(timeout()), this, SLOT(send())); // this signal will be executed in the thread of THIS, i.e. the main thread.
 }
@@ -276,16 +276,18 @@ bool ImageStreamerOpenCV::startStreaming(SenderPtr sender)
 {
 	this->initialize_local();
 
-	if (!mGrabTimer || !mSendTimer)
+	if (!mSendTimer)
+//	if (!mGrabTimer || !mSendTimer)
 	{
 		std::cout << "ImageStreamerOpenCV: Failed to start streaming: Not initialized." << std::endl;
 		return false;
 	}
 
 	mSender = sender;
-	mGrabTimer->start(0);
+//	mGrabTimer->start(0);
 	mSendTimer->start(getSendInterval());
-	mCounter.start();
+	this->continousGrabEvent(); // instead of grabtimer
+//	mCounter.start();
 //	std::cout << "*** ImageStreamerOpenCV: Started" << std::endl;
 
 	return true;
@@ -293,9 +295,10 @@ bool ImageStreamerOpenCV::startStreaming(SenderPtr sender)
 
 void ImageStreamerOpenCV::stopStreaming()
 {
-	if (!mGrabTimer || !mSendTimer)
+	if (!mSendTimer)
+//	if (!mGrabTimer || !mSendTimer)
 		return;
-	mGrabTimer->stop();
+//	mGrabTimer->stop();
 	mSendTimer->stop();
 	mSender.reset();
 
@@ -334,6 +337,19 @@ void ImageStreamerOpenCV::dumpProperty(int val, QString name)
 	if (value != -1)
 		std::cout << "Property " << name.toStdString() << " : " << mVideoCapture->get(val) << std::endl;
 #endif
+}
+
+/**
+ * Grab image, then post an event asking for a new grab.
+ *
+ * This is an alternative to using a QTimer with timeout 0.
+ */
+void ImageStreamerOpenCV::continousGrabEvent()
+{
+	if (!mSendTimer->isActive())
+		return;
+	this->grab();
+	QMetaObject::invokeMethod(this, "continousGrabEvent", Qt::QueuedConnection);
 }
 
 void ImageStreamerOpenCV::grab()

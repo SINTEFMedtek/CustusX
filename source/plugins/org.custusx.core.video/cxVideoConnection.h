@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
 typedef vtkSmartPointer<class vtkImageAlgorithm> vtkImageAlgorithmPtr;
+typedef boost::shared_ptr<QThread> QThreadPtr;
 
 namespace cx
 {
@@ -109,6 +110,8 @@ private:
 	void removeSourceFromProbe(ToolPtr tool);
 
 	ImageReceiverThreadPtr mClient;
+	QThreadPtr mThread;
+
 	bool mConnected;
 	double mFPS;
 	std::vector<ProbeDefinitionPtr> mUnsusedProbeDataVector;
