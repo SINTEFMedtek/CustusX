@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxOpenIGTLinkTrackingSystemService.h"
 #include "cxtestQueuedSignalListener.h"
+#include "cxtestDirectSignalListener.h"
 #include "cxUtilHelpers.h"
 #include "cxReporter.h"
 
@@ -51,8 +52,9 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: Check that the plugin can connect a
 
     REQUIRE(service->getState() == cx::Tool::tsNONE);
 
+    cxtest::DirectSignalListener stateChanges(service.get(), SIGNAL(stateChanged()));
     service->setState(cx::Tool::tsCONFIGURED);
-    REQUIRE(cxtest::waitForQueuedSignal(service.get(), SIGNAL(stateChanged())));
+    REQUIRE(stateChanges.isReceived());
     REQUIRE(service->getState() == cx::Tool::tsCONFIGURED);
 
     service->setState(cx::Tool::tsINITIALIZED);
@@ -62,12 +64,12 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: Check that the plugin can connect a
     service->setState(cx::Tool::tsTRACKING);
     REQUIRE(cxtest::waitForQueuedSignal(service.get(), SIGNAL(stateChanged())));
 
-    //TODO change to get a packages signal????
     cx::sleep_ms(1000); //just let some packages arrive
 
     service->setState(cx::Tool::tsINITIALIZED);
-    REQUIRE(cxtest::waitForQueuedSignal(service.get(), SIGNAL(stateChanged())));
+    REQUIRE(cxtest::waitForQueuedSignal(service.get(), SIGNAL(stateChanged()), 400));
 
-    //service->setState(cx::Tool::tsNONE);
-    //REQUIRE(cxtest::waitForQueuedSignal(service.get(), SIGNAL(stateChanged())));
+    cxtest::DirectSignalListener stateChangesAgain(service.get(), SIGNAL(stateChanged()));
+    service->setState(cx::Tool::tsNONE);
+    REQUIRE(stateChangesAgain.isReceived());
 }
