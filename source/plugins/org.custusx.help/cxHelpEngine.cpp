@@ -62,6 +62,12 @@ HelpEngine::HelpEngine()
 	connect(qApp, SIGNAL(focusChanged(QWidget*, QWidget*)), this, SLOT(focusChanged(QWidget*, QWidget*)));
 }
 
+HelpEngine::~HelpEngine()
+{
+	delete helpEngine;
+//	std::cout << "HelpEngine::~HelpEngine()" << std::endl;
+}
+
 void HelpEngine::focusChanged(QWidget * old, QWidget * now)
 {
 	if (!now)
