@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXROUTETOTARGETFILTER_H
 #define CXROUTETOTARGETFILTER_H
 
-#include "cxPluginAlgorithmExport.h"
+#include "org_custusx_filter_routetotarget_Export.h"
 
 #include "cxPatientModelService.h"
 #include "cxFilterImpl.h"
@@ -53,7 +53,7 @@ namespace cx
 
 typedef boost::shared_ptr<class RouteToTarget> RouteToTargetPtr;
 
-class cxPluginAlgorithm_EXPORT RouteToTargetFilter : public FilterImpl
+class org_custusx_filter_routetotarget_EXPORT RouteToTargetFilter : public FilterImpl
 {
 	Q_OBJECT
 	Q_INTERFACES(cx::Filter)
