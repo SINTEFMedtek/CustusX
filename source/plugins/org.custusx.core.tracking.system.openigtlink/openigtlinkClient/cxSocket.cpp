@@ -1,0 +1,132 @@
+#include "cxSocket.h"
+
+#include <QTcpSocket>
+#include "cxLogger.h"
+
+namespace cx
+{
+
+Socket::Socket(QObject *parent) :
+    QObject(parent),
+    mConnected(false)
+{
+    qRegisterMetaType<QAbstractSocket::SocketError>("QAbstractSocket::SocketError");
+    qRegisterMetaType<QAbstractSocket::SocketState>("QAbstractSocket::SocketState");
+
+    mSocket = QTcpSocketPtr(new QTcpSocket(this));
+    connect(mSocket.get(), &QTcpSocket::connected, this, &Socket::receivedConnected);
+    connect(mSocket.get(), &QTcpSocket::disconnected, this, &Socket::receivedDisconnected);
+    //see http://stackoverflow.com/questions/26062397/qt-connect-function-signal-disambiguation-using-lambdas
+    void (QTcpSocket::* errorOverloaded)(QAbstractSocket::SocketError) = &QTcpSocket::error;
+    connect(mSocket.get(), errorOverloaded, this, &Socket::receivedError);
+    connect(mSocket.get(), &QTcpSocket::hostFound, this, &Socket::receivedHostFound);
+    connect(mSocket.get(), &QTcpSocket::stateChanged, this, &Socket::receivedStateChanged);
+    connect(mSocket.get(), &QTcpSocket::readyRead, this, &Socket::reveidReadyRead);
+}
+
+void Socket::requestConnectToHost(QString ip, int port) const
+{
+    mSocket->connectToHost(ip, port);
+}
+
+bool Socket::isConnected() const
+{
+    return mConnected;
+}
+
+QString Socket::getLastError() const
+{
+    return mSocket->errorString();
+}
+
+void Socket::requestCloseConnection() const
+{
+    mSocket->close();
+}
+
+bool Socket::minBytesAvailable(int bytes) const
+{
+    return mSocket->bytesAvailable() >= bytes;
+}
+
+qint64 Socket::read(char *data, qint64 maxSizeBytes) const
+{
+    return mSocket->read(data, maxSizeBytes);
+}
+
+qint64 Socket::skip(qint64 maxSizeBytes) const
+{
+    char *voidData = new char[maxSizeBytes];
+    int retval = mSocket->read(voidData, maxSizeBytes);
+    delete[] voidData;
+    return retval;
+}
+
+void Socket::receivedConnected()
+{
+    CX_LOG_DEBUG() << "Socket is connected to " << mSocket->peerName() << ":" << mSocket->peerPort();
+    mConnected = true;
+    emit connected();
+}
+
+void Socket::receivedDisconnected()
+{
+    mConnected = false;
+    emit disconnected();
+}
+
+void Socket::receivedError(QAbstractSocket::SocketError socketError)
+{
+    CX_LOG_ERROR() << QString("[%1] Socket error [code=%2]: %3")
+                       .arg(mSocket->peerName())
+                       .arg(QString::number(socketError))
+                       .arg(mSocket->errorString());
+}
+
+void Socket::receivedHostFound()
+{
+    CX_LOG_DEBUG() << "Socket found host.";
+}
+
+QString socketStateToString(QAbstractSocket::SocketState socketState)
+{
+    QString retval;
+    switch(socketState)
+    {
+        case QAbstractSocket::UnconnectedState:
+            retval = "UnconnectedState";
+            break;
+        case QAbstractSocket::HostLookupState:
+            retval = "HostLookupState";
+            break;
+        case QAbstractSocket::ConnectingState:
+            retval = "ConnectingState";
+            break;
+        case QAbstractSocket::ConnectedState:
+            retval = "ConnectedState";
+            break;
+        case QAbstractSocket::BoundState:
+            retval = "BoundState";
+            break;
+        case QAbstractSocket::ListeningState:
+            retval = "ListeningState";
+            break;
+        case QAbstractSocket::ClosingState:
+            retval = "ClosingState";
+            break;
+        default:
+            retval = "Unknown";
+    }
+    return retval;
+}
+
+void Socket::receivedStateChanged(QAbstractSocket::SocketState socketState)
+{
+    CX_LOG_DEBUG() <<  "Socket is now in state " << socketStateToString(socketState);
+}
+
+void Socket::reveidReadyRead()
+{
+    emit readyRead();
+}
+}//namespace cx

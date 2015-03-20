@@ -4,19 +4,23 @@ set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
 set(PLUGIN_SRCS
     cxOpenIGTLinkTrackingSystemPluginActivator.cpp
-    cxOpenIGTLinkTrackingSystemService.cpp
-    cxOpenIGTLinkClient.cpp
-    cxOpenIGTLinkTool.cpp
-    cxSocket.h
-    cxSocket.cpp
+
+    trackingSystemService/cxOpenIGTLinkTrackingSystemService.cpp
+    trackingSystemService/cxOpenIGTLinkTool.cpp
+
+    openigtlinkClient/cxSocket.cpp
+    openigtlinkClient/cxOpenIGTLinkClient.cpp
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
     cxOpenIGTLinkTrackingSystemPluginActivator.h
-    cxOpenIGTLinkTrackingSystemService.h
-    cxOpenIGTLinkClient.h
-    cxOpenIGTLinkTool.h
+
+    trackingSystemService/cxOpenIGTLinkTrackingSystemService.h
+    trackingSystemService/cxOpenIGTLinkTool.h
+
+    openigtlinkClient/cxSocket.h
+    openigtlinkClient/cxOpenIGTLinkClient.h
 )
 
 # Qt Designer files which should be processed by Qts uic
@@ -58,6 +62,10 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC
     .
     ${CMAKE_CURRENT_BINARY_DIR}
+    openigtlinkClient
+    trackingSystemService
+    streamingService
+    guiExtenderService
 )
 
 

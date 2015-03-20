@@ -50,22 +50,16 @@ std::vector<ToolPtr> toVector(std::map<QString, OpenIGTLinkToolPtr> map)
     return retval;
 }
 
-OpenIGTLinkTrackingSystemService::OpenIGTLinkTrackingSystemService() :
-    mState(Tool::tsNONE),
-    mIp("10.218.140.127"),
-    mPort(18944)
+OpenIGTLinkTrackingSystemService::OpenIGTLinkTrackingSystemService(OpenIGTLinkClient *client) :
+    mState(Tool::tsNONE)
 {
-    OpenIGTLinkClient *client = new OpenIGTLinkClient;
-    client->moveToThread(&mOpenIGTLinkThread);
-    connect(&mOpenIGTLinkThread, &QThread::finished, client, &QObject::deleteLater);
+    if(client == NULL)
+        return;
+
     connect(this, &OpenIGTLinkTrackingSystemService::connectToServer, client, &OpenIGTLinkClient::requestConnect);
     connect(this, &OpenIGTLinkTrackingSystemService::disconnectFromServer, client, &OpenIGTLinkClient::requestDisconnect);
-    connect(this, &OpenIGTLinkTrackingSystemService::startListenToServer, client, &OpenIGTLinkClient::requestStartProcessingMessages);
-    connect(this, &OpenIGTLinkTrackingSystemService::stopListenToServer, client, &OpenIGTLinkClient::requestStopProcessingMessages);
     connect(client, &OpenIGTLinkClient::connected, this, &OpenIGTLinkTrackingSystemService::serverIsConnected);
     connect(client, &OpenIGTLinkClient::disconnected, this, &OpenIGTLinkTrackingSystemService::serverIsDisconnected);
-    connect(client, &OpenIGTLinkClient::startedProcessingMessages, this, &OpenIGTLinkTrackingSystemService::serverStartedProcessingMessages);
-    connect(client, &OpenIGTLinkClient::stoppedProcessingMessages, this, &OpenIGTLinkTrackingSystemService::serverStoppedProcessingMessages);
     connect(client, &OpenIGTLinkClient::transform, this, &OpenIGTLinkTrackingSystemService::receiveTransform);
 }
 
@@ -134,15 +128,12 @@ void OpenIGTLinkTrackingSystemService::setLoggingFolder(QString loggingFolder)
 void OpenIGTLinkTrackingSystemService::configure()
 {
     CX_LOG_CHANNEL_DEBUG("janne beate ") << "configure";
-    mOpenIGTLinkThread.start();
     this->serverIsConfigured();
 }
 
 void OpenIGTLinkTrackingSystemService::deconfigure()
 {
     CX_LOG_CHANNEL_DEBUG("janne beate ") << "deconfigure";
-    mOpenIGTLinkThread.quit();
-    mOpenIGTLinkThread.wait();
     mTools.clear();
     mReference.reset();
     this->serverIsDeconfigured();
@@ -151,25 +142,27 @@ void OpenIGTLinkTrackingSystemService::deconfigure()
 void OpenIGTLinkTrackingSystemService::initialize()
 {
     CX_LOG_CHANNEL_DEBUG("janne beate ") << "initialize";
-    emit connectToServer(mIp, mPort);
+    //emit connectToServer();
 }
 
 void OpenIGTLinkTrackingSystemService::uninitialize()
 {
     CX_LOG_CHANNEL_DEBUG("janne beate ") << "uninitialize";
-    emit disconnectFromServer();
+    //emit disconnectFromServer();
 }
 
 void OpenIGTLinkTrackingSystemService::startTracking()
 {
     CX_LOG_CHANNEL_DEBUG("janne beate ") << "startTracking";
-    emit startListenToServer();
+    //emit startListenToServer();
+    emit connectToServer();
 }
 
 void OpenIGTLinkTrackingSystemService::stopTracking()
 {
     CX_LOG_CHANNEL_DEBUG("janne beate ") << "stopTracking";
-    emit stopListenToServer();
+    //emit stopListenToServer();
+    emit disconnectFromServer();
 }
 
 void OpenIGTLinkTrackingSystemService::serverIsConfigured()
@@ -185,20 +178,12 @@ void OpenIGTLinkTrackingSystemService::serverIsDeconfigured()
 void OpenIGTLinkTrackingSystemService::serverIsConnected()
 {
     this->internalSetState(Tool::tsINITIALIZED);
+    this->internalSetState(Tool::tsTRACKING);
 }
 
 void OpenIGTLinkTrackingSystemService::serverIsDisconnected()
 {
     this->internalSetState(Tool::tsCONFIGURED);
-}
-
-void OpenIGTLinkTrackingSystemService::serverStartedProcessingMessages()
-{
-    this->internalSetState(Tool::tsTRACKING);
-}
-
-void OpenIGTLinkTrackingSystemService::serverStoppedProcessingMessages()
-{
     this->internalSetState(Tool::tsINITIALIZED);
 }
 

@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ctkPluginActivator.h>
 #include "boost/shared_ptr.hpp"
+#include <QThread>
 
 namespace cx
 {
@@ -66,6 +67,9 @@ public:
 
 private:
     RegisteredServicePtr mRegistration;
+    QThread mOpenIGTLinkThread;
+    QString mIp;
+    int mPort;
 };
 
 } // namespace cx

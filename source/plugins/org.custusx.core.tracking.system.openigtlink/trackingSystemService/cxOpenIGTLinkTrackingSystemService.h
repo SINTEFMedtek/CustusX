@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-
+class OpenIGTLinkClient;
 typedef boost::shared_ptr<class OpenIGTLinkTool> OpenIGTLinkToolPtr;
 
 /**
@@ -57,7 +57,7 @@ class org_custusx_core_tracking_system_openigtlink_EXPORT OpenIGTLinkTrackingSys
     Q_INTERFACES(cx::TrackingSystemService)
 
 public:
-    OpenIGTLinkTrackingSystemService();
+    OpenIGTLinkTrackingSystemService(OpenIGTLinkClient *client);
     virtual ~OpenIGTLinkTrackingSystemService();
 
     virtual QString getUid() const;
@@ -70,11 +70,8 @@ public:
     virtual void setLoggingFolder(QString loggingFolder); ///<\param loggingFolder path to the folder where logs should be saved
 
 signals:
-    void connectToServer(QString ip, int port);
+    void connectToServer();
     void disconnectFromServer();
-    void startListenToServer();
-    void stopListenToServer();
-
 
 private slots:
     void configure(); ///< sets up the software
@@ -88,8 +85,6 @@ private slots:
     void serverIsDeconfigured();
     void serverIsConnected();
     void serverIsDisconnected();
-    void serverStartedProcessingMessages();
-    void serverStoppedProcessingMessages();
 
     void receiveTransform(QString devicename, Transform3D transform, double timestamp);
 
@@ -97,10 +92,7 @@ private:
     void internalSetState(Tool::State state);
     OpenIGTLinkToolPtr getTool(QString devicename);
 
-    QThread mOpenIGTLinkThread;
     Tool::State mState;
-    QString mIp;
-    int mPort;
     std::map<QString, OpenIGTLinkToolPtr> mTools;
     ToolPtr mReference;
 

@@ -36,12 +36,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 
 #include "cxOpenIGTLinkTrackingSystemService.h"
+#include "cxOpenIGTLinkClient.h"
 #include "cxRegisteredService.h"
 
 namespace cx
 {
 
-OpenIGTLinkTrackingSystemPluginActivator::OpenIGTLinkTrackingSystemPluginActivator()
+OpenIGTLinkTrackingSystemPluginActivator::OpenIGTLinkTrackingSystemPluginActivator():
+    mIp("10.218.140.127"),
+    mPort(18944)
 {}
 
 OpenIGTLinkTrackingSystemPluginActivator::~OpenIGTLinkTrackingSystemPluginActivator()
@@ -49,12 +52,24 @@ OpenIGTLinkTrackingSystemPluginActivator::~OpenIGTLinkTrackingSystemPluginActiva
 
 void OpenIGTLinkTrackingSystemPluginActivator::start(ctkPluginContext* context)
 {
-    OpenIGTLinkTrackingSystemService* service = new OpenIGTLinkTrackingSystemService();
+    OpenIGTLinkClient *client = new OpenIGTLinkClient;
+    client->setIpAndPort(mIp, mPort); //this is done before client is moved to another thread
+    client->moveToThread(&mOpenIGTLinkThread);
+    //todo deletelater vs quit/wait?
+    //connect(&mOpenIGTLinkThread, &QThread::finished, client, &QObject::deleteLater);
+
+    OpenIGTLinkTrackingSystemService* service = new OpenIGTLinkTrackingSystemService(client);
     mRegistration = RegisteredService::create<OpenIGTLinkTrackingSystemService>(context, service, TrackingSystemService_iid);
+
+
+    mOpenIGTLinkThread.start();
 }
 
 void OpenIGTLinkTrackingSystemPluginActivator::stop(ctkPluginContext* context)
 {
+    mOpenIGTLinkThread.quit();
+    mOpenIGTLinkThread.wait();
+
     mRegistration.reset();
     Q_UNUSED(context);
 }
