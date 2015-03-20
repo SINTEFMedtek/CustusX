@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRouteToTarget.h"
 #include "cxPatientModelService.h"
 #include "cxPointMetric.h"
-#include "cxLogicManager.h"
+#include "cxVisServices.h"
 #include "cxStringPropertySelectPointMetric.h"
 #include "cxPatientModelServiceProxy.h"
 
@@ -56,7 +56,7 @@ namespace cx
 {
 
 RouteToTargetFilter::RouteToTargetFilter(ctkPluginContext *pluginContext) :
-    FilterImpl(PatientModelServicePtr(new PatientModelServiceProxy(pluginContext)))
+	FilterImpl(VisServicesPtr(new VisServices(pluginContext)) )
 {
 	mRouteToTarget = RouteToTargetPtr(new RouteToTarget());
 }
@@ -90,13 +90,13 @@ void RouteToTargetFilter::createOptions()
 void RouteToTargetFilter::createInputTypes()
 {
 	StringPropertySelectMeshPtr centerline;
-	centerline = StringPropertySelectMesh::New(mPatientModelService);
+	centerline = StringPropertySelectMesh::New(mServices->patientModelService);
 	centerline->setValueName("Centerline");
 	centerline->setHelp("Select centerline");
 	mInputTypes.push_back(centerline);
 
 	StringPropertySelectPointMetricPtr targetPoint;
-	targetPoint = StringPropertySelectPointMetric::New(mPatientModelService);
+	targetPoint = StringPropertySelectPointMetric::New(mServices->patientModelService);
 	targetPoint->setValueName("Target point");
 	targetPoint->setHelp("Select point metric input");
 	connect(targetPoint.get(), SIGNAL(dataChanged(QString)), this, SLOT(pointMetricChangedSlot(QString)));
@@ -111,7 +111,7 @@ void RouteToTargetFilter::createOutputTypes()
 
 	StringPropertySelectMeshPtr tempMeshStringAdapter;
 
-	tempMeshStringAdapter = StringPropertySelectMesh::New(mPatientModelService);
+	tempMeshStringAdapter = StringPropertySelectMesh::New(mServices->patientModelService);
 	tempMeshStringAdapter->setValueName("Centerline mesh");
 	tempMeshStringAdapter->setHelp("Generated route to target mesh (vtk-format).");
 	mOutputTypes.push_back(tempMeshStringAdapter);
