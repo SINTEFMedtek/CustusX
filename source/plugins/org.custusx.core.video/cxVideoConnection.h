@@ -99,6 +99,7 @@ private slots:
 	void useUnusedProbeDataSlot();///< If no probe is available the ProbeData is saved and this slot is called when a probe becomes available
 
 private:
+	void cleanupAfterDisconnectServer();
 	StreamerServicePtr getStreamerInterface();
 	void updateImage(ImagePtr message); // called by receiving thread when new data arrives.
 	void runClient(ImageReceiverThreadPtr client);

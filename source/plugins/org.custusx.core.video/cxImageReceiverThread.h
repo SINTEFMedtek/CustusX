@@ -83,19 +83,12 @@ public:
 	virtual ProbeDefinitionPtr getLastSonixStatusMessage(); // threadsafe,Threadsafe retrieval of last status message.
 	virtual QString hostDescription() const; // threadsafe
 
-public slots:
-
 signals:
 	void imageReceived();
 	void sonixStatusReceived();
 	void fps(QString, double);
 	void connected(bool on);
-//	void stopInternal();
 	void failedToStart();
-
-
-//protected:
-//	virtual void run();
 
 protected:
 	/** Add the message to a thread-safe queue.
