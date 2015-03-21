@@ -128,14 +128,19 @@ class CustusXInstaller:
         
         retval = os.path.basename(installerFile)
 
-        #print "retval:", retval
+        print "retval1:", retval
         if retval.startswith(prefix):
             retval = retval[len(prefix): ] # remove prefix from start
-        #print "retval:", retval
+        print "retval2:", retval
         if retval.endswith(suffix):
             retval = retval[ : -len(suffix)] # remove suffix from end
-        #print "retval:", retval
-        retval = '_'.join(retval.split('_')[0:-1]) # remove platform_uid from end, if present (remove trailing _<stuff>)
+        print "retval3:", retval
+        retval_split = retval.split('_')
+        if len(retval_split)>1:
+            retval_split = retval_split[0:-1]
+        retval = '_'.join(retval_split) # remove platform_uid from end, if present (remove trailing _<stuff>)
+        #retval = '_'.join(retval.split('_')[0:-1]) # remove platform_uid from end, if present (remove trailing _<stuff>)
+        print "retval4:", retval
         return retval
 
     def _generateReleaseFolderName(self):
