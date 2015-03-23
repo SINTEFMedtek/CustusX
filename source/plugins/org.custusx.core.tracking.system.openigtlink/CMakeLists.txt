@@ -5,6 +5,9 @@ set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 set(PLUGIN_SRCS
     cxOpenIGTLinkTrackingSystemPluginActivator.cpp
 
+    guiExtenderService/cxOpenIGTLinkGuiExtenderService.cpp
+    guiExtenderService/cxOpenIGTLinkWidget.cpp
+
     trackingSystemService/cxOpenIGTLinkTrackingSystemService.cpp
     trackingSystemService/cxOpenIGTLinkTool.cpp
 
@@ -15,6 +18,9 @@ set(PLUGIN_SRCS
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
     cxOpenIGTLinkTrackingSystemPluginActivator.h
+
+    guiExtenderService/cxOpenIGTLinkGuiExtenderService.h
+    guiExtenderService/cxOpenIGTLinkWidget.h
 
     trackingSystemService/cxOpenIGTLinkTrackingSystemService.h
     trackingSystemService/cxOpenIGTLinkTool.h
@@ -36,9 +42,11 @@ set(PLUGIN_resources
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
     ${PLUGIN_target_libraries}
+    cxResourceWidgets
     cxResource
     cxPluginUtilities
     OpenIGTLink
+    cxGUIExtenderService
     )
 
 set(PLUGIN_OUTPUT_DIR "")

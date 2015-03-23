@@ -66,7 +66,7 @@ OpenIGTLinkTrackingSystemService::OpenIGTLinkTrackingSystemService(OpenIGTLinkCl
 OpenIGTLinkTrackingSystemService::~OpenIGTLinkTrackingSystemService()
 {
     this->deconfigure();
-    CX_LOG_CHANNEL_DEBUG("janne beate") << "shutting down opentigtlink thread and destructing OpenIGTLinkTrackingSystemService";
+    CX_LOG_CHANNEL_DEBUG("janne beate ") << "shutting down opentigtlink thread and destructing OpenIGTLinkTrackingSystemService";
 }
 
 QString OpenIGTLinkTrackingSystemService::getUid() const

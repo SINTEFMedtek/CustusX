@@ -30,49 +30,29 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXOPENIGTLINKTRACKINGSYSTEMPLUGINACTIVATOR_H_
-#define CXOPENIGTLINKTRACKINGSYSTEMPLUGINACTIVATOR_H_
 
-#include <ctkPluginActivator.h>
-#include "boost/shared_ptr.hpp"
-#include <QThread>
+#ifndef CXOPENIGTLINKGUIEXTENDERSERVICE_H
+#define CXOPENIGTLINKGUIEXTENDERSERVICE_H
+
+#include "org_custusx_core_tracking_system_openigtlink_Export.h"
+#include "cxGuiExtenderService.h"
 
 namespace cx
 {
+class OpenIGTLinkClient;
 
-typedef boost::shared_ptr<class OpenIGTLinkTrackingSystemService> OpenIGTLinkTrackingSystemServicePtr;
-typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
-
-/**
- * Activator for the OpenIGTLink tracker service
- *
- * \ingroup org_custusx_core_tracking_openigtlink
- *
- * \date 2015-03-03
- * \author Janne Beate Bakeng
- */
-class OpenIGTLinkTrackingSystemPluginActivator :  public QObject, public ctkPluginActivator
+class org_custusx_core_tracking_system_openigtlink_EXPORT OpenIGTLinkGuiExtenderService : public GUIExtenderService
 {
-    Q_OBJECT
-    Q_INTERFACES(ctkPluginActivator)
-    Q_PLUGIN_METADATA(IID "org_custusx_core_tracking_system_openigtlink")
-
 public:
+    OpenIGTLinkGuiExtenderService(OpenIGTLinkClient *client = NULL);
+    virtual ~OpenIGTLinkGuiExtenderService();
 
-    OpenIGTLinkTrackingSystemPluginActivator();
-    ~OpenIGTLinkTrackingSystemPluginActivator();
-
-    void start(ctkPluginContext* context);
-    void stop(ctkPluginContext* context);
+    std::vector<CategorizedWidget> createWidgets() const;
 
 private:
-    RegisteredServicePtr mRegistrationGui;
-    RegisteredServicePtr mRegistrationTracking;
-    QThread mOpenIGTLinkThread;
-    QString mIp;
-    int mPort;
+    GUIExtenderService::CategorizedWidget mWidget;
 };
+typedef boost::shared_ptr<OpenIGTLinkGuiExtenderService> OpenIGTLinkGuiExtenderServicePtr;
 
-} // namespace cx
-
-#endif /* CXOPENIGTLINKTRACKINGSYSTEMPLUGINACTIVATOR_H_ */
+}
+#endif //CXOPENIGTLINKGUIEXTENDERSERVICE_H

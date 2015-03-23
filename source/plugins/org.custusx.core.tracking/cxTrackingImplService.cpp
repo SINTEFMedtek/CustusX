@@ -246,22 +246,15 @@ void TrackingImplService::onTrackingSystemModified(TrackingSystemService* servic
 
 void TrackingImplService::rebuildCachedTools()
 {
-    CX_LOG_CHANNEL_DEBUG("janne beate ") << "START";
-	mTools.clear();
-	for (unsigned i=0; i<mTrackingSystems.size(); ++i)
-	{
-		this->addToolsFrom(mTrackingSystems[i]);
-	}
-    CX_LOG_CHANNEL_DEBUG("janne beate ") << "1";
-	mTools[mManualTool->getUid()] = mManualTool;
-    CX_LOG_CHANNEL_DEBUG("janne beate ") << "2";
-	this->imbueManualToolWithRealProperties();
-    CX_LOG_CHANNEL_DEBUG("janne beate ") << "3";
-	this->setActiveTool(this->getManualTool()->getUid());
-    CX_LOG_CHANNEL_DEBUG("janne beate ") << "4";
-	this->loadPositionHistory(); // the tools are always reconfigured after a setloggingfolder
-    CX_LOG_CHANNEL_DEBUG("janne beate ") << "END";
-//	reportSuccess("ToolManager is set to state ...");
+    mTools.clear();
+    for (unsigned i=0; i<mTrackingSystems.size(); ++i)
+    {
+        this->addToolsFrom(mTrackingSystems[i]);
+    }
+    mTools[mManualTool->getUid()] = mManualTool;
+    this->imbueManualToolWithRealProperties();
+    this->setActiveTool(this->getManualTool()->getUid());
+    this->loadPositionHistory(); // the tools are always reconfigured after a setloggingfolder
 }
 
 void TrackingImplService::imbueManualToolWithRealProperties()

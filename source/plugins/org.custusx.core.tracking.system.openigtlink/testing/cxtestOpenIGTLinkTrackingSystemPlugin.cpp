@@ -37,10 +37,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxUtilHelpers.h"
 #include "cxReporter.h"
 #include "cxOpenIGTLinkClient.h"
+#include "cxOpenIGTLinkGuiExtenderService.h"
 
-TEST_CASE("OpenIGTLinkTrackingSystemService: Check that the service can be created and destroyed", "[unit][plugins][org.custusx.core.tracking.system.openigtlink]")
+TEST_CASE("OpenIGTLinkTrackingSystemService: Check that the openigtlink tracking service can be created and destroyed", "[unit][plugins][org.custusx.core.tracking.system.openigtlink]")
 {
     cx::OpenIGTLinkTrackingSystemServicePtr service = cx::OpenIGTLinkTrackingSystemServicePtr(new cx::OpenIGTLinkTrackingSystemService(NULL));
+    REQUIRE(service);
+    CHECK(service.unique());
+    service.reset();
+}
+
+TEST_CASE("OpenIGTLinkGuiExtender: Check that the openigtlink gui extender service can be created and destroyed", "[unit][org.custusx.core.tracking.system.openigtlink]")
+{
+    cx::OpenIGTLinkGuiExtenderServicePtr service = cx::OpenIGTLinkGuiExtenderServicePtr(new cx::OpenIGTLinkGuiExtenderService(NULL));
     REQUIRE(service);
     CHECK(service.unique());
     service.reset();
