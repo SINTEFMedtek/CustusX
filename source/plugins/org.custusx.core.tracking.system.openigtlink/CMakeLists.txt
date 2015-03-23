@@ -11,6 +11,8 @@ set(PLUGIN_SRCS
     trackingSystemService/cxOpenIGTLinkTrackingSystemService.cpp
     trackingSystemService/cxOpenIGTLinkTool.cpp
 
+    streamerService/cxOpenIGTLinkStreamerService.cpp
+
     openigtlinkClient/cxSocket.cpp
     openigtlinkClient/cxOpenIGTLinkClient.cpp
 )
@@ -24,6 +26,8 @@ set(PLUGIN_MOC_SRCS
 
     trackingSystemService/cxOpenIGTLinkTrackingSystemService.h
     trackingSystemService/cxOpenIGTLinkTool.h
+
+    streamerService/cxOpenIGTLinkStreamerService.h
 
     openigtlinkClient/cxSocket.h
     openigtlinkClient/cxOpenIGTLinkClient.h
@@ -72,7 +76,7 @@ target_include_directories(${PROJECT_NAME}
     ${CMAKE_CURRENT_BINARY_DIR}
     openigtlinkClient
     trackingSystemService
-    streamingService
+    streamerService
     guiExtenderService
 )
 

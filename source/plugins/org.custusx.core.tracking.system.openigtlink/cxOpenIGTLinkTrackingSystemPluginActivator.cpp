@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtPlugin>
 #include <iostream>
 
+#include "cxOpenIGTLinkStreamerService.h"
 #include "cxOpenIGTLinkTrackingSystemService.h"
 #include "cxOpenIGTLinkGuiExtenderService.h"
 #include "cxOpenIGTLinkClient.h"
@@ -59,9 +60,11 @@ void OpenIGTLinkTrackingSystemPluginActivator::start(ctkPluginContext* context)
 
     OpenIGTLinkGuiExtenderService* gui = new OpenIGTLinkGuiExtenderService(client);
     OpenIGTLinkTrackingSystemService* tracking = new OpenIGTLinkTrackingSystemService(client);
+    OpenIGTLinkStreamerService *streamer = new OpenIGTLinkStreamerService(client);
 
     mRegistrationGui = RegisteredService::create<OpenIGTLinkGuiExtenderService>(context, gui, GUIExtenderService_iid);
     mRegistrationTracking = RegisteredService::create<OpenIGTLinkTrackingSystemService>(context, tracking, TrackingSystemService_iid);
+    mRegistrationStreaming = RegisteredService::create<OpenIGTLinkStreamerService>(context, streamer, StreamerService_iid);
 
     mOpenIGTLinkThread.start();
 }
@@ -73,6 +76,7 @@ void OpenIGTLinkTrackingSystemPluginActivator::stop(ctkPluginContext* context)
 
     mRegistrationGui.reset();
     mRegistrationTracking.reset();
+    mRegistrationStreaming.reset();
     Q_UNUSED(context);
 }
 

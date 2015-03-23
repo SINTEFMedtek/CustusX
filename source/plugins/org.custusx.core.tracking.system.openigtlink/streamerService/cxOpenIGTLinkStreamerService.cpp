@@ -30,50 +30,37 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXOPENIGTLINKTRACKINGSYSTEMPLUGINACTIVATOR_H_
-#define CXOPENIGTLINKTRACKINGSYSTEMPLUGINACTIVATOR_H_
-
-#include <ctkPluginActivator.h>
-#include "boost/shared_ptr.hpp"
-#include <QThread>
+#include "cxOpenIGTLinkStreamerService.h"
+#include "cxOpenIGTLinkClient.h"
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class OpenIGTLinkTrackingSystemService> OpenIGTLinkTrackingSystemServicePtr;
-typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
-
-/**
- * Activator for the OpenIGTLink tracker service
- *
- * \ingroup org_custusx_core_tracking_openigtlink
- *
- * \date 2015-03-03
- * \author Janne Beate Bakeng
- */
-class OpenIGTLinkTrackingSystemPluginActivator :  public QObject, public ctkPluginActivator
+OpenIGTLinkStreamerService::OpenIGTLinkStreamerService(OpenIGTLinkClient *client)
 {
-    Q_OBJECT
-    Q_INTERFACES(ctkPluginActivator)
-    Q_PLUGIN_METADATA(IID "org_custusx_core_tracking_system_openigtlink")
 
-public:
+}
 
-    OpenIGTLinkTrackingSystemPluginActivator();
-    ~OpenIGTLinkTrackingSystemPluginActivator();
+OpenIGTLinkStreamerService::~OpenIGTLinkStreamerService()
+{
 
-    void start(ctkPluginContext* context);
-    void stop(ctkPluginContext* context);
+}
 
-private:
-    RegisteredServicePtr mRegistrationGui;
-    RegisteredServicePtr mRegistrationTracking;
-    RegisteredServicePtr mRegistrationStreaming;
-    QThread mOpenIGTLinkThread;
-    QString mIp;
-    int mPort;
-};
+QString OpenIGTLinkStreamerService::getName()
+{
+    return "OpenIGTLink streamer";
+}
 
-} // namespace cx
+std::vector<PropertyPtr> OpenIGTLinkStreamerService::getSettings(QDomElement root)
+{
+    std::vector<PropertyPtr> retval;
+    return retval;
+}
 
-#endif /* CXOPENIGTLINKTRACKINGSYSTEMPLUGINACTIVATOR_H_ */
+StreamerPtr OpenIGTLinkStreamerService::createStreamer(QDomElement root)
+{
+    StreamerPtr retval;
+    return retval;
+}
+
+} //namespace cx

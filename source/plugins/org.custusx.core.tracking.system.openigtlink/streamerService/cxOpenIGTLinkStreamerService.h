@@ -30,50 +30,27 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXOPENIGTLINKTRACKINGSYSTEMPLUGINACTIVATOR_H_
-#define CXOPENIGTLINKTRACKINGSYSTEMPLUGINACTIVATOR_H_
+#ifndef CXOPENIGTLINKSTREAMERSERVICE_H
+#define CXOPENIGTLINKSTREAMERSERVICE_H
 
-#include <ctkPluginActivator.h>
-#include "boost/shared_ptr.hpp"
-#include <QThread>
+#include "org_custusx_core_tracking_system_openigtlink_Export.h"
+#include "cxStreamerService.h"
 
 namespace cx
 {
+class OpenIGTLinkClient;
 
-typedef boost::shared_ptr<class OpenIGTLinkTrackingSystemService> OpenIGTLinkTrackingSystemServicePtr;
-typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
-
-/**
- * Activator for the OpenIGTLink tracker service
- *
- * \ingroup org_custusx_core_tracking_openigtlink
- *
- * \date 2015-03-03
- * \author Janne Beate Bakeng
- */
-class OpenIGTLinkTrackingSystemPluginActivator :  public QObject, public ctkPluginActivator
+class org_custusx_core_tracking_system_openigtlink_EXPORT OpenIGTLinkStreamerService : public StreamerService
 {
-    Q_OBJECT
-    Q_INTERFACES(ctkPluginActivator)
-    Q_PLUGIN_METADATA(IID "org_custusx_core_tracking_system_openigtlink")
-
 public:
+    OpenIGTLinkStreamerService(OpenIGTLinkClient *client);
+    ~OpenIGTLinkStreamerService();
 
-    OpenIGTLinkTrackingSystemPluginActivator();
-    ~OpenIGTLinkTrackingSystemPluginActivator();
-
-    void start(ctkPluginContext* context);
-    void stop(ctkPluginContext* context);
-
-private:
-    RegisteredServicePtr mRegistrationGui;
-    RegisteredServicePtr mRegistrationTracking;
-    RegisteredServicePtr mRegistrationStreaming;
-    QThread mOpenIGTLinkThread;
-    QString mIp;
-    int mPort;
+    virtual QString getName();
+    virtual std::vector<PropertyPtr> getSettings(QDomElement root);
+    virtual StreamerPtr createStreamer(QDomElement root);
 };
 
-} // namespace cx
+} //namespace cx
 
-#endif /* CXOPENIGTLINKTRACKINGSYSTEMPLUGINACTIVATOR_H_ */
+#endif //CXOPENIGTLINKSTREAMERSERVICE_H
