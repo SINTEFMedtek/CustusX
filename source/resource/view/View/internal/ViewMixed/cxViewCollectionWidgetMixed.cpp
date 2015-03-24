@@ -132,12 +132,13 @@ void ViewCollectionWidgetMixed::setModified()
 void ViewCollectionWidgetMixed::render()
 {
 	mBaseLayout->render();
-	report_gl_error_text(cstring_cast(QString("During rendering of base view")));
+    //this creates a crash on MacBook Pro 15-inch, late 2011, 10.9.5 with AMD Radeon HD6770M
+    //report_gl_error_text(cstring_cast(QString("During rendering of base view")));
 
 	for (unsigned i=0; i<mOverlays.size(); ++i)
 	{
 		mOverlays[i]->render();
-		report_gl_error_text(cstring_cast(QString("During rendering of: ") + mOverlays[i]->getView()->getName()));
+        report_gl_error_text(cstring_cast(QString("During rendering of: ") + mOverlays[i]->getView()->getName()));
 	}
 }
 
