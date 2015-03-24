@@ -153,9 +153,6 @@ void GetRandomTestMatrix(igtl::Matrix4x4& matrix)
 namespace cx
 {
 ImageStreamerOpenCV::ImageStreamerOpenCV()
-//	ImageStreamer(parent),
-//	mSendTimer(0),
-//	mGrabTimer(0)
 {
 	mGrabbing = false;
 	mAvailableImage = false;
@@ -164,8 +161,6 @@ ImageStreamerOpenCV::ImageStreamerOpenCV()
 #ifdef CX_USE_OpenCV
 	mVideoCapture.reset(new cv::VideoCapture());
 #endif
-//	mGrabTimer = new QTimer(this);
-//	connect(mGrabTimer, SIGNAL(timeout()), this, SLOT(grab())); // this signal will be executed in the thread of THIS, i.e. the main thread.
 	mSendTimer = new QTimer(this);
 	connect(mSendTimer, SIGNAL(timeout()), this, SLOT(send())); // this signal will be executed in the thread of THIS, i.e. the main thread.
 }
@@ -203,10 +198,6 @@ void ImageStreamerOpenCV::deinitialize_local()
 
 void ImageStreamerOpenCV::initialize_local()
 {
-//	for (StringMap::iterator i=mArguments.begin(); i!=mArguments.end(); ++i)
-//	{
-//		std::cout << "A: " << i->first << " = " << i->second << std::endl;
-//	}
 
 	if (!mArguments.count("videoport"))
 		mArguments["videoport"] = "0";
@@ -277,18 +268,14 @@ bool ImageStreamerOpenCV::startStreaming(SenderPtr sender)
 	this->initialize_local();
 
 	if (!mSendTimer)
-//	if (!mGrabTimer || !mSendTimer)
 	{
 		std::cout << "ImageStreamerOpenCV: Failed to start streaming: Not initialized." << std::endl;
 		return false;
 	}
 
 	mSender = sender;
-//	mGrabTimer->start(0);
 	mSendTimer->start(getSendInterval());
 	this->continousGrabEvent(); // instead of grabtimer
-//	mCounter.start();
-//	std::cout << "*** ImageStreamerOpenCV: Started" << std::endl;
 
 	return true;
 }
@@ -296,9 +283,7 @@ bool ImageStreamerOpenCV::startStreaming(SenderPtr sender)
 void ImageStreamerOpenCV::stopStreaming()
 {
 	if (!mSendTimer)
-//	if (!mGrabTimer || !mSendTimer)
 		return;
-//	mGrabTimer->stop();
 	mSendTimer->stop();
 	mSender.reset();
 

@@ -119,12 +119,10 @@ private:
 	void initialize_local();
 	void deinitialize_local();
 
-//	QTimer* mGrabTimer;
 	QSize mRescaleSize;
 
 	VideoCapturePtr mVideoCapture; // OpenCV video grabber
 	QDateTime mLastGrabTime;
-//	QTime mCounter;
 	bool mAvailableImage;
 	bool mGrabbing;
 
