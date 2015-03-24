@@ -142,6 +142,9 @@ class Controller(cxJenkinsBuildScriptBase.Controller):
             self.controlData().setBuildType("Debug")
             self.controlData().mCoverage = True
 
+            # build often fails due to failure to read gcno files in the build folder..
+            # solve by clearing contents, this is faster than clearing entire workspace.
+            self.cxBuilder.deleteCustusXBuildFolder() 
             self.cxBuilder.buildAllComponents()
             self.cxBuilder.resetCoverage()
             self.cxBuilder.runUnitTests()
