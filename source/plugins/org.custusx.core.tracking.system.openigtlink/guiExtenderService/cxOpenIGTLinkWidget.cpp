@@ -36,15 +36,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxOpenIGTLinkClient.h"
 #include "cxHelperWidgets.h"
 #include "cxProfile.h"
+#include "cxLogger.h"
 
 namespace cx {
 
 OpenIGTLinkWidget::OpenIGTLinkWidget(OpenIGTLinkClient *client, QWidget *parent) :
     BaseWidget(parent, "OpenIGTLinkWidget", "OpenIGTLink Connection")
 {
-    QDomElement element = profile()->getXmlSettings().descend("openigtlink").getElement();
-    StringPropertyBasePtr ip = this->getIpOption(element);
-    DoublePropertyBasePtr port = this->getPortOption(element);
+    XmlOptionFile options = profile()->getXmlSettings().descend("OpenIGTLinkWidget");
+    mOptionsElement = options.getElement();
+    StringPropertyBasePtr ip = this->getIpOption(mOptionsElement);
+    DoublePropertyBasePtr port = this->getPortOption(mOptionsElement);
 
     mConnectButton = new QPushButton("Connect", this);
     mConnectButton->setCheckable(true);
@@ -101,12 +103,12 @@ void OpenIGTLinkWidget::clientDisconnected()
 
 void OpenIGTLinkWidget::connectButtonClicked(bool checked)
 {
-    QDomElement element = profile()->getXmlSettings().descend("openigtlink").getElement();
-    StringPropertyBasePtr ip = this->getIpOption(element);
-    DoublePropertyBasePtr port = this->getPortOption(element);
+    StringPropertyBasePtr ip = this->getIpOption(mOptionsElement);
+    DoublePropertyBasePtr port = this->getPortOption(mOptionsElement);
 
     if(checked)
     {
+        CX_LOG_CHANNEL_DEBUG("janne beate ") << "Widget requesting to connect to " << ip->getValue() << ":" << port->getValue();
         emit ipAndPort(ip->getValue(), port->getValue());
         emit requestConnect();
         mConnectButton->setText("Trying to connect...");

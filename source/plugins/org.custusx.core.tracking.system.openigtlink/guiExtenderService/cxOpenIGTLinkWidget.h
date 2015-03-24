@@ -67,6 +67,7 @@ private:
     StringPropertyBasePtr getIpOption(QDomElement root);
     DoublePropertyBasePtr getPortOption(QDomElement root);
 
+    QDomElement mOptionsElement;
     QPushButton *mConnectButton;
 };
 
