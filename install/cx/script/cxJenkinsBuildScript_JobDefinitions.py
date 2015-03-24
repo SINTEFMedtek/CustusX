@@ -148,6 +148,8 @@ class Controller(cxJenkinsBuildScriptBase.Controller):
             self.cxBuilder.generateCoverageReport()
             self.cxBuilder.runCppCheck()
             self.cxBuilder.runLineCounter()
+            self.cxBuilder.publishCoverageInfo(targetFolder = "nightly")        
+
             self.cxBuilder.finish()
 
     def try_job_release(self):
