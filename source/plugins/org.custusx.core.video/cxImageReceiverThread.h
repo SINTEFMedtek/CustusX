@@ -83,12 +83,15 @@ public:
 	virtual ProbeDefinitionPtr getLastSonixStatusMessage(); // threadsafe,Threadsafe retrieval of last status message.
 	virtual QString hostDescription() const; // threadsafe
 
+public slots:
+	void initialize(); // not threadsafe, call via postevent
+	void shutdown(); // not threadsafe, call via postevent
+
 signals:
 	void imageReceived();
 	void sonixStatusReceived();
 	void fps(QString, double);
-	void connected(bool on);
-	void failedToStart();
+	void finished(); // emitted when object has completed shutdown
 
 protected:
 	/** Add the message to a thread-safe queue.
@@ -102,8 +105,6 @@ protected:
 	void calibrateTimeStamp(ImagePtr imgMsg); ///< Calibrate the time stamps of the incoming message based on the computer clock. Calibration is based on an average of several of the last messages. The calibration is updated every 20-30 sec.
 
 private slots:
-	void initialize();
-	void shutdown();
 
 	void addImageToQueueSlot();
 	void addSonixStatusToQueueSlot();
@@ -111,6 +112,7 @@ private slots:
 private:
 	void reportFPS(QString streamUid);
 	bool imageComesFromSonix(ImagePtr imgMsg);
+	bool attemptInitialize();
 
 	std::map<QString, cx::CyclicActionLoggerPtr> mFPSTimer;
 	QMutex mImageMutex;

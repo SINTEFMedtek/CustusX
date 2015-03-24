@@ -72,6 +72,18 @@ ImageReceiverThread::ImageReceiverThread(StreamerServicePtr streamerInterface, Q
 
 void ImageReceiverThread::initialize()
 {
+	if (!this->attemptInitialize())
+	{
+		// cleanup here in order to do less in the destructor... ??
+		mImageStreamer.reset();
+		mSender.reset();
+
+		emit finished();
+	}
+}
+
+bool ImageReceiverThread::attemptInitialize()
+{
 	XmlOptionFile xmlFile = profile()->getXmlSettings().descend("video");
 	QDomElement element = xmlFile.getElement("video");
 	mImageStreamer = mStreamerInterface->createStreamer(element);
@@ -79,8 +91,7 @@ void ImageReceiverThread::initialize()
 
 	if(!mImageStreamer)
 	{
-		emit failedToStart();
-		return;
+		return false;
 	}
 	mSender.reset(new DirectlyLinkedSender());
 
@@ -89,10 +100,10 @@ void ImageReceiverThread::initialize()
 
 	if(!mImageStreamer->startStreaming(mSender))
 	{
-		emit failedToStart();
-		return;
+		return false;
 	}
-	emit connected(true);
+
+	return true;
 }
 
 void ImageReceiverThread::shutdown()
@@ -104,8 +115,9 @@ void ImageReceiverThread::shutdown()
 		report(QString("Stopped streamer: [%1]").arg(mImageStreamer->getType()));
 		mImageStreamer.reset();
 		mSender.reset();
-		emit connected(false);
 	}
+
+	emit finished();
 }
 
 void ImageReceiverThread::addImageToQueueSlot()
