@@ -78,6 +78,20 @@ TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Use digital video setting", "[uni
 	CHECK(mProbe->getConfigId().compare("Digital") == 0);
 }
 
+TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Use digital video setting with no RT source", "[unit][service][tracking]")
+{
+	testProbeWithNoRTSource();
+	CHECK(!mProbe->getProbeData().getUseDigitalVideo());
+	INFO(mProbe->getRtSourceName().toStdString());
+	CHECK(mProbe->getRtSourceName().compare(mDefaultRtSourceName) == 0);
+	cx::ProbeDefinition data = mProbe->getProbeData();
+	data.setUseDigitalVideo(true);
+	mProbe->setProbeSector(data);
+	CHECK(mProbe->getProbeData().getUseDigitalVideo());
+	CHECK(mProbe->getRtSourceName().compare("Digital") == 0);
+	CHECK(mProbe->getConfigId().compare("Digital") == 0);
+}
+
 TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Use VideoSource", "[unit][service][tracking]")
 {
 	CHECK(!mProbe->getRTSource());

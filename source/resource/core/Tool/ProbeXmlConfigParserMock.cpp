@@ -35,8 +35,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStringList>
 #include <iostream>
 
-ProbeXmlConfigParserMock::ProbeXmlConfigParserMock(QString& pathToXml) :
-	mFileName(pathToXml)
+ProbeXmlConfigParserMock::ProbeXmlConfigParserMock(QString& pathToXml, bool provideRTSource) :
+	mFileName(pathToXml),
+	mProvideRTSource(provideRTSource)
 {}
 
 ProbeXmlConfigParserMock::~ProbeXmlConfigParserMock()
@@ -72,7 +73,8 @@ QStringList ProbeXmlConfigParserMock::getProbeList(QString scanner)
 QStringList ProbeXmlConfigParserMock::getRtSourceList(QString scanner, QString probe)
 {
 	QStringList retval;
-	retval << "DummySource";
+	if (mProvideRTSource)
+		retval << "DummySource";
 	return retval;
 }
 
