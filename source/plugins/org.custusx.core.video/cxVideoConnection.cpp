@@ -137,13 +137,13 @@ void VideoConnection::runDirectLinkClient(StreamerService* service)
 	mThread->setObjectName("org.custusx.core.video.imagereceiver");
 	mClient->moveToThread(mThread);
 
-	connect(mThread, &QThread::started, this, &VideoConnection::onConnected);
-	connect(mThread, &QThread::started, mClient, &ImageReceiverThread::initialize);
+    connect(mThread.data(), &QThread::started, this, &VideoConnection::onConnected);
+    connect(mThread.data(), &QThread::started, mClient.data(), &ImageReceiverThread::initialize);
 
-	connect(mClient, &ImageReceiverThread::finished, mThread, &QThread::quit);
-	connect(mClient, &ImageReceiverThread::finished, mClient, &ImageReceiverThread::deleteLater);
-	connect(mThread, &QThread::finished, this, &VideoConnection::onDisconnected);
-	connect(mThread, &QThread::finished, mThread, &QThread::deleteLater);
+    connect(mClient.data(), &ImageReceiverThread::finished, mThread.data(), &QThread::quit);
+    connect(mClient.data(), &ImageReceiverThread::finished, mClient.data(), &ImageReceiverThread::deleteLater);
+    connect(mThread.data(), &QThread::finished, this, &VideoConnection::onDisconnected);
+    connect(mThread.data(), &QThread::finished, mThread.data(), &QThread::deleteLater);
 
 	mThread->start();
 }
