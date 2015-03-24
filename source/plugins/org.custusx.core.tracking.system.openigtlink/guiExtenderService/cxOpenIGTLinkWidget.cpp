@@ -116,7 +116,7 @@ void OpenIGTLinkWidget::connectButtonClicked(bool checked)
     }
     else
     {
-        emit disconnect();
+        emit requestDisconnect();
         mConnectButton->setText("Trying to disconnect...");
         mConnectButton->setEnabled(false);
     }
