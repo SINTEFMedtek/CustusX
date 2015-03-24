@@ -213,6 +213,11 @@ class CustusXBuilder:
         transfer.copyFolderContentsToRemoteServer(source, target_path);
         transfer.close()
 
+    def deleteCustusXBuildFolder(self):
+        PrintFormatter.printHeader('Delete all contents of CustusX build folder', level=3)
+        custusx = self._createComponent(cxComponents.CustusX)
+        buildDir = custusx.buildPath()
+        shell.run('rm -rf %s' % buildDir)
 
     def resetCoverage(self):
         '''
