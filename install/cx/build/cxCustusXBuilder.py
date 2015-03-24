@@ -183,15 +183,28 @@ class CustusXBuilder:
         PrintFormatter.printHeader('Publish Developer Docs to server', level=2)
         target = self.assembly.controlData.publish_developer_documentation_target
         custusx = self._createComponent(cxComponents.CustusX)
-        cmd = 'scp -r %s/doc/html_dev/* %s'
-        shell.run(cmd % (custusx.buildPath(), target.get_scp_target_string()+"/"+targetFolder))
+        source = '%s/doc/html_dev' %  custusx.buildPath()
+        target_path = '%s/%s' % (target.path, targetFolder)        
+        self.publish(source, target.server, target.user, target_path)
 
     def publishUserDocs(self, targetFolder):
         PrintFormatter.printHeader('Publish User Docs to server', level=2)
         target = self.assembly.controlData.publish_user_documentation_target
         custusx = self._createComponent(cxComponents.CustusX)
-        cmd = 'scp -r %s/doc/html_pure/* %s'
-        shell.run(cmd % (custusx.buildPath(), target.get_scp_target_string()+"/"+targetFolder))
+        source = '%s/doc/html_pure' %  custusx.buildPath()
+        target_path = '%s/%s' % (target.path, targetFolder)        
+        self.publish(source, target.server, target.user, target_path)
+
+    def publish(self, source, server, user, target_path):
+        PrintFormatter.printInfo('Publishing contents of [%s] to server [%s], remote path [%s]' % (source, server, target_path))
+
+        transfer = cx.utils.cxSSH.RemoteFileTransfer()
+        transfer.connect(server, user)
+        #transfer.remote_mkdir(targetBasePath)
+        #transfer.remote_rmdir(target_path) # remove old content if any
+        transfer.copyFolderContentsToRemoteServer(source, target_path);
+        transfer.close()
+
 
     def resetCoverage(self):
         '''

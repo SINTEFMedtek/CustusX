@@ -39,25 +39,40 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QFileInfo>
 #include <QApplication>
 #include <QWidget>
+#include "cxLogger.h"
+#include "cxProfile.h"
 
 namespace cx
 {
 
 HelpEngine::HelpEngine()
 {
-		QString helpFile = DataLocations::getDocPath()+"/cx_user_doc.qhc";
-		helpEngine = new QHelpEngine(helpFile, NULL);
-		helpEngine->setupData();
+	QString helpFile = profile()->getPath() + "/cx_user_doc.qhc";
+	helpEngine = new QHelpEngine(helpFile, NULL);
+	bool success = helpEngine->setupData();
+	//		CX_LOG_CHANNEL_DEBUG("CA") << "Regdocs loaded: " << helpEngine->registeredDocumentations().join("--");
 
-		connect(qApp, SIGNAL(focusObjectChanged(QObject*)), this, SLOT(focusObjectChanged(QObject*)));
-		connect(qApp, SIGNAL(focusChanged(QWidget*, QWidget*)), this, SLOT(focusChanged(QWidget*, QWidget*)));
+	QString docFile = DataLocations::getDocPath()+"/cx_user_doc.qch";
+	helpEngine->registerDocumentation(docFile);
+	//		CX_LOG_CHANNEL_DEBUG("CA") << "Setup help data: " << success << " - " << docFile;
+	//		CX_LOG_CHANNEL_DEBUG("CA") << "Last help error: " << helpEngine->error();
+	//		CX_LOG_CHANNEL_DEBUG("CA") << "Regdocs: " << helpEngine->registeredDocumentations().join("--");
+
+	connect(qApp, SIGNAL(focusObjectChanged(QObject*)), this, SLOT(focusObjectChanged(QObject*)));
+	connect(qApp, SIGNAL(focusChanged(QWidget*, QWidget*)), this, SLOT(focusChanged(QWidget*, QWidget*)));
+}
+
+HelpEngine::~HelpEngine()
+{
+	delete helpEngine;
+//	std::cout << "HelpEngine::~HelpEngine()" << std::endl;
 }
 
 void HelpEngine::focusChanged(QWidget * old, QWidget * now)
 {
 	if (!now)
 		return;
-//	std::cout << "new widget focus: " << now->objectName() << std::endl;
+	//	std::cout << "new widget focus: " << now->objectName() << std::endl;
 
 }
 
@@ -65,11 +80,11 @@ void HelpEngine::focusObjectChanged(QObject* newFocus)
 {
 	if (!newFocus)
 		return;
-//	std::cout << "HelpEngine::focusObjectChanged " << newFocus->objectName() << " -- " << dynamic_cast<QWidget*>(newFocus)->windowTitle() << std::endl;
+//		std::cout << "HelpEngine::focusObjectChanged " << newFocus->objectName() << " -- " << dynamic_cast<QWidget*>(newFocus)->windowTitle() << std::endl;
 	QString keyword = this->findBestMatchingKeyword(newFocus);
 	if (!keyword.isEmpty())
 	{
-//		std::cout << "******** keyword: " << keyword << std::endl;
+//				std::cout << "******** keyword: " << keyword << std::endl;
 		emit keywordActivated(keyword);
 	}
 }
@@ -125,7 +140,7 @@ QString HelpEngine::findBestMatchingKeyword(QObject* object)
 	while (object)
 	{
 		QString id = this->convertToKeyword(object->objectName());
-//		std::cout << "    examining " << object->objectName() << ", keyword = " << id << std::endl;
+//				std::cout << "    examining " << object->objectName() << ", keyword = " << id << std::endl;
 
 		if (id.contains("help_widget"))
 			return "";

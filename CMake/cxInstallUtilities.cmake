@@ -391,20 +391,6 @@ endfunction()
 
 ###############################################################################
 #
-# Install all documentation files for CustusX
-#
-###############################################################################
-function(cx_install_documentation_files)
-	install(DIRECTORY
-		${CustusX_BINARY_DIR}/documentation/
-		DESTINATION ${CX_INSTALL_ROOT_DIR}/documentation
-		DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS}
-		FILE_PERMISSIONS ${CX_FULL_PERMISSIONS})
-
-endfunction()
-
-###############################################################################
-#
 # Installing required run time libs for Windows, msv*.dll
 #
 ###############################################################################
@@ -592,7 +578,8 @@ Configuration for ${CX_SYSTEM_BASE_NAME} ${CustusX_VERSION_STRING}
 		Build type: ${CMAKE_BUILD_TYPE}
 		Shared Libraries: ${BUILD_SHARED_LIBRARIES}
 		Coverage: ${SSC_USE_GCOV}
-		Doxygen: ${BUILD_DOCUMENTATION}
+		Dev docs: ${BUILD_DOCUMENTATION}
+		User docs: ${CX_BUILD_USER_DOCUMENTATION}
 
 	Libraries:
 		Qt Version ${Qt5Core_VERSION_STRING}

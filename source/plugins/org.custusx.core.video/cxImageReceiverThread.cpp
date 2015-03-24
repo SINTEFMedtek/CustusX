@@ -61,16 +61,16 @@ public:
 ///--------------------------------------------------------
 
 ImageReceiverThread::ImageReceiverThread(StreamerServicePtr streamerInterface, QObject* parent) :
-		QThread(parent),
+		QObject(parent),
 		mStreamerInterface(streamerInterface)
 {
-	this->setObjectName("org.custusx.core.video.imagereceiver"); // becomes the thread name
+	this->setObjectName("imagereceiver worker");
 	mGeneratingTimeCalibration = false;
 	mLastReferenceTimestampDiff = 0.0;
 	mLastTimeStamps.reserve(20);
 }
 
-void ImageReceiverThread::run()
+void ImageReceiverThread::initialize()
 {
 	XmlOptionFile xmlFile = profile()->getXmlSettings().descend("video");
 	QDomElement element = xmlFile.getElement("video");
@@ -79,7 +79,7 @@ void ImageReceiverThread::run()
 
 	if(!mImageStreamer)
 	{
-		this->quit();
+		emit failedToStart();
 		return;
 	}
 	mSender.reset(new DirectlyLinkedSender());
@@ -88,16 +88,24 @@ void ImageReceiverThread::run()
 	connect(mSender.get(), SIGNAL(newUSStatus()), this, SLOT(addSonixStatusToQueueSlot()), Qt::DirectConnection);
 
 	if(!mImageStreamer->startStreaming(mSender))
-		this->quit();
+	{
+		emit failedToStart();
+		return;
+	}
 	emit connected(true);
+}
 
-	this->exec();
-
-	report(QString("Stopping streamer: [%1]").arg(mImageStreamer->getType()));
-	mImageStreamer->stopStreaming();
-	mImageStreamer.reset();
-	mSender.reset();
-	emit connected(false);
+void ImageReceiverThread::shutdown()
+{
+	if (mImageStreamer)
+	{
+		report(QString("Stopping streamer: [%1]...").arg(mImageStreamer->getType()));
+		mImageStreamer->stopStreaming();
+		report(QString("Stopped streamer: [%1]").arg(mImageStreamer->getType()));
+		mImageStreamer.reset();
+		mSender.reset();
+		emit connected(false);
+	}
 }
 
 void ImageReceiverThread::addImageToQueueSlot()
@@ -206,13 +214,10 @@ void ImageReceiverThread::calibrateTimeStamp(ImagePtr imgMsg)
 void ImageReceiverThread::reportFPS(QString streamUid)
 {
 	int timeout = 2000;
-//	std::map<QString, cx::CyclicActionLoggerPtr> mFPSTimer;
 	if (!mFPSTimer.count(streamUid))
 	{
 		mFPSTimer[streamUid].reset(new CyclicActionLogger());
 		mFPSTimer[streamUid]->reset(timeout);
-
-		//	mFPSTimer.reset(new CyclicActionLogger());
 	}
 
 	CyclicActionLoggerPtr logger = mFPSTimer[streamUid];

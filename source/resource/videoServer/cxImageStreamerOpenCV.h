@@ -109,6 +109,7 @@ public:
 private slots:
 	void grab();
 	void send();
+	void continousGrabEvent();
 
 private:
 	void dumpProperties();
@@ -118,12 +119,12 @@ private:
 	void initialize_local();
 	void deinitialize_local();
 
-	QTimer* mGrabTimer;
+//	QTimer* mGrabTimer;
 	QSize mRescaleSize;
 
 	VideoCapturePtr mVideoCapture; // OpenCV video grabber
 	QDateTime mLastGrabTime;
-	QTime mCounter;
+//	QTime mCounter;
 	bool mAvailableImage;
 	bool mGrabbing;
 

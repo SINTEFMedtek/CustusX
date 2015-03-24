@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImageReceiverThread.h"
 #include "cxImage.h"
 #include "cxLogger.h"
+#include <QApplication>
 
 typedef vtkSmartPointer<vtkDataSetMapper> vtkDataSetMapperPtr;
 typedef vtkSmartPointer<vtkImageFlip> vtkImageFlipPtr;
@@ -83,6 +84,7 @@ void VideoConnection::connectedSlot(bool on)
 	else
 		this->disconnectServer();
 
+	std::cout << "EMIT CONNECTED " << on << std::endl;
 	emit connected(on);
 }
 
@@ -94,8 +96,21 @@ StreamerServicePtr VideoConnection::getStreamerInterface()
 void VideoConnection::runDirectLinkClient(StreamerService* service)
 {
 	mStreamerInterface.reset(service, null_deleter());//Can't allow boost to delete service
-	ImageReceiverThreadPtr imageReceiverThread(new ImageReceiverThread(mStreamerInterface, this));
+	ImageReceiverThreadPtr imageReceiverThread(new ImageReceiverThread(mStreamerInterface));
+
 	this->runClient(imageReceiverThread);
+}
+
+namespace
+{
+class EventProcessingThread : public QThread
+{
+	virtual void run()
+	{
+		this->exec();
+		qApp->processEvents(); // exec() docs doesn't guarantee that the posted events are processed. - do that here.
+	}
+};
 }
 
 void VideoConnection::runClient(ImageReceiverThreadPtr client)
@@ -106,13 +121,19 @@ void VideoConnection::runClient(ImageReceiverThreadPtr client)
 		return;
 	}
 	mClient = client;
-	connect(mClient.get(), SIGNAL(finished()), this, SLOT(clientFinishedSlot()));
 	connect(mClient.get(), SIGNAL(imageReceived()), this, SLOT(imageReceivedSlot())); // thread-bridging connection
 	connect(mClient.get(), SIGNAL(sonixStatusReceived()), this, SLOT(statusReceivedSlot())); // thread-bridging connection
 	connect(mClient.get(), SIGNAL(fps(QString, double)), this, SLOT(fpsSlot(QString, double))); // thread-bridging connection
 	connect(mClient.get(), SIGNAL(connected(bool)), this, SLOT(connectedSlot(bool)));
 
-	mClient->start();
+	mThread.reset(new EventProcessingThread);
+	mThread->setObjectName("org.custusx.core.video.imagereceiver");
+	mClient->moveToThread(mThread.get());
+	connect(mClient.get(), &ImageReceiverThread::failedToStart, mThread.get(), &QThread::quit);
+	connect(mThread.get(), &QThread::finished, this, &VideoConnection::clientFinishedSlot);
+	QMetaObject::invokeMethod(mClient.get(), "initialize", Qt::QueuedConnection);
+
+	mThread->start();
 }
 
 void VideoConnection::imageReceivedSlot()
@@ -131,34 +152,49 @@ void VideoConnection::statusReceivedSlot()
 
 void VideoConnection::stopClient()
 {
-	if (mClient)
+	if (!mThread)
+		return;
+	QThreadPtr thread = mThread;
+	mThread.reset(); // avoid multiple entries to this method during event processing.
+
+	QMetaObject::invokeMethod(mClient.get(), "shutdown", Qt::QueuedConnection);
+	QString hostdescription = mClient->hostDescription();
+
+	thread->quit();
+	int timeout = 2000;
+	int interval = 25;
+	for (unsigned i=0; i<timeout/interval; ++i)
 	{
-        QString hostdescription = mClient->hostDescription();
-		mClient->quit();
-		mClient->wait(2000);
-
-		if (mClient->isRunning())
-		{
-			mClient->terminate();
-			mClient->wait(); // forever or until dead thread
-            reportWarning(QString("Video Client [%1] did not quit normally - terminated.").arg(hostdescription));
-		}
-
-		disconnect(mClient.get(), SIGNAL(finished()), this, SLOT(clientFinishedSlot()));
-		disconnect(mClient.get(), SIGNAL(imageReceived()), this, SLOT(imageReceivedSlot())); // thread-bridging connection
-		disconnect(mClient.get(), SIGNAL(sonixStatusReceived()), this, SLOT(statusReceivedSlot())); // thread-bridging connection
-		disconnect(mClient.get(), SIGNAL(fps(QString, double)), this, SLOT(fpsSlot(QString, double))); // thread-bridging connection
-		disconnect(mClient.get(), SIGNAL(connected(bool)), this, SLOT(connectedSlot(bool)));
-
-		this->resetProbe();
-
-		mClient.reset();
+		if (!thread->isRunning())
+			break;
+		thread->wait(interval); // forever or until dead thread
+		qApp->processEvents();
 	}
+	if (thread->isRunning())
+	{
+		reportWarning(QString("Video Client [%1] did not quit normally - attempting to terminate.").arg(hostdescription));
+		thread->terminate();
+		thread->wait(); // forever or until dead thread
+		reportWarning(QString("Video Client [%1] did not quit normally - terminated.").arg(hostdescription));
+	}
+	thread.reset();
+
+	mClient.reset();
 }
 
 void VideoConnection::disconnectServer()
 {
 	this->stopClient();
+	this->cleanupAfterDisconnectServer();
+}
+
+void VideoConnection::cleanupAfterDisconnectServer()
+{
+//	this->stopClient();
+	mClient.reset();
+
+	this->resetProbe();
+
 	this->stopAllSources();
 
 	for (unsigned i=0; i<mSources.size(); ++i)
@@ -177,9 +213,8 @@ void VideoConnection::clientFinishedSlot()
 {
 	if (!mClient)
 		return;
-//	if (mClient->isRunning()) // buggy: client might return running even if shutting down
-//		return;
-	this->disconnectServer();
+//	this->disconnectServer();
+	this->cleanupAfterDisconnectServer();
 }
 
 void VideoConnection::useUnusedProbeDataSlot()
@@ -202,7 +237,6 @@ void VideoConnection::resetProbe()
 		data.setUseDigitalVideo(false);
 		probe->setProbeSector(data);
 	}
-//		probe->useDigitalVideo(false);
 }
 
 /** extract information from the IGTLinkUSStatusMessage

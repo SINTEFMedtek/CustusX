@@ -68,6 +68,8 @@ void SessionStorageServiceProxy::onServiceAdded(SessionStorageService* service)
 	connect(mService.get(), &SessionStorageService::sessionChanged, this, &SessionStorageService::sessionChanged);
 	connect(mService.get(), &SessionStorageService::isSaving, this, &SessionStorageService::isSaving);
 	connect(mService.get(), &SessionStorageService::isLoading, this, &SessionStorageService::isLoading);
+
+	emit sessionChanged();
 }
 
 void SessionStorageServiceProxy::onServiceRemoved(SessionStorageService *service)
@@ -78,6 +80,9 @@ void SessionStorageServiceProxy::onServiceRemoved(SessionStorageService *service
 	disconnect(mService.get(), &SessionStorageService::isLoading, this, &SessionStorageService::isLoading);
 
 	mService = SessionStorageServiceProxy::getNullObject();
+
+	emit cleared();
+	emit sessionChanged();
 }
 
 void SessionStorageServiceProxy::load(QString dir)

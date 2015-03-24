@@ -46,7 +46,7 @@ It is possible to visualize overlayed volumes in 2D. Use the Slice Properties Wi
 Widgets {#feature_overview_widgets}
 -----------------------------------------------------------
 
-Widgets contains the bulk of functionality in CustusX, and more can be added by the use of plugins.
+Widgets contains the bulk of functionality in CustusX, and more can be added by the use of \ref plugins.
 Show a Widget by selecting `Menu->Window`, or simply right-clicking on the title bar of an existing
 Widget.
 
@@ -55,6 +55,7 @@ All specific widgets are described here:
 - \subpage utility_widgets
 - \subpage browsing_widgets
 - \subpage algorithms_widgets
+- See \ref plugins for more widgets
 
 
 

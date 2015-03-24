@@ -73,7 +73,7 @@ typedef boost::shared_ptr<class ImageReceiverThread> ImageReceiverThreadPtr;
  * \date Oct 11, 2012
  * \author Christian Askeland, SINTEF
  */
-class org_custusx_core_video_EXPORT ImageReceiverThread: public QThread
+class org_custusx_core_video_EXPORT ImageReceiverThread: public QObject
 {
 Q_OBJECT
 public:
@@ -88,10 +88,7 @@ signals:
 	void sonixStatusReceived();
 	void fps(QString, double);
 	void connected(bool on);
-	void stopInternal();
-
-protected:
-	virtual void run();
+	void failedToStart();
 
 protected:
 	/** Add the message to a thread-safe queue.
@@ -105,6 +102,9 @@ protected:
 	void calibrateTimeStamp(ImagePtr imgMsg); ///< Calibrate the time stamps of the incoming message based on the computer clock. Calibration is based on an average of several of the last messages. The calibration is updated every 20-30 sec.
 
 private slots:
+	void initialize();
+	void shutdown();
+
 	void addImageToQueueSlot();
 	void addSonixStatusToQueueSlot();
 

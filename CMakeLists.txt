@@ -21,6 +21,7 @@ include(cxInstallUtilities)
 include(cxInitializeLibraries)
 include(cxCatchUtilities)
 include(cxGetVersion)
+include(cxDocumentation)
 
 #------------------------------------------------------------------------------
 # Add some compiler flags (preprocessor definitions)
@@ -79,8 +80,8 @@ include_directories( /opt/X11/include )
 #------------------------------------------------------------------------------
 # Add subdirectories
 #------------------------------------------------------------------------------
-add_subdirectory( doc )
 add_subdirectory( source )
+add_subdirectory( doc ) # after plugins - uses global properties set there
 
 
 #------------------------------------------------------------------------------

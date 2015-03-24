@@ -110,7 +110,7 @@ class CustusXInstaller:
         Generate a folder name based on the current detected 
         installer file.
         It is assumed to be on the form 
-          <system_name>_<tag>.<suffix>
+          <system_name>_<tag>_>platform_uid>.<suffix>
         The tagged folder name equals the <tag>.
         
         Old, discarded implementation:
@@ -128,13 +128,19 @@ class CustusXInstaller:
         
         retval = os.path.basename(installerFile)
 
-        print "retval:", retval
+        print "retval1:", retval
         if retval.startswith(prefix):
             retval = retval[len(prefix): ] # remove prefix from start
-        print "retval:", retval
+        print "retval2:", retval
         if retval.endswith(suffix):
             retval = retval[ : -len(suffix)] # remove suffix from end
-        print "retval:", retval
+        print "retval3:", retval
+        retval_split = retval.split('_')
+        if len(retval_split)>1:
+            retval_split = retval_split[0:-1]
+        retval = '_'.join(retval_split) # remove platform_uid from end, if present (remove trailing _<stuff>)
+        #retval = '_'.join(retval.split('_')[0:-1]) # remove platform_uid from end, if present (remove trailing _<stuff>)
+        print "retval4:", retval
         return retval
 
     def _generateReleaseFolderName(self):
@@ -182,25 +188,19 @@ class CustusXInstaller:
         shutil.copy2(source, targetPath)
         PrintFormatter.printInfo("copied file %s into %s" % (source, targetPath))
 
-#        self.cxInstaller.publishReleaseFolder(source, targetFolder)  
-#    def publishReleaseFolder(self, path, target):
     def publishReleaseFolder(self, source, targetFolder, target):
         '''
         Copy a release folder to server
         '''
         PrintFormatter.printHeader('copy/publish package to medtek server', level=2)
-        remoteServer = target.server
         remoteServerPath = target.path
-#        remoteServer = "medtek.sintef.no"
-#        remoteServerPath = "/Volumes/MedTekEksternDisk/Software/CustusX/AutomatedReleases"
         
-#        targetFolder = os.path.split(path)[1]
-        target_path = '%s/%s/%s' % (remoteServerPath, targetFolder, self._getUserFriendlyPlatformName())
+        target_path = '%s/%s/%s' % (target.path, targetFolder, self._getUserFriendlyPlatformName())
         PrintFormatter.printInfo('Publishing contents of [%s] to server [%s], remote path [%s]' % (source, target.server, target_path))
-        targetBasePath = '%s/%s' % (remoteServerPath, targetFolder) # need to create parent folder explicitly
+        targetBasePath = '%s/%s' % (target.path, targetFolder) # need to create parent folder explicitly
 
         transfer = cx.utils.cxSSH.RemoteFileTransfer()
-        transfer.connect(remoteServer, target.user)
+        transfer.connect(target.server, target.user)
         transfer.remote_mkdir(targetBasePath)
         transfer.remote_rmdir(target_path) # remove old content if any
         transfer.copyFolderContentsToRemoteServer(source, target_path);

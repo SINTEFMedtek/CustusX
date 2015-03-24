@@ -52,7 +52,6 @@ namespace cx
 {
 
 // --------------------------------------------------------
-//Reporter* Reporter::mTheInstance = NULL;
 boost::weak_ptr<Reporter> Reporter::mWeakInstance;
 boost::shared_ptr<Reporter> Reporter::mPersistentInstance;
 // --------------------------------------------------------
@@ -79,12 +78,6 @@ ReporterPtr Reporter::getInstance()
 		mWeakInstance = retval;
 	}
 	return retval;
-
-//  if(mTheInstance == NULL)
-//  {
-//    mTheInstance = new Reporter();
-//  }
-//  return mTheInstance;
 }
 
 void Reporter::initialize()
@@ -103,8 +96,6 @@ LogThreadPtr Reporter::createWorker()
 void Reporter::shutdown()
 {
 	mPersistentInstance.reset();
-//  delete mTheInstance;
-//  mTheInstance = NULL;
 }
 
 void Reporter::onEmittedMessage(Message message)
@@ -173,7 +164,8 @@ void Reporter::sendMessage(Message message)
 		return;
 	}
 
-	mWorker->logMessage(message);
+	if (mWorker)
+		mWorker->logMessage(message);
 }
 
 void Reporter::playSound(MESSAGE_LEVEL messageLevel)

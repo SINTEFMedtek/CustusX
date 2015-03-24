@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
 typedef vtkSmartPointer<class vtkImageAlgorithm> vtkImageAlgorithmPtr;
+typedef boost::shared_ptr<QThread> QThreadPtr;
 
 namespace cx
 {
@@ -98,6 +99,7 @@ private slots:
 	void useUnusedProbeDataSlot();///< If no probe is available the ProbeData is saved and this slot is called when a probe becomes available
 
 private:
+	void cleanupAfterDisconnectServer();
 	StreamerServicePtr getStreamerInterface();
 	void updateImage(ImagePtr message); // called by receiving thread when new data arrives.
 	void runClient(ImageReceiverThreadPtr client);
@@ -109,6 +111,8 @@ private:
 	void removeSourceFromProbe(ToolPtr tool);
 
 	ImageReceiverThreadPtr mClient;
+	QThreadPtr mThread;
+
 	bool mConnected;
 	double mFPS;
 	std::vector<ProbeDefinitionPtr> mUnsusedProbeDataVector;

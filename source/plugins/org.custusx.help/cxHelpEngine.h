@@ -60,8 +60,8 @@ class HelpEngine : public QObject
 	Q_OBJECT
 public:
 	HelpEngine();
+	~HelpEngine();
 	QHelpEngine* engine() { return helpEngine; }
-//	void registerWidget(QWidget* widget, QString keyword);
 signals:
 	void keywordActivated(QString);
 private slots:
@@ -70,7 +70,6 @@ private slots:
 private:
 	QString findBestMatchingKeyword(QObject* object);
 	QHelpEngine* helpEngine;
-//	std::map<QObject*, QString> mKeywords;
 
 	bool isBreakChar(QChar c) const;
 	bool isBreakChar(QString text, int index) const;

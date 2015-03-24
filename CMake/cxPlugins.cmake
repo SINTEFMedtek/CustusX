@@ -150,8 +150,10 @@ function(cx_append_plugins_already_present PLUGINS_VARIABLE PLUGIN_BUILD_OPTION_
     getListOfVarsStartingWith(${PLUGIN_BUILD_OPTION_PREFIX} matchedVars)
     foreach (_var IN LISTS matchedVars)
             string(REPLACE ${PLUGIN_BUILD_OPTION_PREFIX} "" plugin_name ${_var})
-            cx_insert_plugin_if_not_in_list(CX_PLUGINS ${plugin_name} "OFF" ${PLUGIN_BUILD_OPTION_PREFIX})
-    endforeach()
+# is this a bug? referring CX_PLUGINS directly in here makes it a local var...
+			cx_insert_plugin_if_not_in_list(CX_PLUGINS ${plugin_name} "OFF" ${PLUGIN_BUILD_OPTION_PREFIX})
+#			cx_insert_plugin_if_not_in_list(plugins_list ${plugin_name} "OFF" ${PLUGIN_BUILD_OPTION_PREFIX})
+	endforeach()
 
     # copy modified input back as retval
     set(${PLUGINS_VARIABLE} ${plugins_list} PARENT_SCOPE)
