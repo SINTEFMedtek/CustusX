@@ -285,12 +285,12 @@ void ProbeImpl::saveCurrentConfig(QString uid, QString name)
 
 QString ProbeImpl::getRtSourceName() const
 {
+	if (this->getProbeData().getUseDigitalVideo())
+		return QString("Digital");
 	QStringList rtSourceList = mXml->getRtSourceList(this->getInstrumentScannerId(), this->getInstrumentId());
 	if (rtSourceList.empty())
 		return QString();
 	QString rtSource = rtSourceList.at(0);
-	if (this->getProbeData().getUseDigitalVideo())
-		rtSource = "Digital";
 	return rtSource;
 }
 
