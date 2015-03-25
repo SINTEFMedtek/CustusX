@@ -33,13 +33,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxOpenIGTLinkGuiExtenderService.h"
 #include "cxOpenIGTLinkClient.h"
-#include "cxOpenIGTLinkWidget.h"
+#include "cxOpenIGTLinkConnectionWidget.h"
 
 namespace cx
 {
 OpenIGTLinkGuiExtenderService::OpenIGTLinkGuiExtenderService(OpenIGTLinkClient* client)
 {
-    mWidget = GUIExtenderService::CategorizedWidget( new OpenIGTLinkWidget(client), "Utility");
+    mWidget = GUIExtenderService::CategorizedWidget( new OpenIGTLinkConnectionWidget(client), "Utility");
 }
 
 OpenIGTLinkGuiExtenderService::~OpenIGTLinkGuiExtenderService()
