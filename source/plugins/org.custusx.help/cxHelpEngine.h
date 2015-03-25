@@ -70,6 +70,7 @@ private slots:
 private:
 	QString findBestMatchingKeyword(QObject* object);
 	QHelpEngine* helpEngine;
+	void setupDataWithWarning();
 
 	bool isBreakChar(QChar c) const;
 	bool isBreakChar(QString text, int index) const;

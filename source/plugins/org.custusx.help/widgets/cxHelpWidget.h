@@ -61,6 +61,7 @@ public:
 	virtual ~HelpWidget();
 
 	virtual QString defaultWhatsThis() const;
+	HelpEnginePtr engine() { return mEngine; }
 
 signals:
 	void requestShowLink(const QUrl&);

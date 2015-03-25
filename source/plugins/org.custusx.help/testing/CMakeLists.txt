@@ -2,9 +2,10 @@
 if(BUILD_TESTING)
 
     set(CX_TEST_CATCH_ORG_CUSTUSX_HELP_MOC_SOURCE_FILES
-    )
+	)
     set(CX_TEST_CATCH_ORG_CUSTUSX_HELP_SOURCE_FILES
-        cxtestHelpPlugin.cpp
+		cxtestHelpPlugin.h
+		cxtestHelpPlugin.cpp
         cxtestDummyHelp.h
         cxtestDummyHelp.cpp
     )
@@ -18,7 +19,13 @@ if(BUILD_TESTING)
         .
         ${CMAKE_CURRENT_BINARY_DIR}
     )
-    target_link_libraries(cxtest_org_custusx_help PRIVATE org_custusx_help cxCatch)
+	target_link_libraries(cxtest_org_custusx_help
+		PRIVATE
+		org_custusx_help
+		cxGui
+#        cxResourceWidgets
+		cxLogicManager
+		cxCatch)
     cx_add_tests_to_catch(cxtest_org_custusx_help)
 
 
