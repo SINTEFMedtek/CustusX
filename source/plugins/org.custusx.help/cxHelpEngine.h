@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <map>
 #include "boost/shared_ptr.hpp"
+#include "org_custusx_help_Export.h"
 
 #include <QString>
 #include <QObject>
@@ -55,7 +56,7 @@ namespace cx
  * \date 2014-09-30
  * \author Christian Askeland
  */
-class HelpEngine : public QObject
+class org_custusx_help_EXPORT HelpEngine : public QObject
 {
 	Q_OBJECT
 public:
