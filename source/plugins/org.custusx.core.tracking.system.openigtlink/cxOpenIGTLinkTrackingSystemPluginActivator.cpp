@@ -54,13 +54,14 @@ OpenIGTLinkTrackingSystemPluginActivator::~OpenIGTLinkTrackingSystemPluginActiva
 
 void OpenIGTLinkTrackingSystemPluginActivator::start(ctkPluginContext* context)
 {
+    mOpenIGTLinkThread.setObjectName("org.custusx.core.openigtlink");
     OpenIGTLinkClient *client = new OpenIGTLinkClient;
     client->setIpAndPort(mIp, mPort); //this is done before client is moved to another thread
     client->moveToThread(&mOpenIGTLinkThread);
 
-    OpenIGTLinkGuiExtenderService* gui = new OpenIGTLinkGuiExtenderService(client);
     OpenIGTLinkTrackingSystemService* tracking = new OpenIGTLinkTrackingSystemService(client);
     OpenIGTLinkStreamerService *streamer = new OpenIGTLinkStreamerService(client);
+    OpenIGTLinkGuiExtenderService* gui = new OpenIGTLinkGuiExtenderService(client);
 
     mRegistrationGui = RegisteredService::create<OpenIGTLinkGuiExtenderService>(context, gui, GUIExtenderService_iid);
     mRegistrationTracking = RegisteredService::create<OpenIGTLinkTrackingSystemService>(context, tracking, TrackingSystemService_iid);

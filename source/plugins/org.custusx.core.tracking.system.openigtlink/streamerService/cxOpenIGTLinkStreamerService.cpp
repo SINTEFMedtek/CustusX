@@ -38,7 +38,11 @@ namespace cx
 
 OpenIGTLinkStreamerService::OpenIGTLinkStreamerService(OpenIGTLinkClient *client)
 {
-
+    mStreamer = OpenIGTLinkStreamerPtr(new OpenIGTLinkStreamer());
+    connect(client, &OpenIGTLinkClient::connected, mStreamer.get(), &OpenIGTLinkStreamer::receivedConnected);
+    connect(client, &OpenIGTLinkClient::disconnected, mStreamer.get(), &OpenIGTLinkStreamer::receivedDisconnected);
+    connect(client, &OpenIGTLinkClient::error, mStreamer.get(), &OpenIGTLinkStreamer::receivedError);
+    connect(client, &OpenIGTLinkClient::image, mStreamer.get(), &OpenIGTLinkStreamer::receivedImage);
 }
 
 OpenIGTLinkStreamerService::~OpenIGTLinkStreamerService()
@@ -59,8 +63,7 @@ std::vector<PropertyPtr> OpenIGTLinkStreamerService::getSettings(QDomElement roo
 
 StreamerPtr OpenIGTLinkStreamerService::createStreamer(QDomElement root)
 {
-    StreamerPtr retval;
-    return retval;
+    return mStreamer;
 }
 
 } //namespace cx

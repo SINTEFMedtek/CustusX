@@ -29,48 +29,52 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXOPENIGTLINKWIDGET_H
-#define CXOPENIGTLINKWIDGET_H
+#ifndef CXOPENIGTLINKSTREAMER_H
+#define CXOPENIGTLINKSTREAMER_H
 
-#include <QDomElement>
-#include "cxBaseWidget.h"
-#include "cxStringProperty.h"
-#include "cxDoubleProperty.h"
+#include "org_custusx_core_tracking_system_openigtlink_Export.h"
+#include "cxStreamer.h"
 
-class QPushButton;
+#include "cxImage.h"
 
-namespace cx {
+namespace cx
+{
 
-class OpenIGTLinkClient;
-
-class OpenIGTLinkWidget : public BaseWidget
+/**
+ * Streamer that listens to an OpenIGTLink connection, then
+ * streams the incoming data.
+ *
+ * \addtogroup org_custusx_core_tracking_system_openigtlink
+ * \author Janne Beate Bakeng, SINTEF
+ * \date 2015-03-25
+ */
+class org_custusx_core_tracking_system_openigtlink_EXPORT OpenIGTLinkStreamer : public Streamer
 {
     Q_OBJECT
 
 public:
-    OpenIGTLinkWidget(OpenIGTLinkClient *client, QWidget *parent=NULL);
-    ~OpenIGTLinkWidget();
+    OpenIGTLinkStreamer();
+    virtual ~OpenIGTLinkStreamer();
 
-    virtual QString defaultWhatsThis() const;
+    virtual bool startStreaming(SenderPtr sender);
+	virtual void stopStreaming();
+	virtual QString getType();
 
-signals:
-    void requestConnect();
-    void requestDisconnect();
-    void ipAndPort(QString ip, int port);
+public slots:
+    void receivedConnected();
+    void receivedDisconnected();
+    void receivedError();
+    void receivedImage(ImagePtr image);
 
-private slots:
-    void clientConnected();
-    void clientDisconnected();
-    void connectButtonClicked(bool checked=false);
+protected slots:
+    virtual void streamSlot();
 
 private:
-    StringPropertyBasePtr getIpOption(QDomElement root);
-    DoublePropertyBasePtr getPortOption(QDomElement root);
+    SenderPtr mSender;
 
-    QDomElement mOptionsElement;
-    QPushButton *mConnectButton;
 };
+typedef boost::shared_ptr<OpenIGTLinkStreamer> OpenIGTLinkStreamerPtr;
 
-}
+} // namespace cx
 
-#endif //CXOPENIGTLINKWIDGET_H
+#endif // CXOPENIGTLINKSTREAMER_H

@@ -6,12 +6,13 @@ set(PLUGIN_SRCS
     cxOpenIGTLinkTrackingSystemPluginActivator.cpp
 
     guiExtenderService/cxOpenIGTLinkGuiExtenderService.cpp
-    guiExtenderService/cxOpenIGTLinkWidget.cpp
+    guiExtenderService/cxOpenIGTLinkConnectionWidget.cpp
 
     trackingSystemService/cxOpenIGTLinkTrackingSystemService.cpp
     trackingSystemService/cxOpenIGTLinkTool.cpp
 
     streamerService/cxOpenIGTLinkStreamerService.cpp
+    streamerService/cxOpenIGTLinkStreamer.cpp
 
     openigtlinkClient/cxSocket.cpp
     openigtlinkClient/cxOpenIGTLinkClient.cpp
@@ -22,12 +23,13 @@ set(PLUGIN_MOC_SRCS
     cxOpenIGTLinkTrackingSystemPluginActivator.h
 
     guiExtenderService/cxOpenIGTLinkGuiExtenderService.h
-    guiExtenderService/cxOpenIGTLinkWidget.h
+    guiExtenderService/cxOpenIGTLinkConnectionWidget.h
 
     trackingSystemService/cxOpenIGTLinkTrackingSystemService.h
     trackingSystemService/cxOpenIGTLinkTool.h
 
     streamerService/cxOpenIGTLinkStreamerService.h
+    streamerService/cxOpenIGTLinkStreamer.h
 
     openigtlinkClient/cxSocket.h
     openigtlinkClient/cxOpenIGTLinkClient.h
@@ -49,8 +51,9 @@ set(PLUGIN_target_libraries
     cxResourceWidgets
     cxResource
     cxPluginUtilities
-    OpenIGTLink
+    cxGrabber
     cxGUIExtenderService
+    OpenIGTLink
     )
 
 set(PLUGIN_OUTPUT_DIR "")

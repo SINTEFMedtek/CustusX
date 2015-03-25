@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "org_custusx_core_tracking_system_openigtlink_Export.h"
 #include "cxStreamerService.h"
+#include "cxOpenIGTLinkStreamer.h"
 
 namespace cx
 {
@@ -42,6 +43,7 @@ class OpenIGTLinkClient;
 
 class org_custusx_core_tracking_system_openigtlink_EXPORT OpenIGTLinkStreamerService : public StreamerService
 {
+
 public:
     OpenIGTLinkStreamerService(OpenIGTLinkClient *client);
     ~OpenIGTLinkStreamerService();
@@ -49,6 +51,9 @@ public:
     virtual QString getName();
     virtual std::vector<PropertyPtr> getSettings(QDomElement root);
     virtual StreamerPtr createStreamer(QDomElement root);
+
+private:
+    OpenIGTLinkStreamerPtr mStreamer;
 };
 
 } //namespace cx

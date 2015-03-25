@@ -155,7 +155,14 @@ IGTLinkImageMessage::Pointer IGTLinkConversion::encode(ImagePtr image)
 	//	return retval;
 }
 
+
 ImagePtr IGTLinkConversion::decode(IGTLinkImageMessage::Pointer message)
+{
+    igtl::ImageMessage::Pointer msg(message.GetPointer());
+    this->decode(msg);
+}
+
+ImagePtr IGTLinkConversion::decode(igtl::ImageMessage::Pointer message)
 {
 	vtkImageImportPtr imageImport = vtkImageImportPtr::New();
 

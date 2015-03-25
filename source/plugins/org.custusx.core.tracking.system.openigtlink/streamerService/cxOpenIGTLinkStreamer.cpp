@@ -29,63 +29,66 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#include "cxOpenIGTLinkStreamer.h"
 
+#include "cxLogger.h"
+#include "cxSender.h"
 
-#ifndef CXOPENIGTLINKCLIENT_H
-#define CXOPENIGTLINKCLIENT_H
-
-#include "org_custusx_core_tracking_system_openigtlink_Export.h"
-
-#include <QObject>
-#include "igtlMessageHeader.h"
-#include "cxSocket.h"
-#include "cxTransform3D.h"
-#include "cxImage.h"
-
-namespace cx {
-
-class org_custusx_core_tracking_system_openigtlink_EXPORT OpenIGTLinkClient : public QObject
+namespace cx
 {
-    Q_OBJECT
-public:
 
-    explicit OpenIGTLinkClient(QObject *parent = 0);
+OpenIGTLinkStreamer::OpenIGTLinkStreamer()
+{}
 
-public slots:
-    void setIpAndPort(QString ip, int port=18944); //not threadsafe
-    void requestConnect();
-    void requestDisconnect();
+OpenIGTLinkStreamer::~OpenIGTLinkStreamer()
+{}
 
-signals:
-    void connected();
-    void disconnected();
-    void error();
 
-    void transform(QString devicename, Transform3D transform, double timestamp);
-    void image(ImagePtr image);
+bool OpenIGTLinkStreamer::startStreaming(SenderPtr sender)
+{
+	mSender = sender;
+	return true;
+}
 
-private slots:
-    void internalConnected();
-    void internalDisconnected();
-    void internalDataAvailable();
+void OpenIGTLinkStreamer::stopStreaming()
+{
+	mSender.reset();
+}
 
-private:
-    bool socketIsConnected();
-    bool enoughBytesAvailableOnSocket(int bytes) const;
-    bool receiveHeader(const igtl::MessageHeader::Pointer header) const;
-    bool receiveBody(const igtl::MessageHeader::Pointer header);
-    bool receiveTransform(const igtl::MessageBase::Pointer header);
-    bool receiveImage(const igtl::MessageBase::Pointer header);
-    bool socketReceive(void *packPointer, int packSize) const;
-    void checkCRC(int c) const;
+QString OpenIGTLinkStreamer::getType()
+{
+    return "OpenIGTLinkStreamer";
+}
 
-    SocketPtr mSocket;
-    igtl::MessageHeader::Pointer mHeader;
-    bool mHeaderReceived;
-    QString mIp;
-    int mPort;
-};
+void OpenIGTLinkStreamer::receivedConnected()
+{
+    CX_LOG_CHANNEL_DEBUG("janne beate ") << "Connected received";
+}
 
-} //namespace cx
+void OpenIGTLinkStreamer::receivedDisconnected()
+{
+    CX_LOG_CHANNEL_DEBUG("janne beate ") << "Disconnect received";
+}
 
-#endif // CXOPENIGTLINKCLIENT_H
+void OpenIGTLinkStreamer::receivedError()
+{
+    CX_LOG_CHANNEL_DEBUG("janne beate ") << "Error received";
+}
+
+void OpenIGTLinkStreamer::receivedImage(ImagePtr image)
+{
+    CX_LOG_CHANNEL_DEBUG("janne beate ") << "Image received";
+    PackagePtr package(new Package());
+    package->mImage = image;
+    if(mSender)
+        mSender->send(package);
+}
+
+void OpenIGTLinkStreamer::streamSlot()
+{
+
+}
+
+} // namespace cx
+
+

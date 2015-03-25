@@ -30,7 +30,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxOpenIGTLinkWidget.h"
+#include "cxOpenIGTLinkConnectionWidget.h"
 
 #include <QPushButton>
 #include "cxOpenIGTLinkClient.h"
@@ -40,23 +40,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx {
 
-OpenIGTLinkWidget::OpenIGTLinkWidget(OpenIGTLinkClient *client, QWidget *parent) :
-    BaseWidget(parent, "OpenIGTLinkWidget", "OpenIGTLink Connection")
+OpenIGTLinkConnectionWidget::OpenIGTLinkConnectionWidget(OpenIGTLinkClient *client, QWidget *parent) :
+    BaseWidget(parent, "OpenIGTLinkConnectionWidget", "OpenIGTLink Connection")
 {
-    XmlOptionFile options = profile()->getXmlSettings().descend("OpenIGTLinkWidget");
+    XmlOptionFile options = profile()->getXmlSettings().descend("OpenIGTLinkConnectionWidget");
     mOptionsElement = options.getElement();
     StringPropertyBasePtr ip = this->getIpOption(mOptionsElement);
     DoublePropertyBasePtr port = this->getPortOption(mOptionsElement);
 
     mConnectButton = new QPushButton("Connect", this);
     mConnectButton->setCheckable(true);
-    connect(mConnectButton, &QPushButton::clicked, this, &OpenIGTLinkWidget::connectButtonClicked);
-    connect(this, &OpenIGTLinkWidget::requestConnect, client, &OpenIGTLinkClient::requestConnect);
-    connect(this, &OpenIGTLinkWidget::requestDisconnect, client, &OpenIGTLinkClient::requestDisconnect);
-    connect(this, &OpenIGTLinkWidget::ipAndPort, client, &OpenIGTLinkClient::setIpAndPort);
-    connect(client, &OpenIGTLinkClient::connected, this, &OpenIGTLinkWidget::clientConnected);
-    connect(client, &OpenIGTLinkClient::disconnected, this, &OpenIGTLinkWidget::clientDisconnected);
-    connect(client, &OpenIGTLinkClient::error, this, &OpenIGTLinkWidget::clientDisconnected);
+    connect(mConnectButton, &QPushButton::clicked, this, &OpenIGTLinkConnectionWidget::connectButtonClicked);
+    connect(this, &OpenIGTLinkConnectionWidget::requestConnect, client, &OpenIGTLinkClient::requestConnect);
+    connect(this, &OpenIGTLinkConnectionWidget::requestDisconnect, client, &OpenIGTLinkClient::requestDisconnect);
+    connect(this, &OpenIGTLinkConnectionWidget::ipAndPort, client, &OpenIGTLinkClient::setIpAndPort);
+    connect(client, &OpenIGTLinkClient::connected, this, &OpenIGTLinkConnectionWidget::clientConnected);
+    connect(client, &OpenIGTLinkClient::disconnected, this, &OpenIGTLinkConnectionWidget::clientDisconnected);
+    connect(client, &OpenIGTLinkClient::error, this, &OpenIGTLinkConnectionWidget::clientDisconnected);
 
     QVBoxLayout* topLayout = new QVBoxLayout(this);
     topLayout->addWidget(sscCreateDataWidget(this, ip));
@@ -65,12 +65,12 @@ OpenIGTLinkWidget::OpenIGTLinkWidget(OpenIGTLinkClient *client, QWidget *parent)
     topLayout->addStretch();
 }
 
-OpenIGTLinkWidget::~OpenIGTLinkWidget()
+OpenIGTLinkConnectionWidget::~OpenIGTLinkConnectionWidget()
 {
 
 }
 
-QString OpenIGTLinkWidget::defaultWhatsThis() const
+QString OpenIGTLinkConnectionWidget::defaultWhatsThis() const
 {
     return  "<html>"
             "<h3>Connect to an OpenIGTLink server</h3>"
@@ -83,7 +83,7 @@ QString OpenIGTLinkWidget::defaultWhatsThis() const
             "</html>";
 }
 
-void OpenIGTLinkWidget::clientConnected()
+void OpenIGTLinkConnectionWidget::clientConnected()
 {
     mConnectButton->blockSignals(true);
     mConnectButton->setEnabled(true);
@@ -92,7 +92,7 @@ void OpenIGTLinkWidget::clientConnected()
     mConnectButton->blockSignals(false);
 }
 
-void OpenIGTLinkWidget::clientDisconnected()
+void OpenIGTLinkConnectionWidget::clientDisconnected()
 {
     mConnectButton->blockSignals(true);
     mConnectButton->setEnabled(true);
@@ -101,7 +101,7 @@ void OpenIGTLinkWidget::clientDisconnected()
     mConnectButton->blockSignals(false);
 }
 
-void OpenIGTLinkWidget::connectButtonClicked(bool checked)
+void OpenIGTLinkConnectionWidget::connectButtonClicked(bool checked)
 {
     StringPropertyBasePtr ip = this->getIpOption(mOptionsElement);
     DoublePropertyBasePtr port = this->getPortOption(mOptionsElement);
@@ -122,7 +122,7 @@ void OpenIGTLinkWidget::connectButtonClicked(bool checked)
     }
 }
 
-StringPropertyBasePtr OpenIGTLinkWidget::getIpOption(QDomElement root)
+StringPropertyBasePtr OpenIGTLinkConnectionWidget::getIpOption(QDomElement root)
 {
     StringPropertyPtr retval;
     QString defaultValue = "127.0.0.1";
@@ -132,7 +132,7 @@ StringPropertyBasePtr OpenIGTLinkWidget::getIpOption(QDomElement root)
 }
 
 
-DoublePropertyBasePtr OpenIGTLinkWidget::getPortOption(QDomElement root)
+DoublePropertyBasePtr OpenIGTLinkConnectionWidget::getPortOption(QDomElement root)
 {
     DoublePropertyPtr retval;
     retval = DoubleProperty::initialize("openigtlink_port", "Port", "TCP/IP Port (default 18333)", 18333, DoubleRange(1024, 49151, 1), 0, root);

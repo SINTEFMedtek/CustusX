@@ -29,63 +29,48 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXOPENIGTLINKCONNECTIONWIDGET_H
+#define CXOPENIGTLINKCONNECTIONWIDGET_H
 
+#include <QDomElement>
+#include "cxBaseWidget.h"
+#include "cxStringProperty.h"
+#include "cxDoubleProperty.h"
 
-#ifndef CXOPENIGTLINKCLIENT_H
-#define CXOPENIGTLINKCLIENT_H
-
-#include "org_custusx_core_tracking_system_openigtlink_Export.h"
-
-#include <QObject>
-#include "igtlMessageHeader.h"
-#include "cxSocket.h"
-#include "cxTransform3D.h"
-#include "cxImage.h"
+class QPushButton;
 
 namespace cx {
 
-class org_custusx_core_tracking_system_openigtlink_EXPORT OpenIGTLinkClient : public QObject
+class OpenIGTLinkClient;
+
+class OpenIGTLinkConnectionWidget : public BaseWidget
 {
     Q_OBJECT
+
 public:
+    OpenIGTLinkConnectionWidget(OpenIGTLinkClient *client, QWidget *parent=NULL);
+    ~OpenIGTLinkConnectionWidget();
 
-    explicit OpenIGTLinkClient(QObject *parent = 0);
-
-public slots:
-    void setIpAndPort(QString ip, int port=18944); //not threadsafe
-    void requestConnect();
-    void requestDisconnect();
+    virtual QString defaultWhatsThis() const;
 
 signals:
-    void connected();
-    void disconnected();
-    void error();
-
-    void transform(QString devicename, Transform3D transform, double timestamp);
-    void image(ImagePtr image);
+    void requestConnect();
+    void requestDisconnect();
+    void ipAndPort(QString ip, int port);
 
 private slots:
-    void internalConnected();
-    void internalDisconnected();
-    void internalDataAvailable();
+    void clientConnected();
+    void clientDisconnected();
+    void connectButtonClicked(bool checked=false);
 
 private:
-    bool socketIsConnected();
-    bool enoughBytesAvailableOnSocket(int bytes) const;
-    bool receiveHeader(const igtl::MessageHeader::Pointer header) const;
-    bool receiveBody(const igtl::MessageHeader::Pointer header);
-    bool receiveTransform(const igtl::MessageBase::Pointer header);
-    bool receiveImage(const igtl::MessageBase::Pointer header);
-    bool socketReceive(void *packPointer, int packSize) const;
-    void checkCRC(int c) const;
+    StringPropertyBasePtr getIpOption(QDomElement root);
+    DoublePropertyBasePtr getPortOption(QDomElement root);
 
-    SocketPtr mSocket;
-    igtl::MessageHeader::Pointer mHeader;
-    bool mHeaderReceived;
-    QString mIp;
-    int mPort;
+    QDomElement mOptionsElement;
+    QPushButton *mConnectButton;
 };
 
-} //namespace cx
+}
 
-#endif // CXOPENIGTLINKCLIENT_H
+#endif //CXOPENIGTLINKWIDGET_H

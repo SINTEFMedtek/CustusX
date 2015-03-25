@@ -68,7 +68,8 @@ public:
 	  * image data, uid and timstamp. The color format is also
 	  * converted to RGBX
 	  */
-	ImagePtr decode(IGTLinkImageMessage::Pointer msg);
+    ImagePtr decode(IGTLinkImageMessage::Pointer msg);
+    ImagePtr decode(igtl::ImageMessage::Pointer msg);
 
 	/**
 	  * Encode the input probedata into an IGTLink message.

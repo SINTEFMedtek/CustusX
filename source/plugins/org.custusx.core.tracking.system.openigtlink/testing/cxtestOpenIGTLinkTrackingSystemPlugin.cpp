@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "catch.hpp"
 
 #include "cxOpenIGTLinkTrackingSystemService.h"
+#include "cxOpenIGTLinkStreamerService.h"
 #include "cxtestQueuedSignalListener.h"
 #include "cxtestDirectSignalListener.h"
 #include "cxUtilHelpers.h"
@@ -49,10 +50,12 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: Check that the openigtlink tracking
 
 TEST_CASE("OpenIGTLinkGuiExtender: Check that the openigtlink gui extender service can be created and destroyed", "[unit][org.custusx.core.tracking.system.openigtlink]")
 {
-    cx::OpenIGTLinkGuiExtenderServicePtr service = cx::OpenIGTLinkGuiExtenderServicePtr(new cx::OpenIGTLinkGuiExtenderService(NULL));
-    REQUIRE(service);
-    CHECK(service.unique());
-    service.reset();
+    cx::OpenIGTLinkClient *client = new cx::OpenIGTLinkClient;
+    cx::OpenIGTLinkGuiExtenderServicePtr gui(new cx::OpenIGTLinkGuiExtenderService(client));
+    REQUIRE(gui);
+    CHECK(gui.unique());
+    gui.reset();
+    delete client;
 }
 
 TEST_CASE("OpenIGTLinkTrackingSystemService: Check that the plugin can connect and stream from a server", "[manual][plugins][org.custusx.core.tracking.system.openigtlink]")
