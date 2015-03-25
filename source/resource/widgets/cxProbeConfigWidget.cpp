@@ -57,7 +57,7 @@ ProbeConfigWidget::ProbeConfigWidget(VisServicesPtr services, QWidget* parent) :
 	QVBoxLayout* topLayout = new QVBoxLayout(this);
 	TrackingServicePtr ts = mServices->getToolManager();
 	mActiveProbeConfig = StringPropertyActiveProbeConfiguration::New(ts);
-	connect(mActiveProbeConfig.get(), SIGNAL(changed()), this, SLOT(activeProbeConfigurationChangedSlot()));
+	connect(mActiveProbeConfig.get(), &StringPropertyActiveProbeConfiguration::changed, this, &ProbeConfigWidget::activeProbeConfigurationChangedSlot);
 	mActiveProbeConfigWidget = new LabeledComboBoxWidget(this, mActiveProbeConfig);
 	topLayout->addWidget(mActiveProbeConfigWidget);
 

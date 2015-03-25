@@ -107,7 +107,7 @@ QString StringPropertyActiveTool::convertInternal2Display(QString internal)
 StringPropertyActiveProbeConfiguration::StringPropertyActiveProbeConfiguration(TrackingServicePtr trackingService)
 {
 	mTrackingService = trackingService;
-  connect(mTrackingService.get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(activeToolChanged()));
+  connect(mTrackingService.get(), &TrackingService::activeToolChanged, this, &StringPropertyActiveProbeConfiguration::activeToolChanged);
   connect(mTrackingService.get(), &TrackingService::stateChanged, this, &StringPropertyActiveProbeConfiguration::activeToolChanged);
   this->activeToolChanged();
 }
@@ -121,12 +121,12 @@ void StringPropertyActiveProbeConfiguration::activeToolChanged()
 		return;
 
 	if (mTool)
-		disconnect(mTool->getProbe().get(), SIGNAL(sectorChanged()), this, SIGNAL(changed()));
+		disconnect(mTool->getProbe().get(), &Probe::sectorChanged, this, &StringPropertyActiveProbeConfiguration::changed);
 
 	mTool = newTool;
 
 	if (mTool)
-		connect(mTool->getProbe().get(), SIGNAL(sectorChanged()), this, SIGNAL(changed()));
+		connect(mTool->getProbe().get(), &Probe::sectorChanged, this, &StringPropertyActiveProbeConfiguration::changed);
 
 	emit changed();
 }
