@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxBaseWidget.h"
 #include "boost/shared_ptr.hpp"
+#include "org_custusx_help_Export.h"
 class QTabWidget;
 class QAction;
 class QSplitter;
@@ -52,7 +53,7 @@ class HelpIndexWidget;
  * \date 2014-09-30
  * \author Christian Askeland
  */
-class HelpWidget : public BaseWidget
+class org_custusx_help_EXPORT HelpWidget : public BaseWidget
 {
 	Q_OBJECT
 
