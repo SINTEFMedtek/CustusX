@@ -61,6 +61,7 @@ TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Create with default XML parser", 
 TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Create with mock XML parser", "[unit][service][tracking]")
 {
 	REQUIRE(mProbe);
+	INFO(mProbe->getConfigId().toStdString());
 	CHECK(!mProbe->getConfigId().isEmpty());
 	CHECK(mProbe->getConfigId().compare(mScannerName + " " + mProbeName + " " + mDefaultRtSourceName) == 0);
 	CHECK(mProbe->isValid());
@@ -69,6 +70,7 @@ TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Create with mock XML parser", "[u
 TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Use digital video setting", "[unit][service][tracking]")
 {
 	CHECK(!mProbe->getProbeData().getUseDigitalVideo());
+	INFO(mProbe->getRtSourceName().toStdString());
 	CHECK(mProbe->getRtSourceName().compare(mDefaultRtSourceName) == 0);
 	cx::ProbeDefinition data = mProbe->getProbeData();
 	data.setUseDigitalVideo(true);
