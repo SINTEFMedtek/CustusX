@@ -12,7 +12,7 @@ DISCLAIMER: CustusX is a research tool: It is not intended for normal clinical u
 
 The code is free to download and use under a BSD-3 license. However, the code base is currently undergoing large changes, thus there is no guarantee that internal interfaces will be stable.
 
-See [custusx.org](http://custusx.org) for [downloads](http://custusx.org/index.php/downloads) and [documentation](http://custusx.org/uploads/developer_doc/nightly/)
+See [custusx.org](http://custusx.org) for [downloads](http://custusx.org/index.php/downloads) and [documentation](http://custusx.org/uploads/developer_doc/nightly/).
 
 ### Build instructions
 
