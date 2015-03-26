@@ -1,4 +1,4 @@
-CustusX Overview {#mainpage}
+CustusX User Documentation {#mainpage}
 ========================
 
 \addindex mainpage_overview 
@@ -8,7 +8,7 @@ Overview {#mainpage_overview}
 
 An IGT Library
 
-<https://github.com/SINTEFMedisinskTeknologi/CustusX>
+<http://www.custusx.org>
 
 CustusX is an application for research in image-guided therapy with a focus on intraoperative use 
 and ultrasound imaging.
@@ -24,7 +24,7 @@ at the \ref definitions for short descriptions of key concepts. The \ref plugins
 Build
 ------------------------
 
-Build instructions can be found on <https://github.com/SINTEFMedisinskTeknologi/CustusX>.
+Build instructions can be [found here](http://custusx.org/uploads/developer_doc/nightly/build_instructions.html).
 
 Licensing 
 ------------------------
