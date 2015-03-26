@@ -110,7 +110,8 @@ TEST_CASE("CustusX full run emits no errors, correct service shutdown.", "[integ
 /**
  * This test has BIG problems when run on a test box, with screen saver on etc etc. Removed from Linux because of this
  */
-TEST_CASE("Speed: vtkVolumeTextureMapper3D render", "[speed][gui][integration][not_win32][not_win64][not_linux]")
+//TEST_CASE("Speed: vtkVolumeTextureMapper3D render", "[speed][gui][integration][not_win32][not_win64]")
+TEST_CASE("Speed: vtkVolumeTextureMapper3D render", "[speed][gui][integration]")
 {
 	initTest();
 
@@ -128,7 +129,8 @@ TEST_CASE("Speed: vtkVolumeTextureMapper3D render", "[speed][gui][integration][n
 /**
  * This test has BIG problems when run on a test box, with screen saver on etc etc. Removed from Linux because of this
  */
-TEST_CASE("Speed: vtkGPUVolumeRayCastMapper render", "[speed][gui][integration][not_win32][not_win64][not_mavericks][not_linux]")
+TEST_CASE("Speed: vtkGPUVolumeRayCastMapper render", "[speed][gui][integration]")
+//TEST_CASE("Speed: vtkGPUVolumeRayCastMapper render", "[speed][gui][integration][not_win32][not_win64][not_mavericks]")
 {
 	initTest();
 	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkGPUVolumeRayCastMapper");
@@ -146,7 +148,8 @@ TEST_CASE("Speed: vtkGPUVolumeRayCastMapper render", "[speed][gui][integration][
 /**
  * This test has BIG problems when run on a test box, with screen saver on etc etc. Removed from Linux because of this
  */
-TEST_CASE("Speed: vtkGPUVolumeRayCastMapper with slicing", "[speed][gui][integration][not_win32][not_win64][not_mavericks][not_linux]")
+TEST_CASE("Speed: vtkGPUVolumeRayCastMapper with slicing", "[speed][gui][integration]")
+//TEST_CASE("Speed: vtkGPUVolumeRayCastMapper with slicing", "[speed][gui][integration][not_win32][not_win64][not_mavericks][not_linux]")
 {
 	initTest();
 	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkGPUVolumeRayCastMapper");

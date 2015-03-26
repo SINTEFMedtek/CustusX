@@ -321,14 +321,32 @@ bool PluginFrameworkManager::stop()
 {
     this->saveState();
 
-    //give plugins time to clean up internal resources before different thread deletes them
+	// give plugins time to clean up internal resources before different thread deletes them
+	// (obsolete because we have disabled the other-thread shutdown)
     emit aboutToStop();
+
+	// Bypass CTK internal 'shutdown in another thread'-mechanism, activated if we
+	// call framework::stop(). It causes too much trouble regarding Qt objects created
+	// in main thread and deleted in another thread. openCV also has trouble.
+	QStringList plugins = getPluginSymbolicNames();
+	for (int i=0; i<plugins.size(); ++i)
+	{
+		this->stop(plugins[i]);
+	}
 
 	// stop the framework
 	try
 	{
         mFramework->stop(); //will start a thread that destructs plugins
 		ctkPluginFrameworkEvent fe = mFramework->waitForStop(5000);
+//		int timeout = 5000;
+//		int interval = 50;
+//		ctkPluginFrameworkEvent fe;
+//		for(int i=0; i<timeout/interval; ++i)
+//		{
+//			fe = mFramework->waitForStop(interval);
+//			qApp->processEvents();
+//		}
 		if (fe.getType() == ctkPluginFrameworkEvent::FRAMEWORK_WAIT_TIMEDOUT)
 		{
 			CX_LOG_CHANNEL_WARNING("plugin") << "Stopping the plugin framework timed out";

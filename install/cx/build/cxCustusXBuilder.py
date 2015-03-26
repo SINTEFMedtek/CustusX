@@ -195,6 +195,14 @@ class CustusXBuilder:
         target_path = '%s/%s' % (target.path, targetFolder)        
         self.publish(source, target.server, target.user, target_path)
 
+    def publishCoverageInfo(self, targetFolder):
+        PrintFormatter.printHeader('Publish Coverage Info to server', level=2)
+        target = self.assembly.controlData.publish_coverage_info_target
+        custusx = self._createComponent(cxComponents.CustusX)
+        source = '%s/gcov/coverage_info' %  self.assembly.controlData.getRootDir()
+        target_path = '%s/%s' % (target.path, targetFolder)        
+        self.publish(source, target.server, target.user, target_path)
+
     def publish(self, source, server, user, target_path):
         PrintFormatter.printInfo('Publishing contents of [%s] to server [%s], remote path [%s]' % (source, server, target_path))
 
@@ -205,6 +213,11 @@ class CustusXBuilder:
         transfer.copyFolderContentsToRemoteServer(source, target_path);
         transfer.close()
 
+    def deleteCustusXBuildFolder(self):
+        PrintFormatter.printHeader('Delete all contents of CustusX build folder', level=3)
+        custusx = self._createComponent(cxComponents.CustusX)
+        buildDir = custusx.buildPath()
+        shell.run('rm -rf %s' % buildDir)
 
     def resetCoverage(self):
         '''
@@ -234,6 +247,7 @@ class CustusXBuilder:
         gcovResultDir = '%s/gcov/coverage_info' % self.assembly.controlData.getRootDir()
         custusx = self._createComponent(cxComponents.CustusX)
         buildDir = custusx.buildPath()
+        sourceDir = custusx.sourcePath()
 
         shell.run(['lcov',
                 '--capture',
@@ -244,6 +258,10 @@ class CustusXBuilder:
                 '--add-tracefile %s/cx_base.gcov' % gcovTempDir,
                 '--add-tracefile %s/cx_test.gcov' % gcovTempDir,
                 '--output-file %s/cx_total.gcov' % gcovTempDir
+                ])
+        shell.run(['lcov',
+                '--extract %s/cx_total.gcov "%s/source/*"' % (gcovTempDir, sourceDir),
+                '--output-file %s/cx_clean0.gcov' % gcovTempDir
                 ])
         filterList = ["/opt/*",
                       "/Library/Frameworks/*",
@@ -260,13 +278,16 @@ class CustusXBuilder:
                       "/moc*.cxx",
                       "/CustusX/build_*",
                       "/Examples/*"]
+        filterList = ["/ThirdParty/*",
+                      "/moc*.cxx",
+                      "/Examples/*"]
         fileFilter = " ".join(filterList)
         shell.run(['lcov',
-                '--remove %s/cx_total.gcov %s' % (gcovTempDir, fileFilter),
-                '--output-file %s/cx_clean.gcov' % gcovTempDir
+                '--remove %s/cx_clean0.gcov %s' % (gcovTempDir, fileFilter),
+                '--output-file %s/cx_clean1.gcov' % gcovTempDir
                 ])
         shell.run(['genhtml',
-                '%s/cx_clean.gcov' % gcovTempDir,
+                '%s/cx_clean1.gcov' % gcovTempDir,
                 '--output-directory %s' % gcovResultDir
                 ])
         

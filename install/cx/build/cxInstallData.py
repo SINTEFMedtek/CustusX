@@ -79,6 +79,7 @@ class Common(object):
         self.publish_release_target                 = cx.utils.cxSSH.RemoteServerID("example.com", "/path/to/folder")
         self.publish_developer_documentation_target = cx.utils.cxSSH.RemoteServerID("example.com", "/path/to/folder")
         self.publish_user_documentation_target      = cx.utils.cxSSH.RemoteServerID("example.com", "/path/to/folder") 
+        self.publish_coverage_info_target           = cx.utils.cxSSH.RemoteServerID("example.com", "/path/to/folder") 
 
         # for the build of CustusX on the custusx.org website
         user = "custusx"
@@ -87,6 +88,8 @@ class Common(object):
         self.publish_release_target                 = cx.utils.cxSSH.RemoteServerID(server, "%s/releases"%root_folder, user)
         self.publish_developer_documentation_target = cx.utils.cxSSH.RemoteServerID(server, "%s/developer_doc"%root_folder, user)
         self.publish_user_documentation_target      = cx.utils.cxSSH.RemoteServerID(server, "%s/user_doc"%root_folder, user) 
+        self.publish_coverage_info_target           = cx.utils.cxSSH.RemoteServerID(server, "%s/gcov"%root_folder, user) 
+
 
         self.gitrepo_internal_site_base = "user@example.com/path/to/folder" #intended for use with "git checkout ssh://%s"
         self.gitrepo_open_site_base = "git@github.com:SINTEFMedtek"  

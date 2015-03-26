@@ -65,6 +65,7 @@ Q_OBJECT
 public:
     OptimizedUpdateWidget(QWidget* parent = NULL);
     virtual ~OptimizedUpdateWidget() {}
+	void forcePrePaint(); // use to explicitly call the prePaintEvent. Use only for testing!
 
 public slots:
     /**

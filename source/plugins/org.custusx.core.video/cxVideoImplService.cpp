@@ -82,6 +82,15 @@ VideoImplService::VideoImplService(ctkPluginContext *context) :
 
 VideoImplService::~VideoImplService()
 {
+	// Disconnect before deleting videoconnection:
+	// The VideoConnection might emit events AND call processevents, causing
+	// recursive calls back to this during deletion.
+	disconnect(mVideoConnection.get(), &VideoConnection::connected, this, &VideoImplService::autoSelectActiveVideoSource);
+	disconnect(mVideoConnection.get(), &VideoConnection::videoSourcesChanged, this, &VideoImplService::autoSelectActiveVideoSource);
+	disconnect(mVideoConnection.get(), &VideoConnection::fps, this, &VideoImplService::fpsSlot);
+	disconnect(mBackend->getToolManager().get(), &TrackingService::activeToolChanged, this, &VideoImplService::autoSelectActiveVideoSource);
+	disconnect(mVideoConnection.get(), &VideoConnection::connected, this, &VideoImplService::connected);
+
 	mVideoConnection.reset();
 }
 

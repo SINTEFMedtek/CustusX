@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include <cxLogicManager.h>
 
+#include <QApplication>
 #include <ctkPluginContext.h>
 #include "cxLogger.h"
 #include "cxVideoServiceProxy.h"
@@ -104,6 +105,8 @@ void LogicManager::initialize(ApplicationComponentPtr component)
 	LogicManager::getInstance()->initializeServices();
 	LogicManager::getInstance()->setApplicationComponent(component);
 
+	// we might want to use this one, in order to shutdown within the main loop
+//	connect(qApp, &QApplication::aboutToQuit, LogicManager::getInstance(), &LogicManager::shutdown);
 }
 
 void LogicManager::shutdown()

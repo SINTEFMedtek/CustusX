@@ -69,7 +69,7 @@ public:
 		delete mMainWindow;
 	}
 
-private:
+//private:
 	QPointer<MAIN_WINDOW> mMainWindow;
 };
 

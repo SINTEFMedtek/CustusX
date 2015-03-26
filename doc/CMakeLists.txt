@@ -1,7 +1,15 @@
-#
-# Build the USER documentation
-#
-find_package(Doxygen)
+###############################################################################
+# Build the USER and DEVELOPER documentation
+###############################################################################
+
+if(CX_BUILD_USER_DOCUMENTATION)
+	find_package( Doxygen 1.8.6 REQUIRED)
+else()
+	find_package( Doxygen 1.8.6 QUIET)
+endif()
+
+
+
 
 INCLUDE (${CMAKE_ROOT}/Modules/Documentation.cmake OPTIONAL)
 

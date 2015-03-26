@@ -43,6 +43,11 @@ OptimizedUpdateWidget::OptimizedUpdateWidget(QWidget* parent) :
 {
 }
 
+void OptimizedUpdateWidget::forcePrePaint()
+{
+	this->prePaintEventPrivate();
+}
+
 void OptimizedUpdateWidget::paintEvent(QPaintEvent* event)
 {
     this->prePaintEventPrivate();

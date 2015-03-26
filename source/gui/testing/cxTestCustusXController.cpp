@@ -51,77 +51,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxViewService.h"
 #include "cxSessionStorageService.h"
+#include "cxMainWindowApplicationComponent.h"
 
 CustusXController::CustusXController(QObject* parent) : QObject(parent)
 {
-  mTestData += "Test Results:\n";
-//  mMainWindow = NULL;
-  mBaseTime = 1000;
+	mTestData += "Test Results:\n";
+	mBaseTime = 1000;
 	mMeasuredFPS = 0;
 	mEnableSlicing = false;
 }
 
 CustusXController::~CustusXController()
 {
-//	if (mMainWindow)
-//		this->stop();
-}
-
-namespace cxtest
-{
-
-/**
- * Class holding the CustusX MainWindow
- */
-class MainWindowFactory : public cx::ApplicationComponent
-{
-public:
-	virtual void create()
-	{
-		if (this->exists())
-			return;
-
-//		PatientModelServicePtr patientModelService = PatientModelServicePtr(new PatientModelServiceProxy(LogicManager::getInstance()->getPluginContext()));
-//		VisualizationServicePtr visualizationService = VisualizationServicePtr(new VisualizationServiceProxy(LogicManager::getInstance()->getPluginContext()));
-//		AcquisitionServicePtr acquisitionService = AcquisitionServicePtr(new AcquisitionServiceProxy(LogicManager::getInstance()->getPluginContext()));
-
-//		CalibrationPluginPtr calibrationPlugin(new CalibrationPlugin(patientModelService, acquisitionService));
-//		AlgorithmPluginPtr algorithmPlugin(new AlgorithmPlugin(visualizationService, patientModelService));
-
-//		mPlugins.push_back(calibrationPlugin);
-//		mPlugins.push_back(algorithmPlugin);
-
-		mMainWindow = new cx::MainWindow(mPlugins);
-
-		mMainWindow->show();
-#ifdef __APPLE__ // needed on mac for bringing to front: does the opposite on linux
-		mMainWindow->activateWindow();
-#endif
-		mMainWindow->raise();
-
-		mMainWindow->setGeometry( 0, 0, 1200, 1200);
-	}
-
-	virtual bool exists() const
-	{
-		return mMainWindow != 0;
-	}
-
-	virtual void destroy()
-	{
-		if (!this->exists())
-			return;
-
-//		qApp->processEvents();
-		std::cout << "Mainwindow.isnull: " << mMainWindow.isNull() << std::endl;
-		delete mMainWindow;
-		mPlugins.clear();
-	}
-
-private:
-	QPointer<cx::MainWindow> mMainWindow;
-	std::vector<cx::GUIExtenderServicePtr> mPlugins;
-};
 }
 
 void CustusXController::start()
@@ -129,34 +70,20 @@ void CustusXController::start()
   qApp->setOrganizationName("SINTEF");
   qApp->setOrganizationDomain("test.sintef.no");
   qApp->setApplicationName("CustusX");
-//  qApp->setWindowIcon(QIcon(":/icons/CustusX.png"));
-//  qApp->setWindowIcon(QIcon(":/icons/.png"));
 
-  cx::ApplicationComponentPtr mainwindow(new cxtest::MainWindowFactory());
+  cx::ApplicationComponentPtr mainwindow(new cx::MainWindowApplicationComponent<cx::MainWindow>());
   cx::LogicManager::initialize(mainwindow);
   cx::settings()->setValue("Automation/autoSave", "false");
   cx::settings()->setValue("Automation/autoLoadRecentPatient", "");
 
-
-//  mMainWindow = new cx::MainWindow(std::vector<cx::GUIExtenderServicePtr>());
-//  mMainWindow->show();
-//#ifdef __APPLE__ // needed on mac for bringing to front: does the opposite on linux
-//  mMainWindow->activateWindow();
-//#endif
-//  mMainWindow->raise();
-
-
-
-  QTimer::singleShot(      0,   this, SLOT(initialBeginCheckRenderSlot()) );
-  QTimer::singleShot(      0,   this, SLOT(loadPatientSlot()) );
+  QTimer::singleShot(0, this, SLOT(initialBeginCheckRenderSlot()) );
+  QTimer::singleShot(0, this, SLOT(loadPatientSlot()) );
 	if(mEnableSlicing)
-		QTimer::singleShot(      0,   this, SLOT(enableSlicingSlot()) );
-
+		QTimer::singleShot(0, this, SLOT(enableSlicingSlot()) );
 }
+
 void CustusXController::stop()
 {
-//  delete mMainWindow;
-//	mMainWindow = NULL;
   cx::LogicManager::shutdown(); // shutdown all global resources, _after_ gui is deleted.
 }
 

@@ -44,7 +44,6 @@ HelpBrowser::HelpBrowser(QWidget *parent, HelpEnginePtr engine)
 	: QTextBrowser(parent), mEngine(engine)
 {
 	connect(mEngine.get(), SIGNAL(keywordActivated(QString)), this, SLOT(showHelpForKeyword(const QString&)));
-//	this->setOpenExternalLinks(true);
 }
 
 void HelpBrowser::showHelpForKeyword(const QString &id)
@@ -52,16 +51,8 @@ void HelpBrowser::showHelpForKeyword(const QString &id)
 	if (mEngine->engine())
 	{
 		QMap<QString, QUrl> links = mEngine->engine()->linksForIdentifier(id);
-//		std::cout << "[links]" << links.size() << std::endl;
 		if (links.count())
 		{
-//			std::cout << "Set links: " << links.size()
-//					  << ", " << links.first().toString()
-//					  << ", " << links.firstKey()
-//					  << std::endl;
-//			std::cout << "sourceH: " << links.first().toString() << std::endl;
-//			std::cout << "sourceE: " << QString(links.first().toEncoded()) << std::endl;
-
 			setSource(links.first());
 		}
 	}
@@ -85,8 +76,6 @@ QVariant HelpBrowser::loadResource(int type, const QUrl &name)
 		QUrl url(name);
 		if (name.isRelative())
 			url = source().resolved(url);
-
-//		std::cout << "HelpBrowser::loadResource, scheme=" << url.scheme() << "  url=" << url.toString() << std::endl;
 
 		if (url.scheme() == "qthelp")
 			return QVariant(mEngine->engine()->fileData(url));
