@@ -61,18 +61,10 @@ namespace cx
 ActiveVolumeWidget::ActiveVolumeWidget(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget* parent) :
   BaseWidget(parent, "ActiveVolumeWidget", "Active Volume")
 {
+	this->setToolTip("The currently selected active volume");
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->setMargin(0);
 	layout->addWidget(new DataSelectWidget(visualizationService, patientModelService, this, StringPropertyActiveImage::New(patientModelService)));
-}
-
-QString ActiveVolumeWidget::defaultWhatsThis() const
-{
-  return "<html>"
-      "<h3>Active volume</h3>"
-      "<p>Displays the currently selected active volume.</p>"
-      "<p><i>Use the list to change the active volume.</i></p>"
-      "</html>";
 }
 
 /// -------------------------------------------------------
@@ -82,6 +74,7 @@ QString ActiveVolumeWidget::defaultWhatsThis() const
 VolumePropertiesWidget::VolumePropertiesWidget(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget *parent) :
 		TabbedWidget(parent, "VolumePropertiesWidget", "Volume Properties")
 {
+	this->setToolTip("Volume properties");
 	this->insertWidgetAtTop(new ActiveVolumeWidget(patientModelService, visualizationService, this));
 
 	bool connectToActiveImage = true;
@@ -91,11 +84,6 @@ VolumePropertiesWidget::VolumePropertiesWidget(PatientModelServicePtr patientMod
 	this->addTab(new ShadingWidget(patientModelService, this, connectToActiveImage), "Shading");
 	this->addTab(new CroppingWidget(this), "Crop");
 	this->addTab(new ClippingWidget(patientModelService, this), "Clip");
-}
-
-QString VolumePropertiesWidget::defaultWhatsThis() const
-{
-	return "<html></html>";
 }
 
 }//namespace

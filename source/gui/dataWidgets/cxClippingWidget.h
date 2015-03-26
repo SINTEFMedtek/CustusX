@@ -92,7 +92,6 @@ Q_OBJECT
 
 public:
 	ClippingWidget(cx::PatientModelServicePtr patientModelService, QWidget* parent);
-	virtual QString defaultWhatsThis() const;
 
 private:
 	InteractiveClipperPtr mInteractiveClipper;

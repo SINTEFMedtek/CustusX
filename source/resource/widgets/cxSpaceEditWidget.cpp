@@ -44,6 +44,7 @@ SpaceEditWidget::SpaceEditWidget(QWidget* parent, SpacePropertyBasePtr dataInter
 	QGridLayout* gridLayout, int row) :
 	BaseWidget(parent, "SpaceEditWidget", "SpaceEditWidget")
 {
+	this->setToolTip("Edit a space (coordinate system)");
 	CX_ASSERT(dataInterface->getAllowOnlyValuesInRange()==true);
 
 	this->setEnabled(dataInterface->getEnabled());
@@ -78,11 +79,6 @@ SpaceEditWidget::SpaceEditWidget(QWidget* parent, SpacePropertyBasePtr dataInter
 	}
 
 	this->setModified();
-}
-
-QString SpaceEditWidget::defaultWhatsThis() const
-{
-	return "<html></html>";
 }
 
 void SpaceEditWidget::attemptSetValue(COORDINATE_SYSTEM id, QString ref)

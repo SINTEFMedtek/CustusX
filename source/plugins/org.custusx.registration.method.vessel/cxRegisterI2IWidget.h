@@ -60,7 +60,6 @@ class RegisterI2IWidget : public RegistrationBaseWidget
 public:
 	RegisterI2IWidget(RegServices services, QWidget* parent);
   ~RegisterI2IWidget();
-  virtual QString defaultWhatsThis() const;
 
 private:
   RegisterI2IWidget();

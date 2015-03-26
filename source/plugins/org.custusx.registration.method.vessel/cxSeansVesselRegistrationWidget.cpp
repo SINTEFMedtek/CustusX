@@ -99,15 +99,6 @@ SeansVesselRegistrationWidget::~SeansVesselRegistrationWidget()
 {
 }
 
-QString SeansVesselRegistrationWidget::defaultWhatsThis() const
-{
-	return "<html>"
-		"<h3>Seans Vessel Registration.</h3>"
-		"<p>Select two datasets you want to registere to eachother, adjust the input parameters.</p>"
-		"<p><i>Adjust the parameters and click the register button.</i></p>"
-		"</html>";
-}
-
 void SeansVesselRegistrationWidget::inputChanged()
 {
 	if(mServices.registrationService->getMovingData() && mServices.registrationService->getFixedData())

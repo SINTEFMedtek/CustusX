@@ -67,7 +67,6 @@ class cxGui_EXPORT CroppingWidget : public BaseWidget
 
 public:
   CroppingWidget(QWidget* parent);
-  virtual QString defaultWhatsThis() const;
 
 private:
   InteractiveCropperPtr mInteractiveCropper;

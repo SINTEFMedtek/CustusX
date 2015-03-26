@@ -60,8 +60,6 @@ public:
 	SpaceEditWidget(QWidget* parent, SpacePropertyBasePtr, QGridLayout* gridLayout = 0, int row = 0);
 	virtual ~SpaceEditWidget() {}
 
-	virtual QString defaultWhatsThis() const;
-
 	void showLabel(bool on);
 
 protected:

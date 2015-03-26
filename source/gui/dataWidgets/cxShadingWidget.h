@@ -73,15 +73,13 @@ public slots:
   void activeImageChangedSlot(); ///< listens to the contextdockwidget for when the current image is changed
   void imageChangedSlot(ImagePtr image);
   void shadingToggledSlot(bool val);
-  virtual QString defaultWhatsThis() const;
 
 protected:
   void init(bool connectToActiveImage);///< Initialize TransferFunctionWidget. Create members
-  //gui
+
   QVBoxLayout* mLayout;
   QCheckBox* mShadingCheckBox;
 
-  //ImagePtr mCurrentImage;
   bool mInitialized;///< Is TransferFunctionWidget initialized
   PatientModelServicePtr mPatientModelService;
   ActiveImageProxyPtr mActiveImageProxy;

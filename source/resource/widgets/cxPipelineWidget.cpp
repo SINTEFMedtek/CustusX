@@ -99,11 +99,6 @@ void PipelineWidgetFilterLine::mousePressEvent(QMouseEvent* event)
 	mRadioButton->setChecked(true);
 }
 
-QString PipelineWidgetFilterLine::defaultWhatsThis() const
-{
-	return QString("");
-}
-
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 ///--------------------------------------------------------
@@ -112,6 +107,7 @@ PipelineWidget::PipelineWidget(VisualizationServicePtr visualizationService, Pat
     BaseWidget(parent, "PipelineWidget", "Pipeline"),
     mPipeline(pipeline)
 {
+	this->setToolTip("Run a series of filters");
 	FilterGroupPtr filters = mPipeline->getFilters();
 	std::vector<SelectDataStringPropertyBasePtr> nodes = mPipeline->getNodes();
 	if (filters->size()+1 != nodes.size())
@@ -177,14 +173,6 @@ void PipelineWidget::runFilterSlot()
 		return;
 
 	mPipeline->execute(line->mFilter->getUid());
-}
-
-QString PipelineWidget::defaultWhatsThis() const
-{
-	return QString("<html>"
-	               "<h3>Pipeline Widget.</h3>"
-	               "<p>Run a series of filters.</p>"
-	               "</html>");
 }
 
 

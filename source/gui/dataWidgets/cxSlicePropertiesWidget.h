@@ -62,12 +62,8 @@ class cxGui_EXPORT SlicePropertiesWidget : public TabbedWidget
 public:
 	SlicePropertiesWidget(cx::PatientModelServicePtr patientModelService, cx::VisualizationServicePtr visualizationService, QWidget* parent);
 	virtual ~SlicePropertiesWidget();
-  virtual QString defaultWhatsThis() const;
 
 protected:
-  virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
-  virtual void hideEvent(QCloseEvent* event); ///<disconnects stuff
-
 private:
 	SlicePropertiesWidget();
 };

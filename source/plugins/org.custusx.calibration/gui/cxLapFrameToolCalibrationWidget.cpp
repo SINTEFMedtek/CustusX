@@ -78,7 +78,7 @@ LapFrameToolCalibrationWidget::LapFrameToolCalibrationWidget(VisServicesPtr serv
   mCalibratingTool->setValueName("Tool");
   mCalibratingTool->setHelp("Select which Tool to calibrate");
 
-  this->setToolTip(this->defaultWhatsThis());
+  this->setToolTip("Calibrate tool matrix using a custom frame");
 
 //  toplayout->addWidget(new QLabel("<b>Select a tool with a known reference point:</b>"));
   toplayout->addWidget(new LabeledComboBoxWidget(this, mCalibRefTool));
@@ -109,17 +109,6 @@ LapFrameToolCalibrationWidget::LapFrameToolCalibrationWidget(VisServicesPtr serv
 
 LapFrameToolCalibrationWidget::~LapFrameToolCalibrationWidget()
 {}
-
-QString LapFrameToolCalibrationWidget::defaultWhatsThis() const
-{
-  return "<html>"
-      "<h3>Laparascopic tool calibration</h3>"
-      "<p><i>Calibrates a tool by sampling it when it is inserted into the slot of the custom-made calibration frame.</i></br>"
-      "<p><i>The tool to be calibrated will have its calibration set in such a way that the calibrating and calibrated tools"
-      "are in the same position.</i></br>"
-      "<p>By using the test button you can test your calibration by pointing at a known reference point.</br></p>"
-      "</html>";
-}
 
 void LapFrameToolCalibrationWidget::calibrateSlot()
 {

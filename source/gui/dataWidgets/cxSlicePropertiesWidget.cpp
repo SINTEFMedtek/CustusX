@@ -47,6 +47,7 @@ namespace cx
 SlicePropertiesWidget::SlicePropertiesWidget(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget* parent) :
 		TabbedWidget(parent, "SlicePropertiesWidget", "Slice Properties")
 {
+	this->setToolTip("2D Image properties");
 	this->insertWidgetAtTop(new DataSelectWidget(visualizationService, patientModelService, this, StringPropertyActiveImage::New(patientModelService)));
   this->addTab(new VolumeInfoWidget(patientModelService, this), "Info");
   this->addTab(new ColorWidget(patientModelService, this), "Color");
@@ -56,23 +57,5 @@ SlicePropertiesWidget::SlicePropertiesWidget(PatientModelServicePtr patientModel
 SlicePropertiesWidget::~SlicePropertiesWidget()
 {}
 
-QString SlicePropertiesWidget::defaultWhatsThis() const
-{
-  return "<html>"
-    "<h3>Image slice properties.</h3>"
-    "<p>Lets you set properties on a 2d image slice.</p>"
-    "<p><i></i></p>"
-    "</html>";
-}
-
-void SlicePropertiesWidget::showEvent(QShowEvent* event)
-{
-  QWidget::showEvent(event);
-}
-
-void SlicePropertiesWidget::hideEvent(QCloseEvent* event)
-{
-  QWidget::closeEvent(event);
-}
 
 }//end namespace cx

@@ -69,18 +69,14 @@ TemporalCalibrationWidget::TemporalCalibrationWidget(VisServicesPtr services, Ac
 {
 	mServices = services;
 
+	this->setToolTip("Temporal calibration from a vertical periodic movement of an US probe");
   mAlgorithm.reset(new TemporalCalibration);
   connect(mServices->getPatientService().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
 
-//  connect(mAcquisition.get(), SIGNAL(ready(bool,QString)), mRecordSessionWidget, SLOT(setReady(bool,QString)));
   connect(acquisitionService.get(), SIGNAL(saveDataCompleted(QString)), this, SLOT(selectData(QString)));
-//  mAcquisition->checkIfReadySlot();
 
   mRecordSessionWidget = new RecordSessionWidget(acquisitionService, this, "temporal_calib");
 
-//  connect(mRecordSessionWidget, SIGNAL(newSession(QString)), mAcquisition.get(), SLOT(saveSession(QString)));
-//  connect(mRecordSessionWidget, SIGNAL(started(QString)), mAcquisition.get(), SLOT(startRecord(QString)));
-//  connect(mRecordSessionWidget, SIGNAL(stopped(bool)), mAcquisition.get(), SLOT(stopRecord(bool)));
   mRecordSessionWidget->setDescriptionVisibility(false);
 
   QVBoxLayout* topLayout = new QVBoxLayout(this);
@@ -88,7 +84,7 @@ TemporalCalibrationWidget::TemporalCalibrationWidget(VisServicesPtr services, Ac
   // add recording widgets
   QLabel* acqLabel = new QLabel("<b>Acquisition</b>");
   topLayout->addWidget(acqLabel);
-  acqLabel->setToolTip(this->defaultWhatsThis());
+  acqLabel->setToolTip(this->toolTip());
   topLayout->addWidget(mInfoLabel);
   topLayout->addWidget(mRecordSessionWidget);
   topLayout->addWidget(new LabeledComboBoxWidget(this, StringPropertyActiveProbeConfiguration::New(mServices->getToolManager())));
@@ -99,7 +95,7 @@ TemporalCalibrationWidget::TemporalCalibrationWidget(VisServicesPtr services, Ac
   // add calibration widgets
   QLabel* calLabel = new QLabel("<b>Calibration</b>");
   topLayout->addWidget(calLabel);
-  calLabel->setToolTip(this->defaultWhatsThis());
+  calLabel->setToolTip(this->toolTip());
 
   mFileSelectWidget = new FileSelectWidget(this);
   connect(mFileSelectWidget, SIGNAL(fileSelected(QString)), this, SLOT(selectData(QString)));
@@ -130,19 +126,6 @@ TemporalCalibrationWidget::TemporalCalibrationWidget(VisServicesPtr services, Ac
 TemporalCalibrationWidget::~TemporalCalibrationWidget()
 {}
 
-QString TemporalCalibrationWidget::defaultWhatsThis() const
-{
-	return "<html>"
-			"<h3>Temporal Calibration.</h3>"
-			"<p><i>Calibrate the time shift between the tracking system and the video acquisition source.</i></br>"
-			"<p>Part 1, Acqusition: Move the probe in a sinusoidal pattern up and down in a water tank or similar."
-			"The <i>first</i> image should be a typical image, as it is used to correlate against all the others."
-			"<p>Part 2, Calibration: Press calibrate to calculate the temporal shift for the selected acquisition."
-			"The shift is not applied in any way. Refer to the log folder for the calibration curves."
-			"<p><b>NB:</b> Previous temporal calibration is applied to probe frames during acqusition.</p>"
-			"</html>";
-}
-
 void TemporalCalibrationWidget::showEvent(QShowEvent* event)
 {
   mFileSelectWidget->refresh();
@@ -150,15 +133,12 @@ void TemporalCalibrationWidget::showEvent(QShowEvent* event)
 
 void TemporalCalibrationWidget::patientChangedSlot()
 {
-//  std::cout << "TemporalCalibrationWidget::patientChangedSlot() "  << std::endl;
   QString filename = mServices->getPatientService()->getActivePatientFolder() + "/US_Acq/";
   mFileSelectWidget->setPath(filename);
-//  this->selectData(filename);
 }
 
 void TemporalCalibrationWidget::selectData(QString filename)
 {
-//  std::cout << "TemporalCalibrationWidget::selectData " << filename << std::endl;
   mAlgorithm->selectData(filename);
   mFileSelectWidget->setFilename(filename);
   mResult->setText("");

@@ -191,6 +191,7 @@ TransferFunction3DWidget::TransferFunction3DWidget(PatientModelServicePtr patien
   mPatientModelService(patientModelService),
   mActiveImageProxy(ActiveImageProxyPtr())
 {
+	this->setToolTip("Set a transfer function on a 3D volume");
   mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(patientModelService, this);
   mTransferFunctionColorWidget = new TransferFunctionColorWidget(patientModelService, this);
 
@@ -210,15 +211,6 @@ TransferFunction3DWidget::TransferFunction3DWidget(PatientModelServicePtr patien
 	  connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &TransferFunction3DWidget::activeImageChangedSlot);
 	  connect(mActiveImageProxy.get(), &ActiveImageProxy::transferFunctionsChanged, this, &TransferFunction3DWidget::activeImageChangedSlot);
   }
-}
-
-QString TransferFunction3DWidget::defaultWhatsThis() const
-{
-  return "<html>"
-    "<h3>3D Transfer Function</h3>"
-    "<p>Lets you set a transfer function on a 3D volume.</p>"
-    "<p><i></i></p>"
-    "</html>";
 }
 
 void TransferFunction3DWidget::activeImageChangedSlot()
@@ -248,6 +240,7 @@ TransferFunction2DWidget::TransferFunction2DWidget(PatientModelServicePtr patien
   mLayout(new QVBoxLayout(this)),
   mPatientModelService(patientModelService)
 {
+	this->setToolTip("Set a transfer function on a 2D image");
   mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(patientModelService, this);
   mTransferFunctionAlphaWidget->setReadOnly(true);
   mTransferFunctionColorWidget = new TransferFunctionColorWidget(patientModelService, this);
@@ -279,15 +272,6 @@ TransferFunction2DWidget::TransferFunction2DWidget(PatientModelServicePtr patien
   this->setLayout(mLayout);
 }
 
-QString TransferFunction2DWidget::defaultWhatsThis() const
-{
-  return "<html>"
-    "<h3>2D Transfer Function</h3>"
-    "<p>Lets you set a transfer function on a 2D image.</p>"
-    "<p><i></i></p>"
-    "</html>";
-}
-
 void TransferFunction2DWidget::activeImageChangedSlot()
 {
   ImagePtr image = mPatientModelService->getActiveImage();
@@ -314,6 +298,7 @@ void TransferFunction2DWidget::activeImageChangedSlot()
 TransferFunctionWidget::TransferFunctionWidget(PatientModelServicePtr patientModelService, QWidget* parent, bool connectToActiveImage) :
   BaseWidget(parent, "TransferFunctionWidget", "Transfer Function")
 {
+	this->setToolTip("Set a new or predefined transfer function on a volume");
   QVBoxLayout* mLayout = new QVBoxLayout(this);
 
   TransferFunction3DWidget* transferFunctionWidget = new TransferFunction3DWidget(patientModelService, this, connectToActiveImage);
@@ -325,12 +310,4 @@ TransferFunctionWidget::TransferFunctionWidget(PatientModelServicePtr patientMod
   this->setLayout(mLayout);
 }
 
-QString TransferFunctionWidget::defaultWhatsThis() const
-{
-  return "<html>"
-    "<h3>Transfer Function.</h3>"
-    "<p>Lets you set a new or predefined transfer function on a volume.</p>"
-    "<p><i></i></p>"
-    "</html>";
-}
 }//namespace cx

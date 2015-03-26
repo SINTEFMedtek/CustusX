@@ -51,11 +51,8 @@ class cxGui_EXPORT ImagePropertiesWidget : public BaseWidget
 
 public:
 	ImagePropertiesWidget(QWidget* parent);
-
 	void imageChanged(ImagePtr image);
 public slots:
-	virtual QString defaultWhatsThis() const;
-
 private slots:
 	void interpolationTypeChanged(int index);
 

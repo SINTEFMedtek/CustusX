@@ -438,7 +438,7 @@ void ConsoleWidget::createUI()
 	mSeverityAction = NULL;
 	mMessagesWidget = NULL;
 
-	this->setWhatsThis(this->defaultWhatsThis());
+	this->setToolTip("Display system information, warnings and errors.");
 
 	QVBoxLayout* layout = new QVBoxLayout;
 	layout->setMargin(0);
@@ -539,15 +539,6 @@ ConsoleWidget::~ConsoleWidget()
 	QString levelString = enum2string<LOG_SEVERITY>(mMessageFilter->getLowestSeverity());
 	this->option("showLevel").writeValue(levelString);
 	this->option("showDetails").writeVariant(mDetailsAction->isChecked());
-}
-
-QString ConsoleWidget::defaultWhatsThis() const
-{
-	return "<html>"
-			"<h3>CustusX console.</h3>"
-			"<p>Display device for system administration messages.</p>"
-			"<p><i>Right click for addition options.</i></p>"
-			"</html>";
 }
 
 void ConsoleWidget::setDetails(bool on)

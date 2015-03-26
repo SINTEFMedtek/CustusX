@@ -143,7 +143,6 @@ public:
 	ConsoleWidget(QWidget* parent, QString uid="ConsoleWidget", QString name="Console");
 	ConsoleWidget(QWidget* parent, QString uid, QString name, XmlOptionFile options, LogPtr log);
 	~ConsoleWidget();
-	virtual QString defaultWhatsThis() const;
 
 	void setDetails(bool on);
 

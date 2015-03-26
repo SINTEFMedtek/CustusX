@@ -71,8 +71,6 @@ private slots:
 	void syncBoxToSectorChanged();
 
 private:
-	virtual QString defaultWhatsThis() const;
-
 	VisServicesPtr mServices;
 	QWidget* mActiveProbeConfigWidget;
 	BoundingBoxWidget* mBBWidget;

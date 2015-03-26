@@ -62,7 +62,6 @@ class cxGui_EXPORT TransferFunction2DColorWidget : public BaseWidget
 public:
   TransferFunction2DColorWidget(PatientModelServicePtr patientModelService, QWidget* parent);
   virtual ~TransferFunction2DColorWidget() {}
-  virtual QString defaultWhatsThis() const;
 
 public slots:
   void activeImageChangedSlot();

@@ -125,7 +125,6 @@ void testBaseWidgetChild(cx::BaseWidget* widget)
 	REQUIRE(widget);
 	CHECK_THAT(widget->objectName().toStdString(), EndsWith("Widget"));
 	CHECK_FALSE(widget->windowTitle().isEmpty());
-	CHECK_THAT(widget->defaultWhatsThis().toStdString(), StartsWith("<html>"));
 }
 
 void testAndDeleteBaseWidgetChild(cx::BaseWidget* widget)

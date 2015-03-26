@@ -58,6 +58,7 @@ TransferFunctionColorWidget::TransferFunctionColorWidget(PatientModelServicePtr 
 	mCurrentClickPos(INT_MIN,INT_MIN),
   mBorder(5)
 {
+	this->setToolTip("Set the color part of a transfer function");
   this->setFocusPolicy(Qt::StrongFocus);
 	mActiveImageProxy = ActiveImageProxy::New(patientModelService);
   connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(activeImageTransferFunctionsChangedSlot()));
@@ -74,15 +75,6 @@ TransferFunctionColorWidget::TransferFunctionColorWidget(PatientModelServicePtr 
 
 TransferFunctionColorWidget::~TransferFunctionColorWidget()
 {}
-
-QString TransferFunctionColorWidget::defaultWhatsThis() const
-{
-  return "<html>"
-	"<h3>Color Transfer Function</h3>"
-	"<p>Let you set the color part of a transfer function.</p>"
-    "<p><i></i></p>"
-    "</html>";
-}
 
 void TransferFunctionColorWidget::enterEvent(QEvent* event)
 {

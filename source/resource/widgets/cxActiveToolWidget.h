@@ -55,8 +55,6 @@ class cxResourceWidgets_EXPORT ActiveToolWidget : public BaseWidget
 public:
   ActiveToolWidget(TrackingServicePtr trackingService, QWidget* parent);
   virtual ~ActiveToolWidget() {}
-
-  virtual QString defaultWhatsThis() const;
 };
 
 }

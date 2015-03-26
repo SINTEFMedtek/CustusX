@@ -55,7 +55,6 @@ public:
 	ActiveVolumeWidget(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget* parent);
   ~ActiveVolumeWidget() {}
 
-  virtual QString defaultWhatsThis() const;
 };
 
 /**
@@ -71,9 +70,7 @@ class cxGui_EXPORT VolumePropertiesWidget : public TabbedWidget
   Q_OBJECT
 public:
 	VolumePropertiesWidget(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget* parent);
-  virtual ~VolumePropertiesWidget(){};
-
-  virtual QString defaultWhatsThis() const;
+  virtual ~VolumePropertiesWidget() {}
 };
 
 }//namespace cx

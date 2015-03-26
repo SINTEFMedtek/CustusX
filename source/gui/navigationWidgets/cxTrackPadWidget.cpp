@@ -59,6 +59,7 @@ namespace cx
 TrackPadWidget::TrackPadWidget(QWidget* parent) :
     BaseWidget(parent, "TrackPadWidget", "Camera Control")
 {
+	this->setToolTip("Track pad camera control");
   mCameraControl = viewService()->getCameraControl();
 
   mMinPadSize = QSize(50,50);
@@ -69,15 +70,6 @@ TrackPadWidget::TrackPadWidget(QWidget* parent) :
   this->createStandard3DViewActions();
   this->definePanLayout();
   this->defineRotateLayout();
-}
-
-QString TrackPadWidget::defaultWhatsThis() const
-{
-  return "<html>"
-      "<h3>Trackpad for touch screen devices</h3>"
-      "<p>Helps the user control the camera on a touch screen.</p>"
-      "<p><i></i></p>"
-      "</html>";
 }
 
 void TrackPadWidget::createStandard3DViewActions()

@@ -55,8 +55,6 @@ public:
 	ImagePreviewWidget(QWidget* parent);
 	virtual ~ImagePreviewWidget();
 
-	virtual QString defaultWhatsThis() const;
-
 	void setSize(int width, int height);
 
 public slots:

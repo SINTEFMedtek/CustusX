@@ -50,6 +50,7 @@ ToolManualCalibrationWidget::ToolManualCalibrationWidget(VisServicesPtr services
   QVBoxLayout* mToptopLayout = new QVBoxLayout(this);
   //toptopLayout->setMargin(0);
 
+  this->setToolTip("Edit tool calibration matrix sMt");
   mTool = StringPropertySelectTool::New(mServices->getToolManager());
   mToptopLayout->addWidget(sscCreateDataWidget(this, mTool));
 
@@ -73,23 +74,12 @@ ToolManualCalibrationWidget::ToolManualCalibrationWidget(VisServicesPtr services
   connect(mServices->getToolManager().get(), &TrackingService::stateChanged, this, &ToolManualCalibrationWidget::toolCalibrationChanged);
 }
 
-
-QString ToolManualCalibrationWidget::defaultWhatsThis() const
-{
-  return "<html>"
-      "<h3>Tool Manual Calibration.</h3>"
-      "<p><i>Manipulate the tool calibration matrix sMt directly, using the matrix manipulation interface.</i></br>"
-      "</html>";
-}
-
-
 void ToolManualCalibrationWidget::toolCalibrationChanged()
 {
 	ToolPtr tool = mTool->getTool();
   if (!tool)
     return;
 
-//  mManualGroup->setVisible(tool->getVisible());
   mMatrixWidget->blockSignals(true);
   mMatrixWidget->setMatrix(tool->getCalibration_sMt());
   mMatrixWidget->blockSignals(false);

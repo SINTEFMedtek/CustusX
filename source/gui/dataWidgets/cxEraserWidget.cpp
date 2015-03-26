@@ -69,14 +69,10 @@ EraserWidget::EraserWidget(QWidget* parent) :
 {
 
 	QVBoxLayout* layout = new QVBoxLayout(this);
+	this->setToolTip("Erase parts of volumes/models");
 
 	mContinousEraseTimer = new QTimer(this);
 	connect(mContinousEraseTimer, SIGNAL(timeout()), this, SLOT(continousRemoveSlot())); // this signal will be executed in the thread of THIS, i.e. the main thread.
-
-//	this->setToolTip(this->defaultWhatsThis());
-
-//	layout->addWidget(new QLabel(QString("<font size=4 color=red><b>%1</b></font><br>Erase parts of active volume using a sphere.").arg("Experimental Widget!!")));
-//	layout->addStretch();
 
 	QHBoxLayout* buttonLayout = new QHBoxLayout;
 	layout->addLayout(buttonLayout);
@@ -127,16 +123,6 @@ void EraserWidget::enableButtons()
 
 EraserWidget::~EraserWidget()
 {
-}
-
-QString EraserWidget::defaultWhatsThis() const
-{
-	return "<html>"
-		"<h3>Functionality for erasing parts of volumes/meshes.</h3>"
-		"<p>"
-		"</p>"
-		"<p><i></i></p>"
-		"</html>";
 }
 
 void EraserWidget::toggleContinous(bool on)

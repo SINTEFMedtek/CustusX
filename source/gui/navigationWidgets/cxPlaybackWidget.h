@@ -78,7 +78,6 @@ private slots:
 	void toggleDetailsSlot();
 
 private:
-	virtual QString defaultWhatsThis() const;
 	QString stripLeadingZeros(QString time);
 	std::vector<TimelineEvent> convertHistoryToEvents(ToolPtr tool);
 	std::vector<TimelineEvent> createEvents();

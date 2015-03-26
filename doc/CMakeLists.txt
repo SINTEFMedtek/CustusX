@@ -48,7 +48,7 @@ function(cx_doc_generate_plugin_page)
     # Generate PLUGIN_SUBPAGES_TEXT containing \subpage refs to all documented plugins
     # ready to insert into markdown.
     foreach(_var ${PLUGIN_DOC_NAMES})
-        set(PLUGIN_SUBPAGES_TEXT "${PLUGIN_SUBPAGES_TEXT}\n\\subpage ${_var} (${_var})" )
+        set(PLUGIN_SUBPAGES_TEXT "${PLUGIN_SUBPAGES_TEXT}\n* \\subpage ${_var} (${_var})" )
     endforeach()
     #message(STATUS "PLUGIN_SUBPAGES_TEXT : " ${PLUGIN_SUBPAGES_TEXT})
 

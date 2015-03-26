@@ -76,6 +76,7 @@ void DicomWidget::createUI()
 	if (mBrowser)
 		return;
 
+	this->setToolTip("Import DICOM data");
 	//Add detailed button
 	mViewHeaderAction = this->createAction(this,
 										   QIcon(),
@@ -97,15 +98,6 @@ void DicomWidget::createUI()
 
 DicomWidget::~DicomWidget()
 {
-}
-
-QString DicomWidget::defaultWhatsThis() const
-{
-	return "<html>"
-			"<h3>Dicom plugin.</h3>"
-			"<p>Import data from dicom</p>"
-			"<p>The dicom widgets are taken from the ctk project.</p>"
-			"</html>";
 }
 
 void DicomWidget::setupDatabaseDirectory()

@@ -44,21 +44,13 @@ namespace cx
 CalibrationMethodsWidget::CalibrationMethodsWidget(VisServicesPtr services, AcquisitionServicePtr acquisitionService, QWidget* parent, QString objectName, QString windowTitle) :
 	TabbedWidget(parent, objectName, windowTitle)
 {
+	this->setToolTip("Collection of calibration methods");
 	this->addTab(new ToolTipCalibrateWidget(services, this), "Tool Tip");
 	this->addTab(new LapFrameToolCalibrationWidget(services, this), "Lap Frame");
 	this->addTab(new ToolTipSampleWidget(services, this), "Sample");
 	this->addTab(new TemporalCalibrationWidget(services, acquisitionService, this), "Temporal");
 	this->addTab(new ToolManualCalibrationWidget(services, this), "Tool Manual");
 	this->addTab(new ProbeConfigWidget(services, this), "Probe");
-}
-
-QString CalibrationMethodsWidget::defaultWhatsThis() const
-{
-  return"<html>"
-      "<h3>Calibration methods.</h3>"
-      "<p>These methods creates data structures that can be use in visualization.</p>"
-      "<p><i>Choose a method.</i></p>"
-      "</html>";
 }
 
 }

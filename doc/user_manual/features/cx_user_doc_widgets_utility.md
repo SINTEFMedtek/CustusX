@@ -8,9 +8,9 @@ Utility Widgets {#utility_widgets}
 Metrics Widget {#utility_widgets_metrics}
 ===========================================================
 
-Utility for sampling points in 3D.
+3D measurement tools.
 
-Lets you sample points in 3D and get the distance between sampled points.
+Define points, distances and angles.
 
 
 
@@ -49,3 +49,29 @@ US Acquisition Widget {#utility_widgets_us_acquisition}
 ===========================================================
 
 *Record and reconstruct US data.*
+
+
+\addindex probe_config_widget
+Probe Config Widget {#utility_widgets_probe_config}
+===========================================================
+View and edit the probe configuration. 
+
+Use the origin to define the position of the probe image in relation 
+to the tool t space. Set the cropping box and the probe sector parameters 
+(depth and width). All can be written back to the ProbeCalibConfigs.xml file.
+
+
+\addindex playback_widget
+Playback Widget {#utility_widgets_playback}
+===========================================================
+
+Play back the whole session.
+Playback contains all tool positions and recorded video
+(video is only recorded during 3D acquisition).
+
+* Green indicates visible tools.
+* Orange indicates recorded video.
+
+> Tip: Press the red putton to start playback
+
+

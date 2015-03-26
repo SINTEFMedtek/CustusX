@@ -60,7 +60,6 @@ class PrepareVesselsWidget : public RegistrationBaseWidget
 public:
 	PrepareVesselsWidget(RegServices services, QWidget* parent);
   virtual ~PrepareVesselsWidget();
-  virtual QString defaultWhatsThis() const;
 
 protected:
   QVBoxLayout* mLayout;

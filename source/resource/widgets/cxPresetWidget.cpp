@@ -41,6 +41,7 @@ namespace cx {
 PresetWidget::PresetWidget(QWidget* parent) :
 	BaseWidget(parent, "PresetWidget", "Presets"), mLayout(new QVBoxLayout(this))
 {
+	this->setToolTip("Select a predefined set of options");
 	mPresetsComboBox = new QComboBox(this);
 	mPresetsComboBox->setToolTip("Select a preset to use");
 	connect(mPresetsComboBox, SIGNAL(currentIndexChanged(const QString&)), this,
@@ -69,15 +70,6 @@ PresetWidget::PresetWidget(QWidget* parent) :
 	this->populateButtonLayout();
 
 	this->setLayout(mLayout);
-}
-
-QString PresetWidget::defaultWhatsThis() const
-{
-  return "<html>"
-    "<h3>Presets</h3>"
-    "<p>Lets you select a predefined set of options.</p>"
-    "<p><i></i></p>"
-    "</html>";
 }
 
 bool PresetWidget::requestSetCurrentPreset(QString name)

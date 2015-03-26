@@ -64,8 +64,6 @@ public:
   FrameTreeWidget(PatientModelServicePtr patientService, QWidget* parent);
   ~FrameTreeWidget() {}
 
-  virtual QString defaultWhatsThis() const;
-
 protected:
   virtual void prePaintEvent();
 private:

@@ -62,10 +62,10 @@ CroppingWidget::CroppingWidget(QWidget* parent) :
 
   QVBoxLayout* layout = new QVBoxLayout(this);
 
-  this->setToolTip(this->defaultWhatsThis());
+  this->setToolTip("Interactive volume cropping");
 
   QGroupBox* activeGroupBox = new QGroupBox("Interactive cropper");
-  activeGroupBox->setToolTip(this->defaultWhatsThis());
+  activeGroupBox->setToolTip(this->toolTip());
   layout->addWidget(activeGroupBox);
   QVBoxLayout* activeLayout = new QVBoxLayout(activeGroupBox);
 
@@ -95,28 +95,6 @@ CroppingWidget::CroppingWidget(QWidget* parent) :
   layout->addStretch();
 
   this->cropperChangedSlot();
-}
-
-QString CroppingWidget::defaultWhatsThis() const
-{
-	return "<html>"
-		"<h3>Functionality for cropping a volume.</h3>"
-		"<p>"
-		"Lets you crop a volume by defining a bounding box along the volume "
-		"axis. Everything outside the box is not shown."
-		"</p>"
-		"<p>"
-		"<b>How to use the bounding box:</b>"
-		"<ul>"
-		"<li>First click the bounding box to get the control spheres</li>"
-		"<li>Click and drag a sphere to change the crop area</li>"
-		"</ul>"
-		"</p>"
-		"<p>"
-		"<b>Tip:</b> To make the crop permanent, press the button to create a new volume from the crop."
-		"</p>"
-		"<p><i></i></p>"
-		"</html>";
 }
 
 void CroppingWidget::boxValuesChanged()

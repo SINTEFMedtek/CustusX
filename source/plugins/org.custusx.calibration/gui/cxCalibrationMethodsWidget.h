@@ -53,7 +53,6 @@ public:
   CalibrationMethodsWidget(VisServicesPtr services, AcquisitionServicePtr acquisitionService,
   		QWidget* parent, QString objectName, QString windowTitle);
   virtual ~CalibrationMethodsWidget() {}
-  virtual QString defaultWhatsThis() const;
 };
 //------------------------------------------------------------------------------
 

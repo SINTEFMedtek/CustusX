@@ -46,6 +46,7 @@ TransferFunctionPresetWidget::TransferFunctionPresetWidget(PatientModelServicePt
 		PresetWidget(parent), mIs3D(is3D),
 		mPatientModelService(patientModelService)
 {
+	this->setToolTip("Select a predefined transfer function");
 	this->setObjectName("TransferFunctionPresetWidget");
 	this->setPresets(patientModelService->getPresetTransferFunctions3D());
 	QString toggleText = "Toggle between apply presets,\neither on %1\nor both 2D and 3D\ntransfer functions.";
@@ -87,15 +88,6 @@ void TransferFunctionPresetWidget::updateToggles()
 		else
 			mToggleAction->setIcon(QIcon(":/icons/preset_2D.png"));
 	}
-}
-
-QString TransferFunctionPresetWidget::defaultWhatsThis() const
-{
-	return "<html>"
-			"<h3>Transfer Function Presets</h3>"
-			"<p>Lets you select a predefined transfer function.</p>"
-			"<p><i></i></p>"
-			"</html>";
 }
 
 void TransferFunctionPresetWidget::populatePresetListSlot()

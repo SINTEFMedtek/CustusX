@@ -119,7 +119,6 @@ void BaseWidget::adjustSizeSlot()
 
 void BaseWidget::showEvent(QShowEvent* event)
 {
-    this->setWhatsThis(this->defaultWhatsThis());
     QWidget::showEvent(event);
 }
 

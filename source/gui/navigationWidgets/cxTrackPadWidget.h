@@ -74,8 +74,6 @@ public:
   TrackPadWidget(QWidget* parent);
   virtual ~TrackPadWidget();
 
-  virtual QString defaultWhatsThis() const;
-
 signals:
 
 protected slots:

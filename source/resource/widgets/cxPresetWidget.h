@@ -59,7 +59,6 @@ class cxResourceWidgets_EXPORT PresetWidget : public BaseWidget
 public:
 	PresetWidget(QWidget* parent);
 	virtual ~PresetWidget(){};
-	virtual QString defaultWhatsThis() const;
 
 	bool requestSetCurrentPreset(QString name); ///< tries to set the preset to the requested name
 	QString getCurrentPreset(); ///< returns the name of the currently selected preset

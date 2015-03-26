@@ -41,25 +41,11 @@ namespace cx {
 OverlayWidget::OverlayWidget(PatientModelServicePtr patientModelService, QWidget* parent) :
 		BaseWidget(parent, "OverlayWidget", "Overlay")
 {
+	this->setToolTip("Manage multiple overlayed 2D slices");
 	QVBoxLayout* layout = new QVBoxLayout(this);
 	layout->setMargin(0);
 	layout->addWidget(new TransferFunction2DOpacityWidget(patientModelService, this), 0);
 	layout->addWidget(new DataViewSelectionWidget(this), 1);
-}
-
-QString OverlayWidget::defaultWhatsThis() const{
-	return "<html>"
-			"<h3>2D overlay.</h3>"
-			"<p>"
-			"Allow visualizing several 2D slices  in top of each other "
-			"by making them partly transparent (alpha), "
-			"or by making parts of the fully transparent (LLR)"
-			"</p>"
-			"<p>"
-			"<b>NB!</b> The functionality in this widget only works on Linux for now"
-			"</p>"
-			"<p><i></i></p>"
-			"</html>";
 }
 
 } /* namespace cx */

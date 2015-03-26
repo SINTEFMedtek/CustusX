@@ -52,7 +52,7 @@ ProbeConfigWidget::ProbeConfigWidget(VisServicesPtr services, QWidget* parent) :
 {
 	mServices = services;
 	mUpdating = false;
-	this->setToolTip(this->defaultWhatsThis());
+	this->setToolTip("Edit ultrasound probe configuration");
 
 	QVBoxLayout* topLayout = new QVBoxLayout(this);
 	TrackingServicePtr ts = mServices->getToolManager();
@@ -138,19 +138,6 @@ ProbeConfigWidget::~ProbeConfigWidget()
 void ProbeConfigWidget::syncBoxToSectorChanged()
 {
 
-}
-
-QString ProbeConfigWidget::defaultWhatsThis() const
-{
-  return "<html>"
-      "<h3>Probe Configuration</h3>"
-      "<p>"
-      "View and edit the probe configuration. "
-      "Use the origin to define the position of the probe image in relation "
-      "to the tool t space. Set the cropping box and the probe sector parameters "
-      "(depth and width). All can be written back to the ProbeCalibConfigs.xml file."
-      "</p>"
-      "</html>";
 }
 
 void ProbeConfigWidget::savePresetSlot()

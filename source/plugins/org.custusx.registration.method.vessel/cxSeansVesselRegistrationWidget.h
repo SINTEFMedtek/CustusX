@@ -61,7 +61,6 @@ class SeansVesselRegistrationWidget : public RegistrationBaseWidget
 public:
 	SeansVesselRegistrationWidget(RegServices services, QWidget* parent);
   virtual ~SeansVesselRegistrationWidget();
-  virtual QString defaultWhatsThis() const;
 
 private slots:
   void registerSlot();

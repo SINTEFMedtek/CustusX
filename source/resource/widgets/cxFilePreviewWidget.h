@@ -62,8 +62,6 @@ public:
 	FilePreviewWidget(QWidget* parent);
 	virtual ~FilePreviewWidget();
 
-	virtual QString defaultWhatsThis() const;
-
 	template<class SYNTAXHIGHLIGHTER>
 	void setSyntaxHighLighter()
 	{

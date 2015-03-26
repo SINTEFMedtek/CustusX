@@ -58,9 +58,8 @@ TabbedWidget::~TabbedWidget()
 void TabbedWidget::addTab(BaseWidget* newTab, QString newTabName)
 {
   int index = mTabWidget->addTab(newTab, newTabName);
-  mTabWidget->setTabToolTip(index, newTab->defaultWhatsThis());
-  mTabWidget->setTabWhatsThis(index, newTab->defaultWhatsThis());
-  newTab->setWhatsThis(newTab->defaultWhatsThis());
+  mTabWidget->setTabToolTip(index, newTab->toolTip());
+  mTabWidget->setTabWhatsThis(index, newTab->whatsThis());
 }
 
 void TabbedWidget::insertWidgetAtTop(QWidget* newWidget)
@@ -75,28 +74,6 @@ void TabbedWidget::tabChanged(const int &index)
 	if (widget)
 		widget->setFocus();
 }
-
-//void TabbedWidget::focusInEvent(QFocusEvent *pEvent)
-//{
-//	// Default handling of the event
-//	QTabWidget::focusInEvent(pEvent);
-
-//	// Activate the widget of the given tab index
-//	QWidget *crtWidget = this->currentWidget();
-//	if (crtWidget)
-//		crtWidget->setFocus();
-//}
-
-QString TabbedWidget::defaultWhatsThis() const
-{
-  return "<html>"
-      "<h3>Tabbed widget.</h3>"
-      "<p>This is a tabbed widget, used for creating a hierarchy of tabbed widgets.</p>"
-      "<p><i>If you see this whats this message, something's wrong!</i></p>"
-      "</html>";
-}
-//------------------------------------------------------------------------------
-
 
 
 //------------------------------------------------------------------------------

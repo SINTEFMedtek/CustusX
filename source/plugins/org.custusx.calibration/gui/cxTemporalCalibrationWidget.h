@@ -62,8 +62,6 @@ public:
   TemporalCalibrationWidget(VisServicesPtr services, AcquisitionServicePtr acquisitionService, QWidget* parent);
   virtual ~TemporalCalibrationWidget();
 
-  virtual QString defaultWhatsThis() const;
-
 private slots:
   void patientChangedSlot();
   void selectData(QString filename);

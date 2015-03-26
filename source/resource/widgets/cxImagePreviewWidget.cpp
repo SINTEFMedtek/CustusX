@@ -44,6 +44,7 @@ ImagePreviewWidget::ImagePreviewWidget(QWidget* parent) :
 		FileWatcherWidget(parent, "ImagePreviewWidget", "Image Preview"),
 		mDisplayLabel(new QLabel())
 {
+	this->setToolTip("Preview of an image file");
 	mDisplayLabel->setAlignment(Qt::AlignCenter);
 
   QVBoxLayout* layout = new QVBoxLayout(this);
@@ -54,14 +55,6 @@ ImagePreviewWidget::ImagePreviewWidget(QWidget* parent) :
 
 ImagePreviewWidget::~ImagePreviewWidget()
 {
-}
-
-QString ImagePreviewWidget::defaultWhatsThis() const
-{
-	return "<html>"
-			"<h3>Image preview.</h3>"
-			"<p>Lets you preview an image.</p>"
-			"</html>";
 }
 
 void ImagePreviewWidget::setSize(int width, int height)

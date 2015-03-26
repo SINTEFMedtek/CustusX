@@ -60,8 +60,6 @@ public:
 	InfoWidget(QWidget* parent, QString objectName, QString windowTitle);
 	virtual ~InfoWidget(){};
 
-	virtual QString defaultWhatsThis() const;
-
 	void addStretch();
 
 protected:

@@ -76,11 +76,6 @@ LabeledComboBoxWidget::LabeledComboBoxWidget(QWidget* parent, StringPropertyBase
     this->setModified();
 }
 
-QString LabeledComboBoxWidget::defaultWhatsThis() const
-{
-	return "<html></html>";
-}
-
 void LabeledComboBoxWidget::comboIndexChanged(int index)
 {
 	mData->setValue(mCombo->itemData(index).toString());

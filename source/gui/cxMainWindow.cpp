@@ -330,6 +330,9 @@ void MainWindow::createActions()
 	mClearPatientAction = new QAction(tr("&Clear Patient"), this);
 	mExportPatientAction = new QAction(tr("&Export Patient"), this);
 
+	mGotoDocumentationAction = new QAction(tr("Web Documentation"), this);
+	connect(mGotoDocumentationAction, &QAction::triggered, this, &MainWindow::onGotoDocumentation);
+
 	connect(mNewPatientAction, &QAction::triggered, this, &MainWindow::newPatientSlot);
 	connect(mLoadFileAction, &QAction::triggered, this, &MainWindow::loadPatientFileSlot);
 	connect(mSaveFileAction, &QAction::triggered, this, &MainWindow::savePatientFileSlot);
@@ -646,6 +649,13 @@ QString MainWindow::getExistingSessionFolder()
 	return folder;
 }
 
+void MainWindow::onGotoDocumentation()
+{
+	QString url("http://custusx.org/index.php/downloads");
+
+	QDesktopServices::openUrl(QUrl(url, QUrl::TolerantMode));
+}
+
 void MainWindow::clearPatientSlot()
 {
 	mServices->getSession()->clear();
@@ -875,7 +885,7 @@ void MainWindow::createMenus()
 
 	mHelpMenuAction = this->menuBar()->addMenu(mHelpMenu);
 	mHelpMenu->addAction(mAboutAction);
-	mHelpMenu->addAction(QWhatsThis::createAction(this));
+	mHelpMenu->addAction(mGotoDocumentationAction);
 }
 
 void MainWindow::createToolBars()
@@ -923,11 +933,6 @@ void MainWindow::createToolBars()
 	mDesktopToolBar->addAction(mSaveDesktopAction);
 	mDesktopToolBar->addAction(mResetDesktopAction);
 	this->registerToolBar(mDesktopToolBar, "Toolbar");
-
-	mHelpToolBar = addToolBar("Help");
-	mHelpToolBar->setObjectName("HelpToolBar");
-	mHelpToolBar->addAction(QWhatsThis::createAction(this));
-	this->registerToolBar(mHelpToolBar, "Toolbar");
 
 	mScreenshotToolBar = addToolBar("Screenshot");
 	mScreenshotToolBar->setObjectName("ScreenshotToolBar");

@@ -71,7 +71,6 @@ class org_custusx_calibration_EXPORT LapFrameToolCalibrationWidget : public Base
 public:
   LapFrameToolCalibrationWidget(VisServicesPtr services, QWidget* parent);
   virtual ~LapFrameToolCalibrationWidget();
-  virtual QString defaultWhatsThis() const;
 
 private slots:
   void calibrateSlot();
@@ -82,7 +81,6 @@ private slots:
 private:
   VisServicesPtr mServices;
   QPushButton* mCalibrateButton;
-//  LabeledComboBoxWidget* mCalibrateToolComboBox;
   QLabel* mReferencePointLabel;
   QPushButton* mTestButton;
   QLabel* mCalibrationLabel;

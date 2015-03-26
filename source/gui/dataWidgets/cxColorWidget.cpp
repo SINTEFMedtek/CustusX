@@ -39,22 +39,12 @@ namespace cx {
 ColorWidget::ColorWidget(PatientModelServicePtr patientModelService, QWidget* parent) :
 		BaseWidget(parent, "ColorWidget", "Color")
 {
+	this->setToolTip("Set 2D image properties");
 	QVBoxLayout* layout = new QVBoxLayout(this);
 	layout->setMargin(0);
 	layout->addWidget(new TransferFunction2DColorWidget(patientModelService, this), 0);
 	layout->addStretch(1);
 	layout->addWidget(new TransferFunctionPresetWidget(patientModelService, this, false), 0);
-}
-
-QString ColorWidget::defaultWhatsThis() const{
-	return "<html>"
-			"<h3>2D coloring.</h3>"
-			"<p>"
-			"Allows setting 2D image properties "
-			"by setting colors and window with and level"
-			"</p>"
-			"<p><i></i></p>"
-			"</html>";
 }
 
 } /* namespace cx */

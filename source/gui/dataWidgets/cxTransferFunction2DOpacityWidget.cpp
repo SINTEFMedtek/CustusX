@@ -42,6 +42,7 @@ TransferFunction2DOpacityWidget::TransferFunction2DOpacityWidget(PatientModelSer
   BaseWidget(parent, "TransferFunction2DOpacityWidget", "2D Opacity"),
   mPatientModelService(patientModelService)
 {
+	this->setToolTip("Set a 2D opacity transfer function");
   QVBoxLayout* layout = new QVBoxLayout(this);
 
   mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(patientModelService, this);
@@ -65,15 +66,6 @@ TransferFunction2DOpacityWidget::TransferFunction2DOpacityWidget(PatientModelSer
   new SliderGroupWidget(this, mDataLLR,    gridLayout, 3);
 
   this->setLayout(layout);
-}
-
-QString TransferFunction2DOpacityWidget::defaultWhatsThis() const
-{
-  return "<html>"
-    "<h3>2D opacity transfer function.</h3>"
-    "<p>Lets you set a 2D opacity transfer function.</p>"
-    "<p><i></i></p>"
-    "</html>";
 }
 
 void TransferFunction2DOpacityWidget::activeImageChangedSlot()

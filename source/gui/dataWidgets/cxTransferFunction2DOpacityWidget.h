@@ -60,7 +60,6 @@ class cxGui_EXPORT TransferFunction2DOpacityWidget : public BaseWidget
 public:
   TransferFunction2DOpacityWidget(PatientModelServicePtr patientModelService, QWidget* parent);
   virtual ~TransferFunction2DOpacityWidget() {}
-  virtual QString defaultWhatsThis() const;
 
 public slots:
   void activeImageChangedSlot();

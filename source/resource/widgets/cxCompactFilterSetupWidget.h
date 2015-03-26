@@ -60,7 +60,7 @@ class cxResourceWidgets_EXPORT CompactFilterSetupWidget : public BaseWidget
 public:
 	CompactFilterSetupWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent, XmlOptionFile options, bool addFrame);
 	void setFilter(FilterPtr filter);
-	QString defaultWhatsThis() const;
+	QString getHelpText() const;
 
 private slots:
 	void obscuredSlot(bool obscured);
