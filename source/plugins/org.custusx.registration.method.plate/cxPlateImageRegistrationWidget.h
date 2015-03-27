@@ -54,7 +54,6 @@ class PlateImageRegistrationWidget : public FastImageRegistrationWidget
 public:
 	PlateImageRegistrationWidget(RegServices services, QWidget* parent);
 	virtual ~PlateImageRegistrationWidget();
-	virtual QString defaultWhatsThis() const;
 
 protected slots:
 	virtual void editLandmarkButtonClickedSlot();

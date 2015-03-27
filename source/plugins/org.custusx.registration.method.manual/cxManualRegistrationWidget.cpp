@@ -47,6 +47,7 @@ ManualImageRegistrationWidget::ManualImageRegistrationWidget(RegServices service
 	mVerticalLayout(new QVBoxLayout(this)),
 	mServices(services)
 {
+	this->setToolTip("Set image position directly");
 	mVerticalLayout->setMargin(0);
 	mLabel = new QLabel("Data matrix rMd");
 	mVerticalLayout->addWidget(mLabel);
@@ -107,11 +108,6 @@ void ManualImageRegistrationWidget::imageMatrixChanged()
 	else
 		mMatrixWidget->setMatrix(Transform3D::Identity());
 	mMatrixWidget->blockSignals(false);
-}
-
-QString ManualImageRegistrationWidget::defaultWhatsThis() const
-{
-	return QString();
 }
 
 } /* namespace cx */

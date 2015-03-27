@@ -1,4 +1,4 @@
-Registration method: Vessel plugin {#org_custusx_registration_method_vessel}
+Registration method Plugin: Vessel {#org_custusx_registration_method_vessel}
 ===================
 
 Overview {#org_custusx_registration_method_vessel_overview}

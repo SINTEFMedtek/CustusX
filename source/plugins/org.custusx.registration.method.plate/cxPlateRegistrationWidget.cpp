@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 PlateRegistrationWidget::PlateRegistrationWidget(RegServices services, QWidget* parent) :
-	RegistrationBaseWidget(services, parent, "PlateRegistrationWidget", "Plate Registration"),
+	RegistrationBaseWidget(services, parent, "LoadPlateRegistrationWidget", "Plate Registration"),
 	mPlateRegistrationButton(new QPushButton("Load registration points", this)),
 	mReferenceToolInfoLabel(new QLabel("", this))
 {
@@ -65,15 +65,6 @@ PlateRegistrationWidget::PlateRegistrationWidget(RegServices services, QWidget* 
 PlateRegistrationWidget::~PlateRegistrationWidget()
 {
 
-}
-
-QString PlateRegistrationWidget::defaultWhatsThis() const
-{
-	return "<html>"
-		   "<h3>Plate registration.</h3>"
-		   "<p>Internally register the reference plates reference points as landmarks.</p>"
-		   "<p><i>Click the button to load landmarks.</i></p>"
-		   "</html>";
 }
 
 void PlateRegistrationWidget::showEvent(QShowEvent* event)

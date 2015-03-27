@@ -39,19 +39,11 @@ namespace cx {
 PlateImageRegistrationWidget::PlateImageRegistrationWidget(RegServices services, QWidget* parent) :
 	FastImageRegistrationWidget(services, parent, "PlateImageRegistrationWidget", "Plate Image Registration")
 {
+	this->setToolTip("Registration using a custom plate object");
 }
 
 PlateImageRegistrationWidget::~PlateImageRegistrationWidget()
 {}
-
-QString PlateImageRegistrationWidget::defaultWhatsThis() const
-{
-	return "<html>"
-		   "<h3>Image registration.</h3>"
-		   "<p>Select landmarks in the data set that you want to use for performing plate registration.</p>"
-		   "<p><i>Click in the dataset and push the add or resample button.</i></p>"
-		   "</html>";
-}
 
 void PlateImageRegistrationWidget::editLandmarkButtonClickedSlot()
 {

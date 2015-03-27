@@ -33,21 +33,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationMethodPlateService.h"
 #include "cxPlateRegistrationWidget.h"
 #include "cxPlateImageRegistrationWidget.h"
-#include "cxImage2PlateRegistrationWidget.h"
+#include "cxTabbedWidget.h"
 
 namespace cx
 {
 
 QWidget *RegistrationMethodPlateImageToPatientService::createWidget()
 {
-	Image2PlateRegistrationWidget* imageAndPlateRegistrationWidget = new Image2PlateRegistrationWidget(NULL, "PlateRegistrationWidget", "Plate");
-	PlateImageRegistrationWidget* platesImageRegistrationWidget = new PlateImageRegistrationWidget(mServices, imageAndPlateRegistrationWidget);
-	PlateRegistrationWidget* plateRegistrationWidget = new PlateRegistrationWidget(mServices, imageAndPlateRegistrationWidget);
+	TabbedWidget* topWidget = new TabbedWidget(NULL, "PlateRegistrationWidget", "Plate");
+	topWidget->setToolTip("Plate Registration");
 
-	imageAndPlateRegistrationWidget->addTab(plateRegistrationWidget, "Plate");
-	imageAndPlateRegistrationWidget->addTab(platesImageRegistrationWidget, "Image");
+	PlateImageRegistrationWidget* plate = new PlateImageRegistrationWidget(mServices, topWidget);
+	PlateRegistrationWidget* image = new PlateRegistrationWidget(mServices, topWidget);
 
-	return imageAndPlateRegistrationWidget;
+	topWidget->addTab(plate, "Plate");
+	topWidget->addTab(image, "Image");
+
+	return topWidget;
 }
 
 } /* namespace cx */

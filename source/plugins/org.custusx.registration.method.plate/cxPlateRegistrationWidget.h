@@ -57,7 +57,6 @@ class PlateRegistrationWidget : public RegistrationBaseWidget
 public:
 	PlateRegistrationWidget(RegServices services, QWidget* parent);
 	virtual ~PlateRegistrationWidget();
-	virtual QString defaultWhatsThis() const;
 
 private slots:
 	virtual void showEvent(QShowEvent* event);

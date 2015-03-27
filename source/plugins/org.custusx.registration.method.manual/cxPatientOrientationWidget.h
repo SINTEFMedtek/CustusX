@@ -60,7 +60,6 @@ class PatientOrientationWidget : public RegistrationBaseWidget
 public:
 	PatientOrientationWidget(RegServices services, QWidget* parent, QString objectName, QString windowTitle);
   ~PatientOrientationWidget();
-  virtual QString defaultWhatsThis() const;
 
 private slots:
   void enableToolSampleButtonSlot();

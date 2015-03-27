@@ -59,7 +59,6 @@ ManualPatientRegistrationWidget(RegServices services, QWidget* parent, QString o
 	 ~ManualPatientRegistrationWidget()
 	{
 	}
-	 QString defaultWhatsThis() const;
 protected:
 	void showEvent(QShowEvent *event);
 	RegServices mServices;
