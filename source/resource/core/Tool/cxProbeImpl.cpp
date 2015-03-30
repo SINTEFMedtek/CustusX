@@ -296,14 +296,21 @@ QString ProbeImpl::findRtSource(QString configId) const
 	if(configId.isEmpty() && !rtSourceList.empty())
 		return rtSourceList.at(0);
 
+	QString retval;
+
 	for (int i = 0; i < rtSourceList.size(); ++i)
 	{
 		QStringList configIdList;
 		configIdList << mXml->getConfigIdList(this->getInstrumentScannerId(), this->getInstrumentId(), rtSourceList[i]);
 		if(configIdList.contains(configId))
-			return rtSourceList[i];
+		{
+			if(!retval.isEmpty())
+				reportWarning(QString("Config id is not unique: %1. Scanner %2, probe: %3. Occurring in RT source: %4 and %5").
+							  arg(configId).arg(this->getInstrumentScannerId()).arg(this->getInstrumentId()).arg(rtSourceList[i]).arg(retval));
+			retval = rtSourceList[i];
+		}
 	}
-	return QString();
+	return retval;
 }
 
 ProbeImpl::ProbeImpl(QString instrumentUid, QString scannerUid) :
