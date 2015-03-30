@@ -95,7 +95,7 @@ public:
 	virtual void removeCurrentConfig(); ///< remove the current config from disk
 	virtual void saveCurrentConfig(QString uid, QString name); ///< save current config to disk under ids (uid,name).
 
-	QString getRtSourceName() const;
+	QString getRtSourceName(QString configurationId = "") const;
 
 private:
 	ProbeImpl(QString instrumentUid, QString scannerUid);
@@ -128,6 +128,7 @@ private:
 	QString mConfigurationId; ///< The probe sector configuration matching the config id in ultrasoundImageConfigs.xml
 
 	ProbeXmlConfigParser::Configuration mConfig;
+	QString findRtSource(QString configId) const;
 };
 
 /**

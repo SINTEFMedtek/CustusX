@@ -57,6 +57,7 @@ public:
 
 protected:
 	void createTestProbe();
+	void testProbeWithNoRTSource();
 	void createParameters();
 	cx::ProbeDefinition createProbeData();
 	QString mProbeName;

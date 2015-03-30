@@ -2599,7 +2599,7 @@
 		<Width>1280</Width>
 		<Height>1024</Height>
               </ImageSize>
-              <HorizontalOffset>Empty</HorizontalOffset>
+              <HorizontalOffset>0</HorizontalOffset>
 	       <Config>
                <ID>WidthMaxDepth40_E9-2</ID>
                <Name>Width: Max, Depth: 40 mm, E9-2</Name>

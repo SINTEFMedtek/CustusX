@@ -42,6 +42,7 @@ namespace cx
 typedef boost::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
 typedef boost::shared_ptr<class ThreadedTimedReconstructer> ThreadedTimedReconstructerPtr;
 typedef boost::shared_ptr<class VisServices> VisServicesPtr;
+typedef boost::shared_ptr<class StringPropertyActiveProbeConfiguration> StringPropertyActiveProbeConfigurationPtr;
 class TimedAlgorithmProgressBar;
 class DisplayTimerWidget;
 
@@ -84,6 +85,7 @@ private:
 	VisServicesPtr mServices;
 	TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
 	DisplayTimerWidget* mDisplayTimerWidget;
+
 	QWidget* mOptionsWidget;
 	QWidget* createOptionsWidget();
 	QWidget* wrapVerticalStretch(QWidget* input);

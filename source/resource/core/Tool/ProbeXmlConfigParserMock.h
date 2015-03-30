@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class cxResource_EXPORT ProbeXmlConfigParserMock : public ProbeXmlConfigParser
 {
 public:
-	ProbeXmlConfigParserMock(QString& pathToXml);
+	ProbeXmlConfigParserMock(QString& pathToXml, bool provideRTSource = true);
 	virtual ~ProbeXmlConfigParserMock();
 	virtual QString getFileName();
 	virtual void removeConfig(QString scanner, QString probe, QString rtsource, QString configId);
@@ -64,6 +64,7 @@ public:
 	virtual ProbeXmlConfigParser::Configuration getConfiguration(QString scanner, QString probe, QString rtsource, QString configId);
 private:
 	QString mFileName;
+	bool mProvideRTSource;
 };
 
 #endif /* PROBEXMLCONFIGPARSERMOC_H_ */

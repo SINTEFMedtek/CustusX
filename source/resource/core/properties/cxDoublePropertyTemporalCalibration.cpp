@@ -47,17 +47,17 @@ void DoublePropertyTimeCalibration::activeToolChanged()
 {
   // ignore tool changes to something non-probeish.
   // This gives the user a chance to use the widget without having to show the probe.
-  ToolPtr newTool = mTrackingService->getActiveTool();
-  if (!newTool || !newTool->hasType(Tool::TOOL_US_PROBE))
+  ToolPtr newTool = mTrackingService->getFirstProbe();
+  if (!newTool || !newTool->getProbe())
     return;
 
   if (mTool)
-    disconnect(mTool->getProbe().get(), SIGNAL(sectorChanged()), this, SIGNAL(changed()));
+	  disconnect(mTool->getProbe().get(), &Probe::sectorChanged, this, &DoublePropertyTimeCalibration::changed);
 
-  mTool = mTrackingService->getActiveTool();
+  mTool = newTool;
 
   if (mTool)
-    connect(mTool->getProbe().get(), SIGNAL(sectorChanged()), this, SIGNAL(changed()));
+	  connect(mTool->getProbe().get(), &Probe::sectorChanged, this, &DoublePropertyTimeCalibration::changed);
 
   emit changed();
 }
@@ -69,7 +69,7 @@ DoublePropertyBasePtr DoublePropertyTimeCalibration::New(TrackingServicePtr trac
 
 double DoublePropertyTimeCalibration::getValue() const
 {
-  if (!mTool)
+  if (!mTool || !mTool->getProbe())
     return 0;
   return mTool->getProbe()->getProbeData().getTemporalCalibration();
 }

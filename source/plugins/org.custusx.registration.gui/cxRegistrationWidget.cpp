@@ -74,6 +74,8 @@ RegistrationWidget::~RegistrationWidget()
 void RegistrationWidget::initRegistrationTypesWidgets()
 {
 	mRegistrationTypes << "ImageToPatient" << "ImageToImage" << "ImageTransform";
+	QStringList registrationTypeDefaults;
+	registrationTypeDefaults << "Landmark" << "Landmark" << "";
 
 	mTypeSelector = StringProperty::initialize("RegistrationTypes",
 													 "Registration Types",
@@ -95,7 +97,7 @@ void RegistrationWidget::initRegistrationTypesWidgets()
 		StringPropertyPtr methodSelector = StringProperty::initialize(mRegistrationTypes[i],
 																				  "Method",
 																				  "Select registration method",
-																				  "",
+																				  registrationTypeDefaults[i],
 																				  QStringList(),
 																				  mOptions.getElement());
 		mMethodsSelectorMap[mRegistrationTypes[i]] = methodSelector;

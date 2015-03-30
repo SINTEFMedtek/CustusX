@@ -37,13 +37,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxBaseWidget.h"
 #include "cxBoundingBoxWidget.h"
-#include "cxToolProperty.h"
 #include "cxVector3DProperty.h"
 #include "cxDoubleProperty.h"
 
 namespace cx
 {
 typedef boost::shared_ptr<class VisServices> VisServicesPtr;
+typedef boost::shared_ptr<class StringPropertyActiveProbeConfiguration> StringPropertyActiveProbeConfigurationPtr;
 
 /**
  *

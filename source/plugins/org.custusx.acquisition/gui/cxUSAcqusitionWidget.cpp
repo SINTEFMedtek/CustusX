@@ -95,6 +95,7 @@ USAcqusitionWidget::USAcqusitionWidget(AcquisitionServicePtr acquisitionService,
 	editsLayout->setColumnStretch(0,0);
 	editsLayout->setColumnStretch(1,1);
 	RecordBaseWidget::mLayout->addLayout(editsLayout);
+
 	new LabeledComboBoxWidget(this, StringPropertyActiveProbeConfiguration::New(mServices->getToolManager()), editsLayout, 0);
 	sscCreateDataWidget(this, mUsReconstructionService->getParam("Preset"), editsLayout, 1);
 
@@ -129,7 +130,6 @@ QString USAcqusitionWidget::defaultWhatsThis() const
 		"<p><i>Record and reconstruct US data.</i></br>"
 		"</html>";
 }
-
 
 void USAcqusitionWidget::toggleDetailsSlot()
 {
