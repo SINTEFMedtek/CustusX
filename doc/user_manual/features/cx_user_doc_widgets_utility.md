@@ -42,15 +42,6 @@ CustusX console, display device for system administration messages.
 *Right click for addition options.*
 
 
-
-
-\addindex us_acquisition_widget
-US Acquisition Widget {#utility_widgets_us_acquisition}
-===========================================================
-
-*Record and reconstruct US data.*
-
-
 \addindex probe_config_widget
 Probe Config Widget {#utility_widgets_probe_config}
 ===========================================================

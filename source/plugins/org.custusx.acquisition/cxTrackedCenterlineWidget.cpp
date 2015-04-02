@@ -56,6 +56,7 @@ TrackedCenterlineWidget::TrackedCenterlineWidget(AcquisitionServicePtr acquisiti
 {
 	this->setObjectName("TrackedCenterlineWidget");
 	this->setWindowTitle("Tracked Centerline");
+	this->setToolTip("Record the tool movement as a centerline");
 
 	mServices = services;
 	connect(mServices->getToolManager().get(), &TrackingService::stateChanged, this, &TrackedCenterlineWidget::checkIfReadySlot);
@@ -66,14 +67,6 @@ TrackedCenterlineWidget::TrackedCenterlineWidget(AcquisitionServicePtr acquisiti
 
 TrackedCenterlineWidget::~TrackedCenterlineWidget()
 {}
-
-QString TrackedCenterlineWidget::defaultWhatsThis() const
-{
-  return "<html>"
-      "<h3>Tracked Centerline.</h3>"
-      "<p><i>Record the tool movement as a centerline.</i></br>"
-      "</html>";
-}
 
 void TrackedCenterlineWidget::checkIfReadySlot()
 {
