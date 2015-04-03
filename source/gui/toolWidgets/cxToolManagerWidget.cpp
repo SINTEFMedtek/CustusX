@@ -49,6 +49,7 @@ ToolManagerWidget::ToolManagerWidget(QWidget* parent) :
     mStartTrackingButton(new QPushButton("Start Tracking")),
     mStopTrackingButton(new QPushButton("Stop Tracking"))
 {
+	this->setToolTip("ToolManager debugging utilities");
   //connect
   connect(mConfigureButton, SIGNAL(clicked(bool)), this, SLOT(configureClickedSlot(bool)));
   connect(mDeConfigureButton, SIGNAL(clicked(bool)), this, SLOT(deconfigureClickedSlot(bool)));
@@ -73,15 +74,6 @@ ToolManagerWidget::ToolManagerWidget(QWidget* parent) :
 
 ToolManagerWidget::~ToolManagerWidget()
 {
-}
-
-QString ToolManagerWidget::defaultWhatsThis() const
-{
-  return "<html>"
-      "<h3>ToolManager debugging utilities.</h3>"
-      "<p>Lets you test different aspects of the toolmanager.</p>"
-      "<p><i></i></p>"
-      "</html>";
 }
 
 void ToolManagerWidget::configureClickedSlot(bool checked)

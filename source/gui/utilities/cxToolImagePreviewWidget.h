@@ -54,8 +54,6 @@ public:
 	ToolImagePreviewWidget(QWidget* parent);
 	virtual ~ToolImagePreviewWidget();
 
-	virtual QString defaultWhatsThis() const;
-
 public slots:
 	virtual void previewFileSlot(const QString& absoluteFilePath);
 };

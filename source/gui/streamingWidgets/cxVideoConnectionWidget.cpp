@@ -66,6 +66,7 @@ VideoConnectionWidget::VideoConnectionWidget(VisServicesPtr services, QWidget* p
 	BaseWidget(parent, "IGTLinkWidget", "Video Connection"),
 	mServices(services)
 {
+	this->setToolTip("Connect to a video source");
 	mOptions = profile()->getXmlSettings().descend("video");
 
 	QString defaultConnection = mServices->videoService->getConnectionMethod();
@@ -196,15 +197,6 @@ QWidget* VideoConnectionWidget::wrapVerticalStretch(QWidget* input)
 	layout->setMargin(0);
 	layout->setSpacing(0);
 	return retval;
-}
-
-QString VideoConnectionWidget::defaultWhatsThis() const
-{
-	return "<html>"
-			"<h3><Setup IGTLink connection.</h3>"
-			"<p>Lets you set up a connection to a streaming server using IGTLink.</p>"
-			"<p><i></i></p>"
-			"</html>";
 }
 
 void VideoConnectionWidget::selectGuiForConnectionMethodSlot()

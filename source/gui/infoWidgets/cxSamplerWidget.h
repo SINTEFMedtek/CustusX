@@ -59,7 +59,6 @@ public:
 	SamplerWidget(QWidget* parent);
 	virtual ~SamplerWidget();
 
-	virtual QString defaultWhatsThis() const;
 private slots:
 	void spacesChangedSlot();
 	void toggleAdvancedSlot();

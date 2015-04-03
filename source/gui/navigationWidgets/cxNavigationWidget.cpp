@@ -56,7 +56,7 @@ NavigationWidget::NavigationWidget(QWidget* parent) :
     mCameraGroupBox(new QGroupBox(tr("Camera Style"), this)),
     mCameraGroupLayout(new QVBoxLayout())
 {
-
+	this->setToolTip("Camera follow style");
   //camera setttings
   mCameraGroupBox->setLayout(mCameraGroupLayout);
 
@@ -76,13 +76,5 @@ NavigationWidget::NavigationWidget(QWidget* parent) :
 NavigationWidget::~NavigationWidget()
 {}
 
-QString NavigationWidget::defaultWhatsThis() const
-{
-  return "<html>"
-      "<h3>Camera navigation.</h3>"
-      "<p>Lets you select if the camera should follow a tool.</p>"
-      "<p><i>Click the options to select camera following style.</i></p>"
-      "</html>";
-}
 
 }

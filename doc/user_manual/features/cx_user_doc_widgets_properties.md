@@ -101,6 +101,17 @@ Tool Properties {#property_widgets_tool}
 ===========================================================
 TBD
 
+
+
+\addindex tool_manager_widget
+Tool Manager Widget
+===========================================================
+
+ToolManager debugging utilities.
+
+Lets you test different aspects of the toolmanager.
+
+
 \addindex mesh_info_widget
 Mesh Properties {#property_widgets_mesh}
 ===========================================================

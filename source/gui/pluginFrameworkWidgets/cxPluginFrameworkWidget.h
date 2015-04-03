@@ -55,8 +55,6 @@ public:
 	PluginFrameworkWidget(QWidget* parent);
 	virtual ~PluginFrameworkWidget();
 
-	virtual QString defaultWhatsThis() const;
-
 protected:
 	QVBoxLayout*  mVerticalLayout; ///< vertical layout is used
 };

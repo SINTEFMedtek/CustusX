@@ -49,6 +49,7 @@ namespace cx
 SamplerWidget::SamplerWidget(QWidget* parent) :
   BaseWidget(parent, "SamplerWidget", "Point Sampler")
 {
+	this->setToolTip("Display current tool tip position");
 	mListener = spaceProvider()->createListener();
 	mListener->setSpace(Space::reference());
 //	mListener.reset(new CoordinateSystemListener(Space(csREF)));
@@ -103,15 +104,6 @@ SamplerWidget::SamplerWidget(QWidget* parent) :
 
 SamplerWidget::~SamplerWidget()
 {}
-
-QString SamplerWidget::defaultWhatsThis() const
-{
-  return "<html>"
-	  "<h3>Utility for sampling the current tool point</h3>"
-	  "<p>Displays the current tool tip position in a selected coordinate system.</p>"
-	  "<p><i></i></p>"
-	  "</html>";
-}
 
 void SamplerWidget::toggleAdvancedSlot()
 {
