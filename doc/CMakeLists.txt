@@ -140,6 +140,7 @@ macro(cx_doc_set_common_userdoc_definitions)
 
     # tweaks that remove source code stuff
     SET(CX_DOXYGEN_SOURCE_BROWSER NO)
+    SET(CX_SHOW_FILES NO)
     SET(CX_DOXYGEN_EXTRACT_ALL NO)
     SET(CX_DOXYGEN_BUILTIN_STL_SUPPORT NO) # when NO this one disables lots of std::stuff in the TOC.
     # end tweaks
@@ -276,6 +277,7 @@ function(cx_build_dev_documentation_html)
      
     # tweaks that make pages more fitting in the internal help system
     SET(CX_DOXYGEN_SOURCE_BROWSER YES)
+    SET(CX_SHOW_FILES YES)
     SET(CX_DOXYGEN_EXTRACT_ALL YES)
     SET(CX_DOXYGEN_BUILTIN_STL_SUPPORT NO) # when NO this one disables lots of std::stuff in the TOC.
     # end tweaks

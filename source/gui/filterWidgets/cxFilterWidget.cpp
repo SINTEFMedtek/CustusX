@@ -109,7 +109,7 @@ void FilterSetupWidget::rebuildOptions()
 		mOptionsWidget->rebuild();
 }
 
-QString FilterSetupWidget::defaultWhatsThis() const
+QString FilterSetupWidget::generateHelpText() const
 {
 	QString name("None");
 	QString help("");
@@ -160,6 +160,8 @@ void FilterSetupWidget::setFilter(FilterPtr filter)
 			mPresetWidget->show();
 		} else
 			mPresetWidget->hide();
+
+		this->setObjectName(mCurrentFilter->getType());
 	}
 	else
 	{
@@ -167,6 +169,8 @@ void FilterSetupWidget::setFilter(FilterPtr filter)
 		mOutputsWidget->setOptions("", std::vector<PropertyPtr>(), false);
 		mOptionsWidget->setOptions("", std::vector<PropertyPtr>(), false);
 	}
+
+	this->setToolTip(this->generateHelpText());
 }
 
 void FilterSetupWidget::toggleDetailed()

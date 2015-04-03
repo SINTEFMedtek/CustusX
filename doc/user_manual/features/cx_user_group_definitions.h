@@ -29,64 +29,11 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXFILTERWIDGET_H
-#define CXFILTERWIDGET_H
 
-#include "cxGuiExport.h"
 
-#include "cxBaseWidget.h"
-#include "cxFilter.h"
-#include "cxFilterTimedAlgorithm.h"
-#include "cxOptionsWidget.h"
-
-namespace cx
-{
-typedef boost::shared_ptr<class WidgetObscuredListener> WidgetObscuredListenerPtr;
-typedef boost::shared_ptr<class VisServices> VisServicesPtr;
-class TimedAlgorithmProgressBar;
-class FilterPresetWidget;
-
-/** Helper widget for displaying the input/output/options part of a Filter.
- * Intended to be included in other Filter widgets.
+/**
+ * \defgroup cx_user_doc_group_filter Filter Services
  *
- * \ingroup cx_gui
- * \date Nov 18, 2012
- * \author Christian Askeland, SINTEF
- * \author Janne Beate Bakeng, SINTEF
+ * \brief All available filters.
  */
-class cxGui_EXPORT FilterSetupWidget : public BaseWidget
-{
-	Q_OBJECT
-public:
-	FilterSetupWidget(VisServicesPtr services, QWidget* parent, XmlOptionFile options, bool addFrame);
-	void setFilter(FilterPtr filter);
-	QString generateHelpText() const;
-	/** Compact Mode: one group, hide main input/output
-	  */
-	void setCompact(bool on);
-	void toggleDetailed();
 
-private slots:
-	void obscuredSlot(bool obscured);
-	void showAdvancedOptions(int state);
-	void rebuildOptions();
-
-private:
-
-	VisServicesPtr mServices;
-	XmlOptionFile mOptions;
-	FilterPtr mCurrentFilter;
-
-	OptionsWidget* mInputsWidget;
-	OptionsWidget* mOutputsWidget;
-	OptionsWidget* mOptionsWidget;
-	FilterPresetWidget*  mPresetWidget;
-	QGroupBox* 	   mOptionsGroupBox;
-	QCheckBox*	   mAdvancedButton;
-	QGroupBox* 	   mFrame;
-	boost::shared_ptr<WidgetObscuredListener> mObscuredListener;
-};
-
-}
-
-#endif // CXFILTERWIDGET_H
