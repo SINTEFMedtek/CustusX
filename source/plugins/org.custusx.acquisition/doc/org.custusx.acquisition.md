@@ -6,7 +6,7 @@ Overview {#org_custusx_acquisition_overview}
 
 The acquisition plugin enables acquisition of various data streams. 
 
-\addindex us_acquisition_widget
+\addindex us_acqusition_widget
 US Acquisition Widget {#org_custusx_acquisition_widgets_acquisition}
 ===========================================================
 

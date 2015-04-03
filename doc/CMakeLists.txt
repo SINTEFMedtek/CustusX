@@ -48,7 +48,8 @@ function(cx_doc_generate_plugin_page)
     # Generate PLUGIN_SUBPAGES_TEXT containing \subpage refs to all documented plugins
     # ready to insert into markdown.
     foreach(_var ${PLUGIN_DOC_NAMES})
-        set(PLUGIN_SUBPAGES_TEXT "${PLUGIN_SUBPAGES_TEXT}\n* \\subpage ${_var} (${_var})" )
+        string(REPLACE "_" "." plugin_name ${_var})
+        set(PLUGIN_SUBPAGES_TEXT "${PLUGIN_SUBPAGES_TEXT}\n* \\subpage ${_var} (${plugin_name})" )
     endforeach()
     #message(STATUS "PLUGIN_SUBPAGES_TEXT : " ${PLUGIN_SUBPAGES_TEXT})
 
@@ -84,7 +85,8 @@ function(cx_doc_generate_plugin_page)
     # Generate UNDOCUMENTED_PLUGINS_TEXT containing \list of all undocumented plugins,
     # ready to insert into markdown.
     foreach(_var ${UNDOCUMENTED_PLUGIN_NAMES})
-        set(UNDOCUMENTED_PLUGINS_TEXT "${UNDOCUMENTED_PLUGINS_TEXT}\n* ${_var}" )
+        string(REPLACE "_" "." plugin_name ${_var})
+        set(UNDOCUMENTED_PLUGINS_TEXT "${UNDOCUMENTED_PLUGINS_TEXT}\n* ${plugin_name}" )
     endforeach()
     #message(STATUS "UNDOCUMENTED_PLUGINS_TEXT : " ${UNDOCUMENTED_PLUGINS_TEXT})
 

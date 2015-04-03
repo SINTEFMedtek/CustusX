@@ -96,7 +96,6 @@ private:
 	QPushButton* mReloadButton;
 	QLineEdit* mExtentLineEdit;
 	QLineEdit* mInputSpacingLineEdit;
-//	SpinBoxGroupWidget* mMaxVolSizeWidget;
 	SpinBoxGroupWidget* mSpacingWidget;
 	SpinBoxGroupWidget* mDimXWidget;
 	SpinBoxGroupWidget* mDimYWidget;
@@ -111,7 +110,6 @@ private:
 	QWidget* createOptionsWidget();
 	QString getCurrentPath();
 	void updateComboBox();
-	QString defaultWhatsThis() const;
 	void createNewStackedWidget(QString algoName);
 };
 

@@ -51,6 +51,7 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, UsReconstructionServ
 	mReconstructer(reconstructer),
 	mFileSelectWidget( new FileSelectWidget(this))
 {
+	this->setToolTip("Reconstruct 3D US data from an acquired 2D sequence");
 	connect(mReconstructer.get(), &UsReconstructionService::reconstructAboutToStart, this, &ReconstructionWidget::reconstructAboutToStartSlot);
 	connect(mReconstructer.get(), &UsReconstructionService::reconstructStarted, this, &ReconstructionWidget::reconstructStartedSlot);
 	connect(mReconstructer.get(), &UsReconstructionService::reconstructFinished, this, &ReconstructionWidget::reconstructFinishedSlot);
@@ -119,14 +120,6 @@ void ReconstructionWidget::updateFileSelectorPath(QString path)
 	mFileSelectWidget->refresh();
 }
 
-QString ReconstructionWidget::defaultWhatsThis() const
-{
-	return "<html>"
-		"<h3>US 3D Reconstruction.</h3>"
-		"<p><i>Reconstruct 3D US data from acquired a 2D sequence.</i></br>"
-		"</html>";
-}
-
 void ReconstructionWidget::toggleDetailsSlot()
 {
   mOptionsWidget->setVisible(!mOptionsWidget->isVisible());
@@ -146,6 +139,7 @@ QWidget* ReconstructionWidget::createOptionsWidget()
 
 	mAlgorithmGroup = new QFrame(this);
 	mAlgorithmGroup->setFrameStyle(QFrame::StyledPanel | QFrame::Raised);
+	mAlgorithmGroup->setFocusPolicy(Qt::StrongFocus); // needed for help system: focus is used to display help text
 	mAlgorithmGroup->setSizePolicy(mAlgorithmGroup->sizePolicy().horizontalPolicy(),QSizePolicy::Fixed);
 
 	QVBoxLayout* algoOuterLayout = new QVBoxLayout(mAlgorithmGroup);
@@ -215,6 +209,7 @@ void ReconstructionWidget::createNewStackedWidget(QString algoName)
 {
 	QWidget* oneAlgoWidget = new QWidget(this);
 	oneAlgoWidget->setObjectName(algoName);
+	mAlgorithmGroup->setObjectName(algoName);
 	mAlgoLayout->addWidget(oneAlgoWidget);
 	QGridLayout* oneAlgoLayout = new QGridLayout(oneAlgoWidget);
 	oneAlgoLayout->setMargin(0);
