@@ -50,6 +50,11 @@ QString OpenCVStreamerService::getName()
 	return "OpenCV";
 }
 
+QString OpenCVStreamerService::getType() const
+{
+	return "open_cv_streamer";
+}
+
 std::vector<PropertyPtr> OpenCVStreamerService::getSettings(QDomElement root)
 {
 	std::vector<PropertyPtr> retval;

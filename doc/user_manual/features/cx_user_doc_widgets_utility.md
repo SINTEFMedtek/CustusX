@@ -18,8 +18,8 @@ Define points, distances and angles.
 Video Connection Widget {#utility_widgets_video_connection}
 ===========================================================
 
-Setup a connection to a video source. There can be several different video sources,
-pick one. TBD.
+Setup a connection to a video source. 
+\ref cx_user_doc_group_streamer contains a list of all available video sources.
 
 
 
@@ -41,7 +41,7 @@ Hover the mouse above the timeline in order to get information about that time.
 > **Tip:** Press the red putton to start playback.
 
 > **Note:** The tools in the current configuration must match those stored in the 
-> patient you want to playback. It there is a mismatch, a notification will appear
+> patient you want to playback. If there is a mismatch, a notification will appear
 > in the console. Use that to add the correct tools.
 
 

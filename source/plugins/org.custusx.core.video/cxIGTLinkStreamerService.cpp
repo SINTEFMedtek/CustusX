@@ -43,6 +43,11 @@ QString IGTLinkStreamerService::getName()
 	return "Remote Server";
 }
 
+QString IGTLinkStreamerService::getType() const
+{
+	return "remote_server_streamer";
+}
+
 std::vector<PropertyPtr> IGTLinkStreamerService::getSettings(QDomElement root)
 {
 	std::vector<PropertyPtr> retval;

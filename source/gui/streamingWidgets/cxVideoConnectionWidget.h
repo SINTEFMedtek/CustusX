@@ -109,6 +109,7 @@ protected:
 	StringPropertyActiveVideoSourcePtr mActiveVideoSourceSelector;
 	XmlOptionFile mOptions;
 	DetailedLabeledComboBoxWidget* mConnectionSelectionWidget;
+	QFrame* mStackedWidgetFrame;
 
 	VisServicesPtr mServices;
 

@@ -54,6 +54,7 @@ public:
 	IGTLinkStreamerService(ctkPluginContext *context) {}
 	virtual ~IGTLinkStreamerService() {}
 	virtual QString getName();
+	virtual QString getType() const;
 	virtual std::vector<PropertyPtr> getSettings(QDomElement root);
 	virtual StreamerPtr createStreamer(QDomElement root);
 private:

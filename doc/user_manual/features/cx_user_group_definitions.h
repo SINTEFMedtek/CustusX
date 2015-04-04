@@ -37,4 +37,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * \brief All available filters.
  */
 
+/**
+ * \defgroup cx_user_doc_group_streamer Video Streamers
+ *
+ * \brief All available video streamers.
+ */
+
 
