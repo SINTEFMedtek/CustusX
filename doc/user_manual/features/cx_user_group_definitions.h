@@ -32,8 +32,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /**
- * \defgroup cx_user_doc_group_filter Filter Services
+ * \defgroup cx_user_doc_group_filter Filter Algorithms
  *
  * \brief All available filters.
  */
+
 

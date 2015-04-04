@@ -11,3 +11,8 @@ PNN US Reconstruction Algorithm {#org_custusx_usreconstruction_pnn_pnn}
 ===========================================================
 
 PNN reconstruction.
+
+
+\addtogroup cx_user_doc_group_usreconstruction
+
+* \ref org_custusx_usreconstruction_pnn
