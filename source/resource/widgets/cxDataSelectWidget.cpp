@@ -157,11 +157,6 @@ void DataSelectWidget::updateDataVisibility()
     this->setShowIcon();
 }
 
-QString DataSelectWidget::defaultWhatsThis() const
-{
-	return "<html></html>";
-}
-
 /** If button is checked (first press), do nothing, except
   * change button icon to show remove in progress.
   * If button is unchecked (second press), remove data.

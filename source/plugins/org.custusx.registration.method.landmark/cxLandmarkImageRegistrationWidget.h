@@ -69,7 +69,7 @@ Q_OBJECT
 public:
 
 	LandmarkImageRegistrationWidget(RegServices services, QWidget* parent, QString objectName,
-		QString windowTitle); ///< sets up layout and connects signals and slots
+		QString windowTitle, bool useRegistrationFixedPropertyInsteadOfActiveImage = false); ///< sets up layout and connects signals and slots
 	virtual ~LandmarkImageRegistrationWidget(); ///< empty
 	virtual QString defaultWhatsThis() const;
 
@@ -109,6 +109,7 @@ private:
 	LandmarkImageRegistrationWidget(); ///< not implemented
 
 	DataPtr getCurrentData() const;
+	bool mUseRegistrationFixedPropertyInsteadOfActiveImage;
 };
 
 /**

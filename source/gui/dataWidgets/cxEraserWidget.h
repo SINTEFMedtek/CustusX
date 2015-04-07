@@ -66,7 +66,6 @@ Q_OBJECT
 
 public:
 	EraserWidget(QWidget* parent);
-	virtual QString defaultWhatsThis() const;
 
 	virtual ~EraserWidget();
 private:

@@ -53,7 +53,6 @@ class cxGui_EXPORT StreamPropertiesWidget : public TabbedWidget
 	Q_OBJECT
 public:
 	StreamPropertiesWidget(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget* parent);
-	virtual QString defaultWhatsThis() const;
 
 private slots:
 	void streamSelectedSlot();

@@ -63,6 +63,7 @@ void HelpWidget::setup()
 	if (mVerticalLayout)
 		return;
 
+	this->setToolTip("Context-sensitive and browser help");
 	mVerticalLayout = new QVBoxLayout(this);
 	mVerticalLayout->setMargin(0);
 	mVerticalLayout->setSpacing(0);
@@ -104,15 +105,6 @@ void HelpWidget::setup()
 
 HelpWidget::~HelpWidget()
 {}
-
-QString HelpWidget::defaultWhatsThis() const
-{
-	return "<html>"
-			"<h3>Experimental help</h3>"
-			"<p></p>"
-			"<p><i></i></p>"
-			"</html>";
-}
 
 void HelpWidget::addContentWidget(QTabWidget* tabWidget, QBoxLayout* buttonLayout)
 {

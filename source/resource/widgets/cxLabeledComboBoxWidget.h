@@ -61,8 +61,6 @@ public:
 	LabeledComboBoxWidget(QWidget* parent, StringPropertyBasePtr, QGridLayout* gridLayout = 0, int row = 0);
 	virtual ~LabeledComboBoxWidget(){};
 
-	virtual QString defaultWhatsThis() const;
-
 	void showLabel(bool on);
 
 protected:

@@ -64,11 +64,7 @@ class ManualImageRegistrationWidget: public BaseWidget
 Q_OBJECT
 public:
 	ManualImageRegistrationWidget(RegServices services, QWidget* parent, QString objectName, QString windowTitle);
-	virtual ~ManualImageRegistrationWidget()
-	{
-//		mRegistrationService.reset();
-	}
-	virtual QString defaultWhatsThis() const;
+	virtual ~ManualImageRegistrationWidget() {}
 
 protected:
 	virtual void showEvent(QShowEvent* event);

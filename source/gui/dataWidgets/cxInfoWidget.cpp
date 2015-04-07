@@ -51,15 +51,6 @@ InfoWidget::InfoWidget(QWidget* parent, QString objectName, QString windowTitle)
 	mTableWidget->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
 }
 
-QString InfoWidget::defaultWhatsThis() const
-{
-  return "<html>"
-      "<h3> Information</h3>"
-      "<p>Displays information.</p>"
-      "<p><i></i></p>"
-      "</html>";
-}
-
 void InfoWidget::addStretch()
 {
 	toptopLayout->addStretch();

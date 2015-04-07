@@ -51,7 +51,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxViewService.h"
 #include "cxSessionStorageService.h"
-#include "cxMainWindowApplicationComponent.h"
 
 CustusXController::CustusXController(QObject* parent) : QObject(parent)
 {
@@ -71,8 +70,11 @@ void CustusXController::start()
   qApp->setOrganizationDomain("test.sintef.no");
   qApp->setApplicationName("CustusX");
 
-  cx::ApplicationComponentPtr mainwindow(new cx::MainWindowApplicationComponent<cx::MainWindow>());
-  cx::LogicManager::initialize(mainwindow);
+//  typedef cx::MainWindowApplicationComponent<cx::MainWindow> MainWindowComponent;
+  mApplicationComponent.reset(new MainWindowComponent());
+//  std::auto_ptr<cx::ApplicationComponentPtr mainwindow(new cx::MainWindowApplicationComponent<cx::MainWindow>());
+
+  cx::LogicManager::initialize(mApplicationComponent);
   cx::settings()->setValue("Automation/autoSave", "false");
   cx::settings()->setValue("Automation/autoLoadRecentPatient", "");
 
@@ -92,6 +94,7 @@ void CustusXController::loadPatientSlot()
   cx::sessionStorageService()->load(mPatientFolder);
   cx::stateService()->setWorkFlowState("NavigationUid");
 //  mMainWindow->setGeometry( 0, 0, 2560, 1440);
+  mApplicationComponent->mMainWindow->setGeometry(QRect(0, 0, 1200, 1200));
 
   if (!cx::patientService()->getDataOfType<cx::Image>().size())
 		return;

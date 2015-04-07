@@ -52,19 +52,16 @@ class cxResourceWidgets_EXPORT PipelineWidgetFilterLine : public BaseWidget
 	Q_OBJECT
 public:
 	PipelineWidgetFilterLine(QWidget* parent, FilterPtr filter, QButtonGroup *buttonGroup);
-	QString defaultWhatsThis() const;
 
 	QRadioButton* mRadioButton;
 	QLabel* mAlgoNameLabel;
 	QAction* mAction;
-//	QAction* mDetailsAction;
 	TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
 	FilterPtr mFilter;
 
 signals:
 	void requestRunFilter();
 	void filterSelected(QString uid);
-//	void showDetails();
 
 private slots:
 	void radioButtonSelectedSlot(bool on);
@@ -85,11 +82,9 @@ class cxResourceWidgets_EXPORT PipelineWidget : public BaseWidget
 	Q_OBJECT
 public:
 	PipelineWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent, PipelinePtr pipeline);
-	QString defaultWhatsThis() const;
 private slots:
 	void runFilterSlot();
 	void filterSelectedSlot(QString uid);
-//	void toggleDetailsSlot();
 private:
 	void selectFilter(int index);
 	PipelinePtr mPipeline;

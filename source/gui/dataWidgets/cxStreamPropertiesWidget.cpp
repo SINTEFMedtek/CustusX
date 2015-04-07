@@ -44,6 +44,7 @@ StreamPropertiesWidget::StreamPropertiesWidget(PatientModelServicePtr patientMod
 	TabbedWidget(parent, "StreamPropertiesWidget", "Stream Properties"),
 	mSelectStream(StringPropertySelectTrackedStream::New(patientModelService))
 {
+	this->setToolTip("Set properties on a tracked 2D/3D stream");
 	bool connectToActiveImage = false;
 	mTransferFunctionWidget = TransferFunction3DWidgetPtr(new TransferFunction3DWidget(patientModelService, this, connectToActiveImage));
 	mShadingWidget = ShadingWidgetPtr(new ShadingWidget(patientModelService, this, connectToActiveImage));
@@ -90,15 +91,6 @@ void StreamPropertiesWidget::firstFrame()
 		mTransferFunctionWidget->imageChangedSlot(image);
 		mShadingWidget->imageChangedSlot(image);
 	}
-}
-
-QString StreamPropertiesWidget::defaultWhatsThis() const
-{
-	return "<html>"
-		   "<h3>Stream properties.</h3>"
-		   "<p>Lets you set properties on a tracked 2D/3D stream.</p>"
-		   "<p><i></i></p>"
-		   "</html>";
 }
 
 } //cx

@@ -61,7 +61,6 @@ class cxResourceWidgets_EXPORT DataSelectWidget : public BaseWidget
 public:
 	DataSelectWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent, SelectDataStringPropertyBasePtr data, QGridLayout* gridLayout = NULL, int row=0);
 	~DataSelectWidget();
-    QString defaultWhatsThis() const;
 
 signals:
 

@@ -57,6 +57,7 @@ PrepareVesselsWidget::PrepareVesselsWidget(RegServices services, QWidget* parent
 		RegistrationBaseWidget(services, parent, "PrepareVesselsWidget", "PrepareVesselsWidget")
 {  
 	VisServicesPtr vs(new VisServices(services));
+	this->setToolTip("Prepare data for vessel I2I registration");
 
 	XmlOptionFile options = profile()->getXmlSettings().descend("registration").descend("PrepareVesselsWidget");
   // fill the pipeline with filters:
@@ -125,15 +126,6 @@ void PrepareVesselsWidget::toFixedSlot()
 PrepareVesselsWidget::~PrepareVesselsWidget()
 {}
 
-QString PrepareVesselsWidget::defaultWhatsThis() const
-{
-  return "<html>"
-      "<h3>Segmentation and centerline extraction for the i2i registration.</h3>"
-      "<p><i>Segment out blood vessels from the selected image, then extract the centerline."
-      "When finished, set the result as moving or fixed data in the registration tab.</i></p>"
-      "<p><b>Tip:</b> The centerline extraction can take a <b>long</b> time.</p>"
-      "</html>";
-}
 
 //------------------------------------------------------------------------------
 }//namespace cx

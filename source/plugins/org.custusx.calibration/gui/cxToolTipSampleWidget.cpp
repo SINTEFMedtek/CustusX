@@ -62,6 +62,7 @@ ToolTipSampleWidget::ToolTipSampleWidget(VisServicesPtr services, QWidget* paren
 {
   QVBoxLayout* toplayout = new QVBoxLayout(this);
 
+  this->setToolTip("Sample the tool tip position");
   mCoordinateSystems = StringPropertySelectCoordinateSystem::New(services->getToolManager());
   mTools = StringPropertySelectTool::New(mServices->getToolManager());
 	mData = StringPropertySelectData::New(mServices->getPatientService());
@@ -91,14 +92,6 @@ ToolTipSampleWidget::ToolTipSampleWidget(VisServicesPtr services, QWidget* paren
 
 ToolTipSampleWidget::~ToolTipSampleWidget()
 {}
-
-QString ToolTipSampleWidget::defaultWhatsThis() const
-{
-  return "<html>"
-     "<h3>Tool tip sampling.</h3>"
-	 "<p>You can sample the active tools tooltip in any coordinate system and get the results written to file.</p>"
-     "</html>";
-}
 
 void ToolTipSampleWidget::saveFileSlot()
 {

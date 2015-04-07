@@ -125,8 +125,13 @@ QStringList ProbeImpl::getConfigIdList() const
 {
 	if (!this->hasRtSource())
 		return QStringList();
-	QStringList configIdList = mXml->getConfigIdList(
-			this->getInstrumentScannerId(), this->getInstrumentId(), this->getRtSourceName());
+
+	// Combine config lists from all RT sources
+	QStringList configIdList;
+	QStringList rtSourceList = mXml->getRtSourceList(this->getInstrumentScannerId(), this->getInstrumentId());
+	for (int i = 0; i < rtSourceList.size(); ++i)
+		configIdList << mXml->getConfigIdList(this->getInstrumentScannerId(), this->getInstrumentId(), rtSourceList[i]);
+
 	return configIdList;
 }
 
@@ -271,27 +276,41 @@ void ProbeImpl::saveCurrentConfig(QString uid, QString name)
 	this->applyNewConfigurationWithId(uid);
 }
 
-//void ProbeImpl::useDigitalVideo(bool digitalStatus)
-//{
-//	mDigitalInterface = digitalStatus;
-//	if (mDigitalInterface)
-//		this->applyNewConfigurationWithId("Digital");
-//}
+QString ProbeImpl::getRtSourceName(QString configurationId) const
+{
+	QString configId = configurationId;
+	if (configId.isEmpty())
+		configId = mConfigurationId;
 
-//bool ProbeImpl::isUsingDigitalVideo() const
-//{
-//	return mDigitalInterface;
-//}
+	if (this->getProbeData().getUseDigitalVideo())
+		return QString("Digital");
 
-QString ProbeImpl::getRtSourceName() const
+	return this->findRtSource(configId);
+}
+
+QString ProbeImpl::findRtSource(QString configId) const
 {
 	QStringList rtSourceList = mXml->getRtSourceList(this->getInstrumentScannerId(), this->getInstrumentId());
-	if (rtSourceList.empty())
-		return QString();
-	QString rtSource = rtSourceList.at(0);
-	if (this->getProbeData().getUseDigitalVideo())
-		rtSource = "Digital";
-	return rtSource;
+
+	//Use first RT source if no config id
+	if(configId.isEmpty() && !rtSourceList.empty())
+		return rtSourceList.at(0);
+
+	QString retval;
+
+	for (int i = 0; i < rtSourceList.size(); ++i)
+	{
+		QStringList configIdList;
+		configIdList << mXml->getConfigIdList(this->getInstrumentScannerId(), this->getInstrumentId(), rtSourceList[i]);
+		if(configIdList.contains(configId))
+		{
+			if(!retval.isEmpty())
+				reportWarning(QString("Config id is not unique: %1. Scanner %2, probe: %3. Occurring in RT source: %4 and %5").
+							  arg(configId).arg(this->getInstrumentScannerId()).arg(this->getInstrumentId()).arg(rtSourceList[i]).arg(retval));
+			retval = rtSourceList[i];
+		}
+	}
+	return retval;
 }
 
 ProbeImpl::ProbeImpl(QString instrumentUid, QString scannerUid) :
@@ -345,7 +364,7 @@ ProbeXmlConfigParser::Configuration ProbeImpl::getConfiguration(QString uid) con
 	{
 		ProbeXmlConfigParser::Configuration config;
 		if(this->hasRtSource())
-			config = mXml->getConfiguration(mScannerUid, mInstrumentUid, this->getRtSourceName(), uid);
+			config = mXml->getConfiguration(mScannerUid, mInstrumentUid, this->getRtSourceName(uid), uid);
 		return config;
 	}
 	return mConfig;

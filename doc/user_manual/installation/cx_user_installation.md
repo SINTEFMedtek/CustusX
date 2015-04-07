@@ -1,8 +1,7 @@
 Installation {#installation}
 ===================
 
-If you can get hold of an installer from the webpage (TBD), installation should be straightforward
-on all supported platforms. Check out the \ref supported_platforms.
+The easiest way to install is to use the installers from the [website](http://custusx.org/index.php/downloads). Check out the \ref supported_platforms.
 
 Tracking System
 -----------------------------------------------------------

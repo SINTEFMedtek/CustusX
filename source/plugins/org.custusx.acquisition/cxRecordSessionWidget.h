@@ -68,8 +68,6 @@ public:
   RecordSessionWidget(AcquisitionServicePtr base, QWidget* parent, QString defaultDescription = "Record Session", bool requireUsReady = true);
   virtual ~RecordSessionWidget();
 
-  virtual QString defaultWhatsThis() const;
-
   void setDescription(QString text);
   void setDescriptionVisibility(bool value);
 

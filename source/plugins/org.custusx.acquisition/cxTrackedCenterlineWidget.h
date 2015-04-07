@@ -62,7 +62,6 @@ class org_custusx_acquisition_EXPORT  TrackedCenterlineWidget : public TrackedRe
 public:
   TrackedCenterlineWidget(AcquisitionServicePtr acquisitionService, VisServicesPtr services, QWidget* parent);
   virtual ~TrackedCenterlineWidget();
-  virtual QString defaultWhatsThis() const;
 
 protected slots:
   void checkIfReadySlot();

@@ -63,8 +63,6 @@ public:
   NavigationWidget(QWidget* parent);
   ~NavigationWidget();
 
-  virtual QString defaultWhatsThis() const;
-
 protected:
   QVBoxLayout*  mVerticalLayout; ///< vertical layout is used
 

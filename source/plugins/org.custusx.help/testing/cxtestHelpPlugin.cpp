@@ -106,7 +106,7 @@ TEST_CASE("org.custusx.help: HelpEngine loads a page", "[unit][plugins][org.cust
 	REQUIRE(links.size()==1);
 
 	CHECK("qthelp://org.custusx.core/doc/index.html#mainpage_overview" == links.first().toString());
-	std::cout << "LINKS: " << links.first().toString().toStdString() << std::endl;
+//	std::cout << "LINKS: " << links.first().toString().toStdString() << std::endl;
 }
 
 
@@ -116,7 +116,7 @@ TEST_CASE("org.custusx.help: HelpWidget displays initial help text", "[unit][plu
 	fixture.setupHelpBrowserInsideMainWindow();
 
 	CHECK("qthelp://org.custusx.core/doc/index.html#mainpage_overview" == fixture.browser->source().toString());
-	CHECK(fixture.browser->toPlainText().contains("CustusX Overview"));
+	CHECK(fixture.browser->toPlainText().contains("CustusX User Documentation"));
 
 //	fixture.printBrowserContents();
 

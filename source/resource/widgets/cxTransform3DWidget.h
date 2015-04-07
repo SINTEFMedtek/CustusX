@@ -62,7 +62,6 @@ class cxResourceWidgets_EXPORT Transform3DWidget : public BaseWidget
 public:
   Transform3DWidget(QWidget* parent = NULL);
   virtual ~Transform3DWidget();
-  virtual QString defaultWhatsThis() const;
 
   void setMatrix(const Transform3D& M);
   Transform3D getMatrix() const;

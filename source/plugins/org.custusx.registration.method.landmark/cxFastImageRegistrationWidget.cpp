@@ -41,8 +41,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-FastImageRegistrationWidget::FastImageRegistrationWidget(RegServices services, QWidget* parent, QString objectName, QString windowTitle) :
-	LandmarkImageRegistrationWidget(services, parent, objectName, windowTitle)
+FastImageRegistrationWidget::FastImageRegistrationWidget(RegServices services, QWidget* parent, QString objectName, QString windowTitle, bool useRegistrationFixedPropertyInsteadOfActiveImage) :
+	LandmarkImageRegistrationWidget(services, parent, objectName, windowTitle, useRegistrationFixedPropertyInsteadOfActiveImage)
 {
 }
 

@@ -56,7 +56,6 @@ class cxGui_EXPORT OverlayWidget : public BaseWidget
 
 public:
 	OverlayWidget(PatientModelServicePtr patientModelService, QWidget* parent);
-	virtual QString defaultWhatsThis() const;
 };
 
 /**

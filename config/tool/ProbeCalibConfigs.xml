@@ -2599,7 +2599,7 @@
 		<Width>1280</Width>
 		<Height>1024</Height>
               </ImageSize>
-              <HorizontalOffset>Empty</HorizontalOffset>
+              <HorizontalOffset>0</HorizontalOffset>
 	       <Config>
                <ID>WidthMaxDepth40_E9-2</ID>
                <Name>Width: Max, Depth: 40 mm, E9-2</Name>
@@ -2756,15 +2756,15 @@
             <RTSource>
                 <Name>DVI_E9-1</Name>
                 <TemporalCalibration>135</TemporalCalibration>
-                <DefaultConfig>WidthMaxDepth4</DefaultConfig>
+                <DefaultConfig>WidthMaxDepth4_E9-1</DefaultConfig>
                 <ImageSize>
                     <Width>1280</Width>
                     <Height>960</Height>
                 </ImageSize>
                 <HorizontalOffset>0</HorizontalOffset>
                 <Config>
-                    <ID>WidthMaxDepth3cm</ID>
-                    <Name>Width: Max, Depth: 3 cm</Name>
+                    <ID>WidthMaxDepth3cm_E9-1</ID>
+                    <Name>Width: Max, Depth: 3 cm, E9-1</Name>
                     <WidthDeg>0</WidthDeg>
                     <Origin>
                         <Col>509.5</Col>
@@ -2782,8 +2782,8 @@
                     </PixelSize>
                 </Config>
                 <Config>
-                    <ID>WidthMaxDepth4</ID>
-                    <Name>Width: Max, Depth: 4 cm</Name>
+                    <ID>WidthMaxDepth4_E9-1</ID>
+                    <Name>Width: Max, Depth: 4 cm, E9-1</Name>
                     <WidthDeg>0</WidthDeg>
                     <Depth>563</Depth>
                     <Offset>0</Offset>
@@ -2820,8 +2820,8 @@
                     </PixelSize>
                 </Config>
                 <Config>
-                    <ID>WidthMaxDepth5</ID>
-                    <Name>Width: Max, Depth: 5 cm</Name>
+                    <ID>WidthMaxDepth5_E9-1</ID>
+                    <Name>Width: Max, Depth: 5 cm, E9-1</Name>
                     <WidthDeg>0</WidthDeg>
                     <Depth>564</Depth>
                     <Offset>0</Offset>
@@ -2858,8 +2858,8 @@
                     </PixelSize>
                 </Config>
                 <Config>
-                    <ID>WidthMaxDepth6</ID>
-                    <Name>Width: Max, Depth: 6 cm</Name>
+                    <ID>WidthMaxDepth6_E9-1</ID>
+                    <Name>Width: Max, Depth: 6 cm, E9-1</Name>
                     <WidthDeg>0</WidthDeg>
                     <Depth>563</Depth>
                     <Offset>0</Offset>
@@ -2896,8 +2896,8 @@
                     </PixelSize>
                 </Config>
                 <Config>
-                    <ID>AngioWidthMaxDepth3cm</ID>
-                    <Name>Angio, Width: Max, Depth: 3 cm</Name>
+                    <ID>AngioWidthMaxDepth3cm_E9-1</ID>
+                    <Name>Angio, Width: Max, Depth: 3 cm, E9-1</Name>
                     <WidthDeg>0</WidthDeg>
                     <Origin>
                         <Col>509.5</Col>
@@ -2915,8 +2915,8 @@
                     </PixelSize>
                 </Config>
                 <Config>
-                    <ID>AngioWidthMaxDepth4</ID>
-                    <Name>Angio, Width: Max, Depth: 4 cm</Name>
+                    <ID>AngioWidthMaxDepth4_E9-1</ID>
+                    <Name>Angio, Width: Max, Depth: 4 cm, E9-1</Name>
                     <WidthDeg>0</WidthDeg>
                     <Depth>563</Depth>
                     <Offset>0</Offset>
@@ -2953,8 +2953,8 @@
                     </PixelSize>
                 </Config>
                 <Config>
-                    <ID>AngioWidthMaxDepth5</ID>
-                    <Name>Angio, Width: Max, Depth: 5 cm</Name>
+                    <ID>AngioWidthMaxDepth5_E9-1</ID>
+                    <Name>Angio, Width: Max, Depth: 5 cm, E9-1</Name>
                     <WidthDeg>0</WidthDeg>
                     <Depth>564</Depth>
                     <Offset>0</Offset>
@@ -2991,8 +2991,8 @@
                     </PixelSize>
                 </Config>
                 <Config>
-                    <ID>AngioWidthMaxDepth6</ID>
-                    <Name>Angio, Width: Max, Depth: 6 cm</Name>
+                    <ID>AngioWidthMaxDepth6_E9-1</ID>
+                    <Name>Angio, Width: Max, Depth: 6 cm, E9-1</Name>
                     <WidthDeg>0</WidthDeg>
                     <Depth>563</Depth>
                     <Offset>0</Offset>
@@ -3029,57 +3029,9 @@
                     </PixelSize>
                 </Config>
             </RTSource>
-	    <RTSource>
-              <Name>DVI_newScanner_E9-3</Name>
-              <TemporalCalibration>0</TemporalCalibration>
-              <DefaultConfig>Empty</DefaultConfig>
-              <ImageSize>
-		<Width>1280</Width>
-		<Height>1024</Height>
-              </ImageSize>
-              <HorizontalOffset>0</HorizontalOffset>
-              <Config>
-		<ID>WidthMaxDepth4</ID>
-		<Name>Width: Max, Depth: 4 mm</Name>
-		<WidthDeg>0</WidthDeg>
-		<Depth>600</Depth>
-		<Offset>0</Offset>
-		<Origin>
-                  <Col>509.5</Col>
-                  <Row>105</Row>
-		</Origin>
-		<NCorners>4</NCorners>
-		<Corner>
-                  <Col>221</Col>
-                  <Row>105</Row>
-		</Corner>
-		<Corner>
-                  <Col>221</Col>
-                  <Row>705</Row>
-		</Corner>
-		<Corner>
-                  <Col>798</Col>
-                  <Row>705</Row>
-		</Corner>
-		<Corner>
-                  <Col>798</Col>
-                  <Row>105</Row>
-		</Corner>
-		<CroppingEdges>
-                  <Left>221</Left>
-                  <Right>798</Right>
-                  <Top>104</Top>
-                  <Bottom>705</Bottom>
-		</CroppingEdges>
-		<PixelSize>
-                  <Width>0.00665557404326123</Width>
-                  <Height>0.00665557404326123</Height>
-		</PixelSize>
-              </Config>
-            </RTSource>
             <RTSource>
                 <Name>Digital</Name>
-                <TemporalCalibration>600</TemporalCalibration>
+                <TemporalCalibration>70</TemporalCalibration>
                 <DefaultConfig>Digital</DefaultConfig>
                 <Config>
                     <ID>Digital</ID>

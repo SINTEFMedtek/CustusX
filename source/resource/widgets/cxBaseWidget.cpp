@@ -44,8 +44,6 @@ namespace cx
 BaseWidget::BaseWidget(QWidget* parent, QString objectName, QString windowTitle) :
     OptimizedUpdateWidget(parent), mObjectName(objectName), mWindowTitle(windowTitle)
 {
-//    if (mObjectName=="US Reconstruction")
-//        std::cout << ":: [" <<  this->objectName() << "]" << std::endl;
 	this->setFocusPolicy(Qt::StrongFocus); // needed for help system: focus is used to display help text
     this->setObjectName(mObjectName);
     this->setWindowTitle(mWindowTitle);
@@ -119,7 +117,6 @@ void BaseWidget::adjustSizeSlot()
 
 void BaseWidget::showEvent(QShowEvent* event)
 {
-    this->setWhatsThis(this->defaultWhatsThis());
     QWidget::showEvent(event);
 }
 

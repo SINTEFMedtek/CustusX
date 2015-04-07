@@ -63,6 +63,7 @@ PointSamplingWidget::PointSamplingWidget(QWidget* parent) :
   mRemoveButton(new QPushButton("Remove", this)),
   mLoadReferencePointsButton(new QPushButton("Load reference points", this))
 {
+	this->setToolTip("Sample and store points");
 	connect(trackingService().get(), &TrackingService::stateChanged, this, &PointSamplingWidget::updateSlot);
 
   //table widget
@@ -92,15 +93,6 @@ PointSamplingWidget::PointSamplingWidget(QWidget* parent) :
 
 PointSamplingWidget::~PointSamplingWidget()
 {}
-
-QString PointSamplingWidget::defaultWhatsThis() const
-{
-  return "<html>"
-      "<h3>Utility for sampling points in 3D</h3>"
-      "<p>Lets you sample points in 3D and get the distance between sampled points.</p>"
-      "<p><i></i></p>"
-      "</html>";
-}
 
 void PointSamplingWidget::itemSelectionChanged()
 {

@@ -56,7 +56,6 @@ class cxGui_EXPORT ColorWidget : public BaseWidget
 
 public:
 	ColorWidget(PatientModelServicePtr patientModelService, QWidget* parent);
-	virtual QString defaultWhatsThis() const;
 };
 
 /**

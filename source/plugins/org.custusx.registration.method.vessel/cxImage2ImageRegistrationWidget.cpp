@@ -40,13 +40,4 @@ Image2ImageRegistrationWidget::Image2ImageRegistrationWidget(QWidget* parent, QS
 {
 }
 
-QString Image2ImageRegistrationWidget::defaultWhatsThis() const
-{
-  return "<html>"
-	  "<h3>Image to image registration.</h3>"
-	  "<p>This is a method used to registrate one image to another using segments of the images.</p>"
-	  "<p><i>Choose a step to continue.</i></p>"
-	  "</html>";
-}
-
 } //cx

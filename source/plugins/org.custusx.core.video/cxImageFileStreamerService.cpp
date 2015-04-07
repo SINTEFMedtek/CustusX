@@ -52,6 +52,11 @@ QString ImageFileStreamerService::getName()
 	return "ImageFile";
 }
 
+QString ImageFileStreamerService::getType() const
+{
+	return "image_file_streamer";
+}
+
 std::vector<PropertyPtr> ImageFileStreamerService::getSettings(QDomElement root)
 {
 	std::vector<PropertyPtr> retval;

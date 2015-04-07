@@ -57,6 +57,7 @@ TransferFunctionAlphaWidget::TransferFunctionAlphaWidget(PatientModelServicePtr 
   mBorder(5),
   mReadOnly(false)
 {
+	this->setToolTip("Set the alpha part of a transfer function");
 	this->setFocusPolicy(Qt::StrongFocus);
 
 	mActiveImageProxy = ActiveImageProxy::New(patientModelService);
@@ -66,15 +67,6 @@ TransferFunctionAlphaWidget::TransferFunctionAlphaWidget(PatientModelServicePtr 
 }
 TransferFunctionAlphaWidget::~TransferFunctionAlphaWidget()
 {}
-
-QString TransferFunctionAlphaWidget::defaultWhatsThis() const
-{
-  return "<html>"
-    "<h3>Alpha Transfer Function.</h3>"
-    "<p>Lets you set the alpha part of a transfer function.</p>"
-    "<p><i></i></p>"
-    "</html>";
-}
 
 void TransferFunctionAlphaWidget::setData(ImagePtr image, ImageTFDataPtr tfData)
 {

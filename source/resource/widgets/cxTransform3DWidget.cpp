@@ -89,6 +89,7 @@ public:
 Transform3DWidget::Transform3DWidget(QWidget* parent) :
     BaseWidget(parent, "Transform3DWidget", "Transform 3D")
 {
+	this->setToolTip("Display and manipulate an affine (rotation+translation) matrix");
   recursive = false;
   mBlockChanges = false;
   //layout
@@ -160,15 +161,6 @@ Transform3DWidget::Transform3DWidget(QWidget* parent) :
   toptopLayout->addStretch();
 
   this->setEditable(false);
-}
-
-QString Transform3DWidget::defaultWhatsThis() const
-{
-  return "<html>"
-    "<h3>Transform 3D</h3>"
-    "<p>Lets you display and manipulat an affine matrix, i.e. a rotation+translation matrix.</p>"
-    "<p><i></i></p>"
-    "</html>";
 }
 
 void Transform3DWidget::textEditChangedSlot()

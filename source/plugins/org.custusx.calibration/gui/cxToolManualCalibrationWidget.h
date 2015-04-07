@@ -57,7 +57,6 @@ class org_custusx_calibration_EXPORT ToolManualCalibrationWidget : public BaseWi
 public:
   ToolManualCalibrationWidget(VisServicesPtr services, QWidget* parent);
   virtual ~ToolManualCalibrationWidget() {}
-  virtual QString defaultWhatsThis() const;
 
 private slots:
   void toolCalibrationChanged();

@@ -60,7 +60,7 @@ class cxGui_EXPORT FilterSetupWidget : public BaseWidget
 public:
 	FilterSetupWidget(VisServicesPtr services, QWidget* parent, XmlOptionFile options, bool addFrame);
 	void setFilter(FilterPtr filter);
-	QString defaultWhatsThis() const;
+	QString generateHelpText() const;
 	/** Compact Mode: one group, hide main input/output
 	  */
 	void setCompact(bool on);

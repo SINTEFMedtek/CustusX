@@ -61,7 +61,6 @@ public:
 	explicit HelpWidget(HelpEnginePtr engine, QWidget* parent = NULL);
 	virtual ~HelpWidget();
 
-	virtual QString defaultWhatsThis() const;
 	HelpEnginePtr engine() { return mEngine; }
 
 signals:

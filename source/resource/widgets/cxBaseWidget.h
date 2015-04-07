@@ -112,7 +112,6 @@ class cxResourceWidgets_EXPORT BaseWidget: public OptimizedUpdateWidget
 public:
     BaseWidget(QWidget* parent, QString objectName, QString windowTitle);
 	virtual ~BaseWidget() {}
-	virtual QString defaultWhatsThis() const = 0; ///< Returns a short description of what this widget will do for you.
 
     QWidget* createMethodWidget(QWidget* inputWidget, QWidget* outputWidget, QString methodname,
     		bool inputChecked = false, bool outputVisible = true);///< Create a specialized widget for filters, with input/ouput, enable and options.

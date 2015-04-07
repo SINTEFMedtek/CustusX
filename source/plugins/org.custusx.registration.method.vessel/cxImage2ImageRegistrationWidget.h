@@ -46,7 +46,6 @@ class Image2ImageRegistrationWidget : public TabbedWidget
 public:
   Image2ImageRegistrationWidget(QWidget* parent, QString objectName, QString windowTitle);
   virtual ~Image2ImageRegistrationWidget(){}
-  virtual QString defaultWhatsThis() const;
 };
 
 } //cx

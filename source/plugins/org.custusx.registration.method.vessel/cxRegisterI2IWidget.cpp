@@ -48,9 +48,6 @@ RegisterI2IWidget::RegisterI2IWidget(RegServices services, QWidget* parent) :
 		RegistrationBaseWidget(services, parent, "RegisterI2IWidget", "Register Image2Image"),
 		mSeansVesselRegsitrationWidget(new SeansVesselRegistrationWidget(services, this))
 {
-//  connect(registrationManager(), SIGNAL(fixedDataChanged(QString)), this, SLOT(fixedImageSlot(QString)));
-//  connect(registrationManager(), SIGNAL(movingDataChanged(QString)), this, SLOT(movingImageSlot(QString)));
-
   QVBoxLayout* topLayout = new QVBoxLayout(this);
   QGridLayout* layout = new QGridLayout();
   topLayout->addLayout(layout);
@@ -62,23 +59,5 @@ RegisterI2IWidget::RegisterI2IWidget(RegServices services, QWidget* parent) :
 
 RegisterI2IWidget::~RegisterI2IWidget()
 {}
-
-QString RegisterI2IWidget::defaultWhatsThis() const
-{
-  return "<html>"
-      "<h3>Registration of vessel segments to eachother.</h3>"
-      "<p><i>Press the button to perform vessel based registration between image 1 and image 2s centerlines.</i></p>"
-      "</html>";
-}
-//
-//void RegisterI2IWidget::fixedImageSlot(QString uid)
-//{
-//  mSeansVesselRegsitrationWidget->fixedImageSlot(uid);
-//}
-//
-//void RegisterI2IWidget::movingImageSlot(QString uid)
-//{
-//  mSeansVesselRegsitrationWidget->movingImageSlot(uid);
-//}
 
 }

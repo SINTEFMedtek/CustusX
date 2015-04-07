@@ -45,6 +45,7 @@ ManualPatientRegistrationWidget::ManualPatientRegistrationWidget(RegServices ser
 				mVerticalLayout(new QVBoxLayout(this)),
 				mServices(services)
 {
+	this->setToolTip("Set patient registration directly");
 	mVerticalLayout->setMargin(0);
 	mLabel = new QLabel("Patient Registration matrix rMpr");
 	mVerticalLayout->addWidget(mLabel);
@@ -84,11 +85,6 @@ void ManualPatientRegistrationWidget::patientMatrixChanged()
 	mMatrixWidget->blockSignals(true);
 	mMatrixWidget->setMatrix(mServices.patientModelService->get_rMpr());
 	mMatrixWidget->blockSignals(false);
-}
-
-QString ManualPatientRegistrationWidget::defaultWhatsThis() const
-{
-	return QString();
 }
 
 bool ManualPatientRegistrationWidget::isValid() const

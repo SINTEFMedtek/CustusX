@@ -69,7 +69,7 @@ void CompactFilterSetupWidget::obscuredSlot(bool obscured)
 		mCurrentFilter->setActive(!obscured);
 }
 
-QString CompactFilterSetupWidget::defaultWhatsThis() const
+QString CompactFilterSetupWidget::getHelpText() const
 {
 	QString name("None");
 	QString help("");
@@ -111,6 +111,7 @@ void CompactFilterSetupWidget::setFilter(FilterPtr filter)
 		std::copy(options.begin(), options.end(), std::back_inserter(all));
 
 		mOptionsWidget->setOptions(mCurrentFilter->getUid(), all, false);
+		this->setToolTip(this->getHelpText());
 	}
 	else
 		mOptionsWidget->setOptions("", std::vector<PropertyPtr>(), false);

@@ -42,21 +42,13 @@ PluginFrameworkWidget::PluginFrameworkWidget(QWidget* parent) :
     BaseWidget(parent, "PluginFrameworkWidget", "Plugin Framework"),
     mVerticalLayout(new QVBoxLayout(this))
 {
+	this->setToolTip("View available plugins");
 	PluginFrameworkManagerPtr pluginFramework = LogicManager::getInstance()->getPluginFramework();
 	mVerticalLayout->addWidget(new ctkPluginBrowser(pluginFramework));
 }
 
 PluginFrameworkWidget::~PluginFrameworkWidget()
 {
-}
-
-QString PluginFrameworkWidget::defaultWhatsThis() const
-{
-  return "<html>"
-      "<h3>Plugin Framework.</h3>"
-      "<p>View the available plugins</p>"
-      "<p>Plugins add functionality to the application</p>"
-      "</html>";
 }
 
 } /* namespace cx */

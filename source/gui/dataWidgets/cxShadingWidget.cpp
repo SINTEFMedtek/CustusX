@@ -67,6 +67,7 @@ ShadingWidget::~ShadingWidget()
 void ShadingWidget::init(bool connectToActiveImage)
 {
   mShadingCheckBox = new QCheckBox("Shading", this);
+  this->setToolTip("Volume shading properties");
 
   connect(mShadingCheckBox, &QCheckBox::toggled, this, &ShadingWidget::shadingToggledSlot);
 
@@ -117,10 +118,5 @@ void ShadingWidget::imageChangedSlot(ImagePtr image)
 	}
 }
 
-
-QString ShadingWidget::defaultWhatsThis() const
-{
-	return "<html></html>";
-}
 
 }//namespace cx

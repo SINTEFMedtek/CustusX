@@ -60,11 +60,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 LandmarkImageRegistrationWidget::LandmarkImageRegistrationWidget(RegServices services, QWidget* parent,
-	QString objectName, QString windowTitle) :
-	LandmarkRegistrationWidget(services, parent, objectName, windowTitle)
+	QString objectName, QString windowTitle, bool useRegistrationFixedPropertyInsteadOfActiveImage) :
+	LandmarkRegistrationWidget(services, parent, objectName, windowTitle),
+	mUseRegistrationFixedPropertyInsteadOfActiveImage(useRegistrationFixedPropertyInsteadOfActiveImage)
 {
-	mCurrentProperty = StringPropertySelectData::New(mServices.patientModelService);
-	connect(mCurrentProperty.get(), SIGNAL(changed()), this, SLOT(onCurrentImageChanged()));
+	if(mUseRegistrationFixedPropertyInsteadOfActiveImage)
+		mCurrentProperty.reset(new StringPropertyRegistrationFixedImage(services.registrationService, services.patientModelService));
+	else
+		mCurrentProperty = StringPropertySelectData::New(mServices.patientModelService);
+	connect(mCurrentProperty.get(), &Property::changed, this, &LandmarkImageRegistrationWidget::onCurrentImageChanged);
 	mImageLandmarkSource = ImageLandmarksSource::New();
 
 	mActiveToolProxy = ActiveToolProxy::New(services.trackingService);
@@ -224,13 +228,12 @@ void LandmarkImageRegistrationWidget::showEvent(QShowEvent* event)
 {
 	LandmarkRegistrationWidget::showEvent(event);
 
-	ImagePtr image = mServices.patientModelService->getActiveImage();
-	if (image)
-		mCurrentProperty->setValue(image->getUid());
-//	if (image && !mManager->getFixedData())
-//		mManager->setFixedData(image);
-//	if (image && !mImageLandmarkSource->getData())
-//		mImageLandmarkSource->setData(image);
+	if(!mUseRegistrationFixedPropertyInsteadOfActiveImage)
+	{
+		ImagePtr image = mServices.patientModelService->getActiveImage();
+		if (image)
+			mCurrentProperty->setValue(image->getUid());
+	}
 
 	mServices.visualizationService->getGroup(0)->setRegistrationMode(rsIMAGE_REGISTRATED);
 	LandmarkRepPtr rep = mServices.visualizationService->get3DReps(0, 0)->findFirst<LandmarkRep>();

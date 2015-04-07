@@ -70,7 +70,6 @@ class org_custusx_calibration_EXPORT ToolTipCalibrateWidget : public BaseWidget
 public:
   ToolTipCalibrateWidget(VisServicesPtr services, QWidget* parent);
   ~ToolTipCalibrateWidget();
-  virtual QString defaultWhatsThis() const;
 
 private slots:
   void calibrateSlot();

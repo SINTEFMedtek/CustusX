@@ -65,8 +65,6 @@ public:
   SoundSpeedConverterWidget(TrackingServicePtr trackingService, QWidget* parent=NULL);
   ~SoundSpeedConverterWidget();
 
-  virtual QString defaultWhatsThis() const;
-
 public slots:
   void applySoundSpeedCompensationFactorSlot(); ///< sets the sounds speed conversion factor on the rt source
 

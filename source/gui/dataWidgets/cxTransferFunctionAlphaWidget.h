@@ -64,7 +64,6 @@ class cxGui_EXPORT TransferFunctionAlphaWidget : public BaseWidget
 public:
   TransferFunctionAlphaWidget(PatientModelServicePtr patientModelService, QWidget* parent);
   virtual ~TransferFunctionAlphaWidget();
-  virtual QString defaultWhatsThis() const;
 
   void setData(ImagePtr image, ImageTFDataPtr tfData);
   void setReadOnly(bool readOnly);///< Set class readonly: Disable mouse interaction

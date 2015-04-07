@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QApplication>
 #include "cxMainWindow.h"
+#include "cxMainWindowApplicationComponent.h"
 
 /**Helper object for automated control of the CustusX application.
  *
@@ -67,6 +68,8 @@ public slots:
 	void changeToNewProfile();
 
 private:
+	typedef cx::MainWindowApplicationComponent<cx::MainWindow> MainWindowComponent;
+	boost::shared_ptr<MainWindowComponent> mApplicationComponent;
 };
 
 #endif /* CXTESTCUSTUSXCONTROLLER_H_ */

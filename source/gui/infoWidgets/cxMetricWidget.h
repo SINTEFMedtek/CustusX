@@ -92,8 +92,6 @@ public:
   MetricWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent);
   virtual ~MetricWidget();
 
-  virtual QString defaultWhatsThis() const;
-
 signals:
 
  public slots:

@@ -54,6 +54,7 @@ FilePreviewWidget::FilePreviewWidget(QWidget* parent) :
 	mTextEdit(new QTextEdit(this)),
 	mSaveButton(new QPushButton("Save", this))
 {
+	this->setToolTip("Preview and edit a file");
 	mSyntaxHighlighter = NULL;
   connect(mSaveButton, SIGNAL(clicked()), this, SLOT(saveSlot()));
   mSaveButton->setEnabled(false);
@@ -77,15 +78,6 @@ FilePreviewWidget::FilePreviewWidget(QWidget* parent) :
 
 FilePreviewWidget::~FilePreviewWidget()
 {}
-
-QString FilePreviewWidget::defaultWhatsThis() const
-{
-  return "<html>"
-      "<h3>File preview.</h3>"
-      "<p>Lets you preview and edit a file.</p>"
-      "<p><i>Click save to keep your changes.</i></p>"
-      "</html>";
-}
 
 void FilePreviewWidget::textChangedSlot()
 {

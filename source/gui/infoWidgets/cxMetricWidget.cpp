@@ -82,7 +82,7 @@ MetricWidget::MetricWidget(VisualizationServicePtr visualizationService, Patient
 	mDelayedUpdateTimer = new QTimer(this);
 	connect(mDelayedUpdateTimer, SIGNAL(timeout()), this, SLOT(delayedUpdate())); // this signal will be executed in the thread of THIS, i.e. the main thread.
 	mDelayedUpdateTimer->start(lowUpdateRate);
-
+	this->setToolTip("3D measurements");
 
 	mModifiedCount = 0;
 	mPaintCount = 0;
@@ -173,15 +173,6 @@ QAction* MetricWidget::createAction(QActionGroup* group, QString iconName, QStri
   	connect(action, SIGNAL(triggered()), this, slot);
   }
   return action;
-}
-
-QString MetricWidget::defaultWhatsThis() const
-{
-  return "<html>"
-      "<h3>Utility for sampling points in 3D</h3>"
-      "<p>Lets you sample points in 3D and get the distance between sampled points.</p>"
-      "<p><i></i></p>"
-      "</html>";
 }
 
 void MetricWidget::cellChangedSlot(int row, int col)

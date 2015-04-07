@@ -57,9 +57,7 @@ class cxGui_EXPORT TransferFunctionPresetWidget: public PresetWidget
 
 public:
 	TransferFunctionPresetWidget(PatientModelServicePtr patientModelService, QWidget* parent, bool is3D);
-	virtual ~TransferFunctionPresetWidget() {
-	}
-	virtual QString defaultWhatsThis() const;
+	virtual ~TransferFunctionPresetWidget() {}
 
 public slots:
 	virtual void resetSlot();

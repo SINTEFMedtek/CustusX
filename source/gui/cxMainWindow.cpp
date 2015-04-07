@@ -256,6 +256,8 @@ void MainWindow::focusChanged(QWidget * old, QWidget * now)
 
 void MainWindow::focusInsideDockWidget(QObject *dockWidget)
 {
+	// focusing to docked widgets is required by the help system
+
 	// Assume structure: QDockWidget->QScrollArea->QWidget,
 	// as defined in MainWindow::addAsDockWidget()
 	QDockWidget* dw = dynamic_cast<QDockWidget*>(dockWidget);
@@ -329,6 +331,9 @@ void MainWindow::createActions()
 	mLoadFileAction->setStatusTip(tr("Load patient file"));
 	mClearPatientAction = new QAction(tr("&Clear Patient"), this);
 	mExportPatientAction = new QAction(tr("&Export Patient"), this);
+
+	mGotoDocumentationAction = new QAction(tr("Web Documentation"), this);
+	connect(mGotoDocumentationAction, &QAction::triggered, this, &MainWindow::onGotoDocumentation);
 
 	connect(mNewPatientAction, &QAction::triggered, this, &MainWindow::newPatientSlot);
 	connect(mLoadFileAction, &QAction::triggered, this, &MainWindow::loadPatientFileSlot);
@@ -646,6 +651,13 @@ QString MainWindow::getExistingSessionFolder()
 	return folder;
 }
 
+void MainWindow::onGotoDocumentation()
+{
+	QString url("http://custusx.org/index.php/downloads");
+
+	QDesktopServices::openUrl(QUrl(url, QUrl::TolerantMode));
+}
+
 void MainWindow::clearPatientSlot()
 {
 	mServices->getSession()->clear();
@@ -875,7 +887,7 @@ void MainWindow::createMenus()
 
 	mHelpMenuAction = this->menuBar()->addMenu(mHelpMenu);
 	mHelpMenu->addAction(mAboutAction);
-	mHelpMenu->addAction(QWhatsThis::createAction(this));
+	mHelpMenu->addAction(mGotoDocumentationAction);
 }
 
 void MainWindow::createToolBars()
@@ -924,11 +936,6 @@ void MainWindow::createToolBars()
 	mDesktopToolBar->addAction(mResetDesktopAction);
 	this->registerToolBar(mDesktopToolBar, "Toolbar");
 
-	mHelpToolBar = addToolBar("Help");
-	mHelpToolBar->setObjectName("HelpToolBar");
-	mHelpToolBar->addAction(QWhatsThis::createAction(this));
-	this->registerToolBar(mHelpToolBar, "Toolbar");
-
 	mScreenshotToolBar = addToolBar("Screenshot");
 	mScreenshotToolBar->setObjectName("ScreenshotToolBar");
 	mScreenshotToolBar->addAction(mShootScreenAction);
@@ -964,7 +971,7 @@ void MainWindow::aboutSlot()
 {
 	QString doc_path = DataLocations::getDocPath();
 	QString appName = qApp->applicationDisplayName();
-	QString url_github("https://github.com/SINTEFMedtek/CustusX");
+	QString url_github("http://custusx.org");
 	QString url_license = QString("file://%1/license.txt").arg(doc_path);
 	QString url_config = QString("file://%1/cxConfigDescription.txt").arg(doc_path);
 

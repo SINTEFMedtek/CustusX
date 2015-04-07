@@ -82,7 +82,6 @@ class cxGui_EXPORT VideoConnectionWidget : public BaseWidget
 public:
 	VideoConnectionWidget(VisServicesPtr services, QWidget* parent);
 	virtual ~VideoConnectionWidget();
-	virtual QString defaultWhatsThis() const;
 
 protected slots:
 	void toggleConnectServer();
@@ -110,6 +109,7 @@ protected:
 	StringPropertyActiveVideoSourcePtr mActiveVideoSourceSelector;
 	XmlOptionFile mOptions;
 	DetailedLabeledComboBoxWidget* mConnectionSelectionWidget;
+	QFrame* mStackedWidgetFrame;
 
 	VisServicesPtr mServices;
 

@@ -49,21 +49,13 @@ FrameTreeWidget::FrameTreeWidget(PatientModelServicePtr patientService, QWidget*
   QVBoxLayout* layout = new QVBoxLayout(this);
 
   //layout->setMargin(0);
+  this->setToolTip("A tree displaying relations between coordinate spaces");
   mTreeWidget = new QTreeWidget(this);
   layout->addWidget(mTreeWidget);
   mTreeWidget->setHeaderLabels(QStringList() << "Frame");
 
   // TODO this must also listen to all changed() in all data
   connect(mPatientService.get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataLoadedSlot()));
-}
-
-QString FrameTreeWidget::defaultWhatsThis() const
-{
-  return "<html>"
-      "<h3>Frame dependencies display.</h3>"
-      "<p>Lets you look at the frame dependencies between different data.</p>"
-      "<p><i></i></p>"
-      "</html>";
 }
 
 void FrameTreeWidget::dataLoadedSlot()

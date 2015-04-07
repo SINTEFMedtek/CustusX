@@ -67,7 +67,6 @@ class org_custusx_calibration_EXPORT ToolTipSampleWidget : public BaseWidget
 public:
   ToolTipSampleWidget(VisServicesPtr services, QWidget* parent);
   ~ToolTipSampleWidget();
-  virtual QString defaultWhatsThis() const;
 
 private slots:
   void saveFileSlot();

@@ -71,6 +71,17 @@ void ProbeFixture::createTestProbe()
 	mProbe = cx::ProbeImpl::New(mProbeName, mScannerName, mXml);
 }
 
+
+void ProbeFixture::testProbeWithNoRTSource()
+{
+	QString xmlFileName = "testXmlFileName";
+	ProbeXmlConfigParserPtr mXml;
+	bool provideRTSource = false;
+	mXml.reset(new ProbeXmlConfigParserMock(xmlFileName, provideRTSource));
+	mDefaultRtSourceName = QString();
+	mProbe = cx::ProbeImpl::New(mProbeName, mScannerName, mXml);
+}
+
 void ProbeFixture::createParameters()
 {
 	mProbeName = "TestProbe";

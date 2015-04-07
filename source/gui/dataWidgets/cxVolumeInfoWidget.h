@@ -60,8 +60,6 @@ public:
   VolumeInfoWidget(PatientModelServicePtr patientModelService, QWidget* parent);
   virtual ~VolumeInfoWidget();
 
-  virtual QString defaultWhatsThis() const;
-
 protected slots:
   void updateSlot();
 

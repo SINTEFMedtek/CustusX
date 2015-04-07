@@ -38,5 +38,7 @@ target_link_libraries(cxResourceFilter
 	${ITK_LIBRARIES}
 )
 
+cx_doc_define_user_docs("${CMAKE_CURRENT_SOURCE_DIR}/doc")
+
 add_subdirectory(testing)
 

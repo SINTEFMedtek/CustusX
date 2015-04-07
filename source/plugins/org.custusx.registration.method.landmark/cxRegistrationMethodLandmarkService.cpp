@@ -61,7 +61,7 @@ QWidget *RegistrationMethodLandmarkImageToImageService::createWidget()
 QWidget *RegistrationMethodLandmarkImageToPatientService::createWidget()
 {
 	LandmarkRegistrationsWidget* landmarkRegistrationsWidget = new LandmarkRegistrationsWidget(NULL, "LandmarkRegistrationImageToImageWidget", "Image to Image Landmark Registration");
-	LandmarkImageRegistrationWidget* imageRegistrationWidget = new LandmarkImageRegistrationWidget(mServices, landmarkRegistrationsWidget, "LMImageRegistrationWidget", "Image Registration");
+	LandmarkImageRegistrationWidget* imageRegistrationWidget = new LandmarkImageRegistrationWidget(mServices, landmarkRegistrationsWidget, "LMImageRegistrationWidget", "Image Registration", true);
 	LandmarkPatientRegistrationWidget* patientRegistrationWidget = new LandmarkPatientRegistrationWidget(mServices, landmarkRegistrationsWidget, "LMPatientRegistrationWidget", "Patient Registration");
 
 	landmarkRegistrationsWidget->addTab(imageRegistrationWidget, "Image landmarks");
@@ -74,7 +74,7 @@ QWidget *RegistrationMethodFastLandmarkImageToPatientService::createWidget()
 {
 	FastRegistrationsWidget* fastRegistrationsWidget = new FastRegistrationsWidget(NULL, "FastRegistrationWidget", "Fast Landmark Registration");
 	FastOrientationRegistrationWidget* fastOrientationRegistrationWidget = new FastOrientationRegistrationWidget(mServices, fastRegistrationsWidget);
-	FastImageRegistrationWidget* fastImageRegistrationWidget = new FastImageRegistrationWidget(mServices, fastRegistrationsWidget, "FastImageRegistrationWidget", "Fast Image Registration");
+	FastImageRegistrationWidget* fastImageRegistrationWidget = new FastImageRegistrationWidget(mServices, fastRegistrationsWidget, "FastImageRegistrationWidget", "Fast Image Registration", true);
 	FastPatientRegistrationWidget* fastPatientRegistrationWidget = new FastPatientRegistrationWidget(mServices, fastRegistrationsWidget);
 	fastRegistrationsWidget->addTab(fastOrientationRegistrationWidget, "Orientation");
 	fastRegistrationsWidget->addTab(fastImageRegistrationWidget, "Image landmark(s)");

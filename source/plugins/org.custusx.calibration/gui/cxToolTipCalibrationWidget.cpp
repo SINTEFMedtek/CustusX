@@ -66,7 +66,7 @@ ToolTipCalibrateWidget::ToolTipCalibrateWidget(VisServicesPtr services, QWidget*
   mTools->setValueName("Reference tool");
   mTools->setHelp("Select a tool with a known reference point");
   mCalibrateToolComboBox = new LabeledComboBoxWidget(this, mTools);
-  this->setToolTip(this->defaultWhatsThis());
+  this->setToolTip("Calibrate tool position part of sMt matrix");
 
   //toplayout->addWidget(new QLabel("<b>Select a tool with a known reference point:</b>"));
   toplayout->addWidget(mCalibrateToolComboBox);
@@ -89,15 +89,6 @@ ToolTipCalibrateWidget::ToolTipCalibrateWidget(VisServicesPtr services, QWidget*
 
 ToolTipCalibrateWidget::~ToolTipCalibrateWidget()
 {}
-
-QString ToolTipCalibrateWidget::defaultWhatsThis() const
-{
-  return "<html>"
-      "<h3>Tool tip calibration.</h3>"
-      "<p><i>Calibrates a tool by sampling it when pointing at a known point on another frame.</i></br>"
-      "By using the test button you can test your calibration by pointing at a known reference point.</br></p>"
-      "</html>";
-}
 
 void ToolTipCalibrateWidget::calibrateSlot()
 {
@@ -149,7 +140,6 @@ void ToolTipCalibrateWidget::toolSelectedSlot()
 {
   QString text("Ref. point: <UNDEFINED POINT>");
   mCalibrateButton->setEnabled(false);
-//  mTestButton->setEnabled(false);
 
   if(mTools->getTool())
   {
@@ -158,7 +148,6 @@ void ToolTipCalibrateWidget::toolSelectedSlot()
     {
       text = "Ref. point: "+qstring_cast(tool->getReferencePoints()[1]);
       mCalibrateButton->setEnabled(true);
-//      mTestButton->setEnabled(true);
     }
     else
 		reportWarning("Selected tool have no known reference point");

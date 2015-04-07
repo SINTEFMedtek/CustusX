@@ -63,8 +63,6 @@ public:
 	DicomWidget(ctkPluginContext* context, QWidget* parent = 0);
 	virtual ~DicomWidget();
 
-	virtual QString defaultWhatsThis() const;
-
 private slots:
 	void onViewHeader();
 	void onImportIntoCustusXAction();
@@ -82,7 +80,6 @@ private:
 	void loadIntoPatientModel(ImagePtr image, QString seriesUid);
 	QStringList currentSeriesSelection();
 	ctkDICOMDatabase* getDatabase() const;
-
 };
 
 } /* namespace cx */

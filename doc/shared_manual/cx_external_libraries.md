@@ -21,6 +21,7 @@ They are listed here:
 | Qxt               | <http://dev.libqxt.org/libqxt/wiki/Home> 
 | Boost             | <http://www.boost.org>
 | Catch             | <http://github.com/philsquared/Catch>
+| Doxygen           | <http://www.doxygen.org>
 
 Code from other sources not listed here may be present in the CustusX source code. The original author
 and licensing is then descibed in the source.

@@ -71,15 +71,4 @@ void ImagePropertiesWidget::imageChanged(ImagePtr image)
 		mInterpolationType->setCurrentIndex(mImage->getInterpolationType());
 }
 
-QString ImagePropertiesWidget::defaultWhatsThis() const
-{
-	return "<html>"
-		"<h3>Image properties</h3>"
-		"<p>"
-		"Set image (volume) properties."
-		"</p>"
-		"<p><i></i></p>"
-		"</html>";
-}
-
 }//end namespace cx

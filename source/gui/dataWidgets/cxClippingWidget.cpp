@@ -100,12 +100,12 @@ ClippingWidget::ClippingWidget(PatientModelServicePtr patientModelService, QWidg
 	LabeledComboBoxWidget* imageCombo = new LabeledComboBoxWidget(this, mImageAdapter);
 	connect(mImageAdapter.get(), SIGNAL(changed()), this, SLOT(imageChangedSlot()));
 
-	this->setToolTip(this->defaultWhatsThis());
+	this->setToolTip("Interactive volume clipping");
 
 	QVBoxLayout* layout = new QVBoxLayout(this);
 
 	QGroupBox* activeClipGroupBox = new QGroupBox("Interactive clipper");
-	activeClipGroupBox->setToolTip(this->defaultWhatsThis());
+	activeClipGroupBox->setToolTip(this->toolTip());
 	layout->addWidget(activeClipGroupBox);
 	QVBoxLayout* activeClipLayout = new QVBoxLayout(activeClipGroupBox);
 
@@ -137,23 +137,6 @@ ClippingWidget::ClippingWidget(PatientModelServicePtr patientModelService, QWidg
 	layout->addStretch();
 
 	this->clipperChangedSlot();
-}
-
-QString ClippingWidget::defaultWhatsThis() const
-{
-	return "<html>"
-		"<h3>Functonality for clipping a volume</h3>"
-		"<p>"
-		"Define clip planes in a volume. The interactive clipper is attached "
-		"to the active tool, and clips the active volume according to a slice "
-		"definition. "
-		"</p>"
-		"<p>"
-		"The current clip can also be saved along with the volume. This can be "
-		"done several times."
-		"</p>"
-		"<p><i></i></p>"
-		"</html>";
 }
 
 void ClippingWidget::clipperChangedSlot()

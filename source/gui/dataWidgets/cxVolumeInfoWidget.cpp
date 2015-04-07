@@ -47,6 +47,7 @@ VolumeInfoWidget::VolumeInfoWidget(PatientModelServicePtr patientModelService, Q
   InfoWidget(parent, "VolumeInfoWidget", "Volume Info"),
   mPatientModelService(patientModelService)
 {
+	this->setToolTip("Display volume info");
 	mActiveImageProxy = ActiveImageProxy::New(patientModelService);
 	connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(updateSlot()));
 
@@ -76,11 +77,6 @@ void VolumeInfoWidget::addWidgets()
 	new LabeledComboBoxWidget(this, mParentFrameAdapter, gridLayout, i++);
 
 	gridLayout->addWidget(mTableWidget, i++, 0, 1, 2);
-}
-
-QString VolumeInfoWidget::defaultWhatsThis() const
-{
-	return "<html></html>";
 }
 
 void VolumeInfoWidget::updateSlot()

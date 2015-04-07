@@ -120,6 +120,9 @@ protected slots:
 	//tool menu
 	void configureSlot(); ///< lets the user choose which configuration files to use for the navigation
 
+	// help
+	void onGotoDocumentation();
+
 	// navigation
 	void centerToImageCenterSlot();
 	void centerToTooltipSlot();
@@ -206,6 +209,7 @@ private:
 	QAction* mStartStreamingAction; ///< start streaming of the default RT source.
 	QActionGroup* mToolsActionGroup; ///< grouping the actions for contacting the navigation system
 
+	QAction* mGotoDocumentationAction;
 	// actions for image navigation
 	QAction* mCenterToImageCenterAction;
 	QAction* mCenterToTooltipAction;

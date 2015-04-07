@@ -42,6 +42,7 @@ TransferFunction2DColorWidget::TransferFunction2DColorWidget(PatientModelService
   BaseWidget(parent, "TransferFunction2DColorWidget", "2D Color"),
   mPatientModelService(patientModelService)
 {
+	this->setToolTip("Set a 2D color transfer function");
   QVBoxLayout* layout = new QVBoxLayout(this);
 
   mTransferFunctionColorWidget = new TransferFunctionColorWidget(patientModelService, this);
@@ -70,15 +71,6 @@ TransferFunction2DColorWidget::TransferFunction2DColorWidget(PatientModelService
   new SliderGroupWidget(this, mDataLevel,  gridLayout, 1);
 
   this->setLayout(layout);
-}
-
-QString TransferFunction2DColorWidget::defaultWhatsThis() const
-{
-  return "<html>"
-    "<h3>2D color transfer function.</h3>"
-    "<p>Lets you set a 2D color transfer function.</p>"
-    "<p><i></i></p>"
-    "</html>";
 }
 
 void TransferFunction2DColorWidget::activeImageChangedSlot()
