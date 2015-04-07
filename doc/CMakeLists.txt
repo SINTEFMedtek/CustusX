@@ -91,7 +91,7 @@ function(cx_doc_generate_plugin_page)
     #message(STATUS "UNDOCUMENTED_PLUGINS_TEXT : " ${UNDOCUMENTED_PLUGINS_TEXT})
 
     CONFIGURE_FILE(
-        ${CX_DOC_INPUT_DIRECTORY}/user_manual/cx_user_doc_plugins.md.in
+        ${CX_DOC_INPUT_DIRECTORY}/shared_manual/cx_user_doc_plugins.md.in
         ${CX_DOC_OUTPUT_DIRECTORY}/cx_user_doc_plugins.md)
     #PLUGIN_SUBPAGES_TEXT
 endfunction()
@@ -266,6 +266,8 @@ function(cx_build_dev_documentation_html)
     SET(CX_DOXYGEN_INPUT 
         ${CX_DOC_INPUT_DIRECTORY}/dev_manual 
         ${CX_DOC_INPUT_DIRECTORY}/shared_manual 
+        ${CX_DOC_OUTPUT_DIRECTORY}/cx_user_doc_plugins.md
+        ${PLUGIN_DOC_FOLDERS}
         ${CustusX_SOURCE_DIR}/source 
         ${CustusX_SOURCE_DIR}/CMake)
     TO_LIST_SPACES(CX_DOXYGEN_INPUT CX_DOXYGEN_INPUT)
