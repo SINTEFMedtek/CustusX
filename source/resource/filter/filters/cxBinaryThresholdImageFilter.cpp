@@ -144,30 +144,36 @@ void BinaryThresholdImageFilter::setActive(bool on)
 	FilterImpl::setActive(on);
 
 	if (!mActive)
-		mServices->visualizationService->removePreview();
+		this->stopPreview();
 }
 
 void BinaryThresholdImageFilter::imageChangedSlot(QString uid)
 {
+	this->stopPreview();
 	this->updateThresholdPairFromImageChange(uid, mThresholdOption);
-	mServices->visualizationService->removePreview();
+}
+
+void BinaryThresholdImageFilter::stopPreview()
+{
+	if(mPreviewImage)
+		mPreviewImage->stopThresholdPreview();
+	mPreviewImage.reset();
 }
 
 void BinaryThresholdImageFilter::thresholdSlot()
 {
+//	this->stopPreview();
 	if (mActive)
 	{
-		ImagePtr image = boost::dynamic_pointer_cast<Image>(mInputTypes[0]->getData());
-		std::vector<double> threshold;
-		threshold.push_back(mThresholdOption->getValue()[0]);
-		threshold.push_back(mThresholdOption->getValue()[1]);
-		mServices->visualizationService->setPreview(image, threshold);
+		mPreviewImage = boost::dynamic_pointer_cast<Image>(mInputTypes[0]->getData());
+		Eigen::Vector2d threshold = Eigen::Vector2d(mThresholdOption->getValue()[0],  mThresholdOption->getValue()[1]);
+		mPreviewImage->startThresholdPreview(threshold);
 	}
 }
 
 bool BinaryThresholdImageFilter::preProcess()
 {
-	mServices->visualizationService->removePreview();
+	this->stopPreview();
 	return FilterImpl::preProcess();
 
 }

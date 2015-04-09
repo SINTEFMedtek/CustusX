@@ -94,8 +94,5 @@ NavigationPtr VisualizationServiceNull::getNavigation() { return NavigationPtr()
 LayoutRepositoryPtr VisualizationServiceNull::getLayoutRepository() { return LayoutRepositoryPtr(); }
 CameraControlPtr VisualizationServiceNull::getCameraControl() { return CameraControlPtr(); }
 QActionGroup* VisualizationServiceNull::createInteractorStyleActionGroup() { return mActionGroup; }
-void VisualizationServiceNull::setPreview(ImagePtr image, const std::vector<double>& threshold) {}
-void VisualizationServiceNull::removePreview() {}
-
 
 } //cx

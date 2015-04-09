@@ -97,10 +97,13 @@ private slots:
 	void thresholdSlot();
 
 private:
+	void stopPreview();
+
 	VisServicesPtr mServices;
 	BoolPropertyPtr mReduceResolutionOption;
 	DoublePropertyPtr mSurfaceThresholdOption;
 	vtkPolyDataPtr mRawResult;
+	ImagePtr mPreviewImage;
 };
 typedef boost::shared_ptr<class ContourFilter> ContourFilterPtr;
 

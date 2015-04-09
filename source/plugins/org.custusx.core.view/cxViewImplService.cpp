@@ -36,7 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewManager.h"
 #include "cxViewGroup.h"
 #include "cxRepManager.h"
-#include "cxThresholdPreview.h"
 #include "cxCoreServices.h"
 #include "cxSessionStorageServiceProxy.h"
 #include "cxXMLNodeWrapper.h"
@@ -160,19 +159,6 @@ CameraControlPtr VisualizationImplService::getCameraControl()
 QActionGroup* VisualizationImplService::createInteractorStyleActionGroup()
 {
 	return viewManager()->createInteractorStyleActionGroup();
-}
-
-void VisualizationImplService::setPreview(ImagePtr image, const std::vector<double>& threshold)
-{
-	if (threshold.size()==1)
-		RepManager::getInstance()->getThresholdPreview()->setPreview(image, threshold[0]);
-	if (threshold.size()==2)
-		RepManager::getInstance()->getThresholdPreview()->setPreview(image, Eigen::Vector2d(threshold[0], threshold[1]));
-}
-
-void VisualizationImplService::removePreview()
-{
-	RepManager::getInstance()->getThresholdPreview()->removePreview();
 }
 
 void VisualizationImplService::onSessionChanged()

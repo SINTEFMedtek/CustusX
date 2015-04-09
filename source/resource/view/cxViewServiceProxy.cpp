@@ -181,14 +181,4 @@ QActionGroup* VisualizationServiceProxy::createInteractorStyleActionGroup()
 	return mVisualizationService->createInteractorStyleActionGroup();
 }
 
-void VisualizationServiceProxy::setPreview(ImagePtr image, const std::vector<double>& threshold)
-{
-	mVisualizationService->setPreview(image, threshold);
-}
-
-void VisualizationServiceProxy::removePreview()
-{
-	mVisualizationService->removePreview();
-}
-
 } //cx

@@ -72,8 +72,6 @@ public:
 	virtual vtkVolumePtr getVtkVolume() = 0; ///< get the images vtkVolume
 	//virtual void setResampleFactor(double factor) = 0; ///< set how detailed the image should be
 	virtual void setMaxVolumeSize(long maxVoxels) = 0; ///< set max volume size for rendering. Must be set before setImage()
-signals:
-	void internalVolumeChanged(); ///< emitted when the internal vtkVolume has been replaced with a new one (happens with ProgressiveLODVolumetricRep)
 protected:
 	VolumetricBaseRep() : RepImpl() {}
 };
@@ -121,6 +119,7 @@ protected:
 protected slots:
 	void transformChangedSlot();
 	void vtkImageDataChangedSlot();
+	void updateVtkImageDataSlot();
 };
 //---------------------------------------------------------
 } // namespace cx
