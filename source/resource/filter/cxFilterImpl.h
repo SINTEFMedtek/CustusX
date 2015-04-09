@@ -66,14 +66,14 @@ public:
 	virtual std::vector<PropertyPtr> getOptions();
 	virtual std::vector<SelectDataStringPropertyBasePtr> getInputTypes();
 	virtual std::vector<SelectDataStringPropertyBasePtr> getOutputTypes();
-	virtual bool hasPresets(){return false;};
-	virtual PresetsPtr getPresets(){ return PresetsPtr();};
-	virtual QDomElement generatePresetFromCurrentlySetOptions(QString name){return QDomElement();};
+	virtual bool hasPresets() { return false; }
+	virtual PresetsPtr getPresets() { return PresetsPtr(); }
+	virtual QDomElement generatePresetFromCurrentlySetOptions(QString name) { return QDomElement(); }
 	virtual void setActive(bool on);
 	virtual bool preProcess();
 
 public slots:
-	virtual void requestSetPresetSlot(QString name){};
+	virtual void requestSetPresetSlot(QString name) {}
 
 protected:
 	explicit FilterImpl(VisServicesPtr services);
@@ -100,7 +100,6 @@ protected:
 	std::vector<DataPtr> mCopiedInput;
 	QDomElement mCopiedOptions;
 	bool mActive;
-//	PatientModelServicePtr mPatientModelService;
 	VisServicesPtr mServices;
 	PatientModelServicePtr patientService();
 

@@ -53,12 +53,10 @@ class org_custusx_core_state_EXPORT StateServiceImpl: public StateService
 Q_OBJECT
 
 public:
-//	static StateServicePtr create(ctkPluginContext* context);
 	virtual ~StateServiceImpl();
 	StateServiceImpl(ctkPluginContext* context);
 
 	virtual QString getVersionName();
-//	virtual QActionGroup* getApplicationActions();
 	virtual QString getApplicationStateName() const;
 	virtual QStringList getAllApplicationStateNames() const;
 
@@ -73,7 +71,6 @@ public:
 
 private:
 	WorkflowStateMachinePtr getWorkflow();
-//	ApplicationStateMachinePtr getApplication();
 	void initialize(StateServiceBackendPtr backend);
 	void fillDefaultSettings();
 	template<class T>
@@ -81,7 +78,6 @@ private:
 	StateServiceBackendPtr createBackend(ctkPluginContext* context);
 
 	WorkflowStateMachinePtr mWorkflowStateMachine;
-//	ApplicationStateMachinePtr mApplicationStateMachine;
 	StateServiceBackendPtr mBackend;
 };
 

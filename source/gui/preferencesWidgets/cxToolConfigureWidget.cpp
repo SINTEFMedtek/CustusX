@@ -223,7 +223,6 @@ void ToolConfigureGroupBox::populateConfigurations()
 	mConfigFilesComboBox->clear();
 
 	TrackerConfigurationPtr config = trackingService()->getConfiguration();
-//	QString application = stateService()->getApplicationStateName();
 	QStringList configurations = config->getConfigurationsGivenApplication();
 
 	foreach(QString filename, configurations)

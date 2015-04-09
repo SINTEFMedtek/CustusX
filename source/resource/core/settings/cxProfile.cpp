@@ -301,8 +301,6 @@ void ProfileManager::setActiveProfile(QString uid)
 
 	mActive.reset(new Profile(this->getPathForCustom(uid), mSettings));
 	this->getGenericSettings()->setValue("profile", mActive->getUid());
-//	if (mSelector)
-//		mSelector->setValue(mActive->getUid());
 	mActive->activate();
 	emit activeProfileChanged();
 //	CX_LOG_INFO() << "Set profile " << mActive->getName();
@@ -336,8 +334,6 @@ void ProfileManager::createCustomProfile(QString uid)
 
 void ProfileManager::profilesChanged()
 {
-//	if (mSelector)
-//		mSelector->setValueRange(this->getProfiles());
 }
 
 

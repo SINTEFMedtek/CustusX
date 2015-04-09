@@ -32,8 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxStateServiceImpl.h"
 
-
-
 #include <iostream>
 #include <QApplication>
 #include <QByteArray>
@@ -60,7 +58,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-
 
 StateServiceImpl::StateServiceImpl(ctkPluginContext* context)
 {
@@ -95,9 +92,6 @@ void StateServiceImpl::initialize(StateServiceBackendPtr backend)
 
 	ProfileManager::initialize();
 
-//	mApplicationStateMachine.reset(new ApplicationStateMachine(mBackend));
-//	mApplicationStateMachine->start();
-
 	mWorkflowStateMachine.reset(new WorkflowStateMachine(mBackend));
 	mWorkflowStateMachine->start();
 
@@ -105,81 +99,16 @@ void StateServiceImpl::initialize(StateServiceBackendPtr backend)
 	connect(mWorkflowStateMachine.get(), &WorkflowStateMachine::activeStateAboutToChange, this, &StateServiceImpl::workflowStateAboutToChange);
 
 	connect(ProfileManager::getInstance(), &ProfileManager::activeProfileChanged, this, &StateServiceImpl::applicationStateChanged);
-//	connect(mApplicationStateMachine.get(), &ApplicationStateMachine::activeStateChanged, this, &StateServiceImpl::applicationStateChanged);
 }
-
-//QActionGroup* StateServiceImpl::getApplicationActions()
-//{
-//	mActionGroup = new QActionGroup(this);
-
-
-//	return mApplicationStateMachine->getActionGroup();
-//}
-
-//QActionGroup* ApplicationStateMachine::getActionGroup()
-//{
-//	QString active = this->getActiveUidState();
-//	mActionGroup->setExclusive(true);
-//	//TODO rebuild action list when we need dynamic lists. Must rethink memory management then.
-//	for (ApplicationStateMap::iterator iter = mStates.begin(); iter != mStates.end(); ++iter)
-//	{
-//		iter->second->createAction(mActionGroup);
-//	}
-
-//	return mActionGroup;
-//}
-
-//QAction* ApplicationState::createAction(QActionGroup* group)
-//{
-//	if (mAction)
-//		return mAction;
-
-//	mAction = new QAction(this->getName(), group);
-//	mAction->setCheckable(true);
-//	mAction->setChecked(mActive);
-//	mAction->setData(QVariant(this->getUid()));
-
-//	connect(mAction, SIGNAL(triggered()), this, SLOT(setActionSlot()));
-
-//	return mAction;
-//}
-
-//QString PresetWidget::getNewPresetName(bool withoutSpaces = false)
-//{
-//	QString retval;
-
-//	// generate a name suggestion: identical if custom, appended by index if default.
-//	QString newName = PresetWidget::getCurrentPreset();
-//	if (!mPresets->getPresetList("").contains(newName))
-//		newName = "custom preset";
-//	if (mPresets->isDefaultPreset(newName))
-//		newName += "(2)";
-
-//	bool ok;
-//	QString text = QInputDialog::getText(this, "Save Preset",
-//			"Custom Preset Name", QLineEdit::Normal, newName, &ok);
-//	if (!ok || text.isEmpty())
-//		text = newName;
-
-//	retval = text;
-//	if(withoutSpaces)
-//		retval = retval.replace(" ", "-");
-
-//	return retval;
-//}
 
 QString StateServiceImpl::getApplicationStateName() const
 {
 	return ProfileManager::getInstance()->activeProfile()->getUid();
-//	if (!mApplicationStateMachine)
-//		return "";
-//	return mApplicationStateMachine->getActiveStateName();
 }
 
 QStringList StateServiceImpl::getAllApplicationStateNames() const
 {
 	return ProfileManager::getInstance()->getProfiles();
-//	return mApplicationStateMachine->getAllApplicationNames();
 }
 
 QString StateServiceImpl::getVersionName()
@@ -201,11 +130,6 @@ void StateServiceImpl::setWorkFlowState(QString uid)
 {
 	mWorkflowStateMachine->setActiveState(uid);
 }
-
-//ApplicationStateMachinePtr StateServiceImpl::getApplication()
-//{
-//	return mApplicationStateMachine;
-//}
 
 template<class T>
 void StateServiceImpl::fillDefault(QString name, T value)
@@ -242,20 +166,6 @@ void StateServiceImpl::fillDefaultSettings()
 	this->fillDefault("Navigation/anyplaneViewOffset", 0.25);
 	this->fillDefault("Navigation/followTooltip", true);
 	this->fillDefault("Navigation/followTooltipBoundary", 0.1);
-
-//	QStringList grabber = this->getDefaultGrabberServer();
-//	if (grabber.size()>0)
-//	{
-//		this->fillDefault("IGTLink/localServer", grabber[0]);
-//		grabber.pop_front();
-//		if (grabber.size()>0)
-//		{
-//			this->fillDefault("IGTLink/arguments", grabber.join(" "));
-//			this->fillDefault("IGTLink/directLinkArgumentHistory", QStringList() << grabber.join(" "));
-//		}
-//	}
-
-//	this->fillDefault("IGTLink/initScript", this->getDefaultGrabberInitScript());
 
 	this->fillDefault("showSectorInRTView", true);
 	this->fillDefault("View3D/stereoType", stFRAME_SEQUENTIAL);

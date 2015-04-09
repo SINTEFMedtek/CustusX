@@ -43,6 +43,8 @@ namespace cx
  * @{
  */
 
+	/** orientation type
+	 */
 	enum cxResource_EXPORT ORIENTATION_TYPE
 	{
 		otOBLIQUE,   ///< orient planes relative to the tool space

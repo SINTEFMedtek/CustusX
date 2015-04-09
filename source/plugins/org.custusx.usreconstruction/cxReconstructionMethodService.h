@@ -85,10 +85,8 @@ public:
 	 */
 	virtual std::vector<PropertyPtr> getSettings(QDomElement root) = 0;
 	/**
-	 * \param frameInfo Timetags and positions for the input frames
-	 * \param frameData The frame data. Assumes that the transfrom is identity.
+	 * \param input data to process
 	 * \param outputData [Out] The reconstructed volume. Memory must be allocated in advance.
-	 * \param frameMask A mask image for the frame.
 	 * \param settings Reference to settings file containing algorithm-specific settings
 	 */
 	virtual bool reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr outputData, QDomElement settings) = 0;

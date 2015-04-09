@@ -78,10 +78,11 @@ public:
 	 * The volume is assumed to lie from [0, 0, 0] -> bounds.
 	 * If any part of an image plane is outside the definition of the volume,
 	 * the pixel value will be set to 0.
-	 * @param planes Transforms from image space to world space (and thus also volume space)
+	 * @param planes_rMf Transforms from image space to world space (and thus also volume space)
 	 *               for the desired slices.
 	 * @param pixelSpacing The size of each pixel in the ultrasonic image.
 	 * @param sliceDimension The size in pixels of each ultrasound image.
+	 * @param output_dMr Position of generated output volume d relative to ref space r.
 	 * @param noiseSigma The sigma of the noise distribution on each image
 	 * @param noiseMean The sigma of the noise distribution on each image
 	 */

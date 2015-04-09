@@ -18,14 +18,14 @@ slots mechanism and extensive libraries. VTK and ITK are used for visualization
 and image processing, CTK for plugins and DICOM, Eigen for basic math, while 
 DCMTK, OpenCV, OpenIGTLink and IGSTK are used for specialized operations.
 
-CustusX uses a \ref superbuild for handling many of the external libraries.
+CustusX uses a \ref dev_superbuild for handling many of the external libraries.
 
 
 Resource Layer {#architecture_resource_layer}
 -----------------------------------------------------------
 A collection of common utility classes available to everyone.
 
-The \cx_resource consists of building blocks that are available to everyone.
+The Resource Layer consists of building blocks that are available to everyone.
 Everything here is/should be reusable, i.e. used by at least two other modules.
 
 The Core library is the basic component, all other libraries depend on that

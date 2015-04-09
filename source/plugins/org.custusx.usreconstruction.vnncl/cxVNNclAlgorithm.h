@@ -90,6 +90,7 @@ public:
 	/**
 	 * Build the OpenCL kernel
 	 * @param program_src The kernel source code
+	 * @param kernelPath path to kernel source
 	 * @param nMaxPlanes The MAX_PLANES parameter of the kernel, i.e. max value of how many planes to include in the reconstruction of one voxel
 	 * @param nPlanes Number of image planes in the input data set
 	 * @param method The method ID. See kernels.cl for more information
@@ -99,7 +100,8 @@ public:
 	 * @param newnessWeight The extra weight to give pixels newer than mean
 	 * @return True on suc
 	 */
-	virtual cl::Program buildCLProgram(std::string program_src, std::string kernelPath,
+	virtual cl::Program buildCLProgram(std::string program_src,
+									   std::string kernelPath,
 	                                  int nMaxPlanes,
 	                                  int nPlanes,
 	                                  int method,
@@ -142,7 +144,7 @@ public:
 	 * @param numBlocks number of blocks in the array
 	 */
 	virtual void freeFrameBlocks(frameBlock_t* framePointers,
-	                             int numBlock);
+								 int numBlocks);
 
 
 	/**

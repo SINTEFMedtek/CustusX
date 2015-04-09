@@ -67,9 +67,6 @@ typedef boost::shared_ptr<class SavingVideoRecorder> SavingVideoRecorderPtr;
 class cxResource_EXPORT UsReconstructionFileMaker
 {
 public:
-	/**
-	 * \param writeColor If set to true, colors will be saved even if settings is set to 8 bit
-	 */
 	UsReconstructionFileMaker(QString sessionDescription);
 	~UsReconstructionFileMaker();
 
@@ -85,6 +82,9 @@ public:
 	QString getSessionName() const { return mSessionDescription; }
 
 
+	/**
+	 * If writeColor set to true, colors will be saved even if settings is set to 8 bit
+	 */
 	USReconstructInputData getReconstructData(cx::ImageDataContainerPtr imageData,
 												   std::vector<double> imageTimestamps,
 	                                               TimedTransformMap trackerRecordedData,

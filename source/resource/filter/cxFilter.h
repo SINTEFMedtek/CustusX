@@ -80,7 +80,6 @@ public:
 	  *  Return a unique string for this algorithm.
 	  */
 	virtual QString getUid() const  = 0;
-//	virtual void setUid(QString uid) = 0;
 	/**
 	  *  Initialize algorithm
 	  *  Fill options for this algorithm.
@@ -142,7 +141,6 @@ public:
 	  * Assumes getOptions(), getInputTypes(), getOutputTypes()
 	  * has been called (this initializes options)
 	  *
-	  * \param outputPath is path to data files for current patient.
 	  * \return success.
 	  */
 	virtual bool preProcess() = 0;
@@ -151,8 +149,6 @@ public:
 	  * This method is threadable - can be executed in a secondary thread.
 	  * Assumes preprocess has been called.
 	  *
-	  * \param input List of data inputs corresponding to getInputTypes()
-	  * \param settings Reference to settings file containing algorithm-specific settings
 	  * \return success.
 	  */
 	virtual bool execute() = 0;
