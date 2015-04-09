@@ -56,6 +56,7 @@ cxResource_EXPORT Eigen::Affine3d fromString(const QString& text, bool* _ok);
 cxResource_EXPORT vtkTransformPtr getVtkTransform(const Eigen::Affine3d* self);
 }
 
+//! @cond Doxygen_Suppress
 namespace Eigen
 {
 
@@ -143,6 +144,7 @@ Transform<_Scalar, _Dim, _Mode, _Options> Transform<_Scalar, _Dim, _Mode, _Optio
 }
 
 } // namespace Eigen
+//! @endcond
 
 // --------------------------------------------------------
 namespace cx

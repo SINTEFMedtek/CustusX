@@ -68,7 +68,7 @@ namespace cx
 		ftFIXED_CENTER, ///< center is set.
 		ftCOUNT
 	};
-	/**Determines the general view direction: from the top/superior (neuro) or from the feet/inferir (radio)
+	/** Determines the general view direction: from the top/superior (neuro) or from the feet/inferir (radio)
 	 */
 	enum cxResource_EXPORT CLINICAL_VIEW
 	{
