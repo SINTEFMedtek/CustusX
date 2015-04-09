@@ -99,7 +99,6 @@ private slots:
 private:
 	void stopPreview();
 
-	VisServicesPtr mServices;
 	BoolPropertyPtr mReduceResolutionOption;
 	DoublePropertyPtr mSurfaceThresholdOption;
 	vtkPolyDataPtr mRawResult;
