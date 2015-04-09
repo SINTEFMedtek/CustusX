@@ -83,9 +83,12 @@ private slots:
 	void thresholdSlot();
 
 private:
+	void stopPreview();
+
 	DoublePairPropertyPtr mThresholdOption;
 	vtkImageDataPtr mRawResult;
 	vtkPolyDataPtr mRawContour;
+	ImagePtr mPreviewImage;
 };
 typedef boost::shared_ptr<class BinaryThresholdImageFilter> BinaryThresholdImageFilterPtr;
 

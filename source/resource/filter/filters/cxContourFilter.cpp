@@ -168,7 +168,14 @@ void ContourFilter::setActive(bool on)
 	FilterImpl::setActive(on);
 
 	if (!mActive)
-		mServices->visualizationService->removePreview();
+		this->stopPreview();
+}
+
+void ContourFilter::stopPreview()
+{
+	if(mPreviewImage)
+		mPreviewImage->stopThresholdPreview();
+	mPreviewImage.reset();
 }
 
 void ContourFilter::imageChangedSlot(QString uid)
@@ -178,7 +185,7 @@ void ContourFilter::imageChangedSlot(QString uid)
 		return;
 
 	this->updateThresholdFromImageChange(uid, mSurfaceThresholdOption);
-	mServices->visualizationService->removePreview();
+	this->stopPreview();
 
 	int extent[6];
 	image->getBaseVtkImageData()->GetExtent(extent);
@@ -190,18 +197,18 @@ void ContourFilter::imageChangedSlot(QString uid)
 
 void ContourFilter::thresholdSlot()
 {
+//	this->stopPreview();
 	if (mActive)
 	{
-		ImagePtr image = boost::dynamic_pointer_cast<Image>(mInputTypes[0]->getData());
-		std::vector<double> threshold;
-		threshold.push_back(mSurfaceThresholdOption->getValue());
-		mServices->visualizationService->setPreview(image, threshold);
+		mPreviewImage = boost::dynamic_pointer_cast<Image>(mInputTypes[0]->getData());
+		Eigen::Vector2d threshold = Eigen::Vector2d(mSurfaceThresholdOption->getValue(),  mPreviewImage->getMax());
+		mPreviewImage->startThresholdPreview(threshold);
 	}
 }
 
 bool ContourFilter::preProcess()
 {
-	mServices->visualizationService->removePreview();
+	this->stopPreview();
 	return FilterImpl::preProcess();
 }
 

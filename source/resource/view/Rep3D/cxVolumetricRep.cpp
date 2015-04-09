@@ -135,10 +135,10 @@ void VolumetricRep::setImage(ImagePtr image)
 	{
 		connect(mImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
 		connect(mImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
+		connect(mImage.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(updateVtkImageDataSlot()));
 		mVolumeProperty->setImage(mImage);
 		this->vtkImageDataChangedSlot();
 		mMonitor = ImageMapperMonitor::create(mVolume, mImage);
-		emit internalVolumeChanged();
 	}
 }
 
@@ -152,15 +152,8 @@ bool VolumetricRep::hasImage(ImagePtr image) const
  */
 void VolumetricRep::vtkImageDataChangedSlot()
 {
-	if (!mImage)
-	{
-		return;
-	}
-
-	vtkImageDataPtr volume = mImage->resample(this->mMaxVoxels);
-	mMapper->SetInputData(volume);
-
-	transformChangedSlot();
+	this->updateVtkImageDataSlot();
+	this->transformChangedSlot();
 }
 
 /**called when transform is changed
@@ -172,6 +165,15 @@ void VolumetricRep::transformChangedSlot()
 		return;
 	}
 	mVolume->SetUserMatrix(mImage->get_rMd().getVtkMatrix());
+}
+
+void VolumetricRep::updateVtkImageDataSlot()
+{
+	if (!mImage)
+		return;
+
+	vtkImageDataPtr volume = mImage->resample(this->mMaxVoxels);
+	mMapper->SetInputData(volume);
 }
 
 void VolumetricRep::setMaxVolumeSize(long maxVoxels)

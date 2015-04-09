@@ -46,6 +46,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkImageClip.h>
 #include <vtkImageIterator.h>
 #include <vtkImageShiftScale.h>
+#include <vtkPiecewiseFunction.h>
+#include <vtkColorTransferFunction.h>
 #include "cxImageTF3D.h"
 #include "cxBoundingBox3D.h"
 #include "cxImageLUT2D.h"
@@ -123,7 +125,7 @@ Image::~Image()
 }
 
 Image::Image(const QString& uid, const vtkImageDataPtr& data, const QString& name) :
-	Data(uid, name), mBaseImageData(data), mMaxRGBIntensity(-1)
+	Data(uid, name), mBaseImageData(data), mMaxRGBIntensity(-1), mThresholdPreview(false)
 {
 	mInitialWindowWidth = -1;
 	mInitialWindowLevel = -1;
@@ -171,8 +173,8 @@ void Image::intitializeFromParentImage(ImagePtr parentImage)
 {
 	this->get_rMd_History()->setRegistration(parentImage->get_rMd());
 	this->get_rMd_History()->setParentSpace(parentImage->getUid());
-	ImageTF3DPtr transferFunctions = parentImage->getTransferFunctions3D()->createCopy();
-	ImageLUT2DPtr LUT2D = parentImage->getLookupTable2D()->createCopy();
+	ImageTF3DPtr transferFunctions = parentImage->getUnmodifiedTransferFunctions3D()->createCopy();
+	ImageLUT2DPtr LUT2D = parentImage->getUnmodifiedLookupTable2D()->createCopy();
 	this->setLookupTable2D(LUT2D);
 	this->setTransferFunctions3D(transferFunctions);
 	this->setModality(parentImage->getModality());
@@ -241,15 +243,14 @@ void Image::resetTransferFunction(ImageLUT2DPtr imageLookupTable2D)
 {
 	if (mImageLookupTable2D)
 	{
-		disconnect(mImageLookupTable2D.get(), SIGNAL(transferFunctionsChanged()), this,
-			SIGNAL(transferFunctionsChanged()));
+		disconnect(mImageLookupTable2D.get(), &ImageTFData::transferFunctionsChanged, this, &Image::transferFunctionsChanged);
 	}
 
 	mImageLookupTable2D = imageLookupTable2D;
 
 	if (mImageLookupTable2D)
 	{
-		connect(mImageLookupTable2D.get(), SIGNAL(transferFunctionsChanged()), this, SIGNAL(transferFunctionsChanged()));
+		connect(mImageLookupTable2D.get(), &ImageTFData::transferFunctionsChanged, this, &Image::transferFunctionsChanged);
 	}
 
 	emit transferFunctionsChanged();
@@ -259,16 +260,14 @@ void Image::resetTransferFunction(ImageTF3DPtr imageTransferFunctions3D)
 {
 	if (mImageTransferFunctions3D)
 	{
-		disconnect(mImageTransferFunctions3D.get(), SIGNAL(transferFunctionsChanged()), this,
-			SIGNAL(transferFunctionsChanged()));
+		disconnect(mImageTransferFunctions3D.get(), &ImageTFData::transferFunctionsChanged, this, &Image::transferFunctionsChanged);
 	}
 
 	mImageTransferFunctions3D = imageTransferFunctions3D;
 
 	if (mImageTransferFunctions3D)
 	{
-		connect(mImageTransferFunctions3D.get(), SIGNAL(transferFunctionsChanged()), this,
-			SIGNAL(transferFunctionsChanged()));
+		connect(mImageTransferFunctions3D.get(), &ImageTFData::transferFunctionsChanged, this, &Image::transferFunctionsChanged);
 	}
 
 	emit transferFunctionsChanged();
@@ -282,8 +281,8 @@ void Image::moveThisAndChildrenToThread(QThread* thread)
 {
 	  // important! move thread affinity to main thread - ensures signals/slots is still called correctly
 	  this->moveToThread(thread);
-	  this->getTransferFunctions3D()->moveToThread(thread);
-	  this->getLookupTable2D()->moveToThread(thread);
+	  this->getUnmodifiedTransferFunctions3D()->moveToThread(thread);
+	  this->getUnmodifiedLookupTable2D()->moveToThread(thread);
 	  this->get_rMd_History()->moveToThread(thread);
 }
 
@@ -317,6 +316,13 @@ vtkImageDataPtr Image::getGrayScaleVtkImageData()
 
 ImageTF3DPtr Image::getTransferFunctions3D()
 {
+	if(mThresholdPreview)
+		return mTresholdPreviewTransferfunctions3D;
+	return getUnmodifiedTransferFunctions3D();
+}
+
+ImageTF3DPtr Image::getUnmodifiedTransferFunctions3D()
+{
 	if(!this->mImageTransferFunctions3D)
 		this->resetTransferFunctions(false, true);
 	return mImageTransferFunctions3D;
@@ -328,6 +334,13 @@ void Image::setTransferFunctions3D(ImageTF3DPtr transferFuntion)
 }
 
 ImageLUT2DPtr Image::getLookupTable2D()
+{
+	if(mThresholdPreview)
+		return mTresholdPreviewLookupTable2D;
+	return getUnmodifiedLookupTable2D();
+}
+
+ImageLUT2DPtr Image::getUnmodifiedLookupTable2D()
 {
 	if(!mImageLookupTable2D)
 		this->resetTransferFunctions(true, false);
@@ -343,29 +356,6 @@ vtkImageDataPtr Image::getBaseVtkImageData()
 {
 	return mBaseImageData;
 }
-
-//vtkImageDataPtr Image::getRefVtkImageData()
-//{
-//	if (!mReferenceImageData) // optimized: don't init it if you don't need it.
-//	{
-//		// provide a resampled volume for algorithms requiring that (such as PickerRep)
-//		mOrientatorMatrix = vtkMatrix4x4Ptr::New();
-//		mOrientator = vtkImageReslicePtr::New();
-//		mOrientator->SetInput(mBaseImageData);
-//		mOrientator->SetInterpolationModeToLinear();
-//		mOrientator->SetOutputDimensionality(3);
-//		mOrientator->SetResliceAxes(mOrientatorMatrix);
-//		mOrientator->AutoCropOutputOn();
-//		mReferenceImageData = mOrientator->GetOutput();
-
-//		mReferenceImageData->Update();
-
-//		this->transformChangedSlot(); // update transform
-//		std::cout << "Warning: Image::getRefVtkImageData() called. Expensive. Do not use." << std::endl;
-//	}
-
-//	return mReferenceImageData;
-//}
 
 DoubleBoundingBox3D Image::boundingBox() const
 {
@@ -476,11 +466,6 @@ int Image::getMaxAlphaValue()
 	return 255;
 }
 
-//LandmarksPtr Image::getLandmarks()
-//{
-//	return mLandmarks;
-//}
-
 void Image::addXml(QDomNode& dataNode)
 {
 	Data::addXml(dataNode);
@@ -488,11 +473,11 @@ void Image::addXml(QDomNode& dataNode)
 	QDomDocument doc = dataNode.ownerDocument();
 
 	QDomElement tf3DNode = doc.createElement("transferfunctions");
-	this->getTransferFunctions3D()->addXml(tf3DNode);
+	this->getUnmodifiedTransferFunctions3D()->addXml(tf3DNode);
 	imageNode.appendChild(tf3DNode);
 
 	QDomElement lut2DNode = doc.createElement("lookuptable2D");
-	this->getLookupTable2D()->addXml(lut2DNode);
+	this->getUnmodifiedLookupTable2D()->addXml(lut2DNode);
 	imageNode.appendChild(lut2DNode);
 
 	QDomElement shadingNode = doc.createElement("shading");
@@ -567,7 +552,7 @@ void Image::parseXml(QDomNode& dataNode)
 	//transferefunctions
 	QDomNode transferfunctionsNode = dataNode.namedItem("transferfunctions");
 	if (!transferfunctionsNode.isNull())
-		this->getTransferFunctions3D()->parseXml(transferfunctionsNode);
+		this->getUnmodifiedTransferFunctions3D()->parseXml(transferfunctionsNode);
 	else
 	{
 		std::cout << "Warning: Image::parseXml() found no transferfunctions";
@@ -577,7 +562,7 @@ void Image::parseXml(QDomNode& dataNode)
 	mInitialWindowWidth = this->loadAttribute(dataNode.namedItem("initialWindow"), "width", -1);
 	mInitialWindowLevel = this->loadAttribute(dataNode.namedItem("initialWindow"), "level", -1);
 
-	this->getLookupTable2D()->parseXml(dataNode.namedItem("lookuptable2D"));
+	this->getUnmodifiedLookupTable2D()->parseXml(dataNode.namedItem("lookuptable2D"));
 
 	// backward compatibility:
 	mShading.on = dataNode.namedItem("shading").toElement().text().toInt();
@@ -640,6 +625,8 @@ void Image::setShadingOn(bool on)
 
 bool Image::getShadingOn() const
 {
+	if (mThresholdPreview)
+		return true;
 	return mShading.on;
 }
 
@@ -861,11 +848,15 @@ void Image::setInterpolationTypeToLinear()
 }
 void Image::setInterpolationType(int val)
 {
+	if (mThresholdPreview)
+		return;
 	mInterpolationType = val;
 	emit vtkImageDataChanged();
 }
 int Image::getInterpolationType() const
 {
+	if (mThresholdPreview)
+		return VTK_NEAREST_INTERPOLATION;
 	return mInterpolationType;
 }
 
@@ -924,6 +915,73 @@ void Image::save(const QString& basePath)
 
 	ImagePtr self = ImagePtr(this, null_deleter());
 	MetaImageReader().saveImage(self, filename);
+}
+
+void Image::startThresholdPreview(const Eigen::Vector2d &threshold)
+{
+	mThresholdPreview = true;
+
+	this->createThresholdPreviewTransferFunctions3D(threshold);
+	this->createThresholdPreviewLookupTable2D(threshold);
+
+	emit transferFunctionsChanged();
+}
+
+void Image::createThresholdPreviewTransferFunctions3D(const Eigen::Vector2d &threshold)
+{
+	ImageDefaultTFGenerator tfGenerator(ImagePtr(this, null_deleter()));
+
+	ColorMap colors = this->createPreviewColorMap(threshold);
+	IntIntMap opacity = this->createPreviewOpacityMap(threshold);
+
+	mTresholdPreviewTransferfunctions3D = tfGenerator.generate3DTFPreset();
+	mTresholdPreviewTransferfunctions3D->resetColor(colors);
+	mTresholdPreviewTransferfunctions3D->resetAlpha(opacity);
+}
+
+void Image::createThresholdPreviewLookupTable2D(const Eigen::Vector2d &threshold)
+{
+	ImageDefaultTFGenerator tfGenerator(ImagePtr(this, null_deleter()));
+
+	ColorMap colors = this->createPreviewColorMap(threshold);
+
+	mTresholdPreviewLookupTable2D = tfGenerator.generate2DTFPreset();
+	mTresholdPreviewLookupTable2D->resetColor(colors);
+	mTresholdPreviewLookupTable2D->setLLR(threshold[0]);
+}
+
+ColorMap Image::createPreviewColorMap(const Eigen::Vector2d &threshold)
+{
+	double lower = threshold[0];
+	ColorMap colors;
+	colors[lower] = Qt::green;
+	colors[this->getMax()] = Qt::green;
+	return colors;
+}
+
+IntIntMap Image::createPreviewOpacityMap(const Eigen::Vector2d &threshold)
+{
+	double lower = threshold[0];
+	double upper = threshold[1];
+	IntIntMap opacity;
+	opacity[lower - 1] = 0;
+	opacity[lower] = this->getMaxAlphaValue();
+	opacity[upper] = this->getMaxAlphaValue();
+	opacity[upper + 1] = 0;
+	return opacity;
+}
+
+void Image::stopThresholdPreview()
+{
+	mThresholdPreview = false;
+	mTresholdPreviewTransferfunctions3D.reset();
+	mTresholdPreviewLookupTable2D.reset();
+
+	//Need to tag these transfer functions as modified to tell the VTK pipeline that we got new TFs
+	this->getTransferFunctions3D()->getColorTF()->Modified();
+	this->getTransferFunctions3D()->getOpacityTF()->Modified();
+
+	emit transferFunctionsChanged();
 }
 
 } // namespace cx

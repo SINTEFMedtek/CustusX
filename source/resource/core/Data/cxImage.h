@@ -53,6 +53,8 @@ class QDomDocument;
 
 namespace cx
 {
+typedef std::map<int, int> IntIntMap;
+typedef std::map<int, QColor> ColorMap;
 
 /** \brief A volumetric data set.
  *
@@ -96,8 +98,6 @@ public:
 	virtual vtkImageDataPtr getBaseVtkImageData(); ///< \return the vtkimagedata in the data coordinate space
 	virtual vtkImageDataPtr getGrayScaleVtkImageData(); ///< as getBaseVtkImageData(), but constrained to 1 component if multicolor.
 	virtual vtkImageDataPtr get8bitGrayScaleVtkImageData();///< Have never been used or tested. Create a test for it
-//	virtual vtkImageDataPtr getRefVtkImageData(); ///< \return the vtkimagedata in the reference coordinate space
-//	LandmarksPtr getLandmarks();
 	/** Return a version of this, containing image data and transfer functions converted to unsigned.
 	  * This is used for the 3D texture slicer that doesnt handle signed data.
 	  */
@@ -177,6 +177,9 @@ public:
 	vtkImageDataPtr resample(long maxVoxels);
 
 	virtual void save(const QString &basePath);
+
+	void startThresholdPreview(const Eigen::Vector2d& threshold);
+	void stopThresholdPreview();
 signals:
 	void vtkImageDataChanged(); ///< emitted when the vktimagedata are invalidated and must be retrieved anew.
 	void transferFunctionsChanged(); ///< emitted when image transfer functions in 2D or 3D are changed.
@@ -220,11 +223,23 @@ private:
 
 	double computeResampleFactor(long maxVoxels);
 
+	ColorMap createPreviewColorMap(const Eigen::Vector2d &threshold);
+	IntIntMap createPreviewOpacityMap(const Eigen::Vector2d &threshold);
+	void createThresholdPreviewTransferFunctions3D(const Eigen::Vector2d &threshold);
+	void createThresholdPreviewLookupTable2D(const Eigen::Vector2d &threshold);
+
+	ImageTF3DPtr getUnmodifiedTransferFunctions3D();
+	ImageLUT2DPtr getUnmodifiedLookupTable2D();
+
 	ImageTF3DPtr mImageTransferFunctions3D;
 	ImageLUT2DPtr mImageLookupTable2D;
 
 	double mInitialWindowWidth;
 	double mInitialWindowLevel;
+
+	bool mThresholdPreview;
+	ImageTF3DPtr mTresholdPreviewTransferfunctions3D;
+	ImageLUT2DPtr mTresholdPreviewLookupTable2D;
 };
 
 } // end namespace cx
