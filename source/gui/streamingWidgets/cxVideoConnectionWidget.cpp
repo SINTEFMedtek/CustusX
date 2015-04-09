@@ -66,6 +66,7 @@ VideoConnectionWidget::VideoConnectionWidget(VisServicesPtr services, QWidget* p
 	BaseWidget(parent, "IGTLinkWidget", "Video Connection"),
 	mServices(services)
 {
+	this->setToolTip("Connect to a video source");
 	mOptions = profile()->getXmlSettings().descend("video");
 
 	QString defaultConnection = mServices->videoService->getConnectionMethod();
@@ -75,7 +76,7 @@ VideoConnectionWidget::VideoConnectionWidget(VisServicesPtr services, QWidget* p
 	connect(mServices->videoService.get(), &VideoService::connected, this, &VideoConnectionWidget::serverStatusChangedSlot);
 
 	mStackedWidget = new QStackedWidget(this);
-	QFrame* frame = this->wrapStackedWidgetInAFrame();
+	mStackedWidgetFrame = this->wrapStackedWidgetInAFrame();
 	mConnectButton = this->initializeConnectButton();
 	mImportStreamImageButton = this->initializeImportStreamImageButton();
 	mActiveVideoSourceSelector = this->initializeActiveVideoSourceSelector();
@@ -83,7 +84,7 @@ VideoConnectionWidget::VideoConnectionWidget(VisServicesPtr services, QWidget* p
 
 	mToptopLayout = new QVBoxLayout(this);
 	mToptopLayout->addWidget(mConnectionSelectionWidget);
-	mToptopLayout->addWidget(frame);
+	mToptopLayout->addWidget(mStackedWidgetFrame);
 	mToptopLayout->addWidget(mConnectButton);
 	mToptopLayout->addWidget(mImportStreamImageButton);
 	mToptopLayout->addWidget(sscCreateDataWidget(this, mActiveVideoSourceSelector));
@@ -133,6 +134,8 @@ QWidget* VideoConnectionWidget::createStreamerWidget(StreamerService* service)
 
 	OptionsWidget* widget = new OptionsWidget(mServices->visualizationService, mServices->patientModelService, this);
 	widget->setOptions(serviceName, adapters, false);
+	widget->setObjectName(service->getType());
+	widget->setFocusPolicy(Qt::StrongFocus); // needed for help system: focus is used to display help text
 
 	connect(mConnectionSelectionWidget, SIGNAL(detailsTriggered()), widget, SLOT(toggleAdvanced()));
 
@@ -183,6 +186,7 @@ QFrame* VideoConnectionWidget::wrapStackedWidgetInAFrame()
 	frame->setSizePolicy(frame->sizePolicy().horizontalPolicy(), QSizePolicy::Fixed);
 	QVBoxLayout* frameLayout = new QVBoxLayout(frame);
 	frameLayout->addWidget(mStackedWidget);
+	frame->setFocusPolicy(Qt::StrongFocus); // needed for help system: focus is used to display help text
 
 	return frame;
 }
@@ -192,30 +196,25 @@ QWidget* VideoConnectionWidget::wrapVerticalStretch(QWidget* input)
 	QWidget* retval = new QWidget(this);
 	QVBoxLayout* layout = new QVBoxLayout(retval);
 	layout->addWidget(input);
+	retval->setObjectName(input->objectName()); // help propagation
 	layout->addStretch();
 	layout->setMargin(0);
 	layout->setSpacing(0);
 	return retval;
 }
 
-QString VideoConnectionWidget::defaultWhatsThis() const
-{
-	return "<html>"
-			"<h3><Setup IGTLink connection.</h3>"
-			"<p>Lets you set up a connection to a streaming server using IGTLink.</p>"
-			"<p><i></i></p>"
-			"</html>";
-}
-
 void VideoConnectionWidget::selectGuiForConnectionMethodSlot()
 {
 	QString name = mConnectionSelector->getValue();
-	//Need to set connection method in VideoConneectionManager before calling useDirectLink(), useLocalServer() and useRemoteServer()
+	//Need to set connection method in VideoConnectionManager before calling useDirectLink(), useLocalServer() and useRemoteServer()
 	mServices->videoService->setConnectionMethod(mConnectionSelector->getValue());
 
 	QWidget* serviceWidget = mStreamerServiceWidgets[name];
 	if(serviceWidget)
+	{
 		mStackedWidget->setCurrentWidget(serviceWidget);
+		mStackedWidgetFrame->setObjectName(serviceWidget->objectName()); // for improved help
+	}
 }
 
 void VideoConnectionWidget::toggleConnectServer()

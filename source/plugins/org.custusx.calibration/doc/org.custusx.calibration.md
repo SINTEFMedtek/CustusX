@@ -1,4 +1,4 @@
-Calibration plugin {#org_custusx_calibration}
+Calibration Plugin {#org_custusx_calibration}
 ===================
 
 Overview {#org_custusx_calibration_overview}

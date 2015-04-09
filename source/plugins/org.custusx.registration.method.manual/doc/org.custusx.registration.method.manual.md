@@ -1,4 +1,4 @@
-Registration Method Plugin: Manual plugin {#org_custusx_registration_method_manual}
+Registration Method Plugin: Manual {#org_custusx_registration_method_manual}
 ===================
 
 Overview {#org_custusx_registration_method_manual_overview}

@@ -66,6 +66,7 @@ class cxResource_EXPORT StreamerService : public QObject
 public:
 	StreamerService() {}
 	virtual QString getName() = 0;
+	virtual QString getType() const  = 0;
 	/**
 	 *  Fill settings for this algorithm.
 	 *  Input is the root node for this algo, filled with stored settings (if any).

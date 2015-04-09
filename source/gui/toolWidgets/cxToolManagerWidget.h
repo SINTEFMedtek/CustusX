@@ -60,8 +60,6 @@ public:
   ToolManagerWidget(QWidget* parent = NULL);
   virtual ~ToolManagerWidget();
 
-  virtual QString defaultWhatsThis() const;
-
 private slots:
   void configureClickedSlot(bool);
   void deconfigureClickedSlot(bool);

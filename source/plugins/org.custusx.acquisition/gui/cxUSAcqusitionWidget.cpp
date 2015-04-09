@@ -67,6 +67,7 @@ USAcqusitionWidget::USAcqusitionWidget(AcquisitionServicePtr acquisitionService,
 {
 	this->setObjectName("USAcqusitionWidget");
 	this->setWindowTitle("US Acquisition");
+	this->setToolTip("Record and reconstruct US data");
 
 	mServices = services;
 	connect(mUsReconstructionService.get(), &UsReconstructionService::reconstructAboutToStart, this, &USAcqusitionWidget::reconstructAboutToStartSlot);
@@ -121,14 +122,6 @@ USAcqusitionWidget::USAcqusitionWidget(AcquisitionServicePtr acquisitionService,
 
 USAcqusitionWidget::~USAcqusitionWidget()
 {
-}
-
-QString USAcqusitionWidget::defaultWhatsThis() const
-{
-	return "<html>"
-		"<h3>US Acquisition.</h3>"
-		"<p><i>Record and reconstruct US data.</i></br>"
-		"</html>";
 }
 
 void USAcqusitionWidget::toggleDetailsSlot()

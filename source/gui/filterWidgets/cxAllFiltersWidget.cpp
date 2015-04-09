@@ -137,14 +137,14 @@ AllFiltersWidget::AllFiltersWidget(VisServicesPtr services, QWidget* parent) :
 	this->filterChangedSlot();
 }
 
-QString AllFiltersWidget::defaultWhatsThis() const
+QString AllFiltersWidget::generateHelpText() const
 {
 	return QString("<html>"
 	               "<h3>Filter Widget.</h3>"
 	               "<p>Select one type of filter.</p>"
 	               "<p><i>Currently selected filter:</i></p>"
 	               "<p>%1</p>"
-	               "</html>").arg(mSetupWidget->defaultWhatsThis());
+				   "</html>").arg(mSetupWidget->generateHelpText());
 }
 
 void AllFiltersWidget::filterChangedSlot()
@@ -158,7 +158,7 @@ void AllFiltersWidget::filterChangedSlot()
 	}
 
 	mSetupWidget->setFilter(mCurrentFilter);
-	mFilterSelector->setHelp(this->defaultWhatsThis());
+	mFilterSelector->setHelp(this->generateHelpText());
 }
 
 void AllFiltersWidget::toggleDetailsSlot()

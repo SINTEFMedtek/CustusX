@@ -57,6 +57,8 @@ All specific widgets are described here:
 - \subpage algorithms_widgets
 - See \ref plugins for more widgets
 
+Other core features:
+- \subpage org_custusx_resource_filter
 
 
 

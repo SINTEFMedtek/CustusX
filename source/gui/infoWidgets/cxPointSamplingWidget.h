@@ -71,8 +71,6 @@ public:
   PointSamplingWidget(QWidget* parent);
   virtual ~PointSamplingWidget();
 
-  virtual QString defaultWhatsThis() const;
-
 signals:
 
 protected slots:

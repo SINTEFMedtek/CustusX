@@ -54,6 +54,7 @@ SoundSpeedConverterWidget::SoundSpeedConverterWidget(TrackingServicePtr tracking
 	mTrackingService(trackingService)
 {
   QVBoxLayout* vLayout = new QVBoxLayout(this);
+  this->setToolTip("Correct the sound speed received from the US scanner");
 
   connect(mApplyButton, SIGNAL(clicked()), this, SLOT(applySoundSpeedCompensationFactorSlot()));
   connect(mResetButton, SIGNAL(clicked()), this, SLOT(resetSlot()));
@@ -85,15 +86,6 @@ SoundSpeedConverterWidget::SoundSpeedConverterWidget(TrackingServicePtr tracking
 
 SoundSpeedConverterWidget::~SoundSpeedConverterWidget()
 {}
-
-QString SoundSpeedConverterWidget::defaultWhatsThis() const
-{
-  return "<html>"
-    "<h3>Speed of sound compensation.</h3>"
-    "<p>Calculates a factor to compensate for the difference in sound of speed which a ultrasound machine expects and the medium you are doing ultrasound on.</p>"
-    "<p><i></i></p>"
-    "</html>";
-}
 
 void SoundSpeedConverterWidget::applySoundSpeedCompensationFactorSlot()
 {

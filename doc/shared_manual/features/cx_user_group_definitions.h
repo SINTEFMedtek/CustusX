@@ -30,69 +30,17 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXRECORDSESSIONWIDGET_H_
-#define CXRECORDSESSIONWIDGET_H_
-
-#include "org_custusx_acquisition_Export.h"
-
-#include "cxBaseWidget.h"
-
-class QPushButton;
-class QLineEdit;
-class QLabel;
-
-namespace cx
-{
-/**
-* \file
-* \addtogroup org_custusx_acquisition
-* @{
-*/
-
-typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
-typedef boost::shared_ptr<class RecordSessionWidget> RecordSessionWidgetPtr;
 
 /**
- * \class RecordSessionWidget
+ * \defgroup cx_user_doc_group_filter Filter Algorithms
  *
- * \brief
- *
- * \date Dec 8, 2010
- * \author Janne Beate Bakeng
+ * \brief All available filters.
  */
-class org_custusx_acquisition_EXPORT  RecordSessionWidget : public BaseWidget
-{
-  Q_OBJECT
-
-public:
-  RecordSessionWidget(AcquisitionServicePtr base, QWidget* parent, QString defaultDescription = "Record Session", bool requireUsReady = true);
-  virtual ~RecordSessionWidget();
-
-  void setDescription(QString text);
-  void setDescriptionVisibility(bool value);
-
-public slots:
-	void setReady(bool val, QString text); ///< deprecated: use readinessChangedSlot instead.
-
-private slots:
-  void startStopSlot(bool);
-  void cancelSlot();
-  void recordStateChangedSlot();
-  void usReadinessChangedSlot();
-
-private:
-
-  AcquisitionServicePtr mAcquisitionService;
-  QLabel* mInfoLabel;
-  QPushButton* mStartStopButton;
-  QPushButton* mCancelButton;
-  QLabel* mDescriptionLabel;
-  QLineEdit* mDescriptionLine;
-  bool mRequireUsReady;
-};
 
 /**
-* @}
-*/
-}//namespace cx
-#endif /* CXRECORDSESSIONWIDGET_H_ */
+ * \defgroup cx_user_doc_group_streamer Video Streamers
+ *
+ * \brief All available video streamers.
+ */
+
+

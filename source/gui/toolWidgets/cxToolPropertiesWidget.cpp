@@ -61,6 +61,7 @@ namespace cx
 ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   BaseWidget(parent, "ToolPropertiesWidget", "Tool Properties")
 {
+	this->setToolTip("Tool properties");
   //layout
   mToptopLayout = new QVBoxLayout(this);
   //toptopLayout->setMargin(0);
@@ -139,15 +140,6 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
 
 ToolPropertiesWidget::~ToolPropertiesWidget()
 {
-}
-
-QString ToolPropertiesWidget::defaultWhatsThis() const
-{
-  return "<html>"
-      "<h3>Tool Properties</h3>"
-      "<p>TODO.</p>"
-      "<p><i></i></p>"
-      "</html>";
 }
 
 void ToolPropertiesWidget::manualToolChanged()

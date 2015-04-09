@@ -47,16 +47,23 @@ endfunction()
 
 ###############################################################################
 #
-# Define documentation for a plugin.
-#
-# Call this once for each plugin that contains a documentation folder,
-# typically in ${CMAKE_CURRENT_SOURCE_DIR}/doc.
+# Add a string VALUE_TO_APPEND to a global property PROPERTY_NAME.
 #
 ###############################################################################
 function(cx_add_string_to_global_property_list PROPERTY_NAME VALUE_TO_APPEND)
     get_property(PROPERTY_VALUE GLOBAL PROPERTY ${PROPERTY_NAME})
     set(PROPERTY_VALUE ${PROPERTY_VALUE} "${VALUE_TO_APPEND}")
     set_property(GLOBAL PROPERTY ${PROPERTY_NAME} ${PROPERTY_VALUE})
+endfunction()
+
+###############################################################################
+#
+# Add a folder containing documentation files.
+#
+#
+###############################################################################
+function(cx_doc_define_user_docs PLUGIN_DOC_FOLDER)
+    cx_add_string_to_global_property_list(CX_PLUGIN_DOC_FOLDERS "${PLUGIN_DOC_FOLDER}")
 endfunction()
 
 ###############################################################################

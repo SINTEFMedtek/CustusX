@@ -61,7 +61,7 @@ class cxGui_EXPORT AllFiltersWidget : public BaseWidget
 	Q_OBJECT
 public:
 	AllFiltersWidget(VisServicesPtr services, QWidget* parent);
-	QString defaultWhatsThis() const;
+	QString generateHelpText() const;
 
 private slots:
 	void filterChangedSlot();

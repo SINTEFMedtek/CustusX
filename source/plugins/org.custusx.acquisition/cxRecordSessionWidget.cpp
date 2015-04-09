@@ -87,15 +87,6 @@ RecordSessionWidget::RecordSessionWidget(AcquisitionServicePtr base, QWidget* pa
 	}
 }
 
-QString RecordSessionWidget::defaultWhatsThis() const
-{
-  return "<html>"
-    "<h3>Record session.</h3>"
-    "<p>Lets you record a session of some kind.</p>"
-    "<p><i></i></p>"
-    "</html>";
-}
-
 void RecordSessionWidget::setReady(bool val, QString text)
 {
   this->setEnabled(val);

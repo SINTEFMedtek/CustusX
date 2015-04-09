@@ -66,7 +66,6 @@ class org_custusx_acquisition_EXPORT USAcqusitionWidget : public RecordBaseWidge
 public:
 	USAcqusitionWidget(AcquisitionServicePtr acquisitionService, VisServicesPtr services, UsReconstructionServicePtr usReconstructionService, QWidget* parent);
 	virtual ~USAcqusitionWidget();
-	virtual QString defaultWhatsThis() const;
 
 private slots:
 	void reconstructStartedSlot();

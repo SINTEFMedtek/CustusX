@@ -256,6 +256,8 @@ void MainWindow::focusChanged(QWidget * old, QWidget * now)
 
 void MainWindow::focusInsideDockWidget(QObject *dockWidget)
 {
+	// focusing to docked widgets is required by the help system
+
 	// Assume structure: QDockWidget->QScrollArea->QWidget,
 	// as defined in MainWindow::addAsDockWidget()
 	QDockWidget* dw = dynamic_cast<QDockWidget*>(dockWidget);

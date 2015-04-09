@@ -70,16 +70,12 @@ public:
   ToolPropertiesWidget(QWidget* parent);
   virtual ~ToolPropertiesWidget();
 
-  virtual QString defaultWhatsThis() const;
-
 signals:
 
 protected slots:
   void updateSlot();
   void activeToolChangedSlot();
   void referenceToolChangedSlot();
-//  void configurationChangedSlot(int index);
-//  void toolsSectorConfigurationChangedSlot();///< Update the combo box when the tools configuration is changed outside the widget. Also used initially to read the tools value.
   void manualToolChanged();
   void manualToolWidgetChanged();
   void spacesChangedSlot();

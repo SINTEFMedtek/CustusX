@@ -551,15 +551,12 @@ cx_initialize_IGSTK()
 find_package(Qt5Core)
 
 
-set(PLUGINS_DESCRIPTION
-"	Plugins:
-")
+set(PLUGINS_DESCRIPTION "	Plugins:")
 getListOfVarsStartingWith("CX_PLUGIN_" matchedVars)
 foreach (_var IN LISTS matchedVars)
         string(REPLACE "CX_PLUGIN_" "" PLUGIN_NAME ${_var})
-        set(PLUGINS_DESCRIPTION ${PLUGINS_DESCRIPTION}
-"		${PLUGIN_NAME}: ${${_var}}
-")
+		# skip the ":" between name and value in because this spams console with one issue per line in QtCreator...
+		set(PLUGINS_DESCRIPTION "${PLUGINS_DESCRIPTION}\n		${PLUGIN_NAME} ${${_var}}")
 endforeach()
 
 	cx_assert_variable_exists(${CX_SYSTEM_BASE_NAME})
