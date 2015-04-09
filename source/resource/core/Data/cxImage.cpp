@@ -173,8 +173,8 @@ void Image::intitializeFromParentImage(ImagePtr parentImage)
 {
 	this->get_rMd_History()->setRegistration(parentImage->get_rMd());
 	this->get_rMd_History()->setParentSpace(parentImage->getUid());
-	ImageTF3DPtr transferFunctions = parentImage->getTransferFunctions3D()->createCopy();
-	ImageLUT2DPtr LUT2D = parentImage->getLookupTable2D()->createCopy();
+	ImageTF3DPtr transferFunctions = parentImage->getUnmodifiedTransferFunctions3D()->createCopy();
+	ImageLUT2DPtr LUT2D = parentImage->getUnmodifiedLookupTable2D()->createCopy();
 	this->setLookupTable2D(LUT2D);
 	this->setTransferFunctions3D(transferFunctions);
 	this->setModality(parentImage->getModality());
@@ -281,8 +281,8 @@ void Image::moveThisAndChildrenToThread(QThread* thread)
 {
 	  // important! move thread affinity to main thread - ensures signals/slots is still called correctly
 	  this->moveToThread(thread);
-	  this->getTransferFunctions3D()->moveToThread(thread);
-	  this->getLookupTable2D()->moveToThread(thread);
+	  this->getUnmodifiedTransferFunctions3D()->moveToThread(thread);
+	  this->getUnmodifiedLookupTable2D()->moveToThread(thread);
 	  this->get_rMd_History()->moveToThread(thread);
 }
 
@@ -318,6 +318,11 @@ ImageTF3DPtr Image::getTransferFunctions3D()
 {
 	if(mThresholdPreview)
 		return mTresholdPreviewTransferfunctions3D;
+	return getUnmodifiedTransferFunctions3D();
+}
+
+ImageTF3DPtr Image::getUnmodifiedTransferFunctions3D()
+{
 	if(!this->mImageTransferFunctions3D)
 		this->resetTransferFunctions(false, true);
 	return mImageTransferFunctions3D;
@@ -332,6 +337,11 @@ ImageLUT2DPtr Image::getLookupTable2D()
 {
 	if(mThresholdPreview)
 		return mTresholdPreviewLookupTable2D;
+	return getUnmodifiedLookupTable2D();
+}
+
+ImageLUT2DPtr Image::getUnmodifiedLookupTable2D()
+{
 	if(!mImageLookupTable2D)
 		this->resetTransferFunctions(true, false);
 	return mImageLookupTable2D;
@@ -463,11 +473,11 @@ void Image::addXml(QDomNode& dataNode)
 	QDomDocument doc = dataNode.ownerDocument();
 
 	QDomElement tf3DNode = doc.createElement("transferfunctions");
-	this->getTransferFunctions3D()->addXml(tf3DNode);
+	this->getUnmodifiedTransferFunctions3D()->addXml(tf3DNode);
 	imageNode.appendChild(tf3DNode);
 
 	QDomElement lut2DNode = doc.createElement("lookuptable2D");
-	this->getLookupTable2D()->addXml(lut2DNode);
+	this->getUnmodifiedLookupTable2D()->addXml(lut2DNode);
 	imageNode.appendChild(lut2DNode);
 
 	QDomElement shadingNode = doc.createElement("shading");
@@ -542,7 +552,7 @@ void Image::parseXml(QDomNode& dataNode)
 	//transferefunctions
 	QDomNode transferfunctionsNode = dataNode.namedItem("transferfunctions");
 	if (!transferfunctionsNode.isNull())
-		this->getTransferFunctions3D()->parseXml(transferfunctionsNode);
+		this->getUnmodifiedTransferFunctions3D()->parseXml(transferfunctionsNode);
 	else
 	{
 		std::cout << "Warning: Image::parseXml() found no transferfunctions";
@@ -552,7 +562,7 @@ void Image::parseXml(QDomNode& dataNode)
 	mInitialWindowWidth = this->loadAttribute(dataNode.namedItem("initialWindow"), "width", -1);
 	mInitialWindowLevel = this->loadAttribute(dataNode.namedItem("initialWindow"), "level", -1);
 
-	this->getLookupTable2D()->parseXml(dataNode.namedItem("lookuptable2D"));
+	this->getUnmodifiedLookupTable2D()->parseXml(dataNode.namedItem("lookuptable2D"));
 
 	// backward compatibility:
 	mShading.on = dataNode.namedItem("shading").toElement().text().toInt();

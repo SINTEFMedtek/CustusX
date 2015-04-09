@@ -228,6 +228,9 @@ private:
 	void createThresholdPreviewTransferFunctions3D(const Eigen::Vector2d &threshold);
 	void createThresholdPreviewLookupTable2D(const Eigen::Vector2d &threshold);
 
+	ImageTF3DPtr getUnmodifiedTransferFunctions3D();
+	ImageLUT2DPtr getUnmodifiedLookupTable2D();
+
 	ImageTF3DPtr mImageTransferFunctions3D;
 	ImageLUT2DPtr mImageLookupTable2D;
 
