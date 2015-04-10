@@ -88,6 +88,7 @@ target_include_directories(org_custusx_usreconstruction
 )
 
 cx_doc_define_plugin_user_docs("${PROJECT_NAME}" "${CMAKE_CURRENT_SOURCE_DIR}/doc")
+cx_add_non_source_file("doc/org.custusx.usreconstruction.md")
 
 add_subdirectory(testing)
 
