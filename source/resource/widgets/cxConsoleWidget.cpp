@@ -326,23 +326,6 @@ void SimpleLogMessageDisplayWidget::format(const Message& message)
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
-//class MyExpandButton : public ctkExpandButton
-//{
-//public:
-//	MyExpandButton(QWidget* parent) : ctkExpandButton(parent) {}
-//	virtual QSize sizeHint() const
-//	{
-//		int ext = this->style()->pixelMetric(QStyle::PM_ToolBarExtensionExtent);
-//		std::cout << "ext: " << ext << std::endl;
-////		ext = ext * 2 / 3;
-//		return QSize(ext, ext * 2 / 3);
-//	}
-//};
-
-///--------------------------------------------------------
-///--------------------------------------------------------
-///--------------------------------------------------------
-
 PopupButton::PopupButton(QWidget* parent)
 {
 //	this->setMouseTracking(true);

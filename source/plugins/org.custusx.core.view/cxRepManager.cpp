@@ -32,8 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxRepManager.h"
 
-#include "cxThresholdPreview.h"
-
 namespace cx
 {
 
@@ -57,16 +55,10 @@ void RepManager::destroyInstance()
 
 RepManager::RepManager()
 {
-	mThresholdPreview.reset(new ThresholdPreview());
 }
 
 RepManager::~RepManager()
 {
-}
-
-ThresholdPreviewPtr RepManager::getThresholdPreview()
-{
-	return mThresholdPreview;
 }
 
 }//namespace cx

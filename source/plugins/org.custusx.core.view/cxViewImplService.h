@@ -77,8 +77,6 @@ public:
 	virtual LayoutRepositoryPtr getLayoutRepository();
 	virtual CameraControlPtr getCameraControl();
 	virtual QActionGroup* createInteractorStyleActionGroup();
-	virtual void setPreview(ImagePtr image, const std::vector<double>& threshold);
-	virtual void removePreview();
 
 	virtual bool isNull();
 

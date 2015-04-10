@@ -50,7 +50,6 @@ namespace cx
 
 typedef std::map<QString, RepPtr> RepMap;
 typedef std::map<QString, VolumetricBaseRepPtr> VolumetricRepMap;
-typedef boost::shared_ptr<class ThresholdPreview> ThresholdPreviewPtr;
 
 class Reporter;
 
@@ -77,8 +76,6 @@ Q_OBJECT
 public:
 	static RepManager* getInstance(); ///< get the only instance of this class
 	static void destroyInstance(); ///< destroy the only instance of this class
-
-	ThresholdPreviewPtr getThresholdPreview(); ///< Get the ThresholdPreview object
 
 	/**Get a previously cached Rep.
 	 *
@@ -133,7 +130,6 @@ private:
 	virtual ~RepManager(); ///< empty
 	RepManager(RepManager const&); ///< not implemented
 	RepManager& operator=(RepManager const&); ///< not implemented
-	ThresholdPreviewPtr mThresholdPreview; ///< Preview a volume with a selected threshold
 };
 
 

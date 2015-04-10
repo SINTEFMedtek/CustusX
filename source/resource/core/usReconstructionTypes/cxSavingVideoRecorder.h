@@ -51,9 +51,9 @@ typedef boost::shared_ptr<class CachedImageDataContainer> CachedImageDataContain
   * The data are saved as separate files in the saveSolder, using prefix
   * as a common filename component:
   *
-  * A single file named <prefix>.fts containing N lines with timestamps
+  * A single file named \<prefix\>.fts containing N lines with timestamps
   * is written.
-  * A sequence of N files named <prefix>_i.mhd (0<i<N) and corresponding .raw
+  * A sequence of N files named \<prefix\>_i.mhd (0<i<N) and corresponding .raw
   * files are written.
   *
   * If stop() is called, the thread will continue to write all remaining data,

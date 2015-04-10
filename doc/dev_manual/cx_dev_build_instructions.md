@@ -29,7 +29,7 @@ Prerequisites {#prerequisites}
 
 These must be installed prior to installing CustusX.
 
-Several other libraries (see \ref external_libraries) are part of the \ref superbuild,
+Several other libraries (see \ref external_libraries) are part of the \ref dev_superbuild,
 and thus does not need to be installed separately. 
 
 For convenience, setup scripts for some platforms are available in the 

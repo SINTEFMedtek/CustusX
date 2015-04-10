@@ -88,3 +88,9 @@ add_subdirectory( doc ) # after plugins - uses global properties set there
 # CTest
 #------------------------------------------------------------------------------
 enable_testing()
+
+#------------------------------------------------------------------------------
+# Add non-source files
+#------------------------------------------------------------------------------
+cx_add_non_source_file("README.md")
+cx_add_non_source_files_to_project_file()

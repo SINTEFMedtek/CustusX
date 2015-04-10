@@ -91,7 +91,7 @@ function(cx_doc_generate_plugin_page)
     #message(STATUS "UNDOCUMENTED_PLUGINS_TEXT : " ${UNDOCUMENTED_PLUGINS_TEXT})
 
     CONFIGURE_FILE(
-        ${CX_DOC_INPUT_DIRECTORY}/user_manual/cx_user_doc_plugins.md.in
+        ${CX_DOC_INPUT_DIRECTORY}/shared_manual/cx_user_doc_plugins.md.in
         ${CX_DOC_OUTPUT_DIRECTORY}/cx_user_doc_plugins.md)
     #PLUGIN_SUBPAGES_TEXT
 endfunction()
@@ -266,6 +266,8 @@ function(cx_build_dev_documentation_html)
     SET(CX_DOXYGEN_INPUT 
         ${CX_DOC_INPUT_DIRECTORY}/dev_manual 
         ${CX_DOC_INPUT_DIRECTORY}/shared_manual 
+        ${CX_DOC_OUTPUT_DIRECTORY}/cx_user_doc_plugins.md
+        ${PLUGIN_DOC_FOLDERS}
         ${CustusX_SOURCE_DIR}/source 
         ${CustusX_SOURCE_DIR}/CMake)
     TO_LIST_SPACES(CX_DOXYGEN_INPUT CX_DOXYGEN_INPUT)
@@ -326,3 +328,42 @@ if(CX_BUILD_USER_DOCUMENTATION)
     cx_build_user_documentation_html()
 	cx_install_documentation_files()
 endif()
+
+
+cx_add_non_source_file("dev_manual/cx_dev_architecture.md")
+cx_add_non_source_file("dev_manual/cx_dev_build_instructions.md")
+cx_add_non_source_file("dev_manual/cx_dev_code_style.md")
+cx_add_non_source_file("dev_manual/cx_dev_coordinate_systems.md")
+cx_add_non_source_file("dev_manual/cx_dev_customize_applications.md")
+cx_add_non_source_file("dev_manual/cx_dev_main_page.md")
+cx_add_non_source_file("dev_manual/cx_dev_superbuild.md")
+cx_add_non_source_file("dev_manual/cx_dev_group_definitions.h")
+cx_add_non_source_file("dev_manual/cx_dev_group_resource.h")
+
+cx_add_non_source_file("user_manual/cx_user_doc_main_page.md")
+
+cx_add_non_source_file("user_manual/tutorial/cx_user_tutorial_customize_user_interface.md")
+cx_add_non_source_file("user_manual/tutorial/cx_user_tutorial_dicom_import.md")
+cx_add_non_source_file("user_manual/tutorial/cx_user_tutorial_image_landmark_registration.md")
+cx_add_non_source_file("user_manual/tutorial/cx_user_tutorial_patient_landmark_registration.md")
+cx_add_non_source_file("user_manual/tutorial/cx_user_tutorial_tracking.md")
+cx_add_non_source_file("user_manual/tutorial/cx_user_tutorial_ultrasound_acquisition.md")
+cx_add_non_source_file("user_manual/tutorial/cx_user_tutorial_video_streaming.md")
+cx_add_non_source_file("user_manual/tutorial/cx_user_tutorial_volumes.md")
+cx_add_non_source_file("user_manual/tutorial/cx_user_tutorial.md")
+
+cx_add_non_source_file("shared_manual/cx_external_libraries.md")
+cx_add_non_source_file("shared_manual/cx_license.md")
+cx_add_non_source_file("shared_manual/cx_user_supported_platforms.md")
+
+cx_add_non_source_file("shared_manual/features/cx_user_definitions.md")
+cx_add_non_source_file("shared_manual/features/cx_user_doc_feature_overview.md")
+cx_add_non_source_file("shared_manual/features/cx_user_doc_widgets_algorithms.md")
+cx_add_non_source_file("shared_manual/features/cx_user_doc_widgets_browsing.md")
+cx_add_non_source_file("shared_manual/features/cx_user_doc_widgets_properties.md")
+cx_add_non_source_file("shared_manual/features/cx_user_doc_widgets_utility.md")
+cx_add_non_source_file("shared_manual/features/cx_user_group_definitions.h")
+
+cx_add_non_source_file("shared_manual/installation/cx_user_installation.md")
+cx_add_non_source_file("shared_manual/installation/cx_user_ndi_install.md")
+

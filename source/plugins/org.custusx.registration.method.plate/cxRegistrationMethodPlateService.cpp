@@ -40,14 +40,14 @@ namespace cx
 
 QWidget *RegistrationMethodPlateImageToPatientService::createWidget()
 {
-	TabbedWidget* topWidget = new TabbedWidget(NULL, "PlateRegistrationWidget", "Plate");
+	TabbedWidget* topWidget = new TabbedWidget(NULL, "org_custusx_registration_method_plate_overview", "Plate");
 	topWidget->setToolTip("Plate Registration");
 
-	PlateImageRegistrationWidget* plate = new PlateImageRegistrationWidget(mServices, topWidget);
-	PlateRegistrationWidget* image = new PlateRegistrationWidget(mServices, topWidget);
+	PlateImageRegistrationWidget* imageLandmarks = new PlateImageRegistrationWidget(mServices, topWidget);
+	PlateRegistrationWidget* referenceLandmarks = new PlateRegistrationWidget(mServices, topWidget);
 
-	topWidget->addTab(plate, "Plate");
-	topWidget->addTab(image, "Image");
+	topWidget->addTab(imageLandmarks, "Image landmarks");
+	topWidget->addTab(referenceLandmarks, "Reference landmarks");
 
 	return topWidget;
 }

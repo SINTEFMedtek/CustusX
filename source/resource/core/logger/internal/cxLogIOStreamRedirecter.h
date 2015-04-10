@@ -46,7 +46,7 @@ namespace cx
 {
 
 /**
- * Redirect text from std::cout/std::cerr to cx::Reporter
+ * Redirect text from std::cout and std::cerr to cx::Reporter
  */
 class SingleStreamerImpl
 {

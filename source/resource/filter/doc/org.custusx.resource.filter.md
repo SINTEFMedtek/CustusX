@@ -59,7 +59,7 @@ Values equal to either threshold is considered to be between the thresholds.
 
 
 \addindex binary_thinning_image_filter_3d_filter
-Centerline Filter {#org_custusx_resource_filter_binary_threshold_image}
+Centerline Filter {#org_custusx_resource_filter_binary_thinning_image}
 ===========================================================
 *Wrapper for a itk::BinaryThinningImageFilter3D.*
 

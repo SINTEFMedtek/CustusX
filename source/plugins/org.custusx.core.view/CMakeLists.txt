@@ -13,7 +13,6 @@ set(PLUGIN_SRCS
     cxMultiVolume3DRepProducer.cpp
     cxRenderLoop.cpp
     cxRepManager.cpp
-    cxThresholdPreview.cpp
     cxViewGroup.cpp
     cxViewManager.cpp
     cxViewWrapper.cpp
@@ -34,7 +33,6 @@ set(PLUGIN_MOC_SRCS
     cxMultiVolume3DRepProducer.h
     cxRenderLoop.h
     cxRepManager.h
-    cxThresholdPreview.h
     cxViewGroup.h
     cxViewManager.h
     cxViewWrapper.h

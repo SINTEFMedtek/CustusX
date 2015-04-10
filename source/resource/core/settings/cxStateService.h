@@ -71,35 +71,13 @@ struct cxResource_EXPORT Desktop
 };
 
 /**
- * \brief Global Application states for CustusX.
+ * \brief Workflow states for CustusX.
  *
- * The StateManager is the main class in \ref cx_service_state , and maintains
- * global state.
+ * Maintains global state. The responsibility of this service
+ * has been reduced, it now controls the workflow steps.
  *
- * Exception: \ref cx_resource_core_settings also contains some global state.
- *
- * \image html cxArchitecture_application.png "State Service main classes"
- *
- *
- *
- * \section cx_section_CLINICAL_VIEW_state Clinical Application State
- *
- * The active clinical application is known to the entire system.
- * The options are:
- *
- *  - Laboratory
- *  - Neurology
- *  - Laparascopy
- *  - Bronchoscopy
- *  - Endovascular
- *
- * The application can be used to customize the system to that clinical
- * area. Each one are represented as a state in StateManager. Currently the
- * tool configurations, the workflow states and the view orientations are
- * affected by this.
- *
- * \sa ApplicationStateMachine
- *
+ * - \ref cx_resource_core_settings also contains some global state.
+ * - \ref cx::Profile contains more state.
  *
  * \section cx_section_workflow Workflow
  *
@@ -140,7 +118,6 @@ public:
 	virtual ~StateService() {}
 
 	virtual QString getVersionName() = 0;
-//	virtual QActionGroup* getApplicationActions() = 0;
 	virtual QString getApplicationStateName() const = 0;
 	virtual QStringList getAllApplicationStateNames() const = 0;
 

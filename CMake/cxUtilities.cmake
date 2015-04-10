@@ -446,3 +446,31 @@ macro(cx_initialize_macosx_bundle)
 	endif(APPLE)
 endmacro()
 
+###############################################################################
+#
+# Add a non-source file to the project file.
+#
+# Call this for each file that sould be added to the project for easy edit
+# access from an IDE (VS, XCode, QtCreator)
+#
+# See also http://public.kitware.com/Bug/view.php?id=7835
+#
+###############################################################################
+function(cx_add_non_source_file NON_SOURCE_FILE)
+	if(IS_ABSOLUTE ${NON_SOURCE_FILE})
+		cx_add_string_to_global_property_list(CX_NON_SOURCE_FILES "${NON_SOURCE_FILE}")
+	else()
+		cx_add_string_to_global_property_list(CX_NON_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/${NON_SOURCE_FILE}")
+	endif()
+endfunction()
+
+###############################################################################
+#
+# Add all non-source files to the project file.
+# (Files that shall not be compiled with this project file.)
+##
+###############################################################################
+function(cx_add_non_source_files_to_project_file)
+	get_property(NON_SOURCE_FILES GLOBAL PROPERTY CX_NON_SOURCE_FILES)
+	add_custom_target(NonSourceFiles SOURCES ${NON_SOURCE_FILES})
+endfunction()

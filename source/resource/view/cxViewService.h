@@ -91,9 +91,6 @@ public:
 	virtual CameraControlPtr getCameraControl() = 0;
 	virtual QActionGroup* createInteractorStyleActionGroup() = 0;
 
-	virtual void setPreview(ImagePtr image, const std::vector<double>& threshold) = 0;
-	virtual void removePreview() = 0;
-
 	virtual bool isNull() = 0;
 	static VisualizationServicePtr getNullObject();
 

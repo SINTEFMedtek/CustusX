@@ -67,7 +67,7 @@ public:
   virtual ~TimedBaseAlgorithm();
 
   virtual QString getProduct() const { return mProduct; }
-  /**Execute the algorithm.
+  /** Execute the algorithm.
    * Parts of the execution can be in another thread, thus the call
    * usually returns after preprocessing is complete.
    * The exec starts by emitting aboutToStart(), which can be used by
@@ -86,7 +86,7 @@ public:
 
 signals:
 	void aboutToStart(); ///< emitted at start of execute. Use to perform preprocessing
-	void started(int maxSteps); /// < emitted at start of run. \param maxSteps is an input to a QProgressBar, set to zero if unknown.
+	void started(int maxSteps); ///< emitted at start of run. \param maxSteps is an input to a QProgressBar, set to zero if unknown.
 	void finished(); ///< should be emitted when at the end of postProcessingSlot
 	void productChanged(); ///< emitted whenever product string has changed
 //	void progress();

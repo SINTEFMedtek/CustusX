@@ -64,7 +64,7 @@ Code Style
 Names 
 -----------------------------
 1. All comments and symbol names shall be in English.
-2. Filenames have the style <moduleprefix><classname>.cpp/h, for example cxVector3D.h 
+2. Filenames have the style \<moduleprefix\>\<classname\>.cpp/h, for example cxVector3D.h 
 3. Class names are camel case with first uppercase letter.
 4. Member variables in a class are usually prefixed with "m". The rest of the name is in camel case. 
 5. Use accessors named getCamelCase() for get, setCamelCase() for set.. 

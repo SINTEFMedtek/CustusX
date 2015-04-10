@@ -138,10 +138,9 @@ vtkPolyDataAlgorithmPtr GraphicalPolyData3D::getSource()
 	return mSource;
 }
 
-
-///--------------------------------------------------------
-///--------------------------------------------------------
-///--------------------------------------------------------
+//--------------------------------------------------------
+//--------------------------------------------------------
+//--------------------------------------------------------
 
 GraphicalPoint3D::GraphicalPoint3D(vtkRendererPtr renderer)
 {
@@ -199,11 +198,6 @@ void GraphicalPoint3D::setColor(QColor color)
 	setColorAndOpacity(actor->GetProperty(), color);
 }
 
-//void GraphicalPoint3D::setColor(Vector3D color)
-//{
-//	actor->GetProperty()->SetColor(color.begin());
-//}
-
 void GraphicalPoint3D::setValue(Vector3D point)
 {
 	actor->SetPosition(point.begin());
@@ -224,11 +218,9 @@ vtkPolyDataPtr GraphicalPoint3D::getPolyData()
 	return source->GetOutput();
 }
 
-
-///--------------------------------------------------------
-///--------------------------------------------------------
-///--------------------------------------------------------
-
+//--------------------------------------------------------
+//--------------------------------------------------------
+//--------------------------------------------------------
 
 GraphicalLine3D::GraphicalLine3D( vtkRendererPtr renderer)
 {
@@ -283,14 +275,9 @@ vtkActorPtr GraphicalLine3D::getActor()
 	return actor;
 }
 
-///--------------------------------------------------------
-///--------------------------------------------------------
-///--------------------------------------------------------
-
-///--------------------------------------------------------
-///--------------------------------------------------------
-///--------------------------------------------------------
-
+//--------------------------------------------------------
+//--------------------------------------------------------
+//--------------------------------------------------------
 
 GraphicalArc3D::GraphicalArc3D( vtkRendererPtr renderer)
 {
@@ -334,14 +321,9 @@ vtkActorPtr GraphicalArc3D::getActor()
 	return actor;
 }
 
-///--------------------------------------------------------
-///--------------------------------------------------------
-///--------------------------------------------------------
-
-///--------------------------------------------------------
-///--------------------------------------------------------
-///--------------------------------------------------------
-
+//--------------------------------------------------------
+//--------------------------------------------------------
+//--------------------------------------------------------
 
 GraphicalArrow3D::GraphicalArrow3D( vtkRendererPtr renderer)
 {
@@ -391,10 +373,9 @@ void GraphicalArrow3D::setValue(Vector3D base, Vector3D normal, double length)
 	actor->SetUserMatrix(M.getVtkMatrix());
 }
 
-///--------------------------------------------------------
-///--------------------------------------------------------
-///--------------------------------------------------------
-
+//--------------------------------------------------------
+//--------------------------------------------------------
+//--------------------------------------------------------
 
 Rect3D::Rect3D(vtkRendererPtr renderer, QColor color)
 {
@@ -462,31 +443,23 @@ void Rect3D::updatePosition(const DoubleBoundingBox3D bb, const Transform3D& M)
 	mPoints->InsertPoint(2, M.coord(bb.corner(1,1,0)).begin());
 	mPoints->InsertPoint(3, M.coord(bb.corner(1,0,0)).begin());
 	mPolyData->SetPoints(mPoints);
-//	mPolyData->Update();
 }
 
-///--------------------------------------------------------
-///--------------------------------------------------------
-///--------------------------------------------------------
-
+//--------------------------------------------------------
+//--------------------------------------------------------
+//--------------------------------------------------------
 
 FollowerText3D::FollowerText3D( vtkRendererPtr renderer)
 {
-//  mRenderer = renderer;
-//  if (!mRenderer)
-//  	return;
-
 	mText = vtkVectorTextPtr::New();
 	vtkPolyDataMapperPtr mapper = vtkPolyDataMapperPtr::New();
 	mapper->SetInputConnection(mText->GetOutputPort());
 	mFollower = vtkFollowerPtr::New();
 	mFollower->SetMapper(mapper);
-//  mFollower->SetCamera(mRenderer->GetActiveCamera());
 	Vector3D mTextScale(2,2,2);
 	mFollower->SetScale(mTextScale.begin());
 
 	this->setSizeInNormalizedViewport(true, 0.025);
-//  mRenderer->AddActor(mFollower);
 	this->setRenderer(renderer);
 }
 
@@ -542,7 +515,6 @@ void FollowerText3D::setSizeInNormalizedViewport(bool on, double size)
 void FollowerText3D::setColor(QColor color)
 {
 	setColorAndOpacity(mFollower->GetProperty(), color);
-//	mFollower->GetProperty()->SetColor(getColorAsVector3D(color).begin());
 }
 
 void FollowerText3D::setText(QString text)
@@ -560,7 +532,7 @@ vtkFollowerPtr FollowerText3D::getActor()
 	return mFollower;
 }
 
-/**Note: Internal method!
+/** Note: Internal method!
  *
  * Scale the text to be a constant fraction of the viewport height
  * Called from a vtk camera observer
@@ -583,10 +555,9 @@ void FollowerText3D::scaleText()
 		mFollower->SetScale(mTextScale.begin());
 }
 
-///--------------------------------------------------------
-///--------------------------------------------------------
-///--------------------------------------------------------
-
+//--------------------------------------------------------
+//--------------------------------------------------------
+//--------------------------------------------------------
 
 CaptionText3D::CaptionText3D( vtkRendererPtr renderer)
 {
@@ -649,8 +620,8 @@ vtkCaptionActor2DPtr CaptionText3D::getActor()
 	return mText;
 }
 
-///--------------------------------------------------------
-///--------------------------------------------------------
-///--------------------------------------------------------
+//--------------------------------------------------------
+//--------------------------------------------------------
+//--------------------------------------------------------
 
 }

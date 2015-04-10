@@ -118,5 +118,4 @@ void ShadingWidget::imageChangedSlot(ImagePtr image)
 	}
 }
 
-
 }//namespace cx

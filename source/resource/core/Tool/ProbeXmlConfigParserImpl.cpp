@@ -424,7 +424,7 @@ void ProbeXmlConfigParserImpl::removeConfig(QString scanner, QString probe, QStr
 }
 
 /**Add a trivial QDomElement with a QTextElement, i.e.
- * <elem> text </elem> .
+ * \<elem\> text \</elem\> .
  *
  */
 void ProbeXmlConfigParserImpl::addTextElement(QDomElement parent, QString element, QString text)

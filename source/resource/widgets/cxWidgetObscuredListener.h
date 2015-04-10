@@ -42,8 +42,6 @@ class QTimer;
 namespace cx
 {
 
-typedef boost::shared_ptr<class ThresholdPreview> ThresholdPreviewPtr;
-
 /**
   * Listen to a widget, then emit signals when it is obscured.
   * This hack solves the issue of tabbed widgets no receiving hide() events,
