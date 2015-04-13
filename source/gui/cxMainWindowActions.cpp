@@ -10,7 +10,6 @@
 #include <QApplication>
 #include <QDesktopServices>
 
-//#include <QtWidgets>
 #include "boost/bind.hpp"
 #include "boost/function.hpp"
 #include "cxReporter.h"
@@ -22,7 +21,6 @@
 #include "cxTrackingService.h"
 #include "cxSettings.h"
 #include "cxVideoService.h"
-//#include "cxStateService.h"
 #include "cxNavigation.h"
 #include "cxImage.h"
 #include "cxPatientModelService.h"
@@ -30,19 +28,9 @@
 #include "cxViewGroupData.h"
 #include "cxSessionStorageService.h"
 #include "cxVisServices.h"
-//#include "cxAudioImpl.h"
-//#include "cxLayoutInteractor.h"
 #include "cxVLCRecorder.h"
-//#include "cxCameraControl.h"
-
-//#include "cxDynamicMainWindowWidgets.h"
-//#include "cxStatusBar.h"
 #include "cxImportDataDialog.h"
 #include "cxExportDataDialog.h"
-//#include "cxSecondaryMainWindow.h"
-//#include "cxSecondaryViewLayoutWindow.h"
-//#include "cxSamplerWidget.h"
-//#include "cxHelperWidgets.h"
 
 namespace cx
 {

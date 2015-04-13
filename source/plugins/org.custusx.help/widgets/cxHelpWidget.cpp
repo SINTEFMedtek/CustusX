@@ -100,7 +100,7 @@ void HelpWidget::setup()
 	this->addWebButton(buttonLayout);
 	buttonLayout->addStretch();
 
-//	browser->showHelpForKeyword("user_doc_overview");
+	browser->showHelpForKeyword("user_doc_overview");
 
 	bool navVis = settings()->value("org.custusx.help/navigationVisible").toBool();
 	mTabWidget->setVisible(navVis);
