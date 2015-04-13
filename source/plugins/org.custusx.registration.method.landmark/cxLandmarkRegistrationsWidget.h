@@ -42,7 +42,6 @@ class LandmarkRegistrationsWidget : public TabbedWidget
 public:
   LandmarkRegistrationsWidget(QWidget* parent, QString objectName, QString windowTitle);
   virtual ~LandmarkRegistrationsWidget(){};
-  virtual QString defaultWhatsThis() const;
 };
 } //cx
 #endif // CXLANDMARKREGISTRATIONSWIDGET_H

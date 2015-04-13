@@ -71,7 +71,6 @@ public:
 	LandmarkImageRegistrationWidget(RegServices services, QWidget* parent, QString objectName,
 		QString windowTitle, bool useRegistrationFixedPropertyInsteadOfActiveImage = false); ///< sets up layout and connects signals and slots
 	virtual ~LandmarkImageRegistrationWidget(); ///< empty
-	virtual QString defaultWhatsThis() const;
 
 protected slots:
 //	virtual void activeImageChangedSlot(); ///< listens to the datamanager for when the active image is changed

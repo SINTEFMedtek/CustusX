@@ -68,8 +68,6 @@ public:
 		QString windowTitle);
 	virtual ~LandmarkRegistrationWidget();
 
-	virtual QString defaultWhatsThis() const;
-
 protected slots:
 	virtual void cellClickedSlot(int row, int column); ///< when a landmark i selected from the table
 

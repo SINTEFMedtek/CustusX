@@ -107,16 +107,6 @@ LandmarkImageRegistrationWidget::~LandmarkImageRegistrationWidget()
 {
 }
 
-QString LandmarkImageRegistrationWidget::defaultWhatsThis() const
-{
-	return "<html>"
-		"<h3>Landmark based image registration.</h3>"
-		"<p>Sample landmarks in the data set. </p>"
-		"<p><i>Click the volume and either add or resample landmarks.</i></p>"
-		"<p>Landmark image registration will move the active image to the fixed image</p>"
-		"</html>";
-}
-
 void LandmarkImageRegistrationWidget::onCurrentImageChanged()
 {
 	DataPtr data = mCurrentProperty->getData();

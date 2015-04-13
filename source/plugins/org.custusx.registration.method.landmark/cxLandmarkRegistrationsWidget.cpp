@@ -40,13 +40,4 @@ LandmarkRegistrationsWidget::LandmarkRegistrationsWidget(QWidget* parent, QStrin
 {
 }
 
-QString LandmarkRegistrationsWidget::defaultWhatsThis() const
-{
-  return "<html>"
-	  "<h3>Landmark based registrations.</h3>"
-	  "<p>This is a set of methods that use landmarks/fiducials to connect the images with the real world.</p>"
-	  "<p><i>Choose a step to continue..</i></p>"
-	  "</html>";
-}
-
 } //cx

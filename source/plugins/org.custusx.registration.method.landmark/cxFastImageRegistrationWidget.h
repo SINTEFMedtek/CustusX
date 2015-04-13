@@ -60,7 +60,6 @@ class org_custusx_registration_method_landmark_EXPORT FastImageRegistrationWidge
 public:
 	FastImageRegistrationWidget(RegServices services, QWidget* parent, QString objectName, QString windowTitle, bool useRegistrationFixedPropertyInsteadOfActiveImage = false);
 	virtual ~FastImageRegistrationWidget();
-	virtual QString defaultWhatsThis() const;
 
 protected:
 	virtual void performRegistration();
