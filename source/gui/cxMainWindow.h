@@ -54,7 +54,8 @@ namespace cx
 class LayoutData;
 class GUIExtenderService;
 class ConsoleWidget;
-class DockWidgets;
+class DynamicMainWindowWidgets;
+class MainWindowActions;
 
 typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
 typedef boost::shared_ptr<class LayoutInteractor> LayoutInteractorPtr;
@@ -78,7 +79,7 @@ class cxGui_EXPORT MainWindow: public QMainWindow
 	Q_OBJECT
 
 public:
-	MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders=std::vector<GUIExtenderServicePtr>());
+	MainWindow();
 	virtual ~MainWindow();
 
 	virtual QMenu* createPopupMenu();
@@ -92,12 +93,6 @@ protected slots:
 	void quitSlot();
 	void toggleFullScreenSlot();
 
-	// File menu
-	void newPatientSlot(); ///< Create new patient with directory structure
-	void loadPatientFileSlot();///< Load all application data from XML file
-	void savePatientFileSlot();///< Save all application data to XML file
-	void clearPatientSlot();///< clear current patient (debug)
-
 	void showControlPanelActionSlot();
 	void showSecondaryViewLayoutWindowActionSlot();
 
@@ -109,40 +104,15 @@ protected slots:
 	void saveDesktopSlot();
 	void resetDesktopSlot();
 
-	//data menu
-	void exportDataSlot();
-	void importDataSlot(); ///< loads data(images) into the datamanager
-	void deleteDataSlot(); ///< deletes data(image) from the patient
-
-	void togglePointPickerActionSlot();
-	void updatePointPickerActionSlot();
-
-	//tool menu
-	void configureSlot(); ///< lets the user choose which configuration files to use for the navigation
-
 	// help
-	void onGotoDocumentation();
+	void onShowContextSentitiveHelp();
 
-	// navigation
-	void centerToImageCenterSlot();
-	void centerToTooltipSlot();
-
-	void updateTrackingActionSlot();
-	void toggleTrackingSlot();
-	void toggleStreamingSlot();
-	void updateStreamingActionSlot();
-
-	void shootScreen();
-	void shootWindow();
-	void recordFullscreen();
-
-	void onStartLogConsole();
 	void dockWidgetVisibilityChanged(bool val);
 	void focusChanged(QWidget * old, QWidget * now);
 
-    void onPluginBaseAdded(GUIExtenderService* service);
-    void onPluginBaseRemoved(GUIExtenderService* service);
-	void onPluginBaseModified(GUIExtenderService* service);
+	void onGUIExtenderServiceAdded(GUIExtenderService* service);
+	void onGUIExtenderServiceRemoved(GUIExtenderService* service);
+	void onGUIExtenderServiceModified(GUIExtenderService* service);
 
 protected:
 	void changeEvent(QEvent * event);
@@ -150,23 +120,16 @@ protected:
 private:
 	void focusInsideDockWidget(QObject* dockWidget);
 	LayoutInteractorPtr mLayoutInteractor;
-	void saveScreenShot(QPixmap pixmap, QString id="");
-	void saveScreenShotThreaded(QImage pixmap, QString filename);
 	void updateWindowTitle();
 	void createActions(); ///< creates and connects (gui-)actions
 	void createMenus(); ///< creates and add (gui-)menues
 	void createToolBars(); ///< creates and adds toolbars for convenience
 
-	void registerToolBar(QToolBar* toolbar, QString groupname = "");
-	void addToWidgetGroupMap(QAction* action, QString groupname);
-	void addGUIExtender(GUIExtenderService* service);
-	QWidget *addCategorizedWidget(GUIExtenderService::CategorizedWidget categorizedWidget);
-	void removeGUIExtender(GUIExtenderService* service);
+	QToolBar *registerToolBar(QString name, QString groupname="Toolbars");
 	void setupGUIExtenders();
 
 	void closeEvent(QCloseEvent *event);///< Save geometry and window state at close
 	QDockWidget* addAsDockWidget(QWidget* widget, QString groupname);
-	QString getExistingSessionFolder();
 
 	//menus
 	QMenu* mFileMenu; ///< Menu for file operations (ex: save/load)
@@ -180,39 +143,15 @@ private:
 	//actions and actiongroups
 	QAction* mAboutAction;
 	QAction* mPreferencesAction;
-	QAction* mStartLogConsoleAction;
 	QAction* mFullScreenAction;
 	QAction* mQuitAction;
 
-	QAction* mShootScreenAction;
-	QAction* mShootWindowAction;
-	QAction* mRecordFullscreenAction;
-
-	QAction* mNewPatientAction;///< Action for creating a new patient
-	QAction* mLoadFileAction;///< Action for loading all data from file
-	QAction* mSaveFileAction;///< Action for saving all data to file
-	QAction* mClearPatientAction;
-	QAction* mExportPatientAction;
 	QAction* mShowControlPanelAction;
 	QAction* mSecondaryViewLayoutWindowAction;
 
 	QActionGroup* mStandard3DViewActions; ///< actions for setting camera in fixed direction.
-	QAction* mShowPointPickerAction;
 
-	QAction* mImportDataAction; ///< action for loading data into the datamanager
-	QAction* mDeleteDataAction; ///< action for deleting the current volume
-
-	QAction* mConfigureToolsAction; ///< action for configuring the toolmanager
-	QAction* mInitializeToolsAction; ///< action for initializing contact with the navigation system
-	QAction* mTrackingToolsAction; ///< action for asking the navigation system to start/stop tracking
-//	QAction* mSaveToolsPositionsAction; ///< action for saving the tool positions
-	QAction* mStartStreamingAction; ///< start streaming of the default RT source.
-	QActionGroup* mToolsActionGroup; ///< grouping the actions for contacting the navigation system
-
-	QAction* mGotoDocumentationAction;
-	// actions for image navigation
-	QAction* mCenterToImageCenterAction;
-	QAction* mCenterToTooltipAction;
+	QAction* mShowContextSensitiveHelpAction;
 	QActionGroup* mInteractorStyleActionGroup;
 
 	//desktop actions
@@ -229,20 +168,14 @@ private:
 	QToolBar* mHelpToolBar; ///< toolbar for entering help mode
 	QToolBar* mScreenshotToolBar;
 
-	std::map<QString, QActionGroup*> mWidgetGroupsMap; ///< map containing groups
-
-	QString mLastImportDataFolder;
-
 	boost::shared_ptr<ServiceTrackerListener<GUIExtenderService> > mServiceListener;
-	std::map<GUIExtenderService*, std::vector<QWidget*> > mWidgetsByPlugin;
 
 	//widgets
 	QPointer<class SecondaryMainWindow> mControlPanel;
 	QPointer<class SecondaryViewLayoutWindow> mSecondaryViewLayoutWindow;
-	ProcessWrapperPtr mLocalVideoServerProcess;
 
-	DockWidgets* mDockWidgets;
-	std::set<QToolBar*> mToolbars;
+	DynamicMainWindowWidgets* mDockWidgets;
+	MainWindowActions* mActions;
 
 	VisServicesPtr mServices;
 };

@@ -54,7 +54,7 @@ public:
 	virtual QString getRegistrationType() {return QString("ImageToPatient");}
 	virtual QString getRegistrationMethod() {return QString("Manual");}
 	virtual QWidget* createWidget();
-	virtual QString getWidgetName() {return QString("ManualPatientRegistrationWidget");}
+	virtual QString getWidgetName() {return QString("org_custusx_registration_method_manual_image_to_patient");}
 };
 
 } //cx

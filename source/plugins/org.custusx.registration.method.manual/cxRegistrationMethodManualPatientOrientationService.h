@@ -25,7 +25,7 @@ public:
 	virtual ~RegistrationMethodManualPatientOrientationService() {}
 	virtual QString getRegistrationType() {return QString("ImageTransform");}
 	virtual QString getRegistrationMethod() {return QString("Manual Patient Orientation");}
-	virtual QString getWidgetName() {return QString("ManualPatientOrientationRegistrationWidget");}
+	virtual QString getWidgetName() {return QString("org_custusx_registration_method_manual_patient_orientation");}
 	virtual QWidget* createWidget();
 };
 } // cx

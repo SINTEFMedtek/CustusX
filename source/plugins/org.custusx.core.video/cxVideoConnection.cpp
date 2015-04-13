@@ -192,7 +192,6 @@ void VideoConnection::onConnected()
 
 void VideoConnection::onDisconnected()
 {
-//	CX_LOG_CHANNEL_DEBUG("CA") << "VideoConnection::onDisconnected()";
 	mClient = NULL;
 	mThread = NULL; // because this method listens to thread::finished
 

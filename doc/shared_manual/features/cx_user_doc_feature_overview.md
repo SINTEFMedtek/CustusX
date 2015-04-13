@@ -1,9 +1,9 @@
 Feature Overview {#feature_overview}
 ===========================================================
+\addindex main_window
 
 Main Window {#feature_overview_main_window}
 ===========================================================
-\addindex main_window
 
 ![CustusX Main Window](mainwindow.png)
 
@@ -14,8 +14,6 @@ the left, but can be dragged to all sides if needed. The Toolbar on top contains
 to important functions. The most important is the Workflow Buttons, which can be used to change
 the main window to a specific state. The Menu (not shown in the image) also contains important 
 functions. 
-
-[TOC] 
  
 View Layout {#feature_overview_view_layouts}
 -----------------------------------------------------------

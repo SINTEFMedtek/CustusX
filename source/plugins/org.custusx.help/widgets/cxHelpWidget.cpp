@@ -46,6 +46,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxHelpSearchWidget.h"
 #include "cxHelpIndexWidget.h"
 #include "cxSettings.h"
+#include "cxLogger.h"
+#include "cxDataLocations.h"
+#include <QDesktopServices>
 
 namespace cx
 {
@@ -94,17 +97,24 @@ void HelpWidget::setup()
 
 	this->addToggleTabWidgetButton(buttonLayout);
 	this->addWebNavigationButtons(buttonLayout);
+	this->addWebButton(buttonLayout);
 	buttonLayout->addStretch();
 
-	browser->showHelpForKeyword("mainpage_overview");
+	browser->showHelpForKeyword("user_doc_overview");
 
 	bool navVis = settings()->value("org.custusx.help/navigationVisible").toBool();
-//	mTabWidget->hide();
 	mTabWidget->setVisible(navVis);
 }
 
 HelpWidget::~HelpWidget()
 {}
+
+QSize HelpWidget::sizeHint() const
+{
+	// removing this gives a very small initial size
+	return QSize(250,30);
+}
+
 
 void HelpWidget::addContentWidget(QTabWidget* tabWidget, QBoxLayout* buttonLayout)
 {
@@ -135,6 +145,21 @@ void HelpWidget::addWebNavigationButtons(QBoxLayout* buttonLayout)
 
 	connect(mBrowser, SIGNAL(backwardAvailable(bool)), back, SLOT(setEnabled(bool)));
 	connect(mBrowser, SIGNAL(forwardAvailable(bool)), forward, SLOT(setEnabled(bool)));
+}
+
+void HelpWidget::addWebButton(QBoxLayout* buttonLayout)
+{
+	this->createAction2(this,
+					   QIcon(":/icons/open_icon_library/applications-internet.png"),
+					   "Web", "Open Web Documentation",
+					   &HelpWidget::onGotoDocumentation,
+					   buttonLayout, new CXSmallToolButton());
+}
+
+void HelpWidget::onGotoDocumentation()
+{
+	QString url = DataLocations::getWebsiteUserDocumentationURL();
+	QDesktopServices::openUrl(QUrl(url, QUrl::TolerantMode));
 }
 
 void HelpWidget::backSlot()

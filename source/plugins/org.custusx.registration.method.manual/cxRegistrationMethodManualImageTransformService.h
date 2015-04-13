@@ -50,7 +50,7 @@ public:
 	virtual QString getRegistrationType() {return QString("ImageTransform");}
 	virtual QString getRegistrationMethod() {return QString("Manual Image Transform");}
 	virtual QWidget* createWidget();
-	virtual QString getWidgetName() {return QString("ManualImageTransformRegistrationWidget");}
+	virtual QString getWidgetName() {return QString("org_custusx_registration_method_manual_image_transform");}
 };
 } // cx
 #endif // CXREGISTRATIONMETHODMANUALIMAGETRANSFORMSERVICE_H

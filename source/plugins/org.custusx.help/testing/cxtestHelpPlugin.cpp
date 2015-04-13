@@ -101,11 +101,11 @@ TEST_CASE("org.custusx.help: HelpEngine loads a page", "[unit][plugins][org.cust
 	cx::HelpEnginePtr engine(new cx::HelpEngine);
 	REQUIRE(engine->engine());
 
-	QString id = "mainpage_overview";
+	QString id = "user_doc_overview";
 	QMap<QString, QUrl> links = engine->engine()->linksForIdentifier(id);
 	REQUIRE(links.size()==1);
 
-	CHECK("qthelp://org.custusx.core/doc/index.html#mainpage_overview" == links.first().toString());
+	CHECK(QString("qthelp://org.custusx.core/doc/index.html#%1").arg(id) == links.first().toString());
 //	std::cout << "LINKS: " << links.first().toString().toStdString() << std::endl;
 }
 
@@ -115,7 +115,7 @@ TEST_CASE("org.custusx.help: HelpWidget displays initial help text", "[unit][plu
 	cxtest::TestHelpFixture fixture;
 	fixture.setupHelpBrowserInsideMainWindow();
 
-	CHECK("qthelp://org.custusx.core/doc/index.html#mainpage_overview" == fixture.browser->source().toString());
+	CHECK("qthelp://org.custusx.core/doc/index.html#user_doc_overview" == fixture.browser->source().toString());
 	CHECK(fixture.browser->toPlainText().contains("CustusX User Documentation"));
 
 //	fixture.printBrowserContents();

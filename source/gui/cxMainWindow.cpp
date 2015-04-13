@@ -37,32 +37,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxConfig.h"
 #include "cxDataLocations.h"
-#include "cxProfile.h"
 #include "cxLogicManager.h"
-#include "cxTrackingService.h"
 #include "cxSettings.h"
-#include "cxVideoService.h"
-#include "cxStateService.h"
-#include "cxNavigation.h"
-#include "cxImage.h"
 #include "cxPatientModelService.h"
 #include "cxViewService.h"
-#include "cxViewGroupData.h"
 #include "cxSessionStorageService.h"
-#include "cxVisServices.h"
 #include "cxAudioImpl.h"
 #include "cxLayoutInteractor.h"
-#include "cxVLCRecorder.h"
 #include "cxCameraControl.h"
 
-#include "cxDockWidgets.h"
+#include "cxDynamicMainWindowWidgets.h"
 #include "cxStatusBar.h"
-#include "cxImportDataDialog.h"
-#include "cxExportDataDialog.h"
 #include "cxSecondaryMainWindow.h"
 #include "cxSecondaryViewLayoutWindow.h"
 #include "cxSamplerWidget.h"
 #include "cxHelperWidgets.h"
+#include "cxMainWindowActions.h"
 
 #include "cxStreamPropertiesWidget.h"
 #include "cxVideoConnectionWidget.h"
@@ -82,12 +72,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxAllFiltersWidget.h"
 #include "cxPluginFrameworkWidget.h"
 
-
 namespace cx
 {
 
-MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
-	mFullScreenAction(NULL), mStandard3DViewActions(new QActionGroup(this)), mControlPanel(NULL), mDockWidgets(new DockWidgets(this))
+MainWindow::MainWindow() :
+	mFullScreenAction(NULL),
+	mStandard3DViewActions(new QActionGroup(this)),
+	mControlPanel(NULL),
+	mDockWidgets(new DynamicMainWindowWidgets(this)),
+	mActions(NULL)
 {
 	this->setObjectName("MainWindow");
 
@@ -95,6 +88,8 @@ MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
 	mLayoutInteractor.reset(new LayoutInteractor());
 
 	this->setCentralWidget(viewService()->getLayoutWidget(this, 0));
+
+	mActions = new MainWindowActions(mServices, this);
 
 	this->createActions();
 	this->createMenus();
@@ -130,13 +125,8 @@ MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
 	this->addAsDockWidget(new PluginFrameworkWidget(this), "Browsing");
 	this->addAsDockWidget(new AllFiltersWidget(VisServices::create(logicManager()->getPluginContext()), this), "Algorithms");
 
-
 	connect(patientService().get(), &PatientModelService::patientChanged, this, &MainWindow::patientChangedSlot);
 	connect(qApp, &QApplication::focusChanged, this, &MainWindow::focusChanged);
-
-	// insert all widgets from all guiExtenders
-	for (unsigned i = 0; i < guiExtenders.size(); ++i)
-		this->addGUIExtender(guiExtenders[i].get());
 
 	this->setupGUIExtenders();
 
@@ -174,73 +164,36 @@ void MainWindow::changeEvent(QEvent * event)
 void MainWindow::setupGUIExtenders()
 {
 	mServiceListener.reset(new ServiceTrackerListener<GUIExtenderService>(
-								 LogicManager::getInstance()->getPluginContext(),
-							   boost::bind(&MainWindow::onPluginBaseAdded, this, _1),
-							   boost::bind(&MainWindow::onPluginBaseModified, this, _1),
-								 boost::bind(&MainWindow::onPluginBaseRemoved, this, _1)
+							   LogicManager::getInstance()->getPluginContext(),
+							   boost::bind(&MainWindow::onGUIExtenderServiceAdded, this, _1),
+							   boost::bind(&MainWindow::onGUIExtenderServiceModified, this, _1),
+							   boost::bind(&MainWindow::onGUIExtenderServiceRemoved, this, _1)
 							   ));
 	mServiceListener->open();
 }
 
-void MainWindow::addGUIExtender(GUIExtenderService* service)
+void MainWindow::onGUIExtenderServiceAdded(GUIExtenderService* service)
 {
 	std::vector<GUIExtenderService::CategorizedWidget> widgets = service->createWidgets();
 	for (unsigned j = 0; j < widgets.size(); ++j)
 	{
-		QWidget* widget = this->addCategorizedWidget(widgets[j]);
-		mWidgetsByPlugin[service].push_back(widget);
+		mDockWidgets->addAsDockWidget(widgets[j].mWidget, widgets[j].mCategory, service);
 	}
 
 	std::vector<QToolBar*> toolBars = service->createToolBars();
 	for(unsigned j = 0; j < toolBars.size(); ++j)
 	{
-		addToolBar(toolBars[j]);
-		this->registerToolBar(toolBars[j], "Toolbar");
+		mDockWidgets->registerToolBar(toolBars[j]);
 	}
 }
 
-QWidget *MainWindow::addCategorizedWidget(GUIExtenderService::CategorizedWidget categorizedWidget)
-{
-	QWidget* retval;
-	retval = this->addAsDockWidget(categorizedWidget.mWidget, categorizedWidget.mCategory);
-	return retval;
-}
-
-void MainWindow::removeGUIExtender(GUIExtenderService* service)
-{
-	while (!mWidgetsByPlugin[service].empty())
-	{
-		// TODO: must remove widget from several difference data structures: simplify!
-		QWidget* widget = mWidgetsByPlugin[service].back();
-		mWidgetsByPlugin[service].pop_back();
-
-		QDockWidget* dockWidget = dynamic_cast<QDockWidget*>(widget);
-		this->removeDockWidget(dockWidget);
-
-		mDockWidgets->erase(dockWidget);
-
-		if (dockWidget)
-		{
-			for (std::map<QString, QActionGroup*>::iterator iter=mWidgetGroupsMap.begin(); iter!=mWidgetGroupsMap.end(); ++iter)
-			{
-				iter->second->removeAction(dockWidget->toggleViewAction());
-			}
-		}
-	}
-}
-
-void MainWindow::onPluginBaseAdded(GUIExtenderService* service)
-{
-	this->addGUIExtender(service);
-}
-
-void MainWindow::onPluginBaseModified(GUIExtenderService* service)
+void MainWindow::onGUIExtenderServiceModified(GUIExtenderService* service)
 {
 }
 
-void MainWindow::onPluginBaseRemoved(GUIExtenderService* service)
+void MainWindow::onGUIExtenderServiceRemoved(GUIExtenderService* service)
 {
-	this->removeGUIExtender(service);
+	mDockWidgets->owningServiceRemoved(service);
 }
 
 void MainWindow::dockWidgetVisibilityChanged(bool val)
@@ -271,26 +224,6 @@ void MainWindow::focusInsideDockWidget(QObject *dockWidget)
 	QTimer::singleShot(0, sa->widget(), SLOT(setFocus())); // avoid loops etc by send async event.
 }
 
-
-void MainWindow::addToWidgetGroupMap(QAction* action, QString groupname)
-{
-	action->setMenuRole(QAction::NoRole);
-	if (mWidgetGroupsMap.find(groupname) != mWidgetGroupsMap.end())
-	{
-		mWidgetGroupsMap[groupname]->addAction(action);
-	}
-	else
-	{
-		QActionGroup* group = new QActionGroup(this);
-		group->setExclusive(false);
-		mWidgetGroupsMap[groupname] = group;
-		QAction* heading = new QAction(groupname, this);
-		heading->setDisabled(true);
-		mWidgetGroupsMap[groupname]->addAction(heading);
-		mWidgetGroupsMap[groupname]->addAction(action);
-	}
-}
-
 MainWindow::~MainWindow()
 {
 	reporter()->setAudioSource(AudioPtr()); // important! QSound::play fires a thread, causes segfault during shutdown
@@ -299,15 +232,7 @@ MainWindow::~MainWindow()
 
 QMenu* MainWindow::createPopupMenu()
 {
-	QMenu* popupMenu = new QMenu(this);
-	std::map<QString, QActionGroup*>::iterator it = mWidgetGroupsMap.begin();
-	for (; it != mWidgetGroupsMap.end(); ++it)
-	{
-		popupMenu->addSeparator();
-		popupMenu->addActions(it->second->actions());
-	}
-
-	return popupMenu;
+	return mDockWidgets->createPopupMenu();
 }
 
 void MainWindow::createActions()
@@ -316,31 +241,9 @@ void MainWindow::createActions()
 	if (cameraControl)
 		mStandard3DViewActions = cameraControl->createStandard3DViewActions();
 
-	// File
-	mNewPatientAction = new QAction(QIcon(":/icons/open_icon_library/document-new-8.png"), tr(
-		"&New patient"), this);
-	mNewPatientAction->setShortcut(tr("Ctrl+N"));
-	mNewPatientAction->setStatusTip(tr("Create a new patient file"));
-	mSaveFileAction = new QAction(QIcon(":/icons/open_icon_library/document-save-5.png"), tr(
-		"&Save Patient"), this);
-	mSaveFileAction->setShortcut(tr("Ctrl+S"));
-	mSaveFileAction->setStatusTip(tr("Save patient file"));
-	mLoadFileAction = new QAction(QIcon(":/icons/open_icon_library/document-open-7.png"), tr(
-		"&Load Patient"), this);
-	mLoadFileAction->setShortcut(tr("Ctrl+L"));
-	mLoadFileAction->setStatusTip(tr("Load patient file"));
-	mClearPatientAction = new QAction(tr("&Clear Patient"), this);
-	mExportPatientAction = new QAction(tr("&Export Patient"), this);
-
-	mGotoDocumentationAction = new QAction(tr("Web Documentation"), this);
-	connect(mGotoDocumentationAction, &QAction::triggered, this, &MainWindow::onGotoDocumentation);
-
-	connect(mNewPatientAction, &QAction::triggered, this, &MainWindow::newPatientSlot);
-	connect(mLoadFileAction, &QAction::triggered, this, &MainWindow::loadPatientFileSlot);
-	connect(mSaveFileAction, &QAction::triggered, this, &MainWindow::savePatientFileSlot);
-	connect(mSaveFileAction, &QAction::triggered, this, &MainWindow::saveDesktopSlot);
-	connect(mExportPatientAction, &QAction::triggered, this, &MainWindow::exportDataSlot);
-	connect(mClearPatientAction, &QAction::triggered, this, &MainWindow::clearPatientSlot);
+	mShowContextSensitiveHelpAction = new QAction(QIcon(":/icons/open_icon_library/help-contents-5.png"),
+												  "Context-sensitive help", this);
+	connect(mShowContextSensitiveHelpAction, &QAction::triggered, this, &MainWindow::onShowContextSentitiveHelp);
 
 	mShowControlPanelAction = new QAction("Show Control Panel", this);
 	connect(mShowControlPanelAction, &QAction::triggered, this, &MainWindow::showControlPanelActionSlot);
@@ -353,11 +256,6 @@ void MainWindow::createActions()
 	mPreferencesAction = new QAction(tr("Preferences"), this);
 	mPreferencesAction->setShortcut(tr("Ctrl+,"));
 	mPreferencesAction->setStatusTip(tr("Show the preferences dialog"));
-
-	mStartLogConsoleAction = new QAction(tr("&Start Log Console"), this);
-	mStartLogConsoleAction->setShortcut(tr("Ctrl+D"));
-	mStartLogConsoleAction->setStatusTip(tr("Open Log Console as external application"));
-	connect(mStartLogConsoleAction, &QAction::triggered, this, &MainWindow::onStartLogConsole);
 
 	mFullScreenAction = new QAction(tr("Fullscreen"), this);
 	mFullScreenAction->setShortcut(tr("F11"));
@@ -374,76 +272,6 @@ void MainWindow::createActions()
 	connect(mPreferencesAction, &QAction::triggered, this, &MainWindow::preferencesSlot);
 	connect(mQuitAction, &QAction::triggered, this, &MainWindow::quitSlot);
 
-	mShootScreenAction = new QAction(tr("Shoot Screen"), this);
-	mShootScreenAction->setIcon(QIcon(":/icons/screenshot-screen.png"));
-	mShootScreenAction->setShortcut(tr("Ctrl+f"));
-	mShootScreenAction->setStatusTip(tr("Save a screenshot to the patient folder."));
-	connect(mShootScreenAction, &QAction::triggered, this, &MainWindow::shootScreen);
-
-	mShootWindowAction = new QAction(tr("Shoot Window"), this);
-	mShootWindowAction->setIcon(QIcon(":/icons/screenshot-window.png"));
-	mShootWindowAction->setShortcut(tr("Ctrl+Shift+f"));
-	mShootWindowAction->setStatusTip(tr("Save an image of the application to the patient folder."));
-	connect(mShootWindowAction, &QAction::triggered, this, &MainWindow::shootWindow);
-
-	mRecordFullscreenAction = new QAction(tr("Record Fullscreen"), this);
-	mRecordFullscreenAction->setShortcut(tr("F8"));
-	mRecordFullscreenAction->setStatusTip(tr("Record a video of the full screen."));
-	connect(mRecordFullscreenAction, &QAction::triggered, this, &MainWindow::recordFullscreen);
-
-	//data
-	mImportDataAction = new QAction(QIcon(":/icons/open_icon_library/document-import-2.png"), tr("&Import data"), this);
-	mImportDataAction->setShortcut(tr("Ctrl+I"));
-	mImportDataAction->setStatusTip(tr("Import image data"));
-
-	mDeleteDataAction = new QAction(tr("Delete current image"), this);
-	mDeleteDataAction->setStatusTip(tr("Delete selected volume"));
-
-	connect(mImportDataAction, &QAction::triggered, this, &MainWindow::importDataSlot);
-	connect(mDeleteDataAction, &QAction::triggered, this, &MainWindow::deleteDataSlot);
-
-	mShowPointPickerAction = new QAction(tr("Point Picker"), this);
-	mShowPointPickerAction->setCheckable(true);
-	mShowPointPickerAction->setToolTip("Activate the 3D Point Picker Probe");
-	mShowPointPickerAction->setIcon(QIcon(":/icons/point_picker.png"));
-	connect(mShowPointPickerAction, &QAction::triggered, this, &MainWindow::togglePointPickerActionSlot);
-
-	if (viewService()->getGroup(0))
-		connect(viewService()->getGroup(0).get(), &ViewGroupData::optionsChanged, this, &MainWindow::updatePointPickerActionSlot);
-	this->updatePointPickerActionSlot();
-
-	//tool
-	mToolsActionGroup = new QActionGroup(this);
-	mConfigureToolsAction = new QAction(tr("Tool configuration"), mToolsActionGroup);
-	mInitializeToolsAction = new QAction(tr("Initialize"), mToolsActionGroup);
-	mTrackingToolsAction = new QAction(tr("Start tracking"), mToolsActionGroup);
-	mTrackingToolsAction->setShortcut(tr("Ctrl+T"));
-
-	mToolsActionGroup->setExclusive(false); // must turn off to get the checkbox independent.
-
-	mStartStreamingAction = new QAction(tr("Start Streaming"), mToolsActionGroup);
-	mStartStreamingAction->setShortcut(tr("Ctrl+V"));
-	connect(mStartStreamingAction, &QAction::triggered, this, &MainWindow::toggleStreamingSlot);
-	connect(videoService().get(), &VideoService::connected, this, &MainWindow::updateStreamingActionSlot);
-	this->updateStreamingActionSlot();
-
-	mConfigureToolsAction->setChecked(true);
-
-	connect(mConfigureToolsAction, &QAction::triggered, this, &MainWindow::configureSlot);
-	boost::function<void()> finit = boost::bind(&TrackingService::setState, trackingService(), Tool::tsINITIALIZED);
-	connect(mInitializeToolsAction, &QAction::triggered, finit);
-	connect(mTrackingToolsAction, &QAction::triggered, this, &MainWindow::toggleTrackingSlot);
-	connect(trackingService().get(), &TrackingService::stateChanged, this, &MainWindow::updateTrackingActionSlot);
-	connect(trackingService().get(), &TrackingService::stateChanged, this, &MainWindow::updateTrackingActionSlot);
-	this->updateTrackingActionSlot();
-
-	mCenterToImageCenterAction = new QAction(tr("Center Image"), this);
-	mCenterToImageCenterAction->setIcon(QIcon(":/icons/center_image.png"));
-	connect(mCenterToImageCenterAction, &QAction::triggered, this, &MainWindow::centerToImageCenterSlot);
-	mCenterToTooltipAction = new QAction(tr("Center Tool"), this);
-	mCenterToTooltipAction->setIcon(QIcon(":/icons/center_tool.png"));
-	connect(mCenterToTooltipAction, &QAction::triggered, this, &MainWindow::centerToTooltipSlot);
-
 	mSaveDesktopAction = new QAction(QIcon(":/icons/workflow_state_save.png"), tr("Save desktop"), this);
 	mSaveDesktopAction->setToolTip("Save desktop for workflow step");
 	connect(mSaveDesktopAction, &QAction::triggered, this, &MainWindow::saveDesktopSlot);
@@ -452,228 +280,11 @@ void MainWindow::createActions()
 	connect(mResetDesktopAction, &QAction::triggered, this, &MainWindow::resetDesktopSlot);
 
 	mInteractorStyleActionGroup = viewService()->createInteractorStyleActionGroup();
+
+	// cross-connect save patient to save session
+	connect(mServices->getSession().get(), &SessionStorageService::isSaving, this, &MainWindow::saveDesktopSlot);
 }
 
-void MainWindow::toggleFullScreenSlot()
-{
-	this->setWindowState(this->windowState() ^ Qt::WindowFullScreen);
-
-	settings()->setValue("gui/fullscreen", (this->windowState() & Qt::WindowFullScreen)!=0);
-}
-
-void MainWindow::shootScreen()
-{
-	QDesktopWidget* desktop = qApp->desktop();
-	QList<QScreen*> screens = qApp->screens();
-
-	for (int i=0; i<desktop->screenCount(); ++i)
-	{
-		QWidget* screenWidget = desktop->screen(i);
-		WId screenWinId = screenWidget->winId();
-		QRect geo = desktop->screenGeometry(i);
-		QString name = "";
-		if (desktop->screenCount()>1)
-			name = screens[i]->name().split(" ").join("");
-		this->saveScreenShot(screens[i]->grabWindow(screenWinId, geo.left(), geo.top(), geo.width(), geo.height()), name);
-	}
-}
-
-void MainWindow::shootWindow()
-{
-	QScreen* screen = qApp->primaryScreen();
-	this->saveScreenShot(screen->grabWindow(this->winId()));
-}
-
-void MainWindow::recordFullscreen()
-{
-	QString path = patientService()->generateFilePath("Screenshots", "mp4");
-
-	if(vlc()->isRecording())
-		vlc()->stopRecording();
-	else
-		vlc()->startRecording(path);
-
-}
-
-void MainWindow::onStartLogConsole()
-{
-	QString fullname = DataLocations::findExecutableInStandardLocations("LogConsole");
-//	std::cout << "MainWindow::onStartLogConsole() " << fullname << std::endl;
-	mLocalVideoServerProcess.reset(new ProcessWrapper(QString("LogConsole")));
-	mLocalVideoServerProcess->launchWithRelativePath(fullname, QStringList());
-}
-
-void MainWindow::saveScreenShot(QPixmap pixmap, QString id)
-{
-	QString ending = "png";
-	if (!id.isEmpty())
-		ending = id + "." + ending;
-	QString path = patientService()->generateFilePath("Screenshots", ending);
-	QtConcurrent::run(boost::bind(&MainWindow::saveScreenShotThreaded, this, pixmap.toImage(), path));
-}
-
-/**Intended to be called in a separate thread.
- * \sa saveScreenShot()
- */
-void MainWindow::saveScreenShotThreaded(QImage pixmap, QString filename)
-{
-	pixmap.save(filename, "png");
-	report("Saved screenshot to " + filename);
-	reporter()->playScreenShotSound();
-}
-
-void MainWindow::toggleStreamingSlot()
-{
-	if (videoService()->isConnected())
-		videoService()->closeConnection();
-	else
-		videoService()->openConnection();
-}
-
-void MainWindow::updateStreamingActionSlot()
-{
-	if (videoService()->isConnected())
-	{
-		mStartStreamingAction->setIcon(QIcon(":/icons/streaming_green.png"));
-		mStartStreamingAction->setText("Stop Streaming");
-	}
-	else
-	{
-		mStartStreamingAction->setIcon(QIcon(":/icons/streaming_red.png"));
-		mStartStreamingAction->setText("Start Streaming");
-	}
-}
-
-void MainWindow::centerToImageCenterSlot()
-{
-	NavigationPtr nav = viewService()->getNavigation();
-
-	if (patientService()->getActiveImage())
-		nav->centerToData(patientService()->getActiveImage());
-	else if (!viewService()->groupCount())
-		nav->centerToView(viewService()->getGroup(0)->getData());
-	else
-		nav->centerToGlobalDataCenter();
-}
-
-void MainWindow::centerToTooltipSlot()
-{
-	NavigationPtr nav = viewService()->getNavigation();
-	nav->centerToTooltip();
-}
-
-void MainWindow::togglePointPickerActionSlot()
-{
-	ViewGroupDataPtr data = viewService()->getGroup(0);
-	ViewGroupData::Options options = data->getOptions();
-	options.mShowPointPickerProbe = !options.mShowPointPickerProbe;
-	data->setOptions(options);
-}
-void MainWindow::updatePointPickerActionSlot()
-{
-	if (!viewService()->getGroup(0))
-		return;
-	bool show = viewService()->getGroup(0)->getOptions().mShowPointPickerProbe;
-	mShowPointPickerAction->setChecked(show);
-}
-
-void MainWindow::updateTrackingActionSlot()
-{
-	if (trackingService()->getState() >= Tool::tsTRACKING)
-	{
-		mTrackingToolsAction->setIcon(QIcon(":/icons/polaris-green.png"));
-		mTrackingToolsAction->setText("Stop Tracking");
-	}
-	else
-	{
-		mTrackingToolsAction->setIcon(QIcon(":/icons/polaris-red.png"));
-		mTrackingToolsAction->setText("Start Tracking");
-	}
-}
-
-void MainWindow::toggleTrackingSlot()
-{
-	if (trackingService()->getState() >= Tool::tsTRACKING)
-		trackingService()->setState(Tool::tsINITIALIZED);
-	else
-		trackingService()->setState(Tool::tsTRACKING);
-}
-
-namespace
-{
-QString timestampFormatFolderFriendly()
-{
-  return QString("yyyy-MM-dd_hh-mm");
-}
-}
-
-void MainWindow::newPatientSlot()
-{
-	QString patientDatafolder = this->getExistingSessionFolder();
-
-	QString timestamp = QDateTime::currentDateTime().toString(timestampFormatFolderFriendly());
-	QString filename = QString("%1_%2_%3.cx3")
-			.arg(timestamp)
-			.arg(profile()->getName())
-			.arg(settings()->value("globalPatientNumber").toString());
-
-	QString choosenDir = patientDatafolder + "/" + filename;
-
-	QFileDialog dialog(this, tr("Select directory to save patient in"), patientDatafolder + "/");
-	dialog.setOption(QFileDialog::DontUseNativeDialog, true);
-	dialog.setOption(QFileDialog::ShowDirsOnly, true);
-	dialog.selectFile(filename);
-	if (!dialog.exec())
-		return;
-	choosenDir = dialog.selectedFiles().front();
-
-	if (!choosenDir.endsWith(".cx3"))
-		choosenDir += QString(".cx3");
-
-	// Update global patient number
-	int patientNumber = settings()->value("globalPatientNumber").toInt();
-	settings()->setValue("globalPatientNumber", ++patientNumber);
-
-	mServices->getSession()->load(choosenDir);
-}
-
-QString MainWindow::getExistingSessionFolder()
-{
-	QString folder = settings()->value("globalPatientDataFolder").toString();
-
-	// Create folders
-	if (!QDir().exists(folder))
-	{
-		QDir().mkdir(folder);
-		report("Made a new patient folder: " + folder);
-	}
-
-	return folder;
-}
-
-void MainWindow::onGotoDocumentation()
-{
-	QString url("http://custusx.org/index.php/downloads");
-
-	QDesktopServices::openUrl(QUrl(url, QUrl::TolerantMode));
-}
-
-void MainWindow::clearPatientSlot()
-{
-	mServices->getSession()->clear();
-}
-
-void MainWindow::savePatientFileSlot()
-{
-	if (patientService()->getActivePatientFolder().isEmpty())
-	{
-		reportWarning("No patient selected, select or create patient before saving!");
-		this->newPatientSlot();
-		return;
-	}
-
-	mServices->getSession()->save();
-}
 
 void MainWindow::onApplicationStateChangedSlot()
 {
@@ -709,29 +320,26 @@ void MainWindow::onWorkflowStateChangedSlot()
 {
 	Desktop desktop = stateService()->getActiveDesktop();
 
-	this->mDockWidgets->hideAll();
-//	for (std::set<QToolBar*>::iterator i=mToolbars.begin(); i!=mToolbars.end(); ++i)
-//		(*i)->hide();
-//	for (std::set<QToolBar*>::iterator i=mToolbars.begin(); i!=mToolbars.end(); ++i)
-//		this->removeToolBar(*i);
-//	for (std::set<QToolBar*>::iterator i=mToolbars.begin(); i!=mToolbars.end(); ++i)
-//		this->addToolBar(*i);
-
+	mDockWidgets->restoreFrom(desktop);
 	viewService()->setActiveLayout(desktop.mLayoutUid, 0);
 	viewService()->setActiveLayout(desktop.mSecondaryLayoutUid, 1);
-	this->restoreState(desktop.mMainWindowState);
 	patientService()->autoSave();
 
-#ifdef CX_APPLE
-	// HACK
-	// Toolbars are not correctly refreshed on mac 10.8,
-	// Cause is related to QVTKWidget (removing it removes the problem)
-	// The following "force refresh by resize" solves repaint, but
-	// inactive toolbars are still partly clickable.
-	QSize size = this->size();
-	this->resize(size.width()-1, size.height());
-	this->resize(size);
-#endif
+	// moved to help plugin:
+//	// set initial focus to mainwindow in order to view it in the documentation
+//	// this is most important when starting up.
+//	QTimer::singleShot(0, this, SLOT(setFocus())); // avoid loops etc by send async event.
+
+//#ifdef CX_APPLE
+//	// HACK
+//	// Toolbars are not correctly refreshed on mac 10.8,
+//	// Cause is related to QVTKWidget (removing it removes the problem)
+//	// The following "force refresh by resize" solves repaint, but
+//	// inactive toolbars are still partly clickable.
+//	QSize size = this->size();
+//	this->resize(size.width()-1, size.height());
+//	this->resize(size);
+//#endif
 }
 
 void MainWindow::saveDesktopSlot()
@@ -749,6 +357,18 @@ void MainWindow::resetDesktopSlot()
 	this->onWorkflowStateChangedSlot();
 }
 
+void MainWindow::onShowContextSentitiveHelp()
+{
+	mDockWidgets->showWidget("Help");
+}
+
+void MainWindow::toggleFullScreenSlot()
+{
+	this->setWindowState(this->windowState() ^ Qt::WindowFullScreen);
+
+	settings()->setValue("gui/fullscreen", (this->windowState() & Qt::WindowFullScreen)!=0);
+}
+
 void MainWindow::showControlPanelActionSlot()
 {
 	if (!mControlPanel)
@@ -761,51 +381,6 @@ void MainWindow::showSecondaryViewLayoutWindowActionSlot()
 	if (!mSecondaryViewLayoutWindow)
 		mSecondaryViewLayoutWindow = new SecondaryViewLayoutWindow(this);
 	mSecondaryViewLayoutWindow->tryShowOnSecondaryScreen();
-}
-
-void MainWindow::loadPatientFileSlot()
-{
-	QString patientDatafolder = this->getExistingSessionFolder();
-
-	// Open file dialog
-	QString folder = QFileDialog::getExistingDirectory(this, "Select patient", patientDatafolder, QFileDialog::ShowDirsOnly);
-	if (folder.isEmpty())
-		return;
-
-	mServices->getSession()->load(folder);
-}
-
-void MainWindow::exportDataSlot()
-{
-	this->savePatientFileSlot();
-
-	ExportDataDialog* wizard = new ExportDataDialog(mServices->patientModelService, this);
-	wizard->exec(); //calling exec() makes the wizard dialog modal which prevents other user interaction with the system
-}
-
-void MainWindow::importDataSlot()
-{
-	this->savePatientFileSlot();
-
-	QString folder = mLastImportDataFolder;
-	if (folder.isEmpty())
-		folder = settings()->value("globalPatientDataFolder").toString();
-
-	QStringList fileName = QFileDialog::getOpenFileNames(this, QString(tr("Select data file(s) for import")),
-		folder, tr("Image/Mesh (*.mhd *.mha *.stl *.vtk *.mnc)"));
-	if (fileName.empty())
-	{
-		report("Import canceled");
-		return;
-	}
-
-	mLastImportDataFolder = QFileInfo(fileName[0]).absolutePath();
-
-	for (int i=0; i<fileName.size(); ++i)
-	{
-		ImportDataDialog* wizard = new ImportDataDialog(mServices->patientModelService, fileName[i], this);
-		wizard->exec(); //calling exec() makes the wizard dialog modal which prevents other user interaction with the system
-	}
 }
 
 void MainWindow::patientChangedSlot()
@@ -833,20 +408,20 @@ void MainWindow::createMenus()
 	// File
 	mFileMenu->addAction(mPreferencesAction);
 	this->menuBar()->addMenu(mFileMenu);
-	mFileMenu->addAction(mNewPatientAction);
-	mFileMenu->addAction(mSaveFileAction);
-	mFileMenu->addAction(mLoadFileAction);
-	mFileMenu->addAction(mClearPatientAction);
+	mFileMenu->addAction(mActions->getAction("NewPatient"));
+	mFileMenu->addAction(mActions->getAction("SaveFile"));
+	mFileMenu->addAction(mActions->getAction("LoadFile"));
+	mFileMenu->addAction(mActions->getAction("ClearPatient"));
 	mFileMenu->addSeparator();
-	mFileMenu->addAction(mExportPatientAction);
-	mFileMenu->addAction(mImportDataAction);
-	mFileMenu->addAction(mDeleteDataAction);
+	mFileMenu->addAction(mActions->getAction("ExportPatient"));
+	mFileMenu->addAction(mActions->getAction("ImportData"));
+	mFileMenu->addAction(mActions->getAction("DeleteData"));
 	mFileMenu->addSeparator();
 	mFileMenu->addAction(mFullScreenAction);
-	mFileMenu->addAction(mStartLogConsoleAction);
-	mFileMenu->addAction(mShootScreenAction);
-	mFileMenu->addAction(mShootWindowAction);
-	mFileMenu->addAction(mRecordFullscreenAction);
+	mFileMenu->addAction(mActions->getAction("StartLogConsole"));
+	mFileMenu->addAction(mActions->getAction("ShootScreen"));
+	mFileMenu->addAction(mActions->getAction("ShootWindow"));
+	mFileMenu->addAction(mActions->getAction("RecordFullscreen"));
 	mFileMenu->addSeparator();
 	mFileMenu->addAction(mShowControlPanelAction);
 	mFileMenu->addAction(mSecondaryViewLayoutWindowAction);
@@ -867,11 +442,11 @@ void MainWindow::createMenus()
 
 	//tool
 	this->menuBar()->addMenu(mToolMenu);
-	mToolMenu->addAction(mConfigureToolsAction);
-	mToolMenu->addAction(mInitializeToolsAction);
-	mToolMenu->addAction(mTrackingToolsAction);
+	mToolMenu->addAction(mActions->getAction("ConfigureTools"));
+	mToolMenu->addAction(mActions->getAction("InitializeTools"));
+	mToolMenu->addAction(mActions->getAction("TrackingTools"));
 	mToolMenu->addSeparator();
-	mToolMenu->addAction(mStartStreamingAction);
+	mToolMenu->addAction(mActions->getAction("StartStreaming"));
 	mToolMenu->addSeparator();
 
 	//layout
@@ -879,99 +454,76 @@ void MainWindow::createMenus()
 	mLayoutInteractor->connectToMenu(mLayoutMenu);
 
 	this->menuBar()->addMenu(mNavigationMenu);
-	mNavigationMenu->addAction(mCenterToImageCenterAction);
-	mNavigationMenu->addAction(mCenterToTooltipAction);
-	mNavigationMenu->addAction(mShowPointPickerAction);
+	mNavigationMenu->addAction(mActions->getAction("CenterToImageCenter"));
+	mNavigationMenu->addAction(mActions->getAction("CenterToTooltip"));
+	mNavigationMenu->addAction(mActions->getAction("ShowPointPicker"));
 	mNavigationMenu->addSeparator();
 	mNavigationMenu->addActions(mInteractorStyleActionGroup->actions());
 
 	mHelpMenuAction = this->menuBar()->addMenu(mHelpMenu);
 	mHelpMenu->addAction(mAboutAction);
-	mHelpMenu->addAction(mGotoDocumentationAction);
+	mHelpMenu->addAction(mActions->getAction("GotoDocumentation"));
+	mHelpMenu->addAction(mShowContextSensitiveHelpAction);
 }
 
 void MainWindow::createToolBars()
 {
-	mDataToolBar = addToolBar("Data");
-	mDataToolBar->setObjectName("DataToolBar");
-	mDataToolBar->addAction(mNewPatientAction);
-	mDataToolBar->addAction(mLoadFileAction);
-	mDataToolBar->addAction(mSaveFileAction);
-	mDataToolBar->addAction(mImportDataAction);
-	this->registerToolBar(mDataToolBar, "Toolbar");
-
-	mToolToolBar = addToolBar("Tools");
-	mToolToolBar->setObjectName("ToolToolBar");
-	mToolToolBar->addAction(mTrackingToolsAction);
-	mToolToolBar->addAction(mStartStreamingAction);
-	this->registerToolBar(mToolToolBar, "Toolbar");
-
-	mNavigationToolBar = addToolBar("Navigation");
-	mNavigationToolBar->setObjectName("NavigationToolBar");
-	mNavigationToolBar->addAction(mCenterToImageCenterAction);
-	mNavigationToolBar->addAction(mCenterToTooltipAction);
-	mNavigationToolBar->addAction(mShowPointPickerAction);
-	this->registerToolBar(mNavigationToolBar, "Toolbar");
-
-	mInteractorStyleToolBar = addToolBar("InteractorStyle");
-	mInteractorStyleToolBar->setObjectName("InteractorStyleToolBar");
-
-	mInteractorStyleToolBar->addActions(mInteractorStyleActionGroup->actions());
-	this->registerToolBar(mInteractorStyleToolBar, "Toolbar");
-
-	mWorkflowToolBar = addToolBar("Workflow");
-	mWorkflowToolBar->setObjectName("WorkflowToolBar");
-
+	mWorkflowToolBar = this->registerToolBar("Workflow");
 	QList<QAction*> actions = stateService()->getWorkflowActions()->actions();
 	for (int i=0; i<actions.size(); ++i)
-	{
 		mWorkflowToolBar->addAction(actions[i]);
-	}
 
-	this->registerToolBar(mWorkflowToolBar, "Toolbar");
+	mDataToolBar = this->registerToolBar("Data");
+	mDataToolBar->addAction(mActions->getAction("NewPatient"));
+	mDataToolBar->addAction(mActions->getAction("LoadFile"));
+	mDataToolBar->addAction(mActions->getAction("SaveFile"));
+	mDataToolBar->addAction(mActions->getAction("ImportData"));
 
-	mDesktopToolBar = addToolBar("Desktop");
-	mDesktopToolBar->setObjectName("DesktopToolBar");
+	mToolToolBar = this->registerToolBar("Tools");
+	mToolToolBar->addAction(mActions->getAction("TrackingTools"));
+	mToolToolBar->addAction(mActions->getAction("StartStreaming"));
+
+	mNavigationToolBar = this->registerToolBar("Navigation");
+	mNavigationToolBar->addAction(mActions->getAction("CenterToImageCenter"));
+	mNavigationToolBar->addAction(mActions->getAction("CenterToTooltip"));
+	mNavigationToolBar->addAction(mActions->getAction("ShowPointPicker"));
+
+	mInteractorStyleToolBar = this->registerToolBar("InteractorStyle");
+	mInteractorStyleToolBar->addActions(mInteractorStyleActionGroup->actions());
+
+	mDesktopToolBar = this->registerToolBar("Desktop");
 	mDesktopToolBar->addAction(mSaveDesktopAction);
 	mDesktopToolBar->addAction(mResetDesktopAction);
-	this->registerToolBar(mDesktopToolBar, "Toolbar");
 
-	mScreenshotToolBar = addToolBar("Screenshot");
-	mScreenshotToolBar->setObjectName("ScreenshotToolBar");
-	mScreenshotToolBar->addAction(mShootScreenAction);
-	this->registerToolBar(mScreenshotToolBar, "Toolbar");
+	mScreenshotToolBar = this->registerToolBar("Screenshot");
+	mScreenshotToolBar->addAction(mActions->getAction("ShootScreen"));
 
-	QToolBar* camera3DViewToolBar = addToolBar("Camera 3D Views");
-	camera3DViewToolBar->setObjectName("Camera3DViewToolBar");
+	QToolBar* camera3DViewToolBar = this->registerToolBar("Camera 3D Views");
 	camera3DViewToolBar->addActions(mStandard3DViewActions->actions());
-	this->registerToolBar(camera3DViewToolBar, "Toolbar");
 
-	QToolBar* samplerWidgetToolBar = addToolBar("Sampler");
-	samplerWidgetToolBar->setObjectName("SamplerToolBar");
+	QToolBar* samplerWidgetToolBar = this->registerToolBar("Sampler");
 	samplerWidgetToolBar->addWidget(new SamplerWidget(this));
-	this->registerToolBar(samplerWidgetToolBar, "Toolbar");
 
-	QToolBar* toolOffsetToolBar = addToolBar("Tool Offset");
-	toolOffsetToolBar->setObjectName("ToolOffsetToolBar");
+	QToolBar* toolOffsetToolBar = this->registerToolBar("Tool Offset");
 	toolOffsetToolBar->addWidget(createDataWidget(mServices->visualizationService, mServices->patientModelService, this, DoublePropertyActiveToolOffset::create()));
-	this->registerToolBar(toolOffsetToolBar, "Toolbar");
+
+	QToolBar* helpToolBar = this->registerToolBar("Help");
+	helpToolBar->addAction(mShowContextSensitiveHelpAction);
 }
 
-void MainWindow::registerToolBar(QToolBar* toolbar, QString groupname)
+QToolBar* MainWindow::registerToolBar(QString name, QString groupname)
 {
-	this->addToWidgetGroupMap(toolbar->toggleViewAction(), groupname);
-	// this avoids overpopulation of gui at startup, and is the same functionality as for dockwidgets.
-	// also gives correct size of mainwindow at startup.
-	mToolbars.insert(toolbar);
-	if (!mToolbars.empty())
-		toolbar->hide();
+	QToolBar* toolbar = new QToolBar(name);
+	toolbar->setObjectName(QString(name).remove(" ")+"ToolBar");
+	mDockWidgets->registerToolBar(toolbar, groupname);
+	return toolbar;
 }
 
 void MainWindow::aboutSlot()
 {
 	QString doc_path = DataLocations::getDocPath();
 	QString appName = qApp->applicationDisplayName();
-	QString url_github("http://custusx.org");
+	QString url_website = DataLocations::getWebsiteURL();
 	QString url_license = QString("file://%1/license.txt").arg(doc_path);
 	QString url_config = QString("file://%1/cxConfigDescription.txt").arg(doc_path);
 
@@ -988,7 +540,7 @@ void MainWindow::aboutSlot()
 	QMessageBox::about(this, tr("About %1").arg(appName), text
 			.arg(appName)
 			.arg(CustusX_VERSION_STRING)
-			.arg(url_github)
+			.arg(url_website)
 			.arg(url_license)
 			.arg(url_config)
 			);
@@ -1015,21 +567,6 @@ void MainWindow::quitSlot()
 	qApp->quit();
 }
 
-void MainWindow::deleteDataSlot()
-{
-	if (!patientService()->getActiveImage())
-		return;
-	QString text = QString("Do you really want to delete data %1?").arg(patientService()->getActiveImage()->getName());
-	if (QMessageBox::question(this, "Data delete", text, QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel))!=QMessageBox::Ok)
-		return;
-	mServices->patientModelService->removeData(patientService()->getActiveImageUid());
-}
-
-void MainWindow::configureSlot()
-{
-	trackingService()->setState(Tool::tsCONFIGURED);
-}
-
 void MainWindow::closeEvent(QCloseEvent *event)
 {
 	QMainWindow::closeEvent(event);
@@ -1038,11 +575,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 QDockWidget* MainWindow::addAsDockWidget(QWidget* widget, QString groupname)
 {
-	QDockWidget* dockWidget = mDockWidgets->addAsDockWidget(widget, groupname);
-	this->addToWidgetGroupMap(dockWidget->toggleViewAction(), groupname);
-	QMainWindow::addDockWidget(Qt::LeftDockWidgetArea, dockWidget);
-	this->restoreDockWidget(dockWidget); // restore if added after construction
-	return dockWidget;
+	return mDockWidgets->addAsDockWidget(widget, groupname);
 }
 
 }//namespace cx

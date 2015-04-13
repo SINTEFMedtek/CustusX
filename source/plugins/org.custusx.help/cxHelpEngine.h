@@ -68,6 +68,7 @@ signals:
 private slots:
 	void focusObjectChanged(QObject* newFocus);
 	void focusChanged(QWidget * old, QWidget * now);
+	void setInitialPage();
 private:
 	QString findBestMatchingKeyword(QObject* object);
 	QHelpEngine* helpEngine;

@@ -1,0 +1,23 @@
+Registration Methods {#org_custusx_registration_gui}
+===========================================================
+
+\addindex org_custusx_registration_gui_overview
+Registration Method types {#org_custusx_registration_gui_overview}
+===========================================================
+
+There is three different kind of registration methods:
+
+## Image To Patient
+Methods for registering a physical patient to image data
+
+\ref cx_group_image_to_patient_registration
+
+## Image To Image
+Metods for registering data sets to each other, usually 3D images
+
+\ref cx_group_image_to_image_registration
+
+## Image Transform
+Various methods of changing the transformation matrices
+
+\ref cx_group_image_transform_registration

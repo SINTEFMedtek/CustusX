@@ -61,6 +61,7 @@ private:
 	XmlOptionFile getSettings();
 //	XmlOptionFile mXmlFile;
 	std::map<QString, Desktop> mWorkflowDefaultDesktops;
+	void addToolbarsToDesktop(Desktop& desktop, QStringList toolbars);
 };
 
 }
