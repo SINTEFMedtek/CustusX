@@ -1,7 +1,7 @@
 Registration Methods {#org_custusx_registration_gui}
 ===========================================================
 
-\addindex org_custusx_registration_gui_overview
+\addindex org_custusx_registration_gui_widget
 Registration Method types {#org_custusx_registration_gui_overview}
 ===========================================================
 

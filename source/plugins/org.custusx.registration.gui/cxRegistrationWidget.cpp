@@ -58,7 +58,7 @@ RegistrationWidget::RegistrationWidget(ctkPluginContext *pluginContext, QWidget*
 	mVerticalLayout(new QVBoxLayout(this)),
 	mOptions(profile()->getXmlSettings().descend("RegistrationWidget"))
 {
-	this->setObjectName("org_custusx_registration_gui_overview");
+	this->setObjectName("org_custusx_registration_gui_widget");
 	this->setWindowTitle("Registration");
 	this->setWhatsThis(this->defaultWhatsThis());
 
