@@ -159,7 +159,7 @@ IGTLinkImageMessage::Pointer IGTLinkConversion::encode(ImagePtr image)
 ImagePtr IGTLinkConversion::decode(IGTLinkImageMessage::Pointer message)
 {
     igtl::ImageMessage::Pointer msg(message.GetPointer());
-    this->decode(msg);
+    return this->decode(msg);
 }
 
 ImagePtr IGTLinkConversion::decode(igtl::ImageMessage::Pointer message)

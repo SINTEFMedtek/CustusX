@@ -55,6 +55,11 @@ QString OpenIGTLinkStreamerService::getName()
     return "OpenIGTLink streamer";
 }
 
+QString OpenIGTLinkStreamerService::getType() const
+{
+    return "openigtlink_streamer";
+}
+
 std::vector<PropertyPtr> OpenIGTLinkStreamerService::getSettings(QDomElement root)
 {
     std::vector<PropertyPtr> retval;
