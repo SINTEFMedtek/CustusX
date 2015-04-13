@@ -74,6 +74,10 @@ public:
   static QString findConfigFilePath(QString fileName, QString pathRelativeToConfigRoot, QString alternativeAbsolutePath = "");
   static QString findConfigPath(QString fileName, QString pathRelativeToConfigRoot, QString alternativeAbsolutePath = "");
   static QString getNoPatientFolder();
+
+  static QString getWebsiteURL();
+  static QString getWebsiteUserDocumentationURL();
+
 private:
   static bool mTestMode;
   static QString readTestDataPathFromFile(QString filename);

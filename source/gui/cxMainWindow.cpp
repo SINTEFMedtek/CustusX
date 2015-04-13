@@ -588,8 +588,7 @@ QString MainWindow::getExistingSessionFolder()
 
 void MainWindow::onGotoDocumentation()
 {
-	QString url("http://custusx.org/index.php/documentation");
-
+	QString url = DataLocations::getWebsiteUserDocumentationURL();
 	QDesktopServices::openUrl(QUrl(url, QUrl::TolerantMode));
 }
 
@@ -654,6 +653,11 @@ void MainWindow::onWorkflowStateChangedSlot()
 	viewService()->setActiveLayout(desktop.mLayoutUid, 0);
 	viewService()->setActiveLayout(desktop.mSecondaryLayoutUid, 1);
 	patientService()->autoSave();
+
+	// moved to help plugin:
+//	// set initial focus to mainwindow in order to view it in the documentation
+//	// this is most important when starting up.
+//	QTimer::singleShot(0, this, SLOT(setFocus())); // avoid loops etc by send async event.
 
 //#ifdef CX_APPLE
 //	// HACK
@@ -881,7 +885,7 @@ void MainWindow::aboutSlot()
 {
 	QString doc_path = DataLocations::getDocPath();
 	QString appName = qApp->applicationDisplayName();
-	QString url_github("http://custusx.org");
+	QString url_website = DataLocations::getWebsiteURL();
 	QString url_license = QString("file://%1/license.txt").arg(doc_path);
 	QString url_config = QString("file://%1/cxConfigDescription.txt").arg(doc_path);
 
@@ -898,7 +902,7 @@ void MainWindow::aboutSlot()
 	QMessageBox::about(this, tr("About %1").arg(appName), text
 			.arg(appName)
 			.arg(CustusX_VERSION_STRING)
-			.arg(url_github)
+			.arg(url_website)
 			.arg(url_license)
 			.arg(url_config)
 			);

@@ -41,29 +41,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-void BaseWidget::testSetup()
-{
-	QHBoxLayout* buttonLayout = new QHBoxLayout(this);
-
-	this->createAction(this,QIcon(":/icons/open_icon_library/arrow-right-3.png"),"Forward", "Forward to next page",SLOT(forwardSlot()),
-					   buttonLayout, new QToolButton());
-	this->createAction(this,QIcon(":/icons/open_icon_library/arrow-right-3.png"),"Forward", "Forward to next page",SLOT(forwardSlot()),
-					   buttonLayout, new QToolButton());
-	this->createAction(this,QIcon(":/icons/open_icon_library/arrow-right-3.png"),"Forward", "Forward to next page",SLOT(forwardSlot()),
-					   buttonLayout, new QToolButton());
-	this->createAction(this,QIcon(":/icons/open_icon_library/arrow-right-3.png"),"Forward", "Forward to next page",SLOT(forwardSlot()),
-					   buttonLayout, new QToolButton());
-	this->createAction(this,QIcon(":/icons/open_icon_library/arrow-right-3.png"),"Forward", "Forward to next page",SLOT(forwardSlot()),
-					   buttonLayout, new QToolButton());
-	this->createAction(this,QIcon(":/icons/open_icon_library/arrow-right-3.png"),"Forward", "Forward to next page",SLOT(forwardSlot()),
-					   buttonLayout, new QToolButton());
-	this->createAction(this,QIcon(":/icons/open_icon_library/arrow-right-3.png"),"Forward", "Forward to next page",SLOT(forwardSlot()),
-					   buttonLayout, new QToolButton());
-	this->createAction(this,QIcon(":/icons/open_icon_library/arrow-right-3.png"),"Forward", "Forward to next page",SLOT(forwardSlot()),
-					   buttonLayout, new QToolButton());
-
-}
-
 BaseWidget::BaseWidget(QWidget* parent, QString objectName, QString windowTitle) :
     OptimizedUpdateWidget(parent), mObjectName(objectName), mWindowTitle(windowTitle)
 {

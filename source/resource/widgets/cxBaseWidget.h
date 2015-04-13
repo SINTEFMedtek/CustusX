@@ -143,8 +143,6 @@ public:
 	  return action;
 	}
 
-	void testSetup();
-
 public slots:
     void adjustSizeSlot();
 
