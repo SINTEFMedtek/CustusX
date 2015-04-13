@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx {
 
 AllFiltersWidget::AllFiltersWidget(VisServicesPtr services, QWidget* parent) :
-    BaseWidget(parent, "FilterWidget", "Configurable Filter")
+	BaseWidget(parent, "algorithm_widgets_configurable_filter", "Configurable Filter")
 {
 	XmlOptionFile options = profile()->getXmlSettings().descend("filterwidget");
 	mFilters.reset(new FilterGroup(options));

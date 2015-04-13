@@ -55,7 +55,7 @@ public:
 	virtual QString getRegistrationType() {return QString("ImageToImage");}
 	virtual QString getRegistrationMethod() {return QString("Manual");}
 	virtual QWidget* createWidget();
-	virtual QString getWidgetName() {return QString("ManualImage2ImageRegistrationWidget");}
+	virtual QString getWidgetName() {return QString("org_custusx_registration_method_manual_image2image");}
 };
 } //cx
 #endif // CXREGISTRATIONMETHODMANUALIMAGETOIMAGESERVICE_H

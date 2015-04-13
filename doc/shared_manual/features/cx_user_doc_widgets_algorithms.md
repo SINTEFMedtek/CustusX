@@ -2,7 +2,7 @@ Algorithms Widgets {#algorithms_widgets}
 ===========================================================
 
 
-\addindex filter_widget
+\addindex algorithm_widgets_configurable_filter
 Configurable Filter Widget {#algorithm_widgets_configurable_filter}
 ===========================================================
 
