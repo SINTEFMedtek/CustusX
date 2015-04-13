@@ -34,13 +34,29 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * \defgroup cx_user_doc_group_filter Filter Algorithms
  *
- * \brief All available filters.
+ * All available filters.
  */
 
 /**
  * \defgroup cx_user_doc_group_streamer Video Streamers
  *
- * \brief All available video streamers.
+ * All available video streamers.
  */
 
+/**
+ * \defgroup cx_group_image_to_image_registration Image To Image Registration Methods
+ *
+ * All available Image To Image Registration Methods.
+ */
 
+/**
+ * \defgroup cx_group_image_to_patient_registration Image To Patient Registration Methods
+ *
+ * All available Image To Patient Registration Methods.
+ */
+
+/**
+ * \defgroup cx_group_image_transform_registration Image Transform Registration Methods
+ *
+ * All available Image Transform Registration Methods.
+ */

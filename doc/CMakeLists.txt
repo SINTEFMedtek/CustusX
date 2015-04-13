@@ -49,7 +49,8 @@ function(cx_doc_generate_plugin_page)
     # ready to insert into markdown.
     foreach(_var ${PLUGIN_DOC_NAMES})
         string(REPLACE "_" "." plugin_name ${_var})
-        set(PLUGIN_SUBPAGES_TEXT "${PLUGIN_SUBPAGES_TEXT}\n* \\subpage ${_var} (${plugin_name})" )
+        string(TOLOWER ${_var} plugin_index)
+        set(PLUGIN_SUBPAGES_TEXT "${PLUGIN_SUBPAGES_TEXT}\n* \\subpage ${plugin_index} (${plugin_name})" )
     endforeach()
     #message(STATUS "PLUGIN_SUBPAGES_TEXT : " ${PLUGIN_SUBPAGES_TEXT})
 

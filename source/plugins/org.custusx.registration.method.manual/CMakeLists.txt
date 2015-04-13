@@ -71,7 +71,12 @@ target_include_directories(org_custusx_registration_method_manual
 )
 
 cx_doc_define_plugin_user_docs("${PROJECT_NAME}" "${CMAKE_CURRENT_SOURCE_DIR}/doc")
-cx_add_non_source_file("doc/org.custusx.registration.method.manual.md")
+cx_add_non_source_file("doc/org_custusx_registration_method_manual.md")
+cx_add_non_source_file("doc/org_custusx_registration_method_manual.h")
+cx_add_non_source_file("doc/org_custusx_registration_method_manual_image_to_patient.md")
+cx_add_non_source_file("doc/org_custusx_registration_method_manual_image2image.md")
+cx_add_non_source_file("doc/org_custusx_registration_method_manual_image_transform.md")
+cx_add_non_source_file("doc/org_custusx_registration_method_manual_patient_orientation.md")
 
 add_subdirectory(testing)
 
