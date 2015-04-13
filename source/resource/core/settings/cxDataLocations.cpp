@@ -281,4 +281,23 @@ QString DataLocations::findExecutableInStandardLocations(QString filename)
 	return result;
 }
 
+QString DataLocations::getWebsiteURL()
+{
+	QString url("http://custusx.org");
+	return url;
+
+}
+
+QString DataLocations::getWebsiteUserDocumentationURL()
+{
+	QString version(CustusX_VERSION_STRING);
+	if (version.contains("dev"))
+		version = "nightly";
+	QString url = QString("%1/uploads/user_doc/%2")
+			.arg(DataLocations::getWebsiteURL())
+			.arg(version);
+	return url;
+}
+
+
 } // namespace cx

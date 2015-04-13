@@ -42,17 +42,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogger.h"
 #include "cxProfile.h"
 #include <QDir>
+#include <QTimer>
 
 namespace cx
 {
 
 HelpEngine::HelpEngine()
 {
-	QDir().mkpath(profile()->getPath()); // otherwise setupData(fails sometimes)
+	QDir().mkpath(profile()->getPath()); // otherwise setupData() fails sometimes
 	QString helpFile = profile()->getPath() + "/cx_user_doc.qhc";
 	helpEngine = new QHelpEngine(helpFile, NULL);
 
-	//		CX_LOG_CHANNEL_DEBUG("CA") << "Regdocs loaded: " << helpEngine->registeredDocumentations().join("--");
 	this->setupDataWithWarning();
 
 	QString docFile = DataLocations::getDocPath()+"/cx_user_doc.qch";
@@ -63,7 +63,7 @@ HelpEngine::HelpEngine()
 	connect(qApp, SIGNAL(focusObjectChanged(QObject*)), this, SLOT(focusObjectChanged(QObject*)));
 	connect(qApp, SIGNAL(focusChanged(QWidget*, QWidget*)), this, SLOT(focusChanged(QWidget*, QWidget*)));
 
-//	CX_LOG_CHANNEL_DEBUG("CA") << "Regdocs: " << helpEngine->registeredDocumentations().join("--");
+	QTimer::singleShot(100, this, SLOT(setInitialPage()));
 }
 
 HelpEngine::~HelpEngine()
@@ -77,6 +77,11 @@ void HelpEngine::setupDataWithWarning()
 	// had problems here before mkdir was called on the qhc path
 	if (!success)
 		CX_LOG_WARNING() << QString("Help engine setup failed with error [%1]").arg(helpEngine->error());
+}
+
+void HelpEngine::setInitialPage()
+{
+	emit keywordActivated("user_doc_overview");
 }
 
 void HelpEngine::focusChanged(QWidget * old, QWidget * now)

@@ -64,10 +64,19 @@ struct cxResource_EXPORT Desktop
 {
 	Desktop();
 	Desktop(QString layout, QByteArray mainwindowstate);
+	void addPreset(QString name, int pos, bool tabbed=true);
 
 	QString mLayoutUid;
 	QString mSecondaryLayoutUid;
 	QByteArray mMainWindowState;
+
+	struct Preset
+	{
+		QString name; // name of widget without postfix (i.e. Workflow instead of WorkflowToolbar)
+		int position; // corresponding to values in Qt::DockWidgetArea and Qt::ToolBarArea
+		bool tabbed;
+	};
+	std::vector<Preset> mPresets; // used on top of the MainWindowState: gives programmatic control over positioning
 };
 
 /**

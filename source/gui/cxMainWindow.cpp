@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVLCRecorder.h"
 #include "cxCameraControl.h"
 
-#include "cxDockWidgets.h"
+#include "cxDynamicMainWindowWidgets.h"
 #include "cxStatusBar.h"
 #include "cxImportDataDialog.h"
 #include "cxExportDataDialog.h"
@@ -86,8 +86,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
-	mFullScreenAction(NULL), mStandard3DViewActions(new QActionGroup(this)), mControlPanel(NULL), mDockWidgets(new DockWidgets(this))
+MainWindow::MainWindow() :
+	mFullScreenAction(NULL), mStandard3DViewActions(new QActionGroup(this)), mControlPanel(NULL), mDockWidgets(new DynamicMainWindowWidgets(this))
 {
 	this->setObjectName("MainWindow");
 
@@ -130,13 +130,8 @@ MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
 	this->addAsDockWidget(new PluginFrameworkWidget(this), "Browsing");
 	this->addAsDockWidget(new AllFiltersWidget(VisServices::create(logicManager()->getPluginContext()), this), "Algorithms");
 
-
 	connect(patientService().get(), &PatientModelService::patientChanged, this, &MainWindow::patientChangedSlot);
 	connect(qApp, &QApplication::focusChanged, this, &MainWindow::focusChanged);
-
-	// insert all widgets from all guiExtenders
-	for (unsigned i = 0; i < guiExtenders.size(); ++i)
-		this->addGUIExtender(guiExtenders[i].get());
 
 	this->setupGUIExtenders();
 
@@ -174,73 +169,36 @@ void MainWindow::changeEvent(QEvent * event)
 void MainWindow::setupGUIExtenders()
 {
 	mServiceListener.reset(new ServiceTrackerListener<GUIExtenderService>(
-								 LogicManager::getInstance()->getPluginContext(),
-							   boost::bind(&MainWindow::onPluginBaseAdded, this, _1),
-							   boost::bind(&MainWindow::onPluginBaseModified, this, _1),
-								 boost::bind(&MainWindow::onPluginBaseRemoved, this, _1)
+							   LogicManager::getInstance()->getPluginContext(),
+							   boost::bind(&MainWindow::onGUIExtenderServiceAdded, this, _1),
+							   boost::bind(&MainWindow::onGUIExtenderServiceModified, this, _1),
+							   boost::bind(&MainWindow::onGUIExtenderServiceRemoved, this, _1)
 							   ));
 	mServiceListener->open();
 }
 
-void MainWindow::addGUIExtender(GUIExtenderService* service)
+void MainWindow::onGUIExtenderServiceAdded(GUIExtenderService* service)
 {
 	std::vector<GUIExtenderService::CategorizedWidget> widgets = service->createWidgets();
 	for (unsigned j = 0; j < widgets.size(); ++j)
 	{
-		QWidget* widget = this->addCategorizedWidget(widgets[j]);
-		mWidgetsByPlugin[service].push_back(widget);
+		mDockWidgets->addAsDockWidget(widgets[j].mWidget, widgets[j].mCategory, service);
 	}
 
 	std::vector<QToolBar*> toolBars = service->createToolBars();
 	for(unsigned j = 0; j < toolBars.size(); ++j)
 	{
-		addToolBar(toolBars[j]);
-		this->registerToolBar(toolBars[j], "Toolbar");
+		mDockWidgets->registerToolBar(toolBars[j]);
 	}
 }
 
-QWidget *MainWindow::addCategorizedWidget(GUIExtenderService::CategorizedWidget categorizedWidget)
-{
-	QWidget* retval;
-	retval = this->addAsDockWidget(categorizedWidget.mWidget, categorizedWidget.mCategory);
-	return retval;
-}
-
-void MainWindow::removeGUIExtender(GUIExtenderService* service)
-{
-	while (!mWidgetsByPlugin[service].empty())
-	{
-		// TODO: must remove widget from several difference data structures: simplify!
-		QWidget* widget = mWidgetsByPlugin[service].back();
-		mWidgetsByPlugin[service].pop_back();
-
-		QDockWidget* dockWidget = dynamic_cast<QDockWidget*>(widget);
-		this->removeDockWidget(dockWidget);
-
-		mDockWidgets->erase(dockWidget);
-
-		if (dockWidget)
-		{
-			for (std::map<QString, QActionGroup*>::iterator iter=mWidgetGroupsMap.begin(); iter!=mWidgetGroupsMap.end(); ++iter)
-			{
-				iter->second->removeAction(dockWidget->toggleViewAction());
-			}
-		}
-	}
-}
-
-void MainWindow::onPluginBaseAdded(GUIExtenderService* service)
-{
-	this->addGUIExtender(service);
-}
-
-void MainWindow::onPluginBaseModified(GUIExtenderService* service)
+void MainWindow::onGUIExtenderServiceModified(GUIExtenderService* service)
 {
 }
 
-void MainWindow::onPluginBaseRemoved(GUIExtenderService* service)
+void MainWindow::onGUIExtenderServiceRemoved(GUIExtenderService* service)
 {
-	this->removeGUIExtender(service);
+	mDockWidgets->owningServiceRemoved(service);
 }
 
 void MainWindow::dockWidgetVisibilityChanged(bool val)
@@ -271,26 +229,6 @@ void MainWindow::focusInsideDockWidget(QObject *dockWidget)
 	QTimer::singleShot(0, sa->widget(), SLOT(setFocus())); // avoid loops etc by send async event.
 }
 
-
-void MainWindow::addToWidgetGroupMap(QAction* action, QString groupname)
-{
-	action->setMenuRole(QAction::NoRole);
-	if (mWidgetGroupsMap.find(groupname) != mWidgetGroupsMap.end())
-	{
-		mWidgetGroupsMap[groupname]->addAction(action);
-	}
-	else
-	{
-		QActionGroup* group = new QActionGroup(this);
-		group->setExclusive(false);
-		mWidgetGroupsMap[groupname] = group;
-		QAction* heading = new QAction(groupname, this);
-		heading->setDisabled(true);
-		mWidgetGroupsMap[groupname]->addAction(heading);
-		mWidgetGroupsMap[groupname]->addAction(action);
-	}
-}
-
 MainWindow::~MainWindow()
 {
 	reporter()->setAudioSource(AudioPtr()); // important! QSound::play fires a thread, causes segfault during shutdown
@@ -299,15 +237,7 @@ MainWindow::~MainWindow()
 
 QMenu* MainWindow::createPopupMenu()
 {
-	QMenu* popupMenu = new QMenu(this);
-	std::map<QString, QActionGroup*>::iterator it = mWidgetGroupsMap.begin();
-	for (; it != mWidgetGroupsMap.end(); ++it)
-	{
-		popupMenu->addSeparator();
-		popupMenu->addActions(it->second->actions());
-	}
-
-	return popupMenu;
+	return mDockWidgets->createPopupMenu();
 }
 
 void MainWindow::createActions()
@@ -332,8 +262,13 @@ void MainWindow::createActions()
 	mClearPatientAction = new QAction(tr("&Clear Patient"), this);
 	mExportPatientAction = new QAction(tr("&Export Patient"), this);
 
-	mGotoDocumentationAction = new QAction(tr("Web Documentation"), this);
+	mGotoDocumentationAction = new QAction(QIcon(":/icons/open_icon_library/applications-internet.png"),
+												  "Web Documentation", this);
 	connect(mGotoDocumentationAction, &QAction::triggered, this, &MainWindow::onGotoDocumentation);
+
+	mShowContextSensitiveHelpAction = new QAction(QIcon(":/icons/open_icon_library/help-contents-5.png"),
+												  "Context-sensitive help", this);
+	connect(mShowContextSensitiveHelpAction, &QAction::triggered, this, &MainWindow::onShowContextSentitiveHelp);
 
 	connect(mNewPatientAction, &QAction::triggered, this, &MainWindow::newPatientSlot);
 	connect(mLoadFileAction, &QAction::triggered, this, &MainWindow::loadPatientFileSlot);
@@ -653,10 +588,15 @@ QString MainWindow::getExistingSessionFolder()
 
 void MainWindow::onGotoDocumentation()
 {
-	QString url("http://custusx.org/index.php/downloads");
-
+	QString url = DataLocations::getWebsiteUserDocumentationURL();
 	QDesktopServices::openUrl(QUrl(url, QUrl::TolerantMode));
 }
+
+void MainWindow::onShowContextSentitiveHelp()
+{
+	mDockWidgets->showWidget("Help");
+}
+
 
 void MainWindow::clearPatientSlot()
 {
@@ -709,29 +649,26 @@ void MainWindow::onWorkflowStateChangedSlot()
 {
 	Desktop desktop = stateService()->getActiveDesktop();
 
-	this->mDockWidgets->hideAll();
-//	for (std::set<QToolBar*>::iterator i=mToolbars.begin(); i!=mToolbars.end(); ++i)
-//		(*i)->hide();
-//	for (std::set<QToolBar*>::iterator i=mToolbars.begin(); i!=mToolbars.end(); ++i)
-//		this->removeToolBar(*i);
-//	for (std::set<QToolBar*>::iterator i=mToolbars.begin(); i!=mToolbars.end(); ++i)
-//		this->addToolBar(*i);
-
+	mDockWidgets->restoreFrom(desktop);
 	viewService()->setActiveLayout(desktop.mLayoutUid, 0);
 	viewService()->setActiveLayout(desktop.mSecondaryLayoutUid, 1);
-	this->restoreState(desktop.mMainWindowState);
 	patientService()->autoSave();
 
-#ifdef CX_APPLE
-	// HACK
-	// Toolbars are not correctly refreshed on mac 10.8,
-	// Cause is related to QVTKWidget (removing it removes the problem)
-	// The following "force refresh by resize" solves repaint, but
-	// inactive toolbars are still partly clickable.
-	QSize size = this->size();
-	this->resize(size.width()-1, size.height());
-	this->resize(size);
-#endif
+	// moved to help plugin:
+//	// set initial focus to mainwindow in order to view it in the documentation
+//	// this is most important when starting up.
+//	QTimer::singleShot(0, this, SLOT(setFocus())); // avoid loops etc by send async event.
+
+//#ifdef CX_APPLE
+//	// HACK
+//	// Toolbars are not correctly refreshed on mac 10.8,
+//	// Cause is related to QVTKWidget (removing it removes the problem)
+//	// The following "force refresh by resize" solves repaint, but
+//	// inactive toolbars are still partly clickable.
+//	QSize size = this->size();
+//	this->resize(size.width()-1, size.height());
+//	this->resize(size);
+//#endif
 }
 
 void MainWindow::saveDesktopSlot()
@@ -888,90 +825,67 @@ void MainWindow::createMenus()
 	mHelpMenuAction = this->menuBar()->addMenu(mHelpMenu);
 	mHelpMenu->addAction(mAboutAction);
 	mHelpMenu->addAction(mGotoDocumentationAction);
+	mHelpMenu->addAction(mShowContextSensitiveHelpAction);
 }
 
 void MainWindow::createToolBars()
 {
-	mDataToolBar = addToolBar("Data");
-	mDataToolBar->setObjectName("DataToolBar");
+	mWorkflowToolBar = this->registerToolBar("Workflow");
+	QList<QAction*> actions = stateService()->getWorkflowActions()->actions();
+	for (int i=0; i<actions.size(); ++i)
+		mWorkflowToolBar->addAction(actions[i]);
+
+	mDataToolBar = this->registerToolBar("Data");
 	mDataToolBar->addAction(mNewPatientAction);
 	mDataToolBar->addAction(mLoadFileAction);
 	mDataToolBar->addAction(mSaveFileAction);
 	mDataToolBar->addAction(mImportDataAction);
-	this->registerToolBar(mDataToolBar, "Toolbar");
 
-	mToolToolBar = addToolBar("Tools");
-	mToolToolBar->setObjectName("ToolToolBar");
+	mToolToolBar = this->registerToolBar("Tools");
 	mToolToolBar->addAction(mTrackingToolsAction);
 	mToolToolBar->addAction(mStartStreamingAction);
-	this->registerToolBar(mToolToolBar, "Toolbar");
 
-	mNavigationToolBar = addToolBar("Navigation");
-	mNavigationToolBar->setObjectName("NavigationToolBar");
+	mNavigationToolBar = this->registerToolBar("Navigation");
 	mNavigationToolBar->addAction(mCenterToImageCenterAction);
 	mNavigationToolBar->addAction(mCenterToTooltipAction);
 	mNavigationToolBar->addAction(mShowPointPickerAction);
-	this->registerToolBar(mNavigationToolBar, "Toolbar");
 
-	mInteractorStyleToolBar = addToolBar("InteractorStyle");
-	mInteractorStyleToolBar->setObjectName("InteractorStyleToolBar");
-
+	mInteractorStyleToolBar = this->registerToolBar("InteractorStyle");
 	mInteractorStyleToolBar->addActions(mInteractorStyleActionGroup->actions());
-	this->registerToolBar(mInteractorStyleToolBar, "Toolbar");
 
-	mWorkflowToolBar = addToolBar("Workflow");
-	mWorkflowToolBar->setObjectName("WorkflowToolBar");
-
-	QList<QAction*> actions = stateService()->getWorkflowActions()->actions();
-	for (int i=0; i<actions.size(); ++i)
-	{
-		mWorkflowToolBar->addAction(actions[i]);
-	}
-
-	this->registerToolBar(mWorkflowToolBar, "Toolbar");
-
-	mDesktopToolBar = addToolBar("Desktop");
-	mDesktopToolBar->setObjectName("DesktopToolBar");
+	mDesktopToolBar = this->registerToolBar("Desktop");
 	mDesktopToolBar->addAction(mSaveDesktopAction);
 	mDesktopToolBar->addAction(mResetDesktopAction);
-	this->registerToolBar(mDesktopToolBar, "Toolbar");
 
-	mScreenshotToolBar = addToolBar("Screenshot");
-	mScreenshotToolBar->setObjectName("ScreenshotToolBar");
+	mScreenshotToolBar = this->registerToolBar("Screenshot");
 	mScreenshotToolBar->addAction(mShootScreenAction);
-	this->registerToolBar(mScreenshotToolBar, "Toolbar");
 
-	QToolBar* camera3DViewToolBar = addToolBar("Camera 3D Views");
-	camera3DViewToolBar->setObjectName("Camera3DViewToolBar");
+	QToolBar* camera3DViewToolBar = this->registerToolBar("Camera 3D Views");
 	camera3DViewToolBar->addActions(mStandard3DViewActions->actions());
-	this->registerToolBar(camera3DViewToolBar, "Toolbar");
 
-	QToolBar* samplerWidgetToolBar = addToolBar("Sampler");
-	samplerWidgetToolBar->setObjectName("SamplerToolBar");
+	QToolBar* samplerWidgetToolBar = this->registerToolBar("Sampler");
 	samplerWidgetToolBar->addWidget(new SamplerWidget(this));
-	this->registerToolBar(samplerWidgetToolBar, "Toolbar");
 
-	QToolBar* toolOffsetToolBar = addToolBar("Tool Offset");
-	toolOffsetToolBar->setObjectName("ToolOffsetToolBar");
+	QToolBar* toolOffsetToolBar = this->registerToolBar("Tool Offset");
 	toolOffsetToolBar->addWidget(createDataWidget(mServices->visualizationService, mServices->patientModelService, this, DoublePropertyActiveToolOffset::create()));
-	this->registerToolBar(toolOffsetToolBar, "Toolbar");
+
+	QToolBar* helpToolBar = this->registerToolBar("Help");
+	helpToolBar->addAction(mShowContextSensitiveHelpAction);
 }
 
-void MainWindow::registerToolBar(QToolBar* toolbar, QString groupname)
+QToolBar* MainWindow::registerToolBar(QString name, QString groupname)
 {
-	this->addToWidgetGroupMap(toolbar->toggleViewAction(), groupname);
-	// this avoids overpopulation of gui at startup, and is the same functionality as for dockwidgets.
-	// also gives correct size of mainwindow at startup.
-	mToolbars.insert(toolbar);
-	if (!mToolbars.empty())
-		toolbar->hide();
+	QToolBar* toolbar = new QToolBar(name);
+	toolbar->setObjectName(QString(name).remove(" ")+"ToolBar");
+	mDockWidgets->registerToolBar(toolbar, groupname);
+	return toolbar;
 }
 
 void MainWindow::aboutSlot()
 {
 	QString doc_path = DataLocations::getDocPath();
 	QString appName = qApp->applicationDisplayName();
-	QString url_github("http://custusx.org");
+	QString url_website = DataLocations::getWebsiteURL();
 	QString url_license = QString("file://%1/license.txt").arg(doc_path);
 	QString url_config = QString("file://%1/cxConfigDescription.txt").arg(doc_path);
 
@@ -988,7 +902,7 @@ void MainWindow::aboutSlot()
 	QMessageBox::about(this, tr("About %1").arg(appName), text
 			.arg(appName)
 			.arg(CustusX_VERSION_STRING)
-			.arg(url_github)
+			.arg(url_website)
 			.arg(url_license)
 			.arg(url_config)
 			);
@@ -1038,11 +952,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 QDockWidget* MainWindow::addAsDockWidget(QWidget* widget, QString groupname)
 {
-	QDockWidget* dockWidget = mDockWidgets->addAsDockWidget(widget, groupname);
-	this->addToWidgetGroupMap(dockWidget->toggleViewAction(), groupname);
-	QMainWindow::addDockWidget(Qt::LeftDockWidgetArea, dockWidget);
-	this->restoreDockWidget(dockWidget); // restore if added after construction
-	return dockWidget;
+	return mDockWidgets->addAsDockWidget(widget, groupname);
 }
 
 }//namespace cx

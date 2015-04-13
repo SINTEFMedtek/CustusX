@@ -47,6 +47,16 @@ Desktop::Desktop(QString layout, QByteArray mainwindowstate) :
 {
 }
 
+void Desktop::addPreset(QString name, int pos, bool tabbed)
+{
+	Preset item;
+	item.name = name;
+	item.position = pos;
+	item.tabbed = tabbed;
+	mPresets.push_back(item);
+}
+
+
 StateServicePtr StateService::getNullObject()
 {
 	static StateServicePtr mNull;
