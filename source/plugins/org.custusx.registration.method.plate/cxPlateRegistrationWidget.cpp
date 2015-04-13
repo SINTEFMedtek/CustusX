@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 PlateRegistrationWidget::PlateRegistrationWidget(RegServices services, QWidget* parent) :
-	RegistrationBaseWidget(services, parent, "LoadPlateRegistrationWidget", "Plate Registration"),
+	RegistrationBaseWidget(services, parent, "org_custusx_registration_method_plate_reference_landmarks", "Plate Registration Reference landmarks"),
 	mPlateRegistrationButton(new QPushButton("Load registration points", this)),
 	mReferenceToolInfoLabel(new QLabel("", this))
 {

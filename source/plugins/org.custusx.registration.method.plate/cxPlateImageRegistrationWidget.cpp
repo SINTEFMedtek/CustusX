@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx {
 
 PlateImageRegistrationWidget::PlateImageRegistrationWidget(RegServices services, QWidget* parent) :
-	FastImageRegistrationWidget(services, parent, "PlateImageRegistrationWidget", "Plate Image Registration")
+	FastImageRegistrationWidget(services, parent, "org_custusx_registration_method_plate_image_landmarks", "Plate Registration Image landmarks")
 {
 	this->setToolTip("Registration using a custom plate object");
 }
