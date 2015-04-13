@@ -61,7 +61,7 @@ cx_add_class_qt_moc(cxGui_SRCS
     #----------------------
     utilities/cxAudioImpl
     utilities/cxToolImagePreviewWidget
-	utilities/cxDockWidgets
+	utilities/cxDynamicMainWindowWidgets
 	#----------------------
     pluginFrameworkWidgets/cxPluginBrowser
     pluginFrameworkWidgets/cxPluginTableModel

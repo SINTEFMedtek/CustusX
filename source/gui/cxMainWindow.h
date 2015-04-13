@@ -54,7 +54,7 @@ namespace cx
 class LayoutData;
 class GUIExtenderService;
 class ConsoleWidget;
-class DockWidgets;
+class DynamicMainWindowWidgets;
 
 typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
 typedef boost::shared_ptr<class LayoutInteractor> LayoutInteractorPtr;
@@ -78,7 +78,7 @@ class cxGui_EXPORT MainWindow: public QMainWindow
 	Q_OBJECT
 
 public:
-	MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders=std::vector<GUIExtenderServicePtr>());
+	MainWindow();
 	virtual ~MainWindow();
 
 	virtual QMenu* createPopupMenu();
@@ -122,6 +122,7 @@ protected slots:
 
 	// help
 	void onGotoDocumentation();
+	void onShowContextSentitiveHelp();
 
 	// navigation
 	void centerToImageCenterSlot();
@@ -140,9 +141,9 @@ protected slots:
 	void dockWidgetVisibilityChanged(bool val);
 	void focusChanged(QWidget * old, QWidget * now);
 
-    void onPluginBaseAdded(GUIExtenderService* service);
-    void onPluginBaseRemoved(GUIExtenderService* service);
-	void onPluginBaseModified(GUIExtenderService* service);
+	void onGUIExtenderServiceAdded(GUIExtenderService* service);
+	void onGUIExtenderServiceRemoved(GUIExtenderService* service);
+	void onGUIExtenderServiceModified(GUIExtenderService* service);
 
 protected:
 	void changeEvent(QEvent * event);
@@ -157,11 +158,7 @@ private:
 	void createMenus(); ///< creates and add (gui-)menues
 	void createToolBars(); ///< creates and adds toolbars for convenience
 
-	void registerToolBar(QToolBar* toolbar, QString groupname = "");
-	void addToWidgetGroupMap(QAction* action, QString groupname);
-	void addGUIExtender(GUIExtenderService* service);
-	QWidget *addCategorizedWidget(GUIExtenderService::CategorizedWidget categorizedWidget);
-	void removeGUIExtender(GUIExtenderService* service);
+	QToolBar *registerToolBar(QString name, QString groupname="Toolbars");
 	void setupGUIExtenders();
 
 	void closeEvent(QCloseEvent *event);///< Save geometry and window state at close
@@ -205,11 +202,12 @@ private:
 	QAction* mConfigureToolsAction; ///< action for configuring the toolmanager
 	QAction* mInitializeToolsAction; ///< action for initializing contact with the navigation system
 	QAction* mTrackingToolsAction; ///< action for asking the navigation system to start/stop tracking
-//	QAction* mSaveToolsPositionsAction; ///< action for saving the tool positions
 	QAction* mStartStreamingAction; ///< start streaming of the default RT source.
 	QActionGroup* mToolsActionGroup; ///< grouping the actions for contacting the navigation system
 
+	QAction* mShowContextSensitiveHelpAction;
 	QAction* mGotoDocumentationAction;
+
 	// actions for image navigation
 	QAction* mCenterToImageCenterAction;
 	QAction* mCenterToTooltipAction;
@@ -229,20 +227,16 @@ private:
 	QToolBar* mHelpToolBar; ///< toolbar for entering help mode
 	QToolBar* mScreenshotToolBar;
 
-	std::map<QString, QActionGroup*> mWidgetGroupsMap; ///< map containing groups
-
 	QString mLastImportDataFolder;
 
 	boost::shared_ptr<ServiceTrackerListener<GUIExtenderService> > mServiceListener;
-	std::map<GUIExtenderService*, std::vector<QWidget*> > mWidgetsByPlugin;
 
 	//widgets
 	QPointer<class SecondaryMainWindow> mControlPanel;
 	QPointer<class SecondaryViewLayoutWindow> mSecondaryViewLayoutWindow;
 	ProcessWrapperPtr mLocalVideoServerProcess;
 
-	DockWidgets* mDockWidgets;
-	std::set<QToolBar*> mToolbars;
+	DynamicMainWindowWidgets* mDockWidgets;
 
 	VisServicesPtr mServices;
 };

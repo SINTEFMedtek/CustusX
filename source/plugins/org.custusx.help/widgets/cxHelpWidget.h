@@ -62,6 +62,7 @@ public:
 	virtual ~HelpWidget();
 
 	HelpEnginePtr engine() { return mEngine; }
+	virtual QSize sizeHint() const;
 
 signals:
 	void requestShowLink(const QUrl&);

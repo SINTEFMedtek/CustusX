@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxHelpSearchWidget.h"
 #include "cxHelpIndexWidget.h"
 #include "cxSettings.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -99,12 +100,18 @@ void HelpWidget::setup()
 	browser->showHelpForKeyword("mainpage_overview");
 
 	bool navVis = settings()->value("org.custusx.help/navigationVisible").toBool();
-//	mTabWidget->hide();
 	mTabWidget->setVisible(navVis);
 }
 
 HelpWidget::~HelpWidget()
 {}
+
+QSize HelpWidget::sizeHint() const
+{
+	// removing this gives a very small initial size
+	return QSize(250,30);
+}
+
 
 void HelpWidget::addContentWidget(QTabWidget* tabWidget, QBoxLayout* buttonLayout)
 {

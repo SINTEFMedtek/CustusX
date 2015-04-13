@@ -52,7 +52,6 @@ HelpEngine::HelpEngine()
 	QString helpFile = profile()->getPath() + "/cx_user_doc.qhc";
 	helpEngine = new QHelpEngine(helpFile, NULL);
 
-	//		CX_LOG_CHANNEL_DEBUG("CA") << "Regdocs loaded: " << helpEngine->registeredDocumentations().join("--");
 	this->setupDataWithWarning();
 
 	QString docFile = DataLocations::getDocPath()+"/cx_user_doc.qch";
@@ -62,8 +61,6 @@ HelpEngine::HelpEngine()
 
 	connect(qApp, SIGNAL(focusObjectChanged(QObject*)), this, SLOT(focusObjectChanged(QObject*)));
 	connect(qApp, SIGNAL(focusChanged(QWidget*, QWidget*)), this, SLOT(focusChanged(QWidget*, QWidget*)));
-
-//	CX_LOG_CHANNEL_DEBUG("CA") << "Regdocs: " << helpEngine->registeredDocumentations().join("--");
 }
 
 HelpEngine::~HelpEngine()
