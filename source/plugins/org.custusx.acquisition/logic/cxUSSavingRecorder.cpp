@@ -215,15 +215,20 @@ void USSavingRecorder::saveStreamSession(USReconstructInputData reconstructData,
 void USSavingRecorder::fileMakerWriteFinished()
 {
 	std::list<QFutureWatcher<QString>*>::iterator iter;
-	for (iter=mSaveThreads.begin(); iter!=mSaveThreads.end(); ++iter)
+	for (iter=mSaveThreads.begin(); iter!=mSaveThreads.end(); )
 	{
-		if (!(*iter)->isFinished())
-			continue;
-		QString result = (*iter)->future().result();
-		delete *iter;
-		iter = mSaveThreads.erase(iter);
+		if ((*iter)->isFinished())
+		{
+			QString result = (*iter)->future().result();
+			delete *iter;
+			iter = mSaveThreads.erase(iter);
 
-		emit saveDataCompleted(result);
+			emit saveDataCompleted(result);
+		}
+		else
+		{
+			++iter;
+		}
 	}
 }
 
