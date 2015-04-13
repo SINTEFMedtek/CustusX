@@ -96,7 +96,7 @@ void DynamicMainWindowWidgets::restoreFrom(const Desktop& desktop)
 
 void DynamicMainWindowWidgets::restorePreset(const Desktop::Preset& preset)
 {
-	QToolBar* tb = mMainWindow->findChild<QToolBar*>(preset.name+"ToolBar");
+	QToolBar* tb = mMainWindow->findChild<QToolBar*>(preset.name);
 	if (tb)
 	{
 		mMainWindow->removeToolBar(tb);

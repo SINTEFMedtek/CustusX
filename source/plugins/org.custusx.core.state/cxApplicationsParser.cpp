@@ -168,7 +168,7 @@ void ApplicationsParser::addToolbarsToDesktop(Desktop& desktop, QStringList tool
 {
 	for (int i=0; i<toolbars.size(); ++i)
 	{
-		desktop.addPreset(toolbars[i], Qt::TopToolBarArea);
+		desktop.addPreset(toolbars[i]+"ToolBar", Qt::TopToolBarArea);
 	}
 }
 
