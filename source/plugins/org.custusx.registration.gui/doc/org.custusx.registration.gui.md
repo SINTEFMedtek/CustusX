@@ -1,11 +1,16 @@
-Registration Methods {#org_custusx_registration_gui}
+Registration Plugin: GUI {#org_custusx_registration_gui}
 ===========================================================
 
 \addindex org_custusx_registration_gui_widget
-Registration Method types {#org_custusx_registration_gui_overview}
+Overview {#org_custusx_registration_gui_overview}
 ===========================================================
 
-There is three different kind of registration methods:
+A collection and grouping of all registration methods
+
+Registration Method Types
+===========================================================
+
+There is three different types of registration methods:
 
 ## Image To Patient
 Methods for registering a physical patient to image data
