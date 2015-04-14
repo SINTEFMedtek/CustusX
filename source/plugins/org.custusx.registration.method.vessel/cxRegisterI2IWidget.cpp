@@ -45,7 +45,7 @@ namespace cx
 
 
 RegisterI2IWidget::RegisterI2IWidget(RegServices services, QWidget* parent) :
-		RegistrationBaseWidget(services, parent, "RegisterI2IWidget", "Register Image2Image"),
+		RegistrationBaseWidget(services, parent, "org_custusx_registration_method_vessel_register_widget", "Register Image2Image"),
 		mSeansVesselRegsitrationWidget(new SeansVesselRegistrationWidget(services, this))
 {
   QVBoxLayout* topLayout = new QVBoxLayout(this);

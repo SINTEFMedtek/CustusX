@@ -56,7 +56,7 @@ public:
 	virtual ~RegistrationMethodLandmarkImageToImageService() {}
 	virtual QString getRegistrationType() {return QString("ImageToImage");}
 	virtual QString getRegistrationMethod() {return QString("Landmark");}
-	virtual QString getWidgetName() {return QString("LandmarkImage2ImageRegistrationWidget");}
+	virtual QString getWidgetName() {return QString("org_custusx_registration_method_landmark_image_to_image_widget");}
 	virtual QWidget* createWidget();
 };
 
@@ -77,7 +77,7 @@ public:
 	virtual ~RegistrationMethodLandmarkImageToPatientService() {}
 	virtual QString getRegistrationType() {return QString("ImageToPatient");}
 	virtual QString getRegistrationMethod() {return QString("Landmark");}
-	virtual QString getWidgetName() {return QString("LandmarkImage2PatientRegistrationWidget");}
+	virtual QString getWidgetName() {return QString("org_custusx_registration_method_landmark_image_to_patient_widget");}
 	virtual QWidget* createWidget();
 };
 
@@ -98,7 +98,7 @@ public:
 	virtual ~RegistrationMethodFastLandmarkImageToPatientService() {}
 	virtual QString getRegistrationType() {return QString("ImageToPatient");}
 	virtual QString getRegistrationMethod() {return QString("Fast");}
-	virtual QString getWidgetName() {return QString("FastLandmarkImage2PatientRegistrationWidget");}
+	virtual QString getWidgetName() {return QString("org_custusx_registration_method_fast_landmark_image_to_patient_widget");}
 	virtual QWidget* createWidget();
 };
 

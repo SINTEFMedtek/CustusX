@@ -1,13 +1,14 @@
 Registration Method Plugin: Vessel {#org_custusx_registration_method_vessel}
 ===================
 
-Overview {#org_custusx_registration_method_vessel_overview}
+\addindex org_custusx_registration_method_vessel_widget
+Vessel Registration {#org_custusx_registration_method_vessel_widget}
 ========================
 
 This registration method performs a rigid body image to image registration between two vessel structures.
 
-\addindex prepare_vessels_widget
-Prepare Vessels Widget {#org_custusx_registration_method_vessel_widget_prepare}
+\addindex org_custusx_registration_method_vessel_prepare_widget
+Prepare Vessels {#org_custusx_registration_method_vessel_prepare_widget}
 ===========================================================
 
 Segmentation and centerline extraction for the i2i registration.
@@ -18,19 +19,13 @@ When finished, set the result as moving or fixed data in the registration tab.
 > The centerline extraction can take a long time.
 
 
-\addindex register_i2i_widget
-Register I2I Widget {#org_custusx_registration_method_vessel_widget_register_i2i}
+\addindex org_custusx_registration_method_vessel_register_widget
+\addindex org_custusx_registration_method_vessel_seans_widget
+Register {#org_custusx_registration_method_vessel_register_widget}
 ===========================================================
 
-Registration of vessel segments to eachother.
-Press the button to perform vessel based registration between image 1 and image 2s centerlines.
-
-\addindex seans_vessel_registration_widget
-Vessel Registration Widget  {#org_custusx_registration_method_vessel_widget_seans}
------------------------------------------------------------
+Registration of vessel segments to each other.
 
 Select two datasets you want to registere to eachother, adjust the input parameters.
-
-Adjust the parameters and click the register button.
-
+Press the register button to perform vessel based registration between fixed and moving images centerlines.
 

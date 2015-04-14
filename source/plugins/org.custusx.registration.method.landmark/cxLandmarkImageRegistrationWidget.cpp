@@ -81,8 +81,8 @@ LandmarkImageRegistrationWidget::LandmarkImageRegistrationWidget(RegServices ser
 	mAddLandmarkButton->setDisabled(true);
 	connect(mAddLandmarkButton, SIGNAL(clicked()), this, SLOT(addLandmarkButtonClickedSlot()));
 
-	mEditLandmarkButton = new QPushButton("Sample", this);
-	mEditLandmarkButton->setToolTip("Resample landmark");
+	mEditLandmarkButton = new QPushButton("Resample", this);
+	mEditLandmarkButton->setToolTip("Resample existing landmark");
 	mEditLandmarkButton->setDisabled(true);
 	connect(mEditLandmarkButton, SIGNAL(clicked()), this, SLOT(editLandmarkButtonClickedSlot()));
 
@@ -105,16 +105,6 @@ LandmarkImageRegistrationWidget::LandmarkImageRegistrationWidget(RegServices ser
 
 LandmarkImageRegistrationWidget::~LandmarkImageRegistrationWidget()
 {
-}
-
-QString LandmarkImageRegistrationWidget::defaultWhatsThis() const
-{
-	return "<html>"
-		"<h3>Landmark based image registration.</h3>"
-		"<p>Sample landmarks in the data set. </p>"
-		"<p><i>Click the volume and either add or resample landmarks.</i></p>"
-		"<p>Landmark image registration will move the active image to the fixed image</p>"
-		"</html>";
 }
 
 void LandmarkImageRegistrationWidget::onCurrentImageChanged()
@@ -236,11 +226,13 @@ void LandmarkImageRegistrationWidget::showEvent(QShowEvent* event)
 	}
 
 	mServices.visualizationService->getGroup(0)->setRegistrationMode(rsIMAGE_REGISTRATED);
+
 	LandmarkRepPtr rep;
 	if(mServices.visualizationService->get3DView(0, 0))
 		rep = mServices.visualizationService->get3DReps(0, 0)->findFirst<LandmarkRep>();
 	if (rep)
 	{
+		LandmarkRepPtr rep = reps3D->findFirst<LandmarkRep>();
 		rep->setPrimarySource(mImageLandmarkSource);
 		rep->setSecondarySource(LandmarksSourcePtr());
 	}

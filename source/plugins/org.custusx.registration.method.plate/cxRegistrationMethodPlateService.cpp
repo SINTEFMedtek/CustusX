@@ -40,7 +40,7 @@ namespace cx
 
 QWidget *RegistrationMethodPlateImageToPatientService::createWidget()
 {
-	TabbedWidget* topWidget = new TabbedWidget(NULL, "org_custusx_registration_method_plate_overview", "Plate");
+	TabbedWidget* topWidget = new TabbedWidget(NULL, this->getWidgetName(), "Plate");
 	topWidget->setToolTip("Plate Registration");
 
 	PlateImageRegistrationWidget* imageLandmarks = new PlateImageRegistrationWidget(mServices, topWidget);

@@ -108,16 +108,6 @@ LandmarkPatientRegistrationWidget::~LandmarkPatientRegistrationWidget()
 {
 }
 
-QString LandmarkPatientRegistrationWidget::defaultWhatsThis() const
-{
-	return "<html>"
-		"<h3>Landmark based patient registration.</h3>"
-		"<p>Sample points on the patient that corresponds to 3 or more landmarks already sampled in the data set. </p>"
-		"<p><i>Point on the patient using a tool and click the Sample button.</i></p>"
-		"<p>Landmark patient registration will move the patient into the global coordinate system (r).</p>"
-		"</html>";
-}
-
 void LandmarkPatientRegistrationWidget::globalConfigurationFileChangedSlot(QString key)
 {
 	if (key == "giveManualToolPhysicalProperties")

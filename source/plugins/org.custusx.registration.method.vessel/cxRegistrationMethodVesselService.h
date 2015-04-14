@@ -56,7 +56,7 @@ public:
 	virtual ~RegistrationMethodVesselImageToImageService() {}
 	virtual QString getRegistrationType() {return QString("ImageToImage");}
 	virtual QString getRegistrationMethod() {return QString("Vessel");}
-	virtual QString getWidgetName() {return QString("VesselImage2ImageRegistrationWidget");}
+	virtual QString getWidgetName() {return QString("org_custusx_registration_method_vessel_widget");}
 	virtual QWidget* createWidget();
 };
 

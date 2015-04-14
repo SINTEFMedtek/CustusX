@@ -33,20 +33,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationMethodVesselService.h"
 #include "cxRegisterI2IWidget.h"
 #include "cxPrepareVesselsWidget.h"
-#include "cxImage2ImageRegistrationWidget.h"
+#include "cxTabbedWidget.h"
 
 namespace cx
 {
 
 QWidget *RegistrationMethodVesselImageToImageService::createWidget()
 {	
-	Image2ImageRegistrationWidget* image2imageWidget = new Image2ImageRegistrationWidget(NULL, "Image2ImageRegistrationWidget", "Image 2 Image Registration");
-	PrepareVesselsWidget* prepareRegistrationWidget = new PrepareVesselsWidget(mServices, image2imageWidget);
+	TabbedWidget* topWidget = new TabbedWidget(NULL, this->getWidgetName(), "Image 2 Image Registration");
 
-	image2imageWidget->addTab(prepareRegistrationWidget, "Prepare"); //should be application specific
-	image2imageWidget->addTab(new RegisterI2IWidget(mServices, image2imageWidget),"Register");
+	RegisterI2IWidget* registerWidget = new RegisterI2IWidget(mServices, topWidget);
+	PrepareVesselsWidget* prepareRegistrationWidget = new PrepareVesselsWidget(mServices, topWidget);
 
-	return image2imageWidget;
+	topWidget->addTab(prepareRegistrationWidget, "Prepare"); //should be application specific
+	topWidget->addTab(registerWidget, "Register");
+
+	return topWidget;
 }
 
 } /* namespace cx */

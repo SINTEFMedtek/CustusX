@@ -54,7 +54,7 @@ namespace cx
 {
 //------------------------------------------------------------------------------
 PrepareVesselsWidget::PrepareVesselsWidget(RegServices services, QWidget* parent) :
-		RegistrationBaseWidget(services, parent, "PrepareVesselsWidget", "PrepareVesselsWidget")
+		RegistrationBaseWidget(services, parent, "org_custusx_registration_method_vessel_prepare_widget", "PrepareVesselsWidget")
 {  
 	VisServicesPtr vs(new VisServices(services));
 	this->setToolTip("Prepare data for vessel I2I registration");
