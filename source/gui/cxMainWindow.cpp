@@ -241,6 +241,7 @@ void MainWindow::focusInsideDockWidget(QObject *dockWidget)
 
 MainWindow::~MainWindow()
 {
+	viewService()->deactivateLayout();
 	reporter()->setAudioSource(AudioPtr()); // important! QSound::play fires a thread, causes segfault during shutdown
 	mServiceListener.reset();
 }
@@ -285,7 +286,7 @@ void MainWindow::createActions()
 
 	connect(mAboutAction, &QAction::triggered, this, &MainWindow::aboutSlot);
 	connect(mPreferencesAction, &QAction::triggered, this, &MainWindow::preferencesSlot);
-	connect(mQuitAction, &QAction::triggered, this, &MainWindow::quitSlot);
+	connect(mQuitAction, &QAction::triggered, qApp, &QApplication::quit);
 
 	mSaveDesktopAction = new QAction(QIcon(":/icons/workflow_state_save.png"), tr("Save desktop"), this);
 	mSaveDesktopAction->setToolTip("Save desktop for workflow step");
@@ -364,6 +365,11 @@ void MainWindow::saveDesktopSlot()
 	desktop.mLayoutUid = viewService()->getActiveLayout(0);
 	desktop.mSecondaryLayoutUid = viewService()->getActiveLayout(1);
 	stateService()->saveDesktop(desktop);
+
+	// save to settings file in addition
+	settings()->setValue("mainWindow/geometry", saveGeometry());
+	settings()->setValue("mainWindow/windowState", saveState());
+	settings()->sync();
 }
 
 void MainWindow::resetDesktopSlot()
@@ -567,25 +573,10 @@ void MainWindow::preferencesSlot()
 	prefDialog.exec();
 }
 
-void MainWindow::quitSlot()
-{
-	report("Shutting down CustusX");
-	viewService()->deactivateLayout();
-
-	patientService()->autoSave();
-
-	settings()->setValue("mainWindow/geometry", saveGeometry());
-	settings()->setValue("mainWindow/windowState", saveState());
-	settings()->sync();
-	report("Closing: Save geometry and window state");
-
-	qApp->quit();
-}
-
 void MainWindow::closeEvent(QCloseEvent *event)
 {
 	QMainWindow::closeEvent(event);
-	this->quitSlot();
+	qApp->quit();
 }
 
 QDockWidget* MainWindow::addAsDockWidget(QWidget* widget, QString groupname)
