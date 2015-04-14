@@ -29,11 +29,9 @@ markers face the same way as the patients nose. Click the Define Orientation but
 Image Landmark(s) {#org_custusx_registration_method_fast_landmark_image_to_patient_image_landmarks}
 -----------------------------------------------------------
 
-Select landmarks in the data set that you want to use for performing fast registration.
-The landmarks are used for the translation part of the registration.
-Click in the dataset and push the add or resample button.
+Sample at least one landmark in the data set (Either add a new or resample an existing landmark).
 
-*Only one landmark is required for fast registration.*
+The landmark(s) are used for the translation part of the registration.
 
 
 \addindex org_custusx_registration_method_fast_landmark_image_to_patient_patient_landmarks_widget

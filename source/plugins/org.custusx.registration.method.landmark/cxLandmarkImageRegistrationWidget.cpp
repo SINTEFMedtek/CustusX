@@ -81,8 +81,8 @@ LandmarkImageRegistrationWidget::LandmarkImageRegistrationWidget(RegServices ser
 	mAddLandmarkButton->setDisabled(true);
 	connect(mAddLandmarkButton, SIGNAL(clicked()), this, SLOT(addLandmarkButtonClickedSlot()));
 
-	mEditLandmarkButton = new QPushButton("Sample", this);
-	mEditLandmarkButton->setToolTip("Resample landmark");
+	mEditLandmarkButton = new QPushButton("Resample", this);
+	mEditLandmarkButton->setToolTip("Resample existing landmark");
 	mEditLandmarkButton->setDisabled(true);
 	connect(mEditLandmarkButton, SIGNAL(clicked()), this, SLOT(editLandmarkButtonClickedSlot()));
 

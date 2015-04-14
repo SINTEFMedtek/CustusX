@@ -14,7 +14,8 @@ Image landmarks {#org_custusx_registration_method_plate_image_landmarks}
 Image registration.
 Select landmarks in the data set that you want to use for performing plate registration.
 
-*Click in the dataset and push the add or resample button.*
+*Click the dataset and either add new or resample existing landmarks.*
+
 
 \addindex org_custusx_registration_method_plate_reference_landmarks
 Reference landmarks {#org_custusx_registration_method_plate_reference_landmarks}

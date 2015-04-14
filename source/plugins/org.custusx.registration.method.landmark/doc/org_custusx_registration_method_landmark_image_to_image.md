@@ -12,9 +12,9 @@ Landmark image registration will move the moving image to the fixed image.
 Image Landmarks {#org_custusx_registration_method_landmark_image_to_image_landmarks}
 -----------------------------------------------------------
 
-Sample landmarks in both data sets.
+Sample at least 3 landmarks in both data sets.
 
-Click the volume and either add or resample landmarks.
+Click the volume and either add new or resample existing landmarks.
 
 
 \addindex org_custusx_registration_method_landmark_image_to_image_register_widget
