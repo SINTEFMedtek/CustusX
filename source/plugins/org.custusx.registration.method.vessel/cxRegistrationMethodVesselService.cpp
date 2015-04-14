@@ -40,7 +40,7 @@ namespace cx
 
 QWidget *RegistrationMethodVesselImageToImageService::createWidget()
 {	
-	Image2ImageRegistrationWidget* image2imageWidget = new Image2ImageRegistrationWidget(NULL, "Image2ImageRegistrationWidget", "Image 2 Image Registration");
+	Image2ImageRegistrationWidget* image2imageWidget = new Image2ImageRegistrationWidget(NULL, "org_custusx_registration_method_vessel_i2i_register_widget", "Image 2 Image Registration");
 	PrepareVesselsWidget* prepareRegistrationWidget = new PrepareVesselsWidget(mServices, image2imageWidget);
 
 	image2imageWidget->addTab(prepareRegistrationWidget, "Prepare"); //should be application specific
