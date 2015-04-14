@@ -56,7 +56,7 @@ public:
 	virtual ~RegistrationMethodBronchoscopyImageToPatientService() {}
 	virtual QString getRegistrationType() {return QString("ImageToPatient");}
 	virtual QString getRegistrationMethod() {return QString("Bronchoscopy");}
-	virtual QString getWidgetName() {return QString("BronchoscopyImage2PatientRegistrationWidget");}
+	virtual QString getWidgetName() {return QString("org_custusx_registration_method_bronchoscopy_widget");}
 	virtual QWidget* createWidget();
 };
 
