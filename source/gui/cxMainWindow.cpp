@@ -209,6 +209,13 @@ void MainWindow::focusChanged(QWidget * old, QWidget * now)
 
 void MainWindow::focusInsideDockWidget(QObject *dockWidget)
 {
+	if (!dockWidget)
+		return;
+
+//	CX_LOG_CHANNEL_DEBUG("HELP_DB") << QString("    try mw::focus [%1](%2)")
+//									   .arg(dockWidget->objectName())
+//									   .arg(dockWidget->metaObject()->className());
+
 	// focusing to docked widgets is required by the help system
 
 	// Assume structure: QDockWidget->QScrollArea->QWidget,
@@ -221,6 +228,14 @@ void MainWindow::focusInsideDockWidget(QObject *dockWidget)
 	QScrollArea* sa = dynamic_cast<QScrollArea*>(dw->widget());
 	if (!sa)
 		return;
+
+	if (!sa->widget())
+		return;
+
+//	CX_LOG_CHANNEL_DEBUG("HELP_DB") << QString("    do mw::focus [%1](%2)")
+//									   .arg(sa->widget()->objectName())
+//									   .arg(sa->widget()->metaObject()->className());
+
 	QTimer::singleShot(0, sa->widget(), SLOT(setFocus())); // avoid loops etc by send async event.
 }
 
@@ -575,7 +590,9 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 QDockWidget* MainWindow::addAsDockWidget(QWidget* widget, QString groupname)
 {
-	return mDockWidgets->addAsDockWidget(widget, groupname);
+	QDockWidget* dw = mDockWidgets->addAsDockWidget(widget, groupname);
+	return dw;
+
 }
 
 }//namespace cx

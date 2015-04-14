@@ -47,7 +47,7 @@ TabbedWidget::TabbedWidget(QWidget* parent, QString objectName, QString windowTi
 //	mTabWidget->setFocusPolicy(Qt::StrongFocus);
 	mLayout = new QVBoxLayout(this);
 	mLayout->addWidget(mTabWidget);
-	mLayout->setMargin(2); // lots of tabbed widgets in layers use up the desktop. Must reduce.
+	mLayout->setMargin(0); // lots of tabbed widgets in layers use up the desktop. Must reduce.
 
 	connect(mTabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(const int &)));
 }

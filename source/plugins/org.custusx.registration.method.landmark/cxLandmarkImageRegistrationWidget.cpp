@@ -236,7 +236,9 @@ void LandmarkImageRegistrationWidget::showEvent(QShowEvent* event)
 	}
 
 	mServices.visualizationService->getGroup(0)->setRegistrationMode(rsIMAGE_REGISTRATED);
-	LandmarkRepPtr rep = mServices.visualizationService->get3DReps(0, 0)->findFirst<LandmarkRep>();
+	LandmarkRepPtr rep;
+	if(mServices.visualizationService->get3DView(0, 0))
+		rep = mServices.visualizationService->get3DReps(0, 0)->findFirst<LandmarkRep>();
 	if (rep)
 	{
 		rep->setPrimarySource(mImageLandmarkSource);

@@ -38,6 +38,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderWindow.h"
 #include "cxBoundingBox3D.h"
 #include "cxViewLinkingViewWidget.h"
+#include "cxTypeConversions.h"
+#include "cxGLHelpers.h"
+
 
 namespace cx
 {
@@ -87,6 +90,9 @@ void ViewWidget::render()
 	{
 		this->getRenderWindow()->Render();
 		mMTimeHash = hash;
+
+		QString msg("During rendering of view: " + this->getView()->getName());
+		report_gl_error_text(cstring_cast(msg));
 	}
 }
 

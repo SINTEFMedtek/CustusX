@@ -132,12 +132,10 @@ void ViewCollectionWidgetMixed::setModified()
 void ViewCollectionWidgetMixed::render()
 {
 	mBaseLayout->render();
-	report_gl_error_text(cstring_cast(QString("During rendering of base view")));
 
 	for (unsigned i=0; i<mOverlays.size(); ++i)
 	{
 		mOverlays[i]->render();
-		report_gl_error_text(cstring_cast(QString("During rendering of: ") + mOverlays[i]->getView()->getName()));
 	}
 }
 

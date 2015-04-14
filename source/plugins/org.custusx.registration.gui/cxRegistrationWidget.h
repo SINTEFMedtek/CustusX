@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXREGISTRATIONWIDGET_H_
 #define CXREGISTRATIONWIDGET_H_
 
-#include <QTabWidget>
+#include "cxTabbedWidget.h"
 #include "cxServiceTrackerListener.h"
 #include "cxRegistrationMethodService.h"
 #include "cxForwardDeclarations.h"
@@ -46,6 +46,37 @@ namespace cx
 {
 typedef boost::shared_ptr<class StringPropertyBase> StringPropertyBasePtr;
 
+
+/**
+ * Widget for one registration type (image2patient, image2image, ...).
+ * Option to select one specific algorithm.
+ *
+ * \ingroup org_custusx_registration_gui
+ *
+ * \date Sep 08 2014
+ * \author Ole Vegard Solberg, SINTEF
+ * \author Geir Arne Tangen, SINTEF
+ */
+class RegistrationTypeWidget : public BaseWidget
+{
+	Q_OBJECT
+public:
+	RegistrationTypeWidget(QString type, QString defVal, XmlOptionFile options, QWidget* parent = 0);
+	virtual ~RegistrationTypeWidget() {}
+
+	void addMethod(RegistrationMethodService* service);
+	void removeMethod(RegistrationMethodService *service);
+
+private slots:
+	void onIndexChanged();
+private:
+	void removeWidgetFromStackedWidget(QString widgetName);
+
+	QStackedWidget *mStackedWidget;
+	XmlOptionFile mOptions;
+	StringPropertyPtr mMethodSelector;
+};
+
 /**
  * Widget for use in the Registration GUI plugin
  *
@@ -55,37 +86,29 @@ typedef boost::shared_ptr<class StringPropertyBase> StringPropertyBasePtr;
  * \author Ole Vegard Solberg, SINTEF
  * \author Geir Arne Tangen, SINTEF
  */
-class RegistrationWidget : public QTabWidget
+class RegistrationWidget : public TabbedWidget
 {
 	Q_OBJECT
 public:
 	RegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent = 0);
-	virtual ~RegistrationWidget();
+	virtual ~RegistrationWidget() {}
 
 private slots:
 	void onCurrentChanged(int index);
 private:
 	void initRegistrationTypesWidgets();
 	void initServiceListener();
-	QString defaultWhatsThis() const;
 
 	void onServiceAdded(RegistrationMethodService *service);
 	void onServiceRemoved(RegistrationMethodService *service);
-	bool knownType(QString registrationType);
-	void removeWidgetFromStackedWidget(QString widgetName, QStackedWidget *stackedWidget);
-	void indexChanged(QString registrationType);
-	void selectStackWidget(StringPropertyPtr comboBox, QStackedWidget *stackedWidget);
 
 	ctkPluginContext* mPluginContext;
-	QVBoxLayout*  mVerticalLayout;
 	boost::shared_ptr<ServiceTrackerListener<RegistrationMethodService> > mServiceListener;
 
 	StringPropertyPtr mTypeSelector;
-	std::map<QString, StringPropertyPtr> mMethodsSelectorMap;
-	std::map<QString, QStackedWidget*> mRegistrationTypeMap;
+	std::map<QString, RegistrationTypeWidget*> mRegistrationTypeMap;
 	QStringList mRegistrationTypes;
 	XmlOptionFile mOptions;
-
 };
 
 } /* namespace cx */

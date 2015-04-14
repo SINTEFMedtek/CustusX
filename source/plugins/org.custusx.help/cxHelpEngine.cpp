@@ -44,6 +44,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDir>
 #include <QTimer>
 
+//#define DEBUG_HELP_SYSTEM // turn on to output help system focus information
+
 namespace cx
 {
 
@@ -94,11 +96,15 @@ void HelpEngine::focusObjectChanged(QObject* newFocus)
 {
 	if (!newFocus)
 		return;
-//	std::cout << "HelpEngine::focusObjectChanged " << newFocus->objectName() << " -- " << dynamic_cast<QWidget*>(newFocus)->windowTitle() << std::endl;
+#ifdef DEBUG_HELP_SYSTEM
+	CX_LOG_CHANNEL_INFO("HELP_DB") << QString("**Focus on [%1]: %2").arg(newFocus->objectName()).arg(dynamic_cast<QWidget*>(newFocus)->windowTitle());
+#endif
 	QString keyword = this->findBestMatchingKeyword(newFocus);
 	if (!keyword.isEmpty())
 	{
-//		std::cout << "******** keyword: " << keyword << std::endl;
+#ifdef DEBUG_HELP_SYSTEM
+		CX_LOG_CHANNEL_INFO("HELP_DB") << QString("    Found keyword [%1]").arg(keyword);
+#endif
 		emit keywordActivated(keyword);
 	}
 }
@@ -154,8 +160,11 @@ QString HelpEngine::findBestMatchingKeyword(QObject* object)
 	while (object)
 	{
 		QString id = this->convertToKeyword(object->objectName());
-//		std::cout << "    examining " << object->objectName() << ", keyword = " << id << std::endl;
-
+#ifdef DEBUG_HELP_SYSTEM
+		CX_LOG_CHANNEL_DEBUG("HELP_DB") << QString("    examining [%1](%2)")
+										   .arg(id)
+										   .arg(object->metaObject()->className());
+#endif
 		if (id.contains("help_widget"))
 			return "";
 

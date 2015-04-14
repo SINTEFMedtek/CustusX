@@ -42,6 +42,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //#define GL_TRACE(string) if (vtkgl::StringMarkerGREMEDY) {vtkgl::StringMarkerGREMEDY(0, QString("%1:%2 - %3").arg(__func__).arg(__LINE__).arg(string).toUtf8().constData());}
 
+/** check for GL errors.
+ *
+ * NOTE: Only call this function when a valid context exist
+ * (i.e vtkRenderWindow::GetNeverRendered() == false)
+ */
 #define report_gl_error() really_report_gl_errors(__FILE__, __LINE__, 0)
 #define report_gl_error_text(text) really_report_gl_errors(__FILE__, __LINE__, text)
 
