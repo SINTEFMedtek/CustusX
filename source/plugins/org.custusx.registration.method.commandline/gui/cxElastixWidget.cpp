@@ -53,7 +53,7 @@ namespace cx
 {
 
 ElastixWidget::ElastixWidget(RegServices services, QWidget* parent) :
-	RegistrationBaseWidget(services, parent, "ElastiXWidget", "ElastiX Registration")
+	RegistrationBaseWidget(services, parent, "org_custusx_registration_method_commandline_elastix_widget", "ElastiX Registration")
 {
 	this->setModified();
 }
@@ -73,7 +73,6 @@ void ElastixWidget::createUI()
 
 	mRegisterButton = new QPushButton("Register");
 	connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
-	mRegisterButton->setToolTip(this->defaultWhatsThis());
 
 	QVBoxLayout* topLayout = new QVBoxLayout(this);
 	topLayout->setMargin(0);
@@ -179,21 +178,6 @@ QWidget* ElastixWidget::createOptionsWidget()
 
 ElastixWidget::~ElastixWidget()
 {}
-
-QString ElastixWidget::defaultWhatsThis() const
-{
-  return "<html>"
-      "<h3>ElastiX Registration.</h3>"
-      "<p>Select two datasets you want to register to each other, "
-      "and a preset suitable for your images.</p>"
-	  "<p><a http://elastix.isi.uu.nl/> ElastiX </a> is normally used for the registration "
-	  "as an external application, although any program with the same input/output "
-	  "can be used. Add parameter files to the folder config/elastix in order to show "
-	  "them to CustusX.</p>"
-      "<p>If a nonlinear registration is selected, CustusX will attempt to import the "
-      "volume produced by ElastiX.</p>"
-      "</html>";
-}
 
 void ElastixWidget::savePresetSlot()
 {
