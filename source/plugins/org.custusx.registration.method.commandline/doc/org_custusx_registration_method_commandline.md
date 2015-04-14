@@ -1,8 +1,8 @@
-Registration Method Plugin: Commandline {#org_custusx_registration_method_commandline}
+Registration Method Plugin: Commandline {#org_custusx_registration_method_commandline_top}
 ===================
 
 \addindex org_custusx_registration_method_commandline_elastix_widget
-Overview {#org_custusx_registration_method_commandline_overview}
+Command Line Registration {#org_custusx_registration_method_commandline}
 ========================
 
 Select two datasets you want to register to each other, and a preset suitable for your images.
