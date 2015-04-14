@@ -1,8 +1,8 @@
 Registration Method Plugin: Plate {#org_custusx_registration_method_plate}
 ===========================================================
 
-\addindex org_custusx_registration_method_plate_overview
-Image to plate registration {#org_custusx_registration_method_plate_overview}
+\addindex org_custusx_registration_method_plate_widget
+Image to plate registration {#org_custusx_registration_method_plate_widget}
 ===========================================================
 
 This is a method used to registrate one image to a specific aurora tool (a plastic plate with CT markers).

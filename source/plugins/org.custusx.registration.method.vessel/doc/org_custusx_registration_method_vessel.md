@@ -19,7 +19,6 @@ When finished, set the result as moving or fixed data in the registration tab.
 > The centerline extraction can take a long time.
 
 
-\addindex org_custusx_registration_method_vessel_i2i_register_widget
 \addindex org_custusx_registration_method_vessel_register_widget
 \addindex org_custusx_registration_method_vessel_seans_widget
 Register {#org_custusx_registration_method_vessel_register_widget}

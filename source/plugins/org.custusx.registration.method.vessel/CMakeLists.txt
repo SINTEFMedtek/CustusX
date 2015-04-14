@@ -10,8 +10,6 @@ set(PLUGIN_SRCS
     cxSeansVesselRegistrationWidget.cpp
     cxRegisterI2IWidget.cpp
     cxPrepareVesselsWidget.cpp
-    cxImage2ImageRegistrationWidget.h
-    cxImage2ImageRegistrationWidget.cpp
 )
 
 # Files which should be processed by Qts moc
