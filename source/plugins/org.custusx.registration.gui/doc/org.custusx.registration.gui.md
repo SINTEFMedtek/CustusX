@@ -7,7 +7,7 @@ Overview {#org_custusx_registration_gui_overview}
 
 A collection and grouping of all registration methods
 
-Registration Method Types
+Registration Method Types {#org_custusx_registration_gui_registration_method_types}
 ===========================================================
 
 There is three different types of registration methods:
