@@ -162,8 +162,10 @@ SlicedImageProxy::~SlicedImageProxy()
 void SlicedImageProxy::setOutputFormat(Vector3D origin, Eigen::Array3i dim, Vector3D spacing)
 {
 	mReslicer->SetOutputOrigin(origin.data());
-//	mReslicer->SetOutputExtent(0, dim[0], 0, dim[1], 0, 0);
-	mReslicer->SetOutputExtent(0, dim[0]-1, 0, dim[1]-1, 0, 0);
+	mReslicer->SetOutputExtent(0, dim[0], 0, dim[1], 0, 0);
+	// this looks like the correct way, but gives incorrect output (the way it is used)
+	// TODO investigate
+//	mReslicer->SetOutputExtent(0, dim[0]-1, 0, dim[1]-1, 0, 0);
 	mReslicer->SetOutputSpacing(spacing.data());
 }
 
