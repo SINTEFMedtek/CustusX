@@ -232,13 +232,21 @@ DataPtr DataManagerImpl::loadData(const QString& uid, const QString& path)
 
 	QString type = DataReaderWriter().findDataTypeFromFile(path);
 	DataPtr data = mDataFactory->create(type, uid);
-	bool loaded = data->load(path);
 
-	if (!data || !loaded)
+	if (!data)
 	{
-		reportError("Error with data file: " + path);
+		reportError("Failed to find loaded for: [" + path + "]");
 		return DataPtr();
 	}
+
+	bool loaded = data->load(path);
+
+	if (!loaded)
+	{
+		reportError("Failed to load file: [" + path + "]");
+		return DataPtr();
+	}
+
 	this->loadData(data);
 	return data;
 }
