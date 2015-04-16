@@ -56,7 +56,7 @@ namespace cx
 {
 
 SeansVesselRegistrationWidget::SeansVesselRegistrationWidget(RegServices services, QWidget* parent) :
-	RegistrationBaseWidget(services, parent, "SeansVesselRegistrationWidget", "Seans Vessel Registration"),
+	RegistrationBaseWidget(services, parent, "org_custusx_registration_method_vessel_seans_widget", "Seans Vessel Registration"),
 	mLTSRatioSpinBox(new QSpinBox()), mLinearCheckBox(new QCheckBox()), mAutoLTSCheckBox(new QCheckBox()),
 	mRegisterButton(new QPushButton("Register"))
 {

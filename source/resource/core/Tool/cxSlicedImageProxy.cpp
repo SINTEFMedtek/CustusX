@@ -163,6 +163,9 @@ void SlicedImageProxy::setOutputFormat(Vector3D origin, Eigen::Array3i dim, Vect
 {
 	mReslicer->SetOutputOrigin(origin.data());
 	mReslicer->SetOutputExtent(0, dim[0], 0, dim[1], 0, 0);
+	// this looks like the correct way, but gives incorrect output (the way it is used)
+	// TODO investigate
+//	mReslicer->SetOutputExtent(0, dim[0]-1, 0, dim[1]-1, 0, 0);
 	mReslicer->SetOutputSpacing(spacing.data());
 }
 
@@ -189,12 +192,7 @@ void SlicedImageProxy::transferFunctionsChangedSlot()
 
 void SlicedImageProxy::updateRedirecterSlot()
 {
-	// if input is 2D - use directly
-	if (mImage->getBaseVtkImageData()->GetDimensions()[2]==1)
-		mRedirecter->SetInputData(mImage->getBaseVtkImageData());
-	else
-		mRedirecter->SetInputConnection(mReslicer->GetOutputPort());
-
+	mRedirecter->SetInputConnection(mReslicer->GetOutputPort());
 	update();
 }
 

@@ -209,6 +209,13 @@ void MainWindow::focusChanged(QWidget * old, QWidget * now)
 
 void MainWindow::focusInsideDockWidget(QObject *dockWidget)
 {
+	if (!dockWidget)
+		return;
+
+//	CX_LOG_CHANNEL_DEBUG("HELP_DB") << QString("    try mw::focus [%1](%2)")
+//									   .arg(dockWidget->objectName())
+//									   .arg(dockWidget->metaObject()->className());
+
 	// focusing to docked widgets is required by the help system
 
 	// Assume structure: QDockWidget->QScrollArea->QWidget,
@@ -221,11 +228,20 @@ void MainWindow::focusInsideDockWidget(QObject *dockWidget)
 	QScrollArea* sa = dynamic_cast<QScrollArea*>(dw->widget());
 	if (!sa)
 		return;
+
+	if (!sa->widget())
+		return;
+
+//	CX_LOG_CHANNEL_DEBUG("HELP_DB") << QString("    do mw::focus [%1](%2)")
+//									   .arg(sa->widget()->objectName())
+//									   .arg(sa->widget()->metaObject()->className());
+
 	QTimer::singleShot(0, sa->widget(), SLOT(setFocus())); // avoid loops etc by send async event.
 }
 
 MainWindow::~MainWindow()
 {
+	viewService()->deactivateLayout();
 	reporter()->setAudioSource(AudioPtr()); // important! QSound::play fires a thread, causes segfault during shutdown
 	mServiceListener.reset();
 }
@@ -270,7 +286,7 @@ void MainWindow::createActions()
 
 	connect(mAboutAction, &QAction::triggered, this, &MainWindow::aboutSlot);
 	connect(mPreferencesAction, &QAction::triggered, this, &MainWindow::preferencesSlot);
-	connect(mQuitAction, &QAction::triggered, this, &MainWindow::quitSlot);
+	connect(mQuitAction, &QAction::triggered, qApp, &QApplication::quit);
 
 	mSaveDesktopAction = new QAction(QIcon(":/icons/workflow_state_save.png"), tr("Save desktop"), this);
 	mSaveDesktopAction->setToolTip("Save desktop for workflow step");
@@ -349,6 +365,11 @@ void MainWindow::saveDesktopSlot()
 	desktop.mLayoutUid = viewService()->getActiveLayout(0);
 	desktop.mSecondaryLayoutUid = viewService()->getActiveLayout(1);
 	stateService()->saveDesktop(desktop);
+
+	// save to settings file in addition
+	settings()->setValue("mainWindow/geometry", saveGeometry());
+	settings()->setValue("mainWindow/windowState", saveState());
+	settings()->sync();
 }
 
 void MainWindow::resetDesktopSlot()
@@ -552,30 +573,17 @@ void MainWindow::preferencesSlot()
 	prefDialog.exec();
 }
 
-void MainWindow::quitSlot()
-{
-	report("Shutting down CustusX");
-	viewService()->deactivateLayout();
-
-	patientService()->autoSave();
-
-	settings()->setValue("mainWindow/geometry", saveGeometry());
-	settings()->setValue("mainWindow/windowState", saveState());
-	settings()->sync();
-	report("Closing: Save geometry and window state");
-
-	qApp->quit();
-}
-
 void MainWindow::closeEvent(QCloseEvent *event)
 {
 	QMainWindow::closeEvent(event);
-	this->quitSlot();
+	qApp->quit();
 }
 
 QDockWidget* MainWindow::addAsDockWidget(QWidget* widget, QString groupname)
 {
-	return mDockWidgets->addAsDockWidget(widget, groupname);
+	QDockWidget* dw = mDockWidgets->addAsDockWidget(widget, groupname);
+	return dw;
+
 }
 
 }//namespace cx

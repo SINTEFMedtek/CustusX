@@ -91,6 +91,7 @@ void DicomWidget::createUI()
 	mBrowser->addActionToToolbar(mViewHeaderAction);
 	mBrowser->addActionToToolbar(mImportIntoCustusXAction);
 
+	mVerticalLayout->setMargin(0);
 	mVerticalLayout->addWidget(mBrowser);
 
 	this->setupDatabaseDirectory();
@@ -114,7 +115,7 @@ void DicomWidget::setupDatabaseDirectory()
 		}
 	}
 
-	CX_LOG_CHANNEL_INFO("dicom") << "databaseDirectory: " << databaseDirectory;
+//	CX_LOG_CHANNEL_INFO("dicom") << "databaseDirectory: " << databaseDirectory;
 //	std::cout << "databaseDirectory: " << databaseDirectory << std::endl;
 	mBrowser->setDatabaseDirectory(databaseDirectory);
 }

@@ -135,7 +135,12 @@ TEST_CASE("org.custusx.help: HelpWidget displays Console Widget help on focus", 
 
 	cx::ConsoleWidget* consoleWidget = fixture.mw->findChild<cx::ConsoleWidget*>();
 	REQUIRE(consoleWidget!=NULL);
-	QMetaObject::invokeMethod(consoleWidget, "setFocus", Qt::QueuedConnection);
+
+	// this test is a bit fragile:
+	//  - the help system sets an initial page aftr 100ms.
+	//  - this test focuses after 200ms
+	//  - qapp runs for 300ms
+	QTimer::singleShot(200, consoleWidget, SLOT(setFocus()));
 
 	fixture.runApp();
 

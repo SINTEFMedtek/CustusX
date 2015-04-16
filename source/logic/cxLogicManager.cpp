@@ -119,7 +119,7 @@ void LogicManager::shutdown()
 
 void LogicManager::initializeServices()
 {
-	CX_LOG_DEBUG() << " --- Begin initialize services";
+	CX_LOG_INFO() << " --- Initialize services for " << qApp->applicationName() << "...";
 	// resources layer
 	ProfileManager::initialize();
 	Reporter::initialize();
@@ -144,7 +144,7 @@ void LogicManager::initializeServices()
 
 	if (mComponent)
 		mComponent->create();
-	CX_LOG_DEBUG() << " --- End initialize services";
+	CX_LOG_DEBUG() << " --- End initialize services.";
 }
 
 void LogicManager::setApplicationComponent(ApplicationComponentPtr component)
@@ -176,7 +176,10 @@ void LogicManager::onRestartWithNewProfile(QString uid)
 
 void LogicManager::shutdownServices()
 {
-	CX_LOG_DEBUG() << " --- Begin shutdown services";
+	CX_LOG_INFO() << " --- Shutting down " << qApp->applicationName() << "...";
+
+	this->getPatientModelService()->autoSave();
+
 	if (mComponent)
 		mComponent->destroy(); // this is the GUI - delete first
 
@@ -195,6 +198,7 @@ void LogicManager::shutdownServices()
 	GPUImageBufferRepository::shutdown();
 	Reporter::shutdown();
 	ProfileManager::shutdown();
+
 	CX_LOG_DEBUG() << " --- End shutdown services";
 }
 

@@ -52,30 +52,97 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-RegistrationWidget::RegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent) :
-	mPluginContext(pluginContext),
-	QTabWidget(parent),
-	mVerticalLayout(new QVBoxLayout(this)),
-	mOptions(profile()->getXmlSettings().descend("RegistrationWidget"))
+RegistrationTypeWidget::RegistrationTypeWidget(QString type, QString defVal, XmlOptionFile options, QWidget* parent) :
+	BaseWidget(parent, type, type),
+	mOptions(options)
 {
-	this->setObjectName("org_custusx_registration_gui_overview");
-	this->setWindowTitle("Registration");
-	this->setWhatsThis(this->defaultWhatsThis());
+	mStackedWidget = new QStackedWidget(this);
+	mStackedWidget->setFocusPolicy(Qt::StrongFocus);
 
-	connect(this, &QTabWidget::currentChanged, this, &RegistrationWidget::onCurrentChanged);
-	this->initRegistrationTypesWidgets();
-	this->initServiceListener();
+	QVBoxLayout *layoutV = new QVBoxLayout(this);
+//		layoutV->setMargin(0);
+
+	mMethodSelector = StringProperty::initialize(type,
+												 "Method",
+												 "Select registration method",
+												 defVal,
+												 QStringList(),
+												 mOptions.getElement());
+	connect(mMethodSelector.get(), &StringProperty::valueWasSet, this, &RegistrationTypeWidget::onIndexChanged);
+
+	layoutV->addWidget(new LabeledComboBoxWidget(this, mMethodSelector));
+	layoutV->addWidget(mStackedWidget);
 }
 
-RegistrationWidget::~RegistrationWidget()
+void RegistrationTypeWidget::onIndexChanged()
 {
+	QString method = mMethodSelector->getValue();
+	int pos = mMethodSelector->getValueRange().indexOf(method);
+	mStackedWidget->setCurrentIndex(pos);
+	this->setObjectName(mStackedWidget->currentWidget()->objectName());
+}
+
+void RegistrationTypeWidget::addMethod(RegistrationMethodService* service)
+{
+	mStackedWidget->addWidget(service->createWidget());
+	QStringList values = mMethodSelector->getValueRange();
+	values << service->getRegistrationMethod();
+	mMethodSelector->setValueRange(values);
+
+	// initialize if not set
+	if (mMethodSelector->getValue().isEmpty())
+	{
+		mMethodSelector->setValue(service->getRegistrationMethod());
+	}
+
+	if (mMethodSelector->getValue() == service->getRegistrationMethod())
+		this->onIndexChanged();
+}
+
+void RegistrationTypeWidget::removeMethod(RegistrationMethodService *service)
+{
+	this->removeWidgetFromStackedWidget(service->getWidgetName());
+
+	QStringList values = mMethodSelector->getValueRange();
+	if (!values.removeOne(service->getRegistrationMethod()))
+		reportWarning("RegistrationWidget::onServiceRemoved: Cannot find and remove service from combobox: "+ service->getRegistrationMethod());
+	mMethodSelector->setValueRange(values);
+}
+
+void RegistrationTypeWidget::removeWidgetFromStackedWidget(QString widgetName)
+{
+	for(int i = 0; i < mStackedWidget->count(); ++i)
+	{
+		QWidget* widget = mStackedWidget->widget(i);
+		if(widget->objectName() == widgetName)
+		{
+			mStackedWidget->removeWidget(widget);
+			delete widget;
+		}
+	}
+}
+
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+
+RegistrationWidget::RegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent) :
+	TabbedWidget(parent, "org_custusx_registration_gui_widget", "Registration"),
+	mPluginContext(pluginContext),
+	mOptions(profile()->getXmlSettings().descend("RegistrationWidget"))
+{
+	connect(mTabWidget, &QTabWidget::currentChanged, this, &RegistrationWidget::onCurrentChanged);
+	this->initRegistrationTypesWidgets();
+	this->initServiceListener();
 }
 
 void RegistrationWidget::initRegistrationTypesWidgets()
 {
 	mRegistrationTypes << "ImageToPatient" << "ImageToImage" << "ImageTransform";
-	QStringList registrationTypeDefaults;
-	registrationTypeDefaults << "Landmark" << "Landmark" << "";
+	QStringList typeDefaults;
+	typeDefaults << "Landmark" << "Landmark" << "";
 
 	mTypeSelector = StringProperty::initialize("RegistrationTypes",
 													 "Registration Types",
@@ -87,31 +154,17 @@ void RegistrationWidget::initRegistrationTypesWidgets()
 
 	for(int i = 0; i < mRegistrationTypes.count(); ++i)
 	{
-		QWidget *widget = new QWidget(this);
-		QStackedWidget *registrationTypeWidget = new QStackedWidget(widget);
-		mRegistrationTypeMap[mRegistrationTypes[i]] = registrationTypeWidget;
+		QString type = mRegistrationTypes[i];
+		RegistrationTypeWidget* widget =
+				new RegistrationTypeWidget(type,
+									   typeDefaults[i],
+									   mOptions, this);
 
-		QVBoxLayout *layoutV = new QVBoxLayout(widget);
-//		layoutV->setMargin(0);
+		mRegistrationTypeMap[type] = widget;
+		this->addTab(widget, type);
 
-		StringPropertyPtr methodSelector = StringProperty::initialize(mRegistrationTypes[i],
-																				  "Method",
-																				  "Select registration method",
-																				  registrationTypeDefaults[i],
-																				  QStringList(),
-																				  mOptions.getElement());
-		mMethodsSelectorMap[mRegistrationTypes[i]] = methodSelector;
-		boost::function<void()> f = boost::bind(&RegistrationWidget::indexChanged, this, mRegistrationTypes[i]);
-		connect(methodSelector.get(), &StringProperty::valueWasSet, f);
-
-		layoutV->addWidget(new LabeledComboBoxWidget(this, methodSelector));
-		layoutV->addWidget(registrationTypeWidget);
-
-		mVerticalLayout->addWidget(widget);
-		this->addTab(widget, mRegistrationTypes[i]);
-
-		if (mTypeSelector->getValue() == mRegistrationTypes[i])
-			this->setCurrentIndex(i);
+		if (mTypeSelector->getValue() == type)
+			mTabWidget->setCurrentIndex(i);
 	}
 
 	this->blockSignals(false);
@@ -122,20 +175,6 @@ void RegistrationWidget::onCurrentChanged(int index)
 	if (index<0)
 		return;
 	mTypeSelector->setValue(mRegistrationTypes[index]);
-}
-
-void RegistrationWidget::indexChanged(QString registrationType)
-{
-	StringPropertyPtr methodSelector = mMethodsSelectorMap[registrationType];
-	QStackedWidget *stackedWidget = mRegistrationTypeMap[registrationType];
-	this->selectStackWidget(methodSelector, stackedWidget);
-}
-
-void RegistrationWidget::selectStackWidget(StringPropertyPtr methodSelector, QStackedWidget *stackedWidget)
-{
-	QString method = methodSelector->getValue();
-	int pos = methodSelector->getValueRange().indexOf(method);
-	stackedWidget->setCurrentIndex(pos);
 }
 
 void RegistrationWidget::initServiceListener()
@@ -151,68 +190,19 @@ void RegistrationWidget::initServiceListener()
 
 void RegistrationWidget::onServiceAdded(RegistrationMethodService* service)
 {
-	if(!this->knownType(service->getRegistrationType()))
+	QString type = service->getRegistrationType();
+	if(!mRegistrationTypeMap.count(type))
+	{
+		reportError("Unknown registrationType : " + type);
 		return;
-
-	StringPropertyPtr methodSelector = mMethodsSelectorMap[service->getRegistrationType()];
-	QStackedWidget *stackedWidget = mRegistrationTypeMap[service->getRegistrationType()];
-
-	stackedWidget->addWidget(service->createWidget());
-	QStringList values = methodSelector->getValueRange();
-	values << service->getRegistrationMethod();
-	methodSelector->setValueRange(values);
-
-	// initialize if not set
-	if (methodSelector->getValue().isEmpty())
-	{
-		methodSelector->setValue(service->getRegistrationMethod());
 	}
-
-	if (methodSelector->getValue() == service->getRegistrationMethod())
-		this->selectStackWidget(methodSelector, stackedWidget);
-}
-
-bool RegistrationWidget::knownType(QString registrationType)
-{
-	if(!mRegistrationTypes.contains(registrationType))
-	{
-		reportError("Unknown registrationType : " + registrationType);
-		return false;
-	}
-	return true;
+	mRegistrationTypeMap[type]->addMethod(service);
 }
 
 void RegistrationWidget::onServiceRemoved(RegistrationMethodService *service)
 {
-	QStackedWidget *stackedWidget = mRegistrationTypeMap[service->getRegistrationType()];
-	this->removeWidgetFromStackedWidget(service->getWidgetName(), stackedWidget);
-
-	StringPropertyPtr comboBox = mMethodsSelectorMap[service->getRegistrationType()];
-	QStringList values = comboBox->getValueRange();
-	if (!values.removeOne(service->getRegistrationMethod()))
-		reportWarning("RegistrationWidget::onServiceRemoved: Cannot find and remove service from combobox: "+ service->getRegistrationMethod());
-	comboBox->setValueRange(values);
-}
-
-void RegistrationWidget::removeWidgetFromStackedWidget(QString widgetName, QStackedWidget *stackedWidget)
-{
-	for(int i = 0; i < stackedWidget->count(); ++i)
-	{
-		QWidget* widget = stackedWidget->widget(i);
-		if(widget->objectName() == widgetName)
-		{
-			stackedWidget->removeWidget(widget);
-			delete widget;
-		}
-	}
-}
-
-QString RegistrationWidget::defaultWhatsThis() const
-{
-  return "<html>"
-      "<h3>Example plugin.</h3>"
-	  "<p>Collection of all registration methods</p>"
-      "</html>";
+	QString type = service->getRegistrationType();
+	mRegistrationTypeMap[type]->removeMethod(service);
 }
 
 } /* namespace cx */

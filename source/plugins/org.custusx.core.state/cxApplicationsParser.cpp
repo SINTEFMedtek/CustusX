@@ -77,6 +77,7 @@ ApplicationsParser::ApplicationsParser()
 	this->addToolbarsToDesktop(desktop, toolbars);
 	desktop.addPreset("VolumePropertiesWidget", Qt::LeftDockWidgetArea, true);
 	desktop.addPreset("SlicePropertiesWidget", Qt::LeftDockWidgetArea, true);
+	desktop.addPreset("DicomWidget", Qt::LeftDockWidgetArea, true);
 	desktop.addPreset("ConsoleWidget", Qt::LeftDockWidgetArea, false);
 	desktop.addPreset("HelpWidget", Qt::RightDockWidgetArea, false);
 	mWorkflowDefaultDesktops["PatientDataUid"] = desktop;
@@ -88,7 +89,7 @@ ApplicationsParser::ApplicationsParser()
 	toolbars <<"Workflow" << "Navigation" << "Tools" << "Screenshot" << "Desktop" << "RegistrationHistory" << "Help";
 	this->addToolbarsToDesktop(desktop, toolbars);
 	desktop.addPreset("ConsoleWidget", Qt::LeftDockWidgetArea, true);
-	desktop.addPreset("RegistrationWidget", Qt::LeftDockWidgetArea, true);
+	desktop.addPreset("org_custusx_registration_gui_widget", Qt::LeftDockWidgetArea, true);
 	desktop.addPreset("RegistrationHistoryWidget", Qt::LeftDockWidgetArea, false);
 	mWorkflowDefaultDesktops["RegistrationUid"] = desktop;
 	//-----------------------------------------------------

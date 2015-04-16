@@ -57,7 +57,6 @@ class FastPatientRegistrationWidget : public LandmarkPatientRegistrationWidget
 public:
   FastPatientRegistrationWidget(RegServices services, QWidget* parent);
   virtual ~FastPatientRegistrationWidget();
-  virtual QString defaultWhatsThis() const;
 
 private:
   virtual void performRegistration();

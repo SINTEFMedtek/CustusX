@@ -114,7 +114,6 @@ void LayoutWidgetUsingViewWidgets::render()
 	{
 		ViewWidget* current = mViews[i];
 		current->render(); // render only changed scenegraph (shaky but smooth)
-		report_gl_error_text(cstring_cast(QString("During rendering of view: ") + current->getView()->getName()));
 	}
 }
 

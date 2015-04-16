@@ -102,6 +102,7 @@ private:
 	void writeUSImages(QString path, ImageDataContainerPtr images, bool compression, std::vector<TimedPosition> pos);
 	void writeMask(QString path, QString session, vtkImageDataPtr mask);
 	void writeREADMEFile(QString reconstructionFolder, QString session);
+	bool writeTimestamps(QString filename, std::vector<TimedPosition> ts, QString type);
 
 	bool writeTransforms(QString filename, std::vector<TimedPosition> ts, QString type);
 	static bool findNewSubfolder(QString subfolderAbsolutePath);

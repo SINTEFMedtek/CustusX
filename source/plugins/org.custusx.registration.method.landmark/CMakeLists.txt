@@ -72,3 +72,10 @@ target_include_directories(org_custusx_registration_method_landmark
     .
     ${CMAKE_CURRENT_BINARY_DIR}
 )
+
+cx_doc_define_plugin_user_docs("${PROJECT_NAME}" "${CMAKE_CURRENT_SOURCE_DIR}/doc")
+cx_add_non_source_file("doc/org_custusx_registration_method_landmark.md")
+cx_add_non_source_file("doc/org_custusx_registration_method_landmark.h")
+cx_add_non_source_file("doc/org_custusx_registration_method_landmark_image_to_image.md")
+cx_add_non_source_file("doc/org_custusx_registration_method_landmark_image_to_patient.md")
+cx_add_non_source_file("doc/org_custusx_registration_method_fast_landmark_image_to_patient.md")

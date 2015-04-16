@@ -38,6 +38,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QGridLayout>
 #include "cxViewUtilities.h"
 #include "cxViewContainerItem.h"
+#include "cxTypeConversions.h"
+#include "cxGLHelpers.h"
 
 namespace cx
 {
@@ -254,6 +256,9 @@ void ViewContainer::renderAll()
 	{
 		this->doRender();
 		mMTimeHash = hash;
+
+		QString msg("During rendering of ViewContainer");
+		report_gl_error_text(cstring_cast(msg));
 	}
 }
 

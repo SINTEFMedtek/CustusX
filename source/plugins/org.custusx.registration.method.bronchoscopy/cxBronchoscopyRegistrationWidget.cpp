@@ -69,7 +69,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegServices services, QWidget* parent) :
-	RegistrationBaseWidget(services, parent, "BronchoscopyRegistrationWidget",
+	RegistrationBaseWidget(services, parent, "org_custusx_registration_method_bronchoscopy_widget",
 						   "Bronchoscopy Registration"),
 	mBronchoscopyRegistration(new BronchoscopyRegistration()),
 	mServices(services)

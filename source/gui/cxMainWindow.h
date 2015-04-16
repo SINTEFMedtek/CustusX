@@ -90,7 +90,6 @@ protected slots:
 	//application menu
 	void aboutSlot();
 	void preferencesSlot();
-	void quitSlot();
 	void toggleFullScreenSlot();
 
 	void showControlPanelActionSlot();

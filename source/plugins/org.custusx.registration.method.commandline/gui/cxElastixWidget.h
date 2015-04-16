@@ -67,7 +67,6 @@ Q_OBJECT
 public:
 	ElastixWidget(RegServices services, QWidget* parent = NULL);
 	virtual ~ElastixWidget();
-	virtual QString defaultWhatsThis() const;
 
 public slots:
 

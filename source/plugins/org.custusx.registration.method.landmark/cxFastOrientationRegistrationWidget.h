@@ -65,7 +65,6 @@ class FastOrientationRegistrationWidget : public RegistrationBaseWidget
 public:
 	FastOrientationRegistrationWidget(RegServices services, QWidget* parent);
   ~FastOrientationRegistrationWidget();
-  virtual QString defaultWhatsThis() const;
 
 protected:
   virtual void showEvent(QShowEvent* event);

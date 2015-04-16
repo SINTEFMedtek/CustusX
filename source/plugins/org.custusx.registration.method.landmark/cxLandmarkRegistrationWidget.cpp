@@ -70,15 +70,6 @@ LandmarkRegistrationWidget::~LandmarkRegistrationWidget()
 {
 }
 
-QString LandmarkRegistrationWidget::defaultWhatsThis() const
-{
-	return "<html>"
-		"<h3>Registration.</h3>"
-		"<p>Interface for registrating.</p>"
-		"<p><i></i></p>"
-		"</html>";
-}
-
 void LandmarkRegistrationWidget::cellClickedSlot(int row, int column)
 {
 	if (row < 0 || column < 0)

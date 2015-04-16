@@ -44,19 +44,32 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 /**
+ * \defgroup cx_group_registration_methods Registration Methods
+ *
+ * \details Registration methods are used to register data sets to patients or to other data sets.
+ *
+ * See also:
+ * \ref org_custusx_registration_gui_registration_method_types
+ *
+ */
+
+/**
  * \defgroup cx_group_image_to_image_registration Image To Image Registration Methods
+ * \ingroup cx_group_registration_methods
  *
  * All available Image To Image Registration Methods.
  */
 
 /**
  * \defgroup cx_group_image_to_patient_registration Image To Patient Registration Methods
+ * \ingroup cx_group_registration_methods
  *
  * All available Image To Patient Registration Methods.
  */
 
 /**
  * \defgroup cx_group_image_transform_registration Image Transform Registration Methods
+ * \ingroup cx_group_registration_methods
  *
  * All available Image Transform Registration Methods.
  */

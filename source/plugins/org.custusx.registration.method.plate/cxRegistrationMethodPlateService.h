@@ -56,7 +56,7 @@ public:
 	virtual ~RegistrationMethodPlateImageToPatientService() {}
 	virtual QString getRegistrationType() {return QString("ImageToPatient");}
 	virtual QString getRegistrationMethod() {return QString("Plate Landmark");}
-	virtual QString getWidgetName() {return QString("PlateImage2PatientRegistrationWidget");}
+	virtual QString getWidgetName() {return QString("org_custusx_registration_method_plate_widget");}
 	virtual QWidget* createWidget();
 };
 

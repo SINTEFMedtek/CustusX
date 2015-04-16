@@ -103,6 +103,7 @@ public:
   DicomImporter Importer;
 
   ctkDICOMQueryRetrieveWidget* QueryRetrieveWidget;
+  ctkDICOMQueryRetrieveWidget* getQueryRetrieveWidget();
 
   QSharedPointer<ctkDICOMDatabase> DICOMDatabase;
   QSharedPointer<ctkDICOMThumbnailGenerator> ThumbnailGenerator;
@@ -121,6 +122,7 @@ public:
 
 DICOMAppWidgetPrivate::DICOMAppWidgetPrivate(DICOMAppWidget* parent): q_ptr(parent)
 {
+	QueryRetrieveWidget = NULL;
   DICOMDatabase = QSharedPointer<ctkDICOMDatabase> (new ctkDICOMDatabase);
   ThumbnailGenerator = QSharedPointer <ctkDICOMThumbnailGenerator> (new ctkDICOMThumbnailGenerator);
   DICOMDatabase->setThumbnailGenerator(ThumbnailGenerator.data());
@@ -133,17 +135,17 @@ DICOMAppWidgetPrivate::~DICOMAppWidgetPrivate()
     {
     delete UpdateSchemaProgress;
     }
+
+  if (QueryRetrieveWidget)
+	  QueryRetrieveWidget->deleteLater();
 }
 
 void DICOMAppWidgetPrivate::setupUi(DICOMAppWidget* parent)
 {
 	Q_Q(DICOMAppWidget);
 
-	QHBoxLayout* layout = new QHBoxLayout(parent);
-	layout->setMargin(0);
-	layout->addWidget(this);
-
-	TopLayout = new QVBoxLayout(this);
+	TopLayout = new QVBoxLayout(parent);
+	TopLayout->setMargin(0);
 
 	ToolBar = new QToolBar;
 	TopLayout->addWidget(ToolBar);
@@ -289,6 +291,24 @@ std::map<ctkDICOMModel::IndexType, QStringList> DICOMAppWidgetPrivate::getSelect
 	return retval;
 }
 
+//----------------------------------------------------------------------------
+ctkDICOMQueryRetrieveWidget* DICOMAppWidgetPrivate::getQueryRetrieveWidget()
+{
+	if (!QueryRetrieveWidget)
+	{
+		Q_Q(DICOMAppWidget);
+		//Initialize Q/R widget
+		QueryRetrieveWidget = new ctkDICOMQueryRetrieveWidget();
+		QueryRetrieveWidget->setWindowModality(Qt::ApplicationModal);
+
+		connect(QueryRetrieveWidget, SIGNAL(canceled()), QueryRetrieveWidget, SLOT(hide()) );
+		connect(QueryRetrieveWidget, SIGNAL(canceled()), q, SLOT(onQueryRetrieveFinished()) );
+
+		QueryRetrieveWidget->setRetrieveDatabase(DICOMDatabase);
+	}
+
+	return QueryRetrieveWidget;
+}
 
 //----------------------------------------------------------------------------
 // DICOMAppWidget methods
@@ -322,9 +342,9 @@ DICOMAppWidget::DICOMAppWidget(QWidget* _parent):Superclass(_parent),
   //Set ToolBar button style
   d->ToolBar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 
-  //Initialize Q/R widget
-  d->QueryRetrieveWidget = new ctkDICOMQueryRetrieveWidget();
-  d->QueryRetrieveWidget->setWindowModality ( Qt::ApplicationModal );
+//  //Initialize Q/R widget
+//  d->QueryRetrieveWidget = new ctkDICOMQueryRetrieveWidget();
+//  d->QueryRetrieveWidget->setWindowModality ( Qt::ApplicationModal );
 
   connect(d->TreeView->selectionModel(),
 		  SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
@@ -338,15 +358,16 @@ DICOMAppWidget::DICOMAppWidget(QWidget* _parent):Superclass(_parent),
   //connect signal and slots
   connect(d->TreeView, SIGNAL(clicked(QModelIndex)), this, SLOT(onModelSelected(QModelIndex)));
 
-  connect(d->QueryRetrieveWidget, SIGNAL(canceled()), d->QueryRetrieveWidget, SLOT(hide()) );
-  connect(d->QueryRetrieveWidget, SIGNAL(canceled()), this, SLOT(onQueryRetrieveFinished()) );
+//  connect(d->QueryRetrieveWidget, SIGNAL(canceled()), d->QueryRetrieveWidget, SLOT(hide()) );
+//  connect(d->QueryRetrieveWidget, SIGNAL(canceled()), this, SLOT(onQueryRetrieveFinished()) );
 }
 
 //----------------------------------------------------------------------------
 DICOMAppWidget::~DICOMAppWidget()
 {
-  Q_D(DICOMAppWidget);
-  d->QueryRetrieveWidget->deleteLater();
+	Q_D(DICOMAppWidget);
+
+//  d->QueryRetrieveWidget->deleteLater();
 }
 
 //----------------------------------------------------------------------------
@@ -418,7 +439,7 @@ void DICOMAppWidget::setDatabaseDirectory(const QString& directory)
     {
     d->DICOMDatabase->openDatabase( databaseFileName );
 
-	CX_LOG_CHANNEL_INFO("dicom") << "open database " << databaseFileName.toStdString() << ", open= " << d->DICOMDatabase->isOpen();
+	CX_LOG_CHANNEL_INFO("dicom") << "Open Database " << databaseFileName.toStdString() << ", open= " << d->DICOMDatabase->isOpen();
 //	std::cout << "open database " << databaseFileName.toStdString() << ", open= " << d->DICOMDatabase->isOpen() << std::endl;
 	}
   catch (std::exception e)
@@ -437,7 +458,7 @@ void DICOMAppWidget::setDatabaseDirectory(const QString& directory)
   d->TreeView->resizeColumnToContents(0);
   d->Importer.setDatabase(d->DICOMDatabase);
 
-  d->QueryRetrieveWidget->setRetrieveDatabase(d->DICOMDatabase);
+//  d->getQueryRetrieveWidget()->setRetrieveDatabase(d->DICOMDatabase);
   d->ThumbnailsWidget->setDatabaseDirectory(directory);
   d->ThumbnailsWidget->setDatabase(d->DICOMDatabase);
   emit databaseDirectoryChanged(directory);
@@ -475,8 +496,8 @@ void DICOMAppWidget::openQueryDialog()
 {
   Q_D(DICOMAppWidget);
 
-  d->QueryRetrieveWidget->show();
-  d->QueryRetrieveWidget->raise();
+  d->getQueryRetrieveWidget()->show();
+  d->getQueryRetrieveWidget()->raise();
 
 }
 

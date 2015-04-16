@@ -69,7 +69,7 @@ RepContainerPtr VisualizationService::get3DReps(int group, int index)
 	if(view)
 		return RepContainerPtr(new RepContainer(view->getReps()));
 	else
-		return RepContainerPtr();
+		return RepContainerPtr(new RepContainer(std::vector<RepPtr>()));
 }
 
 

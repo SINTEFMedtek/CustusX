@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 FastOrientationRegistrationWidget::FastOrientationRegistrationWidget(RegServices services, QWidget* parent) :
-	RegistrationBaseWidget(services, parent, "FastOrientationRegistrationWidget", "Fast Orientation Registration"),
+	RegistrationBaseWidget(services, parent, "org_custusx_registration_method_fast_landmark_image_to_patient_orientation_widget", "Fast Orientation Registration"),
 	mSetOrientationButton(new QPushButton("Define Orientation")),
     mInvertButton(new QCheckBox("Back face"))
 {
@@ -55,7 +55,7 @@ FastOrientationRegistrationWidget::FastOrientationRegistrationWidget(RegServices
   layout->addWidget(mSetOrientationButton);
   layout->addStretch();
 
-  mSetOrientationButton->setToolTip(this->defaultWhatsThis());
+  mSetOrientationButton->setToolTip("Orient the data to the patient using a tracked tool.");
 
   connect(settings(), &Settings::valueChangedFor, this, &FastOrientationRegistrationWidget::globalConfigurationFileChangedSlot);
 
@@ -68,22 +68,6 @@ FastOrientationRegistrationWidget::FastOrientationRegistrationWidget(RegServices
 
 FastOrientationRegistrationWidget::~FastOrientationRegistrationWidget()
 {}
-
-QString FastOrientationRegistrationWidget::defaultWhatsThis() const
-{
-	return "<html>"
-			"<h3>Fast orientation registration.</h3>"
-			"<p><b>Prerequisite:</b> Correctly oriented DICOM axes.</p>"
-			"<p>Fast and approximate method for orienting the data to the patient.</p>"
-			"<p><i>"
-			"Align the Polaris tool so that the tools tip points towards the patients feet and the "
-			"markers face the same way as the patients nose. Click the Get Orientation button."
-			"</i></p>"
-			"<p>"
-			"<b>Tip:</b> If the patient is orientated with the nose down towards the table, try using <i>back face</i>."
-			"</p>"
-			"</html>";
-}
 
 void FastOrientationRegistrationWidget::globalConfigurationFileChangedSlot(QString key)
 {
