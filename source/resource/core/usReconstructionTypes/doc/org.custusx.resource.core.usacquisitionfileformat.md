@@ -10,7 +10,7 @@ US image stream along with tracking and probe information.
 The acquisition is available from \ref org_custusx_acquisition_widgets_acquisition.
 
 All files describing one acquisition lie the same folder.  The files all have
-the name format US-Acq_{index}\_{TS}{stream}.{type}",
+the name format US-Acq_{index}\_{TS}{stream}.{type},
 where
 - {index} is a running index, for convenience.
 - {TS} is a timestamp
@@ -27,8 +27,13 @@ In the following, we use {filebase} = US-Acq_{index}_{TS}{stream}.
 Frame Data {filebase}_{frame}.mhd {#us_acq_file_format_mhd_indexed}
 -----------------------------------------------------------
 
-A sequence of files in the metaheader file format containing the image data, one file
-for each frame. The frame index is given by the index {frame} in the file name.
+A sequence of files in the metaheader file format containing the image data,
+one file for each frame. The frame index is given by the index {frame} in the
+file name.
+
+The metaheader files contains orientation+position info identical to the
+positions in \ref us_acq_file_format_fp. The files can thus be imported
+directly back into CustusX and appear in the correct position.
 
 See http://www.itk.org/Wiki/MetaIO/Documentation for more.
 
@@ -66,8 +71,9 @@ lines in this file is (# tracking positions) x 3.
 Tracking Timestamps {filebase}.tts {#us_acq_file_format_tts}
 -----------------------------------------------------------
 
-This file contains the tracking timestamps. The format equals \ref us_acq_file_format_file_fts ,
-but the number of timestamps equals the number of tracking positions.
+This file contains the tracking timestamps. The format equals
+\ref us_acq_file_format_file_fts, but the number of timestamps equals the
+number of tracking positions.
 
 
 Tracking Positions {filebase}.tp {#us_acq_file_format_tp}
