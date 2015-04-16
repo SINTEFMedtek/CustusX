@@ -227,7 +227,7 @@ ImagePtr IGTLinkConversion::decode(igtl::ImageMessage::Pointer message)
 	igtl::TimeStamp::Pointer timestamp = igtl::TimeStamp::New();
 	message->GetTimeStamp(timestamp);
 
-	double timestampMS = timestamp->GetTimeStamp() * 1000;
+    double timestampMS = timestamp->GetTimeStamp() * 1000;
 	imageImport->SetDataOrigin(0, 0, 0);
 	imageImport->SetDataSpacing(spacing[0], spacing[1], spacing[2]);
 	imageImport->SetWholeExtent(0, size[0] - 1, 0, size[1] - 1, 0, size[2] - 1);

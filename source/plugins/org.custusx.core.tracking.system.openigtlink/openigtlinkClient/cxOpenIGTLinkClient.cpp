@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "igtlTransformMessage.h"
 #include "igtlImageMessage.h"
 #include "cxLogger.h"
+#include "cxTime.h"
 
 #include "cxIGTLinkConversion.h"
 
@@ -53,7 +54,7 @@ OpenIGTLinkClient::OpenIGTLinkClient(QObject *parent) :
     qRegisterMetaType<ImagePtr>("ImagePtr");
 
     mSocket = SocketPtr(new Socket(this));
-    //check affinity on socket!!!
+    //todo: check affinity on socket!!!
     connect(mSocket.get(), &Socket::connected, this, &OpenIGTLinkClient::internalConnected);
     connect(mSocket.get(), &Socket::disconnected, this, &OpenIGTLinkClient::internalDisconnected);
     connect(mSocket.get(), &Socket::readyRead, this, &OpenIGTLinkClient::internalDataAvailable);
@@ -68,7 +69,7 @@ void OpenIGTLinkClient::setIpAndPort(QString ip, int port)
 
 void OpenIGTLinkClient::requestConnect()
 {
-    CX_LOG_CHANNEL_DEBUG("janne beate ") << "trying to connect to " << mIp << ":" << mPort;
+    CX_LOG_INFO() << "Trying to connect to " << mIp << ":" << mPort;
     mSocket->requestConnectToHost(mIp, mPort);
 }
 
@@ -92,7 +93,6 @@ void OpenIGTLinkClient::internalDataAvailable()
     if(!this->socketIsConnected())
         return;
 
-    CX_LOG_CHANNEL_DEBUG("janne beate ") << "---------------------------- internalDataAvailable START";
     bool done = false;
     while(!done)
     {
@@ -112,7 +112,6 @@ void OpenIGTLinkClient::internalDataAvailable()
                 mHeaderReceived = false;
         }
     }
-    CX_LOG_CHANNEL_DEBUG("janne beate ") << "---------------------------- internalDataAvailable STOP";
 }
 
 bool OpenIGTLinkClient::socketIsConnected()
@@ -123,27 +122,21 @@ bool OpenIGTLinkClient::socketIsConnected()
 bool OpenIGTLinkClient::enoughBytesAvailableOnSocket(int bytes) const
 {
     bool retval = mSocket->minBytesAvailable(bytes);
-    //if(!retval) //this is ok
-    //    CX_LOG_CHANNEL_DEBUG("janne beate ") << "not enought bytes available";
     return retval;
 }
 
 bool OpenIGTLinkClient::receiveHeader(const igtl::MessageHeader::Pointer header) const
 {
-    CX_LOG_CHANNEL_DEBUG("janne beate ") << "*** HEADER";
-
     header->InitPack();
 
     if(!this->socketReceive(header->GetPackPointer(), header->GetPackSize()))
         return false;
 
     int c = header->Unpack(1);
-    this->checkCRC(c);
+    this->checkCRC(c); //just for debugging
     if (c & igtl::MessageHeader::UNPACK_HEADER)
     {
         std::string deviceType = std::string(header->GetDeviceType());
-        CX_LOG_CHANNEL_DEBUG("janne beate ") << "Received header of type: " << deviceType;
-
         return true;
     }
     else
@@ -152,22 +145,18 @@ bool OpenIGTLinkClient::receiveHeader(const igtl::MessageHeader::Pointer header)
 
 bool OpenIGTLinkClient::receiveBody(const igtl::MessageBase::Pointer header)
 {
-    CX_LOG_CHANNEL_DEBUG("janne beate ") << "*** BODY";
     if(strcmp(header->GetDeviceType(), "TRANSFORM") == 0)
     {
-        CX_LOG_CHANNEL_DEBUG("janne beate ") << "T";
         if(!this->receiveTransform(header))
             return false;
     }
     else if(strcmp(header->GetDeviceType(), "IMAGE") == 0)
     {
-        CX_LOG_CHANNEL_DEBUG("janne beate ") << "I";
         if(!this->receiveImage(header))
             return false;
     }
     else
     {
-        CX_LOG_CHANNEL_DEBUG("janne beate ") << "U";
         igtl::MessageBase::Pointer body = igtl::MessageBase::New();
         body->SetMessageHeader(header);
         mSocket->skip(body->GetBodySizeToRead());
@@ -181,7 +170,6 @@ bool OpenIGTLinkClient::receiveTransform(const igtl::MessageBase::Pointer header
     body->SetMessageHeader(header);
     body->AllocatePack();
 
-    CX_LOG_CHANNEL_DEBUG("janne beate ") << "Going to read TRANSFORM body";
     if(!this->socketReceive(body->GetPackBodyPointer(), body->GetPackBodySize()))
         return false;
 
@@ -197,9 +185,9 @@ bool OpenIGTLinkClient::receiveTransform(const igtl::MessageBase::Pointer header
         Transform3D transform3D = Transform3D::fromFloatArray(matrix);
         igtl::TimeStamp::Pointer ts = igtl::TimeStamp::New();
         body->GetTimeStamp(ts);
-        igtlUint64 timestamp = ts->GetTimeStampInNanoseconds(); //since epoc
+        double timestamp_ms = ts->GetTimeStamp()*1000; //since epoch
 
-        emit transform(deviceName, transform3D, timestamp);
+        emit transform(deviceName, transform3D, timestamp_ms);
     }
     else
     {
@@ -214,11 +202,7 @@ bool OpenIGTLinkClient::receiveImage(const igtl::MessageBase::Pointer header)
     igtl::ImageMessage::Pointer body = igtl::ImageMessage::New();
     body->SetMessageHeader(header);
     body->AllocatePack();
-    CX_LOG_CHANNEL_DEBUG("janne beate ") << "GetBodySizeToRead " << body->GetBodySizeToRead();
-    CX_LOG_CHANNEL_DEBUG("janne beate ") << "GetPackSize " << body->GetPackSize();
-    CX_LOG_CHANNEL_DEBUG("janne beate ") << "GetPackBodySize " << body->GetPackBodySize();
 
-    CX_LOG_CHANNEL_DEBUG("janne beate ") << "Going to read IMAGE body";
     if(!this->socketReceive(body->GetPackBodyPointer(), body->GetPackBodySize()))
         return false;
 
@@ -226,7 +210,6 @@ bool OpenIGTLinkClient::receiveImage(const igtl::MessageBase::Pointer header)
     this->checkCRC(c);
     if (c & (igtl::MessageHeader::UNPACK_HEADER | igtl::MessageHeader::UNPACK_BODY))
     {
-        CX_LOG_CHANNEL_DEBUG("janne beate ") << "Converting and emitting image.";
         IGTLinkConversion converter;
         ImagePtr theImage = converter.decode(body);
         emit image(theImage);
@@ -239,7 +222,6 @@ bool OpenIGTLinkClient::socketReceive(void *packPointer, int packSize) const
     if(!this->enoughBytesAvailableOnSocket(packSize))
         return false;
 
-    CX_LOG_CHANNEL_DEBUG("janne beate ") << "socketReceive " << packSize;
     int r = mSocket->read(reinterpret_cast<char*>(packPointer), packSize);
     if(r <= 0)
     {
@@ -254,19 +236,19 @@ void OpenIGTLinkClient::checkCRC(int c) const
     switch(c)
     {
         case igtl::MessageHeader::UNPACK_UNDEF:
-            CX_LOG_CHANNEL_DEBUG("janne beate ") << "UNPACK_UNDEF";
+            //CX_LOG_DEBUG() << "UNPACK_UNDEF";
             break;
         case igtl::MessageHeader::UNPACK_HEADER:
-            CX_LOG_CHANNEL_DEBUG("janne beate ") << "UNPACK_HEADER";
+            //CX_LOG_DEBUG() << "UNPACK_HEADER";
             break;
         case igtl::MessageHeader::UNPACK_BODY:
-            CX_LOG_CHANNEL_DEBUG("janne beate ") << "UNPACK_BODY";
+            //CX_LOG_DEBUG() << "UNPACK_BODY";
             break;
         case igtl::MessageHeader::UNPACK_HEADER|igtl::MessageHeader::UNPACK_BODY:
-            CX_LOG_CHANNEL_DEBUG("janne beate ") << "UNPACK_HEADER|UNPACK_BODY";
+            //CX_LOG_DEBUG() << "UNPACK_HEADER|UNPACK_BODY";
             break;
         default:
-            CX_LOG_CHANNEL_DEBUG("janne beate ") << "default: " << c;
+            //CX_LOG_DEBUG() << "default: " << c;
             break;
     }
 }

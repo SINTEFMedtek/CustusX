@@ -85,7 +85,6 @@ bool Socket::minBytesAvailable(int bytes) const
 qint64 Socket::read(char *data, qint64 maxSizeBytes) const
 {
     qint64 readBytes = mSocket->read(data, maxSizeBytes);
-    CX_LOG_CHANNEL_DEBUG("janne beate ") << "Requested to read: " << maxSizeBytes << ", read: " << readBytes;
     return readBytes;
 }
 

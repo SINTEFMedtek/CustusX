@@ -51,7 +51,8 @@ OpenIGTLinkTool::OpenIGTLinkTool(QString uid) :
     mTypes = this->determineTypesBasedOnUid(Tool::mUid);
     if (this->isProbe())
     {
-        mProbe = ProbeImpl::New(Tool::mUid, "OpenIGTLink");
+        //TODO: remove these hardcoded values
+        mProbe = ProbeImpl::New("L14-5", "Ultrasonix");
         connect(mProbe.get(), SIGNAL(sectorChanged()), this, SIGNAL(toolProbeSector()));
     }
 
@@ -174,27 +175,24 @@ void OpenIGTLinkTool::setCalibration_sMt(Transform3D calibration)
 
 void OpenIGTLinkTool::toolTransformAndTimestampSlot(Transform3D matrix, double timestamp)
 {
+    mTimestamp = timestamp;// /1000000;
     Transform3D prMt_filtered = matrix;
 
     if (mTrackingPositionFilter)
     {
-        mTrackingPositionFilter->addPosition(matrix, timestamp);
+        mTrackingPositionFilter->addPosition(matrix, mTimestamp);
         prMt_filtered = mTrackingPositionFilter->getFilteredPosition();
     }
 
-    mTimestamp = timestamp;
-    (*mPositionHistory)[timestamp] = matrix; // store original in history
+    (*mPositionHistory)[mTimestamp] = matrix; // store original in history
     m_prMt = prMt_filtered;
-    emit toolTransformAndTimestamp(m_prMt, timestamp);
-
-    //TODO is this needed?
-//	ToolImpl::set_prMt(matrix, timestamp);
+    emit toolTransformAndTimestamp(m_prMt, mTimestamp);
 }
 
 void OpenIGTLinkTool::calculateTpsSlot()
 {
     int tpsNr = 0;
-
+	/*
     int numberOfTransformsToCheck = ((mPositionHistory->size() >= 10) ? 10 : mPositionHistory->size());
     if (	numberOfTransformsToCheck <= 1)
     {
@@ -211,7 +209,7 @@ void OpenIGTLinkTool::calculateTpsSlot()
 
     if (!similar(secondsPassed, 0))
         tpsNr = (int) (numberOfTransformsToCheck / secondsPassed);
-
+		*/
     emit tps(tpsNr);
 }
 
@@ -221,11 +219,6 @@ void OpenIGTLinkTool::toolVisibleSlot(bool on)
         mTpsTimer.start(1000); //calculate tps every 1 seconds
     else
         mTpsTimer.stop();
-}
-
-void OpenIGTLinkTool::set_prMt(const Transform3D& prMt, double timestamp)
-{
-    CX_LOG_WARNING() << "Cannot set prMt on a openigtlink tool.";
 }
 
 void OpenIGTLinkTool::setVisible(bool vis)
