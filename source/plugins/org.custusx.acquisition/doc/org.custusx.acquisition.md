@@ -1,10 +1,13 @@
 Acquisition Plugin {#org_custusx_acquisition}
 ===================
 
+
 Overview {#org_custusx_acquisition_overview}
 ========================
 
 The acquisition plugin enables acquisition of various data streams. 
+
+\subpage org_custusx_resource_core_usacquisitionfileformat
 
 \addindex us_acqusition_widget
 US Acquisition Widget {#org_custusx_acquisition_widgets_acquisition}
@@ -14,6 +17,8 @@ US Acquisition Widget {#org_custusx_acquisition_widgets_acquisition}
 
 Record a stream of ultrasound images and tracking data, and save to disk. The saved data
 can be used to create a 3D volume reconstruction.
+
+For a description of the file format, see \ref org_custusx_resource_core_usacquisitionfileformat
 
 
 \addindex sound_speed_converter_widget
