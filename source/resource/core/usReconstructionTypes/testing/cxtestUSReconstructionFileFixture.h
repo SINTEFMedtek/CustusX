@@ -36,6 +36,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxUSReconstructInputData.h"
 #include "cxImageDataContainer.h"
 
+#include "cxResourceExport.h"
+
 namespace cxtest
 {
 
@@ -47,7 +49,7 @@ namespace cxtest
  * \date apr 16, 2013
  * \author christiana
  */
-class USReconstructionFileFixture
+class cxResource_EXPORT USReconstructionFileFixture
 {
 public:
 	USReconstructionFileFixture();
