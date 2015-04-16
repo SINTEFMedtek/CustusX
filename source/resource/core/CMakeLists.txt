@@ -311,4 +311,5 @@ target_link_libraries(cxResource
 )
 
 add_subdirectory(testing)
+add_subdirectory(usReconstructionTypes/testing)
 
