@@ -102,7 +102,7 @@ private slots:
 private:
     std::set<Type> determineTypesBasedOnUid(const QString uid) const;
     bool isProbe() const;
-    void createPolyData(); ///< creates the polydata either from file or a vtkConeSource
+    void createPolyData();
 
     vtkPolyDataPtr mPolyData; ///< the polydata used to represent the tool graphically
     ProbePtr mProbe;

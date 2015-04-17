@@ -138,20 +138,7 @@ bool OpenIGTLinkTool::isProbe() const
 
 void OpenIGTLinkTool::createPolyData()
 {
-    //TODO this is copy paste from IGSTK tool: refactor out
-    vtkConeSourcePtr coneSource = vtkConeSourcePtr::New();
-    coneSource->SetResolution(25);
-    coneSource->SetRadius(10);
-    coneSource->SetHeight(100);
-
-    coneSource->SetDirection(0, 0, 1);
-    double newCenter[3];
-    coneSource->GetCenter(newCenter);
-    newCenter[2] = newCenter[2] - coneSource->GetHeight() / 2;
-    coneSource->SetCenter(newCenter);
-
-    coneSource->Update();
-    mPolyData = coneSource->GetOutput();
+    mPolyData = Tool::createDefaultPolyDataCone();
 }
 
 bool OpenIGTLinkTool::isCalibrated() const

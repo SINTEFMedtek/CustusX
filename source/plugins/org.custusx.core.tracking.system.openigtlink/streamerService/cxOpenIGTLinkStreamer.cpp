@@ -77,7 +77,6 @@ void OpenIGTLinkStreamer::receivedError()
 
 void OpenIGTLinkStreamer::receivedImage(ImagePtr image)
 {
-    CX_LOG_CHANNEL_DEBUG("janne beate ") << "Image received";
     PackagePtr package(new Package());
     package->mImage = image;
     if(mSender)

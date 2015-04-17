@@ -70,6 +70,8 @@ class cxResource_EXPORT Tool: public QObject
 {
 	Q_OBJECT
 public:
+    static vtkPolyDataPtr createDefaultPolyDataCone();
+
 	Tool(const QString& uid="", const QString& name = "");
 	virtual ~Tool()	{}
 
