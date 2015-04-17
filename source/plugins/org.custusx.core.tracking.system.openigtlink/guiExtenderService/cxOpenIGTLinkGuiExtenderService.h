@@ -50,7 +50,8 @@ public:
     std::vector<CategorizedWidget> createWidgets() const;
 
 private:
-    GUIExtenderService::CategorizedWidget mWidget;
+    mutable GUIExtenderService::CategorizedWidget mWidget;
+    OpenIGTLinkClient* mClient;
 };
 typedef boost::shared_ptr<OpenIGTLinkGuiExtenderService> OpenIGTLinkGuiExtenderServicePtr;
 

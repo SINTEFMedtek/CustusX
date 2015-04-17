@@ -43,7 +43,7 @@ namespace cx {
 OpenIGTLinkConnectionWidget::OpenIGTLinkConnectionWidget(OpenIGTLinkClient *client, QWidget *parent) :
     BaseWidget(parent, "OpenIGTLinkConnectionWidget", "OpenIGTLink Connection")
 {
-    XmlOptionFile options = profile()->getXmlSettings().descend("OpenIGTLinkConnectionWidget");
+    XmlOptionFile options = profile()->getXmlSettings().descend("openigtlink");
     mOptionsElement = options.getElement();
     StringPropertyBasePtr ip = this->getIpOption(mOptionsElement);
     DoublePropertyBasePtr port = this->getPortOption(mOptionsElement);
@@ -135,7 +135,8 @@ StringPropertyBasePtr OpenIGTLinkConnectionWidget::getIpOption(QDomElement root)
 DoublePropertyBasePtr OpenIGTLinkConnectionWidget::getPortOption(QDomElement root)
 {
     DoublePropertyPtr retval;
-    retval = DoubleProperty::initialize("openigtlink_port", "Port", "TCP/IP Port (default 18333)", 18333, DoubleRange(1024, 49151, 1), 0, root);
+    double defaultValue = 18944;
+    retval = DoubleProperty::initialize("openigtlink_port", "Port", "TCP/IP Port (default "+QString::number(defaultValue)+")", defaultValue, DoubleRange(1024, 49151, 1), 0, root);
     retval->setGuiRepresentation(DoublePropertyBase::grSPINBOX);
     retval->setAdvanced(true);
     retval->setGroup("Connection");

@@ -39,7 +39,7 @@ namespace cx
 {
 OpenIGTLinkGuiExtenderService::OpenIGTLinkGuiExtenderService(OpenIGTLinkClient* client)
 {
-    mWidget = GUIExtenderService::CategorizedWidget( new OpenIGTLinkConnectionWidget(client), "Utility");
+    mClient = client;
 }
 
 OpenIGTLinkGuiExtenderService::~OpenIGTLinkGuiExtenderService()
@@ -49,6 +49,7 @@ OpenIGTLinkGuiExtenderService::~OpenIGTLinkGuiExtenderService()
 std::vector<GUIExtenderService::CategorizedWidget> OpenIGTLinkGuiExtenderService::createWidgets() const
 {
     std::vector<CategorizedWidget> retval;
+    mWidget = GUIExtenderService::CategorizedWidget( new OpenIGTLinkConnectionWidget(mClient), "Utility");
     retval.push_back(mWidget);
     return retval;
 }
