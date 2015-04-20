@@ -19,6 +19,6 @@ if(BUILD_TESTING)
         .
         ${CMAKE_CURRENT_BINARY_DIR}
     )
-    target_link_libraries(cxtestResourceUsReconstructionTypes PRIVATE cxResourceUsReconstructionTypes cxCatch)
+	target_link_libraries(cxtestResourceUsReconstructionTypes PRIVATE cxResource cxCatch)
     cx_add_tests_to_catch(cxtestResourceUsReconstructionTypes)
 endif()

@@ -77,6 +77,7 @@ ApplicationsParser::ApplicationsParser()
 	this->addToolbarsToDesktop(desktop, toolbars);
 	desktop.addPreset("VolumePropertiesWidget", Qt::LeftDockWidgetArea, true);
 	desktop.addPreset("SlicePropertiesWidget", Qt::LeftDockWidgetArea, true);
+	desktop.addPreset("DicomWidget", Qt::LeftDockWidgetArea, true);
 	desktop.addPreset("ConsoleWidget", Qt::LeftDockWidgetArea, false);
 	desktop.addPreset("HelpWidget", Qt::RightDockWidgetArea, false);
 	mWorkflowDefaultDesktops["PatientDataUid"] = desktop;

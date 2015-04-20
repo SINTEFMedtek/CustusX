@@ -310,5 +310,9 @@ target_link_libraries(cxResource
 	${SSC_GCOV_LIBRARY} # add gcov LAST in the link sequence! (http://stackoverflow.com/questions/566472/where-are-the-gcov-symbols)
 )
 
+cx_doc_define_user_docs("${CMAKE_CURRENT_SOURCE_DIR}/usReconstructionTypes/doc")
+cx_add_non_source_file("usReconstructionTypes/doc/org.custusx.resource.core.usacquisitionfileformat.md")
+
 add_subdirectory(testing)
+add_subdirectory(usReconstructionTypes/testing)
 
