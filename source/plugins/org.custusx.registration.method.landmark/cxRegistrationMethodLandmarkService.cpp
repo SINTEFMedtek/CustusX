@@ -31,8 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxRegistrationMethodLandmarkService.h"
-//#include "cxRegistrationMethodsWidget.h"
-#include "cxLandmarkImageRegistrationWidget.h"
+#include "cxImageLandmarksWidget.h"
 #include "cxLandmarkImage2ImageRegistrationWidget.h"
 #include "cxLandmarkPatientRegistrationWidget.h"
 
@@ -49,10 +48,10 @@ namespace cx
 QWidget *RegistrationMethodLandmarkImageToImageService::createWidget()
 {
 	LandmarkRegistrationsWidget* landmarkRegistrationsWidget = new LandmarkRegistrationsWidget(NULL, this->getWidgetName(), "Image to Image Landmark Registration");
-	LandmarkImageRegistrationWidget* imageRegistrationWidget = new LandmarkImageRegistrationWidget(mServices, landmarkRegistrationsWidget, "org_custusx_registration_method_landmark_image_to_image_image_landmarks_widget", "Image Registration");
+	ImageLandmarksWidget* imageLandmarksWidget = new ImageLandmarksWidget(mServices, landmarkRegistrationsWidget, "org_custusx_registration_method_landmark_image_to_image_image_landmarks_widget", "Image Registration");
 	LandmarkImage2ImageRegistrationWidget* image2imageRegistrationWidget = new LandmarkImage2ImageRegistrationWidget(mServices, landmarkRegistrationsWidget, "org_custusx_registration_method_landmark_image_to_image_register_widget", "Image2Image Registration");
 
-	landmarkRegistrationsWidget->addTab(imageRegistrationWidget, "Image landmarks");
+	landmarkRegistrationsWidget->addTab(imageLandmarksWidget, "Image landmarks");
 	landmarkRegistrationsWidget->addTab(image2imageRegistrationWidget, "Register");
 
 	return landmarkRegistrationsWidget;
@@ -61,10 +60,10 @@ QWidget *RegistrationMethodLandmarkImageToImageService::createWidget()
 QWidget *RegistrationMethodLandmarkImageToPatientService::createWidget()
 {
 	LandmarkRegistrationsWidget* landmarkRegistrationsWidget = new LandmarkRegistrationsWidget(NULL, this->getWidgetName(), "Image to Image Landmark Registration");
-	LandmarkImageRegistrationWidget* imageRegistrationWidget = new LandmarkImageRegistrationWidget(mServices, landmarkRegistrationsWidget, "org_custusx_registration_method_landmark_image_to_patient_image_landmarks_widget", "Image Registration", true);
+	ImageLandmarksWidget* imageLandmarksWidget = new ImageLandmarksWidget(mServices, landmarkRegistrationsWidget, "org_custusx_registration_method_landmark_image_to_patient_image_landmarks_widget", "Image Registration", true);
 	LandmarkPatientRegistrationWidget* patientRegistrationWidget = new LandmarkPatientRegistrationWidget(mServices, landmarkRegistrationsWidget, "org_custusx_registration_method_landmark_image_to_patient_patient_landmarks_widget", "Patient Registration");
 
-	landmarkRegistrationsWidget->addTab(imageRegistrationWidget, "Image landmarks");
+	landmarkRegistrationsWidget->addTab(imageLandmarksWidget, "Image landmarks");
 	landmarkRegistrationsWidget->addTab(patientRegistrationWidget, "Patient landmarks");
 
 	return landmarkRegistrationsWidget;

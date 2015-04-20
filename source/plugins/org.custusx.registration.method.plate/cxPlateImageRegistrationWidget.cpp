@@ -48,7 +48,7 @@ PlateImageRegistrationWidget::~PlateImageRegistrationWidget()
 void PlateImageRegistrationWidget::editLandmarkButtonClickedSlot()
 {
 	mServices.patientModelService->setLandmarkActive(mActiveLandmark, true);
-	LandmarkImageRegistrationWidget::editLandmarkButtonClickedSlot();
+	ImageLandmarksWidget::editLandmarkButtonClickedSlot();
 }
 
 void PlateImageRegistrationWidget::performRegistration()

@@ -57,20 +57,20 @@ namespace cx
 /**
  * \class LandmarkImageRegistrationWidget
  *
- * \brief Widget for performing landmark based image registration
+ * \brief Widget for adding image landmarks, used by landmark based image registration methods
  *
  * \date Jan 27, 2009
  * \\author Janne Beate Bakeng, SINTEF
  */
-class org_custusx_registration_method_landmark_EXPORT LandmarkImageRegistrationWidget: public LandmarkRegistrationWidget
+class org_custusx_registration_method_landmark_EXPORT ImageLandmarksWidget: public LandmarkRegistrationWidget
 {
 Q_OBJECT
 
 public:
 
-	LandmarkImageRegistrationWidget(RegServices services, QWidget* parent, QString objectName,
+	ImageLandmarksWidget(RegServices services, QWidget* parent, QString objectName,
 		QString windowTitle, bool useRegistrationFixedPropertyInsteadOfActiveImage = false); ///< sets up layout and connects signals and slots
-	virtual ~LandmarkImageRegistrationWidget(); ///< empty
+	virtual ~ImageLandmarksWidget(); ///< empty
 
 protected slots:
 //	virtual void activeImageChangedSlot(); ///< listens to the datamanager for when the active image is changed
@@ -105,7 +105,7 @@ protected:
 	QPushButton* mRemoveLandmarkButton; ///< the Remove Landmark button
 
 private:
-	LandmarkImageRegistrationWidget(); ///< not implemented
+	ImageLandmarksWidget(); ///< not implemented
 
 	DataPtr getCurrentData() const;
 	bool mUseRegistrationFixedPropertyInsteadOfActiveImage;

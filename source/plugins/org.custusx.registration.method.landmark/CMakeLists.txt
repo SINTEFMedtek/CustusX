@@ -11,7 +11,7 @@ set(PLUGIN_SRCS
     cxFastRegistrationsWidget.h
     cxLandmarkRegistrationsWidget.h
     cxLandmarkRegistrationsWidget.cpp
-    cxLandmarkImageRegistrationWidget.cpp
+    cxImageLandmarksWidget.cpp
     cxLandmarkRegistrationWidget.cpp
     cxLandmarkPatientRegistrationWidget.cpp
     cxLandmarkImage2ImageRegistrationWidget.cpp
@@ -24,7 +24,7 @@ set(PLUGIN_SRCS
 set(PLUGIN_MOC_SRCS
     cxRegistrationMethodLandmarkPluginActivator.h
     cxLandmarkRegistrationWidget.h
-    cxLandmarkImageRegistrationWidget.h
+    cxImageLandmarksWidget.h
     cxLandmarkPatientRegistrationWidget.h
     cxLandmarkImage2ImageRegistrationWidget.h
     cxFastImageRegistrationWidget.h
