@@ -152,6 +152,14 @@ QStringList TrackerConfigurationImpl::filter(QStringList toolsToFilter, QStringL
 			{
 				passedApplicationFilter = true;
 			}
+            if(applicationsFilter.contains("all", Qt::CaseInsensitive))
+            {
+                passedApplicationFilter = true;
+            }
+            if(applicationsFilter.contains("default", Qt::CaseInsensitive))
+            {
+                passedApplicationFilter = true;
+            }
 			++it;
 		}
 		if(!passedApplicationFilter)

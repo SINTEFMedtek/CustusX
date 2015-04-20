@@ -101,7 +101,10 @@ void ToolFilterGroupBox::filterSlot()
 {
   QStringList applicationFilter;
   if (mAppSelector->getValue() == "All")
+  {
 	  applicationFilter = stateService()->getAllApplicationStateNames();
+	  applicationFilter << "All";
+  }
   else
 	  applicationFilter = QStringList() << mAppSelector->getValue();
   QStringList trackingSystemFilter = QStringList() << mTrackingSystemSelector->getValue();
