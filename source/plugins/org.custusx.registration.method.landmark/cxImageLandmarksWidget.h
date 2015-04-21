@@ -48,6 +48,8 @@ class QSlider;
 
 namespace cx
 {
+typedef boost::shared_ptr<class LandmarkListener> LandmarkListenerPtr;
+
 /**
  * \file
  * \addtogroup org_custusx_registration_method_landmark
@@ -97,7 +99,6 @@ protected:
 
 	//gui
 	SelectDataStringPropertyBasePtr mCurrentProperty;
-	ImageLandmarksSourcePtr mImageLandmarkSource;
 	ActiveToolProxyPtr mActiveToolProxy;
 
 	QPushButton* mAddLandmarkButton; ///< the Add Landmark button
@@ -109,6 +110,7 @@ private:
 
 	DataPtr getCurrentData() const;
 	bool mUseRegistrationFixedPropertyInsteadOfActiveImage;
+	LandmarkListenerPtr mLandmarkListener;
 };
 
 /**

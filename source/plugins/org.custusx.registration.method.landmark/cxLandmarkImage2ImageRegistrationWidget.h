@@ -46,6 +46,7 @@ namespace cx
 typedef boost::shared_ptr<class ImageLandmarksSource> ImageLandmarksSourcePtr;
 typedef boost::shared_ptr<class StringPropertyRegistrationFixedImage> StringPropertyRegistrationFixedImagePtr;
 typedef boost::shared_ptr<class StringPropertyRegistrationMovingImage> StringPropertyRegistrationMovingImagePtr;
+typedef boost::shared_ptr<class LandmarkListener> LandmarkListenerPtr;
 
 /**
  * \file
@@ -69,7 +70,6 @@ public:
 	virtual QString defaultWhatsThis() const;
 
 protected slots:
-	void updateRep();
 	void registerSlot();
 	void translationCheckBoxChanged();
 
@@ -83,9 +83,6 @@ protected:
 	virtual void setTargetLandmark(QString uid, Vector3D p_target);
 	virtual QString getTargetName() const;
 
-	ImageLandmarksSourcePtr mFixedLandmarkSource;
-	ImageLandmarksSourcePtr mMovingLandmarkSource;
-
 	//gui
 	StringPropertyRegistrationFixedImagePtr mFixedProperty;
 	StringPropertyRegistrationMovingImagePtr mMovingProperty;
@@ -95,6 +92,7 @@ protected:
 
 private:
 	LandmarkImage2ImageRegistrationWidget(); ///< not implemented
+	LandmarkListenerPtr mLandmarkListener;
 };
 
 /**

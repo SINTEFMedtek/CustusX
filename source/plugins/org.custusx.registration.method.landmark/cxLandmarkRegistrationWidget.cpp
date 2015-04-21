@@ -112,8 +112,9 @@ void LandmarkRegistrationWidget::setManualToolPosition(Vector3D p_r)
 void LandmarkRegistrationWidget::showEvent(QShowEvent* event)
 {
 	QWidget::showEvent(event);
-	connect(mServices.patientModelService.get(), &PatientModelService::landmarkPropertiesChanged,
-			this, &LandmarkRegistrationWidget::landmarkUpdatedSlot);
+	connect(mServices.patientModelService.get(), &PatientModelService::landmarkPropertiesChanged,this, &LandmarkRegistrationWidget::landmarkUpdatedSlot);
+	connect(mServices.patientModelService->getPatientLandmarks().get(), &Landmarks::landmarkAdded, this, &LandmarkRegistrationWidget::landmarkUpdatedSlot);
+	connect(mServices.patientModelService->getPatientLandmarks().get(), &Landmarks::landmarkRemoved, this, &LandmarkRegistrationWidget::landmarkUpdatedSlot);
 
 //	mManager->restart();
 	mServices.registrationService->setLastRegistrationTime(QDateTime::currentDateTime());
@@ -123,8 +124,9 @@ void LandmarkRegistrationWidget::showEvent(QShowEvent* event)
 void LandmarkRegistrationWidget::hideEvent(QHideEvent* event)
 {
 	QWidget::hideEvent(event);
-	disconnect(mServices.patientModelService.get(), &PatientModelService::landmarkPropertiesChanged,
-			this, &LandmarkRegistrationWidget::landmarkUpdatedSlot);
+	disconnect(mServices.patientModelService.get(), &PatientModelService::landmarkPropertiesChanged, this, &LandmarkRegistrationWidget::landmarkUpdatedSlot);
+	disconnect(mServices.patientModelService->getPatientLandmarks().get(), &Landmarks::landmarkAdded, this, &LandmarkRegistrationWidget::landmarkUpdatedSlot);
+	disconnect(mServices.patientModelService->getPatientLandmarks().get(), &Landmarks::landmarkRemoved, this, &LandmarkRegistrationWidget::landmarkUpdatedSlot);
 }
 
 void LandmarkRegistrationWidget::prePaintEvent()

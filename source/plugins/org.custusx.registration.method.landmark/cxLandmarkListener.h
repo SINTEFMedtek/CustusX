@@ -30,18 +30,46 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXLANDMARKREGISTRATIONSWIDGET_H
-#define CXLANDMARKREGISTRATIONSWIDGET_H
+#ifndef CXLANDMARKLISTENER_H
+#define CXLANDMARKLISTENER_H
 
-#include "cxTabbedWidget.h"
+#include <QObject>
+#include <boost/shared_ptr.hpp>
+#include "cxRegServices.h"
 
 namespace cx
 {
-class LandmarkRegistrationsWidget : public TabbedWidget
+
+typedef boost::shared_ptr<class LandmarkListener> LandmarkListenerPtr;
+typedef boost::shared_ptr<class ImageLandmarksSource> ImageLandmarksSourcePtr;
+typedef boost::shared_ptr<class Data> DataPtr;
+
+
+class LandmarkListener : public QObject
 {
+Q_OBJECT
+
 public:
-  LandmarkRegistrationsWidget(QWidget* parent, QString objectName, QString windowTitle);
-  virtual ~LandmarkRegistrationsWidget(){};
+	LandmarkListener(RegServices services);
+	~LandmarkListener();
+	void setLandmarkSource(DataPtr data);
+	DataPtr getLandmarkSource();
+	void useOnlyOneSourceUpdatedFromOutside(bool useOnlyOneSourceUpdatedFromOutside = true);
+	void useI2IRegistration(bool useI2I = true);
+public slots:
+	void showRep();
+	void hideRep();
+private slots:
+	void updateFixed();
+	void updateMoving();
+private:
+	RegServices mServices;
+	bool mImage2Image;
+	bool mUseOnlyOneSourceUpdatedFromOutside;
+	ImageLandmarksSourcePtr mFixedLandmarkSource;
+	ImageLandmarksSourcePtr mMovingLandmarkSource;
 };
+
 } //cx
-#endif // CXLANDMARKREGISTRATIONSWIDGET_H
+
+#endif // CXLANDMARKLISTENER_H

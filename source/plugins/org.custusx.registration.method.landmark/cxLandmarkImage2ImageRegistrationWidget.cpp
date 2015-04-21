@@ -52,6 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewService.h"
 #include "cxViewGroupData.h"
 #include "cxRepContainer.h"
+#include "cxLandmarkListener.h"
 
 namespace cx
 {
@@ -61,13 +62,8 @@ LandmarkImage2ImageRegistrationWidget::LandmarkImage2ImageRegistrationWidget(Reg
 {
 	mLandmarkTableWidget->hide();
 
-	mFixedLandmarkSource = ImageLandmarksSource::New();
-	mMovingLandmarkSource = ImageLandmarksSource::New();
-
-	connect(services.registrationService.get(), &RegistrationService::fixedDataChanged,
-			this, &LandmarkImage2ImageRegistrationWidget::updateRep);
-	connect(services.registrationService.get(), &RegistrationService::movingDataChanged,
-			this, &LandmarkImage2ImageRegistrationWidget::updateRep);
+	mLandmarkListener.reset(new LandmarkListener(services));
+	mLandmarkListener->useI2IRegistration();
 
 	mFixedProperty.reset(new StringPropertyRegistrationFixedImage(services.registrationService, services.patientModelService));
 	mMovingProperty.reset(new StringPropertyRegistrationMovingImage(services.registrationService, services.patientModelService));
@@ -96,12 +92,6 @@ void LandmarkImage2ImageRegistrationWidget::translationCheckBoxChanged()
 	settings()->setValue("registration/I2ILandmarkTranslation", mTranslationCheckBox->isChecked());
 }
 
-void LandmarkImage2ImageRegistrationWidget::updateRep()
-{
-	mFixedLandmarkSource->setData(mServices.registrationService->getFixedData());
-	mMovingLandmarkSource->setData(mServices.registrationService->getMovingData());
-}
-
 void LandmarkImage2ImageRegistrationWidget::registerSlot()
 {
 	this->performRegistration();
@@ -124,30 +114,14 @@ void LandmarkImage2ImageRegistrationWidget::showEvent(QShowEvent* event)
 	LandmarkRegistrationWidget::showEvent(event);
 	mServices.visualizationService->getGroup(0)->setRegistrationMode(rsIMAGE_REGISTRATED);
 
-	LandmarkRepPtr rep = mServices.visualizationService->get3DReps(0, 0)->findFirst<LandmarkRep>();
-//	LandmarkRepPtr rep = RepContainer::findFirstRep<LandmarkRep>(mServices.visualizationService->get3DView(0, 0)->getReps());
-	if (rep)
-	{
-		rep->setPrimarySource(mFixedLandmarkSource);
-		rep->setSecondarySource(mMovingLandmarkSource);
-		rep->setSecondaryColor(QColor::fromRgbF(0, 0.9, 0.5));
-	}
+	mLandmarkListener->showRep();
 }
 
 void LandmarkImage2ImageRegistrationWidget::hideEvent(QHideEvent* event)
 {
 	LandmarkRegistrationWidget::hideEvent(event);
+	mLandmarkListener->hideRep();
 
-	if(mServices.visualizationService->get3DView(0, 0))
-	{
-		LandmarkRepPtr rep = mServices.visualizationService->get3DReps(0, 0)->findFirst<LandmarkRep>();
-//		LandmarkRepPtr rep = RepContainer::findFirstRep<LandmarkRep>(mServices.visualizationService->get3DView(0, 0)->getReps());
-		if (rep)
-		{
-			rep->setPrimarySource(LandmarksSourcePtr());
-			rep->setSecondarySource(LandmarksSourcePtr());
-		}
-	}
 	mServices.visualizationService->getGroup(0)->setRegistrationMode(rsNOT_REGISTRATED);
 }
 
