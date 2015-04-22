@@ -71,7 +71,6 @@ ImageLandmarksWidget::ImageLandmarksWidget(RegServices services, QWidget* parent
 		mCurrentProperty = StringPropertySelectData::New(mServices.patientModelService);
 	connect(mCurrentProperty.get(), &Property::changed, this, &ImageLandmarksWidget::onCurrentImageChanged);
 
-	mLandmarkListener.reset(new LandmarkListener(services));
 	mLandmarkListener->useOnlyOneSourceUpdatedFromOutside();
 
 	mActiveToolProxy = ActiveToolProxy::New(services.trackingService);
@@ -213,6 +212,7 @@ void ImageLandmarksWidget::enableButtons()
 
 void ImageLandmarksWidget::showEvent(QShowEvent* event)
 {
+	mServices.visualizationService->getGroup(0)->setRegistrationMode(rsIMAGE_REGISTRATED);
 	LandmarkRegistrationWidget::showEvent(event);
 
 	if(!mUseRegistrationFixedPropertyInsteadOfActiveImage)
@@ -221,18 +221,13 @@ void ImageLandmarksWidget::showEvent(QShowEvent* event)
 		if (image)
 			mCurrentProperty->setValue(image->getUid());
 	}
-
-	mServices.visualizationService->getGroup(0)->setRegistrationMode(rsIMAGE_REGISTRATED);
-
-	mLandmarkListener->showRep();
 }
 
 void ImageLandmarksWidget::hideEvent(QHideEvent* event)
 {
-	LandmarkRegistrationWidget::hideEvent(event);
-	mLandmarkListener->hideRep();
-
 	mServices.visualizationService->getGroup(0)->setRegistrationMode(rsNOT_REGISTRATED);
+	LandmarkRegistrationWidget::hideEvent(event);
+
 }
 
 void ImageLandmarksWidget::prePaintEvent()

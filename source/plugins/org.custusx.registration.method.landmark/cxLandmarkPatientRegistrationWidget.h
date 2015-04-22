@@ -52,7 +52,6 @@ class QSpinBox;
 namespace cx
 {
 typedef Transform3D Transform3D;
-typedef boost::shared_ptr<class LandmarkListener> LandmarkListenerPtr;
 
 /**
  * \file
@@ -85,9 +84,6 @@ private:
 	QPushButton* mRegisterButton;
 
 	StringPropertyRegistrationFixedImagePtr mFixedProperty;
-
-	LandmarkListenerPtr mLandmarkListener;
-
 };
 
 

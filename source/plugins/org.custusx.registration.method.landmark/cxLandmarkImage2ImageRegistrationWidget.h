@@ -46,7 +46,6 @@ namespace cx
 typedef boost::shared_ptr<class ImageLandmarksSource> ImageLandmarksSourcePtr;
 typedef boost::shared_ptr<class StringPropertyRegistrationFixedImage> StringPropertyRegistrationFixedImagePtr;
 typedef boost::shared_ptr<class StringPropertyRegistrationMovingImage> StringPropertyRegistrationMovingImagePtr;
-typedef boost::shared_ptr<class LandmarkListener> LandmarkListenerPtr;
 
 /**
  * \file
@@ -92,7 +91,6 @@ protected:
 
 private:
 	LandmarkImage2ImageRegistrationWidget(); ///< not implemented
-	LandmarkListenerPtr mLandmarkListener;
 };
 
 /**

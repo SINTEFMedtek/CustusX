@@ -39,7 +39,6 @@ namespace cx
 {
 
 typedef boost::shared_ptr<class ActiveToolProxy> ActiveToolProxyPtr;
-typedef boost::shared_ptr<class LandmarkListener> LandmarkListenerPtr;
 
 /**
  * \class PatientLandMarksWidget
@@ -87,8 +86,6 @@ private slots:
 	void globalConfigurationFileChangedSlot(QString key);
 private:
 	PatientLandMarksWidget(); ///< not implemented
-
-	LandmarkListenerPtr mLandmarkListener;
 };
 
 } //cx

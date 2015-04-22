@@ -62,7 +62,6 @@ LandmarkImage2ImageRegistrationWidget::LandmarkImage2ImageRegistrationWidget(Reg
 {
 	mLandmarkTableWidget->hide();
 
-	mLandmarkListener.reset(new LandmarkListener(services));
 	mLandmarkListener->useI2IRegistration();
 
 	mFixedProperty.reset(new StringPropertyRegistrationFixedImage(services.registrationService, services.patientModelService));
@@ -111,18 +110,14 @@ QString LandmarkImage2ImageRegistrationWidget::defaultWhatsThis() const
 
 void LandmarkImage2ImageRegistrationWidget::showEvent(QShowEvent* event)
 {
-	LandmarkRegistrationWidget::showEvent(event);
 	mServices.visualizationService->getGroup(0)->setRegistrationMode(rsIMAGE_REGISTRATED);
-
-	mLandmarkListener->showRep();
+	LandmarkRegistrationWidget::showEvent(event);
 }
 
 void LandmarkImage2ImageRegistrationWidget::hideEvent(QHideEvent* event)
 {
-	LandmarkRegistrationWidget::hideEvent(event);
-	mLandmarkListener->hideRep();
-
 	mServices.visualizationService->getGroup(0)->setRegistrationMode(rsNOT_REGISTRATED);
+	LandmarkRegistrationWidget::hideEvent(event);
 }
 
 void LandmarkImage2ImageRegistrationWidget::prePaintEvent()

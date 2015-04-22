@@ -57,7 +57,6 @@ PatientLandMarksWidget::PatientLandMarksWidget(RegServices services,
 	LandmarkRegistrationWidget(services, parent, objectName, windowTitle),
 	mToolSampleButton(new QPushButton("Sample Tool", this))
 {
-	mLandmarkListener.reset(new LandmarkListener(services));
 	mLandmarkListener->useI2IRegistration(false);
 
 	connect(services.patientModelService.get(), &PatientModelService::rMprChanged, this, &PatientLandMarksWidget::setModified);
@@ -144,21 +143,15 @@ void PatientLandMarksWidget::toolSampleButtonClickedSlot()
 void PatientLandMarksWidget::showEvent(QShowEvent* event)
 {
 //	std::cout << "PatientLandMarksWidget::showEvent" << std::endl;
-	LandmarkRegistrationWidget::showEvent(event);
-
 	mServices.visualizationService->getGroup(0)->setRegistrationMode(rsPATIENT_REGISTRATED);
-
-	mLandmarkListener->showRep();
+	LandmarkRegistrationWidget::showEvent(event);
 }
 
 void PatientLandMarksWidget::hideEvent(QHideEvent* event)
 {
 //	std::cout << "PatientLandMarksWidget::hideEvent" << std::endl;
-	LandmarkRegistrationWidget::hideEvent(event);
-
-	mLandmarkListener->hideRep();
-
 	mServices.visualizationService->getGroup(0)->setRegistrationMode(rsNOT_REGISTRATED);
+	LandmarkRegistrationWidget::hideEvent(event);
 }
 
 void PatientLandMarksWidget::removeLandmarkButtonClickedSlot()

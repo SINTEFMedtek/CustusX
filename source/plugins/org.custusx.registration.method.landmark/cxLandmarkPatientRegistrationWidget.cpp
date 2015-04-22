@@ -60,7 +60,6 @@ LandmarkPatientRegistrationWidget::LandmarkPatientRegistrationWidget(RegServices
 {
 	mLandmarkTableWidget->hide();
 
-	mLandmarkListener.reset(new LandmarkListener(services));
 	mLandmarkListener->useI2IRegistration(false);
 
 	mFixedProperty.reset(new StringPropertyRegistrationFixedImage(services.registrationService, services.patientModelService));
@@ -89,19 +88,17 @@ void LandmarkPatientRegistrationWidget::registerSlot()
 void LandmarkPatientRegistrationWidget::showEvent(QShowEvent* event)
 {
 //	std::cout << "LandmarkPatientRegistrationWidget::showEvent" << std::endl;
-	LandmarkRegistrationWidget::showEvent(event);
-
 	mServices.visualizationService->getGroup(0)->setRegistrationMode(rsPATIENT_REGISTRATED);
-
-	mLandmarkListener->showRep();
+	LandmarkRegistrationWidget::showEvent(event);
 }
 
 void LandmarkPatientRegistrationWidget::hideEvent(QHideEvent* event)
 {
+	mServices.visualizationService->getGroup(0)->setRegistrationMode(rsNOT_REGISTRATED);
 	LandmarkRegistrationWidget::hideEvent(event);
-	mLandmarkListener->hideRep();
 }
 
+//The following functions look (almost) exactly like the same functions in PatientLandMarksWidget
 void LandmarkPatientRegistrationWidget::performRegistration()
 {
 	if (!mServices.registrationService->getFixedData())
@@ -120,7 +117,6 @@ LandmarkMap LandmarkPatientRegistrationWidget::getTargetLandmarks() const
 	return mServices.patientModelService->getPatientLandmarks()->getLandmarks();
 }
 
-//Copied from PatientLandMarksWidget
 Transform3D LandmarkPatientRegistrationWidget::getTargetTransform() const
 {
 	Transform3D rMpr = mServices.patientModelService->get_rMpr();

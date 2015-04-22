@@ -48,7 +48,6 @@ class QSlider;
 
 namespace cx
 {
-typedef boost::shared_ptr<class LandmarkListener> LandmarkListenerPtr;
 
 /**
  * \file
@@ -110,7 +109,6 @@ private:
 
 	DataPtr getCurrentData() const;
 	bool mUseRegistrationFixedPropertyInsteadOfActiveImage;
-	LandmarkListenerPtr mLandmarkListener;
 };
 
 /**
