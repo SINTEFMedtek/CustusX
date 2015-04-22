@@ -14,6 +14,8 @@ class QMenu;
 class QActionGroup;
 #include "cxStateService.h"
 
+#include "cxGuiExport.h"
+
 namespace cx
 {
 class Desktop;
@@ -27,7 +29,7 @@ class Desktop;
  * \date Sep 08, 2014
  * \author Ole Vegard Solberg, SINTEF
  */
-class DynamicMainWindowWidgets : public QObject
+class cxGui_EXPORT DynamicMainWindowWidgets : public QObject
 {
 	Q_OBJECT
 
