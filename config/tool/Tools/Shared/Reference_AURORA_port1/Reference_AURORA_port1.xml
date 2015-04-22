@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+
+<!-- Tool -->
+<!-- ==== -->
+<tool>
+  <type>reference</type>
+  <id>AuroraRef01</id>
+  <name>Aurora reference port 1</name>
+  <description>Aurora reference port 1</description>
+  <manufacturer>NDI</manufacturer>
+  <clinical_app>Laboratory Laparoscopy</clinical_app>
+  <geo_file></geo_file>
+  <pic_file></pic_file>
+  <doc_file></doc_file>  
+
+  <!-- Instrument -->
+  <instrument>
+    <type></type>
+    <id></id>
+    <name></name>
+    <manufacturer></manufacturer>
+    <description></description>
+  </instrument>
+
+  <!-- Sensor -->
+  <sensor>
+    <type>Aurora</type>
+    <id>Aurora02</id>
+    <name>AuroraSensor2</name>
+    <wireless>yes</wireless>
+    <DOF>6</DOF>
+    <portnumber>0</portnumber>
+    <channelnumber></channelnumber>
+    <manufacturer>NDI</manufacturer>
+    <description></description>
+    <rom_file></rom_file>
+  </sensor>
+
+  <!-- Calibration -->
+  <calibration>
+    <cal_file></cal_file>
+  </calibration>
+</tool>
