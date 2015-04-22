@@ -76,11 +76,15 @@ QWidget *RegistrationMethodFastLandmarkImageToPatientService::createWidget()
 {
 	TabbedWidget* tabWidget = new TabbedWidget(NULL, this->getWidgetName(), "Fast Landmark Registration");
 	FastOrientationRegistrationWidget* orientationWidget = new FastOrientationRegistrationWidget(mServices, tabWidget);
-	FastImageRegistrationWidget* imageLandmarkWidget = new FastImageRegistrationWidget(mServices, tabWidget, "org_custusx_registration_method_fast_landmark_image_to_patient_image_landmarks_widget", "Fast Image Registration", true);
+	FastImageRegistrationWidget* imageLandmarkWidget = new FastImageRegistrationWidget(mServices, tabWidget, "org_custusx_registration_method_fast_landmark_image_to_patient_image_landmarks_widget", "Fast Image Registration - Landmarks", true);
 	FastPatientRegistrationWidget* patientLandmarkWidget = new FastPatientRegistrationWidget(mServices, tabWidget);
+
+	LandmarkPatientRegistrationWidget* registrationWidget = new LandmarkPatientRegistrationWidget(mServices, tabWidget, "org_custusx_registration_method_fast_landmark_image_to_patient_registration_widget", "Fast Image Registration");
+
 	tabWidget->addTab(orientationWidget, "Orientation");
 	tabWidget->addTab(imageLandmarkWidget, "Image landmark(s)");
 	tabWidget->addTab(patientLandmarkWidget, "Patient landmark(s)");
+	tabWidget->addTab(registrationWidget, "Register");
 
 	return tabWidget;
 }
