@@ -34,52 +34,59 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImageLandmarksWidget.h"
 #include "cxLandmarkImage2ImageRegistrationWidget.h"
 #include "cxLandmarkPatientRegistrationWidget.h"
+#include "cxPatientLandMarksWidget.h"
 
 #include "cxFastOrientationRegistrationWidget.h"
 #include "cxFastImageRegistrationWidget.h"
 #include "cxFastPatientRegistrationWidget.h"
 
-#include "cxLandmarkRegistrationsWidget.h"
-#include "cxFastRegistrationsWidget.h"
+#include "cxTabbedWidget.h"
 
 namespace cx
 {
 
 QWidget *RegistrationMethodLandmarkImageToImageService::createWidget()
 {
-	LandmarkRegistrationsWidget* landmarkRegistrationsWidget = new LandmarkRegistrationsWidget(NULL, this->getWidgetName(), "Image to Image Landmark Registration");
-	ImageLandmarksWidget* imageLandmarksWidget = new ImageLandmarksWidget(mServices, landmarkRegistrationsWidget, "org_custusx_registration_method_landmark_image_to_image_image_landmarks_widget", "Image Registration");
-	LandmarkImage2ImageRegistrationWidget* image2imageRegistrationWidget = new LandmarkImage2ImageRegistrationWidget(mServices, landmarkRegistrationsWidget, "org_custusx_registration_method_landmark_image_to_image_register_widget", "Image2Image Registration");
+	TabbedWidget* tabWidget = new TabbedWidget(NULL, this->getWidgetName(), "Image to Image Landmark Registration");
+	ImageLandmarksWidget* imageLandmarksWidget = new ImageLandmarksWidget(mServices, tabWidget, "org_custusx_registration_method_landmark_image_to_image_image_landmarks_widget", "Image Registration");
+	LandmarkImage2ImageRegistrationWidget* image2imageRegistrationWidget = new LandmarkImage2ImageRegistrationWidget(mServices, tabWidget, "org_custusx_registration_method_landmark_image_to_image_register_widget", "Image2Image Registration");
 
-	landmarkRegistrationsWidget->addTab(imageLandmarksWidget, "Image landmarks");
-	landmarkRegistrationsWidget->addTab(image2imageRegistrationWidget, "Register");
+	tabWidget->addTab(imageLandmarksWidget, "Image landmarks");
+	tabWidget->addTab(image2imageRegistrationWidget, "Register");
 
-	return landmarkRegistrationsWidget;
+	return tabWidget;
 }
 
 QWidget *RegistrationMethodLandmarkImageToPatientService::createWidget()
 {
-	LandmarkRegistrationsWidget* landmarkRegistrationsWidget = new LandmarkRegistrationsWidget(NULL, this->getWidgetName(), "Image to Image Landmark Registration");
-	ImageLandmarksWidget* imageLandmarksWidget = new ImageLandmarksWidget(mServices, landmarkRegistrationsWidget, "org_custusx_registration_method_landmark_image_to_patient_image_landmarks_widget", "Image Registration", true);
-	LandmarkPatientRegistrationWidget* patientRegistrationWidget = new LandmarkPatientRegistrationWidget(mServices, landmarkRegistrationsWidget, "org_custusx_registration_method_landmark_image_to_patient_patient_landmarks_widget", "Patient Registration");
+	TabbedWidget* tabWidget = new TabbedWidget(NULL, this->getWidgetName(), "Image to Patient Landmark Registration");
+	ImageLandmarksWidget* imageLandmarksWidget = new ImageLandmarksWidget(mServices, tabWidget, "org_custusx_registration_method_landmark_image_to_patient_image_landmarks_widget", "Image Landmarks", true);
+	PatientLandMarksWidget* patientLandmarksWidget = new PatientLandMarksWidget(mServices, tabWidget, "org_custusx_registration_method_landmark_image_to_patient_patient_landmarks_widget", "Patient Landmarks");
 
-	landmarkRegistrationsWidget->addTab(imageLandmarksWidget, "Image landmarks");
-	landmarkRegistrationsWidget->addTab(patientRegistrationWidget, "Patient landmarks");
+	LandmarkPatientRegistrationWidget* registrationWidget = new LandmarkPatientRegistrationWidget(mServices, tabWidget, "org_custusx_registration_method_landmark_image_to_patient_registration_widget", "Image To Patient Registration");
 
-	return landmarkRegistrationsWidget;
+	tabWidget->addTab(imageLandmarksWidget, "Image landmarks");
+	tabWidget->addTab(patientLandmarksWidget, "Patient landmarks");
+	tabWidget->addTab(registrationWidget, "Register");
+
+	return tabWidget;
 }
 
 QWidget *RegistrationMethodFastLandmarkImageToPatientService::createWidget()
 {
-	FastRegistrationsWidget* fastRegistrationsWidget = new FastRegistrationsWidget(NULL, this->getWidgetName(), "Fast Landmark Registration");
-	FastOrientationRegistrationWidget* fastOrientationRegistrationWidget = new FastOrientationRegistrationWidget(mServices, fastRegistrationsWidget);
-	FastImageRegistrationWidget* fastImageRegistrationWidget = new FastImageRegistrationWidget(mServices, fastRegistrationsWidget, "org_custusx_registration_method_fast_landmark_image_to_patient_image_landmarks_widget", "Fast Image Registration", true);
-	FastPatientRegistrationWidget* fastPatientRegistrationWidget = new FastPatientRegistrationWidget(mServices, fastRegistrationsWidget);
-	fastRegistrationsWidget->addTab(fastOrientationRegistrationWidget, "Orientation");
-	fastRegistrationsWidget->addTab(fastImageRegistrationWidget, "Image landmark(s)");
-	fastRegistrationsWidget->addTab(fastPatientRegistrationWidget, "Patient landmark(s)");
+	TabbedWidget* tabWidget = new TabbedWidget(NULL, this->getWidgetName(), "Fast Landmark Registration");
+	FastOrientationRegistrationWidget* orientationWidget = new FastOrientationRegistrationWidget(mServices, tabWidget);
+	FastImageRegistrationWidget* imageLandmarkWidget = new FastImageRegistrationWidget(mServices, tabWidget, "org_custusx_registration_method_fast_landmark_image_to_patient_image_landmarks_widget", "Fast Image Registration - Landmarks", true);
+	FastPatientRegistrationWidget* patientLandmarkWidget = new FastPatientRegistrationWidget(mServices, tabWidget);
 
-	return fastRegistrationsWidget;
+	LandmarkPatientRegistrationWidget* registrationWidget = new LandmarkPatientRegistrationWidget(mServices, tabWidget, "org_custusx_registration_method_fast_landmark_image_to_patient_registration_widget", "Fast Image Registration");
+
+	tabWidget->addTab(orientationWidget, "Orientation");
+	tabWidget->addTab(imageLandmarkWidget, "Image landmark(s)");
+	tabWidget->addTab(patientLandmarkWidget, "Patient landmark(s)");
+	tabWidget->addTab(registrationWidget, "Register");
+
+	return tabWidget;
 }
 
 

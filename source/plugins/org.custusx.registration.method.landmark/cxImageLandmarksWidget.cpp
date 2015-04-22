@@ -56,6 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewGroupData.h"
 #include "cxRepContainer.h"
 #include "cxTrackingService.h"
+#include "cxLandmarkListener.h"
 
 namespace cx
 {
@@ -69,7 +70,8 @@ ImageLandmarksWidget::ImageLandmarksWidget(RegServices services, QWidget* parent
 	else
 		mCurrentProperty = StringPropertySelectData::New(mServices.patientModelService);
 	connect(mCurrentProperty.get(), &Property::changed, this, &ImageLandmarksWidget::onCurrentImageChanged);
-	mImageLandmarkSource = ImageLandmarksSource::New();
+
+	mLandmarkListener->useOnlyOneSourceUpdatedFromOutside();
 
 	mActiveToolProxy = ActiveToolProxy::New(services.trackingService);
 	connect(mActiveToolProxy.get(), SIGNAL(toolVisible(bool)), this, SLOT(enableButtons()));
@@ -111,7 +113,7 @@ void ImageLandmarksWidget::onCurrentImageChanged()
 {
 	DataPtr data = mCurrentProperty->getData();
 
-	mImageLandmarkSource->setData(data);
+	mLandmarkListener->setLandmarkSource(data);
 	this->enableButtons();
 
 	if (data && !mServices.registrationService->getFixedData())
@@ -123,17 +125,11 @@ void ImageLandmarksWidget::onCurrentImageChanged()
 PickerRepPtr ImageLandmarksWidget::getPickerRep()
 {
 	return mServices.visualizationService->get3DReps(0, 0)->findFirst<PickerRep>();
-//	return RepContainer(mServices.visualizationService->get3DView(0, 0))->findFirst<PickerRep>();
-
-//	if (!mServices.visualizationService->get3DView(0, 0))
-//		return PickerRepPtr();
-
-//	return RepContainer::findFirstRep<PickerRep>(mServices.visualizationService->get3DView(0, 0)->getReps());
 }
 
 DataPtr ImageLandmarksWidget::getCurrentData() const
 {
-	return mImageLandmarkSource->getData();
+	return mLandmarkListener->getLandmarkSource();
 }
 
 void ImageLandmarksWidget::addLandmarkButtonClickedSlot()
@@ -216,6 +212,7 @@ void ImageLandmarksWidget::enableButtons()
 
 void ImageLandmarksWidget::showEvent(QShowEvent* event)
 {
+	mServices.visualizationService->getGroup(0)->setRegistrationMode(rsIMAGE_REGISTRATED);
 	LandmarkRegistrationWidget::showEvent(event);
 
 	if(!mUseRegistrationFixedPropertyInsteadOfActiveImage)
@@ -224,31 +221,13 @@ void ImageLandmarksWidget::showEvent(QShowEvent* event)
 		if (image)
 			mCurrentProperty->setValue(image->getUid());
 	}
-
-	mServices.visualizationService->getGroup(0)->setRegistrationMode(rsIMAGE_REGISTRATED);
-
-	LandmarkRepPtr rep = mServices.visualizationService->get3DReps(0, 0)->findFirst<LandmarkRep>();
-	if (rep)
-	{
-		rep->setPrimarySource(mImageLandmarkSource);
-		rep->setSecondarySource(LandmarksSourcePtr());
-	}
 }
 
 void ImageLandmarksWidget::hideEvent(QHideEvent* event)
 {
+	mServices.visualizationService->getGroup(0)->setRegistrationMode(rsNOT_REGISTRATED);
 	LandmarkRegistrationWidget::hideEvent(event);
 
-	if(mServices.visualizationService->get3DView(0, 0))
-	{
-		LandmarkRepPtr rep = mServices.visualizationService->get3DReps(0, 0)->findFirst<LandmarkRep>();
-		if (rep)
-		{
-			rep->setPrimarySource(LandmarksSourcePtr());
-			rep->setSecondarySource(LandmarksSourcePtr());
-		}
-	}
-	mServices.visualizationService->getGroup(0)->setRegistrationMode(rsNOT_REGISTRATED);
 }
 
 void ImageLandmarksWidget::prePaintEvent()

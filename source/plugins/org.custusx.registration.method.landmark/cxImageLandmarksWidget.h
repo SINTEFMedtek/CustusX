@@ -48,6 +48,7 @@ class QSlider;
 
 namespace cx
 {
+
 /**
  * \file
  * \addtogroup org_custusx_registration_method_landmark
@@ -97,7 +98,6 @@ protected:
 
 	//gui
 	SelectDataStringPropertyBasePtr mCurrentProperty;
-	ImageLandmarksSourcePtr mImageLandmarkSource;
 	ActiveToolProxyPtr mActiveToolProxy;
 
 	QPushButton* mAddLandmarkButton; ///< the Add Landmark button

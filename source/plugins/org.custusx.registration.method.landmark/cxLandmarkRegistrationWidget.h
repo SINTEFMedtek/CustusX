@@ -48,6 +48,7 @@ namespace cx
 {
 typedef std::map<QString, class Landmark> LandmarkMap;
 typedef boost::shared_ptr<class RegistrationManager> RegistrationManagerPtr;
+typedef boost::shared_ptr<class LandmarkListener> LandmarkListenerPtr;
 
 /**
  * \file
@@ -69,7 +70,7 @@ public:
 	virtual ~LandmarkRegistrationWidget();
 
 protected slots:
-	virtual void cellClickedSlot(int row, int column); ///< when a landmark i selected from the table
+	virtual void cellClickedSlot(int row, int column); ///< when a landmark is selected from the table
 
 	void cellChangedSlot(int row, int column); ///< reacts when the user types in a (landmark) name
 	void landmarkUpdatedSlot();
@@ -100,6 +101,8 @@ protected:
 
 	//data
 	QString mActiveLandmark; ///< uid of surrently selected landmark.
+
+	LandmarkListenerPtr mLandmarkListener;
 
 private:
 	LandmarkRegistrationWidget(); ///< not implemented

@@ -44,3 +44,11 @@ The points are used to determine the translation of the patient registration.
 Point on the patient using a tool and click the Sample button.
 Press the register button to register fixed image.
 
+
+\addindex org_custusx_registration_method_fast_landmark_image_to_patient_registration_widget
+Registration
+-----------------------------------------------------------
+
+Register patient to Fixed Volume
+
+Usually the register button don't need to be used as the registration is automatically performed when 1 landmark is sampled both in the image and patient.

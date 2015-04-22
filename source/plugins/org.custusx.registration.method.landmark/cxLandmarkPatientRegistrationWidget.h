@@ -38,7 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxImage.h"
 #include "cxTransform3D.h"
-#include "cxActiveToolProxy.h"
 
 class QVBoxLayout;
 class QComboBox;
@@ -60,57 +59,33 @@ typedef Transform3D Transform3D;
  * @{
  */
 
-/**
- * \class LandmarkPatientRegistrationWidget
- *
- * \brief Widget used as a tab in the ContexDockWidget for patient registration.
- *
- * \date Feb 3, 2009
- * \\author Janne Beate Bakeng, SINTEF
- */
+
 class LandmarkPatientRegistrationWidget: public LandmarkRegistrationWidget
 {
 Q_OBJECT
 
 public:
-	LandmarkPatientRegistrationWidget(RegServices services, QWidget* parent, QString objectName,
-		QString windowTitle); ///< sets up layout and connects signals and slots
-	virtual ~LandmarkPatientRegistrationWidget(); ///< empty
+	LandmarkPatientRegistrationWidget(RegServices services, QWidget* parent, QString objectName, QString windowTitle);
 
 protected slots:
-
 	void registerSlot();
-	virtual void fixedDataChanged(); ///< listens to the datamanager for when the active image is changed
-	void toolSampleButtonClickedSlot(); ///< reacts when the Sample Tool button is clicked
-	virtual void cellClickedSlot(int row, int column); ///< when a landmark i selected from the table
-	void removeLandmarkButtonClickedSlot();
-	void updateToolSampleButton();
+//	virtual void fixedDataChanged(); ///< listens to the datamanager for when the active image is changed
 
 protected:
 	virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
 	virtual void hideEvent(QHideEvent* event);
-    virtual void prePaintEvent(); ///< populates the table widget
-    virtual LandmarkMap getTargetLandmarks() const;
+	virtual LandmarkMap getTargetLandmarks() const;
 	virtual Transform3D getTargetTransform() const;
 	virtual void setTargetLandmark(QString uid, Vector3D p_target);
 	virtual QString getTargetName() const;
 	virtual void performRegistration();
 
-	//gui
-	QPushButton* mToolSampleButton; ///< the Sample Tool button
-	QPushButton* mRemoveLandmarkButton;
+private:
 	QPushButton* mRegisterButton;
 
-	//data
-	ImageLandmarksSourcePtr mImageLandmarkSource;
 	StringPropertyRegistrationFixedImagePtr mFixedProperty;
-	ActiveToolProxyPtr mActiveToolProxy;
-
-private slots:
-	void globalConfigurationFileChangedSlot(QString key);
-private:
-	LandmarkPatientRegistrationWidget(); ///< not implemented
 };
+
 
 /**
  * @}
