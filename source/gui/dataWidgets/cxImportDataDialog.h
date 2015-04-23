@@ -65,6 +65,7 @@ private slots:
   void updateImportTransformButton();
   void importDataSlot();
   void acceptedSlot();
+  void finishedSlot();
 private:
   void setInitialGuessForParentFrame();
   DataPtr mData;

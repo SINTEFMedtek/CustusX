@@ -61,7 +61,7 @@ Console Widget {#utility_widgets_console}
 ===========================================================
 CustusX console, display device for system administration messages.
 
-*Right click for addition options.*
+*Click the upper left arrow for addition options.*
 
 
 
