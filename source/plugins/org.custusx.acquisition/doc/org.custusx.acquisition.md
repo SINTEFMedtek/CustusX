@@ -19,7 +19,7 @@ Record a stream of ultrasound images and tracking data, and save to disk. The sa
 can be used to create a 3D volume reconstruction.
 
 For a description of the file format, see \ref org_custusx_resource_core_usacquisitionfileformat
-
+A correctly configured US probe is required to perform the acquisition. See \ref cx_us_probe_definition for more.
 
 \addindex sound_speed_converter_widget
 Sound Speed Converter Widget {#org_custusx_acquisition_widgets_sound_speed_converter}

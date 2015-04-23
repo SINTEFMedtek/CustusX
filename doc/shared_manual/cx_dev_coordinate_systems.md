@@ -37,71 +37,47 @@ with \p q_M_r yields the same point \p p_q represented in space \p q:
 The multiplication here is done using homogenous coordinates, where a point
 is [x,y,z,1] and a vector is [x,y,z,0].
 
-
-Implementation {#coordinate_systems_implementation}
--------------------------------------------
-
-Points and vectors are implemented using cx::Vector3D. cx::Vector3D only contains
-[x,y,z], thus it is context-dependent if it is a vector or point, and also
-which space it is defined in.
-
-Transformations (the matrix \p qMr) are implemented using cx::Transform3D. The
-internal representation is a 4x4 matrix. cx::Transform3D contains helper methods
-vec(cx::Vector3D) and coord(cx::Vector3D) that transforms the vector or point,
-respectively.
-
-The class CoordinateSystemHelpers provides some nice utility functions.
+All computations are performed in millimeters and radians! File storage also use millimeters, but use degrees instead of radians.
 
 Specific Spaces {#coordinate_systems_specific_spaces}
 -------------------------------------------
 
-\image html ssc_coordinate_systems.png "Major Coordinate systems"
+\image html cx_coordinate_systems/cx_coords_overview.png "Coordinate Systems Overview"
 
-The figure and table shows the most important spaces in CustusX. Some spaces
-have a subscript; This means that there are several of them.
+The basic spaces are reference and patient reference, representing respectively the virtual and physical world. When these two spaces have a valid relation, through the `prMt` transform, the system is properly set up for navigation. Tracking tools move relative to the patient reference, while data (CT, MR, US etc) are defined relative to the reference. 
 
-<TABLE>
-	<TR>
-		<TH>Name</TH>
-		<TH>ID</TH>
-		<TH>Description</TH>
-	</TR>
-	<TR>
-		<TD>reference</TD>
-		<TD>r</TD>
-		<TD>The basic space that connects everything. Has no parent space.</TD>
-	</TR>
-	<TR>
-		<TD>patient reference</TD>
-		<TD>pr</TD>
-		<TD>A physical space, usually the reference tool. When rMpr is defined, the system is said to be patient registered, meaning image spaces are connected to the navigation tools.</TD>
-	</TR>
-	<TR>
-		<TD>data i</TD>
-		<TD>d_i</TD>
-		<TD>Each Data (Image or Mesh or other) has an associated space d_i. In simple cases, it has the reference space as its parent space, but it might also have another data space as parent space. This gives the ability to describe a tree of data spaces. The transform rMd_i is always stored in Data, regardless of the value of the parent space.</TD>
-	</TR>
-	<TR>
-		<TD>slice k</TD>
-		<TD>s_k</TD>
-		<TD>During slicing (for display in a 2D View) a space s is defined. The xy-plane of this space is the slice plane. It is defined with r as the parent space.</TD>
-	</TR>
-	<TR>
-		<TD>tool j</TD>
-		<TD>t_j</TD>
-		<TD>Each Tool has a space t that defines its position. The origin is usually the tool tip, this may vary for ultrasound probes.</TD>
-	</TR>
-	<TR>
-		<TD>tool offset j</TD>
-		<TD>to_j</TD>
-		<TD>Tools can have a virtual offset along its local z axis. The space thus translated is denoted to.</TD>
-	</TR>
-	<TR>
-		<TD>sensor j</TD>
-		<TD>s_j</TD>
-		<TD>Tools usually have a tracking sensor attached that communicates with the tracking system. The local sensor space is denoted s. The transform sMt is the Tool calibration. (Yes, we have two spaces called s. We have to live with that, but they are seldom seen in the same spot)</TD>
-	</TR>
-</TABLE>
+\image html cx_coordinate_systems/cx_coords_all.png "All Coordinate systems"
+
+This figure shows all the major spaces in CustusX. They are described in the table below. Some spaces have a subscript; This means that there are several of them. See also \ref cx_us_probe_spaces.
+
+
+| Name              |  ID   | Description
+| ----------------- | ----- |-----------------------------
+| reference         |  r    | The basic space that connects everything. Has no parent space.
+| patient reference |  pr   | A physical space, usually the reference tool. When rMpr is defined, the system is said to be patient registered, meaning image spaces are connected to the navigation tools.
+| data i            |  d_i  | Each Data (Image or Mesh or other) has an associated space d_i. In simple cases, it has the reference space as its parent space, but it might also have another data space as parent space. This gives the ability to describe a tree of data spaces. The transform rMd_i is always stored in Data, regardless of the value of the parent space.
+| tool j             | t_j  | Each Tool has a space t that defines its position. The origin is usually the tool tip, this may vary for ultrasound probes.
+| tool offset j      | to_j | Tools can have a virtual offset along its local z axis. The space thus translated is denoted `to`.
+| us plane j         | u_j  | See \ref cx_us_probe_spaces.
+| sensor j           | s_j  | Tools usually have a tracking sensor attached that communicates with the tracking system. The local sensor space is denoted s. The transform sMt is the Tool calibration.
+| slice k            | s_k  | During slicing (for display in a 2D View) a space s is defined. The xy-plane of this space is the slice plane. It is defined with r as the parent space. (The s identifier is used for two different spaces, slice and sensor. This is unfortunate, but the two spaces are used in different contexts)
+
+
+The following table describes som important transforms, i.e. relations between two spaces:
+
+| Name                 |  ID   | Description
+| -------------------- | ----- |-----------------------------
+| Patient Registration |  prMt | The Patient Registration connects the physical and virtual worlds, and is required in order to do navigation in the OR. This transform is acquired using a Patient Registration Procedure.
+| Tracking Raw data    |  prMs | Raw position data received from the tracking system.
+| Tool Calibration     |  sMt  | Applied on top of the raw tracking position in order to find the position and orientation of the tool. This transform is either set from the tool producer or determined though a calibration procedure.
+| Data Position        |  rMd  | Position of Data. Used throughout the system.
+| Tool Position        |  prMt | Position of Tool. Used throughout the system.
+
+
+Relations between Data spaces {#coordinate_systems_data}
+-------------------------------------------
+
+Although all Data objects are defined relative to the reference space, they also have a parent space. This allows hierarchical data structures. The parent relation is taken into account when performing registration.
 
 The following figure shows a case where some Data has a parent space
 different from the reference space. One MR volume exists, and some vascular
@@ -114,3 +90,21 @@ to the MR volume. In the process, the parent frame is changed to the MR
 volume.
  
 \image html ssc_coords_data.png "Example of data spaces with parent space different from the reference space."
+
+
+Implementation {#coordinate_systems_implementation}
+-------------------------------------------
+
+- Points and vectors are implemented using cx::Vector3D. cx::Vector3D only contains
+[x,y,z], thus it is context-dependent if it is a vector or point, and also
+which space it is defined in.
+
+- Transformations (the matrix \p qMr) are implemented using cx::Transform3D. The
+internal representation is a 4x4 matrix. cx::Transform3D contains helper methods
+vec(cx::Vector3D) and coord(cx::Vector3D) that transforms the vector or point,
+respectively.
+
+Both cx::Transform3D and cx::Vector3D are based on the [Eigen](http://eigen.tuxfamily.org) library.
+
+The class CoordinateSystemHelpers provides some nice utility functions.
+
