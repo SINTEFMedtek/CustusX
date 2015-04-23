@@ -16,6 +16,10 @@ Series can be imported into CustusX as volumes. The DICOM standard is large, and
 DICOM Widget {#org_custusx_dicom_widget}
 -----------------------------------------------------------
 
-The DICOM Widget provides DICOM import and some PACS integration. See \ref org_custusx_dicom for more.
+The DICOM Widget provides DICOM import and some PACS integration.
+
+Data sets imported into CustusX don't keep any patient informantion (except from the shown data set name). *Remember to **remove** the DICOM datasets after import, as they usually contain patient information.*
+
+See \ref org_custusx_dicom for more.
 
 ![DICOM Widget](org_custusx_dicom_widget.jpg)
