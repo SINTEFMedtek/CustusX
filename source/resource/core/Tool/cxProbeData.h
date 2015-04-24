@@ -48,6 +48,8 @@ namespace cx
  *
  * \brief Definition of characteristics for an Ultrasound Probe Sector.
  *
+ * NOTE: This documentation has been replaced by \ref cx_us_probe_definition.
+ *
  *  \verbatim
  *
  *  * Definitions of probe geometry:
