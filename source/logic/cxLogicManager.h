@@ -77,6 +77,18 @@ public:
   static LogicManager* getInstance();
 
   /**
+	* Initialize the minimal manager, no services.
+	*
+	* Add services manually afterwards using
+	*   getPluginFramework()->start("org.custusx.plugin.name", ctkPlugin::START_TRANSIENT);
+	*
+	* In order to insert a main UI, remember to call
+	*   setApplicationComponent()
+	*
+	*/
+  static void initializeBasic();
+
+  /**
 	* Initialize the manager, including all services (calls initializeServices() ).
 	*/
   static void initialize(ApplicationComponentPtr component=ApplicationComponentPtr());
@@ -84,6 +96,14 @@ public:
 	* Shutdown the manager, including all services (calls shutdownServices() ).
 	*/
   static void shutdown();
+
+  /**
+   * Set an application component, intended to encapsulate the application's
+   * main window or similar. Must be called after initialize.
+   *
+   * Component will be created here and destroyed in shutdown.
+   */
+  void setApplicationComponent(ApplicationComponentPtr component);
 
   /**
    * Do a complete restart of the system:
@@ -113,19 +133,16 @@ private:
 	*/
   void initializeServices();
   /**
-   * Set an application component, intended to encapsulate the application's
-   * main window or similar. Must be called after initialize.
-   *
-   * Component will be created here and destroyed in shutdown.
-   */
-  void setApplicationComponent(ApplicationComponentPtr component);
-  /**
 	* Shutdown all system services, resources and other static objects.
 	*
 	* Deallocate all global resources.
 	* Assumes MainWindow already has been destroyed and the mainloop is exited.
 	*/
   void shutdownServices();
+
+  void basicSetup();
+  void createLegacyStoredServices();
+  void shutdownLegacyStoredServices();
 
   template<class T>
   void shutdownService(boost::shared_ptr<T>& service, QString name);

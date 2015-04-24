@@ -66,13 +66,10 @@ PluginFrameworkManager::PluginFrameworkManager()
 	ctkProperties fwProps;
 	QString storagePath = ProfileManager::getInstance()->getSettingsPath() + "/pluginFramework";
 
-	// remove settings as stored by CTK, because full paths are stored here, causing
-	// problems when running both debug and release on the same machine (and similar).
-	//removeNonemptyDirRecursively(storagePath);
-
 	fwProps[ctkPluginConstants::FRAMEWORK_STORAGE] = storagePath;
 
-	// clear settings stored by ctk
+	// remove settings as stored by CTK, because full paths are stored here, causing
+	// problems when running both debug and release on the same machine (and similar).
 	fwProps[ctkPluginConstants::FRAMEWORK_STORAGE_CLEAN] = ctkPluginConstants::FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT;
 
 	mFrameworkFactory.reset(new ctkPluginFrameworkFactory(fwProps));
@@ -387,7 +384,10 @@ bool PluginFrameworkManager::start(const QString& symbolicName, ctkPlugin::Start
 
 	QString pluginPath = getPluginPath(symbolicName);
 	if (pluginPath.isEmpty())
+	{
+		CX_LOG_CHANNEL_ERROR("plugin") << QString("Failed to find plugin %1 in search path.").arg(symbolicName);
 		return false;
+	}
 
 	try
 	{
