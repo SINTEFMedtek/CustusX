@@ -235,13 +235,13 @@ void ImportDataDialog::acceptedSlot()
 	this->convertFromNifti1Coordinates();
 	this->convertToUnsigned();
 
+	mPatientModelService->autoSave();
+	viewService()->autoShowData(mData);
 	this->finishedSlot();
 }
 
 void ImportDataDialog::finishedSlot()
 {
-	mPatientModelService->autoSave();
-	viewService()->autoShowData(mData);
 }
 
 /** According to
