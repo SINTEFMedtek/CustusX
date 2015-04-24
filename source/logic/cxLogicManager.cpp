@@ -100,6 +100,11 @@ LogicManager* logicManager()
 	return LogicManager::getInstance();
 }
 
+void LogicManager::initializeBasic()
+{
+	LogicManager::getInstance()->basicSetup();
+}
+
 void LogicManager::initialize(ApplicationComponentPtr component)
 {
 	LogicManager::getInstance()->initializeServices();
@@ -120,13 +125,31 @@ void LogicManager::shutdown()
 void LogicManager::initializeServices()
 {
 	CX_LOG_INFO() << " --- Initialize services for " << qApp->applicationName() << "...";
-	// resources layer
+
+	this->basicSetup();
+
+	mPluginFramework->loadState();
+
+	if (mComponent)
+		mComponent->create();
+
+	CX_LOG_DEBUG() << " --- End initialize services.";
+}
+
+void LogicManager::basicSetup()
+{
 	ProfileManager::initialize();
 	Reporter::initialize();
 
 	mPluginFramework = PluginFrameworkManager::create();
 	mPluginFramework->start();
+	mPluginFramework->setSearchPaths(QStringList());
 
+	this->createLegacyStoredServices();
+}
+
+void LogicManager::createLegacyStoredServices()
+{
 	// services layer
 	ctkPluginContext* pc = this->getPluginContext();
 
@@ -134,17 +157,11 @@ void LogicManager::initializeServices()
 	mPatientModelService = PatientModelServiceProxy::create(pc);
 	mVideoService = VideoServiceProxy::create(pc);
 	mViewService = VisualizationServiceProxy::create(pc);
-    connect(mPluginFramework.get(), &PluginFrameworkManager::aboutToStop, mViewService.get(), &VisualizationService::aboutToStop);
+	connect(mPluginFramework.get(), &PluginFrameworkManager::aboutToStop, mViewService.get(), &VisualizationService::aboutToStop);
 	mStateService = StateServiceProxy::create(pc);
 	mSessionStorageService = SessionStorageServiceProxy::create(pc);
 
 	mSpaceProvider.reset(new cx::SpaceProviderImpl(mTrackingService, mPatientModelService));
-
-	mPluginFramework->loadState();
-
-	if (mComponent)
-		mComponent->create();
-	CX_LOG_DEBUG() << " --- End initialize services.";
 }
 
 void LogicManager::setApplicationComponent(ApplicationComponentPtr component)
@@ -185,6 +202,17 @@ void LogicManager::shutdownServices()
 
 	mPluginFramework->stop();
 
+	this->shutdownLegacyStoredServices();
+	mPluginFramework.reset();
+	GPUImageBufferRepository::shutdown();
+	Reporter::shutdown();
+	ProfileManager::shutdown();
+
+	CX_LOG_DEBUG() << " --- End shutdown services";
+}
+
+void LogicManager::shutdownLegacyStoredServices()
+{
 	this->shutdownService(mSpaceProvider, "SpaceProvider"); // remove before patmodel and track
 	this->shutdownService(mStateService, "StateService");
 	this->shutdownService(mViewService, "ViewService");
@@ -192,15 +220,8 @@ void LogicManager::shutdownServices()
 	this->shutdownService(mPatientModelService, "PatientModelService");
 	this->shutdownService(mVideoService, "VideoService");
 	this->shutdownService(mSessionStorageService, "SessionStorageService");
-
-	this->shutdownService(mPluginFramework, "PluginFramework");
-
-	GPUImageBufferRepository::shutdown();
-	Reporter::shutdown();
-	ProfileManager::shutdown();
-
-	CX_LOG_DEBUG() << " --- End shutdown services";
 }
+
 
 template<class T>
 void LogicManager::shutdownService(boost::shared_ptr<T>& service, QString name)

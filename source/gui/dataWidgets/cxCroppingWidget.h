@@ -76,6 +76,7 @@ private:
   QLabel* mBoundingBoxDimensions;
 
 private slots:
+  void setupUI();
   void boxValuesChanged();
   void cropperChangedSlot();
   ImagePtr cropClipButtonClickedSlot();///< Crete a new image based on the images crop and clip values
