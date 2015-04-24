@@ -54,10 +54,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
+
+
 CroppingWidget::CroppingWidget(QWidget* parent) : 
 		BaseWidget(parent, "CroppingWidget", "Crop")
 {
+	connect(viewService().get(), &ViewService::activeLayoutChanged, this, &CroppingWidget::setupUI);
+	this->setupUI();
+}
+
+void CroppingWidget::setupUI()
+{
+	if (mInteractiveCropper)
+		return;
+
   mInteractiveCropper = viewService()->getCropper();
+
+  if (!mInteractiveCropper)
+	  return;
+
   connect(mInteractiveCropper.get(), SIGNAL(changed()), this, SLOT(cropperChangedSlot()));
 
   QVBoxLayout* layout = new QVBoxLayout(this);
