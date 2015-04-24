@@ -46,20 +46,24 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImageAlgorithms.h"
 #include "cxInteractiveCropper.h"
 #include "cxImage.h"
-#include "cxLogicManager.h"
 #include "cxPatientModelService.h"
 #include "cxViewService.h"
 #include "cxInteractiveCropper.h"
+
+#include "cxViewGroupData.h"
+#include "cxReporter.h"
 
 namespace cx
 {
 
 
 
-CroppingWidget::CroppingWidget(QWidget* parent) : 
-		BaseWidget(parent, "CroppingWidget", "Crop")
+CroppingWidget::CroppingWidget(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget* parent) :
+		BaseWidget(parent, "CroppingWidget", "Crop"),
+		mPatientModelService(patientModelService),
+		mVisualizationService(visualizationService)
 {
-	connect(viewService().get(), &ViewService::activeLayoutChanged, this, &CroppingWidget::setupUI);
+	connect(visualizationService.get(), &ViewService::activeLayoutChanged, this, &CroppingWidget::setupUI);
 	this->setupUI();
 }
 
@@ -133,11 +137,31 @@ void CroppingWidget::cropperChangedSlot()
 
 ImagePtr CroppingWidget::cropClipButtonClickedSlot()
 {
-  ImagePtr image = patientService()->getActiveImage();
+  ImagePtr image = mPatientModelService->getActiveImage();
 
   ImagePtr retval = cropImage(patientService(), image);
-  patientService()->insertData(retval);
+  mPatientModelService->insertData(retval);
+
+  this->hideOldAndShowNewVolume(image, retval);
+
   return retval;
+}
+
+void CroppingWidget::hideOldAndShowNewVolume(ImagePtr oldImage, ImagePtr newImage)
+{
+//	int groupNr = mVisualizationService->getActiveGroup();//Gives -1 when we are inside the CroppingWidget
+	int groupNr = 0;
+
+	ViewGroupDataPtr viewGroup = mVisualizationService->getGroup(0);
+	if(!viewGroup)
+	{
+		reportWarning(QString("CroppingWidget: Hide old and show new volume failed. Can't get view group %1.").arg(groupNr));
+		return;
+	}
+	if(!viewGroup->removeData(oldImage->getUid()))
+		reportWarning(QString("CroppingWidget: Hide old and show new volume failed. Can't remove image %1 from view group %2").arg(oldImage->getUid()).arg(groupNr));
+
+	viewGroup->addData(newImage->getUid());
 }
 
 }

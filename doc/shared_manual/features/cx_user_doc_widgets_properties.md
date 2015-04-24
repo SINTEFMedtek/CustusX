@@ -33,7 +33,9 @@ How to use the bounding box:
  * First click the bounding box to get the control spheres
  * Click and drag a sphere to change the crop area
  
-> **Tip:** To make the crop permanent, press the button to create a new volume from the crop.
+###Button: Create new cropped volume
+To make the crop permanent, press the button to create a new volume from the crop.
+This will also hide the original volume and show the new volume.
 
 \addindex shading_widget 
 Volume Shading {#property_widgets_volume_shading}
