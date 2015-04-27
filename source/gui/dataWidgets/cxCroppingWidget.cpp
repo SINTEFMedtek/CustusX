@@ -56,8 +56,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-
-
 CroppingWidget::CroppingWidget(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget* parent) :
 		BaseWidget(parent, "CroppingWidget", "Crop"),
 		mPatientModelService(patientModelService),

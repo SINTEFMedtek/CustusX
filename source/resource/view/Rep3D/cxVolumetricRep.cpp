@@ -135,7 +135,6 @@ void VolumetricRep::setImage(ImagePtr image)
 	{
 		connect(mImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
 		connect(mImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
-		connect(mImage.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(updateVtkImageDataSlot()));
 		mVolumeProperty->setImage(mImage);
 		this->vtkImageDataChangedSlot();
 		mMonitor = ImageMapperMonitor::create(mVolume, mImage);
