@@ -113,7 +113,7 @@ public:
 	void update();
 	void setTargetSpaceToR(); ///< use to draw the slice in 3D r space instead of in 2D s space.
 	vtkActorPtr getActor();
-	std::vector<ImagePtr> getImages() { return mImages; };
+	std::vector<ImagePtr> getImages() { return mImages; }
 
 protected:
 	Texture3DSlicerProxyImpl();
@@ -139,6 +139,8 @@ private:
 	vtkPlaneSourcePtr mPlaneSource;
 	vtkPainterPolyDataMapperPtr mPainterPolyDatamapper;
 	vtkPolyDataAlgorithmPtr mPolyDataAlgorithm;
+
+	static const int mMaxImages = 4;// This class is hardcoded for a maximum of 4 images
 };
 
 #endif // WIN32

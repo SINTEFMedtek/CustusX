@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkImageData.h>
 #include <vtkPainterPolyDataMapper.h>
 #include <vtkLookupTable.h>
+#include <vtkOpenGLRenderWindow.h>
 
 #include "cxImage.h"
 #include "cxView.h"
@@ -57,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSliceProxy.h"
 #include "cxTypeConversions.h"
 #include "cxGPUImageBuffer.h"
-#include <vtkOpenGLRenderWindow.h>
+#include "cxReporter.h"
 
 
 //---------------------------------------------------------
@@ -224,6 +225,13 @@ void Texture3DSlicerProxyImpl::createGeometryPlane( Vector3D point1_s,  Vector3D
 
 void Texture3DSlicerProxyImpl::setImages(std::vector<ImagePtr> images_raw)
 {
+	if(images_raw.size() > mMaxImages)
+	{
+		QString errorText = QString("Texture3DSlicerProxyImpl: GPU multislicer can't handle more than %1 images. Additional images are not shown.").arg(mMaxImages);
+		reportError(errorText);
+		images_raw.resize(mMaxImages);
+	}
+
 	std::vector<ImagePtr> images(images_raw.size());
 	for (unsigned i=0; i<images.size(); ++i)
 	{

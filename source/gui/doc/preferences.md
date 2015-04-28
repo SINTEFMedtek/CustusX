@@ -21,7 +21,7 @@ Parameters affecting the performance of the application.
 - Interval between renderings
 - Max Render Size: Volumes are downsampled to this size before rendered in 3D (2D still shows slices through original data).
 - Smart Render: Render only once per second if there is no changes in the scene.
-- 2D Overlay: Enable multiple volumes in 2D (GPU based)
+- 2D Overlay: Enable multiple volumes in 2D (GPU based multi slicer, can only handle up to 4 images).
 - Optimized views: Speedup by merging all 2D views into a single vtkRenderWindow
 - Still Update Rate: Property in vtkRenderWindow. Increasing this value may improve rendering speed at the cost of quality.
 - 3D Renderer: Select method for rendering images in 3D
