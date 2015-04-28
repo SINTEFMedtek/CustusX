@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+
+<!-- Maybe just type (and rom+cal files) should be required, name=type if empty -->
+
+<!-- Tool -->
+<!-- ==== -->
+<tool>
+  <type>pointer</type>
+  <id>AuroraPointer03</id>
+  <name>Aurora pointer port 3</name>
+  <description>Aurora pointer port 3</description>
+  <manufacturer>NDI</manufacturer>
+  <clinical_app>Laboratory Laparoscopy Endovascular</clinical_app>
+  <geo_file></geo_file>
+  <pic_file></pic_file>
+  <doc_file></doc_file>  
+
+  <!-- Instrument -->
+  <instrument>
+    <type></type>
+    <id></id>
+    <name></name>
+    <manufacturer></manufacturer>
+    <description></description>
+  </instrument>
+
+  <!-- Sensor -->
+  <sensor>
+    <type>Aurora</type>
+    <id>Aurora03</id>
+    <name>AuroraSensor1</name>
+    <wireless>yes</wireless>
+    <DOF>5</DOF>
+    <portnumber>2</portnumber>
+    <channelnumber>0</channelnumber>
+    <manufacturer>NDI</manufacturer>
+    <description></description>
+    <rom_file></rom_file>
+  </sensor>
+
+  <!-- Calibration -->
+  <calibration>
+    <cal_file>AuroraPointer_port3.cal</cal_file>
+  </calibration>
+</tool>

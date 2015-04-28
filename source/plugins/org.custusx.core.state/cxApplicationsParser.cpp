@@ -120,7 +120,7 @@ ApplicationsParser::ApplicationsParser()
 	this->addToolbarsToDesktop(desktop, toolbars);
 	desktop.addPreset("IGTLinkWidget", Qt::LeftDockWidgetArea, true);
 	desktop.addPreset("USReconstruction", Qt::LeftDockWidgetArea, true);
-	desktop.addPreset("USAcqusitionWidget", Qt::LeftDockWidgetArea, true);
+	desktop.addPreset("org_custusx_acquisition_widgets_acquisition", Qt::LeftDockWidgetArea, true);
 	mWorkflowDefaultDesktops["IntraOpImagingUid"] = desktop;
 	//-----------------------------------------------------
 

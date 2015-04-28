@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXFASTPATIENTREGISTRATIONWIDGET_H_
 #define CXFASTPATIENTREGISTRATIONWIDGET_H_
 
-#include "cxLandmarkPatientRegistrationWidget.h"
+#include "cxPatientLandMarksWidget.h"
 
 namespace cx
 {
@@ -52,7 +52,7 @@ namespace cx
  * \date 27. sep. 2010
  * \\author Janne Beate Bakeng
  */
-class FastPatientRegistrationWidget : public LandmarkPatientRegistrationWidget
+class FastPatientRegistrationWidget : public PatientLandMarksWidget
 {
 public:
   FastPatientRegistrationWidget(RegServices services, QWidget* parent);

@@ -138,7 +138,6 @@ void TransferFunctionAlphaWidget::mouseMoveEvent(QMouseEvent* event)
   if(event->buttons() == Qt::LeftButton)
   {
 	this->moveCurrentAlphaPoint(this->getCurrentAlphaPoint(event->pos()));
-	  this->updateTooltip(event->pos());
 	  this->update();
   }
 }

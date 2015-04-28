@@ -66,16 +66,21 @@ class cxGui_EXPORT CroppingWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  CroppingWidget(QWidget* parent);
+  CroppingWidget(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget* parent);
 
 private:
+  void hideOldAndShowNewVolume(ImagePtr oldImage, ImagePtr newImage);///< This only works with view group 0
+
   InteractiveCropperPtr mInteractiveCropper;
   BoundingBoxWidget* mBBWidget;
   QCheckBox* mUseCropperCheckBox;
   QCheckBox* mShowBoxCheckBox;
   QLabel* mBoundingBoxDimensions;
+  PatientModelServicePtr mPatientModelService;
+  VisualizationServicePtr mVisualizationService;
 
 private slots:
+  void setupUI();
   void boxValuesChanged();
   void cropperChangedSlot();
   ImagePtr cropClipButtonClickedSlot();///< Crete a new image based on the images crop and clip values

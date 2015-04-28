@@ -338,14 +338,15 @@ vtkImageDataPtr USFrameData::toGrayscaleAndEffectuateCropping(vtkImageDataPtr in
 //	std::cout << "\t       max " <<  max << std::endl;
 //}
 
-vtkImageDataPtr USFrameData::useAngio(vtkImageDataPtr inData, vtkImageDataPtr grayFrame) const
+vtkImageDataPtr USFrameData::useAngio(vtkImageDataPtr inData, vtkImageDataPtr grayFrame, int frameNum) const
 {
 	// Some of the code here is borrowed from the vtk examples:
 	// http://public.kitware.com/cgi-bin/viewcvs.cgi/*checkout*/Examples/Build/vtkMy/Imaging/vtkImageFoo.cxx?root=VTK&content-type=text/plain
 
 	if (inData->GetNumberOfScalarComponents() != 3)
 	{
-		reportWarning("Angio requested for grayscale ultrasound");
+		if(frameNum == 0) //Only report warning once
+			reportWarning("Angio requested for grayscale ultrasound");
 		return grayFrame;
 	}
 
@@ -449,7 +450,7 @@ std::vector<std::vector<vtkImageDataPtr> > USFrameData::initializeFrames(std::ve
 
 			if (angio[j])
 			{
-				vtkImageDataPtr angioFrame = this->useAngio(current, grayFrame);
+				vtkImageDataPtr angioFrame = this->useAngio(current, grayFrame, i);
 				raw[j][i] = angioFrame;
 			}
 			else
@@ -512,9 +513,6 @@ void USFrameData::fillImageImport(vtkImageImportPtr import, int index)
 	import->SetDataExtentToWholeExtent();
 }
 
-
-
-
 bool USFrameData::is4D()
 {
 	int numberOfFrames = mReducedToFull.size();
@@ -525,5 +523,11 @@ bool USFrameData::is4D()
 	return false;
 }
 
+bool USFrameData::is8bit() const
+{
+	if (mImageContainer->get(0)->GetNumberOfScalarComponents() == 1)
+		return true;
+	return false;
+}
 
 }//namespace cx

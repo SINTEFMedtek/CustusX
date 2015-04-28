@@ -30,7 +30,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxLandmarkImageRegistrationWidget.h"
+#include "cxImageLandmarksWidget.h"
 
 #include <sstream>
 #include <QVBoxLayout>
@@ -56,10 +56,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewGroupData.h"
 #include "cxRepContainer.h"
 #include "cxTrackingService.h"
+#include "cxLandmarkListener.h"
 
 namespace cx
 {
-LandmarkImageRegistrationWidget::LandmarkImageRegistrationWidget(RegServices services, QWidget* parent,
+ImageLandmarksWidget::ImageLandmarksWidget(RegServices services, QWidget* parent,
 	QString objectName, QString windowTitle, bool useRegistrationFixedPropertyInsteadOfActiveImage) :
 	LandmarkRegistrationWidget(services, parent, objectName, windowTitle),
 	mUseRegistrationFixedPropertyInsteadOfActiveImage(useRegistrationFixedPropertyInsteadOfActiveImage)
@@ -68,15 +69,16 @@ LandmarkImageRegistrationWidget::LandmarkImageRegistrationWidget(RegServices ser
 		mCurrentProperty.reset(new StringPropertyRegistrationFixedImage(services.registrationService, services.patientModelService));
 	else
 		mCurrentProperty = StringPropertySelectData::New(mServices.patientModelService);
-	connect(mCurrentProperty.get(), &Property::changed, this, &LandmarkImageRegistrationWidget::onCurrentImageChanged);
-	mImageLandmarkSource = ImageLandmarksSource::New();
+	connect(mCurrentProperty.get(), &Property::changed, this, &ImageLandmarksWidget::onCurrentImageChanged);
+
+	mLandmarkListener->useOnlyOneSourceUpdatedFromOutside();
 
 	mActiveToolProxy = ActiveToolProxy::New(services.trackingService);
 	connect(mActiveToolProxy.get(), SIGNAL(toolVisible(bool)), this, SLOT(enableButtons()));
 	connect(mActiveToolProxy.get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(enableButtons()));
 
 	//pushbuttons
-	mAddLandmarkButton = new QPushButton("Add", this);
+	mAddLandmarkButton = new QPushButton("New Landmark", this);
 	mAddLandmarkButton->setToolTip("Add landmark");
 	mAddLandmarkButton->setDisabled(true);
 	connect(mAddLandmarkButton, SIGNAL(clicked()), this, SLOT(addLandmarkButtonClickedSlot()));
@@ -103,15 +105,15 @@ LandmarkImageRegistrationWidget::LandmarkImageRegistrationWidget(RegServices ser
 	mVerticalLayout->addLayout(landmarkButtonsLayout);
 }
 
-LandmarkImageRegistrationWidget::~LandmarkImageRegistrationWidget()
+ImageLandmarksWidget::~ImageLandmarksWidget()
 {
 }
 
-void LandmarkImageRegistrationWidget::onCurrentImageChanged()
+void ImageLandmarksWidget::onCurrentImageChanged()
 {
 	DataPtr data = mCurrentProperty->getData();
 
-	mImageLandmarkSource->setData(data);
+	mLandmarkListener->setLandmarkSource(data);
 	this->enableButtons();
 
 	if (data && !mServices.registrationService->getFixedData())
@@ -120,23 +122,17 @@ void LandmarkImageRegistrationWidget::onCurrentImageChanged()
 	this->setModified();
 }
 
-PickerRepPtr LandmarkImageRegistrationWidget::getPickerRep()
+PickerRepPtr ImageLandmarksWidget::getPickerRep()
 {
 	return mServices.visualizationService->get3DReps(0, 0)->findFirst<PickerRep>();
-//	return RepContainer(mServices.visualizationService->get3DView(0, 0))->findFirst<PickerRep>();
-
-//	if (!mServices.visualizationService->get3DView(0, 0))
-//		return PickerRepPtr();
-
-//	return RepContainer::findFirstRep<PickerRep>(mServices.visualizationService->get3DView(0, 0)->getReps());
 }
 
-DataPtr LandmarkImageRegistrationWidget::getCurrentData() const
+DataPtr ImageLandmarksWidget::getCurrentData() const
 {
-	return mImageLandmarkSource->getData();
+	return mLandmarkListener->getLandmarkSource();
 }
 
-void LandmarkImageRegistrationWidget::addLandmarkButtonClickedSlot()
+void ImageLandmarksWidget::addLandmarkButtonClickedSlot()
 {
 	PickerRepPtr PickerRep = this->getPickerRep();
 	if (!PickerRep)
@@ -158,7 +154,7 @@ void LandmarkImageRegistrationWidget::addLandmarkButtonClickedSlot()
 }
 
 
-void LandmarkImageRegistrationWidget::editLandmarkButtonClickedSlot()
+void ImageLandmarksWidget::editLandmarkButtonClickedSlot()
 {
 	PickerRepPtr PickerRep = this->getPickerRep();
 	if (!PickerRep)
@@ -179,7 +175,7 @@ void LandmarkImageRegistrationWidget::editLandmarkButtonClickedSlot()
     this->activateLandmark(this->getNextLandmark());
 }
 
-void LandmarkImageRegistrationWidget::removeLandmarkButtonClickedSlot()
+void ImageLandmarksWidget::removeLandmarkButtonClickedSlot()
 {
 	DataPtr image = this->getCurrentData();
 	if (!image)
@@ -190,13 +186,13 @@ void LandmarkImageRegistrationWidget::removeLandmarkButtonClickedSlot()
     this->activateLandmark(next);
 }
 
-void LandmarkImageRegistrationWidget::cellClickedSlot(int row, int column)
+void ImageLandmarksWidget::cellClickedSlot(int row, int column)
 {
 	LandmarkRegistrationWidget::cellClickedSlot(row, column);
 	this->enableButtons();
 }
 
-void LandmarkImageRegistrationWidget::enableButtons()
+void ImageLandmarksWidget::enableButtons()
 {
 	bool selected = !mLandmarkTableWidget->selectedItems().isEmpty();
 	bool loaded = this->getCurrentData() != 0;
@@ -214,8 +210,9 @@ void LandmarkImageRegistrationWidget::enableButtons()
 //	this->setModified();
 }
 
-void LandmarkImageRegistrationWidget::showEvent(QShowEvent* event)
+void ImageLandmarksWidget::showEvent(QShowEvent* event)
 {
+	mServices.visualizationService->getGroup(0)->setRegistrationMode(rsIMAGE_REGISTRATED);
 	LandmarkRegistrationWidget::showEvent(event);
 
 	if(!mUseRegistrationFixedPropertyInsteadOfActiveImage)
@@ -224,34 +221,16 @@ void LandmarkImageRegistrationWidget::showEvent(QShowEvent* event)
 		if (image)
 			mCurrentProperty->setValue(image->getUid());
 	}
-
-	mServices.visualizationService->getGroup(0)->setRegistrationMode(rsIMAGE_REGISTRATED);
-
-	LandmarkRepPtr rep = mServices.visualizationService->get3DReps(0, 0)->findFirst<LandmarkRep>();
-	if (rep)
-	{
-		rep->setPrimarySource(mImageLandmarkSource);
-		rep->setSecondarySource(LandmarksSourcePtr());
-	}
 }
 
-void LandmarkImageRegistrationWidget::hideEvent(QHideEvent* event)
+void ImageLandmarksWidget::hideEvent(QHideEvent* event)
 {
+	mServices.visualizationService->getGroup(0)->setRegistrationMode(rsNOT_REGISTRATED);
 	LandmarkRegistrationWidget::hideEvent(event);
 
-	if(mServices.visualizationService->get3DView(0, 0))
-	{
-		LandmarkRepPtr rep = mServices.visualizationService->get3DReps(0, 0)->findFirst<LandmarkRep>();
-		if (rep)
-		{
-			rep->setPrimarySource(LandmarksSourcePtr());
-			rep->setSecondarySource(LandmarksSourcePtr());
-		}
-	}
-	mServices.visualizationService->getGroup(0)->setRegistrationMode(rsNOT_REGISTRATED);
 }
 
-void LandmarkImageRegistrationWidget::prePaintEvent()
+void ImageLandmarksWidget::prePaintEvent()
 {
     LandmarkRegistrationWidget::prePaintEvent();
 
@@ -262,7 +241,7 @@ void LandmarkImageRegistrationWidget::prePaintEvent()
 	mEditLandmarkButton->setEnabled(!landmarks.empty() && !mActiveLandmark.isEmpty());
 }
 
-LandmarkMap LandmarkImageRegistrationWidget::getTargetLandmarks() const
+LandmarkMap ImageLandmarksWidget::getTargetLandmarks() const
 {
 	DataPtr image = this->getCurrentData();
 	if (!image)
@@ -274,7 +253,7 @@ LandmarkMap LandmarkImageRegistrationWidget::getTargetLandmarks() const
 /** Return transform from target space to reference space
  *
  */
-Transform3D LandmarkImageRegistrationWidget::getTargetTransform() const
+Transform3D ImageLandmarksWidget::getTargetTransform() const
 {
 	DataPtr image = this->getCurrentData();
 	if (!image)
@@ -282,7 +261,7 @@ Transform3D LandmarkImageRegistrationWidget::getTargetTransform() const
 	return image->get_rMd();
 }
 
-void LandmarkImageRegistrationWidget::setTargetLandmark(QString uid, Vector3D p_target)
+void ImageLandmarksWidget::setTargetLandmark(QString uid, Vector3D p_target)
 {
 	DataPtr image = this->getCurrentData();
 	if (!image)
@@ -290,7 +269,7 @@ void LandmarkImageRegistrationWidget::setTargetLandmark(QString uid, Vector3D p_
 	image->getLandmarks()->setLandmark(Landmark(uid, p_target));
 }
 
-QString LandmarkImageRegistrationWidget::getTargetName() const
+QString ImageLandmarksWidget::getTargetName() const
 {
 	DataPtr image = this->getCurrentData();
 	if (!image)

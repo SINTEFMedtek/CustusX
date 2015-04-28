@@ -102,6 +102,7 @@ private:
 	StringPropertySelectImagePtr mImageAdapter;
 	PatientModelServicePtr mPatientModelService;
 private slots:
+	void setupUI();
 	void clipperChangedSlot();
 	void clearButtonClickedSlot();
 	void saveButtonClickedSlot();

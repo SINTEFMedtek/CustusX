@@ -93,10 +93,23 @@ ClippingWidget::ClippingWidget(PatientModelServicePtr patientModelService, QWidg
 	BaseWidget(parent, "ClippingWidget", "Clip"),
 	mPatientModelService(patientModelService)
 {
+	connect(viewService().get(), &ViewService::activeLayoutChanged, this, &ClippingWidget::setupUI);
+	this->setupUI();
+}
+
+void ClippingWidget::setupUI()
+{
+	if (mInteractiveClipper)
+		return;
+
 	mInteractiveClipper = viewService()->getClipper();
+
+	if (!mInteractiveClipper)
+		return;
+
 	connect(mInteractiveClipper.get(), SIGNAL(changed()), this, SLOT(clipperChangedSlot()));
 
-	mImageAdapter = StringPropertySelectImage::New(patientModelService);
+	mImageAdapter = StringPropertySelectImage::New(mPatientModelService);
 	LabeledComboBoxWidget* imageCombo = new LabeledComboBoxWidget(this, mImageAdapter);
 	connect(mImageAdapter.get(), SIGNAL(changed()), this, SLOT(imageChangedSlot()));
 

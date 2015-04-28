@@ -122,9 +122,8 @@ void VolumetricRep::setImage(ImagePtr image)
 	if (mImage)
 	{
 		mVolumeProperty->setImage(ImagePtr());
-//		mImage->disconnectFromRep(this->getSelf());
-		disconnect(mImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
-		disconnect(mImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
+		disconnect(mImage.get(), &Image::vtkImageDataChanged, this, &VolumetricRep::vtkImageDataChangedSlot);
+		disconnect(mImage.get(), &Image::transformChanged, this, &VolumetricRep::transformChangedSlot);
 		mMonitor.reset();
 		mMapper->SetInputData( (vtkImageData*)NULL );
 	}
@@ -133,9 +132,8 @@ void VolumetricRep::setImage(ImagePtr image)
 
 	if (mImage)
 	{
-		connect(mImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
-		connect(mImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
-		connect(mImage.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(updateVtkImageDataSlot()));
+		connect(mImage.get(), &Image::vtkImageDataChanged, this, &VolumetricRep::vtkImageDataChangedSlot);
+		connect(mImage.get(), &Image::transformChanged, this, &VolumetricRep::transformChangedSlot);
 		mVolumeProperty->setImage(mImage);
 		this->vtkImageDataChangedSlot();
 		mMonitor = ImageMapperMonitor::create(mVolume, mImage);

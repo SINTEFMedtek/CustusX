@@ -7,28 +7,28 @@ set(PLUGIN_SRCS
     cxRegistrationMethodLandmarkService.h
     cxRegistrationMethodLandmarkService.cpp
     cxFastImageRegistrationWidget.cpp
-    cxFastRegistrationsWidget.cpp
-    cxFastRegistrationsWidget.h
-    cxLandmarkRegistrationsWidget.h
-    cxLandmarkRegistrationsWidget.cpp
-    cxLandmarkImageRegistrationWidget.cpp
+    cxImageLandmarksWidget.cpp
     cxLandmarkRegistrationWidget.cpp
     cxLandmarkPatientRegistrationWidget.cpp
     cxLandmarkImage2ImageRegistrationWidget.cpp
     cxFastPatientRegistrationWidget.h
     cxFastPatientRegistrationWidget.cpp
     cxFastOrientationRegistrationWidget.cpp
+    cxLandmarkListener.cpp
+    cxPatientLandMarksWidget.cpp
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
     cxRegistrationMethodLandmarkPluginActivator.h
     cxLandmarkRegistrationWidget.h
-    cxLandmarkImageRegistrationWidget.h
+    cxImageLandmarksWidget.h
     cxLandmarkPatientRegistrationWidget.h
     cxLandmarkImage2ImageRegistrationWidget.h
     cxFastImageRegistrationWidget.h
     cxFastOrientationRegistrationWidget.h
+    cxLandmarkListener.h
+    cxPatientLandMarksWidget.h
 )
 
 

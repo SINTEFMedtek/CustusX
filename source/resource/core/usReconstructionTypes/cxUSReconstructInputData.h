@@ -76,6 +76,7 @@ struct cxResource_EXPORT USReconstructInputData
 
 	vtkImageDataPtr getMask();
 	bool isValid() const;
+	bool is8bit() const;
 };
 
 /**

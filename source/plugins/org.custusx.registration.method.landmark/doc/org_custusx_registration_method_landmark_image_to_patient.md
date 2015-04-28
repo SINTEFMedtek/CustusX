@@ -24,3 +24,11 @@ Sample points on the patient that corresponds to 3 or more landmarks already sam
 
 Point on the patient using a tool and click the Sample button.
 Press the register button to register fixed image.
+
+\addindex org_custusx_registration_method_landmark_image_to_patient_registration_widget
+Registration
+-----------------------------------------------------------
+
+Register patient to Fixed Volume
+
+Usually the register button don't need to be used as the registration is automatically performed when at lest 3 landmarks are sampled in both the image and patient.

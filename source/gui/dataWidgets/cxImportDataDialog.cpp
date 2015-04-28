@@ -111,7 +111,7 @@ ImportDataDialog::ImportDataDialog(PatientModelServicePtr patientModelService, Q
   layout->addWidget(mTransformFromParentFrameCheckBox);
   layout->addWidget(mConvertToUnsignedCheckBox);
 
-  connect(mParentFrameAdapter.get(), SIGNAL(changed()), this, SLOT(updateImportTransformButton()));
+  connect(mParentFrameAdapter.get(), &Property::changed, this, &ImportDataDialog::updateImportTransformButton);
   this->updateImportTransformButton();
 
   mErrorLabel = new QLabel();
@@ -122,8 +122,9 @@ ImportDataDialog::ImportDataDialog(PatientModelServicePtr patientModelService, Q
   mOkButton = new QPushButton("OK", this);
   buttons->addStretch();
   buttons->addWidget(mOkButton);
-  connect(mOkButton, SIGNAL(clicked()), this, SLOT(accept()));
-  connect(this, SIGNAL(accepted()), this, SLOT(acceptedSlot()));
+  connect(mOkButton, &QPushButton::clicked, this, &QDialog::accept);
+  connect(this, &QDialog::accepted, this, &ImportDataDialog::acceptedSlot);
+  connect(this, &QDialog::rejected, this, &ImportDataDialog::finishedSlot);
   mOkButton->setDefault(true);
   mOkButton->setFocus();
 
@@ -236,6 +237,11 @@ void ImportDataDialog::acceptedSlot()
 
 	mPatientModelService->autoSave();
 	viewService()->autoShowData(mData);
+	this->finishedSlot();
+}
+
+void ImportDataDialog::finishedSlot()
+{
 }
 
 /** According to

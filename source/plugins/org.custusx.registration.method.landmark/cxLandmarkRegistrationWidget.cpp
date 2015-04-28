@@ -47,17 +47,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxManualTool.h"
 #include "cxPatientModelService.h"
 #include "cxRegistrationService.h"
+#include "cxViewService.h"
 #include"cxData.h"
 #include "cxLogger.h"
 #include "cxLandmark.h"
 #include "cxTrackingService.h"
+#include "cxLandmarkListener.h"
 
 namespace cx
 {
 LandmarkRegistrationWidget::LandmarkRegistrationWidget(RegServices services, QWidget* parent,
 	QString objectName, QString windowTitle) :
 	RegistrationBaseWidget(services, parent, objectName, windowTitle), mVerticalLayout(new QVBoxLayout(this)),
-		mLandmarkTableWidget(new QTableWidget(this)), mAvarageAccuracyLabel(new QLabel(QString(" "), this))
+		mLandmarkTableWidget(new QTableWidget(this)), mAvarageAccuracyLabel(new QLabel(QString(" "), this)),
+		mLandmarkListener(new LandmarkListener(services))
 {
 	//table widget
 	connect(mLandmarkTableWidget, SIGNAL(cellClicked(int, int)), this, SLOT(cellClickedSlot(int, int)));
@@ -112,19 +115,27 @@ void LandmarkRegistrationWidget::setManualToolPosition(Vector3D p_r)
 void LandmarkRegistrationWidget::showEvent(QShowEvent* event)
 {
 	QWidget::showEvent(event);
-	connect(mServices.patientModelService.get(), &PatientModelService::landmarkPropertiesChanged,
-			this, &LandmarkRegistrationWidget::landmarkUpdatedSlot);
+	mLandmarkListener->showRep();
+	connect(mServices.patientModelService.get(), &PatientModelService::landmarkPropertiesChanged,this, &LandmarkRegistrationWidget::landmarkUpdatedSlot);
+	connect(mServices.patientModelService->getPatientLandmarks().get(), &Landmarks::landmarkAdded, this, &LandmarkRegistrationWidget::landmarkUpdatedSlot);
+	connect(mServices.patientModelService->getPatientLandmarks().get(), &Landmarks::landmarkRemoved, this, &LandmarkRegistrationWidget::landmarkUpdatedSlot);
+
+	connect(mServices.visualizationService.get(), &VisualizationService::activeLayoutChanged, mLandmarkListener.get(), &LandmarkListener::showRep);
 
 //	mManager->restart();
 	mServices.registrationService->setLastRegistrationTime(QDateTime::currentDateTime());
 	this->setModified();
+
 }
 
 void LandmarkRegistrationWidget::hideEvent(QHideEvent* event)
 {
 	QWidget::hideEvent(event);
-	disconnect(mServices.patientModelService.get(), &PatientModelService::landmarkPropertiesChanged,
-			this, &LandmarkRegistrationWidget::landmarkUpdatedSlot);
+	disconnect(mServices.patientModelService.get(), &PatientModelService::landmarkPropertiesChanged, this, &LandmarkRegistrationWidget::landmarkUpdatedSlot);
+	disconnect(mServices.patientModelService->getPatientLandmarks().get(), &Landmarks::landmarkAdded, this, &LandmarkRegistrationWidget::landmarkUpdatedSlot);
+	disconnect(mServices.patientModelService->getPatientLandmarks().get(), &Landmarks::landmarkRemoved, this, &LandmarkRegistrationWidget::landmarkUpdatedSlot);
+	disconnect(mServices.visualizationService.get(), &VisualizationService::activeLayoutChanged, mLandmarkListener.get(), &LandmarkListener::showRep);
+	mLandmarkListener->hideRep();
 }
 
 void LandmarkRegistrationWidget::prePaintEvent()

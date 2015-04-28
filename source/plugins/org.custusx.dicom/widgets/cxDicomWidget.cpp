@@ -42,7 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ctkDICOMObjectListWidget.h"
 #include "ctkPluginContext.h"
 #include "cxDicomWidget.h"
-//#include "cxDataLocations.h"
 #include "cxProfile.h"
 #include "cxTypeConversions.h"
 #include "cxDicomConverter.h"
@@ -50,6 +49,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxPatientModelService.h"
 #include "cxDicomImageReader.h"
+#include "cxVisServices.h"
+#include "cxViewService.h"
 
 namespace cx
 {
@@ -179,13 +180,12 @@ void DicomWidget::importSeries(QString seriesUid)
 
 void DicomWidget::loadIntoPatientModel(ImagePtr image, QString seriesUid)
 {
-	ctkServiceTracker<PatientModelService*> tracker(mContext);
-	tracker.open();
-	PatientModelService* service = tracker.getService(); // get arbitrary instance of this type
+	VisServicesPtr services = VisServices::create(mContext);
 
-	if (service)
+	if (!services->patientModelService->isNull())
 	{
-		service->insertData(image);
+		services->patientModelService->insertData(image);
+		services->visualizationService->autoShowData(image);
 		report(QString("Loaded DICOM series %1 as %2").arg(seriesUid).arg(image->getName()));
 	}
 	else
