@@ -225,27 +225,7 @@ void Texture3DSlicerProxyImpl::createGeometryPlane( Vector3D point1_s,  Vector3D
 
 void Texture3DSlicerProxyImpl::setImages(std::vector<ImagePtr> images_raw)
 {
-	if(images_raw.size() > mMaxImages)
-	{
-		QString errorText = QString("Texture3DSlicerProxyImpl: GPU multislicer can't handle more than %1 images. Additional images are not shown.").arg(mMaxImages);
-		reportError(errorText);
-		images_raw.resize(mMaxImages);
-	}
-
-	std::vector<ImagePtr> images(images_raw.size());
-	for (unsigned i=0; i<images.size(); ++i)
-	{
-		images[i] = images_raw[i]->getUnsigned(images_raw[i]);
-	}
-
-	if (mImages.size() == images.size())
-	{
-		bool equal = true;
-		for (unsigned i = 0; i < mImages.size(); ++i)
-			equal &= (mImages[i] == images[i]);
-		if (equal)
-			return;
-	}
+	std::vector<ImagePtr> images = processImages(images_raw);
 
 	for (unsigned i = 0; i < mImages.size(); ++i)
 	{
@@ -258,7 +238,7 @@ void Texture3DSlicerProxyImpl::setImages(std::vector<ImagePtr> images_raw)
 
 	for (unsigned i = 0; i < mImages .size(); ++i)
 	{
-		vtkImageDataPtr inputImage = mImages[i]->getBaseVtkImageData();//
+		vtkImageDataPtr inputImage = mImages[i]->getBaseVtkImageData();
 
 		GPUImageDataBufferPtr dataBuffer = GPUImageBufferRepository::getInstance()->getGPUImageDataBuffer(
 			inputImage);
@@ -278,6 +258,22 @@ void Texture3DSlicerProxyImpl::setImages(std::vector<ImagePtr> images_raw)
 			cstring_cast(this->getTCoordName(i)),
 			vtkDataObject::FIELD_ASSOCIATION_POINTS);
 	}
+}
+
+std::vector<ImagePtr> Texture3DSlicerProxyImpl::processImages(std::vector<ImagePtr> images_raw)
+{
+	if(images_raw.size() > mMaxImages)
+	{
+		QString errorText = QString("Texture3DSlicerProxyImpl: GPU multislicer can't handle more than %1 images. Additional images are not shown.").arg(mMaxImages);
+		reportError(errorText);
+		images_raw.resize(mMaxImages);
+	}
+
+	std::vector<ImagePtr> images(images_raw.size());
+	for (unsigned i=0; i<images.size(); ++i)
+		images[i] = images_raw[i]->getUnsigned(images_raw[i]);
+
+	return images;
 }
 
 
