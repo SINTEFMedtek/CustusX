@@ -136,10 +136,11 @@ public:
 	void purgeAll();
 
 	bool is4D();//Do this object contain 4D data? (Opposed to the usual 3D data)
+	bool is8bit() const;
 
 protected:
 	USFrameData();
-	vtkImageDataPtr useAngio(vtkImageDataPtr inData, vtkImageDataPtr grayFrame) const;/// Use only US angio data as input. Removes grayscale from the US data and converts the remaining color to grayscale
+	vtkImageDataPtr useAngio(vtkImageDataPtr inData, vtkImageDataPtr grayFrame, int frameNum) const;/// Use only US angio data as input. Removes grayscale from the US data and converts the remaining color to grayscale
 
 	vtkImageDataPtr cropImageExtent(vtkImageDataPtr input, IntBoundingBox3D cropbox) const;
 	vtkImageDataPtr toGrayscaleAndEffectuateCropping(vtkImageDataPtr input) const;

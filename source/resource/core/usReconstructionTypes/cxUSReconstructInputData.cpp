@@ -54,4 +54,9 @@ bool USReconstructInputData::isValid() const
 	return true;
 }
 
+bool USReconstructInputData::is8bit() const
+{
+	return mUsRaw->is8bit();
+}
+
 } // namespace cx
