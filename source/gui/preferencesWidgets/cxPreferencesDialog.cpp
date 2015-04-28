@@ -367,8 +367,10 @@ void VideoTab::init()
 
   m24bitRadioButton = new QRadioButton("Save acquisition as 24bit", this);
   m24bitRadioButton->setChecked(!bw);
+  m24bitRadioButton->setToolTip("Convert color video to 24 bit color. If the video already is 8 bit grayscale it will not be converted to 24 bit");
   m8bitRadioButton = new QRadioButton("Save acquisition as 8bit", this);
   m8bitRadioButton->setChecked(bw);
+  m8bitRadioButton->setToolTip("Convert acquired video to 8 bit grayscale");
 
 	mCompressCheckBox = new QCheckBox("Compress acquisition data");
 	mCompressCheckBox->setChecked(settings()->value("Ultrasound/CompressAcquisition", true).toBool());
