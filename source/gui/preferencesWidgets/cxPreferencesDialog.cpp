@@ -61,6 +61,7 @@ namespace cx
 VisualizationTab::VisualizationTab(PatientModelServicePtr patientModelService, QWidget *parent) :
 		PreferenceTab(parent), mStereoTypeActionGroup(NULL)
 {
+	this->setObjectName("preferences_visualization_widget");
 	mPatientModelService = patientModelService;
 	mMainLayout = NULL;
 	mStereoTypeComboBox = NULL;
@@ -260,6 +261,7 @@ void VisualizationTab::setBackgroundColorSlot(QColor color)
 AutomationTab::AutomationTab(QWidget *parent) :
 		PreferenceTab(parent)
 {
+	this->setObjectName("preferences_automation_widget");
 	mAutoSelectActiveToolCheckBox = NULL;
 	mAutoStartTrackingCheckBox = NULL;
 	mAutoStartStreamingCheckBox = NULL;
@@ -346,11 +348,13 @@ void AutomationTab::saveParametersSlot()
 VideoTab::VideoTab(QWidget *parent) :
 		PreferenceTab(parent)
 {
-	  mAcquisitionNameLineEdit = NULL;
-	  mMainLayout = NULL;
-	  m24bitRadioButton = NULL;
-	  m8bitRadioButton = NULL;
-	  mCompressCheckBox = NULL;
+	this->setObjectName("preferences_video_widget");
+	mAcquisitionNameLineEdit = NULL;
+	mMainLayout = NULL;
+	m24bitRadioButton = NULL;
+	m8bitRadioButton = NULL;
+	mCompressCheckBox = NULL;
+
 }
 
 void VideoTab::init()
@@ -359,8 +363,9 @@ void VideoTab::init()
   QHBoxLayout* acqNameLayout = new QHBoxLayout;
   toplayout->addLayout(acqNameLayout);
 
-  acqNameLayout->addWidget(new QLabel("Description"));
+  acqNameLayout->addWidget(new QLabel("Name prefix"));
   mAcquisitionNameLineEdit = new QLineEdit(settings()->value("Ultrasound/acquisitionName").toString());
+  mAcquisitionNameLineEdit->setToolTip("Prefix to name for grabbed video.");
   acqNameLayout->addWidget(mAcquisitionNameLineEdit);
 
   bool bw = settings()->value("Ultrasound/8bitAcquisitionData").toBool();
@@ -401,6 +406,7 @@ ToolConfigTab::ToolConfigTab(QWidget* parent) :
     mFilePreviewWidget(new FilePreviewWidget(this)),
     mImagePreviewWidget(new ToolImagePreviewWidget(this))
 {
+	this->setObjectName("preferences_tool_config_widget");
   mToolConfigureGroupBox = new ToolConfigureGroupBox(this);
   mToolFilterGroupBox  = new ToolFilterGroupBox(this);
   mToolFilterGroupBox->setTrackingSystemSelector(mToolConfigureGroupBox->getTrackingSystemSelector());
@@ -582,6 +588,7 @@ DebugTab::DebugTab(QWidget *parent) :
 		mRenderSpeedLoggingCheckBox(NULL),
 		mMainLayout(NULL)
 {
+	this->setObjectName("preferences_debug_widget");
 }
 
 void DebugTab::init()

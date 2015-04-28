@@ -9,7 +9,7 @@ The acquisition plugin enables acquisition of various data streams.
 
 \subpage org_custusx_resource_core_usacquisitionfileformat
 
-\addindex us_acqusition_widget
+\addindex org_custusx_acquisition_widgets_acquisition
 US Acquisition Widget {#org_custusx_acquisition_widgets_acquisition}
 ===========================================================
 

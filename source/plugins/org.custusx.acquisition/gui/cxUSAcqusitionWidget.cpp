@@ -65,7 +65,7 @@ USAcqusitionWidget::USAcqusitionWidget(AcquisitionServicePtr acquisitionService,
 	RecordBaseWidget(acquisitionService, parent, settings()->value("Ultrasound/acquisitionName").toString()),
 	mUsReconstructionService(usReconstructionService)
 {
-	this->setObjectName("USAcqusitionWidget");
+	this->setObjectName("org_custusx_acquisition_widgets_acquisition");
 	this->setWindowTitle("US Acquisition");
 	this->setToolTip("Record and reconstruct US data");
 

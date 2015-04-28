@@ -51,8 +51,8 @@ namespace cx
 
 PreferenceTab::PreferenceTab(QWidget *parent) :
     QWidget(parent)
-    //settings()(settings())
 {
+	this->setFocusPolicy(Qt::StrongFocus); // needed for help system: focus is used to display help text
   mTopLayout = new QVBoxLayout;
 
   QVBoxLayout* vtopLayout = new QVBoxLayout;
@@ -68,6 +68,7 @@ PreferenceTab::PreferenceTab(QWidget *parent) :
 PerformanceTab::PerformanceTab(QWidget *parent) :
 		PreferenceTab(parent)
 {
+	this->setObjectName("preferences_performance_widget");
 	mRenderingIntervalSpinBox = NULL;
 	mRenderingRateLabel = NULL;
 	mSmartRenderCheckBox = NULL;
