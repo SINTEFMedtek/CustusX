@@ -179,24 +179,24 @@ void OpenIGTLinkTool::toolTransformAndTimestampSlot(Transform3D matrix, double t
 void OpenIGTLinkTool::calculateTpsSlot()
 {
     int tpsNr = 0;
-	/*
-    int numberOfTransformsToCheck = ((mPositionHistory->size() >= 10) ? 10 : mPositionHistory->size());
-    if (	numberOfTransformsToCheck <= 1)
+    size_t numberOfTransformsToCheck = ((mPositionHistory->size() >= 10) ? 10 : mPositionHistory->size());
+    if (numberOfTransformsToCheck <= 1)
     {
         emit tps(0);
         return;
     }
 
-    TimedTransformMap::reverse_iterator it = mPositionHistory->rbegin();
-    double lastTransform = it->first;
-    for (int i = 0; i < numberOfTransformsToCheck; ++i)
-        ++it;
-    double firstTransform = it->first;
+    TimedTransformMap::reverse_iterator rit = mPositionHistory->rbegin();
+    double lastTransform = rit->first;
+    for (int i = 0; i < numberOfTransformsToCheck-1; ++i)
+    {
+        ++rit;
+    }
+    double firstTransform = rit->first;
     double secondsPassed = (lastTransform - firstTransform) / 1000;
 
     if (!similar(secondsPassed, 0))
         tpsNr = (int) (numberOfTransformsToCheck / secondsPassed);
-		*/
     emit tps(tpsNr);
 }
 
