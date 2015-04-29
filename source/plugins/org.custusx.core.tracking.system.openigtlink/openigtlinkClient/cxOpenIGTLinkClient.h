@@ -38,9 +38,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObject>
 #include "igtlMessageHeader.h"
+#include "igtlTransformMessage.h"
+#include "igtlImageMessage.h"
+#include "igtlStatusMessage.h"
+#include "igtlStringMessage.h"
+
 #include "cxSocket.h"
 #include "cxTransform3D.h"
 #include "cxImage.h"
+#include "cxLogger.h"
+
+#define CX_OPENIGTLINK_CHANNEL_NAME "OpenIGTLink"
 
 namespace cx {
 
@@ -75,10 +83,33 @@ private:
     bool receiveHeader(const igtl::MessageHeader::Pointer header) const;
     bool receiveBody(const igtl::MessageHeader::Pointer header);
 
-    bool receiveTransform(const igtl::MessageBase::Pointer header);
-    bool receiveImage(const igtl::MessageBase::Pointer header);
-    bool receiveStatus(const igtl::MessageBase::Pointer header);
-    bool receiveString(const igtl::MessageBase::Pointer header);
+    template <typename T>
+    bool receive(const igtl::MessageBase::Pointer header)
+    {
+        T::Pointer body = T::New();
+        body->SetMessageHeader(header);
+        body->AllocatePack();
+
+        if(!this->socketReceive(body->GetPackBodyPointer(), body->GetPackBodySize()))
+            return false;
+
+        int c = body->Unpack(1);
+        this->checkCRC(c);
+        if (c & igtl::MessageHeader::UNPACK_BODY)
+        {
+            this->process(body);
+        }
+        else
+        {
+            CX_LOG_CHANNEL_ERROR(CX_OPENIGTLINK_CHANNEL_NAME) << "Could not unpack the body.";
+            return false;
+        }
+        return true;
+    }
+    void process(const igtl::TransformMessage::Pointer header);
+    void process(const igtl::ImageMessage::Pointer header);
+    void process(const igtl::StatusMessage::Pointer header);
+    void process(const igtl::StringMessage::Pointer body);
 
     bool socketReceive(void *packPointer, int packSize) const;
     void checkCRC(int c) const;

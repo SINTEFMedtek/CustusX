@@ -33,14 +33,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxOpenIGTLinkClient.h"
 
 #include "cxSender.h"
-#include "igtlTransformMessage.h"
-#include "igtlImageMessage.h"
-#include "cxLogger.h"
 #include "cxTime.h"
 
 #include "cxIGTLinkConversion.h"
-
-#define CX_OPENIGTLINK_CHANNEL_NAME "OpenIGTLink"
 
 namespace cx
 {
@@ -149,22 +144,22 @@ bool OpenIGTLinkClient::receiveBody(const igtl::MessageBase::Pointer header)
 {
     if(strcmp(header->GetDeviceType(), "TRANSFORM") == 0)
     {
-        if(!this->receiveTransform(header))
+        if(!this->receive<igtl::TransformMessage>(header))
             return false;
     }
     else if(strcmp(header->GetDeviceType(), "IMAGE") == 0)
     {
-        if(!this->receiveImage(header))
+        if(!this->receive<igtl::ImageMessage>(header))
             return false;
     }
     else if(strcmp(header->GetDeviceType(), "STATUS") == 0)
     {
-        if(!this->receiveStatus(header))
+        if(!this->receive<igtl::StatusMessage>(header))
             return false;
     }
     else if(strcmp(header->GetDeviceType(), "STRING") == 0)
     {
-        if(!this->receiveString(header))
+        if(!this->receive<igtl::StringMessage>(header))
             return false;
     }
     else
@@ -176,107 +171,39 @@ bool OpenIGTLinkClient::receiveBody(const igtl::MessageBase::Pointer header)
     return true;
 }
 
-bool OpenIGTLinkClient::receiveTransform(const igtl::MessageBase::Pointer header)
+void OpenIGTLinkClient::process(const igtl::TransformMessage::Pointer body)
 {
-    igtl::TransformMessage::Pointer body = igtl::TransformMessage::New();
-    body->SetMessageHeader(header);
-    body->AllocatePack();
+    QString deviceName = body->GetDeviceName();
 
-    if(!this->socketReceive(body->GetPackBodyPointer(), body->GetPackBodySize()))
-        return false;
+    IGTLinkConversion converter;
+    Transform3D transform3D = converter.decode(body);
 
-    int c = body->Unpack(1);
-    this->checkCRC(c);
-    if (c & igtl::MessageHeader::UNPACK_BODY)
-    {
-        // if CRC check is OK. Read transform data.
-        QString deviceName = body->GetDeviceName();
+    igtl::TimeStamp::Pointer ts = igtl::TimeStamp::New();
+    body->GetTimeStamp(ts);
+    double timestamp_ms = ts->GetTimeStamp()*1000; //since epoch
 
-        IGTLinkConversion converter;
-        Transform3D transform3D = converter.decode(body);
-
-        igtl::TimeStamp::Pointer ts = igtl::TimeStamp::New();
-        body->GetTimeStamp(ts);
-        double timestamp_ms = ts->GetTimeStamp()*1000; //since epoch
-
-        emit transform(deviceName, transform3D, timestamp_ms);
-    }
-    else
-    {
-        CX_LOG_CHANNEL_ERROR(CX_OPENIGTLINK_CHANNEL_NAME) << "Could not unpack the body (Transform).";
-        return false;
-    }
-    return true;
+    emit transform(deviceName, transform3D, timestamp_ms);
 }
 
-bool OpenIGTLinkClient::receiveImage(const igtl::MessageBase::Pointer header)
+void OpenIGTLinkClient::process(const igtl::ImageMessage::Pointer body)
 {
-    igtl::ImageMessage::Pointer body = igtl::ImageMessage::New();
-    body->SetMessageHeader(header);
-    body->AllocatePack();
-
-    if(!this->socketReceive(body->GetPackBodyPointer(), body->GetPackBodySize()))
-        return false;
-
-    int c = body->Unpack(1);
-    this->checkCRC(c);
-    if (c & (igtl::MessageHeader::UNPACK_HEADER | igtl::MessageHeader::UNPACK_BODY))
-    {
-        IGTLinkConversion converter;
-        ImagePtr theImage = converter.decode(body);
-        emit image(theImage);
-    }
-    return true;
+    IGTLinkConversion converter;
+    ImagePtr theImage = converter.decode(body);
+    emit image(theImage);
 }
 
-bool OpenIGTLinkClient::receiveStatus(const igtl::MessageBase::Pointer header)
+void OpenIGTLinkClient::process(const igtl::StatusMessage::Pointer body)
 {
-    igtl::StatusMessage::Pointer body = igtl::StatusMessage::New();
-    body->SetMessageHeader(header);
-    body->AllocatePack();
-
-    if(!this->socketReceive(body->GetPackBodyPointer(), body->GetPackBodySize()))
-        return false;
-
-    int c = body->Unpack(1);
-    this->checkCRC(c);
-    if (c & igtl::MessageHeader::UNPACK_BODY)
-    {
-        IGTLinkConversion converter;
-        QString status = converter.decode(body);
-        CX_LOG_CHANNEL_INFO(CX_OPENIGTLINK_CHANNEL_NAME) << status;
-    }
-    else
-    {
-        CX_LOG_CHANNEL_ERROR(CX_OPENIGTLINK_CHANNEL_NAME) << "Could not unpack the body (Status).";
-        return false;
-    }
-    return true;
+    IGTLinkConversion converter;
+    QString status = converter.decode(body);
+    CX_LOG_CHANNEL_INFO(CX_OPENIGTLINK_CHANNEL_NAME) << status;
 }
 
-bool OpenIGTLinkClient::receiveString(const igtl::MessageBase::Pointer header)
+void OpenIGTLinkClient::process(const igtl::StringMessage::Pointer body)
 {
-    igtl::StringMessage::Pointer body = igtl::StringMessage::New();
-    body->SetMessageHeader(header);
-    body->AllocatePack();
-
-    if(!this->socketReceive(body->GetPackBodyPointer(), body->GetPackBodySize()))
-        return false;
-
-    int c = body->Unpack(1);
-    this->checkCRC(c);
-    if (c & igtl::MessageHeader::UNPACK_BODY)
-    {
-        IGTLinkConversion converter;
-        QString string = converter.decode(body);
-        CX_LOG_CHANNEL_INFO(CX_OPENIGTLINK_CHANNEL_NAME) << string;
-    }
-    else
-    {
-        CX_LOG_CHANNEL_ERROR(CX_OPENIGTLINK_CHANNEL_NAME) << "Could not unpack the body (String).";
-        return false;
-    }
-    return true;
+    IGTLinkConversion converter;
+    QString string = converter.decode(body);
+    CX_LOG_CHANNEL_INFO(CX_OPENIGTLINK_CHANNEL_NAME) << string;
 }
 
 bool OpenIGTLinkClient::socketReceive(void *packPointer, int packSize) const
