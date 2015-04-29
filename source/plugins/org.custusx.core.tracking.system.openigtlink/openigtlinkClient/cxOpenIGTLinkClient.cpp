@@ -66,7 +66,7 @@ void OpenIGTLinkClient::setIpAndPort(QString ip, int port)
 
 void OpenIGTLinkClient::requestConnect()
 {
-    CX_LOG_INFO() << "Trying to connect to " << mIp << ":" << mPort;
+    CX_LOG_CHANNEL_INFO(CX_OPENIGTLINK_CHANNEL_NAME) << "Trying to connect to " << mIp << ":" << mPort;
     mSocket->requestConnectToHost(mIp, mPort);
 }
 
@@ -214,7 +214,7 @@ bool OpenIGTLinkClient::socketReceive(void *packPointer, int packSize) const
     int r = mSocket->read(reinterpret_cast<char*>(packPointer), packSize);
     if(r <= 0)
     {
-        CX_LOG_ERROR() << "Error when receiving data from socket.";
+        CX_LOG_CHANNEL_ERROR(CX_OPENIGTLINK_CHANNEL_NAME) << "Error when receiving data from socket.";
         return false;
     }
     return true;
