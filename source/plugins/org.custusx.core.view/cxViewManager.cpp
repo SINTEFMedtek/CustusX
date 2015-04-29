@@ -463,7 +463,8 @@ void ViewManager::rebuildLayouts()
 	}
 
 	this->setSlicePlanesProxyInViewsUpTo2DViewgroup();
-	mCameraControl->setView(this->get3DView());
+
+	mCameraControl->refreshView(this->get3DView());
 }
 
 void ViewManager::setSlicePlanesProxyInViewsUpTo2DViewgroup()
