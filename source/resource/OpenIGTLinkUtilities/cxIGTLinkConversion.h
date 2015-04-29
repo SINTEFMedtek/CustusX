@@ -106,6 +106,8 @@ public:
     ProbeDefinitionPtr decode(ProbeDefinitionPtr msg);
 
 private:
+    QString convertIGTLinkStatusCodes(const int code);
+
 	/** Extract the color format string from enclosing brackets inside
 	  * another string, i.e find "RGBA" from "Device[RGBA]".
 	  * Also return the input without format string as cleanedDeviceName.

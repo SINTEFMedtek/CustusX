@@ -98,7 +98,7 @@ qint64 Socket::skip(qint64 maxSizeBytes) const
 
 void Socket::receivedConnected()
 {
-    CX_LOG_DEBUG() << "Socket is connected to " << mSocket->peerName() << ":" << mSocket->peerPort();
+    //CX_LOG_DEBUG() << "Socket is connected to " << mSocket->peerName() << ":" << mSocket->peerPort();
     mConnected = true;
     emit connected();
 }
@@ -120,7 +120,7 @@ void Socket::receivedError(QAbstractSocket::SocketError socketError)
 
 void Socket::receivedHostFound()
 {
-    CX_LOG_DEBUG() << "Socket found host.";
+    //CX_LOG_DEBUG() << "Socket found host.";
 }
 
 QString socketStateToString(QAbstractSocket::SocketState socketState)
@@ -157,7 +157,7 @@ QString socketStateToString(QAbstractSocket::SocketState socketState)
 
 void Socket::receivedStateChanged(QAbstractSocket::SocketState socketState)
 {
-    CX_LOG_DEBUG() <<  "Socket is now in state " << socketStateToString(socketState);
+    //CX_LOG_DEBUG() <<  "Socket is now in state " << socketStateToString(socketState);
 }
 
 void Socket::reveidReadyRead()

@@ -37,6 +37,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkImageExtractComponents.h>
 #include <vtkImageAppendComponents.h>
 
+#include "igtl_status.h"
+
 #include "cxLog.h"
 #include "cxProbeData.h"
 #include "cxTypeConversions.h"
@@ -64,11 +66,8 @@ QString IGTLinkConversion::decode(igtl::StringMessage::Pointer msg)
 
 QString IGTLinkConversion::decode(igtl::StatusMessage::Pointer msg)
 {
-    QString retval;
-    QString code(msg->GetCode());
-    QString errorname(msg->GetErrorName());
-    QString statusstring(msg->GetStatusString());
-    retval = statusstring +" ["+code+"] " + errorname;
+    QString code = this->convertIGTLinkStatusCodes(msg->GetCode());
+    QString retval = code;
     return retval;
 }
 
@@ -309,7 +308,78 @@ ProbeDefinitionPtr IGTLinkConversion::decode(ProbeDefinitionPtr msg)
 	QString format = this->extractColorFormat(msg->getUid(), &newUid);
 	msg->setUid(newUid);
 
-	return msg;
+    return msg;
+}
+
+QString IGTLinkConversion::convertIGTLinkStatusCodes(const int code)
+{
+    QString retval;
+    switch(code)
+    {
+    case IGTL_STATUS_INVALID:
+        retval = "Status invalid";
+        break;
+    case IGTL_STATUS_OK:
+        retval = "Ok / Freeze mode on";
+        break;
+    case IGTL_STATUS_UNKNOWN_ERROR:
+        retval = "Unknown error";
+        break;
+    case IGTL_STATUS_PANICK_MODE:
+        retval = "Panick mode";
+        break;
+    case IGTL_STATUS_NOT_FOUND:
+        retval = "Not found";
+        break;
+    case IGTL_STATUS_ACCESS_DENIED:
+        retval = "Access denied";
+        break;
+    case IGTL_STATUS_BUSY:
+        retval = "Busy";
+        break;
+    case IGTL_STATUS_TIME_OUT:
+        retval = "Time out / Connection lost";
+        break;
+    case IGTL_STATUS_OVERFLOW:
+        retval = "Overflow / Can't be reached";
+        break;
+    case IGTL_STATUS_CHECKSUM_ERROR:
+        retval = "Checksum error";
+        break;
+    case IGTL_STATUS_CONFIG_ERROR:
+        retval = "Configuration error";
+        break;
+    case IGTL_STATUS_RESOURCE_ERROR:
+        retval = "Not enough resource (memory, storage etc)";
+        break;
+    case IGTL_STATUS_ILLEGAL_INSTRUCTION:
+        retval = "Illegal/Unknown instruction";
+        break;
+    case IGTL_STATUS_NOT_READY:
+        retval = "Device not ready (starting up)";
+        break;
+    case IGTL_STATUS_MANUAL_MODE:
+        retval = "Manual mode (device does not accept commands";
+        break;
+    case IGTL_STATUS_DISABLED:
+        retval = "Device disabled";
+        break;
+    case IGTL_STATUS_NOT_PRESENT:
+        retval = "Device not present";
+        break;
+    case IGTL_STATUS_UNKNOWN_VERSION:
+        retval = "Device version not known";
+        break;
+    case IGTL_STATUS_HARDWARE_FAILURE:
+        retval = "Hardware failure";
+        break;
+    case IGTL_STATUS_SHUT_DOWN:
+        retval = "Exiting / shut down in progress";
+        break;
+    default:
+        retval = "Could not determine what OpenIGTLink status code means.";
+    }
+    return retval;
 }
 
 QString IGTLinkConversion::extractColorFormat(QString deviceName, QString* cleanedDeviceName)

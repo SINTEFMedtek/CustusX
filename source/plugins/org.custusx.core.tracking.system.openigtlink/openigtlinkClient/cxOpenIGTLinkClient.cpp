@@ -77,11 +77,13 @@ void OpenIGTLinkClient::requestDisconnect()
 
 void OpenIGTLinkClient::internalConnected()
 {
+    CX_LOG_CHANNEL_SUCCESS(CX_OPENIGTLINK_CHANNEL_NAME) << "Connected to "  << mIp << ":" << mPort;
     emit connected();
 }
 
 void OpenIGTLinkClient::internalDisconnected()
 {
+    CX_LOG_CHANNEL_SUCCESS(CX_OPENIGTLINK_CHANNEL_NAME) << "Disconnected";
     emit disconnected();
 }
 
@@ -196,14 +198,15 @@ void OpenIGTLinkClient::process(const igtl::StatusMessage::Pointer body)
 {
     IGTLinkConversion converter;
     QString status = converter.decode(body);
-    CX_LOG_CHANNEL_INFO(CX_OPENIGTLINK_CHANNEL_NAME) << status;
+    CX_LOG_CHANNEL_VOLATILE(CX_OPENIGTLINK_CHANNEL_NAME) << status;
 }
 
 void OpenIGTLinkClient::process(const igtl::StringMessage::Pointer body)
 {
     IGTLinkConversion converter;
     QString string = converter.decode(body);
-    CX_LOG_CHANNEL_INFO(CX_OPENIGTLINK_CHANNEL_NAME) << string;
+    //This was spamming the console
+    //CX_LOG_CHANNEL_INFO(CX_OPENIGTLINK_CHANNEL_NAME) << string;
 }
 
 bool OpenIGTLinkClient::socketReceive(void *packPointer, int packSize) const
