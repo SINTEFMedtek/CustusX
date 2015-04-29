@@ -40,6 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxIGTLinkConversion.h"
 
+#define CX_OPENIGTLINK_CHANNEL_NAME "OpenIGTLink"
+
 namespace cx
 {
 
@@ -155,6 +157,16 @@ bool OpenIGTLinkClient::receiveBody(const igtl::MessageBase::Pointer header)
         if(!this->receiveImage(header))
             return false;
     }
+    else if(strcmp(header->GetDeviceType(), "STATUS") == 0)
+    {
+        if(!this->receiveStatus(header))
+            return false;
+    }
+    else if(strcmp(header->GetDeviceType(), "STRING") == 0)
+    {
+        if(!this->receiveString(header))
+            return false;
+    }
     else
     {
         igtl::MessageBase::Pointer body = igtl::MessageBase::New();
@@ -178,11 +190,11 @@ bool OpenIGTLinkClient::receiveTransform(const igtl::MessageBase::Pointer header
     if (c & igtl::MessageHeader::UNPACK_BODY)
     {
         // if CRC check is OK. Read transform data.
-        igtl::Matrix4x4 matrix;
-        body->GetMatrix(matrix);
-
         QString deviceName = body->GetDeviceName();
-        Transform3D transform3D = Transform3D::fromFloatArray(matrix);
+
+        IGTLinkConversion converter;
+        Transform3D transform3D = converter.decode(body);
+
         igtl::TimeStamp::Pointer ts = igtl::TimeStamp::New();
         body->GetTimeStamp(ts);
         double timestamp_ms = ts->GetTimeStamp()*1000; //since epoch
@@ -191,7 +203,7 @@ bool OpenIGTLinkClient::receiveTransform(const igtl::MessageBase::Pointer header
     }
     else
     {
-        CX_LOG_ERROR() << "Could  not unpack the body.";
+        CX_LOG_CHANNEL_ERROR(CX_OPENIGTLINK_CHANNEL_NAME) << "Could not unpack the body (Transform).";
         return false;
     }
     return true;
@@ -217,6 +229,56 @@ bool OpenIGTLinkClient::receiveImage(const igtl::MessageBase::Pointer header)
     return true;
 }
 
+bool OpenIGTLinkClient::receiveStatus(const igtl::MessageBase::Pointer header)
+{
+    igtl::StatusMessage::Pointer body = igtl::StatusMessage::New();
+    body->SetMessageHeader(header);
+    body->AllocatePack();
+
+    if(!this->socketReceive(body->GetPackBodyPointer(), body->GetPackBodySize()))
+        return false;
+
+    int c = body->Unpack(1);
+    this->checkCRC(c);
+    if (c & igtl::MessageHeader::UNPACK_BODY)
+    {
+        IGTLinkConversion converter;
+        QString status = converter.decode(body);
+        CX_LOG_CHANNEL_INFO(CX_OPENIGTLINK_CHANNEL_NAME) << status;
+    }
+    else
+    {
+        CX_LOG_CHANNEL_ERROR(CX_OPENIGTLINK_CHANNEL_NAME) << "Could not unpack the body (Status).";
+        return false;
+    }
+    return true;
+}
+
+bool OpenIGTLinkClient::receiveString(const igtl::MessageBase::Pointer header)
+{
+    igtl::StringMessage::Pointer body = igtl::StringMessage::New();
+    body->SetMessageHeader(header);
+    body->AllocatePack();
+
+    if(!this->socketReceive(body->GetPackBodyPointer(), body->GetPackBodySize()))
+        return false;
+
+    int c = body->Unpack(1);
+    this->checkCRC(c);
+    if (c & igtl::MessageHeader::UNPACK_BODY)
+    {
+        IGTLinkConversion converter;
+        QString string = converter.decode(body);
+        CX_LOG_CHANNEL_INFO(CX_OPENIGTLINK_CHANNEL_NAME) << string;
+    }
+    else
+    {
+        CX_LOG_CHANNEL_ERROR(CX_OPENIGTLINK_CHANNEL_NAME) << "Could not unpack the body (String).";
+        return false;
+    }
+    return true;
+}
+
 bool OpenIGTLinkClient::socketReceive(void *packPointer, int packSize) const
 {
     if(!this->enoughBytesAvailableOnSocket(packSize))
@@ -236,16 +298,16 @@ void OpenIGTLinkClient::checkCRC(int c) const
     switch(c)
     {
         case igtl::MessageHeader::UNPACK_UNDEF:
-            //CX_LOG_DEBUG() << "UNPACK_UNDEF";
+            //CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "UNPACK_UNDEF";
             break;
         case igtl::MessageHeader::UNPACK_HEADER:
-            //CX_LOG_DEBUG() << "UNPACK_HEADER";
+            //CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "UNPACK_HEADER";
             break;
         case igtl::MessageHeader::UNPACK_BODY:
-            //CX_LOG_DEBUG() << "UNPACK_BODY";
+            //CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "UNPACK_BODY";
             break;
         case igtl::MessageHeader::UNPACK_HEADER|igtl::MessageHeader::UNPACK_BODY:
-            //CX_LOG_DEBUG() << "UNPACK_HEADER|UNPACK_BODY";
+            //CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "UNPACK_HEADER|UNPACK_BODY";
             break;
         default:
             //CX_LOG_DEBUG() << "default: " << c;

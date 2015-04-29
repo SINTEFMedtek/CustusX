@@ -74,8 +74,12 @@ private:
     bool enoughBytesAvailableOnSocket(int bytes) const;
     bool receiveHeader(const igtl::MessageHeader::Pointer header) const;
     bool receiveBody(const igtl::MessageHeader::Pointer header);
+
     bool receiveTransform(const igtl::MessageBase::Pointer header);
     bool receiveImage(const igtl::MessageBase::Pointer header);
+    bool receiveStatus(const igtl::MessageBase::Pointer header);
+    bool receiveString(const igtl::MessageBase::Pointer header);
+
     bool socketReceive(void *packPointer, int packSize) const;
     void checkCRC(int c) const;
 
