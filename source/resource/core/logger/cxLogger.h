@@ -89,6 +89,7 @@ cxResource_EXPORT void report(QString msg);
 cxResource_EXPORT void reportWarning(QString msg);
 cxResource_EXPORT void reportError(QString msg);
 cxResource_EXPORT void reportSuccess(QString msg);
+cxResource_EXPORT void reportVolatile(QString msg);
 
 } //namespace cx
 
@@ -111,6 +112,7 @@ cxResource_EXPORT void reportSuccess(QString msg);
 #define CX_LOG_SUCCESS CX_LOG_SEVERITY_INTERNAL(cx::mlSUCCESS).logger
 #define CX_LOG_WARNING CX_LOG_SEVERITY_INTERNAL(cx::mlWARNING).logger
 #define CX_LOG_ERROR   CX_LOG_SEVERITY_INTERNAL(cx::mlERROR).logger
+#define CX_LOG_VOLATILE   CX_LOG_SEVERITY_INTERNAL(cx::mlVOLATILE).logger
 
 /** Log to a named channel
  * Usage:
@@ -122,6 +124,7 @@ cxResource_EXPORT void reportSuccess(QString msg);
 #define CX_LOG_CHANNEL_SUCCESS(channel) CX_LOG_CHANNEL_SEVERITY_INTERNAL(channel, cx::mlSUCCESS).logger()
 #define CX_LOG_CHANNEL_WARNING(channel) CX_LOG_CHANNEL_SEVERITY_INTERNAL(channel, cx::mlWARNING).logger()
 #define CX_LOG_CHANNEL_ERROR(channel)   CX_LOG_CHANNEL_SEVERITY_INTERNAL(channel, cx::mlERROR).logger()
+#define CX_LOG_CHANNEL_VOLATILE(channel) CX_LOG_CHANNEL_SEVERITY_INTERNAL(channel, cx::mlVOLATILE).logger()
 
 /**
   */
