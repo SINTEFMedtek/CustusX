@@ -78,7 +78,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPointMetricRep2D.h"
 
 #include "cxViewFollower.h"
-#include "cxCoreServices.h"
+#include "cxVisServices.h"
 #include "cx2DZoomHandler.h"
 #include "cxNavigation.h"
 #include "cxDataRepContainer.h"
@@ -89,7 +89,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ViewWrapper2D::ViewWrapper2D(ViewPtr view, CoreServicesPtr backend) :
+ViewWrapper2D::ViewWrapper2D(ViewPtr view, VisServicesPtr backend) :
 	ViewWrapper(backend),
 	mOrientationActionGroup(new QActionGroup(view.get()))
 {
@@ -106,13 +106,13 @@ ViewWrapper2D::ViewWrapper2D(ViewPtr view, CoreServicesPtr backend) :
 	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(settingsChangedSlot(QString)));
 
 	// slice proxy
-	mSliceProxy = SliceProxy::create(mBackend->getPatientService());
+	mSliceProxy = SliceProxy::create(mServices->getPatientService());
 
 	mDataRepContainer.reset(new DataRepContainer());
 	mDataRepContainer->setSliceProxy(mSliceProxy);
 	mDataRepContainer->setView(mView);
 
-	mViewFollower = ViewFollower::create(mBackend->getPatientService());
+	mViewFollower = ViewFollower::create(mServices->getPatientService());
 	mViewFollower->setSliceProxy(mSliceProxy);
 
 	addReps();
@@ -121,7 +121,7 @@ ViewWrapper2D::ViewWrapper2D(ViewPtr view, CoreServicesPtr backend) :
 	connect(mZoom2D.get(), SIGNAL(zoomChanged()), this, SLOT(viewportChanged()));
 	setOrientationMode(SyncedValue::create(0)); // must set after addreps()
 
-	connect(mBackend->getToolManager().get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(activeToolChangedSlot()));
+	connect(mServices->getToolManager().get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(activeToolChangedSlot()));
 	connect(mView.get(), SIGNAL(resized(QSize)), this, SLOT(viewportChanged()));
 	connect(mView.get(), SIGNAL(shown()), this, SLOT(showSlot()));
 	connect(mView.get(), SIGNAL(mousePress(int, int, Qt::MouseButtons)), this, SLOT(mousePressSlot(int, int, Qt::MouseButtons)));
@@ -213,7 +213,7 @@ void ViewWrapper2D::addReps()
 	mView->addRep(mDataNameText);
 
 	// tool rep
-	mToolRep2D = ToolRep2D::New(mBackend->getSpaceProvider(), "Tool2D_" + mView->getName());
+	mToolRep2D = ToolRep2D::New(mServices->getSpaceProvider(), "Tool2D_" + mView->getName());
 	mToolRep2D->setSliceProxy(mSliceProxy);
 	mToolRep2D->setUseCrosshair(true);
 //  mToolRep2D->setUseToolLine(false);
@@ -473,7 +473,7 @@ void ViewWrapper2D::imageRemoved(const QString& uid)
 
 void ViewWrapper2D::dataViewPropertiesChangedSlot(QString uid)
 {
-	DataPtr data = mBackend->getPatientService()->getData(uid);
+	DataPtr data = mServices->getPatientService()->getData(uid);
 	DataViewProperties properties = mGroupData->getProperties(uid);
 
 	if (properties.hasSlice2D())
@@ -504,7 +504,7 @@ void ViewWrapper2D::dataRemoved(const QString& uid)
 
 void ViewWrapper2D::activeToolChangedSlot()
 {
-	ToolPtr activeTool = mBackend->getToolManager()->getActiveTool();
+	ToolPtr activeTool = mServices->getToolManager()->getActiveTool();
 	mSliceProxy->setTool(activeTool);
 }
 
@@ -573,7 +573,7 @@ void ViewWrapper2D::mouseWheelSlot(int x, int y, int delta, int orientation, Qt:
 
 	mZoom2D->setFactor(newZoom);
 
-	Navigation(mBackend).centerToTooltip(); // side effect: center on tool
+	Navigation(mServices).centerToTooltip(); // side effect: center on tool
 }
 
 /**Convert a position in Qt viewport space (pixels with origin in upper-left corner)
@@ -592,10 +592,10 @@ Vector3D ViewWrapper2D::qvp2vp(QPoint pos_qvp)
 void ViewWrapper2D::shiftAxisPos(Vector3D delta_vp)
 {
 	delta_vp = -delta_vp;
-	ToolPtr tool = mBackend->getToolManager()->getManualTool();
+	ToolPtr tool = mServices->getToolManager()->getManualTool();
 
 	Transform3D sMr = mSliceProxy->get_sMr();
-	Transform3D rMpr = mBackend->getPatientService()->get_rMpr();
+	Transform3D rMpr = mServices->getPatientService()->get_rMpr();
 	Transform3D prMt = tool->get_prMt();
 	Transform3D vpMs = mView->get_vpMs();
 	Vector3D delta_s = vpMs.inv().vector(delta_vp);
@@ -613,10 +613,10 @@ void ViewWrapper2D::shiftAxisPos(Vector3D delta_vp)
  */
 void ViewWrapper2D::setAxisPos(Vector3D click_vp)
 {
-	ToolPtr tool = mBackend->getToolManager()->getManualTool();
+	ToolPtr tool = mServices->getToolManager()->getManualTool();
 
 	Transform3D sMr = mSliceProxy->get_sMr();
-	Transform3D rMpr = mBackend->getPatientService()->get_rMpr();
+	Transform3D rMpr = mServices->getPatientService()->get_rMpr();
 	Transform3D prMt = tool->get_prMt();
 
 	// find tool position in s

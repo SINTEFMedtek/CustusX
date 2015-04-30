@@ -45,14 +45,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImage.h"
 #include "cxViewManager.h"
 #include "cxInteractiveClipper.h"
-#include "cxCoreServices.h"
+#include "cxVisServices.h"
 #include "cxNavigation.h"
 
 namespace cx
 {
 
-DataViewPropertiesInteractor::DataViewPropertiesInteractor(CoreServicesPtr backend, ViewGroupDataPtr groupData) :
-	mBackend(backend),
+DataViewPropertiesInteractor::DataViewPropertiesInteractor(VisServicesPtr services, ViewGroupDataPtr groupData) :
+	mServices(services),
 	mGroupData(groupData)
 {
 	mProperties = DataViewProperties::createDefault();
@@ -61,7 +61,7 @@ DataViewPropertiesInteractor::DataViewPropertiesInteractor(CoreServicesPtr backe
 void DataViewPropertiesInteractor::addDataActions(QWidget* parent)
 {
 	//add actions to the actiongroups and the contextmenu
-	std::vector<DataPtr> sorted = sortOnGroupsAndAcquisitionTime(mBackend->getPatientService()->getData());
+	std::vector<DataPtr> sorted = sortOnGroupsAndAcquisitionTime(mServices->getPatientService()->getData());
 	mLastDataActionUid = "________________________";
 	for (std::vector<DataPtr>::iterator iter=sorted.begin(); iter!=sorted.end(); ++iter)
 	{
@@ -76,7 +76,7 @@ void DataViewPropertiesInteractor::setDataViewProperties(DataViewProperties prop
 
 void DataViewPropertiesInteractor::addDataAction(QString uid, QWidget* parent)
 {
-	DataPtr data = mBackend->getPatientService()->getData(uid);
+	DataPtr data = mServices->getPatientService()->getData(uid);
 
 	QAction* action = new QAction(qstring_cast(data->getName()), parent);
 
@@ -113,8 +113,8 @@ void DataViewPropertiesInteractor::dataActionSlot()
 		return;
 
 	QString uid = theAction->data().toString();
-	DataPtr data = mBackend->getPatientService()->getData(uid);
-	ImagePtr image = mBackend->getPatientService()->getData<Image>(data->getUid());
+	DataPtr data = mServices->getPatientService()->getData(uid);
+	ImagePtr image = mServices->getPatientService()->getData<Image>(data->getUid());
 
 	bool firstData = mGroupData->getData(DataViewProperties::createFull()).empty();
 
@@ -126,7 +126,7 @@ void DataViewPropertiesInteractor::dataActionSlot()
 		mGroupData->setProperties(uid, props);
 
 		if (image)
-			mBackend->getPatientService()->setActiveImage(image);
+			mServices->getPatientService()->setActiveImage(image);
 	}
 	else
 	{
@@ -136,7 +136,7 @@ void DataViewPropertiesInteractor::dataActionSlot()
 
 	if (firstData)
 	{
-		Navigation(mBackend).centerToGlobalDataCenter(); // reset center for convenience
+		Navigation(mServices).centerToDataInActiveViewGroup(); // reset center for convenience
 		mGroupData->requestInitialize();
 	}
 }
@@ -145,8 +145,8 @@ void DataViewPropertiesInteractor::dataActionSlot()
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
-ViewWrapper::ViewWrapper(CoreServicesPtr backend) :
-	mBackend(backend)
+ViewWrapper::ViewWrapper(VisServicesPtr services) :
+	mServices(services)
 {
 }
 
@@ -163,9 +163,9 @@ void ViewWrapper::setViewGroup(ViewGroupDataPtr group)
 	for (unsigned i = 0; i < data.size(); ++i)
 		this->dataViewPropertiesChangedSlot(data[i]->getUid());
 
-	mDataViewPropertiesInteractor.reset(new DataViewPropertiesInteractor(mBackend, mGroupData));
+	mDataViewPropertiesInteractor.reset(new DataViewPropertiesInteractor(mServices, mGroupData));
 
-	mShow3DSlicesInteractor.reset(new DataViewPropertiesInteractor(mBackend, mGroupData));
+	mShow3DSlicesInteractor.reset(new DataViewPropertiesInteractor(mServices, mGroupData));
 	mShow3DSlicesInteractor->setDataViewProperties(DataViewProperties::createSlice3D());
 }
 

@@ -542,7 +542,7 @@ DataViewSelectionWidget::DataViewSelectionWidget(QWidget* parent)
 
 void DataViewSelectionWidget::viewGroupChangedSlot()
 {
-  int vg = viewService()->getActiveGroup();
+  int vg = viewService()->getActiveGroupId();
   if (vg<0)
     vg = 0;
 

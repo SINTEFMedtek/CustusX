@@ -49,6 +49,7 @@ namespace cx
 
 typedef boost::shared_ptr<class CameraData> CameraDataPtr;
 typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
+typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 
 /**
  * \file
@@ -104,7 +105,7 @@ class cxResourceVisualization_EXPORT ViewGroupData: public QObject
 {
 Q_OBJECT
 public:
-	explicit ViewGroupData(CoreServicesPtr backend);
+	explicit ViewGroupData(CoreServicesPtr services);
 	void requestInitialize();
 //	std::vector<DataPtr> getData() const;
 	std::vector<DataPtr> getData(DataViewProperties properties=DataViewProperties::createFull()) const;
@@ -156,7 +157,7 @@ signals:
 	void optionsChanged();
 
 private:
-	CoreServicesPtr mBackend;
+	CoreServicesPtr mServices;
 	QString mVideoSource;
 	typedef std::pair<QString, DataViewProperties> DataAndViewProperties;
 	std::vector<DataAndViewProperties> mData;

@@ -72,6 +72,11 @@ RepContainerPtr VisualizationService::get3DReps(int group, int index)
 		return RepContainerPtr(new RepContainer(std::vector<RepPtr>()));
 }
 
+ViewGroupDataPtr VisualizationService::getActiveViewGroup()
+{
+	int groupId = this->getActiveGroupId();
+	return this->getGroup(groupId);
+}
 
 } //cx
 

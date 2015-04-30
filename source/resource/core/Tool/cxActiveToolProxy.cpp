@@ -51,6 +51,7 @@ ActiveToolProxy::ActiveToolProxy(TrackingServicePtr trackingService) :
 
 void ActiveToolProxy::activeToolChangedSlot(const QString& uid)
 {
+	std::cout << "ActiveToolProxy::activeToolChangedSlot" << std::endl;
 	if (mTool && mTool->getUid() == uid)
 		return;
 
@@ -62,6 +63,7 @@ void ActiveToolProxy::activeToolChangedSlot(const QString& uid)
 		disconnect(mTool.get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
 		disconnect(mTool.get(), SIGNAL(toolProbeSector()), this, SIGNAL(toolProbeSector()));
 		disconnect(mTool.get(), SIGNAL(tps(int)), this, SIGNAL(tps(int)));
+//		emit tps(0);
 	}
 
 	mTool = mTrackingService->getActiveTool();

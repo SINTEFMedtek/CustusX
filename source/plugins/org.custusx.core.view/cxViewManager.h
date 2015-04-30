@@ -64,7 +64,7 @@ typedef boost::shared_ptr<class CyclicActionLogger> CyclicActionLoggerPtr;
 typedef boost::shared_ptr<class CameraStyleInteractor> CameraStyleInteractorPtr;
 typedef boost::shared_ptr<class RenderLoop> RenderLoopPtr;
 typedef boost::shared_ptr<class LayoutRepository> LayoutRepositoryPtr;
-typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
+typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 typedef boost::shared_ptr<class Navigation> NavigationPtr;
 typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
 
@@ -130,7 +130,7 @@ class org_custusx_core_view_EXPORT ViewManager: public QObject
 {
 Q_OBJECT
 public:
-	static VisualizationServiceOldPtr create(CoreServicesPtr backend);
+	static VisualizationServiceOldPtr create(VisServicesPtr backend);
 	virtual ~ViewManager();
 
 	ViewPtr get3DView(int group = 0, int index = 0);
@@ -190,7 +190,7 @@ protected slots:
 	void setActiveView(QString viewUid);
 
 protected:
-	ViewManager(CoreServicesPtr backend);
+	ViewManager(VisServicesPtr backend);
 
 	void syncOrientationMode(SyncedValuePtr val);
 //	void storeLayoutData(const LayoutData& data);
@@ -228,7 +228,7 @@ protected:
 	SlicePlanesProxyPtr mSlicePlanesProxy;
 
 	CameraStyleInteractorPtr mCameraStyleInteractor;
-	CoreServicesPtr mBackend;
+	VisServicesPtr mBackend;
 
 private:
 	ViewManager(ViewManager const&);

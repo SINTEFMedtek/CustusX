@@ -215,6 +215,7 @@ DoubleBoundingBox3D Mesh::boundingBox() const
 {
 //	getVtkPolyData()->Update();
 	DoubleBoundingBox3D bounds(getVtkPolyData()->GetBounds());
+	std::cout << "Mesh::boundingBox(): " << bounds << std::endl;
 	return bounds;
 }
 

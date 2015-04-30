@@ -46,7 +46,7 @@ public:
 
 	virtual ViewPtr get3DView(int group = 0, int index = 0);
 
-	virtual int getActiveGroup() const;
+	virtual int getActiveGroupId() const;
 	virtual ViewGroupDataPtr getGroup(int groupIdx) const;
 
 	virtual void autoShowData(DataPtr data);

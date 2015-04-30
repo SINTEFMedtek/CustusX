@@ -58,9 +58,9 @@ ViewPtr VisualizationServiceProxy::get3DView(int group, int index)
 	return mVisualizationService->get3DView(group, index);
 }
 
-int VisualizationServiceProxy::getActiveGroup() const
+int VisualizationServiceProxy::getActiveGroupId() const
 {
-	return mVisualizationService->getActiveGroup();
+	return mVisualizationService->getActiveGroupId();
 }
 
 ViewGroupDataPtr VisualizationServiceProxy::getGroup(int groupIdx) const
