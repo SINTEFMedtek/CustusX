@@ -106,7 +106,7 @@ DataSelectWidget::~DataSelectWidget()
 
 ViewGroupDataPtr DataSelectWidget::getActiveViewGroupData()
 {
-	int groupIdx = mVisualizationService->getActiveGroup();
+	int groupIdx = mVisualizationService->getActiveGroupId();
     if (groupIdx<0)
         groupIdx = 0;
 	return mVisualizationService->getGroup(groupIdx);

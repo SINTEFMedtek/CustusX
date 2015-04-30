@@ -52,7 +52,6 @@ namespace cx
 {
 
 typedef boost::shared_ptr<class CameraData> CameraDataPtr;
-typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
 
 /**
  * \file
@@ -69,7 +68,7 @@ class org_custusx_core_view_EXPORT DataViewPropertiesInteractor : public QObject
 {
 	Q_OBJECT
 public:
-	DataViewPropertiesInteractor(CoreServicesPtr backend, ViewGroupDataPtr groupData);
+	DataViewPropertiesInteractor(VisServicesPtr services, ViewGroupDataPtr groupData);
 	void addDataActions(QWidget* parent);
 	void setDataViewProperties(DataViewProperties properties);
 
@@ -77,7 +76,7 @@ private slots:
 	void dataActionSlot();
 private:
 	void addDataAction(QString uid, QWidget* parent);
-	CoreServicesPtr mBackend;
+	VisServicesPtr mServices;
 	ViewGroupDataPtr mGroupData;
 	DataViewProperties mProperties;
 
@@ -116,14 +115,14 @@ protected slots:
 	virtual void videoSourceChangedSlot(QString uid) {}
 
 protected:
-	ViewWrapper(CoreServicesPtr backend);
+	ViewWrapper(VisServicesPtr backend);
 
 	void connectContextMenu(ViewPtr view);
 	virtual void appendToContextMenu(QMenu& contextMenu) = 0;
 	QStringList getAllDataNames(DataViewProperties properties) const;
 
 	ViewGroupDataPtr mGroupData;
-	CoreServicesPtr mBackend;
+	VisServicesPtr mServices;
 	DataViewPropertiesInteractorPtr mDataViewPropertiesInteractor;
 	DataViewPropertiesInteractorPtr mShow3DSlicesInteractor;
 

@@ -31,21 +31,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxNavigation.h"
-//#include "cxCoreServices.h"
-#include "cxData.h"
+#include "cxImage.h"
 #include "cxBoundingBox3D.h"
 #include "cxPatientModelService.h"
 #include "cxTrackingService.h"
 #include "cxManualTool.h"
 #include "cxVolumeHelpers.h"
 #include "cxCameraControl.h"
-#include "cxCoreServices.h"
+#include "cxVisServices.h"
+#include "cxViewService.h"
 
 namespace cx
 {
 
-Navigation::Navigation(CoreServicesPtr backend, CameraControlPtr camera3D) :
-	mBackend(backend),
+Navigation::Navigation(VisServicesPtr services, CameraControlPtr camera3D) :
+	mServices(services),
 	mCamera3D(camera3D)
 {
 
@@ -58,7 +58,7 @@ void Navigation::centerToPosition(Vector3D p_r, QFlags<VIEW_TYPE> viewType)
 	if (viewType.testFlag(v2D))
 	{
 		// set center to calculated position
-		mBackend->patientModelService->setCenter(p_r);
+		mServices->patientModelService->setCenter(p_r);
 	}
 
 	if (viewType.testFlag(v3D))
@@ -68,8 +68,7 @@ void Navigation::centerToPosition(Vector3D p_r, QFlags<VIEW_TYPE> viewType)
 	}
 }
 
-
-/**Place the global center to the center of the image.
+/**Place the global center to the center of the data.
  */
 void Navigation::centerToData(DataPtr image)
 {
@@ -78,39 +77,37 @@ void Navigation::centerToData(DataPtr image)
 	Vector3D p_r = image->get_rMd().coord(image->boundingBox().center());
 
 	this->centerToPosition(p_r);
-//	// set center to calculated position
-//	mBackend->getDataManager()->setCenter(p_r);
-//	this->moveManualToolToPosition(p_r);
 }
 
 /**Place the global center to the mean center of
- * all the images in a view(wrapper).
+ * a vector of data.
  */
-void Navigation::centerToView(const std::vector<DataPtr>& images)
+void Navigation::centerToData(const std::vector<DataPtr>& images)
 {
-	Vector3D p_r = findViewCenter(images);
-	std::cout << "center ToView: " << images.size() << " - " << p_r << std::endl;
-
+	Vector3D p_r = findDataCenter(images);
 	this->centerToPosition(p_r);
-//	// set center to calculated position
-//	mBackend->getDataManager()->setCenter(p_r);
-//	this->moveManualToolToPosition(p_r);
 }
 
-/**Place the global center to the mean center of
- * all the loaded images.
- */
-void Navigation::centerToGlobalDataCenter()
+void Navigation::centerToDataInActiveViewGroup(DataViewProperties properties)
 {
-	if (mBackend->patientModelService->getData().empty())
+	ViewGroupDataPtr activeGroup = mServices->visualizationService->getActiveViewGroup();
+	this->centerToDataInViewGroup(activeGroup, properties);
+}
+
+void Navigation::centerToDataInViewGroup(ViewGroupDataPtr group, DataViewProperties properties)
+{
+	if(!group)
 		return;
 
-	Vector3D p_r = this->findGlobalDataCenter();
+	std::vector<DataPtr> visibleData = group->getData(properties);
+	if(visibleData.empty())
+		return;
 
-	this->centerToPosition(p_r);
-//	// set center to calculated position
-//	mBackend->getDataManager()->setCenter(p_r);
-//	this->moveManualToolToPosition(p_r);
+	ImagePtr activeImage = mServices->patientModelService->getActiveImage();
+	if(activeImage && std::count(visibleData.begin(), visibleData.end(), activeImage))
+		this->centerToData(activeImage);
+	else
+		this->centerToData(visibleData);
 }
 
 /**Place the global center at the current position of the
@@ -118,47 +115,19 @@ void Navigation::centerToGlobalDataCenter()
  */
 void Navigation::centerToTooltip()
 {
-	ToolPtr tool = mBackend->trackingService->getActiveTool();
+	ToolPtr tool = mServices->trackingService->getActiveTool();
 	Vector3D p_pr = tool->get_prMt().coord(Vector3D(0, 0, tool->getTooltipOffset()));
-	Vector3D p_r = mBackend->patientModelService->get_rMpr().coord(p_pr);
+	Vector3D p_r = mServices->patientModelService->get_rMpr().coord(p_pr);
 
 	this->centerToPosition(p_r);
 //	// set center to calculated position
 //	mBackend->getDataManager()->setCenter(p_r);
 }
 
-/**Find the center of all images in the view(wrapper), defined as the mean of
- * all the images center.
- */
-Vector3D Navigation::findViewCenter(const std::vector<DataPtr>& images)
-{
-	return this->findDataCenter(images);
-}
-
-/**Find the center of all images, defined as the mean of
- * all the images center.
- */
-Vector3D Navigation::findGlobalDataCenter()
-{
-	std::map<QString,DataPtr> images = mBackend->patientModelService->getData();
-	if (images.empty())
-		return Vector3D(0, 0, 0);
-
-	std::map<QString,DataPtr>::iterator iter;
-	std::vector<DataPtr> dataVector;
-
-	for (iter = images.begin(); iter != images.end(); ++iter)
-	{
-		dataVector.push_back(iter->second);
-	}
-//  std::cout << "findGlobalDataCenter() " << dataVector.size() << std::endl;
-	return findDataCenter(dataVector);
-}
-
 /**Find the center of the images, defined as the center
  * of the smallest bounding box enclosing the images.
  */
-Vector3D Navigation::findDataCenter(std::vector<DataPtr> data)
+Vector3D Navigation::findDataCenter(const std::vector<DataPtr>& data)
 {
 	DoubleBoundingBox3D bb_sigma = findEnclosingBoundingBox(data, Transform3D::Identity());
 	return bb_sigma.center();
@@ -167,8 +136,8 @@ Vector3D Navigation::findDataCenter(std::vector<DataPtr> data)
 void Navigation::moveManualToolToPosition(Vector3D& p_r)
 {
 	// move the manual tool to the same position. (this is a side effect... do we want it?)
-	ToolPtr manual = mBackend->trackingService->getManualTool();
-	Vector3D p_pr = mBackend->patientModelService->get_rMpr().inv().coord(p_r);
+	ToolPtr manual = mServices->trackingService->getManualTool();
+	Vector3D p_pr = mServices->patientModelService->get_rMpr().inv().coord(p_r);
 	Transform3D prM0t = manual->get_prMt(); // modify old pos in order to keep orientation
 	Vector3D t_pr = prM0t.coord(Vector3D(0, 0, manual->getTooltipOffset()));
 	Transform3D prM1t = createTransformTranslate(p_pr - t_pr) * prM0t;

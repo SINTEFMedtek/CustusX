@@ -200,6 +200,7 @@ void StatusBar::renderingFpsSlot(int numFps)
 
 void StatusBar::tpsSlot(int numTps)
 {
+	//TODO: start here for fixing #947
 	QString tpsString = "TPS: " + QString::number(numTps);
 	mTpsLabel->setText(tpsString);
 }

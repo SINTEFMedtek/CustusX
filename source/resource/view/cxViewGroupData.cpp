@@ -212,12 +212,12 @@ ViewGroupData::Options::Options() :
 {
 }
 
-ViewGroupData::ViewGroupData(CoreServicesPtr backend) :
-	mBackend(backend),
+ViewGroupData::ViewGroupData(CoreServicesPtr services) :
+	mServices(services),
 	mCamera3D(CameraData::create())
 {
-	if(mBackend)
-		connect(mBackend->patientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataAddedOrRemovedInManager()));
+	if(mServices)
+		connect(mServices->patientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataAddedOrRemovedInManager()));
 	mVideoSource = "active";
 	mGroup2DZoom = SyncedValue::create(1);
 	mGlobal2DZoom = mGroup2DZoom;
@@ -231,7 +231,7 @@ void ViewGroupData::dataAddedOrRemovedInManager()
 {
 	for (unsigned i = 0; i < mData.size(); )
 	{
-		if (!mBackend->patientModelService->getData(mData[i].first))
+		if (!mServices->patientModelService->getData(mData[i].first))
 			this->removeData(mData[i].first);
 		else
 			++i;
@@ -328,7 +328,7 @@ void ViewGroupData::clearData()
 
 DataPtr ViewGroupData::getData(QString uid) const
 {
-	DataPtr data = mBackend->patientModelService->getData(uid);
+	DataPtr data = mServices->patientModelService->getData(uid);
 	if (!data)
 	{
 		reportError("Couldn't find the data: [" + uid + "] in the datamanager.");

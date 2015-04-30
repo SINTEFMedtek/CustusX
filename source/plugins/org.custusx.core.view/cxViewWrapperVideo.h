@@ -61,7 +61,7 @@ class org_custusx_core_view_EXPORT ViewWrapperVideo: public ViewWrapper
 {
 Q_OBJECT
 public:
-	ViewWrapperVideo(ViewPtr view, CoreServicesPtr backend);
+	ViewWrapperVideo(ViewPtr view, VisServicesPtr services);
 	virtual ~ViewWrapperVideo();
 	virtual ViewPtr getView();
 	virtual void setSlicePlanesProxy(SlicePlanesProxyPtr proxy) {}

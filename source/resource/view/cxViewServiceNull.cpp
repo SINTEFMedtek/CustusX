@@ -48,7 +48,7 @@ ViewPtr VisualizationServiceNull::get3DView(int group, int index)
 	return ViewPtr();
 }
 
-int VisualizationServiceNull::getActiveGroup() const
+int VisualizationServiceNull::getActiveGroupId() const
 {
 	printWarning();
 	return -1;
