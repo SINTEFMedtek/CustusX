@@ -123,7 +123,6 @@ void MainWindowActions::createTrackingActions()
 											  &MainWindowActions::toggleTrackingSlot);
 
 	connect(trackingService().get(), &TrackingService::stateChanged, this, &MainWindowActions::updateTrackingActionSlot);
-	connect(trackingService().get(), &TrackingService::stateChanged, this, &MainWindowActions::updateTrackingActionSlot);
 	this->updateTrackingActionSlot();
 }
 
