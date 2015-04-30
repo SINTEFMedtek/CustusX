@@ -31,7 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxNavigation.h"
-//#include "cxCoreServices.h"
 #include "cxImage.h"
 #include "cxBoundingBox3D.h"
 #include "cxPatientModelService.h"
@@ -69,8 +68,7 @@ void Navigation::centerToPosition(Vector3D p_r, QFlags<VIEW_TYPE> viewType)
 	}
 }
 
-
-/**Place the global center to the center of the image.
+/**Place the global center to the center of the data.
  */
 void Navigation::centerToData(DataPtr image)
 {
@@ -79,20 +77,14 @@ void Navigation::centerToData(DataPtr image)
 	Vector3D p_r = image->get_rMd().coord(image->boundingBox().center());
 
 	this->centerToPosition(p_r);
-//	// set center to calculated position
-//	mBackend->getDataManager()->setCenter(p_r);
-//	this->moveManualToolToPosition(p_r);
 }
 
-
 /**Place the global center to the mean center of
- * all the images in a view(wrapper).
+ * a vector of data.
  */
-void Navigation::centerToView(const std::vector<DataPtr>& images)
+void Navigation::centerToData(const std::vector<DataPtr>& images)
 {
 	Vector3D p_r = findDataCenter(images);
-//	std::cout << "center ToView: " << images.size() << " - " << p_r << std::endl;
-
 	this->centerToPosition(p_r);
 }
 
@@ -104,32 +96,19 @@ void Navigation::centerToDataInActiveViewGroup(DataViewProperties properties)
 
 void Navigation::centerToDataInViewGroup(ViewGroupDataPtr group, DataViewProperties properties)
 {
-	ImagePtr activeImage = mServices->patientModelService->getActiveImage();
+	if(!group)
+		return;
 
 	std::vector<DataPtr> visibleData = group->getData(properties);
-	if(std::count(visibleData.begin(), visibleData.end(), activeImage))
+	if(visibleData.empty())
+		return;
+
+	ImagePtr activeImage = mServices->patientModelService->getActiveImage();
+	if(activeImage && std::count(visibleData.begin(), visibleData.end(), activeImage))
 		this->centerToData(activeImage);
 	else
-		this->centerToView(visibleData);
-//		this->centerToGlobalDataCenterInActiveViewGroup();
+		this->centerToData(visibleData);
 }
-
-//TODO. Not used
-/**Place the global center to the mean center of
- * all the loaded images.
- */
-//void Navigation::centerToGlobalDataCenterInActiveViewGroup()
-//{
-//	if (mServices->patientModelService->getData().empty())
-//		return;
-
-//	Vector3D p_r = this->findGlobalDataCenter();
-
-//	this->centerToPosition(p_r);
-////	// set center to calculated position
-////	mBackend->getDataManager()->setCenter(p_r);
-////	this->moveManualToolToPosition(p_r);
-//}
 
 /**Place the global center at the current position of the
  * tooltip of the active tool.
@@ -144,35 +123,6 @@ void Navigation::centerToTooltip()
 //	// set center to calculated position
 //	mBackend->getDataManager()->setCenter(p_r);
 }
-
-/**Find the center of all images in the view(wrapper), defined as the mean of
- * all the images center.
- */
-//Vector3D Navigation::findViewCenter(const std::vector<DataPtr>& images)
-//{
-//	return this->findDataCenter(images);
-//}
-
-
-//TODO: Not used
-/**Find the center of all images, defined as the mean of
- * all the images center.
- */
-//Vector3D Navigation::findGlobalDataCenter()
-//{
-//	std::map<QString,DataPtr> data = mServices->patientModelService->getData();
-//	if (data.empty())
-//		return Vector3D(0, 0, 0);
-
-//	std::map<QString,DataPtr>::iterator iter;
-//	std::vector<DataPtr> dataVector;
-
-//	for (iter = data.begin(); iter != data.end(); ++iter)
-//	{
-//		dataVector.push_back(iter->second);
-//	}
-//	return findDataCenter(dataVector);
-//}
 
 /**Find the center of the images, defined as the center
  * of the smallest bounding box enclosing the images.

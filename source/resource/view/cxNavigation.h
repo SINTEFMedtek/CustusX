@@ -53,8 +53,6 @@ class cxResourceVisualization_EXPORT Navigation
 public:
 	enum VIEW_TYPE { v2D = 0x01, v3D=0x02, vBOTH=0x03 };
 	Navigation(VisServicesPtr services, CameraControlPtr camera3D=CameraControlPtr());
-	void centerToData(DataPtr image);
-	void centerToView(const std::vector<DataPtr>& images);
 	void centerToTooltip();
 	void centerToPosition(Vector3D p_r, QFlags<VIEW_TYPE> viewType=vBOTH);
 
@@ -62,10 +60,9 @@ public:
 	void centerToDataInViewGroup(ViewGroupDataPtr group, DataViewProperties properties=DataViewProperties::createFull());
 private:
 	void moveManualToolToPosition(Vector3D& p_r);
-//	Vector3D findViewCenter(const std::vector<DataPtr>& images);
-//	Vector3D findGlobalDataCenter();
 	Vector3D findDataCenter(const std::vector<DataPtr> &data);
-//	void centerToGlobalDataCenterInActiveViewGroup();
+	void centerToData(DataPtr image);
+	void centerToData(const std::vector<DataPtr>& images);
 
 	VisServicesPtr mServices;
 	CameraControlPtr mCamera3D;

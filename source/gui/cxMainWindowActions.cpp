@@ -400,18 +400,7 @@ void MainWindowActions::updateStreamingActionSlot()
 
 void MainWindowActions::centerToImageCenterSlot()
 {
-	std::cout << "MainWindowActions::centerToImageCenterSlot()" << std::endl;
-//	NavigationPtr nav = viewService()->getNavigation();
-
 	viewService()->getNavigation()->centerToDataInActiveViewGroup();
-
-//	if (patientService()->getActiveImage())
-//	{
-//		std::cout << patientService()->getActiveImage()->getUid() << std::endl;
-//		nav->centerToData(patientService()->getActiveImage());
-//	}
-//	else
-//		nav->centerToGlobalDataCenter();
 }
 
 void MainWindowActions::centerToTooltipSlot()

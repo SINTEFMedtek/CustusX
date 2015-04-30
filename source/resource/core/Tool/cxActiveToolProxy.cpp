@@ -51,7 +51,8 @@ ActiveToolProxy::ActiveToolProxy(TrackingServicePtr trackingService) :
 
 void ActiveToolProxy::activeToolChangedSlot(const QString& uid)
 {
-	std::cout << "ActiveToolProxy::activeToolChangedSlot" << std::endl;
+	//Comments part of #947 fix
+//	std::cout << "ActiveToolProxy::activeToolChangedSlot" << std::endl;
 	if (mTool && mTool->getUid() == uid)
 		return;
 
