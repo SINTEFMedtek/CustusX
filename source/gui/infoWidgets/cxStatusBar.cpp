@@ -104,6 +104,7 @@ void StatusBar::connectToToolSignals()
 	this->disconnectFromToolSignals(); // avoid duplicates
 
 	this->addPermanentWidget(mTpsLabel);
+	mTpsLabel->show();
 
 	TrackingService::ToolMap tools = trackingService()->getTools();
 	for (TrackingService::ToolMap::iterator it = tools.begin(); it != tools.end(); ++it)
@@ -200,7 +201,6 @@ void StatusBar::renderingFpsSlot(int numFps)
 
 void StatusBar::tpsSlot(int numTps)
 {
-	//TODO: start here for fixing #947
 	QString tpsString = "TPS: " + QString::number(numTps);
 	mTpsLabel->setText(tpsString);
 }
