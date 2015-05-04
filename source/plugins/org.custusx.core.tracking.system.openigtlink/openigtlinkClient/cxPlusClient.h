@@ -39,6 +39,110 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx {
 
+/**
+ * @brief The PlusClient class contains the knowhow on the packages sent from a
+ * PlusServer. For this class to function correctly, the Plus configuration file
+ * used by the PlusServer needs to set up correctly.
+ *
+ * ASSUMPTIONS:
+ * - all images comes from a probe
+ * - images have their matrix set to be sMt (calibration)
+ *
+ * Example configuration used with the Ultrasonix  L14-5 gps probe:
+ *  <PlusConfiguration version="2.1">
+
+  <DataCollection StartupDelaySec="1.0" >
+    <DeviceSet
+      Name="PlusServer: Ultrasonix ultrasound imaging and tracking device"
+      Description="Broadcasting ultrasound images and tracking data acquired from the Ultrasonix system through OpenIGTLink. If PlusServer does not run on the Ultrasonix PC then update the IP attribute in the Device element with the Ultrasonix PC's IP address."
+    />
+    <Device
+      Id="VideoDevice"
+      Type="SonixVideo"
+      AcquisitionRate="30"
+      IP="127.0.0.1"
+      EnableAutoClip="TRUE"
+      DetectDepthSwitching="true"
+      SharedMemoryStatus="1"
+      AutoClipEnabled="TRUE"
+      ImageGeometryOutputEnabled="TRUE"
+      ImageToTransducerTransformName="ImageToTransducer"
+      ProbeId="L14-5">
+      <DataSources>
+        <DataSource Type="Video" Id="Video" PortName="B"  PortUsImageOrientation="UF" />
+      </DataSources>
+      <OutputChannels>
+        <OutputChannel Id="VideoStream" VideoDataSourceId="Video" />
+      </OutputChannels>
+    </Device>
+    <Device
+      Id="TrackerDevice"
+      Type="Ascension3DG"
+      FilterAcWideNotch="1"
+      ToolReferenceFrame="Tracker" >
+      <DataSources>
+        <DataSource Type="Tool" Id="Probe" PortName="0"  />
+        <DataSource Type="Tool" Id="Needle" PortName="2"  />
+      </DataSources>
+      <OutputChannels>
+        <OutputChannel Id="TrackerStream" >
+          <DataSource Id="Probe"/>
+          <DataSource Id="Needle"/>
+        </OutputChannel>
+      </OutputChannels>
+    </Device>
+    <Device
+      Id="TrackedVideoDevice"
+      Type="VirtualMixer" >
+      <InputChannels>
+        <InputChannel Id="TrackerStream" />
+        <InputChannel Id="VideoStream" />
+      </InputChannels>
+      <OutputChannels>
+        <OutputChannel Id="TrackedVideoStream"/>
+      </OutputChannels>
+    </Device>
+  </DataCollection>
+
+  <CoordinateDefinitions>
+    <Transform From="Transducer" To="Probe"
+      Matrix="
+        0.0018 0.9477 0.0 14.8103
+        -1.0 0.0016 0.0 34.2061
+        -0.0052 0.0166 1 0.2636
+        0 0 0 1" />
+  </CoordinateDefinitions>
+
+  <PlusOpenIGTLinkServer
+    MaxNumberOfIgtlMessagesToSend="100"
+    MaxTimeSpentWithProcessingMs="50"
+    ListeningPort="18944"
+    SendValidTransformsOnly="true"
+    OutputChannelId="TrackedVideoStream" >
+    <DefaultClientInfo>
+      <MessageTypes>
+        <Message Type="TRANSFORM" />
+        <Message Type="IMAGE" />
+        <Message Type="STRING" />
+      </MessageTypes>
+      <TransformNames>
+        <Transform Name="ProbeToTracker" />
+        <Transform Name="NeedleToTracker" />
+      </TransformNames>
+      <ImageNames>
+        <Image Name="Image" EmbeddedTransformToFrame="Probe" />
+      </ImageNames>
+      <StringNames>
+        <String Name="DepthMm" />
+        <String Name="PixelSpacingMm" />
+        <String Name="TransducerOriginPix" />
+      </StringNames>
+    </DefaultClientInfo>
+  </PlusOpenIGTLinkServer>
+
+</PlusConfiguration>
+
+ */
 
 class org_custusx_core_tracking_system_openigtlink_EXPORT PlusClient : public OpenIGTLinkClient
 {
