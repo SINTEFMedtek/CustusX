@@ -17,6 +17,7 @@ set(PLUGIN_SRCS
     openigtlinkClient/cxSocket.cpp
     openigtlinkClient/cxOpenIGTLinkClient.cpp
     openigtlinkClient/cxPlusClient.cpp
+    openigtlinkClient/cxCustusClient.cpp
 )
 
 # Files which should be processed by Qts moc
@@ -35,6 +36,7 @@ set(PLUGIN_MOC_SRCS
     openigtlinkClient/cxSocket.h
     openigtlinkClient/cxOpenIGTLinkClient.h
     openigtlinkClient/cxPlusClient.h
+    openigtlinkClient/cxCustusClient.h
 )
 
 # Qt Designer files which should be processed by Qts uic
