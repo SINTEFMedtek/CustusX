@@ -116,7 +116,7 @@ StringPropertyPtr VNNclReconstructionMethodService::getMethodOption(QDomElement 
         QString method = *it;
         methods << method;
     }
-    return StringProperty::initialize("Method", "", "Which algorithm to use for reconstruction", methods[0],
+    return StringProperty::initialize("Method", "", "Which algorithm to use for reconstruction", methods[2],
             methods, root);
 }
 
@@ -128,7 +128,7 @@ DoublePropertyPtr VNNclReconstructionMethodService::getNewnessWeightOption(QDomE
 
 DoublePropertyPtr VNNclReconstructionMethodService::getBrightnessWeightOption(QDomElement root)
 {
-    return DoubleProperty::initialize("Brightness weight", "", "Brightness weight", 0, DoubleRange(0.0, 10, 0.1),
+    return DoubleProperty::initialize("Brightness weight", "", "Brightness weight", 1, DoubleRange(0.0, 10, 0.1),
             1, root);
 }
 
@@ -146,19 +146,19 @@ StringPropertyPtr VNNclReconstructionMethodService::getPlaneMethodOption(QDomEle
 
 DoublePropertyPtr VNNclReconstructionMethodService::getRadiusOption(QDomElement root)
 {
-    return DoubleProperty::initialize("Radius (mm)", "", "Radius of kernel. mm.", 1, DoubleRange(0.1, 10, 0.1), 1,
+    return DoubleProperty::initialize("Radius (mm)", "", "Radius of kernel. mm.", 3, DoubleRange(0.1, 10, 0.1), 1,
             root);
 }
 
 DoublePropertyPtr VNNclReconstructionMethodService::getMaxPlanesOption(QDomElement root)
 {
-    return DoubleProperty::initialize("nPlanes", "", "Number of planes to include in closest planes", 8,
+    return DoubleProperty::initialize("nPlanes", "", "Number of planes to include in closest planes", 10,
             DoubleRange(1, 200, 1), 0, root);
 }
 
 DoublePropertyPtr VNNclReconstructionMethodService::getNStartsOption(QDomElement root)
 {
-    return DoubleProperty::initialize("nStarts", "", "Number of starts for multistart searchs", 3,
+    return DoubleProperty::initialize("nStarts", "", "Number of starts for multistart searchs", 16,
             DoubleRange(1, 16, 1), 0, root);
 }
 
@@ -174,4 +174,4 @@ int VNNclReconstructionMethodService::getPlaneMethodID(QDomElement root)
 }
 
 
-} /* namespace cx */
+} /* namespace cx */	
