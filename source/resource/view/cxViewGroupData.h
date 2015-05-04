@@ -148,10 +148,10 @@ public:
 	void parseXml(QDomNode dataNode);
 
 private slots:
-	void dataAddedOrRemovedInManager();
+	void purgeDataNotExistingInPatientModelService();
 
 signals:
-	void dataViewPropertiesChanged();
+	void dataViewPropertiesChanged(QString uid);
 	void videoSourceChanged(QString uid);
 	void initialized();
 	void optionsChanged();

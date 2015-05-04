@@ -577,7 +577,6 @@ void ViewWrapper3D::dataViewPropertiesChangedSlot(QString uid)
 
 	this->updateSlices();
 
-	this->activeImageChangedSlot(uid);
 	this->updateView();
 }
 
@@ -736,7 +735,6 @@ void ViewWrapper3D::updateView()
 
 void ViewWrapper3D::activeImageChangedSlot(QString uid)
 {
-	std::cout << "ViewWrapper3D::activeImageChangedSlot: " << uid << std::cout;
 	if(!mGroupData)
 		return;
 	ImagePtr image = mServices->getPatientService()->getActiveImage();

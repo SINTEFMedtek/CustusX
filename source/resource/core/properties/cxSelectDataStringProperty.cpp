@@ -46,7 +46,7 @@ StringPropertyActiveImage::StringPropertyActiveImage(PatientModelServicePtr pati
 {
 	mValueName = "Active Volume";
 	mHelp = "Select the active volume";
-	connect(mPatientModelService.get(), SIGNAL(activeImageChanged(QString)), this, SIGNAL(changed()));
+	connect(mPatientModelService.get(), &PatientModelService::activeImageChanged, this, &StringPropertyActiveImage::changed);
 }
 
 bool StringPropertyActiveImage::setValue(const QString& value)

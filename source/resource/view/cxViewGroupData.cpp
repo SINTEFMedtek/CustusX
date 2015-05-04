@@ -217,7 +217,7 @@ ViewGroupData::ViewGroupData(CoreServicesPtr services) :
 	mCamera3D(CameraData::create())
 {
 	if(mServices)
-		connect(mServices->patientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &ViewGroupData::dataAddedOrRemovedInManager);
+		connect(mServices->patientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &ViewGroupData::purgeDataNotExistingInPatientModelService);
 	mVideoSource = "active";
 	mGroup2DZoom = SyncedValue::create(1);
 	mGlobal2DZoom = mGroup2DZoom;
@@ -227,22 +227,29 @@ ViewGroupData::ViewGroupData(CoreServicesPtr services) :
 	mSliceDefinitions.add(ptSAGITTAL);
 }
 
-void ViewGroupData::dataAddedOrRemovedInManager()
+//Remove all data, and wait to emit signals until all data is removed
+void ViewGroupData::purgeDataNotExistingInPatientModelService()
 {
-	std::cout << this << " ViewGroupData::dataAddedOrRemovedInManager() mData.size():" << mData.size() << std::endl;
-//	this->blockSignals(true);
+	QStringList purged;
 	for (unsigned i = 0; i < mData.size(); )
 	{
-		std::cout << "i: " << i << std::endl;
-		if (!mServices->patientModelService->getData(mData[i].first))
-			this->removeData(mData[i].first);
+		QString uid = mData[i].first;
+		if (!mServices->patientModelService->getData(uid))
+		{
+			if (this->contains(uid))
+			{
+				purged << uid;
+				mData.erase(std::find_if(mData.begin(), mData.end(), data_equals(uid)));
+			}
+		}
 		else
 			++i;
 	}
-//	this->blockSignals(false);
-//	emit dataViewPropertiesChanged();
-	std:cout << "mData.size(): " << mData.size() << std::endl;
+	//Emit delayed signals
+	for(unsigned i = 0; i < purged.size(); ++i)
+		emit dataViewPropertiesChanged(purged[i]);
 }
+
 
 void ViewGroupData::requestInitialize()
 {
@@ -274,7 +281,7 @@ void ViewGroupData::addDataSorted(QString uid)
 	}
 	if (!this->contains(uid))
 		mData.insert(mData.begin(), item);
-	emit dataViewPropertiesChanged();
+	emit dataViewPropertiesChanged(uid);
 }
 
 DataViewProperties ViewGroupData::getProperties(QString uid)
@@ -305,7 +312,7 @@ void ViewGroupData::setProperties(QString uid, DataViewProperties properties)
 		std::find_if(mData.begin(), mData.end(), data_equals(uid))->second = properties;
 	}
 
-	emit dataViewPropertiesChanged();
+	emit dataViewPropertiesChanged(uid);
 }
 
 bool ViewGroupData::contains(QString uid) const
@@ -318,7 +325,7 @@ bool ViewGroupData::removeData(QString uid)
 	if (!this->contains(uid))
 		return false;
 	mData.erase(std::find_if(mData.begin(), mData.end(), data_equals(uid)));
-	emit dataViewPropertiesChanged();
+	emit dataViewPropertiesChanged(uid);
 	return true;
 }
 
@@ -338,8 +345,6 @@ DataPtr ViewGroupData::getData(QString uid) const
 	if (!data)
 	{
 		reportError("Couldn't find the data: [" + uid + "] in the datamanager.");
-		std::cout << this << std::endl;
-		exit(0);
 		return DataPtr();
 	}
 	return data;

@@ -111,7 +111,7 @@ signals:
 protected slots:
 	void contextMenuSlot(const QPoint& point);
 
-//	virtual void dataViewPropertiesChangedSlot(QString uid);
+	virtual void dataViewPropertiesChangedSlot(QString uid) = 0;
 	virtual void videoSourceChangedSlot(QString uid) {}
 
 protected:
