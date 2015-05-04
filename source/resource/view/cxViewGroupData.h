@@ -148,7 +148,7 @@ public:
 	void parseXml(QDomNode dataNode);
 
 private slots:
-	void dataAddedOrRemovedInManager();
+	void purgeDataNotExistingInPatientModelService();
 
 signals:
 	void dataViewPropertiesChanged(QString uid);

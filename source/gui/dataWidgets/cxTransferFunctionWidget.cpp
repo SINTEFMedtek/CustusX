@@ -69,13 +69,13 @@ DoublePropertyImageTFDataBase::DoublePropertyImageTFDataBase()
 
 void DoublePropertyImageTFDataBase::setImageTFData(ImageTFDataPtr tfData, ImagePtr image)
 {
-  if (mImageTFData)
-	  disconnect(image.get(), &Image::transferFunctionsChanged, this, &Property::changed);
+  if (mImage)
+	  disconnect(mImage.get(), &Image::transferFunctionsChanged, this, &Property::changed);
 
   mImageTFData = tfData;
   mImage = image;
 
-  if (mImageTFData)
+  if (image)
 	  connect(image.get(), &Image::transferFunctionsChanged, this, &Property::changed);
 
   emit changed();

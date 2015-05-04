@@ -120,7 +120,7 @@ InteractiveCropper::InteractiveCropper(CoreServicesPtr backend/*PatientModelServ
 //	mPatientModelService(patientModelService)
 {
 	mActiveImageProxy = ActiveImageProxy::New(mBackend->patientModelService);
-	connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(imageChangedSlot()));
+	connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &InteractiveCropper::imageChangedSlot);
 	connect(mActiveImageProxy.get(), SIGNAL(cropBoxChanged()), this, SLOT(imageCropChangedSlot()));
 }
 

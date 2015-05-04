@@ -158,7 +158,7 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ViewPtr view, VisServicesPtr servic
 	this->updateMetricNamesRep();
 
 	connect(mServices->getToolManager().get(), &TrackingService::stateChanged, this, &ViewWrapper3D::toolsAvailableSlot);
-	connect(mServices->getPatientService().get(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(activeImageChangedSlot()));
+	connect(mServices->getPatientService().get(), &PatientModelService::activeImageChanged, this, &ViewWrapper3D::activeImageChangedSlot);
 	this->toolsAvailableSlot();
 
 	mAnnotationMarker = RepManager::getInstance()->getCachedRep<OrientationAnnotation3DRep>();
@@ -577,7 +577,6 @@ void ViewWrapper3D::dataViewPropertiesChangedSlot(QString uid)
 
 	this->updateSlices();
 
-	this->activeImageChangedSlot();
 	this->updateView();
 }
 
@@ -734,7 +733,7 @@ void ViewWrapper3D::updateView()
 	mAnnotationMarker->setVisible(settings()->value("View/showOrientationAnnotation").value<bool>());
 }
 
-void ViewWrapper3D::activeImageChangedSlot()
+void ViewWrapper3D::activeImageChangedSlot(QString uid)
 {
 	if(!mGroupData)
 		return;
