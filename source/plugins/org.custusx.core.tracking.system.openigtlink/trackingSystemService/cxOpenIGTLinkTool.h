@@ -109,6 +109,7 @@ private:
     QTimer mTpsTimer;
     double mTimestamp;
     std::set<Type> mTypes;
+    Transform3D m_sMt_calibration;
 };
 typedef boost::shared_ptr<OpenIGTLinkTool> OpenIGTLinkToolPtr;
 

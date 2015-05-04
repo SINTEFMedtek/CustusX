@@ -87,6 +87,7 @@ private slots:
     void serverIsDisconnected();
 
     void receiveTransform(QString devicename, Transform3D transform, double timestamp);
+    void receiveCalibration(QString devicename, Transform3D calibration);
 
 private:
     void internalSetState(Tool::State state);

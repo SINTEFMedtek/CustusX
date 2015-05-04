@@ -63,6 +63,7 @@ public:
     QString decode(igtl::StatusMessage::Pointer msg);
     QString decode(igtl::StringMessage::Pointer msg);
     ImagePtr decode(igtl::ImageMessage::Pointer msg);
+    Transform3D decode_image_matrix(igtl::ImageMessage::Pointer msg);
     Transform3D decode(igtl::TransformMessage::Pointer msg);
 
     //CustusX message formats

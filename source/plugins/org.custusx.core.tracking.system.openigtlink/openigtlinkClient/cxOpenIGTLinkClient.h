@@ -70,6 +70,7 @@ signals:
     void error();
 
     void transform(QString devicename, Transform3D transform, double timestamp);
+    void calibration(QString devicename, Transform3D calibration);
     void image(ImagePtr image);
 
 private slots:
@@ -77,7 +78,7 @@ private slots:
     void internalDisconnected();
     void internalDataAvailable();
 
-private:
+protected:
     bool socketIsConnected();
     bool enoughBytesAvailableOnSocket(int bytes) const;
     bool receiveHeader(const igtl::MessageHeader::Pointer header) const;
@@ -106,10 +107,10 @@ private:
         }
         return true;
     }
-    void process(const igtl::TransformMessage::Pointer header);
-    void process(const igtl::ImageMessage::Pointer header);
-    void process(const igtl::StatusMessage::Pointer header);
-    void process(const igtl::StringMessage::Pointer body);
+    virtual void process(const igtl::TransformMessage::Pointer body) = 0;
+    virtual void process(const igtl::ImageMessage::Pointer body) = 0;
+    virtual void process(const igtl::StatusMessage::Pointer body) = 0;
+    virtual void process(const igtl::StringMessage::Pointer body) = 0;
 
     bool socketReceive(void *packPointer, int packSize) const;
     void checkCRC(int c) const;

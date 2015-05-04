@@ -43,7 +43,8 @@ namespace cx
 OpenIGTLinkTool::OpenIGTLinkTool(QString uid) :
     ToolImpl(uid, uid),
     mPolyData(NULL),
-    mTimestamp(0)
+    mTimestamp(0),
+    m_sMt_calibration(Transform3D::Identity())
 {
     connect(&mTpsTimer, SIGNAL(timeout()), this, SLOT(calculateTpsSlot()));
 
@@ -143,21 +144,22 @@ void OpenIGTLinkTool::createPolyData()
 
 bool OpenIGTLinkTool::isCalibrated() const
 {
-    //TODO how to know if an openigtlink tool is calibrated??
-    CX_LOG_WARNING() << "OpenIGTLinkTool types are hardcoded to always be calibrated. Is this correct?.";
-    return true;
+    Transform3D identity = Transform3D::Identity();
+    bool calibrated = !similar(m_sMt_calibration, identity);
+    CX_LOG_DEBUG() << "Checking if openiglink tool is calibratated: " << calibrated;
+
+    return calibrated;
 }
 
 Transform3D OpenIGTLinkTool::getCalibration_sMt() const
 {
-    Transform3D identity = Transform3D::Identity();
-    return identity;
+    return m_sMt_calibration;
 }
 
 void OpenIGTLinkTool::setCalibration_sMt(Transform3D calibration)
 {
-    Q_UNUSED(calibration);
-    CX_LOG_WARNING() << "Cannot set calibration on a openigtlink tool";
+    if(!similar(m_sMt_calibration, calibration))
+        m_sMt_calibration = calibration;
 }
 
 void OpenIGTLinkTool::toolTransformAndTimestampSlot(Transform3D matrix, double timestamp)

@@ -61,6 +61,7 @@ OpenIGTLinkTrackingSystemService::OpenIGTLinkTrackingSystemService(OpenIGTLinkCl
     connect(client, &OpenIGTLinkClient::connected, this, &OpenIGTLinkTrackingSystemService::serverIsConnected);
     connect(client, &OpenIGTLinkClient::disconnected, this, &OpenIGTLinkTrackingSystemService::serverIsDisconnected);
     connect(client, &OpenIGTLinkClient::transform, this, &OpenIGTLinkTrackingSystemService::receiveTransform);
+    connect(client, &OpenIGTLinkClient::calibration, this, &OpenIGTLinkTrackingSystemService::receiveCalibration);
 }
 
 OpenIGTLinkTrackingSystemService::~OpenIGTLinkTrackingSystemService()
@@ -191,6 +192,12 @@ void OpenIGTLinkTrackingSystemService::receiveTransform(QString devicename, Tran
 {
     OpenIGTLinkToolPtr tool = this->getTool(devicename);
     tool->toolTransformAndTimestampSlot(transform, timestamp);
+}
+
+void OpenIGTLinkTrackingSystemService::receiveCalibration(QString devicename, Transform3D calibration)
+{
+    OpenIGTLinkToolPtr tool = this->getTool(devicename);
+    tool->setCalibration_sMt(calibration);
 }
 
 void OpenIGTLinkTrackingSystemService::internalSetState(Tool::State state)

@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxUtilHelpers.h"
 #include "cxReporter.h"
 #include "cxOpenIGTLinkClient.h"
+#include "cxPlusClient.h"
 #include "cxOpenIGTLinkGuiExtenderService.h"
 
 TEST_CASE("OpenIGTLinkTrackingSystemService: Check that the openigtlink tracking service can be created and destroyed", "[unit][plugins][org.custusx.core.tracking.system.openigtlink]")
@@ -50,7 +51,7 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: Check that the openigtlink tracking
 
 TEST_CASE("OpenIGTLinkGuiExtender: Check that the openigtlink gui extender service can be created and destroyed", "[unit][org.custusx.core.tracking.system.openigtlink]")
 {
-    cx::OpenIGTLinkClient *client = new cx::OpenIGTLinkClient;
+    cx::PlusClient *client = new cx::PlusClient;
     cx::OpenIGTLinkGuiExtenderServicePtr gui(new cx::OpenIGTLinkGuiExtenderService(client));
     REQUIRE(gui);
     CHECK(gui.unique());
@@ -62,7 +63,7 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: Check that the plugin can connect a
 {
 
     QThread mOpenIGTLinkThread;
-    cx::OpenIGTLinkClient *client = new cx::OpenIGTLinkClient;
+    cx::PlusClient *client = new cx::PlusClient;
     client->setIpAndPort("10.218.140.127"); //this is done before client is moved to another thread
     client->moveToThread(&mOpenIGTLinkThread);
     QObject::connect(&mOpenIGTLinkThread, &QThread::finished, client, &QObject::deleteLater);

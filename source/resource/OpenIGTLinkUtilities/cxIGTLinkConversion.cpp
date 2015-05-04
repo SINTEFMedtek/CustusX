@@ -145,6 +145,14 @@ ImagePtr IGTLinkConversion::decode(igtl::ImageMessage::Pointer message)
     return retval;
 }
 
+Transform3D IGTLinkConversion::decode_image_matrix(igtl::ImageMessage::Pointer msg)
+{
+    igtl::Matrix4x4 matrix;
+    msg->GetMatrix(matrix);
+    Transform3D retval = Transform3D::fromFloatArray(matrix);
+    return retval;
+}
+
 Transform3D IGTLinkConversion::decode(igtl::TransformMessage::Pointer msg)
 {
     igtl::Matrix4x4 matrix;
