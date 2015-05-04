@@ -39,7 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxOpenIGTLinkTrackingSystemService.h"
 #include "cxOpenIGTLinkGuiExtenderService.h"
 #include "cxOpenIGTLinkClient.h"
-#include "cxPlusClient.h"
 #include "cxRegisteredService.h"
 
 namespace cx
@@ -56,7 +55,7 @@ OpenIGTLinkTrackingSystemPluginActivator::~OpenIGTLinkTrackingSystemPluginActiva
 void OpenIGTLinkTrackingSystemPluginActivator::start(ctkPluginContext* context)
 {
     mOpenIGTLinkThread.setObjectName("org.custusx.core.openigtlink");
-    PlusClient *client = new PlusClient;
+    OpenIGTLinkClient *client = new OpenIGTLinkClient;
     client->setIpAndPort(mIp, mPort); //this is done before client is moved to another thread
     client->moveToThread(&mOpenIGTLinkThread);
 

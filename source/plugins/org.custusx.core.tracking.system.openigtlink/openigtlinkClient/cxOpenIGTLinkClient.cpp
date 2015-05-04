@@ -35,6 +35,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSender.h"
 #include "cxTime.h"
 
+#include "cxPlusDialect.h"
+#include "cxCustusDialect.h"
+
 namespace cx
 {
 
@@ -54,6 +57,55 @@ OpenIGTLinkClient::OpenIGTLinkClient(QObject *parent) :
     connect(mSocket.get(), &Socket::disconnected, this, &OpenIGTLinkClient::internalDisconnected);
     connect(mSocket.get(), &Socket::readyRead, this, &OpenIGTLinkClient::internalDataAvailable);
     connect(mSocket.get(), &Socket::error, this, &OpenIGTLinkClient::error);
+
+    DialectPtr dialect = DialectPtr(new CustusDialect());
+    mAvailableDialects[dialect->getName()] = dialect;
+    this->setDialect(dialect->getName());
+
+    dialect = DialectPtr(new PlusDialect());
+    mAvailableDialects[dialect->getName()] = dialect;
+
+    dialect = DialectPtr(new Dialect());
+    mAvailableDialects[dialect->getName()] = dialect;
+
+}
+
+QStringList OpenIGTLinkClient::getAvailableDialects() const
+{
+    QStringList retval;
+    DialectMap::const_iterator it = mAvailableDialects.begin();
+    for( ; it!=mAvailableDialects.end() ; ++it)
+    {
+        retval << it->first;
+    }
+    return retval;
+}
+
+void OpenIGTLinkClient::setDialect(QString dialectname)
+{
+    QMutexLocker locker(&mMutex);
+
+    DialectPtr dialect = mAvailableDialects[dialectname];
+    if(!dialect)
+    {
+        CX_LOG_ERROR() << "\"" << dialectname << "\" is an unknown opentigtlink dialect.";
+        return;
+    }
+
+    if(mDialect)
+    {
+        disconnect(mDialect.get(), &Dialect::image, this, &OpenIGTLinkClient::image);
+        disconnect(mDialect.get(), &Dialect::transform, this, &OpenIGTLinkClient::transform);
+        disconnect(mDialect.get(), &Dialect::calibration, this, &OpenIGTLinkClient::calibration);
+    }
+
+    mDialect = dialect;
+    connect(dialect.get(), &Dialect::image, this, &OpenIGTLinkClient::image);
+    connect(dialect.get(), &Dialect::transform, this, &OpenIGTLinkClient::transform);
+    connect(dialect.get(), &Dialect::calibration, this, &OpenIGTLinkClient::calibration);
+
+    CX_LOG_CHANNEL_SUCCESS(CX_OPENIGTLINK_CHANNEL_NAME) << "Dialect set to " << dialectname;
+
 }
 
 void OpenIGTLinkClient::setIpAndPort(QString ip, int port)

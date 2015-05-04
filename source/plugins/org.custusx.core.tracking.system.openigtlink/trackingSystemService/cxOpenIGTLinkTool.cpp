@@ -159,7 +159,10 @@ Transform3D OpenIGTLinkTool::getCalibration_sMt() const
 void OpenIGTLinkTool::setCalibration_sMt(Transform3D calibration)
 {
     if(!similar(m_sMt_calibration, calibration))
+    {
         m_sMt_calibration = calibration;
+        CX_LOG_INFO() << "OpenIGTLink tool got updated calibration";
+    }
 }
 
 void OpenIGTLinkTool::toolTransformAndTimestampSlot(Transform3D matrix, double timestamp)

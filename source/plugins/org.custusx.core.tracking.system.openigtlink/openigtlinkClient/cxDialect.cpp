@@ -1,10 +1,24 @@
-#include "cxPlusClient.h"
+#include "cxDialect.h"
 
 #include "cxIGTLinkConversion.h"
+#include "cxLogger.h"
 
-namespace cx{
+namespace cx
+{
 
-void PlusClient::process(const igtl::TransformMessage::Pointer body)
+Dialect::Dialect(QObject *parent) :
+    QObject(parent)
+{
+    qRegisterMetaType<Transform3D>("Transform3D");
+    qRegisterMetaType<ImagePtr>("ImagePtr");
+}
+
+QString Dialect::getName() const
+{
+    return "Basic";
+}
+
+void Dialect::translate(const igtl::TransformMessage::Pointer body)
 {
     QString deviceName = body->GetDeviceName();
 
@@ -18,32 +32,24 @@ void PlusClient::process(const igtl::TransformMessage::Pointer body)
     emit transform(deviceName, transform3D, timestamp_ms);
 }
 
-void PlusClient::process(const igtl::ImageMessage::Pointer body)
+void Dialect::translate(const igtl::ImageMessage::Pointer body)
 {
-    IGTLinkConversion converter;
-    ImagePtr theImage = converter.decode(body);
-    emit image(theImage);
-
-    CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "TODO need to set devicename correctly for calibration";
-    QString devicename = "ProbeToTracker"; //TODO remove hardcoded devicename
-    Transform3D sMt = converter.decode_image_matrix(body);
-    emit calibration(devicename, sMt);
+    Q_UNUSED(body);
 }
 
-void PlusClient::process(const igtl::StatusMessage::Pointer body)
+void Dialect::translate(const igtl::StatusMessage::Pointer body)
 {
     IGTLinkConversion converter;
     QString status = converter.decode(body);
     CX_LOG_CHANNEL_VOLATILE(CX_OPENIGTLINK_CHANNEL_NAME) << status;
 }
 
-void PlusClient::process(const igtl::StringMessage::Pointer body)
+void Dialect::translate(const igtl::StringMessage::Pointer body)
 {
     IGTLinkConversion converter;
     QString string = converter.decode(body);
     //This was spamming the console
     //CX_LOG_CHANNEL_INFO(CX_OPENIGTLINK_CHANNEL_NAME) << string;
 }
-
 
 } //namespace cx

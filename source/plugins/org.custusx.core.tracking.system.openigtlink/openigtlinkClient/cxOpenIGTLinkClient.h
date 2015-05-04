@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "org_custusx_core_tracking_system_openigtlink_Export.h"
 
+#include <map>
 #include <QObject>
 #include "igtlMessageHeader.h"
 #include "igtlTransformMessage.h"
@@ -47,10 +48,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTransform3D.h"
 #include "cxImage.h"
 #include "cxLogger.h"
-
-#define CX_OPENIGTLINK_CHANNEL_NAME "OpenIGTLink"
+#include "cxDialect.h"
 
 namespace cx {
+
+/**
+ * @brief The OpenIGTLinkClient class handles incoming OpenIGTLink packages.
+ *
+ * To specify how a packages should be handled you can specify different kind of
+ * supported dialects, which are a way to handle the way different OpenIGTLink
+ * servers send packages.
+ *
+ */
 
 class org_custusx_core_tracking_system_openigtlink_EXPORT OpenIGTLinkClient : public QObject
 {
@@ -58,6 +67,10 @@ class org_custusx_core_tracking_system_openigtlink_EXPORT OpenIGTLinkClient : pu
 public:
 
     explicit OpenIGTLinkClient(QObject *parent = 0);
+
+    //thread safe
+    QStringList getAvailableDialects() const;
+    void setDialect(QString dialectname);
 
 public slots:
     void setIpAndPort(QString ip, int port=18944); //not threadsafe
@@ -78,7 +91,7 @@ private slots:
     void internalDisconnected();
     void internalDataAvailable();
 
-protected:
+private:
     bool socketIsConnected();
     bool enoughBytesAvailableOnSocket(int bytes) const;
     bool receiveHeader(const igtl::MessageHeader::Pointer header) const;
@@ -87,6 +100,8 @@ protected:
     template <typename T>
     bool receive(const igtl::MessageBase::Pointer header)
     {
+        QMutexLocker locker(&mMutex);
+
         T::Pointer body = T::New();
         body->SetMessageHeader(header);
         body->AllocatePack();
@@ -98,7 +113,7 @@ protected:
         this->checkCRC(c);
         if (c & igtl::MessageHeader::UNPACK_BODY)
         {
-            this->process(body);
+            mDialect->translate(body);
         }
         else
         {
@@ -107,19 +122,21 @@ protected:
         }
         return true;
     }
-    virtual void process(const igtl::TransformMessage::Pointer body) = 0;
-    virtual void process(const igtl::ImageMessage::Pointer body) = 0;
-    virtual void process(const igtl::StatusMessage::Pointer body) = 0;
-    virtual void process(const igtl::StringMessage::Pointer body) = 0;
 
     bool socketReceive(void *packPointer, int packSize) const;
     void checkCRC(int c) const;
+
+    QMutex mMutex;
 
     SocketPtr mSocket;
     igtl::MessageHeader::Pointer mHeader;
     bool mHeaderReceived;
     QString mIp;
     int mPort;
+
+    DialectPtr mDialect;
+    typedef std::map<QString, DialectPtr> DialectMap;
+    DialectMap mAvailableDialects;
 };
 
 } //namespace cx

@@ -41,26 +41,30 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx {
 
 OpenIGTLinkConnectionWidget::OpenIGTLinkConnectionWidget(OpenIGTLinkClient *client, QWidget *parent) :
-    BaseWidget(parent, "OpenIGTLinkConnectionWidget", "OpenIGTLink Connection")
+    BaseWidget(parent, "OpenIGTLinkConnectionWidget", "OpenIGTLink Connection"),
+    mClient(client)
 {
     XmlOptionFile options = profile()->getXmlSettings().descend("openigtlink");
     mOptionsElement = options.getElement();
     StringPropertyBasePtr ip = this->getIpOption(mOptionsElement);
     DoublePropertyBasePtr port = this->getPortOption(mOptionsElement);
+    StringPropertyBasePtr dialects = this->getDialectOption(mOptionsElement, mClient);
 
     mConnectButton = new QPushButton("Connect", this);
     mConnectButton->setCheckable(true);
     connect(mConnectButton, &QPushButton::clicked, this, &OpenIGTLinkConnectionWidget::connectButtonClicked);
-    connect(this, &OpenIGTLinkConnectionWidget::requestConnect, client, &OpenIGTLinkClient::requestConnect);
-    connect(this, &OpenIGTLinkConnectionWidget::requestDisconnect, client, &OpenIGTLinkClient::requestDisconnect);
-    connect(this, &OpenIGTLinkConnectionWidget::ipAndPort, client, &OpenIGTLinkClient::setIpAndPort);
-    connect(client, &OpenIGTLinkClient::connected, this, &OpenIGTLinkConnectionWidget::clientConnected);
-    connect(client, &OpenIGTLinkClient::disconnected, this, &OpenIGTLinkConnectionWidget::clientDisconnected);
-    connect(client, &OpenIGTLinkClient::error, this, &OpenIGTLinkConnectionWidget::clientDisconnected);
+
+    connect(this, &OpenIGTLinkConnectionWidget::requestConnect, mClient, &OpenIGTLinkClient::requestConnect);
+    connect(this, &OpenIGTLinkConnectionWidget::requestDisconnect, mClient, &OpenIGTLinkClient::requestDisconnect);
+    connect(this, &OpenIGTLinkConnectionWidget::ipAndPort, mClient, &OpenIGTLinkClient::setIpAndPort);
+    connect(mClient, &OpenIGTLinkClient::connected, this, &OpenIGTLinkConnectionWidget::clientConnected);
+    connect(mClient, &OpenIGTLinkClient::disconnected, this, &OpenIGTLinkConnectionWidget::clientDisconnected);
+    connect(mClient, &OpenIGTLinkClient::error, this, &OpenIGTLinkConnectionWidget::clientDisconnected);
 
     QVBoxLayout* topLayout = new QVBoxLayout(this);
     topLayout->addWidget(sscCreateDataWidget(this, ip));
     topLayout->addWidget(sscCreateDataWidget(this, port));
+    topLayout->addWidget(sscCreateDataWidget(this, dialects));
     topLayout->addWidget(mConnectButton);
     topLayout->addStretch();
 }
@@ -106,6 +110,9 @@ void OpenIGTLinkConnectionWidget::connectButtonClicked(bool checked)
     StringPropertyBasePtr ip = this->getIpOption(mOptionsElement);
     DoublePropertyBasePtr port = this->getPortOption(mOptionsElement);
 
+    StringPropertyBasePtr dialects = this->getDialectOption(mOptionsElement, mClient);
+    mClient->setDialect(dialects->getValue());
+
     if(checked)
     {
         CX_LOG_CHANNEL_DEBUG("janne beate ") << "Widget requesting to connect to " << ip->getValue() << ":" << port->getValue();
@@ -120,6 +127,18 @@ void OpenIGTLinkConnectionWidget::connectButtonClicked(bool checked)
         mConnectButton->setText("Trying to disconnect...");
         mConnectButton->setEnabled(false);
     }
+}
+
+StringPropertyBasePtr OpenIGTLinkConnectionWidget::getDialectOption(QDomElement root, OpenIGTLinkClient* client)
+{
+    StringPropertyPtr retval;
+    QStringList dialectnames;
+    if(client)
+        dialectnames = client->getAvailableDialects();
+    retval = StringProperty::initialize("openigtlink_dialects", "Dialect", "OpenIGTLinkDialect", dialectnames.front(), dialectnames, root);
+    retval->setValueRange(dialectnames);
+    retval->setGroup("Connection");
+    return retval;
 }
 
 StringPropertyBasePtr OpenIGTLinkConnectionWidget::getIpOption(QDomElement root)

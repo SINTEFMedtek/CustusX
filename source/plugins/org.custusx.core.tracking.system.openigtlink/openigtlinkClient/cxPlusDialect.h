@@ -30,17 +30,17 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXPLUSCLIENT_H
-#define CXPLUSCLIENT_H
+#ifndef CXPLUSDIALECT_H
+#define CXPLUSDIALECT_H
 
 #include "org_custusx_core_tracking_system_openigtlink_Export.h"
 
-#include "cxOpenIGTLinkClient.h"
+#include "cxDialect.h"
 
 namespace cx {
 
 /**
- * @brief The PlusClient class contains the knowhow on the packages sent from a
+ * @brief The PlusDialect class contains the knowhow on the packages sent from a
  * PlusServer. For this class to function correctly, the Plus configuration file
  * used by the PlusServer needs to set up correctly.
  *
@@ -144,14 +144,13 @@ namespace cx {
 
  */
 
-class org_custusx_core_tracking_system_openigtlink_EXPORT PlusClient : public OpenIGTLinkClient
+class org_custusx_core_tracking_system_openigtlink_EXPORT PlusDialect : public Dialect
 {
-protected:
-    virtual void process(const igtl::TransformMessage::Pointer body);
-    virtual void process(const igtl::ImageMessage::Pointer body);
-    virtual void process(const igtl::StatusMessage::Pointer body);
-    virtual void process(const igtl::StringMessage::Pointer body);
+public:
+    virtual QString getName() const;
+
+    virtual void translate(const igtl::ImageMessage::Pointer body);
 };
 
 }
-#endif // CXPLUSCLIENT_H
+#endif // CXPLUSDIALECT_H

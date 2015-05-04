@@ -31,25 +31,24 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 
-#ifndef CXCUSTUSCLIENT_H
-#define CXCUSTUSCLIENT_H
+#ifndef CXCUSTUSDIALEC_H
+#define CXCUSTUSDIALECT_H
 
 
 #include "org_custusx_core_tracking_system_openigtlink_Export.h"
 
-#include "cxOpenIGTLinkClient.h"
+#include "cxDialect.h"
 
 namespace cx
 {
 
-class org_custusx_core_tracking_system_openigtlink_EXPORT CustusClient : public OpenIGTLinkClient
+class org_custusx_core_tracking_system_openigtlink_EXPORT CustusDialect : public Dialect
 {
-protected:
-    virtual void process(const igtl::TransformMessage::Pointer body);
-    virtual void process(const igtl::ImageMessage::Pointer body);
-    virtual void process(const igtl::StatusMessage::Pointer body);
-    virtual void process(const igtl::StringMessage::Pointer body);
+public:
+    virtual QString getName() const;
+
+    virtual void translate(const igtl::ImageMessage::Pointer body);
 };
 
 } //namespace cx
-#endif // CXCUSTUSCLIENT_H
+#endif // CXCUSTUSDIALECT_H
