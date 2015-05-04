@@ -106,7 +106,7 @@ private slots:
 	void showAxesActionSlot(bool checked);
 	void showManualToolSlot(bool visible);
 	void resetCameraActionSlot();
-	void activeImageChangedSlot();
+	void activeImageChangedSlot(QString uid);
 	void showRefToolSlot(bool checked);
 	void showToolPathSlot(bool checked);
 	void PickerRepPointPickedSlot(Vector3D p_r);

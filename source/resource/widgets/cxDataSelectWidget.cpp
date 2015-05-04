@@ -120,16 +120,16 @@ void DataSelectWidget::viewGroupChangedSlot()
 
     if (mCurrentViewGroup)
     {
-		disconnect(mCurrentViewGroup.get(), SIGNAL(dataViewPropertiesChanged(QString)),
-				   this, SLOT(updateDataVisibility()));
+		disconnect(mCurrentViewGroup.get(), &ViewGroupData::dataViewPropertiesChanged,
+				   this, &DataSelectWidget::updateDataVisibility);
     }
 
     mCurrentViewGroup = group;
 
     if (mCurrentViewGroup)
     {
-		connect(mCurrentViewGroup.get(), SIGNAL(dataViewPropertiesChanged(QString)),
-				this, SLOT(updateDataVisibility()));
+		connect(mCurrentViewGroup.get(), &ViewGroupData::dataViewPropertiesChanged,
+				this, &DataSelectWidget::updateDataVisibility);
     }
 
     this->updateDataVisibility();

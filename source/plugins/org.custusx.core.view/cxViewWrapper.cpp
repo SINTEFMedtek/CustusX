@@ -154,14 +154,12 @@ void ViewWrapper::setViewGroup(ViewGroupDataPtr group)
 {
 	mGroupData = group;
 
-	connect(mGroupData.get(), SIGNAL(dataViewPropertiesChanged(QString)), SLOT(dataViewPropertiesChangedSlot(QString)));
-//	connect(mGroupData.get(), SIGNAL(dataAdded(QString)), SLOT(dataAddedSlot(QString)));
-//	connect(mGroupData.get(), SIGNAL(dataRemoved(QString)), SLOT(dataRemovedSlot(QString)));
-	connect(mGroupData.get(), SIGNAL(videoSourceChanged(QString)), SLOT(videoSourceChangedSlot(QString)));
+//	connect(mGroupData.get(), &ViewGroupData::dataViewPropertiesChanged, this, &ViewWrapper::dataViewPropertiesChangedSlot);
+	connect(mGroupData.get(), &ViewGroupData::videoSourceChanged, this, &ViewWrapper::videoSourceChangedSlot);
 
-	std::vector<DataPtr> data = mGroupData->getData();
-	for (unsigned i = 0; i < data.size(); ++i)
-		this->dataViewPropertiesChangedSlot(data[i]->getUid());
+//	std::vector<DataPtr> data = mGroupData->getData();
+//	for (unsigned i = 0; i < data.size(); ++i)
+//		this->dataViewPropertiesChangedSlot(data[i]->getUid());
 
 	mDataViewPropertiesInteractor.reset(new DataViewPropertiesInteractor(mServices, mGroupData));
 
@@ -169,9 +167,9 @@ void ViewWrapper::setViewGroup(ViewGroupDataPtr group)
 	mShow3DSlicesInteractor->setDataViewProperties(DataViewProperties::createSlice3D());
 }
 
-void ViewWrapper::dataViewPropertiesChangedSlot(QString uid)
-{
-}
+//void ViewWrapper::dataViewPropertiesChangedSlot(QString uid)
+//{
+//}
 
 void ViewWrapper::contextMenuSlot(const QPoint& point)
 {

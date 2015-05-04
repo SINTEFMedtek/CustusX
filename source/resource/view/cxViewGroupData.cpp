@@ -217,7 +217,7 @@ ViewGroupData::ViewGroupData(CoreServicesPtr services) :
 	mCamera3D(CameraData::create())
 {
 	if(mServices)
-		connect(mServices->patientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataAddedOrRemovedInManager()));
+		connect(mServices->patientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &ViewGroupData::dataAddedOrRemovedInManager);
 	mVideoSource = "active";
 	mGroup2DZoom = SyncedValue::create(1);
 	mGlobal2DZoom = mGroup2DZoom;
@@ -229,13 +229,19 @@ ViewGroupData::ViewGroupData(CoreServicesPtr services) :
 
 void ViewGroupData::dataAddedOrRemovedInManager()
 {
+	std::cout << this << " ViewGroupData::dataAddedOrRemovedInManager() mData.size():" << mData.size() << std::endl;
+//	this->blockSignals(true);
 	for (unsigned i = 0; i < mData.size(); )
 	{
+		std::cout << "i: " << i << std::endl;
 		if (!mServices->patientModelService->getData(mData[i].first))
 			this->removeData(mData[i].first);
 		else
 			++i;
 	}
+//	this->blockSignals(false);
+//	emit dataViewPropertiesChanged();
+	std:cout << "mData.size(): " << mData.size() << std::endl;
 }
 
 void ViewGroupData::requestInitialize()
@@ -268,7 +274,7 @@ void ViewGroupData::addDataSorted(QString uid)
 	}
 	if (!this->contains(uid))
 		mData.insert(mData.begin(), item);
-	emit dataViewPropertiesChanged(uid);
+	emit dataViewPropertiesChanged();
 }
 
 DataViewProperties ViewGroupData::getProperties(QString uid)
@@ -299,7 +305,7 @@ void ViewGroupData::setProperties(QString uid, DataViewProperties properties)
 		std::find_if(mData.begin(), mData.end(), data_equals(uid))->second = properties;
 	}
 
-	emit dataViewPropertiesChanged(uid);
+	emit dataViewPropertiesChanged();
 }
 
 bool ViewGroupData::contains(QString uid) const
@@ -312,7 +318,7 @@ bool ViewGroupData::removeData(QString uid)
 	if (!this->contains(uid))
 		return false;
 	mData.erase(std::find_if(mData.begin(), mData.end(), data_equals(uid)));
-	emit dataViewPropertiesChanged(uid);
+	emit dataViewPropertiesChanged();
 	return true;
 }
 
@@ -332,6 +338,8 @@ DataPtr ViewGroupData::getData(QString uid) const
 	if (!data)
 	{
 		reportError("Couldn't find the data: [" + uid + "] in the datamanager.");
+		std::cout << this << std::endl;
+		exit(0);
 		return DataPtr();
 	}
 	return data;
@@ -435,12 +443,6 @@ void ViewGroupData::parseXml(QDomNode dataNode)
 	{
 		QDomElement elem = dataElems[i];
 		QString uid = elem.text();
-//		DataPtr data = mBackend->patientModelService->getData(uid);
-//		if (!data)
-//		{
-//			reportError("Couldn't find the data: [" + uid + "] in the datamanager.");
-//			continue;
-//		}
 		DataViewProperties properties = DataViewProperties::createDefault();
 		properties.parseXml(elem);
 
