@@ -150,6 +150,7 @@ public:
     virtual QString getName() const;
 
     virtual void translate(const igtl::ImageMessage::Pointer body);
+    virtual void translate(const igtl::StringMessage::Pointer body);
 };
 
 }

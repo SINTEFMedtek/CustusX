@@ -108,6 +108,22 @@ void OpenIGTLinkClient::setDialect(QString dialectname)
 
 }
 
+void OpenIGTLinkClient::sendStringMessage(QString command)
+{
+    QMutexLocker locker(&mMutex);
+
+    //TODO move to the converter
+    igtl::StringMessage::Pointer stringMsg;
+    stringMsg = igtl::StringMessage::New();
+    stringMsg->SetDeviceName("CustusXQuery");
+
+    CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "Sending string: " << command;
+    stringMsg->SetString(command.toStdString());
+    stringMsg->Pack();
+
+    mSocket->write(reinterpret_cast<char*>(stringMsg->GetPackPointer()), stringMsg->GetPackSize());
+}
+
 void OpenIGTLinkClient::setIpAndPort(QString ip, int port)
 {
     mIp = ip;
@@ -128,6 +144,8 @@ void OpenIGTLinkClient::requestDisconnect()
 void OpenIGTLinkClient::internalConnected()
 {
     CX_LOG_CHANNEL_SUCCESS(CX_OPENIGTLINK_CHANNEL_NAME) << "Connected to "  << mIp << ":" << mPort;
+    if(mDialect->getName() == "PlusServer")
+        this->queryServer();
     emit connected();
 }
 
@@ -161,6 +179,18 @@ void OpenIGTLinkClient::internalDataAvailable()
                 mHeaderReceived = false;
         }
     }
+}
+
+void OpenIGTLinkClient::queryServer()
+{
+    QString command = "<Command Name=\"RequestChannelIds\" />";
+    this->sendStringMessage(command);
+
+    command = "<Command Name=\"RequestDeviceIds\" />";
+    this->sendStringMessage(command);
+
+    command = "<Command Name=\"SaveConfig\" />";
+    this->sendStringMessage(command);
 }
 
 bool OpenIGTLinkClient::socketIsConnected()

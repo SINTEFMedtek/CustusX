@@ -54,7 +54,9 @@ Socket::Socket(QObject *parent) :
     connect(mSocket.get(), errorOverloaded, this, &Socket::receivedError);
     connect(mSocket.get(), &QTcpSocket::hostFound, this, &Socket::receivedHostFound);
     connect(mSocket.get(), &QTcpSocket::stateChanged, this, &Socket::receivedStateChanged);
-    connect(mSocket.get(), &QTcpSocket::readyRead, this, &Socket::reveidReadyRead);
+    connect(mSocket.get(), &QTcpSocket::readyRead, this, &Socket::receiveReadyRead);
+    connect(mSocket.get(), &QTcpSocket::bytesWritten, this, &Socket::receiveBytesWritten);
+    connect(mSocket.get(), &QTcpSocket::aboutToClose, this, &Socket::receiveAboutToClose);
 }
 
 void Socket::requestConnectToHost(QString ip, int port) const
@@ -94,6 +96,13 @@ qint64 Socket::skip(qint64 maxSizeBytes) const
     int retval = mSocket->read(voidData, maxSizeBytes);
     delete[] voidData;
     return retval;
+}
+
+qint64 Socket::write(const char *data, qint64 maxSizeBytes) const
+{
+    CX_LOG_DEBUG() << "about to write " << data;
+    qint64 writtenBytes = mSocket->write(data, maxSizeBytes);
+    return writtenBytes;
 }
 
 void Socket::receivedConnected()
@@ -160,8 +169,18 @@ void Socket::receivedStateChanged(QAbstractSocket::SocketState socketState)
     //CX_LOG_DEBUG() <<  "Socket is now in state " << socketStateToString(socketState);
 }
 
-void Socket::reveidReadyRead()
+void Socket::receiveReadyRead()
 {
     emit readyRead();
+}
+
+void Socket::receiveBytesWritten(qint64 bytes)
+{
+    CX_LOG_DEBUG() << "Bytes written to socket: " << bytes;
+}
+
+void Socket::receiveAboutToClose()
+{
+    CX_LOG_DEBUG() << "Socket is about to close";
 }
 }//namespace cx

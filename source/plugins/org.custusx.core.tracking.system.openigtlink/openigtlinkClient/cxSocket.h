@@ -41,7 +41,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 QT_BEGIN_NAMESPACE
 class QTcpSocket;
-//Q_DECLARE_METATYPE(QAbstractSocket::SocketError)
 QT_END_NAMESPACE
 
 namespace cx
@@ -69,6 +68,8 @@ public:
     qint64 read(char *data, qint64 maxSizeBytes) const;
     qint64 skip(qint64 maxSizeBytes) const;
 
+    qint64 write(const char* data, qint64 maxSizeBytes) const;
+
 signals:
     void connected();
     void disconnected();
@@ -81,7 +82,9 @@ private slots:
     void receivedError(QAbstractSocket::SocketError socketError);
     void receivedHostFound();
     void receivedStateChanged(QAbstractSocket::SocketState socketState);
-    void reveidReadyRead();
+    void receiveReadyRead();
+    void receiveBytesWritten(qint64 bytes);
+    void receiveAboutToClose();
 
 private:
     typedef boost::shared_ptr<QTcpSocket> QTcpSocketPtr;

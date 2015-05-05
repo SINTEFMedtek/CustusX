@@ -23,4 +23,12 @@ void PlusDialect::translate(const igtl::ImageMessage::Pointer body)
     emit calibration(devicename, sMt);
 }
 
+void PlusDialect::translate(const igtl::StringMessage::Pointer body)
+{
+    IGTLinkConversion converter;
+    QString string = converter.decode(body);
+    if(string.contains("CommandReply", Qt::CaseInsensitive))
+        CX_LOG_CHANNEL_INFO(CX_OPENIGTLINK_CHANNEL_NAME) << string;
+}
+
 } //namespace cx
