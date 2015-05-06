@@ -143,7 +143,7 @@ protected:
 	vtkImageDataPtr useAngio(vtkImageDataPtr inData, vtkImageDataPtr grayFrame, int frameNum) const;/// Use only US angio data as input. Removes grayscale from the US data and converts the remaining color to grayscale
 
 	vtkImageDataPtr cropImageExtent(vtkImageDataPtr input, IntBoundingBox3D cropbox) const;
-	vtkImageDataPtr toGrayscaleAndEffectuateCropping(vtkImageDataPtr input) const;
+	vtkImageDataPtr to8bitGrayscaleAndEffectuateCropping(vtkImageDataPtr input) const;
 
 	std::vector<int> mReducedToFull; ///< map from indexes in the reduced volume to the full (original) volume.
 	IntBoundingBox3D mCropbox;
@@ -151,6 +151,8 @@ protected:
 	QString mName;
 	cx::ImageDataContainerPtr mImageContainer;
 	bool mPurgeInput;
+private:
+	vtkImageDataPtr convertTo8bit(vtkImageDataPtr input) const;
 };
 
 /**

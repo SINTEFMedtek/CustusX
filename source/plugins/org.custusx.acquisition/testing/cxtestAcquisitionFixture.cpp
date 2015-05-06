@@ -108,7 +108,7 @@ void AcquisitionFixture::initVideo()
 void AcquisitionFixture::setupVideo()
 {
 	mVideoSource = cx::videoService()->getActiveVideoSource();
-	connect(mVideoSource.get(), SIGNAL(newFrame()), this, SLOT(newFrameSlot()));
+	connect(mVideoSource.get(), &cx::VideoSource::newFrame, this, &AcquisitionFixture::newFrameSlot);
 	cx::videoService()->openConnection();
 }
 

@@ -38,7 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkImageResample.h>
 #include <vtkImageClip.h>
-#include "vtkImageShiftScale.h"
 
 #include "cxImage.h"
 #include "cxPatientModelService.h"

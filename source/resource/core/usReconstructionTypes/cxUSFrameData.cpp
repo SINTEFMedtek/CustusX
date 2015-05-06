@@ -285,26 +285,41 @@ vtkImageDataPtr USFrameData::cropImageExtent(vtkImageDataPtr input, IntBoundingB
 
 /**Convert input to grayscale, and return a COPY of that volume ( in order to break the pipeline for memory purposes)
  * ALSO: remove data in image outside extent - required by reconstruction.
+ * Convert to 8 bit as current US reconstruction algorithms only handles 8 bit
  */
-vtkImageDataPtr USFrameData::toGrayscaleAndEffectuateCropping(vtkImageDataPtr input) const
+vtkImageDataPtr USFrameData::to8bitGrayscaleAndEffectuateCropping(vtkImageDataPtr input) const
 {
-	vtkImageDataPtr outData;
+	vtkImageDataPtr grayScaleData;
 
 	if (input->GetNumberOfScalarComponents() == 1) // already gray
 	{
 		// crop (slow)
-		outData = input;
+		grayScaleData = input;
 //		outData->Crop();
 	}
 	else
 	{
 		// convert and crop as side effect (optimization)
-		outData = convertImageDataToGrayScale(input);
+		grayScaleData = convertImageDataToGrayScale(input);
 	}
+
+	vtkImageDataPtr outData = this->convertTo8bit(grayScaleData);
 
 	vtkImageDataPtr copy = vtkImageDataPtr::New();
 	copy->DeepCopy(outData);
 	return copy;
+}
+
+vtkImageDataPtr USFrameData::convertTo8bit(vtkImageDataPtr input) const
+{
+	vtkImageDataPtr retval = input;
+	if (input->GetScalarSize() > 1)
+	{
+		ImagePtr tempImage = cx::ImagePtr(new cx::Image("tempImage", input, "tempImage"));
+		tempImage->resetTransferFunctions();
+		retval = tempImage->get8bitGrayScaleVtkImageData();
+	}
+	return retval;
 }
 
 // for testing
@@ -443,7 +458,7 @@ std::vector<std::vector<vtkImageDataPtr> > USFrameData::initializeFrames(std::ve
 			current = this->cropImageExtent(current, mCropbox);
 
 		// optimization: grayFrame is used in both calculations: compute once
-		vtkImageDataPtr grayFrame = this->toGrayscaleAndEffectuateCropping(current);
+		vtkImageDataPtr grayFrame = this->to8bitGrayscaleAndEffectuateCropping(current);
 
 		for (unsigned j=0; j<angio.size(); ++j)
 		{
