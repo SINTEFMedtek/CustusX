@@ -216,12 +216,12 @@ void ViewWrapperVideo::setupRep(VideoSourcePtr source, ToolPtr tool)
 		return;
 	if (mSource)
 	{
-		disconnect(mSource.get(), SIGNAL(newFrame()), this, SLOT(updateSlot()));
+		disconnect(mSource.get(), &VideoSource::newFrame, this, &ViewWrapperVideo::updateSlot);
 	}
 	mSource = source;
 	if (mSource)
 	{
-		connect(mSource.get(), SIGNAL(newFrame()), this, SLOT(updateSlot()));
+		connect(mSource.get(), &VideoSource::newFrame, this, &ViewWrapperVideo::updateSlot);
 	}
 
 	if (!mSource)
