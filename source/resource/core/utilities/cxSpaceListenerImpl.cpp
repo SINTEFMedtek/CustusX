@@ -76,7 +76,7 @@ void SpaceListenerImpl::doConnect()
 	{
 		if (mSpace.mRefObject == "active")
 		{
-			connect(mDataManager.get(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(reconnect()));
+			connect(mDataManager.get(), &PatientModelService::activeImageChanged, this, &SpaceListenerImpl::reconnect);
 		}
 
 		DataPtr data = mDataManager->getData(mSpace.mRefObject);

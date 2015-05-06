@@ -72,7 +72,7 @@ public:
 	virtual ViewPtr get3DView(int group = 0, int index = 0) = 0;
 	RepContainerPtr get3DReps(int group = 0, int index = 0);
 
-	virtual int getActiveGroup() const = 0;
+	virtual int getActiveGroupId() const = 0;
 	virtual ViewGroupDataPtr getGroup(int groupIdx) const = 0;
 	unsigned groupCount() const;
 
@@ -94,6 +94,8 @@ public:
 	virtual bool isNull() = 0;
 	static VisualizationServicePtr getNullObject();
 
+	// extended Data interface
+	ViewGroupDataPtr getActiveViewGroup();
 signals:
 	void fps(int number); ///< Emits number of frames per second
 	void activeLayoutChanged(); ///< emitted when the active layout changes

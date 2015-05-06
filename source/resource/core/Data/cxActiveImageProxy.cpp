@@ -41,19 +41,19 @@ namespace cx
 ActiveImageProxy::ActiveImageProxy(PatientModelServicePtr patientModelService) :
 	mPatientModelService(patientModelService)
 {
-	connect(mPatientModelService.get(), SIGNAL(activeImageChanged(const QString&)), this,
-			SLOT(activeImageChangedSlot(const QString&)));
-	connect(mPatientModelService.get(), SIGNAL(activeImageChanged(const QString&)), this,
-			SIGNAL(activeImageChanged(const QString&)));
+	connect(mPatientModelService.get(), &PatientModelService::activeImageChanged, this,
+			&ActiveImageProxy::activeImageChangedSlot);
+	connect(mPatientModelService.get(), &PatientModelService::activeImageChanged, this,
+			&ActiveImageProxy::activeImageChanged);
 }
 
 
 ActiveImageProxy::~ActiveImageProxy()
 {
-	disconnect(mPatientModelService.get(), SIGNAL(activeImageChanged(const QString&)), this,
-			   SLOT(activeImageChangedSlot(const QString&)));
-	disconnect(mPatientModelService.get(), SIGNAL(activeImageChanged(const QString&)), this,
-			   SIGNAL(activeImageChanged(const QString&)));
+	disconnect(mPatientModelService.get(), &PatientModelService::activeImageChanged, this,
+			   &ActiveImageProxy::activeImageChangedSlot);
+	disconnect(mPatientModelService.get(), &PatientModelService::activeImageChanged, this,
+			   &ActiveImageProxy::activeImageChanged);
 }
 
 void ActiveImageProxy::activeImageChangedSlot(const QString& uid)

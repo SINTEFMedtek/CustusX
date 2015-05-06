@@ -128,6 +128,8 @@ private:
 	void updateCoordinates(int index);
 	QString getTCoordName(int index);
 	void setColorAttributes(int i);
+	std::vector<ImagePtr> processImages(std::vector<ImagePtr> images_raw);
+
 	DoubleBoundingBox3D mBB_s;
 	std::vector<ImagePtr> mImages;
 	SliceProxyPtr mSliceProxy;

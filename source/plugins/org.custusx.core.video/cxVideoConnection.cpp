@@ -54,7 +54,7 @@ namespace cx
 VideoConnection::VideoConnection(VideoServiceBackendPtr backend)
 {
 	mBackend = backend;
-	mUnsusedProbeDataVector.clear();
+	mUnusedProbeDataVector.clear();
 
 	connect(mBackend->getToolManager().get(), &TrackingService::stateChanged, this, &VideoConnection::connectVideoToProbe);
 	connect(mBackend->getToolManager().get(), SIGNAL(activeToolChanged(QString)), this, SLOT(connectVideoToProbe()));
@@ -216,9 +216,12 @@ void VideoConnection::onDisconnected()
 void VideoConnection::useUnusedProbeDataSlot()
 {
 	disconnect(mBackend->getToolManager().get(), &TrackingService::stateChanged, this, &VideoConnection::useUnusedProbeDataSlot);
-	for (std::vector<ProbeDefinitionPtr>::const_iterator citer = mUnsusedProbeDataVector.begin(); citer != mUnsusedProbeDataVector.end(); ++citer)
-		this->updateStatus(*citer);
-	mUnsusedProbeDataVector.clear();
+
+	std::vector<ProbeDefinitionPtr> unusedProbeDataVector = mUnusedProbeDataVector;
+	mUnusedProbeDataVector.clear();
+
+	for (unsigned i = 0;  i < unusedProbeDataVector.size(); ++i)
+		this->updateStatus(unusedProbeDataVector[i]);
 }
 
 void VideoConnection::resetProbe()
@@ -245,9 +248,9 @@ void VideoConnection::updateStatus(ProbeDefinitionPtr msg)
 	if (!tool || !tool->getProbe())
 	{
 		//Don't throw away the ProbeData. Save it until it can be used
-		if (mUnsusedProbeDataVector.empty())
+		if (mUnusedProbeDataVector.empty())
 			connect(mBackend->getToolManager().get(), &TrackingService::stateChanged, this, &VideoConnection::useUnusedProbeDataSlot);
-		mUnsusedProbeDataVector.push_back(msg);
+		mUnusedProbeDataVector.push_back(msg);
 		return;
 	}
 	ProbePtr probe = tool->getProbe();

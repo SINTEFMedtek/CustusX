@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewManager.h"
 #include "cxViewGroup.h"
 #include "cxRepManager.h"
-#include "cxCoreServices.h"
+#include "cxVisServices.h"
 #include "cxSessionStorageServiceProxy.h"
 #include "cxXMLNodeWrapper.h"
 #include "cxLogger.h"
@@ -47,9 +47,9 @@ namespace cx
 VisualizationImplService::VisualizationImplService(ctkPluginContext *context) :
 	mContext(context )
 {
-	CoreServicesPtr backend = CoreServices::create(context);
+	VisServicesPtr services = VisServices::create(context);
 	mSession = SessionStorageServiceProxy::create(mContext);
-	mBase = ViewManager::create(backend);
+	mBase = ViewManager::create(services);
 
 	if(!viewManager())
 		std::cout << "VisualizationImplService got no viewManager" << std::endl;
@@ -76,7 +76,7 @@ ViewPtr VisualizationImplService::get3DView(int group, int index)
 	return viewManager()->get3DView(group, index);
 }
 
-int VisualizationImplService::getActiveGroup() const
+int VisualizationImplService::getActiveGroupId() const
 {
 	return viewManager()->getActiveViewGroup();
 }

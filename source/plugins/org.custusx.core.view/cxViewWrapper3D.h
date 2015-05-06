@@ -87,7 +87,7 @@ class org_custusx_core_view_EXPORT ViewWrapper3D: public ViewWrapper
 {
 Q_OBJECT
 public:
-	ViewWrapper3D(int startIndex, ViewPtr view, CoreServicesPtr backend);
+	ViewWrapper3D(int startIndex, ViewPtr view, VisServicesPtr services);
 	virtual ~ViewWrapper3D();
 	virtual ViewPtr getView();
 	virtual double getZoom2D() { return -1.0; }
@@ -106,7 +106,7 @@ private slots:
 	void showAxesActionSlot(bool checked);
 	void showManualToolSlot(bool visible);
 	void resetCameraActionSlot();
-	void activeImageChangedSlot();
+	void activeImageChangedSlot(QString uid);
 	void showRefToolSlot(bool checked);
 	void showToolPathSlot(bool checked);
 	void PickerRepPointPickedSlot(Vector3D p_r);

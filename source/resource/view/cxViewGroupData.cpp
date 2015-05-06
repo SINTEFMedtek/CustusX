@@ -212,12 +212,12 @@ ViewGroupData::Options::Options() :
 {
 }
 
-ViewGroupData::ViewGroupData(CoreServicesPtr backend) :
-	mBackend(backend),
+ViewGroupData::ViewGroupData(CoreServicesPtr services) :
+	mServices(services),
 	mCamera3D(CameraData::create())
 {
-	if(mBackend)
-		connect(mBackend->patientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataAddedOrRemovedInManager()));
+	if(mServices)
+		connect(mServices->patientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &ViewGroupData::purgeDataNotExistingInPatientModelService);
 	mVideoSource = "active";
 	mGroup2DZoom = SyncedValue::create(1);
 	mGlobal2DZoom = mGroup2DZoom;
@@ -227,16 +227,29 @@ ViewGroupData::ViewGroupData(CoreServicesPtr backend) :
 	mSliceDefinitions.add(ptSAGITTAL);
 }
 
-void ViewGroupData::dataAddedOrRemovedInManager()
+//Remove all data, and wait to emit signals until all data is removed
+void ViewGroupData::purgeDataNotExistingInPatientModelService()
 {
+	QStringList purged;
 	for (unsigned i = 0; i < mData.size(); )
 	{
-		if (!mBackend->patientModelService->getData(mData[i].first))
-			this->removeData(mData[i].first);
+		QString uid = mData[i].first;
+		if (!mServices->patientModelService->getData(uid))
+		{
+			if (this->contains(uid))
+			{
+				purged << uid;
+				mData.erase(std::find_if(mData.begin(), mData.end(), data_equals(uid)));
+			}
+		}
 		else
 			++i;
 	}
+	//Emit delayed signals
+	for(unsigned i = 0; i < purged.size(); ++i)
+		emit dataViewPropertiesChanged(purged[i]);
 }
+
 
 void ViewGroupData::requestInitialize()
 {
@@ -328,7 +341,7 @@ void ViewGroupData::clearData()
 
 DataPtr ViewGroupData::getData(QString uid) const
 {
-	DataPtr data = mBackend->patientModelService->getData(uid);
+	DataPtr data = mServices->patientModelService->getData(uid);
 	if (!data)
 	{
 		reportError("Couldn't find the data: [" + uid + "] in the datamanager.");
@@ -435,12 +448,6 @@ void ViewGroupData::parseXml(QDomNode dataNode)
 	{
 		QDomElement elem = dataElems[i];
 		QString uid = elem.text();
-//		DataPtr data = mBackend->patientModelService->getData(uid);
-//		if (!data)
-//		{
-//			reportError("Couldn't find the data: [" + uid + "] in the datamanager.");
-//			continue;
-//		}
 		DataViewProperties properties = DataViewProperties::createDefault();
 		properties.parseXml(elem);
 

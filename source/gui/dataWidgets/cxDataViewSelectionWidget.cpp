@@ -403,16 +403,16 @@ void SelectedDataListWidget::setViewGroupData(ViewGroupDataPtr viewGroupData)
 {
   if (mViewGroupData)
   {
-    disconnect(mViewGroupData.get(), SIGNAL(initialized()), this, SLOT(populateList()));
-	disconnect(mViewGroupData.get(), SIGNAL(dataViewPropertiesChanged(QString)), this, SLOT(populateList()));
+	disconnect(mViewGroupData.get(), &ViewGroupData::initialized, this, &SelectedDataListWidget::populateList);
+	disconnect(mViewGroupData.get(), &ViewGroupData::dataViewPropertiesChanged, this, &SelectedDataListWidget::populateList);
   }
 
   mViewGroupData = viewGroupData;
 
   if (mViewGroupData)
   {
-    connect(mViewGroupData.get(), SIGNAL(initialized()), this, SLOT(populateList()));
-	connect(mViewGroupData.get(), SIGNAL(dataViewPropertiesChanged(QString)), this, SLOT(populateList()));
+	connect(mViewGroupData.get(), &ViewGroupData::initialized, this, &SelectedDataListWidget::populateList);
+	connect(mViewGroupData.get(), &ViewGroupData::dataViewPropertiesChanged, this, &SelectedDataListWidget::populateList);
   }
 
   this->populateList();
@@ -542,7 +542,7 @@ DataViewSelectionWidget::DataViewSelectionWidget(QWidget* parent)
 
 void DataViewSelectionWidget::viewGroupChangedSlot()
 {
-  int vg = viewService()->getActiveGroup();
+  int vg = viewService()->getActiveGroupId();
   if (vg<0)
     vg = 0;
 

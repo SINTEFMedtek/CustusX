@@ -113,7 +113,7 @@ private:
 	QPointer<QThread> mThread;
 
 	double mFPS;
-	std::vector<ProbeDefinitionPtr> mUnsusedProbeDataVector;
+	std::vector<ProbeDefinitionPtr> mUnusedProbeDataVector;
 	std::vector<BasicVideoSourcePtr> mSources;
 	VideoServiceBackendPtr mBackend;
 	StreamerServicePtr mStreamerInterface;

@@ -84,6 +84,7 @@ signals:
 
 private slots:
 	void activeToolChangedSlot(const QString&);
+	void trackingStateChanged();
 private:
 	ActiveToolProxy(TrackingServicePtr trackingService);
 	ToolPtr mTool;

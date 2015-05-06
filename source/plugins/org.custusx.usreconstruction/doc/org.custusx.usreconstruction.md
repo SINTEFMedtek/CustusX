@@ -10,7 +10,7 @@ Reconstruct 3D US data from acquired a 2D sequence.
 US Reconstruction Widget {#org_custusx_usreconstruction_widgets_us_reconstruction}
 ===========================================================
 
-Reconstruct 3D US data from acquired a 2D sequence.
+Reconstruct 3D US data from acquired 2D sequence.
 
 Select a US Reconstruction algorithm from the list in \ref cx_user_doc_group_usreconstruction.
 
