@@ -38,6 +38,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <map>
 #include <QObject>
+#include <QMutex>
+#include <QMutexLocker>
 #include "igtlMessageHeader.h"
 #include "igtlTransformMessage.h"
 #include "igtlImageMessage.h"
@@ -107,7 +109,7 @@ private:
     {
         QMutexLocker locker(&mMutex);
 
-        T::Pointer body = T::New();
+		typename T::Pointer body = T::New();
         body->SetMessageHeader(header);
         body->AllocatePack();
 

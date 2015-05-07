@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXOPENIGTLINKGUIEXTENDERSERVICE_H
 
 #include "org_custusx_core_tracking_system_openigtlink_Export.h"
-#include "cxGuiExtenderService.h"
+#include "cxGUIExtenderService.h"
 
 namespace cx
 {

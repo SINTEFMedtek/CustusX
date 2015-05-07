@@ -123,7 +123,7 @@ void OpenIGTLinkClient::sendStringMessage(QString command)
     stringMsg->SetDeviceName("CustusXQuery");
 
     CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "Sending string: " << command;
-    stringMsg->SetString(command.toStdString());
+	stringMsg->SetString(command.toStdString().c_str());
     stringMsg->Pack();
 
     mSocket->write(reinterpret_cast<char*>(stringMsg->GetPackPointer()), stringMsg->GetPackSize());
