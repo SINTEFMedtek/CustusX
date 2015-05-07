@@ -152,10 +152,15 @@ namespace cx {
 class org_custusx_core_tracking_system_openigtlink_EXPORT PlusDialect : public Dialect
 {
 public:
+    PlusDialect();
+
     virtual QString getName() const;
 
     virtual void translate(const igtl::ImageMessage::Pointer body);
     virtual void translate(const igtl::StringMessage::Pointer body);
+
+private:
+    QString mProbeToTrackerName; //name of the device that contains the transform between probe and tracker
 };
 
 }

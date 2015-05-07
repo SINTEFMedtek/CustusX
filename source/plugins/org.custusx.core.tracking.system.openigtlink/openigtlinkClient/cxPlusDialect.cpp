@@ -5,6 +5,11 @@
 
 namespace cx{
 
+PlusDialect::PlusDialect() :
+    mProbeToTrackerName("ProbeToTracker") //set in the PlusServer config file
+{
+}
+
 
 QString PlusDialect::getName() const
 {
@@ -19,13 +24,13 @@ void PlusDialect::translate(const igtl::ImageMessage::Pointer body)
     int z = 2;
 
     //There seems to be a bug in the received images spacing from the plusserver
-    float hack_spacing[3];
-    body->GetSpacing(hack_spacing);
-    float new_spacing[3];
-    new_spacing[x] = hack_spacing[x];
-    new_spacing[y] = hack_spacing[z];
-    new_spacing[z] = 1;
-    body->SetSpacing(new_spacing);
+    float wrong_spacing[3];
+    body->GetSpacing(wrong_spacing);
+    float right_spacing[3];
+    right_spacing[x] = wrong_spacing[x];
+    right_spacing[y] = wrong_spacing[z];
+    right_spacing[z] = 1;
+    body->SetSpacing(right_spacing);
 
     //IMAGE
     IGTLinkConversion converter;
@@ -33,9 +38,8 @@ void PlusDialect::translate(const igtl::ImageMessage::Pointer body)
     emit image(theImage);
 
     //CALIBRATION
-    QString devicename = "ProbeToTracker"; //TODO remove hardcoded devicename
     Transform3D sMt = converter.decode_image_matrix(body);
-    emit calibration(devicename, sMt);
+    emit calibration(mProbeToTrackerName, sMt);
 
     //PROBEDEFINITION
     int dimensions_p[3];
@@ -50,16 +54,16 @@ void PlusDialect::translate(const igtl::ImageMessage::Pointer body)
     ProbeDefinitionPtr definition(new ProbeDefinition);
     definition->setUseDigitalVideo(true);
     definition->setType(ProbeDefinition::tLINEAR);
-    definition->setSpacing(Vector3D(spacing[x], spacing[y], spacing[z]));//(Vector3D(0.087, 0.087, 1));
-    definition->setSize(QSize(dimensions_p[x], dimensions_p[y]));//(QSize(446, 460));
-    definition->setOrigin_p(Vector3D(dimensions_p[x]/2, 0, 0));//(Vector3D(223, 0, 0));
+    definition->setSpacing(Vector3D(spacing[x], spacing[y], spacing[z]));
+    definition->setSize(QSize(dimensions_p[x], dimensions_p[y]));
+    definition->setOrigin_p(Vector3D(dimensions_p[x]/2, 0, 0));
     double depthstart_mm = 0;
     double depthend_mm = extent_p[y]*spacing[y];
     double width_mm = extent_p[x]*spacing[x];
-    definition->setSector(depthstart_mm, depthend_mm, width_mm);//(0, )
-    definition->setClipRect_p(DoubleBoundingBox3D(0, extent_p[x], 0, extent_p[y], 0, extent_p[z]));//(DoubleBoundingBox3D(0,445, 0,459, 0, 1));
+    definition->setSector(depthstart_mm, depthend_mm, width_mm);
+    definition->setClipRect_p(DoubleBoundingBox3D(0, extent_p[x], 0, extent_p[y], 0, extent_p[z]));
 
-    emit probedefinition(devicename, definition);
+    emit probedefinition(mProbeToTrackerName, definition);
 }
 
 void PlusDialect::translate(const igtl::StringMessage::Pointer body)
