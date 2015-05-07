@@ -52,8 +52,7 @@ OpenIGTLinkTool::OpenIGTLinkTool(QString uid) :
     mTypes = this->determineTypesBasedOnUid(Tool::mUid);
     if (this->isProbe())
     {
-        //TODO: remove these hardcoded values
-        mProbe = ProbeImpl::New("L14-5", "Ultrasonix");
+        mProbe = ProbeImpl::New("DigitalProbe", "Digital");
         connect(mProbe.get(), SIGNAL(sectorChanged()), this, SIGNAL(toolProbeSector()));
     }
 

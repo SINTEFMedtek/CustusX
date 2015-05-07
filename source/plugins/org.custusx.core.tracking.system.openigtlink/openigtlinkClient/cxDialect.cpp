@@ -11,6 +11,7 @@ Dialect::Dialect(QObject *parent) :
 {
     qRegisterMetaType<Transform3D>("Transform3D");
     qRegisterMetaType<ImagePtr>("ImagePtr");
+    qRegisterMetaType<ProbeDefinitionPtr>("ProbeDefinitionPtr");
 }
 
 QString Dialect::getName() const

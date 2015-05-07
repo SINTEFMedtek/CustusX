@@ -45,11 +45,16 @@ namespace cx {
  * used by the PlusServer needs to set up correctly.
  *
  * ASSUMPTIONS:
+ * - connected probes are linear
+ * - incoming images does not contain padding (sector == imagesize)
  * - all images comes from a probe
+ * - the datasource with the us must be named Probe
+ * - the transformation from the probe to the tracker must be named ProbeToTracker
  * - images have their matrix set to be sMt (calibration)
  *
  * Example configuration used with the Ultrasonix  L14-5 gps probe:
- *  <PlusConfiguration version="2.1">
+
+<PlusConfiguration version="2.1">
 
   <DataCollection StartupDelaySec="1.0" >
     <DeviceSet

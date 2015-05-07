@@ -88,6 +88,7 @@ private slots:
 
     void receiveTransform(QString devicename, Transform3D transform, double timestamp);
     void receiveCalibration(QString devicename, Transform3D calibration);
+    void receiveProbedefinition(QString devicename, ProbeDefinitionPtr definition);
 
 private:
     void internalSetState(Tool::State state);

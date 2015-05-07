@@ -62,6 +62,7 @@ OpenIGTLinkTrackingSystemService::OpenIGTLinkTrackingSystemService(OpenIGTLinkCl
     connect(client, &OpenIGTLinkClient::disconnected, this, &OpenIGTLinkTrackingSystemService::serverIsDisconnected);
     connect(client, &OpenIGTLinkClient::transform, this, &OpenIGTLinkTrackingSystemService::receiveTransform);
     connect(client, &OpenIGTLinkClient::calibration, this, &OpenIGTLinkTrackingSystemService::receiveCalibration);
+    connect(client, &OpenIGTLinkClient::probedefinition, this, &OpenIGTLinkTrackingSystemService::receiveProbedefinition);
 }
 
 OpenIGTLinkTrackingSystemService::~OpenIGTLinkTrackingSystemService()
@@ -198,6 +199,16 @@ void OpenIGTLinkTrackingSystemService::receiveCalibration(QString devicename, Tr
 {
     OpenIGTLinkToolPtr tool = this->getTool(devicename);
     tool->setCalibration_sMt(calibration);
+}
+
+void OpenIGTLinkTrackingSystemService::receiveProbedefinition(QString devicename, ProbeDefinitionPtr definition)
+{
+    OpenIGTLinkToolPtr tool = this->getTool(devicename);
+    ProbePtr probe = tool->getProbe();
+    ProbeDefinition old_def = probe->getProbeData();
+    definition->setUid(old_def.getUid());
+
+    probe->setProbeSector(*(definition.get()));
 }
 
 void OpenIGTLinkTrackingSystemService::internalSetState(Tool::State state)

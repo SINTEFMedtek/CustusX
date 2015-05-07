@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxTransform3D.h"
 #include "cxImage.h"
+#include "cxProbeData.h"
 
 #define CX_OPENIGTLINK_CHANNEL_NAME "OpenIGTLink"
 
@@ -74,6 +75,7 @@ signals:
     void transform(QString devicename, Transform3D transform, double timestamp);
     void calibration(QString devicename, Transform3D calibration);
     void image(ImagePtr image);
+    void probedefinition(QString devicename, ProbeDefinitionPtr definition);
 
 };
 typedef boost::shared_ptr<Dialect> DialectPtr;

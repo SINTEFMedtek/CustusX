@@ -50,6 +50,7 @@ OpenIGTLinkClient::OpenIGTLinkClient(QObject *parent) :
 {
     qRegisterMetaType<Transform3D>("Transform3D");
     qRegisterMetaType<ImagePtr>("ImagePtr");
+    qRegisterMetaType<ProbeDefinitionPtr>("ProbeDefinitionPtr");
 
     mSocket = SocketPtr(new Socket(this));
     //todo: check affinity on socket!!!
@@ -84,6 +85,8 @@ QStringList OpenIGTLinkClient::getAvailableDialects() const
 void OpenIGTLinkClient::setDialect(QString dialectname)
 {
     QMutexLocker locker(&mMutex);
+    if(mDialect && (dialectname == mDialect->getName()))
+        return;
 
     DialectPtr dialect = mAvailableDialects[dialectname];
     if(!dialect)
@@ -97,12 +100,14 @@ void OpenIGTLinkClient::setDialect(QString dialectname)
         disconnect(mDialect.get(), &Dialect::image, this, &OpenIGTLinkClient::image);
         disconnect(mDialect.get(), &Dialect::transform, this, &OpenIGTLinkClient::transform);
         disconnect(mDialect.get(), &Dialect::calibration, this, &OpenIGTLinkClient::calibration);
+        disconnect(mDialect.get(), &Dialect::probedefinition, this, &OpenIGTLinkClient::probedefinition);
     }
 
     mDialect = dialect;
     connect(dialect.get(), &Dialect::image, this, &OpenIGTLinkClient::image);
     connect(dialect.get(), &Dialect::transform, this, &OpenIGTLinkClient::transform);
     connect(dialect.get(), &Dialect::calibration, this, &OpenIGTLinkClient::calibration);
+    connect(dialect.get(), &Dialect::probedefinition, this, &OpenIGTLinkClient::probedefinition);
 
     CX_LOG_CHANNEL_SUCCESS(CX_OPENIGTLINK_CHANNEL_NAME) << "Dialect set to " << dialectname;
 

@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSocket.h"
 #include "cxTransform3D.h"
 #include "cxImage.h"
+#include "cxProbeData.h"
 #include "cxLogger.h"
 #include "cxDialect.h"
 
@@ -87,6 +88,7 @@ signals:
     void transform(QString devicename, Transform3D transform, double timestamp);
     void calibration(QString devicename, Transform3D calibration);
     void image(ImagePtr image);
+    void probedefinition(QString devicename, ProbeDefinitionPtr definition);
 
 private slots:
     void internalConnected();
