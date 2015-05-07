@@ -88,9 +88,8 @@ TrackingImplService::TrackingImplService(ctkPluginContext *context) :
 
 	this->initializeManualTool(); // do this after setting self.
 
-    CX_LOG_WARNING() << "IGSTK tracking is temporarly disabled in this version";
-    //TrackingSystemServicePtr igstk(new TrackingSystemIGSTKService());
-    //this->installTrackingSystem(igstk);
+    TrackingSystemServicePtr igstk(new TrackingSystemIGSTKService());
+    this->installTrackingSystem(igstk);
 
 	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(globalConfigurationFileChangedSlot(QString)));
 
