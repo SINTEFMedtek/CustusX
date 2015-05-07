@@ -73,7 +73,7 @@ OpenIGTLinkTrackingSystemService::~OpenIGTLinkTrackingSystemService()
 
 QString OpenIGTLinkTrackingSystemService::getUid() const
 {
-    return "org.custusx.core.tracking.system.openigtlink";
+    return "org.custusx.core.openigtlink";
 }
 
 Tool::State OpenIGTLinkTrackingSystemService::getState() const

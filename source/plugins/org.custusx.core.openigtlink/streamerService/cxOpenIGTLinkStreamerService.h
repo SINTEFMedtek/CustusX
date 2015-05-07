@@ -30,55 +30,33 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
+#ifndef CXOPENIGTLINKSTREAMERSERVICE_H
+#define CXOPENIGTLINKSTREAMERSERVICE_H
 
-#ifndef CXDIALECT_H
-#define CXDIALECT_H
-
-#include "org_custusx_core_tracking_system_openigtlink_Export.h"
-
-#include <QObject>
-
-#include <boost/shared_ptr.hpp>
-
-#include "igtlMessageHeader.h"
-#include "igtlTransformMessage.h"
-#include "igtlImageMessage.h"
-#include "igtlStatusMessage.h"
-#include "igtlStringMessage.h"
-
-#include "cxTransform3D.h"
-#include "cxImage.h"
-#include "cxProbeData.h"
-
-#define CX_OPENIGTLINK_CHANNEL_NAME "OpenIGTLink"
+#include "org_custusx_core_openigtlink_Export.h"
+#include "cxStreamerService.h"
+#include "cxOpenIGTLinkStreamer.h"
 
 namespace cx
 {
-/**
- * @brief The Dialect class represents an interpretation of opentigtlink packages.
- */
+class OpenIGTLinkClient;
 
-class org_custusx_core_tracking_system_openigtlink_EXPORT Dialect : public QObject
+class org_custusx_core_openigtlink_EXPORT OpenIGTLinkStreamerService : public StreamerService
 {
-    Q_OBJECT
+
 public:
-    explicit Dialect(QObject *parent = 0);
+    OpenIGTLinkStreamerService(OpenIGTLinkClient *client);
+    ~OpenIGTLinkStreamerService();
 
-    virtual QString getName() const;
+    virtual QString getName();
+    virtual QString getType() const;
+    virtual std::vector<PropertyPtr> getSettings(QDomElement root);
+    virtual StreamerPtr createStreamer(QDomElement root);
 
-    virtual void translate(const igtl::TransformMessage::Pointer body);
-    virtual void translate(const igtl::ImageMessage::Pointer body);
-    virtual void translate(const igtl::StatusMessage::Pointer body);
-    virtual void translate(const igtl::StringMessage::Pointer body);
-
-signals:
-    void transform(QString devicename, Transform3D transform, double timestamp);
-    void calibration(QString devicename, Transform3D calibration);
-    void image(ImagePtr image);
-    void probedefinition(QString devicename, ProbeDefinitionPtr definition);
-
+private:
+    OpenIGTLinkStreamerPtr mStreamer;
 };
-typedef boost::shared_ptr<Dialect> DialectPtr;
 
 } //namespace cx
-#endif // CXDIALECT_H
+
+#endif //CXOPENIGTLINKSTREAMERSERVICE_H

@@ -29,26 +29,52 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXOPENIGTLINKSTREAMER_H
+#define CXOPENIGTLINKSTREAMER_H
 
+#include "org_custusx_core_openigtlink_Export.h"
+#include "cxStreamer.h"
 
-#ifndef CXCUSTUSDIALEC_H
-#define CXCUSTUSDIALECT_H
-
-
-#include "org_custusx_core_tracking_system_openigtlink_Export.h"
-
-#include "cxDialect.h"
+#include "cxImage.h"
 
 namespace cx
 {
 
-class org_custusx_core_tracking_system_openigtlink_EXPORT CustusDialect : public Dialect
+/**
+ * Streamer that listens to an OpenIGTLink connection, then
+ * streams the incoming data.
+ *
+ * \addtogroup org_custusx_core_openigtlink
+ * \author Janne Beate Bakeng, SINTEF
+ * \date 2015-03-25
+ */
+class org_custusx_core_openigtlink_EXPORT OpenIGTLinkStreamer : public Streamer
 {
+    Q_OBJECT
+
 public:
-    virtual QString getName() const;
+    OpenIGTLinkStreamer();
+    virtual ~OpenIGTLinkStreamer();
 
-    virtual void translate(const igtl::ImageMessage::Pointer body);
+    virtual bool startStreaming(SenderPtr sender);
+	virtual void stopStreaming();
+	virtual QString getType();
+
+public slots:
+    void receivedConnected();
+    void receivedDisconnected();
+    void receivedError();
+    void receivedImage(ImagePtr image);
+
+protected slots:
+    virtual void streamSlot();
+
+private:
+    SenderPtr mSender;
+
 };
+typedef boost::shared_ptr<OpenIGTLinkStreamer> OpenIGTLinkStreamerPtr;
 
-} //namespace cx
-#endif // CXCUSTUSDIALECT_H
+} // namespace cx
+
+#endif // CXOPENIGTLINKSTREAMER_H

@@ -30,33 +30,50 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXOPENIGTLINKSTREAMERSERVICE_H
-#define CXOPENIGTLINKSTREAMERSERVICE_H
+#ifndef CXOpenIGTLinkPluginActivator_H_
+#define CXOpenIGTLinkPluginActivator_H_
 
-#include "org_custusx_core_tracking_system_openigtlink_Export.h"
-#include "cxStreamerService.h"
-#include "cxOpenIGTLinkStreamer.h"
+#include <ctkPluginActivator.h>
+#include "boost/shared_ptr.hpp"
+#include <QThread>
 
 namespace cx
 {
-class OpenIGTLinkClient;
 
-class org_custusx_core_tracking_system_openigtlink_EXPORT OpenIGTLinkStreamerService : public StreamerService
+typedef boost::shared_ptr<class OpenIGTLinkTrackingSystemService> OpenIGTLinkTrackingSystemServicePtr;
+typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
+
+/**
+ * Activator for the OpenIGTLink service
+ *
+ * \ingroup org_custusx_core_openigtlink
+ *
+ * \date 2015-03-03
+ * \author Janne Beate Bakeng
+ */
+class OpenIGTLinkPluginActivator :  public QObject, public ctkPluginActivator
 {
+    Q_OBJECT
+    Q_INTERFACES(ctkPluginActivator)
+    Q_PLUGIN_METADATA(IID "org_custusx_core_openigtlink")
 
 public:
-    OpenIGTLinkStreamerService(OpenIGTLinkClient *client);
-    ~OpenIGTLinkStreamerService();
 
-    virtual QString getName();
-    virtual QString getType() const;
-    virtual std::vector<PropertyPtr> getSettings(QDomElement root);
-    virtual StreamerPtr createStreamer(QDomElement root);
+    OpenIGTLinkPluginActivator();
+    ~OpenIGTLinkPluginActivator();
+
+    void start(ctkPluginContext* context);
+    void stop(ctkPluginContext* context);
 
 private:
-    OpenIGTLinkStreamerPtr mStreamer;
+    RegisteredServicePtr mRegistrationGui;
+    RegisteredServicePtr mRegistrationTracking;
+    RegisteredServicePtr mRegistrationStreaming;
+    QThread mOpenIGTLinkThread;
+    QString mIp;
+    int mPort;
 };
 
-} //namespace cx
+} // namespace cx
 
-#endif //CXOPENIGTLINKSTREAMERSERVICE_H
+#endif /* CXOpenIGTLinkPluginActivator_H_ */

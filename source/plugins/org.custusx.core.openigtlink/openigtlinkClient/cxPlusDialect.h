@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPLUSDIALECT_H
 #define CXPLUSDIALECT_H
 
-#include "org_custusx_core_tracking_system_openigtlink_Export.h"
+#include "org_custusx_core_openigtlink_Export.h"
 
 #include "cxDialect.h"
 
@@ -149,7 +149,7 @@ namespace cx {
 
  */
 
-class org_custusx_core_tracking_system_openigtlink_EXPORT PlusDialect : public Dialect
+class org_custusx_core_openigtlink_EXPORT PlusDialect : public Dialect
 {
 public:
     PlusDialect();

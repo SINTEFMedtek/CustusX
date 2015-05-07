@@ -30,7 +30,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxOpenIGTLinkTrackingSystemPluginActivator.h"
+#include "cxOpenIGTLinkPluginActivator.h"
 
 #include <QtPlugin>
 #include <iostream>
@@ -44,15 +44,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-OpenIGTLinkTrackingSystemPluginActivator::OpenIGTLinkTrackingSystemPluginActivator():
+OpenIGTLinkPluginActivator::OpenIGTLinkPluginActivator():
     mIp("10.218.140.127"),
     mPort(18944)
 {}
 
-OpenIGTLinkTrackingSystemPluginActivator::~OpenIGTLinkTrackingSystemPluginActivator()
+OpenIGTLinkPluginActivator::~OpenIGTLinkPluginActivator()
 {}
 
-void OpenIGTLinkTrackingSystemPluginActivator::start(ctkPluginContext* context)
+void OpenIGTLinkPluginActivator::start(ctkPluginContext* context)
 {
     mOpenIGTLinkThread.setObjectName("org.custusx.core.openigtlink");
     OpenIGTLinkClient *client = new OpenIGTLinkClient;
@@ -70,7 +70,7 @@ void OpenIGTLinkTrackingSystemPluginActivator::start(ctkPluginContext* context)
     mOpenIGTLinkThread.start();
 }
 
-void OpenIGTLinkTrackingSystemPluginActivator::stop(ctkPluginContext* context)
+void OpenIGTLinkPluginActivator::stop(ctkPluginContext* context)
 {
     mOpenIGTLinkThread.quit();
     mOpenIGTLinkThread.wait();

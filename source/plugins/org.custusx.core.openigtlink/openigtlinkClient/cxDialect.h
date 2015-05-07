@@ -29,52 +29,56 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXOPENIGTLINKSTREAMER_H
-#define CXOPENIGTLINKSTREAMER_H
 
-#include "org_custusx_core_tracking_system_openigtlink_Export.h"
-#include "cxStreamer.h"
 
+#ifndef CXDIALECT_H
+#define CXDIALECT_H
+
+#include "org_custusx_core_openigtlink_Export.h"
+
+#include <QObject>
+
+#include <boost/shared_ptr.hpp>
+
+#include "igtlMessageHeader.h"
+#include "igtlTransformMessage.h"
+#include "igtlImageMessage.h"
+#include "igtlStatusMessage.h"
+#include "igtlStringMessage.h"
+
+#include "cxTransform3D.h"
 #include "cxImage.h"
+#include "cxProbeData.h"
+
+#define CX_OPENIGTLINK_CHANNEL_NAME "OpenIGTLink"
 
 namespace cx
 {
-
 /**
- * Streamer that listens to an OpenIGTLink connection, then
- * streams the incoming data.
- *
- * \addtogroup org_custusx_core_tracking_system_openigtlink
- * \author Janne Beate Bakeng, SINTEF
- * \date 2015-03-25
+ * @brief The Dialect class represents an interpretation of opentigtlink packages.
  */
-class org_custusx_core_tracking_system_openigtlink_EXPORT OpenIGTLinkStreamer : public Streamer
+
+class org_custusx_core_openigtlink_EXPORT Dialect : public QObject
 {
     Q_OBJECT
-
 public:
-    OpenIGTLinkStreamer();
-    virtual ~OpenIGTLinkStreamer();
+    explicit Dialect(QObject *parent = 0);
 
-    virtual bool startStreaming(SenderPtr sender);
-	virtual void stopStreaming();
-	virtual QString getType();
+    virtual QString getName() const;
 
-public slots:
-    void receivedConnected();
-    void receivedDisconnected();
-    void receivedError();
-    void receivedImage(ImagePtr image);
+    virtual void translate(const igtl::TransformMessage::Pointer body);
+    virtual void translate(const igtl::ImageMessage::Pointer body);
+    virtual void translate(const igtl::StatusMessage::Pointer body);
+    virtual void translate(const igtl::StringMessage::Pointer body);
 
-protected slots:
-    virtual void streamSlot();
-
-private:
-    SenderPtr mSender;
+signals:
+    void transform(QString devicename, Transform3D transform, double timestamp);
+    void calibration(QString devicename, Transform3D calibration);
+    void image(ImagePtr image);
+    void probedefinition(QString devicename, ProbeDefinitionPtr definition);
 
 };
-typedef boost::shared_ptr<OpenIGTLinkStreamer> OpenIGTLinkStreamerPtr;
+typedef boost::shared_ptr<Dialect> DialectPtr;
 
-} // namespace cx
-
-#endif // CXOPENIGTLINKSTREAMER_H
+} //namespace cx
+#endif // CXDIALECT_H

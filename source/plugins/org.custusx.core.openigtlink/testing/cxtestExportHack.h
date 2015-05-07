@@ -1,11 +1,11 @@
 #ifndef EXPORTHACK_H
 #define EXPORTHACK_H
 
-#include "org_custusx_core_tracking_system_openigtlink_Export.h"
+#include "org_custusx_core_openigtlink_Export.h"
 
 //need something exported so that the lib file will be created
 namespace cxtest{
-class org_custusx_core_tracking_system_openigtlink_EXPORT exporthack
+class org_custusx_core_openigtlink_EXPORT exporthack
 {
 public:
     exporthack(){};

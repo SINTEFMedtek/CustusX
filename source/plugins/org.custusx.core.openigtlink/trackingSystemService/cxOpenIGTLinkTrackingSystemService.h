@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QThread>
 
 #include "cxTrackingSystemService.h"
-#include "org_custusx_core_tracking_system_openigtlink_Export.h"
+#include "org_custusx_core_openigtlink_Export.h"
 
 namespace cx
 {
@@ -46,12 +46,12 @@ typedef boost::shared_ptr<class OpenIGTLinkTool> OpenIGTLinkToolPtr;
 /**
  * Tracking system service that gets tracking information from an OpenIGTLink source
  *
- * \ingroup org_custusx_core_tracking_system_openigtlink
+ * \ingroup org_custusx_core_openigtlink
  *
  * \date 2015-03-03
  * \author Janne Beate Bakeng
  */
-class org_custusx_core_tracking_system_openigtlink_EXPORT OpenIGTLinkTrackingSystemService : public TrackingSystemService
+class org_custusx_core_openigtlink_EXPORT OpenIGTLinkTrackingSystemService : public TrackingSystemService
 {
     Q_OBJECT
     Q_INTERFACES(cx::TrackingSystemService)

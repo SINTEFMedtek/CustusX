@@ -34,14 +34,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXOPENIGTLINKGUIEXTENDERSERVICE_H
 #define CXOPENIGTLINKGUIEXTENDERSERVICE_H
 
-#include "org_custusx_core_tracking_system_openigtlink_Export.h"
+#include "org_custusx_core_openigtlink_Export.h"
 #include "cxGUIExtenderService.h"
 
 namespace cx
 {
 class OpenIGTLinkClient;
 
-class org_custusx_core_tracking_system_openigtlink_EXPORT OpenIGTLinkGuiExtenderService : public GUIExtenderService
+class org_custusx_core_openigtlink_EXPORT OpenIGTLinkGuiExtenderService : public GUIExtenderService
 {
 public:
     OpenIGTLinkGuiExtenderService(OpenIGTLinkClient *client = NULL);

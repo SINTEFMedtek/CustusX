@@ -1,9 +1,9 @@
-project(org_custusx_core_tracking_system_openigtlink)
+project(org_custusx_core_openigtlink)
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
 set(PLUGIN_SRCS
-    cxOpenIGTLinkTrackingSystemPluginActivator.cpp
+    cxOpenIGTLinkPluginActivator.cpp
 
     guiExtenderService/cxOpenIGTLinkGuiExtenderService.cpp
     guiExtenderService/cxOpenIGTLinkConnectionWidget.cpp
@@ -23,7 +23,7 @@ set(PLUGIN_SRCS
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
-    cxOpenIGTLinkTrackingSystemPluginActivator.h
+    cxOpenIGTLinkPluginActivator.h
 
     guiExtenderService/cxOpenIGTLinkGuiExtenderService.h
     guiExtenderService/cxOpenIGTLinkConnectionWidget.h

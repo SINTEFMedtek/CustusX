@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXOPENIGTLINKCLIENT_H
 #define CXOPENIGTLINKCLIENT_H
 
-#include "org_custusx_core_tracking_system_openigtlink_Export.h"
+#include "org_custusx_core_openigtlink_Export.h"
 
 #include <map>
 #include <QObject>
@@ -64,7 +64,7 @@ namespace cx {
  *
  */
 
-class org_custusx_core_tracking_system_openigtlink_EXPORT OpenIGTLinkClient : public QObject
+class org_custusx_core_openigtlink_EXPORT OpenIGTLinkClient : public QObject
 {
     Q_OBJECT
 public:

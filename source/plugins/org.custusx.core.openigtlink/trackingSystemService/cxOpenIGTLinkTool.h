@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXOPENIGTLINKTOOL_H
 #define CXOPENIGTLINKTOOL_H
 
-#include "org_custusx_core_tracking_system_openigtlink_Export.h"
+#include "org_custusx_core_openigtlink_Export.h"
 
 #include "cxToolImpl.h"
 
@@ -54,7 +54,7 @@ typedef boost::shared_ptr<class ProbeImpl> ProbeImplPtr;
 
 /**
  * \file
- * \addtogroup org_custusx_core_tracking_system_openigtlink_Export
+ * \addtogroup org_custusx_core_openigtlink
  * @{
  */
 
@@ -66,7 +66,7 @@ typedef boost::shared_ptr<class ProbeImpl> ProbeImplPtr;
  * \date 03 March 2015
  * \author Janne Beate Bakeng, SINTEF
  */
-class org_custusx_core_tracking_system_openigtlink_EXPORT OpenIGTLinkTool: public ToolImpl
+class org_custusx_core_openigtlink_EXPORT OpenIGTLinkTool: public ToolImpl
 {
     friend class OpenIGTLinkTrackingSystemService;
     Q_OBJECT
