@@ -129,9 +129,9 @@ void VideoConnection::runDirectLinkClient(StreamerService* service)
 	mStreamerInterface.reset(service, null_deleter());//Can't allow boost to delete service
 	mClient = new ImageReceiverThread(mStreamerInterface);
 
-	connect(mClient, &ImageReceiverThread::imageReceived, this, &VideoConnection::imageReceivedSlot); // thread-bridging connection
-	connect(mClient, &ImageReceiverThread::sonixStatusReceived, this, &VideoConnection::statusReceivedSlot); // thread-bridging connection
-	connect(mClient, &ImageReceiverThread::fps, this, &VideoConnection::fpsSlot); // thread-bridging connection
+	connect(mClient.data(), &ImageReceiverThread::imageReceived, this, &VideoConnection::imageReceivedSlot); // thread-bridging connection
+	connect(mClient.data(), &ImageReceiverThread::sonixStatusReceived, this, &VideoConnection::statusReceivedSlot); // thread-bridging connection
+	connect(mClient.data(), &ImageReceiverThread::fps, this, &VideoConnection::fpsSlot); // thread-bridging connection
 
 	mThread = new EventProcessingThread;
 	mThread->setObjectName("org.custusx.core.video.imagereceiver");
@@ -169,9 +169,9 @@ void VideoConnection::stopClient()
 
 	if (mClient)
 	{
-		disconnect(mClient, &ImageReceiverThread::imageReceived, this, &VideoConnection::imageReceivedSlot); // thread-bridging connection
-		disconnect(mClient, &ImageReceiverThread::sonixStatusReceived, this, &VideoConnection::statusReceivedSlot); // thread-bridging connection
-		disconnect(mClient, &ImageReceiverThread::fps, this, &VideoConnection::fpsSlot); // thread-bridging connection
+		disconnect(mClient.data(), &ImageReceiverThread::imageReceived, this, &VideoConnection::imageReceivedSlot); // thread-bridging connection
+		disconnect(mClient.data(), &ImageReceiverThread::sonixStatusReceived, this, &VideoConnection::statusReceivedSlot); // thread-bridging connection
+		disconnect(mClient.data(), &ImageReceiverThread::fps, this, &VideoConnection::fpsSlot); // thread-bridging connection
 
 		QMetaObject::invokeMethod(mClient, "shutdown", Qt::QueuedConnection);
 
