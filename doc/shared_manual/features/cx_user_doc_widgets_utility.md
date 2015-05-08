@@ -78,7 +78,9 @@ Click the options to select camera following style.
 \addindex probe_config_widget
 Probe Config Widget {#utility_widgets_probe_config}
 ===========================================================
-View and edit the probe configuration. 
+View and edit the probe configuration.
+
+Units are in pixels, except width for sector probes that are in degrees.
 
 Use the origin to define the position of the probe image in relation 
 to the tool t space. Set the cropping box and the probe sector parameters 
