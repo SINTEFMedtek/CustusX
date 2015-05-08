@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTOOLUSINGIGSTK_H_
 #define CXTOOLUSINGIGSTK_H_
 
-#include "org_custusx_core_tracking_Export.h"
+#include "org_custusx_core_tracking_system_igstk_Export.h"
 
 #include "cxToolImpl.h"
 
@@ -45,10 +45,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkForwardDeclarations.h"
 
 class QStringList;
-
-namespace cx
-{
-}
 
 namespace itk
 {
@@ -65,7 +61,7 @@ typedef boost::shared_ptr<class IgstkTool> IgstkToolPtr;
 
 /**
  * \file
- * \addtogroup org_custusx_core_tracking
+ * \addtogroup org_custusx_core_tracking_igstk
  * @{
  */
 
@@ -73,12 +69,12 @@ typedef boost::shared_ptr<class ProbeImpl> ProbeImplPtr;
 
 /**
  * \brief Class representing the tools a navigation system can recognize.
- * \ingroup org_custusx_core_tracking
+ * \ingroup org_custusx_core_tracking_igstk
  *
  * \date Nov 6, 2008
  * \author Janne Beate Bakeng, SINTEF
  */
-class org_custusx_core_tracking_EXPORT ToolUsingIGSTK: public ToolImpl
+class org_custusx_core_tracking_system_igstk_EXPORT ToolUsingIGSTK : public ToolImpl
 {
 	Q_OBJECT
 
@@ -128,8 +124,8 @@ public:
 	virtual void set_prMt(const Transform3D& prMt, double timestamp);
 	virtual void setVisible(bool vis);
 
-	void addXml(QDomNode& dataNode);
-	void parseXml(QDomNode& dataNode);
+    virtual void addXml(QDomNode& dataNode);
+    virtual void parseXml(QDomNode& dataNode);
 
 signals:
 	void attachedToTracker(bool);
@@ -154,7 +150,7 @@ private:
 	QTimer mTpsTimer;
 	double mTimestamp;
 };
-typedef boost::shared_ptr<ToolUsingIGSTK> cxToolPtr;
+typedef boost::shared_ptr<ToolUsingIGSTK> ToolUsingIGSTKPtr;
 
 /**
  * @}

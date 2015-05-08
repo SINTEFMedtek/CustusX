@@ -39,9 +39,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-IgstkTrackerThread::IgstkTrackerThread(IgstkTracker::InternalStructure trackerStructure,
-				std::vector<IgstkTool::InternalStructure> toolStructures,
-				IgstkTool::InternalStructure referenceToolStructure)
+IgstkTrackerThread::IgstkTrackerThread(ToolFileParser::TrackerInternalStructure trackerStructure,
+                std::vector<ToolFileParser::ToolInternalStructure> toolStructures,
+                ToolFileParser::ToolInternalStructure referenceToolStructure)
 {
 	this->setObjectName("org.custusx.core.tracking.igstk"); // becomes the thread name
 	mInitTrackerStructure = trackerStructure;

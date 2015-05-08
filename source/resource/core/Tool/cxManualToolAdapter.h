@@ -29,55 +29,56 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXTOOLIMPL_H
-#define CXTOOLIMPL_H
+
+#ifndef CXMANUALTOOLADAPTER_H_
+#define CXMANUALTOOLADAPTER_H_
 
 #include "cxResourceExport.h"
 
-#include "cxTool.h"
+#include "cxManualTool.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class TrackingPositionFilter> TrackingPositionFilterPtr;
 
-/** \brief Common functionality for Tool subclasses
+/**
+ * \brief Adapter class for ManualTool.
+ * \ingroup org_custusx_core_tracking
  *
+ * A ManualToolAdapter inherits from manual tool, but also
+ * contains a cx::Tool that is requests shape and probe info from.
  *
- * \ingroup cx_resource_core_tool
- * \date 2014-02-21
- * \author christiana
+ * Used for debug - when testing tools without a tracking system.
+ *
+ *  \date Feb 14, 2011
+ *  \author christiana
  */
-class cxResource_EXPORT ToolImpl : public Tool
+class cxResource_EXPORT ManualToolAdapter : public ManualTool
 {
 	Q_OBJECT
 public:
-	explicit ToolImpl(const QString& uid="", const QString& name ="");
-	virtual ~ToolImpl();
+	explicit ManualToolAdapter(QString uid);
+	explicit ManualToolAdapter(ToolPtr base);
+	virtual ~ManualToolAdapter();
 
-	virtual TimedTransformMapPtr getPositionHistory();
-	virtual TimedTransformMap getSessionHistory(double startTime, double stopTime);
-	virtual Transform3D get_prMt() const;
+	virtual std::set<Type> getTypes() const;
+	virtual vtkPolyDataPtr getGraphicsPolyData() const;
+	virtual bool isCalibrated() const;
+	virtual ProbePtr getProbe() const;
+
+	virtual Transform3D getCalibration_sMt() const;
+	virtual std::map<int, Vector3D> getReferencePoints() const;
+
+	void setBase(ToolPtr base);
 
 	virtual double getTooltipOffset() const;
 	virtual void setTooltipOffset(double val);
 
-	virtual void resetTrackingPositionFilter(TrackingPositionFilterPtr filter);
-	virtual bool isNull() { return false; }
-
-    virtual void addXml(QDomNode& dataNode);
-    virtual void parseXml(QDomNode& dataNode);
-
-protected:
-	virtual void set_prMt(const Transform3D& prMt, double timestamp);
-	TimedTransformMapPtr mPositionHistory;
-	Transform3D m_prMt; ///< the transform from the tool to the patient reference
-	TrackingPositionFilterPtr mTrackingPositionFilter;
-private slots:
 private:
-	double mTooltipOffset;
+  ToolPtr mBase;
 };
-typedef boost::shared_ptr<ToolImpl> cxToolPtr;
 
-} // namespace cx
+typedef boost::shared_ptr<ManualToolAdapter> ManualToolAdapterPtr;
 
-#endif // CXTOOLIMPL_H
+}
+
+#endif /* CXMANUALTOOLADAPTER_H_ */

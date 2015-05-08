@@ -30,79 +30,93 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXIGSTKTRACKERTHREAD_H_
-#define CXIGSTKTRACKERTHREAD_H_
+#ifndef CXIGSTKTOOLMANAGER_H_
+#define CXIGSTKTOOLMANAGER_H_
 
-#include "org_custusx_core_tracking_Export.h"
+#include "org_custusx_core_tracking_system_igstk_Export.h"
 
 #include <map>
 #include <vector>
 #include <QThread>
+#include <QTimer>
+#include <QMutex>
 #include "cxIgstkTracker.h"
-#include "cxIgstkTrackerThread.h"
 #include "cxToolUsingIGSTK.h"
 #include "cxIgstkTool.h"
-#include "cxIgstkToolManager.h"
 
 namespace cx
 {
 /**
  * \file
- * \addtogroup org_custusx_core_tracking
+ * \addtogroup org_custusx_core_tracking_igstk
  * @{
  */
 
 /**
- * \brief Thread containing all of IGSTK
- * \ingroup org_custusx_core_tracking
+ * \brief Manager for IGSTK interface.
+ * \ingroup org_custusx_core_tracking_igstk
  *
- * \sa ToolManager
+ * The manager exists inside IgstkTrackerThread .
  *
- * \date Mar 16, 2011
+ * \date Mar 17, 2011
  * \author Janne Beate Bakeng, SINTEF
  * \author Christian Askeland, SINTEF
  */
-class org_custusx_core_tracking_EXPORT IgstkTrackerThread: public QThread
+class org_custusx_core_tracking_system_igstk_EXPORT IgstkToolManager: public QObject
 {
 Q_OBJECT
 
 public:
-	IgstkTrackerThread(IgstkTracker::InternalStructure trackerStructure,
-					std::vector<IgstkTool::InternalStructure> toolStructures,
-					IgstkTool::InternalStructure referenceToolStructure);
-	virtual ~IgstkTrackerThread();
+    IgstkToolManager(ToolFileParser::TrackerInternalStructure trackerStructure,
+                    std::vector<ToolFileParser::ToolInternalStructure> toolStructures,
+                    ToolFileParser::ToolInternalStructure referenceToolStructure);
+	virtual ~IgstkToolManager();
 
-	void initialize(bool on); ///< connects to the hardware. Threadsafe.
-	void track(bool on); ///< tracking on or off. Threadsafe.
-
-	std::map<QString, IgstkToolPtr> getTools(); ///< ThreadSafe.
+	std::map<QString, IgstkToolPtr> getTools(); ///< ThreadSafe
 	IgstkToolPtr getRefereceTool(); ///< ThreadSafe
 
 signals:
-	void configured(bool on);
-	void initialized(bool on); ///< system is initialized
+	void initialized(bool on); ///< when all trackers and tools are initialized == true, else false
 	void tracking(bool on);
 	void error();
 
-	void requestInitialize(bool on); ///< internal signal
-	void requestTrack(bool on); ///< internal signal
+public slots:
+	void initializeSlot(bool on); ///< connects to the hardware
+	void trackSlot(bool on); ///< tracking on or off
+
+private slots:
+	void trackerTrackingSlot(bool);
+	void checkTimeoutsAndRequestTransformSlot();
+	void deviceInitializedSlot(bool);
+	void attachToolsWhenTrackerIsInitializedSlot(bool);
 
 private:
-	virtual void run();
-	void configure();
-	void deconfigure();
+    void createTracker(ToolFileParser::TrackerInternalStructure trackerStructure);
+    void createTools(std::vector<ToolFileParser::ToolInternalStructure> toolStructures,
+                    ToolFileParser::ToolInternalStructure referenceToolStructure);
+    IgstkToolPtr addIgstkTools(ToolFileParser::ToolInternalStructure& toolStructure);
+	void setReferenceAndTrackerOnTools();
 
-	IgstkTracker::InternalStructure mInitTrackerStructure;
-	std::vector<IgstkTool::InternalStructure> mInitToolStructures;
-	IgstkTool::InternalStructure mInitReferenceToolStructure;
+	void printStatus(); ///< just for debugging
 
-	IgstkToolManagerPtr mManager;
+	TrackerPtr mTracker;
+	QMutex mToolMutex; ///< protects mTools
+	std::map<QString, IgstkToolPtr> mTools;
+	int mInitAnsweres; ///< keeps track of how many tools and trackers have gotten an answer from the hardware
+	QMutex mReferenceMutex; ///< protects mReferenceTool
+	IgstkToolPtr mReferenceTool;
+
+	QTimer* mTimer; ///< timer controlling the demand of transforms
+	igstk::PulseGenerator::Pointer mPulseGenerator;
+
+	bool mInternalInitialized;
+
 };
-typedef boost::shared_ptr<IgstkTrackerThread> IgstkTrackerThreadPtr;
+typedef boost::shared_ptr<IgstkToolManager> IgstkToolManagerPtr;
 
 /**
  * @}
  */
 }
 
-#endif /* CXIGSTKTRACKERTHREAD_H_ */
+#endif /* CXIGSTKTOOLMANAGER_H_ */

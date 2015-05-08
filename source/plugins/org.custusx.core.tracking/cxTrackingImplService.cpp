@@ -51,12 +51,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTime.h"
 #include "cxEnumConverter.h"
 #include "cxDummyTool.h"
-#include "cxToolUsingIGSTK.h"
-#include "cxIgstkTracker.h"
+#include "cxToolImpl.h"
 #include "cxToolConfigurationParser.h"
 #include "cxManualToolAdapter.h"
 #include "cxSettings.h"
-#include "cxIgstkTrackerThread.h"
 #include "cxPlaybackTool.h"
 
 #include "cxPlaybackTime.h"
@@ -65,7 +63,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackerConfigurationImpl.h"
 #include "cxUtilHelpers.h"
 
-#include "cxTrackingSystemIGSTKService.h"
 #include "cxTrackingSystemDummyService.h"
 #include "cxTrackingSystemPlaybackService.h"
 #include "cxSessionStorageServiceProxy.h"
@@ -87,9 +84,6 @@ TrackingImplService::TrackingImplService(ctkPluginContext *context) :
 	connect(mSession.get(), &SessionStorageService::isSaving, this, &TrackingImplService::onSessionSave);
 
 	this->initializeManualTool(); // do this after setting self.
-
-    TrackingSystemServicePtr igstk(new TrackingSystemIGSTKService());
-    this->installTrackingSystem(igstk);
 
 	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(globalConfigurationFileChangedSlot(QString)));
 
@@ -619,7 +613,7 @@ void TrackingImplService::addXml(QDomNode& parentNode)
 	ToolMap::iterator toolIt = tools.begin();
 	for (; toolIt != tools.end(); ++toolIt)
 	{
-		cxToolPtr tool = boost::dynamic_pointer_cast<ToolUsingIGSTK>(toolIt->second);
+        cxToolPtr tool = boost::dynamic_pointer_cast<ToolImpl>(toolIt->second);
 		if (tool)
 		{
 			toolsNode.addObjectToElement("tool", tool);
@@ -652,7 +646,7 @@ void TrackingImplService::parseXml(QDomNode& dataNode)
 		QString tool_uid = toolNode.attribute("uid");
 		if (tools.find(tool_uid) != tools.end())
 		{
-			cxToolPtr tool = boost::dynamic_pointer_cast<ToolUsingIGSTK>(tools.find(tool_uid)->second);
+            cxToolPtr tool = boost::dynamic_pointer_cast<ToolImpl>(tools.find(tool_uid)->second);
 			tool->parseXml(toolNode);
 		}
 	}

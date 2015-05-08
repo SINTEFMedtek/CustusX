@@ -38,9 +38,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-IgstkToolManager::IgstkToolManager(IgstkTracker::InternalStructure trackerStructure,
-				std::vector<IgstkTool::InternalStructure> toolStructures,
-				IgstkTool::InternalStructure referenceToolStructure) :
+IgstkToolManager::IgstkToolManager(ToolFileParser::TrackerInternalStructure trackerStructure,
+                std::vector<ToolFileParser::ToolInternalStructure> toolStructures,
+                ToolFileParser::ToolInternalStructure referenceToolStructure) :
 				mInitAnsweres(0), mInternalInitialized(false)
 {
 	mTimer = 0;
@@ -103,7 +103,7 @@ void IgstkToolManager::setReferenceAndTrackerOnTools()
 	}
 }
 
-void IgstkToolManager::createTracker(IgstkTracker::InternalStructure trackerStructure)
+void IgstkToolManager::createTracker(ToolFileParser::TrackerInternalStructure trackerStructure)
 {
 	TrackerPtr tracker(new IgstkTracker(trackerStructure));
 	if (tracker->isValid())
@@ -112,8 +112,8 @@ void IgstkToolManager::createTracker(IgstkTracker::InternalStructure trackerStru
 		reportWarning("Invalid tracker.");
 }
 
-void IgstkToolManager::createTools(std::vector<IgstkTool::InternalStructure> toolStructures,
-				IgstkTool::InternalStructure referenceToolStructure)
+void IgstkToolManager::createTools(std::vector<ToolFileParser::ToolInternalStructure> toolStructures,
+                ToolFileParser::ToolInternalStructure referenceToolStructure)
 {
 	for (unsigned i = 0; i < toolStructures.size(); ++i)
 	{
@@ -127,7 +127,7 @@ void IgstkToolManager::createTools(std::vector<IgstkTool::InternalStructure> too
 	}
 }
 
-IgstkToolPtr IgstkToolManager::addIgstkTools(IgstkTool::InternalStructure& toolStructure)
+IgstkToolPtr IgstkToolManager::addIgstkTools(ToolFileParser::ToolInternalStructure& toolStructure)
 {
 	IgstkToolPtr igstkTool(new IgstkTool(toolStructure));
 	if (igstkTool->isValid())

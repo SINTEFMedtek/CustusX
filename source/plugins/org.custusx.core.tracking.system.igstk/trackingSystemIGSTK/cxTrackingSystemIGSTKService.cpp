@@ -151,7 +151,7 @@ void TrackingSystemIGSTKService::configure()
 	//parse
 	ConfigurationFileParser configParser(mConfigurationFilePath, mLoggingFolder);
 
-	std::vector<IgstkTracker::InternalStructure> trackers = configParser.getTrackers();
+    std::vector<ToolFileParser::TrackerInternalStructure> trackers = configParser.getTrackers();
 
 	if (trackers.empty())
 	{
@@ -159,16 +159,16 @@ void TrackingSystemIGSTKService::configure()
 		return;
 	}
 
-	IgstkTracker::InternalStructure trackerStructure = trackers[0]; //we only support one tracker atm
+    ToolFileParser::TrackerInternalStructure trackerStructure = trackers[0]; //we only support one tracker atm
 
-	IgstkTool::InternalStructure referenceToolStructure;
-	std::vector<IgstkTool::InternalStructure> toolStructures;
+    ToolFileParser::ToolInternalStructure referenceToolStructure;
+    std::vector<ToolFileParser::ToolInternalStructure> toolStructures;
 	QString referenceToolFile = configParser.getAbsoluteReferenceFilePath();
 	std::vector<QString> toolfiles = configParser.getAbsoluteToolFilePaths();
 	for (std::vector<QString>::iterator it = toolfiles.begin(); it != toolfiles.end(); ++it)
 	{
 		ToolFileParser toolParser(*it, mLoggingFolder);
-		IgstkTool::InternalStructure internalTool = toolParser.getTool();
+        ToolFileParser::ToolInternalStructure internalTool = toolParser.getTool();
 		if ((*it) == referenceToolFile)
 			referenceToolStructure = internalTool;
 		else
@@ -210,7 +210,7 @@ void TrackingSystemIGSTKService::trackerConfiguredSlot(bool on)
 	for (; it != igstkTools.end(); ++it)
 	{
 		IgstkToolPtr igstkTool = it->second;
-		cxToolPtr tool(new ToolUsingIGSTK(igstkTool));
+        ToolUsingIGSTKPtr tool(new ToolUsingIGSTK(igstkTool));
 		if (tool->isValid())
 		{
 			mTools.push_back(tool);

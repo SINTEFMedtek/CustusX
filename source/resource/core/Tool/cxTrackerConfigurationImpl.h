@@ -29,56 +29,52 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXTRACKERCONFIGURATIONIMPL_H
+#define CXTRACKERCONFIGURATIONIMPL_H
 
-#ifndef CXMANUALTOOLADAPTER_H_
-#define CXMANUALTOOLADAPTER_H_
+#include "cxResourceExport.h"
 
-#include "org_custusx_core_tracking_Export.h"
-
-#include "cxManualTool.h"
+#include <QDir>
+#include "cxTrackerConfiguration.h"
+#include "cxToolFileParser.h"
 
 namespace cx
 {
 
 /**
- * \brief Adapter class for ManualTool.
  * \ingroup org_custusx_core_tracking
- *
- * A ManualToolAdapter inherits from manual tool, but also
- * contains a cx::Tool that is requests shape and probe info from.
- *
- * Used for debug - when testing tools without a tracking system.
- *
- *  \date Feb 14, 2011
- *  \author christiana
  */
-class org_custusx_core_tracking_EXPORT ManualToolAdapter : public ManualTool
+class cxResource_EXPORT TrackerConfigurationImpl : public TrackerConfiguration
 {
-	Q_OBJECT
 public:
-	explicit ManualToolAdapter(QString uid);
-	explicit ManualToolAdapter(ToolPtr base);
-	virtual ~ManualToolAdapter();
+	virtual ~TrackerConfigurationImpl() {}
 
-	virtual std::set<Type> getTypes() const;
-	virtual vtkPolyDataPtr getGraphicsPolyData() const;
-	virtual bool isCalibrated() const;
-	virtual ProbePtr getProbe() const;
+	virtual void saveConfiguration(const Configuration& config);
+	virtual Configuration getConfiguration(QString uid);
 
-	virtual Transform3D getCalibration_sMt() const;
-	virtual std::map<int, Vector3D> getReferencePoints() const;
+	virtual QStringList getSupportedTrackingSystems();
+	virtual QStringList getToolsGivenFilter(QStringList applicationsFilter,
+											QStringList trackingsystemsFilter);
+	virtual Tool getTool(QString uid);
+	virtual bool verifyTool(QString uid);
 
-	void setBase(ToolPtr base);
+	virtual QString getConfigurationApplicationsPath();
+	virtual QStringList getConfigurationsGivenApplication();
+	virtual QStringList getAllConfigurations();
+	virtual QStringList getAllTools();
 
-	virtual double getTooltipOffset() const;
-	virtual void setTooltipOffset(double val);
+	virtual bool isNull() { return false; }
 
 private:
-  ToolPtr mBase;
+	QStringList filter(QStringList toolsToFilter, QStringList applicationsFilter,
+			QStringList trackingsystemsFilter);
+    ToolFileParser::ToolInternalStructure getToolInternal(QString toolAbsoluteFilePath);
+
 };
 
-typedef boost::shared_ptr<ManualToolAdapter> ManualToolAdapterPtr;
 
-}
+} // namespace cx
 
-#endif /* CXMANUALTOOLADAPTER_H_ */
+
+
+#endif // CXTRACKERCONFIGURATIONIMPL_H

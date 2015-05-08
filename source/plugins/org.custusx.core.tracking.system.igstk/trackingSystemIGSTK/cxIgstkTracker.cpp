@@ -43,15 +43,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-QStringList IgstkTracker::getSupportedTrackingSystems()
-{
-	QStringList retval;
-	retval << enum2string(tsPOLARIS);
-	retval << enum2string(tsAURORA);
-	return retval;
-}
 
-IgstkTracker::IgstkTracker(InternalStructure internalStructure) :
+IgstkTracker::IgstkTracker(ToolFileParser::TrackerInternalStructure internalStructure) :
 				mInternalStructure(internalStructure),
 				mValid(false),
 				mUid(""),

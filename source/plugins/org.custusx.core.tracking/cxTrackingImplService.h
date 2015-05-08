@@ -52,7 +52,6 @@ namespace cx
 typedef boost::shared_ptr<class TrackingImplService> TrackingImplServicePtr;
 
 typedef boost::shared_ptr<class ManualToolAdapter> ManualToolAdapterPtr;
-typedef boost::shared_ptr<class IgstkTrackerThread> IgstkTrackerThreadPtr;
 typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
 
 typedef boost::shared_ptr<class TrackingSystemService> TrackingSystemServicePtr;

@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXIGSTKTRACKER_H_
 #define CXIGSTKTRACKER_H_
 
-#include "org_custusx_core_tracking_Export.h"
+#include "org_custusx_core_tracking_system_igstk_Export.h"
 
 #include <QObject>
 
@@ -49,19 +49,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #else
 #include "igstkSerialCommunicationForPosix.h"
 #endif
+#include "cxTracker.h"
 #include "cxTool.h"
 #include "cxDefinitions.h"
 #include "cxForwardDeclarations.h"
+#include "cxToolFileParser.h"
 
 namespace cx
 {
 /**
  * \file
- * \addtogroup org_custusx_core_tracking
+ * \addtogroup org_custusx_core_tracking_igstk
  * @{
  */
-
-typedef std::map<QString, ToolPtr> ToolMap;
 
 class IgstkTool;
 typedef boost::shared_ptr<IgstkTool> IgstkToolPtr;
@@ -69,16 +69,15 @@ typedef boost::weak_ptr<IgstkTool> IgstkToolWeakPtr;
 
 /**
  * \brief Class representing the navigation system.
- * \ingroup org_custusx_core_tracking
+ * \ingroup org_custusx_core_tracking_igstk
  *
  * \date Nov 7, 2008
  * \author Janne Beate Bakeng, SINTEF
  */
-class org_custusx_core_tracking_EXPORT IgstkTracker: public QObject
+class org_custusx_core_tracking_system_igstk_EXPORT IgstkTracker: public Tracker
 {
 Q_OBJECT
 public:
-	static QStringList getSupportedTrackingSystems();
 
 #ifdef WIN32
 	/** The type of serial communication used on a windows platform.*/
@@ -117,18 +116,7 @@ public:
 	 TRACKER_COMMUNICATION_OPEN_PORT_ERROR       ///< communication port tried to open or close
 	 */
 
-	/**A trackers internal structure \warning make sure you set all the members to an appropriate value.*/
-	struct InternalStructure
-	{
-		TRACKING_SYSTEM mType; ///< the trackers type
-		QString mLoggingFolderName; ///< path to where log should be saved
-		InternalStructure() :
-						mType(tsNONE),
-						mLoggingFolderName("")
-		{} ///< set default values for the internal structure
-	};
-
-	IgstkTracker(InternalStructure internalStructure);
+    IgstkTracker(ToolFileParser::TrackerInternalStructure internalStructure);
 	~IgstkTracker();
 
 	TRACKING_SYSTEM getType() const; ///< returns the trackers type
@@ -166,7 +154,7 @@ protected:
 
 	void shutdown(); ///< shuts down the tracker, made to be used when an unrecoverable error occures
 
-	InternalStructure mInternalStructure; ///< the trackers type
+    ToolFileParser::TrackerInternalStructure mInternalStructure; ///< the trackers type
 	bool mValid; ///< whether this tracker is constructed correctly or not
 	QString mUid; ///< the trackers unique id
 	QString mName; ///< the trackers name

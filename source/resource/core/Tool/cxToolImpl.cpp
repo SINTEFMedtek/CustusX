@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxToolImpl.h"
 #include "cxTypeConversions.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -96,7 +97,17 @@ void ToolImpl::set_prMt(const Transform3D& prMt, double timestamp)
 
 void ToolImpl::resetTrackingPositionFilter(TrackingPositionFilterPtr filter)
 {
-	mTrackingPositionFilter = filter;
+    mTrackingPositionFilter = filter;
+}
+
+void ToolImpl::addXml(QDomNode &dataNode)
+{
+    CX_LOG_WARNING() << "ToolImpl::addXml refactoring gone wrong... >.<";
+}
+
+void ToolImpl::parseXml(QDomNode &dataNode)
+{
+    CX_LOG_WARNING() << "ToolImpl::parseXml refactoring gone wrong... >.<";
 }
 
 } // namespace cx

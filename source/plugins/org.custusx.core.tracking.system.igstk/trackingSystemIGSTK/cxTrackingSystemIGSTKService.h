@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTRACKINGSYSTEMIGSTKSERVICE_H
 #define CXTRACKINGSYSTEMIGSTKSERVICE_H
 
-#include "org_custusx_core_tracking_Export.h"
+#include "org_custusx_core_tracking_system_igstk_Export.h"
 
 #include "cxTrackingSystemService.h"
 #include "vtkForwardDeclarations.h"
@@ -47,7 +47,7 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup org_custusx_core_tracking
+ * \addtogroup org_custusx_core_tracking_igstk
  * @{
  */
 
@@ -79,7 +79,7 @@ typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
  * \author Janne Beate Bakeng, SINTEF
  * \author Christian Askeland, SINTEF
  */
-class org_custusx_core_tracking_EXPORT TrackingSystemIGSTKService : public TrackingSystemService
+class org_custusx_core_tracking_system_igstk_EXPORT TrackingSystemIGSTKService : public TrackingSystemService
 {
 Q_OBJECT
 

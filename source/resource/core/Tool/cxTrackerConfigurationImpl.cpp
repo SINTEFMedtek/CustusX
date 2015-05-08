@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxToolConfigurationParser.h"
 #include "cxFileHelpers.h"
 #include "cxProfile.h"
+#include "cxTracker.h"
 
 namespace cx
 {
@@ -81,7 +82,7 @@ TrackerConfigurationImpl::Configuration TrackerConfigurationImpl::getConfigurati
 
 	retval.mClinicalApplication = parser.getApplicationapplication();
 
-	std::vector<IgstkTracker::InternalStructure> trackers = parser.getTrackers();
+    std::vector<ToolFileParser::TrackerInternalStructure> trackers = parser.getTrackers();
 	for (unsigned i = 0; i < trackers.size(); ++i)
 	{
 		retval.mTrackingSystem = enum2string(trackers[i].mType);
@@ -118,7 +119,7 @@ TrackerConfigurationImpl::Tool TrackerConfigurationImpl::getTool(QString uid)
 	retval.mName = info.dir().dirName();
 
 	ToolFileParser parser(absoluteFilePath);
-	IgstkTool::InternalStructure internal = parser.getTool();
+    ToolFileParser::ToolInternalStructure internal = parser.getTool();
 
 	retval.mTrackingSystem = enum2string(internal.mTrackerType);
 	retval.mIsReference = internal.mIsReference;
@@ -135,7 +136,7 @@ QStringList TrackerConfigurationImpl::filter(QStringList toolsToFilter, QStringL
 	foreach(QString toolFilePath, toolsToFilter)
 	{
 		//get internal tool
-		IgstkTool::InternalStructure internal = this->getToolInternal(toolFilePath);
+        ToolFileParser::ToolInternalStructure internal = this->getToolInternal(toolFilePath);
 
 		//check tracking systems
 		QString trackerName = enum2string(internal.mTrackerType);
@@ -172,9 +173,9 @@ QStringList TrackerConfigurationImpl::filter(QStringList toolsToFilter, QStringL
 	return retval;
 }
 
-IgstkTool::InternalStructure TrackerConfigurationImpl::getToolInternal(QString toolAbsoluteFilePath)
+ToolFileParser::ToolInternalStructure TrackerConfigurationImpl::getToolInternal(QString toolAbsoluteFilePath)
 {
-	IgstkTool::InternalStructure retval;
+    ToolFileParser::ToolInternalStructure retval;
 
 	ToolFileParser parser(toolAbsoluteFilePath);
 	retval = parser.getTool();
@@ -184,7 +185,7 @@ IgstkTool::InternalStructure TrackerConfigurationImpl::getToolInternal(QString t
 
 bool TrackerConfigurationImpl::verifyTool(QString uid)
 {
-	IgstkTool::InternalStructure internal = this->getToolInternal(uid);
+    ToolFileParser::ToolInternalStructure internal = this->getToolInternal(uid);
 	return internal.verify();
 }
 
@@ -243,7 +244,7 @@ QStringList TrackerConfigurationImpl::getAllTools()
 QStringList TrackerConfigurationImpl::getSupportedTrackingSystems()
 {
 	QStringList retval;
-	retval = IgstkTracker::getSupportedTrackingSystems();
+    retval = Tracker::getSupportedTrackingSystems();
 	return retval;
 }
 

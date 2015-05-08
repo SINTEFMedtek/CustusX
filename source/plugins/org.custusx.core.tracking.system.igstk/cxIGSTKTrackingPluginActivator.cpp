@@ -29,52 +29,39 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXTRACKERCONFIGURATIONIMPL_H
-#define CXTRACKERCONFIGURATIONIMPL_H
 
-#include "org_custusx_core_tracking_Export.h"
+#include "cxIGSTKTrackingPluginActivator.h"
 
-#include "cxTrackerConfiguration.h"
-#include "cxIgstkTool.h"
-#include <QDir>
+#include <QtPlugin>
+#include <iostream>
+
+#include "cxTrackingSystemIGSTKService.h"
+#include "cxRegisteredService.h"
 
 namespace cx
 {
 
-/**
- * \ingroup org_custusx_core_tracking
- */
-class org_custusx_core_tracking_EXPORT TrackerConfigurationImpl : public TrackerConfiguration
+IGSTKTrackingPluginActivator::IGSTKTrackingPluginActivator()
 {
-public:
-	virtual ~TrackerConfigurationImpl() {}
+}
 
-	virtual void saveConfiguration(const Configuration& config);
-	virtual Configuration getConfiguration(QString uid);
+IGSTKTrackingPluginActivator::~IGSTKTrackingPluginActivator()
+{
+}
 
-	virtual QStringList getSupportedTrackingSystems();
-	virtual QStringList getToolsGivenFilter(QStringList applicationsFilter,
-											QStringList trackingsystemsFilter);
-	virtual Tool getTool(QString uid);
-	virtual bool verifyTool(QString uid);
+void IGSTKTrackingPluginActivator::start(ctkPluginContext* context)
+{
+    TrackingSystemIGSTKService* igstk = new TrackingSystemIGSTKService();
+    mRegistration = RegisteredService::create<TrackingSystemIGSTKService>(context, igstk, TrackingSystemService_iid);
+}
 
-	virtual QString getConfigurationApplicationsPath();
-	virtual QStringList getConfigurationsGivenApplication();
-	virtual QStringList getAllConfigurations();
-	virtual QStringList getAllTools();
-
-	virtual bool isNull() { return false; }
-
-private:
-	QStringList filter(QStringList toolsToFilter, QStringList applicationsFilter,
-			QStringList trackingsystemsFilter);
-	IgstkTool::InternalStructure getToolInternal(QString toolAbsoluteFilePath);
-
-};
-
+void IGSTKTrackingPluginActivator::stop(ctkPluginContext* context)
+{
+	mRegistration.reset();
+	Q_UNUSED(context);
+}
 
 } // namespace cx
 
 
 
-#endif // CXTRACKERCONFIGURATIONIMPL_H

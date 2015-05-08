@@ -50,6 +50,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
+typedef boost::shared_ptr<class Tool> ToolPtr;
+typedef std::map<QString, ToolPtr> ToolMap;
 typedef std::map<double, Transform3D> TimedTransformMap;
 typedef boost::shared_ptr<TimedTransformMap> TimedTransformMapPtr;
 typedef boost::shared_ptr<class TrackingPositionFilter> TrackingPositionFilterPtr;
@@ -151,7 +153,6 @@ protected:
 	QString mUid;
 	QString mName;
 };
-typedef boost::shared_ptr<Tool> ToolPtr;
 } // namespace cx
 
 #endif /*CXTOOL_H_*/

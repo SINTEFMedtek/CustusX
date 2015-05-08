@@ -32,10 +32,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxIgstkTool.h"
 
-#include <QDir>
 #include <QDateTime>
 #include <QStringList>
 #include <QTextStream>
+#include <vtkTransform.h>
 #include "cxLogger.h"
 #include "cxTypeConversions.h"
 #include "cxSettings.h"
@@ -44,136 +44,30 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-Transform3D IgstkTool::InternalStructure::getCalibrationAsSSC() const
+igstk::Transform IgstkTool::toIgstkTransform(Transform3D transform)
 {
-	vtkMatrix4x4Ptr M = vtkMatrix4x4Ptr::New();
-	mCalibration.ExportTransform(*(M.GetPointer()));
-	Transform3D sMt = Transform3D::fromVtkMatrix(M);
-	return sMt;
+    igstk::Transform retval;
+    vtkMatrix4x4Ptr matrix = transform.getVtkTransform()->GetMatrix();
+    retval.ImportTransform(*(matrix.GetPointer()));
+    return retval;
 }
 
-void IgstkTool::InternalStructure::setCalibration(const Transform3D& cal)
+Transform3D IgstkTool::toTransform3D(igstk::Transform transform)
 {
-	mCalibration.ImportTransform(*cal.getVtkMatrix());
-}
-
-void IgstkTool::InternalStructure::saveCalibrationToFile()
-{
-	QString filename = mCalibrationFilename;
-//	QFile calibrationFile;
-	if (!filename.isEmpty() && QFile::exists(filename))
-	{
-		//Calibration file exists, overwrite
-//		calibrationFile.setFileName(mCalibrationFilename);
-	}
-	else
-	{
-		//Make a new file, use rom file name as base name
-		filename = mSROMFilename.remove(".rom", Qt::CaseInsensitive);
-		filename.append(".cal");
-//		calibrationFile.setFileName(calibrationFileName);
-	}
-
-	TransformFile file(filename);
-	file.write(this->getCalibrationAsSSC());
-//
-////  Transform3D sMt;
-////  vtkMatrix4x4Ptr M = vtkMatrix4x4Ptr::New();
-////  mCalibration.ExportTransform(*(M.GetPointer()));
-////  Transform3D sMt = Transform3D::fromVtkMatrix(M);
-//	Transform3D sMt = this->getCalibrationAsSSC();
-//
-//	if (!calibrationFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
-//	{
-//		reportError("Could not open " + mUid + "s calibrationfile: " + calibrationFile.fileName());
-//		return;
-//	}
-//
-//	QTextStream streamer(&calibrationFile);
-//	streamer << qstring_cast(sMt);
-//	streamer << endl;
-//
-//	calibrationFile.close();
-
-	report("Replaced calibration in " + filename);
-}
-
-
-bool IgstkTool::InternalStructure::verify()
-{
-	bool retval = true;
-	QString verificationError("Internal verification of tool " + mUid + " failed! REASON: ");
-	if (!mIsPointer && !mIsReference && !mIsProbe)
-	{
-//    reportError(verificationError+" Tag <tool>::<type> is invalid ["+qstring_cast(mType)+"]. Valid types: [pointer, usprobe, reference]");
-		reportError(
-						verificationError
-										+ " Tag <tool>::<type> is invalid, must be one one of pointer/probe/reference ");
-		retval = false;
-	}
-	if (mUid.isEmpty())
-	{
-		reportError(verificationError + " Tag <tool>::<uid> is empty. Give tool a unique id.");
-		retval = false;
-	}
-	if (mTrackerType == tsNONE)
-	{
-		reportError(
-						verificationError + " Tag <sensor>::<type> is invalid ["
-										+ qstring_cast(mTrackerType)
-										+ "]. Valid types: [polaris, spectra, vicra, aurora, micron (NOT SUPPORTED YET)]");
-		retval = false;
-	}
-	if ((mTrackerType == tsAURORA) && (mPortNumber >= 4))
-	{
-		reportError(
-						verificationError + " Tag <sensor>::<portnumber> is invalid ["
-										+ qstring_cast(mPortNumber)
-										+ "]. Valid numbers: [0, 1, 2, 3]");
-		retval = false;
-	}
-	if ((mTrackerType == tsAURORA) && (mChannelNumber >= 1))
-	{
-		reportError(
-						verificationError + " Tag <sensor>::<channelnumber> is invalid ["
-										+ qstring_cast(mChannelNumber) + "]. Valid numbers: [0, 1]");
-		retval = false;
-	}
-	QDir dir;
-	if (!mSROMFilename.isEmpty() && !dir.exists(mSROMFilename))
-	{
-		reportError(
-						verificationError + " Tag <sensor>::<rom_file> is invalid [" + mSROMFilename
-										+ "]. Valid path: relative path to existing rom file.");
-		retval = false;
-	}
-	if (!mCalibrationFilename.isEmpty() && !dir.exists(mCalibrationFilename))
-	{
-		reportError(
-						verificationError + " Tag <calibration>::<cal_file> is invalid ["
-										+ mCalibrationFilename
-										+ "]. Valid path: relative path to existing calibration file.");
-		retval = false;
-	}
-	if (!mTransformSaveFileName.isEmpty() && !dir.exists(mTransformSaveFileName))
-	{
-		reportError(verificationError + " Logging folder is invalid. Contact programmer! :)");
-		retval = false;
-	}
-	if (!mLoggingFolderName.isEmpty() && !dir.exists(mLoggingFolderName))
-	{
-		reportError(verificationError + " Logging folder is invalid. Contact programmer! :)");
-		retval = false;
-	}
-
-	return retval;
+    Transform3D retval;
+    vtkMatrix4x4Ptr matrix = vtkMatrix4x4Ptr::New();
+    transform.ExportTransform(*(matrix.GetPointer()));
+    retval = Transform3D::fromVtkMatrix(matrix);
+    return retval;
 }
 
 void IgstkTool::updateCalibration(const Transform3D& cal)
 {
 	//apply the calibration
-	mInternalStructure.mCalibration.ImportTransform(*cal.getVtkMatrix());
-	this->setCalibrationTransform(mInternalStructure.mCalibration);
+    //mInternalStructure.mCalibration.ImportTransform(*cal.getVtkMatrix());
+    //this->setCalibrationTransform(mInternalStructure.mCalibration);
+    mInternalStructure.mCalibration = cal;
+    this->setCalibrationTransform(mInternalStructure.mCalibration);
 
 	Transform3D sMt = mInternalStructure.getCalibrationAsSSC();
 	report("Set " + mInternalStructure.mName + "s calibration to \n" + qstring_cast(sMt));
@@ -186,7 +80,7 @@ void IgstkTool::updateCalibration(const Transform3D& cal)
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
-IgstkTool::IgstkTool(IgstkTool::InternalStructure internalStructure) :
+IgstkTool::IgstkTool(ToolFileParser::ToolInternalStructure internalStructure) :
 				mToolObserver(itk::ReceptorMemberCommand<IgstkTool>::New()), mValid(false), mVisible(false), mAttachedToTracker(
 								false)
 {
@@ -213,7 +107,7 @@ IgstkTool::~IgstkTool()
 {
 }
 
-IgstkTool::InternalStructure IgstkTool::getInternalStructure()
+ToolFileParser::ToolInternalStructure IgstkTool::getInternalStructure()
 {
 	return mInternalStructure;
 }
@@ -422,6 +316,7 @@ igstk::TrackerTool::Pointer IgstkTool::buildInternalTool()
 	igstk::PolarisTrackerTool::Pointer tempPolarisTool;
 	igstk::AuroraTrackerTool::Pointer tempAuroraTool;
 
+    igstk::Transform calibration = toIgstkTransform(mInternalStructure.mCalibration);
 	switch (mInternalStructure.mTrackerType)
 	{
 	case tsNONE:
@@ -436,7 +331,7 @@ igstk::TrackerTool::Pointer IgstkTool::buildInternalTool()
 		tempPolarisTool->RequestSelectWirelessTrackerTool();
 		tempPolarisTool->RequestSetSROMFileName(string_cast(mInternalStructure.mSROMFilename));
 		tempPolarisTool->RequestConfigure();
-		tempPolarisTool->SetCalibrationTransform(mInternalStructure.mCalibration);
+        tempPolarisTool->SetCalibrationTransform(calibration);
 		tool = tempPolarisTool;
 		break;
 	case tsAURORA:
@@ -454,7 +349,7 @@ igstk::TrackerTool::Pointer IgstkTool::buildInternalTool()
 			tempAuroraTool->RequestSetPortNumber(mInternalStructure.mPortNumber);
 		}
 		tempAuroraTool->RequestConfigure();
-		tempAuroraTool->SetCalibrationTransform(mInternalStructure.mCalibration);
+        tempAuroraTool->SetCalibrationTransform(calibration);
 		tool = tempAuroraTool;
 		break;
 	case tsMICRON:
@@ -466,10 +361,11 @@ igstk::TrackerTool::Pointer IgstkTool::buildInternalTool()
 	return tool;
 }
 
-void IgstkTool::setCalibrationTransform(igstk::Transform calibration)
+void IgstkTool::setCalibrationTransform(Transform3D calibration)
 {
 	mInternalStructure.mCalibration = calibration;
-	mTool->SetCalibrationTransform(calibration);
+    igstk::Transform transform = toIgstkTransform(mInternalStructure.mCalibration);
+    mTool->SetCalibrationTransform(transform);
 }
 
 void IgstkTool::internalAttachedToTracker(bool value)
@@ -536,8 +432,8 @@ void IgstkTool::printInternalStructure()
 	std::cout << "mReferencePoints: " << string_cast(mInternalStructure.mReferencePoints.size()) << std::endl;
 	std::cout << "mWireless: " << mInternalStructure.mWireless << std::endl;
 	std::cout << "m5DOF: " << mInternalStructure.m5DOF << std::endl;
-	std::cout << "mCalibration: " << std::endl;
-	mInternalStructure.mCalibration.Print(std::cout, itk::Indent());
+    std::cout << "mCalibration: " << mInternalStructure.mCalibration << std::endl;
+    //mInternalStructure.mCalibration.Print(std::cout, itk::Indent());"
 	std::cout << "mCalibrationFilename: " << mInternalStructure.mCalibrationFilename << std::endl;
 	std::cout << "mGraphicsFileName: " << mInternalStructure.mGraphicsFileName << std::endl;
 	std::cout << "mTransformSaveFileName: " << mInternalStructure.mTransformSaveFileName << std::endl;

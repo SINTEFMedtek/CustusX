@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxToolImpl.h"
 
-#include "org_custusx_core_tracking_Export.h"
+#include "cxResourceExport.h"
 
 namespace cx
 {
@@ -51,7 +51,7 @@ typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
  *
  * \ingroup org_custusx_core_tracking
  */
-class org_custusx_core_tracking_EXPORT PlaybackTool: public ToolImpl
+class cxResource_EXPORT PlaybackTool: public ToolImpl
 {
 Q_OBJECT
 public:

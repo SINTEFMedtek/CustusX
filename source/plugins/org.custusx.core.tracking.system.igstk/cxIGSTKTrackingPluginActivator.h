@@ -29,55 +29,51 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXTOOLIMPL_H
-#define CXTOOLIMPL_H
 
-#include "cxResourceExport.h"
+#ifndef CXTRACKINGPLUGINACTIVATOR_H_
+#define CXTRACKINGPLUGINACTIVATOR_H_
 
-#include "cxTool.h"
+#include <ctkPluginActivator.h>
+#include "boost/shared_ptr.hpp"
 
 namespace cx
 {
-typedef boost::shared_ptr<class TrackingPositionFilter> TrackingPositionFilterPtr;
 
-/** \brief Common functionality for Tool subclasses
+/**
+ * \defgroup org_custusx_core_tracking_igstk
+ * \ingroup cx_plugins
  *
  *
- * \ingroup cx_resource_core_tool
- * \date 2014-02-21
- * \author christiana
+ * See \ref cx::TrackingImplService.
+ *
  */
-class cxResource_EXPORT ToolImpl : public Tool
+
+
+typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
+
+/**
+ * Activator for the IGSTK Tracking plugin
+ *
+ * \ingroup org_custusx_core_tracking_igstk
+ */
+class IGSTKTrackingPluginActivator :  public QObject, public ctkPluginActivator
 {
-	Q_OBJECT
+    Q_OBJECT
+    Q_INTERFACES(ctkPluginActivator)
+    Q_PLUGIN_METADATA(IID "org_custusx_core_tracking_igstk")
+
 public:
-	explicit ToolImpl(const QString& uid="", const QString& name ="");
-	virtual ~ToolImpl();
 
-	virtual TimedTransformMapPtr getPositionHistory();
-	virtual TimedTransformMap getSessionHistory(double startTime, double stopTime);
-	virtual Transform3D get_prMt() const;
+    IGSTKTrackingPluginActivator();
+    ~IGSTKTrackingPluginActivator();
 
-	virtual double getTooltipOffset() const;
-	virtual void setTooltipOffset(double val);
+    void start(ctkPluginContext* context);
+    void stop(ctkPluginContext* context);
 
-	virtual void resetTrackingPositionFilter(TrackingPositionFilterPtr filter);
-	virtual bool isNull() { return false; }
-
-    virtual void addXml(QDomNode& dataNode);
-    virtual void parseXml(QDomNode& dataNode);
-
-protected:
-	virtual void set_prMt(const Transform3D& prMt, double timestamp);
-	TimedTransformMapPtr mPositionHistory;
-	Transform3D m_prMt; ///< the transform from the tool to the patient reference
-	TrackingPositionFilterPtr mTrackingPositionFilter;
-private slots:
 private:
-	double mTooltipOffset;
+	RegisteredServicePtr mRegistration;
 };
-typedef boost::shared_ptr<ToolImpl> cxToolPtr;
 
 } // namespace cx
 
-#endif // CXTOOLIMPL_H
+#endif /* CXTRACKINGPLUGINACTIVATOR_H_ */

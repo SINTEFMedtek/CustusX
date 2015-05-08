@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXIGSTKTOOL_H_
 #define CXIGSTKTOOL_H_
 
-#include "org_custusx_core_tracking_Export.h"
+#include "org_custusx_core_tracking_system_igstk_Export.h"
 
 #include <QObject>
 #include "cxToolUsingIGSTK.h"
@@ -53,7 +53,7 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup org_custusx_core_tracking
+ * \addtogroup org_custusx_core_tracking_igstk
  * @{
  */
 
@@ -63,69 +63,24 @@ typedef boost::weak_ptr<IgstkTool> IgstkToolWeakPtr;
 
 /**
  * \brief  Class for controlling the igstk tracking (hardware) interface.
- * \ingroup org_custusx_core_tracking
+ * \ingroup org_custusx_core_tracking_igstk
  *
  * \date Mar 16, 2011
  * \author Janne Beate Bakeng, SINTEF
  * \author Christian Askeland, SINTEF
  */
-class org_custusx_core_tracking_EXPORT IgstkTool: public QObject
+class org_custusx_core_tracking_system_igstk_EXPORT IgstkTool: public QObject
 {
 Q_OBJECT
 
 public:
-	/**\brief A tools internal structure
-	 * \warning make sure you set all the members to an appropriate value.
-	 */
-	struct InternalStructure
-	{
-		Transform3D getCalibrationAsSSC() const;
-		void setCalibration(const Transform3D& cal);
-		void saveCalibrationToFile();
-		bool verify();
+    static igstk::Transform toIgstkTransform(Transform3D transform);
+    static Transform3D toTransform3D(igstk::Transform transform);
 
-		bool mIsReference;
-		bool mIsPointer;
-		bool mIsProbe;
-//    Tool::Type   mType;                  ///< the tools type
-		QString mName; ///< the tools name
-		QString mUid; ///< the tools unique id
-		std::vector<QString> mClinicalApplications; ///< the tools clinical application applications
-		TRACKING_SYSTEM mTrackerType; ///< what product the tool belongs to
-		QString mSROMFilename; ///< path to the tools SROM file
-		unsigned int mPortNumber; ///< the port number the tool is connected to
-		unsigned int mChannelNumber; ///< the channel the tool is connected to
-		std::map<int, Vector3D> mReferencePoints; ///< optional point on the frame, specifying a known reference point, 0,0,0 is default, in sensor space
-		bool mWireless; ///< whether or not the tool is wireless
-		bool m5DOF; ///< whether or not the tool have 5 DOF
-		igstk::Transform mCalibration; ///< transform read from mCalibrationFilename
-		QString mCalibrationFilename; ///< path to the tools calibration file
-		QString mGraphicsFileName; ///< path to this tools graphics file
-		QString mPictureFileName; ///< path to picture of the tool
-		QString mTransformSaveFileName; ///< path to where transforms should be saved
-		QString mLoggingFolderName; ///< path to where log should be saved
-		QString mInstrumentId; ///< The instruments id
-		QString mInstrumentScannerId; ///< The id of the ultrasound scanner if the instrument is a probe
-		InternalStructure() :
-						mIsReference(false), mIsPointer(false), mIsProbe(false),
-						//mType(Tool::TOOL_NONE),
-						mName(""), mUid(""),
-						mTrackerType(tsNONE), mSROMFilename(""),
-						mPortNumber(UINT_MAX), mChannelNumber(UINT_MAX),
-						mReferencePoints(), mWireless(true),
-						m5DOF(true), mCalibrationFilename(""),
-						mGraphicsFileName(""), mPictureFileName(""),
-						mTransformSaveFileName(""),
-						mLoggingFolderName(""), mInstrumentId(""),
-						mInstrumentScannerId("")
-		{}	///< sets up default values for all the members
-	};
-
-public:
-	IgstkTool(InternalStructure internalStructure);
+    IgstkTool(ToolFileParser::ToolInternalStructure internalStructure);
 	virtual ~IgstkTool();
 
-	InternalStructure getInternalStructure();
+    ToolFileParser::ToolInternalStructure getInternalStructure();
 	QString getUid();
 
 	igstk::TrackerTool::Pointer getPointer() const; ///< return a pointer to the internal tools base object
@@ -143,7 +98,7 @@ public:
 
 	void setReference(IgstkToolPtr);
 	void setTracker(TrackerPtr tracker);
-	void setCalibrationTransform(igstk::Transform calibration);
+    void setCalibrationTransform(Transform3D calibration);
 	void updateCalibration(const Transform3D& sMt);
 
 	void printInternalStructure();
@@ -164,7 +119,7 @@ private:
 	void internalVisible(bool value);
 	void addLogging(); ///< adds igstk logging to the internal igstk trackertool
 
-	InternalStructure mInternalStructure; ///< the structure that defines the tool characteristics
+    ToolFileParser::ToolInternalStructure mInternalStructure; ///< the structure that defines the tool characteristics
 	igstk::TrackerTool::Pointer mTool; ///< pointer to the base class of the igstk tool
 	IgstkToolWeakPtr mReferenceTool; ///< the tool that is used as a reference to the tracking system
 	TrackerWeakPtr mTracker; ///< the tracker this tool belongs to

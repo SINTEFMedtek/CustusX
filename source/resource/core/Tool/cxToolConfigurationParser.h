@@ -33,28 +33,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTOOLCONFIGURATIONPARSER_H_
 #define CXTOOLCONFIGURATIONPARSER_H_
 
-#include "org_custusx_core_tracking_Export.h"
+#include "cxResourceExport.h"
 
 #include <utility>
 #include <map>
 #include <vector>
 #include <QString>
 #include <QDomDocument>
-#include "cxToolUsingIGSTK.h"
-#include "cxIgstkTracker.h"
-#include "cxIgstkTool.h"
+#include "cxDefinitions.h"
+#include "cxToolFileParser.h"
 
 namespace cx
 {
 
 /**
  * \brief Class for reading the files defining a CustusX tool
- * \ingroup org_custusx_core_tracking
  *
  * \date 21. march 2011
  * \author Janne Beate Bakeng, SINTEF
  */
-class org_custusx_core_tracking_EXPORT ConfigurationFileParser
+class cxResource_EXPORT ConfigurationFileParser
 {
 public:
 	typedef std::pair<QString, bool> ToolFileAndReference;
@@ -72,7 +70,7 @@ public:
 	~ConfigurationFileParser();
 
 	QString getApplicationapplication();
-	std::vector<IgstkTracker::InternalStructure> getTrackers();
+    std::vector<ToolFileParser::TrackerInternalStructure> getTrackers();
 	std::vector<QString> getAbsoluteToolFilePaths();
 	QString getAbsoluteReferenceFilePath();
 
@@ -96,41 +94,6 @@ private:
 	const QString mTypeAttribute, mClinicalAppAttribute, mReferenceAttribute; ///< names of necessary attributes in the configuration file
 };
 
-/**
- * \brief Class for reading the files defining a CustusX tool
- * \ingroup org_custusx_core_tracking
- *
- * \date 21. march 2011
- * \author Janne Beate Bakeng, SINTEF
- */
-class org_custusx_core_tracking_EXPORT ToolFileParser
-{
-public:
-	ToolFileParser(QString absoluteToolFilePath, QString loggingFolder = "");
-	~ToolFileParser();
-
-	IgstkTool::InternalStructure getTool();
-
-	static QString getTemplatesAbsoluteFilePath();
-
-private:
-	QDomNode getToolNode(QString toolAbsoluteFilePath);
-	igstk::Transform readCalibrationFile(QString absoluteFilePath);
-
-	QString mToolFilePath; ///< absolutepath to the tool file
-	QString mLoggingFolder; ///< absolutepath to the logging folder
-
-	QDomDocument mToolDoc; ///< the tool xml document
-	const QString mToolTag, mToolTypeTag, mToolIdTag, mToolNameTag, mToolDescriptionTag, mToolManufacturerTag,
-					mToolClinicalAppTag, mToolGeoFileTag, mToolPicFileTag, mToolDocFileTag, mToolInstrumentTag,
-					mToolInstrumentTypeTag, mToolInstrumentIdTag, mToolInstrumentNameTag,
-					mToolInstrumentManufacturerTag, mToolInstrumentScannerIdTag, mToolInstrumentDescriptionTag,
-					mToolSensorTag, mToolSensorTypeTag, mToolSensorIdTag, mToolSensorNameTag, mToolSensorWirelessTag,
-					mToolSensorDOFTag, mToolSensorPortnumberTag, mToolSensorChannelnumberTag,
-					mToolSensorReferencePointTag, mToolSensorManufacturerTag, mToolSensorDescriptionTag,
-					mToolSensorRomFileTag, mToolCalibrationTag, mToolCalibrationFileTag;
-	///< names of necessary tags in the tool file
-};
 
 /**
  * @}
