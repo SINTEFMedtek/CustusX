@@ -68,12 +68,12 @@ VideoRecorder::~VideoRecorder()
 
 void VideoRecorder::startRecord()
 {
-	connect(mSource.get(), SIGNAL(newFrame()), this, SLOT(newFrameSlot()));
+	connect(mSource.get(), &VideoSource::newFrame, this, &VideoRecorder::newFrameSlot);
 }
 
 void VideoRecorder::stopRecord()
 {
-	disconnect(mSource.get(), SIGNAL(newFrame()), this, SLOT(newFrameSlot()));
+	disconnect(mSource.get(), &VideoSource::newFrame, this, &VideoRecorder::newFrameSlot);
 }
 
 void VideoRecorder::newFrameSlot()

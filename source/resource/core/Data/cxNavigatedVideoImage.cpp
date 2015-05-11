@@ -44,8 +44,7 @@ NavigatedVideoImage::NavigatedVideoImage(QString uid, VideoSourcePtr source, Sli
 {
 	mToolPositionX = -1;
 	mToolPositionY = -1;
-	connect(source.get(), SIGNAL(newFrame()),
-		this, SLOT(newFrame()));
+	connect(source.get(), &VideoSource::newFrame, this, &NavigatedVideoImage::newFrame);
 	getLookupTable2D()->setFullRangeWinLevel(source->getVtkImageData());
 }
 

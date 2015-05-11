@@ -35,9 +35,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxResourceWidgetsExport.h"
 
+#include <QWidget>
+#include <vector>
 #include "cxForwardDeclarations.h"
 #include "cxBoundingBox3D.h"
-#include <QWidget>
 
 namespace cx
 {
@@ -55,9 +56,7 @@ class cxResourceWidgets_EXPORT BoundingBoxWidget: public QWidget
 {
 Q_OBJECT
 public:
-	BoundingBoxWidget(QWidget* parent=NULL);
-//	void setValue(const DoubleBoundingBox3D& bb);
-//	void setRange(const DoubleBoundingBox3D& bb);
+	BoundingBoxWidget(QWidget* parent=NULL, QStringList inCaptions = QStringList());
 	void setValue(const DoubleBoundingBox3D& value, const DoubleBoundingBox3D& range);
 	DoubleBoundingBox3D getValue() const;
 	void showDim(int dim, bool visible);
@@ -65,7 +64,7 @@ public:
 signals:
 	void changed();
 private:
-	boost::array<SliderRangeGroupWidget*, 3> mRange;
+	std::vector<SliderRangeGroupWidget*> mRange;
 };
 
 }

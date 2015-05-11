@@ -64,7 +64,7 @@ TEST_CASE("TubeSegmentationFramework default preset works", "[integration][unsta
 	helper.testDefaultPreset();
 }
 
-TEST_CASE("TubeSegmentationFramework SyntheticVascusynthPreset works", "[integration][not_apple][broken][tsf]")
+TEST_CASE("TubeSegmentationFramework SyntheticVascusynthPreset works", "[integration][tsf]")
 {
 	TestTubeSegmentationFramework helper;
 	helper.testSyntheticVascusynthPreset();
