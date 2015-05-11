@@ -19,7 +19,6 @@ set(PLUGIN_SRCS
     trackingSystemIGSTK/cxIgstkTrackerThread.h
     trackingSystemIGSTK/cxIgstkTrackerThread.cpp
     trackingSystemIGSTK/cxTrackingSystemIGSTKService.cpp
-    trackingSystemIGSTK/cxIGSTKToolFileParser.cpp
 )
 
 # Files which should be processed by Qts moc
@@ -31,7 +30,6 @@ set(PLUGIN_MOC_SRCS
     trackingSystemIGSTK/cxIgstkTrackerThread.h
     trackingSystemIGSTK/cxTrackingSystemIGSTKService.h
     trackingSystemIGSTK/cxToolUsingIGSTK.h
-    trackingSystemIGSTK/cxIGSTKToolFileParser.cpp
 )
 
 # Qt Designer files which should be processed by Qts uic

@@ -121,6 +121,7 @@ public:
 
 protected:
     QDomNode getToolNode(QString toolAbsoluteFilePath);
+    Transform3D readCalibrationFile(QString absoluteFilePath);
 
     QString mToolFilePath; ///< absolutepath to the tool file
     QString mLoggingFolder; ///< absolutepath to the logging folder
@@ -135,6 +136,7 @@ protected:
                     mToolSensorReferencePointTag, mToolSensorManufacturerTag, mToolSensorDescriptionTag,
                     mToolSensorRomFileTag, mToolCalibrationTag, mToolCalibrationFileTag;
     ///< names of necessary tags in the tool file
+
 };
 }//namespace
 
