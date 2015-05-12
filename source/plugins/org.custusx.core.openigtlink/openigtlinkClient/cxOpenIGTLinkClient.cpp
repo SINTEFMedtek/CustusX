@@ -249,6 +249,11 @@ bool OpenIGTLinkClient::receiveBody(const igtl::MessageBase::Pointer header)
         if(!this->receive<igtl::StringMessage>(header))
             return false;
     }
+    else if(strcmp(header->GetDeviceType(), "CX_US_ST") == 0)
+    {
+        if(!this->receive<IGTLinkUSStatusMessage>(header))
+            return false;
+    }
     else
     {
         igtl::MessageBase::Pointer body = igtl::MessageBase::New();

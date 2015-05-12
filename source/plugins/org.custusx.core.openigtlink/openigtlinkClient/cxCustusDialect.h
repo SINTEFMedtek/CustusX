@@ -30,8 +30,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-
-#ifndef CXCUSTUSDIALEC_H
+#ifndef CXCUSTUSDIALECT_H
 #define CXCUSTUSDIALECT_H
 
 
@@ -46,8 +45,13 @@ class org_custusx_core_openigtlink_EXPORT CustusDialect : public Dialect
 {
 public:
     virtual QString getName() const;
+    virtual bool doCRC() const;
 
     virtual void translate(const igtl::ImageMessage::Pointer body);
+    virtual void translate(const IGTLinkUSStatusMessage::Pointer body);
+
+private:
+    IGTLinkUSStatusMessage::Pointer mUnsentUSStatusMessage; ///< received message, will be added to queue when next image arrives
 };
 
 } //namespace cx

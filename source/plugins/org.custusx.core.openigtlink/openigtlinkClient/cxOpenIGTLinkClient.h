@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "igtlImageMessage.h"
 #include "igtlStatusMessage.h"
 #include "igtlStringMessage.h"
+#include "cxIGTLinkUSStatusMessage.h"
 
 #include "cxSocket.h"
 #include "cxTransform3D.h"
@@ -116,7 +117,7 @@ private:
         if(!this->socketReceive(body->GetPackBodyPointer(), body->GetPackBodySize()))
             return false;
 
-        int c = body->Unpack(1);
+        int c = body->Unpack(mDialect->doCRC());
         this->checkCRC(c);
         if (c & igtl::MessageHeader::UNPACK_BODY)
         {
@@ -124,7 +125,7 @@ private:
         }
         else
         {
-            CX_LOG_CHANNEL_ERROR(CX_OPENIGTLINK_CHANNEL_NAME) << "Could not unpack the body.";
+            CX_LOG_CHANNEL_ERROR(CX_OPENIGTLINK_CHANNEL_NAME) << "Could not unpack the body of type: " << body->GetDeviceType();
             return false;
         }
         return true;

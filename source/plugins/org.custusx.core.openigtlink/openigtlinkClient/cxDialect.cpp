@@ -19,6 +19,11 @@ QString Dialect::getName() const
     return "Basic";
 }
 
+bool Dialect::doCRC() const
+{
+    return true;
+}
+
 void Dialect::translate(const igtl::TransformMessage::Pointer body)
 {
     QString deviceName = body->GetDeviceName();
@@ -51,6 +56,11 @@ void Dialect::translate(const igtl::StringMessage::Pointer body)
     QString string = converter.decode(body);
     //This was spamming the console
     //CX_LOG_CHANNEL_INFO(CX_OPENIGTLINK_CHANNEL_NAME) << string;
+}
+
+void cx::Dialect::translate(const IGTLinkUSStatusMessage::Pointer body)
+{
+
 }
 
 } //namespace cx

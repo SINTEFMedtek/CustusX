@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "igtlImageMessage.h"
 #include "igtlStatusMessage.h"
 #include "igtlStringMessage.h"
+#include "cxIGTLinkUSStatusMessage.h"
 
 #include "cxTransform3D.h"
 #include "cxImage.h"
@@ -65,11 +66,13 @@ public:
     explicit Dialect(QObject *parent = 0);
 
     virtual QString getName() const;
+    virtual bool doCRC() const;
 
     virtual void translate(const igtl::TransformMessage::Pointer body);
     virtual void translate(const igtl::ImageMessage::Pointer body);
     virtual void translate(const igtl::StatusMessage::Pointer body);
     virtual void translate(const igtl::StringMessage::Pointer body);
+    virtual void translate(const IGTLinkUSStatusMessage::Pointer body);
 
 signals:
     void transform(QString devicename, Transform3D transform, double timestamp);
