@@ -32,9 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "catch.hpp"
 
-
-#include "cxtestTestToolMesh.h"
-#include "cxReporter.h"
 #include <QStringList>
 #include "cxEnumConverter.h"
 #include "cxDefinitions.h"
@@ -47,31 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cxtest
 {
 
-#ifdef CX_CUSTUS_SINTEF
-TEST_CASE("Sonowand planning navigator STL file are readable", "[unit][tool]")
-{
-	cx::Reporter::initialize();
-
-	TestToolMesh meshTester;
-	meshTester.setToolPath("Neurology/SW-Invite/SW-Planning-Navigator_01-117-0329_POLARIS/");
-	REQUIRE(meshTester.canLoadMesh("01-117-0329_Planning-Navigator.stl"));
-
-	cx::Reporter::shutdown();
-}
-
-TEST_CASE("Sonowand intraop navigator STL file are readable", "[unit][tool]")
-{
-	cx::Reporter::initialize();
-
-	TestToolMesh meshTester;
-	meshTester.setToolPath("Neurology/SW-Invite/SW-Intraoperative-Navigator-07-081-0223_POLARIS/");
-	CHECK(meshTester.canLoadMesh("SW-Intraop-Navigator.stl"));
-
-	cx::Reporter::shutdown();
-}
-#endif
-
-TEST_CASE("Tool xml files use tracking systems supported by ToolManagerUsingIGSTK", "[unit][tool][xml]")
+TEST_CASE("Tool xml files use tracking systems supported by ToolManagerUsingIGSTK", "[unit][tool][xml][org.custus.core.tracking.system.igstk]")
 {
 	cx::TrackingSystemServicePtr system(new cx::TrackingSystemIGSTKService());
 //	cx::TrackingServiceOldPtr trackingService = cx::ToolManagerUsingIGSTK::create();
@@ -89,7 +62,7 @@ TEST_CASE("Tool xml files use tracking systems supported by ToolManagerUsingIGST
 	}
 }
 
-TEST_CASE("Tool configuration files", "[unit][tool][xml]")
+TEST_CASE("Tool configuration files", "[unit][tool][xml][org.custus.core.tracking.system.igstk]")
 {
 	cx::TrackingSystemServicePtr system(new cx::TrackingSystemIGSTKService());
 //	cx::TrackingServiceOldPtr trackingService = cx::ToolManagerUsingIGSTK::create();

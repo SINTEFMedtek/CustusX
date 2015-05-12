@@ -35,20 +35,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxtestTestToolMesh.h"
 #include "cxReporter.h"
-#include <QStringList>
-#include "cxEnumConverter.h"
-#include "cxDefinitions.h"
-#include "cxTrackerConfiguration.h"
-#include "cxTrackingSystemIGSTKService.h"
-#include "cxFileHelpers.h"
-#include "cxDataLocations.h"
-#include "cxConfig.h"
 
 namespace cxtest
 {
 
 #ifdef CX_CUSTUS_SINTEF
-TEST_CASE("Sonowand planning navigator STL file are readable", "[unit][tool]")
+TEST_CASE("Sonowand planning navigator STL file are readable", "[unit][tool][org.custus.core.tracking]")
 {
 	cx::Reporter::initialize();
 
@@ -59,7 +51,7 @@ TEST_CASE("Sonowand planning navigator STL file are readable", "[unit][tool]")
 	cx::Reporter::shutdown();
 }
 
-TEST_CASE("Sonowand intraop navigator STL file are readable", "[unit][tool]")
+TEST_CASE("Sonowand intraop navigator STL file are readable", "[unit][tool][org.custus.core.tracking]")
 {
 	cx::Reporter::initialize();
 
@@ -70,79 +62,5 @@ TEST_CASE("Sonowand intraop navigator STL file are readable", "[unit][tool]")
 	cx::Reporter::shutdown();
 }
 #endif
-
-TEST_CASE("Tool xml files use tracking systems supported by ToolManagerUsingIGSTK", "[unit][tool][xml]")
-{
-	cx::TrackingSystemServicePtr system(new cx::TrackingSystemIGSTKService());
-//	cx::TrackingServiceOldPtr trackingService = cx::ToolManagerUsingIGSTK::create();
-	cx::TrackerConfigurationPtr config = system->getConfiguration();
-	QStringList trackingSystems = config->getSupportedTrackingSystems();
-
-	//Verify tool uses supported tracking system
-	foreach(QString filename, config->getAllTools())
-	{
-		QString toolTrackingSystem = config->getTool(filename).mTrackingSystem;
-
-		INFO("Filename: " + filename.toStdString());
-		INFO("Tracking system: " + toolTrackingSystem.toStdString());
-		REQUIRE(trackingSystems.contains(toolTrackingSystem, Qt::CaseInsensitive));
-	}
-}
-
-TEST_CASE("Tool configuration files", "[unit][tool][xml]")
-{
-	cx::TrackingSystemServicePtr system(new cx::TrackingSystemIGSTKService());
-//	cx::TrackingServiceOldPtr trackingService = cx::ToolManagerUsingIGSTK::create();
-	cx::TrackerConfigurationPtr config = system->getConfiguration();
-
-	QStringList configurations = config->getAllConfigurations();
-
-	foreach(QString filename, configurations)
-	{
-		INFO("Tool config file: " + filename.toStdString());
-		cx::TrackerConfiguration::Configuration configData = config->getConfiguration(filename);
-		QStringList selectedTools = configData.mTools;
-		foreach(QString toolFileName, selectedTools)
-		{
-			QFileInfo file(toolFileName);
-			INFO("Tool file: " + toolFileName.toStdString());
-			CHECK(file.exists());
-			if(file.exists())
-				REQUIRE(configData.mTrackingSystem == config->getTool(toolFileName).mTrackingSystem);
-		}
-	}
-}
-
-TEST_CASE("Tool xml files got existing image files", "[unit][tool][xml]")
-{
-	cx::TrackingSystemServicePtr system(new cx::TrackingSystemIGSTKService());
-//	cx::TrackingServiceOldPtr trackingService = cx::ToolManagerUsingIGSTK::create();
-	cx::TrackerConfigurationPtr config = system->getConfiguration();
-
-	foreach(QString filename, config->getAllTools())
-	{
-		QString imageFileName = config->getTool(filename).mPictureFilename;
-		INFO("Tool file: " + filename);
-		if(!imageFileName.isEmpty())
-		{
-			QFileInfo imageFile(imageFileName);
-			INFO("Image file: " + imageFileName);
-			REQUIRE(imageFile.exists());
-		}
-	}
-}
-
-TEST_CASE("Verify tool xml files", "[unit][tool][xml]")
-{
-	cx::TrackingSystemServicePtr system(new cx::TrackingSystemIGSTKService());
-//	cx::TrackingServiceOldPtr trackingService = cx::ToolManagerUsingIGSTK::create();
-	cx::TrackerConfigurationPtr config = system->getConfiguration();
-
-	foreach(QString filename, config->getAllTools())
-	{
-		INFO("Tool file is faulty: " + filename.toStdString());
-		REQUIRE(config->verifyTool(filename));
-	}
-}
 
 } //namespace cxtest

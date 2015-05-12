@@ -59,5 +59,5 @@ target_include_directories(org_custusx_core_tracking
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-#add_subdirectory(testing)
+add_subdirectory(testing)
 

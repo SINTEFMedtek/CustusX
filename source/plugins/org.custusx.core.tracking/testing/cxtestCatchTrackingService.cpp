@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDummyToolManager.h"
 
 
-TEST_CASE("DummyToolManager setup/shutdown works multiple times", "[unit]")
+TEST_CASE("DummyToolManager setup/shutdown works multiple times", "[unit][org.custus.core.tracking]")
 {
     for (unsigned i=0; i<2; ++i)
     {
