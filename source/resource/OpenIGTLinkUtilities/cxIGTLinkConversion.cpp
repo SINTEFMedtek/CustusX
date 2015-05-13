@@ -56,6 +56,16 @@ void GetIdentityMatrix(igtl::Matrix4x4& matrix)
 namespace cx
 {
 //--------------------------------Standard opentiglink messages---------------------------------------
+
+igtl::StringMessage::Pointer IGTLinkConversion::encode(QString msg)
+{
+    igtl::StringMessage::Pointer retval;
+    retval = igtl::StringMessage::New();
+    retval->SetDeviceName("CustusX");
+    retval->SetString(msg.toStdString().c_str());
+    return retval;
+}
+
 QString IGTLinkConversion::decode(igtl::StringMessage::Pointer msg)
 {
     QString devicename(msg->GetDeviceName());

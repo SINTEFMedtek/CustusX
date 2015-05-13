@@ -113,21 +113,19 @@ void OpenIGTLinkClient::setDialect(QString dialectname)
 
 }
 
+/*
 void OpenIGTLinkClient::sendStringMessage(QString command)
 {
     QMutexLocker locker(&mMutex);
 
-    //TODO move to the converter
-    igtl::StringMessage::Pointer stringMsg;
-    stringMsg = igtl::StringMessage::New();
-    stringMsg->SetDeviceName("CustusXQuery");
-
+    OpenIGTLinkConversion converter;
+    igtl::StringMessage::Pointer stringMsg = converter.encode(command);
     CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "Sending string: " << command;
-	stringMsg->SetString(command.toStdString().c_str());
     stringMsg->Pack();
 
     mSocket->write(reinterpret_cast<char*>(stringMsg->GetPackPointer()), stringMsg->GetPackSize());
 }
+*/
 
 void OpenIGTLinkClient::setIpAndPort(QString ip, int port)
 {
@@ -149,8 +147,8 @@ void OpenIGTLinkClient::requestDisconnect()
 void OpenIGTLinkClient::internalConnected()
 {
     CX_LOG_CHANNEL_SUCCESS(CX_OPENIGTLINK_CHANNEL_NAME) << "Connected to "  << mIp << ":" << mPort;
-    if(mDialect->getName() == "PlusServer")
-        this->queryServer();
+    //if(mDialect->getName() == "PlusServer")
+    //    this->queryServer();
     emit connected();
 }
 
@@ -186,6 +184,7 @@ void OpenIGTLinkClient::internalDataAvailable()
     }
 }
 
+/*
 void OpenIGTLinkClient::queryServer()
 {
     QString command = "<Command Name=\"RequestChannelIds\" />";
@@ -197,7 +196,7 @@ void OpenIGTLinkClient::queryServer()
     command = "<Command Name=\"SaveConfig\" />";
     this->sendStringMessage(command);
 }
-
+*/
 bool OpenIGTLinkClient::socketIsConnected()
 {
     return mSocket->isConnected();
@@ -229,33 +228,35 @@ bool OpenIGTLinkClient::receiveHeader(const igtl::MessageHeader::Pointer header)
 
 bool OpenIGTLinkClient::receiveBody(const igtl::MessageBase::Pointer header)
 {
-    if(strcmp(header->GetDeviceType(), "TRANSFORM") == 0)
+    const char* type = header->GetDeviceType();
+    if(strcmp(type, "TRANSFORM") == 0)
     {
         if(!this->receive<igtl::TransformMessage>(header))
             return false;
     }
-    else if(strcmp(header->GetDeviceType(), "IMAGE") == 0)
+    else if(strcmp(type, "IMAGE") == 0)
     {
         if(!this->receive<igtl::ImageMessage>(header))
             return false;
     }
-    else if(strcmp(header->GetDeviceType(), "STATUS") == 0)
+    else if(strcmp(type, "STATUS") == 0)
     {
         if(!this->receive<igtl::StatusMessage>(header))
             return false;
     }
-    else if(strcmp(header->GetDeviceType(), "STRING") == 0)
+    else if(strcmp(type, "STRING") == 0)
     {
         if(!this->receive<igtl::StringMessage>(header))
             return false;
     }
-    else if(strcmp(header->GetDeviceType(), "CX_US_ST") == 0)
+    else if(strcmp(type, "CX_US_ST") == 0)
     {
         if(!this->receive<IGTLinkUSStatusMessage>(header))
             return false;
     }
     else
     {
+        CX_LOG_CHANNEL_WARNING(CX_OPENIGTLINK_CHANNEL_NAME) << "Skipping message of type " << type;
         igtl::MessageBase::Pointer body = igtl::MessageBase::New();
         body->SetMessageHeader(header);
         mSocket->skip(body->GetBodySizeToRead());

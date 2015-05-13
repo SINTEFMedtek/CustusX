@@ -60,8 +60,9 @@ class cxOpenIGTLinkUtilities_EXPORT IGTLinkConversion
 {
 public:
     //Standard openigtlink messages
-    QString decode(igtl::StatusMessage::Pointer msg);
+    igtl::StringMessage::Pointer encode(QString msg);
     QString decode(igtl::StringMessage::Pointer msg);
+    QString decode(igtl::StatusMessage::Pointer msg);
     ImagePtr decode(igtl::ImageMessage::Pointer msg);
     Transform3D decode_image_matrix(igtl::ImageMessage::Pointer msg);
     Transform3D decode(igtl::TransformMessage::Pointer msg);

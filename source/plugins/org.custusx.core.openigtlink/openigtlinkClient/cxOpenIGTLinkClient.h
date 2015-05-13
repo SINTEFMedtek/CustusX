@@ -76,7 +76,7 @@ public:
     QStringList getAvailableDialects() const;
     void setDialect(QString dialectname);
 
-    void sendStringMessage(QString command);
+    //void sendStringMessage(QString command);
 
 public slots:
     void setIpAndPort(QString ip, int port=18944); //not threadsafe
@@ -99,7 +99,7 @@ private slots:
     void internalDataAvailable();
 
 private:
-    void queryServer();
+    //void queryServer();
     bool socketIsConnected();
     bool enoughBytesAvailableOnSocket(int bytes) const;
     bool receiveHeader(const igtl::MessageHeader::Pointer header) const;
