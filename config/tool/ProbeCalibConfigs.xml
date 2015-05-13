@@ -1769,6 +1769,21 @@
                 </Config>
             </RTSource>
         </USProbe>
+        <USProbe>
+            <Name>hypofyse</Name>
+            <Type>LinearArray</Type>
+            <DefaultRTSource>Digital</DefaultRTSource>
+            <Notes/>
+            <RTSource>
+                <Name>Digital</Name>
+                <TemporalCalibration>213</TemporalCalibration>
+                <DefaultConfig>Digital</DefaultConfig>
+                <Config>
+                    <ID>Digital</ID>
+                    <Name>Digital streaming</Name>
+                </Config>
+            </RTSource>
+        </USProbe>
     </USScanner>
     <USScanner>
         <Name>Vivid E9</Name>
