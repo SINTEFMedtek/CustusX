@@ -76,6 +76,10 @@ void ReconstructionExecuter::startReconstruction(ReconstructionMethodService* al
 	if (!fileData.isValid())
 		return;
 
+	//Don't create an extra B-Mode volume if input data is 8 bit
+	if (fileData.is8bit())
+		createBModeWhenAngio = false;
+
 	mCores = this->createCores(algo, par, createBModeWhenAngio);
 	if (mCores.empty())
 		reportWarning("Failed to start reconstruction");

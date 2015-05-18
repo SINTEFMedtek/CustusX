@@ -45,7 +45,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkImageChangeInformation.h>
 #include <vtkImageClip.h>
 #include <vtkImageIterator.h>
-#include <vtkImageShiftScale.h>
 #include <vtkPiecewiseFunction.h>
 #include <vtkColorTransferFunction.h>
 #include "cxImageTF3D.h"

@@ -54,7 +54,7 @@ namespace cx
 VideoConnection::VideoConnection(VideoServiceBackendPtr backend)
 {
 	mBackend = backend;
-	mUnsusedProbeDataVector.clear();
+	mUnusedProbeDataVector.clear();
 
 	connect(mBackend->getToolManager().get(), &TrackingService::stateChanged, this, &VideoConnection::connectVideoToProbe);
 	connect(mBackend->getToolManager().get(), SIGNAL(activeToolChanged(QString)), this, SLOT(connectVideoToProbe()));
@@ -129,9 +129,9 @@ void VideoConnection::runDirectLinkClient(StreamerService* service)
 	mStreamerInterface.reset(service, null_deleter());//Can't allow boost to delete service
 	mClient = new ImageReceiverThread(mStreamerInterface);
 
-	connect(mClient, SIGNAL(imageReceived()), this, SLOT(imageReceivedSlot())); // thread-bridging connection
-	connect(mClient, SIGNAL(sonixStatusReceived()), this, SLOT(statusReceivedSlot())); // thread-bridging connection
-	connect(mClient, SIGNAL(fps(QString, double)), this, SLOT(fpsSlot(QString, double))); // thread-bridging connection
+	connect(mClient.data(), &ImageReceiverThread::imageReceived, this, &VideoConnection::imageReceivedSlot); // thread-bridging connection
+	connect(mClient.data(), &ImageReceiverThread::sonixStatusReceived, this, &VideoConnection::statusReceivedSlot); // thread-bridging connection
+	connect(mClient.data(), &ImageReceiverThread::fps, this, &VideoConnection::fpsSlot); // thread-bridging connection
 
 	mThread = new EventProcessingThread;
 	mThread->setObjectName("org.custusx.core.video.imagereceiver");
@@ -169,9 +169,9 @@ void VideoConnection::stopClient()
 
 	if (mClient)
 	{
-		disconnect(mClient, SIGNAL(imageReceived()), this, SLOT(imageReceivedSlot())); // thread-bridging connection
-		disconnect(mClient, SIGNAL(sonixStatusReceived()), this, SLOT(statusReceivedSlot())); // thread-bridging connection
-		disconnect(mClient, SIGNAL(fps(QString, double)), this, SLOT(fpsSlot(QString, double))); // thread-bridging connection
+		disconnect(mClient.data(), &ImageReceiverThread::imageReceived, this, &VideoConnection::imageReceivedSlot); // thread-bridging connection
+		disconnect(mClient.data(), &ImageReceiverThread::sonixStatusReceived, this, &VideoConnection::statusReceivedSlot); // thread-bridging connection
+		disconnect(mClient.data(), &ImageReceiverThread::fps, this, &VideoConnection::fpsSlot); // thread-bridging connection
 
 		QMetaObject::invokeMethod(mClient, "shutdown", Qt::QueuedConnection);
 
@@ -216,9 +216,12 @@ void VideoConnection::onDisconnected()
 void VideoConnection::useUnusedProbeDataSlot()
 {
 	disconnect(mBackend->getToolManager().get(), &TrackingService::stateChanged, this, &VideoConnection::useUnusedProbeDataSlot);
-	for (std::vector<ProbeDefinitionPtr>::const_iterator citer = mUnsusedProbeDataVector.begin(); citer != mUnsusedProbeDataVector.end(); ++citer)
-		this->updateStatus(*citer);
-	mUnsusedProbeDataVector.clear();
+
+	std::vector<ProbeDefinitionPtr> unusedProbeDataVector = mUnusedProbeDataVector;
+	mUnusedProbeDataVector.clear();
+
+	for (unsigned i = 0;  i < unusedProbeDataVector.size(); ++i)
+		this->updateStatus(unusedProbeDataVector[i]);
 }
 
 void VideoConnection::resetProbe()
@@ -245,9 +248,9 @@ void VideoConnection::updateStatus(ProbeDefinitionPtr msg)
 	if (!tool || !tool->getProbe())
 	{
 		//Don't throw away the ProbeData. Save it until it can be used
-		if (mUnsusedProbeDataVector.empty())
+		if (mUnusedProbeDataVector.empty())
 			connect(mBackend->getToolManager().get(), &TrackingService::stateChanged, this, &VideoConnection::useUnusedProbeDataSlot);
-		mUnsusedProbeDataVector.push_back(msg);
+		mUnusedProbeDataVector.push_back(msg);
 		return;
 	}
 	ProbePtr probe = tool->getProbe();

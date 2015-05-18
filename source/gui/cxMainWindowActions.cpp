@@ -123,7 +123,6 @@ void MainWindowActions::createTrackingActions()
 											  &MainWindowActions::toggleTrackingSlot);
 
 	connect(trackingService().get(), &TrackingService::stateChanged, this, &MainWindowActions::updateTrackingActionSlot);
-	connect(trackingService().get(), &TrackingService::stateChanged, this, &MainWindowActions::updateTrackingActionSlot);
 	this->updateTrackingActionSlot();
 }
 
@@ -400,14 +399,7 @@ void MainWindowActions::updateStreamingActionSlot()
 
 void MainWindowActions::centerToImageCenterSlot()
 {
-	NavigationPtr nav = viewService()->getNavigation();
-
-	if (patientService()->getActiveImage())
-		nav->centerToData(patientService()->getActiveImage());
-	else if (!viewService()->groupCount())
-		nav->centerToView(viewService()->getGroup(0)->getData());
-	else
-		nav->centerToGlobalDataCenter();
+	viewService()->getNavigation()->centerToDataInActiveViewGroup();
 }
 
 void MainWindowActions::centerToTooltipSlot()

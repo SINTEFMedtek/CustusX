@@ -212,7 +212,7 @@ ProbeXmlConfigParser::Configuration ProbeXmlConfigParserImpl::getConfiguration(Q
   QList<QDomNode> currentRtSourceNodeList = this->getRTSourceNodes(scanner, probe, rtsource);
   if(currentRtSourceNodeList.isEmpty())
   {
-	cx::reportWarning(QString("No rtsources found (Missing temporal calibraion) [%1/%2/%3]").arg(scanner).arg(probe).arg(rtsource));
+	cx::reportWarning(QString("No rtsources found (Missing temporal calibration) [%1/%2/%3]").arg(scanner).arg(probe).arg(rtsource));
     return retval;
   }
   QDomNode rtSourceNode = currentRtSourceNodeList.first();

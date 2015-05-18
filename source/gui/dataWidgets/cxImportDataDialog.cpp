@@ -101,10 +101,7 @@ ImportDataDialog::ImportDataDialog(PatientModelServicePtr patientModelService, Q
   mTransformFromParentFrameCheckBox->setChecked(false);
 
   mConvertToUnsignedCheckBox = new QCheckBox("Convert to unsigned", this);
-  mConvertToUnsignedCheckBox->setToolTip(""
-	  "Convert imported data set to unsigned values.\n"
-	  "This is recommended on Linux because the 2D overlay\n"
-	  "renderer only handles unsigned.");
+  mConvertToUnsignedCheckBox->setToolTip("Convert imported data set to unsigned values.");
   mConvertToUnsignedCheckBox->setChecked(false);
 
   layout->addWidget(mNiftiFormatCheckBox);
@@ -179,20 +176,12 @@ void ImportDataDialog::importDataSlot()
   mNiftiFormatCheckBox->setEnabled(mPatientModelService->getData<Mesh>(mData->getUid())!=0);
 
   mConvertToUnsignedCheckBox->setEnabled(false);
-//  ImagePtr image = boost::dynamic_pointer_cast<Image>(mData);
   if (image && image->getBaseVtkImageData())
   {
-	  vtkImageDataPtr img = image->getBaseVtkImageData();
+//	  vtkImageDataPtr img = image->getBaseVtkImageData();
 //	  std::cout << "type " << img->GetScalarTypeAsString() << " -- " << img->GetScalarType() << std::endl;
 //	  std::cout << "range " << img->GetScalarTypeMin() << " -- " << img->GetScalarTypeMax() << std::endl;
 	  mConvertToUnsignedCheckBox->setEnabled( (image!=0) && (image->getBaseVtkImageData()->GetScalarTypeMin()<0) );
-#ifndef __APPLE__
-#ifndef WIN32
-	  // i.e. LINUX:
-	  if (mConvertToUnsignedCheckBox->isEnabled())
-		  mConvertToUnsignedCheckBox->setChecked(true);
-#endif // WIN32
-#endif // __APPLE__
   }
 }
 
@@ -235,13 +224,13 @@ void ImportDataDialog::acceptedSlot()
 	this->convertFromNifti1Coordinates();
 	this->convertToUnsigned();
 
+	mPatientModelService->autoSave();
+	viewService()->autoShowData(mData);
 	this->finishedSlot();
 }
 
 void ImportDataDialog::finishedSlot()
 {
-	mPatientModelService->autoSave();
-	viewService()->autoShowData(mData);
 }
 
 /** According to

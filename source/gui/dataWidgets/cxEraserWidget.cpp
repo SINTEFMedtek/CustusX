@@ -58,6 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxViewService.h"
 #include "cxViewGroupData.h"
+#include "cxReporter.h"
 
 namespace cx
 {
@@ -258,18 +259,24 @@ void EraserWidget::removeSlot()
 	ImagePtr image = patientService()->getActiveImage();
 	vtkImageDataPtr img = image->getBaseVtkImageData();
 
-	if (img->GetScalarType()==VTK_CHAR)
+	int vtkScalarType = img->GetScalarType();
+
+	if (vtkScalarType==VTK_CHAR)
 		this->eraseVolume(static_cast<char*> (img->GetScalarPointer()), VTK_CHAR_MIN);
-	if (img->GetScalarType()==VTK_UNSIGNED_CHAR)
+	else if (vtkScalarType==VTK_UNSIGNED_CHAR)
 		this->eraseVolume(static_cast<unsigned char*> (img->GetScalarPointer()), VTK_UNSIGNED_CHAR_MIN);
-	if (img->GetScalarType()==VTK_UNSIGNED_SHORT)
+	else if (vtkScalarType==VTK_SIGNED_CHAR)
+		this->eraseVolume(static_cast<signed char*> (img->GetScalarPointer()), VTK_SIGNED_CHAR_MIN);
+	else if (vtkScalarType==VTK_UNSIGNED_SHORT)
 		this->eraseVolume(static_cast<unsigned short*> (img->GetScalarPointer()), VTK_UNSIGNED_SHORT_MIN);
-	if (img->GetScalarType()==VTK_SHORT)
+	else if (vtkScalarType==VTK_SHORT)
 		this->eraseVolume(static_cast<short*> (img->GetScalarPointer()), VTK_SHORT_MIN);
-	if (img->GetScalarType()==VTK_UNSIGNED_INT)
+	else if (vtkScalarType==VTK_UNSIGNED_INT)
 		this->eraseVolume(static_cast<unsigned int*> (img->GetScalarPointer()), VTK_UNSIGNED_INT_MIN);
-	if (img->GetScalarType()==VTK_INT)
+	else if (vtkScalarType==VTK_INT)
 		this->eraseVolume(static_cast<int*> (img->GetScalarPointer()), VTK_INT_MIN);
+	else
+		reportError(QString("Unknown VTK ScalarType: %1").arg(vtkScalarType));
 
 	ImageLUT2DPtr tf2D = image->getLookupTable2D();
 	ImageTF3DPtr tf3D = image->getTransferFunctions3D();

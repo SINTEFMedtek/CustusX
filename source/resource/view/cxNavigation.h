@@ -37,11 +37,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDefinitions.h"
 #include "cxForwardDeclarations.h"
 #include "cxVector3D.h"
+#include "cxViewGroupData.h"
 
 namespace cx
 {
 typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
-typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
+typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 
 /** Functions for navigating in the visualization scene(s).
  *
@@ -51,20 +52,19 @@ class cxResourceVisualization_EXPORT Navigation
 {
 public:
 	enum VIEW_TYPE { v2D = 0x01, v3D=0x02, vBOTH=0x03 };
-	Navigation(CoreServicesPtr backend, CameraControlPtr camera3D=CameraControlPtr());
-	void centerToData(DataPtr image);
-	void centerToView(const std::vector<DataPtr>& images);
-	void centerToGlobalDataCenter();
+	Navigation(VisServicesPtr services, CameraControlPtr camera3D=CameraControlPtr());
 	void centerToTooltip();
 	void centerToPosition(Vector3D p_r, QFlags<VIEW_TYPE> viewType=vBOTH);
 
+	void centerToDataInActiveViewGroup(DataViewProperties properties=DataViewProperties::createFull());
+	void centerToDataInViewGroup(ViewGroupDataPtr group, DataViewProperties properties=DataViewProperties::createFull());
 private:
 	void moveManualToolToPosition(Vector3D& p_r);
-	Vector3D findViewCenter(const std::vector<DataPtr>& images);
-	Vector3D findGlobalDataCenter();
-	Vector3D findDataCenter(std::vector<DataPtr> data);
+	Vector3D findDataCenter(const std::vector<DataPtr> &data);
+	void centerToData(DataPtr image);
+	void centerToData(const std::vector<DataPtr>& images);
 
-	CoreServicesPtr mBackend;
+	VisServicesPtr mServices;
 	CameraControlPtr mCamera3D;
 };
 

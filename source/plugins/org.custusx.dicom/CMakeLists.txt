@@ -71,6 +71,7 @@ set(PLUGIN_target_libraries
     CTKDICOMWidgets
     CTKDICOMCore
     cxPluginUtilities
+    cxResourceVisualization
     ${CTK_EXTERNAL_LIBRARIES}
 )
 

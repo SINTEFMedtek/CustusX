@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSettings.h"
 #include "cxTrackingService.h"
 #include "cxVideoService.h"
-#include "cxCoreServices.h"
+#include "cxVisServices.h"
 #include "vtkRenderWindowInteractor.h"
 #include "cxTool.h"
 #include "cxVideoSource.h"
@@ -56,8 +56,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ViewWrapperVideo::ViewWrapperVideo(ViewPtr view, CoreServicesPtr backend) :
-	ViewWrapper(backend)
+ViewWrapperVideo::ViewWrapperVideo(ViewPtr view, VisServicesPtr services) :
+	ViewWrapper(services)
 {
 	mView = view;
 	this->connectContextMenu(mView);
@@ -68,9 +68,9 @@ ViewWrapperVideo::ViewWrapperVideo(ViewPtr view, CoreServicesPtr backend) :
 	double clipDepth = 1.0; // 1mm depth, i.e. all 3D props rendered outside this range is not shown.
 	mView->getRenderer()->GetActiveCamera()->SetClippingRange(-clipDepth / 2.0, clipDepth / 2.0);
 
-	connect(mBackend->getToolManager().get(), &TrackingService::stateChanged, this, &ViewWrapperVideo::connectStream);
-	connect(mBackend->getVideoService().get(), SIGNAL(activeVideoSourceChanged()), this, SLOT(connectStream()));
-	connect(mBackend->getToolManager().get(), SIGNAL(activeToolChanged(QString)), this, SLOT(connectStream()));
+	connect(mServices->getToolManager().get(), &TrackingService::stateChanged, this, &ViewWrapperVideo::connectStream);
+	connect(mServices->getVideoService().get(), SIGNAL(activeVideoSourceChanged()), this, SLOT(connectStream()));
+	connect(mServices->getToolManager().get(), SIGNAL(activeToolChanged(QString)), this, SLOT(connectStream()));
 
 	addReps();
 
@@ -106,7 +106,7 @@ void ViewWrapperVideo::appendToContextMenu(QMenu& contextMenu)
 
 //	QActionGroup sourceGroup = new QActionGroup(&contextMenu);
 	QMenu* sourceMenu = new QMenu("Video Source", &contextMenu);
-	std::vector<VideoSourcePtr> sources = mBackend->getVideoService()->getVideoSources();
+	std::vector<VideoSourcePtr> sources = mServices->getVideoService()->getVideoSources();
 	this->addStreamAction("active", sourceMenu);
 	for (unsigned i=0; i<sources.size(); ++i)
 		this->addStreamAction(sources[i]->getUid(), sourceMenu);
@@ -174,7 +174,7 @@ void ViewWrapperVideo::connectStream()
 		uid = source->getUid();
 
 	ToolPtr newTool;
-	ToolPtr tool = mBackend->getToolManager()->getFirstProbe();
+	ToolPtr tool = mServices->getToolManager()->getFirstProbe();
 	if (tool && tool->getProbe())
 	{
 		if (tool->getProbe()->getAvailableVideoSources().count(uid))
@@ -195,9 +195,9 @@ void ViewWrapperVideo::connectStream()
 VideoSourcePtr ViewWrapperVideo::getSourceFromService(QString uid)
 {
 	if (uid=="active")
-		return mBackend->getVideoService()->getActiveVideoSource();
+		return mServices->getVideoService()->getActiveVideoSource();
 
-	std::vector<VideoSourcePtr> source = mBackend->getVideoService()->getVideoSources();
+	std::vector<VideoSourcePtr> source = mServices->getVideoService()->getVideoSources();
 
 	for (unsigned i=0; i< source.size(); ++i)
 	{
@@ -216,12 +216,12 @@ void ViewWrapperVideo::setupRep(VideoSourcePtr source, ToolPtr tool)
 		return;
 	if (mSource)
 	{
-		disconnect(mSource.get(), SIGNAL(newFrame()), this, SLOT(updateSlot()));
+		disconnect(mSource.get(), &VideoSource::newFrame, this, &ViewWrapperVideo::updateSlot);
 	}
 	mSource = source;
 	if (mSource)
 	{
-		connect(mSource.get(), SIGNAL(newFrame()), this, SLOT(updateSlot()));
+		connect(mSource.get(), &VideoSource::newFrame, this, &ViewWrapperVideo::updateSlot);
 	}
 
 	if (!mSource)

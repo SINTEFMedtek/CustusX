@@ -53,6 +53,7 @@ GeneralTab::GeneralTab(VisualizationServicePtr visualizationService, PatientMode
 	mVisualizationService(visualizationService),
 	mPatientModelService(patientModelService)
 {
+	this->setObjectName("preferences_general_widget");
 	mPatientDataFolderComboBox = NULL;
 	mVLCPathComboBox = NULL;
 	mToolConfigFolderComboBox = NULL;
