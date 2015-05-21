@@ -110,7 +110,7 @@ public:
 	virtual void setPlaybackMode(PlaybackTimePtr controller) = 0;
 	virtual std::vector<TimelineEvent> getPlaybackEvents() = 0;
 
-	virtual StreamerService *getStreamerService(QString service) = 0;
+	virtual StreamerService *getStreamerService(QString uid);
 	virtual QList<StreamerService *> getStreamerServices() = 0;
 
 	virtual bool isNull() = 0;

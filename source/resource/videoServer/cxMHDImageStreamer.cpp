@@ -276,6 +276,15 @@ void DummyImageStreamer::createTestDataSource(vtkImageDataPtr source)
 	std::cout << "DummyImageStreamer: Initialized secondary data with uid=" << mSecondaryDataSource.mRawUid << std::endl;
 }
 
+void DummyImageStreamer::initialize(StringMap arguments)
+{
+	CommandLineStreamer::initialize(arguments);
+
+	QString filename = arguments["filename"];
+	bool secondary = arguments.count("secondary") ? true : false;
+	this->initialize(filename, secondary);
+}
+
 void DummyImageStreamer::initialize(QString filename, bool secondaryStream, bool sendonce)
 {
 	mUseSecondaryStream = secondaryStream;

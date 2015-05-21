@@ -64,10 +64,8 @@ public:
 	virtual bool startStreaming(SenderPtr sender);
 	virtual void stopStreaming();
 
-	virtual QString getType();
 
 private slots:
-//	virtual void myStreamSlot();
 	virtual void streamSlot() {}
 private slots:
 	void readyReadSlot();
