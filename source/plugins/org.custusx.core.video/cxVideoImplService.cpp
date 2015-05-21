@@ -94,11 +94,6 @@ VideoImplService::~VideoImplService()
 	mVideoConnection.reset();
 }
 
-StreamerService *VideoImplService::getStreamerService(QString service)
-{
-	return mStreamerServiceListener->getService(service);
-}
-
 QList<StreamerService *> VideoImplService::getStreamerServices()
 {
 	return mStreamerServiceListener->getServices();
@@ -283,7 +278,7 @@ void VideoImplService::initServiceListener()
 void VideoImplService::onStreamerServiceAdded(StreamerService* service)
 {
 	if (mConnectionMethod.isEmpty())
-		mConnectionMethod = service->getName();
+		mConnectionMethod = service->getType();
 
 	emit StreamerServiceAdded(service);
 }

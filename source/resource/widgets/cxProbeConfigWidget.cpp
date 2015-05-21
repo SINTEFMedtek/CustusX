@@ -83,7 +83,7 @@ ProbeConfigWidget::ProbeConfigWidget(VisServicesPtr services, QWidget* parent) :
 	QStringList bbCaptions = QStringList() << "X (pixels)" << "Y (pixels)";
 	mBBWidget = new BoundingBoxWidget(this, bbCaptions);
 	cropLayout->addWidget(mBBWidget);
-	connect(mBBWidget, SIGNAL(changed()), this, SLOT(guiImageSettingsChanged()));
+	connect(mBBWidget, &BoundingBoxWidget::changed, this, &ProbeConfigWidget::guiImageSettingsChanged);
 
 	// create sector group
 	QGroupBox* sectorGroupBox = new QGroupBox("Sector");

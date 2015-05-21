@@ -216,11 +216,6 @@ void LocalServerStreamer::stopStreaming()
 		mLocalVideoServerProcess->getProcess()->close();
 }
 
-QString LocalServerStreamer::getType()
-{
-	return "LocalServer";
-}
-
 bool LocalServerStreamer::localVideoServerIsRunning()
 {
 	if (!mLocalVideoServerProcess->getProcess())

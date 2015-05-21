@@ -82,12 +82,6 @@ std::vector<TimelineEvent> VideoServiceNull::getPlaybackEvents()
 	return std::vector<TimelineEvent>();
 }
 
-StreamerService *VideoServiceNull::getStreamerService(QString service)
-{
-	printWarning();
-	return NULL;
-}
-
 QList<StreamerService *> VideoServiceNull::getStreamerServices()
 {
 	printWarning();

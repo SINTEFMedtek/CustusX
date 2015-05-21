@@ -87,7 +87,7 @@ bool ImageReceiverThread::attemptInitialize()
 	XmlOptionFile xmlFile = profile()->getXmlSettings().descend("video");
 	QDomElement element = xmlFile.getElement("video");
 	mImageStreamer = mStreamerInterface->createStreamer(element);
-	report(QString("Starting streamer: [%1]").arg(mImageStreamer->getType()));
+	report(QString("Starting streamer: [%1]").arg(this->hostDescription()));
 
 	if(!mImageStreamer)
 	{
@@ -110,9 +110,9 @@ void ImageReceiverThread::shutdown()
 {
 	if (mImageStreamer)
 	{
-		report(QString("Stopping streamer: [%1]...").arg(mImageStreamer->getType()));
+		report(QString("Stopping streamer: [%1]...").arg(this->hostDescription()));
 		mImageStreamer->stopStreaming();
-		report(QString("Stopped streamer: [%1]").arg(mImageStreamer->getType()));
+		report(QString("Stopped streamer: [%1]").arg(this->hostDescription()));
 		mImageStreamer.reset();
 		mSender.reset();
 	}

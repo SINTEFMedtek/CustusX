@@ -139,11 +139,6 @@ void IGTLinkClientStreamer::stopStreaming()
 	mSender.reset();
 }
 
-QString IGTLinkClientStreamer::getType()
-{
-	return "IGTLinkClient";
-}
-
 QString IGTLinkClientStreamer::hostDescription() const
 {
 	return mAddress + ":" + qstring_cast(mPort);

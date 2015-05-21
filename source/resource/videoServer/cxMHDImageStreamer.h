@@ -95,7 +95,7 @@ public:
  * \author Christian Askeland, SINTEF
  * \date Jun 21, 2011
  */
-class cxGrabber_EXPORT DummyImageStreamer: public Streamer
+class cxGrabber_EXPORT DummyImageStreamer: public CommandLineStreamer
 {
 Q_OBJECT
 
@@ -104,6 +104,7 @@ public:
 	virtual ~DummyImageStreamer(){};
 
 	virtual void initialize(QString filename, bool secondaryStream, bool sendonce = false);
+	virtual void initialize(StringMap arguments);
 	virtual bool startStreaming(SenderPtr sender);
 	virtual void stopStreaming();
 

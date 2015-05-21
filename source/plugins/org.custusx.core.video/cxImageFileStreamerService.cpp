@@ -49,7 +49,7 @@ namespace cx
 
 QString ImageFileStreamerService::getName()
 {
-	return "ImageFile";
+	return "3D Image File";
 }
 
 QString ImageFileStreamerService::getType() const

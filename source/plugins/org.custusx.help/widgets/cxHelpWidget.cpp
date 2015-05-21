@@ -66,7 +66,7 @@ void HelpWidget::setup()
 	if (mVerticalLayout)
 		return;
 
-	this->setToolTip("Context-sensitive and browser help");
+//	this->setToolTip("Context-sensitive and browser help");
 	mVerticalLayout = new QVBoxLayout(this);
 	mVerticalLayout->setMargin(0);
 	mVerticalLayout->setSpacing(0);
