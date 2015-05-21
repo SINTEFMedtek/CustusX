@@ -154,7 +154,8 @@ void StateServiceImpl::fillDefaultSettings()
 	this->fillDefault("TrackingPositionFilter/enabled", false);
 
 	this->fillDefault("renderingInterval", 33);
-	this->fillDefault("backgroundColor", QColor("black"));
+//	this->fillDefault("backgroundColor", QColor("black"));
+	this->fillDefault("backgroundColor", QColor(30,60,70)); // a dark, grey-blue hue
 	this->fillDefault("vlcPath", vlc()->getVLCPath());
 	this->fillDefault("globalPatientNumber", 1);
 	this->fillDefault("Ultrasound/acquisitionName", "US-Acq");
