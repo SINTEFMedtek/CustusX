@@ -51,7 +51,7 @@ BoundingBoxWidget::BoundingBoxWidget(QWidget* parent, QStringList captions) :
 	{
 		DoublePairPropertyPtr property = DoublePairProperty::initialize(captions[i], captions[i], captions[i], DoubleRange(-2000, 2000, 1), 0);
 		mRange.push_back(new SliderRangeGroupWidget(this, property));
-		connect(mRange[i], SIGNAL(valueChanged(double,double)), this, SIGNAL(changed()));
+		connect(mRange[i], &SliderRangeGroupWidget::valueChanged, this, &BoundingBoxWidget::changed);
 		layout->addWidget(mRange[i]);
 		if(i >= captions.size())
 			mRange[i]->setVisible(false);
@@ -78,11 +78,11 @@ DoubleBoundingBox3D BoundingBoxWidget::getValue() const
 {
 	//Init with zeroes
 	std::vector< std::pair<double, double> > values;
-	for(unsigned i; i < 3; ++i)
+	for(unsigned i = 0; i < 3; ++i)
 		values.push_back(std::make_pair(0, 0));
 
 	//Overwrite the zeroes with values (depends on the dim we are using)
-	for(unsigned i; i < mRange.size(); ++i)
+	for(unsigned i = 0; i < mRange.size(); ++i)
 		values[i] = mRange[i]->getValue();
 
 	DoubleBoundingBox3D box(
