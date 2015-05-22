@@ -233,7 +233,7 @@ void StatusBar::onRecordFullscreenChanged()
 	if (vlc()->isRecording())
 	{
 		label->setMargin(0);
-		int size = this->height()*0.75;
+		int size = this->height()*0.75; // fit within statusbar
 		QPixmap map;
 		map.load(":/icons/Video-icon_green.png");
 		label->setPixmap(map.scaled(size, size, Qt::KeepAspectRatio));
@@ -253,11 +253,6 @@ void StatusBar::showMessageSlot(Message message)
 			.arg(qstring_cast(message.getMessageLevel()))
 			.arg(message.getText());
 
-//	this->showMessage(message.getPrintableMessage(), message.getTimeout());
-//	mMessageLevelLabel->setPixmap(QPixmap(":/images/go-home.png"));
-//	mMessageLevelLabel->setPixmap(QPixmap(":/icons/screenshot-screen.png"));
-//	mMessageLevelLabel->setIcon(QIcon(":/icons/screenshot-screen.png"));
-//	mMessageLevelLabel->show();
 	this->showMessage(text, message.getTimeout());
 }
 

@@ -49,7 +49,7 @@ StreamerService* StreamerServiceUtilities::getStreamerServiceFromType(QString na
 	for(int i = 0; i < serviceList.size(); ++i)
 	{
 		StreamerService* service = serviceList.at(i);
-		if (service->getName() == name)
+		if (service->getType() == name)
 			return service;
 	}
 
