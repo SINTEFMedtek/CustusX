@@ -95,7 +95,7 @@ public:
     virtual void setVisible(bool vis);
 
 private slots:
-    void toolTransformAndTimestampSlot(Transform3D matrix, double timestamp); ///< timestamp is in milliseconds
+    void toolTransformAndTimestampSlot(Transform3D prMs, double timestamp); ///< timestamp is in milliseconds
     void calculateTpsSlot();
     void toolVisibleSlot(bool);
 

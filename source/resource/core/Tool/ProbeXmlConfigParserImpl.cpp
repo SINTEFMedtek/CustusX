@@ -192,7 +192,7 @@ ProbeXmlConfigParser::Configuration ProbeXmlConfigParserImpl::getConfiguration(Q
   QList<QDomNode> currentScannerNodeList = this->getScannerNodes(scanner);
   if(currentScannerNodeList.isEmpty())
   {
-	  cx::reportWarning(QString("No scanners found [%1]").arg(scanner));
+      //cx::reportWarning(QString("No scanners found [%1]").arg(scanner));
 	  return retval;
   }
   QDomNode scannerNode = currentScannerNodeList.first();

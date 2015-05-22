@@ -164,18 +164,20 @@ void OpenIGTLinkTool::setCalibration_sMt(Transform3D calibration)
     }
 }
 
-void OpenIGTLinkTool::toolTransformAndTimestampSlot(Transform3D matrix, double timestamp)
+void OpenIGTLinkTool::toolTransformAndTimestampSlot(Transform3D prMs, double timestamp)
 {
     mTimestamp = timestamp;// /1000000;
-    Transform3D prMt_filtered = matrix;
+    Transform3D prMt = prMs * m_sMt_calibration;
+   // Transform3D prMt_filtered = prMs;
+     Transform3D prMt_filtered = prMt;
 
     if (mTrackingPositionFilter)
     {
-        mTrackingPositionFilter->addPosition(matrix, mTimestamp);
+        mTrackingPositionFilter->addPosition(prMt, mTimestamp);
         prMt_filtered = mTrackingPositionFilter->getFilteredPosition();
     }
 
-    (*mPositionHistory)[mTimestamp] = matrix; // store original in history
+    (*mPositionHistory)[mTimestamp] = prMt; // store original in history
     m_prMt = prMt_filtered;
     emit toolTransformAndTimestamp(m_prMt, mTimestamp);
 }
