@@ -518,6 +518,7 @@ void MainWindow::createToolBars()
 
 	mScreenshotToolBar = this->registerToolBar("Screenshot");
 	mScreenshotToolBar->addAction(mActions->getAction("ShootScreen"));
+	mScreenshotToolBar->addAction(mActions->getAction("RecordFullscreen"));
 
 	QToolBar* camera3DViewToolBar = this->registerToolBar("Camera 3D Views");
 	camera3DViewToolBar->addActions(mStandard3DViewActions->actions());
