@@ -527,7 +527,9 @@ void MainWindow::createToolBars()
 	samplerWidgetToolBar->addWidget(new SamplerWidget(this));
 
 	QToolBar* toolOffsetToolBar = this->registerToolBar("Tool Offset");
-	toolOffsetToolBar->addWidget(createDataWidget(mServices->visualizationService, mServices->patientModelService, this, DoublePropertyActiveToolOffset::create()));
+	SpinBoxAndSliderGroupWidget* offsetWidget = new SpinBoxAndSliderGroupWidget(this, DoublePropertyActiveToolOffset::create());
+	offsetWidget->showLabel(false);
+	toolOffsetToolBar->addWidget(offsetWidget);
 
 	QToolBar* helpToolBar = this->registerToolBar("Help");
 	helpToolBar->addAction(mShowContextSensitiveHelpAction);
