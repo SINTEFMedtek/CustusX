@@ -23,7 +23,9 @@ void PlusDialect::translate(const igtl::ImageMessage::Pointer body)
     int y = 1;
     int z = 2;
 
+    //Snakke med Daniel!
     //There seems to be a bug in the received images spacing from the plusserver
+    /*
     float wrong_spacing[3];
     body->GetSpacing(wrong_spacing);
     float right_spacing[3];
@@ -31,17 +33,8 @@ void PlusDialect::translate(const igtl::ImageMessage::Pointer body)
     right_spacing[y] = wrong_spacing[z];
     right_spacing[z] = 1;
     body->SetSpacing(right_spacing);
+    */
 
-    //IMAGE
-    IGTLinkConversion converter;
-    ImagePtr theImage = converter.decode(body);
-    emit image(theImage);
-
-    //CALIBRATION
-    Transform3D sMt = converter.decode_image_matrix(body);
-    emit calibration(mProbeToTrackerName, sMt);
-
-    //PROBEDEFINITION
     int dimensions_p[3];
     body->GetDimensions(dimensions_p);
     float spacing[3];
@@ -51,6 +44,26 @@ void PlusDialect::translate(const igtl::ImageMessage::Pointer body)
     extent_p[y] = dimensions_p[y]-1;
     extent_p[z] = dimensions_p[z]-1;
 
+    //IMAGE
+    IGTLinkConversion converter;
+    ImagePtr theImage = converter.decode(body);
+    emit image(theImage);
+
+    //CALIBRATION
+    //OpenIGTLink defines the origo of the image in the center(c)¸
+    //because of this we first need to translate the calibration matrix
+    //into our images origo (v) which i is upper left
+    Transform3D vMc = Transform3D::Identity();
+    //vMc.translation() = Eigen::Vector3d(-dimensions_p[x]*spacing[x]*0.5*0, dimensions_p[y]*spacing[y]*0.5, -dimensions_p[z]*spacing[z]*0.5*0);
+    vMc.translation() = Eigen::Vector3d(0, dimensions_p[y]*spacing[y]*0.5, 0);
+    CX_LOG_DEBUG() << "translated vMc " << vMc;
+    Transform3D sMt = converter.decode_image_matrix(body);
+    CX_LOG_DEBUG() << "sMt before translation " << sMt;
+    sMt = vMc*sMt;
+    CX_LOG_DEBUG() << "translated sMt " << sMt;
+    emit calibration(mProbeToTrackerName, sMt);
+
+    //PROBEDEFINITION
     ProbeDefinitionPtr definition(new ProbeDefinition);
     definition->setUseDigitalVideo(true);
     definition->setType(ProbeDefinition::tLINEAR);
