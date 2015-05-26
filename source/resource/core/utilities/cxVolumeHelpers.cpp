@@ -320,11 +320,11 @@ void printDisplayFriendlyInfo(std::map<std::string, std::string> map)
 
 int calculateNumVoxelsWithMaxValue(ImagePtr image)
 {
-	return static_cast<int*>(image->getHistogram()->GetOutput()->GetScalarPointer())[image->getRange()];
+	return static_cast<int*>(image->getHistogram()->GetOutput()->GetScalarPointer(image->getRange(), 0, 0))[0];
 }
 int calculateNumVoxelsWithMinValue(ImagePtr image)
 {
-	return static_cast<int*>(image->getHistogram()->GetOutput()->GetScalarPointer())[0];
+	return static_cast<int*>(image->getHistogram()->GetOutput()->GetScalarPointer(0,0,0))[0];
 }
 
 DoubleBoundingBox3D findEnclosingBoundingBox(std::vector<DataPtr> data, Transform3D qMr)

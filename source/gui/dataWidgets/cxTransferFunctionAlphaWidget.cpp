@@ -293,14 +293,14 @@ void TransferFunctionAlphaWidget::paintHistogram(QPainter& painter)
 
 	int x = 0;
 	int y = 0;
-	double barHeightMult = (this->height() - mBorder*2)
-	/ log(histogram->GetOutput()->GetPointData()->GetScalars()->GetRange()[1]+1);
+	double numElementsInBinWithMostElements = log(histogram->GetOutput()->GetPointData()->GetScalars()->GetRange()[1]+1);
+	double barHeightMult = (this->height() - mBorder*2) / numElementsInBinWithMostElements;
 
 	double posMult = (this->width() - mBorder*2) / double(histogramSize);
 	for (int i = mImage->getMin(); i <= mImage->getMax(); i++)
 	{
 	  x = ((i- mImage->getMin()) * posMult); //Offset with min value
-	  y = log(double(static_cast<int*>(histogram->GetOutput()->GetScalarPointer())[i - mImage->getMin()]+1)) * barHeightMult;
+	  y = log(double(static_cast<int*>(histogram->GetOutput()->GetScalarPointer(i - mImage->getMin(), 0, 0))[0]+1)) * barHeightMult;
 	  if (y > 0)
 	  {
 		painter.drawLine(x + mBorder, height() - mBorder,
