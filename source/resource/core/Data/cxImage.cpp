@@ -289,6 +289,7 @@ void Image::setVtkImageData(const vtkImageDataPtr& data, bool resetTransferFunct
 {
 	mBaseImageData = data;
 	mBaseGrayScaleImageData = NULL;
+	mHistogramPtr = NULL;
 
 	if (resetTransferFunctions)
 		this->resetTransferFunctions();
