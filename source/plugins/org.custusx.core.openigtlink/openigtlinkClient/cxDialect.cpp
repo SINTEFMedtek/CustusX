@@ -35,6 +35,9 @@ void Dialect::translate(const igtl::TransformMessage::Pointer body)
     body->GetTimeStamp(ts);
     double timestamp_ms = ts->GetTimeStamp()*1000; //since epoch
 
+    CX_LOG_DEBUG() << "device: " << deviceName;
+    CX_LOG_DEBUG() << transform3D;
+
     emit transform(deviceName, transform3D, timestamp_ms);
 }
 

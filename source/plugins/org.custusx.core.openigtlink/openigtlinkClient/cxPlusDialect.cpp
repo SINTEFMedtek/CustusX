@@ -76,6 +76,7 @@ void PlusDialect::translate(const igtl::ImageMessage::Pointer body)
     // Take 3
 
     Transform3D iMt;
+    iMt.matrix() = Eigen::Matrix4d::Constant(0);
     iMt(2, 0) = 1;
     iMt(0, 1) = 1;
     iMt(1, 2) = 1;
