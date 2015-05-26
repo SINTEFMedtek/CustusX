@@ -107,6 +107,7 @@ private slots:
   void showMessageSlot(Message message); ///< prints the incomming message to the statusbar
   void updateToolButtons();
   void resetToolManagerConnection();
+  void onRecordFullscreenChanged();
 
 private:
   void activateTool(QString uid);
@@ -114,6 +115,7 @@ private:
 
   QLabel* mRenderingFpsLabel; ///< Label for showing rendering FPS
   QLabel* mGrabbingInfoLabel; ///< Label for showing info about the grabber
+  QLabel* mRecordFullscreenLabel; ///< record screen status
   QLabel* mTpsLabel; ///< Label for showing TPS
 //  QLabel* mMessageLevelLabel;
   QToolButton* mMessageLevelLabel;

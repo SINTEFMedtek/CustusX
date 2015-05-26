@@ -161,6 +161,7 @@ public:
 	void addToGridLayout(QGridLayout* gridLayout = 0, int row = 0);
 	void build(QGridLayout* gridLayout = 0, int row = 0);
 
+	void showLabel(bool on);
 
 private slots:
 	void textEditedSlot();

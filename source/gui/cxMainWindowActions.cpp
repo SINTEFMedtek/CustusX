@@ -71,10 +71,12 @@ void MainWindowActions::createActions()
 					   QKeySequence("Ctrl+Shift+f"), "Save an image of the application to the patient folder.",
 					   &MainWindowActions::shootWindow);
 
-	this->createAction("RecordFullscreen", "Record Fullscreen",
+	mRecordFullscreenStreamingAction = this->createAction("RecordFullscreen", "Record Fullscreen",
 					   QIcon(),
 					   QKeySequence("F8"), "Record a video of the full screen.",
 					   &MainWindowActions::recordFullscreen);
+	connect(vlc(), &VLCRecorder::stateChanged, this, &MainWindowActions::updateRecordFullscreenActionSlot);
+	this->updateRecordFullscreenActionSlot();
 
 	mShowPointPickerAction = this->createAction("ShowPointPicker", "Point Picker",
 												QIcon(":/icons/point_picker.png"),
@@ -345,6 +347,23 @@ void MainWindowActions::recordFullscreen()
 		vlc()->stopRecording();
 	else
 		vlc()->startRecording(path);
+}
+
+void MainWindowActions::updateRecordFullscreenActionSlot()
+{
+	mRecordFullscreenStreamingAction->setCheckable(true);
+	mRecordFullscreenStreamingAction->blockSignals(true);
+	mRecordFullscreenStreamingAction->setChecked(vlc()->isRecording());
+	mRecordFullscreenStreamingAction->blockSignals(false);
+
+	if(vlc()->isRecording())
+	{
+		mRecordFullscreenStreamingAction->setIcon(QIcon(":/icons/Video-icon_green.png"));
+	}
+	else
+	{
+		mRecordFullscreenStreamingAction->setIcon(QIcon(":/icons/Video-icon_gray.png"));
+	}
 
 }
 

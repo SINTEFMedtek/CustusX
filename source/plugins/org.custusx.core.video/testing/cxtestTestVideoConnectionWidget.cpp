@@ -91,7 +91,7 @@ void TestVideoConnectionWidget::setupWidgetToRunStreamer(QString filename)
 	mServices->patientModelService->setActiveImage(image);
 	mServices->patientModelService->insertData(image);
 
-	QString method = "ImageFile";
+	QString method = "image_file_streamer";
 	mConnectionSelector->setValue(method);
 	this->getOption("filename", method)->setValueFromVariant(filename);
 	this->getOption("runlocalserver", method)->setValueFromVariant(false);

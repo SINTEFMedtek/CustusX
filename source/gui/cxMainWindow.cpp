@@ -518,6 +518,7 @@ void MainWindow::createToolBars()
 
 	mScreenshotToolBar = this->registerToolBar("Screenshot");
 	mScreenshotToolBar->addAction(mActions->getAction("ShootScreen"));
+	mScreenshotToolBar->addAction(mActions->getAction("RecordFullscreen"));
 
 	QToolBar* camera3DViewToolBar = this->registerToolBar("Camera 3D Views");
 	camera3DViewToolBar->addActions(mStandard3DViewActions->actions());
@@ -526,7 +527,9 @@ void MainWindow::createToolBars()
 	samplerWidgetToolBar->addWidget(new SamplerWidget(this));
 
 	QToolBar* toolOffsetToolBar = this->registerToolBar("Tool Offset");
-	toolOffsetToolBar->addWidget(createDataWidget(mServices->visualizationService, mServices->patientModelService, this, DoublePropertyActiveToolOffset::create()));
+	SpinBoxAndSliderGroupWidget* offsetWidget = new SpinBoxAndSliderGroupWidget(this, DoublePropertyActiveToolOffset::create());
+	offsetWidget->showLabel(false);
+	toolOffsetToolBar->addWidget(offsetWidget);
 
 	QToolBar* helpToolBar = this->registerToolBar("Help");
 	helpToolBar->addAction(mShowContextSensitiveHelpAction);

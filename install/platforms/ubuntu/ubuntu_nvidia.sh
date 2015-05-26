@@ -22,7 +22,7 @@ sudo apt-get -y upgrade
 
 # install nvidia-modprobe in order to load the opencl driver automatically
 # https://devtalk.nvidia.com/default/topic/734098/linux/-boinc-ubuntu-nvidia-no-usable-gpus-found-/
-sudo apt-get -y nvidia-modprobe
+sudo apt-get -y install nvidia-modprobe
 
 
 

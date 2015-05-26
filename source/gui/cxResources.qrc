@@ -103,5 +103,8 @@
         <file>icons/open_icon_library/layer-raise-3.png</file>
         <file>icons/open_icon_library/help-contents-5.png</file>
         <file>icons/open_icon_library/applications-internet.png</file>
+        <file>icons/Video-icon_green.png</file>
+        <file>icons/Video-icon_red.png</file>
+        <file>icons/Video-icon_gray.png</file>
     </qresource>
 </RCC>

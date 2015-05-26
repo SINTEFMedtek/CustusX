@@ -121,19 +121,19 @@ void VideoConnectionWidget::onServiceAdded(StreamerService* service)
 	QWidget* widget = this->createStreamerWidget(service);
 	QWidget* serviceWidget = this->wrapVerticalStretch(widget);
 	mStackedWidget->addWidget(serviceWidget);
-	mStreamerServiceWidgets[service->getName()] = serviceWidget;
+	mStreamerServiceWidgets[service->getType()] = serviceWidget;
 
-	this->addServiceToSelector(service->getName());
+	this->addServiceToSelector(service);
 }
 
 QWidget* VideoConnectionWidget::createStreamerWidget(StreamerService* service)
 {
-	QString serviceName = service->getName();
+//	QString serviceName = service->getName();
 	QDomElement element = mOptions.getElement("video");
 	std::vector<PropertyPtr> adapters = service->getSettings(element);
 
 	OptionsWidget* widget = new OptionsWidget(mServices->visualizationService, mServices->patientModelService, this);
-	widget->setOptions(serviceName, adapters, false);
+	widget->setOptions(service->getType(), adapters, false);
 	widget->setObjectName(service->getType());
 	widget->setFocusPolicy(Qt::StrongFocus); // needed for help system: focus is used to display help text
 
@@ -144,23 +144,29 @@ QWidget* VideoConnectionWidget::createStreamerWidget(StreamerService* service)
 
 void VideoConnectionWidget::onServiceRemoved(StreamerService *service)
 {
-	this->removeServiceFromSelector(service->getName());
-	this->removeServiceWidget(service->getName());
+	this->removeServiceFromSelector(service);
+	this->removeServiceWidget(service->getType());
 }
 
-void VideoConnectionWidget::addServiceToSelector(QString name)
+void VideoConnectionWidget::addServiceToSelector(StreamerService *service)
 {
 	QStringList range = mConnectionSelector->getValueRange();
-	range.append(name);
+	std::map<QString, QString> display = mConnectionSelector->getDisplayNames();
+
+	range.append(service->getType());
 	range.removeDuplicates();
+	display[service->getType()] = service->getName();
+
 	mConnectionSelector->setValueRange(range);
+	mConnectionSelector->setDisplayNames(display);
 }
 
-void VideoConnectionWidget::removeServiceFromSelector(QString name)
+void VideoConnectionWidget::removeServiceFromSelector(StreamerService *service)
 {
 	QStringList range = mConnectionSelector->getValueRange();
-	int index = range.indexOf(name);
-	if(mConnectionSelector->getValue() == name)
+
+	int index = range.indexOf(service->getType());
+	if(mConnectionSelector->getValue() == service->getType())
 		mConnectionSelector->setValue(range[0]);
 	range.removeAt(index);
 	mConnectionSelector->setValueRange(range);
@@ -206,8 +212,9 @@ QWidget* VideoConnectionWidget::wrapVerticalStretch(QWidget* input)
 void VideoConnectionWidget::selectGuiForConnectionMethodSlot()
 {
 	QString name = mConnectionSelector->getValue();
-	//Need to set connection method in VideoConnectionManager before calling useDirectLink(), useLocalServer() and useRemoteServer()
-	mServices->videoService->setConnectionMethod(mConnectionSelector->getValue());
+	//Need to set connection method in VideoConnectionManager before calling
+	//useDirectLink(), useLocalServer() and useRemoteServer()
+	mServices->videoService->setConnectionMethod(name);
 
 	QWidget* serviceWidget = mStreamerServiceWidgets[name];
 	if(serviceWidget)
