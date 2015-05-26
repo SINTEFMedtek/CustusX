@@ -50,17 +50,48 @@ void PlusDialect::translate(const igtl::ImageMessage::Pointer body)
     emit image(theImage);
 
     //CALIBRATION
-    //OpenIGTLink defines the origo of the image in the center(c)¸
+    //OpenIGTLink defines the origo of the image in the center(i)¸
     //because of this we first need to translate the calibration matrix
     //into our images origo (v) which i is upper left
-    Transform3D vMc = Transform3D::Identity();
-    //vMc.translation() = Eigen::Vector3d(-dimensions_p[x]*spacing[x]*0.5*0, dimensions_p[y]*spacing[y]*0.5, -dimensions_p[z]*spacing[z]*0.5*0);
-    vMc.translation() = Eigen::Vector3d(0, dimensions_p[y]*spacing[y]*0.5, 0);
-    CX_LOG_DEBUG() << "translated vMc " << vMc;
-    Transform3D sMt = converter.decode_image_matrix(body);
-    CX_LOG_DEBUG() << "sMt before translation " << sMt;
-    sMt = vMc*sMt;
-    CX_LOG_DEBUG() << "translated sMt " << sMt;
+    //TAKE 1
+    /*
+    Transform3D vMi = Transform3D::Identity();
+    vMi.translation() = Eigen::Vector3d(-dimensions_p[x]*spacing[x]*0.5, -dimensions_p[y]*spacing[y]*0.5, -dimensions_p[z]*spacing[z]*0.5);
+
+    Transform3D vMt = Transform3D::Identity();
+    vMt.translation() = Eigen::Vector3d(dimensions_p[x]*spacing[x]/2, 0, 0);
+
+    Transform3D iMv = converter.decode_image_matrix(body);
+    Transform3D sMt = vMi*iMv*vMt;
+    */
+
+    //Take 2
+    /*
+    Transform3D sMi = converter.decode_image_matrix(body);
+    Transform3D iMt = Transform3D::Identity();
+    iMt.translation() = Eigen::Vector3d(0, -dimensions_p[y]*spacing[y], 0);
+    Transform3D sMt = sMi*iMt;
+    */
+
+    // Take 3
+
+    Transform3D iMt;
+    iMt(2, 0) = 1;
+    iMt(0, 1) = 1;
+    iMt(1, 2) = 1;
+    iMt(1, 3) = -dimensions_p[y]*spacing[y]*0.5; // Dependent on depth, changes if depth is changed on scanner
+    iMt(3,3) = 1;
+    Transform3D sMi = converter.decode_image_matrix(body);
+    Transform3D sMt = sMi * iMt;
+
+    //Transform3D uMt = Transform3D::Identity();
+    //uMt.translation() = Eigen::Vector3d(dimensions_p[x]*spacing[x]*0.5, 0, 0);
+    //CX_LOG_DEBUG() << "translated vMc " << vMc;
+    //Transform3D sMi = converter.decode_image_matrix(body);
+    //CX_LOG_DEBUG() << "sMt before translation " << sMt;
+    //sMt = vMi*sMi*tMu;
+    CX_LOG_DEBUG() << "sMt " << sMt;
+    CX_LOG_DEBUG() << "iMt" << iMt;
     emit calibration(mProbeToTrackerName, sMt);
 
     //PROBEDEFINITION
