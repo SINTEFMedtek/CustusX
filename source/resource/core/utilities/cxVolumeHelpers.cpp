@@ -262,6 +262,8 @@ std::map<std::string, std::string> getDisplayFriendlyInfo(ImagePtr image)
 	retval["Scalar maximum"] = string_cast(image->getMax());
 	retval["Range (max - min)"] = string_cast(image->getRange());
 	retval["Maximum alpha value"] = string_cast(image->getMaxAlphaValue());
+	retval["VTK type min value"] = string_cast(image->getVTKMinValue());
+	retval["VTK type max value"] = string_cast(image->getVTKMaxValue());
 	retval["Modality"] = image->getModality().toStdString();
 	retval["Name"] = image->getName().toStdString();
 	retval["Parent space"] = image->getParentSpace().toStdString();
