@@ -466,6 +466,52 @@ int Image::getMaxAlphaValue()
 	return 255;
 }
 
+int Image::getVTKMinValue()
+{
+	int vtkScalarType = mBaseImageData->GetScalarType();
+
+	if (vtkScalarType==VTK_CHAR)
+		return VTK_CHAR_MIN;
+	else if (vtkScalarType==VTK_UNSIGNED_CHAR)
+		return VTK_UNSIGNED_CHAR_MIN;
+	else if (vtkScalarType==VTK_SIGNED_CHAR)
+		return VTK_SIGNED_CHAR_MIN;
+	else if (vtkScalarType==VTK_UNSIGNED_SHORT)
+		return VTK_UNSIGNED_SHORT_MIN;
+	else if (vtkScalarType==VTK_SHORT)
+		return VTK_SHORT_MIN;
+	else if (vtkScalarType==VTK_UNSIGNED_INT)
+		return VTK_UNSIGNED_INT_MIN;
+	else if (vtkScalarType==VTK_INT)
+		return VTK_INT_MIN;
+	else
+		reportError(QString("Unknown VTK ScalarType: %1").arg(vtkScalarType));
+	return 0;
+}
+
+int Image::getVTKMaxValue()
+{
+	int vtkScalarType = mBaseImageData->GetScalarType();
+
+	if (vtkScalarType==VTK_CHAR)
+		return VTK_CHAR_MAX;
+	else if (vtkScalarType==VTK_UNSIGNED_CHAR)
+		return VTK_UNSIGNED_CHAR_MAX;
+	else if (vtkScalarType==VTK_SIGNED_CHAR)
+		return VTK_SIGNED_CHAR_MAX;
+	else if (vtkScalarType==VTK_UNSIGNED_SHORT)
+		return VTK_UNSIGNED_SHORT_MAX;
+	else if (vtkScalarType==VTK_SHORT)
+		return VTK_SHORT_MAX;
+	else if (vtkScalarType==VTK_UNSIGNED_INT)
+		return VTK_UNSIGNED_INT_MAX;
+	else if (vtkScalarType==VTK_INT)
+		return VTK_INT_MAX;
+	else
+		reportError(QString("Unknown VTK ScalarType: %1").arg(vtkScalarType));
+	return 0;
+}
+
 void Image::addXml(QDomNode& dataNode)
 {
 	Data::addXml(dataNode);
