@@ -114,7 +114,7 @@ macro(cx_doc_set_common_userdoc_definitions)
     SET(CX_DOXYGEN_HAVE_DOT_YESNO NO)
     
     SET(CX_DOXYGEN_OUTPUT_DIRECTORY ${CX_DOC_OUTPUT_DIRECTORY})
-    SET(CX_DOXYGEN_PROJECT_LOGO ${CustusX_SOURCE_DIR}/source/gui/icons/CustusX_64x64.png)
+    SET(CX_DOXYGEN_PROJECT_LOGO ${CustusX_SOURCE_DIR}/source/gui/icons/CustusX/CustusX_64x64.png)
 
     get_property(PLUGIN_DOC_FOLDERS GLOBAL PROPERTY CX_PLUGIN_DOC_FOLDERS)
 
@@ -262,7 +262,7 @@ function(cx_build_dev_documentation_html)
   ENDIF(DOT)
         
     SET(CX_DOXYGEN_OUTPUT_DIRECTORY ${CX_DOC_OUTPUT_DIRECTORY})
-    SET(CX_DOXYGEN_PROJECT_LOGO ${CustusX_SOURCE_DIR}/source/gui/icons/CustusX_64x64.png)
+    SET(CX_DOXYGEN_PROJECT_LOGO ${CustusX_SOURCE_DIR}/source/gui/icons/CustusX/CustusX_64x64.png)
 
     SET(CX_DOXYGEN_INPUT 
         ${CX_DOC_INPUT_DIRECTORY}/dev_manual 

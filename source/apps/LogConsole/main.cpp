@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
 	app.setOrganizationName("CustusX");
 	app.setOrganizationDomain("www.custusx.org");
 	app.setApplicationName("LogConsole");
-	app.setWindowIcon(QIcon(":/icons/CustusX.png"));
+	app.setWindowIcon(QIcon(":/icons/CustusX/CustusX.png"));
 	app.setAttribute(Qt::AA_DontShowIconsInMenus, false);
 
 	cx::LogConsole console;

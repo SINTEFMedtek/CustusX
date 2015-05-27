@@ -1,7 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>cxStyleSheet.ss</file>
-        <file>icons/CustusX.png</file>
         <file>icons/copy.png</file>
         <file>icons/cut.png</file>
         <file>icons/new.png</file>
@@ -106,5 +105,6 @@
         <file>icons/Video-icon_green.png</file>
         <file>icons/Video-icon_red.png</file>
         <file>icons/Video-icon_gray.png</file>
+        <file>icons/CustusX/CustusX.png</file>
     </qresource>
 </RCC>
