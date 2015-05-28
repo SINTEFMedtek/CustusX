@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define KERNELS_CLH_
 
 /**
- *  Original author Tord ¯ygard
+ *  Original author Tord ï¿½ygard
  */
 
 /*******************/
@@ -129,7 +129,7 @@ typedef struct _output_volume_type
 	//#define BOUNDS_CHECK(x, min, ma x) if(x < min || x >= max) printf("Line %d: %s out of range: %d min: %d max: %d\n", __LINE__, #x, x, min, max)
 	#define BOUNDS_CHECK(x, min, max)
 #else
-	#define DEBUG_PRINTF(...)
+//	#define DEBUG_PRINTF(...)
 	#define BOUNDS_CHECK(x, min, max)
 #endif
 
