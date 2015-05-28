@@ -50,7 +50,7 @@ namespace cx {
  * - all images comes from a probe
  * - the datasource with the us must be named Probe
  * - the transformation from the probe to the tracker must be named ProbeToTracker
- * - images have their matrix set to be sMt (calibration)
+ * - all calibrations are transformation packages named CalibrationTo<Name>
  *
  * Example configuration used with the Ultrasonix  L14-5 gps probe:
 
@@ -156,10 +156,20 @@ public:
 
     virtual QString getName() const;
 
+    virtual void translate(const igtl::TransformMessage::Pointer body);
     virtual void translate(const igtl::ImageMessage::Pointer body);
     virtual void translate(const igtl::StringMessage::Pointer body);
 
 private:
+    void registerTransformDeviceName(QString deviceName);
+    bool isCalibration(QString deviceName) const;
+    QString findDeviceForCalibration(QString calibrationDeviceName) const;
+    QString extractDeviceNameFromCalibrationDeviceName(QString calibrationDeviceName) const;
+    QString findRegisteredTransformDeviceNameThatContains(QString deviceName) const;
+
+    Transform3D igtltool_M_custustool; //custus defines its tool coordinate system differently than igtl
+    QStringList mKnownTransformDeviceNames;
+    QString mCalibrationKeyword;
     QString mProbeToTrackerName; //name of the device that contains the transform between probe and tracker
 };
 

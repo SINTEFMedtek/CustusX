@@ -6,14 +6,50 @@
 namespace cx{
 
 PlusDialect::PlusDialect() :
+    mCalibrationKeyword("CalibrationTo"),
     mProbeToTrackerName("ProbeToTracker") //set in the PlusServer config file
 {
+    /* Rotation from igtl coordinate system to
+     * custusxs tool coordination system definition:
+     * 0 1 0 0
+     * 0 0 1 0
+     * 1 0 0 0
+     * 0 0 0 1
+     */
+    igtltool_M_custustool = Transform3D::Identity();
+    igtltool_M_custustool.matrix() = Eigen::Matrix4d::Constant(0);
+    igtltool_M_custustool(2, 0) = 1;
+    igtltool_M_custustool(0, 1) = 1;
+    igtltool_M_custustool(1, 2) = 1;
+    igtltool_M_custustool(3,3) = 1;
 }
-
 
 QString PlusDialect::getName() const
 {
     return "PlusServer";
+}
+
+void PlusDialect::translate(const igtl::TransformMessage::Pointer body)
+{
+    QString deviceName = body->GetDeviceName();
+    this->registerTransformDeviceName(deviceName);
+
+    IGTLinkConversion converter;
+    Transform3D matrix = converter.decode(body);
+
+    if(this->isCalibration(deviceName))
+    {
+        Transform3D s_M_igtltool = matrix;
+        Transform3D s_M_custustool = s_M_igtltool * igtltool_M_custustool;
+        Transform3D sMt = s_M_custustool;
+        QString calibrationBelongsToDeviceName = this->findDeviceForCalibration(deviceName);
+        emit calibration(calibrationBelongsToDeviceName, sMt);
+    }else
+    {
+        double timestamp_ms = this->extractTimeStamp(body); //since epoch
+        Transform3D prMs = matrix;
+        emit transform(deviceName, prMs, timestamp_ms);
+    }
 }
 
 void PlusDialect::translate(const igtl::ImageMessage::Pointer body)
@@ -74,7 +110,7 @@ void PlusDialect::translate(const igtl::ImageMessage::Pointer body)
     */
 
     // Take 3
-
+    /*
     Transform3D iMt;
     iMt.matrix() = Eigen::Matrix4d::Constant(0);
     iMt(2, 0) = 1;
@@ -84,6 +120,7 @@ void PlusDialect::translate(const igtl::ImageMessage::Pointer body)
     iMt(3,3) = 1;
     Transform3D sMi = converter.decode_image_matrix(body);
     Transform3D sMt = sMi * iMt;
+    */
 
     //Transform3D uMt = Transform3D::Identity();
     //uMt.translation() = Eigen::Vector3d(dimensions_p[x]*spacing[x]*0.5, 0, 0);
@@ -91,9 +128,9 @@ void PlusDialect::translate(const igtl::ImageMessage::Pointer body)
     //Transform3D sMi = converter.decode_image_matrix(body);
     //CX_LOG_DEBUG() << "sMt before translation " << sMt;
     //sMt = vMi*sMi*tMu;
-    CX_LOG_DEBUG() << "sMt " << sMt;
-    CX_LOG_DEBUG() << "iMt" << iMt;
-    emit calibration(mProbeToTrackerName, sMt);
+    //CX_LOG_DEBUG() << "sMt " << sMt;
+    //CX_LOG_DEBUG() << "iMt" << iMt;
+    //emit calibration(mProbeToTrackerName, sMt);
 
     //PROBEDEFINITION
     ProbeDefinitionPtr definition(new ProbeDefinition);
@@ -121,4 +158,44 @@ void PlusDialect::translate(const igtl::StringMessage::Pointer body)
     //    CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << string;
 }
 
+void PlusDialect::registerTransformDeviceName(QString deviceName)
+{
+    if(!mKnownTransformDeviceNames.contains(deviceName))
+        mKnownTransformDeviceNames << deviceName;
+}
+
+bool PlusDialect::isCalibration(QString deviceName) const
+{
+    if(deviceName.contains(mCalibrationKeyword))
+        return true;
+    else
+        return false;
+}
+
+QString PlusDialect::findDeviceForCalibration(QString calibrationDeviceName) const
+{
+    QString partialDeviceName = this->extractDeviceNameFromCalibrationDeviceName(calibrationDeviceName);
+    QString calibrationBelongsToDeviceName = this->findRegisteredTransformDeviceNameThatContains(partialDeviceName);
+    return calibrationBelongsToDeviceName;
+}
+
+QString PlusDialect::extractDeviceNameFromCalibrationDeviceName(QString calibrationDeviceName) const
+{
+    QString retval = calibrationDeviceName.remove(mCalibrationKeyword);
+    return retval;
+}
+
+QString PlusDialect::findRegisteredTransformDeviceNameThatContains(QString deviceName) const
+{
+    QString retval("NOT_FOUND");
+
+    QRegExp rx(deviceName+"*");
+    rx.setPatternSyntax(QRegExp::Wildcard);
+    int foundAtIndex = mKnownTransformDeviceNames.indexOf(rx);
+    if(foundAtIndex != -1)
+        retval = mKnownTransformDeviceNames[foundAtIndex];
+
+    return retval;
+
+}
 } //namespace cx

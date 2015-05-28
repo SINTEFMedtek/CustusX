@@ -48,7 +48,6 @@ OpenIGTLinkTool::OpenIGTLinkTool(QString uid) :
 {
     connect(&mTpsTimer, SIGNAL(timeout()), this, SLOT(calculateTpsSlot()));
 
-
     mTypes = this->determineTypesBasedOnUid(Tool::mUid);
     if (this->isProbe())
     {
@@ -155,12 +154,12 @@ Transform3D OpenIGTLinkTool::getCalibration_sMt() const
     return m_sMt_calibration;
 }
 
-void OpenIGTLinkTool::setCalibration_sMt(Transform3D calibration)
+void OpenIGTLinkTool::setCalibration_sMt(Transform3D sMt)
 {
-    if(!similar(m_sMt_calibration, calibration))
+    if(!similar(m_sMt_calibration, sMt))
     {
-        m_sMt_calibration = calibration;
-        CX_LOG_INFO() << "OpenIGTLink tool got updated calibration";
+        m_sMt_calibration = sMt;
+        CX_LOG_INFO() << mName << " got an updated calibration";
     }
 }
 
@@ -168,8 +167,7 @@ void OpenIGTLinkTool::toolTransformAndTimestampSlot(Transform3D prMs, double tim
 {
     mTimestamp = timestamp;// /1000000;
     Transform3D prMt = prMs * m_sMt_calibration;
-   // Transform3D prMt_filtered = prMs;
-     Transform3D prMt_filtered = prMt;
+    Transform3D prMt_filtered = prMt;
 
     if (mTrackingPositionFilter)
     {

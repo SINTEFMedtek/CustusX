@@ -80,6 +80,9 @@ signals:
     void image(ImagePtr image);
     void probedefinition(QString devicename, ProbeDefinitionPtr definition);
 
+protected:
+    double extractTimeStamp(const igtl::TransformMessage::Pointer body);
+
 };
 typedef boost::shared_ptr<Dialect> DialectPtr;
 

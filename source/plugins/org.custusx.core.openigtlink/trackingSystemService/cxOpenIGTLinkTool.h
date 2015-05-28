@@ -89,7 +89,7 @@ public:
 
     virtual bool isCalibrated() const; ///< true if calibration is different from identity
     virtual Transform3D getCalibration_sMt() const; ///< get the calibration transform from tool space to sensor space (where the spheres or similar live)
-    virtual void setCalibration_sMt(Transform3D calibration); ///< requests to use the calibration and replaces the tools calibration file
+    virtual void setCalibration_sMt(Transform3D sMt); ///< requests to use the calibration and replaces the tools calibration file
 
     //virtual void set_prMt(const Transform3D& prMt, double timestamp);
     virtual void setVisible(bool vis);

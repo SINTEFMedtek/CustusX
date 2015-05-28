@@ -29,16 +29,11 @@ void Dialect::translate(const igtl::TransformMessage::Pointer body)
     QString deviceName = body->GetDeviceName();
 
     IGTLinkConversion converter;
-    Transform3D transform3D = converter.decode(body);
+    Transform3D prMs = converter.decode(body);
 
-    igtl::TimeStamp::Pointer ts = igtl::TimeStamp::New();
-    body->GetTimeStamp(ts);
-    double timestamp_ms = ts->GetTimeStamp()*1000; //since epoch
+    double timestamp_ms = this->extractTimeStamp(body);
 
-    CX_LOG_DEBUG() << "device: " << deviceName;
-    CX_LOG_DEBUG() << transform3D;
-
-    emit transform(deviceName, transform3D, timestamp_ms);
+    emit transform(deviceName, prMs, timestamp_ms);
 }
 
 void Dialect::translate(const igtl::ImageMessage::Pointer body)
@@ -64,6 +59,15 @@ void Dialect::translate(const igtl::StringMessage::Pointer body)
 void cx::Dialect::translate(const IGTLinkUSStatusMessage::Pointer body)
 {
 
+}
+
+double Dialect::extractTimeStamp(const igtl::TransformMessage::Pointer body)
+{
+    igtl::TimeStamp::Pointer ts = igtl::TimeStamp::New();
+    body->GetTimeStamp(ts);
+    double timestamp_ms = ts->GetTimeStamp()*1000;
+
+    return timestamp_ms;
 }
 
 } //namespace cx

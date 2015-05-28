@@ -159,7 +159,6 @@ Transform3D IGTLinkConversion::decode_image_matrix(igtl::ImageMessage::Pointer m
 {
     igtl::Matrix4x4 matrix;
     msg->GetMatrix(matrix);
-    igtl::PrintMatrix(matrix);
     Transform3D retval = Transform3D::fromFloatArray(matrix);
     return retval;
 }
