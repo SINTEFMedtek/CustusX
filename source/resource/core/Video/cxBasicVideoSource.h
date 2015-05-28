@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXBASICVIDEOSOURCE_H
 #define CXBASICVIDEOSOURCE_H
 
-#include "org_custusx_core_video_Export.h"
+#include "cxResourceExport.h"
 
 #include "vtkSmartPointer.h"
 #include <stdint.h>
@@ -58,11 +58,11 @@ namespace cx
  * Use the interface extensions to control the input:
  * Set a vtkImageData and
  *
- * \ingroup org_custusx_core_video
+ * \ingroup cx_resource_core_video
  * \date April 26, 2013
  * \author Christian Askeland, SINTEF
  */
-class org_custusx_core_video_EXPORT BasicVideoSource : public VideoSource
+class cxResource_EXPORT BasicVideoSource : public VideoSource
 {
 	Q_OBJECT
 
