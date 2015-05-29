@@ -100,14 +100,12 @@ qint64 Socket::skip(qint64 maxSizeBytes) const
 
 qint64 Socket::write(const char *data, qint64 maxSizeBytes) const
 {
-    CX_LOG_DEBUG() << "about to write " << data;
     qint64 writtenBytes = mSocket->write(data, maxSizeBytes);
     return writtenBytes;
 }
 
 void Socket::receivedConnected()
 {
-    //CX_LOG_DEBUG() << "Socket is connected to " << mSocket->peerName() << ":" << mSocket->peerPort();
     mConnected = true;
     emit connected();
 }
@@ -176,11 +174,11 @@ void Socket::receiveReadyRead()
 
 void Socket::receiveBytesWritten(qint64 bytes)
 {
-    CX_LOG_DEBUG() << "Bytes written to socket: " << bytes;
+    //CX_LOG_DEBUG() << "Bytes written to socket: " << bytes;
 }
 
 void Socket::receiveAboutToClose()
 {
-    CX_LOG_DEBUG() << "Socket is about to close";
+    //CX_LOG_DEBUG() << "Socket is about to close";
 }
 }//namespace cx

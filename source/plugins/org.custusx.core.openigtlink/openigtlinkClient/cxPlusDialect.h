@@ -54,27 +54,26 @@ namespace cx {
  *
  * Example configuration used with the Ultrasonix  L14-5 gps probe:
 
-<PlusConfiguration version="2.1">
-
-  <DataCollection StartupDelaySec="1.0" >
-    <DeviceSet
-      Name="PlusServer: Ultrasonix ultrasound imaging and tracking device"
-      Description="Broadcasting ultrasound images and tracking data acquired from the Ultrasonix system through OpenIGTLink. If PlusServer does not run on the Ultrasonix PC then update the IP attribute in the Device element with the Ultrasonix PC's IP address."
-    />
+<PlusConfiguration version="2.1" PlusRevision="Plus-2.1.2.4115 - Win32">
+  <DataCollection StartupDelaySec="1">
+    <DeviceSet Name="CustusX PlusServer: Ultrasonix ultrasound imaging and tracking device" Description="Broadcasting ultrasound images and tracking data acquired from the Ultrasonix system through OpenIGTLink. If PlusServer does not run on the Ultrasonix PC then update the IP attribute in the Device element with the Ultrasonix PC&apos;s IP address." />
     <Device
       Id="VideoDevice"
       Type="SonixVideo"
       AcquisitionRate="30"
       IP="127.0.0.1"
-      EnableAutoClip="TRUE"
-      DetectDepthSwitching="true"
       SharedMemoryStatus="1"
+      EnableAutoClip="TRUE"
       AutoClipEnabled="TRUE"
       ImageGeometryOutputEnabled="TRUE"
       ImageToTransducerTransformName="ImageToTransducer"
-      ProbeId="L14-5">
+      >
       <DataSources>
-        <DataSource Type="Video" Id="Video" PortName="B"  PortUsImageOrientation="UF" />
+        <DataSource
+          Type="Video"
+          Id="Video"
+          PortName="B"
+          PortUsImageOrientation="MF" />
       </DataSources>
       <OutputChannels>
         <OutputChannel Id="VideoStream" VideoDataSourceId="Video" />
@@ -84,68 +83,78 @@ namespace cx {
       Id="TrackerDevice"
       Type="Ascension3DG"
       FilterAcWideNotch="1"
-      ToolReferenceFrame="Tracker" >
+      ToolReferenceFrame="Tracker">
       <DataSources>
-        <DataSource Type="Tool" Id="Probe" PortName="0"  />
-        <DataSource Type="Tool" Id="Needle" PortName="2"  />
+        <DataSource
+          Type="Tool"
+          Id="Probe"
+          PortName="0"/>
+        <DataSource
+          Type="Tool"
+          Id="Needle"
+          PortName="2"/>
       </DataSources>
       <OutputChannels>
-        <OutputChannel Id="TrackerStream" >
-          <DataSource Id="Probe"/>
-          <DataSource Id="Needle"/>
+        <OutputChannel Id="TrackerStream">
+          <DataSource Id="Probe" />
+          <DataSource Id="Needle" />
         </OutputChannel>
       </OutputChannels>
     </Device>
-    <Device
-      Id="TrackedVideoDevice"
-      Type="VirtualMixer" >
+    <Device Id="TrackedVideoDevice" Type="VirtualMixer">
       <InputChannels>
         <InputChannel Id="TrackerStream" />
         <InputChannel Id="VideoStream" />
       </InputChannels>
       <OutputChannels>
-        <OutputChannel Id="TrackedVideoStream"/>
+        <OutputChannel Id="TrackedVideoStream" />
       </OutputChannels>
     </Device>
   </DataCollection>
-
   <CoordinateDefinitions>
-    <Transform From="Transducer" To="Probe"
+    <!-- Calibration matrix of Plus, calculated from information from Ultrasonix -->
+    <!-- http://perk-software.cs.queensu.ca/plus/doc/nightly/user/DeviceSonixVideo.html -->
+    <!-- Needle calibration matrix -->
+    <Transform From="Calibration" To="NeedleX"
       Matrix="
-        0.0018 0.9477 0.0 14.8103
-        -1.0 0.0016 0.0 34.2061
-        -0.0052 0.0166 1 0.2636
+        0 1 0 8
+        -1 0 0 0
+        0 0 1 0
         0 0 0 1" />
+    <!-- Probe calibration matrix -->
+    <Transform From="Calibration" To="ProbeX"
+      Matrix="
+        0.0018    0.9477   -0.0175   14.8449
+       -1.0000    0.0016   -0.0052   15.0061
+       -0.0052    0.0166    0.9998    0.1638
+             0         0         0    1.0000" />
   </CoordinateDefinitions>
-
   <PlusOpenIGTLinkServer
-    MaxNumberOfIgtlMessagesToSend="100"
-    MaxTimeSpentWithProcessingMs="50"
-    ListeningPort="18944"
-    SendValidTransformsOnly="true"
-    OutputChannelId="TrackedVideoStream" >
+  MaxNumberOfIgtlMessagesToSend="100"
+  MaxTimeSpentWithProcessingMs="50"
+  ListeningPort="18944"
+  SendValidTransformsOnly="true"
+  OutputChannelId="TrackedVideoStream">
     <DefaultClientInfo>
       <MessageTypes>
         <Message Type="TRANSFORM" />
         <Message Type="IMAGE" />
-        <Message Type="STRING" />
       </MessageTypes>
       <TransformNames>
         <Transform Name="ProbeToTracker" />
         <Transform Name="NeedleToTracker" />
+        <!-- Start Calibration transformations -->
+        <Transform Name="CalibrationToNeedleX" />
+        <Transform Name="CalibrationToProbeX" />
+        <!-- End Calibration tranformations -->
       </TransformNames>
       <ImageNames>
-        <Image Name="Image" EmbeddedTransformToFrame="Probe" />
+        <Image Name="Image" EmbeddedTransformToFrame="Transducer" />
       </ImageNames>
-      <StringNames>
-        <String Name="DepthMm" />
-        <String Name="PixelSpacingMm" />
-        <String Name="TransducerOriginPix" />
-      </StringNames>
     </DefaultClientInfo>
   </PlusOpenIGTLinkServer>
-
 </PlusConfiguration>
+
 
  */
 

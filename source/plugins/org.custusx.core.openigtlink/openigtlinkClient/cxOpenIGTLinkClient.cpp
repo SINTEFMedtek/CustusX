@@ -147,8 +147,6 @@ void OpenIGTLinkClient::requestDisconnect()
 void OpenIGTLinkClient::internalConnected()
 {
     CX_LOG_CHANNEL_SUCCESS(CX_OPENIGTLINK_CHANNEL_NAME) << "Connected to "  << mIp << ":" << mPort;
-    //if(mDialect->getName() == "PlusServer")
-    //    this->queryServer();
     emit connected();
 }
 
@@ -197,6 +195,7 @@ void OpenIGTLinkClient::queryServer()
     this->sendStringMessage(command);
 }
 */
+
 bool OpenIGTLinkClient::socketIsConnected()
 {
     return mSocket->isConnected();
