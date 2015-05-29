@@ -232,16 +232,7 @@ void MainWindowActions::newPatientSlot()
 
 QString MainWindowActions::getExistingSessionFolder()
 {
-	QString folder = settings()->value("globalPatientDataFolder").toString();
-
-	// Create folders
-	if (!QDir().exists(folder))
-	{
-		QDir().mkdir(folder);
-		report("Made a new patient folder: " + folder);
-	}
-
-	return folder;
+	return profile()->getSessionRootFolder();
 }
 
 void MainWindowActions::clearPatientSlot()
@@ -287,7 +278,7 @@ void MainWindowActions::importDataSlot()
 
 	QString folder = mLastImportDataFolder;
 	if (folder.isEmpty())
-		folder = settings()->value("globalPatientDataFolder").toString();
+		folder = profile()->getSessionRootFolder();
 
 	QStringList fileName = QFileDialog::getOpenFileNames(this->parentWidget(), QString(tr("Select data file(s) for import")),
 		folder, tr("Image/Mesh (*.mhd *.mha *.stl *.vtk *.mnc *.png)"));

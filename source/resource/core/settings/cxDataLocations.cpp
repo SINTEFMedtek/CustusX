@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxFileHelpers.h"
 #include "cxTypeConversions.h"
 #include "cxReporter.h"
+#include "cxProfile.h"
 
 namespace cx
 {
@@ -51,7 +52,6 @@ void DataLocations::setTestMode()
 {
 	mTestMode = true;
 	cx::removeNonemptyDirRecursively(getTestDataPath() + "/temp");
-	cx::removeNonemptyDirRecursively(getNoPatientFolder());
 }
 
 QString DataLocations::getTestDataPath()
@@ -66,12 +66,6 @@ QString DataLocations::getTestDataPath()
 	{
 		return CX_DATA_ROOT;
 	}
-}
-
-QString DataLocations::getNoPatientFolder()
-{
-	QString patientDatafolder = settings()->value("globalPatientDataFolder").toString();
-	return patientDatafolder + "/NoPatient";
 }
 
 QString DataLocations::getLargeTestDataPath()

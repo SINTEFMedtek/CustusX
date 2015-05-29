@@ -42,28 +42,10 @@ namespace cx
 Settings* settings()
 {
 	return profile()->getSettings();
-//	return Settings::getInstance();
 }
-//Settings* Settings::getInstance()
-//{
-//	return profile()->getSettings();
-////	if (mInstance == NULL)
-////	{
-////		mInstance = new Settings();
-////		mInstance->initialize();
-////	}
-////	return mInstance;
-//}
-
-//void Settings::destroyInstance()
-//{
-////	delete mInstance;
-////	mInstance = NULL;
-//}
 
 Settings::Settings()
 {
-//	connect(ProfileManager::getInstance(), &ProfileManager::activeProfileChanged, this, &Settings::initialize);
 }
 
 Settings::~Settings()
@@ -76,7 +58,6 @@ void Settings::resetFile(QString filename)
 	if (mSettings)
 		keys << mSettings->allKeys();
 
-//	QString filename = profile()->getSettingsFile();
 	mSettings.reset(new QSettings(filename, QSettings::IniFormat));
 
 	if (mSettings)
@@ -86,6 +67,13 @@ void Settings::resetFile(QString filename)
 
 	foreach (QString key, keys)
 		emit valueChangedFor(key);
+}
+
+void Settings::setValueIfNotDefault(const QString& key, const QVariant& value, const QVariant& defaultValue)
+{
+	if (value==defaultValue)
+		return;
+	this->setValue(key, value);
 }
 
 void Settings::setValue(const QString& key, const QVariant& value)
