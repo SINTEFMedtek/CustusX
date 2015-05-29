@@ -43,8 +43,13 @@ void PlusDialect::translate(const igtl::TransformMessage::Pointer body)
         Transform3D s_M_custustool = s_M_igtltool * igtltool_M_custustool;
         Transform3D sMt = s_M_custustool;
         QString calibrationBelongsToDeviceName = this->findDeviceForCalibration(deviceName);
-        emit calibration(calibrationBelongsToDeviceName, sMt);
-    }else
+        CX_LOG_DEBUG() << calibrationBelongsToDeviceName;
+        if(calibrationBelongsToDeviceName != "NOT_FOUND")
+        {
+            emit calibration(calibrationBelongsToDeviceName, sMt);
+        }
+    }
+    else
     {
         double timestamp_ms = this->extractTimeStamp(body); //since epoch
         Transform3D prMs = matrix;
@@ -188,7 +193,7 @@ QString PlusDialect::extractDeviceNameFromCalibrationDeviceName(QString calibrat
 QString PlusDialect::findRegisteredTransformDeviceNameThatContains(QString deviceName) const
 {
     QString retval("NOT_FOUND");
-
+    deviceName.remove("X");
     QRegExp rx(deviceName+"*");
     rx.setPatternSyntax(QRegExp::Wildcard);
     int foundAtIndex = mKnownTransformDeviceNames.indexOf(rx);
