@@ -563,8 +563,6 @@ endforeach()
 	cx_assert_variable_exists(${CustusX_VERSION_STRING})
 	cx_assert_variable_exists(${SSC_USE_GCOV})
 	cx_assert_variable_exists(${CX_USE_OPENCL_UTILITY})
-	cx_assert_variable_exists(${CX_USE_OpenCV})
-	# this text can be inserted into the about box with some effort...
 	set(CONFIGURATION_TEXT
 "
 Configuration for ${CX_SYSTEM_BASE_NAME} ${CustusX_VERSION_STRING}
@@ -592,12 +590,8 @@ Configuration for ${CX_SYSTEM_BASE_NAME} ${CustusX_VERSION_STRING}
 		OpenGL Version: ${OPENGL_VERSION}
 		Eigen Version: ${EIGEN_VERSION}
 
-	Internal libraries:
 		OpenCL Utility Library: ${CX_USE_OPENCL_UTILITY}
 	
-	Grabber Servers:
-		OpenCV Grabber Interface: ${CX_USE_OpenCV}
-
 ${PLUGINS_DESCRIPTION}
 ")
     set(CX_CONFIGURATION_DESCRIPTION ${CONFIGURATION_TEXT} PARENT_SCOPE)

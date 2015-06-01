@@ -53,6 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDoubleProperty.h"
 #include "cxBoolProperty.h"
 #include "cxLogger.h"
+#include "cxVideoServerConfig.h"
 
 #ifdef CX_USE_OpenCV
 #include <opencv2/highgui/highgui.hpp>
@@ -199,6 +200,7 @@ void ImageStreamerOpenCV::deinitialize_local()
 
 void ImageStreamerOpenCV::initialize_local()
 {
+#ifdef CX_USE_OpenCV
 
 	if (!mArguments.count("videoport"))
 		mArguments["videoport"] = "0";
@@ -217,7 +219,6 @@ void ImageStreamerOpenCV::initialize_local()
 	bool sourceIsInt = false;
 	videoSource.toInt(&sourceIsInt);
 
-#ifdef CX_USE_OpenCV
 	if (sourceIsInt){
 	    // open device (camera)
 		mVideoCapture->open(videoport);
@@ -280,6 +281,7 @@ void ImageStreamerOpenCV::initialize_local()
 
 bool ImageStreamerOpenCV::startStreaming(SenderPtr sender)
 {
+#ifdef CX_USE_OpenCV
 	this->initialize_local();
 
 	if (!mSendTimer || !mVideoCapture->isOpened())
@@ -293,6 +295,9 @@ bool ImageStreamerOpenCV::startStreaming(SenderPtr sender)
 	this->continousGrabEvent(); // instead of grabtimer
 
 	return true;
+#else
+	return false;
+#endif //CX_USE_OpenCV
 }
 
 void ImageStreamerOpenCV::stopStreaming()
