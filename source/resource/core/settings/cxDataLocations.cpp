@@ -184,14 +184,26 @@ QStringList DataLocations::getRootConfigPaths()
 
 QString DataLocations::getDocPath()
 {
-  QString path = getBundlePath() + "/" + CX_DOC_ROOT_RELATIVE_INSTALLED; // look for installed location
-  if (QDir(path).exists())
-	return QDir(path).canonicalPath();
+	if(isRunFromBuildFolder())
+	{
+		reportWarning("Using documentation from build folder");
+		if (QDir(CX_DOC_ROOT).exists()) // look for folder in source code
+			return QDir(CX_DOC_ROOT).canonicalPath();
+		else
+		{
+			reportError(QString("DataLocations::getDocPath() cannot find: %1").arg(CX_DOC_ROOT));
+			return "";
+		}
+	}
 
-  if (QDir(CX_DOC_ROOT).exists()) // look for folder in source code
-	return QDir(CX_DOC_ROOT).canonicalPath();
-
-  return "";
+	QString path = getBundlePath() + "/" + CX_DOC_ROOT_RELATIVE_INSTALLED; // look for installed location
+	if (QDir(path).exists())
+		return QDir(path).canonicalPath();
+	else
+	{
+		reportError(QString("DataLocations::getDocPath() cannot find: %1").arg(path));
+		return "";
+	}
 }
 
 QStringList DataLocations::appendStringToAllElements(QStringList root, QString suffix)
@@ -296,7 +308,7 @@ QString DataLocations::getWebsiteUserDocumentationURL()
 bool DataLocations::isRunFromBuildFolder()
 {
 	QString bundlePath = DataLocations::getBundlePath();
-	//Check is cxConfig.h file exists relative to the run application
+	//Check if cxConfig.h file exists relative to the run application
 	QString pathToConfigFile = bundlePath + "/../source/resource/core/settings/cxConfig.h";
 
 	if (QFile(pathToConfigFile).exists())

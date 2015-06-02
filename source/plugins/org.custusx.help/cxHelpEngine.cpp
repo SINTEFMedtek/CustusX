@@ -51,7 +51,6 @@ namespace cx
 
 HelpEngine::HelpEngine()
 {
-	std::cout << "isRunFromBuildFolder: " << DataLocations::isRunFromBuildFolder() << std::endl;
 	QDir().mkpath(profile()->getPath()); // otherwise setupData() fails sometimes
 	QString helpFile = profile()->getPath() + "/cx_user_doc.qhc";
 	helpEngine = new QHelpEngine(helpFile, NULL);
