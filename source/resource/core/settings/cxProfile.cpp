@@ -71,7 +71,7 @@ XmlOptionFile Profile::getXmlSettings()
 	return  XmlOptionFile(filename);
 }
 
-Settings* Profile::getSettings()
+Settings* Profile::getSettings() const
 {
 	return mSettings.get();
 }
@@ -82,17 +82,17 @@ QString Profile::getSettingsFile()
 	return filename;
 }
 
-QString Profile::getName()
+QString Profile::getName() const
 {
 	return this->getUid();
 }
 
-QString Profile::getUid()
+QString Profile::getUid() const
 {
 	return QFileInfo(mPath).fileName();
 }
 
-QString Profile::getPath()
+QString Profile::getPath() const
 {
 	return mPath;
 }
@@ -134,6 +134,33 @@ QStringList Profile::getAllRootConfigPaths()
 	return retval;
 }
 
+
+QString Profile::getDefaultSessionRootFolder() const
+{
+	QStringList path;
+	path << QDir::homePath() << "Patients" << this->getName();
+	return path.join("/");
+}
+
+QString Profile::getSessionRootFolder() const
+{
+	QString folder = this->getSettings()->value("globalPatientDataFolder",
+									   this->getDefaultSessionRootFolder()).toString();
+
+	// Create folders
+	if (!QDir().exists(folder))
+	{
+		QDir().mkdir(folder);
+		report("Made a new patient folder: " + folder);
+	}
+
+	return folder;
+}
+
+void Profile::setSessionRootFolder(QString path)
+{
+	this->getSettings()->setValueIfNotDefault("globalPatientDataFolder", path, this->getDefaultSessionRootFolder());
+}
 
 //---------------------------------------------------------
 //---------------------------------------------------------
