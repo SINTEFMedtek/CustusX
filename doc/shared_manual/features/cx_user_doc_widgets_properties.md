@@ -123,4 +123,5 @@ Displays Information.
 Eraser {#property_widgets_eraser}
 ===========================================================
 Functionality for erasing parts of volumes/meshes.
+By changing the erase value it is also possible to draw.
 

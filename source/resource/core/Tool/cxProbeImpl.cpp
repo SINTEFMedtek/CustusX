@@ -282,9 +282,6 @@ QString ProbeImpl::getRtSourceName(QString configurationId) const
 	if (configId.isEmpty())
 		configId = mConfigurationId;
 
-	if (this->getProbeData().getUseDigitalVideo())
-		return QString("Digital");
-
 	return this->findRtSource(configId);
 }
 
@@ -310,7 +307,7 @@ QString ProbeImpl::findRtSource(QString configId) const
 			retval = rtSourceList[i];
 		}
 	}
-	return retval;
+    return retval;
 }
 
 ProbeImpl::ProbeImpl(QString instrumentUid, QString scannerUid) :

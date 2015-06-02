@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxGrabberExport.h"
 
 #include <QObject> //needed for the mocer when OpenCv is not used...
-#include "cxConfig.h"
+#include "cxVideoServerConfig.h"
 
 #include "boost/shared_ptr.hpp"
 #include <QTcpSocket>

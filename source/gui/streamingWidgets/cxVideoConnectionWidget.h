@@ -115,8 +115,8 @@ protected:
 
 private:
 	QWidget* createStreamerWidget(StreamerService* service);
-	void addServiceToSelector(QString name);
-	void removeServiceFromSelector(QString name);
+	void addServiceToSelector(StreamerService *service);
+	void removeServiceFromSelector(StreamerService *service);
 	void removeServiceWidget(QString name);
 	void addExistingStreamerServices();
 

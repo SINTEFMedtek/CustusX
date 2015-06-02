@@ -71,10 +71,12 @@ void MainWindowActions::createActions()
 					   QKeySequence("Ctrl+Shift+f"), "Save an image of the application to the patient folder.",
 					   &MainWindowActions::shootWindow);
 
-	this->createAction("RecordFullscreen", "Record Fullscreen",
+	mRecordFullscreenStreamingAction = this->createAction("RecordFullscreen", "Record Fullscreen",
 					   QIcon(),
 					   QKeySequence("F8"), "Record a video of the full screen.",
 					   &MainWindowActions::recordFullscreen);
+	connect(vlc(), &VLCRecorder::stateChanged, this, &MainWindowActions::updateRecordFullscreenActionSlot);
+	this->updateRecordFullscreenActionSlot();
 
 	mShowPointPickerAction = this->createAction("ShowPointPicker", "Point Picker",
 												QIcon(":/icons/point_picker.png"),
@@ -230,16 +232,7 @@ void MainWindowActions::newPatientSlot()
 
 QString MainWindowActions::getExistingSessionFolder()
 {
-	QString folder = settings()->value("globalPatientDataFolder").toString();
-
-	// Create folders
-	if (!QDir().exists(folder))
-	{
-		QDir().mkdir(folder);
-		report("Made a new patient folder: " + folder);
-	}
-
-	return folder;
+	return profile()->getSessionRootFolder();
 }
 
 void MainWindowActions::clearPatientSlot()
@@ -285,7 +278,7 @@ void MainWindowActions::importDataSlot()
 
 	QString folder = mLastImportDataFolder;
 	if (folder.isEmpty())
-		folder = settings()->value("globalPatientDataFolder").toString();
+		folder = profile()->getSessionRootFolder();
 
 	QStringList fileName = QFileDialog::getOpenFileNames(this->parentWidget(), QString(tr("Select data file(s) for import")),
 		folder, tr("Image/Mesh (*.mhd *.mha *.stl *.vtk *.mnc *.png)"));
@@ -345,6 +338,23 @@ void MainWindowActions::recordFullscreen()
 		vlc()->stopRecording();
 	else
 		vlc()->startRecording(path);
+}
+
+void MainWindowActions::updateRecordFullscreenActionSlot()
+{
+	mRecordFullscreenStreamingAction->setCheckable(true);
+	mRecordFullscreenStreamingAction->blockSignals(true);
+	mRecordFullscreenStreamingAction->setChecked(vlc()->isRecording());
+	mRecordFullscreenStreamingAction->blockSignals(false);
+
+	if(vlc()->isRecording())
+	{
+		mRecordFullscreenStreamingAction->setIcon(QIcon(":/icons/Video-icon_green.png"));
+	}
+	else
+	{
+		mRecordFullscreenStreamingAction->setIcon(QIcon(":/icons/Video-icon_gray.png"));
+	}
 
 }
 

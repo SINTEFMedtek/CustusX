@@ -68,15 +68,15 @@ macro(cx_install_initialize_customizable_properties)
 	set(CX_LICENSE_FILE "${CustusX_SOURCE_DIR}/License.txt")
 	set_property(GLOBAL PROPERTY CX_LICENSE_FILE "${CX_LICENSE_FILE}")
 
-	set_property(GLOBAL PROPERTY CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/source/gui/icons/CustusX.png")
+	set_property(GLOBAL PROPERTY CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/source/gui/icons/CustusX/CustusX.png")
 	set_property(GLOBAL PROPERTY CPACK_PACKAGE_VENDOR "SINTEF Medical Technology")
 	set_property(GLOBAL PROPERTY CPACK_RESOURCE_FILE_WELCOME "${PROJECT_SOURCE_DIR}/install/install_text/install_welcome.txt")
 	set_property(GLOBAL PROPERTY CPACK_RESOURCE_FILE_README "${PROJECT_SOURCE_DIR}/install/install_text/install_readme.rtf")
 	set_property(GLOBAL PROPERTY CPACK_RESOURCE_FILE_LICENSE "${CX_LICENSE_FILE}")
 
 	if(CX_WINDOWS)
-		set_property(GLOBAL PROPERTY CPACK_NSIS_MUI_ICON "${PROJECT_SOURCE_DIR}/source/gui/icons\\\\CustusX.ico")
-		set_property(GLOBAL PROPERTY CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/source/gui/icons\\\\CustusX.png")
+		set_property(GLOBAL PROPERTY CPACK_NSIS_MUI_ICON "${PROJECT_SOURCE_DIR}/source/gui/icons/CustusX\\\\CustusX.ico")
+		set_property(GLOBAL PROPERTY CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/source/gui/icons/CustusX\\\\CustusX.png")
 	endif (CX_WINDOWS)
 endmacro()
 
@@ -563,8 +563,6 @@ endforeach()
 	cx_assert_variable_exists(${CustusX_VERSION_STRING})
 	cx_assert_variable_exists(${SSC_USE_GCOV})
 	cx_assert_variable_exists(${CX_USE_OPENCL_UTILITY})
-	cx_assert_variable_exists(${CX_USE_OpenCV})
-	# this text can be inserted into the about box with some effort...
 	set(CONFIGURATION_TEXT
 "
 Configuration for ${CX_SYSTEM_BASE_NAME} ${CustusX_VERSION_STRING}
@@ -592,12 +590,8 @@ Configuration for ${CX_SYSTEM_BASE_NAME} ${CustusX_VERSION_STRING}
 		OpenGL Version: ${OPENGL_VERSION}
 		Eigen Version: ${EIGEN_VERSION}
 
-	Internal libraries:
 		OpenCL Utility Library: ${CX_USE_OPENCL_UTILITY}
 	
-	Grabber Servers:
-		OpenCV Grabber Interface: ${CX_USE_OpenCV}
-
 ${PLUGINS_DESCRIPTION}
 ")
     set(CX_CONFIGURATION_DESCRIPTION ${CONFIGURATION_TEXT} PARENT_SCOPE)

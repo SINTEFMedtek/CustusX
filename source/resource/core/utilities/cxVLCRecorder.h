@@ -79,6 +79,9 @@ public:
 	bool waitForStarted(int msecs = 30000);
 	bool waitForFinished(int msecs = 30000);
 
+signals:
+	void stateChanged();
+
 public slots:
 	void startRecording(QString saveFile);
 	void stopRecording();

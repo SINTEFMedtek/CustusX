@@ -22,17 +22,17 @@ Notation {#coordinate_systems_notation}
 
 A point or vector \p p in space \p q are denoted
 
-<tt> p_q </tt>
+	p_q
 
 Space \p q has a parent space \p r. The affine matrix, or transform, \p M relating
 the two spaces are denoted
 
-<tt> q_M_r </tt> (sometimes simply \p qMr)
+	q_M_r (or qMr)
 
 \p q_M_r is defined such that a point p_r in the parent space premultiplied
 with \p q_M_r yields the same point \p p_q represented in space \p q:
 
-<tt> p_q = q_M_r * p_r </tt>
+	p_q = q_M_r * p_r
 
 The multiplication here is done using homogenous coordinates, where a point
 is [x,y,z,1] and a vector is [x,y,z,0].
@@ -42,7 +42,7 @@ All computations are performed in millimeters and radians! File storage also use
 Specific Spaces {#coordinate_systems_specific_spaces}
 -------------------------------------------
 
-\image html cx_coordinate_systems/cx_coords_overview.png "Coordinate Systems Overview"
+\image html coordinateSystems.png "Basic Coordinate Systems"
 
 The basic spaces are reference and patient reference, representing respectively the virtual and physical world. When these two spaces have a valid relation, through the `prMt` transform, the system is properly set up for navigation. Tracking tools move relative to the patient reference, while data (CT, MR, US etc) are defined relative to the reference. 
 
@@ -73,6 +73,9 @@ The following table describes som important transforms, i.e. relations between t
 | Data Position        |  rMd  | Position of Data. Used throughout the system.
 | Tool Position        |  prMt | Position of Tool. Used throughout the system.
 
+The following figure shows an example of two tools, one pointer and one probe. Both are related to the patient reference through the sMt transform.
+
+\image html coordinateSystemsTools.png "Tool Coordinate Systems"
 
 Relations between Data spaces {#coordinate_systems_data}
 -------------------------------------------

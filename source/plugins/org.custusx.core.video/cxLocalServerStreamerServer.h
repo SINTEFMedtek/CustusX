@@ -84,7 +84,6 @@ public:
 	virtual ~LocalServerStreamer();
 	virtual bool startStreaming(SenderPtr sender);
 	virtual void stopStreaming();
-	virtual QString getType();
 
 	static StreamerPtr createStreamerIfEnabled(QDomElement root, StringMap args);
 

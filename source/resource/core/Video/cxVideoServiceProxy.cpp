@@ -95,11 +95,6 @@ bool VideoServiceProxy::isNull()
 	return mVideoService->isNull();
 }
 
-StreamerService *VideoServiceProxy::getStreamerService(QString service)
-{
-	return mVideoService->getStreamerService(service);
-}
-
 QList<StreamerService*> VideoServiceProxy::getStreamerServices()
 {
 	return mVideoService->getStreamerServices();

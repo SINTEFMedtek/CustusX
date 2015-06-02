@@ -52,6 +52,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxStringHelpers.h"
 #include "cxDoubleProperty.h"
 #include "cxBoolProperty.h"
+#include "cxLogger.h"
+#include "cxVideoServerConfig.h"
 
 #ifdef CX_USE_OpenCV
 #include <opencv2/highgui/highgui.hpp>
@@ -198,6 +200,7 @@ void ImageStreamerOpenCV::deinitialize_local()
 
 void ImageStreamerOpenCV::initialize_local()
 {
+#ifdef CX_USE_OpenCV
 
 	if (!mArguments.count("videoport"))
 		mArguments["videoport"] = "0";
@@ -216,7 +219,6 @@ void ImageStreamerOpenCV::initialize_local()
 	bool sourceIsInt = false;
 	videoSource.toInt(&sourceIsInt);
 
-#ifdef CX_USE_OpenCV
 	if (sourceIsInt){
 	    // open device (camera)
 		mVideoCapture->open(videoport);
@@ -231,7 +233,21 @@ void ImageStreamerOpenCV::initialize_local()
 		cerr << "ImageStreamerOpenCV: Failed to open a video device or video file!\n" << endl;
 		return;
 	}
-	else
+
+	// try one grab before accepting the streamer
+	// - this fails if no camera is attached
+	try
+	{
+		mVideoCapture->grab();
+	}
+	catch(cv::Exception e)
+	{
+		CX_LOG_ERROR() << "OpenCV failed with message: " << e.what();
+		mVideoCapture->release();
+		return;
+	}
+
+
 	{
 		//determine default values
 		int default_width = mVideoCapture->get(CV_CAP_PROP_FRAME_WIDTH);
@@ -265,9 +281,10 @@ void ImageStreamerOpenCV::initialize_local()
 
 bool ImageStreamerOpenCV::startStreaming(SenderPtr sender)
 {
+#ifdef CX_USE_OpenCV
 	this->initialize_local();
 
-	if (!mSendTimer)
+	if (!mSendTimer || !mVideoCapture->isOpened())
 	{
 		std::cout << "ImageStreamerOpenCV: Failed to start streaming: Not initialized." << std::endl;
 		return false;
@@ -278,6 +295,9 @@ bool ImageStreamerOpenCV::startStreaming(SenderPtr sender)
 	this->continousGrabEvent(); // instead of grabtimer
 
 	return true;
+#else
+	return false;
+#endif //CX_USE_OpenCV
 }
 
 void ImageStreamerOpenCV::stopStreaming()

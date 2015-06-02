@@ -73,7 +73,6 @@ public:
   static QString findConfigFolder(QString pathRelativeToConfigRoot, QString alternativeAbsolutePath = "");
   static QString findConfigFilePath(QString fileName, QString pathRelativeToConfigRoot, QString alternativeAbsolutePath = "");
   static QString findConfigPath(QString fileName, QString pathRelativeToConfigRoot, QString alternativeAbsolutePath = "");
-  static QString getNoPatientFolder();
 
   static QString getWebsiteURL();
   static QString getWebsiteUserDocumentationURL();

@@ -33,8 +33,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelImplService.h"
 
 #include <ctkPluginContext.h>
-#include "cxData.h"
+#include <vtkImageData.h>
 
+#include "cxData.h"
 #include "cxPatientData.h"
 #include "cxRegistrationTransform.h"
 #include "cxDataFactory.h"
@@ -300,6 +301,10 @@ void PatientModelImplService::videoSourceAdded(VideoSourcePtr source)
 
 	ToolPtr tool = this->getProbeTool(source->getUid());
 	if(!tool)
+		return;
+
+	//Temporary code turning off generation of TrackedStream for video sources that are not 3D
+	if (!source || !source->getVtkImageData() || source->getVtkImageData()->GetDataDimension() != 3)
 		return;
 
 	QString uid = source->getUid() + tool->getUid();

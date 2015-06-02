@@ -65,12 +65,11 @@ public:
 	QString getDefaultSenderType() const;
 	QStringList getSenderTypes() const; ///< all available sender types
 	QStringList getArgumentDescription(QString type) const; ///< arguments for one streamer
-	StreamerPtr getImageSender(QString type);
+	CommandLineStreamerPtr getImageSender(QString type);
 	StreamerPtr getFromArguments(StringMap args);
 
 private:
 	std::vector<CommandLineStreamerPtr> mCommandLineStreamers;
-	std::vector<StreamerPtr> mImageStreamers;
 };
 
 }

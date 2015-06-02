@@ -51,7 +51,7 @@ namespace cx
 class org_custusx_core_video_EXPORT StreamerServiceUtilities
 {
 public:
-	static StreamerService* getStreamerService(QString name, ctkPluginContext* context);
+	static StreamerService* getStreamerServiceFromType(QString name, ctkPluginContext* context);
 };
 
 } /* namespace cx */

@@ -42,17 +42,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QApplication>
 #include <QTimer>
 #include "cxLogger.h"
-
+#include "cxProfile.h"
 
 namespace cx
 {
 
 SessionStorageServiceImpl::SessionStorageServiceImpl(ctkPluginContext *context)
 {
-	settings()->fillDefault("globalPatientDataFolder", QDir::homePath() + "/Patients");
-
 	this->clearCache();
-	mActivePatientFolder = DataLocations::getNoPatientFolder();
+	mActivePatientFolder = this->getNoPatientFolder();
 	connect(this, &SessionStorageServiceImpl::sessionChanged, this, &SessionStorageServiceImpl::onSessionChanged);
 
 	QTimer::singleShot(100, this, SLOT(startupLoadPatient())); // make sure this is called after application state change
@@ -67,7 +65,6 @@ bool SessionStorageServiceImpl::isNull() const
 {
 	return false;
 }
-
 
 void SessionStorageServiceImpl::load(QString dir)
 {
@@ -87,6 +84,12 @@ void SessionStorageServiceImpl::load(QString dir)
 		reportError(QString("Failed to initialize session in existing folder with no valid session: %1").arg(dir));
 	}
 }
+
+QString SessionStorageServiceImpl::getNoPatientFolder() const
+{
+	return DataLocations::getCachePath() + "/NoPatient";
+}
+
 
 bool SessionStorageServiceImpl::isValidSessionFolder(QString dir) const
 {
@@ -170,7 +173,7 @@ void SessionStorageServiceImpl::clear()
 bool SessionStorageServiceImpl::isValid() const
 {
 	return !mActivePatientFolder.isEmpty() &&
-			(mActivePatientFolder != DataLocations::getNoPatientFolder());
+			(mActivePatientFolder != this->getNoPatientFolder());
 }
 
 QString SessionStorageServiceImpl::getRootFolder() const
@@ -200,7 +203,7 @@ void SessionStorageServiceImpl::onSessionChanged()
 
 void SessionStorageServiceImpl::clearPatientSilent()
 {
-	this->setActivePatient(DataLocations::getNoPatientFolder());
+	this->setActivePatient(this->getNoPatientFolder());
 	emit cleared();
 }
 

@@ -790,7 +790,11 @@ int findLocalMinimas(int *guesses,
 
 	// Now with the cube-ish way of doing things, we may simply find all guesses that are closer than CUBE_SIZE * voxel_scale
 	float max_dist = EUCLID_DIST(out_spacing.x * CUBE_SIZE, out_spacing.z*CUBE_SIZE, out_spacing.y*CUBE_SIZE) + radius;
+#ifdef DEBUG
 	DEBUG_PRINTF("Max dist is %f\n", max_dist);
+#endif
+
+
 	int prev_pos = 0;
 	//float smallest_dist = fabs(dot(voxel, plane_eqs[0]));
 	guesses[0] = 0;
@@ -810,12 +814,16 @@ int findLocalMinimas(int *guesses,
 			// of course we want to use this one.
 			if(!hasHighSinceLastTaken)
 			{
+#ifdef DEBUG
 				DEBUG_PRINTF("Minima %d: Found nearby minima: %d : %f\n", nMinima, i, dist);
+#endif
 				// We have a previous minima, and it's too close.
 				float prev_dist = fabs(dot(plane_eqs[guesses[prev_pos]], voxel));
 				if(dist < prev_dist)
 				{
+#ifdef DEBUG
 					DEBUG_PRINTF("Taking it\n");
+#endif
 					// But this one is better, lets use it
 					guesses[prev_pos] = i;
 					hasHighSinceLastTaken = 0;
@@ -824,7 +832,9 @@ int findLocalMinimas(int *guesses,
 			else if(nMinima < MAX_MULTISTART_STARTS)
 			{
 				// We may simply store this minima
+#ifdef DEBUG
 				DEBUG_PRINTF("Minima %d: Found new minima: %d : %f\n", nMinima, i, dist);
+#endif
 				guesses[nMinima] = i;
 				prev_pos = nMinima;
 				hasHighSinceLastTaken = 0;
@@ -850,7 +860,9 @@ int findLocalMinimas(int *guesses,
 				}
 				if(biggest > dist)
 				{
+#ifdef DEBUG
 					DEBUG_PRINTF("Switching out %d for %d: %f vs %f\n", biggest_idx, i, biggest, dist);
+#endif
 					guesses[biggest_idx] = i;
 					prev_pos = biggest_idx;
 				}
@@ -862,7 +874,9 @@ int findLocalMinimas(int *guesses,
 		}
 	}
 
+#ifdef DEBUG
 	DEBUG_PRINTF("Found %d minima in total\n", nMinima);
+#endif
 
 	return nMinima;
 }

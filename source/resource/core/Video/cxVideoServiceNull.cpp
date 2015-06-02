@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVideoServiceNull.h"
 
 #include "cxStreamerService.h"
+#include "cxBasicVideoSource.h"
 
 namespace cx
 {
@@ -43,7 +44,7 @@ void VideoServiceNull::setActiveVideoSource(QString uid)
 
 VideoSourcePtr VideoServiceNull::getActiveVideoSource()
 {
-	return VideoSourcePtr();
+	return VideoSourcePtr(new BasicVideoSource());
 }
 
 std::vector<VideoSourcePtr> VideoServiceNull::getVideoSources()
@@ -80,12 +81,6 @@ void VideoServiceNull::setPlaybackMode(PlaybackTimePtr controller)
 std::vector<TimelineEvent> VideoServiceNull::getPlaybackEvents()
 {
 	return std::vector<TimelineEvent>();
-}
-
-StreamerService *VideoServiceNull::getStreamerService(QString service)
-{
-	printWarning();
-	return NULL;
 }
 
 QList<StreamerService *> VideoServiceNull::getStreamerServices()

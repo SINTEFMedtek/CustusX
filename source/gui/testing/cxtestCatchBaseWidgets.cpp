@@ -157,7 +157,7 @@ TEST_CASE("BaseWidget's children in gui/dataWidgets correctly constructed", "[un
 	testAndDeleteBaseWidgetChild(new cx::ColorWidget(patientModelService, testParent));
 	testAndDeleteBaseWidgetChild(new cx::CroppingWidget(patientModelService, visualizationService, testParent));
 //	testAndDeleteBaseWidgetChild(new cx::DataSelectWidget(testParent));//special case: Needs a SelectDataStringPropertyBasePtr moc object
-	testAndDeleteBaseWidgetChild(new cx::EraserWidget(testParent));
+	testAndDeleteBaseWidgetChild(new cx::EraserWidget(patientModelService, visualizationService, testParent));
 	testAndDeleteBaseWidgetChild(new cx::FrameTreeWidget(patientModelService, testParent));
 	testAndDeleteBaseWidgetChild(new cx::MetricWidget(visualizationService, patientModelService, testParent));
 	testAndDeleteBaseWidgetChild(new cx::NavigationWidget(testParent));

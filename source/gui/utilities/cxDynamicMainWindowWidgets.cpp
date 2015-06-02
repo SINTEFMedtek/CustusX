@@ -14,7 +14,11 @@ namespace cx
 DynamicMainWindowWidgets::DynamicMainWindowWidgets(QMainWindow* mainWindow) :
 	mMainWindow(mainWindow)
 {
-
+	// use dummy toolbar to force default preset toolbars to the left
+	mFirstDummyToolbar = new QToolBar;
+	mFirstDummyToolbar->setObjectName("dummy_toolbar");
+//	mFirstDummyToolbar->hide();
+	mMainWindow->addToolBar(mFirstDummyToolbar);
 }
 
 QDockWidget* DynamicMainWindowWidgets::addAsDockWidget(QWidget* widget, QString groupname, QObject* owningPlugin)
@@ -99,8 +103,9 @@ void DynamicMainWindowWidgets::restorePreset(const Desktop::Preset& preset)
 	QToolBar* tb = mMainWindow->findChild<QToolBar*>(preset.name);
 	if (tb)
 	{
+		// add before dummy
 		mMainWindow->removeToolBar(tb);
-		mMainWindow->addToolBar(Qt::TopToolBarArea, tb);
+		mMainWindow->insertToolBar(mFirstDummyToolbar, tb);
 		tb->show();
 		return;
 	}
@@ -222,26 +227,19 @@ void DynamicMainWindowWidgets::hideAll()
 	{
 		mItems[i].mWidget->hide();
 
-//		QDockWidget* widget = dynamic_cast<QDockWidget*>(mItems[i].mWidget);
-//		if (!widget)
-//			continue;
-
-//		widget->hide();
+		QToolBar* toolbar = dynamic_cast<QToolBar*>(mItems[i].mWidget);
+		if (toolbar)
+		{
+			// move to end of list (i.e. after dummy)
+			mMainWindow->removeToolBar(toolbar);
+			mMainWindow->addToolBar(toolbar);
+		}
 	}
 
-	// hide toolbars are disabled.... why?
-	//	for (std::set<QToolBar*>::iterator i=mToolbars.begin(); i!=mToolbars.end(); ++i)
-	//		(*i)->hide();
-	//	for (std::set<QToolBar*>::iterator i=mToolbars.begin(); i!=mToolbars.end(); ++i)
-	//		this->removeToolBar(*i);
-	//	for (std::set<QToolBar*>::iterator i=mToolbars.begin(); i!=mToolbars.end(); ++i)
-	//		this->addToolBar(*i);
 }
 
 void DynamicMainWindowWidgets::addToWidgetGroupMap(ActionGroupMap& groups, QAction* action, QString groupname)
 {
-	//	QAction* action = new QAction();
-
 	action->setMenuRole(QAction::NoRole);
 
 	if (!groups.count(groupname))
@@ -294,17 +292,5 @@ QMenu* DynamicMainWindowWidgets::createPopupMenu()
 
 	return popupMenu;
 }
-
-//void DockWidgets::toggleDebug(QAction* action, bool checked)
-//{
-//	for (std::set<QDockWidget*>::iterator iter = mDockWidgets.begin(); iter != mDockWidgets.end(); ++iter)
-//	{
-//		if (action == (*iter)->toggleViewAction())
-//		{
-//			if (!checked)
-//				(*iter)->hide();
-//		}
-//	}
-//}
 
 } // namespace cx

@@ -4,9 +4,12 @@ Build instructions {#build_instructions}
 Recommended build procedure {#build_instructions2}
 ===================
 
-* Ensure you are on a \ref supported_platforms. 
+Make sure you:
+* Are on a \ref supported_platforms. 
 * Fulfill the \ref prerequisites. 
-* Choose a root folder for the project. It will be populated as described in \ref build_instructions_folder_structure.
+* Have a github account with [SSH authentication](https://help.github.com/articles/set-up-git/).
+
+Choose a root folder for the project. It will be populated as described in \ref build_instructions_folder_structure.
 
 Then run the following commands:
 

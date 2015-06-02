@@ -17,6 +17,11 @@ set(ALL_LINK_LIBRARIES
 
 cx_initialize_opencv()
 
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/cxVideoServerConfig.h.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/cxVideoServerConfig.h"
+  )
+  
 if(CX_USE_OpenCV)
     set(ALL_LINK_LIBRARIES
         ${ALL_LINK_LIBRARIES}

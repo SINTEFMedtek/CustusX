@@ -180,6 +180,8 @@ public:
 
 	void startThresholdPreview(const Eigen::Vector2d& threshold);
 	void stopThresholdPreview();
+	int getVTKMinValue();
+	int getVTKMaxValue();
 signals:
 	void vtkImageDataChanged(); ///< emitted when the vktimagedata are invalidated and must be retrieved anew.
 	void transferFunctionsChanged(); ///< emitted when image transfer functions in 2D or 3D are changed.

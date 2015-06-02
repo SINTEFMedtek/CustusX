@@ -47,7 +47,8 @@ namespace cx
 
 QString OpenCVStreamerService::getName()
 {
-	return "OpenCV";
+//	return "OpenCV";
+	return "Video Grabber";
 }
 
 QString OpenCVStreamerService::getType() const
