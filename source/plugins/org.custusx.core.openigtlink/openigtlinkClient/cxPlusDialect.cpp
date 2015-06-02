@@ -43,7 +43,6 @@ void PlusDialect::translate(const igtl::TransformMessage::Pointer body)
         Transform3D s_M_custustool = s_M_igtltool * igtltool_M_custustool;
         Transform3D sMt = s_M_custustool;
         QString calibrationBelongsToDeviceName = this->findDeviceForCalibration(deviceName);
-        CX_LOG_DEBUG() << calibrationBelongsToDeviceName;
         if(calibrationBelongsToDeviceName != "NOT_FOUND")
         {
             emit calibration(calibrationBelongsToDeviceName, sMt);
@@ -51,7 +50,7 @@ void PlusDialect::translate(const igtl::TransformMessage::Pointer body)
     }
     else
     {
-        double timestamp_ms = this->extractTimeStamp(body); //since epoch
+        double timestamp_ms = this->getCurrentTimestamp();
         Transform3D prMs = matrix;
         emit transform(deviceName, prMs, timestamp_ms);
     }
@@ -87,6 +86,7 @@ void PlusDialect::translate(const igtl::ImageMessage::Pointer body)
     //IMAGE
     IGTLinkConversion converter;
     ImagePtr theImage = converter.decode(body);
+    theImage->setAcquisitionTime(QDateTime::currentDateTime());
     emit image(theImage);
 
     //PROBEDEFINITION
@@ -113,6 +113,12 @@ void PlusDialect::translate(const igtl::StringMessage::Pointer body)
         CX_LOG_CHANNEL_INFO(CX_OPENIGTLINK_CHANNEL_NAME) << string;
     //else
     //    CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << string;
+}
+
+double PlusDialect::getCurrentTimestamp() const
+{
+    double current_timestamp_ms = QDateTime::currentDateTime().toMSecsSinceEpoch();
+    return current_timestamp_ms;
 }
 
 void PlusDialect::registerTransformDeviceName(QString deviceName)

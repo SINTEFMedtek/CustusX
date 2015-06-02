@@ -170,6 +170,7 @@ public:
     virtual void translate(const igtl::StringMessage::Pointer body);
 
 private:
+    double getCurrentTimestamp() const;
     void registerTransformDeviceName(QString deviceName);
     bool isCalibration(QString deviceName) const;
     QString findDeviceForCalibration(QString calibrationDeviceName) const;
