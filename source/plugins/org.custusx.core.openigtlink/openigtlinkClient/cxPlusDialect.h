@@ -65,6 +65,7 @@ namespace cx {
       SharedMemoryStatus="1"
       EnableAutoClip="TRUE"
       AutoClipEnabled="TRUE"
+      LocalTimeOffsetSec="-0.145"
       ImageGeometryOutputEnabled="TRUE"
       ImageToTransducerTransformName="ImageToTransducer"
       >
