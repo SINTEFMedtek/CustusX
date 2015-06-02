@@ -29,20 +29,34 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include "cxStreamerService.h"
+#ifndef CXSTREAMERINTERFACENULL_H
+#define CXSTREAMERINTERFACENULL_H
 
-#include "cxStreamerServiceNull.h"
-#include "cxNullDeleter.h"
+#include "cxStreamerService.h"
 
 namespace cx
 {
 
-StreamerServicePtr StreamerService::getNullObject()
+/**
+ * \brief Null implementation of the StreamerService.
+ *
+ * \ingroup cx_resource_core_video
+ *
+ * \date June 02, 2015
+ * \author Janne Beate Bakeng, SINTEF
+ */
+class cxResource_EXPORT StreamerServiceNull : public StreamerService
 {
-    static StreamerServicePtr mNull;
-    if (!mNull)
-        mNull.reset(new StreamerServiceNull, null_deleter());
-    return mNull;
-}
+public:
+    StreamerServiceNull() {}
+    virtual ~StreamerServiceNull(){}
+    virtual QString getName();
+    virtual QString getType() const;
+
+    virtual std::vector<PropertyPtr> getSettings(QDomElement root);
+    virtual StreamerPtr createStreamer(QDomElement root);
+};
 
 } //end namespace cx
+
+#endif // CXSTREAMERINTERFACENULL_H
