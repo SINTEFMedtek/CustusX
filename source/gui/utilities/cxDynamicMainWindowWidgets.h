@@ -69,6 +69,7 @@ private:
 
 	QMainWindow* mMainWindow;
 	std::vector<DynamicWidget> mItems;
+	QToolBar* mFirstDummyToolbar;
 };
 
 } // namespace cx

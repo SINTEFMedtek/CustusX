@@ -62,7 +62,7 @@ GeneralTab::GeneralTab(VisualizationServicePtr visualizationService, PatientMode
 
 void GeneralTab::init()
 {
-  mGlobalPatientDataFolder = settings()->value("globalPatientDataFolder").toString();
+  mGlobalPatientDataFolder = profile()->getSessionRootFolder();
   mVLCPath = settings()->value("vlcPath").toString();
   if(!QFile::exists(mVLCPath))
 	  this->searchForVLC();
@@ -244,7 +244,7 @@ void GeneralTab::searchForVLC(QStringList searchPaths)
 
 void GeneralTab::saveParametersSlot()
 {
-  settings()->setValue("globalPatientDataFolder", mGlobalPatientDataFolder);
+	profile()->setSessionRootFolder(mGlobalPatientDataFolder);
   settings()->setValue("vlcPath", mVLCPath);
   settings()->setValue("TrackingPositionFilter/enabled", mFilterToolPositions->getValue());
   settings()->sync();

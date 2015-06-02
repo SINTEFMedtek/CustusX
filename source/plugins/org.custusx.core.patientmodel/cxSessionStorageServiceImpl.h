@@ -86,6 +86,7 @@ private:
 	void writeRecentPatientData();
 	void generateSaveDoc(QDomDocument& doc);
 	void clearPatientSilent();
+	QString getNoPatientFolder() const;
 	void createPatientFolders(QString dir);
 	static QString getVersionName();
 	QDomDocument readXmlFile(QString filename);
