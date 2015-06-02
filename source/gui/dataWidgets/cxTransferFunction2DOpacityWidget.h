@@ -61,7 +61,7 @@ public:
   TransferFunction2DOpacityWidget(PatientModelServicePtr patientModelService, QWidget* parent);
   virtual ~TransferFunction2DOpacityWidget() {}
 
-public slots:
+private slots:
   void activeImageChangedSlot();
 
 protected:

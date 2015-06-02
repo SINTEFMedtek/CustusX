@@ -87,7 +87,7 @@ bool ImageReceiverThread::attemptInitialize()
 	XmlOptionFile xmlFile = profile()->getXmlSettings().descend("video");
 	QDomElement element = xmlFile.getElement("video");
 	mImageStreamer = mStreamerInterface->createStreamer(element);
-	report(QString("Starting streamer: [%1]").arg(mImageStreamer->getType()));
+	report(QString("Starting streamer: [%1]").arg(this->hostDescription()));
 
 	if(!mImageStreamer)
 	{
@@ -95,8 +95,8 @@ bool ImageReceiverThread::attemptInitialize()
 	}
 	mSender.reset(new DirectlyLinkedSender());
 
-	connect(mSender.get(), SIGNAL(newImage()), this, SLOT(addImageToQueueSlot()), Qt::DirectConnection);
-	connect(mSender.get(), SIGNAL(newUSStatus()), this, SLOT(addSonixStatusToQueueSlot()), Qt::DirectConnection);
+	connect(mSender.get(), &DirectlyLinkedSender::newImage, this, &ImageReceiverThread::addImageToQueueSlot, Qt::DirectConnection);
+	connect(mSender.get(), &DirectlyLinkedSender::newUSStatus, this, &ImageReceiverThread::addSonixStatusToQueueSlot, Qt::DirectConnection);
 
 	if(!mImageStreamer->startStreaming(mSender))
 	{
@@ -110,9 +110,9 @@ void ImageReceiverThread::shutdown()
 {
 	if (mImageStreamer)
 	{
-		report(QString("Stopping streamer: [%1]...").arg(mImageStreamer->getType()));
+		report(QString("Stopping streamer: [%1]...").arg(this->hostDescription()));
 		mImageStreamer->stopStreaming();
-		report(QString("Stopped streamer: [%1]").arg(mImageStreamer->getType()));
+		report(QString("Stopped streamer: [%1]").arg(this->hostDescription()));
 		mImageStreamer.reset();
 		mSender.reset();
 	}

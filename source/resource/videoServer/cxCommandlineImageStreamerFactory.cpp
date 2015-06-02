@@ -70,7 +70,7 @@ StreamerPtr CommandlineImageStreamerFactory::getFromArguments(StringMap args)
 	if (args.count("type"))
 		type = args["type"];
 
-	StreamerPtr streamer = this->getImageSender(type);
+	CommandLineStreamerPtr streamer = this->getImageSender(type);
 
 	if (streamer)
 		reportSuccess("Created sender of type: "+type);
@@ -80,29 +80,17 @@ StreamerPtr CommandlineImageStreamerFactory::getFromArguments(StringMap args)
 		return streamer;
 	}
 
-	CommandLineStreamerPtr commandlinestreamer = boost::dynamic_pointer_cast<CommandLineStreamer>(streamer);
-	if(commandlinestreamer)
-		commandlinestreamer->initialize(args);
-
-	DummyImageStreamerPtr mhdimagestreamer = boost::dynamic_pointer_cast<DummyImageStreamer>(streamer);
-	QString filename = args["filename"];
-	bool secondary = args.count("secondary") ? true : false;
-	if(mhdimagestreamer)
-		mhdimagestreamer->initialize(filename, secondary);
-
+	streamer->initialize(args);
 	return streamer;
 }
 
 
 CommandlineImageStreamerFactory::CommandlineImageStreamerFactory()
 {
-#ifdef CX_WIN32
-	mCommandLineStreamers.push_back(CommandLineStreamerPtr(new ImageStreamerSonix()));
-#endif
 #ifdef CX_USE_OpenCV
 	mCommandLineStreamers.push_back(CommandLineStreamerPtr(new ImageStreamerOpenCV()));
 #endif
-	mImageStreamers.push_back(DummyImageStreamerPtr(new DummyImageStreamer()));
+	mCommandLineStreamers.push_back(DummyImageStreamerPtr(new DummyImageStreamer()));
 }
 
 QString CommandlineImageStreamerFactory::getDefaultSenderType() const
@@ -115,35 +103,23 @@ QStringList CommandlineImageStreamerFactory::getSenderTypes() const
 	QStringList retval;
 	for (unsigned i=0; i< mCommandLineStreamers.size(); ++i)
 		retval << mCommandLineStreamers[i]->getType();
-	for (unsigned i=0; i< mImageStreamers.size(); ++i)
-		retval << mImageStreamers[i]->getType();
 	return retval;
 }
 
 QStringList CommandlineImageStreamerFactory::getArgumentDescription(QString type) const
 {
-	QStringList retval;
 	for (unsigned i=0; i< mCommandLineStreamers.size(); ++i)
-	{
 		if (mCommandLineStreamers[i]->getType()==type)
 			return mCommandLineStreamers[i]->getArgumentDescription();
-	}
-	return retval;
+	return QStringList();
 }
 
-StreamerPtr CommandlineImageStreamerFactory::getImageSender(QString type)
+CommandLineStreamerPtr CommandlineImageStreamerFactory::getImageSender(QString type)
 {
 	for (unsigned i=0; i< mCommandLineStreamers.size(); ++i)
-	{
 		if (mCommandLineStreamers[i]->getType()==type)
 			return mCommandLineStreamers[i];
-	}
-	for (unsigned i=0; i< mImageStreamers.size(); ++i)
-	{
-		if (mImageStreamers[i]->getType()==type)
-			return mImageStreamers[i];
-	}
-	return StreamerPtr();
+	return CommandLineStreamerPtr();
 }
 
 

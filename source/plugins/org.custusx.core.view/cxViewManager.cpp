@@ -70,7 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRenderLoop.h"
 #include "cxLayoutRepository.h"
 
-#include "cxCoreServices.h"
+#include "cxVisServices.h"
 #include "cxXMLNodeWrapper.h"
 #include "cxCameraControl.h"
 #include "cxNavigation.h"
@@ -80,14 +80,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-VisualizationServiceOldPtr ViewManager::create(CoreServicesPtr backend)
+VisualizationServiceOldPtr ViewManager::create(VisServicesPtr backend)
 {
 	VisualizationServiceOldPtr retval;
 	retval.reset(new ViewManager(backend));
 	return retval;
 }
 
-ViewManager::ViewManager(/*PatientModelServicePtr patientModelService, */CoreServicesPtr backend) :
+ViewManager::ViewManager(VisServicesPtr backend) :
 				mGlobalObliqueOrientation(false)
 {
 	mBackend = backend;
@@ -463,7 +463,8 @@ void ViewManager::rebuildLayouts()
 	}
 
 	this->setSlicePlanesProxyInViewsUpTo2DViewgroup();
-	mCameraControl->setView(this->get3DView());
+
+	mCameraControl->refreshView(this->get3DView());
 }
 
 void ViewManager::setSlicePlanesProxyInViewsUpTo2DViewgroup()

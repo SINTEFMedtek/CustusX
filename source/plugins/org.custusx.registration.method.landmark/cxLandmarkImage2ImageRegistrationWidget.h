@@ -69,7 +69,6 @@ public:
 	virtual QString defaultWhatsThis() const;
 
 protected slots:
-	void updateRep();
 	void registerSlot();
 	void translationCheckBoxChanged();
 
@@ -82,9 +81,6 @@ protected:
     virtual Transform3D getTargetTransform() const;
 	virtual void setTargetLandmark(QString uid, Vector3D p_target);
 	virtual QString getTargetName() const;
-
-	ImageLandmarksSourcePtr mFixedLandmarkSource;
-	ImageLandmarksSourcePtr mMovingLandmarkSource;
 
 	//gui
 	StringPropertyRegistrationFixedImagePtr mFixedProperty;

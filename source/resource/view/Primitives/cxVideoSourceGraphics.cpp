@@ -138,7 +138,7 @@ void VideoSourceGraphics::setRealtimeStream(VideoSourcePtr data)
 		return;
 	if (mData)
 	{
-		disconnect(mData.get(), SIGNAL(newFrame()), this, SLOT(newDataSlot()));
+		disconnect(mData.get(), &VideoSource::newFrame, this, &VideoSourceGraphics::newDataSlot);
 		mPipeline->setInputVideo(NULL);
 	}
 
@@ -146,7 +146,7 @@ void VideoSourceGraphics::setRealtimeStream(VideoSourcePtr data)
 
 	if (mData)
 	{
-		connect(mData.get(), SIGNAL(newFrame()), this, SLOT(newDataSlot()));
+		connect(mData.get(), &VideoSource::newFrame, this, &VideoSourceGraphics::newDataSlot);
 		mPipeline->setInputVideo(mData->getVtkImageData());
 	}
 

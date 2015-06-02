@@ -80,8 +80,6 @@ cx_add_class(cxGui_SRCS
         cxMainWindowApplicationComponent.h
 )
 
-#set(cxGui_SRCS ${cxGui_SRCS} ${CustusX_SOURCE_DIR}/source/gui/icons/application.icns) # needed at least on apple to display icon
-
 cx_create_export_header("cxGui")
 
 # generate rules for building source files from the resources
@@ -120,6 +118,9 @@ target_link_libraries(cxGui
     cxPluginUtilities
 	cxResourceFilter
 	)
+
+cx_doc_define_plugin_user_docs("${PROJECT_NAME}" "${CMAKE_CURRENT_SOURCE_DIR}/doc")
+cx_add_non_source_file("doc/preferences.md")
 
 add_subdirectory(testing)
 

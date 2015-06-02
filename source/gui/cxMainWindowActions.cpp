@@ -71,10 +71,12 @@ void MainWindowActions::createActions()
 					   QKeySequence("Ctrl+Shift+f"), "Save an image of the application to the patient folder.",
 					   &MainWindowActions::shootWindow);
 
-	this->createAction("RecordFullscreen", "Record Fullscreen",
+	mRecordFullscreenStreamingAction = this->createAction("RecordFullscreen", "Record Fullscreen",
 					   QIcon(),
 					   QKeySequence("F8"), "Record a video of the full screen.",
 					   &MainWindowActions::recordFullscreen);
+	connect(vlc(), &VLCRecorder::stateChanged, this, &MainWindowActions::updateRecordFullscreenActionSlot);
+	this->updateRecordFullscreenActionSlot();
 
 	mShowPointPickerAction = this->createAction("ShowPointPicker", "Point Picker",
 												QIcon(":/icons/point_picker.png"),
@@ -122,7 +124,6 @@ void MainWindowActions::createTrackingActions()
 											  QIcon(), QKeySequence("Ctrl+T"), "",
 											  &MainWindowActions::toggleTrackingSlot);
 
-	connect(trackingService().get(), &TrackingService::stateChanged, this, &MainWindowActions::updateTrackingActionSlot);
 	connect(trackingService().get(), &TrackingService::stateChanged, this, &MainWindowActions::updateTrackingActionSlot);
 	this->updateTrackingActionSlot();
 }
@@ -346,6 +347,23 @@ void MainWindowActions::recordFullscreen()
 		vlc()->stopRecording();
 	else
 		vlc()->startRecording(path);
+}
+
+void MainWindowActions::updateRecordFullscreenActionSlot()
+{
+	mRecordFullscreenStreamingAction->setCheckable(true);
+	mRecordFullscreenStreamingAction->blockSignals(true);
+	mRecordFullscreenStreamingAction->setChecked(vlc()->isRecording());
+	mRecordFullscreenStreamingAction->blockSignals(false);
+
+	if(vlc()->isRecording())
+	{
+		mRecordFullscreenStreamingAction->setIcon(QIcon(":/icons/Video-icon_green.png"));
+	}
+	else
+	{
+		mRecordFullscreenStreamingAction->setIcon(QIcon(":/icons/Video-icon_gray.png"));
+	}
 
 }
 
@@ -400,14 +418,7 @@ void MainWindowActions::updateStreamingActionSlot()
 
 void MainWindowActions::centerToImageCenterSlot()
 {
-	NavigationPtr nav = viewService()->getNavigation();
-
-	if (patientService()->getActiveImage())
-		nav->centerToData(patientService()->getActiveImage());
-	else if (!viewService()->groupCount())
-		nav->centerToView(viewService()->getGroup(0)->getData());
-	else
-		nav->centerToGlobalDataCenter();
+	viewService()->getNavigation()->centerToDataInActiveViewGroup();
 }
 
 void MainWindowActions::centerToTooltipSlot()

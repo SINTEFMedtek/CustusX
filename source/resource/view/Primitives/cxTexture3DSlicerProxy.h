@@ -113,7 +113,7 @@ public:
 	void update();
 	void setTargetSpaceToR(); ///< use to draw the slice in 3D r space instead of in 2D s space.
 	vtkActorPtr getActor();
-	std::vector<ImagePtr> getImages() { return mImages; };
+	std::vector<ImagePtr> getImages() { return mImages; }
 
 protected:
 	Texture3DSlicerProxyImpl();
@@ -128,6 +128,8 @@ private:
 	void updateCoordinates(int index);
 	QString getTCoordName(int index);
 	void setColorAttributes(int i);
+	std::vector<ImagePtr> processImages(std::vector<ImagePtr> images_raw);
+
 	DoubleBoundingBox3D mBB_s;
 	std::vector<ImagePtr> mImages;
 	SliceProxyPtr mSliceProxy;
@@ -139,6 +141,8 @@ private:
 	vtkPlaneSourcePtr mPlaneSource;
 	vtkPainterPolyDataMapperPtr mPainterPolyDatamapper;
 	vtkPolyDataAlgorithmPtr mPolyDataAlgorithm;
+
+	static const int mMaxImages = 4;// This class is hardcoded for a maximum of 4 images
 };
 
 #endif // WIN32

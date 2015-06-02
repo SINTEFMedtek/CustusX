@@ -57,6 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxLogMessageFilter.h"
 #include "cxMessageListener.h"
+#include "cxVLCRecorder.h"
 
 
 namespace cx
@@ -64,6 +65,7 @@ namespace cx
 StatusBar::StatusBar() :
 	mRenderingFpsLabel(new QLabel(this)),
 	mGrabbingInfoLabel(new QLabel(this)),
+	mRecordFullscreenLabel(new QLabel(this)),
 	mTpsLabel(new QLabel(this))
 {
 	mMessageListener = MessageListener::create();
@@ -82,6 +84,8 @@ StatusBar::StatusBar() :
 
 	connect(videoService().get(), SIGNAL(fps(int)), this, SLOT(grabbingFpsSlot(int)));
 	connect(videoService().get(), SIGNAL(connected(bool)), this, SLOT(grabberConnectedSlot(bool)));
+
+	connect(vlc(), &VLCRecorder::stateChanged, this, &StatusBar::onRecordFullscreenChanged);
 
 //	this->addPermanentWidget(mMessageLevelLabel);
 	this->addPermanentWidget(mRenderingFpsLabel);
@@ -104,6 +108,7 @@ void StatusBar::connectToToolSignals()
 	this->disconnectFromToolSignals(); // avoid duplicates
 
 	this->addPermanentWidget(mTpsLabel);
+	mTpsLabel->show();
 
 	TrackingService::ToolMap tools = trackingService()->getTools();
 	for (TrackingService::ToolMap::iterator it = tools.begin(); it != tools.end(); ++it)
@@ -221,17 +226,33 @@ void StatusBar::grabberConnectedSlot(bool connected)
 		this->removeWidget(mGrabbingInfoLabel);
 }
 
+void StatusBar::onRecordFullscreenChanged()
+{
+	QLabel* label = mRecordFullscreenLabel;
+
+	if (vlc()->isRecording())
+	{
+		label->setMargin(0);
+		int size = this->height()*0.75; // fit within statusbar
+		QPixmap map;
+		map.load(":/icons/Video-icon_green.png");
+		label->setPixmap(map.scaled(size, size, Qt::KeepAspectRatio));
+
+		this->addPermanentWidget(mRecordFullscreenLabel);
+		mRecordFullscreenLabel->show();
+	}
+	else
+	{
+		this->removeWidget(mRecordFullscreenLabel);
+	}
+}
+
 void StatusBar::showMessageSlot(Message message)
 {
 	QString text = QString("[%1] %4")
 			.arg(qstring_cast(message.getMessageLevel()))
 			.arg(message.getText());
 
-//	this->showMessage(message.getPrintableMessage(), message.getTimeout());
-//	mMessageLevelLabel->setPixmap(QPixmap(":/images/go-home.png"));
-//	mMessageLevelLabel->setPixmap(QPixmap(":/icons/screenshot-screen.png"));
-//	mMessageLevelLabel->setIcon(QIcon(":/icons/screenshot-screen.png"));
-//	mMessageLevelLabel->show();
 	this->showMessage(text, message.getTimeout());
 }
 

@@ -40,13 +40,17 @@ namespace cx
 ActiveToolProxy::ActiveToolProxy(TrackingServicePtr trackingService) :
 	mTrackingService(trackingService)
 {
-	connect(mTrackingService.get(), SIGNAL(activeToolChanged(const QString&)), this,
-					SLOT(activeToolChangedSlot(const QString&)));
-	connect(mTrackingService.get(), SIGNAL(activeToolChanged(const QString&)), this,
-					SIGNAL(activeToolChanged(const QString&)));
+	connect(mTrackingService.get(), &TrackingService::activeToolChanged, this, &ActiveToolProxy::activeToolChangedSlot);
+	connect(mTrackingService.get(), &TrackingService::stateChanged, this, &ActiveToolProxy::trackingStateChanged);
 
 	if (mTrackingService->getActiveTool())
 		this->activeToolChangedSlot(mTrackingService->getActiveTool()->getUid());
+}
+
+void ActiveToolProxy::trackingStateChanged()
+{
+	if (mTrackingService->getState() != Tool::tsTRACKING)
+		emit tps(0);
 }
 
 void ActiveToolProxy::activeToolChangedSlot(const QString& uid)
@@ -58,10 +62,12 @@ void ActiveToolProxy::activeToolChangedSlot(const QString& uid)
 	{
 		disconnect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this,
 						SIGNAL(toolTransformAndTimestamp(Transform3D, double)));
-		disconnect(mTool.get(), SIGNAL(toolVisible(bool)), this, SIGNAL(toolVisible(bool)));
-		disconnect(mTool.get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
-		disconnect(mTool.get(), SIGNAL(toolProbeSector()), this, SIGNAL(toolProbeSector()));
-		disconnect(mTool.get(), SIGNAL(tps(int)), this, SIGNAL(tps(int)));
+		disconnect(mTool.get(), &Tool::toolVisible, this, &ActiveToolProxy::toolVisible);
+		disconnect(mTool.get(), &Tool::tooltipOffset, this, &ActiveToolProxy::tooltipOffset);
+		disconnect(mTool.get(), &Tool::toolProbeSector, this, &ActiveToolProxy::toolProbeSector);
+		disconnect(mTool.get(), &Tool::tps, this, &ActiveToolProxy::tps);
+
+		emit tps(0);
 	}
 
 	mTool = mTrackingService->getActiveTool();
@@ -70,11 +76,12 @@ void ActiveToolProxy::activeToolChangedSlot(const QString& uid)
 	{
 		connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this,
 						SIGNAL(toolTransformAndTimestamp(Transform3D, double)));
-		connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SIGNAL(toolVisible(bool)));
-		connect(mTool.get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
-		connect(mTool.get(), SIGNAL(toolProbeSector()), this, SIGNAL(toolProbeSector()));
-		connect(mTool.get(), SIGNAL(tps(int)), this, SIGNAL(tps(int)));
+		connect(mTool.get(), &Tool::toolVisible, this, &ActiveToolProxy::toolVisible);
+		connect(mTool.get(), &Tool::tooltipOffset, this, &ActiveToolProxy::tooltipOffset);
+		connect(mTool.get(), &Tool::toolProbeSector, this, &ActiveToolProxy::toolProbeSector);
+		connect(mTool.get(), &Tool::tps, this, &ActiveToolProxy::tps);
 
+		emit activeToolChanged(mTool->getUid());
 		emit toolVisible(mTool->getVisible());
 		emit toolTransformAndTimestamp(mTool->get_prMt(), mTool->getTimestamp());
 		emit tooltipOffset(mTool->getTooltipOffset());

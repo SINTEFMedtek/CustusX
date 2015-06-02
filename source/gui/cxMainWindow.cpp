@@ -108,7 +108,7 @@ MainWindow::MainWindow() :
 
 	this->addAsDockWidget(new PlaybackWidget(this), "Browsing");
 	this->addAsDockWidget(new VideoConnectionWidget(mServices, this), "Utility");
-	this->addAsDockWidget(new EraserWidget(this), "Properties");
+	this->addAsDockWidget(new EraserWidget(mServices->patientModelService, mServices->visualizationService, this), "Properties");
 	this->addAsDockWidget(new MetricWidget(mServices->visualizationService, mServices->patientModelService, this), "Utility");
 	this->addAsDockWidget(new SlicePropertiesWidget(mServices->patientModelService, mServices->visualizationService, this), "Properties");
 	this->addAsDockWidget(new VolumePropertiesWidget(mServices->patientModelService, mServices->visualizationService, this), "Properties");
@@ -518,6 +518,7 @@ void MainWindow::createToolBars()
 
 	mScreenshotToolBar = this->registerToolBar("Screenshot");
 	mScreenshotToolBar->addAction(mActions->getAction("ShootScreen"));
+	mScreenshotToolBar->addAction(mActions->getAction("RecordFullscreen"));
 
 	QToolBar* camera3DViewToolBar = this->registerToolBar("Camera 3D Views");
 	camera3DViewToolBar->addActions(mStandard3DViewActions->actions());
@@ -526,7 +527,9 @@ void MainWindow::createToolBars()
 	samplerWidgetToolBar->addWidget(new SamplerWidget(this));
 
 	QToolBar* toolOffsetToolBar = this->registerToolBar("Tool Offset");
-	toolOffsetToolBar->addWidget(createDataWidget(mServices->visualizationService, mServices->patientModelService, this, DoublePropertyActiveToolOffset::create()));
+	SpinBoxAndSliderGroupWidget* offsetWidget = new SpinBoxAndSliderGroupWidget(this, DoublePropertyActiveToolOffset::create());
+	offsetWidget->showLabel(false);
+	toolOffsetToolBar->addWidget(offsetWidget);
 
 	QToolBar* helpToolBar = this->registerToolBar("Help");
 	helpToolBar->addAction(mShowContextSensitiveHelpAction);

@@ -118,10 +118,10 @@ void DataManagerImpl::clear()
 	m_rMpr_History->clear();
 	mPatientLandmarks->clear();
 
+	emit dataAddedOrRemoved();
 	emit centerChanged();
 	emit activeImageChanged("");
 	emit landmarkPropertiesChanged();
-	emit dataAddedOrRemoved();
 }
 
 LandmarksPtr DataManagerImpl::getPatientLandmarks()

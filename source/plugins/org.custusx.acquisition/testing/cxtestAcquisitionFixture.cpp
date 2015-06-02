@@ -86,7 +86,7 @@ cx::PropertyPtr AcquisitionFixture::getOption(QString uid)
 {
 	QDomElement element = mOptions.getElement("video");
 	cx::StreamerService* streamer;
-	streamer = cx::StreamerServiceUtilities::getStreamerService(mConnectionMethod,
+	streamer = cx::StreamerServiceUtilities::getStreamerServiceFromType(mConnectionMethod,
 																cx::logicManager()->getPluginContext());
 	REQUIRE(streamer);
 	cx::PropertyPtr option = cx::Property::findProperty(streamer->getSettings(element), uid);
@@ -96,7 +96,7 @@ cx::PropertyPtr AcquisitionFixture::getOption(QString uid)
 
 void AcquisitionFixture::initVideo()
 {
-	mConnectionMethod = "ImageFile";
+	mConnectionMethod = "image_file_streamer";
 	cx::videoService()->setConnectionMethod(mConnectionMethod);
 	INFO("bundle path: "+cx::DataLocations::getBundlePath());
 
@@ -108,7 +108,7 @@ void AcquisitionFixture::initVideo()
 void AcquisitionFixture::setupVideo()
 {
 	mVideoSource = cx::videoService()->getActiveVideoSource();
-	connect(mVideoSource.get(), SIGNAL(newFrame()), this, SLOT(newFrameSlot()));
+	connect(mVideoSource.get(), &cx::VideoSource::newFrame, this, &AcquisitionFixture::newFrameSlot);
 	cx::videoService()->openConnection();
 }
 

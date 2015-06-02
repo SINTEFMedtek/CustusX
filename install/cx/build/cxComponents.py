@@ -268,7 +268,7 @@ class OpenCV(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('https://github.com/Itseez/opencv.git', 'OpenCV')
     def update(self):
-        self._getBuilder().gitCheckout('2.4.8')
+        self._getBuilder().gitCheckout('2.4.11')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption

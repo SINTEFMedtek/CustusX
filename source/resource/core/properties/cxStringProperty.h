@@ -79,6 +79,7 @@ public:
 	virtual void setValueRange(QStringList range);
 	virtual QString convertInternal2Display(QString internal); ///< conversion from internal value to display value
 	virtual void setDisplayNames(std::map<QString, QString> names);
+	virtual std::map<QString, QString> getDisplayNames() const { return mDisplayNames; }
 
 	virtual bool isReadOnly() const { return mIsReadOnly; }
 	virtual bool getAllowOnlyValuesInRange() const { return mAllowOnlyValuesInRange; }

@@ -42,7 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class ctkDICOMDatabase;
 class ctkDICOMIndexer;
-class ctkFileDialog;
 class QProgressDialog;
 
 namespace cx
@@ -90,7 +89,6 @@ signals:
 private:
 	void showIndexerDialog();
 
-	ctkFileDialog* ImportDialog;
 	QSharedPointer<ctkDICOMDatabase> DICOMDatabase;
 	QSharedPointer<ctkDICOMIndexer> DICOMIndexer;
 	QProgressDialog *IndexerProgress;

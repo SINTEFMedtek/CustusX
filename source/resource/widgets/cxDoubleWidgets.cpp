@@ -56,6 +56,12 @@ void ScalarInteractionWidget::enableLabel()
 	mLabel->setText(mData->getDisplayName());
 }
 
+void ScalarInteractionWidget::showLabel(bool on)
+{
+	if (mLabel)
+		mLabel->setVisible(on);
+}
+
 void ScalarInteractionWidget::enableSlider()
 {
 	mSlider = new DoubleSlider(this);
@@ -109,6 +115,7 @@ void ScalarInteractionWidget::addToOwnLayout()
 {
 	QHBoxLayout* topLayout = new QHBoxLayout;
 	topLayout->setMargin(0);
+	topLayout->setSpacing(0);
 	this->setLayout(topLayout);
 
 	if (mLabel)

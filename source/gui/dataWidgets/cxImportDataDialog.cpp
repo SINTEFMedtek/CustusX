@@ -101,17 +101,14 @@ ImportDataDialog::ImportDataDialog(PatientModelServicePtr patientModelService, Q
   mTransformFromParentFrameCheckBox->setChecked(false);
 
   mConvertToUnsignedCheckBox = new QCheckBox("Convert to unsigned", this);
-  mConvertToUnsignedCheckBox->setToolTip(""
-	  "Convert imported data set to unsigned values.\n"
-	  "This is recommended on Linux because the 2D overlay\n"
-	  "renderer only handles unsigned.");
+  mConvertToUnsignedCheckBox->setToolTip("Convert imported data set to unsigned values.");
   mConvertToUnsignedCheckBox->setChecked(false);
 
   layout->addWidget(mNiftiFormatCheckBox);
   layout->addWidget(mTransformFromParentFrameCheckBox);
   layout->addWidget(mConvertToUnsignedCheckBox);
 
-  connect(mParentFrameAdapter.get(), SIGNAL(changed()), this, SLOT(updateImportTransformButton()));
+  connect(mParentFrameAdapter.get(), &Property::changed, this, &ImportDataDialog::updateImportTransformButton);
   this->updateImportTransformButton();
 
   mErrorLabel = new QLabel();
@@ -122,8 +119,9 @@ ImportDataDialog::ImportDataDialog(PatientModelServicePtr patientModelService, Q
   mOkButton = new QPushButton("OK", this);
   buttons->addStretch();
   buttons->addWidget(mOkButton);
-  connect(mOkButton, SIGNAL(clicked()), this, SLOT(accept()));
-  connect(this, SIGNAL(accepted()), this, SLOT(acceptedSlot()));
+  connect(mOkButton, &QPushButton::clicked, this, &QDialog::accept);
+  connect(this, &QDialog::accepted, this, &ImportDataDialog::acceptedSlot);
+  connect(this, &QDialog::rejected, this, &ImportDataDialog::finishedSlot);
   mOkButton->setDefault(true);
   mOkButton->setFocus();
 
@@ -178,20 +176,12 @@ void ImportDataDialog::importDataSlot()
   mNiftiFormatCheckBox->setEnabled(mPatientModelService->getData<Mesh>(mData->getUid())!=0);
 
   mConvertToUnsignedCheckBox->setEnabled(false);
-//  ImagePtr image = boost::dynamic_pointer_cast<Image>(mData);
   if (image && image->getBaseVtkImageData())
   {
-	  vtkImageDataPtr img = image->getBaseVtkImageData();
+//	  vtkImageDataPtr img = image->getBaseVtkImageData();
 //	  std::cout << "type " << img->GetScalarTypeAsString() << " -- " << img->GetScalarType() << std::endl;
 //	  std::cout << "range " << img->GetScalarTypeMin() << " -- " << img->GetScalarTypeMax() << std::endl;
 	  mConvertToUnsignedCheckBox->setEnabled( (image!=0) && (image->getBaseVtkImageData()->GetScalarTypeMin()<0) );
-#ifndef __APPLE__
-#ifndef WIN32
-	  // i.e. LINUX:
-	  if (mConvertToUnsignedCheckBox->isEnabled())
-		  mConvertToUnsignedCheckBox->setChecked(true);
-#endif // WIN32
-#endif // __APPLE__
   }
 }
 
@@ -236,6 +226,11 @@ void ImportDataDialog::acceptedSlot()
 
 	mPatientModelService->autoSave();
 	viewService()->autoShowData(mData);
+	this->finishedSlot();
+}
+
+void ImportDataDialog::finishedSlot()
+{
 }
 
 /** According to

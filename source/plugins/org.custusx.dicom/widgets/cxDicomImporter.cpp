@@ -36,11 +36,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMessageBox>
 #include <QProgressDialog>
 #include <QLabel>
+#include <QFileDialog>
 // ctkWidgets includes
-#include "ctkFileDialog.h"
 // ctkDICOMCore includes
 #include "ctkDICOMDatabase.h"
 #include "ctkDICOMIndexer.h"
+
+#include "cxReporter.h"
 
 namespace cx
 {
@@ -54,23 +56,11 @@ DicomImporter::DicomImporter(QObject* parent): QObject(parent)
 	StudiesAddedDuringImport = 0;
 	SeriesAddedDuringImport = 0;
 	InstancesAddedDuringImport = 0;
-
-	//Initialize import widget
-	ImportDialog = new ctkFileDialog();
-	QCheckBox* importCheckbox = new QCheckBox("Copy on import", ImportDialog);
-	ImportDialog->setBottomWidget(importCheckbox);
-	ImportDialog->setFileMode(QFileDialog::Directory);
-	ImportDialog->setLabelText(QFileDialog::Accept,"Import");
-	ImportDialog->setWindowTitle("Import DICOM files from directory ...");
-	ImportDialog->setWindowModality(Qt::ApplicationModal);
-
-	connect(ImportDialog, SIGNAL(fileSelected(QString)),this,SLOT(onImportDirectory(QString)));
 }
 
 DicomImporter::~DicomImporter()
 {
 	delete IndexerProgress;
-	ImportDialog->deleteLater();
 }
 
 void DicomImporter::setDatabase(QSharedPointer<ctkDICOMDatabase> database)
@@ -136,7 +126,7 @@ void DicomImporter::showIndexerDialog()
 	connect(IndexerProgress, SIGNAL(canceled()),
 			DICOMIndexer.data(), SLOT(cancel()));
 	connect(IndexerProgress, SIGNAL(canceled()),
-			this, SLOT(indexingCompleted()));
+			this, SIGNAL(indexingCompleted()));
 
 	// allow users of this widget to know that the process has finished
 	connect(IndexerProgress, SIGNAL(canceled()),
@@ -190,8 +180,11 @@ void DicomImporter::onFileIndexed(const QString& filePath)
 //----------------------------------------------------------------------------
 void DicomImporter::openImportDialog()
 {
-  ImportDialog->show();
-  ImportDialog->raise();
+	QString folder = QFileDialog::getExistingDirectory(NULL, "Import DICOM files from directory ...", "", QFileDialog::ShowDirsOnly);
+	if (!folder.isEmpty())
+		onImportDirectory(folder);
+	else
+		reportWarning("No DICOM folder selected");
 }
 
 //----------------------------------------------------------------------------
@@ -230,13 +223,6 @@ void DicomImporter::onImportDirectory(QString directory)
 {
   if (QDir(directory).exists())
 	{
-	QCheckBox* copyOnImport = qobject_cast<QCheckBox*>(ImportDialog->bottomWidget());
-	QString targetDirectory;
-	if (copyOnImport->checkState() == Qt::Checked)
-	  {
-	  targetDirectory = DICOMDatabase->databaseDirectory();
-	  }
-
 	// reset counts
 	PatientsAddedDuringImport = 0;
 	StudiesAddedDuringImport = 0;
@@ -245,7 +231,7 @@ void DicomImporter::onImportDirectory(QString directory)
 
 	// show progress dialog and perform indexing
 	showIndexerDialog();
-	DICOMIndexer->addDirectory(*DICOMDatabase,directory,targetDirectory);
+	DICOMIndexer->addDirectory(*DICOMDatabase,directory);
 
 	// display summary result
 	if (DisplayImportSummary)

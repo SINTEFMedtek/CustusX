@@ -181,6 +181,13 @@ QAction* CameraControl::addStandard3DViewAction(QString caption, QString help, V
 	return action;
 }
 
+void CameraControl::refreshView(ViewPtr view)
+{
+	this->setView(view);
+	if(view)
+		view->getRenderer()->ResetCameraClippingRange();
+}
+
 void CameraControl::setView(ViewPtr view)
 {
 	mView = view;

@@ -33,9 +33,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVideoService.h"
 #include "cxVideoServiceNull.h"
 #include "cxNullDeleter.h"
+#include "cxStreamerService.h"
 
 namespace cx
 {
+
 VideoServicePtr VideoService::getNullObject()
 {
 	static VideoServicePtr mNull;
@@ -43,4 +45,14 @@ VideoServicePtr VideoService::getNullObject()
 		mNull.reset(new VideoServiceNull, null_deleter());
 	return mNull;
 }
+
+StreamerService* VideoService::getStreamerService(QString uid)
+{
+	QList<StreamerService*> services = this->getStreamerServices();
+	foreach(StreamerService* temp, services)
+		if (temp->getType()==uid)
+			return temp;
+	return NULL;
+}
+
 } //cx

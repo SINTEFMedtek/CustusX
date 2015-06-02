@@ -100,20 +100,13 @@ public:
 		mServiceTracker->open();
 	}
 
-	T* getService(QString name)
+	T* getServiceFromName(QString name)
 	{
 		QList<T*> services = mServiceTracker->getServices();
-
-		T* service = NULL;
 		foreach(T* temp, services)
-		{
-			QString serviceName = temp->getName();
-			if(serviceName.compare(name) == 0)
-			{
-				service = temp;
-			}
-		}
-		return service;
+			if(temp->getName() == name)
+				return temp;
+		return NULL;
 	}
 
 	QList<T*> getServices()

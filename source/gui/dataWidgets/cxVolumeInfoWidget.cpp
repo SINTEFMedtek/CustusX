@@ -49,7 +49,7 @@ VolumeInfoWidget::VolumeInfoWidget(PatientModelServicePtr patientModelService, Q
 {
 	this->setToolTip("Display volume info");
 	mActiveImageProxy = ActiveImageProxy::New(patientModelService);
-	connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(updateSlot()));
+	connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &VolumeInfoWidget::updateSlot);
 
 	this->addWidgets();
 
@@ -58,7 +58,7 @@ VolumeInfoWidget::VolumeInfoWidget(PatientModelServicePtr patientModelService, Q
 
 VolumeInfoWidget::~VolumeInfoWidget()
 {
-	disconnect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(updateSlot()));
+	disconnect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &VolumeInfoWidget::updateSlot);
 }
 
 void VolumeInfoWidget::addWidgets()

@@ -40,7 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVector3D.h"
 #include "vtkForwardDeclarations.h"
 #include "cxDoubleProperty.h"
-#include "cxLegacySingletons.h"
+#include "cxActiveImageProxy.h"
+
 typedef vtkSmartPointer<class vtkSphereWidget> vtkSphereWidgetPtr;
 
 namespace cx
@@ -65,7 +66,7 @@ class cxGui_EXPORT EraserWidget: public BaseWidget
 Q_OBJECT
 
 public:
-	EraserWidget(QWidget* parent);
+	EraserWidget(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget* parent);
 
 	virtual ~EraserWidget();
 private:
@@ -73,19 +74,25 @@ private:
 	vtkSphereSourcePtr mSphere;
 	QCheckBox* mShowEraserCheckBox;
 	DoublePropertyPtr mSphereSizeAdapter;
+	DoublePropertyPtr mEraseValueAdapter;
 	QAction* mDuplicateAction;
 	QAction* mSaveAction;
 	QAction* mRemoveAction;
 	QWidget* mSphereSize;
+	QWidget* mEraseValueWidget;
 
 	void enableButtons();
 	template <class TYPE>
-	void eraseVolume(TYPE* volumePointer, TYPE replaceVal);
+	void eraseVolume(TYPE* volumePointer);
 
 	QTimer* mContinousEraseTimer;
 
 	Vector3D mPreviousCenter;
 	double mPreviousRadius;
+
+	ActiveImageProxyPtr mActiveImageProxy;
+	PatientModelServicePtr mPatientModelService;
+	VisualizationServicePtr mVisualizationService;
 
 private slots:
 	void toggleShowEraser(bool on);
@@ -95,6 +102,7 @@ private slots:
 	void continousRemoveSlot();
 	void duplicateSlot();
 	void sphereSizeChangedSlot();
+	void activeImageChangedSlot();
 };
 
 }

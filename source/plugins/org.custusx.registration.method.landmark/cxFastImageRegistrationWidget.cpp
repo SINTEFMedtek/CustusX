@@ -42,7 +42,7 @@ namespace cx
 {
 
 FastImageRegistrationWidget::FastImageRegistrationWidget(RegServices services, QWidget* parent, QString objectName, QString windowTitle, bool useRegistrationFixedPropertyInsteadOfActiveImage) :
-	LandmarkImageRegistrationWidget(services, parent, objectName, windowTitle, useRegistrationFixedPropertyInsteadOfActiveImage)
+	ImageLandmarksWidget(services, parent, objectName, windowTitle, useRegistrationFixedPropertyInsteadOfActiveImage)
 {
 }
 

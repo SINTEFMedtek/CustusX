@@ -4,7 +4,7 @@ List of Definitions {#definitions}
 | Name                    | Description
 | ----------------------- | -----------------------------
 | Patient                 | The patient is the collection of all data related to a single patient study, such a MR/CT/US volumes, segmentations based on the volumes, and relations between these. All patients in CustusX are anonymous.
-| Clinical Application    | A system wide setting that specifies which clinical domain the system is to be used in. Options are Neurology, Laparascopy etc. This affects the available tools and slice orientations.
+| Clinical Application    | A system wide setting that specifies which clinical domain the system is to be used in. Options are Neurology, Laparoscopy etc. This affects the available tools and slice orientations.
 | Data set                | Either a volume, surface, or other data displaying 3D information of a patient.
 | Metaheader              | Volumetric data format. Consists of two files: .mhd and .raw.
 | View                    | A window inside CustusX displaying volume data in either 2D or 3D.

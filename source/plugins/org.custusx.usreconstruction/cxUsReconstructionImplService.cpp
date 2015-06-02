@@ -100,7 +100,7 @@ ReconstructionMethodService *UsReconstructionImplService::createAlgorithm()
 	QString name = mParams->getParameter("Algorithm")->getValueAsVariant().toString();
 	if(name.isEmpty())
 		return NULL;
-	return mServiceListener->getService(name);
+	return mServiceListener->getServiceFromName(name);
 }
 
 void UsReconstructionImplService::setSettings()

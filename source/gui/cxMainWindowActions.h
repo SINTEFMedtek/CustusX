@@ -64,6 +64,7 @@ private slots:
 	void shootScreen();
 	void shootWindow();
 	void recordFullscreen();
+	void updateRecordFullscreenActionSlot();
 
 	void onStartLogConsole();
 
@@ -76,6 +77,7 @@ private:
 	QAction* mShowPointPickerAction;
 	QAction* mTrackingToolsAction; ///< action for asking the navigation system to start/stop tracking
 	QAction* mStartStreamingAction; ///< start streaming of the default RT source.
+	QAction* mRecordFullscreenStreamingAction;
 
 	QString mLastImportDataFolder;
 	ProcessWrapperPtr mLocalVideoServerProcess;

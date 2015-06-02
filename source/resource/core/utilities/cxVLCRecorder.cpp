@@ -66,6 +66,7 @@ void VLCRecorder::shutdown()
 VLCRecorder::VLCRecorder() :
 		mCommandLine(new ProcessWrapper("VLC")), mVLCPath("")
 {
+	connect(mCommandLine->getProcess(), &QProcess::stateChanged, this, &VLCRecorder::stateChanged);
 	this->findVLCApplication();
 }
 

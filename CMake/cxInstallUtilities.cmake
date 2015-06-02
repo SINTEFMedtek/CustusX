@@ -68,15 +68,15 @@ macro(cx_install_initialize_customizable_properties)
 	set(CX_LICENSE_FILE "${CustusX_SOURCE_DIR}/License.txt")
 	set_property(GLOBAL PROPERTY CX_LICENSE_FILE "${CX_LICENSE_FILE}")
 
-	set_property(GLOBAL PROPERTY CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/source/gui/icons/CustusX.png")
+	set_property(GLOBAL PROPERTY CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/source/gui/icons/CustusX/CustusX.png")
 	set_property(GLOBAL PROPERTY CPACK_PACKAGE_VENDOR "SINTEF Medical Technology")
 	set_property(GLOBAL PROPERTY CPACK_RESOURCE_FILE_WELCOME "${PROJECT_SOURCE_DIR}/install/install_text/install_welcome.txt")
 	set_property(GLOBAL PROPERTY CPACK_RESOURCE_FILE_README "${PROJECT_SOURCE_DIR}/install/install_text/install_readme.rtf")
 	set_property(GLOBAL PROPERTY CPACK_RESOURCE_FILE_LICENSE "${CX_LICENSE_FILE}")
 
 	if(CX_WINDOWS)
-		set_property(GLOBAL PROPERTY CPACK_NSIS_MUI_ICON "${PROJECT_SOURCE_DIR}/source/gui/icons\\\\CustusX.ico")
-		set_property(GLOBAL PROPERTY CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/source/gui/icons\\\\CustusX.png")
+		set_property(GLOBAL PROPERTY CPACK_NSIS_MUI_ICON "${PROJECT_SOURCE_DIR}/source/gui/icons/CustusX\\\\CustusX.ico")
+		set_property(GLOBAL PROPERTY CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/source/gui/icons/CustusX\\\\CustusX.png")
 	endif (CX_WINDOWS)
 endmacro()
 

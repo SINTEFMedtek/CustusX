@@ -52,6 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxStringHelpers.h"
 #include "cxDoubleProperty.h"
 #include "cxBoolProperty.h"
+#include "cxLogger.h"
 
 #ifdef CX_USE_OpenCV
 #include <opencv2/highgui/highgui.hpp>
@@ -231,7 +232,21 @@ void ImageStreamerOpenCV::initialize_local()
 		cerr << "ImageStreamerOpenCV: Failed to open a video device or video file!\n" << endl;
 		return;
 	}
-	else
+
+	// try one grab before accepting the streamer
+	// - this fails if no camera is attached
+	try
+	{
+		mVideoCapture->grab();
+	}
+	catch(cv::Exception e)
+	{
+		CX_LOG_ERROR() << "OpenCV failed with message: " << e.what();
+		mVideoCapture->release();
+		return;
+	}
+
+
 	{
 		//determine default values
 		int default_width = mVideoCapture->get(CV_CAP_PROP_FRAME_WIDTH);
@@ -267,7 +282,7 @@ bool ImageStreamerOpenCV::startStreaming(SenderPtr sender)
 {
 	this->initialize_local();
 
-	if (!mSendTimer)
+	if (!mSendTimer || !mVideoCapture->isOpened())
 	{
 		std::cout << "ImageStreamerOpenCV: Failed to start streaming: Not initialized." << std::endl;
 		return false;

@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-StreamerService* StreamerServiceUtilities::getStreamerService(QString name, ctkPluginContext* context)
+StreamerService* StreamerServiceUtilities::getStreamerServiceFromType(QString name, ctkPluginContext* context)
 {
 	ctkServiceTracker<StreamerService*> tracker(context);
 	tracker.open();
@@ -49,7 +49,7 @@ StreamerService* StreamerServiceUtilities::getStreamerService(QString name, ctkP
 	for(int i = 0; i < serviceList.size(); ++i)
 	{
 		StreamerService* service = serviceList.at(i);
-		if (service->getName() == name)
+		if (service->getType() == name)
 			return service;
 	}
 

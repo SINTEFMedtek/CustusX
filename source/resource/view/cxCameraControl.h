@@ -95,6 +95,7 @@ public:
 	CameraControl(QObject* parent = NULL);
 	virtual ~CameraControl();
 
+	void refreshView(ViewPtr view);
 	void setView(ViewPtr view);
 	QActionGroup* createStandard3DViewActions();
 	void translateByFocusTo(Vector3D p_r);

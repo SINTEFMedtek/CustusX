@@ -644,7 +644,11 @@ ToolPtr TrackingImplService::getManualTool()
 ToolPtr TrackingImplService::getFirstProbe()
 {
 	ToolPtr active = this->getActiveTool();
-	if (active && active->getProbe() && active->getProbe()->isValid())
+
+	// Turned off the check for valid probe fix #1038: No probe sector in 3D scene if no xml emtry for probe.
+	// This will work for digital interfaces where the probe sector definition comes from the interface, and not from the xml file.
+//	if (active && active->getProbe() && active->getProbe()->isValid())
+	if (active && active->getProbe())
 		return active;
 
 	ToolMap tools = this->getTools();

@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "org_custusx_registration_method_landmark_Export.h"
 
-#include "cxLandmarkImageRegistrationWidget.h"
+#include "cxImageLandmarksWidget.h"
 
 namespace cx
 {
@@ -54,7 +54,7 @@ namespace cx
  * \date 27. sep. 2010
  * \author Janne Beate Bakeng, SINTEF
  */
-class org_custusx_registration_method_landmark_EXPORT FastImageRegistrationWidget : public LandmarkImageRegistrationWidget
+class org_custusx_registration_method_landmark_EXPORT FastImageRegistrationWidget : public ImageLandmarksWidget
 {
 	Q_OBJECT
 public:

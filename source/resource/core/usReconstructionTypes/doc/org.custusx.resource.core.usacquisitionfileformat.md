@@ -43,7 +43,7 @@ Replaces \ref us_acq_file_format_mhd.
 Profile Definition {filebase}.probedata.xml {#us_acq_file_format_file_probedata}
 -----------------------------------------------------------
 
-This file contains the probe definition. Replaces \ref us_acq_file_format_file_xml .
+This file contains the [probe definition](#cx_us_probe_definition). Replaces \ref us_acq_file_format_file_xml .
 
 
 Frame Timestamps {filebase}.fts {#us_acq_file_format_file_fts}
@@ -60,7 +60,7 @@ Frame Positions {filebase}.fp {#us_acq_file_format_fp}
 This file contains the frame positions, one matrix for each US frame.
 Each matrix is the `rMu`,
 i.e. the transform from lower-left centered image space to
-global reference (See \ref coordinate_systems and \ref ProbeDefinition).
+global reference (See \ref coordinate_systems and \ref cx_us_probe_definition).
 
 This is a newline-separated sequence of matrices, one for each position.
 The last line of the matrix (always containing 0 0 0 1) is omitted. The matrix

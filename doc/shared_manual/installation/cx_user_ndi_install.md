@@ -1,31 +1,26 @@
 NDI Installation {#install_ndi_driver}
 ===================
 
-CustusX supports the NDI Polaris and Aurora tracking systems though IGSTK, <http://www.igstk.com>. CustusX requires that
-you first install the NDI Track application (available from <http://www.ndigital.com/>) following the NDI 
-install instructions. Load the tool ROM-files into Track and verify that they work correctly. There should
-be no warnings in the Track application: This will cause CustusX to fail silently by not receiving tracking
-data from the tracking system.
+CustusX requires that you first install the NDI Track application (available from <http://www.ndigital.com/>) following the NDI install instructions. 
 
-If you need to create tool definitions for custom tools, remember to add the ROM-file to each definition. 
-
-Mac
------------------------------------------------------------
-Should work out of the box.
+Mac and Windows install should work out of the box.
 
 Linux
 -----------------------------------------------------------
 Run the following shell lines after installing the Track application:
 
-	# Setup access rights for current user
-	USER=`whoami`
-	sudo usermod -a --groups uucp,dialout ${USER}
+Fedora 21:
 
-	# Setup connection between CustusX and IGSTK
-	sudo mkdir -p /Library/CustusX/igstk.links
-	sudo chmod a+rwx /Library/CustusX/igstk.links
+	sudo usermod -a --groups uucp,dialout,lock `whoami`
+	sudo chown :lock /var/lock # fedora
 
-Windows
+Ubuntu 14.04:
+	sudo usermod -a --groups uucp,dialout `whoami`
+
+This sets up access rights for current user. Logout to make these changes work.
+
+Validation
 -----------------------------------------------------------
-CustusX assumes that NDI connects through COM-port 0 (TBD-verify). If this is not the case, change manually.
+Load your tool ROM-files into Track and verify that they work correctly. There should be no warnings in the Track application: This will cause CustusX to fail silently by not receiving tracking data from the tracking system.
+
 

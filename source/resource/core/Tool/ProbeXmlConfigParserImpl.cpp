@@ -212,7 +212,7 @@ ProbeXmlConfigParser::Configuration ProbeXmlConfigParserImpl::getConfiguration(Q
   QList<QDomNode> currentRtSourceNodeList = this->getRTSourceNodes(scanner, probe, rtsource);
   if(currentRtSourceNodeList.isEmpty())
   {
-	cx::reportWarning(QString("No rtsources found (Missing temporal calibraion) [%1/%2/%3]").arg(scanner).arg(probe).arg(rtsource));
+	cx::reportWarning(QString("No rtsources found (Missing temporal calibration) [%1/%2/%3]").arg(scanner).arg(probe).arg(rtsource));
     return retval;
   }
   QDomNode rtSourceNode = currentRtSourceNodeList.first();
@@ -234,7 +234,7 @@ ProbeXmlConfigParser::Configuration ProbeXmlConfigParserImpl::getConfiguration(Q
 	if(!node.isNull())
 		readTextNode(&retval.mTemporalCalibration, rtSourceNode, tempCalPlatformName);
 
-	//  std::cout << "Platform tc: " << retval.mTemporalCalibration << std::endl;
+//    std::cout << "Platform tc: " << retval.mTemporalCalibration << std::endl;
 
 	if(rtsource.compare("Digital")!=0)//No more details are required for digital sources
 	{

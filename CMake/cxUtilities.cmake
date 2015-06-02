@@ -432,11 +432,7 @@ macro(cx_initialize_macosx_bundle)
 	set(CX_COPYRIGHT_TEXT "Copyright SINTEF Medical Technology. BSD licence")
 
 	if(APPLE) # For Apple set the icns file containing icons
-		set(MACOSX_BUNDLE_ICON_FILE "application.icns") # set how it shows up in the Info.plist file
-		#set_source_files_properties(${CustusX_SOURCE_DIR}/source/gui/icons/application.icns
-		#						PROPERTIES MACOSX_PACKAGE_LOCATION Resources)  # set where in the bundle to put the icns file
-		#set(SOURCES ${SOURCES} ${CustusX_SOURCE_DIR}/source/gui/icons/application.icns)  # include the icns file in the target
-
+		set(MACOSX_BUNDLE_ICON_FILE "CustusX.icns") # set how it shows up in the Info.plist file
 		set(MACOSX_BUNDLE_INFO_STRING ${CX_SYSTEM_DEFAULT_APPLICATION})
 		set(MACOSX_BUNDLE_BUNDLE_NAME ${CX_SYSTEM_DEFAULT_APPLICATION})
 		set(MACOSX_BUNDLE_BUNDLE_VERSION "${CustusX_VERSION_STRING}")

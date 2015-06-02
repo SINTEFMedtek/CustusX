@@ -75,15 +75,15 @@ ProbeConfigWidget::ProbeConfigWidget(VisServicesPtr services, QWidget* parent) :
 	mOriginWidget->showDim(2, false);
 
 	// define cropping group
-	QGroupBox* cropGroupBox = new QGroupBox("Crop Box");
+	QGroupBox* cropGroupBox = new QGroupBox("Crop Box", this);
 	cropGroupBox->setToolTip("Define cropping box for the probe image.\nUnits in pixels.");
 	QVBoxLayout* cropLayout = new QVBoxLayout(cropGroupBox);
 	topLayout->addWidget(cropGroupBox);
 
-	mBBWidget = new BoundingBoxWidget(this);
-	mBBWidget->showDim(2, false);
+	QStringList bbCaptions = QStringList() << "X (pixels)" << "Y (pixels)";
+	mBBWidget = new BoundingBoxWidget(this, bbCaptions);
 	cropLayout->addWidget(mBBWidget);
-	connect(mBBWidget, SIGNAL(changed()), this, SLOT(guiImageSettingsChanged()));
+	connect(mBBWidget, &BoundingBoxWidget::changed, this, &ProbeConfigWidget::guiImageSettingsChanged);
 
 	// create sector group
 	QGroupBox* sectorGroupBox = new QGroupBox("Sector");
