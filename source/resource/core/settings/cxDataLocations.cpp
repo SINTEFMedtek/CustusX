@@ -210,7 +210,7 @@ QString changeExtension(QString name, QString ext)
   splitName[splitName.size()-1] = ext;
   return splitName.join(".");
 }
-}
+} //namespace
 
 QString DataLocations::getCachePath()
 {
@@ -293,5 +293,16 @@ QString DataLocations::getWebsiteUserDocumentationURL()
 	return url;
 }
 
+bool DataLocations::isRunFromBuildFolder()
+{
+	QString bundlePath = DataLocations::getBundlePath();
+	//Check is cxConfig.h file exists relative to the run application
+	QString pathToConfigFile = bundlePath + "/../source/resource/core/settings/cxConfig.h";
+
+	if (QFile(pathToConfigFile).exists())
+		return true;
+	else
+		return false;
+}
 
 } // namespace cx

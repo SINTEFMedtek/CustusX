@@ -77,6 +77,7 @@ public:
   static QString getWebsiteURL();
   static QString getWebsiteUserDocumentationURL();
 
+  static bool isRunFromBuildFolder();
 private:
   static bool mTestMode;
   static QString readTestDataPathFromFile(QString filename);
