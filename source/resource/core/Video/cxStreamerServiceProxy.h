@@ -29,20 +29,42 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include "cxStreamerService.h"
+#ifndef CXSTREAMERINTERFACEPROXY_H
+#define CXSTREAMERINTERFACEPROXY_H
 
-#include "cxStreamerServiceNull.h"
-#include "cxNullDeleter.h"
+#include "cxStreamerService.h"
+#include "cxServiceTrackerListener.h"
 
 namespace cx
 {
-
-StreamerServicePtr StreamerService::getNullObject()
+/**
+ * \brief Proxy for StreamerServices.
+ *
+ * \ingroup cx_resource_core_video
+ *
+ * \date June 02, 2015
+ * \author Janne Beate Bakeng, SINTEF
+ */
+class cxResource_EXPORT StreamerServiceProxy : public StreamerService
 {
-    static StreamerServicePtr mNull;
-    if (!mNull)
-        mNull.reset(new StreamerServiceNull, null_deleter());
-    return mNull;
-}
+public:
+    StreamerServiceProxy(ctkPluginContext *context);
+    virtual ~StreamerServiceProxy() {}
+    virtual QString getName();
+    virtual QString getType() const;
+
+    virtual std::vector<PropertyPtr> getSettings(QDomElement root);
+    virtual StreamerPtr createStreamer(QDomElement root);
+private:
+    void initServiceListener();
+    void onServiceAdded(StreamerService *service);
+    void onServiceRemoved(StreamerService *service);
+
+    ctkPluginContext *mPluginContext;
+    StreamerServicePtr mStreamerService;
+    boost::shared_ptr<ServiceTrackerListener<StreamerService> > mServiceListener;
+};
 
 } //end namespace cx
+
+#endif // CXSTREAMERINTERFACEPROXY_H
