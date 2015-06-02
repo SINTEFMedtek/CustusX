@@ -31,7 +31,7 @@ void Dialect::translate(const igtl::TransformMessage::Pointer body)
     IGTLinkConversion converter;
     Transform3D prMs = converter.decode(body);
 
-    double timestamp_ms = this->extractTimeStamp(body);
+    double timestamp_ms = this->extractTimeStamp(igtl::MessageBase::Pointer(body));
 
     emit transform(deviceName, prMs, timestamp_ms);
 }
@@ -61,7 +61,7 @@ void cx::Dialect::translate(const IGTLinkUSStatusMessage::Pointer body)
 
 }
 
-double Dialect::extractTimeStamp(const igtl::TransformMessage::Pointer body)
+double Dialect::extractTimeStamp(const igtl::MessageBase::Pointer body)
 {
     igtl::TimeStamp::Pointer ts = igtl::TimeStamp::New();
     body->GetTimeStamp(ts);

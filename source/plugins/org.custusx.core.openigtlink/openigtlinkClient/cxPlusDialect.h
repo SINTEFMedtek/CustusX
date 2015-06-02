@@ -50,7 +50,7 @@ namespace cx {
  * - all images comes from a probe
  * - the datasource with the us must be named Probe
  * - the transformation from the probe to the tracker must be named ProbeToTracker
- * - all calibrations are transformation packages named CalibrationTo<Name>
+ * - all calibrations are transformation packages named CalibrationTo<Name>X
  *
  * Example configuration used with the Ultrasonix  L14-5 gps probe:
 
@@ -171,6 +171,7 @@ public:
 
 private:
     double getCurrentTimestamp() const;
+    double getSyncedTimestampForTransformsAndImages(double current_original_timestamp);
     void registerTransformDeviceName(QString deviceName);
     bool isCalibration(QString deviceName) const;
     QString findDeviceForCalibration(QString calibrationDeviceName) const;
@@ -181,6 +182,9 @@ private:
     QStringList mKnownTransformDeviceNames;
     QString mCalibrationKeyword;
     QString mProbeToTrackerName; //name of the device that contains the transform between probe and tracker
+
+    double mLastKnownOriginalTimestamp;
+    double mLastKnownLocalTimestamp;
 };
 
 }

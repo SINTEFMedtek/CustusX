@@ -81,7 +81,7 @@ signals:
     void probedefinition(QString devicename, ProbeDefinitionPtr definition);
 
 protected:
-    double extractTimeStamp(const igtl::TransformMessage::Pointer body);
+    double extractTimeStamp(const igtl::MessageBase::Pointer body);
 
 };
 typedef boost::shared_ptr<Dialect> DialectPtr;

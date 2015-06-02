@@ -7,7 +7,9 @@ namespace cx{
 
 PlusDialect::PlusDialect() :
     mCalibrationKeyword("CalibrationTo"),
-    mProbeToTrackerName("ProbeToTracker") //set in the PlusServer config file
+    mProbeToTrackerName("ProbeToTracker"), //set in the PlusServer config file
+    mLastKnownOriginalTimestamp(-1),
+    mLastKnownLocalTimestamp(-1)
 {
     /* Rotation from igtl coordinate system to
      * custusxs tool coordination system definition:
@@ -50,7 +52,9 @@ void PlusDialect::translate(const igtl::TransformMessage::Pointer body)
     }
     else
     {
-        double timestamp_ms = this->getCurrentTimestamp();
+        //double timestamp_ms = this->getCurrentTimestamp();
+        CX_LOG_DEBUG() << "Device(T): " << body->GetDeviceName();
+        double timestamp_ms = this->getSyncedTimestampForTransformsAndImages(this->extractTimeStamp(igtl::MessageBase::Pointer(body)));
         Transform3D prMs = matrix;
         emit transform(deviceName, prMs, timestamp_ms);
     }
@@ -86,7 +90,10 @@ void PlusDialect::translate(const igtl::ImageMessage::Pointer body)
     //IMAGE
     IGTLinkConversion converter;
     ImagePtr theImage = converter.decode(body);
-    theImage->setAcquisitionTime(QDateTime::currentDateTime());
+    CX_LOG_DEBUG() << "Device(I): " << body->GetDeviceName();
+    double timestamp_ms = this->getSyncedTimestampForTransformsAndImages(this->extractTimeStamp(igtl::MessageBase::Pointer(body)));
+    theImage->setAcquisitionTime(QDateTime::fromMSecsSinceEpoch(timestamp_ms));
+    //theImage->setAcquisitionTime(QDateTime::currentDateTime());
     emit image(theImage);
 
     //PROBEDEFINITION
@@ -119,6 +126,22 @@ double PlusDialect::getCurrentTimestamp() const
 {
     double current_timestamp_ms = QDateTime::currentDateTime().toMSecsSinceEpoch();
     return current_timestamp_ms;
+}
+double PlusDialect::getSyncedTimestampForTransformsAndImages(double currentOriginalTimestamp)
+{
+    double retval = 0;
+
+    double currentLocalTimestamp = this->getCurrentTimestamp();
+
+    if(currentOriginalTimestamp != mLastKnownOriginalTimestamp)
+    {
+        mLastKnownOriginalTimestamp = currentOriginalTimestamp;
+        mLastKnownLocalTimestamp = currentLocalTimestamp;
+        CX_LOG_DEBUG() << "TIMESTAMPING";
+    }
+    retval = mLastKnownLocalTimestamp;
+    CX_LOG_DEBUG() << "... using timestamp " << retval;
+    return retval;
 }
 
 void PlusDialect::registerTransformDeviceName(QString deviceName)
