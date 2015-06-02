@@ -234,7 +234,7 @@ ProbeXmlConfigParser::Configuration ProbeXmlConfigParserImpl::getConfiguration(Q
 	if(!node.isNull())
 		readTextNode(&retval.mTemporalCalibration, rtSourceNode, tempCalPlatformName);
 
-	//  std::cout << "Platform tc: " << retval.mTemporalCalibration << std::endl;
+//    std::cout << "Platform tc: " << retval.mTemporalCalibration << std::endl;
 
 	if(rtsource.compare("Digital")!=0)//No more details are required for digital sources
 	{

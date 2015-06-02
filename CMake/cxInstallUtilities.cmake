@@ -75,7 +75,7 @@ macro(cx_install_initialize_customizable_properties)
 	set_property(GLOBAL PROPERTY CPACK_RESOURCE_FILE_LICENSE "${CX_LICENSE_FILE}")
 
 	if(CX_WINDOWS)
-		set_property(GLOBAL PROPERTY CPACK_NSIS_MUI_ICON "${PROJECT_SOURCE_DIR}/source/gui/icons\\\\CustusX.ico")
+		set_property(GLOBAL PROPERTY CPACK_NSIS_MUI_ICON "${PROJECT_SOURCE_DIR}/source/gui/icons/CustusX\\\\CustusX.ico")
 		set_property(GLOBAL PROPERTY CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/source/gui/icons/CustusX\\\\CustusX.png")
 	endif (CX_WINDOWS)
 endmacro()

@@ -1768,6 +1768,15 @@
                     </PixelSize>
                 </Config>
             </RTSource>
+            <RTSource>
+                <Name>Digital</Name>
+                <TemporalCalibration>215</TemporalCalibration>
+                <DefaultConfig>Digital</DefaultConfig>
+                <Config>
+                    <ID>Digital</ID>
+                    <Name>Digital streaming</Name>
+                </Config>
+            </RTSource>
         </USProbe>
         <USProbe>
             <Name>hypofyse</Name>
