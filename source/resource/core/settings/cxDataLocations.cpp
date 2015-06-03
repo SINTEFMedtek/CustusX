@@ -111,11 +111,11 @@ QString DataLocations::getPersistentWritablePath()
 
 	if (mTestMode)
 	{
-//		QString bundlepath = getBundlePath();
-//		bundlepath.replace(":","_");
-//		if (bundlepath.startsWith("/"))
-//			bundlepath.remove(0, 1);
-//		homepath += "/test/" + bundlepath;
+		//		QString bundlepath = getBundlePath();
+		//		bundlepath.replace(":","_");
+		//		if (bundlepath.startsWith("/"))
+		//			bundlepath.remove(0, 1);
+		//		homepath += "/test/" + bundlepath;
 		homepath = getTestDataPath() + "/temp";
 	}
 
@@ -126,15 +126,15 @@ QString DataLocations::getPersistentWritablePath()
 QString DataLocations::getBundlePath()
 {
 #ifdef __APPLE__
-  QString path(qApp->applicationDirPath()+"/../../..");
-  QString bundle = QDir(qApp->applicationDirPath()+"/../..").canonicalPath();
-  if (QFileInfo(bundle).isBundle())
-	  return path;
-  else
-	  return qApp->applicationDirPath();
+	QString path(qApp->applicationDirPath()+"/../../..");
+	QString bundle = QDir(qApp->applicationDirPath()+"/../..").canonicalPath();
+	if (QFileInfo(bundle).isBundle())
+		return path;
+	else
+		return qApp->applicationDirPath();
 #else
-  QString path(qApp->applicationDirPath());
-  return path;
+	QString path(qApp->applicationDirPath());
+	return path;
 #endif
 }
 
@@ -169,17 +169,17 @@ QString DataLocations::getRootConfigPath()
 
 QStringList DataLocations::getRootConfigPaths()
 {
-  QString path = getBundlePath() + "/" + CX_CONFIG_ROOT_RELATIVE_INSTALLED; // look for installed location
-  if (QDir(path).exists())
-	return QStringList() << QDir(path).canonicalPath();
+	QString path = getBundlePath() + "/" + CX_CONFIG_ROOT_RELATIVE_INSTALLED; // look for installed location
+	if (QDir(path).exists())
+		return QStringList() << QDir(path).canonicalPath();
 
-  QStringList retval;
-  if (QDir(CX_CONFIG_ROOT).exists()) // look for folder in source code
-	retval << QDir(CX_CONFIG_ROOT).canonicalPath();
-  if (QDir(CX_OPTIONAL_CONFIG_ROOT).exists()) // look for folder in source code
-	retval << QDir(CX_OPTIONAL_CONFIG_ROOT).canonicalPath();
+	QStringList retval;
+	if (QDir(CX_CONFIG_ROOT).exists()) // look for folder in source code
+		retval << QDir(CX_CONFIG_ROOT).canonicalPath();
+	if (QDir(CX_OPTIONAL_CONFIG_ROOT).exists()) // look for folder in source code
+		retval << QDir(CX_OPTIONAL_CONFIG_ROOT).canonicalPath();
 
-  return retval;
+	return retval;
 }
 
 QString DataLocations::getDocPath()
@@ -221,16 +221,16 @@ namespace
 {
 QString changeExtension(QString name, QString ext)
 {
-  QStringList splitName = name.split(".");
-  splitName[splitName.size()-1] = ext;
-  return splitName.join(".");
+	QStringList splitName = name.split(".");
+	splitName[splitName.size()-1] = ext;
+	return splitName.join(".");
 }
 } //namespace
 
 QString DataLocations::getCachePath()
 {
 	QString path(getPersistentWritablePath()+"/cache/");
-    return path;
+	return path;
 }
 
 QString DataLocations::findConfigFolder(QString pathRelativeToConfigRoot, QString alternativeAbsolutePath)
