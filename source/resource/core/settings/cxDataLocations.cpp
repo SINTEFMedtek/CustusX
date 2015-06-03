@@ -164,9 +164,17 @@ QString DataLocations::getRootConfigPath()
 
 QStringList DataLocations::getRootConfigPaths()
 {
-	QString path = getBundlePath() + "/" + CX_CONFIG_ROOT_RELATIVE_INSTALLED; // look for installed location
-	if (QDir(path).exists())
-		return QStringList() << QDir(path).canonicalPath();
+	if(!isRunFromBuildFolder())
+	{
+		QString path = getBundlePath() + "/" + CX_CONFIG_ROOT_RELATIVE_INSTALLED; // look for installed location
+		if (QDir(path).exists())
+			return QStringList() << QDir(path).canonicalPath();
+		else
+		{
+			CX_LOG_ERROR() << "Cannot find config root path: " << path;
+			return QStringList();
+		}
+	}
 
 	QStringList retval;
 	if (QDir(CX_CONFIG_ROOT).exists()) // look for folder in source code
@@ -179,23 +187,23 @@ QStringList DataLocations::getRootConfigPaths()
 
 QString DataLocations::getDocPath()
 {
-	if(isRunFromBuildFolder())
+	if(!isRunFromBuildFolder())
 	{
-		if (QDir(CX_DOC_ROOT).exists()) // look for folder in source code
-			return QDir(CX_DOC_ROOT).canonicalPath();
+		QString path = getBundlePath() + "/" + CX_DOC_ROOT_RELATIVE_INSTALLED; // look for installed location
+		if (QDir(path).exists())
+			return QDir(path).canonicalPath();
 		else
 		{
-			reportError(QString("DataLocations::getDocPath() cannot find: %1").arg(CX_DOC_ROOT));
+			CX_LOG_ERROR() << QString("Cannot find doc path: ") << path;
 			return "";
 		}
 	}
 
-	QString path = getBundlePath() + "/" + CX_DOC_ROOT_RELATIVE_INSTALLED; // look for installed location
-	if (QDir(path).exists())
-		return QDir(path).canonicalPath();
+	if (QDir(CX_DOC_ROOT).exists()) // look for folder in source code
+		return QDir(CX_DOC_ROOT).canonicalPath();
 	else
 	{
-		reportError(QString("DataLocations::getDocPath() cannot find: %1").arg(path));
+		CX_LOG_ERROR() << QString("Cannot find doc path: ") << CX_DOC_ROOT;
 		return "";
 	}
 }
@@ -309,7 +317,7 @@ bool DataLocations::isRunFromBuildFolder()
 		QString pathToConfigFile = bundlePath + "/../source/resource/core/settings/cxConfig.h";
 		if (QFile(pathToConfigFile).exists())
 		{
-			CX_LOG_INFO() << "Using paths from build folder";
+			std::cout << "Using paths from build folder" << std::endl;
 			mRunFromBuildFolder = true;
 		}
 		else
