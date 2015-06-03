@@ -58,7 +58,12 @@ HelpEngine::HelpEngine()
 	this->setupDataWithWarning();
 
 	QString docFile = DataLocations::getDocPath()+"/cx_user_doc.qch";
-	helpEngine->registerDocumentation(docFile);
+	if(!QFile(docFile).exists())
+		reportWarning(QString("HelpEngine: Cannot find docFile: %1").arg(docFile));
+	if(!helpEngine->unregisterDocumentation(helpEngine->namespaceName(docFile)))
+		reportWarning(QString("HelpEngine: Documentation unregister failed: %1").arg(helpEngine->error()));
+	if(!helpEngine->registerDocumentation(docFile))
+		reportWarning(QString("HelpEngine: Documentation registration failed: %1").arg(helpEngine->error()));
 
 	this->setupDataWithWarning();
 
