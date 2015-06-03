@@ -31,17 +31,46 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxFilenameWidget.h"
 #include "cxFileInputWidget.h"
+#include "cxFilePathProperty.h"
 #include <QFileInfo>
 #include <QDir>
 #include "cxTypeConversions.h"
 #include <iostream>
+#include "cxLogger.h"
 
 namespace cx
 {
 
 ///----------------
 
-FilenameWidget::FilenameWidget(QWidget* parent, StringPropertyBasePtr dataInterface,
+//FilenameWidget::FilenameWidget(QWidget* parent, StringPropertyBasePtr dataInterface,
+//	QGridLayout* gridLayout, int row) :
+//	OptimizedUpdateWidget(parent)
+//{
+//	mData = dataInterface;
+//	connect(mData.get(), SIGNAL(changed()), this, SLOT(setModified()));
+
+//	QHBoxLayout* topLayout = new QHBoxLayout;
+//	topLayout->setMargin(0);
+//	this->setLayout(topLayout);
+
+//	mFileInput = new FileInputWidget(this);
+//	mFileInput->setUseRelativePath(false);
+//	connect(mFileInput, SIGNAL(fileChanged()), this, SLOT(editingFinished()));
+
+//	if (gridLayout) // add to input gridlayout
+//	{
+//		gridLayout->addWidget(mFileInput, row, 0);
+//	}
+//	else // add directly to this
+//	{
+//		topLayout->addWidget(mFileInput);
+//	}
+
+//	this->setModified();
+//}
+
+FilenameWidget::FilenameWidget(QWidget* parent, FilePathPropertyPtr dataInterface,
 	QGridLayout* gridLayout, int row) :
 	OptimizedUpdateWidget(parent)
 {
@@ -68,8 +97,12 @@ FilenameWidget::FilenameWidget(QWidget* parent, StringPropertyBasePtr dataInterf
 	this->setModified();
 }
 
+
 void FilenameWidget::editingFinished()
 {
+	CX_LOG_CHANNEL_DEBUG("CA") << "------- " << mData->getDisplayName();
+	CX_LOG_CHANNEL_DEBUG("CA") << "setval     " << mFileInput->getFilename();
+
 	mData->setValue(mFileInput->getFilename());
 }
 
@@ -77,13 +110,20 @@ void FilenameWidget::prePaintEvent()
 {
 	mFileInput->blockSignals(true);
 
-	QString path = QFileInfo(mData->getValue()).absolutePath();
+//	QString path = QFileInfo(mData->getValue()).absolutePath();
+	QString path = mData->getEmbeddedPath().getRootPath();
 	if (path.isEmpty())
 		path = QDir::homePath();
 
 //	std::cout << "---------------" << std::endl;
 //	std::cout << "val:         " << mData->getValue() << std::endl;
 //	std::cout << "path:         " << path << std::endl;
+
+	CX_LOG_CHANNEL_DEBUG("CA") << "------- " << mData->getDisplayName();
+	CX_LOG_CHANNEL_DEBUG("CA") << "val     " << mData->getValue();
+	CX_LOG_CHANNEL_DEBUG("CA") << "rel     " << mData->getEmbeddedPath().getRelativeFilepath();
+	CX_LOG_CHANNEL_DEBUG("CA") << "abs     " << mData->getEmbeddedPath().getAbsoluteFilepath();
+	CX_LOG_CHANNEL_DEBUG("CA") << "root    " << mData->getEmbeddedPath().getRootPath();
 
 	mFileInput->setDescription(mData->getDisplayName());
 	mFileInput->setBasePath(path);

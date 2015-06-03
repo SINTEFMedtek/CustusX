@@ -48,6 +48,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTimedAlgorithmProgressBar.h"
 #include "cxElastixExecuter.h"
 #include "cxStringProperty.h"
+#include "cxFilePathProperty.h"
+#include "cxDataLocations.h"
+#include "cxHelperWidgets.h"
 
 namespace cx
 {
@@ -134,17 +137,8 @@ QWidget* ElastixWidget::createOptionsWidget()
 	layout->addWidget(mParameterFileWidget0, line, 1, 1, 2);
 	++line;
 
-	layout->addWidget(new QLabel("Executable", this), line, 0);
-	mExecutableEdit = new QLineEdit(this);
-	connect(mExecutableEdit, SIGNAL(editingFinished()), this, SLOT(executableEditFinishedSlot()));
-	layout->addWidget(mExecutableEdit, line, 1);
-
-	QAction* browseExecutableAction = new QAction(QIcon(":/icons/open.png"), "Browse", this);
-	browseExecutableAction->setStatusTip("Select the elastiX executable");
-	connect(browseExecutableAction, SIGNAL(triggered()), this, SLOT(browseExecutableSlot()));
-	QToolButton* button = new QToolButton();
-	button->setDefaultAction(browseExecutableAction);
-	layout->addWidget(button, line, 2);
+	QWidget* executableWidget = sscCreateDataWidget(this, mElastixManager->getParameters()->getActiveExecutable());
+	layout->addWidget(executableWidget, line, 0, 1, 3);
 	++line;
 
 	QHBoxLayout* buttonsLayout = new QHBoxLayout;
@@ -179,6 +173,7 @@ QWidget* ElastixWidget::createOptionsWidget()
 ElastixWidget::~ElastixWidget()
 {}
 
+
 void ElastixWidget::savePresetSlot()
 {
 	ElastixParametersPtr par = mElastixManager->getParameters();
@@ -198,20 +193,6 @@ void ElastixWidget::savePresetSlot()
 void ElastixWidget::deletePresetSlot()
 {
 	mElastixManager->getParameters()->removeCurrentPreset();
-}
-
-void ElastixWidget::executableEditFinishedSlot()
-{
-	mElastixManager->getParameters()->setActiveExecutable(mExecutableEdit->text());
-}
-
-void ElastixWidget::browseExecutableSlot()
-{
-	QString fileName = QFileDialog::getOpenFileName(this, tr("Select Executable"), "~");
-	if (fileName.isEmpty())
-		return;
-
-	mElastixManager->getParameters()->setActiveExecutable(fileName);
 }
 
 void ElastixWidget::userParameterFileSelected(QString filename)
@@ -236,10 +217,6 @@ void ElastixWidget::elastixChangedSlot()
 	mParameterFileWidget0->setFilename(par->getActiveParameterFile0());
 
 	mFilePreviewWidget->previewFileSlot(par->getActiveParameterFile0());
-
-	mExecutableEdit->blockSignals(true);
-	mExecutableEdit->setText(par->getActiveExecutable());
-	mExecutableEdit->blockSignals(false);
 }
 
 void ElastixWidget::registerSlot()

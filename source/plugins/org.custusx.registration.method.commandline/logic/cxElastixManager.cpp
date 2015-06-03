@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewService.h"
 #include "cxVolumeHelpers.h"
 #include "cxLogger.h"
+#include "cxFilePathProperty.h"
 
 namespace cx
 {
@@ -92,7 +93,7 @@ void ElastixManager::preprocessExecuter()
 	QDir outDir(mServices.patientModelService->getActivePatientFolder()+"/elastix/"+timestamp);
 
 	mExecuter->setDisplayProcessMessages(mDisplayProcessMessages->getValue());
-	mExecuter->setInput(mParameters->getActiveExecutable(),
+	mExecuter->setInput(mParameters->getActiveExecutable()->getEmbeddedPath().getAbsoluteFilepath(),
 					 mServices.registrationService->getFixedData(),
 					 mServices.registrationService->getMovingData(),
 	         outDir.absolutePath(),
@@ -118,7 +119,7 @@ void ElastixManager::executionFinishedSlot()
 //	std::cout << "ElastixManager::executionFinishedSlot(), Linear Result mMf: \n" << mMf << std::endl;
 
 	QStringList parameterFiles = mParameters->getActiveParameterFiles();
-	QString desc = QString("Image2Image [exe=%1]").arg(QFileInfo(mParameters->getActiveExecutable()).fileName());
+	QString desc = QString("Image2Image [exe=%1]").arg(QFileInfo(mParameters->getActiveExecutable()->getValue()).fileName());
 	for (unsigned i=0; i<parameterFiles.size(); ++i)
 		desc += QString("[par=%1]").arg(QFileInfo(parameterFiles[i]).fileName());
 

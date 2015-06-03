@@ -40,6 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
+typedef boost::shared_ptr<class FilePathProperty> FilePathPropertyPtr;
+
 /**
  * \file
  * \addtogroup org_custusx_registration_method_commandline
@@ -65,8 +67,7 @@ public:
     QString getActiveParameterFile0() const;
     void setActiveParameterFile1(QString filename);
     QString getActiveParameterFile1() const;
-    void setActiveExecutable(QString filename);
-    QString getActiveExecutable() const;
+	FilePathPropertyPtr getActiveExecutable() const { return mActiveExecutable; }
 
     QStringList getActiveParameterFiles() const;
     QString getPresetNameSuggesion() const; ///< create a name describing the active state, can be used as name for a new preset.
@@ -84,9 +85,10 @@ private:
     QString getFullParameterFilename(QString filename);
     void addDefaultPreset(QString name, QString executable, QStringList parameterFiles);
     void addDefaultPresets();
+	FilePathPropertyPtr getExecutable();
 
     StringPropertyPtr mCurrentPreset;
-    QString mActiveExecutable;
+	FilePathPropertyPtr mActiveExecutable;
     QString mActiveParameterFile0;
     QString mActiveParameterFile1;
     XmlOptionFile mOptions;
