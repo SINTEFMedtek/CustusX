@@ -198,7 +198,10 @@ QString DataLocations::getDocPath()
 
 	QString path = getBundlePath() + "/" + CX_DOC_ROOT_RELATIVE_INSTALLED; // look for installed location
 	if (QDir(path).exists())
+	{
+		reporter()->sendInfo(QString("Using documentation from: %1").arg(path));
 		return QDir(path).canonicalPath();
+	}
 	else
 	{
 		reportError(QString("DataLocations::getDocPath() cannot find: %1").arg(path));
