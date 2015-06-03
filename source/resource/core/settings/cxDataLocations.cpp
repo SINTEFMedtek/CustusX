@@ -110,14 +110,7 @@ QString DataLocations::getPersistentWritablePath()
 	QString homepath = QDir::homePath() + "/cx_settings";
 
 	if (mTestMode)
-	{
-		//		QString bundlepath = getBundlePath();
-		//		bundlepath.replace(":","_");
-		//		if (bundlepath.startsWith("/"))
-		//			bundlepath.remove(0, 1);
-		//		homepath += "/test/" + bundlepath;
 		homepath = getTestDataPath() + "/temp";
-	}
 
 	return homepath;
 }
