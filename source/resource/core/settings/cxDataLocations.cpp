@@ -171,7 +171,7 @@ QStringList DataLocations::getRootConfigPaths()
 			return QStringList() << QDir(path).canonicalPath();
 		else
 		{
-			CX_LOG_ERROR() << "Cannot find config root path: " << path;
+			std::cout << "DataLocations::getRootConfigPaths(): Cannot find config root path: " << path << std::endl;
 			return QStringList();
 		}
 	}
