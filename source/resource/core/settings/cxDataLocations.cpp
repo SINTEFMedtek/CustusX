@@ -46,6 +46,8 @@ namespace cx
 
 //---------------------------------------------------------
 bool DataLocations::mTestMode = false;
+bool DataLocations::mRunFromBuildFolder = false;
+bool DataLocations::mBuildFolderChecked = false;
 //---------------------------------------------------------
 
 void DataLocations::setTestMode()
@@ -179,7 +181,6 @@ QString DataLocations::getDocPath()
 {
 	if(isRunFromBuildFolder())
 	{
-		reportWarning("Using documentation from build folder");
 		if (QDir(CX_DOC_ROOT).exists()) // look for folder in source code
 			return QDir(CX_DOC_ROOT).canonicalPath();
 		else
@@ -300,14 +301,23 @@ QString DataLocations::getWebsiteUserDocumentationURL()
 
 bool DataLocations::isRunFromBuildFolder()
 {
-	QString bundlePath = DataLocations::getBundlePath();
-	//Check if cxConfig.h file exists relative to the run application
-	QString pathToConfigFile = bundlePath + "/../source/resource/core/settings/cxConfig.h";
+	if(!mBuildFolderChecked)
+	{
+		QString bundlePath = DataLocations::getBundlePath();
 
-	if (QFile(pathToConfigFile).exists())
-		return true;
-	else
-		return false;
+		//Check if cxConfig.h file exists relative to the run application
+		QString pathToConfigFile = bundlePath + "/../source/resource/core/settings/cxConfig.h";
+		if (QFile(pathToConfigFile).exists())
+		{
+			CX_LOG_INFO() << "Using paths from build folder";
+			mRunFromBuildFolder = true;
+		}
+		else
+			mRunFromBuildFolder = false;
+		mBuildFolderChecked = true;
+	}
+
+	return mRunFromBuildFolder;
 }
 
 } // namespace cx

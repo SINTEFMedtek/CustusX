@@ -80,6 +80,8 @@ public:
 	static bool isRunFromBuildFolder();
 private:
 	static bool mTestMode;
+	static bool mRunFromBuildFolder;
+	static bool mBuildFolderChecked;
 	static QString readTestDataPathFromFile(QString filename);
 	static QString checkExecutableExist(QString path, QString filename);
 
