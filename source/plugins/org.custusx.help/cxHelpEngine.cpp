@@ -56,10 +56,7 @@ HelpEngine::HelpEngine()
 	helpEngine = new QHelpEngine(helpFile, NULL);
 
 	this->setupDataWithWarning();
-
-	QString docFile = DataLocations::getDocPath()+"/cx_user_doc.qch";
-	helpEngine->registerDocumentation(docFile);
-
+	this->setupDocFile();
 	this->setupDataWithWarning();
 
 	connect(qApp, SIGNAL(focusObjectChanged(QObject*)), this, SLOT(focusObjectChanged(QObject*)));
@@ -71,6 +68,16 @@ HelpEngine::HelpEngine()
 HelpEngine::~HelpEngine()
 {
 	delete helpEngine;
+}
+
+void HelpEngine::setupDocFile()
+{
+	QString docFile = DataLocations::getDocPath()+"/cx_user_doc.qch";
+	if(!QFile(docFile).exists())
+		reportWarning(QString("HelpEngine: Cannot find docFile: %1").arg(docFile));
+	helpEngine->unregisterDocumentation(helpEngine->namespaceName(docFile));
+	if(!helpEngine->registerDocumentation(docFile))
+		reportWarning(QString("HelpEngine: Documentation registration failed: %1").arg(helpEngine->error()));
 }
 
 void HelpEngine::setupDataWithWarning()
