@@ -109,7 +109,7 @@ bool ElastixExecuter::setInput(QString application,
 	mLastOutdir = outdir;
 
 	QStringList cmd;
-	cmd << application;
+	cmd << "\"" + application + "\"";
 	cmd << "-f" << mServices.patientModelService->getActivePatientFolder()+"/"+fixed->getFilename();
 	cmd << "-m" << mServices.patientModelService->getActivePatientFolder()+"/"+moving->getFilename();
 	cmd << "-out" << outdir;
