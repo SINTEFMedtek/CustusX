@@ -197,26 +197,43 @@ void ElastixWidget::deletePresetSlot()
 
 void ElastixWidget::userParameterFileSelected(QString filename)
 {
-	mElastixManager->getParameters()->setActiveParameterFile0(filename);
+	mElastixManager->getParameters()->getActiveParameterFile0()->setValue(filename);
+}
+
+void ElastixWidget::recurseParameterFolders(QString root, QStringList* retval)
+{
+	QDir folder(root);
+	folder.setFilter(QDir::AllDirs|QDir::NoDotAndDotDot);
+	QFileInfoList info = folder.entryInfoList();
+	for (int i=0; i<info.size(); ++i)
+	{
+		QString current = info[i].absoluteFilePath();
+		if (current.endsWith("/par"))
+		{
+			retval->append(current);
+		}
+
+		this->recurseParameterFolders(current, retval);
+	}
 }
 
 void ElastixWidget::elastixChangedSlot()
 {
 	ElastixParametersPtr par = mElastixManager->getParameters();
-	QStringList folders = par->getParameterFilesDir();
+	EmbeddedFilepath par0 = par->getActiveParameterFile0()->getEmbeddedPath();
+	QStringList folders = par0.getRootPaths();
+	QStringList parfolders;
 	for (int i=0; i<folders.size(); ++i)
-	{
-		QDir folder(folders[i]);
-		folder.mkpath(".");
-	}
+		this->recurseParameterFolders(folders[i], &parfolders);
 
-	mParameterFileWidget0->setPaths(folders);
+	mParameterFileWidget0->setPaths(parfolders);
 	QStringList nameFilters;
-	nameFilters << "*.*";
+	nameFilters << "*";
 	mParameterFileWidget0->setNameFilter(nameFilters);
-	mParameterFileWidget0->setFilename(par->getActiveParameterFile0());
+	mParameterFileWidget0->setFilename(par0.getAbsoluteFilepath());
 
-	mFilePreviewWidget->previewFileSlot(par->getActiveParameterFile0());
+
+	mFilePreviewWidget->previewFileSlot(par0.getAbsoluteFilepath());
 }
 
 void ElastixWidget::registerSlot()

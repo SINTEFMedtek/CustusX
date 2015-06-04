@@ -54,7 +54,7 @@ namespace cx
 ElastixManager::ElastixManager(RegServices services) :
 	mServices(services)
 {
-	mOptions = profile()->getXmlSettings().descend("elastix");
+	mOptions = profile()->getXmlSettings().descend(ElastixParameters::getConfigUid());
 
 	mParameters.reset(new ElastixParameters(mOptions));
 	connect(mParameters.get(), SIGNAL(elastixParametersChanged()), this, SIGNAL(elastixChanged()));
@@ -90,7 +90,7 @@ void ElastixManager::preprocessExecuter()
 {
 	QStringList parameterFiles = mParameters->getActiveParameterFiles();
 	QString timestamp = QDateTime::currentDateTime().toString(timestampSecondsFormat());
-	QDir outDir(mServices.patientModelService->getActivePatientFolder()+"/elastix/"+timestamp);
+	QDir outDir(mServices.patientModelService->getActivePatientFolder()+"/"+mParameters->getConfigUid()+"/"+timestamp);
 
 	mExecuter->setDisplayProcessMessages(mDisplayProcessMessages->getValue());
 	mExecuter->setInput(mParameters->getActiveExecutable()->getEmbeddedPath().getAbsoluteFilepath(),

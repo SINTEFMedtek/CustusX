@@ -85,6 +85,7 @@ private:
 	void createUI();
 	QWidget* createOptionsWidget();
 	FilePathPropertyPtr getExecutable(QDomElement root);
+	void recurseParameterFolders(QString root, QStringList* retval);
 
 	QPushButton* mRegisterButton;
 	ElastixManagerPtr mElastixManager;
