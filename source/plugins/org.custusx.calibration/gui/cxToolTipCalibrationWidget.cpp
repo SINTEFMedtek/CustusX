@@ -93,8 +93,6 @@ ToolTipCalibrateWidget::~ToolTipCalibrateWidget()
 
 void ToolTipCalibrateWidget::onTrackingSystemStateChanged()
 {
-	CX_LOG_CHANNEL_DEBUG("CA") << "ToolTipCalibrateWidget::onTrackingSystemStateChanged() " << mServices->getToolManager()->getReferenceTool().get();
-	CX_LOG_CHANNEL_DEBUG("CA") << "   " << mTools->getValue();
 	if (mServices->getToolManager()->getTool(mTools->getValue()))
 		return;
 	if (!mServices->getToolManager()->getReferenceTool())
