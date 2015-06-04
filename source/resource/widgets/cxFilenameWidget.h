@@ -57,7 +57,6 @@ class cxResourceWidgets_EXPORT FilenameWidget: public OptimizedUpdateWidget
 {
 Q_OBJECT
 public:
-//	FilenameWidget(QWidget* parent, StringPropertyBasePtr, QGridLayout* gridLayout = 0, int row = 0);
 	FilenameWidget(QWidget* parent, FilePathPropertyPtr, QGridLayout* gridLayout = 0, int row = 0);
 
 private slots:
