@@ -127,6 +127,23 @@ TrackerConfigurationImpl::Tool TrackerConfigurationImpl::getTool(QString uid)
 	return retval;
 }
 
+QStringList TrackerConfigurationImpl::getAllApplications()
+{
+	QStringList allTools = this->getAllTools();
+	QStringList retval;
+
+	foreach(QString path, allTools)
+	{
+		//get internal tool
+		IgstkTool::InternalStructure internal = this->getToolInternal(path);
+		for (unsigned i=0; i<internal.mClinicalApplications.size(); ++i)
+			retval << internal.mClinicalApplications[i];
+	}
+
+	retval.removeDuplicates();
+	return retval;
+}
+
 QStringList TrackerConfigurationImpl::filter(QStringList toolsToFilter, QStringList applicationsFilter,
 		QStringList trackingsystemsFilter)
 {
