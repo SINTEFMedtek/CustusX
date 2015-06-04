@@ -157,6 +157,9 @@ void DicomWidget::onImportIntoCustusXAction()
 {
 	QStringList series = this->currentSeriesSelection();
 
+	if (series.empty())
+		CX_LOG_WARNING() << "No DICOM series selected, import failed.";
+
 	for (unsigned i=0; i<series.size(); ++i)
 	{
 		this->importSeries(series[i]);
