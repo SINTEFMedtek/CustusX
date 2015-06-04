@@ -38,6 +38,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSettings.h"
 #include "cxTypeConversions.h"
 #include "cxProfile.h"
+#include "cxFilePathProperty.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -46,7 +48,13 @@ ElastixParameters::ElastixParameters(XmlOptionFile options)
 {
     mOptions = options;
 
-    mCurrentPreset = StringProperty::initialize("currentPreset", "Preset", "Current Elastix Preset", "Select Preset...", QStringList(), mOptions.getElement());
+	mActiveExecutable = this->getExecutable();
+	mActiveParameterFile0 = this->getParameterFile("0");
+	mActiveParameterFile1 = this->getParameterFile("1");
+
+	mCurrentPreset = StringProperty::initialize("currentPreset", "Preset",
+												"Current Preset", "Select Preset...",
+												QStringList(), mOptions.getElement());
     connect(mCurrentPreset.get(), SIGNAL(changed()), this, SLOT(currentPresetChangedSlot()));
 
     this->currentPresetChangedSlot();
@@ -54,24 +62,28 @@ ElastixParameters::ElastixParameters(XmlOptionFile options)
 
 void ElastixParameters::addDefaultPresets()
 {
-	QString defaultExecutable = cx::DataLocations::findConfigFilePath("run_elastix.sh", "/elastix/bin");
-    this->addDefaultPreset("elastix/p_Rigid", defaultExecutable, QStringList() << "p_Rigid.txt");
+	FilePathPropertyPtr exe = this->getExecutable();
+	exe->setValue(cx::DataLocations::findConfigFilePath("run_elastix.sh", this->getConfigUid()+"/elastix/bin"));
+	FilePathPropertyPtr par0 = this->getParameterFile("0");
+	par0->setValue("elastix/par/p_Rigid.txt");
+
+	this->addDefaultPreset("elastix/p_Rigid", exe->getValue(), QStringList() << par0->getValue());
 }
 
 void ElastixParameters::addDefaultPreset(QString name, QString executable, QStringList parameterFiles)
-{
+{	
     // ignore add if already present:
     if (!mOptions.tryDescend("preset", "name", name).isNull())
         return;
 
     XmlOptionFile node = mOptions.descend("preset", "name", name);
     node.getElement().setAttribute("executable", executable);
-    for (unsigned i=0; i<parameterFiles.size(); ++i)
-    {
-        QString parName = QString("parameterFile%1").arg(i);
-        QString parVal = QFileInfo(parameterFiles[i]).fileName();
-        node.getElement().setAttribute(parName, parVal);
-    }
+	for (unsigned i=0; i<parameterFiles.size(); ++i)
+	{
+		QString parName = QString("parameterFile%1").arg(i);
+		QString parVal = parameterFiles[i];
+		node.getElement().setAttribute(parName, parVal);
+	}
 }
 
 void ElastixParameters::currentPresetChangedSlot()
@@ -79,23 +91,22 @@ void ElastixParameters::currentPresetChangedSlot()
     this->reloadPresets();
 
     XmlOptionFile node = mOptions.descend("preset", "name", mCurrentPreset->getValue());
-    mActiveExecutable = node.getElement().attribute("executable");
-    mActiveParameterFile0 = this->getFullParameterFilename(node.getElement().attribute("parameterFile0"));
-    mActiveParameterFile1 = this->getFullParameterFilename(node.getElement().attribute("parameterFile1"));
-    emit elastixParametersChanged();
+	mActiveExecutable->setValue(node.getElement().attribute("executable"));
+
+	mActiveParameterFile0->setValue(node.getElement().attribute("parameterFile0"));
+	mActiveParameterFile1->setValue(node.getElement().attribute("parameterFile1"));
+
+	emit elastixParametersChanged();
 }
 
 QString ElastixParameters::getFullParameterFilename(QString filename)
 {
-	return DataLocations::findConfigFilePath(filename, "elastix/parameterFiles");
+	return DataLocations::findConfigFilePath(filename, this->getConfigUid());
 }
 
-QStringList ElastixParameters::getParameterFilesDir() const
+QString ElastixParameters::getConfigUid()
 {
-	QStringList folders = profile()->getAllRootConfigPaths();
-	for(int i=0; i<folders.size(); ++i)
-		folders[i] = folders[i] + "/elastix/parameterFiles";
-	return folders;
+	return "org.custusx.registration.method.commandline";
 }
 
 StringPropertyBasePtr ElastixParameters::getCurrentPreset()
@@ -132,47 +143,42 @@ void ElastixParameters::reloadPresets()
 void ElastixParameters::saveCurrentPreset(QString name)
 {
     XmlOptionFile node = mOptions.descend("preset", "name", name);
-    node.getElement().setAttribute("executable", mActiveExecutable);
-    node.getElement().setAttribute("parameterFile0", QFileInfo(mActiveParameterFile0).fileName());
-    node.getElement().setAttribute("parameterFile1", QFileInfo(mActiveParameterFile1).fileName());
+	node.getElement().setAttribute("executable", mActiveExecutable->getEmbeddedPath().getRelativeFilepath());
+	node.getElement().setAttribute("parameterFile0", mActiveParameterFile0->getEmbeddedPath().getRelativeFilepath());
+	node.getElement().setAttribute("parameterFile1", mActiveParameterFile1->getEmbeddedPath().getRelativeFilepath());
     mCurrentPreset->setValue(name);
 }
 
-void ElastixParameters::setActiveParameterFile0(QString filename)
+FilePathPropertyPtr ElastixParameters::getExecutable()
 {
-    mActiveParameterFile0 = filename;
-    emit elastixParametersChanged();
+	QStringList paths = DataLocations::getRootConfigPaths();
+	paths = DataLocations::appendStringToAllElements(paths, "/"+this->getConfigUid());
+
+	QDomElement root;
+	FilePathPropertyPtr retval;
+	retval = FilePathProperty::initialize("executable", "Executable",
+										  "Name of registration executable",
+										  "",
+										  paths,
+										  root);
+	connect(retval.get(), &FilePathProperty::changed, this, &ElastixParameters::elastixParametersChanged);
+	return retval;
 }
 
-QString ElastixParameters::getActiveParameterFile0() const
+FilePathPropertyPtr ElastixParameters::getParameterFile(QString uid)
 {
-    if (this->validParameterFile(mActiveParameterFile0))
-    	return mActiveParameterFile0;
-    return "";
-}
+	QStringList paths = DataLocations::getRootConfigPaths();
+	paths = DataLocations::appendStringToAllElements(paths, "/"+this->getConfigUid());
 
-void ElastixParameters::setActiveParameterFile1(QString filename)
-{
-    mActiveParameterFile1 = filename;
-    emit elastixParametersChanged();
-}
-
-QString ElastixParameters::getActiveParameterFile1() const
-{
-    if (this->validParameterFile(mActiveParameterFile1))
-    	return mActiveParameterFile1;
-    return "";
-}
-
-void ElastixParameters::setActiveExecutable(QString filename)
-{
-    mActiveExecutable = filename;
-    emit elastixParametersChanged();
-}
-
-QString ElastixParameters::getActiveExecutable() const
-{
-    return mActiveExecutable;
+	QDomElement root;
+	FilePathPropertyPtr retval;
+	retval = FilePathProperty::initialize("parameter"+uid, "Parameter"+uid,
+										  "Name of parameter file "+uid,
+										  "",
+										  paths,
+										  root);
+	connect(retval.get(), &FilePathProperty::changed, this, &ElastixParameters::elastixParametersChanged);
+	return retval;
 }
 
 bool ElastixParameters::validParameterFile(QString file) const
@@ -182,17 +188,20 @@ bool ElastixParameters::validParameterFile(QString file) const
 
 QStringList ElastixParameters::getActiveParameterFiles() const
 {
+	QString p0 = mActiveParameterFile0->getEmbeddedPath().getAbsoluteFilepath();
+	QString p1 = mActiveParameterFile1->getEmbeddedPath().getAbsoluteFilepath();
+
     QStringList retval;
-    if (this->validParameterFile(mActiveParameterFile0))
-        retval << mActiveParameterFile0;
-    if (this->validParameterFile(mActiveParameterFile1))
-        retval  << mActiveParameterFile1;
+	if (this->validParameterFile(p0))
+		retval << p0;
+	if (this->validParameterFile(p1))
+		retval  << p1;
     return retval;
 }
 
 QString ElastixParameters::getPresetNameSuggesion() const
 {
-    QString retval = QFileInfo(mActiveExecutable).baseName();
+	QString retval = QFileInfo(mActiveExecutable->getValue()).baseName();
     QStringList parFiles = this->getActiveParameterFiles();
     for (unsigned i=0; i<parFiles.size(); ++i)
         retval += "/" + QFileInfo(parFiles[i]).baseName();

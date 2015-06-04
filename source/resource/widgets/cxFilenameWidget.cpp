@@ -31,17 +31,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxFilenameWidget.h"
 #include "cxFileInputWidget.h"
+#include "cxFilePathProperty.h"
 #include <QFileInfo>
 #include <QDir>
 #include "cxTypeConversions.h"
 #include <iostream>
+#include "cxLogger.h"
 
 namespace cx
 {
 
-///----------------
-
-FilenameWidget::FilenameWidget(QWidget* parent, StringPropertyBasePtr dataInterface,
+FilenameWidget::FilenameWidget(QWidget* parent, FilePathPropertyPtr dataInterface,
 	QGridLayout* gridLayout, int row) :
 	OptimizedUpdateWidget(parent)
 {
@@ -68,6 +68,7 @@ FilenameWidget::FilenameWidget(QWidget* parent, StringPropertyBasePtr dataInterf
 	this->setModified();
 }
 
+
 void FilenameWidget::editingFinished()
 {
 	mData->setValue(mFileInput->getFilename());
@@ -77,13 +78,9 @@ void FilenameWidget::prePaintEvent()
 {
 	mFileInput->blockSignals(true);
 
-	QString path = QFileInfo(mData->getValue()).absolutePath();
+	QString path = mData->getEmbeddedPath().getRootPath();
 	if (path.isEmpty())
 		path = QDir::homePath();
-
-//	std::cout << "---------------" << std::endl;
-//	std::cout << "val:         " << mData->getValue() << std::endl;
-//	std::cout << "path:         " << path << std::endl;
 
 	mFileInput->setDescription(mData->getDisplayName());
 	mFileInput->setBasePath(path);

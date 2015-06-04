@@ -68,6 +68,8 @@ public:
 
 	virtual void setMovingData(DataPtr data);
 	virtual void setFixedData(DataPtr data);
+	void setMovingData(QString uid);
+	void setFixedData(QString uid);
 	virtual DataPtr getMovingData();
 	virtual DataPtr getFixedData();
 
@@ -100,8 +102,10 @@ private:
 	std::vector<Vector3D> convertAndTransformToPoints(const std::vector<QString> &uids, const LandmarkMap &data, Transform3D M);
 	std::vector<Vector3D> convertVtkPointsToPoints(vtkPointsPtr base);
 
-	DataPtr mFixedData; ///< the data that shouldn't update its matrices during a registrations
-	DataPtr mMovingData; ///< the data that should update its matrices during a registration
+//	DataPtr mFixedData; ///< the data that shouldn't update its matrices during a registrations
+//	DataPtr mMovingData; ///< the data that should update its matrices during a registration
+	QString mFixedData; ///< the data that shouldn't update its matrices during a registrations
+	QString mMovingData; ///< the data that should update its matrices during a registration
 
 	QDateTime mLastRegistrationTime; ///< last timestamp for registration during this session. All registrations in one session results in only one reg transform.
 

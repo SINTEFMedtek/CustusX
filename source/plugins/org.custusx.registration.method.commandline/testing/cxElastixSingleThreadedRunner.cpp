@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 
 #include "cxElastixParameters.h"
+#include "cxFilePathProperty.h"
 
 namespace cx
 {
@@ -68,7 +69,7 @@ bool ElastixSingleThreadedRunner::registerLinear(
 
 	mExecuter->setDisplayProcessMessages(false);
 	mExecuter->setDisplayProcessMessages(true);
-	bool ok = mExecuter->setInput(preset->getActiveExecutable(),
+	bool ok = mExecuter->setInput(preset->getActiveExecutable()->getEmbeddedPath().getAbsoluteFilepath(),
 	         fixed,
 	         moving,
 	         outPath,

@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 class FileInputWidget;
+typedef boost::shared_ptr<class FilePathProperty> FilePathPropertyPtr;
 
 /**\brief Composite widget for filename edit.
  *
@@ -56,13 +57,14 @@ class cxResourceWidgets_EXPORT FilenameWidget: public OptimizedUpdateWidget
 {
 Q_OBJECT
 public:
-	FilenameWidget(QWidget* parent, StringPropertyBasePtr, QGridLayout* gridLayout = 0, int row = 0);
+	FilenameWidget(QWidget* parent, FilePathPropertyPtr, QGridLayout* gridLayout = 0, int row = 0);
+
 private slots:
 	virtual void prePaintEvent();
 	void editingFinished();
 private:
 	FileInputWidget* mFileInput;
-	StringPropertyBasePtr mData;
+	FilePathPropertyPtr mData;
 };
 
 } // namespace cx

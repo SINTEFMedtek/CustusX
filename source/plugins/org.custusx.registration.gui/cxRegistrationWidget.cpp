@@ -140,17 +140,9 @@ RegistrationWidget::RegistrationWidget(ctkPluginContext *pluginContext, QWidget*
 
 void RegistrationWidget::initRegistrationTypesWidgets()
 {
-	mRegistrationTypes << "ImageToPatient" << "ImageToImage" << "ImageTransform";
+	mRegistrationTypes << "ImageToPatient" <<	"ImageToImage" << "ImageTransform";
 	QStringList typeDefaults;
 	typeDefaults << "Landmark" << "Landmark" << "";
-
-	mTypeSelector = StringProperty::initialize("RegistrationTypes",
-													 "Registration Types",
-													 "Select registration type",
-													 "",
-													 mRegistrationTypes,
-													 mOptions.getElement());
-	this->blockSignals(true); // we dont want the onCurrentChanged() to be called while constructing
 
 	for(int i = 0; i < mRegistrationTypes.count(); ++i)
 	{
@@ -163,18 +155,26 @@ void RegistrationWidget::initRegistrationTypesWidgets()
 		mRegistrationTypeMap[type] = widget;
 		this->addTab(widget, type);
 
-		if (mTypeSelector->getValue() == type)
-			mTabWidget->setCurrentIndex(i);
 	}
 
-	this->blockSignals(false);
+	// Create typeselector after the widgets, as the addwidget trigger
+	// a signal that causes type to be overwritten.
+	mTypeSelector = StringProperty::initialize("RegistrationTypes",
+													 "Registration Types",
+													 "Select registration type",
+													 "",
+													 mRegistrationTypes,
+													 mOptions.getElement());
+	if (mRegistrationTypeMap.count(mTypeSelector->getValue()))
+		mTabWidget->setCurrentWidget(mRegistrationTypeMap[mTypeSelector->getValue()]);
 }
 
 void RegistrationWidget::onCurrentChanged(int index)
 {
 	if (index<0)
 		return;
-	mTypeSelector->setValue(mRegistrationTypes[index]);
+	if (mTypeSelector)
+		mTypeSelector->setValue(mRegistrationTypes[index]);
 }
 
 void RegistrationWidget::initServiceListener()

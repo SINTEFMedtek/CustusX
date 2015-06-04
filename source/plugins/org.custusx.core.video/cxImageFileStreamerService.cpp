@@ -38,6 +38,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMHDImageStreamer.h"
 #include "cxLocalServerStreamerServer.h"
 #include "cxTypeConversions.h"
+#include "cxFilePathProperty.h"
+
 
 namespace cx
 {

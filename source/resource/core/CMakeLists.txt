@@ -75,6 +75,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	properties/cxDoublePropertyTemporalCalibration
 	properties/cxStringPropertySelectTool
 	properties/cxStringPropertySelectCoordinateSystem
+        properties/cxFilePathProperty
 
     logger/cxReporter
     logger/cxMessageListener

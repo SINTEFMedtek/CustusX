@@ -48,6 +48,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTimedAlgorithmProgressBar.h"
 #include "cxElastixExecuter.h"
 #include "cxStringProperty.h"
+#include "cxFilePathProperty.h"
+#include "cxDataLocations.h"
+#include "cxHelperWidgets.h"
 
 namespace cx
 {
@@ -134,17 +137,8 @@ QWidget* ElastixWidget::createOptionsWidget()
 	layout->addWidget(mParameterFileWidget0, line, 1, 1, 2);
 	++line;
 
-	layout->addWidget(new QLabel("Executable", this), line, 0);
-	mExecutableEdit = new QLineEdit(this);
-	connect(mExecutableEdit, SIGNAL(editingFinished()), this, SLOT(executableEditFinishedSlot()));
-	layout->addWidget(mExecutableEdit, line, 1);
-
-	QAction* browseExecutableAction = new QAction(QIcon(":/icons/open.png"), "Browse", this);
-	browseExecutableAction->setStatusTip("Select the elastiX executable");
-	connect(browseExecutableAction, SIGNAL(triggered()), this, SLOT(browseExecutableSlot()));
-	QToolButton* button = new QToolButton();
-	button->setDefaultAction(browseExecutableAction);
-	layout->addWidget(button, line, 2);
+	QWidget* executableWidget = sscCreateDataWidget(this, mElastixManager->getParameters()->getActiveExecutable());
+	layout->addWidget(executableWidget, line, 0, 1, 3);
 	++line;
 
 	QHBoxLayout* buttonsLayout = new QHBoxLayout;
@@ -179,6 +173,7 @@ QWidget* ElastixWidget::createOptionsWidget()
 ElastixWidget::~ElastixWidget()
 {}
 
+
 void ElastixWidget::savePresetSlot()
 {
 	ElastixParametersPtr par = mElastixManager->getParameters();
@@ -200,46 +195,45 @@ void ElastixWidget::deletePresetSlot()
 	mElastixManager->getParameters()->removeCurrentPreset();
 }
 
-void ElastixWidget::executableEditFinishedSlot()
-{
-	mElastixManager->getParameters()->setActiveExecutable(mExecutableEdit->text());
-}
-
-void ElastixWidget::browseExecutableSlot()
-{
-	QString fileName = QFileDialog::getOpenFileName(this, tr("Select Executable"), "~");
-	if (fileName.isEmpty())
-		return;
-
-	mElastixManager->getParameters()->setActiveExecutable(fileName);
-}
-
 void ElastixWidget::userParameterFileSelected(QString filename)
 {
-	mElastixManager->getParameters()->setActiveParameterFile0(filename);
+	mElastixManager->getParameters()->getActiveParameterFile0()->setValue(filename);
+}
+
+void ElastixWidget::recurseParameterFolders(QString root, QStringList* retval)
+{
+	QDir folder(root);
+	folder.setFilter(QDir::AllDirs|QDir::NoDotAndDotDot);
+	QFileInfoList info = folder.entryInfoList();
+	for (int i=0; i<info.size(); ++i)
+	{
+		QString current = info[i].absoluteFilePath();
+		if (current.endsWith("/par"))
+		{
+			retval->append(current);
+		}
+
+		this->recurseParameterFolders(current, retval);
+	}
 }
 
 void ElastixWidget::elastixChangedSlot()
 {
 	ElastixParametersPtr par = mElastixManager->getParameters();
-	QStringList folders = par->getParameterFilesDir();
+	EmbeddedFilepath par0 = par->getActiveParameterFile0()->getEmbeddedPath();
+	QStringList folders = par0.getRootPaths();
+	QStringList parfolders;
 	for (int i=0; i<folders.size(); ++i)
-	{
-		QDir folder(folders[i]);
-		folder.mkpath(".");
-	}
+		this->recurseParameterFolders(folders[i], &parfolders);
 
-	mParameterFileWidget0->setPaths(folders);
+	mParameterFileWidget0->setPaths(parfolders);
 	QStringList nameFilters;
-	nameFilters << "*.*";
+	nameFilters << "*";
 	mParameterFileWidget0->setNameFilter(nameFilters);
-	mParameterFileWidget0->setFilename(par->getActiveParameterFile0());
+	mParameterFileWidget0->setFilename(par0.getAbsoluteFilepath());
 
-	mFilePreviewWidget->previewFileSlot(par->getActiveParameterFile0());
 
-	mExecutableEdit->blockSignals(true);
-	mExecutableEdit->setText(par->getActiveExecutable());
-	mExecutableEdit->blockSignals(false);
+	mFilePreviewWidget->previewFileSlot(par0.getAbsoluteFilepath());
 }
 
 void ElastixWidget::registerSlot()

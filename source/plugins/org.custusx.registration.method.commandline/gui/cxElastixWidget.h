@@ -47,6 +47,7 @@ class QLineEdit;
 
 namespace cx
 {
+typedef boost::shared_ptr<class FilePathProperty> FilePathPropertyPtr;
 class TimedAlgorithmProgressBar;
 
 /**
@@ -73,9 +74,7 @@ public slots:
 private slots:
 	void registerSlot();
 	void userParameterFileSelected(QString filename);
-	void browseExecutableSlot();
 	void elastixChangedSlot();
-	void executableEditFinishedSlot();
 	void toggleDetailsSlot();
 	void savePresetSlot();
 	void deletePresetSlot();
@@ -85,6 +84,8 @@ protected:
 private:
 	void createUI();
 	QWidget* createOptionsWidget();
+	FilePathPropertyPtr getExecutable(QDomElement root);
+	void recurseParameterFolders(QString root, QStringList* retval);
 
 	QPushButton* mRegisterButton;
 	ElastixManagerPtr mElastixManager;
@@ -93,9 +94,7 @@ private:
 	StringPropertyBasePtr mMovingImage;
 	FileSelectWidget* mParameterFileWidget0;
 	FilePreviewWidget* mFilePreviewWidget;
-	QLineEdit* mExecutableEdit;
 	cx::TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
-	//  QPushButton* mLaunchServerButton;
 	QWidget* mOptionsWidget;
 };
 
