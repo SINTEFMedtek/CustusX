@@ -83,6 +83,7 @@ public:
 	virtual QStringList getToolsGivenFilter(QStringList applicationsFilter,
 											QStringList trackingsystemsFilter) = 0;
 	virtual QStringList getAllTools() = 0;
+	virtual QStringList getAllApplications() = 0;
 
 	virtual Tool getTool(QString uid) = 0;
 	virtual bool verifyTool(QString uid) = 0;

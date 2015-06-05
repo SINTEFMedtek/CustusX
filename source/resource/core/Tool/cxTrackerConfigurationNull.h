@@ -54,6 +54,7 @@ public:
 	virtual QStringList getToolsGivenFilter(QStringList applicationsFilter,
 											QStringList trackingsystemsFilter) { return QStringList(); }
 	virtual QStringList getAllTools() { return QStringList(); }
+    virtual QStringList getAllApplications() { return QStringList(); }
 
 	virtual Tool getTool(QString uid) { return Tool(); }
 	virtual bool verifyTool(QString uid) { return false; }

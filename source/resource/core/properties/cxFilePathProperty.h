@@ -51,8 +51,9 @@ namespace cx
  *   - relative to the executable,
  *   - relative to one of several configuration roots: the factory root and the custom root
  *
+ * \ingroup cx_resource_core_properties
  */
-class EmbeddedFilepath
+class cxResource_EXPORT EmbeddedFilepath
 {
 public:
     void appendRootPath(QString path);

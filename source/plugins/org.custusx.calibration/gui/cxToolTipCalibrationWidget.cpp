@@ -82,6 +82,7 @@ ToolTipCalibrateWidget::ToolTipCalibrateWidget(VisServicesPtr services, QWidget*
   connect(mTestButton, SIGNAL(clicked()), this, SLOT(testCalibrationSlot()));
 
   connect(mTools.get(), SIGNAL(changed()), this, SLOT(toolSelectedSlot()));
+  connect(mServices->getToolManager().get(), &TrackingService::stateChanged, this, &ToolTipCalibrateWidget::onTrackingSystemStateChanged);
 
   //setting default state
   this->toolSelectedSlot();
@@ -89,6 +90,16 @@ ToolTipCalibrateWidget::ToolTipCalibrateWidget(VisServicesPtr services, QWidget*
 
 ToolTipCalibrateWidget::~ToolTipCalibrateWidget()
 {}
+
+void ToolTipCalibrateWidget::onTrackingSystemStateChanged()
+{
+	if (mServices->getToolManager()->getTool(mTools->getValue()))
+		return;
+	if (!mServices->getToolManager()->getReferenceTool())
+		return;
+
+	mTools->setValue(mServices->getToolManager()->getReferenceTool()->getUid());
+}
 
 void ToolTipCalibrateWidget::calibrateSlot()
 {
