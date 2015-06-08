@@ -131,35 +131,20 @@ LocalServerStreamer::LocalServerStreamer(QString serverName, QString serverArgum
 
 LocalServerStreamer::~LocalServerStreamer()
 {
-
 }
 
-bool LocalServerStreamer::startStreaming(SenderPtr sender)
+void LocalServerStreamer::startStreaming(SenderPtr sender)
 {
 	mLocalVideoServerProcess->launchWithRelativePath(mServerName, mServerArguments.split(" "));
 
-	this->waitForServerStart();
-	if (!this->localVideoServerIsRunning())
-	{
-		reportError("Local server failed to start");
-		return false;
-	}
-
-	return mBase->startStreaming(sender);
+	mSender = sender;
+	connect(mLocalVideoServerProcess.get(), &ProcessWrapper::stateChanged, this, &LocalServerStreamer::processStateChanged);
 }
 
-void LocalServerStreamer::waitForServerStart()
+void LocalServerStreamer::processStateChanged()
 {
-	int waitTime = 5000;
-	while (waitTime > 0)
-	{
-		qApp->processEvents();
-		if (this->localVideoServerIsRunning())
-			return;
-		int interval = 50;
-		sleep_ms(interval);
-		waitTime -= interval;
-	}
+	if(mLocalVideoServerProcess->isRunning())
+		mBase->startStreaming(mSender);
 }
 
 void LocalServerStreamer::stopStreaming()
@@ -167,14 +152,22 @@ void LocalServerStreamer::stopStreaming()
 	mBase->stopStreaming();
 
 	if (mLocalVideoServerProcess->getProcess())
+	{
 		mLocalVideoServerProcess->getProcess()->close();
+		mLocalVideoServerProcess.reset();
+	}
+}
+
+bool LocalServerStreamer::isStreaming()
+{
+	return localVideoServerIsRunning();
 }
 
 bool LocalServerStreamer::localVideoServerIsRunning()
 {
-	if (!mLocalVideoServerProcess->getProcess())
+	if (!mLocalVideoServerProcess || !mLocalVideoServerProcess->getProcess())
 		return false;
-	return this->mLocalVideoServerProcess->getProcess()->state() == QProcess::Running;
+	return this->mLocalVideoServerProcess->isRunning();
 }
 
 
