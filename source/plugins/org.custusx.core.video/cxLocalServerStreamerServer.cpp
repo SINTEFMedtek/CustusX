@@ -74,6 +74,7 @@ BoolPropertyBasePtr LocalServerStreamerArguments::getRunLocalServerOption(QDomEl
 	retval->setGroup("Connection");
 	return retval;
 }
+
 FilePathPropertyPtr LocalServerStreamerArguments::getLocalServerNameOption(QDomElement root)
 {
 	QString filename = "OpenIGTLinkServer";
@@ -81,11 +82,16 @@ FilePathPropertyPtr LocalServerStreamerArguments::getLocalServerNameOption(QDomE
 	filename += ".exe";
 #endif
 
+	QStringList paths = QStringList() << qApp->applicationDirPath();
+#ifdef __APPLE__
+	paths << QString("%1/%2.app/Contents/MacOS").arg(DataLocations::getBundlePath()).arg(filename);
+#endif
+
 	FilePathPropertyPtr retval;
 	retval = FilePathProperty::initialize("localservername", "Server Name",
 										  "Name of server executable, used only if Run Local Server is set.",
 										  filename,
-										  QStringList() << qApp->applicationDirPath(),
+										  paths,
 										  root);
 	retval->setAdvanced(false);
 	retval->setGroup("Connection");
@@ -96,8 +102,6 @@ FilePathPropertyPtr LocalServerStreamerArguments::getLocalServerNameOption(QDomE
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 ///--------------------------------------------------------
-
-
 
 StreamerPtr LocalServerStreamer::createStreamerIfEnabled(QDomElement root, StringMap args)
 {
