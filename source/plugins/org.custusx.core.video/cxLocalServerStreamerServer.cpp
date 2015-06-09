@@ -114,7 +114,8 @@ StreamerPtr LocalServerStreamer::createStreamerIfEnabled(QDomElement root, Strin
 	for (StringMap::iterator i=args.begin(); i!=args.end(); ++i)
 		cmdlineArguments << i->first << i->second;
 
-	QString localServer = LocalServerStreamerArguments().getLocalServerNameOption(root)->getValue();
+	FilePathPropertyPtr localServerProp = LocalServerStreamerArguments().getLocalServerNameOption(root);
+	QString localServer = localServerProp->getEmbeddedPath().getAbsoluteFilepath();
 	boost::shared_ptr<LocalServerStreamer> streamer;
 	streamer.reset(new LocalServerStreamer(localServer, cmdlineArguments.join(" ")));
 
