@@ -68,7 +68,7 @@ public:
 	explicit ProcessWrapper(QString name = "executable", QObject* parent = NULL);
 	virtual ~ProcessWrapper();
 
-	QPointer<QProcess> getProcess();
+	QProcess *getProcess();
 
 	void launchWithRelativePath(QString executable, QStringList arguments = QStringList());
 	void launch(QString executable, QStringList argument = QStringList());

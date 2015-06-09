@@ -139,7 +139,7 @@ void IGTLinkClientStreamer::stopStreaming()
 
 bool IGTLinkClientStreamer::isStreaming()
 {
-	return mSocket;
+	return (mSocket && mSocket->isValid());
 }
 
 QString IGTLinkClientStreamer::hostDescription() const
