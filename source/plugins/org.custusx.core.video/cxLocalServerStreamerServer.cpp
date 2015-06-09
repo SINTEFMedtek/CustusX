@@ -42,6 +42,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDir>
 #include "cxDataLocations.h"
 #include "cxTypeConversions.h"
+#include "cxFilePathProperty.h"
+
 
 namespace cx
 {
@@ -65,7 +67,6 @@ BoolPropertyBasePtr LocalServerStreamerArguments::getRunLocalServerOption(QDomEl
 	bool defaultValue = false;
 #endif
 
-
 	retval = BoolProperty::initialize("runlocalserver", "Run as separate process",
 											"Run streamer in a separate process",
 											defaultValue, root);
@@ -73,77 +74,34 @@ BoolPropertyBasePtr LocalServerStreamerArguments::getRunLocalServerOption(QDomEl
 	retval->setGroup("Connection");
 	return retval;
 }
-StringPropertyBasePtr LocalServerStreamerArguments::getLocalServerNameOption(QDomElement root)
+
+FilePathPropertyPtr LocalServerStreamerArguments::getLocalServerNameOption(QDomElement root)
 {
-	StringPropertyPtr retval;
-	QString defaultValue = this->getOpenIGTLinkServer().join(" ");
-	retval = StringProperty::initialize("localservername", "Server Name",
-											  "Name of server executable, used only if Run Local Server is set.",
-											  defaultValue, root);
-	retval->setGuiRepresentation(StringPropertyBase::grFILENAME);
+	QString filename = "OpenIGTLinkServer";
+#ifdef WIN32
+	filename += ".exe";
+#endif
+
+	QStringList paths = QStringList() << qApp->applicationDirPath();
+#ifdef __APPLE__
+	paths << QString("%1/%2.app/Contents/MacOS").arg(DataLocations::getBundlePath()).arg(filename);
+#endif
+
+	FilePathPropertyPtr retval;
+	retval = FilePathProperty::initialize("localservername", "Server Name",
+										  "Name of server executable, used only if Run Local Server is set.",
+										  filename,
+										  paths,
+										  root);
 	retval->setAdvanced(false);
 	retval->setGroup("Connection");
 	return retval;
 }
 
-/** Look for a grabber server with a given name in path.
- *  If found, return filename with args relative to bundle dir.
- *
- */
-QStringList LocalServerStreamerArguments::checkGrabberServerExist(QString path, QString filename)
-{
-	QStringList retval;
-	path = QDir::cleanPath(path);
-	if (QDir(path).exists(filename))
-        retval << QDir(DataLocations::getBundlePath()).relativeFilePath(path + "/" + filename);
-#ifdef __APPLE__
-	if (retval.isEmpty())
-	{
-		QString bundledPath = QString("%1/%2.app/Contents/MacOS").arg(path).arg(filename);
-		if (QDir(bundledPath).exists(filename))
-            retval << QDir(DataLocations::getBundlePath()).relativeFilePath(bundledPath + "/" + filename);
-	}
-
-#endif
-	return retval;
-}
-
-QStringList LocalServerStreamerArguments::getOpenIGTLinkServer()
-{
-	QString filename = "OpenIGTLinkServer";
-#ifdef WIN32
-	filename = "OpenIGTLinkServer.exe";
-//	postfix = "--in_width 800 --in_height 600"; // if needed, add as gui options in the openCV group
-#endif
-    return this->getGrabberServer(filename);
-}
-
-QStringList LocalServerStreamerArguments::getGrabberServer(QString filename)
-{
-
-	QStringList result;
-#ifdef __APPLE__
-	// run from installed folder on mac
-    result = this->checkGrabberServerExist(qApp->applicationDirPath(), filename);
-	if (!result.isEmpty())
-		return result;
-#endif
-	// run from installed or build bin folder
-    result = this->checkGrabberServerExist(DataLocations::getBundlePath(), filename);
-	if (!result.isEmpty())
-		return result;
-	else
-		reportWarning("Failed to locate default grabber server");
-
-	return result;
-}
-
 
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 ///--------------------------------------------------------
-
-
 
 StreamerPtr LocalServerStreamer::createStreamerIfEnabled(QDomElement root, StringMap args)
 {

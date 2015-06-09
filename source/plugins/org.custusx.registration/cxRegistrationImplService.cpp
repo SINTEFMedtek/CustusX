@@ -60,15 +60,9 @@ RegistrationImplService::RegistrationImplService(ctkPluginContext *context) :
 	mPatientModelService(new PatientModelServiceProxy(context)),
 	mSession(SessionStorageServiceProxy::create(context))
 {
-//	mLastRegistrationTime = QDateTime::currentDateTime();
-
 	connect(mSession.get(), &SessionStorageService::cleared, this, &RegistrationImplService::clearSlot);
 	connect(mSession.get(), &SessionStorageService::isLoading, this, &RegistrationImplService::duringLoadPatientSlot);
 	connect(mSession.get(), &SessionStorageService::isSaving, this, &RegistrationImplService::duringSavePatientSlot);
-
-//	connect(mPatientModelService.get(), &PatientModelService::isSaving, this, &RegistrationImplService::duringSavePatientSlot);
-//	connect(mPatientModelService.get(), &PatientModelService::isLoading, this, &RegistrationImplService::duringLoadPatientSlot);
-//	connect(mPatientModelService.get(), &PatientModelService::cleared, this, &RegistrationImplService::clearSlot);
 }
 
 RegistrationImplService::~RegistrationImplService()
@@ -80,8 +74,6 @@ void RegistrationImplService::duringSavePatientSlot(QDomElement& node)
 	XMLNodeAdder root(node);
 	QDomElement managerNode = root.descend("managers").node().toElement();
 	this->addXml(managerNode);
-//	QDomElement managerNode = mPatientModelService->getCurrentWorkingElement("managers");
-//	this->addXml(managerNode);
 }
 
 void RegistrationImplService::duringLoadPatientSlot(QDomElement& node)
@@ -90,9 +82,6 @@ void RegistrationImplService::duringLoadPatientSlot(QDomElement& node)
 	QDomElement registrationManager = root.descend("managers/registrationManager").node().toElement();
 	if (!registrationManager.isNull())
 		this->parseXml(registrationManager);
-
-//	QDomElement registrationManager = mPatientModelService->getCurrentWorkingElement("managers/registrationManager");
-//	this->parseXml(registrationManager);
 }
 
 void RegistrationImplService::addXml(QDomNode& parentNode)
@@ -121,10 +110,10 @@ void RegistrationImplService::addXml(QDomNode& parentNode)
 void RegistrationImplService::parseXml(QDomNode& dataNode)
 {
 	QString fixedData = dataNode.namedItem("fixedDataUid").toElement().text();
-	this->setFixedData(mPatientModelService->getData(fixedData));
+	this->setFixedData(fixedData);
 
 	QString movingData = dataNode.namedItem("movingDataUid").toElement().text();
-	this->setMovingData(mPatientModelService->getData(movingData));
+	this->setMovingData(movingData);
 }
 
 void RegistrationImplService::clearSlot()
@@ -133,40 +122,46 @@ void RegistrationImplService::clearSlot()
 	this->setFixedData(DataPtr());
 }
 
-
-
-void RegistrationImplService::setMovingData(DataPtr movingData)
+void RegistrationImplService::setMovingData(DataPtr data)
 {
-  mMovingData = movingData;
-  emit movingDataChanged(this->getMovingDataUid());
+	this->setMovingData((data) ? data->getUid() : "");
 }
 
-void RegistrationImplService::setFixedData(DataPtr fixedData)
+void RegistrationImplService::setFixedData(DataPtr data)
 {
-  if(mFixedData == fixedData)
-	return;
+	this->setFixedData((data) ? data->getUid() : "");
+}
 
-  mFixedData = fixedData;
-  if (mFixedData)
-	report("Registration fixed data set to "+mFixedData->getUid());
-  emit fixedDataChanged(this->getFixedDataUid());
+void RegistrationImplService::setMovingData(QString uid)
+{
+	if (uid==mMovingData)
+		return;
+	mMovingData = uid;
+	emit movingDataChanged(mMovingData);
+}
+
+void RegistrationImplService::setFixedData(QString uid)
+{
+	if (uid==mFixedData)
+		return;
+	mFixedData = uid;
+	emit movingDataChanged(mFixedData);
 }
 
 DataPtr RegistrationImplService::getMovingData()
 {
-  return mMovingData;
+	return mPatientModelService->getData(mMovingData);
 }
 
 DataPtr RegistrationImplService::getFixedData()
 {
-  return mFixedData;
+	return mPatientModelService->getData(mFixedData);
 }
 
 QDateTime RegistrationImplService::getLastRegistrationTime()
 {
 	return mLastRegistrationTime;
 }
-
 
 void RegistrationImplService::setLastRegistrationTime(QDateTime time)
 {
@@ -423,29 +418,19 @@ Transform3D RegistrationImplService::performLandmarkRegistration(vtkPointsPtr so
 void RegistrationImplService::applyImage2ImageRegistration(Transform3D delta_pre_rMd, QString description)
 {
 	RegistrationTransform regTrans(delta_pre_rMd, QDateTime::currentDateTime(), description);
-	regTrans.mFixed = mFixedData ? mFixedData->getUid() : "";
-	regTrans.mMoving = mMovingData ? mMovingData->getUid() : "";
+	regTrans.mFixed = mFixedData;
+	regTrans.mMoving = mMovingData;
 
-	this->updateRegistration(mLastRegistrationTime, regTrans, mMovingData);
+	this->updateRegistration(mLastRegistrationTime, regTrans, this->getMovingData());
 
 	mLastRegistrationTime = regTrans.mTimestamp;
 	reportSuccess(QString("Image registration [%1] has been performed on %2").arg(description).arg(regTrans.mMoving) );
 }
 
-//PatientModelService* RegistrationImplService::getPatientModelService()
-//{
-//	ctkServiceTracker<PatientModelService*> tracker(mContext);
-//	tracker.open();
-//	PatientModelService* service = tracker.getService(); // get arbitrary instance of this type
-//	if(!service)
-//		reportError("RegistrationImplService can't access PatientModelService");
-//	return service;
-//}
-
 void RegistrationImplService::applyPatientRegistration(Transform3D rMpr_new, QString description)
 {
 	RegistrationTransform regTrans(rMpr_new, QDateTime::currentDateTime(), description);
-	regTrans.mFixed = mFixedData ? mFixedData->getUid() : "";
+	regTrans.mFixed = mFixedData;
 
 	mPatientModelService->updateRegistration_rMpr(mLastRegistrationTime, regTrans);
 

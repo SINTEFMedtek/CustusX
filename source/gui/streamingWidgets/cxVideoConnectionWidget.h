@@ -53,7 +53,6 @@ typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 
 namespace cx
 {
-class FileSelectWidget;
 class SimulateUSWidget;
 class FileInputWidget;
 class StreamerService;

@@ -52,6 +52,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxBoolProperty.h"
 #include "cxDataReaderWriter.h"
 #include "cxSender.h"
+#include "cxFilePathProperty.h"
+#include "cxProfile.h"
 
 namespace cx
 {
@@ -64,14 +66,15 @@ std::vector<PropertyPtr> ImageStreamerDummyArguments::getSettings(QDomElement ro
 	return retval;
 }
 
-StringPropertyBasePtr ImageStreamerDummyArguments::getFilenameOption(QDomElement root)
+FilePathPropertyPtr ImageStreamerDummyArguments::getFilenameOption(QDomElement root)
 {
-	StringPropertyPtr retval;
-	retval = StringProperty::initialize("filename", "Filename",
-											  "Select a 3D image file to stream from",
-											  "",
-											  root);
-	retval->setGuiRepresentation(StringPropertyBase::grFILENAME);
+	FilePathPropertyPtr retval;
+	retval = FilePathProperty::initialize("filename", "Filename",
+										  "Select a 3D image file to stream from",
+										  "",
+										  QStringList() << profile()->getSessionRootFolder(),
+										  root);
+
 	retval->setGroup("File");
 	return retval;
 }

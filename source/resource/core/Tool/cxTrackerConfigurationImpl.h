@@ -62,6 +62,7 @@ public:
 	virtual QStringList getConfigurationsGivenApplication();
 	virtual QStringList getAllConfigurations();
 	virtual QStringList getAllTools();
+	virtual QStringList getAllApplications();
 
 	virtual bool isNull() { return false; }
 

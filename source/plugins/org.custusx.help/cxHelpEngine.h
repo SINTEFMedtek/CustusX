@@ -78,6 +78,7 @@ private:
 	bool isBreakChar(QString text, int index) const;
 	QString convertToKeyword(QString id) const;
 
+	void setupDocFile();
 };
 typedef boost::shared_ptr<HelpEngine> HelpEnginePtr;
 

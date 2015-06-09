@@ -75,6 +75,7 @@ private slots:
   void calibrateSlot();
   void testCalibrationSlot();
   void toolSelectedSlot();
+  void onTrackingSystemStateChanged();
 
 private:
   VisServicesPtr mServices;

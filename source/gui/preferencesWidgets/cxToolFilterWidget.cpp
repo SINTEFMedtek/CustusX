@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxStringProperty.h"
 #include "cxHelperWidgets.h"
 #include "cxHelperWidgets.h"
-
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -67,9 +67,10 @@ ToolFilterGroupBox::ToolFilterGroupBox(QWidget* parent) :
 
 void ToolFilterGroupBox::createAppSelector()
 {
-	QString defaultValue = "All";
-	QStringList range = stateService()->getAllApplicationStateNames();
-	range.prepend("All");
+	QString defaultValue = "all";
+	TrackerConfigurationPtr config = trackingService()->getConfiguration();
+	QStringList range = config->getAllApplications();
+	range.prepend("all");
 	mAppSelector = StringProperty::initialize("applications", "Application",
 													"Display tools for a given applications",
 													defaultValue,
@@ -94,16 +95,23 @@ void ToolFilterGroupBox::setTrackingSystemSelector(StringPropertyBasePtr selecto
 
 void ToolFilterGroupBox::setClinicalApplicationSlot(QString val)
 {
-  mAppSelector->setValue(val);
+	TrackerConfigurationPtr config = trackingService()->getConfiguration();
+	QStringList range = config->getAllApplications();
+	for (int i=0; i<range.size(); ++i)
+	{
+		if (val.contains(range[i], Qt::CaseInsensitive))
+			mAppSelector->setValue(range[i]);
+	}
 }
 
 void ToolFilterGroupBox::filterSlot()
 {
   QStringList applicationFilter;
-  if (mAppSelector->getValue() == "All")
+  if (mAppSelector->getValue().contains("all", Qt::CaseInsensitive))
   {
-	  applicationFilter = stateService()->getAllApplicationStateNames();
-	  applicationFilter << "All";
+	  TrackerConfigurationPtr config = trackingService()->getConfiguration();
+	  applicationFilter = config->getAllApplications();
+	  applicationFilter << "all";
   }
   else
 	  applicationFilter = QStringList() << mAppSelector->getValue();

@@ -40,6 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
+typedef boost::shared_ptr<class FilePathProperty> FilePathPropertyPtr;
+
 /**
  * \file
  * \addtogroup org_custusx_registration_method_commandline
@@ -57,20 +59,17 @@ class org_custusx_registration_method_commandline_EXPORT ElastixParameters : pub
     Q_OBJECT
 public:
     ElastixParameters(XmlOptionFile options);
-    StringPropertyBasePtr getCurrentPreset();
+	static QString getConfigUid();
+	StringPropertyBasePtr getCurrentPreset();
     void removeCurrentPreset(); ///< Remove the currently selected preset. Reload.
     void saveCurrentPreset(QString newName);
 
-    void setActiveParameterFile0(QString filename);
-    QString getActiveParameterFile0() const;
-    void setActiveParameterFile1(QString filename);
-    QString getActiveParameterFile1() const;
-    void setActiveExecutable(QString filename);
-    QString getActiveExecutable() const;
+	FilePathPropertyPtr getActiveParameterFile0() const { return mActiveParameterFile0; }
+	FilePathPropertyPtr getActiveParameterFile1() const { return mActiveParameterFile1; }
+	FilePathPropertyPtr getActiveExecutable() const { return mActiveExecutable; }
 
     QStringList getActiveParameterFiles() const;
     QString getPresetNameSuggesion() const; ///< create a name describing the active state, can be used as name for a new preset.
-	QStringList getParameterFilesDir() const;
 
 signals:
     void elastixParametersChanged();
@@ -84,11 +83,13 @@ private:
     QString getFullParameterFilename(QString filename);
     void addDefaultPreset(QString name, QString executable, QStringList parameterFiles);
     void addDefaultPresets();
+	FilePathPropertyPtr getExecutable();
+	FilePathPropertyPtr getParameterFile(QString uid);
 
     StringPropertyPtr mCurrentPreset;
-    QString mActiveExecutable;
-    QString mActiveParameterFile0;
-    QString mActiveParameterFile1;
+	FilePathPropertyPtr mActiveExecutable;
+	FilePathPropertyPtr mActiveParameterFile0;
+	FilePathPropertyPtr mActiveParameterFile1;
     XmlOptionFile mOptions;
 };
 typedef boost::shared_ptr<ElastixParameters> ElastixParametersPtr;
