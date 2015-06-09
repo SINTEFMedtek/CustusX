@@ -60,7 +60,7 @@ ProcessWrapper::~ProcessWrapper()
 
 QProcess* ProcessWrapper::getProcess()
 {
-	return mProcess;
+	return mProcess.data();
 }
 
 void ProcessWrapper::launchWithRelativePath(QString executable, QStringList arguments)
