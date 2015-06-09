@@ -106,8 +106,9 @@ public:
 
 	virtual void initialize(QString filename, bool secondaryStream, bool sendonce = false);
 	virtual void initialize(StringMap arguments);
-	virtual bool startStreaming(SenderPtr sender);
+	virtual void startStreaming(SenderPtr sender);
 	virtual void stopStreaming();
+	virtual bool isStreaming();
 
 	virtual QString getType();
 	virtual QStringList getArgumentDescription();

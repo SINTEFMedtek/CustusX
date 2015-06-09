@@ -100,8 +100,9 @@ public:
 	virtual ~ImageStreamerOpenCV();
 
 	virtual void initialize(StringMap arguments);
-	virtual bool startStreaming(SenderPtr sender);
+	virtual void startStreaming(SenderPtr sender);
 	virtual void stopStreaming();
+	virtual bool isStreaming();
 
 	virtual QString getType();
 	virtual QStringList getArgumentDescription();

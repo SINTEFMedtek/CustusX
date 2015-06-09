@@ -279,24 +279,23 @@ void ImageStreamerOpenCV::initialize_local()
 #endif
 }
 
-bool ImageStreamerOpenCV::startStreaming(SenderPtr sender)
+void ImageStreamerOpenCV::startStreaming(SenderPtr sender)
 {
 #ifdef CX_USE_OpenCV
 	this->initialize_local();
 
 	if (!mSendTimer || !mVideoCapture->isOpened())
 	{
-		std::cout << "ImageStreamerOpenCV: Failed to start streaming: Not initialized." << std::endl;
-		return false;
+		reportError("ImageStreamerOpenCV: Failed to start streaming: Not initialized.");
+		return;
 	}
 
 	mSender = sender;
 	mSendTimer->start(getSendInterval());
 	this->continousGrabEvent(); // instead of grabtimer
 
-	return true;
 #else
-	return false;
+	reportWarning("ImageStreamerOpenCV: Failed to start streaming: CX_USE_OpenCV not defined.");
 #endif //CX_USE_OpenCV
 }
 
@@ -308,6 +307,11 @@ void ImageStreamerOpenCV::stopStreaming()
 	mSender.reset();
 
 	this->deinitialize_local();
+}
+
+bool ImageStreamerOpenCV::isStreaming()
+{
+	return (mSendTimer && mVideoCapture->isOpened());
 }
 
 void ImageStreamerOpenCV::dumpProperties()

@@ -78,17 +78,18 @@ Q_OBJECT
 public:
 	LocalServerStreamer(QString serverName, QString serverArguments);
 	virtual ~LocalServerStreamer();
-	virtual bool startStreaming(SenderPtr sender);
+	virtual void startStreaming(SenderPtr sender);
 	virtual void stopStreaming();
+	virtual bool isStreaming();
 
 	static StreamerPtr createStreamerIfEnabled(QDomElement root, StringMap args);
 
 private slots:
 	virtual void streamSlot() {}
 
+	void processStateChanged();
 private:
 	bool localVideoServerIsRunning();
-	void waitForServerStart();
 	ProcessWrapperPtr mLocalVideoServerProcess;
 
 	StreamerPtr mBase;
