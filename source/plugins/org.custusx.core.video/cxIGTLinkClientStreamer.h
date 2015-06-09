@@ -61,8 +61,9 @@ public:
 
 	void setAddress(QString address, int port);
 
-	virtual bool startStreaming(SenderPtr sender);
+	virtual void startStreaming(SenderPtr sender);
 	virtual void stopStreaming();
+	virtual bool isStreaming();
 
 
 private slots:

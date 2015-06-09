@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataLocations.h"
 #include "cxLogger.h"
 #include "cxTypeConversions.h"
+#include <iostream>
 
 namespace cx
 {
@@ -48,6 +49,8 @@ ProcessWrapper::ProcessWrapper(QString name, QObject* parent) :
 
 	mProcess->setProcessChannelMode(QProcess::MergedChannels);
 	mProcess->setReadChannel(QProcess::StandardOutput);
+
+	connect(mProcess, &QProcess::stateChanged, this, &ProcessWrapper::stateChanged);
 }
 
 ProcessWrapper::~ProcessWrapper()
@@ -55,7 +58,7 @@ ProcessWrapper::~ProcessWrapper()
 	mProcess->close();
 }
 
-QProcess* ProcessWrapper::getProcess()
+QPointer<QProcess> ProcessWrapper::getProcess()
 {
 	return mProcess;
 }

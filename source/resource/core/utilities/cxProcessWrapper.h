@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStringList>
 #include <QString>
 #include <QProcess>
+#include <QPointer>
 #include "cxProcessReporter.h"
 
 namespace cx
@@ -67,7 +68,7 @@ public:
 	explicit ProcessWrapper(QString name = "executable", QObject* parent = NULL);
 	virtual ~ProcessWrapper();
 
-	QProcess* getProcess();
+	QPointer<QProcess> getProcess();
 
 	void launchWithRelativePath(QString executable, QStringList arguments = QStringList());
 	void launch(QString executable, QStringList argument = QStringList());
@@ -78,11 +79,14 @@ public:
 	bool waitForStarted(int msecs = 30000);
 	bool waitForFinished(int msecs = 30000);
 
+signals:
+	void stateChanged();
+
 private:
 	QString getExecutableInBundlesAbsolutePath(QString exeInBundle);
 	void internalLaunch(QString executable, QStringList arguments);
 
-	QProcess* mProcess;
+	QPointer<QProcess> mProcess;
 	ProcessReporterPtr mReporter;
 	QString mName;
 	QString mLastExecutablePath; //the path to the last executable that was launched

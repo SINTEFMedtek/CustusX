@@ -54,6 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSender.h"
 #include "cxFilePathProperty.h"
 #include "cxProfile.h"
+#include "cxReporter.h"
 
 namespace cx
 {
@@ -304,21 +305,25 @@ void DummyImageStreamer::initialize(QString filename, bool secondaryStream, bool
 	this->setInitialized(true);
 }
 
-bool DummyImageStreamer::startStreaming(SenderPtr sender)
+void DummyImageStreamer::startStreaming(SenderPtr sender)
 {
 	if (!this->isInitialized())
 	{
-		std::cout << "DummyImageStreamer: Failed to start streaming: Not initialized." << std::endl;
-		return false;
+		reportError("DummyImageStreamer: Failed to start streaming: Not initialized.");
+		return;
 	}
 	mSender = sender;
 	mSendTimer->start(this->getSendInterval());
-	return true;
 }
 
 void DummyImageStreamer::stopStreaming()
 {
 	mSendTimer->stop();
+}
+
+bool DummyImageStreamer::isStreaming()
+{
+	return this->isInitialized();
 }
 
 vtkSmartPointer<vtkImageData> DummyImageStreamer::hasSecondaryData()
