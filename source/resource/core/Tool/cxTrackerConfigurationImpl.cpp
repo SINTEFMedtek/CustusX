@@ -136,7 +136,7 @@ QStringList TrackerConfigurationImpl::getAllApplications()
 	foreach(QString path, allTools)
 	{
 		//get internal tool
-		IgstkTool::InternalStructure internal = this->getToolInternal(path);
+        ToolFileParser::ToolInternalStructure internal = this->getToolInternal(path);
 		for (unsigned i=0; i<internal.mClinicalApplications.size(); ++i)
 			retval << internal.mClinicalApplications[i];
 	}
