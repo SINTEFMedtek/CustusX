@@ -48,7 +48,8 @@ namespace cx
 class cxResource_EXPORT StreamerServiceProxy : public StreamerService
 {
 public:
-    StreamerServiceProxy(ctkPluginContext *context);
+
+    StreamerServiceProxy(ctkPluginContext *context, QString name);
     virtual ~StreamerServiceProxy() {}
     virtual QString getName();
     virtual QString getType() const;
@@ -61,6 +62,7 @@ private:
     void onServiceRemoved(StreamerService *service);
 
     ctkPluginContext *mPluginContext;
+    QString mServiceName;
     StreamerServicePtr mStreamerService;
     boost::shared_ptr<ServiceTrackerListener<StreamerService> > mServiceListener;
 };
