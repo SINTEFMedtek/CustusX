@@ -58,7 +58,7 @@ ProcessWrapper::~ProcessWrapper()
 	mProcess->close();
 }
 
-QPointer<QProcess> ProcessWrapper::getProcess()
+QProcess* ProcessWrapper::getProcess()
 {
 	return mProcess;
 }
