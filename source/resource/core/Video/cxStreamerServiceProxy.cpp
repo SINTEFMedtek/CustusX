@@ -36,8 +36,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-StreamerServiceProxy::StreamerServiceProxy(ctkPluginContext *context) :
+StreamerServiceProxy::StreamerServiceProxy(ctkPluginContext *context, QString name) :
     mPluginContext(context),
+    mServiceName(name),
     mStreamerService(StreamerService::getNullObject())
 {
     this->initServiceListener();
@@ -76,11 +77,13 @@ void StreamerServiceProxy::initServiceListener()
 
 void StreamerServiceProxy::onServiceAdded(StreamerService* service)
 {
-    mStreamerService.reset(service, null_deleter());
+    if(service && service->getName() == mServiceName)
+        mStreamerService.reset(service, null_deleter());
 }
 
 void StreamerServiceProxy::onServiceRemoved(StreamerService *service)
 {
-    mStreamerService = StreamerService::getNullObject();
+    if(service && (service->getName() == mServiceName))
+        mStreamerService = StreamerService::getNullObject();
 }
 } //end namespace cx
