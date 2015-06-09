@@ -83,6 +83,28 @@ void OpenIGTLinkStreamer::receivedImage(ImagePtr image)
         mSender->send(package);
 }
 
+void OpenIGTLinkStreamer::receiveIgtlImage(IGTLinkImageMessage::Pointer igtlimage)
+{
+    PackagePtr package(new Package());
+    package->mIgtLinkImageMessage = igtlimage;
+    // if us status not sent, do it here
+    if (mUnsentUSStatusMessage)
+    {
+        package->mIgtLinkUSStatusMessage = mUnsentUSStatusMessage;
+        mUnsentUSStatusMessage = IGTLinkUSStatusMessage::Pointer();
+    }
+    if(mSender)
+    {
+        CX_LOG_DEBUG() << "sender custus pakke";
+        mSender->send(package);
+    }
+}
+
+void OpenIGTLinkStreamer::receivedUSStatusMessage(IGTLinkUSStatusMessage::Pointer message)
+{
+    mUnsentUSStatusMessage = message;
+}
+
 void OpenIGTLinkStreamer::streamSlot()
 {
 

@@ -19,17 +19,14 @@ bool CustusDialect::doCRC() const
     return false;
 }
 
-void CustusDialect::translate(const igtl::ImageMessage::Pointer body)
+void CustusDialect::translate(const IGTLinkImageMessage::Pointer body)
 {
-    IGTLinkConversion converter;
-    ImagePtr theImage = converter.decode(body);
-    emit image(theImage);
+    emit igtlimage(body);
 }
 
 void CustusDialect::translate(const cx::IGTLinkUSStatusMessage::Pointer body)
 {
-    CX_LOG_DEBUG() << "IGTLinkUSStatusMessage received.";
-    mUnsentUSStatusMessage = body;
+    emit usstatusmessage(body);
 }
 
 }

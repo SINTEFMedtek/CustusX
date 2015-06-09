@@ -58,7 +58,6 @@ void OpenIGTLinkPluginActivator::start(ctkPluginContext* context)
     OpenIGTLinkClient *client = new OpenIGTLinkClient;
     client->setIpAndPort(mIp, mPort); //this is done before client is moved to another thread
     client->moveToThread(&mOpenIGTLinkThread);
-
     OpenIGTLinkTrackingSystemService* tracking = new OpenIGTLinkTrackingSystemService(client);
     OpenIGTLinkStreamerService *streamer = new OpenIGTLinkStreamerService(client);
     OpenIGTLinkGuiExtenderService* gui = new OpenIGTLinkGuiExtenderService(client);

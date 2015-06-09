@@ -102,10 +102,11 @@ ImagePtr IGTLinkConversion::decode(igtl::ImageMessage::Pointer message)
 
     imageImport->SetNumberOfScalarComponents(1);
 
+    CX_LOG_DEBUG() << "Scalar type is " << scalarType;
     switch (scalarType)
     {
     case IGTLinkImageMessage::TYPE_INT8:
-        std::cout << "signed char is not supported. Falling back to unsigned char." << std::endl;
+        CX_LOG_WARNING() << "signed char is not supported. Falling back to unsigned char.";
         imageImport->SetDataScalarTypeToUnsignedChar();
         break;
     case IGTLinkImageMessage::TYPE_UINT8:
@@ -130,7 +131,7 @@ ImagePtr IGTLinkConversion::decode(igtl::ImageMessage::Pointer message)
         imageImport->SetDataScalarTypeToDouble();
         break;
     default:
-        std::cout << "unknown type. Falling back to unsigned char." << std::endl;
+        CX_LOG_WARNING() << "Unknown image type. Falling back to unsigned char.";
         imageImport->SetDataScalarTypeToUnsignedChar();
     }
 
@@ -245,8 +246,8 @@ IGTLinkImageMessage::Pointer IGTLinkConversion::encode(ImagePtr image)
 
 ImagePtr IGTLinkConversion::decode(IGTLinkImageMessage::Pointer message)
 {
-    igtl::ImageMessage::Pointer msg(message.GetPointer());
-    return this->decode(msg);
+    //igtl::ImageMessage::Pointer msg(message.GetPointer());
+    return this->decode(igtl::ImageMessage::Pointer(message));
 }
 
 IGTLinkUSStatusMessage::Pointer IGTLinkConversion::encode(ProbeDefinitionPtr input)

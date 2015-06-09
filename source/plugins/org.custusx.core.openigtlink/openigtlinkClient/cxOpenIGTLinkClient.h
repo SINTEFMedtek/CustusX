@@ -92,6 +92,8 @@ signals:
     void calibration(QString devicename, Transform3D calibration);
     void image(ImagePtr image);
     void probedefinition(QString devicename, ProbeDefinitionPtr definition);
+    void igtlimage(IGTLinkImageMessage::Pointer igtlimage);
+    void usstatusmessage(IGTLinkUSStatusMessage::Pointer message);
 
 private slots:
     void internalConnected();

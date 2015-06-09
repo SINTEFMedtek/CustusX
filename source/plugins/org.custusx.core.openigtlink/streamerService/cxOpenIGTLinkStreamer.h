@@ -36,6 +36,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxStreamer.h"
 
 #include "cxImage.h"
+#include "cxIGTLinkUSStatusMessage.h"
+#include "cxIGTLinkImageMessage.h"
 
 namespace cx
 {
@@ -65,12 +67,15 @@ public slots:
     void receivedDisconnected();
     void receivedError();
     void receivedImage(ImagePtr image);
+    void receiveIgtlImage(IGTLinkImageMessage::Pointer igtlimage);
+    void receivedUSStatusMessage(IGTLinkUSStatusMessage::Pointer message);
 
 protected slots:
     virtual void streamSlot();
 
 private:
     SenderPtr mSender;
+    IGTLinkUSStatusMessage::Pointer mUnsentUSStatusMessage; ///< received message, will be added to queue when next image arrives
 
 };
 typedef boost::shared_ptr<OpenIGTLinkStreamer> OpenIGTLinkStreamerPtr;

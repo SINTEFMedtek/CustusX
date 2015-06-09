@@ -12,6 +12,8 @@ Dialect::Dialect(QObject *parent) :
     qRegisterMetaType<Transform3D>("Transform3D");
     qRegisterMetaType<ImagePtr>("ImagePtr");
     qRegisterMetaType<ProbeDefinitionPtr>("ProbeDefinitionPtr");
+    qRegisterMetaType<IGTLinkUSStatusMessage::Pointer>("IGTLinkUSStatusMessage::Pointer");
+    qRegisterMetaType<IGTLinkImageMessage::Pointer>("IGTLinkImageMessage::Pointer");
 }
 
 QString Dialect::getName() const
@@ -56,7 +58,12 @@ void Dialect::translate(const igtl::StringMessage::Pointer body)
     //CX_LOG_CHANNEL_INFO(CX_OPENIGTLINK_CHANNEL_NAME) << string;
 }
 
-void cx::Dialect::translate(const IGTLinkUSStatusMessage::Pointer body)
+void Dialect::translate(const IGTLinkUSStatusMessage::Pointer body)
+{
+
+}
+
+void Dialect::translate(const IGTLinkImageMessage::Pointer body)
 {
 
 }

@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxPlusDialect.h"
 #include "cxCustusDialect.h"
+#include "igtl_header.h"
 
 namespace cx
 {
@@ -101,6 +102,8 @@ void OpenIGTLinkClient::setDialect(QString dialectname)
         disconnect(mDialect.get(), &Dialect::transform, this, &OpenIGTLinkClient::transform);
         disconnect(mDialect.get(), &Dialect::calibration, this, &OpenIGTLinkClient::calibration);
         disconnect(mDialect.get(), &Dialect::probedefinition, this, &OpenIGTLinkClient::probedefinition);
+        disconnect(mDialect.get(), &Dialect::usstatusmessage, this, &OpenIGTLinkClient::usstatusmessage);
+        disconnect(mDialect.get(), &Dialect::igtlimage, this, &OpenIGTLinkClient::igtlimage);
     }
 
     mDialect = dialect;
@@ -108,6 +111,8 @@ void OpenIGTLinkClient::setDialect(QString dialectname)
     connect(dialect.get(), &Dialect::transform, this, &OpenIGTLinkClient::transform);
     connect(dialect.get(), &Dialect::calibration, this, &OpenIGTLinkClient::calibration);
     connect(dialect.get(), &Dialect::probedefinition, this, &OpenIGTLinkClient::probedefinition);
+    connect(dialect.get(), &Dialect::usstatusmessage, this, &OpenIGTLinkClient::usstatusmessage);
+    connect(dialect.get(), &Dialect::igtlimage, this, &OpenIGTLinkClient::igtlimage);
 
     CX_LOG_CHANNEL_SUCCESS(CX_OPENIGTLINK_CHANNEL_NAME) << "Dialect set to " << dialectname;
 
@@ -235,6 +240,14 @@ bool OpenIGTLinkClient::receiveBody(const igtl::MessageBase::Pointer header)
     }
     else if(strcmp(type, "IMAGE") == 0)
     {
+        //----- CustusX openigtlink server -----
+        //there is a special kind of image package coming from custusx
+        //server where crc is set to 0.
+        QString name(header->GetDeviceName());
+        if((name.contains("Sonix", Qt::CaseInsensitive)) && (!this->receive<IGTLinkImageMessage>(header)))
+            return false;
+        //----------
+
         if(!this->receive<igtl::ImageMessage>(header))
             return false;
     }
