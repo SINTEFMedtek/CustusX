@@ -141,7 +141,10 @@ QStringList DataLocations::getDefaultPluginsPath()
 	{
 		QString appPath(qApp->applicationDirPath());
 
-		QString installLocation = appPath + "/plugins";
+		QString installLocation = appPath;
+#ifndef CX_WINDOWS
+		installLocation = appPath + "/plugins";
+#endif
 		if (QFile(installLocation).exists())
 			retval << installLocation;
 
@@ -153,7 +156,10 @@ QStringList DataLocations::getDefaultPluginsPath()
 	{
 		QString bundlePath = DataLocations::getBundlePath();
 
-		QString buildLocation = bundlePath + "/plugins";
+		QString buildLocation = bundlePath;
+#ifndef CX_WINDOWS
+		buildLocation = bundlePath + "/plugins";
+#endif
 		if (QFile(buildLocation).exists())
 			retval <<  buildLocation;
 	}
