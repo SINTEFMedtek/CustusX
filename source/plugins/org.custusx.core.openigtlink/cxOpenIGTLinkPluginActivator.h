@@ -70,8 +70,6 @@ private:
     RegisteredServicePtr mRegistrationTracking;
     RegisteredServicePtr mRegistrationStreaming;
     QThread mOpenIGTLinkThread;
-    QString mIp;
-    int mPort;
 };
 
 } // namespace cx

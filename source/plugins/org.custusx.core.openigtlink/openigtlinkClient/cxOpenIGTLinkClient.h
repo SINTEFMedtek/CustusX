@@ -108,31 +108,7 @@ private:
     bool receiveBody(const igtl::MessageHeader::Pointer header);
 
     template <typename T>
-    bool receive(const igtl::MessageBase::Pointer header)
-    {
-        QMutexLocker locker(&mMutex);
-
-		typename T::Pointer body = T::New();
-        body->SetMessageHeader(header);
-        body->AllocatePack();
-
-        if(!this->socketReceive(body->GetPackBodyPointer(), body->GetPackBodySize()))
-            return false;
-
-        int c = body->Unpack(mDialect->doCRC());
-        this->checkCRC(c);
-        if (c & igtl::MessageHeader::UNPACK_BODY)
-        {
-            mDialect->translate(body);
-        }
-        else
-        {
-            CX_LOG_CHANNEL_ERROR(CX_OPENIGTLINK_CHANNEL_NAME) << "Could not unpack the body of type: " << body->GetDeviceType();
-            return false;
-        }
-        return true;
-    }
-
+    bool receive(const igtl::MessageBase::Pointer header);
     bool socketReceive(void *packPointer, int packSize) const;
     void checkCRC(int c) const;
 

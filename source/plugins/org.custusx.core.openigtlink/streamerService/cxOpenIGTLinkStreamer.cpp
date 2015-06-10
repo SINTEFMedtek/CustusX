@@ -44,15 +44,19 @@ OpenIGTLinkStreamer::~OpenIGTLinkStreamer()
 {}
 
 
-bool OpenIGTLinkStreamer::startStreaming(SenderPtr sender)
+void OpenIGTLinkStreamer::startStreaming(SenderPtr sender)
 {
 	mSender = sender;
-	return true;
 }
 
 void OpenIGTLinkStreamer::stopStreaming()
 {
-	mSender.reset();
+    mSender.reset();
+}
+
+bool OpenIGTLinkStreamer::isStreaming()
+{
+    return true;
 }
 
 QString OpenIGTLinkStreamer::getType()
@@ -95,7 +99,6 @@ void OpenIGTLinkStreamer::receiveIgtlImage(IGTLinkImageMessage::Pointer igtlimag
     }
     if(mSender)
     {
-        CX_LOG_DEBUG() << "sender custus pakke";
         mSender->send(package);
     }
 }

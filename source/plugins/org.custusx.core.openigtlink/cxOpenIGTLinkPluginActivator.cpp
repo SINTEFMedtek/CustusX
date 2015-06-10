@@ -44,20 +44,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-OpenIGTLinkPluginActivator::OpenIGTLinkPluginActivator():
-    mIp("10.218.140.127"),
-    mPort(18944)
-{}
+OpenIGTLinkPluginActivator::OpenIGTLinkPluginActivator()
+{
+}
 
 OpenIGTLinkPluginActivator::~OpenIGTLinkPluginActivator()
-{}
+{
+}
 
 void OpenIGTLinkPluginActivator::start(ctkPluginContext* context)
 {
     mOpenIGTLinkThread.setObjectName("org.custusx.core.openigtlink");
     OpenIGTLinkClient *client = new OpenIGTLinkClient;
-    client->setIpAndPort(mIp, mPort); //this is done before client is moved to another thread
     client->moveToThread(&mOpenIGTLinkThread);
+
     OpenIGTLinkTrackingSystemService* tracking = new OpenIGTLinkTrackingSystemService(client);
     OpenIGTLinkStreamerService *streamer = new OpenIGTLinkStreamerService(client);
     OpenIGTLinkGuiExtenderService* gui = new OpenIGTLinkGuiExtenderService(client);
@@ -67,6 +67,7 @@ void OpenIGTLinkPluginActivator::start(ctkPluginContext* context)
     mRegistrationStreaming = RegisteredService::create<OpenIGTLinkStreamerService>(context, streamer, StreamerService_iid);
 
     mOpenIGTLinkThread.start();
+
 }
 
 void OpenIGTLinkPluginActivator::stop(ctkPluginContext* context)

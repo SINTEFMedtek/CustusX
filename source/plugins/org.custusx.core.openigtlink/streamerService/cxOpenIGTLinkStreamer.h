@@ -58,8 +58,9 @@ public:
     OpenIGTLinkStreamer();
     virtual ~OpenIGTLinkStreamer();
 
-    virtual bool startStreaming(SenderPtr sender);
+    virtual void startStreaming(SenderPtr sender);
 	virtual void stopStreaming();
+    virtual bool isStreaming();
 	virtual QString getType();
 
 public slots:

@@ -244,12 +244,17 @@ bool OpenIGTLinkClient::receiveBody(const igtl::MessageBase::Pointer header)
         //there is a special kind of image package coming from custusx
         //server where crc is set to 0.
         QString name(header->GetDeviceName());
-        if((name.contains("Sonix", Qt::CaseInsensitive)) && (!this->receive<IGTLinkImageMessage>(header)))
-            return false;
+        if(name.contains("Sonix", Qt::CaseInsensitive))
+        {
+            if(!this->receive<IGTLinkImageMessage>(header))
+                return false;
+        }
         //----------
-
-        if(!this->receive<igtl::ImageMessage>(header))
-            return false;
+        else
+        {
+            if(!this->receive<igtl::ImageMessage>(header))
+                return false;
+        }
     }
     else if(strcmp(type, "STATUS") == 0)
     {
@@ -272,6 +277,32 @@ bool OpenIGTLinkClient::receiveBody(const igtl::MessageBase::Pointer header)
         igtl::MessageBase::Pointer body = igtl::MessageBase::New();
         body->SetMessageHeader(header);
         mSocket->skip(body->GetBodySizeToRead());
+    }
+    return true;
+}
+
+template <typename T>
+bool OpenIGTLinkClient::receive(const igtl::MessageBase::Pointer header)
+{
+    QMutexLocker locker(&mMutex);
+
+    typename T::Pointer body = T::New();
+    body->SetMessageHeader(header);
+    body->AllocatePack();
+
+    if(!this->socketReceive(body->GetPackBodyPointer(), body->GetPackBodySize()))
+        return false;
+
+    int c = body->Unpack(mDialect->doCRC());
+    this->checkCRC(c);
+    if (c & igtl::MessageHeader::UNPACK_BODY)
+    {
+        mDialect->translate(body);
+    }
+    else
+    {
+        CX_LOG_CHANNEL_ERROR(CX_OPENIGTLINK_CHANNEL_NAME) << "Could not unpack the body of type: " << body->GetDeviceType();
+        return false;
     }
     return true;
 }

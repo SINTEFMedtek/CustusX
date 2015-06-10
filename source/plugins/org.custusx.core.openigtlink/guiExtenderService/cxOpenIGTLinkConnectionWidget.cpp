@@ -115,7 +115,6 @@ void OpenIGTLinkConnectionWidget::connectButtonClicked(bool checked)
 
     if(checked)
     {
-        CX_LOG_CHANNEL_DEBUG("janne beate ") << "Widget requesting to connect to " << ip->getValue() << ":" << port->getValue();
         emit ipAndPort(ip->getValue(), port->getValue());
         emit requestConnect();
         mConnectButton->setText("Trying to connect...");

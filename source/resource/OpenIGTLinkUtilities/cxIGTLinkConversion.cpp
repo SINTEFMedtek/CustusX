@@ -102,7 +102,6 @@ ImagePtr IGTLinkConversion::decode(igtl::ImageMessage::Pointer message)
 
     imageImport->SetNumberOfScalarComponents(1);
 
-    CX_LOG_DEBUG() << "Scalar type is " << scalarType;
     switch (scalarType)
     {
     case IGTLinkImageMessage::TYPE_INT8:
@@ -246,7 +245,6 @@ IGTLinkImageMessage::Pointer IGTLinkConversion::encode(ImagePtr image)
 
 ImagePtr IGTLinkConversion::decode(IGTLinkImageMessage::Pointer message)
 {
-    //igtl::ImageMessage::Pointer msg(message.GetPointer());
     return this->decode(igtl::ImageMessage::Pointer(message));
 }
 
