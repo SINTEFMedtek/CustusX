@@ -50,7 +50,7 @@ ProcessWrapper::ProcessWrapper(QString name, QObject* parent) :
 	mProcess->setProcessChannelMode(QProcess::MergedChannels);
 	mProcess->setReadChannel(QProcess::StandardOutput);
 
-	connect(mProcess, &QProcess::stateChanged, this, &ProcessWrapper::stateChanged);
+	connect(mProcess.data(), &QProcess::stateChanged, this, &ProcessWrapper::stateChanged);
 }
 
 ProcessWrapper::~ProcessWrapper()
