@@ -147,10 +147,6 @@ QStringList DataLocations::getDefaultPluginsPath()
 #endif
 		if (QFile(installLocation).exists())
 			retval << installLocation;
-
-		QString fallbackInstallLocation = appPath;
-		if (QFile(fallbackInstallLocation).exists())
-			retval << fallbackInstallLocation;
 	}
 	else
 	{
