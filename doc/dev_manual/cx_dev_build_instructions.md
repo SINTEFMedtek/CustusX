@@ -38,7 +38,7 @@ and thus does not need to be installed separately.
 For convenience, setup scripts for some platforms are available in the 
 repository. They will help setup a machine from scratch, but might give 
 you more than you expected. Look for your platform in 
-[install/platforms](../../install/platforms).
+[install/platforms](https://github.com/SINTEFMedtek/CustusX/tree/master/install/platforms).
 
 ## Superbuild Folder Structure {#build_instructions_folder_structure}
 

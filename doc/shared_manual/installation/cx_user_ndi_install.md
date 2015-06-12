@@ -1,26 +1,32 @@
 NDI Installation {#install_ndi_driver}
 ===================
 
-CustusX requires that you first install the NDI Track application (available from <http://www.ndigital.com/>) following the NDI install instructions. 
+CustusX requires that you first install the NDI ToolBox 
+(available from [NDI Support](https://support.ndigital.com/downloads.php?filetypebrowse=software)) 
+and follow the install instructions. This will install the Track application, which can be used with 
+the NDI systems independently of CustusX. *Note: A user account is required to download.*
 
 Mac and Windows install should work out of the box.
+
 
 Linux
 -----------------------------------------------------------
 Run the following shell lines after installing the Track application:
 
-Fedora 21:
+### Fedora
 
 	sudo usermod -a --groups uucp,dialout,lock `whoami`
-	sudo chown :lock /var/lock # fedora
+	sudo chown :lock /var/lock
 
-Ubuntu 14.04:
+### Ubuntu
+
 	sudo usermod -a --groups uucp,dialout `whoami`
 
 This sets up access rights for current user. Logout to make these changes work.
 
+
 Validation
 -----------------------------------------------------------
-Load your tool ROM-files into Track and verify that they work correctly. There should be no warnings in the Track application: This will cause CustusX to fail silently by not receiving tracking data from the tracking system.
+Load your tool ROM-files into Track and verify that they work correctly. There should be no warnings in the Track application: A badly configured tracking system might cause CustusX to fail silently by not receiving tracking data.
 
 
