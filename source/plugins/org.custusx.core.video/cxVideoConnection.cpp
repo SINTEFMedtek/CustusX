@@ -111,7 +111,7 @@ class EventProcessingThread : public QThread
 };
 }
 
-void VideoConnection::runDirectLinkClient(StreamerService* service)
+void VideoConnection::runDirectLinkClient(StreamerServicePtr service)
 {
 	if (mClient)
 	{
@@ -126,7 +126,7 @@ void VideoConnection::runDirectLinkClient(StreamerService* service)
 		return;
 	}
 
-	mStreamerInterface.reset(service, null_deleter());//Can't allow boost to delete service
+    mStreamerInterface = service;
 	mClient = new ImageReceiverThread(mStreamerInterface);
 
 	connect(mClient.data(), &ImageReceiverThread::imageReceived, this, &VideoConnection::imageReceivedSlot); // thread-bridging connection

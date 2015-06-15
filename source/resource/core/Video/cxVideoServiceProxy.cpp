@@ -95,12 +95,15 @@ bool VideoServiceProxy::isNull()
 	return mVideoService->isNull();
 }
 
-QList<StreamerService*> VideoServiceProxy::getStreamerServices()
+StreamerServicePtr VideoServiceProxy::getStreamerService(QString uid)
+{
+    return mVideoService->getStreamerService(uid);
+}
+
+QList<StreamerServicePtr> VideoServiceProxy::getStreamerServices()
 {
 	return mVideoService->getStreamerServices();
 }
-
-
 
 void VideoServiceProxy::setActiveVideoSource(QString uid)
 {
@@ -149,7 +152,7 @@ void VideoServiceProxy::setPlaybackMode(PlaybackTimePtr controller)
 
 std::vector<TimelineEvent> VideoServiceProxy::getPlaybackEvents()
 {
-	return mVideoService->getPlaybackEvents();
+    return mVideoService->getPlaybackEvents();
 }
 
 

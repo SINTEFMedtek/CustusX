@@ -29,20 +29,61 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include "cxStreamerService.h"
+#include "cxStreamerServiceProxy.h"
 
-#include "cxStreamerServiceNull.h"
+#include <boost/bind.hpp>
 #include "cxNullDeleter.h"
 
 namespace cx
 {
-
-StreamerServicePtr StreamerService::getNullObject()
+StreamerServiceProxy::StreamerServiceProxy(ctkPluginContext *context, QString name) :
+    mPluginContext(context),
+    mServiceName(name),
+    mStreamerService(StreamerService::getNullObject())
 {
-    static StreamerServicePtr mNull;
-    if (!mNull)
-        mNull.reset(new StreamerServiceNull, null_deleter());
-    return mNull;
+    this->initServiceListener();
 }
 
+QString StreamerServiceProxy::getName()
+{
+    return mStreamerService->getName();
+}
+
+QString StreamerServiceProxy::getType() const
+{
+    return mStreamerService->getType();
+}
+
+std::vector<PropertyPtr> StreamerServiceProxy::getSettings(QDomElement root)
+{
+    return mStreamerService->getSettings(root);
+}
+
+StreamerPtr StreamerServiceProxy::createStreamer(QDomElement root)
+{
+    return mStreamerService->createStreamer(root);
+}
+
+void StreamerServiceProxy::initServiceListener()
+{
+    mServiceListener.reset(new ServiceTrackerListener<StreamerService>(
+                                 mPluginContext,
+                                 boost::bind(&StreamerServiceProxy::onServiceAdded, this, _1),
+                                 boost::function<void (StreamerService*)>(),
+                                 boost::bind(&StreamerServiceProxy::onServiceRemoved, this, _1)
+                                 ));
+    mServiceListener->open();
+}
+
+void StreamerServiceProxy::onServiceAdded(StreamerService* service)
+{
+    if(service && service->getName() == mServiceName)
+        mStreamerService.reset(service, null_deleter());
+}
+
+void StreamerServiceProxy::onServiceRemoved(StreamerService *service)
+{
+    if(service && (service->getName() == mServiceName))
+        mStreamerService = StreamerService::getNullObject();
+}
 } //end namespace cx

@@ -46,7 +46,7 @@ namespace cx
 class StreamerService;
 
 typedef boost::shared_ptr<class VideoService> VideoServicePtr;
-
+typedef boost::shared_ptr<class StreamerService> StreamerServicePtr;
 typedef boost::shared_ptr<class VideoSource> VideoSourcePtr;
 typedef boost::shared_ptr<class USAcquisitionVideoPlayback> USAcquisitionVideoPlaybackPtr;
 typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
@@ -110,8 +110,8 @@ public:
 	virtual void setPlaybackMode(PlaybackTimePtr controller) = 0;
 	virtual std::vector<TimelineEvent> getPlaybackEvents() = 0;
 
-	virtual StreamerService *getStreamerService(QString uid);
-	virtual QList<StreamerService *> getStreamerServices() = 0;
+    virtual StreamerServicePtr getStreamerService(QString uid) = 0;
+    virtual QList<StreamerServicePtr> getStreamerServices() = 0;
 
 	virtual bool isNull() = 0;
 	static VideoServicePtr getNullObject();

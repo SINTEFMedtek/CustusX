@@ -29,8 +29,8 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXIMAGESTREAMERINTERFACE_H
-#define CXIMAGESTREAMERINTERFACE_H
+#ifndef CXSTREAMERINTERFACE_H
+#define CXSTREAMERINTERFACE_H
 
 #include "cxResourceExport.h"
 
@@ -64,6 +64,8 @@ class cxResource_EXPORT StreamerService : public QObject
 {
 	Q_OBJECT
 public:
+    static StreamerServicePtr getNullObject();
+
 	StreamerService() {}
 	virtual QString getName() = 0;
 	virtual QString getType() const  = 0;
@@ -82,4 +84,4 @@ public:
 } //end namespace cx
 Q_DECLARE_INTERFACE(cx::StreamerService, StreamerService_iid)
 
-#endif // CXIMAGESTREAMERINTERFACE_H
+#endif // CXSTREAMERINTERFACE_H

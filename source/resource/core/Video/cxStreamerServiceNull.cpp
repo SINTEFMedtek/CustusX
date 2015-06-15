@@ -29,20 +29,31 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include "cxStreamerService.h"
-
 #include "cxStreamerServiceNull.h"
-#include "cxNullDeleter.h"
 
 namespace cx
 {
 
-StreamerServicePtr StreamerService::getNullObject()
+QString StreamerServiceNull::getName()
 {
-    static StreamerServicePtr mNull;
-    if (!mNull)
-        mNull.reset(new StreamerServiceNull, null_deleter());
-    return mNull;
+    return "StreamerServiceNull";
+}
+
+QString StreamerServiceNull::getType() const
+{
+    return "Streamer_Service_Null";
+}
+
+std::vector<PropertyPtr> StreamerServiceNull::getSettings(QDomElement root)
+{
+    std::vector<PropertyPtr> retval;
+    return retval;
+}
+
+StreamerPtr StreamerServiceNull::createStreamer(QDomElement root)
+{
+    StreamerPtr retval;
+    return retval;
 }
 
 } //end namespace cx

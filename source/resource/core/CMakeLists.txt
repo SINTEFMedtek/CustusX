@@ -209,6 +209,8 @@ cx_add_class(cxResource_SOURCE
 
     Video/cxVideoServiceNull
     Video/cxVideoServiceProxy
+    Video/cxStreamerServiceProxy
+    Video/cxStreamerServiceNull
 
     Tool/cxTrackingServiceNull
     Tool/cxTrackingServiceProxy

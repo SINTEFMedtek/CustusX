@@ -51,12 +51,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSpaceProviderImpl.h"
 #include "cxVideoServiceBackend.h"
 #include "cxStreamerService.h"
+#include "cxStreamerServiceProxy.h"
+#include "cxStreamerServiceNull.h"
+#include "cxNullDeleter.h"
 
 namespace cx
 {
 
 VideoImplService::VideoImplService(ctkPluginContext *context) :
-	mContext(context )
+    mContext(context )
 {
 	VideoServiceBackendPtr videoBackend;
 
@@ -94,9 +97,32 @@ VideoImplService::~VideoImplService()
 	mVideoConnection.reset();
 }
 
-QList<StreamerService *> VideoImplService::getStreamerServices()
+StreamerServicePtr VideoImplService::getStreamerService(QString uid)
 {
-	return mStreamerServiceListener->getServices();
+    QList<StreamerServicePtr> services = this->getStreamerServices();
+    foreach(StreamerServicePtr service, services)
+    {
+        if (service->getType()==uid)
+        {
+            return service;
+        }
+    }
+    return StreamerServicePtr(new StreamerServiceNull, null_deleter());
+}
+
+QList<StreamerServicePtr> VideoImplService::getStreamerServices()
+{
+    QList<StreamerServicePtr> retval;
+    QList<StreamerService *> services = mStreamerServiceListener->getServices();
+    foreach(StreamerService* service, services)
+    {
+        if(service)
+        {
+            StreamerServicePtr temp(new StreamerServiceProxy(mBackend->mContext, service->getName()), null_deleter());
+            retval.append(temp);
+        }
+    }
+    return retval;
 }
 
 bool VideoImplService::isNull()
@@ -218,7 +244,8 @@ void VideoImplService::openConnection()
 	if (mVideoConnection->isConnected())
 		return;
 
-	StreamerService* service = this->getStreamerService(mConnectionMethod);
+    //StreamerService* service = this->getStreamerService(mConnectionMethod);
+    StreamerServicePtr service = this->getStreamerService(mConnectionMethod);
 	if (!service)
 	{
 		reportError(QString("Found no streamer for method [%1]").arg(mConnectionMethod));

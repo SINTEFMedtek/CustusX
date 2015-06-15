@@ -109,10 +109,10 @@ VideoConnectionWidget::~VideoConnectionWidget()
 
 void VideoConnectionWidget::addExistingStreamerServices()
 {
-	QList<StreamerService *> services = mServices->videoService->getStreamerServices();
-	foreach(StreamerService* service, services)
+    QList<StreamerServicePtr> services = mServices->videoService->getStreamerServices();
+    foreach(StreamerServicePtr service, services)
 	{
-		this->onServiceAdded(service);
+        this->onServiceAdded(service.get());
 	}
 }
 
