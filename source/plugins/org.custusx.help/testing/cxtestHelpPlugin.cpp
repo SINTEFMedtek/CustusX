@@ -69,9 +69,9 @@ void TestHelpFixture::setupHelpBrowserInsideMainWindow()
 	REQUIRE(browser!=NULL);
 }
 
-void TestHelpFixture::runApp()
+void TestHelpFixture::runApp(int milliseconds)
 {
-	QTimer::singleShot(300, qApp, SLOT(quit()));
+	QTimer::singleShot(milliseconds, qApp, SLOT(quit()));
 	qApp->exec();
 }
 
@@ -138,11 +138,11 @@ TEST_CASE("org.custusx.help: HelpWidget displays Console Widget help on focus", 
 
 	// this test is a bit fragile:
 	//  - the help system sets an initial page aftr 100ms.
-	//  - this test focuses after 200ms
-	//  - qapp runs for 300ms
-	QTimer::singleShot(200, consoleWidget, SLOT(setFocus()));
+	//  - this test focuses after 400ms
+	//  - qapp runs for 600ms
+	QTimer::singleShot(400, consoleWidget, SLOT(setFocus()));
 
-	fixture.runApp();
+	fixture.runApp(600);
 
 //	fixture.printBrowserContents();
 

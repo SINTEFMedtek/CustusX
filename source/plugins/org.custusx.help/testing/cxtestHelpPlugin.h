@@ -16,7 +16,7 @@ class TestHelpFixture
 public:
 	TestHelpFixture();
 	void setupHelpBrowserInsideMainWindow();
-	void runApp();
+	void runApp(int milliseconds = 300);
 	void printBrowserContents();
 	void shutdown();
 
