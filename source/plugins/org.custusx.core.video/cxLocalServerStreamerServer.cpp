@@ -140,10 +140,9 @@ LocalServerStreamer::~LocalServerStreamer()
 
 void LocalServerStreamer::startStreaming(SenderPtr sender)
 {
-	mLocalVideoServerProcess->launchWithRelativePath(mServerName, mServerArguments.split(" "));
-
-	mSender = sender;
-	connect(mLocalVideoServerProcess.get(), &ProcessWrapper::stateChanged, this, &LocalServerStreamer::processStateChanged);
+    mSender = sender;
+    connect(mLocalVideoServerProcess.get(), &ProcessWrapper::stateChanged, this, &LocalServerStreamer::processStateChanged);
+    mLocalVideoServerProcess->launchWithRelativePath(mServerName, mServerArguments.split(" "));
 }
 
 void LocalServerStreamer::processStateChanged()
