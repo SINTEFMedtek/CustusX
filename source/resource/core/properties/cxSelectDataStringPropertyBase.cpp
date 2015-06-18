@@ -34,7 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxData.h"
 #include "cxImageAlgorithms.h"
-#include "cxLogger.h"
 
 namespace cx
 {
@@ -44,7 +43,7 @@ SelectDataStringPropertyBase::SelectDataStringPropertyBase(PatientModelServicePt
 	mPatientModelService(patientModelService)
 {
 	mValueName = "Select data";
-    mUidRegexp = "";
+	mUidRegexp = "";
 	mHelp = mValueName;
 	connect(mPatientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SIGNAL(changed()));
 }
@@ -89,7 +88,7 @@ std::map<QString, DataPtr> SelectDataStringPropertyBase::filterOnUid(std::map<QS
 
 void SelectDataStringPropertyBase::setUidRegexp(QString regexp)
 {
-    mUidRegexp = regexp;
+	mUidRegexp = regexp;
 }
 
 QStringList SelectDataStringPropertyBase::getValueRange() const
