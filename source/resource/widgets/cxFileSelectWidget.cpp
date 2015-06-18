@@ -135,6 +135,15 @@ void FileSelectWidget::selectData()
 	emit fileSelected(mFilename);
 }
 
+QStringList FileSelectWidget::getAllFiles()
+{
+	QStringList files;
+	for (int i=0; i<mRootPaths.size(); ++i)
+		files << this->getAllFiles(mRootPaths[i], mFolderDepth);
+    return files;
+}
+
+
 QStringList FileSelectWidget::getAllFiles(QString folder, int depth)
 {
 	QDir dir(folder);
