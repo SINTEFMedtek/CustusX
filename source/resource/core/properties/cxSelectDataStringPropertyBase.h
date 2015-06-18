@@ -68,6 +68,7 @@ public: // interface extension
 	virtual DataPtr getData() const;
 	virtual void setValueName(const QString name);
 	virtual void setHelp(QString text);
+    virtual void setUidRegexp(QString regexp);
 
 signals:
 	void dataChanged(QString);
@@ -77,7 +78,9 @@ protected:
 		*/
 	explicit SelectDataStringPropertyBase(PatientModelServicePtr patientModelService, QString typeRegexp = ".*");
 	std::map<QString, DataPtr> filterOnType(std::map<QString, DataPtr> input, QString regexp) const;
+	std::map<QString, DataPtr> filterOnUid(std::map<QString, DataPtr> input, QString regexp) const;
 	QString mTypeRegexp;
+	QString mUidRegexp;
 	QString mValueName;
 	QString mHelp;
 
