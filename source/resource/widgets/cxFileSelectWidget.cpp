@@ -137,9 +137,9 @@ void FileSelectWidget::selectData()
 
 QStringList FileSelectWidget::getAllFiles()
 {
-	QStringList files;
-	for (int i=0; i<mRootPaths.size(); ++i)
-		files << this->getAllFiles(mRootPaths[i], mFolderDepth);
+    QStringList files;
+    for (int i=0; i<mRootPaths.size(); ++i)
+        files << this->getAllFiles(mRootPaths[i], mFolderDepth);
     return files;
 }
 
