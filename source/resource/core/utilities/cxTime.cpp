@@ -75,4 +75,11 @@ double getMilliSecondsSinceEpoch()
 #endif
 }
 
+QString toMillisecondsFormatNice(double secondsSinceEpoch)
+{
+    QDateTime time;
+    time.setMSecsSinceEpoch(secondsSinceEpoch);
+    return time.toString(timestampMilliSecondsFormatNice());
+}
+
 } // namespace cx

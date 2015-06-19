@@ -130,6 +130,8 @@ public:
 	//Debugging
 	void printDocument(); ///< print the entire document
 	void printElement(); ///< print just the current element
+    static void printDocument(QDomDocument document);
+    static void printElement(QDomElement element);
 
 private:
 	void load();

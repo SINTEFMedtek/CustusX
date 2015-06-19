@@ -69,6 +69,8 @@ cxResource_EXPORT double getMicroSecondsSinceEpoch();
  */
 cxResource_EXPORT double getMilliSecondsSinceEpoch();
 
+cxResource_EXPORT QString toMillisecondsFormatNice(double secondsSinceEpoch);
+
 /**
  * \}
  */

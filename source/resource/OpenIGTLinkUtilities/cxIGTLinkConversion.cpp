@@ -32,53 +32,153 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxIGTLinkConversion.h"
 
-#include "cxProbeData.h"
 #include <vtkImageImport.h>
 #include <vtkImageData.h>
-#include "cxTypeConversions.h"
 #include <vtkImageExtractComponents.h>
 #include <vtkImageAppendComponents.h>
 
+#include "igtl_status.h"
+
+#include "cxLog.h"
+#include "cxProbeData.h"
+#include "cxTypeConversions.h"
+
 typedef vtkSmartPointer<vtkImageImport> vtkImageImportPtr;
 
-namespace cx
-{
-
-namespace
-{
-//------------------------------------------------------------
-// Function to generate random matrix.
-void GetRandomTestMatrix(igtl::Matrix4x4& matrix)
+void GetIdentityMatrix(igtl::Matrix4x4& matrix)
 {
   matrix[0][0] = 1.0;  matrix[1][0] = 0.0;  matrix[2][0] = 0.0; matrix[3][0] = 0.0;
-  matrix[0][1] = 0.0;  matrix[1][1] = -1.0;  matrix[2][1] = 0.0; matrix[3][1] = 0.0;
+  matrix[0][1] = 0.0;  matrix[1][1] = 1.0;  matrix[2][1] = 0.0; matrix[3][1] = 0.0;
   matrix[0][2] = 0.0;  matrix[1][2] = 0.0;  matrix[2][2] = 1.0; matrix[3][2] = 0.0;
   matrix[0][3] = 0.0;  matrix[1][3] = 0.0;  matrix[2][3] = 0.0; matrix[3][3] = 1.0;
 }
-}
 
-IGTLinkConversion::IGTLinkConversion()
+namespace cx
 {
-}
+//--------------------------------Standard opentiglink messages---------------------------------------
 
-IGTLinkConversion::~IGTLinkConversion()
+igtl::StringMessage::Pointer IGTLinkConversion::encode(QString msg)
 {
-	// TODO Auto-generated destructor stub
+    igtl::StringMessage::Pointer retval;
+    retval = igtl::StringMessage::New();
+    retval->SetDeviceName("CustusX");
+    retval->SetString(msg.toStdString().c_str());
+    return retval;
 }
 
+QString IGTLinkConversion::decode(igtl::StringMessage::Pointer msg)
+{
+    QString devicename(msg->GetDeviceName());
+    QString message(msg->GetString());
+    QString retval = devicename + ": " + message;
+    return retval;
+}
+
+QString IGTLinkConversion::decode(igtl::StatusMessage::Pointer msg)
+{
+    QString code = this->convertIGTLinkStatusCodes(msg->GetCode());
+    QString retval = code;
+    return retval;
+}
+
+ImagePtr IGTLinkConversion::decode(igtl::ImageMessage::Pointer message)
+{
+    vtkImageImportPtr imageImport = vtkImageImportPtr::New();
+
+    // Retrive the image data
+    float spacing[3]; // spacing (mm/pixel)
+    int svsize[3]; // sub-volume size
+    int svoffset[3]; // sub-volume offset
+    int scalarType; // scalar type
+    int size[3]; // image dimension
+
+    // Note: subvolumes is not supported. Implement when needed.
+
+    scalarType = message->GetScalarType();
+    message->GetDimensions(size);
+    message->GetSpacing(spacing);
+    message->GetSubVolume(svsize, svoffset);
+    QString deviceName = message->GetDeviceName();
+
+    imageImport->SetNumberOfScalarComponents(1);
+
+    switch (scalarType)
+    {
+    case IGTLinkImageMessage::TYPE_INT8:
+        CX_LOG_WARNING() << "signed char is not supported. Falling back to unsigned char.";
+        imageImport->SetDataScalarTypeToUnsignedChar();
+        break;
+    case IGTLinkImageMessage::TYPE_UINT8:
+        imageImport->SetDataScalarTypeToUnsignedChar();
+        break;
+    case IGTLinkImageMessage::TYPE_INT16:
+        imageImport->SetDataScalarTypeToShort();
+        break;
+    case IGTLinkImageMessage::TYPE_UINT16:
+        imageImport->SetNumberOfScalarComponents(2);
+        imageImport->SetDataScalarTypeToUnsignedChar();
+        break;
+    case IGTLinkImageMessage::TYPE_INT32:
+    case IGTLinkImageMessage::TYPE_UINT32:
+        imageImport->SetNumberOfScalarComponents(4);
+        imageImport->SetDataScalarTypeToUnsignedChar();
+        break;
+    case IGTLinkImageMessage::TYPE_FLOAT32:
+        imageImport->SetDataScalarTypeToFloat();
+        break;
+    case IGTLinkImageMessage::TYPE_FLOAT64:
+        imageImport->SetDataScalarTypeToDouble();
+        break;
+    default:
+        CX_LOG_WARNING() << "Unknown image type. Falling back to unsigned char.";
+        imageImport->SetDataScalarTypeToUnsignedChar();
+    }
+
+    // get timestamp from igtl second-format:
+    igtl::TimeStamp::Pointer timestamp = igtl::TimeStamp::New();
+    message->GetTimeStamp(timestamp);
+
+    double timestampMS = timestamp->GetTimeStamp() * 1000;
+    imageImport->SetDataOrigin(0, 0, 0);
+    imageImport->SetDataSpacing(spacing[0], spacing[1], spacing[2]);
+    imageImport->SetWholeExtent(0, size[0] - 1, 0, size[1] - 1, 0, size[2] - 1);
+    imageImport->SetDataExtentToWholeExtent();
+    imageImport->SetImportVoidPointer(message->GetScalarPointer());
+
+    imageImport->Modified();
+    imageImport->Update();
+
+    ImagePtr retval(new Image(deviceName, imageImport->GetOutput()));
+    retval->setAcquisitionTime(QDateTime::fromMSecsSinceEpoch(timestampMS));
+    retval = this->decode(retval);
+
+    return retval;
+}
+
+Transform3D IGTLinkConversion::decode_image_matrix(igtl::ImageMessage::Pointer msg)
+{
+    igtl::Matrix4x4 matrix;
+    msg->GetMatrix(matrix);
+    Transform3D retval = Transform3D::fromFloatArray(matrix);
+    return retval;
+}
+
+Transform3D IGTLinkConversion::decode(igtl::TransformMessage::Pointer msg)
+{
+    igtl::Matrix4x4 matrix;
+    msg->GetMatrix(matrix);
+    Transform3D retval = Transform3D::fromFloatArray(matrix);
+    return retval;
+}
+
+//--------------------------------CustusX messages---------------------------------------
 
 IGTLinkImageMessage::Pointer IGTLinkConversion::encode(ImagePtr image)
 {
-	//	IGTLinkImageMessage::Pointer retval;
 	vtkImageDataPtr rawImage = image->getBaseVtkImageData();
 
-//	static int staticCounter = 0;
-	//------------------------------------------------------------
-	// size parameters
 	int   size[]     = {256, 256, 1};       // image dimension
 	rawImage->GetDimensions(size);
-//	std::cout << "img dim " << size[0] << size[1] << size[2] << std::endl;
-	//size[2] = 1; // grab only one frame
 
 	double spacingD[3];
 	float spacingF[3];
@@ -129,121 +229,23 @@ IGTLinkImageMessage::Pointer IGTLinkConversion::encode(ImagePtr image)
 	QDateTime lastGrabTime = image->getAcquisitionTime();
 	igtl::TimeStamp::Pointer timestamp;
 	timestamp = igtl::TimeStamp::New();
-	//  double now = 1.0/1000*(double)QDateTime::currentDateTime().toMSecsSinceEpoch();
 	double grabTime = 1.0 / 1000 * (double) lastGrabTime.toMSecsSinceEpoch();
 	timestamp->SetTime(grabTime);
 	imgMsg->SetTimeStamp(timestamp);
 
-	//------------------------------------------------------------
-	// Set image data (See GetTestImage() bellow for the details)
-	//  GetTestImage(imgMsg, filedir, index);
-
 	int fsize = imgMsg->GetImageSize();
-	//    int frame = (staticCounter++) % image->GetDimensions()[2];
-	//  std::cout << "emitting frame " << frame << ", image size=" << fsize << ", comp="<< image->GetNumberOfScalarComponents() << ", scalarType="<< scalarType << ", dim=("<< image->GetDimensions()[0] << ", "<< image->GetDimensions()[1] << ")" << std::endl;
-	memcpy(imgMsg->GetScalarPointer(), rawImage->GetScalarPointer(0,0,0), fsize); // not sure if we need to copy
+    memcpy(imgMsg->GetScalarPointer(), rawImage->GetScalarPointer(0,0,0), fsize); // not sure if we need to copy
 
-	//------------------------------------------------------------
-	// Get randome orientation matrix and set it.
 	igtl::Matrix4x4 matrix;
-	GetRandomTestMatrix(matrix);
+    GetIdentityMatrix(matrix);
 	imgMsg->SetMatrix(matrix);
 
 	return imgMsg;
-
-
-	//	return retval;
 }
 
 ImagePtr IGTLinkConversion::decode(IGTLinkImageMessage::Pointer message)
 {
-	vtkImageImportPtr imageImport = vtkImageImportPtr::New();
-
-	// Retrive the image data
-	float spacing[3]; // spacing (mm/pixel)
-	int svsize[3]; // sub-volume size
-	int svoffset[3]; // sub-volume offset
-	int scalarType; // scalar type
-	int size[3]; // image dimension
-
-	// Note: subvolumes is not supported. Implement when needed.
-
-	scalarType = message->GetScalarType();
-	message->GetDimensions(size);
-	message->GetSpacing(spacing);
-	message->GetSubVolume(svsize, svoffset);
-//	message->GetOrigin(origin);
-	QString deviceName = message->GetDeviceName();
-//  std::cout << "size : " << Vector3D(size[0], size[1], size[2]) << std::endl;
-
-	imageImport->SetNumberOfScalarComponents(1);
-
-	switch (scalarType)
-	{
-	case IGTLinkImageMessage::TYPE_INT8:
-		std::cout << "signed char is not supported. Falling back to unsigned char." << std::endl;
-		imageImport->SetDataScalarTypeToUnsignedChar();
-		break;
-	case IGTLinkImageMessage::TYPE_UINT8:
-		imageImport->SetDataScalarTypeToUnsignedChar();
-		break;
-	case IGTLinkImageMessage::TYPE_INT16:
-		imageImport->SetDataScalarTypeToShort();
-		break;
-	case IGTLinkImageMessage::TYPE_UINT16:
-//    std::cout << "SetDataScalarTypeToUnsignedShort." << std::endl;
-//		mImageImport->SetDataScalarTypeToUnsignedShort();
-	imageImport->SetNumberOfScalarComponents(2);
-	imageImport->SetDataScalarTypeToUnsignedChar();
-		break;
-	case IGTLinkImageMessage::TYPE_INT32:
-	case IGTLinkImageMessage::TYPE_UINT32:
-//    std::cout << "SetDataScalarTypeTo4channel." << std::endl;
-		// assume RGBA unsigned colors
-		imageImport->SetNumberOfScalarComponents(4);
-//    mImageImport->SetDataScalarTypeToInt();
-		imageImport->SetDataScalarTypeToUnsignedChar();
-//    std::cout << "32bit received" << std::endl;
-		break;
-	case IGTLinkImageMessage::TYPE_FLOAT32:
-		imageImport->SetDataScalarTypeToFloat();
-		break;
-	case IGTLinkImageMessage::TYPE_FLOAT64:
-		imageImport->SetDataScalarTypeToDouble();
-		break;
-	default:
-		std::cout << "unknown type. Falling back to unsigned char." << std::endl;
-		imageImport->SetDataScalarTypeToUnsignedChar();
-	}
-
-	// get timestamp from igtl second-format:
-	igtl::TimeStamp::Pointer timestamp = igtl::TimeStamp::New();
-	message->GetTimeStamp(timestamp);
-
-	double timestampMS = timestamp->GetTimeStamp() * 1000;
-	imageImport->SetDataOrigin(0, 0, 0);
-	imageImport->SetDataSpacing(spacing[0], spacing[1], spacing[2]);
-	imageImport->SetWholeExtent(0, size[0] - 1, 0, size[1] - 1, 0, size[2] - 1);
-	imageImport->SetDataExtentToWholeExtent();
-	imageImport->SetImportVoidPointer(message->GetScalarPointer());
-
-	imageImport->Modified();
-	imageImport->Update();
-
-	ImagePtr retval(new Image(deviceName, imageImport->GetOutput()));
-	retval->setAcquisitionTime(QDateTime::fromMSecsSinceEpoch(timestampMS));
-	retval = this->decode(retval);
-
-//	QString format = this->extractColorFormat(deviceName);
-////	std::cout << QString("found format %1 from %2").arg(format).arg(deviceName) << std::endl;
-
-//	vtkImageDataPtr imageRGB = this->createFilterFormat2RGB(format, imageImport->GetOutput());
-//	imageRGB->Update();
-
-//	ImagePtr retval(new Image(deviceName, imageRGB));
-//	retval->setAcquisitionTime(QDateTime::fromMSecsSinceEpoch(timestampMS));
-
-	return retval;
+    return this->decode(igtl::ImageMessage::Pointer(message));
 }
 
 IGTLinkUSStatusMessage::Pointer IGTLinkConversion::encode(ProbeDefinitionPtr input)
@@ -258,12 +260,6 @@ IGTLinkUSStatusMessage::Pointer IGTLinkConversion::encode(ProbeDefinitionPtr inp
 	retval->SetDepthEnd(input->getDepthEnd());	// End of sector in mm from origin
 	retval->SetWidth(input->getWidth());// Width of sector in mm for LINEAR, Width of sector in radians for SECTOR.
 	retval->SetDeviceName(cstring_cast(input->getUid()));
-
-	//  std::cout << "origin: " << mFrameGeometry.origin[0] << " " << mFrameGeometry.origin[1] << " " << mFrameGeometry.origin[2] << std::endl;
-	//  std::cout << "imageType: " << mFrameGeometry.imageType << std::endl;
-	//  std::cout << "depthStart: " << mFrameGeometry.depthStart << " end: " << mFrameGeometry.depthEnd << std::endl;
-	//  std::cout << "width: " << mFrameGeometry.width << std::endl;
-	//  std::cout << "tilt: " << mFrameGeometry.tilt << std::endl;
 
 	return retval;
 }
@@ -313,7 +309,6 @@ ImagePtr IGTLinkConversion::decode(ImagePtr msg)
 	QString newUid = msg->getUid();
 	QString format = this->extractColorFormat(msg->getUid(), &newUid);
 	vtkImageDataPtr imageRGB = this->createFilterFormat2RGB(format, msg->getBaseVtkImageData());
-//	imageRGB->Update();
 
 	// copy because the image will eventually be passed to another thread, and we cannot have the entire pipeline dragged along.
 	vtkImageDataPtr copy = vtkImageDataPtr::New();
@@ -330,7 +325,78 @@ ProbeDefinitionPtr IGTLinkConversion::decode(ProbeDefinitionPtr msg)
 	QString format = this->extractColorFormat(msg->getUid(), &newUid);
 	msg->setUid(newUid);
 
-	return msg;
+    return msg;
+}
+
+QString IGTLinkConversion::convertIGTLinkStatusCodes(const int code)
+{
+    QString retval;
+    switch(code)
+    {
+    case IGTL_STATUS_INVALID:
+        retval = "Status invalid";
+        break;
+    case IGTL_STATUS_OK:
+        retval = "Ok / Freeze mode on";
+        break;
+    case IGTL_STATUS_UNKNOWN_ERROR:
+        retval = "Unknown error";
+        break;
+    case IGTL_STATUS_PANICK_MODE:
+        retval = "Panick mode";
+        break;
+    case IGTL_STATUS_NOT_FOUND:
+        retval = "Not found";
+        break;
+    case IGTL_STATUS_ACCESS_DENIED:
+        retval = "Access denied";
+        break;
+    case IGTL_STATUS_BUSY:
+        retval = "Busy";
+        break;
+    case IGTL_STATUS_TIME_OUT:
+        retval = "Time out / Connection lost";
+        break;
+    case IGTL_STATUS_OVERFLOW:
+        retval = "Overflow / Can't be reached";
+        break;
+    case IGTL_STATUS_CHECKSUM_ERROR:
+        retval = "Checksum error";
+        break;
+    case IGTL_STATUS_CONFIG_ERROR:
+        retval = "Configuration error";
+        break;
+    case IGTL_STATUS_RESOURCE_ERROR:
+        retval = "Not enough resource (memory, storage etc)";
+        break;
+    case IGTL_STATUS_ILLEGAL_INSTRUCTION:
+        retval = "Illegal/Unknown instruction";
+        break;
+    case IGTL_STATUS_NOT_READY:
+        retval = "Device not ready (starting up)";
+        break;
+    case IGTL_STATUS_MANUAL_MODE:
+        retval = "Manual mode (device does not accept commands";
+        break;
+    case IGTL_STATUS_DISABLED:
+        retval = "Device disabled";
+        break;
+    case IGTL_STATUS_NOT_PRESENT:
+        retval = "Device not present";
+        break;
+    case IGTL_STATUS_UNKNOWN_VERSION:
+        retval = "Device version not known";
+        break;
+    case IGTL_STATUS_HARDWARE_FAILURE:
+        retval = "Hardware failure";
+        break;
+    case IGTL_STATUS_SHUT_DOWN:
+        retval = "Exiting / shut down in progress";
+        break;
+    default:
+        retval = "Could not determine what OpenIGTLink status code means.";
+    }
+    return retval;
 }
 
 QString IGTLinkConversion::extractColorFormat(QString deviceName, QString* cleanedDeviceName)
@@ -367,7 +433,6 @@ vtkImageDataPtr IGTLinkConversion::createFilterFormat2RGB(QString format, vtkIma
 
 vtkImageDataPtr IGTLinkConversion::createFilterAny2RGB(int R, int G, int B, vtkImageDataPtr input)
 {
-//	input->Update();
 	if (input->GetNumberOfScalarComponents() == 1)
 		return input;
 	if (( input->GetNumberOfScalarComponents()==3 )&&( R==0 )&&( G==1 )&&( B==2 ))
@@ -378,7 +443,6 @@ vtkImageDataPtr IGTLinkConversion::createFilterAny2RGB(int R, int G, int B, vtkI
 	splitterRGB->SetInputData(input);
 	splitterRGB->SetComponents(R, G, B);
 	merger->AddInputConnection(splitterRGB->GetOutputPort());
-//	merger->AddInputConnection(0, splitterRGB->GetOutputPort());
 	merger->Update();
 	return merger->GetOutput();
 }
