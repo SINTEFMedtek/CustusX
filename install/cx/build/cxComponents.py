@@ -205,6 +205,7 @@ class VTK(CppComponent):
 #            add('QT_QMAKE_EXECUTABLE:PATH', "%s/bin/qmake"%qt5_root)
             add('VTK_Group_Qt:BOOL', "ON")
 #            add('CMAKE_PREFIX_PATH:PATH', "%s/lib/cmake"%qt5_root)
+            add('CMAKE_PREFIX_PATH:PATH', "/opt/local/libexec/qt5-mac")
         else:
             add('DESIRED_QT_VERSION:STRING', 4)
             add('Module_vtkGUISupportQt:BOOL', True)
@@ -251,6 +252,7 @@ class CTK(CppComponent):
         add('CTK_ENABLE_PluginFramework:BOOL', True)
         #add('CTK_BUILD_SHARED_LIBS:BOOL', self.controlData.getBuildShared())
         add('CTK_BUILD_SHARED_LIBS:BOOL', True)
+        add('CMAKE_PREFIX_PATH:PATH', "/opt/local/libexec/qt5-mac")
         builder.configureCMake()
         PrintFormatter.printInfo('Build CTK during configure step, in order to create CTKConfig.cmake')
         self.build()
@@ -413,6 +415,7 @@ class CustusX(CppComponent):
         add('SSC_USE_GCOV:BOOL', self.controlData.mCoverage);
         add('CX_SYSTEM_BASE_NAME:STRING', self.controlData.system_base_name)
         add('CX_SYSTEM_DEFAULT_APPLICATION:STRING', self.controlData.system_base_name)
+        add('CMAKE_PREFIX_PATH:PATH', "/opt/local/libexec/qt5-mac")
         
         
         libs = self.assembly.libraries
