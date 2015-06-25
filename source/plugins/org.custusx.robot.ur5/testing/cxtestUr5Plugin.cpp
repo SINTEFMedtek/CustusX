@@ -31,7 +31,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "catch.hpp"
 
+#include "cxUr5Connection.h"
+
 TEST_CASE("Ur5Plugin: Check nothing", "[unit][plugins][org.custusx.robot.ur5][hide]")
 {
 	CHECK(true);
+}
+
+TEST_CASE("Ur5Plugin: Connect to robot", "[plugins][org.custusx.robot.ur5][hide]")
+{
+	CHECK(true);
+	QString ipAddress("10.218.140.138");
+	int port = 30003;
+	cx::Ur5Connection connection(ipAddress, port);
+	connection.connectToRobot();
+	REQUIRE(connection.isConnectedToRobot());
+	connection.disconnectFromRobot();
 }

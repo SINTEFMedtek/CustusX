@@ -6,6 +6,7 @@ set(PLUGIN_SRCS
   cxUr5PluginActivator.cpp
   cxUr5GUIExtenderService.cpp
   cxUr5Widget.cpp
+  cxUr5Connection.cpp
 )
 
 # Files which should be processed by Qts moc
@@ -13,6 +14,7 @@ set(PLUGIN_MOC_SRCS
   cxUr5PluginActivator.h
   cxUr5GUIExtenderService.h
   cxUr5Widget.h
+  cxUr5Connection.h
 )
 
 # Qt Designer files which should be processed by Qts uic
@@ -28,6 +30,7 @@ set(PLUGIN_resources
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
     ${PLUGIN_target_libraries}   
+    cxResource
     cxGUIExtenderService
     #cxLogicManager
     cxPluginUtilities
