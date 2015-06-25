@@ -111,6 +111,8 @@ cx_add_class_qt_moc(cxResource_SOURCE
     utilities/cxSpaceListenerImpl
     utilities/cxSyncedValue
     utilities/cxSpaceProvider
+    utilities/cxSocket
+    utilities/cxSocketConnection
 
     patientModel/cxPatientModelService
 

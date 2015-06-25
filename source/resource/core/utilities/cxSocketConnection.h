@@ -30,67 +30,45 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
+#ifndef CXSOCKETCONNECTION_H
+#define CXSOCKETCONNECTION_H
 
-#ifndef CXSOCKET_H
-#define CXSOCKET_H
+#include "cxSocket.h"
 
-#include <boost/shared_ptr.hpp>
-#include <QObject>
-#include <QAbstractSocket>
-#include <QString>
+namespace cx {
 
-QT_BEGIN_NAMESPACE
-class QTcpSocket;
-QT_END_NAMESPACE
 
-namespace cx
-{
-
-typedef boost::shared_ptr<class Socket> SocketPtr;
-
-/**
- * @brief The Socket class socket functionallity
- * @date 18.03.2015
- * @author Janne Beate Bakeng, SINTEF
- */
-class Socket : public QObject
+class cxResource_EXPORT SocketConnection : public QObject
 {
     Q_OBJECT
 public:
-    Socket(QObject *parent);
+    explicit SocketConnection(QObject *parent = 0);
 
-    void requestConnectToHost(QString ip, int port) const;
-    bool isConnected() const;
-    QString getLastError() const;
-    void requestCloseConnection() const;
-
-    bool minBytesAvailable(int bytes) const;
-    qint64 read(char *data, qint64 maxSizeBytes) const;
-    qint64 skip(qint64 maxSizeBytes) const;
-
-    qint64 write(const char* data, qint64 maxSizeBytes) const;
+public slots:
+    void setIpAndPort(QString ip, int port); //not threadsafe
+    void requestConnect();
+    void requestDisconnect();
 
 signals:
     void connected();
     void disconnected();
-    void readyRead();
     void error();
 
 private slots:
-    void receivedConnected();
-    void receivedDisconnected();
-    void receivedError(QAbstractSocket::SocketError socketError);
-    void receivedHostFound();
-    void receivedStateChanged(QAbstractSocket::SocketState socketState);
-    void receiveReadyRead();
-    void receiveBytesWritten(qint64 bytes);
-    void receiveAboutToClose();
+    void internalConnected();
+    void internalDisconnected();
+    virtual void internalDataAvailable();
 
-private:
-    typedef boost::shared_ptr<QTcpSocket> QTcpSocketPtr;
-    QTcpSocketPtr mSocket;
-    bool mConnected;
+protected:
+    bool socketIsConnected();
+    bool enoughBytesAvailableOnSocket(int bytes) const;
+    bool socketReceive(void *packPointer, int packSize) const;
+
+    SocketPtr mSocket;
+    QString mIp;
+    int mPort;
 };
-}
 
-#endif //CXSOCKET_H
+} //namespace cx
+
+#endif // CXSOCKETCONNECTION_H

@@ -43,22 +43,15 @@ namespace cx
 {
 
 OpenIGTLinkClient::OpenIGTLinkClient(QObject *parent) :
-    QObject(parent),
+    SocketConnection(parent),
     mHeader(igtl::MessageHeader::New()),
-    mHeaderReceived(false),
-    mIp("localhost"),
-    mPort(18944)
+    mHeaderReceived(false)
 {
+    mIp = "localhost";
+    mPort = 18944;
     qRegisterMetaType<Transform3D>("Transform3D");
     qRegisterMetaType<ImagePtr>("ImagePtr");
     qRegisterMetaType<ProbeDefinitionPtr>("ProbeDefinitionPtr");
-
-    mSocket = SocketPtr(new Socket(this));
-    //todo: check affinity on socket!!!
-    connect(mSocket.get(), &Socket::connected, this, &OpenIGTLinkClient::internalConnected);
-    connect(mSocket.get(), &Socket::disconnected, this, &OpenIGTLinkClient::internalDisconnected);
-    connect(mSocket.get(), &Socket::readyRead, this, &OpenIGTLinkClient::internalDataAvailable);
-    connect(mSocket.get(), &Socket::error, this, &OpenIGTLinkClient::error);
 
     DialectPtr dialect = DialectPtr(new CustusDialect());
     mAvailableDialects[dialect->getName()] = dialect;
@@ -132,35 +125,6 @@ void OpenIGTLinkClient::sendStringMessage(QString command)
 }
 */
 
-void OpenIGTLinkClient::setIpAndPort(QString ip, int port)
-{
-    mIp = ip;
-    mPort = port;
-}
-
-void OpenIGTLinkClient::requestConnect()
-{
-    CX_LOG_CHANNEL_INFO(CX_OPENIGTLINK_CHANNEL_NAME) << "Trying to connect to " << mIp << ":" << mPort;
-    mSocket->requestConnectToHost(mIp, mPort);
-}
-
-void OpenIGTLinkClient::requestDisconnect()
-{
-    mSocket->requestCloseConnection();
-}
-
-void OpenIGTLinkClient::internalConnected()
-{
-    CX_LOG_CHANNEL_SUCCESS(CX_OPENIGTLINK_CHANNEL_NAME) << "Connected to "  << mIp << ":" << mPort;
-    emit connected();
-}
-
-void OpenIGTLinkClient::internalDisconnected()
-{
-    CX_LOG_CHANNEL_SUCCESS(CX_OPENIGTLINK_CHANNEL_NAME) << "Disconnected";
-    emit disconnected();
-}
-
 void OpenIGTLinkClient::internalDataAvailable()
 {
     if(!this->socketIsConnected())
@@ -200,17 +164,6 @@ void OpenIGTLinkClient::queryServer()
     this->sendStringMessage(command);
 }
 */
-
-bool OpenIGTLinkClient::socketIsConnected()
-{
-    return mSocket->isConnected();
-}
-
-bool OpenIGTLinkClient::enoughBytesAvailableOnSocket(int bytes) const
-{
-    bool retval = mSocket->minBytesAvailable(bytes);
-    return retval;
-}
 
 bool OpenIGTLinkClient::receiveHeader(const igtl::MessageHeader::Pointer header) const
 {
@@ -302,20 +255,6 @@ bool OpenIGTLinkClient::receive(const igtl::MessageBase::Pointer header)
     else
     {
         CX_LOG_CHANNEL_ERROR(CX_OPENIGTLINK_CHANNEL_NAME) << "Could not unpack the body of type: " << body->GetDeviceType();
-        return false;
-    }
-    return true;
-}
-
-bool OpenIGTLinkClient::socketReceive(void *packPointer, int packSize) const
-{
-    if(!this->enoughBytesAvailableOnSocket(packSize))
-        return false;
-
-    int r = mSocket->read(reinterpret_cast<char*>(packPointer), packSize);
-    if(r <= 0)
-    {
-        CX_LOG_CHANNEL_ERROR(CX_OPENIGTLINK_CHANNEL_NAME) << "Error when receiving data from socket.";
         return false;
     }
     return true;
