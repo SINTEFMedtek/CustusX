@@ -52,6 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLabeledLineEditWidget.h"
 #include "cxDataSelectWidget.h"
 #include "cxSelectDataStringProperty.h"
+#include "cxFilePathProperty.h"
 
 namespace cx
 {
@@ -76,12 +77,18 @@ QWidget* createDataWidget(VisualizationServicePtr visualizationService, PatientM
 
 QWidget* sscCreateDataWidget(QWidget* parent, PropertyPtr data, QGridLayout* gridLayout, int row)
 {
+	FilePathPropertyPtr fp = boost::dynamic_pointer_cast<FilePathProperty>(data);
+	if (fp)
+	{
+		return new FilenameWidget(parent, fp, gridLayout, row);
+	}
+
 	StringPropertyBasePtr str = boost::dynamic_pointer_cast<StringPropertyBase>(data);
 	if (str)
 	{
-		if (str->getGuiRepresentation()==StringPropertyBase::grFILENAME)
-			return new FilenameWidget(parent, str, gridLayout, row);
-		else if (str->getAllowOnlyValuesInRange())
+//		if (str->getGuiRepresentation()==StringPropertyBase::grFILENAME)
+//			return new FilenameWidget(parent, str, gridLayout, row);
+		if (str->getAllowOnlyValuesInRange())
 			return new LabeledComboBoxWidget(parent, str, gridLayout, row);
 		else
 			return new LabeledLineEditWidget(parent, str, gridLayout, row);

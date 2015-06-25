@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxGrabberExport.h"
 
 #include <QObject> //needed for the mocer when OpenCv is not used...
-#include "cxConfig.h"
+#include "cxVideoServerConfig.h"
 
 #include "boost/shared_ptr.hpp"
 #include <QTcpSocket>
@@ -100,8 +100,9 @@ public:
 	virtual ~ImageStreamerOpenCV();
 
 	virtual void initialize(StringMap arguments);
-	virtual bool startStreaming(SenderPtr sender);
+	virtual void startStreaming(SenderPtr sender);
 	virtual void stopStreaming();
+	virtual bool isStreaming();
 
 	virtual QString getType();
 	virtual QStringList getArgumentDescription();

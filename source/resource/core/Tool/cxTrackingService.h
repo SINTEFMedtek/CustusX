@@ -70,6 +70,7 @@ typedef boost::shared_ptr<class ManualTool> ManualToolPtr;
 class cxResource_EXPORT TrackingService : public QObject
 {
 	Q_OBJECT
+
 public:
 	typedef std::map<QString, ToolPtr> ToolMap;
 
@@ -106,8 +107,6 @@ signals:
 	void stateChanged();
 	void activeToolChanged(const QString& uId);
 	void newProbe(const ToolPtr probe);
-
-public slots:
 
 };
 

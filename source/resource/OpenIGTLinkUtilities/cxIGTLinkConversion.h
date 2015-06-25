@@ -35,45 +35,55 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxOpenIGTLinkUtilitiesExport.h"
 
-#include "cxImage.h"
-#include "cxTool.h"
+#include "igtlStringMessage.h"
+#include "igtlStatusMessage.h"
+#include "igtlImageMessage.h"
+#include "igtlTransformMessage.h"
+
 #include "cxIGTLinkImageMessage.h"
 #include "cxIGTLinkUSStatusMessage.h"
+
+#include "cxImage.h"
+#include "cxTransform3D.h"
+#include "cxTool.h"
 
 namespace cx
 {
 
 /**
- * Encode and decode IGTLink image and status messages to and from CustusX classes
+ * Encode and decode OpenIGTLink messages
  *
  * \ingroup cx_resource_OpenIGTLinkUtilities
  *
- * \date  Feb 19, 2013
- * \author olevs
- * \author christiana
  */
 class cxOpenIGTLinkUtilities_EXPORT IGTLinkConversion
 {
 public:
-	IGTLinkConversion();
-	virtual ~IGTLinkConversion();
+    //Standard openigtlink messages
+    igtl::StringMessage::Pointer encode(QString msg);
+    QString decode(igtl::StringMessage::Pointer msg);
+    QString decode(igtl::StatusMessage::Pointer msg);
+    ImagePtr decode(igtl::ImageMessage::Pointer msg);
+    Transform3D decode_image_matrix(igtl::ImageMessage::Pointer msg);
+    Transform3D decode(igtl::TransformMessage::Pointer msg);
 
-	/**
+    //CustusX message formats
+    /**
 	  * Encode the image into a IGTLink message, containing
 	  * image data, uid and timstamp
 	  */
-	IGTLinkImageMessage::Pointer encode(ImagePtr image);
+    IGTLinkImageMessage::Pointer encode(ImagePtr image);
 	/**
 	  * Decode the IGTLink message to create an image containing
 	  * image data, uid and timstamp. The color format is also
 	  * converted to RGBX
 	  */
-	ImagePtr decode(IGTLinkImageMessage::Pointer msg);
+    ImagePtr decode(IGTLinkImageMessage::Pointer msg);
 
 	/**
 	  * Encode the input probedata into an IGTLink message.
 	  */
-	IGTLinkUSStatusMessage::Pointer encode(ProbeDefinitionPtr);
+    IGTLinkUSStatusMessage::Pointer encode(ProbeDefinitionPtr);
 	/**
 	  * Decode the input probe and image messages to create a
 	  * ProbeData object based in the input base.
@@ -84,7 +94,7 @@ public:
 	  *
 	  * Some or all of the input messages can be NULL.
 	  */
-	ProbeDefinitionPtr decode(IGTLinkUSStatusMessage::Pointer probeMessage, IGTLinkImageMessage::Pointer imageMessage, ProbeDefinitionPtr base);
+    ProbeDefinitionPtr decode(IGTLinkUSStatusMessage::Pointer probeMessage, IGTLinkImageMessage::Pointer imageMessage, ProbeDefinitionPtr base);
 
 	/**
 	  * Decode the image to standard format with standard color RGBX encoding.
@@ -94,25 +104,27 @@ public:
 	  * to standard RGBX format, strip format from uid,
 	  * and return as new image.
 	  */
-	ImagePtr decode(ImagePtr msg);
-	ProbeDefinitionPtr decode(ProbeDefinitionPtr msg);
+    ImagePtr decode(ImagePtr msg);
+    ProbeDefinitionPtr decode(ProbeDefinitionPtr msg);
 
 private:
+    QString convertIGTLinkStatusCodes(const int code);
+
 	/** Extract the color format string from enclosing brackets inside
 	  * another string, i.e find "RGBA" from "Device[RGBA]".
 	  * Also return the input without format string as cleanedDeviceName.
 	  */
-	QString extractColorFormat(QString deviceName, QString* cleanedDeviceName);
+    QString extractColorFormat(QString deviceName, QString* cleanedDeviceName);
 	/** Filter that converts to RGB format based on a format string
 	  * of the form "RGBA" or any other ordering of these four letters,
 	  * the letters define the ordering of channels in the input.
 	  */
-	vtkImageDataPtr createFilterFormat2RGB(QString format, vtkImageDataPtr input);
+    vtkImageDataPtr createFilterFormat2RGB(QString format, vtkImageDataPtr input);
 	/** Filter that converts from a XYZW-format to RGB.
 	  * The input indexes are the indexes or red/green/blue in the input.
 	  * The alpha channel is discarded.
 	  */
-	vtkImageDataPtr createFilterAny2RGB(int R, int G, int B, vtkImageDataPtr input);
+    vtkImageDataPtr createFilterAny2RGB(int R, int G, int B, vtkImageDataPtr input);
 };
 
 } //namespace cx

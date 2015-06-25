@@ -52,36 +52,38 @@ namespace cx
 class cxResource_EXPORT DataLocations
 {
 public:
-  static QString getBundlePath(); ///< return the folder where the bundle or executable are located.
+	static QString getBundlePath(); ///< return the folder where the bundle or executable are located.
 	static QString getRootConfigPath(); ///< return path to root config folder. May be replaced with getExistingConfigPath()
-  static QStringList getRootConfigPaths();
+	static QStringList getRootConfigPaths();
 
-  static QString getTestDataPath(); ///< return path to test data folder
-  static QString getLargeTestDataPath(); ///< return path to test data folder containing large data sets
-  static QString getExistingTestData(QString pathRelativeToTestDataRoot, QString filename=""); ///< Return full path to test data, both normal and large repositories are searched.
+	static QString getTestDataPath(); ///< return path to test data folder
+	static QString getLargeTestDataPath(); ///< return path to test data folder containing large data sets
+	static QString getExistingTestData(QString pathRelativeToTestDataRoot, QString filename=""); ///< Return full path to test data, both normal and large repositories are searched.
 
-  static QString getDocPath(); ///< return path to folder containing documentation files
-  static QString getPersistentWritablePath(); ///< Path to location usable for persistent and temporary storage of config. Do not use directly, prefer to create methods displaying subpaths.
+	static QString getDocPath(); ///< return path to folder containing documentation files
+	static QString getPersistentWritablePath(); ///< Path to location usable for persistent and temporary storage of config. Do not use directly, prefer to create methods displaying subpaths.
 	static QString getCachePath(); ///< return path to a folder that is used during execution, will be cleared at start and stop.
 	static QStringList getDefaultPluginsPath(); ///< return the folder where plugins should be located, by default.
 
-  static void setTestMode(); ///< set a testing mode that changes location of settings files to a temp folder.
-  static QString findExecutableInStandardLocations(QString filename); ///< look for an exe in the same folder as the executable or bundle.
+	static void setTestMode(); ///< set a testing mode that changes location of settings files to a temp folder.
+	static QString findExecutableInStandardLocations(QString filename); ///< look for an exe in the same folder as the executable or bundle.
 
-  static QStringList appendStringToAllElements(QStringList root, QString suffix);
+	static QStringList appendStringToAllElements(QStringList root, QString suffix);
 
-  static QString findConfigFolder(QString pathRelativeToConfigRoot, QString alternativeAbsolutePath = "");
-  static QString findConfigFilePath(QString fileName, QString pathRelativeToConfigRoot, QString alternativeAbsolutePath = "");
-  static QString findConfigPath(QString fileName, QString pathRelativeToConfigRoot, QString alternativeAbsolutePath = "");
-  static QString getNoPatientFolder();
+	static QString findConfigFolder(QString pathRelativeToConfigRoot, QString alternativeAbsolutePath = "");
+	static QString findConfigFilePath(QString fileName, QString pathRelativeToConfigRoot, QString alternativeAbsolutePath = "");
+	static QString findConfigPath(QString fileName, QString pathRelativeToConfigRoot, QString alternativeAbsolutePath = "");
 
-  static QString getWebsiteURL();
-  static QString getWebsiteUserDocumentationURL();
+	static QString getWebsiteURL();
+	static QString getWebsiteUserDocumentationURL();
 
+	static bool isRunFromBuildFolder();
 private:
-  static bool mTestMode;
-  static QString readTestDataPathFromFile(QString filename);
-  static QString checkExecutableExist(QString path, QString filename);
+	static bool mTestMode;
+	static bool mRunFromBuildFolder;
+	static bool mBuildFolderChecked;
+	static QString readTestDataPathFromFile(QString filename);
+	static QString checkExecutableExist(QString path, QString filename);
 
 };
 

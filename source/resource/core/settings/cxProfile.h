@@ -73,22 +73,22 @@ public:
 	/**
 	 * Return settings ini file.
 	 */
-	Settings* getSettings();
+	Settings* getSettings() const;
 
 	/**
 	 * Return the user-friendly name of profile.
 	 */
-	QString getName();
+	QString getName() const;
 
 	/**
 	 * Return the unique uid of profile.
 	 */
-	QString getUid();
+	QString getUid() const;
 
 	/**
 	 * Return location of profile-specific data. Writable.
 	 */
-	QString getPath();
+	QString getPath() const;
 
 	/**
 	 * Return all paths where tool config files can be found.
@@ -113,10 +113,18 @@ public:
 	 * This includes the value of getPath(), which also is writable.
 	 */
 	QStringList getAllRootConfigPaths();
+
+	/**
+	 * Return root folder where sessions are to be stored
+	 */
+	QString getSessionRootFolder() const;
+	void setSessionRootFolder(QString path);
+
 private:
 	QString mPath;
 	SettingsPtr mSettings;
 	QString getSettingsFile();
+	QString getDefaultSessionRootFolder() const;
 };
 
 /** Manager for the collection of profiles.

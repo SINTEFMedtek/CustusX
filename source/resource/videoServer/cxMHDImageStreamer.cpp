@@ -52,6 +52,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxBoolProperty.h"
 #include "cxDataReaderWriter.h"
 #include "cxSender.h"
+#include "cxFilePathProperty.h"
+#include "cxProfile.h"
+#include "cxReporter.h"
 
 namespace cx
 {
@@ -64,14 +67,15 @@ std::vector<PropertyPtr> ImageStreamerDummyArguments::getSettings(QDomElement ro
 	return retval;
 }
 
-StringPropertyBasePtr ImageStreamerDummyArguments::getFilenameOption(QDomElement root)
+FilePathPropertyPtr ImageStreamerDummyArguments::getFilenameOption(QDomElement root)
 {
-	StringPropertyPtr retval;
-	retval = StringProperty::initialize("filename", "Filename",
-											  "Select a 3D image file to stream from",
-											  "",
-											  root);
-	retval->setGuiRepresentation(StringPropertyBase::grFILENAME);
+	FilePathPropertyPtr retval;
+	retval = FilePathProperty::initialize("filename", "Filename",
+										  "Select a 3D image file to stream from",
+										  "",
+										  QStringList() << profile()->getSessionRootFolder(),
+										  root);
+
 	retval->setGroup("File");
 	return retval;
 }
@@ -301,21 +305,25 @@ void DummyImageStreamer::initialize(QString filename, bool secondaryStream, bool
 	this->setInitialized(true);
 }
 
-bool DummyImageStreamer::startStreaming(SenderPtr sender)
+void DummyImageStreamer::startStreaming(SenderPtr sender)
 {
 	if (!this->isInitialized())
 	{
-		std::cout << "DummyImageStreamer: Failed to start streaming: Not initialized." << std::endl;
-		return false;
+		reportError("DummyImageStreamer: Failed to start streaming: Not initialized.");
+		return;
 	}
 	mSender = sender;
 	mSendTimer->start(this->getSendInterval());
-	return true;
 }
 
 void DummyImageStreamer::stopStreaming()
 {
 	mSendTimer->stop();
+}
+
+bool DummyImageStreamer::isStreaming()
+{
+	return this->isInitialized();
 }
 
 vtkSmartPointer<vtkImageData> DummyImageStreamer::hasSecondaryData()

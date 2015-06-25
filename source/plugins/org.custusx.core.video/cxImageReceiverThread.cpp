@@ -98,10 +98,7 @@ bool ImageReceiverThread::attemptInitialize()
 	connect(mSender.get(), &DirectlyLinkedSender::newImage, this, &ImageReceiverThread::addImageToQueueSlot, Qt::DirectConnection);
 	connect(mSender.get(), &DirectlyLinkedSender::newUSStatus, this, &ImageReceiverThread::addSonixStatusToQueueSlot, Qt::DirectConnection);
 
-	if(!mImageStreamer->startStreaming(mSender))
-	{
-		return false;
-	}
+	mImageStreamer->startStreaming(mSender);
 
 	return true;
 }

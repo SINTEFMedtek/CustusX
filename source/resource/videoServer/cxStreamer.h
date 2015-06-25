@@ -65,11 +65,15 @@ public:
 	Streamer();
 	virtual ~Streamer(){};
 
-	virtual bool startStreaming(SenderPtr sender) = 0;
+	virtual void startStreaming(SenderPtr sender) = 0;
 	virtual void stopStreaming() = 0;
+	virtual bool isStreaming() = 0;
 
 	void setSendInterval(int milliseconds); ///< how often an image should be sent (in milliseconds)
 	int getSendInterval() const; ///< how often an image should be sent (in milliseconds)
+
+signals:
+	void stateChanged();
 
 protected slots:
 	virtual void streamSlot() = 0;

@@ -81,7 +81,7 @@ public:
 	virtual ~VideoConnection();
 	virtual bool isConnected() const;
 	void disconnectServer();
-	void runDirectLinkClient(StreamerService* service);
+    void runDirectLinkClient(StreamerServicePtr service);
 	std::vector<VideoSourcePtr> getVideoSources();
 
 signals:

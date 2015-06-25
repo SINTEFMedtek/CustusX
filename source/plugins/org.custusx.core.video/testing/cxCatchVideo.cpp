@@ -61,7 +61,8 @@ cx::DummyImageStreamerPtr createRunningDummyImageStreamer(TestSenderPtr& sender,
 	REQUIRE(imagestreamer);
 
 	imagestreamer->initialize(filename, secondaryStream, sendonce);
-	REQUIRE(imagestreamer->startStreaming(sender));
+	imagestreamer->startStreaming(sender);
+	REQUIRE(imagestreamer->isStreaming());
 	return imagestreamer;
 }
 

@@ -60,9 +60,8 @@ class cxResource_EXPORT Settings : public QObject
   Q_OBJECT
 
 public:
-//  static Settings* getInstance(); ///< returns the only instance of this class
-//  static void destroyInstance();     ///< destroys the only instance of this class
 
+	void setValueIfNotDefault(const QString& key, const QVariant& value, const QVariant& defaultValue);
   //forwarding functions from QSettings
   void setValue(const QString& key, const QVariant& value);
   QVariant value(const QString& key, const QVariant& defaultValue = QVariant()) const;
@@ -75,9 +74,6 @@ public:
   void resetFile(QString filename); ///< internal use only: reset internal settings file.
   Settings();
   virtual ~Settings();
-
-  //additional functionality
-//  explicit Settings(QString filename);
 
   /** Initialize a setting if undefined.
    */
@@ -92,12 +88,9 @@ signals:
   void valueChangedFor(QString key);
 
 private slots:
-//  void initialize();
 private:
-
   QSettingsPtr mSettings;
 
-//  static Settings* mInstance; ///< The only instance of this class that can exist.
 };
 
 /**\brief Shortcut for accessing the settings instance.*/

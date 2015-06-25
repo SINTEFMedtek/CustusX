@@ -80,7 +80,7 @@ cx::PropertyPtr TestVideoConnectionWidget::getOption(QString uid, QString method
 {
 	cx::XmlOptionFile options = cx::profile()->getXmlSettings().descend("video");
 	QDomElement element = options.getElement("video");
-	cx::StreamerService* streamer = mServices->videoService->getStreamerService(method);
+    cx::StreamerServicePtr streamer = mServices->videoService->getStreamerService(method);
 	cx::PropertyPtr option = cx::Property::findProperty(streamer->getSettings(element), uid);
 	return option;
 }

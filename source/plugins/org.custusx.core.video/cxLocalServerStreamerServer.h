@@ -44,7 +44,9 @@ namespace cx
 typedef boost::shared_ptr<class StringPropertyBase> StringPropertyBasePtr;
 typedef boost::shared_ptr<class DoublePropertyBase> DoublePropertyBasePtr;
 typedef boost::shared_ptr<class Property> PropertyPtr;
+typedef boost::shared_ptr<class FilePathProperty> FilePathPropertyPtr;
 typedef boost::shared_ptr<class BoolPropertyBase> BoolPropertyBasePtr;
+
 
 /** Options for LocalServerStreamer
  *
@@ -59,13 +61,7 @@ public:
 	std::vector<PropertyPtr> getSettings(QDomElement root);
 
 	BoolPropertyBasePtr getRunLocalServerOption(QDomElement root);
-	StringPropertyBasePtr getLocalServerNameOption(QDomElement root);
-
-private:
-    QStringList checkGrabberServerExist(QString path, QString filename);
-	QStringList getOpenIGTLinkServer();
-    QStringList getGrabberServer(QString filename);
-
+	FilePathPropertyPtr getLocalServerNameOption(QDomElement root);
 };
 
 /** Streamer wrapping another Streamer, but also runs an executable as a local process.
@@ -82,17 +78,18 @@ Q_OBJECT
 public:
 	LocalServerStreamer(QString serverName, QString serverArguments);
 	virtual ~LocalServerStreamer();
-	virtual bool startStreaming(SenderPtr sender);
+	virtual void startStreaming(SenderPtr sender);
 	virtual void stopStreaming();
+	virtual bool isStreaming();
 
 	static StreamerPtr createStreamerIfEnabled(QDomElement root, StringMap args);
 
 private slots:
 	virtual void streamSlot() {}
 
+	void processStateChanged();
 private:
 	bool localVideoServerIsRunning();
-	void waitForServerStart();
 	ProcessWrapperPtr mLocalVideoServerProcess;
 
 	StreamerPtr mBase;

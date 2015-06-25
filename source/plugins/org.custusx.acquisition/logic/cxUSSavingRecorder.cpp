@@ -206,8 +206,8 @@ void USSavingRecorder::saveStreamSession(USReconstructInputData reconstructData,
 								  compress
 								  ));
 	QFutureWatcher<QString>* fileMakerFutureWatcher = new QFutureWatcher<QString>();
+    connect(fileMakerFutureWatcher, SIGNAL(finished()), this, SLOT(fileMakerWriteFinished()));
 	fileMakerFutureWatcher->setFuture(fileMakerFuture);
-	connect(fileMakerFutureWatcher, SIGNAL(finished()), this, SLOT(fileMakerWriteFinished()));
 	mSaveThreads.push_back(fileMakerFutureWatcher);
 	fileMaker.reset(); // filemaker is now stored in the mSaveThreads queue, clear as current.
 }
@@ -215,13 +215,17 @@ void USSavingRecorder::saveStreamSession(USReconstructInputData reconstructData,
 void USSavingRecorder::fileMakerWriteFinished()
 {
 	std::list<QFutureWatcher<QString>*>::iterator iter;
-	for (iter=mSaveThreads.begin(); iter!=mSaveThreads.end(); ++iter)
+    for (iter=mSaveThreads.begin(); iter!=mSaveThreads.end();)
 	{
 		if (!(*iter)->isFinished())
+        {
+            ++iter;
 			continue;
+        }
 		QString result = (*iter)->future().result();
 		delete *iter;
-		iter = mSaveThreads.erase(iter);
+        //this increments the iter, so no need to do it in the for statement
+        iter = mSaveThreads.erase(iter);
 
 		emit saveDataCompleted(result);
 	}

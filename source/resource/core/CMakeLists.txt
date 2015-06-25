@@ -50,6 +50,10 @@ cx_add_class_qt_moc(cxResource_SOURCE
     Tool/cxTrackingService
     Tool/cxActiveToolProxy
     Tool/cxTrackingSystemService.h
+    Tool/cxTracker
+    Tool/cxManualToolAdapter
+    Tool/cxPlaybackTool
+    Tool/cxTrackerConfigurationImpl
 
 	properties/cxProperty
 	properties/cxPropertyNull.h
@@ -75,6 +79,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	properties/cxDoublePropertyTemporalCalibration
 	properties/cxStringPropertySelectTool
 	properties/cxStringPropertySelectCoordinateSystem
+        properties/cxFilePathProperty
 
     logger/cxReporter
     logger/cxMessageListener
@@ -127,6 +132,8 @@ cx_add_class(cxResource_SOURCE
     Tool/cxTrackerConfiguration
     Tool/cxToolNull
     Tool/cxProbeImpl
+    Tool/cxToolFileParser
+    Tool/cxToolConfigurationParser
 
     Data/cxDataMetric
     Data/cxDataReaderWriter
@@ -208,6 +215,8 @@ cx_add_class(cxResource_SOURCE
 
     Video/cxVideoServiceNull
     Video/cxVideoServiceProxy
+    Video/cxStreamerServiceProxy
+    Video/cxStreamerServiceNull
 
     Tool/cxTrackingServiceNull
     Tool/cxTrackingServiceProxy

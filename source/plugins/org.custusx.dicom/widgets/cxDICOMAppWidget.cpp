@@ -284,8 +284,8 @@ std::map<ctkDICOMModel::IndexType, QStringList> DICOMAppWidgetPrivate::getSelect
 	  ctkDICOMModel::IndexType type = static_cast<ctkDICOMModel::IndexType>(mDICOMModel.data(index0,ctkDICOMModel::TypeRole).toInt());
 	  QString uid = mDICOMModel.data(index0,ctkDICOMModel::UIDRole).toString();
 
-	  if (!retval.count(type))
-		  retval[type] << uid;
+	  retval[type] << uid;
+	  retval[type].removeDuplicates();
 	}
 
 	return retval;
@@ -329,6 +329,7 @@ DICOMAppWidget::DICOMAppWidget(QWidget* _parent):Superclass(_parent),
   //Enable sorting in tree view
   d->TreeView->setSortingEnabled(true);
   d->TreeView->setSelectionBehavior(QAbstractItemView::SelectRows);
+  d->TreeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
   d->DICOMProxyModel.setSourceModel(&d->mDICOMModel);
   d->TreeView->setModel(&d->mDICOMModel);
 

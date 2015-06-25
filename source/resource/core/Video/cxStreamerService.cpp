@@ -31,7 +31,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxStreamerService.h"
 
+#include "cxStreamerServiceNull.h"
+#include "cxNullDeleter.h"
+
 namespace cx
 {
+
+StreamerServicePtr StreamerService::getNullObject()
+{
+    static StreamerServicePtr mNull;
+    if (!mNull)
+        mNull.reset(new StreamerServiceNull, null_deleter());
+    return mNull;
+}
 
 } //end namespace cx

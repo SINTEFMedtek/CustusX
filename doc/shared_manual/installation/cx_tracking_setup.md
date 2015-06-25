@@ -31,7 +31,7 @@ The folder
 is required to exist and be writable, but is created by the installer.
 
 ### Windows
-CustusX assumes that NDI connects through `COM-port` 0 (TBD-verify). If this is not the case, change manually.
+CustusX assumes that NDI connects through `COM-port` 0. If this is not the case, change manually.
 
 
 Tool File setup {#cx_tool_file}

@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 //Disabled for now. Test will output a warning. Use the test below with the Mock XmlParser instead
-TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Create with default XML parser", "[unit][service][tracking][hide]")
+TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Create with default XML parser", "[unit][service][tracking][hide][org.custus.core.tracking]")
 {
 	mProbe = cx::ProbeImpl::New(mProbeName, mScannerName);
 
@@ -58,7 +58,7 @@ TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Create with default XML parser", 
 	}
 }
 
-TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Create with mock XML parser", "[unit][service][tracking]")
+TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Create with mock XML parser", "[unit][service][tracking][org.custus.core.tracking]")
 {
 	REQUIRE(mProbe);
 	INFO(mProbe->getConfigId().toStdString());
@@ -67,7 +67,7 @@ TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Create with mock XML parser", "[u
 	CHECK(mProbe->isValid());
 }
 
-TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Use digital video setting", "[unit][service][tracking]")
+TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Use digital video setting", "[unit][service][tracking][org.custus.core.tracking]")
 {
 	CHECK(!mProbe->getProbeData().getUseDigitalVideo());
 	INFO(mProbe->getRtSourceName().toStdString());
@@ -80,7 +80,7 @@ TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Use digital video setting", "[uni
 	CHECK(mProbe->getConfigId().compare("Digital") == 0);
 }
 
-TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Use digital video setting with no RT source", "[unit][service][tracking]")
+TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Use digital video setting with no RT source", "[unit][service][tracking][org.custus.core.tracking]")
 {
 	testProbeWithNoRTSource();
 	CHECK(!mProbe->getProbeData().getUseDigitalVideo());
@@ -94,7 +94,7 @@ TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Use digital video setting with no
 	CHECK(mProbe->getConfigId().compare("Digital") == 0);
 }
 
-TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Use VideoSource", "[unit][service][tracking]")
+TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Use VideoSource", "[unit][service][tracking][org.custus.core.tracking]")
 {
 	CHECK(!mProbe->getRTSource());
 	cx::TestVideoSourcePtr videoSource(new cx::TestVideoSource("TestVideoSourceUid", "TestVideoSource" , 80, 40));
@@ -104,14 +104,14 @@ TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Use VideoSource", "[unit][service
 	CHECK(mProbe->getRTSource()->getName().compare("TestVideoSource") == 0);
 }
 
-TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Use Default probe sector", "[unit][service][tracking]")
+TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Use Default probe sector", "[unit][service][tracking][org.custus.core.tracking]")
 {
 	CHECK(mProbe->getSector());
 	CHECK(mProbe->getProbeData().getUid().compare(mDefaultProbeDataUid) == 0);
 	CHECK(cx::similar(mProbe->getProbeData().getTemporalCalibration(), mDefaultTemporalCalibration));
 }
 
-TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Use Custom probe sector", "[unit][service][tracking]")
+TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Use Custom probe sector", "[unit][service][tracking][org.custus.core.tracking]")
 {
 	mProbe->setProbeSector(this->createProbeData());
 	CHECK(mProbe->getSector(mProbeDataUid));
@@ -119,7 +119,7 @@ TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Use Custom probe sector", "[unit]
 	CHECK(cx::similar(mProbe->getProbeData(mProbeDataUid).getTemporalCalibration(), mTemporalCalibration));
 }
 
-TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Set active stream to custom probe sector", "[unit][service][tracking]")
+TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Set active stream to custom probe sector", "[unit][service][tracking][org.custus.core.tracking]")
 {
 	mProbe->setProbeSector(this->createProbeData());
 	CHECK(mProbe->getProbeData().getUid().compare(mDefaultProbeDataUid) == 0);
@@ -134,7 +134,7 @@ TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Set active stream to custom probe
 	CHECK(cx::similar(mProbe->getProbeData().getTemporalCalibration(), mDefaultTemporalCalibration));
 }
 
-TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Set active stream", "[unit][service][tracking]")
+TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Set active stream", "[unit][service][tracking][org.custus.core.tracking]")
 {
 	CHECK(mProbe->getActiveStream().compare(mDefaultProbeDataUid) == 0);
 	QString streamName = "TestStream";

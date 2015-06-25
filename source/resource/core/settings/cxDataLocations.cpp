@@ -39,19 +39,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxFileHelpers.h"
 #include "cxTypeConversions.h"
 #include "cxReporter.h"
+#include "cxProfile.h"
 
 namespace cx
 {
 
 //---------------------------------------------------------
 bool DataLocations::mTestMode = false;
+bool DataLocations::mRunFromBuildFolder = false;
+bool DataLocations::mBuildFolderChecked = false;
 //---------------------------------------------------------
 
 void DataLocations::setTestMode()
 {
 	mTestMode = true;
 	cx::removeNonemptyDirRecursively(getTestDataPath() + "/temp");
-	cx::removeNonemptyDirRecursively(getNoPatientFolder());
 }
 
 QString DataLocations::getTestDataPath()
@@ -66,12 +68,6 @@ QString DataLocations::getTestDataPath()
 	{
 		return CX_DATA_ROOT;
 	}
-}
-
-QString DataLocations::getNoPatientFolder()
-{
-	QString patientDatafolder = settings()->value("globalPatientDataFolder").toString();
-	return patientDatafolder + "/NoPatient";
 }
 
 QString DataLocations::getLargeTestDataPath()
@@ -116,14 +112,7 @@ QString DataLocations::getPersistentWritablePath()
 	QString homepath = QDir::homePath() + "/cx_settings";
 
 	if (mTestMode)
-	{
-//		QString bundlepath = getBundlePath();
-//		bundlepath.replace(":","_");
-//		if (bundlepath.startsWith("/"))
-//			bundlepath.remove(0, 1);
-//		homepath += "/test/" + bundlepath;
 		homepath = getTestDataPath() + "/temp";
-	}
 
 	return homepath;
 }
@@ -132,35 +121,47 @@ QString DataLocations::getPersistentWritablePath()
 QString DataLocations::getBundlePath()
 {
 #ifdef __APPLE__
-  QString path(qApp->applicationDirPath()+"/../../..");
-  QString bundle = QDir(qApp->applicationDirPath()+"/../..").canonicalPath();
-  if (QFileInfo(bundle).isBundle())
-	  return path;
-  else
-	  return qApp->applicationDirPath();
+	QString path(qApp->applicationDirPath()+"/../../..");
+	QString bundle = QDir(qApp->applicationDirPath()+"/../..").canonicalPath();
+	if (QFileInfo(bundle).isBundle())
+		return path;
+	else
+		return qApp->applicationDirPath();
 #else
-  QString path(qApp->applicationDirPath());
-  return path;
+	QString path(qApp->applicationDirPath());
+	return path;
 #endif
 }
 
 QStringList DataLocations::getDefaultPluginsPath()
 {
 	QStringList retval;
-	QString bundlePath = DataLocations::getBundlePath();
-	QString appPath(qApp->applicationDirPath());
 
-	QString buildLocation = bundlePath + "/plugins";
-	if (QFile(buildLocation).exists())
-		retval <<  buildLocation;
+	if(!isRunFromBuildFolder())
+	{
+		QString appPath(qApp->applicationDirPath());
 
-	QString installLocation = appPath + "/plugins";
-	if (QFile(installLocation).exists())
-		retval << installLocation;
+		QString installLocation = appPath;
+#ifndef CX_WINDOWS
+		installLocation = appPath + "/plugins";
+#endif
+		if (QFile(installLocation).exists())
+			retval << installLocation;
 
-	QString fallbackInstallLocation = appPath;
-	if (QFile(fallbackInstallLocation).exists())
-		retval << fallbackInstallLocation;
+		QString fallbackInstallLocation = appPath;
+		if (QFile(fallbackInstallLocation).exists())
+			retval << fallbackInstallLocation;	}
+	else
+	{
+		QString bundlePath = DataLocations::getBundlePath();
+
+		QString buildLocation = bundlePath;
+#ifndef CX_WINDOWS
+		buildLocation = bundlePath + "/plugins";
+#endif
+		if (QFile(buildLocation).exists())
+			retval <<  buildLocation;
+	}
 
 	return retval;
 }
@@ -175,29 +176,48 @@ QString DataLocations::getRootConfigPath()
 
 QStringList DataLocations::getRootConfigPaths()
 {
-  QString path = getBundlePath() + "/" + CX_CONFIG_ROOT_RELATIVE_INSTALLED; // look for installed location
-  if (QDir(path).exists())
-	return QStringList() << QDir(path).canonicalPath();
+	if(!isRunFromBuildFolder())
+	{
+		QString path = getBundlePath() + "/" + CX_CONFIG_ROOT_RELATIVE_INSTALLED; // look for installed location
+		if (QDir(path).exists())
+			return QStringList() << QDir(path).canonicalPath();
+		else
+		{
+			std::cout << "DataLocations::getRootConfigPaths(): Cannot find config root path: " << path << std::endl;
+			return QStringList();
+		}
+	}
 
-  QStringList retval;
-  if (QDir(CX_CONFIG_ROOT).exists()) // look for folder in source code
-	retval << QDir(CX_CONFIG_ROOT).canonicalPath();
-  if (QDir(CX_OPTIONAL_CONFIG_ROOT).exists()) // look for folder in source code
-	retval << QDir(CX_OPTIONAL_CONFIG_ROOT).canonicalPath();
+	QStringList retval;
+	if (QDir(CX_CONFIG_ROOT).exists()) // look for folder in source code
+		retval << QDir(CX_CONFIG_ROOT).canonicalPath();
+	if (QDir(CX_OPTIONAL_CONFIG_ROOT).exists()) // look for folder in source code
+		retval << QDir(CX_OPTIONAL_CONFIG_ROOT).canonicalPath();
 
-  return retval;
+	return retval;
 }
 
 QString DataLocations::getDocPath()
 {
-  QString path = getBundlePath() + "/" + CX_DOC_ROOT_RELATIVE_INSTALLED; // look for installed location
-  if (QDir(path).exists())
-	return QDir(path).canonicalPath();
+	if(!isRunFromBuildFolder())
+	{
+		QString path = getBundlePath() + "/" + CX_DOC_ROOT_RELATIVE_INSTALLED; // look for installed location
+		if (QDir(path).exists())
+			return QDir(path).canonicalPath();
+		else
+		{
+			CX_LOG_ERROR() << QString("Cannot find doc path: ") << path;
+			return "";
+		}
+	}
 
-  if (QDir(CX_DOC_ROOT).exists()) // look for folder in source code
-	return QDir(CX_DOC_ROOT).canonicalPath();
-
-  return "";
+	if (QDir(CX_DOC_ROOT).exists()) // look for folder in source code
+		return QDir(CX_DOC_ROOT).canonicalPath();
+	else
+	{
+		CX_LOG_ERROR() << QString("Cannot find doc path: ") << CX_DOC_ROOT;
+		return "";
+	}
 }
 
 QStringList DataLocations::appendStringToAllElements(QStringList root, QString suffix)
@@ -212,16 +232,16 @@ namespace
 {
 QString changeExtension(QString name, QString ext)
 {
-  QStringList splitName = name.split(".");
-  splitName[splitName.size()-1] = ext;
-  return splitName.join(".");
+	QStringList splitName = name.split(".");
+	splitName[splitName.size()-1] = ext;
+	return splitName.join(".");
 }
-}
+} //namespace
 
 QString DataLocations::getCachePath()
 {
 	QString path(getPersistentWritablePath()+"/cache/");
-    return path;
+	return path;
 }
 
 QString DataLocations::findConfigFolder(QString pathRelativeToConfigRoot, QString alternativeAbsolutePath)
@@ -299,5 +319,25 @@ QString DataLocations::getWebsiteUserDocumentationURL()
 	return url;
 }
 
+bool DataLocations::isRunFromBuildFolder()
+{
+	if(!mBuildFolderChecked)
+	{
+		QString bundlePath = DataLocations::getBundlePath();
+
+		//Check if cxConfig.h file exists relative to the run application
+		QString pathToConfigFile = bundlePath + "/../source/resource/core/settings/cxConfig.h";
+		if (QFile(pathToConfigFile).exists())
+		{
+			std::cout << "Using paths from build folder" << std::endl;
+			mRunFromBuildFolder = true;
+		}
+		else
+			mRunFromBuildFolder = false;
+		mBuildFolderChecked = true;
+	}
+
+	return mRunFromBuildFolder;
+}
 
 } // namespace cx

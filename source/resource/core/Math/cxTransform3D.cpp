@@ -68,6 +68,16 @@ void fill(Eigen::Affine3d* self, vtkMatrix4x4Ptr m)
 			(*self)(r, c) = m->GetElement(r, c);
 }
 
+void fill(Eigen::Affine3d* self, float m[4][4])
+{
+    if (!m)
+        return;
+    for (int r = 0; r < 4; ++r)
+        for (int c = 0; c < 4; ++c)
+            (*self)(r, c) = m[r][c];
+}
+
+
 /**fill the transform with raw data in vtk / row-major ordering form.
  *
  */

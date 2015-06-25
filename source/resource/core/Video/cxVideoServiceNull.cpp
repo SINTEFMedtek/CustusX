@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVideoServiceNull.h"
 
 #include "cxStreamerService.h"
+#include "cxStreamerServiceNull.h"
+#include "cxNullDeleter.h"
 #include "cxBasicVideoSource.h"
 
 namespace cx
@@ -83,10 +85,15 @@ std::vector<TimelineEvent> VideoServiceNull::getPlaybackEvents()
 	return std::vector<TimelineEvent>();
 }
 
-QList<StreamerService *> VideoServiceNull::getStreamerServices()
+StreamerServicePtr VideoServiceNull::getStreamerService(QString uid)
+{
+    return StreamerServicePtr(new StreamerServiceNull() , null_deleter());
+}
+
+QList<StreamerServicePtr> VideoServiceNull::getStreamerServices()
 {
 	printWarning();
-	return QList<StreamerService *>();
+    return QList<StreamerServicePtr>();
 }
 bool VideoServiceNull::isNull()
 {

@@ -69,7 +69,7 @@ void IGTLinkClientStreamer::setAddress(QString address, int port)
 }
 
 
-bool IGTLinkClientStreamer::startStreaming(SenderPtr sender)
+void IGTLinkClientStreamer::startStreaming(SenderPtr sender)
 {
 	mSender = sender;
 //	this->createSendTimer();
@@ -88,15 +88,13 @@ bool IGTLinkClientStreamer::startStreaming(SenderPtr sender)
 
 	if (!this->multipleTryConnectToHost())
 	{
+		reportError("IGTLinkClientStreamer: Failed to start streaming");
 		mSocket.reset();
-		return false;
+		return;
 	}
 
 	// Create a message buffer to receive header
 	mHeaderMsg = igtl::MessageHeader::New();
-
-
-	return true;
 }
 
 bool IGTLinkClientStreamer::multipleTryConnectToHost()
@@ -137,6 +135,11 @@ void IGTLinkClientStreamer::stopStreaming()
 		mSocket.reset();
 	}
 	mSender.reset();
+}
+
+bool IGTLinkClientStreamer::isStreaming()
+{
+	return (mSocket && mSocket->isValid());
 }
 
 QString IGTLinkClientStreamer::hostDescription() const

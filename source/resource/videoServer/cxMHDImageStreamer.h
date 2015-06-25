@@ -46,6 +46,7 @@ namespace cx
 {
 
 typedef boost::shared_ptr<struct Package> PackagePtr;
+typedef boost::shared_ptr<class FilePathProperty> FilePathPropertyPtr;
 
 vtkImageDataPtr loadImage(QString filename);
 vtkLookupTablePtr createLookupTable(int numberOfTableValues);
@@ -82,7 +83,7 @@ public:
 	virtual std::vector<PropertyPtr> getSettings(QDomElement root);
 	StringMap convertToCommandLineArguments(QDomElement root);
 
-	StringPropertyBasePtr getFilenameOption(QDomElement root);
+	FilePathPropertyPtr getFilenameOption(QDomElement root);
 	BoolPropertyBasePtr getSecondaryOption(QDomElement root);
 };
 
@@ -105,8 +106,9 @@ public:
 
 	virtual void initialize(QString filename, bool secondaryStream, bool sendonce = false);
 	virtual void initialize(StringMap arguments);
-	virtual bool startStreaming(SenderPtr sender);
+	virtual void startStreaming(SenderPtr sender);
 	virtual void stopStreaming();
+	virtual bool isStreaming();
 
 	virtual QString getType();
 	virtual QStringList getArgumentDescription();
