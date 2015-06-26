@@ -73,6 +73,16 @@ void SocketConnection::requestDisconnect()
     mSocket->requestCloseConnection();
 }
 
+bool SocketConnection::sendData(const char *data, qint64 maxSize)
+{
+    if(!this->socketIsConnected())
+        return false;
+    qint64 writtenBytes = mSocket->write(data, maxSize);
+    if(writtenBytes != maxSize)
+        return false;
+    return true;
+}
+
 void SocketConnection::internalConnected()
 {
     CX_LOG_SUCCESS() << "Connected to "  << mIp << ":" << mPort;
