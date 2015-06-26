@@ -122,6 +122,16 @@ qint64 Socket::write(const char *data, qint64 maxSizeBytes) const
     return writtenBytes;
 }
 
+bool Socket::waitForBytesWritten(int msecs)
+{
+    return mSocket->waitForBytesWritten(msecs);
+}
+
+bool Socket::waitForReadyRead(int msecs)
+{
+    return mSocket->waitForReadyRead(msecs);
+}
+
 void Socket::receivedConnected()
 {
     mConnected = true;

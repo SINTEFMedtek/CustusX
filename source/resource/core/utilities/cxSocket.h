@@ -73,6 +73,9 @@ public:
 
     qint64 write(const char* data, qint64 maxSizeBytes) const;
 
+    bool waitForBytesWritten(int msecs = 3000);
+    bool waitForReadyRead(int msecs = 3000);
+
 signals:
     void connected();
     void disconnected();
