@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXUR5CONNECTION_H
 
 #include "cxSocketConnection.h"
+#include "org_custusx_robot_ur5_Export.h"
 
 class QTcpSocket;
 
@@ -47,7 +48,7 @@ namespace cx
  * \author Ole Vegard Solberg, SINTEF
  * \date 2015-06-25
  */
-class Ur5Connection : public SocketConnection
+class org_custusx_robot_ur5_EXPORT Ur5Connection : public SocketConnection
 {
     Q_OBJECT
 
