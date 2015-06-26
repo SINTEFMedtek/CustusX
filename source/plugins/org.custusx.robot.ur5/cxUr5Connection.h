@@ -33,9 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXUR5CONNECTION_H
 #define CXUR5CONNECTION_H
 
-
-#include "boost/shared_ptr.hpp"
-#include <QAbstractSocket>
+#include "cxSocketConnection.h"
 
 class QTcpSocket;
 
@@ -44,38 +42,19 @@ namespace cx
 /**
  * Class that handles UR5 robot TCP connection.
  *
- * TODO: This class is based on the IGTLinkClientStreamer class.
- * Try to remove duplicated code by making an utility class.
- *
  * \ingroup org_custusx_robot_ur5
  *
  * \author Ole Vegard Solberg, SINTEF
  * \date 2015-06-25
  */
-class Ur5Connection : public QObject
+class Ur5Connection : public SocketConnection
 {
     Q_OBJECT
 
 public:
     Ur5Connection(QString address, int port);
-
-    void connectToRobot();
-    void disconnectFromRobot();
     bool isConnectedToRobot();
-private slots:
-    void readyReadSlot();
-    void connectedSlot();
-    void disconnectedSlot();
-    void errorSlot(QAbstractSocket::SocketError socketError);
-private:
-    bool multipleTryConnectToHost();
-    bool tryConnectToHost();
-    void hostFoundSlot();
-    QString hostDescription() const;
 
-	QString mAddress;
-	int mPort;
-	boost::shared_ptr<QTcpSocket> mSocket;
 };
 
 } // cx

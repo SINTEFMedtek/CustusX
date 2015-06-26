@@ -38,13 +38,12 @@ TEST_CASE("Ur5Plugin: Check nothing", "[unit][plugins][org.custusx.robot.ur5][hi
 	CHECK(true);
 }
 
-TEST_CASE("Ur5Plugin: Connect to robot", "[plugins][org.custusx.robot.ur5][hide]")
+TEST_CASE("Ur5Plugin: Connect to robot", "[manual][plugins][org.custusx.robot.ur5]")
 {
-	CHECK(true);
 	QString ipAddress("10.218.140.138");
 	int port = 30003;
 	cx::Ur5Connection connection(ipAddress, port);
-	connection.connectToRobot();
+	connection.tryConnectAndWait();
 	REQUIRE(connection.isConnectedToRobot());
-	connection.disconnectFromRobot();
+	connection.requestDisconnect();
 }
