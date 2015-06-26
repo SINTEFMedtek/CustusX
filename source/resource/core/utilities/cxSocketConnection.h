@@ -47,6 +47,7 @@ public:
 public slots:
     void setIpAndPort(QString ip, int port); //not threadsafe
     void requestConnect();
+    void tryConnectAndWait();
     void requestDisconnect();
 
 signals:
