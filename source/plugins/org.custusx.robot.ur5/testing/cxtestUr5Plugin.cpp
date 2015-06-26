@@ -31,19 +31,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "catch.hpp"
 
-#include "cxUr5Connection.h"
+#include "cxtestUr5TestFixture.h"
 
-TEST_CASE("Ur5Plugin: Check nothing", "[unit][plugins][org.custusx.robot.ur5][hide]")
+namespace cxtest
 {
-	CHECK(true);
-}
 
 TEST_CASE("Ur5Plugin: Connect to robot", "[manual][plugins][org.custusx.robot.ur5]")
 {
-	QString ipAddress("10.218.140.138");
-	int port = 30003;
-	cx::Ur5Connection connection(ipAddress, port);
-	connection.tryConnectAndWait();
-	REQUIRE(connection.isConnectedToRobot());
-	connection.requestDisconnect();
+	Ur5TestFixture fixture;
+	REQUIRE(fixture.connection.isConnectedToRobot());
+	fixture.connection.requestDisconnect();
 }
+
+TEST_CASE("Ur5Plugin: Send simple message to robot", "[manual][plugins][org.custusx.robot.ur5]")
+{
+	Ur5TestFixture fixture;
+	REQUIRE(fixture.connection.isConnectedToRobot());
+
+	//TODO: Find a message to send
+//	fixture.connection.sendData(data, size);
+
+	fixture.connection.requestDisconnect();
+}
+
+} //cxtest
