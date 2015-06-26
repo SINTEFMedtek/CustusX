@@ -54,6 +54,8 @@ class Ur5Connection : public SocketConnection
 public:
     Ur5Connection(QString address, int port);
     bool isConnectedToRobot();
+    bool sendMessage(QString message);
+    bool waitForMessage();
 
 };
 

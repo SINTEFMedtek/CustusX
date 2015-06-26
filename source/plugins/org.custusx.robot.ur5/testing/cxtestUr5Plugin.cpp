@@ -43,15 +43,24 @@ TEST_CASE("Ur5Plugin: Connect to robot", "[manual][plugins][org.custusx.robot.ur
 	fixture.connection.requestDisconnect();
 }
 
-TEST_CASE("Ur5Plugin: Send simple message to robot", "[manual][plugins][org.custusx.robot.ur5]")
+TEST_CASE("Ur5Plugin: Send message to robot and receive message from robot", "[manual][plugins][org.custusx.robot.ur5]")
 {
 	Ur5TestFixture fixture;
 	REQUIRE(fixture.connection.isConnectedToRobot());
 
-	//TODO: Find a message to send
-//	fixture.connection.sendData(data, size);
+	QString message("set_tcp(p[0,0,0,0,0,0])");
+	REQUIRE(fixture.connection.sendMessage(message));
+
+	message = "get_joint_positions()";
+	REQUIRE(fixture.connection.sendMessage(message));
+	REQUIRE(fixture.connection.waitForMessage());
+
+	message = "cleanup()";
+	REQUIRE(fixture.connection.sendMessage(message));
 
 	fixture.connection.requestDisconnect();
+
+	REQUIRE_FALSE(fixture.connection.sendMessage(message));
 }
 
 } //cxtest

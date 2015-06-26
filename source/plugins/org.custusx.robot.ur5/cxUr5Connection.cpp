@@ -52,4 +52,18 @@ bool Ur5Connection::isConnectedToRobot()
     return (mSocket && mSocket->isConnected());
 }
 
+bool Ur5Connection::sendMessage(QString message)
+{
+    bool ok = this->sendData(message.toStdString().c_str(), message.size());
+    if(!ok)
+        return false;
+
+    return mSocket->waitForBytesWritten(3000);
+}
+
+bool Ur5Connection::waitForMessage()
+{
+    return mSocket->waitForReadyRead(5000);
+}
+
 } // cx
