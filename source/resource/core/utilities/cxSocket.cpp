@@ -64,6 +64,19 @@ void Socket::requestConnectToHost(QString ip, int port) const
     mSocket->connectToHost(ip, port);
 }
 
+bool Socket::tryConnectToHostAndWait(QString ip, int port) const
+{
+	this->requestConnectToHost(ip, port);
+
+	int timeout = 5000;
+	if (!mSocket->waitForConnected(timeout))
+	{
+		mSocket->disconnectFromHost();
+		return false;
+	}
+	return true;
+}
+
 bool Socket::isConnected() const
 {
     return mConnected;

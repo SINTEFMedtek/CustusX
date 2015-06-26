@@ -61,6 +61,7 @@ public:
     Socket(QObject *parent);
 
     void requestConnectToHost(QString ip, int port) const;
+    bool tryConnectToHostAndWait(QString ip, int port) const;
     bool isConnected() const;
     QString getLastError() const;
     void requestCloseConnection() const;
