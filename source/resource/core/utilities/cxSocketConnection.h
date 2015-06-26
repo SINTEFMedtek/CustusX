@@ -49,6 +49,7 @@ public slots:
     void requestConnect();
     void tryConnectAndWait();
     void requestDisconnect();
+    bool sendData(const char* data, qint64 maxSize);
 
 signals:
     void connected();
