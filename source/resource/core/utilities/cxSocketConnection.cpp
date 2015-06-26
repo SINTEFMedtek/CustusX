@@ -62,6 +62,12 @@ void SocketConnection::requestConnect()
     mSocket->requestConnectToHost(mIp, mPort);
 }
 
+void SocketConnection::tryConnectAndWait()
+{
+    CX_LOG_INFO() << "Trying to connect to " << mIp << ":" << mPort;
+    mSocket->tryConnectToHostAndWait(mIp, mPort);
+}
+
 void SocketConnection::requestDisconnect()
 {
     mSocket->requestCloseConnection();
