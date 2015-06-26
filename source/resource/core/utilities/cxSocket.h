@@ -30,9 +30,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-
 #ifndef CXSOCKET_H
 #define CXSOCKET_H
+
+#include "cxResourceExport.h"
 
 #include <boost/shared_ptr.hpp>
 #include <QObject>
@@ -53,7 +54,7 @@ typedef boost::shared_ptr<class Socket> SocketPtr;
  * @date 18.03.2015
  * @author Janne Beate Bakeng, SINTEF
  */
-class Socket : public QObject
+class cxResource_EXPORT Socket : public QObject
 {
     Q_OBJECT
 public:
@@ -65,6 +66,7 @@ public:
     void requestCloseConnection() const;
 
     bool minBytesAvailable(int bytes) const;
+    qint64 bytesAvailable() const;
     qint64 read(char *data, qint64 maxSizeBytes) const;
     qint64 skip(qint64 maxSizeBytes) const;
 

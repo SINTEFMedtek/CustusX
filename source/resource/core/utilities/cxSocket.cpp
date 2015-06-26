@@ -84,6 +84,11 @@ bool Socket::minBytesAvailable(int bytes) const
     return mSocket->bytesAvailable() >= bytes;
 }
 
+qint64 Socket::bytesAvailable() const
+{
+    return mSocket->bytesAvailable();
+}
+
 qint64 Socket::read(char *data, qint64 maxSizeBytes) const
 {
     qint64 readBytes = mSocket->read(data, maxSizeBytes);

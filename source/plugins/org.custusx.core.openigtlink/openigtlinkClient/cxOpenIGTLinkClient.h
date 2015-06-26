@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "igtlStringMessage.h"
 #include "cxIGTLinkUSStatusMessage.h"
 
-#include "cxSocket.h"
+#include "cxSocketConnection.h"
 #include "cxTransform3D.h"
 #include "cxImage.h"
 #include "cxProbeData.h"
@@ -59,13 +59,13 @@ namespace cx {
 /**
  * @brief The OpenIGTLinkClient class handles incoming OpenIGTLink packages.
  *
- * To specify how a packages should be handled you can specify different kind of
+ * To specify how packages should be handled you can specify different kind of
  * supported dialects, which are a way to handle the way different OpenIGTLink
  * servers send packages.
  *
  */
 
-class org_custusx_core_openigtlink_EXPORT OpenIGTLinkClient : public QObject
+class org_custusx_core_openigtlink_EXPORT OpenIGTLinkClient : public SocketConnection
 {
     Q_OBJECT
 public:
@@ -76,18 +76,7 @@ public:
     QStringList getAvailableDialects() const;
     void setDialect(QString dialectname);
 
-    //void sendStringMessage(QString command);
-
-public slots:
-    void setIpAndPort(QString ip, int port=18944); //not threadsafe
-    void requestConnect();
-    void requestDisconnect();
-
 signals:
-    void connected();
-    void disconnected();
-    void error();
-
     void transform(QString devicename, Transform3D transform, double timestamp);
     void calibration(QString devicename, Transform3D calibration);
     void image(ImagePtr image);
@@ -96,29 +85,20 @@ signals:
     void usstatusmessage(IGTLinkUSStatusMessage::Pointer message);
 
 private slots:
-    void internalConnected();
-    void internalDisconnected();
-    void internalDataAvailable();
+    virtual void internalDataAvailable();
 
 private:
-    //void queryServer();
-    bool socketIsConnected();
-    bool enoughBytesAvailableOnSocket(int bytes) const;
     bool receiveHeader(const igtl::MessageHeader::Pointer header) const;
     bool receiveBody(const igtl::MessageHeader::Pointer header);
 
     template <typename T>
     bool receive(const igtl::MessageBase::Pointer header);
-    bool socketReceive(void *packPointer, int packSize) const;
     void checkCRC(int c) const;
 
     QMutex mMutex;
 
-    SocketPtr mSocket;
     igtl::MessageHeader::Pointer mHeader;
     bool mHeaderReceived;
-    QString mIp;
-    int mPort;
 
     DialectPtr mDialect;
     typedef std::map<QString, DialectPtr> DialectMap;

@@ -14,7 +14,7 @@ set(PLUGIN_SRCS
     streamerService/cxOpenIGTLinkStreamerService.cpp
     streamerService/cxOpenIGTLinkStreamer.cpp
 
-    openigtlinkClient/cxSocket.cpp
+#    openigtlinkClient/cxSocket.cpp
     openigtlinkClient/cxOpenIGTLinkClient.cpp
     openigtlinkClient/cxDialect.cpp
     openigtlinkClient/cxPlusDialect.cpp
@@ -34,7 +34,7 @@ set(PLUGIN_MOC_SRCS
     streamerService/cxOpenIGTLinkStreamerService.h
     streamerService/cxOpenIGTLinkStreamer.h
 
-    openigtlinkClient/cxSocket.h
+#    openigtlinkClient/cxSocket.h
     openigtlinkClient/cxOpenIGTLinkClient.h
     openigtlinkClient/cxDialect.h
     openigtlinkClient/cxPlusDialect.h

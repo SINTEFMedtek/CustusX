@@ -65,7 +65,7 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: Check that the plugin can connect a
     QThread mOpenIGTLinkThread;
     cx::OpenIGTLinkClient *client = new cx::OpenIGTLinkClient;
     client->setDialect("PlusServer");
-    client->setIpAndPort("10.218.140.127"); //this is done before client is moved to another thread
+    client->setIpAndPort("10.218.140.127", 18944); //this is done before client is moved to another thread
     client->moveToThread(&mOpenIGTLinkThread);
     QObject::connect(&mOpenIGTLinkThread, &QThread::finished, client, &QObject::deleteLater);
 
