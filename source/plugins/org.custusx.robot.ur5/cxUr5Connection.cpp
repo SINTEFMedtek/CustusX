@@ -47,6 +47,12 @@ Ur5Connection::Ur5Connection(QString address, int port)
     mPort = port;
 }
 
+void Ur5Connection::setAddress(QString address, int port)
+{
+    mIp = address;
+    mPort = port;
+}
+
 bool Ur5Connection::isConnectedToRobot()
 {
     return (mSocket && mSocket->isConnected());
@@ -54,6 +60,7 @@ bool Ur5Connection::isConnectedToRobot()
 
 bool Ur5Connection::sendMessage(QString message)
 {
+    message.append('\n');
     bool ok = this->sendData(message.toStdString().c_str(), message.size());
     if(!ok)
         return false;
@@ -63,7 +70,31 @@ bool Ur5Connection::sendMessage(QString message)
 
 bool Ur5Connection::waitForMessage()
 {
+    mSocket->waitForBytesWritten(3000);
     return mSocket->waitForReadyRead(5000);
+}
+
+void Ur5Connection::printMessage()
+{
+    std::cout << mSocket->bytesAvailable() << std::endl;
+    return;
+}
+
+bool Ur5Connection::tester()
+{
+    if(!this->socketIsConnected())
+        return false;
+
+    qint64 maxAvailableBytes = mSocket->bytesAvailable();    // How many bytes?
+
+    char* inMessage = new char [maxAvailableBytes];
+    //if(!this->socketReceive(inMessage, maxAvailableBytes))
+    //    return true;
+
+    std::cout << "Number of bytes: " << mSocket->bytesAvailable() << std::endl;
+    std::cout << "SocketConnection incoming message: " << inMessage << std::endl;
+    return true;
+    //TODO: Do something with received message
 }
 
 } // cx

@@ -54,9 +54,17 @@ class org_custusx_robot_ur5_EXPORT Ur5Connection : public SocketConnection
 
 public:
     Ur5Connection(QString address, int port);
+
+    void setAddress(QString address, int port);
+
     bool isConnectedToRobot();
     bool sendMessage(QString message);
     bool waitForMessage();
+
+    void printMessage();
+    bool tester();
+
+private:
 
 };
 

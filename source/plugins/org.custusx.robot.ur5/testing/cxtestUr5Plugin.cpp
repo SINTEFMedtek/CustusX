@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "catch.hpp"
 
+#include <iostream>
 #include "cxtestUr5TestFixture.h"
 
 namespace cxtest
@@ -48,15 +49,19 @@ TEST_CASE("Ur5Plugin: Send message to robot and receive message from robot", "[m
 	Ur5TestFixture fixture;
 	REQUIRE(fixture.connection.isConnectedToRobot());
 
-	QString message("set_tcp(p[0,0,0,0,0,0])");
-	REQUIRE(fixture.connection.sendMessage(message));
+    QString message("set_tcp(p[0,0,0,0,0,0])");
+    //QString message("textmsg(\"Test1\")");
+    REQUIRE(fixture.connection.sendMessage(message));
 
-	message = "get_joint_positions()";
-	REQUIRE(fixture.connection.sendMessage(message));
-	REQUIRE(fixture.connection.waitForMessage());
+    //QString message = "powerdown()\n";
+    //message = "powerdown()";
+    //REQUIRE(fixture.connection.sendMessage(message));
+    //REQUIRE(fixture.connection.tester());
+    //REQUIRE(fixture.connection.waitForMessage());
 
-	message = "cleanup()";
-	REQUIRE(fixture.connection.sendMessage(message));
+
+    //REQUIRE(fixture.connection.sendMessage(message));
+    //REQUIRE(fixture.connection.waitForMessage());
 
 	fixture.connection.requestDisconnect();
 
