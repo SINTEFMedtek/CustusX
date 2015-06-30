@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxUr5Connection.h"
 #include <QTcpSocket>
 #include <iostream>
+#include <sstream>
 
 #include "cxLogger.h"
 #include "cxUtilHelpers.h"
@@ -74,27 +75,42 @@ bool Ur5Connection::waitForMessage()
     return mSocket->waitForReadyRead(5000);
 }
 
-void Ur5Connection::printMessage()
-{
-    std::cout << mSocket->bytesAvailable() << std::endl;
-    return;
-}
-
-bool Ur5Connection::tester()
+void Ur5Connection::internalDataAvailable()
 {
     if(!this->socketIsConnected())
-        return false;
+        return;
 
-    qint64 maxAvailableBytes = mSocket->bytesAvailable();    // How many bytes?
+    int headerSize = 6;
 
-    char* inMessage = new char [maxAvailableBytes];
-    //if(!this->socketReceive(inMessage, maxAvailableBytes))
-    //    return true;
+    // How many bytes?
+    qint64 maxAvailableBytes = mSocket->bytesAvailable();
 
-    std::cout << "Number of bytes: " << mSocket->bytesAvailable() << std::endl;
-    std::cout << "SocketConnection incoming message: " << inMessage << std::endl;
-    return true;
+    CX_LOG_INFO() << "SocketConnection incoming message: " << maxAvailableBytes << " bytes";
+
+    if(maxAvailableBytes<headerSize)
+        return;
+
+    //char* inMessage = new char [maxAvailableBytes];
+    unsigned char* header = new unsigned char [headerSize];
+    if(!this->socketReceive(header, headerSize))
+        return;
+    CX_LOG_INFO() << "SocketConnection incoming message 1 char: " << (int)(header[0]) << " " << (int)header[1] << " " << (int)header[2] << " " << (int)header[3] << " " << (int)header[4] << " " << (int)header[5];
+
+    std::stringstream tmpStream;
+    tmpStream << header;
+
+    bool ok = true;
+    int msgType;
+    tmpStream >> msgType;
+
+    if(!ok)
+        CX_LOG_INFO() << "Conversion failed";
+    else
+        CX_LOG_INFO() << "SocketConnection incoming message: " << msgType;
+
+
     //TODO: Do something with received message
 }
+
 
 } // cx

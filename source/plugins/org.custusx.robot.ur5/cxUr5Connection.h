@@ -61,8 +61,8 @@ public:
     bool sendMessage(QString message);
     bool waitForMessage();
 
-    void printMessage();
-    bool tester();
+private slots:
+    virtual void internalDataAvailable();
 
 private:
 

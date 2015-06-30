@@ -49,19 +49,21 @@ TEST_CASE("Ur5Plugin: Send message to robot and receive message from robot", "[m
 	Ur5TestFixture fixture;
 	REQUIRE(fixture.connection.isConnectedToRobot());
 
-    QString message("set_tcp(p[0,0,0,0,0,0])");
+    //QString message("set_tcp(p[0,0,0,0,0,0])");
     //QString message("textmsg(\"Test1\")");
-    REQUIRE(fixture.connection.sendMessage(message));
 
-    //QString message = "powerdown()\n";
-    //message = "powerdown()";
-    //REQUIRE(fixture.connection.sendMessage(message));
+
+    QString message("get_joint_positions()");
+    REQUIRE(fixture.connection.sendMessage(message));
+    REQUIRE(fixture.connection.waitForMessage());
+
+
     //REQUIRE(fixture.connection.tester());
     //REQUIRE(fixture.connection.waitForMessage());
 
 
     //REQUIRE(fixture.connection.sendMessage(message));
-    //REQUIRE(fixture.connection.waitForMessage());
+
 
 	fixture.connection.requestDisconnect();
 
