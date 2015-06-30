@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "cxGeometricRep.h"
+#include "cxLogger.h"
+
 
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
@@ -39,6 +41,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkActor.h>
 #include <vtkRenderer.h>
 #include <vtkMatrix4x4.h>
+#include <vtkGlyph3D.h>
+#include <vtkArrowSource.h>
+#include <vtkPointData.h>
+
+
 
 #include "cxMesh.h"
 #include "cxView.h"
@@ -51,7 +58,8 @@ namespace cx
 GeometricRep::GeometricRep() :
 	RepImpl()
 {
-	mMapper = vtkPolyDataMapperPtr::New();
+    mMapper = vtkSmartPointer<vtkGlyph3DMapper>::New();
+
 	mProperty = vtkPropertyPtr::New();
 	mActor = vtkActorPtr::New();
 	mActor->SetMapper(mMapper);
@@ -110,8 +118,42 @@ void GeometricRep::meshChangedSlot()
 //	std::cout << "GeometricRep::meshChangedSlot()" << std::endl;
 //	mMesh->connectToRep(mSelf);
 
-	mMapper->SetInputData(mMesh->getVtkPolyData());
-	mMapper->ScalarVisibilityOff();//Don't use the LUT from the VtkPolyData
+    //mMapper->SetInputData(mMesh->getVtkPolyData());
+    //mMapper->ScalarVisibilityOff();//Don't use the LUT from the VtkPolyData
+
+
+     vtkSmartPointer<vtkPolyData> image=mMesh->getVtkPolyData();
+  //   report(image->GetPointData()->GetScalars()->GetName());
+     image->GetPointData()->SetActiveVectors("ImageScalars");
+
+
+
+
+
+//    // Setup the arrows
+      vtkSmartPointer<vtkArrowSource> arrowSource = vtkSmartPointer<vtkArrowSource>::New();
+      //arrowSource->Update();
+
+
+//      vtkSmartPointer<vtkGlyph3D> glyphFilter = vtkSmartPointer<vtkGlyph3D>::New();
+//      glyphFilter->SetSourceConnection(arrowSource->GetOutputPort());
+//      glyphFilter->OrientOn();
+//      glyphFilter->SetVectorModeToUseVector();
+
+//      glyphFilter->SetInputData()image;
+
+ //     glyphFilter->Update();
+
+
+
+    mMapper->SetSourceConnection(arrowSource->GetOutputPort());
+    // Visualize
+    mMapper->SetInputData(image);
+    mMapper->SetOrientationArray("Flow direction");
+    mMapper->Update();
+
+/////////////////////////////////////////
+
 
 	//Set mesh color
 	mActor->GetProperty()->SetColor(mMesh->getColor().redF(), mMesh->getColor().greenF(), mMesh->getColor().blueF());

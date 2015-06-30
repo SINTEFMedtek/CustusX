@@ -39,6 +39,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkForwardDeclarations.h"
 #include "cxRepImpl.h"
 #include "cxVector3D.h"
+#include <vtkGlyph3DMapper.h>
+
 
 namespace cx
 {
@@ -73,7 +75,7 @@ protected:
 	virtual void addRepActorsToViewRenderer(ViewPtr view);
 	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
 
-	vtkPolyDataMapperPtr mMapper;
+    vtkSmartPointer<vtkGlyph3DMapper> mMapper;
 	vtkPropertyPtr mProperty;
 	vtkActorPtr mActor;
 
