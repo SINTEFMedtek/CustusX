@@ -59,6 +59,9 @@ GeometricRep::GeometricRep() :
 	RepImpl()
 {
     mMapper = vtkSmartPointer<vtkGlyph3DMapper>::New();
+   vtkSmartPointer<vtkArrowSource> arrowSource = vtkSmartPointer<vtkArrowSource>::New();
+   //arrowSource->Update();
+   mMapper->SetSourceConnection(arrowSource->GetOutputPort());
 
 	mProperty = vtkPropertyPtr::New();
 	mActor = vtkActorPtr::New();
@@ -121,39 +124,11 @@ void GeometricRep::meshChangedSlot()
     //mMapper->SetInputData(mMesh->getVtkPolyData());
     //mMapper->ScalarVisibilityOff();//Don't use the LUT from the VtkPolyData
 
-
-     vtkSmartPointer<vtkPolyData> image=mMesh->getVtkPolyData();
-  //   report(image->GetPointData()->GetScalars()->GetName());
-     image->GetPointData()->SetActiveVectors("ImageScalars");
-
-
-
-
-
-//    // Setup the arrows
-      vtkSmartPointer<vtkArrowSource> arrowSource = vtkSmartPointer<vtkArrowSource>::New();
-      //arrowSource->Update();
-
-
-//      vtkSmartPointer<vtkGlyph3D> glyphFilter = vtkSmartPointer<vtkGlyph3D>::New();
-//      glyphFilter->SetSourceConnection(arrowSource->GetOutputPort());
-//      glyphFilter->OrientOn();
-//      glyphFilter->SetVectorModeToUseVector();
-
-//      glyphFilter->SetInputData()image;
-
- //     glyphFilter->Update();
-
-
-
-    mMapper->SetSourceConnection(arrowSource->GetOutputPort());
+//     mMesh->getVtkPolyData()->GetPointData()->SetActiveVectors("ImageScalars");
     // Visualize
-    mMapper->SetInputData(image);
+    mMapper->SetInputData(mMesh->getVtkPolyData());
     mMapper->SetOrientationArray("Flow direction");
     mMapper->Update();
-
-/////////////////////////////////////////
-
 
 	//Set mesh color
 	mActor->GetProperty()->SetColor(mMesh->getColor().redF(), mMesh->getColor().greenF(), mMesh->getColor().blueF());
