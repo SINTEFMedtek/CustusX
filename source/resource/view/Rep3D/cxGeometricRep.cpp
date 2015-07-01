@@ -130,8 +130,15 @@ void GeometricRep::meshChangedSlot()
     mMapper->SetOrientationArray("Flow direction");
     mMapper->Update();
 
+
+    mMapper->SetScalarVisibility(1);
+    mMapper->SelectColorArray("Vessel velocity");
+    mMapper->SetUseLookupTableScalarRange(1);
+    mMapper->SetScalarMode(VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
+
+
 	//Set mesh color
-	mActor->GetProperty()->SetColor(mMesh->getColor().redF(), mMesh->getColor().greenF(), mMesh->getColor().blueF());
+    //mActor->GetProperty()->SetColor(mMesh->getColor().redF(), mMesh->getColor().greenF(), mMesh->getColor().blueF());
 	//Set mesh opacity
 	mActor->GetProperty()->SetOpacity(mMesh->getColor().alphaF());
 
