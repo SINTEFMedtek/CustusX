@@ -11,11 +11,11 @@ modification, are permitted provided that the following conditions are met:
    this list of conditions and the following disclaimer.
 
 2. Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
+   this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
 
 3. Neither the name of the copyright holder nor the names of its contributors 
-   may be used to endorse or promote products derived from this software 
+   may be used to endorse or promote products derived from this software
    without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
@@ -36,16 +36,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include <vtkPolyData.h>
+#include <vtkPointData.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 #include <vtkActor.h>
 #include <vtkRenderer.h>
 #include <vtkMatrix4x4.h>
-#include <vtkGlyph3D.h>
 #include <vtkArrowSource.h>
-#include <vtkPointData.h>
-
-
 
 #include "cxMesh.h"
 #include "cxView.h"
@@ -56,113 +53,254 @@ namespace cx
 {
 
 GeometricRep::GeometricRep() :
-	RepImpl()
+    RepImpl()
 {
-    mMapper = vtkSmartPointer<vtkGlyph3DMapper>::New();
-   vtkSmartPointer<vtkArrowSource> arrowSource = vtkSmartPointer<vtkArrowSource>::New();
-   //arrowSource->Update();
-   mMapper->SetSourceConnection(arrowSource->GetOutputPort());
+    mGraphicalPolyDataPtr.reset(new GraphicalPolyData());
+    mGraphicalGlyph3DDataPtr.reset(new GraphicalGlyph3DData());
 
-	mProperty = vtkPropertyPtr::New();
-	mActor = vtkActorPtr::New();
-	mActor->SetMapper(mMapper);
-	mActor->SetProperty(mProperty);
-
-	mProperty->SetPointSize(2);
 }
 GeometricRep::~GeometricRep()
 {
 }
 GeometricRepPtr GeometricRep::New(const QString& uid)
 {
-	return wrap_new(new GeometricRep(), uid);
+    return wrap_new(new GeometricRep(), uid);
 }
 
 void GeometricRep::addRepActorsToViewRenderer(ViewPtr view)
 {
-	view->getRenderer()->AddActor(mActor);
+    mGraphicalPolyDataPtr->setRenderer(view->getRenderer());
+    mGraphicalGlyph3DDataPtr->setRenderer(view->getRenderer());
 }
 
 void GeometricRep::removeRepActorsFromViewRenderer(ViewPtr view)
 {
-	view->getRenderer()->RemoveActor(mActor);
+    mGraphicalPolyDataPtr->setRenderer(NULL);
+    mGraphicalGlyph3DDataPtr->setRenderer(NULL);
 }
 
 void GeometricRep::setMesh(MeshPtr mesh)
 {
-	if (mesh == mMesh)
-		return;
-	if (mMesh)
-	{
-		disconnect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
-		disconnect(mMesh.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
-	}
-	mMesh = mesh;
-	if (mMesh)
-	{
-		connect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
-		connect(mMesh.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
-		this->meshChangedSlot();
-		this->transformChangedSlot();
-	}
+    if (mesh == mMesh)
+        return;
+    if (mMesh)
+    {
+        disconnect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
+        disconnect(mMesh.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
+    }
+    mMesh = mesh;
+    if (mMesh)
+    {
+        connect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
+        connect(mMesh.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
+        this->meshChangedSlot();
+        this->transformChangedSlot();
+    }
 }
 
 MeshPtr GeometricRep::getMesh()
 {
-	return mMesh;
+    return mMesh;
 }
 bool GeometricRep::hasMesh(MeshPtr mesh) const
 {
-	return (mMesh == mesh);
+    return (mMesh == mesh);
 }
 
 void GeometricRep::meshChangedSlot()
 {
-//	std::cout << "GeometricRep::meshChangedSlot()" << std::endl;
-//	mMesh->connectToRep(mSelf);
+    //	std::cout << "GeometricRep::meshChangedSlot()" << std::endl;
+    //	mMesh->connectToRep(mSelf);
 
-    //mMapper->SetInputData(mMesh->getVtkPolyData());
-    //mMapper->ScalarVisibilityOff();//Don't use the LUT from the VtkPolyData
+    //if glyph and showGlyoh:
+    //    mMapper->SetOrientationArray("Flow direction"); //mMesh.getOrientationArray()
+    //    mMapper->SelectColorArray("Vessel velocity");//mMesh.getColorArray()
+    //    mMapper->SetLookupTable(); //mMesh.getLookupTable()
 
-//     mMesh->getVtkPolyData()->GetPointData()->SetActiveVectors("ImageScalars");
-    // Visualize
-    mMapper->SetInputData(mMesh->getVtkPolyData());
-    mMapper->SetOrientationArray("Flow direction");
-    mMapper->Update();
+    mGraphicalGlyph3DDataPtr->updateGlyph(mMesh->getVtkPolyData(),"Flow direction","Vessel velocity");
 
 
-    mMapper->SetScalarVisibility(1);
-    mMapper->SelectColorArray("Vessel velocity");
-    mMapper->SetUseLookupTableScalarRange(1);
-    mMapper->SetScalarMode(VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
+    mGraphicalPolyDataPtr->setData(mMesh->getVtkPolyData());
+    mGraphicalPolyDataPtr->setIsWireFrame(mMesh->getIsWireframe());
+    mGraphicalPolyDataPtr->scalarVisibilityOff();//Don't use the LUT from the VtkPolyData
 
+    //Set mesh color
+    mGraphicalPolyDataPtr->setColor(mMesh->getColor().redF(), mMesh->getColor().greenF(), mMesh->getColor().blueF());
+    //Set mesh opacity
+    mGraphicalPolyDataPtr->setOpacity(mMesh->getColor().alphaF());
 
-	//Set mesh color
-    //mActor->GetProperty()->SetColor(mMesh->getColor().redF(), mMesh->getColor().greenF(), mMesh->getColor().blueF());
-	//Set mesh opacity
-	mActor->GetProperty()->SetOpacity(mMesh->getColor().alphaF());
+    mGraphicalPolyDataPtr->setRepresentation();
 
-	if (mMesh->getIsWireframe())
-		mActor->GetProperty()->SetRepresentationToWireframe();
-	else
-		mActor->GetProperty()->SetRepresentationToSurface();
-
-	//Set backface and frontface culling
-	mActor->GetProperty()->SetBackfaceCulling(mMesh->getBackfaceCulling());
-	mActor->GetProperty()->SetFrontfaceCulling(mMesh->getFrontfaceCulling());
+    //Set backface and frontface culling
+    mGraphicalPolyDataPtr->setBackfaceCulling(mMesh->getBackfaceCulling());
+    mGraphicalPolyDataPtr->setFrontfaceCulling(mMesh->getFrontfaceCulling());
 }
 
 /**called when transform is changed
  * reset it in the prop.*/
 void GeometricRep::transformChangedSlot()
 {
-	if (!mMesh)
-	{
-		return;
-	}
+    if (!mMesh)
+    {
+        return;
+    }
 
-	mActor->SetUserMatrix(mMesh->get_rMd().getVtkMatrix());
+    mGraphicalPolyDataPtr->setUserMatrix(mMesh->get_rMd().getVtkMatrix());
+    mGraphicalGlyph3DDataPtr->setUserMatrix(mMesh->get_rMd().getVtkMatrix());
 }
+
+
+//---------------------------------------------------------
+
+GraphicalMeshBase::GraphicalMeshBase()
+{
+    mProperty = vtkPropertyPtr::New();
+    mActor = vtkActorPtr::New();
+    mActor->SetProperty(mProperty);
+    mProperty->SetPointSize(2);
+}
+
+GraphicalMeshBase::~GraphicalMeshBase()
+{
+    this->setRenderer(NULL);
+}
+
+
+void GraphicalMeshBase::setRenderer(vtkRendererPtr renderer)
+{
+    if (mRenderer)
+        mRenderer->RemoveActor(mActor);
+
+    mRenderer = renderer;
+
+    if (mRenderer)
+        mRenderer->AddActor(mActor);
+}
+
+
+void GraphicalMeshBase::setBackfaceCulling(bool val)
+{
+    mActor->GetProperty()->SetBackfaceCulling(val);
+}
+
+void GraphicalMeshBase::setFrontfaceCulling(bool val)
+{
+    mActor->GetProperty()->SetFrontfaceCulling(val);
+}
+
+void GraphicalMeshBase::setRepresentation()
+{
+    mActor->GetProperty()->SetRepresentationToSurface();
+}
+
+void GraphicalMeshBase::setColor(double red, double green, double blue)
+{
+    mActor->GetProperty()->SetColor(red, green, blue);
+}
+
+void GraphicalMeshBase::setOpacity(double val)
+{
+    mActor->GetProperty()->SetOpacity(val);
+}
+
+
+void GraphicalMeshBase::setUserMatrix(vtkMatrix4x4 *matrix)
+{
+    mActor->SetUserMatrix(matrix);
+}
+
+vtkActorPtr GraphicalMeshBase::getActor()
+{
+    return mActor;
+}
+
+vtkPolyDataPtr GraphicalMeshBase::getPolyData()
+{
+    return mData;
+}
+
+
+//---------------------------------------------------------
+
+GraphicalPolyData::GraphicalPolyData() :
+    GraphicalMeshBase()
+{
+    mMapper =  vtkPolyDataMapperPtr::New();
+    mActor->SetMapper(mMapper);
+
+    mIsWireFrame = false;
+}
+
+
+void GraphicalPolyData::setIsWireFrame(bool val)
+{
+    mIsWireFrame = val;
+}
+
+
+void GraphicalPolyData::setRepresentation()
+{
+    if (mIsWireFrame)
+        mActor->GetProperty()->SetRepresentationToWireframe();
+    else
+        mActor->GetProperty()->SetRepresentationToSurface();
+}
+
+void GraphicalPolyData::setData(vtkPolyDataPtr data)
+{
+    mData = data;
+    if (data)
+        mMapper->SetInputData(mData);
+}
+
+void GraphicalPolyData::scalarVisibilityOff()
+{
+    mMapper->ScalarVisibilityOff();//Don't use the LUT from the VtkPolyData
+}
+
+
+
+
+//---------------------------------------------------------
+
+GraphicalGlyph3DData::GraphicalGlyph3DData() :
+    GraphicalMeshBase()
+{
+    mMapper = vtkSmartPointer<vtkGlyph3DMapper>::New();
+    vtkSmartPointer<vtkArrowSource> arrowSource = vtkSmartPointer<vtkArrowSource>::New();
+    mMapper->SetSourceConnection(arrowSource->GetOutputPort());
+
+    mActor->SetMapper(mMapper);
+}
+
+
+void GraphicalGlyph3DData::updateGlyph(vtkPolyDataPtr data, const char * orientationArray, const char * colorArray)
+{
+    mData = data;
+    if (!data)
+        return;
+
+
+    if(mData->GetPointData()->GetNumberOfArrays()>0)
+    {
+        report("Found field data");
+        report(QString(mData->GetPointData()->GetArrayName(0)));
+        int test = mData->GetPointData()->GetArray(0)->GetNumberOfComponents();
+        report(QString(test));
+        mMapper->SetInputData(mData);
+        mMapper->SetOrientationArray(orientationArray);
+        mMapper->SelectColorArray(colorArray);
+        mMapper->SetScalarVisibility(1);
+        mMapper->SetUseLookupTableScalarRange(1);
+        mMapper->SetScalarMode(VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
+        // mMapper->SetLookupTable(); //mMesh.getLookupTable()
+    }else{
+        report("Found no field data");
+        report(QString(mData->GetFieldData()->GetNumberOfArrays()));
+    }
+}
+
+
 
 //---------------------------------------------------------
 }

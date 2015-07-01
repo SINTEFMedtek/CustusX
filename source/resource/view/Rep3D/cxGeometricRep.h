@@ -47,6 +47,68 @@ namespace cx
 typedef boost::shared_ptr<class Mesh> MeshPtr;
 
 typedef boost::shared_ptr<class GeometricRep> GeometricRepPtr;
+typedef vtkSmartPointer<class vtkGlyph3DMapper> vtkGlyph3DMapperPtr;
+
+
+class cxResourceVisualization_EXPORT GraphicalMeshBase
+{
+public:
+    GraphicalMeshBase();
+    ~GraphicalMeshBase();
+
+    void setRenderer(vtkRendererPtr renderer = vtkRendererPtr());
+    void setBackfaceCulling(bool val);
+    void setFrontfaceCulling(bool val);
+    void setRepresentation();
+    void setColor(double red, double green, double blue);
+    void setOpacity(double val);
+    void setUserMatrix(vtkMatrix4x4 *matrix);
+
+    vtkActorPtr getActor();
+    vtkPolyDataPtr getPolyData();
+
+protected:
+    vtkPropertyPtr mProperty;
+    vtkActorPtr mActor;
+    vtkPolyDataPtr mData;
+    vtkRendererPtr mRenderer;
+};
+typedef boost::shared_ptr<GraphicalMeshBase> GraphicalMeshBasePtr;
+
+
+
+
+class cxResourceVisualization_EXPORT GraphicalPolyData : public GraphicalMeshBase
+{
+public:
+    GraphicalPolyData();
+
+    void setIsWireFrame(bool val);
+    void setRepresentation();
+    void setData(vtkPolyDataPtr data);
+    void scalarVisibilityOff();
+
+private:
+    vtkPolyDataMapperPtr mMapper;
+    bool mIsWireFrame;
+
+};
+typedef boost::shared_ptr<GraphicalPolyData> GraphicalPolyDataPtr;
+
+
+class cxResourceVisualization_EXPORT GraphicalGlyph3DData : public GraphicalMeshBase
+{
+public:
+    GraphicalGlyph3DData();
+
+     void updateGlyph(vtkPolyDataPtr data, const char * orientationArray, const char * colorArray);
+
+private:
+    vtkGlyph3DMapperPtr mMapper;
+};
+typedef boost::shared_ptr<GraphicalGlyph3DData> GraphicalGlyph3DDataPtr;
+
+
 
 /** \brief Display one Mesh in 3D.
  *
@@ -62,7 +124,6 @@ class cxResourceVisualization_EXPORT GeometricRep : public RepImpl
 	Q_OBJECT
 public:
 	virtual ~GeometricRep();
-
 	static GeometricRepPtr New(const QString& uid="");
 
 	virtual QString getType() const { return "GeometricRep"; } ///< gives this reps type
@@ -75,9 +136,8 @@ protected:
 	virtual void addRepActorsToViewRenderer(ViewPtr view);
 	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
 
-    vtkSmartPointer<vtkGlyph3DMapper> mMapper;
-	vtkPropertyPtr mProperty;
-	vtkActorPtr mActor;
+    GraphicalPolyDataPtr mGraphicalPolyDataPtr;
+    GraphicalGlyph3DDataPtr mGraphicalGlyph3DDataPtr;
 
 	MeshPtr mMesh;
 
@@ -85,6 +145,11 @@ private slots:
 	void meshChangedSlot();
 	void transformChangedSlot();
 };
+
+
+
+
+
 
 } // namespace cx
 
