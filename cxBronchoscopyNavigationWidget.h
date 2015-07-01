@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationBaseWidget.h"
 #include "cxResourceWidgetsExport.h"
 #include "cxBaseWidget.h"
-#include "cxSelectDataStringDataAdapter.h"
+#include "cxSelectDataStringProperty.h"
 #include "cxMesh.h"
 #include "cxXmlOptionItem.h"
 
@@ -51,7 +51,6 @@ namespace cx
 {
 
 typedef boost::shared_ptr<class TrackingSystemBronchoscopyService> TrackingSystemBronchoscopyServicePtr;
-typedef boost::shared_ptr<class SelectMeshStringDataAdapter> SelectMeshStringDataAdapterPtr;
 typedef boost::shared_ptr<class BronchoscopePositionProjection> BronchoscopePositionProjectionPtr;
 
 /**
@@ -78,9 +77,9 @@ private:
 	QString defaultWhatsThis() const;
 	void useAdvancedCenterlineProjection(QDomElement root);
 	QVBoxLayout*  mVerticalLayout;
-	BoolDataAdapterXmlPtr mUseAdvancedCenterlineProjection;
+    BoolPropertyPtr mUseAdvancedCenterlineProjection;
 
-	SelectMeshStringDataAdapterPtr mSelectMeshWidget;
+    StringPropertySelectMeshPtr mSelectMeshWidget;
 	QPushButton* mProcessCenterlineButton;
 	QPushButton* mEnableButton;
 	QPushButton* mDisableButton;

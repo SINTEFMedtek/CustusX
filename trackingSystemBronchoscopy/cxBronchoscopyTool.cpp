@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxBronchoscopyTool.h"
 #include "cxTypeConversions.h"
 #include "cxBronchoscopePositionProjection.h"
-#include "cxDoubleDataAdapterXml.h"
+#include "cxDoubleProperty.h"
 
 namespace cx
 {

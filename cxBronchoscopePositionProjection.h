@@ -22,7 +22,7 @@ public:
 	virtual ~BronchoscopePositionProjection();
 	void setCenterline(vtkPolyDataPtr centerline, Transform3D prMd, bool useAdvancedCenterlineProjection);
 	void createMaxDistanceToCenterlineOption(QDomElement root);
-	DoubleDataAdapterXmlPtr getMaxDistanceToCenterlineOption();
+    DoublePropertyPtr getMaxDistanceToCenterlineOption();
     Eigen::MatrixXd getCenterlinePositions(vtkPolyDataPtr centerline, Transform3D prMd);
 	void processCenterline(vtkPolyDataPtr centerline, Transform3D prMd);
 	Transform3D findClosestPoint(Transform3D prMt, double maxDistance);
@@ -37,7 +37,7 @@ public:
 private:
 	bool isPreviousProjectedPointSet;
 	Eigen::MatrixXd mCLpoints;
-	DoubleDataAdapterXmlPtr mMaxDistanceToCenterline;
+    DoublePropertyPtr mMaxDistanceToCenterline;
 	BranchListPtr mBranchListPtr;
 	BranchPtr mProjectedBranchPtr;
 	int mProjectedIndex;
