@@ -92,12 +92,10 @@ public:
 	bool getIsWireframe() const;///< true=wireframe, false=surface
 	vtkPolyDataPtr getTransformedPolyData(Transform3D tranform);///< Create a new transformed polydata
 	bool isFiberBundle() const;
-    void setShowGlyph(bool val);
     bool showGlyph();
+    bool hasGlyph();
     const char * getOrientationArray();
-    void setOrientationArray(const char * orientationArray);
     const char * getColorArray();
-    void setColorArray(const char * colorArray);
 
 
 	virtual void save(const QString &basePath);
@@ -106,6 +104,9 @@ signals:
 public slots:
 	void setBackfaceCullingSlot(bool backfaceCulling);///< Set backface culling on/off in mesh visualization
 	void setFrontfaceCullingSlot(bool backfaceCulling);///< Set frontface culling on/off in mesh visualization
+    void setShowGlyph(bool val);
+    void setOrientationArray(const char * orientationArray);
+    void setColorArray(const char * colorArray);
 
 private:
 	vtkPolyDataPtr mVtkPolyData;

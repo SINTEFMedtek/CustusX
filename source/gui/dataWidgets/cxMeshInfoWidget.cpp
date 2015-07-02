@@ -88,6 +88,7 @@ void MeshInfoWidget::meshSelectedSlot()
 	{
 		disconnect(mBackfaceCullingCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setBackfaceCullingSlot(bool)));
 		disconnect(mFrontfaceCullingCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setFrontfaceCullingSlot(bool)));
+        disconnect(mGlyphVisualizationCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setShowGlyph(bool)));
 		disconnect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
 	}
 
@@ -103,9 +104,15 @@ void MeshInfoWidget::meshSelectedSlot()
 
 	mBackfaceCullingCheckBox->setChecked(mMesh->getBackfaceCulling());
 	mFrontfaceCullingCheckBox->setChecked(mMesh->getFrontfaceCulling());
+    mGlyphVisualizationCheckBox->setChecked(mMesh->showGlyph());
+    mGlyphVisualizationCheckBox->setDisabled(!mMesh->hasGlyph());
+
 	connect(mBackfaceCullingCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setBackfaceCullingSlot(bool)));
 	connect(mFrontfaceCullingCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setFrontfaceCullingSlot(bool)));
-	connect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
+    connect(mGlyphVisualizationCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setShowGlyph(bool)));
+
+    connect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
+
 
 	mParentFrameAdapter->setData(mMesh);
 	mNameAdapter->setData(mMesh);
@@ -131,6 +138,8 @@ void MeshInfoWidget::meshChangedSlot()
 {
 	mBackfaceCullingCheckBox->setChecked(mMesh->getBackfaceCulling());
 	mFrontfaceCullingCheckBox->setChecked(mMesh->getFrontfaceCulling());
+    mGlyphVisualizationCheckBox->setChecked(mMesh->showGlyph());
+    mGlyphVisualizationCheckBox->setDisabled(!mMesh->hasGlyph());
 	mColorAdapter->setValue(mMesh->getColor());
 }
 
@@ -178,7 +187,11 @@ void MeshInfoWidget::addWidgets(PatientModelServicePtr patientModelService)
 	mFrontfaceCullingCheckBox = new QCheckBox("Frontface culling");
 	mFrontfaceCullingCheckBox->setToolTip("Set frontface culling on. Can be used to make transparent meshes work from inside the meshes.");
 	optionsLayout->addWidget(mFrontfaceCullingCheckBox);
-	optionsLayout->addWidget(sscCreateDataWidget(this, mColorAdapter));
+    mGlyphVisualizationCheckBox = new QCheckBox("Glyph visualization");
+    mGlyphVisualizationCheckBox->setToolTip("Enable glyph visualization");
+    mGlyphVisualizationCheckBox->setDisabled(true);
+    optionsLayout->addWidget(mGlyphVisualizationCheckBox);
+    optionsLayout->addWidget(sscCreateDataWidget(this, mColorAdapter));
 	optionsLayout->addStretch(1);
 
 	int gridLayoutRow = 1;

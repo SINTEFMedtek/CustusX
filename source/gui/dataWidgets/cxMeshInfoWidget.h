@@ -86,6 +86,8 @@ private:
   ColorPropertyPtr mColorAdapter;
   QCheckBox* mBackfaceCullingCheckBox;
   QCheckBox* mFrontfaceCullingCheckBox;
+  QCheckBox* mGlyphVisualizationCheckBox;
+
   PatientModelServicePtr mPatientModelService;
   VisualizationServicePtr mVisualizationService;
   

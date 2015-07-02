@@ -250,7 +250,13 @@ bool Mesh::getFrontfaceCulling()
 
 void Mesh::setShowGlyph(bool val)
 {
-    mShowGlyph = mHasGlyph & val;
+    mShowGlyph = val;
+    emit meshChanged();
+}
+
+bool Mesh::hasGlyph()
+{
+    return mHasGlyph;
 }
 
 bool Mesh::showGlyph()
