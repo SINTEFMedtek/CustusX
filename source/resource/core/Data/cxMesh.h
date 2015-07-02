@@ -92,6 +92,13 @@ public:
 	bool getIsWireframe() const;///< true=wireframe, false=surface
 	vtkPolyDataPtr getTransformedPolyData(Transform3D tranform);///< Create a new transformed polydata
 	bool isFiberBundle() const;
+    void setShowGlyph(bool val);
+    bool showGlyph();
+    const char * getOrientationArray();
+    void setOrientationArray(const char * orientationArray);
+    const char * getColorArray();
+    void setColorArray(const char * colorArray);
+
 
 	virtual void save(const QString &basePath);
 signals:
@@ -106,6 +113,10 @@ private:
 	bool mWireframe;
 	bool mBackfaceCulling; ///< If backface culling is on, polygons facing outwards are not drawn.
 	bool mFrontfaceCulling; ///< If frontface culling is on, polygons facing inwards are not drawn.
+    bool mHasGlyph;
+    bool mShowGlyph;
+    std::string mOrientationArray;
+    std::string mColorArray;
 };
 
 typedef boost::shared_ptr<Mesh> MeshPtr;

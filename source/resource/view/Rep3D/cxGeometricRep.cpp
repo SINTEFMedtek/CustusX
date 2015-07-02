@@ -113,11 +113,14 @@ void GeometricRep::meshChangedSlot()
     //	mMesh->connectToRep(mSelf);
 
     //if glyph and showGlyoh:
-    //    mMapper->SetOrientationArray("Flow direction"); //mMesh.getOrientationArray()
+    //    mMapper->SetOrientationArray("Flow direction"); //
     //    mMapper->SelectColorArray("Vessel velocity");//mMesh.getColorArray()
     //    mMapper->SetLookupTable(); //mMesh.getLookupTable()
 
-    mGraphicalGlyph3DDataPtr->updateGlyph(mMesh->getVtkPolyData(),"Flow direction","Vessel velocity");
+    if(mMesh->showGlyph())
+    {
+        mGraphicalGlyph3DDataPtr->updateGlyph(mMesh->getVtkPolyData(),mMesh->getOrientationArray(),mMesh->getColorArray());
+    }
 
 
     mGraphicalPolyDataPtr->setData(mMesh->getVtkPolyData());
@@ -280,24 +283,14 @@ void GraphicalGlyph3DData::updateGlyph(vtkPolyDataPtr data, const char * orienta
     if (!data)
         return;
 
+    mMapper->SetInputData(mData);
+    mMapper->SetOrientationArray(orientationArray);
+    mMapper->SelectColorArray(colorArray);
+    mMapper->SetScalarVisibility(1);
+    mMapper->SetUseLookupTableScalarRange(1);
+    mMapper->SetScalarMode(VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
+    // mMapper->SetLookupTable(); //mMesh.getLookupTable()
 
-    if(mData->GetPointData()->GetNumberOfArrays()>0)
-    {
-        report("Found field data");
-        report(QString(mData->GetPointData()->GetArrayName(0)));
-        int test = mData->GetPointData()->GetArray(0)->GetNumberOfComponents();
-        report(QString(test));
-        mMapper->SetInputData(mData);
-        mMapper->SetOrientationArray(orientationArray);
-        mMapper->SelectColorArray(colorArray);
-        mMapper->SetScalarVisibility(1);
-        mMapper->SetUseLookupTableScalarRange(1);
-        mMapper->SetScalarMode(VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
-        // mMapper->SetLookupTable(); //mMesh.getLookupTable()
-    }else{
-        report("Found no field data");
-        report(QString(mData->GetFieldData()->GetNumberOfArrays()));
-    }
 }
 
 

@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkCellArray.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataWriter.h>
+#include <vtkPointData.h>
 #include <QDomDocument>
 #include <QColor>
 #include <QDir>
@@ -53,13 +54,13 @@ MeshPtr Mesh::create(const QString& uid, const QString& name)
 }
 
 Mesh::Mesh(const QString& uid, const QString& name) :
-	Data(uid, name), mVtkPolyData(vtkPolyDataPtr::New()), mWireframe(false), mBackfaceCulling(false), mFrontfaceCulling(false)
+    Data(uid, name), mVtkPolyData(vtkPolyDataPtr::New()), mWireframe(false), mBackfaceCulling(false), mFrontfaceCulling(false),mHasGlyph(false), mOrientationArray(""), mColorArray(""),mShowGlyph(false)
 {
 	mColor = QColor(255, 0, 0, 255);
 	this->setAcquisitionTime(QDateTime::currentDateTime());
 }
 Mesh::Mesh(const QString& uid, const QString& name, const vtkPolyDataPtr& polyData) :
-	Data(uid, name), mVtkPolyData(polyData), mWireframe(false), mBackfaceCulling(false), mFrontfaceCulling(false)
+    Data(uid, name), mVtkPolyData(polyData), mWireframe(false), mBackfaceCulling(false), mFrontfaceCulling(false),mHasGlyph(false), mOrientationArray(""), mColorArray(""), mShowGlyph(false)
 {
 	mColor = QColor(255, 0, 0, 255);
 	this->setAcquisitionTime(QDateTime::currentDateTime());
@@ -94,6 +95,28 @@ bool Mesh::load(QString path)
 void Mesh::setVtkPolyData(const vtkPolyDataPtr& polyData)
 {
 	mVtkPolyData = polyData;
+
+    int num;
+    for(int k=0; k <  mVtkPolyData->GetPointData()->GetNumberOfArrays(); k++)
+    {
+        num=mVtkPolyData->GetPointData()->GetArray(k)->GetNumberOfComponents();
+        if(num==3)
+        {
+            mOrientationArray=mVtkPolyData->GetPointData()->GetArrayName(k);
+            mHasGlyph=true;
+            break;
+        }
+    }
+    for(int k=0; k <  mVtkPolyData->GetPointData()->GetNumberOfArrays(); k++)
+    {
+        num=mVtkPolyData->GetPointData()->GetArray(k)->GetNumberOfComponents();
+        if(num==1)
+        {
+            mColorArray=mVtkPolyData->GetPointData()->GetArrayName(k);
+            break;
+        }
+    }
+
 	emit meshChanged();
 }
 vtkPolyDataPtr Mesh::getVtkPolyData() const
@@ -124,9 +147,16 @@ void Mesh::addXml(QDomNode& dataNode)
 
 	QDomElement cullingNode = doc.createElement("culling");
 	QDomElement elem = cullingNode.toElement();
-	elem.setAttribute("backfaceCulling", mBackfaceCulling);
-	elem.setAttribute("frontfaceCulling", mFrontfaceCulling);
+    elem.setAttribute("backfaceCulling", mBackfaceCulling);
+    elem.setAttribute("frontfaceCulling", mFrontfaceCulling);
 	meshNode.appendChild(cullingNode);
+
+    QDomElement glyphNode = doc.createElement("glyph");
+    QDomElement elemGlyph = glyphNode.toElement();
+    elemGlyph.setAttribute("orientationArray", mOrientationArray.c_str());
+    elemGlyph.setAttribute("colorArray", mColorArray.c_str());
+    meshNode.appendChild(elemGlyph);
+
 }
 
 void Mesh::parseXml(QDomNode& dataNode)
@@ -169,12 +199,19 @@ void Mesh::parseXml(QDomNode& dataNode)
 		mColor = QColor(red, green, blue, alpha);
 	}
 
-	QDomNode cullingNode = dataNode.namedItem("culling");
-	if (!cullingNode.isNull())
-	{
-		mBackfaceCulling = cullingNode.toElement().attribute("backfaceCulling").toInt();
-		mFrontfaceCulling = cullingNode.toElement().attribute("frontfaceCulling").toInt();
-	}
+    QDomNode cullingNode = dataNode.namedItem("culling");
+    if (!cullingNode.isNull())
+    {
+        mBackfaceCulling = cullingNode.toElement().attribute("backfaceCulling").toInt();
+        mFrontfaceCulling = cullingNode.toElement().attribute("frontfaceCulling").toInt();
+    }
+
+    QDomNode glyphNode = dataNode.namedItem("glyph");
+    if (!glyphNode.isNull())
+    {
+        mOrientationArray = glyphNode.toElement().attribute("orientationArray").toStdString();
+        mColorArray = glyphNode.toElement().attribute("colorArray").toStdString();
+    }
 	emit meshChanged();
 }
 
@@ -210,6 +247,41 @@ bool Mesh::getFrontfaceCulling()
 {
 	return mFrontfaceCulling;
 }
+
+void Mesh::setShowGlyph(bool val)
+{
+    mShowGlyph = mHasGlyph & val;
+}
+
+bool Mesh::showGlyph()
+{
+    return mShowGlyph;
+}
+
+const char * Mesh::getOrientationArray()
+{
+    return mOrientationArray.c_str();
+}
+
+void Mesh::setOrientationArray(const char * orientationArray)
+{
+    mOrientationArray = orientationArray;
+    emit meshChanged();
+}
+
+const char * Mesh::getColorArray()
+{
+    return mColorArray.c_str();
+}
+
+void Mesh::setColorArray(const char * colorArray)
+{
+    mColorArray = colorArray;
+    emit meshChanged();
+}
+
+
+
 
 DoubleBoundingBox3D Mesh::boundingBox() const
 {
