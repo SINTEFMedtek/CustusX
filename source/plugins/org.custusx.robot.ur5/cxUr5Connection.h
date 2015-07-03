@@ -36,8 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSocketConnection.h"
 #include "org_custusx_robot_ur5_Export.h"
 
-class QTcpSocket;
-
 namespace cx
 {
 /**
@@ -54,17 +52,25 @@ class org_custusx_robot_ur5_EXPORT Ur5Connection : public SocketConnection
 
 public:
     Ur5Connection(QString address, int port);
+    Ur5Connection();
 
     void setAddress(QString address, int port);
 
     bool isConnectedToRobot();
     bool sendMessage(QString message);
     bool waitForMessage();
+    void printDataQueue();
+    void testData();
+    void analyzeDataQueue();
+    void analyzeCartData();
 
 private slots:
     virtual void internalDataAvailable();
 
 private:
+
+protected:
+    QByteArray dataQueue,typeHolder,cartDataHolder;
 
 };
 

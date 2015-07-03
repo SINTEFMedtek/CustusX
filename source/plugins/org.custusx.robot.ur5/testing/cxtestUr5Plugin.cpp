@@ -39,35 +39,32 @@ namespace cxtest
 
 TEST_CASE("Ur5Plugin: Connect to robot", "[manual][plugins][org.custusx.robot.ur5]")
 {
-	Ur5TestFixture fixture;
-	REQUIRE(fixture.connection.isConnectedToRobot());
-	fixture.connection.requestDisconnect();
+    //Ur5TestFixture fixture;
+    //REQUIRE(fixture.connection.isConnectedToRobot());
+    //fixture.connection.requestDisconnect();
 }
 
 TEST_CASE("Ur5Plugin: Send message to robot and receive message from robot", "[manual][plugins][org.custusx.robot.ur5]")
 {
-	Ur5TestFixture fixture;
-	REQUIRE(fixture.connection.isConnectedToRobot());
+    Ur5TestFixture fixture;
+    //REQUIRE(fixture.connection.isConnectedToRobot());
 
     //QString message("set_tcp(p[0,0,0,0,0,0])");
     //QString message("textmsg(\"Test1\")");
-
-
-    QString message("get_joint_positions()");
-    REQUIRE(fixture.connection.sendMessage(message));
-    REQUIRE(fixture.connection.waitForMessage());
-
-
-    //REQUIRE(fixture.connection.tester());
     //REQUIRE(fixture.connection.waitForMessage());
 
-
+    //QString message("get_joint_positions()");
     //REQUIRE(fixture.connection.sendMessage(message));
+    //REQUIRE(fixture.connection.waitForMessage());
+    REQUIRE(fixture.connection.waitForMessage());
 
+    //fixture.connection.dataQueue = QByteArray(inMessage,560);
+    //fixture.connection.testData();
+    //fixture.connection.printDataQueue();
+    fixture.connection.analyzeDataQueue();
+    fixture.connection.analyzeCartData();
 
-	fixture.connection.requestDisconnect();
-
-	REQUIRE_FALSE(fixture.connection.sendMessage(message));
+    //REQUIRE_FALSE(fixture.connection.sendMessage(message));
 }
 
 } //cxtest
