@@ -581,4 +581,69 @@ QStringList StringPropertyImageType::getValueRange() const
 	return QStringList::fromSet(QSet<QString>::fromList(retval));
 }
 
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+StringPropertyGlyphOrientationArray::StringPropertyGlyphOrientationArray(PatientModelServicePtr patientModelService) :
+    mPatientModelService(patientModelService)
+{
+    connect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &Property::changed);
+}
+
+StringPropertyGlyphOrientationArray::~StringPropertyGlyphOrientationArray()
+{
+    disconnect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &Property::changed);
+}
+
+void StringPropertyGlyphOrientationArray::setData(MeshPtr data)
+{
+    if (mData)
+        disconnect(mData.get(), &Data::propertiesChanged, this, &Property::changed);
+    mData = data;
+    if (mData)
+        connect(mData.get(), &Data::propertiesChanged, this, &Property::changed);
+    emit changed();
+}
+
+QString StringPropertyGlyphOrientationArray::getDisplayName() const
+{
+    return "Set Glyph orientation array";
+}
+
+bool StringPropertyGlyphOrientationArray::setValue(const QString& value)
+{
+    if (!mData)
+        return false;
+    mData->setOrientationArray(value.toStdString().c_str());
+    return true;
+}
+
+QString StringPropertyGlyphOrientationArray::getValue() const
+{
+    if (!mData)
+        return "";
+    return mData->getOrientationArray();
+}
+
+QString StringPropertyGlyphOrientationArray::getHelp() const
+{
+    if (!mData)
+        return "";
+    return "Select which array to use for orientation of the glyphs.";
+}
+
+QStringList StringPropertyGlyphOrientationArray::getValueRange() const
+{
+    if (!mData)
+    {
+        QStringList retval;
+        retval << "";
+        return retval;
+    }
+    return mData->getOrientationArrayList();
+}
+
+
 } // namespace cx
+

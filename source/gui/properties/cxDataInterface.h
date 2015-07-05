@@ -358,6 +358,36 @@ protected:
   ImagePtr mData;
   PatientModelServicePtr mPatientModelService;
 };
+typedef boost::shared_ptr<class StringPropertyGlyphOrientationArray> StringPropertyGlyphOrientationArrayPtr;
+
+/**
+ * \brief Adapter that selects the glyph orientation array.
+ */
+class cxGui_EXPORT StringPropertyGlyphOrientationArray : public StringPropertyBase
+{
+  Q_OBJECT
+public:
+  static StringPropertyGlyphOrientationArrayPtr New(PatientModelServicePtr patientModelService) { return StringPropertyGlyphOrientationArrayPtr(new StringPropertyGlyphOrientationArray(patientModelService)); }
+  StringPropertyGlyphOrientationArray(PatientModelServicePtr patientModelService);
+  virtual ~StringPropertyGlyphOrientationArray();
+  void setData(MeshPtr data);
+
+public: // basic methods
+  virtual QString getDisplayName() const;
+  virtual bool setValue(const QString& value);
+  virtual QString getValue() const;
+
+public: // optional methods
+  virtual QString getHelp() const;
+  virtual QStringList getValueRange() const;
+
+protected:
+  MeshPtr mData;
+  PatientModelServicePtr mPatientModelService;
+};
+
+
+
 
 } // namespace cx
 

@@ -87,6 +87,8 @@ private:
   QCheckBox* mBackfaceCullingCheckBox;
   QCheckBox* mFrontfaceCullingCheckBox;
   QCheckBox* mGlyphVisualizationCheckBox;
+  StringPropertyGlyphOrientationArrayPtr mGlyphOrientationArrayAdapter;
+
 
   PatientModelServicePtr mPatientModelService;
   VisualizationServicePtr mVisualizationService;

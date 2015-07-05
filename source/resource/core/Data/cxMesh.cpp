@@ -54,16 +54,20 @@ MeshPtr Mesh::create(const QString& uid, const QString& name)
 }
 
 Mesh::Mesh(const QString& uid, const QString& name) :
-    Data(uid, name), mVtkPolyData(vtkPolyDataPtr::New()), mWireframe(false), mBackfaceCulling(false), mFrontfaceCulling(false),mHasGlyph(false), mOrientationArray(""), mColorArray(""),mShowGlyph(false)
+    Data(uid, name), mVtkPolyData(vtkPolyDataPtr::New()), mWireframe(false), mBackfaceCulling(false), mFrontfaceCulling(false),mHasGlyph(false), mOrientationArray(""), mColorArray("")
 {
 	mColor = QColor(255, 0, 0, 255);
 	this->setAcquisitionTime(QDateTime::currentDateTime());
+    mShowGlyph = shouldGlyphBeEnableByDefault();
+    mOrientationArrayList << "";
 }
 Mesh::Mesh(const QString& uid, const QString& name, const vtkPolyDataPtr& polyData) :
-    Data(uid, name), mVtkPolyData(polyData), mWireframe(false), mBackfaceCulling(false), mFrontfaceCulling(false),mHasGlyph(false), mOrientationArray(""), mColorArray(""), mShowGlyph(false)
+    Data(uid, name), mVtkPolyData(polyData), mWireframe(false), mBackfaceCulling(false), mFrontfaceCulling(false),mHasGlyph(false), mOrientationArray(""), mColorArray("")
 {
 	mColor = QColor(255, 0, 0, 255);
 	this->setAcquisitionTime(QDateTime::currentDateTime());
+    mShowGlyph = shouldGlyphBeEnableByDefault();
+    mOrientationArrayList << "";
 }
 Mesh::~Mesh()
 {
@@ -264,7 +268,7 @@ bool Mesh::showGlyph()
     return mShowGlyph;
 }
 
-bool Mesh::showGlyphBeEnableByDefault()
+bool Mesh::shouldGlyphBeEnableByDefault()
 {
     return false;
 }

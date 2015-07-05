@@ -251,6 +251,13 @@ void GraphicalGlyph3DData::setData(vtkPolyDataPtr data)
 
 void GraphicalGlyph3DData::setOrientationArray(const char* orientationArray)
 {
+    if(strlen(orientationArray)>0)
+    {
+        setVisibility(true);
+    }else
+    {
+        setVisibility(false);
+    }
     mMapper->SetOrientationArray(orientationArray);
 }
 

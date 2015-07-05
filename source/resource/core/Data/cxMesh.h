@@ -94,7 +94,6 @@ public:
 	bool isFiberBundle() const;
     bool showGlyph();
     bool hasGlyph();
-    bool showGlyphBeEnableByDefault();
     const char * getOrientationArray();
     const char * getColorArray();
     QStringList getOrientationArrayList();
@@ -120,6 +119,7 @@ private:
 	bool mFrontfaceCulling; ///< If frontface culling is on, polygons facing inwards are not drawn.
     bool mHasGlyph;
     bool mShowGlyph;
+    bool shouldGlyphBeEnableByDefault();
     std::string mOrientationArray;
     std::string mColorArray;
     QStringList mOrientationArrayList;
