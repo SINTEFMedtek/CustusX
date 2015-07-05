@@ -271,7 +271,13 @@ bool Mesh::showGlyph()
 
 bool Mesh::shouldGlyphBeEnableByDefault()
 {
-    return false;
+    if(! mHasGlyph) return false;
+    if(mVtkPolyData->GetNumberOfVerts() > 0) return false;
+    if(mVtkPolyData->GetNumberOfLines() > 0) return false;
+    if(mVtkPolyData->GetNumberOfPolys() > 0) return false;
+    if(mVtkPolyData->GetNumberOfStrips() > 0) return false;
+
+    return true;
 }
 
 
