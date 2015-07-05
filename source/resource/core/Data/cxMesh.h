@@ -94,8 +94,12 @@ public:
 	bool isFiberBundle() const;
     bool showGlyph();
     bool hasGlyph();
+    //bool showGlyphAsDefault();
     const char * getOrientationArray();
     const char * getColorArray();
+    //QStringList getOrientationArrayList();
+    //QStringList getColorArrayList();
+
 
 
 	virtual void save(const QString &basePath);

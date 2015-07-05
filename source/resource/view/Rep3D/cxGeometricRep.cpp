@@ -32,8 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "cxGeometricRep.h"
-#include "cxLogger.h"
-
 
 #include <vtkPolyData.h>
 #include <vtkPointData.h>
@@ -55,7 +53,7 @@ namespace cx
 GeometricRep::GeometricRep() :
     RepImpl()
 {
-    mGraphicalPolyDataPtr.reset(new GraphicalPolyData());
+    mGraphicalPolyDataPtr.reset(new GraphicalPolyData3D());
     mGraphicalGlyph3DDataPtr.reset(new GraphicalGlyph3DData());
 
 }
@@ -109,31 +107,28 @@ bool GeometricRep::hasMesh(MeshPtr mesh) const
 
 void GeometricRep::meshChangedSlot()
 {
-    //	std::cout << "GeometricRep::meshChangedSlot()" << std::endl;
-    //	mMesh->connectToRep(mSelf);
-
-    //if glyph and showGlyoh:
-    //    mMapper->SetOrientationArray("Flow direction"); //
-    //    mMapper->SelectColorArray("Vessel velocity");//mMesh.getColorArray()
     //    mMapper->SetLookupTable(); //mMesh.getLookupTable()
 
+    mGraphicalGlyph3DDataPtr->setVisibility(mMesh->showGlyph());
     if(mMesh->showGlyph())
     {
-        mGraphicalGlyph3DDataPtr->updateGlyph(mMesh->getVtkPolyData(),mMesh->getOrientationArray(),mMesh->getColorArray());
-    }
+        mGraphicalGlyph3DDataPtr->setRenderer(getView()->getRenderer()); // OK???
 
+        mGraphicalGlyph3DDataPtr->setData(mMesh->getVtkPolyData());
+        mGraphicalGlyph3DDataPtr->setOrientationArray(mMesh->getOrientationArray());
+        mGraphicalGlyph3DDataPtr->setColorArray(mMesh->getColorArray());
+        mGraphicalPolyDataPtr->setScalarVisibility(true);
+    }
 
     mGraphicalPolyDataPtr->setData(mMesh->getVtkPolyData());
     mGraphicalPolyDataPtr->setIsWireFrame(mMesh->getIsWireframe());
-    mGraphicalPolyDataPtr->scalarVisibilityOff();//Don't use the LUT from the VtkPolyData
-
+    mGraphicalPolyDataPtr->setPointSize(2);
+    mGraphicalPolyDataPtr->setScalarVisibility(false);//Don't use the LUT from the VtkPolyData
     //Set mesh color
     mGraphicalPolyDataPtr->setColor(mMesh->getColor().redF(), mMesh->getColor().greenF(), mMesh->getColor().blueF());
     //Set mesh opacity
     mGraphicalPolyDataPtr->setOpacity(mMesh->getColor().alphaF());
-
     mGraphicalPolyDataPtr->setRepresentation();
-
     //Set backface and frontface culling
     mGraphicalPolyDataPtr->setBackfaceCulling(mMesh->getBackfaceCulling());
     mGraphicalPolyDataPtr->setFrontfaceCulling(mMesh->getFrontfaceCulling());
@@ -147,150 +142,8 @@ void GeometricRep::transformChangedSlot()
     {
         return;
     }
-
     mGraphicalPolyDataPtr->setUserMatrix(mMesh->get_rMd().getVtkMatrix());
     mGraphicalGlyph3DDataPtr->setUserMatrix(mMesh->get_rMd().getVtkMatrix());
-}
-
-
-//---------------------------------------------------------
-
-GraphicalMeshBase::GraphicalMeshBase()
-{
-    mProperty = vtkPropertyPtr::New();
-    mActor = vtkActorPtr::New();
-    mActor->SetProperty(mProperty);
-    mProperty->SetPointSize(2);
-}
-
-GraphicalMeshBase::~GraphicalMeshBase()
-{
-    this->setRenderer(NULL);
-}
-
-
-void GraphicalMeshBase::setRenderer(vtkRendererPtr renderer)
-{
-    if (mRenderer)
-        mRenderer->RemoveActor(mActor);
-
-    mRenderer = renderer;
-
-    if (mRenderer)
-        mRenderer->AddActor(mActor);
-}
-
-
-void GraphicalMeshBase::setBackfaceCulling(bool val)
-{
-    mActor->GetProperty()->SetBackfaceCulling(val);
-}
-
-void GraphicalMeshBase::setFrontfaceCulling(bool val)
-{
-    mActor->GetProperty()->SetFrontfaceCulling(val);
-}
-
-void GraphicalMeshBase::setRepresentation()
-{
-    mActor->GetProperty()->SetRepresentationToSurface();
-}
-
-void GraphicalMeshBase::setColor(double red, double green, double blue)
-{
-    mActor->GetProperty()->SetColor(red, green, blue);
-}
-
-void GraphicalMeshBase::setOpacity(double val)
-{
-    mActor->GetProperty()->SetOpacity(val);
-}
-
-
-void GraphicalMeshBase::setUserMatrix(vtkMatrix4x4 *matrix)
-{
-    mActor->SetUserMatrix(matrix);
-}
-
-vtkActorPtr GraphicalMeshBase::getActor()
-{
-    return mActor;
-}
-
-vtkPolyDataPtr GraphicalMeshBase::getPolyData()
-{
-    return mData;
-}
-
-
-//---------------------------------------------------------
-
-GraphicalPolyData::GraphicalPolyData() :
-    GraphicalMeshBase()
-{
-    mMapper =  vtkPolyDataMapperPtr::New();
-    mActor->SetMapper(mMapper);
-
-    mIsWireFrame = false;
-}
-
-
-void GraphicalPolyData::setIsWireFrame(bool val)
-{
-    mIsWireFrame = val;
-}
-
-
-void GraphicalPolyData::setRepresentation()
-{
-    if (mIsWireFrame)
-        mActor->GetProperty()->SetRepresentationToWireframe();
-    else
-        mActor->GetProperty()->SetRepresentationToSurface();
-}
-
-void GraphicalPolyData::setData(vtkPolyDataPtr data)
-{
-    mData = data;
-    if (data)
-        mMapper->SetInputData(mData);
-}
-
-void GraphicalPolyData::scalarVisibilityOff()
-{
-    mMapper->ScalarVisibilityOff();//Don't use the LUT from the VtkPolyData
-}
-
-
-
-
-//---------------------------------------------------------
-
-GraphicalGlyph3DData::GraphicalGlyph3DData() :
-    GraphicalMeshBase()
-{
-    mMapper = vtkSmartPointer<vtkGlyph3DMapper>::New();
-    vtkSmartPointer<vtkArrowSource> arrowSource = vtkSmartPointer<vtkArrowSource>::New();
-    mMapper->SetSourceConnection(arrowSource->GetOutputPort());
-
-    mActor->SetMapper(mMapper);
-}
-
-
-void GraphicalGlyph3DData::updateGlyph(vtkPolyDataPtr data, const char * orientationArray, const char * colorArray)
-{
-    mData = data;
-    if (!data)
-        return;
-
-    mMapper->SetInputData(mData);
-    mMapper->SetOrientationArray(orientationArray);
-    mMapper->SelectColorArray(colorArray);
-    mMapper->SetScalarVisibility(1);
-    mMapper->SetUseLookupTableScalarRange(1);
-    mMapper->SetScalarMode(VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
-    // mMapper->SetLookupTable(); //mMesh.getLookupTable()
-
 }
 
 

@@ -54,88 +54,214 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVtkHelperClasses.h"
 #include "vtkPolyDataNormals.h"
 
+#include "cxLogger.h"
+
 namespace cx
 {
 
-GraphicalPolyData3D::GraphicalPolyData3D(vtkPolyDataAlgorithmPtr source, vtkRendererPtr renderer)
+
+GraphicalGeometricBase::GraphicalGeometricBase(vtkPolyDataAlgorithmPtr source, vtkRendererPtr renderer)
 {
-	mMapper = vtkPolyDataMapperPtr::New();
-
-	mActor = vtkActorPtr::New();
-	mActor->SetMapper(mMapper);
-
-	this->setSource(source);
-	this->setRenderer(renderer);
+    mProperty = vtkPropertyPtr::New();
+    mActor = vtkActorPtr::New();
+    mActor->SetProperty(mProperty);
 }
 
-void GraphicalPolyData3D::setSource(vtkPolyDataAlgorithmPtr source)
+GraphicalGeometricBase::~GraphicalGeometricBase()
 {
-	mData = vtkPolyDataPtr();
-	mSource = source;
-
-	if (mSource)
-		mMapper->SetInputConnection(mSource->GetOutputPort());
-	else
-		mMapper->SetInputConnection(NULL);
+    this->setRenderer(NULL);
 }
 
-GraphicalPolyData3D::~GraphicalPolyData3D()
+void GraphicalGeometricBase::setSource(vtkPolyDataAlgorithmPtr source)
 {
-	this->setRenderer(NULL);
+    mData = vtkPolyDataPtr();
+    mSource = source;
+
+    if (mSource)
+        getMapper()->SetInputConnection(mSource->GetOutputPort());
+    else
+        getMapper()->SetInputConnection(NULL);
 }
 
-void GraphicalPolyData3D::setRenderer(vtkRendererPtr renderer)
+void GraphicalGeometricBase::setRenderer(vtkRendererPtr renderer)
 {
-	if (mRenderer)
-		mRenderer->RemoveActor(mActor);
+    if (mRenderer)
+        mRenderer->RemoveActor(mActor);
 
-	mRenderer = renderer;
+    mRenderer = renderer;
 
-	if (mRenderer)
-		mRenderer->AddActor(mActor);
+    if (mRenderer)
+        mRenderer->AddActor(mActor);
+}
+
+void GraphicalGeometricBase::setVisibility(bool visible)
+{
+    mActor->SetVisibility(visible);
 }
 
 
-void GraphicalPolyData3D::setColor(Vector3D color)
+void GraphicalGeometricBase::setBackfaceCulling(bool val)
 {
-	mActor->GetProperty()->SetColor(color.begin());
+    mActor->GetProperty()->SetBackfaceCulling(val);
 }
 
-void GraphicalPolyData3D::setPosition(Vector3D point)
+void GraphicalGeometricBase::setFrontfaceCulling(bool val)
 {
-	mActor->SetPosition(point.begin());
+    mActor->GetProperty()->SetFrontfaceCulling(val);
+}
+
+void GraphicalGeometricBase::setRepresentation()
+{
+    mActor->GetProperty()->SetRepresentationToSurface();
+}
+
+void GraphicalGeometricBase::setColor(double red, double green, double blue)
+{
+    mActor->GetProperty()->SetColor(red, green, blue);
+}
+
+void GraphicalGeometricBase::setColor(Vector3D color)
+{
+    mActor->GetProperty()->SetColor(color.begin());
+}
+
+void GraphicalGeometricBase::setPosition(Vector3D point)
+{
+    mActor->SetPosition(point.begin());
+}
+
+void GraphicalGeometricBase::setOpacity(double val)
+{
+    mActor->GetProperty()->SetOpacity(val);
+}
+
+void GraphicalGeometricBase::setUserMatrix(vtkMatrix4x4 *matrix)
+{
+    mActor->SetUserMatrix(matrix);
+}
+
+void GraphicalGeometricBase::setPointSize(int pointSize)
+{
+    mProperty->SetPointSize(pointSize);
+}
+
+void GraphicalGeometricBase::setScalarVisibility(bool show)
+{
+    if(show)
+    {
+        getMapper()->ScalarVisibilityOn();
+    }else
+    {
+        getMapper()->ScalarVisibilityOff();
+    }
+}
+
+Vector3D GraphicalGeometricBase::getPosition() const
+{
+    return Vector3D(mActor->GetPosition());
+}
+
+vtkActorPtr GraphicalGeometricBase::getActor()
+{
+    return mActor;
+}
+
+vtkPolyDataPtr GraphicalGeometricBase::getPolyData()
+{
+    if (mSource)
+        return mSource->GetOutput();
+    else
+        return mData;
+}
+
+vtkPolyDataAlgorithmPtr GraphicalGeometricBase::getSource()
+{
+    return mSource;
+}
+
+//--------------------------------------------------------
+//--------------------------------------------------------
+//-------------------------------------------------------
+
+GraphicalPolyData3D::GraphicalPolyData3D(vtkPolyDataAlgorithmPtr source, vtkRendererPtr renderer) :
+    GraphicalGeometricBase(source,renderer)
+{
+    mMapper =  vtkPolyDataMapperPtr::New();
+    mIsWireFrame = false;
+
+    mActor->SetMapper(mMapper);
+    setSource(source);
+    setRenderer(renderer);
+}
+
+void GraphicalPolyData3D::setIsWireFrame(bool val)
+{
+    mIsWireFrame = val;
+}
+
+void GraphicalPolyData3D::setRepresentation()
+{
+    if (mIsWireFrame)
+        mActor->GetProperty()->SetRepresentationToWireframe();
+    else
+        mActor->GetProperty()->SetRepresentationToSurface();
 }
 
 void GraphicalPolyData3D::setData(vtkPolyDataPtr data)
 {
-	mSource = vtkPolyDataAlgorithmPtr();
-	mData = data;
+    mSource = vtkPolyDataAlgorithmPtr();
+    mData = data;
 
-	if (mData)
-		mMapper->SetInputData(mData);
+    if (mData)
+        mMapper->SetInputData(mData);
 }
 
-Vector3D GraphicalPolyData3D::getPosition() const
+
+vtkMapperPtr GraphicalPolyData3D::getMapper()
 {
-	return Vector3D(mActor->GetPosition());
+    return mMapper;
 }
 
-vtkActorPtr GraphicalPolyData3D::getActor()
+//--------------------------------------------------------
+//--------------------------------------------------------
+//-------------------------------------------------------
+
+GraphicalGlyph3DData::GraphicalGlyph3DData(vtkPolyDataAlgorithmPtr source, vtkRendererPtr renderer) :
+    GraphicalGeometricBase(source,renderer)
 {
-	return mActor;
+    mMapper = vtkSmartPointer<vtkGlyph3DMapper>::New();
+    vtkSmartPointer<vtkArrowSource> arrowSource = vtkSmartPointer<vtkArrowSource>::New();
+    mMapper->SetSourceConnection(arrowSource->GetOutputPort());
+    mMapper->ScalarVisibilityOn();
+    mMapper->SetUseLookupTableScalarRange(1);
+    mMapper->SetScalarMode(VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
+
+    mActor->SetMapper(mMapper);
+    setSource(source);
+    setRenderer(renderer);
 }
 
-vtkPolyDataPtr GraphicalPolyData3D::getPolyData()
+
+void GraphicalGlyph3DData::setData(vtkPolyDataPtr data)
 {
-	if (mSource)
-		return mSource->GetOutput();
-	else
-		return mData;
+    mData = data;
+    if (data)
+        mMapper->SetInputData(mData);
 }
 
-vtkPolyDataAlgorithmPtr GraphicalPolyData3D::getSource()
+void GraphicalGlyph3DData::setOrientationArray(const char* orientationArray)
 {
-	return mSource;
+    mMapper->SetOrientationArray(orientationArray);
+}
+
+void GraphicalGlyph3DData::setColorArray(const char* colorArray)
+{
+    mMapper->SelectColorArray(colorArray);
+}
+
+vtkMapperPtr GraphicalGlyph3DData::getMapper()
+{
+    return mMapper;
 }
 
 //--------------------------------------------------------

@@ -11,11 +11,11 @@ modification, are permitted provided that the following conditions are met:
    this list of conditions and the following disclaimer.
 
 2. Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
+   this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
 
 3. Neither the name of the copyright holder nor the names of its contributors 
-   may be used to endorse or promote products derived from this software 
+   may be used to endorse or promote products derived from this software
    without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
@@ -34,79 +34,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXGEOMETRICREP_H_
 #define CXGEOMETRICREP_H_
 
-#include "cxResourceVisualizationExport.h"
-
 #include "vtkForwardDeclarations.h"
 #include "cxRepImpl.h"
 #include "cxVector3D.h"
-#include <vtkGlyph3DMapper.h>
+#include "cxGraphicalPrimitives.h"
 
 
 namespace cx
 {
 typedef boost::shared_ptr<class Mesh> MeshPtr;
-
 typedef boost::shared_ptr<class GeometricRep> GeometricRepPtr;
-typedef vtkSmartPointer<class vtkGlyph3DMapper> vtkGlyph3DMapperPtr;
 
-
-class cxResourceVisualization_EXPORT GraphicalMeshBase
-{
-public:
-    GraphicalMeshBase();
-    ~GraphicalMeshBase();
-
-    void setRenderer(vtkRendererPtr renderer = vtkRendererPtr());
-    void setBackfaceCulling(bool val);
-    void setFrontfaceCulling(bool val);
-    void setRepresentation();
-    void setColor(double red, double green, double blue);
-    void setOpacity(double val);
-    void setUserMatrix(vtkMatrix4x4 *matrix);
-
-    vtkActorPtr getActor();
-    vtkPolyDataPtr getPolyData();
-
-protected:
-    vtkPropertyPtr mProperty;
-    vtkActorPtr mActor;
-    vtkPolyDataPtr mData;
-    vtkRendererPtr mRenderer;
-};
-typedef boost::shared_ptr<GraphicalMeshBase> GraphicalMeshBasePtr;
-
-
-
-
-class cxResourceVisualization_EXPORT GraphicalPolyData : public GraphicalMeshBase
-{
-public:
-    GraphicalPolyData();
-
-    void setIsWireFrame(bool val);
-    void setRepresentation();
-    void setData(vtkPolyDataPtr data);
-    void scalarVisibilityOff();
-
-private:
-    vtkPolyDataMapperPtr mMapper;
-    bool mIsWireFrame;
-
-};
-typedef boost::shared_ptr<GraphicalPolyData> GraphicalPolyDataPtr;
-
-
-class cxResourceVisualization_EXPORT GraphicalGlyph3DData : public GraphicalMeshBase
-{
-public:
-    GraphicalGlyph3DData();
-
-     void updateGlyph(vtkPolyDataPtr data, const char * orientationArray, const char * colorArray);
-
-private:
-    vtkGlyph3DMapperPtr mMapper;
-};
-typedef boost::shared_ptr<GraphicalGlyph3DData> GraphicalGlyph3DDataPtr;
 
 
 
@@ -121,29 +59,29 @@ typedef boost::shared_ptr<GraphicalGlyph3DData> GraphicalGlyph3DDataPtr;
  */
 class cxResourceVisualization_EXPORT GeometricRep : public RepImpl
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	virtual ~GeometricRep();
-	static GeometricRepPtr New(const QString& uid="");
+    virtual ~GeometricRep();
+    static GeometricRepPtr New(const QString& uid="");
 
-	virtual QString getType() const { return "GeometricRep"; } ///< gives this reps type
-	void setMesh(MeshPtr mesh); ///< sets this reps mesh
-	MeshPtr getMesh(); ///< gives this reps mesh
-	bool hasMesh(MeshPtr mesh) const; ///< checks if this rep has the give mesh
+    virtual QString getType() const { return "GeometricRep"; } ///< gives this reps type
+    void setMesh(MeshPtr mesh); ///< sets this reps mesh
+    MeshPtr getMesh(); ///< gives this reps mesh
+    bool hasMesh(MeshPtr mesh) const; ///< checks if this rep has the give mesh
 
 protected:
-	GeometricRep();
-	virtual void addRepActorsToViewRenderer(ViewPtr view);
-	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
+    GeometricRep();
+    virtual void addRepActorsToViewRenderer(ViewPtr view);
+    virtual void removeRepActorsFromViewRenderer(ViewPtr view);
 
-    GraphicalPolyDataPtr mGraphicalPolyDataPtr;
+    GraphicalPolyData3DPtr mGraphicalPolyDataPtr;
     GraphicalGlyph3DDataPtr mGraphicalGlyph3DDataPtr;
 
-	MeshPtr mMesh;
+    MeshPtr mMesh;
 
 private slots:
-	void meshChangedSlot();
-	void transformChangedSlot();
+    void meshChangedSlot();
+    void transformChangedSlot();
 };
 
 
