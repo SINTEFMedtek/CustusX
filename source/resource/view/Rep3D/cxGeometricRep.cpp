@@ -112,12 +112,9 @@ void GeometricRep::meshChangedSlot()
     mGraphicalGlyph3DDataPtr->setVisibility(mMesh->showGlyph());
     if(mMesh->showGlyph())
     {
-        mGraphicalGlyph3DDataPtr->setRenderer(getView()->getRenderer()); // OK???
-
         mGraphicalGlyph3DDataPtr->setData(mMesh->getVtkPolyData());
         mGraphicalGlyph3DDataPtr->setOrientationArray(mMesh->getOrientationArray());
         mGraphicalGlyph3DDataPtr->setColorArray(mMesh->getColorArray());
-        mGraphicalPolyDataPtr->setScalarVisibility(true);
     }
 
     mGraphicalPolyDataPtr->setData(mMesh->getVtkPolyData());
