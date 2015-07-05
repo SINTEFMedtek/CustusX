@@ -167,8 +167,8 @@ void MeshInfoWidget::hideEvent(QCloseEvent* event)
 
 void MeshInfoWidget::addWidgets(PatientModelServicePtr patientModelService)
 {
-	mSelectMeshWidget = StringPropertySelectMesh::New(patientModelService);
-	mSelectMeshWidget->setValueName("Surface: ");
+    mSelectMeshWidget = StringPropertySelectMesh::New(patientModelService);
+    mSelectMeshWidget->setValueName("Surface: ");
 	connect(mSelectMeshWidget.get(), &Property::changed, this, &MeshInfoWidget::meshSelectedSlot);
 
 	XmlOptionFile options = profile()->getXmlSettings().descend("MeshInfoWidget");
@@ -206,16 +206,13 @@ void MeshInfoWidget::addWidgets(PatientModelServicePtr patientModelService)
 
     optionsLayout->addStretch(1);
 
-    int gridGlyphLayoutRow = 1;
-    QWidget* glyphWidget = new QWidget(this);
-    QGridLayout* glyphLayout = new QGridLayout(glyphWidget);
-
-    glyphLayout->addWidget(new QLabel("Visualization size:", this), gridGlyphLayoutRow, 0);
     mVisSizeWidget= DoubleProperty::initialize("visSize", " ", "Visualization size",1, DoubleRange(1, 20, 1), 0);
     mVisSizeWidget->setGuiRepresentation(DoublePropertyBase::grSLIDER);
     connect(mVisSizeWidget.get(), &Property::changed, this, &MeshInfoWidget::meshChangedSlot);
-    glyphLayout->addWidget(createDataWidget(mVisualizationService, mPatientModelService, this, mVisSizeWidget),gridGlyphLayoutRow++,1);
 
+    int gridGlyphLayoutRow = 1;
+    QWidget* glyphWidget = new QWidget(this);
+    QGridLayout* glyphLayout = new QGridLayout(glyphWidget);
     mGlyphVisualizationCheckBox = new QCheckBox("Enable glyph visualization");
     mGlyphVisualizationCheckBox->setToolTip("Enable glyph visualization");
     glyphLayout->addWidget(mGlyphVisualizationCheckBox, gridGlyphLayoutRow++,0);
@@ -231,6 +228,8 @@ void MeshInfoWidget::addWidgets(PatientModelServicePtr patientModelService)
     new LabeledComboBoxWidget(this, mParentFrameAdapter, gridLayout, gridLayoutRow++);
 
     gridLayout->addWidget(optionsWidget, gridLayoutRow++, 0, 1, 2);
+    gridLayout->addWidget(new QLabel("Visualization size:", this), gridLayoutRow, 0);
+    gridLayout->addWidget(createDataWidget(mVisualizationService, mPatientModelService, this, mVisSizeWidget),gridLayoutRow++,1);
     gridLayout->addWidget(glyphWidget, gridLayoutRow++, 0, 1, 2);
 	gridLayout->addWidget(mTableWidget, gridLayoutRow++, 0, 1, 2);
 	gridLayout->addWidget(importTransformButton, gridLayoutRow++, 0, 1, 2);

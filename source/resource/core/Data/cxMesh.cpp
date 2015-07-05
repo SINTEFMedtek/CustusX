@@ -225,7 +225,7 @@ void Mesh::parseXml(QDomNode& dataNode)
         mOrientationArray = glyphNode.toElement().attribute("orientationArray").toStdString();
         mColorArray = glyphNode.toElement().attribute("colorArray").toStdString();
         mGlyphLUT = glyphNode.toElement().attribute("glyphLUT").toStdString();
-       // mVisSize =  glyphNode.toElement().attribute("glyphVisSize").toDouble();
+        mVisSize =  glyphNode.toElement().attribute("glyphVisSize").toDouble();
     }
 
 	emit meshChanged();

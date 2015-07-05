@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataInterface.h"
 #include "cxInfoWidget.h"
 
+
 namespace cx
 {
 typedef boost::shared_ptr<class StringPropertySelectMesh> StringPropertySelectMeshPtr;
@@ -82,7 +83,7 @@ private:
   StringPropertyParentFramePtr mParentFrameAdapter;
   StringPropertyDataNameEditablePtr mNameAdapter;
   StringPropertyDataUidEditablePtr mUidAdapter;
-  StringPropertySelectMeshPtr mSelectMeshWidget;
+  StringPropertyActiveMeshPtr mSelectMeshWidget;
   ColorPropertyPtr mColorAdapter;
   QCheckBox* mBackfaceCullingCheckBox;
   QCheckBox* mFrontfaceCullingCheckBox;
