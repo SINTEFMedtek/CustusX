@@ -114,7 +114,6 @@ void Mesh::setVtkPolyData(const vtkPolyDataPtr& polyData)
         {
             mColorArray=mVtkPolyData->GetPointData()->GetArrayName(k);
             mColorArrayList << mVtkPolyData->GetPointData()->GetArrayName(k);
-            break;
         }
     }
 
