@@ -94,11 +94,11 @@ public:
 	bool isFiberBundle() const;
     bool showGlyph();
     bool hasGlyph();
-    //bool showGlyphAsDefault();
+    bool showGlyphBeEnableByDefault();
     const char * getOrientationArray();
     const char * getColorArray();
-    //QStringList getOrientationArrayList();
-    //QStringList getColorArrayList();
+    QStringList getOrientationArrayList();
+    QStringList getColorArrayList();
 
 
 
@@ -122,6 +122,8 @@ private:
     bool mShowGlyph;
     std::string mOrientationArray;
     std::string mColorArray;
+    QStringList mOrientationArrayList;
+    QStringList mColorArrayList;
 };
 
 typedef boost::shared_ptr<Mesh> MeshPtr;

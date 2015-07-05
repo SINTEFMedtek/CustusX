@@ -104,7 +104,7 @@ void Mesh::setVtkPolyData(const vtkPolyDataPtr& polyData)
         {
             mOrientationArray=mVtkPolyData->GetPointData()->GetArrayName(k);
             mHasGlyph=true;
-            break;
+            mOrientationArrayList << mVtkPolyData->GetPointData()->GetArrayName(k);
         }
     }
     for(int k=0; k <  mVtkPolyData->GetPointData()->GetNumberOfArrays(); k++)
@@ -113,6 +113,7 @@ void Mesh::setVtkPolyData(const vtkPolyDataPtr& polyData)
         if(num==1)
         {
             mColorArray=mVtkPolyData->GetPointData()->GetArrayName(k);
+            mColorArrayList << mVtkPolyData->GetPointData()->GetArrayName(k);
             break;
         }
     }
@@ -264,6 +265,12 @@ bool Mesh::showGlyph()
     return mShowGlyph;
 }
 
+bool Mesh::showGlyphBeEnableByDefault()
+{
+    return false;
+}
+
+
 const char * Mesh::getOrientationArray()
 {
     return mOrientationArray.c_str();
@@ -286,6 +293,15 @@ void Mesh::setColorArray(const char * colorArray)
     emit meshChanged();
 }
 
+QStringList Mesh::getOrientationArrayList()
+{
+    return mOrientationArrayList;
+}
+
+QStringList Mesh::getColorArrayList()
+{
+    return mColorArrayList;
+}
 
 
 
