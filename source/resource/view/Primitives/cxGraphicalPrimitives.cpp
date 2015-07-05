@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkPolyDataMapper.h>
 #include <vtkActor.h>
 #include <vtkCellArray.h>
+#include <vtkPointData.h>
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
 #include <vtkCommand.h>
@@ -236,9 +237,6 @@ GraphicalGlyph3DData::GraphicalGlyph3DData(vtkPolyDataAlgorithmPtr source, vtkRe
     mMapper->SetUseLookupTableScalarRange(1);
     mMapper->SetScalarMode(VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
 
-    mLut = vtkSmartPointer<vtkLookupTable>::New();
-    mColorSeries = vtkSmartPointer<vtkColorSeries>::New();
-    mLutId = mColorSeries->GetColorScheme();
     mActor->SetMapper(mMapper);
     setSource(source);
     setRenderer(renderer);
@@ -272,13 +270,11 @@ void GraphicalGlyph3DData::setColorArray(const char* colorArray)
 
 void GraphicalGlyph3DData::setLUT(const char* lut)
 {
-
-    int lutId=mColorSeries->SetColorSchemeByName(lut);
-    if (lutId == mLutId) return;
-    mLutId = lutId;
-    mColorSeries->BuildLookupTable(mLut);
-    mMapper->SetLookupTable(mLut);
-
+    vtkSmartPointer<vtkColorSeries> colorSeries = vtkSmartPointer<vtkColorSeries>::New();
+    vtkSmartPointer<vtkLookupTable> table = vtkLookupTable::New();
+    colorSeries->SetColorSchemeByName(lut);
+    colorSeries->BuildLookupTable(table , vtkColorSeries::ORDINAL);
+    mMapper->SetLookupTable(table);
 }
 
 

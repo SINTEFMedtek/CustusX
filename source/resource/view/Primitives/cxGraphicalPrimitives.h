@@ -137,9 +137,6 @@ public:
 
 private:
     vtkGlyph3DMapperPtr mMapper;
-    vtkSmartPointer<vtkLookupTable> mLut;
-    int mLutId;
-    vtkSmartPointer<vtkColorSeries> mColorSeries;
 };
 typedef boost::shared_ptr<GraphicalGlyph3DData> GraphicalGlyph3DDataPtr;
 
