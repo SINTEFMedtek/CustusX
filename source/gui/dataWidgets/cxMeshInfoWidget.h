@@ -86,6 +86,7 @@ private:
   ColorPropertyPtr mColorAdapter;
   QCheckBox* mBackfaceCullingCheckBox;
   QCheckBox* mFrontfaceCullingCheckBox;
+  DoublePropertyPtr mVisSizeWidget;
   QCheckBox* mGlyphVisualizationCheckBox;
   StringPropertyGlyphOrientationArrayPtr mGlyphOrientationArrayAdapter;
   StringPropertyGlyphColorArrayPtr mGlyphColorArrayAdapter;

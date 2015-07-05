@@ -82,7 +82,6 @@ public:
     Vector3D getPosition() const;
     vtkPolyDataAlgorithmPtr getSource();
 
-
 protected:
     vtkPolyDataAlgorithmPtr mSource;
     vtkPropertyPtr mProperty;
@@ -133,6 +132,7 @@ public:
     void setOrientationArray(const char* orientationArray);
     void setColorArray(const char* colorArray);
     void setLUT(const char* lut);
+    void setScaleFactor(double scaleFactor);
     vtkMapperPtr getMapper();
 
 private:

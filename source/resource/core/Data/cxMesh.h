@@ -94,6 +94,7 @@ public:
 	bool isFiberBundle() const;
     bool showGlyph();
     bool hasGlyph();
+    double getVisSize();
     const char * getOrientationArray();
     const char * getColorArray();
     const char * getGlyphLUT();
@@ -107,6 +108,7 @@ public slots:
 	void setBackfaceCullingSlot(bool backfaceCulling);///< Set backface culling on/off in mesh visualization
 	void setFrontfaceCullingSlot(bool backfaceCulling);///< Set frontface culling on/off in mesh visualization
     void setShowGlyph(bool val);
+    void setVisSize(double size);
     void setOrientationArray(const char * orientationArray);
     void setColorArray(const char * colorArray);
     void setGlyphLUT(const char * glyphLUT);
@@ -117,6 +119,7 @@ private:
 	bool mBackfaceCulling; ///< If backface culling is on, polygons facing outwards are not drawn.
 	bool mFrontfaceCulling; ///< If frontface culling is on, polygons facing inwards are not drawn.
     bool mHasGlyph;
+    double mVisSize;
     bool mShowGlyph;
     bool shouldGlyphBeEnableByDefault();
     std::string mOrientationArray;

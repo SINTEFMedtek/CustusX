@@ -55,7 +55,7 @@ MeshPtr Mesh::create(const QString& uid, const QString& name)
 }
 
 Mesh::Mesh(const QString& uid, const QString& name) :
-    Data(uid, name), mVtkPolyData(vtkPolyDataPtr::New()), mWireframe(false), mBackfaceCulling(false), mFrontfaceCulling(false),mHasGlyph(false), mOrientationArray(""), mColorArray("")
+    Data(uid, name), mVtkPolyData(vtkPolyDataPtr::New()), mWireframe(false), mBackfaceCulling(false), mFrontfaceCulling(false),mHasGlyph(false), mOrientationArray(""), mColorArray(""),mVisSize(2.0)
 {
 	mColor = QColor(255, 0, 0, 255);
     mShowGlyph = shouldGlyphBeEnableByDefault();
@@ -63,7 +63,7 @@ Mesh::Mesh(const QString& uid, const QString& name) :
 	this->setAcquisitionTime(QDateTime::currentDateTime());
 }
 Mesh::Mesh(const QString& uid, const QString& name, const vtkPolyDataPtr& polyData) :
-    Data(uid, name), mVtkPolyData(polyData), mWireframe(false), mBackfaceCulling(false), mFrontfaceCulling(false),mHasGlyph(false), mOrientationArray(""), mColorArray("")
+    Data(uid, name), mVtkPolyData(polyData), mWireframe(false), mBackfaceCulling(false), mFrontfaceCulling(false),mHasGlyph(false), mOrientationArray(""), mColorArray(""),mVisSize(2.0)
 {
 	mColor = QColor(255, 0, 0, 255);
     mShowGlyph = shouldGlyphBeEnableByDefault();
@@ -166,6 +166,7 @@ void Mesh::addXml(QDomNode& dataNode)
     elemGlyph.setAttribute("orientationArray", mOrientationArray.c_str());
     elemGlyph.setAttribute("colorArray", mColorArray.c_str());
     elemGlyph.setAttribute("glyphLUT", mGlyphLUT.c_str());
+    elemGlyph.setAttribute("glyphVisSize", mVisSize);
     meshNode.appendChild(elemGlyph);
 
 }
@@ -223,7 +224,8 @@ void Mesh::parseXml(QDomNode& dataNode)
         mShowGlyph = glyphNode.toElement().attribute("showGlyph").toInt();
         mOrientationArray = glyphNode.toElement().attribute("orientationArray").toStdString();
         mColorArray = glyphNode.toElement().attribute("colorArray").toStdString();
-        //mGlyphLUT = glyphNode.toElement().attribute("glyphLUT").toStdString();
+        mGlyphLUT = glyphNode.toElement().attribute("glyphLUT").toStdString();
+       // mVisSize =  glyphNode.toElement().attribute("glyphVisSize").toDouble();
     }
 
 	emit meshChanged();
@@ -298,6 +300,19 @@ const char * Mesh::getOrientationArray()
 void Mesh::setOrientationArray(const char * orientationArray)
 {
     mOrientationArray = orientationArray;
+    emit meshChanged();
+}
+
+double Mesh::getVisSize()
+{
+    return mVisSize;
+}
+
+void Mesh::setVisSize(double size)
+{
+    if(mVisSize==size) return;
+
+    mVisSize=size;
     emit meshChanged();
 }
 

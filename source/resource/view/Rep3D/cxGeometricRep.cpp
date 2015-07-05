@@ -117,11 +117,12 @@ void GeometricRep::meshChangedSlot()
         mGraphicalGlyph3DDataPtr->setColorArray(mMesh->getColorArray());
         mGraphicalGlyph3DDataPtr->setColor(mMesh->getColor().redF(), mMesh->getColor().greenF(), mMesh->getColor().blueF());
         mGraphicalGlyph3DDataPtr->setLUT(mMesh->getGlyphLUT());
+        mGraphicalGlyph3DDataPtr->setScaleFactor(mMesh->getVisSize());
     }
 
     mGraphicalPolyDataPtr->setData(mMesh->getVtkPolyData());
     mGraphicalPolyDataPtr->setIsWireFrame(mMesh->getIsWireframe());
-    mGraphicalPolyDataPtr->setPointSize(2);
+    mGraphicalPolyDataPtr->setPointSize(mMesh->getVisSize());
     mGraphicalPolyDataPtr->setScalarVisibility(false);//Don't use the LUT from the VtkPolyData
     //Set mesh color
     mGraphicalPolyDataPtr->setColor(mMesh->getColor().redF(), mMesh->getColor().greenF(), mMesh->getColor().blueF());

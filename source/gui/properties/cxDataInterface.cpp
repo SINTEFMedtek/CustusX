@@ -787,11 +787,8 @@ QStringList StringPropertyGlyphLUT::getValueRange() const
     "Brewer Qualitative Paired"<<
     "Brewer Qualitative Set3";
 
-
-
     return retval;
 }
-
 
 } // namespace cx
 

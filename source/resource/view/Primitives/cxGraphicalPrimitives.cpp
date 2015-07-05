@@ -143,6 +143,7 @@ void GraphicalGeometricBase::setUserMatrix(vtkMatrix4x4 *matrix)
 
 void GraphicalGeometricBase::setPointSize(int pointSize)
 {
+    if(pointSize<=0) return;
     mProperty->SetPointSize(pointSize);
 }
 
@@ -236,7 +237,6 @@ GraphicalGlyph3DData::GraphicalGlyph3DData(vtkPolyDataAlgorithmPtr source, vtkRe
     mMapper->ScalarVisibilityOn();
     mMapper->SetUseLookupTableScalarRange(1);
     mMapper->SetScalarMode(VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
-
     mActor->SetMapper(mMapper);
     setSource(source);
     setRenderer(renderer);
@@ -277,6 +277,12 @@ void GraphicalGlyph3DData::setLUT(const char* lut)
     mMapper->SetLookupTable(table);
 }
 
+
+void GraphicalGlyph3DData::setScaleFactor(double scaleFactor)
+{
+    if(scaleFactor<=0) return;
+    mMapper->SetScaleFactor(scaleFactor);
+}
 
 vtkMapperPtr GraphicalGlyph3DData::getMapper()
 {

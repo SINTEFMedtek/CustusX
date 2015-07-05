@@ -419,8 +419,6 @@ protected:
 
 
 
-
-
 typedef boost::shared_ptr<class StringPropertyGlyphLUT> StringPropertyGlyphLUTPtr;
 
 /**
@@ -448,8 +446,6 @@ protected:
   MeshPtr mData;
   PatientModelServicePtr mPatientModelService;
 };
-
-
 
 
 } // namespace cx
