@@ -83,7 +83,7 @@ private:
   StringPropertyParentFramePtr mParentFrameAdapter;
   StringPropertyDataNameEditablePtr mNameAdapter;
   StringPropertyDataUidEditablePtr mUidAdapter;
-  StringPropertyActiveMeshPtr mSelectMeshWidget;
+  StringPropertySelectMeshPtr mSelectMeshWidget;
   ColorPropertyPtr mColorAdapter;
   QCheckBox* mBackfaceCullingCheckBox;
   QCheckBox* mFrontfaceCullingCheckBox;
