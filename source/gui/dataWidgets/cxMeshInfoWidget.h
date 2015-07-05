@@ -89,6 +89,7 @@ private:
   QCheckBox* mGlyphVisualizationCheckBox;
   StringPropertyGlyphOrientationArrayPtr mGlyphOrientationArrayAdapter;
   StringPropertyGlyphColorArrayPtr mGlyphColorArrayAdapter;
+  StringPropertyGlyphLUTPtr mGlyphColorLUTAdapter;
 
 
   PatientModelServicePtr mPatientModelService;

@@ -101,6 +101,7 @@ void MeshInfoWidget::meshSelectedSlot()
 		mUidAdapter->setData(mMesh);
         mGlyphOrientationArrayAdapter->setData(mMesh);
         mGlyphColorArrayAdapter->setData(mMesh);
+        mGlyphColorLUTAdapter->setData(mMesh);
 
 		return;
 	}
@@ -123,7 +124,7 @@ void MeshInfoWidget::meshSelectedSlot()
 	mColorAdapter->setValue(mMesh->getColor());
     mGlyphOrientationArrayAdapter->setData(mMesh);
     mGlyphColorArrayAdapter->setData(mMesh);
-
+    mGlyphColorLUTAdapter->setData(mMesh);
 
 	std::map<std::string, std::string> info = getDisplayFriendlyInfo(mMesh);
 	this->populateTableWidget(info);
@@ -186,7 +187,7 @@ void MeshInfoWidget::addWidgets(PatientModelServicePtr patientModelService)
 	mParentFrameAdapter = StringPropertyParentFrame::New(mPatientModelService);
     mGlyphOrientationArrayAdapter = StringPropertyGlyphOrientationArray::New(mPatientModelService);
     mGlyphColorArrayAdapter = StringPropertyGlyphColorArray::New(mPatientModelService);
-
+    mGlyphColorLUTAdapter = StringPropertyGlyphLUT::New(mPatientModelService);
 
 	QWidget* optionsWidget = new QWidget(this);
 	QHBoxLayout* optionsLayout = new QHBoxLayout(optionsWidget);
@@ -207,8 +208,7 @@ void MeshInfoWidget::addWidgets(PatientModelServicePtr patientModelService)
     glyphLayout->addWidget(mGlyphVisualizationCheckBox,gridGlyphLayoutRow++,0);
     new LabeledComboBoxWidget(this, mGlyphOrientationArrayAdapter,glyphLayout, gridGlyphLayoutRow++);
     new LabeledComboBoxWidget(this, mGlyphColorArrayAdapter,glyphLayout, gridGlyphLayoutRow++);
-
-
+    new LabeledComboBoxWidget(this, mGlyphColorLUTAdapter,glyphLayout, gridGlyphLayoutRow++);
 
 	int gridLayoutRow = 1;
 
