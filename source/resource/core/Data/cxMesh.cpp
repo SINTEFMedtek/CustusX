@@ -57,13 +57,15 @@ Mesh::Mesh(const QString& uid, const QString& name) :
     Data(uid, name), mVtkPolyData(vtkPolyDataPtr::New()), mWireframe(false), mBackfaceCulling(false), mFrontfaceCulling(false),mHasGlyph(false), mOrientationArray(""), mColorArray("")
 {
 	mColor = QColor(255, 0, 0, 255);
+    mShowGlyph = shouldGlyphBeEnableByDefault();
 	this->setAcquisitionTime(QDateTime::currentDateTime());
 }
 Mesh::Mesh(const QString& uid, const QString& name, const vtkPolyDataPtr& polyData) :
     Data(uid, name), mVtkPolyData(polyData), mWireframe(false), mBackfaceCulling(false), mFrontfaceCulling(false),mHasGlyph(false), mOrientationArray(""), mColorArray("")
 {
 	mColor = QColor(255, 0, 0, 255);
-	this->setAcquisitionTime(QDateTime::currentDateTime());
+    mShowGlyph = shouldGlyphBeEnableByDefault();
+    this->setAcquisitionTime(QDateTime::currentDateTime());
 }
 Mesh::~Mesh()
 {
@@ -111,15 +113,12 @@ void Mesh::setVtkPolyData(const vtkPolyDataPtr& polyData)
         }
     }
     mColorArrayList << "";
+    mColorArray="";
     for(int k=0; k <  mVtkPolyData->GetPointData()->GetNumberOfArrays(); k++)
     {
         num=mVtkPolyData->GetPointData()->GetArray(k)->GetNumberOfComponents();
         if(num==1)
         {
-            if(strlen(mColorArray.c_str())==0)
-            {
-                mColorArray=mVtkPolyData->GetPointData()->GetArrayName(k);
-            }
             mColorArrayList << mVtkPolyData->GetPointData()->GetArrayName(k);
         }
     }
@@ -220,10 +219,8 @@ void Mesh::parseXml(QDomNode& dataNode)
         mShowGlyph = glyphNode.toElement().attribute("showGlyph").toInt();
         mOrientationArray = glyphNode.toElement().attribute("orientationArray").toStdString();
         mColorArray = glyphNode.toElement().attribute("colorArray").toStdString();
-    }else
-    {
-        mShowGlyph = shouldGlyphBeEnableByDefault();
     }
+
 	emit meshChanged();
 }
 
