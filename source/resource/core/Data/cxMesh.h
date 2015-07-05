@@ -96,10 +96,9 @@ public:
     bool hasGlyph();
     const char * getOrientationArray();
     const char * getColorArray();
+    const char * getGlyphLUT();
     QStringList getOrientationArrayList();
     QStringList getColorArrayList();
-
-
 
 	virtual void save(const QString &basePath);
 signals:
@@ -110,7 +109,7 @@ public slots:
     void setShowGlyph(bool val);
     void setOrientationArray(const char * orientationArray);
     void setColorArray(const char * colorArray);
-
+    void setGlyphLUT(const char * glyphLUT);
 private:
 	vtkPolyDataPtr mVtkPolyData;
 	QColor mColor;
@@ -122,6 +121,7 @@ private:
     bool shouldGlyphBeEnableByDefault();
     std::string mOrientationArray;
     std::string mColorArray;
+    std::string mGlyphLUT;
     QStringList mOrientationArrayList;
     QStringList mColorArrayList;
 };

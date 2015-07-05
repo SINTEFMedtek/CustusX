@@ -706,6 +706,92 @@ QStringList StringPropertyGlyphColorArray::getValueRange() const
     return mData->getColorArrayList();
 }
 
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+StringPropertyGlyphLUT::StringPropertyGlyphLUT(PatientModelServicePtr patientModelService) :
+    mPatientModelService(patientModelService)
+{
+    connect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &Property::changed);
+}
+
+StringPropertyGlyphLUT::~StringPropertyGlyphLUT()
+{
+    disconnect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &Property::changed);
+}
+
+void StringPropertyGlyphLUT::setData(MeshPtr data)
+{
+    if (mData)
+        disconnect(mData.get(), &Data::propertiesChanged, this, &Property::changed);
+    mData = data;
+    if (mData)
+        connect(mData.get(), &Data::propertiesChanged, this, &Property::changed);
+    emit changed();
+}
+
+QString StringPropertyGlyphLUT::getDisplayName() const
+{
+    return "Set glyph color LUT";
+}
+
+bool StringPropertyGlyphLUT::setValue(const QString& value)
+{
+    if (!mData)
+        return false;
+    mData->setGlyphLUT(value.toStdString().c_str());
+    return true;
+}
+
+QString StringPropertyGlyphLUT::getValue() const
+{
+    if (!mData)
+        return "";
+    return mData->getGlyphLUT();
+}
+
+QString StringPropertyGlyphLUT::getHelp() const
+{
+    if (!mData)
+        return "";
+    return "Select which color LUT to use for coloring the glyphs.";
+}
+
+QStringList StringPropertyGlyphLUT::getValueRange() const
+{
+    QStringList retval;
+
+    retval <<
+    "Spectrum"<<
+    "Warm"<<
+    "Cool"<<
+    "Blues"<<
+    "Wild Flower"<<
+    "Citrus"<<
+
+    "Brewer Diverging Purple-Orange"<<
+    "Brewer Diverging Spectral"<<
+    "Brewer Diverging Brown-Blue-Green"<<
+
+    "Brewer Sequential Blue-Green"<<
+    "Brewer Sequential Yellow-Orange-Brown"<<
+    "Brewer Sequential Blue-Purple"<<
+
+    "Brewer Qualitative Accent"<<
+    "Brewer Qualitative Dark2"<<
+    "Brewer Qualitative Set2"<<
+    "Brewer Qualitative Pastel2"<<
+    "Brewer Qualitative Pastel1"<<
+    "Brewer Qualitative Set1"<<
+    "Brewer Qualitative Paired"<<
+    "Brewer Qualitative Set3";
+
+
+
+    return retval;
+}
+
 
 } // namespace cx
 

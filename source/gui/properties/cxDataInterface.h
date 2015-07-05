@@ -420,6 +420,38 @@ protected:
 
 
 
+
+typedef boost::shared_ptr<class StringPropertyGlyphLUT> StringPropertyGlyphLUTPtr;
+
+/**
+ * \brief Adapter that selects the glyph color LUT.
+ */
+class cxGui_EXPORT StringPropertyGlyphLUT : public StringPropertyBase
+{
+  Q_OBJECT
+public:
+  static StringPropertyGlyphLUTPtr New(PatientModelServicePtr patientModelService) { return StringPropertyGlyphLUTPtr(new StringPropertyGlyphLUT(patientModelService)); }
+  StringPropertyGlyphLUT(PatientModelServicePtr patientModelService);
+  virtual ~StringPropertyGlyphLUT();
+  void setData(MeshPtr data);
+
+public: // basic methods
+  virtual QString getDisplayName() const;
+  virtual bool setValue(const QString& value);
+  virtual QString getValue() const;
+
+public: // optional methods
+  virtual QString getHelp() const;
+  virtual QStringList getValueRange() const;
+
+protected:
+  MeshPtr mData;
+  PatientModelServicePtr mPatientModelService;
+};
+
+
+
+
 } // namespace cx
 
 

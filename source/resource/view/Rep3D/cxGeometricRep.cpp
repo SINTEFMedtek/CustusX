@@ -115,6 +115,7 @@ void GeometricRep::meshChangedSlot()
         mGraphicalGlyph3DDataPtr->setData(mMesh->getVtkPolyData());
         mGraphicalGlyph3DDataPtr->setOrientationArray(mMesh->getOrientationArray());
         mGraphicalGlyph3DDataPtr->setColorArray(mMesh->getColorArray());
+        mGraphicalGlyph3DDataPtr->setLUT(mMesh->getGlyphLUT());
         mGraphicalGlyph3DDataPtr->setColor(mMesh->getColor().redF(), mMesh->getColor().greenF(), mMesh->getColor().blueF());
     }
 

@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMesh.h"
 
 #include <vtkCellArray.h>
+#include <vtkColorSeries.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataWriter.h>
 #include <vtkPointData.h>
@@ -58,6 +59,7 @@ Mesh::Mesh(const QString& uid, const QString& name) :
 {
 	mColor = QColor(255, 0, 0, 255);
     mShowGlyph = shouldGlyphBeEnableByDefault();
+    mGlyphLUT ="Citrus";
 	this->setAcquisitionTime(QDateTime::currentDateTime());
 }
 Mesh::Mesh(const QString& uid, const QString& name, const vtkPolyDataPtr& polyData) :
@@ -65,6 +67,7 @@ Mesh::Mesh(const QString& uid, const QString& name, const vtkPolyDataPtr& polyDa
 {
 	mColor = QColor(255, 0, 0, 255);
     mShowGlyph = shouldGlyphBeEnableByDefault();
+    mGlyphLUT ="Citrus";
     this->setAcquisitionTime(QDateTime::currentDateTime());
 }
 Mesh::~Mesh()
@@ -162,6 +165,7 @@ void Mesh::addXml(QDomNode& dataNode)
     elemGlyph.setAttribute("showGlyph", mShowGlyph);
     elemGlyph.setAttribute("orientationArray", mOrientationArray.c_str());
     elemGlyph.setAttribute("colorArray", mColorArray.c_str());
+    elemGlyph.setAttribute("glyphLUT", mGlyphLUT.c_str());
     meshNode.appendChild(elemGlyph);
 
 }
@@ -219,6 +223,7 @@ void Mesh::parseXml(QDomNode& dataNode)
         mShowGlyph = glyphNode.toElement().attribute("showGlyph").toInt();
         mOrientationArray = glyphNode.toElement().attribute("orientationArray").toStdString();
         mColorArray = glyphNode.toElement().attribute("colorArray").toStdString();
+        //mGlyphLUT = glyphNode.toElement().attribute("glyphLUT").toStdString();
     }
 
 	emit meshChanged();
@@ -306,6 +311,18 @@ void Mesh::setColorArray(const char * colorArray)
     mColorArray = colorArray;
     emit meshChanged();
 }
+
+const char * Mesh::getGlyphLUT()
+{
+    return mGlyphLUT.c_str();
+}
+
+void Mesh::setGlyphLUT(const char * glyphLUT)
+{
+    mGlyphLUT = glyphLUT;
+    emit meshChanged();
+}
+
 
 QStringList Mesh::getOrientationArrayList()
 {

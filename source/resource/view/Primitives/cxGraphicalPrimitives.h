@@ -41,6 +41,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewportListener.h"
 #include <vtkPolyDataAlgorithm.h>
 #include <vtkGlyph3DMapper.h>
+#include <vtkColorSeries.h>
+#include <vtkLookupTable.h>
 #include <vtkMapper.h>
 
 class QColor;
@@ -130,10 +132,14 @@ public:
     void setData(vtkPolyDataPtr data);
     void setOrientationArray(const char* orientationArray);
     void setColorArray(const char* colorArray);
+    void setLUT(const char* lut);
     vtkMapperPtr getMapper();
 
 private:
     vtkGlyph3DMapperPtr mMapper;
+    vtkSmartPointer<vtkLookupTable> mLut;
+    int mLutId;
+    vtkSmartPointer<vtkColorSeries> mColorSeries;
 };
 typedef boost::shared_ptr<GraphicalGlyph3DData> GraphicalGlyph3DDataPtr;
 
@@ -154,7 +160,7 @@ class cxResourceVisualization_EXPORT GraphicalPoint3D
 //		void setColor(Vector3D color);
 		void setColor(QColor color);
 		void setValue(Vector3D point);
-		Vector3D getValue() const;
+        Vector3D getValue() const;
 		vtkActorPtr getActor();
 		vtkPolyDataPtr getPolyData();
 

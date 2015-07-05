@@ -236,6 +236,9 @@ GraphicalGlyph3DData::GraphicalGlyph3DData(vtkPolyDataAlgorithmPtr source, vtkRe
     mMapper->SetUseLookupTableScalarRange(1);
     mMapper->SetScalarMode(VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
 
+    mLut = vtkSmartPointer<vtkLookupTable>::New();
+    mColorSeries = vtkSmartPointer<vtkColorSeries>::New();
+    mLutId = mColorSeries->GetColorScheme();
     mActor->SetMapper(mMapper);
     setSource(source);
     setRenderer(renderer);
@@ -265,6 +268,19 @@ void GraphicalGlyph3DData::setColorArray(const char* colorArray)
     }
     mMapper->SelectColorArray(colorArray);
 }
+
+
+void GraphicalGlyph3DData::setLUT(const char* lut)
+{
+
+    int lutId=mColorSeries->SetColorSchemeByName(lut);
+    if (lutId == mLutId) return;
+    mLutId = lutId;
+    mColorSeries->BuildLookupTable(mLut);
+    mMapper->SetLookupTable(mLut);
+
+}
+
 
 vtkMapperPtr GraphicalGlyph3DData::getMapper()
 {
