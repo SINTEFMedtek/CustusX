@@ -102,17 +102,24 @@ void Mesh::setVtkPolyData(const vtkPolyDataPtr& polyData)
         num=mVtkPolyData->GetPointData()->GetArray(k)->GetNumberOfComponents();
         if(num==3)
         {
-            mOrientationArray=mVtkPolyData->GetPointData()->GetArrayName(k);
-            mHasGlyph=true;
+            if(strlen(mOrientationArray.c_str())==0)
+            {
+                mOrientationArray=mVtkPolyData->GetPointData()->GetArrayName(k);
+                mHasGlyph=true;
+            }
             mOrientationArrayList << mVtkPolyData->GetPointData()->GetArrayName(k);
         }
     }
+    mColorArrayList << "";
     for(int k=0; k <  mVtkPolyData->GetPointData()->GetNumberOfArrays(); k++)
     {
         num=mVtkPolyData->GetPointData()->GetArray(k)->GetNumberOfComponents();
         if(num==1)
         {
-            mColorArray=mVtkPolyData->GetPointData()->GetArrayName(k);
+            if(strlen(mColorArray.c_str())==0)
+            {
+                mColorArray=mVtkPolyData->GetPointData()->GetArrayName(k);
+            }
             mColorArrayList << mVtkPolyData->GetPointData()->GetArrayName(k);
         }
     }

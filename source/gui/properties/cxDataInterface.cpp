@@ -608,7 +608,7 @@ void StringPropertyGlyphOrientationArray::setData(MeshPtr data)
 
 QString StringPropertyGlyphOrientationArray::getDisplayName() const
 {
-    return "Set Glyph orientation array";
+    return "Set glyph orientation array";
 }
 
 bool StringPropertyGlyphOrientationArray::setValue(const QString& value)
@@ -642,6 +642,68 @@ QStringList StringPropertyGlyphOrientationArray::getValueRange() const
         return retval;
     }
     return mData->getOrientationArrayList();
+}
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+StringPropertyGlyphColorArray::StringPropertyGlyphColorArray(PatientModelServicePtr patientModelService) :
+    mPatientModelService(patientModelService)
+{
+    connect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &Property::changed);
+}
+
+StringPropertyGlyphColorArray::~StringPropertyGlyphColorArray()
+{
+    disconnect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &Property::changed);
+}
+
+void StringPropertyGlyphColorArray::setData(MeshPtr data)
+{
+    if (mData)
+        disconnect(mData.get(), &Data::propertiesChanged, this, &Property::changed);
+    mData = data;
+    if (mData)
+        connect(mData.get(), &Data::propertiesChanged, this, &Property::changed);
+    emit changed();
+}
+
+QString StringPropertyGlyphColorArray::getDisplayName() const
+{
+    return "Set glyph color array";
+}
+
+bool StringPropertyGlyphColorArray::setValue(const QString& value)
+{
+    if (!mData)
+        return false;
+    mData->setColorArray(value.toStdString().c_str());
+    return true;
+}
+
+QString StringPropertyGlyphColorArray::getValue() const
+{
+    if (!mData)
+        return "";
+    return mData->getColorArray();
+}
+
+QString StringPropertyGlyphColorArray::getHelp() const
+{
+    if (!mData)
+        return "";
+    return "Select which array to use for coloring the glyphs.";
+}
+
+QStringList StringPropertyGlyphColorArray::getValueRange() const
+{
+    if (!mData)
+    {
+        QStringList retval;
+        retval << "";
+        return retval;
+    }
+    return mData->getColorArrayList();
 }
 
 
