@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXTESTUR5TESTFIXTURE_H
 
 #include "cxUr5Connection.h"
+
 #include "cxtest_org_custusx_robot_ur5_export.h"
 
 namespace cxtest
@@ -45,6 +46,7 @@ public:
     Ur5TestFixture();
 
     cx::Ur5Connection connection;
+
 };
 
 } //cxtest

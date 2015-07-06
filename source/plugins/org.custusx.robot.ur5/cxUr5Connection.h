@@ -35,6 +35,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxSocketConnection.h"
 #include "org_custusx_robot_ur5_Export.h"
+#include "cxTransform3D.h"
+#include "cxVector3D.h"
+
 
 namespace cx
 {
@@ -46,6 +49,8 @@ namespace cx
  * \author Ole Vegard Solberg, SINTEF
  * \date 2015-06-25
  */
+
+
 class org_custusx_robot_ur5_EXPORT Ur5Connection : public SocketConnection
 {
     Q_OBJECT
@@ -59,20 +64,33 @@ public:
     bool isConnectedToRobot();
     bool sendMessage(QString message);
     bool waitForMessage();
-    void printDataQueue();
-    void testData();
-    void analyzeDataQueue();
-    void analyzeCartData();
+
+    void analyze_rawData();
+
+    void set_rawData(unsigned char* inMessage,qint64 bytes);
+    void set_cartData(QByteArray cartDataHolder);
+
+    void print_cartData();
+    void print_rawData();
+
+    void set_testData();
+    Vector3D axis;
+    double angles[3];
 
 private slots:
     virtual void internalDataAvailable();
 
-private:
-
 protected:
-    QByteArray dataQueue,typeHolder,cartDataHolder;
+    QByteArray rawData;
 
 };
+
+
+
+
+
+
+
 
 } // cx
 

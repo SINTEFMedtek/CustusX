@@ -49,20 +49,34 @@ TEST_CASE("Ur5Plugin: Send message to robot and receive message from robot", "[m
     Ur5TestFixture fixture;
     //REQUIRE(fixture.connection.isConnectedToRobot());
 
-    //QString message("set_tcp(p[0,0,0,0,0,0])");
-    //QString message("textmsg(\"Test1\")");
+    //QString message("set_pos(p[0,0,0,0,0,0])");
+    //QString message("movej(p[0.02,-0.59,0.29,2.94,-1.02,-0.04], a=0.3, v=0.3)");
+    //QString message("movej(p[0,-0.6,0.3,3,-1,0], a=0.1, v=0.1,r=0.1)");
+    //REQUIRE(fixture.connection.sendMessage(message));
+
+    //QString message2("movej(p[0,-0.4,0.6,2.2,-0.7,0.6], a=0.1, v=0.1)");
+    //REQUIRE(fixture.connection.sendMessage(message2));
     //REQUIRE(fixture.connection.waitForMessage());
 
     //QString message("get_joint_positions()");
-    //REQUIRE(fixture.connection.sendMessage(message));
-    //REQUIRE(fixture.connection.waitForMessage());
+
     REQUIRE(fixture.connection.waitForMessage());
+    fixture.connection.analyze_rawData();
+    fixture.connection.print_cartData();
+
+    REQUIRE(fixture.connection.waitForMessage());
+    fixture.connection.analyze_rawData();
+    fixture.connection.print_cartData();
+    //while(!(fixture.connection.axis(2)>0.5 || fixture.connection.axis(2)<0.7))
+    //{
+    //REQUIRE(fixture.connection.waitForMessage());
+    //fixture.connection.analyze_rawData();
+    //fixture.connection.print_cartData();
+    //}
 
     //fixture.connection.dataQueue = QByteArray(inMessage,560);
-    //fixture.connection.testData();
-    //fixture.connection.printDataQueue();
-    fixture.connection.analyzeDataQueue();
-    fixture.connection.analyzeCartData();
+    //fixture.connection.set_testData();
+
 
     //REQUIRE_FALSE(fixture.connection.sendMessage(message));
 }
