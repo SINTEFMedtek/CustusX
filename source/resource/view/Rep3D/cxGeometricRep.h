@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXGEOMETRICREP_H_
 #define CXGEOMETRICREP_H_
 
+
 #include "vtkForwardDeclarations.h"
 #include "cxRepImpl.h"
 #include "cxVector3D.h"

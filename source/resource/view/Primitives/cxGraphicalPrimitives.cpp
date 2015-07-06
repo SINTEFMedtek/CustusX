@@ -39,7 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkPolyDataMapper.h>
 #include <vtkActor.h>
 #include <vtkCellArray.h>
-#include <vtkPointData.h>
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
 #include <vtkCommand.h>
@@ -54,8 +53,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkTextProperty.h"
 #include "cxVtkHelperClasses.h"
 #include "vtkPolyDataNormals.h"
-
-#include "cxLogger.h"
 
 namespace cx
 {

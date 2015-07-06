@@ -125,6 +125,7 @@ void Mesh::setVtkPolyData(const vtkPolyDataPtr& polyData)
             mColorArrayList << mVtkPolyData->GetPointData()->GetArrayName(k);
         }
     }
+    mShowGlyph = shouldGlyphBeEnableByDefault();
 
 	emit meshChanged();
 }
