@@ -70,7 +70,7 @@ bool Ur5Connection::sendMessage(QString message)
     if(!ok)
         return false;
 
-    return mSocket->waitForBytesWritten(3000);
+    return mSocket->waitForBytesWritten(300);
 }
 
 bool Ur5Connection::waitForMessage()
@@ -113,6 +113,10 @@ void Ur5Connection::analyze_rawData()
 
         if(typeLength.find(lengthOfType) != typeLength.end() && types.find(typeID) !=types.end())
         {
+            if(typeID==1 && lengthOfType == 251)
+            {
+                set_jointData(rawData.mid(2*(i+sizeof(int)+sizeof(char)),2*(lengthOfType-sizeof(int)-sizeof(char))));
+            }
             if(typeID==4)
             {
                 set_cartData(rawData.mid(2*(i+sizeof(int)+sizeof(char)),2*(lengthOfType-sizeof(int)-sizeof(char))));
@@ -130,20 +134,45 @@ void Ur5Connection::set_cartData(QByteArray cartDataHolder)
         sscanf_s(cartDataHolder.mid(i*(2*sizeof(double)),2*sizeof(double)).data(), "%llx", (unsigned long long *)&a);
         if(i<3)
         {
-            axis(i) = a;
+            currentAxis(i) = a;
         }
         else
         {
-            angles[i-3] = a;
+            currentAngles[i-3] = a;
         }
 
     }
 }
 
+void Ur5Connection::set_jointData(QByteArray jointDataHolder)
+{
+    double a;
+    for(int i=0;i<6;i++)
+    {
+        sscanf_s(jointDataHolder.mid(i*(2*41),2*sizeof(double)).data(), "%llx", (unsigned long long *)&a);
+        if(i<3)
+        {
+            jointAxis(i) = a;
+        }
+        else
+        {
+            jointAngles[i-3] = a;
+        }
+
+    }
+}
+
+
 void Ur5Connection::print_cartData()
 {
-    std::cout << " x,  y,  z: " << axis << std::endl;
-    std::cout << "rx, ry, rz: " << angles[0] << "   " << angles[1] << "  " << angles[2] << std::endl;
+    std::cout << " x,  y,  z: " << currentAxis << std::endl;
+    std::cout << "rx, ry, rz: " << currentAngles[0] << "   " << currentAngles[1] << "  " << currentAngles[2] << std::endl;
+}
+
+void Ur5Connection::print_jointData()
+{
+    std::cout << " x,  y,  z: " << jointAxis << std::endl;
+    std::cout << "rx, ry, rz: " << jointAngles[0] << "  " << jointAngles[1] << " " << jointAngles[2] << std::endl;
 }
 
 void Ur5Connection::print_rawData()
@@ -156,6 +185,43 @@ void Ur5Connection::print_rawData()
     std::cout << std::endl;
 }
 
+bool Ur5Connection::movej(double* axis,double* angles,double a, double v)
+{
+    targetAxis = {axis[0],axis[1],axis[2]};
+    QString prog = QString("movej(p[%1,%2,%3,%4,%5,%6],a=%7,v=%8)").arg(axis[0]).arg(axis[1]).arg(axis[2]).arg(angles[0]).arg(angles[1]).arg(angles[2]).arg(a).arg(v);
+    if(!sendMessage(prog))
+        return false;
+    return true;
+}
+
+bool Ur5Connection::movej(double* axisAngles,double a, double v,double r)
+{
+    targetAxis = {axisAngles[0],axisAngles[1],axisAngles[2]};
+    QString prog = QString("movej(p[%1,%2,%3,%4,%5,%6],a=%7,v=%8,r=%9)").arg(axisAngles[0]).arg(axisAngles[1]).arg(axisAngles[2]).arg(axisAngles[3]).arg(axisAngles[4]).arg(axisAngles[5]).arg(a).arg(v).arg(r);
+    if(!sendMessage(prog))
+        return false;
+    return true;
+}
+
+bool Ur5Connection::waitForMove()
+{
+    while(!atTargetPos())
+    {
+        waitForMessage();
+        analyze_rawData();
+        std::cout << abs(currentAxis(0)-targetAxis(0)) << " " << abs(currentAxis(1)-targetAxis(1)) << " " << abs(currentAxis(2)-targetAxis(2)) << std::endl;
+    }
+    return true;
+}
+
+bool Ur5Connection::atTargetPos()
+{
+    if((abs(currentAxis(0)-targetAxis(0))>blendRadius) || (abs(currentAxis(1)-targetAxis(1))>blendRadius) || (abs(currentAxis(2)-targetAxis(2))>blendRadius))
+    {
+        return false;
+    }
+    return true;
+}
 
 void Ur5Connection::set_testData()
 {

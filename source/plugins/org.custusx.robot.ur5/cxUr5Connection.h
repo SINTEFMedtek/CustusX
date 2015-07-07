@@ -69,13 +69,23 @@ public:
 
     void set_rawData(unsigned char* inMessage,qint64 bytes);
     void set_cartData(QByteArray cartDataHolder);
+    void set_jointData(QByteArray jointDataHolder);
 
     void print_cartData();
+    void print_jointData();
     void print_rawData();
 
+    bool movej(double* axis,double* angles,double a=0.1,double v=0.1);
+    bool movej(double* axisAngles,double a, double v,double r=0);
+
+    bool waitForMove();
+    bool atTargetPos();
+
     void set_testData();
-    Vector3D axis;
-    double angles[3];
+    Vector3D currentAxis,targetAxis,jointAxis;
+    double currentAngles[3],targetAngles[3],jointAngles[3];
+    double blendRadius = 0.001;
+
 
 private slots:
     virtual void internalDataAvailable();

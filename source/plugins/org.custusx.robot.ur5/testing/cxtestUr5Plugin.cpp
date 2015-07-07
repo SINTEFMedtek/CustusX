@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <iostream>
 #include "cxtestUr5TestFixture.h"
+#include "cxMathBase.h"
 
 namespace cxtest
 {
@@ -61,24 +62,69 @@ TEST_CASE("Ur5Plugin: Send message to robot and receive message from robot", "[m
     //QString message("get_joint_positions()");
 
     REQUIRE(fixture.connection.waitForMessage());
-    fixture.connection.analyze_rawData();
-    fixture.connection.print_cartData();
-
-    REQUIRE(fixture.connection.waitForMessage());
-    fixture.connection.analyze_rawData();
-    fixture.connection.print_cartData();
-    //while(!(fixture.connection.axis(2)>0.5 || fixture.connection.axis(2)<0.7))
-    //{
-    //REQUIRE(fixture.connection.waitForMessage());
-    //fixture.connection.analyze_rawData();
-    //fixture.connection.print_cartData();
-    //}
-
-    //fixture.connection.dataQueue = QByteArray(inMessage,560);
     //fixture.connection.set_testData();
+    fixture.connection.analyze_rawData();
+    fixture.connection.print_cartData();
+    //fixture.connection.print_jointData();
 
 
-    //REQUIRE_FALSE(fixture.connection.sendMessage(message));
+//    double axis[3] = {0.3,-0.5,0.3};
+//    double angles[3] = {3,-1,0};
+//    fixture.connection.movej(axis,angles,0.1,0.1);
+//    REQUIRE(fixture.connection.waitForMove());
+
+//    fixture.connection.print_cartData();
+
+//    double axis2[3] = {-0.4,-0.45,0.3};
+//    double angles2[3] = {3,-1,0};
+//    fixture.connection.movej(axis2,angles2,0.1,0.1);
+//    REQUIRE(fixture.connection.waitForMove());
+
+//    fixture.connection.print_cartData();
+
+    double p1[6] = {0.27,-0.22,0.27,0.19,-2.45,-0.08};
+    double p2[6] = {0.28,-0.28,0.33,1.85,-2.49,0};
+    double p3[6] = {0.30,-0.32,0.42,1.82,-2.49,0.1};
+    double p4[6] = {0.31,-0.39,0.50,1.74,-2.54,0.14};
+    double p5[6] = {0.25,-0.59,0.47,1.47,-2.71,0.06};
+    double p6[6] = {0.22,-0.74,0.34,1.37,-2.8,-0.1};
+    double p7[6] = {0.23,-0.79,0.27,1.36,-2.81,-0.12};
+
+    double r = 0;
+
+    fixture.connection.movej(p1,0.1,0.3,r);
+    REQUIRE(fixture.connection.waitForMove());
+    fixture.connection.print_cartData();
+
+
+    fixture.connection.movej(p2,0.1,0.1,r);
+    REQUIRE(fixture.connection.waitForMove());
+    fixture.connection.print_cartData();
+
+    fixture.connection.movej(p3,0.1,0.1,r);
+    REQUIRE(fixture.connection.waitForMove());
+    fixture.connection.print_cartData();
+
+    fixture.connection.movej(p4,0.1,0.1,r);
+    REQUIRE(fixture.connection.waitForMove());
+    fixture.connection.print_cartData();
+
+
+    fixture.connection.movej(p5,0.1,0.1,r);
+    REQUIRE(fixture.connection.waitForMove());
+    fixture.connection.print_cartData();
+
+
+    fixture.connection.movej(p6,0.1,0.1,r);
+    REQUIRE(fixture.connection.waitForMove());
+    fixture.connection.print_cartData();
+
+
+    fixture.connection.movej(p7,0.1,0.1,r);
+    REQUIRE(fixture.connection.waitForMove());
+    fixture.connection.print_cartData();
+
+    fixture.connection.requestDisconnect();
 }
 
 } //cxtest
