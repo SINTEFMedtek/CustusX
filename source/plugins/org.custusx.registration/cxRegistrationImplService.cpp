@@ -145,7 +145,7 @@ void RegistrationImplService::setFixedData(QString uid)
 	if (uid==mFixedData)
 		return;
 	mFixedData = uid;
-	emit movingDataChanged(mFixedData);
+	emit fixedDataChanged(mFixedData);
 }
 
 DataPtr RegistrationImplService::getMovingData()
