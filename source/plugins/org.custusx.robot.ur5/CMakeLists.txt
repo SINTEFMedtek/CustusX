@@ -7,6 +7,9 @@ set(PLUGIN_SRCS
   cxUr5GUIExtenderService.cpp
   cxUr5Widget.cpp
   cxUr5Connection.cpp
+  cxUr5State.cpp
+  cxUr5Transmit.cpp
+  cxUr5Receive.cpp
 )
 
 # Files which should be processed by Qts moc
@@ -15,6 +18,9 @@ set(PLUGIN_MOC_SRCS
   cxUr5GUIExtenderService.h
   cxUr5Widget.h
   cxUr5Connection.h
+  cxUr5State.h
+  cxUr5Transmit.h
+  cxUr5Receive.h
 )
 
 # Qt Designer files which should be processed by Qts uic

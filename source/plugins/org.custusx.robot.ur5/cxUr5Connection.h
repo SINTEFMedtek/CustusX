@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "org_custusx_robot_ur5_Export.h"
 #include "cxTransform3D.h"
 #include "cxVector3D.h"
+#include "cxUr5State.h"
 
 
 namespace cx
@@ -75,17 +76,22 @@ public:
     void print_jointData();
     void print_rawData();
 
-    bool movej(double* axis,double* angles,double a=0.1,double v=0.1);
-    bool movej(double* axisAngles,double a, double v,double r=0);
+    bool movep(double* axis,double* angles,double a=0.1,double v=0.1);
+    bool movep(double* axisAngles,double a, double v,double r=0);
+    bool speedj(double* speedField, double a, double t);
+
+    bool movej(Ur5State targetPose,double acc = 0.1, double vel = 0.1, double r = 0);
+    bool movel(Ur5State targetPose,double acc = 0.1, double vel = 0.1);
 
     bool waitForMove();
     bool atTargetPos();
 
     void set_testData();
-    Vector3D currentAxis,targetAxis,jointAxis;
-    double currentAngles[3],targetAngles[3],jointAngles[3];
-    double blendRadius = 0.001;
 
+
+
+    double blendRadius = 0.0009;
+    Ur5State currentState,targetState,jointState;
 
 private slots:
     virtual void internalDataAvailable();

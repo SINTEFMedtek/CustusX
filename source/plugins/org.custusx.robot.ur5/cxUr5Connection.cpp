@@ -36,7 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 #include <QFile>
 #include <set>
-#include <cxMathBase.h>
 
 #include "cxLogger.h"
 #include "cxUtilHelpers.h"
@@ -99,6 +98,18 @@ void Ur5Connection::set_rawData(unsigned char* inMessage,qint64 bytes)
     rawData = QByteArray(reinterpret_cast<char*>(inMessage),bytes).toHex();
 }
 
+void Ur5Connection::print_rawData()
+{
+    std::cout << "Number of bytes: " << rawData.size() << std::endl;
+    for(int i=0;i<rawData.size();i++)
+    {
+        std::cout << rawData.data()[i];
+    }
+    std::cout << std::endl;
+}
+
+// Her og ned kan flyttes til Ur5Movement eller Ur5Robot
+
 void Ur5Connection::analyze_rawData()
 {
     std::set<int> typeLength = {1254,560,53,251,29,37,64}; // Secondary client data x2, Cart. info, Joint data, Robot modus, Robot data1, Robot data2
@@ -123,81 +134,81 @@ void Ur5Connection::analyze_rawData()
             }
         }
     }
-
 }
 
-void Ur5Connection::set_cartData(QByteArray cartDataHolder)
+void Ur5Connection::set_cartData(QByteArray cartData)
 {
-    double a;
     for(int i=0;i<6;i++)
     {
-        sscanf_s(cartDataHolder.mid(i*(2*sizeof(double)),2*sizeof(double)).data(), "%llx", (unsigned long long *)&a);
         if(i<3)
         {
-            currentAxis(i) = a;
+            sscanf_s(cartData.mid(i*(2*sizeof(double)),2*sizeof(double)).data(), "%llx", (unsigned long long *)&currentState.axis(i));
         }
         else
         {
-            currentAngles[i-3] = a;
+            sscanf_s(cartData.mid(i*(2*sizeof(double)),2*sizeof(double)).data(), "%llx", (unsigned long long *)&currentState.angles(i-3));
         }
 
     }
 }
 
-void Ur5Connection::set_jointData(QByteArray jointDataHolder)
+void Ur5Connection::set_jointData(QByteArray jointData)
 {
-    double a;
     for(int i=0;i<6;i++)
     {
-        sscanf_s(jointDataHolder.mid(i*(2*41),2*sizeof(double)).data(), "%llx", (unsigned long long *)&a);
         if(i<3)
         {
-            jointAxis(i) = a;
+            sscanf_s(jointData.mid(i*(2*41)+2*2*sizeof(double),2*sizeof(double)).data(), "%llx", (unsigned long long *)&jointState.axisVelocity(i));
+            sscanf_s(jointData.mid(i*(2*41),2*sizeof(double)).data(), "%llx", (unsigned long long *)&jointState.axis(i));
         }
         else
         {
-            jointAngles[i-3] = a;
+            sscanf_s(jointData.mid(i*(2*41)+2*2*sizeof(double),2*sizeof(double)).data(), "%llx", (unsigned long long *)&jointState.angleVelocity(i-3));
+            sscanf_s(jointData.mid(i*(2*41),2*sizeof(double)).data(), "%llx", (unsigned long long *)&jointState.angles(i-3));
         }
-
     }
 }
 
 
 void Ur5Connection::print_cartData()
 {
-    std::cout << " x,  y,  z: " << currentAxis << std::endl;
-    std::cout << "rx, ry, rz: " << currentAngles[0] << "   " << currentAngles[1] << "  " << currentAngles[2] << std::endl;
+    std::cout << currentState.axis << std::endl;
+    std::cout << currentState.angles << std::endl;
 }
 
 void Ur5Connection::print_jointData()
 {
-    std::cout << " x,  y,  z: " << jointAxis << std::endl;
-    std::cout << "rx, ry, rz: " << jointAngles[0] << "  " << jointAngles[1] << " " << jointAngles[2] << std::endl;
 }
 
-void Ur5Connection::print_rawData()
-{
-    std::cout << "Number of bytes: " << rawData.size() << std::endl;
-    for(int i=0;i<rawData.size();i++)
-    {
-        std::cout << rawData.data()[i]; // add toHex() on real data
-    }
-    std::cout << std::endl;
-}
 
-bool Ur5Connection::movej(double* axis,double* angles,double a, double v)
+
+bool Ur5Connection::movej(Ur5State p,double a, double v,double r)
 {
-    targetAxis = {axis[0],axis[1],axis[2]};
-    QString prog = QString("movej(p[%1,%2,%3,%4,%5,%6],a=%7,v=%8)").arg(axis[0]).arg(axis[1]).arg(axis[2]).arg(angles[0]).arg(angles[1]).arg(angles[2]).arg(a).arg(v);
+    targetState = p;
+    QString prog = QString("movej(p[%1,%2,%3,%4,%5,%6],a=%7,v=%8,r=%9)")
+            .arg(p.axis(0)).arg(p.axis(1)).arg(p.axis(2)).arg(p.angles(0))
+            .arg(p.angles(1)).arg(p.angles(2)).arg(a).arg(v).arg(r);
     if(!sendMessage(prog))
         return false;
     return true;
 }
 
-bool Ur5Connection::movej(double* axisAngles,double a, double v,double r)
+bool Ur5Connection::movel(Ur5State p,double a, double v)
 {
-    targetAxis = {axisAngles[0],axisAngles[1],axisAngles[2]};
-    QString prog = QString("movej(p[%1,%2,%3,%4,%5,%6],a=%7,v=%8,r=%9)").arg(axisAngles[0]).arg(axisAngles[1]).arg(axisAngles[2]).arg(axisAngles[3]).arg(axisAngles[4]).arg(axisAngles[5]).arg(a).arg(v).arg(r);
+    targetState = p;
+    QString prog = QString("movel(p[%1,%2,%3,%4,%5,%6],a=%7,v=%8)")
+            .arg(p.axis(0)).arg(p.axis(1)).arg(p.axis(2)).arg(p.angles(0))
+            .arg(p.angles(1)).arg(p.angles(2)).arg(a).arg(v);
+    if(!sendMessage(prog))
+        return false;
+    return true;
+}
+
+bool Ur5Connection::speedj(double* speedField, double a, double t)
+{
+    QString prog = QString("speedj([%1,%2,%3,%4,%5,%6],a=%7,t_min=%8)")
+            .arg(speedField[0]).arg(speedField[1]).arg(speedField[2]).arg(speedField[3])
+            .arg(speedField[4]).arg(speedField[5]).arg(a).arg(t);
     if(!sendMessage(prog))
         return false;
     return true;
@@ -209,18 +220,13 @@ bool Ur5Connection::waitForMove()
     {
         waitForMessage();
         analyze_rawData();
-        std::cout << abs(currentAxis(0)-targetAxis(0)) << " " << abs(currentAxis(1)-targetAxis(1)) << " " << abs(currentAxis(2)-targetAxis(2)) << std::endl;
     }
     return true;
 }
 
 bool Ur5Connection::atTargetPos()
 {
-    if((abs(currentAxis(0)-targetAxis(0))>blendRadius) || (abs(currentAxis(1)-targetAxis(1))>blendRadius) || (abs(currentAxis(2)-targetAxis(2))>blendRadius))
-    {
-        return false;
-    }
-    return true;
+    return (currentState.axis-targetState.axis).length() < blendRadius;
 }
 
 void Ur5Connection::set_testData()
