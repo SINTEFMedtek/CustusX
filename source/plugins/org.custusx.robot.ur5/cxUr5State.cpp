@@ -6,14 +6,4 @@
 namespace cx
 {
 
-Ur5State Ur5State::updateCurrentState()
-{
-    return Ur5Receive::analyze_rawData(Ur5Connection::rawData);
-}
-
-Ur5State Ur5State::currentState()
-{
-    return this;
-}
-
 }

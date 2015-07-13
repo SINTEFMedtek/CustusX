@@ -110,81 +110,81 @@ void Ur5Connection::print_rawData()
 
 // Her og ned kan flyttes til Ur5Receive
 
-void Ur5Connection::analyze_rawData()
-{
-    std::set<int> typeLength = {1254,560,53,251,29,37,64}; // Secondary client data x2, Cart. info, Joint data, Robot modus, Robot data1, Robot data2
-    std::set<int> types = {16,4,1,0,2,3,20}; // Secondary client data, Cart. info, Joint data, Robot modus, Robot data1, Robot data2, Robot Messages
+//void Ur5Connection::analyze_rawData()
+//{
+//    std::set<int> typeLength = {1254,560,53,251,29,37,64}; // Secondary client data x2, Cart. info, Joint data, Robot modus, Robot data1, Robot data2
+//    std::set<int> types = {16,4,1,0,2,3,20}; // Secondary client data, Cart. info, Joint data, Robot modus, Robot data1, Robot data2, Robot Messages
 
-    bool ok;
-    for(int i=0;i<rawData.size();i++)
-    {
-        int lengthOfType = rawData.mid(i,sizeof(int)).toHex().toInt(&ok,16);
-        int typeID = rawData.mid((i+sizeof(int)),sizeof(char)).toHex().toInt(&ok,16);
+//    bool ok;
+//    for(int i=0;i<rawData.size();i++)
+//    {
+//        int lengthOfType = rawData.mid(i,sizeof(int)).toHex().toInt(&ok,16);
+//        int typeID = rawData.mid((i+sizeof(int)),sizeof(char)).toHex().toInt(&ok,16);
 
-        if(typeLength.find(lengthOfType) != typeLength.end() && types.find(typeID) !=types.end())
-        {
-            set_data(rawData,i,typeID,lengthOfType);
-        }
-    }
-}
+//        if(typeLength.find(lengthOfType) != typeLength.end() && types.find(typeID) !=types.end())
+//        {
+//            set_data(rawData,i,typeID,lengthOfType);
+//        }
+//    }
+//}
 
-void Ur5Connection::set_data(QByteArray rawData,int i,int typeID,int lengthOfType)
-{
-    if(typeID==1 && lengthOfType == 251)
-    {
-        set_jointData(rawData.mid(i+sizeof(int)+sizeof(char),lengthOfType-sizeof(int)-sizeof(char)));
-    }
-    if(typeID==4)
-    {
-        set_cartData(rawData.mid((i+sizeof(int)+sizeof(char)),(lengthOfType-sizeof(int)-sizeof(char))));
-    }
-}
+//void Ur5Connection::set_data(QByteArray rawData,int i,int typeID,int lengthOfType)
+//{
+//    if(typeID==1 && lengthOfType == 251)
+//    {
+//        set_jointData(rawData.mid(i+sizeof(int)+sizeof(char),lengthOfType-sizeof(int)-sizeof(char)));
+//    }
+//    if(typeID==4)
+//    {
+//        set_cartData(rawData.mid((i+sizeof(int)+sizeof(char)),(lengthOfType-sizeof(int)-sizeof(char))));
+//    }
+//}
 
-void Ur5Connection::set_cartData(QByteArray cartData)
-{
-    for(int i=0;i<6;i++)
-    {
-        if(i<3)
-        {
-            sscanf_s(cartData.mid(i*sizeof(double),sizeof(double)).toHex().data(), "%llx", (unsigned long long *)&currentState.axis(i));
-        }
-        else
-        {
-            sscanf_s(cartData.mid(i*sizeof(double),sizeof(double)).toHex().data(), "%llx", (unsigned long long *)&currentState.angles(i-3));
-        }
+//void Ur5Connection::set_cartData(QByteArray cartData)
+//{
+//    for(int i=0;i<6;i++)
+//    {
+//        if(i<3)
+//        {
+//            sscanf_s(cartData.mid(i*sizeof(double),sizeof(double)).toHex().data(), "%llx", (unsigned long long *)&currentState.cartAxis(i));
+//        }
+//        else
+//        {
+//            sscanf_s(cartData.mid(i*sizeof(double),sizeof(double)).toHex().data(), "%llx", (unsigned long long *)&currentState.cartAngles(i-3));
+//        }
 
-    }
-}
+//    }
+//}
 
-void Ur5Connection::set_jointData(QByteArray jointData)
-{
-    for(int i=0;i<6;i++)
-    {
-        if(i<3)
-        {
-            sscanf_s(jointData.mid(i*41+2*sizeof(double),sizeof(double)).toHex().data(), "%llx", (unsigned long long *)&jointState.axisVelocity(i));
-            sscanf_s(jointData.mid(i*41,sizeof(double)).toHex().data(), "%llx", (unsigned long long *)&jointState.axis(i));
-        }
-        else
-        {
-            sscanf_s(jointData.mid(i*41+2*sizeof(double),sizeof(double)).toHex().data(), "%llx", (unsigned long long *)&jointState.angleVelocity(i-3));
-            sscanf_s(jointData.mid(i*41,sizeof(double)).toHex().data(), "%llx", (unsigned long long *)&jointState.angles(i-3));
-        }
-    }
-}
+//void Ur5Connection::set_jointData(QByteArray jointData)
+//{
+//    for(int i=0;i<6;i++)
+//    {
+//        if(i<3)
+//        {
+//            sscanf_s(jointData.mid(i*41+2*sizeof(double),sizeof(double)).toHex().data(), "%llx", (unsigned long long *)&jointState.cartAxisVelocity(i));
+//            sscanf_s(jointData.mid(i*41,sizeof(double)).toHex().data(), "%llx", (unsigned long long *)&jointState.cartAxis(i));
+//        }
+//        else
+//        {
+//            sscanf_s(jointData.mid(i*41+2*sizeof(double),sizeof(double)).toHex().data(), "%llx", (unsigned long long *)&jointState.angleVelocity(i-3));
+//            sscanf_s(jointData.mid(i*41,sizeof(double)).toHex().data(), "%llx", (unsigned long long *)&jointState.cartAngles(i-3));
+//        }
+//    }
+//}
 
 
-void Ur5Connection::print_cartData()
-{
-    std::cout << currentState.axis << std::endl;
-    std::cout << currentState.angles << std::endl;
-}
+//void Ur5Connection::print_cartData()
+//{
+//    std::cout << currentState.cartAxis << std::endl;
+//    std::cout << currentState.cartAngles << std::endl;
+//}
 
-void Ur5Connection::print_jointData()
-{
-    std::cout << "Pos (x,y,z): " << jointState.axis << "  Vel (vx,vy,vz): " << jointState.axisVelocity << std::endl;
-    std::cout << "Angle (wx,wy,wz):" << jointState.angles << "  Angle velocity:" << jointState.angleVelocity <<std::endl;
-}
+//void Ur5Connection::print_jointData()
+//{
+//    std::cout << "Pos (x,y,z): " << jointState.cartAxis << "  Vel (vx,vy,vz): " << jointState.cartAxisVelocity << std::endl;
+//    std::cout << "Angle (wx,wy,wz):" << jointState.cartAngles << "  Angle velocity:" << jointState.angleVelocity <<std::endl;
+//}
 
 // Ur5Transmit
 
@@ -192,8 +192,8 @@ bool Ur5Connection::movej(Ur5State p,double a, double v,double r)
 {
     targetState = p;
     QString prog = QString("movej(p[%1,%2,%3,%4,%5,%6],a=%7,v=%8,r=%9)")
-            .arg(p.axis(0)).arg(p.axis(1)).arg(p.axis(2)).arg(p.angles(0))
-            .arg(p.angles(1)).arg(p.angles(2)).arg(a).arg(v).arg(r);
+            .arg(p.cartAxis(0)).arg(p.cartAxis(1)).arg(p.cartAxis(2)).arg(p.cartAngles(0))
+            .arg(p.cartAngles(1)).arg(p.cartAngles(2)).arg(a).arg(v).arg(r);
     if(!sendMessage(prog))
         return false;
     return true;
@@ -203,8 +203,8 @@ bool Ur5Connection::movel(Ur5State p,double a, double v)
 {
     targetState = p;
     QString prog = QString("movel(p[%1,%2,%3,%4,%5,%6],a=%7,v=%8)")
-            .arg(p.axis(0)).arg(p.axis(1)).arg(p.axis(2)).arg(p.angles(0))
-            .arg(p.angles(1)).arg(p.angles(2)).arg(a).arg(v);
+            .arg(p.cartAxis(0)).arg(p.cartAxis(1)).arg(p.cartAxis(2)).arg(p.cartAngles(0))
+            .arg(p.cartAngles(1)).arg(p.cartAngles(2)).arg(a).arg(v);
     if(!sendMessage(prog))
         return false;
     return true;
@@ -225,14 +225,14 @@ bool Ur5Connection::waitForMove()
     while(!atTargetPos())
     {
         waitForMessage();
-        analyze_rawData();
+        //analyze_rawData();
     }
     return true;
 }
 
 bool Ur5Connection::atTargetPos()
 {
-    return (currentState.axis-targetState.axis).length() < blendRadius;
+    return (currentState.cartAxis-targetState.cartAxis).length() < blendRadius;
 }
 
 void Ur5Connection::set_testData()

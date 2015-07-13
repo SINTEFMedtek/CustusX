@@ -24,9 +24,9 @@ public:
     QByteArray slicePacket(QByteArray data, int pos, int length);
 
 
-    void push_state(QByteArray data, Ur5State state);
-    void set_cartData(QByteArray cartData, Ur5State state);
-    void set_jointData(QByteArray jointData,Ur5State state);
+    void push_state(QByteArray data, Ur5State &state);
+    void set_cartData(QByteArray cartData, Ur5State &state);
+    void set_jointData(QByteArray jointData,Ur5State &state);
 
     void print_cartData(Ur5State);
     void print_jointData(Ur5State);

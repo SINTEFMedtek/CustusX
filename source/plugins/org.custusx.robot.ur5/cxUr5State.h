@@ -8,8 +8,6 @@ namespace cx
 {
 struct org_custusx_robot_ur5_EXPORT Ur5State
 {
-    Ur5State updateCurrentState();
-    Ur5State currentState();
     Vector3D cartAxis,cartAngles;
     Vector3D jointAxis,jointAngles;
     Vector3D jointAxisVelocity,jointAngleVelocity;

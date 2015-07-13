@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTransform3D.h"
 #include "cxVector3D.h"
 #include "cxUr5State.h"
+#include "cxUr5Receive.h"
 
 
 namespace cx
@@ -66,16 +67,19 @@ public:
     bool sendMessage(QString message);
     bool waitForMessage();
 
-    void analyze_rawData();
-
     void set_rawData(unsigned char* inMessage,qint64 bytes);
-    void set_data(QByteArray rawData,int i,int typeID,int lengthOfType);
-    void set_cartData(QByteArray cartDataHolder);
-    void set_jointData(QByteArray jointDataHolder);
-
-    void print_cartData();
-    void print_jointData();
     void print_rawData();
+
+    // void analyze_rawData();
+
+
+    //void set_data(QByteArray rawData,int i,int typeID,int lengthOfType);
+    //void set_cartData(QByteArray cartDataHolder);
+    //void set_jointData(QByteArray jointDataHolder);
+
+    //void print_cartData();
+    //void print_jointData();
+
 
     bool movep(double* axis,double* angles,double a=0.1,double v=0.1);
     bool movep(double* axisAngles,double a, double v,double r=0);
@@ -90,7 +94,7 @@ public:
     void set_testData();
 
 
-
+    QByteArray rawData;
     double blendRadius = 0.0009;
     Ur5State currentState,targetState,jointState;
 
@@ -98,7 +102,7 @@ private slots:
     virtual void internalDataAvailable();
 
 protected:
-    QByteArray rawData;
+
 
 };
 

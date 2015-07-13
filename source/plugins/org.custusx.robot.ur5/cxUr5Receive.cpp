@@ -8,10 +8,8 @@ namespace cx
 
 Ur5State Ur5Receive::analyze_rawPacket(QByteArray packet)
 {
-    if(!isValidPacket(packet))
-        return Ur5State::currentState();
-
-    return set_state(packet);
+    if(isValidPacket(packet))
+        return set_state(packet);
 }
 
 Ur5State Ur5Receive::set_state(QByteArray data)
@@ -21,7 +19,7 @@ Ur5State Ur5Receive::set_state(QByteArray data)
     {
         if(isValidHeader(getHeader(data,i)))
         {
-            push_state(slicePacket(data,i,headerLength(data)),state);
+            push_state(slicePacket(data,i,headerLength(getHeader(data,i))),state);
         }
     }
     return state;
@@ -51,7 +49,7 @@ int Ur5Receive::headerID(QByteArray data)
 
 bool Ur5Receive::isValidPacket(QByteArray data)
 {
-    return (data.size()==1254 && data.size()==560);
+    return (data.size()==1254 || data.size()==560);
 }
 
 bool Ur5Receive::isValidHeader(QByteArray data)
@@ -63,7 +61,7 @@ bool Ur5Receive::isValidHeader(QByteArray data)
             && types.find(headerID(data)) !=types.end());
 }
 
-void Ur5Receive::push_state(QByteArray data,Ur5State state)
+void Ur5Receive::push_state(QByteArray data,Ur5State &state)
 {
     if(data.size() == 251)
     {
@@ -81,25 +79,22 @@ QByteArray Ur5Receive::removeHeader(QByteArray data)
 }
 
 
-void Ur5Receive::set_cartData(QByteArray cartData,Ur5State state)
+void Ur5Receive::set_cartData(QByteArray cartData,Ur5State &state)
 {
     for(int i=0;i<6;i++)
     {
         if(i<3)
         {
-            sscanf_s(cartData.mid(i*sizeof(double),sizeof(double)).toHex().data(), "%llx",
-                     (unsigned long long *)&state.cartAxis(i);
+            sscanf_s(cartData.mid(i*sizeof(double),sizeof(double)).toHex().data(), "%llx",(unsigned long long *)&state.cartAxis(i));
         }
         else
         {
-            sscanf_s(cartData.mid(i*sizeof(double),sizeof(double)).toHex().data(), "%llx",
-                     (unsigned long long *)&state.cartAngles(i-3));
+            sscanf_s(cartData.mid(i*sizeof(double),sizeof(double)).toHex().data(), "%llx",(unsigned long long *)&state.cartAngles(i-3));
         }
-
     }
 }
 
-void Ur5Receive::set_jointData(QByteArray jointData, Ur5State state)
+void Ur5Receive::set_jointData(QByteArray jointData, Ur5State &state)
 {
     for(int i=0;i<6;i++)
     {

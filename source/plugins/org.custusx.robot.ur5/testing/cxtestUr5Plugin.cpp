@@ -62,9 +62,10 @@ TEST_CASE("Ur5Plugin: Send message to robot and receive message from robot", "[m
 
     //REQUIRE(fixture.connection.waitForMessage());
     fixture.connection.set_testData();
-    fixture.connection.analyze_rawData();
     //fixture.connection.print_rawData();
-    fixture.connection.print_cartData();
+    fixture.state = fixture.receive.analyze_rawPacket(fixture.connection.rawData);
+    //fixture.connection.print_rawData();
+    fixture.receive.print_cartData(fixture.state);
     //fixture.connection.print_jointData();
 
 
