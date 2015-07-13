@@ -47,6 +47,7 @@ TEST_CASE("Ur5Plugin: Connect to robot", "[manual][plugins][org.custusx.robot.ur
 TEST_CASE("Ur5Plugin: Send message to robot and receive message from robot", "[manual][plugins][org.custusx.robot.ur5]")
 {
     Ur5TestFixture fixture;
+
     //REQUIRE(fixture.connection.isConnectedToRobot());
 
     //QString message1("set_tcp(p[0,0,0,0,0,0])");
@@ -68,39 +69,35 @@ TEST_CASE("Ur5Plugin: Send message to robot and receive message from robot", "[m
     fixture.receive.print_cartData(fixture.state);
     //fixture.connection.print_jointData();
 
+    cx::Ur5State p1(0.27,-0.22,0.27,0.19,-2.45,-0.08);
+    cx::Ur5State p2(0.28,-0.28,0.33,1.85,-2.49,0);
+    cx::Ur5State p3(0.29,-0.30,0.375,1.835,-2.49,0.05);
+    cx::Ur5State p4(0.30,-0.32,0.42,1.82,-2.49,0.1);
+    cx::Ur5State p5(0.3025,-0.3375,0.44,1.80,-2.50,0.11);
+    cx::Ur5State p6(0.305,-0.355,0.46,1.78,-2.515,0.12);
+    cx::Ur5State p7(0.31,-0.39,0.50,1.74,-2.54,0.14);
+    cx::Ur5State p8(0.28,-0.49,0.485,1.605,-2.625,0.1);
+    cx::Ur5State p9(0.265,-0.54,0.4775,1.55,-2.68,0.08);
+    cx::Ur5State p10(0.25,-0.59,0.47,1.47,-2.71,0.06);
+    cx::Ur5State p11(0.235,-0.665,0.405,1.42,-2.755,-0.02);
+    cx::Ur5State p12(0.22,-0.74,0.34,1.37,-2.8,-0.1);
+    cx::Ur5State p13(0.225,-0.765,0.305,1.365,-2.805,-0.11);
+    cx::Ur5State p14(0.23,-0.79,0.27,1.36,-2.81,-0.12);
 
-//    double v[6] = {0.01,0.01,0.01,0.01,0.01,0.01};
-//    REQUIRE(fixture.connection.speedj(v,0.3,3));
-
-
-//    double axis[3] = {0.3,-0.5,0.3};
-//    double angles[3] = {3,-1,0};
-//    fixture.connection.movej(axis,angles,0.1,0.1);
-//    REQUIRE(fixture.connection.waitForMove());
-
-//    fixture.connection.print_cartData();
-
-//    double axis2[3] = {-0.4,-0.45,0.3};
-//    double angles2[3] = {3,-1,0};
-//    fixture.connection.movej(axis2,angles2,0.1,0.1);
-//    REQUIRE(fixture.connection.waitForMove());
-
-//    fixture.connection.print_cartData();
-
-//    double p1[6] = {0.27,-0.22,0.27,0.19,-2.45,-0.08};
-//    double p2[6] = {0.28,-0.28,0.33,1.85,-2.49,0};
-//    double t23[6] = {0.29,-0.30,0.375,1.835,-2.49,0.05};
-//    double p3[6] = {0.30,-0.32,0.42,1.82,-2.49,0.1};
-//    double t34[6] = {0.3025,-0.3375,0.44,1.80,-2.50,0.11};
-//    double t34v2[6] = {0.305,-0.355,0.46,1.78,-2.515,0.12};
-//    double p4[6] = {0.31,-0.39,0.50,1.74,-2.54,0.14};
-//    double t45[6] = {0.28,-0.49,0.485,1.605,-2.625,0.1};
-//    double t45v2[6] = {0.265,-0.54,0.4775,1.55,-2.68,0.08};
-//    double p5[6] = {0.25,-0.59,0.47,1.47,-2.71,0.06};
-//    double t56[6] = {0.235,-0.665,0.405,1.42,-2.755,-0.02};
-//    double p6[6] = {0.22,-0.74,0.34,1.37,-2.8,-0.1};
-//    double t67[6] = {0.225,-0.765,0.305,1.365,-2.805,-0.11};
-//    double p7[6] = {0.23,-0.79,0.27,1.36,-2.81,-0.12};
+    fixture.connection.addToMovementQueue(p1);
+    fixture.connection.addToMovementQueue(p2);
+    fixture.connection.addToMovementQueue(p3);
+    fixture.connection.addToMovementQueue(p4);
+    fixture.connection.addToMovementQueue(p5);
+    fixture.connection.addToMovementQueue(p6);
+    fixture.connection.addToMovementQueue(p7);
+    fixture.connection.addToMovementQueue(p8);
+    fixture.connection.addToMovementQueue(p9);
+    fixture.connection.addToMovementQueue(p10);
+    fixture.connection.addToMovementQueue(p11);
+    fixture.connection.addToMovementQueue(p12);
+    fixture.connection.addToMovementQueue(p13);
+    fixture.connection.addToMovementQueue(p14);
 
 //    double r = 0.00;
 //    double a = 0.1; // 0.1

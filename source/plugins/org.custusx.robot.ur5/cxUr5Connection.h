@@ -61,6 +61,8 @@ public:
     Ur5Connection(QString address, int port);
     Ur5Connection();
 
+    Ur5Receive receiver;
+
     void setAddress(QString address, int port);
 
     bool isConnectedToRobot();
@@ -77,7 +79,7 @@ public:
     //void set_cartData(QByteArray cartDataHolder);
     //void set_jointData(QByteArray jointDataHolder);
 
-    //void print_cartData();
+    void print_cartData(Ur5State state);
     //void print_jointData();
 
 
@@ -89,10 +91,15 @@ public:
     bool movel(Ur5State targetPose,double acc = 0.1, double vel = 0.1);
 
     bool waitForMove();
-    bool atTargetPos();
+    bool atTargetPos(Ur5State current);
 
     void set_testData();
 
+    void addToMovementQueue(Ur5State p);
+    void printMovementQueue(std::vector<Ur5State> moveQueue);
+    bool runMovementQueue(std::vector<Ur5State> moveQueue,double a, double v, double r);
+
+    std::vector<Ur5State> movementQueue;
 
     QByteArray rawData;
     double blendRadius = 0.0009;
