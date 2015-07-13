@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVector3D.h"
 #include "cxUr5State.h"
 #include "cxUr5Receive.h"
+#include "cxUr5Transmit.h"
 
 
 namespace cx
@@ -62,6 +63,13 @@ public:
     Ur5Connection();
 
     Ur5Receive receiver;
+    Ur5Transmit transmitter;
+    Ur5State currentState,targetState,jointState;
+    QByteArray rawData;
+
+    std::vector<Ur5State> movementQueue;
+
+    double blendRadius = 0.0009;
 
     void setAddress(QString address, int port);
 
@@ -74,27 +82,12 @@ public:
 
     void update_currentState(bool connected = true);
 
-    bool movep(double* axis,double* angles,double a=0.1,double v=0.1);
-    bool movep(double* axisAngles,double a, double v,double r=0);
-    bool speedj(double* speedField, double a, double t);
-
-    bool movej(Ur5State targetPose,double acc = 0.1, double vel = 0.1, double r = 0);
-    bool movel(Ur5State targetPose,double acc = 0.1, double vel = 0.1);
-
     bool waitForMove();
     bool atTargetPos(Ur5State current);
 
     void set_testData();
 
-    void addToMovementQueue(Ur5State p);
-    void printMovementQueue(std::vector<Ur5State> moveQueue);
-    bool runMovementQueue(std::vector<Ur5State> moveQueue,double a, double v, double r);
-
-    std::vector<Ur5State> movementQueue;
-
-    QByteArray rawData;
-    double blendRadius = 0.0009;
-    Ur5State currentState,targetState,jointState;
+    bool runProgramQueue();
 
 private slots:
     virtual void internalDataAvailable();
