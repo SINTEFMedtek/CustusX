@@ -227,12 +227,14 @@ bool Ur5Connection::speedj(double* speedField, double a, double t)
 
 bool Ur5Connection::waitForMove()
 {
-    while(!atTargetPos(currentState))
+    do
     {
-        waitForMessage();
-        currentState = receiver.analyze_rawPacket(rawData);
+        update_currentState();
     }
-    return true;
+    while(!atTargetPos(currentState));
+    receiver.print_cartData(currentState);
+
+    return atTargetPos(currentState);
 }
 
 bool Ur5Connection::atTargetPos(Ur5State currentState)
@@ -244,14 +246,8 @@ void Ur5Connection::printMovementQueue(std::vector<Ur5State> moveQueue)
 {
     for(int i=0;i<moveQueue.size();i++)
     {
-          print_cartData(moveQueue[i]);
+          receiver.print_cartData(moveQueue[i]);
     }
-}
-
-void Ur5Connection::print_cartData(Ur5State state)
-{
-    std::cout << state.cartAxis << std::endl;
-    std::cout << state.cartAngles << std::endl;
 }
 
 bool Ur5Connection::runMovementQueue(std::vector<Ur5State> movementQueue,double a,double v,double r)
@@ -262,6 +258,15 @@ bool Ur5Connection::runMovementQueue(std::vector<Ur5State> movementQueue,double 
         waitForMove();
     }
     return true;
+}
+
+void Ur5Connection::update_currentState(bool connected)
+{
+    if(!connected)
+        set_testData();
+    else
+        waitForMessage();
+    currentState = receiver.analyze_rawPacket(rawData);
 }
 
 // Test data, may be removed later

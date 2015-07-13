@@ -72,16 +72,7 @@ public:
     void set_rawData(unsigned char* inMessage,qint64 bytes);
     void print_rawData();
 
-    // void analyze_rawData();
-
-
-    //void set_data(QByteArray rawData,int i,int typeID,int lengthOfType);
-    //void set_cartData(QByteArray cartDataHolder);
-    //void set_jointData(QByteArray jointDataHolder);
-
-    void print_cartData(Ur5State state);
-    //void print_jointData();
-
+    void update_currentState(bool connected = true);
 
     bool movep(double* axis,double* angles,double a=0.1,double v=0.1);
     bool movep(double* axisAngles,double a, double v,double r=0);

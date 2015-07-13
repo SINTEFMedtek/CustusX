@@ -47,27 +47,10 @@ TEST_CASE("Ur5Plugin: Connect to robot", "[manual][plugins][org.custusx.robot.ur
 TEST_CASE("Ur5Plugin: Send message to robot and receive message from robot", "[manual][plugins][org.custusx.robot.ur5]")
 {
     Ur5TestFixture fixture;
+    REQUIRE(fixture.connection.isConnectedToRobot());
 
-    //REQUIRE(fixture.connection.isConnectedToRobot());
-
-    //QString message1("set_tcp(p[0,0,0,0,0,0])");
-    //REQUIRE(fixture.connection.sendMessage(message1));
-
-    //REQUIRE(fixture.connection.waitForMessage());
-    //fixture.connection.analyze_rawData();
-    //fixture.connection.print_cartData();
-
-
-    //QString message("set_tcp(p[0,1,-0.2,0,2.22,-2.22])");
-    //REQUIRE(fixture.connection.sendMessage(message));
-
-    //REQUIRE(fixture.connection.waitForMessage());
-    fixture.connection.set_testData();
-    //fixture.connection.print_rawData();
-    fixture.state = fixture.receive.analyze_rawPacket(fixture.connection.rawData);
-    //fixture.connection.print_rawData();
-    fixture.receive.print_cartData(fixture.state);
-    //fixture.connection.print_jointData();
+    fixture.connection.update_currentState();
+    fixture.connection.print_cartData(fixture.connection.currentState);
 
     cx::Ur5State p1(0.27,-0.22,0.27,0.19,-2.45,-0.08);
     cx::Ur5State p2(0.28,-0.28,0.33,1.85,-2.49,0);
@@ -99,66 +82,13 @@ TEST_CASE("Ur5Plugin: Send message to robot and receive message from robot", "[m
     fixture.connection.addToMovementQueue(p13);
     fixture.connection.addToMovementQueue(p14);
 
-//    double r = 0.00;
-//    double a = 0.1; // 0.1
-//    double v = 0.01; // 0.01
 
+    double r = 0.00;
+    double a = 0.2; // 0.1
+    double v = 0.2; // 0.01
 
-//    REQUIRE(fixture.connection.movej(p1,0.5,0.5,r));
-//    REQUIRE(fixture.connection.waitForMove());
-//    fixture.connection.print_cartData();
+    //fixture.connection.runMovementQueue(fixture.connection.movementQueue,a,v,r);
 
-//    fixture.connection.movej(p2,0.5,0.5,r);
-//    REQUIRE(fixture.connection.waitForMove());
-//    fixture.connection.print_cartData();
-
-//    REQUIRE(fixture.connection.movel(t23,a,v,r));
-//    REQUIRE(fixture.connection.waitForMove());
-//    fixture.connection.print_cartData();
-
-//    fixture.connection.movel(p3,a,v,r);
-//    REQUIRE(fixture.connection.waitForMove());
-//    fixture.connection.print_cartData();
-
-//    REQUIRE(fixture.connection.movel(t34,a,v,r));
-//    REQUIRE(fixture.connection.waitForMove());
-//    fixture.connection.print_cartData();
-
-//    REQUIRE(fixture.connection.movel(t34v2,a,v,r));
-//    REQUIRE(fixture.connection.waitForMove());
-//    fixture.connection.print_cartData();
-
-//    REQUIRE(fixture.connection.movel(p4,a,v,r));
-//    REQUIRE(fixture.connection.waitForMove());
-//    fixture.connection.print_cartData();
-
-//    REQUIRE(fixture.connection.movel(t45,a,v,r));
-//    REQUIRE(fixture.connection.waitForMove());
-//    fixture.connection.print_cartData();
-
-//    REQUIRE(fixture.connection.movel(t45v2,a,v,r));
-//    REQUIRE(fixture.connection.waitForMove());
-//    fixture.connection.print_cartData();
-
-//    fixture.connection.movel(p5,a,v,r);
-//    REQUIRE(fixture.connection.waitForMove());
-//    fixture.connection.print_cartData();
-
-//    REQUIRE(fixture.connection.movel(t56,a,v,r));
-//    REQUIRE(fixture.connection.waitForMove());
-//    fixture.connection.print_cartData();
-
-//    fixture.connection.movel(p6,a,v,r);
-//    REQUIRE(fixture.connection.waitForMove());
-//    fixture.connection.print_cartData();
-
-//    fixture.connection.movel(t67,a,v,r);
-//    REQUIRE(fixture.connection.waitForMove());
-//    fixture.connection.print_cartData();
-
-//    fixture.connection.movel(p7,a,v,r);
-//    REQUIRE(fixture.connection.waitForMove());
-//    fixture.connection.print_cartData();
 
     fixture.connection.requestDisconnect();
 }
