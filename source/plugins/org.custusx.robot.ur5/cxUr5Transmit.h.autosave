@@ -1,0 +1,25 @@
+#ifndef UR5TRANSMIT_H
+#define UR5TRANSMIT_H
+
+#include "org_custusx_robot_ur5_Export.h"
+#include "cxUr5State.h"
+
+namespace cx
+{
+
+class org_custusx_robot_ur5_EXPORT Ur5Transmit
+{
+public:
+    std::vector<QString> programQueue,poseQueue;
+    
+    void addToPoseQueue(Ur5State pose);
+    void movejProgram(std::vector<QString> poseQueue, double a, double v, double r);
+    
+    QString movej(Ur5State pose,double a, double v, double r);
+    QString movel(Ur5State pose,double a, double v);
+    QString speedj(double velocityField, double a, double t);
+};
+
+} // cx
+
+#endif // UR5TRANSMIT_H
