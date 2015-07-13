@@ -49,17 +49,16 @@ TEST_CASE("Ur5Plugin: Send message to robot and receive message from robot", "[m
     Ur5TestFixture fixture;
     //REQUIRE(fixture.connection.isConnectedToRobot());
 
-    //QString message("set_pos(p[0,0,0,0,0,0])");
-    //QString message("movej(p[0.02,-0.59,0.29,2.94,-1.02,-0.04], a=0.3, v=0.3)");
-    //QString message("movej(p[0,-0.6,0.3,3,-1,0], a=0.1, v=0.1,r=0.1)");
-    //REQUIRE(fixture.connection.sendMessage(message));
+    //QString message1("set_tcp(p[0,0,0,0,0,0])");
+    //REQUIRE(fixture.connection.sendMessage(message1));
 
-
-    //QString message2("movej(p[0,-0.4,0.6,2.2,-0.7,0.6], a=0.1, v=0.1)");
-    //REQUIRE(fixture.connection.sendMessage(message2));
     //REQUIRE(fixture.connection.waitForMessage());
+    //fixture.connection.analyze_rawData();
+    //fixture.connection.print_cartData();
 
-    //QString message("get_joint_positions()");
+
+    //QString message("set_tcp(p[0,1,-0.2,0,2.22,-2.22])");
+    //REQUIRE(fixture.connection.sendMessage(message));
 
     //REQUIRE(fixture.connection.waitForMessage());
     fixture.connection.set_testData();

@@ -69,6 +69,7 @@ public:
     void analyze_rawData();
 
     void set_rawData(unsigned char* inMessage,qint64 bytes);
+    void set_data(QByteArray rawData,int i,int typeID,int lengthOfType);
     void set_cartData(QByteArray cartDataHolder);
     void set_jointData(QByteArray jointDataHolder);
 
