@@ -17,6 +17,16 @@ void Ur5Transmit::addToPoseQueue(Ur5State pose)
     poseQueue.push_back(pose);
 }
 
+void Ur5Transmit::printPoseQueue()
+{
+    for(int i=0; i<poseQueue.size(); i++)
+    {
+        std::cout << poseQueue[i].cartAxis << std::endl;
+        //std::cout << poseQueue[i].cartAngles << "\n" << std::endl;
+    }
+
+}
+
 void Ur5Transmit::movejProgram(std::vector<Ur5State> poseQueue,double a, double v, double r)
 {
     for(int i=0;i<poseQueue.size();i++)
@@ -61,7 +71,8 @@ int Ur5Transmit::openVTKfile(QString inputFilename)
       std::cout << "output is a polydata" << std::endl;
       vtkPolyData* output = reader->GetPolyDataOutput();
 
-      printVTKinfo(output);
+      //printVTKinfo(output);
+      addPath(output);
 
 
       }
@@ -72,11 +83,8 @@ int Ur5Transmit::openVTKfile(QString inputFilename)
 
 }
 
-void Ur5Transmit::printVTKinfo(vtkPolyData* output)
+void Ur5Transmit::printVTKline(vtkPolyData* output)
 {
-    std::cout << "output has " << output->GetNumberOfPoints() << " points." << std::endl;
-    std::cout << "output has " << output->GetNumberOfLines() << " lines." << std::endl;
-    std::cout << "outpus has " << output->GetNumberOfCells() << " cells" << std::endl;
     std::cout << "line has " << output->GetLines()->GetNumberOfConnectivityEntries() << " points" << std::endl;
 
     for(vtkIdType i=0; i<output->GetCell(0)->GetNumberOfPoints(); i++)
@@ -86,6 +94,21 @@ void Ur5Transmit::printVTKinfo(vtkPolyData* output)
         std::cout << "Point " << output->GetCell(0)->GetPointId(i) << " : (" << p[0] << " " << p[1] << " " << p[2] << ")" << std::endl;
     }
 }
+
+void Ur5Transmit::addPath(vtkPolyData* output)
+{
+    for(vtkIdType i=0; i<output->GetCell(0)->GetNumberOfPoints(); i++)
+    {
+        Ur5State pose;
+        double p[3];
+        output->GetPoint(output->GetCell(0)->GetPointId(i),p);
+        pose.cartAxis = Vector3D(0.70*p[0]/58.5801-0.50,0.30*p[1]/40.15-0.50,0.30*p[2]/124+0.25);
+        pose.cartAngles = Vector3D(-0.6,3.0,0.1);
+        addToPoseQueue(pose);
+    }
+    //printPoseQueue();
+}
+
 
 } //cx
 

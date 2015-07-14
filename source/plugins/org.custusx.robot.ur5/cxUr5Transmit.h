@@ -15,10 +15,13 @@ public:
     std::vector<QString> programQueue;
 
     void addToPoseQueue(Ur5State pose);
+    void printPoseQueue();
+
     void movejProgram(std::vector<Ur5State> poseQueue, double a, double v, double r);
 
     int openVTKfile(QString filename);
-    void printVTKinfo(vtkPolyData* output);
+    void printVTKline(vtkPolyData* output);
+    void addPath(vtkPolyData* output);
 
     QString movej(Ur5State pose,double a, double v, double r);
     QString movel(Ur5State pose,double a, double v);
