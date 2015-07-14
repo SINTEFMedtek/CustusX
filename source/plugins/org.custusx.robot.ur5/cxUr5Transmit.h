@@ -16,6 +16,8 @@ public:
     void addToPoseQueue(Ur5State pose);
     void movejProgram(std::vector<Ur5State> poseQueue, double a, double v, double r);
 
+    bool openVTKfile(char *filename[]);
+
     QString movej(Ur5State pose,double a, double v, double r);
     QString movel(Ur5State pose,double a, double v);
     QString speedj(double* velocityField, double a, double t);

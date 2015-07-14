@@ -1,5 +1,11 @@
 #include "cxUr5Transmit.h"
 
+#include <vtkGenericDataObjectReader.h>
+#include <vtkStructuredGrid.h>
+#include <vtkSmartPointer.h>
+#include <vtkPolyData.h>
+#include <string>
+
 
 namespace cx
 {
@@ -38,6 +44,34 @@ QString Ur5Transmit::speedj(double* velocityField, double a, double t)
             .arg(velocityField[4]).arg(velocityField[5]).arg(a).arg(t);
 }
 
+bool openVTKfile(char *filename[])
+{
+    std::string inputFilename = filename;
+
+    vtkSmartPointer<vtkGenericDataObjectReader> reader =
+          vtkSmartPointer<vtkGenericDataObjectReader>::New();
+
+      reader->SetFileName(inputFilename.c_str());
+      reader->Update();
+
+      if(reader->IsFilePolyData())
+        {
+        std::cout << "output is a polydata" << std::endl;
+        vtkPolyData* output = reader->GetPolyDataOutput();
+        std::cout << "output has " << output->GetNumberOfPoints() << " points." << std::endl;
+        }
+
+      return true;
+}
 
 
 } //cx
+
+
+
+
+
+
+
+
+

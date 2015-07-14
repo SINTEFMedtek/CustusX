@@ -47,55 +47,10 @@ TEST_CASE("Ur5Plugin: Connect to robot", "[manual][plugins][org.custusx.robot.ur
 TEST_CASE("Ur5Plugin: Send message to robot and receive message from robot", "[manual][plugins][org.custusx.robot.ur5]")
 {
     Ur5TestFixture fixture;
-    REQUIRE(fixture.connection.isConnectedToRobot());
+    //REQUIRE(fixture.connection.isConnectedToRobot());
 
-    fixture.connection.update_currentState();
+    fixture.connection.update_currentState(false);
     fixture.connection.receiver.print_cartData(fixture.connection.currentState);
-
-    cx::Ur5State p1(0.27,-0.22,0.27,0.19,-2.45,-0.08);
-    cx::Ur5State p2(0.28,-0.28,0.33,1.85,-2.49,0);
-    cx::Ur5State p3(0.29,-0.30,0.375,1.835,-2.49,0.05);
-    cx::Ur5State p4(0.30,-0.32,0.42,1.82,-2.49,0.1);
-    cx::Ur5State p5(0.3025,-0.3375,0.44,1.80,-2.50,0.11);
-    cx::Ur5State p6(0.305,-0.355,0.46,1.78,-2.515,0.12);
-    cx::Ur5State p7(0.31,-0.39,0.50,1.74,-2.54,0.14);
-    cx::Ur5State p8(0.28,-0.49,0.485,1.605,-2.625,0.1);
-    cx::Ur5State p9(0.265,-0.54,0.4775,1.55,-2.68,0.08);
-    cx::Ur5State p10(0.25,-0.59,0.47,1.47,-2.71,0.06);
-    cx::Ur5State p11(0.235,-0.665,0.405,1.42,-2.755,-0.02);
-    cx::Ur5State p12(0.22,-0.74,0.34,1.37,-2.8,-0.1);
-    cx::Ur5State p13(0.225,-0.765,0.305,1.365,-2.805,-0.11);
-    cx::Ur5State p14(0.23,-0.79,0.27,1.36,-2.81,-0.12);
-
-    fixture.connection.transmitter.addToPoseQueue(p1);
-    fixture.connection.transmitter.addToPoseQueue(p2);
-
-    double r = 0.00;
-    double a = 0.3; // 0.1
-    double v = 0.3; // 0.01
-
-    fixture.connection.transmitter.movejProgram(fixture.connection.transmitter.poseQueue,a,v,r);
-    fixture.connection.runProgramQueue();
-
-    fixture.connection.transmitter.addToPoseQueue(p3);
-    fixture.connection.transmitter.addToPoseQueue(p4);
-    fixture.connection.transmitter.addToPoseQueue(p5);
-    fixture.connection.transmitter.addToPoseQueue(p6);
-    fixture.connection.transmitter.addToPoseQueue(p7);
-    fixture.connection.transmitter.addToPoseQueue(p8);
-    fixture.connection.transmitter.addToPoseQueue(p9);
-    fixture.connection.transmitter.addToPoseQueue(p10);
-    fixture.connection.transmitter.addToPoseQueue(p11);
-    fixture.connection.transmitter.addToPoseQueue(p12);
-    fixture.connection.transmitter.addToPoseQueue(p13);
-    fixture.connection.transmitter.addToPoseQueue(p14);
-
-    double r1 = 0.00;
-    double a1 = 0.1; // 0.1
-    double v1 = 0.01; // 0.01
-
-    fixture.connection.transmitter.movejProgram(fixture.connection.transmitter.poseQueue,a1,v1,r1);
-    fixture.connection.runProgramQueue();
 
     fixture.connection.requestDisconnect();
 }

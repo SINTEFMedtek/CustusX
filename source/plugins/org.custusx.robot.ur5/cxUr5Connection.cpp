@@ -108,7 +108,6 @@ void Ur5Connection::print_rawData()
     std::cout << std::endl;
 }
 
-
 bool Ur5Connection::waitForMove()
 {
     do
