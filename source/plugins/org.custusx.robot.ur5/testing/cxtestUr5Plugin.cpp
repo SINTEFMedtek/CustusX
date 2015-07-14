@@ -52,6 +52,9 @@ TEST_CASE("Ur5Plugin: Send message to robot and receive message from robot", "[m
     fixture.connection.update_currentState(false);
     fixture.connection.receiver.print_cartData(fixture.connection.currentState);
 
+    QString filename("C:\\artery_centerline_fixed_2.vtk");
+    fixture.connection.transmitter.openVTKfile(filename);
+
     fixture.connection.requestDisconnect();
 }
 

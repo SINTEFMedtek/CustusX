@@ -4,6 +4,8 @@
 #include <vtkStructuredGrid.h>
 #include <vtkSmartPointer.h>
 #include <vtkPolyData.h>
+#include <vtkPolyLine.h>
+#include <vtkCellArray.h>
 #include <string>
 
 
@@ -44,26 +46,46 @@ QString Ur5Transmit::speedj(double* velocityField, double a, double t)
             .arg(velocityField[4]).arg(velocityField[5]).arg(a).arg(t);
 }
 
-bool openVTKfile(char *filename[])
+int Ur5Transmit::openVTKfile(QString inputFilename)
 {
-    std::string inputFilename = filename;
-
+    // Get all data from the file
     vtkSmartPointer<vtkGenericDataObjectReader> reader =
-          vtkSmartPointer<vtkGenericDataObjectReader>::New();
+        vtkSmartPointer<vtkGenericDataObjectReader>::New();
 
-      reader->SetFileName(inputFilename.c_str());
-      reader->Update();
+    reader->SetFileName(inputFilename.toStdString().c_str());
+    reader->Update();
 
-      if(reader->IsFilePolyData())
-        {
-        std::cout << "output is a polydata" << std::endl;
-        vtkPolyData* output = reader->GetPolyDataOutput();
-        std::cout << "output has " << output->GetNumberOfPoints() << " points." << std::endl;
-        }
+    // All of the standard data types can be checked and obtained like this:
+    if(reader->IsFilePolyData())
+      {
+      std::cout << "output is a polydata" << std::endl;
+      vtkPolyData* output = reader->GetPolyDataOutput();
 
-      return true;
+      printVTKinfo(output);
+
+
+      }
+
+
+    return EXIT_SUCCESS;
+
+
 }
 
+void Ur5Transmit::printVTKinfo(vtkPolyData* output)
+{
+    std::cout << "output has " << output->GetNumberOfPoints() << " points." << std::endl;
+    std::cout << "output has " << output->GetNumberOfLines() << " lines." << std::endl;
+    std::cout << "outpus has " << output->GetNumberOfCells() << " cells" << std::endl;
+    std::cout << "line has " << output->GetLines()->GetNumberOfConnectivityEntries() << " points" << std::endl;
+
+    for(vtkIdType i=0; i<output->GetCell(0)->GetNumberOfPoints(); i++)
+    {
+        double p[3];
+        output->GetPoint(output->GetCell(0)->GetPointId(i),p);
+        std::cout << "Point " << output->GetCell(0)->GetPointId(i) << " : (" << p[0] << " " << p[1] << " " << p[2] << ")" << std::endl;
+    }
+}
 
 } //cx
 

@@ -46,9 +46,6 @@ public:
     Ur5TestFixture();
 
     cx::Ur5Connection connection;
-    cx::Ur5Receive receive;
-    cx::Ur5State state;
-
 };
 
 } //cxtest
