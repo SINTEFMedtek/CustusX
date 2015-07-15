@@ -26,6 +26,7 @@ public:
     QString movej(Ur5State pose,double a, double v, double r);
     QString movel(Ur5State pose,double a, double v);
     QString speedj(double* velocityField, double a, double t);
+    QString set_tcp(Ur5State pose);
 
 };
 

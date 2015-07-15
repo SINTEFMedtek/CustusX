@@ -147,6 +147,12 @@ void Ur5Connection::update_currentState(bool connected)
     currentState = receiver.analyze_rawPacket(rawData);
 }
 
+void Ur5Connection::initializeWorkspace()
+{
+    update_currentState();
+    sendMessage(transmitter.set_tcp(-currentState));
+}
+
 // Test data, may be removed later
 
 void Ur5Connection::set_testData()

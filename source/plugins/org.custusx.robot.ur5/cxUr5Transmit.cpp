@@ -56,6 +56,13 @@ QString Ur5Transmit::speedj(double* velocityField, double a, double t)
             .arg(velocityField[4]).arg(velocityField[5]).arg(a).arg(t);
 }
 
+QString Ur5Transmit::set_tcp(Ur5State p)
+{
+    return QString("set_tcp(p[%1,%2,%3,%4,%5,%6])")
+            .arg(p.cartAxis(0)).arg(p.cartAxis(1)).arg(p.cartAxis(2)).arg(p.cartAngles(0))
+            .arg(p.cartAngles(1)).arg(p.cartAngles(2));
+}
+
 int Ur5Transmit::openVTKfile(QString inputFilename)
 {
     // Get all data from the file
@@ -102,11 +109,11 @@ void Ur5Transmit::addPath(vtkPolyData* output)
         Ur5State pose;
         double p[3];
         output->GetPoint(output->GetCell(0)->GetPointId(i),p);
-        pose.cartAxis = Vector3D(0.70*p[0]/58.5801-0.50,0.30*p[1]/40.15-0.50,0.30*p[2]/124+0.25);
+        pose.cartAxis = Vector3D(p[0],p[1],p[2])/1000;
         pose.cartAngles = Vector3D(-0.6,3.0,0.1);
         addToPoseQueue(pose);
     }
-    //printPoseQueue();
+    printPoseQueue();
 }
 
 
