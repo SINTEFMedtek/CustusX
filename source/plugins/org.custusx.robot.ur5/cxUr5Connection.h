@@ -81,7 +81,7 @@ public:
     void print_rawData();
 
     void update_currentState(bool connected = true);
-    void initializeWorkspace();
+    void initializeWorkspace(bool currentPos = false);
 
     bool waitForMove();
     bool atTargetPos(Ur5State current);

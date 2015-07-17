@@ -69,13 +69,13 @@ bool Ur5Connection::sendMessage(QString message)
     if(!ok)
         return false;
 
-    return mSocket->waitForBytesWritten(300);
+    return mSocket->waitForBytesWritten(3000);
 }
 
 bool Ur5Connection::waitForMessage()
 {
-    mSocket->waitForBytesWritten(200);
-    return mSocket->waitForReadyRead(500);
+    mSocket->waitForBytesWritten(3000);
+    return mSocket->waitForReadyRead(3000);
 }
 
 void Ur5Connection::internalDataAvailable()
@@ -147,10 +147,133 @@ void Ur5Connection::update_currentState(bool connected)
     currentState = receiver.analyze_rawPacket(rawData);
 }
 
-void Ur5Connection::initializeWorkspace()
+void Ur5Connection::initializeWorkspace(bool currentPos)
 {
+    Ur5State zeroState(0,0,0,0,0,0);
     update_currentState();
-    sendMessage(transmitter.set_tcp(-currentState));
+    Ur5State clearState = zeroState;
+
+    if(currentState.cartAxis.length()>0.01)
+    {
+        sendMessage(transmitter.set_tcp(clearState));
+        update_currentState();
+        if(currentPos == false)
+        {
+            Ur5State origo(-0.36,-0.64,0.29,-1.87,-2.50,0);
+            targetState = origo;
+            sendMessage(transmitter.movej(origo,0.3,0.3,0));
+            waitForMove();
+            update_currentState();
+        }
+    }
+
+
+    while(abs(currentState.cartAxis[2])>0.01 || abs(currentState.cartAxis[0])>0.01 || abs(currentState.cartAxis[1])>0.01)
+    {
+        if(currentState.cartAxis[0]<0 && currentState.cartAxis[1]<0) // (-/- case)
+        {
+            if(currentState.cartAxis[0]>0)
+            {
+                zeroState.cartAxis[0] -= 0.01;
+            }
+            else
+            {
+                zeroState.cartAxis[0] += 0.01;
+            }
+
+            if(currentState.cartAxis[1]>0)
+            {
+                zeroState.cartAxis[1] -= 0.01;
+            }
+            else
+            {
+                zeroState.cartAxis[1] += 0.01;
+            }
+        }
+        else if(currentState.cartAxis[0]>0 && currentState.cartAxis[1]<0) // (+/- case)
+        {
+            if(currentState.cartAxis[0]>0)
+            {
+                zeroState.cartAxis[0] += 0.01;
+            }
+            else
+            {
+                zeroState.cartAxis[0] -= 0.01;
+            }
+
+            if(currentState.cartAxis[1]>0)
+            {
+                zeroState.cartAxis[1] += 0.01;
+            }
+            else
+            {
+                zeroState.cartAxis[1] -= 0.01;
+            }
+        }
+        else if(currentState.cartAxis[0]<0 && currentState.cartAxis[1]>0) // (-/+ case)
+        {
+            if(currentState.cartAxis[0]>0)
+            {
+                zeroState.cartAxis[0] += 0.01;
+            }
+            else
+            {
+                zeroState.cartAxis[0] -= 0.01;
+            }
+
+            if(currentState.cartAxis[1]>0)
+            {
+                zeroState.cartAxis[1] += 0.01;
+            }
+            else
+            {
+                zeroState.cartAxis[1] -= 0.01;
+            }
+        }
+        else if(currentState.cartAxis[0]>0 && currentState.cartAxis[1]>0) // (+/+ case)
+        {
+            if(currentState.cartAxis[0]>0)
+            {
+                zeroState.cartAxis[0] -= 0.01;
+            }
+            else
+            {
+                zeroState.cartAxis[0] += 0.01;
+            }
+
+            if(currentState.cartAxis[1]>0)
+            {
+                zeroState.cartAxis[1] -= 0.01;
+            }
+            else
+            {
+                zeroState.cartAxis[1] += 0.01;
+            }
+        }
+
+        if(currentState.cartAxis[2]>0) // Same top/bottom
+        {
+            zeroState.cartAxis[2] += 0.01;
+        }
+        else
+        {
+            zeroState.cartAxis[2] -= 0.01;
+        }
+
+        sendMessage(transmitter.set_tcp(zeroState));
+        update_currentState();
+        std::cout << currentState.cartAxis << std::endl;
+
+        update_currentState();
+    }
+    zeroState.cartAngles=-currentState.cartAngles;
+
+    sendMessage(transmitter.set_tcp(clearState));
+    update_currentState();
+
+    sendMessage(transmitter.set_tcp(zeroState));
+    update_currentState();
+    receiver.print_cartData(currentState);
 }
 
 // Test data, may be removed later

@@ -21,8 +21,8 @@ void Ur5Transmit::printPoseQueue()
 {
     for(int i=0; i<poseQueue.size(); i++)
     {
-        std::cout << poseQueue[i].cartAxis << std::endl;
-        //std::cout << poseQueue[i].cartAngles << "\n" << std::endl;
+        std::cout << poseQueue[i].cartAxis*1000 << std::endl;
+        std::cout << poseQueue[i].cartAngles << "\n" << std::endl;
     }
 
 }
@@ -110,10 +110,9 @@ void Ur5Transmit::addPath(vtkPolyData* output)
         double p[3];
         output->GetPoint(output->GetCell(0)->GetPointId(i),p);
         pose.cartAxis = Vector3D(p[0],p[1],p[2])/1000;
-        pose.cartAngles = Vector3D(-0.6,3.0,0.1);
+        pose.cartAngles = Vector3D(0,0,0);
         addToPoseQueue(pose);
     }
-    printPoseQueue();
 }
 
 

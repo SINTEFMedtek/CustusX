@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QWidget>
 class QVBoxLayout;
+class QHBoxLayout;
 
 namespace cx
 {
@@ -56,7 +57,8 @@ public:
 
 private:
 	QString defaultWhatsThis() const;
-	QVBoxLayout*  mVerticalLayout;
+    QVBoxLayout*  mVerticalLayout;
+    QHBoxLayout* mHorisontalLayout;
 };
 
 } /* namespace cx */

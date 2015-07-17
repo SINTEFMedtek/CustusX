@@ -32,6 +32,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxUr5Widget.h"
 #include <QLabel>
+#include <QSlider>
+#include <QSpinBox>
+#include <QPushButton>
 #include <QVBoxLayout>
 
 namespace cx
@@ -39,13 +42,46 @@ namespace cx
 
 Ur5Widget::Ur5Widget(QWidget* parent) :
     QWidget(parent),
-    mVerticalLayout(new QVBoxLayout(this))
+    mHorisontalLayout(new QHBoxLayout(this))
 {
     this->setObjectName("Ur5Widget");
     this->setWindowTitle("UR5 Robot");
     this->setWhatsThis(this->defaultWhatsThis());
 
-    mVerticalLayout->addWidget(new QLabel("Hello Plugin!"));
+    //mHorisontalLayout->addWidget(new QLabel("Hello Plugin!"));
+
+    QSpinBox *spinnerX = new QSpinBox;
+    QSlider *sliderX   = new QSlider(Qt::Vertical);
+    spinnerX->setRange(0,100);
+    sliderX->setRange(0,100);
+    QObject::connect(spinnerX, SIGNAL(valueChanged(int)), sliderX, SLOT(setValue(int)));
+    QObject::connect(sliderX, SIGNAL(valueChanged(int)), spinnerX, SLOT(setValue(int)));
+    spinnerX->setValue(0);
+
+    QSpinBox *spinnerY = new QSpinBox;
+    QSlider *sliderY   = new QSlider(Qt::Vertical);
+    spinnerY->setRange(0,100);
+    sliderY->setRange(0,100);
+    QObject::connect(spinnerY, SIGNAL(valueChanged(int)), sliderY, SLOT(setValue(int)));
+    QObject::connect(sliderY, SIGNAL(valueChanged(int)), spinnerY, SLOT(setValue(int)));
+    spinnerY->setValue(0);
+
+    QSpinBox *spinnerZ = new QSpinBox;
+    QSlider *sliderZ   = new QSlider(Qt::Vertical);
+    spinnerZ->setRange(0,100);
+    sliderZ->setRange(0,100);
+    QObject::connect(spinnerZ, SIGNAL(valueChanged(int)), sliderZ, SLOT(setValue(int)));
+    QObject::connect(sliderZ, SIGNAL(valueChanged(int)), spinnerZ, SLOT(setValue(int)));
+    spinnerY->setValue(0);
+
+    mHorisontalLayout->addWidget(sliderX);
+    mHorisontalLayout->addWidget(spinnerX);
+
+    mHorisontalLayout->addWidget(sliderY);
+    mHorisontalLayout->addWidget(spinnerY);
+
+    mHorisontalLayout->addWidget(sliderZ);
+    mHorisontalLayout->addWidget(spinnerZ);
 }
 
 Ur5Widget::~Ur5Widget()
