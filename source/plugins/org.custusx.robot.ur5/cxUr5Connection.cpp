@@ -147,31 +147,32 @@ void Ur5Connection::update_currentState(bool connected)
     currentState = receiver.analyze_rawPacket(rawData);
 }
 
-void Ur5Connection::initializeWorkspace(bool currentPos)
+void Ur5Connection::clearCurrentTCP()
+{
+    Ur5State clearState(0,0,0,0,0,0);
+    update_currentState();
+    sendMessage(transmitter.set_tcp(clearState));
+    update_currentState();
+}
+
+void Ur5Connection::moveToPlannedOrigo(Ur5State origo)
+{
+    targetState = origo;
+    sendMessage(transmitter.movej(origo,0.3,0.3,0));
+    waitForMove();
+    update_currentState();
+}
+
+void Ur5Connection::setOrigo(double threshold)
 {
     Ur5State zeroState(0,0,0,0,0,0);
     update_currentState();
-    Ur5State clearState = zeroState;
 
-    if(currentState.cartAxis.length()>0.01)
+    while(currentState.cartAxis.length()>0.01)
     {
-        sendMessage(transmitter.set_tcp(clearState));
-        update_currentState();
-        if(currentPos == false)
+        if(currentState.cartAxis[0]*currentState.cartAxis[1]>0) // (-/- case and +/+ case)
         {
-            Ur5State origo(-0.36,-0.64,0.29,-1.87,-2.50,0);
-            targetState = origo;
-            sendMessage(transmitter.movej(origo,0.3,0.3,0));
-            waitForMove();
-            update_currentState();
-        }
-    }
-
-
-    while(abs(currentState.cartAxis[2])>0.01 || abs(currentState.cartAxis[0])>0.01 || abs(currentState.cartAxis[1])>0.01)
-    {
-        if(currentState.cartAxis[0]<0 && currentState.cartAxis[1]<0) // (-/- case)
-        {
+            //
             if(currentState.cartAxis[0]>0)
             {
                 zeroState.cartAxis[0] -= 0.01;
@@ -189,8 +190,17 @@ void Ur5Connection::initializeWorkspace(bool currentPos)
             {
                 zeroState.cartAxis[1] += 0.01;
             }
+
+            if(currentState.cartAxis[2]>0) // Same top/bottom, need to check negative values
+            {
+                zeroState.cartAxis[2] += 0.01;
+            }
+            else
+            {
+                zeroState.cartAxis[2] -= 0.01;
+            }
         }
-        else if(currentState.cartAxis[0]>0 && currentState.cartAxis[1]<0) // (+/- case)
+        else if(currentState.cartAxis[0]*currentState.cartAxis[1]<0) // (+/- case and -/+)
         {
             if(currentState.cartAxis[0]>0)
             {
@@ -209,55 +219,15 @@ void Ur5Connection::initializeWorkspace(bool currentPos)
             {
                 zeroState.cartAxis[1] -= 0.01;
             }
-        }
-        else if(currentState.cartAxis[0]<0 && currentState.cartAxis[1]>0) // (-/+ case)
-        {
-            if(currentState.cartAxis[0]>0)
-            {
-                zeroState.cartAxis[0] += 0.01;
-            }
-            else
-            {
-                zeroState.cartAxis[0] -= 0.01;
-            }
 
-            if(currentState.cartAxis[1]>0)
+            if(currentState.cartAxis[2]>0) // Same top/bottom
             {
-                zeroState.cartAxis[1] += 0.01;
+                zeroState.cartAxis[2] += 0.01;
             }
             else
             {
-                zeroState.cartAxis[1] -= 0.01;
+                zeroState.cartAxis[2] -= 0.01;
             }
-        }
-        else if(currentState.cartAxis[0]>0 && currentState.cartAxis[1]>0) // (+/+ case)
-        {
-            if(currentState.cartAxis[0]>0)
-            {
-                zeroState.cartAxis[0] -= 0.01;
-            }
-            else
-            {
-                zeroState.cartAxis[0] += 0.01;
-            }
-
-            if(currentState.cartAxis[1]>0)
-            {
-                zeroState.cartAxis[1] -= 0.01;
-            }
-            else
-            {
-                zeroState.cartAxis[1] += 0.01;
-            }
-        }
-
-        if(currentState.cartAxis[2]>0) // Same top/bottom
-        {
-            zeroState.cartAxis[2] += 0.01;
-        }
-        else
-        {
-            zeroState.cartAxis[2] -= 0.01;
         }
 
         sendMessage(transmitter.set_tcp(zeroState));
@@ -266,19 +236,32 @@ void Ur5Connection::initializeWorkspace(bool currentPos)
 
         update_currentState();
     }
+
     zeroState.cartAngles=-currentState.cartAngles;
 
-    sendMessage(transmitter.set_tcp(clearState));
-    update_currentState();
+    clearCurrentTCP();
 
     sendMessage(transmitter.set_tcp(zeroState));
     update_currentState();
     receiver.print_cartData(currentState);
+
 }
 
-// Test data, may be removed later
+void Ur5Connection::initializeWorkspace(double threshold, Ur5State origo, bool currentPos)
+{
+    if(currentState.cartAxis.length()>threshold)
+    {
+        clearCurrentTCP();
+        if(currentPos == false)
+            moveToPlannedOrigo(origo);
+    }
 
-void Ur5Connection::set_testData()
+    setOrigo(threshold);
+}
+
+
+
+void Ur5Connection::set_testData() // Test data, may be removed later
 {
     rawData = QByteArray::fromHex("000004e6100000001d000000000000070b4001010100000000003ff0000000000000000000fb0140129cbfa3ff339a40129cbaa30d842e00000000000000003d8e53fd423e666741e000004253999afdbff903c903a50f28bff903da0998505c00000000000000004001d87e423e666741e66667425b999afdbff39543291650f0bff3952dca3e8fdd00000000000000003fc970ad423e666741e000004253999afdbfff1bba48ed7f84bfff1bc656ae4b4800000000000000003e832d8e423e00004204cccd425f999afd3ffa063d748b83743ffa06475f9d0b1c00000000000000003e832d8e423e6667420ccccd426c6667fdbff947eb52e92b58bff947e533bc678500000000000000003e177ab3423f999a42113333427b999afd0000003504bfc0d5af562ce9aabfdcda179aa84d0b3fe21e88537014ebc0010712885eeef94001e95d0ce34aa1bfa5d57f65e8a5cd000000e1053c6144ff1c65307f0c75ce3fa23968ff7d5bc39f3658b9ff0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000bfdb333333333333bfd91a9fbe76c8b40000000000000000000000000000000000000000000000003fb6d31fcd24e161000000000000000000000000000000003fbbf141205bc01a3fb83afb7e90ff973fb5119ce075f6fd3ff921fb54524550000000000000000000000000000000003ff921fb54524550bff921fb545245500000000000000000000000000000003509bfec3de20a35cbb9c02254dd7f203b37c00878db7c24eb7ebfed005a97a92bd4c002f6388e6a1839bff63172941fc304000000400300000000000000000000000000003f4401401401401400000000000000000000000000000000000041f5999a424133333f45fa0000000000080200000000250200003f927cca98db97f73f9018cae1c8068542353333003bc49ba6424c0000fd000001d506c01921fb54442d18401921fb54442d18c01921fb54442d18401921fb54442d18c01921fb54442d18401921fb54442d18c01921fb54442d18401921fb54442d18c01921fb54442d18401921fb54442d18c01921fb54442d18401921fb54442d184009333333333333402e0000000000004009333333333333402e0000000000004009333333333333402e000000000000400999999999999a4039000000000000400999999999999a4039000000000000400999999999999a40390000000000003ff0c152382d73653ff657184ae744873fd00000000000003ff33333333333333fd00000000000000000000000000000bfdb333333333333bfd91a9fbe76c8b40000000000000000000000000000000000000000000000003fb6d31fcd24e161000000000000000000000000000000003fbbf141205bc01a3fb83afb7e90ff973fb5119ce075f6fd3ff921fb54524550000000000000000000000000000000003ff921fb54524550bff921fb545245500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000050000000200000001000000010000000200000002000000020000000200000002000000020000003d070000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003f752e79388a2f5900000007080001");
 }

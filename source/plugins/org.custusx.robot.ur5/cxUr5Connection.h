@@ -81,7 +81,12 @@ public:
     void print_rawData();
 
     void update_currentState(bool connected = true);
-    void initializeWorkspace(bool currentPos = false);
+
+    void initializeWorkspace(double threshold=0.01,Ur5State origo = Ur5State{-0.36,-0.64,0.29,-1.87,-2.50,0},bool currentPos = false);
+    void clearCurrentTCP();
+    void moveToPlannedOrigo(Ur5State origo);
+    void setOrigo(double threshold);
+
 
     bool waitForMove();
     bool atTargetPos(Ur5State current);
@@ -94,6 +99,7 @@ private slots:
     virtual void internalDataAvailable();
 
 protected:
+
 
 
 };
