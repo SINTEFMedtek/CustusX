@@ -8,7 +8,8 @@ namespace cx
 
 Ur5State::Ur5State()
 {
-
+    jointAxisVelocity << 0,0,0;
+    jointAngleVelocity << 0,0,0;
 }
 
 Ur5State::Ur5State(double x,double y,double z,double rx,double ry,double rz)

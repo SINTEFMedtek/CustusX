@@ -163,78 +163,88 @@ void Ur5Connection::moveToPlannedOrigo(Ur5State origo)
     update_currentState();
 }
 
+void Ur5Connection::incrementPosQuad(Ur5State &zeroState, double threshold)
+{
+    if(currentState.cartAxis[0]>0)
+    {
+        zeroState.cartAxis[0] -= threshold/2;
+    }
+    else
+    {
+        zeroState.cartAxis[0] += threshold/2;
+    }
+
+    if(currentState.cartAxis[1]>0)
+    {
+        zeroState.cartAxis[1] -= threshold/2;
+    }
+    else
+    {
+        zeroState.cartAxis[1] += threshold/2;
+    }
+
+    if(currentState.cartAxis[2]>0) // Same top/bottom, need to check negative values
+    {
+        zeroState.cartAxis[2] += threshold/2;
+    }
+    else
+    {
+        zeroState.cartAxis[2] -= threshold/2;
+    }
+}
+
+void Ur5Connection::incrementNegQuad(Ur5State &zeroState, double threshold)
+{
+    if(currentState.cartAxis[0]>0)
+    {
+        zeroState.cartAxis[0] += threshold/2;
+    }
+    else
+    {
+        zeroState.cartAxis[0] -= threshold/2;
+    }
+
+    if(currentState.cartAxis[1]>0)
+    {
+        zeroState.cartAxis[1] += threshold/2;
+    }
+    else
+    {
+        zeroState.cartAxis[1] -= threshold/2;
+    }
+
+    if(currentState.cartAxis[2]>0) // Same top/bottom
+    {
+        zeroState.cartAxis[2] += threshold/2;
+    }
+    else
+    {
+        zeroState.cartAxis[2] -= threshold/2;
+    }
+}
+
 void Ur5Connection::setOrigo(double threshold)
 {
     Ur5State zeroState(0,0,0,0,0,0);
     update_currentState();
 
-    while(currentState.cartAxis.length()>0.01)
+    for(double thres = 1;thres>=threshold;thres= thres/2)
     {
-        if(currentState.cartAxis[0]*currentState.cartAxis[1]>0) // (-/- case and +/+ case)
+        while(currentState.cartAxis.length()>thres)
         {
-            //
-            if(currentState.cartAxis[0]>0)
+            if(currentState.cartAxis[0]*currentState.cartAxis[1]>0) // (-/- case and +/+ case)
             {
-                zeroState.cartAxis[0] -= 0.01;
+                incrementPosQuad(zeroState,thres);
             }
-            else
+            else if(currentState.cartAxis[0]*currentState.cartAxis[1]<0) // (+/- case and -/+)
             {
-                zeroState.cartAxis[0] += 0.01;
-            }
-
-            if(currentState.cartAxis[1]>0)
-            {
-                zeroState.cartAxis[1] -= 0.01;
-            }
-            else
-            {
-                zeroState.cartAxis[1] += 0.01;
+                incrementNegQuad(zeroState,thres);
             }
 
-            if(currentState.cartAxis[2]>0) // Same top/bottom, need to check negative values
-            {
-                zeroState.cartAxis[2] += 0.01;
-            }
-            else
-            {
-                zeroState.cartAxis[2] -= 0.01;
-            }
+            sendMessage(transmitter.set_tcp(zeroState));
+            update_currentState();
+            std::cout << currentState.cartAxis << std::endl;
         }
-        else if(currentState.cartAxis[0]*currentState.cartAxis[1]<0) // (+/- case and -/+)
-        {
-            if(currentState.cartAxis[0]>0)
-            {
-                zeroState.cartAxis[0] += 0.01;
-            }
-            else
-            {
-                zeroState.cartAxis[0] -= 0.01;
-            }
-
-            if(currentState.cartAxis[1]>0)
-            {
-                zeroState.cartAxis[1] += 0.01;
-            }
-            else
-            {
-                zeroState.cartAxis[1] -= 0.01;
-            }
-
-            if(currentState.cartAxis[2]>0) // Same top/bottom
-            {
-                zeroState.cartAxis[2] += 0.01;
-            }
-            else
-            {
-                zeroState.cartAxis[2] -= 0.01;
-            }
-        }
-
-        sendMessage(transmitter.set_tcp(zeroState));
-        update_currentState();
-        std::cout << currentState.cartAxis << std::endl;
-
-        update_currentState();
     }
 
     zeroState.cartAngles=-currentState.cartAngles;
@@ -244,7 +254,6 @@ void Ur5Connection::setOrigo(double threshold)
     sendMessage(transmitter.set_tcp(zeroState));
     update_currentState();
     receiver.print_cartData(currentState);
-
 }
 
 void Ur5Connection::initializeWorkspace(double threshold, Ur5State origo, bool currentPos)
@@ -258,7 +267,6 @@ void Ur5Connection::initializeWorkspace(double threshold, Ur5State origo, bool c
 
     setOrigo(threshold);
 }
-
 
 
 void Ur5Connection::set_testData() // Test data, may be removed later

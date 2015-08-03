@@ -52,17 +52,17 @@ TEST_CASE("Ur5Plugin: Send message to robot and receive message from robot", "[m
     //fixture.connection.update_currentState();
     //fixture.connection.receiver.print_cartData(fixture.connection.currentState);
 
-    fixture.connection.initializeWorkspace();
+    fixture.connection.initializeWorkspace(0.0000005);
 
-    double a=0.1;
-    double v=0.01;
-    double r=0;
+        double a=0.1;
+        double v=0.01;
+        double r=0;
 
-    QString filename("C:\\artery_centerline_fixed_2.vtk");
-    fixture.connection.transmitter.openVTKfile(filename);
-    //fixture.connection.transmitter.printPoseQueue();
-    fixture.connection.transmitter.movejProgram(fixture.connection.transmitter.poseQueue,a,v,r);
-    fixture.connection.runProgramQueue();
+        QString filename("C:\\artery_centerline_fixed_2.vtk");
+        fixture.connection.transmitter.openVTKfile(filename);
+        //fixture.connection.transmitter.printPoseQueue();
+        fixture.connection.transmitter.movejProgram(fixture.connection.transmitter.poseQueue,a,v,r);
+        fixture.connection.runProgramQueue();
 
     fixture.connection.requestDisconnect();
 }

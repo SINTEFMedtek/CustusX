@@ -6,6 +6,15 @@
 
 namespace cx
 {
+/**
+ * Struct that handles UR5 robot spatial information.
+ *
+ * \ingroup org_custusx_robot_ur5
+ *
+ * \author Andreas Østvik
+ * \date 2015-07-10
+ */
+
 
 struct org_custusx_robot_ur5_EXPORT Ur5State
 {

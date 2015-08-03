@@ -50,6 +50,7 @@ namespace cx
  * \ingroup org_custusx_robot_ur5
  *
  * \author Ole Vegard Solberg, SINTEF
+ * \author Andreas Østvik
  * \date 2015-06-25
  */
 
@@ -86,6 +87,9 @@ public:
     void clearCurrentTCP();
     void moveToPlannedOrigo(Ur5State origo);
     void setOrigo(double threshold);
+
+    void incrementPosQuad(Ur5State &state, double threshold);
+    void incrementNegQuad(Ur5State &state, double threshold);
 
 
     bool waitForMove();
