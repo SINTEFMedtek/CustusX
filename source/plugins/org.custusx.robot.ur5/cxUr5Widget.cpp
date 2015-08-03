@@ -117,7 +117,6 @@ void Ur5Widget::setupUi(QWidget *Ur5Widget)
 
     // Make subparent tab
     tabWidget = new QTabWidget(Ur5Widget);
-    //tabWidget->setObjectName(QStringLiteral("tabWidget"));
     tabWidget->setGeometry(QRect(2, 5, 430, 290));
     tabWidget->setCurrentIndex(0);
 
