@@ -138,39 +138,33 @@ void Ur5Widget::insertPlannedMoveTab(QTabWidget *tabWidget)
 void Ur5Widget::insertInitializeTab(QTabWidget *tabWidget)
 {
     // InitializeTab
-    initializeTab = new QWidget();
-    initializeTab->setObjectName(QStringLiteral("initializeTab"));
-    horizontalLayoutWidget = new QWidget(initializeTab);
-    //horizontalLayoutWidget->setObjectName(QStringLiteral("horizontalLayoutWidget"));
+    QWidget *initializeTab = new QWidget(this);
+    QWidget *horizontalLayoutWidget = new QWidget(initializeTab);
     horizontalLayoutWidget->setGeometry(QRect(10, 0, 400, 40));
 
     // IP address label
-    horizontalLayout = new QHBoxLayout(horizontalLayoutWidget);
+    QHBoxLayout *horizontalLayout = new QHBoxLayout(horizontalLayoutWidget);
     horizontalLayout->setSpacing(6);
     horizontalLayout->setContentsMargins(11, 11, 11, 11);
-    //horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
     horizontalLayout->setContentsMargins(0, 0, 0, 0);
-    label_3 = new QLabel(horizontalLayoutWidget);
-    //label_3->setObjectName(QStringLiteral("label_3"));
-    horizontalLayout->addWidget(label_3);
-    label_3->setText(QApplication::translate("Ur5Widget", "IP Address", 0));
+    horizontalLayout->addWidget(new QLabel("IP Address: "));
 
     // IP address line edit
     ipLineEdit = new QLineEdit(horizontalLayoutWidget);
-    ipLineEdit->setObjectName(QStringLiteral("ipLineEdit"));
     horizontalLayout->addWidget(ipLineEdit);
     ipLineEdit->setText(QApplication::translate("Ur5Widget", "169.254.62.100", 0));
 
-    verticalSpacer_2 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    QSpacerItem *verticalSpacer_2 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
     horizontalLayout->addItem(verticalSpacer_2);
 
     // Connect button
-    horizontalLayout_2 = new QHBoxLayout();
+    QHBoxLayout *horizontalLayout_2 = new QHBoxLayout();
     horizontalLayout_2->setSpacing(6);
-    //horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
+
     connectButton = new QPushButton(horizontalLayoutWidget);
     connectButton->setObjectName(QStringLiteral("connectButton"));
     connectButton->setMaximumSize(QSize(70, 30));
+
     QIcon icon;
     icon.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/network-idle.ico"), QSize(), QIcon::Normal, QIcon::Off);
     icon.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/network-transmit-receive.ico"), QSize(), QIcon::Normal, QIcon::On);
@@ -181,51 +175,44 @@ void Ur5Widget::insertInitializeTab(QTabWidget *tabWidget)
     connectButton->setText(QApplication::translate("Ur5Widget", "Connect", 0));
 
     // Hard line
-    line = new QFrame(initializeTab);
-    line->setObjectName(QStringLiteral("line"));
+    QFrame *line = new QFrame(initializeTab);
     line->setGeometry(QRect(10, 40, 401, 21));
     line->setFrameShape(QFrame::HLine);
     line->setFrameShadow(QFrame::Sunken);
 
     // Tab for preset coordinates and manual coordinates
-    verticalLayoutWidget = new QWidget(initializeTab);
-    verticalLayoutWidget->setObjectName(QStringLiteral("verticalLayoutWidget"));
+    QWidget *verticalLayoutWidget = new QWidget(initializeTab);
     verticalLayoutWidget->setGeometry(QRect(10, 60, 401, 141));
-    verticalLayout = new QVBoxLayout(verticalLayoutWidget);
+
+    QVBoxLayout *verticalLayout = new QVBoxLayout(verticalLayoutWidget);
     verticalLayout->setSpacing(6);
     verticalLayout->setContentsMargins(11, 11, 11, 11);
-    verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
     verticalLayout->setContentsMargins(0, 0, 0, 0);
 
     // "Set origo for robot workspace" label
     label = new QLabel(verticalLayoutWidget);
-    label->setObjectName(QStringLiteral("label"));
     verticalLayout->addWidget(label);
     label->setText(QApplication::translate("Ur5Widget", "Set origo for robot workspace", 0));
 
     // Preset origo  tab
     tabWidget_2 = new QTabWidget(verticalLayoutWidget);
-    tabWidget_2->setObjectName(QStringLiteral("tabWidget_2"));
-    tab_4 = new QWidget();
-    tab_4->setObjectName(QStringLiteral("tab_4"));
-    horizontalLayoutWidget_3 = new QWidget(tab_4);
-    horizontalLayoutWidget_3->setObjectName(QStringLiteral("horizontalLayoutWidget_3"));
+    QWidget *tab_4 = new QWidget();
+
+    QWidget *horizontalLayoutWidget_3 = new QWidget(tab_4);
     horizontalLayoutWidget_3->setGeometry(QRect(10, 10, 321, 31));
-    horizontalLayout_3 = new QHBoxLayout(horizontalLayoutWidget_3);
+
+    QHBoxLayout *horizontalLayout_3 = new QHBoxLayout(horizontalLayoutWidget_3);
     horizontalLayout_3->setSpacing(6);
     horizontalLayout_3->setContentsMargins(11, 11, 11, 11);
-    horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
     horizontalLayout_3->setContentsMargins(0, 0, 0, 0);
 
     // Choose origo label
     label_2 = new QLabel(horizontalLayoutWidget_3);
-    label_2->setObjectName(QStringLiteral("label_2"));
     horizontalLayout_3->addWidget(label_2, 0, Qt::AlignLeft);
     label_2->setText(QApplication::translate("Ur5Widget", "Choose origo:", 0));
 
     // Preset Origo ComboBox
     presetOrigoComboBox = new QComboBox(horizontalLayoutWidget_3);
-    presetOrigoComboBox->setObjectName(QStringLiteral("presetOrigoComboBox"));
     presetOrigoComboBox->setMinimumSize(QSize(120, 0));
     horizontalLayout_3->addWidget(presetOrigoComboBox);
     presetOrigoComboBox->clear();
@@ -236,14 +223,12 @@ void Ur5Widget::insertInitializeTab(QTabWidget *tabWidget)
 
     // Initialize Button in preset coordinates tab
     initializeButton = new QPushButton(horizontalLayoutWidget_3);
-    initializeButton->setObjectName(QStringLiteral("initializeButton"));
     horizontalLayout_3->addWidget(initializeButton);
     initializeButton->setToolTip(QApplication::translate("Ur5Widget", "Initialize workspace", 0));
     initializeButton->setText(QApplication::translate("Ur5Widget", "Initialize", 0));
 
     // Initialize bar
     initializeBar = new QProgressBar(tab_4);
-    initializeBar->setObjectName(QStringLiteral("initializeBar"));
     initializeBar->setGeometry(QRect(10, 80, 351, 16));
     initializeBar->setValue(0);
 
@@ -253,7 +238,6 @@ void Ur5Widget::insertInitializeTab(QTabWidget *tabWidget)
 
     // Manual coordinates tab
     tab_5 = new QWidget();
-    tab_5->setObjectName(QStringLiteral("tab_5"));
     gridLayoutWidget = new QWidget(tab_5);
     gridLayoutWidget->setObjectName(QStringLiteral("gridLayoutWidget"));
     gridLayoutWidget->setGeometry(QRect(10, 10, 331, 41));

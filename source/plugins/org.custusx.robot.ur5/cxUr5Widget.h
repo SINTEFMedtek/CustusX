@@ -85,7 +85,6 @@ public:
     virtual ~Ur5Widget();
 
     // For initalize tab
-    QWidget *initializeTab,*horizontalLayoutWidget, *verticalLayoutWidget, *horizontalLayoutWidget_3;
     QWidget *tab_4,*tab_5, *gridLayoutWidget;
     QTabWidget *tabWidget, *tabWidget_2;
     QHBoxLayout *horizontalLayout,*horizontalLayout_2,*horizontalLayout_3;
