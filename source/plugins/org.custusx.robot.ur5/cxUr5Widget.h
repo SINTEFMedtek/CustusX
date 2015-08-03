@@ -84,84 +84,44 @@ public:
     Ur5Widget(QWidget* parent = 0);
     virtual ~Ur5Widget();
 
-    // From design
-    QWidget *centralWidget;
-    QTabWidget *tabWidget;
-    QWidget *initializeTab;
-    QWidget *horizontalLayoutWidget;
-    QHBoxLayout *horizontalLayout;
-    QLabel *label_3;
-    QLineEdit *ipLineEdit;
-    QSpacerItem *verticalSpacer_2;
-    QHBoxLayout *horizontalLayout_2;
-    QPushButton *connectButton;
-    QWidget *verticalLayoutWidget;
+    // For initalize tab
+    QWidget *initializeTab,*horizontalLayoutWidget, *verticalLayoutWidget, *horizontalLayoutWidget_3;
+    QWidget *tab_4,*tab_5, *gridLayoutWidget;
+    QTabWidget *tabWidget, *tabWidget_2;
+    QHBoxLayout *horizontalLayout,*horizontalLayout_2,*horizontalLayout_3;
     QVBoxLayout *verticalLayout;
-    QLabel *label;
-    QTabWidget *tabWidget_2;
-    QWidget *tab_4;
-    QWidget *horizontalLayoutWidget_3;
-    QHBoxLayout *horizontalLayout_3;
-    QLabel *label_2;
+    QLineEdit *ipLineEdit, *lineEdit_2;
+    QSpacerItem *verticalSpacer_2;
+    QPushButton *connectButton, *initializeButton, *initializeButton_2, *disconnectButton;
+    QLabel *label, *label_2, *label_3;
     QComboBox *presetOrigoComboBox;
-    QPushButton *initializeButton;
     QProgressBar *initializeBar;
-    QWidget *tab_5;
-    QWidget *gridLayoutWidget;
     QGridLayout *gridLayout;
-    QLabel *label_4;
-    QLineEdit *lineEdit_2;
-    QPushButton *initializeButton_2;
+    QLabel *label_4, *label_11, *label_9, *label_10, *label_8, *label_13, *label_14;
+    QLabel *label_12, *label_15, *label_16, *label_5, *label_7, *label_6;
     QFrame *line;
-    QPushButton *disconnectButton;
+
+    // For manual move tab
     QWidget *manualMoveTab;
     QWidget *gridLayoutWidget_2;
     QGridLayout *gridLayout_2;
-    QPushButton *negZButton;
-    QPushButton *posZButton;
-    QPushButton *posXButton;
-    QPushButton *negYButton;
-    QPushButton *posYButton;
-    QPushButton *stopMove;
-    QPushButton *negXButton;
+
+    QPushButton *negZButton, *posZButton, *posXButton, *negYButton, *posYButton, *stopMove, *negXButton;
     QWidget *gridLayoutWidget_3;
     QGridLayout *gridLayout_3;
-    QScrollBar *horizontalScrollBar;
-    QScrollBar *horizontalScrollBar_2;
-    QScrollBar *horizontalScrollBar_3;
-    QLabel *label_11;
-    QLabel *label_9;
-    QLabel *label_10;
-    QLabel *label_8;
-    QLabel *label_13;
-    QLabel *label_14;
-    QLabel *label_12;
-    QLabel *label_15;
-    QLabel *label_16;
-    QLabel *label_5;
-    QLabel *label_7;
-    QLabel *label_6;
-    QLineEdit *xPosLineEdit;
-    QLineEdit *yPosLineEdit;
-    QScrollBar *horizontalScrollBar_4;
-    QScrollBar *horizontalScrollBar_5;
-    QScrollBar *horizontalScrollBar_6;
-    QLineEdit *ryLineEdit;
-    QLineEdit *rzLineEdit;
-    QLineEdit *zPosLineEdit;
-    QLineEdit *rxLineEdit;
+    QScrollBar *horizontalScrollBar, *horizontalScrollBar_2, *horizontalScrollBar_3;
+
+    QLineEdit *xPosLineEdit, *yPosLineEdit, *zPosLineEdit;
+    QScrollBar *horizontalScrollBar_4, *horizontalScrollBar_5, *horizontalScrollBar_6;
+    QLineEdit *rxLineEdit, *ryLineEdit, *rzLineEdit;
+
     QWidget *gridLayoutWidget_5;
     QGridLayout *gridLayout_5;
-    QLineEdit *accelerationLineEdit;
-    QLineEdit *velocityLineEdit;
-    QLabel *label_19;
-    QLabel *label_20;
-    QLabel *label_21;
-    QLineEdit *timeLineEdit;
-    QLabel *label_17;
-    QLabel *label_18;
-    QLabel *label_22;
+    QLineEdit *accelerationLineEdit, *velocityLineEdit, *timeLineEdit;
+    QLabel *label_19, *label_20, *label_21, *label_17, *label_18, *label_22;
     QFrame *line_2;
+
+    // For planned move tab
     QWidget *plannedMoveTab;
 
     void setupUi(QWidget *parent);

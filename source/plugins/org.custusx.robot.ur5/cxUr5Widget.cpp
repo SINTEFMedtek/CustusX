@@ -141,17 +141,17 @@ void Ur5Widget::insertInitializeTab(QTabWidget *tabWidget)
     initializeTab = new QWidget();
     initializeTab->setObjectName(QStringLiteral("initializeTab"));
     horizontalLayoutWidget = new QWidget(initializeTab);
-    horizontalLayoutWidget->setObjectName(QStringLiteral("horizontalLayoutWidget"));
-    horizontalLayoutWidget->setGeometry(QRect(10, 0, 401, 41));
+    //horizontalLayoutWidget->setObjectName(QStringLiteral("horizontalLayoutWidget"));
+    horizontalLayoutWidget->setGeometry(QRect(10, 0, 400, 40));
 
     // IP address label
     horizontalLayout = new QHBoxLayout(horizontalLayoutWidget);
     horizontalLayout->setSpacing(6);
     horizontalLayout->setContentsMargins(11, 11, 11, 11);
-    horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
+    //horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
     horizontalLayout->setContentsMargins(0, 0, 0, 0);
     label_3 = new QLabel(horizontalLayoutWidget);
-    label_3->setObjectName(QStringLiteral("label_3"));
+    //label_3->setObjectName(QStringLiteral("label_3"));
     horizontalLayout->addWidget(label_3);
     label_3->setText(QApplication::translate("Ur5Widget", "IP Address", 0));
 
@@ -167,7 +167,7 @@ void Ur5Widget::insertInitializeTab(QTabWidget *tabWidget)
     // Connect button
     horizontalLayout_2 = new QHBoxLayout();
     horizontalLayout_2->setSpacing(6);
-    horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
+    //horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
     connectButton = new QPushButton(horizontalLayoutWidget);
     connectButton->setObjectName(QStringLiteral("connectButton"));
     connectButton->setMaximumSize(QSize(70, 30));
@@ -301,8 +301,6 @@ void Ur5Widget::insertInitializeTab(QTabWidget *tabWidget)
     // Add initializeTab
     tabWidget->addTab(initializeTab, QString());
     tabWidget->setTabText(tabWidget->indexOf(initializeTab), QApplication::translate("Ur5Widget", "Initialize", 0));
-
-    // END initializeTab
 }
 
 void Ur5Widget::insertManualMoveTab(QTabWidget *tabWidget)
