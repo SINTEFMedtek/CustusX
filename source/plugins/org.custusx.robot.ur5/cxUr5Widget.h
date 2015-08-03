@@ -85,47 +85,23 @@ public:
     virtual ~Ur5Widget();
 
     // For initalize tab
-    QWidget *tab_4,*tab_5, *gridLayoutWidget;
-    QTabWidget *tabWidget, *tabWidget_2;
-    QHBoxLayout *horizontalLayout,*horizontalLayout_2,*horizontalLayout_3;
-    QVBoxLayout *verticalLayout;
-    QLineEdit *ipLineEdit, *lineEdit_2;
-    QSpacerItem *verticalSpacer_2;
+    QLineEdit *ipLineEdit, *manualCoordinates;
     QPushButton *connectButton, *initializeButton, *initializeButton_2, *disconnectButton;
-    QLabel *label, *label_2, *label_3;
     QComboBox *presetOrigoComboBox;
     QProgressBar *initializeBar;
-    QGridLayout *gridLayout;
-    QLabel *label_4, *label_11, *label_9, *label_10, *label_8, *label_13, *label_14;
-    QLabel *label_12, *label_15, *label_16, *label_5, *label_7, *label_6;
-    QFrame *line;
+    //
 
     // For manual move tab
-    QWidget *manualMoveTab;
-    QWidget *gridLayoutWidget_2;
-    QGridLayout *gridLayout_2;
-
     QPushButton *negZButton, *posZButton, *posXButton, *negYButton, *posYButton, *stopMove, *negXButton;
-    QWidget *gridLayoutWidget_3;
-    QGridLayout *gridLayout_3;
-    QScrollBar *horizontalScrollBar, *horizontalScrollBar_2, *horizontalScrollBar_3;
-
+    QScrollBar *xScrollBar, *yScrollBar, *zScrollBar;
     QLineEdit *xPosLineEdit, *yPosLineEdit, *zPosLineEdit;
-    QScrollBar *horizontalScrollBar_4, *horizontalScrollBar_5, *horizontalScrollBar_6;
+    QScrollBar *rxScrollBar, *ryScrollBar, *rzScrollBar;
     QLineEdit *rxLineEdit, *ryLineEdit, *rzLineEdit;
-
-    QWidget *gridLayoutWidget_5;
-    QGridLayout *gridLayout_5;
     QLineEdit *accelerationLineEdit, *velocityLineEdit, *timeLineEdit;
-    QLabel *label_19, *label_20, *label_21, *label_17, *label_18, *label_22;
-    QFrame *line_2;
-
-    // For planned move tab
-    QWidget *plannedMoveTab;
+    //
 
     void setupUi(QWidget *parent);
-    void retranslateUi(QWidget *parent);
-    //
+
     void insertPlannedMoveTab(QTabWidget *parent);
     void insertInitializeTab(QTabWidget *parent);
     void insertManualMoveTab(QTabWidget *parent);

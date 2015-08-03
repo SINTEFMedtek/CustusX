@@ -116,7 +116,7 @@ void Ur5Widget::setupUi(QWidget *Ur5Widget)
     Ur5Widget->setWindowTitle("UR5 Robot");
 
     // Make subparent tab
-    tabWidget = new QTabWidget(Ur5Widget);
+    QTabWidget *tabWidget = new QTabWidget(Ur5Widget);
     tabWidget->setGeometry(QRect(2, 5, 430, 290));
     tabWidget->setCurrentIndex(0);
 
@@ -129,8 +129,7 @@ void Ur5Widget::setupUi(QWidget *Ur5Widget)
 
 void Ur5Widget::insertPlannedMoveTab(QTabWidget *tabWidget)
 {
-    plannedMoveTab = new QWidget();
-    plannedMoveTab->setObjectName(QStringLiteral("plannedMoveTab"));
+    QWidget *plannedMoveTab = new QWidget();
     tabWidget->addTab(plannedMoveTab, QString());
     tabWidget->setTabText(tabWidget->indexOf(plannedMoveTab), QApplication::translate("Ur5Widget", "Planned move", 0));
 }
@@ -190,12 +189,10 @@ void Ur5Widget::insertInitializeTab(QTabWidget *tabWidget)
     verticalLayout->setContentsMargins(0, 0, 0, 0);
 
     // "Set origo for robot workspace" label
-    label = new QLabel(verticalLayoutWidget);
-    verticalLayout->addWidget(label);
-    label->setText(QApplication::translate("Ur5Widget", "Set origo for robot workspace", 0));
+    verticalLayout->addWidget(new QLabel("Set origo for robot workspace"));
 
     // Preset origo  tab
-    tabWidget_2 = new QTabWidget(verticalLayoutWidget);
+    QTabWidget *tabWidget_2 = new QTabWidget(verticalLayoutWidget);
     QWidget *tab_4 = new QWidget();
 
     QWidget *horizontalLayoutWidget_3 = new QWidget(tab_4);
@@ -207,9 +204,8 @@ void Ur5Widget::insertInitializeTab(QTabWidget *tabWidget)
     horizontalLayout_3->setContentsMargins(0, 0, 0, 0);
 
     // Choose origo label
-    label_2 = new QLabel(horizontalLayoutWidget_3);
-    horizontalLayout_3->addWidget(label_2, 0, Qt::AlignLeft);
-    label_2->setText(QApplication::translate("Ur5Widget", "Choose origo:", 0));
+    horizontalLayout_3->addWidget(new QLabel("Choose origo: "), 0, Qt::AlignLeft);
+
 
     // Preset Origo ComboBox
     presetOrigoComboBox = new QComboBox(horizontalLayoutWidget_3);
@@ -237,27 +233,24 @@ void Ur5Widget::insertInitializeTab(QTabWidget *tabWidget)
     tabWidget_2->setTabText(tabWidget_2->indexOf(tab_4), QApplication::translate("Ur5Widget", "Preset coordinates", 0));
 
     // Manual coordinates tab
-    tab_5 = new QWidget();
-    gridLayoutWidget = new QWidget(tab_5);
+    QWidget *tab_5 = new QWidget();
+    QWidget *gridLayoutWidget = new QWidget(tab_5);
     gridLayoutWidget->setObjectName(QStringLiteral("gridLayoutWidget"));
     gridLayoutWidget->setGeometry(QRect(10, 10, 331, 41));
-    gridLayout = new QGridLayout(gridLayoutWidget);
+
+    QGridLayout *gridLayout = new QGridLayout(gridLayoutWidget);
     gridLayout->setSpacing(6);
     gridLayout->setContentsMargins(11, 11, 11, 11);
     gridLayout->setObjectName(QStringLiteral("gridLayout"));
     gridLayout->setContentsMargins(0, 0, 0, 0);
 
     // Set coordinates label
-    label_4 = new QLabel(gridLayoutWidget);
-    label_4->setObjectName(QStringLiteral("label_4"));
-    gridLayout->addWidget(label_4, 0, 0, 1, 1);
-    label_4->setText(QApplication::translate("Ur5Widget", "Set coordinates", 0));
+    gridLayout->addWidget(new QLabel("Set coordinates: "), 0, 0, 1, 1);
 
     // Manual coordinates line edit
-    lineEdit_2 = new QLineEdit(gridLayoutWidget);
-    lineEdit_2->setObjectName(QStringLiteral("lineEdit_2"));
-    gridLayout->addWidget(lineEdit_2, 0, 1, 1, 1);
-    lineEdit_2->setText(QApplication::translate("Ur5Widget", "(0,0,0,0,0,0)", 0));
+    manualCoordinates = new QLineEdit(gridLayoutWidget);
+    gridLayout->addWidget(manualCoordinates, 0, 1, 1, 1);
+    manualCoordinates->setText(QApplication::translate("Ur5Widget", "(0,0,0,0,0,0)", 0));
 
     // Initialize button 2
     initializeButton_2 = new QPushButton(gridLayoutWidget);
@@ -289,21 +282,20 @@ void Ur5Widget::insertInitializeTab(QTabWidget *tabWidget)
 
 void Ur5Widget::insertManualMoveTab(QTabWidget *tabWidget)
 {
-    // manualMove tab
-    manualMoveTab = new QWidget();
+    QWidget *manualMoveTab = new QWidget();
     manualMoveTab->setObjectName(QStringLiteral("manualMoveTab"));
-    gridLayoutWidget_2 = new QWidget(manualMoveTab);
+
+    QWidget *gridLayoutWidget_2 = new QWidget(manualMoveTab);
     gridLayoutWidget_2->setObjectName(QStringLiteral("gridLayoutWidget_2"));
     gridLayoutWidget_2->setGeometry(QRect(10, 10, 161, 148));
-    gridLayout_2 = new QGridLayout(gridLayoutWidget_2);
+
+    QGridLayout *gridLayout_2 = new QGridLayout(gridLayoutWidget_2);
     gridLayout_2->setSpacing(6);
     gridLayout_2->setContentsMargins(11, 11, 11, 11);
-    gridLayout_2->setObjectName(QStringLiteral("gridLayout_2"));
     gridLayout_2->setContentsMargins(0, 0, 0, 0);
 
     // Negative Z Button
     negZButton = new QPushButton(gridLayoutWidget_2);
-    negZButton->setObjectName(QStringLiteral("negZButton"));
     negZButton->setMaximumSize(QSize(32, 32));
     negZButton->setAutoFillBackground(false);
     negZButton->setStyleSheet(QStringLiteral(""));
@@ -317,7 +309,6 @@ void Ur5Widget::insertManualMoveTab(QTabWidget *tabWidget)
 
     // Positive Z Button
     posZButton = new QPushButton(gridLayoutWidget_2);
-    posZButton->setObjectName(QStringLiteral("posZButton"));
     posZButton->setMaximumSize(QSize(32, 32));
     QIcon icon3;
     icon3.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/arrow-up-double.png"), QSize(), QIcon::Normal, QIcon::Off);
@@ -330,7 +321,6 @@ void Ur5Widget::insertManualMoveTab(QTabWidget *tabWidget)
 
     // Positive X Button
     posXButton = new QPushButton(gridLayoutWidget_2);
-    posXButton->setObjectName(QStringLiteral("posXButton"));
     posXButton->setMaximumSize(QSize(32, 32));
     QIcon icon4;
     icon4.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/arrow-up.png"), QSize(), QIcon::Normal, QIcon::Off);
@@ -341,7 +331,6 @@ void Ur5Widget::insertManualMoveTab(QTabWidget *tabWidget)
 
     // Negative Y Button
     negYButton = new QPushButton(gridLayoutWidget_2);
-    negYButton->setObjectName(QStringLiteral("negYButton"));
     negYButton->setMaximumSize(QSize(32, 32));
     QIcon icon5;
     icon5.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/arrow-right.png"), QSize(), QIcon::Normal, QIcon::Off);
@@ -352,7 +341,6 @@ void Ur5Widget::insertManualMoveTab(QTabWidget *tabWidget)
 
     // Positive Y Button
     posYButton = new QPushButton(gridLayoutWidget_2);
-    posYButton->setObjectName(QStringLiteral("posYButton"));
     posYButton->setMaximumSize(QSize(32, 32));
     QIcon icon6;
     icon6.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/arrow-left.png"), QSize(), QIcon::Normal, QIcon::Off);
@@ -363,7 +351,6 @@ void Ur5Widget::insertManualMoveTab(QTabWidget *tabWidget)
 
     // Stop Move button
     stopMove = new QPushButton(gridLayoutWidget_2);
-    stopMove->setObjectName(QStringLiteral("stopMove"));
     stopMove->setMaximumSize(QSize(32, 32));
     QIcon icon7;
     icon7.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/application-exit-4.png"), QSize(), QIcon::Normal, QIcon::Off);
@@ -384,132 +371,73 @@ void Ur5Widget::insertManualMoveTab(QTabWidget *tabWidget)
     negXButton->setText(QString());
 
     // Grid for coordinates and scroll bar
-    gridLayoutWidget_3 = new QWidget(manualMoveTab);
+    QWidget *gridLayoutWidget_3 = new QWidget(manualMoveTab);
     gridLayoutWidget_3->setObjectName(QStringLiteral("gridLayoutWidget_3"));
     gridLayoutWidget_3->setGeometry(QRect(190, 10, 221, 161));
-    gridLayout_3 = new QGridLayout(gridLayoutWidget_3);
+
+    QGridLayout *gridLayout_3 = new QGridLayout(gridLayoutWidget_3);
     gridLayout_3->setSpacing(6);
     gridLayout_3->setContentsMargins(11, 11, 11, 11);
     gridLayout_3->setObjectName(QStringLiteral("gridLayout_3"));
     gridLayout_3->setContentsMargins(0, 0, 0, 0);
 
     // X coordinate scrollbar
-    horizontalScrollBar = new QScrollBar(gridLayoutWidget_3);
-    horizontalScrollBar->setObjectName(QStringLiteral("horizontalScrollBar"));
-    horizontalScrollBar->setOrientation(Qt::Horizontal);
-    gridLayout_3->addWidget(horizontalScrollBar, 0, 1, 1, 1);
+    xScrollBar = new QScrollBar(gridLayoutWidget_3);
+    xScrollBar->setOrientation(Qt::Horizontal);
+    gridLayout_3->addWidget(xScrollBar, 0, 1, 1, 1);
 
     // Y coordinate scrollbar
-    horizontalScrollBar_2 = new QScrollBar(gridLayoutWidget_3);
-    horizontalScrollBar_2->setObjectName(QStringLiteral("horizontalScrollBar_2"));
-    horizontalScrollBar_2->setOrientation(Qt::Horizontal);
-    gridLayout_3->addWidget(horizontalScrollBar_2, 1, 1, 1, 1);
+    yScrollBar = new QScrollBar(gridLayoutWidget_3);
+    yScrollBar->setOrientation(Qt::Horizontal);
+    gridLayout_3->addWidget(yScrollBar, 1, 1, 1, 1);
 
     // Z coordinate scrollbar
-    horizontalScrollBar_3 = new QScrollBar(gridLayoutWidget_3);
-    horizontalScrollBar_3->setObjectName(QStringLiteral("horizontalScrollBar_3"));
-    horizontalScrollBar_3->setOrientation(Qt::Horizontal);
-    gridLayout_3->addWidget(horizontalScrollBar_3, 3, 1, 1, 1);
+    zScrollBar = new QScrollBar(gridLayoutWidget_3);
+    zScrollBar->setOrientation(Qt::Horizontal);
+    gridLayout_3->addWidget(zScrollBar, 3, 1, 1, 1);
+
+    // Position label
+    gridLayout_3->addWidget(new QLabel("X"), 0, 0, 1, 1, Qt::AlignHCenter);
+    gridLayout_3->addWidget(new QLabel("Y"), 1, 0, 1, 1, Qt::AlignHCenter);
+    gridLayout_3->addWidget(new QLabel("Z"), 3, 0, 1, 1, Qt::AlignHCenter);
 
     // mm label
-    label_11 = new QLabel(gridLayoutWidget_3);
-    label_11->setObjectName(QStringLiteral("label_11"));
-    gridLayout_3->addWidget(label_11, 3, 3, 1, 1);
-    label_11->setText(QApplication::translate("Ur5Widget", "mm", 0));
+    gridLayout_3->addWidget(new QLabel("mm"), 0, 3, 1, 1);
+    gridLayout_3->addWidget(new QLabel("mm"), 1, 3, 1, 1);
+    gridLayout_3->addWidget(new QLabel("mm"), 3, 3, 1, 1);
 
-    // Z label
-    label_9 = new QLabel(gridLayoutWidget_3);
-    label_9->setObjectName(QStringLiteral("label_9"));
-    gridLayout_3->addWidget(label_9, 3, 0, 1, 1, Qt::AlignHCenter);
-    label_9->setText(QApplication::translate("Ur5Widget", "Z", 0));
-
-    // RX label
-    label_10 = new QLabel(gridLayoutWidget_3);
-    label_10->setObjectName(QStringLiteral("label_10"));
-    gridLayout_3->addWidget(label_10, 5, 0, 1, 1);
-    label_10->setText(QApplication::translate("Ur5Widget", "RX", 0));
-
-    // mm label
-    label_8 = new QLabel(gridLayoutWidget_3);
-    label_8->setObjectName(QStringLiteral("label_8"));
-    gridLayout_3->addWidget(label_8, 1, 3, 1, 1);
-    label_8->setText(QApplication::translate("Ur5Widget", "mm", 0));
-
-    // RZ label
-    label_13 = new QLabel(gridLayoutWidget_3);
-    label_13->setObjectName(QStringLiteral("label_13"));
-    gridLayout_3->addWidget(label_13, 7, 0, 1, 1);
-    label_13->setText(QApplication::translate("Ur5Widget", "RZ", 0));
+    // Ri orientation label
+    gridLayout_3->addWidget(new QLabel("RX"), 5, 0, 1, 1);
+    gridLayout_3->addWidget(new QLabel("RZ"), 7, 0, 1, 1);
+    gridLayout_3->addWidget(new QLabel("RY"), 6, 0, 1, 1);
 
     // Rad label
-    label_14 = new QLabel(gridLayoutWidget_3);
-    label_14->setObjectName(QStringLiteral("label_14"));
-    gridLayout_3->addWidget(label_14, 5, 3, 1, 1);
-    label_14->setText(QApplication::translate("Ur5Widget", "Rad", 0));
-
-    // RY label
-    label_12 = new QLabel(gridLayoutWidget_3);
-    label_12->setObjectName(QStringLiteral("label_12"));
-    gridLayout_3->addWidget(label_12, 6, 0, 1, 1);
-    label_12->setText(QApplication::translate("Ur5Widget", "RY", 0));
-
-    // Rad label
-    label_15 = new QLabel(gridLayoutWidget_3);
-    label_15->setObjectName(QStringLiteral("label_15"));
-    gridLayout_3->addWidget(label_15, 6, 3, 1, 1);
-    label_15->setText(QApplication::translate("Ur5Widget", "Rad", 0));
-
-    // Rad label
-    label_16 = new QLabel(gridLayoutWidget_3);
-    label_16->setObjectName(QStringLiteral("label_16"));
-    gridLayout_3->addWidget(label_16, 7, 3, 1, 1);
-    label_16->setText(QApplication::translate("Ur5Widget", "Rad", 0));
-
-    // X label
-    label_5 = new QLabel(gridLayoutWidget_3);
-    label_5->setObjectName(QStringLiteral("label_5"));
-    gridLayout_3->addWidget(label_5, 0, 0, 1, 1, Qt::AlignHCenter);
-    label_5->setText(QApplication::translate("Ur5Widget", "X", 0));
-
-    // Y label
-    label_7 = new QLabel(gridLayoutWidget_3);
-    label_7->setObjectName(QStringLiteral("label_7"));
-    gridLayout_3->addWidget(label_7, 1, 0, 1, 1, Qt::AlignHCenter);
-    label_7->setText(QApplication::translate("Ur5Widget", "Y", 0));
-
-    // mm label
-    label_6 = new QLabel(gridLayoutWidget_3);
-    label_6->setObjectName(QStringLiteral("label_6"));
-    gridLayout_3->addWidget(label_6, 0, 3, 1, 1);
-    label_6->setText(QApplication::translate("Ur5Widget", "mm", 0));
+    gridLayout_3->addWidget(new QLabel("Rad"), 5, 3, 1, 1);
+    gridLayout_3->addWidget(new QLabel("Rad"), 6, 3, 1, 1);
+    gridLayout_3->addWidget(new QLabel("Rad"), 7, 3, 1, 1);
 
     // X coordinate line edit
     xPosLineEdit = new QLineEdit(gridLayoutWidget_3);
-    xPosLineEdit->setObjectName(QStringLiteral("xPosLineEdit"));
     gridLayout_3->addWidget(xPosLineEdit, 0, 2, 1, 1);
 
     // Y coordinate line edit
     yPosLineEdit = new QLineEdit(gridLayoutWidget_3);
-    yPosLineEdit->setObjectName(QStringLiteral("yPosLineEdit"));
     gridLayout_3->addWidget(yPosLineEdit, 1, 2, 1, 1);
 
     // RX orientation scrollbar
-    horizontalScrollBar_4 = new QScrollBar(gridLayoutWidget_3);
-    horizontalScrollBar_4->setObjectName(QStringLiteral("horizontalScrollBar_4"));
-    horizontalScrollBar_4->setOrientation(Qt::Horizontal);
-    gridLayout_3->addWidget(horizontalScrollBar_4, 5, 1, 1, 1);
+    rxScrollBar = new QScrollBar(gridLayoutWidget_3);
+    rxScrollBar->setOrientation(Qt::Horizontal);
+    gridLayout_3->addWidget(rxScrollBar, 5, 1, 1, 1);
 
     // RY orientation scrollbar
-    horizontalScrollBar_5 = new QScrollBar(gridLayoutWidget_3);
-    horizontalScrollBar_5->setObjectName(QStringLiteral("horizontalScrollBar_5"));
-    horizontalScrollBar_5->setOrientation(Qt::Horizontal);
-    gridLayout_3->addWidget(horizontalScrollBar_5, 6, 1, 1, 1);
+    ryScrollBar = new QScrollBar(gridLayoutWidget_3);
+    ryScrollBar->setOrientation(Qt::Horizontal);
+    gridLayout_3->addWidget(ryScrollBar, 6, 1, 1, 1);
 
     // RZ orientation scrollbar
-    horizontalScrollBar_6 = new QScrollBar(gridLayoutWidget_3);
-    horizontalScrollBar_6->setObjectName(QStringLiteral("horizontalScrollBar_6"));
-    horizontalScrollBar_6->setOrientation(Qt::Horizontal);
-    gridLayout_3->addWidget(horizontalScrollBar_6, 7, 1, 1, 1);
+    rzScrollBar = new QScrollBar(gridLayoutWidget_3);
+    rzScrollBar->setOrientation(Qt::Horizontal);
+    gridLayout_3->addWidget(rzScrollBar, 7, 1, 1, 1);
 
     // Line edit for RY orientation
     ryLineEdit = new QLineEdit(gridLayoutWidget_3);
@@ -532,75 +460,48 @@ void Ur5Widget::insertManualMoveTab(QTabWidget *tabWidget)
     gridLayout_3->addWidget(rxLineEdit, 5, 2, 1, 1);
 
     // Hard line
-    line_2 = new QFrame(manualMoveTab);
-    line_2->setObjectName(QStringLiteral("line_2"));
+    QFrame *line_2 = new QFrame(manualMoveTab);
     line_2->setGeometry(QRect(10, 170, 401, 16));
     line_2->setFrameShape(QFrame::HLine);
     line_2->setFrameShadow(QFrame::Sunken);
 
     // Grid for speed, velocity and time
-    gridLayoutWidget_5 = new QWidget(manualMoveTab);
-    gridLayoutWidget_5->setObjectName(QStringLiteral("gridLayoutWidget_5"));
+    QWidget *gridLayoutWidget_5 = new QWidget(manualMoveTab);
     gridLayoutWidget_5->setGeometry(QRect(10, 190, 231, 74));
-    gridLayout_5 = new QGridLayout(gridLayoutWidget_5);
+
+    QGridLayout *gridLayout_5 = new QGridLayout(gridLayoutWidget_5);
     gridLayout_5->setSpacing(6);
     gridLayout_5->setContentsMargins(11, 11, 11, 11);
-    gridLayout_5->setObjectName(QStringLiteral("gridLayout_5"));
     gridLayout_5->setContentsMargins(0, 0, 0, 0);
 
     // Acceleration line edit
     accelerationLineEdit = new QLineEdit(gridLayoutWidget_5);
-    accelerationLineEdit->setObjectName(QStringLiteral("accelerationLineEdit"));
     gridLayout_5->addWidget(accelerationLineEdit, 1, 1, 1, 1);
     accelerationLineEdit->setText(QApplication::translate("Ur5Widget", "0", 0));
 
     // Velocity line edit
     velocityLineEdit = new QLineEdit(gridLayoutWidget_5);
-    velocityLineEdit->setObjectName(QStringLiteral("velocityLineEdit"));
     gridLayout_5->addWidget(velocityLineEdit, 0, 1, 1, 1);
     velocityLineEdit->setText(QApplication::translate("Ur5Widget", "0", 0));
 
     // Acceleration label
-    label_19 = new QLabel(gridLayoutWidget_5);
-    label_19->setObjectName(QStringLiteral("label_19"));
-    gridLayout_5->addWidget(label_19, 1, 0, 1, 1);
-    label_19->setText(QApplication::translate("Ur5Widget", "Acceleration", 0));
+    gridLayout_5->addWidget(new QLabel("Acceleration"), 1, 0, 1, 1);
 
     // Velocity label
-    label_20 = new QLabel(gridLayoutWidget_5);
-    label_20->setObjectName(QStringLiteral("label_20"));
-    gridLayout_5->addWidget(label_20, 0, 0, 1, 1);
-    label_20->setText(QApplication::translate("Ur5Widget", "Velocity", 0));
+    gridLayout_5->addWidget(new QLabel("Velocity"), 0, 0, 1, 1);
 
     // Time label
-    label_21 = new QLabel(gridLayoutWidget_5);
-    label_21->setObjectName(QStringLiteral("label_21"));
-    gridLayout_5->addWidget(label_21, 2, 0, 1, 1);
-    label_21->setText(QApplication::translate("Ur5Widget", "Time", 0));
+    gridLayout_5->addWidget(new QLabel("Time"), 2, 0, 1, 1);
 
     // Time line edit
     timeLineEdit = new QLineEdit(gridLayoutWidget_5);
-    timeLineEdit->setObjectName(QStringLiteral("timeLineEdit"));
     gridLayout_5->addWidget(timeLineEdit, 2, 1, 1, 1);
     timeLineEdit->setText(QApplication::translate("Ur5Widget", "0", 0));
 
-    // unit m/s label
-    label_17 = new QLabel(gridLayoutWidget_5);
-    label_17->setObjectName(QStringLiteral("label_17"));
-    gridLayout_5->addWidget(label_17, 0, 2, 1, 1);
-    label_17->setText(QApplication::translate("Ur5Widget", "m/s", 0));
-
-    // unit m/s^2 label
-    label_18 = new QLabel(gridLayoutWidget_5);
-    label_18->setObjectName(QStringLiteral("label_18"));
-    gridLayout_5->addWidget(label_18, 1, 2, 1, 1);
-    label_18->setText(QApplication::translate("Ur5Widget", "m/s^2", 0));
-
-    // unit s label
-    label_22 = new QLabel(gridLayoutWidget_5);
-    label_22->setObjectName(QStringLiteral("label_22"));
-    gridLayout_5->addWidget(label_22, 2, 2, 1, 1);
-    label_22->setText(QApplication::translate("Ur5Widget", "s", 0));
+    // Labeling
+    gridLayout_5->addWidget(new QLabel("m/s"), 0, 2, 1, 1);
+    gridLayout_5->addWidget(new QLabel("m/s^2"), 1, 2, 1, 1);
+    gridLayout_5->addWidget(new QLabel("s"), 2, 2, 1, 1);
 
     // Add manual move tab
     tabWidget->addTab(manualMoveTab, QString());
