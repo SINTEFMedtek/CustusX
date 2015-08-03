@@ -214,7 +214,7 @@ void Ur5Widget::insertInitializeTab(QTabWidget *tabWidget)
 
     // Initialize bar
     initializeBar = new QProgressBar(tab_4);
-    initializeBar->setGeometry(QRect(10, 80, 351, 16));
+    initializeBar->setGeometry(QRect(10, 80, 350, 20));
     initializeBar->setValue(0);
 
     // Add Preset coordinates tab
@@ -224,11 +224,9 @@ void Ur5Widget::insertInitializeTab(QTabWidget *tabWidget)
     // Manual coordinates tab
     QWidget *tab_5 = new QWidget();
     QWidget *gridLayoutWidget = new QWidget(tab_5);
-    gridLayoutWidget->setGeometry(QRect(10, 10, 331, 41));
+    gridLayoutWidget->setGeometry(QRect(10, 10, 330, 40));
 
     QGridLayout *gridLayout = new QGridLayout(gridLayoutWidget);
-    gridLayout->setSpacing(6);
-    gridLayout->setContentsMargins(11, 11, 11, 11);
     gridLayout->setContentsMargins(0, 0, 0, 0);
 
     // Set coordinates label
@@ -274,18 +272,13 @@ void Ur5Widget::insertManualMoveTab(QTabWidget *tabWidget)
 
     QWidget *gridLayoutWidget_2 = new QWidget(manualMoveTab);
     gridLayoutWidget_2->setObjectName(QStringLiteral("gridLayoutWidget_2"));
-    gridLayoutWidget_2->setGeometry(QRect(10, 10, 161, 148));
+    gridLayoutWidget_2->setGeometry(QRect(10, 10, 160, 150));
 
     QGridLayout *gridLayout_2 = new QGridLayout(gridLayoutWidget_2);
-    gridLayout_2->setSpacing(6);
-    gridLayout_2->setContentsMargins(11, 11, 11, 11);
     gridLayout_2->setContentsMargins(0, 0, 0, 0);
 
     // Negative Z Button
     negZButton = new QPushButton(gridLayoutWidget_2);
-    negZButton->setMaximumSize(QSize(32, 32));
-    negZButton->setAutoFillBackground(false);
-    negZButton->setStyleSheet(QStringLiteral(""));
     QIcon icon2;
     icon2.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/arrow-down-double.png"), QSize(), QIcon::Normal, QIcon::Off);
     negZButton->setIcon(icon2);
@@ -296,7 +289,6 @@ void Ur5Widget::insertManualMoveTab(QTabWidget *tabWidget)
 
     // Positive Z Button
     posZButton = new QPushButton(gridLayoutWidget_2);
-    posZButton->setMaximumSize(QSize(32, 32));
     QIcon icon3;
     icon3.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/arrow-up-double.png"), QSize(), QIcon::Normal, QIcon::Off);
     posZButton->setIcon(icon3);
@@ -308,7 +300,6 @@ void Ur5Widget::insertManualMoveTab(QTabWidget *tabWidget)
 
     // Positive X Button
     posXButton = new QPushButton(gridLayoutWidget_2);
-    posXButton->setMaximumSize(QSize(32, 32));
     QIcon icon4;
     icon4.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/arrow-up.png"), QSize(), QIcon::Normal, QIcon::Off);
     posXButton->setIcon(icon4);
@@ -318,7 +309,6 @@ void Ur5Widget::insertManualMoveTab(QTabWidget *tabWidget)
 
     // Negative Y Button
     negYButton = new QPushButton(gridLayoutWidget_2);
-    negYButton->setMaximumSize(QSize(32, 32));
     QIcon icon5;
     icon5.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/arrow-right.png"), QSize(), QIcon::Normal, QIcon::Off);
     negYButton->setIcon(icon5);
@@ -328,7 +318,6 @@ void Ur5Widget::insertManualMoveTab(QTabWidget *tabWidget)
 
     // Positive Y Button
     posYButton = new QPushButton(gridLayoutWidget_2);
-    posYButton->setMaximumSize(QSize(32, 32));
     QIcon icon6;
     icon6.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/arrow-left.png"), QSize(), QIcon::Normal, QIcon::Off);
     posYButton->setIcon(icon6);
@@ -338,7 +327,6 @@ void Ur5Widget::insertManualMoveTab(QTabWidget *tabWidget)
 
     // Stop Move button
     stopMove = new QPushButton(gridLayoutWidget_2);
-    stopMove->setMaximumSize(QSize(32, 32));
     QIcon icon7;
     icon7.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/application-exit-4.png"), QSize(), QIcon::Normal, QIcon::Off);
     stopMove->setIcon(icon7);
@@ -349,13 +337,21 @@ void Ur5Widget::insertManualMoveTab(QTabWidget *tabWidget)
     // Negative X Button
     negXButton = new QPushButton(gridLayoutWidget_2);
     negXButton->setObjectName(QStringLiteral("negXButton"));
-    negXButton->setMaximumSize(QSize(32, 32));
     QIcon icon8;
     icon8.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/arrow-down.png"), QSize(), QIcon::Normal, QIcon::Off);
     negXButton->setIcon(icon8);
     negXButton->setIconSize(QSize(32, 32));
     gridLayout_2->addWidget(negXButton, 3, 1, 1, 1);
     negXButton->setText(QString());
+
+    // Style sheet for buttons
+    posXButton->setStyleSheet("border:none");
+    negXButton->setStyleSheet("border:none");
+    posYButton->setStyleSheet("border:none");
+    negYButton->setStyleSheet("border:none");
+    posZButton->setStyleSheet("border:none");
+    negZButton->setStyleSheet("border:none");
+    stopMove->setStyleSheet("border:none");
 
     // Grid for coordinates and scroll bar
     QWidget *gridLayoutWidget_3 = new QWidget(manualMoveTab);
@@ -485,7 +481,7 @@ void Ur5Widget::insertManualMoveTab(QTabWidget *tabWidget)
     gridLayout_5->addWidget(timeLineEdit, 2, 1, 1, 1);
     timeLineEdit->setText(QApplication::translate("Ur5Widget", "0", 0));
 
-    // Labeling
+    // Labeling units
     gridLayout_5->addWidget(new QLabel("m/s"), 0, 2, 1, 1);
     gridLayout_5->addWidget(new QLabel("m/s^2"), 1, 2, 1, 1);
     gridLayout_5->addWidget(new QLabel("s"), 2, 2, 1, 1);
@@ -493,9 +489,6 @@ void Ur5Widget::insertManualMoveTab(QTabWidget *tabWidget)
     // Add manual move tab
     tabWidget->addTab(manualMoveTab, QString());
     tabWidget->setTabText(tabWidget->indexOf(manualMoveTab), QApplication::translate("Ur5Widget", "Manual move", 0));
-
-    // END Manual move tab
-
 }
 
 QString Ur5Widget::defaultWhatsThis() const
