@@ -114,9 +114,12 @@ protected slots:
     void checkConnection();
     void initializeButtonSlot();
     void posZButtonSlotPushed();
-    void posZButtonSlotReleased();
     void negZButtonSlotPushed();
-    void negZButtonSlotReleased();
+    void posYButtonSlotPushed();
+    void negYButtonSlotPushed();
+    void posXButtonSlotPushed();
+    void negXButtonSlotPushed();
+    void moveButtonSlotReleased();
     void disconnectButtonSlot();
 
 private:

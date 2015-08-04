@@ -49,14 +49,27 @@ Ur5Widget::Ur5Widget(QWidget* parent) :
 
     posZButton->setAutoRepeat(true);
     negZButton->setAutoRepeat(true);
+    posXButton->setAutoRepeat(true);
+    negXButton->setAutoRepeat(true);
+    posYButton->setAutoRepeat(true);
+    negYButton->setAutoRepeat(true);
 
     connect(connectButton,SIGNAL(clicked()),this,SLOT(connectButtonSlot()));
     connect(connectButton,SIGNAL(clicked()),this,SLOT(checkConnection()));
     connect(initializeButton,SIGNAL(clicked()),this,SLOT(initializeButtonSlot()));
     connect(posZButton,SIGNAL(pressed()),this,SLOT(posZButtonSlotPushed()));
-    connect(posZButton,SIGNAL(released()),this,SLOT(posZButtonSlotReleased()));
+    connect(posZButton,SIGNAL(released()),this,SLOT(moveButtonSlotReleased()));
     connect(negZButton,SIGNAL(pressed()),this,SLOT(negZButtonSlotPushed()));
-    connect(negZButton,SIGNAL(released()),this,SLOT(negZButtonSlotReleased()));
+    connect(negZButton,SIGNAL(released()),this,SLOT(moveButtonSlotReleased()));
+    connect(posYButton,SIGNAL(pressed()),this,SLOT(posYButtonSlotPushed()));
+    connect(posYButton,SIGNAL(released()),this,SLOT(moveButtonSlotReleased()));
+    connect(negYButton,SIGNAL(pressed()),this,SLOT(negYButtonSlotPushed()));
+    connect(negYButton,SIGNAL(released()),this,SLOT(moveButtonSlotReleased()));
+    connect(posXButton,SIGNAL(pressed()),this,SLOT(posXButtonSlotPushed()));
+    connect(posXButton,SIGNAL(released()),this,SLOT(moveButtonSlotReleased()));
+    connect(negXButton,SIGNAL(pressed()),this,SLOT(negXButtonSlotPushed()));
+    connect(negXButton,SIGNAL(released()),this,SLOT(moveButtonSlotReleased()));
+
     connect(disconnectButton,SIGNAL(clicked()),this,SLOT(disconnectButtonSlot()));
 }
 
@@ -71,11 +84,6 @@ void Ur5Widget::posZButtonSlotPushed()
     emit(connection.sendMessage(connection.transmitter.speedl(posZvel,accelerationLineEdit->text(),timeLineEdit->text())));
 }
 
-void Ur5Widget::posZButtonSlotReleased()
-{
-    emit(connection.sendMessage(connection.transmitter.stopl(accelerationLineEdit->text())));
-}
-
 void Ur5Widget::negZButtonSlotPushed()
 {
     Ur5State zVel;
@@ -83,10 +91,40 @@ void Ur5Widget::negZButtonSlotPushed()
     emit(connection.sendMessage(connection.transmitter.speedl(zVel,accelerationLineEdit->text(),timeLineEdit->text())));
 }
 
-void Ur5Widget::negZButtonSlotReleased()
+void Ur5Widget::posYButtonSlotPushed()
+{
+    Ur5State posYvel;
+    posYvel.jointAxisVelocity(1)=velocityLineEdit->text().toDouble();
+    emit(connection.sendMessage(connection.transmitter.speedl(posYvel,accelerationLineEdit->text(),timeLineEdit->text())));
+}
+
+void Ur5Widget::negYButtonSlotPushed()
+{
+    Ur5State posYvel;
+    posYvel.jointAxisVelocity(1)=-velocityLineEdit->text().toDouble();
+    emit(connection.sendMessage(connection.transmitter.speedl(posYvel,accelerationLineEdit->text(),timeLineEdit->text())));
+}
+
+void Ur5Widget::posXButtonSlotPushed()
+{
+    Ur5State posYvel;
+    posYvel.jointAxisVelocity(0)=velocityLineEdit->text().toDouble();
+    emit(connection.sendMessage(connection.transmitter.speedl(posYvel,accelerationLineEdit->text(),timeLineEdit->text())));
+}
+
+void Ur5Widget::negXButtonSlotPushed()
+{
+    Ur5State posYvel;
+    posYvel.jointAxisVelocity(0)=-velocityLineEdit->text().toDouble();
+    emit(connection.sendMessage(connection.transmitter.speedl(posYvel,accelerationLineEdit->text(),timeLineEdit->text())));
+}
+
+
+void Ur5Widget::moveButtonSlotReleased()
 {
     emit(connection.sendMessage(connection.transmitter.stopl(accelerationLineEdit->text())));
 }
+
 
 void Ur5Widget::connectButtonSlot()
 {
@@ -117,9 +155,8 @@ void Ur5Widget::setupUi(QWidget *Ur5Widget)
 
     QTabWidget *tabWidget = new QTabWidget(Ur5Widget);
     tabWidget->setGeometry(QRect(2, 5, 430, 290));
-
     insertInitializeTab(tabWidget);
-    insertManualMoveTab(tabWidget);
+    insertManualMoveTab(tabWidget);    
     insertPlannedMoveTab(tabWidget);
 
     QMetaObject::connectSlotsByName(Ur5Widget);
@@ -127,35 +164,33 @@ void Ur5Widget::setupUi(QWidget *Ur5Widget)
 
 void Ur5Widget::insertPlannedMoveTab(QTabWidget *tabWidget)
 {
-    QWidget *plannedMoveTab = new QWidget();
+    QWidget *plannedMoveTab = new QWidget();   
     tabWidget->addTab(plannedMoveTab, QString());
     tabWidget->setTabText(tabWidget->indexOf(plannedMoveTab), QApplication::translate("Ur5Widget", "Planned move", 0));
 }
 
 void Ur5Widget::insertInitializeTab(QTabWidget *tabWidget)
 {
+
     QWidget *initializeTab = new QWidget(this);
 
+
+    // -------------------------------------------------------
+
     QWidget *horizontalLayoutWidget = new QWidget(initializeTab);
-    horizontalLayoutWidget->setGeometry(QRect(10, 0, 400, 40));
 
     // IP address label
     QHBoxLayout *horizontalLayout = new QHBoxLayout(horizontalLayoutWidget);
-    horizontalLayout->setContentsMargins(0, 0, 0, 0);
     horizontalLayout->addWidget(new QLabel("IP Address: "));
+
     // IP address line edit
     ipLineEdit = new QLineEdit(horizontalLayoutWidget);
     horizontalLayout->addWidget(ipLineEdit);
     ipLineEdit->setText(QApplication::translate("Ur5Widget", "169.254.62.100", 0));
 
-    QSpacerItem *verticalSpacer_2 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-    horizontalLayout->addItem(verticalSpacer_2);
-
     // Connect button
     QHBoxLayout *horizontalLayout_2 = new QHBoxLayout();
-
     connectButton = new QPushButton(horizontalLayoutWidget);
-    connectButton->setMaximumSize(QSize(70, 30));
 
     QIcon icon;
     icon.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/network-idle.ico"), QSize(), QIcon::Normal, QIcon::Off);
@@ -166,11 +201,15 @@ void Ur5Widget::insertInitializeTab(QTabWidget *tabWidget)
     connectButton->setToolTip(QApplication::translate("Ur5Widget", "Connect to robot", 0));
     connectButton->setText(QApplication::translate("Ur5Widget", "Connect", 0));
 
+    // -------------------------------------------------------------------------------------
+
     // Hard line
     QFrame *line = new QFrame(initializeTab);
     line->setGeometry(QRect(10, 40, 400, 20));
     line->setFrameShape(QFrame::HLine);
     line->setFrameShadow(QFrame::Sunken);
+
+    // ---------------------------------------------------------------------------------------
 
     // Tab for preset coordinates and manual coordinates
     QWidget *verticalLayoutWidget = new QWidget(initializeTab);
@@ -187,7 +226,7 @@ void Ur5Widget::insertInitializeTab(QTabWidget *tabWidget)
     QWidget *tab_4 = new QWidget();
 
     QWidget *horizontalLayoutWidget_3 = new QWidget(tab_4);
-    horizontalLayoutWidget_3->setGeometry(QRect(10, 10, 320, 30));
+    horizontalLayoutWidget_3->setGeometry(QRect(10, 10, 320, 40));
 
     QHBoxLayout *horizontalLayout_3 = new QHBoxLayout(horizontalLayoutWidget_3);
     horizontalLayout_3->setContentsMargins(0, 0, 0, 0);
@@ -195,16 +234,15 @@ void Ur5Widget::insertInitializeTab(QTabWidget *tabWidget)
     // Choose origo label
     horizontalLayout_3->addWidget(new QLabel("Choose origo: "), 0, Qt::AlignLeft);
 
-
     // Preset Origo ComboBox
     presetOrigoComboBox = new QComboBox(horizontalLayoutWidget_3);
-    presetOrigoComboBox->setMinimumSize(QSize(120, 0));
-    horizontalLayout_3->addWidget(presetOrigoComboBox);
     presetOrigoComboBox->clear();
     presetOrigoComboBox->insertItems(0, QStringList()
                                      << QApplication::translate("Ur5Widget", "Buttom right corner", 0)
                                      << QApplication::translate("Ur5Widget", "Current position", 0)
                                      );
+    presetOrigoComboBox->setSizePolicy(QSizePolicy::Ignored,QSizePolizy::Expanding);
+    horizontalLayout_3->addWidget(presetOrigoComboBox);
 
     // Initialize Button in preset coordinates tab
     initializeButton = new QPushButton(horizontalLayoutWidget_3);
@@ -253,8 +291,8 @@ void Ur5Widget::insertInitializeTab(QTabWidget *tabWidget)
     // Disconnect button
     disconnectButton = new QPushButton(initializeTab);
     disconnectButton->setObjectName(QStringLiteral("disconnectButton"));
-    disconnectButton->setGeometry(QRect(340, 210, 70, 30));
-    disconnectButton->setMaximumSize(QSize(70, 30));
+    disconnectButton->setGeometry(QRect(300, 220, 125, 35));
+    //disconnectButton->setMaximumSize(QSize(80, 30));
     QIcon icon1;
     icon1.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/network-offline.ico"), QSize(), QIcon::Normal, QIcon::Off);
     disconnectButton->setIcon(icon1);
@@ -460,12 +498,12 @@ void Ur5Widget::insertManualMoveTab(QTabWidget *tabWidget)
     // Acceleration line edit
     accelerationLineEdit = new QLineEdit(gridLayoutWidget_5);
     gridLayout_5->addWidget(accelerationLineEdit, 1, 1, 1, 1);
-    accelerationLineEdit->setText(QApplication::translate("Ur5Widget", "0", 0));
+    accelerationLineEdit->setText(QApplication::translate("Ur5Widget", "0.5", 0));
 
     // Velocity line edit
     velocityLineEdit = new QLineEdit(gridLayoutWidget_5);
     gridLayout_5->addWidget(velocityLineEdit, 0, 1, 1, 1);
-    velocityLineEdit->setText(QApplication::translate("Ur5Widget", "0", 0));
+    velocityLineEdit->setText(QApplication::translate("Ur5Widget", "0.1", 0));
 
     // Acceleration label
     gridLayout_5->addWidget(new QLabel("Acceleration"), 1, 0, 1, 1);
@@ -479,7 +517,7 @@ void Ur5Widget::insertManualMoveTab(QTabWidget *tabWidget)
     // Time line edit
     timeLineEdit = new QLineEdit(gridLayoutWidget_5);
     gridLayout_5->addWidget(timeLineEdit, 2, 1, 1, 1);
-    timeLineEdit->setText(QApplication::translate("Ur5Widget", "0", 0));
+    timeLineEdit->setText(QApplication::translate("Ur5Widget", "0.5", 0));
 
     // Labeling units
     gridLayout_5->addWidget(new QLabel("m/s"), 0, 2, 1, 1);
