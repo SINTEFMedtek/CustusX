@@ -123,7 +123,7 @@ TEST_CASE("org.custusx.help: HelpWidget displays initial help text", "[unit][plu
 	fixture.shutdown();
 }
 
-TEST_CASE("org.custusx.help: HelpWidget displays Console Widget help on focus", "[integration][plugins][org.custusx.help]")
+TEST_CASE("org.custusx.help: HelpWidget displays Console Widget help on focus", "[integration][plugins][org.custusx.help][unstable]")
 {
 	for (int i=0; i<50; ++i)
 	{
