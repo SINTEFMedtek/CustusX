@@ -124,10 +124,7 @@ void DataListWidget::populateData(QString uid, bool indent, QListWidgetItem* aft
   if (indent)
     item->setText("    " + item->text());
 
-  if (boost::dynamic_pointer_cast<Image>(data))
-    item->setIcon(QIcon(":/icons/volume.png"));
-  else
-    item->setIcon(QIcon(":/icons/surface.png"));
+  item->setIcon(data->getIcon());
 
   if (after)
   {

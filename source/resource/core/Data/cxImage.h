@@ -148,6 +148,7 @@ public:
 	{
 		return "image";
 	}
+	virtual QIcon getIcon() {return QIcon(":/icons/volume.png");}
 
 	// methods for defining and storing a cropping box. Image does not use these data, this is up to the mapper
 	virtual void setCropping(bool on);

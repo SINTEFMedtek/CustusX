@@ -138,4 +138,9 @@ DataPtr SelectDataStringPropertyBase::getData() const
 	return mPatientModelService->getData(this->getValue());
 }
 
+DataPtr SelectDataStringPropertyBase::getData(QString uid) const
+{
+	return mPatientModelService->getData(uid);
+}
+
 } //cx
