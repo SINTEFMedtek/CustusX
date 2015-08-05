@@ -56,7 +56,7 @@ class org_custusx_usreconstruction_pnn_EXPORT PNNReconstructionMethodService : p
 {
 	Q_INTERFACES(cx::ReconstructionMethodService)
 public:
-	static ReconstructionMethodService* create(ctkPluginContext* context) { return new PNNReconstructionMethodService(context); }
+	static ReconstructionMethodServicePtr create(ctkPluginContext* context);
 
 	PNNReconstructionMethodService(ctkPluginContext* context);
 	virtual ~PNNReconstructionMethodService();

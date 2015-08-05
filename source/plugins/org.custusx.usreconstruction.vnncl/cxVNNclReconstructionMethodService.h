@@ -49,6 +49,8 @@ namespace cx
  *  Original author Tord Øygard
  */
 
+typedef boost::shared_ptr<class VNNclReconstructionMethodService> VNNclReconstructionMethodServicePtr;
+
 /**
  * Implementation of Tord Øygards reconstruction service.
  *
@@ -61,7 +63,9 @@ class org_custusx_usreconstruction_vnncl_EXPORT VNNclReconstructionMethodService
 {
 	Q_INTERFACES(cx::ReconstructionMethodService)
 public:
-		VNNclReconstructionMethodService(ctkPluginContext* context);
+	static VNNclReconstructionMethodServicePtr create(ctkPluginContext *context);
+
+	VNNclReconstructionMethodService(ctkPluginContext* context);
 	virtual ~VNNclReconstructionMethodService();
 
     /**
@@ -166,7 +170,6 @@ protected:
 
     VNNclAlgorithmPtr mAlgorithm;
 };
-typedef boost::shared_ptr<VNNclReconstructionMethodService> VNNclReconstructionMethodServicePtr;
 
 } /* namespace cx */
 

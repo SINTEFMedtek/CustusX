@@ -60,7 +60,7 @@ class CXTEST_ORG_CUSTUSX_USRECONSTRUCTION_EXPORT ReconstructionAlgorithmFixture
 public:
 	ReconstructionAlgorithmFixture();
 
-	void setAlgorithm(cx::ReconstructionMethodService* algorithm);
+	void setAlgorithm(cx::ReconstructionMethodServicePtr algorithm);
 	void defineOutputVolume(double bounds, double spacing);
 	void setOverallBoundsAndSpacing(double size, double spacing);
 
@@ -85,7 +85,7 @@ private:
 	void printConfiguration();
 	cx::ImagePtr createOutputVolume(QString name);
 
-	cx::ReconstructionMethodService* mAlgorithm;
+	cx::ReconstructionMethodServicePtr mAlgorithm;
 	cx::ProcessedUSInputDataPtr mInputData;
 	cx::ImagePtr mOutputData;
 	bool mVerbose;

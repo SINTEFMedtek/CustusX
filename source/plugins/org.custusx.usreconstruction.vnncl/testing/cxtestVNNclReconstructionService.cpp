@@ -47,7 +47,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSimpleSyntheticVolume.h"
 #endif // CX_USE_OPENCL_UTILITY
 
-
 namespace cxtest
 {
 
@@ -65,7 +64,7 @@ TEST_CASE("ReconstructAlgorithm: VNNcl on sphere","[unit][VNNcl][usreconstructio
 	fixture.getInputGenerator()->setSpherePhantom();
 	QDomDocument domdoc;
 	QDomElement settings = domdoc.createElement("VNNcl");
-	cx::VNNclReconstructionMethodService* algorithm(new cx::VNNclReconstructionMethodService(pluginContext));
+	cx::VNNclReconstructionMethodServicePtr algorithm = cx::VNNclReconstructionMethodService::create(pluginContext);
 	algorithm->enableProfiling();
 
 	QString name = "DefaultVNNcl";

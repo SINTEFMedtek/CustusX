@@ -51,6 +51,11 @@ PNNReconstructionMethodService::PNNReconstructionMethodService(ctkPluginContext*
 PNNReconstructionMethodService::~PNNReconstructionMethodService()
 {}
 
+ReconstructionMethodServicePtr PNNReconstructionMethodService::create(ctkPluginContext *context)
+{
+	return ReconstructionMethodServicePtr(new PNNReconstructionMethodService(context));
+}
+
 QString PNNReconstructionMethodService::getName() const
 {
 	return "PNN";

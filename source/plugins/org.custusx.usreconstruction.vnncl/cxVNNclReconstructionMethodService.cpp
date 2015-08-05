@@ -55,6 +55,11 @@ VNNclReconstructionMethodService::~VNNclReconstructionMethodService()
 {
 }
 
+VNNclReconstructionMethodServicePtr VNNclReconstructionMethodService::create(ctkPluginContext *context)
+{
+    return VNNclReconstructionMethodServicePtr(new VNNclReconstructionMethodService(context));
+}
+
 void VNNclReconstructionMethodService::enableProfiling()
 {
     mAlgorithm->setProfiling(true);
