@@ -30,9 +30,11 @@ include_directories(
 
 set(PLUGIN_SRCS
   cxBronchoscopyNavigationPluginActivator.cpp
+  cxBronchoscopyNavigationGUIExtenderService.h
   cxBronchoscopyNavigationGUIExtenderService.cpp
   cxBronchoscopyNavigationWidget.cpp
- cxBronchoscopePositionProjection.cpp
+  cxBronchoscopePositionProjection.h
+  cxBronchoscopePositionProjection.cpp
 
     trackingSystemBronchoscopy/cxBronchoscopyTool.h
     trackingSystemBronchoscopy/cxBronchoscopyTool.cpp
@@ -42,9 +44,7 @@ set(PLUGIN_SRCS
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
   cxBronchoscopyNavigationPluginActivator.h
-  cxBronchoscopyNavigationGUIExtenderService.h
   cxBronchoscopyNavigationWidget.h
-  cxBronchoscopePositionProjection.h
   trackingSystemBronchoscopy/cxBronchoscopyTool.h
   trackingSystemBronchoscopy/cxTrackingSystemBronchoscopyService.h
 )
