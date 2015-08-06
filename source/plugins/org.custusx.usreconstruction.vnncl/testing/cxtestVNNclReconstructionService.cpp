@@ -51,6 +51,61 @@ namespace cxtest
 {
 
 #ifdef CX_USE_OPENCL_UTILITY
+TEST_CASE("VNNcl init", "[unit][VNNcl][usreconstruction][synthetic]")
+{
+	cx::LogicManager::initialize();
+
+	ctkPluginContext* pluginContext = cx::logicManager()->getPluginContext();
+
+	ReconstructionAlgorithmFixture fixture;
+
+	cx::VNNclReconstructionMethodServicePtr algorithm = cx::VNNclReconstructionMethodService::create(pluginContext);
+
+	REQUIRE(algorithm);
+
+	cx::LogicManager::shutdown();
+}
+
+TEST_CASE("VNNcl: VNN on sphere", "[unit][VNNcl][usreconstruction][synthetic]")
+{
+	cx::LogicManager::initialize();
+
+	ReconstructionAlgorithmFixture fixture;
+
+	ctkPluginContext* pluginContext = cx::logicManager()->getPluginContext();
+	cx::VNNclReconstructionMethodServicePtr algorithm = cx::VNNclReconstructionMethodService::create(pluginContext);
+
+	QString name = "VNN";
+
+	fixture.setOverallBoundsAndSpacing(100, 5);
+	fixture.getInputGenerator()->setSpherePhantom();
+
+	algorithm->enableProfiling();
+
+	QDomDocument domdoc;
+	QDomElement settings = domdoc.createElement("VNNcl");
+
+	algorithm->getRadiusOption(settings)->setValue(10);
+	algorithm->getMethodOption(settings)->setValue("VNN");
+	algorithm->getPlaneMethodOption(settings)->setValue("Heuristic");
+	algorithm->getMaxPlanesOption(settings)->setValue(8);
+	algorithm->getNStartsOption(settings)->setValue(1);
+
+	fixture.setAlgorithm(algorithm);
+	fixture.reconstruct(settings);
+
+	double executionTime = algorithm->getKernelExecutionTime();
+	JenkinsMeasurement jenkins;
+	jenkins.createOutput(name, QString::number(executionTime));
+
+	fixture.checkRMSBelow(20.0);
+	fixture.checkCentroidDifferenceBelow(1);
+	fixture.checkMassDifferenceBelow(0.01);
+
+
+	cx::LogicManager::shutdown();
+}
+
 TEST_CASE("ReconstructAlgorithm: VNNcl on sphere","[unit][VNNcl][usreconstruction][synthetic][not_win32][broken][not_mavericks]")
 {
 	cx::LogicManager::initialize();
