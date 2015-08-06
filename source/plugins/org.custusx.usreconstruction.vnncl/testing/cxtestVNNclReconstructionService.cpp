@@ -106,6 +106,48 @@ TEST_CASE("VNNcl: VNN on sphere", "[unit][VNNcl][usreconstruction][synthetic]")
 	cx::LogicManager::shutdown();
 }
 
+
+TEST_CASE("VNNcl: VNN on real data", "[usreconstruction][integration][VNNcl][unstable]")
+{
+	ReconstructionManagerTestFixture fixture;
+	ReconstructRealTestData realData;
+	cx::UsReconstructionServicePtr reconstructer = fixture.getManager();
+
+//	reconstructer->init();
+	reconstructer->selectData(realData.getSourceFilename());
+	reconstructer->getParam("Algorithm")->setValueFromVariant("VNNcl");
+	reconstructer->getParam("Angio data")->setValueFromVariant(false);
+	reconstructer->getParam("Dual Angio")->setValueFromVariant(false);
+
+	cx::VNNclReconstructionMethodService* algorithm;
+	cx::ReconstructionMethodService* algorithmService = reconstructer->createAlgorithm();
+	REQUIRE(algorithmService);
+	algorithm = dynamic_cast<cx::VNNclReconstructionMethodService*>(algorithmService);
+	REQUIRE(algorithm);// Check if we got the algorithm
+
+	QDomElement algo = reconstructer->getSettings().getElement("algorithms", "VNNcl");
+	algorithm->getRadiusOption(algo)->setValue(1.0);
+
+	// First test with VNN
+	algorithm->getMethodOption(algo)->setValue("VNN");
+	algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
+	algorithm->getMaxPlanesOption(algo)->setValue(1);
+	algorithm->getNStartsOption(algo)->setValue(1);
+
+//	algorithm->getMethodOption(algo)->setValue("VNN2");
+//	algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
+//	algorithm->getMaxPlanesOption(algo)->setValue(8);
+
+	// run the reconstruction in the main thread
+	fixture.reconstruct();
+	// check validity of output:
+	REQUIRE(fixture.getOutput().size()==1);
+	realData.validateBModeData(fixture.getOutput()[0]);
+}
+
+
+
+
 TEST_CASE("ReconstructAlgorithm: VNNcl on sphere","[unit][VNNcl][usreconstruction][synthetic][not_win32][broken][not_mavericks]")
 {
 	cx::LogicManager::initialize();
