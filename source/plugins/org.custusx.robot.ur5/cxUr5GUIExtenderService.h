@@ -60,6 +60,7 @@ public:
 private:
   ctkPluginContext* mContext;
 
+
 };
 typedef boost::shared_ptr<Ur5GUIExtenderService> Ur5GUIExtenderServicePtr;
 

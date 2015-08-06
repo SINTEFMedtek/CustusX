@@ -57,7 +57,12 @@ void Ur5Widget::setupUi(QWidget *Ur5Widget)
     Ur5Widget->setObjectName("Ur5Widget");
     Ur5Widget->setWindowTitle("UR5 Robot");
 
+    connection = Ur5ConnectionPtr(new Ur5Connection);
+
+    QLayout* Ur5WidgetLayout = new QVBoxLayout(Ur5Widget);
+
     tabWidget = new QTabWidget(Ur5Widget);
+    Ur5WidgetLayout->addWidget(tabWidget);
     tabWidget->addTab(new InitializeTab(connection), tr("Initialize"));
     tabWidget->addTab(new ManualMoveTab(connection),tr("Manual movement"));
     tabWidget->addTab(new PlannedMoveTab,tr("Planned movement"));
@@ -231,6 +236,11 @@ void ManualMoveTab::setupUi(QWidget *parent)
 
     QWidget *keyWidget = new QWidget();
     QGridLayout *keyLayout = new QGridLayout(keyWidget);
+    keyLayout->setSpacing(0);
+
+    QWidget *rotKeyWidget = new QWidget();
+    QGridLayout *rotKeyLayout = new QGridLayout(rotKeyWidget);
+    rotKeyLayout->setSpacing(0);
 
     QWidget *velAccWidget = new QWidget();
     QGridLayout *velAccLayout = new QGridLayout(velAccWidget);
@@ -245,9 +255,16 @@ void ManualMoveTab::setupUi(QWidget *parent)
     posXButton = new QPushButton();
     negXButton = new QPushButton();
 
+    rotPosZButton = new QPushButton();
+    rotNegZButton = new QPushButton();
+    rotPosYButton = new QPushButton();
+    rotNegYButton = new QPushButton();
+    rotPosXButton = new QPushButton();
+    rotNegXButton = new QPushButton();
+
     int row=0;
     mainLayout->addWidget(keyWidget,row,0,1,1);
-    mainLayout->addWidget(coordInfoWidget,row,1,1,1);
+    mainLayout->addWidget(rotKeyWidget,row,1,1,1);
 
     row++;
     QFrame *line = new QFrame();
@@ -256,8 +273,8 @@ void ManualMoveTab::setupUi(QWidget *parent)
     mainLayout -> addWidget(line,row,0,1,2);
 
     row++;
-    mainLayout->addWidget(velAccWidget,row,0,1,2);
-
+    mainLayout->addWidget(velAccWidget,row,0,1,1);
+    mainLayout->addWidget(coordInfoWidget,row,1,1,1);
 
     int krow=0;
     keyLayout->addWidget(posZButton, krow, 0, 1, 1);
@@ -318,6 +335,67 @@ void ManualMoveTab::setupUi(QWidget *parent)
     negYButton->setStyleSheet("border:none");
     posZButton->setStyleSheet("border:none");
     negZButton->setStyleSheet("border:none");
+
+
+    int rkrow=0;
+    rotKeyLayout->addWidget(rotNegXButton, rkrow, 0, 1, 1);
+    rotKeyLayout->addWidget(rotPosXButton, rkrow,2,1,1);
+
+    rkrow++;
+    rotKeyLayout->addWidget(rotPosYButton,rkrow,1,1,1);
+
+    rkrow++;
+    rotKeyLayout->addWidget(rotNegZButton,rkrow,0,1,1);
+    rotKeyLayout->addWidget(rotPosZButton,rkrow,2,1,1);
+
+    rkrow++;
+    rotKeyLayout->addWidget(rotNegYButton,rkrow,1,1,1);
+
+    // rotPositive Z Button
+    QIcon i3;
+    i3.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/arrow-right.png"), QSize(), QIcon::Normal, QIcon::Off);
+    rotPosZButton->setIcon(i3);
+    rotPosZButton->setIconSize(QSize(32, 32));
+    rotPosZButton->setToolTip(QApplication::translate("Ur5Widget", "Move in rotPositive Z direction", 0));
+
+    // rotNegative Z Button
+    QIcon i2;
+    i2.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/arrow-left.png"), QSize(), QIcon::Normal, QIcon::Off);
+    rotNegZButton->setIcon(i2);
+    rotNegZButton->setIconSize(QSize(32, 32));
+    rotNegZButton->setToolTip(QApplication::translate("Ur5Widget", "Move in rotNegative Z direction", 0));
+
+    // rotPositive X Button
+    QIcon i4;
+    i4.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/edit-redo-7.ico"), QSize(), QIcon::Normal, QIcon::Off);
+    rotPosXButton->setIcon(i4);
+    rotPosXButton->setIconSize(QSize(32, 32));
+
+    // rotNegative Y Button
+    QIcon i5;
+    i5.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/arrow-down.png"), QSize(), QIcon::Normal, QIcon::Off);
+    rotNegYButton->setIcon(i5);
+    rotNegYButton->setIconSize(QSize(32, 32));
+
+    // rotPositive Y Button
+    QIcon i6;
+    i6.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/arrow-up.png"), QSize(), QIcon::Normal, QIcon::Off);
+    rotPosYButton->setIcon(i6);
+    rotPosYButton->setIconSize(QSize(32, 32));
+
+    // rotNegative X Button
+    QIcon i8;
+    i8.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/edit-undo-7.ico"), QSize(), QIcon::Normal, QIcon::Off);
+    rotNegXButton->setIcon(i8);
+    rotNegXButton->setIconSize(QSize(32, 32));
+
+    // Style sheet for buttons
+    rotPosXButton->setStyleSheet("border:none");
+    rotNegXButton->setStyleSheet("border:none");
+    rotPosYButton->setStyleSheet("border:none");
+    rotNegYButton->setStyleSheet("border:none");
+    rotPosZButton->setStyleSheet("border:none");
+    rotNegZButton->setStyleSheet("border:none");
 
 
     // Velocity
@@ -418,10 +496,6 @@ void ManualMoveTab::setupUi(QWidget *parent)
     rxLineEdit = new QLineEdit();
     rxLineEdit->setObjectName(QStringLiteral("rxLineEdit"));
     coordInfoLayout->addWidget(rxLineEdit, 5, 2, 1, 1);
-
-
-
-
 }
 
 void ManualMoveTab::coordButtonPressed(int axis, int sign)

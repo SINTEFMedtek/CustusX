@@ -117,6 +117,8 @@ public:
     virtual ~ManualMoveTab();
 
     QPushButton *negZButton, *posZButton, *posXButton, *negYButton, *posYButton, *negXButton;
+    QPushButton *rotNegZButton, *rotPosZButton, *rotPosXButton, *rotNegYButton, *rotPosYButton, *rotNegXButton;
+
     QScrollBar *xScrollBar, *yScrollBar, *zScrollBar;
     QLineEdit *xPosLineEdit, *yPosLineEdit, *zPosLineEdit;
     QScrollBar *rxScrollBar, *ryScrollBar, *rzScrollBar;
