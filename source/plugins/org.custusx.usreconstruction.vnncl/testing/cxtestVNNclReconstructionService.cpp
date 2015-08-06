@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxtestJenkinsMeasurement.h"
 #include "cxtestReconstructionAlgorithmFixture.h"
 #include "cxtestReconstructionManagerFixture.h"
+#include "cxtestVNNclFixture.h"
 #include "cxLogicManager.h"
 
 #ifdef CX_USE_OPENCL_UTILITY
@@ -107,46 +108,55 @@ TEST_CASE("VNNcl: VNN on sphere", "[unit][VNNcl][usreconstruction][synthetic]")
 }
 
 
-TEST_CASE("VNNcl: VNN on real data", "[usreconstruction][integration][VNNcl][unstable]")
+TEST_CASE("VNNcl: VNN on real data", "[usreconstruction][integration][VNNcl][unstable][not_apple]")
 {
-	ReconstructionManagerTestFixture fixture;
-	ReconstructRealTestData realData;
-	cx::UsReconstructionServicePtr reconstructer = fixture.getManager();
+	VNNclFixture vnnClFixture;
 
-//	reconstructer->init();
-	reconstructer->selectData(realData.getSourceFilename());
-	reconstructer->getParam("Algorithm")->setValueFromVariant("VNNcl");
-	reconstructer->getParam("Angio data")->setValueFromVariant(false);
-	reconstructer->getParam("Dual Angio")->setValueFromVariant(false);
+	vnnClFixture.initVNN();
 
-	cx::VNNclReconstructionMethodService* algorithm;
-	cx::ReconstructionMethodService* algorithmService = reconstructer->createAlgorithm();
-	REQUIRE(algorithmService);
-	algorithm = dynamic_cast<cx::VNNclReconstructionMethodService*>(algorithmService);
-	REQUIRE(algorithm);// Check if we got the algorithm
-
-	QDomElement algo = reconstructer->getSettings().getElement("algorithms", "VNNcl");
-	algorithm->getRadiusOption(algo)->setValue(1.0);
-
-	// First test with VNN
-	algorithm->getMethodOption(algo)->setValue("VNN");
-	algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
-	algorithm->getMaxPlanesOption(algo)->setValue(1);
-	algorithm->getNStartsOption(algo)->setValue(1);
-
-//	algorithm->getMethodOption(algo)->setValue("VNN2");
-//	algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
-//	algorithm->getMaxPlanesOption(algo)->setValue(8);
-
-	// run the reconstruction in the main thread
-	fixture.reconstruct();
-	// check validity of output:
-	REQUIRE(fixture.getOutput().size()==1);
-	realData.validateBModeData(fixture.getOutput()[0]);
+	vnnClFixture.reconstruct();
+	vnnClFixture.verify();
 }
 
+TEST_CASE("VNNcl: VNN2 on real data", "[usreconstruction][integration][VNNcl][unstable][not_apple]")
+{
+	VNNclFixture vnnClFixture;
+	vnnClFixture.initVNN2();
+	vnnClFixture.reconstruct();
+	vnnClFixture.verify();
+}
 
+TEST_CASE("VNNcl: DW on real data", "[usreconstruction][integration][VNNcl][unstable][not_apple]")
+{
+	VNNclFixture vnnClFixture;
+	vnnClFixture.initDW();
+	vnnClFixture.reconstruct();
+	vnnClFixture.verify();
+}
 
+TEST_CASE("VNNcl: Anisotropic on real data", "[usreconstruction][integration][VNNcl][unstable][not_apple]")
+{
+	VNNclFixture vnnClFixture;
+	vnnClFixture.initAnisotropic();
+	vnnClFixture.reconstruct();
+	vnnClFixture.verify();
+}
+
+TEST_CASE("VNNcl: VNN Multistart on real data", "[usreconstruction][integration][VNNcl][unstable][not_apple]")
+{
+	VNNclFixture vnnClFixture;
+	vnnClFixture.initVNNMultistart();
+	vnnClFixture.reconstruct();
+	vnnClFixture.verify();
+}
+
+TEST_CASE("VNNcl: VNN Closest on real data", "[usreconstruction][integration][VNNcl][unstable][not_apple]")
+{
+	VNNclFixture vnnClFixture;
+	vnnClFixture.initVNNClosest();
+	vnnClFixture.reconstruct();
+	vnnClFixture.verify();
+}
 
 TEST_CASE("ReconstructAlgorithm: VNNcl on sphere","[unit][VNNcl][usreconstruction][synthetic][not_win32][broken][not_mavericks]")
 {
@@ -239,69 +249,4 @@ TEST_CASE("ReconstructAlgorithm: VNNcl on sphere","[unit][VNNcl][usreconstructio
 }
 #endif//CX_USE_OPENCL_UTILITY
 
-
-#ifdef CX_USE_OPENCL_UTILITY
-TEST_CASE("ReconstructManager: VNNcl on real data", "[usreconstruction][integration][VNNcl][not_apple][unstable]")
-{
-	ReconstructionManagerTestFixture fixture;
-	ReconstructRealTestData realData;
-	cx::UsReconstructionServicePtr reconstructer = fixture.getManager();
-
-//	reconstructer->init();
-	reconstructer->selectData(realData.getSourceFilename());
-	reconstructer->getParam("Algorithm")->setValueFromVariant("VNNcl");
-	reconstructer->getParam("Angio data")->setValueFromVariant(false);
-	reconstructer->getParam("Dual Angio")->setValueFromVariant(false);
-
-	cx::VNNclReconstructionMethodService* algorithm;
-	cx::ReconstructionMethodService* algorithmService = reconstructer->createAlgorithm();
-	REQUIRE(algorithmService);
-	algorithm = dynamic_cast<cx::VNNclReconstructionMethodService*>(algorithmService);
-	REQUIRE(algorithm);// Check if we got the algorithm
-
-	QDomElement algo = reconstructer->getSettings().getElement("algorithms", "VNNcl");
-	algorithm->getRadiusOption(algo)->setValue(1.0);
-
-	// First test with VNN
-	algorithm->getMethodOption(algo)->setValue("VNN");
-	algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
-	algorithm->getMaxPlanesOption(algo)->setValue(1);
-	algorithm->getNStartsOption(algo)->setValue(1);
-	SECTION("VNN2")
-	{
-		algorithm->getMethodOption(algo)->setValue("VNN2");
-		algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
-		algorithm->getMaxPlanesOption(algo)->setValue(8);
-	}
-	SECTION("DW")
-	{
-		algorithm->getMethodOption(algo)->setValue("DW");
-		algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
-		algorithm->getMaxPlanesOption(algo)->setValue(8);
-	}
-	SECTION("Anisotropic")
-	{
-		algorithm->getMethodOption(algo)->setValue("Anisotropic");
-		algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
-		algorithm->getMaxPlanesOption(algo)->setValue(8);
-	}
-	SECTION("Multistart search")
-	{
-		algorithm->getMethodOption(algo)->setValue("VNN");
-		algorithm->getNStartsOption(algo)->setValue(5);
-	}
-	SECTION("Closest")
-	{
-		algorithm->getMethodOption(algo)->setValue("VNN");
-		algorithm->getPlaneMethodOption(algo)->setValue("Closest");
-		algorithm->getMaxPlanesOption(algo)->setValue(8);
-	}
-
-	// run the reconstruction in the main thread
-	fixture.reconstruct();
-	// check validity of output:
-	REQUIRE(fixture.getOutput().size()==1);
-	realData.validateBModeData(fixture.getOutput()[0]);
-}
-#endif // CX_USE_OPENCL_UTILITY
 } //namespace cxtest
