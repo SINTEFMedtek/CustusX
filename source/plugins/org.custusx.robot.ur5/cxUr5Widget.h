@@ -60,15 +60,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtWidgets/QWidget>
 //
 
-
-
-
-class QVBoxLayout;
-class QHBoxLayout;
-
 namespace cx
 {
-
 /**
  * Widget for use in the UR5 plugin
  *
@@ -76,6 +69,7 @@ namespace cx
  *
  * \date 2014-05-02
  * \author Christian Askeland
+ * \author Andreas Østvik
  */
 class org_custusx_robot_ur5_EXPORT Ur5Widget : public QWidget
 {
@@ -84,50 +78,80 @@ public:
     Ur5Widget(QWidget* parent = 0);
     virtual ~Ur5Widget();
 
-    // For initalize tab
-    QLineEdit *ipLineEdit, *manualCoordinates;
-    QPushButton *connectButton, *initializeButton, *initializeButton_2, *disconnectButton;
-    QComboBox *presetOrigoComboBox;
-    QProgressBar *initializeBar;
-    //
+private:
+    QTabWidget* tabWidget;
+    void setupUi(QWidget *parent);
+    Ur5ConnectionPtr connection;
+};
 
-    // For manual move tab
-    QPushButton *negZButton, *posZButton, *posXButton, *negYButton, *posYButton, *stopMove, *negXButton;
+class org_custusx_robot_ur5_EXPORT InitializeTab : public QWidget
+{
+    Q_OBJECT
+public:
+    InitializeTab(Ur5ConnectionPtr Ur5Connection,QWidget *parent = 0);
+    virtual ~InitializeTab();
+
+    int initializeProgressValue;
+    QLineEdit *ipLineEdit, *manualCoordinatesLineEdit;
+    QPushButton *connectButton, *disconnectButton, *initializeButton, *initializeButton_2;
+    QComboBox *presetOrigoComboBox;
+    QProgressBar *initializeProgressBar,*initializeProgressBar_2;
+
+protected slots:
+    void connectButtonSlot();
+    void checkConnection();
+    void initializeButtonSlot();
+    void disconnectButtonSlot();
+
+private:
+    void setupUi(QWidget *parent);
+    Ur5ConnectionPtr connection;
+
+};
+
+class org_custusx_robot_ur5_EXPORT ManualMoveTab : public QWidget
+{
+    Q_OBJECT
+public:
+    ManualMoveTab(Ur5ConnectionPtr Ur5Connection,QWidget *parent = 0);
+    virtual ~ManualMoveTab();
+
+    QPushButton *negZButton, *posZButton, *posXButton, *negYButton, *posYButton, *negXButton;
     QScrollBar *xScrollBar, *yScrollBar, *zScrollBar;
     QLineEdit *xPosLineEdit, *yPosLineEdit, *zPosLineEdit;
     QScrollBar *rxScrollBar, *ryScrollBar, *rzScrollBar;
     QLineEdit *rxLineEdit, *ryLineEdit, *rzLineEdit;
     QLineEdit *accelerationLineEdit, *velocityLineEdit, *timeLineEdit;
-    //
 
-    void setupUi(QWidget *parent);
+    void coordButtonPressed(int axis,int sign);
 
-    void insertPlannedMoveTab(QTabWidget *parent);
-    void insertInitializeTab(QTabWidget *parent);
-    void insertManualMoveTab(QTabWidget *parent);
-
-    Ur5Connection connection;
-
-    void test();
-protected slots:
-    void connectButtonSlot();
-    void checkConnection();
-    void initializeButtonSlot();
-    void posZButtonSlotPushed();
-    void negZButtonSlotPushed();
-    void posYButtonSlotPushed();
-    void negYButtonSlotPushed();
-    void posXButtonSlotPushed();
-    void negXButtonSlotPushed();
-    void moveButtonSlotReleased();
-    void disconnectButtonSlot();
+public slots:
+    void moveButtonReleasedSlot();
+    void posZButtonPressedSlot();
+    void negZButtonPressedSlot();
+    void posYButtonPressedSlot();
+    void negYButtonPressedSlot();
+    void posXButtonPressedSlot();
+    void negXButtonPressedSlot();
 
 private:
-    QString defaultWhatsThis() const;
-    QVBoxLayout*  mVerticalLayout;
-    QHBoxLayout* mHorisontalLayout;
-
+    void setupUi(QWidget *parent);
+    Ur5ConnectionPtr connection;
 };
+
+class org_custusx_robot_ur5_EXPORT PlannedMoveTab : public QWidget
+{
+    Q_OBJECT
+public:
+    PlannedMoveTab(QWidget *parent = 0);
+    virtual ~PlannedMoveTab();
+
+protected slots:
+
+private:
+    void setupUi(QWidget *parent);
+};
+
 
 } /* namespace cx */
 

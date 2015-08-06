@@ -53,7 +53,7 @@ namespace cx
  * \author Andreas Østvik
  * \date 2015-06-25
  */
-
+typedef boost::shared_ptr<class Ur5Connection> Ur5ConnectionPtr;
 
 class org_custusx_robot_ur5_EXPORT Ur5Connection : public SocketConnection
 {

@@ -46,6 +46,154 @@ Ur5Widget::Ur5Widget(QWidget* parent) :
     QWidget(parent)
 {
     setupUi(this);
+}
+
+Ur5Widget::~Ur5Widget()
+{
+}
+
+void Ur5Widget::setupUi(QWidget *Ur5Widget)
+{
+    Ur5Widget->setObjectName("Ur5Widget");
+    Ur5Widget->setWindowTitle("UR5 Robot");
+
+    tabWidget = new QTabWidget(Ur5Widget);
+    tabWidget->addTab(new InitializeTab(connection), tr("Initialize"));
+    tabWidget->addTab(new ManualMoveTab(connection),tr("Manual movement"));
+    tabWidget->addTab(new PlannedMoveTab,tr("Planned movement"));
+
+    QMetaObject::connectSlotsByName(Ur5Widget);
+}
+
+InitializeTab::InitializeTab(Ur5ConnectionPtr ur5connection,QWidget *parent) :
+    QWidget(parent),
+    ipLineEdit(new QLineEdit()),
+    connectButton(new QPushButton()),
+    disconnectButton(new QPushButton()),
+    presetOrigoComboBox(new QComboBox()),
+    initializeButton(new QPushButton()),
+    initializeProgressBar(new QProgressBar()),
+    manualCoordinatesLineEdit(new QLineEdit()),
+    initializeButton_2(new QPushButton()),
+    initializeProgressBar_2(new QProgressBar()),
+    connection(ur5connection)
+{
+    setupUi(this);
+    connect(connectButton,SIGNAL(clicked()),this,SLOT(connectButtonSlot()));
+    connect(connectButton,SIGNAL(clicked()),this,SLOT(checkConnection()));
+    connect(initializeButton,SIGNAL(clicked()),this,SLOT(initializeButtonSlot()));
+    connect(disconnectButton,SIGNAL(clicked()),this,SLOT(disconnectButtonSlot()));
+}
+
+InitializeTab::~InitializeTab()
+{
+}
+
+void InitializeTab::setupUi(QWidget *parent)
+{
+    QGridLayout *mainLayout = new QGridLayout(this);
+
+    int row = 0;
+    mainLayout->addWidget(new QLabel("IP Address: "), row, 0, 1, 1);
+    mainLayout->addWidget(ipLineEdit, row, 1,1,2);
+    mainLayout->addWidget(connectButton,row,3,1,1);
+
+    ipLineEdit->setText("169.254.62.100");
+
+    QIcon icon;
+    icon.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/network-idle.ico"), QSize(), QIcon::Normal, QIcon::Off);
+    icon.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/network-transmit-receive.ico"), QSize(), QIcon::Normal, QIcon::On);
+    connectButton->setIcon(icon);
+    connectButton->setToolTip("Connect to robot");
+    connectButton->setText("Connect");
+
+    row ++;
+    QFrame *line = new QFrame();
+    line->setFrameShape(QFrame::HLine);
+    line->setFrameShadow(QFrame::Sunken);
+    mainLayout -> addWidget(line,row,0,1,4);
+
+    row ++;
+    mainLayout->addWidget(new QLabel("Set origo for robot workspace"),row,0,1,2);
+
+    row++;
+    QTabWidget *setCoordinatesTab = new QTabWidget();
+    QWidget *presetCoordinatesTab = new QWidget();
+    QWidget *manualCoordinatesTab = new QWidget();
+    setCoordinatesTab->addTab(presetCoordinatesTab,tr("Preset coordinates"));
+    setCoordinatesTab->addTab(manualCoordinatesTab,tr("Manual coordinates"));
+    mainLayout->addWidget(setCoordinatesTab,row,0,1,4);
+
+    QGridLayout *presetCoordLayout = new QGridLayout(presetCoordinatesTab);
+    presetCoordLayout->addWidget(new QLabel("Choose origo: "),0,0,1,1);
+    presetCoordLayout->addWidget(presetOrigoComboBox,0,1,1,1);
+    presetCoordLayout->addWidget(initializeButton,0,2,1,1);
+
+    presetOrigoComboBox->clear();
+    presetOrigoComboBox->insertItems(0, QStringList()
+                                     << QApplication::translate("Ur5Widget", "Buttom right corner", 0)
+                                     << QApplication::translate("Ur5Widget", "Current position", 0)
+                                     );
+    //presetOrigoComboBox->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Expanding);
+
+    initializeButton->setToolTip(QApplication::translate("Ur5Widget", "Initialize workspace", 0));
+    initializeButton->setText(QApplication::translate("Ur5Widget", "Initialize", 0));
+
+    presetCoordLayout->addWidget(initializeProgressBar,2,0,1,3);
+    initializeProgressValue=0;
+    initializeProgressBar->setValue(initializeProgressValue);
+    initializeProgressBar->setAlignment(Qt::AlignCenter);
+    initializeProgressBar->setFormat("Initializing "+QString::number(initializeProgressValue)+"%");
+
+    QGridLayout *manualCoordLayout = new QGridLayout(manualCoordinatesTab);
+    manualCoordLayout->addWidget(new QLabel("Set coordinates: "), 0, 0, 1, 1);
+    manualCoordLayout->addWidget(manualCoordinatesLineEdit,0,1,1,1);
+    manualCoordLayout->addWidget(initializeButton_2,0,2,1,1);
+    manualCoordLayout->addWidget(initializeProgressBar_2,2,0,1,3);
+
+    manualCoordinatesLineEdit->setText(QApplication::translate("Ur5Widget", "(x,y,z,rx,ry,rz)", 0));
+    initializeButton_2->setToolTip(QApplication::translate("Ur5Widget", "Initialize workspace", 0));
+    initializeButton_2->setText(QApplication::translate("Ur5Widget", "Initialize", 0));
+
+    initializeProgressBar_2->setValue(initializeProgressValue);
+    initializeProgressBar_2->setAlignment(Qt::AlignCenter);
+    initializeProgressBar_2->setFormat("Initializing "+QString::number(initializeProgressValue)+"%");
+
+    row++;
+    mainLayout->addWidget(disconnectButton,row,3,1,1);
+    QIcon icon1;
+    icon1.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/network-offline.ico"), QSize(), QIcon::Normal, QIcon::Off);
+    disconnectButton->setIcon(icon1);
+    disconnectButton->setText("Disconnect");
+}
+
+void InitializeTab::connectButtonSlot()
+{
+    connection->setAddress(ipLineEdit->text(), 30002);
+    emit(connection->tryConnectAndWait());
+}
+
+void InitializeTab::disconnectButtonSlot()
+{
+    emit(connection->requestDisconnect());
+}
+
+void InitializeTab::checkConnection()
+{
+    if(connection->isConnectedToRobot())
+        initializeButton->toggle();
+}
+
+void InitializeTab::initializeButtonSlot()
+{
+    emit(connection->initializeWorkspace(0.00005));
+}
+
+ManualMoveTab::ManualMoveTab(Ur5ConnectionPtr ur5Connection,QWidget *parent) :
+    QWidget(parent),
+    connection(ur5Connection)
+{
+    setupUi(this);
 
     posZButton->setAutoRepeat(true);
     negZButton->setAutoRepeat(true);
@@ -54,333 +202,114 @@ Ur5Widget::Ur5Widget(QWidget* parent) :
     posYButton->setAutoRepeat(true);
     negYButton->setAutoRepeat(true);
 
-    connect(connectButton,SIGNAL(clicked()),this,SLOT(connectButtonSlot()));
-    connect(connectButton,SIGNAL(clicked()),this,SLOT(checkConnection()));
-    connect(initializeButton,SIGNAL(clicked()),this,SLOT(initializeButtonSlot()));
-    connect(posZButton,SIGNAL(pressed()),this,SLOT(posZButtonSlotPushed()));
-    connect(posZButton,SIGNAL(released()),this,SLOT(moveButtonSlotReleased()));
-    connect(negZButton,SIGNAL(pressed()),this,SLOT(negZButtonSlotPushed()));
-    connect(negZButton,SIGNAL(released()),this,SLOT(moveButtonSlotReleased()));
-    connect(posYButton,SIGNAL(pressed()),this,SLOT(posYButtonSlotPushed()));
-    connect(posYButton,SIGNAL(released()),this,SLOT(moveButtonSlotReleased()));
-    connect(negYButton,SIGNAL(pressed()),this,SLOT(negYButtonSlotPushed()));
-    connect(negYButton,SIGNAL(released()),this,SLOT(moveButtonSlotReleased()));
-    connect(posXButton,SIGNAL(pressed()),this,SLOT(posXButtonSlotPushed()));
-    connect(posXButton,SIGNAL(released()),this,SLOT(moveButtonSlotReleased()));
-    connect(negXButton,SIGNAL(pressed()),this,SLOT(negXButtonSlotPushed()));
-    connect(negXButton,SIGNAL(released()),this,SLOT(moveButtonSlotReleased()));
+    connect(posXButton,SIGNAL(pressed()),this,SLOT(posXButtonPressedSlot()));
+    connect(posXButton,SIGNAL(released()),this,SLOT(moveButtonReleasedSlot()));
 
-    connect(disconnectButton,SIGNAL(clicked()),this,SLOT(disconnectButtonSlot()));
+    connect(negXButton,SIGNAL(pressed()),this,SLOT(negXButtonPressedSlot()));
+    connect(negXButton,SIGNAL(released()),this,SLOT(moveButtonReleasedSlot()));
+
+    connect(posYButton,SIGNAL(pressed()),this,SLOT(posYButtonPressedSlot()));
+    connect(posYButton,SIGNAL(released()),this,SLOT(moveButtonReleasedSlot()));
+
+    connect(negYButton,SIGNAL(pressed()),this,SLOT(negYButtonPressedSlot()));
+    connect(negYButton,SIGNAL(released()),this,SLOT(moveButtonReleasedSlot()));
+
+    connect(posZButton,SIGNAL(pressed()),this,SLOT(posZButtonPressedSlot()));
+    connect(posZButton,SIGNAL(released()),this,SLOT(moveButtonReleasedSlot()));
+
+    connect(negZButton,SIGNAL(pressed()),this,SLOT(negZButtonPressedSlot()));
+    connect(negZButton,SIGNAL(released()),this,SLOT(moveButtonReleasedSlot()));
 }
 
-Ur5Widget::~Ur5Widget()
+ManualMoveTab::~ManualMoveTab()
 {
 }
 
-void Ur5Widget::posZButtonSlotPushed()
+void ManualMoveTab::setupUi(QWidget *parent)
 {
-    Ur5State posZvel;
-    posZvel.jointAxisVelocity(2)=velocityLineEdit->text().toDouble();
-    emit(connection.sendMessage(connection.transmitter.speedl(posZvel,accelerationLineEdit->text(),timeLineEdit->text())));
-}
+    QGridLayout *mainLayout = new QGridLayout(this);
 
-void Ur5Widget::negZButtonSlotPushed()
-{
-    Ur5State zVel;
-    zVel.jointAxisVelocity(2)=-velocityLineEdit->text().toDouble();
-    emit(connection.sendMessage(connection.transmitter.speedl(zVel,accelerationLineEdit->text(),timeLineEdit->text())));
-}
+    QWidget *keyWidget = new QWidget();
+    QGridLayout *keyLayout = new QGridLayout(keyWidget);
 
-void Ur5Widget::posYButtonSlotPushed()
-{
-    Ur5State posYvel;
-    posYvel.jointAxisVelocity(1)=velocityLineEdit->text().toDouble();
-    emit(connection.sendMessage(connection.transmitter.speedl(posYvel,accelerationLineEdit->text(),timeLineEdit->text())));
-}
+    QWidget *velAccWidget = new QWidget();
+    QGridLayout *velAccLayout = new QGridLayout(velAccWidget);
 
-void Ur5Widget::negYButtonSlotPushed()
-{
-    Ur5State posYvel;
-    posYvel.jointAxisVelocity(1)=-velocityLineEdit->text().toDouble();
-    emit(connection.sendMessage(connection.transmitter.speedl(posYvel,accelerationLineEdit->text(),timeLineEdit->text())));
-}
+    QWidget *coordInfoWidget = new QWidget();
+    QGridLayout *coordInfoLayout = new QGridLayout(coordInfoWidget);
 
-void Ur5Widget::posXButtonSlotPushed()
-{
-    Ur5State posYvel;
-    posYvel.jointAxisVelocity(0)=velocityLineEdit->text().toDouble();
-    emit(connection.sendMessage(connection.transmitter.speedl(posYvel,accelerationLineEdit->text(),timeLineEdit->text())));
-}
+    posZButton = new QPushButton();
+    negZButton = new QPushButton();
+    posYButton = new QPushButton();
+    negYButton = new QPushButton();
+    posXButton = new QPushButton();
+    negXButton = new QPushButton();
 
-void Ur5Widget::negXButtonSlotPushed()
-{
-    Ur5State posYvel;
-    posYvel.jointAxisVelocity(0)=-velocityLineEdit->text().toDouble();
-    emit(connection.sendMessage(connection.transmitter.speedl(posYvel,accelerationLineEdit->text(),timeLineEdit->text())));
-}
+    int row=0;
+    mainLayout->addWidget(keyWidget,row,0,1,1);
+    mainLayout->addWidget(coordInfoWidget,row,1,1,1);
 
-
-void Ur5Widget::moveButtonSlotReleased()
-{
-    emit(connection.sendMessage(connection.transmitter.stopl(accelerationLineEdit->text())));
-}
-
-
-void Ur5Widget::connectButtonSlot()
-{
-    connection.setAddress(ipLineEdit->text(), 30002);
-    emit(connection.tryConnectAndWait());
-}
-
-void Ur5Widget::disconnectButtonSlot()
-{
-    emit(connection.requestDisconnect());
-}
-
-void Ur5Widget::checkConnection()
-{
-    if(connection.isConnectedToRobot())
-        initializeButton->toggle();
-}
-
-void Ur5Widget::initializeButtonSlot()
-{
-    emit(connection.initializeWorkspace(0.00005));
-}
-
-void Ur5Widget::setupUi(QWidget *Ur5Widget)
-{
-    Ur5Widget->setObjectName("Ur5Widget");
-    Ur5Widget->setWindowTitle("UR5 Robot");
-
-    QTabWidget *tabWidget = new QTabWidget(Ur5Widget);
-    tabWidget->setGeometry(QRect(2, 5, 430, 290));
-    insertInitializeTab(tabWidget);
-    insertManualMoveTab(tabWidget);    
-    insertPlannedMoveTab(tabWidget);
-
-    QMetaObject::connectSlotsByName(Ur5Widget);
-} // setupUi
-
-void Ur5Widget::insertPlannedMoveTab(QTabWidget *tabWidget)
-{
-    QWidget *plannedMoveTab = new QWidget();   
-    tabWidget->addTab(plannedMoveTab, QString());
-    tabWidget->setTabText(tabWidget->indexOf(plannedMoveTab), QApplication::translate("Ur5Widget", "Planned move", 0));
-}
-
-void Ur5Widget::insertInitializeTab(QTabWidget *tabWidget)
-{
-
-    QWidget *initializeTab = new QWidget(this);
-
-
-    // -------------------------------------------------------
-
-    QWidget *horizontalLayoutWidget = new QWidget(initializeTab);
-
-    // IP address label
-    QHBoxLayout *horizontalLayout = new QHBoxLayout(horizontalLayoutWidget);
-    horizontalLayout->addWidget(new QLabel("IP Address: "));
-
-    // IP address line edit
-    ipLineEdit = new QLineEdit(horizontalLayoutWidget);
-    horizontalLayout->addWidget(ipLineEdit);
-    ipLineEdit->setText(QApplication::translate("Ur5Widget", "169.254.62.100", 0));
-
-    // Connect button
-    QHBoxLayout *horizontalLayout_2 = new QHBoxLayout();
-    connectButton = new QPushButton(horizontalLayoutWidget);
-
-    QIcon icon;
-    icon.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/network-idle.ico"), QSize(), QIcon::Normal, QIcon::Off);
-    icon.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/network-transmit-receive.ico"), QSize(), QIcon::Normal, QIcon::On);
-    connectButton->setIcon(icon);
-    horizontalLayout_2->addWidget(connectButton);
-    horizontalLayout->addLayout(horizontalLayout_2);
-    connectButton->setToolTip(QApplication::translate("Ur5Widget", "Connect to robot", 0));
-    connectButton->setText(QApplication::translate("Ur5Widget", "Connect", 0));
-
-    // -------------------------------------------------------------------------------------
-
-    // Hard line
-    QFrame *line = new QFrame(initializeTab);
-    line->setGeometry(QRect(10, 40, 400, 20));
+    row++;
+    QFrame *line = new QFrame();
     line->setFrameShape(QFrame::HLine);
     line->setFrameShadow(QFrame::Sunken);
+    mainLayout -> addWidget(line,row,0,1,2);
 
-    // ---------------------------------------------------------------------------------------
+    row++;
+    mainLayout->addWidget(velAccWidget,row,0,1,2);
 
-    // Tab for preset coordinates and manual coordinates
-    QWidget *verticalLayoutWidget = new QWidget(initializeTab);
-    verticalLayoutWidget->setGeometry(QRect(10, 60, 400, 140));
 
-    QVBoxLayout *verticalLayout = new QVBoxLayout(verticalLayoutWidget);
-    verticalLayout->setContentsMargins(0, 0, 0, 0);
+    int krow=0;
+    keyLayout->addWidget(posZButton, krow, 0, 1, 1);
+    keyLayout->addWidget(negZButton, krow,2,1,1);
 
-    // "Set origo for robot workspace" label
-    verticalLayout->addWidget(new QLabel("Set origo for robot workspace"));
+    krow++;
+    keyLayout->addWidget(posXButton,krow,1,1,1);
 
-    // Preset origo  tab
-    QTabWidget *tabWidget_2 = new QTabWidget(verticalLayoutWidget);
-    QWidget *tab_4 = new QWidget();
+    krow++;
+    keyLayout->addWidget(posYButton,krow,0,1,1);
+    keyLayout->addWidget(negYButton,krow,2,1,1);
 
-    QWidget *horizontalLayoutWidget_3 = new QWidget(tab_4);
-    horizontalLayoutWidget_3->setGeometry(QRect(10, 10, 320, 40));
-
-    QHBoxLayout *horizontalLayout_3 = new QHBoxLayout(horizontalLayoutWidget_3);
-    horizontalLayout_3->setContentsMargins(0, 0, 0, 0);
-
-    // Choose origo label
-    horizontalLayout_3->addWidget(new QLabel("Choose origo: "), 0, Qt::AlignLeft);
-
-    // Preset Origo ComboBox
-    presetOrigoComboBox = new QComboBox(horizontalLayoutWidget_3);
-    presetOrigoComboBox->clear();
-    presetOrigoComboBox->insertItems(0, QStringList()
-                                     << QApplication::translate("Ur5Widget", "Buttom right corner", 0)
-                                     << QApplication::translate("Ur5Widget", "Current position", 0)
-                                     );
-    presetOrigoComboBox->setSizePolicy(QSizePolicy::Ignored,QSizePolizy::Expanding);
-    horizontalLayout_3->addWidget(presetOrigoComboBox);
-
-    // Initialize Button in preset coordinates tab
-    initializeButton = new QPushButton(horizontalLayoutWidget_3);
-    horizontalLayout_3->addWidget(initializeButton);
-    initializeButton->setToolTip(QApplication::translate("Ur5Widget", "Initialize workspace", 0));
-    initializeButton->setText(QApplication::translate("Ur5Widget", "Initialize", 0));
-
-    // Initialize bar
-    initializeBar = new QProgressBar(tab_4);
-    initializeBar->setGeometry(QRect(10, 80, 350, 20));
-    initializeBar->setValue(0);
-
-    // Add Preset coordinates tab
-    tabWidget_2->addTab(tab_4, QString());
-    tabWidget_2->setTabText(tabWidget_2->indexOf(tab_4), QApplication::translate("Ur5Widget", "Preset coordinates", 0));
-
-    // Manual coordinates tab
-    QWidget *tab_5 = new QWidget();
-    QWidget *gridLayoutWidget = new QWidget(tab_5);
-    gridLayoutWidget->setGeometry(QRect(10, 10, 330, 40));
-
-    QGridLayout *gridLayout = new QGridLayout(gridLayoutWidget);
-    gridLayout->setContentsMargins(0, 0, 0, 0);
-
-    // Set coordinates label
-    gridLayout->addWidget(new QLabel("Set coordinates: "), 0, 0, 1, 1);
-
-    // Manual coordinates line edit
-    manualCoordinates = new QLineEdit(gridLayoutWidget);
-    gridLayout->addWidget(manualCoordinates, 0, 1, 1, 1);
-    manualCoordinates->setText(QApplication::translate("Ur5Widget", "(0,0,0,0,0,0)", 0));
-
-    // Initialize button 2
-    initializeButton_2 = new QPushButton(gridLayoutWidget);
-    initializeButton_2->setObjectName(QStringLiteral("initializeButton_2"));
-    gridLayout->addWidget(initializeButton_2, 0, 2, 1, 1);
-    initializeButton_2->setToolTip(QApplication::translate("Ur5Widget", "Initialize workspace", 0));
-    initializeButton_2->setText(QApplication::translate("Ur5Widget", "Initialize", 0));
-
-    // Add Manual coordinates tab
-    tabWidget_2->addTab(tab_5, QString());
-    verticalLayout->addWidget(tabWidget_2);
-    tabWidget_2->setTabText(tabWidget_2->indexOf(tab_5), QApplication::translate("Ur5Widget", "Manual coordinates", 0));
-    tabWidget_2->setCurrentIndex(0);
-
-    // Disconnect button
-    disconnectButton = new QPushButton(initializeTab);
-    disconnectButton->setObjectName(QStringLiteral("disconnectButton"));
-    disconnectButton->setGeometry(QRect(300, 220, 125, 35));
-    //disconnectButton->setMaximumSize(QSize(80, 30));
-    QIcon icon1;
-    icon1.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/network-offline.ico"), QSize(), QIcon::Normal, QIcon::Off);
-    disconnectButton->setIcon(icon1);
-    disconnectButton->setText(QApplication::translate("Ur5Widget", "Disconnect", 0));
-
-    // Add initializeTab
-    tabWidget->addTab(initializeTab, QString());
-    tabWidget->setTabText(tabWidget->indexOf(initializeTab), QApplication::translate("Ur5Widget", "Initialize", 0));
-}
-
-void Ur5Widget::insertManualMoveTab(QTabWidget *tabWidget)
-{
-    QWidget *manualMoveTab = new QWidget();
-    manualMoveTab->setObjectName(QStringLiteral("manualMoveTab"));
-
-    QWidget *gridLayoutWidget_2 = new QWidget(manualMoveTab);
-    gridLayoutWidget_2->setObjectName(QStringLiteral("gridLayoutWidget_2"));
-    gridLayoutWidget_2->setGeometry(QRect(10, 10, 160, 150));
-
-    QGridLayout *gridLayout_2 = new QGridLayout(gridLayoutWidget_2);
-    gridLayout_2->setContentsMargins(0, 0, 0, 0);
-
-    // Negative Z Button
-    negZButton = new QPushButton(gridLayoutWidget_2);
-    QIcon icon2;
-    icon2.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/arrow-down-double.png"), QSize(), QIcon::Normal, QIcon::Off);
-    negZButton->setIcon(icon2);
-    negZButton->setIconSize(QSize(32, 32));
-    gridLayout_2->addWidget(negZButton, 0, 2, 1, 1);
-    negZButton->setToolTip(QApplication::translate("Ur5Widget", "Move in negative Z direction", 0));
-    negZButton->setText(QString());
+    krow++;
+    keyLayout->addWidget(negXButton,krow,1,1,1);
 
     // Positive Z Button
-    posZButton = new QPushButton(gridLayoutWidget_2);
     QIcon icon3;
     icon3.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/arrow-up-double.png"), QSize(), QIcon::Normal, QIcon::Off);
     posZButton->setIcon(icon3);
     posZButton->setIconSize(QSize(32, 32));
-    gridLayout_2->addWidget(posZButton, 0, 0, 1, 1);
     posZButton->setToolTip(QApplication::translate("Ur5Widget", "Move in positive Z direction", 0));
-    posZButton->setText(QString());
 
+    // Negative Z Button
+    QIcon icon2;
+    icon2.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/arrow-down-double.png"), QSize(), QIcon::Normal, QIcon::Off);
+    negZButton->setIcon(icon2);
+    negZButton->setIconSize(QSize(32, 32));
+    negZButton->setToolTip(QApplication::translate("Ur5Widget", "Move in negative Z direction", 0));
 
     // Positive X Button
-    posXButton = new QPushButton(gridLayoutWidget_2);
     QIcon icon4;
     icon4.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/arrow-up.png"), QSize(), QIcon::Normal, QIcon::Off);
     posXButton->setIcon(icon4);
     posXButton->setIconSize(QSize(32, 32));
-    gridLayout_2->addWidget(posXButton, 1, 1, 1, 1);
-    posXButton->setText(QString());
 
     // Negative Y Button
-    negYButton = new QPushButton(gridLayoutWidget_2);
     QIcon icon5;
     icon5.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/arrow-right.png"), QSize(), QIcon::Normal, QIcon::Off);
     negYButton->setIcon(icon5);
     negYButton->setIconSize(QSize(32, 32));
-    gridLayout_2->addWidget(negYButton, 2, 2, 1, 1);
-    negYButton->setText(QString());
 
     // Positive Y Button
-    posYButton = new QPushButton(gridLayoutWidget_2);
     QIcon icon6;
     icon6.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/arrow-left.png"), QSize(), QIcon::Normal, QIcon::Off);
     posYButton->setIcon(icon6);
     posYButton->setIconSize(QSize(32, 32));
-    gridLayout_2->addWidget(posYButton, 2, 0, 1, 1);
-    posYButton->setText(QString());
-
-    // Stop Move button
-    stopMove = new QPushButton(gridLayoutWidget_2);
-    QIcon icon7;
-    icon7.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/application-exit-4.png"), QSize(), QIcon::Normal, QIcon::Off);
-    stopMove->setIcon(icon7);
-    stopMove->setIconSize(QSize(32, 32));
-    gridLayout_2->addWidget(stopMove, 2, 1, 1, 1);
-    stopMove->setText(QString());
 
     // Negative X Button
-    negXButton = new QPushButton(gridLayoutWidget_2);
-    negXButton->setObjectName(QStringLiteral("negXButton"));
     QIcon icon8;
     icon8.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/arrow-down.png"), QSize(), QIcon::Normal, QIcon::Off);
     negXButton->setIcon(icon8);
     negXButton->setIconSize(QSize(32, 32));
-    gridLayout_2->addWidget(negXButton, 3, 1, 1, 1);
-    negXButton->setText(QString());
 
     // Style sheet for buttons
     posXButton->setStyleSheet("border:none");
@@ -389,152 +318,168 @@ void Ur5Widget::insertManualMoveTab(QTabWidget *tabWidget)
     negYButton->setStyleSheet("border:none");
     posZButton->setStyleSheet("border:none");
     negZButton->setStyleSheet("border:none");
-    stopMove->setStyleSheet("border:none");
 
-    // Grid for coordinates and scroll bar
-    QWidget *gridLayoutWidget_3 = new QWidget(manualMoveTab);
-    gridLayoutWidget_3->setObjectName(QStringLiteral("gridLayoutWidget_3"));
-    gridLayoutWidget_3->setGeometry(QRect(190, 10, 221, 161));
 
-    QGridLayout *gridLayout_3 = new QGridLayout(gridLayoutWidget_3);
-    gridLayout_3->setSpacing(6);
-    gridLayout_3->setContentsMargins(11, 11, 11, 11);
-    gridLayout_3->setObjectName(QStringLiteral("gridLayout_3"));
-    gridLayout_3->setContentsMargins(0, 0, 0, 0);
+    // Velocity
+    velAccLayout->addWidget(new QLabel("Velocity"), 0, 0, 1, 1);
+    velocityLineEdit = new QLineEdit();
+    velAccLayout->addWidget(velocityLineEdit, 0, 1, 1, 1);
+    velocityLineEdit->setText(QApplication::translate("Ur5Widget", "0.1", 0));
+    velAccLayout->addWidget(new QLabel("m/s"), 0, 2, 1, 1);
+
+    // Acceleration
+    accelerationLineEdit = new QLineEdit();
+    velAccLayout->addWidget(accelerationLineEdit, 1, 1, 1, 1);
+    accelerationLineEdit->setText(QApplication::translate("Ur5Widget", "0.5", 0));
+    velAccLayout->addWidget(new QLabel("Acceleration"), 1, 0, 1, 1);
+    velAccLayout->addWidget(new QLabel("m/s^2"), 1, 2, 1, 1);
+
+    // Time
+    velAccLayout->addWidget(new QLabel("Time"), 2, 0, 1, 1);
+    timeLineEdit = new QLineEdit();
+    velAccLayout->addWidget(timeLineEdit, 2, 1, 1, 1);
+    timeLineEdit->setText(QApplication::translate("Ur5Widget", "0.5", 0));
+    velAccLayout->addWidget(new QLabel("s"), 2, 2, 1, 1);
 
     // X coordinate scrollbar
-    xScrollBar = new QScrollBar(gridLayoutWidget_3);
+    xScrollBar = new QScrollBar();
     xScrollBar->setOrientation(Qt::Horizontal);
-    gridLayout_3->addWidget(xScrollBar, 0, 1, 1, 1);
+    coordInfoLayout->addWidget(xScrollBar, 0, 1, 1, 1);
 
     // Y coordinate scrollbar
-    yScrollBar = new QScrollBar(gridLayoutWidget_3);
+    yScrollBar = new QScrollBar();
     yScrollBar->setOrientation(Qt::Horizontal);
-    gridLayout_3->addWidget(yScrollBar, 1, 1, 1, 1);
+    coordInfoLayout->addWidget(yScrollBar, 1, 1, 1, 1);
 
     // Z coordinate scrollbar
-    zScrollBar = new QScrollBar(gridLayoutWidget_3);
+    zScrollBar = new QScrollBar();
     zScrollBar->setOrientation(Qt::Horizontal);
-    gridLayout_3->addWidget(zScrollBar, 3, 1, 1, 1);
+    coordInfoLayout->addWidget(zScrollBar, 3, 1, 1, 1);
 
     // Position label
-    gridLayout_3->addWidget(new QLabel("X"), 0, 0, 1, 1, Qt::AlignHCenter);
-    gridLayout_3->addWidget(new QLabel("Y"), 1, 0, 1, 1, Qt::AlignHCenter);
-    gridLayout_3->addWidget(new QLabel("Z"), 3, 0, 1, 1, Qt::AlignHCenter);
+    coordInfoLayout->addWidget(new QLabel("X"), 0, 0, 1, 1, Qt::AlignHCenter);
+    coordInfoLayout->addWidget(new QLabel("Y"), 1, 0, 1, 1, Qt::AlignHCenter);
+    coordInfoLayout->addWidget(new QLabel("Z"), 3, 0, 1, 1, Qt::AlignHCenter);
 
     // mm label
-    gridLayout_3->addWidget(new QLabel("mm"), 0, 3, 1, 1);
-    gridLayout_3->addWidget(new QLabel("mm"), 1, 3, 1, 1);
-    gridLayout_3->addWidget(new QLabel("mm"), 3, 3, 1, 1);
+    coordInfoLayout->addWidget(new QLabel("mm"), 0, 3, 1, 1);
+    coordInfoLayout->addWidget(new QLabel("mm"), 1, 3, 1, 1);
+    coordInfoLayout->addWidget(new QLabel("mm"), 3, 3, 1, 1);
 
     // Ri orientation label
-    gridLayout_3->addWidget(new QLabel("RX"), 5, 0, 1, 1);
-    gridLayout_3->addWidget(new QLabel("RZ"), 7, 0, 1, 1);
-    gridLayout_3->addWidget(new QLabel("RY"), 6, 0, 1, 1);
+    coordInfoLayout->addWidget(new QLabel("RX"), 5, 0, 1, 1);
+    coordInfoLayout->addWidget(new QLabel("RZ"), 7, 0, 1, 1);
+    coordInfoLayout->addWidget(new QLabel("RY"), 6, 0, 1, 1);
 
     // Rad label
-    gridLayout_3->addWidget(new QLabel("Rad"), 5, 3, 1, 1);
-    gridLayout_3->addWidget(new QLabel("Rad"), 6, 3, 1, 1);
-    gridLayout_3->addWidget(new QLabel("Rad"), 7, 3, 1, 1);
+    coordInfoLayout->addWidget(new QLabel("Rad"), 5, 3, 1, 1);
+    coordInfoLayout->addWidget(new QLabel("Rad"), 6, 3, 1, 1);
+    coordInfoLayout->addWidget(new QLabel("Rad"), 7, 3, 1, 1);
 
     // X coordinate line edit
-    xPosLineEdit = new QLineEdit(gridLayoutWidget_3);
-    gridLayout_3->addWidget(xPosLineEdit, 0, 2, 1, 1);
+    xPosLineEdit = new QLineEdit();
+    coordInfoLayout->addWidget(xPosLineEdit, 0, 2, 1, 1);
 
     // Y coordinate line edit
-    yPosLineEdit = new QLineEdit(gridLayoutWidget_3);
-    gridLayout_3->addWidget(yPosLineEdit, 1, 2, 1, 1);
+    yPosLineEdit = new QLineEdit();
+    coordInfoLayout->addWidget(yPosLineEdit, 1, 2, 1, 1);
 
     // RX orientation scrollbar
-    rxScrollBar = new QScrollBar(gridLayoutWidget_3);
+    rxScrollBar = new QScrollBar();
     rxScrollBar->setOrientation(Qt::Horizontal);
-    gridLayout_3->addWidget(rxScrollBar, 5, 1, 1, 1);
+    coordInfoLayout->addWidget(rxScrollBar, 5, 1, 1, 1);
 
     // RY orientation scrollbar
-    ryScrollBar = new QScrollBar(gridLayoutWidget_3);
+    ryScrollBar = new QScrollBar();
     ryScrollBar->setOrientation(Qt::Horizontal);
-    gridLayout_3->addWidget(ryScrollBar, 6, 1, 1, 1);
+    coordInfoLayout->addWidget(ryScrollBar, 6, 1, 1, 1);
 
     // RZ orientation scrollbar
-    rzScrollBar = new QScrollBar(gridLayoutWidget_3);
+    rzScrollBar = new QScrollBar();
     rzScrollBar->setOrientation(Qt::Horizontal);
-    gridLayout_3->addWidget(rzScrollBar, 7, 1, 1, 1);
+    coordInfoLayout->addWidget(rzScrollBar, 7, 1, 1, 1);
 
     // Line edit for RY orientation
-    ryLineEdit = new QLineEdit(gridLayoutWidget_3);
+    ryLineEdit = new QLineEdit();
     ryLineEdit->setObjectName(QStringLiteral("ryLineEdit"));
-    gridLayout_3->addWidget(ryLineEdit, 6, 2, 1, 1);
+    coordInfoLayout->addWidget(ryLineEdit, 6, 2, 1, 1);
 
     // Line edit for RZ orientation
-    rzLineEdit = new QLineEdit(gridLayoutWidget_3);
+    rzLineEdit = new QLineEdit();
     rzLineEdit->setObjectName(QStringLiteral("rzLineEdit"));
-    gridLayout_3->addWidget(rzLineEdit, 7, 2, 1, 1);
+    coordInfoLayout->addWidget(rzLineEdit, 7, 2, 1, 1);
 
     // Line edit for Z position
-    zPosLineEdit = new QLineEdit(gridLayoutWidget_3);
+    zPosLineEdit = new QLineEdit();
     zPosLineEdit->setObjectName(QStringLiteral("zPosLineEdit"));
-    gridLayout_3->addWidget(zPosLineEdit, 3, 2, 1, 1);
+    coordInfoLayout->addWidget(zPosLineEdit, 3, 2, 1, 1);
 
     // Line edit for RX orientation
-    rxLineEdit = new QLineEdit(gridLayoutWidget_3);
+    rxLineEdit = new QLineEdit();
     rxLineEdit->setObjectName(QStringLiteral("rxLineEdit"));
-    gridLayout_3->addWidget(rxLineEdit, 5, 2, 1, 1);
+    coordInfoLayout->addWidget(rxLineEdit, 5, 2, 1, 1);
 
-    // Hard line
-    QFrame *line_2 = new QFrame(manualMoveTab);
-    line_2->setGeometry(QRect(10, 170, 401, 16));
-    line_2->setFrameShape(QFrame::HLine);
-    line_2->setFrameShadow(QFrame::Sunken);
 
-    // Grid for speed, velocity and time
-    QWidget *gridLayoutWidget_5 = new QWidget(manualMoveTab);
-    gridLayoutWidget_5->setGeometry(QRect(10, 190, 231, 74));
 
-    QGridLayout *gridLayout_5 = new QGridLayout(gridLayoutWidget_5);
-    gridLayout_5->setSpacing(6);
-    gridLayout_5->setContentsMargins(11, 11, 11, 11);
-    gridLayout_5->setContentsMargins(0, 0, 0, 0);
 
-    // Acceleration line edit
-    accelerationLineEdit = new QLineEdit(gridLayoutWidget_5);
-    gridLayout_5->addWidget(accelerationLineEdit, 1, 1, 1, 1);
-    accelerationLineEdit->setText(QApplication::translate("Ur5Widget", "0.5", 0));
-
-    // Velocity line edit
-    velocityLineEdit = new QLineEdit(gridLayoutWidget_5);
-    gridLayout_5->addWidget(velocityLineEdit, 0, 1, 1, 1);
-    velocityLineEdit->setText(QApplication::translate("Ur5Widget", "0.1", 0));
-
-    // Acceleration label
-    gridLayout_5->addWidget(new QLabel("Acceleration"), 1, 0, 1, 1);
-
-    // Velocity label
-    gridLayout_5->addWidget(new QLabel("Velocity"), 0, 0, 1, 1);
-
-    // Time label
-    gridLayout_5->addWidget(new QLabel("Time"), 2, 0, 1, 1);
-
-    // Time line edit
-    timeLineEdit = new QLineEdit(gridLayoutWidget_5);
-    gridLayout_5->addWidget(timeLineEdit, 2, 1, 1, 1);
-    timeLineEdit->setText(QApplication::translate("Ur5Widget", "0.5", 0));
-
-    // Labeling units
-    gridLayout_5->addWidget(new QLabel("m/s"), 0, 2, 1, 1);
-    gridLayout_5->addWidget(new QLabel("m/s^2"), 1, 2, 1, 1);
-    gridLayout_5->addWidget(new QLabel("s"), 2, 2, 1, 1);
-
-    // Add manual move tab
-    tabWidget->addTab(manualMoveTab, QString());
-    tabWidget->setTabText(tabWidget->indexOf(manualMoveTab), QApplication::translate("Ur5Widget", "Manual move", 0));
 }
 
-QString Ur5Widget::defaultWhatsThis() const
+void ManualMoveTab::coordButtonPressed(int axis, int sign)
 {
-  return "<html>"
-      "<h3>Example plugin.</h3>"
-      "<p>Used for developers as a starting points for developing a new plugin</p>"
-      "</html>";
+    Ur5State velocity;
+    velocity.jointAxisVelocity(axis)=(sign)*velocityLineEdit->text().toDouble();
+    connection->sendMessage(connection->transmitter.speedl(velocity,accelerationLineEdit->text(),timeLineEdit->text()));
+}
+
+void ManualMoveTab::posZButtonPressedSlot()
+{
+    emit(coordButtonPressed(2,1));
+}
+
+void ManualMoveTab::negZButtonPressedSlot()
+{
+    emit(coordButtonPressed(2,-1));
+}
+
+void ManualMoveTab::posYButtonPressedSlot()
+{
+    emit(coordButtonPressed(1,1));
+}
+
+void ManualMoveTab::negYButtonPressedSlot()
+{
+    emit(coordButtonPressed(1,-1));
+}
+
+void ManualMoveTab::posXButtonPressedSlot()
+{
+   emit(coordButtonPressed(0,1));
+}
+
+void ManualMoveTab::negXButtonPressedSlot()
+{
+    emit(coordButtonPressed(0,-1));
+}
+
+void ManualMoveTab::moveButtonReleasedSlot()
+{
+    emit(connection->sendMessage(connection->transmitter.stopl(accelerationLineEdit->text())));
+}
+
+PlannedMoveTab::PlannedMoveTab(QWidget *parent) :
+    QWidget(parent)
+{
+    setupUi(this);
+}
+
+PlannedMoveTab::~PlannedMoveTab()
+{
+
+}
+
+void PlannedMoveTab::setupUi(QWidget *parent)
+{
+
 }
 
 } /* namespace cx */
