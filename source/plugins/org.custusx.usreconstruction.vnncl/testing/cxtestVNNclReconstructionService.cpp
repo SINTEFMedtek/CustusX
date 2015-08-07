@@ -65,6 +65,8 @@ TEST_CASE("VNNcl: DW on sphere", "[unit][VNNcl][usreconstruction][synthetic]")
 	vnnClFixture.reconstruct();
 	vnnClFixture.verify();
 }
+
+//Fails on maverics
 TEST_CASE("VNNcl: Anisotropic on sphere", "[unit][VNNcl][usreconstruction][synthetic]")
 {
 	VNNclSyntheticFixture vnnClFixture;
@@ -80,7 +82,9 @@ TEST_CASE("VNNcl: VNN multistart on sphere", "[unit][VNNcl][usreconstruction][sy
 	vnnClFixture.verify();
 }
 
-TEST_CASE("VNNcl: VNN on real data", "[usreconstruction][integration][VNNcl][unstable][not_apple]")
+
+//Try to remove the not_apple tag on these 6 tests to see if they all fails all the time
+TEST_CASE("VNNcl: VNN on real data", "[usreconstruction][integration][VNNcl][unstable]")
 {
 	VNNclFixture vnnClFixture;
 	vnnClFixture.initVNN();
@@ -88,7 +92,7 @@ TEST_CASE("VNNcl: VNN on real data", "[usreconstruction][integration][VNNcl][uns
 	vnnClFixture.verify();
 }
 
-TEST_CASE("VNNcl: VNN2 on real data", "[usreconstruction][integration][VNNcl][unstable][not_apple]")
+TEST_CASE("VNNcl: VNN2 on real data", "[usreconstruction][integration][VNNcl][unstable]")
 {
 	VNNclFixture vnnClFixture;
 	vnnClFixture.initVNN2();
@@ -96,7 +100,7 @@ TEST_CASE("VNNcl: VNN2 on real data", "[usreconstruction][integration][VNNcl][un
 	vnnClFixture.verify();
 }
 
-TEST_CASE("VNNcl: DW on real data", "[usreconstruction][integration][VNNcl][unstable][not_apple]")
+TEST_CASE("VNNcl: DW on real data", "[usreconstruction][integration][VNNcl][unstable]")
 {
 	VNNclFixture vnnClFixture;
 	vnnClFixture.initDW();
@@ -104,7 +108,7 @@ TEST_CASE("VNNcl: DW on real data", "[usreconstruction][integration][VNNcl][unst
 	vnnClFixture.verify();
 }
 
-TEST_CASE("VNNcl: Anisotropic on real data", "[usreconstruction][integration][VNNcl][unstable][not_apple]")
+TEST_CASE("VNNcl: Anisotropic on real data", "[usreconstruction][integration][VNNcl][unstable]")
 {
 	VNNclFixture vnnClFixture;
 	vnnClFixture.initAnisotropic();
@@ -112,7 +116,7 @@ TEST_CASE("VNNcl: Anisotropic on real data", "[usreconstruction][integration][VN
 	vnnClFixture.verify();
 }
 
-TEST_CASE("VNNcl: VNN Multistart on real data", "[usreconstruction][integration][VNNcl][unstable][not_apple]")
+TEST_CASE("VNNcl: VNN Multistart on real data", "[usreconstruction][integration][VNNcl][unstable]")
 {
 	VNNclFixture vnnClFixture;
 	vnnClFixture.initVNNMultistart();
@@ -120,7 +124,7 @@ TEST_CASE("VNNcl: VNN Multistart on real data", "[usreconstruction][integration]
 	vnnClFixture.verify();
 }
 
-TEST_CASE("VNNcl: VNN Closest on real data", "[usreconstruction][integration][VNNcl][unstable][not_apple]")
+TEST_CASE("VNNcl: VNN Closest on real data", "[usreconstruction][integration][VNNcl][unstable]")
 {
 	VNNclFixture vnnClFixture;
 	vnnClFixture.initVNNClosest();
