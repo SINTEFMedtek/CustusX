@@ -68,8 +68,8 @@ TEST_CASE("VNNcl: DW on sphere", "[unit][VNNcl][usreconstruction][synthetic][not
 	vnnClFixture.verify();
 }
 
-//Crashes on OSX 10.9.5
-TEST_CASE("VNNcl: Anisotropic on sphere", "[unit][VNNcl][usreconstruction][synthetic][not_mavericks]")
+//Crashes on OSX 10.9.5 and 10.8.5
+TEST_CASE("VNNcl: Anisotropic on sphere", "[unit][VNNcl][usreconstruction][synthetic][not_apple]")
 {
 	VNNclSyntheticFixture vnnClFixture;
 	vnnClFixture.initAnisotropic();
