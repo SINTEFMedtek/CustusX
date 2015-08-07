@@ -44,14 +44,15 @@ namespace cxtest
 
 #ifdef CX_USE_OPENCL_UTILITY
 
-TEST_CASE("VNNcl: VNN on sphere", "[unit][VNNcl][usreconstruction][synthetic]")
+TEST_CASE("VNNcl: VNN on sphere", "[unit][VNNcl][usreconstruction][synthetic][not_apple]")
 {
 	VNNclSyntheticFixture vnnClFixture;
 	vnnClFixture.initVNN();
 	vnnClFixture.reconstruct();
 	vnnClFixture.verify();
 }
-TEST_CASE("VNNcl: VNN2 on sphere", "[unit][VNNcl][usreconstruction][synthetic]")
+
+TEST_CASE("VNNcl: VNN2 on sphere", "[unit][VNNcl][usreconstruction][synthetic][not_apple]")
 {
 	VNNclSyntheticFixture vnnClFixture;
 	vnnClFixture.initVNN2();
@@ -76,7 +77,9 @@ TEST_CASE("VNNcl: Anisotropic on sphere", "[unit][VNNcl][usreconstruction][synth
 	vnnClFixture.reconstruct();
 	vnnClFixture.verify();
 }
-TEST_CASE("VNNcl: VNN multistart on sphere", "[unit][VNNcl][usreconstruction][synthetic]")
+
+//Crashes on OSX 10.8.5
+TEST_CASE("VNNcl: VNN multistart on sphere", "[unit][VNNcl][usreconstruction][synthetic][not_apple]")
 {
 	VNNclSyntheticFixture vnnClFixture;
 	vnnClFixture.initVNNMultistart();
