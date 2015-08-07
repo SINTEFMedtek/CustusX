@@ -34,8 +34,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMesh.h"
 
 #include <vtkCellArray.h>
+#include <vtkColorSeries.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataWriter.h>
+#include <vtkPointData.h>
 #include <QDomDocument>
 #include <QColor>
 #include <QDir>
@@ -53,16 +55,20 @@ MeshPtr Mesh::create(const QString& uid, const QString& name)
 }
 
 Mesh::Mesh(const QString& uid, const QString& name) :
-	Data(uid, name), mVtkPolyData(vtkPolyDataPtr::New()), mWireframe(false), mBackfaceCulling(false), mFrontfaceCulling(false)
+    Data(uid, name), mVtkPolyData(vtkPolyDataPtr::New()), mWireframe(false), mBackfaceCulling(false), mFrontfaceCulling(false),mHasGlyph(false), mOrientationArray(""), mColorArray(""),mVisSize(2.0)
 {
 	mColor = QColor(255, 0, 0, 255);
+    mShowGlyph = shouldGlyphBeEnableByDefault();
+    mGlyphLUT ="Citrus";
 	this->setAcquisitionTime(QDateTime::currentDateTime());
 }
 Mesh::Mesh(const QString& uid, const QString& name, const vtkPolyDataPtr& polyData) :
-	Data(uid, name), mVtkPolyData(polyData), mWireframe(false), mBackfaceCulling(false), mFrontfaceCulling(false)
+    Data(uid, name), mVtkPolyData(polyData), mWireframe(false), mBackfaceCulling(false), mFrontfaceCulling(false),mHasGlyph(false), mOrientationArray(""), mColorArray(""),mVisSize(2.0)
 {
 	mColor = QColor(255, 0, 0, 255);
-	this->setAcquisitionTime(QDateTime::currentDateTime());
+    mShowGlyph = shouldGlyphBeEnableByDefault();
+    mGlyphLUT ="Citrus";
+    this->setAcquisitionTime(QDateTime::currentDateTime());
 }
 Mesh::~Mesh()
 {
@@ -94,6 +100,33 @@ bool Mesh::load(QString path)
 void Mesh::setVtkPolyData(const vtkPolyDataPtr& polyData)
 {
 	mVtkPolyData = polyData;
+
+    int num;
+    for(int k=0; k <  mVtkPolyData->GetPointData()->GetNumberOfArrays(); k++)
+    {
+        num=mVtkPolyData->GetPointData()->GetArray(k)->GetNumberOfComponents();
+        if(num==3)
+        {
+            if(strlen(mOrientationArray.c_str())==0)
+            {
+                mOrientationArray=mVtkPolyData->GetPointData()->GetArrayName(k);
+                mHasGlyph=true;
+            }
+            mOrientationArrayList << mVtkPolyData->GetPointData()->GetArrayName(k);
+        }
+    }
+    mColorArrayList << "";
+    mColorArray="";
+    for(int k=0; k <  mVtkPolyData->GetPointData()->GetNumberOfArrays(); k++)
+    {
+        num=mVtkPolyData->GetPointData()->GetArray(k)->GetNumberOfComponents();
+        if(num==1)
+        {
+            mColorArrayList << mVtkPolyData->GetPointData()->GetArrayName(k);
+        }
+    }
+    mShowGlyph = shouldGlyphBeEnableByDefault();
+
 	emit meshChanged();
 }
 vtkPolyDataPtr Mesh::getVtkPolyData() const
@@ -124,9 +157,19 @@ void Mesh::addXml(QDomNode& dataNode)
 
 	QDomElement cullingNode = doc.createElement("culling");
 	QDomElement elem = cullingNode.toElement();
-	elem.setAttribute("backfaceCulling", mBackfaceCulling);
-	elem.setAttribute("frontfaceCulling", mFrontfaceCulling);
+    elem.setAttribute("backfaceCulling", mBackfaceCulling);
+    elem.setAttribute("frontfaceCulling", mFrontfaceCulling);
 	meshNode.appendChild(cullingNode);
+
+    QDomElement glyphNode = doc.createElement("glyph");
+    QDomElement elemGlyph = glyphNode.toElement();
+    elemGlyph.setAttribute("showGlyph", mShowGlyph);
+    elemGlyph.setAttribute("orientationArray", mOrientationArray.c_str());
+    elemGlyph.setAttribute("colorArray", mColorArray.c_str());
+    elemGlyph.setAttribute("glyphLUT", mGlyphLUT.c_str());
+    elemGlyph.setAttribute("glyphVisSize", mVisSize);
+    meshNode.appendChild(elemGlyph);
+
 }
 
 void Mesh::parseXml(QDomNode& dataNode)
@@ -169,12 +212,23 @@ void Mesh::parseXml(QDomNode& dataNode)
 		mColor = QColor(red, green, blue, alpha);
 	}
 
-	QDomNode cullingNode = dataNode.namedItem("culling");
-	if (!cullingNode.isNull())
-	{
-		mBackfaceCulling = cullingNode.toElement().attribute("backfaceCulling").toInt();
-		mFrontfaceCulling = cullingNode.toElement().attribute("frontfaceCulling").toInt();
-	}
+    QDomNode cullingNode = dataNode.namedItem("culling");
+    if (!cullingNode.isNull())
+    {
+        mBackfaceCulling = cullingNode.toElement().attribute("backfaceCulling").toInt();
+        mFrontfaceCulling = cullingNode.toElement().attribute("frontfaceCulling").toInt();
+    }
+
+    QDomNode glyphNode = dataNode.namedItem("glyph");
+    if (!glyphNode.isNull())
+    {
+        mShowGlyph = glyphNode.toElement().attribute("showGlyph").toInt();
+        mOrientationArray = glyphNode.toElement().attribute("orientationArray").toStdString();
+        mColorArray = glyphNode.toElement().attribute("colorArray").toStdString();
+        mGlyphLUT = glyphNode.toElement().attribute("glyphLUT").toStdString();
+        mVisSize =  glyphNode.toElement().attribute("glyphVisSize").toDouble();
+    }
+
 	emit meshChanged();
 }
 
@@ -210,6 +264,93 @@ bool Mesh::getFrontfaceCulling()
 {
 	return mFrontfaceCulling;
 }
+
+void Mesh::setShowGlyph(bool val)
+{
+    mShowGlyph = val;
+    emit meshChanged();
+}
+
+bool Mesh::hasGlyph()
+{
+    return mHasGlyph;
+}
+
+bool Mesh::showGlyph()
+{
+    return mShowGlyph;
+}
+
+bool Mesh::shouldGlyphBeEnableByDefault()
+{
+    if(! mHasGlyph) return false;
+    if(mVtkPolyData->GetNumberOfVerts() > 0) return false;
+    if(mVtkPolyData->GetNumberOfLines() > 0) return false;
+    if(mVtkPolyData->GetNumberOfPolys() > 0) return false;
+    if(mVtkPolyData->GetNumberOfStrips() > 0) return false;
+
+    return true;
+}
+
+
+const char * Mesh::getOrientationArray()
+{
+    return mOrientationArray.c_str();
+}
+
+void Mesh::setOrientationArray(const char * orientationArray)
+{
+    mOrientationArray = orientationArray;
+    emit meshChanged();
+}
+
+double Mesh::getVisSize()
+{
+    return mVisSize;
+}
+
+void Mesh::setVisSize(double size)
+{
+    if(mVisSize==size) return;
+
+    mVisSize=size;
+    emit meshChanged();
+}
+
+const char * Mesh::getColorArray()
+{
+    return mColorArray.c_str();
+}
+
+void Mesh::setColorArray(const char * colorArray)
+{
+    mColorArray = colorArray;
+    emit meshChanged();
+}
+
+const char * Mesh::getGlyphLUT()
+{
+    return mGlyphLUT.c_str();
+}
+
+void Mesh::setGlyphLUT(const char * glyphLUT)
+{
+    mGlyphLUT = glyphLUT;
+    emit meshChanged();
+}
+
+
+QStringList Mesh::getOrientationArrayList()
+{
+    return mOrientationArrayList;
+}
+
+QStringList Mesh::getColorArrayList()
+{
+    return mColorArrayList;
+}
+
+
 
 DoubleBoundingBox3D Mesh::boundingBox() const
 {

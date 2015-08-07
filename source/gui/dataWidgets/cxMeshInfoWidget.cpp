@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVBoxLayout>
 #include "cxImage.h"
 
+#include "cxDoubleProperty.h"
 #include "cxRegistrationTransform.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxLabeledLineEditWidget.h"
@@ -86,31 +87,47 @@ void MeshInfoWidget::meshSelectedSlot()
 
 	if(mMesh)
 	{
-		disconnect(mBackfaceCullingCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setBackfaceCullingSlot(bool)));
+        mMesh->setVisSize((double) mVisSizeWidget->getValue());
+        disconnect(mBackfaceCullingCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setBackfaceCullingSlot(bool)));
 		disconnect(mFrontfaceCullingCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setFrontfaceCullingSlot(bool)));
+        disconnect(mGlyphVisualizationCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setShowGlyph(bool)));
 		disconnect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
-	}
+    }
 
 	mMesh = mSelectMeshWidget->getMesh();
 
 	if (!mMesh)
 	{
-		mParentFrameAdapter->setData(mMesh);
-		mNameAdapter->setData(mMesh);
+        mParentFrameAdapter->setData(mMesh);
+        mNameAdapter->setData(mMesh);
 		mUidAdapter->setData(mMesh);
+        mGlyphOrientationArrayAdapter->setData(mMesh);
+        mGlyphColorArrayAdapter->setData(mMesh);
+        mGlyphColorLUTAdapter->setData(mMesh);
+
 		return;
 	}
 
 	mBackfaceCullingCheckBox->setChecked(mMesh->getBackfaceCulling());
 	mFrontfaceCullingCheckBox->setChecked(mMesh->getFrontfaceCulling());
+    mGlyphVisualizationCheckBox->setChecked(mMesh->showGlyph());
+    mGlyphVisualizationCheckBox->setEnabled(mMesh->hasGlyph());
+    mVisSizeWidget->setValue(mMesh->getVisSize());
+
 	connect(mBackfaceCullingCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setBackfaceCullingSlot(bool)));
 	connect(mFrontfaceCullingCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setFrontfaceCullingSlot(bool)));
-	connect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
+    connect(mGlyphVisualizationCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setShowGlyph(bool)));
 
-	mParentFrameAdapter->setData(mMesh);
+    connect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
+
+
+    mParentFrameAdapter->setData(mMesh);
 	mNameAdapter->setData(mMesh);
 	mUidAdapter->setData(mMesh);
 	mColorAdapter->setValue(mMesh->getColor());
+    mGlyphOrientationArrayAdapter->setData(mMesh);
+    mGlyphColorArrayAdapter->setData(mMesh);
+    mGlyphColorLUTAdapter->setData(mMesh);
 
 	std::map<std::string, std::string> info = getDisplayFriendlyInfo(mMesh);
 	this->populateTableWidget(info);
@@ -129,9 +146,13 @@ void MeshInfoWidget::importTransformSlot()
   
 void MeshInfoWidget::meshChangedSlot()
 {
+    if(!mMesh) return;
 	mBackfaceCullingCheckBox->setChecked(mMesh->getBackfaceCulling());
 	mFrontfaceCullingCheckBox->setChecked(mMesh->getFrontfaceCulling());
+    mGlyphVisualizationCheckBox->setChecked(mMesh->showGlyph());
+    mGlyphVisualizationCheckBox->setEnabled(mMesh->hasGlyph());
 	mColorAdapter->setValue(mMesh->getColor());
+    mMesh->setVisSize((double) mVisSizeWidget->getValue());
 }
 
 void MeshInfoWidget::showEvent(QShowEvent* event)
@@ -146,8 +167,8 @@ void MeshInfoWidget::hideEvent(QCloseEvent* event)
 
 void MeshInfoWidget::addWidgets(PatientModelServicePtr patientModelService)
 {
-	mSelectMeshWidget = StringPropertySelectMesh::New(patientModelService);
-	mSelectMeshWidget->setValueName("Surface: ");
+    mSelectMeshWidget = StringPropertySelectMesh::New(patientModelService);
+    mSelectMeshWidget->setValueName("Surface: ");
 	connect(mSelectMeshWidget.get(), &Property::changed, this, &MeshInfoWidget::meshSelectedSlot);
 
 	XmlOptionFile options = profile()->getXmlSettings().descend("MeshInfoWidget");
@@ -168,7 +189,10 @@ void MeshInfoWidget::addWidgets(PatientModelServicePtr patientModelService)
 
 	mUidAdapter = StringPropertyDataUidEditable::New();
 	mNameAdapter = StringPropertyDataNameEditable::New();
-	mParentFrameAdapter = StringPropertyParentFrame::New(mPatientModelService);
+    mParentFrameAdapter = StringPropertyParentFrame::New(mPatientModelService);
+    mGlyphOrientationArrayAdapter = StringPropertyGlyphOrientationArray::New(mPatientModelService);
+    mGlyphColorArrayAdapter = StringPropertyGlyphColorArray::New(mPatientModelService);
+    mGlyphColorLUTAdapter = StringPropertyGlyphLUT::New(mPatientModelService);
 
 	QWidget* optionsWidget = new QWidget(this);
 	QHBoxLayout* optionsLayout = new QHBoxLayout(optionsWidget);
@@ -178,20 +202,41 @@ void MeshInfoWidget::addWidgets(PatientModelServicePtr patientModelService)
 	mFrontfaceCullingCheckBox = new QCheckBox("Frontface culling");
 	mFrontfaceCullingCheckBox->setToolTip("Set frontface culling on. Can be used to make transparent meshes work from inside the meshes.");
 	optionsLayout->addWidget(mFrontfaceCullingCheckBox);
-	optionsLayout->addWidget(sscCreateDataWidget(this, mColorAdapter));
-	optionsLayout->addStretch(1);
+    optionsLayout->addWidget(sscCreateDataWidget(this, mColorAdapter));
+
+    optionsLayout->addStretch(1);
+
+    mVisSizeWidget= DoubleProperty::initialize("visSize", " ", "Visualization size",1, DoubleRange(1, 20, 1), 0);
+    mVisSizeWidget->setGuiRepresentation(DoublePropertyBase::grSLIDER);
+    connect(mVisSizeWidget.get(), &Property::changed, this, &MeshInfoWidget::meshChangedSlot);
+
+    int gridGlyphLayoutRow = 1;
+    QWidget* glyphWidget = new QWidget(this);
+    QGridLayout* glyphLayout = new QGridLayout(glyphWidget);
+    mGlyphVisualizationCheckBox = new QCheckBox("Enable glyph visualization");
+    mGlyphVisualizationCheckBox->setToolTip("Enable glyph visualization");
+    glyphLayout->addWidget(mGlyphVisualizationCheckBox, gridGlyphLayoutRow++,0);
+    new LabeledComboBoxWidget(this, mGlyphOrientationArrayAdapter,glyphLayout, gridGlyphLayoutRow++);
+    new LabeledComboBoxWidget(this, mGlyphColorArrayAdapter,glyphLayout, gridGlyphLayoutRow++);
+    new LabeledComboBoxWidget(this, mGlyphColorLUTAdapter,glyphLayout, gridGlyphLayoutRow++);
 
 	int gridLayoutRow = 1;
 
 	gridLayout->addWidget(new DataSelectWidget(mVisualizationService, mPatientModelService, this, mSelectMeshWidget), gridLayoutRow++, 0, 1, 2);
 	new LabeledLineEditWidget(this, mUidAdapter, gridLayout, gridLayoutRow++);
 	new LabeledLineEditWidget(this, mNameAdapter, gridLayout, gridLayoutRow++);
-	new LabeledComboBoxWidget(this, mParentFrameAdapter, gridLayout, gridLayoutRow++);
-	gridLayout->addWidget(optionsWidget, gridLayoutRow++, 0, 1, 2);
+    new LabeledComboBoxWidget(this, mParentFrameAdapter, gridLayout, gridLayoutRow++);
+
+    gridLayout->addWidget(optionsWidget, gridLayoutRow++, 0, 1, 2);
+    gridLayout->addWidget(new QLabel("Visualization size:", this), gridLayoutRow, 0);
+    gridLayout->addWidget(createDataWidget(mVisualizationService, mPatientModelService, this, mVisSizeWidget),gridLayoutRow++,1);
+    gridLayout->addWidget(glyphWidget, gridLayoutRow++, 0, 1, 2);
 	gridLayout->addWidget(mTableWidget, gridLayoutRow++, 0, 1, 2);
 	gridLayout->addWidget(importTransformButton, gridLayoutRow++, 0, 1, 2);
 
 	this->addStretch();
 }
+
+
 
 }//end namespace cx
