@@ -2,7 +2,7 @@
 
 #include "cxBronchoscopePositionProjection.h"
 #include <vtkPolyData.h>
-#include "cxDoubleDataAdapterXml.h"
+#include "cxDoubleProperty.h"
 #include "cxBranchList.h"
 #include "cxBranch.h"
 
@@ -33,13 +33,13 @@ void BronchoscopePositionProjection::setCenterline(vtkPolyDataPtr centerline, Tr
 
 void BronchoscopePositionProjection::createMaxDistanceToCenterlineOption(QDomElement root)
 {
-	mMaxDistanceToCenterline = DoubleDataAdapterXml::initialize("Max distance to centerline (mm)", "",
+    mMaxDistanceToCenterline = DoubleProperty::initialize("Max distance to centerline (mm)", "",
 	"Set max distance to centerline in mm", 30, DoubleRange(1, 100, 1), 0,
 					root);
-	mMaxDistanceToCenterline->setGuiRepresentation(DoubleDataAdapter::grSLIDER);
+    mMaxDistanceToCenterline->setGuiRepresentation(DoubleProperty::grSLIDER);
 }
 
-DoubleDataAdapterXmlPtr BronchoscopePositionProjection::getMaxDistanceToCenterlineOption()
+DoublePropertyPtr BronchoscopePositionProjection::getMaxDistanceToCenterlineOption()
 {
 
 	return mMaxDistanceToCenterline;

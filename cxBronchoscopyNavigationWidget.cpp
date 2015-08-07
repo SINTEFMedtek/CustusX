@@ -40,13 +40,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackingSystemBronchoscopyService.h"
 #include "cxTrackingServiceProxy.h"
 #include "cxPatientModelServiceProxy.h"
-#include "cxVisualizationServiceProxy.h"
+#include "cxViewServiceProxy.h"
 #include "cxBronchoscopePositionProjection.h"
-#include "cxDataAdapterHelper.h"
-#include "cxDoubleDataAdapterXml.h"
+#include "cxDoubleProperty.h"
 #include "cxDataLocations.h"
-#include "cxBoolDataAdapterXml.h"
+#include "cxBoolProperty.h"
 #include "cxCheckBoxWidget.h"
+#include "cxProfile.h"
+#include "cxHelperWidgets.h"
 
 namespace cx
 {
@@ -55,7 +56,7 @@ BronchoscopyNavigationWidget::BronchoscopyNavigationWidget(ctkPluginContext *con
     QWidget(parent),
     mVerticalLayout(new QVBoxLayout(this))
 {
-	mOptions = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("bronchoscopynavigationwidget");
+    mOptions = profile()->getXmlSettings().descend("bronchoscopynavigationwidget");
 
 	mPatientModelService = PatientModelServicePtr(new PatientModelServiceProxy(context));
 	mVisualizationService = VisualizationServicePtr(new VisualizationServiceProxy(context));
@@ -66,7 +67,7 @@ BronchoscopyNavigationWidget::BronchoscopyNavigationWidget(ctkPluginContext *con
 	this->setWindowTitle("BronchoscopyNavigation");
     this->setWhatsThis(this->defaultWhatsThis());
 
-	mSelectMeshWidget = SelectMeshStringDataAdapter::New(mPatientModelService);
+    mSelectMeshWidget = StringPropertySelectMesh::New(mPatientModelService);
 	mSelectMeshWidget->setValueName("Centerline: ");
 
 	//mSelectMaxDistanceWidget =
@@ -88,7 +89,7 @@ BronchoscopyNavigationWidget::BronchoscopyNavigationWidget(ctkPluginContext *con
 	this->useAdvancedCenterlineProjection(mOptions.getElement());
 
 
-	DataAdapterPtr maxDistanceToCenterline = mProjectionCenterlinePtr->getMaxDistanceToCenterlineOption();
+    PropertyPtr maxDistanceToCenterline = mProjectionCenterlinePtr->getMaxDistanceToCenterlineOption();
 
 	mVerticalLayout->addWidget(new DataSelectWidget(mVisualizationService, mPatientModelService, this, mSelectMeshWidget));
 	mVerticalLayout->addWidget(mProcessCenterlineButton);
@@ -167,7 +168,7 @@ QString BronchoscopyNavigationWidget::defaultWhatsThis() const
 
 void BronchoscopyNavigationWidget::useAdvancedCenterlineProjection(QDomElement root)
 {
-	mUseAdvancedCenterlineProjection = BoolDataAdapterXml::initialize("Use advanced centerline projection", "",
+    mUseAdvancedCenterlineProjection = BoolProperty::initialize("Use advanced centerline projection", "",
 																			"Use advanced centerline projection: Avoiding tool position to jump between adjacent branches.", false,
 																				root);
 }
