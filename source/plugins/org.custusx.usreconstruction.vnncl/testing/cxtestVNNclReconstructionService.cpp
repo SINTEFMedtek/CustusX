@@ -32,88 +32,58 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "catch.hpp"
 
-#include "cxReporter.h"
 #include "cxVNNclAlgorithm.h"
-#include "cxVNNclReconstructionMethodService.h"
-#include "cxBoolProperty.h"
-#include "cxtestUtilities.h"
-#include "cxtestReconstructRealData.h"
-#include "cxtestJenkinsMeasurement.h"
-#include "cxtestReconstructionAlgorithmFixture.h"
-#include "cxtestReconstructionManagerFixture.h"
 #include "cxtestVNNclFixture.h"
-#include "cxLogicManager.h"
 
-#ifdef CX_USE_OPENCL_UTILITY
-#include "cxSimpleSyntheticVolume.h"
-#endif // CX_USE_OPENCL_UTILITY
+//#ifdef CX_USE_OPENCL_UTILITY
+//#include "cxSimpleSyntheticVolume.h"
+//#endif // CX_USE_OPENCL_UTILITY
 
 namespace cxtest
 {
 
 #ifdef CX_USE_OPENCL_UTILITY
-TEST_CASE("VNNcl init", "[unit][VNNcl][usreconstruction][synthetic]")
-{
-	cx::LogicManager::initialize();
-
-	ctkPluginContext* pluginContext = cx::logicManager()->getPluginContext();
-
-	ReconstructionAlgorithmFixture fixture;
-
-	cx::VNNclReconstructionMethodServicePtr algorithm = cx::VNNclReconstructionMethodService::create(pluginContext);
-
-	REQUIRE(algorithm);
-
-	cx::LogicManager::shutdown();
-}
 
 TEST_CASE("VNNcl: VNN on sphere", "[unit][VNNcl][usreconstruction][synthetic]")
 {
-	cx::LogicManager::initialize();
-
-	ReconstructionAlgorithmFixture fixture;
-
-	ctkPluginContext* pluginContext = cx::logicManager()->getPluginContext();
-	cx::VNNclReconstructionMethodServicePtr algorithm = cx::VNNclReconstructionMethodService::create(pluginContext);
-
-	QString name = "VNN";
-
-	fixture.setOverallBoundsAndSpacing(100, 5);
-	fixture.getInputGenerator()->setSpherePhantom();
-
-	algorithm->enableProfiling();
-
-	QDomDocument domdoc;
-	QDomElement settings = domdoc.createElement("VNNcl");
-
-	algorithm->getRadiusOption(settings)->setValue(10);
-	algorithm->getMethodOption(settings)->setValue("VNN");
-	algorithm->getPlaneMethodOption(settings)->setValue("Heuristic");
-	algorithm->getMaxPlanesOption(settings)->setValue(8);
-	algorithm->getNStartsOption(settings)->setValue(1);
-
-	fixture.setAlgorithm(algorithm);
-	fixture.reconstruct(settings);
-
-	double executionTime = algorithm->getKernelExecutionTime();
-	JenkinsMeasurement jenkins;
-	jenkins.createOutput(name, QString::number(executionTime));
-
-	fixture.checkRMSBelow(20.0);
-	fixture.checkCentroidDifferenceBelow(1);
-	fixture.checkMassDifferenceBelow(0.01);
-
-
-	cx::LogicManager::shutdown();
+	VNNclSyntheticFixture vnnClFixture;
+	vnnClFixture.initVNN();
+	vnnClFixture.reconstruct();
+	vnnClFixture.verify();
 }
-
+TEST_CASE("VNNcl: VNN2 on sphere", "[unit][VNNcl][usreconstruction][synthetic]")
+{
+	VNNclSyntheticFixture vnnClFixture;
+	vnnClFixture.initVNN2();
+	vnnClFixture.reconstruct();
+	vnnClFixture.verify();
+}
+TEST_CASE("VNNcl: DW on sphere", "[unit][VNNcl][usreconstruction][synthetic]")
+{
+	VNNclSyntheticFixture vnnClFixture;
+	vnnClFixture.initDW();
+	vnnClFixture.reconstruct();
+	vnnClFixture.verify();
+}
+TEST_CASE("VNNcl: Anisotropic on sphere", "[unit][VNNcl][usreconstruction][synthetic]")
+{
+	VNNclSyntheticFixture vnnClFixture;
+	vnnClFixture.initAnisotropic();
+	vnnClFixture.reconstruct();
+	vnnClFixture.verify();
+}
+TEST_CASE("VNNcl: VNN multistart on sphere", "[unit][VNNcl][usreconstruction][synthetic]")
+{
+	VNNclSyntheticFixture vnnClFixture;
+	vnnClFixture.initVNNMultistart();
+	vnnClFixture.reconstruct();
+	vnnClFixture.verify();
+}
 
 TEST_CASE("VNNcl: VNN on real data", "[usreconstruction][integration][VNNcl][unstable][not_apple]")
 {
 	VNNclFixture vnnClFixture;
-
 	vnnClFixture.initVNN();
-
 	vnnClFixture.reconstruct();
 	vnnClFixture.verify();
 }
@@ -158,95 +128,6 @@ TEST_CASE("VNNcl: VNN Closest on real data", "[usreconstruction][integration][VN
 	vnnClFixture.verify();
 }
 
-TEST_CASE("ReconstructAlgorithm: VNNcl on sphere","[unit][VNNcl][usreconstruction][synthetic][not_win32][broken][not_mavericks]")
-{
-	cx::LogicManager::initialize();
-	cx::Reporter::initialize();
-
-	ctkPluginContext* pluginContext = cx::logicManager()->getPluginContext();
-
-	ReconstructionAlgorithmFixture fixture;
-
-	fixture.setOverallBoundsAndSpacing(100, 5);
-	fixture.getInputGenerator()->setSpherePhantom();
-	QDomDocument domdoc;
-	QDomElement settings = domdoc.createElement("VNNcl");
-	cx::VNNclReconstructionMethodServicePtr algorithm = cx::VNNclReconstructionMethodService::create(pluginContext);
-	algorithm->enableProfiling();
-
-	QString name = "DefaultVNNcl";
-
-	fixture.setAlgorithm(algorithm);
-	algorithm->getRadiusOption(settings)->setValue(10);
-	SECTION("VNN")
-	{
-		name = "VNN";
-		std::cout << "Testing VNN\n";
-		algorithm->getMethodOption(settings)->setValue("VNN");
-		algorithm->getPlaneMethodOption(settings)->setValue("Heuristic");
-		algorithm->getMaxPlanesOption(settings)->setValue(8);
-		algorithm->getNStartsOption(settings)->setValue(1);
-		REQUIRE(true);
-	}
-	SECTION("VNN2")
-	{
-		name = "VNN2";
-		std::cout << "Testing VNN2\n";
-		algorithm->getMethodOption(settings)->setValue("VNN2");
-		algorithm->getPlaneMethodOption(settings)->setValue("Heuristic");
-		algorithm->getMaxPlanesOption(settings)->setValue(8);
-		algorithm->getNStartsOption(settings)->setValue(1);
-		REQUIRE(true);
-	}
-	SECTION("DW")
-	{
-		name = "DW";
-		std::cout << "Testing DW\n";
-		algorithm->getMethodOption(settings)->setValue("DW");
-		algorithm->getPlaneMethodOption(settings)->setValue("Heuristic");
-		algorithm->getMaxPlanesOption(settings)->setValue(8);
-		algorithm->getNStartsOption(settings)->setValue(1);
-		REQUIRE(true);
-	}
-	SECTION("Anisotropic")
-	{
-		name = "Anisotropic";
-		std::cout << "Testing Anisotropic\n";
-		algorithm->getMethodOption(settings)->setValue("Anisotropic");
-		algorithm->getPlaneMethodOption(settings)->setValue("Heuristic");
-		algorithm->getMaxPlanesOption(settings)->setValue(8);
-		algorithm->getNStartsOption(settings)->setValue(1);
-		algorithm->getBrightnessWeightOption(settings)->setValue(0);
-		algorithm->getNewnessWeightOption(settings)->setValue(0);
-		REQUIRE(true);
-	}
-	SECTION("Multistart search")
-	{
-		name = "Multistart search";
-		std::cout << "Testing multistart search\n";
-		algorithm->getMethodOption(settings)->setValue("VNN");
-		algorithm->getPlaneMethodOption(settings)->setValue("Heuristic");
-		algorithm->getMaxPlanesOption(settings)->setValue(8);
-		algorithm->getNStartsOption(settings)->setValue(5);
-		REQUIRE(true);
-	}
-
-	fixture.reconstruct(settings);
-
-	double executionTime = algorithm->getKernelExecutionTime();
-	JenkinsMeasurement jenkins;
-	jenkins.createOutput(name, QString::number(executionTime));
-
-	fixture.checkRMSBelow(20.0);
-	fixture.checkCentroidDifferenceBelow(1);
-	fixture.checkMassDifferenceBelow(0.01);
-
-	//need to be sure opencl thread is finished before shutting down Reporter,
-	//or else we could get seg fault because og a callbackk from opencl to Reporter after it is shut down
-	Utilities::sleep_sec(1);
-	cx::Reporter::shutdown();
-	cx::LogicManager::shutdown();
-}
 #endif//CX_USE_OPENCL_UTILITY
 
 } //namespace cxtest

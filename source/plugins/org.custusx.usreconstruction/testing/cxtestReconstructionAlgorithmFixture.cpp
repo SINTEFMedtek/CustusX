@@ -88,7 +88,7 @@ void ReconstructionAlgorithmFixture::printConfiguration()
 	std::cout << "======" << std::endl;
 }
 
-void ReconstructionAlgorithmFixture::setAlgorithm(cx::ReconstructionMethodServicePtr algorithm)
+void ReconstructionAlgorithmFixture::setAlgorithm(cx::ReconstructionMethodService* algorithm)
 {
 	mAlgorithm = algorithm;
 }
