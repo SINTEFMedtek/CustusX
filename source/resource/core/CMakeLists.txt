@@ -53,7 +53,6 @@ cx_add_class_qt_moc(cxResource_SOURCE
     Tool/cxTracker
     Tool/cxManualToolAdapter
     Tool/cxPlaybackTool
-    Tool/cxTrackerConfigurationImpl
 
 	properties/cxProperty
 	properties/cxPropertyNull.h
@@ -136,6 +135,7 @@ cx_add_class(cxResource_SOURCE
     Tool/cxProbeImpl
     Tool/cxToolFileParser
     Tool/cxToolConfigurationParser
+    Tool/cxTrackerConfigurationImpl
 
     Data/cxDataMetric
     Data/cxDataReaderWriter
