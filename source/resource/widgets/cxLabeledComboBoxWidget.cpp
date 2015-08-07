@@ -37,12 +37,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxHelperWidgets.h"
 #include "cxLogger.h"
 
+#include "cxSelectDataStringPropertyBase.h"
+#include "cxData.h"
 
 namespace cx
 {
 
 LabeledComboBoxWidget::LabeledComboBoxWidget(QWidget* parent, StringPropertyBasePtr dataInterface,
-	QGridLayout* gridLayout, int row) :
+    QGridLayout* gridLayout, int row) :
     BaseWidget(parent, "LabeledComboBoxWidget", "LabeledComboBoxWidget")
 {
 	CX_ASSERT(dataInterface->getAllowOnlyValuesInRange()==true);
@@ -100,7 +102,8 @@ void LabeledComboBoxWidget::prePaintEvent()
 	int currentIndex = -1;
 	for (int i = 0; i < range.size(); ++i)
 	{
-		mCombo->addItem(mData->convertInternal2Display(range[i]));
+		QIcon icon = this->getIcon(range[i]);
+		mCombo->addItem(icon, mData->convertInternal2Display(range[i]));
 		mCombo->setItemData(i, range[i]);
 		if (range[i] == currentValue)
 			currentIndex = i;
@@ -110,6 +113,18 @@ void LabeledComboBoxWidget::prePaintEvent()
 	mCombo->setToolTip(mData->getHelp());
 	mLabel->setToolTip(mData->getHelp());
 	mCombo->blockSignals(false);
+}
+
+QIcon LabeledComboBoxWidget::getIcon(QString uid)
+{
+	SelectDataStringPropertyBasePtr dataProperty = boost::dynamic_pointer_cast<SelectDataStringPropertyBase>(mData);
+	if(!dataProperty)
+		return QIcon();
+
+	DataPtr data = dataProperty->getData(uid);
+	if(!data)
+		return QIcon();
+	return data->getIcon();
 }
 
 } // namespace cx

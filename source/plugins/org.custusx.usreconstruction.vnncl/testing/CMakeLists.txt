@@ -7,6 +7,8 @@ if(BUILD_TESTING)
         cxtestVNNclReconstructionService.cpp
         cxtestDummyVNNclReconstruction.h
         cxtestDummyVNNclReconstruction.cpp
+        cxtestVNNclFixture.h
+        cxtestVNNclFixture.cpp
     )
 
     qt5_wrap_cpp(CX_TEST_CATCH_ORG_CUSTUSX_VNNCLRECONSTRUCTION_MOC_SOURCE_FILES ${CX_TEST_CATCH_ORG_CUSTUSX_VNNCLRECONSTRUCTION_MOC_SOURCE_FILES})

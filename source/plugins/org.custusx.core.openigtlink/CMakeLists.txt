@@ -5,19 +5,23 @@ set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 set(PLUGIN_SRCS
     cxOpenIGTLinkPluginActivator.cpp
 
+    guiExtenderService/cxOpenIGTLinkGuiExtenderService.h
     guiExtenderService/cxOpenIGTLinkGuiExtenderService.cpp
     guiExtenderService/cxOpenIGTLinkConnectionWidget.cpp
 
     trackingSystemService/cxOpenIGTLinkTrackingSystemService.cpp
     trackingSystemService/cxOpenIGTLinkTool.cpp
 
+    streamerService/cxOpenIGTLinkStreamerService.h
     streamerService/cxOpenIGTLinkStreamerService.cpp
     streamerService/cxOpenIGTLinkStreamer.cpp
 
 #    openigtlinkClient/cxSocket.cpp
     openigtlinkClient/cxOpenIGTLinkClient.cpp
     openigtlinkClient/cxDialect.cpp
+    openigtlinkClient/cxPlusDialect.h
     openigtlinkClient/cxPlusDialect.cpp
+    openigtlinkClient/cxCustusDialect.h
     openigtlinkClient/cxCustusDialect.cpp
 )
 
@@ -25,20 +29,16 @@ set(PLUGIN_SRCS
 set(PLUGIN_MOC_SRCS
     cxOpenIGTLinkPluginActivator.h
 
-    guiExtenderService/cxOpenIGTLinkGuiExtenderService.h
     guiExtenderService/cxOpenIGTLinkConnectionWidget.h
 
     trackingSystemService/cxOpenIGTLinkTrackingSystemService.h
     trackingSystemService/cxOpenIGTLinkTool.h
 
-    streamerService/cxOpenIGTLinkStreamerService.h
     streamerService/cxOpenIGTLinkStreamer.h
 
 #    openigtlinkClient/cxSocket.h
     openigtlinkClient/cxOpenIGTLinkClient.h
     openigtlinkClient/cxDialect.h
-    openigtlinkClient/cxPlusDialect.h
-    openigtlinkClient/cxCustusDialect.h
 )
 
 # Qt Designer files which should be processed by Qts uic

@@ -61,7 +61,7 @@ class org_custusx_usreconstruction_vnncl_EXPORT VNNclReconstructionMethodService
 {
 	Q_INTERFACES(cx::ReconstructionMethodService)
 public:
-		VNNclReconstructionMethodService(ctkPluginContext* context);
+	VNNclReconstructionMethodService(ctkPluginContext* context);
 	virtual ~VNNclReconstructionMethodService();
 
     /**
@@ -166,7 +166,6 @@ protected:
 
     VNNclAlgorithmPtr mAlgorithm;
 };
-typedef boost::shared_ptr<VNNclReconstructionMethodService> VNNclReconstructionMethodServicePtr;
 
 } /* namespace cx */
 

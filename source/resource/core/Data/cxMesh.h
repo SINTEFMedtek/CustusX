@@ -82,6 +82,7 @@ public:
 	{
 		return "mesh";
 	}
+	virtual QIcon getIcon() {return QIcon(":/icons/surface.png");}
 
 	virtual DoubleBoundingBox3D boundingBox() const;
 	void setColor(const QColor& color);///< Set the color of the mesh

@@ -66,6 +66,7 @@ public: // optional methods
 
 public: // interface extension
 	virtual DataPtr getData() const;
+	virtual DataPtr getData(QString uid) const;
 	virtual void setValueName(const QString name);
 	virtual void setHelp(QString text);
 	virtual void setUidRegexp(QString regexp);

@@ -55,7 +55,7 @@ TEST_CASE("ReconstructAlgorithm: PNN on sphere","[unit][usreconstruction][synthe
 	fixture.setVerbose(true);
 	fixture.getInputGenerator()->setSpherePhantom();
 
-	fixture.setAlgorithm(cx::PNNReconstructionMethodService::create(pluginContext));
+	fixture.setAlgorithm(new cx::PNNReconstructionMethodService(pluginContext));
 	fixture.reconstruct(settings);
 
 	fixture.checkRMSBelow(20.0);
@@ -89,7 +89,7 @@ TEST_CASE("ReconstructAlgorithm: PNN on sphere, tilt","[unit][usreconstruction][
 	generator->setSpherePhantom();
 	fixture.defineOutputVolume(100, 2);
 
-	fixture.setAlgorithm(cx::PNNReconstructionMethodService::create(pluginContext));
+	fixture.setAlgorithm(new cx::PNNReconstructionMethodService(pluginContext));
 	fixture.reconstruct(settings);
 
 	fixture.checkRMSBelow(30.0);

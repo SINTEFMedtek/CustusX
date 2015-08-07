@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/weak_ptr.hpp>
 
 #include <QObject>
+#include <QIcon>
 #include "vtkForwardDeclarations.h"
 #include "cxTransform3D.h"
 #include "cxForwardDeclarations.h"
@@ -87,6 +88,7 @@ public:
 	{
         return "data";
 	}
+	virtual QIcon getIcon() {return QIcon();}
 
 	virtual QString getFilename() const;
 	virtual void setFilename(QString val);

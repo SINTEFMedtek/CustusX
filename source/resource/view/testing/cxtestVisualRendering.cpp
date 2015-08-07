@@ -199,7 +199,7 @@ TEST_CASE("Visual rendering: Several empty views in a sequence.",
 }
 
 TEST_CASE("Visual rendering: Show 3D volume - vtkGPU render",
-		  "[unit][resource][visualization][not_win32][not_win64][not_mavericks]")
+		  "[unit][resource][visualization][not_win32][not_win64][unstable]")
 {
 	cxtest::ViewsFixture fixture;
 	ImageTestList imagenames;

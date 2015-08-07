@@ -67,6 +67,8 @@ public:
 	DataMetric(const QString& uid, const QString& name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider);
 	virtual ~DataMetric();
 
+	virtual QIcon getIcon() {return QIcon(":/icons/metric.png");}
+
     virtual QString getSpace();
     virtual Vector3D getRefCoord() const = 0;
 	virtual QString getAsSingleLineString() const = 0;
