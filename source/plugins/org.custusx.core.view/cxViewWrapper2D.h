@@ -88,8 +88,12 @@ public:
 
 	virtual void updateView();
 
+
+    ImagePtr getImageToDisplay();
+
 protected slots:
 	virtual void dataViewPropertiesChangedSlot(QString uid);
+
 private slots:
 	void activeToolChangedSlot(); ///< makes sure the reps are connected to the right tool
 	void viewportChanged();
@@ -116,13 +120,25 @@ private:
 	void changeOrientationType(ORIENTATION_TYPE type);
 
 	virtual void imageAdded(ImagePtr image);
-	virtual void imageRemoved(const QString& uid);
+    //virtual void imageRemoved(const QString& uid);
 
 	virtual void dataAdded(DataPtr data);
 	virtual void dataRemoved(const QString& uid);
 
-	void resetMultiSlicer();
-	Texture3DSlicerRepPtr mMultiSliceRep;
+    void recreateMultiSlicer();
+    void updateItemsFromViewGroup(QString &text);
+
+    void setDataNameText(QString &text);
+    void updateDataNameText(QString &text);
+
+    void createAndAddSliceRep();
+    void removeAndResetSliceRep();
+
+    bool useGPU2DRendering();
+    void createAndAddMultiSliceRep();
+    void removeAndResetMultiSliceRep();
+
+    Texture3DSlicerRepPtr mMultiSliceRep;
 	DataRepContainerPtr mDataRepContainer;
 
 	GeometricRep2DPtr mPickerGlyphRep;

@@ -84,6 +84,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataRepContainer.h"
 #include "vtkRenderWindowInteractor.h"
 #include "cxPatientModelService.h"
+#include "cxLogger.h"
 
 
 namespace cx
@@ -248,30 +249,52 @@ void ViewWrapper2D::settingsChangedSlot(QString key)
 	}
 }
 
+
+void ViewWrapper2D::removeAndResetSliceRep()
+{
+    if (mSliceRep)
+    {
+        mView->removeRep(mSliceRep);
+        mSliceRep.reset();
+    }
+}
+
+void ViewWrapper2D::removeAndResetMultiSliceRep()
+{
+    if (mMultiSliceRep)
+    {
+        mView->removeRep(mMultiSliceRep);
+        mMultiSliceRep.reset();
+    }
+}
+
+void ViewWrapper2D::createAndAddMultiSliceRep()
+{
+    mMultiSliceRep = Texture3DSlicerRep::New();
+    mMultiSliceRep->setShaderPath(DataLocations::findConfigFolder("/shaders"));
+    mMultiSliceRep->setSliceProxy(mSliceProxy);
+
+    mView->addRep(mMultiSliceRep);
+}
+
 /**Hack: gpu slicer recreate and fill with images every time,
  * due to internal instabilities.
  *
  */
-void ViewWrapper2D::resetMultiSlicer()
+void ViewWrapper2D::recreateMultiSlicer()
 {
-	if (mSliceRep)
-	{
-		mView->removeRep(mSliceRep);
-		mSliceRep.reset();
-	}
-	if (mMultiSliceRep)
-		mView->removeRep(mMultiSliceRep);
-	if (!settings()->value("useGPU2DRendering").toBool())
+    this->removeAndResetSliceRep();
+    this->removeAndResetMultiSliceRep();
+
+    if (!this->useGPU2DRendering())
 		return;
 
-//	std::cout << "using gpu multislicer" << std::endl;
-	mMultiSliceRep = Texture3DSlicerRep::New();
-	mMultiSliceRep->setShaderPath(DataLocations::findConfigFolder("/shaders"));
-	mMultiSliceRep->setSliceProxy(mSliceProxy);
-	mView->addRep(mMultiSliceRep);
-	if (mGroupData)
+    this->createAndAddMultiSliceRep();
+
+    if (mGroupData)
 		mMultiSliceRep->setImages(mGroupData->getImages(DataViewProperties::createSlice2D()));
-	this->viewportChanged();
+
+    this->viewportChanged();
 }
 
 /**Call when viewport size or zoom has changed.
@@ -364,10 +387,10 @@ void ViewWrapper2D::orientationModeChanged()
 {
 	ORIENTATION_TYPE type = static_cast<ORIENTATION_TYPE>(mOrientationMode->get().toInt());
 
-if	(type == this->getOrientationType())
-	return;
+    if	(type == this->getOrientationType())
+        return;
 	if (!mSliceProxy)
-	return;
+        return;
 
 	SliceComputer computer = mSliceProxy->getComputer();
 	computer.switchOrientationMode(type);
@@ -400,76 +423,117 @@ void ViewWrapper2D::imageAdded(ImagePtr image)
 	//Navigation().centerToView(mViewGroup->getImages());
 }
 
+ImagePtr ViewWrapper2D::getImageToDisplay()
+{
+    std::vector<ImagePtr> images = mGroupData->getImages(DataViewProperties::createSlice2D());
+    ImagePtr image;
+    if (!images.empty())
+        image = images.back();  // always show last in vector
+
+    return image;
+}
+
+bool ViewWrapper2D::useGPU2DRendering()
+{
+    return settings()->value("useGPU2DRendering").toBool();
+}
+
+void ViewWrapper2D::createAndAddSliceRep()
+{
+    if (!mSliceRep)
+    {
+        mSliceRep = SliceRepSW::New("SliceRep_" + mView->getName());
+        mSliceRep->setSliceProxy(mSliceProxy);
+        mView->addRep(mSliceRep);
+    }
+}
+
+void ViewWrapper2D::updateItemsFromViewGroup(QString &text)
+{
+    ImagePtr image = this->getImageToDisplay();
+
+    if (image)
+    {
+        Vector3D c = image->get_rMd().coord(image->boundingBox().center());
+        mSliceProxy->setDefaultCenter(c);
+
+        if (this->useGPU2DRendering())
+        {
+            this->recreateMultiSlicer();
+            text = this->getAllDataNames(DataViewProperties::createSlice2D()).join("\n");
+        }
+        else //software rendering
+        {
+            this->removeAndResetMultiSliceRep();
+            this->createAndAddSliceRep();
+
+            mSliceRep->setImage(image);
+
+            // list all meshes and one image.
+            QStringList textList;
+            std::vector<MeshPtr> mesh = mGroupData->getMeshes(DataViewProperties::createSlice2D());
+            for (unsigned i = 0; i < mesh.size(); ++i)
+            textList << qstring_cast(mesh[i]->getName());
+            if (image)
+                textList << image->getName();
+            text = textList.join("\n");
+        }
+    }
+    else //no images to display in the view
+    {
+        this->removeAndResetSliceRep();
+        this->removeAndResetMultiSliceRep();
+    }
+}
+/**
+ * @brief Set the text and font size of the annotation in the lower left corner of the view
+ *
+ * @param text the text that will be displayed
+ */
+void ViewWrapper2D::setDataNameText(QString &text)
+{
+    mDataNameText->setText(0, text);
+    mDataNameText->setFontSize(std::max(12, 22 - 2 * text.size()));
+}
+
+/**
+ * @brief Update the annotation in the lower left corner.
+ * @param text
+ */
+void ViewWrapper2D::updateDataNameText(QString &text)
+{
+    bool show = settings()->value("View/showDataText").value<bool>();
+    if (!show)
+        text = QString();
+
+    this->setDataNameText(text);
+}
+
 void ViewWrapper2D::updateView()
 {
-	QString text;
-	if (mGroupData)
+    QString annotationTextForLowerLeftCorner;
+    if (mGroupData) //the view is a part of a viewgroup
 	{
-		std::vector<ImagePtr> images = mGroupData->getImages(DataViewProperties::createSlice2D());
-		ImagePtr image;
-		if (!images.empty())
-			image = images.back(); // always show last in vector
-
-		if (image)
-		{
-			Vector3D c = image->get_rMd().coord(image->boundingBox().center());
-			mSliceProxy->setDefaultCenter(c);
-		}
-
-		// slice rep
-		if (settings()->value("useGPU2DRendering").toBool())
-		{
-			this->resetMultiSlicer();
-			text = this->getAllDataNames(DataViewProperties::createSlice2D()).join("\n");
-		}
-		else
-		{
-			if (mMultiSliceRep)
-			{
-				mView->removeRep(mMultiSliceRep);
-				mMultiSliceRep.reset();
-			}
-
-			if (!mSliceRep)
-			{
-				mSliceRep = SliceRepSW::New("SliceRep_" + mView->getName());
-				mSliceRep->setSliceProxy(mSliceProxy);
-				mView->addRep(mSliceRep);
-			}
-
-			QStringList textList;
-			mSliceRep->setImage(image);
-
-			// list all meshes and one image.
-			std::vector<MeshPtr> mesh = mGroupData->getMeshes(DataViewProperties::createSlice2D());
-			for (unsigned i = 0; i < mesh.size(); ++i)
-			textList << qstring_cast(mesh[i]->getName());
-			if (image)
-			textList << image->getName();
-			text = textList.join("\n");
-		}
+        this->updateItemsFromViewGroup(annotationTextForLowerLeftCorner);
 	}
 
-	bool show = settings()->value("View/showDataText").value<bool>();
-	if (!show)
-		text = QString();
+    //UPDATE VIEWS DATA LIST ANNOTATION
+    this->updateDataNameText(annotationTextForLowerLeftCorner);
 
-	//update data name text rep
-	mDataNameText->setText(0, text);
-	mDataNameText->setFontSize(std::max(12, 22 - 2 * text.size()));
-
+    //UPDATE ORIENTATION ANNOTATION
 	mOrientationAnnotationRep->setVisible(settings()->value("View/showOrientationAnnotation").value<bool>());
 
+    //UPDATE DATA METRIC ANNOTATION
 	mDataRepContainer->updateSettings();
-//	mViewFollower->ensureCenterWithinView();
 }
 
 
-
-void ViewWrapper2D::imageRemoved(const QString& uid)
-{
-	updateView();
-}
+//DELETE - NOT USED...
+//void ViewWrapper2D::imageRemoved(const QString& uid)
+//{
+//    CX_LOG_DEBUG() << "imageRemoved uid: " << uid;
+//	updateView();
+//}
 
 void ViewWrapper2D::dataViewPropertiesChangedSlot(QString uid)
 {
@@ -485,6 +549,7 @@ void ViewWrapper2D::dataViewPropertiesChangedSlot(QString uid)
 
 void ViewWrapper2D::dataAdded(DataPtr data)
 {
+    CX_LOG_DEBUG() << "dataAdded data " << data->getName();
 	if (boost::dynamic_pointer_cast<Image>(data))
 	{
 		this->imageAdded(boost::dynamic_pointer_cast<Image>(data));
@@ -498,6 +563,7 @@ void ViewWrapper2D::dataAdded(DataPtr data)
 
 void ViewWrapper2D::dataRemoved(const QString& uid)
 {
+    CX_LOG_DEBUG() << "dataRemoved uid: " << uid;
 	mDataRepContainer->removeData(uid);
 	this->updateView();
 }
