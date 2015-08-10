@@ -179,6 +179,7 @@ macro(cx_initialize_VTK)
 		vtkRenderingCore vtkRenderingQt vtkRenderingOpenGL vtkRenderingFreeTypeOpenGL vtkInteractionStyle
 		vtkRenderingVolume vtkRenderingVolumeOpenGL
 		vtkIOGeometry vtkIOLegacy vtkIOMINC
+		vtkIOXMLParser
 		vtkFiltersModeling
 		vtkInteractionWidgets
 		vtkParallelCore
