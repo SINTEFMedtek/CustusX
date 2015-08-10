@@ -39,9 +39,11 @@ public:
     void set_jointData(QByteArray jointData,Ur5State &state);
 
     void print_cartData(Ur5State);
+    void print_cartData(Ur5StatePtr);
     void print_jointData(Ur5State);
 
     QByteArray removeFirstNBytes(QByteArray data,int n);
+
 };
 
 

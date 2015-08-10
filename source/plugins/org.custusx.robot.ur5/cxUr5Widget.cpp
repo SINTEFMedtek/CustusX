@@ -38,6 +38,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSpinBox>
 #include <QPushButton>
 #include <QVBoxLayout>
+#include <QTimer>
+
 
 namespace cx
 {
@@ -65,10 +67,12 @@ void Ur5Widget::setupUi(QWidget *Ur5Widget)
     Ur5WidgetLayout->addWidget(tabWidget);
     tabWidget->addTab(new InitializeTab(connection), tr("Initialize"));
     tabWidget->addTab(new ManualMoveTab(connection),tr("Manual movement"));
-    tabWidget->addTab(new PlannedMoveTab,tr("Planned movement"));
+    tabWidget->addTab(new PlannedMoveTab(connection),tr("Planned movement"));
 
     QMetaObject::connectSlotsByName(Ur5Widget);
 }
+
+
 
 InitializeTab::InitializeTab(Ur5ConnectionPtr ur5connection,QWidget *parent) :
     QWidget(parent),
@@ -77,10 +81,8 @@ InitializeTab::InitializeTab(Ur5ConnectionPtr ur5connection,QWidget *parent) :
     disconnectButton(new QPushButton()),
     presetOrigoComboBox(new QComboBox()),
     initializeButton(new QPushButton()),
-    initializeProgressBar(new QProgressBar()),
     manualCoordinatesLineEdit(new QLineEdit()),
     initializeButton_2(new QPushButton()),
-    initializeProgressBar_2(new QProgressBar()),
     connection(ur5connection)
 {
     setupUi(this);
@@ -130,9 +132,9 @@ void InitializeTab::setupUi(QWidget *parent)
     mainLayout->addWidget(setCoordinatesTab,row,0,1,4);
 
     QGridLayout *presetCoordLayout = new QGridLayout(presetCoordinatesTab);
-    presetCoordLayout->addWidget(new QLabel("Choose origo: "),0,0,1,1);
-    presetCoordLayout->addWidget(presetOrigoComboBox,0,1,1,1);
-    presetCoordLayout->addWidget(initializeButton,0,2,1,1);
+    presetCoordLayout->addWidget(new QLabel("Choose origo: "),0,0,4,1);
+    presetCoordLayout->addWidget(presetOrigoComboBox,0,1,4,1);
+    presetCoordLayout->addWidget(initializeButton,0,2,4,1);
 
     presetOrigoComboBox->clear();
     presetOrigoComboBox->insertItems(0, QStringList()
@@ -144,25 +146,14 @@ void InitializeTab::setupUi(QWidget *parent)
     initializeButton->setToolTip(QApplication::translate("Ur5Widget", "Initialize workspace", 0));
     initializeButton->setText(QApplication::translate("Ur5Widget", "Initialize", 0));
 
-    presetCoordLayout->addWidget(initializeProgressBar,2,0,1,3);
-    initializeProgressValue=0;
-    initializeProgressBar->setValue(initializeProgressValue);
-    initializeProgressBar->setAlignment(Qt::AlignCenter);
-    initializeProgressBar->setFormat("Initializing "+QString::number(initializeProgressValue)+"%");
-
     QGridLayout *manualCoordLayout = new QGridLayout(manualCoordinatesTab);
     manualCoordLayout->addWidget(new QLabel("Set coordinates: "), 0, 0, 1, 1);
     manualCoordLayout->addWidget(manualCoordinatesLineEdit,0,1,1,1);
     manualCoordLayout->addWidget(initializeButton_2,0,2,1,1);
-    manualCoordLayout->addWidget(initializeProgressBar_2,2,0,1,3);
 
     manualCoordinatesLineEdit->setText(QApplication::translate("Ur5Widget", "(x,y,z,rx,ry,rz)", 0));
     initializeButton_2->setToolTip(QApplication::translate("Ur5Widget", "Initialize workspace", 0));
     initializeButton_2->setText(QApplication::translate("Ur5Widget", "Initialize", 0));
-
-    initializeProgressBar_2->setValue(initializeProgressValue);
-    initializeProgressBar_2->setAlignment(Qt::AlignCenter);
-    initializeProgressBar_2->setFormat("Initializing "+QString::number(initializeProgressValue)+"%");
 
     row++;
     mainLayout->addWidget(disconnectButton,row,3,1,1);
@@ -200,12 +191,22 @@ ManualMoveTab::ManualMoveTab(Ur5ConnectionPtr ur5Connection,QWidget *parent) :
 {
     setupUi(this);
 
+    QTimer *timer = new QTimer(this);
+    connect(timer,SIGNAL(timeout()),this,SLOT(updateState()));
+    timer->start(100);
+
     posZButton->setAutoRepeat(true);
     negZButton->setAutoRepeat(true);
     posXButton->setAutoRepeat(true);
     negXButton->setAutoRepeat(true);
     posYButton->setAutoRepeat(true);
     negYButton->setAutoRepeat(true);
+    rotPosXButton->setAutoRepeat(true);
+    rotNegXButton->setAutoRepeat(true);
+    rotPosYButton->setAutoRepeat(true);
+    rotNegYButton->setAutoRepeat(true);
+    rotPosZButton->setAutoRepeat(true);
+    rotNegZButton->setAutoRepeat(true);
 
     connect(posXButton,SIGNAL(pressed()),this,SLOT(posXButtonPressedSlot()));
     connect(posXButton,SIGNAL(released()),this,SLOT(moveButtonReleasedSlot()));
@@ -224,6 +225,24 @@ ManualMoveTab::ManualMoveTab(Ur5ConnectionPtr ur5Connection,QWidget *parent) :
 
     connect(negZButton,SIGNAL(pressed()),this,SLOT(negZButtonPressedSlot()));
     connect(negZButton,SIGNAL(released()),this,SLOT(moveButtonReleasedSlot()));
+
+    connect(rotPosXButton,SIGNAL(pressed()),this,SLOT(posRXButtonPressedSlot()));
+    connect(rotPosXButton,SIGNAL(released()),this,SLOT(moveButtonReleasedSlot()));
+
+    connect(rotNegXButton,SIGNAL(pressed()),this,SLOT(negRXButtonPressedSlot()));
+    connect(rotNegXButton,SIGNAL(released()),this,SLOT(moveButtonReleasedSlot()));
+
+    connect(rotPosYButton,SIGNAL(pressed()),this,SLOT(posRYButtonPressedSlot()));
+    connect(rotPosYButton,SIGNAL(released()),this,SLOT(moveButtonReleasedSlot()));
+
+    connect(rotNegYButton,SIGNAL(pressed()),this,SLOT(negRYButtonPressedSlot()));
+    connect(rotNegYButton,SIGNAL(released()),this,SLOT(moveButtonReleasedSlot()));
+
+    connect(rotPosZButton,SIGNAL(pressed()),this,SLOT(posRZButtonPressedSlot()));
+    connect(rotPosZButton,SIGNAL(released()),this,SLOT(moveButtonReleasedSlot()));
+
+    connect(rotNegZButton,SIGNAL(pressed()),this,SLOT(negRZButtonPressedSlot()));
+    connect(rotNegZButton,SIGNAL(released()),this,SLOT(moveButtonReleasedSlot()));
 }
 
 ManualMoveTab::~ManualMoveTab()
@@ -237,10 +256,12 @@ void ManualMoveTab::setupUi(QWidget *parent)
     QWidget *keyWidget = new QWidget();
     QGridLayout *keyLayout = new QGridLayout(keyWidget);
     keyLayout->setSpacing(0);
+    keyLayout->setMargin(0);
 
     QWidget *rotKeyWidget = new QWidget();
     QGridLayout *rotKeyLayout = new QGridLayout(rotKeyWidget);
     rotKeyLayout->setSpacing(0);
+    rotKeyLayout->setMargin(0);
 
     QWidget *velAccWidget = new QWidget();
     QGridLayout *velAccLayout = new QGridLayout(velAccWidget);
@@ -263,10 +284,14 @@ void ManualMoveTab::setupUi(QWidget *parent)
     rotNegXButton = new QPushButton();
 
     int row=0;
-    mainLayout->addWidget(keyWidget,row,0,1,1);
-    mainLayout->addWidget(rotKeyWidget,row,1,1,1);
+    mainLayout->addWidget(new QLabel("Translational motion"),row,0,1,1,Qt::AlignCenter);
+    mainLayout->addWidget(new QLabel("Rotational motion"),row,1,1,1,Qt::AlignCenter);
 
     row++;
+    mainLayout->addWidget(keyWidget,row,0,3,1,Qt::AlignCenter);
+    mainLayout->addWidget(rotKeyWidget,row,1,3,1,Qt::AlignCenter);
+
+    row=row+3;
     QFrame *line = new QFrame();
     line->setFrameShape(QFrame::HLine);
     line->setFrameShadow(QFrame::Sunken);
@@ -274,7 +299,7 @@ void ManualMoveTab::setupUi(QWidget *parent)
 
     row++;
     mainLayout->addWidget(velAccWidget,row,0,1,1);
-    mainLayout->addWidget(coordInfoWidget,row,1,1,1);
+    mainLayout->addWidget(coordInfoWidget,row,1,3,1);
 
     int krow=0;
     keyLayout->addWidget(posZButton, krow, 0, 1, 1);
@@ -419,21 +444,6 @@ void ManualMoveTab::setupUi(QWidget *parent)
     timeLineEdit->setText(QApplication::translate("Ur5Widget", "0.5", 0));
     velAccLayout->addWidget(new QLabel("s"), 2, 2, 1, 1);
 
-    // X coordinate scrollbar
-    xScrollBar = new QScrollBar();
-    xScrollBar->setOrientation(Qt::Horizontal);
-    coordInfoLayout->addWidget(xScrollBar, 0, 1, 1, 1);
-
-    // Y coordinate scrollbar
-    yScrollBar = new QScrollBar();
-    yScrollBar->setOrientation(Qt::Horizontal);
-    coordInfoLayout->addWidget(yScrollBar, 1, 1, 1, 1);
-
-    // Z coordinate scrollbar
-    zScrollBar = new QScrollBar();
-    zScrollBar->setOrientation(Qt::Horizontal);
-    coordInfoLayout->addWidget(zScrollBar, 3, 1, 1, 1);
-
     // Position label
     coordInfoLayout->addWidget(new QLabel("X"), 0, 0, 1, 1, Qt::AlignHCenter);
     coordInfoLayout->addWidget(new QLabel("Y"), 1, 0, 1, 1, Qt::AlignHCenter);
@@ -462,21 +472,6 @@ void ManualMoveTab::setupUi(QWidget *parent)
     yPosLineEdit = new QLineEdit();
     coordInfoLayout->addWidget(yPosLineEdit, 1, 2, 1, 1);
 
-    // RX orientation scrollbar
-    rxScrollBar = new QScrollBar();
-    rxScrollBar->setOrientation(Qt::Horizontal);
-    coordInfoLayout->addWidget(rxScrollBar, 5, 1, 1, 1);
-
-    // RY orientation scrollbar
-    ryScrollBar = new QScrollBar();
-    ryScrollBar->setOrientation(Qt::Horizontal);
-    coordInfoLayout->addWidget(ryScrollBar, 6, 1, 1, 1);
-
-    // RZ orientation scrollbar
-    rzScrollBar = new QScrollBar();
-    rzScrollBar->setOrientation(Qt::Horizontal);
-    coordInfoLayout->addWidget(rzScrollBar, 7, 1, 1, 1);
-
     // Line edit for RY orientation
     ryLineEdit = new QLineEdit();
     ryLineEdit->setObjectName(QStringLiteral("ryLineEdit"));
@@ -498,10 +493,26 @@ void ManualMoveTab::setupUi(QWidget *parent)
     coordInfoLayout->addWidget(rxLineEdit, 5, 2, 1, 1);
 }
 
+void ManualMoveTab::updateState()
+{
+    if(connection->isConnectedToRobot())
+    {
+        emit(connection->update_currentState());
+    }
+    emit(updatePositionSlot());
+}
+
 void ManualMoveTab::coordButtonPressed(int axis, int sign)
 {
     Ur5State velocity;
     velocity.jointAxisVelocity(axis)=(sign)*velocityLineEdit->text().toDouble();
+    connection->sendMessage(connection->transmitter.speedl(velocity,accelerationLineEdit->text(),timeLineEdit->text()));
+}
+
+void ManualMoveTab::rotButtonPressed(int angle, int sign)
+{
+    Ur5State velocity;
+    velocity.jointAngleVelocity(angle)=(sign)*velocityLineEdit->text().toDouble();
     connection->sendMessage(connection->transmitter.speedl(velocity,accelerationLineEdit->text(),timeLineEdit->text()));
 }
 
@@ -535,15 +546,61 @@ void ManualMoveTab::negXButtonPressedSlot()
     emit(coordButtonPressed(0,-1));
 }
 
+void ManualMoveTab::posRXButtonPressedSlot()
+{
+    emit(rotButtonPressed(0,1));
+}
+
+void ManualMoveTab::negRXButtonPressedSlot()
+{
+    emit(rotButtonPressed(0,-1));
+}
+
+void ManualMoveTab::posRYButtonPressedSlot()
+{
+    emit(rotButtonPressed(1,1));
+}
+
+void ManualMoveTab::negRYButtonPressedSlot()
+{
+    emit(rotButtonPressed(1,-1));
+}
+
+void ManualMoveTab::posRZButtonPressedSlot()
+{
+    emit(rotButtonPressed(2,1));
+}
+
+void ManualMoveTab::negRZButtonPressedSlot()
+{
+    emit(rotButtonPressed(2,-1));
+}
+
+
 void ManualMoveTab::moveButtonReleasedSlot()
 {
     emit(connection->sendMessage(connection->transmitter.stopl(accelerationLineEdit->text())));
 }
 
-PlannedMoveTab::PlannedMoveTab(QWidget *parent) :
-    QWidget(parent)
+void ManualMoveTab::updatePositionSlot()
+{
+    xPosLineEdit->setText(QString::number(connection->currentState.cartAxis(0)));
+    yPosLineEdit->setText(QString::number(connection->currentState.cartAxis(1)));
+    zPosLineEdit->setText(QString::number(connection->currentState.cartAxis(2)));
+    rxLineEdit->setText(QString::number(connection->currentState.cartAngles(0)));
+    ryLineEdit->setText(QString::number(connection->currentState.cartAngles(1)));
+    rzLineEdit->setText(QString::number(connection->currentState.cartAngles(2)));
+}
+
+PlannedMoveTab::PlannedMoveTab(Ur5ConnectionPtr ur5connection, QWidget *parent) :
+    QWidget(parent),
+    connection(ur5connection),
+    vtkLineEdit(new QLineEdit()),
+    runVTKButton(new QPushButton())
 {
     setupUi(this);
+
+    connect(runVTKButton,SIGNAL(clicked()),this,SLOT(runVTKfileSlot()));
 }
 
 PlannedMoveTab::~PlannedMoveTab()
@@ -553,7 +610,60 @@ PlannedMoveTab::~PlannedMoveTab()
 
 void PlannedMoveTab::setupUi(QWidget *parent)
 {
+    QGridLayout *mainLayout = new QGridLayout(this);
+
+    int row = 0;
+    mainLayout->addWidget(new QLabel("Path to .vtk file: "), row, 0, 1, 1);
+    mainLayout->addWidget(vtkLineEdit, row, 1,1,1,Qt::AlignCenter);
+    mainLayout->addWidget(runVTKButton,row,2,1,1);
+
+    runVTKButton->setToolTip("Follow VTK line");
+    runVTKButton->setText("Run");
+
+    vtkLineEdit->setText("C:\\artery_centerline_fixed_2.vtk");
+
+    QWidget *velAccWidget = new QWidget();
+    QGridLayout *velAccLayout = new QGridLayout(velAccWidget);
+
+    row++;
+    QFrame *line = new QFrame();
+    line->setFrameShape(QFrame::HLine);
+    line->setFrameShadow(QFrame::Sunken);
+    mainLayout->addWidget(line,row,0,1,3);
+
+    row++;
+    mainLayout->addWidget(velAccWidget,row,0,1,1);
+
+    // Velocity
+    velAccLayout->addWidget(new QLabel("Velocity"), 0, 0, 1, 1);
+    velocityLineEdit = new QLineEdit();
+    velAccLayout->addWidget(velocityLineEdit, 0, 1, 1, 1);
+    velocityLineEdit->setText(QApplication::translate("Ur5Widget", "0.05", 0));
+    velAccLayout->addWidget(new QLabel("m/s"), 0, 2, 1, 1);
+
+    // Acceleration
+    accelerationLineEdit = new QLineEdit();
+    velAccLayout->addWidget(accelerationLineEdit, 1, 1, 1, 1);
+    accelerationLineEdit->setText(QApplication::translate("Ur5Widget", "0.1", 0));
+    velAccLayout->addWidget(new QLabel("Acceleration"), 1, 0, 1, 1);
+    velAccLayout->addWidget(new QLabel("m/s^2"), 1, 2, 1, 1);
+
+    // Time
+    velAccLayout->addWidget(new QLabel("Time"), 2, 0, 1, 1);
+    timeLineEdit = new QLineEdit();
+    velAccLayout->addWidget(timeLineEdit, 2, 1, 1, 1);
+    timeLineEdit->setText(QApplication::translate("Ur5Widget", "0.5", 0));
+    velAccLayout->addWidget(new QLabel("s"), 2, 2, 1, 1);
+
 
 }
+
+void PlannedMoveTab::runVTKfileSlot()
+{
+    connection->transmitter.openVTKfile(vtkLineEdit->text());
+    connection->transmitter.movejProgram(connection->transmitter.poseQueue,accelerationLineEdit->text().toDouble(),velocityLineEdit->text().toDouble(),0);
+    emit(connection->runProgramQueue());
+}
+
 
 } /* namespace cx */

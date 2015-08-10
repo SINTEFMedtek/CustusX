@@ -78,6 +78,9 @@ public:
     Ur5Widget(QWidget* parent = 0);
     virtual ~Ur5Widget();
 
+public slots:
+
+
 private:
     QTabWidget* tabWidget;
     void setupUi(QWidget *parent);
@@ -95,7 +98,6 @@ public:
     QLineEdit *ipLineEdit, *manualCoordinatesLineEdit;
     QPushButton *connectButton, *disconnectButton, *initializeButton, *initializeButton_2;
     QComboBox *presetOrigoComboBox;
-    QProgressBar *initializeProgressBar,*initializeProgressBar_2;
 
 protected slots:
     void connectButtonSlot();
@@ -106,7 +108,6 @@ protected slots:
 private:
     void setupUi(QWidget *parent);
     Ur5ConnectionPtr connection;
-
 };
 
 class org_custusx_robot_ur5_EXPORT ManualMoveTab : public QWidget
@@ -119,22 +120,37 @@ public:
     QPushButton *negZButton, *posZButton, *posXButton, *negYButton, *posYButton, *negXButton;
     QPushButton *rotNegZButton, *rotPosZButton, *rotPosXButton, *rotNegYButton, *rotPosYButton, *rotNegXButton;
 
-    QScrollBar *xScrollBar, *yScrollBar, *zScrollBar;
     QLineEdit *xPosLineEdit, *yPosLineEdit, *zPosLineEdit;
-    QScrollBar *rxScrollBar, *ryScrollBar, *rzScrollBar;
+
     QLineEdit *rxLineEdit, *ryLineEdit, *rzLineEdit;
     QLineEdit *accelerationLineEdit, *velocityLineEdit, *timeLineEdit;
 
     void coordButtonPressed(int axis,int sign);
+    void rotButtonPressed(int axis,int sign);
+
 
 public slots:
     void moveButtonReleasedSlot();
+
     void posZButtonPressedSlot();
     void negZButtonPressedSlot();
     void posYButtonPressedSlot();
     void negYButtonPressedSlot();
     void posXButtonPressedSlot();
     void negXButtonPressedSlot();
+
+    void posRXButtonPressedSlot();
+    void negRXButtonPressedSlot();
+    void posRYButtonPressedSlot();
+    void negRYButtonPressedSlot();
+    void posRZButtonPressedSlot();
+    void negRZButtonPressedSlot();
+
+
+    void updatePositionSlot();
+
+    void updateState();
+
 
 private:
     void setupUi(QWidget *parent);
@@ -145,15 +161,21 @@ class org_custusx_robot_ur5_EXPORT PlannedMoveTab : public QWidget
 {
     Q_OBJECT
 public:
-    PlannedMoveTab(QWidget *parent = 0);
+    PlannedMoveTab(Ur5ConnectionPtr Ur5Connection, QWidget *parent = 0);
     virtual ~PlannedMoveTab();
 
+    QPushButton* runVTKButton;
+    QLineEdit* vtkLineEdit;
+
+    QLineEdit *accelerationLineEdit, *velocityLineEdit, *timeLineEdit;
+
 protected slots:
+    void runVTKfileSlot();
 
 private:
     void setupUi(QWidget *parent);
+    Ur5ConnectionPtr connection;
 };
-
 
 } /* namespace cx */
 

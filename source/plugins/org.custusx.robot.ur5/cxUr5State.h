@@ -6,6 +6,7 @@
 
 namespace cx
 {
+typedef boost::shared_ptr<struct Ur5State> Ur5StatePtr;
 /**
  * Struct that handles UR5 robot spatial information.
  *
