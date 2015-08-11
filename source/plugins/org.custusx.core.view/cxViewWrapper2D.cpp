@@ -549,7 +549,6 @@ void ViewWrapper2D::dataViewPropertiesChangedSlot(QString uid)
 
 void ViewWrapper2D::dataAdded(DataPtr data)
 {
-    CX_LOG_DEBUG() << "dataAdded data " << data->getName();
 	if (boost::dynamic_pointer_cast<Image>(data))
 	{
 		this->imageAdded(boost::dynamic_pointer_cast<Image>(data));
@@ -563,7 +562,6 @@ void ViewWrapper2D::dataAdded(DataPtr data)
 
 void ViewWrapper2D::dataRemoved(const QString& uid)
 {
-    CX_LOG_DEBUG() << "dataRemoved uid: " << uid;
 	mDataRepContainer->removeData(uid);
 	this->updateView();
 }
