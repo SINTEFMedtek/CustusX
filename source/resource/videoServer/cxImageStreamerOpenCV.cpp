@@ -240,7 +240,7 @@ void ImageStreamerOpenCV::initialize_local()
 	{
 		mVideoCapture->grab();
 	}
-	catch(cv::Exception e)
+	catch(cv::Exception& e)
 	{
 		CX_LOG_ERROR() << "OpenCV failed with message: " << e.what();
 		mVideoCapture->release();

@@ -80,7 +80,7 @@ void ViewContainer::clear()
   */
 QGridLayout* ViewContainer::getGridLayout()
 {
-	return (QGridLayout*) layout();
+    return dynamic_cast<QGridLayout*>(layout());
 }
 
 void ViewContainer::paintEvent(QPaintEvent* event)

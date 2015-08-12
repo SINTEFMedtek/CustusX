@@ -141,7 +141,7 @@ void OptionsWidget::populate(bool showAdvanced)
 			else
 			{
 				groupWidget = it->second;
-				groupLayout = (QGridLayout*) groupWidget->layout();
+				groupLayout = dynamic_cast<QGridLayout*>(groupWidget->layout());
 			}
 
 			//count groupwidgets items to determine row
