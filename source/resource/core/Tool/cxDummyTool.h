@@ -97,9 +97,9 @@ public:
 	virtual void applyNewConfigurationWithId(QString uid) {}
 	virtual void setTemporalCalibration(double val) {}
 	virtual void setSoundSpeedCompensationFactor(double val) {}
-	virtual void setProbeSector(ProbeDefinition probeSector)
+	virtual void setProbeDefinition(ProbeDefinition probeDefinition)
 	{
-		mProbeDefinition = probeSector;
+		mProbeDefinition = probeDefinition;
 		emit sectorChanged();
 	}
 	virtual void setRTSource(VideoSourcePtr source)
@@ -191,7 +191,7 @@ public:
 	{
 		mProbeDefinition = probeDefinition;
 		mProbe.reset(new DummyProbe());
-		mProbe->setProbeSector(mProbeDefinition);
+		mProbe->setProbeDefinition(mProbeDefinition);
 		emit toolProbeSector();
 	}
 	void setProbeSector(ProbePtr probe)

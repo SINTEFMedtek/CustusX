@@ -234,7 +234,7 @@ void VideoConnection::resetProbe()
 	{
 		ProbeDefinition data = probe->getProbeDefinition();
 		data.setUseDigitalVideo(false);
-		probe->setProbeSector(data);
+		probe->setProbeDefinition(data);
 	}
 }
 
@@ -269,7 +269,7 @@ void VideoConnection::updateStatus(ProbeDefinitionPtr msg)
 	data.setClipRect_p(msg->getClipRect_p());
 	data.setUseDigitalVideo(true);
 
-	probe->setProbeSector(data);
+	probe->setProbeDefinition(data);
 	probe->setActiveStream(msg->getUid());
 }
 

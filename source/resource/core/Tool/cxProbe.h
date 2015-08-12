@@ -72,7 +72,7 @@ public:
 	virtual void applyNewConfigurationWithId(QString uid) = 0;
 	virtual void setTemporalCalibration(double val) = 0;
 	virtual void setSoundSpeedCompensationFactor(double val) = 0;
-	virtual void setProbeSector(ProbeDefinition probeSector) = 0;
+	virtual void setProbeDefinition(ProbeDefinition probeDefinition) = 0;
 	virtual void setRTSource(VideoSourcePtr source) = 0;
 	virtual void removeRTSource(VideoSourcePtr source) = 0;
 

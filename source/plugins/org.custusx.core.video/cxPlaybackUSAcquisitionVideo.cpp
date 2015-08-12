@@ -203,7 +203,7 @@ void USAcquisitionVideoPlayback::usDataLoadFinishedSlot()
 	{
 		ProbePtr probe = tool->getProbe();
 		if (probe)
-			probe->setProbeSector(mCurrentData.mProbeDefinition.mData);
+			probe->setProbeDefinition(mCurrentData.mProbeDefinition.mData);
 	}
 
 	// create a vector to allow for quick search

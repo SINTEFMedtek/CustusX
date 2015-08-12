@@ -208,7 +208,7 @@ void OpenIGTLinkTrackingSystemService::receiveProbedefinition(QString devicename
     ProbeDefinition old_def = probe->getProbeDefinition();
     definition->setUid(old_def.getUid());
 
-    probe->setProbeSector(*(definition.get()));
+    probe->setProbeDefinition(*(definition.get()));
 }
 
 void OpenIGTLinkTrackingSystemService::internalSetState(Tool::State state)

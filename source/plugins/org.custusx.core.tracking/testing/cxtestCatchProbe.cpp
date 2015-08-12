@@ -74,7 +74,7 @@ TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Use digital video setting", "[uni
 	CHECK(mProbe->getRtSourceName().compare(mDefaultRtSourceName) == 0);
 	cx::ProbeDefinition data = mProbe->getProbeDefinition();
 	data.setUseDigitalVideo(true);
-	mProbe->setProbeSector(data);
+	mProbe->setProbeDefinition(data);
 	CHECK(mProbe->getProbeDefinition().getUseDigitalVideo());
 //	CHECK(mProbe->getRtSourceName().compare("Digital") == 0);
 	CHECK(mProbe->getConfigId().compare("Digital") == 0);
@@ -88,7 +88,7 @@ TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Use digital video setting with no
 	CHECK(mProbe->getRtSourceName().compare(mDefaultRtSourceName) == 0);
 	cx::ProbeDefinition data = mProbe->getProbeDefinition();
 	data.setUseDigitalVideo(true);
-	mProbe->setProbeSector(data);
+	mProbe->setProbeDefinition(data);
 	CHECK(mProbe->getProbeDefinition().getUseDigitalVideo());
 //	CHECK(mProbe->getRtSourceName().compare("Digital") == 0);
 	CHECK(mProbe->getConfigId().compare("Digital") == 0);
@@ -113,7 +113,7 @@ TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Use Default probe sector", "[unit
 
 TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Use Custom probe sector", "[unit][service][tracking][org.custus.core.tracking]")
 {
-	mProbe->setProbeSector(this->createProbeDefinition());
+	mProbe->setProbeDefinition(this->createProbeDefinition());
 	CHECK(mProbe->getSector(mProbeDefinitionUid));
 	CHECK(mProbe->getProbeDefinition(mProbeDefinitionUid).getUid().compare(mProbeDefinitionUid) == 0);
 	CHECK(cx::similar(mProbe->getProbeDefinition(mProbeDefinitionUid).getTemporalCalibration(), mTemporalCalibration));
@@ -121,7 +121,7 @@ TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Use Custom probe sector", "[unit]
 
 TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Set active stream to custom probe sector", "[unit][service][tracking][org.custus.core.tracking]")
 {
-	mProbe->setProbeSector(this->createProbeDefinition());
+	mProbe->setProbeDefinition(this->createProbeDefinition());
 	CHECK(mProbe->getProbeDefinition().getUid().compare(mDefaultProbeDefinitionUid) == 0);
 
 	mProbe->setActiveStream(mProbeDefinitionUid);

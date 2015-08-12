@@ -152,7 +152,7 @@ void ProbeAdapterRTSource::newFrameSlot()
 		            .arg(uid));
 
 		data.resample(dimImage);
-		probe->setProbeSector(data);
+		probe->setProbeDefinition(data);
 	}
 
 }

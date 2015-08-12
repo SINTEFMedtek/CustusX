@@ -190,12 +190,12 @@ void ProbeImpl::setSoundSpeedCompensationFactor(double factor)
 	emit sectorChanged();
 }
 
-void ProbeImpl::setProbeSector(ProbeDefinition probeSector)
+void ProbeImpl::setProbeDefinition(ProbeDefinition probeDefinition)
 {
-	if (probeSector.getUid().isEmpty())
-		probeSector.setUid(mActiveUid);
+	if (probeDefinition.getUid().isEmpty())
+		probeDefinition.setUid(mActiveUid);
 
-	mProbeDefinition[probeSector.getUid()] = probeSector;
+	mProbeDefinition[probeDefinition.getUid()] = probeDefinition;
 	emit sectorChanged();
 }
 
@@ -392,7 +392,7 @@ void ProbeImpl::updateProbeSector()
 	if(this->isValidConfigId() && !this->getProbeDefinition().getUseDigitalVideo())
 	{
 		ProbeDefinition probeSector = this->createProbeSector();
-		this->setProbeSector(probeSector);
+		this->setProbeDefinition(probeSector);
 	}
 }
 
