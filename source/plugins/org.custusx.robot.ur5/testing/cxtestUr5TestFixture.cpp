@@ -36,9 +36,9 @@ namespace cxtest
 {
 
 Ur5TestFixture::Ur5TestFixture() :
-    connection("169.254.62.100", 30002)
+    connection("169.254.62.100", 30003)
 {
-    connection.tryConnectAndWait();
+    //connection.tryConnectAndWait();
     //connection.requestConnect();
 }
 

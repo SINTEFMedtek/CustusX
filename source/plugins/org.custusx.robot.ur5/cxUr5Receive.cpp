@@ -54,9 +54,10 @@ bool Ur5Receive::isValidPacket(QByteArray data)
 
 bool Ur5Receive::isValidHeader(QByteArray data)
 {
-    std::set<int> typeLength = {53,251,29,37,64}; // Cart. info, Joint data, Robot modus, Robot data1, Robot data2
-    std::set<int> types = {4,1,0,2,3,20}; // Cart. info, Joint data, Robot modus, Robot data1, Robot data2, Robot Messages
+    std::set<int> typeLength = {53,251,29,37,64,61}; // Cart. info, Joint data, Robot modus, Robot data1, Robot data2
+    std::set<int> types = {4,1,0,2,3,20,7}; // Cart. info, Joint data, Robot modus, Robot data1, Robot data2, Robot Messages, Force data
 
+    //std::cout << headerID(data) << " " << headerLength(data) << std::endl;
     return (typeLength.find(headerLength(data)) != typeLength.end()
             && types.find(headerID(data)) !=types.end());
 }
@@ -70,6 +71,10 @@ void Ur5Receive::push_state(QByteArray data,Ur5State &state)
     if(data.size() == 53)
     {
         set_cartData(removeHeader(data),state);
+    }
+    if(data.size() == 61)
+    {
+        set_forceData(removeHeader(data),state);
     }
 }
 
@@ -111,6 +116,21 @@ void Ur5Receive::set_jointData(QByteArray jointData, Ur5State &state)
                      (unsigned long long *)&state.jointAngleVelocity(i-3));
             sscanf_s(jointData.mid(i*41,sizeof(double)).toHex().data(), "%llx",
                      (unsigned long long *)&state.jointAngles(i-3));
+        }
+    }
+}
+
+void Ur5Receive::set_forceData(QByteArray forceData, Ur5State &state)
+{
+    for(int i=0;i<6;i++)
+    {
+        if(i<3)
+        {
+            sscanf_s(forceData.mid(i*sizeof(double),sizeof(double)).toHex().data(), "%llx",(unsigned long long *)&state.force(i));
+        }
+        else
+        {
+            sscanf_s(forceData.mid(i*sizeof(double),sizeof(double)).toHex().data(), "%llx",(unsigned long long *)&state.torque(i-3));
         }
     }
 }

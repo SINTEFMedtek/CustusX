@@ -25,6 +25,7 @@ struct org_custusx_robot_ur5_EXPORT Ur5State
     Vector3D cartAxis,cartAngles;
     Vector3D jointAxis,jointAngles;
     Vector3D jointAxisVelocity,jointAngleVelocity;
+    Vector3D force,torque;
 };
 
 

@@ -37,6 +37,7 @@ public:
     void push_state(QByteArray data, Ur5State &state);
     void set_cartData(QByteArray cartData, Ur5State &state);
     void set_jointData(QByteArray jointData,Ur5State &state);
+    void set_forceData(QByteArray forceData,Ur5State &state);
 
     void print_cartData(Ur5State);
     void print_cartData(Ur5StatePtr);

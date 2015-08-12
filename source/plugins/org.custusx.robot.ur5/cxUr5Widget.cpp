@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QTimer>
+#include "cxLogger.h"
 
 
 namespace cx
@@ -68,11 +69,10 @@ void Ur5Widget::setupUi(QWidget *Ur5Widget)
     tabWidget->addTab(new InitializeTab(connection), tr("Initialize"));
     tabWidget->addTab(new ManualMoveTab(connection),tr("Manual movement"));
     tabWidget->addTab(new PlannedMoveTab(connection),tr("Planned movement"));
+    tabWidget->addTab(new InformationTab(connection),tr("Advanced information"));
 
     QMetaObject::connectSlotsByName(Ur5Widget);
 }
-
-
 
 InitializeTab::InitializeTab(Ur5ConnectionPtr ur5connection,QWidget *parent) :
     QWidget(parent),
@@ -99,6 +99,7 @@ InitializeTab::~InitializeTab()
 void InitializeTab::setupUi(QWidget *parent)
 {
     QGridLayout *mainLayout = new QGridLayout(this);
+    mainLayout->setAlignment(Qt::AlignTop);
 
     int row = 0;
     mainLayout->addWidget(new QLabel("IP Address: "), row, 0, 1, 1);
@@ -131,10 +132,12 @@ void InitializeTab::setupUi(QWidget *parent)
     setCoordinatesTab->addTab(manualCoordinatesTab,tr("Manual coordinates"));
     mainLayout->addWidget(setCoordinatesTab,row,0,1,4);
 
-    QGridLayout *presetCoordLayout = new QGridLayout(presetCoordinatesTab);
-    presetCoordLayout->addWidget(new QLabel("Choose origo: "),0,0,4,1);
-    presetCoordLayout->addWidget(presetOrigoComboBox,0,1,4,1);
-    presetCoordLayout->addWidget(initializeButton,0,2,4,1);
+    QHBoxLayout *presetCoordLayout = new QHBoxLayout(presetCoordinatesTab);
+    presetCoordLayout->setAlignment(Qt::AlignTop);
+
+    presetCoordLayout->addWidget(new QLabel("Choose origo: "));
+    presetCoordLayout->addWidget(presetOrigoComboBox);
+    presetCoordLayout->addWidget(initializeButton);
 
     presetOrigoComboBox->clear();
     presetOrigoComboBox->insertItems(0, QStringList()
@@ -147,6 +150,7 @@ void InitializeTab::setupUi(QWidget *parent)
     initializeButton->setText(QApplication::translate("Ur5Widget", "Initialize", 0));
 
     QGridLayout *manualCoordLayout = new QGridLayout(manualCoordinatesTab);
+    manualCoordLayout->setAlignment(Qt::AlignTop);
     manualCoordLayout->addWidget(new QLabel("Set coordinates: "), 0, 0, 1, 1);
     manualCoordLayout->addWidget(manualCoordinatesLineEdit,0,1,1,1);
     manualCoordLayout->addWidget(initializeButton_2,0,2,1,1);
@@ -182,7 +186,20 @@ void InitializeTab::checkConnection()
 
 void InitializeTab::initializeButtonSlot()
 {
-    emit(connection->initializeWorkspace(0.00005));
+    if(presetOrigoComboBox->currentText() == "Buttom right corner")
+    {
+        report("Moving to buttom right corner.");
+        emit(connection->initializeWorkspace(0.00005));
+    }
+    else if(presetOrigoComboBox->currentText() == "Current position")
+    {
+       report("Setting current pos to origo");
+       emit(connection->initializeWorkspace(0.000005,Ur5State(0,0,0,0,0,0),true));
+    }
+    else
+    {
+        report("Initializing did not work.");
+    }
 }
 
 ManualMoveTab::ManualMoveTab(Ur5ConnectionPtr ur5Connection,QWidget *parent) :
@@ -584,9 +601,9 @@ void ManualMoveTab::moveButtonReleasedSlot()
 
 void ManualMoveTab::updatePositionSlot()
 {
-    xPosLineEdit->setText(QString::number(connection->currentState.cartAxis(0)));
-    yPosLineEdit->setText(QString::number(connection->currentState.cartAxis(1)));
-    zPosLineEdit->setText(QString::number(connection->currentState.cartAxis(2)));
+    xPosLineEdit->setText(QString::number(1000*(connection->currentState.cartAxis(0))));
+    yPosLineEdit->setText(QString::number(1000*(connection->currentState.cartAxis(1))));
+    zPosLineEdit->setText(QString::number(1000*(connection->currentState.cartAxis(2))));
     rxLineEdit->setText(QString::number(connection->currentState.cartAngles(0)));
     ryLineEdit->setText(QString::number(connection->currentState.cartAngles(1)));
     rzLineEdit->setText(QString::number(connection->currentState.cartAngles(2)));
@@ -596,11 +613,13 @@ PlannedMoveTab::PlannedMoveTab(Ur5ConnectionPtr ur5connection, QWidget *parent) 
     QWidget(parent),
     connection(ur5connection),
     vtkLineEdit(new QLineEdit()),
-    runVTKButton(new QPushButton())
+    runVTKButton(new QPushButton()),
+    goToOrigoButton(new QPushButton())
 {
     setupUi(this);
 
     connect(runVTKButton,SIGNAL(clicked()),this,SLOT(runVTKfileSlot()));
+    connect(goToOrigoButton,SIGNAL(clicked()),this,SLOT(goToOrigoButtonSlot()));
 }
 
 PlannedMoveTab::~PlannedMoveTab()
@@ -610,52 +629,53 @@ PlannedMoveTab::~PlannedMoveTab()
 
 void PlannedMoveTab::setupUi(QWidget *parent)
 {
-    QGridLayout *mainLayout = new QGridLayout(this);
+    QVBoxLayout *vertLayout = new QVBoxLayout(this);
+    vertLayout->setAlignment(Qt::AlignTop);
+    QHBoxLayout *layout1 = new QHBoxLayout();
 
-    int row = 0;
-    mainLayout->addWidget(new QLabel("Path to .vtk file: "), row, 0, 1, 1);
-    mainLayout->addWidget(vtkLineEdit, row, 1,1,1,Qt::AlignCenter);
-    mainLayout->addWidget(runVTKButton,row,2,1,1);
+    layout1->addWidget(new QLabel("Path to .vtk file: "));
+    layout1->addWidget(vtkLineEdit);
+    layout1->addWidget(runVTKButton);
 
     runVTKButton->setToolTip("Follow VTK line");
     runVTKButton->setText("Run");
 
     vtkLineEdit->setText("C:\\artery_centerline_fixed_2.vtk");
 
-    QWidget *velAccWidget = new QWidget();
-    QGridLayout *velAccLayout = new QGridLayout(velAccWidget);
+    vertLayout->addLayout(layout1);
 
-    row++;
     QFrame *line = new QFrame();
     line->setFrameShape(QFrame::HLine);
     line->setFrameShadow(QFrame::Sunken);
-    mainLayout->addWidget(line,row,0,1,3);
+    vertLayout->addWidget(line);
+
+    vertLayout->addWidget(goToOrigoButton);
+
+    QFrame *line1 = new QFrame();
+    line1->setFrameShape(QFrame::HLine);
+    line1->setFrameShadow(QFrame::Sunken);
+    vertLayout->addWidget(line1);
+
+    QGridLayout *mainLayout = new QGridLayout();
+
+    int row = 0;
+    // Velocity
+    mainLayout->addWidget(new QLabel("Velocity"), row, 0, 1, 1);
+    velocityLineEdit = new QLineEdit();
+    mainLayout->addWidget(velocityLineEdit, row, 1, 1, 1);
+    velocityLineEdit->setText(QApplication::translate("Ur5Widget", "0.05", 0));
+    mainLayout->addWidget(new QLabel("m/s"), row, 2, 1, 1);
+    goToOrigoButton->setText("Go to origo");
 
     row++;
-    mainLayout->addWidget(velAccWidget,row,0,1,1);
-
-    // Velocity
-    velAccLayout->addWidget(new QLabel("Velocity"), 0, 0, 1, 1);
-    velocityLineEdit = new QLineEdit();
-    velAccLayout->addWidget(velocityLineEdit, 0, 1, 1, 1);
-    velocityLineEdit->setText(QApplication::translate("Ur5Widget", "0.05", 0));
-    velAccLayout->addWidget(new QLabel("m/s"), 0, 2, 1, 1);
-
     // Acceleration
     accelerationLineEdit = new QLineEdit();
-    velAccLayout->addWidget(accelerationLineEdit, 1, 1, 1, 1);
+    mainLayout->addWidget(accelerationLineEdit, row, 1, 1, 1);
     accelerationLineEdit->setText(QApplication::translate("Ur5Widget", "0.1", 0));
-    velAccLayout->addWidget(new QLabel("Acceleration"), 1, 0, 1, 1);
-    velAccLayout->addWidget(new QLabel("m/s^2"), 1, 2, 1, 1);
+    mainLayout->addWidget(new QLabel("Acceleration"), row, 0, 1, 1);
+    mainLayout->addWidget(new QLabel("m/s^2"), row, 2, 1, 1);
 
-    // Time
-    velAccLayout->addWidget(new QLabel("Time"), 2, 0, 1, 1);
-    timeLineEdit = new QLineEdit();
-    velAccLayout->addWidget(timeLineEdit, 2, 1, 1, 1);
-    timeLineEdit->setText(QApplication::translate("Ur5Widget", "0.5", 0));
-    velAccLayout->addWidget(new QLabel("s"), 2, 2, 1, 1);
-
-
+    vertLayout->addLayout(mainLayout);
 }
 
 void PlannedMoveTab::runVTKfileSlot()
@@ -663,6 +683,91 @@ void PlannedMoveTab::runVTKfileSlot()
     connection->transmitter.openVTKfile(vtkLineEdit->text());
     connection->transmitter.movejProgram(connection->transmitter.poseQueue,accelerationLineEdit->text().toDouble(),velocityLineEdit->text().toDouble(),0);
     emit(connection->runProgramQueue());
+}
+
+void PlannedMoveTab::goToOrigoButtonSlot()
+{
+    emit(connection->sendMessage(connection->transmitter.movej(Ur5State(0,0,0,0,0,0),accelerationLineEdit->text().toDouble(),velocityLineEdit->text().toDouble(),0)));
+}
+
+InformationTab::InformationTab(Ur5ConnectionPtr ur5connection, QWidget *parent) :
+    QWidget(parent),
+    connection(ur5connection)
+{
+    setupUi(this);
+
+    QTimer *timer = new QTimer(this);
+    connect(timer,SIGNAL(timeout()),this,SLOT(updateState()));
+    timer->start(100);
+}
+
+InformationTab::~InformationTab()
+{
+
+}
+
+void InformationTab::setupUi(QWidget *parent)
+{
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    QHBoxLayout *hLayout1 = new QHBoxLayout();
+
+    QGridLayout *coordInfoLayout = new QGridLayout();
+
+    coordInfoLayout->addWidget(new QLabel("F_x"), 0, 0, 1, 1, Qt::AlignHCenter);
+    coordInfoLayout->addWidget(new QLabel("F_y"), 1, 0, 1, 1, Qt::AlignHCenter);
+    coordInfoLayout->addWidget(new QLabel("F_z"), 3, 0, 1, 1, Qt::AlignHCenter);
+
+    coordInfoLayout->addWidget(new QLabel("N"), 0, 3, 1, 1);
+    coordInfoLayout->addWidget(new QLabel("N"), 1, 3, 1, 1);
+    coordInfoLayout->addWidget(new QLabel("N"), 3, 3, 1, 1);
+
+    coordInfoLayout->addWidget(new QLabel("T_x"), 5, 0, 1, 1);
+    coordInfoLayout->addWidget(new QLabel("T_z"), 7, 0, 1, 1);
+    coordInfoLayout->addWidget(new QLabel("T_y"), 6, 0, 1, 1);
+
+    coordInfoLayout->addWidget(new QLabel("Nm"), 5, 3, 1, 1);
+    coordInfoLayout->addWidget(new QLabel("Nm"), 6, 3, 1, 1);
+    coordInfoLayout->addWidget(new QLabel("Nm"), 7, 3, 1, 1);
+
+    FxLineEdit = new QLineEdit();
+    coordInfoLayout->addWidget(FxLineEdit, 0, 2, 1, 1);
+
+    FyLineEdit = new QLineEdit();
+    coordInfoLayout->addWidget(FyLineEdit, 1, 2, 1, 1);
+
+    TyLineEdit = new QLineEdit();
+    coordInfoLayout->addWidget(TyLineEdit, 6, 2, 1, 1);
+
+    TzLineEdit = new QLineEdit();
+    coordInfoLayout->addWidget(TzLineEdit, 7, 2, 1, 1);
+
+    FzLineEdit = new QLineEdit();
+    coordInfoLayout->addWidget(FzLineEdit, 3, 2, 1, 1);
+
+    TxLineEdit = new QLineEdit();
+    coordInfoLayout->addWidget(TxLineEdit, 5, 2, 1, 1);
+
+    hLayout1->addLayout(coordInfoLayout);
+    mainLayout->addLayout(hLayout1);
+}
+
+void InformationTab::updateState()
+{
+    if(connection->isConnectedToRobot())
+    {
+        emit(connection->update_currentState());
+    }
+    emit(updateForceSlot());
+}
+
+void InformationTab::updateForceSlot()
+{
+    FxLineEdit->setText(QString::number(connection->currentState.force(0)));
+    FyLineEdit->setText(QString::number(connection->currentState.force(1)));
+    FzLineEdit->setText(QString::number(connection->currentState.force(2)));
+    TxLineEdit->setText(QString::number(connection->currentState.torque(0)));
+    TyLineEdit->setText(QString::number(connection->currentState.torque(1)));
+    TzLineEdit->setText(QString::number(connection->currentState.torque(2)));
 }
 
 

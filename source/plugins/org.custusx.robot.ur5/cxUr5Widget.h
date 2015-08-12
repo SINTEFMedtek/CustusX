@@ -121,8 +121,8 @@ public:
     QPushButton *rotNegZButton, *rotPosZButton, *rotPosXButton, *rotNegYButton, *rotPosYButton, *rotNegXButton;
 
     QLineEdit *xPosLineEdit, *yPosLineEdit, *zPosLineEdit;
-
     QLineEdit *rxLineEdit, *ryLineEdit, *rzLineEdit;
+
     QLineEdit *accelerationLineEdit, *velocityLineEdit, *timeLineEdit;
 
     void coordButtonPressed(int axis,int sign);
@@ -164,13 +164,35 @@ public:
     PlannedMoveTab(Ur5ConnectionPtr Ur5Connection, QWidget *parent = 0);
     virtual ~PlannedMoveTab();
 
-    QPushButton* runVTKButton;
+    QPushButton *runVTKButton,*goToOrigoButton;
     QLineEdit* vtkLineEdit;
 
     QLineEdit *accelerationLineEdit, *velocityLineEdit, *timeLineEdit;
 
 protected slots:
     void runVTKfileSlot();
+    void goToOrigoButtonSlot();
+
+private:
+    void setupUi(QWidget *parent);
+    Ur5ConnectionPtr connection;
+};
+
+class org_custusx_robot_ur5_EXPORT InformationTab : public QWidget
+{
+    Q_OBJECT
+public:
+    InformationTab(Ur5ConnectionPtr Ur5Connection, QWidget *parent = 0);
+    virtual ~InformationTab();
+
+    QLineEdit *FxLineEdit, *FyLineEdit, *FzLineEdit;
+    QLineEdit *TxLineEdit, *TyLineEdit, *TzLineEdit;
+
+
+
+protected slots:
+    void updateState();
+    void updateForceSlot();
 
 private:
     void setupUi(QWidget *parent);
