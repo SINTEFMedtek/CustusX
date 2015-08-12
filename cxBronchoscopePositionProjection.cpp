@@ -11,12 +11,16 @@ namespace cx
 
 BronchoscopePositionProjection::BronchoscopePositionProjection():
 	isPreviousProjectedPointSet(false),
-	mBranchListPtr(new BranchList)
+	mBranchListPtr(new BranchList),
+	mProjectedIndex(0),
+	mUseAdvancedCenterlineProjection(false)
 {
 }
 
 BronchoscopePositionProjection::BronchoscopePositionProjection(vtkPolyDataPtr centerline, Transform3D prMd):
-	isPreviousProjectedPointSet(false)
+	isPreviousProjectedPointSet(false),
+	mProjectedIndex(0),
+	mUseAdvancedCenterlineProjection(false)
 {
     mCLpoints = this->getCenterlinePositions(centerline, prMd);
 }
