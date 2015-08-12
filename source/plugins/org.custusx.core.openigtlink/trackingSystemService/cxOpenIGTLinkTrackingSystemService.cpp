@@ -205,7 +205,7 @@ void OpenIGTLinkTrackingSystemService::receiveProbedefinition(QString devicename
 {
     OpenIGTLinkToolPtr tool = this->getTool(devicename);
     ProbePtr probe = tool->getProbe();
-    ProbeDefinition old_def = probe->getProbeData();
+    ProbeDefinition old_def = probe->getProbeDefinition();
     definition->setUid(old_def.getUid());
 
     probe->setProbeSector(*(definition.get()));

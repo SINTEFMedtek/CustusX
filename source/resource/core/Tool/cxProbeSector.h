@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSize>
 #include "vtkSmartPointer.h"
 #include "vtkForwardDeclarations.h"
-#include "cxProbeData.h"
+#include "cxProbeDefinition.h"
 #include "cxTransform3D.h"
 
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;

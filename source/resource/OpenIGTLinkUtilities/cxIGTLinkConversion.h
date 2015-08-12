@@ -81,12 +81,12 @@ public:
     ImagePtr decode(IGTLinkImageMessage::Pointer msg);
 
 	/**
-	  * Encode the input probedata into an IGTLink message.
+	  * Encode the input ProbeDefinition into an IGTLink message.
 	  */
     IGTLinkUSStatusMessage::Pointer encode(ProbeDefinitionPtr);
 	/**
 	  * Decode the input probe and image messages to create a
-	  * ProbeData object based in the input base.
+	  * ProbeDefinition object based in the input base.
 	  *
 	  * Each message contains part of the data, the parts that
 	  * are missing are simply not filled in (i.e. keep the values

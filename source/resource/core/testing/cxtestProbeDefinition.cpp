@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "catch.hpp"
 #include <QSize>
 #include <boost/shared_ptr.hpp>
-#include "cxProbeData.h"
+#include "cxProbeDefinition.h"
 #include "cxVector3D.h"
 #include "cxBoundingBox3D.h"
 

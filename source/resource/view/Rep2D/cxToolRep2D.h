@@ -46,7 +46,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-class ProbeData;
 typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
 
 
@@ -104,7 +103,6 @@ class cxResourceVisualization_EXPORT ToolRep2D : public RepImpl
 	private:
 		ToolRep2D(SpaceProviderPtr spaceProvider);
 
-		void setProbeSector(ProbeData data);
 		double getOffset();
 		void createCrossHair(vtkRendererPtr renderer);
 		void setVisibility();

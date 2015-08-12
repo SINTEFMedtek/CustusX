@@ -75,7 +75,7 @@ void TrackedStream::setProbeTool(const ToolPtr &probeTool)
 void TrackedStream::toolTransformAndTimestamp(Transform3D prMt, double timestamp)
 {
 	//tMu calculation in ProbeSector differ from the one used here
-//	Transform3D tMu = mProbeData.get_tMu();
+//	Transform3D tMu = mProbeDefinition.get_tMu();
 	Transform3D tMu = this->get_tMu();
 	Transform3D rMpr = mSpaceProvider->get_rMpr();
 	Transform3D rMu = rMpr * prMt * tMu;
@@ -87,7 +87,7 @@ void TrackedStream::toolTransformAndTimestamp(Transform3D prMt, double timestamp
 Transform3D TrackedStream::get_tMu()
 {
 	//Made tMu by copying and modifying code from ProbeSector::get_tMu()
-	ProbeDefinition probeDefinition = mProbeTool->getProbe()->getProbeData();
+	ProbeDefinition probeDefinition = mProbeTool->getProbe()->getProbeDefinition();
 	Vector3D origin_p = probeDefinition.getOrigin_p();
 	Vector3D spacing = probeDefinition.getSpacing();
 	Vector3D origin_u(origin_p[0]*spacing[0], origin_p[1]*spacing[1], origin_p[2]*spacing[2]);

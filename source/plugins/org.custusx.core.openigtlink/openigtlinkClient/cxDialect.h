@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxTransform3D.h"
 #include "cxImage.h"
-#include "cxProbeData.h"
+#include "cxProbeDefinition.h"
 
 #define CX_OPENIGTLINK_CHANNEL_NAME "OpenIGTLink"
 

@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "igtl_status.h"
 
 #include "cxLog.h"
-#include "cxProbeData.h"
+#include "cxProbeDefinition.h"
 #include "cxTypeConversions.h"
 
 typedef vtkSmartPointer<vtkImageImport> vtkImageImportPtr;

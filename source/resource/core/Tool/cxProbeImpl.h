@@ -70,7 +70,7 @@ public:
 
 	virtual QStringList getAvailableVideoSources();
 	virtual VideoSourcePtr getRTSource(QString uid = "active") const;
-	virtual ProbeDefinition getProbeData(QString uid = "active") const;
+	virtual ProbeDefinition getProbeDefinition(QString uid = "active") const;
 	virtual ProbeSectorPtr getSector(QString uid = "active");
 
 	virtual void addXml(QDomNode& dataNode);
@@ -114,7 +114,7 @@ private:
 	void applyConfig();
 
 	QString mActiveUid;
-	std::map<QString, ProbeDefinition> mProbeData; ///< all defined probe definitions
+	std::map<QString, ProbeDefinition> mProbeDefinition; ///< all defined probe definitions
 	std::map<QString, VideoSourcePtr> mSource; ///< all defined sources
 	ProbeWeakPtr mSelf;
 

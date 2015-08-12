@@ -73,9 +73,9 @@ ToolPtr VideoSourceGraphics::getTool()
 	return mTool;
 }
 
-ProbeSector VideoSourceGraphics::getProbeData()
+ProbeSector VideoSourceGraphics::getProbeDefinition()
 {
-	return mProbeData;
+	return mProbeDefinition;
 }
 
 void VideoSourceGraphics::setTool(ToolPtr tool)
@@ -116,10 +116,10 @@ void VideoSourceGraphics::probeSectorChanged()
 	if (!mTool || !mTool->getProbe())
 		return;
 
-	mProbeData.setData(mTool->getProbe()->getProbeData());
+	mProbeDefinition.setData(mTool->getProbe()->getProbeDefinition());
 	if (mClipToSector)
 	{
-		mPipeline->setClip(mProbeData.getSector());
+		mPipeline->setClip(mProbeDefinition.getSector());
 	}
 	else
 	{
@@ -158,7 +158,7 @@ void VideoSourceGraphics::receiveTransforms(Transform3D prMt, double timestamp)
 	if (!mShowInToolSpace)
 		return;
 	Transform3D rMpr = mSpaceProvider->get_rMpr();
-	Transform3D tMu = mProbeData.get_tMu();
+	Transform3D tMu = mProbeDefinition.get_tMu();
 	Transform3D rMu = rMpr * prMt * tMu;
 	mPipeline->setActorUserMatrix(rMu.getVtkMatrix());
 }

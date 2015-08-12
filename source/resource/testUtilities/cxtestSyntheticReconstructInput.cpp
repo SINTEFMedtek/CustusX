@@ -49,7 +49,7 @@ SyntheticReconstructInput::SyntheticReconstructInput()
 	mProbeMovementDefinition.mRangeAngle = 0;
 	mProbeMovementDefinition.mSteps = 200;
 
-	mProbe = cx::DummyToolTestUtilities::createProbeDataLinear(100, 100, Eigen::Array2i(200,200));
+	mProbe = cx::DummyToolTestUtilities::createProbeDefinitionLinear(100, 100, Eigen::Array2i(200,200));
 }
 
 void SyntheticReconstructInput::defineProbeMovementNormalizedTranslationRange(double range)
@@ -80,7 +80,7 @@ void SyntheticReconstructInput::setOverallBoundsAndSpacing(double size, double s
 
 	mBounds = cx::Vector3D::Ones() * size;
 //	this->defineOutputVolume(size, spacing);
-	mProbe = cx::DummyToolTestUtilities::createProbeDataLinear(size, size, Eigen::Array2i(1,1)*(size/spacing+1));
+	mProbe = cx::DummyToolTestUtilities::createProbeDefinitionLinear(size, size, Eigen::Array2i(1,1)*(size/spacing+1));
 	mProbeMovementDefinition.mRangeNormalizedTranslation = cx::Vector3D::UnitX();
 	mProbeMovementDefinition.mRangeAngle = 0;
 	mProbeMovementDefinition.mSteps = size/spacing+1;
@@ -191,7 +191,7 @@ cx::USReconstructInputData SyntheticReconstructInput::generateSynthetic_USRecons
 	// fill rest of info
 	result.rMpr = cx::Transform3D::Identity(); // if <>Identity, remember to also change mPositions
 	result.mProbeUid = "testProbe";
-	result.mProbeData.setData(mProbe);
+	result.mProbeDefinition.setData(mProbe);
 
 	return result;
 }

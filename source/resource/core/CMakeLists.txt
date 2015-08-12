@@ -124,11 +124,11 @@ cx_add_class(cxResource_SOURCE
     cxCoreServices
 
     Tool/cxProbeSector
-    Tool/cxProbeData
+    Tool/cxProbeDefinition
     Tool/ProbeXmlConfigParser.h
     Tool/ProbeXmlConfigParserImpl
     Tool/ProbeXmlConfigParserMock
-    Tool/cxCreateProbeDataFromConfiguration
+    Tool/cxCreateProbeDefinitionFromConfiguration
     Tool/cxTrackingPositionFilter
     Tool/cxTrackerConfiguration
     Tool/cxToolNull

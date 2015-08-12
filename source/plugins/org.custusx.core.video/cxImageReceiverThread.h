@@ -67,7 +67,7 @@ typedef boost::shared_ptr<class ImageReceiverThread> ImageReceiverThreadPtr;
  * Subclass to implement for a specific protocol.
  * Supported messages:
  *  - Image : contains vtkImageData, timestamp, uid, all else is discarded.
- *  - ProbeData : contains sector and image definition, temporal cal is discarded.
+ *  - ProbeDefinition : contains sector and image definition, temporal cal is discarded.
  *
  * \ingroup org_custusx_core_video
  * \date Oct 11, 2012

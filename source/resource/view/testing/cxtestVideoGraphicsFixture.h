@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTransform3D.h"
 
 #include "cxVideoGraphics.h"
-#include "cxProbeData.h"
+#include "cxProbeDefinition.h"
 #include "cxtestRenderTester.h"
 
 namespace cxtest
@@ -56,7 +56,7 @@ public:
 protected:
 	void renderImageAndCompareToExpected(vtkImageDataPtr input, vtkImageDataPtr expected);
 	vtkImageDataPtr  readImageData(QString filename, QString description);
-	cx::ProbeDefinition readProbeData(QString filename);
+	cx::ProbeDefinition readProbeDefinition(QString filename);
 	void addImageToRenderer(vtkImageDataPtr image);
 	cxtest::RenderTesterPtr mMachine;
 	cx::VideoGraphicsPtr mVideoGraphics;

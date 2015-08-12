@@ -139,7 +139,7 @@ TEST_CASE_METHOD(IGTLinkConversionFixture, "IGTLinkConversion: Decode/encode col
 	this->testDecodeEncodeColorImage(values, "ARGB");
 }
 
-TEST_CASE_METHOD(IGTLinkConversionFixture, "IGTLinkConversion: Decode/encode ProbeData", "[unit][resource][OpenIGTLinkUtilities]")
+TEST_CASE_METHOD(IGTLinkConversionFixture, "IGTLinkConversion: Decode/encode ProbeDefinition", "[unit][resource][OpenIGTLinkUtilities]")
 {
 	// generate probe data input
 	cx::ProbeDefinitionPtr input(new cx::ProbeDefinition());

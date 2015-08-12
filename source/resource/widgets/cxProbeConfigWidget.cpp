@@ -216,7 +216,7 @@ void ProbeConfigWidget::activeProbeConfigurationChangedSlot()
 	cx::ProbePtr probe = mActiveProbeConfig->getTool()->getProbe();
 	if (!probe)
 		return;
-	ProbeDefinition data = probe->getProbeData();
+	ProbeDefinition data = probe->getProbeDefinition();
 	mUpdating= true;
 
 	DoubleBoundingBox3D range(0, data.getSize().width(), 0, data.getSize().height());
@@ -261,7 +261,7 @@ void ProbeConfigWidget::guiProbeSectorChanged()
 	cx::ProbePtr probe = mActiveProbeConfig->getTool()->getProbe();
 	if (!probe)
 		return;
-	ProbeDefinition data = probe->getProbeData();
+	ProbeDefinition data = probe->getProbeDefinition();
 
 //	double sx = data.getSpacing()[0]; // mm/pix
 	double sy = data.getSpacing()[1];
@@ -284,7 +284,7 @@ void ProbeConfigWidget::guiImageSettingsChanged()
 	cx::ProbePtr probe = mActiveProbeConfig->getTool()->getProbe();
 	if (!probe)
 		return;
-	ProbeDefinition data = probe->getProbeData();
+	ProbeDefinition data = probe->getProbeDefinition();
 
 	data.setClipRect_p(mBBWidget->getValue());
 
@@ -301,7 +301,7 @@ void ProbeConfigWidget::guiOriginSettingsChanged()
 	cx::ProbePtr probe = mActiveProbeConfig->getTool()->getProbe();
 	if (!probe)
 		return;
-	ProbeDefinition data = probe->getProbeData();
+	ProbeDefinition data = probe->getProbeDefinition();
 
 	// if sync: move clip rect accordingly
 	if (mSyncBoxToSector->isChecked())

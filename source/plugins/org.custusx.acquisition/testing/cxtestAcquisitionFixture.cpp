@@ -116,9 +116,9 @@ void AcquisitionFixture::setupProbe()
 {
 	cx::DummyToolPtr dummyTool(new cx::DummyTool());
 	dummyTool->setToolPositionMovement(dummyTool->createToolPositionMovementTranslationOnly(cx::DoubleBoundingBox3D(0,0,0,10,10,10)));
-	std::pair<QString, cx::ProbeDefinition> probedata = cx::UsReconstructionFileReader::readProbeDataFromFile(mAcqDataFilename);
+	std::pair<QString, cx::ProbeDefinition> probeDefinition = cx::UsReconstructionFileReader::readProbeDefinitionFromFile(mAcqDataFilename);
 	cx::ProbeImplPtr probe = cx::ProbeImpl::New("","");
-	probe->setProbeSector(probedata.second);
+	probe->setProbeSector(probeDefinition.second);
 	dummyTool->setProbeSector(probe);
 	CHECK(dummyTool->getProbe());
 	CHECK(dummyTool->getProbe()->isValid());
@@ -245,7 +245,7 @@ void AcquisitionFixture::verifyFileData(cx::USReconstructInputData fileData)
 	INFO(string_cast(msg));
 	CHECK(cx::similar(pos_time_ms, mRecordDuration, tolerance*mRecordDuration));
 
-	CHECK(fileData.mProbeData.mData.getType()!=cx::ProbeDefinition::tNONE);
+	CHECK(fileData.mProbeDefinition.mData.getType()!=cx::ProbeDefinition::tNONE);
 
 	// check content of images
 	cx::ImageDataContainerPtr images = fileData.mUsRaw->getImageContainer();
@@ -254,8 +254,8 @@ void AcquisitionFixture::verifyFileData(cx::USReconstructInputData fileData)
 	{
 		CHECK(images->get(i));
 		Eigen::Array3i dim(images->get(i)->GetDimensions());
-		CHECK(dim[0]==fileData.mProbeData.mData.getSize().width());
-		CHECK(dim[1]==fileData.mProbeData.mData.getSize().height());
+		CHECK(dim[0]==fileData.mProbeDefinition.mData.getSize().width());
+		CHECK(dim[1]==fileData.mProbeDefinition.mData.getSize().height());
 	}
 }
 

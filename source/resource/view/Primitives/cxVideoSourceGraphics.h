@@ -65,7 +65,7 @@ public:
 	void setRealtimeStream(VideoSourcePtr data);
 	void setTool(ToolPtr tool);
 	ToolPtr getTool();
-	ProbeSector getProbeData();
+	ProbeSector getProbeDefinition();
 	void setClipToSector(bool on); ///< Turn sector clipping on/off. If on, only the area inside the probe sector is shown.
 	void setShowInToolSpace(bool on);
 	vtkActorPtr getActor();
@@ -83,7 +83,7 @@ private:
 	VideoGraphicsPtr mPipeline;
 	bool mShowInToolSpace;
 	ToolPtr mTool;
-	ProbeSector mProbeData;
+	ProbeSector mProbeDefinition;
 	VideoSourcePtr mData;
 	SpaceProviderPtr mSpaceProvider;
 };

@@ -52,7 +52,7 @@ TEST_CASE_METHOD(cxtest::USSavingRecorderFixture, "USSavingRecorder: Use one Vid
 
 TEST_CASE_METHOD(cxtest::USSavingRecorderFixture, "USSavingRecorder: Use one VideoSource with Tool", "[integration][modules][Acquisition]")
 {
-	cx::DummyToolPtr tool = cx::DummyToolTestUtilities::createDummyTool(cx::DummyToolTestUtilities::createProbeDataLinear());
+	cx::DummyToolPtr tool = cx::DummyToolTestUtilities::createDummyTool(cx::DummyToolTestUtilities::createProbeDefinitionLinear());
 	this->setTool(tool);
 	this->addVideoSource(80, 40);
 
@@ -67,7 +67,7 @@ TEST_CASE_METHOD(cxtest::USSavingRecorderFixture, "USSavingRecorder: Use one Vid
 
 TEST_CASE_METHOD(cxtest::USSavingRecorderFixture, "USSavingRecorder: Use one VideoSource with Tool and save", "[integration][modules][Acquisition]")
 {
-	cx::DummyToolPtr tool = cx::DummyToolTestUtilities::createDummyTool(cx::DummyToolTestUtilities::createProbeDataLinear());
+	cx::DummyToolPtr tool = cx::DummyToolTestUtilities::createDummyTool(cx::DummyToolTestUtilities::createProbeDefinitionLinear());
 	this->setTool(tool);
 	this->addVideoSource(80, 40);
 
@@ -99,7 +99,7 @@ TEST_CASE_METHOD(cxtest::USSavingRecorderFixture, "USSavingRecorder: Use 4 Video
 
 TEST_CASE_METHOD(cxtest::USSavingRecorderFixture, "'USSavingRecorder: Use 4 VideoSources with Tool and save", "[integration][modules][Acquisition][unstable]")
 {
-	cx::DummyToolPtr tool = cx::DummyToolTestUtilities::createDummyTool(cx::DummyToolTestUtilities::createProbeDataLinear());
+	cx::DummyToolPtr tool = cx::DummyToolTestUtilities::createDummyTool(cx::DummyToolTestUtilities::createProbeDefinitionLinear());
 	this->setTool(tool);
 	for (unsigned i=0; i<4; ++i)
 		this->addVideoSource(80, 40);
