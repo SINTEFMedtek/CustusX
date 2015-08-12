@@ -105,8 +105,7 @@ void PatientLandMarksWidget::updateToolSampleButton()
 {
 	ToolPtr tool = mServices.trackingService->getActiveTool();
 
-	bool enabled = false;
-	enabled = tool && tool->getVisible() && (!tool->hasType(Tool::TOOL_MANUAL) || settings()->value("giveManualToolPhysicalProperties").toBool()); // enable only for non-manual tools.
+	bool enabled = tool && tool->getVisible() && (!tool->hasType(Tool::TOOL_MANUAL) || settings()->value("giveManualToolPhysicalProperties").toBool()); // enable only for non-manual tools.
 	mToolSampleButton->setEnabled(enabled);
 
 	if (mServices.trackingService->getActiveTool())

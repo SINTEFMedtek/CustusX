@@ -110,8 +110,7 @@ Transform3D FastOrientationRegistrationWidget::get_tMtm() const
 void FastOrientationRegistrationWidget::enableToolSampleButtonSlot()
 {
   ToolPtr tool = mServices.trackingService->getActiveTool();
-  bool enabled = false;
-  enabled = tool &&
+  bool enabled = tool &&
 	  tool->getVisible() &&
 	  (!tool->hasType(Tool::TOOL_MANUAL) || settings()->value("giveManualToolPhysicalProperties").toBool()); // enable only for non-manual tools.
 

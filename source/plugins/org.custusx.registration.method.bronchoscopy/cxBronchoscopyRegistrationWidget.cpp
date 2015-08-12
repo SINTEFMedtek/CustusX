@@ -232,7 +232,7 @@ void BronchoscopyRegistrationWidget::registerSlot()
     TimedTransformMap trackerRecordedData_prMt = RecordSession::getToolHistory_prMt(mTool, session);//input
 //    TimedTransformMap trackerRecordedData = mTrackedCenterLine->getRecording();
 
-    if(trackerRecordedData_prMt.size() == 0)
+	if(trackerRecordedData_prMt.empty())
 	{
         reportError("No positions");
         return;
