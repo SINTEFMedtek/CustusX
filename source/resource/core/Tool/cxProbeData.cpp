@@ -302,4 +302,16 @@ bool ProbeDefinition::getUseDigitalVideo() const
 	return mDigital;
 }
 
+void ProbeDefinition::setVariable(QString variableName, QVariant value)
+{
+	mAdditionalVariables[variableName] = value;
 }
+
+QVariant ProbeDefinition::getVariable(QString variableName)
+{
+	if(!mAdditionalVariables.contains(variableName))
+		CX_LOG_ERROR(QString("Variable %1 don't exist in ProbeDefinition with uid %2").arg(variableName).arg(this->mUid));
+	return mAdditionalVariables[variableName];
+}
+
+} //cx

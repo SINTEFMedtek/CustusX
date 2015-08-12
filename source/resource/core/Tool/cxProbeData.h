@@ -37,6 +37,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxResourceExport.h"
 
 #include <QSize>
+#include <QMap>
+#include <QVariant>
 class QDomNode;
 #include "cxVector3D.h"
 #include "cxBoundingBox3D.h"
@@ -164,6 +166,9 @@ public:
 	void setUseDigitalVideo(bool val); ///< RTSource is digital (eg. US sector is set digitally, not read from .xml file)
 	bool getUseDigitalVideo() const;
 
+	void setVariable(QString variableName, QVariant value);
+	QVariant getVariable(QString variableName);
+
 private:
 	TYPE mType; ///< type of probe
 	double mDepthStart; ///< start of sector, mm
@@ -185,6 +190,8 @@ private:
 	Vector3D transform_p_to_u(const Vector3D& q_p) const;
 	void addImageXml(QDomNode dataNode) const;
 	void parseImageXml(QDomNode dataNode);
+
+	QMap<QString, QVariant> mAdditionalVariables;
 };
 
 typedef boost::shared_ptr<ProbeDefinition> ProbeDefinitionPtr;
