@@ -49,7 +49,7 @@ TEST_CASE("Ur5Plugin: Send message to robot and receive message from robot", "[m
     Ur5TestFixture fixture;
 
     fixture.connection.update_currentState(false);
-    std::cout << fixture.connection.currentState.force << std::endl;
+
 }
 
 } //cxtest

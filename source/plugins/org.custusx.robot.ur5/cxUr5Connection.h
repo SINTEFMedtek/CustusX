@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVector3D.h"
 #include "cxUr5State.h"
 #include "cxUr5Receive.h"
+#include "cxUr5RTReceive.h"
 #include "cxUr5Transmit.h"
 
 
@@ -64,6 +65,7 @@ public:
     Ur5Connection();
 
     Ur5Receive receiver;
+    Ur5RTReceive rtReceiver;
     Ur5Transmit transmitter;
     Ur5State currentState,targetState,jointState;
     QByteArray rawData;

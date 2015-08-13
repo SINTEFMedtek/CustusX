@@ -1,4 +1,4 @@
-#include "cxUr5Receive.h"
+#include "cxUr5RTReceive.h"
 #include "cxVector3D.h"
 #include <set>
 #include "cxUr5State.h"
@@ -6,63 +6,60 @@
 namespace cx
 {
 
-Ur5State Ur5Receive::analyze_rawPacket(QByteArray packet)
+Ur5State Ur5RTReceive::analyze_rawPacket(QByteArray packet)
 {
     if(isValidPacket(packet))
-        return set_state(packet);
+        return set_state(slicePacket(packet,4,812));
 }
 
-Ur5State Ur5Receive::set_state(QByteArray data)
+Ur5State Ur5RTReceive::set_state(QByteArray data)
 {
     Ur5State state;
 
-    for(int i=0;i<data.size();i++)
+    double d[808];
+
+    for(int i=0;i<data.size()/sizeof(double);i++)
     {
-        if(isValidHeader(getHeader(data,i)))
-        {
-            push_state(slicePacket(data,i,headerLength(getHeader(data,i))),state);
-        }
+        sscanf_s(data.mid(i*sizeof(double),sizeof(double)).toHex().data(), "%llx",(unsigned long long *)&d[i]);
     }
+
+
+    for(int i=0;i<data.size()/sizeof(double);i++)
+    {
+        std::cout << i+1 << ": " << d[i] << std::endl;
+    }
+
     return state;
 }
 
-QByteArray Ur5Receive::getHeader(QByteArray data,int pos)
+QByteArray Ur5RTReceive::getHeader(QByteArray data,int pos)
 {
     return data.mid(pos,sizeof(int)+sizeof(char));
 }
 
-QByteArray Ur5Receive::slicePacket(QByteArray data,int pos, int length)
+QByteArray Ur5RTReceive::slicePacket(QByteArray data,int pos, int length)
 {
     return data.mid(pos,length);
 }
 
-int Ur5Receive::headerLength(QByteArray data)
+int Ur5RTReceive::headerLength(QByteArray data)
 {
     bool ok;
     return data.mid(0,sizeof(int)).toHex().toInt(&ok,16);
 }
 
-int Ur5Receive::headerID(QByteArray data)
+int Ur5RTReceive::headerID(QByteArray data)
 {
     bool ok;
     return data.mid((sizeof(int)),sizeof(char)).toHex().toInt(&ok,16);
 }
 
-bool Ur5Receive::isValidPacket(QByteArray data)
+bool Ur5RTReceive::isValidPacket(QByteArray data)
 {
-    return (data.size()==1254 || data.size()==560 || data.size()==1460);
+    return (data.size()==812 || data.size()==1460);
 }
 
-bool Ur5Receive::isValidHeader(QByteArray data)
-{
-    std::set<int> typeLength = {53,251,29,37,64,61}; // Cart. info, Joint data, Robot modus, Robot data1, Robot data2
-    std::set<int> types = {4,1,0,2,3,20,7}; // Cart. info, Joint data, Robot modus, Robot data1, Robot data2, Robot Messages, Force data
-
-    return (typeLength.find(headerLength(data)) != typeLength.end()
-            && types.find(headerID(data)) !=types.end());
-}
-
-void Ur5Receive::push_state(QByteArray data,Ur5State &state)
+void Ur5RTReceive::push_state(QByteArray data,Ur5State &state)
 {
     if(data.size() == 251)
     {
@@ -78,13 +75,13 @@ void Ur5Receive::push_state(QByteArray data,Ur5State &state)
     }
 }
 
-QByteArray Ur5Receive::removeHeader(QByteArray data)
+QByteArray Ur5RTReceive::removeHeader(QByteArray data)
 {
-    return data.mid(sizeof(int)+sizeof(char),data.size()-sizeof(int)-sizeof(char));
+    return data.mid(sizeof(int),data.size()-sizeof(int));
 }
 
 
-void Ur5Receive::set_cartData(QByteArray cartData,Ur5State &state)
+void Ur5RTReceive::set_cartData(QByteArray cartData,Ur5State &state)
 {
     for(int i=0;i<6;i++)
     {
@@ -99,7 +96,7 @@ void Ur5Receive::set_cartData(QByteArray cartData,Ur5State &state)
     }
 }
 
-void Ur5Receive::set_jointData(QByteArray jointData, Ur5State &state)
+void Ur5RTReceive::set_jointData(QByteArray jointData, Ur5State &state)
 {
     for(int i=0;i<6;i++)
     {
@@ -120,7 +117,7 @@ void Ur5Receive::set_jointData(QByteArray jointData, Ur5State &state)
     }
 }
 
-void Ur5Receive::set_forceData(QByteArray forceData, Ur5State &state)
+void Ur5RTReceive::set_forceData(QByteArray forceData, Ur5State &state)
 {
     for(int i=0;i<6;i++)
     {
@@ -136,13 +133,13 @@ void Ur5Receive::set_forceData(QByteArray forceData, Ur5State &state)
 }
 
 
-void Ur5Receive::print_cartData(Ur5State state)
+void Ur5RTReceive::print_cartData(Ur5State state)
 {
     std::cout << state.cartAxis << std::endl;
     std::cout << state.cartAngles << std::endl;
 }
 
-void Ur5Receive::print_jointData(Ur5State state)
+void Ur5RTReceive::print_jointData(Ur5State state)
 {
     std::cout << "Pos (x,y,z): " << state.jointAxis << " " <<
                  "Vel (vx,vy,vz): " << state.jointAxisVelocity << std::endl;
@@ -151,7 +148,7 @@ void Ur5Receive::print_jointData(Ur5State state)
 }
 
 
-void Ur5Receive::print_rawData(QByteArray data)
+void Ur5RTReceive::print_rawData(QByteArray data)
 {
     std::cout << "Number of bytes: " << data.size() << std::endl;
     for(int i=0;i<data.size();i++)

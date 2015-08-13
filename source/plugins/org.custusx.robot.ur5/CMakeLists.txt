@@ -11,6 +11,7 @@ set(PLUGIN_SRCS
   cxUr5Transmit.cpp
   cxUr5Receive.cpp
   cxUr5Script.cpp
+  cxUr5RTReceive.cpp
 )
 
 # Files which should be processed by Qts moc
@@ -23,6 +24,7 @@ set(PLUGIN_MOC_SRCS
   cxUr5Transmit.h
   cxUr5Receive.h
   cxUr5Script.h
+  cxUr5RTReceive.h
 )
 
 # Qt Designer files which should be processed by Qts uic

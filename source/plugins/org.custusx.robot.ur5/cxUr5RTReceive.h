@@ -1,5 +1,5 @@
-#ifndef UR5RECEIVE_H
-#define UR5RECEIVE_H
+#ifndef UR5RTRECEIVE_H
+#define UR5RTRECEIVE_H
 
 #include "org_custusx_robot_ur5_Export.h"
 #include "cxUr5State.h"
@@ -15,8 +15,7 @@ namespace cx
  * \date 2015-07-10
  */
 
-
-class org_custusx_robot_ur5_EXPORT Ur5Receive
+class org_custusx_robot_ur5_EXPORT Ur5RTReceive
 {
 public:
     Ur5State analyze_rawPacket(QByteArray packet);
@@ -29,10 +28,8 @@ public:
     QByteArray removeHeader(QByteArray data);
 
     bool isValidPacket(QByteArray data);
-    bool isValidHeader(QByteArray data);
 
     QByteArray slicePacket(QByteArray data, int pos, int length);
-
 
     void push_state(QByteArray data, Ur5State &state);
     void set_cartData(QByteArray cartData, Ur5State &state);
@@ -45,10 +42,9 @@ public:
     void print_rawData(QByteArray data);
 
     QByteArray removeFirstNBytes(QByteArray data,int n);
-
 };
 
 
 } // cx
 
-#endif // UR5RECEIVE_H
+#endif // UR5RTRECEIVE_H

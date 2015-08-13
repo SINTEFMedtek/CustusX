@@ -188,8 +188,6 @@ public:
     QLineEdit *FxLineEdit, *FyLineEdit, *FzLineEdit;
     QLineEdit *TxLineEdit, *TyLineEdit, *TzLineEdit;
 
-
-
 protected slots:
     void updateState();
     void updateForceSlot();
