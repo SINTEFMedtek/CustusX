@@ -66,7 +66,7 @@ public:
 private slots:
 	void timeChangedSlot();
 	void playSlot();
-	void pauseSlot();
+//	void pauseSlot();
 	void stopSlot();
 	void forwardSlot();
 	void rewindSlot();
@@ -78,7 +78,7 @@ private slots:
 	void toggleDetailsSlot();
 
 private:
-	QString stripLeadingZeros(QString time);
+//	QString stripLeadingZeros(QString time);
 	std::vector<TimelineEvent> convertHistoryToEvents(ToolPtr tool);
 	std::vector<TimelineEvent> createEvents();
 	std::pair<double,double> findTimeRange(std::vector<TimelineEvent> events);

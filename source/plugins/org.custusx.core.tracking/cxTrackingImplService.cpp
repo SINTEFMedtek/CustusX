@@ -514,7 +514,7 @@ bool TrackingImplService::manualToolHasMostRecentTimestamp()
 //		std::cout << "    tool " << it->first << " : "<< it->second->getTimestamp() - mts << std::endl;
 		bestTime = std::max(bestTime, it->second->getTimestamp());
 	}
-	double ahead = mts -bestTime;
+//	double ahead = mts -bestTime;
 //	std::cout << "  mts -bestTime " << " : "<< (mts -bestTime) << std::endl;
 //	std::cout << "  mts > bestTime " << " : "<< bool(mts > bestTime) << std::endl;
 
