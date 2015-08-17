@@ -72,7 +72,8 @@ DataManagerImplPtr DataManagerImpl::create()
 	return retval;
 }
 
-DataManagerImpl::DataManagerImpl()
+DataManagerImpl::DataManagerImpl() :
+	mClinicalApplication(mdNEUROLOGICAL)
 {
 	m_rMpr_History.reset(new RegistrationHistory());
 	connect(m_rMpr_History.get(), SIGNAL(currentChanged()), this, SIGNAL(rMprChanged()));

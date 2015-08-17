@@ -46,13 +46,13 @@ LogThread::LogThread(QObject* parent) :
 
 void LogThread::installObserver(MessageObserverPtr observer, bool resend)
 {
-	PendingActionType action = boost::bind(&MessageRepository::install, mRepository.get(), observer, resend);
+	PendingActionType action = boost::bind(&MessageRepository::install, mRepository, observer, resend);
 	this->callInLogThread(action);
 }
 
 void LogThread::uninstallObserver(MessageObserverPtr observer)
 {
-	PendingActionType action = boost::bind(&MessageRepository::uninstall, mRepository.get(), observer);
+	PendingActionType action = boost::bind(&MessageRepository::uninstall, mRepository, observer);
 	this->callInLogThread(action);
 }
 
