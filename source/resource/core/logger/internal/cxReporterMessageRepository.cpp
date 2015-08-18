@@ -41,15 +41,20 @@ namespace cx
 
 void MessageObserver::sendMessage(const Message& message)
 {
+	QMutexLocker locker(&mMutex);
 	if (!mChannels.contains(message.mChannel))
 	{
 		mChannels.append(message.mChannel);
+		locker.unlock();
 		emit newChannel(message.mChannel);
+		locker.relock();
 	}
 
 	if (this->testFilter(message))
 	{
+		locker.unlock();
 		emit newMessage(message);
+		locker.relock();
 	}
 }
 
@@ -62,6 +67,7 @@ bool MessageObserver::testFilter(const Message &msg) const
 
 void MessageObserver::installFilter(MessageFilterPtr filter)
 {
+	QMutexLocker locker(&mMutex);
 	// Clone to ensure filter is standalone
 	// and safely can be passed to the reporter thread.
 	mFilter = filter->clone();
@@ -113,9 +119,8 @@ void MessageRepository::emitThroughFilter(const Message& message)
 
 void MessageRepository::install(MessageObserverPtr observer, bool resend)
 {
-	this->uninstall(observer);
-
-	mObservers.push_back(observer);
+	if(!this->exists(observer))
+		mObservers.push_back(observer);
 
 	if (resend)
 	{
@@ -125,9 +130,16 @@ void MessageRepository::install(MessageObserverPtr observer, bool resend)
 	}
 }
 
+bool MessageRepository::exists(MessageObserverPtr observer)
+{
+	if (std::count(mObservers.begin(), mObservers.end(), observer))
+		return true;
+	return false;
+}
+
 void MessageRepository::uninstall(MessageObserverPtr observer)
 {
-	if (!std::count(mObservers.begin(), mObservers.end(), observer))
+	if (!this->exists(observer))
 			return;
 	mObservers.erase(std::find(mObservers.begin(), mObservers.end(), observer));
 }
