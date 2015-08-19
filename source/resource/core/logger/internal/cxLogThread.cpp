@@ -102,19 +102,19 @@ LogThread::LogThread(QObject* parent) :
 
 void LogThread::installObserver(MessageObserverPtr observer, bool resend)
 {
-    auto action = boost::bind(&MessageRepository::install, mRepository, observer, resend);
+	ActionType action = boost::bind(&MessageRepository::install, mRepository, observer, resend);
 	this->callInLogThread(action);
 }
 
 void LogThread::uninstallObserver(MessageObserverPtr observer)
 {
-    auto action = boost::bind(&MessageRepository::uninstall, mRepository, observer);
+	ActionType action = boost::bind(&MessageRepository::uninstall, mRepository, observer);
 	this->callInLogThread(action);
 }
 
 void LogThread::setLoggingFolder(QString absoluteLoggingFolderPath)
 {
-    auto action = boost::bind(&LogThread::executeSetLoggingFolder, this, absoluteLoggingFolderPath);
+	ActionType action = boost::bind(&LogThread::executeSetLoggingFolder, this, absoluteLoggingFolderPath);
 	this->callInLogThread(action);
 }
 
