@@ -440,7 +440,7 @@ IGTLinkImageMessage::Pointer ImageStreamerOpenCV::getImageMessage()
 
 
 	int size[] =
-	{ 1.0, 1.0, 1.0 }; // spacing (mm/pixel)
+    { 1, 1, 1 }; // spacing (mm/pixel)
 	size[0] = frame.cols;
 	size[1] = frame.rows;
 

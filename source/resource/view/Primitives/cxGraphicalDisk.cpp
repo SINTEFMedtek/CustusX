@@ -255,7 +255,7 @@ double GraphicalDisk::getRadiusOfCircleSlicedFromSphere(double sphereRadius, dou
 {
 	double retval = 0;
 
-	if (abs(sliceHeight) > sphereRadius)
+    if (std::abs(sliceHeight) > sphereRadius)
 	{
 		retval = 0;
 	}
