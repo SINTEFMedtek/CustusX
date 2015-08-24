@@ -79,6 +79,7 @@ public:
 	virtual void doFastRegistration_Orientation(const Transform3D& tMtm, const Transform3D &prMt) = 0;
 	virtual void doImageRegistration(bool translationOnly) = 0;
 	virtual void applyImage2ImageRegistration(Transform3D delta_pre_rMd, QString description) = 0;
+	virtual void applyContinuousImage2ImageRegistration(Transform3D delta_pre_rMd, QString description) = 0;
 	virtual void applyPatientRegistration(Transform3D rMpr_new, QString description) = 0;
 	virtual void applyPatientOrientation(const Transform3D &tMtm, const Transform3D &prMt) = 0;
 

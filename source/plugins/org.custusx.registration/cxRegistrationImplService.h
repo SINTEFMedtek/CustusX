@@ -78,6 +78,7 @@ public:
 	virtual void doFastRegistration_Orientation(const Transform3D& tMtm, const Transform3D &prMt);
 	virtual void doImageRegistration(bool translationOnly);
 	virtual void applyImage2ImageRegistration(Transform3D delta_pre_rMd, QString description);
+	virtual void applyContinuousImage2ImageRegistration(Transform3D delta_pre_rMd, QString description);
 	virtual void applyPatientRegistration(Transform3D rMpr_new, QString description);
 	virtual void applyPatientOrientation(const Transform3D &tMtm, const Transform3D &prMt);
 
@@ -93,7 +94,7 @@ private slots:
 	void parseXml(QDomNode &dataNode);
 	void clearSlot();
 private:
-	virtual void updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data);
+	virtual void updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data, bool continuous = false);
 //	PatientModelService* getPatientModelService();
 	void writePreLandmarkRegistration(QString name, LandmarkMap landmarks);
 	vtkPointsPtr convertTovtkPoints(const std::vector<QString> &uids, const LandmarkMap &data, Transform3D M);
@@ -112,6 +113,7 @@ private:
 	ctkPluginContext* mContext;
 	PatientModelServicePtr mPatientModelService;
 	SessionStorageServicePtr mSession;
+	void performImage2ImageRegistration(Transform3D delta_pre_rMd, QString description, bool continuous = false);
 };
 
 typedef boost::shared_ptr<RegistrationImplService> RegistrationImplServicePtr;

@@ -60,7 +60,7 @@ RegistrationApplicator::~RegistrationApplicator()
  * Registration is done relative to masterFrame, i.e. data is moved relative to the masterFrame.
  *
  */
-void RegistrationApplicator::updateRegistration(QDateTime oldTime, RegistrationTransform delta_pre_rMd, DataPtr movingData)
+void RegistrationApplicator::updateRegistration(QDateTime oldTime, RegistrationTransform delta_pre_rMd, DataPtr movingData, bool silent)
 {
   FrameForest forest(mSource);
   QDomNode moving = forest.getNode(movingData->getUid());
@@ -75,17 +75,18 @@ void RegistrationApplicator::updateRegistration(QDateTime oldTime, RegistrationT
 
   std::vector<DataPtr> allMovingData = forest.getDataFromDescendantsAndSelf(movingBase);
 
-  report(QString(""
-				 "Update Registration using\n"
-				 "\tFixed:\t%1\n"
-				 "\tMoving:\t%2\n"
-				 "\tDelta matrix (rMd'=Delta*rMd)\n"
-				 "%3")
-		 .arg(delta_pre_rMd.mFixed)
-		 .arg(movingData->getUid())
-		 .arg(qstring_cast(delta_pre_rMd.mValue)));
+  if(!silent)
+	  report(QString(""
+					 "Update Registration using\n"
+					 "\tFixed:\t%1\n"
+					 "\tMoving:\t%2\n"
+					 "\tDelta matrix (rMd'=Delta*rMd)\n"
+					 "%3")
+			 .arg(delta_pre_rMd.mFixed)
+			 .arg(movingData->getUid())
+			 .arg(qstring_cast(delta_pre_rMd.mValue)));
 
-  this->updateTransform(oldTime, allMovingData, delta_pre_rMd);
+  this->updateTransform(oldTime, allMovingData, delta_pre_rMd, silent);
 
   // reconnect only if master and target are unconnected, i.e. doesnt share a common ancestor.
   // If we are registrating inside an already connected tree we only want to change transforms,
@@ -135,7 +136,7 @@ QString RegistrationApplicator::generateNewSpaceUid() const
 	return parentFrame;
 }
 
-void RegistrationApplicator::updateTransform(QDateTime oldTime, std::vector<DataPtr> data, RegistrationTransform delta_pre_rMd)
+void RegistrationApplicator::updateTransform(QDateTime oldTime, std::vector<DataPtr> data, RegistrationTransform delta_pre_rMd, bool silent)
 {
 	// update the transform on all target data:
 	for (unsigned i=0; i<data.size(); ++i)
@@ -144,7 +145,8 @@ void RegistrationApplicator::updateTransform(QDateTime oldTime, std::vector<Data
 	  newTransform.mValue = delta_pre_rMd.mValue * data[i]->get_rMd();
 	  data[i]->get_rMd_History()->updateRegistration(oldTime, newTransform);
 
-	  report("Updated registration of data " + data[i]->getName());
+	  if(!silent)
+		  report("Updated registration of data " + data[i]->getName());
 	}
 }
 
