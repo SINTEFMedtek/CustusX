@@ -180,6 +180,7 @@ signals:
 	void rMprChanged();
 	void streamLoaded();
 	void patientChanged();
+	void videoAddedToTrackedStream();
 };
 
 } // namespace cx
