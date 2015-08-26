@@ -97,6 +97,11 @@ void RegistrationServiceNull::applyPatientRegistration(Transform3D rMpr_new, QSt
 	printWarning();
 }
 
+void RegistrationServiceNull::applyContinuousPatientRegistration(Transform3D rMpr_new, QString description)
+{
+	printWarning();
+}
+
 void RegistrationServiceNull::applyPatientOrientation(const Transform3D &tMtm, const Transform3D &prMt)
 {
 	printWarning();

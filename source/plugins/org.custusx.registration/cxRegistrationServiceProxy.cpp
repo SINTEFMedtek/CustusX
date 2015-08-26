@@ -136,6 +136,11 @@ void RegistrationServiceProxy::applyPatientRegistration(Transform3D rMpr_new, QS
 	mRegistrationService->applyPatientRegistration( rMpr_new, description);
 }
 
+void RegistrationServiceProxy::applyContinuousPatientRegistration(Transform3D rMpr_new, QString description)
+{
+	mRegistrationService->applyContinuousPatientRegistration( rMpr_new, description);
+}
+
 void RegistrationServiceProxy::applyPatientOrientation(const Transform3D &tMtm, const Transform3D &prMt)
 {
 	mRegistrationService->applyPatientOrientation(tMtm, prMt);

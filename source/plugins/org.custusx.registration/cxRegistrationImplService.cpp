@@ -440,6 +440,16 @@ void RegistrationImplService::performImage2ImageRegistration(Transform3D delta_p
 
 void RegistrationImplService::applyPatientRegistration(Transform3D rMpr_new, QString description)
 {
+	this->performPatientRegistration(rMpr_new, description);
+}
+
+void RegistrationImplService::applyContinuousPatientRegistration(Transform3D rMpr_new, QString description)
+{
+	this->performPatientRegistration(rMpr_new, description, true);
+}
+
+void RegistrationImplService::performPatientRegistration(Transform3D rMpr_new, QString description, bool continuous)
+{
 	RegistrationTransform regTrans(rMpr_new, QDateTime::currentDateTime(), description);
 	regTrans.mFixed = mFixedData;
 
