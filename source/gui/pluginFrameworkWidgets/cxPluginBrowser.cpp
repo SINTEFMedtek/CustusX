@@ -113,9 +113,9 @@ ctkPluginBrowser::ctkPluginBrowser(PluginFrameworkManagerPtr framework)
 	pluginsTableView->setModel(mPluginTableModel);
 
 	connect(pluginsTableView->selectionModel(),
-			SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)),
+			&QItemSelectionModel::currentChanged,
 			this,
-			SLOT(pluginSelected(const QModelIndex&)));
+			&ctkPluginBrowser::pluginSelected);
 
 	startPluginNowAction = new QAction(QIcon(":/icons/open_icon_library/arrow-right-double-3.png"), "Start Plugin (ignore activation policy)", this);
 	startPluginAction = new QAction(QIcon(":/icons/open_icon_library/arrow-right-3.png"), "Start Plugin", this);

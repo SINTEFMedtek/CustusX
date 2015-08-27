@@ -76,7 +76,7 @@ DataManagerImpl::DataManagerImpl() :
 	mClinicalApplication(mdNEUROLOGICAL)
 {
 	m_rMpr_History.reset(new RegistrationHistory());
-	connect(m_rMpr_History.get(), SIGNAL(currentChanged()), this, SIGNAL(rMprChanged()));
+	connect(m_rMpr_History.get(), &RegistrationHistory::currentChanged, this, &DataManager::rMprChanged);
 	mPatientLandmarks = Landmarks::create();
 
 	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(settingsChangedSlot(QString)));

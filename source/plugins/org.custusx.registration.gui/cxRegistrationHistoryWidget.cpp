@@ -139,7 +139,7 @@ void RegistrationHistoryWidget::hideEvent(QCloseEvent* event)
 
 	for (unsigned i = 0; i < mHistories.size(); ++i)
 	{
-		disconnect(mHistories[i].get(), SIGNAL(currentChanged()), this, SLOT(updateSlot()));
+		disconnect(mHistories[i].get(), &RegistrationHistory::currentChanged, this, &RegistrationHistoryWidget::updateSlot);
 	}
 	disconnect(mServices.patientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &RegistrationHistoryWidget::reconnectSlot);
 	disconnect(mServices.patientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &RegistrationHistoryWidget::updateSlot);
@@ -149,14 +149,14 @@ void RegistrationHistoryWidget::reconnectSlot()
 {
 	for (unsigned i = 0; i < mHistories.size(); ++i)
 	{
-		disconnect(mHistories[i].get(), SIGNAL(currentChanged()), this, SLOT(updateSlot()));
+		disconnect(mHistories[i].get(), &RegistrationHistory::currentChanged, this, &RegistrationHistoryWidget::updateSlot);
 	}
 
 	mHistories = this->getAllRegistrationHistories();
 
 	for (unsigned i = 0; i < mHistories.size(); ++i)
 	{
-		connect(mHistories[i].get(), SIGNAL(currentChanged()), this, SLOT(updateSlot()));
+		connect(mHistories[i].get(), &RegistrationHistory::currentChanged, this, &RegistrationHistoryWidget::updateSlot);
 	}
 }
 
