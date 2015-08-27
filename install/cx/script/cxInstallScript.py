@@ -65,9 +65,12 @@ class Controller(cxBuildScript.BuildScript):
         return '''
 Installer script for CustusX and its components.
 
+Root folder is cxrepo/../.. = %s
+
 Available components are:
    %s.
-''' % '\n   '.join(self.assembly.getLibnames())
+''' % (self.controlData().getRootDir(),
+       '\n   '.join(self.assembly.getLibnames()))
        
     def setDefaults(self):                
         super(Controller, self).setDefaults()
@@ -91,7 +94,7 @@ Available components are:
         p.add_argument('--checkout', '--co', action='store_true', help='checkout all selected components')
         p.add_argument('--configure_clean', action='store_true', help='delete build folder(s), configure all selected components')
         p.add_argument('--configure', '--conf', action='store_true', help='configure all selected components')
-        p.add_argument('-b', '--build', '--make', action='store_true', help='build all selected components')
+        p.add_argument('-m', '-b', '--make', action='store_true', help='build all selected components')
         p.add_argument('-a', '--all', action='store_true', help='select all components')
         p.add_argument('-f', '--full', action='store_true', help='checkout, configure, make')
         p.add_argument('-c', '--clean', action='store_true', help='make clean')
@@ -137,7 +140,7 @@ Available components are:
                          configure_clean = options.configure_clean, 
                          configure = options.full or options.configure, 
                          clean = options.clean, 
-                         build = options.full or options.build)        
+                         build = options.full or options.make)        
         
         #self.cxBuilder.finish()
         PrintFormatter.finish()
