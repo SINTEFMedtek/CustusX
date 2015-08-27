@@ -453,10 +453,11 @@ void RegistrationImplService::performPatientRegistration(Transform3D rMpr_new, Q
 	RegistrationTransform regTrans(rMpr_new, QDateTime::currentDateTime(), description);
 	regTrans.mFixed = mFixedData;
 
-	mPatientModelService->updateRegistration_rMpr(mLastRegistrationTime, regTrans);
+	mPatientModelService->updateRegistration_rMpr(mLastRegistrationTime, regTrans, continuous);
 
 	mLastRegistrationTime = regTrans.mTimestamp;
-	reportSuccess(QString("Patient registration [%1] has been performed.").arg(description));
+	if(!continuous)
+		reportSuccess(QString("Patient registration [%1] has been performed.").arg(description));
 }
 
 /** Update the registration for data and all data connected to its space.

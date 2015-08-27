@@ -147,7 +147,7 @@ public:
 	virtual void setLandmarkActive(QString uid, bool active) = 0;
 	virtual QString addLandmark() = 0;
 	// utility
-	virtual void updateRegistration_rMpr(const QDateTime& oldTime, const RegistrationTransform& newTransform);
+	virtual void updateRegistration_rMpr(const QDateTime& oldTime, const RegistrationTransform& newTransform, bool continuous);
 
 	virtual QString getActivePatientFolder() const = 0;
 	QString generateFilePath(QString folderName, QString ending);
