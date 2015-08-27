@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxManualToolAdapter.h"
+#include <QTimer>
 
 namespace cx
 {
@@ -122,6 +123,24 @@ std::set<Tool::Type> ManualToolAdapter::getTypes() const
 	std::set<Tool::Type> retval = mBase->getTypes();
 	retval.insert(Tool::TOOL_MANUAL);
 	return retval;
+}
+
+void ManualToolAdapter::startEmittingContinuousPositions(int msecBetweenPositions)
+{
+	QTimer* positionTimer = new QTimer(this);
+	connect(positionTimer, SIGNAL(timeout()), this, SLOT(emitPosition()));
+	positionTimer->start(msecBetweenPositions);
+}
+
+//Not used for now
+//void ManualToolAdapter::stopEmittingContinuousPositions()
+//{
+//	positionTimer->stop();
+//}
+
+void ManualToolAdapter::emitPosition()
+{
+	emit toolTransformAndTimestamp(m_prMt, -1);
 }
 
 }

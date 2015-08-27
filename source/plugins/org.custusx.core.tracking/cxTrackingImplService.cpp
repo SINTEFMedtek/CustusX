@@ -263,6 +263,7 @@ void TrackingImplService::imbueManualToolWithRealProperties()
 		if (iter->second->hasType(Tool::TOOL_REFERENCE))
 			continue;
 		mManualTool->setBase(iter->second);
+		mManualTool->startEmittingContinuousPositions(100);
 
 		if(iter->second->hasType(Tool::TOOL_US_PROBE))
 			emit newProbe(mManualTool);
