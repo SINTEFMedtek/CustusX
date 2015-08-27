@@ -54,8 +54,8 @@ Data::Data(const QString& uid, const QString& name) :
 	else
 		mName = name;
 	m_rMd_History.reset(new RegistrationHistory());
-	connect(m_rMd_History.get(), SIGNAL(currentChanged()), this, SIGNAL(transformChanged()));
-	connect(m_rMd_History.get(), SIGNAL(currentChanged()), this, SLOT(transformChangedSlot()));
+	connect(m_rMd_History.get(), &RegistrationHistory::currentChanged, this, &Data::transformChanged);
+	connect(m_rMd_History.get(), &RegistrationHistory::currentChanged, this, &Data::transformChangedSlot);
 
 	mLandmarks = Landmarks::create();
 }
