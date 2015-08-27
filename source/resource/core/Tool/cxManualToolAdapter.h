@@ -73,6 +73,9 @@ public:
 	virtual double getTooltipOffset() const;
 	virtual void setTooltipOffset(double val);
 
+	void startEmittingContinuousPositions(int msecBetweenPositions);
+private slots:
+	void emitPosition();
 private:
   ToolPtr mBase;
 };

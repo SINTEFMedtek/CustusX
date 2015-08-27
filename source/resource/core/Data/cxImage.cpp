@@ -298,8 +298,8 @@ void Image::setVtkImageData(const vtkImageDataPtr& data, bool resetTransferFunct
 
 vtkImageDataPtr Image::get8bitGrayScaleVtkImageData()
 {
-	double windowWidth = mImageLookupTable2D->getWindow();
-	double windowLevel = mImageLookupTable2D->getLevel();
+	double windowWidth = this->getUnmodifiedLookupTable2D()->getWindow();
+	double windowLevel = this->getUnmodifiedLookupTable2D()->getLevel();
 	return convertImageDataTo8Bit(this->getGrayScaleVtkImageData(), windowWidth, windowLevel);
 }
 

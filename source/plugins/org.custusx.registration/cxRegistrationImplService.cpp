@@ -417,25 +417,47 @@ Transform3D RegistrationImplService::performLandmarkRegistration(vtkPointsPtr so
 
 void RegistrationImplService::applyImage2ImageRegistration(Transform3D delta_pre_rMd, QString description)
 {
+	this->performImage2ImageRegistration(delta_pre_rMd, description);
+}
+
+void RegistrationImplService::applyContinuousImage2ImageRegistration(Transform3D delta_pre_rMd, QString description)
+{
+	this->performImage2ImageRegistration(delta_pre_rMd, description, true);
+}
+
+void RegistrationImplService::performImage2ImageRegistration(Transform3D delta_pre_rMd, QString description, bool continuous)
+{
 	RegistrationTransform regTrans(delta_pre_rMd, QDateTime::currentDateTime(), description);
 	regTrans.mFixed = mFixedData;
 	regTrans.mMoving = mMovingData;
 
-	this->updateRegistration(mLastRegistrationTime, regTrans, this->getMovingData());
+	this->updateRegistration(mLastRegistrationTime, regTrans, this->getMovingData(), continuous);
 
 	mLastRegistrationTime = regTrans.mTimestamp;
-	reportSuccess(QString("Image registration [%1] has been performed on %2").arg(description).arg(regTrans.mMoving) );
+	if(!continuous)
+		reportSuccess(QString("Image registration [%1] has been performed on %2").arg(description).arg(regTrans.mMoving) );
 }
 
 void RegistrationImplService::applyPatientRegistration(Transform3D rMpr_new, QString description)
 {
+	this->performPatientRegistration(rMpr_new, description);
+}
+
+void RegistrationImplService::applyContinuousPatientRegistration(Transform3D rMpr_new, QString description)
+{
+	this->performPatientRegistration(rMpr_new, description, true);
+}
+
+void RegistrationImplService::performPatientRegistration(Transform3D rMpr_new, QString description, bool continuous)
+{
 	RegistrationTransform regTrans(rMpr_new, QDateTime::currentDateTime(), description);
 	regTrans.mFixed = mFixedData;
 
-	mPatientModelService->updateRegistration_rMpr(mLastRegistrationTime, regTrans);
+	mPatientModelService->updateRegistration_rMpr(mLastRegistrationTime, regTrans, continuous);
 
 	mLastRegistrationTime = regTrans.mTimestamp;
-	reportSuccess(QString("Patient registration [%1] has been performed.").arg(description));
+	if(!continuous)
+		reportSuccess(QString("Patient registration [%1] has been performed.").arg(description));
 }
 
 /** Update the registration for data and all data connected to its space.
@@ -443,11 +465,12 @@ void RegistrationImplService::applyPatientRegistration(Transform3D rMpr_new, QSt
  * Registration is done relative to masterFrame, i.e. data is moved relative to the masterFrame.
  *
  */
-void RegistrationImplService::updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data)
+void RegistrationImplService::updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data, bool continuous)
 {
 	RegistrationApplicator applicator(mPatientModelService->getData());
-	applicator.updateRegistration(oldTime, deltaTransform, data);
-	mPatientModelService->autoSave();
+	applicator.updateRegistration(oldTime, deltaTransform, data, continuous);
+	if(!continuous)
+		mPatientModelService->autoSave();
 }
 
 /**\brief Identical to doFastRegistration_Orientation(), except data does not move.

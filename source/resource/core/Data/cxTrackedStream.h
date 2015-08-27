@@ -73,6 +73,7 @@ public:
 	ImagePtr getChangingImage();
 	bool is3D();
 	bool hasVideo() const;
+	bool isStreaming() const;
 signals:
 	void streamChanged(QString uid);
 	void newTool(ToolPtr tool);

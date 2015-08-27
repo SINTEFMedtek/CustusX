@@ -62,7 +62,9 @@ public:
 	virtual void doFastRegistration_Orientation(const Transform3D& tMtm, const Transform3D &prMt);
 	virtual void doImageRegistration(bool translationOnly);
 	virtual void applyImage2ImageRegistration(Transform3D delta_pre_rMd, QString description);
+	virtual void applyContinuousImage2ImageRegistration(Transform3D delta_pre_rMd, QString description);
 	virtual void applyPatientRegistration(Transform3D rMpr_new, QString description);
+	virtual void applyContinuousPatientRegistration(Transform3D rMpr_new, QString description);
 	virtual void applyPatientOrientation(const Transform3D &tMtm, const Transform3D &prMt);
 
 	virtual QDateTime getLastRegistrationTime();

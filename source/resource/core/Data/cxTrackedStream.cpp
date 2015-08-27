@@ -197,4 +197,11 @@ bool TrackedStream::hasVideo() const
 	return true;
 }
 
+bool TrackedStream::isStreaming() const
+{
+	if (this->hasVideo())
+		return mVideoSource->isStreaming();
+	return false;
+}
+
 } //cx
