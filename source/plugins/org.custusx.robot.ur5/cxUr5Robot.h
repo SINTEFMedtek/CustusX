@@ -37,10 +37,15 @@ public slots:
     void initializeWorkspace(double threshold,Ur5State state,bool currentPos);
     void shutdown();
 
+signals:
+    void stateUpdated();
+
 private:
     int rtPort = 30003;
     int secPort = 30002;
     QString IPaddress;
+
+
 
 
 };
