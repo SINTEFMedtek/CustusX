@@ -65,12 +65,16 @@ public:
     Ur5Connection();
     ~Ur5Connection();
 
-    Ur5State mCurrentState,mTargetState,mPreviousState;
+    Ur5State getCurrentState();
+    Ur5State getTargetState();
+    Ur5State getPreviousState();
 
     void setAddress(QString address, int port);
     bool isConnectedToRobot();
 
     bool sendMessage(QString message);
+
+    void updateCurrentState(QByteArray buffer);
 
 public slots:
     void initializeWorkspace(double threshold,Ur5State origo,bool currentPos);
@@ -92,14 +96,13 @@ private:
     bool waitForMove();
     bool waitForMessage();
     bool atTargetPos(Ur5State current);
-    void updateCurrentState(QByteArray buffer);
     bool isValidPacket(qint64 bytes);
 
     double mBlendRadius = 0.001;
 
-
     Ur5MessageEncoder mMessageEncoder;
     Ur5MessageDecoder mMessageDecoder;
+    Ur5State mCurrentState,mTargetState,mPreviousState;
 
 };
 
