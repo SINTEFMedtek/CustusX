@@ -19,13 +19,13 @@ public:
 
 
     Ur5State mCurrentState, mPreviousState;
-    Ur5MessageEncoder mMessageEncoder;
+
 
     void setAddress(QString IPaddress);
 
     bool isConnectedToRobot();
     void sendMessage(QString message);
-    void move(QString typeOfMovement);
+    void move(QString typeOfMovement, Ur5State targetState, double acc, double vel, double rad = 0, double t = 0);
     void openVTKfile(QString filename);
     void moveProgram(double acceleration, double velocity, double radius);
 
@@ -46,6 +46,7 @@ private:
     QString IPaddress;
     Ur5Connection mSecMonitor,mRTMonitor;
     Ur5ProgramEncoder mProgramEncoder;
+    Ur5MessageEncoder mMessageEncoder;
 
 
 

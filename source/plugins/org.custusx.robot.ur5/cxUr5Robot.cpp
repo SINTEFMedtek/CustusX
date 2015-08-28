@@ -94,9 +94,10 @@ void Ur5Robot::sendMessage(QString message)
     mSecMonitor.sendMessage(message);
 }
 
-void Ur5Robot::move(QString typeOfMovement)
+void Ur5Robot::move(QString typeOfMovement, Ur5State targetState, double acc, double vel, double rad, double t)
 {
-
+    if(typeOfMovement=="movej")
+        sendMessage(mMessageEncoder.movej(targetState,acc,vel,0));
 }
 
 void Ur5Robot::openVTKfile(QString filename)
