@@ -128,15 +128,6 @@ void Ur5Connection::runProgramQueue(std::vector<QString> programQueue, std::vect
     emit(finished());
 }
 
-void Ur5Connection::updateCurrentState(bool connected)
-{
-    if(!connected)
-    {
-        mCurrentState = mMessageDecoder.analyzeRawPacket(setTestData(30003));
-        emit(stateChanged());
-    }
-}
-
 void Ur5Connection::updateCurrentState(QByteArray rawData)
 {
     mCurrentState = mMessageDecoder.analyzeRawPacket(rawData);
