@@ -72,8 +72,6 @@ public:
 
     bool sendMessage(QString message);
 
-    void updateCurrentState(bool connected = false);
-
 public slots:
     void initializeWorkspace(double threshold,Ur5State origo,bool currentPos);
     void runProgramQueue(std::vector<QString> programQueue, std::vector<Ur5State> poseQueue);
@@ -99,7 +97,7 @@ private:
 
     double mBlendRadius = 0.001;
 
-    QByteArray setTestData(int port);
+
     Ur5MessageEncoder mMessageEncoder;
     Ur5MessageDecoder mMessageDecoder;
 
