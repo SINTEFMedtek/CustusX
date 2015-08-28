@@ -293,67 +293,67 @@ void Ur5ManualMoveTab::rotButtonPressed(int angle, int sign)
 
 void Ur5ManualMoveTab::posZButtonPressedSlot()
 {
-    emit(coordButtonPressed(2,1));
+    coordButtonPressed(2,1);
 }
 
 void Ur5ManualMoveTab::negZButtonPressedSlot()
 {
-    emit(coordButtonPressed(2,-1));
+    coordButtonPressed(2,-1);
 }
 
 void Ur5ManualMoveTab::posYButtonPressedSlot()
 {
-    emit(coordButtonPressed(1,1));
+    coordButtonPressed(1,1);
 }
 
 void Ur5ManualMoveTab::negYButtonPressedSlot()
 {
-    emit(coordButtonPressed(1,-1));
+    coordButtonPressed(1,-1);
 }
 
 void Ur5ManualMoveTab::posXButtonPressedSlot()
 {
-   emit(coordButtonPressed(0,1));
+   coordButtonPressed(0,1);
 }
 
 void Ur5ManualMoveTab::negXButtonPressedSlot()
 {
-    emit(coordButtonPressed(0,-1));
+    coordButtonPressed(0,-1);
 }
 
 void Ur5ManualMoveTab::posRXButtonPressedSlot()
 {
-    emit(rotButtonPressed(0,1));
+    rotButtonPressed(0,1);
 }
 
 void Ur5ManualMoveTab::negRXButtonPressedSlot()
 {
-    emit(rotButtonPressed(0,-1));
+    rotButtonPressed(0,-1);
 }
 
 void Ur5ManualMoveTab::posRYButtonPressedSlot()
 {
-    emit(rotButtonPressed(1,1));
+    rotButtonPressed(1,1);
 }
 
 void Ur5ManualMoveTab::negRYButtonPressedSlot()
 {
-    emit(rotButtonPressed(1,-1));
+    rotButtonPressed(1,-1);
 }
 
 void Ur5ManualMoveTab::posRZButtonPressedSlot()
 {
-    emit(rotButtonPressed(2,1));
+    rotButtonPressed(2,1);
 }
 
 void Ur5ManualMoveTab::negRZButtonPressedSlot()
 {
-    emit(rotButtonPressed(2,-1));
+    rotButtonPressed(2,-1);
 }
 
 void Ur5ManualMoveTab::moveButtonReleasedSlot()
 {
-    emit(mUr5Robot->sendMessage(mUr5Robot->mMessageEncoder.stopl(accelerationLineEdit->text())));
+    mUr5Robot->sendMessage(mUr5Robot->mMessageEncoder.stopl(accelerationLineEdit->text()));
 }
 
 void Ur5ManualMoveTab::updatePositionSlot()
