@@ -94,10 +94,8 @@ void Ur5Connection::internalDataAvailable()
         return;
     }
 
-    QByteArray buffer = mSocket->read(mSocket->bytesAvailable());
-
     mPreviousState = mCurrentState;
-    updateCurrentState(buffer);
+    updateCurrentState(mSocket->read(mSocket->bytesAvailable()));
 }
 
 bool Ur5Connection::waitForMove()
