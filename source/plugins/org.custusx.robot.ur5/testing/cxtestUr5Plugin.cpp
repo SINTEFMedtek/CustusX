@@ -48,6 +48,7 @@ TEST_CASE("Ur5Plugin: Send message to robot and receive message from robot", "[m
 TEST_CASE("Ur5Plugin: Analyze raw data packet and update current state", "[manual][plugins][org.custusx.robot.ur5]")
 {
     Ur5TestFixture fixture;
+
     QByteArray rawData560 = fixture.getTestData(560);
     fixture.mUr5Connection.updateCurrentState(rawData560);
     REQUIRE(fixture.mUr5Connection.getCurrentState().updated == true);
