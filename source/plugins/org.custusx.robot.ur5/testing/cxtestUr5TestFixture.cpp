@@ -47,14 +47,14 @@ QByteArray Ur5TestFixture::getTestData(int packetSize)
 {
     if(packetSize == 560)
     {
-        QString filename = "C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/cxDataFromRobot560.txt";
+        QString filename = "C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/testing/test.data/cxDataFromRobot560.txt";
         QFile file(filename);
         if (!file.open(QIODevice::ReadOnly)) return QByteArray();
         return QByteArray::fromHex(file.readAll());
     }
     else if(packetSize == 1254)
     {
-        QString filename = "C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/cxDataFromRobot1254.txt";
+        QString filename = "C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/testing/test.data/cxDataFromRobot1254.txt";
         QFile file(filename);
         if (!file.open(QIODevice::ReadOnly)) return QByteArray();
         return QByteArray::fromHex(file.readAll());
