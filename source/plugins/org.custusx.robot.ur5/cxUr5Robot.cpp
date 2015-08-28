@@ -9,6 +9,10 @@ Ur5Robot::Ur5Robot()
     connect(&mSecMonitor,SIGNAL(stateChanged()),this,SLOT(updateCurrentState()));
 }
 
+Ur5Robot::~Ur5Robot()
+{
+}
+
 void Ur5Robot::updateCurrentState()
 {
     mPreviousState=mCurrentState;
