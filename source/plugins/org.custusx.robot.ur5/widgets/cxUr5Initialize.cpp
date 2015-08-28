@@ -116,8 +116,7 @@ void Ur5InitializeTab::setupUi(QWidget *parent)
 
 void Ur5InitializeTab::connectButtonSlot()
 {
-    mUr5Robot->setAddress(ipLineEdit->text());
-    mUr5Robot->connectToRobot();
+    mUr5Robot->connectToRobot(ipLineEdit->text());
 
     if(mUr5Robot->isConnectedToRobot() && !connectButton->isChecked())
     {
