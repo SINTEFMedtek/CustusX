@@ -17,12 +17,13 @@ public:
     Ur5Robot();
     ~Ur5Robot();
 
-
-    Ur5State mCurrentState, mPreviousState;
+    Ur5State getCurrentState();
+    Ur5State getPreviousState();
+    void setCurrentState(Ur5State currentState);
+    void setPreviousState(Ur5State previousState);
 
 
     void setAddress(QString IPaddress);
-
     bool isConnectedToRobot();
     void sendMessage(QString message);
     void move(QString typeOfMovement, Ur5State targetState, double acc, double vel, double rad = 0, double t = 0);
@@ -48,10 +49,7 @@ private:
     Ur5Connection mSecMonitor,mRTMonitor;
     Ur5ProgramEncoder mProgramEncoder;
     Ur5MessageEncoder mMessageEncoder;
-
-
-
-
+    Ur5State mCurrentState, mPreviousState;
 
 };
 
