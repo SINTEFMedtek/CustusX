@@ -16,10 +16,10 @@ public:
     QString movel(Ur5State pose,double a, double v);
 
     QString speedj(double* velocityField, double a, double t);
-    QString speedl(Ur5State p, QString a, QString t);
+    QString speedl(Ur5State p, double a, double t);
 
-    QString stopj(QString a);
-    QString stopl(QString a);
+    QString stopj(double a);
+    QString stopl(double a);
 
     QString set_tcp(Ur5State pose);
 

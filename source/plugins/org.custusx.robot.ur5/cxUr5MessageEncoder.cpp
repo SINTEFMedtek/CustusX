@@ -35,7 +35,7 @@ QString Ur5MessageEncoder::speedj(double* velocityField, double a, double t)
             .arg(velocityField[4]).arg(velocityField[5]).arg(a).arg(t);
 }
 
-QString Ur5MessageEncoder::speedl(Ur5State p, QString a, QString t)
+QString Ur5MessageEncoder::speedl(Ur5State p, double a, double t)
 {
     return QString("speedl([%1,%2,%3,%4,%5,%6],a=%7,t_min=%8)")
             .arg(p.jointAxisVelocity(0)).arg(p.jointAxisVelocity(1)).arg(p.jointAxisVelocity(2)).arg(p.jointAngleVelocity(0))
@@ -49,12 +49,12 @@ QString Ur5MessageEncoder::set_tcp(Ur5State p)
             .arg(p.cartAngles(1)).arg(p.cartAngles(2));
 }
 
-QString Ur5MessageEncoder::stopl(QString a)
+QString Ur5MessageEncoder::stopl(double a)
 {
     return QString("stopl(%1)").arg(a);
 }
 
-QString Ur5MessageEncoder::stopj(QString a)
+QString Ur5MessageEncoder::stopj(double a)
 {
     return QString("stopj(%1)").arg(a);
 }
