@@ -187,7 +187,7 @@ void Transform3DWidget::toggleInvertSlot()
 {
 	// the interpretation of matrix is dependent on mInvertAction->isChecked()!
 	mDecomposition.reset(mDecomposition.getMatrix().inverse());
-	this->updateValues();
+	this->setModified();
 //	this->updateInvertAction();
 }
 
@@ -310,7 +310,7 @@ Transform3D Transform3DWidget::convertToFromExternal(const Transform3D& M) const
 void Transform3DWidget::setMatrixInternal(const Transform3D& M)
 {
 	mDecomposition.reset(M);
-	this->updateValues();
+	this->setModified();
 	emit changed();
 }
 
@@ -333,7 +333,7 @@ void Transform3DWidget::changedSlot()
   Vector3D t(mTranslationAdapter[0]->getValue(),mTranslationAdapter[1]->getValue(),mTranslationAdapter[2]->getValue());
   mDecomposition.setPosition(t);
 
-  this->updateValues();
+  this->setModified();
   emit changed();
   recursive = false;
 }
@@ -354,7 +354,7 @@ namespace
 	}
 }
 
-void Transform3DWidget::updateValues()
+void Transform3DWidget::prePaintEvent()
 {
   QString M = qstring_cast(this->getMatrixInternal());
 

@@ -71,9 +71,9 @@ protected slots:
   void removeSlot();
   void forwardSlot();
   void fastForwardSlot();
-  void updateSlot();
   void reconnectSlot();
 
+  virtual void prePaintEvent();
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
   virtual void hideEvent(QCloseEvent* event); ///<disconnects stuff

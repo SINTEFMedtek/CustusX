@@ -128,9 +128,9 @@ void RegistrationHistoryWidget::showEvent(QShowEvent* event)
 
 	this->reconnectSlot();
 	connect(mServices.patientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &RegistrationHistoryWidget::reconnectSlot);
-	connect(mServices.patientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &RegistrationHistoryWidget::updateSlot);
+	connect(mServices.patientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &RegistrationHistoryWidget::setModified);
 
-	updateSlot();
+	setModified();
 }
 
 void RegistrationHistoryWidget::hideEvent(QCloseEvent* event)
@@ -139,24 +139,24 @@ void RegistrationHistoryWidget::hideEvent(QCloseEvent* event)
 
 	for (unsigned i = 0; i < mHistories.size(); ++i)
 	{
-		disconnect(mHistories[i].get(), &RegistrationHistory::currentChanged, this, &RegistrationHistoryWidget::updateSlot);
+		disconnect(mHistories[i].get(), &RegistrationHistory::currentChanged, this, &RegistrationHistoryWidget::setModified);
 	}
 	disconnect(mServices.patientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &RegistrationHistoryWidget::reconnectSlot);
-	disconnect(mServices.patientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &RegistrationHistoryWidget::updateSlot);
+	disconnect(mServices.patientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &RegistrationHistoryWidget::setModified);
 }
 
 void RegistrationHistoryWidget::reconnectSlot()
 {
 	for (unsigned i = 0; i < mHistories.size(); ++i)
 	{
-		disconnect(mHistories[i].get(), &RegistrationHistory::currentChanged, this, &RegistrationHistoryWidget::updateSlot);
+		disconnect(mHistories[i].get(), &RegistrationHistory::currentChanged, this, &RegistrationHistoryWidget::setModified);
 	}
 
 	mHistories = this->getAllRegistrationHistories();
 
 	for (unsigned i = 0; i < mHistories.size(); ++i)
 	{
-		connect(mHistories[i].get(), &RegistrationHistory::currentChanged, this, &RegistrationHistoryWidget::updateSlot);
+		connect(mHistories[i].get(), &RegistrationHistory::currentChanged, this, &RegistrationHistoryWidget::setModified);
 	}
 }
 
@@ -396,10 +396,11 @@ void RegistrationHistoryWidget::fastForwardSlot()
 	}
 }
 
-void RegistrationHistoryWidget::updateSlot()
+void RegistrationHistoryWidget::prePaintEvent()
 {
-	std::vector<RegistrationHistoryPtr> raw = getAllRegistrationHistories();
-	std::vector<RegistrationTransform> history = mergeHistory(raw);
+	//Not used?
+//	std::vector<RegistrationHistoryPtr> raw = getAllRegistrationHistories();
+//	std::vector<RegistrationTransform> history = mergeHistory(raw);
 
 	TimeMap times = this->getRegistrationTimes();
 	std::map<QDateTime, QString>::iterator current = this->findCurrentActiveIter(times);

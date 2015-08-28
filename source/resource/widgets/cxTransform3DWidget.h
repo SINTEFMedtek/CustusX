@@ -70,6 +70,8 @@ public:
 signals:
   void changed();
 
+protected slots:
+  virtual void prePaintEvent();
 private slots:
   void changedSlot();
   void toggleEditSlot();
@@ -80,7 +82,6 @@ private:
   void setMatrixInternal(const Transform3D& M);
   Transform3D getMatrixInternal() const;
 
-  void updateValues();
   void addAngleControls(QString uid, QString name, int index, QVBoxLayout* layout);
   void addTranslationControls(QString uid, QString name, int index, QVBoxLayout* layout);
   void rotateSlot(QPointF delta, int index);
