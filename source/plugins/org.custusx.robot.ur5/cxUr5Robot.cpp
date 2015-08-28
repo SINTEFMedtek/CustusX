@@ -98,6 +98,14 @@ void Ur5Robot::move(QString typeOfMovement, Ur5State targetState, double acc, do
 {
     if(typeOfMovement=="movej")
         sendMessage(mMessageEncoder.movej(targetState,acc,vel,0));
+    else if(typeOfMovement=="speedl")
+        sendMessage(mMessageEncoder.speedl(targetState,acc,t));
+}
+
+void Ur5Robot::stopMove(QString typeOfStop, double acc)
+{
+    if(typeOfStop=="stopl")
+        sendMessage(mMessageEncoder.stopl(acc));
 }
 
 void Ur5Robot::openVTKfile(QString filename)
