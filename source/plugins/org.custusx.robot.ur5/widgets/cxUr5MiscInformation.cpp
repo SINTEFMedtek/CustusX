@@ -23,17 +23,14 @@
 namespace cx
 {
 
-Ur5MiscInformationTab::Ur5MiscInformationTab(Ur5RobotPtr ur5robot, QWidget *parent) :
+Ur5MiscInformationTab::Ur5MiscInformationTab(Ur5RobotPtr Ur5Robot, QWidget *parent) :
     QWidget(parent),
-    ur5Robot(ur5robot)
+    mUr5Robot(Ur5Robot)
 {
     setupUi(this);
 
-    connect(&ur5Robot->mRTMonitor,SIGNAL(stateChanged()),this,SLOT(updateForceSlot()));
-    connect(&ur5Robot->mSecMonitor,SIGNAL(stateChanged()),this,SLOT(updateForceSlot()));
-    connect(&ur5Robot->mRTMonitor,SIGNAL(stateChanged()),this,SLOT(updatePositionSlot()));
-    connect(&ur5Robot->mSecMonitor,SIGNAL(stateChanged()),this,SLOT(updatePositionSlot()));
-
+    connect(mUr5Robot.get(),SIGNAL(stateUpdated()),this,SLOT(updateForceSlot()));
+    connect(mUr5Robot.get(),SIGNAL(stateUpdated()),this,SLOT(updatePositionSlot()));
 }
 
 Ur5MiscInformationTab::~Ur5MiscInformationTab()
@@ -242,37 +239,37 @@ void Ur5MiscInformationTab::setupUi(QWidget *parent)
 
 void Ur5MiscInformationTab::updateForceSlot()
 {
-    FxLineEdit->setText(QString::number(ur5Robot->mCurrentState.force(0),'f',1));
-    FyLineEdit->setText(QString::number(ur5Robot->mCurrentState.force(1),'f',1));
-    FzLineEdit->setText(QString::number(ur5Robot->mCurrentState.force(2),'f',1));
-    TxLineEdit->setText(QString::number(ur5Robot->mCurrentState.torque(0),'f',1));
-    TyLineEdit->setText(QString::number(ur5Robot->mCurrentState.torque(1),'f',1));
-    TzLineEdit->setText(QString::number(ur5Robot->mCurrentState.torque(2),'f',1));
-    FLineEdit->setText(QString::number(ur5Robot->mCurrentState.force.length(),'f',1));
+    FxLineEdit->setText(QString::number(mUr5Robot->mCurrentState.force(0),'f',1));
+    FyLineEdit->setText(QString::number(mUr5Robot->mCurrentState.force(1),'f',1));
+    FzLineEdit->setText(QString::number(mUr5Robot->mCurrentState.force(2),'f',1));
+    TxLineEdit->setText(QString::number(mUr5Robot->mCurrentState.torque(0),'f',1));
+    TyLineEdit->setText(QString::number(mUr5Robot->mCurrentState.torque(1),'f',1));
+    TzLineEdit->setText(QString::number(mUr5Robot->mCurrentState.torque(2),'f',1));
+    FLineEdit->setText(QString::number(mUr5Robot->mCurrentState.force.length(),'f',1));
 }
 
 void Ur5MiscInformationTab::updatePositionSlot()
 {
-    xPosLineEdit->setText(QString::number(1000*(ur5Robot->mCurrentState.cartAxis(0)),'f',2));
-    yPosLineEdit->setText(QString::number(1000*(ur5Robot->mCurrentState.cartAxis(1)),'f',2));
-    zPosLineEdit->setText(QString::number(1000*(ur5Robot->mCurrentState.cartAxis(2)),'f',2));
-    rxLineEdit->setText(QString::number(ur5Robot->mCurrentState.cartAngles(0),'f',4));
-    ryLineEdit->setText(QString::number(ur5Robot->mCurrentState.cartAngles(1),'f',4));
-    rzLineEdit->setText(QString::number(ur5Robot->mCurrentState.cartAngles(2),'f',4));
+    xPosLineEdit->setText(QString::number(1000*(mUr5Robot->mCurrentState.cartAxis(0)),'f',2));
+    yPosLineEdit->setText(QString::number(1000*(mUr5Robot->mCurrentState.cartAxis(1)),'f',2));
+    zPosLineEdit->setText(QString::number(1000*(mUr5Robot->mCurrentState.cartAxis(2)),'f',2));
+    rxLineEdit->setText(QString::number(mUr5Robot->mCurrentState.cartAngles(0),'f',4));
+    ryLineEdit->setText(QString::number(mUr5Robot->mCurrentState.cartAngles(1),'f',4));
+    rzLineEdit->setText(QString::number(mUr5Robot->mCurrentState.cartAngles(2),'f',4));
 
-    jxPosLineEdit->setText(QString::number(ur5Robot->mCurrentState.jointAxis(0),'f',4));
-    jyPosLineEdit->setText(QString::number(ur5Robot->mCurrentState.jointAxis(1),'f',4));
-    jzPosLineEdit->setText(QString::number(ur5Robot->mCurrentState.jointAxis(2),'f',4));
-    jrxLineEdit->setText(QString::number(ur5Robot->mCurrentState.jointAngles(0),'f',4));
-    jryLineEdit->setText(QString::number(ur5Robot->mCurrentState.jointAngles(1),'f',4));
-    jrzLineEdit->setText(QString::number(ur5Robot->mCurrentState.jointAngles(2),'f',4));
+    jxPosLineEdit->setText(QString::number(mUr5Robot->mCurrentState.jointAxis(0),'f',4));
+    jyPosLineEdit->setText(QString::number(mUr5Robot->mCurrentState.jointAxis(1),'f',4));
+    jzPosLineEdit->setText(QString::number(mUr5Robot->mCurrentState.jointAxis(2),'f',4));
+    jrxLineEdit->setText(QString::number(mUr5Robot->mCurrentState.jointAngles(0),'f',4));
+    jryLineEdit->setText(QString::number(mUr5Robot->mCurrentState.jointAngles(1),'f',4));
+    jrzLineEdit->setText(QString::number(mUr5Robot->mCurrentState.jointAngles(2),'f',4));
 
-    txPosLineEdit->setText(QString::number(ur5Robot->mCurrentState.tcpAxis(0),'f',2));
-    tyPosLineEdit->setText(QString::number(ur5Robot->mCurrentState.tcpAxis(1),'f',2));
-    tzPosLineEdit->setText(QString::number(ur5Robot->mCurrentState.tcpAxis(2),'f',2));
-    trxLineEdit->setText(QString::number(ur5Robot->mCurrentState.tcpAngles(0),'f',4));
-    tryLineEdit->setText(QString::number(ur5Robot->mCurrentState.tcpAngles(1),'f',4));
-    trzLineEdit->setText(QString::number(ur5Robot->mCurrentState.tcpAngles(2),'f',4));
+    txPosLineEdit->setText(QString::number(mUr5Robot->mCurrentState.tcpAxis(0),'f',2));
+    tyPosLineEdit->setText(QString::number(mUr5Robot->mCurrentState.tcpAxis(1),'f',2));
+    tzPosLineEdit->setText(QString::number(mUr5Robot->mCurrentState.tcpAxis(2),'f',2));
+    trxLineEdit->setText(QString::number(mUr5Robot->mCurrentState.tcpAngles(0),'f',4));
+    tryLineEdit->setText(QString::number(mUr5Robot->mCurrentState.tcpAngles(1),'f',4));
+    trzLineEdit->setText(QString::number(mUr5Robot->mCurrentState.tcpAngles(2),'f',4));
 }
 
 } // cx

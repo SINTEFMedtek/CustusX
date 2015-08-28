@@ -9,14 +9,13 @@ namespace cx
 
 Ur5ManualMoveTab::Ur5ManualMoveTab(Ur5RobotPtr Ur5Robot,QWidget *parent) :
     QWidget(parent),
-    ur5robot(Ur5Robot)
+    mUr5Robot(Ur5Robot)
 {
     setupUi(this);
 
     connectMovementButtons();
 
-    connect(&ur5robot->mSecMonitor,SIGNAL(stateChanged()),this,SLOT(updatePositionSlot()));
-    connect(&ur5robot->mRTMonitor,SIGNAL(stateChanged()),this,SLOT(updatePositionSlot()));
+    connect(mUr5Robot.get(),&Ur5Robot::stateUpdated,this,&Ur5ManualMoveTab::updatePositionSlot);
 }
 
 Ur5ManualMoveTab::~Ur5ManualMoveTab()
@@ -282,14 +281,14 @@ void Ur5ManualMoveTab::coordButtonPressed(int axis, int sign)
 {
     Ur5State velocity;
     velocity.jointAxisVelocity(axis)=(sign)*velocityLineEdit->text().toDouble();
-    ur5robot->sendMessage(ur5robot->mMessageEncoder.speedl(velocity,accelerationLineEdit->text(),timeLineEdit->text()));
+    mUr5Robot->sendMessage(mUr5Robot->mMessageEncoder.speedl(velocity,accelerationLineEdit->text(),timeLineEdit->text()));
 }
 
 void Ur5ManualMoveTab::rotButtonPressed(int angle, int sign)
 {
     Ur5State velocity;
     velocity.jointAngleVelocity(angle)=(sign)*velocityLineEdit->text().toDouble();
-    ur5robot->sendMessage(ur5robot->mMessageEncoder.speedl(velocity,accelerationLineEdit->text(),timeLineEdit->text()));
+    mUr5Robot->sendMessage(mUr5Robot->mMessageEncoder.speedl(velocity,accelerationLineEdit->text(),timeLineEdit->text()));
 }
 
 void Ur5ManualMoveTab::posZButtonPressedSlot()
@@ -354,17 +353,17 @@ void Ur5ManualMoveTab::negRZButtonPressedSlot()
 
 void Ur5ManualMoveTab::moveButtonReleasedSlot()
 {
-    emit(ur5robot->sendMessage(ur5robot->mMessageEncoder.stopl(accelerationLineEdit->text())));
+    emit(mUr5Robot->sendMessage(mUr5Robot->mMessageEncoder.stopl(accelerationLineEdit->text())));
 }
 
 void Ur5ManualMoveTab::updatePositionSlot()
 {
-    xPosLineEdit->setText(QString::number(1000*(ur5robot->mCurrentState.cartAxis(0)),'f',2));
-    yPosLineEdit->setText(QString::number(1000*(ur5robot->mCurrentState.cartAxis(1)),'f',2));
-    zPosLineEdit->setText(QString::number(1000*(ur5robot->mCurrentState.cartAxis(2)),'f',2));
-    rxLineEdit->setText(QString::number(ur5robot->mCurrentState.cartAngles(0),'f',4));
-    ryLineEdit->setText(QString::number(ur5robot->mCurrentState.cartAngles(1),'f',4));
-    rzLineEdit->setText(QString::number(ur5robot->mCurrentState.cartAngles(2),'f',4));
+    xPosLineEdit->setText(QString::number(1000*(mUr5Robot->mCurrentState.cartAxis(0)),'f',2));
+    yPosLineEdit->setText(QString::number(1000*(mUr5Robot->mCurrentState.cartAxis(1)),'f',2));
+    zPosLineEdit->setText(QString::number(1000*(mUr5Robot->mCurrentState.cartAxis(2)),'f',2));
+    rxLineEdit->setText(QString::number(mUr5Robot->mCurrentState.cartAngles(0),'f',4));
+    ryLineEdit->setText(QString::number(mUr5Robot->mCurrentState.cartAngles(1),'f',4));
+    rzLineEdit->setText(QString::number(mUr5Robot->mCurrentState.cartAngles(2),'f',4));
 }
 
 void Ur5ManualMoveTab::connectMovementButtons()
