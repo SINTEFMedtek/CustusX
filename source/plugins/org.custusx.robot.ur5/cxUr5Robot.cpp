@@ -15,19 +15,45 @@ Ur5Robot::~Ur5Robot()
 
 void Ur5Robot::updateCurrentState()
 {
-    mPreviousState=mCurrentState;
-    this->mCurrentState.timeSinceStart=this->mRTMonitor.mCurrentState.timeSinceStart;
-    this->mCurrentState.cartAngles=this->mSecMonitor.mCurrentState.cartAngles;
-    this->mCurrentState.cartAxis=this->mSecMonitor.mCurrentState.cartAxis;
-    this->mCurrentState.force=this->mRTMonitor.mCurrentState.force;
-    this->mCurrentState.torque=this->mRTMonitor.mCurrentState.torque;
-    this->mCurrentState.jointAngles=this->mRTMonitor.mCurrentState.jointAngles;
-    this->mCurrentState.jointAngleVelocity=this->mRTMonitor.mCurrentState.jointAngleVelocity;
-    this->mCurrentState.jointAxis=this->mRTMonitor.mCurrentState.jointAxis;
-    this->mCurrentState.jointAxisVelocity=this->mRTMonitor.mCurrentState.jointAxisVelocity;
-    this->mCurrentState.tcpAngles=this->mRTMonitor.mCurrentState.tcpAngles;
-    this->mCurrentState.tcpAxis=this->mRTMonitor.mCurrentState.tcpAxis;
+    this->setPreviousState(getCurrentState());
+
+    Ur5State currentState;
+
+    currentState.timeSinceStart=this->mRTMonitor.mCurrentState.timeSinceStart;
+    currentState.cartAngles=this->mSecMonitor.mCurrentState.cartAngles;
+    currentState.cartAxis=this->mSecMonitor.mCurrentState.cartAxis;
+    currentState.force=this->mRTMonitor.mCurrentState.force;
+    currentState.torque=this->mRTMonitor.mCurrentState.torque;
+    currentState.jointAngles=this->mRTMonitor.mCurrentState.jointAngles;
+    currentState.jointAngleVelocity=this->mRTMonitor.mCurrentState.jointAngleVelocity;
+    currentState.jointAxis=this->mRTMonitor.mCurrentState.jointAxis;
+    currentState.jointAxisVelocity=this->mRTMonitor.mCurrentState.jointAxisVelocity;
+    currentState.tcpAngles=this->mRTMonitor.mCurrentState.tcpAngles;
+    currentState.tcpAxis=this->mRTMonitor.mCurrentState.tcpAxis;
+
+    this->setCurrentState(currentState);
+
     emit(stateUpdated());
+}
+
+Ur5State Ur5Robot::getCurrentState()
+{
+    return (this->mCurrentState);
+}
+
+Ur5State Ur5Robot::getPreviousState()
+{
+    return (this->mPreviousState);
+}
+
+void Ur5Robot::setCurrentState(Ur5State currentState)
+{
+    this->mCurrentState=currentState;
+}
+
+void Ur5Robot::setPreviousState(Ur5State previousState)
+{
+    this->mPreviousState=previousState;
 }
 
 void Ur5Robot::setAddress(QString address)
