@@ -15,7 +15,7 @@ namespace cx
 
 Ur5InitializeTab::Ur5InitializeTab(Ur5RobotPtr Ur5Robot,QWidget *parent) :
     QWidget(parent),
-    ur5Robot(Ur5Robot)
+    mUr5Robot(Ur5Robot)
 {
     setupUi(this);
 
@@ -116,14 +116,14 @@ void Ur5InitializeTab::setupUi(QWidget *parent)
 
 void Ur5InitializeTab::connectButtonSlot()
 {
-    ur5Robot->setAddress(ipLineEdit->text());
-    ur5Robot->connectToRobot();
+    mUr5Robot->setAddress(ipLineEdit->text());
+    mUr5Robot->connectToRobot();
 
-    if(ur5Robot->isConnectedToRobot() && !connectButton->isChecked())
+    if(mUr5Robot->isConnectedToRobot() && !connectButton->isChecked())
     {
         connectButton->toggle();
     }
-    else if(!ur5Robot->isConnectedToRobot() && connectButton->isChecked())
+    else if(!mUr5Robot->isConnectedToRobot() && connectButton->isChecked())
     {
         connectButton->toggle();
     }
@@ -131,9 +131,9 @@ void Ur5InitializeTab::connectButtonSlot()
 
 void Ur5InitializeTab::disconnectButtonSlot()
 {
-    ur5Robot->disconnectFromRobot();
+    mUr5Robot->disconnectFromRobot();
 
-    if(!ur5Robot->isConnectedToRobot() && connectButton->isChecked())
+    if(!mUr5Robot->isConnectedToRobot() && connectButton->isChecked())
         connectButton->toggle();
 
 }
@@ -143,18 +143,18 @@ void Ur5InitializeTab::initializeButtonSlot()
     if(presetOrigoComboBox->currentText() == "Buttom right corner")
     {
         report("Moving to buttom right corner.");
-        ur5Robot->initializeWorkspace(0.00005,Ur5State(-0.36,-0.64,0.29,-1.87,-2.50,0),false);
+        mUr5Robot->initializeWorkspace(0.00005,Ur5State(-0.36,-0.64,0.29,-1.87,-2.50,0),false);
     }
     else if(presetOrigoComboBox->currentText() == "Current position")
     {
        report("Setting current pos to origo");
-       ur5Robot->initializeWorkspace(0.000005,Ur5State(0,0,0,0,0,0),true);
+       mUr5Robot->initializeWorkspace(0.000005,Ur5State(0,0,0,0,0,0),true);
     }
 }
 
 void Ur5InitializeTab::shutdownButtonSlot()
 {
-    ur5Robot->shutdown();
+    mUr5Robot->shutdown();
 }
 
 } // cx

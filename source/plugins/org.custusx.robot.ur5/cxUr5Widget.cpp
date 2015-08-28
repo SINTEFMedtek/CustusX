@@ -55,7 +55,7 @@ namespace cx
 Ur5Widget::Ur5Widget(QWidget* parent) :
     QWidget(parent)
 {
-    ur5Robot = Ur5RobotPtr(new Ur5Robot);
+    mUr5Robot = Ur5RobotPtr(new Ur5Robot);
 
     setupUi(this);
 }
@@ -72,10 +72,10 @@ void Ur5Widget::setupUi(QWidget *Ur5Widget)
     QLayout* Ur5WidgetLayout = new QVBoxLayout(Ur5Widget);
     QTabWidget* tabWidget = new QTabWidget(Ur5Widget);
     Ur5WidgetLayout->addWidget(tabWidget);
-    tabWidget->addTab(new Ur5InitializeTab(ur5Robot), tr("Initialize"));
-    tabWidget->addTab(new Ur5ManualMoveTab(ur5Robot),tr("Manual movement"));
-    tabWidget->addTab(new Ur5PlannedMoveTab(ur5Robot),tr("Planned movement"));
-    tabWidget->addTab(new Ur5MiscInformationTab(ur5Robot),tr("Advanced information"));
+    tabWidget->addTab(new Ur5InitializeTab(mUr5Robot), tr("Initialize"));
+    tabWidget->addTab(new Ur5ManualMoveTab(mUr5Robot),tr("Manual movement"));
+    tabWidget->addTab(new Ur5PlannedMoveTab(mUr5Robot),tr("Planned movement"));
+    tabWidget->addTab(new Ur5MiscInformationTab(mUr5Robot),tr("Advanced information"));
 
     QMetaObject::connectSlotsByName(Ur5Widget);
 }

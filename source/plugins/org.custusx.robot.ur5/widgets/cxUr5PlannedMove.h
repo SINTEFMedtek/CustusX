@@ -28,7 +28,7 @@ protected slots:
 
 private:
     void setupUi(QWidget *parent);
-    Ur5RobotPtr ur5Robot;
+    Ur5RobotPtr mUr5Robot;
 };
 
 } // cx

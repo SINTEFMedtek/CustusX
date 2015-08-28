@@ -51,7 +51,7 @@ public slots:
 
 private:
     void setupUi(QWidget *parent);
-    Ur5RobotPtr ur5robot;
+    Ur5RobotPtr mUr5Robot;
     void connectMovementButtons();
 };
 

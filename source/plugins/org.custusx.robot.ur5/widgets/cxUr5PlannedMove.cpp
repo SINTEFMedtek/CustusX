@@ -9,9 +9,9 @@
 namespace cx
 {
 
-Ur5PlannedMoveTab::Ur5PlannedMoveTab(Ur5RobotPtr ur5robot, QWidget *parent) :
+Ur5PlannedMoveTab::Ur5PlannedMoveTab(Ur5RobotPtr Ur5Robot, QWidget *parent) :
     QWidget(parent),
-    ur5Robot(ur5robot)
+    mUr5Robot(Ur5Robot)
 {
     setupUi(this);
 
@@ -82,13 +82,13 @@ void Ur5PlannedMoveTab::setupUi(QWidget *parent)
 
 void Ur5PlannedMoveTab::runVTKfileSlot()
 {
-    ur5Robot->openVTKfile(vtkLineEdit->text());
-    ur5Robot->moveProgram(ur5Robot->mProgramEncoder.poseQueue,accelerationLineEdit->text().toDouble(),velocityLineEdit->text().toDouble(),0);
+    mUr5Robot->openVTKfile(vtkLineEdit->text());
+    mUr5Robot->moveProgram(mUr5Robot->mProgramEncoder.poseQueue,accelerationLineEdit->text().toDouble(),velocityLineEdit->text().toDouble(),0);
 }
 
 void Ur5PlannedMoveTab::goToOrigoButtonSlot()
 {
-    ur5Robot->sendMessage(ur5Robot->mMessageEncoder.movej(Ur5State(0,0,0,0,0,0),accelerationLineEdit->text().toDouble(),velocityLineEdit->text().toDouble(),0));
+    mUr5Robot->sendMessage(mUr5Robot->mMessageEncoder.movej(Ur5State(0,0,0,0,0,0),accelerationLineEdit->text().toDouble(),velocityLineEdit->text().toDouble(),0));
 }
 
 } // cx
