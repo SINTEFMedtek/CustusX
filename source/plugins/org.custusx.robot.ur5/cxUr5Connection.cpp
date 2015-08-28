@@ -259,4 +259,19 @@ bool Ur5Connection::isValidPacket(qint64 bytes)
     return (bytes == 1460 || bytes == 560 || bytes == 812 || bytes == 1624 || bytes ==1254);
 }
 
+Ur5State Ur5Connection::getCurrentState()
+{
+    return (this->mCurrentState);
+}
+
+Ur5State Ur5Connection::getTargetState()
+{
+    return (this->mCurrentState);
+}
+
+Ur5State Ur5Connection::getPreviousState()
+{
+    return (this->mCurrentState);
+}
+
 } // cx
