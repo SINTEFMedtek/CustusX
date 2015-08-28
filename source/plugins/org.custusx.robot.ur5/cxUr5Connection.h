@@ -66,7 +66,6 @@ public:
     ~Ur5Connection();
 
     Ur5MessageDecoder mMessageDecoder;
-    Ur5ProgramEncoder mProgramEncoder;
     Ur5State mCurrentState,mTargetState,mPreviousState;
 
     void setAddress(QString address, int port);
