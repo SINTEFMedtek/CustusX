@@ -88,7 +88,7 @@ void Ur5PlannedMoveTab::runVTKfileSlot()
 
 void Ur5PlannedMoveTab::goToOrigoButtonSlot()
 {
-    mUr5Robot->sendMessage(mUr5Robot->mMessageEncoder.movej(Ur5State(0,0,0,0,0,0),accelerationLineEdit->text().toDouble(),velocityLineEdit->text().toDouble(),0));
+    mUr5Robot->move("movej",Ur5State(0,0,0,0,0,0),accelerationLineEdit->text().toDouble(),velocityLineEdit->text().toDouble());
 }
 
 } // cx
