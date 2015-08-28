@@ -83,7 +83,7 @@ void Ur5PlannedMoveTab::setupUi(QWidget *parent)
 void Ur5PlannedMoveTab::runVTKfileSlot()
 {
     mUr5Robot->openVTKfile(vtkLineEdit->text());
-    mUr5Robot->moveProgram(accelerationLineEdit->text().toDouble(),velocityLineEdit->text().toDouble(),0);
+    mUr5Robot->moveProgram("movej",accelerationLineEdit->text().toDouble(),velocityLineEdit->text().toDouble(),0);
 }
 
 void Ur5PlannedMoveTab::goToOrigoButtonSlot()
