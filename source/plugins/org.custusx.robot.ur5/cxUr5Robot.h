@@ -17,7 +17,7 @@ public:
     Ur5Robot();
     ~Ur5Robot();
 
-    Ur5ProgramEncoder mProgramEncoder;
+
     Ur5State mCurrentState, mPreviousState;
     Ur5MessageEncoder mMessageEncoder;
 
@@ -27,7 +27,7 @@ public:
     void sendMessage(QString message);
     void move(QString typeOfMovement);
     void openVTKfile(QString filename);
-    void moveProgram(std::vector<Ur5State> poseQueue,double acceleration, double velocity, double radius);
+    void moveProgram(double acceleration, double velocity, double radius);
 
 
 public slots:
@@ -45,6 +45,7 @@ private:
     int secPort = 30002;
     QString IPaddress;
     Ur5Connection mSecMonitor,mRTMonitor;
+    Ur5ProgramEncoder mProgramEncoder;
 
 
 

@@ -104,10 +104,10 @@ void Ur5Robot::openVTKfile(QString filename)
     mProgramEncoder.openVTKfile(filename);
 }
 
-void Ur5Robot::moveProgram(std::vector<Ur5State> poseQueue, double acceleration,double velocity, double radius)
+void Ur5Robot::moveProgram(double acceleration,double velocity, double radius)
 {
     mRTMonitor.requestDisconnect();
-    mProgramEncoder.movejProgram(poseQueue,acceleration,velocity,radius);
+    mProgramEncoder.movejProgram(mProgramEncoder.poseQueue,acceleration,velocity,radius);
     mSecMonitor.runProgramQueue(mProgramEncoder.programQueue,mProgramEncoder.poseQueue);
     mRTMonitor.requestConnect();
 }
