@@ -61,26 +61,39 @@ void Ur5Robot::setAddress(QString address)
     IPaddress = address;
 }
 
-void Ur5Robot::connectToRobot(int port)
+QString Ur5Robot::getAddress()
+{
+    return (this->IPaddress);
+}
+
+void Ur5Robot::connectToRobot(QString IPaddress)
 {
     mRTMonitor.setAddress(IPaddress,rtPort);
     mSecMonitor.setAddress(IPaddress,secPort);
+
+    connectToPort(rtPort);
+    connectToPort(secPort);
+}
+
+void Ur5Robot::disconnectFromRobot()
+{
+    disconnectFromPort(rtPort);
+    disconnectFromPort(secPort);
+}
+
+void Ur5Robot::connectToPort(int port)
+{
     if(port == 30003)
     {
         mRTMonitor.requestConnect();
     }
     else if(port == 30002)
     {
-        mSecMonitor.requestConnect();
-    }
-    else
-    {
-        mRTMonitor.requestConnect();
         mSecMonitor.requestConnect();
     }
 }
 
-void Ur5Robot::disconnectFromRobot(int port)
+void Ur5Robot::disconnectFromPort(int port)
 {
     if(port == 30003)
     {
@@ -88,11 +101,6 @@ void Ur5Robot::disconnectFromRobot(int port)
     }
     else if(port == 30002)
     {
-        mSecMonitor.requestDisconnect();
-    }
-    else
-    {
-        mRTMonitor.requestDisconnect();
         mSecMonitor.requestDisconnect();
     }
 }
@@ -139,10 +147,17 @@ void Ur5Robot::openVTKfile(QString filename)
     mProgramEncoder.openVTKfile(filename);
 }
 
-void Ur5Robot::moveProgram(double acceleration,double velocity, double radius)
+void Ur5Robot::moveProgram(QString typeOfProgram,double acceleration,double velocity, double radius)
 {
     mRTMonitor.requestDisconnect();
-    mProgramEncoder.movejProgram(mProgramEncoder.poseQueue,acceleration,velocity,radius);
+    if(typeOfProgram == "movej")
+    {
+        mProgramEncoder.movejProgram(mProgramEncoder.poseQueue,acceleration,velocity,radius);
+    }
+    else
+    {
+        return;
+    }
     mSecMonitor.runProgramQueue(mProgramEncoder.programQueue,mProgramEncoder.poseQueue);
     mRTMonitor.requestConnect();
 }
