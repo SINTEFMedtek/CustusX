@@ -358,12 +358,15 @@ void Ur5ManualMoveTab::moveButtonReleasedSlot()
 
 void Ur5ManualMoveTab::updatePositionSlot()
 {
-    xPosLineEdit->setText(QString::number(1000*(mUr5Robot->mCurrentState.cartAxis(0)),'f',2));
-    yPosLineEdit->setText(QString::number(1000*(mUr5Robot->mCurrentState.cartAxis(1)),'f',2));
-    zPosLineEdit->setText(QString::number(1000*(mUr5Robot->mCurrentState.cartAxis(2)),'f',2));
-    rxLineEdit->setText(QString::number(mUr5Robot->mCurrentState.cartAngles(0),'f',4));
-    ryLineEdit->setText(QString::number(mUr5Robot->mCurrentState.cartAngles(1),'f',4));
-    rzLineEdit->setText(QString::number(mUr5Robot->mCurrentState.cartAngles(2),'f',4));
+    Ur5State currentState;
+    currentState=mUr5Robot->getCurrentState();
+
+    xPosLineEdit->setText(QString::number(1000*(currentState.cartAxis(0)),'f',2));
+    yPosLineEdit->setText(QString::number(1000*(currentState.cartAxis(1)),'f',2));
+    zPosLineEdit->setText(QString::number(1000*(currentState.cartAxis(2)),'f',2));
+    rxLineEdit->setText(QString::number(currentState.cartAngles(0),'f',4));
+    ryLineEdit->setText(QString::number(currentState.cartAngles(1),'f',4));
+    rzLineEdit->setText(QString::number(currentState.cartAngles(2),'f',4));
 }
 
 void Ur5ManualMoveTab::connectMovementButtons()
