@@ -15,8 +15,8 @@ class org_custusx_robot_ur5_EXPORT Ur5Robot : public QObject
     Q_OBJECT
 public:
     Ur5Robot();
+    ~Ur5Robot();
 
-    Ur5Connection mSecMonitor,mRTMonitor;
     Ur5ProgramEncoder mProgramEncoder;
     Ur5State mCurrentState, mPreviousState;
     Ur5MessageEncoder mMessageEncoder;
@@ -44,6 +44,8 @@ private:
     int rtPort = 30003;
     int secPort = 30002;
     QString IPaddress;
+    Ur5Connection mSecMonitor,mRTMonitor;
+
 
 
 
