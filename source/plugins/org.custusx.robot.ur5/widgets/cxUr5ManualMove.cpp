@@ -280,15 +280,15 @@ void Ur5ManualMoveTab::setupUi(QWidget *parent)
 void Ur5ManualMoveTab::coordButtonPressed(int axis, int sign)
 {
     Ur5State velocity;
-    velocity.jointAxisVelocity(axis)=(sign)*velocityLineEdit->text().toDouble();
-    mUr5Robot->sendMessage(mUr5Robot->mMessageEncoder.speedl(velocity,accelerationLineEdit->text(),timeLineEdit->text()));
+    velocity.jointAxisVelocity(axis)=(sign)*velocityLineEdit->text().toDouble();  
+    mUr5Robot->move("speedl",velocity,accelerationLineEdit->text().toDouble(),0,0,timeLineEdit->text().toDouble());
 }
 
 void Ur5ManualMoveTab::rotButtonPressed(int angle, int sign)
 {
     Ur5State velocity;
     velocity.jointAngleVelocity(angle)=(sign)*velocityLineEdit->text().toDouble();
-    mUr5Robot->sendMessage(mUr5Robot->mMessageEncoder.speedl(velocity,accelerationLineEdit->text(),timeLineEdit->text()));
+    mUr5Robot->move("speedl",velocity,accelerationLineEdit->text().toDouble(),0,0,timeLineEdit->text().toDouble());
 }
 
 void Ur5ManualMoveTab::posZButtonPressedSlot()
@@ -353,7 +353,7 @@ void Ur5ManualMoveTab::negRZButtonPressedSlot()
 
 void Ur5ManualMoveTab::moveButtonReleasedSlot()
 {
-    mUr5Robot->sendMessage(mUr5Robot->mMessageEncoder.stopl(accelerationLineEdit->text()));
+    mUr5Robot->stopMove("stopl",accelerationLineEdit->text().toDouble());
 }
 
 void Ur5ManualMoveTab::updatePositionSlot()
