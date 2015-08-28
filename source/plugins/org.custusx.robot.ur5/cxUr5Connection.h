@@ -65,7 +65,6 @@ public:
     Ur5Connection();
     ~Ur5Connection();
 
-    Ur5MessageDecoder mMessageDecoder;
     Ur5State mCurrentState,mTargetState,mPreviousState;
 
     void setAddress(QString address, int port);
@@ -102,6 +101,7 @@ private:
 
     QByteArray setTestData(int port);
     Ur5MessageEncoder mMessageEncoder;
+    Ur5MessageDecoder mMessageDecoder;
 
 };
 
