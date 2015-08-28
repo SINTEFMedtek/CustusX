@@ -23,6 +23,7 @@ void Ur5Robot::updateCurrentState()
     this->mCurrentState.jointAxisVelocity=this->mRTMonitor.mCurrentState.jointAxisVelocity;
     this->mCurrentState.tcpAngles=this->mRTMonitor.mCurrentState.tcpAngles;
     this->mCurrentState.tcpAxis=this->mRTMonitor.mCurrentState.tcpAxis;
+    emit(stateUpdated());
 }
 
 void Ur5Robot::setAddress(QString address)
