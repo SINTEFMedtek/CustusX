@@ -65,12 +65,12 @@ public:
     Ur5Connection();
     ~Ur5Connection();
 
+    void setAddress(QString address, int port);
+    bool isConnectedToRobot();
+
     Ur5State getCurrentState();
     Ur5State getTargetState();
     Ur5State getPreviousState();
-
-    void setAddress(QString address, int port);
-    bool isConnectedToRobot();
 
     bool sendMessage(QString message);
 
