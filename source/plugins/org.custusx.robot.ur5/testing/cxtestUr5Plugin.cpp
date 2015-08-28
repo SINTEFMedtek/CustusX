@@ -48,9 +48,6 @@ TEST_CASE("Ur5Plugin: Connect to robot", "[manual][plugins][org.custusx.robot.ur
 TEST_CASE("Ur5Plugin: Send message to robot and receive message from robot", "[manual][plugins][org.custusx.robot.ur5]")
 {
     Ur5TestFixture fixture;
-
-    fixture.ur5robot.connectToRobot();
-    fixture.ur5robot.disconnectFromRobot();
 }
 
 } //cxtest
