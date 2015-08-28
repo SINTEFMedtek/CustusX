@@ -46,7 +46,6 @@ QT_END_NAMESPACE
 
 namespace cx
 {
-
 typedef boost::shared_ptr<class Socket> SocketPtr;
 
 /**
@@ -69,6 +68,7 @@ public:
     bool minBytesAvailable(int bytes) const;
     qint64 bytesAvailable() const;
     qint64 read(char *data, qint64 maxSizeBytes) const;
+    QByteArray read(qint64 maxSizeBytes) const;
     qint64 skip(qint64 maxSizeBytes) const;
 
     qint64 write(const char* data, qint64 maxSizeBytes) const;

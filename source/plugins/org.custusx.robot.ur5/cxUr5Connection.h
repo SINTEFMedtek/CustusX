@@ -38,9 +38,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTransform3D.h"
 #include "cxVector3D.h"
 #include "cxUr5State.h"
-#include "cxUr5Receive.h"
-#include "cxUr5RTReceive.h"
-#include "cxUr5Transmit.h"
+#include "cxUr5MessageDecoder.h"
+#include "cxUr5MessageEncoder.h"
+#include "cxUr5ProgramEncoder.h"
 
 
 namespace cx
@@ -63,58 +63,48 @@ class org_custusx_robot_ur5_EXPORT Ur5Connection : public SocketConnection
 public:
     Ur5Connection(QString address, int port);
     Ur5Connection();
+    ~Ur5Connection();
 
-    Ur5Receive receiver;
-    Ur5RTReceive rtReceiver;
-    Ur5Transmit transmitter;
-    Ur5State currentState,targetState,jointState;
-    QByteArray rawData;
-
-    std::vector<Ur5State> movementQueue;
-
-    double blendRadius = 0.0009;
+    Ur5MessageDecoder mMessageDecoder;
+    Ur5ProgramEncoder mProgramEncoder;
+    Ur5State mCurrentState,mTargetState,mPreviousState;
 
     void setAddress(QString address, int port);
-
     bool isConnectedToRobot();
+
     bool sendMessage(QString message);
-    bool waitForMessage();
 
-    void set_rawData(unsigned char* inMessage,qint64 bytes);
-    void print_rawData();
+    void updateCurrentState(bool connected = false);
 
-    void update_currentState(bool connected = true);
-
-    void initializeWorkspace(double threshold=0.01,Ur5State origo = Ur5State{-0.36,-0.64,0.29,-1.87,-2.50,0},bool currentPos = false);
-    void clearCurrentTCP();
-    void moveToPlannedOrigo(Ur5State origo);
-    void setOrigo(double threshold);
-
-    void incrementPosQuad(Ur5State &state, double threshold);
-    void incrementNegQuad(Ur5State &state, double threshold);
-
-
-    bool waitForMove();
-    bool atTargetPos(Ur5State current);
-
-    void set_testData();
-
-    bool runProgramQueue();
+public slots:
+    void initializeWorkspace(double threshold,Ur5State origo,bool currentPos);
+    void runProgramQueue(std::vector<QString> programQueue, std::vector<Ur5State> poseQueue);
 
 private slots:
     virtual void internalDataAvailable();
 
-protected:
+signals:
+    void stateChanged();
+    void finished();
 
+private:
+    Ur5State incrementPosQuad(Ur5State state, double threshold);
+    Ur5State incrementNegQuad(Ur5State state, double threshold);
+    void clearCurrentTCP();
+    void moveToPlannedOrigo(Ur5State origo);
+    void setOrigo(double threshold);
+    bool waitForMove();
+    bool waitForMessage();
+    bool atTargetPos(Ur5State current);
+    void updateCurrentState(QByteArray buffer);
+    bool isValidPacket(qint64 bytes);
 
+    double mBlendRadius = 0.001;
+
+    QByteArray setTestData(int port);
+    Ur5MessageEncoder mMessageEncoder;
 
 };
-
-
-
-
-
-
 
 
 } // cx

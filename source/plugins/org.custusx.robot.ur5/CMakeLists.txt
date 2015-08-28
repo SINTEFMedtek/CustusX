@@ -4,27 +4,37 @@ set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
 set(PLUGIN_SRCS
   cxUr5PluginActivator.cpp
-  cxUr5GUIExtenderService.cpp
-  cxUr5Widget.cpp
+  cxUr5Robot.cpp
   cxUr5Connection.cpp
   cxUr5State.cpp
-  cxUr5Transmit.cpp
-  cxUr5Receive.cpp
-  cxUr5Script.cpp
-  cxUr5RTReceive.cpp
+  cxUr5MessageEncoder.cpp
+  cxUr5MessageDecoder.cpp
+  cxUr5ProgramEncoder.cpp
+  cxUr5GUIExtenderService.cpp
+
+  cxUr5Widget.cpp
+  widgets/cxUr5MiscInformation.cpp
+  widgets/cxUr5Initialize.cpp
+  widgets/cxUr5ManualMove.cpp
+  widgets/cxUr5PlannedMove.cpp
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
   cxUr5PluginActivator.h
-  cxUr5GUIExtenderService.h
-  cxUr5Widget.h
+  cxUr5Robot.h
   cxUr5Connection.h
   cxUr5State.h
-  cxUr5Transmit.h
-  cxUr5Receive.h
-  cxUr5Script.h
-  cxUr5RTReceive.h
+  cxUr5MessageEncoder.h
+  cxUr5MessageDecoder.h
+  cxUr5ProgramEncoder.h
+  cxUr5GUIExtenderService.h
+
+  cxUr5Widget.h
+  widgets/cxUr5MiscInformation.h
+  widgets/cxUr5Initialize.h
+  widgets/cxUr5ManualMove.h
+  widgets/cxUr5PlannedMove.h
 )
 
 # Qt Designer files which should be processed by Qts uic

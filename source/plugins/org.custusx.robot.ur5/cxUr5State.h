@@ -8,7 +8,7 @@ namespace cx
 {
 typedef boost::shared_ptr<struct Ur5State> Ur5StatePtr;
 /**
- * Struct that handles UR5 robot spatial information.
+ * Struct that holds UR5 robot information.
  *
  * \ingroup org_custusx_robot_ur5
  *
@@ -21,11 +21,18 @@ struct org_custusx_robot_ur5_EXPORT Ur5State
 {
     Ur5State();
     Ur5State(double x,double y,double z,double rx,double ry,double rz);
+    Ur5State(bool updated);
+    ~Ur5State();
 
     Vector3D cartAxis,cartAngles;
     Vector3D jointAxis,jointAngles;
     Vector3D jointAxisVelocity,jointAngleVelocity;
     Vector3D force,torque;
+    Vector3D tcpAxis,tcpAngles;
+
+    double timeSinceStart;
+
+    bool updated;
 };
 
 

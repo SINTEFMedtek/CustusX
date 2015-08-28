@@ -35,30 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QWidget>
 
-#include "cxUr5Connection.h"
+#include "cxUr5Robot.h"
 #include "org_custusx_robot_ur5_Export.h"
-
-// From design
-#include <QtCore/QVariant>
-#include <QtWidgets/QAction>
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
-#include <QtWidgets/QComboBox>
-#include <QtWidgets/QFrame>
-#include <QtWidgets/QGridLayout>
-#include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QHeaderView>
-#include <QtWidgets/QLabel>
-#include <QtWidgets/QLineEdit>
-#include <QtWidgets/QMainWindow>
-#include <QtWidgets/QProgressBar>
-#include <QtWidgets/QPushButton>
-#include <QtWidgets/QScrollBar>
-#include <QtWidgets/QSpacerItem>
-#include <QtWidgets/QTabWidget>
-#include <QtWidgets/QVBoxLayout>
-#include <QtWidgets/QWidget>
-//
 
 namespace cx
 {
@@ -78,124 +56,12 @@ public:
     Ur5Widget(QWidget* parent = 0);
     virtual ~Ur5Widget();
 
-public slots:
-
-
-private:
-    QTabWidget* tabWidget;
-    void setupUi(QWidget *parent);
-    Ur5ConnectionPtr connection;
-};
-
-class org_custusx_robot_ur5_EXPORT InitializeTab : public QWidget
-{
-    Q_OBJECT
-public:
-    InitializeTab(Ur5ConnectionPtr Ur5Connection,QWidget *parent = 0);
-    virtual ~InitializeTab();
-
-    int initializeProgressValue;
-    QLineEdit *ipLineEdit, *manualCoordinatesLineEdit;
-    QPushButton *connectButton, *disconnectButton, *initializeButton, *initializeButton_2;
-    QComboBox *presetOrigoComboBox;
-
-protected slots:
-    void connectButtonSlot();
-    void checkConnection();
-    void initializeButtonSlot();
-    void disconnectButtonSlot();
-
 private:
     void setupUi(QWidget *parent);
-    Ur5ConnectionPtr connection;
+    Ur5RobotPtr ur5Robot;
+
 };
 
-class org_custusx_robot_ur5_EXPORT ManualMoveTab : public QWidget
-{
-    Q_OBJECT
-public:
-    ManualMoveTab(Ur5ConnectionPtr Ur5Connection,QWidget *parent = 0);
-    virtual ~ManualMoveTab();
-
-    QPushButton *negZButton, *posZButton, *posXButton, *negYButton, *posYButton, *negXButton;
-    QPushButton *rotNegZButton, *rotPosZButton, *rotPosXButton, *rotNegYButton, *rotPosYButton, *rotNegXButton;
-
-    QLineEdit *xPosLineEdit, *yPosLineEdit, *zPosLineEdit;
-    QLineEdit *rxLineEdit, *ryLineEdit, *rzLineEdit;
-
-    QLineEdit *accelerationLineEdit, *velocityLineEdit, *timeLineEdit;
-
-    void coordButtonPressed(int axis,int sign);
-    void rotButtonPressed(int axis,int sign);
-
-
-public slots:
-    void moveButtonReleasedSlot();
-
-    void posZButtonPressedSlot();
-    void negZButtonPressedSlot();
-    void posYButtonPressedSlot();
-    void negYButtonPressedSlot();
-    void posXButtonPressedSlot();
-    void negXButtonPressedSlot();
-
-    void posRXButtonPressedSlot();
-    void negRXButtonPressedSlot();
-    void posRYButtonPressedSlot();
-    void negRYButtonPressedSlot();
-    void posRZButtonPressedSlot();
-    void negRZButtonPressedSlot();
-
-
-    void updatePositionSlot();
-
-    void updateState();
-
-
-private:
-    void setupUi(QWidget *parent);
-    Ur5ConnectionPtr connection;
-};
-
-class org_custusx_robot_ur5_EXPORT PlannedMoveTab : public QWidget
-{
-    Q_OBJECT
-public:
-    PlannedMoveTab(Ur5ConnectionPtr Ur5Connection, QWidget *parent = 0);
-    virtual ~PlannedMoveTab();
-
-    QPushButton *runVTKButton,*goToOrigoButton;
-    QLineEdit* vtkLineEdit;
-
-    QLineEdit *accelerationLineEdit, *velocityLineEdit, *timeLineEdit;
-
-protected slots:
-    void runVTKfileSlot();
-    void goToOrigoButtonSlot();
-
-private:
-    void setupUi(QWidget *parent);
-    Ur5ConnectionPtr connection;
-};
-
-class org_custusx_robot_ur5_EXPORT InformationTab : public QWidget
-{
-    Q_OBJECT
-public:
-    InformationTab(Ur5ConnectionPtr Ur5Connection, QWidget *parent = 0);
-    virtual ~InformationTab();
-
-    QLineEdit *FxLineEdit, *FyLineEdit, *FzLineEdit;
-    QLineEdit *TxLineEdit, *TyLineEdit, *TzLineEdit;
-
-protected slots:
-    void updateState();
-    void updateForceSlot();
-
-private:
-    void setupUi(QWidget *parent);
-    Ur5ConnectionPtr connection;
-};
 
 } /* namespace cx */
 

@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTESTUR5TESTFIXTURE_H
 #define CXTESTUR5TESTFIXTURE_H
 
-#include "cxUr5Connection.h"
+#include "cxUr5Robot.h"
 
 #include "cxtest_org_custusx_robot_ur5_export.h"
 
@@ -45,7 +45,7 @@ class CXTEST_ORG_CUSTUSX_ROBOT_UR5_EXPORT Ur5TestFixture
 public:
     Ur5TestFixture();
 
-    cx::Ur5Connection connection;
+    cx::Ur5Robot ur5robot;
 };
 
 } //cxtest
