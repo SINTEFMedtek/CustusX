@@ -17,27 +17,35 @@ public:
     Ur5Robot();
     ~Ur5Robot();
 
+    bool isConnectedToRobot();
+
     Ur5State getCurrentState();
     Ur5State getPreviousState();
     void setCurrentState(Ur5State currentState);
     void setPreviousState(Ur5State previousState);
 
-
+    QString getAddress();
     void setAddress(QString IPaddress);
-    bool isConnectedToRobot();
-    void sendMessage(QString message);
+
     void move(QString typeOfMovement, Ur5State targetState, double acc, double vel, double rad = 0, double t = 0);
     void stopMove(QString typeOfStop,double acc);
+
     void openVTKfile(QString filename);
-    void moveProgram(double acceleration, double velocity, double radius);
+    void moveProgram(QString typeOfProgram,double acceleration, double velocity, double radius);
 
 
 public slots:
+    void connectToRobot(QString IPaddress);
+    void disconnectFromRobot();
+
     void updateCurrentState();
-    void connectToRobot(int port = 0);
-    void disconnectFromRobot(int port = 0);
     void initializeWorkspace(double threshold,Ur5State state,bool currentPos);
     void shutdown();
+
+private slots:
+    void connectToPort(int port);
+    void disconnectFromPort(int port);
+
 
 signals:
     void stateUpdated();
@@ -50,6 +58,8 @@ private:
     Ur5ProgramEncoder mProgramEncoder;
     Ur5MessageEncoder mMessageEncoder;
     Ur5State mCurrentState, mPreviousState;
+
+    void sendMessage(QString message);
 
 };
 
