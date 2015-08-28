@@ -51,7 +51,7 @@ TEST_CASE("Ur5Plugin: Send message to robot and receive message from robot", "[m
 
     fixture.ur5robot.connectToRobot();
 
-    fixture.ur5robot.mSecMonitor.sendMessage(QString("movej([0,-1.57,0,0,-1.57,0],a=0.1,v=0.1,r=0)"));
+    //fixture.ur5robot.mSecMonitor.sendMessage(QString("movej([0,-1.57,0,0,-1.57,0],a=0.1,v=0.1,r=0)"));
 
 
     fixture.ur5robot.disconnectFromRobot();
