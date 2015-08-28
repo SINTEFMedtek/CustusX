@@ -51,6 +51,10 @@ TEST_CASE("Ur5Plugin: Analyze raw data packet and update current state", "[manua
     QByteArray rawData560 = fixture.getTestData(560);
     fixture.mUr5Connection.updateCurrentState(rawData560);
     REQUIRE(fixture.mUr5Connection.getCurrentState().updated == true);
+
+    QByteArray rawData1254 = fixture.getTestData(1254);
+    fixture.mUr5Connection.updateCurrentState(rawData1254);
+    REQUIRE(fixture.mUr5Connection.getCurrentState().updated == true);
 }
 
 } //cxtest
