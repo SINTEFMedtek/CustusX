@@ -45,7 +45,10 @@ class CXTEST_ORG_CUSTUSX_ROBOT_UR5_EXPORT Ur5TestFixture
 public:
     Ur5TestFixture();
 
-    cx::Ur5Robot ur5robot;
+    cx::Ur5Robot mUr5Robot;
+    cx::Ur5Connection mUr5Connection;
+
+    QByteArray getTestData(int packetSize);
 };
 
 } //cxtest

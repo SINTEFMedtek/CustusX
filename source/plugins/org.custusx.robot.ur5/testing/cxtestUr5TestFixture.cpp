@@ -32,15 +32,37 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxtestUr5TestFixture.h"
 
+#include <QFile>
+
 namespace cxtest
 {
 
 Ur5TestFixture::Ur5TestFixture() :
-    ur5robot()//connection("169.254.62.100", 30003)
+    mUr5Robot(),
+    mUr5Connection()
 {
-    ur5robot.setAddress("169.254.62.100");
-    //connection.tryConnectAndWait();
-    //connection.requestConnect();
+}
+
+QByteArray Ur5TestFixture::getTestData(int packetSize)
+{
+    if(packetSize == 560)
+    {
+        QString filename = "C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/cxDataFromRobot560.txt";
+        QFile file(filename);
+        if (!file.open(QIODevice::ReadOnly)) return QByteArray();
+        return QByteArray::fromHex(file.readAll());
+    }
+    else if(packetSize == 1254)
+    {
+        QString filename = "C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/cxDataFromRobot1254.txt";
+        QFile file(filename);
+        if (!file.open(QIODevice::ReadOnly)) return QByteArray();
+        return QByteArray::fromHex(file.readAll());
+    }
+    else
+    {
+        return QByteArray(0);
+    }
 }
 
 } //cxtest
