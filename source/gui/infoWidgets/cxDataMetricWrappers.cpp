@@ -202,13 +202,13 @@ PointMetricWrapper::PointMetricWrapper(VisualizationServicePtr visualizationServ
 	mData(data)
 {
 	mInternalUpdate = false;
-	connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
-	connect(mPatientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataChangedSlot()));
+//	connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
+//	connect(mPatientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataChangedSlot()));
 }
 
 PointMetricWrapper::~PointMetricWrapper()
 {
-	disconnect(mPatientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataChangedSlot()));
+//	disconnect(mPatientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataChangedSlot()));
 }
 
 QWidget* PointMetricWrapper::createWidget()
@@ -231,7 +231,7 @@ QWidget* PointMetricWrapper::createWidget()
 
 	this->addColorWidget(topLayout);
 	topLayout->addStretch();
-	this->dataChangedSlot();
+//	this->dataChangedSlot();
 
 	return widget;
 }
@@ -319,9 +319,9 @@ void PointMetricWrapper::coordinateChanged()
 	mData->setCoordinate(mCoordinate->getValue());
 }
 
-void PointMetricWrapper::dataChangedSlot()
-{
-}
+//void PointMetricWrapper::dataChangedSlot()
+//{
+//}
 
 void PointMetricWrapper::update()
 {
@@ -386,7 +386,7 @@ QString PlaneMetricWrapper::getArguments() const
 
 void PlaneMetricWrapper::dataChangedSlot()
 {
-	mInternalUpdate = true;
+//	mInternalUpdate = true;
 	mInternalUpdate = false;
 }
 
@@ -443,7 +443,7 @@ QString DistanceMetricWrapper::getArguments() const
 
 void DistanceMetricWrapper::dataChangedSlot()
 {
-	mInternalUpdate = true;
+//	mInternalUpdate = true;
 	mInternalUpdate = false;
 }
 

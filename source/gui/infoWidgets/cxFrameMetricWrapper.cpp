@@ -46,13 +46,13 @@ FrameMetricWrapper::FrameMetricWrapper(VisualizationServicePtr visualizationServ
 	mData(data)
 {
 	mInternalUpdate = false;
-	connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
-	connect(mPatientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataChangedSlot()));
+//	connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
+//	connect(mPatientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataChangedSlot()));
 }
 
 FrameMetricWrapper::~FrameMetricWrapper()
 {
-	disconnect(mPatientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataChangedSlot()));
+//	disconnect(mPatientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataChangedSlot()));
 }
 
 QWidget* FrameMetricWrapper::createWidget()
@@ -71,8 +71,8 @@ QWidget* FrameMetricWrapper::createWidget()
 	hLayout->addWidget(new SpaceEditWidget(widget, mSpaceSelector));
 
 	mFrameWidget = new Transform3DWidget(widget);
-	connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
-	connect(mData.get(), SIGNAL(propertiesChanged()), this, SLOT(dataChangedSlot()));
+//	connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
+//	connect(mData.get(), SIGNAL(propertiesChanged()), this, SLOT(dataChangedSlot()));
 	connect(mFrameWidget, SIGNAL(changed()), this, SLOT(frameWidgetChangedSlot()));
 	topLayout->addWidget(mFrameWidget);
 
@@ -85,7 +85,7 @@ QWidget* FrameMetricWrapper::createWidget()
 
 	this->addColorWidget(topLayout);
 
-	this->dataChangedSlot();
+//	this->dataChangedSlot();
 
 	return widget;
 }
@@ -127,9 +127,9 @@ void FrameMetricWrapper::spaceSelected()
 		mData->setSpace(space);
 }
 
-void FrameMetricWrapper::dataChangedSlot()
-{
-}
+//void FrameMetricWrapper::dataChangedSlot()
+//{
+//}
 
 void FrameMetricWrapper::frameWidgetChangedSlot()
 {

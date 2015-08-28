@@ -48,14 +48,14 @@ ToolMetricWrapper::ToolMetricWrapper(VisualizationServicePtr visualizationServic
 	mData(data)
 {
 	mInternalUpdate = false;
-	connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
-	connect(mData.get(), SIGNAL(propertiesChanged()), this, SLOT(dataChangedSlot()));
-	connect(mPatientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataChangedSlot()));
+//	connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
+//	connect(mData.get(), SIGNAL(propertiesChanged()), this, SLOT(dataChangedSlot()));
+//	connect(mPatientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataChangedSlot()));
 }
 
 ToolMetricWrapper::~ToolMetricWrapper()
 {
-	disconnect(mPatientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataChangedSlot()));
+//	disconnect(mPatientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataChangedSlot()));
 }
 
 QWidget* ToolMetricWrapper::createWidget()
@@ -91,7 +91,7 @@ QWidget* ToolMetricWrapper::createWidget()
 
 	this->addColorWidget(topLayout);
 
-	this->dataChangedSlot();
+//	this->dataChangedSlot();
 
 	return widget;
 }
@@ -175,9 +175,9 @@ void ToolMetricWrapper::toolOffsetSet()
 	mData->setToolOffset(mToolOffsetSelector->getValue());
 }
 
-void ToolMetricWrapper::dataChangedSlot()
-{
-}
+//void ToolMetricWrapper::dataChangedSlot()
+//{
+//}
 
 void ToolMetricWrapper::update()
 {
