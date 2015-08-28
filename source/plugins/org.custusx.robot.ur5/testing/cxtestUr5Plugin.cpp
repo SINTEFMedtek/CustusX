@@ -39,14 +39,16 @@ namespace cxtest
 
 TEST_CASE("Ur5Plugin: Connect to robot", "[manual][plugins][org.custusx.robot.ur5]")
 {
-    //Ur5TestFixture fixture;
-    //REQUIRE(fixture.connection.isConnectedToRobot());
-    //fixture.connection.requestDisconnect();
 }
 
 TEST_CASE("Ur5Plugin: Send message to robot and receive message from robot", "[manual][plugins][org.custusx.robot.ur5]")
 {
+}
+
+TEST_CASE("Ur5Plugin: Analyze raw data packet and update current state", "[manual][plugins][org.custusx.robot.ur5]")
+{
     Ur5TestFixture fixture;
+    QByteArray rawData = fixture.getTestData(560);
 }
 
 } //cxtest
