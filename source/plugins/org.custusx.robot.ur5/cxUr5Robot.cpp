@@ -19,17 +19,17 @@ void Ur5Robot::updateCurrentState()
 
     Ur5State currentState;
 
-    currentState.timeSinceStart=this->mRTMonitor.mCurrentState.timeSinceStart;
-    currentState.cartAngles=this->mSecMonitor.mCurrentState.cartAngles;
-    currentState.cartAxis=this->mSecMonitor.mCurrentState.cartAxis;
-    currentState.force=this->mRTMonitor.mCurrentState.force;
-    currentState.torque=this->mRTMonitor.mCurrentState.torque;
-    currentState.jointAngles=this->mRTMonitor.mCurrentState.jointAngles;
-    currentState.jointAngleVelocity=this->mRTMonitor.mCurrentState.jointAngleVelocity;
-    currentState.jointAxis=this->mRTMonitor.mCurrentState.jointAxis;
-    currentState.jointAxisVelocity=this->mRTMonitor.mCurrentState.jointAxisVelocity;
-    currentState.tcpAngles=this->mRTMonitor.mCurrentState.tcpAngles;
-    currentState.tcpAxis=this->mRTMonitor.mCurrentState.tcpAxis;
+    currentState.timeSinceStart=mRTMonitor.getCurrentState().timeSinceStart;
+    currentState.cartAngles=mSecMonitor.getCurrentState().cartAngles;
+    currentState.cartAxis=mSecMonitor.getCurrentState().cartAxis;
+    currentState.force=mRTMonitor.getCurrentState().force;
+    currentState.torque=mRTMonitor.getCurrentState().torque;
+    currentState.jointAngles=mRTMonitor.getCurrentState().jointAngles;
+    currentState.jointAngleVelocity=mRTMonitor.getCurrentState().jointAngleVelocity;
+    currentState.jointAxis=mRTMonitor.getCurrentState().jointAxis;
+    currentState.jointAxisVelocity=mRTMonitor.getCurrentState().jointAxisVelocity;
+    currentState.tcpAngles=mRTMonitor.getCurrentState().tcpAngles;
+    currentState.tcpAxis=mRTMonitor.getCurrentState().tcpAxis;
 
     this->setCurrentState(currentState);
 
