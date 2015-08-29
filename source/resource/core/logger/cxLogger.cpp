@@ -91,5 +91,7 @@ void report(QString msg) { reporter()->sendInfo(msg); }
 void reportWarning(QString msg) { reporter()->sendWarning(msg); }
 void reportError(QString msg) { reporter()->sendError(msg); }
 void reportSuccess(QString msg) { reporter()->sendSuccess(msg); }
+void reportVolatile(QString msg) { reporter()->sendVolatile(msg); }
+
 
 }

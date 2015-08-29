@@ -76,6 +76,8 @@ public:
 	void setPath(QString path);
 	void setFolderDepth(int depth);
 
+	QStringList getAllFiles();
+
 public slots:
 	void refresh();
 

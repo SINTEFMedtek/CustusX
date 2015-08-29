@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxTrackingImplService.h"
 
+#include "boost/bind.hpp"
+
 #include <QTimer>
 #include <QDir>
 #include <QList>
@@ -49,12 +51,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTime.h"
 #include "cxEnumConverter.h"
 #include "cxDummyTool.h"
-#include "cxToolUsingIGSTK.h"
-#include "cxIgstkTracker.h"
+#include "cxToolImpl.h"
 #include "cxToolConfigurationParser.h"
 #include "cxManualToolAdapter.h"
 #include "cxSettings.h"
-#include "cxIgstkTrackerThread.h"
 #include "cxPlaybackTool.h"
 
 #include "cxPlaybackTime.h"
@@ -63,16 +63,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackerConfigurationImpl.h"
 #include "cxUtilHelpers.h"
 
-#include "cxTrackingSystemIGSTKService.h"
 #include "cxTrackingSystemDummyService.h"
 #include "cxTrackingSystemPlaybackService.h"
 #include "cxSessionStorageServiceProxy.h"
+
+#include "cxNullDeleter.h"
 
 namespace cx
 {
 
 TrackingImplService::TrackingImplService(ctkPluginContext *context) :
-//				mLoggingFolder(""),
 				mLastLoadPositionHistory(0),
 				mContext(context),
 				mToolTipOffset(0)
@@ -85,10 +85,9 @@ TrackingImplService::TrackingImplService(ctkPluginContext *context) :
 
 	this->initializeManualTool(); // do this after setting self.
 
-	TrackingSystemServicePtr igstk(new TrackingSystemIGSTKService());
-	this->installTrackingSystem(igstk);
-
 	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(globalConfigurationFileChangedSlot(QString)));
+
+    this->listenForTrackingSystemServices(context);
 }
 
 TrackingImplService::~TrackingImplService()
@@ -210,20 +209,45 @@ void TrackingImplService::setState(const Tool::State val)
 		mTrackingSystems[i]->setState(val);
 }
 
+void TrackingImplService::listenForTrackingSystemServices(ctkPluginContext *context)
+{
+    mServiceListener.reset(new ServiceTrackerListener<TrackingSystemService>(
+                                context,
+                                boost::bind(&TrackingImplService::onTrackingSystemAdded, this, _1),
+                                boost::bind(&TrackingImplService::onTrackingSystemModified, this, _1),
+                                boost::bind(&TrackingImplService::onTrackingSystemRemoved, this, _1)
+                               ));
+    mServiceListener->open();
+}
+
+void TrackingImplService::onTrackingSystemAdded(TrackingSystemService* service)
+{
+    CX_LOG_CHANNEL_DEBUG("janne beate ") << "Added TrackinsSystemService: " << service->getUid();
+    this->installTrackingSystem(TrackingSystemServicePtr(service, null_deleter()));
+}
+
+void TrackingImplService::onTrackingSystemRemoved(TrackingSystemService* service)
+{
+    CX_LOG_CHANNEL_DEBUG("janne beate ") << "Removed TrackinsSystemService: " << service->getUid();
+    this->unInstallTrackingSystem(TrackingSystemServicePtr(service, null_deleter()));
+}
+
+void TrackingImplService::onTrackingSystemModified(TrackingSystemService* service)
+{
+    CX_LOG_CHANNEL_DEBUG("janne beate ") << "Modified TrackinsSystemService: " << service->getUid();
+}
+
 void TrackingImplService::rebuildCachedTools()
 {
-	mTools.clear();
-	for (unsigned i=0; i<mTrackingSystems.size(); ++i)
-	{
-		this->addToolsFrom(mTrackingSystems[i]);
-	}
-
-	mTools[mManualTool->getUid()] = mManualTool;
-	this->imbueManualToolWithRealProperties();
-	this->setActiveTool(this->getManualTool()->getUid());
-	this->loadPositionHistory(); // the tools are always reconfigured after a setloggingfolder
-
-//	reportSuccess("ToolManager is set to state ...");
+    mTools.clear();
+    for (unsigned i=0; i<mTrackingSystems.size(); ++i)
+    {
+        this->addToolsFrom(mTrackingSystems[i]);
+    }
+    mTools[mManualTool->getUid()] = mManualTool;
+    this->imbueManualToolWithRealProperties();
+    this->setActiveTool(this->getManualTool()->getUid());
+    this->loadPositionHistory(); // the tools are always reconfigured after a setloggingfolder
 }
 
 void TrackingImplService::imbueManualToolWithRealProperties()
@@ -589,7 +613,7 @@ void TrackingImplService::addXml(QDomNode& parentNode)
 	ToolMap::iterator toolIt = tools.begin();
 	for (; toolIt != tools.end(); ++toolIt)
 	{
-		cxToolPtr tool = boost::dynamic_pointer_cast<ToolUsingIGSTK>(toolIt->second);
+        cxToolPtr tool = boost::dynamic_pointer_cast<ToolImpl>(toolIt->second);
 		if (tool)
 		{
 			toolsNode.addObjectToElement("tool", tool);
@@ -622,7 +646,7 @@ void TrackingImplService::parseXml(QDomNode& dataNode)
 		QString tool_uid = toolNode.attribute("uid");
 		if (tools.find(tool_uid) != tools.end())
 		{
-			cxToolPtr tool = boost::dynamic_pointer_cast<ToolUsingIGSTK>(tools.find(tool_uid)->second);
+            cxToolPtr tool = boost::dynamic_pointer_cast<ToolImpl>(tools.find(tool_uid)->second);
 			tool->parseXml(toolNode);
 		}
 	}

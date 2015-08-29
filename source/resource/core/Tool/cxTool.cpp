@@ -31,11 +31,30 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxTool.h"
+
+#include <vtkConeSource.h>
 #include "cxToolNull.h"
 #include "cxNullDeleter.h"
 
 namespace cx
 {
+vtkPolyDataPtr Tool::createDefaultPolyDataCone()
+{
+    vtkConeSourcePtr coneSource = vtkConeSourcePtr::New();
+    coneSource->SetResolution(25);
+    coneSource->SetRadius(10);
+    coneSource->SetHeight(100);
+
+    coneSource->SetDirection(0, 0, 1);
+    double newCenter[3];
+    coneSource->GetCenter(newCenter);
+    newCenter[2] = newCenter[2] - coneSource->GetHeight() / 2;
+    coneSource->SetCenter(newCenter);
+
+    coneSource->Update();
+    return coneSource->GetOutput();
+}
+
 Tool::Tool(const QString &uid, const QString &name) :
 	mUid(uid), mName(name)
 {

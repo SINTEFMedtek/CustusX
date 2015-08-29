@@ -4,6 +4,8 @@
 #include "cxResourceExport.h"
 #include "cxTool.h"
 
+#define TrackingSystemService_iid "cx::TrackingSystemService"
+
 namespace cx
 {
 
@@ -34,14 +36,12 @@ public:
 
 	virtual void setLoggingFolder(QString loggingFolder) = 0; ///<\param loggingFolder path to the folder where logs should be saved
 
-//	virtual bool isNull() = 0;
-//	static TrackingSystemServicePtr getNullObject();
 signals:
 	void stateChanged();
 	void newProbe(const ToolPtr probe);
-public slots:
-};
 
-}
+};
+} //namespace cx
+Q_DECLARE_INTERFACE(cx::TrackingSystemService, TrackingSystemService_iid)
 
 #endif // CXTRACKINGSYSTEMSERVICE_H

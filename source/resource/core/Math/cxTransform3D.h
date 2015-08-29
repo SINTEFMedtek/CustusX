@@ -49,6 +49,7 @@ namespace cx_transform3D_internal
 {
 cxResource_EXPORT boost::array<double, 16> flatten(const Eigen::Affine3d* self);
 cxResource_EXPORT void fill(Eigen::Affine3d* self, vtkMatrix4x4Ptr m);
+cxResource_EXPORT void fill(Eigen::Affine3d* self, float m[4][4]);
 cxResource_EXPORT void fill(Eigen::Affine3d* self, const double* raw);
 cxResource_EXPORT vtkMatrix4x4Ptr getVtkMatrix(const Eigen::Affine3d* self);
 cxResource_EXPORT std::ostream& put(const Eigen::Affine3d* self, std::ostream& s, int indent, char newline);
@@ -142,6 +143,15 @@ Transform<_Scalar, _Dim, _Mode, _Options> Transform<_Scalar, _Dim, _Mode, _Optio
 	cx_transform3D_internal::fill(&retval, m);
 	return retval;
 }
+
+template<typename _Scalar, int _Dim, int _Mode, int _Options>
+Transform<_Scalar, _Dim, _Mode, _Options> Transform<_Scalar, _Dim, _Mode, _Options>::fromFloatArray(float m[4][4])
+{
+    Transform<_Scalar, _Dim, _Mode, _Options> retval;
+    cx_transform3D_internal::fill(&retval, m);
+    return retval;
+}
+
 
 } // namespace Eigen
 //! @endcond
