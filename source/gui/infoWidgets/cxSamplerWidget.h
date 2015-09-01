@@ -63,7 +63,7 @@ private slots:
 	void spacesChangedSlot();
 	void toggleAdvancedSlot();
 protected:
-	void prePaintEvent();
+	virtual void prePaintEvent();
 private:
 	void showAdvanced();
 

@@ -44,7 +44,6 @@ typedef vtkSmartPointer<class vtkPolyData> vtkPolyDataPtr;
 #include "cxTransform3D.h"
 
 #include <boost/shared_ptr.hpp>
-//#include "cxProbeData.h"
 #include "vtkForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
 #include "cxTool.h"

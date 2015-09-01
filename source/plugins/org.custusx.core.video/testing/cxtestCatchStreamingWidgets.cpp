@@ -62,7 +62,7 @@ TEST_CASE("VideoConnectionWidget can stream", "[unit][gui][not_win32][widget][st
 	services->getSession()->load(folder);
 //	services->patientModelService->newPatient(folder);
 
-	cx::DummyToolPtr tool = cx::DummyToolTestUtilities::createDummyTool(cx::DummyToolTestUtilities::createProbeDataLinear());
+	cx::DummyToolPtr tool = cx::DummyToolTestUtilities::createDummyTool(cx::DummyToolTestUtilities::createProbeDefinitionLinear());
 	services->trackingService->runDummyTool(tool);
 
 	REQUIRE((services->trackingService->getState()>=cx::Tool::tsTRACKING));

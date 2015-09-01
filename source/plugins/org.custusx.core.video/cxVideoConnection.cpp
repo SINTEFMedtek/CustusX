@@ -54,7 +54,7 @@ namespace cx
 VideoConnection::VideoConnection(VideoServiceBackendPtr backend)
 {
 	mBackend = backend;
-	mUnusedProbeDataVector.clear();
+	mUnusedProbeDefinitionVector.clear();
 
 	connect(mBackend->getToolManager().get(), &TrackingService::stateChanged, this, &VideoConnection::connectVideoToProbe);
 	connect(mBackend->getToolManager().get(), SIGNAL(activeToolChanged(QString)), this, SLOT(connectVideoToProbe()));
@@ -213,15 +213,15 @@ void VideoConnection::onDisconnected()
 	emit videoSourcesChanged();
 }
 
-void VideoConnection::useUnusedProbeDataSlot()
+void VideoConnection::useUnusedProbeDefinitionSlot()
 {
-	disconnect(mBackend->getToolManager().get(), &TrackingService::stateChanged, this, &VideoConnection::useUnusedProbeDataSlot);
+	disconnect(mBackend->getToolManager().get(), &TrackingService::stateChanged, this, &VideoConnection::useUnusedProbeDefinitionSlot);
 
-	std::vector<ProbeDefinitionPtr> unusedProbeDataVector = mUnusedProbeDataVector;
-	mUnusedProbeDataVector.clear();
+	std::vector<ProbeDefinitionPtr> unusedProbeDefinitionVector = mUnusedProbeDefinitionVector;
+	mUnusedProbeDefinitionVector.clear();
 
-	for (unsigned i = 0;  i < unusedProbeDataVector.size(); ++i)
-		this->updateStatus(unusedProbeDataVector[i]);
+	for (unsigned i = 0;  i < unusedProbeDefinitionVector.size(); ++i)
+		this->updateStatus(unusedProbeDefinitionVector[i]);
 }
 
 void VideoConnection::resetProbe()
@@ -232,9 +232,9 @@ void VideoConnection::resetProbe()
 	ProbePtr probe = tool->getProbe();
 	if (probe)
 	{
-		ProbeDefinition data = probe->getProbeData();
+		ProbeDefinition data = probe->getProbeDefinition();
 		data.setUseDigitalVideo(false);
-		probe->setProbeSector(data);
+		probe->setProbeDefinition(data);
 	}
 }
 
@@ -247,10 +247,10 @@ void VideoConnection::updateStatus(ProbeDefinitionPtr msg)
 	ToolPtr tool = mBackend->getToolManager()->getFirstProbe();
 	if (!tool || !tool->getProbe())
 	{
-		//Don't throw away the ProbeData. Save it until it can be used
-		if (mUnusedProbeDataVector.empty())
-			connect(mBackend->getToolManager().get(), &TrackingService::stateChanged, this, &VideoConnection::useUnusedProbeDataSlot);
-		mUnusedProbeDataVector.push_back(msg);
+		//Don't throw away the ProbeDefinition. Save it until it can be used
+		if (mUnusedProbeDefinitionVector.empty())
+			connect(mBackend->getToolManager().get(), &TrackingService::stateChanged, this, &VideoConnection::useUnusedProbeDefinitionSlot);
+		mUnusedProbeDefinitionVector.push_back(msg);
 		return;
 	}
 	ProbePtr probe = tool->getProbe();
@@ -258,7 +258,7 @@ void VideoConnection::updateStatus(ProbeDefinitionPtr msg)
 	// start with getting a valid data object from the probe, in order to keep
 	// existing values (such as temporal calibration).
 	// Note that the 'active' data is get while the 'uid' data is set.
-	ProbeDefinition data = probe->getProbeData();
+	ProbeDefinition data = probe->getProbeDefinition();
 
 	data.setUid(msg->getUid());
 	data.setType(msg->getType());
@@ -269,7 +269,7 @@ void VideoConnection::updateStatus(ProbeDefinitionPtr msg)
 	data.setClipRect_p(msg->getClipRect_p());
 	data.setUseDigitalVideo(true);
 
-	probe->setProbeSector(data);
+	probe->setProbeDefinition(data);
 	probe->setActiveStream(msg->getUid());
 }
 
@@ -334,7 +334,7 @@ std::vector<VideoSourcePtr> VideoConnection::getVideoSources()
 
 /** Imbue probe with all stream and probe info from grabber.
  *
- * Call when active probe is changed or when streaming config is changed (new streams, new probedata)
+ * Call when active probe is changed or when streaming config is changed (new streams, new probeDefinition)
  *
  * Find the active probe, then insert all current streams into that probe.
  *

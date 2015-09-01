@@ -30,14 +30,14 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxCreateProbeDataFromConfiguration.h"
+#include "cxCreateProbeDefinitionFromConfiguration.h"
 #include "cxTypeConversions.h"
 #include <iostream>
 
 namespace cx
 {
 
-ProbeXmlConfigParser::Configuration createConfigurationFromProbeData(ProbeXmlConfigParser::Configuration basis, ProbeDefinition data)
+ProbeXmlConfigParser::Configuration createConfigurationFromProbeDefinition(ProbeXmlConfigParser::Configuration basis, ProbeDefinition data)
 {
 	ProbeXmlConfigParser::Configuration config = basis;
 
@@ -81,12 +81,12 @@ ProbeXmlConfigParser::Configuration createConfigurationFromProbeData(ProbeXmlCon
 	return config;
 }
 
-ProbeDefinition createProbeDataFromConfiguration(ProbeXmlConfigParser::Configuration config)
+ProbeDefinition createProbeDefinitionFromConfiguration(ProbeXmlConfigParser::Configuration config)
 {
   if(config.isEmpty())
     return ProbeDefinition();
 
-	ProbeDefinition probeData;
+    ProbeDefinition probeDefinition;
 
   if (config.mWidthDeg > 0.1) // Sector probe
   {
@@ -94,8 +94,8 @@ ProbeDefinition createProbeDataFromConfiguration(ProbeXmlConfigParser::Configura
 	double depthEnd = config.mDepth * config.mPixelHeight + depthStart;
 
 	double width = config.mWidthDeg * M_PI / 180.0;//width in radians
-	probeData = ProbeDefinition(ProbeDefinition::tSECTOR);
-	probeData.setSector(depthStart, depthEnd, width);
+	probeDefinition = ProbeDefinition(ProbeDefinition::tSECTOR);
+	probeDefinition.setSector(depthStart, depthEnd, width);
   }
   else //Linear probe
   {
@@ -105,17 +105,17 @@ ProbeDefinition createProbeDataFromConfiguration(ProbeXmlConfigParser::Configura
     double depthStart = double(config.mTopEdge-config.mOriginRow) * config.mPixelHeight;
     double depthEnd = double(config.mBottomEdge-config.mOriginRow) * config.mPixelHeight;
 
-	probeData = ProbeDefinition(ProbeDefinition::tLINEAR);
-	probeData.setSector(depthStart, depthEnd, width);
+	probeDefinition = ProbeDefinition(ProbeDefinition::tLINEAR);
+	probeDefinition.setSector(depthStart, depthEnd, width);
   }
 
-	probeData.setSpacing(Vector3D(config.mPixelWidth, config.mPixelHeight, 1));
-	probeData.setSize(QSize(config.mImageWidth, config.mImageHeight));
-	probeData.setOrigin_p(Vector3D(config.mOriginCol, config.mOriginRow, 0));
-	probeData.setClipRect_p(DoubleBoundingBox3D(config.mLeftEdge,config.mRightEdge,config.mTopEdge,config.mBottomEdge,0,0));
-	probeData.setTemporalCalibration(config.mTemporalCalibration);
+	probeDefinition.setSpacing(Vector3D(config.mPixelWidth, config.mPixelHeight, 1));
+	probeDefinition.setSize(QSize(config.mImageWidth, config.mImageHeight));
+	probeDefinition.setOrigin_p(Vector3D(config.mOriginCol, config.mOriginRow, 0));
+	probeDefinition.setClipRect_p(DoubleBoundingBox3D(config.mLeftEdge,config.mRightEdge,config.mTopEdge,config.mBottomEdge,0,0));
+	probeDefinition.setTemporalCalibration(config.mTemporalCalibration);
 
-	return probeData;
+	return probeDefinition;
 }
 
 } // namespace cx

@@ -56,7 +56,12 @@ namespace cx
 {
 
 ElastixWidget::ElastixWidget(RegServices services, QWidget* parent) :
-	RegistrationBaseWidget(services, parent, "org_custusx_registration_method_commandline_elastix_widget", "ElastiX Registration")
+	RegistrationBaseWidget(services, parent, "org_custusx_registration_method_commandline_elastix_widget", "ElastiX Registration"),
+	mRegisterButton(NULL),
+	mParameterFileWidget0(NULL),
+	mFilePreviewWidget(NULL),
+	mTimedAlgorithmProgressBar(NULL),
+	mOptionsWidget(NULL)
 {
 	this->setModified();
 }

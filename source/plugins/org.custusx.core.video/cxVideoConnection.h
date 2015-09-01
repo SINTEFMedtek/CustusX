@@ -96,7 +96,7 @@ private slots:
 	void statusReceivedSlot();
 	void fpsSlot(QString, double fps);
 	void connectVideoToProbe();
-	void useUnusedProbeDataSlot();///< If no probe is available the ProbeData is saved and this slot is called when a probe becomes available
+	void useUnusedProbeDefinitionSlot();///< If no probe is available the ProbeDefinition is saved and this slot is called when a probe becomes available
 
 private:
 	void waitForClientFinished();
@@ -113,7 +113,7 @@ private:
 	QPointer<QThread> mThread;
 
 	double mFPS;
-	std::vector<ProbeDefinitionPtr> mUnusedProbeDataVector;
+	std::vector<ProbeDefinitionPtr> mUnusedProbeDefinitionVector;
 	std::vector<BasicVideoSourcePtr> mSources;
 	VideoServiceBackendPtr mBackend;
 	StreamerServicePtr mStreamerInterface;

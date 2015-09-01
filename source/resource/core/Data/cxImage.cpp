@@ -298,8 +298,8 @@ void Image::setVtkImageData(const vtkImageDataPtr& data, bool resetTransferFunct
 
 vtkImageDataPtr Image::get8bitGrayScaleVtkImageData()
 {
-	double windowWidth = mImageLookupTable2D->getWindow();
-	double windowLevel = mImageLookupTable2D->getLevel();
+	double windowWidth = this->getUnmodifiedLookupTable2D()->getWindow();
+	double windowLevel = this->getUnmodifiedLookupTable2D()->getLevel();
 	return convertImageDataTo8Bit(this->getGrayScaleVtkImageData(), windowWidth, windowLevel);
 }
 
@@ -423,7 +423,6 @@ int Image::getMax()
 		{
 			return mMaxRGBIntensity;
 		}
-		QDateTime before = QDateTime::currentDateTime();
 		double max = 0.0;
 		switch (mBaseImageData->GetScalarType())
 		{
@@ -884,14 +883,15 @@ vtkImageDataPtr Image::createDummyImageData(int axisSize, int maxVoxelValue)
 	return dummyImageData;
 }
 
-void Image::setInterpolationTypeToNearest()
-{
-	this->setInterpolationType(VTK_NEAREST_INTERPOLATION);
-}
-void Image::setInterpolationTypeToLinear()
-{
-	this->setInterpolationType(VTK_LINEAR_INTERPOLATION);
-}
+//void Image::setInterpolationTypeToNearest()
+//{
+//	this->setInterpolationType(VTK_NEAREST_INTERPOLATION);
+//}
+//void Image::setInterpolationTypeToLinear()
+//{
+//	this->setInterpolationType(VTK_LINEAR_INTERPOLATION);
+//}
+
 void Image::setInterpolationType(int val)
 {
 	if (mThresholdPreview)
@@ -926,8 +926,8 @@ vtkImageDataPtr Image::resample(long maxVoxels)
 		resampler->GetOutput()->GetScalarRange();
 		retval = resampler->GetOutput();
 
-		long voxelsDown = retval->GetNumberOfPoints();
-		long voxelsOrig = this->getBaseVtkImageData()->GetNumberOfPoints();
+//		long voxelsDown = retval->GetNumberOfPoints();
+//		long voxelsOrig = this->getBaseVtkImageData()->GetNumberOfPoints();
 //		report("Created downsampled volume in Image: "
 //									 + this->getName()
 //									 + " below " + qstring_cast(voxelsDown/1000/1000) + "M. "

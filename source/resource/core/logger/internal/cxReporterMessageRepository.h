@@ -51,6 +51,8 @@ namespace cx
  * MessageListener install the MessageObserver into the
  * MessageRepository, which in turn sends messages that
  * passes the filter.
+ *
+ * This class is threadsafe
  */
 class MessageObserver : public QObject
 {
@@ -75,6 +77,7 @@ private:
 
 	MessageFilterPtr mFilter;
 	QStringList mChannels;
+	QMutex mMutex;
 };
 
 typedef boost::shared_ptr<class MessageObserver> MessageObserverPtr;
@@ -112,6 +115,7 @@ private:
 	QList<Message> mMessages;
 	std::vector<MessageObserverPtr> mObservers;
 	int mMessageHistoryMaxSize;
+	bool exists(MessageObserverPtr observer);
 };
 
 

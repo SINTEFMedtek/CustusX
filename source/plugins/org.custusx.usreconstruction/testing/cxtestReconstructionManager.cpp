@@ -187,7 +187,7 @@ TEST_CASE("ReconstructManager: Preprocessor handles too large clip rect","[integ
 	SyntheticReconstructInputPtr generator(new SyntheticReconstructInput);
 	Eigen::Array2i frameSize = Eigen::Array2i(150,150);
 	Eigen::Array2i extent = frameSize - 1;
-	cx::ProbeDefinition probeDefinition = cx::DummyToolTestUtilities::createProbeDataLinear(100, 100, frameSize);
+	cx::ProbeDefinition probeDefinition = cx::DummyToolTestUtilities::createProbeDefinitionLinear(100, 100, frameSize);
 
 	//Adding 2 sections creates 3 runs: 1 with the simple case clip rect == extent, the other 2 with extent+1 and +500
 	SECTION("Set clip rect just to large")

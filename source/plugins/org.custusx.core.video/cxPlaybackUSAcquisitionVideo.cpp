@@ -191,7 +191,7 @@ void USAcquisitionVideoPlayback::usDataLoadFinishedSlot()
 {
 	// file read operation has completed: read and clear
 	mCurrentData = mUSImageDataFutureResult.result();
-	mCurrentData.mProbeData.mData.setUid(mVideoSourceUid);
+	mCurrentData.mProbeDefinition.mData.setUid(mVideoSourceUid);
 	// clear result so we can check for it next run
 	mUSImageDataReader.reset();
 
@@ -203,7 +203,7 @@ void USAcquisitionVideoPlayback::usDataLoadFinishedSlot()
 	{
 		ProbePtr probe = tool->getProbe();
 		if (probe)
-			probe->setProbeSector(mCurrentData.mProbeData.mData);
+			probe->setProbeDefinition(mCurrentData.mProbeDefinition.mData);
 	}
 
 	// create a vector to allow for quick search

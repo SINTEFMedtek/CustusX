@@ -243,7 +243,7 @@ void VideoGraphics::connectVideoImageToPipeline()
 
 void VideoGraphics::updatePlaneSourceBounds()
 {
-	// set the planesource where we have no probedata.
+	// set the planesource where we have no ProbeDefinition.
 	// TODO dont do this when planesource is not part of pipeline.
 	DoubleBoundingBox3D bounds(mDataRedirecter->GetOutput()->GetBounds());
 	if (!similar(bounds.range()[0], 0.0) || !similar(bounds.range()[1], 0.0))

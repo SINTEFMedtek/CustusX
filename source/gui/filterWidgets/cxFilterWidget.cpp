@@ -142,8 +142,8 @@ void FilterSetupWidget::setFilter(FilterPtr filter)
 	{
 		mCurrentFilter->setActive(!mObscuredListener->isObscured());
 
-		std::vector<SelectDataStringPropertyBasePtr> inputTypes = mCurrentFilter->getInputTypes();
-		std::vector<SelectDataStringPropertyBasePtr> outputTypes = mCurrentFilter->getOutputTypes();
+//		std::vector<SelectDataStringPropertyBasePtr> inputTypes = mCurrentFilter->getInputTypes();
+//		std::vector<SelectDataStringPropertyBasePtr> outputTypes = mCurrentFilter->getOutputTypes();
 		std::vector<PropertyPtr> options = mCurrentFilter->getOptions();
 
 		mInputsWidget->setOptions(mCurrentFilter->getUid(), mCurrentFilter->getInputTypes(), false);

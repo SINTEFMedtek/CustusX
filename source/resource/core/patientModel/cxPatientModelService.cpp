@@ -74,10 +74,15 @@ Transform3D PatientModelService::get_rMpr() const
 	return this->get_rMpr_History()->getCurrentRegistration().mValue;
 }
 
-void PatientModelService::updateRegistration_rMpr(const QDateTime& oldTime, const RegistrationTransform& newTransform)
+void PatientModelService::updateRegistration_rMpr(const QDateTime& oldTime, const RegistrationTransform& newTransform, bool continuous)
 {
+	//Block signals from RegistrationHistory when running continuous registration,
+	//because these trigger RegistrationHistoryWidget::prePaintEvent() that uses too much time.
+	this->get_rMpr_History()->blockSignals(continuous);
+
 	this->get_rMpr_History()->updateRegistration(oldTime, newTransform);
-	this->autoSave();
+	if(!continuous)
+		this->autoSave();
 }
 
 VideoSourcePtr PatientModelService::getStream(const QString& uid) const

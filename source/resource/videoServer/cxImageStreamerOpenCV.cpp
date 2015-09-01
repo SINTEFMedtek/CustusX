@@ -240,7 +240,7 @@ void ImageStreamerOpenCV::initialize_local()
 	{
 		mVideoCapture->grab();
 	}
-	catch(cv::Exception e)
+	catch(cv::Exception& e)
 	{
 		CX_LOG_ERROR() << "OpenCV failed with message: " << e.what();
 		mVideoCapture->release();
@@ -440,7 +440,7 @@ IGTLinkImageMessage::Pointer ImageStreamerOpenCV::getImageMessage()
 
 
 	int size[] =
-	{ 1.0, 1.0, 1.0 }; // spacing (mm/pixel)
+    { 1, 1, 1 }; // spacing (mm/pixel)
 	size[0] = frame.cols;
 	size[1] = frame.rows;
 

@@ -38,7 +38,7 @@ namespace cx
 {
 vtkImageDataPtr USReconstructInputData::getMask()
 {
-	vtkImageDataPtr retval = mProbeData.getMask();
+	vtkImageDataPtr retval = mProbeDefinition.getMask();
 	return retval;
 }
 

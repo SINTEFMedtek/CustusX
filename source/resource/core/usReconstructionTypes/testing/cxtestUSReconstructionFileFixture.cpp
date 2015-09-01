@@ -98,7 +98,7 @@ void USReconstructionFileFixture::assertCorrespondence(ReconstructionData input,
 
 	CHECK( output.mProbeUid == input.tool->getUid() );
 
-	CHECK( output.mProbeData.mData.getType() == input.tool->getProbe()->getProbeData().getType() );
+	CHECK( output.mProbeDefinition.mData.getType() == input.tool->getProbe()->getProbeDefinition().getType() );
 	// might add more here: compare timestamps and transforms, frame sizes, probe sector
 }
 
@@ -121,15 +121,15 @@ USReconstructionFileFixture::ReconstructionData USReconstructionFileFixture::cre
 		retval.trackerData[i] = cx::createTransformTranslate(cx::Vector3D(i,0,0));
 	retval.writeColor = true;
 	Eigen::Array2i frameSize(100, 50);
-	cx::ProbeDefinition probeData = cx::DummyToolTestUtilities::createProbeDataLinear(10, 5, frameSize);
-	cx::DummyToolPtr tool = cx::DummyToolTestUtilities::createDummyTool(probeData);
+	cx::ProbeDefinition probeDefinition = cx::DummyToolTestUtilities::createProbeDefinitionLinear(10, 5, frameSize);
+	cx::DummyToolPtr tool = cx::DummyToolTestUtilities::createDummyTool(probeDefinition);
 	retval.tool = tool;
 
 	// add frames spaced 2 seconds apart
 	unsigned framesCount = 10;
 	vtkImageDataPtr imageData = cx::generateVtkImageData(
 				Eigen::Array3i(frameSize[0], frameSize[1], framesCount),
-			probeData.getSpacing(),
+			probeDefinition.getSpacing(),
 				0);
 	retval.imageData.reset(new cx::SplitFramesContainer(imageData));
 	for (unsigned i=0; i<framesCount; ++i)

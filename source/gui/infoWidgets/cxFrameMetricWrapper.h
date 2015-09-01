@@ -63,7 +63,7 @@ public:
 private slots:
   void moveToToolPosition();
   void spaceSelected();
-  void dataChangedSlot();
+//  void dataChangedSlot();
   void frameWidgetChangedSlot();
 private:
   cx::FrameMetricPtr mData;

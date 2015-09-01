@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSocketConnection.h"
 #include "cxTransform3D.h"
 #include "cxImage.h"
-#include "cxProbeData.h"
+#include "cxProbeDefinition.h"
 #include "cxLogger.h"
 #include "cxDialect.h"
 

@@ -46,7 +46,8 @@ namespace cx
 
 ViewContainer::ViewContainer(QWidget *parent, Qt::WindowFlags f) :
 	QVTKWidget(parent, f),
-	mMouseEventTarget(NULL)
+	mMouseEventTarget(NULL),
+	mRenderWindow(NULL)
 {
 	this->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(this, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(customContextMenuRequestedSlot(const QPoint &)));
@@ -80,7 +81,7 @@ void ViewContainer::clear()
   */
 QGridLayout* ViewContainer::getGridLayout()
 {
-	return (QGridLayout*) layout();
+    return dynamic_cast<QGridLayout*>(layout());
 }
 
 void ViewContainer::paintEvent(QPaintEvent* event)

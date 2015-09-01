@@ -129,7 +129,7 @@ private slots:
   void moveToToolPosition();
   void spaceSelected();
   void coordinateChanged();
-  void dataChangedSlot();
+//  void dataChangedSlot();
 private:
   QWidget* createSampleButton(QWidget* parent) const;
   SpacePropertyPtr createSpaceSelector() const;

@@ -196,28 +196,25 @@ void DetailedLogMessageDisplayWidget::add(const Message& message)
 	int row = mTable->rowCount();
 	mTable->insertRow(row);
 
-	QTableWidgetItem* item = NULL;
-
 	QString timestamp = message.getTimeStamp().toString("hh:mm:ss.zzz");
-	item = this->addItem(0, timestamp, message);
+	this->addItem(0, timestamp, message);
 
 	QString source;
 	if (!message.mSourceFile.isEmpty())
 		source = QString("%1:%2").arg(message.mSourceFile).arg(message.mSourceLine);
-	item = this->addItem(1, source, message);
-//	item->setTextAlignment(Qt::AlignRight);
+	this->addItem(1, source, message);
 
 	QString function = message.mSourceFunction;
-	item = this->addItem(2, function, message);
+	this->addItem(2, function, message);
 
 	QString thread = message.mThread;
-	item = this->addItem(3, thread, message);
+	this->addItem(3, thread, message);
 
 	QString level = enum2string(message.getMessageLevel());
-	item = this->addItem(4, level, message);
+	this->addItem(4, level, message);
 
 	QString desc = message.getText();
-	item = this->addItem(5, desc, message);
+	this->addItem(5, desc, message);
 
 	this->scrollToBottom();
 }

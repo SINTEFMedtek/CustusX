@@ -200,7 +200,7 @@ void USSavingRecorderFixture::verifySaveData(QString filename)
 	{
 		CHECK( !hasBeenRead.mPositions.empty() );
 		CHECK( hasBeenRead.mProbeUid == mTool->getUid() );
-		CHECK( hasBeenRead.mProbeData.mData.getType() == mTool->getProbe()->getProbeData().getType() );
+		CHECK( hasBeenRead.mProbeDefinition.mData.getType() == mTool->getProbe()->getProbeDefinition().getType() );
 	}
 	else
 	{

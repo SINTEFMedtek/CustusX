@@ -64,7 +64,6 @@ void requireVolumeIn3DScene()
 {
 	RenderTesterPtr renderTester = cxtest::RenderTester::create(cx::viewService()->get3DView()->getRenderWindow());
 	vtkImageDataPtr output = renderTester->renderToImage();
-	int numNonZeroPixels = Utilities::getNumberOfNonZeroVoxels(output);
 	double fractionNonZeroPixels = Utilities::getFractionOfVoxelsAboveThreshold(output, 0);
 
 	REQUIRE(fractionNonZeroPixels > 0.2);//Expect more than the pointer in the 3D scene

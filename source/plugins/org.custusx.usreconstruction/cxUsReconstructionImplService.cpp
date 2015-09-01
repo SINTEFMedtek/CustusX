@@ -145,7 +145,6 @@ void UsReconstructionImplService::reconstructFinishedSlot()
 {
 	mOriginalFileData.mUsRaw->purgeAll();
 
-	std::set<cx::TimedAlgorithmPtr> retval;
 	for (unsigned i=0; i<mExecuters.size(); ++i)
 	{
 		if (mExecuters[i]->getThread()->isFinished())

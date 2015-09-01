@@ -30,16 +30,16 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXCREATEPROBEDATAFROMCONFIGURATION_H_
-#define CXCREATEPROBEDATAFROMCONFIGURATION_H_
+#ifndef CXCREATEPROBEDEFINITIONFROMCONFIGURATION_H_
+#define CXCREATEPROBEDEFINITIONFROMCONFIGURATION_H_
 
 #include "cxResourceExport.h"
 
-#include "cxProbeData.h"
+#include "cxProbeDefinition.h"
 #include "ProbeXmlConfigParser.h"
 
 /**
-* \file cxCreateProbeDataFromConfiguration.h
+* \file cxCreateProbeDefinitionFromConfiguration.h
 *
 * \date Nov 26, 2010
 * \author Christian Askeland, SINTEF
@@ -54,7 +54,7 @@ namespace cx
 
 
 /**
- * Convert from ProbeXmlConfigParser::Configuration to ProbeData
+ * Convert from ProbeXmlConfigParser::Configuration to ProbeDefinition
  *
  * Notes about the conversion:
  * The xml format contains redundant data. The following list defines
@@ -104,13 +104,13 @@ namespace cx
  *
  * \sa ProbeXmlConfigParser
  */
-cxResource_EXPORT ProbeDefinition createProbeDataFromConfiguration(ProbeXmlConfigParser::Configuration config);
+cxResource_EXPORT ProbeDefinition createProbeDefinitionFromConfiguration(ProbeXmlConfigParser::Configuration config);
 
 /**
  * \sa ProbeXmlConfigParser
- * \sa createConfigurationFromProbeData()
+ * \sa createConfigurationFromProbeDefinition()
  */
-cxResource_EXPORT ProbeXmlConfigParser::Configuration createConfigurationFromProbeData(ProbeXmlConfigParser::Configuration basis, ProbeDefinition data);
+cxResource_EXPORT ProbeXmlConfigParser::Configuration createConfigurationFromProbeDefinition(ProbeXmlConfigParser::Configuration basis, ProbeDefinition data);
 
 } // namespace cx
 
@@ -118,4 +118,4 @@ cxResource_EXPORT ProbeXmlConfigParser::Configuration createConfigurationFromPro
 * @}
 */
 
-#endif /* CXCREATEPROBEDATAFROMCONFIGURATION_H_ */
+#endif /* CXCREATEPROBEDEFINITIONFROMCONFIGURATION_H_ */

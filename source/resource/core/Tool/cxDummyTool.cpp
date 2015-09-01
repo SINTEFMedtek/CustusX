@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ProbeDefinition DummyToolTestUtilities::createProbeData(ProbeDefinition::TYPE type, double depth, double width, Eigen::Array2i frameSize)
+ProbeDefinition DummyToolTestUtilities::createProbeDefinition(ProbeDefinition::TYPE type, double depth, double width, Eigen::Array2i frameSize)
 {
 	ProbeDefinition retval;
 	retval.setType(type);
@@ -63,15 +63,15 @@ ProbeDefinition DummyToolTestUtilities::createProbeData(ProbeDefinition::TYPE ty
 	return retval;
 }
 
-ProbeDefinition DummyToolTestUtilities::createProbeDataLinear(double depth, double width, Eigen::Array2i frameSize)
+ProbeDefinition DummyToolTestUtilities::createProbeDefinitionLinear(double depth, double width, Eigen::Array2i frameSize)
 {
-	return createProbeData(ProbeDefinition::tLINEAR, depth, width, frameSize);
+	return createProbeDefinition(ProbeDefinition::tLINEAR, depth, width, frameSize);
 }
 
-DummyToolPtr DummyToolTestUtilities::createDummyTool(ProbeDefinition probeData)
+DummyToolPtr DummyToolTestUtilities::createDummyTool(ProbeDefinition probeDefinition)
 {
 	DummyToolPtr retval(new DummyTool());
-	retval->setProbeSector(probeData);
+	retval->setProbeSector(probeDefinition);
 	retval->setVisible(true);
 	retval->startTracking(30);
 	return retval;

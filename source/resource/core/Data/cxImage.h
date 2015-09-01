@@ -170,8 +170,8 @@ public:
 
 	static vtkImageDataPtr createDummyImageData(int axisSize, int maxVoxelValue); ///< Create a moc object of vtkImageData
 
-	void setInterpolationTypeToNearest();
-	void setInterpolationTypeToLinear();
+//	void setInterpolationTypeToNearest();
+//	void setInterpolationTypeToLinear();
 	void setInterpolationType(int val);
 	int getInterpolationType() const;
 

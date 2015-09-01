@@ -41,7 +41,8 @@ namespace cx
 {
 
 ViewCollectionWidgetUsingViewContainer::ViewCollectionWidgetUsingViewContainer(QWidget* parent) :
-	ViewCollectionWidget(parent)
+	ViewCollectionWidget(parent),
+	mViewContainer(NULL)
 {
 	QVBoxLayout* layout = new QVBoxLayout(this);
 	this->setLayout(layout);

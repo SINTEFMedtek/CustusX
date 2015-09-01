@@ -963,11 +963,11 @@ int vtkSonixVideoSource::RequestData(
 
   int inPadX = 0;
   int inPadY = 0;
-  int inPadZ; // do inPadZ later
+  // do inPadZ later
 
   int outPadX = -outputExtent[0];
   int outPadY = -outputExtent[2];
-  int outPadZ;  // do outPadZ later
+  // do outPadZ later
 
   if (outPadX < 0)
     {
@@ -983,7 +983,7 @@ int vtkSonixVideoSource::RequestData(
 
   int outX = frameExtentX - inPadX; 
   int outY = frameExtentY - inPadY; 
-  int outZ; // do outZ later
+  // do outZ later
 
   if (outX > extentX - outPadX)
     {
@@ -1048,8 +1048,8 @@ int vtkSonixVideoSource::RequestData(
     char *inPtrTmp ;
 
     extentZ = outputExtent[5]-outputExtent[4]+1;
-    inPadZ = 0;
-    outPadZ = -outputExtent[4];
+    int inPadZ = 0;
+    int outPadZ = -outputExtent[4];
     
     if (outPadZ < 0)
       {
@@ -1057,7 +1057,7 @@ int vtkSonixVideoSource::RequestData(
       outPadZ = 0;
       }
 
-    outZ = frameExtentZ - inPadZ;
+    int outZ = frameExtentZ - inPadZ;
 
     if (outZ > extentZ - outPadZ)
       {

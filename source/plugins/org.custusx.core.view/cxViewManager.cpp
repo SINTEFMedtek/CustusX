@@ -216,7 +216,7 @@ QWidget *ViewManager::getLayoutWidget(QWidget* parent, int index)
  */
 void ViewManager::layoutWidgetDestroyed(QObject* object)
 {
-	ViewCollectionWidget* widget = dynamic_cast<ViewCollectionWidget*>(object);
+//	ViewCollectionWidget* widget = dynamic_cast<ViewCollectionWidget*>(object);
 	for (unsigned i=0; i<mLayoutWidgets.size(); ++i)
 	{
 		if (mLayoutWidgets[i] == object)

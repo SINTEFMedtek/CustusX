@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString>
 
 #include "ProbeXmlConfigParserMock.h"
-#include "cxProbeData.h"
+#include "cxProbeDefinition.h"
 #include "cxTestVideoSource.h"
 #include "cxReporter.h"
 #include "catch.hpp"
@@ -86,19 +86,19 @@ void ProbeFixture::createParameters()
 {
 	mProbeName = "TestProbe";
 	mScannerName = "TestScanner";
-	cx::ProbeDefinition probeData;
-	mDefaultProbeDataUid = probeData.getUid(); //Uid set to "default" in ProbeData()
-	mDefaultTemporalCalibration = probeData.getTemporalCalibration();
-	mProbeDataUid = "TestProbeData";
+	cx::ProbeDefinition probeDefinition;
+	mDefaultProbeDefinitionUid = probeDefinition.getUid(); //Uid set to "default" in ProbeDefinition()
+	mDefaultTemporalCalibration = probeDefinition.getTemporalCalibration();
+	mProbeDefinitionUid = "TestprobeDefinition";
 }
 
-cx::ProbeDefinition ProbeFixture::createProbeData()
+cx::ProbeDefinition ProbeFixture::createProbeDefinition()
 {
-	cx::ProbeDefinition probeData = mProbe->getProbeData();
-	probeData.setUid(mProbeDataUid);
+	cx::ProbeDefinition probeDefinition = mProbe->getProbeDefinition();
+	probeDefinition.setUid(mProbeDefinitionUid);
 	mTemporalCalibration = 1000.5;
-	probeData.setTemporalCalibration(mTemporalCalibration);
-	return probeData;
+	probeDefinition.setTemporalCalibration(mTemporalCalibration);
+	return probeDefinition;
 }
 
 } //namespace cxtest

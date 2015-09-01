@@ -82,6 +82,7 @@ public:
 class MessageFilterConsole : public MessageFilter
 {
 public:
+	MessageFilterConsole() : mChannel("") {}
 	virtual bool operator()(const Message& msg) const
 	{
 		if (!isActiveChannel(msg))

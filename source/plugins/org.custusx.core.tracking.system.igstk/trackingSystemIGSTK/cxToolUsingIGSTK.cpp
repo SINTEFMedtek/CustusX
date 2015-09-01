@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTextStream>
 
 #include "cxTypeConversions.h"
-#include "cxProbeData.h"
+#include "cxProbeDefinition.h"
 #include "cxProbeImpl.h"
 #include "cxIgstkTool.h"
 #include "cxTrackingPositionFilter.h"
@@ -128,7 +128,7 @@ QString ToolUsingIGSTK::getName() const
 double ToolUsingIGSTK::getTooltipOffset() const
 {
 	if(this->getProbe())
-		return this->getProbe()->getProbeData().getDepthStart();
+		return this->getProbe()->getProbeDefinition().getDepthStart();
 	return ToolImpl::getTooltipOffset();
 }
 

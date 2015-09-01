@@ -59,11 +59,11 @@ protected:
 	void createTestProbe();
 	void testProbeWithNoRTSource();
 	void createParameters();
-	cx::ProbeDefinition createProbeData();
+	cx::ProbeDefinition createProbeDefinition();
 	QString mProbeName;
 	QString mScannerName;
-	QString mDefaultProbeDataUid;
-	QString mProbeDataUid;
+	QString mDefaultProbeDefinitionUid;
+	QString mProbeDefinitionUid;
 	QString mDefaultRtSourceName;
 	cx::ProbeImplPtr mProbe;
 	double mDefaultTemporalCalibration;

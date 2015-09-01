@@ -11,7 +11,8 @@ namespace cx
 {
 
 RouteToTarget::RouteToTarget():
-	mBranchListPtr(new BranchList)
+	mBranchListPtr(new BranchList),
+	mProjectedIndex(0)
 {
 }
 

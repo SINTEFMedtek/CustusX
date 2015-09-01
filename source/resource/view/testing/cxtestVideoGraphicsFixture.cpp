@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxView.h"
 #include "cxTypeConversions.h"
 
-#include "cxProbeData.h"
+#include "cxProbeDefinition.h"
 #include "cxProbeSector.h"
 #include "cxDummyTool.h"
 #include "cxUtilHelpers.h"
@@ -70,7 +70,7 @@ vtkImageDataPtr VideoGraphicsFixture::readImageData(QString filename, QString de
 	return retval;
 }
 
-cx::ProbeDefinition VideoGraphicsFixture::readProbeData(QString filename)
+cx::ProbeDefinition VideoGraphicsFixture::readProbeDefinition(QString filename)
 {
 	QString path = cxtest::Utilities::getDataRoot("testing/videographics/"+filename);
 	QString probeDataFilename = cx::changeExtension(path, "probedata.xml");
