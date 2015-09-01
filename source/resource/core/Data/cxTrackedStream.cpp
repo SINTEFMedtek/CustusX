@@ -170,7 +170,7 @@ QString TrackedStream::getType() const
 
 QString TrackedStream::getTypeName()
 {
-	return "TrackedStream";
+	return "trackedStream";
 }
 
 ImagePtr TrackedStream::getChangingImage()
@@ -195,6 +195,13 @@ bool TrackedStream::hasVideo() const
 	if(!mVideoSource || !mVideoSource->getVtkImageData())
 		return false;
 	return true;
+}
+
+bool TrackedStream::isStreaming() const
+{
+	if (this->hasVideo())
+		return mVideoSource->isStreaming();
+	return false;
 }
 
 } //cx

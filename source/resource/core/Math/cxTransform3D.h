@@ -47,7 +47,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 namespace cx_transform3D_internal
 {
+/** provide an array of the transform indices, vtk / row-major ordering
+ */
 cxResource_EXPORT boost::array<double, 16> flatten(const Eigen::Affine3d* self);
+
 cxResource_EXPORT void fill(Eigen::Affine3d* self, vtkMatrix4x4Ptr m);
 cxResource_EXPORT void fill(Eigen::Affine3d* self, float m[4][4]);
 cxResource_EXPORT void fill(Eigen::Affine3d* self, const double* raw);
@@ -179,16 +182,54 @@ typedef Eigen::Affine3d Transform3D;
 
 cxResource_EXPORT bool similar(const Transform3D& a, const Transform3D& b, double tol = 1.0E-4);
 
+/** Transform bb using the transform m.
+ * Only the two defining corners are actually transformed.
+ */
 cxResource_EXPORT DoubleBoundingBox3D transform(const Transform3D& m, const DoubleBoundingBox3D& bb);
 
+/** Normalize volume defined by in to volume defined by out.
+ *
+ * This is intended for creating transforms from one viewport to another, i.e.
+ * the two boxes should be aligned and differ only in translation + scaling.
+ */
 cxResource_EXPORT Transform3D createTransformNormalize(const DoubleBoundingBox3D& in, const DoubleBoundingBox3D& out);
+
+/**Create a transform representing a scale in x,y,z
+ */
 cxResource_EXPORT Transform3D createTransformScale(const Vector3D& scale);
+
+/** Create a transform representing a translation
+ */
 cxResource_EXPORT Transform3D createTransformTranslate(const Vector3D& translation);
+
+/** Create a transform representing a rotation about the X-axis with an input angle.
+ */
 cxResource_EXPORT Transform3D createTransformRotateX(const double angle);
+
+/** Create a transform representing a rotation about the Y-axis with an input angle.
+ */
 cxResource_EXPORT Transform3D createTransformRotateY(const double angle);
+
+/** Create a transform representing a rotation about the Z-axis with an input angle.
+ */
 cxResource_EXPORT Transform3D createTransformRotateZ(const double angle);
+
+/** Create a transform to a space defined by an origin and two perpendicular unit vectors that
+ * for the x-y plane.
+ * The original space is A and the space defined by ijc are B
+ * The returned transform M_AB converts a point in B to A:
+ * 		p_A = M_AB * p_B
+ */
 cxResource_EXPORT Transform3D createTransformIJC(const Vector3D& ivec, const Vector3D& jvec, const Vector3D& center);
+
 cxResource_EXPORT Transform3D createTransformRotationBetweenVectors(Vector3D from, Vector3D to);
+
+/**
+  * Convert from left-posterior-superior (LPS) or right-anterior-superior (RAS).
+  * LPS is used by DICOM and CustusX,
+  * RAS is used by Slicer, ITK-Snap, NifTI,
+  */
+cxResource_EXPORT Transform3D createTransformLPS2RAS();
 
 // --------------------------------------------------------
 typedef boost::shared_ptr<Transform3D> Transform3DPtr;

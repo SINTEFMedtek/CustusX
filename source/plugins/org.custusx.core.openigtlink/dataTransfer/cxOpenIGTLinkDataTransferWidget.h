@@ -29,72 +29,45 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXOPENIGTLINKDATATRANSFERWIDGET_H
+#define CXOPENIGTLINKDATATRANSFERWIDGET_H
 
-#ifndef CXTRACKEDSTREAM_H
-#define CXTRACKEDSTREAM_H
+#include <QThread>
+#include "cxBaseWidget.h"
+#include "cxXmlOptionItem.h"
+#include "cxForwardDeclarations.h"
 
-#include "cxImage.h"
+class ctkPluginContext;
 
-namespace cx
-{
+namespace cx {
 
-/** \brief A data set for video streams (2D/3D).
- *
- * Allowing video stream as a data type
- *
- * \ingroup cx_resource_core_data
- *
- * \date jan 28, 2015
- * \author Ole Vegard Solberg, SINTEF
- */
-class cxResource_EXPORT TrackedStream : public Data
+class OpenIGTLinkConnectionWidget;
+class OpenIGTLinkClient;
+typedef boost::shared_ptr<class BoolProperty> BoolPropertyPtr;
+typedef boost::shared_ptr<class OpenIGTLinkClientThreadHandler> OpenIGTLinkClientThreadHandlerPtr;
+
+class OpenIGTLinkDataTransferWidget : public BaseWidget
 {
 	Q_OBJECT
 public:
-	static TrackedStreamPtr create(const QString& uid, const QString& name = "");
-	TrackedStream(const QString &uid, const QString &name, const ToolPtr &probe, const VideoSourcePtr &videoSource);
-
-	void setProbeTool(const ToolPtr &probeTool);
-	ToolPtr getProbeTool();
-	void setVideoSource(const VideoSourcePtr &videoSource);
-	VideoSourcePtr getVideoSource();
-	void setSpaceProvider(SpaceProviderPtr spaceProvider);
-
-	virtual void addXml(QDomNode& dataNode);
-	virtual void parseXml(QDomNode& dataNode);
-
-	virtual DoubleBoundingBox3D boundingBox() const;
-	virtual bool load(QString path) { return true;} ///< Not used
-	virtual void save(const QString& basePath) {} ///< Not used
-
-	virtual QString getType() const;
-	static QString getTypeName();
-
-	ImagePtr getChangingImage();
-	bool is3D();
-	bool hasVideo() const;
-	bool isStreaming() const;
-signals:
-	void streamChanged(QString uid);
-	void newTool(ToolPtr tool);
-	void newVideoSource(VideoSourcePtr videoSource);
-	void newFrame();
-	void streaming(bool on); ///< emitted when streaming started/stopped
-
-private slots:
-	void newFrameSlot();
-	void toolTransformAndTimestamp(Transform3D prMt, double timestamp);
+	OpenIGTLinkDataTransferWidget(ctkPluginContext* context, QWidget* parent=NULL);
+	~OpenIGTLinkDataTransferWidget();
 private:
-	ToolPtr mProbeTool;
-	VideoSourcePtr mVideoSource;
-	ImagePtr mImage;
+//	QThread mOpenIGTLinkThread;
+//	OpenIGTLinkClient* mClient;
+	OpenIGTLinkConnectionWidget* mConnectionWidget;
+	BoolPropertyPtr mAcceptIncomingData;
+	XmlOptionFile mOptions;
+	ctkPluginContext* mContext;
+	OpenIGTLinkClientThreadHandlerPtr mOpenIGTLink;
 
-	SpaceProviderPtr mSpaceProvider;
-	Transform3D get_tMu();
+	PatientModelServicePtr mPatientModelService;
+	VisualizationServicePtr mViewService;
+
+	QString getConfigUid() const;
+	void onImageReceived(ImagePtr image);
 };
 
-typedef boost::shared_ptr<TrackedStream> TrackedStreamPtr;
+} // namespace cx
 
-} //cx
-
-#endif // CXTRACKEDSTREAM_H
+#endif // CXOPENIGTLINKDATATRANSFERWIDGET_H

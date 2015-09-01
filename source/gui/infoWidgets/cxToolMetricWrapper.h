@@ -64,7 +64,7 @@ private slots:
   void spaceSelected();
   void toolNameSet();
   void toolOffsetSet();
-  void dataChangedSlot();
+//  void dataChangedSlot();
   void frameWidgetChangedSlot();
 private:
   cx::ToolMetricPtr mData;

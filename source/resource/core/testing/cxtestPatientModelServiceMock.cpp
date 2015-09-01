@@ -47,7 +47,7 @@ namespace cxtest
 PatientModelServiceMock::PatientModelServiceMock()
 {
 	m_rMpr.reset(new cx::RegistrationHistory());
-	connect(m_rMpr.get(), SIGNAL(currentChanged()), this, SIGNAL(rMprChanged()));
+	connect(m_rMpr.get(), &cx::RegistrationHistory::currentChanged, this, &cx::PatientModelService::rMprChanged);
 }
 
 void PatientModelServiceMock::insertData(cx::DataPtr data)

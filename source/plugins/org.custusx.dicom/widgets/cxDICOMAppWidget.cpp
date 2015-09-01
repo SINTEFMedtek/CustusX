@@ -357,13 +357,13 @@ DICOMAppWidget::DICOMAppWidget(QWidget* _parent):Superclass(_parent),
 //  d->QueryRetrieveWidget->setWindowModality ( Qt::ApplicationModal );
 
   connect(d->TreeView->selectionModel(),
-		  SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
+		  &QItemSelectionModel::selectionChanged,
 		  this,
-		  SLOT(onSelectionChanged(const QItemSelection&, const QItemSelection&)));
+		  &DICOMAppWidget::onSelectionChanged);
   connect(d->TreeView->selectionModel(),
-		  SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)),
+		  &QItemSelectionModel::currentChanged,
 		  this,
-		  SLOT(onCurrentChanged(const QModelIndex&, const QModelIndex&)));
+		  &DICOMAppWidget::onCurrentChanged);
 
   //connect signal and slots
   connect(d->TreeView, SIGNAL(clicked(QModelIndex)), this, SLOT(onModelSelected(QModelIndex)));

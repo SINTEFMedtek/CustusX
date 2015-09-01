@@ -34,11 +34,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxOpenIGTLinkGuiExtenderService.h"
 #include "cxOpenIGTLinkClient.h"
 #include "cxOpenIGTLinkConnectionWidget.h"
+#include "cxOpenIGTLinkDataTransferWidget.h"
 
 namespace cx
 {
-OpenIGTLinkGuiExtenderService::OpenIGTLinkGuiExtenderService(OpenIGTLinkClient* client)
+OpenIGTLinkGuiExtenderService::OpenIGTLinkGuiExtenderService(ctkPluginContext *context, OpenIGTLinkClient* client)
 {
+	mContext = context;
     mClient = client;
 }
 
@@ -49,8 +51,8 @@ OpenIGTLinkGuiExtenderService::~OpenIGTLinkGuiExtenderService()
 std::vector<GUIExtenderService::CategorizedWidget> OpenIGTLinkGuiExtenderService::createWidgets() const
 {
     std::vector<CategorizedWidget> retval;
-    mWidget = GUIExtenderService::CategorizedWidget( new OpenIGTLinkConnectionWidget(mClient), "Utility");
-    retval.push_back(mWidget);
-    return retval;
+	retval.push_back(GUIExtenderService::CategorizedWidget( new OpenIGTLinkConnectionWidget(mClient), "Utility"));
+	retval.push_back(GUIExtenderService::CategorizedWidget( new OpenIGTLinkDataTransferWidget(mContext), "Utility"));
+	return retval;
 }
 }//namespace cx

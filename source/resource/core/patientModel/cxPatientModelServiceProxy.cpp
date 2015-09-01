@@ -80,8 +80,8 @@ void PatientModelServiceProxy::onServiceAdded(PatientModelService* service)
 	connect(service, &PatientModelService::clinicalApplicationChanged, this, &PatientModelService::clinicalApplicationChanged);
 	connect(service, &PatientModelService::rMprChanged, this, &PatientModelService::rMprChanged);
 	connect(service, &PatientModelService::streamLoaded, this, &PatientModelService::streamLoaded);
-
 	connect(service, &PatientModelService::patientChanged, this, &PatientModelService::patientChanged);
+	connect(service, &PatientModelService::videoAddedToTrackedStream, this, &PatientModelService::videoAddedToTrackedStream);
 
 	if(mPatientModelService->isNull())
 		reportWarning("PatientModelServiceProxy::onServiceAdded mPatientModelService->isNull()");
@@ -103,8 +103,8 @@ void PatientModelServiceProxy::onServiceRemoved(PatientModelService *service)
 	disconnect(service, &PatientModelService::clinicalApplicationChanged, this, &PatientModelService::clinicalApplicationChanged);
 	disconnect(service, &PatientModelService::rMprChanged, this, &PatientModelService::rMprChanged);
 	disconnect(service, &PatientModelService::streamLoaded, this, &PatientModelService::streamLoaded);
-
 	disconnect(service, &PatientModelService::patientChanged, this, &PatientModelService::patientChanged);
+	disconnect(service, &PatientModelService::videoAddedToTrackedStream, this, &PatientModelService::videoAddedToTrackedStream);
 
 	mPatientModelService = PatientModelService::getNullObject();
 

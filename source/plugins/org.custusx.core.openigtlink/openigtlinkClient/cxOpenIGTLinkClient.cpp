@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxSender.h"
 #include "cxTime.h"
+#include <QThread>
 
 #include "cxPlusDialect.h"
 #include "cxCustusDialect.h"
@@ -62,7 +63,10 @@ OpenIGTLinkClient::OpenIGTLinkClient(QObject *parent) :
 
     dialect = DialectPtr(new Dialect());
     mAvailableDialects[dialect->getName()] = dialect;
+}
 
+OpenIGTLinkClient::~OpenIGTLinkClient()
+{
 }
 
 QStringList OpenIGTLinkClient::getAvailableDialects() const
@@ -107,7 +111,7 @@ void OpenIGTLinkClient::setDialect(QString dialectname)
     connect(dialect.get(), &Dialect::usstatusmessage, this, &OpenIGTLinkClient::usstatusmessage);
     connect(dialect.get(), &Dialect::igtlimage, this, &OpenIGTLinkClient::igtlimage);
 
-    CX_LOG_CHANNEL_SUCCESS(CX_OPENIGTLINK_CHANNEL_NAME) << "Dialect set to " << dialectname;
+	CX_LOG_CHANNEL_SUCCESS(CX_OPENIGTLINK_CHANNEL_NAME) << "IGTL Dialect set to " << dialectname;
 
 }
 
@@ -173,7 +177,6 @@ bool OpenIGTLinkClient::receiveHeader(const igtl::MessageHeader::Pointer header)
         return false;
 
     int c = header->Unpack(1);
-    this->checkCRC(c); //just for debugging
     if (c & igtl::MessageHeader::UNPACK_HEADER)
     {
         std::string deviceType = std::string(header->GetDeviceType());
@@ -247,7 +250,6 @@ bool OpenIGTLinkClient::receive(const igtl::MessageBase::Pointer header)
         return false;
 
     int c = body->Unpack(mDialect->doCRC());
-    this->checkCRC(c);
     if (c & igtl::MessageHeader::UNPACK_BODY)
     {
         mDialect->translate(body);
@@ -260,26 +262,31 @@ bool OpenIGTLinkClient::receive(const igtl::MessageBase::Pointer header)
     return true;
 }
 
-void OpenIGTLinkClient::checkCRC(int c) const
+
+
+
+OpenIGTLinkClientThreadHandler::OpenIGTLinkClientThreadHandler(QString threadname)
 {
-    switch(c)
-    {
-        case igtl::MessageHeader::UNPACK_UNDEF:
-            //CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "UNPACK_UNDEF";
-            break;
-        case igtl::MessageHeader::UNPACK_HEADER:
-            //CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "UNPACK_HEADER";
-            break;
-        case igtl::MessageHeader::UNPACK_BODY:
-            //CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "UNPACK_BODY";
-            break;
-        case igtl::MessageHeader::UNPACK_HEADER|igtl::MessageHeader::UNPACK_BODY:
-            //CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "UNPACK_HEADER|UNPACK_BODY";
-            break;
-        default:
-            //CX_LOG_DEBUG() << "default: " << c;
-            break;
-    }
+	mThread.reset(new QThread());
+	mThread->setObjectName(threadname);
+	mClient.reset(new OpenIGTLinkClient);
+	mClient->moveToThread(mThread.get());
+
+	mThread->start();
+}
+
+OpenIGTLinkClientThreadHandler::~OpenIGTLinkClientThreadHandler()
+{
+	mThread->quit();
+	mThread->wait();
+
+	mClient.reset();
+	// thread-delete implicitly at end.
+}
+
+OpenIGTLinkClient* OpenIGTLinkClientThreadHandler::client()
+{
+	return mClient.get();
 }
 
 
