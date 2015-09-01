@@ -170,7 +170,7 @@ QString TrackedStream::getType() const
 
 QString TrackedStream::getTypeName()
 {
-	return "TrackedStream";
+	return "trackedStream";
 }
 
 ImagePtr TrackedStream::getChangingImage()
