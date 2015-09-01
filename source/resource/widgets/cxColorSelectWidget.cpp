@@ -83,6 +83,7 @@ void ColorSelectWidget::prePaintEvent()
 
     mColorButton->setColor(mData->getValue());
     mColorButton->setToolTip(mData->getHelp());
+	mLabel->setToolTip(mData->getHelp());
 
     mColorButton->blockSignals(false);
 }
