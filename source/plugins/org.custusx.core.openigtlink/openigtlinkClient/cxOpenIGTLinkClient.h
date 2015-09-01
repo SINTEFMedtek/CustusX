@@ -93,7 +93,6 @@ private:
 
     template <typename T>
     bool receive(const igtl::MessageBase::Pointer header);
-    void checkCRC(int c) const;
 
     QMutex mMutex;
 

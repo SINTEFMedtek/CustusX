@@ -173,7 +173,6 @@ bool OpenIGTLinkClient::receiveHeader(const igtl::MessageHeader::Pointer header)
         return false;
 
     int c = header->Unpack(1);
-    this->checkCRC(c); //just for debugging
     if (c & igtl::MessageHeader::UNPACK_HEADER)
     {
         std::string deviceType = std::string(header->GetDeviceType());
@@ -247,7 +246,6 @@ bool OpenIGTLinkClient::receive(const igtl::MessageBase::Pointer header)
         return false;
 
     int c = body->Unpack(mDialect->doCRC());
-    this->checkCRC(c);
     if (c & igtl::MessageHeader::UNPACK_BODY)
     {
         mDialect->translate(body);
@@ -258,28 +256,6 @@ bool OpenIGTLinkClient::receive(const igtl::MessageBase::Pointer header)
         return false;
     }
     return true;
-}
-
-void OpenIGTLinkClient::checkCRC(int c) const
-{
-    switch(c)
-    {
-        case igtl::MessageHeader::UNPACK_UNDEF:
-            //CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "UNPACK_UNDEF";
-            break;
-        case igtl::MessageHeader::UNPACK_HEADER:
-            //CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "UNPACK_HEADER";
-            break;
-        case igtl::MessageHeader::UNPACK_BODY:
-            //CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "UNPACK_BODY";
-            break;
-        case igtl::MessageHeader::UNPACK_HEADER|igtl::MessageHeader::UNPACK_BODY:
-            //CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "UNPACK_HEADER|UNPACK_BODY";
-            break;
-        default:
-            //CX_LOG_DEBUG() << "default: " << c;
-            break;
-    }
 }
 
 

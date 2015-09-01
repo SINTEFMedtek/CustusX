@@ -65,7 +65,9 @@ public:
     QString decode(igtl::StatusMessage::Pointer msg);
     ImagePtr decode(igtl::ImageMessage::Pointer msg);
     Transform3D decode_image_matrix(igtl::ImageMessage::Pointer msg);
-    Transform3D decode(igtl::TransformMessage::Pointer msg);
+	QDateTime decode_timestamp(igtl::MessageBase* msg);
+	void encode_timestamp(QDateTime ts, igtl::MessageBase* msg);
+	Transform3D decode(igtl::TransformMessage::Pointer msg);
 
     //CustusX message formats
     /**

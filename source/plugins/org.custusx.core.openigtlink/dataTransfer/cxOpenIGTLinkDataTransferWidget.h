@@ -29,33 +29,42 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXOPENIGTLINKDATATRANSFERWIDGET_H
+#define CXOPENIGTLINKDATATRANSFERWIDGET_H
 
+#include <QThread>
+#include "cxBaseWidget.h"
+#include "cxXmlOptionItem.h"
+#include "cxForwardDeclarations.h"
 
-#ifndef CXOPENIGTLINKGUIEXTENDERSERVICE_H
-#define CXOPENIGTLINKGUIEXTENDERSERVICE_H
-
-#include "org_custusx_core_openigtlink_Export.h"
-#include "cxGUIExtenderService.h"
 class ctkPluginContext;
 
-namespace cx
-{
+namespace cx {
+
+class OpenIGTLinkConnectionWidget;
 class OpenIGTLinkClient;
+typedef boost::shared_ptr<class BoolProperty> BoolPropertyPtr;
 
-class org_custusx_core_openigtlink_EXPORT OpenIGTLinkGuiExtenderService : public GUIExtenderService
+class OpenIGTLinkDataTransferWidget : public BaseWidget
 {
+	Q_OBJECT
 public:
-	OpenIGTLinkGuiExtenderService(ctkPluginContext* context, OpenIGTLinkClient *client = NULL);
-    virtual ~OpenIGTLinkGuiExtenderService();
-
-    std::vector<CategorizedWidget> createWidgets() const;
-
+	OpenIGTLinkDataTransferWidget(ctkPluginContext* context, QWidget* parent=NULL);
 private:
-    mutable GUIExtenderService::CategorizedWidget mWidget;
-    OpenIGTLinkClient* mClient;
+	QThread mOpenIGTLinkThread;
+	OpenIGTLinkClient* mClient;
+	OpenIGTLinkConnectionWidget* mConnectionWidget;
+	BoolPropertyPtr mAcceptIncomingData;
+	XmlOptionFile mOptions;
 	ctkPluginContext* mContext;
-};
-typedef boost::shared_ptr<OpenIGTLinkGuiExtenderService> OpenIGTLinkGuiExtenderServicePtr;
 
-}
-#endif //CXOPENIGTLINKGUIEXTENDERSERVICE_H
+	PatientModelServicePtr mPatientModelService;
+	VisualizationServicePtr mViewService;
+
+	QString getConfigUid() const;
+	void onImageReceived(ImagePtr image);
+};
+
+} // namespace cx
+
+#endif // CXOPENIGTLINKDATATRANSFERWIDGET_H

@@ -134,11 +134,6 @@ ImagePtr IGTLinkConversion::decode(igtl::ImageMessage::Pointer message)
         imageImport->SetDataScalarTypeToUnsignedChar();
     }
 
-    // get timestamp from igtl second-format:
-    igtl::TimeStamp::Pointer timestamp = igtl::TimeStamp::New();
-    message->GetTimeStamp(timestamp);
-
-    double timestampMS = timestamp->GetTimeStamp() * 1000;
     imageImport->SetDataOrigin(0, 0, 0);
     imageImport->SetDataSpacing(spacing[0], spacing[1], spacing[2]);
     imageImport->SetWholeExtent(0, size[0] - 1, 0, size[1] - 1, 0, size[2] - 1);
@@ -149,7 +144,7 @@ ImagePtr IGTLinkConversion::decode(igtl::ImageMessage::Pointer message)
     imageImport->Update();
 
     ImagePtr retval(new Image(deviceName, imageImport->GetOutput()));
-    retval->setAcquisitionTime(QDateTime::fromMSecsSinceEpoch(timestampMS));
+	retval->setAcquisitionTime(this->decode_timestamp(message));
     retval = this->decode(retval);
 
     return retval;
@@ -160,6 +155,13 @@ Transform3D IGTLinkConversion::decode_image_matrix(igtl::ImageMessage::Pointer m
     igtl::Matrix4x4 matrix;
     msg->GetMatrix(matrix);
     Transform3D retval = Transform3D::fromFloatArray(matrix);
+
+	if (msg->GetCoordinateSystem() == igtl::ImageMessage::COORDINATE_RAS)
+	{
+		retval = retval * createTransformLPS2RAS().inv();
+	}
+	// the other option, igtl::ImageMessage::COORDINATE_LPS, is the internally supported one.
+
     return retval;
 }
 
@@ -226,12 +228,7 @@ IGTLinkImageMessage::Pointer IGTLinkConversion::encode(ImagePtr image)
 	imgMsg->SetSubVolume(svsize, svoffset);
 	imgMsg->AllocateScalars();
 
-	QDateTime lastGrabTime = image->getAcquisitionTime();
-	igtl::TimeStamp::Pointer timestamp;
-	timestamp = igtl::TimeStamp::New();
-	double grabTime = 1.0 / 1000 * (double) lastGrabTime.toMSecsSinceEpoch();
-	timestamp->SetTime(grabTime);
-	imgMsg->SetTimeStamp(timestamp);
+	this->encode_timestamp(image->getAcquisitionTime(), imgMsg);
 
 	int fsize = imgMsg->GetImageSize();
     memcpy(imgMsg->GetScalarPointer(), rawImage->GetScalarPointer(0,0,0), fsize); // not sure if we need to copy
@@ -446,5 +443,24 @@ vtkImageDataPtr IGTLinkConversion::createFilterAny2RGB(int R, int G, int B, vtkI
 	merger->Update();
 	return merger->GetOutput();
 }
+
+QDateTime IGTLinkConversion::decode_timestamp(igtl::MessageBase* msg)
+{
+	// get timestamp from igtl second-format:
+	igtl::TimeStamp::Pointer timestamp = igtl::TimeStamp::New();
+	msg->GetTimeStamp(timestamp);
+	double timestampMS = timestamp->GetTimeStamp() * 1000;
+	return QDateTime::fromMSecsSinceEpoch(timestampMS);
+}
+
+void IGTLinkConversion::encode_timestamp(QDateTime ts, igtl::MessageBase* msg)
+{
+	igtl::TimeStamp::Pointer timestamp;
+	timestamp = igtl::TimeStamp::New();
+	double grabTime = 1.0 / 1000 * (double) ts.toMSecsSinceEpoch();
+	timestamp->SetTime(grabTime);
+	msg->SetTimeStamp(timestamp);
+}
+
 
 } // namespace cx

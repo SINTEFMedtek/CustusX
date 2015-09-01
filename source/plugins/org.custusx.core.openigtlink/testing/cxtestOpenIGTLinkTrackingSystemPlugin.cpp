@@ -52,7 +52,7 @@ TEST_CASE("OpenIGTLinkGuiExtender: Check that the openigtlink gui extender servi
 {
     cx::OpenIGTLinkClient *client = new cx::OpenIGTLinkClient;
     client->setDialect("PlusServer");
-    cx::OpenIGTLinkGuiExtenderServicePtr gui(new cx::OpenIGTLinkGuiExtenderService(client));
+	cx::OpenIGTLinkGuiExtenderServicePtr gui(new cx::OpenIGTLinkGuiExtenderService(NULL, client));
     REQUIRE(gui);
     CHECK(gui.unique());
     gui.reset();
