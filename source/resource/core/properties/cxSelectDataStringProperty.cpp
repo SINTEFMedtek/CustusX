@@ -99,8 +99,8 @@ ImagePtr StringPropertySelectImage::getImage()
 //---------------------------------------------------------
 
 
-StringPropertySelectData::StringPropertySelectData(PatientModelServicePtr patientModelService) :
-	SelectDataStringPropertyBase(patientModelService, ".*")
+StringPropertySelectData::StringPropertySelectData(PatientModelServicePtr patientModelService, QString typeRegexp) :
+	SelectDataStringPropertyBase(patientModelService, typeRegexp)
 {
 }
 
@@ -168,7 +168,7 @@ MeshPtr StringPropertySelectMesh::getMesh()
 //---------------------------------------------------------
 
 StringPropertySelectTrackedStream::StringPropertySelectTrackedStream(PatientModelServicePtr patientModelService) :
-	SelectDataStringPropertyBase(patientModelService, "TrackedStream")
+	SelectDataStringPropertyBase(patientModelService, "trackedStream")
 {
 	mValueName = "Select stream";
 	mHelp = "Select a tracked stream";

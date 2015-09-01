@@ -90,7 +90,10 @@ class cxResource_EXPORT StringPropertySelectData : public SelectDataStringProper
 {
   Q_OBJECT
 public:
-	static StringPropertySelectDataPtr New(PatientModelServicePtr patientModelService) { return StringPropertySelectDataPtr(new StringPropertySelectData(patientModelService)); }
+	static StringPropertySelectDataPtr New(PatientModelServicePtr patientModelService, QString typeRegexp = ".*")
+	{
+		return StringPropertySelectDataPtr(new StringPropertySelectData(patientModelService, typeRegexp));
+	}
   virtual ~StringPropertySelectData() {}
 
 public: // basic methods
@@ -101,7 +104,7 @@ public: // interface extension
   virtual DataPtr getData() const;
 
 protected:
-	StringPropertySelectData(PatientModelServicePtr patientModelService);
+	StringPropertySelectData(PatientModelServicePtr patientModelService, QString typeRegexp = ".*");
 private:
 //  DataPtr mData;
   QString mUid;
