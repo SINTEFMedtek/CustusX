@@ -46,11 +46,11 @@ void Dialect::translate(const igtl::ImageMessage::Pointer body)
 	ImagePtr theImage = converter.decode(body);
 	theImage->get_rMd_History()->setRegistration(converter.decode_image_matrix(body));
 
-	QString dtype(body->GetDeviceType());
-	QString dname(body->GetDeviceName());
-	CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << QString("Accepting incoming igtlink message (%1, %2): ")
-														.arg(dtype)
-														.arg(dname);
+//	QString dtype(body->GetDeviceType());
+//	QString dname(body->GetDeviceName());
+//	CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << QString("Accepting incoming igtlink message (%1, %2): ")
+//														.arg(dtype)
+//														.arg(dname);
 
 	emit image(theImage);
 }
