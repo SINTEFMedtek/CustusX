@@ -100,6 +100,8 @@ bool Mesh::load(QString path)
 void Mesh::setVtkPolyData(const vtkPolyDataPtr& polyData)
 {
 	mVtkPolyData = polyData;
+    mOrientationArrayList.clear();
+    mColorArrayList.clear();
 
     int num;
     for(int k=0; k <  mVtkPolyData->GetPointData()->GetNumberOfArrays(); k++)
