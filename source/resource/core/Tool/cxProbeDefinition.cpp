@@ -232,6 +232,11 @@ void ProbeDefinition::applySoundSpeedCompensationFactor(double factor)
 		reportWarning("Sound speed compensation is applied to spacing[1], i.e. it is correct for linear probes and approxomate for other probes. Factor: " + qstring_cast(factor));
 }
 
+double ProbeDefinition::getSoundSpeedCompensationFactor() const
+{
+    return mSoundSpeedCompensationFactor;
+}
+
 //Should be transform_uMv(p) (input in pixels, output in mm)
 Vector3D ProbeDefinition::transform_p_to_u(const Vector3D& q_p) const
 {

@@ -149,6 +149,7 @@ public:
 	void updateClipRectFromSector();
 	void updateSectorFromClipRect();
 	void applySoundSpeedCompensationFactor(double factor);///< Compensate for soundspeed for linear probes
+    double getSoundSpeedCompensationFactor() const;
 
 	Vector3D getOrigin_u() const; ///< probe origin in image space u. (lower-left corner origin)
 	DoubleBoundingBox3D getClipRect_u() const; ///< sector clipping rect in image space u. (lower-left corner origin)
