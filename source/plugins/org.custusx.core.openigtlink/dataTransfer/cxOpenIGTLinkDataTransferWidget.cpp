@@ -105,6 +105,7 @@ void OpenIGTLinkDataTransferWidget::onSend()
 	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
 	if (image)
 	{
+		mOpenIGTLink->client()->sendMessage(image);
 		// send
 		return;
 	}

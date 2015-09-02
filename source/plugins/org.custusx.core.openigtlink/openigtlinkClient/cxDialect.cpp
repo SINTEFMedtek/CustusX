@@ -49,9 +49,10 @@ void Dialect::translate(const igtl::ImageMessage::Pointer body)
 	CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << QString("Accepting incoming igtlink message (%1, %2): ")
 														.arg(dtype)
 														.arg(dname);
+
 	IGTLinkConversionImage imageConverter;
 	ImagePtr retval = imageConverter.decode(body);
-	std::cout << "retval " << retval.get() << std::endl;
+//	std::cout << "retval " << retval.get() << std::endl;
 	emit image(retval);
 //	//IMAGE
 //	IGTLinkConversion converter;

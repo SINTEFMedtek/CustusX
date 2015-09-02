@@ -70,7 +70,10 @@ public:
 
 private:
 	vtkImageDataPtr decode_vtkImageData(igtl::ImageMessage* in);
-	Transform3D decode_Transform3D(igtl::ImageMessage* msg);
+	void decode_rMd(igtl::ImageMessage* msg, ImagePtr out);
+//	void encode_Transform3D(Transform3D rMd, igtl::ImageMessage *outmsg);
+	void encode_rMd(ImagePtr image, igtl::ImageMessage *outmsg);
+	void encode_vtkImageData(vtkImageDataPtr in, igtl::ImageMessage *outmsg);
 
 private:
 	int IGTLToVTKScalarType(int igtlType);

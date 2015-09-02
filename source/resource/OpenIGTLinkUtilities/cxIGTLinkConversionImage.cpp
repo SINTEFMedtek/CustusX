@@ -58,15 +58,30 @@ namespace cx
 ImagePtr IGTLinkConversionImage::decode(igtl::ImageMessage *msg)
 {
 	vtkImageDataPtr vtkImage = this->decode_vtkImageData(msg);
-	Transform3D transform = this->decode_Transform3D(msg);
+//	Transform3D transform = this->decode_rMd(msg);
 	QDateTime timestamp = IGTLinkConversionBase().decode_timestamp(msg);
 	QString deviceName = msg->GetDeviceName();
 
 	ImagePtr retval(new Image(deviceName, vtkImage));
 	retval->setAcquisitionTime(timestamp);
-	retval->get_rMd_History()->setRegistration(transform);
+	this->decode_rMd(msg, retval);
+//	retval->get_rMd_History()->setRegistration(transform);
 //	retval = this->decode(retval);
 
+	return retval;
+}
+
+igtl::ImageMessage::Pointer IGTLinkConversionImage::encode(ImagePtr image)
+{
+	igtl::ImageMessage::Pointer retval = igtl::ImageMessage::New();
+	IGTLinkConversionBase baseConverter;
+
+	retval->SetDeviceName(cstring_cast(image->getUid()));
+	baseConverter.encode_timestamp(image->getAcquisitionTime(), retval);
+	this->encode_vtkImageData(image->getBaseVtkImageData(), retval);
+	this->encode_rMd(image, retval);
+
+	retval->Pack();
 	return retval;
 }
 
@@ -276,19 +291,218 @@ vtkImageDataPtr IGTLinkConversionImage::decode_vtkImageData(igtl::ImageMessage *
 	return imageData;
 }
 
-Transform3D IGTLinkConversionImage::decode_Transform3D(igtl::ImageMessage *msg)
+void IGTLinkConversionImage::encode_vtkImageData(vtkImageDataPtr in, igtl::ImageMessage *outmsg)
+{
+	// NOTE: This method is mostly a copy-paste from Slicer.
+	// MRML and coordinate stuff are removed.
+	// Avoid refactoring the internals, as it is important to keep the code similar to the origin.
+
+//	if (!mrmlNode)
+//      {
+//      return 0;
+//      }
+
+//    // If mrmlNode is Image node
+//    if (event == vtkMRMLVolumeNode::ImageDataModifiedEvent && strcmp(mrmlNode->GetNodeTagName(), "Volume") == 0)
+//      {
+//      vtkMRMLScalarVolumeNode* volumeNode =
+//        vtkMRMLScalarVolumeNode::SafeDownCast(mrmlNode);
+
+//      if (!volumeNode)
+//        {
+//        return 0;
+//        }
+
+	vtkImageDataPtr imageData = in;
+//      vtkImageData* imageData = volumeNode->GetImageData();
+	  int   isize[3];          // image dimension
+	  //int   svsize[3];        // sub-volume size
+	  int   scalarType;       // scalar type
+	  //double *origin;
+	  double *spacing;       // spacing (mm/pixel)
+	  //int   ncomp;
+	  int   svoffset[] = {0, 0, 0};           // sub-volume offset
+	  int   endian;
+
+	  scalarType = imageData->GetScalarType();
+	  //ncomp = imageData->GetNumberOfScalarComponents();
+	  imageData->GetDimensions(isize);
+	  //imageData->GetExtent(0, isize[0]-1, 0, isize[1]-1, 0, isize[2]-1);
+	  //origin = imageData->GetOrigin();
+	  spacing = imageData->GetSpacing();
+
+	  // Check endianness of the machine
+	  endian = igtl::ImageMessage::ENDIAN_BIG;
+	  if (igtl_is_little_endian())
+		{
+		endian = igtl::ImageMessage::ENDIAN_LITTLE;
+		}
+
+//      if (this->OutImageMessage.IsNull())
+//        {
+//        this->OutImageMessage = igtl::ImageMessage::New();
+//        }
+	  outmsg->SetDimensions(isize);
+	  outmsg->SetSpacing((float)spacing[0], (float)spacing[1], (float)spacing[2]);
+	  outmsg->SetScalarType(scalarType);
+	  outmsg->SetEndian(endian);
+//	  outmsg->SetDeviceName(volumeNode->GetName());
+	  outmsg->SetSubVolume(isize, svoffset);
+	  outmsg->AllocateScalars();
+
+	  memcpy(outmsg->GetScalarPointer(),
+			 imageData->GetScalarPointer(),
+			 outmsg->GetImageSize());
+
+//	  // Transform
+//	  vtkMatrix4x4* rtimgTransform = vtkMatrix4x4::New();
+//	  volumeNode->GetIJKToRASMatrix(rtimgTransform);
+//	  float ntx = rtimgTransform->Element[0][0] / (float)spacing[0];
+//	  float nty = rtimgTransform->Element[1][0] / (float)spacing[0];
+//	  float ntz = rtimgTransform->Element[2][0] / (float)spacing[0];
+//	  float nsx = rtimgTransform->Element[0][1] / (float)spacing[1];
+//	  float nsy = rtimgTransform->Element[1][1] / (float)spacing[1];
+//	  float nsz = rtimgTransform->Element[2][1] / (float)spacing[1];
+//	  float nnx = rtimgTransform->Element[0][2] / (float)spacing[2];
+//	  float nny = rtimgTransform->Element[1][2] / (float)spacing[2];
+//	  float nnz = rtimgTransform->Element[2][2] / (float)spacing[2];
+//	  float px  = rtimgTransform->Element[0][3];
+//	  float py  = rtimgTransform->Element[1][3];
+//	  float pz  = rtimgTransform->Element[2][3];
+
+//	  rtimgTransform->Delete();
+
+	  // Shift the center
+	  // NOTE: The center of the image should be shifted due to different
+	  // definitions of image origin between VTK (Slicer) and OpenIGTLink;
+	  // OpenIGTLink image has its origin at the center, while VTK image
+	  // has one at the corner.
+
+//	  float hfovi = (float)spacing[0] * (float)(isize[0]-1) / 2.0;
+//	  float hfovj = (float)spacing[1] * (float)(isize[1]-1) / 2.0;
+//	  float hfovk = (float)spacing[2] * (float)(isize[2]-1) / 2.0;
+
+//	  float cx = ntx * hfovi + nsx * hfovj + nnx * hfovk;
+//	  float cy = nty * hfovi + nsy * hfovj + nny * hfovk;
+//	  float cz = ntz * hfovi + nsz * hfovj + nnz * hfovk;
+
+//	  px = px + cx;
+//	  py = py + cy;
+//	  pz = pz + cz;
+
+//	  igtl::Matrix4x4 matrix; // Image origin and orientation matrix
+//	  matrix[0][0] = ntx;
+//	  matrix[1][0] = nty;
+//	  matrix[2][0] = ntz;
+//	  matrix[0][1] = nsx;
+//	  matrix[1][1] = nsy;
+//	  matrix[2][1] = nsz;
+//	  matrix[0][2] = nnx;
+//	  matrix[1][2] = nny;
+//	  matrix[2][2] = nnz;
+//	  matrix[0][3] = px;
+//	  matrix[1][3] = py;
+//	  matrix[2][3] = pz;
+
+//	  outmsg->SetMatrix(matrix);
+//	  outmsg->Pack();
+
+//	  *size = outmsg->GetPackSize();
+//	  *igtlMsg = (void*)outmsg->GetPackPointer();
+
+//      return 1;
+//      }
+//    else if (strcmp(mrmlNode->GetNodeTagName(), "IGTLQuery") == 0)   // If mrmlNode is query node
+//      {
+//      vtkMRMLIGTLQueryNode* qnode = vtkMRMLIGTLQueryNode::SafeDownCast(mrmlNode);
+//      if (qnode)
+//        {
+//        if (qnode->GetQueryType() == vtkMRMLIGTLQueryNode::TYPE_GET)
+//          {
+//          if (this->GetImageMessage.IsNull())
+//            {
+//            this->GetImageMessage = igtl::GetImageMessage::New();
+//            }
+//          this->GetImageMessage->SetDeviceName(qnode->GetIGTLDeviceName());
+//          this->GetImageMessage->Pack();
+//          *size = this->GetImageMessage->GetPackSize();
+//          *igtlMsg = this->GetImageMessage->GetPackPointer();
+//          return 1;
+//          }
+//        /*
+//        else if (qnode->GetQueryType() == vtkMRMLIGTLQueryNode::TYPE_START)
+//          {
+//          *size = 0;
+//          return 0;
+//          }
+//        else if (qnode->GetQueryType() == vtkMRMLIGTLQueryNode::TYPE_STOP)
+//          {
+//          *size = 0;
+//          return 0;
+//          }
+//        */
+//        return 0;
+//        }
+//      }
+//    else
+//      {
+//      return 0;
+//      }
+
+//    return 0;
+}
+
+void IGTLinkConversionImage::decode_rMd(igtl::ImageMessage *msg, ImagePtr out)
 {
 	igtl::Matrix4x4 matrix;
 	msg->GetMatrix(matrix);
-	Transform3D retval = Transform3D::fromFloatArray(matrix);
+	Transform3D rMigtl = Transform3D::fromFloatArray(matrix);
+
+	CX_LOG_CHANNEL_DEBUG("ca") << "rMigtl\n" << rMigtl;
+
+	Vector3D c = out->boundingBox().center();
+	Transform3D rMcorner = rMigtl * createTransformTranslate(-c);
+
+	Transform3D rMlps;
+	CX_LOG_CHANNEL_DEBUG("ca") << "rMcorner\n" << rMcorner;
 
 	if (msg->GetCoordinateSystem() == igtl::ImageMessage::COORDINATE_RAS)
 	{
-		retval = retval * createTransformLPS2RAS().inv();
+		rMlps = rMcorner * createTransformLPS2RAS().inv();
 	}
-	// the other option, igtl::ImageMessage::COORDINATE_LPS, is the internally supported one.
+	else
+	{
+		// igtl::ImageMessage::COORDINATE_LPS, this is the internally supported one.
+		rMlps = rMcorner;
+	}
 
-	return retval;
+	CX_LOG_CHANNEL_DEBUG("ca") << "rMlps decode\n" << rMlps;
+
+	out->get_rMd_History()->setRegistration(rMlps);
+}
+
+void IGTLinkConversionImage::encode_rMd(ImagePtr image, igtl::ImageMessage *outmsg)
+{
+	Transform3D rMlps = image->get_rMd();
+	// convert to RAS
+	Transform3D rMras = rMlps * createTransformLPS2RAS();
+	// shift origin to image center
+	Vector3D c = image->boundingBox().center();
+	Transform3D rMigtl = rMras * createTransformTranslate(c);
+
+	CX_LOG_CHANNEL_DEBUG("ca") << "rMlps encode\n" << rMlps;
+	CX_LOG_CHANNEL_DEBUG("ca") << "rMras encode\n" << rMras;
+	CX_LOG_CHANNEL_DEBUG("ca") << "rMigtl encode\n" << rMigtl;
+
+	igtl::Matrix4x4 matrix;
+	for (int r = 0; r < 4; ++r)
+		for (int c = 0; c < 4; ++c)
+			matrix[r][c] = rMigtl(r,c);
+
+	// there seems to be a bug in Slicer: LPS not supported in OpenIGTLinkIF.
+	outmsg->SetCoordinateSystem(igtl::ImageMessage::COORDINATE_RAS);
+//	outmsg->SetCoordinateSystem(igtl::ImageMessage::COORDINATE_LPS);
+	outmsg->SetMatrix(matrix);
 }
 
 int IGTLinkConversionImage::IGTLToVTKScalarType(int igtlType)

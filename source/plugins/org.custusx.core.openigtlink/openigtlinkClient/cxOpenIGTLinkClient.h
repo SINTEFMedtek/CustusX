@@ -80,6 +80,7 @@ public:
     //thread safe
     QStringList getAvailableDialects() const;
     void setDialect(QString dialectname);
+	void sendMessage(ImagePtr image); // thread safe?????????????????????????????
 
 signals:
     void transform(QString devicename, Transform3D transform, double timestamp);

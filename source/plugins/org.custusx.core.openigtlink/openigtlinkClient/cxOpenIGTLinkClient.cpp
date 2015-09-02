@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPlusDialect.h"
 #include "cxCustusDialect.h"
 #include "igtl_header.h"
+#include "cxIGTLinkConversionImage.h"
 
 namespace cx
 {
@@ -113,6 +114,33 @@ void OpenIGTLinkClient::setDialect(QString dialectname)
 
 	CX_LOG_CHANNEL_SUCCESS(CX_OPENIGTLINK_CHANNEL_NAME) << "IGTL Dialect set to " << dialectname;
 
+}
+
+//void OpenIGTLinkClient::invokePendingAction(boost::function<void()> function)
+//{
+//    QMetaObject::invokeMethod(this, "pendingAction", Qt::QueuedConnection);
+//}
+
+//void OpenIGTLinkClient::pendingAction(boost::function<void()> function)
+//{
+//	function();
+////    QMetaObject::invokeMethod(this, "pendingAction", Qt::QueuedConnection);
+//	igtl::StringMessage::Pointer
+//	stringMsg->Pack();
+//    mSocket->write(reinterpret_cast<char*>(stringMsg->GetPackPointer()), stringMsg->GetPackSize());
+//}
+
+void OpenIGTLinkClient::sendMessage(ImagePtr image)
+{
+	QMutexLocker locker(&mMutex);
+
+	IGTLinkConversionImage imageConverter;
+	igtl::ImageMessage::Pointer msg = imageConverter.encode(image);
+//    igtl::StringMessage::Pointer stringMsg = converter.encode(command);
+	CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "Sending image: " << image->getName();
+	msg->Pack();
+
+	mSocket->write(reinterpret_cast<char*>(msg->GetPackPointer()), msg->GetPackSize());
 }
 
 /*
