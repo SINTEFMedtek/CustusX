@@ -29,65 +29,28 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-
-
-#ifndef CXDIALECT_H
-#define CXDIALECT_H
-
-#include "org_custusx_core_openigtlink_Export.h"
-
-#include <QObject>
-
-#include <boost/shared_ptr.hpp>
-
-#include "igtlMessageHeader.h"
-#include "igtlTransformMessage.h"
-#include "igtlImageMessage.h"
-#include "igtlStatusMessage.h"
-#include "igtlStringMessage.h"
-#include "cxIGTLinkUSStatusMessage.h"
-#include "cxIGTLinkImageMessage.h"
-
-#include "cxTransform3D.h"
-#include "cxImage.h"
-#include "cxProbeDefinition.h"
-
-#define CX_OPENIGTLINK_CHANNEL_NAME "OpenIGTLink"
+#include "cxIGTLinkConversionBase.h"
 
 namespace cx
 {
-/**
- * @brief The Dialect class represents an interpretation of opentigtlink packages.
- */
 
-class org_custusx_core_openigtlink_EXPORT Dialect : public QObject
+QDateTime IGTLinkConversionBase::decode_timestamp(igtl::MessageBase* msg)
 {
-    Q_OBJECT
-public:
-    explicit Dialect(QObject *parent = 0);
+	// get timestamp from igtl second-format:
+	igtl::TimeStamp::Pointer timestamp = igtl::TimeStamp::New();
+	msg->GetTimeStamp(timestamp);
+	double timestampMS = timestamp->GetTimeStamp() * 1000;
+	return QDateTime::fromMSecsSinceEpoch(timestampMS);
+}
 
-    virtual QString getName() const;
-    virtual bool doCRC() const;
+void IGTLinkConversionBase::encode_timestamp(QDateTime ts, igtl::MessageBase* msg)
+{
+	igtl::TimeStamp::Pointer timestamp;
+	timestamp = igtl::TimeStamp::New();
+	double grabTime = 1.0 / 1000 * (double) ts.toMSecsSinceEpoch();
+	timestamp->SetTime(grabTime);
+	msg->SetTimeStamp(timestamp);
+}
 
-    virtual void translate(const igtl::TransformMessage::Pointer body);
-    virtual void translate(const igtl::ImageMessage::Pointer body);
-    virtual void translate(const igtl::StatusMessage::Pointer body);
-    virtual void translate(const igtl::StringMessage::Pointer body);
-    virtual void translate(const IGTLinkUSStatusMessage::Pointer body);
-    virtual void translate(const IGTLinkImageMessage::Pointer body);
 
-signals:
-    void transform(QString devicename, Transform3D transform, double timestamp);
-    void calibration(QString devicename, Transform3D calibration);
-    void image(ImagePtr image);
-    void igtlimage(IGTLinkImageMessage::Pointer igtlimage);
-    void usstatusmessage(IGTLinkUSStatusMessage::Pointer msg);
-    void probedefinition(QString devicename, ProbeDefinitionPtr definition);
-
-protected:
-	void writeNotSupportedMessage(igtl::MessageBase *body);
-};
-typedef boost::shared_ptr<Dialect> DialectPtr;
-
-} //namespace cx
-#endif // CXDIALECT_H
+} // namespace cx

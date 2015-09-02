@@ -262,8 +262,9 @@ bool OpenIGTLinkClient::receive(const igtl::MessageBase::Pointer header)
     return true;
 }
 
-
-
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
 
 OpenIGTLinkClientThreadHandler::OpenIGTLinkClientThreadHandler(QString threadname)
 {

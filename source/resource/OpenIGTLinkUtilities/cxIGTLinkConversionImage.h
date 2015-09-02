@@ -30,64 +30,53 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
+/*==========================================================================
 
-#ifndef CXDIALECT_H
-#define CXDIALECT_H
+  Portions (c) Copyright 2008-2009 Brigham and Women's Hospital (BWH) All Rights Reserved.
 
-#include "org_custusx_core_openigtlink_Export.h"
+  See Doc/copyright/copyright.txt
+  or http://www.slicer.org/copyright/copyright.txt for details.
 
-#include <QObject>
+  Program:   3D Slicer
+  Module:    $HeadURL: http://svn.slicer.org/Slicer3/trunk/Modules/OpenIGTLinkIF/vtkIGTLToMRMLImage.h $
+  Date:      $Date: 2010-11-23 00:58:13 -0500 (Tue, 23 Nov 2010) $
+  Version:   $Revision: 15552 $
 
-#include <boost/shared_ptr.hpp>
+==========================================================================*/
+#ifndef CXIGTLINKCONVERSIONIMAGE_H
+#define CXIGTLINKCONVERSIONIMAGE_H
 
-#include "igtlMessageHeader.h"
-#include "igtlTransformMessage.h"
 #include "igtlImageMessage.h"
-#include "igtlStatusMessage.h"
-#include "igtlStringMessage.h"
-#include "cxIGTLinkUSStatusMessage.h"
-#include "cxIGTLinkImageMessage.h"
-
-#include "cxTransform3D.h"
 #include "cxImage.h"
-#include "cxProbeDefinition.h"
-
-#define CX_OPENIGTLINK_CHANNEL_NAME "OpenIGTLink"
 
 namespace cx
 {
-/**
- * @brief The Dialect class represents an interpretation of opentigtlink packages.
+
+/** Convert cx::Image <--> igtl::ImageMessage
+ *
+ * Based on the class vtkIGTLToMRMLImage from https://github.com/openigtlink/OpenIGTLinkIF.git
+ * License text can be found at the start of this file.
+ *
+ * encode: create igtl messages
+ * decode: read from igtl messages
+ *
+ * decode methods assume Unpack() has been called.
  */
-
-class org_custusx_core_openigtlink_EXPORT Dialect : public QObject
+class IGTLinkConversionImage
 {
-    Q_OBJECT
 public:
-    explicit Dialect(QObject *parent = 0);
+	igtl::ImageMessage::Pointer encode(ImagePtr in);
+	ImagePtr decode(igtl::ImageMessage *in);
 
-    virtual QString getName() const;
-    virtual bool doCRC() const;
+private:
+	vtkImageDataPtr decode_vtkImageData(igtl::ImageMessage* in);
+	Transform3D decode_Transform3D(igtl::ImageMessage* msg);
 
-    virtual void translate(const igtl::TransformMessage::Pointer body);
-    virtual void translate(const igtl::ImageMessage::Pointer body);
-    virtual void translate(const igtl::StatusMessage::Pointer body);
-    virtual void translate(const igtl::StringMessage::Pointer body);
-    virtual void translate(const IGTLinkUSStatusMessage::Pointer body);
-    virtual void translate(const IGTLinkImageMessage::Pointer body);
+private:
+	int IGTLToVTKScalarType(int igtlType);
 
-signals:
-    void transform(QString devicename, Transform3D transform, double timestamp);
-    void calibration(QString devicename, Transform3D calibration);
-    void image(ImagePtr image);
-    void igtlimage(IGTLinkImageMessage::Pointer igtlimage);
-    void usstatusmessage(IGTLinkUSStatusMessage::Pointer msg);
-    void probedefinition(QString devicename, ProbeDefinitionPtr definition);
-
-protected:
-	void writeNotSupportedMessage(igtl::MessageBase *body);
 };
-typedef boost::shared_ptr<Dialect> DialectPtr;
 
 } //namespace cx
-#endif // CXDIALECT_H
+
+#endif // CXIGTLINKCONVERSIONIMAGE_H

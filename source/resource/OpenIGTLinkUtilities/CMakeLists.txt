@@ -14,7 +14,15 @@ SET ( cxOpenIGTLinkUtilities_FILES
         igtl_us_status.c
         cxIGTLinkConversion.h
         cxIGTLinkConversion.cpp
-    )
+		cxIGTLinkConversionImage.h
+		cxIGTLinkConversionImage.cpp
+		cxIGTLinkConversionPolyData.h
+		cxIGTLinkConversionPolyData.cpp
+		cxIGTLinkConversionBase.h
+		cxIGTLinkConversionBase.cpp
+		cxIGTLinkConversionSonixCXLegacy.h
+		cxIGTLinkConversionSonixCXLegacy.cpp
+	)
 
 cx_create_export_header("cxOpenIGTLinkUtilities")
 add_library( cxOpenIGTLinkUtilities

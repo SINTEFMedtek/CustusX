@@ -29,48 +29,8 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXOPENIGTLINKDATATRANSFERWIDGET_H
-#define CXOPENIGTLINKDATATRANSFERWIDGET_H
+#include "cxIGTLinkConversionPolyData.h"
 
-#include <QThread>
-#include "cxBaseWidget.h"
-#include "cxXmlOptionItem.h"
-#include "cxForwardDeclarations.h"
-
-class ctkPluginContext;
-
-namespace cx {
-
-class OpenIGTLinkConnectionWidget;
-class OpenIGTLinkClient;
-typedef boost::shared_ptr<class BoolProperty> BoolPropertyPtr;
-typedef boost::shared_ptr<class StringPropertySelectData> StringPropertySelectDataPtr;
-typedef boost::shared_ptr<class OpenIGTLinkClientThreadHandler> OpenIGTLinkClientThreadHandlerPtr;
-
-class OpenIGTLinkDataTransferWidget : public BaseWidget
+cxIGTLinkConversionPolyData::cxIGTLinkConversionPolyData()
 {
-	Q_OBJECT
-public:
-	OpenIGTLinkDataTransferWidget(ctkPluginContext* context, QWidget* parent=NULL);
-	~OpenIGTLinkDataTransferWidget();
-private:
-//	QThread mOpenIGTLinkThread;
-//	OpenIGTLinkClient* mClient;
-	OpenIGTLinkConnectionWidget* mConnectionWidget;
-	BoolPropertyPtr mAcceptIncomingData;
-	StringPropertySelectDataPtr mDataToSend;
-	XmlOptionFile mOptions;
-	ctkPluginContext* mContext;
-	OpenIGTLinkClientThreadHandlerPtr mOpenIGTLink;
-
-	PatientModelServicePtr mPatientModelService;
-	VisualizationServicePtr mViewService;
-
-	QString getConfigUid() const;
-	void onImageReceived(ImagePtr image);
-	void onSend();
-};
-
-} // namespace cx
-
-#endif // CXOPENIGTLINKDATATRANSFERWIDGET_H
+}

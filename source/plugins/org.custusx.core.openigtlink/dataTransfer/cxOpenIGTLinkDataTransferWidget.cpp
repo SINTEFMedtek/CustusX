@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxOpenIGTLinkDataTransferWidget.h"
 
+#include <QPushButton>
 #include "cxOpenIGTLinkClient.h"
 #include "cxOpenIGTLinkConnectionWidget.h"
 #include "cxBoolProperty.h"
@@ -38,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxHelperWidgets.h"
 #include "cxPatientModelServiceProxy.h"
 #include "cxViewServiceProxy.h"
+#include "cxSelectDataStringProperty.h"
 
 namespace cx {
 
@@ -51,23 +53,25 @@ OpenIGTLinkDataTransferWidget::OpenIGTLinkDataTransferWidget(ctkPluginContext *c
 
 	mOpenIGTLink.reset(new OpenIGTLinkClientThreadHandler(this->getConfigUid()));
 
-//	mOpenIGTLinkThread.setObjectName("org.custusx.core.openigtlink.datatransfer");
-//	mClient = new OpenIGTLinkClient;
-//	mClient->moveToThread(&mOpenIGTLinkThread);
-//	mOpenIGTLinkThread.start();
-
 	connect(mOpenIGTLink->client(), &OpenIGTLinkClient::image, this, &OpenIGTLinkDataTransferWidget::onImageReceived);
 
 	mConnectionWidget = new OpenIGTLinkConnectionWidget(mOpenIGTLink->client());
 
+	mDataToSend = StringPropertySelectData::New(mPatientModelService);
 
 	mAcceptIncomingData = BoolProperty::initialize("acceptIncoming", "Accept Incoming",
 												   "Accept incoming data and add to Patient Model",
 												   true, mOptions.getElement());
 
+	QPushButton* sendButton = new QPushButton("Send", this);
+	connect(sendButton, &QPushButton::clicked, this, &OpenIGTLinkDataTransferWidget::onSend);
+
 	QVBoxLayout* layout = new QVBoxLayout(this);
+	layout->setMargin(0);
 	layout->addWidget(mConnectionWidget);
 	layout->addWidget(createDataWidget(mViewService, mPatientModelService, this, mAcceptIncomingData));
+	layout->addWidget(createDataWidget(mViewService, mPatientModelService, this, mDataToSend));
+	layout->addWidget(sendButton);
 }
 
 OpenIGTLinkDataTransferWidget::~OpenIGTLinkDataTransferWidget()
@@ -83,8 +87,9 @@ QString OpenIGTLinkDataTransferWidget::getConfigUid() const
 void OpenIGTLinkDataTransferWidget::onImageReceived(ImagePtr image)
 {
 	QString actionText = mAcceptIncomingData->getValue() ? "inserting" : "ignoring";
-	CX_LOG_CHANNEL_INFO("org.custusx.core.openigtlink") << QString("Received image [%1] over IGTLink, %2")
-														   .arg(image->getName())
+	QString nameText = image ? image->getName() : "NULL";
+	CX_LOG_CHANNEL_INFO(this->getConfigUid()) << QString("Received image [%1] over IGTLink, %2")
+														   .arg(nameText)
 														   .arg(actionText);
 
 	if (mAcceptIncomingData->getValue())
@@ -92,6 +97,21 @@ void OpenIGTLinkDataTransferWidget::onImageReceived(ImagePtr image)
 		mPatientModelService->insertData(image);
 		mViewService->autoShowData(image);
 	}
+}
+
+void OpenIGTLinkDataTransferWidget::onSend()
+{
+	DataPtr data = mDataToSend->getData();
+	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
+	if (image)
+	{
+		// send
+		return;
+	}
+
+	QString name = data ? data->getName() : "NULL";
+	CX_LOG_CHANNEL_INFO(this->getConfigUid()) << QString("Failed to send data %1 over igtl: Unsupported type")
+														   .arg(name);
 }
 
 } // namespace cx

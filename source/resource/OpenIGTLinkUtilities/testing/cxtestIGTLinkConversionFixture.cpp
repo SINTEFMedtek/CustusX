@@ -93,7 +93,7 @@ void IGTLinkConversionFixture::testDecodeEncodeColorImage(Val3VectorType values,
     input->setAcquisitionTime(time);
 
     cx::IGTLinkConversion converter;
-    cx::IGTLinkImageMessage::Pointer msg = converter.encode(input);
+	cx::IGTLinkImageMessage::Pointer msg = converter.encode(input);
     cx::ImagePtr output = converter.decode(msg);
 
     CHECK(output);

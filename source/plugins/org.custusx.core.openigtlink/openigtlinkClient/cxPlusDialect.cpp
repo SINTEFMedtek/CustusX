@@ -2,6 +2,7 @@
 
 #include "cxIGTLinkConversion.h"
 #include "cxLogger.h"
+#include "cxIGTLinkConversionBase.h"
 
 namespace cx{
 
@@ -52,7 +53,8 @@ void PlusDialect::translate(const igtl::TransformMessage::Pointer body)
     }
     else
     {
-		double timestamp_ms = converter.decode_timestamp(body).toMSecsSinceEpoch();
+		IGTLinkConversionBase baseConverter;
+		double timestamp_ms = baseConverter.decode_timestamp(body).toMSecsSinceEpoch();
 		timestamp_ms = this->getSyncedTimestampForTransformsAndImages(timestamp_ms);
         Transform3D prMs = matrix;
         emit transform(deviceName, prMs, timestamp_ms);
@@ -90,7 +92,8 @@ void PlusDialect::translate(const igtl::ImageMessage::Pointer body)
     IGTLinkConversion converter;
     ImagePtr theImage = converter.decode(body);
 
-	double timestamp_ms = converter.decode_timestamp(body).toMSecsSinceEpoch();
+	IGTLinkConversionBase baseConverter;
+	double timestamp_ms = baseConverter.decode_timestamp(body).toMSecsSinceEpoch();
 	timestamp_ms = this->getSyncedTimestampForTransformsAndImages(timestamp_ms);
     theImage->setAcquisitionTime(QDateTime::fromMSecsSinceEpoch(timestamp_ms));
     emit image(theImage);
