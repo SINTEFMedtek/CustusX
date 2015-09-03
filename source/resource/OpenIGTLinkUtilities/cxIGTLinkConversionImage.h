@@ -48,6 +48,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "igtlImageMessage.h"
 #include "cxImage.h"
+#include "cxOpenIGTLinkUtilitiesExport.h"
+
 
 namespace cx
 {
@@ -63,7 +65,7 @@ namespace cx
  * decode methods assume Unpack() has been called.
  * encode methods assume Pack() will be called.
  */
-class IGTLinkConversionImage
+class cxOpenIGTLinkUtilities_EXPORT IGTLinkConversionImage
 {
 public:
 	igtl::ImageMessage::Pointer encode(ImagePtr in, PATIENT_COORDINATE_SYSTEM externalSpace);

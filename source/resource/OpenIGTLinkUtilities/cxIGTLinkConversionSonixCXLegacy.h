@@ -32,7 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXIGTLINKCONVERSIONSONIXCXLEGACY_H
 #define CXIGTLINKCONVERSIONSONIXCXLEGACY_H
 
-#include "cxOpenIGTLinkUtilitiesExport.h"
 
 #include "igtlStringMessage.h"
 #include "igtlStatusMessage.h"
@@ -45,11 +44,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImage.h"
 #include "cxTransform3D.h"
 #include "cxTool.h"
+#include "cxOpenIGTLinkUtilitiesExport.h"
 
 namespace cx
 {
 
-class IGTLinkConversionSonixCXLegacy
+class cxOpenIGTLinkUtilities_EXPORT IGTLinkConversionSonixCXLegacy
 {
 public:
 	/**

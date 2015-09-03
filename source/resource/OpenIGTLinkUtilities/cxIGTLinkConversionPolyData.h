@@ -47,6 +47,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "igtlPolyDataMessage.h"
 #include "cxMesh.h"
+#include "cxOpenIGTLinkUtilitiesExport.h"
+
 
 namespace cx
 {
@@ -62,7 +64,7 @@ namespace cx
  * decode methods assume Unpack() has been called.
  * encode methods assume Pack() will be called.
  */
-class IGTLinkConversionPolyData
+class cxOpenIGTLinkUtilities_EXPORT IGTLinkConversionPolyData
 {
 public:
 	igtl::PolyDataMessage::Pointer encode(MeshPtr in, PATIENT_COORDINATE_SYSTEM externalSpace);

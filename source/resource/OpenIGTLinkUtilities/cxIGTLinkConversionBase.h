@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "igtlMessageBase.h"
 #include <QDateTime>
+#include "cxOpenIGTLinkUtilitiesExport.h"
 
 
 namespace cx
@@ -46,7 +47,7 @@ namespace cx
  *
  * decode methods assume Unpack() has been called.
  */
-class IGTLinkConversionBase
+class cxOpenIGTLinkUtilities_EXPORT IGTLinkConversionBase
 {
 public:
 	void encode_timestamp(QDateTime ts, igtl::MessageBase* msg);
