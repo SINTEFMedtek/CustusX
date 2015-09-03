@@ -191,9 +191,9 @@ DataPtr PatientModelServiceProxy::importData(QString fileName, QString &infoText
 	return mPatientModelService->importData(fileName, infoText);
 }
 
-void PatientModelServiceProxy::exportPatient(bool niftiFormat)
+void PatientModelServiceProxy::exportPatient(PATIENT_COORDINATE_SYSTEM externalSpace)
 {
-	return mPatientModelService->exportPatient(niftiFormat);
+	return mPatientModelService->exportPatient(externalSpace);
 }
 
 void PatientModelServiceProxy::removeData(QString uid)

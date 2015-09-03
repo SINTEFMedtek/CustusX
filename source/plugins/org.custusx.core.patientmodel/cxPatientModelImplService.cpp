@@ -230,9 +230,9 @@ DataPtr PatientModelImplService::importData(QString fileName, QString &infoText)
 	return this->patientData()->importData(fileName, infoText);
 }
 
-void PatientModelImplService::exportPatient(bool niftiFormat)
+void PatientModelImplService::exportPatient(PATIENT_COORDINATE_SYSTEM externalSpace)
 {
-	this->patientData()->exportPatient(niftiFormat);
+	this->patientData()->exportPatient(externalSpace);
 }
 
 void PatientModelImplService::removeData(QString uid)

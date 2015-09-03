@@ -246,8 +246,10 @@ void ImportDataDialog::convertFromNifti1Coordinates()
     return;
   if(!mData)
     return;
-  Transform3D rMd = mData->get_rMd();
-  rMd = createTransformRotateZ(M_PI) * rMd;
+  Transform3D sMd = mData->get_rMd();
+  Transform3D sMr = createTransformFromReferenceToExternal(pcsRAS);
+//  rMd = createTransformRotateZ(M_PI) * rMd;
+  Transform3D rMd = sMr.inv() * sMd;
   mData->get_rMd_History()->setRegistration(rMd);
   report("Nifti import: Converted data " + mData->getName() + " from LPS to RAS coordinates.");
 }

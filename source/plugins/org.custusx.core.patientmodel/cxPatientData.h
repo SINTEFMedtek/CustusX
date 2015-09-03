@@ -81,7 +81,7 @@ public slots:
 	 */
 	DataPtr importData(QString fileName, QString &infoText);
 	void removeData(QString uid);
-	void exportPatient(bool niftiFormat);
+	void exportPatient(PATIENT_COORDINATE_SYSTEM externalSpace);
 	void autoSave();
 
 signals:

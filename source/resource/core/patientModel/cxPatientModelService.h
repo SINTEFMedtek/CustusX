@@ -154,7 +154,7 @@ public:
 
 	virtual bool isPatientValid() const = 0;
 	virtual DataPtr importData(QString fileName, QString &infoText) = 0;
-	virtual void exportPatient(bool niftiFormat) = 0;
+	virtual void exportPatient(PATIENT_COORDINATE_SYSTEM externalSpace) = 0;
 
 	virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const = 0;
 

@@ -127,7 +127,7 @@ DataPtr PatientModelServiceNull::importData(QString fileName, QString &infoText)
 	return DataPtr();
 }
 
-void PatientModelServiceNull::exportPatient(bool niftiFormat)
+void PatientModelServiceNull::exportPatient(PATIENT_COORDINATE_SYSTEM externalSpace)
 {
 	printWarning();
 }

@@ -88,9 +88,14 @@ ExportDataDialog::~ExportDataDialog()
 {
 }
 
+PATIENT_COORDINATE_SYSTEM ExportDataDialog::getExternalSpace()
+{
+	return mNiftiFormatCheckBox->isChecked() ? pcsLPS : pcsRAS;
+}
+
 void ExportDataDialog::acceptedSlot()
 {
-	mPatientModelService->exportPatient(mNiftiFormatCheckBox->isChecked());
+	mPatientModelService->exportPatient(this->getExternalSpace());
 }
 
 }//namespace cx

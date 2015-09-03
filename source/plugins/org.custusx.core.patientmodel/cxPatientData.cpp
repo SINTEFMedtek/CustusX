@@ -125,7 +125,7 @@ void PatientData::autoSave()
 		mSession->save();
 }
 
-void PatientData::exportPatient(bool niftiFormat)
+void PatientData::exportPatient(PATIENT_COORDINATE_SYSTEM externalSpace)
 {
 	QString targetFolder = mSession->getRootFolder() + "/Export/"
 					+ QDateTime::currentDateTime().toString(timestampSecondsFormat());
@@ -142,13 +142,10 @@ void PatientData::exportPatient(bool niftiFormat)
 		MeshPtr mesh = iter->second;
 
 		Transform3D rMd = mesh->get_rMd();
-		if (niftiFormat)
-		{
-			rMd = createTransformRotateZ(M_PI) * rMd; // convert back to NIFTI format
-			report("Nifti export: Converted data " + mesh->getName() + " from LPS to RAS coordinates.");
-		}
+		Transform3D sMr = createTransformFromReferenceToExternal(externalSpace);
+		Transform3D sMd = sMr * rMd;
 
-		vtkPolyDataPtr poly = mesh->getTransformedPolyData(rMd);
+		vtkPolyDataPtr poly = mesh->getTransformedPolyData(sMd);
 		// create a copy with the SAME UID as the original. Do not load this one into the datamanager!
 		mesh = mDataManager->getDataFactory()->createSpecific<Mesh>(mesh->getUid(), mesh->getName());
 		mesh->setVtkPolyData(poly);
