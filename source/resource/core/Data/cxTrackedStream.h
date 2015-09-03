@@ -80,6 +80,7 @@ signals:
 	void newVideoSource(VideoSourcePtr videoSource);
 	void newFrame();
 	void streaming(bool on); ///< emitted when streaming started/stopped
+	void newPosition();
 
 private slots:
 	void newFrameSlot();
