@@ -7,6 +7,7 @@ set(PLUGIN_SRCS
 
     guiExtenderService/cxOpenIGTLinkGuiExtenderService.h
 	dataTransfer/cxOpenIGTLinkDataTransferWidget.cpp
+	dataTransfer/cxOpenIGTLinkDataTransfer.cpp
 
     guiExtenderService/cxOpenIGTLinkGuiExtenderService.cpp
     guiExtenderService/cxOpenIGTLinkConnectionWidget.cpp
@@ -27,6 +28,7 @@ set(PLUGIN_SRCS
     openigtlinkClient/cxCustusDialect.cpp
 	openigtlinkClient/cxRASDialect.h
 	openigtlinkClient/cxRASDialect.cpp
+
 )
 
 # Files which should be processed by Qts moc
@@ -34,7 +36,8 @@ set(PLUGIN_MOC_SRCS
     cxOpenIGTLinkPluginActivator.h
 
 	dataTransfer/cxOpenIGTLinkDataTransferWidget.h
-    guiExtenderService/cxOpenIGTLinkConnectionWidget.h
+	dataTransfer/cxOpenIGTLinkDataTransfer.h
+	guiExtenderService/cxOpenIGTLinkConnectionWidget.h
 
     trackingSystemService/cxOpenIGTLinkTrackingSystemService.h
     trackingSystemService/cxOpenIGTLinkTool.h

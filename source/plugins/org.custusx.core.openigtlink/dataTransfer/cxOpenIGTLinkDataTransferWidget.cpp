@@ -36,31 +36,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxOpenIGTLinkClient.h"
 #include "cxOpenIGTLinkConnectionWidget.h"
 #include "cxBoolProperty.h"
-#include "cxProfile.h"
 #include "cxHelperWidgets.h"
-#include "cxPatientModelServiceProxy.h"
-#include "cxViewServiceProxy.h"
 #include "cxSelectDataStringProperty.h"
 #include "cxStringProperty.h"
-#include "cxMesh.h"
+#include "cxOpenIGTLinkDataTransfer.h"
 
 namespace cx {
 
 OpenIGTLinkDataTransferWidget::OpenIGTLinkDataTransferWidget(ctkPluginContext *context, QWidget *parent) :
 	BaseWidget(parent, "OpenIGTLinkDataTransferWidget", "OpenIGTLink Data Transfer")
 {
-	mOptions = profile()->getXmlSettings().descend(this->getConfigUid());
+	mDataTransfer.reset(new OpenIGTLinkDataTransfer(context));
 
-	mPatientModelService = PatientModelServiceProxy::create(context);
-	mViewService = VisualizationServiceProxy::create(context);
+	mConnectionWidget = new OpenIGTLinkConnectionWidget(mDataTransfer->getOpenIGTLink());
 
-	mOpenIGTLink.reset(new OpenIGTLinkClientThreadHandler(this->getConfigUid()));
-
-	connect(mOpenIGTLink->client(), &OpenIGTLinkClient::image, this, &OpenIGTLinkDataTransferWidget::onImageReceived);
-	connect(mOpenIGTLink->client(), &OpenIGTLinkClient::mesh, this, &OpenIGTLinkDataTransferWidget::onMeshReceived);
-
-	mConnectionWidget = new OpenIGTLinkConnectionWidget(mOpenIGTLink->client());
-
+	// handled by dialect - remove (kept cause might be useful in export/import dialogs)
 //	mCoordinateSystem = StringProperty::initialize("igltcoords", "Coordinate System",
 //												   "Select which space to interpret/represent the iglink data in\n"
 //												   "RAS is used by Slicer and others,\n"
@@ -73,32 +63,30 @@ OpenIGTLinkDataTransferWidget::OpenIGTLinkDataTransferWidget(ctkPluginContext *c
 //	names["RAS"] = "RAS (Slicer)";
 //	mCoordinateSystem->setDisplayNames(names);
 
-	mDataToSend = StringPropertySelectData::New(mPatientModelService);
-
-	mAcceptIncomingData = BoolProperty::initialize("acceptIncoming", "Accept Incoming",
-												   "Accept incoming data and add to Patient Model",
-												   true, mOptions.getElement());
-
 	QPushButton* sendButton = new QPushButton("Send", this);
-	connect(sendButton, &QPushButton::clicked, this, &OpenIGTLinkDataTransferWidget::onSend);
+	connect(sendButton, &QPushButton::clicked, mDataTransfer.get(), &OpenIGTLinkDataTransfer::onSend);
 
 	QVBoxLayout* layout = new QVBoxLayout(this);
-	layout->setMargin(0);
+//	layout->setMargin(0);
 
 	QVBoxLayout* connectionLayout = this->createVBoxInGroupBox(layout, "Connection");
 	connectionLayout->addWidget(mConnectionWidget);
 
 	QVBoxLayout* receiveLayout = this->createVBoxInGroupBox(layout, "Receive");
-	receiveLayout->addWidget(createDataWidget(mViewService, mPatientModelService, this, mAcceptIncomingData));
+	receiveLayout->addWidget(createDataWidget(mDataTransfer->getViewService(),
+											  mDataTransfer->getPatientModelService(),
+											  this, mDataTransfer->getAcceptIncomingData()));
 
 	QVBoxLayout* sendLayout = this->createVBoxInGroupBox(layout, "Send");
-	sendLayout->addWidget(createDataWidget(mViewService, mPatientModelService, this, mDataToSend));
+	sendLayout->addWidget(createDataWidget(mDataTransfer->getViewService(),
+										   mDataTransfer->getPatientModelService(),
+										   this, mDataTransfer->getDataToSend()));
 	sendLayout->addWidget(sendButton);
 }
 
 OpenIGTLinkDataTransferWidget::~OpenIGTLinkDataTransferWidget()
 {
-	mOpenIGTLink.reset(); //
+	mDataTransfer.reset();
 }
 
 QVBoxLayout* OpenIGTLinkDataTransferWidget::createVBoxInGroupBox(QVBoxLayout* parent, QString header)
@@ -111,67 +99,6 @@ QVBoxLayout* OpenIGTLinkDataTransferWidget::createVBoxInGroupBox(QVBoxLayout* pa
 	parent->addWidget(groupBox);
 
 	return layout;
-}
-
-//QWidget* OpenIGTLinkDataTransferWidget::createVBoxWidget()
-//{
-//	QWidget* widget = new QWidget(this);
-//	QVBoxLayout* layout = new QVBoxLayout(widget);
-//	layout->setMargin(0);
-////	layout->addWidget(receiveWidget);
-//	return widget;
-//}
-
-QString OpenIGTLinkDataTransferWidget::getConfigUid() const
-{
-	return "org.custusx.core.openigtlink.datatransfer";
-}
-
-void OpenIGTLinkDataTransferWidget::onImageReceived(ImagePtr image)
-{
-	this->onDataReceived(image);
-}
-
-void OpenIGTLinkDataTransferWidget::onMeshReceived(MeshPtr mesh)
-{
-	this->onDataReceived(mesh);
-}
-
-void OpenIGTLinkDataTransferWidget::onDataReceived(DataPtr data)
-{
-	QString actionText = mAcceptIncomingData->getValue() ? "inserting" : "ignoring";
-	QString nameText = data ? data->getName() : "NULL";
-	CX_LOG_CHANNEL_INFO(this->getConfigUid()) << QString("Received image [%1] over IGTLink, %2")
-														   .arg(nameText)
-														   .arg(actionText);
-
-	if (mAcceptIncomingData->getValue())
-	{
-		mPatientModelService->insertData(data);
-		mViewService->autoShowData(data);
-	}
-}
-
-
-void OpenIGTLinkDataTransferWidget::onSend()
-{
-	DataPtr data = mDataToSend->getData();
-	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
-	if (image)
-	{
-		mOpenIGTLink->client()->sendMessage(image);
-		return;
-	}
-	MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(data);
-	if (mesh)
-	{
-		mOpenIGTLink->client()->sendMessage(mesh);
-		return;
-	}
-
-	QString name = data ? data->getName() : "NULL";
-	CX_LOG_CHANNEL_INFO(this->getConfigUid()) << QString("Failed to send data %1 over igtl: Unsupported type")
-														   .arg(name);
 }
 
 } // namespace cx
