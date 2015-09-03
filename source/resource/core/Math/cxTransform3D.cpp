@@ -242,10 +242,20 @@ Transform3D createTransformIJC(const Vector3D& ivec, const Vector3D& jvec, const
 	return t;
 }
 
+
 cxResource_EXPORT Transform3D createTransformLPS2RAS()
 {
 	return createTransformRotateZ(M_PI);
 }
+
+cxResource_EXPORT Transform3D createTransformFromReferenceToExternal(PATIENT_COORDINATE_SYSTEM external)
+{
+	if (external==pcsRAS)
+		return createTransformLPS2RAS();
+	else
+		return Transform3D::Identity();
+}
+
 
 
 } // namespace cx

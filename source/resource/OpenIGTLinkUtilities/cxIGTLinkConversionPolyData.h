@@ -29,13 +29,58 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+
+/*==========================================================================
+
+  Portions (c) Copyright 2008-2014 Brigham and Women's Hospital (BWH) All Rights Reserved.
+
+  See Doc/copyright/copyright.txt
+  or http://www.slicer.org/copyright/copyright.txt for details.
+
+  Program:   3D Slicer
+  Module:    vtkIGTLToMRMLPolyData.cxx
+
+==========================================================================*/
+
 #ifndef CXIGTLINKCONVERSIONPOLYDATA_H
 #define CXIGTLINKCONVERSIONPOLYDATA_H
 
-class cxIGTLinkConversionPolyData
+#include "igtlPolyDataMessage.h"
+#include "cxMesh.h"
+
+namespace cx
+{
+
+/** Convert cx::Mesh <--> igtl::PolyDataMessage
+ *
+ * Based on the class vtkIGTLToMRMLPolyData from https://github.com/openigtlink/OpenIGTLinkIF.git
+ * License text can be found at the start of this file.
+ *
+ * encode: create igtl messages
+ * decode: read from igtl messages
+ *
+ * decode methods assume Unpack() has been called.
+ * encode methods assume Pack() will be called.
+ */
+class IGTLinkConversionPolyData
 {
 public:
-	cxIGTLinkConversionPolyData();
+	igtl::PolyDataMessage::Pointer encode(MeshPtr in, PATIENT_COORDINATE_SYSTEM externalSpace);
+	MeshPtr decode(igtl::PolyDataMessage *in, PATIENT_COORDINATE_SYSTEM externalSpace);
+
+private:
+	vtkPolyDataPtr decode_vtkPolyData(igtl::PolyDataMessage* msg);
+	void encode_vtkPolyData(vtkPolyDataPtr in, igtl::PolyDataMessage* outMsg);
+	vtkPolyDataPtr decodeCoordinateSystem(vtkPolyDataPtr polyData, PATIENT_COORDINATE_SYSTEM externalSpace);
+	vtkPolyDataPtr encodeCoordinateSystem(MeshPtr mesh, PATIENT_COORDINATE_SYSTEM externalSpace);
+
+private:
+	int VTKToIGTLCellArray(vtkCellArray* src, igtl::PolyDataCellArray* dest);
+	int VTKToIGTLAttribute(vtkDataSetAttributes* src, int i, igtl::PolyDataAttribute* dest);
+
 };
+
+} //namespace cx
+
 
 #endif // CXIGTLINKCONVERSIONPOLYDATA_H

@@ -25,6 +25,8 @@ set(PLUGIN_SRCS
     openigtlinkClient/cxPlusDialect.cpp
     openigtlinkClient/cxCustusDialect.h
     openigtlinkClient/cxCustusDialect.cpp
+	openigtlinkClient/cxRASDialect.h
+	openigtlinkClient/cxRASDialect.cpp
 )
 
 # Files which should be processed by Qts moc

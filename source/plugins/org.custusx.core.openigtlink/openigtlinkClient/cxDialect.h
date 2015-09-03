@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/shared_ptr.hpp>
 
 #include "igtlMessageHeader.h"
+#include "igtlPolyDataMessage.h"
 #include "igtlTransformMessage.h"
 #include "igtlImageMessage.h"
 #include "igtlStatusMessage.h"
@@ -68,10 +69,12 @@ public:
 
     virtual QString getName() const;
     virtual bool doCRC() const;
+	virtual PATIENT_COORDINATE_SYSTEM coordinateSystem() const { return pcsLPS; }
 
     virtual void translate(const igtl::TransformMessage::Pointer body);
     virtual void translate(const igtl::ImageMessage::Pointer body);
-    virtual void translate(const igtl::StatusMessage::Pointer body);
+	virtual void translate(const igtl::PolyDataMessage::Pointer body);
+	virtual void translate(const igtl::StatusMessage::Pointer body);
     virtual void translate(const igtl::StringMessage::Pointer body);
     virtual void translate(const IGTLinkUSStatusMessage::Pointer body);
     virtual void translate(const IGTLinkImageMessage::Pointer body);
@@ -80,11 +83,13 @@ signals:
     void transform(QString devicename, Transform3D transform, double timestamp);
     void calibration(QString devicename, Transform3D calibration);
     void image(ImagePtr image);
-    void igtlimage(IGTLinkImageMessage::Pointer igtlimage);
+	void mesh(MeshPtr mesh);
+	void igtlimage(IGTLinkImageMessage::Pointer igtlimage);
     void usstatusmessage(IGTLinkUSStatusMessage::Pointer msg);
     void probedefinition(QString devicename, ProbeDefinitionPtr definition);
 
 protected:
+	void writeAcceptingMessage(igtl::MessageBase* body);
 	void writeNotSupportedMessage(igtl::MessageBase *body);
 };
 typedef boost::shared_ptr<Dialect> DialectPtr;

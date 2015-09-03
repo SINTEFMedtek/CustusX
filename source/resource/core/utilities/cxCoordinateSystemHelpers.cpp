@@ -67,4 +67,6 @@ bool operator==(const CoordinateSystem& lhs, const CoordinateSystem& rhs)
 
 // --------------------------------------------------------
 
+
+
 } //namespace cx

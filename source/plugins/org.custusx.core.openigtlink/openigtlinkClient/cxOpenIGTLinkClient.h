@@ -81,12 +81,14 @@ public:
     QStringList getAvailableDialects() const;
     void setDialect(QString dialectname);
 	void sendMessage(ImagePtr image); // thread safe?????????????????????????????
+	void sendMessage(MeshPtr image); // thread safe?????????????????????????????
 
 signals:
     void transform(QString devicename, Transform3D transform, double timestamp);
     void calibration(QString devicename, Transform3D calibration);
     void image(ImagePtr image);
-    void probedefinition(QString devicename, ProbeDefinitionPtr definition);
+	void mesh(MeshPtr image);
+	void probedefinition(QString devicename, ProbeDefinitionPtr definition);
     void igtlimage(IGTLinkImageMessage::Pointer igtlimage);
     void usstatusmessage(IGTLinkUSStatusMessage::Pointer message);
 

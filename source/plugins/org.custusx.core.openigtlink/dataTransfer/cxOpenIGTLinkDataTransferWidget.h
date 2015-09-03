@@ -44,6 +44,7 @@ namespace cx {
 class OpenIGTLinkConnectionWidget;
 class OpenIGTLinkClient;
 typedef boost::shared_ptr<class BoolProperty> BoolPropertyPtr;
+typedef boost::shared_ptr<class StringProperty> StringPropertyPtr;
 typedef boost::shared_ptr<class StringPropertySelectData> StringPropertySelectDataPtr;
 typedef boost::shared_ptr<class OpenIGTLinkClientThreadHandler> OpenIGTLinkClientThreadHandlerPtr;
 
@@ -54,8 +55,6 @@ public:
 	OpenIGTLinkDataTransferWidget(ctkPluginContext* context, QWidget* parent=NULL);
 	~OpenIGTLinkDataTransferWidget();
 private:
-//	QThread mOpenIGTLinkThread;
-//	OpenIGTLinkClient* mClient;
 	OpenIGTLinkConnectionWidget* mConnectionWidget;
 	BoolPropertyPtr mAcceptIncomingData;
 	StringPropertySelectDataPtr mDataToSend;
@@ -68,7 +67,12 @@ private:
 
 	QString getConfigUid() const;
 	void onImageReceived(ImagePtr image);
+	void onMeshReceived(MeshPtr image);
+	void onDataReceived(DataPtr data);
 	void onSend();
+
+	QVBoxLayout* createVBoxInGroupBox(QVBoxLayout* parent, QString header);
+//	QWidget* createVBoxWidget();
 };
 
 } // namespace cx

@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxOpenIGTLinkDataTransferWidget.h"
 
 #include <QPushButton>
+#include <QGroupBox>
 #include "cxOpenIGTLinkClient.h"
 #include "cxOpenIGTLinkConnectionWidget.h"
 #include "cxBoolProperty.h"
@@ -40,6 +41,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelServiceProxy.h"
 #include "cxViewServiceProxy.h"
 #include "cxSelectDataStringProperty.h"
+#include "cxStringProperty.h"
+#include "cxMesh.h"
 
 namespace cx {
 
@@ -54,8 +57,21 @@ OpenIGTLinkDataTransferWidget::OpenIGTLinkDataTransferWidget(ctkPluginContext *c
 	mOpenIGTLink.reset(new OpenIGTLinkClientThreadHandler(this->getConfigUid()));
 
 	connect(mOpenIGTLink->client(), &OpenIGTLinkClient::image, this, &OpenIGTLinkDataTransferWidget::onImageReceived);
+	connect(mOpenIGTLink->client(), &OpenIGTLinkClient::mesh, this, &OpenIGTLinkDataTransferWidget::onMeshReceived);
 
 	mConnectionWidget = new OpenIGTLinkConnectionWidget(mOpenIGTLink->client());
+
+//	mCoordinateSystem = StringProperty::initialize("igltcoords", "Coordinate System",
+//												   "Select which space to interpret/represent the iglink data in\n"
+//												   "RAS is used by Slicer and others,\n"
+//												   "LPS by CustusX and DICOM.",
+//												   "RAS",
+//												   QStringList() << "RAS" << "LPS",
+//												   mOptions.getElement());
+//	std::map<QString,QString> names;
+//	names["LPS"] = "LPS (DICOM)";
+//	names["RAS"] = "RAS (Slicer)";
+//	mCoordinateSystem->setDisplayNames(names);
 
 	mDataToSend = StringPropertySelectData::New(mPatientModelService);
 
@@ -68,16 +84,43 @@ OpenIGTLinkDataTransferWidget::OpenIGTLinkDataTransferWidget(ctkPluginContext *c
 
 	QVBoxLayout* layout = new QVBoxLayout(this);
 	layout->setMargin(0);
-	layout->addWidget(mConnectionWidget);
-	layout->addWidget(createDataWidget(mViewService, mPatientModelService, this, mAcceptIncomingData));
-	layout->addWidget(createDataWidget(mViewService, mPatientModelService, this, mDataToSend));
-	layout->addWidget(sendButton);
+
+	QVBoxLayout* connectionLayout = this->createVBoxInGroupBox(layout, "Connection");
+	connectionLayout->addWidget(mConnectionWidget);
+
+	QVBoxLayout* receiveLayout = this->createVBoxInGroupBox(layout, "Receive");
+	receiveLayout->addWidget(createDataWidget(mViewService, mPatientModelService, this, mAcceptIncomingData));
+
+	QVBoxLayout* sendLayout = this->createVBoxInGroupBox(layout, "Send");
+	sendLayout->addWidget(createDataWidget(mViewService, mPatientModelService, this, mDataToSend));
+	sendLayout->addWidget(sendButton);
 }
 
 OpenIGTLinkDataTransferWidget::~OpenIGTLinkDataTransferWidget()
 {
 	mOpenIGTLink.reset(); //
 }
+
+QVBoxLayout* OpenIGTLinkDataTransferWidget::createVBoxInGroupBox(QVBoxLayout* parent, QString header)
+{
+	QWidget* widget = new QWidget(this);
+	QVBoxLayout* layout = new QVBoxLayout(widget);
+	layout->setMargin(0);
+
+	QGroupBox* groupBox = this->wrapInGroupBox(widget, header);
+	parent->addWidget(groupBox);
+
+	return layout;
+}
+
+//QWidget* OpenIGTLinkDataTransferWidget::createVBoxWidget()
+//{
+//	QWidget* widget = new QWidget(this);
+//	QVBoxLayout* layout = new QVBoxLayout(widget);
+//	layout->setMargin(0);
+////	layout->addWidget(receiveWidget);
+//	return widget;
+//}
 
 QString OpenIGTLinkDataTransferWidget::getConfigUid() const
 {
@@ -86,18 +129,29 @@ QString OpenIGTLinkDataTransferWidget::getConfigUid() const
 
 void OpenIGTLinkDataTransferWidget::onImageReceived(ImagePtr image)
 {
+	this->onDataReceived(image);
+}
+
+void OpenIGTLinkDataTransferWidget::onMeshReceived(MeshPtr mesh)
+{
+	this->onDataReceived(mesh);
+}
+
+void OpenIGTLinkDataTransferWidget::onDataReceived(DataPtr data)
+{
 	QString actionText = mAcceptIncomingData->getValue() ? "inserting" : "ignoring";
-	QString nameText = image ? image->getName() : "NULL";
+	QString nameText = data ? data->getName() : "NULL";
 	CX_LOG_CHANNEL_INFO(this->getConfigUid()) << QString("Received image [%1] over IGTLink, %2")
 														   .arg(nameText)
 														   .arg(actionText);
 
 	if (mAcceptIncomingData->getValue())
 	{
-		mPatientModelService->insertData(image);
-		mViewService->autoShowData(image);
+		mPatientModelService->insertData(data);
+		mViewService->autoShowData(data);
 	}
 }
+
 
 void OpenIGTLinkDataTransferWidget::onSend()
 {
@@ -106,7 +160,12 @@ void OpenIGTLinkDataTransferWidget::onSend()
 	if (image)
 	{
 		mOpenIGTLink->client()->sendMessage(image);
-		// send
+		return;
+	}
+	MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(data);
+	if (mesh)
+	{
+		mOpenIGTLink->client()->sendMessage(mesh);
 		return;
 	}
 

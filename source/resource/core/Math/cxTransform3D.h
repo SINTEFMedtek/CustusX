@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/shared_ptr.hpp>
 #include <QString>
 #include "cxVector3D.h"
+#include "cxDefinitions.h"
 
 
 /** implementation functions used the Eigen extensions.
@@ -224,12 +225,22 @@ cxResource_EXPORT Transform3D createTransformIJC(const Vector3D& ivec, const Vec
 
 cxResource_EXPORT Transform3D createTransformRotationBetweenVectors(Vector3D from, Vector3D to);
 
+
 /**
   * Convert from left-posterior-superior (LPS) or right-anterior-superior (RAS).
   * LPS is used by DICOM and CustusX,
   * RAS is used by Slicer, ITK-Snap, NifTI,
   */
 cxResource_EXPORT Transform3D createTransformLPS2RAS();
+
+/**
+  * Create a transform from the internal (LPS) space to a given
+  * external (LPS or RAS) space. The return value is on the form
+  * sMr, where s=external space, r=internal ref space.
+  */
+cxResource_EXPORT Transform3D createTransformFromReferenceToExternal(PATIENT_COORDINATE_SYSTEM external);
+
+
 
 // --------------------------------------------------------
 typedef boost::shared_ptr<Transform3D> Transform3DPtr;

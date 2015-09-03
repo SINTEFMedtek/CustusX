@@ -144,8 +144,8 @@ void PatientData::exportPatient(bool niftiFormat)
 		Transform3D rMd = mesh->get_rMd();
 		if (niftiFormat)
 		{
-			rMd = rMd * createTransformRotateZ(M_PI); // convert back to NIFTI format
-			report("Nifti export: rotated data " + mesh->getName() + " 180* around Z-axis.");
+			rMd = createTransformRotateZ(M_PI) * rMd; // convert back to NIFTI format
+			report("Nifti export: Converted data " + mesh->getName() + " from LPS to RAS coordinates.");
 		}
 
 		vtkPolyDataPtr poly = mesh->getTransformedPolyData(rMd);

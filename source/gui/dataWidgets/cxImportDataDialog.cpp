@@ -247,10 +247,9 @@ void ImportDataDialog::convertFromNifti1Coordinates()
   if(!mData)
     return;
   Transform3D rMd = mData->get_rMd();
-  rMd = rMd * createTransformRotateZ(M_PI);
+  rMd = createTransformRotateZ(M_PI) * rMd;
   mData->get_rMd_History()->setRegistration(rMd);
- // report("Nifti import: rotated input data " + mData->getName() + " 180* around Z-axis.");
-  report("Nifti import: Converted data " + mData->getName() + " from RAS to LPS (rotate 180* around Z-axis).");
+  report("Nifti import: Converted data " + mData->getName() + " from LPS to RAS coordinates.");
 }
 
 /** Apply the transform from the parent frame to the imported data.

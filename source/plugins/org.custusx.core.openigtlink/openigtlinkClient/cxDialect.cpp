@@ -5,6 +5,7 @@
 #include "cxRegistrationTransform.h"
 #include "cxIGTLinkConversionImage.h"
 #include "cxIGTLinkConversionBase.h"
+#include "cxIGTLinkConversionPolyData.h"
 
 namespace cx
 {
@@ -42,25 +43,22 @@ void Dialect::translate(const igtl::TransformMessage::Pointer body)
     emit transform(deviceName, prMs, timestamp_ms);
 }
 
+void Dialect::translate(const igtl::PolyDataMessage::Pointer body)
+{
+	this->writeAcceptingMessage(body);
+
+	IGTLinkConversionPolyData polyConverter;
+	MeshPtr retval = polyConverter.decode(body, this->coordinateSystem());
+	emit mesh(retval);
+}
+
 void Dialect::translate(const igtl::ImageMessage::Pointer body)
 {
-	QString dtype(body->GetDeviceType());
-	QString dname(body->GetDeviceName());
-	CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << QString("Accepting incoming igtlink message (%1, %2): ")
-														.arg(dtype)
-														.arg(dname);
+	this->writeAcceptingMessage(body);
 
 	IGTLinkConversionImage imageConverter;
 	ImagePtr retval = imageConverter.decode(body);
-//	std::cout << "retval " << retval.get() << std::endl;
 	emit image(retval);
-//	//IMAGE
-//	IGTLinkConversion converter;
-//	ImagePtr theImage = converter.decode(body);
-//	theImage->get_rMd_History()->setRegistration(converter.decode_image_matrix(body));
-
-
-//	emit image(theImage);
 }
 
 void Dialect::translate(const igtl::StatusMessage::Pointer body)
@@ -76,7 +74,6 @@ void Dialect::translate(igtl::StringMessage::Pointer body)
     QString string = converter.decode(body);
     //This was spamming the console
 	CX_LOG_CHANNEL_INFO(CX_OPENIGTLINK_CHANNEL_NAME) << "IGTL string: " << string;
-	//this->writeNotSupportedMessage(body);
 }
 
 void Dialect::writeNotSupportedMessage(igtl::MessageBase* body)
@@ -84,6 +81,15 @@ void Dialect::writeNotSupportedMessage(igtl::MessageBase* body)
 	QString dtype(body->GetDeviceType());
 	QString dname(body->GetDeviceName());
 	CX_LOG_CHANNEL_INFO(CX_OPENIGTLINK_CHANNEL_NAME) << QString("Ignoring incoming igtlink message (%1, %2): ")
+														.arg(dtype)
+														.arg(dname);
+}
+
+void Dialect::writeAcceptingMessage(igtl::MessageBase* body)
+{
+	QString dtype(body->GetDeviceType());
+	QString dname(body->GetDeviceName());
+	CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << QString("Accepting incoming igtlink message (%1, %2): ")
 														.arg(dtype)
 														.arg(dname);
 }

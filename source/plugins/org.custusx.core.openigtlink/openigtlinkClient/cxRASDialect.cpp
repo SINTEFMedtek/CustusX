@@ -29,52 +29,18 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXOPENIGTLINKCONNECTIONWIDGET_H
-#define CXOPENIGTLINKCONNECTIONWIDGET_H
+#include "cxRASDialect.h"
 
-#include <QDomElement>
-#include "cxBaseWidget.h"
-#include "cxStringProperty.h"
-#include "cxDoubleProperty.h"
+#include "cxIGTLinkConversion.h"
+#include "cxImage.h"
+#include "cxLogger.h"
 
-class QPushButton;
-
-namespace cx {
-
-class OpenIGTLinkClient;
-
-class OpenIGTLinkConnectionWidget : public BaseWidget
+namespace cx
 {
-    Q_OBJECT
 
-public:
-    OpenIGTLinkConnectionWidget(OpenIGTLinkClient *client, QWidget *parent=NULL);
-    ~OpenIGTLinkConnectionWidget();
-
-    virtual QString defaultWhatsThis() const;
-
-signals:
-    void requestConnect();
-    void requestDisconnect();
-    void ipAndPort(QString ip, int port);
-
-private slots:
-    void clientConnected();
-    void clientDisconnected();
-    void connectButtonClicked(bool checked=false);
-
-private:
-    StringPropertyBasePtr getDialectOption(QDomElement root, OpenIGTLinkClient *client);
-    StringPropertyBasePtr getIpOption(QDomElement root);
-    DoublePropertyBasePtr getPortOption(QDomElement root);
-
-    QDomElement mOptionsElement;
-    QPushButton *mConnectButton;
-	QWidget* mOptionsWidget;
-
-    OpenIGTLinkClient* mClient;
-};
-
+QString RASDialect::getName() const
+{
+	return "RAS";
 }
 
-#endif //CXOPENIGTLINKWIDGET_H
+}

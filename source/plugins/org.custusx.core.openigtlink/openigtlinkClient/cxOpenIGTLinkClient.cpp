@@ -38,8 +38,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxPlusDialect.h"
 #include "cxCustusDialect.h"
+#include "cxRASDialect.h"
 #include "igtl_header.h"
 #include "cxIGTLinkConversionImage.h"
+#include "cxIGTLinkConversionPolyData.h"
 
 namespace cx
 {
@@ -53,7 +55,8 @@ OpenIGTLinkClient::OpenIGTLinkClient(QObject *parent) :
     mPort = 18944;
     qRegisterMetaType<Transform3D>("Transform3D");
     qRegisterMetaType<ImagePtr>("ImagePtr");
-    qRegisterMetaType<ProbeDefinitionPtr>("ProbeDefinitionPtr");
+	qRegisterMetaType<ImagePtr>("MeshPtr");
+	qRegisterMetaType<ProbeDefinitionPtr>("ProbeDefinitionPtr");
 
     DialectPtr dialect = DialectPtr(new CustusDialect());
     mAvailableDialects[dialect->getName()] = dialect;
@@ -64,6 +67,9 @@ OpenIGTLinkClient::OpenIGTLinkClient(QObject *parent) :
 
     dialect = DialectPtr(new Dialect());
     mAvailableDialects[dialect->getName()] = dialect;
+
+	dialect = DialectPtr(new RASDialect());
+	mAvailableDialects[dialect->getName()] = dialect;
 }
 
 OpenIGTLinkClient::~OpenIGTLinkClient()
@@ -97,7 +103,8 @@ void OpenIGTLinkClient::setDialect(QString dialectname)
     if(mDialect)
     {
         disconnect(mDialect.get(), &Dialect::image, this, &OpenIGTLinkClient::image);
-        disconnect(mDialect.get(), &Dialect::transform, this, &OpenIGTLinkClient::transform);
+		disconnect(mDialect.get(), &Dialect::mesh, this, &OpenIGTLinkClient::mesh);
+		disconnect(mDialect.get(), &Dialect::transform, this, &OpenIGTLinkClient::transform);
         disconnect(mDialect.get(), &Dialect::calibration, this, &OpenIGTLinkClient::calibration);
         disconnect(mDialect.get(), &Dialect::probedefinition, this, &OpenIGTLinkClient::probedefinition);
         disconnect(mDialect.get(), &Dialect::usstatusmessage, this, &OpenIGTLinkClient::usstatusmessage);
@@ -106,7 +113,8 @@ void OpenIGTLinkClient::setDialect(QString dialectname)
 
     mDialect = dialect;
     connect(dialect.get(), &Dialect::image, this, &OpenIGTLinkClient::image);
-    connect(dialect.get(), &Dialect::transform, this, &OpenIGTLinkClient::transform);
+	connect(dialect.get(), &Dialect::mesh, this, &OpenIGTLinkClient::mesh);
+	connect(dialect.get(), &Dialect::transform, this, &OpenIGTLinkClient::transform);
     connect(dialect.get(), &Dialect::calibration, this, &OpenIGTLinkClient::calibration);
     connect(dialect.get(), &Dialect::probedefinition, this, &OpenIGTLinkClient::probedefinition);
     connect(dialect.get(), &Dialect::usstatusmessage, this, &OpenIGTLinkClient::usstatusmessage);
@@ -135,9 +143,21 @@ void OpenIGTLinkClient::sendMessage(ImagePtr image)
 	QMutexLocker locker(&mMutex);
 
 	IGTLinkConversionImage imageConverter;
-	igtl::ImageMessage::Pointer msg = imageConverter.encode(image);
+	igtl::ImageMessage::Pointer msg = imageConverter.encode(image, mDialect->coordinateSystem());
 //    igtl::StringMessage::Pointer stringMsg = converter.encode(command);
 	CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "Sending image: " << image->getName();
+	msg->Pack();
+
+	mSocket->write(reinterpret_cast<char*>(msg->GetPackPointer()), msg->GetPackSize());
+}
+
+void OpenIGTLinkClient::sendMessage(MeshPtr data)
+{
+	QMutexLocker locker(&mMutex);
+
+	IGTLinkConversionPolyData polyConverter;
+	igtl::PolyDataMessage::Pointer msg = polyConverter.encode(data, mDialect->coordinateSystem());
+	CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "Sending mesh: " << data->getName();
 	msg->Pack();
 
 	mSocket->write(reinterpret_cast<char*>(msg->GetPackPointer()), msg->GetPackSize());
@@ -216,13 +236,18 @@ bool OpenIGTLinkClient::receiveHeader(const igtl::MessageHeader::Pointer header)
 
 bool OpenIGTLinkClient::receiveBody(const igtl::MessageBase::Pointer header)
 {
-    const char* type = header->GetDeviceType();
-    if(strcmp(type, "TRANSFORM") == 0)
+	QString type = QString(header->GetDeviceType()).toUpper();
+	if (type=="TRANSFORM")
     {
         if(!this->receive<igtl::TransformMessage>(header))
             return false;
     }
-    else if(strcmp(type, "IMAGE") == 0)
+	else if (type=="POLYDATA")
+	{
+		if(!this->receive<igtl::PolyDataMessage>(header))
+			return false;
+	}
+	else if (type=="IMAGE")
     {
         //----- CustusX openigtlink server -----
         //there is a special kind of image package coming from custusx
@@ -240,17 +265,17 @@ bool OpenIGTLinkClient::receiveBody(const igtl::MessageBase::Pointer header)
                 return false;
         }
     }
-    else if(strcmp(type, "STATUS") == 0)
+	else if (type=="STATUS")
     {
         if(!this->receive<igtl::StatusMessage>(header))
             return false;
     }
-    else if(strcmp(type, "STRING") == 0)
+	else if (type=="STRING")
     {
         if(!this->receive<igtl::StringMessage>(header))
             return false;
     }
-    else if(strcmp(type, "CX_US_ST") == 0)
+	else if (type=="CX_US_ST")
     {
         if(!this->receive<IGTLinkUSStatusMessage>(header))
             return false;

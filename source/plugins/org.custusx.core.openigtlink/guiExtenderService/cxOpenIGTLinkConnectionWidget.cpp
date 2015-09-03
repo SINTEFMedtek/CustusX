@@ -62,9 +62,13 @@ OpenIGTLinkConnectionWidget::OpenIGTLinkConnectionWidget(OpenIGTLinkClient *clie
     connect(mClient, &OpenIGTLinkClient::error, this, &OpenIGTLinkConnectionWidget::clientDisconnected);
 
     QVBoxLayout* topLayout = new QVBoxLayout(this);
-    topLayout->addWidget(sscCreateDataWidget(this, ip));
-    topLayout->addWidget(sscCreateDataWidget(this, port));
-    topLayout->addWidget(sscCreateDataWidget(this, dialects));
+	mOptionsWidget = new QWidget(this);
+	QVBoxLayout* optionsLayout = new QVBoxLayout(mOptionsWidget);
+	optionsLayout->setMargin(0);
+	topLayout->addWidget(mOptionsWidget);
+	optionsLayout->addWidget(sscCreateDataWidget(this, ip));
+	optionsLayout->addWidget(sscCreateDataWidget(this, port));
+	optionsLayout->addWidget(sscCreateDataWidget(this, dialects));
     topLayout->addWidget(mConnectButton);
     topLayout->addStretch();
 }
@@ -94,6 +98,8 @@ void OpenIGTLinkConnectionWidget::clientConnected()
     mConnectButton->setChecked(true);
     mConnectButton->setText("Disconnect");
     mConnectButton->blockSignals(false);
+
+	mOptionsWidget->setEnabled(false);
 }
 
 void OpenIGTLinkConnectionWidget::clientDisconnected()
@@ -103,6 +109,8 @@ void OpenIGTLinkConnectionWidget::clientDisconnected()
     mConnectButton->setChecked(false);
     mConnectButton->setText("Connect");
     mConnectButton->blockSignals(false);
+
+	mOptionsWidget->setEnabled(true);
 }
 
 void OpenIGTLinkConnectionWidget::connectButtonClicked(bool checked)

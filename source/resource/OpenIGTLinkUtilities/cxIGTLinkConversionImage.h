@@ -61,23 +61,27 @@ namespace cx
  * decode: read from igtl messages
  *
  * decode methods assume Unpack() has been called.
+ * encode methods assume Pack() will be called.
  */
 class IGTLinkConversionImage
 {
 public:
-	igtl::ImageMessage::Pointer encode(ImagePtr in);
+	igtl::ImageMessage::Pointer encode(ImagePtr in, PATIENT_COORDINATE_SYSTEM externalSpace);
 	ImagePtr decode(igtl::ImageMessage *in);
 
 private:
 	vtkImageDataPtr decode_vtkImageData(igtl::ImageMessage* in);
 	void decode_rMd(igtl::ImageMessage* msg, ImagePtr out);
 //	void encode_Transform3D(Transform3D rMd, igtl::ImageMessage *outmsg);
-	void encode_rMd(ImagePtr image, igtl::ImageMessage *outmsg);
+	void encode_rMd(ImagePtr image, igtl::ImageMessage *outmsg, PATIENT_COORDINATE_SYSTEM externalSpace);
 	void encode_vtkImageData(vtkImageDataPtr in, igtl::ImageMessage *outmsg);
 
 private:
 	int IGTLToVTKScalarType(int igtlType);
-
+	Transform3D getMatrix(igtl::ImageMessage *msg);
+	void setMatrix(igtl::ImageMessage *msg, Transform3D matrix);
+	int getIgtlCoordinateSystem(PATIENT_COORDINATE_SYSTEM space) const;
+	PATIENT_COORDINATE_SYSTEM getPatientCoordinateSystem(int igtlSpace) const;
 };
 
 } //namespace cx
