@@ -82,6 +82,7 @@ void TrackedStream::toolTransformAndTimestamp(Transform3D prMt, double timestamp
 
 	if (mImage)
 		mImage->get_rMd_History()->setRegistration(rMu);
+	emit newPosition();
 }
 
 Transform3D TrackedStream::get_tMu()
@@ -170,7 +171,7 @@ QString TrackedStream::getType() const
 
 QString TrackedStream::getTypeName()
 {
-	return "TrackedStream";
+	return "trackedStream";
 }
 
 ImagePtr TrackedStream::getChangingImage()

@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
+typedef boost::shared_ptr<class OpenIGTLinkClientThreadHandler> OpenIGTLinkClientThreadHandlerPtr;
 typedef boost::shared_ptr<class OpenIGTLinkTrackingSystemService> OpenIGTLinkTrackingSystemServicePtr;
 typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
 
@@ -69,7 +70,8 @@ private:
     RegisteredServicePtr mRegistrationGui;
     RegisteredServicePtr mRegistrationTracking;
     RegisteredServicePtr mRegistrationStreaming;
-    QThread mOpenIGTLinkThread;
+//    QThread mOpenIGTLinkThread;
+	OpenIGTLinkClientThreadHandlerPtr mOpenIGTLink;
 };
 
 } // namespace cx

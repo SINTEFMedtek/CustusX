@@ -6,6 +6,8 @@ set(PLUGIN_SRCS
     cxOpenIGTLinkPluginActivator.cpp
 
     guiExtenderService/cxOpenIGTLinkGuiExtenderService.h
+	dataTransfer/cxOpenIGTLinkDataTransferWidget.cpp
+
     guiExtenderService/cxOpenIGTLinkGuiExtenderService.cpp
     guiExtenderService/cxOpenIGTLinkConnectionWidget.cpp
 
@@ -29,6 +31,7 @@ set(PLUGIN_SRCS
 set(PLUGIN_MOC_SRCS
     cxOpenIGTLinkPluginActivator.h
 
+	dataTransfer/cxOpenIGTLinkDataTransferWidget.h
     guiExtenderService/cxOpenIGTLinkConnectionWidget.h
 
     trackingSystemService/cxOpenIGTLinkTrackingSystemService.h
@@ -55,7 +58,8 @@ ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
     ${PLUGIN_target_libraries}
     cxResourceWidgets
-    cxResource
+	cxResourceVisualization
+	cxResource
     cxPluginUtilities
     cxGrabber
     cxGUIExtenderService
@@ -87,6 +91,7 @@ target_include_directories(${PROJECT_NAME}
     trackingSystemService
     streamerService
     guiExtenderService
+	dataTransfer
 )
 
 
