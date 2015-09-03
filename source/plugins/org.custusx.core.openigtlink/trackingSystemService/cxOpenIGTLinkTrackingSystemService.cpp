@@ -207,6 +207,7 @@ void OpenIGTLinkTrackingSystemService::receiveProbedefinition(QString devicename
     ProbePtr probe = tool->getProbe();
     ProbeDefinition old_def = probe->getProbeDefinition();
     definition->setUid(old_def.getUid());
+    definition->applySoundSpeedCompensationFactor(old_def.getSoundSpeedCompensationFactor());
 
     probe->setProbeDefinition(*(definition.get()));
 }

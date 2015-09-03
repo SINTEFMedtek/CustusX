@@ -319,7 +319,13 @@ void MainWindowActions::shootScreen()
 		QRect geo = desktop->screenGeometry(i);
 		QString name = "";
 		if (desktop->screenCount()>1)
+        {
 			name = screens[i]->name().split(" ").join("");
+            //On windows screens[i]->name() is "\\.\DISPLAY1",
+            //Have to remove unvalid chars for the filename
+            name.replace("\\", "");
+            name.replace(".", "");
+        }
 		this->saveScreenShot(screens[i]->grabWindow(screenWinId, geo.left(), geo.top(), geo.width(), geo.height()), name);
 	}
 }
