@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxSender.h"
 #include "cxTime.h"
+#include <QThread>
 
 #include "cxPlusDialect.h"
 #include "cxCustusDialect.h"
@@ -62,7 +63,10 @@ OpenIGTLinkClient::OpenIGTLinkClient(QObject *parent) :
 
     dialect = DialectPtr(new Dialect());
     mAvailableDialects[dialect->getName()] = dialect;
+}
 
+OpenIGTLinkClient::~OpenIGTLinkClient()
+{
 }
 
 QStringList OpenIGTLinkClient::getAvailableDialects() const
@@ -107,7 +111,7 @@ void OpenIGTLinkClient::setDialect(QString dialectname)
     connect(dialect.get(), &Dialect::usstatusmessage, this, &OpenIGTLinkClient::usstatusmessage);
     connect(dialect.get(), &Dialect::igtlimage, this, &OpenIGTLinkClient::igtlimage);
 
-    CX_LOG_CHANNEL_SUCCESS(CX_OPENIGTLINK_CHANNEL_NAME) << "Dialect set to " << dialectname;
+	CX_LOG_CHANNEL_SUCCESS(CX_OPENIGTLINK_CHANNEL_NAME) << "IGTL Dialect set to " << dialectname;
 
 }
 
@@ -256,6 +260,33 @@ bool OpenIGTLinkClient::receive(const igtl::MessageBase::Pointer header)
         return false;
     }
     return true;
+}
+
+
+
+
+OpenIGTLinkClientThreadHandler::OpenIGTLinkClientThreadHandler(QString threadname)
+{
+	mThread.reset(new QThread());
+	mThread->setObjectName(threadname);
+	mClient.reset(new OpenIGTLinkClient);
+	mClient->moveToThread(mThread.get());
+
+	mThread->start();
+}
+
+OpenIGTLinkClientThreadHandler::~OpenIGTLinkClientThreadHandler()
+{
+	mThread->quit();
+	mThread->wait();
+
+	mClient.reset();
+	// thread-delete implicitly at end.
+}
+
+OpenIGTLinkClient* OpenIGTLinkClientThreadHandler::client()
+{
+	return mClient.get();
 }
 
 

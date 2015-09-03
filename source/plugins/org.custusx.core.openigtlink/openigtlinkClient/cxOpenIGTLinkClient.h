@@ -54,7 +54,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogger.h"
 #include "cxDialect.h"
 
+typedef boost::shared_ptr<QThread> QThreadPtr;
+
 namespace cx {
+
+typedef boost::shared_ptr<class OpenIGTLinkClient> OpenIGTLinkClientPtr;
 
 /**
  * @brief The OpenIGTLinkClient class handles incoming OpenIGTLink packages.
@@ -71,6 +75,7 @@ class org_custusx_core_openigtlink_EXPORT OpenIGTLinkClient : public SocketConne
 public:
 
     explicit OpenIGTLinkClient(QObject *parent = 0);
+	virtual ~OpenIGTLinkClient();
 
     //thread safe
     QStringList getAvailableDialects() const;
@@ -103,6 +108,25 @@ private:
     typedef std::map<QString, DialectPtr> DialectMap;
     DialectMap mAvailableDialects;
 };
+
+typedef boost::shared_ptr<class OpenIGTLinkClientThreadHandler> OpenIGTLinkClientThreadHandlerPtr;
+
+/** Encapsulates running of the OpenIGTLinkClient in a thread.
+ *  Lifetime of the thread equals that of this object.
+ *
+ */
+class OpenIGTLinkClientThreadHandler
+{
+public:
+	explicit OpenIGTLinkClientThreadHandler(QString threadname);
+	~OpenIGTLinkClientThreadHandler();
+	OpenIGTLinkClient* client();
+
+private:
+	OpenIGTLinkClientPtr mClient;
+	QThreadPtr mThread;
+};
+
 
 } //namespace cx
 

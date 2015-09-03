@@ -44,19 +44,22 @@ namespace cx {
 class OpenIGTLinkConnectionWidget;
 class OpenIGTLinkClient;
 typedef boost::shared_ptr<class BoolProperty> BoolPropertyPtr;
+typedef boost::shared_ptr<class OpenIGTLinkClientThreadHandler> OpenIGTLinkClientThreadHandlerPtr;
 
 class OpenIGTLinkDataTransferWidget : public BaseWidget
 {
 	Q_OBJECT
 public:
 	OpenIGTLinkDataTransferWidget(ctkPluginContext* context, QWidget* parent=NULL);
+	~OpenIGTLinkDataTransferWidget();
 private:
-	QThread mOpenIGTLinkThread;
-	OpenIGTLinkClient* mClient;
+//	QThread mOpenIGTLinkThread;
+//	OpenIGTLinkClient* mClient;
 	OpenIGTLinkConnectionWidget* mConnectionWidget;
 	BoolPropertyPtr mAcceptIncomingData;
 	XmlOptionFile mOptions;
 	ctkPluginContext* mContext;
+	OpenIGTLinkClientThreadHandlerPtr mOpenIGTLink;
 
 	PatientModelServicePtr mPatientModelService;
 	VisualizationServicePtr mViewService;

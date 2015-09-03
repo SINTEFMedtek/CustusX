@@ -54,31 +54,34 @@ OpenIGTLinkPluginActivator::~OpenIGTLinkPluginActivator()
 
 void OpenIGTLinkPluginActivator::start(ctkPluginContext* context)
 {
-    mOpenIGTLinkThread.setObjectName("org.custusx.core.openigtlink");
-    OpenIGTLinkClient *client = new OpenIGTLinkClient;
-    client->moveToThread(&mOpenIGTLinkThread);
+	mOpenIGTLink.reset(new OpenIGTLinkClientThreadHandler("org.custusx.core.openigtlink"));
+//    mOpenIGTLinkThread.setObjectName("org.custusx.core.openigtlink");
+//    OpenIGTLinkClient *client = new OpenIGTLinkClient;
+//    client->moveToThread(&mOpenIGTLinkThread);
 
-    OpenIGTLinkTrackingSystemService* tracking = new OpenIGTLinkTrackingSystemService(client);
-    OpenIGTLinkStreamerService *streamer = new OpenIGTLinkStreamerService(client);
-	OpenIGTLinkGuiExtenderService* gui = new OpenIGTLinkGuiExtenderService(context, client);
+	OpenIGTLinkTrackingSystemService* tracking = new OpenIGTLinkTrackingSystemService(mOpenIGTLink->client());
+	OpenIGTLinkStreamerService *streamer = new OpenIGTLinkStreamerService(mOpenIGTLink->client());
+	OpenIGTLinkGuiExtenderService* gui = new OpenIGTLinkGuiExtenderService(context, mOpenIGTLink->client());
 
     mRegistrationGui = RegisteredService::create<OpenIGTLinkGuiExtenderService>(context, gui, GUIExtenderService_iid);
     mRegistrationTracking = RegisteredService::create<OpenIGTLinkTrackingSystemService>(context, tracking, TrackingSystemService_iid);
     mRegistrationStreaming = RegisteredService::create<OpenIGTLinkStreamerService>(context, streamer, StreamerService_iid);
 
-    mOpenIGTLinkThread.start();
+//    mOpenIGTLinkThread.start();
 
 }
 
 void OpenIGTLinkPluginActivator::stop(ctkPluginContext* context)
 {
-    mOpenIGTLinkThread.quit();
-    mOpenIGTLinkThread.wait();
+//    mOpenIGTLinkThread.quit();
+//    mOpenIGTLinkThread.wait();
 
     mRegistrationGui.reset();
     mRegistrationTracking.reset();
     mRegistrationStreaming.reset();
     Q_UNUSED(context);
+
+	mOpenIGTLink.reset();
 }
 
 } // namespace cx

@@ -49,14 +49,16 @@ OpenIGTLinkDataTransferWidget::OpenIGTLinkDataTransferWidget(ctkPluginContext *c
 	mPatientModelService = PatientModelServiceProxy::create(context);
 	mViewService = VisualizationServiceProxy::create(context);
 
-	mOpenIGTLinkThread.setObjectName("org.custusx.core.openigtlink.datatransfer");
-	mClient = new OpenIGTLinkClient;
-	mClient->moveToThread(&mOpenIGTLinkThread);
-	mOpenIGTLinkThread.start();
+	mOpenIGTLink.reset(new OpenIGTLinkClientThreadHandler(this->getConfigUid()));
 
-	connect(mClient, &OpenIGTLinkClient::image, this, &OpenIGTLinkDataTransferWidget::onImageReceived);
+//	mOpenIGTLinkThread.setObjectName("org.custusx.core.openigtlink.datatransfer");
+//	mClient = new OpenIGTLinkClient;
+//	mClient->moveToThread(&mOpenIGTLinkThread);
+//	mOpenIGTLinkThread.start();
 
-	mConnectionWidget = new OpenIGTLinkConnectionWidget(mClient);
+	connect(mOpenIGTLink->client(), &OpenIGTLinkClient::image, this, &OpenIGTLinkDataTransferWidget::onImageReceived);
+
+	mConnectionWidget = new OpenIGTLinkConnectionWidget(mOpenIGTLink->client());
 
 
 	mAcceptIncomingData = BoolProperty::initialize("acceptIncoming", "Accept Incoming",
@@ -66,6 +68,11 @@ OpenIGTLinkDataTransferWidget::OpenIGTLinkDataTransferWidget(ctkPluginContext *c
 	QVBoxLayout* layout = new QVBoxLayout(this);
 	layout->addWidget(mConnectionWidget);
 	layout->addWidget(createDataWidget(mViewService, mPatientModelService, this, mAcceptIncomingData));
+}
+
+OpenIGTLinkDataTransferWidget::~OpenIGTLinkDataTransferWidget()
+{
+	mOpenIGTLink.reset(); //
 }
 
 QString OpenIGTLinkDataTransferWidget::getConfigUid() const
@@ -80,8 +87,11 @@ void OpenIGTLinkDataTransferWidget::onImageReceived(ImagePtr image)
 														   .arg(image->getName())
 														   .arg(actionText);
 
-	mPatientModelService->insertData(image);
-	mViewService->autoShowData(image);
+	if (mAcceptIncomingData->getValue())
+	{
+		mPatientModelService->insertData(image);
+		mViewService->autoShowData(image);
+	}
 }
 
 } // namespace cx
