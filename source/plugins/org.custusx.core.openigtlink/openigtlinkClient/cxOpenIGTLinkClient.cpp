@@ -124,27 +124,12 @@ void OpenIGTLinkClient::setDialect(QString dialectname)
 
 }
 
-//void OpenIGTLinkClient::invokePendingAction(boost::function<void()> function)
-//{
-//    QMetaObject::invokeMethod(this, "pendingAction", Qt::QueuedConnection);
-//}
-
-//void OpenIGTLinkClient::pendingAction(boost::function<void()> function)
-//{
-//	function();
-////    QMetaObject::invokeMethod(this, "pendingAction", Qt::QueuedConnection);
-//	igtl::StringMessage::Pointer
-//	stringMsg->Pack();
-//    mSocket->write(reinterpret_cast<char*>(stringMsg->GetPackPointer()), stringMsg->GetPackSize());
-//}
-
 void OpenIGTLinkClient::sendMessage(ImagePtr image)
 {
 	QMutexLocker locker(&mMutex);
 
 	IGTLinkConversionImage imageConverter;
 	igtl::ImageMessage::Pointer msg = imageConverter.encode(image, mDialect->coordinateSystem());
-//    igtl::StringMessage::Pointer stringMsg = converter.encode(command);
 	CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "Sending image: " << image->getName();
 	msg->Pack();
 

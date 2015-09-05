@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSelectDataStringProperty.h"
 #include "cxStringProperty.h"
 #include "cxMesh.h"
+#include "cxIGTLinkConversionPolyData.h"
 
 namespace cx {
 
@@ -116,6 +117,16 @@ void OpenIGTLinkDataTransfer::onSend()
 	MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(data);
 	if (mesh)
 	{
+//		// test begin
+//		IGTLinkConversionPolyData polyConverter;
+//		igtl::PolyDataMessage::Pointer msg = polyConverter.encode(mesh, pcsRAS);
+//		CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "Debbuging mesh: " << data->getName();
+
+//		MeshPtr retval = polyConverter.decode(msg, pcsRAS);
+//		mPatientModelService->insertData(retval);
+//		return;
+//		// test end
+
 		mOpenIGTLink->client()->sendMessage(mesh);
 		return;
 	}
