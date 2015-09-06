@@ -107,6 +107,7 @@ VBWidget::VBWidget(ctkPluginContext *context, QWidget *parent) :
 	mViewSlider->setMinimum(-30);
 	mViewSlider->setMaximum(30);
 
+
 	endoscopeControlLayout->addWidget(labelRot,0,0,Qt::AlignHCenter);
 	endoscopeControlLayout->addWidget(labelView,0,2,Qt::AlignHCenter);
 	endoscopeControlLayout->addWidget(mRotateDial,1,0);
