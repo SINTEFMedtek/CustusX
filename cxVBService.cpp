@@ -46,7 +46,7 @@ std::vector<GUIExtenderService::CategorizedWidget> VBGUIExtenderService::createW
 	std::vector<CategorizedWidget> retval;
 	retval.push_back(GUIExtenderService::CategorizedWidget(
 						 new VBWidget(mContext, NULL),
-						 "Browsing"));
+						 "Utility"));
 
 	return retval;
 }

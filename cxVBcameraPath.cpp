@@ -41,8 +41,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMesh.h"
 #include "cxTrackingService.h"
 #include "cxPatientModelService.h"
-//#include "cxCameraControl.h"
-
 
 
 namespace cx {
@@ -64,9 +62,9 @@ void CXVBcameraPath::cameraRawPointsSlot(MeshPtr mesh)
 	Transform3D r_M_d = mesh->get_rMd();
 
 	mNumberOfInputPoints = polyDataInput->GetNumberOfPoints();
-	std::cout << "cxVBcameraPath::cameraRawPointsSlot() - Number of Points : "
-			  << mNumberOfInputPoints << std::endl;
-	std::cout << "cxVBcameraPath, Route to target - rMd matrix : " << r_M_d << std::endl;
+//	std::cout << "cxVBcameraPath::cameraRawPointsSlot() - Number of Points : "
+//			  << mNumberOfInputPoints << std::endl;
+//	std::cout << "cxVBcameraPath, Route to target - rMd matrix : " << r_M_d << std::endl;
 
 	mSplineX = vtkSmartPointer<vtkCardinalSpline>::New();
 	mSplineY = vtkSmartPointer<vtkCardinalSpline>::New();
@@ -79,10 +77,10 @@ void CXVBcameraPath::cameraRawPointsSlot(MeshPtr mesh)
 		mSplineX->AddPoint(i,p[0]);
 		mSplineY->AddPoint(i,p[1]);
 		mSplineZ->AddPoint(i,p[2]);
-		if(i==0)
-			std::cout << "Start point : " << p[0] << " ," << p[1] << " ," << p[2] << std::endl;
-		else if(i==(mNumberOfInputPoints-1))
-				std::cout << "Target point : " << p[0] << " ," << p[1] << " ," << p[2] << std::endl;
+//		if(i==0)
+//			std::cout << "Start point : " << p[0] << " ," << p[1] << " ," << p[2] << std::endl;
+//		else if(i==(mNumberOfInputPoints-1))
+//				std::cout << "Target point : " << p[0] << " ," << p[1] << " ," << p[2] << std::endl;
 	}
 
 	// Setting spline parameter range to correspond with slider range
@@ -127,15 +125,11 @@ void CXVBcameraPath::cameraPathPositionSlot(int pos)
 	mLastCameraPos_r = Vector3D(pos_r[0], pos_r[1], pos_r[2]);
 	mLastCameraFocus_r = Vector3D(focus_r[0], focus_r[1], focus_r[2]);
 
-	std::cout << "Position : " << pos_r[0] << ", " << pos_r[1] << ", " << pos_r[2] << std::endl;
-	std::cout << "Focus: " << focus_r[0] << ", " << focus_r[1] << ", " << focus_r[2] << std::endl;
+//	std::cout << "Position : " << pos_r[0] << ", " << pos_r[1] << ", " << pos_r[2] << std::endl;
+//	std::cout << "Focus: " << focus_r[0] << ", " << focus_r[1] << ", " << focus_r[2] << std::endl;
 
 	this->updateManualToolPosition();
-//	mCamera->SetViewUp(0,-1,0);
-//	mCamera->SetPosition(pos_r[0],pos_r[1],pos_r[2]);
-//	mCamera->SetFocalPoint(focus_r[0], focus_r[1], focus_r[2]);
-//	mCamera->SetClippingRange(1,1000);
-//	mCamera->Print(std::cout);
+
 }
 
 void CXVBcameraPath::updateManualToolPosition()
@@ -163,28 +157,12 @@ void CXVBcameraPath::updateManualToolPosition()
 
 	mManualTool->set_prMt(prMt);
 
-/*
- * Old Code - to be removed
-	Transform3D rMpr = mPatientModelService->get_rMpr();
-	Vector3D p_pr = rMpr.inv().coord(p_r);
-
-	Vector3D offset = mManualTool->get_prMt().vector(Vector3D(0, 0, mManualTool->getTooltipOffset()));
-	p_pr -= offset;
-	p_r = rMpr.coord(p_pr);
-
-	// TODO set center here will not do: must handle
-//	mPatientModelService->setCenter(p_r);
-	Vector3D p0_pr = mManualTool->get_prMt().coord(Vector3D(0, 0, 0));
-
-	mManualTool->set_prMt(createTransformTranslate(p_pr - p0_pr) * mManualTool->get_prMt());
-*/
 }
 
 void CXVBcameraPath::cameraViewAngleSlot(int angle)
 {
-	std::cout << "CXVBcameraPath::cameraViewAngleSlot : " << angle << std::endl;
+//	std::cout << "CXVBcameraPath::cameraViewAngleSlot : " << angle << std::endl;
 	mLastCameraViewAngle = static_cast<double>(angle) * (M_PI / 180);
-	std::cout << "Radians : " << mLastCameraViewAngle << std::endl;
 	this->updateManualToolPosition();
 }
 
@@ -192,7 +170,6 @@ void CXVBcameraPath::cameraRotateAngleSlot(int angle)
 {
 	std::cout << "CXVBcameraPath::cameraRotateAngleSlot : " << angle << std::endl;
 	mLastCameraRotAngle = static_cast<double>(angle) * (M_PI / 180);
-	std::cout << "Radians : " << mLastCameraRotAngle << std::endl;
 	this->updateManualToolPosition();
 }
 
