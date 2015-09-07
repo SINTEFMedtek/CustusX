@@ -76,6 +76,13 @@ Ur5State Ur5MessageDecoder::setRTState(QByteArray data)
     return state;
 }
 
+double Ur5MessageDecoder::pickDouble(QByteArray data, int index)
+{
+    double a;
+    QDataStream stream(data.mid(index,sizeof(double)));
+    stream >> a;
+    return a;
+}
 
 QByteArray Ur5MessageDecoder::getHeader(QByteArray data,int pos)
 {
