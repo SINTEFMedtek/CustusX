@@ -105,13 +105,6 @@ int Ur5MessageDecoder::pickInteger(QByteArray data,int pos)
     return data.mid(pos,sizeof(int)).toHex().toInt(&ok,16);
 }
 
-double Ur5MessageDecoder::pickDouble(QByteArray data, int pos)
-{
-    double val = 0;
-    sscanf_s(data.mid(pos*sizeof(double),sizeof(double)).toHex().data(), "%llx",val);
-    return val;
-}
-
 int Ur5MessageDecoder::headerID(QByteArray data)
 {
     bool ok;
