@@ -59,6 +59,13 @@ QByteArray Ur5TestFixture::getTestData(int packetSize)
         if (!file.open(QIODevice::ReadOnly)) return QByteArray();
         return QByteArray::fromHex(file.readAll());
     }
+    else if(packetSize == 1460)
+    {
+        QString filename = "C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/testing/test.data/cxDataFromRobot1460.txt";
+        QFile file(filename);
+        if (!file.open(QIODevice::ReadOnly)) return QByteArray();
+        return QByteArray::fromHex(file.readAll());
+    }
     else
     {
         return QByteArray(0);
