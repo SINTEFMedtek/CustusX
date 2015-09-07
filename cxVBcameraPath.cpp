@@ -45,8 +45,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx {
 
-CXVBcameraPath::CXVBcameraPath(TrackingServicePtr tracker, PatientModelServicePtr patientModel, vtkCamera *camera) :
-	mTrackingService(tracker), mPatientModelService(patientModel), mCamera(camera)
+CXVBcameraPath::CXVBcameraPath(TrackingServicePtr tracker, PatientModelServicePtr patientModel) :
+	mTrackingService(tracker), mPatientModelService(patientModel)
 {
 	mManualTool = mTrackingService->getManualTool();
 }

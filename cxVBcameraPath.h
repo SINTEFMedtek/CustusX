@@ -39,7 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVector3D.h"
 
 typedef vtkSmartPointer<class vtkCardinalSpline> vtkCardinalSplinePtr;
-class vtkCamera;
 
 namespace cx {
 
@@ -67,7 +66,6 @@ private:
 	TrackingServicePtr			mTrackingService;
 	PatientModelServicePtr		mPatientModelService;
 	ToolPtr						mManualTool;
-	vtkCamera*					mCamera;
 
 	int							mNumberOfInputPoints;
 	Vector3D					mLastCameraPos_r;
@@ -78,8 +76,7 @@ private:
 	void updateManualToolPosition();
 
 public:
-	CXVBcameraPath(TrackingServicePtr tracker, PatientModelServicePtr patientModel,
-				   vtkCamera* camera);
+	CXVBcameraPath(TrackingServicePtr tracker, PatientModelServicePtr patientModel);
 
 public slots:
 	void cameraRawPointsSlot(MeshPtr mesh);

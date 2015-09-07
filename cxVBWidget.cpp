@@ -39,7 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QGridLayout>
 #include <QLabel>
 #include <QDial>
-#include "vtkRenderer.h"
 
 #include "cxVBWidget.h"
 #include "cxPatientModelServiceProxy.h"
@@ -65,7 +64,6 @@ VBWidget::VBWidget(ctkPluginContext *context, QWidget *parent) :
 	mPatientModelService = PatientModelServicePtr(new PatientModelServiceProxy(context));
 	mVisualizationService = VisualizationServicePtr(new VisualizationServiceProxy(context));
 	mTrackingService = TrackingServiceProxy::create(context);
-	mCamera = mVisualizationService->get3DView()->getRenderer()->GetActiveCamera();
 
 	mRouteToTarget = StringPropertySelectMesh::New(mPatientModelService);
 	mRouteToTarget->setValueName("Route to target path: ");
@@ -120,7 +118,7 @@ VBWidget::VBWidget(ctkPluginContext *context, QWidget *parent) :
 
 	this->enableControls(false);
 
-	mCameraPath = new CXVBcameraPath(mTrackingService, mPatientModelService, mCamera);
+	mCameraPath = new CXVBcameraPath(mTrackingService, mPatientModelService);
 
 	connect(mRouteToTarget.get(), &SelectDataStringPropertyBase::dataChanged,
 			this, &VBWidget::inputChangedSlot);
