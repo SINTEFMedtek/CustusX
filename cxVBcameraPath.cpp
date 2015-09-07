@@ -41,12 +41,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMesh.h"
 #include "cxTrackingService.h"
 #include "cxPatientModelService.h"
+#include "cxViewServiceProxy.h"
+#include "cxView.h"
+
 
 
 namespace cx {
 
-CXVBcameraPath::CXVBcameraPath(TrackingServicePtr tracker, PatientModelServicePtr patientModel) :
-	mTrackingService(tracker), mPatientModelService(patientModel)
+CXVBcameraPath::CXVBcameraPath(TrackingServicePtr tracker, PatientModelServicePtr patientModel, VisualizationServicePtr visualization) :
+	mTrackingService(tracker), mPatientModelService(patientModel), mVisualizationService(visualization)
 {
 	mManualTool = mTrackingService->getManualTool();
 }
@@ -164,6 +167,7 @@ void CXVBcameraPath::cameraViewAngleSlot(int angle)
 //	std::cout << "CXVBcameraPath::cameraViewAngleSlot : " << angle << std::endl;
 	mLastCameraViewAngle = static_cast<double>(angle) * (M_PI / 180);
 	this->updateManualToolPosition();
+	mVisualizationService->get3DView()->setModified();
 }
 
 void CXVBcameraPath::cameraRotateAngleSlot(int angle)
@@ -171,6 +175,7 @@ void CXVBcameraPath::cameraRotateAngleSlot(int angle)
 	std::cout << "CXVBcameraPath::cameraRotateAngleSlot : " << angle << std::endl;
 	mLastCameraRotAngle = static_cast<double>(angle) * (M_PI / 180);
 	this->updateManualToolPosition();
+	mVisualizationService->get3DView()->setModified();
 }
 
 

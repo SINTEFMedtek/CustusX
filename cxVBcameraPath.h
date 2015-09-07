@@ -42,8 +42,6 @@ typedef vtkSmartPointer<class vtkCardinalSpline> vtkCardinalSplinePtr;
 
 namespace cx {
 
-typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
-
 /**
  * Class for storing and processing the virtual
  * endoscope camera path when performing
@@ -65,6 +63,7 @@ private:
 	vtkCardinalSplinePtr		mSplineZ;
 	TrackingServicePtr			mTrackingService;
 	PatientModelServicePtr		mPatientModelService;
+	VisualizationServicePtr		mVisualizationService;
 	ToolPtr						mManualTool;
 
 	int							mNumberOfInputPoints;
@@ -76,7 +75,8 @@ private:
 	void updateManualToolPosition();
 
 public:
-	CXVBcameraPath(TrackingServicePtr tracker, PatientModelServicePtr patientModel);
+	CXVBcameraPath(TrackingServicePtr tracker, PatientModelServicePtr patientModel,
+				   VisualizationServicePtr visualization);
 
 public slots:
 	void cameraRawPointsSlot(MeshPtr mesh);

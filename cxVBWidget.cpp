@@ -118,7 +118,7 @@ VBWidget::VBWidget(ctkPluginContext *context, QWidget *parent) :
 
 	this->enableControls(false);
 
-	mCameraPath = new CXVBcameraPath(mTrackingService, mPatientModelService);
+	mCameraPath = new CXVBcameraPath(mTrackingService, mPatientModelService, mVisualizationService);
 
 	connect(mRouteToTarget.get(), &SelectDataStringPropertyBase::dataChanged,
 			this, &VBWidget::inputChangedSlot);
