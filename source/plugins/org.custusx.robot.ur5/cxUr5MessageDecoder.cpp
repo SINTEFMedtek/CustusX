@@ -25,7 +25,7 @@ Ur5State Ur5MessageDecoder::analyzeRawPacket(QByteArray packet)
 
 Ur5State Ur5MessageDecoder::setState(QByteArray data)
 {
-    Ur5State state;
+    Ur5State state(false);
 
     for(int i=0;i<data.size();i++)
     {
