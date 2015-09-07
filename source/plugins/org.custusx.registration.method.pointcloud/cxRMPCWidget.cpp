@@ -37,7 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackingService.h"
 #include "cxMesh.h"
 #include "cxSelectDataStringProperty.h"
-#include "cxTrackedCenterlineWidget.h"
 #include "cxRecordSessionWidget.h"
 #include "cxRecordSession.h"
 #include "cxView.h"
@@ -84,7 +83,7 @@ RMPCWidget::RMPCWidget(RegServices services, QWidget* parent) :
 	connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
 	mRegisterButton->setToolTip(this->defaultWhatsThis());
 
-	mRecordTrackingWidget = new RecordTrackingWidget(mServices, this);
+	mRecordTrackingWidget = new RecordTrackingWidget(mServices.acquisitionService, mServices, this);
 
 	mVerticalLayout->setMargin(0);
 	mVerticalLayout->addWidget(new DataSelectWidget(mServices.visualizationService, mServices.patientModelService, this, mSurfaceSelector));

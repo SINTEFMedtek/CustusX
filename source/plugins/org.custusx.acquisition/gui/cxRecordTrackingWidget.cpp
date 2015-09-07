@@ -51,11 +51,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-RecordTrackingWidget::RecordTrackingWidget(RegServices services, QWidget* parent) :
+RecordTrackingWidget::RecordTrackingWidget(AcquisitionServicePtr acquisitionService, VisServices services, QWidget* parent) :
 	QWidget(parent),
-	mServices(services)
+	mServices(services),
+  mAcquisitionService(acquisitionService)
 {
-	mVerticalLayout = new QVBoxLayout(this);
+	QVBoxLayout* mVerticalLayout = new QVBoxLayout(this);
 	mOptions = profile()->getXmlSettings().descend("RecordTrackingWidget");
 
 	mToolSelector = StringPropertySelectTool::New(services.getToolManager());
@@ -64,7 +65,7 @@ RecordTrackingWidget::RecordTrackingWidget(RegServices services, QWidget* parent
 	this->initSessionSelector();
 
 	AcquisitionService::TYPES context(AcquisitionService::tTRACKING);
-	mRecordSessionWidget.reset(new RecordSessionWidget(services.acquisitionService, this, context, "Surface tracker data"));
+	mRecordSessionWidget.reset(new RecordSessionWidget(mAcquisitionService, this, context, "Surface tracker data"));
 	mRecordSessionWidget->setDescriptionVisibility(false);
 
 	mVerticalLayout->setMargin(0);
@@ -90,7 +91,7 @@ void RecordTrackingWidget::initSessionSelector()
 
 QStringList RecordTrackingWidget::getSessionList()
 {
-	std::vector<RecordSessionPtr> sessions = mServices.acquisitionService->getSessions();
+	std::vector<RecordSessionPtr> sessions = mAcquisitionService->getSessions();
 	std::vector<RecordSessionPtr>::iterator it = sessions.begin();
 	QStringList sessionUids;
 
@@ -129,7 +130,7 @@ void RecordTrackingWidget::acquisitionStopped()
 {
 //	std::cout << "acquisitionStopped" << std::endl;
 
-	QString newUid = mServices.acquisitionService->getLatestSession()->getUid();
+	QString newUid = mAcquisitionService->getLatestSession()->getUid();
 	QStringList range = mSessionSelector->getValueRange();
 	range << newUid;
 	mSessionSelector->setValueRange(range);
@@ -176,22 +177,22 @@ ToolRep3DPtr RecordTrackingWidget::getToolRepIn3DView()
 void RecordTrackingWidget::obscuredSlot(bool obscured)
 {
 	if (obscured)
-		mServices.acquisitionService->cancelRecord();
+		mAcquisitionService->cancelRecord();
 //	std::cout << "obscuredSlot: " << obscured << std::endl;
 
 	if (!obscured)
 	{
-		connect(mServices.acquisitionService.get(), &AcquisitionService::started, this, &RecordTrackingWidget::acquisitionStarted);
-		connect(mServices.acquisitionService.get(), &AcquisitionService::acquisitionStopped, this, &RecordTrackingWidget::acquisitionStopped, Qt::QueuedConnection);
-		connect(mServices.acquisitionService.get(), &AcquisitionService::cancelled, this, &RecordTrackingWidget::acquisitionCancelled);
-		connect(mServices.acquisitionService.get(), &AcquisitionService::recordedSessionsChanged, this, &RecordTrackingWidget::recordedSessionsChanged);
+		connect(mAcquisitionService.get(), &AcquisitionService::started, this, &RecordTrackingWidget::acquisitionStarted);
+		connect(mAcquisitionService.get(), &AcquisitionService::acquisitionStopped, this, &RecordTrackingWidget::acquisitionStopped, Qt::QueuedConnection);
+		connect(mAcquisitionService.get(), &AcquisitionService::cancelled, this, &RecordTrackingWidget::acquisitionCancelled);
+		connect(mAcquisitionService.get(), &AcquisitionService::recordedSessionsChanged, this, &RecordTrackingWidget::recordedSessionsChanged);
 	}
 	else
 	{
-		disconnect(mServices.acquisitionService.get(), &AcquisitionService::started, this, &RecordTrackingWidget::acquisitionStarted);
-		disconnect(mServices.acquisitionService.get(), &AcquisitionService::acquisitionStopped, this, &RecordTrackingWidget::acquisitionStopped);
-		disconnect(mServices.acquisitionService.get(), &AcquisitionService::cancelled, this, &RecordTrackingWidget::acquisitionCancelled);
-		disconnect(mServices.acquisitionService.get(), &AcquisitionService::recordedSessionsChanged, this, &RecordTrackingWidget::recordedSessionsChanged);
+		disconnect(mAcquisitionService.get(), &AcquisitionService::started, this, &RecordTrackingWidget::acquisitionStarted);
+		disconnect(mAcquisitionService.get(), &AcquisitionService::acquisitionStopped, this, &RecordTrackingWidget::acquisitionStopped);
+		disconnect(mAcquisitionService.get(), &AcquisitionService::cancelled, this, &RecordTrackingWidget::acquisitionCancelled);
+		disconnect(mAcquisitionService.get(), &AcquisitionService::recordedSessionsChanged, this, &RecordTrackingWidget::recordedSessionsChanged);
 	}
 
 //	ToolRep3DPtr activeRep3D = this->getToolRepIn3DView();
@@ -224,7 +225,7 @@ TimedTransformMap RecordTrackingWidget::getRecordedTrackerData_prMt()
 	RecordSessionPtr session;
 	QString sessionUid = mSessionSelector->getValue();
 	if(!sessionUid.isEmpty())
-		session = mServices.acquisitionService->getSession(sessionUid);
+		session = mAcquisitionService->getSession(sessionUid);
 	if(!session)
 		reportError("No session");
 

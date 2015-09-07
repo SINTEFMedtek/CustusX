@@ -37,7 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackingService.h"
 #include "cxMesh.h"
 #include "cxSelectDataStringProperty.h"
-#include "cxTrackedCenterlineWidget.h"
 #include "cxRecordSessionWidget.h"
 #include "cxRecordSession.h"
 #include "cxView.h"

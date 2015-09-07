@@ -5,7 +5,6 @@ set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 set(PLUGIN_SRCS
     cxRMPCPluginActivator.h
     cxRMPCPluginActivator.cpp
-	cxRecordTrackingWidget.cpp
 
 	cxRMPCService.cpp
 	cxRMPCFromPointerService.cpp
@@ -20,7 +19,6 @@ set(PLUGIN_MOC_SRCS
 	cxRMPCFromPointerService.h
 	cxRMPCWidget.h
 	cxRMPCFromPointerWidget.h
-	cxRecordTrackingWidget.h
 )
 
 cx_create_export_header(${PROJECT_NAME})

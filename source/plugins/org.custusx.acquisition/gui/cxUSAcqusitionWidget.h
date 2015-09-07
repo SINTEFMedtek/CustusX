@@ -33,9 +33,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXUSACQUSITIONWIDGET_H_
 #define CXUSACQUSITIONWIDGET_H_
 
+#include "cxBaseWidget.h"
+#include "cxAcquisitionService.h"
 #include "org_custusx_acquisition_Export.h"
 
-#include "cxRecordBaseWidget.h"
 
 namespace cx
 {

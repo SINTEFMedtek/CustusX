@@ -34,11 +34,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QPushButton>
 #include <QDomElement>
-#include "cxRegistrationBaseWidget.h"
 #include "cxForwardDeclarations.h"
 #include "cxXmlOptionItem.h"
 #include "cxTool.h"
-
+#include "cxVisServices.h"
 
 namespace cx
 {
@@ -64,7 +63,7 @@ class RecordTrackingWidget: public QWidget
 	Q_OBJECT
 
 public:
-	RecordTrackingWidget(RegServices services, QWidget *parent);
+	RecordTrackingWidget(AcquisitionServicePtr acquisitionService, VisServices services, QWidget *parent);
 	virtual ~RecordTrackingWidget()	{}
 
 	ToolPtr getSuitableRecordingTool();
@@ -80,8 +79,8 @@ private slots:
 	void acquisitionCancelled();
 	void recordedSessionsChanged();
 private:
-	RegServices mServices;
-	QVBoxLayout* mVerticalLayout;
+	VisServices mServices;
+	AcquisitionServicePtr mAcquisitionService;
 	XmlOptionFile mOptions;
 
 	RecordSessionWidgetPtr mRecordSessionWidget;
