@@ -150,11 +150,11 @@ void Ur5MessageDecoder::setCartData(QByteArray cartData,Ur5State &state)
     {
         if(i<3)
         {
-            sscanf_s(cartData.mid(i*sizeof(double),sizeof(double)).toHex().data(), "%llx",(unsigned long long *)&state.cartAxis(i));
+            state.cartAxis(i) = pickDouble(cartData,i*sizeof(double));
         }
         else
         {
-            sscanf_s(cartData.mid(i*sizeof(double),sizeof(double)).toHex().data(), "%llx",(unsigned long long *)&state.cartAngles(i-3));
+            state.cartAngles(i-3) = pickDouble(cartData,i*sizeof(double));
         }
     }
 }
