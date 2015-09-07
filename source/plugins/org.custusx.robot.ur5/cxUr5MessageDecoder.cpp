@@ -2,6 +2,7 @@
 #include "cxVector3D.h"
 #include <set>
 #include "cxUr5State.h"
+#include <QDataStream>
 
 namespace cx
 {
