@@ -269,9 +269,6 @@ public:
 		if (!mContext)
 			return;
 		mRegistrator.computeDistances(mContext);
-//		vtkPolyDataPtr temp = mRegistrator.convertToPolyData(mContext->mSourcePoints);
-//		mMovingData->SetPoints(temp->GetPoints());
-//		mMovingData->SetVerts(temp->GetVerts());
 
 		vtkPolyDataPtr moving = mContext->getMovingPoints();
 		mMovingData->SetPoints(moving->GetPoints());
@@ -280,18 +277,6 @@ public:
 		vtkPolyDataPtr fixed = mContext->getFixedPoints();
 		mFixedData->SetPoints(fixed->GetPoints());
 		mFixedData->SetVerts(fixed->GetVerts());
-
-		//		// draw lines: slow but nice
-		//		mLines.clear();
-		//		View* view = mServices.visualizationService->get3DView();
-		//		for (int i=0; i<mContext->mSortedSourcePoints->GetNumberOfPoints(); ++i)
-		//		{
-		//			GraphicalLine3DPtr line(new GraphicalLine3D(view->getRenderer()));
-		//			line->setValue(Vector3D(mContext->mSortedSourcePoints->GetPoint(i)),
-		//				Vector3D(mContext->mSortedTargetPoints->GetPoint(i)));
-		//			line->setColor(Vector3D(1,0,0));
-		//			mLines.push_back(line);
-		//		}
 
 		// draw lines
 		mPolyLines->Allocate();

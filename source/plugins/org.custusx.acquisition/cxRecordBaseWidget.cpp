@@ -49,44 +49,44 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-RecordBaseWidget::RecordBaseWidget(AcquisitionServicePtr acquisitionService, QWidget* parent, QString description):
-    BaseWidget(parent, "RecordBaseWidget", "Record Base"),
-	mAcquisitionService(acquisitionService),
-    mLayout(new QVBoxLayout(this))
-{
-	this->setObjectName("RecordBaseWidget");
-	this->setWindowTitle("Record Base");
+//RecordBaseWidget::RecordBaseWidget(AcquisitionServicePtr acquisitionService, QWidget* parent, QString description):
+//    BaseWidget(parent, "RecordBaseWidget", "Record Base"),
+//	mAcquisitionService(acquisitionService),
+//    mLayout(new QVBoxLayout(this))
+//{
+//	this->setObjectName("RecordBaseWidget");
+//	this->setWindowTitle("Record Base");
 
-	mRecordSessionWidget = new RecordSessionWidget(mAcquisitionService, this, description);
-	mLayout->addWidget(mRecordSessionWidget);
-}
+//	mRecordSessionWidget = new RecordSessionWidget(mAcquisitionService, this, description);
+//	mLayout->addWidget(mRecordSessionWidget);
+//}
 
-RecordBaseWidget::~RecordBaseWidget()
-{}
+//RecordBaseWidget::~RecordBaseWidget()
+//{}
 
+//////----------------------------------------------------------------------------------------------------------------------
+//////----------------------------------------------------------------------------------------------------------------------
+//////----------------------------------------------------------------------------------------------------------------------
+
+//TrackedRecordWidget::TrackedRecordWidget(AcquisitionServicePtr acquisitionService, QWidget* parent, QString description) :
+//  RecordBaseWidget(acquisitionService, parent, description)
+//{}
+
+//TrackedRecordWidget::~TrackedRecordWidget()
+//{}
+
+//void TrackedRecordWidget::setTool(ToolPtr tool)
+//{
+//  if(mTool && tool && (mTool->getUid() == tool->getUid()))
+//    return;
+
+//  mTool = tool;
+//  emit toolChanged();
+//}
+
+//ToolPtr TrackedRecordWidget::getTool()
+//{
+//  return mTool;
+//}
 ////----------------------------------------------------------------------------------------------------------------------
-////----------------------------------------------------------------------------------------------------------------------
-////----------------------------------------------------------------------------------------------------------------------
-
-TrackedRecordWidget::TrackedRecordWidget(AcquisitionServicePtr acquisitionService, QWidget* parent, QString description) :
-  RecordBaseWidget(acquisitionService, parent, description)
-{}
-
-TrackedRecordWidget::~TrackedRecordWidget()
-{}
-
-void TrackedRecordWidget::setTool(ToolPtr tool)
-{
-  if(mTool && tool && (mTool->getUid() == tool->getUid()))
-    return;
-
-  mTool = tool;
-  emit toolChanged();
-}
-
-ToolPtr TrackedRecordWidget::getTool()
-{
-  return mTool;
-}
-//----------------------------------------------------------------------------------------------------------------------
 }//namespace cx

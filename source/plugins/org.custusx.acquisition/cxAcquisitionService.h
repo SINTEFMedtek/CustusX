@@ -60,6 +60,15 @@ class org_custusx_acquisition_EXPORT AcquisitionService : public QObject
 public:
 	virtual ~AcquisitionService() {}
 
+	enum TYPE
+	{
+		tTRACKING,
+		tUS,
+		tCOUNT
+	};
+	typedef QFlags<TYPE> TYPES;
+//	Q_DECLARE_FLAGS( TYPES, TYPE);
+
 	enum STATE
 	{
 		sRUNNING = 0,
@@ -75,11 +84,11 @@ public:
 	virtual RecordSessionPtr getLatestSession() = 0;
 	virtual std::vector<RecordSessionPtr> getSessions() = 0;
 
-	virtual bool isReady() const = 0;
-	virtual QString getInfoText() const = 0;
+	virtual bool isReady(TYPES context) const = 0;
+	virtual QString getInfoText(TYPES context) const = 0;
 	virtual STATE getState() const = 0;
-	virtual void toggleRecord() = 0;
-	virtual void startRecord() = 0;
+	virtual void toggleRecord(TYPES context) = 0;
+	virtual void startRecord(TYPES context) = 0;
 	virtual void stopRecord() = 0;
 	virtual void cancelRecord() = 0;
 	virtual void startPostProcessing() = 0;

@@ -51,172 +51,172 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-TrackedCenterlineWidget::TrackedCenterlineWidget(AcquisitionServicePtr acquisitionService, VisServicesPtr services, QWidget* parent) :
-	TrackedRecordWidget(acquisitionService, parent, "Tracked centerline")
-{
-	this->setObjectName("TrackedCenterlineWidget");
-	this->setWindowTitle("Tracked Centerline");
-	this->setToolTip("Record the tool movement as a centerline");
+//TrackedCenterlineWidget::TrackedCenterlineWidget(AcquisitionServicePtr acquisitionService, VisServicesPtr services, QWidget* parent) :
+//	TrackedRecordWidget(acquisitionService, parent, "Tracked centerline")
+//{
+//	this->setObjectName("TrackedCenterlineWidget");
+//	this->setWindowTitle("Tracked Centerline");
+//	this->setToolTip("Record the tool movement as a centerline");
 
-	mServices = services;
-	connect(mServices->getToolManager().get(), &TrackingService::stateChanged, this, &TrackedCenterlineWidget::checkIfReadySlot);
-	mLayout->addStretch();
+//	mServices = services;
+//	connect(mServices->getToolManager().get(), &TrackingService::stateChanged, this, &TrackedCenterlineWidget::checkIfReadySlot);
+//	mLayout->addStretch();
 
-	this->checkIfReadySlot();
-}
+//	this->checkIfReadySlot();
+//}
 
-TrackedCenterlineWidget::~TrackedCenterlineWidget()
-{}
+//TrackedCenterlineWidget::~TrackedCenterlineWidget()
+//{}
 
-void TrackedCenterlineWidget::checkIfReadySlot()
-{
-  if(mServices->getToolManager()->getState()>=Tool::tsTRACKING)
-  {
-    mRecordSessionWidget->setReady(true, "<font color=green>Ready to record!</font>\n");
-  }
-  else
-  {
-    mRecordSessionWidget->setReady(false, "<font color=red>Need to start tracking.</font>\n");
-  }
-}
-
-void TrackedCenterlineWidget::postProcessingSlot(QString sessionId)
-{
-//  RecordSessionPtr session = mPluginData->getRecordSession(sessionId);
-//
-//  //get the transforms from the session
-//  TimedTransformMap transforms_prMt = this->getRecording(session);
-//  if(transforms_prMt.empty())
+//void TrackedCenterlineWidget::checkIfReadySlot()
+//{
+//  if(mServices->getToolManager()->getState()>=Tool::tsTRACKING)
 //  {
-//    reportError("Could not find any tracking data from session "+sessionId+". Aborting volume tracking data generation.");
-//    return;
+//    mRecordSessionWidget->setReady(true, "<font color=green>Ready to record!</font>\n");
 //  }
-//
-//  //visualize the tracked data as a mesh
-//  loadMeshFromToolTransforms(transforms_prMt);
-//
-//  //convert the transforms into a binary image
-//  TrackingDataToVolume converter;
-//  int padding = 10;
-//  converter.setInput(transforms_prMt, padding);
-//  ImagePtr image_d = converter.getOutput();
-//
-//  //extract the centerline
-//  QString savepath = patientService()->getPatientData()->getActivePatientFolder();
-//  mCenterlineAlgorithm.setInput(image_d, savepath);
-  mSessionID = sessionId;
-//  mCenterlineAlgorithm.execute();
-//  mRecordSessionWidget->setReady(false, "<font color=orange>Generating centerline... Please wait!</font>\n");
-}
+//  else
+//  {
+//    mRecordSessionWidget->setReady(false, "<font color=red>Need to start tracking.</font>\n");
+//  }
+//}
 
-void TrackedCenterlineWidget::preprocessResampler()
-{
-	RecordSessionPtr session = mAcquisitionService->getSession(mSessionID);
+//void TrackedCenterlineWidget::postProcessingSlot(QString sessionId)
+//{
+////  RecordSessionPtr session = mPluginData->getRecordSession(sessionId);
+////
+////  //get the transforms from the session
+////  TimedTransformMap transforms_prMt = this->getRecording(session);
+////  if(transforms_prMt.empty())
+////  {
+////    reportError("Could not find any tracking data from session "+sessionId+". Aborting volume tracking data generation.");
+////    return;
+////  }
+////
+////  //visualize the tracked data as a mesh
+////  loadMeshFromToolTransforms(transforms_prMt);
+////
+////  //convert the transforms into a binary image
+////  TrackingDataToVolume converter;
+////  int padding = 10;
+////  converter.setInput(transforms_prMt, padding);
+////  ImagePtr image_d = converter.getOutput();
+////
+////  //extract the centerline
+////  QString savepath = patientService()->getPatientData()->getActivePatientFolder();
+////  mCenterlineAlgorithm.setInput(image_d, savepath);
+//  mSessionID = sessionId;
+////  mCenterlineAlgorithm.execute();
+////  mRecordSessionWidget->setReady(false, "<font color=orange>Generating centerline... Please wait!</font>\n");
+//}
 
-	//get the transforms from the session
-	TimedTransformMap transforms_prMt = this->getRecording(session);
-	if(transforms_prMt.empty())
-	{
-		reportError("Could not find any tracking data from session "+mSessionID+". Aborting volume tracking data generation.");
-		return;
-	}
+//void TrackedCenterlineWidget::preprocessResampler()
+//{
+//	RecordSessionPtr session = mAcquisitionService->getSession(mSessionID);
 
-	//visualize the tracked data as a mesh
-	loadMeshFromToolTransforms(mServices->getPatientService(), transforms_prMt);
+//	//get the transforms from the session
+//	TimedTransformMap transforms_prMt = this->getRecording(session);
+//	if(transforms_prMt.empty())
+//	{
+//		reportError("Could not find any tracking data from session "+mSessionID+". Aborting volume tracking data generation.");
+//		return;
+//	}
 
-	//convert the transforms into a binary image
-//	TrackingDataToVolume converter;
-//	int padding = 10;
-//	converter.setInput(transforms_prMt, padding);
-//	ImagePtr image_d = converter.getOutput();
+//	//visualize the tracked data as a mesh
+//	loadMeshFromToolTransforms(mServices->getPatientService(), transforms_prMt);
 
-	//extract the centerline
-//	QString savepath = patientService()->getPatientData()->getActivePatientFolder();
-//	mCenterlineAlgorithm.setInput(image_d, savepath);
-	mRecordSessionWidget->setReady(false, "<font color=orange>Generating centerline... Please wait!</font>\n");
-}
+//	//convert the transforms into a binary image
+////	TrackingDataToVolume converter;
+////	int padding = 10;
+////	converter.setInput(transforms_prMt, padding);
+////	ImagePtr image_d = converter.getOutput();
+
+//	//extract the centerline
+////	QString savepath = patientService()->getPatientData()->getActivePatientFolder();
+////	mCenterlineAlgorithm.setInput(image_d, savepath);
+//	mRecordSessionWidget->setReady(false, "<font color=orange>Generating centerline... Please wait!</font>\n");
+//}
 
 
-void TrackedCenterlineWidget::centerlineFinishedSlot()
-{
-  this->checkIfReadySlot();
-}
+//void TrackedCenterlineWidget::centerlineFinishedSlot()
+//{
+//  this->checkIfReadySlot();
+//}
 
-void TrackedCenterlineWidget::startedSlot(QString sessionId)
-{
-  //show preview of tool path
-  TrackingService::ToolMap tools = mServices->getToolManager()->getTools();
-  TrackingService::ToolMap::iterator toolIt = tools.begin();
+//void TrackedCenterlineWidget::startedSlot(QString sessionId)
+//{
+//  //show preview of tool path
+//  TrackingService::ToolMap tools = mServices->getToolManager()->getTools();
+//  TrackingService::ToolMap::iterator toolIt = tools.begin();
 
-  ToolRep3DPtr activeRep3D;
-  for(; toolIt != tools.end(); ++toolIt)
-  {
-	  activeRep3D = mServices->visualizationService->get3DReps()->findFirst<ToolRep3D>(toolIt->second);
-    if(!activeRep3D)
-      continue;
-    activeRep3D->getTracer()->clear();
-    activeRep3D->getTracer()->start();
-  }
-}
+//  ToolRep3DPtr activeRep3D;
+//  for(; toolIt != tools.end(); ++toolIt)
+//  {
+//	  activeRep3D = mServices->visualizationService->get3DReps()->findFirst<ToolRep3D>(toolIt->second);
+//    if(!activeRep3D)
+//      continue;
+//    activeRep3D->getTracer()->clear();
+//    activeRep3D->getTracer()->start();
+//  }
+//}
 
-void TrackedCenterlineWidget::stoppedSlot(bool)
-{
-  //hide preview of tool path
-  TrackingService::ToolMap tools = mServices->getToolManager()->getTools();
-  TrackingService::ToolMap::iterator toolIt = tools.begin();
+//void TrackedCenterlineWidget::stoppedSlot(bool)
+//{
+//  //hide preview of tool path
+//  TrackingService::ToolMap tools = mServices->getToolManager()->getTools();
+//  TrackingService::ToolMap::iterator toolIt = tools.begin();
 
-  ToolRep3DPtr activeRep3D;
-  for(; toolIt != tools.end(); ++toolIt)
-  {
-	activeRep3D = mServices->visualizationService->get3DReps()->findFirst<ToolRep3D>(toolIt->second);
-    if(!activeRep3D)
-      continue;
-    if (activeRep3D->getTracer()->isRunning())
-    {
-      activeRep3D->getTracer()->stop();
-      activeRep3D->getTracer()->clear();
-    }
-  }
-}
-TimedTransformMap TrackedCenterlineWidget::getRecording(RecordSessionPtr session)
-{
-  TimedTransformMap retval;
+//  ToolRep3DPtr activeRep3D;
+//  for(; toolIt != tools.end(); ++toolIt)
+//  {
+//	activeRep3D = mServices->visualizationService->get3DReps()->findFirst<ToolRep3D>(toolIt->second);
+//    if(!activeRep3D)
+//      continue;
+//    if (activeRep3D->getTracer()->isRunning())
+//    {
+//      activeRep3D->getTracer()->stop();
+//      activeRep3D->getTracer()->clear();
+//    }
+//  }
+//}
+//TimedTransformMap TrackedCenterlineWidget::getRecording(RecordSessionPtr session)
+//{
+//  TimedTransformMap retval;
 
-  double startTime = session->getStartTime();
-  double stopTime = session->getStopTime();
+//  double startTime = session->getStartTime();
+//  double stopTime = session->getStopTime();
 
-  ToolPtr tool = this->findTool(startTime, stopTime);
-  if(!tool)
-  {
-	reportWarning("Found no tool with tracking data from the given session.");
-    return retval;
-  }
-  this->setTool(tool);
-  retval = tool->getSessionHistory(startTime, stopTime);
+//  ToolPtr tool = this->findTool(startTime, stopTime);
+//  if(!tool)
+//  {
+//	reportWarning("Found no tool with tracking data from the given session.");
+//    return retval;
+//  }
+//  this->setTool(tool);
+//  retval = tool->getSessionHistory(startTime, stopTime);
 
-  return retval;
-}
+//  return retval;
+//}
 
-ToolPtr TrackedCenterlineWidget::findTool(double startTime, double stopTime)
-{
-  ToolPtr retval;
+//ToolPtr TrackedCenterlineWidget::findTool(double startTime, double stopTime)
+//{
+//  ToolPtr retval;
 
-  SessionToolHistoryMap toolTransformMap = mServices->getToolManager()->getSessionHistory(startTime, stopTime);
-  if(toolTransformMap.size() == 1)
-  {
-	report("Found one tool("+toolTransformMap.begin()->first->getName()+") with relevant data.");
-	retval = toolTransformMap.begin()->first;
-  }
-  else if(toolTransformMap.size() > 1)
-  {
-	reportWarning("Found more than one tool with relevant data, user needs to choose which one to use for tracked centerline extraction.");
-    //TODO make the user select which tool they wanna use!!! Pop-up???
-	retval = toolTransformMap.begin()->first;
-    //TODO
-  }else if(toolTransformMap.empty())
-  {
-	reportWarning("Could not find any session history for given session.");
-  }
-  return retval;
-}
+//  SessionToolHistoryMap toolTransformMap = mServices->getToolManager()->getSessionHistory(startTime, stopTime);
+//  if(toolTransformMap.size() == 1)
+//  {
+//	report("Found one tool("+toolTransformMap.begin()->first->getName()+") with relevant data.");
+//	retval = toolTransformMap.begin()->first;
+//  }
+//  else if(toolTransformMap.size() > 1)
+//  {
+//	reportWarning("Found more than one tool with relevant data, user needs to choose which one to use for tracked centerline extraction.");
+//    //TODO make the user select which tool they wanna use!!! Pop-up???
+//	retval = toolTransformMap.begin()->first;
+//    //TODO
+//  }else if(toolTransformMap.empty())
+//  {
+//	reportWarning("Could not find any session history for given session.");
+//  }
+//  return retval;
+//}
 }//namespace cx

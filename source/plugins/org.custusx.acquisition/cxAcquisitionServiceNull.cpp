@@ -57,13 +57,13 @@ std::vector<RecordSessionPtr> AcquisitionServiceNull::getSessions()
 	return std::vector<RecordSessionPtr>();
 }
 
-bool AcquisitionServiceNull::isReady() const
+bool AcquisitionServiceNull::isReady(TYPES context) const
 {
 	printWarning();
 	return false;
 }
 
-QString AcquisitionServiceNull::getInfoText() const
+QString AcquisitionServiceNull::getInfoText(TYPES context) const
 {
 	printWarning();
 	return QString();
@@ -75,12 +75,12 @@ AcquisitionService::STATE AcquisitionServiceNull::getState() const
 	return AcquisitionService::sNOT_RUNNING;
 }
 
-void AcquisitionServiceNull::toggleRecord()
+void AcquisitionServiceNull::toggleRecord(TYPES context)
 {
 	printWarning();
 }
 
-void AcquisitionServiceNull::startRecord()
+void AcquisitionServiceNull::startRecord(TYPES context)
 {
 	printWarning();
 }

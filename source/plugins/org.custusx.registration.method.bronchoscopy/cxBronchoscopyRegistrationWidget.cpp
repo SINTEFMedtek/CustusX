@@ -95,7 +95,8 @@ BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegServices servi
 
 //    mTrackedCenterLine = new TrackedCenterlineWidget(mAcquisitionData, this);
 
-	mRecordSessionWidget.reset(new RecordSessionWidget(services.acquisitionService, this, "Bronchoscope path", false));
+	AcquisitionService::TYPES context(AcquisitionService::tTRACKING);
+	mRecordSessionWidget.reset(new RecordSessionWidget(services.acquisitionService, this, context, "Bronchoscope path"));
 
 	mVerticalLayout->setMargin(0);
 	mVerticalLayout->addWidget(new DataSelectWidget(mServices.visualizationService, mServices.patientModelService, this, mSelectMeshWidget));

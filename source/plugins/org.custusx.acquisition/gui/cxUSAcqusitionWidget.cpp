@@ -62,12 +62,17 @@ namespace cx
 {
 
 USAcqusitionWidget::USAcqusitionWidget(AcquisitionServicePtr acquisitionService, VisServicesPtr services, UsReconstructionServicePtr usReconstructionService, QWidget* parent) :
-	RecordBaseWidget(acquisitionService, parent, settings()->value("Ultrasound/acquisitionName").toString()),
-	mUsReconstructionService(usReconstructionService)
+	BaseWidget(parent, "org_custusx_acquisition_widgets_acquisition", "US Acquisition"),
+	mUsReconstructionService(usReconstructionService),
+	mAcquisitionService(acquisitionService),
+	mLayout(new QVBoxLayout(this))
 {
-	this->setObjectName("org_custusx_acquisition_widgets_acquisition");
-	this->setWindowTitle("US Acquisition");
 	this->setToolTip("Record and reconstruct US data");
+
+	QString desc = settings()->value("Ultrasound/acquisitionName").toString();
+	AcquisitionService::TYPES context(AcquisitionService::tUS);
+	mRecordSessionWidget = new RecordSessionWidget(mAcquisitionService, this, context, desc);
+	mLayout->addWidget(mRecordSessionWidget);
 
 	mServices = services;
 	connect(mUsReconstructionService.get(), &UsReconstructionService::reconstructAboutToStart, this, &USAcqusitionWidget::reconstructAboutToStartSlot);
@@ -95,7 +100,7 @@ USAcqusitionWidget::USAcqusitionWidget(AcquisitionServicePtr acquisitionService,
 	QGridLayout* editsLayout = new QGridLayout;
 	editsLayout->setColumnStretch(0,0);
 	editsLayout->setColumnStretch(1,1);
-	RecordBaseWidget::mLayout->addLayout(editsLayout);
+	mLayout->addLayout(editsLayout);
 
 	new LabeledComboBoxWidget(this, StringPropertyActiveProbeConfiguration::New(mServices->getToolManager()), editsLayout, 0);
 	sscCreateDataWidget(this, mUsReconstructionService->getParam("Preset"), editsLayout, 1);

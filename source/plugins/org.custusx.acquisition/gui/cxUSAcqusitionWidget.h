@@ -45,6 +45,7 @@ typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 typedef boost::shared_ptr<class StringPropertyActiveProbeConfiguration> StringPropertyActiveProbeConfigurationPtr;
 class TimedAlgorithmProgressBar;
 class DisplayTimerWidget;
+class RecordSessionWidget;
 
 /**
 * \file
@@ -60,7 +61,7 @@ class DisplayTimerWidget;
  * \date Dec 9, 2010
  * \author Janne Beate Bakeng, SINTEF
  */
-class org_custusx_acquisition_EXPORT USAcqusitionWidget : public RecordBaseWidget
+class org_custusx_acquisition_EXPORT USAcqusitionWidget : public BaseWidget
 {
 	Q_OBJECT
 public:
@@ -80,6 +81,10 @@ private slots:
 	void recordCancelled();
 
 private:
+	AcquisitionServicePtr mAcquisitionService;
+	QVBoxLayout* mLayout;
+	RecordSessionWidget* mRecordSessionWidget;
+
 	UsReconstructionServicePtr mUsReconstructionService;
 	VisServicesPtr mServices;
 	TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;

@@ -89,6 +89,20 @@ UsReconstructionServicePtr USAcquisition::getReconstructer()
 	return mBase->getPluginData()->getReconstructer();
 }
 
+bool USAcquisition::isReady(AcquisitionService::TYPES context) const
+{
+	if (!context.testFlag(AcquisitionService::tUS))
+		return true;
+	return mReady;
+}
+
+QString USAcquisition::getInfoText(AcquisitionService::TYPES context) const
+{
+	if (!context.testFlag(AcquisitionService::tUS))
+		return "";
+	return mInfoText;
+}
+
 void USAcquisition::checkIfReadySlot()
 {
 	bool tracking = this->getServices()->getToolManager()->getState()>=Tool::tsTRACKING;
@@ -136,9 +150,6 @@ void USAcquisition::setReady(bool val, QString text)
 	mReady = val;
 	mInfoText = text;
 
-	if (!mReady && mBase->getState()==AcquisitionService::sRUNNING)
-		mBase->cancelRecord();
-
 	emit readinessChanged();
 }
 
@@ -149,6 +160,9 @@ int USAcquisition::getNumberOfSavingThreads() const
 
 void USAcquisition::recordStarted()
 {
+	if (!mBase->getCurrentContext().testFlag(AcquisitionService::tUS))
+		return;
+
 	this->getReconstructer()->selectData(USReconstructInputData()); // clear old data in reconstructeer
 
 	ToolPtr tool = this->getServices()->getToolManager()->getFirstProbe();
@@ -158,6 +172,9 @@ void USAcquisition::recordStarted()
 
 void USAcquisition::recordStopped()
 {
+	if (!mBase->getCurrentContext().testFlag(AcquisitionService::tUS))
+		return;
+
 	mCore->stopRecord();
 
 	this->sendAcquisitionDataToReconstructer();

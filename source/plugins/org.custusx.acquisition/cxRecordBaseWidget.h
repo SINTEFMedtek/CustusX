@@ -49,73 +49,73 @@ class QPushButton;
 
 namespace cx
 {
-/**
-* \file
-* \addtogroup org_custusx_acquisition
-* @{
-*/
+//*
+//* \file
+//* \addtogroup org_custusx_acquisition
+//* @{
+//	*/
 
 
-typedef boost::shared_ptr<class RecordSession> RecordSessionPtr;
-class RecordSessionWidget;
-/**
- * RecordBaseWidget
- *
- * \brief
- *
- * \date Dec 9, 2010
- * \author Janne Beate Bakeng, SINTEF
- */
-class org_custusx_acquisition_EXPORT  RecordBaseWidget : public BaseWidget
-{
-  Q_OBJECT
+//	typedef boost::shared_ptr<class RecordSession> RecordSessionPtr;
+//	class RecordSessionWidget;
+//	/**
+// * RecordBaseWidget
+// *
+// * \brief
+// *
+// * \date Dec 9, 2010
+// * \author Janne Beate Bakeng, SINTEF
+// */
+//	class org_custusx_acquisition_EXPORT  RecordBaseWidget : public BaseWidget
+//	{
+//		Q_OBJECT
 
-public:
-  RecordBaseWidget(AcquisitionServicePtr acquisitionService, QWidget* parent, QString description = "Record Session");
-  virtual ~RecordBaseWidget();
+//	public:
+//		RecordBaseWidget(AcquisitionServicePtr acquisitionService, QWidget* parent, QString description = "Record Session");
+//		virtual ~RecordBaseWidget();
 
-protected:
-  AcquisitionServicePtr mAcquisitionService;
-  QVBoxLayout* mLayout;
-  RecordSessionWidget* mRecordSessionWidget;
+//	protected:
+//		AcquisitionServicePtr mAcquisitionService;
+//		QVBoxLayout* mLayout;
+//		RecordSessionWidget* mRecordSessionWidget;
 
-};
+//	};
 
-/**
- * TrackedRecordWidget
- *
- * \brief
- *
- * \date Dec 17, 2010
- * \author Janne Beate Bakeng, SINTEF
- */
-class org_custusx_acquisition_EXPORT  TrackedRecordWidget : public RecordBaseWidget
-{
-  Q_OBJECT
-public:
-  TrackedRecordWidget(AcquisitionServicePtr acquisitionService, QWidget* parent, QString description);
-  virtual ~TrackedRecordWidget();
+//	/**
+// * TrackedRecordWidget
+// *
+// * \brief
+// *
+// * \date Dec 17, 2010
+// * \author Janne Beate Bakeng, SINTEF
+// */
+//	class org_custusx_acquisition_EXPORT  TrackedRecordWidget : public RecordBaseWidget
+//	{
+//		Q_OBJECT
+//	public:
+//		TrackedRecordWidget(AcquisitionServicePtr acquisitionService, QWidget* parent, QString description);
+//		virtual ~TrackedRecordWidget();
 
-signals:
-  void toolChanged();
+//	signals:
+//		void toolChanged();
 
-protected slots:
-  virtual void checkIfReadySlot() = 0;
-  virtual void postProcessingSlot(QString sessionId) = 0;
-  virtual void startedSlot(QString sessionId) = 0;
-  virtual void stoppedSlot(bool) = 0;
+//	protected slots:
+//		virtual void checkIfReadySlot() = 0;
+//		virtual void postProcessingSlot(QString sessionId) = 0;
+//		virtual void startedSlot(QString sessionId) = 0;
+//		virtual void stoppedSlot(bool) = 0;
 
-protected:
-  virtual TimedTransformMap getRecording(RecordSessionPtr session) = 0; ///< gets the tracking data from all relevant tool for the given session
-  void setTool(ToolPtr tool);
-  ToolPtr getTool();
+//	protected:
+//		virtual TimedTransformMap getRecording(RecordSessionPtr session) = 0; ///< gets the tracking data from all relevant tool for the given session
+//		void setTool(ToolPtr tool);
+//		ToolPtr getTool();
 
-private:
-  ToolPtr mTool;
-};
+//	private:
+//		ToolPtr mTool;
+//	};
 
-/**
-* @}
-*/
+//	/**
+//* @}
+
 }//namespace cx
 #endif /* CXRECORDBASEWIDGET_H_ */

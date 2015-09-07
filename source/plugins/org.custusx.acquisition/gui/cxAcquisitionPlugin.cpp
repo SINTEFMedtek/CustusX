@@ -68,7 +68,7 @@ std::vector<GUIExtenderService::CategorizedWidget> AcquisitionPlugin::createWidg
 
 	retval.push_back(GUIExtenderService::CategorizedWidget(new USAcqusitionWidget(mAcquisitionService, mServices, mUsReconstructionService, NULL), "Utility"));
 
-	retval.push_back(GUIExtenderService::CategorizedWidget(new TrackedCenterlineWidget(mAcquisitionService, mServices, NULL), "Utility"));
+//	retval.push_back(GUIExtenderService::CategorizedWidget(new TrackedCenterlineWidget(mAcquisitionService, mServices, NULL), "Utility"));
 
 	return retval;
 

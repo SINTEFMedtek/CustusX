@@ -63,7 +63,8 @@ RecordTrackingWidget::RecordTrackingWidget(RegServices services, QWidget* parent
 
 	this->initSessionSelector();
 
-	mRecordSessionWidget.reset(new RecordSessionWidget(services.acquisitionService, this, "Surface tracker data", false));
+	AcquisitionService::TYPES context(AcquisitionService::tTRACKING);
+	mRecordSessionWidget.reset(new RecordSessionWidget(services.acquisitionService, this, context, "Surface tracker data"));
 	mRecordSessionWidget->setDescriptionVisibility(false);
 
 	mVerticalLayout->setMargin(0);
@@ -111,7 +112,7 @@ void RecordTrackingWidget::initializeTrackingService()
 
 void RecordTrackingWidget::acquisitionStarted()
 {
-	std::cout << "acquisitionStarted" << std::endl;
+//	std::cout << "acquisitionStarted" << std::endl;
 
 	mRecordingTool = this->getSuitableRecordingTool();
 
@@ -126,7 +127,7 @@ void RecordTrackingWidget::acquisitionStarted()
 
 void RecordTrackingWidget::acquisitionStopped()
 {
-	std::cout << "acquisitionStopped" << std::endl;
+//	std::cout << "acquisitionStopped" << std::endl;
 
 	QString newUid = mServices.acquisitionService->getLatestSession()->getUid();
 	QStringList range = mSessionSelector->getValueRange();
@@ -139,7 +140,6 @@ void RecordTrackingWidget::acquisitionStopped()
 	ToolRep3DPtr activeRep3D = this->getToolRepIn3DView();
 	if (activeRep3D)
 	{
-		std::cout << "STOP" << std::endl;
 		activeRep3D->getTracer()->stop();
 	}
 
@@ -151,7 +151,6 @@ void RecordTrackingWidget::acquisitionCancelled()
 	ToolRep3DPtr activeRep3D = this->getToolRepIn3DView();
 	if (activeRep3D)
 	{
-		std::cout << "CLEAR" << std::endl;
 		activeRep3D->getTracer()->stop();
 		activeRep3D->getTracer()->clear();
 	}

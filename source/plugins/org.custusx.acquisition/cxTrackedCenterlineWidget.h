@@ -42,44 +42,44 @@ namespace cx
 {
 typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 
-/**
-* \file
-* \addtogroup org_custusx_acquisition
-* @{
-*/
+///**
+//* \file
+//* \addtogroup org_custusx_acquisition
+//* @{
+//*/
 
-/**
- * TrackedCenterlineWidget
- *
- * \brief NOT IN USE. TEST!!!
- *
- * \date Dec 9, 2010
- * \author Janne Beate Bakeng, SINTEF
- */
-class org_custusx_acquisition_EXPORT  TrackedCenterlineWidget : public TrackedRecordWidget
-{
-  Q_OBJECT
-public:
-  TrackedCenterlineWidget(AcquisitionServicePtr acquisitionService, VisServicesPtr services, QWidget* parent);
-  virtual ~TrackedCenterlineWidget();
+///**
+// * TrackedCenterlineWidget
+// *
+// * \brief NOT IN USE. TEST!!!
+// *
+// * \date Dec 9, 2010
+// * \author Janne Beate Bakeng, SINTEF
+// */
+//class org_custusx_acquisition_EXPORT  TrackedCenterlineWidget : public TrackedRecordWidget
+//{
+//  Q_OBJECT
+//public:
+//  TrackedCenterlineWidget(AcquisitionServicePtr acquisitionService, VisServicesPtr services, QWidget* parent);
+//  virtual ~TrackedCenterlineWidget();
 
-protected slots:
-  void checkIfReadySlot();
-  void postProcessingSlot(QString sessionId);
-  void startedSlot(QString sessionId);
-  void stoppedSlot(bool);
+//protected slots:
+//  void checkIfReadySlot();
+//  void postProcessingSlot(QString sessionId);
+//  void startedSlot(QString sessionId);
+//  void stoppedSlot(bool);
 
-  void centerlineFinishedSlot();
-  void preprocessResampler();
+//  void centerlineFinishedSlot();
+//  void preprocessResampler();
 
-private:
-  virtual TimedTransformMap getRecording(RecordSessionPtr session); ///< gets the tracking data from all relevant tool for the given session
-  ToolPtr findTool(double startTime, double stopTime);
+//private:
+//  virtual TimedTransformMap getRecording(RecordSessionPtr session); ///< gets the tracking data from all relevant tool for the given session
+//  ToolPtr findTool(double startTime, double stopTime);
 
-//  Centerline  mCenterlineAlgorithm;
-  QString mSessionID;
-  VisServicesPtr mServices;
-};
+////  Centerline  mCenterlineAlgorithm;
+//  QString mSessionID;
+//  VisServicesPtr mServices;
+//};
 
 /**
 * @}

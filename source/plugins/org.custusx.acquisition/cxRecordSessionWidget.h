@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "org_custusx_acquisition_Export.h"
 
 #include "cxBaseWidget.h"
+#include "cxAcquisitionService.h"
 
 class QPushButton;
 class QLineEdit;
@@ -65,20 +66,23 @@ class org_custusx_acquisition_EXPORT  RecordSessionWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  RecordSessionWidget(AcquisitionServicePtr base, QWidget* parent, QString defaultDescription = "Record Session", bool requireUsReady = true);
+  RecordSessionWidget(AcquisitionServicePtr base, QWidget* parent,
+					  AcquisitionService::TYPES context,
+					  QString defaultDescription = "Record Session"
+					  );
   virtual ~RecordSessionWidget();
 
   void setDescription(QString text);
   void setDescriptionVisibility(bool value);
 
-public slots:
-	void setReady(bool val, QString text); ///< deprecated: use readinessChangedSlot instead.
+//public slots:
+//	void setReady(bool val, QString text); ///< deprecated: use readinessChangedSlot instead.
 
 private slots:
   void startStopSlot(bool);
   void cancelSlot();
   void recordStateChangedSlot();
-  void usReadinessChangedSlot();
+  void onReadinessChanged();
 
 private:
 
@@ -88,7 +92,7 @@ private:
   QPushButton* mCancelButton;
   QLabel* mDescriptionLabel;
   QLineEdit* mDescriptionLine;
-  bool mRequireUsReady;
+  AcquisitionService::TYPES mContext;
 };
 
 /**
