@@ -165,17 +165,13 @@ void Ur5MessageDecoder::setJointData(QByteArray jointData, Ur5State &state)
     {
         if(i<3)
         {
-            sscanf_s(jointData.mid(i*41+2*sizeof(double),sizeof(double)).toHex().data(), "%llx",
-                     (unsigned long long *)&state.jointAxisVelocity(i));
-            sscanf_s(jointData.mid(i*41,sizeof(double)).toHex().data(), "%llx",
-                     (unsigned long long *)&state.jointAxis(i));
+            state.jointAxis(i) = pickDouble(jointData,i*41);
+            state.jointAxisVelocity(i) = pickDouble(jointData, i*41+2*sizeof(double));
         }
         else
         {
-            sscanf_s(jointData.mid(i*41+2*sizeof(double),sizeof(double)).toHex().data(), "%llx",
-                     (unsigned long long *)&state.jointAngleVelocity(i-3));
-            sscanf_s(jointData.mid(i*41,sizeof(double)).toHex().data(), "%llx",
-                     (unsigned long long *)&state.jointAngles(i-3));
+            state.jointAngles(i-3) = pickDouble(jointData,i*41);
+            state.jointAngleVelocity(i-3) = pickDouble(jointData,i*41+2*sizeof(double));
         }
     }
 }
