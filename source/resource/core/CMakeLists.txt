@@ -98,6 +98,8 @@ cx_add_class_qt_moc(cxResource_SOURCE
     settings/cxSessionStorageService
 	settings/cxProfile
 	settings/cxPatientStorage
+    settings/cxWorkflowStateMachine
+    settings/cxWorkflowState
 
     algorithms/cxTimedAlgorithm.h
     algorithms/cxThreadedTimedAlgorithm.h
@@ -208,6 +210,8 @@ cx_add_class(cxResource_SOURCE
     settings/cxDataLocations
     settings/cxSettings
     settings/cxSessionStorageServiceProxy
+    settings/cxRequestEnterStateTransition.h
+    settings/cxStateServiceBackend
 
     vesselReg/SeansVesselReg.cxx
     vesselReg/SeansVesselReg.hxx

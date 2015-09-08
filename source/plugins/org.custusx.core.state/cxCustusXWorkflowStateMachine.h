@@ -30,64 +30,37 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXREQUESTENTERSTATETRANSITION_H_
-#define CXREQUESTENTERSTATETRANSITION_H_
+#ifndef CXCUSTUSXWORKFLOWSTATEMACHINE_H_
+#define CXCUSTUSXWORKFLOWSTATEMACHINE_H_
 
 #include "org_custusx_core_state_Export.h"
 
-#include <QEvent>
-#include <QAbstractTransition>
+#include <QObject>
+#include "boost/shared_ptr.hpp"
+#include "cxWorkflowStateMachine.h"
 
 namespace cx
 {
-/**
- * \file
+typedef boost::shared_ptr<class StateServiceBackend> StateServiceBackendPtr;
+
+/** \brief State Machine for the Workflow Steps for CustusX
+ *
+ *  See StateService for a description.
+ *
  * \ingroup org_custusx_core_state
- * @{
+ * \date 9. sept. 2015
+ * \author Janne Beate Bakeng, SINTEF
  */
-
-/** \brief Utility class for StateService states.
- *
- */
-struct org_custusx_core_state_EXPORT  RequestEnterStateEvent: public QEvent
+class org_custusx_core_state_EXPORT CustusXWorkflowStateMachine : public WorkflowStateMachine
 {
-	RequestEnterStateEvent(const QString &stateUid) :
-					QEvent(QEvent::Type(QEvent::User + 1)), mStateUid(stateUid)
-	{}
-
-	QString mStateUid;
-};
-
-/** \brief Utility class for StateService states.
- *
- * \date 5. aug. 2010
- * \\author jbake
- */
-class org_custusx_core_state_EXPORT RequestEnterStateTransition: public QAbstractTransition
-{
+Q_OBJECT
 public:
-	RequestEnterStateTransition(const QString &stateUid) :
-					mStateUid(stateUid)
-	{}
+        CustusXWorkflowStateMachine(StateServiceBackendPtr backend);
+        virtual ~CustusXWorkflowStateMachine();
 
-protected:
-	virtual bool eventTest(QEvent *e)
-	{
-		if (e->type() != QEvent::Type(QEvent::User + 1)) // StringEvent
-			return false;
-		RequestEnterStateEvent *se = static_cast<RequestEnterStateEvent*>(e);
-		return (mStateUid == se->mStateUid);
-	}
-
-	virtual void onTransition(QEvent *)
-	{}
-
-private:
-	QString mStateUid;
 };
 
-/**
- * @}
- */
-} //namespace cx
-#endif /* CXREQUESTENTERSTATETRANSITION_H_ */
+typedef boost::shared_ptr<CustusXWorkflowStateMachine> CustusXWorkflowStateMachinePtr;
+}
+
+#endif /* CXCUSTUSXWORKFLOWSTATEMACHINE_H_ */

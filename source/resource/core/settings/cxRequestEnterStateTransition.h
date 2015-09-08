@@ -29,50 +29,65 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXSTATESERVICEBACKEND_H
-#define CXSTATESERVICEBACKEND_H
 
-#include "org_custusx_core_state_Export.h"
+#ifndef CXREQUESTENTERSTATETRANSITION_H_
+#define CXREQUESTENTERSTATETRANSITION_H_
 
-#include "boost/shared_ptr.hpp"
-#include "cxForwardDeclarations.h"
+#include "cxResourceExport.h"
+
+#include <QEvent>
+#include <QAbstractTransition>
 
 namespace cx
 {
-
-class VideoServiceOld;
-class PatientService;
-typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
-typedef boost::shared_ptr<class StateServiceBackend> StateServiceBackendPtr;
-
 /**
- *
+ * \file
  * \ingroup org_custusx_core_state
- *
- * \date 2014-03-06
- * \author christiana
+ * @{
  */
-class org_custusx_core_state_EXPORT StateServiceBackend
+
+/** \brief Utility class for StateService states.
+ *
+ */
+struct cxResource_EXPORT  RequestEnterStateEvent: public QEvent
 {
-public:
-	StateServiceBackend(TrackingServicePtr trackingService,
-						VideoServicePtr videoService,
-						SpaceProviderPtr spaceProvider,
-						PatientModelServicePtr patientService);
+	RequestEnterStateEvent(const QString &stateUid) :
+					QEvent(QEvent::Type(QEvent::User + 1)), mStateUid(stateUid)
+	{}
 
-	TrackingServicePtr getToolManager();
-	VideoServicePtr getVideoService();
-	SpaceProviderPtr getSpaceProvider();
-	PatientModelServicePtr getPatientService();
-
-private:
-	TrackingServicePtr mTrackingService;
-	SpaceProviderPtr mSpaceProvider;
-	VideoServicePtr mVideoService;
-	PatientModelServicePtr mPatientService;
+	QString mStateUid;
 };
 
+/** \brief Utility class for StateService states.
+ *
+ * \date 5. aug. 2010
+ * \\author jbake
+ */
+class cxResource_EXPORT RequestEnterStateTransition: public QAbstractTransition
+{
+public:
+	RequestEnterStateTransition(const QString &stateUid) :
+					mStateUid(stateUid)
+	{}
 
-} // namespace cx
+protected:
+	virtual bool eventTest(QEvent *e)
+	{
+		if (e->type() != QEvent::Type(QEvent::User + 1)) // StringEvent
+			return false;
+		RequestEnterStateEvent *se = static_cast<RequestEnterStateEvent*>(e);
+		return (mStateUid == se->mStateUid);
+	}
 
-#endif // CXSTATESERVICEBACKEND_H
+	virtual void onTransition(QEvent *)
+	{}
+
+private:
+	QString mStateUid;
+};
+
+/**
+ * @}
+ */
+} //namespace cx
+#endif /* CXREQUESTENTERSTATETRANSITION_H_ */

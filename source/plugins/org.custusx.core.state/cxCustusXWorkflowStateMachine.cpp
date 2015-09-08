@@ -30,66 +30,29 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXWORKFLOWSTATEMACHINE_H_
-#define CXWORKFLOWSTATEMACHINE_H_
-
-#include "org_custusx_core_state_Export.h"
-
-#include <QStateMachine>
-#include <QActionGroup>
-#include "cxForwardDeclarations.h"
-
-class QToolBar;
-class QMenu;
+#include "cxCustusXWorkflowStateMachine.h"
+#include "cxCustusXWorkflowStates.h"
+#include "cxStateServiceBackend.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class StateServiceBackend> StateServiceBackendPtr;
 
-class WorkflowState;
-
-/** \brief State Machine for the Workflow Steps
- *
- *  See StateService for a description.
- *
- * \ingroup org_custusx_core_state
- * \date 4. aug. 2010
- * \author Janne Beate Bakeng, SINTEF
- */
-class org_custusx_core_state_EXPORT WorkflowStateMachine: public QStateMachine
+CustusXWorkflowStateMachine::CustusXWorkflowStateMachine(StateServiceBackendPtr backend) :
+    WorkflowStateMachine(backend)
 {
-Q_OBJECT
-public:
-	WorkflowStateMachine(StateServiceBackendPtr backend);
-	virtual ~WorkflowStateMachine();
+	WorkflowState* patientData = this->newState(new PatientDataWorkflowState(mParentState, mBackend));
+	this->newState(new RegistrationWorkflowState(mParentState, mBackend));
+	this->newState(new PreOpPlanningWorkflowState(mParentState, mBackend));
+	this->newState(new NavigationWorkflowState(mParentState, mBackend));
+	this->newState(new IntraOpImagingWorkflowState(mParentState, mBackend));
+	this->newState(new PostOpControllWorkflowState(mParentState, mBackend));
 
-	QActionGroup* getActionGroup();
-
-	QString getActiveUidState();
-	void setActiveState(QString uid);
-
-signals:
-	void activeStateChanged();
-	void activeStateAboutToChange();
-
-private slots:
-	void startedSlot();
-	void clinicalApplicationChangedSlot();
-
-private:
-	void fillActionGroup(WorkflowState* current, QActionGroup* group);
-	QAction* addAction(QString stateUid, QActionGroup* group);
-	WorkflowState* newState(WorkflowState* state);
-
-	typedef std::map<QString, WorkflowState*> WorkflowStateMap;
-	WorkflowStateMap mStates;
-	WorkflowState* mParentState;
-	QActionGroup* mActionGroup;
-	bool mStarted;
-	StateServiceBackendPtr mBackend;
-};
-
-typedef boost::shared_ptr<WorkflowStateMachine> WorkflowStateMachinePtr;
+	//set initial state on all levels
+	this->setInitialState(mParentState);
+	mParentState->setInitialState(patientData);
 }
 
-#endif /* CXWORKFLOWSTATEMACHINE_H_ */
+CustusXWorkflowStateMachine::~CustusXWorkflowStateMachine()
+{}
+
+} //namespace cx

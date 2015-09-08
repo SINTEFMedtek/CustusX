@@ -50,18 +50,11 @@ WorkflowStateMachine::WorkflowStateMachine(StateServiceBackendPtr backend) : mBa
 
 	mParentState = new ParentWorkflowState(this, mBackend);
 
-	WorkflowState* patientData = this->newState(new PatientDataWorkflowState(mParentState, mBackend));
-	this->newState(new RegistrationWorkflowState(mParentState, mBackend));
-	this->newState(new PreOpPlanningWorkflowState(mParentState, mBackend));
-	this->newState(new NavigationWorkflowState(mParentState, mBackend));
-	this->newState(new IntraOpImagingWorkflowState(mParentState, mBackend));
-	this->newState(new PostOpControllWorkflowState(mParentState, mBackend));
-
-	//set initial state on all levels
-	this->setInitialState(mParentState);
-	mParentState->setInitialState(patientData);
-
 	connect(mBackend->getPatientService().get(), SIGNAL(clinicalApplicationChanged()), this, SLOT(clinicalApplicationChangedSlot()));
+}
+
+WorkflowStateMachine::~WorkflowStateMachine()
+{
 }
 
 void WorkflowStateMachine::clinicalApplicationChangedSlot()
@@ -87,10 +80,6 @@ WorkflowState* WorkflowStateMachine::newState(WorkflowState* state)
 	connect(state, SIGNAL(aboutToExit()), this, SIGNAL(activeStateAboutToChange()));
 
 	return state;
-}
-
-WorkflowStateMachine::~WorkflowStateMachine()
-{
 }
 
 QActionGroup* WorkflowStateMachine::getActionGroup()

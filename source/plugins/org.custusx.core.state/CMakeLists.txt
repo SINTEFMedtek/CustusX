@@ -9,13 +9,10 @@ set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
 set(PLUGIN_SRCS
     cxStateServiceImpl.cpp
-    cxWorkflowStateMachine.h
-    cxWorkflowStateMachine.cpp
-    cxWorkflowState.h
-    cxWorkflowState.cpp
-    cxRequestEnterStateTransition.h
-    cxStateServiceBackend.cpp
-    cxStateServiceBackend.h
+    cxCustusXWorkflowStateMachine.h
+    cxCustusXWorkflowStateMachine.cpp
+    cxCustusXWorkflowStates.h
+    cxCustusXWorkflowStates.cpp
     cxStatePluginActivator.cpp
     cxApplicationsParser.h
     cxApplicationsParser.cpp
@@ -23,8 +20,8 @@ set(PLUGIN_SRCS
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
-    cxWorkflowStateMachine.h
-    cxWorkflowState.h
+    cxCustusXWorkflowStateMachine.h
+    cxCustusXWorkflowStates.h
     cxStateServiceImpl.h
     cxStatePluginActivator.h
 )
