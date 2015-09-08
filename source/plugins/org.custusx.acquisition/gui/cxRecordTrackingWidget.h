@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxXmlOptionItem.h"
 #include "cxTool.h"
 #include "cxVisServices.h"
+#include "org_custusx_acquisition_Export.h"
 
 namespace cx
 {
@@ -58,7 +59,7 @@ typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectTo
  * \date 2015-09-06
  * \author Christian Askeland
  */
-class RecordTrackingWidget: public QWidget
+class org_custusx_acquisition_EXPORT RecordTrackingWidget: public QWidget
 {
 	Q_OBJECT
 
