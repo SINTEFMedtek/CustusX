@@ -15,6 +15,19 @@ endmacro()
 
 cx_initialize_TSF()
 
+macro(cx_initialize_FAST)
+    find_package( FAST REQUIRED)
+    include(${FAST_USE_FILE})
+    message("===========================")
+    message("Initializing FAST in TSF plugin")
+    message("===========================")
+    cx_install_add_library_dirs(${FAST_LIBRARY_DIRS})
+endmacro()
+
+cx_initialize_FAST()
+
+
+
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
 set(PLUGIN_SRCS
@@ -54,6 +67,7 @@ set(PLUGIN_target_libraries
 
     PRIVATE
     tubeSegmentationLib
+    FAST
     SIPL
     cxResource
     cxResourceFilter

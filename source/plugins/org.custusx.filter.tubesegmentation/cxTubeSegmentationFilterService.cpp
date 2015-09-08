@@ -56,6 +56,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkForwardDeclarations.h"
 #include "cxPatientModelServiceProxy.h"
 #include "cxVisServices.h"
+// Test
+#include "FAST/Algorithms/BinaryThresholding/BinaryThresholding.hpp"
 
 namespace cx {
 
@@ -64,6 +66,9 @@ TubeSegmentationFilter::TubeSegmentationFilter(ctkPluginContext *pluginContext) 
 {
 	connect(patientService().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
 	mPresets = this->populatePresets();
+
+    // Test
+    fast::BinaryThresholding::pointer fastObject = fast::BinaryThresholding::New();
 }
 
 QString TubeSegmentationFilter::getName() const
