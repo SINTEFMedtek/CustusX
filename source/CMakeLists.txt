@@ -17,7 +17,7 @@ cx_initialize_CTK()
 
 cx_initialize_TSF()
 cx_initialize_level_set_segmentation()
-cx_initialize_FAST()
+#cx_initialize_FAST()
 cx_initialize_OpenCLUtilityLibrary()
 
 find_package(OpenGL)
