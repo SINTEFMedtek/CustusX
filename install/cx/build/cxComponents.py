@@ -407,6 +407,7 @@ class CustusX(CppComponent):
         add('Tube-Segmentation-Framework_DIR:PATH', self._createSibling(TubeSegmentationFramework).configPath())
         add('Level-Set-Segmentation_DIR:PATH', self._createSibling(LevelSetSegmentation).configPath())
         add('OpenCLUtilityLibrary_DIR:PATH', self._createSibling(OpenCLUtilityLibrary).configPath())
+        add('FAST_DIR:PATH', self._createSibling(FAST).configPath())
         add('BUILD_DOCUMENTATION:BOOL', self.controlData.build_developer_doc)            
         add('CX_BUILD_USER_DOCUMENTATION:BOOL', self.controlData.build_user_doc)            
         add('BUILD_TESTING:BOOL', self.controlData.mBuildTesting);
@@ -505,6 +506,29 @@ class OpenCLUtilityLibrary(CppComponent):
     def configure(self):
         builder = self._getBuilder()
         builder.configureCMake()
+    def findPackagePath(self):
+        return self.buildPath()
+        
+# ---------------------------------------------------------
+
+class FAST(CppComponent):
+    def name(self):
+        return "FAST"
+    def help(self):
+        return 'FAST.'
+    def path(self):
+        return self.controlData.getWorkingPath() + "/FAST"
+    def sourcePath(self):
+        return self.controlData.getWorkingPath() + "/FAST/FAST/source"
+    def _rawCheckout(self):
+        self._getBuilder().gitClone('git@github.com:smistad/FAST')
+    def update(self):
+        self._getBuilder().gitCheckoutBranch('master', submodules=True)
+        #self._getBuilder().gitCheckout('43614718f7667dd5013af9300fcc63ae30bf244c')
+    def configure(self):
+        builder = self._getBuilder()
+        cmakeOptions = '-DMODULE_OpenIGTLink=OFF -DBUILD_EXAMPLES=OFF -DBUILD_TESTS=OFF'
+        builder.configureCMake(cmakeOptions)
     def findPackagePath(self):
         return self.buildPath()
         
