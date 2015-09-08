@@ -69,35 +69,33 @@ void CXVBcameraPath::cameraRawPointsSlot(MeshPtr mesh)
 //			  << mNumberOfInputPoints << std::endl;
 //	std::cout << "cxVBcameraPath, Route to target - rMd matrix : " << r_M_d << std::endl;
 
+	mNumberOfControlPoints = mNumberOfInputPoints / 10;
+	std::cout << "NumberOfControlPoints : " << mNumberOfControlPoints << std::endl;
+
 	mSplineX = vtkSmartPointer<vtkCardinalSpline>::New();
 	mSplineY = vtkSmartPointer<vtkCardinalSpline>::New();
 	mSplineZ = vtkSmartPointer<vtkCardinalSpline>::New();
 
-	for(int i=0;i<mNumberOfInputPoints;i++)
+	// Setting the spline curve points
+	double p[3];
+	int indexCntrl;
+	int indexPoints;
+
+	for(int i=0;i<=mNumberOfControlPoints;i++)
 	{
-		double p[3];
-		vtkpoints->GetPoint(i,p);
+		int indexP = (i*mNumberOfInputPoints-1)/mNumberOfControlPoints;
+		std::cout << "Adding index : " << i << " , " << indexP << std::endl;
+		vtkpoints->GetPoint(indexP,p);
 		mSplineX->AddPoint(i,p[0]);
 		mSplineY->AddPoint(i,p[1]);
 		mSplineZ->AddPoint(i,p[2]);
-//		if(i==0)
-//			std::cout << "Start point : " << p[0] << " ," << p[1] << " ," << p[2] << std::endl;
-//		else if(i==(mNumberOfInputPoints-1))
-//				std::cout << "Target point : " << p[0] << " ," << p[1] << " ," << p[2] << std::endl;
 	}
-
-	// Setting spline parameter range to correspond with slider range
-	double range[2];
-	range[0] = 0; range[1] = 100;
-	mSplineX->SetParametricRange(range);
-	mSplineY->SetParametricRange(range);
-	mSplineZ->SetParametricRange(range);
 
 }
 
 void CXVBcameraPath::cameraPathPositionSlot(int pos)
 {
-	std::cout << "CXVBcameraPath::cameraPathPositionSlot , pos " << pos << std::endl;
+//	std::cout << "CXVBcameraPath::cameraPathPositionSlot , pos " << pos << std::endl;
 //	std::cout << "Check spline -------- " << std::endl;
 //	std::cout << "Spline point : " << mSplineX->Evaluate(pos) << " , " << mSplineY->Evaluate(pos)
 //			  << " , " << mSplineZ->Evaluate(pos) << std::endl;
@@ -108,25 +106,26 @@ void CXVBcameraPath::cameraPathPositionSlot(int pos)
 //	Transform3D rMpr = mPatientModelService->get_rMpr();
 //	Transform3D rMt = rMpr * mManualTool->get_prMt();
 //	std::cout << rMt << std::endl;
-	double pos_r[3], focus_r[3];
-	if(pos<(mNumberOfInputPoints-4)) {
-		pos_r[0] = mSplineX->Evaluate(pos);
-		pos_r[1] = mSplineY->Evaluate(pos);
-		pos_r[2] = mSplineZ->Evaluate(pos);
-		focus_r[0] = mSplineX->Evaluate(pos+4);
-		focus_r[1] = mSplineY->Evaluate(pos+4);
-		focus_r[2] = mSplineZ->Evaluate(pos+4);
-	} else {
-		pos_r[0] = mSplineX->Evaluate(mNumberOfInputPoints-4);
-		pos_r[1] = mSplineY->Evaluate(mNumberOfInputPoints-4);
-		pos_r[2] = mSplineZ->Evaluate(mNumberOfInputPoints-4);
-		focus_r[0] = mSplineX->Evaluate(mNumberOfInputPoints);
-		focus_r[1] = mSplineY->Evaluate(mNumberOfInputPoints);
-		focus_r[2] = mSplineZ->Evaluate(mNumberOfInputPoints);
-	}
+	double splineParameter = pos*mNumberOfControlPoints / 100.0;
+//	std::cout << "CXVBcameraPath::cameraPathPositionSlot , pos : " << pos
+//			  << ", spline parameter : " << splineParameter << std::endl;
 
-	mLastCameraPos_r = Vector3D(pos_r[0], pos_r[1], pos_r[2]);
-	mLastCameraFocus_r = Vector3D(focus_r[0], focus_r[1], focus_r[2]);
+	double pos_r[3], focus_r[3];
+
+	pos_r[0] = mSplineX->Evaluate(splineParameter);
+	pos_r[1] = mSplineY->Evaluate(splineParameter);
+	pos_r[2] = mSplineZ->Evaluate(splineParameter);
+	focus_r[0] = mSplineX->Evaluate(splineParameter+0.5);
+	focus_r[1] = mSplineY->Evaluate(splineParameter+0.5);
+	focus_r[2] = mSplineZ->Evaluate(splineParameter+0.5);
+
+
+	// If camera position approaches end point on spline, keep the last position
+	// and focus to make sure it wont be set to invalid values
+	if(splineParameter<((double)(mNumberOfControlPoints)-0.5)) {
+		mLastCameraPos_r = Vector3D(pos_r[0], pos_r[1], pos_r[2]);
+		mLastCameraFocus_r = Vector3D(focus_r[0], focus_r[1], focus_r[2]);
+	}
 
 //	std::cout << "Position : " << pos_r[0] << ", " << pos_r[1] << ", " << pos_r[2] << std::endl;
 //	std::cout << "Focus: " << focus_r[0] << ", " << focus_r[1] << ", " << focus_r[2] << std::endl;
@@ -177,7 +176,5 @@ void CXVBcameraPath::cameraRotateAngleSlot(int angle)
 	this->updateManualToolPosition();
 	mVisualizationService->get3DView()->setModified();
 }
-
-
 
 } /* namespace cx */

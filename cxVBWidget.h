@@ -45,7 +45,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QHBoxLayout;
 class QDial;
 class QSlider;
-class vtkCamera;
 
 namespace cx
 {
@@ -79,7 +78,6 @@ private:
 	VisualizationServicePtr		mVisualizationService;
 	TrackingServicePtr			mTrackingService;
 	CXVBcameraPath*				mCameraPath;
-	vtkCamera*					mCamera;
 
 	void						enableControls(bool enable);
 
