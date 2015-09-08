@@ -59,7 +59,7 @@ igtl::ImageMessage::Pointer IGTLinkConversionImage::encode(ImagePtr image, PATIE
 {
 	igtl::ImageMessage::Pointer retval = igtl::ImageMessage::New();
 
-	retval->SetDeviceName(cstring_cast(image->getUid()));
+	retval->SetDeviceName(cstring_cast(image->getName()));
 	IGTLinkConversionBase().encode_timestamp(image->getAcquisitionTime(), retval);
 	this->encode_vtkImageData(image->getBaseVtkImageData(), retval);
 	this->encode_rMd(image, retval, externalSpace);

@@ -77,7 +77,7 @@ igtl::PolyDataMessage::Pointer IGTLinkConversionPolyData::encode(MeshPtr in, PAT
 	igtl::PolyDataMessage::Pointer retval = igtl::PolyDataMessage::New();
 	IGTLinkConversionBase baseConverter;
 
-	retval->SetDeviceName(cstring_cast(in->getUid()));
+	retval->SetDeviceName(cstring_cast(in->getName()));
 	baseConverter.encode_timestamp(in->getAcquisitionTime(), retval);
 	vtkPolyDataPtr polyData = in->getVtkPolyData();
 	polyData = this->encodeCoordinateSystem(in, externalSpace);
@@ -101,15 +101,8 @@ MeshPtr IGTLinkConversionPolyData::decode(igtl::PolyDataMessage *in, PATIENT_COO
 
 vtkPolyDataPtr IGTLinkConversionPolyData::decodeCoordinateSystem(vtkPolyDataPtr polyData, PATIENT_COORDINATE_SYSTEM externalSpace)
 {
-//	Transform3D rMd = Transform3D::Identity();
 	Transform3D sMr = createTransformFromReferenceToExternal(externalSpace);
 	Transform3D rMs = sMr.inv();
-//	if (externalSpace=="RAS")
-//	{
-//		rMd = createTransformLPS2RAS().inv();
-//	}
-
-//	CX_LOG_CHANNEL_DEBUG("ca") << "POLY rMd endecode\n" << rMd;
 
 	MeshPtr mesh(new Mesh("temp", "temp", polyData));
 	vtkPolyDataPtr poly = mesh->getTransformedPolyData(rMs);
@@ -121,10 +114,6 @@ vtkPolyDataPtr IGTLinkConversionPolyData::encodeCoordinateSystem(MeshPtr mesh, P
 	Transform3D rMd = mesh->get_rMd();
 	Transform3D sMr = createTransformFromReferenceToExternal(externalSpace);
 	Transform3D sMd = sMr * rMd;
-//	if (externalSpace=="RAS")
-//	{
-//		rMd = createTransformLPS2RAS() * rMd;
-//	}
 
 	vtkPolyDataPtr poly = mesh->getTransformedPolyData(sMd);
 	return poly;
@@ -160,7 +149,7 @@ vtkPolyDataPtr IGTLinkConversionPolyData::decode_vtkPolyData(igtl::PolyDataMessa
 
   // Vertices
   igtl::PolyDataCellArray::Pointer verticesArray =  polyDataMsg->GetVertices();
-  int nvertices = verticesArray->GetNumberOfCells();
+  int nvertices = verticesArray.IsNotNull() ? verticesArray->GetNumberOfCells() : 0;
   if (nvertices > 0)
 	{
 	vtkSmartPointer<vtkCellArray> vertCells = vtkSmartPointer<vtkCellArray>::New();
@@ -183,7 +172,7 @@ vtkPolyDataPtr IGTLinkConversionPolyData::decode_vtkPolyData(igtl::PolyDataMessa
 
   // Lines
   igtl::PolyDataCellArray::Pointer linesArray = polyDataMsg->GetLines();
-  int nlines = linesArray->GetNumberOfCells();
+  int nlines = linesArray.IsNotNull() ? linesArray->GetNumberOfCells() : 0;
   if (nlines > 0)
 	{
 	vtkSmartPointer<vtkCellArray> lineCells = vtkSmartPointer<vtkCellArray>::New();
@@ -208,7 +197,7 @@ vtkPolyDataPtr IGTLinkConversionPolyData::decode_vtkPolyData(igtl::PolyDataMessa
 
   // Polygons
   igtl::PolyDataCellArray::Pointer polygonsArray = polyDataMsg->GetPolygons();
-  int npolygons = polygonsArray->GetNumberOfCells();
+  int npolygons =polygonsArray.IsNotNull() ? polygonsArray->GetNumberOfCells() : 0;
   if (npolygons > 0)
 	{
 	vtkSmartPointer<vtkCellArray> polygonCells = vtkSmartPointer<vtkCellArray>::New();
@@ -233,7 +222,7 @@ vtkPolyDataPtr IGTLinkConversionPolyData::decode_vtkPolyData(igtl::PolyDataMessa
 
   // Triangle Strips
   igtl::PolyDataCellArray::Pointer triangleStripsArray = polyDataMsg->GetTriangleStrips();
-  int ntstrips = triangleStripsArray->GetNumberOfCells();
+  int ntstrips = triangleStripsArray.IsNotNull() ? triangleStripsArray->GetNumberOfCells() : 0;
   if (ntstrips > 0)
 	{
 	vtkSmartPointer<vtkCellArray> tstripCells = vtkSmartPointer<vtkCellArray>::New();
@@ -374,7 +363,7 @@ void IGTLinkConversionPolyData::encode_vtkPolyData(vtkPolyDataPtr in, igtl::Poly
 	vtkSmartPointer<vtkCellArray> polygonCells = poly->GetPolys();
 	if (polygonCells.GetPointer() != NULL)
 	  {
-	  igtl::PolyDataCellArray::Pointer polygonsArray;
+	  igtl::PolyDataCellArray::Pointer polygonsArray = igtl::PolyDataCellArray::New();
 	  if (this->VTKToIGTLCellArray(polygonCells, polygonsArray) > 0)
 		{
 		outMsg->SetPolygons(polygonsArray);
@@ -416,7 +405,7 @@ void IGTLinkConversionPolyData::encode_vtkPolyData(vtkPolyDataPtr in, igtl::Poly
 	  for (int i = 0; i < nCellAttributes; i ++)
 		{
 		igtl::PolyDataAttribute::Pointer attribute = igtl::PolyDataAttribute::New();
-		if (this->VTKToIGTLAttribute(pdata, i, attribute) > 0)
+		if (this->VTKToIGTLAttribute(cdata, i, attribute) > 0)
 		  {
 		  outMsg->AddAttribute(attribute);
 		  }
