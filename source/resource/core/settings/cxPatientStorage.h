@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPATIENTSTORAGE_H
 #define CXPATIENTSTORAGE_H
 
+#include "cxResourceExport.h"
+
 #include <QObject>
 #include <boost/shared_ptr.hpp>
 #include <boost/function.hpp>
@@ -55,7 +57,7 @@ typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
  *  \date Sep 07, 2015
  *  \author Ole Vegard Solberg, SINTEF
  */
-class PatientStorage : public QObject
+class cxResource_EXPORT PatientStorage : public QObject
 {
 	Q_OBJECT
 public:
