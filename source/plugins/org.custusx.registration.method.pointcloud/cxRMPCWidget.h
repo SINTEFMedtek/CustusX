@@ -71,12 +71,6 @@ public:
 	virtual QString defaultWhatsThis() const;
 private slots:
 	void registerSlot();
-//	void acquisitionStarted();
-//	void acquisitionStopped();
-//	void obscuredSlot(bool obscured);
-
-//	void acquisitionCancelled();
-//	void recordedSessionsChanged();
 private:
 	RegServices mServices;
 	QVBoxLayout* mVerticalLayout;
@@ -86,21 +80,9 @@ private:
 
 	QVBoxLayout* createVBoxInGroupBox(QVBoxLayout* parent, QString header);
 
-//	RecordSessionWidgetPtr mRecordSessionWidget;
 	StringPropertySelectMeshPtr mSurfaceSelector;
-//	StringPropertyPtr mSessionSelector;
 	QPushButton* mRegisterButton;
-//	ToolPtr mTool;
-//	StringPropertySelectToolPtr mToolSelector;
 	RecordTrackingWidget* mRecordTrackingWidget;
-
-//	boost::shared_ptr<WidgetObscuredListener> mObscuredListener;
-
-//	ToolRep3DPtr getToolRepIn3DView(ToolPtr tool);
-
-//	void initSessionSelector();
-//	QStringList getSessionList();
-//	void initializeTrackingService();
 };
 
 } //namespace cx

@@ -80,6 +80,13 @@ void StringProperty::setReadOnly(bool val)
 	emit changed();
 }
 
+void StringProperty::setDisplayName(QString val)
+{
+	mName = val;
+	emit changed();
+}
+
+
 QString StringProperty::getDisplayName() const
 {
 	return mName;

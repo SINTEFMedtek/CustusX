@@ -63,13 +63,13 @@ class RecordTrackingWidget: public QWidget
 	Q_OBJECT
 
 public:
-	RecordTrackingWidget(AcquisitionServicePtr acquisitionService, VisServices services, QWidget *parent);
+	RecordTrackingWidget(XmlOptionFile options, AcquisitionServicePtr acquisitionService, VisServices services, QWidget *parent);
 	virtual ~RecordTrackingWidget()	{}
 
 	ToolPtr getSuitableRecordingTool();
-	ToolRep3DPtr getToolRepIn3DView();
 	TimedTransformMap getRecordedTrackerData_prMt();
 	void ShowLastRecordingInView();
+	StringPropertyPtr getSessionSelector() { return mSessionSelector; }
 
 private slots:
 	void acquisitionStarted();
@@ -92,7 +92,8 @@ private:
 
 	void initSessionSelector();
 	QStringList getSessionList();
-	void initializeTrackingService();
+//	void initializeTrackingService();
+	ToolRep3DPtr getToolRepIn3DView();
 };
 
 } //namespace cx

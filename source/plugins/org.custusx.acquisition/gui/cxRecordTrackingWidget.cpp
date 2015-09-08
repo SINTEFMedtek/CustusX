@@ -51,13 +51,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-RecordTrackingWidget::RecordTrackingWidget(AcquisitionServicePtr acquisitionService, VisServices services, QWidget* parent) :
+RecordTrackingWidget::RecordTrackingWidget(XmlOptionFile options, AcquisitionServicePtr acquisitionService, VisServices services, QWidget* parent) :
 	QWidget(parent),
 	mServices(services),
+	mOptions(options),
   mAcquisitionService(acquisitionService)
 {
 	QVBoxLayout* mVerticalLayout = new QVBoxLayout(this);
-	mOptions = profile()->getXmlSettings().descend("RecordTrackingWidget");
+//	mOptions = profile()->getXmlSettings().descend("RecordTrackingWidget");
 
 	mToolSelector = StringPropertySelectTool::New(services.getToolManager());
 	//this->initializeTrackingService();
@@ -105,11 +106,11 @@ QStringList RecordTrackingWidget::getSessionList()
 	return sessionUids;
 }
 
-void RecordTrackingWidget::initializeTrackingService()
-{
-	if(mServices.trackingService->getState() < Tool::tsCONFIGURED)
-		mServices.trackingService->setState(Tool::tsCONFIGURED);
-}
+//void RecordTrackingWidget::initializeTrackingService()
+//{
+//	if(mServices.trackingService->getState() < Tool::tsCONFIGURED)
+//		mServices.trackingService->setState(Tool::tsCONFIGURED);
+//}
 
 void RecordTrackingWidget::acquisitionStarted()
 {
