@@ -25,23 +25,34 @@ Ur5ManualMoveTab::~Ur5ManualMoveTab()
 
 void Ur5ManualMoveTab::setupUi(QWidget *parent)
 {
-    QGridLayout *mainLayout = new QGridLayout(this);
+   mainLayout = new QHBoxLayout(this);
 
-    QWidget *keyWidget = new QWidget();
-    QGridLayout *keyLayout = new QGridLayout(keyWidget);
+   QWidget *leftColumnWidgets = new QWidget();
+   QVBoxLayout *leftColumnLayout = new QVBoxLayout(leftColumnWidgets);
+
+   QWidget *rightColumnWidgets = new QWidget();
+   QVBoxLayout *rightColumnLayout = new QVBoxLayout(rightColumnWidgets);
+
+   setMoveToolLayout(leftColumnLayout);
+   setCoordInfoWidget(rightColumnLayout);
+   setMoveSettingsWidget(leftColumnLayout);
+   setJointMoveWidget(rightColumnLayout);
+
+   mainLayout->addWidget(leftColumnWidgets,0,Qt::AlignTop|Qt::AlignLeft);
+   mainLayout->addWidget(rightColumnWidgets,0,Qt::AlignTop|Qt::AlignRight);
+}
+
+void Ur5ManualMoveTab::setMoveToolLayout(QVBoxLayout *parent)
+{
+    QGroupBox* group = new QGroupBox("Move tool");
+    group->setFlat(true);
+    parent->addWidget(group);
+
+    QGridLayout *keyLayout = new QGridLayout();
+    group->setLayout(keyLayout);
     keyLayout->setSpacing(0);
     keyLayout->setMargin(0);
-
-    QWidget *rotKeyWidget = new QWidget();
-    QGridLayout *rotKeyLayout = new QGridLayout(rotKeyWidget);
-    rotKeyLayout->setSpacing(0);
-    rotKeyLayout->setMargin(0);
-
-    QWidget *velAccWidget = new QWidget();
-    QGridLayout *velAccLayout = new QGridLayout(velAccWidget);
-
-    QWidget *coordInfoWidget = new QWidget();
-    QGridLayout *coordInfoLayout = new QGridLayout(coordInfoWidget);
+    keyLayout->setContentsMargins(0,0,0,0);
 
     posZButton = new QPushButton();
     negZButton = new QPushButton();
