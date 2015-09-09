@@ -38,8 +38,8 @@ QString Ur5MessageEncoder::speedj(double* velocityField, double a, double t)
 QString Ur5MessageEncoder::speedl(Ur5State p, double a, double t)
 {
     return QString("speedl([%1,%2,%3,%4,%5,%6],a=%7,t_min=%8)")
-            .arg(p.jointAxisVelocity(0)).arg(p.jointAxisVelocity(1)).arg(p.jointAxisVelocity(2)).arg(p.jointAngleVelocity(0))
-            .arg(p.jointAngleVelocity(1)).arg(p.jointAngleVelocity(2)).arg(a).arg(t);
+            .arg(p.jointVelocity(0)).arg(p.jointVelocity(1)).arg(p.jointVelocity(2)).arg(p.jointVelocity(0))
+            .arg(p.jointVelocity(1)).arg(p.jointVelocity(2)).arg(a).arg(t);
 }
 
 QString Ur5MessageEncoder::set_tcp(Ur5State p)
