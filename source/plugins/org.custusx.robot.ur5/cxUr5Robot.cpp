@@ -24,10 +24,8 @@ void Ur5Robot::updateCurrentState()
     currentState.cartAxis=mSecMonitor.getCurrentState().cartAxis;
     currentState.force=mRTMonitor.getCurrentState().force;
     currentState.torque=mRTMonitor.getCurrentState().torque;
-    currentState.jointAngles=mRTMonitor.getCurrentState().jointAngles;
-    currentState.jointAngleVelocity=mRTMonitor.getCurrentState().jointAngleVelocity;
-    currentState.jointAxis=mRTMonitor.getCurrentState().jointAxis;
-    currentState.jointAxisVelocity=mRTMonitor.getCurrentState().jointAxisVelocity;
+    currentState.jointPosition=mRTMonitor.getCurrentState().jointPosition;
+    currentState.jointVelocity=mRTMonitor.getCurrentState().jointVelocity;
     currentState.tcpAngles=mRTMonitor.getCurrentState().tcpAngles;
     currentState.tcpAxis=mRTMonitor.getCurrentState().tcpAxis;
 
