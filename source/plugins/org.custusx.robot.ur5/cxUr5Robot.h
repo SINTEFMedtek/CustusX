@@ -57,6 +57,8 @@ private:
     Ur5State mCurrentState, mPreviousState;
 
     void sendMessage(QString message);
+    void connectToPort(int port);
+    void disconnectFromPort(int port);
 
 };
 
