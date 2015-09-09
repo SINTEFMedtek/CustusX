@@ -100,15 +100,5 @@ void ToolImpl::resetTrackingPositionFilter(TrackingPositionFilterPtr filter)
     mTrackingPositionFilter = filter;
 }
 
-void ToolImpl::addXml(QDomNode &dataNode)
-{
-    CX_LOG_WARNING() << "ToolImpl::addXml refactoring gone wrong... >.<";
-}
-
-void ToolImpl::parseXml(QDomNode &dataNode)
-{
-    CX_LOG_WARNING() << "ToolImpl::parseXml refactoring gone wrong... >.<";
-}
-
 } // namespace cx
 

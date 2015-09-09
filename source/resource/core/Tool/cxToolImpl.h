@@ -64,8 +64,8 @@ public:
 	virtual void resetTrackingPositionFilter(TrackingPositionFilterPtr filter);
 	virtual bool isNull() { return false; }
 
-    virtual void addXml(QDomNode& dataNode);
-    virtual void parseXml(QDomNode& dataNode);
+	virtual void addXml(QDomNode& dataNode) {}
+	virtual void parseXml(QDomNode& dataNode) {}
 
 protected:
 	virtual void set_prMt(const Transform3D& prMt, double timestamp);
