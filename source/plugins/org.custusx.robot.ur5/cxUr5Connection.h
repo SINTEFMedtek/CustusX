@@ -74,11 +74,12 @@ public:
 
     bool sendMessage(QString message);
 
-    void updateCurrentState(QByteArray buffer);
+
 
 public slots:
     void initializeWorkspace(double threshold,Ur5State origo,bool currentPos);
     void runProgramQueue(std::vector<QString> programQueue, std::vector<Ur5State> poseQueue);
+    void updateCurrentState(QByteArray buffer);
 
 private slots:
     virtual void internalDataAvailable();
