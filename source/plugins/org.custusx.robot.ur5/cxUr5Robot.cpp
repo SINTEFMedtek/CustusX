@@ -73,12 +73,18 @@ void Ur5Robot::connectToRobot(QString IPaddress)
 
     connectToPort(rtPort);
     connectToPort(secPort);
+
+    if(isConnectedToRobot())
+        emit(connected());
 }
 
 void Ur5Robot::disconnectFromRobot()
 {
     disconnectFromPort(rtPort);
     disconnectFromPort(secPort);
+
+    if(!isConnectedToRobot())
+        emit(disconnected());
 }
 
 void Ur5Robot::connectToPort(int port)
@@ -121,6 +127,7 @@ void Ur5Robot::shutdown()
 {
     sendMessage(mMessageEncoder.powerdown());
     disconnectFromRobot();
+    emit(shuttingdown());
 }
 
 void Ur5Robot::sendMessage(QString message)
