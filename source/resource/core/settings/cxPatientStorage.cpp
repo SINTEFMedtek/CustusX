@@ -61,9 +61,9 @@ void PatientStorage::duringSavePatientSlot(QDomElement& node)
 void PatientStorage::duringLoadPatientSlot(QDomElement& node)
 {
 	XMLNodeParser root(node);
-	QDomElement m2USRegWidget = root.descend(mBaseNodeName).node().toElement();
-	if (!m2USRegWidget.isNull())
-		this->parseXml(m2USRegWidget);
+	QDomElement baseNode = root.descend(mBaseNodeName).node().toElement();
+	if (!baseNode.isNull())
+		this->parseXml(baseNode);
 }
 
 void PatientStorage::addXml(QDomNode& parentNode)
@@ -81,7 +81,6 @@ void PatientStorage::addXml(QDomNode& parentNode)
 
 void PatientStorage::parseXml(QDomNode& dataNode)
 {
-
 	std::map<QString, boost::function<void(QString value)> >::iterator iter;
 	for(iter = mSetFunctions.begin(); iter != mSetFunctions.end(); ++iter)
 	{
