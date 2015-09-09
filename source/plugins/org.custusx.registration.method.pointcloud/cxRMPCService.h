@@ -29,60 +29,36 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXRMPCSERVICE_H
+#define CXRMPCSERVICE_H
 
-#ifndef CXACQUISITIONSERVICEPROXY_H
-#define CXACQUISITIONSERVICEPROXY_H
+#include "cxRegistrationMethodService.h"
+#include "org_custusx_registration_method_pointcloud_Export.h"
 
-#include "cxAcquisitionService.h"
-#include "cxServiceTrackerListener.h"
 namespace cx
 {
 
-/** \brief Always provides an AcqusitionService
+/**
+ * Registration method: Point cloud to surface.
  *
- * Use the Proxy design pattern.
- * Uses ServiceTrackerListener to either provide an
- * implementation of AcqusitionService or
- * the null object (AcqusitionServiceNull)
+ * \ingroup org_custusx_registration_method_pointcloud
  *
- *  \ingroup org_custusx_acqiusition
- *  \date 2014-11-26
- *  \author Ole Vegard Solberg, SINTEF
+ * \date 2015-09-06
+ * \author Christian Askeland, SINTEF
  */
-class org_custusx_acquisition_EXPORT AcquisitionServiceProxy : public AcquisitionService
+class org_custusx_registration_method_pointcloud_EXPORT RMPCImageToPatientService : public RegistrationMethodService
 {
-	Q_OBJECT
+	Q_INTERFACES(cx::RegistrationMethodService)
 public:
-//	static AcquisitionServicePtr create(ctkPluginContext *pluginContext);
-	AcquisitionServiceProxy(ctkPluginContext *context);
-	~AcquisitionServiceProxy() {}
-
-	virtual bool isNull();
-
-	virtual RecordSessionPtr getLatestSession();
-	virtual std::vector<RecordSessionPtr> getSessions();
-
-	virtual bool isReady(TYPES context) const;
-	virtual QString getInfoText(TYPES context) const;
-	virtual STATE getState() const;
-	virtual void toggleRecord(TYPES context);
-	virtual void startRecord(TYPES context);
-	virtual void stopRecord();
-	virtual void cancelRecord();
-	virtual void startPostProcessing();
-	virtual void stopPostProcessing();
-
-	virtual int getNumberOfSavingThreads() const;
-
-private:
-	ctkPluginContext *mPluginContext;
-	AcquisitionServicePtr mAcquisitionService;
-	boost::shared_ptr<ServiceTrackerListener<AcquisitionService> > mServiceListener;
-
-	void initServiceListener();
-	void onServiceAdded(AcquisitionService *service);
-	void onServiceRemoved(AcquisitionService *service);
+	RMPCImageToPatientService(RegServices services) :
+		RegistrationMethodService(services) {}
+	virtual ~RMPCImageToPatientService() {}
+	virtual QString getRegistrationType() {return QString("ImageToPatient");}
+	virtual QString getRegistrationMethod() {return QString("PointCloud");}
+	virtual QString getWidgetName() {return QString("org_custusx_registration_method_pointcloud_widget");}
+	virtual QWidget* createWidget();
 };
 
-} //cx
-#endif // CXACQUISITIONSERVICEPROXY_H
+} /* namespace cx */
+
+#endif // CXRMPCSERVICE_H

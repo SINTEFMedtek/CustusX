@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSTATESERVICEBACKEND_H
 #define CXSTATESERVICEBACKEND_H
 
-#include "org_custusx_core_state_Export.h"
+#include "cxResourceExport.h"
 
 #include "boost/shared_ptr.hpp"
 #include "cxForwardDeclarations.h"
@@ -52,7 +52,7 @@ typedef boost::shared_ptr<class StateServiceBackend> StateServiceBackendPtr;
  * \date 2014-03-06
  * \author christiana
  */
-class org_custusx_core_state_EXPORT StateServiceBackend
+class cxResource_EXPORT StateServiceBackend
 {
 public:
 	StateServiceBackend(TrackingServicePtr trackingService,

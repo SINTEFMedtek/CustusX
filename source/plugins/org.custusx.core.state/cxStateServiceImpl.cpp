@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSettings.h"
 #include "cxDataLocations.h"
 #include "cxWorkflowStateMachine.h"
+#include "cxCustusXWorkflowStateMachine.h"
 #include "cxDataLocations.h"
 #include "cxConfig.h"
 #include "cxVLCRecorder.h"
@@ -92,7 +93,7 @@ void StateServiceImpl::initialize(StateServiceBackendPtr backend)
 
 	ProfileManager::initialize();
 
-	mWorkflowStateMachine.reset(new WorkflowStateMachine(mBackend));
+    mWorkflowStateMachine.reset(new CustusXWorkflowStateMachine(mBackend));
 	mWorkflowStateMachine->start();
 
 	connect(mWorkflowStateMachine.get(), &WorkflowStateMachine::activeStateChanged, this, &StateServiceImpl::workflowStateChanged);

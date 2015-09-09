@@ -1,30 +1,27 @@
-###########################################################
-##               State Service
-##
-###########################################################
-
-project(org_custusx_core_state)
+project(org_custusx_registration_method_pointcloud)
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
 set(PLUGIN_SRCS
-    cxStateServiceImpl.cpp
-    cxCustusXWorkflowStateMachine.h
-    cxCustusXWorkflowStateMachine.cpp
-    cxCustusXWorkflowStates.h
-    cxCustusXWorkflowStates.cpp
-    cxStatePluginActivator.cpp
-    cxApplicationsParser.h
-    cxApplicationsParser.cpp
+    cxRMPCPluginActivator.h
+    cxRMPCPluginActivator.cpp
+
+	cxRMPCService.cpp
+	cxRMPCFromPointerService.cpp
+	cxRMPCWidget.cpp
+	cxRMPCFromPointerWidget.cpp
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
-    cxCustusXWorkflowStateMachine.h
-    cxCustusXWorkflowStates.h
-    cxStateServiceImpl.h
-    cxStatePluginActivator.h
+    cxRMPCPluginActivator.h
+	cxRMPCService.h
+	cxRMPCFromPointerService.h
+	cxRMPCWidget.h
+	cxRMPCFromPointerWidget.h
 )
+
+cx_create_export_header(${PROJECT_NAME})
 
 # Qt Designer files which should be processed by Qts uic
 set(PLUGIN_UI_FORMS
@@ -37,10 +34,9 @@ set(PLUGIN_resources
 #Compute the plugin dependencies
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
-    ${PLUGIN_target_libraries}
-    cxPluginUtilities
-    Qt5::Widgets
-    cxResource
+    ${PLUGIN_target_libraries}   
+    cxResourceWidgets
+	org_custusx_registration
     )
 
 set(PLUGIN_OUTPUT_DIR "")
@@ -59,8 +55,12 @@ ctkMacroBuildPlugin(
   TARGET_LIBRARIES ${PLUGIN_target_libraries}
   OUTPUT_DIR ${PLUGIN_OUTPUT_DIR}
 )
-target_include_directories(org_custusx_core_state
+
+target_include_directories(org_custusx_registration_method_pointcloud
     PUBLIC
     .
     ${CMAKE_CURRENT_BINARY_DIR}
 )
+
+cx_doc_define_plugin_user_docs("${PROJECT_NAME}" "${CMAKE_CURRENT_SOURCE_DIR}/doc")
+cx_add_non_source_file("doc/org_custusx_registration_method_pointcloud.md")

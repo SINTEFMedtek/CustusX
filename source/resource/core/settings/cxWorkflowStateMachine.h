@@ -30,92 +30,69 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXRECORDBASEWIDGET_H_
-#define CXRECORDBASEWIDGET_H_
+#ifndef CXWORKFLOWSTATEMACHINE_H_
+#define CXWORKFLOWSTATEMACHINE_H_
 
-#include "org_custusx_acquisition_Export.h"
+#include "cxResourceExport.h"
 
-#include <QWidget>
-#include "cxBaseWidget.h"
-#include "cxTool.h"
-#include "cxVideoRecorder.h"
-//#include "cxRecordSession.h"
-#include "cxAcquisitionService.h"
+#include <QStateMachine>
+#include <QActionGroup>
+#include "cxForwardDeclarations.h"
 
-class QLabel;
-class QVBoxLayout;
-class QDoubleSpinBox;
-class QPushButton;
+class QToolBar;
+class QMenu;
 
 namespace cx
 {
-/**
-* \file
-* \addtogroup org_custusx_acquisition
-* @{
-*/
+typedef boost::shared_ptr<class StateServiceBackend> StateServiceBackendPtr;
 
+class WorkflowState;
 
-typedef boost::shared_ptr<class RecordSession> RecordSessionPtr;
-class RecordSessionWidget;
-/**
- * RecordBaseWidget
+/** \brief State Machine for the Workflow Steps
  *
- * \brief
+ *  See StateService for a description.
  *
- * \date Dec 9, 2010
+ * \ingroup org_custusx_core_state
+ * \date 4. aug. 2010
  * \author Janne Beate Bakeng, SINTEF
  */
-class org_custusx_acquisition_EXPORT  RecordBaseWidget : public BaseWidget
+class cxResource_EXPORT WorkflowStateMachine: public QStateMachine
 {
-  Q_OBJECT
-
+Q_OBJECT
 public:
-  RecordBaseWidget(AcquisitionServicePtr acquisitionService, QWidget* parent, QString description = "Record Session");
-  virtual ~RecordBaseWidget();
+	WorkflowStateMachine(StateServiceBackendPtr backend);
+	virtual ~WorkflowStateMachine();
 
-protected:
-  AcquisitionServicePtr mAcquisitionService;
-  QVBoxLayout* mLayout;
-  RecordSessionWidget* mRecordSessionWidget;
+	QActionGroup* getActionGroup();
 
-};
-
-/**
- * TrackedRecordWidget
- *
- * \brief
- *
- * \date Dec 17, 2010
- * \author Janne Beate Bakeng, SINTEF
- */
-class org_custusx_acquisition_EXPORT  TrackedRecordWidget : public RecordBaseWidget
-{
-  Q_OBJECT
-public:
-  TrackedRecordWidget(AcquisitionServicePtr acquisitionService, QWidget* parent, QString description);
-  virtual ~TrackedRecordWidget();
+	QString getActiveUidState();
+	void setActiveState(QString uid);
 
 signals:
-  void toolChanged();
+    void activeStateChanged();
+    void activeStateAboutToChange();
 
-protected slots:
-  virtual void checkIfReadySlot() = 0;
-  virtual void postProcessingSlot(QString sessionId) = 0;
-  virtual void startedSlot(QString sessionId) = 0;
-  virtual void stoppedSlot(bool) = 0;
+private slots:
+	void startedSlot();
+	void clinicalApplicationChangedSlot();
 
 protected:
-  virtual TimedTransformMap getRecording(RecordSessionPtr session) = 0; ///< gets the tracking data from all relevant tool for the given session
-  void setTool(ToolPtr tool);
-  ToolPtr getTool();
+    virtual WorkflowState* newState(WorkflowState* state);
+
+    WorkflowState* mParentState;
+    StateServiceBackendPtr mBackend;
 
 private:
-  ToolPtr mTool;
+	void fillActionGroup(WorkflowState* current, QActionGroup* group);
+	QAction* addAction(QString stateUid, QActionGroup* group);
+
+	typedef std::map<QString, WorkflowState*> WorkflowStateMap;
+	WorkflowStateMap mStates;
+	QActionGroup* mActionGroup;
+	bool mStarted;
 };
 
-/**
-* @}
-*/
-}//namespace cx
-#endif /* CXRECORDBASEWIDGET_H_ */
+typedef boost::shared_ptr<WorkflowStateMachine> WorkflowStateMachinePtr;
+}
+
+#endif /* CXWORKFLOWSTATEMACHINE_H_ */

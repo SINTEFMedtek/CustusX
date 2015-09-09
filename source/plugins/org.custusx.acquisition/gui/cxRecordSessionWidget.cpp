@@ -46,14 +46,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-RecordSessionWidget::RecordSessionWidget(AcquisitionServicePtr base, QWidget* parent, QString defaultDescription, bool requireUsReady) :
+RecordSessionWidget::RecordSessionWidget(AcquisitionServicePtr base, QWidget* parent,
+										 AcquisitionService::TYPES context, QString defaultDescription) :
     BaseWidget(parent, "RecordSessionWidget", "Record Session"),
 	mAcquisitionService(base),
     mInfoLabel(new QLabel("")),
     mStartStopButton(new QPushButton(QIcon(":/icons/open_icon_library/media-record-3.png"), "Start")),
     mCancelButton(new QPushButton(QIcon(":/icons/open_icon_library/process-stop-7.png"), "Cancel")),
 	mDescriptionLine(new QLineEdit(defaultDescription)),
-	mRequireUsReady(requireUsReady)
+	mContext(context)
 {
 	QVBoxLayout* layout = new QVBoxLayout(this);
 	layout->setMargin(0);
@@ -80,18 +81,15 @@ RecordSessionWidget::RecordSessionWidget(AcquisitionServicePtr base, QWidget* pa
 
 	this->recordStateChangedSlot();
 
-	if (mRequireUsReady)
-	{
-		connect(mAcquisitionService.get(), &AcquisitionService::usReadinessChanged, this, &RecordSessionWidget::usReadinessChangedSlot);
-		this->usReadinessChangedSlot();
-	}
+	connect(mAcquisitionService.get(), &AcquisitionService::usReadinessChanged, this, &RecordSessionWidget::onReadinessChanged);
+	this->onReadinessChanged();
 }
 
-void RecordSessionWidget::setReady(bool val, QString text)
-{
-  this->setEnabled(val);
-  mInfoLabel->setText(text);
-}
+//void RecordSessionWidget::setReady(bool val, QString text)
+//{
+//  this->setEnabled(val);
+//  mInfoLabel->setText(text);
+//}
 
 void RecordSessionWidget::setDescriptionVisibility(bool value)
 {
@@ -107,10 +105,10 @@ void RecordSessionWidget::setDescription(QString text)
   mDescriptionLine->setText(text);
 }
 
-void RecordSessionWidget::usReadinessChangedSlot()
+void RecordSessionWidget::onReadinessChanged()
 {
-	this->setEnabled(mAcquisitionService->isReady());
-	mInfoLabel->setText(mAcquisitionService->getInfoText());
+	this->setEnabled(mAcquisitionService->isReady(mContext));
+	mInfoLabel->setText(mAcquisitionService->getInfoText(mContext));
 }
 
 void RecordSessionWidget::recordStateChangedSlot()
@@ -149,7 +147,7 @@ void RecordSessionWidget::recordStateChangedSlot()
 
 void RecordSessionWidget::startStopSlot(bool checked)
 {
-	mAcquisitionService->toggleRecord();
+	mAcquisitionService->toggleRecord(mContext);
 }
 
 void RecordSessionWidget::cancelSlot()

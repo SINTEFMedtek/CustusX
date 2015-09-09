@@ -75,7 +75,8 @@ TemporalCalibrationWidget::TemporalCalibrationWidget(VisServicesPtr services, Ac
 
   connect(acquisitionService.get(), SIGNAL(saveDataCompleted(QString)), this, SLOT(selectData(QString)));
 
-  mRecordSessionWidget = new RecordSessionWidget(acquisitionService, this, "temporal_calib");
+  cx::AcquisitionService::TYPES context(cx::AcquisitionService::tTRACKING | cx::AcquisitionService::tUS);
+  mRecordSessionWidget = new RecordSessionWidget(acquisitionService, this, context, "temporal_calib");
 
   mRecordSessionWidget->setDescriptionVisibility(false);
 

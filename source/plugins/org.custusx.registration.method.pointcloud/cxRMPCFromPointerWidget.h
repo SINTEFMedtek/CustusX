@@ -29,60 +29,13 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXRMPCFROMPOINTERWIDGET_H
+#define CXRMPCFROMPOINTERWIDGET_H
 
-#ifndef CXACQUISITIONSERVICEPROXY_H
-#define CXACQUISITIONSERVICEPROXY_H
-
-#include "cxAcquisitionService.h"
-#include "cxServiceTrackerListener.h"
-namespace cx
+class cxRMPCFromPointerWidget
 {
-
-/** \brief Always provides an AcqusitionService
- *
- * Use the Proxy design pattern.
- * Uses ServiceTrackerListener to either provide an
- * implementation of AcqusitionService or
- * the null object (AcqusitionServiceNull)
- *
- *  \ingroup org_custusx_acqiusition
- *  \date 2014-11-26
- *  \author Ole Vegard Solberg, SINTEF
- */
-class org_custusx_acquisition_EXPORT AcquisitionServiceProxy : public AcquisitionService
-{
-	Q_OBJECT
 public:
-//	static AcquisitionServicePtr create(ctkPluginContext *pluginContext);
-	AcquisitionServiceProxy(ctkPluginContext *context);
-	~AcquisitionServiceProxy() {}
-
-	virtual bool isNull();
-
-	virtual RecordSessionPtr getLatestSession();
-	virtual std::vector<RecordSessionPtr> getSessions();
-
-	virtual bool isReady(TYPES context) const;
-	virtual QString getInfoText(TYPES context) const;
-	virtual STATE getState() const;
-	virtual void toggleRecord(TYPES context);
-	virtual void startRecord(TYPES context);
-	virtual void stopRecord();
-	virtual void cancelRecord();
-	virtual void startPostProcessing();
-	virtual void stopPostProcessing();
-
-	virtual int getNumberOfSavingThreads() const;
-
-private:
-	ctkPluginContext *mPluginContext;
-	AcquisitionServicePtr mAcquisitionService;
-	boost::shared_ptr<ServiceTrackerListener<AcquisitionService> > mServiceListener;
-
-	void initServiceListener();
-	void onServiceAdded(AcquisitionService *service);
-	void onServiceRemoved(AcquisitionService *service);
+	cxRMPCFromPointerWidget();
 };
 
-} //cx
-#endif // CXACQUISITIONSERVICEPROXY_H
+#endif // CXRMPCFROMPOINTERWIDGET_H

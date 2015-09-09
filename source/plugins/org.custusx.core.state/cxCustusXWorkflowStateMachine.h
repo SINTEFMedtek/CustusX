@@ -30,69 +30,37 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXRECORDSESSIONWIDGET_H_
-#define CXRECORDSESSIONWIDGET_H_
+#ifndef CXCUSTUSXWORKFLOWSTATEMACHINE_H_
+#define CXCUSTUSXWORKFLOWSTATEMACHINE_H_
 
-#include "org_custusx_acquisition_Export.h"
+#include "org_custusx_core_state_Export.h"
 
-#include "cxBaseWidget.h"
-
-class QPushButton;
-class QLineEdit;
-class QLabel;
+#include <QObject>
+#include "boost/shared_ptr.hpp"
+#include "cxWorkflowStateMachine.h"
 
 namespace cx
 {
-/**
-* \file
-* \addtogroup org_custusx_acquisition
-* @{
-*/
+typedef boost::shared_ptr<class StateServiceBackend> StateServiceBackendPtr;
 
-typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
-typedef boost::shared_ptr<class RecordSessionWidget> RecordSessionWidgetPtr;
-
-/**
- * \class RecordSessionWidget
+/** \brief State Machine for the Workflow Steps for CustusX
  *
- * \brief
+ *  See StateService for a description.
  *
- * \date Dec 8, 2010
- * \author Janne Beate Bakeng
+ * \ingroup org_custusx_core_state
+ * \date 9. sept. 2015
+ * \author Janne Beate Bakeng, SINTEF
  */
-class org_custusx_acquisition_EXPORT  RecordSessionWidget : public BaseWidget
+class org_custusx_core_state_EXPORT CustusXWorkflowStateMachine : public WorkflowStateMachine
 {
-  Q_OBJECT
-
+Q_OBJECT
 public:
-  RecordSessionWidget(AcquisitionServicePtr base, QWidget* parent, QString defaultDescription = "Record Session", bool requireUsReady = true);
-  virtual ~RecordSessionWidget();
+        CustusXWorkflowStateMachine(StateServiceBackendPtr backend);
+        virtual ~CustusXWorkflowStateMachine();
 
-  void setDescription(QString text);
-  void setDescriptionVisibility(bool value);
-
-public slots:
-	void setReady(bool val, QString text); ///< deprecated: use readinessChangedSlot instead.
-
-private slots:
-  void startStopSlot(bool);
-  void cancelSlot();
-  void recordStateChangedSlot();
-  void usReadinessChangedSlot();
-
-private:
-
-  AcquisitionServicePtr mAcquisitionService;
-  QLabel* mInfoLabel;
-  QPushButton* mStartStopButton;
-  QPushButton* mCancelButton;
-  QLabel* mDescriptionLabel;
-  QLineEdit* mDescriptionLine;
-  bool mRequireUsReady;
 };
 
-/**
-* @}
-*/
-}//namespace cx
-#endif /* CXRECORDSESSIONWIDGET_H_ */
+typedef boost::shared_ptr<CustusXWorkflowStateMachine> CustusXWorkflowStateMachinePtr;
+}
+
+#endif /* CXCUSTUSXWORKFLOWSTATEMACHINE_H_ */

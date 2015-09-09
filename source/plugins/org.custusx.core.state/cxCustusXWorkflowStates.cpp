@@ -30,7 +30,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxWorkflowState.h"
+#include "cxCustusXWorkflowStates.h"
 #include "cxStateService.h"
 #include "cxSettings.h"
 #include "cxTrackingService.h"
@@ -42,71 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-
-void WorkflowState::onEntry(QEvent * event)
-{
-	report("Workflow change to [" + mName + "]");
-	if (mAction)
-		mAction->setChecked(true);
-}
-
-void WorkflowState::onExit(QEvent * event)
-{
-	emit aboutToExit();
-}
-
-std::vector<WorkflowState*> WorkflowState::getChildStates()
-{
-	QObjectList childrenList = this->children();
-	std::vector<WorkflowState*> retval;
-	for (int i = 0; i < childrenList.size(); ++i)
-	{
-		WorkflowState* state = dynamic_cast<WorkflowState*>(childrenList[i]);
-		if (state)
-			retval.push_back(state);
-	}
-	return retval;
-}
-
-QAction* WorkflowState::createAction(QActionGroup* group)
-{
-	if (mAction)
-		return mAction;
-
-	mAction = new QAction(this->getName(), group);
-	mAction->setIcon(this->getIcon());
-	mAction->setStatusTip(this->getName());
-	mAction->setCheckable(true);
-	mAction->setData(QVariant(this->getUid()));
-	this->canEnterSlot();
-
-	connect(mAction, SIGNAL(triggered()), this, SLOT(setActionSlot()));
-
-	return mAction;
-}
-
-void WorkflowState::canEnterSlot()
-{
-	if (mAction)
-		mAction->setEnabled(this->canEnter());
-}
-
-void WorkflowState::setActionSlot()
-{
-	this->machine()->postEvent(new RequestEnterStateEvent(this->getUid()));
-}
-
-
-void WorkflowState::autoStartHardware()
-{
-	if (settings()->value("Automation/autoStartTracking").toBool())
-		mBackend->getToolManager()->setState(Tool::tsTRACKING);
-	if (settings()->value("Automation/autoStartStreaming").toBool())
-		mBackend->getVideoService()->openConnection();
-}
-
-// --------------------------------------------------------
-// --------------------------------------------------------
 
 // --------------------------------------------------------
 // --------------------------------------------------------

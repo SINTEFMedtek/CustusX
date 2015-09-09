@@ -30,60 +30,29 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXTRACKEDCENTERLINEWIDGET_H_
-#define CXTRACKEDCENTERLINEWIDGET_H_
-
-#include "org_custusx_acquisition_Export.h"
-
-#include "cxRecordBaseWidget.h"
-#include "cxTool.h"
+#include "cxCustusXWorkflowStateMachine.h"
+#include "cxCustusXWorkflowStates.h"
+#include "cxStateServiceBackend.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 
-/**
-* \file
-* \addtogroup org_custusx_acquisition
-* @{
-*/
-
-/**
- * TrackedCenterlineWidget
- *
- * \brief NOT IN USE. TEST!!!
- *
- * \date Dec 9, 2010
- * \author Janne Beate Bakeng, SINTEF
- */
-class org_custusx_acquisition_EXPORT  TrackedCenterlineWidget : public TrackedRecordWidget
+CustusXWorkflowStateMachine::CustusXWorkflowStateMachine(StateServiceBackendPtr backend) :
+    WorkflowStateMachine(backend)
 {
-  Q_OBJECT
-public:
-  TrackedCenterlineWidget(AcquisitionServicePtr acquisitionService, VisServicesPtr services, QWidget* parent);
-  virtual ~TrackedCenterlineWidget();
+	WorkflowState* patientData = this->newState(new PatientDataWorkflowState(mParentState, mBackend));
+	this->newState(new RegistrationWorkflowState(mParentState, mBackend));
+	this->newState(new PreOpPlanningWorkflowState(mParentState, mBackend));
+	this->newState(new NavigationWorkflowState(mParentState, mBackend));
+	this->newState(new IntraOpImagingWorkflowState(mParentState, mBackend));
+	this->newState(new PostOpControllWorkflowState(mParentState, mBackend));
 
-protected slots:
-  void checkIfReadySlot();
-  void postProcessingSlot(QString sessionId);
-  void startedSlot(QString sessionId);
-  void stoppedSlot(bool);
+	//set initial state on all levels
+	this->setInitialState(mParentState);
+	mParentState->setInitialState(patientData);
+}
 
-  void centerlineFinishedSlot();
-  void preprocessResampler();
+CustusXWorkflowStateMachine::~CustusXWorkflowStateMachine()
+{}
 
-private:
-  virtual TimedTransformMap getRecording(RecordSessionPtr session); ///< gets the tracking data from all relevant tool for the given session
-  ToolPtr findTool(double startTime, double stopTime);
-
-//  Centerline  mCenterlineAlgorithm;
-  QString mSessionID;
-  VisServicesPtr mServices;
-};
-
-/**
-* @}
-*/
-}//namespace cx
-
-#endif /* CXTRACKEDCENTERLINEWIDGET_H_ */
+} //namespace cx

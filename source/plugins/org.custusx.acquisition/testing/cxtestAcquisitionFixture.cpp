@@ -170,7 +170,7 @@ void AcquisitionFixture::start()
 	if (cx::trackingService()->getState() < cx::Tool::tsTRACKING)
 		return;
 
-	mAcquisitionService->startRecord();
+	mAcquisitionService->startRecord(this->getContext());
 	QTimer::singleShot(mRecordDuration, this, SLOT(stop()));
 }
 
@@ -184,11 +184,18 @@ void AcquisitionFixture::newFrameSlot()
 	// add debug code here if needed.
 }
 
+cx::AcquisitionService::TYPES AcquisitionFixture::getContext()
+{
+	cx::AcquisitionService::TYPES context(cx::AcquisitionService::tTRACKING | cx::AcquisitionService::tUS);
+	return context;
+}
+
+
 void AcquisitionFixture::readinessChangedSlot()
 {
 	std::cout << QString("Acquisition Ready Status %1: %2")
-				 .arg(mAcquisitionService->isReady())
-				 .arg(mAcquisitionService->getInfoText()) << std::endl;
+				 .arg(mAcquisitionService->isReady(this->getContext()))
+				 .arg(mAcquisitionService->getInfoText(this->getContext())) << std::endl;
 }
 
 void AcquisitionFixture::acquisitionDataReadySlot()

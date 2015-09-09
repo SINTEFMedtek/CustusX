@@ -84,6 +84,7 @@ public:
 	virtual bool isReadOnly() const { return mIsReadOnly; }
 	virtual bool getAllowOnlyValuesInRange() const { return mAllowOnlyValuesInRange; }
 	void setReadOnly(bool val);
+	virtual void setDisplayName(QString val);
 
 
 signals:

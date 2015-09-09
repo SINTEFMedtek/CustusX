@@ -29,72 +29,74 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXRECORDTRACKINGWIDGET_H
+#define CXRECORDTRACKINGWIDGET_H
 
-#ifndef CXACQUISITIONIMPLSERVICE_H
-#define CXACQUISITIONIMPLSERVICE_H
-
-#include "cxAcquisitionService.h"
-class ctkPluginContext;
-class QDomElement;
+#include <QPushButton>
+#include <QDomElement>
+#include "cxForwardDeclarations.h"
+#include "cxXmlOptionItem.h"
+#include "cxTool.h"
+#include "cxVisServices.h"
+#include "org_custusx_acquisition_Export.h"
 
 namespace cx
 {
+class WidgetObscuredListener;
 typedef boost::shared_ptr<class Acquisition> AcquisitionPtr;
+typedef boost::shared_ptr<class StringPropertySelectMesh> StringPropertySelectMeshPtr;
+typedef boost::shared_ptr<class ToolRep3D> ToolRep3DPtr;
+typedef boost::shared_ptr<class RecordSessionWidget> RecordSessionWidgetPtr;
 typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
-typedef boost::shared_ptr<class USAcquisition> USAcquisitionPtr;
-typedef boost::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
-typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
-typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
-typedef boost::shared_ptr<class VisServices> VisServicesPtr;
+//typedef boost::shared_ptr<class BronchoscopyRegistration> BronchoscopyRegistrationPtr;
+typedef std::map<QString, ToolPtr> ToolMap;
+typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
 
-/** \brief Implementation for Acqusition service
+/**
  *
- *  \ingroup org_custusx_acqiusition
- *  \date 2014-11-26
- *  \author Ole Vegard Solberg, SINTEF
+ * Record tracking data.
+ *
+ * \date 2015-09-06
+ * \author Christian Askeland
  */
-class org_custusx_acquisition_EXPORT AcquisitionImplService : public AcquisitionService
+class org_custusx_acquisition_EXPORT RecordTrackingWidget: public QWidget
 {
-	Q_INTERFACES(cx::AcquisitionService)
+	Q_OBJECT
+
 public:
-	AcquisitionImplService(ctkPluginContext *context);
-	virtual ~AcquisitionImplService();
-	virtual bool isNull();
+	RecordTrackingWidget(XmlOptionFile options, AcquisitionServicePtr acquisitionService, VisServices services, QWidget *parent);
+	virtual ~RecordTrackingWidget()	{}
 
-	virtual RecordSessionPtr getLatestSession();
-	virtual std::vector<RecordSessionPtr> getSessions();
-
-	virtual bool isReady(TYPES context) const;
-	virtual QString getInfoText(TYPES context) const;
-	virtual STATE getState() const;
-	virtual void toggleRecord(TYPES context);
-	virtual void startRecord(TYPES context);
-	virtual void stopRecord();
-	virtual void cancelRecord();
-	virtual void startPostProcessing();
-	virtual void stopPostProcessing();
-
-	virtual int getNumberOfSavingThreads() const;
-
+	ToolPtr getSuitableRecordingTool();
+	TimedTransformMap getRecordedTrackerData_prMt();
+	void ShowLastRecordingInView();
+	StringPropertyPtr getSessionSelector() { return mSessionSelector; }
 
 private slots:
-	void duringClearPatientSlot();
-	void duringSavePatientSlot(QDomElement& node);
-	void duringLoadPatientSlot(QDomElement& node);
-private:
-	ctkPluginContext* mContext;
-	AcquisitionDataPtr mAcquisitionData;
-	AcquisitionPtr mAcquisition;
-	UsReconstructionServicePtr mUsReconstructService;
-	USAcquisitionPtr mUsAcquisition;
-	VisServicesPtr mServices;
+	void acquisitionStarted();
+	void acquisitionStopped();
+	void obscuredSlot(bool obscured);
 
-	void addXml(QDomNode& dataNode);
-	void parseXml(QDomNode& dataNode);
+	void acquisitionCancelled();
+	void recordedSessionsChanged();
+private:
+	VisServices mServices;
+	AcquisitionServicePtr mAcquisitionService;
+	XmlOptionFile mOptions;
+
+	RecordSessionWidgetPtr mRecordSessionWidget;
+	StringPropertyPtr mSessionSelector;
+	ToolPtr mRecordingTool;
+	StringPropertySelectToolPtr mToolSelector;
+
+	boost::shared_ptr<WidgetObscuredListener> mObscuredListener;
+
+	void initSessionSelector();
+	QStringList getSessionList();
+//	void initializeTrackingService();
+	ToolRep3DPtr getToolRepIn3DView();
 };
 
-typedef boost::shared_ptr<AcquisitionImplService> AcquisitionImplServicePtr;
+} //namespace cx
 
-} //cx
-
-#endif // CXACQUISITIONIMPLSERVICE_H
+#endif // CXRECORDTRACKINGWIDGET_H

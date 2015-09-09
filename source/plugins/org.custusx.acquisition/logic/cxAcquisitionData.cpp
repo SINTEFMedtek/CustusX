@@ -43,6 +43,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSettings.h"
 #include "cxUsReconstructionService.h"
 #include "cxReporter.h"
+#include "cxVisServices.h"
+
 
 namespace cx
 {
@@ -158,23 +160,77 @@ QString AcquisitionData::getNewUid()
 ///--------------------------------------------------------
 
 Acquisition::Acquisition(AcquisitionDataPtr pluginData, QObject* parent) :
-	QObject(parent), mPluginData(pluginData), mCurrentState(AcquisitionService::sNOT_RUNNING)
+	QObject(parent), mPluginData(pluginData), mCurrentState(AcquisitionService::sNOT_RUNNING),
+  mReady(true),
+  mInfoText("")
 {
+	connect(this->getServices()->getToolManager().get(), &TrackingService::stateChanged, this, &Acquisition::checkIfReadySlot);
+	connect(this->getServices()->getToolManager().get(), &TrackingService::activeToolChanged, this, &Acquisition::checkIfReadySlot);
+	this->checkIfReadySlot();
 }
 
 Acquisition::~Acquisition()
 {
 }
 
-void Acquisition::toggleRecord()
+bool Acquisition::isReady(AcquisitionService::TYPES context) const
+{
+	if (!context.testFlag(AcquisitionService::tTRACKING))
+		return true;
+	return mReady;
+//	return true;
+}
+
+QString Acquisition::getInfoText(AcquisitionService::TYPES context) const
+{
+	if (!context.testFlag(AcquisitionService::tTRACKING))
+		return "";
+	return mInfoText;
+}
+
+void Acquisition::checkIfReadySlot()
+{
+	bool tracking = this->getServices()->getToolManager()->getState()>=Tool::tsTRACKING;
+	ToolPtr tool = this->getServices()->getToolManager()->getActiveTool();
+
+	QString mWhatsMissing;
+	mWhatsMissing.clear();
+
+	if(tracking)
+	{
+		mWhatsMissing = "<font color=green>Ready to record!</font><br>";
+		if (!tool || !tool->getVisible())
+		{
+			mWhatsMissing += "<font color=orange>Tool not visible</font><br>";
+		}
+	}
+	else
+	{
+		mWhatsMissing.append("<font color=red>Need to start tracking.</font><br>");
+	}
+
+	// do not require tracking to be present in order to perform an acquisition.
+	this->setReady(tracking, mWhatsMissing);
+}
+
+void Acquisition::setReady(bool val, QString text)
+{
+	std::cout << "Acquisition::setReady " << text << std::endl;
+	mReady = val;
+	mInfoText = text;
+
+	emit readinessChanged();
+}
+
+void Acquisition::toggleRecord(AcquisitionService::TYPES context)
 {
 	if (this->getState()==AcquisitionService::sRUNNING)
 		this->stopRecord();
 	else
-		this->startRecord();
+		this->startRecord(context);
 }
 
-void Acquisition::startRecord()
+void Acquisition::startRecord(AcquisitionService::TYPES context)
 {
 	if (this->getState()!=AcquisitionService::sNOT_RUNNING)
 	{
@@ -183,6 +239,7 @@ void Acquisition::startRecord()
 	}
 
 	double startTime = getMilliSecondsSinceEpoch();
+	mCurrentContext = context;
 	mLatestSession.reset(new cx::RecordSession(mPluginData->getNewUid(), startTime, startTime, settings()->value("Ultrasound/acquisitionName").toString()));
 	reporter()->playStartSound();
 	this->setState(AcquisitionService::sRUNNING);
@@ -210,6 +267,7 @@ void Acquisition::cancelRecord()
 	}
 	reporter()->playCancelSound();
 	mLatestSession.reset();
+	mCurrentContext = AcquisitionService::TYPES();
 	this->setState(AcquisitionService::sNOT_RUNNING);
 }
 
@@ -239,5 +297,9 @@ void Acquisition::setState(AcquisitionService::STATE newState)
 	emit stateChanged();
 }
 
+VisServicesPtr Acquisition::getServices()
+{
+	return this->getPluginData()->getServices();
+}
 
 }

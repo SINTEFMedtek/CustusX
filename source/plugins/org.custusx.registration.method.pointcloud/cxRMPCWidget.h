@@ -29,59 +29,62 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXRMPCWIDGET_H
+#define CXRMPCWIDGET_H
 
-#ifndef CXPATIENTSTORAGE_H
-#define CXPATIENTSTORAGE_H
+#include <QPushButton>
+#include <QDomElement>
+#include "cxRegistrationBaseWidget.h"
+#include "cxForwardDeclarations.h"
+#include "cxXmlOptionItem.h"
 
-#include "cxResourceExport.h"
-
-#include <QObject>
-#include <boost/shared_ptr.hpp>
-#include <boost/function.hpp>
-#include <boost/bind.hpp>
-
-class QDomElement;
-class QDomNode;
 
 namespace cx
 {
-typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
+class WidgetObscuredListener;
+class RecordTrackingWidget;
+typedef boost::shared_ptr<class Acquisition> AcquisitionPtr;
+typedef boost::shared_ptr<class StringPropertySelectMesh> StringPropertySelectMeshPtr;
+typedef boost::shared_ptr<class ToolRep3D> ToolRep3DPtr;
+typedef boost::shared_ptr<class RecordSessionWidget> RecordSessionWidgetPtr;
+typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
+//typedef boost::shared_ptr<class BronchoscopyRegistration> BronchoscopyRegistrationPtr;
+typedef std::map<QString, ToolPtr> ToolMap;
+typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
 
-/**\brief Helper class for storing variables in the patient file.
+/**
  *
- * Use boost::bind to supply get/set functions.
+ * \brief Register a point cloud to a surface
  *
- * E.g.:
- * storeVariable("variableName", boost::bind(&VariableToBeStoredClass::getValue, &variableToBeStored), boost::bind(&VariableToBeStoredClass::setValue, &variableToBeStored, _1));
- *
- * or:
- * storeVariable("variableName", boost::bind(&VariableToBeStoredClass::getValue, variableToBeStoredSmartPtr), boost::bind(&VariableToBeStoredClass::setValue, variableToBeStoredSmartPtr, _1));
- *
- *  \date Sep 07, 2015
- *  \author Ole Vegard Solberg, SINTEF
+ * \date 2015-09-06
+ * \author Christian Askeland
  */
-class cxResource_EXPORT PatientStorage : public QObject
+class RMPCWidget: public RegistrationBaseWidget
 {
 	Q_OBJECT
+
 public:
-	PatientStorage(SessionStorageServicePtr sessionStorageService, QString baseNodeName);
-	/**
-	 * @brief storeVariable Store a variable in the patient file
-	 * @param nodeName Name of the node to store
-	 * @param getValueFunction Suppy a get function returning a QString. Use boost::bind
-	 * @param setValueFunction Suppy a set function with a QString as parameter. Use boost::bind
-	 */
-	void storeVariable(QString nodeName, boost::function<QString ()> getValueFunction, boost::function<void (QString)> setValueFunction);
+	RMPCWidget(RegServices services, QWidget *parent);
+	virtual ~RMPCWidget()
+	{
+	}
+	virtual QString defaultWhatsThis() const;
 private slots:
-	void duringSavePatientSlot(QDomElement &node);
-	void duringLoadPatientSlot(QDomElement &node);
+	void registerSlot();
 private:
-	QString mBaseNodeName;
-	std::map<QString, boost::function<QString()> > mGetFunctions;
-	std::map<QString, boost::function<void(QString value)> > mSetFunctions;
-	void addXml(QDomNode &parentNode);
-	void parseXml(QDomNode &dataNode);
+	RegServices mServices;
+	QVBoxLayout* mVerticalLayout;
+	QLabel* mLabel;
+	XmlOptionFile mOptions;
+	MeshPtr mMesh;
+
+	QVBoxLayout* createVBoxInGroupBox(QVBoxLayout* parent, QString header);
+
+	StringPropertySelectMeshPtr mSurfaceSelector;
+	QPushButton* mRegisterButton;
+	RecordTrackingWidget* mRecordTrackingWidget;
 };
 
-} //cx
-#endif // CXPATIENTSTORAGE_H
+} //namespace cx
+
+#endif // CXRMPCWIDGET_H

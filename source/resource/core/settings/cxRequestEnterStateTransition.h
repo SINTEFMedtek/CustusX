@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXREQUESTENTERSTATETRANSITION_H_
 #define CXREQUESTENTERSTATETRANSITION_H_
 
-#include "org_custusx_core_state_Export.h"
+#include "cxResourceExport.h"
 
 #include <QEvent>
 #include <QAbstractTransition>
@@ -49,7 +49,7 @@ namespace cx
 /** \brief Utility class for StateService states.
  *
  */
-struct org_custusx_core_state_EXPORT  RequestEnterStateEvent: public QEvent
+struct cxResource_EXPORT  RequestEnterStateEvent: public QEvent
 {
 	RequestEnterStateEvent(const QString &stateUid) :
 					QEvent(QEvent::Type(QEvent::User + 1)), mStateUid(stateUid)
@@ -63,7 +63,7 @@ struct org_custusx_core_state_EXPORT  RequestEnterStateEvent: public QEvent
  * \date 5. aug. 2010
  * \\author jbake
  */
-class org_custusx_core_state_EXPORT RequestEnterStateTransition: public QAbstractTransition
+class cxResource_EXPORT RequestEnterStateTransition: public QAbstractTransition
 {
 public:
 	RequestEnterStateTransition(const QString &stateUid) :

@@ -30,59 +30,51 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXACQUISITIONSERVICEPROXY_H
-#define CXACQUISITIONSERVICEPROXY_H
+#ifndef CXRMPCPLUGINACTIVATOR_H
+#define CXRMPCPLUGINACTIVATOR_H
 
-#include "cxAcquisitionService.h"
-#include "cxServiceTrackerListener.h"
+#include "org_custusx_registration_method_pointcloud_Export.h"
+
+#include <ctkPluginActivator.h>
+#include "boost/shared_ptr.hpp"
+
 namespace cx
 {
-
-/** \brief Always provides an AcqusitionService
+/**
+ * \defgroup org_custusx_registration_method_pointcloud
+ * \ingroup cx_plugins
  *
- * Use the Proxy design pattern.
- * Uses ServiceTrackerListener to either provide an
- * implementation of AcqusitionService or
- * the null object (AcqusitionServiceNull)
- *
- *  \ingroup org_custusx_acqiusition
- *  \date 2014-11-26
- *  \author Ole Vegard Solberg, SINTEF
  */
-class org_custusx_acquisition_EXPORT AcquisitionServiceProxy : public AcquisitionService
+
+typedef boost::shared_ptr<class DicomGUIExtenderService> DicomGUIExtenderServicePtr;
+typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
+
+/**
+ * Activator for the pointcloud registration plugin
+ *
+ * \ingroup org_custusx_registration_method_pointcloud
+ *
+ * \date 2015-09-06
+ * \author Christian Askeland
+ */
+class org_custusx_registration_method_pointcloud_EXPORT RMPCPluginActivator :  public QObject, public ctkPluginActivator
 {
-	Q_OBJECT
+  Q_OBJECT
+  Q_INTERFACES(ctkPluginActivator)
+  Q_PLUGIN_METADATA(IID "org_custusx_registration_method_pointcloud")
+
 public:
-//	static AcquisitionServicePtr create(ctkPluginContext *pluginContext);
-	AcquisitionServiceProxy(ctkPluginContext *context);
-	~AcquisitionServiceProxy() {}
 
-	virtual bool isNull();
+  RMPCPluginActivator();
+  ~RMPCPluginActivator();
 
-	virtual RecordSessionPtr getLatestSession();
-	virtual std::vector<RecordSessionPtr> getSessions();
-
-	virtual bool isReady(TYPES context) const;
-	virtual QString getInfoText(TYPES context) const;
-	virtual STATE getState() const;
-	virtual void toggleRecord(TYPES context);
-	virtual void startRecord(TYPES context);
-	virtual void stopRecord();
-	virtual void cancelRecord();
-	virtual void startPostProcessing();
-	virtual void stopPostProcessing();
-
-	virtual int getNumberOfSavingThreads() const;
+  void start(ctkPluginContext* context);
+  void stop(ctkPluginContext* context);
 
 private:
-	ctkPluginContext *mPluginContext;
-	AcquisitionServicePtr mAcquisitionService;
-	boost::shared_ptr<ServiceTrackerListener<AcquisitionService> > mServiceListener;
-
-	void initServiceListener();
-	void onServiceAdded(AcquisitionService *service);
-	void onServiceRemoved(AcquisitionService *service);
+  RegisteredServicePtr mRegistration;
 };
 
-} //cx
-#endif // CXACQUISITIONSERVICEPROXY_H
+} // namespace cx
+
+#endif // CXRMPCPLUGINACTIVATOR_H

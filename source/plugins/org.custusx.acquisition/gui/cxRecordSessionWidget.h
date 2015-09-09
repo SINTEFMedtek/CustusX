@@ -30,66 +30,73 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXWORKFLOWSTATEMACHINE_H_
-#define CXWORKFLOWSTATEMACHINE_H_
+#ifndef CXRECORDSESSIONWIDGET_H_
+#define CXRECORDSESSIONWIDGET_H_
 
-#include "org_custusx_core_state_Export.h"
+#include "org_custusx_acquisition_Export.h"
 
-#include <QStateMachine>
-#include <QActionGroup>
-#include "cxForwardDeclarations.h"
+#include "cxBaseWidget.h"
+#include "cxAcquisitionService.h"
 
-class QToolBar;
-class QMenu;
+class QPushButton;
+class QLineEdit;
+class QLabel;
 
 namespace cx
 {
-typedef boost::shared_ptr<class StateServiceBackend> StateServiceBackendPtr;
+/**
+* \file
+* \addtogroup org_custusx_acquisition
+* @{
+*/
 
-class WorkflowState;
+typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
+typedef boost::shared_ptr<class RecordSessionWidget> RecordSessionWidgetPtr;
 
-/** \brief State Machine for the Workflow Steps
+/**
+ * \class RecordSessionWidget
  *
- *  See StateService for a description.
+ * \brief
  *
- * \ingroup org_custusx_core_state
- * \date 4. aug. 2010
- * \author Janne Beate Bakeng, SINTEF
+ * \date Dec 8, 2010
+ * \author Janne Beate Bakeng
  */
-class org_custusx_core_state_EXPORT WorkflowStateMachine: public QStateMachine
+class org_custusx_acquisition_EXPORT  RecordSessionWidget : public BaseWidget
 {
-Q_OBJECT
+  Q_OBJECT
+
 public:
-	WorkflowStateMachine(StateServiceBackendPtr backend);
-	virtual ~WorkflowStateMachine();
+  RecordSessionWidget(AcquisitionServicePtr base, QWidget* parent,
+					  AcquisitionService::TYPES context,
+					  QString defaultDescription = "Record Session"
+					  );
+  virtual ~RecordSessionWidget();
 
-	QActionGroup* getActionGroup();
+  void setDescription(QString text);
+  void setDescriptionVisibility(bool value);
 
-	QString getActiveUidState();
-	void setActiveState(QString uid);
-
-signals:
-	void activeStateChanged();
-	void activeStateAboutToChange();
+//public slots:
+//	void setReady(bool val, QString text); ///< deprecated: use readinessChangedSlot instead.
 
 private slots:
-	void startedSlot();
-	void clinicalApplicationChangedSlot();
+  void startStopSlot(bool);
+  void cancelSlot();
+  void recordStateChangedSlot();
+  void onReadinessChanged();
 
 private:
-	void fillActionGroup(WorkflowState* current, QActionGroup* group);
-	QAction* addAction(QString stateUid, QActionGroup* group);
-	WorkflowState* newState(WorkflowState* state);
 
-	typedef std::map<QString, WorkflowState*> WorkflowStateMap;
-	WorkflowStateMap mStates;
-	WorkflowState* mParentState;
-	QActionGroup* mActionGroup;
-	bool mStarted;
-	StateServiceBackendPtr mBackend;
+  AcquisitionServicePtr mAcquisitionService;
+  QLabel* mInfoLabel;
+  QPushButton* mStartStopButton;
+  QPushButton* mCancelButton;
+  QLabel* mDescriptionLabel;
+  QLineEdit* mDescriptionLine;
+  AcquisitionService::TYPES mContext;
 };
 
-typedef boost::shared_ptr<WorkflowStateMachine> WorkflowStateMachinePtr;
-}
-
-#endif /* CXWORKFLOWSTATEMACHINE_H_ */
+/**
+* @}
+*/
+}//namespace cx
+#endif /* CXRECORDSESSIONWIDGET_H_ */
