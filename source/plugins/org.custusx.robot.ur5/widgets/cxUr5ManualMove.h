@@ -6,6 +6,7 @@
 
 #include <QLineEdit>
 #include <QPushButton>
+#include <QGridLayout>
 
 namespace cx
 {
@@ -22,6 +23,9 @@ public:
 
     QLineEdit *xPosLineEdit, *yPosLineEdit, *zPosLineEdit;
     QLineEdit *rxLineEdit, *ryLineEdit, *rzLineEdit;
+
+    QLineEdit *jxPosLineEdit, *jyPosLineEdit, *jzPosLineEdit;
+    QLineEdit *jrxLineEdit, *jryLineEdit, *jrzLineEdit;
 
     QLineEdit *accelerationLineEdit, *velocityLineEdit, *timeLineEdit;
 
@@ -50,9 +54,15 @@ public slots:
 
 
 private:
+    QHBoxLayout *mainLayout;
     void setupUi(QWidget *parent);
     Ur5RobotPtr mUr5Robot;
     void connectMovementButtons();
+
+    void setMoveToolLayout(QVBoxLayout *vLayout);
+    void setMoveSettingsWidget(QVBoxLayout *vLayout);
+    void setCoordInfoWidget(QVBoxLayout *vLayout);
+    void setJointMoveWidget(QVBoxLayout *vLayout);
 };
 
 } // cx
