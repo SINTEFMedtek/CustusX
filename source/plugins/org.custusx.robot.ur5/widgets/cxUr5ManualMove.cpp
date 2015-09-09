@@ -3,6 +3,7 @@
 #include <QGridLayout>
 #include <QLabel>
 #include <QApplication>
+#include <QGroupBox>
 
 namespace cx
 {
