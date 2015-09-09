@@ -77,7 +77,7 @@ bool Ur5Connection::sendMessage(QString message)
     return mSocket->waitForBytesWritten(3000);
 }
 
-bool Ur5Connection::waitForMessage()
+bool Ur5Connection::waitForUpdate()
 {
     mSocket->waitForBytesWritten(3000);
     return mSocket->waitForReadyRead(3000);
@@ -88,7 +88,7 @@ void Ur5Connection::internalDataAvailable()
     if(!this->socketIsConnected())
         return;
 
-    if(!isValidPacket(mSocket->bytesAvailable()))
+    if(!isPotentialPacket(mSocket->bytesAvailable()))
     {
         mSocket->skip(mSocket->bytesAvailable());
         return;
@@ -102,7 +102,7 @@ bool Ur5Connection::waitForMove()
 {
     while(!atTargetPos(mCurrentState))
     {
-        waitForMessage();
+        waitForUpdate();
     }
 
     return atTargetPos(mCurrentState);
@@ -139,7 +139,7 @@ void Ur5Connection::clearCurrentTCP()
 {
     Ur5State clearState(0,0,0,0,0,0);
     sendMessage(mMessageEncoder.set_tcp(clearState));
-    waitForMessage();
+    waitForUpdate();
 }
 
 void Ur5Connection::moveToPlannedOrigo(Ur5State origo)
@@ -152,7 +152,7 @@ void Ur5Connection::moveToPlannedOrigo(Ur5State origo)
 void Ur5Connection::setOrigo(double threshold)
 {
     Ur5State zeroState(0,0,0,0,0,0);
-    waitForMessage();
+    waitForUpdate();
 
     for(double thres = 1;thres>=threshold;thres= thres/2)
     {
@@ -168,7 +168,7 @@ void Ur5Connection::setOrigo(double threshold)
             }
 
             sendMessage(mMessageEncoder.set_tcp(zeroState));
-            waitForMessage();
+            waitForUpdate();
         }
     }
 
@@ -177,7 +177,7 @@ void Ur5Connection::setOrigo(double threshold)
     clearCurrentTCP();
 
     sendMessage(mMessageEncoder.set_tcp(zeroState));
-    waitForMessage();
+    waitForUpdate();
 }
 
 Ur5State Ur5Connection::incrementPosQuad(Ur5State zeroState, double threshold)
@@ -254,7 +254,7 @@ void Ur5Connection::initializeWorkspace(double threshold, Ur5State origo, bool c
     emit(finished());
 }
 
-bool Ur5Connection::isValidPacket(qint64 bytes)
+bool Ur5Connection::isPotentialPacket(qint64 bytes)
 {
     return (bytes == 1460 || bytes == 560 || bytes == 812 || bytes == 1624 || bytes ==1254);
 }

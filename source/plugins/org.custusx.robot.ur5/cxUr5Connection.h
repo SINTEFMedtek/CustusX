@@ -95,9 +95,9 @@ private:
     void moveToPlannedOrigo(Ur5State origo);
     void setOrigo(double threshold);
     bool waitForMove();
-    bool waitForMessage();
+    bool waitForUpdate();
     bool atTargetPos(Ur5State current);
-    bool isValidPacket(qint64 bytes);
+    bool isPotentialPacket(qint64 bytes);
 
     double mBlendRadius = 0.001;
 
