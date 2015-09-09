@@ -62,44 +62,47 @@ void Ur5ManualMoveTab::setMoveToolLayout(QVBoxLayout *parent)
     negXButton = new QPushButton();
 
     posZButton->setAutoRepeat(true);
+    posZButton->setToolTip("Move in positive Z direction");
+
     negZButton->setAutoRepeat(true);
+    negZButton->setToolTip("Move in negative Z direction");
+
     posXButton->setAutoRepeat(true);
+    posXButton->setToolTip("Move in positive Y direction");
+
     negXButton->setAutoRepeat(true);
+    negXButton->setToolTip("Move in negative Y direction");
+
     posYButton->setAutoRepeat(true);
+    posYButton->setToolTip("Move in positive X direction");
+
     negYButton->setAutoRepeat(true);
+    negYButton->setToolTip("Move in negative X direction");
 
-
-    rotPosZButton = new QPushButton();
-    rotNegZButton = new QPushButton();
-    rotPosYButton = new QPushButton();
-    rotNegYButton = new QPushButton();
     rotPosXButton = new QPushButton();
     rotNegXButton = new QPushButton();
+    rotPosYButton = new QPushButton();
+    rotNegYButton = new QPushButton();
+    rotPosZButton = new QPushButton();
+    rotNegZButton = new QPushButton();
 
     rotPosXButton->setAutoRepeat(true);
+    rotPosXButton->setToolTip("Rotate counter-clockwise around X axis");
+
     rotNegXButton->setAutoRepeat(true);
+    rotNegXButton->setToolTip("Rotate clockwise around X axis");
+
     rotPosYButton->setAutoRepeat(true);
+    rotPosYButton->setToolTip("Rotate counter-clockwise around Y axis");
+
     rotNegYButton->setAutoRepeat(true);
+    rotNegYButton->setToolTip("Rotate clockwise around Y axis");
+
     rotPosZButton->setAutoRepeat(true);
+    rotPosZButton->setToolTip("Rotate counter-clockwise around Z axis");
+
     rotNegZButton->setAutoRepeat(true);
-
-    int row=0;
-    mainLayout->addWidget(new QLabel("Translational motion"),row,0,1,1,Qt::AlignCenter);
-    mainLayout->addWidget(new QLabel("Rotational motion"),row,1,1,1,Qt::AlignCenter);
-
-    row++;
-    mainLayout->addWidget(keyWidget,row,0,3,1,Qt::AlignCenter);
-    mainLayout->addWidget(rotKeyWidget,row,1,3,1,Qt::AlignCenter);
-
-    row=row+3;
-    QFrame *line = new QFrame();
-    line->setFrameShape(QFrame::HLine);
-    line->setFrameShadow(QFrame::Sunken);
-    mainLayout -> addWidget(line,row,0,1,2);
-
-    row++;
-    mainLayout->addWidget(velAccWidget,row,0,1,1);
-    mainLayout->addWidget(coordInfoWidget,row,1,3,1);
+    rotNegZButton->setToolTip("Rotate clockwise around Z axis");
 
     int krow=0;
     keyLayout->addWidget(posZButton, krow, 0, 1, 1);
@@ -114,6 +117,20 @@ void Ur5ManualMoveTab::setMoveToolLayout(QVBoxLayout *parent)
 
     krow++;
     keyLayout->addWidget(negXButton,krow,1,1,1);
+
+    krow++;
+    keyLayout->addWidget(rotNegXButton, krow, 0, 1, 1);
+    keyLayout->addWidget(rotPosXButton, krow,2,1,1);
+
+    krow++;
+    keyLayout->addWidget(rotPosYButton,krow,1,1,1);
+
+    krow++;
+    keyLayout->addWidget(rotNegZButton,krow,0,1,1);
+    keyLayout->addWidget(rotPosZButton,krow,2,1,1);
+
+    krow++;
+    keyLayout->addWidget(rotNegYButton,krow,1,1,1);
 
     // Positive Z Button
     QIcon icon3;
@@ -141,16 +158,10 @@ void Ur5ManualMoveTab::setMoveToolLayout(QVBoxLayout *parent)
     negYButton->setIcon(icon5);
     negYButton->setIconSize(QSize(32, 32));
 
-    // Positive Y Button
-    QIcon icon6;
-    icon6.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/arrow-left.png"), QSize(), QIcon::Normal, QIcon::Off);
-    posYButton->setIcon(icon6);
+    posYButton->setIcon(QIcon("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/arrow-left.png"));
     posYButton->setIconSize(QSize(32, 32));
 
-    // Negative X Button
-    QIcon icon8;
-    icon8.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/arrow-down.png"), QSize(), QIcon::Normal, QIcon::Off);
-    negXButton->setIcon(icon8);
+    negXButton->setIcon(QIcon("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/arrow-down.png"));
     negXButton->setIconSize(QSize(32, 32));
 
     // Style sheet for buttons
@@ -160,21 +171,6 @@ void Ur5ManualMoveTab::setMoveToolLayout(QVBoxLayout *parent)
     negYButton->setStyleSheet("border:none");
     posZButton->setStyleSheet("border:none");
     negZButton->setStyleSheet("border:none");
-
-
-    int rkrow=0;
-    rotKeyLayout->addWidget(rotNegXButton, rkrow, 0, 1, 1);
-    rotKeyLayout->addWidget(rotPosXButton, rkrow,2,1,1);
-
-    rkrow++;
-    rotKeyLayout->addWidget(rotPosYButton,rkrow,1,1,1);
-
-    rkrow++;
-    rotKeyLayout->addWidget(rotNegZButton,rkrow,0,1,1);
-    rotKeyLayout->addWidget(rotPosZButton,rkrow,2,1,1);
-
-    rkrow++;
-    rotKeyLayout->addWidget(rotNegYButton,rkrow,1,1,1);
 
     // rotPositive Z Button
     QIcon i3;
@@ -221,7 +217,16 @@ void Ur5ManualMoveTab::setMoveToolLayout(QVBoxLayout *parent)
     rotNegYButton->setStyleSheet("border:none");
     rotPosZButton->setStyleSheet("border:none");
     rotNegZButton->setStyleSheet("border:none");
+}
 
+void Ur5ManualMoveTab::setMoveSettingsWidget(QVBoxLayout *parent)
+{
+    QGroupBox* group = new QGroupBox("Move settings");
+    group->setFlat(true);
+    parent->addWidget(group);
+
+    QGridLayout *velAccLayout = new QGridLayout();
+    group->setLayout(velAccLayout);
 
     // Velocity
     velAccLayout->addWidget(new QLabel("Velocity"), 0, 0, 1, 1);
@@ -243,6 +248,16 @@ void Ur5ManualMoveTab::setMoveToolLayout(QVBoxLayout *parent)
     velAccLayout->addWidget(timeLineEdit, 2, 1, 1, 1);
     timeLineEdit->setText(QApplication::translate("Ur5Widget", "0.5", 0));
     velAccLayout->addWidget(new QLabel("s"), 2, 2, 1, 1);
+}
+
+void Ur5ManualMoveTab::setCoordInfoWidget(QVBoxLayout *parent)
+{
+    QGroupBox* group = new QGroupBox("Tool position");
+    group->setFlat(true);
+    parent->addWidget(group);
+
+    QGridLayout *coordInfoLayout = new QGridLayout();
+    group->setLayout(coordInfoLayout);
 
     // Position label
     coordInfoLayout->addWidget(new QLabel("X"), 0, 0, 1, 1, Qt::AlignHCenter);
@@ -289,17 +304,72 @@ void Ur5ManualMoveTab::setMoveToolLayout(QVBoxLayout *parent)
     coordInfoLayout->addWidget(rzLineEdit, 7, 2, 1, 1);
 }
 
+void Ur5ManualMoveTab::setJointMoveWidget(QVBoxLayout *parent)
+{
+    QGroupBox* group = new QGroupBox("Move joints");
+    group->setFlat(true);
+    parent->addWidget(group);
+
+    QGridLayout *coordInfoLayout = new QGridLayout();
+    group->setLayout(coordInfoLayout);
+
+    // Position label
+    coordInfoLayout->addWidget(new QLabel("Base"), 9, 4, 1, 1, Qt::AlignHCenter);
+    coordInfoLayout->addWidget(new QLabel("Shoulder"), 10, 4, 1, 1, Qt::AlignHCenter);
+    coordInfoLayout->addWidget(new QLabel("Elbow"), 11, 4, 1, 1, Qt::AlignHCenter);
+
+    // mm label
+    coordInfoLayout->addWidget(new QLabel("Rad"), 9, 6, 1, 1);
+    coordInfoLayout->addWidget(new QLabel("Rad"), 10, 6, 1, 1);
+    coordInfoLayout->addWidget(new QLabel("Rad"), 11, 6, 1, 1);
+
+    // Ri orientation label
+    coordInfoLayout->addWidget(new QLabel("Wrist 1"), 12, 4, 1, 1);
+    coordInfoLayout->addWidget(new QLabel("Wrist 2"), 13, 4, 1, 1);
+    coordInfoLayout->addWidget(new QLabel("Wrist 3"), 14, 4, 1, 1);
+
+    // Rad label
+    coordInfoLayout->addWidget(new QLabel("Rad"), 12, 6, 1, 1);
+    coordInfoLayout->addWidget(new QLabel("Rad"), 13, 6, 1, 1);
+    coordInfoLayout->addWidget(new QLabel("Rad"), 14, 6, 1, 1);
+
+    // X coordinate line edit
+    jxPosLineEdit = new QLineEdit();
+    coordInfoLayout->addWidget(jxPosLineEdit, 9, 5, 1, 1);
+
+    // Y coordinate line edit
+    jyPosLineEdit = new QLineEdit();
+    coordInfoLayout->addWidget(jyPosLineEdit, 10, 5, 1, 1);
+
+    // Line edit for Z position
+    jzPosLineEdit = new QLineEdit();
+    jzPosLineEdit->setObjectName(QStringLiteral("zPosLineEdit"));
+    coordInfoLayout->addWidget(jzPosLineEdit, 11, 5, 1, 1);
+
+    // Line edit for RX orientation
+    jrxLineEdit = new QLineEdit();
+    coordInfoLayout->addWidget(jrxLineEdit, 12, 5, 1, 1);
+
+    // Line edit for RY orientation
+    jryLineEdit = new QLineEdit();
+    coordInfoLayout->addWidget(jryLineEdit, 13, 5, 1, 1);
+
+    // Line edit for RZ orientation
+    jrzLineEdit = new QLineEdit();
+    coordInfoLayout->addWidget(jrzLineEdit, 14, 5, 1, 1);
+}
+
 void Ur5ManualMoveTab::coordButtonPressed(int axis, int sign)
 {
     Ur5State velocity;
-    velocity.jointAxisVelocity(axis)=(sign)*velocityLineEdit->text().toDouble();  
+    velocity.jointVelocity(axis)=(sign)*velocityLineEdit->text().toDouble();
     mUr5Robot->move("speedl",velocity,accelerationLineEdit->text().toDouble(),0,0,timeLineEdit->text().toDouble());
 }
 
 void Ur5ManualMoveTab::rotButtonPressed(int angle, int sign)
 {
     Ur5State velocity;
-    velocity.jointAngleVelocity(angle)=(sign)*velocityLineEdit->text().toDouble();
+    velocity.jointVelocity(angle+3)=(sign)*velocityLineEdit->text().toDouble();
     mUr5Robot->move("speedl",velocity,accelerationLineEdit->text().toDouble(),0,0,timeLineEdit->text().toDouble());
 }
 
