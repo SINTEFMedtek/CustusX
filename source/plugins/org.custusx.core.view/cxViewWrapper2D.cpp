@@ -75,6 +75,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxData.h"
 #include "cxMesh.h"
 #include "cxImage.h"
+#include "cxTrackedStream.h"
 #include "cxPointMetricRep2D.h"
 
 #include "cxViewFollower.h"
@@ -283,7 +284,7 @@ void ViewWrapper2D::createAndAddMultiSliceRep()
  */
 void ViewWrapper2D::recreateMultiSlicer()
 {
-    this->removeAndResetSliceRep();
+	this->removeAndResetSliceRep();
     this->removeAndResetMultiSliceRep();
 
     if (!this->useGPU2DRendering())
@@ -292,7 +293,10 @@ void ViewWrapper2D::recreateMultiSlicer()
     this->createAndAddMultiSliceRep();
 
     if (mGroupData)
-		mMultiSliceRep->setImages(mGroupData->getImages(DataViewProperties::createSlice2D()));
+	{
+		std::vector<ImagePtr> images = mGroupData->getImagesAndChangingImagesFromTrackedStreams(DataViewProperties::createSlice2D());
+		mMultiSliceRep->setImages(images);
+	}
 
     this->viewportChanged();
 }
@@ -425,7 +429,7 @@ void ViewWrapper2D::imageAdded(ImagePtr image)
 
 ImagePtr ViewWrapper2D::getImageToDisplay()
 {
-    std::vector<ImagePtr> images = mGroupData->getImages(DataViewProperties::createSlice2D());
+	std::vector<ImagePtr> images = mGroupData->getImagesAndChangingImagesFromTrackedStreams(DataViewProperties::createSlice2D());
     ImagePtr image;
     if (!images.empty())
         image = images.back();  // always show last in vector

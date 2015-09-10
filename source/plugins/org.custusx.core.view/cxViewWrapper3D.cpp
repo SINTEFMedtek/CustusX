@@ -667,7 +667,7 @@ RepPtr ViewWrapper3D::createTrackedStreamRep(TrackedStreamPtr trackedStream)
 	}
 	else
 	{
-		std::cout << "ViewWrapper3D::createDataRep3D. StreamRep2D not implemented yet" << std::endl;
+		reportWarning("ViewWrapper3D::createDataRep3D. StreamRep2D not implemented yet");
 		return RepPtr();
 	}
 }

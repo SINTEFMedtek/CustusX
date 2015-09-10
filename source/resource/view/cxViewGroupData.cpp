@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataMetric.h"
 #include "cxView.h"
 #include "cxImage.h"
+#include "cxTrackedStream.h"
 #include "cxInteractiveClipper.h"
 #include "boost/bind.hpp"
 #include "cxXMLNodeWrapper.h"
@@ -394,6 +395,28 @@ std::vector<ImagePtr> ViewGroupData::getImages(DataViewProperties properties) co
 std::vector<MeshPtr> ViewGroupData::getMeshes(DataViewProperties properties) const
 {
 	return this->getDataOfType<Mesh>(properties);
+}
+
+std::vector<TrackedStreamPtr> ViewGroupData::getTrackedStreams(DataViewProperties properties) const
+{
+	return this->getDataOfType<TrackedStream>(properties);
+}
+
+//Should this only return 3D images?
+std::vector<ImagePtr> ViewGroupData::getImagesAndChangingImagesFromTrackedStreams(DataViewProperties properties) const
+{
+	std::vector<ImagePtr> images = this->getImages(properties);
+	std::vector<TrackedStreamPtr> streams = this->getTrackedStreams(properties);
+//	std::cout << "getImagesAndChangingImagesFromTrackedStreams images: " << images.size() << " streams: " << streams.size() << std::endl;
+
+	for(int i = 0; i < streams.size(); ++i)
+	{
+		ImagePtr changingImage = streams[i]->getChangingImage();
+		if(changingImage)// TODO: Check on streams[i]->is3D() instead?
+			images.push_back(changingImage);
+	}
+//	std::cout << "getImagesAndChangingImagesFromTrackedStreams total: " << images.size() << std::endl;
+	return images;
 }
 
 ViewGroupData::Options ViewGroupData::getOptions() const

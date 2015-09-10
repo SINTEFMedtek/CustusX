@@ -117,6 +117,8 @@ public:
 	void clearData();
 	std::vector<ImagePtr> getImages(DataViewProperties properties) const;
 	std::vector<MeshPtr> getMeshes(DataViewProperties properties) const;
+	std::vector<TrackedStreamPtr> getTrackedStreams(DataViewProperties properties) const;
+	std::vector<ImagePtr> getImagesAndChangingImagesFromTrackedStreams(DataViewProperties properties) const;
 	DataViewProperties getProperties(QString uid);
 	void setProperties(QString uid, DataViewProperties properties);
 
