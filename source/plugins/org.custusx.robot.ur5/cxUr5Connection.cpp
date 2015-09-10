@@ -98,34 +98,6 @@ void Ur5Connection::internalDataAvailable()
     updateCurrentState(mSocket->read(mSocket->bytesAvailable()));
 }
 
-bool Ur5Connection::waitForMove()
-{
-    while(!atTargetPos(mCurrentState))
-    {
-        waitForUpdate();
-    }
-
-    return atTargetPos(mCurrentState);
-}
-
-bool Ur5Connection::atTargetPos(Ur5State currentState)
-{
-    return (currentState.cartAxis-mTargetState.cartAxis).length() < mBlendRadius;
-}
-
-void Ur5Connection::runProgramQueue(std::vector<QString> programQueue, std::vector<Ur5State> poseQueue)
-{
-    for(int i=0;i<programQueue.size();i++)
-    {
-        mTargetState = poseQueue[i];
-        sendMessage(programQueue[i]);
-        waitForMove();
-    }
-    programQueue.clear();
-    poseQueue.clear();
-    emit(finished());
-}
-
 void Ur5Connection::updateCurrentState(QByteArray rawData)
 {
     mCurrentState = mMessageDecoder.analyzeRawPacket(rawData);
@@ -273,5 +245,34 @@ Ur5State Ur5Connection::getPreviousState()
 {
     return (this->mCurrentState);
 }
+
+bool Ur5Connection::waitForMove()
+{
+    while(!atTargetPos(mCurrentState))
+    {
+        waitForUpdate();
+    }
+
+    return atTargetPos(mCurrentState);
+}
+
+bool Ur5Connection::atTargetPos(Ur5State currentState)
+{
+    return (currentState.cartAxis-mTargetState.cartAxis).length() < mBlendRadius;
+}
+
+void Ur5Connection::runProgramQueue(std::vector<QString> programQueue, std::vector<Ur5State> poseQueue)
+{
+    for(int i=0;i<programQueue.size();i++)
+    {
+        mTargetState = poseQueue[i];
+        sendMessage(programQueue[i]);
+        waitForMove();
+    }
+    programQueue.clear();
+    poseQueue.clear();
+    emit(finished());
+}
+
 
 } // cx
