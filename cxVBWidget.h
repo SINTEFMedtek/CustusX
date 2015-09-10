@@ -78,6 +78,7 @@ private:
 	VisualizationServicePtr		mVisualizationService;
 	TrackingServicePtr			mTrackingService;
 	CXVBcameraPath*				mCameraPath;
+	bool						mControlsEnabled;
 
 	void						enableControls(bool enable);
 
@@ -86,6 +87,7 @@ signals:
 
 private slots:
 	void						inputChangedSlot();
+	virtual void				keyPressEvent(QKeyEvent* event);
 
 };
 
