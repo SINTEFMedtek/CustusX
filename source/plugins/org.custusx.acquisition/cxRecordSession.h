@@ -66,10 +66,12 @@ class org_custusx_acquisition_EXPORT RecordSession
 {
 public:
 	RecordSession(QString uid, double startTime, double stopTime, QString description);
+	RecordSession(int id, double startTime, double stopTime, QString description);
 	virtual ~RecordSession();
 
 	QString getUid();
 	QString getDescription();
+	QString getHumanDescription() const;
 	double getStartTime();
 	double getStopTime();
 
@@ -81,6 +83,9 @@ public:
 	static TimedTransformMap getToolHistory_prMt(ToolPtr tool, RecordSessionPtr session);
 
 protected:
+	int getID() const;
+	QString getCategory() const;
+	QDateTime getTimestamp() const;
 
 	QString mUid;
 	double mStartTime;

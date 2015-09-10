@@ -47,21 +47,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 RecordSessionWidget::RecordSessionWidget(AcquisitionServicePtr base, QWidget* parent,
-										 AcquisitionService::TYPES context, QString defaultDescription) :
+										 AcquisitionService::TYPES context, QString category) :
     BaseWidget(parent, "RecordSessionWidget", "Record Session"),
 	mAcquisitionService(base),
     mInfoLabel(new QLabel("")),
     mStartStopButton(new QPushButton(QIcon(":/icons/open_icon_library/media-record-3.png"), "Start")),
     mCancelButton(new QPushButton(QIcon(":/icons/open_icon_library/process-stop-7.png"), "Cancel")),
-	mDescriptionLine(new QLineEdit(defaultDescription)),
-	mContext(context)
+	mContext(context),
+	mCategory(category)
 {
 	QVBoxLayout* layout = new QVBoxLayout(this);
 	layout->setMargin(0);
-	mDescriptionLabel = new QLabel("Description:");
 	layout->addWidget(mInfoLabel);
-	layout->addWidget(mDescriptionLabel);
-	layout->addWidget(mDescriptionLine);
 
 	QHBoxLayout* buttonLayout = new QHBoxLayout();
 
@@ -85,25 +82,8 @@ RecordSessionWidget::RecordSessionWidget(AcquisitionServicePtr base, QWidget* pa
 	this->onReadinessChanged();
 }
 
-//void RecordSessionWidget::setReady(bool val, QString text)
-//{
-//  this->setEnabled(val);
-//  mInfoLabel->setText(text);
-//}
-
-void RecordSessionWidget::setDescriptionVisibility(bool value)
-{
-    mDescriptionLine->setVisible(value);
-    mDescriptionLabel->setVisible(value);
-}
-
 RecordSessionWidget::~RecordSessionWidget()
 {}
-
-void RecordSessionWidget::setDescription(QString text)
-{
-  mDescriptionLine->setText(text);
-}
 
 void RecordSessionWidget::onReadinessChanged()
 {
@@ -147,7 +127,7 @@ void RecordSessionWidget::recordStateChangedSlot()
 
 void RecordSessionWidget::startStopSlot(bool checked)
 {
-	mAcquisitionService->toggleRecord(mContext);
+	mAcquisitionService->toggleRecord(mContext, mCategory);
 }
 
 void RecordSessionWidget::cancelSlot()

@@ -90,7 +90,10 @@ BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegServices servi
 	connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
 	mRegisterButton->setToolTip(this->defaultWhatsThis());
 
-	mRecordTrackingWidget = new RecordTrackingWidget(mOptions.descend("recordTracker"), mServices.acquisitionService, mServices, this);
+	mRecordTrackingWidget = new RecordTrackingWidget(mOptions.descend("recordTracker"),
+													 mServices.acquisitionService, mServices,
+													 "bronc_path",
+													 this);
 	mRecordTrackingWidget->getSessionSelector()->setHelp("Select bronchoscope path for registration");
 	mRecordTrackingWidget->getSessionSelector()->setDisplayName("Bronchoscope path");
 
@@ -187,7 +190,7 @@ void BronchoscopyRegistrationWidget::registerSlot()
         for (int i = 0; i < 4; i++)
             std::cout << display_rMpr.row(i) << std::endl;
 
-	mRecordTrackingWidget->ShowLastRecordingInView();
+	mRecordTrackingWidget->showSelectedRecordingInView();
 
 }
 

@@ -87,8 +87,8 @@ public:
 	virtual bool isReady(TYPES context) const = 0;
 	virtual QString getInfoText(TYPES context) const = 0;
 	virtual STATE getState() const = 0;
-	virtual void toggleRecord(TYPES context) = 0;
-	virtual void startRecord(TYPES context) = 0;
+	virtual void toggleRecord(TYPES context, QString category);
+	virtual void startRecord(TYPES context, QString category) = 0;
 	virtual void stopRecord() = 0;
 	virtual void cancelRecord() = 0;
 	virtual void startPostProcessing() = 0;
