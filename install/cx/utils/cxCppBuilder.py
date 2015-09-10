@@ -28,6 +28,7 @@ class CppBuilder:
     '''
     def __init__(self):
         self.cmakeOptions={}
+        self._addDefaultCmakeOptions()
     def setPaths(self, base, build, source):
         self.mBasePath = base
         self.mBuildPath = build
@@ -183,7 +184,6 @@ class CppBuilder:
         self.cmakeOptions[key] = value
 
     def configureCMake(self, options=''):        
-        self._addDefaultCmakeOptions()                
         generator = self.controlData.getCMakeGenerator()
         optionsFromAssembly = self._assembleOptions()
         self._printOptions()        
