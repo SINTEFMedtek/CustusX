@@ -37,6 +37,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogger.h"
 #include "cxTime.h"
 #include "cxTool.h"
+#include <QDateTime>
+#include "cxTime.h"
 
 namespace cx
 {
@@ -49,8 +51,56 @@ RecordSession::RecordSession(QString uid, double startTime, double stopTime, QSt
 	mDescription.append("_"+mUid+"");
 }
 
+RecordSession::RecordSession(int id, double startTime, double stopTime, QString description) :
+	mStartTime(startTime),
+	mStopTime(stopTime)
+{
+	QString timestamp = this->getTimestamp().toString(timestampSecondsFormat());
+
+	mUid = QString("%1_%2")
+			.arg(id, 2, 10, QChar('0'))
+			.arg(timestamp);
+
+	mDescription = QString("%1_%2")
+			.arg(description)
+			.arg(mUid);
+
+	//	//  retval = qstring_cast(max + 1);
+	//	retval = QString("%1").arg(max + 1, 2, 10, QChar('0'));
+	//	retval += "_" + QDateTime::currentDateTime().toString(timestampSecondsFormat());
+	//	return retval;
+}
+
+
 RecordSession::~RecordSession()
 {}
+
+QDateTime RecordSession::getTimestamp() const
+{
+	return QDateTime::fromMSecsSinceEpoch(mStartTime);
+}
+
+QString RecordSession::getCategory() const
+{
+	return mDescription.split("_"+mUid).first();
+}
+
+int RecordSession::getID() const
+{
+	return mUid.split("_").first().toInt();
+}
+
+QString RecordSession::getHumanDescription() const
+{
+	QString format("hh:mm");
+//	QString format("yyyy-MM-dd hh:mm");
+	QString ts = this->getTimestamp().toString(format);
+
+	return QString("%1 %2 %3")
+			.arg(this->getCategory())
+			.arg(this->getID())
+			.arg(ts);
+}
 
 QString RecordSession::getUid()
 {
@@ -110,8 +160,8 @@ void RecordSession::parseXml(QDomNode& parentNode)
 
 TimedTransformMap RecordSession::getToolHistory_prMt(ToolPtr tool, RecordSessionPtr session)
 {
-	if(!tool)
-		reportError("RecordSession::getToolHistory_prMt(): Tool missing.");
+//	if(!tool)
+//		reportError("RecordSession::getToolHistory_prMt(): Tool missing.");
 
 	TimedTransformMap retval;
 
@@ -120,7 +170,10 @@ TimedTransformMap RecordSession::getToolHistory_prMt(ToolPtr tool, RecordSession
 
 	if(retval.empty() && session)
 	{
-		reportError("RecordSession::getToolHistory_prMt(): Could not find any tracking data from session "+session->getUid()+".");
+		CX_LOG_ERROR() << QString("Could not find any tracking data for tool [%1] in session [%2]. ")
+						  .arg(tool.get() ? tool->getName() : "NULL")
+						  .arg(session.get() ? session->getHumanDescription() : "NULL");
+//		reportError("RecordSession::getToolHistory_prMt(): Could not find any tracking data from session "+session->getUid()+".");
 	}
 
 	return retval;

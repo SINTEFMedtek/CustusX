@@ -135,14 +135,9 @@ AcquisitionService::STATE AcquisitionImplService::getState() const
 	return mAcquisition->getState();
 }
 
-void AcquisitionImplService::toggleRecord(TYPES context)
+void AcquisitionImplService::startRecord(TYPES context, QString category)
 {
-	mAcquisition->toggleRecord(context);
-}
-
-void AcquisitionImplService::startRecord(TYPES context)
-{
-	mAcquisition->startRecord(context);
+	mAcquisition->startRecord(context, category);
 }
 
 void AcquisitionImplService::stopRecord()

@@ -72,7 +72,8 @@ public:
 	void removeRecordSession(RecordSessionPtr session);
 	std::vector<RecordSessionPtr> getRecordSessions();
 	RecordSessionPtr getRecordSession(QString uid);
-	QString getNewUid();
+//	QString getNewUid();
+	int getNewSessionId();
 
 	VisServicesPtr getServices() { return mServices; }
 	UsReconstructionServicePtr getReconstructer() { return mReconstructer; }
@@ -110,13 +111,10 @@ public:
 	bool isReady(AcquisitionService::TYPES) const;
 	QString getInfoText(AcquisitionService::TYPES) const;
 
-	/** Start or stop recording, depending on current state.
-	  */
-	void toggleRecord(AcquisitionService::TYPES context);
 	/** Start recording.
 	  * Change state to running, create session object.
 	  */
-	void startRecord(AcquisitionService::TYPES context);
+	void startRecord(AcquisitionService::TYPES context, QString category);
 	/** Stop recording.
 	  * Change state to not_running, finalize session object and keep it available.
 	  */

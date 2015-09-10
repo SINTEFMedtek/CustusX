@@ -83,7 +83,11 @@ RMPCWidget::RMPCWidget(RegServices services, QWidget* parent) :
 	connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
 	mRegisterButton->setToolTip(this->defaultWhatsThis());
 
-	mRecordTrackingWidget = new RecordTrackingWidget(mOptions.descend("recordTracker"), mServices.acquisitionService, mServices, this);
+	mRecordTrackingWidget = new RecordTrackingWidget(mOptions.descend("recordTracker"),
+													 mServices.acquisitionService,
+													 mServices,
+													 "tracker",
+													 this);
 
 	mVerticalLayout->setMargin(0);
 	mVerticalLayout->addWidget(new DataSelectWidget(mServices.visualizationService, mServices.patientModelService, this, mSurfaceSelector));
@@ -153,7 +157,7 @@ void RMPCWidget::registerSlot()
 		for (int i = 0; i < 4; i++)
 			std::cout << display_rMpr.row(i) << std::endl;
 
-	mRecordTrackingWidget->ShowLastRecordingInView();
+	mRecordTrackingWidget->showSelectedRecordingInView();
 }
 
 

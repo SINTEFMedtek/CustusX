@@ -133,10 +133,31 @@ void AcquisitionData::parseXml(QDomNode& dataNode)
 	}
 }
 
+///**generate a unique uid for use with a recordsession
+// *
+// */
+//QString AcquisitionData::getNewUid()
+//{
+//	QString retval;
+//	int max = 0;
+//	std::vector<RecordSessionPtr> recordsessions = this->getRecordSessions();
+//	std::vector<RecordSessionPtr>::iterator iter;
+//	for (iter = recordsessions.begin(); iter != recordsessions.end(); ++iter)
+//	{
+//		QString index = (*iter)->getUid().split("_").front();
+//		max = std::max(max, index.toInt());
+//	}
+
+//	//  retval = qstring_cast(max + 1);
+//	retval = QString("%1").arg(max + 1, 2, 10, QChar('0'));
+//	retval += "_" + QDateTime::currentDateTime().toString(timestampSecondsFormat());
+//	return retval;
+//}
+
 /**generate a unique uid for use with a recordsession
  *
  */
-QString AcquisitionData::getNewUid()
+int AcquisitionData::getNewSessionId()
 {
 	QString retval;
 	int max = 0;
@@ -148,12 +169,13 @@ QString AcquisitionData::getNewUid()
 		max = std::max(max, index.toInt());
 	}
 
-	//  retval = qstring_cast(max + 1);
-	retval = QString("%1").arg(max + 1, 2, 10, QChar('0'));
-	retval += "_" + QDateTime::currentDateTime().toString(timestampSecondsFormat());
-	return retval;
-}
+	return max+1;
 
+//	//  retval = qstring_cast(max + 1);
+//	retval = QString("%1").arg(max + 1, 2, 10, QChar('0'));
+//	retval += "_" + QDateTime::currentDateTime().toString(timestampSecondsFormat());
+//	return retval;
+}
 
 ///--------------------------------------------------------
 ///--------------------------------------------------------
@@ -177,8 +199,8 @@ bool Acquisition::isReady(AcquisitionService::TYPES context) const
 {
 	if (!context.testFlag(AcquisitionService::tTRACKING))
 		return true;
-	return mReady;
-//	return true;
+		return true;
+//	return mReady;
 }
 
 QString Acquisition::getInfoText(AcquisitionService::TYPES context) const
@@ -221,15 +243,7 @@ void Acquisition::setReady(bool val, QString text)
 	emit readinessChanged();
 }
 
-void Acquisition::toggleRecord(AcquisitionService::TYPES context)
-{
-	if (this->getState()==AcquisitionService::sRUNNING)
-		this->stopRecord();
-	else
-		this->startRecord(context);
-}
-
-void Acquisition::startRecord(AcquisitionService::TYPES context)
+void Acquisition::startRecord(AcquisitionService::TYPES context, QString category)
 {
 	if (this->getState()!=AcquisitionService::sNOT_RUNNING)
 	{
@@ -239,7 +253,8 @@ void Acquisition::startRecord(AcquisitionService::TYPES context)
 
 	double startTime = getMilliSecondsSinceEpoch();
 	mCurrentContext = context;
-	mLatestSession.reset(new cx::RecordSession(mPluginData->getNewUid(), startTime, startTime, settings()->value("Ultrasound/acquisitionName").toString()));
+	mLatestSession.reset(new cx::RecordSession(mPluginData->getNewSessionId(), startTime, startTime, category));
+//	mLatestSession.reset(new cx::RecordSession(mPluginData->getNewUid(), startTime, startTime, category));
 	reporter()->playStartSound();
 	this->setState(AcquisitionService::sRUNNING);
 }
