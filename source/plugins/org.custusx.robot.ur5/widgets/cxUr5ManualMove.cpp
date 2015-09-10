@@ -15,8 +15,9 @@ Ur5ManualMoveTab::Ur5ManualMoveTab(Ur5RobotPtr Ur5Robot,QWidget *parent) :
     setupUi(this);
 
     connectMovementButtons();
+    connectJointButtons();
 
-    connect(mUr5Robot.get(),&Ur5Robot::stateUpdated,this,&Ur5ManualMoveTab::updatePositionSlot);
+    connect(mUr5Robot.get(),&Ur5Robot::stateUpdated,this,&Ur5ManualMoveTab::updatePositions);
 }
 
 Ur5ManualMoveTab::~Ur5ManualMoveTab()
@@ -39,7 +40,11 @@ void Ur5ManualMoveTab::setupUi(QWidget *parent)
    setJointMoveWidget(rightColumnLayout);
 
    mainLayout->addWidget(leftColumnWidgets,0,Qt::AlignTop|Qt::AlignLeft);
+   //mainLayout->addItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
    mainLayout->addWidget(rightColumnWidgets,0,Qt::AlignTop|Qt::AlignRight);
+
+   mainLayout->setSpacing(5);
+   mainLayout->setMargin(5);
 }
 
 void Ur5ManualMoveTab::setMoveToolLayout(QVBoxLayout *parent)
@@ -105,63 +110,45 @@ void Ur5ManualMoveTab::setMoveToolLayout(QVBoxLayout *parent)
     rotNegZButton->setToolTip("Rotate clockwise around Z axis");
 
     int krow=0;
-    keyLayout->addWidget(posZButton, krow, 0, 1, 1);
-    keyLayout->addWidget(negZButton, krow,2,1,1);
+    keyLayout->addWidget(posZButton, krow, 0, 1, 1,Qt::AlignBottom);
+    keyLayout->addWidget(negZButton, krow,2,1,1,Qt::AlignBottom);
 
     krow++;
-    keyLayout->addWidget(posXButton,krow,1,1,1);
+    keyLayout->addWidget(posXButton,krow,1,1,1,Qt::AlignBottom);
 
     krow++;
-    keyLayout->addWidget(posYButton,krow,0,1,1);
-    keyLayout->addWidget(negYButton,krow,2,1,1);
+    keyLayout->addWidget(posYButton,krow,0,1,1,Qt::AlignRight);
+    keyLayout->addWidget(negYButton,krow,2,1,1,Qt::AlignLeft);
 
     krow++;
-    keyLayout->addWidget(negXButton,krow,1,1,1);
+    keyLayout->addWidget(negXButton,krow,1,1,1,Qt::AlignTop);
 
     krow++;
-    keyLayout->addWidget(rotNegXButton, krow, 0, 1, 1);
-    keyLayout->addWidget(rotPosXButton, krow,2,1,1);
+    keyLayout->addWidget(rotNegXButton, krow, 0, 1, 1,Qt::AlignBottom);
+    keyLayout->addWidget(rotPosXButton, krow,2,1,1,Qt::AlignBottom);
 
     krow++;
-    keyLayout->addWidget(rotPosYButton,krow,1,1,1);
+    keyLayout->addWidget(rotPosYButton,krow,1,1,1,Qt::AlignBottom);
 
     krow++;
-    keyLayout->addWidget(rotNegZButton,krow,0,1,1);
-    keyLayout->addWidget(rotPosZButton,krow,2,1,1);
+    keyLayout->addWidget(rotNegZButton,krow,0,1,1,Qt::AlignRight);
+    keyLayout->addWidget(rotPosZButton,krow,2,1,1,Qt::AlignLeft);
 
     krow++;
-    keyLayout->addWidget(rotNegYButton,krow,1,1,1);
+    keyLayout->addWidget(rotNegYButton,krow,1,1,1,Qt::AlignTop);
 
-    // Positive Z Button
-    QIcon icon3;
-    icon3.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/arrow-up-double.png"), QSize(), QIcon::Normal, QIcon::Off);
-    posZButton->setIcon(icon3);
     posZButton->setIconSize(QSize(32, 32));
-    posZButton->setToolTip(QApplication::translate("Ur5Widget", "Move in positive Z direction", 0));
+    posZButton->setToolTip("Move in positive Z direction");
 
-    // Negative Z Button
-    QIcon icon2;
-    icon2.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/arrow-down-double.png"), QSize(), QIcon::Normal, QIcon::Off);
-    negZButton->setIcon(icon2);
     negZButton->setIconSize(QSize(32, 32));
-    negZButton->setToolTip(QApplication::translate("Ur5Widget", "Move in negative Z direction", 0));
+    negZButton->setToolTip("Move in negative Z direction");
 
-    // Positive X Button
-    QIcon icon4;
-    icon4.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/arrow-up.png"), QSize(), QIcon::Normal, QIcon::Off);
-    posXButton->setIcon(icon4);
     posXButton->setIconSize(QSize(32, 32));
 
-    // Negative Y Button
-    QIcon icon5;
-    icon5.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/arrow-right.png"), QSize(), QIcon::Normal, QIcon::Off);
-    negYButton->setIcon(icon5);
     negYButton->setIconSize(QSize(32, 32));
 
-    posYButton->setIcon(QIcon("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/arrow-left.png"));
     posYButton->setIconSize(QSize(32, 32));
 
-    negXButton->setIcon(QIcon("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/arrow-down.png"));
     negXButton->setIconSize(QSize(32, 32));
 
     // Style sheet for buttons
@@ -201,8 +188,12 @@ void Ur5ManualMoveTab::setMoveSettingsWidget(QVBoxLayout *parent)
     QGridLayout *velAccLayout = new QGridLayout();
     group->setLayout(velAccLayout);
 
+    velAccLayout->setSpacing(5);
+    velAccLayout->setMargin(5);
+    //velAccLayout->setContentsMargins(0,0,0,0);
+
     // Velocity
-    velAccLayout->addWidget(new QLabel("Velocity"), 0, 0, 1, 1);
+    velAccLayout->addWidget(new QLabel("Vel"), 0, 0, 1, 1);
     velocityLineEdit = new QLineEdit();
     velAccLayout->addWidget(velocityLineEdit, 0, 1, 1, 1);
     velocityLineEdit->setText(QApplication::translate("Ur5Widget", "0.1", 0));
@@ -212,7 +203,7 @@ void Ur5ManualMoveTab::setMoveSettingsWidget(QVBoxLayout *parent)
     accelerationLineEdit = new QLineEdit();
     velAccLayout->addWidget(accelerationLineEdit, 1, 1, 1, 1);
     accelerationLineEdit->setText(QApplication::translate("Ur5Widget", "0.5", 0));
-    velAccLayout->addWidget(new QLabel("Acceleration"), 1, 0, 1, 1);
+    velAccLayout->addWidget(new QLabel("Acc"), 1, 0, 1, 1);
     velAccLayout->addWidget(new QLabel("m/s^2"), 1, 2, 1, 1);
 
     // Time
@@ -231,6 +222,9 @@ void Ur5ManualMoveTab::setCoordInfoWidget(QVBoxLayout *parent)
 
     QGridLayout *coordInfoLayout = new QGridLayout();
     group->setLayout(coordInfoLayout);
+
+    coordInfoLayout->setSpacing(5);
+    coordInfoLayout->setMargin(5);
 
     // Position label
     coordInfoLayout->addWidget(new QLabel("X"), 0, 0, 1, 1, Qt::AlignHCenter);
@@ -395,6 +389,13 @@ void Ur5ManualMoveTab::coordButtonPressed(int axis, int sign)
     mUr5Robot->move("speedl",velocity,accelerationLineEdit->text().toDouble(),0,0,timeLineEdit->text().toDouble());
 }
 
+void Ur5ManualMoveTab::jointButtonPressed(int joint,int sign)
+{
+    Ur5State velocity;
+    velocity.jointVelocity(joint)=(sign)*velocityLineEdit->text().toDouble();
+    mUr5Robot->move("speedj",velocity,accelerationLineEdit->text().toDouble(),0,0,timeLineEdit->text().toDouble());
+}
+
 void Ur5ManualMoveTab::rotButtonPressed(int angle, int sign)
 {
     Ur5State velocity;
@@ -402,72 +403,77 @@ void Ur5ManualMoveTab::rotButtonPressed(int angle, int sign)
     mUr5Robot->move("speedl",velocity,accelerationLineEdit->text().toDouble(),0,0,timeLineEdit->text().toDouble());
 }
 
-void Ur5ManualMoveTab::posZButtonPressedSlot()
+void Ur5ManualMoveTab::posZButtonPressed()
 {
     coordButtonPressed(2,1);
 }
 
-void Ur5ManualMoveTab::negZButtonPressedSlot()
+void Ur5ManualMoveTab::negZButtonPressed()
 {
     coordButtonPressed(2,-1);
 }
 
-void Ur5ManualMoveTab::posYButtonPressedSlot()
+void Ur5ManualMoveTab::posYButtonPressed()
 {
     coordButtonPressed(1,1);
 }
 
-void Ur5ManualMoveTab::negYButtonPressedSlot()
+void Ur5ManualMoveTab::negYButtonPressed()
 {
     coordButtonPressed(1,-1);
 }
 
-void Ur5ManualMoveTab::posXButtonPressedSlot()
+void Ur5ManualMoveTab::posXButtonPressed()
 {
    coordButtonPressed(0,1);
 }
 
-void Ur5ManualMoveTab::negXButtonPressedSlot()
+void Ur5ManualMoveTab::negXButtonPressed()
 {
     coordButtonPressed(0,-1);
 }
 
-void Ur5ManualMoveTab::posRXButtonPressedSlot()
+void Ur5ManualMoveTab::posRXButtonPressed()
 {
     rotButtonPressed(0,1);
 }
 
-void Ur5ManualMoveTab::negRXButtonPressedSlot()
+void Ur5ManualMoveTab::negRXButtonPressed()
 {
     rotButtonPressed(0,-1);
 }
 
-void Ur5ManualMoveTab::posRYButtonPressedSlot()
+void Ur5ManualMoveTab::posRYButtonPressed()
 {
     rotButtonPressed(1,1);
 }
 
-void Ur5ManualMoveTab::negRYButtonPressedSlot()
+void Ur5ManualMoveTab::negRYButtonPressed()
 {
     rotButtonPressed(1,-1);
 }
 
-void Ur5ManualMoveTab::posRZButtonPressedSlot()
+void Ur5ManualMoveTab::posRZButtonPressed()
 {
     rotButtonPressed(2,1);
 }
 
-void Ur5ManualMoveTab::negRZButtonPressedSlot()
+void Ur5ManualMoveTab::negRZButtonPressed()
 {
     rotButtonPressed(2,-1);
 }
 
-void Ur5ManualMoveTab::moveButtonReleasedSlot()
+void Ur5ManualMoveTab::moveButtonReleased()
 {
     mUr5Robot->stopMove("stopl",accelerationLineEdit->text().toDouble());
 }
 
-void Ur5ManualMoveTab::updatePositionSlot()
+void Ur5ManualMoveTab::jointButtonReleased()
+{
+    mUr5Robot->stopMove("stopj",accelerationLineEdit->text().toDouble());
+}
+
+void Ur5ManualMoveTab::updatePositions()
 {
     Ur5State currentState;
     currentState=mUr5Robot->getCurrentState();
@@ -478,45 +484,140 @@ void Ur5ManualMoveTab::updatePositionSlot()
     rxLineEdit->setText(QString::number(currentState.cartAngles(0),'f',4));
     ryLineEdit->setText(QString::number(currentState.cartAngles(1),'f',4));
     rzLineEdit->setText(QString::number(currentState.cartAngles(2),'f',4));
+    q1LineEdit->setText(QString::number(currentState.jointPosition(0),'f',2));
+    q2LineEdit->setText(QString::number(currentState.jointPosition(1),'f',2));
+    q3LineEdit->setText(QString::number(currentState.jointPosition(2),'f',2));
+    q4LineEdit->setText(QString::number(currentState.jointPosition(3),'f',4));
+    q5LineEdit->setText(QString::number(currentState.jointPosition(4),'f',4));
+    q6LineEdit->setText(QString::number(currentState.jointPosition(5),'f',4));
 }
 
 void Ur5ManualMoveTab::connectMovementButtons()
 {
-    connect(posXButton,SIGNAL(pressed()),this,SLOT(posXButtonPressedSlot()));
-    connect(posXButton,SIGNAL(released()),this,SLOT(moveButtonReleasedSlot()));
+    connect(posXButton,&QPushButton::pressed,this,&Ur5ManualMoveTab::posXButtonPressed);
+    connect(posXButton,&QPushButton::released,this,&Ur5ManualMoveTab::moveButtonReleased);
 
-    connect(negXButton,SIGNAL(pressed()),this,SLOT(negXButtonPressedSlot()));
-    connect(negXButton,SIGNAL(released()),this,SLOT(moveButtonReleasedSlot()));
+    connect(negXButton,&QPushButton::pressed,this,&Ur5ManualMoveTab::negXButtonPressed);
+    connect(negXButton,&QPushButton::released,this,&Ur5ManualMoveTab::moveButtonReleased);
 
-    connect(posYButton,SIGNAL(pressed()),this,SLOT(posYButtonPressedSlot()));
-    connect(posYButton,SIGNAL(released()),this,SLOT(moveButtonReleasedSlot()));
+    connect(posYButton,&QPushButton::pressed,this,&Ur5ManualMoveTab::posYButtonPressed);
+    connect(posYButton,&QPushButton::released,this,&Ur5ManualMoveTab::moveButtonReleased);
 
-    connect(negYButton,SIGNAL(pressed()),this,SLOT(negYButtonPressedSlot()));
-    connect(negYButton,SIGNAL(released()),this,SLOT(moveButtonReleasedSlot()));
+    connect(negYButton,&QPushButton::pressed,this,&Ur5ManualMoveTab::negYButtonPressed);
+    connect(negYButton,&QPushButton::released,this,&Ur5ManualMoveTab::moveButtonReleased);
 
-    connect(posZButton,SIGNAL(pressed()),this,SLOT(posZButtonPressedSlot()));
-    connect(posZButton,SIGNAL(released()),this,SLOT(moveButtonReleasedSlot()));
+    connect(posZButton,&QPushButton::pressed,this,&Ur5ManualMoveTab::posZButtonPressed);
+    connect(posZButton,&QPushButton::released,this,&Ur5ManualMoveTab::moveButtonReleased);
 
-    connect(negZButton,SIGNAL(pressed()),this,SLOT(negZButtonPressedSlot()));
-    connect(negZButton,SIGNAL(released()),this,SLOT(moveButtonReleasedSlot()));
+    connect(negZButton,&QPushButton::pressed,this,&Ur5ManualMoveTab::negZButtonPressed);
+    connect(negZButton,&QPushButton::released,this,&Ur5ManualMoveTab::moveButtonReleased);
 
-    connect(rotPosXButton,SIGNAL(pressed()),this,SLOT(posRXButtonPressedSlot()));
-    connect(rotPosXButton,SIGNAL(released()),this,SLOT(moveButtonReleasedSlot()));
+    connect(rotPosXButton,&QPushButton::pressed,this,&Ur5ManualMoveTab::posRXButtonPressed);
+    connect(rotPosXButton,&QPushButton::released,this,&Ur5ManualMoveTab::moveButtonReleased);
 
-    connect(rotNegXButton,SIGNAL(pressed()),this,SLOT(negRXButtonPressedSlot()));
-    connect(rotNegXButton,SIGNAL(released()),this,SLOT(moveButtonReleasedSlot()));
+    connect(rotNegXButton,&QPushButton::pressed,this,&Ur5ManualMoveTab::negRXButtonPressed);
+    connect(rotNegXButton,&QPushButton::released,this,&Ur5ManualMoveTab::moveButtonReleased);
 
-    connect(rotPosYButton,SIGNAL(pressed()),this,SLOT(posRYButtonPressedSlot()));
-    connect(rotPosYButton,SIGNAL(released()),this,SLOT(moveButtonReleasedSlot()));
+    connect(rotPosYButton,&QPushButton::pressed,this,&Ur5ManualMoveTab::posRYButtonPressed);
+    connect(rotPosYButton,&QPushButton::released,this,&Ur5ManualMoveTab::moveButtonReleased);
 
-    connect(rotNegYButton,SIGNAL(pressed()),this,SLOT(negRYButtonPressedSlot()));
-    connect(rotNegYButton,SIGNAL(released()),this,SLOT(moveButtonReleasedSlot()));
+    connect(rotNegYButton,&QPushButton::pressed,this,&Ur5ManualMoveTab::negRYButtonPressed);
+    connect(rotNegYButton,&QPushButton::released,this,&Ur5ManualMoveTab::moveButtonReleased);
 
-    connect(rotPosZButton,SIGNAL(pressed()),this,SLOT(posRZButtonPressedSlot()));
-    connect(rotPosZButton,SIGNAL(released()),this,SLOT(moveButtonReleasedSlot()));
+    connect(rotPosZButton,&QPushButton::pressed,this,&Ur5ManualMoveTab::posRZButtonPressed);
+    connect(rotPosZButton,&QPushButton::released,this,&Ur5ManualMoveTab::moveButtonReleased);
 
-    connect(rotNegZButton,SIGNAL(pressed()),this,SLOT(negRZButtonPressedSlot()));
-    connect(rotNegZButton,SIGNAL(released()),this,SLOT(moveButtonReleasedSlot()));
+    connect(rotNegZButton,&QPushButton::pressed,this,&Ur5ManualMoveTab::negRZButtonPressed);
+    connect(rotNegZButton,&QPushButton::released,this,&Ur5ManualMoveTab::moveButtonReleased);
+}
+
+void Ur5ManualMoveTab::connectJointButtons()
+{
+    connect(q1PosButton,&QPushButton::pressed,this,&Ur5ManualMoveTab::q1PosButtonPressed);
+    connect(q2PosButton,&QPushButton::pressed,this,&Ur5ManualMoveTab::q2PosButtonPressed);
+    connect(q3PosButton,&QPushButton::pressed,this,&Ur5ManualMoveTab::q3PosButtonPressed);
+    connect(q4PosButton,&QPushButton::pressed,this,&Ur5ManualMoveTab::q4PosButtonPressed);
+    connect(q5PosButton,&QPushButton::pressed,this,&Ur5ManualMoveTab::q5PosButtonPressed);
+    connect(q6PosButton,&QPushButton::pressed,this,&Ur5ManualMoveTab::q6PosButtonPressed);
+    connect(q1NegButton,&QPushButton::pressed,this,&Ur5ManualMoveTab::q1NegButtonPressed);
+    connect(q2NegButton,&QPushButton::pressed,this,&Ur5ManualMoveTab::q2NegButtonPressed);
+    connect(q3NegButton,&QPushButton::pressed,this,&Ur5ManualMoveTab::q3NegButtonPressed);
+    connect(q4NegButton,&QPushButton::pressed,this,&Ur5ManualMoveTab::q4NegButtonPressed);
+    connect(q5NegButton,&QPushButton::pressed,this,&Ur5ManualMoveTab::q5NegButtonPressed);
+    connect(q6NegButton,&QPushButton::pressed,this,&Ur5ManualMoveTab::q6NegButtonPressed);
+
+    connect(q1PosButton,&QPushButton::released,this,&Ur5ManualMoveTab::jointButtonReleased);
+    connect(q2PosButton,&QPushButton::released,this,&Ur5ManualMoveTab::jointButtonReleased);
+    connect(q3PosButton,&QPushButton::released,this,&Ur5ManualMoveTab::jointButtonReleased);
+    connect(q4PosButton,&QPushButton::released,this,&Ur5ManualMoveTab::jointButtonReleased);
+    connect(q5PosButton,&QPushButton::released,this,&Ur5ManualMoveTab::jointButtonReleased);
+    connect(q6PosButton,&QPushButton::released,this,&Ur5ManualMoveTab::jointButtonReleased);
+    connect(q1NegButton,&QPushButton::released,this,&Ur5ManualMoveTab::jointButtonReleased);
+    connect(q2NegButton,&QPushButton::released,this,&Ur5ManualMoveTab::jointButtonReleased);
+    connect(q3NegButton,&QPushButton::released,this,&Ur5ManualMoveTab::jointButtonReleased);
+    connect(q4NegButton,&QPushButton::released,this,&Ur5ManualMoveTab::jointButtonReleased);
+    connect(q5NegButton,&QPushButton::released,this,&Ur5ManualMoveTab::jointButtonReleased);
+    connect(q6NegButton,&QPushButton::released,this,&Ur5ManualMoveTab::jointButtonReleased);
+}
+
+void Ur5ManualMoveTab::q1PosButtonPressed()
+{
+    jointButtonPressed(0,1);
+}
+
+void Ur5ManualMoveTab::q2PosButtonPressed()
+{
+    jointButtonPressed(1,1);
+}
+
+void Ur5ManualMoveTab::q3PosButtonPressed()
+{
+    jointButtonPressed(2,1);
+}
+
+void Ur5ManualMoveTab::q4PosButtonPressed()
+{
+    jointButtonPressed(3,1);
+}
+
+void Ur5ManualMoveTab::q5PosButtonPressed()
+{
+    jointButtonPressed(4,1);
+}
+
+void Ur5ManualMoveTab::q6PosButtonPressed()
+{
+    jointButtonPressed(5,1);
+}
+
+void Ur5ManualMoveTab::q1NegButtonPressed()
+{
+    jointButtonPressed(0,-1);
+}
+
+void Ur5ManualMoveTab::q2NegButtonPressed()
+{
+    jointButtonPressed(1,-1);
+}
+
+void Ur5ManualMoveTab::q3NegButtonPressed()
+{
+    jointButtonPressed(2,-1);
+}
+
+void Ur5ManualMoveTab::q4NegButtonPressed()
+{
+    jointButtonPressed(3,-1);
+}
+
+void Ur5ManualMoveTab::q5NegButtonPressed()
+{
+    jointButtonPressed(4,-1);
+}
+
+void Ur5ManualMoveTab::q6NegButtonPressed()
+{
+    jointButtonPressed(5,-1);
 }
 
 } // cx
