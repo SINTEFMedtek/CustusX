@@ -47,10 +47,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxWidgetObscuredListener.h"
 #include "cxStringPropertySelectTool.h"
 #include "cxAcquisitionService.h"
+#include "cxSelectRecordSessionWidget.h"
 
 
 namespace cx
 {
+
 RecordTrackingWidget::RecordTrackingWidget(XmlOptionFile options,
 										   AcquisitionServicePtr acquisitionService,
 										   VisServices services,
@@ -59,13 +61,13 @@ RecordTrackingWidget::RecordTrackingWidget(XmlOptionFile options,
 	QWidget(parent),
 	mServices(services),
 	mOptions(options),
-  mAcquisitionService(acquisitionService)
+	mAcquisitionService(acquisitionService)
 {
 	QVBoxLayout* mVerticalLayout = new QVBoxLayout(this);
 
 	mToolSelector = StringPropertySelectTool::New(services.getToolManager());
 
-	this->initSessionSelector();
+	mSelectRecordSession = new SelectRecordSession(mOptions, acquisitionService, services);
 
 	AcquisitionService::TYPES context(AcquisitionService::tTRACKING);
 	mRecordSessionWidget = new RecordSessionWidget(mAcquisitionService, this, context, category);
@@ -74,34 +76,15 @@ RecordTrackingWidget::RecordTrackingWidget(XmlOptionFile options,
 
 	mVerticalLayout->addWidget(sscCreateDataWidget(this, mToolSelector));
 	mVerticalLayout->addWidget(mRecordSessionWidget);
-	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mSessionSelector));
+	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mSelectRecordSession->getSessionSelector()));
 
 	mObscuredListener.reset(new WidgetObscuredListener(this));
 	connect(mObscuredListener.get(), SIGNAL(obscured(bool)), this, SLOT(obscuredSlot(bool)));
 }
 
-void RecordTrackingWidget::initSessionSelector()
+StringPropertyPtr RecordTrackingWidget::getSessionSelector()
 {
-	mSessionSelector = StringProperty::initialize("tracking_session", "Tracking Data", "Select tracker data", "", QStringList());
-	this->recordedSessionsChanged();
-}
-
-void RecordTrackingWidget::recordedSessionsChanged()
-{
-	std::vector<RecordSessionPtr> sessions = mAcquisitionService->getSessions();
-	QStringList uids;
-	std::map<QString, QString> names;
-	for(unsigned i=0; i<sessions.size(); ++i)
-	{
-		QString uid = sessions[i]->getUid();
-		uids << uid;
-		names[uid] = sessions[i]->getHumanDescription();
-	}
-	mSessionSelector->setValueRange(uids);
-	mSessionSelector->setDisplayNames(names);
-
-	if(mSessionSelector->getValue().isEmpty() && !uids.isEmpty())
-		mSessionSelector->setValue(uids.last());
+	return mSelectRecordSession->getSessionSelector();
 }
 
 void RecordTrackingWidget::acquisitionStarted()
@@ -120,8 +103,7 @@ void RecordTrackingWidget::acquisitionStarted()
 void RecordTrackingWidget::acquisitionStopped()
 {
 	QString newUid = mAcquisitionService->getLatestSession()->getUid();
-	this->recordedSessionsChanged();
-	mSessionSelector->setValue(newUid);
+	mSelectRecordSession->getSessionSelector()->setValue(newUid);
 
 	mServices.patientModelService->autoSave();
 
@@ -158,27 +140,30 @@ void RecordTrackingWidget::obscuredSlot(bool obscured)
 {
 	if (obscured)
 		mAcquisitionService->cancelRecord();
-//	std::cout << "obscuredSlot: " << obscured << std::endl;
 
 	if (!obscured)
 	{
 		connect(mAcquisitionService.get(), &AcquisitionService::started, this, &RecordTrackingWidget::acquisitionStarted);
 		connect(mAcquisitionService.get(), &AcquisitionService::acquisitionStopped, this, &RecordTrackingWidget::acquisitionStopped, Qt::QueuedConnection);
 		connect(mAcquisitionService.get(), &AcquisitionService::cancelled, this, &RecordTrackingWidget::acquisitionCancelled);
-		connect(mAcquisitionService.get(), &AcquisitionService::recordedSessionsChanged, this, &RecordTrackingWidget::recordedSessionsChanged);
-		connect(mSessionSelector.get(), &StringProperty::changed, this, &RecordTrackingWidget::showSelectedRecordingInView);
-
-		this->recordedSessionsChanged();
+		connect(mToolSelector.get(), &StringPropertySelectTool::changed, this, &RecordTrackingWidget::onToolChanged);
+		mSelectRecordSession->setTool(this->getSuitableRecordingTool());
 	}
 	else
 	{
 		disconnect(mAcquisitionService.get(), &AcquisitionService::started, this, &RecordTrackingWidget::acquisitionStarted);
 		disconnect(mAcquisitionService.get(), &AcquisitionService::acquisitionStopped, this, &RecordTrackingWidget::acquisitionStopped);
 		disconnect(mAcquisitionService.get(), &AcquisitionService::cancelled, this, &RecordTrackingWidget::acquisitionCancelled);
-		disconnect(mAcquisitionService.get(), &AcquisitionService::recordedSessionsChanged, this, &RecordTrackingWidget::recordedSessionsChanged);
-		disconnect(mSessionSelector.get(), &StringProperty::changed, this, &RecordTrackingWidget::showSelectedRecordingInView);
+		disconnect(mToolSelector.get(), &StringPropertySelectTool::changed, this, &RecordTrackingWidget::onToolChanged);
+		mSelectRecordSession->setTool(ToolPtr());
 	}
 }
+
+void RecordTrackingWidget::onToolChanged()
+{
+	mSelectRecordSession->setTool(this->getSuitableRecordingTool());
+}
+
 
 ToolPtr RecordTrackingWidget::getSuitableRecordingTool()
 {
@@ -190,39 +175,8 @@ ToolPtr RecordTrackingWidget::getSuitableRecordingTool()
 
 TimedTransformMap RecordTrackingWidget::getRecordedTrackerData_prMt()
 {
-	ToolPtr tool = this->getSuitableRecordingTool();
-
-	if(!tool)
-	{
-		reportError("Found no tool in tracker recorder");
-		return TimedTransformMap();
-	}
-
-	RecordSessionPtr session;
-	QString sessionUid = mSessionSelector->getValue();
-	if(!sessionUid.isEmpty())
-		session = mAcquisitionService->getSession(sessionUid);
-
-	TimedTransformMap trackerRecordedData_prMt = RecordSession::getToolHistory_prMt(tool, session);
-
-	return trackerRecordedData_prMt;
+	return mSelectRecordSession->getRecordedTrackerData_prMt();
 }
 
-void RecordTrackingWidget::showSelectedRecordingInView()
-{
-	TimedTransformMap trackerRecordedData_prMt = this->getRecordedTrackerData_prMt();
-
-	ToolRep3DPtr activeRep3D = this->getToolRepIn3DView();
-	if(activeRep3D && !trackerRecordedData_prMt.empty())
-	{
-		activeRep3D->getTracer()->clear();
-		activeRep3D->getTracer()->setColor(QColor("green"));
-		activeRep3D->getTracer()->addManyPositions(trackerRecordedData_prMt);
-	}
-	else
-	{
-		activeRep3D->getTracer()->clear();
-	}
-}
 
 } //namespace cx
