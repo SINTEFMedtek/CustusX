@@ -30,7 +30,6 @@ void Ur5Robot::updateCurrentState()
     currentState.tcpAxis=mRTMonitor.getCurrentState().tcpAxis;
 
     this->setCurrentState(currentState);
-
     emit(stateUpdated());
 }
 
@@ -139,12 +138,16 @@ void Ur5Robot::move(QString typeOfMovement, Ur5State targetState, double acc, do
         sendMessage(mMessageEncoder.movej(targetState,acc,vel,0));
     else if(typeOfMovement=="speedl")
         sendMessage(mMessageEncoder.speedl(targetState,acc,t));
+    else if(typeOfMovement =="speedj")
+        sendMessage(mMessageEncoder.speedj(targetState,acc,t));
 }
 
 void Ur5Robot::stopMove(QString typeOfStop, double acc)
 {
     if(typeOfStop=="stopl")
         sendMessage(mMessageEncoder.stopl(acc));
+    else if(typeOfStop=="stopj")
+        sendMessage(mMessageEncoder.stopj(acc));
 }
 
 void Ur5Robot::openVTKfile(QString filename)
