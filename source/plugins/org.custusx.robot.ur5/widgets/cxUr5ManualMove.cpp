@@ -54,12 +54,12 @@ void Ur5ManualMoveTab::setMoveToolLayout(QVBoxLayout *parent)
     keyLayout->setMargin(0);
     keyLayout->setContentsMargins(0,0,0,0);
 
-    posZButton = new QPushButton();
-    negZButton = new QPushButton();
-    posYButton = new QPushButton();
-    negYButton = new QPushButton();
-    posXButton = new QPushButton();
-    negXButton = new QPushButton();
+    posZButton = new QPushButton(QIcon("/icons/arrow-up-double.png"),"");
+    negZButton = new QPushButton(QIcon("/icons/arrow-down-double.png"),"");
+    posXButton = new QPushButton(QIcon("/icons/arrow-up.png"),"");
+    negXButton = new QPushButton(QIcon("/icons/arrow-down.png"),"");
+    posYButton = new QPushButton(QIcon("/icons/arrow-left.png"),"");
+    negYButton = new QPushButton(QIcon("/icons/arrow-right.png"),"");
 
     posZButton->setAutoRepeat(true);
     posZButton->setToolTip("Move in positive Z direction");
@@ -79,12 +79,12 @@ void Ur5ManualMoveTab::setMoveToolLayout(QVBoxLayout *parent)
     negYButton->setAutoRepeat(true);
     negYButton->setToolTip("Move in negative X direction");
 
-    rotPosXButton = new QPushButton();
-    rotNegXButton = new QPushButton();
-    rotPosYButton = new QPushButton();
-    rotNegYButton = new QPushButton();
-    rotPosZButton = new QPushButton();
-    rotNegZButton = new QPushButton();
+    rotPosXButton = new QPushButton(QIcon("/icons/edit-redo-7.ico"),"");
+    rotNegXButton = new QPushButton(QIcon("/icons/edit-undo-7.ico"),"");
+    rotPosYButton = new QPushButton(QIcon("/icons/arrow-up.png"),"");
+    rotNegYButton = new QPushButton(QIcon("/icons/arrow-down.png"),"");
+    rotPosZButton = new QPushButton(QIcon("/icons/arrow-right.png"),"");
+    rotNegZButton = new QPushButton(QIcon("/icons/arrow-left.png"),"");
 
     rotPosXButton->setAutoRepeat(true);
     rotPosXButton->setToolTip("Rotate counter-clockwise around X axis");
@@ -172,42 +172,15 @@ void Ur5ManualMoveTab::setMoveToolLayout(QVBoxLayout *parent)
     posZButton->setStyleSheet("border:none");
     negZButton->setStyleSheet("border:none");
 
-    // rotPositive Z Button
-    QIcon i3;
-    i3.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/arrow-right.png"), QSize(), QIcon::Normal, QIcon::Off);
-    rotPosZButton->setIcon(i3);
     rotPosZButton->setIconSize(QSize(32, 32));
-    rotPosZButton->setToolTip(QApplication::translate("Ur5Widget", "Move in rotPositive Z direction", 0));
+    rotPosZButton->setToolTip("Move in rotPositive Z direction");
 
-    // rotNegative Z Button
-    QIcon i2;
-    i2.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/arrow-left.png"), QSize(), QIcon::Normal, QIcon::Off);
-    rotNegZButton->setIcon(i2);
     rotNegZButton->setIconSize(QSize(32, 32));
-    rotNegZButton->setToolTip(QApplication::translate("Ur5Widget", "Move in rotNegative Z direction", 0));
+    rotNegZButton->setToolTip("Move in rotNegative Z direction");
 
-    // rotPositive X Button
-    QIcon i4;
-    i4.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/edit-redo-7.ico"), QSize(), QIcon::Normal, QIcon::Off);
-    rotPosXButton->setIcon(i4);
     rotPosXButton->setIconSize(QSize(32, 32));
-
-    // rotNegative Y Button
-    QIcon i5;
-    i5.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/arrow-down.png"), QSize(), QIcon::Normal, QIcon::Off);
-    rotNegYButton->setIcon(i5);
     rotNegYButton->setIconSize(QSize(32, 32));
-
-    // rotPositive Y Button
-    QIcon i6;
-    i6.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/arrow-up.png"), QSize(), QIcon::Normal, QIcon::Off);
-    rotPosYButton->setIcon(i6);
     rotPosYButton->setIconSize(QSize(32, 32));
-
-    // rotNegative X Button
-    QIcon i8;
-    i8.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/edit-undo-7.ico"), QSize(), QIcon::Normal, QIcon::Off);
-    rotNegXButton->setIcon(i8);
     rotNegXButton->setIconSize(QSize(32, 32));
 
     // Style sheet for buttons
@@ -313,50 +286,106 @@ void Ur5ManualMoveTab::setJointMoveWidget(QVBoxLayout *parent)
     QGridLayout *coordInfoLayout = new QGridLayout();
     group->setLayout(coordInfoLayout);
 
-    // Position label
-    coordInfoLayout->addWidget(new QLabel("Base"), 9, 4, 1, 1, Qt::AlignHCenter);
-    coordInfoLayout->addWidget(new QLabel("Shoulder"), 10, 4, 1, 1, Qt::AlignHCenter);
-    coordInfoLayout->addWidget(new QLabel("Elbow"), 11, 4, 1, 1, Qt::AlignHCenter);
+    coordInfoLayout->setSpacing(5);
+    coordInfoLayout->setMargin(5);
 
-    // mm label
-    coordInfoLayout->addWidget(new QLabel("Rad"), 9, 6, 1, 1);
-    coordInfoLayout->addWidget(new QLabel("Rad"), 10, 6, 1, 1);
-    coordInfoLayout->addWidget(new QLabel("Rad"), 11, 6, 1, 1);
+    q1PosButton = new QPushButton(QIcon("/icons/arrow-right.png"),"");
+    q1NegButton = new QPushButton(QIcon("/icons/arrow-left.png"),"");
+    q2PosButton = new QPushButton(QIcon("/icons/arrow-right.png"),"");
+    q2NegButton = new QPushButton(QIcon("/icons/arrow-left.png"),"");
+    q3PosButton = new QPushButton(QIcon("/icons/arrow-right.png"),"");
+    q3NegButton = new QPushButton(QIcon("/icons/arrow-left.png"),"");
+    q4PosButton = new QPushButton(QIcon("/icons/arrow-right.png"),"");
+    q4NegButton = new QPushButton(QIcon("/icons/arrow-left.png"),"");
+    q5PosButton = new QPushButton(QIcon("/icons/arrow-right.png"),"");
+    q5NegButton = new QPushButton(QIcon("/icons/arrow-left.png"),"");
+    q6PosButton = new QPushButton(QIcon("/icons/arrow-right.png"),"");
+    q6NegButton = new QPushButton(QIcon("/icons/arrow-left.png"),"");
 
-    // Ri orientation label
-    coordInfoLayout->addWidget(new QLabel("Wrist 1"), 12, 4, 1, 1);
-    coordInfoLayout->addWidget(new QLabel("Wrist 2"), 13, 4, 1, 1);
-    coordInfoLayout->addWidget(new QLabel("Wrist 3"), 14, 4, 1, 1);
+    q1PosButton->setAutoRepeat(true);
+    q1PosButton->setToolTip("Move in positive Z direction");
 
-    // Rad label
-    coordInfoLayout->addWidget(new QLabel("Rad"), 12, 6, 1, 1);
-    coordInfoLayout->addWidget(new QLabel("Rad"), 13, 6, 1, 1);
-    coordInfoLayout->addWidget(new QLabel("Rad"), 14, 6, 1, 1);
+    q2PosButton->setAutoRepeat(true);
+    q2PosButton->setToolTip("Move in negative Z direction");
 
-    // X coordinate line edit
-    jxPosLineEdit = new QLineEdit();
-    coordInfoLayout->addWidget(jxPosLineEdit, 9, 5, 1, 1);
+    q3PosButton->setAutoRepeat(true);
+    q3PosButton->setToolTip("Move in positive Y direction");
 
-    // Y coordinate line edit
-    jyPosLineEdit = new QLineEdit();
-    coordInfoLayout->addWidget(jyPosLineEdit, 10, 5, 1, 1);
+    q4PosButton->setAutoRepeat(true);
+    q4PosButton->setToolTip("Move in negative Y direction");
 
-    // Line edit for Z position
-    jzPosLineEdit = new QLineEdit();
-    jzPosLineEdit->setObjectName(QStringLiteral("zPosLineEdit"));
-    coordInfoLayout->addWidget(jzPosLineEdit, 11, 5, 1, 1);
+    q5PosButton->setAutoRepeat(true);
+    q5PosButton->setToolTip("Move in positive X direction");
 
-    // Line edit for RX orientation
-    jrxLineEdit = new QLineEdit();
-    coordInfoLayout->addWidget(jrxLineEdit, 12, 5, 1, 1);
+    q6PosButton->setAutoRepeat(true);
+    q6PosButton->setToolTip("Move in negative X direction");
 
-    // Line edit for RY orientation
-    jryLineEdit = new QLineEdit();
-    coordInfoLayout->addWidget(jryLineEdit, 13, 5, 1, 1);
+    q1NegButton->setAutoRepeat(true);
+    q1NegButton->setToolTip("Move in positive Z direction");
 
-    // Line edit for RZ orientation
-    jrzLineEdit = new QLineEdit();
-    coordInfoLayout->addWidget(jrzLineEdit, 14, 5, 1, 1);
+    q2NegButton->setAutoRepeat(true);
+    q2NegButton->setToolTip("Move in negative Z direction");
+
+    q3NegButton->setAutoRepeat(true);
+    q3NegButton->setToolTip("Move in positive Y direction");
+
+    q4NegButton->setAutoRepeat(true);
+    q4NegButton->setToolTip("Move in negative Y direction");
+
+    q5NegButton->setAutoRepeat(true);
+    q5NegButton->setToolTip("Move in positive X direction");
+
+    q6NegButton->setAutoRepeat(true);
+    q6NegButton->setToolTip("Move in negative X direction");
+
+    q1LineEdit = new QLineEdit();
+    q2LineEdit = new QLineEdit();
+    q3LineEdit = new QLineEdit();
+    q4LineEdit = new QLineEdit();
+    q5LineEdit = new QLineEdit();
+    q6LineEdit = new QLineEdit();
+
+    int row = 0;
+    coordInfoLayout->addWidget(new QLabel("Base"), row, 0, 1, 1, Qt::AlignHCenter);
+    coordInfoLayout->addWidget(q1NegButton,row,1,1,1);
+    coordInfoLayout->addWidget(q1PosButton,row,2,1,1);
+    coordInfoLayout->addWidget(q1LineEdit, row, 3, 1, 1);
+    coordInfoLayout->addWidget(new QLabel("Rad"), row, 4, 1, 1);
+
+    row++;
+    coordInfoLayout->addWidget(new QLabel("Shoulder"), row, 0, 1, 1, Qt::AlignHCenter);
+    coordInfoLayout->addWidget(q2NegButton,row,1,1,1);
+    coordInfoLayout->addWidget(q2PosButton,row,2,1,1);
+    coordInfoLayout->addWidget(q2LineEdit, row, 3, 1, 1);
+    coordInfoLayout->addWidget(new QLabel("Rad"), row, 4, 1, 1);
+
+    row++;
+    coordInfoLayout->addWidget(new QLabel("Elbow"), row, 0, 1, 1, Qt::AlignHCenter);
+    coordInfoLayout->addWidget(q3NegButton,row,1,1,1);
+    coordInfoLayout->addWidget(q3PosButton,row,2,1,1);
+    coordInfoLayout->addWidget(q3LineEdit, row, 3, 1, 1);
+    coordInfoLayout->addWidget(new QLabel("Rad"), row, 4, 1, 1);
+
+    row++;
+    coordInfoLayout->addWidget(new QLabel("Wrist 1"), row, 0, 1, 1);
+    coordInfoLayout->addWidget(q4NegButton,row,1,1,1);
+    coordInfoLayout->addWidget(q4PosButton,row,2,1,1);
+    coordInfoLayout->addWidget(q4LineEdit, row, 3, 1, 1);
+    coordInfoLayout->addWidget(new QLabel("Rad"), row, 4, 1, 1);
+
+    row++;
+    coordInfoLayout->addWidget(new QLabel("Wrist 2"), row, 0, 1, 1);
+    coordInfoLayout->addWidget(q5NegButton,row,1,1,1);
+    coordInfoLayout->addWidget(q5PosButton,row,2,1,1);
+    coordInfoLayout->addWidget(q5LineEdit, row, 3, 1, 1);
+    coordInfoLayout->addWidget(new QLabel("Rad"), row, 4, 1, 1);
+
+    row++;
+    coordInfoLayout->addWidget(new QLabel("Wrist 3"), row, 0, 1, 1);
+    coordInfoLayout->addWidget(q6NegButton,row,1,1,1);
+    coordInfoLayout->addWidget(q6PosButton,row,2,1,1);
+    coordInfoLayout->addWidget(q6LineEdit, row, 3, 1, 1);
+    coordInfoLayout->addWidget(new QLabel("Rad"), row, 4, 1, 1);
 }
 
 void Ur5ManualMoveTab::coordButtonPressed(int axis, int sign)
