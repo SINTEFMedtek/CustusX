@@ -7,7 +7,6 @@
 #include <QComboBox>
 #include <QLabel>
 #include <QApplication>
-#include <QThread>
 
 namespace cx
 {
