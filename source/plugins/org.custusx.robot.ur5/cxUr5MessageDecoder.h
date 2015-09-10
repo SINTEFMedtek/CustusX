@@ -21,9 +21,6 @@ class org_custusx_robot_ur5_EXPORT Ur5MessageDecoder
 public:
     Ur5State analyzeRawPacket(QByteArray packet);
 
-    double pickDouble(QByteArray data, int pos);
-    int pickInteger(QByteArray data, int pos);
-
 private:
     void pushState(QByteArray data, Ur5State &state);
     QByteArray slicePacket(QByteArray data, int pos, int length);
@@ -38,6 +35,9 @@ private:
     Ur5State setRTState(QByteArray data);
     void setCartData(QByteArray cartData, Ur5State &state);
     void setJointData(QByteArray jointData,Ur5State &state);
+
+    double pickDouble(QByteArray data, int pos);
+    int pickInteger(QByteArray data, int pos);
 };
 
 
