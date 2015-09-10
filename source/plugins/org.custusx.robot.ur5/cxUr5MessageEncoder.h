@@ -15,7 +15,7 @@ public:
     QString movej(Ur5State pose,double a, double v, double r);
     QString movel(Ur5State pose,double a, double v);
 
-    QString speedj(double* velocityField, double a, double t);
+    QString speedj(Ur5State p, double a, double t);
     QString speedl(Ur5State p, double a, double t);
 
     QString stopj(double a);

@@ -28,18 +28,18 @@ QString Ur5MessageEncoder::movec(Ur5State pose_via,Ur5State pose_to, double a, d
             .arg(a).arg(v).arg(r);
 }
 
-QString Ur5MessageEncoder::speedj(double* velocityField, double a, double t)
+QString Ur5MessageEncoder::speedj(Ur5State p, double a, double t)
 {
     return QString("speedj([%1,%2,%3,%4,%5,%6],a=%7,t_min=%8)")
-            .arg(velocityField[0]).arg(velocityField[1]).arg(velocityField[2]).arg(velocityField[3])
-            .arg(velocityField[4]).arg(velocityField[5]).arg(a).arg(t);
+            .arg(p.jointVelocity(0)).arg(p.jointVelocity(1)).arg(p.jointVelocity(2)).arg(p.jointVelocity(3))
+            .arg(p.jointVelocity(4)).arg(p.jointVelocity(5)).arg(a).arg(t);
 }
 
 QString Ur5MessageEncoder::speedl(Ur5State p, double a, double t)
 {
     return QString("speedl([%1,%2,%3,%4,%5,%6],a=%7,t_min=%8)")
-            .arg(p.jointVelocity(0)).arg(p.jointVelocity(1)).arg(p.jointVelocity(2)).arg(p.jointVelocity(0))
-            .arg(p.jointVelocity(1)).arg(p.jointVelocity(2)).arg(a).arg(t);
+            .arg(p.jointVelocity(0)).arg(p.jointVelocity(1)).arg(p.jointVelocity(2)).arg(p.jointVelocity(3))
+            .arg(p.jointVelocity(4)).arg(p.jointVelocity(5)).arg(a).arg(t);
 }
 
 QString Ur5MessageEncoder::set_tcp(Ur5State p)
