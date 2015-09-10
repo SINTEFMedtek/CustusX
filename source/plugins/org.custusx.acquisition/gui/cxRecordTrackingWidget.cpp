@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxWidgetObscuredListener.h"
 #include "cxStringPropertySelectTool.h"
 #include "cxAcquisitionService.h"
-#include "cxSelectRecordSessionWidget.h"
+#include "cxRecordSessionSelector.h"
 
 
 namespace cx
