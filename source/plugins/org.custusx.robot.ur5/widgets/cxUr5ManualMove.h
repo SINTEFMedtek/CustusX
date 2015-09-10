@@ -7,6 +7,7 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QGridLayout>
+#include <QScrollBar>
 
 namespace cx
 {
@@ -18,51 +19,73 @@ public:
     Ur5ManualMoveTab(Ur5RobotPtr Ur5Robot,QWidget *parent = 0);
     virtual ~Ur5ManualMoveTab();
 
+private slots:
+    void moveButtonReleased();
+    void jointButtonReleased();
+
+    void posZButtonPressed();
+    void negZButtonPressed();
+    void posYButtonPressed();
+    void negYButtonPressed();
+    void posXButtonPressed();
+    void negXButtonPressed();
+    void posRXButtonPressed();
+    void negRXButtonPressed();
+    void posRYButtonPressed();
+    void negRYButtonPressed();
+    void posRZButtonPressed();
+    void negRZButtonPressed();
+
+    void q1PosButtonPressed();
+    void q2PosButtonPressed();
+    void q3PosButtonPressed();
+    void q4PosButtonPressed();
+    void q5PosButtonPressed();
+    void q6PosButtonPressed();
+    void q1NegButtonPressed();
+    void q2NegButtonPressed();
+    void q3NegButtonPressed();
+    void q4NegButtonPressed();
+    void q5NegButtonPressed();
+    void q6NegButtonPressed();
+
+    void updatePositions();
+
+private:
+    QHBoxLayout *mainLayout;
+    void setupUi(QWidget *parent);
+    Ur5RobotPtr mUr5Robot;
+
+    void connectMovementButtons();
+    void connectJointButtons();
+
+    void setMoveToolLayout(QVBoxLayout *vLayout);
+    void setMoveSettingsWidget(QVBoxLayout *vLayout);
+    void setCoordInfoWidget(QVBoxLayout *vLayout);
+    void setJointMoveWidget(QVBoxLayout *vLayout);
+
     QPushButton *negZButton, *posZButton, *posXButton, *negYButton, *posYButton, *negXButton;
     QPushButton *rotNegZButton, *rotPosZButton, *rotPosXButton, *rotNegYButton, *rotPosYButton, *rotNegXButton;
 
     QLineEdit *xPosLineEdit, *yPosLineEdit, *zPosLineEdit;
     QLineEdit *rxLineEdit, *ryLineEdit, *rzLineEdit;
 
-    QLineEdit *jxPosLineEdit, *jyPosLineEdit, *jzPosLineEdit;
-    QLineEdit *jrxLineEdit, *jryLineEdit, *jrzLineEdit;
+    QLineEdit *q1LineEdit, *q2LineEdit, *q3LineEdit;
+    QLineEdit *q4LineEdit, *q5LineEdit, *q6LineEdit;
+
+    QPushButton *q1PosButton, *q1NegButton;
+    QPushButton *q2PosButton, *q2NegButton;
+    QPushButton *q3PosButton, *q3NegButton;
+    QPushButton *q4PosButton, *q4NegButton;
+    QPushButton *q5PosButton, *q5NegButton;
+    QPushButton *q6PosButton, *q6NegButton;
 
     QLineEdit *accelerationLineEdit, *velocityLineEdit, *timeLineEdit;
 
     void coordButtonPressed(int axis,int sign);
     void rotButtonPressed(int axis,int sign);
+    void jointButtonPressed(int joint,int sign);
 
-
-public slots:
-    void moveButtonReleasedSlot();
-    void posZButtonPressedSlot();
-    void negZButtonPressedSlot();
-    void posYButtonPressedSlot();
-    void negYButtonPressedSlot();
-    void posXButtonPressedSlot();
-    void negXButtonPressedSlot();
-
-    void posRXButtonPressedSlot();
-    void negRXButtonPressedSlot();
-    void posRYButtonPressedSlot();
-    void negRYButtonPressedSlot();
-    void posRZButtonPressedSlot();
-    void negRZButtonPressedSlot();
-
-
-    void updatePositionSlot();
-
-
-private:
-    QHBoxLayout *mainLayout;
-    void setupUi(QWidget *parent);
-    Ur5RobotPtr mUr5Robot;
-    void connectMovementButtons();
-
-    void setMoveToolLayout(QVBoxLayout *vLayout);
-    void setMoveSettingsWidget(QVBoxLayout *vLayout);
-    void setCoordInfoWidget(QVBoxLayout *vLayout);
-    void setJointMoveWidget(QVBoxLayout *vLayout);
 };
 
 } // cx
