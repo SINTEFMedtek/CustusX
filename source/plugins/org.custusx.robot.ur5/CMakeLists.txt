@@ -80,6 +80,4 @@ target_include_directories(org_custusx_robot_ur5
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-
 add_subdirectory(testing)
-
