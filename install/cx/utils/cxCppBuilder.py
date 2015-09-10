@@ -206,7 +206,7 @@ class CppBuilder:
         add('CMAKE_ECLIPSE_GENERATE_LINKED_RESOURCES', False)            
     
     def _assembleOptions(self):
-        return " ".join(["-D%s=%s"%(key,val) for key,val in self.cmakeOptions.iteritems()])
+        return " ".join(['-D%s="%s"'%(key,val) for key,val in self.cmakeOptions.iteritems()])
     
     def _printOptions(self):
         options = "".join(["    %s = %s\n"%(key,val) for key,val in self.cmakeOptions.iteritems()])
