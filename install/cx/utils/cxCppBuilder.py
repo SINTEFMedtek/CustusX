@@ -182,8 +182,8 @@ class CppBuilder:
     def addCMakeOption(self, key, value):
         self.cmakeOptions[key] = value
 
-    def configureCMake(self, options=''):        
-        self._addDefaultCmakeOptions()                
+    def configureCMake(self, options=''): 
+        self._addDefaultCmakeOptions()
         generator = self.controlData.getCMakeGenerator()
         optionsFromAssembly = self._assembleOptions()
         self._printOptions()        
