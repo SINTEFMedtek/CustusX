@@ -44,8 +44,8 @@ void Ur5InitializeTab::setupUi(QWidget *parent)
     ipLineEdit->setText("169.254.62.100");
 
     QIcon icon;
-    icon.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/network-idle.ico"), QSize(), QIcon::Normal, QIcon::Off);
-    icon.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/network-transmit-receive.ico"), QSize(), QIcon::Normal, QIcon::On);
+    icon.addFile("/icons/network-idle.ico", QSize(), QIcon::Normal, QIcon::Off);
+    icon.addFile("/icons/network-transmit-receive.ico", QSize(), QIcon::Normal, QIcon::On);
     connectButton->setIcon(icon);
     connectButton->setToolTip("Connect to robot");
     connectButton->setText("Connect");   
@@ -100,18 +100,10 @@ void Ur5InitializeTab::setupUi(QWidget *parent)
     initializeButton_2->setText(QApplication::translate("Ur5Widget", "Initialize", 0));
 
     row++;
-    shutdownButton = new QPushButton();
-    disconnectButton = new QPushButton();
+    shutdownButton = new QPushButton(QIcon("/icons/application-exit-4.png"),"Shutdown");
+    disconnectButton = new QPushButton(QIcon("/icons/network-offline.ico"),"Disconnect");
     mainLayout->addWidget(shutdownButton,row,0,1,1);
     mainLayout->addWidget(disconnectButton,row,3,1,1);
-    QIcon icon1;
-    icon1.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/network-offline.ico"), QSize(), QIcon::Normal, QIcon::Off);
-    disconnectButton->setIcon(icon1);
-    disconnectButton->setText("Disconnect");
-    QIcon icon2;
-    icon2.addFile(QStringLiteral("C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/icons/system-log-out-5.ico"), QSize(), QIcon::Normal, QIcon::Off);
-    shutdownButton->setIcon(icon2);
-    shutdownButton->setText("Shutdown");
 }
 
 void Ur5InitializeTab::connectButtonSlot()
