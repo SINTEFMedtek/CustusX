@@ -43,6 +43,9 @@ TEST_CASE("Ur5Plugin: Connect to robot", "[manual][plugins][org.custusx.robot.ur
 
 TEST_CASE("Ur5Plugin: Send message to robot and receive message from robot", "[manual][plugins][org.custusx.robot.ur5]")
 {
+    Ur5TestFixture fixture;
+    fixture.mUr5Robot.connectToRobot("169.254.62.100");
+    CHECK(fixture.mUr5Robot.isConnectedToRobot());
 }
 
 TEST_CASE("Ur5Plugin: Analyze raw data packet and update current state", "[manual][plugins][org.custusx.robot.ur5]")
