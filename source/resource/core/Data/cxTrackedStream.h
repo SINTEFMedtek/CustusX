@@ -72,6 +72,7 @@ public:
 
 	ImagePtr getChangingImage();
 	bool is3D();
+	bool is2D();
 	bool hasVideo() const;
 	bool isStreaming() const;
 signals:

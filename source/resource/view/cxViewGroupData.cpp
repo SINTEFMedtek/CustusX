@@ -402,20 +402,30 @@ std::vector<TrackedStreamPtr> ViewGroupData::getTrackedStreams(DataViewPropertie
 	return this->getDataOfType<TrackedStream>(properties);
 }
 
-//Should this only return 3D images?
-std::vector<ImagePtr> ViewGroupData::getImagesAndChangingImagesFromTrackedStreams(DataViewProperties properties) const
+std::vector<TrackedStreamPtr> ViewGroupData::getTracked2DStreams(DataViewProperties properties) const
+{
+	std::vector<TrackedStreamPtr> streams = this->getTrackedStreams(properties);
+	std::vector<TrackedStreamPtr> retval;
+
+	for(int i = 0; i < streams.size(); ++i)
+	{
+		if(streams[i]->is2D() )
+			retval.push_back(streams[i]);
+	}
+	return retval;
+}
+
+std::vector<ImagePtr> ViewGroupData::getImagesAndChanging3DImagesFromTrackedStreams(DataViewProperties properties) const
 {
 	std::vector<ImagePtr> images = this->getImages(properties);
 	std::vector<TrackedStreamPtr> streams = this->getTrackedStreams(properties);
-//	std::cout << "getImagesAndChangingImagesFromTrackedStreams images: " << images.size() << " streams: " << streams.size() << std::endl;
 
 	for(int i = 0; i < streams.size(); ++i)
 	{
 		ImagePtr changingImage = streams[i]->getChangingImage();
-		if(changingImage)// TODO: Check on streams[i]->is3D() instead?
+		if(streams[i]->is3D())
 			images.push_back(changingImage);
 	}
-//	std::cout << "getImagesAndChangingImagesFromTrackedStreams total: " << images.size() << std::endl;
 	return images;
 }
 

@@ -303,10 +303,6 @@ void PatientModelImplService::videoSourceAdded(VideoSourcePtr source)
 	if(!tool)
 		return;
 
-	//Temporary code turning off generation of TrackedStream for video sources that are not 3D
-	if (!source || !source->getVtkImageData() || source->getVtkImageData()->GetDataDimension() != 3)
-		return;
-
 	QString uid = source->getUid() + tool->getUid();
 	QString name = source->getName() + " - " + tool->getName();
 	TrackedStreamPtr trackedStream = this->dataService()->getTrackedStream(uid);

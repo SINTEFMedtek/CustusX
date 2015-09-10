@@ -293,13 +293,38 @@ void ViewWrapper2D::recreateMultiSlicer()
     this->createAndAddMultiSliceRep();
 
     if (mGroupData)
-	{
-		std::vector<ImagePtr> images = mGroupData->getImagesAndChangingImagesFromTrackedStreams(DataViewProperties::createSlice2D());
-		mMultiSliceRep->setImages(images);
-	}
+		mMultiSliceRep->setImages(this->getImagesToView());
 
     this->viewportChanged();
 }
+
+std::vector<ImagePtr> ViewWrapper2D::getImagesToView()
+{
+	std::vector<ImagePtr> images = mGroupData->getImagesAndChanging3DImagesFromTrackedStreams(DataViewProperties::createSlice2D());
+
+	if(this->isAnyplane())
+	{
+		ImagePtr changingImage = this->get2DStreamImage();
+		if(changingImage)
+			images.push_back(changingImage);
+	}
+	return images;
+}
+
+bool ViewWrapper2D::isAnyplane()
+{
+	PLANE_TYPE plane = mSliceProxy->getComputer().getPlaneType();
+	return plane == ptANYPLANE;
+}
+
+ImagePtr ViewWrapper2D::get2DStreamImage()
+{
+	std::vector<TrackedStreamPtr> streams = mGroupData->getTracked2DStreams(DataViewProperties::createSlice2D());
+	TrackedStreamPtr stream = streams[0];
+	ImagePtr changingImage = stream->getChangingImage();
+	return changingImage;
+}
+
 
 /**Call when viewport size or zoom has changed.
  * Recompute camera zoom and  reps requiring vpMs.
@@ -429,7 +454,7 @@ void ViewWrapper2D::imageAdded(ImagePtr image)
 
 ImagePtr ViewWrapper2D::getImageToDisplay()
 {
-	std::vector<ImagePtr> images = mGroupData->getImagesAndChangingImagesFromTrackedStreams(DataViewProperties::createSlice2D());
+	std::vector<ImagePtr> images = mGroupData->getImagesAndChanging3DImagesFromTrackedStreams(DataViewProperties::createSlice2D());
     ImagePtr image;
     if (!images.empty())
         image = images.back();  // always show last in vector
@@ -489,6 +514,7 @@ void ViewWrapper2D::updateItemsFromViewGroup(QString &text)
         this->removeAndResetMultiSliceRep();
     }
 }
+
 /**
  * @brief Set the text and font size of the annotation in the lower left corner of the view
  *
