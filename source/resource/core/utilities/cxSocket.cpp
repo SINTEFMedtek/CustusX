@@ -108,6 +108,15 @@ qint64 Socket::read(char *data, qint64 maxSizeBytes) const
     return readBytes;
 }
 
+
+// Implementert av Andreas
+QByteArray Socket::read(qint64 maxSizeBytes) const
+{
+    QByteArray readBytes = mSocket->read(maxSizeBytes);
+    return readBytes;
+}
+// -----
+
 qint64 Socket::skip(qint64 maxSizeBytes) const
 {
     char *voidData = new char[maxSizeBytes];
@@ -209,4 +218,5 @@ void Socket::receiveAboutToClose()
 {
     //CX_LOG_DEBUG() << "Socket is about to close";
 }
+
 }//namespace cx

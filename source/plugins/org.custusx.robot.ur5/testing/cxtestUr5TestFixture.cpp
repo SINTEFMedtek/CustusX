@@ -30,73 +30,46 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXSOCKET_H
-#define CXSOCKET_H
+#include "cxtestUr5TestFixture.h"
 
-#include "cxResourceExport.h"
+#include <QFile>
 
-#include <boost/shared_ptr.hpp>
-#include <QObject>
-#include <QAbstractSocket>
-#include <QString>
-
-QT_BEGIN_NAMESPACE
-class QTcpSocket;
-QT_END_NAMESPACE
-
-namespace cx
+namespace cxtest
 {
-typedef boost::shared_ptr<class Socket> SocketPtr;
 
-/**
- * @brief The Socket class socket functionallity
- * @date 18.03.2015
- * @author Janne Beate Bakeng, SINTEF
- */
-class cxResource_EXPORT Socket : public QObject
+Ur5TestFixture::Ur5TestFixture() :
+    mUr5Robot(),
+    mUr5Connection()
 {
-    Q_OBJECT
-public:
-    Socket(QObject *parent);
-
-    void requestConnectToHost(QString ip, int port) const;
-    bool tryConnectToHostAndWait(QString ip, int port) const;
-    bool isConnected() const;
-    QString getLastError() const;
-    void requestCloseConnection() const;
-
-    bool minBytesAvailable(int bytes) const;
-    qint64 bytesAvailable() const;
-    qint64 read(char *data, qint64 maxSizeBytes) const;
-    QByteArray read(qint64 maxSizeBytes) const;
-    qint64 skip(qint64 maxSizeBytes) const;
-
-    qint64 write(const char* data, qint64 maxSizeBytes) const;
-
-    bool waitForBytesWritten(int msecs = 3000);
-    bool waitForReadyRead(int msecs = 3000);
-
-signals:
-    void connected();
-    void disconnected();
-    void readyRead();
-    void error();
-
-private slots:
-    void receivedConnected();
-    void receivedDisconnected();
-    void receivedError(QAbstractSocket::SocketError socketError);
-    void receivedHostFound();
-    void receivedStateChanged(QAbstractSocket::SocketState socketState);
-    void receiveReadyRead();
-    void receiveBytesWritten(qint64 bytes);
-    void receiveAboutToClose();
-
-private:
-    typedef boost::shared_ptr<QTcpSocket> QTcpSocketPtr;
-    QTcpSocketPtr mSocket;
-    bool mConnected;
-};
 }
 
-#endif //CXSOCKET_H
+QByteArray Ur5TestFixture::getTestData(int packetSize)
+{
+    if(packetSize == 560)
+    {
+        QString filename = "C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/testing/test.data/cxDataFromRobot560.txt";
+        QFile file(filename);
+        if (!file.open(QIODevice::ReadOnly)) return QByteArray();
+        return QByteArray::fromHex(file.readAll());
+    }
+    else if(packetSize == 1254)
+    {
+        QString filename = "C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/testing/test.data/cxDataFromRobot1254.txt";
+        QFile file(filename);
+        if (!file.open(QIODevice::ReadOnly)) return QByteArray();
+        return QByteArray::fromHex(file.readAll());
+    }
+    else if(packetSize == 1460)
+    {
+        QString filename = "C:/Dev/cx/Cx/CX/source/plugins/org.custusx.robot.ur5/testing/test.data/cxDataFromRobot1460.txt";
+        QFile file(filename);
+        if (!file.open(QIODevice::ReadOnly)) return QByteArray();
+        return QByteArray::fromHex(file.readAll());
+    }
+    else
+    {
+        return QByteArray(0);
+    }
+}
+
+} //cxtest

@@ -31,6 +31,7 @@ set(CX_PLUGINS
   org.custusx.acquisition:ON
   org.custusx.calibration:ON
   org.custusx.help:ON
+  org.custusx.robot.ur5:ON
 )
 
 # Add plugins defined externally, i.e defined outside CustusX core.

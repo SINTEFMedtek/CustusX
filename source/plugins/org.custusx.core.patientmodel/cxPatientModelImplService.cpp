@@ -107,8 +107,6 @@ void PatientModelImplService::shutdownInterconnectedDataAndSpace()
 
 	requireUnique(mDataService, "DataService");
 	mDataService.reset();
-
-
 }
 
 

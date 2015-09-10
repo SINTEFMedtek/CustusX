@@ -30,73 +30,27 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXSOCKET_H
-#define CXSOCKET_H
+#ifndef CXTESTUR5TESTFIXTURE_H
+#define CXTESTUR5TESTFIXTURE_H
 
-#include "cxResourceExport.h"
+#include "cxUr5Robot.h"
 
-#include <boost/shared_ptr.hpp>
-#include <QObject>
-#include <QAbstractSocket>
-#include <QString>
+#include "cxtest_org_custusx_robot_ur5_export.h"
 
-QT_BEGIN_NAMESPACE
-class QTcpSocket;
-QT_END_NAMESPACE
-
-namespace cx
+namespace cxtest
 {
-typedef boost::shared_ptr<class Socket> SocketPtr;
 
-/**
- * @brief The Socket class socket functionallity
- * @date 18.03.2015
- * @author Janne Beate Bakeng, SINTEF
- */
-class cxResource_EXPORT Socket : public QObject
+class CXTEST_ORG_CUSTUSX_ROBOT_UR5_EXPORT Ur5TestFixture
 {
-    Q_OBJECT
 public:
-    Socket(QObject *parent);
+    Ur5TestFixture();
 
-    void requestConnectToHost(QString ip, int port) const;
-    bool tryConnectToHostAndWait(QString ip, int port) const;
-    bool isConnected() const;
-    QString getLastError() const;
-    void requestCloseConnection() const;
+    cx::Ur5Robot mUr5Robot;
+    cx::Ur5Connection mUr5Connection;
 
-    bool minBytesAvailable(int bytes) const;
-    qint64 bytesAvailable() const;
-    qint64 read(char *data, qint64 maxSizeBytes) const;
-    QByteArray read(qint64 maxSizeBytes) const;
-    qint64 skip(qint64 maxSizeBytes) const;
-
-    qint64 write(const char* data, qint64 maxSizeBytes) const;
-
-    bool waitForBytesWritten(int msecs = 3000);
-    bool waitForReadyRead(int msecs = 3000);
-
-signals:
-    void connected();
-    void disconnected();
-    void readyRead();
-    void error();
-
-private slots:
-    void receivedConnected();
-    void receivedDisconnected();
-    void receivedError(QAbstractSocket::SocketError socketError);
-    void receivedHostFound();
-    void receivedStateChanged(QAbstractSocket::SocketState socketState);
-    void receiveReadyRead();
-    void receiveBytesWritten(qint64 bytes);
-    void receiveAboutToClose();
-
-private:
-    typedef boost::shared_ptr<QTcpSocket> QTcpSocketPtr;
-    QTcpSocketPtr mSocket;
-    bool mConnected;
+    QByteArray getTestData(int packetSize);
 };
-}
 
-#endif //CXSOCKET_H
+} //cxtest
+
+#endif // CXTESTUR5TESTFIXTURE_H
