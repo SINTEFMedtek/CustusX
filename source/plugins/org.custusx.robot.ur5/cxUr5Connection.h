@@ -74,8 +74,6 @@ public:
 
     bool sendMessage(QString message);
 
-
-
 public slots:
     void initializeWorkspace(double threshold,Ur5State origo,bool currentPos);
     void runProgramQueue(std::vector<QString> programQueue, std::vector<Ur5State> poseQueue);
