@@ -199,8 +199,8 @@ bool Acquisition::isReady(AcquisitionService::TYPES context) const
 {
 	if (!context.testFlag(AcquisitionService::tTRACKING))
 		return true;
-		return true;
-//	return mReady;
+//		return true;
+	return mReady;
 }
 
 QString Acquisition::getInfoText(AcquisitionService::TYPES context) const
