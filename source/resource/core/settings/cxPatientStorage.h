@@ -49,10 +49,13 @@ typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
 
 /**\brief Helper class for storing variables in the patient file.
  *
- * Use boost::bind to supply set/get functions.
+ * Use boost::bind to supply get/set functions.
  *
  * E.g.:
- * storeVariable("variableName", boost::bind(&VariableToBeStoredClass::getValue, variableToBeStoredObject), boost::bind(&VariableToBeStoredClass::setValue, variableToBeStoredObject, _1));
+ * storeVariable("variableName", boost::bind(&VariableToBeStoredClass::getValue, &variableToBeStored), boost::bind(&VariableToBeStoredClass::setValue, &variableToBeStored, _1));
+ *
+ * or:
+ * storeVariable("variableName", boost::bind(&VariableToBeStoredClass::getValue, variableToBeStoredSmartPtr), boost::bind(&VariableToBeStoredClass::setValue, variableToBeStoredSmartPtr, _1));
  *
  *  \date Sep 07, 2015
  *  \author Ole Vegard Solberg, SINTEF
