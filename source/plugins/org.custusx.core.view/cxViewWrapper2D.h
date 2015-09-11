@@ -140,7 +140,6 @@ private:
 
 	std::vector<ImagePtr> getImagesToView();
 	bool isAnyplane();
-	ImagePtr get2DStreamImage();
 
 	Texture3DSlicerRepPtr mMultiSliceRep;
 	DataRepContainerPtr mDataRepContainer;

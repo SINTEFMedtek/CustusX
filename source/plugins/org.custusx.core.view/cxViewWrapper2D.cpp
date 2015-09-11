@@ -304,9 +304,9 @@ std::vector<ImagePtr> ViewWrapper2D::getImagesToView()
 
 	if(this->isAnyplane())
 	{
-		ImagePtr changingImage = this->get2DStreamImage();
-		if(changingImage)
-			images.push_back(changingImage);
+		std::vector<TrackedStreamPtr> streams = mGroupData->getTracked2DStreams(DataViewProperties::createSlice2D());
+		for(int i = 0; i < streams.size(); ++i)
+			images.push_back(streams[i]->getChangingImage());
 	}
 	return images;
 }
@@ -316,15 +316,6 @@ bool ViewWrapper2D::isAnyplane()
 	PLANE_TYPE plane = mSliceProxy->getComputer().getPlaneType();
 	return plane == ptANYPLANE;
 }
-
-ImagePtr ViewWrapper2D::get2DStreamImage()
-{
-	std::vector<TrackedStreamPtr> streams = mGroupData->getTracked2DStreams(DataViewProperties::createSlice2D());
-	TrackedStreamPtr stream = streams[0];
-	ImagePtr changingImage = stream->getChangingImage();
-	return changingImage;
-}
-
 
 /**Call when viewport size or zoom has changed.
  * Recompute camera zoom and  reps requiring vpMs.
