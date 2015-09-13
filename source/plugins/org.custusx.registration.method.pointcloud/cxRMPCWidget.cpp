@@ -65,6 +65,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegServices.h"
 #include "cxRecordTrackingWidget.h"
 #include <QGroupBox>
+#include "cxRegistrationProperties.h"
+#include "cxPC_ICP_Widget.h"
+#include "vesselReg/SeansVesselReg.hxx"
+#include "cxMeshHelpers.h"
+#include "vtkPointData.h"
 
 namespace cx
 {
@@ -76,8 +81,10 @@ RMPCWidget::RMPCWidget(RegServices services, QWidget* parent) :
 	mVerticalLayout = new QVBoxLayout(this);
 	mOptions = profile()->getXmlSettings().descend("RMPCWidget");
 
-	mSurfaceSelector = StringPropertySelectMesh::New(mServices.patientModelService);
-	mSurfaceSelector->setValueName("Surface: ");
+//	mSurfaceSelector = StringPropertySelectMesh::New(mServices.patientModelService);
+//	mSurfaceSelector->setValueName("Surface: ");
+
+	mFixedImage.reset(new StringPropertyRegistrationFixedImage(services.registrationService, services.patientModelService));
 
 	mRegisterButton = new QPushButton("Register");
 	connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
@@ -89,8 +96,14 @@ RMPCWidget::RMPCWidget(RegServices services, QWidget* parent) :
 													 "tracker",
 													 this);
 
+//	mICPWidget = new PCICPWidget(mServices, this);
+//	connect(mICPWidget, &PCICPWidget::registrationChanged, this, &RMPCWidget::onRegistration);
+//	void setFixedData(DataPtr fixed);
+//	void setMovingData(DataPtr moving);
+
 	mVerticalLayout->setMargin(0);
-	mVerticalLayout->addWidget(new DataSelectWidget(mServices.visualizationService, mServices.patientModelService, this, mSurfaceSelector));
+	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mFixedImage));
+//	mVerticalLayout->addWidget(new DataSelectWidget(mServices.visualizationService, mServices.patientModelService, this, mSurfaceSelector));
 
 	QVBoxLayout* trackLayout = this->createVBoxInGroupBox(mVerticalLayout, "Tracking Recorder");
 	trackLayout->setMargin(0);
@@ -118,46 +131,69 @@ QString RMPCWidget::defaultWhatsThis() const
 	return QString();
 }
 
+//void RMPCWidget::onRegistration(Transform3D fMm)
+//{
+//	mServices.registrationService->applyPatientRegistration(new_rMpr, "Surface to Tracker");
+
+//}
+
 void RMPCWidget::registerSlot()
 {
-	std::cout << "NOT in USE" << std::endl;
-//	if(!mBronchoscopyRegistration->isCenterlineProcessed())
-//	{
-//		reportError("Centerline not processed");
-//		return;
-//	}
+	QString logPath = mServices.patientModelService->getActivePatientFolder() + "/Logs/";
 
-	Transform3D old_rMpr = mServices.patientModelService->get_rMpr();//input to registrationAlgorithm
-	//std::cout << "rMpr: " << std::endl;
-	//std::cout << old_rMpr << std::endl;
+	DataPtr fixed = mServices.registrationService->getFixedData();
+//	CX_LOG_CHANNEL_DEBUG("CA") << "trackerdata_r " << fixed->get->GetNumberOfCells();
 
-//	ToolPtr tool = mRecordTrackingWidget->getSuitableRecordingTool();
-
+	Transform3D rMpr = mServices.patientModelService->get_rMpr();
 	TimedTransformMap trackerRecordedData_prMt = mRecordTrackingWidget->getRecordedTrackerData_prMt();
+	CX_LOG_CHANNEL_DEBUG("CA") << "trackerRecordedData_prMt " << trackerRecordedData_prMt.size();
+	vtkPolyDataPtr trackerdata_r = polydataFromTransforms(trackerRecordedData_prMt, rMpr);
+	CX_LOG_CHANNEL_DEBUG("CA") << "trackerdata_r " << trackerdata_r->GetNumberOfCells();
+	MeshPtr moving(new Mesh("tracker_temp"));
+	moving->setVtkPolyData(trackerdata_r);
+//	mServices.patientModelService->insertData(moving);
 
-	if(trackerRecordedData_prMt.empty())
+	SeansVesselReg vesselReg;
+	vesselReg.mt_auto_lts = true;
+	vesselReg.mt_ltsRatio = 80;
+	vesselReg.mt_doOnlyLinear = true;
+	vesselReg.mt_auto_lts = false;
+	vesselReg.margin = 10E6;
+
+	reportDebug("Using lts_ratio: " + qstring_cast(vesselReg.mt_ltsRatio));
+
+	if(!moving)
 	{
-		reportError("No positions");
+		reportWarning("Moving volume not set.");
+		return;
+	}
+	else if(!fixed)
+	{
+		reportWarning("Fixed volume not set.");
 		return;
 	}
 
-	Transform3D new_rMpr;
-//	double maxDistanceForLocalRegistration = 30; //mm
-//	if(mUseLocalRegistration->getValue())
-//		new_rMpr = Transform3D(mBronchoscopyRegistration->runBronchoscopyRegistration(trackerRecordedData_prMt,old_rMpr,maxDistanceForLocalRegistration));
-//	else
-//		new_rMpr = Transform3D(mBronchoscopyRegistration->runBronchoscopyRegistration(trackerRecordedData_prMt,old_rMpr,0));
+	bool success = vesselReg.execute(moving, fixed, logPath);
+	if (!success)
+	{
+		reportWarning("ICP registration failed.");
+		return;
+	}
 
-	new_rMpr = new_rMpr*old_rMpr;//output
-	mServices.registrationService->applyPatientRegistration(new_rMpr, "Bronchoscopy centerline to tracking data");
+	Transform3D linearTransform = vesselReg.getLinearResult();
+	std::cout << "v2v linear result:\n" << linearTransform << std::endl;
+	//std::cout << "v2v inverted linear result:\n" << linearTransform.inverse() << std::endl;
 
-	Eigen::Matrix4d display_rMpr = Eigen::Matrix4d::Identity();
-			display_rMpr = new_rMpr*display_rMpr;
-	std::cout << "New prMt: " << std::endl;
-		for (int i = 0; i < 4; i++)
-			std::cout << display_rMpr.row(i) << std::endl;
+	vesselReg.checkQuality(linearTransform);
 
-//	mRecordTrackingWidget->showSelectedRecordingInView();
+	// The registration is performed in space r. Thus, given an old data position rMd, we find the
+	// new one as rM'd = Q * rMd, where Q is the inverted registration output.
+	// Delta is thus equal to Q:
+	Transform3D delta = linearTransform.inv();
+	std::cout << "delta:\n" << delta << std::endl;
+
+	Transform3D new_rMpr = delta*rMpr;//output
+	mServices.registrationService->applyPatientRegistration(new_rMpr, "Surface to Tracker");
 }
 
 

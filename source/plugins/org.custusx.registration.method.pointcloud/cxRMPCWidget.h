@@ -43,6 +43,7 @@ namespace cx
 {
 class WidgetObscuredListener;
 class RecordTrackingWidget;
+class PCICPWidget;
 typedef boost::shared_ptr<class Acquisition> AcquisitionPtr;
 typedef boost::shared_ptr<class StringPropertySelectMesh> StringPropertySelectMeshPtr;
 typedef boost::shared_ptr<class ToolRep3D> ToolRep3DPtr;
@@ -80,9 +81,11 @@ private:
 
 	QVBoxLayout* createVBoxInGroupBox(QVBoxLayout* parent, QString header);
 
+	StringPropertyBasePtr mFixedImage;
 	StringPropertySelectMeshPtr mSurfaceSelector;
 	QPushButton* mRegisterButton;
 	RecordTrackingWidget* mRecordTrackingWidget;
+	PCICPWidget* mICPWidget;
 };
 
 } //namespace cx

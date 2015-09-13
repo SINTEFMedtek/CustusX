@@ -29,8 +29,8 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXRECORDTRACKINGWIDGET_H
-#define CXRECORDTRACKINGWIDGET_H
+#ifndef CXRECORDSESSIONSELECTOR_H_
+#define CXRECORDSESSIONSELECTOR_H_
 
 #include <QPushButton>
 #include <QDomElement>
@@ -51,53 +51,48 @@ typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
 //typedef boost::shared_ptr<class BronchoscopyRegistration> BronchoscopyRegistrationPtr;
 typedef std::map<QString, ToolPtr> ToolMap;
 typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
-class SelectRecordSession;
+
 
 /**
  *
- * Record tracking data.
+ * Wrap a SessionSelector, always show tracking data in 3D view for that session,
+ * for a given tool.
  *
- * \date 2015-09-06
+ * \date 2015-09-10
  * \author Christian Askeland
  */
-class org_custusx_acquisition_EXPORT RecordTrackingWidget: public QWidget
+class org_custusx_acquisition_EXPORT SelectRecordSession: public QObject
 {
 	Q_OBJECT
 
 public:
-	RecordTrackingWidget(XmlOptionFile options,
+	SelectRecordSession(XmlOptionFile options,
 						 AcquisitionServicePtr acquisitionService,
-						 VisServices services,
-						 QString category,
-						 QWidget *parent);
-	virtual ~RecordTrackingWidget()	{}
+						 VisServices services);
+	virtual ~SelectRecordSession()	{}
 
-	ToolPtr getSuitableRecordingTool();
+	void setTool(ToolPtr tool);
 	TimedTransformMap getRecordedTrackerData_prMt();
-	StringPropertyPtr getSessionSelector();
+	StringPropertyPtr getSessionSelector() { return mSessionSelector; }
 
 private slots:
-	void acquisitionStarted();
-	void acquisitionStopped();
-	void acquisitionCancelled();
-	void obscuredSlot(bool obscured);
 
+	void recordedSessionsChanged();
 private:
 	VisServices mServices;
 	AcquisitionServicePtr mAcquisitionService;
 	XmlOptionFile mOptions;
 
-	RecordSessionWidget* mRecordSessionWidget;
-	ToolPtr mRecordingTool;
-	SelectRecordSession* mSelectRecordSession;
-	StringPropertySelectToolPtr mToolSelector;
+	StringPropertyPtr mSessionSelector;
+	ToolPtr mTool;
 
-	boost::shared_ptr<WidgetObscuredListener> mObscuredListener;
-
+	void initSessionSelector();
 	ToolRep3DPtr getToolRepIn3DView();
-	void onToolChanged();
+	void showSelectedRecordingInView();
+	void clearTracer();
 };
 
 } //namespace cx
 
-#endif // CXRECORDTRACKINGWIDGET_H
+
+#endif // CXRECORDSESSIONSELECTOR_H_
