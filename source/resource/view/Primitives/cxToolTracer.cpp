@@ -49,19 +49,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxBoundingBox3D.h"
 #include "cxVolumeHelpers.h"
 #include "cxSpaceProvider.h"
+#include "cxSpaceListener.h"
 
 namespace cx
 {
 
 ToolTracerPtr ToolTracer::create(SpaceProviderPtr spaceProvider)
 {
-	ToolTracerPtr retval(new ToolTracer);
-	retval->mSpaceProvider = spaceProvider;
+	ToolTracerPtr retval(new ToolTracer(spaceProvider));
 	return retval;
 }
 
-ToolTracer::ToolTracer()
+ToolTracer::ToolTracer(SpaceProviderPtr spaceProvider)
 {
+	mSpaceProvider = spaceProvider;
 	mRunning = false;
 	mPolyData = vtkPolyDataPtr::New();
 	mActor = vtkActorPtr::New();
@@ -85,6 +86,11 @@ ToolTracer::ToolTracer()
 	mFirstPoint = false;
 	mMinDistance = -1.0;
 	mSkippedPoints = 0;
+
+	mSpaceListener = mSpaceProvider->createListener();
+	mSpaceListener->setSpace(CoordinateSystem::patientReference());
+	connect(mSpaceListener.get(), &SpaceListener::changed, this, &ToolTracer::onSpaceChanged);
+	this->onSpaceChanged();
 }
 
 void ToolTracer::start()
@@ -152,6 +158,13 @@ vtkActorPtr ToolTracer::getActor()
 	return mActor;
 }
 
+void ToolTracer::onSpaceChanged()
+{
+	Transform3D rMpr = mSpaceProvider->get_rMpr();
+//	std::cout << "rMpr ToolTracer: \n" << rMpr << std::endl;
+	mActor->SetUserMatrix(rMpr.getVtkMatrix());
+}
+
 bool ToolTracer::isRunning() const
 {
 	return mRunning;
@@ -159,7 +172,8 @@ bool ToolTracer::isRunning() const
 
 void ToolTracer::receiveTransforms(Transform3D prMt, double timestamp)
 {
-	Transform3D rMpr = mSpaceProvider->get_rMpr();
+	Transform3D rMpr = Transform3D::Identity(); // handle rMpr in actor
+//	Transform3D rMpr = mSpaceProvider->get_rMpr();
 	Transform3D rMt = rMpr * prMt;
 
 	Vector3D p = rMt.coord(Vector3D(0,0,0));

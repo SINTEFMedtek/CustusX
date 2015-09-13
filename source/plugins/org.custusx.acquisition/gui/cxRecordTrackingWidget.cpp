@@ -89,7 +89,7 @@ StringPropertyPtr RecordTrackingWidget::getSessionSelector()
 
 void RecordTrackingWidget::acquisitionStarted()
 {
-//	mRecordingTool = this->getSuitableRecordingTool();
+	mRecordingTool = this->getSuitableRecordingTool();
 
 	ToolRep3DPtr activeRep3D = this->getToolRepIn3DView();
 	if (activeRep3D)
@@ -128,12 +128,7 @@ void RecordTrackingWidget::acquisitionCancelled()
 
 ToolRep3DPtr RecordTrackingWidget::getToolRepIn3DView()
 {
-	RepContainerPtr repContainer = mServices.visualizationService->get3DReps(0, 0);
-	ToolPtr tool = this->getSuitableRecordingTool();
-	if (repContainer)
-		return repContainer->findFirst<ToolRep3D>(tool);
-	else
-		return ToolRep3DPtr();
+	return mServices.visualizationService->get3DReps(0, 0)->findFirst<ToolRep3D>(mRecordingTool);
 }
 
 void RecordTrackingWidget::obscuredSlot(bool obscured)

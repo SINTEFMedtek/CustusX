@@ -48,6 +48,7 @@ SeansVesselReg::SeansVesselReg()// : mInvertedTransform(false)
 	mt_maximumNumberOfIterations = 100;
 	mt_verbose = false;
 	mt_maximumDurationSeconds = 1E6; // Random high number
+	margin = 40;
 }
 
 SeansVesselReg::~SeansVesselReg()
@@ -222,13 +223,13 @@ SeansVesselReg::ContextPtr SeansVesselReg::createContext(DataPtr source, DataPtr
 		return ContextPtr();
 	}
 
-	double margin = 40;
+//	double margin = 40;
 	vtkPolyDataPtr sourcePolyData = this->crop(inputSourcePolyData, targetPolyData, margin);
 
 	//Make sure we have stuff to work with
 	if (!sourcePolyData->GetNumberOfPoints() || !targetPolyData->GetNumberOfPoints())
 	{
-		std::cerr << "Can't execute with empty source or target data" << std::endl;
+		std::cerr << "No data after cropping, failed." << std::endl;
 		return ContextPtr();
 	}
 

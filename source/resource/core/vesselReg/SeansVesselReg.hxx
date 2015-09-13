@@ -87,6 +87,7 @@ public:
 	int mt_maximumNumberOfIterations;
 	bool mt_verbose;
 	double mt_maximumDurationSeconds;
+	double margin;
 
 	// debug interface:
 	ContextPtr createContext(DataPtr source, DataPtr target);
