@@ -29,79 +29,34 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-
+#include "catch.hpp"
+#include "cxtestDummyDataManager.h"
 #include "cxStream2DRep3D.h"
-
-#include <vtkRenderer.h>
-
 #include "cxTrackedStream.h"
-#include "cxTool.h"
-#include "cxVideoSourceGraphics.h"
-#include "cxView.h"
+#include "cxDummyTool.h"
+#include "cxTestVideoSource.h"
 
-namespace cx
+TEST_CASE("Stream2DRep3D init", "[unit][resource]")
 {
-
-Stream2DRep3DPtr Stream2DRep3D::New(SpaceProviderPtr spaceProvider, const QString& uid)
-{
-	return wrap_new(new Stream2DRep3D(spaceProvider), uid);
+	cxtest::TestServicesPtr mServices = cxtest::TestServices::create();
+	cx::Stream2DRep3DPtr rep = cx::Stream2DRep3D::New(mServices->spaceProvider());
+	REQUIRE(rep);
 }
 
-Stream2DRep3D::Stream2DRep3D(SpaceProviderPtr spaceProvider) :
-	RepImpl(),
-	mSpaceProvider(spaceProvider)
+TEST_CASE("Stream2DRep3D Set TrackedStream", "[unit][resource]")
 {
-	bool useMask = true;
-	mRTStream.reset(new VideoSourceGraphics(mSpaceProvider, useMask));
+	cxtest::TestServicesPtr mServices = cxtest::TestServices::create();
+	cx::Stream2DRep3DPtr rep = cx::Stream2DRep3D::New(mServices->spaceProvider());
+	REQUIRE(rep);
+
+	cx::TrackedStreamPtr trackedStream = cx::TrackedStream::create("streamUid", "streamName");
+	rep->setTrackedStream(trackedStream);
+	REQUIRE_FALSE(rep->isReady());
+
+	cx::DummyToolPtr dummyTool(new cx::DummyTool());
+	cx::TestVideoSourcePtr testVideoSource(new cx::TestVideoSource("TestVideoSourceUid", "TestVideoSource" , 80, 40));
+
+	trackedStream->setProbeTool(dummyTool);
+	trackedStream->setVideoSource(testVideoSource);
+	REQUIRE(rep->isReady());
 }
-
-QString Stream2DRep3D::getType() const
-{
-	return "Stream2DRep3D";
-}
-
-void Stream2DRep3D::setTrackedStream(TrackedStreamPtr trackedStream)
-{
-	if(mTrackedStream)
-	{
-		disconnect(mTrackedStream.get(), &TrackedStream::newTool, this, &Stream2DRep3D::trackedStreamChanged);
-		disconnect(mTrackedStream.get(), &TrackedStream::newVideoSource, this, &Stream2DRep3D::trackedStreamChanged);
-	}
-
-	mTrackedStream = trackedStream;
-
-	if(mTrackedStream)
-	{
-		connect(mTrackedStream.get(), &TrackedStream::newTool, this, &Stream2DRep3D::trackedStreamChanged);
-		connect(mTrackedStream.get(), &TrackedStream::newVideoSource, this, &Stream2DRep3D::trackedStreamChanged);
-	}
-	this->trackedStreamChanged();
-}
-
-void Stream2DRep3D::addRepActorsToViewRenderer(ViewPtr view)
-{
-	view->getRenderer()->AddActor(mRTStream->getActor());
-}
-
-void Stream2DRep3D::removeRepActorsFromViewRenderer(ViewPtr view)
-{
-	view->getRenderer()->RemoveActor(mRTStream->getActor());
-}
-
-void Stream2DRep3D::trackedStreamChanged()
-{
-	ToolPtr tool = mTrackedStream->getProbeTool();
-	mRTStream->setTool(tool);
-	mRTStream->setRealtimeStream(mTrackedStream->getVideoSource());
-}
-
-bool Stream2DRep3D::isReady()
-{
-	if(!mTrackedStream->getProbeTool())
-		return false;
-	if(!mTrackedStream->getVideoSource())
-		return false;
-	return true;
-}
-
-} //cx

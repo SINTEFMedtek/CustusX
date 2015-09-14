@@ -57,7 +57,8 @@ class cxResourceVisualization_EXPORT Stream2DRep3D : public RepImpl
 public:
     static Stream2DRep3DPtr New(SpaceProviderPtr spaceProvider, const QString& uid = "");
     virtual QString getType() const;
-    void setTrackedStream(TrackedStreamPtr trackedStream);
+	void setTrackedStream(TrackedStreamPtr trackedStream);
+	bool isReady();
 protected:
 	virtual void addRepActorsToViewRenderer(ViewPtr view);
 	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
