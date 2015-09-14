@@ -54,7 +54,7 @@ class cxGui_EXPORT DataListWidget : public QListWidget
   Q_OBJECT
 
 public:
-  DataListWidget(QWidget* parent = NULL);
+  DataListWidget(PatientModelServicePtr patientModelService, QWidget* parent = NULL);
   virtual ~DataListWidget();
   virtual QSize sizeHint() const;
 
@@ -65,6 +65,8 @@ signals:
 protected:
   void populate(QStringList dataUids);
   void populateData(QString uid, bool indent=false, QListWidgetItem* after = NULL);
+
+  PatientModelServicePtr mPatientModelService;
 
 private slots:
   void itemSelectionChangedSlot();
@@ -77,7 +79,7 @@ class cxGui_EXPORT AllDataListWidget : public DataListWidget
   Q_OBJECT
 
 public:
-  AllDataListWidget(QWidget* parent = NULL);
+  AllDataListWidget(PatientModelServicePtr patientModelService, QWidget* parent = NULL);
   virtual ~AllDataListWidget();
 
 protected:
@@ -98,7 +100,7 @@ class cxGui_EXPORT SelectedDataListWidget : public DataListWidget
   Q_OBJECT
 
 public:
-  SelectedDataListWidget(QWidget* parent = NULL);
+  SelectedDataListWidget(PatientModelServicePtr patientModelService, QWidget* parent = NULL);
   virtual ~SelectedDataListWidget();
   void setViewGroupData(ViewGroupDataPtr viewGroupData);
 
@@ -132,7 +134,7 @@ class cxGui_EXPORT DataViewSelectionWidget : public QWidget
 {
   Q_OBJECT
 public:
-  DataViewSelectionWidget(QWidget* parent = NULL);
+  DataViewSelectionWidget(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget* parent = NULL);
   virtual ~DataViewSelectionWidget();
 
 private slots:
@@ -142,6 +144,7 @@ private:
   SelectedDataListWidget* mSelectedDataListWidget;
   AllDataListWidget* mAllDataListWidget;
   QLabel* mVisibleLabel;
+  VisualizationServicePtr mVisualizationService;
 };
 
 /**

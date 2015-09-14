@@ -161,7 +161,7 @@ TEST_CASE("BaseWidget's children in gui/dataWidgets correctly constructed", "[un
 	testAndDeleteBaseWidgetChild(new cx::FrameTreeWidget(patientModelService, testParent));
 	testAndDeleteBaseWidgetChild(new cx::MetricWidget(visualizationService, patientModelService, testParent));
 	testAndDeleteBaseWidgetChild(new cx::NavigationWidget(testParent));
-	testAndDeleteBaseWidgetChild(new cx::OverlayWidget(patientModelService, testParent));
+	testAndDeleteBaseWidgetChild(new cx::OverlayWidget(patientModelService, visualizationService, testParent));
 	testAndDeleteBaseWidgetChild(new cx::PlaybackWidget(testParent));
 	testAndDeleteBaseWidgetChild(new cx::PointSamplingWidget(testParent));
 //	testAndDeleteBaseWidgetChild(new cx::ProbeConfigWidget(testParent));
