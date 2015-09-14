@@ -152,12 +152,12 @@ void Ur5ManualMoveTab::setMoveToolLayout(QVBoxLayout *parent)
     negXButton->setIconSize(QSize(32, 32));
 
     // Style sheet for buttons
-    posXButton->setStyleSheet("border:none");
-    negXButton->setStyleSheet("border:none");
-    posYButton->setStyleSheet("border:none");
-    negYButton->setStyleSheet("border:none");
-    posZButton->setStyleSheet("border:none");
-    negZButton->setStyleSheet("border:none");
+//    posXButton->setStyleSheet("border:none");
+//    negXButton->setStyleSheet("border:none");
+//    posYButton->setStyleSheet("border:none");
+//    negYButton->setStyleSheet("border:none");
+//    posZButton->setStyleSheet("border:none");
+//    negZButton->setStyleSheet("border:none");
 
     rotPosZButton->setIconSize(QSize(32, 32));
     rotPosZButton->setToolTip("Move in rotPositive Z direction");
@@ -171,12 +171,12 @@ void Ur5ManualMoveTab::setMoveToolLayout(QVBoxLayout *parent)
     rotNegXButton->setIconSize(QSize(32, 32));
 
     // Style sheet for buttons
-    rotPosXButton->setStyleSheet("border:none");
-    rotNegXButton->setStyleSheet("border:none");
-    rotPosYButton->setStyleSheet("border:none");
-    rotNegYButton->setStyleSheet("border:none");
-    rotPosZButton->setStyleSheet("border:none");
-    rotNegZButton->setStyleSheet("border:none");
+//    rotPosXButton->setStyleSheet("border:none");
+//    rotNegXButton->setStyleSheet("border:none");
+//    rotPosYButton->setStyleSheet("border:none");
+//    rotNegYButton->setStyleSheet("border:none");
+//    rotPosZButton->setStyleSheet("border:none");
+//    rotNegZButton->setStyleSheet("border:none");
 }
 
 void Ur5ManualMoveTab::setMoveSettingsWidget(QVBoxLayout *parent)
