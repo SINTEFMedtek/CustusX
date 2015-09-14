@@ -112,6 +112,7 @@ typedef boost::shared_ptr<class SlicePlanes3DRep> SlicePlanes3DRepPtr;
 typedef boost::shared_ptr<class SlicePlanesProxy> SlicePlanesProxyPtr;
 typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
 typedef boost::shared_ptr<class SliceRepSW> SliceRepSWPtr;
+typedef boost::shared_ptr<class Stream2DRep3D> Stream2DRep3DPtr;
 typedef boost::shared_ptr<class StreamRep3D> StreamRep3DPtr;
 typedef boost::shared_ptr<class SurfaceRep> SurfaceRepPtr;
 typedef boost::shared_ptr<class TestVideoSource> TestVideoSourcePtr;

@@ -105,6 +105,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxTrackedStream.h"
 #include "cxStreamRep3D.h"
+#include "cxStream2DRep3D.h"
 
 namespace cx
 {
@@ -650,24 +651,19 @@ RepPtr ViewWrapper3D::createTrackedStreamRep(TrackedStreamPtr trackedStream)
 		disconnect(trackedStream.get(), &TrackedStream::streamChanged, this, &ViewWrapper3D::dataViewPropertiesChangedSlot);
 	if(trackedStream->is3D())
 	{
-//		std::cout << "ViewWrapper3D::createDataRep3D. Create StreamRep3D" << std::endl;
 		StreamRep3DPtr rep = StreamRep3D::New(mServices->getSpaceProvider(), mServices->getPatientService());
-		QString visualizerType = settings()->value("View3D/ImageRender3DVisualizer").toString();
-		if(visualizerType == "vtkVolumeTextureMapper3D")
-			rep->setUseVolumeTextureMapper();
-		else if(visualizerType == "vtkGPUVolumeRayCastMapper")
-			rep->setUseGPUVolumeRayCastMapper();
-		else
-		{
-			reportError(QString("No visualizer found for string=%1").arg(visualizerType));
-				return RepPtr();
-		}
+		rep->setTrackedStream(trackedStream);
+		return rep;
+	}
+	else if (trackedStream->is2D())
+	{
+		Stream2DRep3DPtr rep = Stream2DRep3D::New(mServices->getSpaceProvider());
 		rep->setTrackedStream(trackedStream);
 		return rep;
 	}
 	else
 	{
-		reportWarning("ViewWrapper3D::createDataRep3D. StreamRep2D not implemented yet");
+		reportWarning("ViewWrapper3D::createDataRep3D. TrackedStream is not 2D or 3D");
 		return RepPtr();
 	}
 }

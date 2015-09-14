@@ -30,49 +30,47 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXSTREAMREP3D_H
-#define CXSTREAMREP3D_H
+#ifndef CX2DSTREAMREP3D_H
+#define CX2DSTREAMREP3D_H
 
-#include "cxVolumetricRep.h"
+#include "cxResourceVisualizationExport.h"
+#include "cxRepImpl.h"
 #include "cxForwardDeclarations.h"
-#include "cxTransform3D.h"
 
 namespace cx
 {
 typedef boost::shared_ptr<class VideoSourceGraphics> VideoSourceGraphicsPtr;
 
-/** \brief Display a 3D stream in 3D
+/** \brief Display a stream as 2D in 3D
+ *
+ * The stream can be either 2D or 3D
  *
  * \ingroup cx_resource_view
  * \ingroup cx_resource_view_rep3D
  *
- * \date jan 29, 2015
+ * \date Sep 10, 2015
  * \author Ole Vegard Solberg, SINTEF
  */
-class cxResourceVisualization_EXPORT StreamRep3D : public VolumetricRep
+class cxResourceVisualization_EXPORT Stream2DRep3D : public RepImpl
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	static StreamRep3DPtr New(SpaceProviderPtr spaceProvider, PatientModelServicePtr patientModelService, const QString &uid="");
-	virtual QString getType() const;
-
-	void setTrackedStream(TrackedStreamPtr trackedStream);
-	TrackedStreamPtr getTrackedStream();
-
+    static Stream2DRep3DPtr New(SpaceProviderPtr spaceProvider, const QString& uid = "");
+    virtual QString getType() const;
+    void setTrackedStream(TrackedStreamPtr trackedStream);
+protected:
+	virtual void addRepActorsToViewRenderer(ViewPtr view);
+	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
 private slots:
-	void newTool(ToolPtr tool);
-	void newVideoSource(VideoSourcePtr videoSource);
+	void trackedStreamChanged();
 private:
-	StreamRep3D(SpaceProviderPtr spaceProvider, PatientModelServicePtr patientModelService);
-	void initTransferFunction(ImagePtr image);
-	void setVisualizerType();
+    Stream2DRep3D(SpaceProviderPtr spaceProvider);
 
-	TrackedStreamPtr mTrackedStream;
-	VideoSourcePtr mVideoSource;
-
-	PatientModelServicePtr mPatientModelService;
+    SpaceProviderPtr mSpaceProvider;
+    VideoSourceGraphicsPtr mRTStream;
+    TrackedStreamPtr mTrackedStream;
 };
 
 } //cx
 
-#endif // CXSTREAMREP3D_H
+#endif // CX2DSTREAMREP3D_H

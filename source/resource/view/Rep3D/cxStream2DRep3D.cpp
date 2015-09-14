@@ -30,49 +30,69 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXSTREAMREP3D_H
-#define CXSTREAMREP3D_H
+#include "cxStream2DRep3D.h"
 
-#include "cxVolumetricRep.h"
-#include "cxForwardDeclarations.h"
-#include "cxTransform3D.h"
+#include <vtkRenderer.h>
+
+#include "cxTrackedStream.h"
+#include "cxTool.h"
+#include "cxVideoSourceGraphics.h"
+#include "cxView.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class VideoSourceGraphics> VideoSourceGraphicsPtr;
 
-/** \brief Display a 3D stream in 3D
- *
- * \ingroup cx_resource_view
- * \ingroup cx_resource_view_rep3D
- *
- * \date jan 29, 2015
- * \author Ole Vegard Solberg, SINTEF
- */
-class cxResourceVisualization_EXPORT StreamRep3D : public VolumetricRep
+Stream2DRep3DPtr Stream2DRep3D::New(SpaceProviderPtr spaceProvider, const QString& uid)
 {
-	Q_OBJECT
-public:
-	static StreamRep3DPtr New(SpaceProviderPtr spaceProvider, PatientModelServicePtr patientModelService, const QString &uid="");
-	virtual QString getType() const;
+	return wrap_new(new Stream2DRep3D(spaceProvider), uid);
+}
 
-	void setTrackedStream(TrackedStreamPtr trackedStream);
-	TrackedStreamPtr getTrackedStream();
+Stream2DRep3D::Stream2DRep3D(SpaceProviderPtr spaceProvider) :
+	RepImpl(),
+	mSpaceProvider(spaceProvider)
+{
+	bool useMask = true;
+	mRTStream.reset(new VideoSourceGraphics(mSpaceProvider, useMask));
+}
 
-private slots:
-	void newTool(ToolPtr tool);
-	void newVideoSource(VideoSourcePtr videoSource);
-private:
-	StreamRep3D(SpaceProviderPtr spaceProvider, PatientModelServicePtr patientModelService);
-	void initTransferFunction(ImagePtr image);
-	void setVisualizerType();
+QString Stream2DRep3D::getType() const
+{
+	return "Stream2DRep3D";
+}
 
-	TrackedStreamPtr mTrackedStream;
-	VideoSourcePtr mVideoSource;
+void Stream2DRep3D::setTrackedStream(TrackedStreamPtr trackedStream)
+{
+	if(mTrackedStream)
+	{
+		disconnect(mTrackedStream.get(), &TrackedStream::newTool, this, &Stream2DRep3D::trackedStreamChanged);
+		disconnect(mTrackedStream.get(), &TrackedStream::newVideoSource, this, &Stream2DRep3D::trackedStreamChanged);
+	}
 
-	PatientModelServicePtr mPatientModelService;
-};
+	mTrackedStream = trackedStream;
+
+	if(mTrackedStream)
+	{
+		connect(mTrackedStream.get(), &TrackedStream::newTool, this, &Stream2DRep3D::trackedStreamChanged);
+		connect(mTrackedStream.get(), &TrackedStream::newVideoSource, this, &Stream2DRep3D::trackedStreamChanged);
+	}
+	this->trackedStreamChanged();
+}
+
+void Stream2DRep3D::addRepActorsToViewRenderer(ViewPtr view)
+{
+	view->getRenderer()->AddActor(mRTStream->getActor());
+}
+
+void Stream2DRep3D::removeRepActorsFromViewRenderer(ViewPtr view)
+{
+	view->getRenderer()->RemoveActor(mRTStream->getActor());
+}
+
+void Stream2DRep3D::trackedStreamChanged()
+{
+	ToolPtr tool = mTrackedStream->getProbeTool();
+	mRTStream->setTool(tool);
+		mRTStream->setRealtimeStream(mTrackedStream->getVideoSource());
+}
 
 } //cx
-
-#endif // CXSTREAMREP3D_H
