@@ -47,4 +47,17 @@ TEST_CASE("DataManagerImpl setup/shutdown works multiple times", "[unit]")
     }
 }
 
+TEST_CASE("Active Image: set/get", "[unit]")
+{
+	cx::DataServicePtr dataManager = cx::DataManagerImpl::create();
 
+	cx::ImagePtr image1 = cx::Image::create("imageUid1","ImageName1");
+	cx::ImagePtr image2 = cx::Image::create("imageUid2","ImageName2");
+	dataManager->setActiveImage(image1);
+
+	REQUIRE(dataManager->getActiveImage() == image1);
+	REQUIRE_FALSE(dataManager->getActiveImage() == image2);
+
+	dataManager->setActiveImage(image2);
+	REQUIRE(dataManager->getActiveImage() == image2);
+}
