@@ -113,7 +113,7 @@ void DataManagerImpl::clear()
 {
 	mData.clear();
 	mCenter = Vector3D(0, 0, 0);
-	mActiveImage.reset();
+	mActiveData.clear();
 	mLandmarkProperties.clear();
 
 	m_rMpr_History->clear();
@@ -165,21 +165,42 @@ void DataManagerImpl::setCenter(const Vector3D& center)
 
 ImagePtr DataManagerImpl::getActiveImage() const
 {
-	return mActiveImage;
+	return DataManager::getActiveData<Image>();
 }
+
 void DataManagerImpl::setActiveImage(ImagePtr activeImage)
 {
-	if (mActiveImage == activeImage)
+	this->setActiveData(activeImage);
+}
+
+DataPtr DataManagerImpl::getActiveData() const
+{
+	if(mActiveData.isEmpty())
+		return DataPtr();
+	return mActiveData.last();
+}
+
+void DataManagerImpl::setActiveData(DataPtr activeData)
+{
+	if(getActiveData() == activeData)
 		return;
 
-	mActiveImage = activeImage;
+	mActiveData.removeAll(activeData);
+	mActiveData.append(activeData);
 
+	this->emitSignals(activeData);
+}
+
+void DataManagerImpl::emitSignals(DataPtr activeData)
+{
 	QString uid = "";
-	if (mActiveImage)
-		uid = mActiveImage->getUid();
-
-	emit activeImageChanged(uid);
-//	report("Active image set to " + qstring_cast(uid));
+	if(activeData)
+	{
+		uid = activeData->getUid();
+		if(activeData->getType() == "image")
+			emit activeImageChanged(uid);
+	}
+	emit activeDataChanged(uid);
 }
 
 void DataManagerImpl::setLandmarkNames(std::vector<QString> names)
@@ -232,6 +253,8 @@ DataPtr DataManagerImpl::loadData(const QString& uid, const QString& path)
 		return mData[uid];
 
 	QString type = DataReaderWriter().findDataTypeFromFile(path);
+	if(!mDataFactory)
+		reportError("DataManagerImpl::loadData() Got no DataFactory");
 	DataPtr data = mDataFactory->create(type, uid);
 
 	if (!data)
@@ -321,8 +344,8 @@ void DataManagerImpl::addXml(QDomNode& parentNode)
 	m_rMpr_History->addXml(dataManagerNode);
 
 	QDomElement activeImageNode = doc.createElement("activeImageUid");
-	if (mActiveImage)
-		activeImageNode.appendChild(doc.createTextNode(mActiveImage->getUid()));
+	if(!mActiveData.isEmpty())
+		activeImageNode.appendChild(doc.createTextNode(this->getActiveDataStringList().join(" ")));
 	dataManagerNode.appendChild(activeImageNode);
 
 	QDomElement landmarkPropsNode = doc.createElement("landmarkprops");
@@ -406,12 +429,9 @@ void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString rootPath)
 	{
 		if (child.toElement().tagName() == "activeImageUid")
 		{
-			const QString activeImageString = child.toElement().text();
-			if (!activeImageString.isEmpty())
-			{
-				ImagePtr image = this->getImage(activeImageString);
-				this->setActiveImage(image);
-			}
+			const QString activeDataList = child.toElement().text();
+			if (!activeDataList.isEmpty())
+				this->loadActiveData(activeDataList);
 		}
 		//TODO add activeMesh
 		if (child.toElement().tagName() == "center")
@@ -500,13 +520,6 @@ QString DataManagerImpl::findAbsolutePath(QDir relativePath, QString rootPath)
 	if (!rootPath.isEmpty())
 		absolutePath = rootPath + "/" + relativePath.path();
 	return absolutePath;
-}
-
-void DataManagerImpl::vtkImageDataChangedSlot()
-{
-	QString uid = "";
-	if (mActiveImage)
-		uid = mActiveImage->getUid();
 }
 
 CLINICAL_VIEW DataManagerImpl::getClinicalApplication() const
@@ -623,6 +636,29 @@ void DataManagerImpl::deleteFiles(DataPtr data, QString basePath)
 			continue;
 		report(QString("Removing %1 from disk").arg(files[i]));
 		QFile(files[i]).remove();
+	}
+}
+
+QList<DataPtr> DataManagerImpl::getActiveDataList() const
+{
+	return mActiveData;
+}
+
+QStringList DataManagerImpl::getActiveDataStringList() const
+{
+	QStringList retval;
+	for(int i = 0; i < mActiveData.size(); ++i)
+		retval << mActiveData.at(i)->getUid();
+	return retval;
+}
+
+void DataManagerImpl::loadActiveData(const QString activeDatas)
+{
+	QStringList activeDataList = activeDatas.split(" ");
+	for(int i = 0; i < activeDataList.size(); ++i)
+	{
+		DataPtr data = this->getData(activeDataList.at(i));
+		this->setActiveData(data);
 	}
 }
 

@@ -99,8 +99,23 @@ public:
 	virtual void setCenter(const Vector3D& center) = 0;
 
 	// state information
-	virtual ImagePtr getActiveImage() const; ///< used for system state
-	virtual void setActiveImage(ImagePtr activeImage); ///< used for system state
+	virtual ImagePtr getActiveImage() const = 0; ///< used for system state
+	virtual DataPtr getActiveData() const = 0;
+	template <class DATA>
+	boost::shared_ptr<DATA> getActiveData() const
+	{
+		boost::shared_ptr<DATA> retval;
+		QList<DataPtr> activeDataList = this->getActiveDataList();
+		for(int i = activeDataList.size() - 1; i >= 0; --i)
+		{
+			retval = boost::dynamic_pointer_cast<DATA>(activeDataList.at(i));
+			if(retval)
+				return retval;
+		}
+		return retval;
+	}
+	virtual void setActiveImage(ImagePtr activeImage) = 0; ///< used for system state
+	virtual void setActiveData(DataPtr activeData) = 0;
 	virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const;
 
 	virtual QString addLandmark() = 0;
@@ -131,6 +146,7 @@ signals:
 	void centerChanged(); ///< emitted when center is changed.
 	void dataAddedOrRemoved();
 	void activeImageChanged(const QString& uId); ///< emitted when the active image is changed
+	void activeDataChanged(const QString& uId);
 	void landmarkPropertiesChanged(); ///< emitted when global info about a landmark changed
 	void clinicalApplicationChanged();
 	void streamLoaded();
@@ -139,6 +155,7 @@ signals:
 protected:
 	DataManager();
 	virtual ~DataManager();
+	virtual QList<DataPtr> getActiveDataList() const = 0;
 };
 
 } // namespace cx

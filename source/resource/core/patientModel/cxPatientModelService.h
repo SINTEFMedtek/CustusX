@@ -175,6 +175,7 @@ signals:
 	void centerChanged(); ///< emitted when center is changed.
 	void dataAddedOrRemoved();
 	void activeImageChanged(const QString& uId);
+	void activeDataChanged(const QString& uId);
 	void landmarkPropertiesChanged(); ///< emitted when global info about a landmark changed
 	void clinicalApplicationChanged();
 	void rMprChanged();

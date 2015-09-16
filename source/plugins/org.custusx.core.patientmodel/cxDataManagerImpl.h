@@ -97,7 +97,9 @@ public:
 
 	// state information
 	virtual ImagePtr getActiveImage() const; ///< used for system state
+	virtual DataPtr getActiveData() const;
 	virtual void setActiveImage(ImagePtr activeImage); ///< used for system state
+	virtual void setActiveData(DataPtr activeData);
 
 	virtual QString addLandmark();
 	virtual void setLandmarkNames(std::vector<QString> names);
@@ -134,7 +136,8 @@ protected:
 	void deleteFiles(DataPtr data, QString basePath);
 
 	//state
-	ImagePtr mActiveImage;
+	QList<DataPtr> mActiveData;
+	virtual QList<DataPtr> getActiveDataList() const;
 	DataPtr loadData(QDomElement node, QString rootPath);
 	int findUniqueUidNumber(QString uidBase) const;
 
@@ -152,8 +155,9 @@ private:
 	QDir findRelativePath(QDomElement node, QString rootPath);
 	QString findPath(QDomElement node);
 	QString findAbsolutePath(QDir relativePath, QString rootPath);
-public slots:
-	void vtkImageDataChangedSlot();
+	void emitSignals(DataPtr activeData);
+	QStringList getActiveDataStringList() const;
+	void loadActiveData(const QString activeDatas);
 private slots:
 	void settingsChangedSlot(QString key);
 };

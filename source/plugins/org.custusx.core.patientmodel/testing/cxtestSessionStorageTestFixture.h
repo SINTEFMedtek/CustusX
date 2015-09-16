@@ -30,57 +30,40 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "catch.hpp"
+#ifndef CXTESTSESSIONSTORAGETESTFIXTURE_H
+#define CXTESTSESSIONSTORAGETESTFIXTURE_H
+
 #include <QString>
-#include "cxPatientStorage.h"
-#include "cxtestSessionStorageTestFixture.h"
+#include <boost/shared_ptr.hpp>
 
-namespace
+namespace cx
 {
-
-struct TestVariable
-{
-	QString mValue;
-	TestVariable() : mValue("Empty") {}
-	QString get() {	return mValue;}
-	void set(QString val) {	mValue = val;}
-};
+typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
 }
 
 namespace cxtest
 {
 
-TEST_CASE("PatientStorage save/load works", "[unit][resource][core]")
+class SessionStorageTestFixture
 {
-	cxtest::SessionStorageTestFixture storageFixture;
+public:
+	SessionStorageTestFixture();
 
-	TestVariable variableToTest;
-	CHECK(variableToTest.get() == "Empty");
+	~SessionStorageTestFixture();
 
-    QString testString1("first");
-    QString testString2("second");
-    variableToTest.set(testString1);
+	void createSessions();
+	void loadSession1();
+	void loadSession2();
+	void reloadSession1();
+	void reloadSession2();
+	void saveSession();
 
-	storageFixture.createSessions();
+	cx::SessionStorageServicePtr mSessionStorageService;
+private:
+	bool mSessionsCreated;
+	QString mSession1;
+	QString mSession2;
+};
 
-	CHECK(variableToTest.get() == testString1);
-
-	cx::PatientStorage storage(storageFixture.mSessionStorageService, "TestNode");
-	storage.storeVariable("testVariable", boost::bind(&TestVariable::get, &variableToTest), boost::bind(&TestVariable::set, &variableToTest, _1));
-
-	storageFixture.loadSession1();
-	CHECK(variableToTest.get() == testString1);
-	storageFixture.saveSession();
-
-	storageFixture.loadSession2();
-	CHECK(variableToTest.get() == testString1);
-	variableToTest.set(testString2);
-	storageFixture.saveSession();
-
-    CHECK(variableToTest.get() == testString2);
-	CHECK_FALSE(variableToTest.get() == testString1);
-
-	storageFixture.loadSession1();
-	CHECK(variableToTest.get() == testString1);
-}
-}//cxtest
+} //cxtest
+#endif // CXTESTSESSIONSTORAGETESTFIXTURE_H
