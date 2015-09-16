@@ -98,7 +98,6 @@ public:
 	// state information
 	virtual ImagePtr getActiveImage() const; ///< used for system state
 	virtual DataPtr getActiveData() const;
-	virtual void setActiveImage(ImagePtr activeImage); ///< used for system state
 	virtual void setActiveData(DataPtr activeData);
 
 	virtual QString addLandmark();
@@ -124,7 +123,6 @@ public:
 	virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const;
 
 	virtual void generateUidAndName(QString* _uid, QString* _name);
-
 protected:
 	DataManagerImpl();
 
@@ -158,6 +156,10 @@ private:
 	void emitSignals(DataPtr activeData);
 	QStringList getActiveDataStringList() const;
 	void loadActiveData(const QString activeDatas);
+	void removeActiveData(DataPtr dataToBeRemoved);
+	void emitActiveImageChanged();
+	void emitActiveDataChanged();
+	QString getChangedUid(DataPtr activeData);
 private slots:
 	void settingsChangedSlot(QString key);
 };

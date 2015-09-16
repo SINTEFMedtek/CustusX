@@ -192,7 +192,7 @@ ImagePtr PatientModelImplService::getActiveImage() const
 
 void PatientModelImplService::setActiveImage(ImagePtr activeImage)
 {
-	dataService()->setActiveImage(activeImage);
+	dataService()->setActiveData(activeImage);
 }
 
 CLINICAL_VIEW PatientModelImplService::getClinicalApplication() const

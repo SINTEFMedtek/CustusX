@@ -122,6 +122,7 @@ void DataManagerImpl::clear()
 	emit dataAddedOrRemoved();
 	emit centerChanged();
 	emit activeImageChanged("");
+	emit activeDataChanged("");
 	emit landmarkPropertiesChanged();
 }
 
@@ -168,11 +169,6 @@ ImagePtr DataManagerImpl::getActiveImage() const
 	return DataManager::getActiveData<Image>();
 }
 
-void DataManagerImpl::setActiveImage(ImagePtr activeImage)
-{
-	this->setActiveData(activeImage);
-}
-
 DataPtr DataManagerImpl::getActiveData() const
 {
 	if(mActiveData.isEmpty())
@@ -193,14 +189,9 @@ void DataManagerImpl::setActiveData(DataPtr activeData)
 
 void DataManagerImpl::emitSignals(DataPtr activeData)
 {
-	QString uid = "";
-	if(activeData)
-	{
-		uid = activeData->getUid();
-		if(activeData->getType() == "image")
-			emit activeImageChanged(uid);
-	}
-	emit activeDataChanged(uid);
+	this->emitActiveDataChanged();
+	if(activeData && activeData->getType() == "image")
+		this->emitActiveImageChanged();
 }
 
 void DataManagerImpl::setLandmarkNames(std::vector<QString> names)
@@ -601,16 +592,58 @@ void DataManagerImpl::generateUidAndName(QString* _uid, QString* _name)
 	}
 }
 
+void DataManagerImpl::emitActiveImageChanged()
+{
+	DataPtr activeImage = DataManager::getActiveData<Image>();
+	QString uid = getChangedUid(activeImage);
+	emit activeImageChanged(uid);
+}
+
+void DataManagerImpl::emitActiveDataChanged()
+{
+	DataPtr activeData = this->getActiveData();
+	QString uid = getChangedUid(activeData);
+	emit activeDataChanged(uid);
+}
+
+QString DataManagerImpl::getChangedUid(DataPtr activeData)
+{
+	QString uid = "";
+	if(activeData)
+		uid = activeData->getUid();
+	return uid;
+}
+
+void DataManagerImpl::removeActiveData(DataPtr dataToBeRemoved)
+{
+	if(!dataToBeRemoved)
+		reportWarning("DataManagerImpl::removeActiveData: No data");
+	if(!mActiveData.contains(dataToBeRemoved))
+		return;
+
+	bool resendActiveImage = false;
+	bool resendActiveData = false;
+	if (DataManager::getActiveData<Image>() == dataToBeRemoved)
+		resendActiveImage = true;
+	if(this->getActiveData() == dataToBeRemoved)
+		resendActiveData = true;
+
+	mActiveData.removeAll(dataToBeRemoved);
+
+	if(resendActiveImage)
+		emitActiveImageChanged();
+	if(resendActiveData)
+		emitActiveDataChanged();
+}
+
 void DataManagerImpl::removeData(const QString& uid, QString basePath)
 {
-	if (this->getActiveImage() && this->getActiveImage()->getUid() == uid)
-		this->setActiveImage(ImagePtr());
-
-	DataPtr data = this->getData(uid);
+	DataPtr dataToBeRemoved = this->getData(uid);
+	removeActiveData(dataToBeRemoved);
 
 	mData.erase(uid);
 
-	this->deleteFiles(data, basePath);
+	this->deleteFiles(dataToBeRemoved, basePath);
 
 	emit dataAddedOrRemoved(); // this should alert everybody interested in the data as a collection.
 	report("Removed data [" + uid + "].");
@@ -623,11 +656,10 @@ void DataManagerImpl::deleteFiles(DataPtr data, QString basePath)
 	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
 	QStringList files;
 	if (!data->getFilename().isEmpty())
-		files << QDir(basePath).absoluteFilePath(data->getFilename());
-
-	if (image)
 	{
-		files <<  changeExtension(files[0], "raw");
+		files << QDir(basePath).absoluteFilePath(data->getFilename());
+		if (image)
+			files <<  changeExtension(files[0], "raw");
 	}
 
 	for (int i=0; i<files.size(); ++i)

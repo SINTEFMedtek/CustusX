@@ -78,7 +78,7 @@ TEST_CASE("Active Image: set/get", "[unit]")
 	cx::DataServicePtr dataManager = cx::DataManagerImpl::create();
 	testDataStructures testData;
 
-	dataManager->setActiveImage(testData.image1);
+	dataManager->setActiveData(testData.image1);
 
 	REQUIRE(dataManager->getActiveImage() == testData.image1);
 	REQUIRE_FALSE(dataManager->getActiveImage() == testData.image2);
@@ -94,7 +94,7 @@ TEST_CASE("Active Image: activeImageChanged signal", "[unit]")
 	testDataStructures testData;
 
 	cxtest::DirectSignalListener signalListener(dataManager.get(), SIGNAL(activeImageChanged(QString)));
-	dataManager->setActiveImage(testData.image1);
+	dataManager->setActiveData(testData.image1);
 	CHECK(signalListener.isReceived());
 
 	cxtest::DirectSignalListener signalListener2(dataManager.get(), SIGNAL(activeImageChanged(QString)));
@@ -141,7 +141,7 @@ TEST_CASE("Active Image: save/load in patient file", "[unit]")
 
 	storageFixture.loadSession2();
 	CHECK_FALSE(dataManager->getActiveImage() == data1);
-	dataManager->setActiveImage(testData.image2);
+	dataManager->setActiveData(testData.image2);
 	storageFixture.saveSession();
 
 	CHECK(dataManager->getActiveImage() == testData.image2);
@@ -196,6 +196,31 @@ TEST_CASE("Active Data: activeDataChanged signal", "[unit]")
 	cxtest::DirectSignalListener signalListener2(dataManager.get(), SIGNAL(activeDataChanged(QString)));
 	dataManager->setActiveData(testData.mesh1);
 	CHECK(signalListener2.isReceived());
+}
+
+TEST_CASE("Active Data: Remove data", "[unit]")
+{
+	cx::DataServicePtr dataManager = cx::DataManagerImpl::create();
+	testDataStructures testData;
+
+	dataManager->loadData(testData.image1);
+	dataManager->loadData(testData.image2);
+	dataManager->loadData(testData.mesh1);
+
+	dataManager->setActiveData(testData.mesh1);
+	dataManager->setActiveData(testData.image2);
+	dataManager->setActiveData(testData.image1);
+
+	cxtest::DirectSignalListener signalListener(dataManager.get(), SIGNAL(activeDataChanged(QString)));
+	dataManager->removeData(testData.image1->getUid(), "");
+	CHECK(dataManager->getActiveData() == testData.image2);
+	CHECK(signalListener.isReceived());
+
+	dataManager->removeData(testData.image2->getUid(), "");
+	CHECK(dataManager->getActiveData() == testData.mesh1);
+
+	dataManager->removeData(testData.mesh1->getUid(), "");
+	CHECK_FALSE(dataManager->getActiveData());
 }
 
 TEST_CASE("Active Data: Call set multiple times", "[unit]")

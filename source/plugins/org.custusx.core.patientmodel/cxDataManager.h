@@ -114,8 +114,7 @@ public:
 		}
 		return retval;
 	}
-	virtual void setActiveImage(ImagePtr activeImage) = 0; ///< used for system state
-	virtual void setActiveData(DataPtr activeData) = 0;
+	virtual void setActiveData(DataPtr activeData) = 0; ///< used for system state
 	virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const;
 
 	virtual QString addLandmark() = 0;
