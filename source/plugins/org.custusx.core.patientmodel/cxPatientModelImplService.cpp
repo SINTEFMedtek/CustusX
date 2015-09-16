@@ -190,9 +190,9 @@ ImagePtr PatientModelImplService::getActiveImage() const
 	return dataService()->getActiveImage();
 }
 
-void PatientModelImplService::setActiveImage(ImagePtr activeImage)
+void PatientModelImplService::setActiveData(DataPtr activeData)
 {
-	dataService()->setActiveData(activeImage);
+	dataService()->setActiveData(activeData);
 }
 
 CLINICAL_VIEW PatientModelImplService::getClinicalApplication() const

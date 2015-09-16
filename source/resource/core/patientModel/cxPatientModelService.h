@@ -135,7 +135,12 @@ public:
 	virtual RegistrationHistoryPtr get_rMpr_History() const = 0;
 	// active image
 	virtual ImagePtr getActiveImage() const = 0; ///< used for system state
-	virtual void setActiveImage(ImagePtr activeImage) = 0; ///< used for system state
+	virtual void setActiveData(DataPtr activeData) = 0; ///< used for system state
+	virtual void setActiveData(QString uid)
+	{
+		this->setActiveData(this->getData(uid));
+	}
+
 	// landmarks
 	virtual LandmarksPtr getPatientLandmarks() const = 0; ///< landmark defined in patient space
 	/** Get all defined landmarks.

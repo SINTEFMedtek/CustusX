@@ -156,9 +156,9 @@ ImagePtr PatientModelServiceProxy::getActiveImage() const
 	return mPatientModelService->getActiveImage();
 }
 
-void PatientModelServiceProxy::setActiveImage(ImagePtr activeImage)
+void PatientModelServiceProxy::setActiveData(DataPtr activeData)
 {
-	mPatientModelService->setActiveImage(activeImage);
+	mPatientModelService->setActiveData(activeData);
 }
 
 void PatientModelServiceProxy::autoSave()

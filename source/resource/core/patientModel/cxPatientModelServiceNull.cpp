@@ -87,7 +87,7 @@ ImagePtr PatientModelServiceNull::getActiveImage() const
 	return ImagePtr();
 }
 
-void PatientModelServiceNull::setActiveImage(ImagePtr activeImage)
+void PatientModelServiceNull::setActiveData(DataPtr activeData)
 {
 	printWarning();
 }

@@ -74,7 +74,7 @@ public:
 	virtual RegistrationHistoryPtr get_rMpr_History() const;
 
 	virtual ImagePtr getActiveImage() const; ///< used for system state
-	virtual void setActiveImage(ImagePtr activeImage); ///< used for system state
+	virtual void setActiveData(DataPtr activeData); ///< used for system state
 
 	virtual CLINICAL_VIEW getClinicalApplication() const;
 	virtual void setClinicalApplication(CLINICAL_VIEW application);

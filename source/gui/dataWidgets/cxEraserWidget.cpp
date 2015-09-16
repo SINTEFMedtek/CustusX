@@ -185,7 +185,7 @@ void EraserWidget::duplicateSlot()
 
 	ImagePtr duplicate = duplicateImage(mPatientModelService, original);
 	mPatientModelService->insertData(duplicate);
-	mPatientModelService->setActiveImage(duplicate);
+	mPatientModelService->setActiveData(duplicate);
 
 	// replace viz of original with duplicate
 //	std::vector<ViewGroupPtr> viewGroups = mVisualizationService->getViewGroupDatas();
