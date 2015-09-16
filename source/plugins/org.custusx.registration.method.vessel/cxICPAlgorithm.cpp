@@ -29,65 +29,8 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXRMPCWIDGET_H
-#define CXRMPCWIDGET_H
+#include "cxICPAlgorithm.h"
 
-#include <QPushButton>
-#include <QDomElement>
-#include "cxRegistrationBaseWidget.h"
-#include "cxForwardDeclarations.h"
-#include "cxXmlOptionItem.h"
-
-
-namespace cx
+cxICPAlgorithm::cxICPAlgorithm()
 {
-class WidgetObscuredListener;
-class RecordTrackingWidget;
-class PCICPWidget;
-typedef boost::shared_ptr<class Acquisition> AcquisitionPtr;
-typedef boost::shared_ptr<class StringPropertySelectMesh> StringPropertySelectMeshPtr;
-typedef boost::shared_ptr<class ToolRep3D> ToolRep3DPtr;
-typedef boost::shared_ptr<class RecordSessionWidget> RecordSessionWidgetPtr;
-typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
-//typedef boost::shared_ptr<class BronchoscopyRegistration> BronchoscopyRegistrationPtr;
-typedef std::map<QString, ToolPtr> ToolMap;
-typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
-
-/**
- *
- * \brief Register a point cloud to a surface
- *
- * \date 2015-09-06
- * \author Christian Askeland
- */
-class RMPCWidget: public RegistrationBaseWidget
-{
-	Q_OBJECT
-
-public:
-	RMPCWidget(RegServices services, QWidget *parent);
-	virtual ~RMPCWidget()
-	{
-	}
-	virtual QString defaultWhatsThis() const;
-private slots:
-	void registerSlot();
-private:
-	RegServices mServices;
-	QVBoxLayout* mVerticalLayout;
-	QLabel* mLabel;
-	XmlOptionFile mOptions;
-	MeshPtr mMesh;
-
-	QVBoxLayout* createVBoxInGroupBox(QVBoxLayout* parent, QString header);
-
-	StringPropertyBasePtr mFixedImage;
-	StringPropertySelectMeshPtr mSurfaceSelector;
-	QPushButton* mRegisterButton;
-	RecordTrackingWidget* mRecordTrackingWidget;
-//	PCICPWidget* mICPWidget;
-};
-
-} //namespace cx
-
-#endif // CXRMPCWIDGET_H
+}

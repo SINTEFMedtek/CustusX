@@ -246,8 +246,9 @@ void SeansVesselRegFixture::doTestVessel2VesselRegistration(
 	vesselReg.setDebugOutput(verbose);
 	vesselReg.mt_doOnlyLinear = true;
 
-	bool success = vesselReg.execute(source, target,
+	bool success = vesselReg.initialize(source, target,
 			cx::DataLocations::getTestDataPath() + "/Log");
+	success = success && vesselReg.execute();
 	CHECK(success);
 
 	cx::Transform3D linearTransform = vesselReg.getLinearResult();
@@ -316,7 +317,7 @@ void SeansVesselRegFixture::doTestVessel2VesselRegistration(
 				<< std::endl;
 	}
 
-//	CHECK(t_delta.length() < tol_dist);
-//	CHECK(fabs(a) < tol_angle);
+//	REQUIRE(t_delta.length() < tol_dist);
+//	REQUIRE(fabs(a) < tol_angle);
 }
 } /* namespace cxtest */

@@ -51,36 +51,68 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationService.h"
 #include "cxViewService.h"
 #include "cxPatientModelService.h"
+#include "cxICPWidget.h"
+#include "cxMeshInView.h"
+#include "cxWidgetObscuredListener.h"
+#include "cxSpaceProvider.h"
+#include "cxSpaceListener.h"
 
 namespace cx
 {
 
 SeansVesselRegistrationWidget::SeansVesselRegistrationWidget(RegServices services, QWidget* parent) :
-	RegistrationBaseWidget(services, parent, "org_custusx_registration_method_vessel_seans_widget", "Seans Vessel Registration"),
-	mLTSRatioSpinBox(new QSpinBox()), mLinearCheckBox(new QCheckBox()), mAutoLTSCheckBox(new QCheckBox()),
-	mRegisterButton(new QPushButton("Register"))
+	RegistrationBaseWidget(services, parent,
+						   "org_custusx_registration_method_vessel_seans_widget",
+						   "Seans Vessel Registration")
 {
-	mRegisterButton->setEnabled(false);
-	connect(mRegisterButton, &QPushButton::clicked, this, &SeansVesselRegistrationWidget::registerSlot);
+	mRegistrator.reset(new SeansVesselReg());
+
+	mSpaceListenerMoving = mServices.spaceProvider->createListener();
+	mSpaceListenerFixed = mServices.spaceProvider->createListener();
+	connect(mSpaceListenerMoving.get(), &SpaceListener::changed, this, &SeansVesselRegistrationWidget::onSpacesChanged);
+	connect(mSpaceListenerFixed.get(), &SpaceListener::changed, this, &SeansVesselRegistrationWidget::onSpacesChanged);
 
 	connect(mServices.registrationService.get(), &RegistrationService::fixedDataChanged,
 			this, &SeansVesselRegistrationWidget::inputChanged);
 	connect(mServices.registrationService.get(), &RegistrationService::movingDataChanged,
 			this, &SeansVesselRegistrationWidget::inputChanged);
 
-	QVBoxLayout* topLayout = new QVBoxLayout(this);
-	QGridLayout* layout = new QGridLayout();
-	topLayout->addLayout(layout);
+	mLTSRatio = DoubleProperty::initialize("LTSRatio", "LTS Ratio",
+										   "Fraction of points in the lesser point set to use during each iteration.",
+										   80, DoubleRange(20,100,1), 0);
+	connect(mLTSRatio.get(), &DoubleProperty::changed, this, &SeansVesselRegistrationWidget::onSettingsChanged);
 
-	mVesselRegOptionsButton = new QPushButton("Options", this);
-	mVesselRegOptionsButton->setEnabled(false);
-	mVesselRegOptionsButton->setCheckable(true);
+	mAutoLTS = BoolProperty::initialize("autoLTS","Auto LTS",
+										"Ignore LTS, instead attempt to find optimal value",
+									   false);
+	connect(mAutoLTS.get(), &DoubleProperty::changed, this, &SeansVesselRegistrationWidget::onSettingsChanged);
 
-	mVesselRegOptionsWidget = this->createGroupbox(this->createOptionsWidget(),
-		"Vessel registration options");
-	connect(mVesselRegOptionsButton, SIGNAL(clicked(bool)), mVesselRegOptionsWidget, SLOT(setVisible(bool)));
-	mVesselRegOptionsWidget->setVisible(mVesselRegOptionsButton->isChecked());
+	mLinear = BoolProperty::initialize("linear","Linear",
+									   "Use only linear iteration",
+									   true);
+	connect(mLinear.get(), &DoubleProperty::changed, this, &SeansVesselRegistrationWidget::onSettingsChanged);
 
+	mDisplayProgress = BoolProperty::initialize("progress","Display Progress",
+												"Display metric and difference lines between point sets",
+									   true);
+	connect(mDisplayProgress.get(), &DoubleProperty::changed, this, &SeansVesselRegistrationWidget::onDisplayProgressChanged);
+
+	mOneStep = BoolProperty::initialize("onestep","One Step",
+										"Registration is done one iteration at a time.",
+									   false);
+	connect(mOneStep.get(), &DoubleProperty::changed, this, &SeansVesselRegistrationWidget::onSettingsChanged);
+
+	std::vector<PropertyPtr> properties;
+	properties.push_back(mLTSRatio);
+	properties.push_back(mAutoLTS);
+	properties.push_back(mLinear);
+	properties.push_back(mDisplayProgress);
+	properties.push_back(mOneStep);
+	mICPWidget = new ICPWidget(this);
+	mICPWidget->setSettings(properties);
+	connect(mICPWidget, &ICPWidget::requestRegister, this, &SeansVesselRegistrationWidget::registerSlot);
+
+	QGridLayout* layout = new QGridLayout(this);
 	QGridLayout* entryLayout = new QGridLayout;
 	entryLayout->setColumnStretch(1, 1);
 
@@ -90,29 +122,69 @@ SeansVesselRegistrationWidget::SeansVesselRegistrationWidget(RegServices service
 	new LabeledComboBoxWidget(this, mMovingImage, entryLayout, 1);
 
 	layout->addLayout(entryLayout, 0, 0, 2, 2);
-	layout->addWidget(mRegisterButton, 2, 0);
-	layout->addWidget(mVesselRegOptionsButton, 2, 1);
-	layout->addWidget(mVesselRegOptionsWidget, 3, 0, 1, 2);
+	layout->addWidget(mICPWidget, 2, 0, 2, 2);
+
+	mObscuredListener.reset(new WidgetObscuredListener(this));
+	connect(mObscuredListener.get(), SIGNAL(obscured(bool)), this, SLOT(obscuredSlot(bool)));
+
+	this->inputChanged();
+	this->onSettingsChanged();
 }
 
 SeansVesselRegistrationWidget::~SeansVesselRegistrationWidget()
 {
 }
 
-void SeansVesselRegistrationWidget::inputChanged()
+void SeansVesselRegistrationWidget::obscuredSlot(bool obscured)
 {
-	if(mServices.registrationService->getMovingData() && mServices.registrationService->getFixedData())
+	if (obscured)
 	{
-		mRegisterButton->setEnabled(true);
-		mVesselRegOptionsButton->setEnabled(true);
-		mVesselRegOptionsWidget->setVisible(mVesselRegOptionsButton->isChecked());
+		mMeshInView.reset();
 	}
 	else
 	{
-		mRegisterButton->setEnabled(false);
-		mVesselRegOptionsButton->setEnabled(false);
-		mVesselRegOptionsWidget->setVisible(false);
+		this->onSettingsChanged();
+		this->inputChanged();
 	}
+}
+
+void SeansVesselRegistrationWidget::onSpacesChanged()
+{
+	if (mObscuredListener->isObscured())
+		return;
+
+	DataPtr moving = mServices.registrationService->getMovingData();
+	DataPtr fixed = mServices.registrationService->getFixedData();
+	QString logPath = mServices.patientModelService->getActivePatientFolder() + "/Logs/";
+
+	mRegistrator->initialize(moving, fixed, logPath);
+
+	mICPWidget->enableRegistration(mRegistrator->isValid());
+	this->updateDifferenceLines();
+	mICPWidget->setRMS(mRegistrator->getResultMetric());
+}
+
+void SeansVesselRegistrationWidget::inputChanged()
+{
+	if (mObscuredListener->isObscured())
+		return;
+
+	DataPtr moving = mServices.registrationService->getMovingData();
+	DataPtr fixed = mServices.registrationService->getFixedData();
+
+	mSpaceListenerFixed->setSpace(mServices.spaceProvider->getD(fixed));
+	mSpaceListenerMoving->setSpace(mServices.spaceProvider->getD(moving));
+
+	this->onSpacesChanged();
+}
+
+void SeansVesselRegistrationWidget::onSettingsChanged()
+{
+	if (mObscuredListener->isObscured())
+		return;
+	mRegistrator->mt_auto_lts = mAutoLTS->getValue();
+	mRegistrator->mt_ltsRatio = mLTSRatio->getValue();
+	mRegistrator->mt_doOnlyLinear = mLinear->getValue();
 }
 
 void SeansVesselRegistrationWidget::registerSlot()
@@ -126,49 +198,34 @@ void SeansVesselRegistrationWidget::registerSlot()
 //	int single_point_thre = 1; //TODO, add user interface
 //	bool verbose = 1; //TODO, add user interface
 
-	QString logPath = mServices.patientModelService->getActivePatientFolder() + "/Logs/";
+	mRegistrator->notifyPreRegistrationWarnings();
 
-//	mRegistrationService->doVesselRegistration(lts_ratio, stop_delta, lambda, sigma, lin_flag, sample, single_point_thre, verbose,
-//		logPath);
-
-	SeansVesselReg vesselReg;
-	vesselReg.mt_auto_lts = true;
-	vesselReg.mt_ltsRatio = mLTSRatioSpinBox->value();
-	vesselReg.mt_doOnlyLinear = mLinearCheckBox->isChecked();
-	vesselReg.mt_auto_lts = mAutoLTSCheckBox->isChecked();
-
-	if (vesselReg.mt_auto_lts)
+	if (mRegistrator->mt_auto_lts)
 	{
 		reportDebug("Using automatic lts_ratio");
 	}
 	else
 	{
-		reportDebug("Using lts_ratio: " + qstring_cast(vesselReg.mt_ltsRatio));
+		reportDebug("Using lts_ratio: " + qstring_cast(mRegistrator->mt_ltsRatio));
 	}
 
-	if(!mServices.registrationService->getMovingData())
-	{
-		reportWarning("Moving volume not set.");
-		return;
-	}
-	else if(!mServices.registrationService->getFixedData())
-	{
-		reportWarning("Fixed volume not set.");
-		return;
-	}
+	bool success = false;
+	if (mOneStep->getValue())
+		success = mRegistrator->performOneRegistration();
+	else
+		success = mRegistrator->execute();
 
-	bool success = vesselReg.execute(mServices.registrationService->getMovingData(), mServices.registrationService->getFixedData(), logPath);
 	if (!success)
 	{
 		reportWarning("Vessel registration failed.");
 		return;
 	}
 
-	Transform3D linearTransform = vesselReg.getLinearResult();
+	Transform3D linearTransform = mRegistrator->getLinearResult();
 	std::cout << "v2v linear result:\n" << linearTransform << std::endl;
 	//std::cout << "v2v inverted linear result:\n" << linearTransform.inverse() << std::endl;
 
-	vesselReg.checkQuality(linearTransform);
+	mRegistrator->checkQuality(linearTransform);
 
 	// The registration is performed in space r. Thus, given an old data position rMd, we find the
 	// new one as rM'd = Q * rMd, where Q is the inverted registration output.
@@ -178,195 +235,23 @@ void SeansVesselRegistrationWidget::registerSlot()
 	mServices.registrationService->applyImage2ImageRegistration(delta, "Vessel based");
 }
 
-/**Utililty class for debugging the SeansVesselRegistration class interactively.
- *
- * \sa SeansVesselRegistrationWidget
- */
-class SeansVesselRegistrationDebugger
+
+void SeansVesselRegistrationWidget::updateDifferenceLines()
 {
-public:
-	SeansVesselRegistrationDebugger(RegServices services, double ltsRatio, bool linear) :
-		mServices(services)
-	{
-		mRegistrator.mt_doOnlyLinear = linear;
-		mRegistrator.mt_ltsRatio = ltsRatio;
-		mRegistrator.mt_auto_lts = false;
+	if (!mMeshInView)
+		mMeshInView.reset(new MeshInView(mServices.visualizationService));
 
-		mContext = mRegistrator.createContext(mServices.registrationService->getMovingData(), mServices.registrationService->getFixedData());
-
-		//mMovingData = mRegistrator.convertToPolyData(mContext->mSourcePoints);
-		mMovingData = mContext->getMovingPoints();
-		mFixedData = mContext->getFixedPoints();
-
-		MeshPtr moving(new Mesh("v2vreg_moving", "v2vreg_moving", mMovingData));
-		moving->setColor(QColor("red"));
-
-		MeshPtr fixed(new Mesh("v2vreg_fixed", "v2vreg_fixed", mFixedData));
-		fixed->setColor(QColor("green"));
-
-		mPolyLines = vtkPolyDataPtr::New();
-		MeshPtr lines(new Mesh("v2vreg_lines", "v2vreg_lines", mPolyLines));
-		lines->setColor(QColor("cornflowerblue"));
-
-		ViewPtr view = mServices.visualizationService->get3DView();
-
-		m_mRep = GeometricRep::New();
-		m_mRep->setMesh(moving);
-		view->addRep(m_mRep);
-
-		m_fRep = GeometricRep::New();
-		m_fRep->setMesh(fixed);
-		view->addRep(m_fRep);
-
-		m_lineRep = GeometricRep::New();
-		m_lineRep->setMesh(lines);
-		view->addRep(m_lineRep);
-
-		this->update();
-
-		report("Initialized V2V algorithm (debug). Use Step to iterate.");
-	}
-	~SeansVesselRegistrationDebugger()
-	{
-		ViewPtr view = mServices.visualizationService->get3DView();
-		view->removeRep(m_mRep);
-		view->removeRep(m_fRep);
-		view->removeRep(m_lineRep);
-		report("Closed V2V algorithm (debug).");
-	}
-	void stepL()
-	{
-		if (!mContext)
-			return;
-		mRegistrator.performOneRegistration(mContext, true);
-		this->update();
-		report(QString("One Linear V2V iteration, metric=%1").arg(mContext->mMetric));
-	}
-	void stepNL()
-	{
-		if (!mContext)
-			return;
-		mRegistrator.performOneRegistration(mContext, false);
-		this->update();
-		report(QString("One Nonlinear V2V iteration, metric=%1").arg(mContext->mMetric));
-	}
-	void apply()
-	{
-		if (!mContext)
-			return;
-
-		Transform3D linearTransform = mRegistrator.getLinearResult(mContext);
-		std::cout << "v2v linear result:\n" << linearTransform << std::endl;
-
-		mRegistrator.checkQuality(linearTransform);
-		Transform3D delta = linearTransform.inv();
-		mServices.registrationService->applyImage2ImageRegistration(delta, "Vessel based");
-
-		report(QString("Applied linear registration from debug iteration."));
-	}
-	void update()
-	{
-		if (!mContext)
-			return;
-		mRegistrator.computeDistances(mContext);
-
-		vtkPolyDataPtr moving = mContext->getMovingPoints();
-		mMovingData->SetPoints(moving->GetPoints());
-		mMovingData->SetVerts(moving->GetVerts());
-
-		vtkPolyDataPtr fixed = mContext->getFixedPoints();
-		mFixedData->SetPoints(fixed->GetPoints());
-		mFixedData->SetVerts(fixed->GetVerts());
-
-		// draw lines
-		mPolyLines->Allocate();
-		vtkPointsPtr verts = vtkPointsPtr::New();
-		for (int i = 0; i < mContext->mSortedSourcePoints->GetNumberOfPoints(); ++i)
-		{
-			verts->InsertNextPoint(mContext->mSortedSourcePoints->GetPoint(i));
-			verts->InsertNextPoint(mContext->mSortedTargetPoints->GetPoint(i));
-
-			vtkIdType connectivity[2];
-			connectivity[0] = 2 * i;
-			connectivity[1] = 2 * i + 1;
-			mPolyLines->InsertNextCell(VTK_LINE, 2, connectivity);
-		}
-		mPolyLines->SetPoints(verts);
-	}
-
-private:
-	SeansVesselReg mRegistrator;
-	SeansVesselReg::ContextPtr mContext;
-	vtkPolyDataPtr mMovingData, mFixedData;
-	vtkPolyDataPtr mPolyLines;
-	GeometricRepPtr m_mRep, m_fRep, m_lineRep;
-	//	std::vector<GraphicalLine3DPtr> mLines;
-	RegServices mServices;
-};
-
-void SeansVesselRegistrationWidget::debugInit()
-{
-	mDebugger.reset(new SeansVesselRegistrationDebugger(mServices, mLTSRatioSpinBox->value(),
-		mLinearCheckBox->isChecked()));
-}
-void SeansVesselRegistrationWidget::debugRunOneLinearStep()
-{
-	if (mDebugger)
-		mDebugger->stepL();
-}
-void SeansVesselRegistrationWidget::debugRunOneNonlinearStep()
-{
-	if (mDebugger)
-		mDebugger->stepNL();
+	bool show = mDisplayProgress->getValue() && mRegistrator->isValid();
+	if (show)
+		mMeshInView->show(mRegistrator->getDifferenceLines());
+	else
+		mMeshInView->hide();
 }
 
-void SeansVesselRegistrationWidget::debugApply()
+void SeansVesselRegistrationWidget::onDisplayProgressChanged()
 {
-	if (mDebugger)
-		mDebugger->apply();
+	this->updateDifferenceLines();
 }
 
-void SeansVesselRegistrationWidget::debugClear()
-{
-	mDebugger.reset();
-}
-
-QWidget* SeansVesselRegistrationWidget::createOptionsWidget()
-{
-	QWidget* retval = new QWidget(this);
-	QGridLayout* layout = new QGridLayout(retval);
-
-	mLTSRatioSpinBox->setSingleStep(1);
-	mLTSRatioSpinBox->setValue(80);
-
-	mLinearCheckBox->setChecked(true);
-	mAutoLTSCheckBox->setChecked(true);
-
-	int line = 0;
-	layout->addWidget(new QLabel("Auto LTS:"), line, 0);
-	layout->addWidget(mAutoLTSCheckBox, line, 1);
-	++line;
-	layout->addWidget(new QLabel("LTS Ratio:"), line, 0);
-	layout->addWidget(mLTSRatioSpinBox, line, 1);
-	++line;
-	layout->addWidget(new QLabel("Linear:"), line, 0);
-	layout->addWidget(mLinearCheckBox, line, 1);
-	++line;
-	layout->addWidget(new QLabel("Debug"), line, 0);
-	QHBoxLayout* debugLayout = new QHBoxLayout;
-	layout->addLayout(debugLayout, line, 1, 1, 1);
-	this->createAction(this, QIcon(), "Init",
-		"Initialize the V2V algorithm.\n Display only, registration will not be updated in CustusX (Debug)",
-		SLOT(debugInit()), debugLayout);
-	this->createAction(this, QIcon(), "Lin", "Run one Linear step in the V2V algorithm. (Debug)",
-		SLOT(debugRunOneLinearStep()), debugLayout);
-	this->createAction(this, QIcon(), "NL",
-		"Run one Nonlinear step in the V2V algorithm. (Should be one at the end only)(Debug)",
-		SLOT(debugRunOneNonlinearStep()), debugLayout);
-	this->createAction(this, QIcon(), "Apply", "Apply results from the debug iteration", SLOT(debugApply()), debugLayout);
-	this->createAction(this, QIcon(), "Clear", "Clear debugging of the V2V algorithm.", SLOT(debugClear()), debugLayout);
-
-	return retval;
-}
 
 }//namespace cx
