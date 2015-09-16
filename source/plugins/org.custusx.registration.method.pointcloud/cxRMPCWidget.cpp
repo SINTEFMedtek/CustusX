@@ -173,7 +173,8 @@ void RMPCWidget::registerSlot()
 		return;
 	}
 
-	bool success = vesselReg.execute(moving, fixed, logPath);
+	bool success = vesselReg.initialize(moving, fixed, logPath);
+	success = success && vesselReg.execute();
 	if (!success)
 	{
 		reportWarning("ICP registration failed.");

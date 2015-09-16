@@ -10,6 +10,10 @@ set(PLUGIN_SRCS
     cxSeansVesselRegistrationWidget.cpp
     cxRegisterI2IWidget.cpp
     cxPrepareVesselsWidget.cpp
+	cxICPWidget.cpp
+	cxICPAlgorithm.cpp
+	cxMeshInView.cpp
+	cxMeshInView.h
 )
 
 # Files which should be processed by Qts moc
@@ -18,6 +22,8 @@ set(PLUGIN_MOC_SRCS
     cxSeansVesselRegistrationWidget.h
     cxRegisterI2IWidget.h
     cxPrepareVesselsWidget.h
+	cxICPWidget.h
+	cxICPAlgorithm.h
 )
 
 # Qt Designer files which should be processed by Qts uic

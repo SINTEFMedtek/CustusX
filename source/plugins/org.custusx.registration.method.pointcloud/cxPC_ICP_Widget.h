@@ -30,81 +30,64 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXSEANSVESSELREGISTRATIONWIDGET_H_
-#define CXSEANSVESSELREGISTRATIONWIDGET_H_
+#ifndef CXPCICPWidget_H_
+#define CXPCICPWidget_H_
 
 #include "cxRegistrationBaseWidget.h"
 #include "cxStringPropertyBase.h"
+#include "cxForwardDeclarations.h"
+#include "cxTransform3D.h"
 
 class QSpinBox;
 class QPushButton;
 class QLabel;
-#include "cxBoolProperty.h"
-#include "cxDoubleProperty.h"
 
 namespace cx
 {
-class ICPWidget;
 typedef boost::shared_ptr<class SeansVesselRegistrationDebugger> SeansVesselRegistrationDebuggerPtr;
-typedef boost::shared_ptr<class GeometricRep> GeometricRepPtr;
-typedef boost::shared_ptr<class SeansVesselReg> SeansVesselRegPtr;
-typedef boost::shared_ptr<class MeshInView> MeshInViewPtr;
-typedef boost::shared_ptr<class SpaceListener> SpaceListenerPtr;
-
-
-
 
 /**
- * SeansVesselRegistrationWidget.h
- *
- * \brief Widget for controlling input to
- * Seans Vessel Registration
- *
- * \ingroup org_custusx_registration_method_vessel
- * \date Feb 21, 2011
- * \author Janne Beate Bakeng, SINTEF
  */
-class SeansVesselRegistrationWidget : public RegistrationBaseWidget
+class PCICPWidget : public BaseWidget
 {
 	Q_OBJECT
 public:
-	SeansVesselRegistrationWidget(RegServices services, QWidget* parent);
-	virtual ~SeansVesselRegistrationWidget();
+	PCICPWidget(VisServicesPtr services, QWidget* parent);
+	virtual ~PCICPWidget();
+
+	void setFixedData(DataPtr fixed);
+	void setMovingData(DataPtr moving);
+
+signals:
+	void registrationChanged(Transform3D fMm);
 
 private slots:
 	void registerSlot();
+//	void debugInit();
+//	void debugRunOneLinearStep();
+//	void debugRunOneNonlinearStep();
+//	void debugClear();
+//	void debugApply();
 	void inputChanged();
-	void obscuredSlot(bool obscured);
 
 private:
+	QWidget* createOptionsWidget();
+	SeansVesselRegistrationDebuggerPtr mDebugger;
+
+	QSpinBox* mLTSRatioSpinBox;
+	QCheckBox* mLinearCheckBox;
+	QCheckBox* mAutoLTSCheckBox;
 	QPushButton* mRegisterButton;
+	QPushButton* mVesselRegOptionsButton;
+	QGroupBox* mVesselRegOptionsWidget;
 
-	DoublePropertyPtr mLTSRatio;
-	BoolPropertyPtr mLinear;
-	BoolPropertyPtr mAutoLTS;
-	BoolPropertyPtr mDisplayProgress;
-	BoolPropertyPtr mOneStep;
-
-	StringPropertyBasePtr mFixedImage;
-	StringPropertyBasePtr mMovingImage;
-
-	GeometricRepPtr m_lineRep;
-
-	ICPWidget* mICPWidget;
-	SeansVesselRegPtr mRegistrator;
-	MeshInViewPtr mMeshInView;
-	boost::shared_ptr<class WidgetObscuredListener> mObscuredListener;
-
-	SpaceListenerPtr mSpaceListenerMoving;
-	SpaceListenerPtr mSpaceListenerFixed;
-
-	void onSpacesChanged();
-	void updateDifferenceLines();
-	void onSettingsChanged();
-	void onDisplayProgressChanged();
+	DataPtr mFixed;
+	DataPtr mMoving;
+	VisServicesPtr mServices;
+	//  StringPropertyBasePtr mFixedImage;
+	//  StringPropertyBasePtr mMovingImage;
 };
-
 
 }//namespace cx
 
-#endif /* CXSEANSVESSELREGISTRATIONWIDGET_H_ */
+#endif /* CXPCICPWidget_H_ */

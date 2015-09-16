@@ -29,65 +29,56 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXRMPCWIDGET_H
-#define CXRMPCWIDGET_H
+#ifndef CXICPWIDGET_H
+#define CXICPWIDGET_H
 
-#include <QPushButton>
-#include <QDomElement>
 #include "cxRegistrationBaseWidget.h"
-#include "cxForwardDeclarations.h"
-#include "cxXmlOptionItem.h"
+#include "cxStringPropertyBase.h"
+#include "vesselReg/SeansVesselReg.hxx"
+#include "cxBoolProperty.h"
+#include "cxDoubleProperty.h"
 
+class QSpinBox;
+class QPushButton;
+class QLabel;
 
 namespace cx
 {
-class WidgetObscuredListener;
-class RecordTrackingWidget;
-class PCICPWidget;
-typedef boost::shared_ptr<class Acquisition> AcquisitionPtr;
-typedef boost::shared_ptr<class StringPropertySelectMesh> StringPropertySelectMeshPtr;
-typedef boost::shared_ptr<class ToolRep3D> ToolRep3DPtr;
-typedef boost::shared_ptr<class RecordSessionWidget> RecordSessionWidgetPtr;
-typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
-//typedef boost::shared_ptr<class BronchoscopyRegistration> BronchoscopyRegistrationPtr;
-typedef std::map<QString, ToolPtr> ToolMap;
-typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
+typedef boost::shared_ptr<class SeansVesselRegistrationDebugger> SeansVesselRegistrationDebuggerPtr;
 
-/**
+/** GUI for ICP control - no logic.
  *
- * \brief Register a point cloud to a surface
- *
- * \date 2015-09-06
+ * \ingroup org_custusx_registration_method_vessel
+ * \date 2015-09-13
  * \author Christian Askeland
  */
-class RMPCWidget: public RegistrationBaseWidget
+class ICPWidget : public BaseWidget
 {
 	Q_OBJECT
-
 public:
-	RMPCWidget(RegServices services, QWidget *parent);
-	virtual ~RMPCWidget()
-	{
-	}
-	virtual QString defaultWhatsThis() const;
-private slots:
-	void registerSlot();
+	ICPWidget(QWidget* parent);
+	virtual ~ICPWidget();
+
+	void setSettings(std::vector<PropertyPtr> properties);
+	void enableRegistration(bool on);
+	void setRMS(double val);
+
+signals:
+	void requestRegister();
+
 private:
-	RegServices mServices;
-	QVBoxLayout* mVerticalLayout;
-	QLabel* mLabel;
-	XmlOptionFile mOptions;
-	MeshPtr mMesh;
+	QWidget* createOptionsWidget();
 
-	QVBoxLayout* createVBoxInGroupBox(QVBoxLayout* parent, QString header);
-
-	StringPropertyBasePtr mFixedImage;
-	StringPropertySelectMeshPtr mSurfaceSelector;
+	std::vector<PropertyPtr> mProperties;
 	QPushButton* mRegisterButton;
-	RecordTrackingWidget* mRecordTrackingWidget;
-//	PCICPWidget* mICPWidget;
+	QAction* mVesselRegOptionsButton;
+	QWidget* mOptionsWidget;
+	QGroupBox* mVesselRegOptionsWidget;
+	QLineEdit* mMetricValue;
 };
 
-} //namespace cx
 
-#endif // CXRMPCWIDGET_H
+
+}//namespace cx
+
+#endif // CXICPWIDGET_H
