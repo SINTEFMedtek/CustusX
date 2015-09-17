@@ -38,6 +38,8 @@ private:
 
     double pickDouble(QByteArray data, int pos);
     int pickInteger(QByteArray data, int pos);
+
+    Eigen::RowVectorXd getJointPositionsRT(QByteArray data);
 };
 
 

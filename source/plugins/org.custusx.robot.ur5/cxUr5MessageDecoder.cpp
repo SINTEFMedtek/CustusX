@@ -44,12 +44,9 @@ Ur5State Ur5MessageDecoder::setRTState(QByteArray data)
 
     state.timeSinceStart = pickDouble(data,0);
 
-    state.jointPosition(0) = pickDouble(data,31*sizeof(double));
-    state.jointPosition(1) = pickDouble(data,32*sizeof(double));
-    state.jointPosition(2) = pickDouble(data,33*sizeof(double));
-    state.jointPosition(3) = pickDouble(data,34*sizeof(double));
-    state.jointPosition(4) = pickDouble(data,35*sizeof(double));
-    state.jointPosition(5) = pickDouble(data,36*sizeof(double));
+    state.jointPosition = getJointPositionsRT(data);
+
+
 
     state.jointVelocity(0) = pickDouble(data,37*sizeof(double));
     state.jointVelocity(1) = pickDouble(data,38*sizeof(double));
@@ -74,6 +71,16 @@ Ur5State Ur5MessageDecoder::setRTState(QByteArray data)
 
     state.updated = true;
     return state;
+}
+
+Eigen::RowVectorXd Ur5MessageDecoder::getJointPositionsRT(QByteArray data)
+{
+    Eigen::RowVectorXd jp(6);
+    for(int i=0;i<6;i++)
+    {
+        jp(i) = pickDouble(data,(31+i)*sizeof(double));
+    }
+    return jp;
 }
 
 double Ur5MessageDecoder::pickDouble(QByteArray data, int index)
