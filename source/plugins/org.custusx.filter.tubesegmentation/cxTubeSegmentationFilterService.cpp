@@ -69,6 +69,12 @@ TubeSegmentationFilter::TubeSegmentationFilter(ctkPluginContext *pluginContext) 
 
     // Test
     fast::BinaryThresholding::pointer fastObject = fast::BinaryThresholding::New();
+    fastObject->setLowerThreshold(1);
+    try {
+    fastObject->update();
+    } catch(fast::Exception &e) {
+        std::cout << "FAST: Works!" << std::endl;
+    }
 }
 
 QString TubeSegmentationFilter::getName() const

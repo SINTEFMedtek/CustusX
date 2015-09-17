@@ -523,12 +523,17 @@ class FAST(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git@github.com:smistad/FAST')
     def update(self):
-        self._getBuilder().gitCheckoutBranch('master', submodules=True)
+        self._getBuilder().gitCheckoutBranch('development', submodules=True)
         #self._getBuilder().gitCheckout('43614718f7667dd5013af9300fcc63ae30bf244c')
     def configure(self):
         builder = self._getBuilder()
-        cmakeOptions = '-DMODULE_OpenIGTLink=OFF -DBUILD_EXAMPLES=OFF -DBUILD_TESTS=OFF'
-        builder.configureCMake(cmakeOptions)
+        add = builder.addCMakeOption
+        add('MODULE_OpenIGTLink:BOOL', False)
+        add('BUILD_EXAMPLES:BOOL', False)
+        add('BUILD_TESTS:BOOL', False)
+        add('VTK_INTEROP:BOOL', True)
+        add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
+        builder.configureCMake()
     def findPackagePath(self):
         return self.buildPath()
         
