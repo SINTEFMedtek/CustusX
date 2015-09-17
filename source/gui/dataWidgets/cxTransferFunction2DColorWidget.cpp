@@ -75,7 +75,7 @@ TransferFunction2DColorWidget::TransferFunction2DColorWidget(PatientModelService
 
 void TransferFunction2DColorWidget::activeImageChangedSlot()
 {
-  ImagePtr image = mPatientModelService->getActiveImage();
+  ImagePtr image = mPatientModelService->getActiveData<Image>();
   ImageTFDataPtr tf;
   if (image)
     tf = image->getLookupTable2D();

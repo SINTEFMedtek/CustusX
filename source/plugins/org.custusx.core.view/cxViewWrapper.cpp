@@ -120,7 +120,7 @@ void DataViewPropertiesInteractor::dataActionSlot()
 		mGroupData->setProperties(uid, props);
 
 		if (image)
-			mServices->getPatientService()->setActiveImage(image);
+			mServices->getPatientService()->setActiveData(image);
 	}
 	else
 	{

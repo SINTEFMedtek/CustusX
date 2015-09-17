@@ -242,7 +242,7 @@ void InteractiveCropper::resetBoundingBox()
 void InteractiveCropper::imageChangedSlot()
 {
 //	mImage = mPatientModelService->getActiveImage();
-	mImage = mBackend->patientModelService->getActiveImage();
+	mImage = mBackend->patientModelService->getActiveData<Image>();
 
 	this->imageCropChangedSlot();
 	emit changed();

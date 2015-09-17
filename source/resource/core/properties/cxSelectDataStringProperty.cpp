@@ -52,9 +52,9 @@ StringPropertyActiveImage::StringPropertyActiveImage(PatientModelServicePtr pati
 bool StringPropertyActiveImage::setValue(const QString& value)
 {
   ImagePtr newImage = mPatientModelService->getData<Image>(value);
-  if (newImage==mPatientModelService->getActiveImage())
+  if (newImage==mPatientModelService->getActiveData<Image>())
 	return false;
-  mPatientModelService->setActiveImage(newImage);
+  mPatientModelService->setActiveData(newImage);
   return true;
 }
 

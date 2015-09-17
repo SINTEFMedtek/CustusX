@@ -30,57 +30,64 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "catch.hpp"
-#include <QString>
-#include "cxPatientStorage.h"
 #include "cxtestSessionStorageTestFixture.h"
 
-namespace
-{
-
-struct TestVariable
-{
-	QString mValue;
-	TestVariable() : mValue("Empty") {}
-	QString get() {	return mValue;}
-	void set(QString val) {	mValue = val;}
-};
-}
+#include "cxDataLocations.h"
+#include "cxLogicManager.h"
+#include "cxSessionStorageServiceImpl.h"
 
 namespace cxtest
 {
 
-TEST_CASE("PatientStorage save/load works", "[unit][resource][core]")
+SessionStorageTestFixture::SessionStorageTestFixture() :
+	mSessionsCreated(false)
 {
-	cxtest::SessionStorageTestFixture storageFixture;
+	cx::DataLocations::setTestMode();
+	cx::LogicManager::initialize();
+	ctkPluginContext* context = cx::LogicManager::getInstance()->getPluginContext();
+	mSessionStorageService = cx::SessionStorageServicePtr (new cx::SessionStorageServiceImpl(context));
 
-	TestVariable variableToTest;
-	CHECK(variableToTest.get() == "Empty");
-
-    QString testString1("first");
-    QString testString2("second");
-    variableToTest.set(testString1);
-
-	storageFixture.createSessions();
-
-	CHECK(variableToTest.get() == testString1);
-
-	cx::PatientStorage storage(storageFixture.mSessionStorageService, "TestNode");
-	storage.storeVariable("testVariable", boost::bind(&TestVariable::get, &variableToTest), boost::bind(&TestVariable::set, &variableToTest, _1));
-
-	storageFixture.loadSession1();
-	CHECK(variableToTest.get() == testString1);
-	storageFixture.saveSession();
-
-	storageFixture.loadSession2();
-	CHECK(variableToTest.get() == testString1);
-	variableToTest.set(testString2);
-	storageFixture.saveSession();
-
-    CHECK(variableToTest.get() == testString2);
-	CHECK_FALSE(variableToTest.get() == testString1);
-
-	storageFixture.loadSession1();
-	CHECK(variableToTest.get() == testString1);
+	mSession1 = QString("/temp/TestPatient1.cx3");
+	mSession2 = QString("/temp/TestPatient2.cx3");
 }
-}//cxtest
+
+SessionStorageTestFixture::~SessionStorageTestFixture()
+{
+	cx::LogicManager::shutdown();
+}
+
+void SessionStorageTestFixture::createSessions()
+{
+	if(!mSessionsCreated)
+	{
+		this->loadSession2();
+		this->loadSession1();
+	}
+}
+
+void SessionStorageTestFixture::saveSession()
+{
+	mSessionStorageService->save();
+}
+
+void SessionStorageTestFixture::loadSession1()
+{
+	mSessionStorageService->load(cx::DataLocations::getTestDataPath() + mSession1);
+}
+
+void SessionStorageTestFixture::loadSession2()
+{
+	mSessionStorageService->load(cx::DataLocations::getTestDataPath() + mSession2);
+}
+void SessionStorageTestFixture::reloadSession1()
+{
+	this->loadSession2();
+	this->loadSession1();
+}
+void SessionStorageTestFixture::reloadSession2()
+{
+	this->loadSession1();
+	this->loadSession2();
+}
+
+} //cxtest

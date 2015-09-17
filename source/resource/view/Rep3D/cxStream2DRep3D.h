@@ -30,73 +30,48 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXTRACKEDSTREAM_H
-#define CXTRACKEDSTREAM_H
+#ifndef CX2DSTREAMREP3D_H
+#define CX2DSTREAMREP3D_H
 
-#include "cxImage.h"
+#include "cxResourceVisualizationExport.h"
+#include "cxRepImpl.h"
+#include "cxForwardDeclarations.h"
 
 namespace cx
 {
+typedef boost::shared_ptr<class VideoSourceGraphics> VideoSourceGraphicsPtr;
 
-/** \brief A data set for video streams (2D/3D).
+/** \brief Display a stream as 2D in 3D
  *
- * Allowing video stream as a data type
+ * The stream can be either 2D or 3D
  *
- * \ingroup cx_resource_core_data
+ * \ingroup cx_resource_view
+ * \ingroup cx_resource_view_rep3D
  *
- * \date jan 28, 2015
+ * \date Sep 10, 2015
  * \author Ole Vegard Solberg, SINTEF
  */
-class cxResource_EXPORT TrackedStream : public Data
+class cxResourceVisualization_EXPORT Stream2DRep3D : public RepImpl
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	static TrackedStreamPtr create(const QString& uid, const QString& name = "");
-	TrackedStream(const QString &uid, const QString &name, const ToolPtr &probe, const VideoSourcePtr &videoSource);
-
-	void setProbeTool(const ToolPtr &probeTool);
-	ToolPtr getProbeTool();
-	void setVideoSource(const VideoSourcePtr &videoSource);
-	VideoSourcePtr getVideoSource();
-	void setSpaceProvider(SpaceProviderPtr spaceProvider);
-
-	virtual void addXml(QDomNode& dataNode);
-	virtual void parseXml(QDomNode& dataNode);
-
-	virtual DoubleBoundingBox3D boundingBox() const;
-	virtual bool load(QString path) { return true;} ///< Not used
-	virtual void save(const QString& basePath) {} ///< Not used
-
-	virtual QString getType() const;
-	static QString getTypeName();
-
-	ImagePtr getChangingImage();
-	bool is3D();
-	bool is2D();
-	bool hasVideo() const;
-	bool isStreaming() const;
-signals:
-	void streamChanged(QString uid);
-	void newTool(ToolPtr tool);
-	void newVideoSource(VideoSourcePtr videoSource);
-	void newFrame();
-	void streaming(bool on); ///< emitted when streaming started/stopped
-	void newPosition();
-
+    static Stream2DRep3DPtr New(SpaceProviderPtr spaceProvider, const QString& uid = "");
+    virtual QString getType() const;
+	void setTrackedStream(TrackedStreamPtr trackedStream);
+	bool isReady();
+protected:
+	virtual void addRepActorsToViewRenderer(ViewPtr view);
+	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
 private slots:
-	void newFrameSlot();
-	void toolTransformAndTimestamp(Transform3D prMt, double timestamp);
+	void trackedStreamChanged();
 private:
-	ToolPtr mProbeTool;
-	VideoSourcePtr mVideoSource;
-	ImagePtr mImage;
+    Stream2DRep3D(SpaceProviderPtr spaceProvider);
 
-	SpaceProviderPtr mSpaceProvider;
-	Transform3D get_tMu();
+    SpaceProviderPtr mSpaceProvider;
+    VideoSourceGraphicsPtr mRTStream;
+    TrackedStreamPtr mTrackedStream;
 };
-
-typedef boost::shared_ptr<TrackedStream> TrackedStreamPtr;
 
 } //cx
 
-#endif // CXTRACKEDSTREAM_H
+#endif // CX2DSTREAMREP3D_H

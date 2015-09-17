@@ -17,6 +17,7 @@ if(BUILD_TESTING)
             cxtestVideoGraphics.cpp
             cxtestVisualRendering.cpp
             cxtestImageEnveloper.cpp
+            cxtestStream2DRep3D.cpp
     )
 
     qt5_wrap_cpp(CXTEST_SOURCES_TO_MOC ${CXTEST_SOURCES_TO_MOC})

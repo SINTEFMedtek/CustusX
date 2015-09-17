@@ -30,73 +30,40 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXTRACKEDSTREAM_H
-#define CXTRACKEDSTREAM_H
+#ifndef CXTESTSESSIONSTORAGETESTFIXTURE_H
+#define CXTESTSESSIONSTORAGETESTFIXTURE_H
 
-#include "cxImage.h"
+#include <QString>
+#include <boost/shared_ptr.hpp>
 
 namespace cx
 {
+typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
+}
 
-/** \brief A data set for video streams (2D/3D).
- *
- * Allowing video stream as a data type
- *
- * \ingroup cx_resource_core_data
- *
- * \date jan 28, 2015
- * \author Ole Vegard Solberg, SINTEF
- */
-class cxResource_EXPORT TrackedStream : public Data
+namespace cxtest
 {
-	Q_OBJECT
+
+class SessionStorageTestFixture
+{
 public:
-	static TrackedStreamPtr create(const QString& uid, const QString& name = "");
-	TrackedStream(const QString &uid, const QString &name, const ToolPtr &probe, const VideoSourcePtr &videoSource);
+	SessionStorageTestFixture();
 
-	void setProbeTool(const ToolPtr &probeTool);
-	ToolPtr getProbeTool();
-	void setVideoSource(const VideoSourcePtr &videoSource);
-	VideoSourcePtr getVideoSource();
-	void setSpaceProvider(SpaceProviderPtr spaceProvider);
+	~SessionStorageTestFixture();
 
-	virtual void addXml(QDomNode& dataNode);
-	virtual void parseXml(QDomNode& dataNode);
+	void createSessions();
+	void loadSession1();
+	void loadSession2();
+	void reloadSession1();
+	void reloadSession2();
+	void saveSession();
 
-	virtual DoubleBoundingBox3D boundingBox() const;
-	virtual bool load(QString path) { return true;} ///< Not used
-	virtual void save(const QString& basePath) {} ///< Not used
-
-	virtual QString getType() const;
-	static QString getTypeName();
-
-	ImagePtr getChangingImage();
-	bool is3D();
-	bool is2D();
-	bool hasVideo() const;
-	bool isStreaming() const;
-signals:
-	void streamChanged(QString uid);
-	void newTool(ToolPtr tool);
-	void newVideoSource(VideoSourcePtr videoSource);
-	void newFrame();
-	void streaming(bool on); ///< emitted when streaming started/stopped
-	void newPosition();
-
-private slots:
-	void newFrameSlot();
-	void toolTransformAndTimestamp(Transform3D prMt, double timestamp);
+	cx::SessionStorageServicePtr mSessionStorageService;
 private:
-	ToolPtr mProbeTool;
-	VideoSourcePtr mVideoSource;
-	ImagePtr mImage;
-
-	SpaceProviderPtr mSpaceProvider;
-	Transform3D get_tMu();
+	bool mSessionsCreated;
+	QString mSession1;
+	QString mSession2;
 };
 
-typedef boost::shared_ptr<TrackedStream> TrackedStreamPtr;
-
-} //cx
-
-#endif // CXTRACKEDSTREAM_H
+} //cxtest
+#endif // CXTESTSESSIONSTORAGETESTFIXTURE_H

@@ -102,7 +102,7 @@ void LandmarkPatientRegistrationWidget::hideEvent(QHideEvent* event)
 void LandmarkPatientRegistrationWidget::performRegistration()
 {
 	if (!mServices.registrationService->getFixedData())
-		mServices.registrationService->setFixedData(mServices.patientModelService->getActiveImage());
+		mServices.registrationService->setFixedData(mServices.patientModelService->getActiveData<Image>());
 
 	if (mServices.patientModelService->getPatientLandmarks()->getLandmarks().size() < 3)
 		return;

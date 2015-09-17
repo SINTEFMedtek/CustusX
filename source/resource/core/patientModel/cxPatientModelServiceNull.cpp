@@ -80,14 +80,7 @@ void PatientModelServiceNull::setLandmarkName(QString uid, QString name)
 	printWarning();;
 }
 
-
-ImagePtr PatientModelServiceNull::getActiveImage() const
-{
-	printWarning();
-	return ImagePtr();
-}
-
-void PatientModelServiceNull::setActiveImage(ImagePtr activeImage)
+void PatientModelServiceNull::setActiveData(DataPtr activeData)
 {
 	printWarning();
 }
@@ -101,6 +94,12 @@ bool PatientModelServiceNull::isNull()
 {
 	printWarning();
 	return true;
+}
+
+QList<DataPtr> PatientModelServiceNull::getActiveDataList() const
+{
+	printWarning();
+	return QList<DataPtr>();
 }
 
 std::map<QString, VideoSourcePtr> PatientModelServiceNull::getStreams() const

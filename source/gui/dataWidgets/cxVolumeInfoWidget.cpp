@@ -81,7 +81,7 @@ void VolumeInfoWidget::addWidgets()
 
 void VolumeInfoWidget::updateSlot()
 {
-	ImagePtr image = mPatientModelService->getActiveImage();
+	ImagePtr image = mPatientModelService->getActiveData<Image>();
 	mParentFrameAdapter->setData(image);
 	mNameAdapter->setData(image);
 	mUidAdapter->setData(image);

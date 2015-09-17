@@ -185,14 +185,14 @@ bool PatientModelImplService::isNull()
 	return false;
 }
 
-ImagePtr PatientModelImplService::getActiveImage() const
+QList<DataPtr> PatientModelImplService::getActiveDataList() const
 {
-	return dataService()->getActiveImage();
+	return dataService()->getActiveDataList();
 }
 
-void PatientModelImplService::setActiveImage(ImagePtr activeImage)
+void PatientModelImplService::setActiveData(DataPtr activeData)
 {
-	dataService()->setActiveImage(activeImage);
+	dataService()->setActiveData(activeData);
 }
 
 CLINICAL_VIEW PatientModelImplService::getClinicalApplication() const
@@ -271,8 +271,7 @@ RegistrationHistoryPtr PatientModelImplService::get_rMpr_History() const
 	return this->dataService()->get_rMpr_History();
 }
 
-
-DataManagerImplPtr PatientModelImplService::dataService() const
+DataServicePtr PatientModelImplService::dataService() const
 {
 	return mDataService;
 }
@@ -301,10 +300,6 @@ void PatientModelImplService::videoSourceAdded(VideoSourcePtr source)
 
 	ToolPtr tool = this->getProbeTool(source->getUid());
 	if(!tool)
-		return;
-
-	//Temporary code turning off generation of TrackedStream for video sources that are not 3D
-	if (!source || !source->getVtkImageData() || source->getVtkImageData()->GetDataDimension() != 3)
 		return;
 
 	QString uid = source->getUid() + tool->getUid();

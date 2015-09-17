@@ -299,9 +299,9 @@ void MainWindowActions::importDataSlot()
 
 void MainWindowActions::deleteDataSlot()
 {
-	if (!patientService()->getActiveImage())
+	if (!patientService()->getActiveData<Image>())
 		return;
-	QString text = QString("Do you really want to delete data %1?").arg(patientService()->getActiveImage()->getName());
+	QString text = QString("Do you really want to delete data %1?").arg(patientService()->getActiveData<Image>()->getName());
 	if (QMessageBox::question(this->parentWidget(), "Data delete", text, QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel))!=QMessageBox::Ok)
 		return;
 	mServices->patientModelService->removeData(patientService()->getActiveImageUid());

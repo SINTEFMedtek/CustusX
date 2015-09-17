@@ -116,6 +116,11 @@ void PatientModelServiceProxy::onServiceRemoved(PatientModelService *service)
 	emit patientChanged();
 }
 
+QList<DataPtr> PatientModelServiceProxy::getActiveDataList() const
+{
+	return mPatientModelService->getActiveDataList();
+}
+
 void PatientModelServiceProxy::insertData(DataPtr data)
 {
 	mPatientModelService->insertData(data);
@@ -151,14 +156,9 @@ void PatientModelServiceProxy::setLandmarkName(QString uid, QString name)
 	mPatientModelService->setLandmarkName(uid, name);
 }
 
-ImagePtr PatientModelServiceProxy::getActiveImage() const
+void PatientModelServiceProxy::setActiveData(DataPtr activeData)
 {
-	return mPatientModelService->getActiveImage();
-}
-
-void PatientModelServiceProxy::setActiveImage(ImagePtr activeImage)
-{
-	mPatientModelService->setActiveImage(activeImage);
+	mPatientModelService->setActiveData(activeData);
 }
 
 void PatientModelServiceProxy::autoSave()

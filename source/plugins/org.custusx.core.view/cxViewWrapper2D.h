@@ -138,7 +138,10 @@ private:
     void createAndAddMultiSliceRep();
     void removeAndResetMultiSliceRep();
 
-    Texture3DSlicerRepPtr mMultiSliceRep;
+	std::vector<ImagePtr> getImagesToView();
+	bool isAnyplane();
+
+	Texture3DSlicerRepPtr mMultiSliceRep;
 	DataRepContainerPtr mDataRepContainer;
 
 	GeometricRep2DPtr mPickerGlyphRep;
@@ -160,6 +163,7 @@ private:
 	Vector3D mClickPos;
 
 	QActionGroup* mOrientationActionGroup;
+
 };
 typedef boost::shared_ptr<ViewWrapper2D> ViewWrapper2DPtr;
 

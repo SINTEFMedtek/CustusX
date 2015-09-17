@@ -70,7 +70,7 @@ TransferFunction2DOpacityWidget::TransferFunction2DOpacityWidget(PatientModelSer
 
 void TransferFunction2DOpacityWidget::activeImageChangedSlot()
 {
-  ImagePtr image = mPatientModelService->getActiveImage();
+  ImagePtr image = mPatientModelService->getActiveData<Image>();
   ImageTFDataPtr tf;
   if (image)
     tf = image->getLookupTable2D();
