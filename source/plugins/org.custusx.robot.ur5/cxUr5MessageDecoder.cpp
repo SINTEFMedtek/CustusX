@@ -43,33 +43,14 @@ Ur5State Ur5MessageDecoder::setRTState(QByteArray data)
     Ur5State state;
 
     state.timeSinceStart = pickDouble(data,0);
-
     state.jointPosition = getJointPositionsRT(data);
-
-
-
-    state.jointVelocity(0) = pickDouble(data,37*sizeof(double));
-    state.jointVelocity(1) = pickDouble(data,38*sizeof(double));
-    state.jointVelocity(2) = pickDouble(data,39*sizeof(double));
-    state.jointVelocity(3) = pickDouble(data,40*sizeof(double));
-    state.jointVelocity(4) = pickDouble(data,41*sizeof(double));
-    state.jointVelocity(5) = pickDouble(data,42*sizeof(double));
-
-    state.tcpAxis(0) = pickDouble(data,55*sizeof(double));
-    state.tcpAxis(1) = pickDouble(data,56*sizeof(double));
-    state.tcpAxis(2) = pickDouble(data,57*sizeof(double));
-    state.tcpAngles(0) = pickDouble(data,58*sizeof(double));
-    state.tcpAngles(1) = pickDouble(data,59*sizeof(double));
-    state.tcpAngles(2) = pickDouble(data,60*sizeof(double));
-
-    state.force(0) = pickDouble(data,67*sizeof(double));
-    state.force(1) = pickDouble(data,68*sizeof(double));
-    state.force(2) = pickDouble(data,69*sizeof(double));
-    state.torque(0) = pickDouble(data,70*sizeof(double));
-    state.torque(1) = pickDouble(data,71*sizeof(double));
-    state.torque(2) = pickDouble(data,72*sizeof(double));
-
+    state.jointVelocity = getJointVelocitiesRT(data);
+    state.tcpAxis = getTCPAxisRT(data);
+    state.tcpAngles = getTCPAnglesRT(data);
+    state.force = getForceRT(data);
+    state.torque = getTorqueRT(data);
     state.updated = true;
+
     return state;
 }
 
