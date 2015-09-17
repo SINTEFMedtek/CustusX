@@ -43,6 +43,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackingService.h"
 #include "cxDataFactory.h"
 
+#include "cxLogicManager.h"
+#include "cxSelectDataStringProperty.h"
+#include "cxPatientModelServiceProxy.h"
+
 
 namespace {
 
@@ -59,6 +63,19 @@ struct testDataStructures
 		mesh1 = cx::Mesh::create("meshUid1","meshName1");
 	}
 };
+
+cx::PatientModelServicePtr initPatientModelService()
+{
+	cx::LogicManager::initialize();
+	ctkPluginContext *pluginContext = cx::logicManager()->getPluginContext();
+	cx::PatientModelServicePtr patientModelService = cx::PatientModelServiceProxy::create(pluginContext);
+	return patientModelService;
+}
+
+void shutdownPatientModelService()
+{
+	cx::LogicManager::shutdown();
+}
 
 } // namespace
 
@@ -238,4 +255,20 @@ TEST_CASE("Active Data: Call set multiple times", "[unit]")
 	dataManager->setActiveData(testData.image1);
 	dataManager->setActiveData(testData.image1);
 	REQUIRE(dataManager->getActiveData() == testData.image1);
+}
+
+TEST_CASE("StringPropertyActiveData works", "[unit][resource][core]")
+{
+	testDataStructures testData;
+	cx::PatientModelServicePtr patientModelService = initPatientModelService();
+
+	patientModelService->insertData(testData.image1);
+
+	cx::StringPropertyActiveDataPtr activeDataProperty = cx::StringPropertyActiveData::New(patientModelService, "image");
+	REQUIRE(activeDataProperty);
+
+	activeDataProperty->setValue(testData.image1->getUid());
+	REQUIRE(activeDataProperty->getValue() == testData.image1->getUid());
+
+	shutdownPatientModelService();
 }

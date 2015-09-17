@@ -36,6 +36,29 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
+typedef boost::shared_ptr<class StringPropertyActiveData> StringPropertyActiveDataPtr;
+/** Property that connects to the current active data.
+ * Example: Active data: [DataName]
+ * where active data is the value
+ * and DataName is taken from the valuerange
+ */
+class cxResource_EXPORT StringPropertyActiveData : public SelectDataStringPropertyBase
+{
+	Q_OBJECT
+public:
+	static StringPropertyActiveDataPtr New(PatientModelServicePtr patientModelService, QString typeRegexp = ".*")
+	{
+		return StringPropertyActiveDataPtr(new StringPropertyActiveData(patientModelService, typeRegexp));
+	}
+	virtual ~StringPropertyActiveData() {}
+
+public: // basic methods
+	virtual bool setValue(const QString& value);
+	virtual QString getValue() const;
+protected:
+	StringPropertyActiveData(PatientModelServicePtr patientModelService, QString typeRegexp = ".*");
+};
+
 typedef boost::shared_ptr<class StringPropertyActiveImage> StringPropertyActiveImagePtr;
 /** Property that connects to the current active image.
  * Example: Active image: [DataName]
@@ -44,15 +67,18 @@ typedef boost::shared_ptr<class StringPropertyActiveImage> StringPropertyActiveI
  */
 class cxResource_EXPORT StringPropertyActiveImage : public SelectDataStringPropertyBase
 {
-  Q_OBJECT
+	Q_OBJECT
 public:
-	static StringPropertyActiveImagePtr New(PatientModelServicePtr patientModelService) { return StringPropertyActiveImagePtr(new StringPropertyActiveImage(patientModelService)); }
+	static StringPropertyActiveImagePtr New(PatientModelServicePtr patientModelService)
+	{
+		return StringPropertyActiveImagePtr(new StringPropertyActiveImage(patientModelService));
+	}
 	StringPropertyActiveImage(PatientModelServicePtr patientModelService);
-  virtual ~StringPropertyActiveImage() {}
+	virtual ~StringPropertyActiveImage() {}
 
 public: // basic methods
-  virtual bool setValue(const QString& value);
-  virtual QString getValue() const;
+	virtual bool setValue(const QString& value);
+	virtual QString getValue() const;
 };
 
 
