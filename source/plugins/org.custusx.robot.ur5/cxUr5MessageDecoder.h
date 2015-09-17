@@ -40,6 +40,11 @@ private:
     int pickInteger(QByteArray data, int pos);
 
     Eigen::RowVectorXd getJointPositionsRT(QByteArray data);
+    Eigen::RowVectorXd getJointVelocitiesRT(QByteArray data);
+    Vector3D getForceRT(QByteArray data);
+    Vector3D getTorqueRT(QByteArray data);
+    Vector3D getTCPAxisRT(QByteArray data);
+    Vector3D getTCPAnglesRT(QByteArray data);
 };
 
 

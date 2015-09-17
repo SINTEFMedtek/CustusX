@@ -83,6 +83,56 @@ Eigen::RowVectorXd Ur5MessageDecoder::getJointPositionsRT(QByteArray data)
     return jp;
 }
 
+Eigen::RowVectorXd Ur5MessageDecoder::getJointVelocitiesRT(QByteArray data)
+{
+    Eigen::RowVectorXd jv(6);
+    for(int i=0;i<6;i++)
+    {
+        jv(i) = pickDouble(data,(37+i)*sizeof(double));
+    }
+    return jv;
+}
+
+Vector3D Ur5MessageDecoder::getTCPAxisRT(QByteArray data)
+{
+    Vector3D tcpAxis;
+    for(int i=0;i<3;i++)
+    {
+        tcpAxis(i) = pickDouble(data,(55+i)*sizeof(double));
+    }
+    return tcpAxis;
+}
+
+Vector3D Ur5MessageDecoder::getTCPAnglesRT(QByteArray data)
+{
+    Vector3D tcpAngles;
+    for(int i=0;i<3;i++)
+    {
+        tcpAngles(i) = pickDouble(data,(58+i)*sizeof(double));
+    }
+    return tcpAngles;
+}
+
+Vector3D Ur5MessageDecoder::getForceRT(QByteArray data)
+{
+    Vector3D force;
+    for(int i=0;i<3;i++)
+    {
+        force(i) = pickDouble(data,(67+i)*sizeof(double));
+    }
+    return force;
+}
+
+Vector3D Ur5MessageDecoder::getTorqueRT(QByteArray data)
+{
+    Vector3D torque;
+    for(int i=0;i<3;i++)
+    {
+        torque(i) = pickDouble(data,(70+i)*sizeof(double));
+    }
+    return torque;
+}
+
 double Ur5MessageDecoder::pickDouble(QByteArray data, int index)
 {
     double a;
