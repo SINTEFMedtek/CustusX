@@ -100,30 +100,12 @@ public:
 
 	// extended Data interface
 	template <class DATA>
-	std::map<QString, boost::shared_ptr<DATA> > getDataOfType() const
-	{
-		std::map<QString, DataPtr> data = this->getData();
-		std::map<QString, boost::shared_ptr<DATA> > retval;
-		for (std::map<QString, DataPtr>::const_iterator i=data.begin(); i!=data.end(); ++i)
-		{
-			boost::shared_ptr<DATA> val = boost::dynamic_pointer_cast<DATA>(i->second);
-			if (val)
-				retval[val->getUid()] = val;
-		}
-		return retval;
-	}
+	std::map<QString, boost::shared_ptr<DATA> > getDataOfType() const;
 	DataPtr getData(const QString& uid) const;
 	template <class DATA>
-	boost::shared_ptr<DATA> getData(const QString& uid) const
-	{
-		return boost::dynamic_pointer_cast<DATA>(this->getData(uid));
-	}
+	boost::shared_ptr<DATA> getData(const QString& uid) const;
 	template<class DATA>
-	boost::shared_ptr<DATA> createSpecificData(QString uid, QString name="")
-	{
-		DataPtr retval = this->createData(DATA::getTypeName(), uid, name);
-		return boost::dynamic_pointer_cast<DATA>(retval);
-	}
+	boost::shared_ptr<DATA> createSpecificData(QString uid, QString name="");
 
 	QString getActiveImageUid();
 
@@ -135,11 +117,12 @@ public:
 	virtual RegistrationHistoryPtr get_rMpr_History() const = 0;
 	// active image
 	virtual ImagePtr getActiveImage() const = 0; ///< used for system state
+	virtual QList<DataPtr> getActiveDataList() const = 0;
+	DataPtr getActiveData() const;
+	template <class DATA>
+	boost::shared_ptr<DATA> getActiveData() const;
 	virtual void setActiveData(DataPtr activeData) = 0; ///< used for system state
-	virtual void setActiveData(QString uid)
-	{
-		this->setActiveData(this->getData(uid));
-	}
+	virtual void setActiveData(QString uid);
 
 	// landmarks
 	virtual LandmarksPtr getPatientLandmarks() const = 0; ///< landmark defined in patient space
@@ -188,6 +171,48 @@ signals:
 	void patientChanged();
 	void videoAddedToTrackedStream();
 };
+
+
+template <class DATA>
+std::map<QString, boost::shared_ptr<DATA> > PatientModelService::getDataOfType() const
+{
+	std::map<QString, DataPtr> data = this->getData();
+	std::map<QString, boost::shared_ptr<DATA> > retval;
+	for (std::map<QString, DataPtr>::const_iterator i=data.begin(); i!=data.end(); ++i)
+	{
+		boost::shared_ptr<DATA> val = boost::dynamic_pointer_cast<DATA>(i->second);
+		if (val)
+			retval[val->getUid()] = val;
+	}
+	return retval;
+}
+
+template <class DATA>
+boost::shared_ptr<DATA> PatientModelService::getData(const QString& uid) const
+{
+	return boost::dynamic_pointer_cast<DATA>(this->getData(uid));
+}
+
+template<class DATA>
+boost::shared_ptr<DATA> PatientModelService::createSpecificData(QString uid, QString name)
+{
+	DataPtr retval = this->createData(DATA::getTypeName(), uid, name);
+	return boost::dynamic_pointer_cast<DATA>(retval);
+}
+
+template <class DATA>
+boost::shared_ptr<DATA> PatientModelService::getActiveData() const
+{
+	boost::shared_ptr<DATA> retval;
+	QList<DataPtr> activeDataList = this->getActiveDataList();
+	for(int i = activeDataList.size() - 1; i >= 0; --i)
+	{
+		retval = boost::dynamic_pointer_cast<DATA>(activeDataList.at(i));
+		if(retval)
+			return retval;
+	}
+	return retval;
+}
 
 } // namespace cx
 Q_DECLARE_INTERFACE(cx::PatientModelService, PatientModelService_iid)

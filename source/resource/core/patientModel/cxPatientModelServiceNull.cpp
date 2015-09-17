@@ -103,6 +103,12 @@ bool PatientModelServiceNull::isNull()
 	return true;
 }
 
+QList<DataPtr> PatientModelServiceNull::getActiveDataList() const
+{
+	printWarning();
+	return QList<DataPtr>();
+}
+
 std::map<QString, VideoSourcePtr> PatientModelServiceNull::getStreams() const
 {
 	printWarning();

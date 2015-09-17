@@ -63,6 +63,7 @@ public:
 
 	virtual ImagePtr getActiveImage() const;
 	virtual void setActiveData(DataPtr activeData);
+	virtual QList<DataPtr> getActiveDataList() const;
 
 	virtual CLINICAL_VIEW getClinicalApplication() const;
 	virtual void setClinicalApplication(CLINICAL_VIEW application);

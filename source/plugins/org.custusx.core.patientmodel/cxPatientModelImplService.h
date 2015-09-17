@@ -75,6 +75,7 @@ public:
 
 	virtual ImagePtr getActiveImage() const; ///< used for system state
 	virtual void setActiveData(DataPtr activeData); ///< used for system state
+	virtual QList<DataPtr> getActiveDataList() const;
 
 	virtual CLINICAL_VIEW getClinicalApplication() const;
 	virtual void setClinicalApplication(CLINICAL_VIEW application);
@@ -106,7 +107,7 @@ private:
 	void createInterconnectedDataAndSpace();
 	void shutdownInterconnectedDataAndSpace();
 
-	DataManagerImplPtr dataService() const;
+	virtual DataServicePtr dataService() const;
 	PatientDataPtr patientData() const;
 
 	DataManagerImplPtr mDataService;

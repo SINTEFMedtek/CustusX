@@ -74,6 +74,18 @@ Transform3D PatientModelService::get_rMpr() const
 	return this->get_rMpr_History()->getCurrentRegistration().mValue;
 }
 
+DataPtr PatientModelService::getActiveData() const
+{
+	if(this->getActiveDataList().isEmpty())
+		return DataPtr();
+	return this->getActiveDataList().last();
+}
+
+void PatientModelService::setActiveData(QString uid)
+{
+	this->setActiveData(this->getData(uid));
+}
+
 void PatientModelService::updateRegistration_rMpr(const QDateTime& oldTime, const RegistrationTransform& newTransform, bool continuous)
 {
 	//Block signals from RegistrationHistory when running continuous registration,

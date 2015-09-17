@@ -185,6 +185,11 @@ bool PatientModelImplService::isNull()
 	return false;
 }
 
+QList<DataPtr> PatientModelImplService::getActiveDataList() const
+{
+	return dataService()->getActiveDataList();
+}
+
 ImagePtr PatientModelImplService::getActiveImage() const
 {
 	return dataService()->getActiveImage();
@@ -271,8 +276,7 @@ RegistrationHistoryPtr PatientModelImplService::get_rMpr_History() const
 	return this->dataService()->get_rMpr_History();
 }
 
-
-DataManagerImplPtr PatientModelImplService::dataService() const
+DataServicePtr PatientModelImplService::dataService() const
 {
 	return mDataService;
 }

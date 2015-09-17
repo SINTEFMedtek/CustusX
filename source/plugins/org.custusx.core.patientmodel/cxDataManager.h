@@ -115,6 +115,8 @@ public:
 		return retval;
 	}
 	virtual void setActiveData(DataPtr activeData) = 0; ///< used for system state
+	virtual QList<DataPtr> getActiveDataList() const = 0;
+
 	virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const;
 
 	virtual QString addLandmark() = 0;
@@ -154,7 +156,6 @@ signals:
 protected:
 	DataManager();
 	virtual ~DataManager();
-	virtual QList<DataPtr> getActiveDataList() const = 0;
 };
 
 } // namespace cx
