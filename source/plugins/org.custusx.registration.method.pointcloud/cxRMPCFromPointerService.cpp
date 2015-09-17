@@ -31,6 +31,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxRMPCFromPointerService.h"
 
-cxRMPCFromPointerService::cxRMPCFromPointerService()
+#include "cxRMPCFromPointerWidget.h"
+
+namespace cx
 {
+
+QWidget *RMPCFromPointerImageToPatientService::createWidget()
+{
+	RMPCFromPointerWidget* widget = new RMPCFromPointerWidget(mServices, NULL);
+	return widget;
 }
+
+} /* namespace cx */

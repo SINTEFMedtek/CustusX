@@ -64,7 +64,6 @@ void MeshInView::show(vtkPolyDataPtr polyData)
 			view->addRep(mRep);
 	}
 
-	CX_LOG_CHANNEL_DEBUG("CA") << "MeshInView::Show";
 	mRep->getMesh()->setVtkPolyData(polyData);
 }
 
