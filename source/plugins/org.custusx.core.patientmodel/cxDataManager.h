@@ -99,7 +99,6 @@ public:
 	virtual void setCenter(const Vector3D& center) = 0;
 
 	// state information
-	virtual ImagePtr getActiveImage() const = 0; ///< used for system state
 	virtual DataPtr getActiveData() const = 0;
 	template <class DATA>
 	boost::shared_ptr<DATA> getActiveData() const

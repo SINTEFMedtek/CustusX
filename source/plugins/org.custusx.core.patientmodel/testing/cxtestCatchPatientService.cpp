@@ -80,11 +80,11 @@ TEST_CASE("Active Image: set/get", "[unit]")
 
 	dataManager->setActiveData(testData.image1);
 
-	REQUIRE(dataManager->getActiveImage() == testData.image1);
-	REQUIRE_FALSE(dataManager->getActiveImage() == testData.image2);
+	REQUIRE(dataManager->getActiveData<cx::Image>() == testData.image1);
+	REQUIRE_FALSE(dataManager->getActiveData<cx::Image>() == testData.image2);
 
 	dataManager->setActiveData(testData.mesh1);
-	REQUIRE(dataManager->getActiveImage() == testData.image1);
+	REQUIRE(dataManager->getActiveData<cx::Image>() == testData.image1);
 }
 
 
@@ -130,25 +130,26 @@ TEST_CASE("Active Image: save/load in patient file", "[unit]")
 	dataManager->loadData(data1);
 
 
-	CHECK_FALSE(dataManager->getActiveImage() == data1);
+	CHECK_FALSE(dataManager->getActiveData() == data1);
 
 	dataManager->setActiveData(testData.image2);
 	dataManager->setActiveData(data1);
 	dataManager->setActiveData(testData.mesh1);
-	CHECK(dataManager->getActiveImage() == data1);
+//	cx::ImagePtr image = dataManager->cx::DataManager::getActiveData<cx::Image>();
+	CHECK(dataManager->cx::DataManager::getActiveData<cx::Image>() == data1);
 	storageFixture.saveSession();
 
 
 	storageFixture.loadSession2();
-	CHECK_FALSE(dataManager->getActiveImage() == data1);
+	CHECK_FALSE(dataManager->cx::DataManager::getActiveData<cx::Image>() == data1);
 	dataManager->setActiveData(testData.image2);
 	storageFixture.saveSession();
 
-	CHECK(dataManager->getActiveImage() == testData.image2);
+	CHECK(dataManager->cx::DataManager::getActiveData<cx::Image>() == testData.image2);
 
 	storageFixture.reloadSession1();
-	REQUIRE(dataManager->getActiveImage());
-	CHECK(dataManager->getActiveImage()->getUid() == data1->getUid());
+	REQUIRE(dataManager->cx::DataManager::getActiveData<cx::Image>());
+	CHECK(dataManager->cx::DataManager::getActiveData<cx::Image>()->getUid() == data1->getUid());
 }
 
 TEST_CASE("Active Data: set/get", "[unit]")

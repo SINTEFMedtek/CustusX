@@ -96,7 +96,6 @@ public:
 	virtual void setCenter(const Vector3D& center);
 
 	// state information
-	virtual ImagePtr getActiveImage() const; ///< used for system state
 	virtual DataPtr getActiveData() const;
 	virtual void setActiveData(DataPtr activeData);
 

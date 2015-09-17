@@ -164,11 +164,6 @@ void DataManagerImpl::setCenter(const Vector3D& center)
 	emit centerChanged();
 }
 
-ImagePtr DataManagerImpl::getActiveImage() const
-{
-	return DataManager::getActiveData<Image>();
-}
-
 DataPtr DataManagerImpl::getActiveData() const
 {
 	if(mActiveData.isEmpty())

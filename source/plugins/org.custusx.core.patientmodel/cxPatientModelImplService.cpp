@@ -192,7 +192,7 @@ QList<DataPtr> PatientModelImplService::getActiveDataList() const
 
 ImagePtr PatientModelImplService::getActiveImage() const
 {
-	return dataService()->getActiveImage();
+	return PatientModelService::getActiveData<Image>();
 }
 
 void PatientModelImplService::setActiveData(DataPtr activeData)
