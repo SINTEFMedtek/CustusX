@@ -182,8 +182,8 @@ class CppBuilder:
     def addCMakeOption(self, key, value):
         self.cmakeOptions[key] = value
 
-    def configureCMake(self, options=''):        
-        self._addDefaultCmakeOptions()                
+    def configureCMake(self, options=''): 
+        self._addDefaultCmakeOptions()
         generator = self.controlData.getCMakeGenerator()
         optionsFromAssembly = self._assembleOptions()
         self._printOptions()        
@@ -206,7 +206,7 @@ class CppBuilder:
         add('CMAKE_ECLIPSE_GENERATE_LINKED_RESOURCES', False)            
     
     def _assembleOptions(self):
-        return " ".join(["-D%s=%s"%(key,val) for key,val in self.cmakeOptions.iteritems()])
+        return " ".join(['-D%s="%s"'%(key,val) for key,val in self.cmakeOptions.iteritems()])
     
     def _printOptions(self):
         options = "".join(["    %s = %s\n"%(key,val) for key,val in self.cmakeOptions.iteritems()])
