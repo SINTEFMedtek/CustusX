@@ -42,10 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSpaceProviderImpl.h"
 #include "cxTrackingService.h"
 #include "cxDataFactory.h"
-
-#include "cxLogicManager.h"
 #include "cxSelectDataStringProperty.h"
-#include "cxPatientModelServiceProxy.h"
 
 
 namespace {
@@ -63,19 +60,6 @@ struct testDataStructures
 		mesh1 = cx::Mesh::create("meshUid1","meshName1");
 	}
 };
-
-cx::PatientModelServicePtr initPatientModelService()
-{
-	cx::LogicManager::initialize();
-	ctkPluginContext *pluginContext = cx::logicManager()->getPluginContext();
-	cx::PatientModelServicePtr patientModelService = cx::PatientModelServiceProxy::create(pluginContext);
-	return patientModelService;
-}
-
-void shutdownPatientModelService()
-{
-	cx::LogicManager::shutdown();
-}
 
 } // namespace
 
@@ -125,48 +109,39 @@ TEST_CASE("Active Image: activeImageChanged signal", "[unit]")
 
 TEST_CASE("Active Image: save/load in patient file", "[unit]")
 {
-	cx::DataManagerImplPtr dataManager = cx::DataManagerImpl::create();
 	testDataStructures testData;
 	cxtest::SessionStorageTestFixture storageFixture;
-
-	cx::SpaceProviderPtr space(new cx::SpaceProviderImpl(cx::TrackingService::getNullObject(), cx::PatientModelService::getNullObject()));
-	cx::DataFactoryPtr factory(new cx::DataFactory(cx::PatientModelService::getNullObject(), space));
-
-	dataManager->setDataFactory(factory);
-
-	cx::PatientDataPtr patientData = cx::PatientDataPtr(new cx::PatientData(dataManager, storageFixture.mSessionStorageService));
+	cx::PatientModelServicePtr patientModelService = storageFixture.mPatientModelService;
 
 	storageFixture.createSessions();
 	storageFixture.loadSession1();
 
 	QString filename = cx::DataLocations::getExistingTestData("testing/TubeSegmentationFramework", "Default.mhd");
 	QString info;
-	cx::DataPtr data1 = patientData->importData(filename, info);
+	cx::DataPtr data1 = patientModelService->importData(filename, info);
 	REQUIRE(data1);
 
-	dataManager->loadData(data1);
+	patientModelService->insertData(data1);
 
+	CHECK_FALSE(patientModelService->getActiveData() == data1);
 
-	CHECK_FALSE(dataManager->getActiveData() == data1);
-
-	dataManager->setActiveData(testData.image2);
-	dataManager->setActiveData(data1);
-	dataManager->setActiveData(testData.mesh1);
-//	cx::ImagePtr image = dataManager->cx::DataManager::getActiveData<cx::Image>();
-	CHECK(dataManager->cx::DataManager::getActiveData<cx::Image>() == data1);
+	patientModelService->setActiveData(testData.image2);
+	patientModelService->setActiveData(data1);
+	patientModelService->setActiveData(testData.mesh1);
+	CHECK(patientModelService->getActiveData<cx::Image>() == data1);
 	storageFixture.saveSession();
 
 
 	storageFixture.loadSession2();
-	CHECK_FALSE(dataManager->cx::DataManager::getActiveData<cx::Image>() == data1);
-	dataManager->setActiveData(testData.image2);
+	CHECK_FALSE(patientModelService->getActiveData<cx::Image>() == data1);
+	patientModelService->setActiveData(testData.image2);
 	storageFixture.saveSession();
 
-	CHECK(dataManager->cx::DataManager::getActiveData<cx::Image>() == testData.image2);
+	CHECK(patientModelService->getActiveData<cx::Image>() == testData.image2);
 
 	storageFixture.reloadSession1();
-	REQUIRE(dataManager->cx::DataManager::getActiveData<cx::Image>());
-	CHECK(dataManager->cx::DataManager::getActiveData<cx::Image>()->getUid() == data1->getUid());
+	REQUIRE(patientModelService->getActiveData<cx::Image>());
+	CHECK(patientModelService->getActiveData<cx::Image>()->getUid() == data1->getUid());
 }
 
 TEST_CASE("Active Data: set/get", "[unit]")
@@ -260,7 +235,8 @@ TEST_CASE("Active Data: Call set multiple times", "[unit]")
 TEST_CASE("StringPropertyActiveData works", "[unit][resource][core]")
 {
 	testDataStructures testData;
-	cx::PatientModelServicePtr patientModelService = initPatientModelService();
+	cxtest::SessionStorageTestFixture storageFixture;
+	cx::PatientModelServicePtr patientModelService = storageFixture.mPatientModelService;
 
 	patientModelService->insertData(testData.image1);
 
@@ -269,6 +245,4 @@ TEST_CASE("StringPropertyActiveData works", "[unit][resource][core]")
 
 	activeDataProperty->setValue(testData.image1->getUid());
 	REQUIRE(activeDataProperty->getValue() == testData.image1->getUid());
-
-	shutdownPatientModelService();
 }
