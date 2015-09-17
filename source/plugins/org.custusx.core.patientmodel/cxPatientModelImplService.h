@@ -73,7 +73,6 @@ public:
 	virtual Transform3D get_rMpr() const; ///< get the patient registration transform
 	virtual RegistrationHistoryPtr get_rMpr_History() const;
 
-	virtual ImagePtr getActiveImage() const; ///< used for system state
 	virtual void setActiveData(DataPtr activeData); ///< used for system state
 	virtual QList<DataPtr> getActiveDataList() const;
 

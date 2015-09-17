@@ -116,7 +116,6 @@ public:
 	virtual Transform3D get_rMpr() const;
 	virtual RegistrationHistoryPtr get_rMpr_History() const = 0;
 	// active image
-	virtual ImagePtr getActiveImage() const = 0; ///< used for system state
 	virtual QList<DataPtr> getActiveDataList() const = 0;
 	DataPtr getActiveData() const;
 	template <class DATA>

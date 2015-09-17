@@ -80,13 +80,6 @@ void PatientModelServiceNull::setLandmarkName(QString uid, QString name)
 	printWarning();;
 }
 
-
-ImagePtr PatientModelServiceNull::getActiveImage() const
-{
-	printWarning();
-	return ImagePtr();
-}
-
 void PatientModelServiceNull::setActiveData(DataPtr activeData)
 {
 	printWarning();

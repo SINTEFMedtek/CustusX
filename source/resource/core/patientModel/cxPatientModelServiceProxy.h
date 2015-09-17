@@ -73,7 +73,6 @@ public:
 
 	virtual RegistrationHistoryPtr get_rMpr_History() const;
 
-	virtual ImagePtr getActiveImage() const;
 	virtual void setActiveData(DataPtr activeData);
 	virtual QList<DataPtr> getActiveDataList() const;
 

@@ -156,11 +156,6 @@ void PatientModelServiceProxy::setLandmarkName(QString uid, QString name)
 	mPatientModelService->setLandmarkName(uid, name);
 }
 
-ImagePtr PatientModelServiceProxy::getActiveImage() const
-{
-	return mPatientModelService->getActiveImage();
-}
-
 void PatientModelServiceProxy::setActiveData(DataPtr activeData)
 {
 	mPatientModelService->setActiveData(activeData);

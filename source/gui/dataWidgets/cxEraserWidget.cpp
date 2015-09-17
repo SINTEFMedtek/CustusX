@@ -110,7 +110,7 @@ EraserWidget::EraserWidget(PatientModelServicePtr patientModelService, Visualiza
 	mSphereSize = new SpinBoxAndSliderGroupWidget(this, mSphereSizeAdapter);
 	layout->addWidget(mSphereSize);
 
-	ImagePtr image = mPatientModelService->getActiveImage();
+	ImagePtr image = mPatientModelService->getActiveData<Image>();
 	int eraseValue = 0;
 	if(image)
 		eraseValue = image->getMin();
@@ -129,7 +129,7 @@ EraserWidget::EraserWidget(PatientModelServicePtr patientModelService, Visualiza
 
 void EraserWidget::activeImageChangedSlot()
 {
-	ImagePtr image = mPatientModelService->getActiveImage();
+	ImagePtr image = mPatientModelService->getActiveData<Image>();
 	if(!image)
 		return;
 
@@ -181,7 +181,7 @@ void EraserWidget::continousRemoveSlot()
 
 void EraserWidget::duplicateSlot()
 {
-	ImagePtr original = mPatientModelService->getActiveImage();
+	ImagePtr original = mPatientModelService->getActiveData<Image>();
 
 	ImagePtr duplicate = duplicateImage(mPatientModelService, original);
 	mPatientModelService->insertData(duplicate);
@@ -211,14 +211,14 @@ void EraserWidget::sphereSizeChangedSlot()
  */
 void EraserWidget::saveSlot()
 {
-	mPatientModelService->insertData(mPatientModelService->getActiveImage());
+	mPatientModelService->insertData(mPatientModelService->getActiveData<Image>());
 }
 
 
 template <class TYPE>
 void EraserWidget::eraseVolume(TYPE* volumePointer)
 {
-	ImagePtr image = mPatientModelService->getActiveImage();
+	ImagePtr image = mPatientModelService->getActiveData<Image>();
 	vtkImageDataPtr img = image->getBaseVtkImageData();
 
 
@@ -285,7 +285,7 @@ void EraserWidget::removeSlot()
 	if (!mSphere)
 		return;
 
-	ImagePtr image = mPatientModelService->getActiveImage();
+	ImagePtr image = mPatientModelService->getActiveData<Image>();
 	vtkImageDataPtr img = image->getBaseVtkImageData();
 
 	int vtkScalarType = img->GetScalarType();

@@ -275,7 +275,7 @@ Transform3D SpaceProviderImpl::get_rMd(QString uid)
 	DataPtr data = mDataManager->getData(uid);
 
 	if (!data && uid=="active")
-		data = mDataManager->getActiveImage();
+		data = mDataManager->getActiveData<Image>();
 
 	if(!data)
 	{
@@ -293,7 +293,7 @@ Transform3D SpaceProviderImpl::get_rMdv(QString uid)
 	DataPtr data = mDataManager->getData(uid);
 
 	if (!data && uid=="active")
-		data = mDataManager->getActiveImage();
+		data = mDataManager->getActiveData<Image>();
 
 	if(!data)
 	{

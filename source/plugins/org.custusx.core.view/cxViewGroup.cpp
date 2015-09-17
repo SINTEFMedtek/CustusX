@@ -130,7 +130,7 @@ void ViewGroup::mouseClickInViewGroupSlot()
 {
 	std::vector<ImagePtr> images = mViewGroupData->getImages(DataViewProperties::createFull());
 	if (!images.empty())
-		if (!std::count(images.begin(), images.end(), mBackend->getPatientService()->getActiveImage()))
+		if (!std::count(images.begin(), images.end(), mBackend->getPatientService()->getActiveData<Image>()))
 			mBackend->getPatientService()->setActiveData(images.front()->getUid());
 
 	View* view = static_cast<View*>(this->sender());

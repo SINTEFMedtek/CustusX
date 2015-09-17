@@ -200,7 +200,7 @@ void PatientLandMarksWidget::setTargetLandmark(QString uid, Vector3D p_target)
 void PatientLandMarksWidget::performRegistration()
 {
 	if (!mServices.registrationService->getFixedData())
-		mServices.registrationService->setFixedData(mServices.patientModelService->getActiveImage());
+		mServices.registrationService->setFixedData(mServices.patientModelService->getActiveData<Image>());
 
 	if (mServices.patientModelService->getPatientLandmarks()->getLandmarks().size() < 3)
 		return;

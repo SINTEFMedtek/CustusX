@@ -57,7 +57,7 @@ void FastImageRegistrationWidget::performRegistration()
 	DataPtr fixedData = mServices.registrationService->getFixedData();
 	if(!fixedData)
 	{
-		fixedData = mServices.patientModelService->getActiveImage();
+		fixedData = mServices.patientModelService->getActiveData<Image>();
 		mServices.registrationService->setFixedData(fixedData);
 	}
 

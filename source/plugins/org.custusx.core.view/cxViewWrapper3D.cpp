@@ -733,7 +733,7 @@ void ViewWrapper3D::activeImageChangedSlot(QString uid)
 {
 	if(!mGroupData)
 		return;
-	ImagePtr image = mServices->getPatientService()->getActiveImage();
+	ImagePtr image = mServices->getPatientService()->getActiveData<Image>();
 
 	// only show landmarks belonging to image visible in this view:
 	std::vector<ImagePtr> images = mGroupData->getImages(DataViewProperties::create3D());

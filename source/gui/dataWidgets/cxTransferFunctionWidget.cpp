@@ -215,7 +215,7 @@ TransferFunction3DWidget::TransferFunction3DWidget(PatientModelServicePtr patien
 
 void TransferFunction3DWidget::activeImageChangedSlot()
 {
-  ImagePtr activeImage = mPatientModelService->getActiveImage();
+  ImagePtr activeImage = mPatientModelService->getActiveData<Image>();
   this->imageChangedSlot(activeImage);
 }
 
@@ -274,7 +274,7 @@ TransferFunction2DWidget::TransferFunction2DWidget(PatientModelServicePtr patien
 
 void TransferFunction2DWidget::activeImageChangedSlot()
 {
-  ImagePtr image = mPatientModelService->getActiveImage();
+  ImagePtr image = mPatientModelService->getActiveData<Image>();
   ImageTFDataPtr tf;
   if (image)
     tf = image->getLookupTable2D();

@@ -89,7 +89,7 @@ DoublePropertyActiveImageBase::DoublePropertyActiveImageBase(PatientModelService
 }
 void DoublePropertyActiveImageBase::activeImageChanged()
 {
-  mImage = mPatientModelService->getActiveImage();
+  mImage = mPatientModelService->getActiveData<Image>();
   emit changed();
 }
 double DoublePropertyActiveImageBase::getValue() const

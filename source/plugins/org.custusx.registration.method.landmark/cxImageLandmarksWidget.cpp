@@ -217,7 +217,7 @@ void ImageLandmarksWidget::showEvent(QShowEvent* event)
 
 	if(!mUseRegistrationFixedPropertyInsteadOfActiveImage)
 	{
-		ImagePtr image = mServices.patientModelService->getActiveImage();
+		ImagePtr image = mServices.patientModelService->getActiveData<Image>();
 		if (image)
 			mCurrentProperty->setValue(image->getUid());
 	}
