@@ -17,6 +17,9 @@ set(PLUGIN_SRCS
   widgets/cxUr5Initialize.cpp
   widgets/cxUr5ManualMove.cpp
   widgets/cxUr5PlannedMove.cpp
+
+  trackingSystemRobot/cxTrackingSystemRobotService.cpp
+  trackingSystemRobot/cxRobotTool.cpp
 )
 
 # Files which should be processed by Qts moc
@@ -35,6 +38,9 @@ set(PLUGIN_MOC_SRCS
   widgets/cxUr5Initialize.h
   widgets/cxUr5ManualMove.h
   widgets/cxUr5PlannedMove.h
+
+  trackingSystemRobot/cxTrackingSystemRobotService.h
+  trackingSystemRobot/cxRobotTool.h
 )
 
 # Qt Designer files which should be processed by Qts uic
