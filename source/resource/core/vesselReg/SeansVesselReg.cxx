@@ -245,8 +245,6 @@ SeansVesselReg::ContextPtr SeansVesselReg::createContext(DataPtr source, DataPtr
 	if (!source || !target)
 		return SeansVesselReg::ContextPtr();
 
-	CX_LOG_CHANNEL_DEBUG("CA") << "  SeansVesselReg::createContext start";
-
 	vtkPolyDataPtr targetPolyData = this->convertToPolyData(target);
 	vtkPolyDataPtr inputSourcePolyData = this->convertToPolyData(source);
 //	targetPolyData->Update();
@@ -306,8 +304,6 @@ SeansVesselReg::ContextPtr SeansVesselReg::createContext(DataPtr source, DataPtr
 
 	context->mLtsRatio = mt_ltsRatio; ///< local copy of the lts ratio, can be changed for current iteration.
 
-	CX_LOG_CHANNEL_DEBUG("CA") << "  SeansVesselReg::createContext stop";
-
 	return context;
 }
 
@@ -319,8 +315,6 @@ SeansVesselReg::ContextPtr SeansVesselReg::createContext(DataPtr source, DataPtr
  */
 void SeansVesselReg::computeDistances(ContextPtr context)
 {
-	CX_LOG_CHANNEL_DEBUG("CA") << "  SeansVesselReg::computeDistances start";
-
 	if (!context)
 		context = mLastRun;
 	if (!context)
@@ -378,8 +372,6 @@ void SeansVesselReg::computeDistances(ContextPtr context)
 	sort->Sort(residuals, IdList);
 	context->mSortedSourcePoints = this->createSortedPoints(IdList, context->mSourcePoints, nb_points);
 	context->mSortedTargetPoints = this->createSortedPoints(IdList, closestPoint, nb_points);
-
-	CX_LOG_CHANNEL_DEBUG("CA") << "  SeansVesselReg::computeDistances stop";
 }
 
 /**\brief Register the source points to the target point in a single ste.

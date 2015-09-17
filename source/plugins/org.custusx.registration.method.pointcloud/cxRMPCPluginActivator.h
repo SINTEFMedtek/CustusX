@@ -72,7 +72,8 @@ public:
   void stop(ctkPluginContext* context);
 
 private:
-  RegisteredServicePtr mRegistration;
+  RegisteredServicePtr mPointCloud;
+  RegisteredServicePtr mPointerToSurface;
 };
 
 } // namespace cx

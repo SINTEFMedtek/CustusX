@@ -32,10 +32,102 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXICPALGORITHM_H
 #define CXICPALGORITHM_H
 
-class cxICPAlgorithm
+#include "cxRegistrationBaseWidget.h"
+#include "cxStringPropertyBase.h"
+
+class QSpinBox;
+class QPushButton;
+class QLabel;
+#include "cxBoolProperty.h"
+#include "cxDoubleProperty.h"
+#include "cxTransform3D.h"
+
+namespace cx
 {
+class ICPWidget;
+typedef boost::shared_ptr<class SeansVesselRegistrationDebugger> SeansVesselRegistrationDebuggerPtr;
+typedef boost::shared_ptr<class GeometricRep> GeometricRepPtr;
+typedef boost::shared_ptr<class SeansVesselReg> SeansVesselRegPtr;
+typedef boost::shared_ptr<class MeshInView> MeshInViewPtr;
+typedef boost::shared_ptr<class SpaceListener> SpaceListenerPtr;
+
+
+
+
+/**
+ *
+ * Base class for Widgets implementing registration using the ICP method.
+ * Subclass to perform e.g. I2I or I2P registration.
+ *
+ * Note: mICPWidget will be created and initialized, but not added to a
+ * widget. Must be done by subclass.
+ *
+ * \ingroup org_custusx_registration_method_vessel
+ * \date Feb 21, 2011
+ * \author Janne Beate Bakeng, SINTEF
+ */
+class ICPRegistrationBaseWidget : public RegistrationBaseWidget
+{
+	Q_OBJECT
 public:
-	cxICPAlgorithm();
+	ICPRegistrationBaseWidget(RegServices services, QWidget* parent, QString uid, QString name);
+	virtual ~ICPRegistrationBaseWidget();
+
+protected:
+	/**
+	 * subclass must call mRegistrator->initialize() with proper input
+	 */
+	virtual void initializeRegistrator() = 0;
+	/**
+	 * called when widget is shown. Subclass must update data if needed.
+	 */
+	virtual void onShown() = 0;
+	/**
+	 * subclass must set the given registration delta into the registration manager.
+	 */
+	virtual void applyRegistration(Transform3D delta) = 0;
+
+	/**
+	 * subclass must implement to setup widget
+	 */
+	virtual void setup() = 0;
+
+	virtual double getDefaultAutoLTS() const { return true; }
+
+protected:
+	virtual void prePaintEvent();
+
+private slots:
+	void obscuredSlot(bool obscured);
+	void registerSlot();
+
+protected:
+	DoublePropertyPtr mLTSRatio;
+	DoublePropertyPtr mMargin;
+	BoolPropertyPtr mLinear;
+	BoolPropertyPtr mAutoLTS;
+	BoolPropertyPtr mDisplayProgress;
+	BoolPropertyPtr mOneStep;
+
+	ICPWidget* mICPWidget;
+	XmlOptionFile mOptions;
+	SeansVesselRegPtr mRegistrator;
+	boost::shared_ptr<class WidgetObscuredListener> mObscuredListener;
+
+	void onSpacesChanged();
+	void onSettingsChanged();
+
+private:
+	MeshInViewPtr mMeshInView;
+
+	void initializeProperties();
+	std::vector<PropertyPtr> getAllProperties();
+	void updateDifferenceLines();
+	void onDisplayProgressChanged();
+	void initialize();
 };
+
+
+}//namespace cx
 
 #endif // CXICPALGORITHM_H

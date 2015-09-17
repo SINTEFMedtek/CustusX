@@ -41,6 +41,8 @@ class QPushButton;
 class QLabel;
 #include "cxBoolProperty.h"
 #include "cxDoubleProperty.h"
+#include "cxICPAlgorithm.h"
+#include "cxTransform3D.h"
 
 namespace cx
 {
@@ -55,53 +57,33 @@ typedef boost::shared_ptr<class SpaceListener> SpaceListenerPtr;
 
 
 /**
- * SeansVesselRegistrationWidget.h
  *
- * \brief Widget for controlling input to
- * Seans Vessel Registration
+ * \brief I2I (image2image) ICP registration
  *
  * \ingroup org_custusx_registration_method_vessel
  * \date Feb 21, 2011
  * \author Janne Beate Bakeng, SINTEF
  */
-class SeansVesselRegistrationWidget : public RegistrationBaseWidget
+class SeansVesselRegistrationWidget : public ICPRegistrationBaseWidget
 {
 	Q_OBJECT
 public:
 	SeansVesselRegistrationWidget(RegServices services, QWidget* parent);
 	virtual ~SeansVesselRegistrationWidget();
 
-private slots:
-	void registerSlot();
-	void inputChanged();
-	void obscuredSlot(bool obscured);
+protected:
+	virtual void initializeRegistrator();
+	virtual void inputChanged();
+	virtual void applyRegistration(Transform3D delta);
+	virtual void onShown();
+	virtual void setup();
 
 private:
-	QPushButton* mRegisterButton;
-
-	DoublePropertyPtr mLTSRatio;
-	BoolPropertyPtr mLinear;
-	BoolPropertyPtr mAutoLTS;
-	BoolPropertyPtr mDisplayProgress;
-	BoolPropertyPtr mOneStep;
-
 	StringPropertyBasePtr mFixedImage;
 	StringPropertyBasePtr mMovingImage;
 
-	GeometricRepPtr m_lineRep;
-
-	ICPWidget* mICPWidget;
-	SeansVesselRegPtr mRegistrator;
-	MeshInViewPtr mMeshInView;
-	boost::shared_ptr<class WidgetObscuredListener> mObscuredListener;
-
 	SpaceListenerPtr mSpaceListenerMoving;
 	SpaceListenerPtr mSpaceListenerFixed;
-
-	void onSpacesChanged();
-	void updateDifferenceLines();
-	void onSettingsChanged();
-	void onDisplayProgressChanged();
 };
 
 
