@@ -73,8 +73,8 @@ public:
 	virtual Transform3D get_rMpr() const; ///< get the patient registration transform
 	virtual RegistrationHistoryPtr get_rMpr_History() const;
 
-	virtual ImagePtr getActiveImage() const; ///< used for system state
-	virtual void setActiveImage(ImagePtr activeImage); ///< used for system state
+	virtual void setActiveData(DataPtr activeData); ///< used for system state
+	virtual QList<DataPtr> getActiveDataList() const;
 
 	virtual CLINICAL_VIEW getClinicalApplication() const;
 	virtual void setClinicalApplication(CLINICAL_VIEW application);
@@ -106,7 +106,7 @@ private:
 	void createInterconnectedDataAndSpace();
 	void shutdownInterconnectedDataAndSpace();
 
-	DataManagerImplPtr dataService() const;
+	virtual DataServicePtr dataService() const;
 	PatientDataPtr patientData() const;
 
 	DataManagerImplPtr mDataService;

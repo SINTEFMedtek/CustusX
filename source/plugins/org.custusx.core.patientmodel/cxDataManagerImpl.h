@@ -96,8 +96,8 @@ public:
 	virtual void setCenter(const Vector3D& center);
 
 	// state information
-	virtual ImagePtr getActiveImage() const; ///< used for system state
-	virtual void setActiveImage(ImagePtr activeImage); ///< used for system state
+	virtual DataPtr getActiveData() const;
+	virtual void setActiveData(DataPtr activeData);
 
 	virtual QString addLandmark();
 	virtual void setLandmarkNames(std::vector<QString> names);
@@ -122,7 +122,6 @@ public:
 	virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const;
 
 	virtual void generateUidAndName(QString* _uid, QString* _name);
-
 protected:
 	DataManagerImpl();
 
@@ -134,7 +133,8 @@ protected:
 	void deleteFiles(DataPtr data, QString basePath);
 
 	//state
-	ImagePtr mActiveImage;
+	QList<DataPtr> mActiveData;
+	virtual QList<DataPtr> getActiveDataList() const;
 	DataPtr loadData(QDomElement node, QString rootPath);
 	int findUniqueUidNumber(QString uidBase) const;
 
@@ -152,8 +152,13 @@ private:
 	QDir findRelativePath(QDomElement node, QString rootPath);
 	QString findPath(QDomElement node);
 	QString findAbsolutePath(QDir relativePath, QString rootPath);
-public slots:
-	void vtkImageDataChangedSlot();
+	void emitSignals(DataPtr activeData);
+	QStringList getActiveDataStringList() const;
+	void loadActiveData(const QString activeDatas);
+	void removeActiveData(DataPtr dataToBeRemoved);
+	void emitActiveImageChanged();
+	void emitActiveDataChanged();
+	QString getChangedUid(DataPtr activeData);
 private slots:
 	void settingsChangedSlot(QString key);
 };

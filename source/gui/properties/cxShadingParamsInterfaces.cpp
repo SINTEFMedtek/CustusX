@@ -46,7 +46,7 @@ DoublePropertyShadingBase::DoublePropertyShadingBase(PatientModelServicePtr pati
 
 void DoublePropertyShadingBase::activeImageChanged()
 {  
-  mImage = mPatientModelService->getActiveImage();
+  mImage = mPatientModelService->getActiveData<Image>();
   emit changed();
 }
 

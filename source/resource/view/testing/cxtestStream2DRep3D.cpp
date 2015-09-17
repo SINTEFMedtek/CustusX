@@ -29,58 +29,34 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-
 #include "catch.hpp"
-#include <QString>
-#include "cxPatientStorage.h"
-#include "cxtestSessionStorageTestFixture.h"
+#include "cxtestDummyDataManager.h"
+#include "cxStream2DRep3D.h"
+#include "cxTrackedStream.h"
+#include "cxDummyTool.h"
+#include "cxTestVideoSource.h"
 
-namespace
+TEST_CASE("Stream2DRep3D init", "[unit][resource]")
 {
-
-struct TestVariable
-{
-	QString mValue;
-	TestVariable() : mValue("Empty") {}
-	QString get() {	return mValue;}
-	void set(QString val) {	mValue = val;}
-};
+	cxtest::TestServicesPtr mServices = cxtest::TestServices::create();
+	cx::Stream2DRep3DPtr rep = cx::Stream2DRep3D::New(mServices->spaceProvider());
+	REQUIRE(rep);
 }
 
-namespace cxtest
+TEST_CASE("Stream2DRep3D Set TrackedStream", "[unit][resource]")
 {
+	cxtest::TestServicesPtr mServices = cxtest::TestServices::create();
+	cx::Stream2DRep3DPtr rep = cx::Stream2DRep3D::New(mServices->spaceProvider());
+	REQUIRE(rep);
 
-TEST_CASE("PatientStorage save/load works", "[unit][resource][core]")
-{
-	cxtest::SessionStorageTestFixture storageFixture;
+	cx::TrackedStreamPtr trackedStream = cx::TrackedStream::create("streamUid", "streamName");
+	rep->setTrackedStream(trackedStream);
+	REQUIRE_FALSE(rep->isReady());
 
-	TestVariable variableToTest;
-	CHECK(variableToTest.get() == "Empty");
+	cx::DummyToolPtr dummyTool(new cx::DummyTool());
+	cx::TestVideoSourcePtr testVideoSource(new cx::TestVideoSource("TestVideoSourceUid", "TestVideoSource" , 80, 40));
 
-    QString testString1("first");
-    QString testString2("second");
-    variableToTest.set(testString1);
-
-	storageFixture.createSessions();
-
-	CHECK(variableToTest.get() == testString1);
-
-	cx::PatientStorage storage(storageFixture.mSessionStorageService, "TestNode");
-	storage.storeVariable("testVariable", boost::bind(&TestVariable::get, &variableToTest), boost::bind(&TestVariable::set, &variableToTest, _1));
-
-	storageFixture.loadSession1();
-	CHECK(variableToTest.get() == testString1);
-	storageFixture.saveSession();
-
-	storageFixture.loadSession2();
-	CHECK(variableToTest.get() == testString1);
-	variableToTest.set(testString2);
-	storageFixture.saveSession();
-
-    CHECK(variableToTest.get() == testString2);
-	CHECK_FALSE(variableToTest.get() == testString1);
-
-	storageFixture.loadSession1();
-	CHECK(variableToTest.get() == testString1);
+	trackedStream->setProbeTool(dummyTool);
+	trackedStream->setVideoSource(testVideoSource);
+	REQUIRE(rep->isReady());
 }
-}//cxtest

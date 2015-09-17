@@ -73,8 +73,8 @@ public:
 
 	virtual RegistrationHistoryPtr get_rMpr_History() const;
 
-	virtual ImagePtr getActiveImage() const;
-	virtual void setActiveImage(ImagePtr activeImage);
+	virtual void setActiveData(DataPtr activeData);
+	virtual QList<DataPtr> getActiveDataList() const;
 
 	virtual CLINICAL_VIEW getClinicalApplication() const;
 	virtual void setClinicalApplication(CLINICAL_VIEW application);

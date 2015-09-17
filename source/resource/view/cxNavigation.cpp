@@ -103,7 +103,7 @@ void Navigation::centerToDataInViewGroup(ViewGroupDataPtr group, DataViewPropert
 	if(visibleData.empty())
 		return;
 
-	ImagePtr activeImage = mServices->patientModelService->getActiveImage();
+	ImagePtr activeImage = mServices->patientModelService->getActiveData<Image>();
 	if(activeImage && std::count(visibleData.begin(), visibleData.end(), activeImage))
 		this->centerToData(activeImage);
 	else

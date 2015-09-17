@@ -75,6 +75,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxData.h"
 #include "cxMesh.h"
 #include "cxImage.h"
+#include "cxTrackedStream.h"
 #include "cxPointMetricRep2D.h"
 
 #include "cxViewFollower.h"
@@ -283,7 +284,7 @@ void ViewWrapper2D::createAndAddMultiSliceRep()
  */
 void ViewWrapper2D::recreateMultiSlicer()
 {
-    this->removeAndResetSliceRep();
+	this->removeAndResetSliceRep();
     this->removeAndResetMultiSliceRep();
 
     if (!this->useGPU2DRendering())
@@ -292,9 +293,28 @@ void ViewWrapper2D::recreateMultiSlicer()
     this->createAndAddMultiSliceRep();
 
     if (mGroupData)
-		mMultiSliceRep->setImages(mGroupData->getImages(DataViewProperties::createSlice2D()));
+		mMultiSliceRep->setImages(this->getImagesToView());
 
     this->viewportChanged();
+}
+
+std::vector<ImagePtr> ViewWrapper2D::getImagesToView()
+{
+	std::vector<ImagePtr> images = mGroupData->getImagesAndChanging3DImagesFromTrackedStreams(DataViewProperties::createSlice2D());
+
+	if(this->isAnyplane())
+	{
+		std::vector<TrackedStreamPtr> streams = mGroupData->getTracked2DStreams(DataViewProperties::createSlice2D());
+		for(int i = 0; i < streams.size(); ++i)
+			images.push_back(streams[i]->getChangingImage());
+	}
+	return images;
+}
+
+bool ViewWrapper2D::isAnyplane()
+{
+	PLANE_TYPE plane = mSliceProxy->getComputer().getPlaneType();
+	return plane == ptANYPLANE;
 }
 
 /**Call when viewport size or zoom has changed.
@@ -425,7 +445,7 @@ void ViewWrapper2D::imageAdded(ImagePtr image)
 
 ImagePtr ViewWrapper2D::getImageToDisplay()
 {
-    std::vector<ImagePtr> images = mGroupData->getImages(DataViewProperties::createSlice2D());
+	std::vector<ImagePtr> images = mGroupData->getImagesAndChanging3DImagesFromTrackedStreams(DataViewProperties::createSlice2D());
     ImagePtr image;
     if (!images.empty())
         image = images.back();  // always show last in vector
@@ -485,6 +505,7 @@ void ViewWrapper2D::updateItemsFromViewGroup(QString &text)
         this->removeAndResetMultiSliceRep();
     }
 }
+
 /**
  * @brief Set the text and font size of the annotation in the lower left corner of the view
  *

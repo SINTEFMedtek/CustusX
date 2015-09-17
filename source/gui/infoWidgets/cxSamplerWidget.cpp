@@ -135,7 +135,7 @@ void SamplerWidget::prePaintEvent()
 	int w=1;
 	QString coord = QString("%1, %2, %3").arg(p[0], w, 'f', 1).arg(p[1], w, 'f', 1).arg(p[2], w, 'f', 1);
 
-	ImagePtr image = patientService()->getActiveImage();
+	ImagePtr image = patientService()->getActiveData<Image>();
 	if (image)
 	{
 		Vector3D p = spaceProvider()->getActiveToolTipPoint(Space(csDATA_VOXEL,"active"), true);

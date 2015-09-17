@@ -191,6 +191,14 @@ bool TrackedStream::is3D()
 		return false;
 }
 
+bool TrackedStream::is2D()
+{
+	if(this->hasVideo() && ( mVideoSource->getVtkImageData()->GetDataDimension() == 2) )
+		return true;
+	else
+		return false;
+}
+
 bool TrackedStream::hasVideo() const
 {
 	if(!mVideoSource || !mVideoSource->getVtkImageData())

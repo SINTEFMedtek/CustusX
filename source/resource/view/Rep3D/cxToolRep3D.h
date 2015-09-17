@@ -134,7 +134,6 @@ private:
 	ProbeSectorPtr mProbeSector;
 	vtkPolyDataMapperPtr mProbeSectorPolyDataMapper;
 	vtkActorPtr mProbeSectorActor;
-	VideoSourceGraphicsPtr mRTStream;
 	QColor mTooltipPointColor;
 	QColor mOffsetPointColor;
 	QColor mOffsetLineColor;

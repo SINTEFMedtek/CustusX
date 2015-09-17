@@ -50,8 +50,9 @@ PatientModelServicePtr PatientModelService::getNullObject()
 
 DataPtr PatientModelService::getData(const QString& uid) const
 {
+	//TODO: Should active be remaned to activeImage
 	if (uid=="active")
-		return this->getActiveImage();
+		return this->getActiveData<Image>();
 
 	std::map<QString, DataPtr> all = this->getData();
 	std::map<QString, DataPtr>::const_iterator iter = all.find(uid);
@@ -62,7 +63,7 @@ DataPtr PatientModelService::getData(const QString& uid) const
 
 QString PatientModelService::getActiveImageUid()
 {
-	ImagePtr image = this->getActiveImage();
+	ImagePtr image = this->getActiveData<Image>();
 	if (image)
 		return image->getUid();
 	else
@@ -72,6 +73,18 @@ QString PatientModelService::getActiveImageUid()
 Transform3D PatientModelService::get_rMpr() const
 {
 	return this->get_rMpr_History()->getCurrentRegistration().mValue;
+}
+
+DataPtr PatientModelService::getActiveData() const
+{
+	if(this->getActiveDataList().isEmpty())
+		return DataPtr();
+	return this->getActiveDataList().last();
+}
+
+void PatientModelService::setActiveData(QString uid)
+{
+	this->setActiveData(this->getData(uid));
 }
 
 void PatientModelService::updateRegistration_rMpr(const QDateTime& oldTime, const RegistrationTransform& newTransform, bool continuous)

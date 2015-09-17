@@ -135,7 +135,7 @@ void CroppingWidget::cropperChangedSlot()
 
 ImagePtr CroppingWidget::cropClipButtonClickedSlot()
 {
-  ImagePtr image = mPatientModelService->getActiveImage();
+  ImagePtr image = mPatientModelService->getActiveData<Image>();
 
   ImagePtr retval = cropImage(patientService(), image);
   mPatientModelService->insertData(retval);

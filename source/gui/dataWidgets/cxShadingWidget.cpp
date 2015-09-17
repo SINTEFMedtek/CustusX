@@ -104,7 +104,7 @@ void ShadingWidget::shadingToggledSlot(bool val)
 
 void ShadingWidget::activeImageChangedSlot()
 {
-	ImagePtr activeImage = mPatientModelService->getActiveImage();
+	ImagePtr activeImage = mPatientModelService->getActiveData<Image>();
 	this->imageChangedSlot(activeImage);
 }
 

@@ -113,7 +113,7 @@ void DataManagerImpl::clear()
 {
 	mData.clear();
 	mCenter = Vector3D(0, 0, 0);
-	mActiveImage.reset();
+	mActiveData.clear();
 	mLandmarkProperties.clear();
 
 	m_rMpr_History->clear();
@@ -122,6 +122,7 @@ void DataManagerImpl::clear()
 	emit dataAddedOrRemoved();
 	emit centerChanged();
 	emit activeImageChanged("");
+	emit activeDataChanged("");
 	emit landmarkPropertiesChanged();
 }
 
@@ -163,23 +164,29 @@ void DataManagerImpl::setCenter(const Vector3D& center)
 	emit centerChanged();
 }
 
-ImagePtr DataManagerImpl::getActiveImage() const
+DataPtr DataManagerImpl::getActiveData() const
 {
-	return mActiveImage;
+	if(mActiveData.isEmpty())
+		return DataPtr();
+	return mActiveData.last();
 }
-void DataManagerImpl::setActiveImage(ImagePtr activeImage)
+
+void DataManagerImpl::setActiveData(DataPtr activeData)
 {
-	if (mActiveImage == activeImage)
+	if(getActiveData() == activeData)
 		return;
 
-	mActiveImage = activeImage;
+	mActiveData.removeAll(activeData);
+	mActiveData.append(activeData);
 
-	QString uid = "";
-	if (mActiveImage)
-		uid = mActiveImage->getUid();
+	this->emitSignals(activeData);
+}
 
-	emit activeImageChanged(uid);
-//	report("Active image set to " + qstring_cast(uid));
+void DataManagerImpl::emitSignals(DataPtr activeData)
+{
+	this->emitActiveDataChanged();
+	if(activeData && activeData->getType() == "image")
+		this->emitActiveImageChanged();
 }
 
 void DataManagerImpl::setLandmarkNames(std::vector<QString> names)
@@ -232,6 +239,8 @@ DataPtr DataManagerImpl::loadData(const QString& uid, const QString& path)
 		return mData[uid];
 
 	QString type = DataReaderWriter().findDataTypeFromFile(path);
+	if(!mDataFactory)
+		reportError("DataManagerImpl::loadData() Got no DataFactory");
 	DataPtr data = mDataFactory->create(type, uid);
 
 	if (!data)
@@ -321,8 +330,8 @@ void DataManagerImpl::addXml(QDomNode& parentNode)
 	m_rMpr_History->addXml(dataManagerNode);
 
 	QDomElement activeImageNode = doc.createElement("activeImageUid");
-	if (mActiveImage)
-		activeImageNode.appendChild(doc.createTextNode(mActiveImage->getUid()));
+	if(!mActiveData.isEmpty())
+		activeImageNode.appendChild(doc.createTextNode(this->getActiveDataStringList().join(" ")));
 	dataManagerNode.appendChild(activeImageNode);
 
 	QDomElement landmarkPropsNode = doc.createElement("landmarkprops");
@@ -406,12 +415,9 @@ void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString rootPath)
 	{
 		if (child.toElement().tagName() == "activeImageUid")
 		{
-			const QString activeImageString = child.toElement().text();
-			if (!activeImageString.isEmpty())
-			{
-				ImagePtr image = this->getImage(activeImageString);
-				this->setActiveImage(image);
-			}
+			const QString activeDataList = child.toElement().text();
+			if (!activeDataList.isEmpty())
+				this->loadActiveData(activeDataList);
 		}
 		//TODO add activeMesh
 		if (child.toElement().tagName() == "center")
@@ -502,13 +508,6 @@ QString DataManagerImpl::findAbsolutePath(QDir relativePath, QString rootPath)
 	return absolutePath;
 }
 
-void DataManagerImpl::vtkImageDataChangedSlot()
-{
-	QString uid = "";
-	if (mActiveImage)
-		uid = mActiveImage->getUid();
-}
-
 CLINICAL_VIEW DataManagerImpl::getClinicalApplication() const
 {
 	return mClinicalApplication;
@@ -588,16 +587,58 @@ void DataManagerImpl::generateUidAndName(QString* _uid, QString* _name)
 	}
 }
 
+void DataManagerImpl::emitActiveImageChanged()
+{
+	DataPtr activeImage = DataManager::getActiveData<Image>();
+	QString uid = getChangedUid(activeImage);
+	emit activeImageChanged(uid);
+}
+
+void DataManagerImpl::emitActiveDataChanged()
+{
+	DataPtr activeData = this->getActiveData();
+	QString uid = getChangedUid(activeData);
+	emit activeDataChanged(uid);
+}
+
+QString DataManagerImpl::getChangedUid(DataPtr activeData)
+{
+	QString uid = "";
+	if(activeData)
+		uid = activeData->getUid();
+	return uid;
+}
+
+void DataManagerImpl::removeActiveData(DataPtr dataToBeRemoved)
+{
+	if(!dataToBeRemoved)
+		reportWarning("DataManagerImpl::removeActiveData: No data");
+	if(!mActiveData.contains(dataToBeRemoved))
+		return;
+
+	bool resendActiveImage = false;
+	bool resendActiveData = false;
+	if (DataManager::getActiveData<Image>() == dataToBeRemoved)
+		resendActiveImage = true;
+	if(this->getActiveData() == dataToBeRemoved)
+		resendActiveData = true;
+
+	mActiveData.removeAll(dataToBeRemoved);
+
+	if(resendActiveImage)
+		emitActiveImageChanged();
+	if(resendActiveData)
+		emitActiveDataChanged();
+}
+
 void DataManagerImpl::removeData(const QString& uid, QString basePath)
 {
-	if (this->getActiveImage() && this->getActiveImage()->getUid() == uid)
-		this->setActiveImage(ImagePtr());
-
-	DataPtr data = this->getData(uid);
+	DataPtr dataToBeRemoved = this->getData(uid);
+	removeActiveData(dataToBeRemoved);
 
 	mData.erase(uid);
 
-	this->deleteFiles(data, basePath);
+	this->deleteFiles(dataToBeRemoved, basePath);
 
 	emit dataAddedOrRemoved(); // this should alert everybody interested in the data as a collection.
 	report("Removed data [" + uid + "].");
@@ -610,11 +651,10 @@ void DataManagerImpl::deleteFiles(DataPtr data, QString basePath)
 	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
 	QStringList files;
 	if (!data->getFilename().isEmpty())
-		files << QDir(basePath).absoluteFilePath(data->getFilename());
-
-	if (image)
 	{
-		files <<  changeExtension(files[0], "raw");
+		files << QDir(basePath).absoluteFilePath(data->getFilename());
+		if (image)
+			files <<  changeExtension(files[0], "raw");
 	}
 
 	for (int i=0; i<files.size(); ++i)
@@ -623,6 +663,29 @@ void DataManagerImpl::deleteFiles(DataPtr data, QString basePath)
 			continue;
 		report(QString("Removing %1 from disk").arg(files[i]));
 		QFile(files[i]).remove();
+	}
+}
+
+QList<DataPtr> DataManagerImpl::getActiveDataList() const
+{
+	return mActiveData;
+}
+
+QStringList DataManagerImpl::getActiveDataStringList() const
+{
+	QStringList retval;
+	for(int i = 0; i < mActiveData.size(); ++i)
+		retval << mActiveData.at(i)->getUid();
+	return retval;
+}
+
+void DataManagerImpl::loadActiveData(const QString activeDatas)
+{
+	QStringList activeDataList = activeDatas.split(" ");
+	for(int i = 0; i < activeDataList.size(); ++i)
+	{
+		DataPtr data = this->getData(activeDataList.at(i));
+		this->setActiveData(data);
 	}
 }
 
