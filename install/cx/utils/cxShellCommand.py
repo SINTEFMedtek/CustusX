@@ -56,13 +56,17 @@ class ShellCommandReal(ShellCommand):
         else:        
             p = self._runDirectly(self.command)            
         self._checkTerminate(p)
-        return p        
+        return p    
+    
+    def _get_popen_executable(self):
+        if platform.system() is not 'Windows':
+            return '/bin/bash'
+        else:
+            return None
+            
         
     def _runDirectly(self, cmd):
-        shell_name = None
-        if platform.system() is not 'Windows':
-            shell_name='/bin/bash'
-        p = subprocess.Popen(cmd, shell=True, cwd=self.cwd, executable=shell_name)
+        p = subprocess.Popen(cmd, shell=True, cwd=self.cwd, executable=self._get_popen_executable())
         p.communicate("") # wait for process to complete
         p.returncode = self._convertCatchReturnCode139ToSegfault(p.returncode)
         return ShellCommand.ReturnValue(returncode=p.returncode, process=p)
@@ -84,7 +88,7 @@ class ShellCommandReal(ShellCommand):
 
     def _runAndRedirectOutput(self, cmd):
         output = []
-        p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=self.cwd)        
+        p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=self.cwd, executable=self._get_popen_executable())        
         for line in self._readFromProcess(p):
             if(not self.silent):
                 self._printOutput(line.rstrip())
