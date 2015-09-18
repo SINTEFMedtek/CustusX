@@ -66,7 +66,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRecordTrackingWidget.h"
 #include <QGroupBox>
 #include "cxRegistrationProperties.h"
-#include "cxPC_ICP_Widget.h"
 #include "vesselReg/SeansVesselReg.hxx"
 #include "cxMeshHelpers.h"
 #include "vtkPointData.h"

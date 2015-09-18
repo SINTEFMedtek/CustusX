@@ -10,7 +10,6 @@ set(PLUGIN_SRCS
 	cxRMPCFromPointerService.cpp
 	cxRMPCWidget.cpp
 	cxRMPCFromPointerWidget.cpp
-	cxPC_ICP_Widget.cpp
 )
 
 # Files which should be processed by Qts moc
@@ -20,7 +19,6 @@ set(PLUGIN_MOC_SRCS
 	cxRMPCFromPointerService.h
 	cxRMPCWidget.h
 	cxRMPCFromPointerWidget.h
-    cxPC_ICP_Widget.h
 )
 
 cx_create_export_header(${PROJECT_NAME})
