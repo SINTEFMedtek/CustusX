@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationBaseWidget.h"
 #include "cxForwardDeclarations.h"
 #include "cxXmlOptionItem.h"
-#include "cxICPAlgorithm.h"
+#include "cxICPRegistrationBaseWidget.h"
 
 namespace cx
 {

@@ -11,7 +11,7 @@ set(PLUGIN_SRCS
     cxRegisterI2IWidget.cpp
     cxPrepareVesselsWidget.cpp
 	cxICPWidget.cpp
-	cxICPAlgorithm.cpp
+	cxICPRegistrationBaseWidget.cpp
 	cxMeshInView.cpp
 	cxMeshInView.h
 )
@@ -23,7 +23,7 @@ set(PLUGIN_MOC_SRCS
     cxRegisterI2IWidget.h
     cxPrepareVesselsWidget.h
 	cxICPWidget.h
-	cxICPAlgorithm.h
+	cxICPRegistrationBaseWidget.h
 )
 
 # Qt Designer files which should be processed by Qts uic

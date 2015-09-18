@@ -41,7 +41,7 @@ class QPushButton;
 class QLabel;
 #include "cxBoolProperty.h"
 #include "cxDoubleProperty.h"
-#include "cxICPAlgorithm.h"
+#include "cxICPRegistrationBaseWidget.h"
 #include "cxTransform3D.h"
 
 namespace cx
