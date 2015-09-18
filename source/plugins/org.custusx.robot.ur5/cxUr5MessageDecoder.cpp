@@ -34,6 +34,7 @@ Ur5State Ur5MessageDecoder::setState(QByteArray data)
             pushState(slicePacket(data,i,headerLength(getHeader(data,i))),state);
         }
     }
+    setTransformationMatrix(state);
     state.updated = true;
     return state;
 }
@@ -175,6 +176,12 @@ void Ur5MessageDecoder::pushState(QByteArray data,Ur5State &state)
     {
         setCartData(removeHeader(data),state);
     }
+}
+
+void Ur5MessageDecoder::setTransformationMatrix(Ur5State &state)
+{
+    state.baseMee = Eigen::AngleAxisd(state.cartAngles.norm(),state.cartAngles/state.cartAngles.norm());
+    state.baseMee.translation() = state.cartAxis;
 }
 
 QByteArray Ur5MessageDecoder::removeHeader(QByteArray data)
