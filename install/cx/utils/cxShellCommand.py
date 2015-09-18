@@ -59,7 +59,10 @@ class ShellCommandReal(ShellCommand):
         return p        
         
     def _runDirectly(self, cmd):
-        p = subprocess.Popen(cmd, shell=True, cwd=self.cwd)
+        shell_name = None
+        if platform.system() is not 'Windows':
+            shell_name='/bin/bash'
+        p = subprocess.Popen(cmd, shell=True, cwd=self.cwd, executable=shell_name)
         p.communicate("") # wait for process to complete
         p.returncode = self._convertCatchReturnCode139ToSegfault(p.returncode)
         return ShellCommand.ReturnValue(returncode=p.returncode, process=p)
