@@ -122,7 +122,7 @@ void VisualizationTab::init()
   mAnyplaneViewOffset = DoubleProperty::initialize("AnyplaneViewOffset",
 														 "View Offset",
 														 "Position of virtual tool tip in anyplane view, % from top.",
-														 anyplaneViewOffset, DoubleRange(0.1,0.5,0.05), 2, QDomNode());
+														 anyplaneViewOffset, DoubleRange(-0.5,0.5,0.05), 2, QDomNode());
   mAnyplaneViewOffset->setInternal2Display(100);
 
   bool followTooltip = settings()->value("Navigation/followTooltip").value<bool>();
