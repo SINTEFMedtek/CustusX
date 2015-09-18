@@ -316,6 +316,8 @@ void PatientModelImplService::videoSourceAdded(VideoSourcePtr source)
 	//Only load trackedStream, don't save it
 	this->dataService()->loadData(trackedStream);
 	emit videoAddedToTrackedStream();
+	if(this->getActiveData<TrackedStream>() == trackedStream)
+		this->setActiveData(trackedStream);
 }
 
 ToolPtr PatientModelImplService::getProbeTool(QString videoSourceUid)

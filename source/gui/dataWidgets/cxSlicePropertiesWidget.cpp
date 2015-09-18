@@ -52,7 +52,7 @@ SlicePropertiesWidget::SlicePropertiesWidget(PatientModelServicePtr patientModel
 	this->insertWidgetAtTop(new DataSelectWidget(visualizationService, patientModelService, this, activeDataProperty));
 	this->addTab(new ColorWidget(patientModelService, this), "Color");
 	this->addTab(new OverlayWidget(patientModelService, visualizationService, this), "Overlay");
-	this->addTab(new VolumeInfoWidget(patientModelService, this), "Info");//Not neccesary as this is part of Volume Properties?
+//	this->addTab(new VolumeInfoWidget(patientModelService, this), "Info");//Not neccesary as this is part of Volume Properties?
 }
 
 SlicePropertiesWidget::~SlicePropertiesWidget()

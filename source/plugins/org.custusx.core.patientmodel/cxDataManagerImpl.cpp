@@ -175,8 +175,6 @@ void DataManagerImpl::setActiveData(DataPtr activeData)
 {
 	if (!activeData)
 		return;
-	if(getActiveData() == activeData)
-		return;
 
 	mActiveData.removeAll(activeData);
 	mActiveData.append(activeData);

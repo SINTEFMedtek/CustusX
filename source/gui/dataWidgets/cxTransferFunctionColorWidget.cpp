@@ -190,7 +190,6 @@ int TransferFunctionColorWidget::imageIntensity2screenX(int intensity)
 
 int TransferFunctionColorWidget::screenX2imageIntensity(int screenX)
 {
-//	int retval =
 	double i = mImage->getMin() + mImage->getRange() * double(screenX - mPlotArea.left()) /(mPlotArea.width()-1);
 	int retval = int(i+0.5);
 	return retval;
@@ -334,6 +333,8 @@ TransferFunctionColorWidget::ColorPoint TransferFunctionColorWidget::getCurrentC
 TransferFunctionColorWidget::ColorPoint TransferFunctionColorWidget::getCurrentColorPoint(int clickX)
 {
   ColorPoint point;
+  if(!mImage)
+	  return point;
   point.intensity = screenX2imageIntensity(clickX);
   point.intensity = constrainValue(point.intensity, mImage->getMin(), mImage->getMax());
 

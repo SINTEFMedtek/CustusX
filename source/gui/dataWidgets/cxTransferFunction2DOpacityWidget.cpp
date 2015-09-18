@@ -52,8 +52,8 @@ TransferFunction2DOpacityWidget::TransferFunction2DOpacityWidget(PatientModelSer
   mDataLLR.reset(new DoublePropertyImageTFDataLLR);
 
   mActiveImageProxy = ActiveImageProxy::New(patientModelService);
-  connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &TransferFunction2DOpacityWidget::activeImageChangedSlot);
   connect(mActiveImageProxy.get(), &ActiveImageProxy::transferFunctionsChanged, this, &TransferFunction2DOpacityWidget::activeImageChangedSlot);
+  connect(mPatientModelService.get(), &PatientModelService::activeDataChanged, this, &TransferFunction2DOpacityWidget::activeImageChangedSlot);
 
   mTransferFunctionAlphaWidget->setSizePolicy(QSizePolicy::MinimumExpanding,
                                               QSizePolicy::MinimumExpanding);
@@ -68,9 +68,14 @@ TransferFunction2DOpacityWidget::TransferFunction2DOpacityWidget(PatientModelSer
   this->setLayout(layout);
 }
 
+TransferFunction2DOpacityWidget::~TransferFunction2DOpacityWidget()
+{
+	disconnect(mPatientModelService.get(), &PatientModelService::activeDataChanged, this, &TransferFunction2DOpacityWidget::activeImageChangedSlot);
+}
+
 void TransferFunction2DOpacityWidget::activeImageChangedSlot()
 {
-  ImagePtr image = mPatientModelService->getActiveData<Image>();
+	ImagePtr image = mPatientModelService->getDerivedActiveImage();
   ImageTFDataPtr tf;
   if (image)
     tf = image->getLookupTable2D();
