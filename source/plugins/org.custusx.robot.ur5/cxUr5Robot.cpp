@@ -28,6 +28,7 @@ void Ur5Robot::updateCurrentState()
     currentState.jointVelocity=mRTMonitor.getCurrentState().jointVelocity;
     currentState.tcpAngles=mRTMonitor.getCurrentState().tcpAngles;
     currentState.tcpAxis=mRTMonitor.getCurrentState().tcpAxis;
+    currentState.baseMee = mSecMonitor.getCurrentState().baseMee;
 
     this->setCurrentState(currentState);
     emit(stateUpdated());
