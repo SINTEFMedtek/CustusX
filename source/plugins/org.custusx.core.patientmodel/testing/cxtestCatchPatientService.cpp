@@ -76,35 +76,37 @@ TEST_CASE("DataManagerImpl setup/shutdown works multiple times", "[unit]")
 
 TEST_CASE("Active Image: set/get", "[unit]")
 {
-	cx::DataServicePtr dataManager = cx::DataManagerImpl::create();
+	cxtest::SessionStorageTestFixture storageFixture;
+	cx::PatientModelServicePtr patientModelService = storageFixture.mPatientModelService;
 	testDataStructures testData;
 
-	dataManager->setActiveData(testData.image1);
+	patientModelService->setActiveData(testData.image1);
 
-	REQUIRE(dataManager->getActiveData<cx::Image>() == testData.image1);
-	REQUIRE_FALSE(dataManager->getActiveData<cx::Image>() == testData.image2);
+	REQUIRE(patientModelService->getActiveData<cx::Image>() == testData.image1);
+	REQUIRE_FALSE(patientModelService->getActiveData<cx::Image>() == testData.image2);
 
-	dataManager->setActiveData(testData.mesh1);
-	REQUIRE(dataManager->getActiveData<cx::Image>() == testData.image1);
+	patientModelService->setActiveData(testData.mesh1);
+	REQUIRE(patientModelService->getActiveData<cx::Image>() == testData.image1);
 }
 
 
 TEST_CASE("Active Image: activeImageChanged signal", "[unit]")
 {
-	cx::DataServicePtr dataManager = cx::DataManagerImpl::create();
+	cxtest::SessionStorageTestFixture storageFixture;
+	cx::PatientModelServicePtr patientModelService = storageFixture.mPatientModelService;
 	testDataStructures testData;
 
-	cxtest::DirectSignalListener signalListener(dataManager.get(), SIGNAL(activeImageChanged(QString)));
-	dataManager->setActiveData(testData.image1);
+	cxtest::DirectSignalListener signalListener(patientModelService.get(), SIGNAL(activeImageChanged(QString)));
+	patientModelService->setActiveData(testData.image1);
 	CHECK(signalListener.isReceived());
 
-	cxtest::DirectSignalListener signalListener2(dataManager.get(), SIGNAL(activeImageChanged(QString)));
-	dataManager->setActiveData(testData.image2);
-	CHECK(signalListener2.isReceived());
-
-	cxtest::DirectSignalListener signalListener3(dataManager.get(), SIGNAL(activeImageChanged(QString)));
-	dataManager->setActiveData(testData.mesh1);
+	cxtest::DirectSignalListener signalListener3(patientModelService.get(), SIGNAL(activeImageChanged(QString)));
+	patientModelService->setActiveData(testData.mesh1);
 	CHECK_FALSE(signalListener3.isReceived());
+
+	cxtest::DirectSignalListener signalListener2(patientModelService.get(), SIGNAL(activeImageChanged(QString)));
+	patientModelService->setActiveData(testData.image1);
+	CHECK(signalListener2.isReceived());
 }
 
 TEST_CASE("Active Image: save/load in patient file", "[unit]")
@@ -146,90 +148,95 @@ TEST_CASE("Active Image: save/load in patient file", "[unit]")
 
 TEST_CASE("Active Data: set/get", "[unit]")
 {
-	cx::DataServicePtr dataManager = cx::DataManagerImpl::create();
+	cxtest::SessionStorageTestFixture storageFixture;
+	cx::PatientModelServicePtr patientModelService = storageFixture.mPatientModelService;
 	testDataStructures testData;
 
-	dataManager->setActiveData(testData.image1);
+	patientModelService->setActiveData(testData.image1);
 
-	REQUIRE(dataManager->getActiveData() == testData.image1);
-	REQUIRE_FALSE(dataManager->getActiveData() == testData.image2);
+	REQUIRE(patientModelService->getActiveData() == testData.image1);
+	REQUIRE_FALSE(patientModelService->getActiveData() == testData.image2);
 
-	dataManager->setActiveData(testData.image2);
-	REQUIRE(dataManager->getActiveData() == testData.image2);
+	patientModelService->setActiveData(testData.image2);
+	REQUIRE(patientModelService->getActiveData() == testData.image2);
 }
 
 TEST_CASE("Active Data: Get data of specific type", "[unit]")
 {
-	cx::DataServicePtr dataManager = cx::DataManagerImpl::create();
+	cxtest::SessionStorageTestFixture storageFixture;
+	cx::PatientModelServicePtr patientModelService = storageFixture.mPatientModelService;
 	testDataStructures testData;
 
-	dataManager->setActiveData(testData.image1);
-	REQUIRE(dataManager->getActiveData<cx::Image>() == testData.image1);
-	REQUIRE_FALSE(dataManager->getActiveData<cx::Mesh>());
+	patientModelService->setActiveData(testData.image1);
+	REQUIRE(patientModelService->getActiveData<cx::Image>() == testData.image1);
+	REQUIRE_FALSE(patientModelService->getActiveData<cx::Mesh>());
 
-	dataManager->setActiveData(testData.mesh1);
-	REQUIRE(dataManager->getActiveData<cx::Mesh>() == testData.mesh1);
-	REQUIRE(dataManager->getActiveData<cx::Image>() == testData.image1);
+	patientModelService->setActiveData(testData.mesh1);
+	REQUIRE(patientModelService->getActiveData<cx::Mesh>() == testData.mesh1);
+	REQUIRE(patientModelService->getActiveData<cx::Image>() == testData.image1);
 
-	dataManager->setActiveData(testData.image2);
-	REQUIRE(dataManager->getActiveData<cx::Image>() == testData.image2);
-	REQUIRE(dataManager->getActiveData<cx::Mesh>() == testData.mesh1);
-	REQUIRE_FALSE(dataManager->getActiveData<cx::Image>() == testData.image1);
+	patientModelService->setActiveData(testData.image2);
+	REQUIRE(patientModelService->getActiveData<cx::Image>() == testData.image2);
+	REQUIRE(patientModelService->getActiveData<cx::Mesh>() == testData.mesh1);
+	REQUIRE_FALSE(patientModelService->getActiveData<cx::Image>() == testData.image1);
 }
 
 TEST_CASE("Active Data: activeDataChanged signal", "[unit]")
 {
-	cx::DataServicePtr dataManager = cx::DataManagerImpl::create();
 	testDataStructures testData;
+	cxtest::SessionStorageTestFixture storageFixture;
+	cx::PatientModelServicePtr patientModelService = storageFixture.mPatientModelService;
 
-	cxtest::DirectSignalListener signalListener(dataManager.get(), SIGNAL(activeDataChanged(QString)));
-	dataManager->setActiveData(testData.image2);
+	cxtest::DirectSignalListener signalListener(patientModelService.get(), SIGNAL(activeDataChanged(QString)));
+	patientModelService->setActiveData(testData.image2);
 	CHECK(signalListener.isReceived());
 
-	cxtest::DirectSignalListener signalListener2(dataManager.get(), SIGNAL(activeDataChanged(QString)));
-	dataManager->setActiveData(testData.mesh1);
+	cxtest::DirectSignalListener signalListener2(patientModelService.get(), SIGNAL(activeDataChanged(QString)));
+	patientModelService->setActiveData(testData.mesh1);
 	CHECK(signalListener2.isReceived());
 }
 
 TEST_CASE("Active Data: Remove data", "[unit]")
 {
-	cx::DataServicePtr dataManager = cx::DataManagerImpl::create();
+	cxtest::SessionStorageTestFixture storageFixture;
+	cx::PatientModelServicePtr patientModelService = storageFixture.mPatientModelService;
 	testDataStructures testData;
 
-	dataManager->loadData(testData.image1);
-	dataManager->loadData(testData.image2);
-	dataManager->loadData(testData.mesh1);
+	patientModelService->insertData(testData.image1);
+	patientModelService->insertData(testData.image2);
+	patientModelService->insertData(testData.mesh1);
 
-	dataManager->setActiveData(testData.mesh1);
-	dataManager->setActiveData(testData.image2);
-	dataManager->setActiveData(testData.image1);
+	patientModelService->setActiveData(testData.mesh1);
+	patientModelService->setActiveData(testData.image2);
+	patientModelService->setActiveData(testData.image1);
 
-	cxtest::DirectSignalListener signalListener(dataManager.get(), SIGNAL(activeDataChanged(QString)));
-	dataManager->removeData(testData.image1->getUid(), "");
-	CHECK(dataManager->getActiveData() == testData.image2);
+	cxtest::DirectSignalListener signalListener(patientModelService.get(), SIGNAL(activeDataChanged(QString)));
+	patientModelService->removeData(testData.image1->getUid());
+	CHECK(patientModelService->getActiveData() == testData.image2);
 	CHECK(signalListener.isReceived());
 
-	dataManager->removeData(testData.image2->getUid(), "");
-	CHECK(dataManager->getActiveData() == testData.mesh1);
+	patientModelService->removeData(testData.image2->getUid());
+	CHECK(patientModelService->getActiveData() == testData.mesh1);
 
-	dataManager->removeData(testData.mesh1->getUid(), "");
-	CHECK_FALSE(dataManager->getActiveData());
+	patientModelService->removeData(testData.mesh1->getUid());
+	CHECK_FALSE(patientModelService->getActiveData());
 }
 
 TEST_CASE("Active Data: Call set multiple times", "[unit]")
 {
-	cx::DataServicePtr dataManager = cx::DataManagerImpl::create();
+	cxtest::SessionStorageTestFixture storageFixture;
+	cx::PatientModelServicePtr patientModelService = storageFixture.mPatientModelService;
 	testDataStructures testData;
 
-	dataManager->setActiveData(testData.image1);
-	REQUIRE(dataManager->getActiveData() == testData.image1);
+	patientModelService->setActiveData(testData.image1);
+	REQUIRE(patientModelService->getActiveData() == testData.image1);
 
-	dataManager->setActiveData(testData.image2);
-	REQUIRE(dataManager->getActiveData() == testData.image2);
+	patientModelService->setActiveData(testData.image2);
+	REQUIRE(patientModelService->getActiveData() == testData.image2);
 
-	dataManager->setActiveData(testData.image1);
-	dataManager->setActiveData(testData.image1);
-	REQUIRE(dataManager->getActiveData() == testData.image1);
+	patientModelService->setActiveData(testData.image1);
+	patientModelService->setActiveData(testData.image1);
+	REQUIRE(patientModelService->getActiveData() == testData.image1);
 }
 
 TEST_CASE("StringPropertyActiveData works", "[unit][resource][core]")

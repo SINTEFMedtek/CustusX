@@ -59,6 +59,7 @@ PatientModelImplService::PatientModelImplService(ctkPluginContext *context) :
 
 	connect(this->dataService().get(), &DataManager::dataAddedOrRemoved, this, &PatientModelService::dataAddedOrRemoved);
 	connect(this->dataService().get(), &DataManager::activeImageChanged, this, &PatientModelService::activeImageChanged);
+	connect(this->dataService().get(), &DataManager::activeDataChanged, this, &PatientModelService::activeDataChanged);
 	connect(this->dataService().get(), &DataManager::rMprChanged, this, &PatientModelService::rMprChanged);
 	connect(this->dataService().get(), &DataManager::streamLoaded, this, &PatientModelService::streamLoaded);
 	connect(this->dataService().get(), &DataManager::clinicalApplicationChanged, this, &PatientModelService::clinicalApplicationChanged);
@@ -118,6 +119,7 @@ PatientModelImplService::~PatientModelImplService()
 	{
 		disconnect(this->dataService().get(), &DataManager::dataAddedOrRemoved, this, &PatientModelService::dataAddedOrRemoved);
 		disconnect(this->dataService().get(), &DataManager::activeImageChanged, this, &PatientModelService::activeImageChanged);
+		disconnect(this->dataService().get(), &DataManager::activeDataChanged, this, &PatientModelService::activeDataChanged);
 		disconnect(this->dataService().get(), &DataManager::rMprChanged, this, &PatientModelService::rMprChanged);
 		disconnect(this->dataService().get(), &DataManager::streamLoaded, this, &PatientModelService::streamLoaded);
 		disconnect(this->dataService().get(), &DataManager::clinicalApplicationChanged, this, &PatientModelService::clinicalApplicationChanged);
