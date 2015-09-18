@@ -3,6 +3,7 @@
 
 #include "org_custusx_robot_ur5_Export.h"
 #include "cxVector3D.h"
+#include "cxTransform3D.h"
 
 namespace cx
 {
@@ -30,6 +31,8 @@ struct org_custusx_robot_ur5_EXPORT Ur5State
 
     Eigen::RowVectorXd jointPosition;
     Eigen::RowVectorXd jointVelocity;
+
+    Transform3D baseMee;
 
     double timeSinceStart;
 
