@@ -299,7 +299,6 @@ void PatientModelImplService::newProbe(const ToolPtr tool)
 
 void PatientModelImplService::videoSourceAdded(VideoSourcePtr source)
 {
-
 	ToolPtr tool = this->getProbeTool(source->getUid());
 	if(!tool)
 		return;
@@ -316,6 +315,11 @@ void PatientModelImplService::videoSourceAdded(VideoSourcePtr source)
 	//Only load trackedStream, don't save it
 	this->dataService()->loadData(trackedStream);
 	emit videoAddedToTrackedStream();
+	this->reEmitActiveTrackedStream(trackedStream);
+}
+
+void PatientModelImplService::reEmitActiveTrackedStream(TrackedStreamPtr trackedStream)
+{
 	if(this->getActiveData<TrackedStream>() == trackedStream)
 		this->setActiveData(trackedStream);
 }

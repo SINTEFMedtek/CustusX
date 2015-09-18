@@ -46,6 +46,8 @@ if(BUILD_TESTING)
         cxSyntheticVolume.cpp
         cxSimpleSyntheticVolume.h
         cxSimpleSyntheticVolume.cpp
+        cxtestProbeFixture.h
+        cxtestProbeFixture.cpp
     )
 
     qt5_wrap_cpp(CX_TESTUTILITIES_FILES_TO_MOC ${CX_TESTUTILITIES_FILES_TO_MOC})

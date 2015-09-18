@@ -44,7 +44,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataFactory.h"
 #include "cxSelectDataStringProperty.h"
 
-
 namespace {
 
 struct testDataStructures

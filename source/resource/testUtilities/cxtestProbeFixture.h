@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTESTPROBEFIXTURE_H
 #define CXTESTPROBEFIXTURE_H
 
-#include "cxtest_org_custusx_core_tracking_export.h"
+#include "cxtestutilities_export.h"
 
 #include "cxTool.h"
 #include "cxProbeImpl.h"
@@ -44,18 +44,17 @@ namespace cxtest
 /*
  * \class TestProbe
  *
- * \Brief Unit tests for the cxProbe class4
+ * \Brief Unit tests for the cxProbe class
  *
  * \date Jun 3, 2013
  * \author Ole Vegard Solberg, SINTEF
  */
-class CXTEST_ORG_CUSTUSX_CORE_TRACKING_EXPORT ProbeFixture
+class CXTESTUTILITIES_EXPORT ProbeFixture
 {
 public:
 	ProbeFixture();
 	~ProbeFixture();
 
-protected:
 	void createTestProbe();
 	void testProbeWithNoRTSource();
 	void createParameters();
