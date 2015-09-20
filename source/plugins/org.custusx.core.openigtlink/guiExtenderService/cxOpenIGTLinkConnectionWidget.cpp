@@ -75,6 +75,9 @@ OpenIGTLinkConnectionWidget::OpenIGTLinkConnectionWidget(OpenIGTLinkClient *clie
     topLayout->addWidget(mConnectButton);
     topLayout->addStretch();
 	CX_LOG_CHANNEL_DEBUG("CA") << "OpenIGTLinkConnectionWidget end create " << client->getUid();
+
+	this->onStateChanged(mClient->getState());
+
 }
 
 OpenIGTLinkConnectionWidget::~OpenIGTLinkConnectionWidget()
@@ -152,7 +155,7 @@ StringPropertyBasePtr OpenIGTLinkConnectionWidget::getIpOption(QDomElement root)
 {
     StringPropertyPtr retval;
     QString defaultValue = "127.0.0.1";
-	retval = StringProperty::initialize("address", "Address", "TCP/IP Address", defaultValue, root);
+	retval = StringProperty::initialize("address", "Address", "Network Address", defaultValue, root);
     retval->setGroup("Connection");
     return retval;
 }
@@ -163,7 +166,7 @@ DoublePropertyBasePtr OpenIGTLinkConnectionWidget::getPortOption(QDomElement roo
     DoublePropertyPtr retval;
     double defaultValue = 18944;
 	retval = DoubleProperty::initialize("port", "Port",
-										"TCP/IP Port (default "+QString::number(defaultValue)+")",
+										"Network Port (default "+QString::number(defaultValue)+")",
 										defaultValue,
 										DoubleRange(1024, 49151, 1), 0, root);
     retval->setGuiRepresentation(DoublePropertyBase::grSPINBOX);
@@ -178,7 +181,7 @@ StringPropertyBasePtr OpenIGTLinkConnectionWidget::getRoleOption(QDomElement roo
 	QStringList values = QStringList() << "client" << "server";
 	QString value = values.front();
 	retval = StringProperty::initialize("role", "Role",
-										"Act as client or server in the TCP/IP connection",
+										"Act as client or server in the network connection",
 										value, values, root);
 	retval->setGroup("Connection");
 	return retval;

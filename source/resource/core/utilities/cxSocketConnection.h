@@ -38,6 +38,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QTcpServer;
 #include "cxEnumConverter.h"
 
+#include <QTcpServer>
+
 namespace cx {
 enum CX_SOCKETCONNECTION_STATE
 {
@@ -54,6 +56,27 @@ SNW_DECLARE_ENUM_STRING_CONVERTERS(cx, CX_SOCKETCONNECTION_STATE);
 
 
 namespace cx {
+
+
+/**
+ * Reimplement QTcpServer::incomingConnection() to
+ * do nothing but emit a signal.
+ *
+ * Used internally by SocketConnection.
+ */
+class SingleConnectionTcpServer : public QTcpServer
+{
+	Q_OBJECT
+public:
+	SingleConnectionTcpServer(QObject* parent);
+	void setSocket(QPointer<Socket> socket);
+signals:
+	void incoming(qintptr socketDescriptor);
+protected:
+	void incomingConnection(qintptr socketDescriptor);
+private:
+	QPointer<Socket> mSocket;
+};
 
 class cxResource_EXPORT SocketConnection : public QObject
 {
@@ -82,6 +105,9 @@ public:
 		}
 	};
 
+	ConnectionInfo getConnectionInfo();
+	CX_SOCKETCONNECTION_STATE getState();
+
 public slots:
 	void setConnectionInfo(ConnectionInfo info);
     void requestConnect();
@@ -109,10 +135,18 @@ protected:
 	bool startListen();
 	void stopListen();
 	void incomingConnection(qintptr socketDescriptor);
+	void setCurrentConnectionInfo();
+	void stateChange(CX_SOCKETCONNECTION_STATE newState);
 
 	Socket* mSocket;
-	ConnectionInfo mConnectionInfo;
-	QPointer<QTcpServer> mServer;
+//	QPointer<QTcpServer> mServer;
+	void onNewConnection();
+	QPointer<SingleConnectionTcpServer> mServer;
+
+	CX_SOCKETCONNECTION_STATE mCurrentState;
+	ConnectionInfo mCurrentConnectionInfo; ///< info for the currently active connection
+	QMutex mNextConnectionInfoMutex;
+	ConnectionInfo mNextConnectionInfo; ///< info to be used for the next connect(), mutexed.
 };
 
 } //namespace cx

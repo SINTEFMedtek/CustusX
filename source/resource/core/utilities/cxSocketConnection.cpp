@@ -45,16 +45,54 @@ SNW_DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, CX_SOCKETCONNECTION_STATE, scsCOUNT)
 }
 SNW_DEFINE_ENUM_STRING_CONVERTERS_END(cx, CX_SOCKETCONNECTION_STATE, scsCOUNT)
 
-namespace cx {
+
+
+namespace cx
+{
+
+void SingleConnectionTcpServer::setSocket(QPointer<Socket> socket)
+{
+	mSocket = socket;
+}
+
+SingleConnectionTcpServer::SingleConnectionTcpServer(QObject* parent) :
+	QTcpServer(parent)
+{
+}
+
+
+void SingleConnectionTcpServer::incomingConnection(qintptr socketDescriptor)
+{
+	emit incoming(socketDescriptor);
+//	CX_LOG_INFO() << "Server: Incoming connection...";
+
+//	if (mSocket->isConnected())
+//	{
+//		reportError("Incoming connection request rejected: The server can only handle a single connection.");
+//		return;
+//	}
+
+//	mSocket->getSocket()->setSocketDescriptor(socketDescriptor);
+
+//	QString clientName = mSocket->getSocket()->localAddress().toString();
+//	report("Server connected to "+clientName+". Session started.");
+}
+
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
 
 SocketConnection::SocketConnection(QObject *parent) :
 	QObject(parent)
 {
+	mCurrentState = scsINACTIVE;
 	qRegisterMetaType<boost::function<void()> >("boost::function<void()>");
 	qRegisterMetaType<CX_SOCKETCONNECTION_STATE>("CX_SOCKETCONNECTION_STATE");
 
-	mConnectionInfo.host = "localhost";
-	mConnectionInfo.port = 18944;
+	mNextConnectionInfo.host = "localhost";
+	mNextConnectionInfo.port = 18944;
 
 	mSocket = new Socket(this);
 	connect(mSocket, &Socket::connected, this, &SocketConnection::internalConnected);
@@ -64,19 +102,55 @@ SocketConnection::SocketConnection(QObject *parent) :
 	connect(mSocket, &Socket::error, this, &SocketConnection::internalError);
 }
 
+SocketConnection::ConnectionInfo SocketConnection::getConnectionInfo()
+{
+	QMutexLocker locker(&mNextConnectionInfoMutex);
+	return mNextConnectionInfo;
+}
+
 void SocketConnection::setConnectionInfo(ConnectionInfo info)
 {
-	mConnectionInfo = info;
+	QMutexLocker locker(&mNextConnectionInfoMutex);
+	mNextConnectionInfo = info;
+}
+
+void SocketConnection::setCurrentConnectionInfo()
+{
+	QMutexLocker locker(&mNextConnectionInfoMutex);
+	mCurrentConnectionInfo = mNextConnectionInfo;
+}
+
+void SocketConnection::stateChange(CX_SOCKETCONNECTION_STATE newState)
+{
+	if (mCurrentState==newState)
+		return;
+
+	if (newState==scsCONNECTED)
+		emit connected();
+	else if (mCurrentState==scsCONNECTED)
+		emit disconnected();
+
+	mCurrentState = newState;
+
+	emit stateChanged(mCurrentState);
+}
+
+CX_SOCKETCONNECTION_STATE SocketConnection::getState()
+{
+	return mCurrentState;
 }
 
 void SocketConnection::requestConnect()
 {
-	CX_LOG_CHANNEL_DEBUG("CA") << "RequestConnect";
-	if (mConnectionInfo.isClient())
+	this->setCurrentConnectionInfo();
+
+	ConnectionInfo info = mCurrentConnectionInfo;
+
+	if (info.isClient())
 	{
-		CX_LOG_INFO() << "Trying to connect to " << mConnectionInfo.getDescription();
-		emit stateChanged(scsCONNECTING);
-		mSocket->requestConnectToHost(mConnectionInfo.host, mConnectionInfo.port);
+		CX_LOG_INFO() << "Trying to connect to " << info.getDescription();
+		this->stateChange(scsCONNECTING);
+		mSocket->requestConnectToHost(info.host, info.port);
 	}
 	else
 	{
@@ -92,8 +166,6 @@ void SocketConnection::requestConnect()
 
 void SocketConnection::requestDisconnect()
 {
-	CX_LOG_INFO("CA") << "RequestDisconnect";
-
 	this->stopListen();
 	mSocket->requestCloseConnection();
 }
@@ -110,22 +182,20 @@ bool SocketConnection::sendData(const char *data, qint64 maxSize)
 
 void SocketConnection::internalConnected()
 {
-	CX_LOG_SUCCESS() << "Connected to "  << mConnectionInfo.getDescription();
-	emit stateChanged(scsCONNECTED);
-	emit connected();
+	CX_LOG_SUCCESS() << "Connected to "  << mCurrentConnectionInfo.getDescription();
+	this->stateChange(scsCONNECTED);
 }
 
 void SocketConnection::internalDisconnected()
 {
     CX_LOG_SUCCESS() << "Disconnected";
-	emit stateChanged(scsINACTIVE);
-	emit disconnected();
+	this->stateChange(scsINACTIVE);
 }
 
 void SocketConnection::internalError()
 {
 	CX_LOG_INFO() << "Error";
-	emit stateChanged(scsINACTIVE);
+	this->stateChange(scsINACTIVE);
 }
 
 void SocketConnection::internalDataAvailable()
@@ -174,15 +244,19 @@ bool SocketConnection::socketReceive(void *packPointer, int packSize) const
 bool SocketConnection::startListen()
 {
 	if (!mServer)
-		mServer = new QTcpServer(this);
-	emit stateChanged(scsCONNECTING);
+	{
+//		mServer = new QTcpServer(this);
+		mServer = new SingleConnectionTcpServer(this);
+		connect(mServer, &SingleConnectionTcpServer::incoming, this, &SocketConnection::incomingConnection);
+		mServer->setSocket(mSocket);
+	}
+	this->stateChange(scsCONNECTING);
+	connect(mServer, &QTcpServer::newConnection, this, &SocketConnection::onNewConnection);
 
-//	CX_LOG_CHANNEL_DEBUG("CA") << "set port " << mConnectionInfo.port;
-	bool started = mServer->listen(QHostAddress::Any, mConnectionInfo.port);
+	bool started = mServer->listen(QHostAddress::Any, mCurrentConnectionInfo.port);
 
 	if (started)
 	{
-//		this->getAllServerHostnames();
 		CX_LOG_INFO() << QString("Server address: %1").arg(this->getAllServerHostnames().join(", "));
 		CX_LOG_INFO() << QString("Server is listening to port %1").arg(mServer->serverPort());
 	}
@@ -191,8 +265,13 @@ bool SocketConnection::startListen()
 		CX_LOG_INFO() << QString("Server failed to start. Error: ").arg(mServer->errorString());
 	}
 
-	emit stateChanged(scsLISTENING);
+	this->stateChange(scsLISTENING);
 	return started;
+}
+
+void SocketConnection::onNewConnection()
+{
+	CX_LOG_CHANNEL_DEBUG("CA") << "NEW INCOMING CONNECTION";
 }
 
 void SocketConnection::stopListen()
@@ -201,9 +280,7 @@ void SocketConnection::stopListen()
 	{
 		mServer->close();
 		if (!mSocket->isConnected())
-		{
-			emit stateChanged(scsINACTIVE);
-		}
+			this->stateChange(scsINACTIVE);
 	}
 }
 
@@ -221,8 +298,7 @@ void SocketConnection::incomingConnection(qintptr socketDescriptor)
 	QString clientName = mSocket->getSocket()->localAddress().toString();
 	report("Connected to "+clientName+". Session started.");
 
-	emit connected();
-	emit stateChanged(scsCONNECTED);
+	this->stateChange(scsCONNECTED);
 }
 
 QStringList SocketConnection::getAllServerHostnames()
