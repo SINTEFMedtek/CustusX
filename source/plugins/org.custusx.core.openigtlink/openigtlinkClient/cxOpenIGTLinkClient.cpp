@@ -52,8 +52,6 @@ OpenIGTLinkClient::OpenIGTLinkClient(QString uid, QObject *parent) :
 	mHeaderReceived(false),
 	mUid(uid)
 {
-//    mIp = "localhost";
-//    mPort = 18944;
     qRegisterMetaType<Transform3D>("Transform3D");
     qRegisterMetaType<ImagePtr>("ImagePtr");
 	qRegisterMetaType<ImagePtr>("MeshPtr");
@@ -85,14 +83,8 @@ void OpenIGTLinkClient::invoke(boost::function<void()> func)
 							  Q_ARG(boost::function<void()>, func));
 }
 
-//void OpenIGTLinkClient::onInvoke2(int val)
-//{
-//	CX_LOG_CHANNEL_DEBUG("CA") << "OpenIGTLinkClient::onInvoke2";
-//}
-
 void OpenIGTLinkClient::onInvoke(boost::function<void()> func)
 {
-//	CX_LOG_CHANNEL_DEBUG("CA") << "OpenIGTLinkClient::onInvoke";
 	func();
 }
 

@@ -217,20 +217,16 @@ void SocketConnection::incomingConnection(qintptr socketDescriptor)
 		return;
 	}
 
-//	connect(mSocket, SIGNAL(disconnected()), this, SLOT(socketDisconnectedSlot()));
 	mSocket->getSocket()->setSocketDescriptor(socketDescriptor);
 	QString clientName = mSocket->getSocket()->localAddress().toString();
 	report("Connected to "+clientName+". Session started.");
-//	SenderPtr sender(new GrabberSenderQTcpSocket(mSocket));
 
-//	mImageSender->startStreaming(sender);
 	emit connected();
 	emit stateChanged(scsCONNECTED);
 }
 
 QStringList SocketConnection::getAllServerHostnames()
 {
-//	CX_LOG_INFO() <<  "Server IP adresses: ";
 	QStringList addresses;
 
 	foreach(QNetworkInterface interface, QNetworkInterface::allInterfaces())
@@ -242,7 +238,6 @@ QStringList SocketConnection::getAllServerHostnames()
 					 && entry.ip().toString() != "127.0.0.1"
 					 && entry.ip().toString().contains(".") )
 					addresses << QString("%1: %2").arg(interface.name()).arg(entry.ip().toString());
-//					CX_LOG_INFO() << interface.name() << " " << entry.ip().toString();
 			}
 	}
 

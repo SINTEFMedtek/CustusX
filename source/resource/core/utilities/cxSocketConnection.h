@@ -110,13 +110,8 @@ protected:
 	void stopListen();
 	void incomingConnection(qintptr socketDescriptor);
 
-
 	Socket* mSocket;
-//    QString mIp;
-//    int mPort;
 	ConnectionInfo mConnectionInfo;
-
-
 	QPointer<QTcpServer> mServer;
 };
 

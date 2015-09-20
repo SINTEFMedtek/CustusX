@@ -57,14 +57,6 @@ OpenIGTLinkConnectionWidget::OpenIGTLinkConnectionWidget(OpenIGTLinkClient *clie
 	mConnectButton->setCheckable(true);
     connect(mConnectButton, &QPushButton::clicked, this, &OpenIGTLinkConnectionWidget::connectButtonClicked);
 
-	// these connections facilitate cross-thread communication
-//    connect(this, &OpenIGTLinkConnectionWidget::requestConnect, mClient, &OpenIGTLinkClient::requestConnect);
-//    connect(this, &OpenIGTLinkConnectionWidget::requestDisconnect, mClient, &OpenIGTLinkClient::requestDisconnect);
-//	connect(this, &OpenIGTLinkConnectionWidget::setConnectionInfo, mClient, &OpenIGTLinkClient::setConnectionInfo);
-
-//    connect(mClient, &OpenIGTLinkClient::connected, this, &OpenIGTLinkConnectionWidget::clientConnected);
-//    connect(mClient, &OpenIGTLinkClient::disconnected, this, &OpenIGTLinkConnectionWidget::clientDisconnected);
-//    connect(mClient, &OpenIGTLinkClient::error, this, &OpenIGTLinkConnectionWidget::clientDisconnected);
 	connect(mClient, &OpenIGTLinkClient::stateChanged, this, &OpenIGTLinkConnectionWidget::onStateChanged);
 
     QVBoxLayout* topLayout = new QVBoxLayout(this);
@@ -119,32 +111,8 @@ void OpenIGTLinkConnectionWidget::onStateChanged(CX_SOCKETCONNECTION_STATE state
 	mOptionsWidget->setEnabled(state == scsINACTIVE);
 }
 
-//void OpenIGTLinkConnectionWidget::clientConnected()
-//{
-////    mConnectButton->blockSignals(true);
-////    mConnectButton->setEnabled(true);
-////    mConnectButton->setChecked(true);
-////    mConnectButton->setText("Disconnect");
-////    mConnectButton->blockSignals(false);
-
-////	mOptionsWidget->setEnabled(false);
-//}
-
-//void OpenIGTLinkConnectionWidget::clientDisconnected()
-//{
-////    mConnectButton->blockSignals(true);
-////    mConnectButton->setEnabled(true);
-////    mConnectButton->setChecked(false);
-////    mConnectButton->setText("Connect");
-////    mConnectButton->blockSignals(false);
-
-////	mOptionsWidget->setEnabled(true);
-//}
-
 void OpenIGTLinkConnectionWidget::connectButtonClicked(bool checked)
 {
-//    StringPropertyBasePtr ip = this->getIpOption(mOptionsElement);
-//    DoublePropertyBasePtr port = this->getPortOption(mOptionsElement);
     StringPropertyBasePtr dialects = this->getDialectOption(mOptionsElement, mClient);
     mClient->setDialect(dialects->getValue());
 
@@ -156,23 +124,15 @@ void OpenIGTLinkConnectionWidget::connectButtonClicked(bool checked)
 
     if(checked)
     {
-//		CX_LOG_CHANNEL_DEBUG("CA") << "set port " << info.port;
 		boost::function<void()> configure = boost::bind(&OpenIGTLinkClient::setConnectionInfo, mClient, info);
 		mClient->invoke(configure);
-//        emit ipAndPort(ip->getValue(), port->getValue());
 		boost::function<void()> connect = boost::bind(&OpenIGTLinkClient::requestConnect, mClient);
 		mClient->invoke(connect);
-//        emit requestConnect();
-//        mConnectButton->setText("Trying to connect...");
-//        mConnectButton->setEnabled(false);
     }
     else
     {
 		boost::function<void()> disconnect = boost::bind(&OpenIGTLinkClient::requestDisconnect, mClient);
 		mClient->invoke(disconnect);
-//        emit requestDisconnect();
-//        mConnectButton->setText("Trying to disconnect...");
-//        mConnectButton->setEnabled(false);
     }
 }
 
@@ -209,7 +169,6 @@ DoublePropertyBasePtr OpenIGTLinkConnectionWidget::getPortOption(QDomElement roo
     retval->setGuiRepresentation(DoublePropertyBase::grSPINBOX);
     retval->setAdvanced(true);
     retval->setGroup("Connection");
-//	CX_LOG_CHANNEL_DEBUG("CA") << "port_from_init " << retval->getValue();
     return retval;
 }
 

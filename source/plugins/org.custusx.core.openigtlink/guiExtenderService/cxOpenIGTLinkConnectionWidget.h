@@ -54,14 +54,7 @@ public:
 
     virtual QString defaultWhatsThis() const;
 
-//signals:
-//	void requestConnect(); ///< private use
-//	void requestDisconnect(); ///< private use
-//	void ipAndPort(QString ip, int port); ///< private use
-
 private slots:
-//    void clientConnected();
-//    void clientDisconnected();
     void connectButtonClicked(bool checked=false);
 
 private:

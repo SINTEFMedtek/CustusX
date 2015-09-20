@@ -98,7 +98,6 @@ signals:
 
 private slots:
     virtual void internalDataAvailable();
-//	void onInvoke2(int val);
 	void onInvoke(boost::function<void()> func);
 
 private:
