@@ -91,6 +91,14 @@ public:
 		QString host;
 		int port;
 
+		bool operator==(const ConnectionInfo& rhs) const
+		{
+			return (this->role == rhs.role)
+					&& (this->protocol == rhs.protocol)
+					&& (this->host == rhs.host)
+					&& (this->port == rhs.port);
+		}
+
 		bool isServer() const { return role.toLower()=="server"; }
 		bool isClient() const { return !this->isServer(); }
 		QString getDescription() const
@@ -109,13 +117,14 @@ public:
 	CX_SOCKETCONNECTION_STATE getState();
 
 public slots:
-	void setConnectionInfo(ConnectionInfo info);
-    void requestConnect();
+	virtual void setConnectionInfo(ConnectionInfo info); ///< thread-safe
+	void requestConnect(); ///< not thread-safe: use invoke
 //    void tryConnectAndWait();
-    void requestDisconnect();
-    bool sendData(const char* data, qint64 maxSize);
+	void requestDisconnect(); ///< not thread-safe: use invoke
+	bool sendData(const char* data, qint64 maxSize); ///< not thread-safe
 
 signals:
+	void connectionInfoChanged();
 	void stateChanged(CX_SOCKETCONNECTION_STATE status);
     void connected();
     void disconnected();
@@ -139,8 +148,6 @@ protected:
 	void stateChange(CX_SOCKETCONNECTION_STATE newState);
 
 	Socket* mSocket;
-//	QPointer<QTcpServer> mServer;
-	void onNewConnection();
 	QPointer<SingleConnectionTcpServer> mServer;
 
 	CX_SOCKETCONNECTION_STATE mCurrentState;

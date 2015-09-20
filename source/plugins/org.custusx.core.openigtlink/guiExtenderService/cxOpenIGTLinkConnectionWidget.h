@@ -42,6 +42,7 @@ class QPushButton;
 
 namespace cx {
 
+typedef boost::shared_ptr<class OpenIGTLinkClientThreadHandler> OpenIGTLinkClientThreadHandlerPtr;
 class OpenIGTLinkClient;
 
 class OpenIGTLinkConnectionWidget : public BaseWidget
@@ -49,7 +50,7 @@ class OpenIGTLinkConnectionWidget : public BaseWidget
     Q_OBJECT
 
 public:
-    OpenIGTLinkConnectionWidget(OpenIGTLinkClient *client, QWidget *parent=NULL);
+	OpenIGTLinkConnectionWidget(OpenIGTLinkClientThreadHandlerPtr client, QWidget *parent=NULL);
     ~OpenIGTLinkConnectionWidget();
 
     virtual QString defaultWhatsThis() const;
@@ -58,18 +59,11 @@ private slots:
     void connectButtonClicked(bool checked=false);
 
 private:
-    StringPropertyBasePtr getDialectOption(QDomElement root, OpenIGTLinkClient *client);
-    StringPropertyBasePtr getIpOption(QDomElement root);
-    DoublePropertyBasePtr getPortOption(QDomElement root);
-	StringPropertyBasePtr getRoleOption(QDomElement root);
-
 	void onStateChanged(CX_SOCKETCONNECTION_STATE state);
 
-    QDomElement mOptionsElement;
     QPushButton *mConnectButton;
 	QWidget* mOptionsWidget;
-
-    OpenIGTLinkClient* mClient;
+	OpenIGTLinkClientThreadHandlerPtr mClient;
 };
 
 }

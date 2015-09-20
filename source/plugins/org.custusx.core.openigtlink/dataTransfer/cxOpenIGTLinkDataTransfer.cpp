@@ -69,9 +69,9 @@ OpenIGTLinkDataTransfer::~OpenIGTLinkDataTransfer()
 	mOpenIGTLink.reset(); //
 }
 
-OpenIGTLinkClient* OpenIGTLinkDataTransfer::getOpenIGTLink()
+OpenIGTLinkClientThreadHandlerPtr OpenIGTLinkDataTransfer::getOpenIGTLink()
 {
-	return mOpenIGTLink->client();
+	return mOpenIGTLink;
 }
 
 QString OpenIGTLinkDataTransfer::getConfigUid() const

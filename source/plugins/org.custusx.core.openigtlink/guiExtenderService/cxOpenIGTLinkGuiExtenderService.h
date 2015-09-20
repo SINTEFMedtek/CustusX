@@ -40,19 +40,20 @@ class ctkPluginContext;
 
 namespace cx
 {
+typedef boost::shared_ptr<class OpenIGTLinkClientThreadHandler> OpenIGTLinkClientThreadHandlerPtr;
 class OpenIGTLinkClient;
 
 class org_custusx_core_openigtlink_EXPORT OpenIGTLinkGuiExtenderService : public GUIExtenderService
 {
 public:
-	OpenIGTLinkGuiExtenderService(ctkPluginContext* context, OpenIGTLinkClient *client = NULL);
+	OpenIGTLinkGuiExtenderService(ctkPluginContext* context, OpenIGTLinkClientThreadHandlerPtr client);
     virtual ~OpenIGTLinkGuiExtenderService();
 
     std::vector<CategorizedWidget> createWidgets() const;
 
 private:
     mutable GUIExtenderService::CategorizedWidget mWidget;
-    OpenIGTLinkClient* mClient;
+	OpenIGTLinkClientThreadHandlerPtr mClient;
 	ctkPluginContext* mContext;
 };
 typedef boost::shared_ptr<OpenIGTLinkGuiExtenderService> OpenIGTLinkGuiExtenderServicePtr;

@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-OpenIGTLinkGuiExtenderService::OpenIGTLinkGuiExtenderService(ctkPluginContext *context, OpenIGTLinkClient* client)
+OpenIGTLinkGuiExtenderService::OpenIGTLinkGuiExtenderService(ctkPluginContext *context, OpenIGTLinkClientThreadHandlerPtr client)
 {
 	mContext = context;
     mClient = client;

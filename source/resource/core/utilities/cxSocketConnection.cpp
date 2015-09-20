@@ -64,18 +64,6 @@ SingleConnectionTcpServer::SingleConnectionTcpServer(QObject* parent) :
 void SingleConnectionTcpServer::incomingConnection(qintptr socketDescriptor)
 {
 	emit incoming(socketDescriptor);
-//	CX_LOG_INFO() << "Server: Incoming connection...";
-
-//	if (mSocket->isConnected())
-//	{
-//		reportError("Incoming connection request rejected: The server can only handle a single connection.");
-//		return;
-//	}
-
-//	mSocket->getSocket()->setSocketDescriptor(socketDescriptor);
-
-//	QString clientName = mSocket->getSocket()->localAddress().toString();
-//	report("Server connected to "+clientName+". Session started.");
 }
 
 
@@ -93,6 +81,7 @@ SocketConnection::SocketConnection(QObject *parent) :
 
 	mNextConnectionInfo.host = "localhost";
 	mNextConnectionInfo.port = 18944;
+	mNextConnectionInfo.role = "client";
 
 	mSocket = new Socket(this);
 	connect(mSocket, &Socket::connected, this, &SocketConnection::internalConnected);
@@ -111,7 +100,12 @@ SocketConnection::ConnectionInfo SocketConnection::getConnectionInfo()
 void SocketConnection::setConnectionInfo(ConnectionInfo info)
 {
 	QMutexLocker locker(&mNextConnectionInfoMutex);
+	if (info==mNextConnectionInfo)
+		return;
 	mNextConnectionInfo = info;
+	locker.unlock();
+
+	emit connectionInfoChanged();
 }
 
 void SocketConnection::setCurrentConnectionInfo()
@@ -245,13 +239,11 @@ bool SocketConnection::startListen()
 {
 	if (!mServer)
 	{
-//		mServer = new QTcpServer(this);
 		mServer = new SingleConnectionTcpServer(this);
 		connect(mServer, &SingleConnectionTcpServer::incoming, this, &SocketConnection::incomingConnection);
 		mServer->setSocket(mSocket);
 	}
 	this->stateChange(scsCONNECTING);
-	connect(mServer, &QTcpServer::newConnection, this, &SocketConnection::onNewConnection);
 
 	bool started = mServer->listen(QHostAddress::Any, mCurrentConnectionInfo.port);
 
@@ -267,11 +259,6 @@ bool SocketConnection::startListen()
 
 	this->stateChange(scsLISTENING);
 	return started;
-}
-
-void SocketConnection::onNewConnection()
-{
-	CX_LOG_CHANNEL_DEBUG("CA") << "NEW INCOMING CONNECTION";
 }
 
 void SocketConnection::stopListen()

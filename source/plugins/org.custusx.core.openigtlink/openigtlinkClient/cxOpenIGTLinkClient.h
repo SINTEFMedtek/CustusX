@@ -80,12 +80,13 @@ public:
 
     //thread safe
 	QString getUid() const { return mUid; }
-    QStringList getAvailableDialects() const;
-    void setDialect(QString dialectname);
-	void sendMessage(ImagePtr image); // thread safe?????????????????????????????
-	void sendMessage(MeshPtr image); // thread safe?????????????????????????????
-
+	virtual void setConnectionInfo(ConnectionInfo info);
+	QStringList getAvailableDialects() const;
 	void invoke(boost::function<void()> func);
+
+	// not thread-safe: use invoke to call in this thread
+	void sendMessage(ImagePtr image);
+	void sendMessage(MeshPtr image);
 
 signals:
     void transform(QString devicename, Transform3D transform, double timestamp);
@@ -100,7 +101,11 @@ private slots:
     virtual void internalDataAvailable();
 	void onInvoke(boost::function<void()> func);
 
+protected:
+
 private:
+	DialectPtr initDialect(DialectPtr value);
+	void setDialect(QString dialectname);
 	bool receiveHeader(const igtl::MessageHeader::Pointer header) const;
     bool receiveBody(const igtl::MessageHeader::Pointer header);
 
@@ -124,16 +129,35 @@ typedef boost::shared_ptr<class OpenIGTLinkClientThreadHandler> OpenIGTLinkClien
  *  Lifetime of the thread equals that of this object.
  *
  */
-class OpenIGTLinkClientThreadHandler
+class OpenIGTLinkClientThreadHandler : public QObject
 {
+	Q_OBJECT
 public:
 	explicit OpenIGTLinkClientThreadHandler(QString threadname);
 	~OpenIGTLinkClientThreadHandler();
 	OpenIGTLinkClient* client();
 
+	StringPropertyBasePtr getDialectOption() { return mDialects; }
+	StringPropertyBasePtr getIpOption() { return mIp; }
+	DoublePropertyBasePtr getPortOption() { return mPort; }
+	StringPropertyBasePtr getRoleOption() { return mRole; }
+
 private:
+	void onConnectionInfoChanged();
+	void onPropertiesChanged();
+	StringPropertyBasePtr mIp;
+	DoublePropertyBasePtr mPort;
+	StringPropertyBasePtr mDialects;
+	StringPropertyBasePtr mRole;
+
+	StringPropertyBasePtr createDialectOption();
+	StringPropertyBasePtr createIpOption();
+	DoublePropertyBasePtr createPortOption();
+	StringPropertyBasePtr createRoleOption();
+
 	OpenIGTLinkClientPtr mClient;
 	QThreadPtr mThread;
+	QDomElement mOptionsElement;
 };
 
 

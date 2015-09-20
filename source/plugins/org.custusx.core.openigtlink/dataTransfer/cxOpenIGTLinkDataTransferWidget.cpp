@@ -69,7 +69,8 @@ OpenIGTLinkDataTransferWidget::OpenIGTLinkDataTransferWidget(ctkPluginContext *c
 	QVBoxLayout* layout = new QVBoxLayout(this);
 //	layout->setMargin(0);
 
-	QVBoxLayout* connectionLayout = this->createVBoxInGroupBox(layout, "Connection");
+	QString uid = mDataTransfer->getOpenIGTLink()->client()->getUid();
+	QVBoxLayout* connectionLayout = this->createVBoxInGroupBox(layout, QString("Connection/%1").arg(uid));
 	connectionLayout->addWidget(mConnectionWidget);
 
 	QVBoxLayout* receiveLayout = this->createVBoxInGroupBox(layout, "Receive");

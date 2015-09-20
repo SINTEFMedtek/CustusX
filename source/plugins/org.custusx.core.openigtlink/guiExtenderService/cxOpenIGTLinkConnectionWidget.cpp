@@ -41,23 +41,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx {
 
-OpenIGTLinkConnectionWidget::OpenIGTLinkConnectionWidget(OpenIGTLinkClient *client, QWidget *parent) :
+OpenIGTLinkConnectionWidget::OpenIGTLinkConnectionWidget(OpenIGTLinkClientThreadHandlerPtr client, QWidget *parent) :
     BaseWidget(parent, "OpenIGTLinkConnectionWidget", "OpenIGTLink Connection"),
     mClient(client)
 {
-	CX_LOG_CHANNEL_DEBUG("CA") << "OpenIGTLinkConnectionWidget create " << client->getUid();
-	XmlOptionFile options = profile()->getXmlSettings().descend(client->getUid());
-    mOptionsElement = options.getElement();
-    StringPropertyBasePtr ip = this->getIpOption(mOptionsElement);
-    DoublePropertyBasePtr port = this->getPortOption(mOptionsElement);
-    StringPropertyBasePtr dialects = this->getDialectOption(mOptionsElement, mClient);
-	StringPropertyBasePtr role = this->getRoleOption(mOptionsElement);
+	StringPropertyBasePtr ip = mClient->getIpOption();
+	DoublePropertyBasePtr port = mClient->getPortOption();
+	StringPropertyBasePtr dialects = mClient->getDialectOption();
+	StringPropertyBasePtr role = mClient->getRoleOption();
 
     mConnectButton = new QPushButton("Connect", this);
 	mConnectButton->setCheckable(true);
     connect(mConnectButton, &QPushButton::clicked, this, &OpenIGTLinkConnectionWidget::connectButtonClicked);
 
-	connect(mClient, &OpenIGTLinkClient::stateChanged, this, &OpenIGTLinkConnectionWidget::onStateChanged);
+	connect(mClient->client(), &OpenIGTLinkClient::stateChanged, this, &OpenIGTLinkConnectionWidget::onStateChanged);
 
     QVBoxLayout* topLayout = new QVBoxLayout(this);
 
@@ -74,9 +71,9 @@ OpenIGTLinkConnectionWidget::OpenIGTLinkConnectionWidget(OpenIGTLinkClient *clie
 
     topLayout->addWidget(mConnectButton);
     topLayout->addStretch();
-	CX_LOG_CHANNEL_DEBUG("CA") << "OpenIGTLinkConnectionWidget end create " << client->getUid();
+//	CX_LOG_CHANNEL_DEBUG("CA") << "OpenIGTLinkConnectionWidget end create " << client->getUid();
 
-	this->onStateChanged(mClient->getState());
+	this->onStateChanged(mClient->client()->getState());
 
 }
 
@@ -100,7 +97,7 @@ QString OpenIGTLinkConnectionWidget::defaultWhatsThis() const
 
 void OpenIGTLinkConnectionWidget::onStateChanged(CX_SOCKETCONNECTION_STATE state)
 {
-	CX_LOG_CHANNEL_DEBUG("CA") << "Changed connection state to " << string_cast(state);
+//	CX_LOG_CHANNEL_DEBUG("CA") << "Changed connection state to " << string_cast(state);
 
 	QString status = qstring_cast(state);
 	QString action = (state==scsINACTIVE) ? "Connect" : "Disconnect";
@@ -116,76 +113,18 @@ void OpenIGTLinkConnectionWidget::onStateChanged(CX_SOCKETCONNECTION_STATE state
 
 void OpenIGTLinkConnectionWidget::connectButtonClicked(bool checked)
 {
-    StringPropertyBasePtr dialects = this->getDialectOption(mOptionsElement, mClient);
-    mClient->setDialect(dialects->getValue());
-
-	OpenIGTLinkClient::ConnectionInfo info;
-	info.role = this->getRoleOption(mOptionsElement)->getValue();
-	info.host = this->getIpOption(mOptionsElement)->getValue();
-	info.port = this->getPortOption(mOptionsElement)->getValue();
-	info.protocol = this->getDialectOption(mOptionsElement, mClient)->getValue();
-
     if(checked)
     {
-		boost::function<void()> configure = boost::bind(&OpenIGTLinkClient::setConnectionInfo, mClient, info);
-		mClient->invoke(configure);
-		boost::function<void()> connect = boost::bind(&OpenIGTLinkClient::requestConnect, mClient);
-		mClient->invoke(connect);
+		boost::function<void()> connect = boost::bind(&OpenIGTLinkClient::requestConnect, mClient->client());
+		mClient->client()->invoke(connect);
     }
     else
     {
-		boost::function<void()> disconnect = boost::bind(&OpenIGTLinkClient::requestDisconnect, mClient);
-		mClient->invoke(disconnect);
+		boost::function<void()> disconnect = boost::bind(&OpenIGTLinkClient::requestDisconnect, mClient->client());
+		mClient->client()->invoke(disconnect);
     }
 }
 
-StringPropertyBasePtr OpenIGTLinkConnectionWidget::getDialectOption(QDomElement root, OpenIGTLinkClient* client)
-{
-    StringPropertyPtr retval;
-    QStringList dialectnames;
-    if(client)
-        dialectnames = client->getAvailableDialects();
-	retval = StringProperty::initialize("protocol", "Dialect", "OpenIGTLinkDialect", dialectnames.front(), dialectnames, root);
-    retval->setValueRange(dialectnames);
-    retval->setGroup("Connection");
-    return retval;
-}
-
-StringPropertyBasePtr OpenIGTLinkConnectionWidget::getIpOption(QDomElement root)
-{
-    StringPropertyPtr retval;
-    QString defaultValue = "127.0.0.1";
-	retval = StringProperty::initialize("address", "Address", "Network Address", defaultValue, root);
-    retval->setGroup("Connection");
-    return retval;
-}
-
-
-DoublePropertyBasePtr OpenIGTLinkConnectionWidget::getPortOption(QDomElement root)
-{
-    DoublePropertyPtr retval;
-    double defaultValue = 18944;
-	retval = DoubleProperty::initialize("port", "Port",
-										"Network Port (default "+QString::number(defaultValue)+")",
-										defaultValue,
-										DoubleRange(1024, 49151, 1), 0, root);
-    retval->setGuiRepresentation(DoublePropertyBase::grSPINBOX);
-    retval->setAdvanced(true);
-    retval->setGroup("Connection");
-    return retval;
-}
-
-StringPropertyBasePtr OpenIGTLinkConnectionWidget::getRoleOption(QDomElement root)
-{
-	StringPropertyPtr retval;
-	QStringList values = QStringList() << "client" << "server";
-	QString value = values.front();
-	retval = StringProperty::initialize("role", "Role",
-										"Act as client or server in the network connection",
-										value, values, root);
-	retval->setGroup("Connection");
-	return retval;
-}
 
 
 

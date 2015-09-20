@@ -67,7 +67,7 @@ public:
 	StringPropertySelectDataPtr getDataToSend() { return mDataToSend; }
 	PatientModelServicePtr getPatientModelService() { return mPatientModelService; }
 	VisualizationServicePtr getViewService() { return mViewService; }
-	OpenIGTLinkClient* getOpenIGTLink();
+	OpenIGTLinkClientThreadHandlerPtr getOpenIGTLink();
 
 	/**
 	 * Send data over igtl, using the data set in the DataToSend property
