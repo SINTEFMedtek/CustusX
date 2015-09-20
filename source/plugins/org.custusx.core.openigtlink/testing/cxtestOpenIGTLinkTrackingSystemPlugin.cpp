@@ -50,7 +50,7 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: Check that the openigtlink tracking
 
 TEST_CASE("OpenIGTLinkGuiExtender: Check that the openigtlink gui extender service can be created and destroyed", "[unit][org.custusx.core.tracking.system.openigtlink]")
 {
-    cx::OpenIGTLinkClient *client = new cx::OpenIGTLinkClient;
+	cx::OpenIGTLinkClient *client = new cx::OpenIGTLinkClient("test");
     client->setDialect("PlusServer");
 	cx::OpenIGTLinkGuiExtenderServicePtr gui(new cx::OpenIGTLinkGuiExtenderService(NULL, client));
     REQUIRE(gui);
@@ -63,9 +63,14 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: Check that the plugin can connect a
 {
 
     QThread mOpenIGTLinkThread;
-    cx::OpenIGTLinkClient *client = new cx::OpenIGTLinkClient;
-    client->setDialect("PlusServer");
-    client->setIpAndPort("10.218.140.127", 18944); //this is done before client is moved to another thread
+	cx::OpenIGTLinkClient *client = new cx::OpenIGTLinkClient("test");
+	cx::OpenIGTLinkClient::ConnectionInfo info;
+	info.host = "10.218.140.127";
+	info.port = 18944;
+	info.protocol = "PlusServer";
+	client->setDialect("PlusServer");
+	client->setConnectionInfo(info); //this is done before client is moved to another thread
+//    client->setIpAndPort("10.218.140.127", 18944); //this is done before client is moved to another thread
     client->moveToThread(&mOpenIGTLinkThread);
     QObject::connect(&mOpenIGTLinkThread, &QThread::finished, client, &QObject::deleteLater);
 

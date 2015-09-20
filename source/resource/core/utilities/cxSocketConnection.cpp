@@ -32,45 +32,70 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxSocketConnection.h"
 #include "cxLogger.h"
+#include <QTcpServer>
+#include <QTcpSocket>
+#include <QNetworkInterface>
+
+SNW_DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, CX_SOCKETCONNECTION_STATE, scsCOUNT)
+{
+	"inactive",
+	"connected",
+	"listening",
+	"connecting"
+}
+SNW_DEFINE_ENUM_STRING_CONVERTERS_END(cx, CX_SOCKETCONNECTION_STATE, scsCOUNT)
 
 namespace cx {
 
 SocketConnection::SocketConnection(QObject *parent) :
-    QObject(parent),
-    mIp("localhost"),
-    mPort(0)
+	QObject(parent)
 {
+	qRegisterMetaType<boost::function<void()> >("boost::function<void()>");
+	qRegisterMetaType<CX_SOCKETCONNECTION_STATE>("CX_SOCKETCONNECTION_STATE");
 
-    mSocket = SocketPtr(new Socket(this));
-    //todo: check affinity on socket!!!
-    connect(mSocket.get(), &Socket::connected, this, &SocketConnection::internalConnected);
-    connect(mSocket.get(), &Socket::disconnected, this, &SocketConnection::internalDisconnected);
-    connect(mSocket.get(), &Socket::readyRead, this, &SocketConnection::internalDataAvailable);
-    connect(mSocket.get(), &Socket::error, this, &SocketConnection::error);
+	mConnectionInfo.host = "localhost";
+	mConnectionInfo.port = 18944;
+
+	mSocket = new Socket(this);
+	connect(mSocket, &Socket::connected, this, &SocketConnection::internalConnected);
+	connect(mSocket, &Socket::disconnected, this, &SocketConnection::internalDisconnected);
+	connect(mSocket, &Socket::readyRead, this, &SocketConnection::internalDataAvailable);
+	connect(mSocket, &Socket::error, this, &SocketConnection::error);
+	connect(mSocket, &Socket::error, this, &SocketConnection::internalError);
 }
 
-
-void SocketConnection::setIpAndPort(QString ip, int port)
+void SocketConnection::setConnectionInfo(ConnectionInfo info)
 {
-    mIp = ip;
-    mPort = port;
+	mConnectionInfo = info;
 }
 
 void SocketConnection::requestConnect()
 {
-    CX_LOG_INFO() << "Trying to connect to " << mIp << ":" << mPort;
-    mSocket->requestConnectToHost(mIp, mPort);
+	CX_LOG_CHANNEL_DEBUG("CA") << "RequestConnect";
+	if (mConnectionInfo.isClient())
+	{
+		CX_LOG_INFO() << "Trying to connect to " << mConnectionInfo.getDescription();
+		emit stateChanged(scsCONNECTING);
+		mSocket->requestConnectToHost(mConnectionInfo.host, mConnectionInfo.port);
+	}
+	else
+	{
+		this->startListen();
+	}
 }
 
-void SocketConnection::tryConnectAndWait()
-{
-    CX_LOG_INFO() << "Trying to connect to " << mIp << ":" << mPort;
-    mSocket->tryConnectToHostAndWait(mIp, mPort);
-}
+//void SocketConnection::tryConnectAndWait()
+//{
+//    CX_LOG_INFO() << "Trying to connect to " << mIp << ":" << mPort;
+//    mSocket->tryConnectToHostAndWait(mIp, mPort);
+//}
 
 void SocketConnection::requestDisconnect()
 {
-    mSocket->requestCloseConnection();
+	CX_LOG_INFO("CA") << "RequestDisconnect";
+
+	this->stopListen();
+	mSocket->requestCloseConnection();
 }
 
 bool SocketConnection::sendData(const char *data, qint64 maxSize)
@@ -85,14 +110,22 @@ bool SocketConnection::sendData(const char *data, qint64 maxSize)
 
 void SocketConnection::internalConnected()
 {
-    CX_LOG_SUCCESS() << "Connected to "  << mIp << ":" << mPort;
-    emit connected();
+	CX_LOG_SUCCESS() << "Connected to "  << mConnectionInfo.getDescription();
+	emit stateChanged(scsCONNECTED);
+	emit connected();
 }
 
 void SocketConnection::internalDisconnected()
 {
     CX_LOG_SUCCESS() << "Disconnected";
-    emit disconnected();
+	emit stateChanged(scsINACTIVE);
+	emit disconnected();
+}
+
+void SocketConnection::internalError()
+{
+	CX_LOG_INFO() << "Error";
+	emit stateChanged(scsINACTIVE);
 }
 
 void SocketConnection::internalDataAvailable()
@@ -136,4 +169,84 @@ bool SocketConnection::socketReceive(void *packPointer, int packSize) const
     }
     return true;
 }
+
+
+bool SocketConnection::startListen()
+{
+	if (!mServer)
+		mServer = new QTcpServer(this);
+	emit stateChanged(scsCONNECTING);
+
+//	CX_LOG_CHANNEL_DEBUG("CA") << "set port " << mConnectionInfo.port;
+	bool started = mServer->listen(QHostAddress::Any, mConnectionInfo.port);
+
+	if (started)
+	{
+//		this->getAllServerHostnames();
+		CX_LOG_INFO() << QString("Server address: %1").arg(this->getAllServerHostnames().join(", "));
+		CX_LOG_INFO() << QString("Server is listening to port %1").arg(mServer->serverPort());
+	}
+	else
+	{
+		CX_LOG_INFO() << QString("Server failed to start. Error: ").arg(mServer->errorString());
+	}
+
+	emit stateChanged(scsLISTENING);
+	return started;
+}
+
+void SocketConnection::stopListen()
+{
+	if (mServer && mServer->isListening())
+	{
+		mServer->close();
+		if (!mSocket->isConnected())
+		{
+			emit stateChanged(scsINACTIVE);
+		}
+	}
+}
+
+void SocketConnection::incomingConnection(qintptr socketDescriptor)
+{
+	CX_LOG_INFO() << "Server: Incoming connection...";
+
+	if (this->socketIsConnected())
+	{
+		reportError("Incoming connection request rejected: The server can only handle a single connection.");
+		return;
+	}
+
+//	connect(mSocket, SIGNAL(disconnected()), this, SLOT(socketDisconnectedSlot()));
+	mSocket->getSocket()->setSocketDescriptor(socketDescriptor);
+	QString clientName = mSocket->getSocket()->localAddress().toString();
+	report("Connected to "+clientName+". Session started.");
+//	SenderPtr sender(new GrabberSenderQTcpSocket(mSocket));
+
+//	mImageSender->startStreaming(sender);
+	emit connected();
+	emit stateChanged(scsCONNECTED);
+}
+
+QStringList SocketConnection::getAllServerHostnames()
+{
+//	CX_LOG_INFO() <<  "Server IP adresses: ";
+	QStringList addresses;
+
+	foreach(QNetworkInterface interface, QNetworkInterface::allInterfaces())
+	{
+		if (interface.flags().testFlag(QNetworkInterface::IsRunning))
+			foreach (QNetworkAddressEntry entry, interface.addressEntries())
+			{
+				if ( interface.hardwareAddress() != "00:00:00:00:00:00"
+					 && entry.ip().toString() != "127.0.0.1"
+					 && entry.ip().toString().contains(".") )
+					addresses << QString("%1: %2").arg(interface.name()).arg(entry.ip().toString());
+//					CX_LOG_INFO() << interface.name() << " " << entry.ip().toString();
+			}
+	}
+
+	return addresses;
+}
+
 } //namespace cx

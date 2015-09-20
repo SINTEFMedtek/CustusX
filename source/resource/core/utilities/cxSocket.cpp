@@ -46,17 +46,17 @@ Socket::Socket(QObject *parent) :
     qRegisterMetaType<QAbstractSocket::SocketError>("QAbstractSocket::SocketError");
     qRegisterMetaType<QAbstractSocket::SocketState>("QAbstractSocket::SocketState");
 
-    mSocket = QTcpSocketPtr(new QTcpSocket(this));
-    connect(mSocket.get(), &QTcpSocket::connected, this, &Socket::receivedConnected);
-    connect(mSocket.get(), &QTcpSocket::disconnected, this, &Socket::receivedDisconnected);
+	mSocket = new QTcpSocket(this);
+	connect(mSocket, &QTcpSocket::connected, this, &Socket::receivedConnected);
+	connect(mSocket, &QTcpSocket::disconnected, this, &Socket::receivedDisconnected);
     //see http://stackoverflow.com/questions/26062397/qt-connect-function-signal-disambiguation-using-lambdas
     void (QTcpSocket::* errorOverloaded)(QAbstractSocket::SocketError) = &QTcpSocket::error;
-    connect(mSocket.get(), errorOverloaded, this, &Socket::receivedError);
-    connect(mSocket.get(), &QTcpSocket::hostFound, this, &Socket::receivedHostFound);
-    connect(mSocket.get(), &QTcpSocket::stateChanged, this, &Socket::receivedStateChanged);
-    connect(mSocket.get(), &QTcpSocket::readyRead, this, &Socket::receiveReadyRead);
-    connect(mSocket.get(), &QTcpSocket::bytesWritten, this, &Socket::receiveBytesWritten);
-    connect(mSocket.get(), &QTcpSocket::aboutToClose, this, &Socket::receiveAboutToClose);
+	connect(mSocket, errorOverloaded, this, &Socket::receivedError);
+	connect(mSocket, &QTcpSocket::hostFound, this, &Socket::receivedHostFound);
+	connect(mSocket, &QTcpSocket::stateChanged, this, &Socket::receivedStateChanged);
+	connect(mSocket, &QTcpSocket::readyRead, this, &Socket::receiveReadyRead);
+	connect(mSocket, &QTcpSocket::bytesWritten, this, &Socket::receiveBytesWritten);
+	connect(mSocket, &QTcpSocket::aboutToClose, this, &Socket::receiveAboutToClose);
 }
 
 void Socket::requestConnectToHost(QString ip, int port) const

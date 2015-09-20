@@ -75,6 +75,7 @@ public:
 
     bool waitForBytesWritten(int msecs = 3000);
     bool waitForReadyRead(int msecs = 3000);
+	QTcpSocket* getSocket() { return mSocket; }
 
 signals:
     void connected();
@@ -93,8 +94,7 @@ private slots:
     void receiveAboutToClose();
 
 private:
-    typedef boost::shared_ptr<QTcpSocket> QTcpSocketPtr;
-    QTcpSocketPtr mSocket;
+	QTcpSocket* mSocket;
     bool mConnected;
 };
 }

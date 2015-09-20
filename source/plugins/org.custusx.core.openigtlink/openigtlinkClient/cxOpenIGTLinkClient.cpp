@@ -46,13 +46,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-OpenIGTLinkClient::OpenIGTLinkClient(QObject *parent) :
+OpenIGTLinkClient::OpenIGTLinkClient(QString uid, QObject *parent) :
     SocketConnection(parent),
     mHeader(igtl::MessageHeader::New()),
-    mHeaderReceived(false)
+	mHeaderReceived(false),
+	mUid(uid)
 {
-    mIp = "localhost";
-    mPort = 18944;
+//    mIp = "localhost";
+//    mPort = 18944;
     qRegisterMetaType<Transform3D>("Transform3D");
     qRegisterMetaType<ImagePtr>("ImagePtr");
 	qRegisterMetaType<ImagePtr>("MeshPtr");
@@ -74,6 +75,25 @@ OpenIGTLinkClient::OpenIGTLinkClient(QObject *parent) :
 
 OpenIGTLinkClient::~OpenIGTLinkClient()
 {
+}
+
+void OpenIGTLinkClient::invoke(boost::function<void()> func)
+{
+	QMetaObject::invokeMethod(this,
+							  "onInvoke",
+							  Qt::QueuedConnection,
+							  Q_ARG(boost::function<void()>, func));
+}
+
+//void OpenIGTLinkClient::onInvoke2(int val)
+//{
+//	CX_LOG_CHANNEL_DEBUG("CA") << "OpenIGTLinkClient::onInvoke2";
+//}
+
+void OpenIGTLinkClient::onInvoke(boost::function<void()> func)
+{
+//	CX_LOG_CHANNEL_DEBUG("CA") << "OpenIGTLinkClient::onInvoke";
+	func();
 }
 
 QStringList OpenIGTLinkClient::getAvailableDialects() const
@@ -308,7 +328,7 @@ OpenIGTLinkClientThreadHandler::OpenIGTLinkClientThreadHandler(QString threadnam
 {
 	mThread.reset(new QThread());
 	mThread->setObjectName(threadname);
-	mClient.reset(new OpenIGTLinkClient);
+	mClient.reset(new OpenIGTLinkClient(threadname));
 	mClient->moveToThread(mThread.get());
 
 	mThread->start();

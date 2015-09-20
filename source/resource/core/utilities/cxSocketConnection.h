@@ -34,9 +34,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXSOCKETCONNECTION_H
 
 #include "cxSocket.h"
+#include <QPointer>
+class QTcpServer;
+#include "cxEnumConverter.h"
 
 namespace cx {
+enum CX_SOCKETCONNECTION_STATE
+{
+	scsINACTIVE,
+	scsCONNECTED,
+	scsLISTENING,
+	scsCONNECTING,
+	scsCOUNT
+};
+} // namespace cx
 
+SNW_DECLARE_ENUM_STRING_CONVERTERS(cx, CX_SOCKETCONNECTION_STATE);
+
+
+
+namespace cx {
 
 class cxResource_EXPORT SocketConnection : public QObject
 {
@@ -44,14 +61,36 @@ class cxResource_EXPORT SocketConnection : public QObject
 public:
     explicit SocketConnection(QObject *parent = 0);
 
+	struct ConnectionInfo
+	{
+		QString role;
+		QString protocol;
+		QString host;
+		int port;
+
+		bool isServer() const { return role.toLower()=="server"; }
+		bool isClient() const { return !this->isServer(); }
+		QString getDescription() const
+		{
+			QString postfix;
+			QString name = host;
+			if (isServer())
+					name = "listen";
+			if (!protocol.isEmpty())
+				postfix = QString("[%1]").arg(protocol);
+			return QString("%1:%2%3").arg(name).arg(port).arg(postfix);
+		}
+	};
+
 public slots:
-    void setIpAndPort(QString ip, int port); //not threadsafe
+	void setConnectionInfo(ConnectionInfo info);
     void requestConnect();
-    void tryConnectAndWait();
+//    void tryConnectAndWait();
     void requestDisconnect();
     bool sendData(const char* data, qint64 maxSize);
 
 signals:
+	void stateChanged(CX_SOCKETCONNECTION_STATE status);
     void connected();
     void disconnected();
     void error();
@@ -59,16 +98,26 @@ signals:
 private slots:
     void internalConnected();
     void internalDisconnected();
-    virtual void internalDataAvailable();
+	void internalError();
+	virtual void internalDataAvailable();
 
 protected:
     bool socketIsConnected();
     bool enoughBytesAvailableOnSocket(int bytes) const;
     bool socketReceive(void *packPointer, int packSize) const;
+	QStringList getAllServerHostnames();
+	bool startListen();
+	void stopListen();
+	void incomingConnection(qintptr socketDescriptor);
 
-    SocketPtr mSocket;
-    QString mIp;
-    int mPort;
+
+	Socket* mSocket;
+//    QString mIp;
+//    int mPort;
+	ConnectionInfo mConnectionInfo;
+
+
+	QPointer<QTcpServer> mServer;
 };
 
 } //namespace cx

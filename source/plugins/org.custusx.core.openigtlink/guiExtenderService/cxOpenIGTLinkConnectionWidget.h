@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxBaseWidget.h"
 #include "cxStringProperty.h"
 #include "cxDoubleProperty.h"
+#include "cxSocketConnection.h"
 
 class QPushButton;
 
@@ -53,20 +54,23 @@ public:
 
     virtual QString defaultWhatsThis() const;
 
-signals:
-    void requestConnect();
-    void requestDisconnect();
-    void ipAndPort(QString ip, int port);
+//signals:
+//	void requestConnect(); ///< private use
+//	void requestDisconnect(); ///< private use
+//	void ipAndPort(QString ip, int port); ///< private use
 
 private slots:
-    void clientConnected();
-    void clientDisconnected();
+//    void clientConnected();
+//    void clientDisconnected();
     void connectButtonClicked(bool checked=false);
 
 private:
     StringPropertyBasePtr getDialectOption(QDomElement root, OpenIGTLinkClient *client);
     StringPropertyBasePtr getIpOption(QDomElement root);
     DoublePropertyBasePtr getPortOption(QDomElement root);
+	StringPropertyBasePtr getRoleOption(QDomElement root);
+
+	void onStateChanged(CX_SOCKETCONNECTION_STATE state);
 
     QDomElement mOptionsElement;
     QPushButton *mConnectButton;
