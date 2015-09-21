@@ -174,6 +174,8 @@ bool SocketServerConnector::startListen()
 
 void SocketServerConnector::stopListen()
 {
+	mSocket->close();
+
 	if (mServer && mServer->isListening())
 	{
 		CX_LOG_INFO() << QString("Server stopped listening to port %1").arg(mServer->serverPort());
