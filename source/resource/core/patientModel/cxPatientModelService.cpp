@@ -78,14 +78,40 @@ Transform3D PatientModelService::get_rMpr() const
 
 DataPtr PatientModelService::getActiveData() const
 {
-	if(this->getActiveDataList().isEmpty())
+	if(this->getActiveDataHistory().isEmpty())
 		return DataPtr();
-	return this->getActiveDataList().last();
+	return this->getActiveDataHistory().last();
+}
+
+QList<DataPtr> PatientModelService::getActiveDataHistory(QString typeRegexp) const
+{
+	QRegExp reg(typeRegexp);
+	QList<DataPtr> activeDatas = this->getActiveDataHistory();
+
+	for(int i = 0; i < activeDatas.size(); )
+	{
+		int current = i++;
+		if(!activeDatas.at(current)->getType().contains(reg))
+			activeDatas.removeAt(current);
+	}
+
+	return activeDatas;
+}
+
+DataPtr PatientModelService::getActiveData(QString typeRegexp) const
+{
+	QList<DataPtr> activeDatas = getActiveDataHistory(typeRegexp);
+
+	DataPtr activeData;
+	if(!activeDatas.isEmpty())
+		activeData = activeDatas.last();
+
+	return activeData;
 }
 
 ImagePtr PatientModelService::getDerivedActiveImage() const
 {
-	DataPtr activeData = this->getActiveData();
+	DataPtr activeData = this->getActiveData("image|trackedStream");
 	ImagePtr retval;
 	TrackedStreamPtr stream = boost::dynamic_pointer_cast<TrackedStream>(activeData);
 	if(stream)

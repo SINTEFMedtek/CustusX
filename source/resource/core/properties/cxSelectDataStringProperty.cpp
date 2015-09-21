@@ -46,7 +46,7 @@ StringPropertyActiveData::StringPropertyActiveData(PatientModelServicePtr patien
 {
 	mValueName = "Active Data";
 	mHelp = "Select the active data obejct";
-	connect(mPatientModelService.get(), &PatientModelService::activeImageChanged, this, &StringPropertyActiveImage::changed);
+	connect(mPatientModelService.get(), &PatientModelService::activeDataChanged, this, &StringPropertyActiveData::changed);
 }
 
 bool StringPropertyActiveData::setValue(const QString& value)
@@ -61,7 +61,8 @@ bool StringPropertyActiveData::setValue(const QString& value)
 QString StringPropertyActiveData::getValue() const
 {
 	QString retval = "";
-	DataPtr activeData = mPatientModelService->getActiveData();
+	DataPtr activeData = mPatientModelService->getActiveData(mTypeRegexp);
+
 	if(activeData)
 		retval = activeData->getUid();
 	return retval;

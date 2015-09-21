@@ -56,6 +56,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxCameraStyle.h"
 #include "cxPatientModelService.h"
 #include "cxImage.h"
+#include "cxMesh.h"
+#include "cxTrackedStream.h"
 
 namespace cx
 {
@@ -129,9 +131,15 @@ void ViewGroup::syncOrientationMode(SyncedValuePtr val)
 void ViewGroup::mouseClickInViewGroupSlot()
 {
 	std::vector<ImagePtr> images = mViewGroupData->getImages(DataViewProperties::createFull());
-	if (!images.empty())
-		if (!std::count(images.begin(), images.end(), mBackend->getPatientService()->getActiveData<Image>()))
-			mBackend->getPatientService()->setActiveData(images.front()->getUid());
+	std::vector<MeshPtr> meshes = mViewGroupData->getMeshes(DataViewProperties::createFull());
+	std::vector<TrackedStreamPtr> trackedStreams = mViewGroupData->getTrackedStreams(DataViewProperties::createFull());
+
+	if(!meshes.empty())
+		mBackend->getPatientService()->setActiveData(meshes.front()->getUid());
+	if(!images.empty())
+		mBackend->getPatientService()->setActiveData(images.front()->getUid());
+	if(!trackedStreams.empty())
+		mBackend->getPatientService()->setActiveData(trackedStreams.front()->getUid());
 
 	View* view = static_cast<View*>(this->sender());
 	if (view && mActiveView)
@@ -147,7 +155,6 @@ void ViewGroup::initializeActiveView(SyncedValuePtr val)
 {
 	mActiveView = val;
 }
-
 
 void ViewGroup::addXml(QDomNode& dataNode)
 {

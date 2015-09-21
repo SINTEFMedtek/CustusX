@@ -116,8 +116,9 @@ public:
 	virtual Transform3D get_rMpr() const;
 	virtual RegistrationHistoryPtr get_rMpr_History() const = 0;
 	// active image
-	virtual QList<DataPtr> getActiveDataList() const = 0;
+	virtual QList<DataPtr> getActiveDataHistory() const = 0;
 	DataPtr getActiveData() const;
+	DataPtr getActiveData(QString typeRegexp) const;
 	ImagePtr getDerivedActiveImage() const;///< In addition to returning Image this also provides derived (changing) images from TrackedStream
 	template <class DATA>
 	boost::shared_ptr<DATA> getActiveData() const;
@@ -159,6 +160,7 @@ public:
 
 	static PatientModelServicePtr getNullObject();
 
+	QList<DataPtr> getActiveDataHistory(QString typeRegexp) const;
 signals:
 	void centerChanged(); ///< emitted when center is changed.
 	void dataAddedOrRemoved();
@@ -204,7 +206,7 @@ template <class DATA>
 boost::shared_ptr<DATA> PatientModelService::getActiveData() const
 {
 	boost::shared_ptr<DATA> retval;
-	QList<DataPtr> activeDataList = this->getActiveDataList();
+	QList<DataPtr> activeDataList = this->getActiveDataHistory();
 	for(int i = activeDataList.size() - 1; i >= 0; --i)
 	{
 		retval = boost::dynamic_pointer_cast<DATA>(activeDataList.at(i));

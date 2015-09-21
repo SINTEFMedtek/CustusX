@@ -108,7 +108,6 @@ void DataViewPropertiesInteractor::dataActionSlot()
 
 	QString uid = theAction->data().toString();
 	DataPtr data = mServices->getPatientService()->getData(uid);
-	ImagePtr image = mServices->getPatientService()->getData<Image>(data->getUid());
 
 	bool firstData = mGroupData->getData(DataViewProperties::createFull()).empty();
 
@@ -119,8 +118,8 @@ void DataViewPropertiesInteractor::dataActionSlot()
 		DataViewProperties props = old.addFlagsIn(mProperties);
 		mGroupData->setProperties(uid, props);
 
-		if (image)
-			mServices->getPatientService()->setActiveData(image);
+		if (data)
+			mServices->getPatientService()->setActiveData(data);
 	}
 	else
 	{

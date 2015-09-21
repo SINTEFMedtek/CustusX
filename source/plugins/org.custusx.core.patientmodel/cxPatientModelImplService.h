@@ -74,7 +74,7 @@ public:
 	virtual RegistrationHistoryPtr get_rMpr_History() const;
 
 	virtual void setActiveData(DataPtr activeData); ///< used for system state
-	virtual QList<DataPtr> getActiveDataList() const;
+	virtual QList<DataPtr> getActiveDataHistory() const;
 
 	virtual CLINICAL_VIEW getClinicalApplication() const;
 	virtual void setClinicalApplication(CLINICAL_VIEW application);

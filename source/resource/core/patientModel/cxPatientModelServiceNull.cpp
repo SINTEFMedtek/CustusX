@@ -96,7 +96,7 @@ bool PatientModelServiceNull::isNull()
 	return true;
 }
 
-QList<DataPtr> PatientModelServiceNull::getActiveDataList() const
+QList<DataPtr> PatientModelServiceNull::getActiveDataHistory() const
 {
 	printWarning();
 	return QList<DataPtr>();

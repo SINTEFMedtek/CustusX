@@ -187,7 +187,7 @@ bool PatientModelImplService::isNull()
 	return false;
 }
 
-QList<DataPtr> PatientModelImplService::getActiveDataList() const
+QList<DataPtr> PatientModelImplService::getActiveDataHistory() const
 {
 	return dataService()->getActiveDataList();
 }

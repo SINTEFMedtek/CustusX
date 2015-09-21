@@ -122,9 +122,9 @@ void PatientModelServiceProxy::onServiceRemoved(PatientModelService *service)
 	emit patientChanged();
 }
 
-QList<DataPtr> PatientModelServiceProxy::getActiveDataList() const
+QList<DataPtr> PatientModelServiceProxy::getActiveDataHistory() const
 {
-	return mPatientModelService->getActiveDataList();
+	return mPatientModelService->getActiveDataHistory();
 }
 
 void PatientModelServiceProxy::insertData(DataPtr data)
