@@ -69,13 +69,13 @@ class SingleConnectionTcpServer : public QTcpServer
 	Q_OBJECT
 public:
 	SingleConnectionTcpServer(QObject* parent);
-	void setSocket(QPointer<Socket> socket);
+//	void setSocket(QPointer<Socket> socket);
 signals:
 	void incoming(qintptr socketDescriptor);
 protected:
 	void incomingConnection(qintptr socketDescriptor);
 private:
-	QPointer<Socket> mSocket;
+//	QPointer<Socket> mSocket;
 };
 
 class cxResource_EXPORT SocketConnection : public QObject

@@ -50,10 +50,10 @@ SNW_DEFINE_ENUM_STRING_CONVERTERS_END(cx, CX_SOCKETCONNECTION_STATE, scsCOUNT)
 namespace cx
 {
 
-void SingleConnectionTcpServer::setSocket(QPointer<Socket> socket)
-{
-	mSocket = socket;
-}
+//void SingleConnectionTcpServer::setSocket(QPointer<Socket> socket)
+//{
+//	mSocket = socket;
+//}
 
 SingleConnectionTcpServer::SingleConnectionTcpServer(QObject* parent) :
 	QTcpServer(parent)
@@ -184,12 +184,21 @@ void SocketConnection::internalDisconnected()
 {
     CX_LOG_SUCCESS() << "Disconnected";
 	this->stateChange(scsINACTIVE);
+
+	if (mServer->isListening())
+		this->stateChange(scsLISTENING);
+	else
+		this->stateChange(scsINACTIVE);
 }
 
 void SocketConnection::internalError()
 {
 	CX_LOG_INFO() << "Error";
-	this->stateChange(scsINACTIVE);
+
+	if (mServer->isListening())
+		this->stateChange(scsLISTENING);
+	else
+		this->stateChange(scsINACTIVE);
 }
 
 void SocketConnection::internalDataAvailable()
@@ -241,7 +250,7 @@ bool SocketConnection::startListen()
 	{
 		mServer = new SingleConnectionTcpServer(this);
 		connect(mServer, &SingleConnectionTcpServer::incoming, this, &SocketConnection::incomingConnection);
-		mServer->setSocket(mSocket);
+//		mServer->setSocket(mSocket);
 	}
 	this->stateChange(scsCONNECTING);
 
@@ -254,7 +263,7 @@ bool SocketConnection::startListen()
 	}
 	else
 	{
-		CX_LOG_INFO() << QString("Server failed to start. Error: ").arg(mServer->errorString());
+		CX_LOG_INFO() << QString("Server failed to start. Error: %1").arg(mServer->errorString());
 	}
 
 	this->stateChange(scsLISTENING);
@@ -281,9 +290,11 @@ void SocketConnection::incomingConnection(qintptr socketDescriptor)
 		return;
 	}
 
-	mSocket->getSocket()->setSocketDescriptor(socketDescriptor);
+	int success = mSocket->getSocket()->setSocketDescriptor(socketDescriptor, QAbstractSocket::ConnectedState);
 	QString clientName = mSocket->getSocket()->localAddress().toString();
-	report("Connected to "+clientName+". Session started.");
+	report("Connected to "+clientName+". Session started." + qstring_cast(success));
+	CX_LOG_CHANNEL_DEBUG("CA") << "Socket is connected: " << mSocket->isConnected();
+	CX_LOG_CHANNEL_DEBUG("CA") << "Socket is in state: " << mSocket->getSocket()->state();
 
 	this->stateChange(scsCONNECTED);
 }

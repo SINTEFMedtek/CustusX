@@ -190,6 +190,7 @@ void OpenIGTLinkClient::sendStringMessage(QString command)
 
 void OpenIGTLinkClient::internalDataAvailable()
 {
+	CX_LOG_CHANNEL_DEBUG("CA") << "OpenIGTLinkClient::internalDataAvailable()";
     if(!this->socketIsConnected())
         return;
 
@@ -202,7 +203,8 @@ void OpenIGTLinkClient::internalDataAvailable()
                 done = true;
             else
                 mHeaderReceived = true;
-        }
+			CX_LOG_CHANNEL_DEBUG("CA") << "OpenIGTLinkClient::internalDataAvailable2() " << mHeaderReceived;
+		}
 
         if(mHeaderReceived)
         {
@@ -210,7 +212,8 @@ void OpenIGTLinkClient::internalDataAvailable()
                 done = true;
             else
                 mHeaderReceived = false;
-        }
+			CX_LOG_CHANNEL_DEBUG("CA") << "OpenIGTLinkClient::internalDataAvailable3() " << done;
+		}
     }
 }
 
@@ -391,7 +394,7 @@ StringPropertyBasePtr OpenIGTLinkClientThreadHandler::createDialectOption()
 	QStringList dialectnames;
 	if(mClient)
 		dialectnames = mClient->getAvailableDialects();
-	retval = StringProperty::initialize("protocol", "Dialect", "OpenIGTLinkDialect",
+	retval = StringProperty::initialize("protocol", "Connect to", "Protocol to use during connection.",
 										mClient->getConnectionInfo().protocol,
 										dialectnames, mOptionsElement);
 	retval->setValueRange(dialectnames);
