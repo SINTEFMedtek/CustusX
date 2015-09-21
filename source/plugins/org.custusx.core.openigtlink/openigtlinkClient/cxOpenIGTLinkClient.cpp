@@ -190,7 +190,6 @@ void OpenIGTLinkClient::sendStringMessage(QString command)
 
 void OpenIGTLinkClient::internalDataAvailable()
 {
-	CX_LOG_CHANNEL_DEBUG("CA") << "OpenIGTLinkClient::internalDataAvailable()";
     if(!this->socketIsConnected())
         return;
 
@@ -203,7 +202,6 @@ void OpenIGTLinkClient::internalDataAvailable()
                 done = true;
             else
                 mHeaderReceived = true;
-			CX_LOG_CHANNEL_DEBUG("CA") << "OpenIGTLinkClient::internalDataAvailable2() " << mHeaderReceived;
 		}
 
         if(mHeaderReceived)
@@ -212,7 +210,6 @@ void OpenIGTLinkClient::internalDataAvailable()
                 done = true;
             else
                 mHeaderReceived = false;
-			CX_LOG_CHANNEL_DEBUG("CA") << "OpenIGTLinkClient::internalDataAvailable3() " << done;
 		}
     }
 }
@@ -299,10 +296,19 @@ bool OpenIGTLinkClient::receiveBody(const igtl::MessageBase::Pointer header)
         CX_LOG_CHANNEL_WARNING(CX_OPENIGTLINK_CHANNEL_NAME) << "Skipping message of type " << type;
         igtl::MessageBase::Pointer body = igtl::MessageBase::New();
         body->SetMessageHeader(header);
-        mSocket->skip(body->GetBodySizeToRead());
+		this->skip(body->GetBodySizeToRead());
     }
     return true;
 }
+
+qint64 OpenIGTLinkClient::skip(qint64 maxSizeBytes) const
+{
+	char *voidData = new char[maxSizeBytes];
+	int retval = mSocket->read(voidData, maxSizeBytes);
+	delete[] voidData;
+	return retval;
+}
+
 
 template <typename T>
 bool OpenIGTLinkClient::receive(const igtl::MessageBase::Pointer header)

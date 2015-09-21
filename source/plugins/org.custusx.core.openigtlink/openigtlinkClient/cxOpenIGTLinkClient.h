@@ -108,6 +108,7 @@ private:
 	void setDialect(QString dialectname);
 	bool receiveHeader(const igtl::MessageHeader::Pointer header) const;
     bool receiveBody(const igtl::MessageHeader::Pointer header);
+	qint64 skip(qint64 maxSizeBytes) const;
 
     template <typename T>
     bool receive(const igtl::MessageBase::Pointer header);

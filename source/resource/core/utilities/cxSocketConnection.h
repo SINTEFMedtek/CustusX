@@ -33,12 +33,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSOCKETCONNECTION_H
 #define CXSOCKETCONNECTION_H
 
-#include "cxSocket.h"
 #include <QPointer>
-class QTcpServer;
-#include "cxEnumConverter.h"
-
 #include <QTcpServer>
+#include "cxEnumConverter.h"
+#include "boost/shared_ptr.hpp"
 
 namespace cx {
 enum CX_SOCKETCONNECTION_STATE
@@ -57,26 +55,7 @@ SNW_DECLARE_ENUM_STRING_CONVERTERS(cx, CX_SOCKETCONNECTION_STATE);
 
 namespace cx {
 
-
-/**
- * Reimplement QTcpServer::incomingConnection() to
- * do nothing but emit a signal.
- *
- * Used internally by SocketConnection.
- */
-class SingleConnectionTcpServer : public QTcpServer
-{
-	Q_OBJECT
-public:
-	SingleConnectionTcpServer(QObject* parent);
-//	void setSocket(QPointer<Socket> socket);
-signals:
-	void incoming(qintptr socketDescriptor);
-protected:
-	void incomingConnection(qintptr socketDescriptor);
-private:
-//	QPointer<Socket> mSocket;
-};
+typedef boost::shared_ptr<class SocketConnector> SocketConnectorPtr;
 
 class cxResource_EXPORT SocketConnection : public QObject
 {
@@ -119,7 +98,6 @@ public:
 public slots:
 	virtual void setConnectionInfo(ConnectionInfo info); ///< thread-safe
 	void requestConnect(); ///< not thread-safe: use invoke
-//    void tryConnectAndWait();
 	void requestDisconnect(); ///< not thread-safe: use invoke
 	bool sendData(const char* data, qint64 maxSize); ///< not thread-safe
 
@@ -133,27 +111,28 @@ signals:
 private slots:
     void internalConnected();
     void internalDisconnected();
-	void internalError();
-	virtual void internalDataAvailable();
+	void internalError(QAbstractSocket::SocketError socketError);
+	virtual void internalDataAvailable() = 0;
 
 protected:
-    bool socketIsConnected();
+	SocketConnectorPtr createConnector(ConnectionInfo info);
+	bool socketIsConnected();
     bool enoughBytesAvailableOnSocket(int bytes) const;
     bool socketReceive(void *packPointer, int packSize) const;
 	QStringList getAllServerHostnames();
-	bool startListen();
-	void stopListen();
-	void incomingConnection(qintptr socketDescriptor);
 	void setCurrentConnectionInfo();
 	void stateChange(CX_SOCKETCONNECTION_STATE newState);
+	CX_SOCKETCONNECTION_STATE computeState();
+//	void onServerStateChanged(CX_SOCKETCONNECTION_STATE state);
 
-	Socket* mSocket;
-	QPointer<SingleConnectionTcpServer> mServer;
+	QTcpSocket* mSocket;
 
 	CX_SOCKETCONNECTION_STATE mCurrentState;
-	ConnectionInfo mCurrentConnectionInfo; ///< info for the currently active connection
 	QMutex mNextConnectionInfoMutex;
 	ConnectionInfo mNextConnectionInfo; ///< info to be used for the next connect(), mutexed.
+
+private:
+	SocketConnectorPtr mConnector;
 };
 
 } //namespace cx
