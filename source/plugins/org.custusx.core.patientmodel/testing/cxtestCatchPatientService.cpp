@@ -73,6 +73,7 @@ TEST_CASE("DataManagerImpl setup/shutdown works multiple times", "[unit]")
     }
 }
 
+//Moved
 TEST_CASE("Active Image: set/get", "[unit]")
 {
 	cxtest::SessionStorageTestFixture storageFixture;
@@ -89,6 +90,7 @@ TEST_CASE("Active Image: set/get", "[unit]")
 }
 
 
+//Moved
 TEST_CASE("Active Image: activeImageChanged signal", "[unit]")
 {
 	cxtest::SessionStorageTestFixture storageFixture;
@@ -145,6 +147,7 @@ TEST_CASE("Active Image: save/load in patient file", "[unit]")
 	CHECK(patientModelService->getActiveData<cx::Image>()->getUid() == data1->getUid());
 }
 
+//Moved
 TEST_CASE("Active Data: set/get", "[unit]")
 {
 	cxtest::SessionStorageTestFixture storageFixture;
@@ -160,6 +163,7 @@ TEST_CASE("Active Data: set/get", "[unit]")
 	REQUIRE(patientModelService->getActiveData() == testData.image2);
 }
 
+//Moved
 TEST_CASE("Active Data: Get data of specific type", "[unit]")
 {
 	cxtest::SessionStorageTestFixture storageFixture;
@@ -180,6 +184,7 @@ TEST_CASE("Active Data: Get data of specific type", "[unit]")
 	REQUIRE_FALSE(patientModelService->getActiveData<cx::Image>() == testData.image1);
 }
 
+//Moved
 TEST_CASE("Active Data: activeDataChanged signal", "[unit]")
 {
 	testDataStructures testData;
@@ -195,6 +200,7 @@ TEST_CASE("Active Data: activeDataChanged signal", "[unit]")
 	CHECK(signalListener2.isReceived());
 }
 
+//Moved
 TEST_CASE("Active Data: Remove data", "[unit]")
 {
 	cxtest::SessionStorageTestFixture storageFixture;
@@ -221,6 +227,7 @@ TEST_CASE("Active Data: Remove data", "[unit]")
 	CHECK_FALSE(patientModelService->getActiveData());
 }
 
+//Moved
 TEST_CASE("Active Data: Call set multiple times", "[unit]")
 {
 	cxtest::SessionStorageTestFixture storageFixture;
@@ -235,6 +242,18 @@ TEST_CASE("Active Data: Call set multiple times", "[unit]")
 
 	patientModelService->setActiveData(testData.image1);
 	patientModelService->setActiveData(testData.image1);
+	REQUIRE(patientModelService->getActiveData() == testData.image1);
+}
+
+TEST_CASE("Set ActiveData using uid", "[unit]")
+{
+	cxtest::SessionStorageTestFixture storageFixture;
+	cx::PatientModelServicePtr patientModelService = storageFixture.mPatientModelService;
+	testDataStructures testData;
+
+	patientModelService->insertData(testData.image1);
+
+	patientModelService->setActiveData(testData.image1->getUid());
 	REQUIRE(patientModelService->getActiveData() == testData.image1);
 }
 

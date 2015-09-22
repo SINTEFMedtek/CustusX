@@ -34,6 +34,7 @@ if(BUILD_TESTING)
         cxtestPatientModelServiceMock.h
         cxtestDummyDataManager.h
         cxtestDummyDataManager.cpp
+        cxtestActiveData.cpp
     )
 
     set(CX_TESTRESOURCE_LINK_LIBS
