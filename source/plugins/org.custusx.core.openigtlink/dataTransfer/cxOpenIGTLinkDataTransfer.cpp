@@ -41,16 +41,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxStringProperty.h"
 #include "cxMesh.h"
 #include "cxIGTLinkConversionPolyData.h"
+#include "cxVideoServiceProxy.h"
+#include "cxVideoSource.h"
 
 namespace cx {
 
 OpenIGTLinkDataTransfer::OpenIGTLinkDataTransfer(ctkPluginContext *context, QObject* parent) :
-	QObject(parent)
+	QObject(parent),
+	mContext(context)
 {
 	mOptions = profile()->getXmlSettings().descend(this->getConfigUid());
 
 	mPatientModelService = PatientModelServiceProxy::create(context);
 	mViewService = VisualizationServiceProxy::create(context);
+	mVideoService = VideoServiceProxy::create(context);
 
 	mOpenIGTLink.reset(new OpenIGTLinkClientThreadHandler(this->getConfigUid()));
 
@@ -60,8 +64,15 @@ OpenIGTLinkDataTransfer::OpenIGTLinkDataTransfer(ctkPluginContext *context, QObj
 	mDataToSend = StringPropertySelectData::New(mPatientModelService);
 
 	mAcceptIncomingData = BoolProperty::initialize("acceptIncoming", "Accept Incoming",
-												   "Accept incoming data and add to Patient Model",
+												   "Accept incoming data and add to Patient",
 												   true, mOptions.getElement());
+
+	mStreamActiveVideoSource = BoolProperty::initialize("stream", "Stream Video",
+												   "Stream the active Video Source over the connection",
+												   false, QDomNode());
+	connect(mStreamActiveVideoSource.get(), &BoolProperty::changed,
+			this, &OpenIGTLinkDataTransfer::onStreamActiveVideoSourceChanged);
+
 }
 
 OpenIGTLinkDataTransfer::~OpenIGTLinkDataTransfer()
@@ -133,7 +144,55 @@ void OpenIGTLinkDataTransfer::onSend()
 
 	QString name = data ? data->getName() : "NULL";
 	CX_LOG_CHANNEL_INFO(this->getConfigUid()) << QString("Failed to send data %1 over igtl: Unsupported type")
-														   .arg(name);
+												 .arg(name);
+}
+
+void OpenIGTLinkDataTransfer::onStreamActiveVideoSourceChanged()
+{
+	if (mStreamActiveVideoSource->getValue())
+	{
+		this->startStream();
+	}
+	else
+	{
+		this->stopStream();
+	}
+
+}
+
+void OpenIGTLinkDataTransfer::startStream()
+{
+	if (mStreamingVideoSource)
+	{
+		CX_LOG_WARNING() << QString("Already emitting VideoSource %1 on igtl").arg(mStreamingVideoSource->getName());
+		return;
+	}
+
+	mStreamingVideoSource = mVideoService->getActiveVideoSource();
+	connect(mStreamingVideoSource.get(), &VideoSource::newFrame,
+			this, &OpenIGTLinkDataTransfer::onNewStreamFrame);
+	CX_LOG_INFO() << QString("Started emitting VideoSource %1 on igtl").arg(mStreamingVideoSource->getName());
+}
+
+void OpenIGTLinkDataTransfer::stopStream()
+{
+	if (!mStreamingVideoSource)
+		return;
+
+	CX_LOG_INFO() << QString("Stopped emitting VideoSource %1 on igtl").arg(mStreamingVideoSource->getName());
+	disconnect(mStreamingVideoSource.get(), &VideoSource::newFrame,
+			   this, &OpenIGTLinkDataTransfer::onNewStreamFrame);
+	mStreamingVideoSource.reset();
+}
+
+void OpenIGTLinkDataTransfer::onNewStreamFrame()
+{
+	vtkImageDataPtr data = mStreamingVideoSource->getVtkImageData();
+
+	ImagePtr image(new Image(mStreamingVideoSource->getUid()+"_snapshot",
+							 data,
+							 mStreamingVideoSource->getName()));
+	mOpenIGTLink->client()->sendMessage(image);
 }
 
 } // namespace cx

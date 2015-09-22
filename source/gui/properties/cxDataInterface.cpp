@@ -182,43 +182,6 @@ QString StringPropertySelectRTSourceBase::convertInternal2Display(QString intern
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-StringPropertyActiveVideoSource::StringPropertyActiveVideoSource()
-{
-	connect(videoService().get(), &VideoService::activeVideoSourceChanged, this, &Property::changed);
-}
-
-QString StringPropertyActiveVideoSource::getDisplayName() const
-{
-	return "Stream";
-}
-
-bool StringPropertyActiveVideoSource::setValue(const QString& value)
-{
-	if (value == this->getValue())
-		return false;
-	videoService()->setActiveVideoSource(value);
-	emit changed();
-	return true;
-}
-
-QString StringPropertyActiveVideoSource::getValue() const
-{
-	return videoService()->getActiveVideoSource()->getUid();
-}
-
-QStringList StringPropertyActiveVideoSource::getValueRange() const
-{
-	std::vector<VideoSourcePtr> sources = videoService()->getVideoSources();
-	QStringList retval;
-	for (unsigned i=0; i<sources.size(); ++i)
-		retval << sources[i]->getUid();
-	return retval;
-}
-
-QString StringPropertyActiveVideoSource::getHelp() const
-{
-	return "Select the active video source.";
-}
 
 
 //---------------------------------------------------------

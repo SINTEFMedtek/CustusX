@@ -40,6 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSelectDataStringProperty.h"
 #include "cxStringProperty.h"
 #include "cxOpenIGTLinkDataTransfer.h"
+#include "cxStringPropertyActiveVideoSource.h"
+#include "cxHelperWidgets.h"
 
 namespace cx {
 
@@ -83,6 +85,12 @@ OpenIGTLinkDataTransferWidget::OpenIGTLinkDataTransferWidget(ctkPluginContext *c
 										   mDataTransfer->getPatientModelService(),
 										   this, mDataTransfer->getDataToSend()));
 	sendLayout->addWidget(sendButton);
+	sendLayout->addWidget(createDataWidget(mDataTransfer->getViewService(),
+										   mDataTransfer->getPatientModelService(),
+										   this, StringPropertyActiveVideoSource::create(mDataTransfer->getVideoService())));
+	sendLayout->addWidget(createDataWidget(mDataTransfer->getViewService(),
+										   mDataTransfer->getPatientModelService(),
+										   this, mDataTransfer->getStreamActiveVideoSource()));
 }
 
 OpenIGTLinkDataTransferWidget::~OpenIGTLinkDataTransferWidget()

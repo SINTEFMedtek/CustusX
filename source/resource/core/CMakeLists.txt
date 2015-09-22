@@ -36,6 +36,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
     Video/cxVideoService
     Video/cxStreamerService
     Video/cxBasicVideoSource
+	Video/cxStringPropertyActiveVideoSource
 
     Tool/cxTool
     Tool/cxToolProxy

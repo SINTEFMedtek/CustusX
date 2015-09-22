@@ -183,26 +183,6 @@ private:
   QString mValueName;
 };
 
-typedef boost::shared_ptr<class StringPropertyActiveVideoSource> StringPropertyActiveVideoSourcePtr;
-/**
- * \brief Adapter for controlling the active video source in cx::VideoServiceOld
- */
-class cxGui_EXPORT StringPropertyActiveVideoSource : public StringPropertyBase
-{
-  Q_OBJECT
-public:
-  static StringPropertyActiveVideoSourcePtr New() { return StringPropertyActiveVideoSourcePtr(new StringPropertyActiveVideoSource()); }
-  StringPropertyActiveVideoSource();
-  virtual ~StringPropertyActiveVideoSource() {}
-
-public: // basic methods
-  virtual QString getDisplayName() const;
-  virtual bool setValue(const QString& value);
-  virtual QString getValue() const;
-  virtual QStringList getValueRange() const;
-  virtual QString getHelp() const;
-};
-
 
 typedef boost::shared_ptr<class StringPropertyParentFrame> StringPropertyParentFramePtr;
 
