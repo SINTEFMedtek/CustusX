@@ -258,7 +258,7 @@ TEST_CASE("Active Data: Call set multiple times", "[unit]")
 	REQUIRE(activeData->getActive() == testData.image1);
 }
 
-TEST_CASE("Set ActiveData using uid", "[unit]")
+TEST_CASE("ActiveData: Set using uid", "[unit]")
 {
 	cxtest::SessionStorageTestFixture storageFixture;
 	cx::PatientModelServicePtr patientModelService = storageFixture.mPatientModelService;
