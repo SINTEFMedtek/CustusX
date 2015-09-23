@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "boost/shared_ptr.hpp"
 #include <QString>
 #include <QObject>
+#include "org_custusx_core_openigtlink_Export.h"
 
 namespace cx
 {
@@ -46,7 +47,7 @@ typedef boost::shared_ptr<class OpenIGTLinkClientThreadHandler> OpenIGTLinkClien
  *
  *
  */
-class NetworkConnectionManager : public QObject
+class org_custusx_core_openigtlink_EXPORT NetworkConnectionManager : public QObject
 {
 	Q_OBJECT
 public:

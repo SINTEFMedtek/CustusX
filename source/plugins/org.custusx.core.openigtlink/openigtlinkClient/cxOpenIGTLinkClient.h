@@ -130,7 +130,7 @@ typedef boost::shared_ptr<class OpenIGTLinkClientThreadHandler> OpenIGTLinkClien
  *  Lifetime of the thread equals that of this object.
  *
  */
-class OpenIGTLinkClientThreadHandler : public QObject
+class org_custusx_core_openigtlink_EXPORT OpenIGTLinkClientThreadHandler : public QObject
 {
 	Q_OBJECT
 public:
