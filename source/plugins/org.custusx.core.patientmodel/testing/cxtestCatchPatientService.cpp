@@ -115,7 +115,7 @@ TEST_CASE("Active Image: activeImageChanged signal", "[unit]")
 	CHECK(signalListener2.isReceived());
 }
 
-TEST_CASE("Active Image: save/load in patient file", "[unit]")
+TEST_CASE("ActiveData: save/load in patient file", "[unit]")
 {
 	cxtest::SessionStorageTestFixture storageFixture;
 	cx::PatientModelServicePtr patientModelService = storageFixture.mPatientModelService;

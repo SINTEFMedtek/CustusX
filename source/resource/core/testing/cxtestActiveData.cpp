@@ -197,6 +197,29 @@ TEST_CASE("ActiveData: Get image from TrackedStream with VideoSource", "[unit]")
 	CHECK(activeData.getDerivedActiveImage()->getUid().contains(testData.trackedStream1->getUid()));
 }
 
-//TODO: Make test for save/load
-//TODO: Make test for remove
-//TODO: Make test for getActiveImageUid()
+TEST_CASE("ActiveData: getActiveImageUid", "[unit]")
+{
+	testDataStructures testData;
+	cx::ActiveData activeData(cx::PatientModelService::getNullObject(), cx::SessionStorageService::getNullObject());
+	activeData.setActive(testData.image1);
+	CHECK(activeData.getActiveImageUid() == testData.image1->getUid());
+}
+
+TEST_CASE("ActiveData: remove", "[unit]")
+{
+	testDataStructures testData;
+	cx::ActiveData activeData(cx::PatientModelService::getNullObject(), cx::SessionStorageService::getNullObject());
+	activeData.setActive(testData.image1);
+	activeData.setActive(testData.image2);
+
+	cxtest::DirectSignalListener signalListener(&activeData, SIGNAL(activeDataChanged(QString)));
+	cxtest::DirectSignalListener signalListener2(&activeData, SIGNAL(activeImageChanged(QString)));
+	activeData.remove(testData.image2);
+	CHECK(signalListener.isReceived());
+	CHECK(signalListener2.isReceived());
+
+	CHECK(activeData.getActive() == testData.image1);
+
+	activeData.remove(testData.image1);
+	CHECK_FALSE(activeData.getActive());
+}
