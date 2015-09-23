@@ -39,11 +39,11 @@ class ctkPluginContext;
 
 namespace cx {
 
-class OpenIGTLinkClient;
+class NetworkConnection;
 typedef boost::shared_ptr<class BoolProperty> BoolPropertyPtr;
 typedef boost::shared_ptr<class StringProperty> StringPropertyPtr;
 typedef boost::shared_ptr<class StringPropertySelectData> StringPropertySelectDataPtr;
-typedef boost::shared_ptr<class OpenIGTLinkClientThreadHandler> OpenIGTLinkClientThreadHandlerPtr;
+typedef boost::shared_ptr<class NetworkConnectionHandle> NetworkConnectionHandlePtr;
 
 
 /**
@@ -60,7 +60,7 @@ class OpenIGTLinkDataTransfer : public QObject
 {
 	Q_OBJECT
 public:
-	OpenIGTLinkDataTransfer(ctkPluginContext* context, OpenIGTLinkClientThreadHandlerPtr connection, QObject *parent=NULL);
+	OpenIGTLinkDataTransfer(ctkPluginContext* context, NetworkConnectionHandlePtr connection, QObject *parent=NULL);
 	~OpenIGTLinkDataTransfer();
 
 	BoolPropertyPtr getAcceptIncomingData() { return mAcceptIncomingData; }
@@ -69,7 +69,7 @@ public:
 	PatientModelServicePtr getPatientModelService() { return mPatientModelService; }
 	VisualizationServicePtr getViewService() { return mViewService; }
 	VideoServicePtr getVideoService() { return mVideoService; }
-	OpenIGTLinkClientThreadHandlerPtr getOpenIGTLink();
+	NetworkConnectionHandlePtr getOpenIGTLink();
 
 	/**
 	 * Send data over igtl, using the data set in the DataToSend property
@@ -82,7 +82,7 @@ private:
 	StringPropertySelectDataPtr mDataToSend;
 	XmlOptionFile mOptions;
 	ctkPluginContext* mContext;
-	OpenIGTLinkClientThreadHandlerPtr mOpenIGTLink;
+	NetworkConnectionHandlePtr mOpenIGTLink;
 
 	PatientModelServicePtr mPatientModelService;
 	VisualizationServicePtr mViewService;

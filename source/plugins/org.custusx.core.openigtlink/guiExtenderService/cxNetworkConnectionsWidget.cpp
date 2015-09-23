@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDetailedLabeledComboBoxWidget.h"
 #include "cxOpenIGTLinkClient.h"
 #include "cxLogger.h"
+#include "cxConnectionHandle.h"
 
 namespace cx
 {
@@ -120,7 +121,7 @@ void NetworkConnectionsWidget::onConnectionSelected()
 
 void NetworkConnectionsWidget::updateConnectionWidget()
 {
-	OpenIGTLinkClientThreadHandlerPtr connection = mConnections->getConnection(mConnectionSelector->getUid());
+	NetworkConnectionHandlePtr connection = mConnections->getConnection(mConnectionSelector->getUid());
 	OpenIGTLinkConnectionWidget* widget = new OpenIGTLinkConnectionWidget(connection);
 	mOptionsWidget->replaceWidget(widget);
 	if (connection)

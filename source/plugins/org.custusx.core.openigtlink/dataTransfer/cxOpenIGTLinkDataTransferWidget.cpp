@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxOpenIGTLinkDataTransfer.h"
 #include "cxStringPropertyActiveVideoSource.h"
 #include "cxHelperWidgets.h"
+#include "cxConnectionHandle.h"
 
 namespace cx {
 

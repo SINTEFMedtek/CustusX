@@ -40,10 +40,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxOpenIGTLinkClient.h"
 #include "cxOpenIGTLinkGuiExtenderService.h"
 #include "cxNetworkConnectionManager.h"
+#include "cxConnectionHandle.h"
 
 TEST_CASE("OpenIGTLinkTrackingSystemService: Check that the openigtlink tracking service can be created and destroyed", "[unit][plugins][org.custusx.core.tracking.system.openigtlink]")
 {
-	cx::OpenIGTLinkTrackingSystemServicePtr service = cx::OpenIGTLinkTrackingSystemServicePtr(new cx::OpenIGTLinkTrackingSystemService(cx::OpenIGTLinkClientThreadHandlerPtr()));
+	cx::OpenIGTLinkTrackingSystemServicePtr service = cx::OpenIGTLinkTrackingSystemServicePtr(new cx::OpenIGTLinkTrackingSystemService(cx::NetworkConnectionHandlePtr()));
     REQUIRE(service);
     CHECK(service.unique());
     service.reset();
@@ -52,8 +53,8 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: Check that the openigtlink tracking
 TEST_CASE("OpenIGTLinkGuiExtender: Check that the openigtlink gui extender service can be created and destroyed", "[unit][org.custusx.core.tracking.system.openigtlink][hide]")
 {
 	cx::NetworkConnectionManagerPtr connections(new cx::NetworkConnectionManager());
-//	cx::OpenIGTLinkClientThreadHandlerPtr client(new cx::OpenIGTLinkClientThreadHandler("test"));
-//	cx::OpenIGTLinkClient::ConnectionInfo info;
+//	cx::NetworkConnectionHandlePtr client(new cx::NetworkConnectionHandle("test"));
+//	cx::NetworkConnection::ConnectionInfo info;
 //	info.protocol = "PlusServer";
 //	client->client()->setConnectionInfo(info);
 	cx::OpenIGTLinkGuiExtenderServicePtr gui(new cx::OpenIGTLinkGuiExtenderService(NULL, connections));
@@ -65,11 +66,11 @@ TEST_CASE("OpenIGTLinkGuiExtender: Check that the openigtlink gui extender servi
 
 TEST_CASE("OpenIGTLinkTrackingSystemService: Check that the plugin can connect and stream from a server", "[manual][plugins][org.custusx.core.tracking.system.openigtlink]")
 {
-	cx::OpenIGTLinkClientThreadHandlerPtr connection(new cx::OpenIGTLinkClientThreadHandler("test"));
+	cx::NetworkConnectionHandlePtr connection(new cx::NetworkConnectionHandle("test"));
 
 //    QThread mOpenIGTLinkThread;
-//	cx::OpenIGTLinkClient *client = new cx::OpenIGTLinkClient("test");
-	cx::OpenIGTLinkClient::ConnectionInfo info;
+//	cx::NetworkConnection *client = new cx::NetworkConnection("test");
+	cx::NetworkConnection::ConnectionInfo info;
 	info.host = "10.218.140.127";
 	info.port = 18944;
 	info.protocol = "PlusServer";

@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxNetworkConnectionManager.h"
 
 #include "cxOpenIGTLinkClient.h"
+#include "cxConnectionHandle.h"
+
 
 namespace cx
 {
@@ -43,7 +45,7 @@ NetworkConnectionManager::NetworkConnectionManager()
 QString NetworkConnectionManager::newConnection(QString suggested_uid)
 {
 	QString uid = this->findUniqueUidNumber(suggested_uid);
-	OpenIGTLinkClientThreadHandlerPtr connection(new OpenIGTLinkClientThreadHandler(uid));
+	NetworkConnectionHandlePtr connection(new NetworkConnectionHandle(uid));
 	mConnections.push_back(connection);
 	emit connectionsChanged();
 	return uid;
@@ -62,7 +64,7 @@ QString NetworkConnectionManager::findUniqueUidNumber(QString uidBase) const
 	return uid;
 }
 
-std::vector<OpenIGTLinkClientThreadHandlerPtr> NetworkConnectionManager::getConnections() const
+std::vector<NetworkConnectionHandlePtr> NetworkConnectionManager::getConnections() const
 {
 	return mConnections;
 }
@@ -75,17 +77,17 @@ QStringList NetworkConnectionManager::getConnectionUids() const
 	return retval;
 }
 
-OpenIGTLinkClientThreadHandlerPtr NetworkConnectionManager::findConnection(QString uid) const
+NetworkConnectionHandlePtr NetworkConnectionManager::findConnection(QString uid) const
 {
 	for (unsigned i=0; i<mConnections.size(); ++i)
 		if (mConnections[i]->client()->getUid() == uid)
 			return mConnections[i];
-	return OpenIGTLinkClientThreadHandlerPtr();
+	return NetworkConnectionHandlePtr();
 }
 
-OpenIGTLinkClientThreadHandlerPtr NetworkConnectionManager::getConnection(QString uid)
+NetworkConnectionHandlePtr NetworkConnectionManager::getConnection(QString uid)
 {
-	OpenIGTLinkClientThreadHandlerPtr connection = this->findConnection(uid);
+	NetworkConnectionHandlePtr connection = this->findConnection(uid);
 
 	if (!connection)
 	{

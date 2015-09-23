@@ -59,10 +59,10 @@ typedef boost::shared_ptr<QThread> QThreadPtr;
 
 namespace cx {
 
-typedef boost::shared_ptr<class OpenIGTLinkClient> OpenIGTLinkClientPtr;
+typedef boost::shared_ptr<class NetworkConnection> NetworkConnectionPtr;
 
 /**
- * @brief The OpenIGTLinkClient class handles incoming OpenIGTLink packages.
+ * @brief The NetworkConnection class handles incoming OpenIGTLink packages.
  *
  * To specify how packages should be handled you can specify different kind of
  * supported dialects, which are a way to handle the way different OpenIGTLink
@@ -70,13 +70,13 @@ typedef boost::shared_ptr<class OpenIGTLinkClient> OpenIGTLinkClientPtr;
  *
  */
 
-class org_custusx_core_openigtlink_EXPORT OpenIGTLinkClient : public SocketConnection
+class org_custusx_core_openigtlink_EXPORT NetworkConnection : public SocketConnection
 {
     Q_OBJECT
 public:
 
-	explicit OpenIGTLinkClient(QString uid, QObject *parent = 0);
-	virtual ~OpenIGTLinkClient();
+	explicit NetworkConnection(QString uid, QObject *parent = 0);
+	virtual ~NetworkConnection();
 
     //thread safe
 	QString getUid() const { return mUid; }
@@ -124,42 +124,6 @@ private:
 	const QString mUid;
 };
 
-typedef boost::shared_ptr<class OpenIGTLinkClientThreadHandler> OpenIGTLinkClientThreadHandlerPtr;
-
-/** Encapsulates running of the OpenIGTLinkClient in a thread.
- *  Lifetime of the thread equals that of this object.
- *
- */
-class org_custusx_core_openigtlink_EXPORT OpenIGTLinkClientThreadHandler : public QObject
-{
-	Q_OBJECT
-public:
-	explicit OpenIGTLinkClientThreadHandler(QString threadname);
-	~OpenIGTLinkClientThreadHandler();
-	OpenIGTLinkClient* client();
-
-	StringPropertyBasePtr getDialectOption() { return mDialects; }
-	StringPropertyBasePtr getIpOption() { return mIp; }
-	DoublePropertyBasePtr getPortOption() { return mPort; }
-	StringPropertyBasePtr getRoleOption() { return mRole; }
-
-private:
-	void onConnectionInfoChanged();
-	void onPropertiesChanged();
-	StringPropertyBasePtr mIp;
-	DoublePropertyBasePtr mPort;
-	StringPropertyBasePtr mDialects;
-	StringPropertyBasePtr mRole;
-
-	StringPropertyBasePtr createDialectOption();
-	StringPropertyBasePtr createIpOption();
-	DoublePropertyBasePtr createPortOption();
-	StringPropertyBasePtr createRoleOption();
-
-	OpenIGTLinkClientPtr mClient;
-	QThreadPtr mThread;
-	QDomElement mOptionsElement;
-};
 
 
 } //namespace cx

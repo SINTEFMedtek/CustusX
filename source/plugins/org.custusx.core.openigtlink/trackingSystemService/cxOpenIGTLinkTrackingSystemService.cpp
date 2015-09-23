@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxLogger.h"
 #include "cxOpenIGTLinkClient.h"
+#include "cxConnectionHandle.h"
 #include "cxOpenIGTLinkTool.h"
 
 namespace cx
@@ -50,7 +51,7 @@ std::vector<ToolPtr> toVector(std::map<QString, OpenIGTLinkToolPtr> map)
     return retval;
 }
 
-OpenIGTLinkTrackingSystemService::OpenIGTLinkTrackingSystemService(OpenIGTLinkClientThreadHandlerPtr connection) :
+OpenIGTLinkTrackingSystemService::OpenIGTLinkTrackingSystemService(NetworkConnectionHandlePtr connection) :
 	mState(Tool::tsNONE),
 	mConnection(connection)
 
@@ -58,15 +59,15 @@ OpenIGTLinkTrackingSystemService::OpenIGTLinkTrackingSystemService(OpenIGTLinkCl
 	if(mConnection == NULL)
         return;
 
-	OpenIGTLinkClient* client = mConnection->client();
+	NetworkConnection* client = mConnection->client();
 
-	connect(this, &OpenIGTLinkTrackingSystemService::connectToServer, client, &OpenIGTLinkClient::requestConnect);
-	connect(this, &OpenIGTLinkTrackingSystemService::disconnectFromServer, client, &OpenIGTLinkClient::requestDisconnect);
-	connect(client, &OpenIGTLinkClient::connected, this, &OpenIGTLinkTrackingSystemService::serverIsConnected);
-	connect(client, &OpenIGTLinkClient::disconnected, this, &OpenIGTLinkTrackingSystemService::serverIsDisconnected);
-	connect(client, &OpenIGTLinkClient::transform, this, &OpenIGTLinkTrackingSystemService::receiveTransform);
-	connect(client, &OpenIGTLinkClient::calibration, this, &OpenIGTLinkTrackingSystemService::receiveCalibration);
-	connect(client, &OpenIGTLinkClient::probedefinition, this, &OpenIGTLinkTrackingSystemService::receiveProbedefinition);
+	connect(this, &OpenIGTLinkTrackingSystemService::connectToServer, client, &NetworkConnection::requestConnect);
+	connect(this, &OpenIGTLinkTrackingSystemService::disconnectFromServer, client, &NetworkConnection::requestDisconnect);
+	connect(client, &NetworkConnection::connected, this, &OpenIGTLinkTrackingSystemService::serverIsConnected);
+	connect(client, &NetworkConnection::disconnected, this, &OpenIGTLinkTrackingSystemService::serverIsDisconnected);
+	connect(client, &NetworkConnection::transform, this, &OpenIGTLinkTrackingSystemService::receiveTransform);
+	connect(client, &NetworkConnection::calibration, this, &OpenIGTLinkTrackingSystemService::receiveCalibration);
+	connect(client, &NetworkConnection::probedefinition, this, &OpenIGTLinkTrackingSystemService::receiveProbedefinition);
 }
 
 OpenIGTLinkTrackingSystemService::~OpenIGTLinkTrackingSystemService()

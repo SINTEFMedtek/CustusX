@@ -30,6 +30,7 @@ set(PLUGIN_SRCS
 	openigtlinkClient/cxRASDialect.h
 	openigtlinkClient/cxRASDialect.cpp
 	openigtlinkClient/cxNetworkConnectionManager.cpp
+	openigtlinkClient/cxConnectionHandle.cpp
 )
 
 # Files which should be processed by Qts moc
@@ -50,6 +51,7 @@ set(PLUGIN_MOC_SRCS
     openigtlinkClient/cxOpenIGTLinkClient.h
     openigtlinkClient/cxDialect.h
 	openigtlinkClient/cxNetworkConnectionManager.h
+	openigtlinkClient/cxConnectionHandle.h
 )
 
 # Qt Designer files which should be processed by Qts uic

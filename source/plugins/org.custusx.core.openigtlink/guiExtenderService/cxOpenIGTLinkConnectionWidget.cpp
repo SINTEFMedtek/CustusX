@@ -38,10 +38,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxProfile.h"
 #include "cxLogger.h"
 #include "boost/bind.hpp"
+#include "cxConnectionHandle.h"
+
 
 namespace cx {
 
-OpenIGTLinkConnectionWidget::OpenIGTLinkConnectionWidget(OpenIGTLinkClientThreadHandlerPtr client, QWidget *parent) :
+OpenIGTLinkConnectionWidget::OpenIGTLinkConnectionWidget(NetworkConnectionHandlePtr client, QWidget *parent) :
     BaseWidget(parent, "OpenIGTLinkConnectionWidget", "OpenIGTLink Connection"),
     mClient(client)
 {
@@ -54,7 +56,7 @@ OpenIGTLinkConnectionWidget::OpenIGTLinkConnectionWidget(OpenIGTLinkClientThread
 	mConnectButton->setCheckable(true);
     connect(mConnectButton, &QPushButton::clicked, this, &OpenIGTLinkConnectionWidget::connectButtonClicked);
 
-	connect(mClient->client(), &OpenIGTLinkClient::stateChanged, this, &OpenIGTLinkConnectionWidget::onStateChanged);
+	connect(mClient->client(), &NetworkConnection::stateChanged, this, &OpenIGTLinkConnectionWidget::onStateChanged);
 
     QVBoxLayout* topLayout = new QVBoxLayout(this);
 
@@ -115,12 +117,12 @@ void OpenIGTLinkConnectionWidget::connectButtonClicked(bool checked)
 {
     if(checked)
     {
-		boost::function<void()> connect = boost::bind(&OpenIGTLinkClient::requestConnect, mClient->client());
+		boost::function<void()> connect = boost::bind(&NetworkConnection::requestConnect, mClient->client());
 		mClient->client()->invoke(connect);
     }
     else
     {
-		boost::function<void()> disconnect = boost::bind(&OpenIGTLinkClient::requestDisconnect, mClient->client());
+		boost::function<void()> disconnect = boost::bind(&NetworkConnection::requestDisconnect, mClient->client());
 		mClient->client()->invoke(disconnect);
     }
 }

@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 typedef boost::shared_ptr<class NetworkConnectionManager> NetworkConnectionManagerPtr;
-typedef boost::shared_ptr<class OpenIGTLinkClientThreadHandler> OpenIGTLinkClientThreadHandlerPtr;
+typedef boost::shared_ptr<class NetworkConnectionHandle> NetworkConnectionHandlePtr;
 
 /**
  * Manages all network connections in CustusX.
@@ -56,16 +56,16 @@ public:
 	QStringList getConnectionUids() const;
 
 
-	std::vector<OpenIGTLinkClientThreadHandlerPtr> getConnections() const;
-	OpenIGTLinkClientThreadHandlerPtr getConnection(QString uid);
+	std::vector<NetworkConnectionHandlePtr> getConnections() const;
+	NetworkConnectionHandlePtr getConnection(QString uid);
 signals:
 	void connectionsChanged();
 
 private:
 	QString newConnection(QString suggested_uid);
 	QString findUniqueUidNumber(QString uidBase) const;
-	OpenIGTLinkClientThreadHandlerPtr findConnection(QString uid) const;
-	std::vector<OpenIGTLinkClientThreadHandlerPtr> mConnections;
+	NetworkConnectionHandlePtr findConnection(QString uid) const;
+	std::vector<NetworkConnectionHandlePtr> mConnections;
 };
 
 } // namespace cx

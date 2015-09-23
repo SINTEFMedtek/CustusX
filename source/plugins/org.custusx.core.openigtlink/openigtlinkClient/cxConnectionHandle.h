@@ -30,37 +30,74 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-
-#ifndef CXOPENIGTLINKGUIEXTENDERSERVICE_H
-#define CXOPENIGTLINKGUIEXTENDERSERVICE_H
+#ifndef CXCONNECTIONHANDLE_H
+#define CXCONNECTIONHANDLE_H
 
 #include "org_custusx_core_openigtlink_Export.h"
-#include "cxGUIExtenderService.h"
-class ctkPluginContext;
 
-namespace cx
-{
-typedef boost::shared_ptr<class NetworkConnectionManager> NetworkConnectionManagerPtr;
+#include <map>
+#include <QObject>
+#include <QMutex>
+#include <QMutexLocker>
+#include "igtlMessageHeader.h"
+#include "igtlTransformMessage.h"
+#include "igtlImageMessage.h"
+#include "igtlStatusMessage.h"
+#include "igtlStringMessage.h"
+#include "cxIGTLinkUSStatusMessage.h"
+
+#include "cxSocketConnection.h"
+#include "cxTransform3D.h"
+#include "cxImage.h"
+#include "cxProbeDefinition.h"
+#include "cxLogger.h"
+#include "cxDialect.h"
+#include "boost/function.hpp"
+
+typedef boost::shared_ptr<QThread> QThreadPtr;
+
+namespace cx {
+
+typedef boost::shared_ptr<class NetworkConnection> NetworkConnectionPtr;
 typedef boost::shared_ptr<class NetworkConnectionHandle> NetworkConnectionHandlePtr;
-typedef boost::shared_ptr<class OpenIGTLinkDataTransfer> OpenIGTLinkDataTransferPtr;
-class NetworkConnection;
 
-class org_custusx_core_openigtlink_EXPORT OpenIGTLinkGuiExtenderService : public GUIExtenderService
+/** Encapsulates running of the NetworkConnection in a thread.
+ *  Lifetime of the thread equals that of this object.
+ *
+ */
+class org_custusx_core_openigtlink_EXPORT NetworkConnectionHandle : public QObject
 {
+	Q_OBJECT
 public:
-	OpenIGTLinkGuiExtenderService(ctkPluginContext* context, NetworkConnectionManagerPtr connections);
-    virtual ~OpenIGTLinkGuiExtenderService();
+	explicit NetworkConnectionHandle(QString threadname);
+	~NetworkConnectionHandle();
+	NetworkConnection* client();
 
-    std::vector<CategorizedWidget> createWidgets() const;
+	StringPropertyBasePtr getDialectOption() { return mDialects; }
+	StringPropertyBasePtr getIpOption() { return mIp; }
+	DoublePropertyBasePtr getPortOption() { return mPort; }
+	StringPropertyBasePtr getRoleOption() { return mRole; }
 
 private:
-    mutable GUIExtenderService::CategorizedWidget mWidget;
-	NetworkConnectionManagerPtr mConnections;
-//	NetworkConnectionHandlePtr mClient;
-	ctkPluginContext* mContext;
-	OpenIGTLinkDataTransferPtr mDataTransfer;
-};
-typedef boost::shared_ptr<OpenIGTLinkGuiExtenderService> OpenIGTLinkGuiExtenderServicePtr;
+	void onConnectionInfoChanged();
+	void onPropertiesChanged();
+	StringPropertyBasePtr mIp;
+	DoublePropertyBasePtr mPort;
+	StringPropertyBasePtr mDialects;
+	StringPropertyBasePtr mRole;
 
-}
-#endif //CXOPENIGTLINKGUIEXTENDERSERVICE_H
+	StringPropertyBasePtr createDialectOption();
+	StringPropertyBasePtr createIpOption();
+	DoublePropertyBasePtr createPortOption();
+	StringPropertyBasePtr createRoleOption();
+
+	NetworkConnectionPtr mClient;
+	QThreadPtr mThread;
+	QDomElement mOptionsElement;
+};
+
+
+} //namespace cx
+
+
+#endif // CXCONNECTIONHANDLE_H

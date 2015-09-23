@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-OpenIGTLinkClient::OpenIGTLinkClient(QString uid, QObject *parent) :
+NetworkConnection::NetworkConnection(QString uid, QObject *parent) :
     SocketConnection(parent),
     mHeader(igtl::MessageHeader::New()),
 	mHeaderReceived(false),
@@ -73,23 +73,23 @@ OpenIGTLinkClient::OpenIGTLinkClient(QString uid, QObject *parent) :
 	this->setDialect(info.protocol);
 }
 
-OpenIGTLinkClient::~OpenIGTLinkClient()
+NetworkConnection::~NetworkConnection()
 {
 }
 
-DialectPtr OpenIGTLinkClient::initDialect(DialectPtr value)
+DialectPtr NetworkConnection::initDialect(DialectPtr value)
 {
 	mAvailableDialects[value->getName()] = value;
 	return value;
 }
 
-void OpenIGTLinkClient::setConnectionInfo(ConnectionInfo info)
+void NetworkConnection::setConnectionInfo(ConnectionInfo info)
 {
 	SocketConnection::setConnectionInfo(info);
 	this->setDialect(info.protocol);
 }
 
-void OpenIGTLinkClient::invoke(boost::function<void()> func)
+void NetworkConnection::invoke(boost::function<void()> func)
 {
 	QMetaObject::invokeMethod(this,
 							  "onInvoke",
@@ -97,12 +97,12 @@ void OpenIGTLinkClient::invoke(boost::function<void()> func)
 							  Q_ARG(boost::function<void()>, func));
 }
 
-void OpenIGTLinkClient::onInvoke(boost::function<void()> func)
+void NetworkConnection::onInvoke(boost::function<void()> func)
 {
 	func();
 }
 
-QStringList OpenIGTLinkClient::getAvailableDialects() const
+QStringList NetworkConnection::getAvailableDialects() const
 {
     QStringList retval;
     DialectMap::const_iterator it = mAvailableDialects.begin();
@@ -113,7 +113,7 @@ QStringList OpenIGTLinkClient::getAvailableDialects() const
     return retval;
 }
 
-void OpenIGTLinkClient::setDialect(QString dialectname)
+void NetworkConnection::setDialect(QString dialectname)
 {
     QMutexLocker locker(&mMutex);
     if(mDialect && (dialectname == mDialect->getName()))
@@ -128,29 +128,29 @@ void OpenIGTLinkClient::setDialect(QString dialectname)
 
     if(mDialect)
     {
-        disconnect(mDialect.get(), &Dialect::image, this, &OpenIGTLinkClient::image);
-		disconnect(mDialect.get(), &Dialect::mesh, this, &OpenIGTLinkClient::mesh);
-		disconnect(mDialect.get(), &Dialect::transform, this, &OpenIGTLinkClient::transform);
-        disconnect(mDialect.get(), &Dialect::calibration, this, &OpenIGTLinkClient::calibration);
-        disconnect(mDialect.get(), &Dialect::probedefinition, this, &OpenIGTLinkClient::probedefinition);
-        disconnect(mDialect.get(), &Dialect::usstatusmessage, this, &OpenIGTLinkClient::usstatusmessage);
-        disconnect(mDialect.get(), &Dialect::igtlimage, this, &OpenIGTLinkClient::igtlimage);
+		disconnect(mDialect.get(), &Dialect::image, this, &NetworkConnection::image);
+		disconnect(mDialect.get(), &Dialect::mesh, this, &NetworkConnection::mesh);
+		disconnect(mDialect.get(), &Dialect::transform, this, &NetworkConnection::transform);
+		disconnect(mDialect.get(), &Dialect::calibration, this, &NetworkConnection::calibration);
+		disconnect(mDialect.get(), &Dialect::probedefinition, this, &NetworkConnection::probedefinition);
+		disconnect(mDialect.get(), &Dialect::usstatusmessage, this, &NetworkConnection::usstatusmessage);
+		disconnect(mDialect.get(), &Dialect::igtlimage, this, &NetworkConnection::igtlimage);
     }
 
     mDialect = dialect;
-    connect(dialect.get(), &Dialect::image, this, &OpenIGTLinkClient::image);
-	connect(dialect.get(), &Dialect::mesh, this, &OpenIGTLinkClient::mesh);
-	connect(dialect.get(), &Dialect::transform, this, &OpenIGTLinkClient::transform);
-    connect(dialect.get(), &Dialect::calibration, this, &OpenIGTLinkClient::calibration);
-    connect(dialect.get(), &Dialect::probedefinition, this, &OpenIGTLinkClient::probedefinition);
-    connect(dialect.get(), &Dialect::usstatusmessage, this, &OpenIGTLinkClient::usstatusmessage);
-    connect(dialect.get(), &Dialect::igtlimage, this, &OpenIGTLinkClient::igtlimage);
+	connect(dialect.get(), &Dialect::image, this, &NetworkConnection::image);
+	connect(dialect.get(), &Dialect::mesh, this, &NetworkConnection::mesh);
+	connect(dialect.get(), &Dialect::transform, this, &NetworkConnection::transform);
+	connect(dialect.get(), &Dialect::calibration, this, &NetworkConnection::calibration);
+	connect(dialect.get(), &Dialect::probedefinition, this, &NetworkConnection::probedefinition);
+	connect(dialect.get(), &Dialect::usstatusmessage, this, &NetworkConnection::usstatusmessage);
+	connect(dialect.get(), &Dialect::igtlimage, this, &NetworkConnection::igtlimage);
 
 	CX_LOG_CHANNEL_SUCCESS(CX_OPENIGTLINK_CHANNEL_NAME) << "IGTL Dialect set to " << dialectname;
 
 }
 
-void OpenIGTLinkClient::sendMessage(ImagePtr image)
+void NetworkConnection::sendMessage(ImagePtr image)
 {
 	QMutexLocker locker(&mMutex);
 
@@ -162,7 +162,7 @@ void OpenIGTLinkClient::sendMessage(ImagePtr image)
 	mSocket->write(reinterpret_cast<char*>(msg->GetPackPointer()), msg->GetPackSize());
 }
 
-void OpenIGTLinkClient::sendMessage(MeshPtr data)
+void NetworkConnection::sendMessage(MeshPtr data)
 {
 	QMutexLocker locker(&mMutex);
 
@@ -175,7 +175,7 @@ void OpenIGTLinkClient::sendMessage(MeshPtr data)
 }
 
 /*
-void OpenIGTLinkClient::sendStringMessage(QString command)
+void NetworkConnection::sendStringMessage(QString command)
 {
     QMutexLocker locker(&mMutex);
 
@@ -188,7 +188,7 @@ void OpenIGTLinkClient::sendStringMessage(QString command)
 }
 */
 
-void OpenIGTLinkClient::internalDataAvailable()
+void NetworkConnection::internalDataAvailable()
 {
     if(!this->socketIsConnected())
         return;
@@ -215,7 +215,7 @@ void OpenIGTLinkClient::internalDataAvailable()
 }
 
 /*
-void OpenIGTLinkClient::queryServer()
+void NetworkConnection::queryServer()
 {
     QString command = "<Command Name=\"RequestChannelIds\" />";
     this->sendStringMessage(command);
@@ -228,7 +228,7 @@ void OpenIGTLinkClient::queryServer()
 }
 */
 
-bool OpenIGTLinkClient::receiveHeader(const igtl::MessageHeader::Pointer header) const
+bool NetworkConnection::receiveHeader(const igtl::MessageHeader::Pointer header) const
 {
     header->InitPack();
 
@@ -245,7 +245,7 @@ bool OpenIGTLinkClient::receiveHeader(const igtl::MessageHeader::Pointer header)
         return false;
 }
 
-bool OpenIGTLinkClient::receiveBody(const igtl::MessageBase::Pointer header)
+bool NetworkConnection::receiveBody(const igtl::MessageBase::Pointer header)
 {
 	QString type = QString(header->GetDeviceType()).toUpper();
 	if (type=="TRANSFORM")
@@ -301,7 +301,7 @@ bool OpenIGTLinkClient::receiveBody(const igtl::MessageBase::Pointer header)
     return true;
 }
 
-qint64 OpenIGTLinkClient::skip(qint64 maxSizeBytes) const
+qint64 NetworkConnection::skip(qint64 maxSizeBytes) const
 {
 	char *voidData = new char[maxSizeBytes];
 	int retval = mSocket->read(voidData, maxSizeBytes);
@@ -311,7 +311,7 @@ qint64 OpenIGTLinkClient::skip(qint64 maxSizeBytes) const
 
 
 template <typename T>
-bool OpenIGTLinkClient::receive(const igtl::MessageBase::Pointer header)
+bool NetworkConnection::receive(const igtl::MessageBase::Pointer header)
 {
     QMutexLocker locker(&mMutex);
 
@@ -335,119 +335,5 @@ bool OpenIGTLinkClient::receive(const igtl::MessageBase::Pointer header)
     return true;
 }
 
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
-
-OpenIGTLinkClientThreadHandler::OpenIGTLinkClientThreadHandler(QString threadname)
-{
-	mThread.reset(new QThread());
-	mThread->setObjectName(threadname);
-	mClient.reset(new OpenIGTLinkClient(threadname));
-	connect(mClient.get(), &OpenIGTLinkClient::connectionInfoChanged, this, &OpenIGTLinkClientThreadHandler::onConnectionInfoChanged);
-	mClient->moveToThread(mThread.get());
-
-	XmlOptionFile options = profile()->getXmlSettings().descend(mClient->getUid());
-	mOptionsElement = options.getElement();
-
-	mIp = this->createIpOption();
-	mPort = this->createPortOption();
-	mDialects = this->createDialectOption();
-	mRole = this->createRoleOption();
-
-	this->onPropertiesChanged();
-
-	mThread->start();
-}
-
-void OpenIGTLinkClientThreadHandler::onPropertiesChanged()
-{
-	OpenIGTLinkClient::ConnectionInfo info;
-	info.role = mRole->getValue();
-	info.host = mIp->getValue();
-	info.port = mPort->getValue();
-	info.protocol = mDialects->getValue();
-
-	mClient->setConnectionInfo(info);
-}
-
-void OpenIGTLinkClientThreadHandler::onConnectionInfoChanged()
-{
-	OpenIGTLinkClient::ConnectionInfo info = mClient->getConnectionInfo();
-	mRole->setValue(info.role);
-	mIp->setValue(info.host);
-	mPort->setValue(info.port);
-	mDialects->setValue(info.protocol);
-}
-
-OpenIGTLinkClientThreadHandler::~OpenIGTLinkClientThreadHandler()
-{
-	mThread->quit();
-	mThread->wait();
-
-	mClient.reset();
-	// thread-delete implicitly at end.
-}
-
-OpenIGTLinkClient* OpenIGTLinkClientThreadHandler::client()
-{
-	return mClient.get();
-}
-
-StringPropertyBasePtr OpenIGTLinkClientThreadHandler::createDialectOption()
-{
-	StringPropertyPtr retval;
-	QStringList dialectnames;
-	if(mClient)
-		dialectnames = mClient->getAvailableDialects();
-	retval = StringProperty::initialize("protocol", "Connect to", "Protocol to use during connection.",
-										mClient->getConnectionInfo().protocol,
-										dialectnames, mOptionsElement);
-	retval->setValueRange(dialectnames);
-	retval->setGroup("Connection");
-	connect(retval.get(), &Property::changed, this, &OpenIGTLinkClientThreadHandler::onPropertiesChanged);
-	return retval;
-}
-
-StringPropertyBasePtr OpenIGTLinkClientThreadHandler::createIpOption()
-{
-	StringPropertyPtr retval;
-	retval = StringProperty::initialize("address", "Address", "Network Address",
-										mClient->getConnectionInfo().host,
-										mOptionsElement);
-	retval->setGroup("Connection");
-	connect(retval.get(), &Property::changed, this, &OpenIGTLinkClientThreadHandler::onPropertiesChanged);
-	return retval;
-}
-
-
-DoublePropertyBasePtr OpenIGTLinkClientThreadHandler::createPortOption()
-{
-	DoublePropertyPtr retval;
-	int defval = mClient->getConnectionInfo().port;
-	retval = DoubleProperty::initialize("port", "Port",
-										"Network Port (default "+QString::number(defval)+")",
-										defval,
-										DoubleRange(1024, 49151, 1), 0,
-										mOptionsElement);
-	retval->setGuiRepresentation(DoublePropertyBase::grSPINBOX);
-	retval->setAdvanced(true);
-	retval->setGroup("Connection");
-	connect(retval.get(), &Property::changed, this, &OpenIGTLinkClientThreadHandler::onPropertiesChanged);
-	return retval;
-}
-
-StringPropertyBasePtr OpenIGTLinkClientThreadHandler::createRoleOption()
-{
-	StringPropertyPtr retval;
-	QStringList values = QStringList() << "client" << "server";
-	retval = StringProperty::initialize("role", "Role",
-										"Act as client or server in the network connection",
-										mClient->getConnectionInfo().role,
-										values, mOptionsElement);
-	retval->setGroup("Connection");
-	connect(retval.get(), &Property::changed, this, &OpenIGTLinkClientThreadHandler::onPropertiesChanged);
-	return retval;
-}
 
 }//namespace cx

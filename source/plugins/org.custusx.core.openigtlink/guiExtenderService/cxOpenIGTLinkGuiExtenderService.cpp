@@ -46,7 +46,7 @@ OpenIGTLinkGuiExtenderService::OpenIGTLinkGuiExtenderService(ctkPluginContext *c
 	mContext = context;
 	mConnections = connections;
 
-	OpenIGTLinkClientThreadHandlerPtr connection = mConnections->getConnection("dataTransfer");
+	NetworkConnectionHandlePtr connection = mConnections->getConnection("dataTransfer");
 	mDataTransfer.reset(new OpenIGTLinkDataTransfer(mContext, connection));
 }
 

@@ -40,9 +40,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-class OpenIGTLinkClient;
+class NetworkConnection;
 typedef boost::shared_ptr<class OpenIGTLinkTool> OpenIGTLinkToolPtr;
-typedef boost::shared_ptr<class OpenIGTLinkClientThreadHandler> OpenIGTLinkClientThreadHandlerPtr;
+typedef boost::shared_ptr<class NetworkConnectionHandle> NetworkConnectionHandlePtr;
 
 /**
  * Tracking system service that gets tracking information from an OpenIGTLink source
@@ -58,7 +58,7 @@ class org_custusx_core_openigtlink_EXPORT OpenIGTLinkTrackingSystemService : pub
     Q_INTERFACES(cx::TrackingSystemService)
 
 public:
-	OpenIGTLinkTrackingSystemService(OpenIGTLinkClientThreadHandlerPtr connection);
+	OpenIGTLinkTrackingSystemService(NetworkConnectionHandlePtr connection);
     virtual ~OpenIGTLinkTrackingSystemService();
 
     virtual QString getUid() const;
@@ -98,7 +98,7 @@ private:
     Tool::State mState;
     std::map<QString, OpenIGTLinkToolPtr> mTools;
     ToolPtr mReference;
-	OpenIGTLinkClientThreadHandlerPtr mConnection;
+	NetworkConnectionHandlePtr mConnection;
 
 };
 typedef boost::shared_ptr<OpenIGTLinkTrackingSystemService> OpenIGTLinkTrackingSystemServicePtr;

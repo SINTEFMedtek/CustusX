@@ -43,10 +43,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxIGTLinkConversionPolyData.h"
 #include "cxVideoServiceProxy.h"
 #include "cxVideoSource.h"
+#include "cxConnectionHandle.h"
 
 namespace cx {
 
-OpenIGTLinkDataTransfer::OpenIGTLinkDataTransfer(ctkPluginContext *context, OpenIGTLinkClientThreadHandlerPtr connection, QObject* parent) :
+OpenIGTLinkDataTransfer::OpenIGTLinkDataTransfer(ctkPluginContext *context, NetworkConnectionHandlePtr connection, QObject* parent) :
 	QObject(parent),
 	mContext(context),
 	mOpenIGTLink(connection)
@@ -57,10 +58,10 @@ OpenIGTLinkDataTransfer::OpenIGTLinkDataTransfer(ctkPluginContext *context, Open
 	mViewService = VisualizationServiceProxy::create(context);
 	mVideoService = VideoServiceProxy::create(context);
 
-//	mOpenIGTLink.reset(new OpenIGTLinkClientThreadHandler(this->getConfigUid()));
+//	mOpenIGTLink.reset(new NetworkConnectionHandle(this->getConfigUid()));
 
-	connect(mOpenIGTLink->client(), &OpenIGTLinkClient::image, this, &OpenIGTLinkDataTransfer::onImageReceived);
-	connect(mOpenIGTLink->client(), &OpenIGTLinkClient::mesh, this, &OpenIGTLinkDataTransfer::onMeshReceived);
+	connect(mOpenIGTLink->client(), &NetworkConnection::image, this, &OpenIGTLinkDataTransfer::onImageReceived);
+	connect(mOpenIGTLink->client(), &NetworkConnection::mesh, this, &OpenIGTLinkDataTransfer::onMeshReceived);
 
 	mDataToSend = StringPropertySelectData::New(mPatientModelService);
 
@@ -81,7 +82,7 @@ OpenIGTLinkDataTransfer::~OpenIGTLinkDataTransfer()
 	mOpenIGTLink.reset(); //
 }
 
-OpenIGTLinkClientThreadHandlerPtr OpenIGTLinkDataTransfer::getOpenIGTLink()
+NetworkConnectionHandlePtr OpenIGTLinkDataTransfer::getOpenIGTLink()
 {
 	return mOpenIGTLink;
 }

@@ -42,15 +42,15 @@ class QPushButton;
 
 namespace cx {
 
-typedef boost::shared_ptr<class OpenIGTLinkClientThreadHandler> OpenIGTLinkClientThreadHandlerPtr;
-class OpenIGTLinkClient;
+typedef boost::shared_ptr<class NetworkConnectionHandle> NetworkConnectionHandlePtr;
+class NetworkConnection;
 
 class OpenIGTLinkConnectionWidget : public BaseWidget
 {
     Q_OBJECT
 
 public:
-	OpenIGTLinkConnectionWidget(OpenIGTLinkClientThreadHandlerPtr client, QWidget *parent=NULL);
+	OpenIGTLinkConnectionWidget(NetworkConnectionHandlePtr client, QWidget *parent=NULL);
     ~OpenIGTLinkConnectionWidget();
 
     virtual QString defaultWhatsThis() const;
@@ -63,7 +63,7 @@ private:
 
     QPushButton *mConnectButton;
 	QWidget* mOptionsWidget;
-	OpenIGTLinkClientThreadHandlerPtr mClient;
+	NetworkConnectionHandlePtr mClient;
 };
 
 }

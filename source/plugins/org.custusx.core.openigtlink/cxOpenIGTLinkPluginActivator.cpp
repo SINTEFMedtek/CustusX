@@ -57,7 +57,7 @@ void OpenIGTLinkPluginActivator::start(ctkPluginContext* context)
 {
 	mNetworkConnections.reset(new NetworkConnectionManager());
 
-	OpenIGTLinkClientThreadHandlerPtr defaultConnection = mNetworkConnections->getConnection("org.custusx.core.openigtlink");
+	NetworkConnectionHandlePtr defaultConnection = mNetworkConnections->getConnection("org.custusx.core.openigtlink");
 
 	OpenIGTLinkTrackingSystemService* tracking = new OpenIGTLinkTrackingSystemService(defaultConnection);
 	OpenIGTLinkStreamerService *streamer = new OpenIGTLinkStreamerService(defaultConnection);
