@@ -195,6 +195,12 @@ void ActiveData::setActive(DataPtr activeData)
 	this->emitSignals(activeData);
 }
 
+void ActiveData::setActive(QString uid)
+{
+	DataPtr dataToSet = mPatientModelService->getData(uid);
+	this->setActive(dataToSet);
+}
+
 QString ActiveData::getActiveImageUid()
 {
 	ImagePtr image = this->getActive<Image>();

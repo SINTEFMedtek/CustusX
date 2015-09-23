@@ -116,7 +116,6 @@ public:
 
 	// active data
 	virtual ActiveDataPtr getActiveData() const = 0;
-	virtual void setActiveData(QString uid);
 
 	// landmarks
 	virtual LandmarksPtr getPatientLandmarks() const = 0; ///< landmark defined in patient space
@@ -146,14 +145,11 @@ public:
 	virtual CLINICAL_VIEW getClinicalApplication() const = 0;
 	virtual void setClinicalApplication(CLINICAL_VIEW application) = 0;
 
-//	virtual QDomElement getCurrentWorkingElement(QString path) = 0;
-
 	virtual void autoSave() = 0;//TODO remove, and integrate into other functions
 	virtual bool isNull() = 0;
 
 	static PatientModelServicePtr getNullObject();
 
-//	QList<DataPtr> getActiveDataHistory(QString typeRegexp) const;
 signals:
 	void centerChanged(); ///< emitted when center is changed.
 	void dataAddedOrRemoved();

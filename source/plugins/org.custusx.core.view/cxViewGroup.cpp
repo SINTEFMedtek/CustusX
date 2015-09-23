@@ -58,6 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImage.h"
 #include "cxMesh.h"
 #include "cxTrackedStream.h"
+#include "cxActiveData.h"
 
 namespace cx
 {
@@ -133,13 +134,14 @@ void ViewGroup::mouseClickInViewGroupSlot()
 	std::vector<ImagePtr> images = mViewGroupData->getImages(DataViewProperties::createFull());
 	std::vector<MeshPtr> meshes = mViewGroupData->getMeshes(DataViewProperties::createFull());
 	std::vector<TrackedStreamPtr> trackedStreams = mViewGroupData->getTrackedStreams(DataViewProperties::createFull());
+	ActiveDataPtr activeData = mBackend->getPatientService()->getActiveData();
 
 	if(!meshes.empty())
-		mBackend->getPatientService()->setActiveData(meshes.front()->getUid());
+		activeData->setActive(meshes.front()->getUid());
 	if(!images.empty())
-		mBackend->getPatientService()->setActiveData(images.front()->getUid());
+		activeData->setActive(images.front()->getUid());
 	if(!trackedStreams.empty())
-		mBackend->getPatientService()->setActiveData(trackedStreams.front()->getUid());
+		activeData->setActive(trackedStreams.front()->getUid());
 
 	View* view = static_cast<View*>(this->sender());
 	if (view && mActiveView)

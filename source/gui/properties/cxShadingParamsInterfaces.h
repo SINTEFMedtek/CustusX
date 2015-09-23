@@ -56,8 +56,6 @@ class cxGui_EXPORT DoublePropertyShadingBase : public DoublePropertyBase
 public:
   DoublePropertyShadingBase(ActiveDataPtr activeData);
   virtual ~DoublePropertyShadingBase() {}
-  //virtual double getValue() const;
-  //virtual bool setValue(double val);
   virtual void connectValueSignals(bool on) {}  
 private slots:
   void activeImageChanged();

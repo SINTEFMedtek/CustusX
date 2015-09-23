@@ -267,7 +267,7 @@ TEST_CASE("Set ActiveData using uid", "[unit]")
 
 	patientModelService->insertData(testData.image1);
 
-	patientModelService->setActiveData(testData.image1->getUid());
+	activeData->setActive(testData.image1->getUid());
 	REQUIRE(activeData->getActive() == testData.image1);
 }
 

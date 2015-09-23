@@ -54,7 +54,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxShadingParamsInterfaces.h"
 #include "cxSettings.h"
 #include "cxPatientModelService.h"
-#include "cxLogicManager.h"
 #include "cxActiveData.h"
 
 namespace cx

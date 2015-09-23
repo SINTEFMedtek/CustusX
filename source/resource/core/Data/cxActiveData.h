@@ -65,7 +65,7 @@ public:
 	boost::shared_ptr<DATA> getActive() const;
 	virtual ImagePtr getDerivedActiveImage() const;///< In addition to returning Image this also provides derived (changing) images from TrackedStream
 	virtual void setActive(DataPtr activeData);
-//	virtual void setActiveData(QString uid);
+	virtual void setActive(QString uid);
 	virtual QString getActiveImageUid();
 	virtual void remove(DataPtr dataToBeRemoved);
 
