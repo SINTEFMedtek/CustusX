@@ -47,7 +47,7 @@ OpenIGTLinkGuiExtenderService::OpenIGTLinkGuiExtenderService(ctkPluginContext *c
 	mConnections = connections;
 
 	NetworkConnectionHandlePtr connection = mConnections->getConnection("dataTransfer");
-	mDataTransfer.reset(new OpenIGTLinkDataTransfer(mContext, connection));
+	mDataTransfer.reset(new NetworkDataTransfer(mContext, connection));
 }
 
 OpenIGTLinkGuiExtenderService::~OpenIGTLinkGuiExtenderService()
@@ -59,7 +59,7 @@ std::vector<GUIExtenderService::CategorizedWidget> OpenIGTLinkGuiExtenderService
 
     std::vector<CategorizedWidget> retval;
 	retval.push_back(GUIExtenderService::CategorizedWidget( new NetworkConnectionsWidget(mConnections), "Utility"));
-	retval.push_back(GUIExtenderService::CategorizedWidget( new OpenIGTLinkDataTransferWidget(mDataTransfer), "Utility"));
+	retval.push_back(GUIExtenderService::CategorizedWidget( new NetworkDataTransferWidget(mDataTransfer), "Utility"));
 	return retval;
 }
 }//namespace cx

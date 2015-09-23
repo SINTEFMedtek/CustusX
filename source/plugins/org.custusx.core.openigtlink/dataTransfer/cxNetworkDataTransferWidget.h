@@ -43,7 +43,7 @@ namespace cx {
 class NetworkConnectionWidget;
 class NetworkConnection;
 typedef boost::shared_ptr<class NetworkConnectionHandle> NetworkConnectionHandlePtr;
-typedef boost::shared_ptr<class OpenIGTLinkDataTransfer> OpenIGTLinkDataTransferPtr;
+typedef boost::shared_ptr<class NetworkDataTransfer> NetworkDataTransferPtr;
 typedef boost::shared_ptr<class BoolProperty> BoolPropertyPtr;
 typedef boost::shared_ptr<class StringProperty> StringPropertyPtr;
 typedef boost::shared_ptr<class StringPropertySelectData> StringPropertySelectDataPtr;
@@ -51,14 +51,14 @@ typedef boost::shared_ptr<class StringPropertySelectData> StringPropertySelectDa
 /**
  * Widget for handling data transfer to/from an OpenIGTLink server.
  */
-class OpenIGTLinkDataTransferWidget : public BaseWidget
+class NetworkDataTransferWidget : public BaseWidget
 {
 	Q_OBJECT
 public:
-	OpenIGTLinkDataTransferWidget(OpenIGTLinkDataTransferPtr backend, QWidget* parent=NULL);
-	~OpenIGTLinkDataTransferWidget();
+	NetworkDataTransferWidget(NetworkDataTransferPtr backend, QWidget* parent=NULL);
+	~NetworkDataTransferWidget();
 private:
-	OpenIGTLinkDataTransferPtr mDataTransfer;
+	NetworkDataTransferPtr mDataTransfer;
 	NetworkConnectionWidget* mConnectionWidget;
 
 	QVBoxLayout* createVBoxInGroupBox(QVBoxLayout* parent, QString header);

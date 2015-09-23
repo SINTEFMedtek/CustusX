@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx {
 
-OpenIGTLinkDataTransferWidget::OpenIGTLinkDataTransferWidget(OpenIGTLinkDataTransferPtr backend, QWidget *parent) :
+NetworkDataTransferWidget::NetworkDataTransferWidget(NetworkDataTransferPtr backend, QWidget *parent) :
 	BaseWidget(parent, "OpenIGTLinkDataTransferWidget", "OpenIGTLink Data Transfer"),
 	mDataTransfer(backend)
 {
@@ -67,7 +67,7 @@ OpenIGTLinkDataTransferWidget::OpenIGTLinkDataTransferWidget(OpenIGTLinkDataTran
 //	mCoordinateSystem->setDisplayNames(names);
 
 	QPushButton* sendButton = new QPushButton("Send", this);
-	connect(sendButton, &QPushButton::clicked, mDataTransfer.get(), &OpenIGTLinkDataTransfer::onSend);
+	connect(sendButton, &QPushButton::clicked, mDataTransfer.get(), &NetworkDataTransfer::onSend);
 
 	QVBoxLayout* layout = new QVBoxLayout(this);
 //	layout->setMargin(0);
@@ -94,12 +94,12 @@ OpenIGTLinkDataTransferWidget::OpenIGTLinkDataTransferWidget(OpenIGTLinkDataTran
 										   this, mDataTransfer->getStreamActiveVideoSource()));
 }
 
-OpenIGTLinkDataTransferWidget::~OpenIGTLinkDataTransferWidget()
+NetworkDataTransferWidget::~NetworkDataTransferWidget()
 {
 	mDataTransfer.reset();
 }
 
-QVBoxLayout* OpenIGTLinkDataTransferWidget::createVBoxInGroupBox(QVBoxLayout* parent, QString header)
+QVBoxLayout* NetworkDataTransferWidget::createVBoxInGroupBox(QVBoxLayout* parent, QString header)
 {
 	QWidget* widget = new QWidget(this);
 	QVBoxLayout* layout = new QVBoxLayout(widget);

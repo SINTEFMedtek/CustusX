@@ -42,7 +42,7 @@ namespace cx
 {
 typedef boost::shared_ptr<class NetworkServiceImpl> NetworkConnectionManagerPtr;
 typedef boost::shared_ptr<class NetworkConnectionHandle> NetworkConnectionHandlePtr;
-typedef boost::shared_ptr<class OpenIGTLinkDataTransfer> OpenIGTLinkDataTransferPtr;
+typedef boost::shared_ptr<class NetworkDataTransfer> NetworkDataTransferPtr;
 class NetworkConnection;
 
 class org_custusx_core_openigtlink_EXPORT OpenIGTLinkGuiExtenderService : public GUIExtenderService
@@ -58,7 +58,7 @@ private:
 	NetworkConnectionManagerPtr mConnections;
 //	NetworkConnectionHandlePtr mClient;
 	ctkPluginContext* mContext;
-	OpenIGTLinkDataTransferPtr mDataTransfer;
+	NetworkDataTransferPtr mDataTransfer;
 };
 typedef boost::shared_ptr<OpenIGTLinkGuiExtenderService> OpenIGTLinkGuiExtenderServicePtr;
 

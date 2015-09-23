@@ -56,12 +56,12 @@ typedef boost::shared_ptr<class NetworkConnectionHandle> NetworkConnectionHandle
  *
  * Use the DataToSend and onSend() to send data to server.
  */
-class OpenIGTLinkDataTransfer : public QObject
+class NetworkDataTransfer : public QObject
 {
 	Q_OBJECT
 public:
-	OpenIGTLinkDataTransfer(ctkPluginContext* context, NetworkConnectionHandlePtr connection, QObject *parent=NULL);
-	~OpenIGTLinkDataTransfer();
+	NetworkDataTransfer(ctkPluginContext* context, NetworkConnectionHandlePtr connection, QObject *parent=NULL);
+	~NetworkDataTransfer();
 
 	BoolPropertyPtr getAcceptIncomingData() { return mAcceptIncomingData; }
 	BoolPropertyPtr getStreamActiveVideoSource() { return mStreamActiveVideoSource; }

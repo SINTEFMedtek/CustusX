@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx {
 
-OpenIGTLinkDataTransfer::OpenIGTLinkDataTransfer(ctkPluginContext *context, NetworkConnectionHandlePtr connection, QObject* parent) :
+NetworkDataTransfer::NetworkDataTransfer(ctkPluginContext *context, NetworkConnectionHandlePtr connection, QObject* parent) :
 	QObject(parent),
 	mContext(context),
 	mOpenIGTLink(connection)
@@ -60,8 +60,8 @@ OpenIGTLinkDataTransfer::OpenIGTLinkDataTransfer(ctkPluginContext *context, Netw
 
 //	mOpenIGTLink.reset(new NetworkConnectionHandle(this->getConfigUid()));
 
-	connect(mOpenIGTLink->client(), &NetworkConnection::image, this, &OpenIGTLinkDataTransfer::onImageReceived);
-	connect(mOpenIGTLink->client(), &NetworkConnection::mesh, this, &OpenIGTLinkDataTransfer::onMeshReceived);
+	connect(mOpenIGTLink->client(), &NetworkConnection::image, this, &NetworkDataTransfer::onImageReceived);
+	connect(mOpenIGTLink->client(), &NetworkConnection::mesh, this, &NetworkDataTransfer::onMeshReceived);
 
 	mDataToSend = StringPropertySelectData::New(mPatientModelService);
 
@@ -73,36 +73,36 @@ OpenIGTLinkDataTransfer::OpenIGTLinkDataTransfer(ctkPluginContext *context, Netw
 												   "Stream the active Video Source over the connection",
 												   false, QDomNode());
 	connect(mStreamActiveVideoSource.get(), &BoolProperty::changed,
-			this, &OpenIGTLinkDataTransfer::onStreamActiveVideoSourceChanged);
+			this, &NetworkDataTransfer::onStreamActiveVideoSourceChanged);
 
 }
 
-OpenIGTLinkDataTransfer::~OpenIGTLinkDataTransfer()
+NetworkDataTransfer::~NetworkDataTransfer()
 {
 	mOpenIGTLink.reset(); //
 }
 
-NetworkConnectionHandlePtr OpenIGTLinkDataTransfer::getOpenIGTLink()
+NetworkConnectionHandlePtr NetworkDataTransfer::getOpenIGTLink()
 {
 	return mOpenIGTLink;
 }
 
-QString OpenIGTLinkDataTransfer::getConfigUid() const
+QString NetworkDataTransfer::getConfigUid() const
 {
 	return "org.custusx.core.openigtlink.datatransfer";
 }
 
-void OpenIGTLinkDataTransfer::onImageReceived(ImagePtr image)
+void NetworkDataTransfer::onImageReceived(ImagePtr image)
 {
 	this->onDataReceived(image);
 }
 
-void OpenIGTLinkDataTransfer::onMeshReceived(MeshPtr mesh)
+void NetworkDataTransfer::onMeshReceived(MeshPtr mesh)
 {
 	this->onDataReceived(mesh);
 }
 
-void OpenIGTLinkDataTransfer::onDataReceived(DataPtr data)
+void NetworkDataTransfer::onDataReceived(DataPtr data)
 {
 	QString actionText = mAcceptIncomingData->getValue() ? "inserting" : "ignoring";
 	QString nameText = data ? data->getName() : "NULL";
@@ -118,7 +118,7 @@ void OpenIGTLinkDataTransfer::onDataReceived(DataPtr data)
 }
 
 
-void OpenIGTLinkDataTransfer::onSend()
+void NetworkDataTransfer::onSend()
 {
 	DataPtr data = mDataToSend->getData();
 	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
@@ -149,7 +149,7 @@ void OpenIGTLinkDataTransfer::onSend()
 												 .arg(name);
 }
 
-void OpenIGTLinkDataTransfer::onStreamActiveVideoSourceChanged()
+void NetworkDataTransfer::onStreamActiveVideoSourceChanged()
 {
 	if (mStreamActiveVideoSource->getValue())
 	{
@@ -162,7 +162,7 @@ void OpenIGTLinkDataTransfer::onStreamActiveVideoSourceChanged()
 
 }
 
-void OpenIGTLinkDataTransfer::startStream()
+void NetworkDataTransfer::startStream()
 {
 	if (mStreamingVideoSource)
 	{
@@ -172,22 +172,22 @@ void OpenIGTLinkDataTransfer::startStream()
 
 	mStreamingVideoSource = mVideoService->getActiveVideoSource();
 	connect(mStreamingVideoSource.get(), &VideoSource::newFrame,
-			this, &OpenIGTLinkDataTransfer::onNewStreamFrame);
+			this, &NetworkDataTransfer::onNewStreamFrame);
 	CX_LOG_INFO() << QString("Started emitting VideoSource %1 on igtl").arg(mStreamingVideoSource->getName());
 }
 
-void OpenIGTLinkDataTransfer::stopStream()
+void NetworkDataTransfer::stopStream()
 {
 	if (!mStreamingVideoSource)
 		return;
 
 	CX_LOG_INFO() << QString("Stopped emitting VideoSource %1 on igtl").arg(mStreamingVideoSource->getName());
 	disconnect(mStreamingVideoSource.get(), &VideoSource::newFrame,
-			   this, &OpenIGTLinkDataTransfer::onNewStreamFrame);
+			   this, &NetworkDataTransfer::onNewStreamFrame);
 	mStreamingVideoSource.reset();
 }
 
-void OpenIGTLinkDataTransfer::onNewStreamFrame()
+void NetworkDataTransfer::onNewStreamFrame()
 {
 	vtkImageDataPtr data = mStreamingVideoSource->getVtkImageData();
 
