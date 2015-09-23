@@ -34,24 +34,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxtestTestTransferFunctionColorWidget.h"
 #include "cxtestTestTransferFunctions.h"
-//#include "cxLogicManager.h"
 #include "cxPatientModelService.h"
+#include "cxSessionStorageService.h"
+#include "cxActiveData.h"
 
 namespace cxtest
 {
 
 TEST_CASE("Correct ColorTFBoundaries calculated for default transfer function", "[unit][gui][not_win32][widget]")
 {
-//	cx::LogicManager::initialize();
-	cx::PatientModelServicePtr patientModelService = cx::PatientModelService::getNullObject();//Mock
-	TestTransferFunctionColorWidget*  widget = new TestTransferFunctionColorWidget(patientModelService);
+	cx::ActiveDataPtr mockActiveData = cx::ActiveDataPtr(new cx::ActiveData(cx::PatientModelService::getNullObject(), cx::SessionStorageService::getNullObject()));
+	TestTransferFunctionColorWidget*  widget = new TestTransferFunctionColorWidget(mockActiveData);
 	QRect plotArea = QRect(10, 20, 100, 200);
 	widget->setPlotArea(plotArea);
 	widget->initWithTestData();
 	REQUIRE(plotArea.left() <= widget->getLeftAreaBoundary());
 	REQUIRE(plotArea.right() >= widget->getRigthAreaBoundary());
 	delete widget;
-//	cx::LogicManager::shutdown();
 }
 
 

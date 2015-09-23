@@ -33,12 +33,105 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxActiveData.h"
 #include "cxImage.h"
 #include "cxTrackedStream.h"
+#include "cxPatientStorage.h"
+#include "cxReporter.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
 
-ActiveData::ActiveData()
+// --------------------------------------------------------
+ActiveDataPtr ActiveData::mNull; ///< static member
+// --------------------------------------------------------
+
+/**NULL implementation of ActiveData
+ */
+class ActiveDataNull: public ActiveData
 {
+public:
+	ActiveDataNull() :
+		ActiveData(PatientModelService::getNullObject(), SessionStorageService::getNullObject()) {}
+	virtual QList<DataPtr> getActiveDataHistory() const
+	{
+		printWarning("getActiveDataHistory");
+		return QList<DataPtr>();
+	}
+	virtual DataPtr getActive() const
+	{
+		printWarning("getActive");
+		return DataPtr();
+	}
+	virtual DataPtr getActiveUsingRegexp(QString typeRegexp) const
+	{
+		printWarning("getActiveUsingRegexp(QString)");
+		return DataPtr();
+	}
+	virtual ImagePtr getDerivedActiveImage() const
+	{
+		printWarning("getDerivedActiveImage");
+		return ImagePtr();
+	}
+	virtual void setActive(DataPtr activeData)
+	{
+		printWarning("setActive");
+	}
+	virtual QString getActiveImageUid()
+	{
+		printWarning("getActiveImageUid");
+		return QString();
+	}
+	virtual void remove(DataPtr dataToBeRemoved)
+	{
+		printWarning("remove");
+	}
+	void printWarning(QString warning = "") const
+	{
+		reportWarning("Trying to use ActiveDataNull. Function: " + warning);
+	}
+	static ActiveDataPtr getNullObject();
+	virtual bool isNull() const
+	{
+		return true;
+	}
+};
+
+//---------------------------------------------------------
+//-------  ActiveData  ------------------------------------
+//---------------------------------------------------------
+
+
+ActiveData::ActiveData(PatientModelServicePtr patientModelService, SessionStorageServicePtr sessionStorageService) :
+	mStorage(new PatientStorage(sessionStorageService, "ActiveData", true)),
+	mPatientModelService(patientModelService)
+{
+	mStorage->storeVariable("activeUids",
+							boost::bind(&ActiveData::getStringToSave, this),
+							boost::bind(&ActiveData::loadFromString, this, _1));
+}
+
+QString ActiveData::getStringToSave() const
+{
+	return this->getActiveDataStringList().join(" ");
+}
+
+QStringList ActiveData::getActiveDataStringList() const
+{
+	QStringList retval;
+	if(!mActiveData.isEmpty())
+		for(int i = 0; i < mActiveData.size(); ++i)
+			retval << mActiveData.at(i)->getUid();
+	return retval;
+}
+
+void ActiveData::loadFromString(const QString activeDatas)
+{
+	mActiveData.clear();
+	QStringList activeDataList = activeDatas.split(" ");
+	for(int i = 0; i < activeDataList.size(); ++i)
+	{
+		DataPtr data = mPatientModelService->getData(activeDataList.at(i));
+		this->setActive(data);
+	}
 }
 
 QList<DataPtr> ActiveData::getActiveDataHistory() const
@@ -46,14 +139,14 @@ QList<DataPtr> ActiveData::getActiveDataHistory() const
 	return mActiveData;
 }
 
-DataPtr ActiveData::getActiveData() const
+DataPtr ActiveData::getActive() const
 {
 	if(mActiveData.isEmpty())
 		return DataPtr();
 	return mActiveData.last();
 }
 
-DataPtr ActiveData::getActiveData(QString typeRegexp) const
+DataPtr ActiveData::getActiveUsingRegexp(QString typeRegexp) const
 {
 	QList<DataPtr> activeDatas = getActiveDataHistory(typeRegexp);
 
@@ -66,7 +159,7 @@ DataPtr ActiveData::getActiveData(QString typeRegexp) const
 
 ImagePtr ActiveData::getDerivedActiveImage() const
 {
-	DataPtr activeData = this->getActiveData("image|trackedStream");
+	DataPtr activeData = this->getActiveUsingRegexp("image|trackedStream");
 	ImagePtr retval;
 	TrackedStreamPtr stream = boost::dynamic_pointer_cast<TrackedStream>(activeData);
 	if(stream)
@@ -91,7 +184,7 @@ QList<DataPtr> ActiveData::getActiveDataHistory(QString typeRegexp) const
 	return activeDatas;
 }
 
-void ActiveData::setActiveData(DataPtr activeData)
+void ActiveData::setActive(DataPtr activeData)
 {
 	if (!activeData)
 		return;
@@ -100,6 +193,15 @@ void ActiveData::setActiveData(DataPtr activeData)
 	mActiveData.append(activeData);
 
 	this->emitSignals(activeData);
+}
+
+QString ActiveData::getActiveImageUid()
+{
+	ImagePtr image = this->getActive<Image>();
+	if (image)
+		return image->getUid();
+	else
+		return "";
 }
 
 void ActiveData::emitSignals(DataPtr activeData)
@@ -111,14 +213,14 @@ void ActiveData::emitSignals(DataPtr activeData)
 
 void ActiveData::emitActiveImageChanged()
 {
-	DataPtr activeData = ActiveData::getActiveData<Image>();
+	DataPtr activeData = ActiveData::getActive<Image>();
 	QString uid = getChangedUid(activeData);
 	emit activeImageChanged(uid);
 }
 
 void ActiveData::emitActiveDataChanged()
 {
-	DataPtr activeData = this->getActiveData();
+	DataPtr activeData = this->getActive();
 	QString uid = getChangedUid(activeData);
 	emit activeDataChanged(uid);
 }
@@ -131,6 +233,33 @@ QString ActiveData::getChangedUid(DataPtr activeData) const
 	return uid;
 }
 
+void ActiveData::remove(DataPtr dataToBeRemoved)
+{
+	if(!dataToBeRemoved)
+		reportWarning("ActiveData::remove: No data");
+	if(!mActiveData.contains(dataToBeRemoved))
+		return;
 
+	bool resendActiveImage = false;
+	bool resendActiveData = false;
+	if (this->getActive<Image>() == dataToBeRemoved)
+		resendActiveImage = true;
+	if(this->getActive() == dataToBeRemoved)
+		resendActiveData = true;
+
+	mActiveData.removeAll(dataToBeRemoved);
+
+	if(resendActiveImage)
+		emitActiveImageChanged();
+	if(resendActiveData)
+		emitActiveDataChanged();
+}
+
+ActiveDataPtr ActiveData::getNullObject()
+{
+	if (!mNull)
+		mNull.reset(new ActiveDataNull);
+	return mNull;
+}
 
 }//cx

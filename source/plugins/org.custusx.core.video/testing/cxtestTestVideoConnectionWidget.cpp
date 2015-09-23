@@ -88,8 +88,8 @@ cx::PropertyPtr TestVideoConnectionWidget::getOption(QString uid, QString method
 void TestVideoConnectionWidget::setupWidgetToRunStreamer(QString filename)
 {
 	cx::ImagePtr image = Utilities::create3DImage();
-	mServices->patientModelService->setActiveData(image);
 	mServices->patientModelService->insertData(image);
+	mServices->patientModelService->setActiveData(image->getUid());
 
 	QString method = "image_file_streamer";
 	mConnectionSelector->setValue(method);

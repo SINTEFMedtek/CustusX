@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackingService.h"
 #include "cxData.h"
 #include "cxTool.h"
+#include "cxActiveData.h"
 
 namespace cx
 {
@@ -74,10 +75,9 @@ void SpaceListenerImpl::doConnect()
 {
 	if (mSpace.mId == csDATA)
 	{
+		ActiveDataPtr activeData = mDataManager->getActiveData();
 		if (mSpace.mRefObject == "active")
-		{
-			connect(mDataManager.get(), &PatientModelService::activeImageChanged, this, &SpaceListenerImpl::reconnect);
-		}
+			connect(activeData.get(), &ActiveData::activeDataChanged, this, &SpaceListenerImpl::reconnect);
 
 		DataPtr data = mDataManager->getData(mSpace.mRefObject);
 		if (data)
@@ -114,6 +114,10 @@ void SpaceListenerImpl::doDisconnect()
 {
 	if (mSpace.mId == csDATA)
 	{
+		ActiveDataPtr activeData = mDataManager->getActiveData();
+		if (mSpace.mRefObject == "active")
+			disconnect(activeData.get(), &ActiveData::activeDataChanged, this, &SpaceListenerImpl::reconnect);
+
 		DataPtr data = mDataManager->getData(mSpace.mRefObject);
 		if (data)
 		{

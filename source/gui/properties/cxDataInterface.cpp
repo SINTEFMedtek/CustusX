@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVideoService.h"
 #include "cxPatientModelService.h"
 #include "cxActiveToolProxy.h"
+#include "cxActiveData.h"
 
 //TODO: remove
 #include "cxLegacySingletons.h"
@@ -80,16 +81,16 @@ DoubleRange DoublePropertyActiveToolOffset::getValueRange() const
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-DoublePropertyActiveImageBase::DoublePropertyActiveImageBase(PatientModelServicePtr patientModelService) :
-	mPatientModelService(patientModelService)
+DoublePropertyActiveImageBase::DoublePropertyActiveImageBase(ActiveDataPtr activeData) :
+	mActiveData(activeData)
 {
-	mActiveImageProxy = ActiveImageProxy::New(patientModelService);
+	mActiveImageProxy = ActiveImageProxy::New(mActiveData);
 	connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &DoublePropertyActiveImageBase::activeImageChanged);
 	connect(mActiveImageProxy.get(), &ActiveImageProxy::transferFunctionsChanged, this, &Property::changed);
 }
 void DoublePropertyActiveImageBase::activeImageChanged()
 {
-  mImage = mPatientModelService->getActiveData<Image>();
+  mImage = mActiveData->getActive<Image>();
   emit changed();
 }
 double DoublePropertyActiveImageBase::getValue() const

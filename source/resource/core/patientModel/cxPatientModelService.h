@@ -107,22 +107,15 @@ public:
 	template<class DATA>
 	boost::shared_ptr<DATA> createSpecificData(QString uid, QString name="");
 
-	QString getActiveImageUid();
-
 	// streams
 	virtual std::map<QString, VideoSourcePtr> getStreams() const = 0;
 	VideoSourcePtr getStream(const QString &uid) const; ///< Convenience function getting a specified stream
 	// patient registration
 	virtual Transform3D get_rMpr() const;
 	virtual RegistrationHistoryPtr get_rMpr_History() const = 0;
-	// active image
-	virtual QList<DataPtr> getActiveDataHistory() const = 0;
-	DataPtr getActiveData() const;
-	DataPtr getActiveData(QString typeRegexp) const;
-	ImagePtr getDerivedActiveImage() const;///< In addition to returning Image this also provides derived (changing) images from TrackedStream
-	template <class DATA>
-	boost::shared_ptr<DATA> getActiveData() const;
-	virtual void setActiveData(DataPtr activeData) = 0; ///< used for system state
+
+	// active data
+	virtual ActiveDataPtr getActiveData() const = 0;
 	virtual void setActiveData(QString uid);
 
 	// landmarks
@@ -160,12 +153,10 @@ public:
 
 	static PatientModelServicePtr getNullObject();
 
-	QList<DataPtr> getActiveDataHistory(QString typeRegexp) const;
+//	QList<DataPtr> getActiveDataHistory(QString typeRegexp) const;
 signals:
 	void centerChanged(); ///< emitted when center is changed.
 	void dataAddedOrRemoved();
-	void activeImageChanged(const QString& uId);
-	void activeDataChanged(const QString& uId);
 	void landmarkPropertiesChanged(); ///< emitted when global info about a landmark changed
 	void clinicalApplicationChanged();
 	void rMprChanged();
@@ -200,20 +191,6 @@ boost::shared_ptr<DATA> PatientModelService::createSpecificData(QString uid, QSt
 {
 	DataPtr retval = this->createData(DATA::getTypeName(), uid, name);
 	return boost::dynamic_pointer_cast<DATA>(retval);
-}
-
-template <class DATA>
-boost::shared_ptr<DATA> PatientModelService::getActiveData() const
-{
-	boost::shared_ptr<DATA> retval;
-	QList<DataPtr> activeDataList = this->getActiveDataHistory();
-	for(int i = activeDataList.size() - 1; i >= 0; --i)
-	{
-		retval = boost::dynamic_pointer_cast<DATA>(activeDataList.at(i));
-		if(retval)
-			return retval;
-	}
-	return retval;
 }
 
 } // namespace cx

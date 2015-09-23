@@ -68,6 +68,7 @@ void SessionStorageServiceProxy::onServiceAdded(SessionStorageService* service)
 	connect(mService.get(), &SessionStorageService::sessionChanged, this, &SessionStorageService::sessionChanged);
 	connect(mService.get(), &SessionStorageService::isSaving, this, &SessionStorageService::isSaving);
 	connect(mService.get(), &SessionStorageService::isLoading, this, &SessionStorageService::isLoading);
+	connect(mService.get(), &SessionStorageService::isLoadingSecond, this, &SessionStorageService::isLoadingSecond);
 
 	emit sessionChanged();
 }
@@ -78,6 +79,7 @@ void SessionStorageServiceProxy::onServiceRemoved(SessionStorageService *service
 	disconnect(mService.get(), &SessionStorageService::sessionChanged, this, &SessionStorageService::sessionChanged);
 	disconnect(mService.get(), &SessionStorageService::isSaving, this, &SessionStorageService::isSaving);
 	disconnect(mService.get(), &SessionStorageService::isLoading, this, &SessionStorageService::isLoading);
+	disconnect(mService.get(), &SessionStorageService::isLoadingSecond, this, &SessionStorageService::isLoadingSecond);
 
 	mService = SessionStorageServiceProxy::getNullObject();
 

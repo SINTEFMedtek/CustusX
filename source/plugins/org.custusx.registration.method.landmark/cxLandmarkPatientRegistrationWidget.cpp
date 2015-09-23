@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewGroupData.h"
 #include "cxReporter.h"
 #include "cxLandmarkListener.h"
+#include "cxActiveData.h"
 
 namespace cx
 {
@@ -102,7 +103,10 @@ void LandmarkPatientRegistrationWidget::hideEvent(QHideEvent* event)
 void LandmarkPatientRegistrationWidget::performRegistration()
 {
 	if (!mServices.registrationService->getFixedData())
-		mServices.registrationService->setFixedData(mServices.patientModelService->getActiveData<Image>());
+	{
+		ActiveDataPtr activeData = mServices.patientModelService->getActiveData();
+		mServices.registrationService->setFixedData(activeData->getActive<Image>());
+	}
 
 	if (mServices.patientModelService->getPatientLandmarks()->getLandmarks().size() < 3)
 		return;

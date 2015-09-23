@@ -85,7 +85,7 @@ class cxGui_EXPORT DoublePropertyActiveImageBase : public DoublePropertyBase
 {
   Q_OBJECT
 public:
-  DoublePropertyActiveImageBase(PatientModelServicePtr patientModelService);
+  DoublePropertyActiveImageBase(ActiveDataPtr activeData);
   virtual ~DoublePropertyActiveImageBase() {}
   virtual double getValue() const;
   virtual bool setValue(double val);
@@ -98,7 +98,7 @@ protected:
 
   ImagePtr mImage;
   ActiveImageProxyPtr mActiveImageProxy;
-  PatientModelServicePtr mPatientModelService;
+  ActiveDataPtr mActiveData;
 };
 
 /**

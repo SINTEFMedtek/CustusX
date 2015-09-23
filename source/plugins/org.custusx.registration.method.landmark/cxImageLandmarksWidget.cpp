@@ -57,6 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRepContainer.h"
 #include "cxTrackingService.h"
 #include "cxLandmarkListener.h"
+#include "cxActiveData.h"
 
 namespace cx
 {
@@ -217,7 +218,8 @@ void ImageLandmarksWidget::showEvent(QShowEvent* event)
 
 	if(!mUseRegistrationFixedPropertyInsteadOfActiveImage)
 	{
-		ImagePtr image = mServices.patientModelService->getActiveData<Image>();
+		ActiveDataPtr activeData = mServices.patientModelService->getActiveData();
+		ImagePtr image = activeData->getActive<Image>();
 		if (image)
 			mCurrentProperty->setValue(image->getUid());
 	}

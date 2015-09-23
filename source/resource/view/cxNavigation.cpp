@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxCameraControl.h"
 #include "cxVisServices.h"
 #include "cxViewService.h"
+#include "cxActiveData.h"
 
 namespace cx
 {
@@ -103,7 +104,8 @@ void Navigation::centerToDataInViewGroup(ViewGroupDataPtr group, DataViewPropert
 	if(visibleData.empty())
 		return;
 
-	ImagePtr activeImage = mServices->patientModelService->getActiveData<Image>();
+	ActiveDataPtr active = mServices->patientModelService->getActiveData();
+	ImagePtr activeImage = active->getActive<Image>();
 	if(activeImage && std::count(visibleData.begin(), visibleData.end(), activeImage))
 		this->centerToData(activeImage);
 	else

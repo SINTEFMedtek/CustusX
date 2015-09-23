@@ -58,6 +58,7 @@ class ViewItem;
 // KEEP SORTED AND UNIQUE!
 
 // data
+typedef boost::shared_ptr<class ActiveData> ActiveDataPtr;
 typedef boost::shared_ptr<class Tool> ToolPtr;
 typedef boost::shared_ptr<class ManualTool> ManualToolPtr;
 typedef boost::shared_ptr<class DummyTool> DummyToolPtr;

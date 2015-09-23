@@ -60,7 +60,7 @@ class cxGui_EXPORT TransferFunction2DColorWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  TransferFunction2DColorWidget(PatientModelServicePtr patientModelService, QWidget* parent);
+  TransferFunction2DColorWidget(ActiveDataPtr activeData, QWidget* parent);
   virtual ~TransferFunction2DColorWidget();
 
 public slots:
@@ -71,7 +71,7 @@ protected:
   TransferFunctionColorWidget* mTransferFunctionColorWidget;
   DoublePropertyImageTFDataBasePtr mDataWindow, mDataLevel;
   ActiveImageProxyPtr mActiveImageProxy;
-  PatientModelServicePtr mPatientModelService;
+  ActiveDataPtr mActiveData;
 };
 
 /**

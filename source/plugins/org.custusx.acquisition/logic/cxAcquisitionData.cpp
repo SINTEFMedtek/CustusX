@@ -215,7 +215,6 @@ void Acquisition::checkIfReadySlot()
 
 void Acquisition::setReady(bool val, QString text)
 {
-	std::cout << "Acquisition::setReady " << text << std::endl;
 	mReady = val;
 	mInfoText = text;
 
