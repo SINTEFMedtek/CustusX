@@ -50,19 +50,23 @@ std::vector<ToolPtr> toVector(std::map<QString, OpenIGTLinkToolPtr> map)
     return retval;
 }
 
-OpenIGTLinkTrackingSystemService::OpenIGTLinkTrackingSystemService(OpenIGTLinkClient *client) :
-    mState(Tool::tsNONE)
+OpenIGTLinkTrackingSystemService::OpenIGTLinkTrackingSystemService(OpenIGTLinkClientThreadHandlerPtr connection) :
+	mState(Tool::tsNONE),
+	mConnection(connection)
+
 {
-    if(client == NULL)
+	if(mConnection == NULL)
         return;
 
-    connect(this, &OpenIGTLinkTrackingSystemService::connectToServer, client, &OpenIGTLinkClient::requestConnect);
-    connect(this, &OpenIGTLinkTrackingSystemService::disconnectFromServer, client, &OpenIGTLinkClient::requestDisconnect);
-    connect(client, &OpenIGTLinkClient::connected, this, &OpenIGTLinkTrackingSystemService::serverIsConnected);
-    connect(client, &OpenIGTLinkClient::disconnected, this, &OpenIGTLinkTrackingSystemService::serverIsDisconnected);
-    connect(client, &OpenIGTLinkClient::transform, this, &OpenIGTLinkTrackingSystemService::receiveTransform);
-    connect(client, &OpenIGTLinkClient::calibration, this, &OpenIGTLinkTrackingSystemService::receiveCalibration);
-    connect(client, &OpenIGTLinkClient::probedefinition, this, &OpenIGTLinkTrackingSystemService::receiveProbedefinition);
+	OpenIGTLinkClient* client = mConnection->client();
+
+	connect(this, &OpenIGTLinkTrackingSystemService::connectToServer, client, &OpenIGTLinkClient::requestConnect);
+	connect(this, &OpenIGTLinkTrackingSystemService::disconnectFromServer, client, &OpenIGTLinkClient::requestDisconnect);
+	connect(client, &OpenIGTLinkClient::connected, this, &OpenIGTLinkTrackingSystemService::serverIsConnected);
+	connect(client, &OpenIGTLinkClient::disconnected, this, &OpenIGTLinkTrackingSystemService::serverIsDisconnected);
+	connect(client, &OpenIGTLinkClient::transform, this, &OpenIGTLinkTrackingSystemService::receiveTransform);
+	connect(client, &OpenIGTLinkClient::calibration, this, &OpenIGTLinkTrackingSystemService::receiveCalibration);
+	connect(client, &OpenIGTLinkClient::probedefinition, this, &OpenIGTLinkTrackingSystemService::receiveProbedefinition);
 }
 
 OpenIGTLinkTrackingSystemService::~OpenIGTLinkTrackingSystemService()

@@ -42,6 +42,7 @@ namespace cx {
 
 class OpenIGTLinkConnectionWidget;
 class OpenIGTLinkClient;
+typedef boost::shared_ptr<class OpenIGTLinkClientThreadHandler> OpenIGTLinkClientThreadHandlerPtr;
 typedef boost::shared_ptr<class OpenIGTLinkDataTransfer> OpenIGTLinkDataTransferPtr;
 typedef boost::shared_ptr<class BoolProperty> BoolPropertyPtr;
 typedef boost::shared_ptr<class StringProperty> StringPropertyPtr;
@@ -54,7 +55,7 @@ class OpenIGTLinkDataTransferWidget : public BaseWidget
 {
 	Q_OBJECT
 public:
-	OpenIGTLinkDataTransferWidget(ctkPluginContext* context, QWidget* parent=NULL);
+	OpenIGTLinkDataTransferWidget(OpenIGTLinkDataTransferPtr backend, QWidget* parent=NULL);
 	~OpenIGTLinkDataTransferWidget();
 private:
 	OpenIGTLinkDataTransferPtr mDataTransfer;

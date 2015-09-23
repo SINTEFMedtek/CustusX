@@ -45,10 +45,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx {
 
-OpenIGTLinkDataTransferWidget::OpenIGTLinkDataTransferWidget(ctkPluginContext *context, QWidget *parent) :
-	BaseWidget(parent, "OpenIGTLinkDataTransferWidget", "OpenIGTLink Data Transfer")
+OpenIGTLinkDataTransferWidget::OpenIGTLinkDataTransferWidget(OpenIGTLinkDataTransferPtr backend, QWidget *parent) :
+	BaseWidget(parent, "OpenIGTLinkDataTransferWidget", "OpenIGTLink Data Transfer"),
+	mDataTransfer(backend)
 {
-	mDataTransfer.reset(new OpenIGTLinkDataTransfer(context));
+//	mDataTransfer.reset(new OpenIGTLinkDataTransfer(context, connection));
 
 	mConnectionWidget = new OpenIGTLinkConnectionWidget(mDataTransfer->getOpenIGTLink());
 

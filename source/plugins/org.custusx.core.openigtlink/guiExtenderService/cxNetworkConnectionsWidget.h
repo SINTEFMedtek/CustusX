@@ -29,54 +29,69 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXNETWORKCONNECTIONSWIDGET_H
+#define CXNETWORKCONNECTIONSWIDGET_H
 
-#ifndef CXOpenIGTLinkPluginActivator_H_
-#define CXOpenIGTLinkPluginActivator_H_
+#include "org_custusx_core_openigtlink_Export.h"
 
-#include <ctkPluginActivator.h>
-#include "boost/shared_ptr.hpp"
-#include <QThread>
+#include "cxBaseWidget.h"
+
+#include <vector>
+#include <boost/shared_ptr.hpp>
+#include <QProcess>
+#include "cxTransform3D.h"
+#include "cxForwardDeclarations.h"
+#include "cxXmlOptionItem.h"
+#include "cxVisServices.h"
+
+class QPushButton;
+class QComboBox;
+class QLineEdit;
+class QStackedWidget;
+typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 
 namespace cx
 {
-
-typedef boost::shared_ptr<class OpenIGTLinkClientThreadHandler> OpenIGTLinkClientThreadHandlerPtr;
-typedef boost::shared_ptr<class OpenIGTLinkTrackingSystemService> OpenIGTLinkTrackingSystemServicePtr;
-typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
+//class SimulateUSWidget;
+//class FileInputWidget;
+//class StreamerService;
+//class XmlOptionFile;
+class DetailedLabeledComboBoxWidget;
+//typedef boost::shared_ptr<class VideoConnectionManager> VideoConnectionManagerPtr;
+//typedef boost::shared_ptr<class StringPropertyActiveVideoSource> StringPropertyActiveVideoSourcePtr;
+//typedef boost::shared_ptr<class StringProperty> StringPropertyPtr;
+//typedef boost::shared_ptr<class Tool> ToolPtr;
+//typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 typedef boost::shared_ptr<class NetworkConnectionManager> NetworkConnectionManagerPtr;
 
 /**
- * Activator for the OpenIGTLink service
+ * \brief GUI for managing network connections
  *
- * \ingroup org_custusx_core_openigtlink
- *
- * \date 2015-03-03
- * \author Janne Beate Bakeng
+ * \date 2015-09-23
+ * \author Christian Askeland, SINTEF
  */
-class OpenIGTLinkPluginActivator :  public QObject, public ctkPluginActivator
+class org_custusx_core_openigtlink_EXPORT NetworkConnectionsWidget : public BaseWidget
 {
-    Q_OBJECT
-    Q_INTERFACES(ctkPluginActivator)
-    Q_PLUGIN_METADATA(IID "org_custusx_core_openigtlink")
+  Q_OBJECT
 
 public:
-
-    OpenIGTLinkPluginActivator();
-    ~OpenIGTLinkPluginActivator();
-
-    void start(ctkPluginContext* context);
-    void stop(ctkPluginContext* context);
+	NetworkConnectionsWidget(NetworkConnectionManagerPtr connections, QWidget* parent=NULL);
+	virtual ~NetworkConnectionsWidget() {}
 
 private:
-    RegisteredServicePtr mRegistrationGui;
-    RegisteredServicePtr mRegistrationTracking;
-    RegisteredServicePtr mRegistrationStreaming;
-//    QThread mOpenIGTLinkThread;
-//	OpenIGTLinkClientThreadHandlerPtr mOpenIGTLink;
+	NetworkConnectionManagerPtr mConnections;
+	StringPropertyPtr mConnectionSelector;
 
-	NetworkConnectionManagerPtr mNetworkConnections;
+	void onNetworkManagerChanged();
+	void onConnectionSelected();
+	void updateConnectionWidget();
+
+	XmlOptionFile mOptions;
+	DetailedLabeledComboBoxWidget* mConnectionSelectionWidget;
+	class WidgetInGroupBox* mOptionsWidget;
+
 };
 
-} // namespace cx
+}//end namespace cx
 
-#endif /* CXOpenIGTLinkPluginActivator_H_ */
+#endif // CXNETWORKCONNECTIONSWIDGET_H

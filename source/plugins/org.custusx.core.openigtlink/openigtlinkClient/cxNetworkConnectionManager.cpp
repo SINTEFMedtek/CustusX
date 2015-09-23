@@ -29,51 +29,72 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#include "cxNetworkConnectionManager.h"
 
-#include "cxOpenIGTLinkStreamerService.h"
 #include "cxOpenIGTLinkClient.h"
 
 namespace cx
 {
 
-OpenIGTLinkStreamerService::OpenIGTLinkStreamerService(OpenIGTLinkClientThreadHandlerPtr connection) :
-	mConnection(connection)
+NetworkConnectionManager::NetworkConnectionManager()
 {
-	OpenIGTLinkClient* client = mConnection->client();
-    mStreamer = OpenIGTLinkStreamerPtr(new OpenIGTLinkStreamer());
-
-	connect(client, &OpenIGTLinkClient::connected, mStreamer.get(), &OpenIGTLinkStreamer::receivedConnected);
-	connect(client, &OpenIGTLinkClient::disconnected, mStreamer.get(), &OpenIGTLinkStreamer::receivedDisconnected);
-	connect(client, &OpenIGTLinkClient::error, mStreamer.get(), &OpenIGTLinkStreamer::receivedError);
-	connect(client, &OpenIGTLinkClient::image, mStreamer.get(), &OpenIGTLinkStreamer::receivedImage);
-	connect(client, &OpenIGTLinkClient::usstatusmessage, mStreamer.get(), &OpenIGTLinkStreamer::receivedUSStatusMessage);
-	connect(client, &OpenIGTLinkClient::igtlimage, mStreamer.get(), &OpenIGTLinkStreamer::receiveIgtlImage);
 }
 
-OpenIGTLinkStreamerService::~OpenIGTLinkStreamerService()
+QString NetworkConnectionManager::newConnection(QString suggested_uid)
 {
-
+	QString uid = this->findUniqueUidNumber(suggested_uid);
+	OpenIGTLinkClientThreadHandlerPtr connection(new OpenIGTLinkClientThreadHandler(uid));
+	mConnections.push_back(connection);
+	emit connectionsChanged();
+	return uid;
 }
 
-QString OpenIGTLinkStreamerService::getName()
+QString NetworkConnectionManager::findUniqueUidNumber(QString uidBase) const
 {
-    return "OpenIGTLink streamer";
+	int counter = 0;
+	QString uid = uidBase;
+	while (this->findConnection(uid))
+	{
+		counter++;
+		uid = QString("%1%2").arg(uidBase).arg(counter);
+	}
+
+	return uid;
 }
 
-QString OpenIGTLinkStreamerService::getType() const
+std::vector<OpenIGTLinkClientThreadHandlerPtr> NetworkConnectionManager::getConnections() const
 {
-    return "openigtlink_streamer";
+	return mConnections;
 }
 
-std::vector<PropertyPtr> OpenIGTLinkStreamerService::getSettings(QDomElement root)
+QStringList NetworkConnectionManager::getConnectionUids() const
 {
-    std::vector<PropertyPtr> retval;
-    return retval;
+	QStringList retval;
+	for (unsigned i=0; i<mConnections.size(); ++i)
+		retval << mConnections[i]->client()->getUid();
+	return retval;
 }
 
-StreamerPtr OpenIGTLinkStreamerService::createStreamer(QDomElement root)
+OpenIGTLinkClientThreadHandlerPtr NetworkConnectionManager::findConnection(QString uid) const
 {
-    return mStreamer;
+	for (unsigned i=0; i<mConnections.size(); ++i)
+		if (mConnections[i]->client()->getUid() == uid)
+			return mConnections[i];
+	return OpenIGTLinkClientThreadHandlerPtr();
 }
 
-} //namespace cx
+OpenIGTLinkClientThreadHandlerPtr NetworkConnectionManager::getConnection(QString uid)
+{
+	OpenIGTLinkClientThreadHandlerPtr connection = this->findConnection(uid);
+
+	if (!connection)
+	{
+		this->newConnection(uid);
+		connection = this->findConnection(uid);
+	}
+
+	return connection;
+}
+
+
+} // namespace cx

@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxOpenIGTLinkGuiExtenderService.h"
 #include "cxOpenIGTLinkClient.h"
 #include "cxRegisteredService.h"
+#include "cxNetworkConnectionManager.h"
 
 namespace cx
 {
@@ -54,14 +55,18 @@ OpenIGTLinkPluginActivator::~OpenIGTLinkPluginActivator()
 
 void OpenIGTLinkPluginActivator::start(ctkPluginContext* context)
 {
-	mOpenIGTLink.reset(new OpenIGTLinkClientThreadHandler("org.custusx.core.openigtlink"));
+	mNetworkConnections.reset(new NetworkConnectionManager());
+
+//	QString defaultConnection = mNetworkConnections->newConnection("org.custusx.core.openigtlink");
+	OpenIGTLinkClientThreadHandlerPtr defaultConnection = mNetworkConnections->getConnection("org.custusx.core.openigtlink");
+//	mOpenIGTLink.reset(new OpenIGTLinkClientThreadHandler("org.custusx.core.openigtlink"));
 //    mOpenIGTLinkThread.setObjectName("org.custusx.core.openigtlink");
 //    OpenIGTLinkClient *client = new OpenIGTLinkClient;
 //    client->moveToThread(&mOpenIGTLinkThread);
 
-	OpenIGTLinkTrackingSystemService* tracking = new OpenIGTLinkTrackingSystemService(mOpenIGTLink->client());
-	OpenIGTLinkStreamerService *streamer = new OpenIGTLinkStreamerService(mOpenIGTLink->client());
-	OpenIGTLinkGuiExtenderService* gui = new OpenIGTLinkGuiExtenderService(context, mOpenIGTLink);
+	OpenIGTLinkTrackingSystemService* tracking = new OpenIGTLinkTrackingSystemService(defaultConnection);
+	OpenIGTLinkStreamerService *streamer = new OpenIGTLinkStreamerService(defaultConnection);
+	OpenIGTLinkGuiExtenderService* gui = new OpenIGTLinkGuiExtenderService(context, mNetworkConnections);
 
     mRegistrationGui = RegisteredService::create<OpenIGTLinkGuiExtenderService>(context, gui, GUIExtenderService_iid);
     mRegistrationTracking = RegisteredService::create<OpenIGTLinkTrackingSystemService>(context, tracking, TrackingSystemService_iid);
@@ -81,7 +86,7 @@ void OpenIGTLinkPluginActivator::stop(ctkPluginContext* context)
     mRegistrationStreaming.reset();
     Q_UNUSED(context);
 
-	mOpenIGTLink.reset();
+	mNetworkConnections.reset();
 }
 
 } // namespace cx

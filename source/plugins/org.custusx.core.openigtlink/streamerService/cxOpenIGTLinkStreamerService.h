@@ -40,12 +40,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 class OpenIGTLinkClient;
+typedef boost::shared_ptr<class OpenIGTLinkClientThreadHandler> OpenIGTLinkClientThreadHandlerPtr;
+
 
 class org_custusx_core_openigtlink_EXPORT OpenIGTLinkStreamerService : public StreamerService
 {
 
 public:
-    OpenIGTLinkStreamerService(OpenIGTLinkClient *client);
+	OpenIGTLinkStreamerService(OpenIGTLinkClientThreadHandlerPtr connection);
     ~OpenIGTLinkStreamerService();
 
     virtual QString getName();
@@ -55,6 +57,7 @@ public:
 
 private:
     OpenIGTLinkStreamerPtr mStreamer;
+	OpenIGTLinkClientThreadHandlerPtr mConnection;
 };
 
 } //namespace cx

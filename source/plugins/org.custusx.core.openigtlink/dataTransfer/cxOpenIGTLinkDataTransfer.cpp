@@ -46,9 +46,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx {
 
-OpenIGTLinkDataTransfer::OpenIGTLinkDataTransfer(ctkPluginContext *context, QObject* parent) :
+OpenIGTLinkDataTransfer::OpenIGTLinkDataTransfer(ctkPluginContext *context, OpenIGTLinkClientThreadHandlerPtr connection, QObject* parent) :
 	QObject(parent),
-	mContext(context)
+	mContext(context),
+	mOpenIGTLink(connection)
 {
 	mOptions = profile()->getXmlSettings().descend(this->getConfigUid());
 
@@ -56,7 +57,7 @@ OpenIGTLinkDataTransfer::OpenIGTLinkDataTransfer(ctkPluginContext *context, QObj
 	mViewService = VisualizationServiceProxy::create(context);
 	mVideoService = VideoServiceProxy::create(context);
 
-	mOpenIGTLink.reset(new OpenIGTLinkClientThreadHandler(this->getConfigUid()));
+//	mOpenIGTLink.reset(new OpenIGTLinkClientThreadHandler(this->getConfigUid()));
 
 	connect(mOpenIGTLink->client(), &OpenIGTLinkClient::image, this, &OpenIGTLinkDataTransfer::onImageReceived);
 	connect(mOpenIGTLink->client(), &OpenIGTLinkClient::mesh, this, &OpenIGTLinkDataTransfer::onMeshReceived);

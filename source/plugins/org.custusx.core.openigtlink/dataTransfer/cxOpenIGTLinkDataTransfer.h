@@ -60,7 +60,7 @@ class OpenIGTLinkDataTransfer : public QObject
 {
 	Q_OBJECT
 public:
-	OpenIGTLinkDataTransfer(ctkPluginContext* context, QObject *parent=NULL);
+	OpenIGTLinkDataTransfer(ctkPluginContext* context, OpenIGTLinkClientThreadHandlerPtr connection, QObject *parent=NULL);
 	~OpenIGTLinkDataTransfer();
 
 	BoolPropertyPtr getAcceptIncomingData() { return mAcceptIncomingData; }
