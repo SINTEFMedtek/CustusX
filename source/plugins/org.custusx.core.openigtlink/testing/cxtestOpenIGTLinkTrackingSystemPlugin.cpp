@@ -49,7 +49,7 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: Check that the openigtlink tracking
     service.reset();
 }
 
-TEST_CASE("OpenIGTLinkGuiExtender: Check that the openigtlink gui extender service can be created and destroyed", "[unit][org.custusx.core.tracking.system.openigtlink]")
+TEST_CASE("OpenIGTLinkGuiExtender: Check that the openigtlink gui extender service can be created and destroyed", "[unit][org.custusx.core.tracking.system.openigtlink][hide]")
 {
 	cx::NetworkConnectionManagerPtr connections(new cx::NetworkConnectionManager());
 //	cx::OpenIGTLinkClientThreadHandlerPtr client(new cx::OpenIGTLinkClientThreadHandler("test"));
