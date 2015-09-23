@@ -42,13 +42,17 @@ Ur5GUIExtenderService::Ur5GUIExtenderService(ctkPluginContext *context) :
 {
 }
 
+Ur5GUIExtenderService::Ur5GUIExtenderService(ctkPluginContext *context, Ur5RobotPtr robot) :
+  mContext(context),
+  mUr5Robot(robot)
+{
+}
+
 std::vector<GUIExtenderService::CategorizedWidget> Ur5GUIExtenderService::createWidgets() const
 {
 	std::vector<CategorizedWidget> retval;
 
-	retval.push_back(GUIExtenderService::CategorizedWidget(
-			new Ur5Widget(),
-			"Utility"));
+    retval.push_back(GUIExtenderService::CategorizedWidget(new Ur5Widget(mUr5Robot), "Utility"));
 
 	return retval;
 }
