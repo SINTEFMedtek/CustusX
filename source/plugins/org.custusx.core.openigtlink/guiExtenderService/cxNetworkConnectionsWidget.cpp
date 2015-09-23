@@ -121,12 +121,11 @@ void NetworkConnectionsWidget::onConnectionSelected()
 
 void NetworkConnectionsWidget::updateConnectionWidget()
 {
-	NetworkConnectionHandlePtr connection = mConnections->getConnection(mConnectionSelector->getUid());
+	NetworkConnectionHandlePtr connection = mConnections->getConnection(mConnectionSelector->getValue());
 	NetworkConnectionWidget* widget = new NetworkConnectionWidget(connection);
 	mOptionsWidget->replaceWidget(widget);
 	if (connection)
 	{
-		CX_LOG_CHANNEL_DEBUG("CA") << "update " <<  (connection->client()->getUid());
 		mOptionsWidget->groupBox->setTitle(connection->client()->getUid());
 	}
 }
