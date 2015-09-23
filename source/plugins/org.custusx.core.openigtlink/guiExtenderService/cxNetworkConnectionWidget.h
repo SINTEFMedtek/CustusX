@@ -45,13 +45,13 @@ namespace cx {
 typedef boost::shared_ptr<class NetworkConnectionHandle> NetworkConnectionHandlePtr;
 class NetworkConnection;
 
-class OpenIGTLinkConnectionWidget : public BaseWidget
+class NetworkConnectionWidget : public BaseWidget
 {
     Q_OBJECT
 
 public:
-	OpenIGTLinkConnectionWidget(NetworkConnectionHandlePtr client, QWidget *parent=NULL);
-    ~OpenIGTLinkConnectionWidget();
+	NetworkConnectionWidget(NetworkConnectionHandlePtr client, QWidget *parent=NULL);
+	~NetworkConnectionWidget();
 
     virtual QString defaultWhatsThis() const;
 

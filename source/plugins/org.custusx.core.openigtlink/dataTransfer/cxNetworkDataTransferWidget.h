@@ -40,7 +40,7 @@ class ctkPluginContext;
 
 namespace cx {
 
-class OpenIGTLinkConnectionWidget;
+class NetworkConnectionWidget;
 class NetworkConnection;
 typedef boost::shared_ptr<class NetworkConnectionHandle> NetworkConnectionHandlePtr;
 typedef boost::shared_ptr<class OpenIGTLinkDataTransfer> OpenIGTLinkDataTransferPtr;
@@ -59,7 +59,7 @@ public:
 	~OpenIGTLinkDataTransferWidget();
 private:
 	OpenIGTLinkDataTransferPtr mDataTransfer;
-	OpenIGTLinkConnectionWidget* mConnectionWidget;
+	NetworkConnectionWidget* mConnectionWidget;
 
 	QVBoxLayout* createVBoxInGroupBox(QVBoxLayout* parent, QString header);
 };

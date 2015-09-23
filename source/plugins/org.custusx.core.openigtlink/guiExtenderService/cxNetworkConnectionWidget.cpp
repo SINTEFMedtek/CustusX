@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx {
 
-OpenIGTLinkConnectionWidget::OpenIGTLinkConnectionWidget(NetworkConnectionHandlePtr client, QWidget *parent) :
+NetworkConnectionWidget::NetworkConnectionWidget(NetworkConnectionHandlePtr client, QWidget *parent) :
     BaseWidget(parent, "OpenIGTLinkConnectionWidget", "OpenIGTLink Connection"),
     mClient(client)
 {
@@ -54,9 +54,9 @@ OpenIGTLinkConnectionWidget::OpenIGTLinkConnectionWidget(NetworkConnectionHandle
 
     mConnectButton = new QPushButton("Connect", this);
 	mConnectButton->setCheckable(true);
-    connect(mConnectButton, &QPushButton::clicked, this, &OpenIGTLinkConnectionWidget::connectButtonClicked);
+    connect(mConnectButton, &QPushButton::clicked, this, &NetworkConnectionWidget::connectButtonClicked);
 
-	connect(mClient->client(), &NetworkConnection::stateChanged, this, &OpenIGTLinkConnectionWidget::onStateChanged);
+	connect(mClient->client(), &NetworkConnection::stateChanged, this, &NetworkConnectionWidget::onStateChanged);
 
     QVBoxLayout* topLayout = new QVBoxLayout(this);
 
@@ -79,12 +79,12 @@ OpenIGTLinkConnectionWidget::OpenIGTLinkConnectionWidget(NetworkConnectionHandle
 
 }
 
-OpenIGTLinkConnectionWidget::~OpenIGTLinkConnectionWidget()
+NetworkConnectionWidget::~NetworkConnectionWidget()
 {
 
 }
 
-QString OpenIGTLinkConnectionWidget::defaultWhatsThis() const
+QString NetworkConnectionWidget::defaultWhatsThis() const
 {
     return  "<html>"
             "<h3>Connect to an OpenIGTLink server</h3>"
@@ -97,7 +97,7 @@ QString OpenIGTLinkConnectionWidget::defaultWhatsThis() const
             "</html>";
 }
 
-void OpenIGTLinkConnectionWidget::onStateChanged(CX_SOCKETCONNECTION_STATE state)
+void NetworkConnectionWidget::onStateChanged(CX_SOCKETCONNECTION_STATE state)
 {
 //	CX_LOG_CHANNEL_DEBUG("CA") << "Changed connection state to " << string_cast(state);
 
@@ -113,7 +113,7 @@ void OpenIGTLinkConnectionWidget::onStateChanged(CX_SOCKETCONNECTION_STATE state
 	mOptionsWidget->setEnabled(state == scsINACTIVE);
 }
 
-void OpenIGTLinkConnectionWidget::connectButtonClicked(bool checked)
+void NetworkConnectionWidget::connectButtonClicked(bool checked)
 {
     if(checked)
     {

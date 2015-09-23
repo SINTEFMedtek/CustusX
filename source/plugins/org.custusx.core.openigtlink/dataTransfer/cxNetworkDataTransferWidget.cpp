@@ -50,9 +50,8 @@ OpenIGTLinkDataTransferWidget::OpenIGTLinkDataTransferWidget(OpenIGTLinkDataTran
 	BaseWidget(parent, "OpenIGTLinkDataTransferWidget", "OpenIGTLink Data Transfer"),
 	mDataTransfer(backend)
 {
-//	mDataTransfer.reset(new OpenIGTLinkDataTransfer(context, connection));
 
-	mConnectionWidget = new OpenIGTLinkConnectionWidget(mDataTransfer->getOpenIGTLink());
+	mConnectionWidget = new NetworkConnectionWidget(mDataTransfer->getOpenIGTLink());
 
 	// handled by dialect - remove (kept cause might be useful in export/import dialogs)
 //	mCoordinateSystem = StringProperty::initialize("igltcoords", "Coordinate System",

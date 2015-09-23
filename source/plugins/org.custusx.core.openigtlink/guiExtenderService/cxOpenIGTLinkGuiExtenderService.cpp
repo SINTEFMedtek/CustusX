@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxNetworkConnection.h"
 #include "cxNetworkConnectionWidget.h"
 #include "cxNetworkDataTransferWidget.h"
-#include "cxNetworkConnectionManager.h"
+#include "cxNetworkServiceImpl.h"
 #include "cxNetworkDataTransfer.h"
 #include "cxNetworkConnectionsWidget.h"
 

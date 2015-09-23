@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxOpenIGTLinkGuiExtenderService.h"
 #include "cxNetworkConnection.h"
 #include "cxRegisteredService.h"
-#include "cxNetworkConnectionManager.h"
+#include "cxNetworkServiceImpl.h"
 
 namespace cx
 {

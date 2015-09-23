@@ -29,7 +29,7 @@ set(PLUGIN_SRCS
     openigtlinkClient/cxCustusDialect.cpp
 	openigtlinkClient/cxRASDialect.h
 	openigtlinkClient/cxRASDialect.cpp
-	openigtlinkClient/cxNetworkConnectionManager.cpp
+	openigtlinkClient/cxNetworkServiceImpl.cpp
 	openigtlinkClient/cxNetworkConnectionHandle.cpp
 )
 
@@ -50,7 +50,7 @@ set(PLUGIN_MOC_SRCS
 #    openigtlinkClient/cxSocket.h
     openigtlinkClient/cxNetworkConnection.h
     openigtlinkClient/cxDialect.h
-	openigtlinkClient/cxNetworkConnectionManager.h
+	openigtlinkClient/cxNetworkServiceImpl.h
 	openigtlinkClient/cxNetworkConnectionHandle.h
 )
 

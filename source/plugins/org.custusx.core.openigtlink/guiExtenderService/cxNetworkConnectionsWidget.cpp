@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxNetworkConnectionsWidget.h"
 
-#include "cxNetworkConnectionManager.h"
+#include "cxNetworkServiceImpl.h"
 #include "cxStringProperty.h"
 #include "cxNetworkConnectionWidget.h"
 #include <QGroupBox>
@@ -122,7 +122,7 @@ void NetworkConnectionsWidget::onConnectionSelected()
 void NetworkConnectionsWidget::updateConnectionWidget()
 {
 	NetworkConnectionHandlePtr connection = mConnections->getConnection(mConnectionSelector->getUid());
-	OpenIGTLinkConnectionWidget* widget = new OpenIGTLinkConnectionWidget(connection);
+	NetworkConnectionWidget* widget = new NetworkConnectionWidget(connection);
 	mOptionsWidget->replaceWidget(widget);
 	if (connection)
 	{
