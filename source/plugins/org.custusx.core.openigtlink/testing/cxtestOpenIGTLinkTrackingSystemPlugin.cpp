@@ -52,7 +52,7 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: Check that the openigtlink tracking
 
 TEST_CASE("OpenIGTLinkGuiExtender: Check that the openigtlink gui extender service can be created and destroyed", "[unit][org.custusx.core.tracking.system.openigtlink][hide]")
 {
-	cx::NetworkConnectionManagerPtr connections(new cx::NetworkConnectionManager());
+	cx::NetworkConnectionManagerPtr connections(new cx::NetworkServiceImpl());
 //	cx::NetworkConnectionHandlePtr client(new cx::NetworkConnectionHandle("test"));
 //	cx::NetworkConnection::ConnectionInfo info;
 //	info.protocol = "PlusServer";

@@ -62,7 +62,7 @@ class DetailedLabeledComboBoxWidget;
 //typedef boost::shared_ptr<class StringProperty> StringPropertyPtr;
 //typedef boost::shared_ptr<class Tool> ToolPtr;
 //typedef boost::shared_ptr<class VisServices> VisServicesPtr;
-typedef boost::shared_ptr<class NetworkConnectionManager> NetworkConnectionManagerPtr;
+typedef boost::shared_ptr<class NetworkServiceImpl> NetworkConnectionManagerPtr;
 
 /**
  * \brief GUI for managing network connections

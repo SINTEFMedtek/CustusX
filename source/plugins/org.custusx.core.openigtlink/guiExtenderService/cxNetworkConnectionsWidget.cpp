@@ -88,7 +88,7 @@ NetworkConnectionsWidget::NetworkConnectionsWidget(NetworkConnectionManagerPtr c
 	connect(mConnectionSelector.get(), &StringProperty::changed,
 			this, &NetworkConnectionsWidget::onConnectionSelected);
 
-	connect(mConnections.get(), &NetworkConnectionManager::connectionsChanged,
+	connect(mConnections.get(), &NetworkServiceImpl::connectionsChanged,
 			this, &NetworkConnectionsWidget::onNetworkManagerChanged);
 
 	mConnectionSelectionWidget = new DetailedLabeledComboBoxWidget(this, mConnectionSelector);

@@ -55,7 +55,7 @@ OpenIGTLinkPluginActivator::~OpenIGTLinkPluginActivator()
 
 void OpenIGTLinkPluginActivator::start(ctkPluginContext* context)
 {
-	mNetworkConnections.reset(new NetworkConnectionManager());
+	mNetworkConnections.reset(new NetworkServiceImpl());
 
 	NetworkConnectionHandlePtr defaultConnection = mNetworkConnections->getConnection("org.custusx.core.openigtlink");
 

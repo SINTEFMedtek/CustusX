@@ -29,74 +29,19 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include "cxNetworkConnectionManager.h"
-
-#include "cxOpenIGTLinkClient.h"
-#include "cxConnectionHandle.h"
+#include "cxNetworkService.h"
 
 
 namespace cx
 {
 
-NetworkServiceImpl::NetworkServiceImpl()
-{
-}
-
-QString NetworkServiceImpl::newConnection(QString suggested_uid)
-{
-	QString uid = this->findUniqueUidNumber(suggested_uid);
-	NetworkConnectionHandlePtr connection(new NetworkConnectionHandle(uid));
-	mConnections.push_back(connection);
-	emit connectionsChanged();
-	return uid;
-}
-
-QString NetworkServiceImpl::findUniqueUidNumber(QString uidBase) const
-{
-	int counter = 0;
-	QString uid = uidBase;
-	while (this->findConnection(uid))
-	{
-		counter++;
-		uid = QString("%1%2").arg(uidBase).arg(counter);
-	}
-
-	return uid;
-}
-
-std::vector<NetworkConnectionHandlePtr> NetworkServiceImpl::getConnections() const
-{
-	return mConnections;
-}
-
-QStringList NetworkServiceImpl::getConnectionUids() const
-{
-	QStringList retval;
-	for (unsigned i=0; i<mConnections.size(); ++i)
-		retval << mConnections[i]->client()->getUid();
-	return retval;
-}
-
-NetworkConnectionHandlePtr NetworkServiceImpl::findConnection(QString uid) const
-{
-	for (unsigned i=0; i<mConnections.size(); ++i)
-		if (mConnections[i]->client()->getUid() == uid)
-			return mConnections[i];
-	return NetworkConnectionHandlePtr();
-}
-
-NetworkConnectionHandlePtr NetworkServiceImpl::getConnection(QString uid)
-{
-	NetworkConnectionHandlePtr connection = this->findConnection(uid);
-
-	if (!connection)
-	{
-		this->newConnection(uid);
-		connection = this->findConnection(uid);
-	}
-
-	return connection;
-}
-
+//QStringList NetworkService::getConnectionUids() const
+//{
+//	std::vector<NetworkConnectionHandlePtr> connections = this->getConnections();
+//	QStringList retval;
+//	for (unsigned i=0; i<connections.size(); ++i)
+//		retval << connections[i]->client()->getUid();
+//	return retval;
+//}
 
 } // namespace cx

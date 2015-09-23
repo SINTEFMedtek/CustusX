@@ -29,74 +29,42 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include "cxNetworkConnectionManager.h"
+#ifndef CXNETWORKSERVICE_H
+#define CXNETWORKSERVICE_H
 
-#include "cxOpenIGTLinkClient.h"
-#include "cxConnectionHandle.h"
 
+#include "cxResourceExport.h"
+#include "boost/shared_ptr.hpp"
+#include <QString>
+#include <QStringList>
+#include <QObject>
+
+#define NetworkService_iid "cx::NetworkService"
 
 namespace cx
 {
+typedef boost::shared_ptr<class NetworkServiceImpl> NetworkConnectionManagerPtr;
+typedef boost::shared_ptr<class NetworkConnectionHandle> NetworkConnectionHandlePtr;
 
-NetworkServiceImpl::NetworkServiceImpl()
+/**
+ * Manages all network connections in CustusX.
+ *
+ *
+ */
+class cxResource_EXPORT NetworkService : public QObject
 {
-}
-
-QString NetworkServiceImpl::newConnection(QString suggested_uid)
-{
-	QString uid = this->findUniqueUidNumber(suggested_uid);
-	NetworkConnectionHandlePtr connection(new NetworkConnectionHandle(uid));
-	mConnections.push_back(connection);
-	emit connectionsChanged();
-	return uid;
-}
-
-QString NetworkServiceImpl::findUniqueUidNumber(QString uidBase) const
-{
-	int counter = 0;
-	QString uid = uidBase;
-	while (this->findConnection(uid))
-	{
-		counter++;
-		uid = QString("%1%2").arg(uidBase).arg(counter);
-	}
-
-	return uid;
-}
-
-std::vector<NetworkConnectionHandlePtr> NetworkServiceImpl::getConnections() const
-{
-	return mConnections;
-}
-
-QStringList NetworkServiceImpl::getConnectionUids() const
-{
-	QStringList retval;
-	for (unsigned i=0; i<mConnections.size(); ++i)
-		retval << mConnections[i]->client()->getUid();
-	return retval;
-}
-
-NetworkConnectionHandlePtr NetworkServiceImpl::findConnection(QString uid) const
-{
-	for (unsigned i=0; i<mConnections.size(); ++i)
-		if (mConnections[i]->client()->getUid() == uid)
-			return mConnections[i];
-	return NetworkConnectionHandlePtr();
-}
-
-NetworkConnectionHandlePtr NetworkServiceImpl::getConnection(QString uid)
-{
-	NetworkConnectionHandlePtr connection = this->findConnection(uid);
-
-	if (!connection)
-	{
-		this->newConnection(uid);
-		connection = this->findConnection(uid);
-	}
-
-	return connection;
-}
-
+	Q_OBJECT
+public:
+	virtual ~NetworkService() {}
+	virtual QStringList getConnectionUids() const = 0; // TODO use impl in this class
+	virtual std::vector<NetworkConnectionHandlePtr> getConnections() const = 0;
+	virtual NetworkConnectionHandlePtr getConnection(QString uid) = 0;
+signals:
+	void connectionsChanged();
+};
 
 } // namespace cx
+Q_DECLARE_INTERFACE(cx::NetworkService, NetworkService_iid)
+
+
+#endif // CXNETWORKSERVICE_H

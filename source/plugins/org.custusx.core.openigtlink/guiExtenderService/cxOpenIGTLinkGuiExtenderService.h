@@ -40,7 +40,7 @@ class ctkPluginContext;
 
 namespace cx
 {
-typedef boost::shared_ptr<class NetworkConnectionManager> NetworkConnectionManagerPtr;
+typedef boost::shared_ptr<class NetworkServiceImpl> NetworkConnectionManagerPtr;
 typedef boost::shared_ptr<class NetworkConnectionHandle> NetworkConnectionHandlePtr;
 typedef boost::shared_ptr<class OpenIGTLinkDataTransfer> OpenIGTLinkDataTransferPtr;
 class NetworkConnection;

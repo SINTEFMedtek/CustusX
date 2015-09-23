@@ -35,11 +35,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "boost/shared_ptr.hpp"
 #include <QString>
 #include <QObject>
+#include "cxNetworkService.h"
 #include "org_custusx_core_openigtlink_Export.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class NetworkConnectionManager> NetworkConnectionManagerPtr;
+typedef boost::shared_ptr<class NetworkServiceImpl> NetworkConnectionManagerPtr;
 typedef boost::shared_ptr<class NetworkConnectionHandle> NetworkConnectionHandlePtr;
 
 /**
@@ -47,11 +48,11 @@ typedef boost::shared_ptr<class NetworkConnectionHandle> NetworkConnectionHandle
  *
  *
  */
-class org_custusx_core_openigtlink_EXPORT NetworkConnectionManager : public QObject
+class org_custusx_core_openigtlink_EXPORT NetworkServiceImpl : public NetworkService
 {
 	Q_OBJECT
 public:
-	NetworkConnectionManager();
+	NetworkServiceImpl();
 
 	QStringList getConnectionUids() const;
 
