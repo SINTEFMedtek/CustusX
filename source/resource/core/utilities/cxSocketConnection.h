@@ -92,8 +92,8 @@ public:
 		}
 	};
 
-	ConnectionInfo getConnectionInfo();
-	CX_SOCKETCONNECTION_STATE getState();
+	ConnectionInfo getConnectionInfo(); ///< thread-safe
+	CX_SOCKETCONNECTION_STATE getState(); ///< thread-safe
 
 public slots:
 	virtual void setConnectionInfo(ConnectionInfo info); ///< thread-safe

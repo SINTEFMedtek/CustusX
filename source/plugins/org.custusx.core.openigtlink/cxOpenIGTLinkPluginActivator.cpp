@@ -57,30 +57,20 @@ void OpenIGTLinkPluginActivator::start(ctkPluginContext* context)
 {
 	mNetworkConnections.reset(new NetworkConnectionManager());
 
-//	QString defaultConnection = mNetworkConnections->newConnection("org.custusx.core.openigtlink");
 	OpenIGTLinkClientThreadHandlerPtr defaultConnection = mNetworkConnections->getConnection("org.custusx.core.openigtlink");
-//	mOpenIGTLink.reset(new OpenIGTLinkClientThreadHandler("org.custusx.core.openigtlink"));
-//    mOpenIGTLinkThread.setObjectName("org.custusx.core.openigtlink");
-//    OpenIGTLinkClient *client = new OpenIGTLinkClient;
-//    client->moveToThread(&mOpenIGTLinkThread);
 
 	OpenIGTLinkTrackingSystemService* tracking = new OpenIGTLinkTrackingSystemService(defaultConnection);
 	OpenIGTLinkStreamerService *streamer = new OpenIGTLinkStreamerService(defaultConnection);
+
 	OpenIGTLinkGuiExtenderService* gui = new OpenIGTLinkGuiExtenderService(context, mNetworkConnections);
 
     mRegistrationGui = RegisteredService::create<OpenIGTLinkGuiExtenderService>(context, gui, GUIExtenderService_iid);
     mRegistrationTracking = RegisteredService::create<OpenIGTLinkTrackingSystemService>(context, tracking, TrackingSystemService_iid);
     mRegistrationStreaming = RegisteredService::create<OpenIGTLinkStreamerService>(context, streamer, StreamerService_iid);
-
-//    mOpenIGTLinkThread.start();
-
 }
 
 void OpenIGTLinkPluginActivator::stop(ctkPluginContext* context)
 {
-//    mOpenIGTLinkThread.quit();
-//    mOpenIGTLinkThread.wait();
-
     mRegistrationGui.reset();
     mRegistrationTracking.reset();
     mRegistrationStreaming.reset();

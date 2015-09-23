@@ -52,14 +52,16 @@ class NetworkConnectionManager : public QObject
 public:
 	NetworkConnectionManager();
 
-	QString newConnection(QString suggested_uid);
 	QStringList getConnectionUids() const;
+
+
 	std::vector<OpenIGTLinkClientThreadHandlerPtr> getConnections() const;
 	OpenIGTLinkClientThreadHandlerPtr getConnection(QString uid);
 signals:
 	void connectionsChanged();
 
 private:
+	QString newConnection(QString suggested_uid);
 	QString findUniqueUidNumber(QString uidBase) const;
 	OpenIGTLinkClientThreadHandlerPtr findConnection(QString uid) const;
 	std::vector<OpenIGTLinkClientThreadHandlerPtr> mConnections;
