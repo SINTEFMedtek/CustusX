@@ -151,7 +151,7 @@ bool SocketServerConnector::startListen()
 	if (!mServer)
 	{
 		mServer = new SingleConnectionTcpServer(this);
-		connect(mServer, &SingleConnectionTcpServer::incoming, this, &SocketServerConnector::incomingConnection);
+		connect(mServer.data(), &SingleConnectionTcpServer::incoming, this, &SocketServerConnector::incomingConnection);
 //		mServer->setSocket(mSocket);
 	}
 	emit stateChanged(scsCONNECTING);

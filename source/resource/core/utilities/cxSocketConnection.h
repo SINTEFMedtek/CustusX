@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QPointer>
 #include <QTcpServer>
+#include <QMutex>
 #include "cxEnumConverter.h"
 #include "boost/shared_ptr.hpp"
 
