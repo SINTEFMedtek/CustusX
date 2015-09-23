@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxOpenIGTLinkStreamerService.h"
 #include "cxOpenIGTLinkTrackingSystemService.h"
 #include "cxOpenIGTLinkGuiExtenderService.h"
-#include "cxOpenIGTLinkClient.h"
+#include "cxNetworkConnection.h"
 #include "cxRegisteredService.h"
 #include "cxNetworkConnectionManager.h"
 

@@ -32,11 +32,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "cxOpenIGTLinkGuiExtenderService.h"
-#include "cxOpenIGTLinkClient.h"
-#include "cxOpenIGTLinkConnectionWidget.h"
-#include "cxOpenIGTLinkDataTransferWidget.h"
+#include "cxNetworkConnection.h"
+#include "cxNetworkConnectionWidget.h"
+#include "cxNetworkDataTransferWidget.h"
 #include "cxNetworkConnectionManager.h"
-#include "cxOpenIGTLinkDataTransfer.h"
+#include "cxNetworkDataTransfer.h"
 #include "cxNetworkConnectionsWidget.h"
 
 namespace cx

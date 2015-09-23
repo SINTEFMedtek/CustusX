@@ -33,8 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxOpenIGTLinkTrackingSystemService.h"
 
 #include "cxLogger.h"
-#include "cxOpenIGTLinkClient.h"
-#include "cxConnectionHandle.h"
+#include "cxNetworkConnection.h"
+#include "cxNetworkConnectionHandle.h"
 #include "cxOpenIGTLinkTool.h"
 
 namespace cx

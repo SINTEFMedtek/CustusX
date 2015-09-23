@@ -6,11 +6,11 @@ set(PLUGIN_SRCS
     cxOpenIGTLinkPluginActivator.cpp
 
     guiExtenderService/cxOpenIGTLinkGuiExtenderService.h
-	dataTransfer/cxOpenIGTLinkDataTransferWidget.cpp
-	dataTransfer/cxOpenIGTLinkDataTransfer.cpp
+	dataTransfer/cxNetworkDataTransferWidget.cpp
+	dataTransfer/cxNetworkDataTransfer.cpp
 
     guiExtenderService/cxOpenIGTLinkGuiExtenderService.cpp
-    guiExtenderService/cxOpenIGTLinkConnectionWidget.cpp
+    guiExtenderService/cxNetworkConnectionWidget.cpp
 	guiExtenderService/cxNetworkConnectionsWidget.cpp
 
     trackingSystemService/cxOpenIGTLinkTrackingSystemService.cpp
@@ -21,7 +21,7 @@ set(PLUGIN_SRCS
     streamerService/cxOpenIGTLinkStreamer.cpp
 
 #    openigtlinkClient/cxSocket.cpp
-    openigtlinkClient/cxOpenIGTLinkClient.cpp
+    openigtlinkClient/cxNetworkConnection.cpp
     openigtlinkClient/cxDialect.cpp
     openigtlinkClient/cxPlusDialect.h
     openigtlinkClient/cxPlusDialect.cpp
@@ -30,16 +30,16 @@ set(PLUGIN_SRCS
 	openigtlinkClient/cxRASDialect.h
 	openigtlinkClient/cxRASDialect.cpp
 	openigtlinkClient/cxNetworkConnectionManager.cpp
-	openigtlinkClient/cxConnectionHandle.cpp
+	openigtlinkClient/cxNetworkConnectionHandle.cpp
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
     cxOpenIGTLinkPluginActivator.h
 
-	dataTransfer/cxOpenIGTLinkDataTransferWidget.h
-	dataTransfer/cxOpenIGTLinkDataTransfer.h
-	guiExtenderService/cxOpenIGTLinkConnectionWidget.h
+	dataTransfer/cxNetworkDataTransferWidget.h
+	dataTransfer/cxNetworkDataTransfer.h
+	guiExtenderService/cxNetworkConnectionWidget.h
 	guiExtenderService/cxNetworkConnectionsWidget.h
 
     trackingSystemService/cxOpenIGTLinkTrackingSystemService.h
@@ -48,10 +48,10 @@ set(PLUGIN_MOC_SRCS
     streamerService/cxOpenIGTLinkStreamer.h
 
 #    openigtlinkClient/cxSocket.h
-    openigtlinkClient/cxOpenIGTLinkClient.h
+    openigtlinkClient/cxNetworkConnection.h
     openigtlinkClient/cxDialect.h
 	openigtlinkClient/cxNetworkConnectionManager.h
-	openigtlinkClient/cxConnectionHandle.h
+	openigtlinkClient/cxNetworkConnectionHandle.h
 )
 
 # Qt Designer files which should be processed by Qts uic

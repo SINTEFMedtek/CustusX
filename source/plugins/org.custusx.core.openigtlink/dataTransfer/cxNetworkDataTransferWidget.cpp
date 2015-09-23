@@ -29,20 +29,20 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include "cxOpenIGTLinkDataTransferWidget.h"
+#include "cxNetworkDataTransferWidget.h"
 
 #include <QPushButton>
 #include <QGroupBox>
-#include "cxOpenIGTLinkClient.h"
-#include "cxOpenIGTLinkConnectionWidget.h"
+#include "cxNetworkConnection.h"
+#include "cxNetworkConnectionWidget.h"
 #include "cxBoolProperty.h"
 #include "cxHelperWidgets.h"
 #include "cxSelectDataStringProperty.h"
 #include "cxStringProperty.h"
-#include "cxOpenIGTLinkDataTransfer.h"
+#include "cxNetworkDataTransfer.h"
 #include "cxStringPropertyActiveVideoSource.h"
 #include "cxHelperWidgets.h"
-#include "cxConnectionHandle.h"
+#include "cxNetworkConnectionHandle.h"
 
 namespace cx {
 

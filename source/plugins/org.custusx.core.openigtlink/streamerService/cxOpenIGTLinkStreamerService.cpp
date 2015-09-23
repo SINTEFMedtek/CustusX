@@ -31,8 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxOpenIGTLinkStreamerService.h"
-#include "cxOpenIGTLinkClient.h"
-#include "cxConnectionHandle.h"
+#include "cxNetworkConnection.h"
+#include "cxNetworkConnectionHandle.h"
 
 namespace cx
 {

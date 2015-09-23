@@ -29,9 +29,9 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include "cxOpenIGTLinkDataTransfer.h"
+#include "cxNetworkDataTransfer.h"
 
-#include "cxOpenIGTLinkClient.h"
+#include "cxNetworkConnection.h"
 #include "cxBoolProperty.h"
 #include "cxProfile.h"
 #include "cxHelperWidgets.h"
@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxIGTLinkConversionPolyData.h"
 #include "cxVideoServiceProxy.h"
 #include "cxVideoSource.h"
-#include "cxConnectionHandle.h"
+#include "cxNetworkConnectionHandle.h"
 
 namespace cx {
 

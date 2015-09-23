@@ -37,10 +37,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxtestDirectSignalListener.h"
 #include "cxUtilHelpers.h"
 #include "cxReporter.h"
-#include "cxOpenIGTLinkClient.h"
+#include "cxNetworkConnection.h"
 #include "cxOpenIGTLinkGuiExtenderService.h"
 #include "cxNetworkConnectionManager.h"
-#include "cxConnectionHandle.h"
+#include "cxNetworkConnectionHandle.h"
 
 TEST_CASE("OpenIGTLinkTrackingSystemService: Check that the openigtlink tracking service can be created and destroyed", "[unit][plugins][org.custusx.core.tracking.system.openigtlink]")
 {

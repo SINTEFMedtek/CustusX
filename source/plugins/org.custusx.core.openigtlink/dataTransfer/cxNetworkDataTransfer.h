@@ -29,41 +29,83 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXOPENIGTLINKDATATRANSFERWIDGET_H
-#define CXOPENIGTLINKDATATRANSFERWIDGET_H
+#ifndef CXNETWORKDATATRANSFER_H_
+#define CXNETWORKDATATRANSFER_H_
 
-#include <QThread>
-#include "cxBaseWidget.h"
+#include "cxXmlOptionItem.h"
 #include "cxForwardDeclarations.h"
 
 class ctkPluginContext;
 
 namespace cx {
 
-class OpenIGTLinkConnectionWidget;
 class NetworkConnection;
-typedef boost::shared_ptr<class NetworkConnectionHandle> NetworkConnectionHandlePtr;
-typedef boost::shared_ptr<class OpenIGTLinkDataTransfer> OpenIGTLinkDataTransferPtr;
 typedef boost::shared_ptr<class BoolProperty> BoolPropertyPtr;
 typedef boost::shared_ptr<class StringProperty> StringPropertyPtr;
 typedef boost::shared_ptr<class StringPropertySelectData> StringPropertySelectDataPtr;
+typedef boost::shared_ptr<class NetworkConnectionHandle> NetworkConnectionHandlePtr;
+
 
 /**
- * Widget for handling data transfer to/from an OpenIGTLink server.
+ * Handle transfer of data to and from CustusX over OpenIGTLink.
+ * The connection must be set up and is available from getOpenIGTLink().
+ *
+ * When AcceptIncomingData is set and the system is connected to a server,
+ * incoming data is automatically added to PatientModel and possibly shown
+ * in the Views.
+ *
+ * Use the DataToSend and onSend() to send data to server.
  */
-class OpenIGTLinkDataTransferWidget : public BaseWidget
+class OpenIGTLinkDataTransfer : public QObject
 {
 	Q_OBJECT
 public:
-	OpenIGTLinkDataTransferWidget(OpenIGTLinkDataTransferPtr backend, QWidget* parent=NULL);
-	~OpenIGTLinkDataTransferWidget();
-private:
-	OpenIGTLinkDataTransferPtr mDataTransfer;
-	OpenIGTLinkConnectionWidget* mConnectionWidget;
+	OpenIGTLinkDataTransfer(ctkPluginContext* context, NetworkConnectionHandlePtr connection, QObject *parent=NULL);
+	~OpenIGTLinkDataTransfer();
 
-	QVBoxLayout* createVBoxInGroupBox(QVBoxLayout* parent, QString header);
+	BoolPropertyPtr getAcceptIncomingData() { return mAcceptIncomingData; }
+	BoolPropertyPtr getStreamActiveVideoSource() { return mStreamActiveVideoSource; }
+	StringPropertySelectDataPtr getDataToSend() { return mDataToSend; }
+	PatientModelServicePtr getPatientModelService() { return mPatientModelService; }
+	VisualizationServicePtr getViewService() { return mViewService; }
+	VideoServicePtr getVideoService() { return mVideoService; }
+	NetworkConnectionHandlePtr getOpenIGTLink();
+
+	/**
+	 * Send data over igtl, using the data set in the DataToSend property
+	 */
+	void onSend();
+
+private:
+	BoolPropertyPtr mStreamActiveVideoSource;
+	BoolPropertyPtr mAcceptIncomingData;
+	StringPropertySelectDataPtr mDataToSend;
+	XmlOptionFile mOptions;
+	ctkPluginContext* mContext;
+	NetworkConnectionHandlePtr mOpenIGTLink;
+
+	PatientModelServicePtr mPatientModelService;
+	VisualizationServicePtr mViewService;
+	VideoServicePtr mVideoService;
+
+	VideoSourcePtr mStreamingVideoSource;
+
+	QString getConfigUid() const;
+	void onImageReceived(ImagePtr image);
+	void onMeshReceived(MeshPtr image);
+	void onDataReceived(DataPtr data);
+
+	void onNewStreamFrame();
+
+	void onStreamActiveVideoSourceChanged();
+	/**
+	 * Stream data over igtl, using the active stream (experimental)
+	 */
+	void startStream();
+	void stopStream();
+
 };
 
 } // namespace cx
 
-#endif // CXOPENIGTLINKDATATRANSFERWIDGET_H
+#endif // CXNETWORKDATATRANSFER_H_

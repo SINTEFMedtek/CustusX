@@ -30,7 +30,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxConnectionHandle.h"
+#include "cxNetworkConnectionHandle.h"
 
 #include "cxSender.h"
 #include "cxTime.h"
@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxProfile.h"
 #include "cxStringProperty.h"
 #include "cxDoubleProperty.h"
-#include "cxOpenIGTLinkClient.h"
+#include "cxNetworkConnection.h"
 
 namespace cx
 {

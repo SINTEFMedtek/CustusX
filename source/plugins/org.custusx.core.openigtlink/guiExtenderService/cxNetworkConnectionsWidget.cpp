@@ -33,12 +33,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxNetworkConnectionManager.h"
 #include "cxStringProperty.h"
-#include "cxOpenIGTLinkConnectionWidget.h"
+#include "cxNetworkConnectionWidget.h"
 #include <QGroupBox>
 #include "cxDetailedLabeledComboBoxWidget.h"
-#include "cxOpenIGTLinkClient.h"
+#include "cxNetworkConnection.h"
 #include "cxLogger.h"
-#include "cxConnectionHandle.h"
+#include "cxNetworkConnectionHandle.h"
 
 namespace cx
 {
