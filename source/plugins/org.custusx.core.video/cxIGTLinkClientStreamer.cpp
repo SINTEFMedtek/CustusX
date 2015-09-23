@@ -314,7 +314,7 @@ void IGTLinkClientStreamer::addToQueue(IGTLinkUSStatusMessage::Pointer msg)
 
 void IGTLinkClientStreamer::addToQueue(IGTLinkImageMessage::Pointer msg)
 {
-	IGTLinkConversion converter;
+//	IGTLinkConversion converter;
 
 	PackagePtr package(new Package());
 	package->mIgtLinkImageMessage = msg;
