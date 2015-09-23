@@ -18,7 +18,7 @@ set(PLUGIN_SRCS
   widgets/cxUr5ManualMove.cpp
   widgets/cxUr5PlannedMove.cpp
 
-  trackingSystemRobot/cxTrackingSystemRobotService.cpp
+  trackingSystemRobot/cxRobotTrackingSystemService.cpp
   trackingSystemRobot/cxRobotTool.cpp
 )
 
@@ -39,7 +39,7 @@ set(PLUGIN_MOC_SRCS
   widgets/cxUr5ManualMove.h
   widgets/cxUr5PlannedMove.h
 
-  trackingSystemRobot/cxTrackingSystemRobotService.h
+  trackingSystemRobot/cxRobotTrackingSystemService.h
   trackingSystemRobot/cxRobotTool.h
 )
 
@@ -60,7 +60,7 @@ set(PLUGIN_target_libraries
     cxGUIExtenderService
     #cxLogicManager
     cxPluginUtilities
-	Qt5::Widgets
+    Qt5::Widgets
     )
 
 set(PLUGIN_OUTPUT_DIR "")
