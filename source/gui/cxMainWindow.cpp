@@ -71,6 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxEraserWidget.h"
 #include "cxAllFiltersWidget.h"
 #include "cxPluginFrameworkWidget.h"
+#include "cxBrowserWidget.h"
 
 namespace cx
 {
@@ -124,6 +125,8 @@ MainWindow::MainWindow() :
 	this->addAsDockWidget(new ToolManagerWidget(this), "Debugging");
 	this->addAsDockWidget(new PluginFrameworkWidget(this), "Browsing");
 	this->addAsDockWidget(new AllFiltersWidget(VisServices::create(logicManager()->getPluginContext()), this), "Algorithms");
+
+	this->addAsDockWidget(new BrowserWidget(this), "Browsing");
 
 	connect(patientService().get(), &PatientModelService::patientChanged, this, &MainWindow::patientChangedSlot);
 	connect(qApp, &QApplication::focusChanged, this, &MainWindow::focusChanged);
