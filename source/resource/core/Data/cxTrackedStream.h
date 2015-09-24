@@ -53,6 +53,7 @@ class cxResource_EXPORT TrackedStream : public Data
 public:
 	static TrackedStreamPtr create(const QString& uid, const QString& name = "");
 	TrackedStream(const QString &uid, const QString &name, const ToolPtr &probe, const VideoSourcePtr &videoSource);
+	~TrackedStream();
 
 	void setProbeTool(const ToolPtr &probeTool);
 	ToolPtr getProbeTool();
