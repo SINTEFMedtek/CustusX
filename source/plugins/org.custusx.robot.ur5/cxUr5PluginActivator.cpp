@@ -37,26 +37,35 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxUr5GUIExtenderService.h"
 #include "cxRegisteredService.h"
+#include "trackingSystemRobot/cxRobotTrackingSystemService.h"
 
 namespace cx
 {
 
 Ur5PluginActivator::Ur5PluginActivator()
 {
-	std::cout << "Created Ur5PluginActivator" << std::endl;
+    std::cout << "Created Ur5PluginActivator" << std::endl;
 }
 
 Ur5PluginActivator::~Ur5PluginActivator()
 {}
 
 void Ur5PluginActivator::start(ctkPluginContext* context)
-{
-	mRegistration = RegisteredService::create<Ur5GUIExtenderService>(context, GUIExtenderService_iid);
+{   
+    mUr5Robot = Ur5RobotPtr(new Ur5Robot);
+
+    Ur5GUIExtenderService* gui = new Ur5GUIExtenderService(context,mUr5Robot);
+    RobotTrackingSystemService* tracking = new RobotTrackingSystemService(mUr5Robot);
+
+    mRegistrationGui = RegisteredService::create<Ur5GUIExtenderService>(context,gui, GUIExtenderService_iid);
+    mRegistrationTracking = RegisteredService::create<RobotTrackingSystemService>(context,tracking,TrackingSystemService_iid);
 }
 
 void Ur5PluginActivator::stop(ctkPluginContext* context)
 {
-	mRegistration.reset();
+    mRegistrationGui.reset();
+    mRegistrationTracking.reset();
+
 	Q_UNUSED(context);
 }
 
