@@ -68,7 +68,6 @@ PatientLandMarksWidget::PatientLandMarksWidget(RegServices services,
 
 	mRemoveLandmarkButton = new QPushButton("Clear", this);
 	mRemoveLandmarkButton->setToolTip("Clear selected landmark");
-	//  mRemoveLandmarkButton->setDisabled(true);
 	connect(mRemoveLandmarkButton, &QPushButton::clicked, this, &PatientLandMarksWidget::removeLandmarkButtonClickedSlot);
 
 	//toolmanager
@@ -79,15 +78,10 @@ PatientLandMarksWidget::PatientLandMarksWidget(RegServices services,
 	connect(settings(), &Settings::valueChangedFor, this, &PatientLandMarksWidget::globalConfigurationFileChangedSlot);
 
 	//layout
-//	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mFixedProperty));
 	mVerticalLayout->addWidget(mLandmarkTableWidget);
 	mVerticalLayout->addWidget(mToolSampleButton);
 	mVerticalLayout->addWidget(mAvarageAccuracyLabel);
-
-	QHBoxLayout* buttonsLayout = new QHBoxLayout;
-//	buttonsLayout->addWidget(mRegisterButton);
-	buttonsLayout->addWidget(mRemoveLandmarkButton);
-	mVerticalLayout->addLayout(buttonsLayout);
+	mVerticalLayout->addWidget(mRemoveLandmarkButton);
 
 	this->updateToolSampleButton();
 }

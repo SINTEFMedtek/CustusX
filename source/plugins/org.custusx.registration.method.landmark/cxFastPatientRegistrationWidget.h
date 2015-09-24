@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXFASTPATIENTREGISTRATIONWIDGET_H_
 
 #include "cxPatientLandMarksWidget.h"
+#include <QCheckBox>
 
 namespace cx
 {
@@ -58,6 +59,11 @@ public:
   FastPatientRegistrationWidget(RegServices services, QWidget* parent);
   virtual ~FastPatientRegistrationWidget();
 
+protected:
+  QCheckBox* mMouseClickSample;
+
+private slots:
+  void mouseClickStateChanged();
 private:
   virtual void performRegistration();
 };

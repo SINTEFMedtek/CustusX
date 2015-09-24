@@ -40,6 +40,12 @@ namespace cx
 FastPatientRegistrationWidget::FastPatientRegistrationWidget(RegServices services, QWidget* parent) :
 		PatientLandMarksWidget(services, parent, "org_custusx_registration_method_fast_landmark_image_to_patient_patient_landmarks_widget", "Fast Patient Registration")
 {
+	mMouseClickSample = new QCheckBox("Sample with mouse clicks in 2D.", this);
+	mMouseClickSample->setToolTip("Allow mouse clicks in 2D views to sample patient landmarks");
+	connect(mMouseClickSample, &QCheckBox::stateChanged, this, &FastPatientRegistrationWidget::mouseClickStateChanged);
+
+
+	mVerticalLayout->addWidget(mMouseClickSample);
 }
 
 FastPatientRegistrationWidget::~FastPatientRegistrationWidget()
@@ -49,6 +55,11 @@ void FastPatientRegistrationWidget::performRegistration()
 {
 	mServices.registrationService->doFastRegistration_Translation();
 	this->updateAverageAccuracyLabel();
+}
+
+void FastPatientRegistrationWidget::mouseClickStateChanged()
+{
+	mMouseClickSample->isChecked();
 }
 
 }//namespace cx
