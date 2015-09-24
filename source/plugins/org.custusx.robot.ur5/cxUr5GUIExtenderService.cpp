@@ -36,12 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-
-Ur5GUIExtenderService::Ur5GUIExtenderService(ctkPluginContext *context) :
-  mContext(context)
-{
-}
-
 Ur5GUIExtenderService::Ur5GUIExtenderService(ctkPluginContext *context, Ur5RobotPtr robot) :
   mContext(context),
   mUr5Robot(robot)
