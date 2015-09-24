@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImage.h"
 #include "cxProbeDefinition.h"
 #include "cxLogger.h"
-#include "cxDialect.h"
+#include "cxProtocol.h"
 #include "boost/function.hpp"
 
 typedef boost::shared_ptr<QThread> QThreadPtr;

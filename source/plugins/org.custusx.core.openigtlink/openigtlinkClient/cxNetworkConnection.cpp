@@ -36,9 +36,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTime.h"
 #include <QThread>
 
-#include "cxPlusDialect.h"
-#include "cxCustusDialect.h"
-#include "cxRASDialect.h"
+#include "cxPlusProtocol.h"
+#include "cxCustusProtocol.h"
+#include "cxRASProtocol.h"
 #include "igtl_header.h"
 #include "cxIGTLinkConversionImage.h"
 #include "cxIGTLinkConversionPolyData.h"
@@ -64,10 +64,10 @@ NetworkConnection::NetworkConnection(QString uid, QObject *parent) :
 
 	ConnectionInfo info = this->getConnectionInfo();
 
-	info.protocol = this->initDialect(DialectPtr(new CustusDialect()))->getName();
-	this->initDialect(DialectPtr(new PlusDialect()));
-	this->initDialect(DialectPtr(new Dialect()));
-	this->initDialect(DialectPtr(new RASDialect()));
+    info.protocol = this->initDialect(ProtocolPtr(new CustusProtocol()))->getName();
+    this->initDialect(ProtocolPtr(new PlusProtocol()));
+    this->initDialect(ProtocolPtr(new Protocol()));
+    this->initDialect(ProtocolPtr(new RASProtocol()));
 
 	SocketConnection::setConnectionInfo(info);
 	this->setDialect(info.protocol);
@@ -77,7 +77,7 @@ NetworkConnection::~NetworkConnection()
 {
 }
 
-DialectPtr NetworkConnection::initDialect(DialectPtr value)
+ProtocolPtr NetworkConnection::initDialect(ProtocolPtr value)
 {
 	mAvailableDialects[value->getName()] = value;
 	return value;
@@ -119,7 +119,7 @@ void NetworkConnection::setDialect(QString dialectname)
     if(mDialect && (dialectname == mDialect->getName()))
         return;
 
-    DialectPtr dialect = mAvailableDialects[dialectname];
+    ProtocolPtr dialect = mAvailableDialects[dialectname];
     if(!dialect)
     {
         CX_LOG_ERROR() << "\"" << dialectname << "\" is an unknown opentigtlink dialect.";
@@ -128,23 +128,23 @@ void NetworkConnection::setDialect(QString dialectname)
 
     if(mDialect)
     {
-		disconnect(mDialect.get(), &Dialect::image, this, &NetworkConnection::image);
-		disconnect(mDialect.get(), &Dialect::mesh, this, &NetworkConnection::mesh);
-		disconnect(mDialect.get(), &Dialect::transform, this, &NetworkConnection::transform);
-		disconnect(mDialect.get(), &Dialect::calibration, this, &NetworkConnection::calibration);
-		disconnect(mDialect.get(), &Dialect::probedefinition, this, &NetworkConnection::probedefinition);
-		disconnect(mDialect.get(), &Dialect::usstatusmessage, this, &NetworkConnection::usstatusmessage);
-		disconnect(mDialect.get(), &Dialect::igtlimage, this, &NetworkConnection::igtlimage);
+        disconnect(mDialect.get(), &Protocol::image, this, &NetworkConnection::image);
+        disconnect(mDialect.get(), &Protocol::mesh, this, &NetworkConnection::mesh);
+        disconnect(mDialect.get(), &Protocol::transform, this, &NetworkConnection::transform);
+        disconnect(mDialect.get(), &Protocol::calibration, this, &NetworkConnection::calibration);
+        disconnect(mDialect.get(), &Protocol::probedefinition, this, &NetworkConnection::probedefinition);
+        disconnect(mDialect.get(), &Protocol::usstatusmessage, this, &NetworkConnection::usstatusmessage);
+        disconnect(mDialect.get(), &Protocol::igtlimage, this, &NetworkConnection::igtlimage);
     }
 
     mDialect = dialect;
-	connect(dialect.get(), &Dialect::image, this, &NetworkConnection::image);
-	connect(dialect.get(), &Dialect::mesh, this, &NetworkConnection::mesh);
-	connect(dialect.get(), &Dialect::transform, this, &NetworkConnection::transform);
-	connect(dialect.get(), &Dialect::calibration, this, &NetworkConnection::calibration);
-	connect(dialect.get(), &Dialect::probedefinition, this, &NetworkConnection::probedefinition);
-	connect(dialect.get(), &Dialect::usstatusmessage, this, &NetworkConnection::usstatusmessage);
-	connect(dialect.get(), &Dialect::igtlimage, this, &NetworkConnection::igtlimage);
+    connect(dialect.get(), &Protocol::image, this, &NetworkConnection::image);
+    connect(dialect.get(), &Protocol::mesh, this, &NetworkConnection::mesh);
+    connect(dialect.get(), &Protocol::transform, this, &NetworkConnection::transform);
+    connect(dialect.get(), &Protocol::calibration, this, &NetworkConnection::calibration);
+    connect(dialect.get(), &Protocol::probedefinition, this, &NetworkConnection::probedefinition);
+    connect(dialect.get(), &Protocol::usstatusmessage, this, &NetworkConnection::usstatusmessage);
+    connect(dialect.get(), &Protocol::igtlimage, this, &NetworkConnection::igtlimage);
 
 	CX_LOG_CHANNEL_SUCCESS(CX_OPENIGTLINK_CHANNEL_NAME) << "IGTL Dialect set to " << dialectname;
 

@@ -22,36 +22,36 @@ set(PLUGIN_SRCS
 
 #    openigtlinkClient/cxSocket.cpp
     openigtlinkClient/cxNetworkConnection.cpp
-    openigtlinkClient/cxDialect.cpp
-    openigtlinkClient/cxPlusDialect.h
-    openigtlinkClient/cxPlusDialect.cpp
-    openigtlinkClient/cxCustusDialect.h
-    openigtlinkClient/cxCustusDialect.cpp
-	openigtlinkClient/cxRASDialect.h
-	openigtlinkClient/cxRASDialect.cpp
-	openigtlinkClient/cxNetworkServiceImpl.cpp
-	openigtlinkClient/cxNetworkConnectionHandle.cpp
+    openigtlinkClient/cxNetworkServiceImpl.cpp
+    openigtlinkClient/cxNetworkConnectionHandle.cpp
+
+    openigtlinkClient/protocols/cxProtocol.cpp
+    openigtlinkClient/protocols/cxPlusProtocol.h
+    openigtlinkClient/protocols/cxPlusProtocol.cpp
+    openigtlinkClient/protocols/cxCustusProtocol.h
+    openigtlinkClient/protocols/cxCustusProtocol.cpp
+    openigtlinkClient/protocols/cxRASProtocol.h
+    openigtlinkClient/protocols/cxRASProtocol.cpp
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
     cxOpenIGTLinkPluginActivator.h
 
-	dataTransfer/cxNetworkDataTransferWidget.h
-	dataTransfer/cxNetworkDataTransfer.h
-	guiExtenderService/cxNetworkConnectionWidget.h
-	guiExtenderService/cxNetworkConnectionsWidget.h
+    dataTransfer/cxNetworkDataTransferWidget.h
+    dataTransfer/cxNetworkDataTransfer.h
+    guiExtenderService/cxNetworkConnectionWidget.h
+    guiExtenderService/cxNetworkConnectionsWidget.h
 
     trackingSystemService/cxOpenIGTLinkTrackingSystemService.h
     trackingSystemService/cxOpenIGTLinkTool.h
 
     streamerService/cxOpenIGTLinkStreamer.h
 
-#    openigtlinkClient/cxSocket.h
     openigtlinkClient/cxNetworkConnection.h
-    openigtlinkClient/cxDialect.h
-	openigtlinkClient/cxNetworkServiceImpl.h
-	openigtlinkClient/cxNetworkConnectionHandle.h
+    openigtlinkClient/cxNetworkServiceImpl.h
+    openigtlinkClient/cxNetworkConnectionHandle.h
+    openigtlinkClient/protocols/cxProtocol.h
 )
 
 # Qt Designer files which should be processed by Qts uic
@@ -98,10 +98,11 @@ target_include_directories(${PROJECT_NAME}
     .
     ${CMAKE_CURRENT_BINARY_DIR}
     openigtlinkClient
+    openigtlinkClient/protocols
     trackingSystemService
     streamerService
     guiExtenderService
-	dataTransfer
+    dataTransfer
 )
 
 

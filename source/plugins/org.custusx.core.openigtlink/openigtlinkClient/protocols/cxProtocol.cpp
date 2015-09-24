@@ -1,4 +1,4 @@
-#include "cxDialect.h"
+#include "cxProtocol.h"
 
 #include "cxIGTLinkConversion.h"
 #include "cxLogger.h"
@@ -10,7 +10,7 @@
 namespace cx
 {
 
-Dialect::Dialect(QObject *parent) :
+Protocol::Protocol(QObject *parent) :
     QObject(parent)
 {
     qRegisterMetaType<Transform3D>("Transform3D");
@@ -20,17 +20,17 @@ Dialect::Dialect(QObject *parent) :
     qRegisterMetaType<IGTLinkImageMessage::Pointer>("IGTLinkImageMessage::Pointer");
 }
 
-QString Dialect::getName() const
+QString Protocol::getName() const
 {
     return "Basic";
 }
 
-bool Dialect::doCRC() const
+bool Protocol::doCRC() const
 {
     return true;
 }
 
-void Dialect::translate(const igtl::TransformMessage::Pointer body)
+void Protocol::translate(const igtl::TransformMessage::Pointer body)
 {
     QString deviceName = body->GetDeviceName();
 
@@ -43,7 +43,7 @@ void Dialect::translate(const igtl::TransformMessage::Pointer body)
     emit transform(deviceName, prMs, timestamp_ms);
 }
 
-void Dialect::translate(const igtl::PolyDataMessage::Pointer body)
+void Protocol::translate(const igtl::PolyDataMessage::Pointer body)
 {
 	this->writeAcceptingMessage(body);
 
@@ -52,7 +52,7 @@ void Dialect::translate(const igtl::PolyDataMessage::Pointer body)
 	emit mesh(retval);
 }
 
-void Dialect::translate(const igtl::ImageMessage::Pointer body)
+void Protocol::translate(const igtl::ImageMessage::Pointer body)
 {
 	this->writeAcceptingMessage(body);
 
@@ -61,14 +61,14 @@ void Dialect::translate(const igtl::ImageMessage::Pointer body)
 	emit image(retval);
 }
 
-void Dialect::translate(const igtl::StatusMessage::Pointer body)
+void Protocol::translate(const igtl::StatusMessage::Pointer body)
 {
 	IGTLinkConversion converter;
     QString status = converter.decode(body);
 	CX_LOG_CHANNEL_VOLATILE(CX_OPENIGTLINK_CHANNEL_NAME) << "IGTL status: " << status;
 }
 
-void Dialect::translate(igtl::StringMessage::Pointer body)
+void Protocol::translate(igtl::StringMessage::Pointer body)
 {
 	IGTLinkConversion converter;
     QString string = converter.decode(body);
@@ -76,7 +76,7 @@ void Dialect::translate(igtl::StringMessage::Pointer body)
 	CX_LOG_CHANNEL_INFO(CX_OPENIGTLINK_CHANNEL_NAME) << "IGTL string: " << string;
 }
 
-void Dialect::writeNotSupportedMessage(igtl::MessageBase* body)
+void Protocol::writeNotSupportedMessage(igtl::MessageBase* body)
 {
 	QString dtype(body->GetDeviceType());
 	QString dname(body->GetDeviceName());
@@ -85,7 +85,7 @@ void Dialect::writeNotSupportedMessage(igtl::MessageBase* body)
 														.arg(dname);
 }
 
-void Dialect::writeAcceptingMessage(igtl::MessageBase* body)
+void Protocol::writeAcceptingMessage(igtl::MessageBase* body)
 {
 	QString dtype(body->GetDeviceType());
 	QString dname(body->GetDeviceName());
@@ -94,12 +94,12 @@ void Dialect::writeAcceptingMessage(igtl::MessageBase* body)
 														.arg(dname);
 }
 
-void Dialect::translate(const IGTLinkUSStatusMessage::Pointer body)
+void Protocol::translate(const IGTLinkUSStatusMessage::Pointer body)
 {
 	this->writeNotSupportedMessage(body);
 }
 
-void Dialect::translate(const IGTLinkImageMessage::Pointer body)
+void Protocol::translate(const IGTLinkImageMessage::Pointer body)
 {
 	this->writeNotSupportedMessage(body);
 }

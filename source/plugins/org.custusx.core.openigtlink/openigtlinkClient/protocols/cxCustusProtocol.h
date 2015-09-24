@@ -30,69 +30,26 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
+#ifndef CXCUSTUSPROTOCOL_H
+#define CXCUSTUSPROTOCOL_H
 
-#ifndef CXDIALECT_H
-#define CXDIALECT_H
 
 #include "org_custusx_core_openigtlink_Export.h"
 
-#include <QObject>
-
-#include <boost/shared_ptr.hpp>
-
-#include "igtlMessageHeader.h"
-#include "igtlPolyDataMessage.h"
-#include "igtlTransformMessage.h"
-#include "igtlImageMessage.h"
-#include "igtlStatusMessage.h"
-#include "igtlStringMessage.h"
-#include "cxIGTLinkUSStatusMessage.h"
-#include "cxIGTLinkImageMessage.h"
-
-#include "cxTransform3D.h"
-#include "cxImage.h"
-#include "cxProbeDefinition.h"
-
-#define CX_OPENIGTLINK_CHANNEL_NAME "OpenIGTLink"
+#include "cxProtocol.h"
 
 namespace cx
 {
-/**
- * @brief The Dialect class represents an interpretation of opentigtlink packages.
- */
 
-class org_custusx_core_openigtlink_EXPORT Dialect : public QObject
+class org_custusx_core_openigtlink_EXPORT CustusProtocol : public Protocol
 {
-    Q_OBJECT
 public:
-    explicit Dialect(QObject *parent = 0);
-
     virtual QString getName() const;
     virtual bool doCRC() const;
-	virtual PATIENT_COORDINATE_SYSTEM coordinateSystem() const { return pcsLPS; }
 
-    virtual void translate(const igtl::TransformMessage::Pointer body);
-    virtual void translate(const igtl::ImageMessage::Pointer body);
-	virtual void translate(const igtl::PolyDataMessage::Pointer body);
-	virtual void translate(const igtl::StatusMessage::Pointer body);
-    virtual void translate(const igtl::StringMessage::Pointer body);
-    virtual void translate(const IGTLinkUSStatusMessage::Pointer body);
     virtual void translate(const IGTLinkImageMessage::Pointer body);
-
-signals:
-    void transform(QString devicename, Transform3D transform, double timestamp);
-    void calibration(QString devicename, Transform3D calibration);
-    void image(ImagePtr image);
-	void mesh(MeshPtr mesh);
-	void igtlimage(IGTLinkImageMessage::Pointer igtlimage);
-    void usstatusmessage(IGTLinkUSStatusMessage::Pointer msg);
-    void probedefinition(QString devicename, ProbeDefinitionPtr definition);
-
-protected:
-	void writeAcceptingMessage(igtl::MessageBase* body);
-	void writeNotSupportedMessage(igtl::MessageBase *body);
+    virtual void translate(const IGTLinkUSStatusMessage::Pointer body);
 };
-typedef boost::shared_ptr<Dialect> DialectPtr;
 
 } //namespace cx
-#endif // CXDIALECT_H
+#endif // CXCUSTUSPROTOCOL_H

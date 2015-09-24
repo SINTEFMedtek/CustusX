@@ -30,12 +30,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXPLUSDIALECT_H
-#define CXPLUSDIALECT_H
+#ifndef CXPLUSPROTOCOL_H
+#define CXPLUSPROTOCOL_H
 
 #include "org_custusx_core_openigtlink_Export.h"
 
-#include "cxDialect.h"
+#include "cxProtocol.h"
 
 namespace cx {
 
@@ -159,10 +159,10 @@ namespace cx {
 
  */
 
-class org_custusx_core_openigtlink_EXPORT PlusDialect : public Dialect
+class org_custusx_core_openigtlink_EXPORT PlusProtocol : public Protocol
 {
 public:
-    PlusDialect();
+    PlusProtocol();
 
     virtual QString getName() const;
 
@@ -189,4 +189,4 @@ private:
 };
 
 }
-#endif // CXPLUSDIALECT_H
+#endif // CXPLUSPROTOCOL_H

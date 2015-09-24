@@ -29,17 +29,17 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXRASDIALECT_H
-#define CXRASDIALECT_H
+#ifndef CXRASPROTOCOL_H
+#define CXRASPROTOCOL_H
 
 #include "org_custusx_core_openigtlink_Export.h"
 
-#include "cxDialect.h"
+#include "cxProtocol.h"
 
 namespace cx
 {
 
-class org_custusx_core_openigtlink_EXPORT RASDialect : public Dialect
+class org_custusx_core_openigtlink_EXPORT RASProtocol : public Protocol
 {
 public:
 	virtual QString getName() const;
@@ -48,4 +48,4 @@ public:
 
 } //namespace cx
 
-#endif // CXRASDIALECT_H
+#endif // CXRASPROTOCOL_H

@@ -29,7 +29,7 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include "cxCustusDialect.h"
+#include "cxCustusProtocol.h"
 
 #include "cxIGTLinkConversion.h"
 #include "cxImage.h"
@@ -38,24 +38,24 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-QString CustusDialect::getName() const
+QString CustusProtocol::getName() const
 {
     return "Custus";
 }
 
-bool CustusDialect::doCRC() const
+bool CustusProtocol::doCRC() const
 {
     //in the old version of the custusx openigtlink server
     //crc checking is disabled (for images)
     return false;
 }
 
-void CustusDialect::translate(const IGTLinkImageMessage::Pointer body)
+void CustusProtocol::translate(const IGTLinkImageMessage::Pointer body)
 {
     emit igtlimage(body);
 }
 
-void CustusDialect::translate(const cx::IGTLinkUSStatusMessage::Pointer body)
+void CustusProtocol::translate(const cx::IGTLinkUSStatusMessage::Pointer body)
 {
     emit usstatusmessage(body);
 }

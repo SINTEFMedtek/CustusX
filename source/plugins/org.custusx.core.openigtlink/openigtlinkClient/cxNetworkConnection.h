@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImage.h"
 #include "cxProbeDefinition.h"
 #include "cxLogger.h"
-#include "cxDialect.h"
+#include "cxProtocol.h"
 #include "boost/function.hpp"
 
 typedef boost::shared_ptr<QThread> QThreadPtr;
@@ -104,7 +104,7 @@ private slots:
 protected:
 
 private:
-	DialectPtr initDialect(DialectPtr value);
+    ProtocolPtr initDialect(ProtocolPtr value);
 	void setDialect(QString dialectname);
 	bool receiveHeader(const igtl::MessageHeader::Pointer header) const;
     bool receiveBody(const igtl::MessageHeader::Pointer header);
@@ -118,8 +118,8 @@ private:
     igtl::MessageHeader::Pointer mHeader;
     bool mHeaderReceived;
 
-    DialectPtr mDialect;
-    typedef std::map<QString, DialectPtr> DialectMap;
+    ProtocolPtr mDialect;
+    typedef std::map<QString, ProtocolPtr> DialectMap;
     DialectMap mAvailableDialects;
 	const QString mUid;
 };
