@@ -159,7 +159,7 @@ private:
 	Zoom2DHandlerPtr mZoom2D;
 
 	SyncedValuePtr mOrientationMode;
-	Vector3D mClickPos;
+	Vector3D mLastClickPos_vp;
 
 	QActionGroup* mOrientationActionGroup;
 

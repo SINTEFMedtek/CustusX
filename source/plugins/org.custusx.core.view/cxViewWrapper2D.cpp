@@ -612,8 +612,8 @@ void ViewWrapper2D::mousePressSlot(int x, int y, Qt::MouseButtons buttons)
 {
 	if (buttons & Qt::LeftButton)
 	{
-		Vector3D vp = qvp2vp(QPoint(x,y));
-		moveManualTool(vp, Vector3D(0,0,0));
+		Vector3D clickPos_vp = qvp2vp(QPoint(x,y));
+		moveManualTool(clickPos_vp, Vector3D(0,0,0));
 	}
 }
 
@@ -626,7 +626,7 @@ void ViewWrapper2D::mouseMoveSlot(int x, int y, Qt::MouseButtons buttons)
 	if (buttons & Qt::LeftButton)
 	{
 		Vector3D vp = qvp2vp(QPoint(x,y));
-		moveManualTool(vp, vp - mClickPos);
+		moveManualTool(vp, vp - mLastClickPos_vp);
 	}
 }
 
@@ -637,7 +637,7 @@ void ViewWrapper2D::moveManualTool(Vector3D vp, Vector3D delta_vp)
 	else
 	{
 		this->shiftAxisPos(delta_vp); // signal the maual tool that something is happening (important for playback tool)
-		mClickPos = vp;
+		mLastClickPos_vp = vp;
 	}
 }
 
