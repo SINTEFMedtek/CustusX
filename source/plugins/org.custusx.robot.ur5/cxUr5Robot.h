@@ -42,6 +42,7 @@ public slots:
     void shutdown();
 
 signals:
+    void transform(QString devicename, Transform3D transform, double timestamp);
     void stateUpdated();
     void connected();
     void disconnected();
