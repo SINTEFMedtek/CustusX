@@ -107,8 +107,7 @@ private slots:
 	void optionChangedSlot();
 
 private:
-	void moveManualTool(QPoint point);
-
+	void moveManualTool(Vector3D vp, Vector3D delta_vp);
 	virtual void appendToContextMenu(QMenu& contextMenu);
 	void addReps();
 	DoubleBoundingBox3D getViewport() const;
