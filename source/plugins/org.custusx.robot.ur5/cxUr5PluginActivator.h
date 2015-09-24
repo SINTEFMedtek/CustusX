@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ctkPluginActivator.h>
 #include "boost/shared_ptr.hpp"
+#include "cxUr5Robot.h"
 
 namespace cx
 {
@@ -65,7 +66,10 @@ public:
 	void stop(ctkPluginContext* context);
 
 private:
-	RegisteredServicePtr mRegistration;
+    RegisteredServicePtr mRegistrationGui;
+    RegisteredServicePtr mRegistrationTracking;
+
+    Ur5RobotPtr mUr5Robot;
 };
 
 } // namespace cx
