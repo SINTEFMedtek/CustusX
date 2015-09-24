@@ -163,7 +163,7 @@ bool Ur5MessageDecoder::isValidHeader(QByteArray data)
 //    return (typeLength.find(headerLength(data)) != typeLength.end()
 //            && types.find(headerID(data)) !=types.end());
 
-    return (headerLength(data)==53 && headerID(data)==4 || headerLength(data) == 251 && headerID(data)==1);
+    return (headerLength(data)==53 && headerID(data)==4);
 }
 
 void Ur5MessageDecoder::pushState(QByteArray data,Ur5State &state)
