@@ -1,21 +1,24 @@
+
 #include "cxRobotTool.h"
-#include "cxTypeConversions.h"
-#include "cxDoubleProperty.h"
+#include "cxProbeImpl.h"
+#include "cxLogger.h"
+
+
 
 namespace cx
 {
 
-RobotTool::RobotTool(ToolPtr base, Ur5RobotPtr robot):
-    ToolImpl(base->getUid(), "Robot tracker" +base->getName()),
-    mBase(base),
-    mUr5Robot(robot)
+RobotTool::RobotTool(QString uid, Ur5RobotPtr robot):
+    ToolImpl(uid,uid),
+    mPolyData(NULL),
+    mUr5Robot(robot),
+    mTimestamp(0)
 {
-    connect(mBase.get(), &Tool::toolProbeSector, this, &Tool::toolProbeSector);
-    connect(mBase.get(), &Tool::tooltipOffset, this, &Tool::tooltipOffset);
-    connect(mBase.get(), &Tool::toolTransformAndTimestamp, this, &RobotTool::onToolTransformAndTimestamp);
-    connect(mBase.get(), &Tool::toolVisible, this, &Tool::toolVisible);
-    connect(mBase.get(), &Tool::tooltipOffset, this, &Tool::tooltipOffset);
-    connect(mBase.get(), &Tool::tps, this, &Tool::tps);
+    connect(&mTpsTimer, &QTimer::timeout, this, &RobotTool::calculateTpsSlot);
+    mTypes = this->determineTypesBasedOnUid(Tool::mUid);
+
+    this->createPolyData();
+    this->toolVisibleSlot(true);
 }
 
 RobotTool::~RobotTool()
@@ -23,20 +26,27 @@ RobotTool::~RobotTool()
 
 }
 
-void RobotTool::onToolTransformAndTimestamp(Transform3D prMt, double timestamp)
+std::set<Tool::Type> RobotTool::determineTypesBasedOnUid(const QString uid) const
 {
-    m_prMt = mUr5Robot->getCurrentState().baseMee;
-    emit toolTransformAndTimestamp(m_prMt, timestamp);
+    std::set<Type> retval;
+    retval.insert(TOOL_POINTER);
+    if(uid.contains("probe", Qt::CaseInsensitive))
+    {
+        retval.insert(TOOL_US_PROBE);
+    }
+    return retval;
 }
+
+
 
 std::set<Tool::Type> RobotTool::getTypes() const
 {
-    return mBase->getTypes();
+    return mTypes;
 }
 
 vtkPolyDataPtr RobotTool::getGraphicsPolyData() const
 {
-    return mBase->getGraphicsPolyData();
+    return mPolyData;
 }
 
 Transform3D RobotTool::get_prMt() const
@@ -46,67 +56,105 @@ Transform3D RobotTool::get_prMt() const
 
 bool RobotTool::getVisible() const
 {
-    return mBase->getVisible();
+    return true;
 }
 
 QString RobotTool::getUid() const
 {
-    return mUid;
+    return Tool::mUid;
 }
 
 QString RobotTool::getName() const
 {
-    return mName;
+    return Tool::mName;
 }
 
 bool RobotTool::isCalibrated() const
 {
-    return mBase->isCalibrated();
+    return true;
 }
 
 double RobotTool::getTimestamp() const
 {
-    return mBase->getTimestamp();
+    return mTimestamp;
 }
 
 // Just use the tool tip offset from the tool manager
 double RobotTool::getTooltipOffset() const
 {
-    return mBase->getTooltipOffset();
+    return ToolImpl::getTooltipOffset();
 }
 
 // Just use the tool tip offset from the tool manager
 void RobotTool::setTooltipOffset(double val)
 {
-    mBase->setTooltipOffset(val);
+    ToolImpl::setTooltipOffset(val);
 }
 
 Transform3D RobotTool::getCalibration_sMt() const
 {
-    return mBase->getCalibration_sMt();
-}
-
-std::map<int, Vector3D> RobotTool::getReferencePoints() const
-{
-    return mBase->getReferencePoints();
+    return m_sMt_calibration;
 }
 
 bool RobotTool::isInitialized() const
 {
-    return mBase->isInitialized();
-}
-
-void RobotTool::set_prMt(const Transform3D& prMt, double timestamp)
-{
-    mBase->set_prMt(prMt, timestamp);
-
+    return true;
 }
 
 void RobotTool::setVisible(bool vis)
 {
-    mBase->setVisible(vis);
+    CX_LOG_WARNING() << "Cannot set visible on a openigtlink tool.";
 }
 
+
+void RobotTool::toolTransformAndTimestampSlot(Transform3D prMs, double timestamp)
+{
+    mTimestamp = timestamp;// /1000000;
+    Transform3D prMt = prMs;
+    Transform3D prMt_filtered = prMt;
+
+    (*mPositionHistory)[mTimestamp] = prMt; // store original in history
+    m_prMt = prMt_filtered;
+    emit toolTransformAndTimestamp(m_prMt, mTimestamp);
+}
+
+void RobotTool::calculateTpsSlot()
+{
+    int tpsNr = 0;
+    size_t numberOfTransformsToCheck = ((mPositionHistory->size() >= 10) ? 10 : mPositionHistory->size());
+
+    if (numberOfTransformsToCheck <= 1)
+    {
+        emit tps(0);
+        return;
+    }
+
+    TimedTransformMap::reverse_iterator rit = mPositionHistory->rbegin();
+    double lastTransform = rit->first;
+    for (int i = 0; i < numberOfTransformsToCheck-1; ++i)
+    {
+        ++rit;
+    }
+    double firstTransform = rit->first;
+    double secondsPassed = (lastTransform - firstTransform) / 1000;
+
+    if (!similar(secondsPassed, 0))
+        tpsNr = (int) (numberOfTransformsToCheck / secondsPassed);
+    emit tps(tpsNr);
+}
+
+void RobotTool::createPolyData()
+{
+    mPolyData = Tool::createDefaultPolyDataCone();
+}
+
+void RobotTool::toolVisibleSlot(bool on)
+{
+    if (on)
+        mTpsTimer.start(1000); //calculate tps every 1 seconds
+    else
+        mTpsTimer.stop();
+}
 
 
 } // namespace cx

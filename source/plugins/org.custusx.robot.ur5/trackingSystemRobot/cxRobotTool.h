@@ -2,7 +2,10 @@
 #define CXROBOTTOOL_H
 
 #include "org_custusx_robot_ur5_Export.h"
+
 #include "cxToolImpl.h"
+#include <QTimer>
+
 #include "cxUr5Robot.h"
 
 namespace cx
@@ -11,13 +14,15 @@ typedef boost::shared_ptr<class RobotTool> RobotToolPtr;
 
 class org_custusx_robot_ur5_EXPORT RobotTool: public ToolImpl
 {
-Q_OBJECT
+    friend class RobotTrackingSystemService;
+    Q_OBJECT
 
 public:
-    explicit RobotTool(ToolPtr base, Ur5RobotPtr robot);
+    RobotTool(QString uid, Ur5RobotPtr robot);
     virtual ~RobotTool();
 
     virtual std::set<Type> getTypes() const;
+
     virtual vtkPolyDataPtr getGraphicsPolyData() const;
     virtual Transform3D get_prMt() const;
     virtual bool getVisible() const;
@@ -25,33 +30,33 @@ public:
     virtual QString getName() const;
     virtual bool isCalibrated() const;
     virtual double getTimestamp() const;
-
     virtual double getTooltipOffset() const;
     virtual void setTooltipOffset(double val);
 
     virtual Transform3D getCalibration_sMt() const;
-    virtual std::map<int, Vector3D> getReferencePoints() const;
 
-    virtual TimedTransformMapPtr getPositionHistory() { return mBase->getPositionHistory(); }
     virtual bool isInitialized() const;
-    virtual ProbePtr getProbe() const { return mBase->getProbe(); }
-    virtual bool hasReferencePointWithId(int id) { return mBase->hasReferencePointWithId(id); }
-    virtual TimedTransformMap getSessionHistory(double startTime, double stopTime) { return mBase->getSessionHistory(startTime, stopTime); }
 
-    virtual void set_prMt(const Transform3D& prMt, double timestamp);
     virtual void setVisible(bool vis);
 
-    // extensions
-    ToolPtr getBase() { return mBase; }
-
 private slots:
-    void onToolTransformAndTimestamp(Transform3D matrix, double timestamp);
+    void toolTransformAndTimestampSlot(Transform3D prMs, double timestamp);
+    void calculateTpsSlot();
+    void toolVisibleSlot(bool);
 
 private:
-    ToolPtr mBase;
-    Transform3D m_prMt;
-    Ur5RobotPtr mUr5Robot;
+    void createPolyData();
 
+    std::set<Type> mTypes;
+
+    vtkPolyDataPtr mPolyData;
+
+    QTimer mTpsTimer;
+    Transform3D m_prMt,m_sMt_calibration;
+    Ur5RobotPtr mUr5Robot;
+    double mTimestamp;
+
+    std::set<Type> determineTypesBasedOnUid(const QString uid) const;
 };
 
 } /* namespace cx */
