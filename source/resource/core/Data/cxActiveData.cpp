@@ -86,7 +86,7 @@ public:
 	}
 	void printWarning(QString warning = "") const
 	{
-		reportWarning("Trying to use ActiveDataNull. Function: " + warning);
+//		reportWarning("Trying to use ActiveDataNull. Function: " + warning);
 	}
 	static ActiveDataPtr getNullObject();
 	virtual bool isNull() const
