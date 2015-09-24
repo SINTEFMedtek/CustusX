@@ -51,11 +51,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-Ur5Widget::Ur5Widget(QWidget* parent) :
-    QWidget(parent)
+Ur5Widget::Ur5Widget(Ur5RobotPtr robot, QWidget* parent) :
+    QWidget(parent),
+    mUr5Robot(robot)
 {
-    mUr5Robot = Ur5RobotPtr(new Ur5Robot);
-
     setupUi(this);
 }
 
