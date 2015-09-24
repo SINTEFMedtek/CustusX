@@ -625,8 +625,8 @@ void ViewWrapper2D::mouseMoveSlot(int x, int y, Qt::MouseButtons buttons)
 {
 	if (buttons & Qt::LeftButton)
 	{
-		Vector3D vp = qvp2vp(QPoint(x,y));
-		moveManualTool(vp, vp - mLastClickPos_vp);
+		Vector3D clickPos_vp = qvp2vp(QPoint(x,y));
+		moveManualTool(clickPos_vp, clickPos_vp - mLastClickPos_vp);
 	}
 }
 
