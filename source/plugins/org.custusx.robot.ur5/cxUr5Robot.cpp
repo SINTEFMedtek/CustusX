@@ -30,6 +30,8 @@ void Ur5Robot::updateCurrentState()
     currentState.tcpAxis=mRTMonitor.getCurrentState().tcpAxis;
     currentState.baseMee = mSecMonitor.getCurrentState().baseMee;
 
+    emit transform("RobotTracker",currentState.baseMee,currentState.timeSinceStart);
+
     this->setCurrentState(currentState);
     emit(stateUpdated());
 }
