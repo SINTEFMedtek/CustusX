@@ -60,14 +60,16 @@ class OpenIGTLinkDataTransfer : public QObject
 {
 	Q_OBJECT
 public:
-	OpenIGTLinkDataTransfer(ctkPluginContext* context, QObject *parent=NULL);
+	OpenIGTLinkDataTransfer(ctkPluginContext* context, OpenIGTLinkClientThreadHandlerPtr connection, QObject *parent=NULL);
 	~OpenIGTLinkDataTransfer();
 
 	BoolPropertyPtr getAcceptIncomingData() { return mAcceptIncomingData; }
+	BoolPropertyPtr getStreamActiveVideoSource() { return mStreamActiveVideoSource; }
 	StringPropertySelectDataPtr getDataToSend() { return mDataToSend; }
 	PatientModelServicePtr getPatientModelService() { return mPatientModelService; }
 	VisualizationServicePtr getViewService() { return mViewService; }
-	OpenIGTLinkClient* getOpenIGTLink();
+	VideoServicePtr getVideoService() { return mVideoService; }
+	OpenIGTLinkClientThreadHandlerPtr getOpenIGTLink();
 
 	/**
 	 * Send data over igtl, using the data set in the DataToSend property
@@ -75,6 +77,7 @@ public:
 	void onSend();
 
 private:
+	BoolPropertyPtr mStreamActiveVideoSource;
 	BoolPropertyPtr mAcceptIncomingData;
 	StringPropertySelectDataPtr mDataToSend;
 	XmlOptionFile mOptions;
@@ -83,11 +86,23 @@ private:
 
 	PatientModelServicePtr mPatientModelService;
 	VisualizationServicePtr mViewService;
+	VideoServicePtr mVideoService;
+
+	VideoSourcePtr mStreamingVideoSource;
 
 	QString getConfigUid() const;
 	void onImageReceived(ImagePtr image);
 	void onMeshReceived(MeshPtr image);
 	void onDataReceived(DataPtr data);
+
+	void onNewStreamFrame();
+
+	void onStreamActiveVideoSourceChanged();
+	/**
+	 * Stream data over igtl, using the active stream (experimental)
+	 */
+	void startStream();
+	void stopStream();
 
 };
 

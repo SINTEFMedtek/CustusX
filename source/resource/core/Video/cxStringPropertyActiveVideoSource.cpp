@@ -29,51 +29,52 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#include "cxStringPropertyActiveVideoSource.h"
 
-#include "cxOpenIGTLinkStreamerService.h"
-#include "cxOpenIGTLinkClient.h"
+#include "cxVideoService.h"
+#include "cxVideoSource.h"
 
 namespace cx
 {
 
-OpenIGTLinkStreamerService::OpenIGTLinkStreamerService(OpenIGTLinkClientThreadHandlerPtr connection) :
-	mConnection(connection)
+StringPropertyActiveVideoSource::StringPropertyActiveVideoSource(VideoServicePtr service) :
+	mService(service)
 {
-	OpenIGTLinkClient* client = mConnection->client();
-    mStreamer = OpenIGTLinkStreamerPtr(new OpenIGTLinkStreamer());
-
-	connect(client, &OpenIGTLinkClient::connected, mStreamer.get(), &OpenIGTLinkStreamer::receivedConnected);
-	connect(client, &OpenIGTLinkClient::disconnected, mStreamer.get(), &OpenIGTLinkStreamer::receivedDisconnected);
-	connect(client, &OpenIGTLinkClient::error, mStreamer.get(), &OpenIGTLinkStreamer::receivedError);
-	connect(client, &OpenIGTLinkClient::image, mStreamer.get(), &OpenIGTLinkStreamer::receivedImage);
-	connect(client, &OpenIGTLinkClient::usstatusmessage, mStreamer.get(), &OpenIGTLinkStreamer::receivedUSStatusMessage);
-	connect(client, &OpenIGTLinkClient::igtlimage, mStreamer.get(), &OpenIGTLinkStreamer::receiveIgtlImage);
+	connect(mService.get(), &VideoService::activeVideoSourceChanged, this, &Property::changed);
 }
 
-OpenIGTLinkStreamerService::~OpenIGTLinkStreamerService()
+QString StringPropertyActiveVideoSource::getDisplayName() const
 {
-
+	return "Stream";
 }
 
-QString OpenIGTLinkStreamerService::getName()
+bool StringPropertyActiveVideoSource::setValue(const QString& value)
 {
-    return "OpenIGTLink streamer";
+	if (value == this->getValue())
+		return false;
+	mService->setActiveVideoSource(value);
+	emit changed();
+	return true;
 }
 
-QString OpenIGTLinkStreamerService::getType() const
+QString StringPropertyActiveVideoSource::getValue() const
 {
-    return "openigtlink_streamer";
+	return mService->getActiveVideoSource()->getUid();
 }
 
-std::vector<PropertyPtr> OpenIGTLinkStreamerService::getSettings(QDomElement root)
+QStringList StringPropertyActiveVideoSource::getValueRange() const
 {
-    std::vector<PropertyPtr> retval;
-    return retval;
+	std::vector<VideoSourcePtr> sources = mService->getVideoSources();
+	QStringList retval;
+	for (unsigned i=0; i<sources.size(); ++i)
+		retval << sources[i]->getUid();
+	return retval;
 }
 
-StreamerPtr OpenIGTLinkStreamerService::createStreamer(QDomElement root)
+QString StringPropertyActiveVideoSource::getHelp() const
 {
-    return mStreamer;
+	return "Select the active video source.";
 }
 
-} //namespace cx
+
+} // namespace cx

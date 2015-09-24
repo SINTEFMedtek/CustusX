@@ -36,11 +36,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxBaseWidget.h"
 #include "cxStringProperty.h"
 #include "cxDoubleProperty.h"
+#include "cxSocketConnection.h"
 
 class QPushButton;
 
 namespace cx {
 
+typedef boost::shared_ptr<class OpenIGTLinkClientThreadHandler> OpenIGTLinkClientThreadHandlerPtr;
 class OpenIGTLinkClient;
 
 class OpenIGTLinkConnectionWidget : public BaseWidget
@@ -48,31 +50,20 @@ class OpenIGTLinkConnectionWidget : public BaseWidget
     Q_OBJECT
 
 public:
-    OpenIGTLinkConnectionWidget(OpenIGTLinkClient *client, QWidget *parent=NULL);
+	OpenIGTLinkConnectionWidget(OpenIGTLinkClientThreadHandlerPtr client, QWidget *parent=NULL);
     ~OpenIGTLinkConnectionWidget();
 
     virtual QString defaultWhatsThis() const;
 
-signals:
-    void requestConnect();
-    void requestDisconnect();
-    void ipAndPort(QString ip, int port);
-
 private slots:
-    void clientConnected();
-    void clientDisconnected();
     void connectButtonClicked(bool checked=false);
 
 private:
-    StringPropertyBasePtr getDialectOption(QDomElement root, OpenIGTLinkClient *client);
-    StringPropertyBasePtr getIpOption(QDomElement root);
-    DoublePropertyBasePtr getPortOption(QDomElement root);
+	void onStateChanged(CX_SOCKETCONNECTION_STATE state);
 
-    QDomElement mOptionsElement;
     QPushButton *mConnectButton;
 	QWidget* mOptionsWidget;
-
-    OpenIGTLinkClient* mClient;
+	OpenIGTLinkClientThreadHandlerPtr mClient;
 };
 
 }

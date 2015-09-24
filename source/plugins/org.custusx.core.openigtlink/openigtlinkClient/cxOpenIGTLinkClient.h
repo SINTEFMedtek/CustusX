@@ -53,6 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxProbeDefinition.h"
 #include "cxLogger.h"
 #include "cxDialect.h"
+#include "boost/function.hpp"
 
 typedef boost::shared_ptr<QThread> QThreadPtr;
 
@@ -74,14 +75,18 @@ class org_custusx_core_openigtlink_EXPORT OpenIGTLinkClient : public SocketConne
     Q_OBJECT
 public:
 
-    explicit OpenIGTLinkClient(QObject *parent = 0);
+	explicit OpenIGTLinkClient(QString uid, QObject *parent = 0);
 	virtual ~OpenIGTLinkClient();
 
     //thread safe
-    QStringList getAvailableDialects() const;
-    void setDialect(QString dialectname);
-	void sendMessage(ImagePtr image); // thread safe?????????????????????????????
-	void sendMessage(MeshPtr image); // thread safe?????????????????????????????
+	QString getUid() const { return mUid; }
+	virtual void setConnectionInfo(ConnectionInfo info);
+	QStringList getAvailableDialects() const;
+	void invoke(boost::function<void()> func);
+
+	// not thread-safe: use invoke to call in this thread
+	void sendMessage(ImagePtr image);
+	void sendMessage(MeshPtr image);
 
 signals:
     void transform(QString devicename, Transform3D transform, double timestamp);
@@ -94,10 +99,16 @@ signals:
 
 private slots:
     virtual void internalDataAvailable();
+	void onInvoke(boost::function<void()> func);
+
+protected:
 
 private:
-    bool receiveHeader(const igtl::MessageHeader::Pointer header) const;
+	DialectPtr initDialect(DialectPtr value);
+	void setDialect(QString dialectname);
+	bool receiveHeader(const igtl::MessageHeader::Pointer header) const;
     bool receiveBody(const igtl::MessageHeader::Pointer header);
+	qint64 skip(qint64 maxSizeBytes) const;
 
     template <typename T>
     bool receive(const igtl::MessageBase::Pointer header);
@@ -110,6 +121,7 @@ private:
     DialectPtr mDialect;
     typedef std::map<QString, DialectPtr> DialectMap;
     DialectMap mAvailableDialects;
+	const QString mUid;
 };
 
 typedef boost::shared_ptr<class OpenIGTLinkClientThreadHandler> OpenIGTLinkClientThreadHandlerPtr;
@@ -118,16 +130,35 @@ typedef boost::shared_ptr<class OpenIGTLinkClientThreadHandler> OpenIGTLinkClien
  *  Lifetime of the thread equals that of this object.
  *
  */
-class OpenIGTLinkClientThreadHandler
+class org_custusx_core_openigtlink_EXPORT OpenIGTLinkClientThreadHandler : public QObject
 {
+	Q_OBJECT
 public:
 	explicit OpenIGTLinkClientThreadHandler(QString threadname);
 	~OpenIGTLinkClientThreadHandler();
 	OpenIGTLinkClient* client();
 
+	StringPropertyBasePtr getDialectOption() { return mDialects; }
+	StringPropertyBasePtr getIpOption() { return mIp; }
+	DoublePropertyBasePtr getPortOption() { return mPort; }
+	StringPropertyBasePtr getRoleOption() { return mRole; }
+
 private:
+	void onConnectionInfoChanged();
+	void onPropertiesChanged();
+	StringPropertyBasePtr mIp;
+	DoublePropertyBasePtr mPort;
+	StringPropertyBasePtr mDialects;
+	StringPropertyBasePtr mRole;
+
+	StringPropertyBasePtr createDialectOption();
+	StringPropertyBasePtr createIpOption();
+	DoublePropertyBasePtr createPortOption();
+	StringPropertyBasePtr createRoleOption();
+
 	OpenIGTLinkClientPtr mClient;
 	QThreadPtr mThread;
+	QDomElement mOptionsElement;
 };
 
 

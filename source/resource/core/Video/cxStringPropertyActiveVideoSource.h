@@ -29,51 +29,39 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXSTRINGPROPERTYACTIVEVIDEOSOURCE_H
+#define CXSTRINGPROPERTYACTIVEVIDEOSOURCE_H
 
-#include "cxOpenIGTLinkStreamerService.h"
-#include "cxOpenIGTLinkClient.h"
+#include "cxStringPropertyBase.h"
+#include "cxResourceExport.h"
 
 namespace cx
 {
 
-OpenIGTLinkStreamerService::OpenIGTLinkStreamerService(OpenIGTLinkClientThreadHandlerPtr connection) :
-	mConnection(connection)
+typedef boost::shared_ptr<class VideoService> VideoServicePtr;
+typedef boost::shared_ptr<class StringPropertyActiveVideoSource> StringPropertyActiveVideoSourcePtr;
+
+/**
+ * \brief Property for controlling the active video source in cx::VideoService
+ */
+class cxResource_EXPORT StringPropertyActiveVideoSource : public StringPropertyBase
 {
-	OpenIGTLinkClient* client = mConnection->client();
-    mStreamer = OpenIGTLinkStreamerPtr(new OpenIGTLinkStreamer());
+  Q_OBJECT
+public:
+	static StringPropertyActiveVideoSourcePtr create(VideoServicePtr service) { return StringPropertyActiveVideoSourcePtr(new StringPropertyActiveVideoSource(service)); }
+  StringPropertyActiveVideoSource(VideoServicePtr service);
+  virtual ~StringPropertyActiveVideoSource() {}
 
-	connect(client, &OpenIGTLinkClient::connected, mStreamer.get(), &OpenIGTLinkStreamer::receivedConnected);
-	connect(client, &OpenIGTLinkClient::disconnected, mStreamer.get(), &OpenIGTLinkStreamer::receivedDisconnected);
-	connect(client, &OpenIGTLinkClient::error, mStreamer.get(), &OpenIGTLinkStreamer::receivedError);
-	connect(client, &OpenIGTLinkClient::image, mStreamer.get(), &OpenIGTLinkStreamer::receivedImage);
-	connect(client, &OpenIGTLinkClient::usstatusmessage, mStreamer.get(), &OpenIGTLinkStreamer::receivedUSStatusMessage);
-	connect(client, &OpenIGTLinkClient::igtlimage, mStreamer.get(), &OpenIGTLinkStreamer::receiveIgtlImage);
-}
+public:
+  virtual QString getDisplayName() const;
+  virtual bool setValue(const QString& value);
+  virtual QString getValue() const;
+  virtual QStringList getValueRange() const;
+  virtual QString getHelp() const;
+private:
+  VideoServicePtr mService;
+};
 
-OpenIGTLinkStreamerService::~OpenIGTLinkStreamerService()
-{
+} // namespace cx
 
-}
-
-QString OpenIGTLinkStreamerService::getName()
-{
-    return "OpenIGTLink streamer";
-}
-
-QString OpenIGTLinkStreamerService::getType() const
-{
-    return "openigtlink_streamer";
-}
-
-std::vector<PropertyPtr> OpenIGTLinkStreamerService::getSettings(QDomElement root)
-{
-    std::vector<PropertyPtr> retval;
-    return retval;
-}
-
-StreamerPtr OpenIGTLinkStreamerService::createStreamer(QDomElement root)
-{
-    return mStreamer;
-}
-
-} //namespace cx
+#endif // CXSTRINGPROPERTYACTIVEVIDEOSOURCE_H

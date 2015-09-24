@@ -58,6 +58,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewService.h"
 #include "cxImage.h"
 #include "cxProfile.h"
+#include "cxHelperWidgets.h"
+#include "cxStringPropertyActiveVideoSource.h"
 
 namespace cx
 {
@@ -182,7 +184,7 @@ void VideoConnectionWidget::removeServiceWidget(QString name)
 
 StringPropertyActiveVideoSourcePtr VideoConnectionWidget::initializeActiveVideoSourceSelector()
 {
-	return StringPropertyActiveVideoSource::New();
+	return StringPropertyActiveVideoSource::create(mServices->videoService);
 }
 
 QFrame* VideoConnectionWidget::wrapStackedWidgetInAFrame()

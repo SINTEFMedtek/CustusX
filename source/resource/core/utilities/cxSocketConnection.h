@@ -33,10 +33,30 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSOCKETCONNECTION_H
 #define CXSOCKETCONNECTION_H
 
-#include "cxSocket.h"
+#include <QPointer>
+#include <QTcpServer>
+#include <QMutex>
+#include "cxEnumConverter.h"
+#include "boost/shared_ptr.hpp"
+
+namespace cx {
+enum CX_SOCKETCONNECTION_STATE
+{
+	scsINACTIVE,
+	scsCONNECTED,
+	scsLISTENING,
+	scsCONNECTING,
+	scsCOUNT
+};
+} // namespace cx
+
+SNW_DECLARE_ENUM_STRING_CONVERTERS(cx, CX_SOCKETCONNECTION_STATE);
+
+
 
 namespace cx {
 
+typedef boost::shared_ptr<class SocketConnector> SocketConnectorPtr;
 
 class cxResource_EXPORT SocketConnection : public QObject
 {
@@ -44,14 +64,47 @@ class cxResource_EXPORT SocketConnection : public QObject
 public:
     explicit SocketConnection(QObject *parent = 0);
 
+	struct ConnectionInfo
+	{
+		QString role;
+		QString protocol;
+		QString host;
+		int port;
+
+		bool operator==(const ConnectionInfo& rhs) const
+		{
+			return (this->role == rhs.role)
+					&& (this->protocol == rhs.protocol)
+					&& (this->host == rhs.host)
+					&& (this->port == rhs.port);
+		}
+
+		bool isServer() const { return role.toLower()=="server"; }
+		bool isClient() const { return !this->isServer(); }
+		QString getDescription() const
+		{
+			QString postfix;
+			QString name = host;
+			if (isServer())
+					name = "listen";
+			if (!protocol.isEmpty())
+				postfix = QString("[%1]").arg(protocol);
+			return QString("%1:%2%3").arg(name).arg(port).arg(postfix);
+		}
+	};
+
+	ConnectionInfo getConnectionInfo(); ///< thread-safe
+	CX_SOCKETCONNECTION_STATE getState(); ///< thread-safe
+
 public slots:
-    void setIpAndPort(QString ip, int port); //not threadsafe
-    void requestConnect();
-    void tryConnectAndWait();
-    void requestDisconnect();
-    bool sendData(const char* data, qint64 maxSize);
+	virtual void setConnectionInfo(ConnectionInfo info); ///< thread-safe
+	void requestConnect(); ///< not thread-safe: use invoke
+	void requestDisconnect(); ///< not thread-safe: use invoke
+	bool sendData(const char* data, qint64 maxSize); ///< not thread-safe
 
 signals:
+	void connectionInfoChanged();
+	void stateChanged(CX_SOCKETCONNECTION_STATE status);
     void connected();
     void disconnected();
     void error();
@@ -59,16 +112,28 @@ signals:
 private slots:
     void internalConnected();
     void internalDisconnected();
-    virtual void internalDataAvailable();
+	void internalError(QAbstractSocket::SocketError socketError);
+	virtual void internalDataAvailable() = 0;
 
 protected:
-    bool socketIsConnected();
+	SocketConnectorPtr createConnector(ConnectionInfo info);
+	bool socketIsConnected();
     bool enoughBytesAvailableOnSocket(int bytes) const;
     bool socketReceive(void *packPointer, int packSize) const;
+	QStringList getAllServerHostnames();
+	void setCurrentConnectionInfo();
+	void stateChange(CX_SOCKETCONNECTION_STATE newState);
+	CX_SOCKETCONNECTION_STATE computeState();
+//	void onServerStateChanged(CX_SOCKETCONNECTION_STATE state);
 
-    SocketPtr mSocket;
-    QString mIp;
-    int mPort;
+	QTcpSocket* mSocket;
+
+	CX_SOCKETCONNECTION_STATE mCurrentState;
+	QMutex mNextConnectionInfoMutex;
+	ConnectionInfo mNextConnectionInfo; ///< info to be used for the next connect(), mutexed.
+
+private:
+	SocketConnectorPtr mConnector;
 };
 
 } //namespace cx

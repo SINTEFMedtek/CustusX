@@ -40,13 +40,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSelectDataStringProperty.h"
 #include "cxStringProperty.h"
 #include "cxOpenIGTLinkDataTransfer.h"
+#include "cxStringPropertyActiveVideoSource.h"
+#include "cxHelperWidgets.h"
 
 namespace cx {
 
-OpenIGTLinkDataTransferWidget::OpenIGTLinkDataTransferWidget(ctkPluginContext *context, QWidget *parent) :
-	BaseWidget(parent, "OpenIGTLinkDataTransferWidget", "OpenIGTLink Data Transfer")
+OpenIGTLinkDataTransferWidget::OpenIGTLinkDataTransferWidget(OpenIGTLinkDataTransferPtr backend, QWidget *parent) :
+	BaseWidget(parent, "OpenIGTLinkDataTransferWidget", "OpenIGTLink Data Transfer"),
+	mDataTransfer(backend)
 {
-	mDataTransfer.reset(new OpenIGTLinkDataTransfer(context));
+//	mDataTransfer.reset(new OpenIGTLinkDataTransfer(context, connection));
 
 	mConnectionWidget = new OpenIGTLinkConnectionWidget(mDataTransfer->getOpenIGTLink());
 
@@ -69,7 +72,8 @@ OpenIGTLinkDataTransferWidget::OpenIGTLinkDataTransferWidget(ctkPluginContext *c
 	QVBoxLayout* layout = new QVBoxLayout(this);
 //	layout->setMargin(0);
 
-	QVBoxLayout* connectionLayout = this->createVBoxInGroupBox(layout, "Connection");
+	QString uid = mDataTransfer->getOpenIGTLink()->client()->getUid();
+	QVBoxLayout* connectionLayout = this->createVBoxInGroupBox(layout, QString("Connection/%1").arg(uid));
 	connectionLayout->addWidget(mConnectionWidget);
 
 	QVBoxLayout* receiveLayout = this->createVBoxInGroupBox(layout, "Receive");
@@ -82,6 +86,12 @@ OpenIGTLinkDataTransferWidget::OpenIGTLinkDataTransferWidget(ctkPluginContext *c
 										   mDataTransfer->getPatientModelService(),
 										   this, mDataTransfer->getDataToSend()));
 	sendLayout->addWidget(sendButton);
+	sendLayout->addWidget(createDataWidget(mDataTransfer->getViewService(),
+										   mDataTransfer->getPatientModelService(),
+										   this, StringPropertyActiveVideoSource::create(mDataTransfer->getVideoService())));
+	sendLayout->addWidget(createDataWidget(mDataTransfer->getViewService(),
+										   mDataTransfer->getPatientModelService(),
+										   this, mDataTransfer->getStreamActiveVideoSource()));
 }
 
 OpenIGTLinkDataTransferWidget::~OpenIGTLinkDataTransferWidget()

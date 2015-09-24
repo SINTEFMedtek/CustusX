@@ -29,51 +29,46 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXNETWORKCONNECTIONMANAGER_H
+#define CXNETWORKCONNECTIONMANAGER_H
 
-#include "cxOpenIGTLinkStreamerService.h"
-#include "cxOpenIGTLinkClient.h"
+#include "boost/shared_ptr.hpp"
+#include <QString>
+#include <QObject>
+#include "org_custusx_core_openigtlink_Export.h"
 
 namespace cx
 {
+typedef boost::shared_ptr<class NetworkConnectionManager> NetworkConnectionManagerPtr;
+typedef boost::shared_ptr<class OpenIGTLinkClientThreadHandler> OpenIGTLinkClientThreadHandlerPtr;
 
-OpenIGTLinkStreamerService::OpenIGTLinkStreamerService(OpenIGTLinkClientThreadHandlerPtr connection) :
-	mConnection(connection)
+/**
+ * Manages all network connections in CustusX.
+ *
+ *
+ */
+class org_custusx_core_openigtlink_EXPORT NetworkConnectionManager : public QObject
 {
-	OpenIGTLinkClient* client = mConnection->client();
-    mStreamer = OpenIGTLinkStreamerPtr(new OpenIGTLinkStreamer());
+	Q_OBJECT
+public:
+	NetworkConnectionManager();
 
-	connect(client, &OpenIGTLinkClient::connected, mStreamer.get(), &OpenIGTLinkStreamer::receivedConnected);
-	connect(client, &OpenIGTLinkClient::disconnected, mStreamer.get(), &OpenIGTLinkStreamer::receivedDisconnected);
-	connect(client, &OpenIGTLinkClient::error, mStreamer.get(), &OpenIGTLinkStreamer::receivedError);
-	connect(client, &OpenIGTLinkClient::image, mStreamer.get(), &OpenIGTLinkStreamer::receivedImage);
-	connect(client, &OpenIGTLinkClient::usstatusmessage, mStreamer.get(), &OpenIGTLinkStreamer::receivedUSStatusMessage);
-	connect(client, &OpenIGTLinkClient::igtlimage, mStreamer.get(), &OpenIGTLinkStreamer::receiveIgtlImage);
-}
+	QStringList getConnectionUids() const;
 
-OpenIGTLinkStreamerService::~OpenIGTLinkStreamerService()
-{
 
-}
+	std::vector<OpenIGTLinkClientThreadHandlerPtr> getConnections() const;
+	OpenIGTLinkClientThreadHandlerPtr getConnection(QString uid);
+signals:
+	void connectionsChanged();
 
-QString OpenIGTLinkStreamerService::getName()
-{
-    return "OpenIGTLink streamer";
-}
+private:
+	QString newConnection(QString suggested_uid);
+	QString findUniqueUidNumber(QString uidBase) const;
+	OpenIGTLinkClientThreadHandlerPtr findConnection(QString uid) const;
+	std::vector<OpenIGTLinkClientThreadHandlerPtr> mConnections;
+};
 
-QString OpenIGTLinkStreamerService::getType() const
-{
-    return "openigtlink_streamer";
-}
+} // namespace cx
 
-std::vector<PropertyPtr> OpenIGTLinkStreamerService::getSettings(QDomElement root)
-{
-    std::vector<PropertyPtr> retval;
-    return retval;
-}
 
-StreamerPtr OpenIGTLinkStreamerService::createStreamer(QDomElement root)
-{
-    return mStreamer;
-}
-
-} //namespace cx
+#endif // CXNETWORKCONNECTIONMANAGER_H
