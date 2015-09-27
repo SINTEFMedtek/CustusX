@@ -105,8 +105,10 @@ void ICPWidget::setSettings(std::vector<PropertyPtr> properties)
 void ICPWidget::enableRegistration(bool on)
 {
 	mRegisterButton->setEnabled(on);
-	mVesselRegOptionsButton->setEnabled(on);
-	mVesselRegOptionsWidget->setVisible(mVesselRegOptionsButton->isChecked() && on);
+	mVesselRegOptionsButton->setEnabled(true);
+	mVesselRegOptionsWidget->setVisible(mVesselRegOptionsButton->isChecked());
+//	mVesselRegOptionsButton->setEnabled(on);
+//	mVesselRegOptionsWidget->setVisible(mVesselRegOptionsButton->isChecked() && on);
 }
 
 void ICPWidget::setRMS(double val)
