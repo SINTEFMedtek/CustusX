@@ -173,6 +173,7 @@ void RMPCFromPointerWidget::applyRegistration(Transform3D delta)
 {
 	Transform3D rMpr = mServices.patientModelService->get_rMpr();
 	Transform3D new_rMpr = delta*rMpr;//output
+	mServices.registrationService->setLastRegistrationTime(QDateTime::currentDateTime());//Instead of restart
 	mServices.registrationService->applyPatientRegistration(new_rMpr, "Surface to Tracker");
 }
 
