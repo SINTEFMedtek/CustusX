@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vesselReg/SeansVesselReg.hxx"
 #include "cxBoolProperty.h"
 #include "cxDoubleProperty.h"
+#include "org_custusx_registration_method_vessel_Export.h"
 
 class QSpinBox;
 class QPushButton;
@@ -52,7 +53,7 @@ namespace cx
  * \date 2015-09-13
  * \author Christian Askeland
  */
-class ICPWidget : public BaseWidget
+class org_custusx_registration_method_vessel_EXPORT ICPWidget : public BaseWidget
 {
 	Q_OBJECT
 public:

@@ -43,6 +43,7 @@ class QLabel;
 #include "cxDoubleProperty.h"
 #include "cxICPRegistrationBaseWidget.h"
 #include "cxTransform3D.h"
+#include "org_custusx_registration_method_vessel_Export.h"
 
 namespace cx
 {
@@ -64,7 +65,7 @@ typedef boost::shared_ptr<class SpaceListener> SpaceListenerPtr;
  * \date Feb 21, 2011
  * \author Janne Beate Bakeng, SINTEF
  */
-class SeansVesselRegistrationWidget : public ICPRegistrationBaseWidget
+class org_custusx_registration_method_vessel_EXPORT SeansVesselRegistrationWidget : public ICPRegistrationBaseWidget
 {
 	Q_OBJECT
 public:

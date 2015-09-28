@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXMESHINVIEW_H
 
 #include "cxForwardDeclarations.h"
+#include "org_custusx_registration_method_vessel_Export.h"
 
 namespace cx
 {
@@ -42,7 +43,7 @@ typedef boost::shared_ptr<class MeshInView> MeshInViewPtr;
 /**
  * Display a mesh or polydata in the main 3D view.
  */
-class MeshInView
+class org_custusx_registration_method_vessel_EXPORT MeshInView
 {
 public:
 	MeshInView(ViewServicePtr viewService);
