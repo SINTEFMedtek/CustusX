@@ -127,32 +127,12 @@ void AcquisitionData::parseXml(QDomNode& dataNode)
 	QDomElement recodesessionNode = recordsessionsNode.firstChildElement("recordSession");
 	for (; !recodesessionNode.isNull(); recodesessionNode = recodesessionNode.nextSiblingElement("recordSession"))
 	{
-		RecordSessionPtr session(new RecordSession("", 0,0,""));
+//		RecordSessionPtr session(new RecordSession("", 0,0,""));
+		RecordSessionPtr session(new RecordSession());
 		session->parseXml(recodesessionNode);
 		this->addRecordSession(session);
 	}
 }
-
-///**generate a unique uid for use with a recordsession
-// *
-// */
-//QString AcquisitionData::getNewUid()
-//{
-//	QString retval;
-//	int max = 0;
-//	std::vector<RecordSessionPtr> recordsessions = this->getRecordSessions();
-//	std::vector<RecordSessionPtr>::iterator iter;
-//	for (iter = recordsessions.begin(); iter != recordsessions.end(); ++iter)
-//	{
-//		QString index = (*iter)->getUid().split("_").front();
-//		max = std::max(max, index.toInt());
-//	}
-
-//	//  retval = qstring_cast(max + 1);
-//	retval = QString("%1").arg(max + 1, 2, 10, QChar('0'));
-//	retval += "_" + QDateTime::currentDateTime().toString(timestampSecondsFormat());
-//	return retval;
-//}
 
 /**generate a unique uid for use with a recordsession
  *
@@ -170,11 +150,6 @@ int AcquisitionData::getNewSessionId()
 	}
 
 	return max+1;
-
-//	//  retval = qstring_cast(max + 1);
-//	retval = QString("%1").arg(max + 1, 2, 10, QChar('0'));
-//	retval += "_" + QDateTime::currentDateTime().toString(timestampSecondsFormat());
-//	return retval;
 }
 
 ///--------------------------------------------------------
@@ -197,9 +172,9 @@ Acquisition::~Acquisition()
 
 bool Acquisition::isReady(AcquisitionService::TYPES context) const
 {
+			return true;
 	if (!context.testFlag(AcquisitionService::tTRACKING))
 		return true;
-//		return true;
 	return mReady;
 }
 
@@ -243,7 +218,7 @@ void Acquisition::setReady(bool val, QString text)
 	emit readinessChanged();
 }
 
-void Acquisition::startRecord(AcquisitionService::TYPES context, QString category)
+void Acquisition::startRecord(AcquisitionService::TYPES context, QString category, RecordSessionPtr session)
 {
 	if (this->getState()!=AcquisitionService::sNOT_RUNNING)
 	{
@@ -251,12 +226,18 @@ void Acquisition::startRecord(AcquisitionService::TYPES context, QString categor
 		return;
 	}
 
-	double startTime = getMilliSecondsSinceEpoch();
 	mCurrentContext = context;
-	mLatestSession.reset(new cx::RecordSession(mPluginData->getNewSessionId(), startTime, startTime, category));
-//	mLatestSession.reset(new cx::RecordSession(mPluginData->getNewUid(), startTime, startTime, category));
+
+	if (session)
+		mLatestSession = session;
+	else
+		mLatestSession.reset(new cx::RecordSession(mPluginData->getNewSessionId(), category));
+
+	mLatestSession->startNewInterval();
+
 	reporter()->playStartSound();
 	this->setState(AcquisitionService::sRUNNING);
+	emit started();
 }
 
 void Acquisition::stopRecord()
@@ -266,11 +247,12 @@ void Acquisition::stopRecord()
 		return;
 	}
 
-	mLatestSession->setStopTime(getMilliSecondsSinceEpoch());
-	mPluginData->addRecordSession(mLatestSession);
-//	trackingService()->savePositionHistory(); //asks all the tools to save their transforms and timestamps
+	mLatestSession->stopLastInterval();
+	if (!mPluginData->getRecordSession(mLatestSession->getUid()))
+		mPluginData->addRecordSession(mLatestSession);
 	reporter()->playStopSound();
 	this->setState(AcquisitionService::sNOT_RUNNING);
+	emit acquisitionStopped();
 }
 
 void Acquisition::cancelRecord()
@@ -281,8 +263,10 @@ void Acquisition::cancelRecord()
 	}
 	reporter()->playCancelSound();
 	mLatestSession.reset();
+	mLatestSession->cancelLastInterval();
 	mCurrentContext = AcquisitionService::TYPES();
 	this->setState(AcquisitionService::sNOT_RUNNING);
+	emit cancelled();
 }
 
 void Acquisition::startPostProcessing()
@@ -300,13 +284,13 @@ void Acquisition::setState(AcquisitionService::STATE newState)
 	AcquisitionService::STATE lastState = mCurrentState;
 	mCurrentState = newState;
 
-	// emit some helper signals
-	if (lastState!=AcquisitionService::sRUNNING && newState==AcquisitionService::sRUNNING)
-		emit started();
-	else if (lastState==AcquisitionService::sRUNNING && newState!=AcquisitionService::sRUNNING && mLatestSession)
-		emit acquisitionStopped();
-	else if (lastState==AcquisitionService::sRUNNING && newState!=AcquisitionService::sRUNNING && !mLatestSession)
-		emit cancelled();
+//	// emit some helper signals
+//	if (lastState!=AcquisitionService::sRUNNING && newState==AcquisitionService::sRUNNING)
+//		emit started();
+//	else if (lastState==AcquisitionService::sRUNNING && newState!=AcquisitionService::sRUNNING && mLatestSession)
+//		emit acquisitionStopped();
+//	else if (lastState==AcquisitionService::sRUNNING && newState!=AcquisitionService::sRUNNING && !mLatestSession)
+//		emit cancelled();
 
 	emit stateChanged();
 }

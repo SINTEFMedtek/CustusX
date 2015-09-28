@@ -149,9 +149,7 @@ MeshPtr RMPCFromPointerWidget::getTrackerDataAsMesh()
 	Transform3D rMpr = mServices.patientModelService->get_rMpr();
 
 	TimedTransformMap trackerRecordedData_prMt = mRecordTrackingWidget->getRecordedTrackerData_prMt();
-//	CX_LOG_CHANNEL_DEBUG("CA") << "trackerRecordedData_prMt " << trackerRecordedData_prMt.size();
 	vtkPolyDataPtr trackerdata_r = polydataFromTransforms(trackerRecordedData_prMt, rMpr);
-//	CX_LOG_CHANNEL_DEBUG("CA") << "trackerdata_r " << trackerdata_r->GetNumberOfCells();
 
 	MeshPtr moving(new Mesh("tracker_temp"));
 	moving->setVtkPolyData(trackerdata_r);

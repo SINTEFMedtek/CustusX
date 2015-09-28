@@ -62,13 +62,13 @@ RecordSessionPtr AcquisitionService::getSession(QString uid)
 	return retval;
 }
 
-void AcquisitionService::toggleRecord(AcquisitionService::TYPES context, QString category)
-{
-	if (this->getState()==AcquisitionService::sRUNNING)
-		this->stopRecord();
-	else
-		this->startRecord(context, category);
-}
+//void AcquisitionService::toggleRecord(AcquisitionService::TYPES context, QString category)
+//{
+//	if (this->getState()==AcquisitionService::sRUNNING)
+//		this->stopRecord();
+//	else
+//		this->startRecord(context, category);
+//}
 
 
 } //cx

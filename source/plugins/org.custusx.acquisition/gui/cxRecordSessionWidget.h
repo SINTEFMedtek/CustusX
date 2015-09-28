@@ -72,6 +72,7 @@ public:
   virtual ~RecordSessionWidget();
 
   void setDescription(QString text);
+  void setCurrentSession(QString uid); ///< set a session that the next recording adds to
 
 private slots:
   void startStopSlot(bool);
@@ -87,6 +88,7 @@ private:
   QPushButton* mCancelButton;
   AcquisitionService::TYPES mContext;
   QString mCategory;
+  QString mCurrentSession;
 };
 
 /**

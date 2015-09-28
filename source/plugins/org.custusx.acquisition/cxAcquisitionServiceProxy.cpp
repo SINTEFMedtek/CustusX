@@ -133,9 +133,9 @@ AcquisitionService::STATE AcquisitionServiceProxy::getState() const
 	return mAcquisitionService->getState();
 }
 
-void AcquisitionServiceProxy::startRecord(TYPES context, QString category)
+void AcquisitionServiceProxy::startRecord(TYPES context, QString category, RecordSessionPtr session)
 {
-	mAcquisitionService->startRecord(context, category);
+	mAcquisitionService->startRecord(context, category, session);
 }
 
 void AcquisitionServiceProxy::stopRecord()

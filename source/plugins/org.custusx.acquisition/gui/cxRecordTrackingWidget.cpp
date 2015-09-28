@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxStringPropertySelectTool.h"
 #include "cxAcquisitionService.h"
 #include "cxRecordSessionSelector.h"
+#include "cxBoolProperty.h"
 
 
 namespace cx
@@ -68,6 +69,12 @@ RecordTrackingWidget::RecordTrackingWidget(XmlOptionFile options,
 	mToolSelector = StringPropertySelectTool::New(services.getToolManager());
 
 	mSelectRecordSession = new SelectRecordSession(mOptions, acquisitionService, services);
+	connect(mSelectRecordSession->getSessionSelector().get(), &StringProperty::changed, this, &RecordTrackingWidget::onMergeChanged);
+
+	mMergeWithExistingSession = BoolProperty::initialize("mergerecording", "Merge",
+														 "Merge new recording with existing recorded session",
+														 false, QDomNode());
+	connect(mMergeWithExistingSession.get(), &BoolProperty::changed, this, &RecordTrackingWidget::onMergeChanged);
 
 	AcquisitionService::TYPES context(AcquisitionService::tTRACKING);
 	mRecordSessionWidget = new RecordSessionWidget(mAcquisitionService, this, context, category);
@@ -76,6 +83,7 @@ RecordTrackingWidget::RecordTrackingWidget(XmlOptionFile options,
 
 	mVerticalLayout->addWidget(sscCreateDataWidget(this, mToolSelector));
 	mVerticalLayout->addWidget(mRecordSessionWidget);
+	mVerticalLayout->addWidget(sscCreateDataWidget(this, mMergeWithExistingSession));
 	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mSelectRecordSession->getSessionSelector()));
 
 	mObscuredListener.reset(new WidgetObscuredListener(this));
@@ -124,6 +132,15 @@ void RecordTrackingWidget::acquisitionCancelled()
 		activeRep3D->getTracer()->stop();
 		activeRep3D->getTracer()->clear();
 	}
+}
+
+void RecordTrackingWidget::onMergeChanged()
+{
+	QString mergeSession = "";
+	if (mMergeWithExistingSession->getValue())
+		mergeSession = mSelectRecordSession->getSessionSelector()->getValue();
+
+	mRecordSessionWidget->setCurrentSession(mergeSession);
 }
 
 ToolRep3DPtr RecordTrackingWidget::getToolRepIn3DView()

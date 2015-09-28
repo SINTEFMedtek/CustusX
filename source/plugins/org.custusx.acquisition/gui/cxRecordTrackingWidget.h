@@ -91,11 +91,13 @@ private:
 	ToolPtr mRecordingTool;
 	SelectRecordSession* mSelectRecordSession;
 	StringPropertySelectToolPtr mToolSelector;
+	BoolPropertyPtr mMergeWithExistingSession;
 
 	boost::shared_ptr<WidgetObscuredListener> mObscuredListener;
 
 	ToolRep3DPtr getToolRepIn3DView();
 	void onToolChanged();
+	void onMergeChanged();
 };
 
 } //namespace cx

@@ -127,12 +127,24 @@ void RecordSessionWidget::recordStateChangedSlot()
 
 void RecordSessionWidget::startStopSlot(bool checked)
 {
-	mAcquisitionService->toggleRecord(mContext, mCategory);
+	RecordSessionPtr session = mAcquisitionService->getSession(mCurrentSession);
+
+	if (mAcquisitionService->getState()==AcquisitionService::sRUNNING)
+		mAcquisitionService->stopRecord();
+	else
+		mAcquisitionService->startRecord(mContext, mCategory, session);
+
+//	mAcquisitionService->toggleRecord(mContext, mCategory);
 }
 
 void RecordSessionWidget::cancelSlot()
 {
 	mAcquisitionService->cancelRecord();
+}
+
+void RecordSessionWidget::setCurrentSession(QString uid)
+{
+	mCurrentSession = uid;
 }
 
 }

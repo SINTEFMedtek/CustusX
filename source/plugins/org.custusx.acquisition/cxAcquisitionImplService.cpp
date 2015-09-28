@@ -135,9 +135,9 @@ AcquisitionService::STATE AcquisitionImplService::getState() const
 	return mAcquisition->getState();
 }
 
-void AcquisitionImplService::startRecord(TYPES context, QString category)
+void AcquisitionImplService::startRecord(TYPES context, QString category, RecordSessionPtr session)
 {
-	mAcquisition->startRecord(context, category);
+	mAcquisition->startRecord(context, category, session);
 }
 
 void AcquisitionImplService::stopRecord()

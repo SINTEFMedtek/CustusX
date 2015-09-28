@@ -114,7 +114,7 @@ public:
 	/** Start recording.
 	  * Change state to running, create session object.
 	  */
-	void startRecord(AcquisitionService::TYPES context, QString category);
+	void startRecord(AcquisitionService::TYPES context, QString category, RecordSessionPtr session);
 	/** Stop recording.
 	  * Change state to not_running, finalize session object and keep it available.
 	  */
