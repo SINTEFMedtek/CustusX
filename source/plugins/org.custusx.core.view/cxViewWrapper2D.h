@@ -106,6 +106,7 @@ private slots:
 	void settingsChangedSlot(QString key);
 	void optionChangedSlot();
 
+	void samplePoint(Vector3D click_vp);
 private:
 	void moveManualTool(Vector3D vp, Vector3D delta_vp);
 	virtual void appendToContextMenu(QMenu& contextMenu);
@@ -162,7 +163,6 @@ private:
 	Vector3D mLastClickPos_vp;
 
 	QActionGroup* mOrientationActionGroup;
-
 };
 typedef boost::shared_ptr<ViewWrapper2D> ViewWrapper2DPtr;
 

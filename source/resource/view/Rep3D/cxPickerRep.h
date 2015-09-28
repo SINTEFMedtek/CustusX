@@ -91,7 +91,7 @@ signals:
 	void dataPicked(QString uid);
 
 public slots:
-	void pickLandmarkSlot3D(vtkObject* renderWindowInteractor); ///< When you use the renderwindowinteractor
+	void pickLandmarkSlot(vtkObject* renderWindowInteractor); ///< When you use the renderwindowinteractor
 
 protected:
 	PickerRep(PatientModelServicePtr dataManager); ///< use New instead

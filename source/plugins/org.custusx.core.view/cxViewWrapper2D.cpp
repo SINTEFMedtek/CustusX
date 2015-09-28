@@ -87,7 +87,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxLogger.h"
 
-
 namespace cx
 {
 
@@ -138,6 +137,17 @@ ViewWrapper2D::~ViewWrapper2D()
 {
 	if (mView)
 		mView->removeReps();
+}
+
+void ViewWrapper2D::samplePoint(Vector3D click_vp)
+{
+	Transform3D sMr = mSliceProxy->get_sMr();
+	Transform3D vpMs = mView->get_vpMs();
+
+	Vector3D p_s = vpMs.inv().coord(click_vp);
+	Vector3D p_r = sMr.inv().coord(p_s);
+
+	CX_LOG_DEBUG() << "ViewWrapper2D p_r: " << p_r;
 }
 
 void ViewWrapper2D::appendToContextMenu(QMenu& contextMenu)
@@ -614,6 +624,7 @@ void ViewWrapper2D::mousePressSlot(int x, int y, Qt::MouseButtons buttons)
 	{
 		Vector3D clickPos_vp = qvp2vp(QPoint(x,y));
 		moveManualTool(clickPos_vp, Vector3D(0,0,0));
+		samplePoint(clickPos_vp);
 	}
 }
 
@@ -662,7 +673,7 @@ void ViewWrapper2D::mouseWheelSlot(int x, int y, int delta, int orientation, Qt:
 Vector3D ViewWrapper2D::qvp2vp(QPoint pos_qvp)
 {
 	QSize size = mView->size();
-	Vector3D pos_vp(pos_qvp.x(), size.height() - pos_qvp.y(), 0.0); // convert from left-handed qt space to vtk space display/viewport
+	Vector3D pos_vp(pos_qvp.x(), size.height()-1 - pos_qvp.y(), 0.0); // convert from left-handed qt space to vtk space display/viewport
 	return pos_vp;
 }
 

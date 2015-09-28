@@ -227,7 +227,7 @@ void PickerRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr rende
 	}
 }
 
-void PickerRep::pickLandmarkSlot3D(vtkObject* renderWindowInteractor)
+void PickerRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
 {
 	vtkRenderWindowInteractorPtr iren = vtkRenderWindowInteractor::SafeDownCast(renderWindowInteractor);
 
@@ -242,6 +242,7 @@ void PickerRep::pickLandmarkSlot3D(vtkObject* renderWindowInteractor)
 		return;
 
 	Vector3D clickPoint(pickedPoint[0], pickedPoint[1], 0);
+
 	this->pickLandmark(clickPoint, renderer);
 }
 
@@ -357,9 +358,7 @@ Vector3D PickerRep::getDisplacement()
 
 void PickerRep::OnLeftButtonDown()
 {
-	ViewPtr view = this->getView();
-	if(view->getType() == View::VIEW_3D)
-		this->pickLandmarkSlot3D(view->getRenderWindow()->GetInteractor());
+	this->pickLandmarkSlot(this->getView()->getRenderWindow()->GetInteractor());
 }
 
 void PickerRep::OnMouseMove()
