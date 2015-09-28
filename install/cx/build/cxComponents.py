@@ -536,6 +536,10 @@ class FAST(CppComponent):
         builder.configureCMake()
     def findPackagePath(self):
         return self.buildPath()
+    def addConfigurationToDownstreamLib(self, builder):
+        add = builder.addCMakeOption
+        if self.controlData.force_connect_sublibraries:
+            add('CX_PLUGIN_org.custusx.filter.airways:BOOL', True);
         
 # ---------------------------------------------------------
 
