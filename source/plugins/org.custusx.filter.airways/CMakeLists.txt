@@ -6,7 +6,8 @@ macro(cx_initialize_FAST)
     find_package( FAST REQUIRED)
     include(${FAST_USE_FILE})
     message("===========================")
-    message("Initializing FAST in TSF plugin")
+    message("Initializing FAST in Airways plugin")
+    message("-- ${FAST_LIBRARY_DIRS}")
     message("===========================")
     cx_install_add_library_dirs(${FAST_LIBRARY_DIRS})
 endmacro()
@@ -53,15 +54,6 @@ set(PLUGIN_UI_FORMS
 set(PLUGIN_resources
 )
 
-install(FILES
-        ${Tube-Segmentation-Framework_KERNELS_DIR}/kernels.cl
-        ${Tube-Segmentation-Framework_KERNELS_DIR}/kernels_no_3d_write.cl
-        DESTINATION ${CX_INSTALL_ROOT_DIR}/config/tsf/)
-install(DIRECTORY ${Tube-Segmentation-Framework_PARAMETERS_DIR}
-        DESTINATION ${CX_INSTALL_ROOT_DIR}/config/tsf/
-        FILE_PERMISSIONS ${CX_FULL_PERMISSIONS}
-        DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS})
-
 #Compute the plugin dependencies
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries
@@ -69,7 +61,7 @@ set(PLUGIN_target_libraries
     ${PLUGIN_target_libraries}
 
     PRIVATE
-    #airwaysLib
+    OpenCLUtilityLibrary
     FAST
     cxResource
     cxResourceFilter

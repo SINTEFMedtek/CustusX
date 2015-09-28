@@ -525,6 +525,7 @@ class FAST(CppComponent):
     def update(self):
         self._getBuilder().gitCheckoutBranch('development', submodules=True)
         #self._getBuilder().gitCheckout('43614718f7667dd5013af9300fcc63ae30bf244c')
+        self._getBuilder()._gitSubmoduleUpdate()
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption

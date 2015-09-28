@@ -52,21 +52,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelServiceProxy.h"
 #include "cxVisServices.h"
 // Test
-#include "FAST/Algorithms/BinaryThresholding/BinaryThresholding.hpp"
+#include "FAST/Importers/ImageFileImporter.hpp"
+#include "FAST/Algorithms/TubeSegmentationAndCenterlineExtraction/TubeSegmentationAndCenterlineExtraction.hpp"
 
 namespace cx {
 
 AirwaysFilter::AirwaysFilter(ctkPluginContext *pluginContext) :
 	FilterImpl(VisServices::create(pluginContext))
 {
-    // Test
-    fast::BinaryThresholding::pointer fastObject = fast::BinaryThresholding::New();
-    fastObject->setLowerThreshold(1);
-    try {
-    fastObject->update();
-    } catch(fast::Exception &e) {
-        std::cout << "FAST: Works!" << std::endl;
-    }
+
 }
 
 QString AirwaysFilter::getName() const
@@ -90,6 +84,7 @@ QString AirwaysFilter::getHelp() const
 
 bool AirwaysFilter::execute()
 {
+	std::cout << "EXECUTING AIRWAYS FILTER" << std::endl;
     ImagePtr input = this->getCopiedInputImage();
     	if (!input)
     		return false;
@@ -97,7 +92,35 @@ bool AirwaysFilter::execute()
 	std::string filename = (patientService()->getActivePatientFolder()+"/"+input->getFilename()).toStdString();
 
 	try {
-		// TODO Run algorithm here
+		// Import image data from disk
+		fast::ImageFileImporter::pointer importer = fast::ImageFileImporter::New();
+		importer->setFilename(filename);
+
+	    // Need to know the data type
+	    importer->update();
+	    fast::Image::pointer image = importer->getOutputData<fast::Image>();
+	    std::cout << "IMAGE LOADED" << std::endl;
+
+	    // Set up algorithm
+		fast::TubeSegmentationAndCenterlineExtraction::pointer tubeExtraction = fast::TubeSegmentationAndCenterlineExtraction::New();
+	    tubeExtraction->setInputConnection(importer->getOutputPort());
+	    tubeExtraction->extractDarkTubes();
+	    tubeExtraction->enableAutomaticCropping(true);
+	    // Set min and max intensity based on HU unit scale
+	    if(image->getDataType() == fast::TYPE_UINT16) {
+	        tubeExtraction->setMinimumIntensity(0);
+	        tubeExtraction->setMaximumIntensity(1124);
+	    } else {
+	        tubeExtraction->setMinimumIntensity(-1024);
+	        tubeExtraction->setMaximumIntensity(100);
+	    }
+	    tubeExtraction->setMinimumRadius(0.5);
+	    tubeExtraction->setMaximumRadius(50);
+	    tubeExtraction->setSensitivity(getSensitivityOption(mOptions)->getValue());
+	    // TODO set blur amount..
+
+	    tubeExtraction->update(); // RUN
+
 
 	} catch(fast::Exception& e) {
 		std::string error = e.what();
@@ -130,7 +153,8 @@ bool AirwaysFilter::postProcess()
 
 void AirwaysFilter::createOptions()
 {
-
+	mOptionsAdapters.push_back(getSensitivityOption(mOptions));
+	mOptionsAdapters.push_back(getNoiseLevelOption(mOptions));
 }
 
 void AirwaysFilter::createInputTypes()
@@ -226,6 +250,26 @@ MeshPtr AirwaysFilter::loadVtkFile(QString pathToFile, QString newDatasUid){
 		reportError("Could not load "+pathToFile);
 
 	return retval;
+}
+
+DoublePropertyPtr AirwaysFilter::getSensitivityOption(QDomElement root)
+{
+	DoublePropertyPtr retval = DoubleProperty::initialize("Sensitivity",
+			"", "Select sensitivity for the segmentation", 0.8,
+			DoubleRange(0.01, 1, 0.01), 2, root);
+	retval->setGuiRepresentation(DoubleProperty::grSLIDER);
+	return retval;
+
+}
+
+DoublePropertyPtr AirwaysFilter::getNoiseLevelOption(QDomElement root)
+{
+	DoublePropertyPtr retval = DoubleProperty::initialize("Noise level",
+			"", "Select the amount of noise present in the image", 0.5,
+			DoubleRange(0.0, 2, 0.5), 1, root);
+	retval->setGuiRepresentation(DoubleProperty::grSLIDER);
+	return retval;
+
 }
 
 AirwaysFilter::~AirwaysFilter() {

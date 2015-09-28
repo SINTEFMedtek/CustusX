@@ -91,6 +91,10 @@ private:
 	vtkImageDataPtr importRawImageData(void * data, int size_x, int size_y, int size_z, ImagePtr input, int type); ///< converts a any array to a vtkImageDataPtr
 	MeshPtr loadVtkFile(QString pathToFile, QString newDatasUid); ///< loads a vtk file into CustusX
 
+
+	DoublePropertyPtr getSensitivityOption(QDomElement root);
+	DoublePropertyPtr getNoiseLevelOption(QDomElement root);
+
 };
 typedef boost::shared_ptr<class AirwaysFilter> AirwaysFilterPtr;
 
