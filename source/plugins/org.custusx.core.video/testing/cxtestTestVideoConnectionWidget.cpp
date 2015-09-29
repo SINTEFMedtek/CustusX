@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataLocations.h"
 #include "cxStreamerServiceUtilities.h"
 #include "cxProfile.h"
+#include "cxActiveData.h"
 
 namespace cxtest
 {
@@ -87,9 +88,10 @@ cx::PropertyPtr TestVideoConnectionWidget::getOption(QString uid, QString method
 
 void TestVideoConnectionWidget::setupWidgetToRunStreamer(QString filename)
 {
+	cx::ActiveDataPtr activeData = mServices->patientModelService->getActiveData();
 	cx::ImagePtr image = Utilities::create3DImage();
-	mServices->patientModelService->setActiveData(image);
 	mServices->patientModelService->insertData(image);
+	activeData->setActive(image);
 
 	QString method = "image_file_streamer";
 	mConnectionSelector->setValue(method);

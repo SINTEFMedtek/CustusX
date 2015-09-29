@@ -139,7 +139,7 @@ class cxGui_EXPORT TransferFunction3DWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  TransferFunction3DWidget(PatientModelServicePtr patientModelService, QWidget* parent, bool connectToActiveImage = true);
+  TransferFunction3DWidget(ActiveDataPtr activeData, QWidget* parent, bool connectToActiveImage = true);
   virtual ~TransferFunction3DWidget() {}
 
 public slots:
@@ -151,8 +151,8 @@ protected:
   TransferFunctionAlphaWidget* mTransferFunctionAlphaWidget;
   TransferFunctionColorWidget* mTransferFunctionColorWidget;
 
-  PatientModelServicePtr mPatientModelService;
   ActiveImageProxyPtr mActiveImageProxy;
+  ActiveDataPtr mActiveData;
 };
 
 class cxGui_EXPORT TransferFunction2DWidget : public BaseWidget
@@ -160,7 +160,7 @@ class cxGui_EXPORT TransferFunction2DWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  TransferFunction2DWidget(PatientModelServicePtr patientModelService, QWidget* parent, bool connectToActiveImage = true);
+  TransferFunction2DWidget(ActiveDataPtr activeData, QWidget* parent, bool connectToActiveImage = true);
   virtual ~TransferFunction2DWidget() {}
 
 public slots:
@@ -173,7 +173,7 @@ protected:
   DoublePropertyImageTFDataBasePtr mDataWindow, mDataAlpha, mDataLLR, mDataLevel;
 
   ActiveImageProxyPtr mActiveImageProxy;
-  PatientModelServicePtr mPatientModelService;
+  ActiveDataPtr mActiveData;
 };
 
 

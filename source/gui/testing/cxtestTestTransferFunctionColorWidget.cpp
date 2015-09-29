@@ -38,8 +38,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cxtest {
 
-TestTransferFunctionColorWidget::TestTransferFunctionColorWidget(cx::PatientModelServicePtr patientModelService) :
-		TransferFunctionColorWidget(patientModelService, NULL)
+TestTransferFunctionColorWidget::TestTransferFunctionColorWidget(cx::ActiveDataPtr activeData) :
+		TransferFunctionColorWidget(activeData, NULL)
 {}
 
 

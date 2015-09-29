@@ -39,16 +39,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogger.h"
 #include "cxSpaceListenerImpl.h"
 #include "cxTool.h"
+#include "cxActiveData.h"
 
 
 namespace cx
 {
 
-SpaceProviderImpl::SpaceProviderImpl(TrackingServicePtr trackingService, PatientModelServicePtr dataManager)
+SpaceProviderImpl::SpaceProviderImpl(TrackingServicePtr trackingService, PatientModelServicePtr dataManager) :
+	mTrackingService(trackingService),
+	mDataManager(dataManager)
 {
-	mTrackingService = trackingService;
-	mDataManager = dataManager;
-
 //	connect(mTrackingService.get(), SIGNAL(stateChanged()), this, SIGNAL(spaceAddedOrRemoved()));
 	connect(mTrackingService.get(), &TrackingService::stateChanged, this, &SpaceProvider::spaceAddedOrRemoved);
 	connect(mDataManager.get(), &PatientModelService::dataAddedOrRemoved, this, &SpaceProvider::spaceAddedOrRemoved);
@@ -275,7 +275,10 @@ Transform3D SpaceProviderImpl::get_rMd(QString uid)
 	DataPtr data = mDataManager->getData(uid);
 
 	if (!data && uid=="active")
-		data = mDataManager->getActiveData<Image>();
+	{
+		ActiveDataPtr activeData = mDataManager->getActiveData();
+		data = activeData->getActive<Image>();
+	}
 
 	if(!data)
 	{
@@ -293,7 +296,10 @@ Transform3D SpaceProviderImpl::get_rMdv(QString uid)
 	DataPtr data = mDataManager->getData(uid);
 
 	if (!data && uid=="active")
-		data = mDataManager->getActiveData<Image>();
+	{
+		ActiveDataPtr activeData = mDataManager->getActiveData();
+		data = activeData->getActive<Image>();
+	}
 
 	if(!data)
 	{

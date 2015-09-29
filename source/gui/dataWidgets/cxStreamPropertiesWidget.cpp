@@ -36,6 +36,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackedStream.h"
 #include "cxTransferFunctionWidget.h"
 #include "cxShadingWidget.h"
+#include "cxActiveData.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
@@ -46,8 +48,9 @@ StreamPropertiesWidget::StreamPropertiesWidget(PatientModelServicePtr patientMod
 {
 	this->setToolTip("Set properties on a tracked 2D/3D stream");
 	bool connectToActiveImage = false;
-	mTransferFunctionWidget = TransferFunction3DWidgetPtr(new TransferFunction3DWidget(patientModelService, this, connectToActiveImage));
-	mShadingWidget = ShadingWidgetPtr(new ShadingWidget(patientModelService, this, connectToActiveImage));
+	ActiveDataPtr activeData = patientModelService->getActiveData();
+	mTransferFunctionWidget = TransferFunction3DWidgetPtr(new TransferFunction3DWidget(activeData, this, connectToActiveImage));
+	mShadingWidget = ShadingWidgetPtr(new ShadingWidget(activeData, this, connectToActiveImage));
 
 	this->insertWidgetAtTop(new DataSelectWidget(visualizationService, patientModelService, this, mSelectStream));
 	this->addTab(mTransferFunctionWidget.get(), QString("Transfer Functions"));

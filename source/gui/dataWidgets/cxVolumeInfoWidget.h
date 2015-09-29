@@ -73,6 +73,7 @@ private:
   StringPropertyImageTypePtr mImageTypeAdapter;
   ActiveImageProxyPtr mActiveImageProxy;
   PatientModelServicePtr mPatientModelService;
+  ActiveDataPtr mActiveData;
 };
 
 }//namespace cx
