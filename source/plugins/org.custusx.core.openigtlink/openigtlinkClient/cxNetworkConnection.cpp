@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxProfile.h"
 #include "cxStringProperty.h"
 #include "cxDoubleProperty.h"
+#include "vtkImageData.h"
 
 namespace cx
 {
@@ -160,6 +161,46 @@ void write_send_info(igtl::ImageMessage::Pointer msg)
 }
 }
 
+void NetworkConnection::streamImage(ImagePtr image)
+{
+    QMutexLocker locker(&mMutex);
+
+    IGTLinkConversionImage imageConverter;
+    igtl::ImageMessage::Pointer msg = imageConverter.encode(image, mDialect->coordinateSystem());
+    msg->Pack();
+
+    int sendSize = msg->GetPackSize()/1024;
+    int waitingSize = mSocket->bytesToWrite()/1024;
+    double waitToSendRatio = double(waitingSize)/double(sendSize);
+    double waitToSendRatioThreshold = 0.5;
+
+    static int sentCounter =0;
+    static int dropCounter =0;
+//    CX_LOG_CHANNEL_DEBUG("igtl_test") << "ratio: " << waitToSendRatio << " ratio";
+    CX_LOG_CHANNEL_DEBUG("igtl_test") << "GetNumComponents: " << msg->GetNumComponents() << " ";
+
+
+    if (waitToSendRatio > waitToSendRatioThreshold)
+    {
+        dropCounter++;
+        CX_LOG_CHANNEL_DEBUG("igtl_test") << QString("dropped stream image: wanted to send %1kB but %2kB already waiting, sent=%3,drop=%4")
+                                             .arg(sendSize)
+                                             .arg(waitingSize)
+                                             .arg(sentCounter)
+                                             .arg(dropCounter);
+
+        return;
+    }
+    sentCounter++;
+
+    CX_LOG_CHANNEL_DEBUG("igtl_test") << "bytes to write pre write: " << waitingSize << " kbyte";
+    image->getBaseVtkImageData()->Print(std::cout);
+
+    write_send_info(msg);
+    mSocket->write(reinterpret_cast<char*>(msg->GetPackPointer()), msg->GetPackSize());
+//    CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "Sent image: " << image->getName();
+}
+
 void NetworkConnection::sendImage(ImagePtr image)
 {
 	QMutexLocker locker(&mMutex);
@@ -167,7 +208,11 @@ void NetworkConnection::sendImage(ImagePtr image)
 	IGTLinkConversionImage imageConverter;
 	igtl::ImageMessage::Pointer msg = imageConverter.encode(image, mDialect->coordinateSystem());
 	msg->Pack();
-	write_send_info(msg);
+
+    int kb = mSocket->bytesToWrite()/1024;
+    CX_LOG_CHANNEL_DEBUG("igtl_test") << "bytes to write pre write: " << kb << " kbyte";
+
+    write_send_info(msg);
 	mSocket->write(reinterpret_cast<char*>(msg->GetPackPointer()), msg->GetPackSize());
 //    CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "Sent image: " << image->getName();
 }

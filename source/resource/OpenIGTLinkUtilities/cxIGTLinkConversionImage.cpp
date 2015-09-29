@@ -304,6 +304,7 @@ void IGTLinkConversionImage::encode_vtkImageData(vtkImageDataPtr in, igtl::Image
 	scalarType = imageData->GetScalarType();
 	imageData->GetDimensions(isize);
 	spacing = imageData->GetSpacing();
+    int numComponents = imageData->GetNumberOfScalarComponents();
 
 	// Check endianness of the machine
 	endian = igtl::ImageMessage::ENDIAN_BIG;
@@ -317,7 +318,8 @@ void IGTLinkConversionImage::encode_vtkImageData(vtkImageDataPtr in, igtl::Image
 	outmsg->SetScalarType(scalarType);
 	outmsg->SetEndian(endian);
 	outmsg->SetSubVolume(isize, svoffset);
-	outmsg->AllocateScalars();
+    outmsg->SetNumComponents(numComponents);
+    outmsg->AllocateScalars();
 
 	memcpy(outmsg->GetScalarPointer(),
 		   imageData->GetScalarPointer(),

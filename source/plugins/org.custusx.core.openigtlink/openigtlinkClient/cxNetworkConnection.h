@@ -87,6 +87,7 @@ public:
 	// not thread-safe: use invoke to call in this thread
 	void sendImage(ImagePtr image);
 	void sendMesh(MeshPtr image);
+    void streamImage(ImagePtr image);
 
 signals:
     void transform(QString devicename, Transform3D transform, double timestamp);

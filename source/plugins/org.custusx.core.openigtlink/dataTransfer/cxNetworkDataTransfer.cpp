@@ -201,7 +201,7 @@ void NetworkDataTransfer::onNewStreamFrame()
 							 data,
 							 mStreamingVideoSource->getName()));
 
-	boost::function<void()> message = boost::bind(&NetworkConnection::sendImage, mOpenIGTLink->client(), image);
+    boost::function<void()> message = boost::bind(&NetworkConnection::streamImage, mOpenIGTLink->client(), image);
 	mOpenIGTLink->client()->invoke(message);
 
 //	mOpenIGTLink->client()->sendMessage(image);
