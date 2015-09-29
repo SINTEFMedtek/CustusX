@@ -85,8 +85,8 @@ public:
 	void invoke(boost::function<void()> func);
 
 	// not thread-safe: use invoke to call in this thread
-	void sendMessage(ImagePtr image);
-	void sendMessage(MeshPtr image);
+	void sendImage(ImagePtr image);
+	void sendMesh(MeshPtr image);
 
 signals:
     void transform(QString devicename, Transform3D transform, double timestamp);

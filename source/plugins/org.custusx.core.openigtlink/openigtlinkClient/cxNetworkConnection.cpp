@@ -150,19 +150,28 @@ void NetworkConnection::setDialect(QString dialectname)
 
 }
 
-void NetworkConnection::sendMessage(ImagePtr image)
+namespace
+{
+void write_send_info(igtl::ImageMessage::Pointer msg)
+{
+	int kb = msg->GetPackSize()/1024;
+	CX_LOG_CHANNEL_DEBUG("igtl_test") << "Writing image to socket: " << msg->GetDeviceName()
+									  << ", " << kb << " kByte";
+}
+}
+
+void NetworkConnection::sendImage(ImagePtr image)
 {
 	QMutexLocker locker(&mMutex);
 
 	IGTLinkConversionImage imageConverter;
 	igtl::ImageMessage::Pointer msg = imageConverter.encode(image, mDialect->coordinateSystem());
-	CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "Sending image: " << image->getName();
 	msg->Pack();
-
+	write_send_info(msg);
 	mSocket->write(reinterpret_cast<char*>(msg->GetPackPointer()), msg->GetPackSize());
 }
 
-void NetworkConnection::sendMessage(MeshPtr data)
+void NetworkConnection::sendMesh(MeshPtr data)
 {
 	QMutexLocker locker(&mMutex);
 

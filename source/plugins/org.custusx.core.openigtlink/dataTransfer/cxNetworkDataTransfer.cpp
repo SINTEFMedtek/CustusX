@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVideoServiceProxy.h"
 #include "cxVideoSource.h"
 #include "cxNetworkConnectionHandle.h"
+#include "boost/bind.hpp"
 
 namespace cx {
 
@@ -124,7 +125,9 @@ void NetworkDataTransfer::onSend()
 	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
 	if (image)
 	{
-		mOpenIGTLink->client()->sendMessage(image);
+		boost::function<void()> message = boost::bind(&NetworkConnection::sendImage, mOpenIGTLink->client(), image);
+		mOpenIGTLink->client()->invoke(message);
+//		mOpenIGTLink->client()->sendMessage(image);
 		return;
 	}
 	MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(data);
@@ -140,7 +143,10 @@ void NetworkDataTransfer::onSend()
 //		return;
 //		// test end
 
-		mOpenIGTLink->client()->sendMessage(mesh);
+		boost::function<void()> message = boost::bind(&NetworkConnection::sendMesh, mOpenIGTLink->client(), mesh);
+		mOpenIGTLink->client()->invoke(message);
+
+//		mOpenIGTLink->client()->sendMessage(mesh);
 		return;
 	}
 
@@ -194,7 +200,11 @@ void NetworkDataTransfer::onNewStreamFrame()
 	ImagePtr image(new Image(mStreamingVideoSource->getUid()+"_snapshot",
 							 data,
 							 mStreamingVideoSource->getName()));
-	mOpenIGTLink->client()->sendMessage(image);
+
+	boost::function<void()> message = boost::bind(&NetworkConnection::sendImage, mOpenIGTLink->client(), image);
+	mOpenIGTLink->client()->invoke(message);
+
+//	mOpenIGTLink->client()->sendMessage(image);
 }
 
 } // namespace cx
