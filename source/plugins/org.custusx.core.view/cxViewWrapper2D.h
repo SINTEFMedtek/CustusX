@@ -109,6 +109,7 @@ private slots:
 	void settingsChangedSlot(QString key);
 	void optionChangedSlot();
 
+protected slots:
 	void samplePoint(Vector3D click_vp);
 private:
 	void moveManualTool(Vector3D vp, Vector3D delta_vp);

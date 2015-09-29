@@ -63,7 +63,7 @@ protected:
   QCheckBox* mMouseClickSample;
 
 private slots:
-  void mouseClickStateChanged();
+  void mouseClickSampleStateChanged();
   void pointSampled(Vector3D p_r);
 private:
   virtual void performRegistration();

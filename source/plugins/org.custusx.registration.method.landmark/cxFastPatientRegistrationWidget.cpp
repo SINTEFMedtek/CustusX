@@ -44,7 +44,7 @@ FastPatientRegistrationWidget::FastPatientRegistrationWidget(RegServices service
 {
 	mMouseClickSample = new QCheckBox("Sample with mouse clicks in 2D.", this);
 	mMouseClickSample->setToolTip("Allow mouse clicks in 2D views to sample patient landmarks");
-	connect(mMouseClickSample, &QCheckBox::stateChanged, this, &FastPatientRegistrationWidget::mouseClickStateChanged);
+	connect(mMouseClickSample, &QCheckBox::stateChanged, this, &FastPatientRegistrationWidget::mouseClickSampleStateChanged);
 
 	connect(mServices.visualizationService.get(), &VisualizationService::pointSampled, this, &FastPatientRegistrationWidget::pointSampled);//test
 
@@ -60,8 +60,9 @@ void FastPatientRegistrationWidget::performRegistration()
 	this->updateAverageAccuracyLabel();
 }
 
-void FastPatientRegistrationWidget::mouseClickStateChanged()
+void FastPatientRegistrationWidget::mouseClickSampleStateChanged()
 {
+	CX_LOG_DEBUG() << "FastPatientRegistrationWidget::mouseClickStateChanged";
 //	if(mMouseClickSample->isChecked())
 //		connect(mServices.visualizationService.get(), &VisualizationService::pointSampled, this, &FastPatientRegistrationWidget::pointSampled);
 //	else
