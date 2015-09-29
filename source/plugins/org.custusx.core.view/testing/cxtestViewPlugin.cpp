@@ -31,12 +31,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "catch.hpp"
-#include "cxViewWrapper2D.h"
 #include "cxVisServices.h"
-#include "cxLogicManager.h"
-#include "cxViewsFixture.h"
 #include "cxViewService.h"
 #include "cxtestDirectSignalListener.h"
+#include "cxtestVisualizationHelper.h"
 
 TEST_CASE("VisualizationPlugin: Check nothing", "[unit][plugins][org.custusx.core.view][hide]")
 {
@@ -44,48 +42,9 @@ TEST_CASE("VisualizationPlugin: Check nothing", "[unit][plugins][org.custusx.cor
 }
 
 
-namespace {
-typedef boost::shared_ptr<class ViewWrapper2DFixture> ViewWrapper2DFixturePtr;
-struct ViewWrapper2DFixture : public cx::ViewWrapper2D
-{
-	ViewWrapper2DFixture(cx::ViewPtr view, cx::VisServicesPtr services) :
-		cx::ViewWrapper2D(view, services)
-	{}
-
-	void emitPointSampled()
-	{
-		this->samplePoint(cx::Vector3D(1, 1, 1));
-	}
-};
-
-struct VisualizationTestHelper
-{
-	VisualizationTestHelper()
-	{
-		cx::LogicManager::initialize();
-		services = cx::VisServices::create(cx::logicManager()->getPluginContext());
-
-		cx::ViewPtr view = viewsFixture.addView(0, 0);
-
-		viewWrapper.reset(new ViewWrapper2DFixture(view, services));
-	}
-
-	~VisualizationTestHelper()
-	{
-		services.reset();
-		cx::LogicManager::shutdown();
-	}
-	cx::VisServicesPtr services;
-	ViewWrapper2DFixturePtr viewWrapper;
-private:
-	cxtest::ViewsFixture viewsFixture;
-};
-
-}//namespace
-
 TEST_CASE("ViewWrapper2D: Emits pointSampled signal", "[unit][plugins][org.custusx.core.view]")
 {
-	VisualizationTestHelper visHelper;
+	cxtest::VisualizationHelper visHelper;
 
 	cxtest::DirectSignalListener signalListener(visHelper.viewWrapper.get(), SIGNAL(pointSampled(Vector3D)));
 	visHelper.viewWrapper->emitPointSampled();
@@ -94,7 +53,7 @@ TEST_CASE("ViewWrapper2D: Emits pointSampled signal", "[unit][plugins][org.custu
 
 TEST_CASE("VisualizationService: Emits pointSampled signal", "[unit][plugins][org.custusx.core.view]")
 {
-	VisualizationTestHelper visHelper;
+	cxtest::VisualizationHelper visHelper;
 
 	cxtest::DirectSignalListener signalListener(visHelper.services->visualizationService.get(), SIGNAL(pointSampled(Vector3D)));
 	visHelper.viewWrapper->emitPointSampled();

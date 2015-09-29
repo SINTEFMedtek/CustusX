@@ -1,7 +1,9 @@
 
 if(BUILD_TESTING)
 
-  set(CX_TEST_CATCH_org_custusx_core_view_MOC_SOURCE_FILES)
+  set(CX_TEST_CATCH_org_custusx_core_view_MOC_SOURCE_FILES
+    cxtestVisualizationHelper.h
+    )
   set(CX_TEST_CATCH_org_custusx_core_view_SOURCE_FILES
     cxtestViewPlugin.cpp
     cxtestCatchMultiVolume3DRepProducer.cpp
@@ -12,6 +14,7 @@ if(BUILD_TESTING)
     cxtestCatchVtkOpenGLGPUMultiVolumeRayCastMapper.cpp
     cxtestDataTypeSort.cpp
     cxtestRendering.cpp
+    cxtestVisualizationHelper.cpp
     )
   qt5_wrap_cpp(CX_TEST_CATCH_org_custusx_core_view_MOC_SOURCE_FILES ${CX_TEST_CATCH_org_custusx_core_view_MOC_SOURCE_FILES})
   add_library(cxtest_org_custusx_core_view ${CX_TEST_CATCH_org_custusx_core_view_SOURCE_FILES} ${CX_TEST_CATCH_org_custusx_core_visualization_MOC_SOURCE_FILES})

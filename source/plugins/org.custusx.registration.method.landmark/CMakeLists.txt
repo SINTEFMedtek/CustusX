@@ -11,7 +11,6 @@ set(PLUGIN_SRCS
     cxLandmarkRegistrationWidget.cpp
     cxLandmarkPatientRegistrationWidget.cpp
     cxLandmarkImage2ImageRegistrationWidget.cpp
-    cxFastPatientRegistrationWidget.h
     cxFastPatientRegistrationWidget.cpp
     cxFastOrientationRegistrationWidget.cpp
     cxLandmarkListener.cpp
@@ -22,6 +21,7 @@ set(PLUGIN_SRCS
 set(PLUGIN_MOC_SRCS
     cxRegistrationMethodLandmarkPluginActivator.h
     cxLandmarkRegistrationWidget.h
+    cxFastPatientRegistrationWidget.h
     cxImageLandmarksWidget.h
     cxLandmarkPatientRegistrationWidget.h
     cxLandmarkImage2ImageRegistrationWidget.h
@@ -79,3 +79,5 @@ cx_add_non_source_file("doc/org_custusx_registration_method_landmark.h")
 cx_add_non_source_file("doc/org_custusx_registration_method_landmark_image_to_image.md")
 cx_add_non_source_file("doc/org_custusx_registration_method_landmark_image_to_patient.md")
 cx_add_non_source_file("doc/org_custusx_registration_method_fast_landmark_image_to_patient.md")
+
+add_subdirectory(testing)

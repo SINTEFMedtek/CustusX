@@ -55,6 +55,7 @@ namespace cx
  */
 class FastPatientRegistrationWidget : public PatientLandMarksWidget
 {
+	Q_OBJECT
 public:
   FastPatientRegistrationWidget(RegServices services, QWidget* parent);
   virtual ~FastPatientRegistrationWidget();
@@ -62,9 +63,9 @@ public:
 protected:
   QCheckBox* mMouseClickSample;
 
-private slots:
+protected slots:
   void mouseClickSampleStateChanged();
-  void pointSampled(Vector3D p_r);
+  virtual void pointSampled(Vector3D p_r);
 private:
   virtual void performRegistration();
 };
