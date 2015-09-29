@@ -101,6 +101,7 @@ signals:
 	void activeLayoutChanged(); ///< emitted when the active layout changes
 	void activeViewChanged(); ///< emitted when the active view changes
 	void renderingEnabledChanged(); ///< emitted then rendering is enabled/disabled
+	void pointSampled(Vector3D p_r);
 
 public slots:
     virtual void aboutToStop() = 0;

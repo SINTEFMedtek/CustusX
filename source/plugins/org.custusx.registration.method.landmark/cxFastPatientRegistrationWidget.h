@@ -64,6 +64,7 @@ protected:
 
 private slots:
   void mouseClickStateChanged();
+  void pointSampled(Vector3D p_r);
 private:
   virtual void performRegistration();
 };

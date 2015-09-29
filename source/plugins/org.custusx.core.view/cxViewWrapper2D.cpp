@@ -86,6 +86,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderWindowInteractor.h"
 #include "cxPatientModelService.h"
 #include "cxLogger.h"
+#include "cxViewService.h"
 
 namespace cx
 {
@@ -94,6 +95,7 @@ ViewWrapper2D::ViewWrapper2D(ViewPtr view, VisServicesPtr backend) :
 	ViewWrapper(backend),
 	mOrientationActionGroup(new QActionGroup(view.get()))
 {
+	qRegisterMetaType<Vector3D>("Vector3D");
 	mView = view;
 	this->connectContextMenu(mView);
 
@@ -128,6 +130,7 @@ ViewWrapper2D::ViewWrapper2D(ViewPtr view, VisServicesPtr backend) :
 	connect(mView.get(), SIGNAL(mousePress(int, int, Qt::MouseButtons)), this, SLOT(mousePressSlot(int, int, Qt::MouseButtons)));
 	connect(mView.get(), SIGNAL(mouseMove(int, int, Qt::MouseButtons)), this, SLOT(mouseMoveSlot(int, int, Qt::MouseButtons)));
 	connect(mView.get(), SIGNAL(mouseWheel(int, int, int, int, Qt::MouseButtons)), this, SLOT(mouseWheelSlot(int, int, int, int, Qt::MouseButtons)));
+	connect(this, &ViewWrapper2D::pointSampled, mServices->visualizationService.get(), &VisualizationService::pointSampled);
 
 	this->activeToolChangedSlot();
 	this->updateView();
@@ -147,7 +150,8 @@ void ViewWrapper2D::samplePoint(Vector3D click_vp)
 	Vector3D p_s = vpMs.inv().coord(click_vp);
 	Vector3D p_r = sMr.inv().coord(p_s);
 
-	CX_LOG_DEBUG() << "ViewWrapper2D p_r: " << p_r;
+	CX_LOG_DEBUG() << "ViewWrapper2D::samplePoint() p_r: " << p_r;
+	emit pointSampled(p_r);
 }
 
 void ViewWrapper2D::appendToContextMenu(QMenu& contextMenu)

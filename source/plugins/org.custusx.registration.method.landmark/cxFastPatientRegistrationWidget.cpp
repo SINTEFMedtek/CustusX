@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "cxRegistrationService.h"
+#include "cxViewService.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -44,6 +46,7 @@ FastPatientRegistrationWidget::FastPatientRegistrationWidget(RegServices service
 	mMouseClickSample->setToolTip("Allow mouse clicks in 2D views to sample patient landmarks");
 	connect(mMouseClickSample, &QCheckBox::stateChanged, this, &FastPatientRegistrationWidget::mouseClickStateChanged);
 
+	connect(mServices.visualizationService.get(), &VisualizationService::pointSampled, this, &FastPatientRegistrationWidget::pointSampled);//test
 
 	mVerticalLayout->addWidget(mMouseClickSample);
 }
@@ -59,7 +62,15 @@ void FastPatientRegistrationWidget::performRegistration()
 
 void FastPatientRegistrationWidget::mouseClickStateChanged()
 {
-	mMouseClickSample->isChecked();
+//	if(mMouseClickSample->isChecked())
+//		connect(mServices.visualizationService.get(), &VisualizationService::pointSampled, this, &FastPatientRegistrationWidget::pointSampled);
+//	else
+//		disconnect(mServices.visualizationService.get(), &VisualizationService::pointSampled, this, &FastPatientRegistrationWidget::pointSampled);
+}
+
+void FastPatientRegistrationWidget::pointSampled(Vector3D p_r)
+{
+	CX_LOG_DEBUG() << "FastPatientRegistrationWidget::pointSampled p_r: " << p_r;
 }
 
 }//namespace cx

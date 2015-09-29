@@ -91,6 +91,9 @@ public:
 
     ImagePtr getImageToDisplay();
 
+signals:
+	void pointSampled(Vector3D p_r);
+
 protected slots:
 	virtual void dataViewPropertiesChangedSlot(QString uid);
 
