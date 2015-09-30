@@ -134,15 +134,9 @@ bool AirwaysFilter::execute()
 	    fast::Segmentation::pointer segmentation = tubeExtraction->getOutputData<fast::Segmentation>(0);
 
 	    // Get the transformation of the segmentation
-	    // TODO transform coming out from fast is incorrect for some reason...
-	    std::cout << "FAST transform2:" << std::endl;
-	    fast::AffineTransformation T = fast::SceneGraph::getAffineTransformationFromData(segmentation);
-	    std::cout << T.matrix() << std::endl;
-	    std::cout << "CX transform:" << std::endl;
-	    mTransformation.matrix() = T.matrix().cast<double>();
-	    std::cout << mTransformation.translation() << std::endl;
-
-	    std::cout << "FINISHED CONVERTING SEGMENTATION TO VTK" << std::endl;
+	    Eigen::Affine3f T = fast::SceneGraph::getEigenAffineTransformationFromData(segmentation);
+	    mTransformation.matrix() = T.matrix().cast<double>(); // cast to double
+	    std::cout << mTransformation.matrix() << std::endl;
 
 		// TODO write vtk centerline to disk, and load it
 
@@ -195,7 +189,7 @@ bool AirwaysFilter::postProcess()
 			QColor("green")
 	);
 	// TODO fix this
-	//contour->get_rMd_History()->setRegistration(mTransformation);
+	contour->get_rMd_History()->setRegistration(mTransformation);
 
 	// Set output
 	mOutputTypes[1]->setValue(contour->getUid());
