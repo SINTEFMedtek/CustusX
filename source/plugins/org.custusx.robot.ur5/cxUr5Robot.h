@@ -46,6 +46,8 @@ signals:
     void stateUpdated();
     void connected();
     void disconnected();
+    void startTracking();
+    void stopTracking();
     void shuttingdown();
 
 private:
