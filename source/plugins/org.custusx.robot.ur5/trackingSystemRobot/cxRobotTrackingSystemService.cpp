@@ -102,19 +102,22 @@ void RobotTrackingSystemService::internalSetState(Tool::State state)
 void RobotTrackingSystemService::serverIsConnected()
 {
     this->internalSetState(Tool::tsINITIALIZED);
-    this->internalSetState(Tool::tsTRACKING);
 }
 
 void RobotTrackingSystemService::serverIsDisconnected()
 {
     this->internalSetState(Tool::tsCONFIGURED);
-    this->internalSetState(Tool::tsINITIALIZED);
 }
 
 void RobotTrackingSystemService::receiveTransform(QString devicename, Transform3D transform, double timestamp)
 {
+    if(mTimer==0 || timestamp>mTimer+tps)
+    {
     RobotToolPtr tool = this->getTool(devicename);
     tool->toolTransformAndTimestampSlot(transform,timestamp);
+    tool->tps((timestamp-mTimer)/tps);
+    mTimer = timestamp;
+    }
 }
 
 void RobotTrackingSystemService::configure()
