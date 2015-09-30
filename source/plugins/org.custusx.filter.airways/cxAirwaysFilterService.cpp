@@ -53,7 +53,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVisServices.h"
 // Test
 #include "FAST/Importers/ImageFileImporter.hpp"
+#include "FAST/Exporters/VTKImageExporter.hpp"
 #include "FAST/Algorithms/TubeSegmentationAndCenterlineExtraction/TubeSegmentationAndCenterlineExtraction.hpp"
+#include "FAST/Data/Segmentation.hpp"
+#include "FAST/SceneGraph.hpp"
 
 namespace cx {
 
@@ -88,6 +91,7 @@ bool AirwaysFilter::execute()
     ImagePtr input = this->getCopiedInputImage();
     	if (!input)
     		return false;
+    mInputImage = input;
 
 	std::string filename = (patientService()->getActivePatientFolder()+"/"+input->getFilename()).toStdString();
 
@@ -119,8 +123,28 @@ bool AirwaysFilter::execute()
 	    tubeExtraction->setSensitivity(getSensitivityOption(mOptions)->getValue());
 	    // TODO set blur amount..
 
-	    tubeExtraction->update(); // RUN
+	    // Convert fast segmentation data to VTK data which CX can use
+        vtkSmartPointer<fast::VTKImageExporter> vtkExporter = fast::VTKImageExporter::New();
+	    vtkExporter->setInputConnection(tubeExtraction->getSegmentationOutputPort());
+	    mSegmentationOutput = vtkExporter->GetOutput();
+	    vtkExporter->Update();
+	    std::cout << "FINISHED AIRWAY SEGMENTATION" << std::endl;
 
+	    // Get output segmentation data
+	    fast::Segmentation::pointer segmentation = tubeExtraction->getOutputData<fast::Segmentation>(0);
+
+	    // Get the transformation of the segmentation
+	    // TODO transform coming out from fast is incorrect for some reason...
+	    std::cout << "FAST transform2:" << std::endl;
+	    fast::AffineTransformation T = fast::SceneGraph::getAffineTransformationFromData(segmentation);
+	    std::cout << T.matrix() << std::endl;
+	    std::cout << "CX transform:" << std::endl;
+	    mTransformation.matrix() = T.matrix().cast<double>();
+	    std::cout << mTransformation.translation() << std::endl;
+
+	    std::cout << "FINISHED CONVERTING SEGMENTATION TO VTK" << std::endl;
+
+		// TODO write vtk centerline to disk, and load it
 
 	} catch(fast::Exception& e) {
 		std::string error = e.what();
@@ -136,7 +160,7 @@ bool AirwaysFilter::execute()
 
 		return false;
 	} catch (...){
-		reportError("Tube segmentation algorithm threw a unknown exception.");
+		reportError("Airway segmentation algorithm threw a unknown exception.");
 
 		return false;
 	}
@@ -145,8 +169,38 @@ bool AirwaysFilter::execute()
 
 bool AirwaysFilter::postProcess()
 {
+	if(!mSegmentationOutput)
+		return false;
 
-	// TODO populate the output data channels
+	std::cout << "POST PROCESS" << std::endl;
+
+	// Make contour of segmented volume
+	double threshold = 1; /// because the segmented image is 0..1
+	vtkPolyDataPtr rawContour = ContourFilter::execute(
+			mSegmentationOutput,
+			threshold,
+			false, // reduce resolution
+			true, // smoothing
+			true, // keep topology
+			0 // target decimation
+	);
+	//outputSegmentation->get_rMd_History()->setRegistration(rMd_i);
+	//patientService()->insertData(outputSegmentation);
+
+	// Add contour internally to cx
+	MeshPtr contour = ContourFilter::postProcess(
+			patientService(),
+			rawContour,
+			mInputImage,
+			QColor("green")
+	);
+	// TODO fix this
+	//contour->get_rMd_History()->setRegistration(mTransformation);
+
+	// Set output
+	mOutputTypes[1]->setValue(contour->getUid());
+
+	// TODO get centerline somehow
 
 	return true;
 }
@@ -163,7 +217,7 @@ void AirwaysFilter::createInputTypes()
 
 	temp = StringPropertySelectImage::New(patientService());
 	temp->setValueName("Input");
-	temp->setHelp("Select input to run Tube segmentation on.");
+	temp->setHelp("Select input to run airway segmentation on.");
 	mInputTypes.push_back(temp);
 }
 
@@ -183,59 +237,6 @@ void AirwaysFilter::createOutputTypes()
 	tempMeshStringAdapter->setHelp("Generated surface of the segmented volume.");
 	mOutputTypes.push_back(tempMeshStringAdapter);
 
-}
-
-vtkImageDataPtr AirwaysFilter::convertToVtkImageData(char * data, int size_x, int size_y, int size_z, ImagePtr input)
-{
-	if (!input)
-		return vtkImageDataPtr::New();
-
-	vtkImageDataPtr retval = this->importRawImageData((void*) data, size_x, size_y, size_z, input, VTK_UNSIGNED_CHAR);
-	return retval;
-}
-
-vtkImageDataPtr AirwaysFilter::convertToVtkImageData(float * data, int size_x, int size_y, int size_z, ImagePtr input)
-{
-	if (!input)
-		return vtkImageDataPtr::New();
-
-	vtkImageDataPtr retval = this->importRawImageData((void*) data, size_x, size_y, size_z, input, VTK_FLOAT);
-	return retval;
-}
-
-//From vtkType.h (on Ubuntu 12.04)
-//#define VTK_VOID            0
-//#define VTK_BIT             1
-//#define VTK_CHAR            2
-//#define VTK_SIGNED_CHAR    15
-//#define VTK_UNSIGNED_CHAR   3
-//#define VTK_SHORT           4
-//#define VTK_UNSIGNED_SHORT  5
-//#define VTK_INT             6
-//#define VTK_UNSIGNED_INT    7
-//#define VTK_LONG            8
-//#define VTK_UNSIGNED_LONG   9
-//#define VTK_FLOAT          10
-//#define VTK_DOUBLE         11
-//#define VTK_ID_TYPE        12
-vtkImageDataPtr AirwaysFilter::importRawImageData(void * data, int size_x, int size_y, int size_z, ImagePtr input, int type)
-{
-	vtkImageImportPtr imageImport = vtkImageImportPtr::New();
-
-	imageImport->SetWholeExtent(0, size_x - 1, 0, size_y - 1, 0, size_z - 1);
-	imageImport->SetDataExtentToWholeExtent();
-	imageImport->SetDataScalarType(type);
-	imageImport->SetNumberOfScalarComponents(1);
-	imageImport->SetDataSpacing(input->getBaseVtkImageData()->GetSpacing());
-	imageImport->SetImportVoidPointer(data);
-//	imageImport->GetOutput()->Update();
-	imageImport->Update();
-	imageImport->Modified();
-
-	vtkImageDataPtr retval = vtkImageDataPtr::New();
-	retval->DeepCopy(imageImport->GetOutput());
-
-	return retval;
 }
 
 MeshPtr AirwaysFilter::loadVtkFile(QString pathToFile, QString newDatasUid){

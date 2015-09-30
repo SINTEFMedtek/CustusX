@@ -46,14 +46,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxStringProperty.h"
 #include "cxBoolProperty.h"
 
-class TSFOutput;
 class ctkPluginContext;
 
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
 
 namespace cx {
-typedef boost::shared_ptr<class TSFPresets> TSFPresetsPtr;
 
 /**
  * Filter for segmenting and extract the centerline of a volume.
@@ -86,14 +84,14 @@ protected:
 	virtual void createOutputTypes();
 
 private:
-	vtkImageDataPtr convertToVtkImageData(char * data, int size_x, int size_y, int size_z, ImagePtr input); ///< converts a char array to a vtkImageDataPtr
-	vtkImageDataPtr convertToVtkImageData(float * data, int size_x, int size_y, int size_z, ImagePtr input); ///< converts a float array to a vtkImageDataPtr
-	vtkImageDataPtr importRawImageData(void * data, int size_x, int size_y, int size_z, ImagePtr input, int type); ///< converts a any array to a vtkImageDataPtr
 	MeshPtr loadVtkFile(QString pathToFile, QString newDatasUid); ///< loads a vtk file into CustusX
 
 
 	DoublePropertyPtr getSensitivityOption(QDomElement root);
 	DoublePropertyPtr getNoiseLevelOption(QDomElement root);
+	vtkImageDataPtr mSegmentationOutput;
+	Transform3D mTransformation;
+	ImagePtr mInputImage;
 
 };
 typedef boost::shared_ptr<class AirwaysFilter> AirwaysFilterPtr;
