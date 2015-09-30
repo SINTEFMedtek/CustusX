@@ -5,8 +5,8 @@ namespace cx
 
 Ur5Robot::Ur5Robot()
 {
-    connect(&mRTMonitor,SIGNAL(stateChanged()),this,SLOT(updateCurrentState()));
-    connect(&mSecMonitor,SIGNAL(stateChanged()),this,SLOT(updateCurrentState()));
+    connect(&mRTMonitor,&Ur5Connection::stateChanged,this,&Ur5Robot::updateCurrentState);
+    connect(&mSecMonitor,&Ur5Connection::stateChanged,this,&Ur5Robot::updateCurrentState);
 }
 
 Ur5Robot::~Ur5Robot()
@@ -172,7 +172,6 @@ void Ur5Robot::moveProgram(QString typeOfProgram,double acceleration,double velo
     mSecMonitor.runProgramQueue(mProgramEncoder.programQueue,mProgramEncoder.poseQueue);
     mRTMonitor.requestConnect();
 }
-
 
 
 } // cx
