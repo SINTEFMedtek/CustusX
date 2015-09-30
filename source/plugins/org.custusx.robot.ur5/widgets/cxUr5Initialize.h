@@ -20,11 +20,14 @@ public:
     Ur5InitializeTab(Ur5RobotPtr Ur5Robot,QWidget *parent = 0);
     virtual ~Ur5InitializeTab();
 
-protected slots:
+private slots:
     void connectButtonSlot();
     void initializeButtonSlot();
     void disconnectButtonSlot();
     void shutdownButtonSlot();
+
+    void startTrackingSlot();
+    void stopTrackingSlot();
 
 private:
     void setupUi(QWidget *parent);
