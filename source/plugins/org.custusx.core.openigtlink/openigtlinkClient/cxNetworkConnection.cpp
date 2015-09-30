@@ -205,6 +205,8 @@ void NetworkConnection::sendImage(ImagePtr image)
 {
 	QMutexLocker locker(&mMutex);
 
+//	image.reset(new Image("tmp", image->getGrayScaleVtkImageData()));
+
 	IGTLinkConversionImage imageConverter;
 	igtl::ImageMessage::Pointer msg = imageConverter.encode(image, mDialect->coordinateSystem());
 	msg->Pack();
@@ -212,7 +214,29 @@ void NetworkConnection::sendImage(ImagePtr image)
     int kb = mSocket->bytesToWrite()/1024;
     CX_LOG_CHANNEL_DEBUG("igtl_test") << "bytes to write pre write: " << kb << " kbyte";
 
-    write_send_info(msg);
+	QImage qimg((uchar*)image->getBaseVtkImageData()->GetScalarPointer(), 640, 1136, QImage::Format_RGB888);
+	CX_LOG_CHANNEL_DEBUG("CA") << "start saves";
+	CX_LOG_CHANNEL_DEBUG("CA") << "save png: " << qimg.save("/Users/christiana/dev/temp.png");
+	CX_LOG_CHANNEL_DEBUG("CA") << "saved png";
+	for (int i=0; i<=100; i+=10)
+		CX_LOG_CHANNEL_DEBUG("CA") << "save jpg: " << i << " success:" << qimg.save(QString("/Users/christiana/dev/temp%1.jpg").arg(i),"jpg", i);
+	CX_LOG_CHANNEL_DEBUG("CA") << "save bmp: " << qimg.save("/Users/christiana/dev/temp.bmp");
+
+	write_send_info(msg);
+	CX_LOG_CHANNEL_DEBUG("CA") << QString("start compress s=%2 (%3)").arg(msg->GetPackSize()/1024).arg(msg->GetPackSize());
+//	CX_LOG_CHANNEL_DEBUG("CA") << "start compress s=" << msg->GetPackSize()/1024;
+	QByteArray compressed = qCompress(reinterpret_cast<const uchar*>(msg->GetPackPointer()), msg->GetPackSize(), -1);
+	CX_LOG_CHANNEL_DEBUG("CA") << QString("  done compress %1: s=%2 (%3)").arg(-1).arg(compressed.size()/1024).arg(compressed.size());
+//	CX_LOG_CHANNEL_DEBUG("CA") << "done compress -1: s=" << compressed.size();
+	for (int i=0; i<10; ++i)
+	{
+		compressed = qCompress(reinterpret_cast<const uchar*>(msg->GetPackPointer()), msg->GetPackSize(), i);
+		CX_LOG_CHANNEL_DEBUG("CA") << QString("  done compress %1: s=%2 (%3)").arg(i).arg(compressed.size()/1024).arg(compressed.size());
+	}
+//	compressed = qCompress(reinterpret_cast<const uchar*>(msg->GetPackPointer()), msg->GetPackSize(), 9);
+//	CX_LOG_CHANNEL_DEBUG("CA") << "done compress 9: s=" << compressed.size()/1024;
+	CX_LOG_CHANNEL_DEBUG("CA") << "stop compress";
+
 	mSocket->write(reinterpret_cast<char*>(msg->GetPackPointer()), msg->GetPackSize());
 //    CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "Sent image: " << image->getName();
 }
