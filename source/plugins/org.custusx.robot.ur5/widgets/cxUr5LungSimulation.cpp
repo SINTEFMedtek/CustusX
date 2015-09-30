@@ -1,12 +1,20 @@
 #include "cxUr5LungSimulation.h"
 
-Ur5LungSimulation::Ur5LungSimulation()
+
+namespace cx
+{
+
+Ur5LungSimulationTab::Ur5LungSimulationTab(Ur5RobotPtr Ur5Robot,QWidget *parent) :
+    QWidget(parent),
+    mUr5Robot(Ur5Robot)
 {
 
 }
 
-Ur5LungSimulation::~Ur5LungSimulation()
+Ur5LungSimulationTab::~Ur5LungSimulationTab()
 {
 
 }
+
+} // cx
 
