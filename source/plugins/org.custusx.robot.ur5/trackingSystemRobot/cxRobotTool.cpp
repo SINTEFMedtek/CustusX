@@ -30,10 +30,6 @@ std::set<Tool::Type> RobotTool::determineTypesBasedOnUid(const QString uid) cons
 {
     std::set<Type> retval;
     retval.insert(TOOL_POINTER);
-    if(uid.contains("probe", Qt::CaseInsensitive))
-    {
-        retval.insert(TOOL_US_PROBE);
-    }
     return retval;
 }
 
@@ -120,27 +116,6 @@ void RobotTool::toolTransformAndTimestampSlot(Transform3D prMs, double timestamp
 
 void RobotTool::calculateTpsSlot()
 {
-    int tpsNr = 0;
-    size_t numberOfTransformsToCheck = ((mPositionHistory->size() >= 10) ? 10 : mPositionHistory->size());
-
-    if (numberOfTransformsToCheck <= 1)
-    {
-        emit tps(0);
-        return;
-    }
-
-    TimedTransformMap::reverse_iterator rit = mPositionHistory->rbegin();
-    double lastTransform = rit->first;
-    for (int i = 0; i < numberOfTransformsToCheck-1; ++i)
-    {
-        ++rit;
-    }
-    double firstTransform = rit->first;
-    double secondsPassed = (lastTransform - firstTransform) / 1000;
-
-    if (!similar(secondsPassed, 0))
-        tpsNr = (int) (numberOfTransformsToCheck / secondsPassed);
-    emit tps(tpsNr);
 }
 
 void RobotTool::createPolyData()
