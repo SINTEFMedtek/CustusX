@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "widgets/cxUr5Initialize.h"
 #include "widgets/cxUr5ManualMove.h"
 #include "widgets/cxUr5PlannedMove.h"
+#include "widgets/cxUr5LungSimulation.h"
 
 #include <QLabel>
 #include <QSlider>
@@ -73,7 +74,8 @@ void Ur5Widget::setupUi(QWidget *Ur5Widget)
     tabWidget->addTab(new Ur5InitializeTab(mUr5Robot), tr("Initialize"));
     tabWidget->addTab(new Ur5ManualMoveTab(mUr5Robot),tr("Manual movement"));
     tabWidget->addTab(new Ur5PlannedMoveTab(mUr5Robot),tr("Planned movement"));
-    tabWidget->addTab(new Ur5MiscInformationTab(mUr5Robot),tr("Misc information"));
+    tabWidget->addTab(new Ur5LungSimulationTab(mUr5Robot),tr("Lung simulation"));
+    //tabWidget->addTab(new Ur5MiscInformationTab(mUr5Robot),tr("Misc information"));
 
     QMetaObject::connectSlotsByName(Ur5Widget);
 }
