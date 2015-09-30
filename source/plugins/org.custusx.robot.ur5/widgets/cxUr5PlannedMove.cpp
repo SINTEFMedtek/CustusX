@@ -2,6 +2,7 @@
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QGroupBox>
 #include <QLabel>
 #include <QApplication>
 
@@ -16,7 +17,6 @@ Ur5PlannedMoveTab::Ur5PlannedMoveTab(Ur5RobotPtr Ur5Robot, QWidget *parent) :
     setupUi(this);
 
     connect(runVTKButton,SIGNAL(clicked()),this,SLOT(runVTKfileSlot()));
-    connect(goToOrigoButton,SIGNAL(clicked()),this,SLOT(goToOrigoButtonSlot()));
 }
 
 Ur5PlannedMoveTab::~Ur5PlannedMoveTab()
@@ -26,9 +26,21 @@ Ur5PlannedMoveTab::~Ur5PlannedMoveTab()
 
 void Ur5PlannedMoveTab::setupUi(QWidget *parent)
 {
-    QVBoxLayout *vertLayout = new QVBoxLayout(this);
-    vertLayout->setAlignment(Qt::AlignTop);
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    mainLayout->setAlignment(Qt::AlignTop);
+
+    setMoveVTKWidget(mainLayout);
+    setMoveSettingsWidget(mainLayout);
+}
+
+void Ur5PlannedMoveTab::setMoveVTKWidget(QVBoxLayout *parent)
+{
+    QGroupBox* group = new QGroupBox("Follow .vtk line");
+    group->setFlat(true);
+    parent->addWidget(group);
+
     QHBoxLayout *layout1 = new QHBoxLayout();
+    group->setLayout(layout1);
 
     vtkLineEdit = new QLineEdit();
     runVTKButton = new QPushButton();
@@ -42,42 +54,34 @@ void Ur5PlannedMoveTab::setupUi(QWidget *parent)
 
 
     vtkLineEdit->setText("C:\\artery_centerline_fixed_2.vtk");
+}
 
-    vertLayout->addLayout(layout1);
+void Ur5PlannedMoveTab::setMoveSettingsWidget(QVBoxLayout *parent)
+{
+    QGroupBox* group = new QGroupBox("Move settings");
+    group->setFlat(true);
+    parent->addWidget(group);
 
-    QFrame *line = new QFrame();
-    line->setFrameShape(QFrame::HLine);
-    line->setFrameShadow(QFrame::Sunken);
-    vertLayout->addWidget(line);
+    QGridLayout *velAccLayout = new QGridLayout();
+    group->setLayout(velAccLayout);
 
-    goToOrigoButton = new QPushButton();
-    goToOrigoButton->setText("Go to origo");
-    vertLayout->addWidget(goToOrigoButton);
+    velAccLayout->setSpacing(5);
+    velAccLayout->setMargin(5);
+    //velAccLayout->setContentsMargins(0,0,0,0);
 
-    QFrame *line1 = new QFrame();
-    line1->setFrameShape(QFrame::HLine);
-    line1->setFrameShadow(QFrame::Sunken);
-    vertLayout->addWidget(line1);
-
-    QGridLayout *mainLayout = new QGridLayout();
-
-    int row = 0;
     // Velocity
-    mainLayout->addWidget(new QLabel("Velocity"), row, 0, 1, 1);
+    velAccLayout->addWidget(new QLabel("Vel"), 0, 0, 1, 1);
     velocityLineEdit = new QLineEdit();
-    mainLayout->addWidget(velocityLineEdit, row, 1, 1, 1);
-    velocityLineEdit->setText(QApplication::translate("Ur5Widget", "0.05", 0));
-    mainLayout->addWidget(new QLabel("m/s"), row, 2, 1, 1);
+    velAccLayout->addWidget(velocityLineEdit, 0, 1, 1, 1);
+    velocityLineEdit->setText(QApplication::translate("Ur5Widget", "0.1", 0));
+    velAccLayout->addWidget(new QLabel("m/s"), 0, 2, 1, 1);
 
-    row++;
     // Acceleration
     accelerationLineEdit = new QLineEdit();
-    mainLayout->addWidget(accelerationLineEdit, row, 1, 1, 1);
-    accelerationLineEdit->setText(QApplication::translate("Ur5Widget", "0.1", 0));
-    mainLayout->addWidget(new QLabel("Acceleration"), row, 0, 1, 1);
-    mainLayout->addWidget(new QLabel("m/s^2"), row, 2, 1, 1);
-
-    vertLayout->addLayout(mainLayout);
+    velAccLayout->addWidget(accelerationLineEdit, 1, 1, 1, 1);
+    accelerationLineEdit->setText(QApplication::translate("Ur5Widget", "0.5", 0));
+    velAccLayout->addWidget(new QLabel("Acc"), 1, 0, 1, 1);
+    velAccLayout->addWidget(new QLabel("m/s^2"), 1, 2, 1, 1);
 }
 
 void Ur5PlannedMoveTab::runVTKfileSlot()

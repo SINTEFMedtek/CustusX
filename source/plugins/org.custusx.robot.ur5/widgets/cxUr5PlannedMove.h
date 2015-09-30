@@ -6,6 +6,8 @@
 
 #include <QPushButton>
 #include <QLineEdit>
+#include <QVBoxLayout>
+
 
 namespace cx
 {
@@ -17,7 +19,7 @@ public:
     Ur5PlannedMoveTab(Ur5RobotPtr Ur5Robot, QWidget *parent = 0);
     virtual ~Ur5PlannedMoveTab();
 
-    QPushButton *runVTKButton,*goToOrigoButton;
+    QPushButton *runVTKButton;
     QLineEdit *vtkLineEdit;
 
     QLineEdit *accelerationLineEdit, *velocityLineEdit, *timeLineEdit;
@@ -29,6 +31,9 @@ protected slots:
 private:
     void setupUi(QWidget *parent);
     Ur5RobotPtr mUr5Robot;
+
+    void setMoveVTKWidget(QVBoxLayout *parent);
+    void setMoveSettingsWidget(QVBoxLayout *parent);
 };
 
 } // cx
