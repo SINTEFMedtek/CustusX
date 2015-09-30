@@ -59,55 +59,67 @@ void Ur5ManualMoveTab::setMoveToolLayout(QVBoxLayout *parent)
     keyLayout->setMargin(0);
     keyLayout->setContentsMargins(0,0,0,0);
 
-    posZButton = new QPushButton(QIcon("/icons/arrow-up-double.png"),"");
-    negZButton = new QPushButton(QIcon("/icons/arrow-down-double.png"),"");
-    posXButton = new QPushButton(QIcon("/icons/arrow-up.png"),"");
-    negXButton = new QPushButton(QIcon("/icons/arrow-down.png"),"");
-    posYButton = new QPushButton(QIcon("/icons/arrow-left.png"),"");
-    negYButton = new QPushButton(QIcon("/icons/arrow-right.png"),"");
+    posZButton = new QPushButton(tr("+z")); //QIcon("/icons/arrow-up-double.png"),"");
+    negZButton = new QPushButton(tr("-z")); //QIcon("/icons/arrow-down-double.png"),"");
+    posXButton = new QPushButton("+x"); //QIcon("/icons/arrow-up.png"),"");
+    negXButton = new QPushButton("-x"); //QIcon("/icons/arrow-down.png"),"");
+    posYButton = new QPushButton("+y"); //QIcon("/icons/arrow-left.png"),"");
+    negYButton = new QPushButton(tr("-y")); // QIcon("/icons/arrow-right.png"),"");
 
     posZButton->setAutoRepeat(true);
     posZButton->setToolTip("Move in positive Z direction");
+    posZButton->setMaximumWidth(32);
 
     negZButton->setAutoRepeat(true);
     negZButton->setToolTip("Move in negative Z direction");
+    negZButton->setMaximumWidth(32);
 
     posXButton->setAutoRepeat(true);
     posXButton->setToolTip("Move in positive Y direction");
+    posXButton->setMaximumWidth(32);
 
     negXButton->setAutoRepeat(true);
     negXButton->setToolTip("Move in negative Y direction");
+    negXButton->setMaximumWidth(32);
 
     posYButton->setAutoRepeat(true);
     posYButton->setToolTip("Move in positive X direction");
+    posYButton->setMaximumWidth(32);
 
     negYButton->setAutoRepeat(true);
     negYButton->setToolTip("Move in negative X direction");
+    negYButton->setMaximumWidth(32);
 
-    rotPosXButton = new QPushButton(QIcon("/icons/edit-redo-7.ico"),"");
-    rotNegXButton = new QPushButton(QIcon("/icons/edit-undo-7.ico"),"");
-    rotPosYButton = new QPushButton(QIcon("/icons/arrow-up.png"),"");
-    rotNegYButton = new QPushButton(QIcon("/icons/arrow-down.png"),"");
-    rotPosZButton = new QPushButton(QIcon("/icons/arrow-right.png"),"");
-    rotNegZButton = new QPushButton(QIcon("/icons/arrow-left.png"),"");
+    rotPosXButton = new QPushButton(tr("+rx"));
+    rotNegXButton = new QPushButton(tr("-rx"));
+    rotPosYButton = new QPushButton(tr("+ry"));
+    rotNegYButton = new QPushButton(tr("-ry"));
+    rotPosZButton = new QPushButton(tr("+rz"));
+    rotNegZButton = new QPushButton(tr("-rz"));
 
     rotPosXButton->setAutoRepeat(true);
     rotPosXButton->setToolTip("Rotate counter-clockwise around X axis");
+    rotPosXButton->setMaximumWidth(32);
 
     rotNegXButton->setAutoRepeat(true);
     rotNegXButton->setToolTip("Rotate clockwise around X axis");
+    rotNegXButton->setMaximumWidth(32);
 
     rotPosYButton->setAutoRepeat(true);
     rotPosYButton->setToolTip("Rotate counter-clockwise around Y axis");
+    rotPosYButton->setMaximumWidth(32);
 
     rotNegYButton->setAutoRepeat(true);
     rotNegYButton->setToolTip("Rotate clockwise around Y axis");
+    rotNegYButton->setMaximumWidth(32);
 
     rotPosZButton->setAutoRepeat(true);
     rotPosZButton->setToolTip("Rotate counter-clockwise around Z axis");
+    rotPosZButton->setMaximumWidth(32);
 
     rotNegZButton->setAutoRepeat(true);
     rotNegZButton->setToolTip("Rotate clockwise around Z axis");
+    rotNegZButton->setMaximumWidth(32);
 
     int krow=0;
     keyLayout->addWidget(posZButton, krow, 0, 1, 1,Qt::AlignBottom);
@@ -137,19 +149,8 @@ void Ur5ManualMoveTab::setMoveToolLayout(QVBoxLayout *parent)
     krow++;
     keyLayout->addWidget(rotNegYButton,krow,1,1,1,Qt::AlignTop);
 
-    posZButton->setIconSize(QSize(32, 32));
     posZButton->setToolTip("Move in positive Z direction");
-
-    negZButton->setIconSize(QSize(32, 32));
     negZButton->setToolTip("Move in negative Z direction");
-
-    posXButton->setIconSize(QSize(32, 32));
-
-    negYButton->setIconSize(QSize(32, 32));
-
-    posYButton->setIconSize(QSize(32, 32));
-
-    negXButton->setIconSize(QSize(32, 32));
 
     // Style sheet for buttons
 //    posXButton->setStyleSheet("border:none");
@@ -159,16 +160,16 @@ void Ur5ManualMoveTab::setMoveToolLayout(QVBoxLayout *parent)
 //    posZButton->setStyleSheet("border:none");
 //    negZButton->setStyleSheet("border:none");
 
-    rotPosZButton->setIconSize(QSize(32, 32));
+    //rotPosZButton->setIconSize(QSize(32, 32));
     rotPosZButton->setToolTip("Move in rotPositive Z direction");
 
-    rotNegZButton->setIconSize(QSize(32, 32));
+    //rotNegZButton->setIconSize(QSize(32, 32));
     rotNegZButton->setToolTip("Move in rotNegative Z direction");
 
-    rotPosXButton->setIconSize(QSize(32, 32));
-    rotNegYButton->setIconSize(QSize(32, 32));
-    rotPosYButton->setIconSize(QSize(32, 32));
-    rotNegXButton->setIconSize(QSize(32, 32));
+//    rotPosXButton->setIconSize(QSize(32, 32));
+//    rotNegYButton->setIconSize(QSize(32, 32));
+//    rotPosYButton->setIconSize(QSize(32, 32));
+//    rotNegXButton->setIconSize(QSize(32, 32));
 
     // Style sheet for buttons
 //    rotPosXButton->setStyleSheet("border:none");
@@ -283,54 +284,66 @@ void Ur5ManualMoveTab::setJointMoveWidget(QVBoxLayout *parent)
     coordInfoLayout->setSpacing(5);
     coordInfoLayout->setMargin(5);
 
-    q1PosButton = new QPushButton(QIcon("/icons/arrow-right.png"),"");
-    q1NegButton = new QPushButton(QIcon("/icons/arrow-left.png"),"");
-    q2PosButton = new QPushButton(QIcon("/icons/arrow-right.png"),"");
-    q2NegButton = new QPushButton(QIcon("/icons/arrow-left.png"),"");
-    q3PosButton = new QPushButton(QIcon("/icons/arrow-right.png"),"");
-    q3NegButton = new QPushButton(QIcon("/icons/arrow-left.png"),"");
-    q4PosButton = new QPushButton(QIcon("/icons/arrow-right.png"),"");
-    q4NegButton = new QPushButton(QIcon("/icons/arrow-left.png"),"");
-    q5PosButton = new QPushButton(QIcon("/icons/arrow-right.png"),"");
-    q5NegButton = new QPushButton(QIcon("/icons/arrow-left.png"),"");
-    q6PosButton = new QPushButton(QIcon("/icons/arrow-right.png"),"");
-    q6NegButton = new QPushButton(QIcon("/icons/arrow-left.png"),"");
+    q1PosButton = new QPushButton(tr("+"));
+    q1NegButton = new QPushButton(tr("-"));
+    q2PosButton = new QPushButton(tr("+"));
+    q2NegButton = new QPushButton(tr("-"));
+    q3PosButton = new QPushButton(tr("+"));
+    q3NegButton = new QPushButton(tr("-"));
+    q4PosButton = new QPushButton(tr("+"));
+    q4NegButton = new QPushButton(tr("-"));
+    q5PosButton = new QPushButton(tr("+"));
+    q5NegButton = new QPushButton(tr("-"));
+    q6PosButton = new QPushButton(tr("+"));
+    q6NegButton = new QPushButton(tr("-"));
 
     q1PosButton->setAutoRepeat(true);
     q1PosButton->setToolTip("Move in positive Z direction");
+    q1PosButton->setMaximumWidth(32);
 
     q2PosButton->setAutoRepeat(true);
     q2PosButton->setToolTip("Move in negative Z direction");
+    q2PosButton->setMaximumWidth(32);
 
     q3PosButton->setAutoRepeat(true);
     q3PosButton->setToolTip("Move in positive Y direction");
+    q3PosButton->setMaximumWidth(32);
 
     q4PosButton->setAutoRepeat(true);
     q4PosButton->setToolTip("Move in negative Y direction");
+    q4PosButton->setMaximumWidth(32);
 
     q5PosButton->setAutoRepeat(true);
     q5PosButton->setToolTip("Move in positive X direction");
+    q5PosButton->setMaximumWidth(32);
 
     q6PosButton->setAutoRepeat(true);
     q6PosButton->setToolTip("Move in negative X direction");
+    q6PosButton->setMaximumWidth(32);
 
     q1NegButton->setAutoRepeat(true);
     q1NegButton->setToolTip("Move in positive Z direction");
+    q1NegButton->setMaximumWidth(32);
 
     q2NegButton->setAutoRepeat(true);
     q2NegButton->setToolTip("Move in negative Z direction");
+    q2NegButton->setMaximumWidth(32);
 
     q3NegButton->setAutoRepeat(true);
     q3NegButton->setToolTip("Move in positive Y direction");
+    q3NegButton->setMaximumWidth(32);
 
     q4NegButton->setAutoRepeat(true);
     q4NegButton->setToolTip("Move in negative Y direction");
+    q4NegButton->setMaximumWidth(32);
 
     q5NegButton->setAutoRepeat(true);
     q5NegButton->setToolTip("Move in positive X direction");
+    q5NegButton->setMaximumWidth(32);
 
     q6NegButton->setAutoRepeat(true);
     q6NegButton->setToolTip("Move in negative X direction");
+    q6NegButton->setMaximumWidth(32);
 
     q1LineEdit = new QLineEdit();
     q2LineEdit = new QLineEdit();
@@ -619,5 +632,6 @@ void Ur5ManualMoveTab::q6NegButtonPressed()
 {
     jointButtonPressed(5,-1);
 }
+
 
 } // cx
