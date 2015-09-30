@@ -60,6 +60,8 @@ private:
     ToolPtr mReference;
 
     Ur5RobotPtr mUr5Robot;
+    double mTimer;
+    double tps = 0.1;
 };
 
 } /* namespace cx */
