@@ -18,14 +18,14 @@ std::vector<ToolPtr> toVector(std::map<QString, RobotToolPtr> map)
 
 RobotTrackingSystemService::RobotTrackingSystemService(Ur5RobotPtr robot) :
     mState(Tool::tsNONE),
+    mTimer(0),
     mUr5Robot(robot)
 {
     if(robot == NULL)
         return;
 
-    connect(mUr5Robot.get(), &Ur5Robot::connected, this, &RobotTrackingSystemService::serverIsConnected);
-    connect(mUr5Robot.get(), &Ur5Robot::disconnected, this, &RobotTrackingSystemService::serverIsDisconnected);
-    connect(mUr5Robot.get(), &Ur5Robot::transform, this, &RobotTrackingSystemService::receiveTransform);
+    connect(mUr5Robot.get(), &Ur5Robot::startTracking, this, &RobotTrackingSystemService::startTracking);
+    connect(mUr5Robot.get(), &Ur5Robot::stopTracking, this, &RobotTrackingSystemService::stopTracking);
 }
 
 RobotTrackingSystemService::~RobotTrackingSystemService()
@@ -65,12 +65,15 @@ void RobotTrackingSystemService::setState(const Tool::State val)
 
 void RobotTrackingSystemService::startTracking()
 {
-    emit connectToServer();
+    this->configure();
+    this->internalSetState(Tool::tsTRACKING);
+    connect(mUr5Robot.get(), &Ur5Robot::transform, this, &RobotTrackingSystemService::receiveTransform);
 }
 
 void RobotTrackingSystemService::stopTracking()
 {
-    emit disconnectFromServer();
+    disconnect(mUr5Robot.get(), &Ur5Robot::transform, this, &RobotTrackingSystemService::receiveTransform);
+    this->deconfigure();
 }
 
 std::vector<ToolPtr> RobotTrackingSystemService::getTools()
