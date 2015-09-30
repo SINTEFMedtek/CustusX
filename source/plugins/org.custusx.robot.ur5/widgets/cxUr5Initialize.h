@@ -5,6 +5,7 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QComboBox>
+#include <QVBoxLayout>
 
 #include "cxUr5Robot.h"
 
@@ -36,7 +37,10 @@ private:
     QLineEdit *ipLineEdit, *manualCoordinatesLineEdit;
     QPushButton *connectButton, *disconnectButton, *initializeButton, *initializeButton_2, *shutdownButton;
     QComboBox *presetOrigoComboBox;
+    QPushButton *startTrackingButton, *stopTrackingButton;
 
+    void setRobotConnectionLayout(QVBoxLayout *parent);
+    void setRobotTrackingLayout(QVBoxLayout *parent);
 };
 
 } // cx
