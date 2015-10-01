@@ -29,53 +29,50 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#include "cxMeshInView.h"
 
-#ifndef CXRMPCPLUGINACTIVATOR_H
-#define CXRMPCPLUGINACTIVATOR_H
-
-#include "org_custusx_registration_method_pointcloud_Export.h"
-
-#include <ctkPluginActivator.h>
-#include "boost/shared_ptr.hpp"
+#include "cxMesh.h"
+#include "cxGeometricRep.h"
+#include "cxViewService.h"
+#include "cxView.h"
+#include "cxLogger.h"
 
 namespace cx
 {
-/**
- * \defgroup org_custusx_registration_method_pointcloud
- * \ingroup cx_plugins
- *
- */
 
-typedef boost::shared_ptr<class DicomGUIExtenderService> DicomGUIExtenderServicePtr;
-typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
-
-/**
- * Activator for the pointcloud registration plugin
- *
- * \ingroup org_custusx_registration_method_pointcloud
- *
- * \date 2015-09-06
- * \author Christian Askeland
- */
-class org_custusx_registration_method_pointcloud_EXPORT RMPCPluginActivator :  public QObject, public ctkPluginActivator
+MeshInView::MeshInView(ViewServicePtr viewService) : mViewService(viewService)
 {
-  Q_OBJECT
-  Q_INTERFACES(ctkPluginActivator)
-  Q_PLUGIN_METADATA(IID "org_custusx_registration_method_pointcloud")
 
-public:
+}
+MeshInView::~MeshInView()
+{
+	this->hide();
+}
 
-  RMPCPluginActivator();
-  ~RMPCPluginActivator();
+void MeshInView::show(vtkPolyDataPtr polyData)
+{
+	if (!mRep)
+	{
+		MeshPtr mesh(new Mesh("mesh", "mesh"));
+		mesh->setColor(QColor("cornflowerblue"));
 
-  void start(ctkPluginContext* context);
-  void stop(ctkPluginContext* context);
+		mRep = GeometricRep::New();
+		mRep->setMesh(mesh);
 
-private:
-  RegisteredServicePtr mPointCloud;
-  RegisteredServicePtr mPointerToSurface;
-};
+		ViewPtr view = mViewService->get3DView();
+		if (view)
+			view->addRep(mRep);
+	}
+
+	mRep->getMesh()->setVtkPolyData(polyData);
+}
+
+void MeshInView::hide()
+{
+	ViewPtr view = mViewService->get3DView();
+	if (view)
+		view->removeRep(mRep);
+	mRep.reset();
+}
 
 } // namespace cx
-
-#endif // CXRMPCPLUGINACTIVATOR_H

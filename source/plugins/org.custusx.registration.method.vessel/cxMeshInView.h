@@ -29,53 +29,34 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXMESHINVIEW_H
+#define CXMESHINVIEW_H
 
-#ifndef CXRMPCPLUGINACTIVATOR_H
-#define CXRMPCPLUGINACTIVATOR_H
-
-#include "org_custusx_registration_method_pointcloud_Export.h"
-
-#include <ctkPluginActivator.h>
-#include "boost/shared_ptr.hpp"
+#include "cxForwardDeclarations.h"
+#include "org_custusx_registration_method_vessel_Export.h"
 
 namespace cx
 {
-/**
- * \defgroup org_custusx_registration_method_pointcloud
- * \ingroup cx_plugins
- *
- */
 
-typedef boost::shared_ptr<class DicomGUIExtenderService> DicomGUIExtenderServicePtr;
-typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
+typedef boost::shared_ptr<class MeshInView> MeshInViewPtr;
 
 /**
- * Activator for the pointcloud registration plugin
- *
- * \ingroup org_custusx_registration_method_pointcloud
- *
- * \date 2015-09-06
- * \author Christian Askeland
+ * Display a mesh or polydata in the main 3D view.
  */
-class org_custusx_registration_method_pointcloud_EXPORT RMPCPluginActivator :  public QObject, public ctkPluginActivator
+class org_custusx_registration_method_vessel_EXPORT MeshInView
 {
-  Q_OBJECT
-  Q_INTERFACES(ctkPluginActivator)
-  Q_PLUGIN_METADATA(IID "org_custusx_registration_method_pointcloud")
-
 public:
-
-  RMPCPluginActivator();
-  ~RMPCPluginActivator();
-
-  void start(ctkPluginContext* context);
-  void stop(ctkPluginContext* context);
+	MeshInView(ViewServicePtr viewService);
+	~MeshInView();
+	void show(vtkPolyDataPtr polyData);
+	void hide();
 
 private:
-  RegisteredServicePtr mPointCloud;
-  RegisteredServicePtr mPointerToSurface;
+	GeometricRepPtr mRep;
+	ViewServicePtr mViewService;
 };
 
 } // namespace cx
 
-#endif // CXRMPCPLUGINACTIVATOR_H
+
+#endif // CXMESHINVIEW_H

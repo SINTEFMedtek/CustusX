@@ -72,9 +72,22 @@ BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegServices servi
 	RegistrationBaseWidget(services, parent, "org_custusx_registration_method_bronchoscopy_widget",
 						   "Bronchoscopy Registration"),
 	mBronchoscopyRegistration(new BronchoscopyRegistration()),
-	mServices(services)
+	mServices(services),
+	mRecordTrackingWidget(NULL)
 {
 	mVerticalLayout = new QVBoxLayout(this);
+}
+
+void BronchoscopyRegistrationWidget::prePaintEvent()
+{
+	if (!mRecordTrackingWidget)
+	{
+		this->setup();
+	}
+}
+
+void BronchoscopyRegistrationWidget::setup()
+{
 	mOptions = profile()->getXmlSettings().descend("bronchoscopyregistrationwidget");
 
 	mSelectMeshWidget = StringPropertySelectMesh::New(mServices.patientModelService);
@@ -90,7 +103,10 @@ BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegServices servi
 	connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
 	mRegisterButton->setToolTip(this->defaultWhatsThis());
 
-	mRecordTrackingWidget = new RecordTrackingWidget(mOptions.descend("recordTracker"), mServices.acquisitionService, mServices, this);
+	mRecordTrackingWidget = new RecordTrackingWidget(mOptions.descend("recordTracker"),
+													 mServices.acquisitionService, mServices,
+													 "bronc_path",
+													 this);
 	mRecordTrackingWidget->getSessionSelector()->setHelp("Select bronchoscope path for registration");
 	mRecordTrackingWidget->getSessionSelector()->setDisplayName("Bronchoscope path");
 
@@ -187,7 +203,7 @@ void BronchoscopyRegistrationWidget::registerSlot()
         for (int i = 0; i < 4; i++)
             std::cout << display_rMpr.row(i) << std::endl;
 
-	mRecordTrackingWidget->ShowLastRecordingInView();
+//	mRecordTrackingWidget->showSelectedRecordingInView();
 
 }
 

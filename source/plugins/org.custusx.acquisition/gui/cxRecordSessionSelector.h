@@ -29,71 +29,76 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXRMPCFROMPOINTERWIDGET_H
-#define CXRMPCFROMPOINTERWIDGET_H
+#ifndef CXRECORDSESSIONSELECTOR_H_
+#define CXRECORDSESSIONSELECTOR_H_
 
 #include <QPushButton>
 #include <QDomElement>
-#include "cxRegistrationBaseWidget.h"
 #include "cxForwardDeclarations.h"
 #include "cxXmlOptionItem.h"
-#include "cxICPRegistrationBaseWidget.h"
+#include "cxTool.h"
+#include "cxVisServices.h"
+#include "org_custusx_acquisition_Export.h"
 
 namespace cx
 {
 class WidgetObscuredListener;
-class RecordTrackingWidget;
-class ICPWidget;
 typedef boost::shared_ptr<class Acquisition> AcquisitionPtr;
 typedef boost::shared_ptr<class StringPropertySelectMesh> StringPropertySelectMeshPtr;
 typedef boost::shared_ptr<class ToolRep3D> ToolRep3DPtr;
-typedef boost::shared_ptr<class RecordSessionWidget> RecordSessionWidgetPtr;
+typedef boost::shared_ptr<class RecordSession> RecordSessionPtr;
+class RecordSessionWidget;
 typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
 //typedef boost::shared_ptr<class BronchoscopyRegistration> BronchoscopyRegistrationPtr;
 typedef std::map<QString, ToolPtr> ToolMap;
 typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
-typedef boost::shared_ptr<class SeansVesselReg> SeansVesselRegPtr;
-typedef boost::shared_ptr<class MeshInView> MeshInViewPtr;
-typedef boost::shared_ptr<class SpaceListener> SpaceListenerPtr;
+typedef boost::shared_ptr<class SelectRecordSession> SelectRecordSessionPtr;
 
 /**
  *
- * \brief Register a point cloud to a surface
+ * Wrap a SessionSelector, always show tracking data in 3D view for that session,
+ * for a given tool.
  *
- * \date 2015-09-06
+ * \date 2015-09-10
  * \author Christian Askeland
  */
-class RMPCFromPointerWidget: public ICPRegistrationBaseWidget
+class org_custusx_acquisition_EXPORT SelectRecordSession: public QObject
 {
 	Q_OBJECT
 
 public:
-	RMPCFromPointerWidget(RegServices services, QWidget *parent);
-	virtual ~RMPCFromPointerWidget() {}
-	virtual QString defaultWhatsThis() const;
+	SelectRecordSession(XmlOptionFile options,
+						 AcquisitionServicePtr acquisitionService,
+						 VisServices services);
+	virtual ~SelectRecordSession()	{}
 
-protected:
-	virtual void initializeRegistrator();
-	virtual void inputChanged();
-	virtual void applyRegistration(Transform3D delta);
-	virtual void onShown();
-	virtual void setup();
+	void setTool(ToolPtr tool);
+	ToolPtr getTool();
+	TimedTransformMap getRecordedTrackerData_prMt();
+	StringPropertyPtr getSessionSelector() { return mSessionSelector; }
 
-	virtual double getDefaultAutoLTS() const { return false; }
+private slots:
 
+	void recordedSessionsChanged();
 private:
-	void queuedAutoRegistration();
-	void connectAutoRegistration();
-	MeshPtr getTrackerDataAsMesh();
-	QVBoxLayout* createVBoxInGroupBox(QVBoxLayout* parent, QString header);
+	VisServices mServices;
+	AcquisitionServicePtr mAcquisitionService;
+	XmlOptionFile mOptions;
+	ToolPtr mCurrentTracedTool;
 
-	StringPropertyBasePtr mFixedImage;
-	RecordTrackingWidget* mRecordTrackingWidget;
+	StringPropertyPtr mSessionSelector;
+	ToolPtr mToolOverride;
 
-	SpaceListenerPtr mSpaceListenerMoving;
-	SpaceListenerPtr mSpaceListenerFixed;
+	void initSessionSelector();
+	ToolRep3DPtr getToolRepIn3DView(ToolPtr tool);
+	void showSelectedRecordingInView();
+	void clearTracer();
+	RecordSessionPtr getSession();
+	void warnIfNoTrackingDataInSession();
+	ToolPtr findToolContainingMostDataForSession(std::map<QString,ToolPtr> tools, RecordSessionPtr session);
 };
 
 } //namespace cx
 
-#endif // CXRMPCFROMPOINTERWIDGET_H
+
+#endif // CXRECORDSESSIONSELECTOR_H_

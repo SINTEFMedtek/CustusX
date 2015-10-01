@@ -74,10 +74,15 @@ public:
 	{
 	}
 	virtual QString defaultWhatsThis() const;
+
+protected:
+	virtual void prePaintEvent();
 private slots:
 	void processCenterlineSlot();
 	void registerSlot();
 private:
+	void setup();
+
 	RegServices mServices;
 	QVBoxLayout* mVerticalLayout;
 	BoolPropertyPtr mUseLocalRegistration;

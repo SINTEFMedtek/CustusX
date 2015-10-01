@@ -114,15 +114,16 @@ void USSavingRecorderFixture::addVideoSource(int width, int height)
 
 void USSavingRecorderFixture::startRecord()
 {
-	double start = QDateTime::currentMSecsSinceEpoch();
-	QString uid = QDateTime::currentDateTime().toString(cx::timestampSecondsFormat());
-	mSession.reset(new cx::RecordSession(uid, start, start, "session_0"));
+//	double start = QDateTime::currentMSecsSinceEpoch();
+//	QString uid = QDateTime::currentDateTime().toString(cx::timestampSecondsFormat());
+	mSession.reset(new cx::RecordSession(0, "session"));
+	mSession->startNewInterval();
 	mRecorder->startRecord(mSession, mTool, mVideo);
 }
 
 void USSavingRecorderFixture::stopRecord()
 {
-	mSession->setStopTime(QDateTime::currentMSecsSinceEpoch());
+	mSession->stopLastInterval();
 	mRecorder->stopRecord();
 }
 
@@ -167,7 +168,9 @@ void USSavingRecorderFixture::dataSaved(QString filename)
 void USSavingRecorderFixture::verifyMemData(QString uid)
 {
 	cx::USReconstructInputData data = mRecorder->getDataForStream(uid);
-	double duration = mSession->getStopTime() - mSession->getStartTime();
+	REQUIRE(mSession->getIntervalCount());
+	double duration = mSession->getInterval(0).first.msecsTo(mSession->getInterval(0).second);
+//	double duration = mSession->getStopTime() - mSession->getStartTime();
 	int minFPS = 10;
 
 	CX_LOG_CHANNEL_INFO("test.acquisition") << "filename " << data.mFilename;
