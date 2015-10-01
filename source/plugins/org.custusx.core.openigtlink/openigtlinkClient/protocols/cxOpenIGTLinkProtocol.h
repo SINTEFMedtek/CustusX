@@ -27,6 +27,9 @@ public:
 
     virtual bool readyToReceiveData();
 
+    virtual void encode(ImagePtr image, char *pointer, int size);
+    virtual void encode(MeshPtr data, char *pointer, int size);
+
     virtual void translate(const igtl::MessageHeader::Pointer &header, const igtl::MessageBase::Pointer &body);
     virtual void translate(const igtl::TransformMessage::Pointer body);
     virtual void translate(const igtl::ImageMessage::Pointer body);

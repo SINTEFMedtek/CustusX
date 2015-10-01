@@ -36,13 +36,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTime.h"
 #include <QThread>
 
+#include "cxProtocol.h"
 #include "cxOpenIGTLinkProtocol.h"
 #include "cxPlusProtocol.h"
 #include "cxCustusProtocol.h"
 #include "cxRASProtocol.h"
-#include "igtl_header.h"
-#include "cxIGTLinkConversionImage.h"
-#include "cxIGTLinkConversionPolyData.h"
+
 #include "cxXmlOptionItem.h"
 #include "cxProfile.h"
 #include "cxStringProperty.h"
@@ -65,9 +64,8 @@ NetworkConnection::NetworkConnection(QString uid, QObject *parent) :
 
 	ConnectionInfo info = this->getConnectionInfo();
 
-    info.protocol = this->initProtocol(ProtocolPtr(new CustusProtocol()))->getName();
-
     //TODO move to the correct plugin init
+    info.protocol = this->initProtocol(ProtocolPtr(new CustusProtocol()))->getName();
     this->initProtocol(ProtocolPtr(new PlusProtocol()));
     this->initProtocol(ProtocolPtr(new OpenIGTLinkProtocol()));
     this->initProtocol(ProtocolPtr(new RASProtocol()));
@@ -158,25 +156,23 @@ void NetworkConnection::setProtocol(QString protocolname)
 void NetworkConnection::sendMessage(ImagePtr image)
 {
 	QMutexLocker locker(&mMutex);
+    char *pointer = NULL;
+    int size = 0;
 
-	IGTLinkConversionImage imageConverter;
-    igtl::ImageMessage::Pointer msg = imageConverter.encode(image, mProtocol->coordinateSystem());
-	CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "Sending image: " << image->getName();
-	msg->Pack();
+    mProtocol->encode(image, pointer, size);
 
-	mSocket->write(reinterpret_cast<char*>(msg->GetPackPointer()), msg->GetPackSize());
+    mSocket->write(pointer, size);
 }
 
-void NetworkConnection::sendMessage(MeshPtr data)
+void NetworkConnection::sendMessage(MeshPtr mesh)
 {
 	QMutexLocker locker(&mMutex);
+    char *pointer = NULL;
+    int size = 0;
 
-	IGTLinkConversionPolyData polyConverter;
-    igtl::PolyDataMessage::Pointer msg = polyConverter.encode(data, mProtocol->coordinateSystem());
-	CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "Sending mesh: " << data->getName();
-	msg->Pack();
+    mProtocol->encode(mesh, pointer, size);
 
-	mSocket->write(reinterpret_cast<char*>(msg->GetPackPointer()), msg->GetPackSize());
+    mSocket->write(pointer, size);
 }
 
 void NetworkConnection::internalDataAvailable()
@@ -195,10 +191,6 @@ void NetworkConnection::internalDataAvailable()
             //CX_LOG_DEBUG() << "B";
             pack->notifyDataArrived();
             done = true;
-        }
-        else
-        {
-            cx::sleep_ms(100);
         }
     }
     //CX_LOG_DEBUG() << "END receive";

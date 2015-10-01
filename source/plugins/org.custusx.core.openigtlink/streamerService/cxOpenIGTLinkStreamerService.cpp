@@ -47,8 +47,8 @@ OpenIGTLinkStreamerService::OpenIGTLinkStreamerService(NetworkConnectionHandlePt
 	connect(client, &NetworkConnection::disconnected, mStreamer.get(), &OpenIGTLinkStreamer::receivedDisconnected);
 	connect(client, &NetworkConnection::error, mStreamer.get(), &OpenIGTLinkStreamer::receivedError);
 	connect(client, &NetworkConnection::image, mStreamer.get(), &OpenIGTLinkStreamer::receivedImage);
-	connect(client, &NetworkConnection::usstatusmessage, mStreamer.get(), &OpenIGTLinkStreamer::receivedUSStatusMessage);
-	connect(client, &NetworkConnection::igtlimage, mStreamer.get(), &OpenIGTLinkStreamer::receiveIgtlImage);
+//	connect(client, &NetworkConnection::usstatusmessage, mStreamer.get(), &OpenIGTLinkStreamer::receivedUSStatusMessage);
+//	connect(client, &NetworkConnection::igtlimage, mStreamer.get(), &OpenIGTLinkStreamer::receiveIgtlImage);
 }
 
 OpenIGTLinkStreamerService::~OpenIGTLinkStreamerService()

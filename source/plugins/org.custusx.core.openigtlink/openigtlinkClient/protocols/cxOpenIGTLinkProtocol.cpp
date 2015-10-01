@@ -27,6 +27,26 @@ bool OpenIGTLinkProtocol::readyToReceiveData()
     return mReadyToReceive && mPack->isFinishedWith();
 }
 
+void OpenIGTLinkProtocol::encode(ImagePtr image, char *pointer, int size)
+{
+    IGTLinkConversionImage imageConverter;
+    igtl::ImageMessage::Pointer msg = imageConverter.encode(image, this->coordinateSystem());
+    CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "Sending image: " << image->getName();
+    msg->Pack();
+    pointer = reinterpret_cast<char*>(msg->GetPackPointer());
+    size = msg->GetPackSize();
+}
+
+void OpenIGTLinkProtocol::encode(MeshPtr data, char *pointer, int size)
+{
+    IGTLinkConversionPolyData polyConverter;
+    igtl::PolyDataMessage::Pointer msg = polyConverter.encode(data, this->coordinateSystem());
+    CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "Sending mesh: " << data->getName();
+    msg->Pack();
+    pointer = reinterpret_cast<char*>(msg->GetPackPointer());
+    size = msg->GetPackSize();
+}
+
 void OpenIGTLinkProtocol::translate(const igtl::MessageHeader::Pointer &header, const igtl::MessageBase::Pointer &body)
 {
     //CX_LOG_DEBUG() << "Incoming message to OpenIGTLinkProtocol";

@@ -40,13 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include <QMutex>
 #include <QMutexLocker>
-#include "igtlMessageHeader.h"
-#include "igtlTransformMessage.h"
-#include "igtlImageMessage.h"
-#include "igtlStatusMessage.h"
-#include "igtlStringMessage.h"
-#include "cxIGTLinkUSStatusMessage.h"
-
 #include "cxSocketConnection.h"
 #include "cxTransform3D.h"
 #include "cxImage.h"
@@ -95,8 +88,8 @@ signals:
     void image(ImagePtr image);
 	void mesh(MeshPtr image);
 	void probedefinition(QString devicename, ProbeDefinitionPtr definition);
-    void igtlimage(IGTLinkImageMessage::Pointer igtlimage);
-    void usstatusmessage(IGTLinkUSStatusMessage::Pointer message);
+//    void igtlimage(IGTLinkImageMessage::Pointer igtlimage);
+//    void usstatusmessage(IGTLinkUSStatusMessage::Pointer message);
 
 private slots:
     virtual void internalDataAvailable();

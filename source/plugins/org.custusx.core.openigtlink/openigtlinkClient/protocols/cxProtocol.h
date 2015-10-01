@@ -97,6 +97,8 @@ public:
 	virtual PATIENT_COORDINATE_SYSTEM coordinateSystem() const { return pcsLPS; }
     virtual PackPtr getPack();
     virtual bool readyToReceiveData() = 0;
+    virtual void encode(ImagePtr image, char *pointer, int size) = 0;
+    virtual void encode(MeshPtr data, char *pointer, int size) = 0;
 
 protected slots:
     virtual void processPack() = 0;

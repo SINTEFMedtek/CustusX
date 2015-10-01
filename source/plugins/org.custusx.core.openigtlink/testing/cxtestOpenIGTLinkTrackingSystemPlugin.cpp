@@ -113,7 +113,7 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: Check that the plugin can connect a
 
 }
 
-TEST_CASE("NetworkConnectionHandle: Check that a server and a client can talk to eachother", "[org.custusx.core.tracking.system.openigtlink][jbb]")
+TEST_CASE("NetworkConnectionHandle: Check that a server and a client can talk to eachother", "[org.custusx.core.tracking.system.openigtlink]")
 {
     //CLIENT
     QString clientHandleName = "client_handle";
@@ -183,7 +183,7 @@ TEST_CASE("NetworkConnectionHandle: Check that a server and a client can talk to
     client_handle.reset();
 }
 
-TEST_CASE("OpenIGTLinkStreamingService: Check that the openigtlink streaming service can be created and destroyed", "[org.custusx.core.tracking.system.openigtlink][jbb]")
+TEST_CASE("OpenIGTLinkStreamingService: Check that the openigtlink streaming service can be created and destroyed", "[org.custusx.core.tracking.system.openigtlink]")
 {
     cx::NetworkConnectionHandlePtr connection(new cx::NetworkConnectionHandle("test"));
     cx::OpenIGTLinkStreamerServicePtr service = cx::OpenIGTLinkStreamerServicePtr(new cx::OpenIGTLinkStreamerService(connection));
