@@ -54,6 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Test
 #include "FAST/Importers/ImageFileImporter.hpp"
 #include "FAST/Exporters/VTKImageExporter.hpp"
+#include "FAST/Exporters/VTKLineSetExporter.hpp"
 #include "FAST/Algorithms/TubeSegmentationAndCenterlineExtraction/TubeSegmentationAndCenterlineExtraction.hpp"
 #include "FAST/Data/Segmentation.hpp"
 #include "FAST/SceneGraph.hpp"
@@ -109,7 +110,8 @@ bool AirwaysFilter::execute()
 		fast::TubeSegmentationAndCenterlineExtraction::pointer tubeExtraction = fast::TubeSegmentationAndCenterlineExtraction::New();
 	    tubeExtraction->setInputConnection(importer->getOutputPort());
 	    tubeExtraction->extractDarkTubes();
-	    tubeExtraction->enableAutomaticCropping(true);
+	    if(getCroppingOption(mOptions)->getValue())
+			tubeExtraction->enableAutomaticCropping(true);
 	    // Set min and max intensity based on HU unit scale
 	    if(image->getDataType() == fast::TYPE_UINT16) {
 	        tubeExtraction->setMinimumIntensity(0);
@@ -126,8 +128,8 @@ bool AirwaysFilter::execute()
 	    // Convert fast segmentation data to VTK data which CX can use
         vtkSmartPointer<fast::VTKImageExporter> vtkExporter = fast::VTKImageExporter::New();
 	    vtkExporter->setInputConnection(tubeExtraction->getSegmentationOutputPort());
-	    mSegmentationOutput = vtkExporter->GetOutput();
 	    vtkExporter->Update();
+	    mSegmentationOutput = vtkExporter->GetOutput();
 	    std::cout << "FINISHED AIRWAY SEGMENTATION" << std::endl;
 
 	    // Get output segmentation data
@@ -136,9 +138,12 @@ bool AirwaysFilter::execute()
 	    // Get the transformation of the segmentation
 	    Eigen::Affine3f T = fast::SceneGraph::getEigenAffineTransformationFromData(segmentation);
 	    mTransformation.matrix() = T.matrix().cast<double>(); // cast to double
-	    std::cout << mTransformation.matrix() << std::endl;
 
-		// TODO write vtk centerline to disk, and load it
+	    // Get centerline
+	    vtkSmartPointer<fast::VTKLineSetExporter> vtkCenterlineExporter = fast::VTKLineSetExporter::New();
+	    vtkCenterlineExporter->setInputConnection(tubeExtraction->getCenterlineOutputPort());
+	    mCenterlineOutput = vtkCenterlineExporter->GetOutput();
+	    vtkCenterlineExporter->Update();
 
 	} catch(fast::Exception& e) {
 		std::string error = e.what();
@@ -188,19 +193,27 @@ bool AirwaysFilter::postProcess()
 			mInputImage,
 			QColor("green")
 	);
-	// TODO fix this
 	contour->get_rMd_History()->setRegistration(mTransformation);
 
 	// Set output
 	mOutputTypes[1]->setValue(contour->getUid());
 
 	// TODO get centerline somehow
+	QString uid = mInputImage->getUid() + "_centerline%1";
+	QString name = mInputImage->getName() + " centerline%1";
+	MeshPtr centerline = patientService()->createSpecificData<Mesh>(uid, name);
+	centerline->setVtkPolyData(mCenterlineOutput);
+	centerline->get_rMd_History()->setParentSpace(mInputImage->getUid());
+	centerline->get_rMd_History()->setRegistration(mTransformation);
+	patientService()->insertData(centerline);
+	mOutputTypes[0]->setValue(centerline->getUid());
 
 	return true;
 }
 
 void AirwaysFilter::createOptions()
 {
+	mOptionsAdapters.push_back(getCroppingOption(mOptions));
 	mOptionsAdapters.push_back(getSensitivityOption(mOptions));
 	mOptionsAdapters.push_back(getNoiseLevelOption(mOptions));
 }
@@ -233,24 +246,10 @@ void AirwaysFilter::createOutputTypes()
 
 }
 
-MeshPtr AirwaysFilter::loadVtkFile(QString pathToFile, QString newDatasUid){
-	PolyDataMeshReader reader;
-	DataPtr data;
-	if(reader.canLoad("vtk", pathToFile))
-		data = reader.load(newDatasUid, pathToFile);
-
-	MeshPtr retval = boost::dynamic_pointer_cast<Mesh>(data);
-
-    if(!data || !retval)
-		reportError("Could not load "+pathToFile);
-
-	return retval;
-}
-
 DoublePropertyPtr AirwaysFilter::getSensitivityOption(QDomElement root)
 {
 	DoublePropertyPtr retval = DoubleProperty::initialize("Sensitivity",
-			"", "Select sensitivity for the segmentation", 0.8,
+			"", "Select sensitivity for the segmentation", 0.85,
 			DoubleRange(0.01, 1, 0.01), 2, root);
 	retval->setGuiRepresentation(DoubleProperty::grSLIDER);
 	return retval;
@@ -264,8 +263,15 @@ DoublePropertyPtr AirwaysFilter::getNoiseLevelOption(QDomElement root)
 			DoubleRange(0.0, 2, 0.5), 1, root);
 	retval->setGuiRepresentation(DoubleProperty::grSLIDER);
 	return retval;
-
 }
+
+BoolPropertyPtr AirwaysFilter::getCroppingOption(QDomElement root)
+{
+	BoolPropertyPtr retval = BoolProperty::initialize("Automatic cropping", "", "Turn on or off automatic cropping. "
+			"If you turn off cropping you should crop the dataset yourself.", true, root);
+	return retval;
+}
+
 
 AirwaysFilter::~AirwaysFilter() {
 }

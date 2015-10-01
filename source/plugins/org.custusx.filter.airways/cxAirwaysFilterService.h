@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class ctkPluginContext;
 
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
-typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
+typedef vtkSmartPointer<class vtkPolyData> vtkPolyDataPtr;
 
 namespace cx {
 
@@ -84,12 +84,11 @@ protected:
 	virtual void createOutputTypes();
 
 private:
-	MeshPtr loadVtkFile(QString pathToFile, QString newDatasUid); ///< loads a vtk file into CustusX
-
-
 	DoublePropertyPtr getSensitivityOption(QDomElement root);
 	DoublePropertyPtr getNoiseLevelOption(QDomElement root);
+	BoolPropertyPtr getCroppingOption(QDomElement root);
 	vtkImageDataPtr mSegmentationOutput;
+	vtkPolyDataPtr mCenterlineOutput;
 	Transform3D mTransformation;
 	ImagePtr mInputImage;
 
