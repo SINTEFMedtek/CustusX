@@ -94,9 +94,10 @@ public:
 typedef boost::shared_ptr<EncodedPackage> EncodedPackagePtr;
 
 /**
- * @brief The Dialect class represents an interpretation of opentigtlink packages.
+ * An Application layer protocol for sending/receiving CustusX objects.
+ *
+ * Single-threaded.
  */
-
 class org_custusx_core_openigtlink_EXPORT Protocol : public QObject
 {
     Q_OBJECT
@@ -120,7 +121,7 @@ signals:
     void probedefinition(QString devicename, ProbeDefinitionPtr definition);
 
 protected:
-    QMutex mPackMutex;
+//    QMutex mPackMutex;
     PackPtr mPack;
 
 };

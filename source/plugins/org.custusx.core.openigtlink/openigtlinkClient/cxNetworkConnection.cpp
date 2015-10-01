@@ -111,7 +111,8 @@ QStringList NetworkConnection::getAvailableDialects() const
 
 void NetworkConnection::setProtocol(QString protocolname)
 {
-    if(mProtocol && (protocolname == mProtocol->getName()))
+	assertRunningInObjectThread();
+	if(mProtocol && (protocolname == mProtocol->getName()))
         return;
 
     ProtocolPtr protocol = mAvailableDialects[protocolname];
@@ -211,7 +212,8 @@ void NetworkConnection::sendMesh(MeshPtr data)
 
 void NetworkConnection::internalDataAvailable()
 {
-    //CX_LOG_DEBUG() << "START receive";
+	assertRunningInObjectThread();
+	//CX_LOG_DEBUG() << "START receive";
     if(!this->socketIsConnected())
         return;
 

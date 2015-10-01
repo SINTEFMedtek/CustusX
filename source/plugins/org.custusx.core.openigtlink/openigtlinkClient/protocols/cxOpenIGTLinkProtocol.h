@@ -79,7 +79,7 @@ protected slots:
 private:
     igtl::MessageHeader::Pointer mHeader;
     igtl::MessageBase::Pointer mBody;
-    QMutex mReadyReadMutex;
+//    QMutex mReadyReadMutex;
     bool mReadyToReceive;
 
     void setReadyToReceive(bool ready);

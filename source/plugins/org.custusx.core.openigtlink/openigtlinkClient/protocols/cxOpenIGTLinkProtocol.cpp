@@ -24,8 +24,8 @@ bool OpenIGTLinkProtocol::doCRC() const
 
 bool OpenIGTLinkProtocol::readyToReceiveData()
 {
-    QMutexLocker locker(&mReadyReadMutex);
-    QMutexLocker lock(&mPackMutex);
+//    QMutexLocker locker(&mReadyReadMutex);
+//    QMutexLocker lock(&mPackMutex);
     return mReadyToReceive && mPack->isFinishedWith();
 }
 
@@ -243,7 +243,7 @@ void OpenIGTLinkProtocol::processPack()
 
 void OpenIGTLinkProtocol::setReadyToReceive(bool ready)
 {
-    QMutexLocker locker(&mReadyReadMutex);
+//    QMutexLocker locker(&mReadyReadMutex);
     CX_LOG_DEBUG() << (ready ? "Is " : "NOT ") << "ready to receive";
     mReadyToReceive = ready;
 
@@ -251,7 +251,7 @@ void OpenIGTLinkProtocol::setReadyToReceive(bool ready)
 
 void OpenIGTLinkProtocol::preparePack(void* pointer, int size)
 {
-    QMutexLocker locker(&mPackMutex);
+//    QMutexLocker locker(&mPackMutex);
     //CX_LOG_DEBUG() << "Preparing pack, size: " << size << ", pointer: " << pointer;
     disconnect(mPack.get(), &Pack::dataArrived, this, &OpenIGTLinkProtocol::processPack);
     mPack.reset(new Pack(pointer, size));

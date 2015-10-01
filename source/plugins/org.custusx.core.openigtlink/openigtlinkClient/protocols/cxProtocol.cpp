@@ -23,7 +23,7 @@ QString Protocol::getName() const
 
 PackPtr Protocol::getPack()
 {
-    QMutexLocker locker(&mPackMutex);
+//    QMutexLocker locker(&mPackMutex);
     return mPack;
 }
 
