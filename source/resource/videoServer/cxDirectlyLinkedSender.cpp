@@ -47,7 +47,6 @@ void DirectlyLinkedSender::send(IGTLinkImageMessage::Pointer msg)
 {
 	if (!msg || !this->isReady())
 		return;
-	CX_LOG_CHANNEL_DEBUG("CA") << "DirectlyLinkedSender::send - decode image message";
 	IGTLinkConversion converter;
 	this->send(converter.decode(msg));
 	if (mUnsentUSStatusMessage)

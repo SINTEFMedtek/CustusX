@@ -125,8 +125,6 @@ int swapCopy64(igtlUint64 * dst, igtlUint64 * src, int n)
 
 vtkImageDataPtr IGTLinkConversionImage::decode_vtkImageData(igtl::ImageMessage *imgMsg)
 {
-	CX_LOG_CHANNEL_DEBUG("CA") << "IGTLinkConversionImage::decode_vtkImageData - decode image message";
-
 	// NOTE: This method is mostly a copy-paste from Slicer.
 	// MRML and coordinate stuff are removed.
 	// Avoid refactoring the internals, as it is important to keep the code similar to the origin.
@@ -287,7 +285,6 @@ vtkImageDataPtr IGTLinkConversionImage::decode_vtkImageData(igtl::ImageMessage *
 	}
 
 	imageData->Modified();
-	imageData->Print(std::cout);
 	return imageData;
 }
 

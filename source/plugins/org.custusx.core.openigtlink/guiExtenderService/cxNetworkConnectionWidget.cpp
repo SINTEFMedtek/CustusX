@@ -73,7 +73,6 @@ NetworkConnectionWidget::NetworkConnectionWidget(NetworkConnectionHandlePtr clie
 
     topLayout->addWidget(mConnectButton);
     topLayout->addStretch();
-//	CX_LOG_CHANNEL_DEBUG("CA") << "OpenIGTLinkConnectionWidget end create " << client->getUid();
 
 	this->onStateChanged(mClient->getNetworkConnection()->getState());
 
@@ -99,8 +98,6 @@ QString NetworkConnectionWidget::defaultWhatsThis() const
 
 void NetworkConnectionWidget::onStateChanged(CX_SOCKETCONNECTION_STATE state)
 {
-//	CX_LOG_CHANNEL_DEBUG("CA") << "Changed connection state to " << string_cast(state);
-
 	QString status = qstring_cast(state);
 	QString action = (state==scsINACTIVE) ? "Connect" : "Disconnect";
 

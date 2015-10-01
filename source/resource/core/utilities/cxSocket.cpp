@@ -197,7 +197,6 @@ void SocketServerConnector::incomingConnection(qintptr socketDescriptor)
 	int success = mSocket->setSocketDescriptor(socketDescriptor, QAbstractSocket::ConnectedState);
 	QString clientName = mSocket->localAddress().toString();
 	report("Connected to "+clientName+". Session started." + qstring_cast(success));
-//	CX_LOG_CHANNEL_DEBUG("CA") << "Socket is in state: " << mSocket->state();
 
 	emit stateChanged(this->getState());
 }

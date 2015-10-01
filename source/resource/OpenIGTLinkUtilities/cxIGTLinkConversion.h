@@ -102,6 +102,7 @@ public:
     ProbeDefinitionPtr decode(IGTLinkUSStatusMessage::Pointer probeMessage, IGTLinkImageMessage::Pointer imageMsg, ProbeDefinitionPtr base)
     {
         CX_LOG_ERROR() << "THIS CODE SHOULD BE REMOVED!!!!";
+		return ProbeDefinitionPtr();
     }
     ProbeDefinitionPtr decode(IGTLinkUSStatusMessage::Pointer probeMessage, igtl::ImageMessage::Pointer imageMsg, ProbeDefinitionPtr base);
 

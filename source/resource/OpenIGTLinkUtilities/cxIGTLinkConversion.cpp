@@ -73,7 +73,8 @@ QString IGTLinkConversion::decode(igtl::StatusMessage::Pointer msg)
 
 ImagePtr IGTLinkConversion::decode(igtl::ImageMessage::Pointer message)
 {
-	return IGTLinkConversionImage().decode(message);
+	return IGTLinkConversionSonixCXLegacy().decode(message);
+//	return IGTLinkConversionImage().decode(message);
 }
 
 Transform3D IGTLinkConversion::decode(igtl::TransformMessage::Pointer msg)
