@@ -133,10 +133,7 @@ void NetworkConnection::setProtocol(QString protocolname)
         disconnect(mProtocol.get(), &Protocol::mesh, this, &NetworkConnection::mesh);
         disconnect(mProtocol.get(), &Protocol::transform, this, &NetworkConnection::transform);
         disconnect(mProtocol.get(), &Protocol::calibration, this, &NetworkConnection::calibration);
-        //TODO
-//        disconnect(mDialect.get(), &OpenIGTLinkProtocol::probedefinition, this, &NetworkConnection::probedefinition);
-//        disconnect(mDialect.get(), &OpenIGTLinkProtocol::usstatusmessage, this, &NetworkConnection::usstatusmessage);
-//        disconnect(mDialect.get(), &OpenIGTLinkProtocol::igtlimage, this, &NetworkConnection::igtlimage);
+        disconnect(mProtocol.get(), &Protocol::probedefinition, this, &NetworkConnection::probedefinition);
     }
 
     mProtocol = protocol;
@@ -144,10 +141,7 @@ void NetworkConnection::setProtocol(QString protocolname)
     connect(protocol.get(), &Protocol::mesh, this, &NetworkConnection::mesh);
     connect(protocol.get(), &Protocol::transform, this, &NetworkConnection::transform);
     connect(protocol.get(), &Protocol::calibration, this, &NetworkConnection::calibration);
-    //TODO
-//    connect(dialect.get(), &OpenIGTLinkProtocol::probedefinition, this, &NetworkConnection::probedefinition);
-//    connect(dialect.get(), &OpenIGTLinkProtocol::usstatusmessage, this, &NetworkConnection::usstatusmessage);
-//    connect(dialect.get(), &OpenIGTLinkProtocol::igtlimage, this, &NetworkConnection::igtlimage);
+    connect(protocol.get(), &Protocol::probedefinition, this, &NetworkConnection::probedefinition);
 
     CX_LOG_CHANNEL_SUCCESS(CX_OPENIGTLINK_CHANNEL_NAME) << "IGTL Dialect set to " << protocolname;
 

@@ -63,21 +63,21 @@ void OpenIGTLinkProtocol::translate(const igtl::MessageHeader::Pointer &header, 
     }
     else if (type=="IMAGE")
     {
-        //----- CustusX openigtlink server -----
-        //there is a special kind of image package coming from custusx
-        //server where crc is set to 0.
-        QString name(header->GetDeviceName());
-        if(name.contains("Sonix", Qt::CaseInsensitive))
-        {
-            const IGTLinkImageMessage::Pointer temp = dynamic_cast<IGTLinkImageMessage*>(body.GetPointer());
-            this->translate(temp);
-        }
-        //----------
-        else
-        {
+//        //----- CustusX openigtlink server -----
+//        //there is a special kind of image package coming from custusx
+//        //server where crc is set to 0.
+//        QString name(header->GetDeviceName());
+//        if(name.contains("Sonix", Qt::CaseInsensitive))
+//        {
+//            const IGTLinkImageMessage::Pointer temp = dynamic_cast<IGTLinkImageMessage*>(body.GetPointer());
+//            this->translate(temp);
+//        }
+//        //----------
+//        else
+//        {
             const igtl::ImageMessage::Pointer temp = dynamic_cast<igtl::ImageMessage*>(body.GetPointer());
             this->translate(temp);
-        }
+//        }
     }
     else if (type=="STATUS")
     {
@@ -148,11 +148,6 @@ void OpenIGTLinkProtocol::translate(igtl::StringMessage::Pointer body)
 }
 
 void OpenIGTLinkProtocol::translate(const IGTLinkUSStatusMessage::Pointer body)
-{
-    this->writeNotSupportedMessage(body);
-}
-
-void OpenIGTLinkProtocol::translate(const IGTLinkImageMessage::Pointer body)
 {
     this->writeNotSupportedMessage(body);
 }

@@ -108,6 +108,7 @@ signals:
     void calibration(QString devicename, Transform3D calibration);
     void image(ImagePtr image);
 	void mesh(MeshPtr mesh);
+    void probedefinition(QString devicename, ProbeDefinitionPtr definition);
 
 protected:
     QMutex mPackMutex;

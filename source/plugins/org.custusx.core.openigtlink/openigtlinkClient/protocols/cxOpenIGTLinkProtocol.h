@@ -37,12 +37,6 @@ public:
     virtual void translate(const igtl::StatusMessage::Pointer body);
     virtual void translate(const igtl::StringMessage::Pointer body);
     virtual void translate(const IGTLinkUSStatusMessage::Pointer body);
-    virtual void translate(const IGTLinkImageMessage::Pointer body);
-
-signals:
-    void igtlimage(IGTLinkImageMessage::Pointer igtlimage);
-    void usstatusmessage(IGTLinkUSStatusMessage::Pointer msg);
-    void probedefinition(QString devicename, ProbeDefinitionPtr definition);
 
 protected:
     void writeAcceptingMessage(igtl::MessageBase* body) const;

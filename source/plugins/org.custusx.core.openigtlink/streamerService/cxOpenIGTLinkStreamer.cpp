@@ -66,50 +66,59 @@ QString OpenIGTLinkStreamer::getType()
 
 void OpenIGTLinkStreamer::receivedConnected()
 {
-    CX_LOG_CHANNEL_DEBUG("janne beate ") << "Connected received";
+    //CX_LOG_CHANNEL_DEBUG("janne beate ") << "Connected received";
 }
 
 void OpenIGTLinkStreamer::receivedDisconnected()
 {
-    CX_LOG_CHANNEL_DEBUG("janne beate ") << "Disconnect received";
+    //CX_LOG_CHANNEL_DEBUG("janne beate ") << "Disconnect received";
 }
 
 void OpenIGTLinkStreamer::receivedError()
 {
-    CX_LOG_CHANNEL_DEBUG("janne beate ") << "Error received";
+    //CX_LOG_CHANNEL_DEBUG("janne beate ") << "Error received";
 }
 
 void OpenIGTLinkStreamer::receivedImage(ImagePtr image)
 {
-    CX_LOG_CHANNEL_DEBUG("janne beate ") << "ImagePtr received";
+    CX_LOG_DEBUG() << "Streamer received ImagePtr";
     PackagePtr package(new Package());
     package->mImage = image;
     if(mSender)
         mSender->send(package);
 }
 
-void OpenIGTLinkStreamer::receiveIgtlImage(IGTLinkImageMessage::Pointer igtlimage)
+void OpenIGTLinkStreamer::receivedProbedefinition(QString not_used, ProbeDefinitionPtr probedef)
 {
-    CX_LOG_CHANNEL_DEBUG("janne beate ") << "IGTLinkImageMessage received";
+    CX_LOG_DEBUG() << "Streamer received ProbeDefinitionPtr";
     PackagePtr package(new Package());
-    package->mIgtLinkImageMessage = igtlimage;
-    // if us status not sent, do it here
-    if (mUnsentUSStatusMessage)
-    {
-        package->mIgtLinkUSStatusMessage = mUnsentUSStatusMessage;
-        mUnsentUSStatusMessage = IGTLinkUSStatusMessage::Pointer();
-    }
+    package->mProbe = probedef;
     if(mSender)
-    {
         mSender->send(package);
-    }
 }
 
-void OpenIGTLinkStreamer::receivedUSStatusMessage(IGTLinkUSStatusMessage::Pointer message)
-{
-    CX_LOG_CHANNEL_DEBUG("janne beate ") << "IGTLinkUSStatusMessage received";
-    mUnsentUSStatusMessage = message;
-}
+//void OpenIGTLinkStreamer::receiveIgtlImage(IGTLinkImageMessage::Pointer igtlimage)
+//{
+//    CX_LOG_CHANNEL_DEBUG("janne beate ") << "IGTLinkImageMessage received";
+//    PackagePtr package(new Package());
+//    package->mIgtLinkImageMessage = igtlimage;
+//    // if us status not sent, do it here
+//    if (mUnsentUSStatusMessage)
+//    {
+//        package->mIgtLinkUSStatusMessage = mUnsentUSStatusMessage;
+//        mUnsentUSStatusMessage = IGTLinkUSStatusMessage::Pointer();
+//    }
+//    if(mSender)
+//    {
+//        mSender->send(package);
+//    }
+//}
+
+//void OpenIGTLinkStreamer::receivedUSStatusMessage(IGTLinkUSStatusMessage::Pointer message)
+//{
+//    CX_LOG_CHANNEL_DEBUG("janne beate ") << "IGTLinkUSStatusMessage received";
+//    mUnsentUSStatusMessage = message;
+//}
 
 void OpenIGTLinkStreamer::streamSlot()
 {
