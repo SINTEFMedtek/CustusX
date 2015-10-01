@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTransferFunction2DOpacityWidget.h"
 #include "cxDataSelectWidget.h"
 #include "cxSelectDataStringProperty.h"
+#include "cxPatientModelService.h"
 
 namespace cx {
 
@@ -44,7 +45,7 @@ OverlayWidget::OverlayWidget(PatientModelServicePtr patientModelService, Visuali
 	this->setToolTip("Manage multiple overlayed 2D slices");
 	QVBoxLayout* layout = new QVBoxLayout(this);
 	layout->setMargin(0);
-	layout->addWidget(new TransferFunction2DOpacityWidget(patientModelService, this), 0);
+	layout->addWidget(new TransferFunction2DOpacityWidget(patientModelService->getActiveData(), this), 0);
 	layout->addWidget(new DataViewSelectionWidget(patientModelService, visualizationService, this), 1);
 }
 

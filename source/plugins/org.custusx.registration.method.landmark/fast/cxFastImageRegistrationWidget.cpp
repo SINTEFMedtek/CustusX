@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxData.h"
 #include "cxImage.h"
 #include "cxRegistrationService.h"
+#include "cxActiveData.h"
 
 namespace cx
 {
@@ -57,7 +58,8 @@ void FastImageRegistrationWidget::performRegistration()
 	DataPtr fixedData = mServices.registrationService->getFixedData();
 	if(!fixedData)
 	{
-		fixedData = mServices.patientModelService->getActiveData<Image>();
+		ActiveDataPtr activeData = mServices.patientModelService->getActiveData();
+		fixedData = activeData->getActive<Image>();
 		mServices.registrationService->setFixedData(fixedData);
 	}
 

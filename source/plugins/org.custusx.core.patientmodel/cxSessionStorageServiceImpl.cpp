@@ -230,6 +230,7 @@ void SessionStorageServiceImpl::loadPatientSilent(QString choosenDir)
 		//Read the xml
 		QDomElement element = doc.documentElement();
 		emit isLoading(element);
+		emit isLoadingSecond(element);
 	}
 
 	emit sessionChanged();

@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVolumeInfoWidget.h"
 #include "cxVolumeHelpers.h"
 #include "cxTypeConversions.h"
-#include "cxLogicManager.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
@@ -81,7 +81,7 @@ VolumePropertiesWidget::VolumePropertiesWidget(PatientModelServicePtr patientMod
 
 	this->addTab(new VolumeInfoWidget(patientModelService, this), "Info");
 	this->addTab(new TransferFunctionWidget(patientModelService, this, connectToActiveImage), QString("Transfer Functions"));
-	this->addTab(new ShadingWidget(patientModelService, this, connectToActiveImage), "Properties");
+	this->addTab(new ShadingWidget(patientModelService->getActiveData(), this, connectToActiveImage), "Properties");
 	this->addTab(new CroppingWidget(patientModelService, visualizationService, this), "Crop");
 	this->addTab(new ClippingWidget(patientModelService, this), "Clip");
 }

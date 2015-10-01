@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxInteractiveClipper.h"
 #include "cxVisServices.h"
 #include "cxNavigation.h"
+#include "cxActiveData.h"
 
 namespace cx
 {
@@ -119,7 +120,10 @@ void DataViewPropertiesInteractor::dataActionSlot()
 		mGroupData->setProperties(uid, props);
 
 		if (data)
-			mServices->getPatientService()->setActiveData(data);
+		{
+			ActiveDataPtr activeData = mServices->getPatientService()->getActiveData();
+			activeData->setActive(data);
+		}
 	}
 	else
 	{

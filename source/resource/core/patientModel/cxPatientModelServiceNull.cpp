@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxLandmark.h"
 #include "cxRegistrationTransform.h"
+#include "cxActiveData.h"
 
 namespace cx
 {
@@ -80,11 +81,6 @@ void PatientModelServiceNull::setLandmarkName(QString uid, QString name)
 	printWarning();;
 }
 
-void PatientModelServiceNull::setActiveData(DataPtr activeData)
-{
-	printWarning();
-}
-
 void PatientModelServiceNull::autoSave()
 {
 	printWarning();
@@ -94,12 +90,6 @@ bool PatientModelServiceNull::isNull()
 {
 	printWarning();
 	return true;
-}
-
-QList<DataPtr> PatientModelServiceNull::getActiveDataHistory() const
-{
-	printWarning();
-	return QList<DataPtr>();
 }
 
 std::map<QString, VideoSourcePtr> PatientModelServiceNull::getStreams() const
@@ -172,6 +162,12 @@ RegistrationHistoryPtr PatientModelServiceNull::get_rMpr_History() const
 {
 	printWarning();	
 	return RegistrationHistory::getNullObject();
+}
+
+ActiveDataPtr PatientModelServiceNull::getActiveData() const
+{
+	printWarning();
+	return ActiveData::getNullObject();
 }
 
 CLINICAL_VIEW PatientModelServiceNull::getClinicalApplication() const

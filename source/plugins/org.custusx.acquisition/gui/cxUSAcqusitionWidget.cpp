@@ -87,8 +87,6 @@ USAcqusitionWidget::USAcqusitionWidget(AcquisitionServicePtr acquisitionService,
 	connect(mAcquisitionService.get(), &AcquisitionService::acquisitionDataReady, this, &USAcqusitionWidget::acquisitionDataReadySlot);
 	connect(mAcquisitionService.get(), &AcquisitionService::saveDataCompleted, mUsReconstructionService.get(), &UsReconstructionService::newDataOnDisk);
 
-	mRecordSessionWidget->setDescriptionVisibility(false);
-
 	QHBoxLayout* timerLayout = new QHBoxLayout;
 	mLayout->addLayout(timerLayout);
 	mDisplayTimerWidget = new DisplayTimerWidget(this);

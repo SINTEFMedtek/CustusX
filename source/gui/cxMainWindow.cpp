@@ -436,7 +436,6 @@ void MainWindow::createMenus()
 	mFileMenu->addSeparator();
 	mFileMenu->addAction(mActions->getAction("ExportPatient"));
 	mFileMenu->addAction(mActions->getAction("ImportData"));
-	mFileMenu->addAction(mActions->getAction("DeleteData"));
 	mFileMenu->addSeparator();
 	mFileMenu->addAction(mFullScreenAction);
 	mFileMenu->addAction(mActions->getAction("StartLogConsole"));

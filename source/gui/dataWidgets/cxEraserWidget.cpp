@@ -59,6 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewService.h"
 #include "cxViewGroupData.h"
 #include "cxReporter.h"
+#include "cxActiveData.h"
 
 namespace cx
 {
@@ -69,8 +70,8 @@ EraserWidget::EraserWidget(PatientModelServicePtr patientModelService, Visualiza
 	mPreviousRadius(0),
 	mActiveImageProxy(ActiveImageProxyPtr()),
 	mPatientModelService(patientModelService),
-	mVisualizationService(visualizationService)
-
+	mVisualizationService(visualizationService),
+	mActiveData(patientModelService->getActiveData())
 {
 
 	QVBoxLayout* layout = new QVBoxLayout(this);
@@ -110,13 +111,13 @@ EraserWidget::EraserWidget(PatientModelServicePtr patientModelService, Visualiza
 	mSphereSize = new SpinBoxAndSliderGroupWidget(this, mSphereSizeAdapter);
 	layout->addWidget(mSphereSize);
 
-	ImagePtr image = mPatientModelService->getActiveData<Image>();
+	ImagePtr image = mActiveData->getActive<Image>();
 	int eraseValue = 0;
 	if(image)
 		eraseValue = image->getMin();
 	mEraseValueAdapter = DoubleProperty::initialize("EraseValue", "Erase value", "Erase/draw with value", eraseValue, DoubleRange(1,200,1), 0, QDomNode());
 
-	mActiveImageProxy = ActiveImageProxy::New(mPatientModelService);
+	mActiveImageProxy = ActiveImageProxy::New(mActiveData);
 	connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &EraserWidget::activeImageChangedSlot);
 
 	mEraseValueWidget = new SpinBoxAndSliderGroupWidget(this, mEraseValueAdapter);
@@ -129,7 +130,7 @@ EraserWidget::EraserWidget(PatientModelServicePtr patientModelService, Visualiza
 
 void EraserWidget::activeImageChangedSlot()
 {
-	ImagePtr image = mPatientModelService->getActiveData<Image>();
+	ImagePtr image = mActiveData->getActive<Image>();
 	if(!image)
 		return;
 
@@ -181,11 +182,11 @@ void EraserWidget::continousRemoveSlot()
 
 void EraserWidget::duplicateSlot()
 {
-	ImagePtr original = mPatientModelService->getActiveData<Image>();
+	ImagePtr original = mActiveData->getActive<Image>();
 
 	ImagePtr duplicate = duplicateImage(mPatientModelService, original);
 	mPatientModelService->insertData(duplicate);
-	mPatientModelService->setActiveData(duplicate);
+	mActiveData->setActive(duplicate);
 
 	// replace viz of original with duplicate
 //	std::vector<ViewGroupPtr> viewGroups = mVisualizationService->getViewGroupDatas();
@@ -211,14 +212,14 @@ void EraserWidget::sphereSizeChangedSlot()
  */
 void EraserWidget::saveSlot()
 {
-	mPatientModelService->insertData(mPatientModelService->getActiveData<Image>());
+	mPatientModelService->insertData(mActiveData->getActive<Image>());
 }
 
 
 template <class TYPE>
 void EraserWidget::eraseVolume(TYPE* volumePointer)
 {
-	ImagePtr image = mPatientModelService->getActiveData<Image>();
+	ImagePtr image = mActiveData->getActive<Image>();
 	vtkImageDataPtr img = image->getBaseVtkImageData();
 
 
@@ -285,7 +286,7 @@ void EraserWidget::removeSlot()
 	if (!mSphere)
 		return;
 
-	ImagePtr image = mPatientModelService->getActiveData<Image>();
+	ImagePtr image = mActiveData->getActive<Image>();
 	vtkImageDataPtr img = image->getBaseVtkImageData();
 
 	int vtkScalarType = img->GetScalarType();

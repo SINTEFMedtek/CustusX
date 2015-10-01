@@ -154,7 +154,6 @@ void NetworkConnection::sendMessage(ImagePtr image)
     int size = 0;
 
     mProtocol->encode(image, pointer, size);
-
     mSocket->write(pointer, size);
 }
 
@@ -165,7 +164,6 @@ void NetworkConnection::sendMessage(MeshPtr mesh)
     int size = 0;
 
     mProtocol->encode(mesh, pointer, size);
-
     mSocket->write(pointer, size);
 }
 

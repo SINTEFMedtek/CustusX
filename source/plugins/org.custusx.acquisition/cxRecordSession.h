@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QString>
 #include <map>
+#include <QDateTime>
 #include "boost/shared_ptr.hpp"
 #include "cxForwardDeclarations.h"
 #include "cxTransform3D.h"
@@ -65,27 +66,40 @@ typedef std::map<double, Transform3D> TimedTransformMap;
 class org_custusx_acquisition_EXPORT RecordSession
 {
 public:
-	RecordSession(QString uid, double startTime, double stopTime, QString description);
+	RecordSession();
+	RecordSession(int id, QString category);
 	virtual ~RecordSession();
 
-	QString getUid();
-	QString getDescription();
-	double getStartTime();
-	double getStopTime();
+	QString getUid() const;
+	QString getHumanDescription() const; ///< description useful for display in gui.
+	QString getDescription() const; ///< another legacy uid, used for folder creation etc
+	std::pair<QDateTime,QDateTime> getInterval(int i);
+	unsigned getIntervalCount() const;
 
-	void setStopTime(double val) { mStopTime = val; }
+	void startNewInterval();
+	void stopLastInterval();
+	void cancelLastInterval();
 
-	void addXml(QDomNode& dataNode);
-	void parseXml(QDomNode& dataNode);
+	void addXml(QDomNode& node);
+	void parseXml(QDomNode& node);
 
-	static TimedTransformMap getToolHistory_prMt(ToolPtr tool, RecordSessionPtr session);
+	static TimedTransformMap getToolHistory_prMt(ToolPtr tool, RecordSessionPtr session, bool verbose);
 
 protected:
+	QDateTime getTimestamp() const;
 
-	QString mUid;
-	double mStartTime;
-	double mStopTime;
-	QString mDescription;
+	typedef std::pair<QDateTime, QDateTime> IntervalType;
+	std::vector<IntervalType> mIntervals;
+	QDateTime mTimestamp;
+	QString mCategory;
+	int mId;
+
+	QDateTime timestamp2datetime(QString in) const;
+	QString datetime2timestamp(QDateTime in) const;
+
+	bool isOldStyleXmlFormat(QDomNode& node);
+	void parseXml_oldstyle(QDomNode& parentNode);
+	void setIdAndTimestampFromUid(QString uid);
 };
 
 /**

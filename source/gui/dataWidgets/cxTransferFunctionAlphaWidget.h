@@ -62,7 +62,7 @@ class cxGui_EXPORT TransferFunctionAlphaWidget : public BaseWidget
 
 	void clearBackground(QPainter &painter);
 public:
-  TransferFunctionAlphaWidget(PatientModelServicePtr patientModelService, QWidget* parent);
+  TransferFunctionAlphaWidget(ActiveDataPtr activeData, QWidget* parent);
   virtual ~TransferFunctionAlphaWidget();
 
   void setData(ImagePtr image, ImageTFDataPtr tfData);

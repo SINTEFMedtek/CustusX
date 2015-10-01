@@ -82,7 +82,9 @@ signals:
 	void cleared(); ///< emitted when session is cleared, before isLoading is called
 	void sessionChanged(); ///< emitted after change to a new session (new or loaded or cleared)
 	void isSaving(QDomElement& root); ///< xml storage is available
+	void isSavingSecond(QDomElement& root); ///< Triggered after the isSaving signal, to allow for data that
 	void isLoading(QDomElement& root); ///< emitted while loading a session. Xml storage is available, getRootFolder() is set to loaded value.
+	void isLoadingSecond(QDomElement& root); ///< Emitted after the isLoading signal, to allow for structures that must be loaded after core structures like PatientModel
 };
 
 } // namespace cx

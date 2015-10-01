@@ -77,7 +77,7 @@ private:
 	bool mIs3D; ///< true if 3D, false if 2D
 	bool mApplyToAll; ///< true if presets are to be applied to both 2D and 3D
 	ActiveImageProxyPtr mActiveImageProxy;
-	PatientModelServicePtr mPatientModelService;
+	ActiveDataPtr mActiveData;
 
 };
 

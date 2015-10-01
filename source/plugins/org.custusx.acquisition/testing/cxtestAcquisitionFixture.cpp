@@ -170,7 +170,7 @@ void AcquisitionFixture::start()
 	if (cx::trackingService()->getState() < cx::Tool::tsTRACKING)
 		return;
 
-	mAcquisitionService->startRecord(this->getContext());
+	mAcquisitionService->startRecord(this->getContext(), "test");
 	QTimer::singleShot(mRecordDuration, this, SLOT(stop()));
 }
 

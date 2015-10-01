@@ -106,6 +106,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackedStream.h"
 #include "cxStreamRep3D.h"
 #include "cxStream2DRep3D.h"
+#include "cxActiveData.h"
 
 namespace cx
 {
@@ -159,7 +160,7 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ViewPtr view, VisServicesPtr servic
 	this->updateMetricNamesRep();
 
 	connect(mServices->getToolManager().get(), &TrackingService::stateChanged, this, &ViewWrapper3D::toolsAvailableSlot);
-	connect(mServices->getPatientService().get(), &PatientModelService::activeImageChanged, this, &ViewWrapper3D::activeImageChangedSlot);
+	connect(mServices->getPatientService()->getActiveData().get(), &ActiveData::activeImageChanged, this, &ViewWrapper3D::activeImageChangedSlot);
 	this->toolsAvailableSlot();
 
 	mAnnotationMarker = RepManager::getInstance()->getCachedRep<OrientationAnnotation3DRep>();
@@ -733,7 +734,7 @@ void ViewWrapper3D::activeImageChangedSlot(QString uid)
 {
 	if(!mGroupData)
 		return;
-	ImagePtr image = mServices->getPatientService()->getActiveData<Image>();
+	ImagePtr image = mServices->getPatientService()->getData<Image>(uid);
 
 	// only show landmarks belonging to image visible in this view:
 	std::vector<ImagePtr> images = mGroupData->getImages(DataViewProperties::create3D());

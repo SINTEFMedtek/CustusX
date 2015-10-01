@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewService.h"
 #include "cxViewGroupData.h"
 #include "cxLogger.h"
+#include "cxActiveData.h"
 
 namespace cx
 {
@@ -100,13 +101,15 @@ void DataListWidget::populate(QStringList dataUids)
 
 void DataListWidget::itemSelectionChangedSlot()
 {
-  QList<QListWidgetItem*> items = this->selectedItems();
-  if (items.empty())
-	return;
-  DataPtr data = mPatientModelService->getData(items[0]->data(Qt::UserRole).toString());
-  if (data)
-	mPatientModelService->setActiveData(data);
-
+	QList<QListWidgetItem*> items = this->selectedItems();
+	if (items.empty())
+		return;
+	DataPtr data = mPatientModelService->getData(items[0]->data(Qt::UserRole).toString());
+	if (data)
+	{
+		ActiveDataPtr activeData = mPatientModelService->getActiveData();
+		activeData->setActive(data);
+	}
 }
 
 void DataListWidget::populateData(QString uid, bool indent, QListWidgetItem* after)
