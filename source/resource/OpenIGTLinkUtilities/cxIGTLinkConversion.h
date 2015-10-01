@@ -40,12 +40,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "igtlImageMessage.h"
 #include "igtlTransformMessage.h"
 
-#include "cxIGTLinkImageMessage.h"
 #include "cxIGTLinkUSStatusMessage.h"
+
+//TODO remove
+#include "cxIGTLinkImageMessage.h"
 
 #include "cxImage.h"
 #include "cxTransform3D.h"
 #include "cxTool.h"
+
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -95,7 +99,11 @@ public:
 	  *
 	  * Some or all of the input messages can be NULL.
 	  */
-    ProbeDefinitionPtr decode(IGTLinkUSStatusMessage::Pointer probeMessage, IGTLinkImageMessage::Pointer imageMessage, ProbeDefinitionPtr base);
+    ProbeDefinitionPtr decode(IGTLinkUSStatusMessage::Pointer probeMessage, IGTLinkImageMessage::Pointer imageMsg, ProbeDefinitionPtr base)
+    {
+        CX_LOG_ERROR() << "THIS CODE SHOULD BE REMOVED!!!!";
+    }
+    ProbeDefinitionPtr decode(IGTLinkUSStatusMessage::Pointer probeMessage, igtl::ImageMessage::Pointer imageMsg, ProbeDefinitionPtr base);
 
 	/**
 	  * Decode the image to standard format with standard color RGBX encoding.

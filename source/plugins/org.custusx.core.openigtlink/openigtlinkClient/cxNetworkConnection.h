@@ -88,8 +88,6 @@ signals:
     void image(ImagePtr image);
 	void mesh(MeshPtr image);
 	void probedefinition(QString devicename, ProbeDefinitionPtr definition);
-//    void igtlimage(IGTLinkImageMessage::Pointer igtlimage);
-//    void usstatusmessage(IGTLinkUSStatusMessage::Pointer message);
 
 private slots:
     virtual void internalDataAvailable();

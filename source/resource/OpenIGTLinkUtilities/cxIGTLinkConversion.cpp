@@ -112,7 +112,7 @@ IGTLinkUSStatusMessage::Pointer IGTLinkConversion::encode(ProbeDefinitionPtr inp
 }
 
 //'copied' from OpenIGTLinkRTSource::updateSonixStatus()
-ProbeDefinitionPtr IGTLinkConversion::decode(IGTLinkUSStatusMessage::Pointer probeMessage, IGTLinkImageMessage::Pointer imageMessage, ProbeDefinitionPtr base)
+ProbeDefinitionPtr IGTLinkConversion::decode(IGTLinkUSStatusMessage::Pointer probeMessage, igtl::ImageMessage::Pointer imageMessage, ProbeDefinitionPtr base)
 {
 	ProbeDefinitionPtr retval;
 	if (base)

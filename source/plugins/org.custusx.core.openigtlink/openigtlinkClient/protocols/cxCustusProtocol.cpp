@@ -50,14 +50,25 @@ bool CustusProtocol::doCRC() const
     return false;
 }
 
-void CustusProtocol::translate(const IGTLinkImageMessage::Pointer body)
+void CustusProtocol::translate(const igtl::ImageMessage::Pointer body)
 {
-    emit igtlimage(body);
+    IGTLinkConversion converter;
+    ImagePtr imagePtr = converter.decode(body);
+    imagePtr = converter.decode(imagePtr);
+    emit image(imagePtr);
+
+    if(mUnsentUSStatusMessage)
+    {
+        ProbeDefinitionPtr definition = converter.decode(mUnsentUSStatusMessage, body, ProbeDefinitionPtr(new ProbeDefinition()));
+        QString devicename = "TODO";
+        mUnsentUSStatusMessage = IGTLinkUSStatusMessage::New();
+        emit probedefinition(devicename, definition);
+    }
 }
 
 void CustusProtocol::translate(const cx::IGTLinkUSStatusMessage::Pointer body)
 {
-    emit usstatusmessage(body);
+    mUnsentUSStatusMessage = body;
 }
 
 }
