@@ -63,6 +63,9 @@ public:
   virtual ~FastPatientRegistrationWidget();
 
 protected:
+  virtual void showEvent(QShowEvent *event);
+  virtual void hideEvent(QHideEvent *event);
+
   QCheckBox* mMouseClickSample;
 
 protected slots:

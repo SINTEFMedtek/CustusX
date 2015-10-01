@@ -45,7 +45,6 @@ FastPatientRegistrationWidget::FastPatientRegistrationWidget(RegServices service
 	mMouseClickSample = new QCheckBox("Sample with mouse clicks in 2D.", this);
 	mMouseClickSample->setToolTip("Allow mouse clicks in 2D views to sample patient landmarks");
 	connect(mMouseClickSample, &QCheckBox::stateChanged, this, &FastPatientRegistrationWidget::mouseClickSampleStateChanged);
-//	mMouseClickSample->setChecked(true);//Test
 
 	mVerticalLayout->addWidget(mMouseClickSample);
 }
@@ -100,6 +99,18 @@ void FastPatientRegistrationWidget::pointSampled(Vector3D p_r)
 
 	this->setTargetLandmark(uid, p_target);
 	this->performRegistration();
+}
+
+void FastPatientRegistrationWidget::showEvent(QShowEvent* event)
+{
+	mMouseClickSample->setChecked(true);
+	PatientLandMarksWidget::showEvent(event);
+}
+
+void FastPatientRegistrationWidget::hideEvent(QHideEvent* event)
+{
+	mMouseClickSample->setChecked(false);
+	PatientLandMarksWidget::hideEvent(event);
 }
 
 }//namespace cx
