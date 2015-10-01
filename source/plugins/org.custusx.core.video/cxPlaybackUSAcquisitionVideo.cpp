@@ -137,7 +137,14 @@ std::vector<TimelineEvent> USAcquisitionVideoPlayback::getEvents()
  */
 QStringList USAcquisitionVideoPlayback::getAbsolutePathToFtsFiles(QString folder)
 {
-	return getAbsolutePathToFiles(folder, QStringList("*.fts"), true);
+    QStringList nameFilters;
+    nameFilters << "*TissueAngio.fts" << "*TissueFlow.fts" << "*ScanConverted.fts";
+    QStringList res = getAbsolutePathToFiles(folder,nameFilters, true);
+    if(res.isEmpty())
+    {
+        res=getAbsolutePathToFiles(folder,QStringList("*.fts"), true);
+    }
+    return res;
 }
 
 void USAcquisitionVideoPlayback::timerChangedSlot()
