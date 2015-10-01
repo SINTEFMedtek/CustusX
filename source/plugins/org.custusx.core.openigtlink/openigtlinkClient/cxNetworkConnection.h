@@ -74,14 +74,13 @@ public:
 
     //thread safe
 	QString getUid() const { return mUid; }
-	virtual void setConnectionInfo(ConnectionInfo info);
 	QStringList getAvailableDialects() const;
 	void invoke(boost::function<void()> func);
 
 	// not thread-safe: use invoke to call in this thread
-	void sendImage(ImagePtr image);
-	void sendMesh(MeshPtr image);
-    void streamImage(ImagePtr image);
+	void sendImage(ImagePtr image); ///< not thread-safe: use invoke
+	void sendMesh(MeshPtr image); ///< not thread-safe: use invoke
+	void streamImage(ImagePtr image); ///< not thread-safe: use invoke
 
 signals:
     void transform(QString devicename, Transform3D transform, double timestamp);
@@ -90,15 +89,16 @@ signals:
 	void mesh(MeshPtr image);
 	void probedefinition(QString devicename, ProbeDefinitionPtr definition);
 
+protected:
+	virtual void setProtocol(QString protocolname);
+
 private slots:
     virtual void internalDataAvailable();
 	void onInvoke(boost::function<void()> func);
 
 private:
-    ProtocolPtr initProtocol(ProtocolPtr value);
-    void setProtocol(QString protocolname);
+	ProtocolPtr initProtocol(ProtocolPtr value);
 
-    QMutex mMutex;
     ProtocolPtr mProtocol;
     typedef std::map<QString, ProtocolPtr> DialectMap;
     DialectMap mAvailableDialects;

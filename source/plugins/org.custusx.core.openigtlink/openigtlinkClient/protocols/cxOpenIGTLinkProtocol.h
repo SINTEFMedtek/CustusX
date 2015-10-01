@@ -18,6 +18,33 @@
 namespace cx
 {
 
+template<class TYPE>
+class igtlEncodedPackage : public EncodedPackage
+{
+public:
+	static EncodedPackagePtr create(typename TYPE::Pointer msg)
+	{
+		return EncodedPackagePtr(new igtlEncodedPackage<TYPE>(msg));
+	}
+	explicit igtlEncodedPackage(typename TYPE::Pointer msg) :
+		mMsg(msg)
+	{
+	}
+	virtual ~igtlEncodedPackage() {}
+	const QByteArray data() const
+	{
+		return QByteArray::fromRawData(reinterpret_cast<const char*>(mMsg->GetPackPointer()), mMsg->GetPackSize());
+	}
+
+	typename TYPE::Pointer mMsg;
+};
+
+template<class TYPE>
+static EncodedPackagePtr createEncodedPackage(typename TYPE::Pointer msg)
+{
+	return EncodedPackagePtr(new igtlEncodedPackage<TYPE>(msg));
+}
+
 class OpenIGTLinkProtocol : public Protocol
 {
     Q_OBJECT
@@ -28,8 +55,8 @@ public:
     virtual bool readyToReceiveData();
 
     //TODO refactor to use pack system
-    virtual void encode(ImagePtr image, char *pointer, int size);
-    virtual void encode(MeshPtr data, char *pointer, int size);
+	virtual EncodedPackagePtr encode(ImagePtr image);
+	virtual EncodedPackagePtr encode(MeshPtr data);
 
     virtual void translate(const igtl::MessageHeader::Pointer &header, const igtl::MessageBase::Pointer &body);
     virtual void translate(const igtl::TransformMessage::Pointer body);
@@ -39,9 +66,12 @@ public:
     virtual void translate(const igtl::StringMessage::Pointer body);
     virtual void translate(const IGTLinkUSStatusMessage::Pointer body);
 
+
 protected:
     void writeAcceptingMessage(igtl::MessageBase* body) const;
     void writeNotSupportedMessage(igtl::MessageBase *body) const;
+	virtual PATIENT_COORDINATE_SYSTEM coordinateSystem() const { return pcsLPS; }
+	virtual bool doCRC() const;
 
 protected slots:
     void processPack();

@@ -21,11 +21,6 @@ QString Protocol::getName() const
     return "Basic";
 }
 
-bool Protocol::doCRC() const
-{
-    return true;
-}
-
 PackPtr Protocol::getPack()
 {
     QMutexLocker locker(&mPackMutex);

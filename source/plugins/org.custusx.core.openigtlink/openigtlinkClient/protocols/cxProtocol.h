@@ -82,6 +82,17 @@ private:
 };
 typedef boost::shared_ptr<Pack> PackPtr;
 
+
+/** Wraps anything that can be viewed as a const QByteArray.
+ */
+class EncodedPackage
+{
+public:
+	virtual ~EncodedPackage() {}
+	virtual const QByteArray data() const = 0;
+};
+typedef boost::shared_ptr<EncodedPackage> EncodedPackagePtr;
+
 /**
  * @brief The Dialect class represents an interpretation of opentigtlink packages.
  */
@@ -93,12 +104,10 @@ public:
     explicit Protocol(QObject *parent = 0);
 
     virtual QString getName() const;
-    virtual bool doCRC() const;
-	virtual PATIENT_COORDINATE_SYSTEM coordinateSystem() const { return pcsLPS; }
     virtual PackPtr getPack();
     virtual bool readyToReceiveData() = 0;
-    virtual void encode(ImagePtr image, char *pointer, int size) = 0;
-    virtual void encode(MeshPtr data, char *pointer, int size) = 0;
+	virtual EncodedPackagePtr encode(ImagePtr image) = 0;
+	virtual EncodedPackagePtr encode(MeshPtr data) = 0;
 
 protected slots:
     virtual void processPack() = 0;

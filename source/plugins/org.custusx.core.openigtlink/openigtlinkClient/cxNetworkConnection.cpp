@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkImageData.h"
 
 #include "cxUtilHelpers.h"
+#include "cxMesh.h"
 
 namespace cx
 {
@@ -72,7 +73,6 @@ NetworkConnection::NetworkConnection(QString uid, QObject *parent) :
     this->initProtocol(ProtocolPtr(new RASProtocol()));
 
 	SocketConnection::setConnectionInfo(info);
-    this->setProtocol(info.protocol);
 }
 
 NetworkConnection::~NetworkConnection()
@@ -83,12 +83,6 @@ ProtocolPtr NetworkConnection::initProtocol(ProtocolPtr value)
 {
 	mAvailableDialects[value->getName()] = value;
 	return value;
-}
-
-void NetworkConnection::setConnectionInfo(ConnectionInfo info)
-{
-	SocketConnection::setConnectionInfo(info);
-    this->setProtocol(info.protocol);
 }
 
 void NetworkConnection::invoke(boost::function<void()> func)
@@ -117,7 +111,6 @@ QStringList NetworkConnection::getAvailableDialects() const
 
 void NetworkConnection::setProtocol(QString protocolname)
 {
-    QMutexLocker locker(&mMutex);
     if(mProtocol && (protocolname == mProtocol->getName()))
         return;
 
@@ -160,13 +153,11 @@ void NetworkConnection::setProtocol(QString protocolname)
 
 void NetworkConnection::streamImage(ImagePtr image)
 {
-    QMutexLocker locker(&mMutex);
-	char *pointer = NULL;
-	int size = 0;
+	assertRunningInObjectThread();
 
-	mProtocol->encode(image, pointer, size);
+	EncodedPackagePtr package = mProtocol->encode(image);
 
-	int sendSize = size/1024;
+	int sendSize = package->data().size()/1024;
     int waitingSize = mSocket->bytesToWrite()/1024;
     double waitToSendRatio = double(waitingSize)/double(sendSize);
     double waitToSendRatioThreshold = 0.5;
@@ -197,29 +188,25 @@ void NetworkConnection::streamImage(ImagePtr image)
 //    mSocket->write(reinterpret_cast<char*>(msg->GetPackPointer()), msg->GetPackSize());
 //    CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "Sent image: " << image->getName();
 
-
-	mSocket->write(pointer, size);
-
+	mSocket->write(package->data());
 }
 
 void NetworkConnection::sendImage(ImagePtr image)
 {
-	QMutexLocker locker(&mMutex);
-    char *pointer = NULL;
-    int size = 0;
+	assertRunningInObjectThread();
+	CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "Sending image: " << image->getName();
 
-    mProtocol->encode(image, pointer, size);
-    mSocket->write(pointer, size);
+	EncodedPackagePtr package = mProtocol->encode(image);
+	mSocket->write(package->data());
 }
 
 void NetworkConnection::sendMesh(MeshPtr data)
 {
-	QMutexLocker locker(&mMutex);
-    char *pointer = NULL;
-    int size = 0;
+	assertRunningInObjectThread();
+	CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "Sending mesh: " << data->getName();
 
-	mProtocol->encode(data, pointer, size);
-    mSocket->write(pointer, size);
+	EncodedPackagePtr package = mProtocol->encode(data);
+	mSocket->write(package->data());
 }
 
 void NetworkConnection::internalDataAvailable()
