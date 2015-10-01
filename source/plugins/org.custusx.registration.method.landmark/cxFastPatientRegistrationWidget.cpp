@@ -42,8 +42,8 @@ namespace cx
 FastPatientRegistrationWidget::FastPatientRegistrationWidget(RegServices services, QWidget* parent) :
 		PatientLandMarksWidget(services, parent, "org_custusx_registration_method_fast_landmark_image_to_patient_patient_landmarks_widget", "Fast Patient Registration")
 {
-	mMouseClickSample = new QCheckBox("Sample with mouse clicks in 2D.", this);
-	mMouseClickSample->setToolTip("Allow mouse clicks in 2D views to sample patient landmarks");
+	mMouseClickSample = new QCheckBox("Sample with mouse clicks in anyplane view.", this);
+	mMouseClickSample->setToolTip("Allow mouse clicks in 2D anyplane view to sample patient landmarks.");
 	connect(mMouseClickSample, &QCheckBox::stateChanged, this, &FastPatientRegistrationWidget::mouseClickSampleStateChanged);
 
 	mVerticalLayout->addWidget(mMouseClickSample);

@@ -143,7 +143,9 @@ ViewWrapper2D::~ViewWrapper2D()
 
 void ViewWrapper2D::samplePoint(Vector3D click_vp)
 {
-	//TODO: Only emit when anyplane?
+	if(!this->isAnyplane())
+		return;
+
 	Transform3D sMr = mSliceProxy->get_sMr();
 	Transform3D vpMs = mView->get_vpMs();
 
