@@ -71,9 +71,9 @@ class org_custusx_core_openigtlink_EXPORT NetworkConnectionHandle : public QObje
 public:
 	explicit NetworkConnectionHandle(QString threadname);
 	~NetworkConnectionHandle();
-	NetworkConnection* client();
+    NetworkConnection* getNetworkConnection();
 
-	StringPropertyBasePtr getDialectOption() { return mDialects; }
+    StringPropertyBasePtr getDialectOption() { return mProtocols; }
 	StringPropertyBasePtr getIpOption() { return mIp; }
 	DoublePropertyBasePtr getPortOption() { return mPort; }
 	StringPropertyBasePtr getRoleOption() { return mRole; }
@@ -83,7 +83,7 @@ private:
 	void onPropertiesChanged();
 	StringPropertyBasePtr mIp;
 	DoublePropertyBasePtr mPort;
-	StringPropertyBasePtr mDialects;
+    StringPropertyBasePtr mProtocols;
 	StringPropertyBasePtr mRole;
 
 	StringPropertyBasePtr createDialectOption();

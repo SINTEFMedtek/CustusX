@@ -34,6 +34,7 @@ QString PlusProtocol::getName() const
 
 void PlusProtocol::translate(const igtl::TransformMessage::Pointer body)
 {
+    CX_LOG_DEBUG() << "Transform incoming to plusprotocol";
     QString deviceName = body->GetDeviceName();
     this->registerTransformDeviceName(deviceName);
 
@@ -63,6 +64,7 @@ void PlusProtocol::translate(const igtl::TransformMessage::Pointer body)
 
 void PlusProtocol::translate(const igtl::ImageMessage::Pointer body)
 {
+    CX_LOG_DEBUG() << "Image incoming to plusprotocol";
     //DIMENSION
     int x = 0;
     int y = 1;

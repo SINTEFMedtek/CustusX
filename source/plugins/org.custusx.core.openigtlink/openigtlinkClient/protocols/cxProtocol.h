@@ -40,23 +40,48 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <boost/shared_ptr.hpp>
 
-#include "igtlMessageHeader.h"
-#include "igtlPolyDataMessage.h"
-#include "igtlTransformMessage.h"
-#include "igtlImageMessage.h"
-#include "igtlStatusMessage.h"
-#include "igtlStringMessage.h"
-#include "cxIGTLinkUSStatusMessage.h"
-#include "cxIGTLinkImageMessage.h"
-
 #include "cxTransform3D.h"
 #include "cxImage.h"
 #include "cxProbeDefinition.h"
 
-#define CX_OPENIGTLINK_CHANNEL_NAME "OpenIGTLink"
-
 namespace cx
 {
+
+class Pack : public QObject
+{
+    Q_OBJECT
+
+signals:
+    void dataArrived();
+
+public:
+    Pack(void* pointer=NULL, int size=0) :
+        pointer(pointer),
+        size(size),
+        canBeOverWritten(true)
+    {}
+
+    void notifyDataArrived()
+    {
+        std::cout << "dataArrived()" << std::endl;
+        canBeOverWritten = false;
+        emit dataArrived();
+    }
+
+    bool isFinishedWith()
+    {
+        return canBeOverWritten;
+    }
+
+    void* pointer;
+    int size;
+
+private:
+    bool canBeOverWritten;
+
+};
+typedef boost::shared_ptr<Pack> PackPtr;
+
 /**
  * @brief The Dialect class represents an interpretation of opentigtlink packages.
  */
@@ -70,27 +95,22 @@ public:
     virtual QString getName() const;
     virtual bool doCRC() const;
 	virtual PATIENT_COORDINATE_SYSTEM coordinateSystem() const { return pcsLPS; }
+    virtual PackPtr getPack();
+    virtual bool readyToReceiveData() = 0;
 
-    virtual void translate(const igtl::TransformMessage::Pointer body);
-    virtual void translate(const igtl::ImageMessage::Pointer body);
-	virtual void translate(const igtl::PolyDataMessage::Pointer body);
-	virtual void translate(const igtl::StatusMessage::Pointer body);
-    virtual void translate(const igtl::StringMessage::Pointer body);
-    virtual void translate(const IGTLinkUSStatusMessage::Pointer body);
-    virtual void translate(const IGTLinkImageMessage::Pointer body);
+protected slots:
+    virtual void processPack() = 0;
 
 signals:
     void transform(QString devicename, Transform3D transform, double timestamp);
     void calibration(QString devicename, Transform3D calibration);
     void image(ImagePtr image);
 	void mesh(MeshPtr mesh);
-	void igtlimage(IGTLinkImageMessage::Pointer igtlimage);
-    void usstatusmessage(IGTLinkUSStatusMessage::Pointer msg);
-    void probedefinition(QString devicename, ProbeDefinitionPtr definition);
 
 protected:
-	void writeAcceptingMessage(igtl::MessageBase* body);
-	void writeNotSupportedMessage(igtl::MessageBase *body);
+    QMutex mPackMutex;
+    PackPtr mPack;
+
 };
 typedef boost::shared_ptr<Protocol> ProtocolPtr;
 

@@ -59,7 +59,7 @@ OpenIGTLinkTrackingSystemService::OpenIGTLinkTrackingSystemService(NetworkConnec
 	if(mConnection == NULL)
         return;
 
-	NetworkConnection* client = mConnection->client();
+	NetworkConnection* client = mConnection->getNetworkConnection();
 
 	connect(this, &OpenIGTLinkTrackingSystemService::connectToServer, client, &NetworkConnection::requestConnect);
 	connect(this, &OpenIGTLinkTrackingSystemService::disconnectFromServer, client, &NetworkConnection::requestDisconnect);
@@ -155,14 +155,14 @@ void OpenIGTLinkTrackingSystemService::initialize()
 void OpenIGTLinkTrackingSystemService::uninitialize()
 {
     CX_LOG_CHANNEL_DEBUG("janne beate ") << "uninitialize";
-    //emit disconnectFromServer();
+    emit disconnectFromServer();
 }
 
 void OpenIGTLinkTrackingSystemService::startTracking()
 {
     CX_LOG_CHANNEL_DEBUG("janne beate ") << "startTracking";
     //emit startListenToServer();
-    emit connectToServer();
+    //emit connectToServer();
 }
 
 void OpenIGTLinkTrackingSystemService::stopTracking()
@@ -196,6 +196,7 @@ void OpenIGTLinkTrackingSystemService::serverIsDisconnected()
 
 void OpenIGTLinkTrackingSystemService::receiveTransform(QString devicename, Transform3D transform, double timestamp)
 {
+    CX_LOG_DEBUG() << "transform";
     OpenIGTLinkToolPtr tool = this->getTool(devicename);
     tool->toolTransformAndTimestampSlot(transform, timestamp);
 }

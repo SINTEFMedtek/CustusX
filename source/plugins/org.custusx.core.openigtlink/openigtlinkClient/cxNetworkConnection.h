@@ -53,6 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxProbeDefinition.h"
 #include "cxLogger.h"
 #include "cxProtocol.h"
+#include "cxOpenIGTLinkProtocol.h"
 #include "boost/function.hpp"
 
 typedef boost::shared_ptr<QThread> QThreadPtr;
@@ -101,24 +102,12 @@ private slots:
     virtual void internalDataAvailable();
 	void onInvoke(boost::function<void()> func);
 
-protected:
-
 private:
-    ProtocolPtr initDialect(ProtocolPtr value);
-	void setDialect(QString dialectname);
-	bool receiveHeader(const igtl::MessageHeader::Pointer header) const;
-    bool receiveBody(const igtl::MessageHeader::Pointer header);
-	qint64 skip(qint64 maxSizeBytes) const;
-
-    template <typename T>
-    bool receive(const igtl::MessageBase::Pointer header);
+    ProtocolPtr initProtocol(ProtocolPtr value);
+    void setProtocol(QString protocolname);
 
     QMutex mMutex;
-
-    igtl::MessageHeader::Pointer mHeader;
-    bool mHeaderReceived;
-
-    ProtocolPtr mDialect;
+    ProtocolPtr mProtocol;
     typedef std::map<QString, ProtocolPtr> DialectMap;
     DialectMap mAvailableDialects;
 	const QString mUid;

@@ -26,6 +26,8 @@ set(PLUGIN_SRCS
     openigtlinkClient/cxNetworkConnectionHandle.cpp
 
     openigtlinkClient/protocols/cxProtocol.cpp
+    openigtlinkClient/protocols/cxOpenIGTLinkProtocol.h
+    openigtlinkClient/protocols/cxOpenIGTLinkProtocol.cpp
     openigtlinkClient/protocols/cxPlusProtocol.h
     openigtlinkClient/protocols/cxPlusProtocol.cpp
     openigtlinkClient/protocols/cxCustusProtocol.h
@@ -52,6 +54,7 @@ set(PLUGIN_MOC_SRCS
     openigtlinkClient/cxNetworkServiceImpl.h
     openigtlinkClient/cxNetworkConnectionHandle.h
     openigtlinkClient/protocols/cxProtocol.h
+    openigtlinkClient/protocols/cxOpenIGTLinkProtocol.h
 )
 
 # Qt Designer files which should be processed by Qts uic

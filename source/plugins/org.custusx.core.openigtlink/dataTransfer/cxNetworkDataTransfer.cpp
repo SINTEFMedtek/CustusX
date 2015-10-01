@@ -60,8 +60,8 @@ NetworkDataTransfer::NetworkDataTransfer(ctkPluginContext *context, NetworkConne
 
 //	mOpenIGTLink.reset(new NetworkConnectionHandle(this->getConfigUid()));
 
-	connect(mOpenIGTLink->client(), &NetworkConnection::image, this, &NetworkDataTransfer::onImageReceived);
-	connect(mOpenIGTLink->client(), &NetworkConnection::mesh, this, &NetworkDataTransfer::onMeshReceived);
+	connect(mOpenIGTLink->getNetworkConnection(), &NetworkConnection::image, this, &NetworkDataTransfer::onImageReceived);
+	connect(mOpenIGTLink->getNetworkConnection(), &NetworkConnection::mesh, this, &NetworkDataTransfer::onMeshReceived);
 
 	mDataToSend = StringPropertySelectData::New(mPatientModelService);
 
@@ -124,7 +124,7 @@ void NetworkDataTransfer::onSend()
 	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
 	if (image)
 	{
-		mOpenIGTLink->client()->sendMessage(image);
+		mOpenIGTLink->getNetworkConnection()->sendMessage(image);
 		return;
 	}
 	MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(data);
@@ -140,7 +140,7 @@ void NetworkDataTransfer::onSend()
 //		return;
 //		// test end
 
-		mOpenIGTLink->client()->sendMessage(mesh);
+		mOpenIGTLink->getNetworkConnection()->sendMessage(mesh);
 		return;
 	}
 
@@ -194,7 +194,7 @@ void NetworkDataTransfer::onNewStreamFrame()
 	ImagePtr image(new Image(mStreamingVideoSource->getUid()+"_snapshot",
 							 data,
 							 mStreamingVideoSource->getName()));
-	mOpenIGTLink->client()->sendMessage(image);
+	mOpenIGTLink->getNetworkConnection()->sendMessage(image);
 }
 
 } // namespace cx

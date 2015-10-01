@@ -65,7 +65,7 @@ NetworkConnectionHandle::NetworkConnectionHandle(QString threadname)
 
 	mIp = this->createIpOption();
 	mPort = this->createPortOption();
-	mDialects = this->createDialectOption();
+    mProtocols = this->createDialectOption();
 	mRole = this->createRoleOption();
 
 	this->onPropertiesChanged();
@@ -79,7 +79,7 @@ void NetworkConnectionHandle::onPropertiesChanged()
 	info.role = mRole->getValue();
 	info.host = mIp->getValue();
 	info.port = mPort->getValue();
-	info.protocol = mDialects->getValue();
+    info.protocol = mProtocols->getValue();
 
 	mClient->setConnectionInfo(info);
 }
@@ -90,7 +90,7 @@ void NetworkConnectionHandle::onConnectionInfoChanged()
 	mRole->setValue(info.role);
 	mIp->setValue(info.host);
 	mPort->setValue(info.port);
-	mDialects->setValue(info.protocol);
+    mProtocols->setValue(info.protocol);
 }
 
 NetworkConnectionHandle::~NetworkConnectionHandle()
@@ -102,7 +102,7 @@ NetworkConnectionHandle::~NetworkConnectionHandle()
 	// thread-delete implicitly at end.
 }
 
-NetworkConnection* NetworkConnectionHandle::client()
+NetworkConnection* NetworkConnectionHandle::getNetworkConnection()
 {
 	return mClient.get();
 }

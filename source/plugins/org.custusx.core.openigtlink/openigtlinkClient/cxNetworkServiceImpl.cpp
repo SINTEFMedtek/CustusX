@@ -73,14 +73,14 @@ QStringList NetworkServiceImpl::getConnectionUids() const
 {
 	QStringList retval;
 	for (unsigned i=0; i<mConnections.size(); ++i)
-		retval << mConnections[i]->client()->getUid();
+        retval << mConnections[i]->getNetworkConnection()->getUid();
 	return retval;
 }
 
 NetworkConnectionHandlePtr NetworkServiceImpl::findConnection(QString uid) const
 {
 	for (unsigned i=0; i<mConnections.size(); ++i)
-		if (mConnections[i]->client()->getUid() == uid)
+        if (mConnections[i]->getNetworkConnection()->getUid() == uid)
 			return mConnections[i];
 	return NetworkConnectionHandlePtr();
 }

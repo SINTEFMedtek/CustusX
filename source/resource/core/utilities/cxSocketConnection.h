@@ -112,8 +112,8 @@ signals:
 private slots:
     void internalConnected();
     void internalDisconnected();
-	void internalError(QAbstractSocket::SocketError socketError);
-	virtual void internalDataAvailable() = 0;
+    void internalError(QAbstractSocket::SocketError socketError);
+    virtual void internalDataAvailable() = 0;
 
 protected:
 	SocketConnectorPtr createConnector(ConnectionInfo info);

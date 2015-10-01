@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "org_custusx_core_openigtlink_Export.h"
 
-#include "cxProtocol.h"
+#include "cxOpenIGTLinkProtocol.h"
 
 namespace cx {
 
@@ -159,7 +159,7 @@ namespace cx {
 
  */
 
-class org_custusx_core_openigtlink_EXPORT PlusProtocol : public Protocol
+class org_custusx_core_openigtlink_EXPORT PlusProtocol : public OpenIGTLinkProtocol
 {
 public:
     PlusProtocol();

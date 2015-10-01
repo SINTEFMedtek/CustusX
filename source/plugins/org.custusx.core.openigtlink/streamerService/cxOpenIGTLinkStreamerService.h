@@ -59,7 +59,7 @@ private:
     OpenIGTLinkStreamerPtr mStreamer;
 	NetworkConnectionHandlePtr mConnection;
 };
-
+typedef boost::shared_ptr<OpenIGTLinkStreamerService> OpenIGTLinkStreamerServicePtr;
 } //namespace cx
 
 #endif //CXOPENIGTLINKSTREAMERSERVICE_H

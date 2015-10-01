@@ -81,6 +81,7 @@ void OpenIGTLinkStreamer::receivedError()
 
 void OpenIGTLinkStreamer::receivedImage(ImagePtr image)
 {
+    CX_LOG_CHANNEL_DEBUG("janne beate ") << "ImagePtr received";
     PackagePtr package(new Package());
     package->mImage = image;
     if(mSender)
@@ -89,6 +90,7 @@ void OpenIGTLinkStreamer::receivedImage(ImagePtr image)
 
 void OpenIGTLinkStreamer::receiveIgtlImage(IGTLinkImageMessage::Pointer igtlimage)
 {
+    CX_LOG_CHANNEL_DEBUG("janne beate ") << "IGTLinkImageMessage received";
     PackagePtr package(new Package());
     package->mIgtLinkImageMessage = igtlimage;
     // if us status not sent, do it here
@@ -105,6 +107,7 @@ void OpenIGTLinkStreamer::receiveIgtlImage(IGTLinkImageMessage::Pointer igtlimag
 
 void OpenIGTLinkStreamer::receivedUSStatusMessage(IGTLinkUSStatusMessage::Pointer message)
 {
+    CX_LOG_CHANNEL_DEBUG("janne beate ") << "IGTLinkUSStatusMessage received";
     mUnsentUSStatusMessage = message;
 }
 

@@ -56,7 +56,7 @@ NetworkConnectionWidget::NetworkConnectionWidget(NetworkConnectionHandlePtr clie
 	mConnectButton->setCheckable(true);
     connect(mConnectButton, &QPushButton::clicked, this, &NetworkConnectionWidget::connectButtonClicked);
 
-	connect(mClient->client(), &NetworkConnection::stateChanged, this, &NetworkConnectionWidget::onStateChanged);
+	connect(mClient->getNetworkConnection(), &NetworkConnection::stateChanged, this, &NetworkConnectionWidget::onStateChanged);
 
     QVBoxLayout* topLayout = new QVBoxLayout(this);
 
@@ -75,7 +75,7 @@ NetworkConnectionWidget::NetworkConnectionWidget(NetworkConnectionHandlePtr clie
     topLayout->addStretch();
 //	CX_LOG_CHANNEL_DEBUG("CA") << "OpenIGTLinkConnectionWidget end create " << client->getUid();
 
-	this->onStateChanged(mClient->client()->getState());
+	this->onStateChanged(mClient->getNetworkConnection()->getState());
 
 }
 
@@ -117,13 +117,13 @@ void NetworkConnectionWidget::connectButtonClicked(bool checked)
 {
     if(checked)
     {
-		boost::function<void()> connect = boost::bind(&NetworkConnection::requestConnect, mClient->client());
-		mClient->client()->invoke(connect);
+		boost::function<void()> connect = boost::bind(&NetworkConnection::requestConnect, mClient->getNetworkConnection());
+		mClient->getNetworkConnection()->invoke(connect);
     }
     else
     {
-		boost::function<void()> disconnect = boost::bind(&NetworkConnection::requestDisconnect, mClient->client());
-		mClient->client()->invoke(disconnect);
+		boost::function<void()> disconnect = boost::bind(&NetworkConnection::requestDisconnect, mClient->getNetworkConnection());
+		mClient->getNetworkConnection()->invoke(disconnect);
     }
 }
 

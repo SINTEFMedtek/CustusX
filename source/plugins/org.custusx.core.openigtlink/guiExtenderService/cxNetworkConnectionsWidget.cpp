@@ -77,7 +77,7 @@ struct WidgetInGroupBox
 
 
 
-NetworkConnectionsWidget::NetworkConnectionsWidget(NetworkConnectionManagerPtr connections, QWidget* parent) :
+NetworkConnectionsWidget::NetworkConnectionsWidget(NetworkServiceImplPtr connections, QWidget* parent) :
 	BaseWidget(parent, "NetworkConnectionsWidget", "Network Connections"),
 	mConnections(connections)
 {
@@ -126,7 +126,7 @@ void NetworkConnectionsWidget::updateConnectionWidget()
 	mOptionsWidget->replaceWidget(widget);
 	if (connection)
 	{
-		mOptionsWidget->groupBox->setTitle(connection->client()->getUid());
+		mOptionsWidget->groupBox->setTitle(connection->getNetworkConnection()->getUid());
 	}
 }
 
