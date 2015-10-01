@@ -149,7 +149,6 @@ void ViewWrapper2D::samplePoint(Vector3D click_vp)
 	Vector3D p_s = vpMs.inv().coord(click_vp);
 	Vector3D p_r = sMr.inv().coord(p_s);
 
-	CX_LOG_DEBUG() << "ViewWrapper2D::samplePoint() p_r: " << p_r;
 	emit pointSampled(p_r);
 }
 

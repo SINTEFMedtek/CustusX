@@ -36,6 +36,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientLandMarksWidget.h"
 #include <QCheckBox>
 
+class QTableWidgetItem;
+
 namespace cx
 {
 /**
@@ -68,6 +70,7 @@ protected slots:
   virtual void pointSampled(Vector3D p_r);
 private:
   virtual void performRegistration();
+  QTableWidgetItem * getLandmarkTableItem();
 };
 
 /**
