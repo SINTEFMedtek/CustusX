@@ -40,19 +40,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include <QMutex>
 #include <QMutexLocker>
-#include "igtlMessageHeader.h"
-#include "igtlTransformMessage.h"
-#include "igtlImageMessage.h"
-#include "igtlStatusMessage.h"
-#include "igtlStringMessage.h"
-#include "cxIGTLinkUSStatusMessage.h"
-
 #include "cxSocketConnection.h"
 #include "cxTransform3D.h"
 #include "cxImage.h"
 #include "cxProbeDefinition.h"
 #include "cxLogger.h"
 #include "cxProtocol.h"
+#include "cxOpenIGTLinkProtocol.h"
 #include "boost/function.hpp"
 
 typedef boost::shared_ptr<QThread> QThreadPtr;
@@ -94,31 +88,19 @@ signals:
     void image(ImagePtr image);
 	void mesh(MeshPtr image);
 	void probedefinition(QString devicename, ProbeDefinitionPtr definition);
-    void igtlimage(IGTLinkImageMessage::Pointer igtlimage);
-    void usstatusmessage(IGTLinkUSStatusMessage::Pointer message);
+//    void igtlimage(IGTLinkImageMessage::Pointer igtlimage);
+//    void usstatusmessage(IGTLinkUSStatusMessage::Pointer message);
 
 private slots:
     virtual void internalDataAvailable();
 	void onInvoke(boost::function<void()> func);
 
-protected:
-
 private:
-    ProtocolPtr initDialect(ProtocolPtr value);
-	void setDialect(QString dialectname);
-	bool receiveHeader(const igtl::MessageHeader::Pointer header) const;
-    bool receiveBody(const igtl::MessageHeader::Pointer header);
-	qint64 skip(qint64 maxSizeBytes) const;
-
-    template <typename T>
-    bool receive(const igtl::MessageBase::Pointer header);
+    ProtocolPtr initProtocol(ProtocolPtr value);
+    void setProtocol(QString protocolname);
 
     QMutex mMutex;
-
-    igtl::MessageHeader::Pointer mHeader;
-    bool mHeaderReceived;
-
-    ProtocolPtr mDialect;
+    ProtocolPtr mProtocol;
     typedef std::map<QString, ProtocolPtr> DialectMap;
     DialectMap mAvailableDialects;
 	const QString mUid;

@@ -43,7 +43,7 @@ namespace cx
 typedef boost::shared_ptr<class NetworkConnectionHandle> NetworkConnectionHandlePtr;
 typedef boost::shared_ptr<class OpenIGTLinkTrackingSystemService> OpenIGTLinkTrackingSystemServicePtr;
 typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
-typedef boost::shared_ptr<class NetworkServiceImpl> NetworkConnectionManagerPtr;
+typedef boost::shared_ptr<class NetworkServiceImpl> NetworkServiceImplPtr;
 
 /**
  * Activator for the OpenIGTLink service
@@ -74,7 +74,7 @@ private:
 //    QThread mOpenIGTLinkThread;
 //	NetworkConnectionHandlePtr mOpenIGTLink;
 
-	NetworkConnectionManagerPtr mNetworkConnections;
+    NetworkServiceImplPtr mNetworkConnections;
 };
 
 } // namespace cx

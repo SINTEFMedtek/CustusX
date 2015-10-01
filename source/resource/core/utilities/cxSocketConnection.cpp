@@ -219,7 +219,10 @@ bool SocketConnection::socketIsConnected()
 
 bool SocketConnection::enoughBytesAvailableOnSocket(int bytes) const
 {
-	return mSocket->bytesAvailable() >= bytes;
+    bool enoughBytes = mSocket->bytesAvailable() >= bytes;
+    if(!enoughBytes)
+        CX_LOG_WARNING() << "Want " << bytes << " but only "<< mSocket->bytesAvailable() << " are available on the socket.";
+    return enoughBytes;
 }
 
 bool SocketConnection::socketReceive(void *packPointer, int packSize) const
@@ -227,7 +230,8 @@ bool SocketConnection::socketReceive(void *packPointer, int packSize) const
     if(!this->enoughBytesAvailableOnSocket(packSize))
         return false;
 
-    int r = mSocket->read(reinterpret_cast<char*>(packPointer), packSize);
+    char* charPointer = reinterpret_cast<char*>(packPointer);
+    int r = mSocket->read(charPointer, packSize);
     if(r <= 0)
     {
         CX_LOG_ERROR() << "Error when receiving data from socket.";

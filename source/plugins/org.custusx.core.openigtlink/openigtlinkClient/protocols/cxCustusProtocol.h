@@ -36,12 +36,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "org_custusx_core_openigtlink_Export.h"
 
-#include "cxProtocol.h"
+#include "cxOpenIGTLinkProtocol.h"
 
 namespace cx
 {
 
-class org_custusx_core_openigtlink_EXPORT CustusProtocol : public Protocol
+class org_custusx_core_openigtlink_EXPORT CustusProtocol : public OpenIGTLinkProtocol
 {
 public:
     virtual QString getName() const;

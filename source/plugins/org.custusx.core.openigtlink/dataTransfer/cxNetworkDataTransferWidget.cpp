@@ -72,7 +72,7 @@ NetworkDataTransferWidget::NetworkDataTransferWidget(NetworkDataTransferPtr back
 	QVBoxLayout* layout = new QVBoxLayout(this);
 //	layout->setMargin(0);
 
-	QString uid = mDataTransfer->getOpenIGTLink()->client()->getUid();
+	QString uid = mDataTransfer->getOpenIGTLink()->getNetworkConnection()->getUid();
 	QVBoxLayout* connectionLayout = this->createVBoxInGroupBox(layout, QString("Connection/%1").arg(uid));
 	connectionLayout->addWidget(mConnectionWidget);
 

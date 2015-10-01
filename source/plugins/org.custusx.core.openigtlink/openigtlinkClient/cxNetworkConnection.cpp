@@ -36,24 +36,24 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTime.h"
 #include <QThread>
 
+#include "cxProtocol.h"
+#include "cxOpenIGTLinkProtocol.h"
 #include "cxPlusProtocol.h"
 #include "cxCustusProtocol.h"
 #include "cxRASProtocol.h"
-#include "igtl_header.h"
-#include "cxIGTLinkConversionImage.h"
-#include "cxIGTLinkConversionPolyData.h"
+
 #include "cxXmlOptionItem.h"
 #include "cxProfile.h"
 #include "cxStringProperty.h"
 #include "cxDoubleProperty.h"
+
+#include "cxUtilHelpers.h"
 
 namespace cx
 {
 
 NetworkConnection::NetworkConnection(QString uid, QObject *parent) :
     SocketConnection(parent),
-    mHeader(igtl::MessageHeader::New()),
-	mHeaderReceived(false),
 	mUid(uid)
 {
     qRegisterMetaType<Transform3D>("Transform3D");
@@ -64,20 +64,21 @@ NetworkConnection::NetworkConnection(QString uid, QObject *parent) :
 
 	ConnectionInfo info = this->getConnectionInfo();
 
-    info.protocol = this->initDialect(ProtocolPtr(new CustusProtocol()))->getName();
-    this->initDialect(ProtocolPtr(new PlusProtocol()));
-    this->initDialect(ProtocolPtr(new Protocol()));
-    this->initDialect(ProtocolPtr(new RASProtocol()));
+    //TODO move to the correct plugin init
+    info.protocol = this->initProtocol(ProtocolPtr(new CustusProtocol()))->getName();
+    this->initProtocol(ProtocolPtr(new PlusProtocol()));
+    this->initProtocol(ProtocolPtr(new OpenIGTLinkProtocol()));
+    this->initProtocol(ProtocolPtr(new RASProtocol()));
 
 	SocketConnection::setConnectionInfo(info);
-	this->setDialect(info.protocol);
+    this->setProtocol(info.protocol);
 }
 
 NetworkConnection::~NetworkConnection()
 {
 }
 
-ProtocolPtr NetworkConnection::initDialect(ProtocolPtr value)
+ProtocolPtr NetworkConnection::initProtocol(ProtocolPtr value)
 {
 	mAvailableDialects[value->getName()] = value;
 	return value;
@@ -86,7 +87,7 @@ ProtocolPtr NetworkConnection::initDialect(ProtocolPtr value)
 void NetworkConnection::setConnectionInfo(ConnectionInfo info)
 {
 	SocketConnection::setConnectionInfo(info);
-	this->setDialect(info.protocol);
+    this->setProtocol(info.protocol);
 }
 
 void NetworkConnection::invoke(boost::function<void()> func)
@@ -113,228 +114,85 @@ QStringList NetworkConnection::getAvailableDialects() const
     return retval;
 }
 
-void NetworkConnection::setDialect(QString dialectname)
+void NetworkConnection::setProtocol(QString protocolname)
 {
     QMutexLocker locker(&mMutex);
-    if(mDialect && (dialectname == mDialect->getName()))
+    if(mProtocol && (protocolname == mProtocol->getName()))
         return;
 
-    ProtocolPtr dialect = mAvailableDialects[dialectname];
-    if(!dialect)
+    ProtocolPtr protocol = mAvailableDialects[protocolname];
+    if(!protocol)
     {
-        CX_LOG_ERROR() << "\"" << dialectname << "\" is an unknown opentigtlink dialect.";
+        CX_LOG_ERROR() << "\"" << protocolname << "\" is an unknown opentigtlink dialect.";
         return;
     }
 
-    if(mDialect)
+    if(mProtocol)
     {
-        disconnect(mDialect.get(), &Protocol::image, this, &NetworkConnection::image);
-        disconnect(mDialect.get(), &Protocol::mesh, this, &NetworkConnection::mesh);
-        disconnect(mDialect.get(), &Protocol::transform, this, &NetworkConnection::transform);
-        disconnect(mDialect.get(), &Protocol::calibration, this, &NetworkConnection::calibration);
-        disconnect(mDialect.get(), &Protocol::probedefinition, this, &NetworkConnection::probedefinition);
-        disconnect(mDialect.get(), &Protocol::usstatusmessage, this, &NetworkConnection::usstatusmessage);
-        disconnect(mDialect.get(), &Protocol::igtlimage, this, &NetworkConnection::igtlimage);
+        disconnect(mProtocol.get(), &Protocol::image, this, &NetworkConnection::image);
+        disconnect(mProtocol.get(), &Protocol::mesh, this, &NetworkConnection::mesh);
+        disconnect(mProtocol.get(), &Protocol::transform, this, &NetworkConnection::transform);
+        disconnect(mProtocol.get(), &Protocol::calibration, this, &NetworkConnection::calibration);
+        //TODO
+//        disconnect(mDialect.get(), &OpenIGTLinkProtocol::probedefinition, this, &NetworkConnection::probedefinition);
+//        disconnect(mDialect.get(), &OpenIGTLinkProtocol::usstatusmessage, this, &NetworkConnection::usstatusmessage);
+//        disconnect(mDialect.get(), &OpenIGTLinkProtocol::igtlimage, this, &NetworkConnection::igtlimage);
     }
 
-    mDialect = dialect;
-    connect(dialect.get(), &Protocol::image, this, &NetworkConnection::image);
-    connect(dialect.get(), &Protocol::mesh, this, &NetworkConnection::mesh);
-    connect(dialect.get(), &Protocol::transform, this, &NetworkConnection::transform);
-    connect(dialect.get(), &Protocol::calibration, this, &NetworkConnection::calibration);
-    connect(dialect.get(), &Protocol::probedefinition, this, &NetworkConnection::probedefinition);
-    connect(dialect.get(), &Protocol::usstatusmessage, this, &NetworkConnection::usstatusmessage);
-    connect(dialect.get(), &Protocol::igtlimage, this, &NetworkConnection::igtlimage);
+    mProtocol = protocol;
+    connect(protocol.get(), &Protocol::image, this, &NetworkConnection::image);
+    connect(protocol.get(), &Protocol::mesh, this, &NetworkConnection::mesh);
+    connect(protocol.get(), &Protocol::transform, this, &NetworkConnection::transform);
+    connect(protocol.get(), &Protocol::calibration, this, &NetworkConnection::calibration);
+    //TODO
+//    connect(dialect.get(), &OpenIGTLinkProtocol::probedefinition, this, &NetworkConnection::probedefinition);
+//    connect(dialect.get(), &OpenIGTLinkProtocol::usstatusmessage, this, &NetworkConnection::usstatusmessage);
+//    connect(dialect.get(), &OpenIGTLinkProtocol::igtlimage, this, &NetworkConnection::igtlimage);
 
-	CX_LOG_CHANNEL_SUCCESS(CX_OPENIGTLINK_CHANNEL_NAME) << "IGTL Dialect set to " << dialectname;
+    CX_LOG_CHANNEL_SUCCESS(CX_OPENIGTLINK_CHANNEL_NAME) << "IGTL Dialect set to " << protocolname;
 
 }
 
 void NetworkConnection::sendMessage(ImagePtr image)
 {
 	QMutexLocker locker(&mMutex);
+    char *pointer = NULL;
+    int size = 0;
 
-	IGTLinkConversionImage imageConverter;
-	igtl::ImageMessage::Pointer msg = imageConverter.encode(image, mDialect->coordinateSystem());
-	CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "Sending image: " << image->getName();
-	msg->Pack();
-
-	mSocket->write(reinterpret_cast<char*>(msg->GetPackPointer()), msg->GetPackSize());
-//    CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "Sent image: " << image->getName();
+    mProtocol->encode(image, pointer, size);
+    mSocket->write(pointer, size);
 }
 
-void NetworkConnection::sendMessage(MeshPtr data)
+void NetworkConnection::sendMessage(MeshPtr mesh)
 {
 	QMutexLocker locker(&mMutex);
+    char *pointer = NULL;
+    int size = 0;
 
-	IGTLinkConversionPolyData polyConverter;
-	igtl::PolyDataMessage::Pointer msg = polyConverter.encode(data, mDialect->coordinateSystem());
-	CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "Sending mesh: " << data->getName();
-	msg->Pack();
-
-	mSocket->write(reinterpret_cast<char*>(msg->GetPackPointer()), msg->GetPackSize());
+    mProtocol->encode(mesh, pointer, size);
+    mSocket->write(pointer, size);
 }
-
-/*
-void NetworkConnection::sendStringMessage(QString command)
-{
-    QMutexLocker locker(&mMutex);
-
-    OpenIGTLinkConversion converter;
-    igtl::StringMessage::Pointer stringMsg = converter.encode(command);
-    CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "Sending string: " << command;
-    stringMsg->Pack();
-
-    mSocket->write(reinterpret_cast<char*>(stringMsg->GetPackPointer()), stringMsg->GetPackSize());
-}
-*/
 
 void NetworkConnection::internalDataAvailable()
 {
+    //CX_LOG_DEBUG() << "START receive";
     if(!this->socketIsConnected())
         return;
 
     bool done = false;
-    while(!done)
+    if(mProtocol->readyToReceiveData())
     {
-        if(!mHeaderReceived)
+        //CX_LOG_DEBUG() << "A ready to receive data " << mProtocol->readyToReceiveData();
+        PackPtr pack = mProtocol->getPack();
+        if(this->socketReceive(pack->pointer, pack->size))
         {
-            if(!this->receiveHeader(mHeader))
-                done = true;
-            else
-                mHeaderReceived = true;
-		}
-
-        if(mHeaderReceived)
-        {
-            if(!this->receiveBody(mHeader))
-                done = true;
-            else
-                mHeaderReceived = false;
-		}
-    }
-}
-
-/*
-void NetworkConnection::queryServer()
-{
-    QString command = "<Command Name=\"RequestChannelIds\" />";
-    this->sendStringMessage(command);
-
-    command = "<Command Name=\"RequestDeviceIds\" />";
-    this->sendStringMessage(command);
-
-    command = "<Command Name=\"SaveConfig\" />";
-    this->sendStringMessage(command);
-}
-*/
-
-bool NetworkConnection::receiveHeader(const igtl::MessageHeader::Pointer header) const
-{
-    header->InitPack();
-
-    if(!this->socketReceive(header->GetPackPointer(), header->GetPackSize()))
-        return false;
-
-    int c = header->Unpack(1);
-    if (c & igtl::MessageHeader::UNPACK_HEADER)
-    {
-        std::string deviceType = std::string(header->GetDeviceType());
-        return true;
-    }
-    else
-        return false;
-}
-
-bool NetworkConnection::receiveBody(const igtl::MessageBase::Pointer header)
-{
-	QString type = QString(header->GetDeviceType()).toUpper();
-	if (type=="TRANSFORM")
-    {
-        if(!this->receive<igtl::TransformMessage>(header))
-            return false;
-    }
-	else if (type=="POLYDATA")
-	{
-		if(!this->receive<igtl::PolyDataMessage>(header))
-			return false;
-	}
-	else if (type=="IMAGE")
-    {
-        //----- CustusX openigtlink server -----
-        //there is a special kind of image package coming from custusx
-        //server where crc is set to 0.
-        QString name(header->GetDeviceName());
-        if(name.contains("Sonix", Qt::CaseInsensitive))
-        {
-            if(!this->receive<IGTLinkImageMessage>(header))
-                return false;
-        }
-        //----------
-        else
-        {
-            if(!this->receive<igtl::ImageMessage>(header))
-                return false;
+            //CX_LOG_DEBUG() << "B";
+            pack->notifyDataArrived();
+            done = true;
         }
     }
-	else if (type=="STATUS")
-    {
-        if(!this->receive<igtl::StatusMessage>(header))
-            return false;
-    }
-	else if (type=="STRING")
-    {
-        if(!this->receive<igtl::StringMessage>(header))
-            return false;
-    }
-	else if (type=="CX_US_ST")
-    {
-        if(!this->receive<IGTLinkUSStatusMessage>(header))
-            return false;
-    }
-    else
-    {
-        CX_LOG_CHANNEL_WARNING(CX_OPENIGTLINK_CHANNEL_NAME) << "Skipping message of type " << type;
-        igtl::MessageBase::Pointer body = igtl::MessageBase::New();
-        body->SetMessageHeader(header);
-		this->skip(body->GetBodySizeToRead());
-    }
-    return true;
+    //CX_LOG_DEBUG() << "END receive";
+
 }
-
-qint64 NetworkConnection::skip(qint64 maxSizeBytes) const
-{
-	char *voidData = new char[maxSizeBytes];
-	int retval = mSocket->read(voidData, maxSizeBytes);
-	delete[] voidData;
-	return retval;
-}
-
-
-template <typename T>
-bool NetworkConnection::receive(const igtl::MessageBase::Pointer header)
-{
-    QMutexLocker locker(&mMutex);
-
-    typename T::Pointer body = T::New();
-    body->SetMessageHeader(header);
-    body->AllocatePack();
-
-    if(!this->socketReceive(body->GetPackBodyPointer(), body->GetPackBodySize()))
-        return false;
-
-    int c = body->Unpack(mDialect->doCRC());
-    if (c & igtl::MessageHeader::UNPACK_BODY)
-    {
-        mDialect->translate(body);
-    }
-    else
-    {
-        CX_LOG_CHANNEL_ERROR(CX_OPENIGTLINK_CHANNEL_NAME) << "Could not unpack the body of type: " << body->GetDeviceType();
-        return false;
-    }
-    return true;
-}
-
 
 }//namespace cx
