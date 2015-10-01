@@ -75,7 +75,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxNavigation.h"
 #include "cxPatientModelService.h"
 
-
 namespace cx
 {
 
@@ -527,6 +526,7 @@ ViewWrapperPtr ViewManager::createViewWrapper(ViewPtr view, LayoutViewData viewD
 	{
 		ViewWrapper2DPtr wrapper(new ViewWrapper2D(view, mBackend));
 		wrapper->initializePlane(viewData.mPlane);
+		connect(wrapper.get(), &ViewWrapper2D::pointSampled, this, &ViewManager::pointSampled);
 		return wrapper;
 	}
 	else if (viewData.mType == View::VIEW_3D)

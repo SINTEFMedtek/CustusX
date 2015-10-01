@@ -50,12 +50,3 @@ TEST_CASE("ViewWrapper2D: Emits pointSampled signal", "[unit][plugins][org.custu
 	visHelper.viewWrapper->emitPointSampled();
 	CHECK(signalListener.isReceived());
 }
-
-TEST_CASE("VisualizationService: Emits pointSampled signal", "[unit][plugins][org.custusx.core.view]")
-{
-	cxtest::VisualizationHelper visHelper;
-
-	cxtest::DirectSignalListener signalListener(visHelper.services->visualizationService.get(), SIGNAL(pointSampled(Vector3D)));
-	visHelper.viewWrapper->emitPointSampled();
-	CHECK(signalListener.isReceived());
-}

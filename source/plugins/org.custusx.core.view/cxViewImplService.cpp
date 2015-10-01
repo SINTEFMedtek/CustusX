@@ -65,6 +65,7 @@ VisualizationImplService::VisualizationImplService(ctkPluginContext *context) :
 	connect(viewManager(), &ViewManager::fps, this, &VisualizationService::fps);
 	connect(viewManager(), &ViewManager::activeLayoutChanged, this, &VisualizationService::activeLayoutChanged);
 	connect(viewManager(), &ViewManager::renderingEnabledChanged, this, &VisualizationService::renderingEnabledChanged);
+	connect(viewManager(), &ViewManager::pointSampled, this, &VisualizationService::pointSampled);
 }
 
 VisualizationImplService::~VisualizationImplService()

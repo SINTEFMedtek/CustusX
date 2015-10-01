@@ -180,6 +180,7 @@ signals:
 	void activeLayoutChanged(); ///< emitted when the active layout changes
 	void activeViewChanged(); ///< emitted when the active view changes
 	void renderingEnabledChanged(); ///< emitted then rendering is enabled/disabled
+	void pointSampled(Vector3D p_r);
 
 protected slots:
 	void settingsChangedSlot(QString key);
