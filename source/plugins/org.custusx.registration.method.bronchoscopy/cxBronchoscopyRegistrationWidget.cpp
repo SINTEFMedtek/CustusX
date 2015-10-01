@@ -72,9 +72,22 @@ BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegServices servi
 	RegistrationBaseWidget(services, parent, "org_custusx_registration_method_bronchoscopy_widget",
 						   "Bronchoscopy Registration"),
 	mBronchoscopyRegistration(new BronchoscopyRegistration()),
-	mServices(services)
+	mServices(services),
+	mRecordTrackingWidget(NULL)
 {
 	mVerticalLayout = new QVBoxLayout(this);
+}
+
+void BronchoscopyRegistrationWidget::prePaintEvent()
+{
+	if (!mRecordTrackingWidget)
+	{
+		this->setup();
+	}
+}
+
+void BronchoscopyRegistrationWidget::setup()
+{
 	mOptions = profile()->getXmlSettings().descend("bronchoscopyregistrationwidget");
 
 	mSelectMeshWidget = StringPropertySelectMesh::New(mServices.patientModelService);

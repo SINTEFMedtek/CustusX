@@ -71,22 +71,16 @@ SelectRecordSession::SelectRecordSession(XmlOptionFile options,
 
 void SelectRecordSession::setTool(ToolPtr tool)
 {
-	if (tool==mTool)
+	if (tool==mToolOverride)
 		return;
 
-	this->clearTracer();
+	mToolOverride = tool;
 
-	mTool = tool;
-
-	this->recordedSessionsChanged();
 	this->showSelectedRecordingInView();
 }
 
 void SelectRecordSession::recordedSessionsChanged()
 {
-	if (!mTool) // optimization, see setTool()
-		return;
-
 	std::vector<RecordSessionPtr> sessions = mAcquisitionService->getSessions();
 	QStringList uids;
 	std::map<QString, QString> names;
@@ -101,34 +95,85 @@ void SelectRecordSession::recordedSessionsChanged()
 
 	if(mSessionSelector->getValue().isEmpty() && !uids.isEmpty())
 		mSessionSelector->setValue(uids.last());
+
+	this->showSelectedRecordingInView();
 }
 
-
-ToolRep3DPtr SelectRecordSession::getToolRepIn3DView()
+void SelectRecordSession::warnIfNoTrackingDataInSession()
 {
-	return mServices.visualizationService->get3DReps(0, 0)->findFirst<ToolRep3D>(mTool);
+	RecordSessionPtr session = this->getSession();
+	ToolPtr tool = this->getTool();
+	if (session && !tool)
+	{
+		CX_LOG_WARNING() << QString("Could not find any tracking data for any loaded tools in session [%2]. ")
+						  .arg(session.get() ? session->getHumanDescription() : "NULL");
+	}
+}
+
+RecordSessionPtr SelectRecordSession::getSession()
+{
+	QString uid = mSessionSelector->getValue();
+	if(!uid.isEmpty())
+		return mAcquisitionService->getSession(uid);
+	return RecordSessionPtr();
 }
 
 TimedTransformMap SelectRecordSession::getRecordedTrackerData_prMt()
 {
-	if(!mTool)
-		return TimedTransformMap();
+	RecordSessionPtr session = this->getSession();
+	ToolPtr tool = this->getTool();
 
-	RecordSessionPtr session;
-	QString sessionUid = mSessionSelector->getValue();
-	if(!sessionUid.isEmpty())
-		session = mAcquisitionService->getSession(sessionUid);
-
-	TimedTransformMap trackerRecordedData_prMt = RecordSession::getToolHistory_prMt(mTool, session);
+	TimedTransformMap trackerRecordedData_prMt = RecordSession::getToolHistory_prMt(tool, session, false);
 
 	return trackerRecordedData_prMt;
 }
 
+ToolPtr SelectRecordSession::getTool()
+{
+	if (mToolOverride)
+		return mToolOverride;
+
+	RecordSessionPtr session = this->getSession();
+	TrackingService::ToolMap tools = mServices.trackingService->getTools();
+
+	ToolPtr tool = this->findToolContainingMostDataForSession(tools, session);
+	return tool;
+}
+
+ToolPtr SelectRecordSession::findToolContainingMostDataForSession(std::map<QString, ToolPtr> tools, RecordSessionPtr session)
+{
+	std::map<int,ToolPtr> tooldata;
+
+	for (TrackingService::ToolMap::iterator i=tools.begin(); i!=tools.end(); ++i)
+	{
+		TimedTransformMap trackerRecordedData_prMt = RecordSession::getToolHistory_prMt(i->second, session, false);
+		tooldata[trackerRecordedData_prMt.size()] = i->second;
+	}
+
+	if (!tooldata.empty() && (tooldata.rbegin()->first!=0))
+		return tooldata.rbegin()->second;
+
+	return ToolPtr();
+}
+
+ToolRep3DPtr SelectRecordSession::getToolRepIn3DView(ToolPtr tool)
+{
+	return mServices.visualizationService->get3DReps(0, 0)->findFirst<ToolRep3D>(tool);
+}
+
 void SelectRecordSession::showSelectedRecordingInView()
 {
-	TimedTransformMap trackerRecordedData_prMt = this->getRecordedTrackerData_prMt();
+	this->warnIfNoTrackingDataInSession();
 
-	ToolRep3DPtr activeRep3D = this->getToolRepIn3DView();
+	this->clearTracer();
+
+	TimedTransformMap trackerRecordedData_prMt = this->getRecordedTrackerData_prMt();
+	if (trackerRecordedData_prMt.empty())
+		return;
+
+	mCurrentTracedTool = this->getTool();
+
+	ToolRep3DPtr activeRep3D = this->getToolRepIn3DView(mCurrentTracedTool);
 	if(!activeRep3D)
 		return;
 
@@ -146,11 +191,14 @@ void SelectRecordSession::showSelectedRecordingInView()
 
 void SelectRecordSession::clearTracer()
 {
-	ToolRep3DPtr activeRep3D = this->getToolRepIn3DView();
+	ToolRep3DPtr activeRep3D = this->getToolRepIn3DView(mCurrentTracedTool);
+
 	if(activeRep3D)
 	{
 		activeRep3D->getTracer()->clear();
 	}
+
+	mCurrentTracedTool.reset();
 }
 
 } //namespace cx

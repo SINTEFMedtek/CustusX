@@ -68,11 +68,11 @@ RecordTrackingWidget::RecordTrackingWidget(XmlOptionFile options,
 
 	mToolSelector = StringPropertySelectTool::New(services.getToolManager());
 
-	mSelectRecordSession = new SelectRecordSession(mOptions, acquisitionService, services);
+	mSelectRecordSession.reset(new SelectRecordSession(mOptions, acquisitionService, services));
 	connect(mSelectRecordSession->getSessionSelector().get(), &StringProperty::changed, this, &RecordTrackingWidget::onMergeChanged);
 
 	mMergeWithExistingSession = BoolProperty::initialize("mergerecording", "Merge",
-														 "Merge new recording with existing recorded session",
+														 "Merge new recording with selected recorded session",
 														 false, QDomNode());
 	connect(mMergeWithExistingSession.get(), &BoolProperty::changed, this, &RecordTrackingWidget::onMergeChanged);
 
@@ -81,13 +81,19 @@ RecordTrackingWidget::RecordTrackingWidget(XmlOptionFile options,
 
 	mVerticalLayout->setMargin(0);
 
-	mVerticalLayout->addWidget(sscCreateDataWidget(this, mToolSelector));
+	mToolSelectorWidget = sscCreateDataWidget(this, mToolSelector);
+	mVerticalLayout->addWidget(mToolSelectorWidget);
 	mVerticalLayout->addWidget(mRecordSessionWidget);
 	mVerticalLayout->addWidget(sscCreateDataWidget(this, mMergeWithExistingSession));
 	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mSelectRecordSession->getSessionSelector()));
 
 	mObscuredListener.reset(new WidgetObscuredListener(this));
 	connect(mObscuredListener.get(), SIGNAL(obscured(bool)), this, SLOT(obscuredSlot(bool)));
+}
+
+void RecordTrackingWidget::displayToolSelector(bool on)
+{
+	mToolSelectorWidget->setVisible(on);
 }
 
 StringPropertyPtr RecordTrackingWidget::getSessionSelector()
@@ -102,7 +108,8 @@ void RecordTrackingWidget::acquisitionStarted()
 	ToolRep3DPtr activeRep3D = this->getToolRepIn3DView();
 	if (activeRep3D)
 	{
-		activeRep3D->getTracer()->clear();
+		if (!mMergeWithExistingSession->getValue())
+			activeRep3D->getTracer()->clear();
 		activeRep3D->getTracer()->setColor(QColor("magenta"));
 		activeRep3D->getTracer()->start();
 	}
@@ -111,6 +118,7 @@ void RecordTrackingWidget::acquisitionStarted()
 void RecordTrackingWidget::acquisitionStopped()
 {
 	QString newUid = mAcquisitionService->getLatestSession()->getUid();
+	CX_LOG_CHANNEL_DEBUG("CA") << "RecordTrackingWidget::acquisitionStopped() setting " << newUid;
 	mSelectRecordSession->getSessionSelector()->setValue(newUid);
 
 	mServices.patientModelService->autoSave();
@@ -122,6 +130,8 @@ void RecordTrackingWidget::acquisitionStopped()
 	}
 
 //	this->saveSessions();
+
+	emit acquisitionCompleted();
 }
 
 void RecordTrackingWidget::acquisitionCancelled()
@@ -189,6 +199,5 @@ TimedTransformMap RecordTrackingWidget::getRecordedTrackerData_prMt()
 {
 	return mSelectRecordSession->getRecordedTrackerData_prMt();
 }
-
 
 } //namespace cx

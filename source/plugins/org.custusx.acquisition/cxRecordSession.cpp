@@ -158,6 +158,7 @@ void RecordSession::parseXml(QDomNode& node)
 		bool ok;
 		interval.first = this->timestamp2datetime(source.attribute("start"));
 		interval.second = this->timestamp2datetime(source.attribute("stop"));
+		mIntervals.push_back(interval);
 	}
 }
 
@@ -205,7 +206,7 @@ void RecordSession::setIdAndTimestampFromUid(QString uid)
 	mTimestamp = QDateTime::fromString(uid.split("_").last(), timestampSecondsFormat());
 }
 
-TimedTransformMap RecordSession::getToolHistory_prMt(ToolPtr tool, RecordSessionPtr session)
+TimedTransformMap RecordSession::getToolHistory_prMt(ToolPtr tool, RecordSessionPtr session, bool verbose)
 {
 	TimedTransformMap retval;
 
@@ -220,7 +221,7 @@ TimedTransformMap RecordSession::getToolHistory_prMt(ToolPtr tool, RecordSession
 		}
 	}
 
-	if(retval.empty() && session)
+	if(retval.empty() && session && verbose)
 	{
 		CX_LOG_ERROR() << QString("Could not find any tracking data for tool [%1] in session [%2]. ")
 						  .arg(tool.get() ? tool->getName() : "NULL")

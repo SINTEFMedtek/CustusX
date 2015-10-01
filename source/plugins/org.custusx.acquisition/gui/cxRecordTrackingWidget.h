@@ -51,7 +51,7 @@ typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
 //typedef boost::shared_ptr<class BronchoscopyRegistration> BronchoscopyRegistrationPtr;
 typedef std::map<QString, ToolPtr> ToolMap;
 typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
-class SelectRecordSession;
+typedef boost::shared_ptr<class SelectRecordSession> SelectRecordSessionPtr;
 
 /**
  *
@@ -75,6 +75,11 @@ public:
 	ToolPtr getSuitableRecordingTool();
 	TimedTransformMap getRecordedTrackerData_prMt();
 	StringPropertyPtr getSessionSelector();
+	SelectRecordSessionPtr getSelectRecordSession() { return mSelectRecordSession; }
+	void displayToolSelector(bool on);
+
+signals:
+	void acquisitionCompleted(); ///< aquisition complete, and widget internal state is updated accordingly
 
 private slots:
 	void acquisitionStarted();
@@ -88,8 +93,9 @@ private:
 	XmlOptionFile mOptions;
 
 	RecordSessionWidget* mRecordSessionWidget;
+	QWidget* mToolSelectorWidget;
 	ToolPtr mRecordingTool;
-	SelectRecordSession* mSelectRecordSession;
+	SelectRecordSessionPtr mSelectRecordSession;
 	StringPropertySelectToolPtr mToolSelector;
 	BoolPropertyPtr mMergeWithExistingSession;
 

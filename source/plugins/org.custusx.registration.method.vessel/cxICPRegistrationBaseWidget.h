@@ -100,6 +100,7 @@ protected:
 
 private slots:
 	void obscuredSlot(bool obscured);
+protected slots:
 	void registerSlot();
 
 protected:

@@ -31,48 +31,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxRMPCFromPointerWidget.h"
 
-#include <vtkPolyData.h>
-#include "cxTransform3D.h"
-#include "cxDataSelectWidget.h"
-#include "cxTrackingService.h"
 #include "cxMesh.h"
-#include "cxSelectDataStringProperty.h"
-#include "cxRecordSessionWidget.h"
-#include "cxRecordSession.h"
-#include "cxView.h"
-#include "cxToolRep3D.h"
-#include "cxToolTracer.h"
-//#include "cxBronchoscopyRegistration.h"
-#include "cxLogger.h"
-#include "cxTypeConversions.h"
 #include "cxPatientModelService.h"
 #include "cxRegistrationService.h"
-#include "cxViewService.h"
 #include "cxStringProperty.h"
 #include "cxLabeledComboBoxWidget.h"
-#include "cxTrackingService.h"
-#include "cxDoubleProperty.h"
-#include "cxProfile.h"
-#include "cxHelperWidgets.h"
-#include "cxBoolProperty.h"
-#include "cxCheckBoxWidget.h"
-#include "cxRepContainer.h"
 #include "cxWidgetObscuredListener.h"
-#include "cxViewGroupData.h"
-#include "cxStringPropertySelectTool.h"
-#include "cxHelperWidgets.h"
-#include "cxAcquisitionService.h"
-#include "cxRegServices.h"
 #include "cxRecordTrackingWidget.h"
 #include <QGroupBox>
 #include "cxRegistrationProperties.h"
 #include "vesselReg/SeansVesselReg.hxx"
 #include "cxMeshHelpers.h"
-#include "vtkPointData.h"
 #include "cxICPWidget.h"
-#include "cxMeshInView.h"
 #include "cxSpaceListener.h"
 #include "cxSpaceProvider.h"
+#include "cxAcquisitionService.h"
+#include "cxRecordSessionSelector.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -100,8 +75,10 @@ void RMPCFromPointerWidget::setup()
 													 mServices,
 													 "tracker",
 													 this);
+	mRecordTrackingWidget->displayToolSelector(false);
 	connect(mRecordTrackingWidget->getSessionSelector().get(), &StringProperty::changed,
 			this, &RMPCFromPointerWidget::inputChanged);
+	this->connectAutoRegistration();
 
 	QVBoxLayout* layout = new QVBoxLayout(this);
 	layout->setMargin(0);
@@ -115,6 +92,15 @@ void RMPCFromPointerWidget::setup()
 
 	this->inputChanged();
 	this->onSettingsChanged();
+}
+
+void RMPCFromPointerWidget::connectAutoRegistration()
+{
+	// connect queued: we record based on the selected session and not the last one
+	// and must thus wait for the selection to update
+	connect(mRecordTrackingWidget, &RecordTrackingWidget::acquisitionCompleted, this,
+			&RMPCFromPointerWidget::queuedAutoRegistration,
+			Qt::QueuedConnection);
 }
 
 
@@ -140,6 +126,7 @@ void RMPCFromPointerWidget::initializeRegistrator()
 	DataPtr fixed = mServices.registrationService->getFixedData();
 	MeshPtr moving = this->getTrackerDataAsMesh();
 	QString logPath = mServices.patientModelService->getActivePatientFolder() + "/Logs/";
+	CX_LOG_CHANNEL_DEBUG("CA") << "initializeRegistrator " << mRecordTrackingWidget->getSelectRecordSession()->getSessionSelector()->getValue();
 
 	mRegistrator->initialize(moving, fixed, logPath);
 }
@@ -167,12 +154,23 @@ void RMPCFromPointerWidget::inputChanged()
 	this->onSpacesChanged();
 }
 
+void RMPCFromPointerWidget::queuedAutoRegistration()
+{
+	if (!mObscuredListener->isObscured())
+	{
+		CX_LOG_CHANNEL_DEBUG("CA") << "Auto register";
+		this->registerSlot();
+	}
+}
+
 void RMPCFromPointerWidget::applyRegistration(Transform3D delta)
 {
+	ToolPtr tool = mRecordTrackingWidget->getSelectRecordSession()->getTool();
 	Transform3D rMpr = mServices.patientModelService->get_rMpr();
 	Transform3D new_rMpr = delta*rMpr;//output
 	mServices.registrationService->setLastRegistrationTime(QDateTime::currentDateTime());//Instead of restart
-	mServices.registrationService->applyPatientRegistration(new_rMpr, "Surface to Tracker");
+	QString text = QString("Contour from %1").arg(tool->getName());
+	mServices.registrationService->applyPatientRegistration(new_rMpr, text);
 }
 
 void RMPCFromPointerWidget::onShown()

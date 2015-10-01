@@ -82,6 +82,8 @@ protected:
 	virtual double getDefaultAutoLTS() const { return false; }
 
 private:
+	void queuedAutoRegistration();
+	void connectAutoRegistration();
 	MeshPtr getTrackerDataAsMesh();
 	QVBoxLayout* createVBoxInGroupBox(QVBoxLayout* parent, QString header);
 

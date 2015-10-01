@@ -42,7 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 class WidgetObscuredListener;
-class RecordTrackingWidget;
 class ICPWidget;
 typedef boost::shared_ptr<class Acquisition> AcquisitionPtr;
 typedef boost::shared_ptr<class StringPropertySelectMesh> StringPropertySelectMeshPtr;

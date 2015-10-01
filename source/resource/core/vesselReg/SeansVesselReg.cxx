@@ -31,6 +31,7 @@
 #include "vtkLandmarkTransform.h"
 #include "vtkFloatArray.h"
 #include "cxMesh.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -80,7 +81,6 @@ bool SeansVesselReg::initialize(DataPtr source, DataPtr target, QString logPath)
  */
 bool SeansVesselReg::execute()
 {
-	CX_LOG_CHANNEL_DEBUG("") << "SeansVesselReg::execute()";
 	if (mt_verbose)
 	{
 		std::cout << "stop Threshold:" << mt_distanceDeltaStopThreshold << endl;
@@ -245,6 +245,8 @@ SeansVesselReg::ContextPtr SeansVesselReg::createContext(DataPtr source, DataPtr
 	if (!source || !target)
 		return SeansVesselReg::ContextPtr();
 
+	QTime time = QTime::currentTime();
+
 	vtkPolyDataPtr targetPolyData = this->convertToPolyData(target);
 	vtkPolyDataPtr inputSourcePolyData = this->convertToPolyData(source);
 //	targetPolyData->Update();
@@ -304,6 +306,7 @@ SeansVesselReg::ContextPtr SeansVesselReg::createContext(DataPtr source, DataPtr
 
 	context->mLtsRatio = mt_ltsRatio; ///< local copy of the lts ratio, can be changed for current iteration.
 
+	CX_LOG_CHANNEL_DEBUG("CA") << "createcontext: " << time.msecsTo(QTime::currentTime());
 	return context;
 }
 

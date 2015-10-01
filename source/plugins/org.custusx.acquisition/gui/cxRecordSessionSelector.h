@@ -46,12 +46,13 @@ class WidgetObscuredListener;
 typedef boost::shared_ptr<class Acquisition> AcquisitionPtr;
 typedef boost::shared_ptr<class StringPropertySelectMesh> StringPropertySelectMeshPtr;
 typedef boost::shared_ptr<class ToolRep3D> ToolRep3DPtr;
+typedef boost::shared_ptr<class RecordSession> RecordSessionPtr;
 class RecordSessionWidget;
 typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
 //typedef boost::shared_ptr<class BronchoscopyRegistration> BronchoscopyRegistrationPtr;
 typedef std::map<QString, ToolPtr> ToolMap;
 typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
-
+typedef boost::shared_ptr<class SelectRecordSession> SelectRecordSessionPtr;
 
 /**
  *
@@ -72,6 +73,7 @@ public:
 	virtual ~SelectRecordSession()	{}
 
 	void setTool(ToolPtr tool);
+	ToolPtr getTool();
 	TimedTransformMap getRecordedTrackerData_prMt();
 	StringPropertyPtr getSessionSelector() { return mSessionSelector; }
 
@@ -82,14 +84,18 @@ private:
 	VisServices mServices;
 	AcquisitionServicePtr mAcquisitionService;
 	XmlOptionFile mOptions;
+	ToolPtr mCurrentTracedTool;
 
 	StringPropertyPtr mSessionSelector;
-	ToolPtr mTool;
+	ToolPtr mToolOverride;
 
 	void initSessionSelector();
-	ToolRep3DPtr getToolRepIn3DView();
+	ToolRep3DPtr getToolRepIn3DView(ToolPtr tool);
 	void showSelectedRecordingInView();
 	void clearTracer();
+	RecordSessionPtr getSession();
+	void warnIfNoTrackingDataInSession();
+	ToolPtr findToolContainingMostDataForSession(std::map<QString,ToolPtr> tools, RecordSessionPtr session);
 };
 
 } //namespace cx

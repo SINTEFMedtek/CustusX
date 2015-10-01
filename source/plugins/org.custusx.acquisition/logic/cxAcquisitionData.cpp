@@ -252,7 +252,9 @@ void Acquisition::stopRecord()
 		mPluginData->addRecordSession(mLatestSession);
 	reporter()->playStopSound();
 	this->setState(AcquisitionService::sNOT_RUNNING);
+	CX_LOG_CHANNEL_DEBUG("CA") << "pre emit acq stop";
 	emit acquisitionStopped();
+	CX_LOG_CHANNEL_DEBUG("CA") << "post emit acq stop";
 }
 
 void Acquisition::cancelRecord()

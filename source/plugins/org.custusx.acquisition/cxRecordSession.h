@@ -83,7 +83,7 @@ public:
 	void addXml(QDomNode& node);
 	void parseXml(QDomNode& node);
 
-	static TimedTransformMap getToolHistory_prMt(ToolPtr tool, RecordSessionPtr session);
+	static TimedTransformMap getToolHistory_prMt(ToolPtr tool, RecordSessionPtr session, bool verbose);
 
 protected:
 	QDateTime getTimestamp() const;
