@@ -31,129 +31,86 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxRMPCWidget.h"
 
-#include <vtkPolyData.h>
-#include "cxTransform3D.h"
-#include "cxDataSelectWidget.h"
-#include "cxTrackingService.h"
-#include "cxMesh.h"
-#include "cxSelectDataStringProperty.h"
-#include "cxRecordSessionWidget.h"
-#include "cxRecordSession.h"
-#include "cxView.h"
-#include "cxToolRep3D.h"
-#include "cxToolTracer.h"
-//#include "cxBronchoscopyRegistration.h"
-#include "cxLogger.h"
-#include "cxTypeConversions.h"
 #include "cxPatientModelService.h"
 #include "cxRegistrationService.h"
-#include "cxViewService.h"
-#include "cxStringProperty.h"
 #include "cxLabeledComboBoxWidget.h"
-#include "cxTrackingService.h"
-#include "cxDoubleProperty.h"
-#include "cxProfile.h"
-#include "cxHelperWidgets.h"
-#include "cxBoolProperty.h"
-#include "cxCheckBoxWidget.h"
-#include "cxRepContainer.h"
 #include "cxWidgetObscuredListener.h"
-#include "cxViewGroupData.h"
-#include "cxStringPropertySelectTool.h"
-#include "cxHelperWidgets.h"
-#include "cxAcquisitionService.h"
-#include "cxRegServices.h"
-#include "cxRecordTrackingWidget.h"
-#include <QGroupBox>
+#include "cxRegistrationProperties.h"
+#include "vesselReg/SeansVesselReg.hxx"
+#include "cxICPWidget.h"
+#include "cxSpaceListener.h"
+#include "cxSpaceProvider.h"
 
 namespace cx
 {
 RMPCWidget::RMPCWidget(RegServices services, QWidget* parent) :
-	RegistrationBaseWidget(services, parent, "org_custusx_registration_method_pointcloud_widget",
-						   "Point Cloud Registration"),
-	mServices(services)
+	ICPRegistrationBaseWidget(services, parent, "org_custusx_registration_method_pointcloud_widget",
+						   "Point Cloud Registration")
 {
-	mVerticalLayout = new QVBoxLayout(this);
-	mOptions = profile()->getXmlSettings().descend("RMPCWidget");
-
-	mSurfaceSelector = StringPropertySelectMesh::New(mServices.patientModelService);
-	mSurfaceSelector->setValueName("Surface: ");
-
-	mRegisterButton = new QPushButton("Register");
-	connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
-	mRegisterButton->setToolTip(this->defaultWhatsThis());
-
-	mRecordTrackingWidget = new RecordTrackingWidget(mOptions.descend("recordTracker"), mServices.acquisitionService, mServices, this);
-
-	mVerticalLayout->setMargin(0);
-	mVerticalLayout->addWidget(new DataSelectWidget(mServices.visualizationService, mServices.patientModelService, this, mSurfaceSelector));
-
-	QVBoxLayout* trackLayout = this->createVBoxInGroupBox(mVerticalLayout, "Tracking Recorder");
-	trackLayout->setMargin(0);
-	trackLayout->addWidget(mRecordTrackingWidget);
-
-	mVerticalLayout->addWidget(mRegisterButton);
-
-	mVerticalLayout->addStretch();
 }
 
-QVBoxLayout* RMPCWidget::createVBoxInGroupBox(QVBoxLayout* parent, QString header)
+void RMPCWidget::setup()
 {
-	QWidget* widget = new QWidget(this);
-	QVBoxLayout* layout = new QVBoxLayout(widget);
+	mSpaceListenerMoving = mServices.spaceProvider->createListener();
+	mSpaceListenerFixed = mServices.spaceProvider->createListener();
+	mSpaceListenerMoving->setSpace(mServices.spaceProvider->getPr());
+	connect(mSpaceListenerMoving.get(), &SpaceListener::changed, this, &RMPCWidget::onSpacesChanged);
+	connect(mSpaceListenerFixed.get(), &SpaceListener::changed, this, &RMPCWidget::onSpacesChanged);
+
+	mFixedImage.reset(new StringPropertyRegistrationFixedImage(mServices.registrationService, mServices.patientModelService));
+	mMovingImage.reset(new StringPropertyRegistrationMovingImage(mServices.registrationService, mServices.patientModelService));
+
+	connect(mServices.registrationService.get(), &RegistrationService::fixedDataChanged,
+			this, &RMPCWidget::inputChanged);
+	connect(mServices.registrationService.get(), &RegistrationService::movingDataChanged,
+			this, &RMPCWidget::inputChanged);
+
+	QVBoxLayout* layout = new QVBoxLayout(this);
 	layout->setMargin(0);
+	layout->addWidget(new LabeledComboBoxWidget(this, mFixedImage));
+	layout->addWidget(new LabeledComboBoxWidget(this, mMovingImage));
 
-	QGroupBox* groupBox = this->wrapInGroupBox(widget, header);
-	parent->addWidget(groupBox);
+	layout->addWidget(mICPWidget);
+	layout->addStretch();
 
-	return layout;
+	this->inputChanged();
+	this->onSettingsChanged();
 }
 
-QString RMPCWidget::defaultWhatsThis() const
+
+void RMPCWidget::initializeRegistrator()
 {
-	return QString();
+	DataPtr fixed = mServices.registrationService->getFixedData();
+	DataPtr moving = mServices.registrationService->getMovingData();
+	QString logPath = mServices.patientModelService->getActivePatientFolder() + "/Logs/";
+
+	mRegistrator->initialize(moving, fixed, logPath);
 }
 
-void RMPCWidget::registerSlot()
+void RMPCWidget::inputChanged()
 {
-	std::cout << "NOT in USE" << std::endl;
-//	if(!mBronchoscopyRegistration->isCenterlineProcessed())
-//	{
-//		reportError("Centerline not processed");
-//		return;
-//	}
-
-	Transform3D old_rMpr = mServices.patientModelService->get_rMpr();//input to registrationAlgorithm
-	//std::cout << "rMpr: " << std::endl;
-	//std::cout << old_rMpr << std::endl;
-
-//	ToolPtr tool = mRecordTrackingWidget->getSuitableRecordingTool();
-
-	TimedTransformMap trackerRecordedData_prMt = mRecordTrackingWidget->getRecordedTrackerData_prMt();
-
-	if(trackerRecordedData_prMt.empty())
-	{
-		reportError("No positions");
+	if (mObscuredListener->isObscured())
 		return;
-	}
 
-	Transform3D new_rMpr;
-//	double maxDistanceForLocalRegistration = 30; //mm
-//	if(mUseLocalRegistration->getValue())
-//		new_rMpr = Transform3D(mBronchoscopyRegistration->runBronchoscopyRegistration(trackerRecordedData_prMt,old_rMpr,maxDistanceForLocalRegistration));
-//	else
-//		new_rMpr = Transform3D(mBronchoscopyRegistration->runBronchoscopyRegistration(trackerRecordedData_prMt,old_rMpr,0));
+	DataPtr fixed = mServices.registrationService->getFixedData();
+	mSpaceListenerFixed->setSpace(mServices.spaceProvider->getD(fixed));
 
-	new_rMpr = new_rMpr*old_rMpr;//output
-	mServices.registrationService->applyPatientRegistration(new_rMpr, "Bronchoscopy centerline to tracking data");
+	this->onSpacesChanged();
+}
 
-	Eigen::Matrix4d display_rMpr = Eigen::Matrix4d::Identity();
-			display_rMpr = new_rMpr*display_rMpr;
-	std::cout << "New prMt: " << std::endl;
-		for (int i = 0; i < 4; i++)
-			std::cout << display_rMpr.row(i) << std::endl;
+void RMPCWidget::applyRegistration(Transform3D delta)
+{
+	Transform3D rMpr = mServices.patientModelService->get_rMpr();
+	Transform3D new_rMpr = delta*rMpr;//output
+	mServices.registrationService->applyPatientRegistration(new_rMpr, "I2P Surface to Surface");
 
-	mRecordTrackingWidget->ShowLastRecordingInView();
+	mServices.registrationService->applyImage2ImageRegistration(delta, "I2P Surface to Surface - correction");
+
+}
+
+void RMPCWidget::onShown()
+{
+	this->inputChanged();
 }
 
 

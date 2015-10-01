@@ -45,6 +45,7 @@ class QDomNode;
 
 namespace cx
 {
+typedef boost::shared_ptr<class PatientStorage> PatientStoragePtr;
 typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
 
 /**\brief Helper class for storing variables in the patient file.
@@ -64,7 +65,7 @@ class cxResource_EXPORT PatientStorage : public QObject
 {
 	Q_OBJECT
 public:
-	PatientStorage(SessionStorageServicePtr sessionStorageService, QString baseNodeName);
+	PatientStorage(SessionStorageServicePtr sessionStorageService, QString baseNodeName, bool delayedLoad = false);
 	/**
 	 * @brief storeVariable Store a variable in the patient file
 	 * @param nodeName Name of the node to store

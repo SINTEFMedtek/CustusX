@@ -52,6 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxViewGroupData.h"
 #include "cxReporter.h"
+#include "cxActiveData.h"
 
 namespace cx
 {
@@ -135,14 +136,15 @@ void CroppingWidget::cropperChangedSlot()
 
 ImagePtr CroppingWidget::cropClipButtonClickedSlot()
 {
-  ImagePtr image = mPatientModelService->getActiveData<Image>();
+	ActiveDataPtr activeData = mPatientModelService->getActiveData();
+	ImagePtr image = activeData->getActive<Image>();
 
-  ImagePtr retval = cropImage(patientService(), image);
-  mPatientModelService->insertData(retval);
+	ImagePtr retval = cropImage(patientService(), image);
+	mPatientModelService->insertData(retval);
 
-  this->hideOldAndShowNewVolume(image, retval);
+	this->hideOldAndShowNewVolume(image, retval);
 
-  return retval;
+	return retval;
 }
 
 void CroppingWidget::hideOldAndShowNewVolume(ImagePtr oldImage, ImagePtr newImage)

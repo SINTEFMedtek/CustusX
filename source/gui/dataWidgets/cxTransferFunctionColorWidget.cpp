@@ -53,14 +53,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-TransferFunctionColorWidget::TransferFunctionColorWidget(PatientModelServicePtr patientModelService, QWidget* parent) :
+TransferFunctionColorWidget::TransferFunctionColorWidget(ActiveDataPtr activeData, QWidget* parent) :
   BaseWidget(parent, "TransferFunctionColorWidget", "Color Transfer Function"),
 	mCurrentClickPos(INT_MIN,INT_MIN),
   mBorder(5)
 {
 	this->setToolTip("Set the color part of a transfer function");
   this->setFocusPolicy(Qt::StrongFocus);
-	mActiveImageProxy = ActiveImageProxy::New(patientModelService);
+	mActiveImageProxy = ActiveImageProxy::New(activeData);
   connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(activeImageTransferFunctionsChangedSlot()));
 
   mSelectedPoint.reset();

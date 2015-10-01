@@ -31,6 +31,7 @@
 #include "vtkLandmarkTransform.h"
 #include "vtkFloatArray.h"
 #include "cxMesh.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -48,6 +49,7 @@ SeansVesselReg::SeansVesselReg()// : mInvertedTransform(false)
 	mt_maximumNumberOfIterations = 100;
 	mt_verbose = false;
 	mt_maximumDurationSeconds = 1E6; // Random high number
+	margin = 40;
 }
 
 SeansVesselReg::~SeansVesselReg()
@@ -59,13 +61,28 @@ SeansVesselReg::~SeansVesselReg()
  *
  * source is moving and target is fixed
  */
-bool SeansVesselReg::execute(DataPtr source, DataPtr target, QString logPath)
+bool SeansVesselReg::initialize(DataPtr source, DataPtr target, QString logPath)
 {
 	if (mt_verbose)
 	{
 		reporter()->sendDebug("SOURCE: " + source->getUid());
 		reporter()->sendDebug("TARGET: " + target->getUid());
+	}
 
+	m_logPath = logPath;
+	mLastRun = this->createContext(source, target);
+	return mLastRun != NULL;
+}
+
+/**Execute the vessel to vessel registration.
+ * The result is available via the getLinearResult().
+ *
+ * source is moving and target is fixed
+ */
+bool SeansVesselReg::execute()
+{
+	if (mt_verbose)
+	{
 		std::cout << "stop Threshold:" << mt_distanceDeltaStopThreshold << endl;
 		std::cout << "sigma:" << mt_sigma << endl;
 		std::cout << "lts Ratio:" << mt_ltsRatio << endl;
@@ -75,8 +92,7 @@ bool SeansVesselReg::execute(DataPtr source, DataPtr target, QString logPath)
 	}
 	QTime start = QTime::currentTime();
 
-	// create a context containing all input, temporaries and output.
-	ContextPtr context = this->createContext(source, target);
+	ContextPtr context = mLastRun;
 
 	if (!context)
 		return false;
@@ -97,7 +113,7 @@ bool SeansVesselReg::execute(DataPtr source, DataPtr target, QString logPath)
 		this->performOneRegistration(context, false);
 	}
 
-	printOutResults(logPath + "/Vessel_Based_Registration_", context->mConcatenation);
+	printOutResults(m_logPath + "/Vessel_Based_Registration_", context->mConcatenation);
 
 	if (mt_verbose)
 		std::cout << QString("\n\nV2V Execution time: %1s").arg(start.secsTo(QTime::currentTime())) << endl;
@@ -106,6 +122,21 @@ bool SeansVesselReg::execute(DataPtr source, DataPtr target, QString logPath)
 //	mLinearTransformResult = this->getLinearTransform(context->mConcatenation);
 
 	return true;
+}
+
+bool SeansVesselReg::performOneRegistration()
+{
+	ContextPtr context = mLastRun;
+	if (!context)
+		return false;
+	this->performOneRegistration(context, mt_doOnlyLinear);
+	mLastRun = context;
+	return true;
+}
+
+bool SeansVesselReg::isValid() const
+{
+	return mLastRun && mLastRun->getFixedPoints() && mLastRun->getMovingPoints();
 }
 
 /**Search along several LTS for the best solution.
@@ -211,6 +242,9 @@ SeansVesselReg::ContextPtr SeansVesselReg::splitContext(ContextPtr context)
  */
 SeansVesselReg::ContextPtr SeansVesselReg::createContext(DataPtr source, DataPtr target)
 {
+	if (!source || !target)
+		return SeansVesselReg::ContextPtr();
+
 	vtkPolyDataPtr targetPolyData = this->convertToPolyData(target);
 	vtkPolyDataPtr inputSourcePolyData = this->convertToPolyData(source);
 //	targetPolyData->Update();
@@ -222,13 +256,13 @@ SeansVesselReg::ContextPtr SeansVesselReg::createContext(DataPtr source, DataPtr
 		return ContextPtr();
 	}
 
-	double margin = 40;
+//	double margin = 40;
 	vtkPolyDataPtr sourcePolyData = this->crop(inputSourcePolyData, targetPolyData, margin);
 
 	//Make sure we have stuff to work with
 	if (!sourcePolyData->GetNumberOfPoints() || !targetPolyData->GetNumberOfPoints())
 	{
-		std::cerr << "Can't execute with empty source or target data" << std::endl;
+		std::cerr << "No data after cropping, failed." << std::endl;
 		return ContextPtr();
 	}
 
@@ -236,6 +270,7 @@ SeansVesselReg::ContextPtr SeansVesselReg::createContext(DataPtr source, DataPtr
 
 	context->mConcatenation = vtkGeneralTransformPtr::New();
 	context->mInvertedTransform = false;
+	context->mMetric = -1;
 
 	// Algorithm requires #source < #target
 	// swap if this is not the case
@@ -280,6 +315,14 @@ SeansVesselReg::ContextPtr SeansVesselReg::createContext(DataPtr source, DataPtr
  */
 void SeansVesselReg::computeDistances(ContextPtr context)
 {
+	if (!context)
+		context = mLastRun;
+	if (!context)
+		return;
+
+	if (context->mSortedSourcePoints || context->mSortedTargetPoints)
+		return;
+
 	// total number of source points:
 	int numPoints = context->mSourcePoints->GetNumberOfPoints();
 	// number of source points used in each iteration (the rest is temporarily rejected from the computation)
@@ -345,8 +388,7 @@ void SeansVesselReg::computeDistances(ContextPtr context)
 void SeansVesselReg::performOneRegistration(ContextPtr context, bool linear)
 {
 	// compute distances if not already done.
-	if (!context->mSortedSourcePoints || !context->mSortedTargetPoints)
-		this->computeDistances(context);
+	this->computeDistances(context);
 
 	if (!context->mSortedSourcePoints || !context->mSortedTargetPoints)
 		return;
@@ -370,6 +412,8 @@ void SeansVesselReg::performOneRegistration(ContextPtr context, bool linear)
 
 	// add transform from this iteration to the total
 	context->mConcatenation->Concatenate(context->mTransform);
+
+	this->computeDistances(context);
 }
 
 /**Using the already sorted list of point ID's, create a sorted list of points
@@ -503,6 +547,27 @@ vtkPolyDataPtr SeansVesselReg::Context::getFixedPoints()
 	}
 }
 
+vtkPolyDataPtr SeansVesselReg::Context::getDifferenceLines()
+{
+	vtkPolyDataPtr retval = vtkPolyDataPtr::New();
+	// draw lines
+	retval->Allocate();
+	vtkPointsPtr verts = vtkPointsPtr::New();
+	for (int i = 0; i < this->mSortedSourcePoints->GetNumberOfPoints(); ++i)
+	{
+		verts->InsertNextPoint(this->mSortedSourcePoints->GetPoint(i));
+		verts->InsertNextPoint(this->mSortedTargetPoints->GetPoint(i));
+
+		vtkIdType connectivity[2];
+		connectivity[0] = 2 * i;
+		connectivity[1] = 2 * i + 1;
+		retval->InsertNextCell(VTK_LINE, 2, connectivity);
+	}
+	retval->SetPoints(verts);
+	return retval;
+}
+
+
 vtkPolyDataPtr SeansVesselReg::convertToPolyData(vtkPointsPtr input)
 {
 	vtkCellArrayPtr cellArray = vtkCellArrayPtr::New();
@@ -592,6 +657,8 @@ double SeansVesselReg::getResultMetric(ContextPtr context)
 {
 	if (!context)
 		context = mLastRun;
+	if (!context)
+		return -1;
 	return context->mMetric;
 }
 
@@ -602,26 +669,22 @@ double SeansVesselReg::getResultLtsRatio(ContextPtr context)
 	return context->mLtsRatio;
 }
 
-/**Convert the linear transform part of myContatenation to a Transform3D
+/**Convert the linear transform part of contatenation to a Transform3D
  */
-Transform3D SeansVesselReg::getLinearTransform(vtkGeneralTransformPtr myConcatenation)
+Transform3D SeansVesselReg::getLinearTransform(vtkGeneralTransformPtr concatenation)
 {
-	vtkMatrix4x4Ptr l_tempMatrix = vtkMatrix4x4Ptr::New();
-	vtkMatrix4x4Ptr l_resultMatrix = vtkMatrix4x4Ptr::New();
+	Transform3D M_acc = Transform3D::Identity(); // accumulated linear transform
 
-	if (mt_doOnlyLinear)
-		l_tempMatrix->DeepCopy(((vtkLandmarkTransform*) myConcatenation->GetConcatenatedTransform(0))->GetMatrix());
-
-	l_resultMatrix->Identity();
-	for (int i = 1; i < myConcatenation->GetNumberOfConcatenatedTransforms(); ++i)
+	for (int i = 0; i < concatenation->GetNumberOfConcatenatedTransforms(); ++i)
 	{
-		vtkMatrix4x4::Multiply4x4(l_tempMatrix,
-			((vtkLandmarkTransform*) myConcatenation->GetConcatenatedTransform(i))->GetMatrix(), l_resultMatrix);
-		l_tempMatrix->DeepCopy(l_resultMatrix);
-
+		vtkLandmarkTransformPtr LM_i = (vtkLandmarkTransform*) concatenation->GetConcatenatedTransform(i);
+		if (!LM_i.GetPointer()) // skip non-landmark transforms
+			continue;
+		Transform3D M_i = Transform3D(LM_i->GetMatrix());
+		M_acc = M_acc * M_i;
 	}
 
-	return Transform3D(l_resultMatrix).inverse();
+	return M_acc.inverse();
 }
 
 void SeansVesselReg::printOutResults(QString fileNamePrefix, vtkGeneralTransformPtr myConcatenation)
@@ -726,51 +789,6 @@ void SeansVesselReg::printOutResults(QString fileNamePrefix, vtkGeneralTransform
 	}
 	file_out2.close();
 }
-
-///**Not used and probably buggy
-// *
-// */
-//ImagePtr SeansVesselReg::loadMinc(char* p_dataFile)
-//{
-//	time_t sec1 = clock();
-//	std::cout << "Reading " << p_dataFile << " -> ";
-//	std::cout.flush();
-
-//	//Read data input file
-//	vtkMINCImageReaderPtr l_dataReader = vtkMINCImageReaderPtr::New();
-//	l_dataReader->SetFileName(p_dataFile);
-//	l_dataReader->Update();
-
-//	double l_dataOrigin[3];
-//	l_dataReader->GetOutput()->GetOrigin(l_dataOrigin);
-//	std::cout << (clock() - sec1) / (double) CLOCKS_PER_SEC << " secs...DONE -> Processing...";
-//	std::cout.flush();
-//	int l_dimensions[3];
-//	l_dataReader->GetOutput()->GetDimensions(l_dimensions);
-
-//	//set the transform
-//	vtkTransformPtr l_dataTransform = vtkTransformPtr::New();
-//	l_dataTransform->SetMatrix(l_dataReader->GetDirectionCosines());
-//	l_dataTransform->Translate(l_dataReader->GetDataOrigin());
-//	l_dataTransform->GetInverse()->TransformPoint(l_dataOrigin, l_dataOrigin);
-//	l_dataTransform->Translate(l_dataOrigin);
-//	l_dataTransform->Scale(l_dataReader->GetOutput()->GetSpacing());
-
-//	Transform3D rMd(l_dataTransform->GetMatrix());
-
-//	// TODO: ensure rMd is correct in CustusX terms
-
-//	QFile file(p_dataFile);
-//	QFileInfo info(file);
-//	QString uid(info.completeBaseName() + "_minc_%1");
-//	QString name = uid;
-
-//	ImagePtr image = dataManager()->createImage(l_dataReader->GetOutput(), uid, name);
-//	image->get_rMd_History()->addRegistration(RegistrationTransform(rMd, QDateTime::currentDateTime(),
-//		"from Minc file"));
-
-//	return image;
-//}
 
 /** Input an image representation of centerlines.
  *  Transform to polydata, reject all data outside bounding box,
@@ -941,4 +959,33 @@ void SeansVesselReg::checkQuality(Transform3D linearTransform)
 		report(qualityText);
 	}
 }
+
+vtkPolyDataPtr SeansVesselReg::getDifferenceLines()
+{
+	if (!mLastRun)
+		return vtkPolyDataPtr();
+	this->computeDistances();
+	return mLastRun->getDifferenceLines();
+}
+
+void SeansVesselReg::notifyPreRegistrationWarnings()
+{
+	if (!mLastRun)
+	{
+		reportWarning("ICP not initialized");
+		return;
+	}
+
+	if(!mLastRun->getMovingPoints())
+	{
+		reportWarning("Moving points not set.");
+	}
+
+	if(!mLastRun->getFixedPoints())
+	{
+		reportWarning("Fixed points not set.");
+	}
+}
+
+
 } //namespace cx

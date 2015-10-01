@@ -56,6 +56,7 @@ public: // basic methods
 	virtual bool setValue(const QString& value);
 	virtual QString getValue() const;
 protected:
+	ActiveDataPtr mActiveData;
 	StringPropertyActiveData(PatientModelServicePtr patientModelService, QString typeRegexp = ".*");
 };
 
@@ -79,6 +80,8 @@ public:
 public: // basic methods
 	virtual bool setValue(const QString& value);
 	virtual QString getValue() const;
+protected:
+	ActiveDataPtr mActiveData;
 };
 
 

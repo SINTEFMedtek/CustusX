@@ -230,7 +230,8 @@ void WirePhantomWidget::registration()
 	QString logPath = mServices.patientModelService->getActivePatientFolder() + "/Logs/";
 //	vesselReg.setDebugOutput(true);
 
-	bool success = vesselReg.execute(mServices.registrationService->getMovingData(), mServices.registrationService->getFixedData(), logPath);
+	bool success = vesselReg.initialize(mServices.registrationService->getMovingData(), mServices.registrationService->getFixedData(), logPath);
+	success = success && vesselReg.execute();
     if (!success)
     {
         reportWarning("Vessel registration failed.");

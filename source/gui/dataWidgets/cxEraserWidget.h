@@ -93,6 +93,7 @@ private:
 	ActiveImageProxyPtr mActiveImageProxy;
 	PatientModelServicePtr mPatientModelService;
 	VisualizationServicePtr mVisualizationService;
+	ActiveDataPtr mActiveData;
 
 private slots:
 	void toggleShowEraser(bool on);

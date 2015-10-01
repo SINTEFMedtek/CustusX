@@ -38,6 +38,7 @@ set(PLUGIN_SRCS
 	gui/cxStringPropertySelectRecordSession.cpp
     gui/cxRecordSessionWidget.cpp
     gui/cxRecordTrackingWidget.cpp
+	gui/cxRecordSessionSelector.cpp
 )
 
 # Files which should be processed by Qts moc
@@ -55,6 +56,7 @@ set(PLUGIN_MOC_SRCS
     gui/cxAcquisitionPlugin.h
     gui/cxRecordSessionWidget.h
     gui/cxRecordTrackingWidget.h
+	gui/cxRecordSessionSelector.h
 )
 
 # Qt Designer files which should be processed by Qts uic

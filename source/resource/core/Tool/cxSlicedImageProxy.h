@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxResourceExport.h"
 
+#include <QObject>
 #include "cxIndent.h"
 #include "cxTransform3D.h"
 #include "vtkForwardDeclarations.h"

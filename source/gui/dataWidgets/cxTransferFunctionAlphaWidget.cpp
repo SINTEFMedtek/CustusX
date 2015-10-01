@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-TransferFunctionAlphaWidget::TransferFunctionAlphaWidget(PatientModelServicePtr patientModelService, QWidget* parent) :
+TransferFunctionAlphaWidget::TransferFunctionAlphaWidget(ActiveDataPtr activeData, QWidget* parent) :
   BaseWidget(parent, "TransferFunctionAlphaWidget", "Alpha Transfer Function"),
   mBorder(5),
   mReadOnly(false)
@@ -60,7 +60,7 @@ TransferFunctionAlphaWidget::TransferFunctionAlphaWidget(PatientModelServicePtr 
 	this->setToolTip("Set the alpha part of a transfer function");
 	this->setFocusPolicy(Qt::StrongFocus);
 
-	mActiveImageProxy = ActiveImageProxy::New(patientModelService);
+	mActiveImageProxy = ActiveImageProxy::New(activeData);
   connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(activeImageTransferFunctionsChangedSlot()));
 
   mSelectedAlphaPoint.reset();

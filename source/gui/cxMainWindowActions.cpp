@@ -165,12 +165,6 @@ void MainWindowActions::createPatientActions()
 					   QKeySequence("Ctrl+I"),
 					   "Import image data",
 					   &MainWindowActions::importDataSlot);
-
-	this->createAction("DeleteData", "Delete current image",
-					   QIcon(),
-					   QKeySequence(),
-					   "Delete selected volume",
-					   &MainWindowActions::deleteDataSlot);
 }
 
 template <class T>
@@ -295,16 +289,6 @@ void MainWindowActions::importDataSlot()
 		ImportDataDialog* wizard = new ImportDataDialog(mServices->patientModelService, fileName[i], this->parentWidget());
 		wizard->exec(); //calling exec() makes the wizard dialog modal which prevents other user interaction with the system
 	}
-}
-
-void MainWindowActions::deleteDataSlot()
-{
-	if (!patientService()->getActiveData<Image>())
-		return;
-	QString text = QString("Do you really want to delete data %1?").arg(patientService()->getActiveData<Image>()->getName());
-	if (QMessageBox::question(this->parentWidget(), "Data delete", text, QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel))!=QMessageBox::Ok)
-		return;
-	mServices->patientModelService->removeData(patientService()->getActiveImageUid());
 }
 
 void MainWindowActions::shootScreen()

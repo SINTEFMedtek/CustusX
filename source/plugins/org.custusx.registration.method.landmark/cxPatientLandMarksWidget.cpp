@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLandmark.h"
 #include "cxViewGroupData.h"
 #include "cxImage.h"
+#include "cxActiveData.h"
 
 namespace cx
 {
@@ -199,8 +200,9 @@ void PatientLandMarksWidget::setTargetLandmark(QString uid, Vector3D p_target)
 
 void PatientLandMarksWidget::performRegistration()
 {
+	ActiveDataPtr activeData = mServices.patientModelService->getActiveData();
 	if (!mServices.registrationService->getFixedData())
-		mServices.registrationService->setFixedData(mServices.patientModelService->getActiveData<Image>());
+		mServices.registrationService->setFixedData(activeData->getActive<Image>());
 
 	if (mServices.patientModelService->getPatientLandmarks()->getLandmarks().size() < 3)
 		return;

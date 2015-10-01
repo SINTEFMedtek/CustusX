@@ -117,7 +117,7 @@ ViewManager::ViewManager(VisServicesPtr backend) :
 	mActiveLayout = QStringList() << "" << "";
 	mLayoutWidgets.resize(mActiveLayout.size(), NULL);
 
-	mInteractiveCropper.reset(new InteractiveCropper(mBackend/*patientModelService*/));
+	mInteractiveCropper.reset(new InteractiveCropper(mBackend->patientModelService->getActiveData()));
 	mInteractiveClipper.reset(new InteractiveClipper(mBackend));
 	connect(this, SIGNAL(activeLayoutChanged()), mInteractiveClipper.get(), SIGNAL(changed()));
 	connect(mInteractiveCropper.get(), SIGNAL(changed()), mRenderLoop.get(), SLOT(requestPreRenderSignal()));
