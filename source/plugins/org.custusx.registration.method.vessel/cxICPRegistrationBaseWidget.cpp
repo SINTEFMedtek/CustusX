@@ -77,6 +77,13 @@ void ICPRegistrationBaseWidget::prePaintEvent()
 		this->initialize();
 		this->setup();
 	}
+
+
+	this->initializeRegistrator();
+
+	mICPWidget->enableRegistration(mRegistrator->isValid());
+	this->updateDifferenceLines();
+	mICPWidget->setRMS(mRegistrator->getResultMetric());
 }
 
 void ICPRegistrationBaseWidget::initialize()
@@ -160,11 +167,12 @@ void ICPRegistrationBaseWidget::onSpacesChanged()
 	if (mObscuredListener->isObscured())
 		return;
 
-	this->initializeRegistrator();
+	this->setModified();
+//	this->initializeRegistrator();
 
-	mICPWidget->enableRegistration(mRegistrator->isValid());
-	this->updateDifferenceLines();
-	mICPWidget->setRMS(mRegistrator->getResultMetric());
+//	mICPWidget->enableRegistration(mRegistrator->isValid());
+//	this->updateDifferenceLines();
+//	mICPWidget->setRMS(mRegistrator->getResultMetric());
 }
 
 void ICPRegistrationBaseWidget::onSettingsChanged()

@@ -118,7 +118,6 @@ void RecordTrackingWidget::acquisitionStarted()
 void RecordTrackingWidget::acquisitionStopped()
 {
 	QString newUid = mAcquisitionService->getLatestSession()->getUid();
-	CX_LOG_CHANNEL_DEBUG("CA") << "RecordTrackingWidget::acquisitionStopped() setting " << newUid;
 	mSelectRecordSession->getSessionSelector()->setValue(newUid);
 
 	mServices.patientModelService->autoSave();
@@ -128,8 +127,6 @@ void RecordTrackingWidget::acquisitionStopped()
 	{
 		activeRep3D->getTracer()->stop();
 	}
-
-//	this->saveSessions();
 
 	emit acquisitionCompleted();
 }

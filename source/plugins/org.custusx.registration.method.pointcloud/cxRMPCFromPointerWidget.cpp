@@ -126,7 +126,6 @@ void RMPCFromPointerWidget::initializeRegistrator()
 	DataPtr fixed = mServices.registrationService->getFixedData();
 	MeshPtr moving = this->getTrackerDataAsMesh();
 	QString logPath = mServices.patientModelService->getActivePatientFolder() + "/Logs/";
-	CX_LOG_CHANNEL_DEBUG("CA") << "initializeRegistrator " << mRecordTrackingWidget->getSelectRecordSession()->getSessionSelector()->getValue();
 
 	mRegistrator->initialize(moving, fixed, logPath);
 }
@@ -158,7 +157,6 @@ void RMPCFromPointerWidget::queuedAutoRegistration()
 {
 	if (!mObscuredListener->isObscured())
 	{
-		CX_LOG_CHANNEL_DEBUG("CA") << "Auto register";
 		this->registerSlot();
 	}
 }
