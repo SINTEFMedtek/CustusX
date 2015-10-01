@@ -14,9 +14,6 @@ OpenIGTLinkProtocol::OpenIGTLinkProtocol() :
     mHeader(igtl::MessageHeader::New()),
     mBody(igtl::MessageBase::New())
 {
-    qRegisterMetaType<IGTLinkUSStatusMessage::Pointer>("IGTLinkUSStatusMessage::Pointer");
-    qRegisterMetaType<IGTLinkImageMessage::Pointer>("IGTLinkImageMessage::Pointer");
-
     this->getReadyToReceiveHeader();
 }
 
