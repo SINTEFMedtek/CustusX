@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxProfile.h"
 #include "cxStringProperty.h"
 #include "cxDoubleProperty.h"
+#include "vtkImageData.h"
 
 #include "cxUtilHelpers.h"
 
@@ -147,7 +148,61 @@ void NetworkConnection::setProtocol(QString protocolname)
 
 }
 
-void NetworkConnection::sendMessage(ImagePtr image)
+//namespace
+//{
+//void write_send_info(igtl::ImageMessage::Pointer msg)
+//{
+//	int kb = msg->GetPackSize()/1024;
+//	CX_LOG_CHANNEL_DEBUG("igtl_test") << "Writing image to socket: " << msg->GetDeviceName()
+//									  << ", " << kb << " kByte";
+//}
+//}
+
+void NetworkConnection::streamImage(ImagePtr image)
+{
+    QMutexLocker locker(&mMutex);
+	char *pointer = NULL;
+	int size = 0;
+
+	mProtocol->encode(image, pointer, size);
+
+	int sendSize = size/1024;
+    int waitingSize = mSocket->bytesToWrite()/1024;
+    double waitToSendRatio = double(waitingSize)/double(sendSize);
+    double waitToSendRatioThreshold = 0.5;
+
+    static int sentCounter =0;
+    static int dropCounter =0;
+//    CX_LOG_CHANNEL_DEBUG("igtl_test") << "ratio: " << waitToSendRatio << " ratio";
+//    CX_LOG_CHANNEL_DEBUG("igtl_test") << "GetNumComponents: " << msg->GetNumComponents() << " ";
+
+
+    if (waitToSendRatio > waitToSendRatioThreshold)
+    {
+        dropCounter++;
+        CX_LOG_CHANNEL_DEBUG("igtl_test") << QString("dropped stream image: wanted to send %1kB but %2kB already waiting, sent=%3,drop=%4")
+                                             .arg(sendSize)
+                                             .arg(waitingSize)
+                                             .arg(sentCounter)
+                                             .arg(dropCounter);
+
+        return;
+    }
+    sentCounter++;
+
+//    CX_LOG_CHANNEL_DEBUG("igtl_test") << "bytes to write pre write: " << waitingSize << " kbyte";
+//    image->getBaseVtkImageData()->Print(std::cout);
+
+//    write_send_info(msg);
+//    mSocket->write(reinterpret_cast<char*>(msg->GetPackPointer()), msg->GetPackSize());
+//    CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "Sent image: " << image->getName();
+
+
+	mSocket->write(pointer, size);
+
+}
+
+void NetworkConnection::sendImage(ImagePtr image)
 {
 	QMutexLocker locker(&mMutex);
     char *pointer = NULL;
@@ -157,13 +212,13 @@ void NetworkConnection::sendMessage(ImagePtr image)
     mSocket->write(pointer, size);
 }
 
-void NetworkConnection::sendMessage(MeshPtr mesh)
+void NetworkConnection::sendMesh(MeshPtr data)
 {
 	QMutexLocker locker(&mMutex);
     char *pointer = NULL;
     int size = 0;
 
-    mProtocol->encode(mesh, pointer, size);
+	mProtocol->encode(data, pointer, size);
     mSocket->write(pointer, size);
 }
 

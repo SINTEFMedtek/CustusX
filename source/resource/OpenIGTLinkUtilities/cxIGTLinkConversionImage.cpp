@@ -125,6 +125,8 @@ int swapCopy64(igtlUint64 * dst, igtlUint64 * src, int n)
 
 vtkImageDataPtr IGTLinkConversionImage::decode_vtkImageData(igtl::ImageMessage *imgMsg)
 {
+	CX_LOG_CHANNEL_DEBUG("CA") << "IGTLinkConversionImage::decode_vtkImageData - decode image message";
+
 	// NOTE: This method is mostly a copy-paste from Slicer.
 	// MRML and coordinate stuff are removed.
 	// Avoid refactoring the internals, as it is important to keep the code similar to the origin.
@@ -285,6 +287,7 @@ vtkImageDataPtr IGTLinkConversionImage::decode_vtkImageData(igtl::ImageMessage *
 	}
 
 	imageData->Modified();
+	imageData->Print(std::cout);
 	return imageData;
 }
 
@@ -304,6 +307,7 @@ void IGTLinkConversionImage::encode_vtkImageData(vtkImageDataPtr in, igtl::Image
 	scalarType = imageData->GetScalarType();
 	imageData->GetDimensions(isize);
 	spacing = imageData->GetSpacing();
+    int numComponents = imageData->GetNumberOfScalarComponents();
 
 	// Check endianness of the machine
 	endian = igtl::ImageMessage::ENDIAN_BIG;
@@ -317,7 +321,8 @@ void IGTLinkConversionImage::encode_vtkImageData(vtkImageDataPtr in, igtl::Image
 	outmsg->SetScalarType(scalarType);
 	outmsg->SetEndian(endian);
 	outmsg->SetSubVolume(isize, svoffset);
-	outmsg->AllocateScalars();
+    outmsg->SetNumComponents(numComponents);
+    outmsg->AllocateScalars();
 
 	memcpy(outmsg->GetScalarPointer(),
 		   imageData->GetScalarPointer(),
@@ -354,9 +359,9 @@ void IGTLinkConversionImage::decode_rMd(igtl::ImageMessage *msg, ImagePtr out)
 
 	Transform3D rMd = rMs * sMigtl * igtlMd;
 
-	CX_LOG_CHANNEL_DEBUG("ca") << "sMigtl\n" << sMigtl;
-	CX_LOG_CHANNEL_DEBUG("ca") << "rMs\n" << rMs;
-	CX_LOG_CHANNEL_DEBUG("ca") << "rMd decode\n" << rMd;
+//	CX_LOG_CHANNEL_DEBUG("ca") << "sMigtl\n" << sMigtl;
+//	CX_LOG_CHANNEL_DEBUG("ca") << "rMs\n" << rMs;
+//	CX_LOG_CHANNEL_DEBUG("ca") << "rMd decode\n" << rMd;
 
 	out->get_rMd_History()->setRegistration(rMd);
 }

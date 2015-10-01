@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxIGTLinkConversionBase.h"
 #include "cxIGTLinkConversionSonixCXLegacy.h"
+#include "cxIGTLinkConversionImage.h"
 
 namespace cx
 {
@@ -72,7 +73,7 @@ QString IGTLinkConversion::decode(igtl::StatusMessage::Pointer msg)
 
 ImagePtr IGTLinkConversion::decode(igtl::ImageMessage::Pointer message)
 {
-	return IGTLinkConversionSonixCXLegacy().decode(message);
+	return IGTLinkConversionImage().decode(message);
 }
 
 Transform3D IGTLinkConversion::decode(igtl::TransformMessage::Pointer msg)
