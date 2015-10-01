@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogger.h"
 #include "cxTrackingServiceProxy.h"
 #include "cxPatientModelServiceProxy.h"
+#include "cxFileHelpers.h"
 #include "cxSpaceProviderImpl.h"
 #include "cxVideoServiceBackend.h"
 #include "cxStreamerService.h"
@@ -72,7 +73,7 @@ VideoImplService::VideoImplService(ctkPluginContext *context) :
 	mEmptyVideoSource.reset(new BasicVideoSource());
 	mVideoConnection.reset(new VideoConnection(mBackend));
 	mActiveVideoSource = mEmptyVideoSource;
-	mUSAcquisitionVideoPlayback.reset(new USAcquisitionVideoPlayback(mBackend));
+    //mUSAcquisitionVideoPlayback.reset(new USAcquisitionVideoPlayback(mBackend));
 
 	connect(mVideoConnection.get(), &VideoConnection::connected, this, &VideoImplService::autoSelectActiveVideoSource);
 	connect(mVideoConnection.get(), &VideoConnection::videoSourcesChanged, this, &VideoImplService::autoSelectActiveVideoSource);
@@ -163,8 +164,12 @@ void VideoImplService::setActiveVideoSource(QString uid)
 VideoSourcePtr VideoImplService::getGuessForActiveVideoSource(VideoSourcePtr old)
 {
 	// ask for playback stream:
-	if (mUSAcquisitionVideoPlayback->isActive())
-		return mUSAcquisitionVideoPlayback->getVideoSource();
+    foreach(USAcquisitionVideoPlaybackPtr uSAcquisitionVideoPlayback,mUSAcquisitionVideoPlaybacks)
+    {
+        if (uSAcquisitionVideoPlayback->isActive())
+            return uSAcquisitionVideoPlayback->getVideoSource();
+    }
+
 
 	// ask for active stream in first probe:
 	ToolPtr tool = mBackend->getToolManager()->getFirstProbe();
@@ -202,34 +207,53 @@ VideoSourcePtr VideoImplService::getActiveVideoSource()
 
 void VideoImplService::setPlaybackMode(PlaybackTimePtr controller)
 {
-	mUSAcquisitionVideoPlayback->setTime(controller);
-	this->autoSelectActiveVideoSource();
 
-	VideoSourcePtr playbackSource = mUSAcquisitionVideoPlayback->getVideoSource();
-	TrackingService::ToolMap tools = mBackend->getToolManager()->getTools();
-	for (TrackingService::ToolMap::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
-	{
-		ProbePtr probe = iter->second->getProbe();
-		if (!probe)
-			continue;
-		if (mUSAcquisitionVideoPlayback->isActive())
-			probe->setRTSource(playbackSource);
-		else
-			probe->removeRTSource(playbackSource);
-	}
-	if (mUSAcquisitionVideoPlayback->isActive())
-		this->setActiveVideoSource(playbackSource->getUid());
-	else
-		this->autoSelectActiveVideoSource();
+    QStringList res = getAbsolutePathToFiles( mBackend->getDataManager()->getActivePatientFolder() + "/US_Acq/",QStringList("*.fts"), true);
+    QSet<QString> types;
+    foreach (const QString &acq, res)
+    {
+        types.insert(acq.split("_").back());
+    }
+    foreach(const QString type, types.toList() ){
+        USAcquisitionVideoPlaybackPtr test = new USAcquisitionVideoPlayback(mBackend,type);
+        mUSAcquisitionVideoPlaybacks.push_back(test  );
 
-	mUSAcquisitionVideoPlayback->setRoot(mBackend->getDataManager()->getActivePatientFolder() + "/US_Acq/");
+
+        mUSAcquisitionVideoPlaybacks.back()>setTime(controller);
+        this->autoSelectActiveVideoSource();
+
+        VideoSourcePtr playbackSource = mUSAcquisitionVideoPlaybacks.back()->getVideoSource();
+        TrackingService::ToolMap tools = mBackend->getToolManager()->getTools();
+        for (TrackingService::ToolMap::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
+        {
+            ProbePtr probe = iter->second->getProbe();
+            if (!probe)
+                continue;
+            if (mUSAcquisitionVideoPlaybacks.back()->isActive())
+                probe->setRTSource(playbackSource);
+            else
+                probe->removeRTSource(playbackSource);
+        }
+        if (mUSAcquisitionVideoPlaybacks.back()->isActive())
+            this->setActiveVideoSource(playbackSource->getUid());
+        else
+            this->autoSelectActiveVideoSource();
+
+        mUSAcquisitionVideoPlaybacks.back()->setRoot(mBackend->getDataManager()->getActivePatientFolder() + "/US_Acq/");
+
+    }
 }
 
 std::vector<VideoSourcePtr> VideoImplService::getVideoSources()
 {
 	std::vector<VideoSourcePtr> retval = mVideoConnection->getVideoSources();
-	if (mUSAcquisitionVideoPlayback->isActive())
-		retval.push_back(mUSAcquisitionVideoPlayback->getVideoSource());
+    foreach(USAcquisitionVideoPlaybackPtr uSAcquisitionVideoPlayback,mUSAcquisitionVideoPlaybacks)
+    {
+        if (uSAcquisitionVideoPlayback->isActive())
+            retval.push_back(uSAcquisitionVideoPlayback->getVideoSource());
+    }
+
+
 	return retval;
 }
 
@@ -287,7 +311,13 @@ void VideoImplService::setConnectionMethod(QString connectionMethod)
 
 std::vector<TimelineEvent> VideoImplService::getPlaybackEvents()
 {
-	return mUSAcquisitionVideoPlayback->getEvents();
+    std::vector<TimelineEvent> retval;
+    foreach(USAcquisitionVideoPlaybackPtr uSAcquisitionVideoPlayback,mUSAcquisitionVideoPlaybacks)
+    {
+        retval.push_back(uSAcquisitionVideoPlayback->getEvents());
+    }
+
+    return retval;
 }
 
 void VideoImplService::initServiceListener()

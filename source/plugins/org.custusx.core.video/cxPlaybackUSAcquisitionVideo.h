@@ -66,7 +66,7 @@ class org_custusx_core_video_EXPORT USAcquisitionVideoPlayback : public QObject
 {
 	Q_OBJECT
 public:
-	explicit USAcquisitionVideoPlayback(VideoServiceBackendPtr backend);
+    explicit USAcquisitionVideoPlayback(VideoServiceBackendPtr backend, QString type);
 	virtual ~USAcquisitionVideoPlayback();
 	VideoSourcePtr getVideoSource();
 	void setRoot(const QString path);
@@ -75,14 +75,15 @@ public:
 	std::vector<TimelineEvent> getEvents();
 
 private slots:
-	void timerChangedSlot();
-	void usDataLoadFinishedSlot();
+    void timerChangedSlot();
+    void usDataLoadFinishedSlot();
 
 private:
-	void updateFrame(QString filename);
+    void updateFrame(QString filename);
 	void loadFullData(QString filename);
 	QStringList getAbsolutePathToFtsFiles(QString folder);
 	QString mRoot;
+    QString mType;
 	PlaybackTimePtr mTimer;
 	BasicVideoSourcePtr mVideoSource;
 	std::vector<TimelineEvent> mEvents;

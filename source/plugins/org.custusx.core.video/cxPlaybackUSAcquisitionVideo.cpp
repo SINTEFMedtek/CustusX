@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxUsReconstructionFileReader.h"
 #include "cxTestVideoSource.h"
 #include "cxTrackingService.h"
+#include "cxReporter.h"
 //#include "cxProbeImpl.h"
 #include "cxUSFrameData.h"
 #include "cxPlaybackTime.h"
@@ -56,9 +57,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-USAcquisitionVideoPlayback::USAcquisitionVideoPlayback(VideoServiceBackendPtr backend) :
+USAcquisitionVideoPlayback::USAcquisitionVideoPlayback(VideoServiceBackendPtr backend, QString type) :
 	QObject(NULL),
-	mVideoSourceUid("playback")
+    mVideoSourceUid(type.append("_playback"),
+    mType(type))
 {
 	mBackend = backend;
 	mVideoSource.reset(new BasicVideoSource(mVideoSourceUid));
@@ -71,10 +73,6 @@ USAcquisitionVideoPlayback::~USAcquisitionVideoPlayback()
 {
 }
 
-VideoSourcePtr USAcquisitionVideoPlayback::getVideoSource()
-{
-	return mVideoSource;
-}
 
 bool USAcquisitionVideoPlayback::isActive() const
 {
@@ -122,6 +120,8 @@ std::vector<TimelineEvent> USAcquisitionVideoPlayback::getEvents()
 						QString("Acquisition %1").arg(QFileInfo(allFiles[i]).fileName()),
 						timestamps.front().mTime,
 						timestamps.back().mTime);
+        report("------------------------ here");
+        report(allFiles[i]);
 		current.mUid = allFiles[i];
 		current.mGroup = "acquisition";
 		current.mColor = QColor::fromHsv(36, 255, 222);
@@ -137,22 +137,29 @@ std::vector<TimelineEvent> USAcquisitionVideoPlayback::getEvents()
  */
 QStringList USAcquisitionVideoPlayback::getAbsolutePathToFtsFiles(QString folder)
 {
-    QStringList nameFilters;
+    /*QStringList nameFilters;
     nameFilters << "*TissueAngio.fts" << "*TissueFlow.fts" << "*ScanConverted.fts";
     QStringList res = getAbsolutePathToFiles(folder,nameFilters, true);
     if(res.isEmpty())
     {
         res=getAbsolutePathToFiles(folder,QStringList("*.fts"), true);
     }
+    */
+    QStringList res = getAbsolutePathToFiles(folder,QStringList("*.fts"), true);
     return res;
 }
+QStringList USAcquisitionVideoPlayback::getVideoSourceUids() const
+{
+    return mVideoSourceUids;
+}
+
 
 void USAcquisitionVideoPlayback::timerChangedSlot()
 {
-	TimelineEvent event;
-	for (unsigned i=0; i<mEvents.size(); ++i)
-	{
-		if (mEvents[i].isInside(mTimer->getTime().toMSecsSinceEpoch()))
+    TimelineEvent event;
+    for (unsigned i=0; i<mEvents.size(); ++i)
+    {
+        if (mEvents[i].isInside(mTimer->getTime().toMSecsSinceEpoch()) && mEvents[i].mUid.endsWidth(mType))
 		{
 			event = mEvents[i];
 			break;
