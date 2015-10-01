@@ -27,6 +27,7 @@ public:
 
     virtual bool readyToReceiveData();
 
+    //TODO refactor to use pack system
     virtual void encode(ImagePtr image, char *pointer, int size);
     virtual void encode(MeshPtr data, char *pointer, int size);
 
