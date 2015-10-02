@@ -59,9 +59,9 @@ namespace cx
 
 USAcquisitionVideoPlayback::USAcquisitionVideoPlayback(VideoServiceBackendPtr backend, QString type) :
 	QObject(NULL),
-    mVideoSourceUid(type.append("_playback"),
-    mType(type))
+    mVideoSourceUid(type.append("_playback"))
 {
+    mType=type;
 	mBackend = backend;
 	mVideoSource.reset(new BasicVideoSource(mVideoSourceUid));
 	mVideoSource->setStatusString(QString("No US Acquisition"));
@@ -148,18 +148,13 @@ QStringList USAcquisitionVideoPlayback::getAbsolutePathToFtsFiles(QString folder
     QStringList res = getAbsolutePathToFiles(folder,QStringList("*.fts"), true);
     return res;
 }
-QStringList USAcquisitionVideoPlayback::getVideoSourceUids() const
-{
-    return mVideoSourceUids;
-}
-
 
 void USAcquisitionVideoPlayback::timerChangedSlot()
 {
     TimelineEvent event;
     for (unsigned i=0; i<mEvents.size(); ++i)
     {
-        if (mEvents[i].isInside(mTimer->getTime().toMSecsSinceEpoch()) && mEvents[i].mUid.endsWidth(mType))
+        if (mEvents[i].isInside(mTimer->getTime().toMSecsSinceEpoch()) && mEvents[i].mUid.endsWith(mType))
 		{
 			event = mEvents[i];
 			break;

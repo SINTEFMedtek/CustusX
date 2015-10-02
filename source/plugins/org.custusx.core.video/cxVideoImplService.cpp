@@ -214,12 +214,14 @@ void VideoImplService::setPlaybackMode(PlaybackTimePtr controller)
     {
         types.insert(acq.split("_").back());
     }
+    USAcquisitionVideoPlaybackPtr tempUSAcquisitionVideoPlayback;
     foreach(const QString type, types.toList() ){
-        USAcquisitionVideoPlaybackPtr test = new USAcquisitionVideoPlayback(mBackend,type);
-        mUSAcquisitionVideoPlaybacks.push_back(test  );
+
+        tempUSAcquisitionVideoPlayback.reset(new USAcquisitionVideoPlayback(mBackend,type));
+        mUSAcquisitionVideoPlaybacks.push_back(tempUSAcquisitionVideoPlayback  );
 
 
-        mUSAcquisitionVideoPlaybacks.back()>setTime(controller);
+        mUSAcquisitionVideoPlaybacks.back()->setTime(controller);
         this->autoSelectActiveVideoSource();
 
         VideoSourcePtr playbackSource = mUSAcquisitionVideoPlaybacks.back()->getVideoSource();
@@ -314,7 +316,7 @@ std::vector<TimelineEvent> VideoImplService::getPlaybackEvents()
     std::vector<TimelineEvent> retval;
     foreach(USAcquisitionVideoPlaybackPtr uSAcquisitionVideoPlayback,mUSAcquisitionVideoPlaybacks)
     {
-        retval.push_back(uSAcquisitionVideoPlayback->getEvents());
+        retval.insert( retval.end(), uSAcquisitionVideoPlayback->getEvents().begin(), uSAcquisitionVideoPlayback->getEvents().end() );
     }
 
     return retval;
