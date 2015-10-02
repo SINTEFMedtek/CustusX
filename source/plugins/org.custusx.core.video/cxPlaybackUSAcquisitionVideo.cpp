@@ -59,10 +59,10 @@ namespace cx
 
 USAcquisitionVideoPlayback::USAcquisitionVideoPlayback(VideoServiceBackendPtr backend, QString type) :
 	QObject(NULL),
-    mVideoSourceUid(type.append("_playback"))
+    mVideoSourceUid(type +"_playback")
 {
     mType=type;
-	mBackend = backend;
+    mBackend = backend;
 	mVideoSource.reset(new BasicVideoSource(mVideoSourceUid));
 	mVideoSource->setStatusString(QString("No US Acquisition"));
 
@@ -73,6 +73,11 @@ USAcquisitionVideoPlayback::~USAcquisitionVideoPlayback()
 {
 }
 
+
+VideoSourcePtr USAcquisitionVideoPlayback::getVideoSource()
+{
+       return mVideoSource;
+}
 
 bool USAcquisitionVideoPlayback::isActive() const
 {
@@ -120,8 +125,6 @@ std::vector<TimelineEvent> USAcquisitionVideoPlayback::getEvents()
 						QString("Acquisition %1").arg(QFileInfo(allFiles[i]).fileName()),
 						timestamps.front().mTime,
 						timestamps.back().mTime);
-        report("------------------------ here");
-        report(allFiles[i]);
 		current.mUid = allFiles[i];
 		current.mGroup = "acquisition";
 		current.mColor = QColor::fromHsv(36, 255, 222);
@@ -137,16 +140,12 @@ std::vector<TimelineEvent> USAcquisitionVideoPlayback::getEvents()
  */
 QStringList USAcquisitionVideoPlayback::getAbsolutePathToFtsFiles(QString folder)
 {
-    /*QStringList nameFilters;
-    nameFilters << "*TissueAngio.fts" << "*TissueFlow.fts" << "*ScanConverted.fts";
-    QStringList res = getAbsolutePathToFiles(folder,nameFilters, true);
-    if(res.isEmpty())
-    {
-        res=getAbsolutePathToFiles(folder,QStringList("*.fts"), true);
-    }
-    */
-    QStringList res = getAbsolutePathToFiles(folder,QStringList("*.fts"), true);
-    return res;
+    return getAbsolutePathToFiles(folder,QStringList(QString("*").append(mType)), true);
+}
+
+QString USAcquisitionVideoPlayback::getType() const
+{
+    return mType;
 }
 
 void USAcquisitionVideoPlayback::timerChangedSlot()

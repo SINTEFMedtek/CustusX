@@ -139,6 +139,8 @@ void VideoImplService::autoSelectActiveVideoSource()
 
 void VideoImplService::setActiveVideoSource(QString uid)
 {
+    report("---");
+    report(uid);
 	mActiveVideoSource = mEmptyVideoSource;
 
 	std::vector<VideoSourcePtr> sources = this->getVideoSources();
@@ -163,6 +165,16 @@ void VideoImplService::setActiveVideoSource(QString uid)
 
 VideoSourcePtr VideoImplService::getGuessForActiveVideoSource(VideoSourcePtr old)
 {
+    QStringList nameFilters;
+    nameFilters << "*TissueAngio.fts" << "*TissueFlow.fts" << "*ScanConverted.fts";
+    // ask for playback stream:
+    foreach(USAcquisitionVideoPlaybackPtr uSAcquisitionVideoPlayback,mUSAcquisitionVideoPlaybacks)
+    {
+        report(uSAcquisitionVideoPlayback->getType());
+        if (uSAcquisitionVideoPlayback->isActive() && nameFilters.contains(uSAcquisitionVideoPlayback->getType()) )
+            return uSAcquisitionVideoPlayback->getVideoSource();
+     }
+
 	// ask for playback stream:
     foreach(USAcquisitionVideoPlaybackPtr uSAcquisitionVideoPlayback,mUSAcquisitionVideoPlaybacks)
     {
@@ -316,7 +328,9 @@ std::vector<TimelineEvent> VideoImplService::getPlaybackEvents()
     std::vector<TimelineEvent> retval;
     foreach(USAcquisitionVideoPlaybackPtr uSAcquisitionVideoPlayback,mUSAcquisitionVideoPlaybacks)
     {
-        retval.insert( retval.end(), uSAcquisitionVideoPlayback->getEvents().begin(), uSAcquisitionVideoPlayback->getEvents().end() );
+        std::vector<TimelineEvent> events = uSAcquisitionVideoPlayback->getEvents();
+        retval.reserve(retval.size() + events.size());
+        retval.insert( retval.end(), events.begin(), events.end() );
     }
 
     return retval;

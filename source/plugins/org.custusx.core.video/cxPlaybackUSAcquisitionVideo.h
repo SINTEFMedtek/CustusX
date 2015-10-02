@@ -74,6 +74,8 @@ public:
 	bool isActive() const;
 	std::vector<TimelineEvent> getEvents();
 
+    QString getType() const;
+
 private slots:
     void timerChangedSlot();
     void usDataLoadFinishedSlot();
@@ -84,10 +86,10 @@ private:
 	QStringList getAbsolutePathToFtsFiles(QString folder);
 	QString mRoot;
     QString mType;
-	PlaybackTimePtr mTimer;
+    PlaybackTimePtr mTimer;
 	BasicVideoSourcePtr mVideoSource;
 	std::vector<TimelineEvent> mEvents;
-	const QString mVideoSourceUid;
+    const QString mVideoSourceUid;
 
 	USReconstructInputData mCurrentData;
 	std::vector<double> mCurrentTimestamps; // copy of time frame timestamps from mCurrentData.
