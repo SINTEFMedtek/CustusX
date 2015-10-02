@@ -68,6 +68,11 @@ ViewGroupDataPtr VisualizationServiceProxy::getGroup(int groupIdx) const
 	return mVisualizationService->getGroup(groupIdx);
 }
 
+void VisualizationServiceProxy::setRegistrationMode(REGISTRATION_STATUS mode)
+{
+	mVisualizationService->setRegistrationMode(mode);
+}
+
 void VisualizationServiceProxy::initServiceListener()
 {
 	mServiceListener.reset(new ServiceTrackerListener<VisualizationService>(
@@ -86,6 +91,7 @@ void VisualizationServiceProxy::onServiceAdded(VisualizationService* service)
 	connect(service, &VisualizationService::fps, this, &VisualizationService::fps);
 	connect(service, &VisualizationService::activeLayoutChanged, this, &VisualizationService::activeLayoutChanged);
 	connect(service, &VisualizationService::renderingEnabledChanged, this, &VisualizationService::renderingEnabledChanged);
+	connect(service, &VisualizationService::pointSampled, this, &VisualizationService::pointSampled);
 
 	emit activeLayoutChanged();
 	emit activeViewChanged();
@@ -98,6 +104,7 @@ void VisualizationServiceProxy::onServiceRemoved(VisualizationService *service)
 	disconnect(service, &VisualizationService::fps, this, &VisualizationService::fps);
 	disconnect(service, &VisualizationService::activeLayoutChanged, this, &VisualizationService::activeLayoutChanged);
 	disconnect(service, &VisualizationService::renderingEnabledChanged, this, &VisualizationService::renderingEnabledChanged);
+	disconnect(service, &VisualizationService::pointSampled, this, &VisualizationService::pointSampled);
 
 	mVisualizationService = VisualizationService::getNullObject();
 

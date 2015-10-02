@@ -59,6 +59,11 @@ ViewGroupDataPtr VisualizationServiceNull::getGroup(int groupIdx) const
 	printWarning();
 	return ViewGroupDataPtr();
 }
+
+void VisualizationServiceNull::setRegistrationMode(REGISTRATION_STATUS mode)
+{
+	printWarning();
+}
 bool VisualizationServiceNull::isNull()
 {
 	return true;

@@ -30,50 +30,33 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXVIEWSERVICENULL_H_
-#define CXVIEWSERVICENULL_H_
+#include "cxtestFastPatientRegistrationWidgetFixture.h"
+#include <QShowEvent>
+#include <QHideEvent>
+//#include "cxVector3D.h"
 
-#include "cxResourceVisualizationExport.h"
 
-#include "cxViewService.h"
+cxtest::FastPatientRegistrationWidgetFixture::FastPatientRegistrationWidgetFixture(cx::RegServices services, QWidget *parent) :
+	cx::FastPatientRegistrationWidget(services, parent),
+	mPointSampled(false)
+{}
 
-namespace cx
+void cxtest::FastPatientRegistrationWidgetFixture::triggerShowEvent()
 {
-class cxResourceVisualization_EXPORT VisualizationServiceNull : public VisualizationService
+	this->showEvent(new QShowEvent());
+}
+
+void cxtest::FastPatientRegistrationWidgetFixture::triggerHideEvent()
 {
-public:
-	VisualizationServiceNull();
+	this->hideEvent(new QHideEvent());
+}
 
-	virtual ViewPtr get3DView(int group = 0, int index = 0);
+QCheckBox* cxtest::FastPatientRegistrationWidgetFixture::getMouseClickSample()
+{
+	return mMouseClickSample;
+}
 
-	virtual int getActiveGroupId() const;
-	virtual ViewGroupDataPtr getGroup(int groupIdx) const;
-	virtual void setRegistrationMode(REGISTRATION_STATUS mode);
-
-	virtual void autoShowData(DataPtr data);
-	virtual void enableRender(bool val);
-	virtual bool renderingIsEnabled() const;
-
-	virtual QWidget* getLayoutWidget(QWidget* parent, int index);
-	virtual QString getActiveLayout(int widgetIndex) const;
-	virtual void setActiveLayout(const QString& uid, int widgetIndex);
-	virtual InteractiveClipperPtr getClipper();
-	virtual InteractiveCropperPtr getCropper();
-	virtual CyclicActionLoggerPtr getRenderTimer();
-	virtual NavigationPtr getNavigation();
-	virtual LayoutRepositoryPtr getLayoutRepository();
-	virtual CameraControlPtr getCameraControl();
-	virtual QActionGroup* createInteractorStyleActionGroup();
-
-	virtual bool isNull();
-
-public slots:
-    virtual void aboutToStop(){}
-
-private:
-	void printWarning() const;
-	QActionGroup* mActionGroup;
-
-};
-} //cx
-#endif // CXVIEWSERVICENULL_H_
+void cxtest::FastPatientRegistrationWidgetFixture::pointSampled(cx::Vector3D p_r)
+{
+	mPointSampled = true;
+}

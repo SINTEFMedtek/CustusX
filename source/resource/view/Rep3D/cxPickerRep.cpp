@@ -242,6 +242,7 @@ void PickerRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
 		return;
 
 	Vector3D clickPoint(pickedPoint[0], pickedPoint[1], 0);
+
 	this->pickLandmark(clickPoint, renderer);
 }
 

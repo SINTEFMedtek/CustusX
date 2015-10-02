@@ -138,8 +138,8 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ViewPtr view, VisServicesPtr servic
 
 	mPickerRep = PickerRep::New(mServices->getPatientService());
 
-	connect(mPickerRep.get(), SIGNAL(pointPicked(Vector3D)), this, SLOT(PickerRepPointPickedSlot(Vector3D)));
-	connect(mPickerRep.get(), SIGNAL(dataPicked(QString)), this, SLOT(PickerRepDataPickedSlot(QString)));
+	connect(mPickerRep.get(), SIGNAL(pointPicked(Vector3D)), this, SLOT(pickerRepPointPickedSlot(Vector3D)));
+//	connect(mPickerRep.get(), SIGNAL(dataPicked(QString)), this, SLOT(pickerRepDataPickedSlot(QString)));
 	mPickerRep->setSphereRadius(settings()->value("View3D/sphereRadius").toDouble());
 	mPickerRep->setEnabled(false);
 	mView->addRep(mPickerRep);
@@ -274,13 +274,13 @@ void ViewWrapper3D::updateMetricNamesRep()
 	}
 }
 
-void ViewWrapper3D::PickerRepPointPickedSlot(Vector3D p_r)
+void ViewWrapper3D::pickerRepPointPickedSlot(Vector3D p_r)
 {
 	NavigationPtr nav = this->getNavigation();
 	nav->centerToPosition(p_r, Navigation::v2D);
 }
 
-void ViewWrapper3D::PickerRepDataPickedSlot(QString uid)
+void ViewWrapper3D::pickerRepDataPickedSlot(QString uid)
 {
 	//std::cout << "picked: " << uid << std::endl;
 }

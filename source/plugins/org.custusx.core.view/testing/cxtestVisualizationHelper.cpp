@@ -30,50 +30,36 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXVIEWSERVICENULL_H_
-#define CXVIEWSERVICENULL_H_
+#include "cxtestVisualizationHelper.h"
+#include "cxLogicManager.h"
+#include "cxVisServices.h"
 
-#include "cxResourceVisualizationExport.h"
 
-#include "cxViewService.h"
+namespace cxtest{
 
-namespace cx
+VisualizationHelper::VisualizationHelper()
 {
-class cxResourceVisualization_EXPORT VisualizationServiceNull : public VisualizationService
+	cx::LogicManager::initialize();
+	services = cx::VisServices::create(cx::logicManager()->getPluginContext());
+
+	cx::ViewPtr view = viewsFixture.addView(0, 0);
+
+	viewWrapper.reset(new ViewWrapper2DFixture(view, services));
+}
+
+VisualizationHelper::~VisualizationHelper()
 {
-public:
-	VisualizationServiceNull();
+	services.reset();
+	cx::LogicManager::shutdown();
+}
 
-	virtual ViewPtr get3DView(int group = 0, int index = 0);
+ViewWrapper2DFixture::ViewWrapper2DFixture(cx::ViewPtr view, cx::VisServicesPtr services) :
+	cx::ViewWrapper2D(view, services)
+{}
 
-	virtual int getActiveGroupId() const;
-	virtual ViewGroupDataPtr getGroup(int groupIdx) const;
-	virtual void setRegistrationMode(REGISTRATION_STATUS mode);
+void ViewWrapper2DFixture::emitPointSampled()
+{
+	this->samplePoint(cx::Vector3D(1, 1, 1));
+}
 
-	virtual void autoShowData(DataPtr data);
-	virtual void enableRender(bool val);
-	virtual bool renderingIsEnabled() const;
-
-	virtual QWidget* getLayoutWidget(QWidget* parent, int index);
-	virtual QString getActiveLayout(int widgetIndex) const;
-	virtual void setActiveLayout(const QString& uid, int widgetIndex);
-	virtual InteractiveClipperPtr getClipper();
-	virtual InteractiveCropperPtr getCropper();
-	virtual CyclicActionLoggerPtr getRenderTimer();
-	virtual NavigationPtr getNavigation();
-	virtual LayoutRepositoryPtr getLayoutRepository();
-	virtual CameraControlPtr getCameraControl();
-	virtual QActionGroup* createInteractorStyleActionGroup();
-
-	virtual bool isNull();
-
-public slots:
-    virtual void aboutToStop(){}
-
-private:
-	void printWarning() const;
-	QActionGroup* mActionGroup;
-
-};
-} //cx
-#endif // CXVIEWSERVICENULL_H_
+}//namespace cxtest

@@ -30,50 +30,34 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXVIEWSERVICENULL_H_
-#define CXVIEWSERVICENULL_H_
+#ifndef CXTESTVISIALIZATIONHELPER_H
+#define CXTESTVISIALIZATIONHELPER_H
 
-#include "cxResourceVisualizationExport.h"
+#include "cxViewWrapper2D.h"
+#include "cxViewsFixture.h"
 
-#include "cxViewService.h"
-
-namespace cx
+namespace cxtest
 {
-class cxResourceVisualization_EXPORT VisualizationServiceNull : public VisualizationService
+typedef boost::shared_ptr<class ViewWrapper2DFixture> ViewWrapper2DFixturePtr;
+struct ViewWrapper2DFixture : public cx::ViewWrapper2D
+{
+	ViewWrapper2DFixture(cx::ViewPtr view, cx::VisServicesPtr services);
+	void emitPointSampled();
+};
+
+class VisualizationHelper
 {
 public:
-	VisualizationServiceNull();
+	VisualizationHelper();
+	~VisualizationHelper();
 
-	virtual ViewPtr get3DView(int group = 0, int index = 0);
-
-	virtual int getActiveGroupId() const;
-	virtual ViewGroupDataPtr getGroup(int groupIdx) const;
-	virtual void setRegistrationMode(REGISTRATION_STATUS mode);
-
-	virtual void autoShowData(DataPtr data);
-	virtual void enableRender(bool val);
-	virtual bool renderingIsEnabled() const;
-
-	virtual QWidget* getLayoutWidget(QWidget* parent, int index);
-	virtual QString getActiveLayout(int widgetIndex) const;
-	virtual void setActiveLayout(const QString& uid, int widgetIndex);
-	virtual InteractiveClipperPtr getClipper();
-	virtual InteractiveCropperPtr getCropper();
-	virtual CyclicActionLoggerPtr getRenderTimer();
-	virtual NavigationPtr getNavigation();
-	virtual LayoutRepositoryPtr getLayoutRepository();
-	virtual CameraControlPtr getCameraControl();
-	virtual QActionGroup* createInteractorStyleActionGroup();
-
-	virtual bool isNull();
-
-public slots:
-    virtual void aboutToStop(){}
-
+	cx::VisServicesPtr services;
+	ViewWrapper2DFixturePtr viewWrapper;
 private:
-	void printWarning() const;
-	QActionGroup* mActionGroup;
-
+	ViewsFixture viewsFixture;
 };
-} //cx
-#endif // CXVIEWSERVICENULL_H_
+
+}//namespace cxtest
+
+
+#endif // CXTESTVISIALIZATIONHELPER_H

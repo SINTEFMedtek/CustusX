@@ -38,6 +38,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx {
 
+RegServicesPtr RegServices::create(ctkPluginContext* context)
+{
+	return RegServicesPtr(new RegServices(context));
+}
+
 RegServices::RegServices(ctkPluginContext* context) :
 	VisServices(context)
 {

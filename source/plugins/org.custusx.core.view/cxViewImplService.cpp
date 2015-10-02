@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSessionStorageServiceProxy.h"
 #include "cxXMLNodeWrapper.h"
 #include "cxLogger.h"
+#include "cxViewGroupData.h"
 
 namespace cx
 {
@@ -65,6 +66,7 @@ VisualizationImplService::VisualizationImplService(ctkPluginContext *context) :
 	connect(viewManager(), &ViewManager::fps, this, &VisualizationService::fps);
 	connect(viewManager(), &ViewManager::activeLayoutChanged, this, &VisualizationService::activeLayoutChanged);
 	connect(viewManager(), &ViewManager::renderingEnabledChanged, this, &VisualizationService::renderingEnabledChanged);
+	connect(viewManager(), &ViewManager::pointSampled, this, &VisualizationService::pointSampled);
 }
 
 VisualizationImplService::~VisualizationImplService()
@@ -83,6 +85,11 @@ int VisualizationImplService::getActiveGroupId() const
 ViewGroupDataPtr VisualizationImplService::getGroup(int groupIdx) const
 {
 	return viewManager()->getViewGroup(groupIdx);
+}
+
+void VisualizationImplService::setRegistrationMode(REGISTRATION_STATUS mode)
+{
+	this->getGroup(0)->setRegistrationMode(mode);
 }
 
 bool VisualizationImplService::isNull()

@@ -68,7 +68,6 @@ PatientLandMarksWidget::PatientLandMarksWidget(RegServices services,
 
 	mRemoveLandmarkButton = new QPushButton("Clear", this);
 	mRemoveLandmarkButton->setToolTip("Clear selected landmark");
-	//  mRemoveLandmarkButton->setDisabled(true);
 	connect(mRemoveLandmarkButton, &QPushButton::clicked, this, &PatientLandMarksWidget::removeLandmarkButtonClickedSlot);
 
 	//toolmanager
@@ -79,15 +78,10 @@ PatientLandMarksWidget::PatientLandMarksWidget(RegServices services,
 	connect(settings(), &Settings::valueChangedFor, this, &PatientLandMarksWidget::globalConfigurationFileChangedSlot);
 
 	//layout
-//	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mFixedProperty));
 	mVerticalLayout->addWidget(mLandmarkTableWidget);
 	mVerticalLayout->addWidget(mToolSampleButton);
 	mVerticalLayout->addWidget(mAvarageAccuracyLabel);
-
-	QHBoxLayout* buttonsLayout = new QHBoxLayout;
-//	buttonsLayout->addWidget(mRegisterButton);
-	buttonsLayout->addWidget(mRemoveLandmarkButton);
-	mVerticalLayout->addLayout(buttonsLayout);
+	mVerticalLayout->addWidget(mRemoveLandmarkButton);
 
 	this->updateToolSampleButton();
 }
@@ -142,15 +136,13 @@ void PatientLandMarksWidget::toolSampleButtonClickedSlot()
 
 void PatientLandMarksWidget::showEvent(QShowEvent* event)
 {
-//	std::cout << "PatientLandMarksWidget::showEvent" << std::endl;
-	mServices.visualizationService->getGroup(0)->setRegistrationMode(rsPATIENT_REGISTRATED);
+	mServices.visualizationService->setRegistrationMode(rsPATIENT_REGISTRATED);
 	LandmarkRegistrationWidget::showEvent(event);
 }
 
 void PatientLandMarksWidget::hideEvent(QHideEvent* event)
 {
-//	std::cout << "PatientLandMarksWidget::hideEvent" << std::endl;
-	mServices.visualizationService->getGroup(0)->setRegistrationMode(rsNOT_REGISTRATED);
+	mServices.visualizationService->setRegistrationMode(rsNOT_REGISTRATED);
 	LandmarkRegistrationWidget::hideEvent(event);
 }
 

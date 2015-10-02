@@ -86,7 +86,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderWindowInteractor.h"
 #include "cxPatientModelService.h"
 #include "cxLogger.h"
-
+#include "cxViewService.h"
 
 namespace cx
 {
@@ -95,6 +95,7 @@ ViewWrapper2D::ViewWrapper2D(ViewPtr view, VisServicesPtr backend) :
 	ViewWrapper(backend),
 	mOrientationActionGroup(new QActionGroup(view.get()))
 {
+	qRegisterMetaType<Vector3D>("Vector3D");
 	mView = view;
 	this->connectContextMenu(mView);
 
@@ -138,6 +139,20 @@ ViewWrapper2D::~ViewWrapper2D()
 {
 	if (mView)
 		mView->removeReps();
+}
+
+void ViewWrapper2D::samplePoint(Vector3D click_vp)
+{
+	if(!this->isAnyplane())
+		return;
+
+	Transform3D sMr = mSliceProxy->get_sMr();
+	Transform3D vpMs = mView->get_vpMs();
+
+	Vector3D p_s = vpMs.inv().coord(click_vp);
+	Vector3D p_r = sMr.inv().coord(p_s);
+
+	emit pointSampled(p_r);
 }
 
 void ViewWrapper2D::appendToContextMenu(QMenu& contextMenu)
@@ -612,15 +627,9 @@ void ViewWrapper2D::mousePressSlot(int x, int y, Qt::MouseButtons buttons)
 {
 	if (buttons & Qt::LeftButton)
 	{
-		if (this->getOrientationType() == otORTHOGONAL)
-		{
-			setAxisPos(qvp2vp(QPoint(x,y)));
-		}
-		else
-		{
-			mClickPos = qvp2vp(QPoint(x,y));
-			this->shiftAxisPos(Vector3D(0,0,0)); // signal the maual tool that something is happening (important for playback tool)
-		}
+		Vector3D clickPos_vp = qvp2vp(QPoint(x,y));
+		moveManualTool(clickPos_vp, Vector3D(0,0,0));
+		samplePoint(clickPos_vp);
 	}
 }
 
@@ -632,19 +641,21 @@ void ViewWrapper2D::mouseMoveSlot(int x, int y, Qt::MouseButtons buttons)
 {
 	if (buttons & Qt::LeftButton)
 	{
-		if (this->getOrientationType() == otORTHOGONAL)
-		{
-			setAxisPos(qvp2vp(QPoint(x,y)));
-		}
-		else
-		{
-			Vector3D p = qvp2vp(QPoint(x,y));
-			this->shiftAxisPos(p - mClickPos);
-			mClickPos = p;
-		}
+		Vector3D clickPos_vp = qvp2vp(QPoint(x,y));
+		moveManualTool(clickPos_vp, clickPos_vp - mLastClickPos_vp);
 	}
 }
 
+void ViewWrapper2D::moveManualTool(Vector3D vp, Vector3D delta_vp)
+{
+	if (this->getOrientationType() == otORTHOGONAL)
+		setAxisPos(vp);
+	else
+	{
+		this->shiftAxisPos(delta_vp); // signal the maual tool that something is happening (important for playback tool)
+		mLastClickPos_vp = vp;
+	}
+}
 
 /**Part of the mouse interactor:
  * Interpret mouse wheel as a zoom operation.
@@ -667,7 +678,7 @@ void ViewWrapper2D::mouseWheelSlot(int x, int y, int delta, int orientation, Qt:
 Vector3D ViewWrapper2D::qvp2vp(QPoint pos_qvp)
 {
 	QSize size = mView->size();
-	Vector3D pos_vp(pos_qvp.x(), size.height() - pos_qvp.y(), 0.0); // convert from left-handed qt space to vtk space display/viewport
+	Vector3D pos_vp(pos_qvp.x(), size.height()-1 - pos_qvp.y(), 0.0); // convert from left-handed qt space to vtk space display/viewport
 	return pos_vp;
 }
 

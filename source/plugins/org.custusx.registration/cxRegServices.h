@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-
+typedef boost::shared_ptr<class RegServices> RegServicesPtr;
 typedef boost::shared_ptr<class RegistrationService> RegistrationServicePtr;
 typedef boost::shared_ptr<class VisualizationService> VisualizationServicePtr;
 typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
@@ -54,6 +54,7 @@ typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
 class org_custusx_registration_EXPORT RegServices : public VisServices
 {
 public:
+	static RegServicesPtr create(ctkPluginContext* context);
 	RegServices(ctkPluginContext* context);
 	static RegServices getNullObjects();
 
