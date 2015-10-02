@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXTESTFASTPATIENTREGISTRATIONWIDGETFIXTURE_H
 
 #include "cxFastPatientRegistrationWidget.h"
+#include "cxtest_org_custusx_registration_method_landmark_export.h"
 
 namespace cx
 {
@@ -44,7 +45,7 @@ namespace cxtest
 {
 
 typedef boost::shared_ptr<class FastPatientRegistrationWidgetFixture> FastPatientRegistrationWidgetFixturePtr;
-class FastPatientRegistrationWidgetFixture : public cx::FastPatientRegistrationWidget
+class CXTEST_ORG_CUSTUSX_REGISTRATION_METHOD_LANDMARK_EXPORT FastPatientRegistrationWidgetFixture : public cx::FastPatientRegistrationWidget
 {
 	Q_OBJECT
 public:
