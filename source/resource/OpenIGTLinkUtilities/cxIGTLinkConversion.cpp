@@ -87,15 +87,15 @@ Transform3D IGTLinkConversion::decode(igtl::TransformMessage::Pointer msg)
 
 //--------------------------------CustusX messages---------------------------------------
 
-IGTLinkImageMessage::Pointer IGTLinkConversion::encode(ImagePtr image)
-{
-	return IGTLinkConversionSonixCXLegacy().encode(image);
-}
+//IGTLinkImageMessage::Pointer IGTLinkConversion::encode(ImagePtr image)
+//{
+//	return IGTLinkConversionSonixCXLegacy().encode(image);
+//}
 
-ImagePtr IGTLinkConversion::decode(IGTLinkImageMessage::Pointer message)
-{
-    return this->decode(igtl::ImageMessage::Pointer(message));
-}
+//ImagePtr IGTLinkConversion::decode(IGTLinkImageMessage::Pointer message)
+//{
+//    return this->decode(igtl::ImageMessage::Pointer(message));
+//}
 
 IGTLinkUSStatusMessage::Pointer IGTLinkConversion::encode(ProbeDefinitionPtr input)
 {
@@ -150,18 +150,19 @@ ProbeDefinitionPtr IGTLinkConversion::decode(IGTLinkUSStatusMessage::Pointer pro
 		retval->setClipRect_p(DoubleBoundingBox3D(0, retval->getSize().width(), 0, retval->getSize().height(), 0, 0));
 	}
 
-	return this->decode(retval);
+	return retval;
+//	return this->decode(retval);
 }
 
-ImagePtr IGTLinkConversion::decode(ImagePtr msg)
-{
-	return IGTLinkConversionSonixCXLegacy().decode(msg);
-}
+//ImagePtr IGTLinkConversion::decode(ImagePtr msg)
+//{
+//	return IGTLinkConversionSonixCXLegacy().decode(msg);
+//}
 
-ProbeDefinitionPtr IGTLinkConversion::decode(ProbeDefinitionPtr msg)
-{
-	return IGTLinkConversionSonixCXLegacy().decode(msg);
-}
+//ProbeDefinitionPtr IGTLinkConversion::decode(ProbeDefinitionPtr msg)
+//{
+//	return IGTLinkConversionSonixCXLegacy().decode(msg);
+//}
 
 QString IGTLinkConversion::convertIGTLinkStatusCodes(const int code)
 {

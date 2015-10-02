@@ -73,17 +73,17 @@ public:
 //	igtl::ImageMessage::Pointer encode(ImagePtr image);
 
     //CustusX message formats
-    /**
-	  * Encode the image into a IGTLink message, containing
-	  * image data, uid and timstamp
-	  */
-	IGTLinkImageMessage::Pointer encode(ImagePtr image);
-	/**
-	  * Decode the IGTLink message to create an image containing
-	  * image data, uid and timstamp. The color format is also
-	  * converted to RGBX
-	  */
-    ImagePtr decode(IGTLinkImageMessage::Pointer msg);
+//    /**
+//	  * Encode the image into a IGTLink message, containing
+//	  * image data, uid and timstamp
+//	  */
+//	IGTLinkImageMessage::Pointer encode(ImagePtr image);
+//	/**
+//	  * Decode the IGTLink message to create an image containing
+//	  * image data, uid and timstamp. The color format is also
+//	  * converted to RGBX
+//	  */
+//	ImagePtr decode(igtl::ImageMessage::Pointer msg);
 
 	/**
 	  * Encode the input ProbeDefinition into an IGTLink message.
@@ -99,23 +99,23 @@ public:
 	  *
 	  * Some or all of the input messages can be NULL.
 	  */
-    ProbeDefinitionPtr decode(IGTLinkUSStatusMessage::Pointer probeMessage, IGTLinkImageMessage::Pointer imageMsg, ProbeDefinitionPtr base)
-    {
-        CX_LOG_ERROR() << "THIS CODE SHOULD BE REMOVED!!!!";
-		return ProbeDefinitionPtr();
-    }
-    ProbeDefinitionPtr decode(IGTLinkUSStatusMessage::Pointer probeMessage, igtl::ImageMessage::Pointer imageMsg, ProbeDefinitionPtr base);
+//    ProbeDefinitionPtr decode(IGTLinkUSStatusMessage::Pointer probeMessage, IGTLinkImageMessage::Pointer imageMsg, ProbeDefinitionPtr base)
+//    {
+//        CX_LOG_ERROR() << "THIS CODE SHOULD BE REMOVED!!!!";
+//		return ProbeDefinitionPtr();
+//    }
+	ProbeDefinitionPtr decode(IGTLinkUSStatusMessage::Pointer probeMessage, igtl::ImageMessage::Pointer imageMsg, ProbeDefinitionPtr base);
 
-	/**
-	  * Decode the image to standard format with standard color RGBX encoding.
-	  *
-	  * Find the substring [XYZW] in the msg uid, where each letter can be
-	  * one of RGBAX. The letters describe the image components. Rearrange
-	  * to standard RGBX format, strip format from uid,
-	  * and return as new image.
-	  */
-	ImagePtr decode(ImagePtr msg);
-	ProbeDefinitionPtr decode(ProbeDefinitionPtr msg);
+//	/**
+//	  * Decode the image to standard format with standard color RGBX encoding.
+//	  *
+//	  * Find the substring [XYZW] in the msg uid, where each letter can be
+//	  * one of RGBAX. The letters describe the image components. Rearrange
+//	  * to standard RGBX format, strip format from uid,
+//	  * and return as new image.
+//	  */
+//	ImagePtr decode(ImagePtr msg);
+//	ProbeDefinitionPtr decode(ProbeDefinitionPtr msg);
 
 private:
     QString convertIGTLinkStatusCodes(const int code);

@@ -275,20 +275,8 @@ void OpenIGTLinkProtocol::prepareBody(const igtl::MessageHeader::Pointer &header
         this->prepareBody<igtl::PolyDataMessage>(header, body);
     }
     else if (type=="IMAGE")
-    {
-        //----- CustusX openigtlink server -----
-        //there is a special kind of image package coming from custusx
-        //server where crc is set to 0.
-        QString name(header->GetDeviceName());
-        if(name.contains("Sonix", Qt::CaseInsensitive))
-        {
-            this->prepareBody<IGTLinkImageMessage>(header, body);
-        }
-        //----------
-        else
-        {
-            this->prepareBody<igtl::ImageMessage>(header, body);
-        }
+	{
+		this->prepareBody<igtl::ImageMessage>(header, body);
     }
     else if (type=="STATUS")
     {

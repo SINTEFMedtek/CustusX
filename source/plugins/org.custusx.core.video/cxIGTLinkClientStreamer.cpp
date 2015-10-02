@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxLogger.h"
 #include "cxIGTLinkConversion.h"
+#include "cxIGTLinkConversionImage.h"
 #include "cxCyclicActionLogger.h"
 #include "cxUtilHelpers.h"
 #include "cxTime.h"
@@ -286,7 +287,7 @@ QDateTime my_decode_timestamp(igtl::MessageBase* msg)
 	return QDateTime::fromMSecsSinceEpoch(timestampMS);
 }
 
-void write_time_info(IGTLinkImageMessage::Pointer imgMsg)
+void write_time_info(igtl::ImageMessage::Pointer imgMsg)
 {
 	int kb = imgMsg->GetPackSize()/1024;
 //	CX_LOG_CHANNEL_DEBUG("igtl_rec_test") << "unpacked: , " << kb << " kByte, name=" << imgMsg->GetDeviceName();
@@ -302,8 +303,7 @@ void write_time_info(IGTLinkImageMessage::Pointer imgMsg)
 bool IGTLinkClientStreamer::ReceiveImage(QTcpSocket* socket, igtl::MessageHeader::Pointer& header)
 {
 	// Create a message buffer to receive transform data
-	IGTLinkImageMessage::Pointer imgMsg;
-	imgMsg = IGTLinkImageMessage::New();
+	igtl::ImageMessage::Pointer imgMsg = igtl::ImageMessage::New();
 	imgMsg->SetMessageHeader(header);
 	imgMsg->AllocatePack();
 
@@ -339,17 +339,19 @@ void IGTLinkClientStreamer::addToQueue(IGTLinkUSStatusMessage::Pointer msg)
 	mUnsentUSStatusMessage = msg;
 }
 
-void IGTLinkClientStreamer::addToQueue(IGTLinkImageMessage::Pointer msg)
+void IGTLinkClientStreamer::addToQueue(igtl::ImageMessage::Pointer msg)
 {
-//	IGTLinkConversion converter;
+	IGTLinkConversion converter;
+	IGTLinkConversionImage imageconverter;
 
 	PackagePtr package(new Package());
-	package->mIgtLinkImageMessage = msg;
+	package->mImage = imageconverter.decode(msg);
 
 	// if us status not sent, do it here
 	if (mUnsentUSStatusMessage)
 	{
-		package->mIgtLinkUSStatusMessage = mUnsentUSStatusMessage;
+		CX_LOG_WARNING() << "default constructed probe definition used as input.";
+		package->mProbe = converter.decode(mUnsentUSStatusMessage, msg, ProbeDefinitionPtr(new ProbeDefinition()));
 		mUnsentUSStatusMessage = IGTLinkUSStatusMessage::Pointer();
 	}
 

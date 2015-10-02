@@ -91,29 +91,29 @@ ImagePtr IGTLinkConversionSonixCXLegacy::decode(igtl::ImageMessage::Pointer mess
 
 	switch (scalarType)
 	{
-	case IGTLinkImageMessage::TYPE_INT8:
+	case igtl::ImageMessage::TYPE_INT8:
 		CX_LOG_WARNING() << "signed char is not supported. Falling back to unsigned char.";
 		imageImport->SetDataScalarTypeToUnsignedChar();
 		break;
-	case IGTLinkImageMessage::TYPE_UINT8:
+	case igtl::ImageMessage::TYPE_UINT8:
 		imageImport->SetDataScalarTypeToUnsignedChar();
 		break;
-	case IGTLinkImageMessage::TYPE_INT16:
+	case igtl::ImageMessage::TYPE_INT16:
 		imageImport->SetDataScalarTypeToShort();
 		break;
-	case IGTLinkImageMessage::TYPE_UINT16:
+	case igtl::ImageMessage::TYPE_UINT16:
 		imageImport->SetNumberOfScalarComponents(2);
 		imageImport->SetDataScalarTypeToUnsignedChar();
 		break;
-	case IGTLinkImageMessage::TYPE_INT32:
-	case IGTLinkImageMessage::TYPE_UINT32:
+	case igtl::ImageMessage::TYPE_INT32:
+	case igtl::ImageMessage::TYPE_UINT32:
 		imageImport->SetNumberOfScalarComponents(4);
 		imageImport->SetDataScalarTypeToUnsignedChar();
 		break;
-	case IGTLinkImageMessage::TYPE_FLOAT32:
+	case igtl::ImageMessage::TYPE_FLOAT32:
 		imageImport->SetDataScalarTypeToFloat();
 		break;
-	case IGTLinkImageMessage::TYPE_FLOAT64:
+	case igtl::ImageMessage::TYPE_FLOAT64:
 		imageImport->SetDataScalarTypeToDouble();
 		break;
 	default:
@@ -138,7 +138,7 @@ ImagePtr IGTLinkConversionSonixCXLegacy::decode(igtl::ImageMessage::Pointer mess
 	return retval;
 }
 
-IGTLinkImageMessage::Pointer IGTLinkConversionSonixCXLegacy::encode(ImagePtr image)
+igtl::ImageMessage::Pointer IGTLinkConversionSonixCXLegacy::encode(ImagePtr image)
 {
 	vtkImageDataPtr rawImage = image->getBaseVtkImageData();
 
@@ -178,12 +178,12 @@ IGTLinkImageMessage::Pointer IGTLinkConversionSonixCXLegacy::encode(ImagePtr ima
 	if (scalarType==-1)
 	{
 		std::cerr << "Unsupported file type based on vtk " << rawImage->GetScalarTypeAsString() << std::endl;
-		return IGTLinkImageMessage::Pointer();
+		return igtl::ImageMessage::Pointer();
 	}
 
 	//------------------------------------------------------------
 	// Create a new IMAGE type message
-	IGTLinkImageMessage::Pointer imgMsg = IGTLinkImageMessage::New();
+	igtl::ImageMessage::Pointer imgMsg = igtl::ImageMessage::New();
 	imgMsg->SetDimensions(size);
 	imgMsg->SetSpacing(spacingF);
 	imgMsg->SetScalarType(scalarType);

@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxCustusProtocol.h"
 
 #include "cxIGTLinkConversion.h"
+#include "cxIGTLinkConversionImage.h"
+#include "cxIGTLinkConversionSonixCXLegacy.h"
 #include "cxImage.h"
 #include "cxLogger.h"
 
@@ -53,14 +55,17 @@ bool CustusProtocol::doCRC() const
 void CustusProtocol::translate(const igtl::ImageMessage::Pointer body)
 {
     IGTLinkConversion converter;
-    ImagePtr imagePtr = converter.decode(body);
-    imagePtr = converter.decode(imagePtr);
+	IGTLinkConversionSonixCXLegacy cxconverter;
+	ImagePtr imagePtr = cxconverter.decode(body);
+	imagePtr = cxconverter.decode(imagePtr);
     emit image(imagePtr);
 
     if(mUnsentUSStatusMessage)
     {
+		CX_LOG_WARNING() << "default constructed probe definition used as input.";
         ProbeDefinitionPtr definition = converter.decode(mUnsentUSStatusMessage, body, ProbeDefinitionPtr(new ProbeDefinition()));
-        QString devicename = "TODO";
+		definition = cxconverter.decode(definition);
+		QString devicename = "TODO";
         mUnsentUSStatusMessage = IGTLinkUSStatusMessage::New();
         emit probedefinition(devicename, definition);
     }

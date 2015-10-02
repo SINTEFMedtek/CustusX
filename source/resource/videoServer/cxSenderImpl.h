@@ -68,16 +68,10 @@ public:
 	virtual void send(PackagePtr package);
 
 protected:
-	/**Send an image message, NOT packed.
-	 */
-	virtual void send(IGTLinkImageMessage::Pointer msg) = 0;
-	/**Send an US status message, NOT packed
-	 */
-	virtual void send(IGTLinkUSStatusMessage::Pointer msg) = 0;
-	/**Send an image message, NOT packed.
+	/** Send an image message
 	 */
 	virtual void send(ImagePtr msg) = 0;
-	/**Send an US status message, NOT packed
+	/** Send an US status message
 	 */
 	virtual void send(ProbeDefinitionPtr msg) = 0;
 };
