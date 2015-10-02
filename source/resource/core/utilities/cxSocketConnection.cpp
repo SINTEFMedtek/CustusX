@@ -232,7 +232,7 @@ bool SocketConnection::enoughBytesAvailableOnSocket(int bytes) const
 {
     bool enoughBytes = mSocket->bytesAvailable() >= bytes;
     if(!enoughBytes)
-        CX_LOG_WARNING() << "Want " << bytes << " but only "<< mSocket->bytesAvailable() << " are available on the socket.";
+        CX_LOG_DEBUG() << "Want " << bytes << " but only "<< mSocket->bytesAvailable() << " are available on the socket atm.";
     return enoughBytes;
 }
 

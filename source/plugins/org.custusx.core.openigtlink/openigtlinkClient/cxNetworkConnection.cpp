@@ -158,7 +158,7 @@ void NetworkConnection::streamImage(ImagePtr image)
 
 	EncodedPackagePtr package = mProtocol->encode(image);
 
-	int sendSize = package->data().size()/1024;
+    int sendSize = package->data()->size/1024;
     int waitingSize = mSocket->bytesToWrite()/1024;
     double waitToSendRatio = double(waitingSize)/double(sendSize);
     double waitToSendRatioThreshold = 0.5;
@@ -189,7 +189,7 @@ void NetworkConnection::streamImage(ImagePtr image)
 //    mSocket->write(reinterpret_cast<char*>(msg->GetPackPointer()), msg->GetPackSize());
 //    CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "Sent image: " << image->getName();
 
-	mSocket->write(package->data());
+    mSocket->write(reinterpret_cast<char*>(package->data()->pointer));
 }
 
 void NetworkConnection::sendImage(ImagePtr image)
@@ -198,7 +198,7 @@ void NetworkConnection::sendImage(ImagePtr image)
 	CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "Sending image: " << image->getName();
 
 	EncodedPackagePtr package = mProtocol->encode(image);
-	mSocket->write(package->data());
+    mSocket->write(reinterpret_cast<char*>(package->data()->pointer));
 }
 
 void NetworkConnection::sendMesh(MeshPtr data)
@@ -207,7 +207,7 @@ void NetworkConnection::sendMesh(MeshPtr data)
 	CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "Sending mesh: " << data->getName();
 
 	EncodedPackagePtr package = mProtocol->encode(data);
-	mSocket->write(package->data());
+    mSocket->write(reinterpret_cast<char*>(package->data()->pointer));
 }
 
 void NetworkConnection::internalDataAvailable()
@@ -221,8 +221,8 @@ void NetworkConnection::internalDataAvailable()
     if(mProtocol->readyToReceiveData())
     {
         //CX_LOG_DEBUG() << "A ready to receive data " << mProtocol->readyToReceiveData();
-        PackPtr pack = mProtocol->getPack();
-        if(this->socketReceive(pack->pointer, pack->size))
+        EncodedPackagePtr pack = mProtocol->getPack();
+        if(this->socketReceive(pack->data()->pointer, pack->data()->size))
         {
             //CX_LOG_DEBUG() << "B";
             pack->notifyDataArrived();

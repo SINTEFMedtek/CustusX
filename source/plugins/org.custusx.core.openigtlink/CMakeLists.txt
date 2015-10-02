@@ -25,6 +25,7 @@ set(PLUGIN_SRCS
     openigtlinkClient/cxNetworkServiceImpl.cpp
     openigtlinkClient/cxNetworkConnectionHandle.cpp
 
+    openigtlinkClient/protocols/cxEncodedPackage.cpp
     openigtlinkClient/protocols/cxProtocol.cpp
     openigtlinkClient/protocols/cxOpenIGTLinkProtocol.h
     openigtlinkClient/protocols/cxOpenIGTLinkProtocol.cpp
@@ -53,6 +54,8 @@ set(PLUGIN_MOC_SRCS
     openigtlinkClient/cxNetworkConnection.h
     openigtlinkClient/cxNetworkServiceImpl.h
     openigtlinkClient/cxNetworkConnectionHandle.h
+
+    openigtlinkClient/protocols/cxEncodedPackage.h
     openigtlinkClient/protocols/cxProtocol.h
     openigtlinkClient/protocols/cxOpenIGTLinkProtocol.h
 )

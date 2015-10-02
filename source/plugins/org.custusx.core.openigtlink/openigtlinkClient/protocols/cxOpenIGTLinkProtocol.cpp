@@ -175,7 +175,7 @@ void OpenIGTLinkProtocol::getReadyToReceiveBody()
     //CX_LOG_DEBUG() << "getting ready to receive BODY";
     this->prepareBody(mHeader, mBody);
     //CX_LOG_DEBUG() << "mBody->pointer " << mBody->GetPackBodyPointer() << " size " << mBody->GetPackBodySize();
-    this->preparePack(mBody->GetPackBodyPointer(), mBody->GetPackBodySize());
+    this->prepareBodyPack(mBody);
     this->setReadyToReceive(true);
 }
 
@@ -183,7 +183,7 @@ void OpenIGTLinkProtocol::getReadyToReceiveHeader()
 {
     //CX_LOG_DEBUG() << "getting ready to receive HEADER";
     this->prepareHeader(mHeader);
-    this->preparePack(mHeader->GetPackPointer(), mHeader->GetPackSize());
+    this->prepareHeaderPack(mHeader);
     this->setReadyToReceive(true);
 }
 
@@ -220,7 +220,7 @@ void OpenIGTLinkProtocol::processPack()
     //CX_LOG_DEBUG() << "1 processPack ";
     this->setReadyToReceive(false);
     //CX_LOG_DEBUG() << "2 processPack ";
-    if(mPack->size == mHeader->GetPackSize())
+    if(mPack->data()->size == mHeader->GetPackSize())
     {
         this->unpackHeader(mHeader);
         CX_LOG_DEBUG() << "HEADER: " << mHeader->GetDeviceType();
@@ -243,24 +243,32 @@ void OpenIGTLinkProtocol::processPack()
 
 void OpenIGTLinkProtocol::setReadyToReceive(bool ready)
 {
-//    QMutexLocker locker(&mReadyReadMutex);
     CX_LOG_DEBUG() << (ready ? "Is " : "NOT ") << "ready to receive";
     mReadyToReceive = ready;
 
 }
 
-void OpenIGTLinkProtocol::preparePack(void* pointer, int size)
+void OpenIGTLinkProtocol::prepareHeaderPack(igtl::MessageHeader::Pointer &message)
 {
-//    QMutexLocker locker(&mPackMutex);
-    //CX_LOG_DEBUG() << "Preparing pack, size: " << size << ", pointer: " << pointer;
-    disconnect(mPack.get(), &Pack::dataArrived, this, &OpenIGTLinkProtocol::processPack);
-    mPack.reset(new Pack(pointer, size));
-    connect(mPack.get(), &Pack::dataArrived, this, &OpenIGTLinkProtocol::processPack);
+    if(mPack)
+        disconnect(mPack.get(), &EncodedPackage::dataArrived, this, &OpenIGTLinkProtocol::processPack);
+    mPack = igtlEncodedPackage<igtl::MessageHeader>::create(message);
+    connect(mPack.get(), &EncodedPackage::dataArrived, this, &OpenIGTLinkProtocol::processPack);
+}
+
+void OpenIGTLinkProtocol::prepareBodyPack(igtl::MessageBase::Pointer &message)
+{
+    if(mPack)
+        disconnect(mPack.get(), &EncodedPackage::dataArrived, this, &OpenIGTLinkProtocol::processPack);
+    mPack = igtlEncodedBodyPackage::create(message);
+    connect(mPack.get(), &EncodedPackage::dataArrived, this, &OpenIGTLinkProtocol::processPack);
 }
 
 void OpenIGTLinkProtocol::prepareHeader(const igtl::MessageHeader::Pointer &header) const
 {
     header->InitPack();
+    //CX_LOG_DEBUG() << "(    ) prepareHeader, pointer: " << header->GetPackPointer() << " size: " << header->GetPackSize();
+    //CX_LOG_DEBUG() << "(BODY) prepareHeader, pointer: " << header->GetPackBodyPointer() << " size: " << header->GetPackBodySize();
 }
 
 void OpenIGTLinkProtocol::prepareBody(const igtl::MessageHeader::Pointer &header, igtl::MessageBase::Pointer &body)
@@ -331,6 +339,8 @@ void OpenIGTLinkProtocol::prepareBody(const igtl::MessageHeader::Pointer &header
     body = T::New();
     body->SetMessageHeader(header);
     body->AllocatePack();
+    //CX_LOG_DEBUG() << "(    ) prepareBody, pointer: " << body->GetPackPointer() << " size: " << body->GetPackSize();
+    //CX_LOG_DEBUG() << "(BODY) prepareBody, pointer: " << body->GetPackBodyPointer() << " size: " << body->GetPackBodySize();
 }
 
 bool OpenIGTLinkProtocol::unpackBody(const igtl::MessageBase::Pointer &body)
