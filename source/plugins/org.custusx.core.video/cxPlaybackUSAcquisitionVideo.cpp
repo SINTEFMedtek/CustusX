@@ -59,7 +59,7 @@ namespace cx
 
 USAcquisitionVideoPlayback::USAcquisitionVideoPlayback(VideoServiceBackendPtr backend, QString type) :
 	QObject(NULL),
-    mVideoSourceUid(type +"_playback")
+    mVideoSourceUid("playback " + type)
 {
     mType=type;
     mBackend = backend;
@@ -140,7 +140,7 @@ std::vector<TimelineEvent> USAcquisitionVideoPlayback::getEvents()
  */
 QStringList USAcquisitionVideoPlayback::getAbsolutePathToFtsFiles(QString folder)
 {
-    return getAbsolutePathToFiles(folder,QStringList(QString("*").append(mType)), true);
+    return getAbsolutePathToFiles(folder,QStringList(QString("*_").append(mType)), true);
 }
 
 QString USAcquisitionVideoPlayback::getType() const

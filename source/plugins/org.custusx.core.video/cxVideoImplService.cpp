@@ -168,15 +168,23 @@ void VideoImplService::setActiveVideoSource(QString uid)
 
 VideoSourcePtr VideoImplService::getGuessForActiveVideoSource(VideoSourcePtr old)
 {
-    //QStringList nameFilters;
-//    nameFilters << "*TissueAngio.fts" << "*TissueFlow.fts" << "*ScanConverted.fts";
-//    // ask for playback stream:
-//    foreach(USAcquisitionVideoPlaybackPtr uSAcquisitionVideoPlayback,mUSAcquisitionVideoPlaybacks)
-//    {
-//        report(uSAcquisitionVideoPlayback->getType());
-//        if (uSAcquisitionVideoPlayback->isActive() && nameFilters.contains(uSAcquisitionVideoPlayback->getType()) )
-//            return uSAcquisitionVideoPlayback->getVideoSource();
-//     }
+    std::vector<VideoSourcePtr> allSources = this->getVideoSources();
+    // keep existing if present
+    if (old)
+    {
+        if (std::count(allSources.begin(), allSources.end(), old))
+                return old;
+    }
+
+    QStringList nameFilters;
+    nameFilters << "TissueAngio.fts" << "TissueFlow.fts" << "ScanConverted.fts";
+    // ask for playback stream:
+    foreach(USAcquisitionVideoPlaybackPtr uSAcquisitionVideoPlayback,mUSAcquisitionVideoPlaybacks)
+    {
+        report(uSAcquisitionVideoPlayback->getType());
+        if (uSAcquisitionVideoPlayback->isActive() && nameFilters.contains(uSAcquisitionVideoPlayback->getType()) )
+            return uSAcquisitionVideoPlayback->getVideoSource();
+     }
 
 	// ask for playback stream:
     foreach(USAcquisitionVideoPlaybackPtr uSAcquisitionVideoPlayback,mUSAcquisitionVideoPlaybacks)
@@ -184,7 +192,6 @@ VideoSourcePtr VideoImplService::getGuessForActiveVideoSource(VideoSourcePtr old
         if (uSAcquisitionVideoPlayback->isActive())
             return uSAcquisitionVideoPlayback->getVideoSource();
     }
-
 
 	// ask for active stream in first probe:
 	ToolPtr tool = mBackend->getToolManager()->getFirstProbe();
@@ -201,13 +208,6 @@ VideoSourcePtr VideoImplService::getGuessForActiveVideoSource(VideoSourcePtr old
 	}
 
 	// ask for anything
-	std::vector<VideoSourcePtr> allSources = this->getVideoSources();
-	// keep existing if present
-	if (old)
-	{
-		if (std::count(allSources.begin(), allSources.end(), old))
-				return old;
-	}
 	if (!allSources.empty())
 		return allSources.front();
 
@@ -251,14 +251,9 @@ void VideoImplService::setPlaybackMode(PlaybackTimePtr controller)
             else
                 probe->removeRTSource(playbackSource);
         }
-        if (mUSAcquisitionVideoPlaybacks.back()->isActive())
-            this->setActiveVideoSource(playbackSource->getUid());
-        else
-            this->autoSelectActiveVideoSource();
-
         mUSAcquisitionVideoPlaybacks.back()->setRoot(mBackend->getDataManager()->getActivePatientFolder() + "/US_Acq/");
-
     }
+    this->autoSelectActiveVideoSource();
 }
 
 std::vector<VideoSourcePtr> VideoImplService::getVideoSources()
@@ -269,8 +264,6 @@ std::vector<VideoSourcePtr> VideoImplService::getVideoSources()
         if (uSAcquisitionVideoPlayback->isActive())
             retval.push_back(uSAcquisitionVideoPlayback->getVideoSource());
     }
-
-
 	return retval;
 }
 
