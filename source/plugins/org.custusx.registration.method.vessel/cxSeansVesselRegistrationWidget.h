@@ -11,11 +11,11 @@ modification, are permitted provided that the following conditions are met:
    this list of conditions and the following disclaimer.
 
 2. Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
+   this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
 
 3. Neither the name of the copyright holder nor the names of its contributors 
-   may be used to endorse or promote products derived from this software 
+   may be used to endorse or promote products derived from this software
    without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
@@ -39,51 +39,52 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QSpinBox;
 class QPushButton;
 class QLabel;
+#include "cxBoolProperty.h"
+#include "cxDoubleProperty.h"
+#include "cxICPRegistrationBaseWidget.h"
+#include "cxTransform3D.h"
+#include "org_custusx_registration_method_vessel_Export.h"
 
 namespace cx
 {
+class ICPWidget;
 typedef boost::shared_ptr<class SeansVesselRegistrationDebugger> SeansVesselRegistrationDebuggerPtr;
+typedef boost::shared_ptr<class GeometricRep> GeometricRepPtr;
+typedef boost::shared_ptr<class SeansVesselReg> SeansVesselRegPtr;
+typedef boost::shared_ptr<class MeshInView> MeshInViewPtr;
+typedef boost::shared_ptr<class SpaceListener> SpaceListenerPtr;
+
+
+
 
 /**
- * SeansVesselRegistrationWidget.h
  *
- * \brief Widget for controlling input to
- * Seans Vessel Registration
+ * \brief I2I (image2image) ICP registration
  *
  * \ingroup org_custusx_registration_method_vessel
  * \date Feb 21, 2011
  * \author Janne Beate Bakeng, SINTEF
  */
-
-class SeansVesselRegistrationWidget : public RegistrationBaseWidget
+class org_custusx_registration_method_vessel_EXPORT SeansVesselRegistrationWidget : public ICPRegistrationBaseWidget
 {
-  Q_OBJECT
+	Q_OBJECT
 public:
 	SeansVesselRegistrationWidget(RegServices services, QWidget* parent);
-  virtual ~SeansVesselRegistrationWidget();
+	virtual ~SeansVesselRegistrationWidget();
 
-private slots:
-  void registerSlot();
-  void debugInit();
-  void debugRunOneLinearStep();
-  void debugRunOneNonlinearStep();
-  void debugClear();
-  void debugApply();
-	void inputChanged();
+protected:
+	virtual void initializeRegistrator();
+	virtual void inputChanged();
+	virtual void applyRegistration(Transform3D delta);
+	virtual void onShown();
+	virtual void setup();
 
 private:
-  QWidget* createOptionsWidget();
-  SeansVesselRegistrationDebuggerPtr mDebugger;
+	StringPropertyBasePtr mFixedImage;
+	StringPropertyBasePtr mMovingImage;
 
-  QSpinBox* mLTSRatioSpinBox;
-  QCheckBox* mLinearCheckBox;
-  QCheckBox* mAutoLTSCheckBox;
-  QPushButton* mRegisterButton;
-	QPushButton* mVesselRegOptionsButton;
-	QGroupBox* mVesselRegOptionsWidget;
-
-  StringPropertyBasePtr mFixedImage;
-  StringPropertyBasePtr mMovingImage;
+	SpaceListenerPtr mSpaceListenerMoving;
+	SpaceListenerPtr mSpaceListenerFixed;
 };
 
 

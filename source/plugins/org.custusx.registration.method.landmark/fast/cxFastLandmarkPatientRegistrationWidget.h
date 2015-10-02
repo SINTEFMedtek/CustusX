@@ -30,52 +30,48 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXRMPCPLUGINACTIVATOR_H
-#define CXRMPCPLUGINACTIVATOR_H
+#ifndef CXFASTLANDMARKPATIENTREGISTRATIONWIDGET_H
+#define CXFASTLANDMARKPATIENTREGISTRATIONWIDGET_H
 
-#include "org_custusx_registration_method_pointcloud_Export.h"
+#include "cxLandmarkRegistrationWidget.h"
+#include "cxRegistrationProperties.h"
 
-#include <ctkPluginActivator.h>
-#include "boost/shared_ptr.hpp"
+#include "cxImage.h"
+#include "cxTransform3D.h"
+#include "cxLandmarkPatientRegistrationWidget.h"
+
+class QVBoxLayout;
+class QComboBox;
+class QTableWidget;
+class QPushButton;
+class QString;
+class QLabel;
+class QSlider;
+class QGridLayout;
+class QSpinBox;
 
 namespace cx
 {
-/**
- * \defgroup org_custusx_registration_method_pointcloud
- * \ingroup cx_plugins
- *
- */
-
-typedef boost::shared_ptr<class DicomGUIExtenderService> DicomGUIExtenderServicePtr;
-typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
+typedef Transform3D Transform3D;
 
 /**
- * Activator for the pointcloud registration plugin
- *
- * \ingroup org_custusx_registration_method_pointcloud
- *
- * \date 2015-09-06
- * \author Christian Askeland
+ * \file
+ * \addtogroup org_custusx_registration_method_landmark
+ * @{
  */
-class org_custusx_registration_method_pointcloud_EXPORT RMPCPluginActivator :  public QObject, public ctkPluginActivator
+class FastLandmarkPatientRegistrationWidget: public LandmarkPatientRegistrationWidget
 {
-  Q_OBJECT
-  Q_INTERFACES(ctkPluginActivator)
-  Q_PLUGIN_METADATA(IID "org_custusx_registration_method_pointcloud")
-
 public:
+	FastLandmarkPatientRegistrationWidget(RegServices services, QWidget* parent, QString objectName, QString windowTitle);
 
-  RMPCPluginActivator();
-  ~RMPCPluginActivator();
-
-  void start(ctkPluginContext* context);
-  void stop(ctkPluginContext* context);
-
-private:
-  RegisteredServicePtr mPointCloud;
-  RegisteredServicePtr mPointerToSurface;
+protected:
+	virtual void performRegistration();
 };
 
-} // namespace cx
 
-#endif // CXRMPCPLUGINACTIVATOR_H
+/**
+ * @}
+ */
+}//namespace cx
+
+#endif // CXFASTLANDMARKPATIENTREGISTRATIONWIDGET_H

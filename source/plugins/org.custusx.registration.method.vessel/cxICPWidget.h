@@ -29,53 +29,57 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXICPWIDGET_H
+#define CXICPWIDGET_H
 
-#ifndef CXRMPCPLUGINACTIVATOR_H
-#define CXRMPCPLUGINACTIVATOR_H
+#include "cxRegistrationBaseWidget.h"
+#include "cxStringPropertyBase.h"
+#include "vesselReg/SeansVesselReg.hxx"
+#include "cxBoolProperty.h"
+#include "cxDoubleProperty.h"
+#include "org_custusx_registration_method_vessel_Export.h"
 
-#include "org_custusx_registration_method_pointcloud_Export.h"
-
-#include <ctkPluginActivator.h>
-#include "boost/shared_ptr.hpp"
+class QSpinBox;
+class QPushButton;
+class QLabel;
 
 namespace cx
 {
-/**
- * \defgroup org_custusx_registration_method_pointcloud
- * \ingroup cx_plugins
- *
- */
+//typedef boost::shared_ptr<class SeansVesselRegistrationDebugger> SeansVesselRegistrationDebuggerPtr;
 
-typedef boost::shared_ptr<class DicomGUIExtenderService> DicomGUIExtenderServicePtr;
-typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
-
-/**
- * Activator for the pointcloud registration plugin
+/** GUI for ICP control - no logic.
  *
- * \ingroup org_custusx_registration_method_pointcloud
- *
- * \date 2015-09-06
+ * \ingroup org_custusx_registration_method_vessel
+ * \date 2015-09-13
  * \author Christian Askeland
  */
-class org_custusx_registration_method_pointcloud_EXPORT RMPCPluginActivator :  public QObject, public ctkPluginActivator
+class org_custusx_registration_method_vessel_EXPORT ICPWidget : public BaseWidget
 {
-  Q_OBJECT
-  Q_INTERFACES(ctkPluginActivator)
-  Q_PLUGIN_METADATA(IID "org_custusx_registration_method_pointcloud")
-
+	Q_OBJECT
 public:
+	ICPWidget(QWidget* parent);
+	virtual ~ICPWidget();
 
-  RMPCPluginActivator();
-  ~RMPCPluginActivator();
+	void setSettings(std::vector<PropertyPtr> properties);
+	void enableRegistration(bool on);
+	void setRMS(double val);
 
-  void start(ctkPluginContext* context);
-  void stop(ctkPluginContext* context);
+signals:
+	void requestRegister();
 
 private:
-  RegisteredServicePtr mPointCloud;
-  RegisteredServicePtr mPointerToSurface;
+	QWidget* createOptionsWidget();
+
+	std::vector<PropertyPtr> mProperties;
+	QPushButton* mRegisterButton;
+	QAction* mVesselRegOptionsButton;
+	QWidget* mOptionsWidget;
+	QGroupBox* mVesselRegOptionsWidget;
+	QLineEdit* mMetricValue;
 };
 
-} // namespace cx
 
-#endif // CXRMPCPLUGINACTIVATOR_H
+
+}//namespace cx
+
+#endif // CXICPWIDGET_H

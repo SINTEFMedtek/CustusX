@@ -68,15 +68,11 @@ class org_custusx_acquisition_EXPORT  RecordSessionWidget : public BaseWidget
 public:
   RecordSessionWidget(AcquisitionServicePtr base, QWidget* parent,
 					  AcquisitionService::TYPES context,
-					  QString defaultDescription = "Record Session"
-					  );
+					  QString category);
   virtual ~RecordSessionWidget();
 
   void setDescription(QString text);
-  void setDescriptionVisibility(bool value);
-
-//public slots:
-//	void setReady(bool val, QString text); ///< deprecated: use readinessChangedSlot instead.
+  void setCurrentSession(QString uid); ///< set a session that the next recording adds to
 
 private slots:
   void startStopSlot(bool);
@@ -90,9 +86,9 @@ private:
   QLabel* mInfoLabel;
   QPushButton* mStartStopButton;
   QPushButton* mCancelButton;
-  QLabel* mDescriptionLabel;
-  QLineEdit* mDescriptionLine;
   AcquisitionService::TYPES mContext;
+  QString mCategory;
+  QString mCurrentSession;
 };
 
 /**
