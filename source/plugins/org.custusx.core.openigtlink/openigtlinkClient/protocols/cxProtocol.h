@@ -39,59 +39,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 
 #include <boost/shared_ptr.hpp>
-
+#include "cxEncodedPackage.h"
 #include "cxTransform3D.h"
 #include "cxImage.h"
 #include "cxProbeDefinition.h"
 
 namespace cx
 {
-
-class Pack : public QObject
-{
-    Q_OBJECT
-
-signals:
-    void dataArrived();
-
-public:
-    Pack(void* pointer=NULL, int size=0) :
-        pointer(pointer),
-        size(size),
-        canBeOverWritten(true)
-    {}
-
-    void notifyDataArrived()
-    {
-        std::cout << "dataArrived()" << std::endl;
-        canBeOverWritten = false;
-        emit dataArrived();
-    }
-
-    bool isFinishedWith()
-    {
-        return canBeOverWritten;
-    }
-
-    void* pointer;
-    int size;
-
-private:
-    bool canBeOverWritten;
-
-};
-typedef boost::shared_ptr<Pack> PackPtr;
-
-
-/** Wraps anything that can be viewed as a const QByteArray.
- */
-class EncodedPackage
-{
-public:
-	virtual ~EncodedPackage() {}
-	virtual const QByteArray data() const = 0;
-};
-typedef boost::shared_ptr<EncodedPackage> EncodedPackagePtr;
 
 /**
  * An Application layer protocol for sending/receiving CustusX objects.
@@ -105,7 +59,7 @@ public:
     explicit Protocol(QObject *parent = 0);
 
     virtual QString getName() const;
-    virtual PackPtr getPack();
+    virtual EncodedPackagePtr getPack();
     virtual bool readyToReceiveData() = 0;
 	virtual EncodedPackagePtr encode(ImagePtr image) = 0;
 	virtual EncodedPackagePtr encode(MeshPtr data) = 0;
@@ -121,8 +75,7 @@ signals:
     void probedefinition(QString devicename, ProbeDefinitionPtr definition);
 
 protected:
-//    QMutex mPackMutex;
-    PackPtr mPack;
+    EncodedPackagePtr mPack;
 
 };
 typedef boost::shared_ptr<Protocol> ProtocolPtr;

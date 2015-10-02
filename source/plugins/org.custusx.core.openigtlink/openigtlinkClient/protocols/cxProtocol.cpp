@@ -8,8 +8,7 @@ namespace cx
 {
 
 Protocol::Protocol(QObject *parent) :
-    QObject(parent),
-    mPack(new Pack())
+    QObject(parent)
 {
     qRegisterMetaType<Transform3D>("Transform3D");
     qRegisterMetaType<ImagePtr>("ImagePtr");
@@ -21,9 +20,8 @@ QString Protocol::getName() const
     return "Basic";
 }
 
-PackPtr Protocol::getPack()
+EncodedPackagePtr Protocol::getPack()
 {
-//    QMutexLocker locker(&mPackMutex);
     return mPack;
 }
 
