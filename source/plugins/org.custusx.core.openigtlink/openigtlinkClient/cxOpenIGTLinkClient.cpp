@@ -160,6 +160,7 @@ void OpenIGTLinkClient::sendMessage(ImagePtr image)
 	msg->Pack();
 
 	mSocket->write(reinterpret_cast<char*>(msg->GetPackPointer()), msg->GetPackSize());
+//    CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "Sent image: " << image->getName();
 }
 
 void OpenIGTLinkClient::sendMessage(MeshPtr data)

@@ -30,52 +30,42 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXRMPCPLUGINACTIVATOR_H
-#define CXRMPCPLUGINACTIVATOR_H
+#include "cxFastLandmarkPatientRegistrationWidget.h"
 
-#include "org_custusx_registration_method_pointcloud_Export.h"
-
-#include <ctkPluginActivator.h>
-#include "boost/shared_ptr.hpp"
+#include <QVBoxLayout>
+#include <QPushButton>
+#include <QTableWidgetItem>
+#include <QHeaderView>
+#include <QSlider>
+#include <QGridLayout>
+#include <QSpinBox>
+#include <vtkDoubleArray.h>
+#include "cxVector3D.h"
+#include "cxLogger.h"
+#include "cxLabeledComboBoxWidget.h"
+#include "cxLandmarkRep.h"
+#include "cxView.h"
+#include "cxRegistrationService.h"
+#include "cxViewService.h"
+#include "cxPatientModelService.h"
+#include "cxViewGroupData.h"
+#include "cxReporter.h"
+#include "cxLandmarkListener.h"
+#include "cxActiveData.h"
 
 namespace cx
 {
-/**
- * \defgroup org_custusx_registration_method_pointcloud
- * \ingroup cx_plugins
- *
- */
 
-typedef boost::shared_ptr<class DicomGUIExtenderService> DicomGUIExtenderServicePtr;
-typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
-
-/**
- * Activator for the pointcloud registration plugin
- *
- * \ingroup org_custusx_registration_method_pointcloud
- *
- * \date 2015-09-06
- * \author Christian Askeland
- */
-class org_custusx_registration_method_pointcloud_EXPORT RMPCPluginActivator :  public QObject, public ctkPluginActivator
+FastLandmarkPatientRegistrationWidget::FastLandmarkPatientRegistrationWidget(RegServices services, QWidget* parent, QString objectName, QString windowTitle) :
+	LandmarkPatientRegistrationWidget(services, parent, objectName, windowTitle)
 {
-  Q_OBJECT
-  Q_INTERFACES(ctkPluginActivator)
-  Q_PLUGIN_METADATA(IID "org_custusx_registration_method_pointcloud")
+}
 
-public:
+//The following functions look (almost) exactly like the same functions in PatientLandMarksWidget
+void FastLandmarkPatientRegistrationWidget::performRegistration()
+{
+	mServices.registrationService->doFastRegistration_Translation();
+	this->updateAverageAccuracyLabel();
+}
 
-  RMPCPluginActivator();
-  ~RMPCPluginActivator();
-
-  void start(ctkPluginContext* context);
-  void stop(ctkPluginContext* context);
-
-private:
-  RegisteredServicePtr mPointCloud;
-  RegisteredServicePtr mPointerToSurface;
-};
-
-} // namespace cx
-
-#endif // CXRMPCPLUGINACTIVATOR_H
+}//namespace cx

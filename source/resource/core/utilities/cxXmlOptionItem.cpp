@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QFileInfo>
 #include <QTextStream>
 #include <QDomElement>
+#include <QDataStream>
 #include <QStringList>
 #include <QMutex>
 #include <QBuffer>

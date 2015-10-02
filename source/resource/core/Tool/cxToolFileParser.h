@@ -39,6 +39,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTransform3D.h"
 #include "cxVector3D.h"
 #include "cxDefinitions.h"
+#include <vector>
+#include <map>
 
 namespace cx {
 

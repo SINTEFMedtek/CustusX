@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVIEW_H_
 #define CXVIEW_H_
 
+#include <QObject>
 #include "sscConfig.h"
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
