@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString>
 #include <QObject>
 #include "cxNetworkService.h"
+#include "cxXmlOptionItem.h"
 #include "org_custusx_core_openigtlink_Export.h"
 
 namespace cx
@@ -63,6 +64,7 @@ signals:
 	void connectionsChanged();
 
 private:
+	XmlOptionFile mOptions;
 	QString newConnection(QString suggested_uid);
 	QString findUniqueUidNumber(QString uidBase) const;
 	NetworkConnectionHandlePtr findConnection(QString uid) const;

@@ -69,7 +69,7 @@ TEST_CASE("OpenIGTLinkGuiExtender: Check that the openigtlink gui extender servi
 
 TEST_CASE("OpenIGTLinkTrackingSystemService: Check that the plugin can connect and stream from a plus server", "[manual][plugins][org.custusx.core.tracking.system.openigtlink]")
 {
-    cx::NetworkConnectionHandlePtr client_connection_handle(new cx::NetworkConnectionHandle("test"));
+	cx::NetworkConnectionHandlePtr client_connection_handle(new cx::NetworkConnectionHandle("test", cx::XmlOptionFile()));
 	cx::NetworkConnection::ConnectionInfo info;
     info.host = "10.218.140.138";
 	info.port = 18944;
@@ -117,7 +117,7 @@ TEST_CASE("NetworkConnectionHandle: Check that a server and a client can talk to
 {
     //CLIENT
     QString clientHandleName = "client_handle";
-    cx::NetworkConnectionHandlePtr client_handle(new cx::NetworkConnectionHandle(clientHandleName));
+	cx::NetworkConnectionHandlePtr client_handle(new cx::NetworkConnectionHandle(clientHandleName, cx::XmlOptionFile()));
     REQUIRE(client_handle);
     CHECK(client_handle.unique());
 
@@ -139,7 +139,7 @@ TEST_CASE("NetworkConnectionHandle: Check that a server and a client can talk to
 
     //SERVER
     QString serverHandleName = "server_handle";
-    cx::NetworkConnectionHandlePtr server_handle(new cx::NetworkConnectionHandle(serverHandleName));
+	cx::NetworkConnectionHandlePtr server_handle(new cx::NetworkConnectionHandle(serverHandleName, cx::XmlOptionFile()));
     REQUIRE(server_handle);
     CHECK(server_handle.unique());
 
@@ -185,7 +185,7 @@ TEST_CASE("NetworkConnectionHandle: Check that a server and a client can talk to
 
 TEST_CASE("OpenIGTLinkStreamingService: Check that the openigtlink streaming service can be created and destroyed", "[org.custusx.core.tracking.system.openigtlink]")
 {
-    cx::NetworkConnectionHandlePtr connection(new cx::NetworkConnectionHandle("test"));
+	cx::NetworkConnectionHandlePtr connection(new cx::NetworkConnectionHandle("test", cx::XmlOptionFile()));
     cx::OpenIGTLinkStreamerServicePtr service = cx::OpenIGTLinkStreamerServicePtr(new cx::OpenIGTLinkStreamerService(connection));
     REQUIRE(service);
     CHECK(service.unique());

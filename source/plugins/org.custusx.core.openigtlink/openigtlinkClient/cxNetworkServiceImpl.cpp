@@ -33,19 +33,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxNetworkConnection.h"
 #include "cxNetworkConnectionHandle.h"
-
+#include "cxProfile.h"
 
 namespace cx
 {
 
 NetworkServiceImpl::NetworkServiceImpl()
 {
+	mOptions = profile()->getXmlSettings().descend("networkservice");
 }
 
 QString NetworkServiceImpl::newConnection(QString suggested_uid)
 {
 	QString uid = this->findUniqueUidNumber(suggested_uid);
-	NetworkConnectionHandlePtr connection(new NetworkConnectionHandle(uid));
+	NetworkConnectionHandlePtr connection(new NetworkConnectionHandle(uid, mOptions));
 	mConnections.push_back(connection);
 	emit connectionsChanged();
 	return uid;

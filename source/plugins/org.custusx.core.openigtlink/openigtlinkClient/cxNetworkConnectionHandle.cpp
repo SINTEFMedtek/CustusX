@@ -52,7 +52,7 @@ namespace cx
 {
 
 
-NetworkConnectionHandle::NetworkConnectionHandle(QString threadname)
+NetworkConnectionHandle::NetworkConnectionHandle(QString threadname, XmlOptionFile options)
 {
 	mThread.reset(new QThread());
 	mThread->setObjectName(threadname);
@@ -60,8 +60,7 @@ NetworkConnectionHandle::NetworkConnectionHandle(QString threadname)
 	connect(mClient.get(), &NetworkConnection::connectionInfoChanged, this, &NetworkConnectionHandle::onConnectionInfoChanged);
 	mClient->moveToThread(mThread.get());
 
-	XmlOptionFile options = profile()->getXmlSettings().descend(mClient->getUid());
-	mOptionsElement = options.getElement();
+	mOptions = options.descend(mClient->getUid());
 
 	mIp = this->createIpOption();
 	mPort = this->createPortOption();
@@ -115,7 +114,7 @@ StringPropertyBasePtr NetworkConnectionHandle::createDialectOption()
 		dialectnames = mClient->getAvailableDialects();
 	retval = StringProperty::initialize("protocol", "Connect to", "Protocol to use during connection.",
 										mClient->getConnectionInfo().protocol,
-										dialectnames, mOptionsElement);
+										dialectnames, mOptions.getElement());
 	retval->setValueRange(dialectnames);
 	retval->setGroup("Connection");
 	connect(retval.get(), &Property::changed, this, &NetworkConnectionHandle::onPropertiesChanged);
@@ -127,7 +126,7 @@ StringPropertyBasePtr NetworkConnectionHandle::createIpOption()
 	StringPropertyPtr retval;
 	retval = StringProperty::initialize("address", "Address", "Network Address",
 										mClient->getConnectionInfo().host,
-										mOptionsElement);
+										mOptions.getElement());
 	retval->setGroup("Connection");
 	connect(retval.get(), &Property::changed, this, &NetworkConnectionHandle::onPropertiesChanged);
 	return retval;
@@ -142,7 +141,7 @@ DoublePropertyBasePtr NetworkConnectionHandle::createPortOption()
 										"Network Port (default "+QString::number(defval)+")",
 										defval,
 										DoubleRange(1024, 49151, 1), 0,
-										mOptionsElement);
+										mOptions.getElement());
 	retval->setGuiRepresentation(DoublePropertyBase::grSPINBOX);
 	retval->setAdvanced(true);
 	retval->setGroup("Connection");
@@ -157,7 +156,7 @@ StringPropertyBasePtr NetworkConnectionHandle::createRoleOption()
 	retval = StringProperty::initialize("role", "Role",
 										"Act as client or server in the network connection",
 										mClient->getConnectionInfo().role,
-										values, mOptionsElement);
+										values, mOptions.getElement());
 	retval->setGroup("Connection");
 	connect(retval.get(), &Property::changed, this, &NetworkConnectionHandle::onPropertiesChanged);
 	return retval;

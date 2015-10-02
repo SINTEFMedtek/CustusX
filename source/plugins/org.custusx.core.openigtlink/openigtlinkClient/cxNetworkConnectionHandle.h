@@ -53,6 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogger.h"
 #include "cxProtocol.h"
 #include "boost/function.hpp"
+#include "cxXmlOptionItem.h"
 
 typedef boost::shared_ptr<QThread> QThreadPtr;
 
@@ -69,7 +70,7 @@ class org_custusx_core_openigtlink_EXPORT NetworkConnectionHandle : public QObje
 {
 	Q_OBJECT
 public:
-	explicit NetworkConnectionHandle(QString threadname);
+	explicit NetworkConnectionHandle(QString threadname, XmlOptionFile options);
 	~NetworkConnectionHandle();
     NetworkConnection* getNetworkConnection();
 
@@ -93,7 +94,8 @@ private:
 
 	NetworkConnectionPtr mClient;
 	QThreadPtr mThread;
-	QDomElement mOptionsElement;
+	XmlOptionFile mOptions;
+
 };
 
 
