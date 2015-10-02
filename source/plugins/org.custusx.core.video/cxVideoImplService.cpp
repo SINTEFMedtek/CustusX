@@ -139,8 +139,6 @@ void VideoImplService::autoSelectActiveVideoSource()
 
 void VideoImplService::setActiveVideoSource(QString uid)
 {
-    report("---");
-    report(uid);
 	mActiveVideoSource = mEmptyVideoSource;
 
 	std::vector<VideoSourcePtr> sources = this->getVideoSources();
@@ -159,7 +157,6 @@ void VideoImplService::setActiveVideoSource(QString uid)
             report("No active streams");
 			continue;
         }
-        report(uid);
 		probe->setActiveStream(uid);
 	}
 
@@ -168,20 +165,15 @@ void VideoImplService::setActiveVideoSource(QString uid)
 
 VideoSourcePtr VideoImplService::getGuessForActiveVideoSource(VideoSourcePtr old)
 {
-    std::vector<VideoSourcePtr> allSources = this->getVideoSources();
-    // keep existing if present
-    if (old)
-    {
-        if (std::count(allSources.begin(), allSources.end(), old))
-                return old;
-    }
+
+    if(old && old->getUid().contains("playback"))
+        return old;
 
     QStringList nameFilters;
     nameFilters << "TissueAngio.fts" << "TissueFlow.fts" << "ScanConverted.fts";
     // ask for playback stream:
     foreach(USAcquisitionVideoPlaybackPtr uSAcquisitionVideoPlayback,mUSAcquisitionVideoPlaybacks)
     {
-        report(uSAcquisitionVideoPlayback->getType());
         if (uSAcquisitionVideoPlayback->isActive() && nameFilters.contains(uSAcquisitionVideoPlayback->getType()) )
             return uSAcquisitionVideoPlayback->getVideoSource();
      }
@@ -207,6 +199,13 @@ VideoSourcePtr VideoImplService::getGuessForActiveVideoSource(VideoSourcePtr old
 		return tool->getProbe()->getRTSource();
 	}
 
+    std::vector<VideoSourcePtr> allSources = this->getVideoSources();
+    // keep existing if present
+    if (old)
+    {
+        if (std::count(allSources.begin(), allSources.end(), old))
+                return old;
+    }
 	// ask for anything
 	if (!allSources.empty())
 		return allSources.front();

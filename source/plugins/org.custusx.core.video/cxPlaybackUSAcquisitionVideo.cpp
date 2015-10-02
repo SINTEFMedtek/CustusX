@@ -153,7 +153,7 @@ void USAcquisitionVideoPlayback::timerChangedSlot()
     TimelineEvent event;
     for (unsigned i=0; i<mEvents.size(); ++i)
     {
-        if (mEvents[i].isInside(mTimer->getTime().toMSecsSinceEpoch()) && mEvents[i].mUid.endsWith(mType))
+        if (mEvents[i].isInside(mTimer->getTime().toMSecsSinceEpoch()))// && mEvents[i].mUid.endsWith(mType))
 		{
 			event = mEvents[i];
 			break;
