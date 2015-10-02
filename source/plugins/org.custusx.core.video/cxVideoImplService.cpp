@@ -155,8 +155,11 @@ void VideoImplService::setActiveVideoSource(QString uid)
 		ProbePtr probe = iter->second->getProbe();
 		if (!probe)
 			continue;
-		if (!probe->getAvailableVideoSources().count(uid))
+        if (!probe->getAvailableVideoSources().count(uid)){
+            report("No active streams");
 			continue;
+        }
+        report(uid);
 		probe->setActiveStream(uid);
 	}
 
@@ -165,15 +168,15 @@ void VideoImplService::setActiveVideoSource(QString uid)
 
 VideoSourcePtr VideoImplService::getGuessForActiveVideoSource(VideoSourcePtr old)
 {
-    QStringList nameFilters;
-    nameFilters << "*TissueAngio.fts" << "*TissueFlow.fts" << "*ScanConverted.fts";
-    // ask for playback stream:
-    foreach(USAcquisitionVideoPlaybackPtr uSAcquisitionVideoPlayback,mUSAcquisitionVideoPlaybacks)
-    {
-        report(uSAcquisitionVideoPlayback->getType());
-        if (uSAcquisitionVideoPlayback->isActive() && nameFilters.contains(uSAcquisitionVideoPlayback->getType()) )
-            return uSAcquisitionVideoPlayback->getVideoSource();
-     }
+    //QStringList nameFilters;
+//    nameFilters << "*TissueAngio.fts" << "*TissueFlow.fts" << "*ScanConverted.fts";
+//    // ask for playback stream:
+//    foreach(USAcquisitionVideoPlaybackPtr uSAcquisitionVideoPlayback,mUSAcquisitionVideoPlaybacks)
+//    {
+//        report(uSAcquisitionVideoPlayback->getType());
+//        if (uSAcquisitionVideoPlayback->isActive() && nameFilters.contains(uSAcquisitionVideoPlayback->getType()) )
+//            return uSAcquisitionVideoPlayback->getVideoSource();
+//     }
 
 	// ask for playback stream:
     foreach(USAcquisitionVideoPlaybackPtr uSAcquisitionVideoPlayback,mUSAcquisitionVideoPlaybacks)
