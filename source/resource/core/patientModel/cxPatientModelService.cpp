@@ -54,10 +54,7 @@ PatientModelServicePtr PatientModelService::getNullObject()
 DataPtr PatientModelService::getData(const QString& uid) const
 {
 	if (uid=="active")
-	{
-		reportError("Refactor error: PatientModelService::getData() do no longer give active image. Use ActiveImage class instead");
-		return DataPtr();
-	}
+		return this->getActiveData()->getActive();
 
 	std::map<QString, DataPtr> all = this->getData();
 	std::map<QString, DataPtr>::const_iterator iter = all.find(uid);
