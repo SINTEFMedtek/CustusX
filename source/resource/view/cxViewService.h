@@ -72,9 +72,13 @@ public:
 	virtual ViewPtr get3DView(int group = 0, int index = 0) = 0;
 	RepContainerPtr get3DReps(int group = 0, int index = 0);
 
+	//TODO: Remove direct access to this internal structure
 	virtual int getActiveGroupId() const = 0;
 	virtual ViewGroupDataPtr getGroup(int groupIdx) const = 0;
 	unsigned groupCount() const;
+
+	//All above group access needs to be replaced with functions:
+	virtual void setRegistrationMode(REGISTRATION_STATUS mode) = 0;
 
 	virtual void autoShowData(DataPtr data) = 0;
 	virtual void enableRender(bool val) = 0;

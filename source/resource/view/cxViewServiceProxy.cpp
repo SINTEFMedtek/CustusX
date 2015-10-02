@@ -68,6 +68,11 @@ ViewGroupDataPtr VisualizationServiceProxy::getGroup(int groupIdx) const
 	return mVisualizationService->getGroup(groupIdx);
 }
 
+void VisualizationServiceProxy::setRegistrationMode(REGISTRATION_STATUS mode)
+{
+	mVisualizationService->setRegistrationMode(mode);
+}
+
 void VisualizationServiceProxy::initServiceListener()
 {
 	mServiceListener.reset(new ServiceTrackerListener<VisualizationService>(

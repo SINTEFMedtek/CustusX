@@ -32,12 +32,82 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "catch.hpp"
 
+#include "cxFastPatientRegistrationWidget.h"
+#include "cxRegServices.h"
+#include "cxLogicManager.h"
+#include "cxtestFastPatientRegistrationWidgetFixture.h"
+#include "cxViewServiceNull.h"
+
+namespace
+{
+typedef boost::shared_ptr<class VisualizationServiceFixture> VisualizationServiceFixturePtr;
+class VisualizationServiceFixture : public cx::VisualizationServiceNull
+{
+public:
+	void emitPointSampled()
+	{
+		emit pointSampled(cx::Vector3D(1, 1, 1));
+	}
+};
+
+
+class FastPatientRegistrationWidgetHelper
+{
+public:
+	FastPatientRegistrationWidgetHelper()
+	{
+		cx::LogicManager::initialize();
+		cx::RegServicesPtr services = cx::RegServices::create(cx::logicManager()->getPluginContext());
+
+		viewFixture = VisualizationServiceFixturePtr(new VisualizationServiceFixture());
+		services->visualizationService = viewFixture;
+
+		widgetFixture = cxtest::FastPatientRegistrationWidgetFixturePtr(new cxtest::FastPatientRegistrationWidgetFixture(*services, NULL));
+	}
+	~FastPatientRegistrationWidgetHelper()
+	{
+		cx::LogicManager::shutdown();
+	}
+
+	cxtest::FastPatientRegistrationWidgetFixturePtr widgetFixture;
+	VisualizationServiceFixturePtr viewFixture;
+};
+
+}//namespace
+
 namespace cxtest
 {
 
-TEST_CASE("FastPatientRegistrationWidget: empty", "[unit][plugins][org.custusx.core.view][hide]")
+TEST_CASE("FastPatientRegistrationWidget: Sample with mouse click is turned on/off when widget is shown/hidden",
+		  "[unit][plugins][registration][hide]")
 {
-	CHECK(true);
+	FastPatientRegistrationWidgetHelper helper;
+
+	CHECK_FALSE(helper.widgetFixture->getMouseClickSample()->isChecked());
+
+	helper.widgetFixture->triggerShowEvent();
+	CHECK(helper.widgetFixture->getMouseClickSample()->isChecked());
+
+	helper.widgetFixture->triggerHideEvent();
+	CHECK_FALSE(helper.widgetFixture->getMouseClickSample()->isChecked());
+}
+
+TEST_CASE("FastPatientRegistrationWidget: Receive pointSampled signals when sample with mouse click is on",
+		  "[unit][plugins][registration][hide]")
+{
+	FastPatientRegistrationWidgetHelper helper;
+
+	helper.viewFixture->emitPointSampled();
+	CHECK_FALSE(helper.widgetFixture->mPointSampled);
+
+	helper.widgetFixture->triggerShowEvent();
+	helper.viewFixture->emitPointSampled();
+	CHECK(helper.widgetFixture->mPointSampled);
+
+	helper.widgetFixture->mPointSampled = false;
+	helper.widgetFixture->triggerHideEvent();
+	helper.viewFixture->emitPointSampled();
+	CHECK_FALSE(helper.widgetFixture->mPointSampled);
 }
 
 }//cxtest

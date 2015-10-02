@@ -30,50 +30,35 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXVIEWSERVICENULL_H_
-#define CXVIEWSERVICENULL_H_
+#ifndef CXTESTFASTPATIENTREGISTRATIONWIDGETFIXTURE_H
+#define CXTESTFASTPATIENTREGISTRATIONWIDGETFIXTURE_H
 
-#include "cxResourceVisualizationExport.h"
-
-#include "cxViewService.h"
+#include "cxFastPatientRegistrationWidget.h"
 
 namespace cx
 {
-class cxResourceVisualization_EXPORT VisualizationServiceNull : public VisualizationService
+typedef boost::shared_ptr<class ViewWrapper2D> ViewWrapper2DPtr;
+}
+
+namespace cxtest
 {
+
+typedef boost::shared_ptr<class FastPatientRegistrationWidgetFixture> FastPatientRegistrationWidgetFixturePtr;
+class FastPatientRegistrationWidgetFixture : public cx::FastPatientRegistrationWidget
+{
+	Q_OBJECT
 public:
-	VisualizationServiceNull();
+	FastPatientRegistrationWidgetFixture(cx::RegServices services, QWidget* parent);
+	void connectTo(cx::ViewWrapper2DPtr viewWrapper);
 
-	virtual ViewPtr get3DView(int group = 0, int index = 0);
-
-	virtual int getActiveGroupId() const;
-	virtual ViewGroupDataPtr getGroup(int groupIdx) const;
-	virtual void setRegistrationMode(REGISTRATION_STATUS mode);
-
-	virtual void autoShowData(DataPtr data);
-	virtual void enableRender(bool val);
-	virtual bool renderingIsEnabled() const;
-
-	virtual QWidget* getLayoutWidget(QWidget* parent, int index);
-	virtual QString getActiveLayout(int widgetIndex) const;
-	virtual void setActiveLayout(const QString& uid, int widgetIndex);
-	virtual InteractiveClipperPtr getClipper();
-	virtual InteractiveCropperPtr getCropper();
-	virtual CyclicActionLoggerPtr getRenderTimer();
-	virtual NavigationPtr getNavigation();
-	virtual LayoutRepositoryPtr getLayoutRepository();
-	virtual CameraControlPtr getCameraControl();
-	virtual QActionGroup* createInteractorStyleActionGroup();
-
-	virtual bool isNull();
-
-public slots:
-    virtual void aboutToStop(){}
-
-private:
-	void printWarning() const;
-	QActionGroup* mActionGroup;
-
+	void triggerShowEvent();
+	void triggerHideEvent();
+	QCheckBox *getMouseClickSample();
+	bool mPointSampled;
+protected slots:
+	virtual void pointSampled(cx::Vector3D p_r);
 };
-} //cx
-#endif // CXVIEWSERVICENULL_H_
+
+}//namespace cxtest
+
+#endif // CXTESTFASTPATIENTREGISTRATIONWIDGETFIXTURE_H

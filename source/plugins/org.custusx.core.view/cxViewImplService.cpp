@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSessionStorageServiceProxy.h"
 #include "cxXMLNodeWrapper.h"
 #include "cxLogger.h"
+#include "cxViewGroupData.h"
 
 namespace cx
 {
@@ -84,6 +85,11 @@ int VisualizationImplService::getActiveGroupId() const
 ViewGroupDataPtr VisualizationImplService::getGroup(int groupIdx) const
 {
 	return viewManager()->getViewGroup(groupIdx);
+}
+
+void VisualizationImplService::setRegistrationMode(REGISTRATION_STATUS mode)
+{
+	this->getGroup(0)->setRegistrationMode(mode);
 }
 
 bool VisualizationImplService::isNull()

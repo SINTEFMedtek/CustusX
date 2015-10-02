@@ -52,6 +52,7 @@ public:
 
 	virtual int getActiveGroupId() const;
 	virtual ViewGroupDataPtr getGroup(int groupIdx) const;
+	virtual void setRegistrationMode(REGISTRATION_STATUS mode);
 
 	virtual void autoShowData(DataPtr data);
 	virtual void enableRender(bool val);

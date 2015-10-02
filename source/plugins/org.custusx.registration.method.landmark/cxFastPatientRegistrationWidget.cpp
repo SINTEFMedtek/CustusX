@@ -40,7 +40,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 FastPatientRegistrationWidget::FastPatientRegistrationWidget(RegServices services, QWidget* parent) :
-		PatientLandMarksWidget(services, parent, "org_custusx_registration_method_fast_landmark_image_to_patient_patient_landmarks_widget", "Fast Patient Registration")
+		PatientLandMarksWidget(services, parent,
+							   "org_custusx_registration_method_fast_landmark_image_to_patient_patient_landmarks_widget",
+							   "Fast Patient Registration"),
+		mMouseClickSample(NULL)
 {
 	mMouseClickSample = new QCheckBox("Sample with mouse clicks in anyplane view.", this);
 	mMouseClickSample->setToolTip("Allow mouse clicks in 2D anyplane view to sample patient landmarks.");

@@ -1,9 +1,11 @@
 
 if(BUILD_TESTING)
     set(CXTEST_SOURCES_TO_MOC
+    cxtestFastPatientRegistrationWidgetFixture.h
     )
     set(CXTEST_PLUGINREGISTRATION_SOURCES ${CXTEST_PLUGINREGISTRATION_SOURCES}
         cxtestFastPatientRegistration.cpp
+        cxtestFastPatientRegistrationWidgetFixture.cpp
     )
 
     qt5_wrap_cpp(CXTEST_SOURCES_TO_MOC ${CXTEST_SOURCES_TO_MOC})
