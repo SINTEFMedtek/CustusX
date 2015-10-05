@@ -73,9 +73,8 @@ VideoImplService::VideoImplService(ctkPluginContext *context) :
 	mEmptyVideoSource.reset(new BasicVideoSource());
 	mVideoConnection.reset(new VideoConnection(mBackend));
 	mActiveVideoSource = mEmptyVideoSource;
-    //mUSAcquisitionVideoPlayback.reset(new USAcquisitionVideoPlayback(mBackend));
 
-	connect(mVideoConnection.get(), &VideoConnection::connected, this, &VideoImplService::autoSelectActiveVideoSource);
+    connect(mVideoConnection.get(), &VideoConnection::connected, this, &VideoImplService::autoSelectActiveVideoSource);
 	connect(mVideoConnection.get(), &VideoConnection::videoSourcesChanged, this, &VideoImplService::autoSelectActiveVideoSource);
 	connect(mVideoConnection.get(), &VideoConnection::fps, this, &VideoImplService::fpsSlot);
 	connect(mBackend->getToolManager().get(), &TrackingService::activeToolChanged, this, &VideoImplService::autoSelectActiveVideoSource);
@@ -236,7 +235,6 @@ void VideoImplService::setPlaybackMode(PlaybackTimePtr controller)
 
 
         mUSAcquisitionVideoPlaybacks.back()->setTime(controller);
-        this->autoSelectActiveVideoSource();
 
         VideoSourcePtr playbackSource = mUSAcquisitionVideoPlaybacks.back()->getVideoSource();
         TrackingService::ToolMap tools = mBackend->getToolManager()->getTools();
