@@ -62,6 +62,7 @@ NetworkConnection::NetworkConnection(QString uid, QObject *parent) :
     qRegisterMetaType<ImagePtr>("ImagePtr");
 	qRegisterMetaType<ImagePtr>("MeshPtr");
 	qRegisterMetaType<ProbeDefinitionPtr>("ProbeDefinitionPtr");
+	qRegisterMetaType<VoidFunctionType>("VoidFunctionType");
 
 
 	ConnectionInfo info = this->getConnectionInfo();
@@ -90,10 +91,10 @@ void NetworkConnection::invoke(boost::function<void()> func)
 	QMetaObject::invokeMethod(this,
 							  "onInvoke",
 							  Qt::QueuedConnection,
-							  Q_ARG(boost::function<void()>, func));
+							  Q_ARG(VoidFunctionType, func));
 }
 
-void NetworkConnection::onInvoke(boost::function<void()> func)
+void NetworkConnection::onInvoke(VoidFunctionType func)
 {
 	func();
 }

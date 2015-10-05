@@ -67,7 +67,10 @@ typedef boost::shared_ptr<class NetworkConnection> NetworkConnectionPtr;
 class org_custusx_core_openigtlink_EXPORT NetworkConnection : public SocketConnection
 {
     Q_OBJECT
+
+	typedef boost::function<void()>  VoidFunctionType;
 public:
+
 
 	explicit NetworkConnection(QString uid, QObject *parent = 0);
 	virtual ~NetworkConnection();
@@ -75,7 +78,7 @@ public:
     //thread safe
 	QString getUid() const { return mUid; }
 	QStringList getAvailableDialects() const;
-	void invoke(boost::function<void()> func);
+	void invoke(boost::function<void()>  func);
 
 	// not thread-safe: use invoke to call in this thread
 	void sendImage(ImagePtr image); ///< not thread-safe: use invoke
@@ -94,7 +97,7 @@ protected:
 
 private slots:
     virtual void internalDataAvailable();
-	void onInvoke(boost::function<void()> func);
+	void onInvoke(VoidFunctionType func);
 
 private:
 	ProtocolPtr initProtocol(ProtocolPtr value);
