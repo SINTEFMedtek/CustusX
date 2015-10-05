@@ -78,7 +78,7 @@ class cxResource_EXPORT SocketConnection : public QObject
 public:
     explicit SocketConnection(QObject *parent = 0);
 
-	struct ConnectionInfo
+	struct cxResource_EXPORT ConnectionInfo
 	{
 		QString role;
 		QString protocol;
