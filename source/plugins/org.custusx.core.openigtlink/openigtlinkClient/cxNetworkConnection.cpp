@@ -199,7 +199,7 @@ void NetworkConnection::sendImage(ImagePtr image)
 	CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "Sending image: " << image->getName();
 
 	EncodedPackagePtr package = mProtocol->encode(image);
-    mSocket->write(reinterpret_cast<char*>(package->data()->pointer));
+	mSocket->write(package->data()->pointer, package->data()->size);
 }
 
 void NetworkConnection::sendMesh(MeshPtr data)
@@ -208,7 +208,7 @@ void NetworkConnection::sendMesh(MeshPtr data)
 	CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "Sending mesh: " << data->getName();
 
 	EncodedPackagePtr package = mProtocol->encode(data);
-    mSocket->write(reinterpret_cast<char*>(package->data()->pointer));
+	mSocket->write(package->data()->pointer, package->data()->size);
 }
 
 void NetworkConnection::internalDataAvailable()

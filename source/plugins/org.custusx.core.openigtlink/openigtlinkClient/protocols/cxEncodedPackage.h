@@ -54,13 +54,13 @@ Q_OBJECT
 public:
     struct ByteArray
     {
-        void* pointer;
+		char* pointer;
         int size;
     };
     typedef boost::shared_ptr<ByteArray> ByteArrayPtr;
 
 public:
-    EncodedPackage(void* pointer=NULL, int size=0);
+	EncodedPackage(char* pointer=NULL, int size=0);
     virtual ~EncodedPackage() {}
     virtual const ByteArrayPtr data() const = 0;
     //TODO rename these two...
@@ -87,7 +87,7 @@ public:
         return EncodedPackagePtr(new igtlEncodedPackage<TYPE>(msg));
     }
     explicit igtlEncodedPackage(typename TYPE::Pointer msg) :
-       EncodedPackage(msg->GetPackPointer(), msg->GetPackSize()),
+	   EncodedPackage(reinterpret_cast<char*>(msg->GetPackPointer()), msg->GetPackSize()),
        mMsg(msg),
        mCanBeOverWritten(true)
     {}
@@ -128,7 +128,7 @@ public:
     {
         mMsg = msg;
         mCanBeOverWritten = true;
-        mData->pointer = msg->GetPackBodyPointer();
+		mData->pointer = reinterpret_cast<char*>(msg->GetPackBodyPointer());
         mData->size = msg->GetPackBodySize();
     }
     virtual ~igtlEncodedBodyPackage() {}
