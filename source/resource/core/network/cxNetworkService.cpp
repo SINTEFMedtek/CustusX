@@ -29,46 +29,19 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXNETWORKCONNECTIONMANAGER_H
-#define CXNETWORKCONNECTIONMANAGER_H
+#include "cxNetworkService.h"
 
-#include "boost/shared_ptr.hpp"
-#include <QString>
-#include <QObject>
-#include "org_custusx_core_openigtlink_Export.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class NetworkConnectionManager> NetworkConnectionManagerPtr;
-typedef boost::shared_ptr<class OpenIGTLinkClientThreadHandler> OpenIGTLinkClientThreadHandlerPtr;
 
-/**
- * Manages all network connections in CustusX.
- *
- *
- */
-class org_custusx_core_openigtlink_EXPORT NetworkConnectionManager : public QObject
-{
-	Q_OBJECT
-public:
-	NetworkConnectionManager();
-
-	QStringList getConnectionUids() const;
-
-
-	std::vector<OpenIGTLinkClientThreadHandlerPtr> getConnections() const;
-	OpenIGTLinkClientThreadHandlerPtr getConnection(QString uid);
-signals:
-	void connectionsChanged();
-
-private:
-	QString newConnection(QString suggested_uid);
-	QString findUniqueUidNumber(QString uidBase) const;
-	OpenIGTLinkClientThreadHandlerPtr findConnection(QString uid) const;
-	std::vector<OpenIGTLinkClientThreadHandlerPtr> mConnections;
-};
+//QStringList NetworkService::getConnectionUids() const
+//{
+//	std::vector<NetworkConnectionHandlePtr> connections = this->getConnections();
+//	QStringList retval;
+//	for (unsigned i=0; i<connections.size(); ++i)
+//		retval << connections[i]->client()->getUid();
+//	return retval;
+//}
 
 } // namespace cx
-
-
-#endif // CXNETWORKCONNECTIONMANAGER_H

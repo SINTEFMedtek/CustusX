@@ -62,7 +62,7 @@ class DetailedLabeledComboBoxWidget;
 //typedef boost::shared_ptr<class StringProperty> StringPropertyPtr;
 //typedef boost::shared_ptr<class Tool> ToolPtr;
 //typedef boost::shared_ptr<class VisServices> VisServicesPtr;
-typedef boost::shared_ptr<class NetworkConnectionManager> NetworkConnectionManagerPtr;
+typedef boost::shared_ptr<class NetworkServiceImpl> NetworkServiceImplPtr;
 
 /**
  * \brief GUI for managing network connections
@@ -75,11 +75,11 @@ class org_custusx_core_openigtlink_EXPORT NetworkConnectionsWidget : public Base
   Q_OBJECT
 
 public:
-	NetworkConnectionsWidget(NetworkConnectionManagerPtr connections, QWidget* parent=NULL);
+	NetworkConnectionsWidget(NetworkServiceImplPtr connections, QWidget* parent=NULL);
 	virtual ~NetworkConnectionsWidget() {}
 
 private:
-	NetworkConnectionManagerPtr mConnections;
+	NetworkServiceImplPtr mConnections;
 	StringPropertyPtr mConnectionSelector;
 
 	void onNetworkManagerChanged();

@@ -30,53 +30,30 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXOpenIGTLinkPluginActivator_H_
-#define CXOpenIGTLinkPluginActivator_H_
+#ifndef CXCUSTUSPROTOCOL_H
+#define CXCUSTUSPROTOCOL_H
 
-#include <ctkPluginActivator.h>
-#include "boost/shared_ptr.hpp"
-#include <QThread>
+
+#include "org_custusx_core_openigtlink_Export.h"
+
+#include "cxOpenIGTLinkProtocol.h"
+#include "cxIGTLinkUSStatusMessage.h"
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class NetworkConnectionHandle> NetworkConnectionHandlePtr;
-typedef boost::shared_ptr<class OpenIGTLinkTrackingSystemService> OpenIGTLinkTrackingSystemServicePtr;
-typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
-typedef boost::shared_ptr<class NetworkServiceImpl> NetworkServiceImplPtr;
-
-/**
- * Activator for the OpenIGTLink service
- *
- * \ingroup org_custusx_core_openigtlink
- *
- * \date 2015-03-03
- * \author Janne Beate Bakeng
- */
-class OpenIGTLinkPluginActivator :  public QObject, public ctkPluginActivator
+class org_custusx_core_openigtlink_EXPORT CustusProtocol : public OpenIGTLinkProtocol
 {
-    Q_OBJECT
-    Q_INTERFACES(ctkPluginActivator)
-    Q_PLUGIN_METADATA(IID "org_custusx_core_openigtlink")
-
 public:
+    virtual QString getName() const;
+    virtual bool doCRC() const;
 
-    OpenIGTLinkPluginActivator();
-    ~OpenIGTLinkPluginActivator();
-
-    void start(ctkPluginContext* context);
-    void stop(ctkPluginContext* context);
+    virtual void translate(const igtl::ImageMessage::Pointer body);
+    virtual void translate(const IGTLinkUSStatusMessage::Pointer body);
 
 private:
-    RegisteredServicePtr mRegistrationGui;
-    RegisteredServicePtr mRegistrationTracking;
-    RegisteredServicePtr mRegistrationStreaming;
-//    QThread mOpenIGTLinkThread;
-//	NetworkConnectionHandlePtr mOpenIGTLink;
-
-    NetworkServiceImplPtr mNetworkConnections;
+    IGTLinkUSStatusMessage::Pointer mUnsentUSStatusMessage; ///< received message, will be added to queue when next image arrives
 };
 
-} // namespace cx
-
-#endif /* CXOpenIGTLinkPluginActivator_H_ */
+} //namespace cx
+#endif // CXCUSTUSPROTOCOL_H

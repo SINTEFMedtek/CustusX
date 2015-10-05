@@ -29,21 +29,9 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#include "catch.hpp"
 
-#include "cxSenderImpl.h"
-#include "cxIGTLinkConversion.h"
-
-namespace cx
+TEST_CASE("ExamplePlugin: Check nothing", "[unit][plugins][org.custusx.example][hide]")
 {
-
-void SenderImpl::send(PackagePtr package)
-{
-	if(package->mImage)
-		this->send(package->mImage);
-
-	if(package->mProbe)
-		this->send(package->mProbe);
+	CHECK(true);
 }
-
-
-} /* namespace cx */

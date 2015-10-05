@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QNetworkInterface>
+#include <QThread>
 
 #include "cxSocket.h"
 #include "cxLogger.h"
@@ -52,22 +53,27 @@ SNW_DEFINE_ENUM_STRING_CONVERTERS_END(cx, CX_SOCKETCONNECTION_STATE, scsCOUNT)
 namespace cx
 {
 
-////void SingleConnectionTcpServer::setSocket(QPointer<Socket> socket)
-////{
-////	mSocket = socket;
-////}
 
-//SingleConnectionTcpServer::SingleConnectionTcpServer(QObject* parent) :
-//	QTcpServer(parent)
-//{
-//}
+	bool SocketConnection::ConnectionInfo::operator==(const ConnectionInfo& rhs) const
+	{
+		return (this->role == rhs.role)
+				&& (this->protocol == rhs.protocol)
+				&& (this->host == rhs.host)
+				&& (this->port == rhs.port);
+	}
 
-
-//void SingleConnectionTcpServer::incomingConnection(qintptr socketDescriptor)
-//{
-//	emit incoming(socketDescriptor);
-//}
-
+	bool SocketConnection::ConnectionInfo::isServer() const { return role.toLower()=="server"; }
+	bool SocketConnection::ConnectionInfo::isClient() const { return !this->isServer(); }
+	QString SocketConnection::ConnectionInfo::getDescription() const
+	{
+		QString postfix;
+		QString name = host;
+		if (isServer())
+			name = "listen";
+		if (!protocol.isEmpty())
+			postfix = QString("[%1]").arg(protocol);
+		return QString("%1:%2%3").arg(name).arg(port).arg(postfix);
+	}
 
 ////---------------------------------------------------------
 ////---------------------------------------------------------
@@ -135,8 +141,11 @@ CX_SOCKETCONNECTION_STATE SocketConnection::getState()
 
 void SocketConnection::requestConnect()
 {
+	assertRunningInObjectThread();
+
 	ConnectionInfo info = this->getConnectionInfo();
 	mConnector = this->createConnector(info);
+	this->setProtocol(info.protocol);
 	mConnector->activate();
 }
 
@@ -155,6 +164,8 @@ SocketConnectorPtr SocketConnection::createConnector(ConnectionInfo info)
 
 void SocketConnection::requestDisconnect()
 {
+	assertRunningInObjectThread();
+
 	if (mConnector)
 	{
 		mConnector->deactivate();
@@ -219,7 +230,10 @@ bool SocketConnection::socketIsConnected()
 
 bool SocketConnection::enoughBytesAvailableOnSocket(int bytes) const
 {
-	return mSocket->bytesAvailable() >= bytes;
+    bool enoughBytes = mSocket->bytesAvailable() >= bytes;
+    if(!enoughBytes)
+        CX_LOG_DEBUG() << "Want " << bytes << " but only "<< mSocket->bytesAvailable() << " are available on the socket atm.";
+    return enoughBytes;
 }
 
 bool SocketConnection::socketReceive(void *packPointer, int packSize) const
@@ -227,7 +241,8 @@ bool SocketConnection::socketReceive(void *packPointer, int packSize) const
     if(!this->enoughBytesAvailableOnSocket(packSize))
         return false;
 
-    int r = mSocket->read(reinterpret_cast<char*>(packPointer), packSize);
+    char* charPointer = reinterpret_cast<char*>(packPointer);
+    int r = mSocket->read(charPointer, packSize);
     if(r <= 0)
     {
         CX_LOG_ERROR() << "Error when receiving data from socket.";

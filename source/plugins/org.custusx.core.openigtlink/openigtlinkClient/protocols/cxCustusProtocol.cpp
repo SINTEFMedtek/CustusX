@@ -29,54 +29,51 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#include "cxCustusProtocol.h"
 
-#ifndef CXOpenIGTLinkPluginActivator_H_
-#define CXOpenIGTLinkPluginActivator_H_
-
-#include <ctkPluginActivator.h>
-#include "boost/shared_ptr.hpp"
-#include <QThread>
+#include "cxIGTLinkConversion.h"
+#include "cxIGTLinkConversionImage.h"
+#include "cxIGTLinkConversionSonixCXLegacy.h"
+#include "cxImage.h"
+#include "cxLogger.h"
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class NetworkConnectionHandle> NetworkConnectionHandlePtr;
-typedef boost::shared_ptr<class OpenIGTLinkTrackingSystemService> OpenIGTLinkTrackingSystemServicePtr;
-typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
-typedef boost::shared_ptr<class NetworkServiceImpl> NetworkServiceImplPtr;
-
-/**
- * Activator for the OpenIGTLink service
- *
- * \ingroup org_custusx_core_openigtlink
- *
- * \date 2015-03-03
- * \author Janne Beate Bakeng
- */
-class OpenIGTLinkPluginActivator :  public QObject, public ctkPluginActivator
+QString CustusProtocol::getName() const
 {
-    Q_OBJECT
-    Q_INTERFACES(ctkPluginActivator)
-    Q_PLUGIN_METADATA(IID "org_custusx_core_openigtlink")
+    return "Custus";
+}
 
-public:
+bool CustusProtocol::doCRC() const
+{
+    //in the old version of the custusx openigtlink server
+    //crc checking is disabled (for images)
+    return false;
+}
 
-    OpenIGTLinkPluginActivator();
-    ~OpenIGTLinkPluginActivator();
+void CustusProtocol::translate(const igtl::ImageMessage::Pointer body)
+{
+    IGTLinkConversion converter;
+	IGTLinkConversionSonixCXLegacy cxconverter;
+	ImagePtr imagePtr = cxconverter.decode(body);
+	imagePtr = cxconverter.decode(imagePtr);
+    emit image(imagePtr);
 
-    void start(ctkPluginContext* context);
-    void stop(ctkPluginContext* context);
+    if(mUnsentUSStatusMessage)
+    {
+		CX_LOG_WARNING() << "default constructed probe definition used as input.";
+        ProbeDefinitionPtr definition = converter.decode(mUnsentUSStatusMessage, body, ProbeDefinitionPtr(new ProbeDefinition()));
+		definition = cxconverter.decode(definition);
+		QString devicename = "TODO";
+        mUnsentUSStatusMessage = IGTLinkUSStatusMessage::New();
+        emit probedefinition(devicename, definition);
+    }
+}
 
-private:
-    RegisteredServicePtr mRegistrationGui;
-    RegisteredServicePtr mRegistrationTracking;
-    RegisteredServicePtr mRegistrationStreaming;
-//    QThread mOpenIGTLinkThread;
-//	NetworkConnectionHandlePtr mOpenIGTLink;
+void CustusProtocol::translate(const cx::IGTLinkUSStatusMessage::Pointer body)
+{
+    mUnsentUSStatusMessage = body;
+}
 
-    NetworkServiceImplPtr mNetworkConnections;
-};
-
-} // namespace cx
-
-#endif /* CXOpenIGTLinkPluginActivator_H_ */
+}

@@ -29,8 +29,8 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXOPENIGTLINKDATATRANSFER_H
-#define CXOPENIGTLINKDATATRANSFER_H
+#ifndef CXNETWORKDATATRANSFER_H_
+#define CXNETWORKDATATRANSFER_H_
 
 #include "cxXmlOptionItem.h"
 #include "cxForwardDeclarations.h"
@@ -39,11 +39,11 @@ class ctkPluginContext;
 
 namespace cx {
 
-class OpenIGTLinkClient;
+class NetworkConnection;
 typedef boost::shared_ptr<class BoolProperty> BoolPropertyPtr;
 typedef boost::shared_ptr<class StringProperty> StringPropertyPtr;
 typedef boost::shared_ptr<class StringPropertySelectData> StringPropertySelectDataPtr;
-typedef boost::shared_ptr<class OpenIGTLinkClientThreadHandler> OpenIGTLinkClientThreadHandlerPtr;
+typedef boost::shared_ptr<class NetworkConnectionHandle> NetworkConnectionHandlePtr;
 
 
 /**
@@ -56,12 +56,12 @@ typedef boost::shared_ptr<class OpenIGTLinkClientThreadHandler> OpenIGTLinkClien
  *
  * Use the DataToSend and onSend() to send data to server.
  */
-class OpenIGTLinkDataTransfer : public QObject
+class NetworkDataTransfer : public QObject
 {
 	Q_OBJECT
 public:
-	OpenIGTLinkDataTransfer(ctkPluginContext* context, OpenIGTLinkClientThreadHandlerPtr connection, QObject *parent=NULL);
-	~OpenIGTLinkDataTransfer();
+	NetworkDataTransfer(ctkPluginContext* context, NetworkConnectionHandlePtr connection, QObject *parent=NULL);
+	~NetworkDataTransfer();
 
 	BoolPropertyPtr getAcceptIncomingData() { return mAcceptIncomingData; }
 	BoolPropertyPtr getStreamActiveVideoSource() { return mStreamActiveVideoSource; }
@@ -69,7 +69,7 @@ public:
 	PatientModelServicePtr getPatientModelService() { return mPatientModelService; }
 	VisualizationServicePtr getViewService() { return mViewService; }
 	VideoServicePtr getVideoService() { return mVideoService; }
-	OpenIGTLinkClientThreadHandlerPtr getOpenIGTLink();
+	NetworkConnectionHandlePtr getOpenIGTLink();
 
 	/**
 	 * Send data over igtl, using the data set in the DataToSend property
@@ -82,7 +82,7 @@ private:
 	StringPropertySelectDataPtr mDataToSend;
 	XmlOptionFile mOptions;
 	ctkPluginContext* mContext;
-	OpenIGTLinkClientThreadHandlerPtr mOpenIGTLink;
+	NetworkConnectionHandlePtr mOpenIGTLink;
 
 	PatientModelServicePtr mPatientModelService;
 	VisualizationServicePtr mViewService;
@@ -108,4 +108,4 @@ private:
 
 } // namespace cx
 
-#endif // CXOPENIGTLINKDATATRANSFER_H
+#endif // CXNETWORKDATATRANSFER_H_

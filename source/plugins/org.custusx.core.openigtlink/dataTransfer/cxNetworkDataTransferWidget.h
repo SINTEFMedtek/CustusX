@@ -29,8 +29,8 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXOPENIGTLINKDATATRANSFERWIDGET_H
-#define CXOPENIGTLINKDATATRANSFERWIDGET_H
+#ifndef CXNETWORKDATATRANSFERWIDGET_H_
+#define CXNETWORKDATATRANSFERWIDGET_H_
 
 #include <QThread>
 #include "cxBaseWidget.h"
@@ -40,10 +40,10 @@ class ctkPluginContext;
 
 namespace cx {
 
-class OpenIGTLinkConnectionWidget;
-class OpenIGTLinkClient;
-typedef boost::shared_ptr<class OpenIGTLinkClientThreadHandler> OpenIGTLinkClientThreadHandlerPtr;
-typedef boost::shared_ptr<class OpenIGTLinkDataTransfer> OpenIGTLinkDataTransferPtr;
+class NetworkConnectionWidget;
+class NetworkConnection;
+typedef boost::shared_ptr<class NetworkConnectionHandle> NetworkConnectionHandlePtr;
+typedef boost::shared_ptr<class NetworkDataTransfer> NetworkDataTransferPtr;
 typedef boost::shared_ptr<class BoolProperty> BoolPropertyPtr;
 typedef boost::shared_ptr<class StringProperty> StringPropertyPtr;
 typedef boost::shared_ptr<class StringPropertySelectData> StringPropertySelectDataPtr;
@@ -51,19 +51,19 @@ typedef boost::shared_ptr<class StringPropertySelectData> StringPropertySelectDa
 /**
  * Widget for handling data transfer to/from an OpenIGTLink server.
  */
-class OpenIGTLinkDataTransferWidget : public BaseWidget
+class NetworkDataTransferWidget : public BaseWidget
 {
 	Q_OBJECT
 public:
-	OpenIGTLinkDataTransferWidget(OpenIGTLinkDataTransferPtr backend, QWidget* parent=NULL);
-	~OpenIGTLinkDataTransferWidget();
+	NetworkDataTransferWidget(NetworkDataTransferPtr backend, QWidget* parent=NULL);
+	~NetworkDataTransferWidget();
 private:
-	OpenIGTLinkDataTransferPtr mDataTransfer;
-	OpenIGTLinkConnectionWidget* mConnectionWidget;
+	NetworkDataTransferPtr mDataTransfer;
+	NetworkConnectionWidget* mConnectionWidget;
 
 	QVBoxLayout* createVBoxInGroupBox(QVBoxLayout* parent, QString header);
 };
 
 } // namespace cx
 
-#endif // CXOPENIGTLINKDATATRANSFERWIDGET_H
+#endif // CXNETWORKDATATRANSFERWIDGET_H_

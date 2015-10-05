@@ -38,9 +38,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxOpenIGTLinkStreamerService.h"
 #include "cxOpenIGTLinkTrackingSystemService.h"
 #include "cxOpenIGTLinkGuiExtenderService.h"
-#include "cxOpenIGTLinkClient.h"
+#include "cxNetworkConnection.h"
 #include "cxRegisteredService.h"
-#include "cxNetworkConnectionManager.h"
+#include "cxNetworkServiceImpl.h"
 
 namespace cx
 {
@@ -55,9 +55,9 @@ OpenIGTLinkPluginActivator::~OpenIGTLinkPluginActivator()
 
 void OpenIGTLinkPluginActivator::start(ctkPluginContext* context)
 {
-	mNetworkConnections.reset(new NetworkConnectionManager());
+	mNetworkConnections.reset(new NetworkServiceImpl());
 
-	OpenIGTLinkClientThreadHandlerPtr defaultConnection = mNetworkConnections->getConnection("org.custusx.core.openigtlink");
+	NetworkConnectionHandlePtr defaultConnection = mNetworkConnections->getConnection("org.custusx.core.openigtlink");
 
 	OpenIGTLinkTrackingSystemService* tracking = new OpenIGTLinkTrackingSystemService(defaultConnection);
 	OpenIGTLinkStreamerService *streamer = new OpenIGTLinkStreamerService(defaultConnection);

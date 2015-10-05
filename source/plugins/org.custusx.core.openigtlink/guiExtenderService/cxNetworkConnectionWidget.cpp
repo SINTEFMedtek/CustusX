@@ -30,18 +30,20 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxOpenIGTLinkConnectionWidget.h"
+#include "cxNetworkConnectionWidget.h"
 
 #include <QPushButton>
-#include "cxOpenIGTLinkClient.h"
+#include "cxNetworkConnection.h"
 #include "cxHelperWidgets.h"
 #include "cxProfile.h"
 #include "cxLogger.h"
 #include "boost/bind.hpp"
+#include "cxNetworkConnectionHandle.h"
+
 
 namespace cx {
 
-OpenIGTLinkConnectionWidget::OpenIGTLinkConnectionWidget(OpenIGTLinkClientThreadHandlerPtr client, QWidget *parent) :
+NetworkConnectionWidget::NetworkConnectionWidget(NetworkConnectionHandlePtr client, QWidget *parent) :
     BaseWidget(parent, "OpenIGTLinkConnectionWidget", "OpenIGTLink Connection"),
     mClient(client)
 {
@@ -52,9 +54,9 @@ OpenIGTLinkConnectionWidget::OpenIGTLinkConnectionWidget(OpenIGTLinkClientThread
 
     mConnectButton = new QPushButton("Connect", this);
 	mConnectButton->setCheckable(true);
-    connect(mConnectButton, &QPushButton::clicked, this, &OpenIGTLinkConnectionWidget::connectButtonClicked);
+    connect(mConnectButton, &QPushButton::clicked, this, &NetworkConnectionWidget::connectButtonClicked);
 
-	connect(mClient->client(), &OpenIGTLinkClient::stateChanged, this, &OpenIGTLinkConnectionWidget::onStateChanged);
+	connect(mClient->getNetworkConnection(), &NetworkConnection::stateChanged, this, &NetworkConnectionWidget::onStateChanged);
 
     QVBoxLayout* topLayout = new QVBoxLayout(this);
 
@@ -71,18 +73,17 @@ OpenIGTLinkConnectionWidget::OpenIGTLinkConnectionWidget(OpenIGTLinkClientThread
 
     topLayout->addWidget(mConnectButton);
     topLayout->addStretch();
-//	CX_LOG_CHANNEL_DEBUG("CA") << "OpenIGTLinkConnectionWidget end create " << client->getUid();
 
-	this->onStateChanged(mClient->client()->getState());
+	this->onStateChanged(mClient->getNetworkConnection()->getState());
 
 }
 
-OpenIGTLinkConnectionWidget::~OpenIGTLinkConnectionWidget()
+NetworkConnectionWidget::~NetworkConnectionWidget()
 {
 
 }
 
-QString OpenIGTLinkConnectionWidget::defaultWhatsThis() const
+QString NetworkConnectionWidget::defaultWhatsThis() const
 {
     return  "<html>"
             "<h3>Connect to an OpenIGTLink server</h3>"
@@ -95,10 +96,8 @@ QString OpenIGTLinkConnectionWidget::defaultWhatsThis() const
             "</html>";
 }
 
-void OpenIGTLinkConnectionWidget::onStateChanged(CX_SOCKETCONNECTION_STATE state)
+void NetworkConnectionWidget::onStateChanged(CX_SOCKETCONNECTION_STATE state)
 {
-//	CX_LOG_CHANNEL_DEBUG("CA") << "Changed connection state to " << string_cast(state);
-
 	QString status = qstring_cast(state);
 	QString action = (state==scsINACTIVE) ? "Connect" : "Disconnect";
 
@@ -111,17 +110,17 @@ void OpenIGTLinkConnectionWidget::onStateChanged(CX_SOCKETCONNECTION_STATE state
 	mOptionsWidget->setEnabled(state == scsINACTIVE);
 }
 
-void OpenIGTLinkConnectionWidget::connectButtonClicked(bool checked)
+void NetworkConnectionWidget::connectButtonClicked(bool checked)
 {
     if(checked)
     {
-		boost::function<void()> connect = boost::bind(&OpenIGTLinkClient::requestConnect, mClient->client());
-		mClient->client()->invoke(connect);
+		boost::function<void()> connect = boost::bind(&NetworkConnection::requestConnect, mClient->getNetworkConnection());
+		mClient->getNetworkConnection()->invoke(connect);
     }
     else
     {
-		boost::function<void()> disconnect = boost::bind(&OpenIGTLinkClient::requestDisconnect, mClient->client());
-		mClient->client()->invoke(disconnect);
+		boost::function<void()> disconnect = boost::bind(&NetworkConnection::requestDisconnect, mClient->getNetworkConnection());
+		mClient->getNetworkConnection()->invoke(disconnect);
     }
 }
 

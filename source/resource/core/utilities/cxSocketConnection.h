@@ -52,6 +52,20 @@ enum CX_SOCKETCONNECTION_STATE
 
 SNW_DECLARE_ENUM_STRING_CONVERTERS(cx, CX_SOCKETCONNECTION_STATE);
 
+/** Insert into every method that is only allowed to be called inside
+  * the object's own thread.
+  */
+#define assertRunningInObjectThread() \
+{ \
+	if (QThread::currentThread()!=this->thread()) \
+	{ \
+		CX_LOG_ERROR() \
+			<< QString("Method should be called in the object's thread [%1] only, current thread = [%2]") \
+			.arg(this->thread()->objectName()) \
+			.arg(QThread::currentThread()->objectName()); \
+	}		\
+} \
+
 
 
 namespace cx {
@@ -71,35 +85,20 @@ public:
 		QString host;
 		int port;
 
-		bool operator==(const ConnectionInfo& rhs) const
-		{
-			return (this->role == rhs.role)
-					&& (this->protocol == rhs.protocol)
-					&& (this->host == rhs.host)
-					&& (this->port == rhs.port);
-		}
-
-		bool isServer() const { return role.toLower()=="server"; }
-		bool isClient() const { return !this->isServer(); }
-		QString getDescription() const
-		{
-			QString postfix;
-			QString name = host;
-			if (isServer())
-					name = "listen";
-			if (!protocol.isEmpty())
-				postfix = QString("[%1]").arg(protocol);
-			return QString("%1:%2%3").arg(name).arg(port).arg(postfix);
-		}
+		bool operator==(const ConnectionInfo& rhs) const;
+		bool isServer() const;
+		bool isClient() const;
+		QString getDescription() const;
 	};
 
 	ConnectionInfo getConnectionInfo(); ///< thread-safe
 	CX_SOCKETCONNECTION_STATE getState(); ///< thread-safe
+	virtual void setConnectionInfo(ConnectionInfo info); ///< thread-safe
+
+	virtual void requestConnect(); ///< not thread-safe: use invoke
+	virtual void requestDisconnect(); ///< not thread-safe: use invoke
 
 public slots:
-	virtual void setConnectionInfo(ConnectionInfo info); ///< thread-safe
-	void requestConnect(); ///< not thread-safe: use invoke
-	void requestDisconnect(); ///< not thread-safe: use invoke
 	bool sendData(const char* data, qint64 maxSize); ///< not thread-safe
 
 signals:
@@ -112,10 +111,11 @@ signals:
 private slots:
     void internalConnected();
     void internalDisconnected();
-	void internalError(QAbstractSocket::SocketError socketError);
-	virtual void internalDataAvailable() = 0;
+    void internalError(QAbstractSocket::SocketError socketError);
+    virtual void internalDataAvailable() = 0;
 
 protected:
+	virtual void setProtocol(QString protocolname) = 0;
 	SocketConnectorPtr createConnector(ConnectionInfo info);
 	bool socketIsConnected();
     bool enoughBytesAvailableOnSocket(int bytes) const;

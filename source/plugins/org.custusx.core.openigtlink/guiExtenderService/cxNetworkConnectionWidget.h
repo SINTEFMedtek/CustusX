@@ -29,54 +29,43 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXNETWORKCONNECTIONWIDGET_H_
+#define CXNETWORKCONNECTIONWIDGET_H_
 
-#ifndef CXOpenIGTLinkPluginActivator_H_
-#define CXOpenIGTLinkPluginActivator_H_
+#include <QDomElement>
+#include "cxBaseWidget.h"
+#include "cxStringProperty.h"
+#include "cxDoubleProperty.h"
+#include "cxSocketConnection.h"
 
-#include <ctkPluginActivator.h>
-#include "boost/shared_ptr.hpp"
-#include <QThread>
+class QPushButton;
 
-namespace cx
-{
+namespace cx {
 
 typedef boost::shared_ptr<class NetworkConnectionHandle> NetworkConnectionHandlePtr;
-typedef boost::shared_ptr<class OpenIGTLinkTrackingSystemService> OpenIGTLinkTrackingSystemServicePtr;
-typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
-typedef boost::shared_ptr<class NetworkServiceImpl> NetworkServiceImplPtr;
+class NetworkConnection;
 
-/**
- * Activator for the OpenIGTLink service
- *
- * \ingroup org_custusx_core_openigtlink
- *
- * \date 2015-03-03
- * \author Janne Beate Bakeng
- */
-class OpenIGTLinkPluginActivator :  public QObject, public ctkPluginActivator
+class NetworkConnectionWidget : public BaseWidget
 {
     Q_OBJECT
-    Q_INTERFACES(ctkPluginActivator)
-    Q_PLUGIN_METADATA(IID "org_custusx_core_openigtlink")
 
 public:
+	NetworkConnectionWidget(NetworkConnectionHandlePtr client, QWidget *parent=NULL);
+	~NetworkConnectionWidget();
 
-    OpenIGTLinkPluginActivator();
-    ~OpenIGTLinkPluginActivator();
+    virtual QString defaultWhatsThis() const;
 
-    void start(ctkPluginContext* context);
-    void stop(ctkPluginContext* context);
+private slots:
+    void connectButtonClicked(bool checked=false);
 
 private:
-    RegisteredServicePtr mRegistrationGui;
-    RegisteredServicePtr mRegistrationTracking;
-    RegisteredServicePtr mRegistrationStreaming;
-//    QThread mOpenIGTLinkThread;
-//	NetworkConnectionHandlePtr mOpenIGTLink;
+	void onStateChanged(CX_SOCKETCONNECTION_STATE state);
 
-    NetworkServiceImplPtr mNetworkConnections;
+    QPushButton *mConnectButton;
+	QWidget* mOptionsWidget;
+	NetworkConnectionHandlePtr mClient;
 };
 
-} // namespace cx
+}
 
-#endif /* CXOpenIGTLinkPluginActivator_H_ */
+#endif //CXOPENIGTLINKWIDGET_H

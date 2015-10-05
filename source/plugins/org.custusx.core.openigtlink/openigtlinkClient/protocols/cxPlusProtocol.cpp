@@ -1,4 +1,4 @@
-#include "cxPlusDialect.h"
+#include "cxPlusProtocol.h"
 
 #include "cxIGTLinkConversion.h"
 #include "cxLogger.h"
@@ -6,7 +6,7 @@
 
 namespace cx{
 
-PlusDialect::PlusDialect() :
+PlusProtocol::PlusProtocol() :
     mCalibrationKeyword("CalibrationTo"),
     mProbeToTrackerName("ProbeToTracker"), //set in the PlusServer config file
     mLastKnownOriginalTimestamp(-1),
@@ -27,13 +27,14 @@ PlusDialect::PlusDialect() :
     igtltool_M_custustool(3,3) = 1;
 }
 
-QString PlusDialect::getName() const
+QString PlusProtocol::getName() const
 {
     return "PlusServer";
 }
 
-void PlusDialect::translate(const igtl::TransformMessage::Pointer body)
+void PlusProtocol::translate(const igtl::TransformMessage::Pointer body)
 {
+    CX_LOG_DEBUG() << "Transform incoming to plusprotocol";
     QString deviceName = body->GetDeviceName();
     this->registerTransformDeviceName(deviceName);
 
@@ -61,8 +62,9 @@ void PlusDialect::translate(const igtl::TransformMessage::Pointer body)
     }
 }
 
-void PlusDialect::translate(const igtl::ImageMessage::Pointer body)
+void PlusProtocol::translate(const igtl::ImageMessage::Pointer body)
 {
+    CX_LOG_DEBUG() << "Image incoming to plusprotocol";
     //DIMENSION
     int x = 0;
     int y = 1;
@@ -114,7 +116,7 @@ void PlusDialect::translate(const igtl::ImageMessage::Pointer body)
     emit probedefinition(mProbeToTrackerName, definition);
 }
 
-void PlusDialect::translate(const igtl::StringMessage::Pointer body)
+void PlusProtocol::translate(const igtl::StringMessage::Pointer body)
 {
     IGTLinkConversion converter;
     QString string = converter.decode(body);
@@ -124,12 +126,12 @@ void PlusDialect::translate(const igtl::StringMessage::Pointer body)
     //    CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << string;
 }
 
-double PlusDialect::getCurrentTimestamp() const
+double PlusProtocol::getCurrentTimestamp() const
 {
     double current_timestamp_ms = QDateTime::currentDateTime().toMSecsSinceEpoch();
     return current_timestamp_ms;
 }
-double PlusDialect::getSyncedTimestampForTransformsAndImages(double currentOriginalTimestamp)
+double PlusProtocol::getSyncedTimestampForTransformsAndImages(double currentOriginalTimestamp)
 {
     double retval = 0;
 
@@ -143,13 +145,13 @@ double PlusDialect::getSyncedTimestampForTransformsAndImages(double currentOrigi
     return retval;
 }
 
-void PlusDialect::registerTransformDeviceName(QString deviceName)
+void PlusProtocol::registerTransformDeviceName(QString deviceName)
 {
     if(!mKnownTransformDeviceNames.contains(deviceName))
         mKnownTransformDeviceNames << deviceName;
 }
 
-bool PlusDialect::isCalibration(QString deviceName) const
+bool PlusProtocol::isCalibration(QString deviceName) const
 {
     if(deviceName.contains(mCalibrationKeyword))
         return true;
@@ -157,20 +159,20 @@ bool PlusDialect::isCalibration(QString deviceName) const
         return false;
 }
 
-QString PlusDialect::findDeviceForCalibration(QString calibrationDeviceName) const
+QString PlusProtocol::findDeviceForCalibration(QString calibrationDeviceName) const
 {
     QString partialDeviceName = this->extractDeviceNameFromCalibrationDeviceName(calibrationDeviceName);
     QString calibrationBelongsToDeviceName = this->findRegisteredTransformDeviceNameThatContains(partialDeviceName);
     return calibrationBelongsToDeviceName;
 }
 
-QString PlusDialect::extractDeviceNameFromCalibrationDeviceName(QString calibrationDeviceName) const
+QString PlusProtocol::extractDeviceNameFromCalibrationDeviceName(QString calibrationDeviceName) const
 {
     QString retval = calibrationDeviceName.remove(mCalibrationKeyword);
     return retval;
 }
 
-QString PlusDialect::findRegisteredTransformDeviceNameThatContains(QString deviceName) const
+QString PlusProtocol::findRegisteredTransformDeviceNameThatContains(QString deviceName) const
 {
     QString retval("NOT_FOUND");
     deviceName.remove("X");

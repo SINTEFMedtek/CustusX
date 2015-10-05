@@ -30,20 +30,37 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxSenderImpl.h"
-#include "cxIGTLinkConversion.h"
+#include "cxNetworkPluginActivator.h"
+
+#include <QtPlugin>
+#include <iostream>
+
+#include "cxNetworkServiceImpl.h"
+#include "cxRegisteredService.h"
 
 namespace cx
 {
 
-void SenderImpl::send(PackagePtr package)
+NetworkPluginActivator::NetworkPluginActivator()
 {
-	if(package->mImage)
-		this->send(package->mImage);
-
-	if(package->mProbe)
-		this->send(package->mProbe);
+    std::cout << "Created NetworkPluginActivator" << std::endl;
 }
 
+NetworkPluginActivator::~NetworkPluginActivator()
+{}
 
-} /* namespace cx */
+void NetworkPluginActivator::start(ctkPluginContext* context)
+{
+    //mRegistration = RegisteredService::create<NetworkServiceImpl>(context, NetworkService_iid);
+}
+
+void NetworkPluginActivator::stop(ctkPluginContext* context)
+{
+	mRegistration.reset();
+	Q_UNUSED(context);
+}
+
+} // namespace cx
+
+
+

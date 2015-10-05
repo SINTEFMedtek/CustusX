@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxGrabberSenderQTcpSocket.h"
 #include "cxIGTLinkConversion.h"
+#include "cxIGTLinkConversionImage.h"
+#include "cxIGTLinkConversionSonixCXLegacy.h"
 
 namespace cx
 {
@@ -51,7 +53,7 @@ bool GrabberSenderQTcpSocket::isReady() const
 	return true;
 }
 
-void GrabberSenderQTcpSocket::send(IGTLinkImageMessage::Pointer msg)
+void GrabberSenderQTcpSocket::send(igtl::ImageMessage::Pointer msg)
 {
 	if (!msg || !this->isReady())
 		return;
@@ -76,8 +78,8 @@ void GrabberSenderQTcpSocket::send(ImagePtr msg)
 	if (!this->isReady())
 		return;
 
-	IGTLinkConversion converter;
-	this->send(converter.encode(msg));
+	IGTLinkConversionImage converter;
+	this->send(converter.encode(msg, pcsLPS));
 }
 
 void GrabberSenderQTcpSocket::send(ProbeDefinitionPtr msg)

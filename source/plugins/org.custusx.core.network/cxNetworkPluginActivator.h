@@ -30,20 +30,44 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxSenderImpl.h"
-#include "cxIGTLinkConversion.h"
+#ifndef CXNETWORKPLUGINACTIVATOR_H_
+#define CXNETWORKPLUGINACTIVATOR_H_
+
+#include <ctkPluginActivator.h>
+#include "boost/shared_ptr.hpp"
 
 namespace cx
 {
 
-void SenderImpl::send(PackagePtr package)
+typedef boost::shared_ptr<class NetworkService> NetworkServicePtr;
+typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
+
+/**
+ * Activator for the Network plugin
+ *
+ * \ingroup org_custusx_core_network
+ *
+ * \date 2015-09-24
+ * \author Janne Beate Bakeng
+ */
+class NetworkPluginActivator :  public QObject, public ctkPluginActivator
 {
-	if(package->mImage)
-		this->send(package->mImage);
+	Q_OBJECT
+	Q_INTERFACES(ctkPluginActivator)
+    Q_PLUGIN_METADATA(IID "org_custusx_core_network")
 
-	if(package->mProbe)
-		this->send(package->mProbe);
-}
+public:
 
+    NetworkPluginActivator();
+    ~NetworkPluginActivator();
 
-} /* namespace cx */
+	void start(ctkPluginContext* context);
+	void stop(ctkPluginContext* context);
+
+private:
+	RegisteredServicePtr mRegistration;
+};
+
+} // namespace cx
+
+#endif /* CXNETWORKPLUGINACTIVATOR_H_ */

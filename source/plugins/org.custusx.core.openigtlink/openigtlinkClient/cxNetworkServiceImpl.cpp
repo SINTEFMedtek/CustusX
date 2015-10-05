@@ -29,35 +29,75 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include "cxCustusDialect.h"
+#include "cxNetworkServiceImpl.h"
 
-#include "cxIGTLinkConversion.h"
-#include "cxImage.h"
-#include "cxLogger.h"
+#include "cxNetworkConnection.h"
+#include "cxNetworkConnectionHandle.h"
+#include "cxProfile.h"
 
 namespace cx
 {
 
-QString CustusDialect::getName() const
+NetworkServiceImpl::NetworkServiceImpl()
 {
-    return "Custus";
+	mOptions = profile()->getXmlSettings().descend("networkservice");
 }
 
-bool CustusDialect::doCRC() const
+QString NetworkServiceImpl::newConnection(QString suggested_uid)
 {
-    //in the old version of the custusx openigtlink server
-    //crc checking is disabled (for images)
-    return false;
+	QString uid = this->findUniqueUidNumber(suggested_uid);
+	NetworkConnectionHandlePtr connection(new NetworkConnectionHandle(uid, mOptions));
+	mConnections.push_back(connection);
+	emit connectionsChanged();
+	return uid;
 }
 
-void CustusDialect::translate(const IGTLinkImageMessage::Pointer body)
+QString NetworkServiceImpl::findUniqueUidNumber(QString uidBase) const
 {
-    emit igtlimage(body);
+	int counter = 0;
+	QString uid = uidBase;
+	while (this->findConnection(uid))
+	{
+		counter++;
+		uid = QString("%1%2").arg(uidBase).arg(counter);
+	}
+
+	return uid;
 }
 
-void CustusDialect::translate(const cx::IGTLinkUSStatusMessage::Pointer body)
+std::vector<NetworkConnectionHandlePtr> NetworkServiceImpl::getConnections() const
 {
-    emit usstatusmessage(body);
+	return mConnections;
 }
 
+QStringList NetworkServiceImpl::getConnectionUids() const
+{
+	QStringList retval;
+	for (unsigned i=0; i<mConnections.size(); ++i)
+        retval << mConnections[i]->getNetworkConnection()->getUid();
+	return retval;
 }
+
+NetworkConnectionHandlePtr NetworkServiceImpl::findConnection(QString uid) const
+{
+	for (unsigned i=0; i<mConnections.size(); ++i)
+        if (mConnections[i]->getNetworkConnection()->getUid() == uid)
+			return mConnections[i];
+	return NetworkConnectionHandlePtr();
+}
+
+NetworkConnectionHandlePtr NetworkServiceImpl::getConnection(QString uid)
+{
+	NetworkConnectionHandlePtr connection = this->findConnection(uid);
+
+	if (!connection)
+	{
+		this->newConnection(uid);
+		connection = this->findConnection(uid);
+	}
+
+	return connection;
+}
+
+
+} // namespace cx

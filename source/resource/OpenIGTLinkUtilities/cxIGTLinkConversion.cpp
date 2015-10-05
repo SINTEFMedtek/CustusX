@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxIGTLinkConversionBase.h"
 #include "cxIGTLinkConversionSonixCXLegacy.h"
+#include "cxIGTLinkConversionImage.h"
 
 namespace cx
 {
@@ -73,6 +74,7 @@ QString IGTLinkConversion::decode(igtl::StatusMessage::Pointer msg)
 ImagePtr IGTLinkConversion::decode(igtl::ImageMessage::Pointer message)
 {
 	return IGTLinkConversionSonixCXLegacy().decode(message);
+//	return IGTLinkConversionImage().decode(message);
 }
 
 Transform3D IGTLinkConversion::decode(igtl::TransformMessage::Pointer msg)
@@ -85,15 +87,15 @@ Transform3D IGTLinkConversion::decode(igtl::TransformMessage::Pointer msg)
 
 //--------------------------------CustusX messages---------------------------------------
 
-IGTLinkImageMessage::Pointer IGTLinkConversion::encode(ImagePtr image)
-{
-	return IGTLinkConversionSonixCXLegacy().encode(image);
-}
+//IGTLinkImageMessage::Pointer IGTLinkConversion::encode(ImagePtr image)
+//{
+//	return IGTLinkConversionSonixCXLegacy().encode(image);
+//}
 
-ImagePtr IGTLinkConversion::decode(IGTLinkImageMessage::Pointer message)
-{
-    return this->decode(igtl::ImageMessage::Pointer(message));
-}
+//ImagePtr IGTLinkConversion::decode(IGTLinkImageMessage::Pointer message)
+//{
+//    return this->decode(igtl::ImageMessage::Pointer(message));
+//}
 
 IGTLinkUSStatusMessage::Pointer IGTLinkConversion::encode(ProbeDefinitionPtr input)
 {
@@ -112,7 +114,7 @@ IGTLinkUSStatusMessage::Pointer IGTLinkConversion::encode(ProbeDefinitionPtr inp
 }
 
 //'copied' from OpenIGTLinkRTSource::updateSonixStatus()
-ProbeDefinitionPtr IGTLinkConversion::decode(IGTLinkUSStatusMessage::Pointer probeMessage, IGTLinkImageMessage::Pointer imageMessage, ProbeDefinitionPtr base)
+ProbeDefinitionPtr IGTLinkConversion::decode(IGTLinkUSStatusMessage::Pointer probeMessage, igtl::ImageMessage::Pointer imageMessage, ProbeDefinitionPtr base)
 {
 	ProbeDefinitionPtr retval;
 	if (base)
@@ -148,18 +150,19 @@ ProbeDefinitionPtr IGTLinkConversion::decode(IGTLinkUSStatusMessage::Pointer pro
 		retval->setClipRect_p(DoubleBoundingBox3D(0, retval->getSize().width(), 0, retval->getSize().height(), 0, 0));
 	}
 
-	return this->decode(retval);
+	return retval;
+//	return this->decode(retval);
 }
 
-ImagePtr IGTLinkConversion::decode(ImagePtr msg)
-{
-	return IGTLinkConversionSonixCXLegacy().decode(msg);
-}
+//ImagePtr IGTLinkConversion::decode(ImagePtr msg)
+//{
+//	return IGTLinkConversionSonixCXLegacy().decode(msg);
+//}
 
-ProbeDefinitionPtr IGTLinkConversion::decode(ProbeDefinitionPtr msg)
-{
-	return IGTLinkConversionSonixCXLegacy().decode(msg);
-}
+//ProbeDefinitionPtr IGTLinkConversion::decode(ProbeDefinitionPtr msg)
+//{
+//	return IGTLinkConversionSonixCXLegacy().decode(msg);
+//}
 
 QString IGTLinkConversion::convertIGTLinkStatusCodes(const int code)
 {

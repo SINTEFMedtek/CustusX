@@ -40,25 +40,25 @@ class ctkPluginContext;
 
 namespace cx
 {
-typedef boost::shared_ptr<class NetworkConnectionManager> NetworkConnectionManagerPtr;
-typedef boost::shared_ptr<class OpenIGTLinkClientThreadHandler> OpenIGTLinkClientThreadHandlerPtr;
-typedef boost::shared_ptr<class OpenIGTLinkDataTransfer> OpenIGTLinkDataTransferPtr;
-class OpenIGTLinkClient;
+typedef boost::shared_ptr<class NetworkServiceImpl> NetworkServiceImplPtr;
+typedef boost::shared_ptr<class NetworkConnectionHandle> NetworkConnectionHandlePtr;
+typedef boost::shared_ptr<class NetworkDataTransfer> NetworkDataTransferPtr;
+class NetworkConnection;
 
 class org_custusx_core_openigtlink_EXPORT OpenIGTLinkGuiExtenderService : public GUIExtenderService
 {
 public:
-	OpenIGTLinkGuiExtenderService(ctkPluginContext* context, NetworkConnectionManagerPtr connections);
+    OpenIGTLinkGuiExtenderService(ctkPluginContext* context, NetworkServiceImplPtr connections);
     virtual ~OpenIGTLinkGuiExtenderService();
 
     std::vector<CategorizedWidget> createWidgets() const;
 
 private:
     mutable GUIExtenderService::CategorizedWidget mWidget;
-	NetworkConnectionManagerPtr mConnections;
-//	OpenIGTLinkClientThreadHandlerPtr mClient;
+    NetworkServiceImplPtr mConnections;
+//	NetworkConnectionHandlePtr mClient;
 	ctkPluginContext* mContext;
-	OpenIGTLinkDataTransferPtr mDataTransfer;
+	NetworkDataTransferPtr mDataTransfer;
 };
 typedef boost::shared_ptr<OpenIGTLinkGuiExtenderService> OpenIGTLinkGuiExtenderServicePtr;
 

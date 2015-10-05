@@ -29,23 +29,49 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXRASDIALECT_H
-#define CXRASDIALECT_H
+#ifndef CXNETWORKSERVICEIMPL_H_
+#define CXNETWORKSERVICEIMPL_H_
 
+#include "boost/shared_ptr.hpp"
+#include <QString>
+#include <QObject>
+#include "cxNetworkService.h"
+#include "cxXmlOptionItem.h"
 #include "org_custusx_core_openigtlink_Export.h"
-
-#include "cxDialect.h"
 
 namespace cx
 {
+typedef boost::shared_ptr<class NetworkServiceImpl> NetworkServiceImplPtr;
+typedef boost::shared_ptr<class NetworkConnectionHandle> NetworkConnectionHandlePtr;
 
-class org_custusx_core_openigtlink_EXPORT RASDialect : public Dialect
+/**
+ * Manages all network connections in CustusX.
+ *
+ *
+ */
+class org_custusx_core_openigtlink_EXPORT NetworkServiceImpl : public NetworkService
 {
+	Q_OBJECT
 public:
-	virtual QString getName() const;
-	virtual PATIENT_COORDINATE_SYSTEM coordinateSystem() const { return pcsRAS; }
+	NetworkServiceImpl();
+
+	QStringList getConnectionUids() const;
+
+
+	std::vector<NetworkConnectionHandlePtr> getConnections() const;
+	NetworkConnectionHandlePtr getConnection(QString uid);
+signals:
+	void connectionsChanged();
+
+private:
+	XmlOptionFile mOptions;
+	QString newConnection(QString suggested_uid);
+	QString findUniqueUidNumber(QString uidBase) const;
+	NetworkConnectionHandlePtr findConnection(QString uid) const;
+	std::vector<NetworkConnectionHandlePtr> mConnections;
 };
 
-} //namespace cx
+} // namespace cx
 
-#endif // CXRASDIALECT_H
+
+#endif // CXNETWORKSERVICEIMPL_H_

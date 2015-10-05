@@ -29,43 +29,23 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXOPENIGTLINKCONNECTIONWIDGET_H
-#define CXOPENIGTLINKCONNECTIONWIDGET_H
+#ifndef CXRASPROTOCOL_H
+#define CXRASPROTOCOL_H
 
-#include <QDomElement>
-#include "cxBaseWidget.h"
-#include "cxStringProperty.h"
-#include "cxDoubleProperty.h"
-#include "cxSocketConnection.h"
+#include "org_custusx_core_openigtlink_Export.h"
 
-class QPushButton;
+#include "cxOpenIGTLinkProtocol.h"
 
-namespace cx {
-
-typedef boost::shared_ptr<class OpenIGTLinkClientThreadHandler> OpenIGTLinkClientThreadHandlerPtr;
-class OpenIGTLinkClient;
-
-class OpenIGTLinkConnectionWidget : public BaseWidget
+namespace cx
 {
-    Q_OBJECT
 
+class org_custusx_core_openigtlink_EXPORT RASProtocol : public OpenIGTLinkProtocol
+{
 public:
-	OpenIGTLinkConnectionWidget(OpenIGTLinkClientThreadHandlerPtr client, QWidget *parent=NULL);
-    ~OpenIGTLinkConnectionWidget();
-
-    virtual QString defaultWhatsThis() const;
-
-private slots:
-    void connectButtonClicked(bool checked=false);
-
-private:
-	void onStateChanged(CX_SOCKETCONNECTION_STATE state);
-
-    QPushButton *mConnectButton;
-	QWidget* mOptionsWidget;
-	OpenIGTLinkClientThreadHandlerPtr mClient;
+	virtual QString getName() const;
+	virtual PATIENT_COORDINATE_SYSTEM coordinateSystem() const { return pcsRAS; }
 };
 
-}
+} //namespace cx
 
-#endif //CXOPENIGTLINKWIDGET_H
+#endif // CXRASPROTOCOL_H

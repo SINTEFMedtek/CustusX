@@ -31,68 +31,82 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 
-#ifndef CXDIALECT_H
-#define CXDIALECT_H
+#ifndef CXNETWORKCONNECTION_H_
+#define CXNETWORKCONNECTION_H_
 
 #include "org_custusx_core_openigtlink_Export.h"
 
+#include <map>
 #include <QObject>
-
-#include <boost/shared_ptr.hpp>
-
-#include "igtlMessageHeader.h"
-#include "igtlPolyDataMessage.h"
-#include "igtlTransformMessage.h"
-#include "igtlImageMessage.h"
-#include "igtlStatusMessage.h"
-#include "igtlStringMessage.h"
-#include "cxIGTLinkUSStatusMessage.h"
-#include "cxIGTLinkImageMessage.h"
-
+#include <QMutex>
+#include <QMutexLocker>
+#include "cxSocketConnection.h"
 #include "cxTransform3D.h"
 #include "cxImage.h"
 #include "cxProbeDefinition.h"
+#include "cxLogger.h"
+#include "cxProtocol.h"
+#include "cxOpenIGTLinkProtocol.h"
+#include "boost/function.hpp"
 
-#define CX_OPENIGTLINK_CHANNEL_NAME "OpenIGTLink"
+typedef boost::shared_ptr<QThread> QThreadPtr;
 
-namespace cx
-{
+namespace cx {
+
+typedef boost::shared_ptr<class NetworkConnection> NetworkConnectionPtr;
+
 /**
- * @brief The Dialect class represents an interpretation of opentigtlink packages.
+ * @brief The NetworkConnection class handles incoming OpenIGTLink packages.
+ *
+ * To specify how packages should be handled you can specify different kind of
+ * supported dialects, which are a way to handle the way different OpenIGTLink
+ * servers send packages.
+ *
  */
 
-class org_custusx_core_openigtlink_EXPORT Dialect : public QObject
+class org_custusx_core_openigtlink_EXPORT NetworkConnection : public SocketConnection
 {
     Q_OBJECT
 public:
-    explicit Dialect(QObject *parent = 0);
 
-    virtual QString getName() const;
-    virtual bool doCRC() const;
-	virtual PATIENT_COORDINATE_SYSTEM coordinateSystem() const { return pcsLPS; }
+	explicit NetworkConnection(QString uid, QObject *parent = 0);
+	virtual ~NetworkConnection();
 
-    virtual void translate(const igtl::TransformMessage::Pointer body);
-    virtual void translate(const igtl::ImageMessage::Pointer body);
-	virtual void translate(const igtl::PolyDataMessage::Pointer body);
-	virtual void translate(const igtl::StatusMessage::Pointer body);
-    virtual void translate(const igtl::StringMessage::Pointer body);
-    virtual void translate(const IGTLinkUSStatusMessage::Pointer body);
-    virtual void translate(const IGTLinkImageMessage::Pointer body);
+    //thread safe
+	QString getUid() const { return mUid; }
+	QStringList getAvailableDialects() const;
+	void invoke(boost::function<void()> func);
+
+	// not thread-safe: use invoke to call in this thread
+	void sendImage(ImagePtr image); ///< not thread-safe: use invoke
+	void sendMesh(MeshPtr image); ///< not thread-safe: use invoke
+	void streamImage(ImagePtr image); ///< not thread-safe: use invoke
 
 signals:
     void transform(QString devicename, Transform3D transform, double timestamp);
     void calibration(QString devicename, Transform3D calibration);
     void image(ImagePtr image);
-	void mesh(MeshPtr mesh);
-	void igtlimage(IGTLinkImageMessage::Pointer igtlimage);
-    void usstatusmessage(IGTLinkUSStatusMessage::Pointer msg);
-    void probedefinition(QString devicename, ProbeDefinitionPtr definition);
+	void mesh(MeshPtr image);
+	void probedefinition(QString devicename, ProbeDefinitionPtr definition);
 
 protected:
-	void writeAcceptingMessage(igtl::MessageBase* body);
-	void writeNotSupportedMessage(igtl::MessageBase *body);
+	virtual void setProtocol(QString protocolname);
+
+private slots:
+    virtual void internalDataAvailable();
+	void onInvoke(boost::function<void()> func);
+
+private:
+	ProtocolPtr initProtocol(ProtocolPtr value);
+
+    ProtocolPtr mProtocol;
+    typedef std::map<QString, ProtocolPtr> DialectMap;
+    DialectMap mAvailableDialects;
+	const QString mUid;
 };
-typedef boost::shared_ptr<Dialect> DialectPtr;
+
+
 
 } //namespace cx
-#endif // CXDIALECT_H
+
+#endif // CXNETWORKCONNECTION_H_

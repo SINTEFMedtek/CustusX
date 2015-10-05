@@ -30,9 +30,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-
-#ifndef CXOPENIGTLINKCLIENT_H
-#define CXOPENIGTLINKCLIENT_H
+#ifndef CXNETWORKCONNECTIONHANDLE_H_
+#define CXNETWORKCONNECTIONHANDLE_H_
 
 #include "org_custusx_core_openigtlink_Export.h"
 
@@ -52,93 +51,30 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImage.h"
 #include "cxProbeDefinition.h"
 #include "cxLogger.h"
-#include "cxDialect.h"
+#include "cxProtocol.h"
 #include "boost/function.hpp"
+#include "cxXmlOptionItem.h"
 
 typedef boost::shared_ptr<QThread> QThreadPtr;
 
 namespace cx {
 
-typedef boost::shared_ptr<class OpenIGTLinkClient> OpenIGTLinkClientPtr;
+typedef boost::shared_ptr<class NetworkConnection> NetworkConnectionPtr;
+typedef boost::shared_ptr<class NetworkConnectionHandle> NetworkConnectionHandlePtr;
 
-/**
- * @brief The OpenIGTLinkClient class handles incoming OpenIGTLink packages.
- *
- * To specify how packages should be handled you can specify different kind of
- * supported dialects, which are a way to handle the way different OpenIGTLink
- * servers send packages.
- *
- */
-
-class org_custusx_core_openigtlink_EXPORT OpenIGTLinkClient : public SocketConnection
-{
-    Q_OBJECT
-public:
-
-	explicit OpenIGTLinkClient(QString uid, QObject *parent = 0);
-	virtual ~OpenIGTLinkClient();
-
-    //thread safe
-	QString getUid() const { return mUid; }
-	virtual void setConnectionInfo(ConnectionInfo info);
-	QStringList getAvailableDialects() const;
-	void invoke(boost::function<void()> func);
-
-	// not thread-safe: use invoke to call in this thread
-	void sendMessage(ImagePtr image);
-	void sendMessage(MeshPtr image);
-
-signals:
-    void transform(QString devicename, Transform3D transform, double timestamp);
-    void calibration(QString devicename, Transform3D calibration);
-    void image(ImagePtr image);
-	void mesh(MeshPtr image);
-	void probedefinition(QString devicename, ProbeDefinitionPtr definition);
-    void igtlimage(IGTLinkImageMessage::Pointer igtlimage);
-    void usstatusmessage(IGTLinkUSStatusMessage::Pointer message);
-
-private slots:
-    virtual void internalDataAvailable();
-	void onInvoke(boost::function<void()> func);
-
-protected:
-
-private:
-	DialectPtr initDialect(DialectPtr value);
-	void setDialect(QString dialectname);
-	bool receiveHeader(const igtl::MessageHeader::Pointer header) const;
-    bool receiveBody(const igtl::MessageHeader::Pointer header);
-	qint64 skip(qint64 maxSizeBytes) const;
-
-    template <typename T>
-    bool receive(const igtl::MessageBase::Pointer header);
-
-    QMutex mMutex;
-
-    igtl::MessageHeader::Pointer mHeader;
-    bool mHeaderReceived;
-
-    DialectPtr mDialect;
-    typedef std::map<QString, DialectPtr> DialectMap;
-    DialectMap mAvailableDialects;
-	const QString mUid;
-};
-
-typedef boost::shared_ptr<class OpenIGTLinkClientThreadHandler> OpenIGTLinkClientThreadHandlerPtr;
-
-/** Encapsulates running of the OpenIGTLinkClient in a thread.
+/** Encapsulates running of the NetworkConnection in a thread.
  *  Lifetime of the thread equals that of this object.
  *
  */
-class org_custusx_core_openigtlink_EXPORT OpenIGTLinkClientThreadHandler : public QObject
+class org_custusx_core_openigtlink_EXPORT NetworkConnectionHandle : public QObject
 {
 	Q_OBJECT
 public:
-	explicit OpenIGTLinkClientThreadHandler(QString threadname);
-	~OpenIGTLinkClientThreadHandler();
-	OpenIGTLinkClient* client();
+	explicit NetworkConnectionHandle(QString threadname, XmlOptionFile options);
+	~NetworkConnectionHandle();
+    NetworkConnection* getNetworkConnection();
 
-	StringPropertyBasePtr getDialectOption() { return mDialects; }
+    StringPropertyBasePtr getDialectOption() { return mProtocols; }
 	StringPropertyBasePtr getIpOption() { return mIp; }
 	DoublePropertyBasePtr getPortOption() { return mPort; }
 	StringPropertyBasePtr getRoleOption() { return mRole; }
@@ -148,7 +84,7 @@ private:
 	void onPropertiesChanged();
 	StringPropertyBasePtr mIp;
 	DoublePropertyBasePtr mPort;
-	StringPropertyBasePtr mDialects;
+    StringPropertyBasePtr mProtocols;
 	StringPropertyBasePtr mRole;
 
 	StringPropertyBasePtr createDialectOption();
@@ -156,12 +92,14 @@ private:
 	DoublePropertyBasePtr createPortOption();
 	StringPropertyBasePtr createRoleOption();
 
-	OpenIGTLinkClientPtr mClient;
+	NetworkConnectionPtr mClient;
 	QThreadPtr mThread;
-	QDomElement mOptionsElement;
+	XmlOptionFile mOptions;
+
 };
 
 
 } //namespace cx
 
-#endif // CXOPENIGTLINKCLIENT_H
+
+#endif // CXNETWORKCONNECTIONHANDLE_H_
