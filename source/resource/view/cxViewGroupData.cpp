@@ -415,7 +415,7 @@ std::vector<TrackedStreamPtr> ViewGroupData::getTracked2DStreams(DataViewPropert
 	return retval;
 }
 
-std::vector<ImagePtr> ViewGroupData::getImagesAndChanging3DImagesFromTrackedStreams(DataViewProperties properties) const
+std::vector<ImagePtr> ViewGroupData::getImagesAndChangingImagesFromTrackedStreams(DataViewProperties properties, bool include2D) const
 {
 	std::vector<ImagePtr> images = this->getImages(properties);
 	std::vector<TrackedStreamPtr> streams = this->getTrackedStreams(properties);
@@ -424,6 +424,8 @@ std::vector<ImagePtr> ViewGroupData::getImagesAndChanging3DImagesFromTrackedStre
 	{
 		ImagePtr changingImage = streams[i]->getChangingImage();
 		if(streams[i]->is3D())
+			images.push_back(changingImage);
+		if(include2D && streams[i]->is2D())
 			images.push_back(changingImage);
 	}
 	return images;

@@ -315,7 +315,7 @@ void ViewWrapper2D::recreateMultiSlicer()
 
 std::vector<ImagePtr> ViewWrapper2D::getImagesToView()
 {
-	std::vector<ImagePtr> images = mGroupData->getImagesAndChanging3DImagesFromTrackedStreams(DataViewProperties::createSlice2D());
+	std::vector<ImagePtr> images = mGroupData->getImagesAndChangingImagesFromTrackedStreams(DataViewProperties::createSlice2D());
 
 	if(this->isAnyplane())
 	{
@@ -460,7 +460,7 @@ void ViewWrapper2D::imageAdded(ImagePtr image)
 
 ImagePtr ViewWrapper2D::getImageToDisplay()
 {
-	std::vector<ImagePtr> images = mGroupData->getImagesAndChanging3DImagesFromTrackedStreams(DataViewProperties::createSlice2D());
+	std::vector<ImagePtr> images = mGroupData->getImagesAndChangingImagesFromTrackedStreams(DataViewProperties::createSlice2D(), true);
     ImagePtr image;
     if (!images.empty())
         image = images.back();  // always show last in vector
