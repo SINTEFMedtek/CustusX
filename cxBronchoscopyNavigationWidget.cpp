@@ -59,7 +59,7 @@ BronchoscopyNavigationWidget::BronchoscopyNavigationWidget(ctkPluginContext *con
     mOptions = profile()->getXmlSettings().descend("bronchoscopynavigationwidget");
 
 	mPatientModelService = PatientModelServicePtr(new PatientModelServiceProxy(context));
-	mVisualizationService = VisualizationServicePtr(new VisualizationServiceProxy(context));
+	mViewService = ViewServicePtr(new ViewServiceProxy(context));
 	mTrackingService = TrackingServiceProxy::create(context);
 
 
@@ -91,10 +91,10 @@ BronchoscopyNavigationWidget::BronchoscopyNavigationWidget(ctkPluginContext *con
 
     PropertyPtr maxDistanceToCenterline = mProjectionCenterlinePtr->getMaxDistanceToCenterlineOption();
 
-	mVerticalLayout->addWidget(new DataSelectWidget(mVisualizationService, mPatientModelService, this, mSelectMeshWidget));
+	mVerticalLayout->addWidget(new DataSelectWidget(mViewService, mPatientModelService, this, mSelectMeshWidget));
 	mVerticalLayout->addWidget(mProcessCenterlineButton);
 	mVerticalLayout->addWidget(new CheckBoxWidget(this, mUseAdvancedCenterlineProjection));
-	mVerticalLayout->addWidget(createDataWidget(mVisualizationService, mPatientModelService, this, maxDistanceToCenterline));
+	mVerticalLayout->addWidget(createDataWidget(mViewService, mPatientModelService, this, maxDistanceToCenterline));
 	mVerticalLayout->addWidget(mEnableButton);
 	mVerticalLayout->addWidget(mDisableButton);
 	mVerticalLayout->addStretch();

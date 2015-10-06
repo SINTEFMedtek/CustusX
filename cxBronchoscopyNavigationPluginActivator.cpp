@@ -51,9 +51,9 @@ BronchoscopyNavigationPluginActivator::~BronchoscopyNavigationPluginActivator()
 
 void BronchoscopyNavigationPluginActivator::start(ctkPluginContext* context)
 {
-	//VisualizationServicePtr visualizationService = VisualizationServicePtr(context);
+	//ViewServicePtr viewService = ViewServicePtr(context);
 //	PatientModelServicePtr patientModelService = PatientModelServicePtr(new PatientModelServiceProxy(context));
-//	VisualizationServicePtr visualizationService = VisualizationServicePtr(new VisualizationServiceProxy(context));
+//	ViewServicePtr viewService = ViewServicePtr(new ViewServiceProxy(context));
 	BronchoscopyNavigationGUIExtenderService *bronchoscopyNavigationService = new BronchoscopyNavigationGUIExtenderService(context);
 	mRegistration = RegisteredServicePtr(new RegisteredService(context, bronchoscopyNavigationService, GUIExtenderService_iid));
 }

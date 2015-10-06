@@ -89,7 +89,7 @@ private:
 
 
 	PatientModelServicePtr mPatientModelService;
-	VisualizationServicePtr mVisualizationService;
+	ViewServicePtr mViewService;
 	TrackingServicePtr mTrackingService;
 
 	XmlOptionFile mOptions;
