@@ -39,9 +39,50 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReporter.h"
 #include "boost/bind.hpp"
 #include <QScreen>
+#include <QVBoxLayout>
+#include "cxViewService.h"
+//#include "cxSecondaryViewLayoutWindow.h"
+#include "cxViewCollectionWidget.h"
+#include "vtkRenderer.h"
+#include "vtkWindowToImageFilter.h"
+#include "vtkRenderWindow.h"
+#include "vtkPNGWriter.h"
+#include "vtkUnsignedCharArray.h"
 
 namespace cx
 {
+
+SecondaryViewLayoutWindow::SecondaryViewLayoutWindow(QWidget* parent, VisualizationServicePtr viewService) :
+	QWidget(parent),
+	mViewService(viewService)
+{
+	this->setLayout(new QVBoxLayout(this));
+	this->layout()->setMargin(0);
+	this->setWindowTitle("View Layout");
+}
+
+void SecondaryViewLayoutWindow::showEvent(QShowEvent* event)
+{
+	QWidget* widget = mViewService->getLayoutWidget(this, 1);
+	this->layout()->addWidget(widget);
+	if (mViewService->getActiveLayout(1).isEmpty())
+		mViewService->setActiveLayout("LAYOUT_OBLIQUE_3DAnyDual_x1", 1);
+}
+
+void SecondaryViewLayoutWindow::hideEvent(QCloseEvent* event)
+{
+	mViewService->setActiveLayout("", 1);
+}
+
+void SecondaryViewLayoutWindow::closeEvent(QCloseEvent *event)
+{
+	mViewService->setActiveLayout("", 1);
+}
+
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
 
 ScreenVideoProvider::ScreenVideoProvider(VisServicesPtr services) :
 	mServices(services)
@@ -50,19 +91,17 @@ ScreenVideoProvider::ScreenVideoProvider(VisServicesPtr services) :
 }
 
 
-void ScreenVideoProvider::saveScreenShot(QPixmap pixmap, QString id)
+void ScreenVideoProvider::saveScreenShot(QImage image, QString id)
 {
 	QString ending = "png";
 	if (!id.isEmpty())
 		ending = id + "." + ending;
 	QString path = mServices->patientModelService->generateFilePath("Screenshots", ending);
-	QtConcurrent::run(boost::bind(&ScreenVideoProvider::saveScreenShotThreaded, this, pixmap.toImage(), path));
+	QtConcurrent::run(boost::bind(&ScreenVideoProvider::saveScreenShotThreaded, this, image, path));
 }
 
-QByteArray ScreenVideoProvider::generatePNGEncoding(QPixmap pixmap)
+QByteArray ScreenVideoProvider::generatePNGEncoding(QImage image)
 {
-	QImage image = pixmap.toImage();
-
 	QByteArray ba;
 	QBuffer buffer(&ba);
 	buffer.open(QIODevice::WriteOnly);
@@ -113,5 +152,72 @@ QPixmap ScreenVideoProvider::grabScreen(unsigned screenid)
 //	}
 
 //}
+
+
+void ScreenVideoProvider::showSecondaryLayout()
+{
+	std::cout << "show window" << std::endl;
+	if (!mSecondaryViewLayoutWindow)
+		mSecondaryViewLayoutWindow = new SecondaryViewLayoutWindow(NULL, mServices->visualizationService);
+	mSecondaryViewLayoutWindow->show();
+
+	QRect rect = QRect(QPoint(50,50), QSize(320,568));
+	mSecondaryViewLayoutWindow->setGeometry(rect);
+	mSecondaryViewLayoutWindow->move(rect.topLeft());
+}
+
+vtkImageDataPtr ScreenVideoProvider::view2vtkImageData(ViewPtr view)
+{
+	Eigen::Array4d vp(view->getRenderer()->GetViewport());
+	vtkWindowToImageFilterPtr w2i = vtkWindowToImageFilterPtr::New();
+	w2i->SetInput(view->getRenderWindow());
+	w2i->SetViewport(vp.data());
+	w2i->SetReadFrontBuffer(false);
+	w2i->Update();
+	CX_LOG_CHANNEL_DEBUG("CA") << "Updated view " << vp;
+	vtkImageDataPtr image = w2i->GetOutput();
+	return image;
+}
+
+QImage ScreenVideoProvider::vtkImageData2QImage(vtkImageDataPtr input)
+{
+	unsigned char* ptr = reinterpret_cast<unsigned char*>(input->GetScalarPointer());
+	Eigen::Array3i dim(input->GetDimensions());
+//	int len = image->GetNumberOfScalarComponents() * image->GetScalarSize() * dim[0] * dim[1];
+
+	QImage retval(ptr, dim[0], dim[1], QImage::Format_RGB888);
+	return retval;
+}
+
+QImage ScreenVideoProvider::grabSecondaryLayout()
+{
+	QWidget* widget = mServices->visualizationService->getLayoutWidget(NULL, 1);
+	ViewCollectionWidget* vcWidget = dynamic_cast<ViewCollectionWidget*>(widget);
+	std::vector<ViewPtr> views = vcWidget->getViews();
+
+	CX_LOG_CHANNEL_DEBUG("CA") << "views: " << views.size();
+	for (unsigned i=0; i<views.size(); ++i)
+	{
+		vtkImageDataPtr vtkImage = this->view2vtkImageData(views[i]);
+		QImage qImage = vtkImageData2QImage(vtkImage);
+		return qImage;
+
+//		char* ptr = reinterpret_cast<char*>(image->GetScalarPointer());
+//		QImage img();
+//		Eigen::Array3i dim(image->GetDimensions());
+//		int len = image->GetNumberOfScalarComponents() * image->GetScalarSize() * dim[0] * dim[1];
+//		pm.loadFromData(reinterpret_cast<char*>(image->GetScalarPointer()), len);
+
+//		vtkPNGWriterPtr writer = vtkPNGWriterPtr::New();
+//		writer->SetWriteToMemory(true);
+//		writer->SetInputData(image);
+//		writer->SetCompressionLevel(0);
+//		writer->Write();
+//		vtkUnsignedCharArrayPtr result = writer->GetResult();
+	}
+
+	return QImage();
+}
+
 
 } // namespace cx

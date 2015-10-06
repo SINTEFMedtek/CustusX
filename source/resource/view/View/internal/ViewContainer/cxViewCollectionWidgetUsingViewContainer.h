@@ -66,6 +66,7 @@ public:
 	virtual void render();
 	virtual void setGridSpacing(int val);
 	virtual void setGridMargin(int val);
+	virtual std::vector<ViewPtr> getViews();
 
 private:
 	std::vector<ViewPtr> mViews;

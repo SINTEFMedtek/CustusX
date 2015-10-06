@@ -151,4 +151,12 @@ void ViewCollectionWidgetMixed::setGridMargin(int val)
 	mLayout->setMargin(val);
 }
 
+std::vector<ViewPtr> ViewCollectionWidgetMixed::getViews()
+{
+	std::vector<ViewPtr> retval = mBaseLayout->getViews();
+	for (unsigned i=0; i<mOverlays.size(); ++i)
+		retval.push_back(mOverlays[i]->getView());
+	return retval;
+}
+
 } /* namespace cx */

@@ -115,9 +115,16 @@ void NetworkPluginActivator::handle_request(QHttpRequest *req, QHttpResponse *re
 	{
 		this->handle_screenshot(req, resp);
 	}
+	else if (req->path() == "/image/viewshot")
+	{
+		this->handle_viewshot(req, resp);
+//		this->handle_view3D(req, resp);
+	}
 	else if (req->path() == "/image/view3D")
 	{
-		this->handle_view3D(req, resp);
+		mScreenVideo->showSecondaryLayout();
+		this->handle_default(req, resp);
+//		this->handle_view3D(req, resp);
 	}
 	else if (req->path() == "/layout?list")
 	{
@@ -147,9 +154,24 @@ void NetworkPluginActivator::handle_view3D(QHttpRequest *req, QHttpResponse *res
 {
 	std::cout << "handle_view3D" << std::endl;
 
-	QPixmap pm = mScreenVideo->grabScreen(0);
-//	mScreenVideo->saveScreenShot(pm, "webimage");
-	QByteArray ba = mScreenVideo->generatePNGEncoding(pm);
+	QImage image = mScreenVideo->grabScreen(0).toImage();
+	mScreenVideo->saveScreenShot(image, "webimage");
+	QByteArray ba = mScreenVideo->generatePNGEncoding(image);
+
+	resp->setHeader("Content-Type", "image/png");
+	resp->setHeader("Content-Length", QString::number(ba.size()));
+	resp->writeHead(200); // everything is OK
+	resp->write(ba);
+	resp->end();
+}
+
+void NetworkPluginActivator::handle_viewshot(QHttpRequest *req, QHttpResponse *resp)
+{
+	std::cout << "handle_viewshot" << std::endl;
+
+	QImage image = mScreenVideo->grabSecondaryLayout();
+	mScreenVideo->saveScreenShot(image, "webimage_view");
+	QByteArray ba = mScreenVideo->generatePNGEncoding(image);
 
 	resp->setHeader("Content-Type", "image/png");
 	resp->setHeader("Content-Length", QString::number(ba.size()));
@@ -162,9 +184,9 @@ void NetworkPluginActivator::handle_screenshot(QHttpRequest *req, QHttpResponse 
 {
 	std::cout << "handle_screenshot" << std::endl;
 
-	QPixmap pm = mScreenVideo->grabScreen(0);
+	QImage image = mScreenVideo->grabScreen(0).toImage();
 //	mScreenVideo->saveScreenShot(pm, "webimage");
-	QByteArray ba = mScreenVideo->generatePNGEncoding(pm);
+	QByteArray ba = mScreenVideo->generatePNGEncoding(image);
 
 	resp->setHeader("Content-Type", "image/png");
 	resp->setHeader("Content-Length", QString::number(ba.size()));

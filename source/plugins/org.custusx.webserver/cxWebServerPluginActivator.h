@@ -74,6 +74,7 @@ private slots:
 	void handle_view3D(QHttpRequest *req, QHttpResponse *resp);
 	void handle_default(QHttpRequest *req, QHttpResponse *resp);
 	void handle_screenshot(QHttpRequest *req, QHttpResponse *resp);
+	void handle_viewshot(QHttpRequest *req, QHttpResponse *resp);
 
 	void handle_stream(QHttpRequest *req, QHttpResponse *resp);
 	void handle_helloworld(QHttpRequest *req, QHttpResponse *resp);

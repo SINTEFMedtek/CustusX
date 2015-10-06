@@ -101,5 +101,11 @@ void ViewCollectionWidgetUsingViewContainer::setGridMargin(int val)
 	mViewContainer->getGridLayout()->setMargin(val);
 }
 
+std::vector<ViewPtr> ViewCollectionWidgetUsingViewContainer::getViews()
+{
+	return mViews;
+}
+
+
 
 } /* namespace cx */

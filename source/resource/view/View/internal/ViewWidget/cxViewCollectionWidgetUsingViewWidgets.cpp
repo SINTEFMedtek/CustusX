@@ -127,4 +127,12 @@ void LayoutWidgetUsingViewWidgets::setGridMargin(int val)
 	mLayout->setMargin(val);
 }
 
+std::vector<ViewPtr> LayoutWidgetUsingViewWidgets::getViews()
+{
+	std::vector<ViewPtr> retval;
+	for (unsigned i=0; i<mViews.size(); ++i)
+		retval.push_back(mViews[i]->getView());
+	return retval;
+}
+
 } // cx
