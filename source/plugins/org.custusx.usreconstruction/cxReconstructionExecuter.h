@@ -55,9 +55,9 @@ class org_custusx_usreconstruction_EXPORT ReconstructionExecuter : public QObjec
 {
 	Q_OBJECT
 public:
-	ReconstructionExecuter(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService) :
+	ReconstructionExecuter(PatientModelServicePtr patientModelService, ViewServicePtr viewService) :
 	mPatientModelService(patientModelService),
-	mVisualizationService(visualizationService)
+	mViewService(viewService)
 	{}
 
 	/** Execute the reconstruction in asynchronously.
@@ -96,7 +96,7 @@ private:
 	std::vector<ReconstructCorePtr> mCores;
 	cx::TimedAlgorithmPtr mPipeline;
 	PatientModelServicePtr mPatientModelService;
-	VisualizationServicePtr mVisualizationService;
+	ViewServicePtr mViewService;
 };
 
 } /* namespace cx */

@@ -55,7 +55,7 @@ namespace cxtest
 {
 
 ReconstructionManagerTestFixture::ReconstructionManagerTestFixture() :
-	mVisualizationService(cx::VisualizationService::getNullObject())
+	mViewService(cx::ViewService::getNullObject())
 {
 	mVerbose = false;
 	cx::DataLocations::setTestMode();
@@ -94,7 +94,7 @@ void ReconstructionManagerTestFixture::reconstruct()
 	cx::UsReconstructionServicePtr reconstructer = this->getManager();
 	bool createBModeWhenAngio = reconstructer->getParam("Dual Angio")->getValueAsVariant().toBool();
 
-	cx::ReconstructionExecuterPtr executer(new cx::ReconstructionExecuter(mPatientModelService, mVisualizationService));
+	cx::ReconstructionExecuterPtr executer(new cx::ReconstructionExecuter(mPatientModelService, mViewService));
 
 	executer->startNonThreadedReconstruction(reconstructer->createAlgorithm(),
 			reconstructer->createCoreParameters(),
@@ -109,7 +109,7 @@ void ReconstructionManagerTestFixture::threadedReconstruct()
 	mOutput.clear();
 	cx::UsReconstructionServicePtr reconstructer = this->getManager();
 
-	cx::ReconstructionExecuterPtr executer(new cx::ReconstructionExecuter(mPatientModelService, mVisualizationService));
+	cx::ReconstructionExecuterPtr executer(new cx::ReconstructionExecuter(mPatientModelService, mViewService));
 
 	bool createBModeWhenAngio = reconstructer->getParam("Dual Angio")->getValueAsVariant().toBool();
 	executer->startReconstruction(reconstructer->createAlgorithm(),

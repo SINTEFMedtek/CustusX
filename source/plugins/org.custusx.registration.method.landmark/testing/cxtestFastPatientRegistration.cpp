@@ -40,9 +40,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace
 {
-typedef boost::shared_ptr<class VisualizationServiceFixture> VisualizationServiceFixturePtr;
+typedef boost::shared_ptr<class ViewServiceFixture> ViewServiceFixturePtr;
 typedef boost::shared_ptr<class TestRegServices> TestRegServicesPtr;
-class VisualizationServiceFixture : public cx::VisualizationServiceNull
+class ViewServiceFixture : public cx::ViewServiceNull
 {
 public:
 	void emitPointSampled()
@@ -58,12 +58,12 @@ public:
 	{
 		return TestRegServicesPtr(new TestRegServices(context));
 	}
-	VisualizationServiceFixturePtr viewFixture;
+	ViewServiceFixturePtr viewFixture;
 protected:
 	TestRegServices(ctkPluginContext* context) :
 		RegServices(context)
 	{
-		viewFixture = VisualizationServiceFixturePtr(new VisualizationServiceFixture());
+		viewFixture = ViewServiceFixturePtr(new ViewServiceFixture());
 		this->mViewService = viewFixture;
 	}
 };
@@ -83,7 +83,7 @@ public:
 		cx::LogicManager::shutdown();
 	}
 
-	VisualizationServiceFixturePtr view()
+	ViewServiceFixturePtr view()
 	{
 		return mServices->viewFixture;
 	}

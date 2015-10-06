@@ -43,10 +43,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-DataSelectWidget::DataSelectWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget *parent, SelectDataStringPropertyBasePtr data, QGridLayout* gridLayout, int row) :
+DataSelectWidget::DataSelectWidget(ViewServicePtr viewService, PatientModelServicePtr patientModelService, QWidget *parent, SelectDataStringPropertyBasePtr data, QGridLayout* gridLayout, int row) :
     BaseWidget(parent, "DataSelectWidget", "DataSelectWidget"),
 	mData(data),
-	mVisualizationService(visualizationService),
+	mViewService(viewService),
 	mPatientModelService(patientModelService)
 {
 
@@ -92,7 +92,7 @@ DataSelectWidget::DataSelectWidget(VisualizationServicePtr visualizationService,
 		layout->addWidget(removeButton);
     }
 
-	connect(mVisualizationService.get(), SIGNAL(activeViewChanged()), this, SLOT(viewGroupChangedSlot()));
+	connect(mViewService.get(), SIGNAL(activeViewChanged()), this, SLOT(viewGroupChangedSlot()));
     connect(mData.get(), SIGNAL(changed()), this, SLOT(updateDataVisibility()));
 
     this->setRemoveIcon();
@@ -101,15 +101,15 @@ DataSelectWidget::DataSelectWidget(VisualizationServicePtr visualizationService,
 
 DataSelectWidget::~DataSelectWidget()
 {
-	disconnect(mVisualizationService.get(), SIGNAL(activeViewChanged()), this, SLOT(viewGroupChangedSlot()));
+	disconnect(mViewService.get(), SIGNAL(activeViewChanged()), this, SLOT(viewGroupChangedSlot()));
 }
 
 ViewGroupDataPtr DataSelectWidget::getActiveViewGroupData()
 {
-	int groupIdx = mVisualizationService->getActiveGroupId();
+	int groupIdx = mViewService->getActiveGroupId();
     if (groupIdx<0)
         groupIdx = 0;
-	return mVisualizationService->getGroup(groupIdx);
+	return mViewService->getGroup(groupIdx);
 }
 
 void DataSelectWidget::viewGroupChangedSlot()

@@ -52,7 +52,7 @@ class cxGui_EXPORT StreamPropertiesWidget : public TabbedWidget
 {
 	Q_OBJECT
 public:
-	StreamPropertiesWidget(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget* parent);
+	StreamPropertiesWidget(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget* parent);
 
 private slots:
 	void streamSelectedSlot();

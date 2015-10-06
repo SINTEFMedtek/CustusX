@@ -43,8 +43,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx {
 
-ToolMetricWrapper::ToolMetricWrapper(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, cx::ToolMetricPtr data) :
-	MetricBase(visualizationService, patientModelService),
+ToolMetricWrapper::ToolMetricWrapper(ViewServicePtr viewService, PatientModelServicePtr patientModelService, cx::ToolMetricPtr data) :
+	MetricBase(viewService, patientModelService),
 	mData(data)
 {
 	mInternalUpdate = false;
@@ -75,8 +75,8 @@ QWidget* ToolMetricWrapper::createWidget()
 	hLayout->setMargin(0);
 	topLayout->addLayout(hLayout);
 
-	hLayout2->addWidget(createDataWidget(mVisualizationService, mPatientModelService, widget, mToolNameSelector));
-	hLayout2->addWidget(createDataWidget(mVisualizationService, mPatientModelService, widget, mToolOffsetSelector));
+	hLayout2->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mToolNameSelector));
+	hLayout2->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mToolOffsetSelector));
 
 	hLayout->addWidget(new SpaceEditWidget(widget, mSpaceSelector));
 

@@ -126,7 +126,7 @@ cx::CompositeTimedAlgorithmPtr ReconstructionExecuter::assembleReconstructionPip
 	}
 
 	for (unsigned i=0; i<cores.size(); ++i)
-		temp->append(ThreadedTimedReconstructCore::create(mPatientModelService, mVisualizationService, cores[i]));
+		temp->append(ThreadedTimedReconstructCore::create(mPatientModelService, mViewService, cores[i]));
 
 	return pipeline;
 }

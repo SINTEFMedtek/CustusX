@@ -41,12 +41,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxData.h"
 class QActionGroup;
 
-#define VisualizationService_iid "cx::VisualizationService"
+#define ViewService_iid "cx::ViewService"
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class VisualizationService> VisualizationServicePtr;
+typedef boost::shared_ptr<class ViewService> ViewServicePtr;
 typedef boost::shared_ptr<class ViewGroup> ViewGroupPtr;
 typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
 typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
@@ -65,7 +65,7 @@ typedef boost::shared_ptr<class RepContainer> RepContainerPtr;
  *  \date 2014-09-19
  *  \author Ole Vegard Solberg, SINTEF
  */
-class cxResourceVisualization_EXPORT VisualizationService : public QObject
+class cxResourceVisualization_EXPORT ViewService : public QObject
 {
 	Q_OBJECT
 public:
@@ -96,7 +96,7 @@ public:
 	virtual QActionGroup* createInteractorStyleActionGroup() = 0;
 
 	virtual bool isNull() = 0;
-	static VisualizationServicePtr getNullObject();
+	static ViewServicePtr getNullObject();
 
 	// extended Data interface
 	ViewGroupDataPtr getActiveViewGroup();
@@ -112,9 +112,7 @@ public slots:
 
 };
 
-typedef VisualizationService ViewService;
-
 } //cx
-Q_DECLARE_INTERFACE(cx::VisualizationService, VisualizationService_iid)
+Q_DECLARE_INTERFACE(cx::ViewService, ViewService_iid)
 
 #endif // CXVIEWSERVICE_H_

@@ -120,7 +120,7 @@ void LandmarkRegistrationWidget::showEvent(QShowEvent* event)
 	connect(mServices->patient()->getPatientLandmarks().get(), &Landmarks::landmarkAdded, this, &LandmarkRegistrationWidget::landmarkUpdatedSlot);
 	connect(mServices->patient()->getPatientLandmarks().get(), &Landmarks::landmarkRemoved, this, &LandmarkRegistrationWidget::landmarkUpdatedSlot);
 
-	connect(mServices->view().get(), &VisualizationService::activeLayoutChanged, mLandmarkListener.get(), &LandmarkListener::showRep);
+	connect(mServices->view().get(), &ViewService::activeLayoutChanged, mLandmarkListener.get(), &LandmarkListener::showRep);
 
 //	mManager->restart();
 	mServices->registration()->setLastRegistrationTime(QDateTime::currentDateTime());
@@ -134,7 +134,7 @@ void LandmarkRegistrationWidget::hideEvent(QHideEvent* event)
 	disconnect(mServices->patient().get(), &PatientModelService::landmarkPropertiesChanged, this, &LandmarkRegistrationWidget::landmarkUpdatedSlot);
 	disconnect(mServices->patient()->getPatientLandmarks().get(), &Landmarks::landmarkAdded, this, &LandmarkRegistrationWidget::landmarkUpdatedSlot);
 	disconnect(mServices->patient()->getPatientLandmarks().get(), &Landmarks::landmarkRemoved, this, &LandmarkRegistrationWidget::landmarkUpdatedSlot);
-	disconnect(mServices->view().get(), &VisualizationService::activeLayoutChanged, mLandmarkListener.get(), &LandmarkListener::showRep);
+	disconnect(mServices->view().get(), &ViewService::activeLayoutChanged, mLandmarkListener.get(), &LandmarkListener::showRep);
 	mLandmarkListener->hideRep();
 }
 

@@ -64,9 +64,9 @@ void FastPatientRegistrationWidget::performRegistration()
 void FastPatientRegistrationWidget::mouseClickSampleStateChanged()
 {
 	if(mMouseClickSample->isChecked())
-		connect(mServices->view().get(), &VisualizationService::pointSampled, this, &FastPatientRegistrationWidget::pointSampled);
+		connect(mServices->view().get(), &ViewService::pointSampled, this, &FastPatientRegistrationWidget::pointSampled);
 	else
-		disconnect(mServices->view().get(), &VisualizationService::pointSampled, this, &FastPatientRegistrationWidget::pointSampled);
+		disconnect(mServices->view().get(), &ViewService::pointSampled, this, &FastPatientRegistrationWidget::pointSampled);
 }
 
 QTableWidgetItem * FastPatientRegistrationWidget::getLandmarkTableItem()

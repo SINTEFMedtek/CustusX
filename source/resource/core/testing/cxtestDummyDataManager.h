@@ -60,11 +60,11 @@ public:
 	~TestVisServices();
 //	static TestVisServices getNullObjects();
 
-//	VisualizationServicePtr view() { return visualizationService;}
+//	ViewServicePtr view() { return viewService;}
 
 protected:
 //	TestVisServices();
-//	VisualizationServicePtr visualizationService;
+//	ViewServicePtr viewService;
 };
 
 //struct CXTESTRESOURCE_EXPORT TestServicesType

@@ -40,7 +40,7 @@ namespace cx
 {
 typedef boost::shared_ptr<class RegServices> RegServicesPtr;
 typedef boost::shared_ptr<class RegistrationService> RegistrationServicePtr;
-typedef boost::shared_ptr<class VisualizationService> VisualizationServicePtr;
+typedef boost::shared_ptr<class ViewService> ViewServicePtr;
 typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
 
 /**

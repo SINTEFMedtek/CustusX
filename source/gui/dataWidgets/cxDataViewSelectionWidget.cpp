@@ -488,8 +488,8 @@ protected:
 
 };
 
-DataViewSelectionWidget::DataViewSelectionWidget(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget* parent) :
-	mVisualizationService(visualizationService)
+DataViewSelectionWidget::DataViewSelectionWidget(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget* parent) :
+	mViewService(viewService)
 {
   // TODO Auto-generated constructor stub
   QHBoxLayout* layout = new QHBoxLayout(this);
@@ -534,17 +534,17 @@ DataViewSelectionWidget::DataViewSelectionWidget(PatientModelServicePtr patientM
   allLayout->addWidget(mAllDataListWidget);
   layout->addLayout(allLayout);
 
-  connect(mVisualizationService.get(), SIGNAL(activeViewChanged()), this, SLOT(viewGroupChangedSlot()));
+  connect(mViewService.get(), SIGNAL(activeViewChanged()), this, SLOT(viewGroupChangedSlot()));
   this->viewGroupChangedSlot();
 }
 
 void DataViewSelectionWidget::viewGroupChangedSlot()
 {
-  int vg = mVisualizationService->getActiveGroupId();
+  int vg = mViewService->getActiveGroupId();
   if (vg<0)
     vg = 0;
 
-  ViewGroupDataPtr group = mVisualizationService->getGroup(vg);
+  ViewGroupDataPtr group = mViewService->getGroup(vg);
   if (group)
 	  mSelectedDataListWidget->setViewGroupData(group);
 

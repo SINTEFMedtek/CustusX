@@ -40,7 +40,7 @@ namespace cx
 {
 
 typedef boost::shared_ptr<class VisServices> VisServicesPtr;
-typedef boost::shared_ptr<class VisualizationService> VisualizationServicePtr;
+typedef boost::shared_ptr<class ViewService> ViewServicePtr;
 
 /**
  * Convenience class combining all services used by visualization.
@@ -57,11 +57,11 @@ public:
 	VisServices(ctkPluginContext* context);
 	static VisServicesPtr getNullObjects();
 
-	VisualizationServicePtr view() { return mViewService;}
+	ViewServicePtr view() { return mViewService;}
 
 protected:
 	VisServices();
-	VisualizationServicePtr mViewService;
+	ViewServicePtr mViewService;
 };
 
 

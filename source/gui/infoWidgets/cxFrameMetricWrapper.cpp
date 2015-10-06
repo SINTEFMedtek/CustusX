@@ -41,8 +41,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx {
 
-FrameMetricWrapper::FrameMetricWrapper(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, cx::FrameMetricPtr data) :
-	MetricBase(visualizationService, patientModelService),
+FrameMetricWrapper::FrameMetricWrapper(ViewServicePtr viewService, PatientModelServicePtr patientModelService, cx::FrameMetricPtr data) :
+	MetricBase(viewService, patientModelService),
 	mData(data)
 {
 	mInternalUpdate = false;

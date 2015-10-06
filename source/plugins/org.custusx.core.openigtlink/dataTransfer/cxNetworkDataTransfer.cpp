@@ -56,7 +56,7 @@ NetworkDataTransfer::NetworkDataTransfer(ctkPluginContext *context, NetworkConne
 	mOptions = profile()->getXmlSettings().descend(this->getConfigUid());
 
 	mPatientModelService = PatientModelServiceProxy::create(context);
-	mViewService = VisualizationServiceProxy::create(context);
+	mViewService = ViewServiceProxy::create(context);
 	mVideoService = VideoServiceProxy::create(context);
 
 //	mOpenIGTLink.reset(new NetworkConnectionHandle(this->getConfigUid()));
