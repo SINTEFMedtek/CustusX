@@ -41,12 +41,30 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace
 {
 typedef boost::shared_ptr<class VisualizationServiceFixture> VisualizationServiceFixturePtr;
+typedef boost::shared_ptr<class TestRegServices> TestRegServicesPtr;
 class VisualizationServiceFixture : public cx::VisualizationServiceNull
 {
 public:
 	void emitPointSampled()
 	{
 		emit pointSampled(cx::Vector3D(1, 1, 1));
+	}
+};
+
+class TestRegServices : public cx::RegServices
+{
+public:
+	static TestRegServicesPtr create(ctkPluginContext* context)
+	{
+		return TestRegServicesPtr(new TestRegServices(context));
+	}
+	VisualizationServiceFixturePtr viewFixture;
+protected:
+	TestRegServices(ctkPluginContext* context) :
+		RegServices(context)
+	{
+		viewFixture = VisualizationServiceFixturePtr(new VisualizationServiceFixture());
+		this->mViewService = viewFixture;
 	}
 };
 
@@ -57,20 +75,22 @@ public:
 	FastPatientRegistrationWidgetHelper()
 	{
 		cx::LogicManager::initialize();
-		cx::RegServicesPtr services = cx::RegServices::create(cx::logicManager()->getPluginContext());
-
-		viewFixture = VisualizationServiceFixturePtr(new VisualizationServiceFixture());
-		services->mVisualizationService = viewFixture;
-
-		widgetFixture = cxtest::FastPatientRegistrationWidgetFixturePtr(new cxtest::FastPatientRegistrationWidgetFixture(services, NULL));
+		mServices = TestRegServices::create(cx::logicManager()->getPluginContext());
+		widgetFixture = cxtest::FastPatientRegistrationWidgetFixturePtr(new cxtest::FastPatientRegistrationWidgetFixture(mServices, NULL));
 	}
 	~FastPatientRegistrationWidgetHelper()
 	{
 		cx::LogicManager::shutdown();
 	}
 
+	VisualizationServiceFixturePtr view()
+	{
+		return mServices->viewFixture;
+	}
+
 	cxtest::FastPatientRegistrationWidgetFixturePtr widgetFixture;
-	VisualizationServiceFixturePtr viewFixture;
+protected:
+	TestRegServicesPtr mServices;
 };
 
 }//namespace
@@ -97,16 +117,16 @@ TEST_CASE("FastPatientRegistrationWidget: Receive pointSampled signals when samp
 {
 	FastPatientRegistrationWidgetHelper helper;
 
-	helper.viewFixture->emitPointSampled();
+	helper.view()->emitPointSampled();
 	CHECK_FALSE(helper.widgetFixture->mPointSampled);
 
 	helper.widgetFixture->triggerShowEvent();
-	helper.viewFixture->emitPointSampled();
+	helper.view()->emitPointSampled();
 	CHECK(helper.widgetFixture->mPointSampled);
 
 	helper.widgetFixture->mPointSampled = false;
 	helper.widgetFixture->triggerHideEvent();
-	helper.viewFixture->emitPointSampled();
+	helper.view()->emitPointSampled();
 	CHECK_FALSE(helper.widgetFixture->mPointSampled);
 }
 

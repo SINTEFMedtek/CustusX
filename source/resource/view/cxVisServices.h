@@ -57,11 +57,11 @@ public:
 	VisServices(ctkPluginContext* context);
 	static VisServicesPtr getNullObjects();
 
-	VisualizationServicePtr view() { return mVisualizationService;}
+	VisualizationServicePtr view() { return mViewService;}
 
-	VisualizationServicePtr mVisualizationService;//TODO: Fix: Moved from protected temporarily
 protected:
 	VisServices();
+	VisualizationServicePtr mViewService;
 };
 
 
