@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxSessionStorageService.h"
 #include "cxVisServices.h"
-#include "cxtestDummyDataManager.h"
+#include "cxtestVisServices.h"
 
 TEST_CASE("DilationFilter: execute", "[unit][modules][Algorithm][DilationFilter]")
 {

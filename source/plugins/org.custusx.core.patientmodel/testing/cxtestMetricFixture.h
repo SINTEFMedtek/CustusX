@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPointMetric.h"
 #include "cxPlaneMetric.h"
 #include <QDomNode>
-#include "cxtestDummyDataManager.h"
+#include "cxtestVisServices.h"
 #include "cxMessageListener.h"
 #include "cxPatientModelService.h"
 #include "cxTypeConversions.h"

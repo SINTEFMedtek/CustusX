@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "catch.hpp"
-#include "cxtestDummyDataManager.h"
+#include "cxtestVisServices.h"
 
 #include "cxMessageListener.h"
 

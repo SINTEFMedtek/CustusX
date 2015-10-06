@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxtestresourcevisualization_export.h"
 
-#include "cxtestDummyDataManager.h"
+#include "cxtestVisServices.h"
 #include "cxMessageListener.h"
 #include "cxForwardDeclarations.h"
 #include "cxDefinitions.h"

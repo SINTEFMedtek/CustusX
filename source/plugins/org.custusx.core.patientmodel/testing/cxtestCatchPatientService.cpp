@@ -32,7 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "catch.hpp"
 #include "cxDataManagerImpl.h"
-#include "cxtestDummyDataManager.h"
 #include "cxtestDirectSignalListener.h"
 #include "cxtestSessionStorageTestFixture.h"
 #include "cxPatientData.h"

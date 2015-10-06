@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImageTF3D.h"
 #include "cxImageLUT2D.h"
 #include "cxDataLocations.h"
-#include "cxtestDummyDataManager.h"
+#include "cxtestVisServices.h"
 #include "cxPatientModelService.h"
 
 using namespace cx;

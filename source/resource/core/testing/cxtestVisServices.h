@@ -45,11 +45,9 @@ namespace cxtest
 typedef boost::shared_ptr<class TestVisServices> TestVisServicesPtr;
 
 /**
- * Convenience class combining all services used by visualization.
+ * Test version of cx::VisServices.
  *
- * \ingroup cx_resource_view
- *
- * \date Nov 14 2014
+ * \date Oct 6 2015
  * \author Ole Vegard Solberg, SINTEF
  */
 class CXTESTRESOURCE_EXPORT TestVisServices : public cx::VisServices
@@ -58,43 +56,8 @@ public:
 	static TestVisServicesPtr create();
 	TestVisServices();
 	~TestVisServices();
-//	static TestVisServices getNullObjects();
-
-//	ViewServicePtr view() { return viewService;}
-
-protected:
-//	TestVisServices();
-//	ViewServicePtr viewService;
 };
 
-//struct CXTESTRESOURCE_EXPORT TestServicesType
-//{
-//	cx::PatientModelServicePtr mPatientModelService;
-//	cx::SpaceProviderPtr mSpaceProvider;
-//	cx::TrackingServicePtr mTrackingService;
-//};
-
-//TestServicesType CXTESTRESOURCE_EXPORT createDummyCoreServices();
-//void CXTESTRESOURCE_EXPORT destroyDummyCoreServices(TestServicesType& services);
-
-//typedef boost::shared_ptr<class TestServices> TestServicesPtr;
-
-///** A minimal set of services for test usage.
-//  */
-//class CXTESTRESOURCE_EXPORT TestServices : public TestServicesType
-//{
-//public:
-//	static TestServicesPtr create();
-//	~TestServices();
-
-//	cx::PatientModelServicePtr patientModelService() { return mPatientModelService; }
-//	cx::SpaceProviderPtr spaceProvider() { return mSpaceProvider; }
-//	cx::TrackingServicePtr trackingService() { return mTrackingService; }
-
-//private:
-//	TestServices();
-//};
-
-} // namespace cx
+} // namespace cxtest
 
 #endif // CXTESTDUMMYDATAMANAGER_H

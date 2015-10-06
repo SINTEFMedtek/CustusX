@@ -30,7 +30,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "catch.hpp"
-#include "cxtestDummyDataManager.h"
+#include "cxtestVisServices.h"
 #include "cxStream2DRep3D.h"
 #include "cxTrackedStream.h"
 #include "cxDummyTool.h"

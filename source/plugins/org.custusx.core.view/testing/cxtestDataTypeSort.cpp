@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxCoreServices.h"
 #include "cxtestPatientModelServiceMock.h"
 #include "cxLogger.h"
-#include "cxtestDummyDataManager.h"
+#include "cxtestVisServices.h"
 
 TEST_CASE("Sort cx::Data user-friendly using getPriority()", "[unit][service][visualization]")
 {
