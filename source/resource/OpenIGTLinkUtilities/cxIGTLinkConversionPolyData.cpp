@@ -493,7 +493,7 @@ int IGTLinkConversionPolyData::VTKToIGTLAttribute(vtkDataSetAttributes* src, int
 	{
 	dest->SetType(igtl::PolyDataAttribute::POINT_RGBA | attrTypeBit);
 	}
-  dest->SetName(array->GetName());
+  dest->SetName((array->GetName() ? array->GetName() : ""));
   int ntuples = array->GetNumberOfTuples();
   dest->SetSize(ntuples);
 
