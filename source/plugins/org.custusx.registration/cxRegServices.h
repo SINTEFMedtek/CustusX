@@ -56,13 +56,15 @@ class org_custusx_registration_EXPORT RegServices : public VisServices
 public:
 	static RegServicesPtr create(ctkPluginContext* context);
 	RegServices(ctkPluginContext* context);
-	static RegServices getNullObjects();
+	static RegServicesPtr getNullObjects();
 
-	RegistrationServicePtr registrationService;
-//	VisualizationServicePtr visualizationService;
-	AcquisitionServicePtr acquisitionService;
+	RegistrationServicePtr registration() { return registrationService; }
+	AcquisitionServicePtr acquisition() { return acquisitionService; }
+
 protected:
 	RegServices();
+	RegistrationServicePtr registrationService;
+	AcquisitionServicePtr acquisitionService;
 };
 
 }

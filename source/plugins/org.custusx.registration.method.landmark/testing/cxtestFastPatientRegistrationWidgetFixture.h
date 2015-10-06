@@ -49,7 +49,7 @@ class CXTEST_ORG_CUSTUSX_REGISTRATION_METHOD_LANDMARK_EXPORT FastPatientRegistra
 {
 	Q_OBJECT
 public:
-	FastPatientRegistrationWidgetFixture(cx::RegServices services, QWidget* parent);
+	FastPatientRegistrationWidgetFixture(cx::RegServicesPtr services, QWidget* parent);
 	void connectTo(cx::ViewWrapper2DPtr viewWrapper);
 
 	void triggerShowEvent();

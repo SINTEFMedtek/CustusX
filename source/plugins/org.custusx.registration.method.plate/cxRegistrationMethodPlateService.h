@@ -51,7 +51,7 @@ class org_custusx_registration_method_plate_EXPORT RegistrationMethodPlateImageT
 {
 	Q_INTERFACES(cx::RegistrationMethodService)
 public:
-	RegistrationMethodPlateImageToPatientService(RegServices services) :
+	RegistrationMethodPlateImageToPatientService(RegServicesPtr services) :
 		RegistrationMethodService(services) {}
 	virtual ~RegistrationMethodPlateImageToPatientService() {}
 	virtual QString getRegistrationType() {return QString("ImageToPatient");}

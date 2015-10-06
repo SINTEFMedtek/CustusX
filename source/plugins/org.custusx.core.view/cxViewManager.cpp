@@ -115,7 +115,7 @@ ViewManager::ViewManager(VisServicesPtr backend) :
 	mActiveLayout = QStringList() << "" << "";
 	mLayoutWidgets.resize(mActiveLayout.size(), NULL);
 
-	mInteractiveCropper.reset(new InteractiveCropper(mBackend->patientModelService->getActiveData()));
+	mInteractiveCropper.reset(new InteractiveCropper(mBackend->patient()->getActiveData()));
 	mInteractiveClipper.reset(new InteractiveClipper(mBackend));
 	connect(this, SIGNAL(activeLayoutChanged()), mInteractiveClipper.get(), SIGNAL(changed()));
 	connect(mInteractiveCropper.get(), SIGNAL(changed()), mRenderLoop.get(), SLOT(requestPreRenderSignal()));
@@ -341,7 +341,7 @@ void ViewManager::parseXml(QDomNode viewmanagerNode)
 	XMLNodeParser base(viewmanagerNode);
 
 	QString clippedImage = base.parseTextFromElement("clippedImage");
-	mInteractiveClipper->setImage(mBackend->getPatientService()->getData<Image>(clippedImage));
+	mInteractiveClipper->setImage(mBackend->patient()->getData<Image>(clippedImage));
 
 	base.parseDoubleFromElementWithDefault("global2DZoom", mGlobal2DZoomVal->get().toDouble());
 

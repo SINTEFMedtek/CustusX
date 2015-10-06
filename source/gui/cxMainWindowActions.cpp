@@ -221,7 +221,7 @@ void MainWindowActions::newPatientSlot()
 	int patientNumber = settings()->value("globalPatientNumber").toInt();
 	settings()->setValue("globalPatientNumber", ++patientNumber);
 
-	mServices->getSession()->load(choosenDir);
+	mServices->session()->load(choosenDir);
 }
 
 QString MainWindowActions::getExistingSessionFolder()
@@ -231,7 +231,7 @@ QString MainWindowActions::getExistingSessionFolder()
 
 void MainWindowActions::clearPatientSlot()
 {
-	mServices->getSession()->clear();
+	mServices->session()->clear();
 }
 
 void MainWindowActions::savePatientFileSlot()
@@ -243,7 +243,7 @@ void MainWindowActions::savePatientFileSlot()
 		return;
 	}
 
-	mServices->getSession()->save();
+	mServices->session()->save();
 }
 
 void MainWindowActions::loadPatientFileSlot()
@@ -255,14 +255,14 @@ void MainWindowActions::loadPatientFileSlot()
 	if (folder.isEmpty())
 		return;
 
-	mServices->getSession()->load(folder);
+	mServices->session()->load(folder);
 }
 
 void MainWindowActions::exportDataSlot()
 {
 	this->savePatientFileSlot();
 
-	ExportDataDialog* wizard = new ExportDataDialog(mServices->patientModelService, this->parentWidget());
+	ExportDataDialog* wizard = new ExportDataDialog(mServices->patient(), this->parentWidget());
 	wizard->exec(); //calling exec() makes the wizard dialog modal which prevents other user interaction with the system
 }
 
@@ -286,7 +286,7 @@ void MainWindowActions::importDataSlot()
 
 	for (int i=0; i<fileName.size(); ++i)
 	{
-		ImportDataDialog* wizard = new ImportDataDialog(mServices->patientModelService, fileName[i], this->parentWidget());
+		ImportDataDialog* wizard = new ImportDataDialog(mServices->patient(), fileName[i], this->parentWidget());
 		wizard->exec(); //calling exec() makes the wizard dialog modal which prevents other user interaction with the system
 	}
 }

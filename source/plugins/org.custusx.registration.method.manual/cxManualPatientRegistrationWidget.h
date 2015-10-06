@@ -55,13 +55,13 @@ class ManualPatientRegistrationWidget: public BaseWidget
 {
 Q_OBJECT
 public:
-ManualPatientRegistrationWidget(RegServices services, QWidget* parent, QString objectName);
+ManualPatientRegistrationWidget(RegServicesPtr services, QWidget* parent, QString objectName);
 	 ~ManualPatientRegistrationWidget()
 	{
 	}
 protected:
 	void showEvent(QShowEvent *event);
-	RegServices mServices;
+	RegServicesPtr mServices;
 
 private slots:
 	void matrixWidgetChanged();

@@ -5,7 +5,7 @@
 namespace cx
 {
 
-RegistrationMethodManualImageToImageService::RegistrationMethodManualImageToImageService(RegServices services) :
+RegistrationMethodManualImageToImageService::RegistrationMethodManualImageToImageService(RegServicesPtr services) :
 	RegistrationMethodManualService(services)
 {
 }

@@ -62,7 +62,7 @@ ToolTipCalibrateWidget::ToolTipCalibrateWidget(VisServicesPtr services, QWidget*
 {
   QVBoxLayout* toplayout = new QVBoxLayout(this);
 
-  mTools = StringPropertySelectTool::New(mServices->getToolManager());
+  mTools = StringPropertySelectTool::New(mServices->tracking());
   mTools->setValueName("Reference tool");
   mTools->setHelp("Select a tool with a known reference point");
   mCalibrateToolComboBox = new LabeledComboBoxWidget(this, mTools);
@@ -82,7 +82,7 @@ ToolTipCalibrateWidget::ToolTipCalibrateWidget(VisServicesPtr services, QWidget*
   connect(mTestButton, SIGNAL(clicked()), this, SLOT(testCalibrationSlot()));
 
   connect(mTools.get(), SIGNAL(changed()), this, SLOT(toolSelectedSlot()));
-  connect(mServices->getToolManager().get(), &TrackingService::stateChanged, this, &ToolTipCalibrateWidget::onTrackingSystemStateChanged);
+  connect(mServices->tracking().get(), &TrackingService::stateChanged, this, &ToolTipCalibrateWidget::onTrackingSystemStateChanged);
 
   //setting default state
   this->toolSelectedSlot();
@@ -93,12 +93,12 @@ ToolTipCalibrateWidget::~ToolTipCalibrateWidget()
 
 void ToolTipCalibrateWidget::onTrackingSystemStateChanged()
 {
-	if (mServices->getToolManager()->getTool(mTools->getValue()))
+	if (mServices->tracking()->getTool(mTools->getValue()))
 		return;
-	if (!mServices->getToolManager()->getReferenceTool())
+	if (!mServices->tracking()->getReferenceTool())
 		return;
 
-	mTools->setValue(mServices->getToolManager()->getReferenceTool()->getUid());
+	mTools->setValue(mServices->tracking()->getReferenceTool()->getUid());
 }
 
 void ToolTipCalibrateWidget::calibrateSlot()
@@ -109,11 +109,11 @@ void ToolTipCalibrateWidget::calibrateSlot()
   if(!refTool || !refTool->hasReferencePointWithId(1))
     return;
 
-  ToolPtr tool = mServices->getToolManager()->getActiveTool();
-  CoordinateSystem to = mServices->getSpaceProvider()->getT(tool);
-  Vector3D P_t = mServices->getSpaceProvider()->getActiveToolTipPoint(to);
+  ToolPtr tool = mServices->tracking()->getActiveTool();
+  CoordinateSystem to = mServices->spaceProvider()->getT(tool);
+  Vector3D P_t = mServices->spaceProvider()->getActiveToolTipPoint(to);
 
-  ToolTipCalibrationCalculator calc(mServices->getSpaceProvider(), tool, refTool, P_t);
+  ToolTipCalibrationCalculator calc(mServices->spaceProvider(), tool, refTool, P_t);
   Transform3D calibration = calc.get_calibration_sMt();
 
   QMessageBox msgBox;
@@ -136,10 +136,10 @@ void ToolTipCalibrateWidget::testCalibrationSlot()
   if(!selectedTool || !selectedTool->hasReferencePointWithId(1))
     return;
 
-  CoordinateSystem to = mServices->getSpaceProvider()->getT(mServices->getToolManager()->getActiveTool());
-  Vector3D sampledPoint = mServices->getSpaceProvider()->getActiveToolTipPoint(to);
+  CoordinateSystem to = mServices->spaceProvider()->getT(mServices->tracking()->getActiveTool());
+  Vector3D sampledPoint = mServices->spaceProvider()->getActiveToolTipPoint(to);
 
-  ToolTipCalibrationCalculator calc(mServices->getSpaceProvider(), mServices->getToolManager()->getActiveTool(), selectedTool, sampledPoint);
+  ToolTipCalibrationCalculator calc(mServices->spaceProvider(), mServices->tracking()->getActiveTool(), selectedTool, sampledPoint);
   Vector3D delta_selectedTool = calc.get_delta_ref();
 
   mDeltaLabel->setText("<b>Delta:</b> "+qstring_cast(delta_selectedTool)+" <br> <b>Length:</b>  "+qstring_cast(delta_selectedTool.length()));

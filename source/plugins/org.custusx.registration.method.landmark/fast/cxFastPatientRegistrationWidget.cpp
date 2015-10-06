@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-FastPatientRegistrationWidget::FastPatientRegistrationWidget(RegServices services, QWidget* parent) :
+FastPatientRegistrationWidget::FastPatientRegistrationWidget(RegServicesPtr services, QWidget* parent) :
 		PatientLandMarksWidget(services, parent,
 							   "org_custusx_registration_method_fast_landmark_image_to_patient_patient_landmarks_widget",
 							   "Fast Patient Registration"),
@@ -57,16 +57,16 @@ FastPatientRegistrationWidget::~FastPatientRegistrationWidget()
 
 void FastPatientRegistrationWidget::performRegistration()
 {
-	mServices.registrationService->doFastRegistration_Translation();
+	mServices->registration()->doFastRegistration_Translation();
 	this->updateAverageAccuracyLabel();
 }
 
 void FastPatientRegistrationWidget::mouseClickSampleStateChanged()
 {
 	if(mMouseClickSample->isChecked())
-		connect(mServices.visualizationService.get(), &VisualizationService::pointSampled, this, &FastPatientRegistrationWidget::pointSampled);
+		connect(mServices->view().get(), &VisualizationService::pointSampled, this, &FastPatientRegistrationWidget::pointSampled);
 	else
-		disconnect(mServices.visualizationService.get(), &VisualizationService::pointSampled, this, &FastPatientRegistrationWidget::pointSampled);
+		disconnect(mServices->view().get(), &VisualizationService::pointSampled, this, &FastPatientRegistrationWidget::pointSampled);
 }
 
 QTableWidgetItem * FastPatientRegistrationWidget::getLandmarkTableItem()

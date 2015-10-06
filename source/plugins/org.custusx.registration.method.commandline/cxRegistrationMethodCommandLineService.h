@@ -52,7 +52,7 @@ class org_custusx_registration_method_commandline_EXPORT RegistrationMethodComma
 {
 	Q_INTERFACES(cx::RegistrationMethodService)
 public:
-	RegistrationMethodCommandLineService(RegServices services) :
+	RegistrationMethodCommandLineService(RegServicesPtr services) :
 		RegistrationMethodService(services) {}
 	virtual ~RegistrationMethodCommandLineService() {}
 	virtual QString getRegistrationType() {return QString("ImageToImage");}

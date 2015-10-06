@@ -135,7 +135,7 @@ public:
 	boost::shared_ptr<METRIC_TYPE> createTestMetric(QString uid="")
 	{
 		boost::shared_ptr<METRIC_TYPE> retval;
-		retval = mServices->mPatientModelService->createSpecificData<METRIC_TYPE>(uid);
+		retval = mServices->patient()->createSpecificData<METRIC_TYPE>(uid);
 //		mServices->mPatientModelService->insertData(retval);
 		return retval;
 
@@ -160,13 +160,13 @@ public:
     void setPatientRegistration();
 	void insertData(cx::DataPtr data)
 	{
-		mServices->mPatientModelService->insertData(data);
+		mServices->patient()->insertData(data);
 	}
 
 	bool verifySingleLineHeader(QStringList list, cx::DataMetricPtr metric);
 
 private:
-	TestServicesPtr mServices;
+	TestVisServicesPtr mServices;
 	cx::MessageListenerPtr mMessageListener;
 
 	cx::SpaceProviderPtr getSpaceProvider();

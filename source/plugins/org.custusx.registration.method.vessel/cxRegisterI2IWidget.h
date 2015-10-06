@@ -58,7 +58,7 @@ class RegisterI2IWidget : public RegistrationBaseWidget
   Q_OBJECT
 
 public:
-	RegisterI2IWidget(RegServices services, QWidget* parent);
+	RegisterI2IWidget(RegServicesPtr services, QWidget* parent);
   ~RegisterI2IWidget();
 
 private:

@@ -71,7 +71,7 @@ class RMPCWidget: public ICPRegistrationBaseWidget
 	Q_OBJECT
 
 public:
-	RMPCWidget(RegServices services, QWidget *parent);
+	RMPCWidget(RegServicesPtr services, QWidget *parent);
 	virtual ~RMPCWidget() {}
 
 protected:

@@ -54,7 +54,7 @@ RegistrationMethodManualPluginActivator::~RegistrationMethodManualPluginActivato
 
 void RegistrationMethodManualPluginActivator::start(ctkPluginContext* context)
 {
-	RegServices services(context);
+	RegServicesPtr services = RegServices::create(context);
 
 	RegistrationMethodManualImageToImageService *i2i = new RegistrationMethodManualImageToImageService(services);
 	RegistrationMethodManualImageToPatientService *i2p = new RegistrationMethodManualImageToPatientService(services);

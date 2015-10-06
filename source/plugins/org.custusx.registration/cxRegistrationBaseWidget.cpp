@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-RegistrationBaseWidget::RegistrationBaseWidget(RegServices services, QWidget* parent, QString objectName, QString windowTitle) :
+RegistrationBaseWidget::RegistrationBaseWidget(RegServicesPtr services, QWidget* parent, QString objectName, QString windowTitle) :
   BaseWidget(parent, objectName, windowTitle),
 	mServices(services)
 {

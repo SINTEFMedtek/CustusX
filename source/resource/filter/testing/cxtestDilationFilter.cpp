@@ -47,14 +47,10 @@ TEST_CASE("DilationFilter: execute", "[unit][modules][Algorithm][DilationFilter]
 	cx::DataLocations::setTestMode();
 
 	{
-		cxtest::TestServicesType dummyservices = cxtest::createDummyCoreServices();
+		cxtest::TestVisServicesPtr dummyservices = cxtest::TestVisServices::create();
 
-		cx::VisServicesPtr vs(new cx::VisServices(cx::VisServices::getNullObjects()));
-		vs->patientModelService = dummyservices.mPatientModelService;
-		vs->trackingService = dummyservices.mTrackingService;
-		vs->spaceProvider = dummyservices.mSpaceProvider;
 		// Setup filter
-		cx::DilationFilterPtr filter(new cx::DilationFilter(vs));
+		cx::DilationFilterPtr filter(new cx::DilationFilter(dummyservices));
 		REQUIRE(filter);
 		filter->getInputTypes();
 		filter->getOutputTypes();
@@ -62,7 +58,7 @@ TEST_CASE("DilationFilter: execute", "[unit][modules][Algorithm][DilationFilter]
 
 		QString filename = cx::DataLocations::getTestDataPath()+ "/testing/DilationFilter/helix_seg.mhd";
 		QString info;
-		cx::DataPtr data = vs->patientModelService->importData(filename, info);
+		cx::DataPtr data = dummyservices->patient()->importData(filename, info);
 		REQUIRE(data);
 
 		//set input

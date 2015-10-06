@@ -198,7 +198,7 @@ void USAcquisitionVideoPlayback::usDataLoadFinishedSlot()
 	mVideoSource->start();
 
 	// set the probe sector from file data:
-	ToolPtr tool = mBackend->getToolManager()->getFirstProbe();
+	ToolPtr tool = mBackend->tracking()->getFirstProbe();
 	if (tool)
 	{
 		ProbePtr probe = tool->getProbe();

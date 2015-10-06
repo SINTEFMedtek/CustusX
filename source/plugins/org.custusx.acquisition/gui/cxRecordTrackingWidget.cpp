@@ -56,7 +56,7 @@ namespace cx
 
 RecordTrackingWidget::RecordTrackingWidget(XmlOptionFile options,
 										   AcquisitionServicePtr acquisitionService,
-										   VisServices services,
+										   VisServicesPtr services,
 										   QString category,
 										   QWidget* parent) :
 	QWidget(parent),
@@ -66,7 +66,7 @@ RecordTrackingWidget::RecordTrackingWidget(XmlOptionFile options,
 {
 	QVBoxLayout* mVerticalLayout = new QVBoxLayout(this);
 
-	mToolSelector = StringPropertySelectTool::New(services.getToolManager());
+	mToolSelector = StringPropertySelectTool::New(services->tracking());
 
 	mSelectRecordSession.reset(new SelectRecordSession(mOptions, acquisitionService, services));
 	connect(mSelectRecordSession->getSessionSelector().get(), &StringProperty::changed, this, &RecordTrackingWidget::onMergeChanged);
@@ -120,7 +120,7 @@ void RecordTrackingWidget::acquisitionStopped()
 	QString newUid = mAcquisitionService->getLatestSession()->getUid();
 	mSelectRecordSession->getSessionSelector()->setValue(newUid);
 
-	mServices.patientModelService->autoSave();
+	mServices->patient()->autoSave();
 
 	ToolRep3DPtr activeRep3D = this->getToolRepIn3DView();
 	if (activeRep3D)
@@ -152,7 +152,7 @@ void RecordTrackingWidget::onMergeChanged()
 
 ToolRep3DPtr RecordTrackingWidget::getToolRepIn3DView()
 {
-	return mServices.visualizationService->get3DReps(0, 0)->findFirst<ToolRep3D>(mRecordingTool);
+	return mServices->view()->get3DReps(0, 0)->findFirst<ToolRep3D>(mRecordingTool);
 }
 
 void RecordTrackingWidget::obscuredSlot(bool obscured)
@@ -188,7 +188,7 @@ ToolPtr RecordTrackingWidget::getSuitableRecordingTool()
 {
 	ToolPtr retval = mToolSelector->getTool();
 	if(!retval)
-		retval = mServices.trackingService->getActiveTool();
+		retval = mServices->tracking()->getActiveTool();
 	return retval;
 }
 

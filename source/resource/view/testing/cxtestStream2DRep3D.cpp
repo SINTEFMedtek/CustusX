@@ -38,14 +38,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 TEST_CASE("Stream2DRep3D init", "[unit][resource]")
 {
-	cxtest::TestServicesPtr mServices = cxtest::TestServices::create();
+	cxtest::TestVisServicesPtr mServices = cxtest::TestVisServices::create();
 	cx::Stream2DRep3DPtr rep = cx::Stream2DRep3D::New(mServices->spaceProvider());
 	REQUIRE(rep);
 }
 
 TEST_CASE("Stream2DRep3D Set TrackedStream", "[unit][resource]")
 {
-	cxtest::TestServicesPtr mServices = cxtest::TestServices::create();
+	cxtest::TestVisServicesPtr mServices = cxtest::TestVisServices::create();
 	cx::Stream2DRep3DPtr rep = cx::Stream2DRep3D::New(mServices->spaceProvider());
 	REQUIRE(rep);
 

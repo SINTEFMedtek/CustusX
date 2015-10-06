@@ -60,10 +60,10 @@ public:
 						SpaceProviderPtr spaceProvider,
 						PatientModelServicePtr patientService);
 
-	TrackingServicePtr getToolManager();
-	VideoServicePtr getVideoService();
+	TrackingServicePtr tracking();
+	VideoServicePtr video();
 	SpaceProviderPtr getSpaceProvider();
-	PatientModelServicePtr getPatientService();
+	PatientModelServicePtr patient();
 
 private:
 	TrackingServicePtr mTrackingService;

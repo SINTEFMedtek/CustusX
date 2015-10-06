@@ -55,10 +55,11 @@ class cxResourceVisualization_EXPORT VisServices : public CoreServices
 public:
 	static VisServicesPtr create(ctkPluginContext* context);
 	VisServices(ctkPluginContext* context);
-	static VisServices getNullObjects();
+	static VisServicesPtr getNullObjects();
 
-	VisualizationServicePtr visualizationService;
+	VisualizationServicePtr view() { return mVisualizationService;}
 
+	VisualizationServicePtr mVisualizationService;//TODO: Fix: Moved from protected temporarily
 protected:
 	VisServices();
 };

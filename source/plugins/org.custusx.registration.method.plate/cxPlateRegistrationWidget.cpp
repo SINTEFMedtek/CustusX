@@ -46,13 +46,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-PlateRegistrationWidget::PlateRegistrationWidget(RegServices services, QWidget* parent) :
+PlateRegistrationWidget::PlateRegistrationWidget(RegServicesPtr services, QWidget* parent) :
 	RegistrationBaseWidget(services, parent, "org_custusx_registration_method_plate_reference_landmarks", "Plate Registration Reference landmarks"),
 	mPlateRegistrationButton(new QPushButton("Load registration points", this)),
 	mReferenceToolInfoLabel(new QLabel("", this))
 {
 	connect(mPlateRegistrationButton, SIGNAL(clicked()), this, SLOT(plateRegistrationSlot()));
-	connect(mServices.trackingService.get(), &TrackingService::stateChanged, this, &PlateRegistrationWidget::internalUpdate);
+	connect(mServices->tracking().get(), &TrackingService::stateChanged, this, &PlateRegistrationWidget::internalUpdate);
 
 	QVBoxLayout* toptopLayout = new QVBoxLayout(this);
 	toptopLayout->addWidget(mReferenceToolInfoLabel);
@@ -70,35 +70,35 @@ PlateRegistrationWidget::~PlateRegistrationWidget()
 void PlateRegistrationWidget::showEvent(QShowEvent* event)
 {
   BaseWidget::showEvent(event);
-  connect(mServices.patientModelService->getPatientLandmarks().get(), &Landmarks::landmarkAdded,
+  connect(mServices->patient()->getPatientLandmarks().get(), &Landmarks::landmarkAdded,
 		  this, &PlateRegistrationWidget::landmarkUpdatedSlot);
-  connect(mServices.patientModelService->getPatientLandmarks().get(), &Landmarks::landmarkRemoved,
+  connect(mServices->patient()->getPatientLandmarks().get(), &Landmarks::landmarkRemoved,
 		  this, &PlateRegistrationWidget::landmarkUpdatedSlot);
 
-  mServices.visualizationService->getGroup(0)->setRegistrationMode(rsPATIENT_REGISTRATED);
+  mServices->view()->getGroup(0)->setRegistrationMode(rsPATIENT_REGISTRATED);
 }
 
 void PlateRegistrationWidget::hideEvent(QHideEvent* event)
 {
   BaseWidget::hideEvent(event);
-  disconnect(mServices.patientModelService->getPatientLandmarks().get(), &Landmarks::landmarkAdded,
+  disconnect(mServices->patient()->getPatientLandmarks().get(), &Landmarks::landmarkAdded,
 			 this, &PlateRegistrationWidget::landmarkUpdatedSlot);
-  disconnect(mServices.patientModelService->getPatientLandmarks().get(), &Landmarks::landmarkRemoved,
+  disconnect(mServices->patient()->getPatientLandmarks().get(), &Landmarks::landmarkRemoved,
 			 this, &PlateRegistrationWidget::landmarkUpdatedSlot);
 
-  mServices.visualizationService->getGroup(0)->setRegistrationMode(rsNOT_REGISTRATED);
+  mServices->view()->getGroup(0)->setRegistrationMode(rsNOT_REGISTRATED);
 }
 
 void PlateRegistrationWidget::landmarkUpdatedSlot()
 {
-	mServices.registrationService->doFastRegistration_Translation();
+	mServices->registration()->doFastRegistration_Translation();
 }
 
 void PlateRegistrationWidget::plateRegistrationSlot()
 {
-	mServices.patientModelService->getPatientLandmarks()->clear();
+	mServices->patient()->getPatientLandmarks()->clear();
 
-  ToolPtr refTool = mServices.trackingService->getReferenceTool();
+  ToolPtr refTool = mServices->tracking()->getReferenceTool();
   if(!refTool)//cannot register without a reference tool
   {
 	reportDebug("No refTool");
@@ -114,17 +114,17 @@ void PlateRegistrationWidget::plateRegistrationSlot()
   std::map<int, Vector3D>::iterator it = referencePoints.begin();
   for(; it != referencePoints.end(); ++it)
   {
-	QString uid = mServices.patientModelService->addLandmark();
-	mServices.patientModelService->setLandmarkName(uid, qstring_cast(it->first));
-	mServices.patientModelService->getPatientLandmarks()->setLandmark(Landmark(uid, it->second));
+	QString uid = mServices->patient()->addLandmark();
+	mServices->patient()->setLandmarkName(uid, qstring_cast(it->first));
+	mServices->patient()->getPatientLandmarks()->setLandmark(Landmark(uid, it->second));
   }
 
   // set all landmarks as not active as default
-  LandmarkPropertyMap map = mServices.patientModelService->getLandmarkProperties();
+  LandmarkPropertyMap map = mServices->patient()->getLandmarkProperties();
   LandmarkPropertyMap::iterator landmarkIt = map.begin();
   for(; landmarkIt != map.end(); ++landmarkIt)
   {
-	mServices.patientModelService->setLandmarkActive(landmarkIt->first, false);
+	mServices->patient()->setLandmarkActive(landmarkIt->first, false);
   }
 
   //we don't want the user to load the landmarks twice, it will result in alot of global landmarks...
@@ -133,7 +133,7 @@ void PlateRegistrationWidget::plateRegistrationSlot()
 
 void PlateRegistrationWidget::internalUpdate()
 {
-  ToolPtr refTool = mServices.trackingService->getReferenceTool();
+  ToolPtr refTool = mServices->tracking()->getReferenceTool();
 
   QString labelText = "";
   if(!refTool || refTool->getReferencePoints().size()<1)

@@ -40,11 +40,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ManualImage2ImageRegistrationWidget::ManualImage2ImageRegistrationWidget(RegServices services, QWidget *parent, QString objectName) :
+ManualImage2ImageRegistrationWidget::ManualImage2ImageRegistrationWidget(RegServicesPtr services, QWidget *parent, QString objectName) :
 	ManualImageRegistrationWidget(services, parent, objectName, "Manual Image to Image Registration")
 {
-	StringPropertyBasePtr fixedImage(new StringPropertyRegistrationFixedImage(services.registrationService, services.patientModelService));
-	StringPropertyBasePtr movingImage(new StringPropertyRegistrationMovingImage(services.registrationService, services.patientModelService));
+	StringPropertyBasePtr fixedImage(new StringPropertyRegistrationFixedImage(services->registration(), services->patient()));
+	StringPropertyBasePtr movingImage(new StringPropertyRegistrationMovingImage(services->registration(), services->patient()));
 
 	LabeledComboBoxWidget* fixed = new LabeledComboBoxWidget(this, fixedImage);
 	LabeledComboBoxWidget* moving = new LabeledComboBoxWidget(this, movingImage);
@@ -63,7 +63,7 @@ QString ManualImage2ImageRegistrationWidget::getDescription()
 
 bool ManualImage2ImageRegistrationWidget::isValid() const
 {
-	return mServices.registrationService->getMovingData() && mServices.registrationService->getFixedData();
+	return mServices->registration()->getMovingData() && mServices->registration()->getFixedData();
 }
 
 Transform3D ManualImage2ImageRegistrationWidget::getMatrixFromBackend()
@@ -71,8 +71,8 @@ Transform3D ManualImage2ImageRegistrationWidget::getMatrixFromBackend()
 	if (!this->isValid())
 		return Transform3D::Identity();
 
-	Transform3D rMm = mServices.registrationService->getMovingData()->get_rMd();
-	Transform3D rMf = mServices.registrationService->getFixedData()->get_rMd();
+	Transform3D rMm = mServices->registration()->getMovingData()->get_rMd();
+	Transform3D rMf = mServices->registration()->getFixedData()->get_rMd();
 	Transform3D fMm = rMf.inv() * rMm;
 	return fMm;
 }
@@ -82,8 +82,8 @@ void ManualImage2ImageRegistrationWidget::setMatrixFromWidget(Transform3D M)
 	if (!this->isValid())
 		return;
 
-	Transform3D rMm = mServices.registrationService->getMovingData()->get_rMd();
-	Transform3D rMf = mServices.registrationService->getFixedData()->get_rMd();
+	Transform3D rMm = mServices->registration()->getMovingData()->get_rMd();
+	Transform3D rMf = mServices->registration()->getFixedData()->get_rMd();
 	Transform3D fQm = M; // the modified fMm matrix
 
 	// start with
@@ -92,6 +92,6 @@ void ManualImage2ImageRegistrationWidget::setMatrixFromWidget(Transform3D M)
 	//                fQm = fMr * delta * rMm
 	Transform3D delta = rMf * fQm * rMm.inv();
 
-	mServices.registrationService->applyImage2ImageRegistration(delta, "Manual Image");
+	mServices->registration()->applyImage2ImageRegistration(delta, "Manual Image");
 }
 } // cx

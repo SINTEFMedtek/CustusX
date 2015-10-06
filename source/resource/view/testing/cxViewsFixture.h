@@ -97,7 +97,7 @@ private:
 	RenderTesterPtr getRenderTesterForView(int viewIndex);
 
 	QString mShaderFolder;
-	cxtest::TestServicesPtr mServices;
+	cxtest::TestVisServicesPtr mServices;
 	cx::MessageListenerPtr mMessageListener;
 	ViewsWindowPtr mWindow;
 };

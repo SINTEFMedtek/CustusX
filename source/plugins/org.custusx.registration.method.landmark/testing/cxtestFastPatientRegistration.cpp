@@ -60,9 +60,9 @@ public:
 		cx::RegServicesPtr services = cx::RegServices::create(cx::logicManager()->getPluginContext());
 
 		viewFixture = VisualizationServiceFixturePtr(new VisualizationServiceFixture());
-		services->visualizationService = viewFixture;
+		services->mVisualizationService = viewFixture;
 
-		widgetFixture = cxtest::FastPatientRegistrationWidgetFixturePtr(new cxtest::FastPatientRegistrationWidgetFixture(*services, NULL));
+		widgetFixture = cxtest::FastPatientRegistrationWidgetFixturePtr(new cxtest::FastPatientRegistrationWidgetFixture(services, NULL));
 	}
 	~FastPatientRegistrationWidgetHelper()
 	{

@@ -49,11 +49,11 @@ namespace cx
 class org_custusx_registration_EXPORT RegistrationBaseWidget : public BaseWidget
 {
 public:
-	RegistrationBaseWidget(RegServices services, QWidget *parent, QString objectName, QString windowTitle);
+	RegistrationBaseWidget(RegServicesPtr services, QWidget *parent, QString objectName, QString windowTitle);
   virtual ~RegistrationBaseWidget() {}
 
 protected:
-	RegServices mServices;
+	RegServicesPtr mServices;
 };
 
 /**

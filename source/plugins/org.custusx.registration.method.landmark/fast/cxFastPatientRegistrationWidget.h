@@ -60,7 +60,7 @@ class org_custusx_registration_method_landmark_EXPORT FastPatientRegistrationWid
 {
 	Q_OBJECT
 public:
-  FastPatientRegistrationWidget(RegServices services, QWidget* parent);
+  FastPatientRegistrationWidget(RegServicesPtr services, QWidget* parent);
   virtual ~FastPatientRegistrationWidget();
 
 protected:

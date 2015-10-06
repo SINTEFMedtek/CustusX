@@ -90,13 +90,13 @@ void RouteToTargetFilter::createOptions()
 void RouteToTargetFilter::createInputTypes()
 {
 	StringPropertySelectMeshPtr centerline;
-	centerline = StringPropertySelectMesh::New(mServices->patientModelService);
+	centerline = StringPropertySelectMesh::New(mServices->patient());
 	centerline->setValueName("Centerline");
 	centerline->setHelp("Select centerline");
 	mInputTypes.push_back(centerline);
 
 	StringPropertySelectPointMetricPtr targetPoint;
-	targetPoint = StringPropertySelectPointMetric::New(mServices->patientModelService);
+	targetPoint = StringPropertySelectPointMetric::New(mServices->patient());
 	targetPoint->setValueName("Target point");
 	targetPoint->setHelp("Select point metric input");
 	connect(targetPoint.get(), SIGNAL(dataChanged(QString)), this, SLOT(pointMetricChangedSlot(QString)));
@@ -111,7 +111,7 @@ void RouteToTargetFilter::createOutputTypes()
 
 	StringPropertySelectMeshPtr tempMeshStringAdapter;
 
-	tempMeshStringAdapter = StringPropertySelectMesh::New(mServices->patientModelService);
+	tempMeshStringAdapter = StringPropertySelectMesh::New(mServices->patient());
 	tempMeshStringAdapter->setValueName("Centerline mesh");
 	tempMeshStringAdapter->setHelp("Generated route to target mesh (vtk-format).");
 	mOutputTypes.push_back(tempMeshStringAdapter);

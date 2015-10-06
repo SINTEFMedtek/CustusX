@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegServices services, QWidget* parent) :
+BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegServicesPtr services, QWidget* parent) :
 	RegistrationBaseWidget(services, parent, "org_custusx_registration_method_bronchoscopy_widget",
 						   "Bronchoscopy Registration"),
 	mBronchoscopyRegistration(new BronchoscopyRegistration()),
@@ -90,7 +90,7 @@ void BronchoscopyRegistrationWidget::setup()
 {
 	mOptions = profile()->getXmlSettings().descend("bronchoscopyregistrationwidget");
 
-	mSelectMeshWidget = StringPropertySelectMesh::New(mServices.patientModelService);
+	mSelectMeshWidget = StringPropertySelectMesh::New(mServices->patient());
 	mSelectMeshWidget->setValueName("Centerline: ");
 
 	//this->initializeTrackingService();
@@ -104,21 +104,21 @@ void BronchoscopyRegistrationWidget::setup()
 	mRegisterButton->setToolTip(this->defaultWhatsThis());
 
 	mRecordTrackingWidget = new RecordTrackingWidget(mOptions.descend("recordTracker"),
-													 mServices.acquisitionService, mServices,
+													 mServices->acquisition(), mServices,
 													 "bronc_path",
 													 this);
 	mRecordTrackingWidget->getSessionSelector()->setHelp("Select bronchoscope path for registration");
 	mRecordTrackingWidget->getSessionSelector()->setDisplayName("Bronchoscope path");
 
 	mVerticalLayout->setMargin(0);
-	mVerticalLayout->addWidget(new DataSelectWidget(mServices.visualizationService, mServices.patientModelService, this, mSelectMeshWidget));
+	mVerticalLayout->addWidget(new DataSelectWidget(mServices->view(), mServices->patient(), this, mSelectMeshWidget));
 
 	this->selectSubsetOfBranches(mOptions.getElement());
 	this->createMaxNumberOfGenerations(mOptions.getElement());
 	this->useLocalRegistration(mOptions.getElement());
 
 	mVerticalLayout->addWidget(new CheckBoxWidget(this, mUseSubsetOfGenerations));
-	mVerticalLayout->addWidget(createDataWidget(mServices.visualizationService, mServices.patientModelService, this, mMaxNumberOfGenerations));
+	mVerticalLayout->addWidget(createDataWidget(mServices->view(), mServices->patient(), this, mMaxNumberOfGenerations));
 	mVerticalLayout->addWidget(mProcessCenterlineButton);
 	mVerticalLayout->addWidget(mRecordTrackingWidget);
 	mVerticalLayout->addWidget(new CheckBoxWidget(this, mUseLocalRegistration));
@@ -134,8 +134,8 @@ QString BronchoscopyRegistrationWidget::defaultWhatsThis() const
 
 void BronchoscopyRegistrationWidget::initializeTrackingService()
 {
-	if(mServices.trackingService->getState() < Tool::tsCONFIGURED)
-		mServices.trackingService->setState(Tool::tsCONFIGURED);
+	if(mServices->tracking()->getState() < Tool::tsCONFIGURED)
+		mServices->tracking()->setState(Tool::tsCONFIGURED);
 }
 
 void BronchoscopyRegistrationWidget::processCenterlineSlot()
@@ -159,12 +159,12 @@ void BronchoscopyRegistrationWidget::processCenterlineSlot()
 	{
 		QString uid = mSelectMeshWidget->getMesh()->getUid() + "_cl%1";
 		QString name = mSelectMeshWidget->getMesh()->getName()+" cl_processed%1";
-		mMesh = mServices.patientModelService->createSpecificData<Mesh>(uid, name);
+		mMesh = mServices->patient()->createSpecificData<Mesh>(uid, name);
 	}
 	mMesh->setVtkPolyData(processedCenterline);
 	mMesh->setColor(QColor(0, 0, 255, 255));
-	mServices.patientModelService->insertData(mMesh);
-	mServices.visualizationService->autoShowData(mMesh);
+	mServices->patient()->insertData(mMesh);
+	mServices->view()->autoShowData(mMesh);
 }
 
 void BronchoscopyRegistrationWidget::registerSlot()
@@ -175,7 +175,7 @@ void BronchoscopyRegistrationWidget::registerSlot()
 		return;
 	}
 
-	Transform3D old_rMpr = mServices.patientModelService->get_rMpr();//input to registrationAlgorithm
+	Transform3D old_rMpr = mServices->patient()->get_rMpr();//input to registrationAlgorithm
     //std::cout << "rMpr: " << std::endl;
     //std::cout << old_rMpr << std::endl;
 
@@ -195,7 +195,7 @@ void BronchoscopyRegistrationWidget::registerSlot()
 		new_rMpr = Transform3D(mBronchoscopyRegistration->runBronchoscopyRegistration(trackerRecordedData_prMt,old_rMpr,0));
 
     new_rMpr = new_rMpr*old_rMpr;//output
-	mServices.registrationService->applyPatientRegistration(new_rMpr, "Bronchoscopy centerline to tracking data");
+	mServices->registration()->applyPatientRegistration(new_rMpr, "Bronchoscopy centerline to tracking data");
 
     Eigen::Matrix4d display_rMpr = Eigen::Matrix4d::Identity();
             display_rMpr = new_rMpr*display_rMpr;

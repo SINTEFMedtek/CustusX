@@ -39,6 +39,7 @@ if(BUILD_TESTING)
 
     set(CX_TESTRESOURCE_LINK_LIBS
         cxResource
+        cxResourceVisualization
         cxtestUtilities
     )
 

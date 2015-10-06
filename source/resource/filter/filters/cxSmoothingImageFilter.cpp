@@ -93,7 +93,7 @@ void SmoothingImageFilter::createInputTypes()
 {
 	SelectDataStringPropertyBasePtr temp;
 
-	temp = StringPropertySelectImage::New(mServices->getPatientService());
+	temp = StringPropertySelectImage::New(mServices->patient());
 	temp->setValueName("Input");
 	temp->setHelp("Select image input for smoothing");
 	mInputTypes.push_back(temp);
@@ -103,7 +103,7 @@ void SmoothingImageFilter::createOutputTypes()
 {
 	SelectDataStringPropertyBasePtr temp;
 
-	temp = StringPropertySelectData::New(mServices->getPatientService());
+	temp = StringPropertySelectData::New(mServices->patient());
 	temp->setValueName("Output");
 	temp->setHelp("Output smoothed image");
 	mOutputTypes.push_back(temp);
@@ -151,7 +151,7 @@ bool SmoothingImageFilter::postProcess()
 
 	QString uid = input->getUid() + "_sm%1";
 	QString name = input->getName()+" sm%1";
-	ImagePtr output = createDerivedImage(mServices->getPatientService(),
+	ImagePtr output = createDerivedImage(mServices->patient(),
 										 uid, name,
 										 mRawResult, input);
 
@@ -159,7 +159,7 @@ bool SmoothingImageFilter::postProcess()
 	if (!output)
 		return false;
 
-	mServices->getPatientService()->insertData(output);
+	mServices->patient()->insertData(output);
 
 	// set output
 	mOutputTypes.front()->setValue(output->getUid());

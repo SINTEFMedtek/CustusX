@@ -59,7 +59,7 @@ void Navigation::centerToPosition(Vector3D p_r, QFlags<VIEW_TYPE> viewType)
 	if (viewType.testFlag(v2D))
 	{
 		// set center to calculated position
-		mServices->patientModelService->setCenter(p_r);
+		mServices->patient()->setCenter(p_r);
 	}
 
 	if (viewType.testFlag(v3D))
@@ -91,7 +91,7 @@ void Navigation::centerToData(const std::vector<DataPtr>& images)
 
 void Navigation::centerToDataInActiveViewGroup(DataViewProperties properties)
 {
-	ViewGroupDataPtr activeGroup = mServices->visualizationService->getActiveViewGroup();
+	ViewGroupDataPtr activeGroup = mServices->view()->getActiveViewGroup();
 	this->centerToDataInViewGroup(activeGroup, properties);
 }
 
@@ -104,7 +104,7 @@ void Navigation::centerToDataInViewGroup(ViewGroupDataPtr group, DataViewPropert
 	if(visibleData.empty())
 		return;
 
-	ActiveDataPtr active = mServices->patientModelService->getActiveData();
+	ActiveDataPtr active = mServices->patient()->getActiveData();
 	ImagePtr activeImage = active->getActive<Image>();
 	if(activeImage && std::count(visibleData.begin(), visibleData.end(), activeImage))
 		this->centerToData(activeImage);
@@ -117,9 +117,9 @@ void Navigation::centerToDataInViewGroup(ViewGroupDataPtr group, DataViewPropert
  */
 void Navigation::centerToTooltip()
 {
-	ToolPtr tool = mServices->trackingService->getActiveTool();
+	ToolPtr tool = mServices->tracking()->getActiveTool();
 	Vector3D p_pr = tool->get_prMt().coord(Vector3D(0, 0, tool->getTooltipOffset()));
-	Vector3D p_r = mServices->patientModelService->get_rMpr().coord(p_pr);
+	Vector3D p_r = mServices->patient()->get_rMpr().coord(p_pr);
 
 	this->centerToPosition(p_r);
 //	// set center to calculated position
@@ -138,8 +138,8 @@ Vector3D Navigation::findDataCenter(const std::vector<DataPtr>& data)
 void Navigation::moveManualToolToPosition(Vector3D& p_r)
 {
 	// move the manual tool to the same position. (this is a side effect... do we want it?)
-	ToolPtr manual = mServices->trackingService->getManualTool();
-	Vector3D p_pr = mServices->patientModelService->get_rMpr().inv().coord(p_r);
+	ToolPtr manual = mServices->tracking()->getManualTool();
+	Vector3D p_pr = mServices->patient()->get_rMpr().inv().coord(p_r);
 	Transform3D prM0t = manual->get_prMt(); // modify old pos in order to keep orientation
 	Vector3D t_pr = prM0t.coord(Vector3D(0, 0, manual->getTooltipOffset()));
 	Transform3D prM1t = createTransformTranslate(p_pr - t_pr) * prM0t;
