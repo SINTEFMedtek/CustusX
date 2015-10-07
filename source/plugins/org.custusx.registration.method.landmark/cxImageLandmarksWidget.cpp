@@ -53,7 +53,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationService.h"
 #include "cxPatientModelService.h"
 #include "cxViewService.h"
-#include "cxViewGroupData.h"
 #include "cxRepContainer.h"
 #include "cxTrackingService.h"
 #include "cxLandmarkListener.h"
@@ -213,7 +212,7 @@ void ImageLandmarksWidget::enableButtons()
 
 void ImageLandmarksWidget::showEvent(QShowEvent* event)
 {
-	mServices->view()->getGroup(0)->setRegistrationMode(rsIMAGE_REGISTRATED);
+	mServices->view()->setRegistrationMode(rsIMAGE_REGISTRATED);
 	LandmarkRegistrationWidget::showEvent(event);
 
 	if(!mUseRegistrationFixedPropertyInsteadOfActiveImage)
@@ -227,7 +226,7 @@ void ImageLandmarksWidget::showEvent(QShowEvent* event)
 
 void ImageLandmarksWidget::hideEvent(QHideEvent* event)
 {
-	mServices->view()->getGroup(0)->setRegistrationMode(rsNOT_REGISTRATED);
+	mServices->view()->setRegistrationMode(rsNOT_REGISTRATED);
 	LandmarkRegistrationWidget::hideEvent(event);
 
 }
