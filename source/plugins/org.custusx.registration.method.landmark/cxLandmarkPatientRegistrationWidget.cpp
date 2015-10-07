@@ -48,7 +48,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationService.h"
 #include "cxViewService.h"
 #include "cxPatientModelService.h"
-#include "cxViewGroupData.h"
 #include "cxReporter.h"
 #include "cxLandmarkListener.h"
 #include "cxActiveData.h"
@@ -89,13 +88,13 @@ void LandmarkPatientRegistrationWidget::registerSlot()
 void LandmarkPatientRegistrationWidget::showEvent(QShowEvent* event)
 {
 //	std::cout << "LandmarkPatientRegistrationWidget::showEvent" << std::endl;
-	mServices->view()->getGroup(0)->setRegistrationMode(rsPATIENT_REGISTRATED);
+	mServices->view()->setRegistrationMode(rsPATIENT_REGISTRATED);
 	LandmarkRegistrationWidget::showEvent(event);
 }
 
 void LandmarkPatientRegistrationWidget::hideEvent(QHideEvent* event)
 {
-	mServices->view()->getGroup(0)->setRegistrationMode(rsNOT_REGISTRATED);
+	mServices->view()->setRegistrationMode(rsNOT_REGISTRATED);
 	LandmarkRegistrationWidget::hideEvent(event);
 }
 

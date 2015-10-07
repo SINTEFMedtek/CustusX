@@ -46,7 +46,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxReporter.h"
 #include "cxLandmark.h"
-#include "cxViewGroupData.h"
 #include "cxImage.h"
 #include "cxActiveData.h"
 

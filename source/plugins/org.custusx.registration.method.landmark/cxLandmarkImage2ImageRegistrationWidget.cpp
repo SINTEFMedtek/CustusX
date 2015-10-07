@@ -50,7 +50,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationProperties.h"
 #include "cxRegistrationService.h"
 #include "cxViewService.h"
-#include "cxViewGroupData.h"
 #include "cxRepContainer.h"
 #include "cxLandmarkListener.h"
 
@@ -110,13 +109,13 @@ QString LandmarkImage2ImageRegistrationWidget::defaultWhatsThis() const
 
 void LandmarkImage2ImageRegistrationWidget::showEvent(QShowEvent* event)
 {
-	mServices->view()->getGroup(0)->setRegistrationMode(rsIMAGE_REGISTRATED);
+	mServices->view()->setRegistrationMode(rsIMAGE_REGISTRATED);
 	LandmarkRegistrationWidget::showEvent(event);
 }
 
 void LandmarkImage2ImageRegistrationWidget::hideEvent(QHideEvent* event)
 {
-	mServices->view()->getGroup(0)->setRegistrationMode(rsNOT_REGISTRATED);
+	mServices->view()->setRegistrationMode(rsNOT_REGISTRATED);
 	LandmarkRegistrationWidget::hideEvent(event);
 }
 
