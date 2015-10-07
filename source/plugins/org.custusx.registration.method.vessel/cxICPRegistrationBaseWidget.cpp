@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ICPRegistrationBaseWidget::ICPRegistrationBaseWidget(RegServices services, QWidget* parent, QString uid, QString name) :
+ICPRegistrationBaseWidget::ICPRegistrationBaseWidget(RegServicesPtr services, QWidget* parent, QString uid, QString name) :
 	RegistrationBaseWidget(services, parent, uid, name)
 {
 	this->setLayout(new QVBoxLayout); // we need something, otherwise the widget might not be painted at all.
@@ -238,7 +238,7 @@ void ICPRegistrationBaseWidget::registerSlot()
 void ICPRegistrationBaseWidget::updateDifferenceLines()
 {
 	if (!mMeshInView)
-		mMeshInView.reset(new MeshInView(mServices.visualizationService));
+		mMeshInView.reset(new MeshInView(mServices->view()));
 
 	bool show = mDisplayProgress->getValue() && mRegistrator->isValid();
 	if (show)

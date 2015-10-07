@@ -64,9 +64,9 @@ bool TestVideoConnectionWidget::canStream(QString filename)
 
 	QTest::mouseClick(mConnectButton, Qt::LeftButton); //connect
 
-	waitForQueuedSignal(mServices->videoService.get(), SIGNAL(connected(bool)), 1000);
-	waitForQueuedSignal(mServices->videoService.get(), SIGNAL(activeVideoSourceChanged()), 500);
-	cx::VideoSourcePtr stream = mServices->videoService->getActiveVideoSource();
+	waitForQueuedSignal(mServices->video().get(), SIGNAL(connected(bool)), 1000);
+	waitForQueuedSignal(mServices->video().get(), SIGNAL(activeVideoSourceChanged()), 500);
+	cx::VideoSourcePtr stream = mServices->video()->getActiveVideoSource();
 	waitForQueuedSignal(stream.get(), SIGNAL(newFrame()), 500);
 	bool canStream = stream->isStreaming();
 
@@ -81,16 +81,16 @@ cx::PropertyPtr TestVideoConnectionWidget::getOption(QString uid, QString method
 {
 	cx::XmlOptionFile options = cx::profile()->getXmlSettings().descend("video");
 	QDomElement element = options.getElement("video");
-    cx::StreamerServicePtr streamer = mServices->videoService->getStreamerService(method);
+    cx::StreamerServicePtr streamer = mServices->video()->getStreamerService(method);
 	cx::PropertyPtr option = cx::Property::findProperty(streamer->getSettings(element), uid);
 	return option;
 }
 
 void TestVideoConnectionWidget::setupWidgetToRunStreamer(QString filename)
 {
-	cx::ActiveDataPtr activeData = mServices->patientModelService->getActiveData();
+	cx::ActiveDataPtr activeData = mServices->patient()->getActiveData();
 	cx::ImagePtr image = Utilities::create3DImage();
-	mServices->patientModelService->insertData(image);
+	mServices->patient()->insertData(image);
 	activeData->setActive(image);
 
 	QString method = "image_file_streamer";

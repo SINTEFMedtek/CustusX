@@ -34,41 +34,30 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxtestresource_export.h"
 
-#include "cxForwardDeclarations.h"
 #include <QStringList>
+#include "cxForwardDeclarations.h"
+#include "cxVisServices.h"
 class ctkPluginContext;
 
 namespace cxtest
 {
 
-struct CXTESTRESOURCE_EXPORT TestServicesType
-{
-	cx::PatientModelServicePtr mPatientModelService;
-	cx::SpaceProviderPtr mSpaceProvider;
-	cx::TrackingServicePtr mTrackingService;
-};
+typedef boost::shared_ptr<class TestVisServices> TestVisServicesPtr;
 
-TestServicesType CXTESTRESOURCE_EXPORT createDummyCoreServices();
-void CXTESTRESOURCE_EXPORT destroyDummyCoreServices(TestServicesType& services);
-
-typedef boost::shared_ptr<class TestServices> TestServicesPtr;
-
-/** A minimal set of services for test usage.
-  */
-class CXTESTRESOURCE_EXPORT TestServices : public TestServicesType
+/**
+ * Test version of cx::VisServices.
+ *
+ * \date Oct 6 2015
+ * \author Ole Vegard Solberg, SINTEF
+ */
+class CXTESTRESOURCE_EXPORT TestVisServices : public cx::VisServices
 {
 public:
-	static TestServicesPtr create();
-	~TestServices();
-
-	cx::PatientModelServicePtr patientModelService() { return mPatientModelService; }
-	cx::SpaceProviderPtr spaceProvider() { return mSpaceProvider; }
-	cx::TrackingServicePtr trackingService() { return mTrackingService; }
-
-private:
-	TestServices();
+	static TestVisServicesPtr create();
+	TestVisServices();
+	~TestVisServices();
 };
 
-} // namespace cx
+} // namespace cxtest
 
 #endif // CXTESTDUMMYDATAMANAGER_H

@@ -113,7 +113,7 @@ void DilationFilter::createInputTypes()
 {
 	SelectDataStringPropertyBasePtr temp;
 
-	temp = StringPropertySelectImage::New(mServices->getPatientService());
+	temp = StringPropertySelectImage::New(mServices->patient());
 	temp->setValueName("Input");
 	temp->setHelp("Select segmentation input for dilation");
 	mInputTypes.push_back(temp);
@@ -123,12 +123,12 @@ void DilationFilter::createOutputTypes()
 {
 	SelectDataStringPropertyBasePtr temp;
 
-	temp = StringPropertySelectData::New(mServices->getPatientService());
+	temp = StringPropertySelectData::New(mServices->patient());
 	temp->setValueName("Output");
 	temp->setHelp("Dilated segmentation image");
 	mOutputTypes.push_back(temp);
 
-	temp = StringPropertySelectData::New(mServices->getPatientService());
+	temp = StringPropertySelectData::New(mServices->patient());
 	temp->setValueName("Contour");
 	temp->setHelp("Output contour generated from dilated segmentation image.");
 	mOutputTypes.push_back(temp);
@@ -210,7 +210,7 @@ bool DilationFilter::postProcess()
 
 	QString uid = input->getUid() + "_seg%1";
 	QString name = input->getName()+" seg%1";
-	ImagePtr output = createDerivedImage(mServices->getPatientService(),
+	ImagePtr output = createDerivedImage(mServices->patient(),
 										 uid, name,
 										 mRawResult, input);
 	mRawResult = NULL;
@@ -218,7 +218,7 @@ bool DilationFilter::postProcess()
 		return false;
 
 	output->resetTransferFunctions();
-	mServices->getPatientService()->insertData(output);
+	mServices->patient()->insertData(output);
 
 	// set output
 	mOutputTypes.front()->setValue(output->getUid());
@@ -227,7 +227,7 @@ bool DilationFilter::postProcess()
 	if (mRawContour!=NULL)
 	{
 		ColorPropertyPtr colorOption = this->getColorOption(mOptions);
-		MeshPtr contour = ContourFilter::postProcess(mServices->getPatientService(), mRawContour, output, colorOption->getValue());
+		MeshPtr contour = ContourFilter::postProcess(mServices->patient(), mRawContour, output, colorOption->getValue());
 		mOutputTypes[1]->setValue(contour->getUid());
 		mRawContour = vtkPolyDataPtr();
 	}

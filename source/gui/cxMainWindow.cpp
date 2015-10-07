@@ -108,19 +108,19 @@ MainWindow::MainWindow() :
 
 	this->addAsDockWidget(new PlaybackWidget(this), "Browsing");
 	this->addAsDockWidget(new VideoConnectionWidget(mServices, this), "Utility");
-	this->addAsDockWidget(new EraserWidget(mServices->patientModelService, mServices->visualizationService, this), "Properties");
-	this->addAsDockWidget(new MetricWidget(mServices->visualizationService, mServices->patientModelService, this), "Utility");
-	this->addAsDockWidget(new SlicePropertiesWidget(mServices->patientModelService, mServices->visualizationService, this), "Properties");
-	this->addAsDockWidget(new VolumePropertiesWidget(mServices->patientModelService, mServices->visualizationService, this), "Properties");
-	this->addAsDockWidget(new MeshInfoWidget(mServices->patientModelService, mServices->visualizationService, this), "Properties");
-	this->addAsDockWidget(new StreamPropertiesWidget(mServices->patientModelService, mServices->visualizationService, this), "Properties");
+	this->addAsDockWidget(new EraserWidget(mServices->patient(), mServices->view(), this), "Properties");
+	this->addAsDockWidget(new MetricWidget(mServices->view(), mServices->patient(), this), "Utility");
+	this->addAsDockWidget(new SlicePropertiesWidget(mServices->patient(), mServices->view(), this), "Properties");
+	this->addAsDockWidget(new VolumePropertiesWidget(mServices->patient(), mServices->view(), this), "Properties");
+	this->addAsDockWidget(new MeshInfoWidget(mServices->patient(), mServices->view(), this), "Properties");
+	this->addAsDockWidget(new StreamPropertiesWidget(mServices->patient(), mServices->view(), this), "Properties");
 	this->addAsDockWidget(new TrackPadWidget(this), "Utility");
 	this->addAsDockWidget(new ToolPropertiesWidget(this), "Properties");
 	this->addAsDockWidget(new NavigationWidget(this), "Properties");
 	this->addAsDockWidget(new ConsoleWidget(this, "ConsoleWidget", "Console"), "Utility");
 	this->addAsDockWidget(new ConsoleWidget(this, "ConsoleWidget2", "Extra Console"), "Utility");
 //	this->addAsDockWidget(new ConsoleWidgetCollection(this, "ConsoleWidgets", "Consoles"), "Utility");
-	this->addAsDockWidget(new FrameTreeWidget(mServices->patientModelService, this), "Browsing");
+	this->addAsDockWidget(new FrameTreeWidget(mServices->patient(), this), "Browsing");
 	this->addAsDockWidget(new ToolManagerWidget(this), "Debugging");
 	this->addAsDockWidget(new PluginFrameworkWidget(this), "Browsing");
 	this->addAsDockWidget(new AllFiltersWidget(VisServices::create(logicManager()->getPluginContext()), this), "Algorithms");
@@ -298,7 +298,7 @@ void MainWindow::createActions()
 	mInteractorStyleActionGroup = viewService()->createInteractorStyleActionGroup();
 
 	// cross-connect save patient to save session
-	connect(mServices->getSession().get(), &SessionStorageService::isSaving, this, &MainWindow::saveDesktopSlot);
+	connect(mServices->session().get(), &SessionStorageService::isSaving, this, &MainWindow::saveDesktopSlot);
 }
 
 
@@ -571,7 +571,7 @@ void MainWindow::aboutSlot()
 
 void MainWindow::preferencesSlot()
 {
-	PreferencesDialog prefDialog(mServices->visualizationService, mServices->patientModelService, this);
+	PreferencesDialog prefDialog(mServices->view(), mServices->patient(), this);
 	prefDialog.exec();
 }
 

@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ElastixSingleThreadedRunner::ElastixSingleThreadedRunner(RegServices services)
+ElastixSingleThreadedRunner::ElastixSingleThreadedRunner(RegServicesPtr services)
 {
 	mExecuter.reset(new ElastixExecuter(services));
 	connect(mExecuter.get(), SIGNAL(finished()), this, SLOT(executionFinishedSlot()));

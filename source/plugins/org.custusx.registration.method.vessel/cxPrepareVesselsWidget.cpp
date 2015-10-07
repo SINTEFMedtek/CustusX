@@ -53,20 +53,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 //------------------------------------------------------------------------------
-PrepareVesselsWidget::PrepareVesselsWidget(RegServices services, QWidget* parent) :
+PrepareVesselsWidget::PrepareVesselsWidget(RegServicesPtr services, QWidget* parent) :
 		RegistrationBaseWidget(services, parent, "org_custusx_registration_method_vessel_prepare_widget", "PrepareVesselsWidget")
 {  
-	VisServicesPtr vs(new VisServices(services));
 	this->setToolTip("Prepare data for vessel I2I registration");
 
 	XmlOptionFile options = profile()->getXmlSettings().descend("registration").descend("PrepareVesselsWidget");
   // fill the pipeline with filters:
-	mPipeline.reset(new Pipeline(services.patientModelService));
+	mPipeline.reset(new Pipeline(services->patient()));
   FilterGroupPtr filters(new FilterGroup(options.descend("pipeline")));
-	filters->append(FilterPtr(new ResampleImageFilter(vs)));
-	filters->append(FilterPtr(new SmoothingImageFilter(vs)));
-	filters->append(FilterPtr(new BinaryThresholdImageFilter(vs)));
-	filters->append(FilterPtr(new BinaryThinningImageFilter3DFilter(vs)));
+	filters->append(FilterPtr(new ResampleImageFilter(services)));
+	filters->append(FilterPtr(new SmoothingImageFilter(services)));
+	filters->append(FilterPtr(new BinaryThresholdImageFilter(services)));
+	filters->append(FilterPtr(new BinaryThinningImageFilter3DFilter(services)));
   mPipeline->initialize(filters);
 
 //  mPipeline->getNodes()[0]->setValueName("US Image:");
@@ -75,7 +74,7 @@ PrepareVesselsWidget::PrepareVesselsWidget(RegServices services, QWidget* parent
 
   mLayout = new QVBoxLayout(this);
 
-  mPipelineWidget = new PipelineWidget(services.visualizationService, services.patientModelService, NULL, mPipeline);
+  mPipelineWidget = new PipelineWidget(services->view(), services->patient(), NULL, mPipeline);
   mLayout->addWidget(mPipelineWidget);
 
   mColorProperty = ColorProperty::initialize("Color", "",
@@ -113,14 +112,14 @@ void PrepareVesselsWidget::toMovingSlot()
 {
 	DataPtr data = mPipeline->getNodes().back()->getData();
 	if (data)
-		mServices.registrationService->setMovingData(data);
+		mServices->registration()->setMovingData(data);
 }
 
 void PrepareVesselsWidget::toFixedSlot()
 {
 	DataPtr data = mPipeline->getNodes().back()->getData();
 	if (data)
-		mServices.registrationService->setFixedData(data);
+		mServices->registration()->setFixedData(data);
 }
 
 PrepareVesselsWidget::~PrepareVesselsWidget()

@@ -29,35 +29,19 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include "cxCustusDialect.h"
+#include "cxNetworkService.h"
 
-#include "cxIGTLinkConversion.h"
-#include "cxImage.h"
-#include "cxLogger.h"
 
 namespace cx
 {
 
-QString CustusDialect::getName() const
-{
-    return "Custus";
-}
+//QStringList NetworkService::getConnectionUids() const
+//{
+//	std::vector<NetworkConnectionHandlePtr> connections = this->getConnections();
+//	QStringList retval;
+//	for (unsigned i=0; i<connections.size(); ++i)
+//		retval << connections[i]->client()->getUid();
+//	return retval;
+//}
 
-bool CustusDialect::doCRC() const
-{
-    //in the old version of the custusx openigtlink server
-    //crc checking is disabled (for images)
-    return false;
-}
-
-void CustusDialect::translate(const IGTLinkImageMessage::Pointer body)
-{
-    emit igtlimage(body);
-}
-
-void CustusDialect::translate(const cx::IGTLinkUSStatusMessage::Pointer body)
-{
-    emit usstatusmessage(body);
-}
-
-}
+} // namespace cx

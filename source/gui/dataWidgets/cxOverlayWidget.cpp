@@ -39,14 +39,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx {
 
-OverlayWidget::OverlayWidget(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget* parent) :
+OverlayWidget::OverlayWidget(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget* parent) :
 		BaseWidget(parent, "OverlayWidget", "Overlay")
 {
 	this->setToolTip("Manage multiple overlayed 2D slices");
 	QVBoxLayout* layout = new QVBoxLayout(this);
 	layout->setMargin(0);
 	layout->addWidget(new TransferFunction2DOpacityWidget(patientModelService->getActiveData(), this), 0);
-	layout->addWidget(new DataViewSelectionWidget(patientModelService, visualizationService, this), 1);
+	layout->addWidget(new DataViewSelectionWidget(patientModelService, viewService, this), 1);
 }
 
 } /* namespace cx */

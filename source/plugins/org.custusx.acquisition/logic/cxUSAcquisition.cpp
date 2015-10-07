@@ -62,10 +62,10 @@ USAcquisition::USAcquisition(AcquisitionPtr base, QObject* parent) :
 	connect(mCore.get(), SIGNAL(saveDataCompleted(QString)), this, SIGNAL(saveDataCompleted(QString)));
 
 
-	connect(this->getServices()->getToolManager().get(), &TrackingService::stateChanged, this, &USAcquisition::checkIfReadySlot);
-	connect(this->getServices()->getToolManager().get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(checkIfReadySlot()));
-	connect(this->getServices()->getVideoService().get(), SIGNAL(activeVideoSourceChanged()), this, SLOT(checkIfReadySlot()));
-	connect(this->getServices()->getVideoService().get(), &VideoService::connected, this, &USAcquisition::checkIfReadySlot);
+	connect(this->getServices()->tracking().get(), &TrackingService::stateChanged, this, &USAcquisition::checkIfReadySlot);
+	connect(this->getServices()->tracking().get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(checkIfReadySlot()));
+	connect(this->getServices()->video().get(), SIGNAL(activeVideoSourceChanged()), this, SLOT(checkIfReadySlot()));
+	connect(this->getServices()->video().get(), &VideoService::connected, this, &USAcquisition::checkIfReadySlot);
 
 	connect(mBase.get(), SIGNAL(started()), this, SLOT(recordStarted()));
 	connect(mBase.get(), SIGNAL(acquisitionStopped()), this, SLOT(recordStopped()), Qt::QueuedConnection);
@@ -105,9 +105,9 @@ QString USAcquisition::getInfoText(AcquisitionService::TYPES context) const
 
 void USAcquisition::checkIfReadySlot()
 {
-	bool tracking = this->getServices()->getToolManager()->getState()>=Tool::tsTRACKING;
-	bool streaming = this->getServices()->getVideoService()->isConnected();
-	ToolPtr tool = this->getServices()->getToolManager()->getFirstProbe();
+	bool tracking = this->getServices()->tracking()->getState()>=Tool::tsTRACKING;
+	bool streaming = this->getServices()->video()->isConnected();
+	ToolPtr tool = this->getServices()->tracking()->getFirstProbe();
 
 	QString mWhatsMissing;
 	mWhatsMissing.clear();
@@ -165,7 +165,7 @@ void USAcquisition::recordStarted()
 
 	this->getReconstructer()->selectData(USReconstructInputData()); // clear old data in reconstructeer
 
-	ToolPtr tool = this->getServices()->getToolManager()->getFirstProbe();
+	ToolPtr tool = this->getServices()->tracking()->getFirstProbe();
 	mCore->setWriteColor(this->getWriteColor());
 	mCore->startRecord(mBase->getLatestSession(), tool, this->getRecordingVideoSources(tool));
 }
@@ -179,9 +179,9 @@ void USAcquisition::recordStopped()
 
 	this->sendAcquisitionDataToReconstructer();
 
-	mCore->set_rMpr(this->getServices()->getPatientService()->get_rMpr());
+	mCore->set_rMpr(this->getServices()->patient()->get_rMpr());
 	bool compress = settings()->value("Ultrasound/CompressAcquisition", true).toBool();
-	QString baseFolder = this->getServices()->getPatientService()->getActivePatientFolder();
+	QString baseFolder = this->getServices()->patient()->getActivePatientFolder();
 	mCore->startSaveData(baseFolder, compress);
 
 	mCore->clearRecording();
@@ -196,9 +196,9 @@ void USAcquisition::recordCancelled()
 
 void USAcquisition::sendAcquisitionDataToReconstructer()
 {
-	mCore->set_rMpr(this->getServices()->getPatientService()->get_rMpr());
+	mCore->set_rMpr(this->getServices()->patient()->get_rMpr());
 
-	VideoSourcePtr activeVideoSource = this->getServices()->getVideoService()->getActiveVideoSource();
+	VideoSourcePtr activeVideoSource = this->getServices()->video()->getActiveVideoSource();
 	if (activeVideoSource)
 	{
 		USReconstructInputData data = mCore->getDataForStream(activeVideoSource->getUid());
@@ -220,7 +220,7 @@ std::vector<VideoSourcePtr> USAcquisition::getRecordingVideoSources(ToolPtr tool
 	}
 	else
 	{
-		retval = this->getServices()->getVideoService()->getVideoSources();
+		retval = this->getServices()->video()->getVideoSources();
 	}
 
 	return retval;

@@ -134,7 +134,7 @@ class cxGui_EXPORT DataViewSelectionWidget : public QWidget
 {
   Q_OBJECT
 public:
-  DataViewSelectionWidget(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget* parent = NULL);
+  DataViewSelectionWidget(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget* parent = NULL);
   virtual ~DataViewSelectionWidget();
 
 private slots:
@@ -144,7 +144,7 @@ private:
   SelectedDataListWidget* mSelectedDataListWidget;
   AllDataListWidget* mAllDataListWidget;
   QLabel* mVisibleLabel;
-  VisualizationServicePtr mVisualizationService;
+  ViewServicePtr mViewService;
 };
 
 /**

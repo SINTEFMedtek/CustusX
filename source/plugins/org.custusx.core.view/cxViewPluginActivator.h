@@ -42,7 +42,7 @@ namespace cx
  * \defgroup org_custusx_core_view
  * \ingroup cx_plugins
  *
- * \see cx::VisualizationImplService.
+ * \see cx::ViewImplService.
  *
  */
 

@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-QWidget* createDataWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent, PropertyPtr data, QGridLayout* gridLayout, int row)
+QWidget* createDataWidget(ViewServicePtr viewService, PatientModelServicePtr patientModelService, QWidget* parent, PropertyPtr data, QGridLayout* gridLayout, int row)
 {
 	QWidget* retval = NULL;
 
@@ -65,7 +65,7 @@ QWidget* createDataWidget(VisualizationServicePtr visualizationService, PatientM
 	SelectDataStringPropertyBasePtr dsda = boost::dynamic_pointer_cast<SelectDataStringPropertyBase>(data);
 	if (dsda)
 	{
-		retval = new DataSelectWidget(visualizationService, patientModelService, parent, dsda, gridLayout, row);
+		retval = new DataSelectWidget(viewService, patientModelService, parent, dsda, gridLayout, row);
 		return retval;
 	}
 	if(retval != NULL)

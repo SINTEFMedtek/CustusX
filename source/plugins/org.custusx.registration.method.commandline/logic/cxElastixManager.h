@@ -60,7 +60,7 @@ class ElastixManager : public QObject
 {
 	Q_OBJECT
 public:
-	ElastixManager(RegServices services);
+	ElastixManager(RegServicesPtr services);
 	virtual ~ElastixManager();
 
 	BoolPropertyPtr getDisplayProcessMessages() { return mDisplayProcessMessages; }
@@ -84,7 +84,7 @@ private:
 	BoolPropertyPtr mDisplayProcessMessages;
 	BoolPropertyPtr mDisableRendering;
 	ElastixExecuterPtr mExecuter;
-	RegServices mServices;
+	RegServicesPtr mServices;
 };
 typedef boost::shared_ptr<ElastixManager> ElastixManagerPtr;
 

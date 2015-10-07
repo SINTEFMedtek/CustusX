@@ -29,18 +29,56 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include "cxRASDialect.h"
 
-#include "cxIGTLinkConversion.h"
+
+#ifndef CXPROTOCOL_H
+#define CXPROTOCOL_H
+
+#include "org_custusx_core_openigtlink_Export.h"
+
+#include <QObject>
+
+#include <boost/shared_ptr.hpp>
+#include "cxEncodedPackage.h"
+#include "cxTransform3D.h"
 #include "cxImage.h"
-#include "cxLogger.h"
+#include "cxProbeDefinition.h"
 
 namespace cx
 {
 
-QString RASDialect::getName() const
+/**
+ * An Application layer protocol for sending/receiving CustusX objects.
+ *
+ * Single-threaded.
+ */
+class org_custusx_core_openigtlink_EXPORT Protocol : public QObject
 {
-	return "RAS";
-}
+    Q_OBJECT
+public:
+    explicit Protocol(QObject *parent = 0);
 
-}
+    virtual QString getName() const;
+    virtual EncodedPackagePtr getPack();
+    virtual bool readyToReceiveData() = 0;
+	virtual EncodedPackagePtr encode(ImagePtr image) = 0;
+	virtual EncodedPackagePtr encode(MeshPtr data) = 0;
+
+protected slots:
+    virtual void processPack() = 0;
+
+signals:
+    void transform(QString devicename, Transform3D transform, double timestamp);
+    void calibration(QString devicename, Transform3D calibration);
+    void image(ImagePtr image);
+	void mesh(MeshPtr mesh);
+    void probedefinition(QString devicename, ProbeDefinitionPtr definition);
+
+protected:
+    EncodedPackagePtr mPack;
+
+};
+typedef boost::shared_ptr<Protocol> ProtocolPtr;
+
+} //namespace cx
+#endif // CXPROTOCOL_H

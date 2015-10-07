@@ -70,11 +70,11 @@ LapFrameToolCalibrationWidget::LapFrameToolCalibrationWidget(VisServicesPtr serv
       0.0, DoubleRange(-M_PI/2, M_PI/2, M_PI/180), 0);
   mCameraAngleAdapter->setInternal2Display(180.0/M_PI);
 
-  mCalibRefTool = StringPropertySelectTool::New(mServices->getToolManager());
+  mCalibRefTool = StringPropertySelectTool::New(mServices->tracking());
   mCalibRefTool->setValueName("Calibration Frame");
   mCalibRefTool->setHelp("Select Calibration Reference Frame");
 
-  mCalibratingTool = StringPropertySelectTool::New(mServices->getToolManager());
+  mCalibratingTool = StringPropertySelectTool::New(mServices->tracking());
   mCalibratingTool->setValueName("Tool");
   mCalibratingTool->setHelp("Select which Tool to calibrate");
 
@@ -104,7 +104,7 @@ LapFrameToolCalibrationWidget::LapFrameToolCalibrationWidget(VisServicesPtr serv
   //setting default state
   this->toolSelectedSlot();
 
-  connect(mServices->getToolManager().get(), &cx::TrackingService::stateChanged, this, &LapFrameToolCalibrationWidget::trackingStartedSlot);
+  connect(mServices->tracking().get(), &cx::TrackingService::stateChanged, this, &LapFrameToolCalibrationWidget::trackingStartedSlot);
 }
 
 LapFrameToolCalibrationWidget::~LapFrameToolCalibrationWidget()
@@ -186,7 +186,7 @@ void LapFrameToolCalibrationWidget::toolSelectedSlot()
 
 void LapFrameToolCalibrationWidget::trackingStartedSlot()
 {
-	ToolPtr ref = mServices->getToolManager()->getTool("calibration_tool");
+	ToolPtr ref = mServices->tracking()->getTool("calibration_tool");
 	if (ref)
 		mCalibRefTool->setValue(ref->getUid());
 }

@@ -134,7 +134,7 @@ void ViewGroup::mouseClickInViewGroupSlot()
 	std::vector<ImagePtr> images = mViewGroupData->getImages(DataViewProperties::createFull());
 	std::vector<MeshPtr> meshes = mViewGroupData->getMeshes(DataViewProperties::createFull());
 	std::vector<TrackedStreamPtr> trackedStreams = mViewGroupData->getTrackedStreams(DataViewProperties::createFull());
-	ActiveDataPtr activeData = mBackend->getPatientService()->getActiveData();
+	ActiveDataPtr activeData = mBackend->patient()->getActiveData();
 
 	if(!meshes.empty())
 		activeData->setActive(meshes.front()->getUid());

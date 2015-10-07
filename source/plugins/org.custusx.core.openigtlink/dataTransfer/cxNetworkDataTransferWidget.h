@@ -29,46 +29,41 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXNETWORKCONNECTIONMANAGER_H
-#define CXNETWORKCONNECTIONMANAGER_H
+#ifndef CXNETWORKDATATRANSFERWIDGET_H_
+#define CXNETWORKDATATRANSFERWIDGET_H_
 
-#include "boost/shared_ptr.hpp"
-#include <QString>
-#include <QObject>
-#include "org_custusx_core_openigtlink_Export.h"
+#include <QThread>
+#include "cxBaseWidget.h"
+#include "cxForwardDeclarations.h"
 
-namespace cx
-{
-typedef boost::shared_ptr<class NetworkConnectionManager> NetworkConnectionManagerPtr;
-typedef boost::shared_ptr<class OpenIGTLinkClientThreadHandler> OpenIGTLinkClientThreadHandlerPtr;
+class ctkPluginContext;
+
+namespace cx {
+
+class NetworkConnectionWidget;
+class NetworkConnection;
+typedef boost::shared_ptr<class NetworkConnectionHandle> NetworkConnectionHandlePtr;
+typedef boost::shared_ptr<class NetworkDataTransfer> NetworkDataTransferPtr;
+typedef boost::shared_ptr<class BoolProperty> BoolPropertyPtr;
+typedef boost::shared_ptr<class StringProperty> StringPropertyPtr;
+typedef boost::shared_ptr<class StringPropertySelectData> StringPropertySelectDataPtr;
 
 /**
- * Manages all network connections in CustusX.
- *
- *
+ * Widget for handling data transfer to/from an OpenIGTLink server.
  */
-class org_custusx_core_openigtlink_EXPORT NetworkConnectionManager : public QObject
+class NetworkDataTransferWidget : public BaseWidget
 {
 	Q_OBJECT
 public:
-	NetworkConnectionManager();
-
-	QStringList getConnectionUids() const;
-
-
-	std::vector<OpenIGTLinkClientThreadHandlerPtr> getConnections() const;
-	OpenIGTLinkClientThreadHandlerPtr getConnection(QString uid);
-signals:
-	void connectionsChanged();
-
+	NetworkDataTransferWidget(NetworkDataTransferPtr backend, QWidget* parent=NULL);
+	~NetworkDataTransferWidget();
 private:
-	QString newConnection(QString suggested_uid);
-	QString findUniqueUidNumber(QString uidBase) const;
-	OpenIGTLinkClientThreadHandlerPtr findConnection(QString uid) const;
-	std::vector<OpenIGTLinkClientThreadHandlerPtr> mConnections;
+	NetworkDataTransferPtr mDataTransfer;
+	NetworkConnectionWidget* mConnectionWidget;
+
+	QVBoxLayout* createVBoxInGroupBox(QVBoxLayout* parent, QString header);
 };
 
 } // namespace cx
 
-
-#endif // CXNETWORKCONNECTIONMANAGER_H
+#endif // CXNETWORKDATATRANSFERWIDGET_H_

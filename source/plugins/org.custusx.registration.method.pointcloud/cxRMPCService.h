@@ -50,8 +50,8 @@ class org_custusx_registration_method_pointcloud_EXPORT RMPCImageToPatientServic
 {
 	Q_INTERFACES(cx::RegistrationMethodService)
 public:
-	RMPCImageToPatientService(RegServices services) :
-		RegistrationMethodService(services) {}
+	RMPCImageToPatientService(ctkPluginContext* context) :
+		RegistrationMethodService(RegServices::create(context)) {}
 	virtual ~RMPCImageToPatientService() {}
 	virtual QString getRegistrationType() {return QString("ImageToPatient");}
 	virtual QString getRegistrationMethod() {return QString("PointCloud");}

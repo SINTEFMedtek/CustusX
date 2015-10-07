@@ -66,7 +66,7 @@ class cxGui_EXPORT EraserWidget: public BaseWidget
 Q_OBJECT
 
 public:
-	EraserWidget(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget* parent);
+	EraserWidget(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget* parent);
 
 	virtual ~EraserWidget();
 private:
@@ -92,7 +92,7 @@ private:
 
 	ActiveImageProxyPtr mActiveImageProxy;
 	PatientModelServicePtr mPatientModelService;
-	VisualizationServicePtr mVisualizationService;
+	ViewServicePtr mViewService;
 	ActiveDataPtr mActiveData;
 
 private slots:

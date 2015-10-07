@@ -31,13 +31,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxNetworkConnectionsWidget.h"
 
-#include "cxNetworkConnectionManager.h"
+#include "cxNetworkServiceImpl.h"
 #include "cxStringProperty.h"
-#include "cxOpenIGTLinkConnectionWidget.h"
+#include "cxNetworkConnectionWidget.h"
 #include <QGroupBox>
 #include "cxDetailedLabeledComboBoxWidget.h"
-#include "cxOpenIGTLinkClient.h"
+#include "cxNetworkConnection.h"
 #include "cxLogger.h"
+#include "cxNetworkConnectionHandle.h"
 
 namespace cx
 {
@@ -76,7 +77,7 @@ struct WidgetInGroupBox
 
 
 
-NetworkConnectionsWidget::NetworkConnectionsWidget(NetworkConnectionManagerPtr connections, QWidget* parent) :
+NetworkConnectionsWidget::NetworkConnectionsWidget(NetworkServiceImplPtr connections, QWidget* parent) :
 	BaseWidget(parent, "NetworkConnectionsWidget", "Network Connections"),
 	mConnections(connections)
 {
@@ -87,7 +88,7 @@ NetworkConnectionsWidget::NetworkConnectionsWidget(NetworkConnectionManagerPtr c
 	connect(mConnectionSelector.get(), &StringProperty::changed,
 			this, &NetworkConnectionsWidget::onConnectionSelected);
 
-	connect(mConnections.get(), &NetworkConnectionManager::connectionsChanged,
+	connect(mConnections.get(), &NetworkServiceImpl::connectionsChanged,
 			this, &NetworkConnectionsWidget::onNetworkManagerChanged);
 
 	mConnectionSelectionWidget = new DetailedLabeledComboBoxWidget(this, mConnectionSelector);
@@ -120,13 +121,12 @@ void NetworkConnectionsWidget::onConnectionSelected()
 
 void NetworkConnectionsWidget::updateConnectionWidget()
 {
-	OpenIGTLinkClientThreadHandlerPtr connection = mConnections->getConnection(mConnectionSelector->getUid());
-	OpenIGTLinkConnectionWidget* widget = new OpenIGTLinkConnectionWidget(connection);
+	NetworkConnectionHandlePtr connection = mConnections->getConnection(mConnectionSelector->getValue());
+	NetworkConnectionWidget* widget = new NetworkConnectionWidget(connection);
 	mOptionsWidget->replaceWidget(widget);
 	if (connection)
 	{
-		CX_LOG_CHANNEL_DEBUG("CA") << "update " <<  (connection->client()->getUid());
-		mOptionsWidget->groupBox->setTitle(connection->client()->getUid());
+		mOptionsWidget->groupBox->setTitle(connection->getNetworkConnection()->getUid());
 	}
 }
 

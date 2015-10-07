@@ -68,12 +68,12 @@ namespace cx
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-MetricWidget::MetricWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent) :
+MetricWidget::MetricWidget(ViewServicePtr viewService, PatientModelServicePtr patientModelService, QWidget* parent) :
   BaseWidget(parent, "MetricWidget", "Metrics/3D ruler"),
   mVerticalLayout(new QVBoxLayout(this)),
   mTable(new QTableWidget(this)),
   mPatientModelService(patientModelService),
-  mVisualizationService(visualizationService)
+  mViewService(viewService)
 {
 	// the delayed timer lowers the update rate of this widget,
 	// as is is seen to strangle the render speed when many metrics are present.
@@ -235,30 +235,30 @@ bool isType(boost::shared_ptr<SUPER> data)
 }
 
 template<class WRAPPER, class METRIC, class SUPER>
-boost::shared_ptr<WRAPPER> createMetricWrapperOfType(cx::VisualizationServicePtr visualizationService, cx::PatientModelServicePtr patientModelService, boost::shared_ptr<SUPER> data)
+boost::shared_ptr<WRAPPER> createMetricWrapperOfType(cx::ViewServicePtr viewService, cx::PatientModelServicePtr patientModelService, boost::shared_ptr<SUPER> data)
 {
-	return boost::shared_ptr<WRAPPER>(new WRAPPER(visualizationService, patientModelService, castTo<METRIC>(data)));
+	return boost::shared_ptr<WRAPPER>(new WRAPPER(viewService, patientModelService, castTo<METRIC>(data)));
 }
 }
 
-MetricBasePtr MetricWidget::createMetricWrapper(cx::VisualizationServicePtr visualizationService, cx::PatientModelServicePtr patientModelService, DataPtr data)
+MetricBasePtr MetricWidget::createMetricWrapper(cx::ViewServicePtr viewService, cx::PatientModelServicePtr patientModelService, DataPtr data)
 {
 	if (isType<PointMetric>(data))
-	  return createMetricWrapperOfType<PointMetricWrapper, PointMetric>(visualizationService, patientModelService, data);
+	  return createMetricWrapperOfType<PointMetricWrapper, PointMetric>(viewService, patientModelService, data);
 	if (isType<DistanceMetric>(data))
-	  return createMetricWrapperOfType<DistanceMetricWrapper, DistanceMetric>(visualizationService, patientModelService, data);
+	  return createMetricWrapperOfType<DistanceMetricWrapper, DistanceMetric>(viewService, patientModelService, data);
 	if (isType<AngleMetric>(data))
-	  return createMetricWrapperOfType<AngleMetricWrapper, AngleMetric>(visualizationService, patientModelService, data);
+	  return createMetricWrapperOfType<AngleMetricWrapper, AngleMetric>(viewService, patientModelService, data);
 	if (isType<FrameMetric>(data))
-	  return createMetricWrapperOfType<FrameMetricWrapper, FrameMetric>(visualizationService, patientModelService, data);
+	  return createMetricWrapperOfType<FrameMetricWrapper, FrameMetric>(viewService, patientModelService, data);
 	if (isType<ToolMetric>(data))
-	  return createMetricWrapperOfType<ToolMetricWrapper, ToolMetric>(visualizationService, patientModelService, data);
+	  return createMetricWrapperOfType<ToolMetricWrapper, ToolMetric>(viewService, patientModelService, data);
 	if (isType<PlaneMetric>(data))
-	  return createMetricWrapperOfType<PlaneMetricWrapper, PlaneMetric>(visualizationService, patientModelService, data);
+	  return createMetricWrapperOfType<PlaneMetricWrapper, PlaneMetric>(viewService, patientModelService, data);
 	if (isType<DonutMetric>(data))
-	  return createMetricWrapperOfType<DonutMetricWrapper, DonutMetric>(visualizationService, patientModelService, data);
+	  return createMetricWrapperOfType<DonutMetricWrapper, DonutMetric>(viewService, patientModelService, data);
 	if (isType<SphereMetric>(data))
-	  return createMetricWrapperOfType<SphereMetricWrapper, SphereMetric>(visualizationService, patientModelService, data);
+	  return createMetricWrapperOfType<SphereMetricWrapper, SphereMetric>(viewService, patientModelService, data);
 
 	return MetricBasePtr();
 }
@@ -266,13 +266,13 @@ MetricBasePtr MetricWidget::createMetricWrapper(cx::VisualizationServicePtr visu
 /** create new metric wrappers for all metrics in PaSM
  *
  */
-std::vector<MetricBasePtr> MetricWidget::createMetricWrappers(cx::VisualizationServicePtr visualizationService, cx::PatientModelServicePtr patientModelService)
+std::vector<MetricBasePtr> MetricWidget::createMetricWrappers(cx::ViewServicePtr viewService, cx::PatientModelServicePtr patientModelService)
 {
 	std::vector<MetricBasePtr> retval;
   std::map<QString, DataPtr> all = patientService()->getData();
   for (std::map<QString, DataPtr>::iterator iter=all.begin(); iter!=all.end(); ++iter)
   {
-	MetricBasePtr wrapper = this->createMetricWrapper(visualizationService, patientModelService, iter->second);
+	MetricBasePtr wrapper = this->createMetricWrapper(viewService, patientModelService, iter->second);
   	if (wrapper)
   	{
   		retval.push_back(wrapper);
@@ -287,7 +287,7 @@ void MetricWidget::prePaintEvent()
 //	QTime timer;
 //	timer.start();
 	mPaintCount++;
-  std::vector<MetricBasePtr> newMetrics = this->createMetricWrappers(mVisualizationService, mPatientModelService);
+  std::vector<MetricBasePtr> newMetrics = this->createMetricWrappers(mViewService, mPatientModelService);
 
   bool rebuild = !this->checkEqual(newMetrics, mMetrics);
   if (rebuild)

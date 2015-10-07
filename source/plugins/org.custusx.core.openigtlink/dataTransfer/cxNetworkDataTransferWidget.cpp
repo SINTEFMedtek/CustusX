@@ -29,29 +29,29 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include "cxOpenIGTLinkDataTransferWidget.h"
+#include "cxNetworkDataTransferWidget.h"
 
 #include <QPushButton>
 #include <QGroupBox>
-#include "cxOpenIGTLinkClient.h"
-#include "cxOpenIGTLinkConnectionWidget.h"
+#include "cxNetworkConnection.h"
+#include "cxNetworkConnectionWidget.h"
 #include "cxBoolProperty.h"
 #include "cxHelperWidgets.h"
 #include "cxSelectDataStringProperty.h"
 #include "cxStringProperty.h"
-#include "cxOpenIGTLinkDataTransfer.h"
+#include "cxNetworkDataTransfer.h"
 #include "cxStringPropertyActiveVideoSource.h"
 #include "cxHelperWidgets.h"
+#include "cxNetworkConnectionHandle.h"
 
 namespace cx {
 
-OpenIGTLinkDataTransferWidget::OpenIGTLinkDataTransferWidget(OpenIGTLinkDataTransferPtr backend, QWidget *parent) :
-	BaseWidget(parent, "OpenIGTLinkDataTransferWidget", "OpenIGTLink Data Transfer"),
+NetworkDataTransferWidget::NetworkDataTransferWidget(NetworkDataTransferPtr backend, QWidget *parent) :
+	BaseWidget(parent, "NetworkDataTransferWidget", "Network Data Transfer"),
 	mDataTransfer(backend)
 {
-//	mDataTransfer.reset(new OpenIGTLinkDataTransfer(context, connection));
 
-	mConnectionWidget = new OpenIGTLinkConnectionWidget(mDataTransfer->getOpenIGTLink());
+	mConnectionWidget = new NetworkConnectionWidget(mDataTransfer->getOpenIGTLink());
 
 	// handled by dialect - remove (kept cause might be useful in export/import dialogs)
 //	mCoordinateSystem = StringProperty::initialize("igltcoords", "Coordinate System",
@@ -67,12 +67,12 @@ OpenIGTLinkDataTransferWidget::OpenIGTLinkDataTransferWidget(OpenIGTLinkDataTran
 //	mCoordinateSystem->setDisplayNames(names);
 
 	QPushButton* sendButton = new QPushButton("Send", this);
-	connect(sendButton, &QPushButton::clicked, mDataTransfer.get(), &OpenIGTLinkDataTransfer::onSend);
+	connect(sendButton, &QPushButton::clicked, mDataTransfer.get(), &NetworkDataTransfer::onSend);
 
 	QVBoxLayout* layout = new QVBoxLayout(this);
 //	layout->setMargin(0);
 
-	QString uid = mDataTransfer->getOpenIGTLink()->client()->getUid();
+	QString uid = mDataTransfer->getOpenIGTLink()->getNetworkConnection()->getUid();
 	QVBoxLayout* connectionLayout = this->createVBoxInGroupBox(layout, QString("Connection/%1").arg(uid));
 	connectionLayout->addWidget(mConnectionWidget);
 
@@ -94,12 +94,12 @@ OpenIGTLinkDataTransferWidget::OpenIGTLinkDataTransferWidget(OpenIGTLinkDataTran
 										   this, mDataTransfer->getStreamActiveVideoSource()));
 }
 
-OpenIGTLinkDataTransferWidget::~OpenIGTLinkDataTransferWidget()
+NetworkDataTransferWidget::~NetworkDataTransferWidget()
 {
 	mDataTransfer.reset();
 }
 
-QVBoxLayout* OpenIGTLinkDataTransferWidget::createVBoxInGroupBox(QVBoxLayout* parent, QString header)
+QVBoxLayout* NetworkDataTransferWidget::createVBoxInGroupBox(QVBoxLayout* parent, QString header)
 {
 	QWidget* widget = new QWidget(this);
 	QVBoxLayout* layout = new QVBoxLayout(widget);

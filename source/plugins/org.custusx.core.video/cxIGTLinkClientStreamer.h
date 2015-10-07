@@ -84,7 +84,7 @@ private:
 	bool ReceiveSonixStatus(QTcpSocket* socket, igtl::MessageHeader::Pointer& header);
 	bool readOneMessage();
 	void addToQueue(IGTLinkUSStatusMessage::Pointer msg);
-	void addToQueue(IGTLinkImageMessage::Pointer msg);
+	void addToQueue(igtl::ImageMessage::Pointer msg);
 	bool multipleTryConnectToHost();
 	bool tryConnectToHost();
 

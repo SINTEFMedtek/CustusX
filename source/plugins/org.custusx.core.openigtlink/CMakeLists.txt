@@ -6,11 +6,11 @@ set(PLUGIN_SRCS
     cxOpenIGTLinkPluginActivator.cpp
 
     guiExtenderService/cxOpenIGTLinkGuiExtenderService.h
-	dataTransfer/cxOpenIGTLinkDataTransferWidget.cpp
-	dataTransfer/cxOpenIGTLinkDataTransfer.cpp
+	dataTransfer/cxNetworkDataTransferWidget.cpp
+	dataTransfer/cxNetworkDataTransfer.cpp
 
     guiExtenderService/cxOpenIGTLinkGuiExtenderService.cpp
-    guiExtenderService/cxOpenIGTLinkConnectionWidget.cpp
+    guiExtenderService/cxNetworkConnectionWidget.cpp
 	guiExtenderService/cxNetworkConnectionsWidget.cpp
 
     trackingSystemService/cxOpenIGTLinkTrackingSystemService.cpp
@@ -21,35 +21,43 @@ set(PLUGIN_SRCS
     streamerService/cxOpenIGTLinkStreamer.cpp
 
 #    openigtlinkClient/cxSocket.cpp
-    openigtlinkClient/cxOpenIGTLinkClient.cpp
-    openigtlinkClient/cxDialect.cpp
-    openigtlinkClient/cxPlusDialect.h
-    openigtlinkClient/cxPlusDialect.cpp
-    openigtlinkClient/cxCustusDialect.h
-    openigtlinkClient/cxCustusDialect.cpp
-	openigtlinkClient/cxRASDialect.h
-	openigtlinkClient/cxRASDialect.cpp
-	openigtlinkClient/cxNetworkConnectionManager.cpp
+    openigtlinkClient/cxNetworkConnection.cpp
+    openigtlinkClient/cxNetworkServiceImpl.cpp
+    openigtlinkClient/cxNetworkConnectionHandle.cpp
+
+    openigtlinkClient/protocols/cxEncodedPackage.cpp
+    openigtlinkClient/protocols/cxProtocol.cpp
+    openigtlinkClient/protocols/cxOpenIGTLinkProtocol.h
+    openigtlinkClient/protocols/cxOpenIGTLinkProtocol.cpp
+    openigtlinkClient/protocols/cxPlusProtocol.h
+    openigtlinkClient/protocols/cxPlusProtocol.cpp
+    openigtlinkClient/protocols/cxCustusProtocol.h
+    openigtlinkClient/protocols/cxCustusProtocol.cpp
+    openigtlinkClient/protocols/cxRASProtocol.h
+    openigtlinkClient/protocols/cxRASProtocol.cpp
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
     cxOpenIGTLinkPluginActivator.h
 
-	dataTransfer/cxOpenIGTLinkDataTransferWidget.h
-	dataTransfer/cxOpenIGTLinkDataTransfer.h
-	guiExtenderService/cxOpenIGTLinkConnectionWidget.h
-	guiExtenderService/cxNetworkConnectionsWidget.h
+    dataTransfer/cxNetworkDataTransferWidget.h
+    dataTransfer/cxNetworkDataTransfer.h
+    guiExtenderService/cxNetworkConnectionWidget.h
+    guiExtenderService/cxNetworkConnectionsWidget.h
 
     trackingSystemService/cxOpenIGTLinkTrackingSystemService.h
     trackingSystemService/cxOpenIGTLinkTool.h
 
     streamerService/cxOpenIGTLinkStreamer.h
 
-#    openigtlinkClient/cxSocket.h
-    openigtlinkClient/cxOpenIGTLinkClient.h
-    openigtlinkClient/cxDialect.h
-	openigtlinkClient/cxNetworkConnectionManager.h
+    openigtlinkClient/cxNetworkConnection.h
+    openigtlinkClient/cxNetworkServiceImpl.h
+    openigtlinkClient/cxNetworkConnectionHandle.h
+
+    openigtlinkClient/protocols/cxEncodedPackage.h
+    openigtlinkClient/protocols/cxProtocol.h
+    openigtlinkClient/protocols/cxOpenIGTLinkProtocol.h
 )
 
 # Qt Designer files which should be processed by Qts uic
@@ -96,10 +104,11 @@ target_include_directories(${PROJECT_NAME}
     .
     ${CMAKE_CURRENT_BINARY_DIR}
     openigtlinkClient
+    openigtlinkClient/protocols
     trackingSystemService
     streamerService
     guiExtenderService
-	dataTransfer
+    dataTransfer
 )
 
 

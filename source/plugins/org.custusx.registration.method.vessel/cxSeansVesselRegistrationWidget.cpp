@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-SeansVesselRegistrationWidget::SeansVesselRegistrationWidget(RegServices services, QWidget* parent) :
+SeansVesselRegistrationWidget::SeansVesselRegistrationWidget(RegServicesPtr services, QWidget* parent) :
 	ICPRegistrationBaseWidget(services, parent,
 						   "org_custusx_registration_method_vessel_seans_widget",
 						   "Seans Vessel Registration")
@@ -70,23 +70,23 @@ SeansVesselRegistrationWidget::SeansVesselRegistrationWidget(RegServices service
 
 void SeansVesselRegistrationWidget::setup()
 {
-	mSpaceListenerMoving = mServices.spaceProvider->createListener();
-	mSpaceListenerFixed = mServices.spaceProvider->createListener();
+	mSpaceListenerMoving = mServices->spaceProvider()->createListener();
+	mSpaceListenerFixed = mServices->spaceProvider()->createListener();
 	connect(mSpaceListenerMoving.get(), &SpaceListener::changed, this, &SeansVesselRegistrationWidget::onSpacesChanged);
 	connect(mSpaceListenerFixed.get(), &SpaceListener::changed, this, &SeansVesselRegistrationWidget::onSpacesChanged);
 
-	connect(mServices.registrationService.get(), &RegistrationService::fixedDataChanged,
+	connect(mServices->registration().get(), &RegistrationService::fixedDataChanged,
 			this, &SeansVesselRegistrationWidget::inputChanged);
-	connect(mServices.registrationService.get(), &RegistrationService::movingDataChanged,
+	connect(mServices->registration().get(), &RegistrationService::movingDataChanged,
 			this, &SeansVesselRegistrationWidget::inputChanged);
 
 	QVBoxLayout* layout = new QVBoxLayout(this);
 	QGridLayout* entryLayout = new QGridLayout;
 	entryLayout->setColumnStretch(1, 1);
 
-	mFixedImage.reset(new StringPropertyRegistrationFixedImage(mServices.registrationService, mServices.patientModelService));
+	mFixedImage.reset(new StringPropertyRegistrationFixedImage(mServices->registration(), mServices->patient()));
 	new LabeledComboBoxWidget(this, mFixedImage, entryLayout, 0);
-	mMovingImage.reset(new StringPropertyRegistrationMovingImage(mServices.registrationService, mServices.patientModelService));
+	mMovingImage.reset(new StringPropertyRegistrationMovingImage(mServices->registration(), mServices->patient()));
 	new LabeledComboBoxWidget(this, mMovingImage, entryLayout, 1);
 
 	layout->addLayout(entryLayout);
@@ -102,9 +102,9 @@ SeansVesselRegistrationWidget::~SeansVesselRegistrationWidget()
 
 void SeansVesselRegistrationWidget::initializeRegistrator()
 {
-	DataPtr moving = mServices.registrationService->getMovingData();
-	DataPtr fixed = mServices.registrationService->getFixedData();
-	QString logPath = mServices.patientModelService->getActivePatientFolder() + "/Logs/";
+	DataPtr moving = mServices->registration()->getMovingData();
+	DataPtr fixed = mServices->registration()->getFixedData();
+	QString logPath = mServices->patient()->getActivePatientFolder() + "/Logs/";
 
 	mRegistrator->initialize(moving, fixed, logPath);
 }
@@ -114,18 +114,18 @@ void SeansVesselRegistrationWidget::inputChanged()
 	if (mObscuredListener->isObscured())
 		return;
 
-	DataPtr moving = mServices.registrationService->getMovingData();
-	DataPtr fixed = mServices.registrationService->getFixedData();
+	DataPtr moving = mServices->registration()->getMovingData();
+	DataPtr fixed = mServices->registration()->getFixedData();
 
-	mSpaceListenerFixed->setSpace(mServices.spaceProvider->getD(fixed));
-	mSpaceListenerMoving->setSpace(mServices.spaceProvider->getD(moving));
+	mSpaceListenerFixed->setSpace(mServices->spaceProvider()->getD(fixed));
+	mSpaceListenerMoving->setSpace(mServices->spaceProvider()->getD(moving));
 
 	this->onSpacesChanged();
 }
 
 void SeansVesselRegistrationWidget::applyRegistration(Transform3D delta)
 {
-	mServices.registrationService->applyImage2ImageRegistration(delta, "Vessel based");
+	mServices->registration()->applyImage2ImageRegistration(delta, "Vessel based");
 }
 
 void SeansVesselRegistrationWidget::onShown()

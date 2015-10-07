@@ -44,7 +44,7 @@ namespace cx
 {
 
 
-RegisterI2IWidget::RegisterI2IWidget(RegServices services, QWidget* parent) :
+RegisterI2IWidget::RegisterI2IWidget(RegServicesPtr services, QWidget* parent) :
 		RegistrationBaseWidget(services, parent, "org_custusx_registration_method_vessel_register_widget", "Register Image2Image"),
 		mSeansVesselRegsitrationWidget(new SeansVesselRegistrationWidget(services, this))
 {
@@ -54,7 +54,7 @@ RegisterI2IWidget::RegisterI2IWidget(RegServices services, QWidget* parent) :
 
   layout->addWidget(mSeansVesselRegsitrationWidget);
   layout->addWidget(new QLabel("Parent frame tree status:"), 3, 0);
-  layout->addWidget(new FrameTreeWidget(services.patientModelService, this), 4, 0);
+  layout->addWidget(new FrameTreeWidget(services->patient(), this), 4, 0);
 }
 
 RegisterI2IWidget::~RegisterI2IWidget()

@@ -68,9 +68,9 @@ FilterSetupWidget::FilterSetupWidget(VisServicesPtr services, QWidget* parent, X
 
 	mOptions = options;
 
-	mInputsWidget = new OptionsWidget(mServices->visualizationService, mServices->getPatientService(), this);
-	mOutputsWidget = new OptionsWidget(mServices->visualizationService, mServices->getPatientService(), this);
-	mOptionsWidget = new OptionsWidget(mServices->visualizationService, mServices->getPatientService(), this);
+	mInputsWidget = new OptionsWidget(mServices->view(), mServices->patient(), this);
+	mOutputsWidget = new OptionsWidget(mServices->view(), mServices->patient(), this);
+	mOptionsWidget = new OptionsWidget(mServices->view(), mServices->patient(), this);
 	mPresetWidget = new FilterPresetWidget(this);
 	mAdvancedButton = new QCheckBox("Show &advanced options", this);
 	connect(mAdvancedButton, SIGNAL(stateChanged(int)), this, SLOT(showAdvancedOptions(int)));

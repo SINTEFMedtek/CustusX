@@ -67,7 +67,7 @@ class org_custusx_acquisition_EXPORT RecordTrackingWidget: public QWidget
 public:
 	RecordTrackingWidget(XmlOptionFile options,
 						 AcquisitionServicePtr acquisitionService,
-						 VisServices services,
+						 VisServicesPtr services,
 						 QString category,
 						 QWidget *parent);
 	virtual ~RecordTrackingWidget()	{}
@@ -88,7 +88,7 @@ private slots:
 	void obscuredSlot(bool obscured);
 
 private:
-	VisServices mServices;
+	VisServicesPtr mServices;
 	AcquisitionServicePtr mAcquisitionService;
 	XmlOptionFile mOptions;
 

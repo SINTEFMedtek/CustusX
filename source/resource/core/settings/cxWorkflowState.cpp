@@ -100,9 +100,9 @@ void WorkflowState::setActionSlot()
 void WorkflowState::autoStartHardware()
 {
 	if (settings()->value("Automation/autoStartTracking").toBool())
-		mBackend->getToolManager()->setState(Tool::tsTRACKING);
+		mBackend->tracking()->setState(Tool::tsTRACKING);
 	if (settings()->value("Automation/autoStartStreaming").toBool())
-		mBackend->getVideoService()->openConnection();
+		mBackend->video()->openConnection();
 }
 
 

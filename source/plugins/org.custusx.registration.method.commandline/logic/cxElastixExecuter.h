@@ -71,7 +71,7 @@ class org_custusx_registration_method_commandline_EXPORT ElastixExecuter : publi
 {
 	Q_OBJECT
 public:
-	ElastixExecuter(RegServices services, QObject* parent=NULL);
+	ElastixExecuter(RegServicesPtr services, QObject* parent=NULL);
 	virtual ~ElastixExecuter();
 
 	void setDisplayProcessMessages(bool on);
@@ -144,7 +144,7 @@ private:
 	QProcess* mProcess;
 	DataPtr mFixed;
 	DataPtr mMoving;
-	RegServices mServices;
+	RegServicesPtr mServices;
 };
 
 /**Reader class for an Elastix-style parameter file.

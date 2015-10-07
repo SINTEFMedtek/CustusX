@@ -69,7 +69,7 @@ class org_custusx_registration_method_vessel_EXPORT SeansVesselRegistrationWidge
 {
 	Q_OBJECT
 public:
-	SeansVesselRegistrationWidget(RegServices services, QWidget* parent);
+	SeansVesselRegistrationWidget(RegServicesPtr services, QWidget* parent);
 	virtual ~SeansVesselRegistrationWidget();
 
 protected:

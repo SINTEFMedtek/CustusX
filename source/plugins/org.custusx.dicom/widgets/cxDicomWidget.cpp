@@ -185,10 +185,10 @@ void DicomWidget::loadIntoPatientModel(ImagePtr image, QString seriesUid)
 {
 	VisServicesPtr services = VisServices::create(mContext);
 
-	if (!services->patientModelService->isNull())
+	if (!services->patient()->isNull())
 	{
-		services->patientModelService->insertData(image);
-		services->visualizationService->autoShowData(image);
+		services->patient()->insertData(image);
+		services->view()->autoShowData(image);
 		report(QString("Loaded DICOM series %1 as %2").arg(seriesUid).arg(image->getName()));
 	}
 	else

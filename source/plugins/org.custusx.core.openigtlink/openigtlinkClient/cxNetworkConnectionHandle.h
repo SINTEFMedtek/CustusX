@@ -30,69 +30,76 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-
-#ifndef CXDIALECT_H
-#define CXDIALECT_H
+#ifndef CXNETWORKCONNECTIONHANDLE_H_
+#define CXNETWORKCONNECTIONHANDLE_H_
 
 #include "org_custusx_core_openigtlink_Export.h"
 
+#include <map>
 #include <QObject>
-
-#include <boost/shared_ptr.hpp>
-
+#include <QMutex>
+#include <QMutexLocker>
 #include "igtlMessageHeader.h"
-#include "igtlPolyDataMessage.h"
 #include "igtlTransformMessage.h"
 #include "igtlImageMessage.h"
 #include "igtlStatusMessage.h"
 #include "igtlStringMessage.h"
 #include "cxIGTLinkUSStatusMessage.h"
-#include "cxIGTLinkImageMessage.h"
 
+#include "cxSocketConnection.h"
 #include "cxTransform3D.h"
 #include "cxImage.h"
 #include "cxProbeDefinition.h"
+#include "cxLogger.h"
+#include "cxProtocol.h"
+#include "boost/function.hpp"
+#include "cxXmlOptionItem.h"
 
-#define CX_OPENIGTLINK_CHANNEL_NAME "OpenIGTLink"
+typedef boost::shared_ptr<QThread> QThreadPtr;
 
-namespace cx
-{
-/**
- * @brief The Dialect class represents an interpretation of opentigtlink packages.
+namespace cx {
+
+typedef boost::shared_ptr<class NetworkConnection> NetworkConnectionPtr;
+typedef boost::shared_ptr<class NetworkConnectionHandle> NetworkConnectionHandlePtr;
+
+/** Encapsulates running of the NetworkConnection in a thread.
+ *  Lifetime of the thread equals that of this object.
+ *
  */
-
-class org_custusx_core_openigtlink_EXPORT Dialect : public QObject
+class org_custusx_core_openigtlink_EXPORT NetworkConnectionHandle : public QObject
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    explicit Dialect(QObject *parent = 0);
+	explicit NetworkConnectionHandle(QString threadname, XmlOptionFile options);
+	~NetworkConnectionHandle();
+    NetworkConnection* getNetworkConnection();
 
-    virtual QString getName() const;
-    virtual bool doCRC() const;
-	virtual PATIENT_COORDINATE_SYSTEM coordinateSystem() const { return pcsLPS; }
+    StringPropertyBasePtr getDialectOption() { return mProtocols; }
+	StringPropertyBasePtr getIpOption() { return mIp; }
+	DoublePropertyBasePtr getPortOption() { return mPort; }
+	StringPropertyBasePtr getRoleOption() { return mRole; }
 
-    virtual void translate(const igtl::TransformMessage::Pointer body);
-    virtual void translate(const igtl::ImageMessage::Pointer body);
-	virtual void translate(const igtl::PolyDataMessage::Pointer body);
-	virtual void translate(const igtl::StatusMessage::Pointer body);
-    virtual void translate(const igtl::StringMessage::Pointer body);
-    virtual void translate(const IGTLinkUSStatusMessage::Pointer body);
-    virtual void translate(const IGTLinkImageMessage::Pointer body);
+private:
+	void onConnectionInfoChanged();
+	void onPropertiesChanged();
+	StringPropertyBasePtr mIp;
+	DoublePropertyBasePtr mPort;
+    StringPropertyBasePtr mProtocols;
+	StringPropertyBasePtr mRole;
 
-signals:
-    void transform(QString devicename, Transform3D transform, double timestamp);
-    void calibration(QString devicename, Transform3D calibration);
-    void image(ImagePtr image);
-	void mesh(MeshPtr mesh);
-	void igtlimage(IGTLinkImageMessage::Pointer igtlimage);
-    void usstatusmessage(IGTLinkUSStatusMessage::Pointer msg);
-    void probedefinition(QString devicename, ProbeDefinitionPtr definition);
+	StringPropertyBasePtr createDialectOption();
+	StringPropertyBasePtr createIpOption();
+	DoublePropertyBasePtr createPortOption();
+	StringPropertyBasePtr createRoleOption();
 
-protected:
-	void writeAcceptingMessage(igtl::MessageBase* body);
-	void writeNotSupportedMessage(igtl::MessageBase *body);
+	NetworkConnectionPtr mClient;
+	QThreadPtr mThread;
+	XmlOptionFile mOptions;
+
 };
-typedef boost::shared_ptr<Dialect> DialectPtr;
+
 
 } //namespace cx
-#endif // CXDIALECT_H
+
+
+#endif // CXNETWORKCONNECTIONHANDLE_H_

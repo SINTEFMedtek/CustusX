@@ -51,7 +51,7 @@ RegistrationMethodVesselPluginActivator::~RegistrationMethodVesselPluginActivato
 
 void RegistrationMethodVesselPluginActivator::start(ctkPluginContext* context)
 {
-	RegServices services(context);
+	RegServicesPtr services = RegServices::create(context);
 	RegistrationMethodVesselImageToImageService* image2imageService = new RegistrationMethodVesselImageToImageService(services);
 
 	mRegistrationImageToImage = RegisteredServicePtr(new RegisteredService(context, image2imageService, RegistrationMethodService_iid));

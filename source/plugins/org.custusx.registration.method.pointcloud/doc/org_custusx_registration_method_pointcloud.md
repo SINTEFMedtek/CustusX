@@ -15,6 +15,7 @@ Steps:
 - Start recording, then move the pointer over the skin area in question. The movement should generate a surface that contains enough variation such that it can be matched to the segmented surface.
 - The two surfaces are registered to each other using the \ref org_custusx_registration_method_icp_algorithm, and the patient registration is updated.
 
+	Tip: A nice skin segmentation algorithm can be found in Slicer3D: Module Foreground masking (BRAINS). Use this to get a mask, then run a contouring on the mask using the Model Maker Module in order to get a surface. The OpenIGTLink connection can be used to transfer data between the two applications, or file transfer can be used. Note that CustusX uses LTS and Slicer uses RAS coordinates.
 
 \addindex org_custusx_registration_method_pointcloud_widget
 Point Cloud I2P Registration {#org_custusx_registration_method_pointcloud_widget}

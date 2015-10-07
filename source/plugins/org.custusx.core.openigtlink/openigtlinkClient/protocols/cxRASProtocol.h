@@ -29,41 +29,23 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXOPENIGTLINKDATATRANSFERWIDGET_H
-#define CXOPENIGTLINKDATATRANSFERWIDGET_H
+#ifndef CXRASPROTOCOL_H
+#define CXRASPROTOCOL_H
 
-#include <QThread>
-#include "cxBaseWidget.h"
-#include "cxForwardDeclarations.h"
+#include "org_custusx_core_openigtlink_Export.h"
 
-class ctkPluginContext;
+#include "cxOpenIGTLinkProtocol.h"
 
-namespace cx {
-
-class OpenIGTLinkConnectionWidget;
-class OpenIGTLinkClient;
-typedef boost::shared_ptr<class OpenIGTLinkClientThreadHandler> OpenIGTLinkClientThreadHandlerPtr;
-typedef boost::shared_ptr<class OpenIGTLinkDataTransfer> OpenIGTLinkDataTransferPtr;
-typedef boost::shared_ptr<class BoolProperty> BoolPropertyPtr;
-typedef boost::shared_ptr<class StringProperty> StringPropertyPtr;
-typedef boost::shared_ptr<class StringPropertySelectData> StringPropertySelectDataPtr;
-
-/**
- * Widget for handling data transfer to/from an OpenIGTLink server.
- */
-class OpenIGTLinkDataTransferWidget : public BaseWidget
+namespace cx
 {
-	Q_OBJECT
-public:
-	OpenIGTLinkDataTransferWidget(OpenIGTLinkDataTransferPtr backend, QWidget* parent=NULL);
-	~OpenIGTLinkDataTransferWidget();
-private:
-	OpenIGTLinkDataTransferPtr mDataTransfer;
-	OpenIGTLinkConnectionWidget* mConnectionWidget;
 
-	QVBoxLayout* createVBoxInGroupBox(QVBoxLayout* parent, QString header);
+class org_custusx_core_openigtlink_EXPORT RASProtocol : public OpenIGTLinkProtocol
+{
+public:
+	virtual QString getName() const;
+	virtual PATIENT_COORDINATE_SYSTEM coordinateSystem() const { return pcsRAS; }
 };
 
-} // namespace cx
+} //namespace cx
 
-#endif // CXOPENIGTLINKDATATRANSFERWIDGET_H
+#endif // CXRASPROTOCOL_H

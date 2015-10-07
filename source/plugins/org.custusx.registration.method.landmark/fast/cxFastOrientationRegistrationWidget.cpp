@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-FastOrientationRegistrationWidget::FastOrientationRegistrationWidget(RegServices services, QWidget* parent) :
+FastOrientationRegistrationWidget::FastOrientationRegistrationWidget(RegServicesPtr services, QWidget* parent) :
 	RegistrationBaseWidget(services, parent, "org_custusx_registration_method_fast_landmark_image_to_patient_orientation_widget", "Fast Orientation Registration"),
 	mSetOrientationButton(new QPushButton("Define Orientation")),
     mInvertButton(new QCheckBox("Back face"))
@@ -59,7 +59,7 @@ FastOrientationRegistrationWidget::FastOrientationRegistrationWidget(RegServices
 
   connect(settings(), &Settings::valueChangedFor, this, &FastOrientationRegistrationWidget::globalConfigurationFileChangedSlot);
 
-  mActiveToolProxy =  ActiveToolProxy::New(services.trackingService);
+  mActiveToolProxy =  ActiveToolProxy::New(services->tracking());
   connect(mActiveToolProxy.get(), SIGNAL(toolVisible(bool)), this, SLOT(enableToolSampleButtonSlot()));
   connect(mActiveToolProxy.get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(enableToolSampleButtonSlot()));
   this->enableToolSampleButtonSlot();
@@ -87,8 +87,8 @@ void FastOrientationRegistrationWidget::hideEvent(QHideEvent* event)
 
 void FastOrientationRegistrationWidget::setOrientationSlot()
 {
-	Transform3D prMt = mServices.trackingService->getActiveTool()->get_prMt();
-	mServices.registrationService->doFastRegistration_Orientation(this->get_tMtm(), prMt);
+	Transform3D prMt = mServices->tracking()->getActiveTool()->get_prMt();
+	mServices->registration()->doFastRegistration_Orientation(this->get_tMtm(), prMt);
 }
 
 Transform3D FastOrientationRegistrationWidget::get_tMtm() const
@@ -109,7 +109,7 @@ Transform3D FastOrientationRegistrationWidget::get_tMtm() const
 
 void FastOrientationRegistrationWidget::enableToolSampleButtonSlot()
 {
-  ToolPtr tool = mServices.trackingService->getActiveTool();
+  ToolPtr tool = mServices->tracking()->getActiveTool();
   bool enabled = tool &&
 	  tool->getVisible() &&
 	  (!tool->hasType(Tool::TOOL_MANUAL) || settings()->value("giveManualToolPhysicalProperties").toBool()); // enable only for non-manual tools.

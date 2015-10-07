@@ -29,43 +29,42 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXOPENIGTLINKCONNECTIONWIDGET_H
-#define CXOPENIGTLINKCONNECTIONWIDGET_H
+#ifndef CXNETWORKSERVICE_H
+#define CXNETWORKSERVICE_H
 
-#include <QDomElement>
-#include "cxBaseWidget.h"
-#include "cxStringProperty.h"
-#include "cxDoubleProperty.h"
-#include "cxSocketConnection.h"
 
-class QPushButton;
+#include "cxResourceExport.h"
+#include "boost/shared_ptr.hpp"
+#include <QString>
+#include <QStringList>
+#include <QObject>
 
-namespace cx {
+#define NetworkService_iid "cx::NetworkService"
 
-typedef boost::shared_ptr<class OpenIGTLinkClientThreadHandler> OpenIGTLinkClientThreadHandlerPtr;
-class OpenIGTLinkClient;
-
-class OpenIGTLinkConnectionWidget : public BaseWidget
+namespace cx
 {
-    Q_OBJECT
+typedef boost::shared_ptr<class NetworkServiceImpl> NetworkServiceImplPtr;
+typedef boost::shared_ptr<class NetworkConnectionHandle> NetworkConnectionHandlePtr;
 
+/**
+ * Manages all network connections in CustusX.
+ *
+ *
+ */
+class cxResource_EXPORT NetworkService : public QObject
+{
+	Q_OBJECT
 public:
-	OpenIGTLinkConnectionWidget(OpenIGTLinkClientThreadHandlerPtr client, QWidget *parent=NULL);
-    ~OpenIGTLinkConnectionWidget();
-
-    virtual QString defaultWhatsThis() const;
-
-private slots:
-    void connectButtonClicked(bool checked=false);
-
-private:
-	void onStateChanged(CX_SOCKETCONNECTION_STATE state);
-
-    QPushButton *mConnectButton;
-	QWidget* mOptionsWidget;
-	OpenIGTLinkClientThreadHandlerPtr mClient;
+	virtual ~NetworkService() {}
+	virtual QStringList getConnectionUids() const = 0; // TODO use impl in this class
+	virtual std::vector<NetworkConnectionHandlePtr> getConnections() const = 0;
+	virtual NetworkConnectionHandlePtr getConnection(QString uid) = 0;
+signals:
+	void connectionsChanged();
 };
 
-}
+} // namespace cx
+Q_DECLARE_INTERFACE(cx::NetworkService, NetworkService_iid)
 
-#endif //CXOPENIGTLINKWIDGET_H
+
+#endif // CXNETWORKSERVICE_H

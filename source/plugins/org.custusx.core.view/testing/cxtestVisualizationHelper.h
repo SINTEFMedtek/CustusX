@@ -29,72 +29,35 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include "cxNetworkConnectionManager.h"
 
-#include "cxOpenIGTLinkClient.h"
+#ifndef CXTESTVISIALIZATIONHELPER_H
+#define CXTESTVISIALIZATIONHELPER_H
 
-namespace cx
+#include "cxViewWrapper2D.h"
+#include "cxViewsFixture.h"
+
+namespace cxtest
 {
-
-NetworkConnectionManager::NetworkConnectionManager()
+typedef boost::shared_ptr<class ViewWrapper2DFixture> ViewWrapper2DFixturePtr;
+struct ViewWrapper2DFixture : public cx::ViewWrapper2D
 {
-}
+	ViewWrapper2DFixture(cx::ViewPtr view, cx::VisServicesPtr services);
+	void emitPointSampled();
+};
 
-QString NetworkConnectionManager::newConnection(QString suggested_uid)
+class VisualizationHelper
 {
-	QString uid = this->findUniqueUidNumber(suggested_uid);
-	OpenIGTLinkClientThreadHandlerPtr connection(new OpenIGTLinkClientThreadHandler(uid));
-	mConnections.push_back(connection);
-	emit connectionsChanged();
-	return uid;
-}
+public:
+	VisualizationHelper();
+	~VisualizationHelper();
 
-QString NetworkConnectionManager::findUniqueUidNumber(QString uidBase) const
-{
-	int counter = 0;
-	QString uid = uidBase;
-	while (this->findConnection(uid))
-	{
-		counter++;
-		uid = QString("%1%2").arg(uidBase).arg(counter);
-	}
+	cx::VisServicesPtr services;
+	ViewWrapper2DFixturePtr viewWrapper;
+private:
+	ViewsFixture viewsFixture;
+};
 
-	return uid;
-}
-
-std::vector<OpenIGTLinkClientThreadHandlerPtr> NetworkConnectionManager::getConnections() const
-{
-	return mConnections;
-}
-
-QStringList NetworkConnectionManager::getConnectionUids() const
-{
-	QStringList retval;
-	for (unsigned i=0; i<mConnections.size(); ++i)
-		retval << mConnections[i]->client()->getUid();
-	return retval;
-}
-
-OpenIGTLinkClientThreadHandlerPtr NetworkConnectionManager::findConnection(QString uid) const
-{
-	for (unsigned i=0; i<mConnections.size(); ++i)
-		if (mConnections[i]->client()->getUid() == uid)
-			return mConnections[i];
-	return OpenIGTLinkClientThreadHandlerPtr();
-}
-
-OpenIGTLinkClientThreadHandlerPtr NetworkConnectionManager::getConnection(QString uid)
-{
-	OpenIGTLinkClientThreadHandlerPtr connection = this->findConnection(uid);
-
-	if (!connection)
-	{
-		this->newConnection(uid);
-		connection = this->findConnection(uid);
-	}
-
-	return connection;
-}
+}//namespace cxtest
 
 
-} // namespace cx
+#endif // CXTESTVISIALIZATIONHELPER_H

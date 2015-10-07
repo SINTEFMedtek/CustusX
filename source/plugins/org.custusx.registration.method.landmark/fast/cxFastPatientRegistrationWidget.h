@@ -34,6 +34,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXFASTPATIENTREGISTRATIONWIDGET_H_
 
 #include "cxPatientLandMarksWidget.h"
+#include "org_custusx_registration_method_landmark_Export.h"
+#include <QCheckBox>
+
+class QTableWidgetItem;
 
 namespace cx
 {
@@ -52,14 +56,25 @@ namespace cx
  * \date 27. sep. 2010
  * \\author Janne Beate Bakeng
  */
-class FastPatientRegistrationWidget : public PatientLandMarksWidget
+class org_custusx_registration_method_landmark_EXPORT FastPatientRegistrationWidget : public PatientLandMarksWidget
 {
+	Q_OBJECT
 public:
-  FastPatientRegistrationWidget(RegServices services, QWidget* parent);
+  FastPatientRegistrationWidget(RegServicesPtr services, QWidget* parent);
   virtual ~FastPatientRegistrationWidget();
 
+protected:
+  virtual void showEvent(QShowEvent *event);
+  virtual void hideEvent(QHideEvent *event);
+
+  QCheckBox* mMouseClickSample;
+
+protected slots:
+  void mouseClickSampleStateChanged();
+  virtual void pointSampled(Vector3D p_r);
 private:
   virtual void performRegistration();
+  QTableWidgetItem * getLandmarkTableItem();
 };
 
 /**

@@ -29,9 +29,9 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include "cxOpenIGTLinkDataTransfer.h"
+#include "cxNetworkDataTransfer.h"
 
-#include "cxOpenIGTLinkClient.h"
+#include "cxNetworkConnection.h"
 #include "cxBoolProperty.h"
 #include "cxProfile.h"
 #include "cxHelperWidgets.h"
@@ -43,10 +43,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxIGTLinkConversionPolyData.h"
 #include "cxVideoServiceProxy.h"
 #include "cxVideoSource.h"
+#include "cxNetworkConnectionHandle.h"
+#include "boost/bind.hpp"
 
 namespace cx {
 
-OpenIGTLinkDataTransfer::OpenIGTLinkDataTransfer(ctkPluginContext *context, OpenIGTLinkClientThreadHandlerPtr connection, QObject* parent) :
+NetworkDataTransfer::NetworkDataTransfer(ctkPluginContext *context, NetworkConnectionHandlePtr connection, QObject* parent) :
 	QObject(parent),
 	mContext(context),
 	mOpenIGTLink(connection)
@@ -54,13 +56,13 @@ OpenIGTLinkDataTransfer::OpenIGTLinkDataTransfer(ctkPluginContext *context, Open
 	mOptions = profile()->getXmlSettings().descend(this->getConfigUid());
 
 	mPatientModelService = PatientModelServiceProxy::create(context);
-	mViewService = VisualizationServiceProxy::create(context);
+	mViewService = ViewServiceProxy::create(context);
 	mVideoService = VideoServiceProxy::create(context);
 
-//	mOpenIGTLink.reset(new OpenIGTLinkClientThreadHandler(this->getConfigUid()));
+//	mOpenIGTLink.reset(new NetworkConnectionHandle(this->getConfigUid()));
 
-	connect(mOpenIGTLink->client(), &OpenIGTLinkClient::image, this, &OpenIGTLinkDataTransfer::onImageReceived);
-	connect(mOpenIGTLink->client(), &OpenIGTLinkClient::mesh, this, &OpenIGTLinkDataTransfer::onMeshReceived);
+	connect(mOpenIGTLink->getNetworkConnection(), &NetworkConnection::image, this, &NetworkDataTransfer::onImageReceived);
+	connect(mOpenIGTLink->getNetworkConnection(), &NetworkConnection::mesh, this, &NetworkDataTransfer::onMeshReceived);
 
 	mDataToSend = StringPropertySelectData::New(mPatientModelService);
 
@@ -72,36 +74,36 @@ OpenIGTLinkDataTransfer::OpenIGTLinkDataTransfer(ctkPluginContext *context, Open
 												   "Stream the active Video Source over the connection",
 												   false, QDomNode());
 	connect(mStreamActiveVideoSource.get(), &BoolProperty::changed,
-			this, &OpenIGTLinkDataTransfer::onStreamActiveVideoSourceChanged);
+			this, &NetworkDataTransfer::onStreamActiveVideoSourceChanged);
 
 }
 
-OpenIGTLinkDataTransfer::~OpenIGTLinkDataTransfer()
+NetworkDataTransfer::~NetworkDataTransfer()
 {
 	mOpenIGTLink.reset(); //
 }
 
-OpenIGTLinkClientThreadHandlerPtr OpenIGTLinkDataTransfer::getOpenIGTLink()
+NetworkConnectionHandlePtr NetworkDataTransfer::getOpenIGTLink()
 {
 	return mOpenIGTLink;
 }
 
-QString OpenIGTLinkDataTransfer::getConfigUid() const
+QString NetworkDataTransfer::getConfigUid() const
 {
 	return "org.custusx.core.openigtlink.datatransfer";
 }
 
-void OpenIGTLinkDataTransfer::onImageReceived(ImagePtr image)
+void NetworkDataTransfer::onImageReceived(ImagePtr image)
 {
 	this->onDataReceived(image);
 }
 
-void OpenIGTLinkDataTransfer::onMeshReceived(MeshPtr mesh)
+void NetworkDataTransfer::onMeshReceived(MeshPtr mesh)
 {
 	this->onDataReceived(mesh);
 }
 
-void OpenIGTLinkDataTransfer::onDataReceived(DataPtr data)
+void NetworkDataTransfer::onDataReceived(DataPtr data)
 {
 	QString actionText = mAcceptIncomingData->getValue() ? "inserting" : "ignoring";
 	QString nameText = data ? data->getName() : "NULL";
@@ -117,13 +119,14 @@ void OpenIGTLinkDataTransfer::onDataReceived(DataPtr data)
 }
 
 
-void OpenIGTLinkDataTransfer::onSend()
+void NetworkDataTransfer::onSend()
 {
 	DataPtr data = mDataToSend->getData();
 	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
 	if (image)
 	{
-		mOpenIGTLink->client()->sendMessage(image);
+		boost::function<void()> message = boost::bind(&NetworkConnection::sendImage, mOpenIGTLink->getNetworkConnection(), image);
+		mOpenIGTLink->getNetworkConnection()->invoke(message);
 		return;
 	}
 	MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(data);
@@ -139,7 +142,8 @@ void OpenIGTLinkDataTransfer::onSend()
 //		return;
 //		// test end
 
-		mOpenIGTLink->client()->sendMessage(mesh);
+		boost::function<void()> message = boost::bind(&NetworkConnection::sendMesh, mOpenIGTLink->getNetworkConnection(), mesh);
+		mOpenIGTLink->getNetworkConnection()->invoke(message);
 		return;
 	}
 
@@ -148,7 +152,7 @@ void OpenIGTLinkDataTransfer::onSend()
 												 .arg(name);
 }
 
-void OpenIGTLinkDataTransfer::onStreamActiveVideoSourceChanged()
+void NetworkDataTransfer::onStreamActiveVideoSourceChanged()
 {
 	if (mStreamActiveVideoSource->getValue())
 	{
@@ -161,7 +165,7 @@ void OpenIGTLinkDataTransfer::onStreamActiveVideoSourceChanged()
 
 }
 
-void OpenIGTLinkDataTransfer::startStream()
+void NetworkDataTransfer::startStream()
 {
 	if (mStreamingVideoSource)
 	{
@@ -171,29 +175,31 @@ void OpenIGTLinkDataTransfer::startStream()
 
 	mStreamingVideoSource = mVideoService->getActiveVideoSource();
 	connect(mStreamingVideoSource.get(), &VideoSource::newFrame,
-			this, &OpenIGTLinkDataTransfer::onNewStreamFrame);
+			this, &NetworkDataTransfer::onNewStreamFrame);
 	CX_LOG_INFO() << QString("Started emitting VideoSource %1 on igtl").arg(mStreamingVideoSource->getName());
 }
 
-void OpenIGTLinkDataTransfer::stopStream()
+void NetworkDataTransfer::stopStream()
 {
 	if (!mStreamingVideoSource)
 		return;
 
 	CX_LOG_INFO() << QString("Stopped emitting VideoSource %1 on igtl").arg(mStreamingVideoSource->getName());
 	disconnect(mStreamingVideoSource.get(), &VideoSource::newFrame,
-			   this, &OpenIGTLinkDataTransfer::onNewStreamFrame);
+			   this, &NetworkDataTransfer::onNewStreamFrame);
 	mStreamingVideoSource.reset();
 }
 
-void OpenIGTLinkDataTransfer::onNewStreamFrame()
+void NetworkDataTransfer::onNewStreamFrame()
 {
 	vtkImageDataPtr data = mStreamingVideoSource->getVtkImageData();
 
 	ImagePtr image(new Image(mStreamingVideoSource->getUid()+"_snapshot",
 							 data,
 							 mStreamingVideoSource->getName()));
-	mOpenIGTLink->client()->sendMessage(image);
+
+	boost::function<void()> message = boost::bind(&NetworkConnection::streamImage, mOpenIGTLink->getNetworkConnection(), image);
+	mOpenIGTLink->getNetworkConnection()->invoke(message);
 }
 
 } // namespace cx

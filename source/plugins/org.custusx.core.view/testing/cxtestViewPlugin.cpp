@@ -31,8 +31,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "catch.hpp"
+#include "cxVisServices.h"
+#include "cxViewService.h"
+#include "cxtestDirectSignalListener.h"
+#include "cxtestVisualizationHelper.h"
 
 TEST_CASE("VisualizationPlugin: Check nothing", "[unit][plugins][org.custusx.core.view][hide]")
 {
 	CHECK(true);
+}
+
+
+TEST_CASE("ViewWrapper2D: Emits pointSampled signal when anyplane", "[unit][plugins][org.custusx.core.view]")
+{
+	cxtest::VisualizationHelper visHelper;
+
+	cxtest::DirectSignalListener signalListener(visHelper.viewWrapper.get(), SIGNAL(pointSampled(Vector3D)));
+	visHelper.viewWrapper->emitPointSampled();
+	CHECK_FALSE(signalListener.isReceived());
+
+	visHelper.viewWrapper->initializePlane(cx::ptANYPLANE);
+
+	visHelper.viewWrapper->emitPointSampled();
+	CHECK(signalListener.isReceived());
 }

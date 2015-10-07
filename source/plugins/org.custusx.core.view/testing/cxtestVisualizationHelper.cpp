@@ -29,23 +29,37 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXRASDIALECT_H
-#define CXRASDIALECT_H
 
-#include "org_custusx_core_openigtlink_Export.h"
+#include "cxtestVisualizationHelper.h"
+#include "cxLogicManager.h"
+#include "cxVisServices.h"
 
-#include "cxDialect.h"
 
-namespace cx
+namespace cxtest{
+
+VisualizationHelper::VisualizationHelper()
 {
+	cx::LogicManager::initialize();
+	services = cx::VisServices::create(cx::logicManager()->getPluginContext());
 
-class org_custusx_core_openigtlink_EXPORT RASDialect : public Dialect
+	cx::ViewPtr view = viewsFixture.addView(0, 0);
+
+	viewWrapper.reset(new ViewWrapper2DFixture(view, services));
+}
+
+VisualizationHelper::~VisualizationHelper()
 {
-public:
-	virtual QString getName() const;
-	virtual PATIENT_COORDINATE_SYSTEM coordinateSystem() const { return pcsRAS; }
-};
+	services.reset();
+	cx::LogicManager::shutdown();
+}
 
-} //namespace cx
+ViewWrapper2DFixture::ViewWrapper2DFixture(cx::ViewPtr view, cx::VisServicesPtr services) :
+	cx::ViewWrapper2D(view, services)
+{}
 
-#endif // CXRASDIALECT_H
+void ViewWrapper2DFixture::emitPointSampled()
+{
+	this->samplePoint(cx::Vector3D(1, 1, 1));
+}
+
+}//namespace cxtest

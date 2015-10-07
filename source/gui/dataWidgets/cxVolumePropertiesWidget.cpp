@@ -58,31 +58,31 @@ namespace cx
 /// -------------------------------------------------------
 /// -------------------------------------------------------
 
-ActiveVolumeWidget::ActiveVolumeWidget(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget* parent) :
+ActiveVolumeWidget::ActiveVolumeWidget(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget* parent) :
   BaseWidget(parent, "ActiveVolumeWidget", "Active Volume")
 {
 	this->setToolTip("The currently selected active volume");
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->setMargin(0);
-	layout->addWidget(new DataSelectWidget(visualizationService, patientModelService, this, StringPropertyActiveImage::New(patientModelService)));
+	layout->addWidget(new DataSelectWidget(viewService, patientModelService, this, StringPropertyActiveImage::New(patientModelService)));
 }
 
 /// -------------------------------------------------------
 /// -------------------------------------------------------
 /// -------------------------------------------------------
 
-VolumePropertiesWidget::VolumePropertiesWidget(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget *parent) :
+VolumePropertiesWidget::VolumePropertiesWidget(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget *parent) :
 		TabbedWidget(parent, "VolumePropertiesWidget", "Volume Properties")
 {
 	this->setToolTip("Volume properties");
-	this->insertWidgetAtTop(new ActiveVolumeWidget(patientModelService, visualizationService, this));
+	this->insertWidgetAtTop(new ActiveVolumeWidget(patientModelService, viewService, this));
 
 	bool connectToActiveImage = true;
 
 	this->addTab(new VolumeInfoWidget(patientModelService, this), "Info");
 	this->addTab(new TransferFunctionWidget(patientModelService, this, connectToActiveImage), QString("Transfer Functions"));
 	this->addTab(new ShadingWidget(patientModelService->getActiveData(), this, connectToActiveImage), "Properties");
-	this->addTab(new CroppingWidget(patientModelService, visualizationService, this), "Crop");
+	this->addTab(new CroppingWidget(patientModelService, viewService, this), "Crop");
 	this->addTab(new ClippingWidget(patientModelService, this), "Clip");
 }
 

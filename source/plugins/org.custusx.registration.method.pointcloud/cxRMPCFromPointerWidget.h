@@ -68,7 +68,7 @@ class RMPCFromPointerWidget: public ICPRegistrationBaseWidget
 	Q_OBJECT
 
 public:
-	RMPCFromPointerWidget(RegServices services, QWidget *parent);
+	RMPCFromPointerWidget(RegServicesPtr services, QWidget *parent);
 	virtual ~RMPCFromPointerWidget() {}
 	virtual QString defaultWhatsThis() const;
 

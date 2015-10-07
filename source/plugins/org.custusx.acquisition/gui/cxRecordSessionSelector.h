@@ -69,7 +69,7 @@ class org_custusx_acquisition_EXPORT SelectRecordSession: public QObject
 public:
 	SelectRecordSession(XmlOptionFile options,
 						 AcquisitionServicePtr acquisitionService,
-						 VisServices services);
+						 VisServicesPtr services);
 	virtual ~SelectRecordSession()	{}
 
 	void setTool(ToolPtr tool);
@@ -81,7 +81,7 @@ private slots:
 
 	void recordedSessionsChanged();
 private:
-	VisServices mServices;
+	VisServicesPtr mServices;
 	AcquisitionServicePtr mAcquisitionService;
 	XmlOptionFile mOptions;
 	ToolPtr mCurrentTracedTool;

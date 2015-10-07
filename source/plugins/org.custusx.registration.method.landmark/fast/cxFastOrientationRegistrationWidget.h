@@ -63,7 +63,7 @@ class FastOrientationRegistrationWidget : public RegistrationBaseWidget
   Q_OBJECT
 
 public:
-	FastOrientationRegistrationWidget(RegServices services, QWidget* parent);
+	FastOrientationRegistrationWidget(RegServicesPtr services, QWidget* parent);
   ~FastOrientationRegistrationWidget();
 
 protected:

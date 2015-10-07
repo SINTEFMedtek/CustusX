@@ -494,7 +494,7 @@ void ToolConfigTab::globalConfigurationFileChangedSlot(QString key)
 // PreferencesDialog
 //------------------------------------------------------------------------------
 
-PreferencesDialog::PreferencesDialog(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget *parent) :
+PreferencesDialog::PreferencesDialog(ViewServicePtr viewService, PatientModelServicePtr patientModelService, QWidget *parent) :
   QDialog(parent)
 {
   mActionGroup = new QActionGroup(this);
@@ -505,7 +505,7 @@ PreferencesDialog::PreferencesDialog(VisualizationServicePtr visualizationServic
 
   mButtonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Apply | QDialogButtonBox::Cancel);
 
-  this->addTab(new GeneralTab(visualizationService, patientModelService), tr("General"));
+  this->addTab(new GeneralTab(viewService, patientModelService), tr("General"));
   this->addTab(new PerformanceTab, tr("Performance"));
   this->addTab(new AutomationTab, tr("Automation"));
   this->addTab(new VisualizationTab(patientModelService), tr("Visualization"));
