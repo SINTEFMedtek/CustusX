@@ -341,7 +341,7 @@ void SessionStorageServiceImpl::startupLoadPatient()
 	if (folder.isEmpty() && settings()->value("Automation/autoLoadRecentPatient").toBool())
 	{
 		folder = settings()->value("startup/lastPatient").toString();
-        if(this->folderExists(folder))
+        if(this->isValidSessionFolder(folder))
         {
             QDateTime lastSaveTime = QDateTime::fromString(settings()->value("startup/lastPatientSaveTime").toString(), timestampSecondsFormat());
             double minsSinceLastSave = lastSaveTime.secsTo(QDateTime::currentDateTime())/60;
@@ -360,7 +360,7 @@ void SessionStorageServiceImpl::startupLoadPatient()
         }
         else
         {
-            report("Startup Load: Ignored recent patient because it does not exists anymore");
+            report("Startup Load: Ignored recent patient because it is not valid anymore");
             folder = "";
         }
 
