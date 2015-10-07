@@ -68,7 +68,7 @@ TEST_CASE("LevelSetFilter: getSeedPointFromTool", "[unit][modules][Algorithm][Le
 	cx::ImagePtr image = cxtest::Utilities::create3DImage();
 
 	cx::VisServicesPtr vs = cx::VisServices::create(cx::logicManager()->getPluginContext());
-	cx::Vector3D point = cx::LevelSetFilter::getSeedPointFromTool(vs->getSpaceProvider(), image);
+	cx::Vector3D point = cx::LevelSetFilter::getSeedPointFromTool(vs->spaceProvider(), image);
 	REQUIRE(toolTipPoint(0) == point(0));
     REQUIRE(toolTipPoint(1) == point(1));
     REQUIRE(toolTipPoint(2) == point(2));
