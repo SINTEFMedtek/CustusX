@@ -67,6 +67,7 @@ private:
 	ToolPtr						mManualTool;
 
 	int							mNumberOfInputPoints;
+	int							mNumberOfControlPoints;
 	Vector3D					mLastCameraPos_r;
 	Vector3D					mLastCameraFocus_r;
 	double						mLastCameraViewAngle;

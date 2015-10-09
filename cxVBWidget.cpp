@@ -55,11 +55,14 @@ namespace cx
 
 VBWidget::VBWidget(ctkPluginContext *context, QWidget *parent) :
 	QWidget(parent),
-	mHorizontalLayout(new QHBoxLayout(this))
+	mHorizontalLayout(new QHBoxLayout(this)),
+	mControlsEnabled(false)
 {
 	this->setObjectName("Virtual Bronchoscopy Widget");
 	this->setWindowTitle("Virtual Bronchoscopy");
 	this->setWhatsThis(this->defaultWhatsThis());
+
+	this->setFocusPolicy(Qt::StrongFocus);  // Widget needs focus to handle Key events
 
 	mPatientModelService = PatientModelServicePtr(new PatientModelServiceProxy(context));
 	mViewService = ViewServicePtr(new ViewServiceProxy(context));
@@ -140,12 +143,56 @@ void  VBWidget::enableControls(bool enable)
 	mPlaybackSlider->setEnabled(enable);
 	mRotateDial->setEnabled(enable);
 	mViewSlider->setEnabled(enable);
+	mControlsEnabled = enable;
 }
 
 void VBWidget::inputChangedSlot()
 {
 	this->enableControls(true);
 	emit cameraPathChanged(mRouteToTarget->getMesh());
+}
+
+void VBWidget::keyPressEvent(QKeyEvent* event)
+{
+
+	if (event->key()==Qt::Key_Up)
+	{
+		if(mControlsEnabled) {
+			int currentPos = mPlaybackSlider->value();
+			mPlaybackSlider->setValue(currentPos+1);
+			return;
+		}
+	}
+
+	if (event->key()==Qt::Key_Down)
+	{
+		if(mControlsEnabled) {
+			int currentPos = mPlaybackSlider->value();
+			mPlaybackSlider->setValue(currentPos-1);
+			return;
+		}
+	}
+
+	if (event->key()==Qt::Key_Right)
+	{
+		if(mControlsEnabled) {
+			int currentPos = mViewSlider->value();
+			mViewSlider->setValue(currentPos+1);
+			return;
+		}
+	}
+
+	if (event->key()==Qt::Key_Left)
+	{
+		if(mControlsEnabled) {
+			int currentPos = mViewSlider->value();
+			mViewSlider->setValue(currentPos-1);
+			return;
+		}
+	}
+
+	// Forward the keyPressevent if not processed
+	QWidget::keyPressEvent(event);
 }
 
 QString VBWidget::defaultWhatsThis() const
