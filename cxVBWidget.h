@@ -76,7 +76,7 @@ private:
 
 	StringPropertySelectMeshPtr	mRouteToTarget;
 	PatientModelServicePtr		mPatientModelService;
-	VisualizationServicePtr		mVisualizationService;
+	ViewServicePtr				mViewService;
 	TrackingServicePtr			mTrackingService;
 	CXVBcameraPath*				mCameraPath;
 	vtkCamera*					mCamera;

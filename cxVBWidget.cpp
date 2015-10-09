@@ -62,7 +62,7 @@ VBWidget::VBWidget(ctkPluginContext *context, QWidget *parent) :
 	this->setWhatsThis(this->defaultWhatsThis());
 
 	mPatientModelService = PatientModelServicePtr(new PatientModelServiceProxy(context));
-	mVisualizationService = VisualizationServicePtr(new VisualizationServiceProxy(context));
+	mViewService = ViewServicePtr(new ViewServiceProxy(context));
 	mTrackingService = TrackingServiceProxy::create(context);
 
 	mRouteToTarget = StringPropertySelectMesh::New(mPatientModelService);
@@ -70,7 +70,7 @@ VBWidget::VBWidget(ctkPluginContext *context, QWidget *parent) :
 
 	// Selector for route to target
 	QVBoxLayout *inputVbox = new QVBoxLayout;
-	inputVbox->addWidget(new DataSelectWidget(mVisualizationService, mPatientModelService, this,mRouteToTarget));
+	inputVbox->addWidget(new DataSelectWidget(mViewService, mPatientModelService, this,mRouteToTarget));
 	QGroupBox *inputBox = new QGroupBox(tr("Input"));
 	inputBox->setLayout(inputVbox);
 	mHorizontalLayout->addWidget(inputBox);
@@ -118,7 +118,7 @@ VBWidget::VBWidget(ctkPluginContext *context, QWidget *parent) :
 
 	this->enableControls(false);
 
-	mCameraPath = new CXVBcameraPath(mTrackingService, mPatientModelService, mVisualizationService);
+	mCameraPath = new CXVBcameraPath(mTrackingService, mPatientModelService, mViewService);
 
 	connect(mRouteToTarget.get(), &SelectDataStringPropertyBase::dataChanged,
 			this, &VBWidget::inputChangedSlot);

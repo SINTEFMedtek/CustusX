@@ -63,7 +63,7 @@ private:
 	vtkCardinalSplinePtr		mSplineZ;
 	TrackingServicePtr			mTrackingService;
 	PatientModelServicePtr		mPatientModelService;
-	VisualizationServicePtr		mVisualizationService;
+	ViewServicePtr				mViewService;
 	ToolPtr						mManualTool;
 
 	int							mNumberOfInputPoints;
@@ -76,7 +76,7 @@ private:
 
 public:
 	CXVBcameraPath(TrackingServicePtr tracker, PatientModelServicePtr patientModel,
-				   VisualizationServicePtr visualization);
+				   ViewServicePtr visualization);
 
 public slots:
 	void cameraRawPointsSlot(MeshPtr mesh);
