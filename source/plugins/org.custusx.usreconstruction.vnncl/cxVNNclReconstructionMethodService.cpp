@@ -49,6 +49,7 @@ VNNclReconstructionMethodService::VNNclReconstructionMethodService(ctkPluginCont
     mMethods.push_back("Anisotropic");
     mPlaneMethods.push_back("Heuristic");
     mPlaneMethods.push_back("Closest");
+    mPlaneMethods.push_back("Closest ver2");
 }
 
 VNNclReconstructionMethodService::~VNNclReconstructionMethodService()

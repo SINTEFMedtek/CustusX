@@ -69,6 +69,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Plane searching methods
 #define PLANE_HEURISTIC 0
 #define PLANE_CLOSEST 1
+#define PLANE_CLOSEST_VER2 2
 
 // Anisotropic method specific constants
 #define ANISOTROPIC_SIZE 3
@@ -231,6 +232,16 @@ int isValidPixel(int2 point, const __global unsigned char* mask, int2 in_size);
 
 int findHighestIdx(__local close_plane_t *planes, int n);
 
+int2 findClosestPlanes_ver2(__local close_plane_t *close_planes,
+        __local float4* const plane_eqs,
+        __global float16* const plane_matrices,
+        const float4 voxel,
+        const float radius,
+        __global const unsigned char* mask,
+        int2 in_size,
+        float2 in_spacing);
+
+
 int2 findClosestPlanes_heuristic(__local close_plane_t *close_planes,
 		__local float4* const plane_eqs,
 		__global float16* const plane_matrices,
@@ -263,6 +274,8 @@ int2 findClosestPlanes_multistart(__local close_plane_t *close_planes,
 	#endif
 
 	#define FIND_CLOSE_PLANES(a, b, c, d, e, f, g, h, i, j) findClosestPlanes_multistart(a, b, c, d, e, f, g, 0, h, i, j)
+#elif PLANE_METHOD == PLANE_CLOSEST_VER2
+    #define FIND_CLOSE_PLANES(a, b, c, d, e, f, g, h, i, j) findClosestPlanes_ver2(a, b, c, d, e, h, i, j)
 #endif
 
 __global const unsigned char* getImageData(int plane_id,

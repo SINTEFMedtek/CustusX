@@ -85,6 +85,88 @@ int findHighestIdx(__local close_plane_t *planes,
 	return maxidx;
 }
 
+
+int2 findClosestPlanes_ver2(__local close_plane_t *close_planes,
+        __local float4* const plane_eqs,
+        __global float16* const plane_matrices,
+        const float4 voxel,
+        const float radius,
+        __global const unsigned char* mask,
+        int2 in_size,
+        float2 in_spacing)
+{
+    close_plane_t tmp;
+    tmp.dist = INFINITY;
+    tmp.plane_id = -1;
+    for(int i = 0; i < MAX_PLANES; i++)
+    {
+        CLOSE_PLANE_IDX(close_planes, i) = tmp;
+    }
+
+    // The index of the plane with the smallest distance found so far
+    int smallest_idx = 0;
+    // The smallest distance found so far
+    float smallest_dist = 99999.9f;
+
+    // The index of the plane with the biggest index so far
+    int max_idx = findHighestIdx(close_planes, MAX_PLANES);
+
+    // The biggest distance found so far
+    float max_dist = min(fabs(CLOSE_PLANE_IDX(close_planes, max_idx).dist), radius);
+
+    int2 ret;
+    float dist;
+    int found = 0;
+    for(int i = 0; i < N_PLANES; i++)
+    {
+        dist = dot(voxel, plane_eqs[i]);
+
+
+        // Check if the plane is closer than the one farthest away we have included so far
+        if(fabs(dist) < max_dist)
+        {
+            BOUNDS_CHECK(i, 0, N_PLANES);
+            BOUNDS_CHECK(max_idx, 0, MAX_PLANES);
+            float4 translated_voxel = PROJECTONTOPLANEEQ(voxel,
+                    plane_eqs[i],
+                    dist);
+            int2 p = toImgCoord_int(translated_voxel,
+                            plane_matrices[i],
+                            in_spacing);
+
+            if(isValidPixel(p, mask, in_size))
+            {
+
+                // If yes, swap out the one with the longest distance for this plane
+                tmp.dist = dist;
+                tmp.plane_id = i;
+                CLOSE_PLANE_IDX(close_planes, max_idx) = tmp;
+                found++;
+
+                // We have found MAX_PLANES planes, but we don't know they're the closest ones.
+                // Find the next candidate for eviction -
+                // the plane with the longest distance to the voxel
+                max_idx = findHighestIdx(close_planes, MAX_PLANES);
+                max_dist = min(fabs(CLOSE_PLANE_IDX(close_planes, max_idx).dist), radius);
+
+                if(smallest_dist > fabs(dist))
+                {
+                    // Update next guess
+                    smallest_dist = fabs(dist);
+                    smallest_idx = i;
+                }
+            }
+        }
+
+    }
+
+    ret.x = min(found, MAX_PLANES);
+    ret.y = 0;
+
+    return ret;
+}
+
+
 int2 findClosestPlanes_multistart(__local close_plane_t *close_planes,
 		__local float4* const plane_eqs,
 		__global float16* const plane_matrices,
