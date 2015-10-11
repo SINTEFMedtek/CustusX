@@ -103,27 +103,20 @@ int2 findClosestPlanes_ver2(__local close_plane_t *close_planes,
         CLOSE_PLANE_IDX(close_planes, i) = tmp;
     }
 
-    // The index of the plane with the smallest distance found so far
-    int smallest_idx = 0;
-    // The smallest distance found so far
-    float smallest_dist = 99999.9f;
-
-    // The index of the plane with the biggest index so far
-    int max_idx = findHighestIdx(close_planes, MAX_PLANES);
-
-    // The biggest distance found so far
-    float max_dist = min(fabs(CLOSE_PLANE_IDX(close_planes, max_idx).dist), radius);
+    int max_idx = 0;
+    float max_dist = 99999.9f;
 
     int2 ret;
     float dist;
+    float abs_dist;
     int found = 0;
     for(int i = 0; i < N_PLANES; i++)
     {
         dist = dot(voxel, plane_eqs[i]);
-
+        abs_dist = fabs(dist);
 
         // Check if the plane is closer than the one farthest away we have included so far
-        if(fabs(dist) < max_dist)
+        if(abs_dist < max_dist)
         {
             BOUNDS_CHECK(i, 0, N_PLANES);
             BOUNDS_CHECK(max_idx, 0, MAX_PLANES);
@@ -148,13 +141,6 @@ int2 findClosestPlanes_ver2(__local close_plane_t *close_planes,
                 // the plane with the longest distance to the voxel
                 max_idx = findHighestIdx(close_planes, MAX_PLANES);
                 max_dist = min(fabs(CLOSE_PLANE_IDX(close_planes, max_idx).dist), radius);
-
-                if(smallest_dist > fabs(dist))
-                {
-                    // Update next guess
-                    smallest_dist = fabs(dist);
-                    smallest_idx = i;
-                }
             }
         }
 
@@ -868,6 +854,10 @@ int findLocalMinimas(int *guesses,
 	// But if we can find two indices a and b, such that dist(i) < dist(a) and dist(i) < dist(b)
 	// and b - a = LOCAL_SEARCH_DISTANCE, it's a good chance it's a minima.
 
+
+    if (MAX_MULTISTART_STARTS < 1)
+        return 0;
+
 	int nMinima = 1;
 
 	// Now with the cube-ish way of doing things, we may simply find all guesses that are closer than CUBE_SIZE * voxel_scale
@@ -1164,7 +1154,7 @@ voxel_methods(int volume_xsize,
 						nGuesses,
 						mask,
 						in_size,
-						in_spacing);
+                        in_spacing);
 
 				n_close_planes = close_planes_ret.x;
 

@@ -275,6 +275,11 @@ int2 findClosestPlanes_multistart(__local close_plane_t *close_planes,
 
 	#define FIND_CLOSE_PLANES(a, b, c, d, e, f, g, h, i, j) findClosestPlanes_multistart(a, b, c, d, e, f, g, 0, h, i, j)
 #elif PLANE_METHOD == PLANE_CLOSEST_VER2
+    #ifdef MAX_MULTISTART_STARTS
+    #undef MAX_MULTISTART_STARTS
+    #define MAX_MULTISTART_STARTS 0
+    #endif
+
     #define FIND_CLOSE_PLANES(a, b, c, d, e, f, g, h, i, j) findClosestPlanes_ver2(a, b, c, d, e, h, i, j)
 #endif
 
