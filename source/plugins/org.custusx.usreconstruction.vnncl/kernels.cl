@@ -42,7 +42,8 @@ int isValidPixel(int2 point, const __global unsigned char* mask, int2 in_size)
 #else
 	if((ISINSIDE(point.x, in_size.x)
 		&& ISINSIDE(point.y, in_size.y)
-		&& ISNOTMASKED(point.x, point.y, mask, in_size.x)))
+        && ISNOTMASKED(point.x, point.y, mask, in_size.x))
+        )
 	{
 		return 1;
 	}
@@ -107,18 +108,15 @@ int2 findClosestPlanes_ver2(__local close_plane_t *close_planes,
     float max_dist = 99999.9f;
 
     int2 ret;
-    float dist;
     float abs_dist;
     int found = 0;
     for(int i = 0; i < N_PLANES; i++)
     {
-        dist = dot(voxel, plane_eqs[i]);
-        abs_dist = fabs(dist);
+        abs_dist = fabs(dot(voxel, plane_eqs[i]));
 
         // Check if the plane is closer than the one farthest away we have included so far
-        if(abs_dist < max_dist)
+        if(abs_dist < max_dist && abs_dist<radius)
         {
-            BOUNDS_CHECK(i, 0, N_PLANES);
             BOUNDS_CHECK(max_idx, 0, MAX_PLANES);
             float4 translated_voxel = PROJECTONTOPLANEEQ(voxel,
                     plane_eqs[i],
@@ -131,7 +129,7 @@ int2 findClosestPlanes_ver2(__local close_plane_t *close_planes,
             {
 
                 // If yes, swap out the one with the longest distance for this plane
-                tmp.dist = dist;
+                tmp.dist = abs_dist;
                 tmp.plane_id = i;
                 CLOSE_PLANE_IDX(close_planes, max_idx) = tmp;
                 found++;
@@ -140,7 +138,7 @@ int2 findClosestPlanes_ver2(__local close_plane_t *close_planes,
                 // Find the next candidate for eviction -
                 // the plane with the longest distance to the voxel
                 max_idx = findHighestIdx(close_planes, MAX_PLANES);
-                max_dist = min(fabs(CLOSE_PLANE_IDX(close_planes, max_idx).dist), radius);
+                max_dist = fabs(CLOSE_PLANE_IDX(close_planes, max_idx).dist);
             }
         }
 
@@ -812,8 +810,8 @@ unsigned char anisotropicFilter(__local const close_plane_t *pixels, int n_plane
 	// Use the resulting gauss sigma to calcualte weights
 	for(int i = 0; i < n_planes; i++)
 	{
-		tmp = CLOSE_PLANE_IDX(pixels, i);
-		float weight = ANISOTROPIC_WEIGHT(tmp, variance, mean_value, mean_id, gauss_sigma);
+        tmp = CLOSE_PLANE_IDX(pixels, i);
+        float weight = ANISOTROPIC_WEIGHT(tmp, variance, mean_value, mean_id, gauss_sigma);
 		sum = mad(tmp.intensity,weight, sum);
 		sum_weights += weight;
 	}
