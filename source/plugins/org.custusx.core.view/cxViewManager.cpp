@@ -620,7 +620,7 @@ int ViewManager::findGroupContaining3DViewGivenGuess(int preferredGroup)
 
 void ViewManager::autoShowData(DataPtr data)
 {
-	if (settings()->value("Automation/autoShowNewData").toBool())
+    if (settings()->value("Automation/autoShowNewData").toBool()  && data)
 	{
 		this->getViewGroups()[0]->getData()->addDataSorted(data->getUid());
 	}
