@@ -133,11 +133,18 @@ Transform3D DicomImageReader::getImageTransformPatient() const
 
 	for (int i=0; i<3; ++i)
 	{
-		OFCondition condition;
 		e_x[i] = this->getDouble(DCM_ImageOrientationPatient, i, OFTrue);
 		e_y[i] = this->getDouble(DCM_ImageOrientationPatient, i+3, OFTrue);
 		pos[i] = this->getDouble(DCM_ImagePositionPatient, i, OFTrue);
 	}
+
+    const double eps = std::numeric_limits<double>::epsilon();
+    if( e_x.norm() < eps && e_y.norm()< eps) // Zero matrix
+    {
+        report("Set transform matrix to identity");
+        e_x[0]=1;
+        e_y[1]=1;
+    }
 
 	Transform3D retval = cx::createTransformIJC(e_x, e_y, pos);
 	return retval;
