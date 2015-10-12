@@ -90,6 +90,7 @@ ViewPtr ViewCollectionWidgetMixed::addView(View::Type type, LayoutRegion region)
 		this->addWidgetToLayout(mLayout, mBaseLayout, mBaseRegion);
 	}
 	view_utils::setStretchFactors(mLayout, mTotalRegion, 1);
+	mRegions[view->getUid()] = region;
 
 	return view;
 }
@@ -157,6 +158,11 @@ std::vector<ViewPtr> ViewCollectionWidgetMixed::getViews()
 	for (unsigned i=0; i<mOverlays.size(); ++i)
 		retval.push_back(mOverlays[i]->getView());
 	return retval;
+}
+
+LayoutRegion ViewCollectionWidgetMixed::getLayoutRegion(QString view)
+{
+	return mRegions[view];
 }
 
 } /* namespace cx */

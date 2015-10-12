@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderWindow.h"
 #include "vtkPNGWriter.h"
 #include "vtkUnsignedCharArray.h"
+#include <QPainter>
 
 namespace cx
 {
@@ -195,12 +196,55 @@ QImage ScreenVideoProvider::grabSecondaryLayout()
 	ViewCollectionWidget* vcWidget = dynamic_cast<ViewCollectionWidget*>(widget);
 	std::vector<ViewPtr> views = vcWidget->getViews();
 
+	QImage target(QSize(320, 568), QImage::Format_RGB888);
+	target.fill(QColor("red"));
+	QPainter painter(&target);
+//	QRect rect = QRect(QPoint(50,50), QSize(320,568));
+
+	LayoutRegion totalRegion = vcWidget->getLayoutRegion(views[0]->getUid());
+	for (unsigned i=1; i<views.size(); ++i)
+	{
+		totalRegion = merge(totalRegion, vcWidget->getLayoutRegion(views[i]->getUid()));
+	}
+
 	CX_LOG_CHANNEL_DEBUG("CA") << "views: " << views.size();
 	for (unsigned i=0; i<views.size(); ++i)
 	{
+//		if (i>0)
+//			continue;
 		vtkImageDataPtr vtkImage = this->view2vtkImageData(views[i]);
 		QImage qImage = vtkImageData2QImage(vtkImage);
-		return qImage;
+		qImage = qImage.mirrored(false, true);
+//		return qImage;
+		vtkRendererPtr renderer = views[i]->getRenderer();
+		Eigen::Array4d vp(renderer->GetViewport());
+
+		LayoutRegion region = vcWidget->getLayoutRegion(views[i]->getUid());
+		CX_LOG_CHANNEL_DEBUG("CA") << QString("region %1 %2, %3 %4 ")
+									  .arg(region.pos.col)
+									  .arg(region.pos.row)
+									  .arg(region.span.col)
+									  .arg(region.span.row);
+
+		CX_LOG_CHANNEL_DEBUG("CA") << "norm viewport" << vp;
+		renderer->NormalizedViewportToViewport(vp.data()[0], vp.data()[1]);
+		renderer->NormalizedViewportToViewport(vp.data()[2], vp.data()[3]);
+		CX_LOG_CHANNEL_DEBUG("CA") << "viewport" << vp;
+
+		QPoint pos;
+		pos.setX(double(region.pos.col) / double(totalRegion.span.col) * target.size().width());
+		pos.setY(double(region.pos.row) / double(totalRegion.span.row) * target.size().height());
+		CX_LOG_CHANNEL_DEBUG("CA") << "pos" << pos.x() << ", " << pos.y();
+
+//		renderer->ViewportToNormalizedDisplay(vp.data()[0], vp.data()[1]);
+//		renderer->ViewportToNormalizedDisplay(vp.data()[2], vp.data()[3]);
+//		CX_LOG_CHANNEL_DEBUG("CA") << "vp in normalized display" << vp;
+//		renderer->NormalizedDisplayToDisplay(vp.data()[0], vp.data()[1]);
+//		renderer->NormalizedDisplayToDisplay(vp.data()[2], vp.data()[3]);
+//		CX_LOG_CHANNEL_DEBUG("CA") << "vp in normalized display" << vp;
+
+
+		painter.drawImage(pos, qImage);
 
 //		char* ptr = reinterpret_cast<char*>(image->GetScalarPointer());
 //		QImage img();
@@ -216,7 +260,7 @@ QImage ScreenVideoProvider::grabSecondaryLayout()
 //		vtkUnsignedCharArrayPtr result = writer->GetResult();
 	}
 
-	return QImage();
+	return target;
 }
 
 

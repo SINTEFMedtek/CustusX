@@ -74,6 +74,7 @@ public:
 	virtual void setGridMargin(int val) = 0;
 
 	virtual std::vector<ViewPtr> getViews() = 0;
+	virtual LayoutRegion getLayoutRegion(QString view) = 0;
 
 protected:
 	ViewCollectionWidget(QWidget* parent) : QWidget(parent) {}

@@ -66,6 +66,7 @@ public:
 	virtual void setGridSpacing(int val);
 	virtual void setGridMargin(int val);
 	virtual std::vector<ViewPtr> getViews();
+	virtual LayoutRegion getLayoutRegion(QString view);
 
 private:
 	ViewWidget* retrieveView(View::Type type);
@@ -75,6 +76,7 @@ private:
 	boost::shared_ptr<ViewCache<ViewWidget> > mViewCacheRT;
 	boost::shared_ptr<ViewCache<ViewWidget> > mViewCache;
 	QGridLayout* mLayout; ///< the layout
+	std::map<QString, LayoutRegion> mRegions;
 	std::vector<ViewWidget*> mViews;
 };
 

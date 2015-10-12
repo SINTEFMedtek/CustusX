@@ -67,10 +67,12 @@ public:
 	virtual void setGridSpacing(int val);
 	virtual void setGridMargin(int val);
 	virtual std::vector<ViewPtr> getViews();
+	virtual LayoutRegion getLayoutRegion(QString view);
 
 private:
 	std::vector<ViewPtr> mViews;
 	class ViewContainer* mViewContainer;
+	std::map<QString, LayoutRegion> mRegions;
 };
 
 
