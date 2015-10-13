@@ -138,8 +138,8 @@ Transform3D DicomImageReader::getImageTransformPatient() const
 		pos[i] = this->getDouble(DCM_ImagePositionPatient, i, OFTrue);
 	}
 
-    const double eps = std::numeric_limits<double>::epsilon();
-    if( e_x.norm() < eps && e_y.norm()< eps) // Zero matrix
+    Vector3D zero_vec(0,0,0);
+    if( similar(e_x,zero_vec) && similar(e_y,zero_vec)) // Zero matrix
     {
         report("Set transform matrix to identity");
         e_x[0]=1;
