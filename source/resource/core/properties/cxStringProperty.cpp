@@ -36,28 +36,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDomElement>
 #include <QStringList>
 #include "cxTypeConversions.h"
+#include "cxLogger.h"
 
 namespace cx
 {
 
-StringProperty::StringProperty() : 	mIsReadOnly(false)
-{
-
-}
+StringProperty::StringProperty() :
+    mIsReadOnly(false)
+{}
 
 /** Make sure one given option exists witin root.
  * If not present, fill inn the input defaults.
  */
 StringPropertyPtr StringProperty::initialize(const QString& uid, QString name, QString help, QString value, QStringList range, QDomNode root)
 {
-	StringPropertyPtr retval(new StringProperty());
-	retval->mUid = uid;
-	retval->mName = name.isEmpty() ? uid : name;
-	retval->mHelp = help;
-	retval->mRange = range;
-	retval->mStore = XmlOptionItem(uid, root.toElement());
-	retval->mValue = retval->mStore.readValue(value);
-	retval->mAllowOnlyValuesInRange = true;
+    StringPropertyPtr retval = StringProperty::initialize(uid, name, help, value, root);
+    retval->mRange = range;
 	return retval;
 }
 
@@ -67,7 +61,6 @@ StringPropertyPtr StringProperty::initialize(const QString& uid, QString name, Q
 	retval->mUid = uid;
 	retval->mName = name.isEmpty() ? uid : name;
 	retval->mHelp = help;
-	//retval->mRange = range;
 	retval->mStore = XmlOptionItem(uid, root.toElement());
 	retval->mValue = retval->mStore.readValue(value);
 	retval->mAllowOnlyValuesInRange = false;
