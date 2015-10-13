@@ -155,12 +155,11 @@ PointMetricPtr MetricManager::addPointInDefaultPosition()
 
     PointMetricPtr pointMetric = boost::dynamic_pointer_cast<PointMetric>(data);
     if(pointMetric)
-    {
         ref = pointMetric->getSpace();
-    }
 
     DataMetricPtr metric = boost::dynamic_pointer_cast<DataMetric>(data);
-    color = metric->getColor();
+    if(metric)
+        color = metric->getColor();
 
     return this->addPoint(p_ref, ref,"point%1", color);
 }
