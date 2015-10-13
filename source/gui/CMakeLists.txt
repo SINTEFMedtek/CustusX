@@ -3,8 +3,8 @@
 ###########################################################
 
 cx_add_class_qt_moc(cxGui_SRCS
-	filterWidgets/cxFilterWidget
-	filterWidgets/cxAllFiltersWidget
+        filterWidgets/cxFilterSetupWidget
+        filterWidgets/cxFiltersWidget
 	#----------------------
 	properties/cxDataInterface
 	properties/cxShadingParamsInterfaces

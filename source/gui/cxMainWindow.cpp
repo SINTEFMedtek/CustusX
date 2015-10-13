@@ -69,7 +69,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMetricWidget.h"
 #include "cxPlaybackWidget.h"
 #include "cxEraserWidget.h"
-#include "cxAllFiltersWidget.h"
+#include "cxFiltersWidget.h"
 #include "cxPluginFrameworkWidget.h"
 
 namespace cx
@@ -123,7 +123,7 @@ MainWindow::MainWindow() :
 	this->addAsDockWidget(new FrameTreeWidget(mServices->patientModelService, this), "Browsing");
 	this->addAsDockWidget(new ToolManagerWidget(this), "Debugging");
 	this->addAsDockWidget(new PluginFrameworkWidget(this), "Browsing");
-	this->addAsDockWidget(new AllFiltersWidget(VisServices::create(logicManager()->getPluginContext()), this), "Algorithms");
+    this->addAsDockWidget(new FiltersWidget(VisServices::create(logicManager()->getPluginContext()), this), "Algorithms");
 
 	connect(patientService().get(), &PatientModelService::patientChanged, this, &MainWindow::patientChangedSlot);
 	connect(qApp, &QApplication::focusChanged, this, &MainWindow::focusChanged);
