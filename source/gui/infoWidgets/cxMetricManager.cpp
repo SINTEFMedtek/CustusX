@@ -151,15 +151,21 @@ PointMetricPtr MetricManager::addPointInDefaultPosition()
 
     DataPtr data = patientService()->getData(mActiveLandmark);
     if(!data)
+
         return this->addPoint(p_ref, ref,"point%1", color);
 
     PointMetricPtr pointMetric = boost::dynamic_pointer_cast<PointMetric>(data);
     if(pointMetric)
+    {
         ref = pointMetric->getSpace();
+        p_ref = spaceProvider()->getActiveToolTipPoint(ref, true);
+    }
 
     DataMetricPtr metric = boost::dynamic_pointer_cast<DataMetric>(data);
     if(metric)
         color = metric->getColor();
+
+
 
     return this->addPoint(p_ref, ref,"point%1", color);
 }
