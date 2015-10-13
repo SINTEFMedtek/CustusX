@@ -10,6 +10,10 @@ set(PLUGIN_SRCS
     cxSeansVesselRegistrationWidget.cpp
     cxRegisterI2IWidget.cpp
     cxPrepareVesselsWidget.cpp
+	cxICPWidget.cpp
+	cxICPRegistrationBaseWidget.cpp
+	cxMeshInView.cpp
+	cxMeshInView.h
 )
 
 # Files which should be processed by Qts moc
@@ -18,6 +22,8 @@ set(PLUGIN_MOC_SRCS
     cxSeansVesselRegistrationWidget.h
     cxRegisterI2IWidget.h
     cxPrepareVesselsWidget.h
+	cxICPWidget.h
+	cxICPRegistrationBaseWidget.h
 )
 
 # Qt Designer files which should be processed by Qts uic
@@ -65,3 +71,4 @@ target_include_directories(org_custusx_registration_method_vessel
 cx_doc_define_plugin_user_docs("${PROJECT_NAME}" "${CMAKE_CURRENT_SOURCE_DIR}/doc")
 cx_add_non_source_file("doc/org_custusx_registration_method_vessel.md")
 cx_add_non_source_file("doc/org_custusx_registration_method_vessel.h")
+

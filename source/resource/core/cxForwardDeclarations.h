@@ -58,6 +58,7 @@ class ViewItem;
 // KEEP SORTED AND UNIQUE!
 
 // data
+typedef boost::shared_ptr<class ActiveData> ActiveDataPtr;
 typedef boost::shared_ptr<class Tool> ToolPtr;
 typedef boost::shared_ptr<class ManualTool> ManualToolPtr;
 typedef boost::shared_ptr<class DummyTool> DummyToolPtr;
@@ -129,23 +130,19 @@ typedef boost::shared_ptr<class VolumetricBaseRep> VolumetricBaseRepPtr;
 typedef boost::shared_ptr<class VolumetricRep> VolumetricRepPtr;
 
 // Services
-typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
-typedef boost::shared_ptr<class VisualizationService> ViewServicePtr;
-typedef boost::shared_ptr<class StateService> StateServicePtr;
-
-typedef boost::weak_ptr<class SpaceProvider> SpaceProviderWeakPtr;
-typedef boost::weak_ptr<class VideoServiceOld> VideoServiceOldWeakPtr;
-typedef boost::weak_ptr<class ViewManager> VisualizationServiceWeakPtr;
-typedef boost::weak_ptr<class StateService> StateServiceWeakPtr;
-
-// Plugin Services
 typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
 typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
 typedef boost::shared_ptr<class RegistrationService> RegistrationServicePtr;
+typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
+typedef boost::shared_ptr<class StateService> StateServicePtr;
 typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
 typedef boost::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
 typedef boost::shared_ptr<class VideoService> VideoServicePtr;
-typedef boost::shared_ptr<class VisualizationService> VisualizationServicePtr;
+typedef boost::shared_ptr<class ViewService> ViewServicePtr;
+
+typedef boost::weak_ptr<class SpaceProvider> SpaceProviderWeakPtr;
+typedef boost::weak_ptr<class StateService> StateServiceWeakPtr;
+typedef boost::weak_ptr<class ViewManager> ViewServiceWeakPtr;
 
 // data adapters
 typedef boost::shared_ptr<class StringPropertyBase> StringPropertyBasePtr;

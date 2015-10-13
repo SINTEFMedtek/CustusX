@@ -55,7 +55,7 @@ InteractiveClipper::InteractiveClipper(CoreServicesPtr backend) :
 
 	// create a slice planes proxy containing all slice definitions,
 	// for use with the clipper
-	PatientModelServicePtr dm = mBackend->patientModelService;
+	PatientModelServicePtr dm = mBackend->patient();
 	mSlicePlanesProxy = SlicePlanesProxyPtr(new SlicePlanesProxy());
 	mSlicePlanesProxy->addSimpleSlicePlane(ptSAGITTAL, dm);
 	mSlicePlanesProxy->addSimpleSlicePlane(ptCORONAL, dm);
@@ -68,7 +68,7 @@ InteractiveClipper::InteractiveClipper(CoreServicesPtr backend) :
 
 	connect(mSlicePlaneClipper.get(), SIGNAL(slicePlaneChanged()), this, SLOT(changedSlot()));
 	connect(this, SIGNAL(changed()), this, SLOT(changedSlot()));
-	connect(mBackend->trackingService.get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(activeToolChangedSlot()));
+	connect(mBackend->tracking().get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(activeToolChangedSlot()));
 
 	this->activeToolChangedSlot();
 	this->changedSlot();
@@ -194,7 +194,7 @@ std::vector<PLANE_TYPE> InteractiveClipper::getAvailableSlicePlanes() const
 
 void InteractiveClipper::activeToolChangedSlot()
 {
-	ToolPtr activTool = mBackend->trackingService->getActiveTool();
+	ToolPtr activTool = mBackend->tracking()->getActiveTool();
 
 	SlicePlanesProxy::DataMap data = mSlicePlanesProxy->getData();
 	for (SlicePlanesProxy::DataMap::iterator iter = data.begin(); iter != data.end(); ++iter)

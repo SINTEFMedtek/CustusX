@@ -32,16 +32,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "cxOpenIGTLinkGuiExtenderService.h"
-#include "cxOpenIGTLinkClient.h"
-#include "cxOpenIGTLinkConnectionWidget.h"
-#include "cxOpenIGTLinkDataTransferWidget.h"
+#include "cxNetworkConnection.h"
+#include "cxNetworkConnectionWidget.h"
+#include "cxNetworkDataTransferWidget.h"
+#include "cxNetworkServiceImpl.h"
+#include "cxNetworkDataTransfer.h"
+#include "cxNetworkConnectionsWidget.h"
 
 namespace cx
 {
-OpenIGTLinkGuiExtenderService::OpenIGTLinkGuiExtenderService(ctkPluginContext *context, OpenIGTLinkClient* client)
+OpenIGTLinkGuiExtenderService::OpenIGTLinkGuiExtenderService(ctkPluginContext *context, NetworkServiceImplPtr connections)
 {
 	mContext = context;
-    mClient = client;
+	mConnections = connections;
+
+	NetworkConnectionHandlePtr connection = mConnections->getConnection("dataTransfer");
+	mDataTransfer.reset(new NetworkDataTransfer(mContext, connection));
 }
 
 OpenIGTLinkGuiExtenderService::~OpenIGTLinkGuiExtenderService()
@@ -50,9 +56,10 @@ OpenIGTLinkGuiExtenderService::~OpenIGTLinkGuiExtenderService()
 
 std::vector<GUIExtenderService::CategorizedWidget> OpenIGTLinkGuiExtenderService::createWidgets() const
 {
+
     std::vector<CategorizedWidget> retval;
-	retval.push_back(GUIExtenderService::CategorizedWidget( new OpenIGTLinkConnectionWidget(mClient), "Utility"));
-	retval.push_back(GUIExtenderService::CategorizedWidget( new OpenIGTLinkDataTransferWidget(mContext), "Utility"));
+	retval.push_back(GUIExtenderService::CategorizedWidget( new NetworkConnectionsWidget(mConnections), "Utility"));
+	retval.push_back(GUIExtenderService::CategorizedWidget( new NetworkDataTransferWidget(mDataTransfer), "Utility"));
 	return retval;
 }
 }//namespace cx

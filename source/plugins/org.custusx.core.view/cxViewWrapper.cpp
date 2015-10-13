@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxInteractiveClipper.h"
 #include "cxVisServices.h"
 #include "cxNavigation.h"
+#include "cxActiveData.h"
 
 namespace cx
 {
@@ -60,7 +61,7 @@ DataViewPropertiesInteractor::DataViewPropertiesInteractor(VisServicesPtr servic
 void DataViewPropertiesInteractor::addDataActions(QWidget* parent)
 {
 	//add actions to the actiongroups and the contextmenu
-	std::vector<DataPtr> sorted = sortOnGroupsAndAcquisitionTime(mServices->getPatientService()->getData());
+	std::vector<DataPtr> sorted = sortOnGroupsAndAcquisitionTime(mServices->patient()->getData());
 	mLastDataActionUid = "________________________";
 	for (std::vector<DataPtr>::iterator iter=sorted.begin(); iter!=sorted.end(); ++iter)
 	{
@@ -75,7 +76,7 @@ void DataViewPropertiesInteractor::setDataViewProperties(DataViewProperties prop
 
 void DataViewPropertiesInteractor::addDataAction(QString uid, QWidget* parent)
 {
-	DataPtr data = mServices->getPatientService()->getData(uid);
+	DataPtr data = mServices->patient()->getData(uid);
 
 	QAction* action = new QAction(qstring_cast(data->getName()), parent);
 
@@ -107,7 +108,7 @@ void DataViewPropertiesInteractor::dataActionSlot()
 		return;
 
 	QString uid = theAction->data().toString();
-	DataPtr data = mServices->getPatientService()->getData(uid);
+	DataPtr data = mServices->patient()->getData(uid);
 
 	bool firstData = mGroupData->getData(DataViewProperties::createFull()).empty();
 
@@ -119,7 +120,10 @@ void DataViewPropertiesInteractor::dataActionSlot()
 		mGroupData->setProperties(uid, props);
 
 		if (data)
-			mServices->getPatientService()->setActiveData(data);
+		{
+			ActiveDataPtr activeData = mServices->patient()->getActiveData();
+			activeData->setActive(data);
+		}
 	}
 	else
 	{

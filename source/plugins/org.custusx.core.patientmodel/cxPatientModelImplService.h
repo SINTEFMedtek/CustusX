@@ -73,8 +73,7 @@ public:
 	virtual Transform3D get_rMpr() const; ///< get the patient registration transform
 	virtual RegistrationHistoryPtr get_rMpr_History() const;
 
-	virtual void setActiveData(DataPtr activeData); ///< used for system state
-	virtual QList<DataPtr> getActiveDataHistory() const;
+	virtual ActiveDataPtr getActiveData() const;
 
 	virtual CLINICAL_VIEW getClinicalApplication() const;
 	virtual void setClinicalApplication(CLINICAL_VIEW application);
@@ -109,6 +108,9 @@ private:
 	virtual DataServicePtr dataService() const;
 	PatientDataPtr patientData() const;
 
+	ToolPtr getProbeTool(QString videoSourceUid);
+	void reEmitActiveTrackedStream(TrackedStreamPtr trackedStream);
+
 	DataManagerImplPtr mDataService;
 	PatientDataPtr mPatientData;
 	DataFactoryPtr mDataFactory;
@@ -116,8 +118,9 @@ private:
 	TrackingServicePtr mTrackingService;
 
 	std::map<QString, ToolPtr> mProbeTools;
-	ToolPtr getProbeTool(QString videoSourceUid);
-	void reEmitActiveTrackedStream(TrackedStreamPtr trackedStream);
+
+	ActiveDataPtr mActiveData;
+
 };
 typedef boost::shared_ptr<PatientModelImplService> PatientModelImplServicePtr;
 

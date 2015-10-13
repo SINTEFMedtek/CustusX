@@ -55,6 +55,7 @@ namespace cx
 
 typedef boost::shared_ptr<class ToolTracer> ToolTracerPtr;
 typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
+typedef boost::shared_ptr<class SpaceListener> SpaceListenerPtr;
 
 /** \brief 3D Graphics class for displaying the trace path traversed by a tool.
  *
@@ -64,7 +65,7 @@ typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
  *
  * \ingroup cx_resource_view
  */
-class cxResourceVisualization_EXPORT ToolTracer : QObject
+class cxResourceVisualization_EXPORT ToolTracer : public QObject
 {
 	Q_OBJECT
 public:
@@ -86,9 +87,10 @@ public:
 private slots:
 	void receiveTransforms(Transform3D prMt, double timestamp);
 private:
-	ToolTracer();
+	ToolTracer(SpaceProviderPtr spaceProvider);
 	void connectTool();
 	void disconnectTool();
+	void onSpaceChanged();
 
 	bool mRunning;
 	vtkPolyDataPtr mPolyData; ///< polydata representation of the probe, in space u
@@ -106,6 +108,7 @@ private:
 	double mMinDistance;
 
 	SpaceProviderPtr mSpaceProvider;
+	SpaceListenerPtr mSpaceListener;
 };
 
 } // namespace cx

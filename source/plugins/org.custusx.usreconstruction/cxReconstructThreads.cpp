@@ -87,10 +87,10 @@ void ThreadedTimedReconstructPreprocessor::postProcessingSlot()
 //---------------------------------------------------------
 
 
-ThreadedTimedReconstructCore::ThreadedTimedReconstructCore(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, ReconstructCorePtr reconstructer) :
+ThreadedTimedReconstructCore::ThreadedTimedReconstructCore(PatientModelServicePtr patientModelService, ViewServicePtr viewService, ReconstructCorePtr reconstructer) :
 	cx::ThreadedTimedAlgorithm<void> ("US Reconstruction", 30),
 	mPatientModelService(patientModelService),
-	mVisualizationService(visualizationService)
+	mViewService(viewService)
 {
 	mUseDefaultMessages = false;
 	mReconstructer = reconstructer;
@@ -115,7 +115,7 @@ void ThreadedTimedReconstructCore::postProcessingSlot()
 	mReconstructer->threadedPostReconstruct();
 
 	mPatientModelService->autoSave();
-	mVisualizationService->autoShowData(mReconstructer->getOutput());
+	mViewService->autoShowData(mReconstructer->getOutput());
 }
 
 }

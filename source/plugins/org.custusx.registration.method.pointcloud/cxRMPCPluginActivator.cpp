@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 
 #include "cxRMPCService.h"
-//#include "cxRMPCGUIExtenderService.h"
+#include "cxRMPCFromPointerService.h"
 #include "cxRegisteredService.h"
 
 
@@ -53,15 +53,15 @@ RMPCPluginActivator::~RMPCPluginActivator()
 }
 
 void RMPCPluginActivator::start(ctkPluginContext* context)
-{
-//	std::cout << "Starting RMPCPluginActivator" << std::endl;
-	mRegistration = RegisteredService::create<RMPCImageToPatientService>(context, RegistrationMethodService_iid);
+{	
+	mPointerToSurface = RegisteredService::create<RMPCFromPointerImageToPatientService>(context, RegistrationMethodService_iid);
+	mPointCloud = RegisteredService::create<RMPCImageToPatientService>(context, RegistrationMethodService_iid);
 }
 
 void RMPCPluginActivator::stop(ctkPluginContext* context)
 {
-	mRegistration.reset();
-	//	std::cout << "Stopped RMPCPluginActivator" << std::endl;
+	mPointerToSurface.reset();
+	mPointCloud.reset();
 	Q_UNUSED(context);
 }
 

@@ -146,7 +146,7 @@ void ContourFilter::createInputTypes()
 {
 	SelectDataStringPropertyBasePtr temp;
 
-	temp = StringPropertySelectImage::New(mServices->getPatientService());
+	temp = StringPropertySelectImage::New(mServices->patient());
 	temp->setValueName("Input");
 	temp->setHelp("Select image input for contouring");
 	connect(temp.get(), SIGNAL(dataChanged(QString)), this, SLOT(imageChangedSlot(QString)));
@@ -157,7 +157,7 @@ void ContourFilter::createOutputTypes()
 {
 	SelectDataStringPropertyBasePtr temp;
 
-	temp = StringPropertySelectMesh::New(mServices->getPatientService());
+	temp = StringPropertySelectMesh::New(mServices->patient());
 	temp->setValueName("Output");
 	temp->setHelp("Output contour");
 	mOutputTypes.push_back(temp);
@@ -180,7 +180,7 @@ void ContourFilter::stopPreview()
 
 void ContourFilter::imageChangedSlot(QString uid)
 {
-	ImagePtr image = mServices->getPatientService()->getData<Image>(uid);
+	ImagePtr image = mServices->patient()->getData<Image>(uid);
 	if(!image)
 		return;
 
@@ -324,7 +324,7 @@ bool ContourFilter::postProcess()
 		return false;
 
 	ColorPropertyPtr colorOption = this->getColorOption(mOptions);
-	MeshPtr output = this->postProcess(mServices->getPatientService(), mRawResult, input, colorOption->getValue());
+	MeshPtr output = this->postProcess(mServices->patient(), mRawResult, input, colorOption->getValue());
 	mRawResult = NULL;
 
 	if (output)

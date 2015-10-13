@@ -68,7 +68,7 @@ class org_custusx_core_patientmodel_EXPORT DataManagerImpl: public DataManager
 {
 Q_OBJECT
 public:
-	static DataManagerImplPtr create();
+	static DataManagerImplPtr create(ActiveDataPtr activeData);
 	virtual ~DataManagerImpl();
 	void setSpaceProvider(SpaceProviderPtr spaceProvider);
 	void setDataFactory(DataFactoryPtr dataFactory);
@@ -95,10 +95,6 @@ public:
 	virtual Vector3D getCenter() const;
 	virtual void setCenter(const Vector3D& center);
 
-	// state information
-	virtual DataPtr getActiveData() const;
-	virtual void setActiveData(DataPtr activeData);
-
 	virtual QString addLandmark();
 	virtual void setLandmarkNames(std::vector<QString> names);
 	virtual void setLandmarkName(QString uid, QString name);
@@ -123,7 +119,7 @@ public:
 
 	virtual void generateUidAndName(QString* _uid, QString* _name);
 protected:
-	DataManagerImpl();
+	DataManagerImpl(ActiveDataPtr activeData);
 
 protected:
 	std::map<QString, VideoSourcePtr> mStreams;
@@ -132,9 +128,6 @@ protected:
 	CLINICAL_VIEW mClinicalApplication;
 	void deleteFiles(DataPtr data, QString basePath);
 
-	//state
-	QList<DataPtr> mActiveData;
-	virtual QList<DataPtr> getActiveDataList() const;
 	DataPtr loadData(QDomElement node, QString rootPath);
 	int findUniqueUidNumber(QString uidBase) const;
 
@@ -147,18 +140,12 @@ protected:
 
 	SpaceProviderPtr mSpaceProvider;
 	DataFactoryPtr mDataFactory;
+	ActiveDataPtr mActiveData;
 
 private:
 	QDir findRelativePath(QDomElement node, QString rootPath);
 	QString findPath(QDomElement node);
 	QString findAbsolutePath(QDir relativePath, QString rootPath);
-	void emitSignals(DataPtr activeData);
-	QStringList getActiveDataStringList() const;
-	void loadActiveData(const QString activeDatas);
-	void removeActiveData(DataPtr dataToBeRemoved);
-	void emitActiveImageChanged();
-	void emitActiveDataChanged();
-	QString getChangedUid(DataPtr activeData);
 private slots:
 	void settingsChangedSlot(QString key);
 };

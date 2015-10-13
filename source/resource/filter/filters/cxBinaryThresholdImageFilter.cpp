@@ -117,7 +117,7 @@ void BinaryThresholdImageFilter::createInputTypes()
 {
 	SelectDataStringPropertyBasePtr temp;
 
-	temp = StringPropertySelectImage::New(mServices->getPatientService());
+	temp = StringPropertySelectImage::New(mServices->patient());
 	temp->setValueName("Input");
 	temp->setHelp("Select image input for thresholding");
 	connect(temp.get(), SIGNAL(dataChanged(QString)), this, SLOT(imageChangedSlot(QString)));
@@ -128,12 +128,12 @@ void BinaryThresholdImageFilter::createOutputTypes()
 {
 	SelectDataStringPropertyBasePtr temp;
 
-	temp = StringPropertySelectData::New(mServices->getPatientService());
+	temp = StringPropertySelectData::New(mServices->patient());
 	temp->setValueName("Output");
 	temp->setHelp("Output thresholded binary image");
 	mOutputTypes.push_back(temp);
 
-	temp = StringPropertySelectData::New(mServices->getPatientService());
+	temp = StringPropertySelectData::New(mServices->patient());
 	temp->setValueName("Contour");
 	temp->setHelp("Output contour generated from thresholded binary image.");
 	mOutputTypes.push_back(temp);
@@ -239,14 +239,14 @@ bool BinaryThresholdImageFilter::postProcess()
 
 	QString uid = input->getUid() + "_seg%1";
 	QString name = input->getName()+" seg%1";
-	ImagePtr output = createDerivedImage(mServices->getPatientService(),
+	ImagePtr output = createDerivedImage(mServices->patient(),
 										 uid, name,
 										 mRawResult, input);
 
 	mRawResult = NULL;
 
 	output->resetTransferFunctions();
-	mServices->getPatientService()->insertData(output);
+	mServices->patient()->insertData(output);
 
 	// set output
 	mOutputTypes.front()->setValue(output->getUid());
@@ -255,7 +255,7 @@ bool BinaryThresholdImageFilter::postProcess()
 	if (mRawContour!=NULL)
 	{
 		ColorPropertyPtr colorOption = this->getColorOption(mOptions);
-		MeshPtr contour = ContourFilter::postProcess(mServices->getPatientService(), mRawContour, output, colorOption->getValue());
+		MeshPtr contour = ContourFilter::postProcess(mServices->patient(), mRawContour, output, colorOption->getValue());
 		mOutputTypes[1]->setValue(contour->getUid());
 		mRawContour = vtkPolyDataPtr();
 	}

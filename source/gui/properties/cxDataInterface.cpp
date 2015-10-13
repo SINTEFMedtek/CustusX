@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVideoService.h"
 #include "cxPatientModelService.h"
 #include "cxActiveToolProxy.h"
+#include "cxActiveData.h"
 
 //TODO: remove
 #include "cxLegacySingletons.h"
@@ -80,16 +81,16 @@ DoubleRange DoublePropertyActiveToolOffset::getValueRange() const
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-DoublePropertyActiveImageBase::DoublePropertyActiveImageBase(PatientModelServicePtr patientModelService) :
-	mPatientModelService(patientModelService)
+DoublePropertyActiveImageBase::DoublePropertyActiveImageBase(ActiveDataPtr activeData) :
+	mActiveData(activeData)
 {
-	mActiveImageProxy = ActiveImageProxy::New(patientModelService);
+	mActiveImageProxy = ActiveImageProxy::New(mActiveData);
 	connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &DoublePropertyActiveImageBase::activeImageChanged);
 	connect(mActiveImageProxy.get(), &ActiveImageProxy::transferFunctionsChanged, this, &Property::changed);
 }
 void DoublePropertyActiveImageBase::activeImageChanged()
 {
-  mImage = mPatientModelService->getActiveData<Image>();
+  mImage = mActiveData->getActive<Image>();
   emit changed();
 }
 double DoublePropertyActiveImageBase::getValue() const
@@ -143,151 +144,6 @@ DoubleRange DoubleProperty2DLevel::getValueRange() const
 
   double max = mImage->getMax();
   return DoubleRange(1,max,max/1000.0);
-}
-
-////---------------------------------------------------------
-////---------------------------------------------------------
-////---------------------------------------------------------
-
-StringPropertySelectRTSourceBase::StringPropertySelectRTSourceBase(PatientModelServicePtr patientModelService) :
-	mPatientModelService(patientModelService)
-{
-	connect(mPatientModelService.get(), &PatientModelService::streamLoaded, this, &Property::changed);
-}
-
-StringPropertySelectRTSourceBase::~StringPropertySelectRTSourceBase()
-{
-	disconnect(mPatientModelService.get(), &PatientModelService::streamLoaded, this, &Property::changed);
-}
-
-QStringList StringPropertySelectRTSourceBase::getValueRange() const
-{
-  std::map<QString, VideoSourcePtr> streams = mPatientModelService->getStreams();
-  QStringList retval;
-  retval << "<no real time source>";
-  std::map<QString, VideoSourcePtr>::iterator it = streams.begin();
-  for (; it !=streams.end(); ++it)
-    retval << qstring_cast(it->second->getUid());
-  return retval;
-}
-
-QString StringPropertySelectRTSourceBase::convertInternal2Display(QString internal)
-{
-  VideoSourcePtr rtSource = mPatientModelService->getStream(internal);
-  if (!rtSource)
-    return "<no real time source>";
-  return qstring_cast(rtSource->getName());
-}
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
-
-StringPropertyActiveVideoSource::StringPropertyActiveVideoSource()
-{
-	connect(videoService().get(), &VideoService::activeVideoSourceChanged, this, &Property::changed);
-}
-
-QString StringPropertyActiveVideoSource::getDisplayName() const
-{
-	return "Stream";
-}
-
-bool StringPropertyActiveVideoSource::setValue(const QString& value)
-{
-	if (value == this->getValue())
-		return false;
-	videoService()->setActiveVideoSource(value);
-	emit changed();
-	return true;
-}
-
-QString StringPropertyActiveVideoSource::getValue() const
-{
-	return videoService()->getActiveVideoSource()->getUid();
-}
-
-QStringList StringPropertyActiveVideoSource::getValueRange() const
-{
-	std::vector<VideoSourcePtr> sources = videoService()->getVideoSources();
-	QStringList retval;
-	for (unsigned i=0; i<sources.size(); ++i)
-		retval << sources[i]->getUid();
-	return retval;
-}
-
-QString StringPropertyActiveVideoSource::getHelp() const
-{
-	return "Select the active video source.";
-}
-
-
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
-
-
-StringPropertySelectRTSource::StringPropertySelectRTSource(PatientModelServicePtr patientModelService) :
-	StringPropertySelectRTSourceBase(patientModelService),
-    mValueName("Select Real Time Source")
-{
-	connect(patientModelService.get(), &PatientModelService::streamLoaded, this, &StringPropertySelectRTSource::setDefaultSlot);
-	this->setDefaultSlot();
-}
-
-QString StringPropertySelectRTSource::getDisplayName() const
-{
-  return mValueName;
-}
-
-bool StringPropertySelectRTSource::setValue(const QString& value)
-{
-  if(mRTSource && (mRTSource->getUid() == value))
-    return false;
-
-  if(mRTSource)
-	  disconnect(mRTSource.get(), &VideoSource::streaming, this, &Property::changed);
-
-  VideoSourcePtr rtSource = mPatientModelService->getStream(value);
-  if(!rtSource)
-    return false;
-
-  mRTSource = rtSource;
-  connect(mRTSource.get(), &VideoSource::streaming, this, &Property::changed);
-
-  emit changed();
-  return true;
-}
-
-QString StringPropertySelectRTSource::getValue() const
-{
-  if(!mRTSource)
-    return "<no real time source>";
-  return mRTSource->getUid();
-}
-
-QString StringPropertySelectRTSource::getHelp() const
-{
-  return "Select a real time source";
-}
-
-VideoSourcePtr StringPropertySelectRTSource::getRTSource()
-{
-  return mRTSource;
-}
-
-void StringPropertySelectRTSource::setValueName(const QString name)
-{
-  mValueName = name;
-}
-
-void StringPropertySelectRTSource::setDefaultSlot()
-{
-  std::map<QString, VideoSourcePtr> streams = mPatientModelService->getStreams();
-  std::map<QString, VideoSourcePtr>::iterator it = streams.begin();
-  if(it != streams.end())
-  {
-    this->setValue(it->first);
-  }
 }
 
 

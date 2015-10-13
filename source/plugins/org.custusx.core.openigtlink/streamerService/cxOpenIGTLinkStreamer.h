@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxStreamer.h"
 
 #include "cxImage.h"
+#include "cxProbeDefinition.h"
 #include "cxIGTLinkUSStatusMessage.h"
 #include "cxIGTLinkImageMessage.h"
 
@@ -68,8 +69,9 @@ public slots:
     void receivedDisconnected();
     void receivedError();
     void receivedImage(ImagePtr image);
-    void receiveIgtlImage(IGTLinkImageMessage::Pointer igtlimage);
-    void receivedUSStatusMessage(IGTLinkUSStatusMessage::Pointer message);
+    void receivedProbedefinition(QString not_used, ProbeDefinitionPtr probedef);
+//    void receiveIgtlImage(IGTLinkImageMessage::Pointer igtlimage);
+//    void receivedUSStatusMessage(IGTLinkUSStatusMessage::Pointer message);
 
 protected slots:
     virtual void streamSlot();

@@ -38,8 +38,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxOpenIGTLinkStreamerService.h"
 #include "cxOpenIGTLinkTrackingSystemService.h"
 #include "cxOpenIGTLinkGuiExtenderService.h"
-#include "cxOpenIGTLinkClient.h"
+#include "cxNetworkConnection.h"
 #include "cxRegisteredService.h"
+#include "cxNetworkServiceImpl.h"
 
 namespace cx
 {
@@ -54,34 +55,28 @@ OpenIGTLinkPluginActivator::~OpenIGTLinkPluginActivator()
 
 void OpenIGTLinkPluginActivator::start(ctkPluginContext* context)
 {
-	mOpenIGTLink.reset(new OpenIGTLinkClientThreadHandler("org.custusx.core.openigtlink"));
-//    mOpenIGTLinkThread.setObjectName("org.custusx.core.openigtlink");
-//    OpenIGTLinkClient *client = new OpenIGTLinkClient;
-//    client->moveToThread(&mOpenIGTLinkThread);
+	mNetworkConnections.reset(new NetworkServiceImpl());
 
-	OpenIGTLinkTrackingSystemService* tracking = new OpenIGTLinkTrackingSystemService(mOpenIGTLink->client());
-	OpenIGTLinkStreamerService *streamer = new OpenIGTLinkStreamerService(mOpenIGTLink->client());
-	OpenIGTLinkGuiExtenderService* gui = new OpenIGTLinkGuiExtenderService(context, mOpenIGTLink->client());
+	NetworkConnectionHandlePtr defaultConnection = mNetworkConnections->getConnection("org.custusx.core.openigtlink");
+
+	OpenIGTLinkTrackingSystemService* tracking = new OpenIGTLinkTrackingSystemService(defaultConnection);
+	OpenIGTLinkStreamerService *streamer = new OpenIGTLinkStreamerService(defaultConnection);
+
+	OpenIGTLinkGuiExtenderService* gui = new OpenIGTLinkGuiExtenderService(context, mNetworkConnections);
 
     mRegistrationGui = RegisteredService::create<OpenIGTLinkGuiExtenderService>(context, gui, GUIExtenderService_iid);
     mRegistrationTracking = RegisteredService::create<OpenIGTLinkTrackingSystemService>(context, tracking, TrackingSystemService_iid);
     mRegistrationStreaming = RegisteredService::create<OpenIGTLinkStreamerService>(context, streamer, StreamerService_iid);
-
-//    mOpenIGTLinkThread.start();
-
 }
 
 void OpenIGTLinkPluginActivator::stop(ctkPluginContext* context)
 {
-//    mOpenIGTLinkThread.quit();
-//    mOpenIGTLinkThread.wait();
-
     mRegistrationGui.reset();
     mRegistrationTracking.reset();
     mRegistrationStreaming.reset();
     Q_UNUSED(context);
 
-	mOpenIGTLink.reset();
+	mNetworkConnections.reset();
 }
 
 } // namespace cx

@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxCoreServices.h"
 #include "cxtestPatientModelServiceMock.h"
 #include "cxLogger.h"
+#include "cxtestVisServices.h"
 
 TEST_CASE("Sort cx::Data user-friendly using getPriority()", "[unit][service][visualization]")
 {
@@ -87,12 +88,10 @@ TEST_CASE("Sort cx::Data user-friendly using getPriority()", "[unit][service][vi
 	for (unsigned i=0; i<sorted.size(); ++i)
 		CHECK(unsorted1[i]==sorted[i]);
 
-	cx::PatientModelServicePtr pms(new cxtest::PatientModelServiceMock());
-	cx::CoreServicesPtr nullBackend = cx::CoreServices::getNull();
-	nullBackend->patientModelService = pms;
+	cxtest::TestVisServicesPtr nullBackend = cxtest::TestVisServices::create();
 
 	for (unsigned i=0; i<unsorted2.size(); ++i)
-		pms->insertData(unsorted2[i]);
+		nullBackend->patient()->insertData(unsorted2[i]);
 
 	cx::ViewGroupData vgData(nullBackend);
 	for (unsigned i=0; i<unsorted2.size(); ++i)

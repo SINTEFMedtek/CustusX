@@ -59,18 +59,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewService.h"
 #include "cxViewGroupData.h"
 #include "cxReporter.h"
+#include "cxActiveData.h"
 
 namespace cx
 {
 
-EraserWidget::EraserWidget(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget* parent) :
+EraserWidget::EraserWidget(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget* parent) :
 	BaseWidget(parent, "EraserWidget", "Eraser"),
 	mPreviousCenter(0,0,0),
 	mPreviousRadius(0),
 	mActiveImageProxy(ActiveImageProxyPtr()),
 	mPatientModelService(patientModelService),
-	mVisualizationService(visualizationService)
-
+	mViewService(viewService),
+	mActiveData(patientModelService->getActiveData())
 {
 
 	QVBoxLayout* layout = new QVBoxLayout(this);
@@ -110,13 +111,13 @@ EraserWidget::EraserWidget(PatientModelServicePtr patientModelService, Visualiza
 	mSphereSize = new SpinBoxAndSliderGroupWidget(this, mSphereSizeAdapter);
 	layout->addWidget(mSphereSize);
 
-	ImagePtr image = mPatientModelService->getActiveData<Image>();
+	ImagePtr image = mActiveData->getActive<Image>();
 	int eraseValue = 0;
 	if(image)
 		eraseValue = image->getMin();
 	mEraseValueAdapter = DoubleProperty::initialize("EraseValue", "Erase value", "Erase/draw with value", eraseValue, DoubleRange(1,200,1), 0, QDomNode());
 
-	mActiveImageProxy = ActiveImageProxy::New(mPatientModelService);
+	mActiveImageProxy = ActiveImageProxy::New(mActiveData);
 	connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &EraserWidget::activeImageChangedSlot);
 
 	mEraseValueWidget = new SpinBoxAndSliderGroupWidget(this, mEraseValueAdapter);
@@ -129,7 +130,7 @@ EraserWidget::EraserWidget(PatientModelServicePtr patientModelService, Visualiza
 
 void EraserWidget::activeImageChangedSlot()
 {
-	ImagePtr image = mPatientModelService->getActiveData<Image>();
+	ImagePtr image = mActiveData->getActive<Image>();
 	if(!image)
 		return;
 
@@ -166,8 +167,8 @@ void EraserWidget::toggleContinous(bool on)
 
 void EraserWidget::continousRemoveSlot()
 {
-	Transform3D rMd = mVisualizationService->getGroup(0)->getOptions().mPickerGlyph->get_rMd();
-	//Transform3D rMd = mVisualizationService->getViewGroupDatas().front()->getData()->getOptions().mPickerGlyph->get_rMd();
+	Transform3D rMd = mViewService->getGroup(0)->getOptions().mPickerGlyph->get_rMd();
+	//Transform3D rMd = mViewService->getViewGroupDatas().front()->getData()->getOptions().mPickerGlyph->get_rMd();
 	Vector3D c(mSphere->GetCenter());
 	c = rMd.coord(c);
 	double r = mSphere->GetRadius();
@@ -181,18 +182,18 @@ void EraserWidget::continousRemoveSlot()
 
 void EraserWidget::duplicateSlot()
 {
-	ImagePtr original = mPatientModelService->getActiveData<Image>();
+	ImagePtr original = mActiveData->getActive<Image>();
 
 	ImagePtr duplicate = duplicateImage(mPatientModelService, original);
 	mPatientModelService->insertData(duplicate);
-	mPatientModelService->setActiveData(duplicate);
+	mActiveData->setActive(duplicate);
 
 	// replace viz of original with duplicate
-//	std::vector<ViewGroupPtr> viewGroups = mVisualizationService->getViewGroupDatas();
-	for (unsigned i = 0; i < mVisualizationService->groupCount(); ++i)
+//	std::vector<ViewGroupPtr> viewGroups = mViewService->getViewGroupDatas();
+	for (unsigned i = 0; i < mViewService->groupCount(); ++i)
 	{
-		if (mVisualizationService->getGroup(i)->removeData(original->getUid()))
-			mVisualizationService->getGroup(i)->addData(duplicate->getUid());
+		if (mViewService->getGroup(i)->removeData(original->getUid()))
+			mViewService->getGroup(i)->addData(duplicate->getUid());
 	}
 }
 
@@ -211,21 +212,21 @@ void EraserWidget::sphereSizeChangedSlot()
  */
 void EraserWidget::saveSlot()
 {
-	mPatientModelService->insertData(mPatientModelService->getActiveData<Image>());
+	mPatientModelService->insertData(mActiveData->getActive<Image>());
 }
 
 
 template <class TYPE>
 void EraserWidget::eraseVolume(TYPE* volumePointer)
 {
-	ImagePtr image = mPatientModelService->getActiveData<Image>();
+	ImagePtr image = mActiveData->getActive<Image>();
 	vtkImageDataPtr img = image->getBaseVtkImageData();
 
 
 	Eigen::Array3i dim(img->GetDimensions());
 	Vector3D spacing(img->GetSpacing());
 
-	Transform3D rMd = mVisualizationService->getGroup(0)->getOptions().mPickerGlyph->get_rMd();
+	Transform3D rMd = mViewService->getGroup(0)->getOptions().mPickerGlyph->get_rMd();
 	Vector3D c(mSphere->GetCenter());
 	c = rMd.coord(c);
 	double r = mSphere->GetRadius();
@@ -285,7 +286,7 @@ void EraserWidget::removeSlot()
 	if (!mSphere)
 		return;
 
-	ImagePtr image = mPatientModelService->getActiveData<Image>();
+	ImagePtr image = mActiveData->getActive<Image>();
 	vtkImageDataPtr img = image->getBaseVtkImageData();
 
 	int vtkScalarType = img->GetScalarType();
@@ -323,7 +324,7 @@ void EraserWidget::toggleShowEraser(bool on)
 {
 	if (on)
 	{
-//		std::vector<ViewGroupPtr> viewGroups = mVisualizationService->getViewGroups();
+//		std::vector<ViewGroupPtr> viewGroups = mViewService->getViewGroups();
 		mSphere = vtkSphereSourcePtr::New();
 
 		mSphere->SetRadius(40);
@@ -334,22 +335,22 @@ void EraserWidget::toggleShowEraser(bool on)
 		double a = mSphereSizeAdapter->getValue();
 		mSphere->SetRadius(a);
 		mSphere->Update();
-		MeshPtr glyph = mVisualizationService->getGroup(0)->getOptions().mPickerGlyph;
+		MeshPtr glyph = mViewService->getGroup(0)->getOptions().mPickerGlyph;
 		glyph->setVtkPolyData(mSphere->GetOutput());
 		glyph->setColor(QColor(255, 204, 0)); // same as tool
 		glyph->setIsWireframe(true);
 
 		// set same glyph in all groups
-		for (unsigned i=0; i<mVisualizationService->groupCount(); ++i)
+		for (unsigned i=0; i<mViewService->groupCount(); ++i)
 		{
-			ViewGroupData::Options options = mVisualizationService->getGroup(i)->getOptions();
+			ViewGroupData::Options options = mViewService->getGroup(i)->getOptions();
 			options.mPickerGlyph = glyph;
-			mVisualizationService->getGroup(i)->setOptions(options);
+			mViewService->getGroup(i)->setOptions(options);
 		}
 	}
 	else
 	{
-		mVisualizationService->getGroup(0)->getOptions().mPickerGlyph->setVtkPolyData(NULL);
+		mViewService->getGroup(0)->getOptions().mPickerGlyph->setVtkPolyData(NULL);
 		mContinousEraseCheckBox->setChecked(false);
 	}
 

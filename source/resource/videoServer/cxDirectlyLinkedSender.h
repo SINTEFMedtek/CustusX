@@ -60,8 +60,6 @@ public:
 	virtual ~DirectlyLinkedSender() {}
 
 	bool isReady() const;
-	virtual void send(IGTLinkImageMessage::Pointer msg);
-	virtual void send(IGTLinkUSStatusMessage::Pointer msg);
 	virtual void send(ImagePtr msg);
 	virtual void send(ProbeDefinitionPtr msg);
 
@@ -75,7 +73,6 @@ signals:
 private:
 	ImagePtr mImage;
 	ProbeDefinitionPtr mUSStatus;
-	IGTLinkUSStatusMessage::Pointer mUnsentUSStatusMessage; ///< received message, will be added to queue when next image arrives
 
 };
 typedef boost::shared_ptr<DirectlyLinkedSender> DirectlyLinkedSenderPtr;

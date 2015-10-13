@@ -35,178 +35,190 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QTcpSocket>
 #include "cxLogger.h"
+#include <QTcpServer>
+#include <QNetworkInterface>
 
 namespace cx
 {
 
-Socket::Socket(QObject *parent) :
-    QObject(parent),
-    mConnected(false)
-{
-    qRegisterMetaType<QAbstractSocket::SocketError>("QAbstractSocket::SocketError");
-    qRegisterMetaType<QAbstractSocket::SocketState>("QAbstractSocket::SocketState");
+//void SingleConnectionTcpServer::setSocket(QPointer<Socket> socket)
+//{
+//	mSocket = socket;
+//}
 
-    mSocket = QTcpSocketPtr(new QTcpSocket(this));
-    connect(mSocket.get(), &QTcpSocket::connected, this, &Socket::receivedConnected);
-    connect(mSocket.get(), &QTcpSocket::disconnected, this, &Socket::receivedDisconnected);
-    //see http://stackoverflow.com/questions/26062397/qt-connect-function-signal-disambiguation-using-lambdas
-    void (QTcpSocket::* errorOverloaded)(QAbstractSocket::SocketError) = &QTcpSocket::error;
-    connect(mSocket.get(), errorOverloaded, this, &Socket::receivedError);
-    connect(mSocket.get(), &QTcpSocket::hostFound, this, &Socket::receivedHostFound);
-    connect(mSocket.get(), &QTcpSocket::stateChanged, this, &Socket::receivedStateChanged);
-    connect(mSocket.get(), &QTcpSocket::readyRead, this, &Socket::receiveReadyRead);
-    connect(mSocket.get(), &QTcpSocket::bytesWritten, this, &Socket::receiveBytesWritten);
-    connect(mSocket.get(), &QTcpSocket::aboutToClose, this, &Socket::receiveAboutToClose);
+SingleConnectionTcpServer::SingleConnectionTcpServer(QObject* parent) :
+	QTcpServer(parent)
+{
 }
 
-void Socket::requestConnectToHost(QString ip, int port) const
+
+void SingleConnectionTcpServer::incomingConnection(qintptr socketDescriptor)
 {
-    mSocket->connectToHost(ip, port);
+	emit incoming(socketDescriptor);
 }
 
-bool Socket::tryConnectToHostAndWait(QString ip, int port) const
-{
-	this->requestConnectToHost(ip, port);
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
 
-	int timeout = 5000;
-	if (!mSocket->waitForConnected(timeout))
+SocketClientConnector::SocketClientConnector(SocketConnection::ConnectionInfo info, QTcpSocket* socket) :
+	mInfo(info),
+	mSocket(socket)
+{
+	connect(mSocket, &QTcpSocket::connected, this, &SocketClientConnector::internalConnected);
+	connect(mSocket, &QTcpSocket::disconnected, this, &SocketClientConnector::internalDisconnected);
+}
+
+SocketClientConnector::~SocketClientConnector()
+{
+
+}
+
+void SocketClientConnector::activate()
+{
+	CX_LOG_INFO() << "Trying to connect to " << mInfo.getDescription();
+	emit stateChanged(scsCONNECTING);
+	mSocket->connectToHost(mInfo.host, mInfo.port);
+}
+
+void SocketClientConnector::deactivate()
+{
+	mSocket->close();
+//	this->stopListen();
+}
+
+CX_SOCKETCONNECTION_STATE SocketClientConnector::getState()
+{
+	if (mSocket->state() == QAbstractSocket::ConnectedState)
+		return scsCONNECTED;
+	if (mSocket->state() == QAbstractSocket::UnconnectedState)
+		return scsINACTIVE;
+	return scsCONNECTING;
+}
+
+void SocketClientConnector::internalConnected()
+{
+	CX_LOG_SUCCESS() << "Connected to "  << mInfo.getDescription();
+	emit stateChanged(this->getState());
+}
+
+void SocketClientConnector::internalDisconnected()
+{
+	CX_LOG_SUCCESS() << "Disconnected";
+	this->stateChanged(this->getState());
+}
+
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+SocketServerConnector::SocketServerConnector(SocketConnection::ConnectionInfo info, QTcpSocket* socket) :
+	mInfo(info),
+	mSocket(socket)
+{
+
+}
+
+SocketServerConnector::~SocketServerConnector()
+{
+
+}
+
+void SocketServerConnector::activate()
+{
+	this->startListen();
+}
+
+void SocketServerConnector::deactivate()
+{
+	this->stopListen();
+}
+
+CX_SOCKETCONNECTION_STATE SocketServerConnector::getState()
+{
+	if (mSocket->state() == QAbstractSocket::ConnectedState)
+		return scsCONNECTED;
+	if (mServer->isListening())
+		return scsLISTENING;
+	if (mSocket->state() == QAbstractSocket::UnconnectedState)
+		return scsINACTIVE;
+	return scsCONNECTING;
+}
+
+bool SocketServerConnector::startListen()
+{
+	if (!mServer)
 	{
-		mSocket->disconnectFromHost();
-		return false;
+		mServer = new SingleConnectionTcpServer(this);
+		connect(mServer.data(), &SingleConnectionTcpServer::incoming, this, &SocketServerConnector::incomingConnection);
+//		mServer->setSocket(mSocket);
 	}
-	return true;
+	emit stateChanged(scsCONNECTING);
+
+	bool started = mServer->listen(QHostAddress::Any, mInfo.port);
+
+	if (started)
+	{
+		CX_LOG_INFO() << QString("Server address: %1").arg(this->getAllServerHostnames().join(", "));
+		CX_LOG_INFO() << QString("Server is listening to port %1").arg(mServer->serverPort());
+	}
+	else
+	{
+		CX_LOG_INFO() << QString("Server failed to start. Error: %1").arg(mServer->errorString());
+	}
+
+	emit stateChanged(this->getState());
+	return started;
 }
 
-bool Socket::isConnected() const
+void SocketServerConnector::stopListen()
 {
-    return mConnected;
+	mSocket->close();
+
+	if (mServer && mServer->isListening())
+	{
+		CX_LOG_INFO() << QString("Server stopped listening to port %1").arg(mServer->serverPort());
+		mServer->close();
+		emit stateChanged(this->getState());
+	}
 }
 
-QString Socket::getLastError() const
+void SocketServerConnector::incomingConnection(qintptr socketDescriptor)
 {
-    return mSocket->errorString();
+	CX_LOG_INFO() << "Server: Incoming connection...";
+
+	if (this->mSocket->state() == QAbstractSocket::ConnectedState)
+	{
+		reportError("Incoming connection request rejected: The server can only handle a single connection.");
+		return;
+	}
+
+	int success = mSocket->setSocketDescriptor(socketDescriptor, QAbstractSocket::ConnectedState);
+	QString clientName = mSocket->localAddress().toString();
+	report("Connected to "+clientName+". Session started." + qstring_cast(success));
+
+	emit stateChanged(this->getState());
 }
 
-void Socket::requestCloseConnection() const
+QStringList SocketServerConnector::getAllServerHostnames()
 {
-    mSocket->close();
+	QStringList addresses;
+
+	foreach(QNetworkInterface interface, QNetworkInterface::allInterfaces())
+	{
+		if (interface.flags().testFlag(QNetworkInterface::IsRunning))
+			foreach (QNetworkAddressEntry entry, interface.addressEntries())
+			{
+				if ( interface.hardwareAddress() != "00:00:00:00:00:00"
+					 && entry.ip().toString() != "127.0.0.1"
+					 && entry.ip().toString().contains(".") )
+					addresses << QString("%1: %2").arg(interface.name()).arg(entry.ip().toString());
+			}
+	}
+
+	return addresses;
 }
 
-bool Socket::minBytesAvailable(int bytes) const
-{
-    return mSocket->bytesAvailable() >= bytes;
-}
 
-qint64 Socket::bytesAvailable() const
-{
-    return mSocket->bytesAvailable();
-}
-
-qint64 Socket::read(char *data, qint64 maxSizeBytes) const
-{
-    qint64 readBytes = mSocket->read(data, maxSizeBytes);
-    return readBytes;
-}
-
-qint64 Socket::skip(qint64 maxSizeBytes) const
-{
-    char *voidData = new char[maxSizeBytes];
-    int retval = mSocket->read(voidData, maxSizeBytes);
-    delete[] voidData;
-    return retval;
-}
-
-qint64 Socket::write(const char *data, qint64 maxSizeBytes) const
-{
-    qint64 writtenBytes = mSocket->write(data, maxSizeBytes);
-    return writtenBytes;
-}
-
-bool Socket::waitForBytesWritten(int msecs)
-{
-    return mSocket->waitForBytesWritten(msecs);
-}
-
-bool Socket::waitForReadyRead(int msecs)
-{
-    return mSocket->waitForReadyRead(msecs);
-}
-
-void Socket::receivedConnected()
-{
-    mConnected = true;
-    emit connected();
-}
-
-void Socket::receivedDisconnected()
-{
-    mConnected = false;
-    emit disconnected();
-}
-
-void Socket::receivedError(QAbstractSocket::SocketError socketError)
-{
-    CX_LOG_ERROR() << QString("[%1] Socket error [code=%2]: %3")
-                       .arg(mSocket->peerName())
-                       .arg(QString::number(socketError))
-                       .arg(mSocket->errorString());
-    emit error();
-}
-
-void Socket::receivedHostFound()
-{
-    //CX_LOG_DEBUG() << "Socket found host.";
-}
-
-QString socketStateToString(QAbstractSocket::SocketState socketState)
-{
-    QString retval;
-    switch(socketState)
-    {
-        case QAbstractSocket::UnconnectedState:
-            retval = "UnconnectedState";
-            break;
-        case QAbstractSocket::HostLookupState:
-            retval = "HostLookupState";
-            break;
-        case QAbstractSocket::ConnectingState:
-            retval = "ConnectingState";
-            break;
-        case QAbstractSocket::ConnectedState:
-            retval = "ConnectedState";
-            break;
-        case QAbstractSocket::BoundState:
-            retval = "BoundState";
-            break;
-        case QAbstractSocket::ListeningState:
-            retval = "ListeningState";
-            break;
-        case QAbstractSocket::ClosingState:
-            retval = "ClosingState";
-            break;
-        default:
-            retval = "Unknown";
-    }
-    return retval;
-}
-
-void Socket::receivedStateChanged(QAbstractSocket::SocketState socketState)
-{
-    //CX_LOG_DEBUG() <<  "Socket is now in state " << socketStateToString(socketState);
-}
-
-void Socket::receiveReadyRead()
-{
-    emit readyRead();
-}
-
-void Socket::receiveBytesWritten(qint64 bytes)
-{
-    //CX_LOG_DEBUG() << "Bytes written to socket: " << bytes;
-}
-
-void Socket::receiveAboutToClose()
-{
-    //CX_LOG_DEBUG() << "Socket is about to close";
-}
 }//namespace cx

@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include <QAbstractSocket>
 #include <QString>
+#include "cxSocketConnection.h"
 
 QT_BEGIN_NAMESPACE
 class QTcpSocket;
@@ -47,56 +48,82 @@ QT_END_NAMESPACE
 namespace cx
 {
 
-typedef boost::shared_ptr<class Socket> SocketPtr;
-
 /**
- * @brief The Socket class socket functionallity
- * @date 18.03.2015
- * @author Janne Beate Bakeng, SINTEF
+ * Reimplement QTcpServer::incomingConnection() to
+ * do nothing but emit a signal.
+ *
+ * Used internally by SocketConnection.
  */
-class cxResource_EXPORT Socket : public QObject
+class SingleConnectionTcpServer : public QTcpServer
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    Socket(QObject *parent);
-
-    void requestConnectToHost(QString ip, int port) const;
-    bool tryConnectToHostAndWait(QString ip, int port) const;
-    bool isConnected() const;
-    QString getLastError() const;
-    void requestCloseConnection() const;
-
-    bool minBytesAvailable(int bytes) const;
-    qint64 bytesAvailable() const;
-    qint64 read(char *data, qint64 maxSizeBytes) const;
-    qint64 skip(qint64 maxSizeBytes) const;
-
-    qint64 write(const char* data, qint64 maxSizeBytes) const;
-
-    bool waitForBytesWritten(int msecs = 3000);
-    bool waitForReadyRead(int msecs = 3000);
-
+	SingleConnectionTcpServer(QObject* parent);
+//	void setSocket(QPointer<Socket> socket);
 signals:
-    void connected();
-    void disconnected();
-    void readyRead();
-    void error();
+	void incoming(qintptr socketDescriptor);
+protected:
+	void incomingConnection(qintptr socketDescriptor);
+private:
+//	QPointer<Socket> mSocket;
+};
 
-private slots:
-    void receivedConnected();
-    void receivedDisconnected();
-    void receivedError(QAbstractSocket::SocketError socketError);
-    void receivedHostFound();
-    void receivedStateChanged(QAbstractSocket::SocketState socketState);
-    void receiveReadyRead();
-    void receiveBytesWritten(qint64 bytes);
-    void receiveAboutToClose();
+
+class cxResource_EXPORT SocketConnector : public QObject
+{
+	Q_OBJECT
+public:
+	virtual ~SocketConnector() {}
+//	SocketConnector(SocketConnection::ConnectionInfo info, QSocket* socket);
+
+	virtual void activate() = 0;
+	virtual void deactivate() = 0;
+	virtual CX_SOCKETCONNECTION_STATE getState() = 0;
+signals:
+	void stateChanged(CX_SOCKETCONNECTION_STATE);
+};
+
+class cxResource_EXPORT SocketClientConnector : public SocketConnector
+{
+public:
+	SocketClientConnector(SocketConnection::ConnectionInfo info, QTcpSocket* socket);
+	virtual ~SocketClientConnector();
+
+	virtual void activate();
+	virtual void deactivate();
+	virtual CX_SOCKETCONNECTION_STATE getState();
 
 private:
-    typedef boost::shared_ptr<QTcpSocket> QTcpSocketPtr;
-    QTcpSocketPtr mSocket;
-    bool mConnected;
+	void internalConnected();
+	void internalDisconnected();
+
+	SocketConnection::ConnectionInfo mInfo;
+	QTcpSocket* mSocket;
+
 };
+
+class cxResource_EXPORT SocketServerConnector : public SocketConnector
+{
+	Q_OBJECT
+public:
+	SocketServerConnector(SocketConnection::ConnectionInfo info, QTcpSocket* socket);
+	virtual ~SocketServerConnector();
+
+	virtual void activate();
+	virtual void deactivate();
+	virtual CX_SOCKETCONNECTION_STATE getState();
+
+private:
+	bool startListen();
+	void stopListen();
+	void incomingConnection(qintptr socketDescriptor);
+	QStringList getAllServerHostnames();
+
+	SocketConnection::ConnectionInfo mInfo;
+	QPointer<class SingleConnectionTcpServer> mServer;
+	QTcpSocket* mSocket;
+};
+
 }
 
 #endif //CXSOCKET_H

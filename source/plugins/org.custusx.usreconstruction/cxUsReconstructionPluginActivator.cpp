@@ -61,10 +61,10 @@ UsReconstructionPluginActivator::~UsReconstructionPluginActivator()
 void UsReconstructionPluginActivator::start(ctkPluginContext* context)
 {
 	PatientModelServicePtr patientModelService = PatientModelServicePtr(new PatientModelServiceProxy(context));
-	VisualizationServicePtr visualizationService = VisualizationServicePtr(new VisualizationServiceProxy(context));
+	ViewServicePtr viewService = ViewServicePtr(new ViewServiceProxy(context));
 
 	XmlOptionFile xmlFile = profile()->getXmlSettings().descend("usReconstruction");
-	UsReconstructionImplService *usReconstructionService = new UsReconstructionImplService(context, patientModelService, visualizationService, xmlFile);
+	UsReconstructionImplService *usReconstructionService = new UsReconstructionImplService(context, patientModelService, viewService, xmlFile);
 
 	mUsReconstruction = RegisteredServicePtr(new RegisteredService(context, usReconstructionService, UsReconstructionService_iid));
 

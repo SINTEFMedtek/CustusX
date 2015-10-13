@@ -36,6 +36,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
     Video/cxVideoService
     Video/cxStreamerService
     Video/cxBasicVideoSource
+	Video/cxStringPropertyActiveVideoSource
 
     Tool/cxTool
     Tool/cxToolProxy
@@ -120,6 +121,8 @@ cx_add_class_qt_moc(cxResource_SOURCE
     patientModel/cxPatientModelService
 
     usReconstructionTypes/cxSavingVideoRecorder
+
+	network/cxNetworkService
 )
 
 cx_add_class(cxResource_SOURCE
@@ -313,6 +316,7 @@ target_include_directories(cxResource
     ./utilities
     ./registration
     ./patientModel
+	./network
     ./usReconstructionTypes
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}/settings

@@ -81,7 +81,7 @@ class cxResourceWidgets_EXPORT PipelineWidget : public BaseWidget
 {
 	Q_OBJECT
 public:
-	PipelineWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent, PipelinePtr pipeline);
+	PipelineWidget(ViewServicePtr viewService, PatientModelServicePtr patientModelService, QWidget* parent, PipelinePtr pipeline);
 private slots:
 	void runFilterSlot();
 	void filterSelectedSlot(QString uid);

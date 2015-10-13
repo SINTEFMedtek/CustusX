@@ -33,7 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxOpenIGTLinkTrackingSystemService.h"
 
 #include "cxLogger.h"
-#include "cxOpenIGTLinkClient.h"
+#include "cxNetworkConnection.h"
+#include "cxNetworkConnectionHandle.h"
 #include "cxOpenIGTLinkTool.h"
 
 namespace cx
@@ -50,19 +51,23 @@ std::vector<ToolPtr> toVector(std::map<QString, OpenIGTLinkToolPtr> map)
     return retval;
 }
 
-OpenIGTLinkTrackingSystemService::OpenIGTLinkTrackingSystemService(OpenIGTLinkClient *client) :
-    mState(Tool::tsNONE)
+OpenIGTLinkTrackingSystemService::OpenIGTLinkTrackingSystemService(NetworkConnectionHandlePtr connection) :
+	mState(Tool::tsNONE),
+	mConnection(connection)
+
 {
-    if(client == NULL)
+	if(mConnection == NULL)
         return;
 
-    connect(this, &OpenIGTLinkTrackingSystemService::connectToServer, client, &OpenIGTLinkClient::requestConnect);
-    connect(this, &OpenIGTLinkTrackingSystemService::disconnectFromServer, client, &OpenIGTLinkClient::requestDisconnect);
-    connect(client, &OpenIGTLinkClient::connected, this, &OpenIGTLinkTrackingSystemService::serverIsConnected);
-    connect(client, &OpenIGTLinkClient::disconnected, this, &OpenIGTLinkTrackingSystemService::serverIsDisconnected);
-    connect(client, &OpenIGTLinkClient::transform, this, &OpenIGTLinkTrackingSystemService::receiveTransform);
-    connect(client, &OpenIGTLinkClient::calibration, this, &OpenIGTLinkTrackingSystemService::receiveCalibration);
-    connect(client, &OpenIGTLinkClient::probedefinition, this, &OpenIGTLinkTrackingSystemService::receiveProbedefinition);
+	NetworkConnection* client = mConnection->getNetworkConnection();
+
+	connect(this, &OpenIGTLinkTrackingSystemService::connectToServer, client, &NetworkConnection::requestConnect);
+	connect(this, &OpenIGTLinkTrackingSystemService::disconnectFromServer, client, &NetworkConnection::requestDisconnect);
+	connect(client, &NetworkConnection::connected, this, &OpenIGTLinkTrackingSystemService::serverIsConnected);
+	connect(client, &NetworkConnection::disconnected, this, &OpenIGTLinkTrackingSystemService::serverIsDisconnected);
+	connect(client, &NetworkConnection::transform, this, &OpenIGTLinkTrackingSystemService::receiveTransform);
+	connect(client, &NetworkConnection::calibration, this, &OpenIGTLinkTrackingSystemService::receiveCalibration);
+	connect(client, &NetworkConnection::probedefinition, this, &OpenIGTLinkTrackingSystemService::receiveProbedefinition);
 }
 
 OpenIGTLinkTrackingSystemService::~OpenIGTLinkTrackingSystemService()
@@ -150,14 +155,14 @@ void OpenIGTLinkTrackingSystemService::initialize()
 void OpenIGTLinkTrackingSystemService::uninitialize()
 {
     CX_LOG_CHANNEL_DEBUG("janne beate ") << "uninitialize";
-    //emit disconnectFromServer();
+    emit disconnectFromServer();
 }
 
 void OpenIGTLinkTrackingSystemService::startTracking()
 {
     CX_LOG_CHANNEL_DEBUG("janne beate ") << "startTracking";
     //emit startListenToServer();
-    emit connectToServer();
+    //emit connectToServer();
 }
 
 void OpenIGTLinkTrackingSystemService::stopTracking()
@@ -191,6 +196,7 @@ void OpenIGTLinkTrackingSystemService::serverIsDisconnected()
 
 void OpenIGTLinkTrackingSystemService::receiveTransform(QString devicename, Transform3D transform, double timestamp)
 {
+    CX_LOG_DEBUG() << "transform";
     OpenIGTLinkToolPtr tool = this->getTool(devicename);
     tool->toolTransformAndTimestampSlot(transform, timestamp);
 }

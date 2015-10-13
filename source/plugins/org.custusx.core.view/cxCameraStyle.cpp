@@ -146,13 +146,16 @@ void CameraStyleInteractor::updateActionGroup()
 	if (mStyle)
 		currentStyle = enum2string(mStyle->getCameraStyle());
 
-	QList<QAction*> actions = mCameraStyleGroup->actions();
-	for (int i=0; i<actions.size(); ++i)
+	if(mCameraStyleGroup)
 	{
-		actions[i]->blockSignals(true);
-		actions[i]->setChecked(actions[i]->data().toString() == currentStyle);
-		actions[i]->setEnabled(mStyle!=0);
-		actions[i]->blockSignals(false);
+		QList<QAction*> actions = mCameraStyleGroup->actions();
+		for (int i=0; i<actions.size(); ++i)
+		{
+			actions[i]->blockSignals(true);
+			actions[i]->setChecked(actions[i]->data().toString() == currentStyle);
+			actions[i]->setEnabled(mStyle!=0);
+			actions[i]->blockSignals(false);
+		}
 	}
 
 }

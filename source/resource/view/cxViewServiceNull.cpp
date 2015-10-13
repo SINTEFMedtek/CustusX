@@ -37,62 +37,67 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-VisualizationServiceNull::VisualizationServiceNull()
+ViewServiceNull::ViewServiceNull()
 {
 	mActionGroup = new QActionGroup(this);
 }
 
-ViewPtr VisualizationServiceNull::get3DView(int group, int index)
+ViewPtr ViewServiceNull::get3DView(int group, int index)
 {
 	printWarning();
 	return ViewPtr();
 }
 
-int VisualizationServiceNull::getActiveGroupId() const
+int ViewServiceNull::getActiveGroupId() const
 {
 	printWarning();
 	return -1;
 }
 
-ViewGroupDataPtr VisualizationServiceNull::getGroup(int groupIdx) const
+ViewGroupDataPtr ViewServiceNull::getGroup(int groupIdx) const
 {
 	printWarning();
 	return ViewGroupDataPtr();
 }
-bool VisualizationServiceNull::isNull()
+
+void ViewServiceNull::setRegistrationMode(REGISTRATION_STATUS mode)
+{
+	printWarning();
+}
+bool ViewServiceNull::isNull()
 {
 	return true;
 }
 
-void VisualizationServiceNull::printWarning() const
+void ViewServiceNull::printWarning() const
 {
 //	reportWarning("Trying to use VideoServiceNull. Is VideoService (org.custusx.core.view) disabled?");
 }
 
-void VisualizationServiceNull::autoShowData(cx::DataPtr data)
+void ViewServiceNull::autoShowData(cx::DataPtr data)
 {
 	printWarning();
 }
 
-void VisualizationServiceNull::enableRender(bool val)
+void ViewServiceNull::enableRender(bool val)
 {
 
 }
 
-bool VisualizationServiceNull::renderingIsEnabled() const
+bool ViewServiceNull::renderingIsEnabled() const
 {
 	return false;
 }
 
-QWidget* VisualizationServiceNull::getLayoutWidget(QWidget *parent, int index) { return NULL; }
-QString VisualizationServiceNull::getActiveLayout(int widgetIndex) const { return ""; }
-void VisualizationServiceNull::setActiveLayout(const QString& uid, int widgetIndex) {}
-InteractiveClipperPtr VisualizationServiceNull::getClipper() { return InteractiveClipperPtr(); }
-InteractiveCropperPtr VisualizationServiceNull::getCropper() { return InteractiveCropperPtr(); }
-CyclicActionLoggerPtr VisualizationServiceNull::getRenderTimer() { return CyclicActionLoggerPtr(); }
-NavigationPtr VisualizationServiceNull::getNavigation() { return NavigationPtr(); }
-LayoutRepositoryPtr VisualizationServiceNull::getLayoutRepository() { return LayoutRepositoryPtr(); }
-CameraControlPtr VisualizationServiceNull::getCameraControl() { return CameraControlPtr(); }
-QActionGroup* VisualizationServiceNull::createInteractorStyleActionGroup() { return mActionGroup; }
+QWidget* ViewServiceNull::getLayoutWidget(QWidget *parent, int index) { return NULL; }
+QString ViewServiceNull::getActiveLayout(int widgetIndex) const { return ""; }
+void ViewServiceNull::setActiveLayout(const QString& uid, int widgetIndex) {}
+InteractiveClipperPtr ViewServiceNull::getClipper() { return InteractiveClipperPtr(); }
+InteractiveCropperPtr ViewServiceNull::getCropper() { return InteractiveCropperPtr(); }
+CyclicActionLoggerPtr ViewServiceNull::getRenderTimer() { return CyclicActionLoggerPtr(); }
+NavigationPtr ViewServiceNull::getNavigation() { return NavigationPtr(); }
+LayoutRepositoryPtr ViewServiceNull::getLayoutRepository() { return LayoutRepositoryPtr(); }
+CameraControlPtr ViewServiceNull::getCameraControl() { return CameraControlPtr(); }
+QActionGroup* ViewServiceNull::createInteractorStyleActionGroup() { return mActionGroup; }
 
 } //cx

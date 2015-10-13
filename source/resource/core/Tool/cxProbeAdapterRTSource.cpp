@@ -59,7 +59,12 @@ ProbeAdapterRTSource::ProbeAdapterRTSource(QString uid, ProbePtr probe, VideoSou
 }
 
 ProbeAdapterRTSource::~ProbeAdapterRTSource()
-{}
+{
+	disconnect(mBase.get(), &VideoSource::streaming, this, &VideoSource::streaming);
+	disconnect(mBase.get(), &VideoSource::connected, this, &VideoSource::connected);
+	disconnect(mBase.get(), &VideoSource::newFrame, this, &VideoSource::newFrame);
+	disconnect(mBase.get(), &VideoSource::newFrame, this, &ProbeAdapterRTSource::newFrameSlot);
+}
 
 QString ProbeAdapterRTSource::getUid()
 {

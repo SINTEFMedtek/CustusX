@@ -91,6 +91,9 @@ public:
 
     ImagePtr getImageToDisplay();
 
+signals:
+	void pointSampled(Vector3D p_r);
+
 protected slots:
 	virtual void dataViewPropertiesChangedSlot(QString uid);
 
@@ -106,9 +109,10 @@ private slots:
 	void settingsChangedSlot(QString key);
 	void optionChangedSlot();
 
+protected slots:
+	void samplePoint(Vector3D click_vp);
 private:
-	void moveManualTool(QPoint point);
-
+	void moveManualTool(Vector3D vp, Vector3D delta_vp);
 	virtual void appendToContextMenu(QMenu& contextMenu);
 	void addReps();
 	DoubleBoundingBox3D getViewport() const;
@@ -160,10 +164,9 @@ private:
 	Zoom2DHandlerPtr mZoom2D;
 
 	SyncedValuePtr mOrientationMode;
-	Vector3D mClickPos;
+	Vector3D mLastClickPos_vp;
 
 	QActionGroup* mOrientationActionGroup;
-
 };
 typedef boost::shared_ptr<ViewWrapper2D> ViewWrapper2DPtr;
 

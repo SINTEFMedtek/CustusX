@@ -40,28 +40,29 @@ class QDomElement;
 
 namespace cx
 {
-typedef boost::shared_ptr<class ViewManager> VisualizationServiceOldPtr;
+typedef boost::shared_ptr<class ViewManager> ViewManagerPtr;
 typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
 
 /**
- * Implementation of VisualizationService.
+ * Implementation of ViewService.
  *
  * \ingroup org_custusx_core_view
  *
  * \date 2014-09-19
  * \author Ole Vegard Solberg
  */
-class org_custusx_core_view_EXPORT VisualizationImplService : public VisualizationService
+class org_custusx_core_view_EXPORT ViewImplService : public ViewService
 {
-	Q_INTERFACES(cx::VisualizationService)
+	Q_INTERFACES(cx::ViewService)
 public:
-	VisualizationImplService(ctkPluginContext* context);
-	virtual ~VisualizationImplService();
+	ViewImplService(ctkPluginContext* context);
+	virtual ~ViewImplService();
 
 	virtual ViewPtr get3DView(int group = 0, int index = 0);
 
 	virtual int getActiveGroupId() const;
 	virtual ViewGroupDataPtr getGroup(int groupIdx) const;
+	virtual void setRegistrationMode(REGISTRATION_STATUS mode);
 
 	virtual void autoShowData(DataPtr data);
 	virtual void enableRender(bool val);
@@ -91,12 +92,12 @@ private slots:
 
 private:
 	ctkPluginContext *mContext;
-	VisualizationServiceOldPtr mBase;
+	ViewManagerPtr mBase;
 	SessionStorageServicePtr mSession;
 
 	ViewManager* viewManager() const { return mBase.get(); }
 };
-typedef boost::shared_ptr<VisualizationImplService> VisualizationImplServicePtr;
+typedef boost::shared_ptr<ViewImplService> ViewImplServicePtr;
 
 } /* namespace cx */
 

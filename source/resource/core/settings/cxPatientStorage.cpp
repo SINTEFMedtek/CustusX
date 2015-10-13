@@ -37,9 +37,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-PatientStorage::PatientStorage(SessionStorageServicePtr sessionStorageService, QString baseNodeName) :
+PatientStorage::PatientStorage(SessionStorageServicePtr sessionStorageService, QString baseNodeName, bool delayedLoad) :
 	mBaseNodeName(baseNodeName)
 {
+	if(delayedLoad)
+		connect(sessionStorageService.get(), &SessionStorageService::isLoadingSecond, this, &PatientStorage::duringLoadPatientSlot);
 	connect(sessionStorageService.get(), &SessionStorageService::isLoading, this, &PatientStorage::duringLoadPatientSlot);
 	connect(sessionStorageService.get(), &SessionStorageService::isSaving, this, &PatientStorage::duringSavePatientSlot);
 }

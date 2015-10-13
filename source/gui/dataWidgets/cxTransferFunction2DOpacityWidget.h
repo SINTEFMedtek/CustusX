@@ -58,7 +58,7 @@ class cxGui_EXPORT TransferFunction2DOpacityWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  TransferFunction2DOpacityWidget(PatientModelServicePtr patientModelService, QWidget* parent);
+  TransferFunction2DOpacityWidget(ActiveDataPtr activeData, QWidget* parent);
   virtual ~TransferFunction2DOpacityWidget();
 
 private slots:
@@ -68,7 +68,7 @@ protected:
   TransferFunctionAlphaWidget* mTransferFunctionAlphaWidget;
   DoublePropertyImageTFDataBasePtr mDataAlpha, mDataLLR;
   ActiveImageProxyPtr mActiveImageProxy;
-  PatientModelServicePtr mPatientModelService;
+  ActiveDataPtr mActiveData;
 };
 
 /**

@@ -243,7 +243,7 @@ class cxGui_EXPORT PreferencesDialog : public QDialog
     Q_OBJECT
 
 public:
-	PreferencesDialog(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget *parent = 0);
+	PreferencesDialog(ViewServicePtr viewService, PatientModelServicePtr patientModelService, QWidget *parent = 0);
 	virtual ~PreferencesDialog();
 
 signals:

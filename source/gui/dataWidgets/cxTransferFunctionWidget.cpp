@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxShadingParamsInterfaces.h"
 #include "cxSettings.h"
 #include "cxPatientModelService.h"
-#include "cxLogicManager.h"
+#include "cxActiveData.h"
 
 namespace cx
 {
@@ -185,15 +185,15 @@ DoubleRange DoublePropertyImageTFDataAlpha::getValueRange() const
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-TransferFunction3DWidget::TransferFunction3DWidget(PatientModelServicePtr patientModelService, QWidget* parent, bool connectToActiveImage) :
+TransferFunction3DWidget::TransferFunction3DWidget(ActiveDataPtr activeData, QWidget* parent, bool connectToActiveImage) :
   BaseWidget(parent, "TransferFunction3DWidget", "3D"),
   mLayout(new QVBoxLayout(this)),
-  mPatientModelService(patientModelService),
-  mActiveImageProxy(ActiveImageProxyPtr())
+  mActiveImageProxy(ActiveImageProxyPtr()),
+  mActiveData(activeData)
 {
 	this->setToolTip("Set a transfer function on a 3D volume");
-  mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(patientModelService, this);
-  mTransferFunctionColorWidget = new TransferFunctionColorWidget(patientModelService, this);
+  mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(activeData, this);
+  mTransferFunctionColorWidget = new TransferFunctionColorWidget(activeData, this);
 
   mTransferFunctionAlphaWidget->setSizePolicy(QSizePolicy::MinimumExpanding,
                                               QSizePolicy::MinimumExpanding);
@@ -207,7 +207,7 @@ TransferFunction3DWidget::TransferFunction3DWidget(PatientModelServicePtr patien
 
   if(connectToActiveImage)
   {
-	  mActiveImageProxy = ActiveImageProxy::New(patientModelService);
+	  mActiveImageProxy = ActiveImageProxy::New(mActiveData);
 	  connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &TransferFunction3DWidget::activeImageChangedSlot);
 	  connect(mActiveImageProxy.get(), &ActiveImageProxy::transferFunctionsChanged, this, &TransferFunction3DWidget::activeImageChangedSlot);
   }
@@ -215,7 +215,7 @@ TransferFunction3DWidget::TransferFunction3DWidget(PatientModelServicePtr patien
 
 void TransferFunction3DWidget::activeImageChangedSlot()
 {
-  ImagePtr activeImage = mPatientModelService->getActiveData<Image>();
+  ImagePtr activeImage = mActiveData->getActive<Image>();
   this->imageChangedSlot(activeImage);
 }
 
@@ -235,22 +235,22 @@ void TransferFunction3DWidget::imageChangedSlot(ImagePtr image)
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-TransferFunction2DWidget::TransferFunction2DWidget(PatientModelServicePtr patientModelService, QWidget* parent, bool connectToActiveImage) :
+TransferFunction2DWidget::TransferFunction2DWidget(ActiveDataPtr activeData, QWidget* parent, bool connectToActiveImage) :
   BaseWidget(parent, "TransferFunction2DWidget", "2D"),
   mLayout(new QVBoxLayout(this)),
-  mPatientModelService(patientModelService)
+  mActiveData(activeData)
 {
 	this->setToolTip("Set a transfer function on a 2D image");
-  mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(patientModelService, this);
+  mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(activeData, this);
   mTransferFunctionAlphaWidget->setReadOnly(true);
-  mTransferFunctionColorWidget = new TransferFunctionColorWidget(patientModelService, this);
+  mTransferFunctionColorWidget = new TransferFunctionColorWidget(activeData, this);
 
   mDataWindow.reset(new DoublePropertyImageTFDataWindow);
   mDataLevel.reset(new DoublePropertyImageTFDataLevel);
   mDataAlpha.reset(new DoublePropertyImageTFDataAlpha);
   mDataLLR.reset(new DoublePropertyImageTFDataLLR);
 
-  mActiveImageProxy = ActiveImageProxy::New(patientModelService);
+  mActiveImageProxy = ActiveImageProxy::New(mActiveData);
   connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &TransferFunction2DWidget::activeImageChangedSlot);
   connect(mActiveImageProxy.get(), &ActiveImageProxy::transferFunctionsChanged, this, &TransferFunction2DWidget::activeImageChangedSlot);
 
@@ -274,7 +274,7 @@ TransferFunction2DWidget::TransferFunction2DWidget(PatientModelServicePtr patien
 
 void TransferFunction2DWidget::activeImageChangedSlot()
 {
-  ImagePtr image = mPatientModelService->getActiveData<Image>();
+  ImagePtr image = mActiveData->getActive<Image>();
   ImageTFDataPtr tf;
   if (image)
     tf = image->getLookupTable2D();
@@ -301,7 +301,7 @@ TransferFunctionWidget::TransferFunctionWidget(PatientModelServicePtr patientMod
 	this->setToolTip("Set a new or predefined transfer function on a volume");
   QVBoxLayout* mLayout = new QVBoxLayout(this);
 
-  TransferFunction3DWidget* transferFunctionWidget = new TransferFunction3DWidget(patientModelService, this, connectToActiveImage);
+  TransferFunction3DWidget* transferFunctionWidget = new TransferFunction3DWidget(patientModelService->getActiveData(), this, connectToActiveImage);
 
   mLayout->setMargin(0);
   mLayout->addWidget(transferFunctionWidget);

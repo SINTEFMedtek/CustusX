@@ -54,17 +54,14 @@ namespace cx
 
 struct Package
 {
-	IGTLinkImageMessage::Pointer mIgtLinkImageMessage;
-	IGTLinkUSStatusMessage::Pointer mIgtLinkUSStatusMessage;
 	ImagePtr mImage;
 	ProbeDefinitionPtr mProbe;
-
 };
 
 typedef boost::shared_ptr<Package> PackagePtr;
 
-/**Interface for sending grabbed data from the ImageSender classes further to either
- * a TCP/IP socket or directly via a Qt signal.
+/** Interface for sending grabbed data from the ImageSender classes further to either
+ *  a TCP/IP socket or directly via a Qt signal.
  *
  * \ingroup cx_resource_videoserver
  * \author Christian Askeland, SINTEF

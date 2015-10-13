@@ -109,7 +109,7 @@ private slots:
 	void activeImageChangedSlot(QString uid);
 	void showRefToolSlot(bool checked);
 	void showToolPathSlot(bool checked);
-	void PickerRepPointPickedSlot(Vector3D p_r);
+	void pickerRepPointPickedSlot(Vector3D p_r);
 	void centerImageActionSlot();
 	void centerToolActionSlot();
 	void optionChangedSlot();
@@ -117,7 +117,7 @@ private slots:
 	void globalConfigurationFileChangedSlot(QString key);
 	void setStereoEyeAngle(double angle);
 	void settingsChangedSlot(QString key);
-	void PickerRepDataPickedSlot(QString);
+	void pickerRepDataPickedSlot(QString);
 	void updateView();
 
 private:

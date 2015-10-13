@@ -75,12 +75,7 @@ AcquisitionService::STATE AcquisitionServiceNull::getState() const
 	return AcquisitionService::sNOT_RUNNING;
 }
 
-void AcquisitionServiceNull::toggleRecord(TYPES context)
-{
-	printWarning();
-}
-
-void AcquisitionServiceNull::startRecord(TYPES context)
+void AcquisitionServiceNull::startRecord(TYPES context, QString category, RecordSessionPtr session)
 {
 	printWarning();
 }

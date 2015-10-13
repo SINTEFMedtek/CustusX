@@ -62,7 +62,7 @@ public:
 		ElastixParametersPtr preset,
         Transform3D* result);
 
-	ElastixSingleThreadedRunner(RegServices services);
+	ElastixSingleThreadedRunner(RegServicesPtr services);
 	virtual ~ElastixSingleThreadedRunner();
 
 private slots:

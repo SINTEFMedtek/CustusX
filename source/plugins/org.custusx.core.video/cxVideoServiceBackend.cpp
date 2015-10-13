@@ -64,7 +64,7 @@ PatientModelServicePtr VideoServiceBackend::getDataManager()
 	return mDataManager;
 }
 
-TrackingServicePtr VideoServiceBackend::getToolManager()
+TrackingServicePtr VideoServiceBackend::tracking()
 {
 	return mTrackingService;
 }

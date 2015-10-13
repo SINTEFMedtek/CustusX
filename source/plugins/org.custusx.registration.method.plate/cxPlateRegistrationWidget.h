@@ -55,7 +55,7 @@ class PlateRegistrationWidget : public RegistrationBaseWidget
 {
 	Q_OBJECT
 public:
-	PlateRegistrationWidget(RegServices services, QWidget* parent);
+	PlateRegistrationWidget(RegServicesPtr services, QWidget* parent);
 	virtual ~PlateRegistrationWidget();
 
 private slots:

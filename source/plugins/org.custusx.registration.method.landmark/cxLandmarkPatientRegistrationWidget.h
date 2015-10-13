@@ -65,7 +65,7 @@ class LandmarkPatientRegistrationWidget: public LandmarkRegistrationWidget
 Q_OBJECT
 
 public:
-	LandmarkPatientRegistrationWidget(RegServices services, QWidget* parent, QString objectName, QString windowTitle);
+	LandmarkPatientRegistrationWidget(RegServicesPtr services, QWidget* parent, QString objectName, QString windowTitle);
 
 protected slots:
 	void registerSlot();
