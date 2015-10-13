@@ -122,12 +122,13 @@ void MetricManager::setManualToolPosition(Vector3D p_r)
 	tool->set_prMt(createTransformTranslate(p_pr - p0_pr) * tool->get_prMt());
 }
 
-PointMetricPtr MetricManager::addPoint(Vector3D point, CoordinateSystem space, QString name)
+PointMetricPtr MetricManager::addPoint(Vector3D point, CoordinateSystem space, QString name, QColor color)
 {
-	PointMetricPtr p1 =	patientService()->createSpecificData<PointMetric>("point%1");
+    PointMetricPtr p1 =	patientService()->createSpecificData<PointMetric>(name);
 	p1->get_rMd_History()->setParentSpace("reference");
 	p1->setSpace(space);
 	p1->setCoordinate(point);
+    p1->setColor(color);
 	patientService()->insertData(p1);
 
 	viewService()->getGroup(0)->addData(p1->getUid());
@@ -145,8 +146,23 @@ void MetricManager::addPointButtonClickedSlot()
 PointMetricPtr MetricManager::addPointInDefaultPosition()
 {
 	CoordinateSystem ref = CoordinateSystem::reference();
-	Vector3D p_ref = spaceProvider()->getActiveToolTipPoint(ref, true);
-	return this->addPoint(p_ref, ref);
+    QColor color = QColor(240, 170, 255, 255);
+    Vector3D p_ref = spaceProvider()->getActiveToolTipPoint(ref, true);
+
+    DataPtr data = patientService()->getData(mActiveLandmark);
+    if(!data)
+        return this->addPoint(p_ref, ref,"point%1", color);
+
+    PointMetricPtr pointMetric = boost::dynamic_pointer_cast<PointMetric>(data);
+    if(pointMetric)
+    {
+        ref = pointMetric->getSpace();
+    }
+
+    DataMetricPtr metric = boost::dynamic_pointer_cast<DataMetric>(data);
+    color = metric->getColor();
+
+    return this->addPoint(p_ref, ref,"point%1", color);
 }
 
 void MetricManager::addFrameButtonClickedSlot()
@@ -293,6 +309,12 @@ void MetricManager::addDonutButtonClickedSlot()
 
 void MetricManager::installNewMetric(DataMetricPtr metric)
 {
+    DataMetricPtr prevMetric = this->getMetric(mActiveLandmark);
+    if(prevMetric)
+    {
+        metric->setColor(prevMetric->getColor());
+    }
+
 	patientService()->insertData(metric);
 	this->setActiveUid(metric->getUid());
 	viewService()->getGroup(0)->addData(metric->getUid());
