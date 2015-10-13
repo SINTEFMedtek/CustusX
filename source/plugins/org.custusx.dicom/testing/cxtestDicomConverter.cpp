@@ -238,3 +238,26 @@ TEST_CASE("DicomConverter: Convert Kaisa", "[integration][plugins][org.custusx.d
 	fixture.checkImagesEqual(convertedImage, referenceImage);
 }
 
+
+TEST_CASE("DicomConverter: US data from SW, missing position data", "[integration][plugins][org.custusx.dicom]")
+{
+    //Transform matrix should be identity and not zero
+    DicomConverterTestFixture fixture;
+
+    QString inputDicomDataDirectory = cx::DataLocations::getLargeTestDataPath()+"/testing/SW_US_dicom_import/";
+    QString referenceImageFilename = cx::DataLocations::getLargeTestDataPath()+"/testing/SW_US_dicom_import/US__Tissue__2__10_06_1_20151013T095633.mhd";
+
+    ctkDICOMDatabasePtr db = fixture.loadDirectory(inputDicomDataDirectory);
+    QString patient = fixture.getOneFromList(db->patients());
+    QString study = fixture.getOneFromList(db->studiesForPatient(patient));
+    QString series = fixture.getOneFromList(db->seriesForStudy(study));
+    QStringList files = db->filesForSeries(series);
+    cx::DicomConverter converter;
+    converter.setDicomDatabase(db.data());
+
+    cx::ImagePtr convertedImage = converter.convertToImage(series);
+    cx::ImagePtr referenceImage = fixture.loadImageFromFile(referenceImageFilename, "reference");
+
+    fixture.checkImagesEqual(referenceImage, referenceImage); //
+    fixture.checkImagesEqual(convertedImage, referenceImage);
+}
