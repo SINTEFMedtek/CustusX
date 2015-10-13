@@ -63,7 +63,8 @@ public:
 	/** Make sure one given option exists witin root.
 	 * If not present, fill inn the input defaults.
 	 */
-    static StringPropertyPtr initialize(const QString& uid, QString name, QString help, QString value, QStringList range, QDomNode root = QDomNode());
+	static StringPropertyPtr initialize(const QString& uid, QString name, QString help, QString value,
+		QStringList range, QDomNode root = QDomNode());
 	static StringPropertyPtr initialize(const QString& uid, QString name, QString help, QString value, QDomNode root = QDomNode());
 
 public:
