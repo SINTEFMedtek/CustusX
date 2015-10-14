@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXNETWORKCONNECTION_H_
 #define CXNETWORKCONNECTION_H_
 
-#include "org_custusx_core_openigtlink_Export.h"
+#include "org_custusx_core_network_Export.h"
 
 #include <map>
 #include <QObject>
@@ -46,7 +46,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxProbeDefinition.h"
 #include "cxLogger.h"
 #include "cxProtocol.h"
-#include "cxOpenIGTLinkProtocol.h"
 #include "boost/function.hpp"
 
 typedef boost::shared_ptr<QThread> QThreadPtr;
@@ -64,13 +63,15 @@ typedef boost::shared_ptr<class NetworkConnection> NetworkConnectionPtr;
  *
  */
 
-class org_custusx_core_openigtlink_EXPORT NetworkConnection : public SocketConnection
+class org_custusx_core_network_EXPORT NetworkConnection : public SocketConnection
 {
     Q_OBJECT
 public:
 
 	explicit NetworkConnection(QString uid, QObject *parent = 0);
 	virtual ~NetworkConnection();
+
+    void addProtocol(ProtocolPtr value);
 
     //thread safe
 	QString getUid() const { return mUid; }
@@ -97,8 +98,6 @@ private slots:
 	void onInvoke(boost::function<void()> func);
 
 private:
-	ProtocolPtr initProtocol(ProtocolPtr value);
-
     ProtocolPtr mProtocol;
     typedef std::map<QString, ProtocolPtr> DialectMap;
     DialectMap mAvailableDialects;

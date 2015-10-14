@@ -29,77 +29,49 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXNETWORKSERVICEIMPL_H_
+#define CXNETWORKSERVICEIMPL_H_
 
-#ifndef CXNETWORKCONNECTIONHANDLE_H_
-#define CXNETWORKCONNECTIONHANDLE_H_
-
-#include "org_custusx_core_openigtlink_Export.h"
-
-#include <map>
+#include "boost/shared_ptr.hpp"
+#include <QString>
 #include <QObject>
-#include <QMutex>
-#include <QMutexLocker>
-#include "igtlMessageHeader.h"
-#include "igtlTransformMessage.h"
-#include "igtlImageMessage.h"
-#include "igtlStatusMessage.h"
-#include "igtlStringMessage.h"
-#include "cxIGTLinkUSStatusMessage.h"
-
-#include "cxSocketConnection.h"
-#include "cxTransform3D.h"
-#include "cxImage.h"
-#include "cxProbeDefinition.h"
-#include "cxLogger.h"
-#include "cxProtocol.h"
-#include "boost/function.hpp"
+#include "cxNetworkService.h"
 #include "cxXmlOptionItem.h"
+#include "org_custusx_core_network_Export.h"
 
-typedef boost::shared_ptr<QThread> QThreadPtr;
-
-namespace cx {
-
-typedef boost::shared_ptr<class NetworkConnection> NetworkConnectionPtr;
+namespace cx
+{
+typedef boost::shared_ptr<class NetworkServiceImpl> NetworkServiceImplPtr;
 typedef boost::shared_ptr<class NetworkConnectionHandle> NetworkConnectionHandlePtr;
 
-/** Encapsulates running of the NetworkConnection in a thread.
- *  Lifetime of the thread equals that of this object.
+/**
+ * Manages all network connections in CustusX.
+ *
  *
  */
-class org_custusx_core_openigtlink_EXPORT NetworkConnectionHandle : public QObject
+class org_custusx_core_network_EXPORT NetworkServiceImpl : public NetworkService
 {
 	Q_OBJECT
 public:
-	explicit NetworkConnectionHandle(QString threadname, XmlOptionFile options);
-	~NetworkConnectionHandle();
-    NetworkConnection* getNetworkConnection();
+	NetworkServiceImpl();
 
-    StringPropertyBasePtr getDialectOption() { return mProtocols; }
-	StringPropertyBasePtr getIpOption() { return mIp; }
-	DoublePropertyBasePtr getPortOption() { return mPort; }
-	StringPropertyBasePtr getRoleOption() { return mRole; }
+	QStringList getConnectionUids() const;
+
+
+	std::vector<NetworkConnectionHandlePtr> getConnections() const;
+	NetworkConnectionHandlePtr getConnection(QString uid);
+signals:
+	void connectionsChanged();
 
 private:
-	void onConnectionInfoChanged();
-	void onPropertiesChanged();
-	StringPropertyBasePtr mIp;
-	DoublePropertyBasePtr mPort;
-    StringPropertyBasePtr mProtocols;
-	StringPropertyBasePtr mRole;
-
-	StringPropertyBasePtr createDialectOption();
-	StringPropertyBasePtr createIpOption();
-	DoublePropertyBasePtr createPortOption();
-	StringPropertyBasePtr createRoleOption();
-
-	NetworkConnectionPtr mClient;
-	QThreadPtr mThread;
 	XmlOptionFile mOptions;
-
+	QString newConnection(QString suggested_uid);
+	QString findUniqueUidNumber(QString uidBase) const;
+	NetworkConnectionHandlePtr findConnection(QString uid) const;
+	std::vector<NetworkConnectionHandlePtr> mConnections;
 };
 
+} // namespace cx
 
-} //namespace cx
 
-
-#endif // CXNETWORKCONNECTIONHANDLE_H_
+#endif // CXNETWORKSERVICEIMPL_H_

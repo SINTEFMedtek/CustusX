@@ -1,6 +1,5 @@
 #include "cxProtocol.h"
 
-#include "cxIGTLinkConversion.h"
 #include "cxLogger.h"
 #include "cxRegistrationTransform.h"
 

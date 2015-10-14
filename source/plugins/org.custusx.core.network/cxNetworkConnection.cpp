@@ -37,10 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QThread>
 
 #include "cxProtocol.h"
-#include "cxOpenIGTLinkProtocol.h"
-#include "cxPlusProtocol.h"
-#include "cxCustusProtocol.h"
-#include "cxRASProtocol.h"
 
 #include "cxXmlOptionItem.h"
 #include "cxProfile.h"
@@ -63,26 +59,32 @@ NetworkConnection::NetworkConnection(QString uid, QObject *parent) :
 	qRegisterMetaType<ImagePtr>("MeshPtr");
 	qRegisterMetaType<ProbeDefinitionPtr>("ProbeDefinitionPtr");
 
+    /*
+    ProtocolPtr protocol = this->addProtocol(ProtocolPtr(new CustusProtocol()));
+    ConnectionInfo info = this->getConnectionInfo();
+    info.protocol = protocol->getName();
 
-	ConnectionInfo info = this->getConnectionInfo();
 
-    //TODO move to the correct plugin init
-    info.protocol = this->initProtocol(ProtocolPtr(new CustusProtocol()))->getName();
-    this->initProtocol(ProtocolPtr(new PlusProtocol()));
-    this->initProtocol(ProtocolPtr(new OpenIGTLinkProtocol()));
-    this->initProtocol(ProtocolPtr(new RASProtocol()));
+    this->addProtocol(ProtocolPtr(new PlusProtocol()));
+    this->addProtocol(ProtocolPtr(new OpenIGTLinkProtocol()));
+    this->addProtocol(ProtocolPtr(new RASProtocol()));
 
-	SocketConnection::setConnectionInfo(info);
+    SocketConnection::setConnectionInfo(info);
+    */
 }
 
 NetworkConnection::~NetworkConnection()
 {
 }
 
-ProtocolPtr NetworkConnection::initProtocol(ProtocolPtr value)
+void NetworkConnection::addProtocol(ProtocolPtr value)
 {
 	mAvailableDialects[value->getName()] = value;
-	return value;
+
+    ConnectionInfo info = this->getConnectionInfo();
+    info.protocol = value->getName();
+    SocketConnection::setConnectionInfo(info);
+
 }
 
 void NetworkConnection::invoke(boost::function<void()> func)
@@ -118,7 +120,7 @@ void NetworkConnection::setProtocol(QString protocolname)
     ProtocolPtr protocol = mAvailableDialects[protocolname];
     if(!protocol)
     {
-        CX_LOG_ERROR() << "\"" << protocolname << "\" is an unknown opentigtlink dialect.";
+        CX_LOG_ERROR() << "\"" << protocolname << "\" is an unknown protocol.";
         return;
     }
 
@@ -138,7 +140,7 @@ void NetworkConnection::setProtocol(QString protocolname)
     connect(protocol.get(), &Protocol::calibration, this, &NetworkConnection::calibration);
     connect(protocol.get(), &Protocol::probedefinition, this, &NetworkConnection::probedefinition);
 
-    CX_LOG_CHANNEL_SUCCESS(CX_OPENIGTLINK_CHANNEL_NAME) << "IGTL Dialect set to " << protocolname;
+    CX_LOG_SUCCESS() << "Protocol set to " << protocolname;
 
 }
 
@@ -195,7 +197,7 @@ void NetworkConnection::streamImage(ImagePtr image)
 void NetworkConnection::sendImage(ImagePtr image)
 {
 	assertRunningInObjectThread();
-	CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "Sending image: " << image->getName();
+    CX_LOG_DEBUG() << "Sending image: " << image->getName();
 
 	EncodedPackagePtr package = mProtocol->encode(image);
     mSocket->write(reinterpret_cast<char*>(package->data()->pointer));
@@ -204,7 +206,7 @@ void NetworkConnection::sendImage(ImagePtr image)
 void NetworkConnection::sendMesh(MeshPtr data)
 {
 	assertRunningInObjectThread();
-	CX_LOG_CHANNEL_DEBUG(CX_OPENIGTLINK_CHANNEL_NAME) << "Sending mesh: " << data->getName();
+    CX_LOG_DEBUG()  << "Sending mesh: " << data->getName();
 
 	EncodedPackagePtr package = mProtocol->encode(data);
     mSocket->write(reinterpret_cast<char*>(package->data()->pointer));

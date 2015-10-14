@@ -34,7 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxOpenIGTLinkTrackingSystemService.h"
 #include "cxOpenIGTLinkStreamerService.h"
 #include "cxtestQueuedSignalListener.h"
-#include "cxtestDirectSignalListener.h"
 #include "cxUtilHelpers.h"
 #include "cxtestUtilities.h"
 #include "cxReporter.h"
@@ -111,76 +110,6 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: Check that the plugin can connect a
     //service.reset();
     //client_connection_handle.reset();
 
-}
-
-TEST_CASE("NetworkConnectionHandle: Check that a server and a client can talk to eachother", "[org.custusx.core.tracking.system.openigtlink]")
-{
-    //CLIENT
-    QString clientHandleName = "client_handle";
-	cx::NetworkConnectionHandlePtr client_handle(new cx::NetworkConnectionHandle(clientHandleName, cx::XmlOptionFile()));
-    REQUIRE(client_handle);
-    CHECK(client_handle.unique());
-
-    cx::NetworkConnection* client_connection = client_handle->getNetworkConnection();
-    REQUIRE(client_connection);
-    REQUIRE(client_connection->getState() == cx::scsINACTIVE);
-    REQUIRE(client_connection->getUid() == clientHandleName);
-    REQUIRE(client_connection->getAvailableDialects().size() > 0);
-
-    cx::SocketConnection::ConnectionInfo client_info = client_connection->getConnectionInfo();
-    //check that default values have not changed
-    CHECK(client_info.role == "client");
-    CHECK(client_info.protocol == "Custus");
-    CHECK(client_info.host == "localhost");
-    CHECK(client_info.port == 18944);
-    CHECK(client_info.isClient());
-    CHECK_FALSE(client_info.isServer());
-    REQUIRE_FALSE(client_info.getDescription().isEmpty());
-
-    //SERVER
-    QString serverHandleName = "server_handle";
-	cx::NetworkConnectionHandlePtr server_handle(new cx::NetworkConnectionHandle(serverHandleName, cx::XmlOptionFile()));
-    REQUIRE(server_handle);
-    CHECK(server_handle.unique());
-
-    cx::NetworkConnection* server_connection = server_handle->getNetworkConnection();
-    REQUIRE(server_connection);
-    cx::SocketConnection::ConnectionInfo server_info = server_connection->getConnectionInfo();
-    server_info.role = "Server";
-    server_connection->setConnectionInfo(server_info);
-
-    //try to connect to localhost without server, expect to fail
-    boost::function<void()> client_connect = boost::bind(&cx::NetworkConnection::requestConnect, client_connection);
-    boost::function<void()> client_disconnect = boost::bind(&cx::NetworkConnection::requestDisconnect, client_connection);
-    client_connection->invoke(client_connect);
-    REQUIRE(cxtest::waitForQueuedSignal(client_connection, SIGNAL(stateChanged(CX_SOCKETCONNECTION_STATE))));
-    REQUIRE(client_connection->getState() == cx::scsINACTIVE);
-
-    //trying to setup server to listen, expecting to succeed
-    boost::function<void()> server_connect = boost::bind(&cx::NetworkConnection::requestConnect, server_connection);
-    boost::function<void()> server_disconnect = boost::bind(&cx::NetworkConnection::requestDisconnect, server_connection);
-    server_connection->invoke(server_connect);
-    REQUIRE(cxtest::waitForQueuedSignal(server_connection, SIGNAL(stateChanged(CX_SOCKETCONNECTION_STATE))));
-    //a bit hard to time which state the server will be in since it is in another thread, give it some time
-    cx::sleep_ms(500);
-    REQUIRE( server_connection->getState() == cx::scsLISTENING);
-
-    //try to connect to localhost without server, expect to succeed
-    client_connection->invoke(client_connect);
-    REQUIRE(cxtest::waitForQueuedSignal(client_connection, SIGNAL(stateChanged(CX_SOCKETCONNECTION_STATE))));
-    cx::sleep_ms(500);
-    REQUIRE(client_connection->getState() == cx::scsCONNECTED);
-
-    //try to disconnect the client
-    client_connection->invoke(client_disconnect);
-    REQUIRE(cxtest::waitForQueuedSignal(client_connection, SIGNAL(stateChanged(CX_SOCKETCONNECTION_STATE))));
-
-    //try to disconnect the server
-    server_connection->invoke(server_disconnect);
-    REQUIRE(cxtest::waitForQueuedSignal(server_connection, SIGNAL(stateChanged(CX_SOCKETCONNECTION_STATE))));
-
-    server_handle.reset();
-    client_handle.reset();
 }
 
 TEST_CASE("OpenIGTLinkStreamingService: Check that the openigtlink streaming service can be created and destroyed", "[org.custusx.core.tracking.system.openigtlink]")

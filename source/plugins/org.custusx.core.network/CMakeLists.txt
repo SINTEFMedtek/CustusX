@@ -3,12 +3,18 @@ project(org_custusx_core_network)
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
 set(PLUGIN_SRCS
-  cxNetworkPluginActivator.cpp
+    cxNetworkPluginActivator.cpp
+    cxNetworkConnection.cpp
+    cxNetworkServiceImpl.cpp
+    cxNetworkConnectionHandle.cpp
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
-  cxNetworkPluginActivator.h
+    cxNetworkPluginActivator.h
+    cxNetworkConnection.h
+    cxNetworkServiceImpl.h
+    cxNetworkConnectionHandle.h
 )
 
 # Qt Designer files which should be processed by Qts uic
@@ -25,7 +31,8 @@ ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
     ${PLUGIN_target_libraries}   
     cxPluginUtilities
-    org_custusx_core_openigtlink #todo remove
+    cxResource
+    cxGrabber
     )
 
 set(PLUGIN_OUTPUT_DIR "")

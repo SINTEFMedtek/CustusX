@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ENCODEDPACKAGE_H
 #define ENCODEDPACKAGE_H
 
+#include "cxResourceExport.h"
 #include <iostream>
 #include <boost/shared_ptr.hpp>
 //#include <QByteArray>
@@ -47,7 +48,7 @@ namespace cx
 /**
  * Wrapper for shared memory area
  */
-class EncodedPackage : public QObject
+class cxResource_EXPORT EncodedPackage : public QObject
 {
 Q_OBJECT
 

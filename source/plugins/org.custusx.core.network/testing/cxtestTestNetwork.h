@@ -29,49 +29,65 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXNETWORKSERVICEIMPL_H_
-#define CXNETWORKSERVICEIMPL_H_
 
-#include "boost/shared_ptr.hpp"
-#include <QString>
-#include <QObject>
-#include "cxNetworkService.h"
-#include "cxXmlOptionItem.h"
-#include "org_custusx_core_openigtlink_Export.h"
+#ifndef TESTNETWORK_H
+#define TESTNETWORK_H
 
-namespace cx
+#include "catch.hpp"
+#include <boost/bind.hpp>
+#include "cxNetworkConnection.h"
+#include "cxNetworkConnectionHandle.h"
+#include "cxtestQueuedSignalListener.h"
+#include "cxSocketConnection.h"
+#include "cxUtilHelpers.h"
+
+
+namespace cxtest
 {
-typedef boost::shared_ptr<class NetworkServiceImpl> NetworkServiceImplPtr;
-typedef boost::shared_ptr<class NetworkConnectionHandle> NetworkConnectionHandlePtr;
-
-/**
- * Manages all network connections in CustusX.
- *
- *
- */
-class org_custusx_core_openigtlink_EXPORT NetworkServiceImpl : public NetworkService
+class TestNetwork
 {
-	Q_OBJECT
 public:
-	NetworkServiceImpl();
+    TestNetwork();
 
-	QStringList getConnectionUids() const;
+    virtual ~TestNetwork();
 
+    virtual void setup() = 0;
+    virtual void testDefaultNetworkConnection();
+    virtual void testDefaultConnectionInfo() = 0;
+    virtual void testConnectionAndExpectState(cx::CX_SOCKETCONNECTION_STATE state, int wait_ms) = 0;
+    virtual void testDisconnect() = 0;
 
-	std::vector<NetworkConnectionHandlePtr> getConnections() const;
-	NetworkConnectionHandlePtr getConnection(QString uid);
-signals:
-	void connectionsChanged();
-
-private:
-	XmlOptionFile mOptions;
-	QString newConnection(QString suggested_uid);
-	QString findUniqueUidNumber(QString uidBase) const;
-	NetworkConnectionHandlePtr findConnection(QString uid) const;
-	std::vector<NetworkConnectionHandlePtr> mConnections;
+protected:
+    QString ip;
+    int port;
+    QString handleName;
+    cx::NetworkConnectionHandlePtr handle;
+    boost::function<void()> connect_function;
+    boost::function<void()> disconnect_function;
 };
 
-} // namespace cx
+class TestClientNetwork : public TestNetwork
+{
+public:
+    virtual ~TestClientNetwork();
+    virtual void setup();
+    virtual void testDefaultConnectionInfo();
+    virtual void testConnectionAndExpectState(cx::CX_SOCKETCONNECTION_STATE state, int wait_ms);
+    virtual void testDisconnect();
+};
 
+class TestServerNetwork : public TestNetwork
+{
+public:
+    virtual ~TestServerNetwork();
+    virtual void setup();
+    virtual void testDefaultConnectionInfo();
+    virtual void testConnectionAndExpectState(cx::CX_SOCKETCONNECTION_STATE state, int wait_ms);
+    virtual void testDisconnect();
 
-#endif // CXNETWORKSERVICEIMPL_H_
+private:
+    void setAsServer(cx::NetworkConnection* connection);
+};
+}
+
+#endif // TESTNETWORK_H

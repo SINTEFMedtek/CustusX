@@ -122,7 +122,9 @@ cx_add_class_qt_moc(cxResource_SOURCE
 
     usReconstructionTypes/cxSavingVideoRecorder
 
-	network/cxNetworkService
+    network/cxNetworkService
+    network/cxProtocol
+    network/cxEncodedPackage
 )
 
 cx_add_class(cxResource_SOURCE

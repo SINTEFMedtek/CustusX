@@ -36,9 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTime.h"
 #include <QThread>
 
-#include "cxPlusProtocol.h"
-#include "cxCustusProtocol.h"
-#include "cxRASProtocol.h"
 #include "igtl_header.h"
 #include "cxIGTLinkConversionImage.h"
 #include "cxIGTLinkConversionPolyData.h"

@@ -31,7 +31,32 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "catch.hpp"
 
-TEST_CASE("ExamplePlugin: Check nothing", "[unit][plugins][org.custusx.example][hide]")
+#include "cxtestTestNetwork.h"
+
+
+TEST_CASE("NetworkConnectionHandle: Check that a server and a client can talk to eachother", "[org.custusx.core.network]")
 {
-	CHECK(true);
+    //CLIENT
+    cxtest::TestClientNetwork client;
+    client.setup();
+    client.testDefaultNetworkConnection();
+    client.testDefaultConnectionInfo();
+
+    //SERVER
+    cxtest::TestServerNetwork server;
+    server.setup();
+    server.testDefaultNetworkConnection();
+    server.testDefaultConnectionInfo();
+
+    //try to connect to localhost without server, expect to fail
+    client.testConnectionAndExpectState(cx::scsINACTIVE, 0);
+
+    //trying to setup server to listen, expecting to succeed
+    server.testConnectionAndExpectState(cx::scsLISTENING, 500);
+
+    //try to connect to localhost without server, expect to succeed
+    client.testConnectionAndExpectState(cx::scsCONNECTED, 500);
+
+    client.testDisconnect();
+    server.testDisconnect();
 }

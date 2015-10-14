@@ -5,6 +5,8 @@ if(BUILD_TESTING)
     set(CX_TEST_CATCH_ORG_CUSTUSX_CORE_NETWORK_SOURCE_FILES
         ${CX_TEST_CATCH_ORG_CUSTUSX_CORE_NETWORK_MOC_SOURCE_FILES}
         cxtestNetworkPlugin.cpp
+        cxtestTestNetwork.h
+        cxtestTestNetwork.cpp
     )
 
     qt5_wrap_cpp(CX_TEST_CATCH_ORG_CUSTUSX_CORE_NETWORK_MOC_SOURCE_FILES ${CX_TEST_CATCH_ORG_CUSTUSX_CORE_NETWORK_MOC_SOURCE_FILES})
@@ -16,7 +18,12 @@ if(BUILD_TESTING)
         .
         ${CMAKE_CURRENT_BINARY_DIR}
     )
-    target_link_libraries(cxtest_org_custusx_core_network PRIVATE org_custusx_core_network cxCatch)
+    target_link_libraries(cxtest_org_custusx_core_network
+        PRIVATE
+        org_custusx_core_network
+        cxtestUtilities
+        cxCatch
+    )
     cx_add_tests_to_catch(cxtest_org_custusx_core_network)
 
 endif(BUILD_TESTING)

@@ -30,55 +30,76 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
+#ifndef CXNETWORKCONNECTIONHANDLE_H_
+#define CXNETWORKCONNECTIONHANDLE_H_
 
-#ifndef CXPROTOCOL_H
-#define CXPROTOCOL_H
+#include "org_custusx_core_network_Export.h"
 
-#include "org_custusx_core_openigtlink_Export.h"
-
+#include <map>
 #include <QObject>
+#include <QMutex>
+#include <QMutexLocker>
+#include "igtlMessageHeader.h"
+#include "igtlTransformMessage.h"
+#include "igtlImageMessage.h"
+#include "igtlStatusMessage.h"
+#include "igtlStringMessage.h"
+//#include "cxIGTLinkUSStatusMessage.h"
 
-#include <boost/shared_ptr.hpp>
-#include "cxEncodedPackage.h"
+#include "cxSocketConnection.h"
 #include "cxTransform3D.h"
 #include "cxImage.h"
 #include "cxProbeDefinition.h"
+#include "cxLogger.h"
+#include "cxProtocol.h"
+#include "boost/function.hpp"
+#include "cxXmlOptionItem.h"
 
-namespace cx
-{
+typedef boost::shared_ptr<QThread> QThreadPtr;
 
-/**
- * An Application layer protocol for sending/receiving CustusX objects.
+namespace cx {
+
+typedef boost::shared_ptr<class NetworkConnection> NetworkConnectionPtr;
+typedef boost::shared_ptr<class NetworkConnectionHandle> NetworkConnectionHandlePtr;
+
+/** Encapsulates running of the NetworkConnection in a thread.
+ *  Lifetime of the thread equals that of this object.
  *
- * Single-threaded.
  */
-class org_custusx_core_openigtlink_EXPORT Protocol : public QObject
+class org_custusx_core_network_EXPORT NetworkConnectionHandle : public QObject
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    explicit Protocol(QObject *parent = 0);
+	explicit NetworkConnectionHandle(QString threadname, XmlOptionFile options);
+	~NetworkConnectionHandle();
+    NetworkConnection* getNetworkConnection();
 
-    virtual QString getName() const;
-    virtual EncodedPackagePtr getPack();
-    virtual bool readyToReceiveData() = 0;
-	virtual EncodedPackagePtr encode(ImagePtr image) = 0;
-	virtual EncodedPackagePtr encode(MeshPtr data) = 0;
+    StringPropertyBasePtr getDialectOption() { return mProtocols; }
+	StringPropertyBasePtr getIpOption() { return mIp; }
+	DoublePropertyBasePtr getPortOption() { return mPort; }
+	StringPropertyBasePtr getRoleOption() { return mRole; }
 
-protected slots:
-    virtual void processPack() = 0;
+private:
+	void onConnectionInfoChanged();
+	void onPropertiesChanged();
+	StringPropertyBasePtr mIp;
+	DoublePropertyBasePtr mPort;
+    StringPropertyBasePtr mProtocols;
+	StringPropertyBasePtr mRole;
 
-signals:
-    void transform(QString devicename, Transform3D transform, double timestamp);
-    void calibration(QString devicename, Transform3D calibration);
-    void image(ImagePtr image);
-	void mesh(MeshPtr mesh);
-    void probedefinition(QString devicename, ProbeDefinitionPtr definition);
+	StringPropertyBasePtr createDialectOption();
+	StringPropertyBasePtr createIpOption();
+	DoublePropertyBasePtr createPortOption();
+	StringPropertyBasePtr createRoleOption();
 
-protected:
-    EncodedPackagePtr mPack;
+	NetworkConnectionPtr mClient;
+	QThreadPtr mThread;
+	XmlOptionFile mOptions;
 
 };
-typedef boost::shared_ptr<Protocol> ProtocolPtr;
+
 
 } //namespace cx
-#endif // CXPROTOCOL_H
+
+
+#endif // CXNETWORKCONNECTIONHANDLE_H_
