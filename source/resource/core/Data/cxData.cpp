@@ -36,6 +36,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDomDocument>
 #include <QDateTime>
 #include <QRegExp>
+
+#include <vtkPlane.h>
+
 #include "cxRegistrationTransform.h"
 #include "cxTime.h"
 #include "cxLandmark.h"
@@ -193,5 +196,36 @@ CoordinateSystem Data::getCoordinateSystem()
 {
 	return CoordinateSystem(csDATA, this->getUid());
 }
+
+//Moved from Image
+// methods for defining and storing clip planes. Data does not use these data, this is up to the mapper
+void Data::addPersistentClipPlane(vtkPlanePtr plane)
+{
+	if (std::count(mPersistentClipPlanes.begin(), mPersistentClipPlanes.end(), plane))
+		return;
+	mPersistentClipPlanes.push_back(plane);
+	emit clipPlanesChanged();
+}
+
+std::vector<vtkPlanePtr> Data::getAllClipPlanes()
+{
+	std::vector<vtkPlanePtr> retval = mPersistentClipPlanes;
+	if (mInteractiveClipPlane)
+		retval.push_back(mInteractiveClipPlane);
+	return retval;
+}
+
+void Data::clearPersistentClipPlanes()
+{
+	mPersistentClipPlanes.clear();
+	emit clipPlanesChanged();
+}
+
+void Data::setInteractiveClipPlane(vtkPlanePtr plane)
+{
+	mInteractiveClipPlane = plane;
+	emit clipPlanesChanged();
+}
+
 
 } // namespace cx

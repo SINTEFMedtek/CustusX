@@ -151,10 +151,11 @@ TEST_CASE("BaseWidget's children in gui/dataWidgets correctly constructed", "[un
 	cx::PatientModelServicePtr patientModelService = cx::PatientModelService::getNullObject(); //mock PatientModelService with the null object
 	cx::ViewServicePtr viewService = cx::ViewService::getNullObject(); //mock
 	cx::TrackingServicePtr trackingService = cx::TrackingService::getNullObject(); //mock
+	cx::VisServicesPtr services = cx::VisServices::getNullObjects();
 
 	testAndDeleteBaseWidgetChild(new cx::ActiveToolWidget(trackingService, testParent));
 	testAndDeleteBaseWidgetChild(new cx::ActiveVolumeWidget(patientModelService, viewService, testParent));
-	testAndDeleteBaseWidgetChild(new cx::ClippingWidget(patientModelService, testParent));
+	testAndDeleteBaseWidgetChild(new cx::ClippingWidget(services, testParent));
 	testAndDeleteBaseWidgetChild(new cx::ColorWidget(patientModelService, testParent));
 	testAndDeleteBaseWidgetChild(new cx::CroppingWidget(patientModelService, viewService, testParent));
 //	testAndDeleteBaseWidgetChild(new cx::DataSelectWidget(testParent));//special case: Needs a SelectDataStringPropertyBasePtr moc object
@@ -209,11 +210,10 @@ TEST_CASE("TabbedWidgets are correctly constructed", "[unit][gui][widget][not_wi
 {
 	init();
 	ctkPluginContext *pluginContext = cx::LogicManager::getInstance()->getPluginContext();
-	cx::PatientModelServicePtr patientModelService = cx::PatientModelServiceProxy::create(pluginContext);
-	cx::ViewServicePtr viewService = cx::ViewService::getNullObject(); //mock
+	cx::VisServicesPtr services = cx::VisServices::create(pluginContext);
 	//cxTabbedWidgets
-	testAndDeleteBaseWidgetChild(new cx::SlicePropertiesWidget(patientModelService, viewService, NULL));
-	testAndDeleteBaseWidgetChild(new cx::VolumePropertiesWidget(patientModelService, viewService, NULL));
+	testAndDeleteBaseWidgetChild(new cx::SlicePropertiesWidget(services->patient(), services->view(), NULL));
+	testAndDeleteBaseWidgetChild(new cx::VolumePropertiesWidget(services, NULL));
 	shutdown();
 }
 

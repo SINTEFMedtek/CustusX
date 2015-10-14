@@ -69,7 +69,7 @@ class cxGui_EXPORT VolumePropertiesWidget : public TabbedWidget
 {
   Q_OBJECT
 public:
-	VolumePropertiesWidget(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget* parent);
+	VolumePropertiesWidget(VisServicesPtr services, QWidget* parent);
   virtual ~VolumePropertiesWidget() {}
 };
 
