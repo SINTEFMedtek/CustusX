@@ -23,7 +23,6 @@ public:
 
 private slots:
     void connectButtonSlot();
-    void initializeButtonSlot();
     void disconnectButtonSlot();
     void shutdownButtonSlot();
 
@@ -35,7 +34,7 @@ private:
     Ur5RobotPtr mUr5Robot;
 
     QLineEdit *ipLineEdit, *manualCoordinatesLineEdit;
-    QPushButton *connectButton, *disconnectButton, *initializeButton, *initializeButton_2, *shutdownButton;
+    QPushButton *connectButton, *disconnectButton,*shutdownButton;
     QComboBox *presetOrigoComboBox;
     QPushButton *startTrackingButton, *stopTrackingButton;
 
