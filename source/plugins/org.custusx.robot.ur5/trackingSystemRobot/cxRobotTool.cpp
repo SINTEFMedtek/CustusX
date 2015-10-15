@@ -14,7 +14,7 @@ RobotTool::RobotTool(QString uid, Ur5RobotPtr robot):
     mUr5Robot(robot),
     mTimestamp(0)
 {
-    connect(&mTpsTimer, &QTimer::timeout, this, &RobotTool::calculateTpsSlot);
+    //connect(&mTpsTimer, &QTimer::timeout, this, &RobotTool::calculateTpsSlot);
     mTypes = this->determineTypesBasedOnUid(Tool::mUid);
 
     this->createPolyData();
@@ -125,10 +125,10 @@ void RobotTool::createPolyData()
 
 void RobotTool::toolVisibleSlot(bool on)
 {
-    if (on)
-        mTpsTimer.start(1000); //calculate tps every 1 seconds
-    else
-        mTpsTimer.stop();
+//    if (on)
+//        mTpsTimer.start(1000); //calculate tps every 1 seconds
+//    else
+//        mTpsTimer.stop();
 }
 
 
