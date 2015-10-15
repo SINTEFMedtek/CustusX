@@ -39,10 +39,6 @@ namespace cxtest
 
 TEST_CASE("Ur5Plugin: Connect to robot", "[manual][plugins][org.custusx.robot.ur5]")
 {
-}
-
-TEST_CASE("Ur5Plugin: Send message to robot and receive message from robot", "[manual][plugins][org.custusx.robot.ur5]")
-{
     Ur5TestFixture fixture;
     fixture.mUr5Robot.connectToRobot("169.254.62.100");
     CHECK(fixture.mUr5Robot.isConnectedToRobot());
@@ -63,6 +59,18 @@ TEST_CASE("Ur5Plugin: Analyze raw data packet and update current state", "[manua
     QByteArray rawData1460 = fixture.getTestData(1460);
     fixture.mUr5Connection.updateCurrentState(rawData1460);
     REQUIRE(fixture.mUr5Connection.getCurrentState().updated == true);
+}
+
+
+TEST_CASE("Ur5Plugin: Read VTK data", "[manual][plugins][org.custusx.robot.ur5]")
+{
+    Ur5TestFixture fixture;
+
+    QString path = "C:/line.vtk";
+    fixture.mUr5Robot.openVTKfile(path);
+
+    QString path2 = "C:/artery_centerline_fixed_2.vtk";
+    fixture.mUr5Robot.openVTKfile(path2);
 }
 
 } //cxtest
