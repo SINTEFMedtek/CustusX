@@ -79,7 +79,6 @@ public:
 private slots:
     virtual void internalDataAvailable();
 
-
 signals:
     void stateChanged();
 
