@@ -5,12 +5,53 @@ namespace cx
 
 Ur5Robot::Ur5Robot()
 {
+    moveInProgress = false;
+
     connect(&mRTMonitor,&Ur5Connection::stateChanged,this,&Ur5Robot::updateCurrentState);
     connect(&mSecMonitor,&Ur5Connection::stateChanged,this,&Ur5Robot::updateCurrentState);
+    connect(this,&Ur5Robot::atTarget,this,&Ur5Robot::atTargetSlot);
+
+    mBlendRadius=0.001;
 }
 
 Ur5Robot::~Ur5Robot()
 {
+}
+
+void Ur5Robot::atTargetSlot()
+{
+    this->nextMove();
+}
+
+void Ur5Robot::nextMove()
+{
+    if(moveInProgress && !mProgramEncoder.jointPositionQueue.empty())
+    {
+        mProgramEncoder.jointPositionQueue.erase(mProgramEncoder.jointPositionQueue.begin());
+        if(mProgramEncoder.jointPositionQueue.empty())
+        {
+            moveInProgress=false;
+        }
+        else
+        {
+        mTargetState.jointPosition = mProgramEncoder.jointPositionQueue[0];
+        this->move("movej",mTargetState.jointPosition,moveAcceleration,moveVelocity);
+        }
+    }
+    else if(moveInProgress && !mProgramEncoder.poseQueue.empty())
+    {
+        mProgramEncoder.poseQueue.erase(mProgramEncoder.poseQueue.begin());
+        if(mProgramEncoder.poseQueue.empty())
+        {
+            moveInProgress=false;
+        }
+        else
+        {
+        mTargetState.cartAxis = mProgramEncoder.poseQueue[0].cartAxis; //+ mStartPosition.cartAxis;
+        mTargetState.cartAngles = mStartPosition.cartAngles;
+        this->move("movej",mTargetState,moveAcceleration,moveVelocity);
+        }
+    }
 }
 
 void Ur5Robot::updateCurrentState()
@@ -34,6 +75,7 @@ void Ur5Robot::updateCurrentState()
 
     this->setCurrentState(currentState);
     emit(stateUpdated());
+    this->atTargetState();
 }
 
 Ur5State Ur5Robot::getCurrentState()
@@ -130,12 +172,42 @@ void Ur5Robot::sendMessage(QString message)
 
 void Ur5Robot::move(QString typeOfMovement, Ur5State targetState, double acc, double vel, double rad, double t)
 {
+    mTargetState = targetState;
+
     if(typeOfMovement=="movej")
         sendMessage(mMessageEncoder.movej(targetState,acc,vel,0));
     else if(typeOfMovement=="speedl")
         sendMessage(mMessageEncoder.speedl(targetState,acc,t));
     else if(typeOfMovement =="speedj")
         sendMessage(mMessageEncoder.speedj(targetState,acc,t));
+}
+
+void Ur5Robot::move(QString typeOfMovement, Eigen::RowVectorXd targetState, double acc, double vel, double t, double rad)
+{
+    mTargetState.jointPosition = targetState;
+
+    if(typeOfMovement=="movej")
+        sendMessage(mMessageEncoder.movej(targetState,acc,vel,t,rad));
+    else if(typeOfMovement=="speedl")
+        sendMessage(mMessageEncoder.speedl(targetState,acc,t));
+    else if(typeOfMovement =="speedj")
+        sendMessage(mMessageEncoder.speedj(targetState,acc,t));
+
+}
+
+void Ur5Robot::addToMoveQueue(Eigen::RowVectorXd target)
+{
+    mProgramEncoder.jointPositionQueue.push_back(target);
+}
+
+void Ur5Robot::addToProgramQueue(QString str)
+{
+    mProgramEncoder.programQueue.push_back(str);
+}
+
+void Ur5Robot::clearProgramQueue()
+{
+    mProgramEncoder.programQueue.clear();
 }
 
 void Ur5Robot::stopMove(QString typeOfStop, double acc)
@@ -151,19 +223,70 @@ void Ur5Robot::openVTKfile(QString filename)
     mProgramEncoder.openVTKfile(filename);
 }
 
-void Ur5Robot::moveProgram(QString typeOfProgram,double acceleration,double velocity, double radius)
+void Ur5Robot::moveProgram(QString typeOfProgram,double acceleration,double velocity, double radius, double t)
 {
-    mRTMonitor.requestDisconnect();
     if(typeOfProgram == "movej")
     {
         mProgramEncoder.movejProgram(mProgramEncoder.poseQueue,acceleration,velocity,radius);
+        mStartPosition = this->getCurrentState();
+        Ur5State bah;
+        bah.cartAxis = mProgramEncoder.poseQueue[0].cartAxis; //+ mStartPosition.cartAxis;
+        bah.cartAngles = mStartPosition.cartAngles;
+        this->move("movej",bah,acceleration,velocity);
+        moveInProgress=true;
+        moveAcceleration=acceleration;
+        moveVelocity=velocity;
+    }
+    else if(typeOfProgram == "movej2")
+    {
+        mProgramEncoder.movejProgram(mProgramEncoder.jointPositionQueue,acceleration,velocity,radius);
+        this->move("movej",mProgramEncoder.jointPositionQueue[0],acceleration,velocity);
+        moveInProgress=true;
+        moveAcceleration=acceleration;
+        moveVelocity=velocity;
     }
     else
     {
         return;
     }
-    mSecMonitor.runProgramQueue(mProgramEncoder.programQueue,mProgramEncoder.poseQueue);
-    mRTMonitor.requestConnect();
+}
+
+bool Ur5Robot::atTargetState()
+{
+    if((mCurrentState.jointPosition-mTargetState.jointPosition).length()<mBlendRadius)
+    {
+        emit atTarget();
+        return true;
+    }
+    else if((mCurrentState.cartAxis-mTargetState.cartAxis).length()<mBlendRadius)
+    {
+        emit atTarget();
+        return true;
+    }
+    return false;
+}
+
+void Ur5Robot::printMoveQueue()
+{
+    for(int i = 0; i<mProgramEncoder.jointPositionQueue.size(); i++)
+        std::cout << mProgramEncoder.jointPositionQueue[i] << std::endl;
+}
+
+void Ur5Robot::printProgramQueue()
+{
+    for(int i = 0; i<mProgramEncoder.programQueue.size(); i++)
+        std::cout << mProgramEncoder.programQueue[i].toStdString() << std::endl;
+}
+
+void Ur5Robot::setBlendRadius(double blendRadius)
+{
+    std::cout << "Blend radius set to " << blendRadius << std::endl;
+    mBlendRadius=blendRadius;
+}
+
+std::vector<QString> Ur5Robot::getProgramQueue()
+{
+    return this->mProgramEncoder.programQueue;
 }
 
 
