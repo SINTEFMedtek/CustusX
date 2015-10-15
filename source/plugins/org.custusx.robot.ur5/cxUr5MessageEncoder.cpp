@@ -64,6 +64,15 @@ QString Ur5MessageEncoder::powerdown()
     return QString("powerdown()");
 }
 
+QString Ur5MessageEncoder::textmsg(QString str)
+{
+    return QString("textmsg(%1)").arg(str);
+}
+
+QString Ur5MessageEncoder::sleep(double t)
+{
+    return QString("sleep(%1)").arg(t);
+}
 
 
 

@@ -26,7 +26,9 @@ public:
     QString powerdown();
     QString set_gravity(Vector3D direction);
     QString set_payload(double mass);
+
     QString textmsg(QString msg);
+    QString sleep(double time);
 };
 
 } // cx
