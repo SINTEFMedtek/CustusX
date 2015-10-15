@@ -118,7 +118,7 @@ void RobotTrackingSystemService::receiveTransform(QString devicename, Transform3
     {
     RobotToolPtr tool = this->getTool(devicename);
     tool->toolTransformAndTimestampSlot(transform,timestamp);
-    tool->tps((timestamp-mTimer)/tps);
+    tool->tps(1/(timestamp-mTimer));
     mTimer = timestamp;
     }
 }
