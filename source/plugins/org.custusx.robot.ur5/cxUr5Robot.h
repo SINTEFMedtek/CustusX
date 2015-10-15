@@ -2,6 +2,7 @@
 #define UR5ROBOT_H
 
 #include "org_custusx_robot_ur5_Export.h"
+
 #include "cxUr5Connection.h"
 #include "cxUr5MessageEncoder.h"
 #include "cxUr5State.h"
@@ -13,6 +14,9 @@ typedef boost::shared_ptr<class Ur5Robot> Ur5RobotPtr;
 class org_custusx_robot_ur5_EXPORT Ur5Robot : public QObject
 {
     Q_OBJECT
+
+    friend class Ur5LungSimulation;
+
 public:
     Ur5Robot();
     ~Ur5Robot();
