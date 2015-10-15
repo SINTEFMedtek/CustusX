@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "widgets/cxUr5Initialize.h"
 #include "widgets/cxUr5ManualMove.h"
 #include "widgets/cxUr5PlannedMove.h"
-#include "widgets/cxUr5LungSimulation.h"
+#include "widgets/cxUr5LungSimulationTab.h"
 
 #include <QLabel>
 #include <QSlider>
