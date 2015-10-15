@@ -497,9 +497,9 @@ void Ur5ManualMoveTab::updatePositions()
     rxLineEdit->setText(QString::number(currentState.cartAngles(0),'f',4));
     ryLineEdit->setText(QString::number(currentState.cartAngles(1),'f',4));
     rzLineEdit->setText(QString::number(currentState.cartAngles(2),'f',4));
-    q1LineEdit->setText(QString::number(currentState.jointPosition(0),'f',2));
-    q2LineEdit->setText(QString::number(currentState.jointPosition(1),'f',2));
-    q3LineEdit->setText(QString::number(currentState.jointPosition(2),'f',2));
+    q1LineEdit->setText(QString::number(currentState.jointPosition(0),'f',4));
+    q2LineEdit->setText(QString::number(currentState.jointPosition(1),'f',4));
+    q3LineEdit->setText(QString::number(currentState.jointPosition(2),'f',4));
     q4LineEdit->setText(QString::number(currentState.jointPosition(3),'f',4));
     q5LineEdit->setText(QString::number(currentState.jointPosition(4),'f',4));
     q6LineEdit->setText(QString::number(currentState.jointPosition(5),'f',4));
