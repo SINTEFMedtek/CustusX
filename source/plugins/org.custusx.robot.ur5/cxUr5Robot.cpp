@@ -116,13 +116,6 @@ bool Ur5Robot::isConnectedToRobot()
     return (mRTMonitor.isConnectedToRobot() && mSecMonitor.isConnectedToRobot());
 }
 
-void Ur5Robot::initializeWorkspace(double threshold,Ur5State state,bool currentPos)
-{
-    mRTMonitor.requestDisconnect();
-    mSecMonitor.initializeWorkspace(threshold,state,currentPos);
-    mRTMonitor.requestConnect();
-}
-
 void Ur5Robot::shutdown()
 {
     sendMessage(mMessageEncoder.powerdown());

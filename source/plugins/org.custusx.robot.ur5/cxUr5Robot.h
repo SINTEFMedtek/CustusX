@@ -37,7 +37,6 @@ public:
     void openVTKfile(QString filename);
     void moveProgram(QString typeOfProgram,double acceleration, double velocity, double radius);
 
-    void initializeWorkspace(double threshold,Ur5State state,bool currentPos);
 
 public slots:
     void connectToRobot(QString IPaddress);
