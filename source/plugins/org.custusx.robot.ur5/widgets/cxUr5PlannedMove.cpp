@@ -16,7 +16,9 @@ Ur5PlannedMoveTab::Ur5PlannedMoveTab(Ur5RobotPtr Ur5Robot, QWidget *parent) :
 {
     setupUi(this);
 
+    connect(openVTKButton,SIGNAL(clicked()),this, SLOT(openVTKfileSlot()));
     connect(runVTKButton,SIGNAL(clicked()),this,SLOT(runVTKfileSlot()));
+    connect(blendRadiusLineEdit,SIGNAL(textChanged(QString)),this,SLOT(blendRadiusChangedSlot()));
 }
 
 Ur5PlannedMoveTab::~Ur5PlannedMoveTab()
@@ -33,6 +35,11 @@ void Ur5PlannedMoveTab::setupUi(QWidget *parent)
     setMoveSettingsWidget(mainLayout);
 }
 
+void Ur5PlannedMoveTab::blendRadiusChangedSlot()
+{
+    mUr5Robot->setBlendRadius(blendRadiusLineEdit->text().toDouble());
+}
+
 void Ur5PlannedMoveTab::setMoveVTKWidget(QVBoxLayout *parent)
 {
     QGroupBox* group = new QGroupBox("Follow .vtk line");
@@ -44,16 +51,19 @@ void Ur5PlannedMoveTab::setMoveVTKWidget(QVBoxLayout *parent)
 
     vtkLineEdit = new QLineEdit();
     runVTKButton = new QPushButton();
+    openVTKButton = new QPushButton(tr("Open"));
 
     layout1->addWidget(new QLabel("Path to .vtk file: "));
     layout1->addWidget(vtkLineEdit);
+    layout1->addWidget(openVTKButton);
     layout1->addWidget(runVTKButton);
+
 
     runVTKButton->setToolTip("Follow VTK line");
     runVTKButton->setText("Run");
 
 
-    vtkLineEdit->setText("C:\\artery_centerline_fixed_2.vtk");
+    vtkLineEdit->setText("C:\\line.vtk");
 }
 
 void Ur5PlannedMoveTab::setMoveSettingsWidget(QVBoxLayout *parent)
@@ -73,21 +83,32 @@ void Ur5PlannedMoveTab::setMoveSettingsWidget(QVBoxLayout *parent)
     velAccLayout->addWidget(new QLabel("Vel"), 0, 0, 1, 1);
     velocityLineEdit = new QLineEdit();
     velAccLayout->addWidget(velocityLineEdit, 0, 1, 1, 1);
-    velocityLineEdit->setText(QApplication::translate("Ur5Widget", "0.1", 0));
+    velocityLineEdit->setText(QApplication::translate("Ur5Widget", "0.015", 0));
     velAccLayout->addWidget(new QLabel("m/s"), 0, 2, 1, 1);
 
     // Acceleration
     accelerationLineEdit = new QLineEdit();
     velAccLayout->addWidget(accelerationLineEdit, 1, 1, 1, 1);
-    accelerationLineEdit->setText(QApplication::translate("Ur5Widget", "0.5", 0));
+    accelerationLineEdit->setText(QApplication::translate("Ur5Widget", "0.3", 0));
     velAccLayout->addWidget(new QLabel("Acc"), 1, 0, 1, 1);
     velAccLayout->addWidget(new QLabel("m/s^2"), 1, 2, 1, 1);
+
+    // Blend radius
+    blendRadiusLineEdit = new QLineEdit();
+    blendRadiusLineEdit->setText(tr("0.001"));
+    velAccLayout->addWidget(new QLabel("Blend radius"));
+    velAccLayout->addWidget(blendRadiusLineEdit,2,1,1,1);
+    velAccLayout->addWidget(new QLabel("m"));
 }
 
 void Ur5PlannedMoveTab::runVTKfileSlot()
 {
-    mUr5Robot->openVTKfile(vtkLineEdit->text());
     mUr5Robot->moveProgram("movej",accelerationLineEdit->text().toDouble(),velocityLineEdit->text().toDouble(),0);
+}
+
+void Ur5PlannedMoveTab::openVTKfileSlot()
+{
+     mUr5Robot->openVTKfile(vtkLineEdit->text());
 }
 
 void Ur5PlannedMoveTab::goToOrigoButtonSlot()

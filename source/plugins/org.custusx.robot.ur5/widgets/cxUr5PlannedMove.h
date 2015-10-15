@@ -19,14 +19,16 @@ public:
     Ur5PlannedMoveTab(Ur5RobotPtr Ur5Robot, QWidget *parent = 0);
     virtual ~Ur5PlannedMoveTab();
 
-    QPushButton *runVTKButton;
+    QPushButton *runVTKButton, *openVTKButton;
     QLineEdit *vtkLineEdit;
 
-    QLineEdit *accelerationLineEdit, *velocityLineEdit, *timeLineEdit;
+    QLineEdit *accelerationLineEdit, *velocityLineEdit, *timeLineEdit, *blendRadiusLineEdit;
 
 protected slots:
     void runVTKfileSlot();
+    void openVTKfileSlot();
     void goToOrigoButtonSlot();
+    void blendRadiusChangedSlot();
 
 private:
     void setupUi(QWidget *parent);
