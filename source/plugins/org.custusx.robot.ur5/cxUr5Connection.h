@@ -74,35 +74,24 @@ public:
 
     bool sendMessage(QString message);
 
-public slots:
-    void initializeWorkspace(double threshold,Ur5State origo,bool currentPos);
-    void runProgramQueue(std::vector<QString> programQueue, std::vector<Ur5State> poseQueue);
     void updateCurrentState(QByteArray buffer);
 
 private slots:
     virtual void internalDataAvailable();
 
+
 signals:
     void stateChanged();
-    void finished();
 
 private:
-    Ur5State incrementPosQuad(Ur5State state, double threshold);
-    Ur5State incrementNegQuad(Ur5State state, double threshold);
     void clearCurrentTCP();
-    void moveToPlannedOrigo(Ur5State origo);
-    void setOrigo(double threshold);
-    bool waitForMove();
-    bool waitForUpdate();
-    bool atTargetPos(Ur5State current);
-    bool isPotentialPacket(qint64 bytes);
 
-    double mBlendRadius = 0.001;
+    bool waitForUpdate();
+    bool isPotentialPacket(qint64 bytes);
 
     Ur5MessageEncoder mMessageEncoder;
     Ur5MessageDecoder mMessageDecoder;
     Ur5State mCurrentState,mTargetState,mPreviousState;
-
 };
 
 
