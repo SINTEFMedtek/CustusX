@@ -1,5 +1,6 @@
 #include "cxUr5ProgramEncoder.h"
 
+#include <vtkPolyDataReader.h>
 #include <vtkGenericDataObjectReader.h>
 #include <vtkStructuredGrid.h>
 #include <vtkSmartPointer.h>
@@ -25,6 +26,14 @@ void Ur5ProgramEncoder::movejProgram(std::vector<Ur5State> poseQueue,double a, d
     }
 }
 
+void Ur5ProgramEncoder::movejProgram(std::vector<Eigen::RowVectorXd> jointPositionQueue,double a, double v, double t, double r)
+{
+    for(int i=0;i<jointPositionQueue.size();i++)
+    {
+        programQueue.push_back(mMessageEncoder.movej(jointPositionQueue[i],a,v,t,r));
+    }
+}
+
 int Ur5ProgramEncoder::openVTKfile(QString inputFilename)
 {
     vtkSmartPointer<vtkGenericDataObjectReader> reader =
@@ -37,8 +46,10 @@ int Ur5ProgramEncoder::openVTKfile(QString inputFilename)
       {
       std::cout << "Output is a polydata" << std::endl;
       vtkPolyData* output = reader->GetPolyDataOutput();
+      std::cout << output->GetNumberOfPoints() << std::endl;
       addPath(output);
       }
+
     return EXIT_SUCCESS;
 }
 
@@ -56,6 +67,7 @@ void Ur5ProgramEncoder::printVTKline(vtkPolyData* output)
 
 void Ur5ProgramEncoder::addPath(vtkPolyData* output)
 {
+    std::cout << output->GetLines()->GetNumberOfConnectivityEntries() << std::endl;
     for(vtkIdType i=0; i<output->GetCell(0)->GetNumberOfPoints(); i++)
     {
         Ur5State pose;
