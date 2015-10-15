@@ -11,6 +11,18 @@ QString Ur5MessageEncoder::movej(Ur5State p,double a, double v,double r)
             .arg(p.cartAngles(1)).arg(p.cartAngles(2)).arg(a).arg(v).arg(r);
 }
 
+QString Ur5MessageEncoder::movej(Eigen::RowVectorXd p,double a, double v,double t,double r)
+{
+    return QString("movej([%1,%2,%3,%4,%5,%6],a=%7,v=%8,r=%9)")
+            .arg(p(0)).arg(p(1)).arg(p(2)).arg(p(3)).arg(p(4)).arg(p(5)).arg(a).arg(v).arg(t).arg(r);
+}
+
+QString Ur5MessageEncoder::movej(Eigen::RowVectorXd p,double t)
+{
+    return QString("movej([%1,%2,%3,%4,%5,%6],a=1.4,v=1.05,t=%7)")
+            .arg(p(0)).arg(p(1)).arg(p(2)).arg(p(3)).arg(p(4)).arg(p(5)).arg(t);
+}
+
 QString Ur5MessageEncoder::movel(Ur5State p,double a, double v)
 {
     return QString("movel(p[%1,%2,%3,%4,%5,%6],a=%7,v=%8)")
@@ -35,11 +47,25 @@ QString Ur5MessageEncoder::speedj(Ur5State p, double a, double t)
             .arg(p.jointVelocity(4)).arg(p.jointVelocity(5)).arg(a).arg(t);
 }
 
+QString Ur5MessageEncoder::speedj(Eigen::RowVectorXd jointVelocity, double a, double t)
+{
+    return QString("speedj([%1,%2,%3,%4,%5,%6],a=%7,t_min=%8)")
+            .arg(jointVelocity(0)).arg(jointVelocity(1)).arg(jointVelocity(2)).arg(jointVelocity(3))
+            .arg(jointVelocity(4)).arg(jointVelocity(5)).arg(a).arg(t);
+}
+
 QString Ur5MessageEncoder::speedl(Ur5State p, double a, double t)
 {
     return QString("speedl([%1,%2,%3,%4,%5,%6],a=%7,t_min=%8)")
             .arg(p.jointVelocity(0)).arg(p.jointVelocity(1)).arg(p.jointVelocity(2)).arg(p.jointVelocity(3))
             .arg(p.jointVelocity(4)).arg(p.jointVelocity(5)).arg(a).arg(t);
+}
+
+QString Ur5MessageEncoder::speedl(Eigen::RowVectorXd linearVelocity, double a, double t)
+{
+    return QString("speedl([%1,%2,%3,%4,%5,%6],a=%7,t_min=%8)")
+            .arg(linearVelocity(0)).arg(linearVelocity(1)).arg(linearVelocity(2)).arg(linearVelocity(3))
+            .arg(linearVelocity(4)).arg(linearVelocity(5)).arg(a).arg(t);
 }
 
 QString Ur5MessageEncoder::set_tcp(Ur5State p)

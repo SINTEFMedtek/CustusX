@@ -13,10 +13,14 @@ class org_custusx_robot_ur5_EXPORT Ur5MessageEncoder
 public:
     QString movec(Ur5State pose_via,Ur5State pose_to, double a, double v, double r);
     QString movej(Ur5State pose,double a, double v, double r);
+    QString movej(Eigen::RowVectorXd pose, double a, double v, double t, double r);
+    QString movej(Eigen::RowVectorXd pose, double t);
     QString movel(Ur5State pose,double a, double v);
 
     QString speedj(Ur5State p, double a, double t);
+    QString speedj(Eigen::RowVectorXd p, double a, double t);
     QString speedl(Ur5State p, double a, double t);
+    QString speedl(Eigen::RowVectorXd p, double a, double t);
 
     QString stopj(double a);
     QString stopl(double a);
