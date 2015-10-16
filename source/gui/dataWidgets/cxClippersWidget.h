@@ -30,35 +30,41 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxLogQDebugRedirecter.h"
-#include "cxReporter.h"
+#ifndef CXCLIPPERSWIDGET_H
+#define CXCLIPPERSWIDGET_H
+
+#include "cxGuiExport.h"
+
+#include "cxBaseWidget.h"
+#include "cxForwardDeclarations.h"
+#include "cxStringProperty.h"
 
 namespace cx
 {
+typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
+typedef boost::shared_ptr<std::map<QString, InteractiveClipperPtr> > ClippersPtr;
 
-void convertQtMessagesToCxMessages(QtMsgType type, const QMessageLogContext &, const QString &msg)
+class cxGui_EXPORT ClippersWidget: public BaseWidget
 {
-	MESSAGE_LEVEL level = mlINFO;
-	switch (type)
-	{
-	case QtDebugMsg:
-		level = mlDEBUG;
-		break;
-	case QtWarningMsg:
-		level = mlWARNING;
-		break;
-	case QtCriticalMsg:
-		level = mlERROR;
-		break;
-	case QtFatalMsg:
-		level = mlERROR;
-		//abort(); here we hope for the best instead of aborting...
-	}
+Q_OBJECT
+public:
+	ClippersWidget(VisServicesPtr services, QWidget* parent);
 
-	Message message("[QT] "+msg, level);
-	message.mChannel = "qdebug";
-	reporter()->sendMessage(message);
-}
+protected:
+	VisServicesPtr mServices;
+	StringPropertyPtr mClipperSelector;
 
+	ClippersPtr mClippers;
 
-} //End namespace cx
+	void setupDataStructures();
+	void setupUI();
+	void initClipperSelector();
+	void createDefaultClippers();
+	QStringList getInitialClipperNames();
+	QString getNameBaseOfCurrentClipper();
+protected slots:
+	void newClipperButtonClicked();
+	void clipperChanged();
+};
+}//cx
+#endif // CXCLIPPERSWIDGET_H

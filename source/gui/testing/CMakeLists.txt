@@ -30,6 +30,7 @@ if(BUILD_TESTING)
         cxtestTestTransferFunctions.cpp
         cxtestOpenCLAndGui.cpp
 		cxtestProfileChange.cpp
+		cxtestClippersWidget.cpp
     )
 
     qt5_wrap_cpp(CXTEST_SOURCES_TO_MOC ${CXTEST_SOURCES_TO_MOC})

@@ -78,6 +78,7 @@ public:
 	InteractiveClipperPtr mInteractiveClipper;
 };
 
+
 /*
  * \class ClippingWidget
  *
@@ -98,7 +99,7 @@ private:
 	QCheckBox* mUseClipperCheckBox;
 	QCheckBox* mInvertPlaneCheckBox;
 	StringPropertyBasePtr mPlaneAdapter;
-	StringPropertySelectDataPtr mImageAdapter;
+	StringPropertySelectDataPtr mDataAdapter;
 	VisServicesPtr mServices;
 private slots:
 	void setupUI();
