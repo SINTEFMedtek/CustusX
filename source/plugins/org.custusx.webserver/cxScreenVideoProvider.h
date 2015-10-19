@@ -51,7 +51,7 @@ class SecondaryViewLayoutWindow: public QWidget
 Q_OBJECT
 
 public:
-	SecondaryViewLayoutWindow(QWidget* parent, VisualizationServicePtr viewService);
+	SecondaryViewLayoutWindow(QWidget* parent, ViewServicePtr viewService);
 	~SecondaryViewLayoutWindow() {}
 
 	void tryShowOnSecondaryScreen();
@@ -64,7 +64,7 @@ private:
 	QString toString(QRect r) const;
 	int findSmallestSecondaryScreen();
 
-	VisualizationServicePtr mViewService;
+	ViewServicePtr mViewService;
 };
 
 class ScreenVideoProvider : public QObject

@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-SecondaryViewLayoutWindow::SecondaryViewLayoutWindow(QWidget* parent, VisualizationServicePtr viewService) :
+SecondaryViewLayoutWindow::SecondaryViewLayoutWindow(QWidget* parent, ViewServicePtr viewService) :
 	QWidget(parent),
 	mViewService(viewService)
 {
@@ -97,7 +97,7 @@ void ScreenVideoProvider::saveScreenShot(QImage image, QString id)
 	QString ending = "png";
 	if (!id.isEmpty())
 		ending = id + "." + ending;
-	QString path = mServices->patientModelService->generateFilePath("Screenshots", ending);
+	QString path = mServices->patient()->generateFilePath("Screenshots", ending);
 	QtConcurrent::run(boost::bind(&ScreenVideoProvider::saveScreenShotThreaded, this, image, path));
 }
 
@@ -159,7 +159,7 @@ void ScreenVideoProvider::showSecondaryLayout()
 {
 	std::cout << "show window" << std::endl;
 	if (!mSecondaryViewLayoutWindow)
-		mSecondaryViewLayoutWindow = new SecondaryViewLayoutWindow(NULL, mServices->visualizationService);
+		mSecondaryViewLayoutWindow = new SecondaryViewLayoutWindow(NULL, mServices->view());
 	mSecondaryViewLayoutWindow->show();
 
 	QRect rect = QRect(QPoint(50,50), QSize(320,568));
@@ -192,7 +192,7 @@ QImage ScreenVideoProvider::vtkImageData2QImage(vtkImageDataPtr input)
 
 QImage ScreenVideoProvider::grabSecondaryLayout()
 {
-	QWidget* widget = mServices->visualizationService->getLayoutWidget(NULL, 1);
+	QWidget* widget = mServices->view()->getLayoutWidget(NULL, 1);
 	ViewCollectionWidget* vcWidget = dynamic_cast<ViewCollectionWidget*>(widget);
 	std::vector<ViewPtr> views = vcWidget->getViews();
 
