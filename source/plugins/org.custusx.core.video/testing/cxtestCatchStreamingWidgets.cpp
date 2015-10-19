@@ -59,14 +59,14 @@ TEST_CASE("VideoConnectionWidget can stream", "[unit][gui][not_win32][widget][st
 	QString folder = cx::DataLocations::getTestDataPath() + "/temp/test.cx3";
 	cx::VisServicesPtr services = cx::VisServices::create(cx::logicManager()->getPluginContext());
 
-	services->getSession()->load(folder);
-//	services->patientModelService->newPatient(folder);
+	services->session()->load(folder);
+//	services->patient()->newPatient(folder);
 
 	cx::DummyToolPtr tool = cx::DummyToolTestUtilities::createDummyTool(cx::DummyToolTestUtilities::createProbeDefinitionLinear());
-	services->trackingService->runDummyTool(tool);
+	services->tracking()->runDummyTool(tool);
 
-	REQUIRE((services->trackingService->getState()>=cx::Tool::tsTRACKING));
-	waitForQueuedSignal(services->trackingService.get(), SIGNAL(stateChanged()));
+	REQUIRE((services->tracking()->getState()>=cx::Tool::tsTRACKING));
+	waitForQueuedSignal(services->tracking().get(), SIGNAL(stateChanged()));
 
 	QString filename = cx::DataLocations::getTestDataPath() + "/testing/TubeSegmentationFramework/Default.mhd";
 	REQUIRE(QFile::exists(filename));

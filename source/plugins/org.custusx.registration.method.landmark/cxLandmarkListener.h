@@ -50,7 +50,7 @@ class LandmarkListener : public QObject
 Q_OBJECT
 
 public:
-	LandmarkListener(RegServices services);
+	LandmarkListener(RegServicesPtr services);
 	~LandmarkListener();
 	void setLandmarkSource(DataPtr data);
 	DataPtr getLandmarkSource();
@@ -63,7 +63,7 @@ private slots:
 	void updateFixed();
 	void updateMoving();
 private:
-	RegServices mServices;
+	RegServicesPtr mServices;
 	bool mImage2Image;
 	bool mUseOnlyOneSourceUpdatedFromOutside;
 	ImageLandmarksSourcePtr mFixedLandmarkSource;

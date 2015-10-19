@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //#include "cxVector3D.h"
 
 
-cxtest::FastPatientRegistrationWidgetFixture::FastPatientRegistrationWidgetFixture(cx::RegServices services, QWidget *parent) :
+cxtest::FastPatientRegistrationWidgetFixture::FastPatientRegistrationWidgetFixture(cx::RegServicesPtr services, QWidget *parent) :
 	cx::FastPatientRegistrationWidget(services, parent),
 	mPointSampled(false)
 {}

@@ -218,7 +218,7 @@ ViewGroupData::ViewGroupData(CoreServicesPtr services) :
 	mCamera3D(CameraData::create())
 {
 	if(mServices)
-		connect(mServices->patientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &ViewGroupData::purgeDataNotExistingInPatientModelService);
+		connect(mServices->patient().get(), &PatientModelService::dataAddedOrRemoved, this, &ViewGroupData::purgeDataNotExistingInPatientModelService);
 	mVideoSource = "active";
 	mGroup2DZoom = SyncedValue::create(1);
 	mGlobal2DZoom = mGroup2DZoom;
@@ -235,7 +235,7 @@ void ViewGroupData::purgeDataNotExistingInPatientModelService()
 	for (unsigned i = 0; i < mData.size(); )
 	{
 		QString uid = mData[i].first;
-		if (!mServices->patientModelService->getData(uid))
+		if (!mServices->patient()->getData(uid))
 		{
 			if (this->contains(uid))
 			{
@@ -342,7 +342,7 @@ void ViewGroupData::clearData()
 
 DataPtr ViewGroupData::getData(QString uid) const
 {
-	DataPtr data = mServices->patientModelService->getData(uid);
+	DataPtr data = mServices->patient()->getData(uid);
 	if (!data)
 	{
 		reportError("Couldn't find the data: [" + uid + "] in the datamanager.");

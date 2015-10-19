@@ -50,7 +50,7 @@ WorkflowStateMachine::WorkflowStateMachine(StateServiceBackendPtr backend) : mBa
 
 	mParentState = new ParentWorkflowState(this, mBackend);
 
-	connect(mBackend->getPatientService().get(), SIGNAL(clinicalApplicationChanged()), this, SLOT(clinicalApplicationChangedSlot()));
+	connect(mBackend->patient().get(), SIGNAL(clinicalApplicationChanged()), this, SLOT(clinicalApplicationChangedSlot()));
 }
 
 WorkflowStateMachine::~WorkflowStateMachine()

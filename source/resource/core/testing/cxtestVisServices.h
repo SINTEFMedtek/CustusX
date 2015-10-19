@@ -29,64 +29,35 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXFILTERWIDGET_H
-#define CXFILTERWIDGET_H
+#ifndef CXTESTDUMMYDATAMANAGER_H
+#define CXTESTDUMMYDATAMANAGER_H
 
-#include "cxGuiExport.h"
+#include "cxtestresource_export.h"
 
-#include "cxBaseWidget.h"
-#include "cxFilter.h"
-#include "cxFilterTimedAlgorithm.h"
-#include "cxOptionsWidget.h"
+#include <QStringList>
+#include "cxForwardDeclarations.h"
+#include "cxVisServices.h"
+class ctkPluginContext;
 
-namespace cx
+namespace cxtest
 {
-typedef boost::shared_ptr<class WidgetObscuredListener> WidgetObscuredListenerPtr;
-typedef boost::shared_ptr<class VisServices> VisServicesPtr;
-class TimedAlgorithmProgressBar;
-class FilterPresetWidget;
 
-/** Helper widget for displaying the input/output/options part of a Filter.
- * Intended to be included in other Filter widgets.
+typedef boost::shared_ptr<class TestVisServices> TestVisServicesPtr;
+
+/**
+ * Test version of cx::VisServices.
  *
- * \ingroup cx_gui
- * \date Nov 18, 2012
- * \author Christian Askeland, SINTEF
- * \author Janne Beate Bakeng, SINTEF
+ * \date Oct 6 2015
+ * \author Ole Vegard Solberg, SINTEF
  */
-class cxGui_EXPORT FilterSetupWidget : public BaseWidget
+class CXTESTRESOURCE_EXPORT TestVisServices : public cx::VisServices
 {
-	Q_OBJECT
 public:
-	FilterSetupWidget(VisServicesPtr services, QWidget* parent, XmlOptionFile options, bool addFrame);
-	void setFilter(FilterPtr filter);
-	QString generateHelpText() const;
-	/** Compact Mode: one group, hide main input/output
-	  */
-	void setCompact(bool on);
-	void toggleDetailed();
-
-private slots:
-	void obscuredSlot(bool obscured);
-	void showAdvancedOptions(int state);
-	void rebuildOptions();
-
-private:
-
-	VisServicesPtr mServices;
-	XmlOptionFile mOptions;
-	FilterPtr mCurrentFilter;
-
-	OptionsWidget* mInputsWidget;
-	OptionsWidget* mOutputsWidget;
-	OptionsWidget* mOptionsWidget;
-	FilterPresetWidget*  mPresetWidget;
-	QGroupBox* 	   mOptionsGroupBox;
-	QCheckBox*	   mAdvancedButton;
-	QGroupBox* 	   mFrame;
-	boost::shared_ptr<WidgetObscuredListener> mObscuredListener;
+	static TestVisServicesPtr create();
+	TestVisServices();
+	~TestVisServices();
 };
 
-}
+} // namespace cxtest
 
-#endif // CXFILTERWIDGET_H
+#endif // CXTESTDUMMYDATAMANAGER_H

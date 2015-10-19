@@ -55,7 +55,7 @@ ProbeConfigWidget::ProbeConfigWidget(VisServicesPtr services, QWidget* parent) :
 	this->setToolTip("Edit ultrasound probe configuration");
 
 	QVBoxLayout* topLayout = new QVBoxLayout(this);
-	TrackingServicePtr ts = mServices->getToolManager();
+	TrackingServicePtr ts = mServices->tracking();
 	mActiveProbeConfig = StringPropertyActiveProbeConfiguration::New(ts);
 	connect(mActiveProbeConfig.get(), &StringPropertyActiveProbeConfiguration::changed, this, &ProbeConfigWidget::activeProbeConfigurationChangedSlot);
 	mActiveProbeConfigWidget = new LabeledComboBoxWidget(this, mActiveProbeConfig);

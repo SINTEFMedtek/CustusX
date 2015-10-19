@@ -42,11 +42,11 @@ class ctkPluginContext;
 namespace cx
 {
 
-class cxResourceVisualization_EXPORT VisualizationServiceProxy : public VisualizationService
+class cxResourceVisualization_EXPORT ViewServiceProxy : public ViewService
 {
 public:
-	static VisualizationServicePtr create(ctkPluginContext *pluginContext);
-	VisualizationServiceProxy(ctkPluginContext *pluginContext);
+	static ViewServicePtr create(ctkPluginContext *pluginContext);
+	ViewServiceProxy(ctkPluginContext *pluginContext);
 
 	virtual ViewPtr get3DView(int group = 0, int index = 0);
 
@@ -76,12 +76,12 @@ public slots:
 
 private:
 	void initServiceListener();
-	void onServiceAdded(VisualizationService* service);
-	void onServiceRemoved(VisualizationService *service);
+	void onServiceAdded(ViewService* service);
+	void onServiceRemoved(ViewService *service);
 
 	ctkPluginContext *mPluginContext;
-    VisualizationServicePtr mVisualizationService;
-	boost::shared_ptr<ServiceTrackerListener<VisualizationService> > mServiceListener;
+    ViewServicePtr mViewService;
+	boost::shared_ptr<ServiceTrackerListener<ViewService> > mServiceListener;
 };
 } //cx
 #endif // CXVIEWSERVICEPROXY_H_

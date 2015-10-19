@@ -103,7 +103,7 @@ void PipelineWidgetFilterLine::mousePressEvent(QMouseEvent* event)
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
-PipelineWidget::PipelineWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent, PipelinePtr pipeline) :
+PipelineWidget::PipelineWidget(ViewServicePtr viewService, PatientModelServicePtr patientModelService, QWidget* parent, PipelinePtr pipeline) :
     BaseWidget(parent, "PipelineWidget", "Pipeline"),
     mPipeline(pipeline)
 {
@@ -129,7 +129,7 @@ PipelineWidget::PipelineWidget(VisualizationServicePtr visualizationService, Pat
 
 	for (unsigned i=0; i<filters->size(); ++i)
 	{
-		topLayout->addLayout(Inner::addHMargin(new DataSelectWidget(visualizationService, patientModelService, this, nodes[i])));
+		topLayout->addLayout(Inner::addHMargin(new DataSelectWidget(viewService, patientModelService, this, nodes[i])));
 
 		PipelineWidgetFilterLine* algoLine = new PipelineWidgetFilterLine(this, filters->get(i), mButtonGroup);
 		connect(algoLine, SIGNAL(requestRunFilter()), this, SLOT(runFilterSlot()));
@@ -142,11 +142,11 @@ PipelineWidget::PipelineWidget(VisualizationServicePtr visualizationService, Pat
 		frame->setObjectName("FilterBackground");
 		topLayout->addWidget(frame);
 	}
-	topLayout->addLayout(Inner::addHMargin(new DataSelectWidget(visualizationService, patientModelService, this, nodes.back())));
+	topLayout->addLayout(Inner::addHMargin(new DataSelectWidget(viewService, patientModelService, this, nodes.back())));
 
 	topLayout->addSpacing(12);
 
-	mSetupWidget = new CompactFilterSetupWidget(visualizationService, patientModelService, this, filters->getOptions(), true);
+	mSetupWidget = new CompactFilterSetupWidget(viewService, patientModelService, this, filters->getOptions(), true);
 	topLayout->addWidget(mSetupWidget);
 
 	topLayout->addStretch();

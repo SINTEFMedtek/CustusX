@@ -50,12 +50,12 @@ StateServiceBackend::StateServiceBackend(TrackingServicePtr trackingService,
 
 }
 
-TrackingServicePtr StateServiceBackend::getToolManager()
+TrackingServicePtr StateServiceBackend::tracking()
 {
 	return mTrackingService;
 }
 
-VideoServicePtr StateServiceBackend::getVideoService()
+VideoServicePtr StateServiceBackend::video()
 {
 	return mVideoService;
 }
@@ -65,7 +65,7 @@ SpaceProviderPtr StateServiceBackend::getSpaceProvider()
 	return mSpaceProvider;
 }
 
-PatientModelServicePtr StateServiceBackend::getPatientService()
+PatientModelServicePtr StateServiceBackend::patient()
 {
 	return mPatientService;
 }

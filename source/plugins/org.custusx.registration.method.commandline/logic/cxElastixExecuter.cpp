@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ElastixExecuter::ElastixExecuter(RegServices services, QObject* parent) :
+ElastixExecuter::ElastixExecuter(RegServicesPtr services, QObject* parent) :
 	TimedBaseAlgorithm("ElastiX", 1000),
 	mServices(services)
 {
@@ -110,8 +110,8 @@ bool ElastixExecuter::setInput(QString application,
 
 	QStringList cmd;
 	cmd << "\"" + application + "\"";
-	cmd << "-f" << mServices.patientModelService->getActivePatientFolder()+"/"+fixed->getFilename();
-	cmd << "-m" << mServices.patientModelService->getActivePatientFolder()+"/"+moving->getFilename();
+	cmd << "-f" << mServices->patient()->getActivePatientFolder()+"/"+fixed->getFilename();
+	cmd << "-m" << mServices->patient()->getActivePatientFolder()+"/"+moving->getFilename();
 	cmd << "-out" << outdir;
 	cmd << "-t0" << initFilename;
 	for (int i=0; i<parameterfiles.size(); ++i)
@@ -292,7 +292,7 @@ QString ElastixExecuter::findMostRecentTransformOutputFile() const
 
 Transform3D ElastixExecuter::getFileTransform_ddMd(DataPtr volume)
 {
-	QString patFolder = mServices.patientModelService->getActivePatientFolder();
+	QString patFolder = mServices->patient()->getActivePatientFolder();
 	CustomMetaImagePtr reader = CustomMetaImage::create(patFolder+"/"+volume->getFilename());
 	Transform3D ddMd = reader->readTransform();
 	return ddMd;

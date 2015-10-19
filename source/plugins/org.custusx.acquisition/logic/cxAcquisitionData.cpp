@@ -161,8 +161,8 @@ Acquisition::Acquisition(AcquisitionDataPtr pluginData, QObject* parent) :
   mReady(true),
   mInfoText("")
 {
-	connect(this->getServices()->getToolManager().get(), &TrackingService::stateChanged, this, &Acquisition::checkIfReadySlot);
-	connect(this->getServices()->getToolManager().get(), &TrackingService::activeToolChanged, this, &Acquisition::checkIfReadySlot);
+	connect(this->getServices()->tracking().get(), &TrackingService::stateChanged, this, &Acquisition::checkIfReadySlot);
+	connect(this->getServices()->tracking().get(), &TrackingService::activeToolChanged, this, &Acquisition::checkIfReadySlot);
 	this->checkIfReadySlot();
 }
 
@@ -187,8 +187,8 @@ QString Acquisition::getInfoText(AcquisitionService::TYPES context) const
 
 void Acquisition::checkIfReadySlot()
 {
-	bool tracking = this->getServices()->getToolManager()->getState()>=Tool::tsTRACKING;
-	ToolPtr tool = this->getServices()->getToolManager()->getActiveTool();
+	bool tracking = this->getServices()->tracking()->getState()>=Tool::tsTRACKING;
+	ToolPtr tool = this->getServices()->tracking()->getActiveTool();
 
 	QString mWhatsMissing;
 	mWhatsMissing.clear();

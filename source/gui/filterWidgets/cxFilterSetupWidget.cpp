@@ -30,13 +30,14 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxFilterWidget.h"
+#include "cxFilterSetupWidget.h"
 
 #include <QGroupBox>
 #include <QCheckBox>
 #include "cxFilterPresetWidget.h"
 #include "cxWidgetObscuredListener.h"
 #include "cxVisServices.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -68,9 +69,9 @@ FilterSetupWidget::FilterSetupWidget(VisServicesPtr services, QWidget* parent, X
 
 	mOptions = options;
 
-	mInputsWidget = new OptionsWidget(mServices->visualizationService, mServices->getPatientService(), this);
-	mOutputsWidget = new OptionsWidget(mServices->visualizationService, mServices->getPatientService(), this);
-	mOptionsWidget = new OptionsWidget(mServices->visualizationService, mServices->getPatientService(), this);
+	mInputsWidget = new OptionsWidget(mServices->view(), mServices->patient(), this);
+	mOutputsWidget = new OptionsWidget(mServices->view(), mServices->patient(), this);
+	mOptionsWidget = new OptionsWidget(mServices->view(), mServices->patient(), this);
 	mPresetWidget = new FilterPresetWidget(this);
 	mAdvancedButton = new QCheckBox("Show &advanced options", this);
 	connect(mAdvancedButton, SIGNAL(stateChanged(int)), this, SLOT(showAdvancedOptions(int)));
@@ -142,13 +143,9 @@ void FilterSetupWidget::setFilter(FilterPtr filter)
 	{
 		mCurrentFilter->setActive(!mObscuredListener->isObscured());
 
-//		std::vector<SelectDataStringPropertyBasePtr> inputTypes = mCurrentFilter->getInputTypes();
-//		std::vector<SelectDataStringPropertyBasePtr> outputTypes = mCurrentFilter->getOutputTypes();
-		std::vector<PropertyPtr> options = mCurrentFilter->getOptions();
-
 		mInputsWidget->setOptions(mCurrentFilter->getUid(), mCurrentFilter->getInputTypes(), false);
 		mOutputsWidget->setOptions(mCurrentFilter->getUid(), mCurrentFilter->getOutputTypes(), false);
-		mOptionsWidget->setOptions(mCurrentFilter->getUid(), options, false);
+        mOptionsWidget->setOptions(mCurrentFilter->getUid(), mCurrentFilter->getOptions(), false);
 
 		//presets
 		if(mCurrentFilter->hasPresets())

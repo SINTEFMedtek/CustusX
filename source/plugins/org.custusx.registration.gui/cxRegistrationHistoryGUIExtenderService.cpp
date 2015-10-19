@@ -39,7 +39,7 @@ namespace cx
 {
 
 
-RegistrationHistoryGUIExtenderService::RegistrationHistoryGUIExtenderService(RegServices services) :
+RegistrationHistoryGUIExtenderService::RegistrationHistoryGUIExtenderService(RegServicesPtr services) :
 	mServices(services)
 {
 }

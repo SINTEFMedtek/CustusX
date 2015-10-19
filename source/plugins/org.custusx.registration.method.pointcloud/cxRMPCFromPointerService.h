@@ -51,8 +51,8 @@ class org_custusx_registration_method_pointcloud_EXPORT RMPCFromPointerImageToPa
 {
 	Q_INTERFACES(cx::RegistrationMethodService)
 public:
-	RMPCFromPointerImageToPatientService(RegServices services) :
-		RegistrationMethodService(services) {}
+	RMPCFromPointerImageToPatientService(ctkPluginContext* context) :
+		RegistrationMethodService(RegServices::create(context)) {}
 	virtual ~RMPCFromPointerImageToPatientService() {}
 	virtual QString getRegistrationType() {return QString("ImageToPatient");}
 	virtual QString getRegistrationMethod() {return QString("Contour From Tool");}

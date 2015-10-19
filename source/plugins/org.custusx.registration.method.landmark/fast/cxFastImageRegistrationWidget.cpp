@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-FastImageRegistrationWidget::FastImageRegistrationWidget(RegServices services, QWidget* parent, QString objectName, QString windowTitle, bool useRegistrationFixedPropertyInsteadOfActiveImage) :
+FastImageRegistrationWidget::FastImageRegistrationWidget(RegServicesPtr services, QWidget* parent, QString objectName, QString windowTitle, bool useRegistrationFixedPropertyInsteadOfActiveImage) :
 	ImageLandmarksWidget(services, parent, objectName, windowTitle, useRegistrationFixedPropertyInsteadOfActiveImage)
 {
 }
@@ -55,12 +55,12 @@ FastImageRegistrationWidget::~FastImageRegistrationWidget()
 void FastImageRegistrationWidget::performRegistration()
 {
 	//make sure the masterImage is set
-	DataPtr fixedData = mServices.registrationService->getFixedData();
+	DataPtr fixedData = mServices->registration()->getFixedData();
 	if(!fixedData)
 	{
-		ActiveDataPtr activeData = mServices.patientModelService->getActiveData();
+		ActiveDataPtr activeData = mServices->patient()->getActiveData();
 		fixedData = activeData->getActive<Image>();
-		mServices.registrationService->setFixedData(fixedData);
+		mServices->registration()->setFixedData(fixedData);
 	}
 
 	this->updateAverageAccuracyLabel();

@@ -51,7 +51,7 @@ RegistrationMethodLandmarkPluginActivator::~RegistrationMethodLandmarkPluginActi
 
 void RegistrationMethodLandmarkPluginActivator::start(ctkPluginContext* context)
 {
-	RegServices services(context);
+	RegServicesPtr services = RegServices::create(context);
 	RegistrationMethodLandmarkImageToImageService* image2imageService = new RegistrationMethodLandmarkImageToImageService(services);
 	RegistrationMethodLandmarkImageToPatientService* image2patientService = new RegistrationMethodLandmarkImageToPatientService(services);
 	RegistrationMethodFastLandmarkImageToPatientService* fastImage2patientService = new RegistrationMethodFastLandmarkImageToPatientService(services);

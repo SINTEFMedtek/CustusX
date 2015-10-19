@@ -89,12 +89,12 @@ void ConnectedThresholdImageFilter::postProcessingSlot()
 	QString name = mInput->getName()+" seg%1";
 
 	//create a Image
-	ImagePtr result = createDerivedImage(mServices->getPatientService(),
+	ImagePtr result = createDerivedImage(mServices->patient(),
 										 uid, name,
 										 rawResult, mInput);
 	mOutput->resetTransferFunctions();
 
-	mServices->getPatientService()->insertData(mOutput);
+	mServices->patient()->insertData(mOutput);
 
 	//let the user know you are finished
 	reportSuccess("Done segmenting: \"" + mOutput->getName()+"\"");

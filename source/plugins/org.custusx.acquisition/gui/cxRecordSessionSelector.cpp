@@ -54,7 +54,7 @@ namespace cx
 
 SelectRecordSession::SelectRecordSession(XmlOptionFile options,
 										 AcquisitionServicePtr acquisitionService,
-										 VisServices services) :
+										 VisServicesPtr services) :
 	mServices(services),
 	mOptions(options),
 	mAcquisitionService(acquisitionService)
@@ -134,7 +134,7 @@ ToolPtr SelectRecordSession::getTool()
 		return mToolOverride;
 
 	RecordSessionPtr session = this->getSession();
-	TrackingService::ToolMap tools = mServices.trackingService->getTools();
+	TrackingService::ToolMap tools = mServices->tracking()->getTools();
 
 	ToolPtr tool = this->findToolContainingMostDataForSession(tools, session);
 	return tool;
@@ -158,7 +158,7 @@ ToolPtr SelectRecordSession::findToolContainingMostDataForSession(std::map<QStri
 
 ToolRep3DPtr SelectRecordSession::getToolRepIn3DView(ToolPtr tool)
 {
-	return mServices.visualizationService->get3DReps(0, 0)->findFirst<ToolRep3D>(tool);
+	return mServices->view()->get3DReps(0, 0)->findFirst<ToolRep3D>(tool);
 }
 
 void SelectRecordSession::showSelectedRecordingInView()

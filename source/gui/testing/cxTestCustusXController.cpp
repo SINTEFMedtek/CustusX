@@ -123,7 +123,7 @@ void CustusXController::enableSlicingSlot()
 		if(!imageMap.empty())
 		{
 			cx::ImagePtr image = imageMap.begin()->second;
-			interactiveClipper->setImage(image);
+			interactiveClipper->setData(image);
 			interactiveClipper->useClipper(true);
 		}
 		else

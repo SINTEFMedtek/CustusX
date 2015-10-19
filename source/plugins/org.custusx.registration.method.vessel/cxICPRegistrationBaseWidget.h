@@ -71,7 +71,7 @@ class org_custusx_registration_method_vessel_EXPORT ICPRegistrationBaseWidget : 
 {
 	Q_OBJECT
 public:
-	ICPRegistrationBaseWidget(RegServices services, QWidget* parent, QString uid, QString name);
+	ICPRegistrationBaseWidget(RegServicesPtr services, QWidget* parent, QString uid, QString name);
 	virtual ~ICPRegistrationBaseWidget();
 
 protected:

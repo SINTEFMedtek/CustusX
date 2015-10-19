@@ -68,9 +68,9 @@ ViewWrapperVideo::ViewWrapperVideo(ViewPtr view, VisServicesPtr services) :
 	double clipDepth = 1.0; // 1mm depth, i.e. all 3D props rendered outside this range is not shown.
 	mView->getRenderer()->GetActiveCamera()->SetClippingRange(-clipDepth / 2.0, clipDepth / 2.0);
 
-	connect(mServices->getToolManager().get(), &TrackingService::stateChanged, this, &ViewWrapperVideo::connectStream);
-	connect(mServices->getVideoService().get(), SIGNAL(activeVideoSourceChanged()), this, SLOT(connectStream()));
-	connect(mServices->getToolManager().get(), SIGNAL(activeToolChanged(QString)), this, SLOT(connectStream()));
+	connect(mServices->tracking().get(), &TrackingService::stateChanged, this, &ViewWrapperVideo::connectStream);
+	connect(mServices->video().get(), SIGNAL(activeVideoSourceChanged()), this, SLOT(connectStream()));
+	connect(mServices->tracking().get(), SIGNAL(activeToolChanged(QString)), this, SLOT(connectStream()));
 
 	addReps();
 
@@ -106,7 +106,7 @@ void ViewWrapperVideo::appendToContextMenu(QMenu& contextMenu)
 
 //	QActionGroup sourceGroup = new QActionGroup(&contextMenu);
 	QMenu* sourceMenu = new QMenu("Video Source", &contextMenu);
-	std::vector<VideoSourcePtr> sources = mServices->getVideoService()->getVideoSources();
+	std::vector<VideoSourcePtr> sources = mServices->video()->getVideoSources();
 	this->addStreamAction("active", sourceMenu);
 	for (unsigned i=0; i<sources.size(); ++i)
 		this->addStreamAction(sources[i]->getUid(), sourceMenu);
@@ -174,7 +174,7 @@ void ViewWrapperVideo::connectStream()
 		uid = source->getUid();
 
 	ToolPtr newTool;
-	ToolPtr tool = mServices->getToolManager()->getFirstProbe();
+	ToolPtr tool = mServices->tracking()->getFirstProbe();
 	if (tool && tool->getProbe())
 	{
 		if (tool->getProbe()->getAvailableVideoSources().count(uid))
@@ -195,9 +195,9 @@ void ViewWrapperVideo::connectStream()
 VideoSourcePtr ViewWrapperVideo::getSourceFromService(QString uid)
 {
 	if (uid=="active")
-		return mServices->getVideoService()->getActiveVideoSource();
+		return mServices->video()->getActiveVideoSource();
 
-	std::vector<VideoSourcePtr> source = mServices->getVideoService()->getVideoSources();
+	std::vector<VideoSourcePtr> source = mServices->video()->getVideoSources();
 
 	for (unsigned i=0; i< source.size(); ++i)
 	{

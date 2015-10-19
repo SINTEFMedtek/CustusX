@@ -56,8 +56,8 @@ VideoConnection::VideoConnection(VideoServiceBackendPtr backend)
 	mBackend = backend;
 	mUnusedProbeDefinitionVector.clear();
 
-	connect(mBackend->getToolManager().get(), &TrackingService::stateChanged, this, &VideoConnection::connectVideoToProbe);
-	connect(mBackend->getToolManager().get(), SIGNAL(activeToolChanged(QString)), this, SLOT(connectVideoToProbe()));
+	connect(mBackend->tracking().get(), &TrackingService::stateChanged, this, &VideoConnection::connectVideoToProbe);
+	connect(mBackend->tracking().get(), SIGNAL(activeToolChanged(QString)), this, SLOT(connectVideoToProbe()));
 }
 
 VideoConnection::~VideoConnection()
@@ -202,7 +202,7 @@ void VideoConnection::onDisconnected()
 	for (unsigned i=0; i<mSources.size(); ++i)
 		mSources[i]->setInput(ImagePtr());
 
-	ToolPtr tool = mBackend->getToolManager()->getFirstProbe();
+	ToolPtr tool = mBackend->tracking()->getFirstProbe();
 	if (tool && tool->getProbe())
 		this->removeSourceFromProbe(tool);
 
@@ -215,7 +215,7 @@ void VideoConnection::onDisconnected()
 
 void VideoConnection::useUnusedProbeDefinitionSlot()
 {
-	disconnect(mBackend->getToolManager().get(), &TrackingService::stateChanged, this, &VideoConnection::useUnusedProbeDefinitionSlot);
+	disconnect(mBackend->tracking().get(), &TrackingService::stateChanged, this, &VideoConnection::useUnusedProbeDefinitionSlot);
 
 	std::vector<ProbeDefinitionPtr> unusedProbeDefinitionVector = mUnusedProbeDefinitionVector;
 	mUnusedProbeDefinitionVector.clear();
@@ -226,7 +226,7 @@ void VideoConnection::useUnusedProbeDefinitionSlot()
 
 void VideoConnection::resetProbe()
 {
-	ToolPtr tool = mBackend->getToolManager()->getFirstProbe();
+	ToolPtr tool = mBackend->tracking()->getFirstProbe();
 	if (!tool || !tool->getProbe())
 		return;
 	ProbePtr probe = tool->getProbe();
@@ -244,12 +244,12 @@ void VideoConnection::resetProbe()
  */
 void VideoConnection::updateStatus(ProbeDefinitionPtr msg)
 {
-	ToolPtr tool = mBackend->getToolManager()->getFirstProbe();
+	ToolPtr tool = mBackend->tracking()->getFirstProbe();
 	if (!tool || !tool->getProbe())
 	{
 		//Don't throw away the ProbeDefinition. Save it until it can be used
 		if (mUnusedProbeDefinitionVector.empty())
-			connect(mBackend->getToolManager().get(), &TrackingService::stateChanged, this, &VideoConnection::useUnusedProbeDefinitionSlot);
+			connect(mBackend->tracking().get(), &TrackingService::stateChanged, this, &VideoConnection::useUnusedProbeDefinitionSlot);
 		mUnusedProbeDefinitionVector.push_back(msg);
 		return;
 	}
@@ -341,7 +341,7 @@ std::vector<VideoSourcePtr> VideoConnection::getVideoSources()
  */
 void VideoConnection::connectVideoToProbe()
 {
-	ToolPtr tool = mBackend->getToolManager()->getFirstProbe();
+	ToolPtr tool = mBackend->tracking()->getFirstProbe();
 	if (!tool)
 		return;
 
