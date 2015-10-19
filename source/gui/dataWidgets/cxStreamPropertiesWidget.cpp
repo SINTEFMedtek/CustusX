@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-StreamPropertiesWidget::StreamPropertiesWidget(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget *parent) :
+StreamPropertiesWidget::StreamPropertiesWidget(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget *parent) :
 	TabbedWidget(parent, "StreamPropertiesWidget", "Stream Properties"),
 	mSelectStream(StringPropertySelectTrackedStream::New(patientModelService))
 {
@@ -52,7 +52,7 @@ StreamPropertiesWidget::StreamPropertiesWidget(PatientModelServicePtr patientMod
 	mTransferFunctionWidget = TransferFunction3DWidgetPtr(new TransferFunction3DWidget(activeData, this, connectToActiveImage));
 	mShadingWidget = ShadingWidgetPtr(new ShadingWidget(activeData, this, connectToActiveImage));
 
-	this->insertWidgetAtTop(new DataSelectWidget(visualizationService, patientModelService, this, mSelectStream));
+	this->insertWidgetAtTop(new DataSelectWidget(viewService, patientModelService, this, mSelectStream));
 	this->addTab(mTransferFunctionWidget.get(), QString("Transfer Functions"));
 	this->addTab(mShadingWidget.get(), "Shading");
 

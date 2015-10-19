@@ -32,13 +32,14 @@ if(BUILD_TESTING)
         cxtestImage.cpp
         cxtestPatientModelServiceMock.cpp
         cxtestPatientModelServiceMock.h
-        cxtestDummyDataManager.h
-        cxtestDummyDataManager.cpp
+        cxtestVisServices.h
+        cxtestVisServices.cpp
         cxtestActiveData.cpp
     )
 
     set(CX_TESTRESOURCE_LINK_LIBS
         cxResource
+        cxResourceVisualization
         cxtestUtilities
     )
 

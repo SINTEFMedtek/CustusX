@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-VisualizationImplService::VisualizationImplService(ctkPluginContext *context) :
+ViewImplService::ViewImplService(ctkPluginContext *context) :
 	mContext(context )
 {
 	VisServicesPtr services = VisServices::create(context);
@@ -53,136 +53,136 @@ VisualizationImplService::VisualizationImplService(ctkPluginContext *context) :
 	mBase = ViewManager::create(services);
 
 	if(!viewManager())
-		std::cout << "VisualizationImplService got no viewManager" << std::endl;
+		std::cout << "ViewImplService got no viewManager" << std::endl;
 //	connect(viewManager(), SIGNAL(activeViewChanged()), this, SIGNAL(activeViewChanged()));
-//	connect(viewManager(), &ViewManager::renderingEnabledChanged, this, &VisualizationService::renderingEnabledChanged);
+//	connect(viewManager(), &ViewManager::renderingEnabledChanged, this, &ViewService::renderingEnabledChanged);
 
-	connect(mSession.get(), &SessionStorageService::sessionChanged, this, &VisualizationImplService::onSessionChanged);
-	connect(mSession.get(), &SessionStorageService::cleared, this, &VisualizationImplService::onSessionCleared);
-	connect(mSession.get(), &SessionStorageService::isLoading, this, &VisualizationImplService::onSessionLoad);
-	connect(mSession.get(), &SessionStorageService::isSaving, this, &VisualizationImplService::onSessionSave);
+	connect(mSession.get(), &SessionStorageService::sessionChanged, this, &ViewImplService::onSessionChanged);
+	connect(mSession.get(), &SessionStorageService::cleared, this, &ViewImplService::onSessionCleared);
+	connect(mSession.get(), &SessionStorageService::isLoading, this, &ViewImplService::onSessionLoad);
+	connect(mSession.get(), &SessionStorageService::isSaving, this, &ViewImplService::onSessionSave);
 
-	connect(viewManager(), &ViewManager::activeViewChanged, this, &VisualizationService::activeViewChanged);
-	connect(viewManager(), &ViewManager::fps, this, &VisualizationService::fps);
-	connect(viewManager(), &ViewManager::activeLayoutChanged, this, &VisualizationService::activeLayoutChanged);
-	connect(viewManager(), &ViewManager::renderingEnabledChanged, this, &VisualizationService::renderingEnabledChanged);
-	connect(viewManager(), &ViewManager::pointSampled, this, &VisualizationService::pointSampled);
+	connect(viewManager(), &ViewManager::activeViewChanged, this, &ViewService::activeViewChanged);
+	connect(viewManager(), &ViewManager::fps, this, &ViewService::fps);
+	connect(viewManager(), &ViewManager::activeLayoutChanged, this, &ViewService::activeLayoutChanged);
+	connect(viewManager(), &ViewManager::renderingEnabledChanged, this, &ViewService::renderingEnabledChanged);
+	connect(viewManager(), &ViewManager::pointSampled, this, &ViewService::pointSampled);
 }
 
-VisualizationImplService::~VisualizationImplService()
+ViewImplService::~ViewImplService()
 {
 }
 
-ViewPtr VisualizationImplService::get3DView(int group, int index)
+ViewPtr ViewImplService::get3DView(int group, int index)
 {
 	return viewManager()->get3DView(group, index);
 }
 
-int VisualizationImplService::getActiveGroupId() const
+int ViewImplService::getActiveGroupId() const
 {
 	return viewManager()->getActiveViewGroup();
 }
-ViewGroupDataPtr VisualizationImplService::getGroup(int groupIdx) const
+ViewGroupDataPtr ViewImplService::getGroup(int groupIdx) const
 {
 	return viewManager()->getViewGroup(groupIdx);
 }
 
-void VisualizationImplService::setRegistrationMode(REGISTRATION_STATUS mode)
+void ViewImplService::setRegistrationMode(REGISTRATION_STATUS mode)
 {
 	this->getGroup(0)->setRegistrationMode(mode);
 }
 
-bool VisualizationImplService::isNull()
+bool ViewImplService::isNull()
 {
 	return false;
 }
 
-void VisualizationImplService::aboutToStop()
+void ViewImplService::aboutToStop()
 {
     CX_LOG_DEBUG() << "About to destruct the visualizationservice and viewmanager, making sure timers are stopped.";
     viewManager()->enableRender(false);
 }
 
-void VisualizationImplService::autoShowData(cx::DataPtr data)
+void ViewImplService::autoShowData(cx::DataPtr data)
 {
 	viewManager()->autoShowData(data);
 }
 
-void VisualizationImplService::enableRender(bool val)
+void ViewImplService::enableRender(bool val)
 {
 	viewManager()->enableRender(val);
 }
 
-bool VisualizationImplService::renderingIsEnabled() const
+bool ViewImplService::renderingIsEnabled() const
 {
 	return viewManager()->renderingIsEnabled();
 }
 
-QWidget* VisualizationImplService::getLayoutWidget(QWidget* parent, int index)
+QWidget* ViewImplService::getLayoutWidget(QWidget* parent, int index)
 {
 	return viewManager()->getLayoutWidget(parent, index);
 }
 
-QString VisualizationImplService::getActiveLayout(int widgetIndex) const
+QString ViewImplService::getActiveLayout(int widgetIndex) const
 {
 	return viewManager()->getActiveLayout(widgetIndex);
 }
 
-void VisualizationImplService::setActiveLayout(const QString& uid, int widgetIndex)
+void ViewImplService::setActiveLayout(const QString& uid, int widgetIndex)
 {
 	viewManager()->setActiveLayout(uid, widgetIndex);
 }
 
-InteractiveClipperPtr VisualizationImplService::getClipper()
+InteractiveClipperPtr ViewImplService::getClipper()
 {
 	return viewManager()->getClipper();
 }
 
-InteractiveCropperPtr VisualizationImplService::getCropper()
+InteractiveCropperPtr ViewImplService::getCropper()
 {
 	return viewManager()->getCropper();
 }
 
-CyclicActionLoggerPtr VisualizationImplService::getRenderTimer()
+CyclicActionLoggerPtr ViewImplService::getRenderTimer()
 {
 	return viewManager()->getRenderTimer();
 }
 
-NavigationPtr VisualizationImplService::getNavigation()
+NavigationPtr ViewImplService::getNavigation()
 {
 	return viewManager()->getNavigation();
 }
 
-LayoutRepositoryPtr VisualizationImplService::getLayoutRepository()
+LayoutRepositoryPtr ViewImplService::getLayoutRepository()
 {
 	return viewManager()->getLayoutRepository();
 }
 
-CameraControlPtr VisualizationImplService::getCameraControl()
+CameraControlPtr ViewImplService::getCameraControl()
 {
 	return viewManager()->getCameraControl();
 }
 
-QActionGroup* VisualizationImplService::createInteractorStyleActionGroup()
+QActionGroup* ViewImplService::createInteractorStyleActionGroup()
 {
 	return viewManager()->createInteractorStyleActionGroup();
 }
 
-void VisualizationImplService::onSessionChanged()
+void ViewImplService::onSessionChanged()
 {
 }
-void VisualizationImplService::onSessionCleared()
+void ViewImplService::onSessionCleared()
 {
 	viewManager()->clear();
 }
-void VisualizationImplService::onSessionLoad(QDomElement& node)
+void ViewImplService::onSessionLoad(QDomElement& node)
 {
 	XMLNodeParser root(node);
 	QDomElement viewManagerNode = root.descend("managers/viewManager").node().toElement();
 	if (!viewManagerNode.isNull())
 		viewManager()->parseXml(viewManagerNode);
 }
-void VisualizationImplService::onSessionSave(QDomElement& node)
+void ViewImplService::onSessionSave(QDomElement& node)
 {
 	XMLNodeAdder root(node);
 	QDomElement managerNode = root.descend("managers").node().toElement();

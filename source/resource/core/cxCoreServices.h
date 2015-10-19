@@ -59,20 +59,20 @@ class cxResource_EXPORT CoreServices
 public:
 	static CoreServicesPtr create(ctkPluginContext* context);
 	CoreServices(ctkPluginContext* context);
-	static CoreServices getNullObjects();
-	static CoreServicesPtr getNull();
+	static CoreServicesPtr getNullObjects();
 
-	PatientModelServicePtr getPatientService() { return patientModelService; }
-	TrackingServicePtr getToolManager() { return trackingService; }
-	VideoServicePtr getVideoService() { return videoService; }
-	SpaceProviderPtr getSpaceProvider() { return spaceProvider; }
-	SessionStorageServicePtr getSession() { return sessionStorageService; }
+	PatientModelServicePtr patient() { return mPatientModelService; }
+	TrackingServicePtr tracking() { return mTrackingService; }
+	VideoServicePtr video() { return mVideoService; }
+	SpaceProviderPtr spaceProvider() { return mSpaceProvider; }
+	SessionStorageServicePtr session() { return mSessionStorageService; }
 
-	PatientModelServicePtr patientModelService;
-	TrackingServicePtr trackingService;
-	VideoServicePtr videoService;
-	SpaceProviderPtr spaceProvider;
-	SessionStorageServicePtr sessionStorageService;
+protected:
+	PatientModelServicePtr mPatientModelService;
+	TrackingServicePtr mTrackingService;
+	VideoServicePtr mVideoService;
+	SpaceProviderPtr mSpaceProvider;
+	SessionStorageServicePtr mSessionStorageService;
 
 protected:
 	CoreServices();

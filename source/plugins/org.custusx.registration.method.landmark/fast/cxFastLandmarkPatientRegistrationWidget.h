@@ -62,7 +62,7 @@ typedef Transform3D Transform3D;
 class FastLandmarkPatientRegistrationWidget: public LandmarkPatientRegistrationWidget
 {
 public:
-	FastLandmarkPatientRegistrationWidget(RegServices services, QWidget* parent, QString objectName, QString windowTitle);
+	FastLandmarkPatientRegistrationWidget(RegServicesPtr services, QWidget* parent, QString objectName, QString windowTitle);
 
 protected:
 	virtual void performRegistration();

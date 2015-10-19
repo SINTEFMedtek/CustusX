@@ -48,7 +48,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationService.h"
 #include "cxViewService.h"
 #include "cxPatientModelService.h"
-#include "cxViewGroupData.h"
 #include "cxReporter.h"
 #include "cxLandmarkListener.h"
 #include "cxActiveData.h"
@@ -56,15 +55,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-LandmarkPatientRegistrationWidget::LandmarkPatientRegistrationWidget(RegServices services, QWidget* parent, QString objectName, QString windowTitle) :
+LandmarkPatientRegistrationWidget::LandmarkPatientRegistrationWidget(RegServicesPtr services, QWidget* parent, QString objectName, QString windowTitle) :
 	LandmarkRegistrationWidget(services, parent, objectName, windowTitle)
 {
 	mLandmarkTableWidget->hide();
 
 	mLandmarkListener->useI2IRegistration(false);
 
-	mFixedProperty.reset(new StringPropertyRegistrationFixedImage(services.registrationService, services.patientModelService));
-	connect(services.patientModelService.get(), &PatientModelService::rMprChanged, this, &LandmarkPatientRegistrationWidget::setModified);
+	mFixedProperty.reset(new StringPropertyRegistrationFixedImage(services->registration(), services->patient()));
+	connect(services->patient().get(), &PatientModelService::rMprChanged, this, &LandmarkPatientRegistrationWidget::setModified);
 
 
 	mRegisterButton = new QPushButton("Register", this);
@@ -89,47 +88,47 @@ void LandmarkPatientRegistrationWidget::registerSlot()
 void LandmarkPatientRegistrationWidget::showEvent(QShowEvent* event)
 {
 //	std::cout << "LandmarkPatientRegistrationWidget::showEvent" << std::endl;
-	mServices.visualizationService->getGroup(0)->setRegistrationMode(rsPATIENT_REGISTRATED);
+	mServices->view()->setRegistrationMode(rsPATIENT_REGISTRATED);
 	LandmarkRegistrationWidget::showEvent(event);
 }
 
 void LandmarkPatientRegistrationWidget::hideEvent(QHideEvent* event)
 {
-	mServices.visualizationService->getGroup(0)->setRegistrationMode(rsNOT_REGISTRATED);
+	mServices->view()->setRegistrationMode(rsNOT_REGISTRATED);
 	LandmarkRegistrationWidget::hideEvent(event);
 }
 
 //The following functions look (almost) exactly like the same functions in PatientLandMarksWidget
 void LandmarkPatientRegistrationWidget::performRegistration()
 {
-	if (!mServices.registrationService->getFixedData())
+	if (!mServices->registration()->getFixedData())
 	{
-		ActiveDataPtr activeData = mServices.patientModelService->getActiveData();
-		mServices.registrationService->setFixedData(activeData->getActive<Image>());
+		ActiveDataPtr activeData = mServices->patient()->getActiveData();
+		mServices->registration()->setFixedData(activeData->getActive<Image>());
 	}
 
-	if (mServices.patientModelService->getPatientLandmarks()->getLandmarks().size() < 3)
+	if (mServices->patient()->getPatientLandmarks()->getLandmarks().size() < 3)
 		return;
 
-	mServices.registrationService->doPatientRegistration();
+	mServices->registration()->doPatientRegistration();
 
 	this->updateAverageAccuracyLabel();
 }
 
 LandmarkMap LandmarkPatientRegistrationWidget::getTargetLandmarks() const
 {
-	return mServices.patientModelService->getPatientLandmarks()->getLandmarks();
+	return mServices->patient()->getPatientLandmarks()->getLandmarks();
 }
 
 Transform3D LandmarkPatientRegistrationWidget::getTargetTransform() const
 {
-	Transform3D rMpr = mServices.patientModelService->get_rMpr();
+	Transform3D rMpr = mServices->patient()->get_rMpr();
 	return rMpr;
 }
 
 void LandmarkPatientRegistrationWidget::setTargetLandmark(QString uid, Vector3D p_target)
 {
-	mServices.patientModelService->getPatientLandmarks()->setLandmark(Landmark(uid, p_target));
+	mServices->patient()->getPatientLandmarks()->setLandmark(Landmark(uid, p_target));
 	reporter()->playSampleSound();
 }
 

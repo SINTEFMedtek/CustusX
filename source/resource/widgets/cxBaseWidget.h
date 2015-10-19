@@ -95,7 +95,7 @@ public:
 namespace cx
 {
 typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
-typedef boost::shared_ptr<class VisualizationService> VisualizationServicePtr;
+typedef boost::shared_ptr<class ViewService> ViewServicePtr;
 /**
  * \class BaseWidget
  *

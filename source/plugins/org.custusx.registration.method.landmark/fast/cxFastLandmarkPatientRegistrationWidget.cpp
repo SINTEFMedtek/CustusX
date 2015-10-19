@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-FastLandmarkPatientRegistrationWidget::FastLandmarkPatientRegistrationWidget(RegServices services, QWidget* parent, QString objectName, QString windowTitle) :
+FastLandmarkPatientRegistrationWidget::FastLandmarkPatientRegistrationWidget(RegServicesPtr services, QWidget* parent, QString objectName, QString windowTitle) :
 	LandmarkPatientRegistrationWidget(services, parent, objectName, windowTitle)
 {
 }
@@ -64,7 +64,7 @@ FastLandmarkPatientRegistrationWidget::FastLandmarkPatientRegistrationWidget(Reg
 //The following functions look (almost) exactly like the same functions in PatientLandMarksWidget
 void FastLandmarkPatientRegistrationWidget::performRegistration()
 {
-	mServices.registrationService->doFastRegistration_Translation();
+	mServices->registration()->doFastRegistration_Translation();
 	this->updateAverageAccuracyLabel();
 }
 

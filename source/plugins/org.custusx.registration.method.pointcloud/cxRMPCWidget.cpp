@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-RMPCWidget::RMPCWidget(RegServices services, QWidget* parent) :
+RMPCWidget::RMPCWidget(RegServicesPtr services, QWidget* parent) :
 	ICPRegistrationBaseWidget(services, parent, "org_custusx_registration_method_pointcloud_widget",
 						   "Point Cloud Registration")
 {
@@ -51,18 +51,18 @@ RMPCWidget::RMPCWidget(RegServices services, QWidget* parent) :
 
 void RMPCWidget::setup()
 {
-	mSpaceListenerMoving = mServices.spaceProvider->createListener();
-	mSpaceListenerFixed = mServices.spaceProvider->createListener();
-	mSpaceListenerMoving->setSpace(mServices.spaceProvider->getPr());
+	mSpaceListenerMoving = mServices->spaceProvider()->createListener();
+	mSpaceListenerFixed = mServices->spaceProvider()->createListener();
+	mSpaceListenerMoving->setSpace(mServices->spaceProvider()->getPr());
 	connect(mSpaceListenerMoving.get(), &SpaceListener::changed, this, &RMPCWidget::onSpacesChanged);
 	connect(mSpaceListenerFixed.get(), &SpaceListener::changed, this, &RMPCWidget::onSpacesChanged);
 
-	mFixedImage.reset(new StringPropertyRegistrationFixedImage(mServices.registrationService, mServices.patientModelService));
-	mMovingImage.reset(new StringPropertyRegistrationMovingImage(mServices.registrationService, mServices.patientModelService));
+	mFixedImage.reset(new StringPropertyRegistrationFixedImage(mServices->registration(), mServices->patient()));
+	mMovingImage.reset(new StringPropertyRegistrationMovingImage(mServices->registration(), mServices->patient()));
 
-	connect(mServices.registrationService.get(), &RegistrationService::fixedDataChanged,
+	connect(mServices->registration().get(), &RegistrationService::fixedDataChanged,
 			this, &RMPCWidget::inputChanged);
-	connect(mServices.registrationService.get(), &RegistrationService::movingDataChanged,
+	connect(mServices->registration().get(), &RegistrationService::movingDataChanged,
 			this, &RMPCWidget::inputChanged);
 
 	QVBoxLayout* layout = new QVBoxLayout(this);
@@ -80,9 +80,9 @@ void RMPCWidget::setup()
 
 void RMPCWidget::initializeRegistrator()
 {
-	DataPtr fixed = mServices.registrationService->getFixedData();
-	DataPtr moving = mServices.registrationService->getMovingData();
-	QString logPath = mServices.patientModelService->getActivePatientFolder() + "/Logs/";
+	DataPtr fixed = mServices->registration()->getFixedData();
+	DataPtr moving = mServices->registration()->getMovingData();
+	QString logPath = mServices->patient()->getActivePatientFolder() + "/Logs/";
 
 	mRegistrator->initialize(moving, fixed, logPath);
 }
@@ -92,19 +92,19 @@ void RMPCWidget::inputChanged()
 	if (mObscuredListener->isObscured())
 		return;
 
-	DataPtr fixed = mServices.registrationService->getFixedData();
-	mSpaceListenerFixed->setSpace(mServices.spaceProvider->getD(fixed));
+	DataPtr fixed = mServices->registration()->getFixedData();
+	mSpaceListenerFixed->setSpace(mServices->spaceProvider()->getD(fixed));
 
 	this->onSpacesChanged();
 }
 
 void RMPCWidget::applyRegistration(Transform3D delta)
 {
-	Transform3D rMpr = mServices.patientModelService->get_rMpr();
+	Transform3D rMpr = mServices->patient()->get_rMpr();
 	Transform3D new_rMpr = delta*rMpr;//output
-	mServices.registrationService->applyPatientRegistration(new_rMpr, "I2P Surface to Surface");
+	mServices->registration()->applyPatientRegistration(new_rMpr, "I2P Surface to Surface");
 
-	mServices.registrationService->applyImage2ImageRegistration(delta, "I2P Surface to Surface - correction");
+	mServices->registration()->applyImage2ImageRegistration(delta, "I2P Surface to Surface - correction");
 
 }
 

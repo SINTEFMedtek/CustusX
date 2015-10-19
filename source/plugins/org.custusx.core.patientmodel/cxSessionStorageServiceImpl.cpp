@@ -341,22 +341,29 @@ void SessionStorageServiceImpl::startupLoadPatient()
 	if (folder.isEmpty() && settings()->value("Automation/autoLoadRecentPatient").toBool())
 	{
 		folder = settings()->value("startup/lastPatient").toString();
+        if(this->isValidSessionFolder(folder))
+        {
+            QDateTime lastSaveTime = QDateTime::fromString(settings()->value("startup/lastPatientSaveTime").toString(), timestampSecondsFormat());
+            double minsSinceLastSave = lastSaveTime.secsTo(QDateTime::currentDateTime())/60;
+            double autoLoadRecentPatientWithinHours = settings()->value("Automation/autoLoadRecentPatientWithinHours").toDouble();
+            int allowedMinsSinceLastSave = autoLoadRecentPatientWithinHours*60;
+            if (minsSinceLastSave > allowedMinsSinceLastSave) // if less than 8 hours, accept
+            {
+                report(
+                    QString("Startup Load: Ignored recent patient because %1 hours since last save, limit is %2")
+                    .arg(int(minsSinceLastSave/60))
+                    .arg(int(allowedMinsSinceLastSave/60)));
+                folder = "";
+            }
+            if (!folder.isEmpty())
+                report(QString("Startup Load [%1] as recent patient").arg(folder));
+        }
+        else
+        {
+            report("Startup Load: Ignored recent patient because it is not valid anymore");
+            folder = "";
+        }
 
-		QDateTime lastSaveTime = QDateTime::fromString(settings()->value("startup/lastPatientSaveTime").toString(), timestampSecondsFormat());
-		double minsSinceLastSave = lastSaveTime.secsTo(QDateTime::currentDateTime())/60;
-		double autoLoadRecentPatientWithinHours = settings()->value("Automation/autoLoadRecentPatientWithinHours").toDouble();
-		int allowedMinsSinceLastSave = autoLoadRecentPatientWithinHours*60;
-		if (minsSinceLastSave > allowedMinsSinceLastSave) // if less than 8 hours, accept
-		{
-			report(
-				QString("Startup Load: Ignored recent patient because %1 hours since last save, limit is %2")
-				.arg(int(minsSinceLastSave/60))
-				.arg(int(allowedMinsSinceLastSave/60)));
-			folder = "";
-		}
-
-		if (!folder.isEmpty())
-			report(QString("Startup Load [%1] as recent patient").arg(folder));
 	}
 
 	if (folder.isEmpty())

@@ -50,7 +50,7 @@ RegistrationMethodCommandLinePluginActivator::~RegistrationMethodCommandLinePlug
 
 void RegistrationMethodCommandLinePluginActivator::start(ctkPluginContext* context)
 {
-	RegServices services(context);
+	RegServicesPtr services = RegServices::create(context);
 	RegistrationMethodCommandLineService* service = new RegistrationMethodCommandLineService(services);
 	mRegistrationCommandLine = RegisteredService::create<RegistrationMethodCommandLineService>(context, service, RegistrationMethodService_iid);
 }

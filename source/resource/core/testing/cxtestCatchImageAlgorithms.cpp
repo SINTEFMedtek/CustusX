@@ -38,15 +38,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImageTF3D.h"
 #include "cxImageLUT2D.h"
 #include "cxDataLocations.h"
-#include "cxtestDummyDataManager.h"
+#include "cxtestVisServices.h"
 #include "cxPatientModelService.h"
 
 using namespace cx;
 
 TEST_CASE("ImageAlgorithms: resample() works", "[unit][resource][core]")
 {
-	cxtest::TestServicesType services = cxtest::createDummyCoreServices();
-	cx::PatientModelServicePtr pasm = services.mPatientModelService;
+	cxtest::TestVisServicesPtr services = cxtest::TestVisServices::create();
+	cx::PatientModelServicePtr pasm = services->patient();
 
 	QString fname0 = cx::DataLocations::getTestDataPath() + "/testing/ResampleTest.cx3/Images/mra.mhd";
 	QString fname1 = cx::DataLocations::getTestDataPath() + "/testing/ResampleTest.cx3/Images/US_01_20110222T110117_1.mhd";

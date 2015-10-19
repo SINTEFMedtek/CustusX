@@ -62,7 +62,7 @@ class cxGui_EXPORT MeshInfoWidget : public InfoWidget
   Q_OBJECT
 
 public:
-	MeshInfoWidget(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget* parent);
+	MeshInfoWidget(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget* parent);
   virtual ~MeshInfoWidget();
 
 protected slots:
@@ -95,7 +95,7 @@ private:
 
 
   PatientModelServicePtr mPatientModelService;
-  VisualizationServicePtr mVisualizationService;
+  ViewServicePtr mViewService;
   
   MeshInfoWidget();
 };

@@ -35,12 +35,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkPolyData.h>
 #include <vtkPointData.h>
-#include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 #include <vtkActor.h>
 #include <vtkRenderer.h>
 #include <vtkMatrix4x4.h>
 #include <vtkArrowSource.h>
+#include <vtkPlane.h>
 
 #include "cxMesh.h"
 #include "cxView.h"
@@ -85,15 +85,41 @@ void GeometricRep::setMesh(MeshPtr mesh)
     {
         disconnect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
         disconnect(mMesh.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
+		disconnect(mMesh.get(), SIGNAL(clipPlanesChanged()), this, SLOT(clipPlanesChangedSlot()));
     }
     mMesh = mesh;
     if (mMesh)
     {
         connect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
         connect(mMesh.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
+		connect(mMesh.get(), SIGNAL(clipPlanesChanged()), this, SLOT(clipPlanesChangedSlot()));
         this->meshChangedSlot();
         this->transformChangedSlot();
     }
+}
+
+//Copied from ImageMapperMonitor (used by VolumetricRep)
+void GeometricRep::clipPlanesChangedSlot()
+{
+	this->clearClipping();
+
+	if (!mMesh)
+		return;
+
+	std::vector<vtkPlanePtr> mPlanes;
+	mPlanes = mMesh->getAllClipPlanes();
+	for (unsigned i=0; i<mPlanes.size(); ++i)
+	{
+		mGraphicalPolyDataPtr->getMapper()->AddClippingPlane(mPlanes[i]);
+	}
+}
+
+void GeometricRep::clearClipping()
+{
+	if (!mMesh)
+		return;
+
+	mGraphicalPolyDataPtr->getMapper()->RemoveAllClippingPlanes();
 }
 
 MeshPtr GeometricRep::getMesh()

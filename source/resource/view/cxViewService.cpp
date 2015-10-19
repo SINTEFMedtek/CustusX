@@ -39,16 +39,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-VisualizationServicePtr VisualizationService::getNullObject()
+ViewServicePtr ViewService::getNullObject()
 {
-	static VisualizationServicePtr mNull;
+	static ViewServicePtr mNull;
 	if (!mNull)
-		mNull.reset(new VisualizationServiceNull, null_deleter());
+		mNull.reset(new ViewServiceNull, null_deleter());
 	return mNull;
 }
 
 
-unsigned VisualizationService::groupCount() const
+unsigned ViewService::groupCount() const
 {
 	int count = 0;
 	while(this->getGroup(count))
@@ -56,13 +56,13 @@ unsigned VisualizationService::groupCount() const
 	return count;
 }
 
-void VisualizationService::deactivateLayout()
+void ViewService::deactivateLayout()
 {
 	this->setActiveLayout("", 0);
 	this->setActiveLayout("", 1);
 }
 
-RepContainerPtr VisualizationService::get3DReps(int group, int index)
+RepContainerPtr ViewService::get3DReps(int group, int index)
 {
 	ViewPtr view = this->get3DView(group, index);
 
@@ -72,7 +72,7 @@ RepContainerPtr VisualizationService::get3DReps(int group, int index)
 		return RepContainerPtr(new RepContainer(std::vector<RepPtr>()));
 }
 
-ViewGroupDataPtr VisualizationService::getActiveViewGroup()
+ViewGroupDataPtr ViewService::getActiveViewGroup()
 {
 	int groupId = this->getActiveGroupId();
 	return this->getGroup(groupId);

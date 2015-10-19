@@ -29,46 +29,64 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXTESTDUMMYDATAMANAGER_H
-#define CXTESTDUMMYDATAMANAGER_H
+#ifndef CXFILTERWIDGET_H
+#define CXFILTERWIDGET_H
 
-#include "cxtestresource_export.h"
+#include "cxGuiExport.h"
 
-#include "cxForwardDeclarations.h"
-#include <QStringList>
-class ctkPluginContext;
+#include "cxBaseWidget.h"
+#include "cxFilter.h"
+#include "cxFilterTimedAlgorithm.h"
+#include "cxOptionsWidget.h"
 
-namespace cxtest
+namespace cx
 {
+typedef boost::shared_ptr<class WidgetObscuredListener> WidgetObscuredListenerPtr;
+typedef boost::shared_ptr<class VisServices> VisServicesPtr;
+class TimedAlgorithmProgressBar;
+class FilterPresetWidget;
 
-struct CXTESTRESOURCE_EXPORT TestServicesType
+/** Helper widget for displaying the input/output/options part of a Filter.
+ * Intended to be included in other Filter widgets.
+ *
+ * \ingroup cx_gui
+ * \date Nov 18, 2012
+ * \author Christian Askeland, SINTEF
+ * \author Janne Beate Bakeng, SINTEF
+ */
+class cxGui_EXPORT FilterSetupWidget : public BaseWidget
 {
-	cx::PatientModelServicePtr mPatientModelService;
-	cx::SpaceProviderPtr mSpaceProvider;
-	cx::TrackingServicePtr mTrackingService;
-};
-
-TestServicesType CXTESTRESOURCE_EXPORT createDummyCoreServices();
-void CXTESTRESOURCE_EXPORT destroyDummyCoreServices(TestServicesType& services);
-
-typedef boost::shared_ptr<class TestServices> TestServicesPtr;
-
-/** A minimal set of services for test usage.
-  */
-class CXTESTRESOURCE_EXPORT TestServices : public TestServicesType
-{
+	Q_OBJECT
 public:
-	static TestServicesPtr create();
-	~TestServices();
+	FilterSetupWidget(VisServicesPtr services, QWidget* parent, XmlOptionFile options, bool addFrame);
 
-	cx::PatientModelServicePtr patientModelService() { return mPatientModelService; }
-	cx::SpaceProviderPtr spaceProvider() { return mSpaceProvider; }
-	cx::TrackingServicePtr trackingService() { return mTrackingService; }
+    void setFilter(FilterPtr filter);
+	QString generateHelpText() const;
+
+    void setCompact(bool on); ///< Compact Mode: one group, hide main input/output
+	void toggleDetailed();
+
+private slots:
+	void obscuredSlot(bool obscured);
+	void showAdvancedOptions(int state);
+	void rebuildOptions();
 
 private:
-	TestServices();
+
+	VisServicesPtr mServices;
+	XmlOptionFile mOptions;
+	FilterPtr mCurrentFilter;
+
+	OptionsWidget* mInputsWidget;
+	OptionsWidget* mOutputsWidget;
+	OptionsWidget* mOptionsWidget;
+	FilterPresetWidget*  mPresetWidget;
+	QGroupBox* 	   mOptionsGroupBox;
+	QCheckBox*	   mAdvancedButton;
+	QGroupBox* 	   mFrame;
+	boost::shared_ptr<WidgetObscuredListener> mObscuredListener;
 };
 
-} // namespace cx
+}
 
-#endif // CXTESTDUMMYDATAMANAGER_H
+#endif // CXFILTERWIDGET_H

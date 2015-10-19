@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-RMPCFromPointerWidget::RMPCFromPointerWidget(RegServices services, QWidget* parent) :
+RMPCFromPointerWidget::RMPCFromPointerWidget(RegServicesPtr services, QWidget* parent) :
 	ICPRegistrationBaseWidget(services, parent, "org_custusx_registration_method_pointcloud_frompointer_widget",
 						   "Point Cloud Registration")
 {
@@ -59,19 +59,19 @@ RMPCFromPointerWidget::RMPCFromPointerWidget(RegServices services, QWidget* pare
 
 void RMPCFromPointerWidget::setup()
 {
-	mSpaceListenerMoving = mServices.spaceProvider->createListener();
-	mSpaceListenerFixed = mServices.spaceProvider->createListener();
-	mSpaceListenerMoving->setSpace(mServices.spaceProvider->getPr());
+	mSpaceListenerMoving = mServices->spaceProvider()->createListener();
+	mSpaceListenerFixed = mServices->spaceProvider()->createListener();
+	mSpaceListenerMoving->setSpace(mServices->spaceProvider()->getPr());
 	connect(mSpaceListenerMoving.get(), &SpaceListener::changed, this, &RMPCFromPointerWidget::onSpacesChanged);
 	connect(mSpaceListenerFixed.get(), &SpaceListener::changed, this, &RMPCFromPointerWidget::onSpacesChanged);
 
-	mFixedImage.reset(new StringPropertyRegistrationFixedImage(mServices.registrationService, mServices.patientModelService));
+	mFixedImage.reset(new StringPropertyRegistrationFixedImage(mServices->registration(), mServices->patient()));
 
-	connect(mServices.registrationService.get(), &RegistrationService::fixedDataChanged,
+	connect(mServices->registration().get(), &RegistrationService::fixedDataChanged,
 			this, &RMPCFromPointerWidget::inputChanged);
 
 	mRecordTrackingWidget = new RecordTrackingWidget(mOptions.descend("recordTracker"),
-													 mServices.acquisitionService,
+													 mServices->acquisition(),
 													 mServices,
 													 "tracker",
 													 this);
@@ -123,16 +123,16 @@ QString RMPCFromPointerWidget::defaultWhatsThis() const
 
 void RMPCFromPointerWidget::initializeRegistrator()
 {
-	DataPtr fixed = mServices.registrationService->getFixedData();
+	DataPtr fixed = mServices->registration()->getFixedData();
 	MeshPtr moving = this->getTrackerDataAsMesh();
-	QString logPath = mServices.patientModelService->getActivePatientFolder() + "/Logs/";
+	QString logPath = mServices->patient()->getActivePatientFolder() + "/Logs/";
 
 	mRegistrator->initialize(moving, fixed, logPath);
 }
 
 MeshPtr RMPCFromPointerWidget::getTrackerDataAsMesh()
 {
-	Transform3D rMpr = mServices.patientModelService->get_rMpr();
+	Transform3D rMpr = mServices->patient()->get_rMpr();
 
 	TimedTransformMap trackerRecordedData_prMt = mRecordTrackingWidget->getRecordedTrackerData_prMt();
 	vtkPolyDataPtr trackerdata_r = polydataFromTransforms(trackerRecordedData_prMt, rMpr);
@@ -147,8 +147,8 @@ void RMPCFromPointerWidget::inputChanged()
 	if (mObscuredListener->isObscured())
 		return;
 
-	DataPtr fixed = mServices.registrationService->getFixedData();
-	mSpaceListenerFixed->setSpace(mServices.spaceProvider->getD(fixed));
+	DataPtr fixed = mServices->registration()->getFixedData();
+	mSpaceListenerFixed->setSpace(mServices->spaceProvider()->getD(fixed));
 
 	this->onSpacesChanged();
 }
@@ -164,11 +164,11 @@ void RMPCFromPointerWidget::queuedAutoRegistration()
 void RMPCFromPointerWidget::applyRegistration(Transform3D delta)
 {
 	ToolPtr tool = mRecordTrackingWidget->getSelectRecordSession()->getTool();
-	Transform3D rMpr = mServices.patientModelService->get_rMpr();
+	Transform3D rMpr = mServices->patient()->get_rMpr();
 	Transform3D new_rMpr = delta*rMpr;//output
-	mServices.registrationService->setLastRegistrationTime(QDateTime::currentDateTime());//Instead of restart
+	mServices->registration()->setLastRegistrationTime(QDateTime::currentDateTime());//Instead of restart
 	QString text = QString("Contour from %1").arg(tool->getName());
-	mServices.registrationService->applyPatientRegistration(new_rMpr, text);
+	mServices->registration()->applyPatientRegistration(new_rMpr, text);
 }
 
 void RMPCFromPointerWidget::onShown()

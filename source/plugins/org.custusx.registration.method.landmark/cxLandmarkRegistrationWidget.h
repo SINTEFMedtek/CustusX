@@ -65,7 +65,7 @@ class LandmarkRegistrationWidget: public RegistrationBaseWidget
 Q_OBJECT
 
 public:
-	LandmarkRegistrationWidget(RegServices services, QWidget* parent, QString objectName,
+	LandmarkRegistrationWidget(RegServicesPtr services, QWidget* parent, QString objectName,
 		QString windowTitle);
 	virtual ~LandmarkRegistrationWidget();
 

@@ -74,7 +74,7 @@ CameraStyleForView::CameraStyleForView(CoreServicesPtr backend) :
 	mPreRenderListener.reset(new ViewportPreRenderListener);
 	mPreRenderListener->setCallback(boost::bind(&CameraStyleForView::onPreRender, this));
 
-	connect(mBackend->getToolManager().get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(activeToolChangedSlot()));
+	connect(mBackend->tracking().get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(activeToolChangedSlot()));
 }
 
 void CameraStyleForView::setView(ViewPtr widget)
@@ -148,7 +148,7 @@ void CameraStyleForView::moveCameraToolStyleSlot(Transform3D prMt, double timest
 	if (!camera)
 		return;
 
-	Transform3D rMpr = mBackend->getPatientService()->get_rMpr();
+	Transform3D rMpr = mBackend->patient()->get_rMpr();
 
 	Transform3D rMt = rMpr * prMt;
 
@@ -191,7 +191,7 @@ void CameraStyleForView::moveCameraToolStyleSlot(Transform3D prMt, double timest
 
 void CameraStyleForView::activeToolChangedSlot()
 {
-	ToolPtr newTool = mBackend->getToolManager()->getActiveTool();
+	ToolPtr newTool = mBackend->tracking()->getActiveTool();
 	if (newTool == mFollowingTool)
 		return;
 
@@ -209,7 +209,7 @@ void CameraStyleForView::connectTool()
 	if (!this->isToolFollowingStyle(mCameraStyleForView))
 		return;
 
-	mFollowingTool = mBackend->getToolManager()->getActiveTool();
+	mFollowingTool = mBackend->tracking()->getActiveTool();
 
 	if (!mFollowingTool)
 		return;

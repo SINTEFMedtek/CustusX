@@ -45,7 +45,7 @@ namespace cxtest {
 MetricFixture::MetricFixture()
 {
 	mMessageListener = cx::MessageListener::createWithQueue();
-	mServices = TestServices::create();
+	mServices = TestVisServices::create();
 }
 
 MetricFixture::~MetricFixture()
@@ -229,7 +229,7 @@ void MetricFixture::setPatientRegistration()
 {
 	cx::Transform3D testRegistration;
 	testRegistration = cx::Transform3D(cx::createTransformTranslate(cx::Vector3D(5,6,7)));
-	mServices->mPatientModelService->get_rMpr_History()->setRegistration(testRegistration);
+	mServices->patient()->get_rMpr_History()->setRegistration(testRegistration);
 }
 
 bool MetricFixture::verifySingleLineHeader(QStringList list, cx::DataMetricPtr metric)

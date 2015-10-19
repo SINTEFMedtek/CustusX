@@ -67,7 +67,7 @@ public:
 	BoolPropertyPtr getStreamActiveVideoSource() { return mStreamActiveVideoSource; }
 	StringPropertySelectDataPtr getDataToSend() { return mDataToSend; }
 	PatientModelServicePtr getPatientModelService() { return mPatientModelService; }
-	VisualizationServicePtr getViewService() { return mViewService; }
+	ViewServicePtr getViewService() { return mViewService; }
 	VideoServicePtr getVideoService() { return mVideoService; }
 	NetworkConnectionHandlePtr getOpenIGTLink();
 
@@ -85,7 +85,7 @@ private:
 	NetworkConnectionHandlePtr mOpenIGTLink;
 
 	PatientModelServicePtr mPatientModelService;
-	VisualizationServicePtr mViewService;
+	ViewServicePtr mViewService;
 	VideoServicePtr mVideoService;
 
 	VideoSourcePtr mStreamingVideoSource;

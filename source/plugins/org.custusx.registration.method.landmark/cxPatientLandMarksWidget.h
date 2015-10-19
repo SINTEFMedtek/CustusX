@@ -54,7 +54,7 @@ class org_custusx_registration_method_landmark_EXPORT PatientLandMarksWidget: pu
 Q_OBJECT
 
 public:
-	PatientLandMarksWidget(RegServices services, QWidget* parent, QString objectName,
+	PatientLandMarksWidget(RegServicesPtr services, QWidget* parent, QString objectName,
 		QString windowTitle); ///< sets up layout and connects signals and slots
 	virtual ~PatientLandMarksWidget(); ///< empty
 

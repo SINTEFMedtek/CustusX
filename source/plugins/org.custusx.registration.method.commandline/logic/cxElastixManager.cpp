@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ElastixManager::ElastixManager(RegServices services) :
+ElastixManager::ElastixManager(RegServicesPtr services) :
 	mServices(services)
 {
 	mOptions = profile()->getXmlSettings().descend(ElastixParameters::getConfigUid());
@@ -90,25 +90,25 @@ void ElastixManager::preprocessExecuter()
 {
 	QStringList parameterFiles = mParameters->getActiveParameterFiles();
 	QString timestamp = QDateTime::currentDateTime().toString(timestampSecondsFormat());
-	QDir outDir(mServices.patientModelService->getActivePatientFolder()+"/"+mParameters->getConfigUid()+"/"+timestamp);
+	QDir outDir(mServices->patient()->getActivePatientFolder()+"/"+mParameters->getConfigUid()+"/"+timestamp);
 
 	mExecuter->setDisplayProcessMessages(mDisplayProcessMessages->getValue());
 	mExecuter->setInput(mParameters->getActiveExecutable()->getEmbeddedPath().getAbsoluteFilepath(),
-					 mServices.registrationService->getFixedData(),
-					 mServices.registrationService->getMovingData(),
+					 mServices->registration()->getFixedData(),
+					 mServices->registration()->getMovingData(),
 	         outDir.absolutePath(),
 	         parameterFiles);
 
 	if (mDisableRendering->getValue())
 	{
-		mServices.visualizationService->enableRender(false);
+		mServices->view()->enableRender(false);
 	}
 }
 
 void ElastixManager::executionFinishedSlot()
 {
 	if (mDisableRendering->getValue())
-		mServices.visualizationService->enableRender(true);
+		mServices->view()->enableRender(true);
 
 	bool ok = false;
 	Transform3D mMf = mExecuter->getAffineResult_mMf(&ok);
@@ -131,15 +131,15 @@ void ElastixManager::executionFinishedSlot()
 	// as the input to regmanager applyImage2ImageRegistration()
 
 	Transform3D delta_pre_rMd =
-		mServices.registrationService->getFixedData()->get_rMd()
+		mServices->registration()->getFixedData()->get_rMd()
 		* mMf.inv()
-		* mServices.registrationService->getMovingData()->get_rMd().inv();
+		* mServices->registration()->getMovingData()->get_rMd().inv();
 
 //	std::cout << "ElastixManager::executionFinishedSlot(), delta_pre_rMd: \n" << delta_pre_rMd << std::endl;
-//	std::cout << "ElastixManager::executionFinishedSlot(), expected new rMdm: \n" << mServices.registrationService->getFixedData()->get_rMd() * mMf.inv() << std::endl;
+//	std::cout << "ElastixManager::executionFinishedSlot(), expected new rMdm: \n" << mServices->registration()->getFixedData()->get_rMd() * mMf.inv() << std::endl;
 
-//	mServices.registrationService->applyImage2ImageRegistration(mMf.inv(), desc);
-	mServices.registrationService->applyImage2ImageRegistration(delta_pre_rMd, desc);
+//	mServices->registration()->applyImage2ImageRegistration(mMf.inv(), desc);
+	mServices->registration()->applyImage2ImageRegistration(delta_pre_rMd, desc);
 
 	// add nonlinear data AFTER registering - we dont want these data to be double-registered!
 	this->addNonlinearData();
@@ -157,7 +157,7 @@ void ElastixManager::addNonlinearData()
 	if (!ok)
 		return;
 
-	ImagePtr movingImage = boost::dynamic_pointer_cast<Image>(mServices.registrationService->getMovingData());
+	ImagePtr movingImage = boost::dynamic_pointer_cast<Image>(mServices->registration()->getMovingData());
 	ImagePtr raw = boost::dynamic_pointer_cast<Image>(MetaImageReader().load(nonlinearVolumeFilename, nonlinearVolumeFilename));
 
 	if (!raw)
@@ -169,14 +169,14 @@ void ElastixManager::addNonlinearData()
 	QString uid = movingImage->getUid() + "_nl%1";
 	QString name = movingImage->getName()+" nl%1";
 
-	ImagePtr nlVolume = createDerivedImage(mServices.patientModelService,
+	ImagePtr nlVolume = createDerivedImage(mServices->patient(),
 										 uid, name,
 										 raw->getBaseVtkImageData(), movingImage);
 
 	// volume is resampled into the space of the fixed data:
-	nlVolume->get_rMd_History()->setRegistration(mServices.registrationService->getFixedData()->get_rMd());
+	nlVolume->get_rMd_History()->setRegistration(mServices->registration()->getFixedData()->get_rMd());
 
-	mServices.patientModelService->insertData(nlVolume);
+	mServices->patient()->insertData(nlVolume);
 
 	report(QString("Added volume %1, created by a nonlinear transform").arg(nlVolume->getName()));
 }

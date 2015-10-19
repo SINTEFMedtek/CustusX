@@ -108,7 +108,7 @@ void BinaryThinningImageFilter3DFilter::createInputTypes()
 {
 	SelectDataStringPropertyBasePtr temp;
 
-	temp = StringPropertySelectImage::New(mServices->getPatientService());
+	temp = StringPropertySelectImage::New(mServices->patient());
 	temp->setValueName("Input");
 	temp->setHelp("Select binary volume input for thinning");
 	//    connect(temp.get(), SIGNAL(dataChanged(QString)), this, SLOT(imageChangedSlot(QString)));
@@ -119,7 +119,7 @@ void BinaryThinningImageFilter3DFilter::createOutputTypes()
 {
 	SelectDataStringPropertyBasePtr temp;
 
-	temp = StringPropertySelectMesh::New((mServices->getPatientService()));
+	temp = StringPropertySelectMesh::New((mServices->patient()));
 	temp->setValueName("Output");
 	temp->setHelp("Output centerline model");
 	mOutputTypes.push_back(temp);
@@ -188,7 +188,7 @@ bool BinaryThinningImageFilter3DFilter::postProcess()
 
 	ImagePtr input = this->getCopiedInputImage();
 
-	ImagePtr outImage = createDerivedImage(mServices->getPatientService(),
+	ImagePtr outImage = createDerivedImage(mServices->patient(),
 										 input->getUid() + "_cl_temp%1", input->getName()+" cl_temp%1",
 										 mRawResult, input);
 
@@ -200,11 +200,11 @@ bool BinaryThinningImageFilter3DFilter::postProcess()
 
 	QString uid = input->getUid() + "_cl%1";
 	QString name = input->getName()+" cl%1";
-	MeshPtr mesh = mServices->getPatientService()->createSpecificData<Mesh>(uid, name);
+	MeshPtr mesh = mServices->patient()->createSpecificData<Mesh>(uid, name);
 	mesh->setVtkPolyData(centerlinePolyData);
 	mesh->setColor(outputColor->getValue());
 	mesh->get_rMd_History()->setParentSpace(input->getUid());
-	mServices->getPatientService()->insertData(mesh);
+	mServices->patient()->insertData(mesh);
 
 	// set output
 	mOutputTypes.front()->setValue(mesh->getUid());

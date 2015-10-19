@@ -149,7 +149,7 @@ bool LevelSetFilter::preProcess()
 	filename = (patientService()->getActivePatientFolder()
 			+ "/" + inputImage->getFilename()).toStdString();
 
-	seedPoint = getSeedPointFromTool(mServices->getSpaceProvider(), inputImage);
+	seedPoint = getSeedPointFromTool(mServices->spaceProvider(), inputImage);
 	if (!isSeedPointInsideImage(seedPoint, inputImage))
 	{
 		std::cout << "Seed point is not inside image!" << std::endl;

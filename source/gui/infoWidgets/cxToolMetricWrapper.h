@@ -50,7 +50,7 @@ class cxGui_EXPORT ToolMetricWrapper : public MetricBase
 {
   Q_OBJECT
 public:
-  explicit ToolMetricWrapper(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, cx::ToolMetricPtr data);
+  explicit ToolMetricWrapper(ViewServicePtr viewService, PatientModelServicePtr patientModelService, cx::ToolMetricPtr data);
   virtual ~ToolMetricWrapper();
   virtual QWidget* createWidget();
   virtual QString getValue() const;

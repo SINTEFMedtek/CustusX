@@ -58,7 +58,7 @@ class org_custusx_registration_EXPORT RegistrationMethodService : public QObject
 {
 	Q_OBJECT
 public:
-	RegistrationMethodService(RegServices services) :
+	RegistrationMethodService(RegServicesPtr services) :
 	mServices(services) {}
     virtual ~RegistrationMethodService() {}
 
@@ -68,7 +68,7 @@ public:
 	virtual QString getRegistrationMethod() = 0;
 
 protected:
-	RegServices mServices;
+	RegServicesPtr mServices;
 };
 
 } //namespace cx

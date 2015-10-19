@@ -100,7 +100,7 @@ USAcqusitionWidget::USAcqusitionWidget(AcquisitionServicePtr acquisitionService,
 	editsLayout->setColumnStretch(1,1);
 	mLayout->addLayout(editsLayout);
 
-	new LabeledComboBoxWidget(this, StringPropertyActiveProbeConfiguration::New(mServices->getToolManager()), editsLayout, 0);
+	new LabeledComboBoxWidget(this, StringPropertyActiveProbeConfiguration::New(mServices->tracking()), editsLayout, 0);
 	sscCreateDataWidget(this, mUsReconstructionService->getParam("Preset"), editsLayout, 1);
 
 	QAction* optionsAction = this->createAction(this,
@@ -139,12 +139,12 @@ QWidget* USAcqusitionWidget::createOptionsWidget()
 	QGridLayout* layout = new QGridLayout(retval);
 	layout->setMargin(0);
 
-	SoundSpeedConverterWidget* soundSpeedWidget = new SoundSpeedConverterWidget(mServices->getToolManager(), this);
+	SoundSpeedConverterWidget* soundSpeedWidget = new SoundSpeedConverterWidget(mServices->tracking(), this);
 
 	ProbeConfigWidget* probeWidget = new ProbeConfigWidget(mServices, this);
 	probeWidget->getActiveProbeConfigWidget()->setVisible(false);
 
-	SpinBoxGroupWidget* temporalCalibrationWidget = new SpinBoxGroupWidget(this, DoublePropertyTimeCalibration::New(mServices->getToolManager()));
+	SpinBoxGroupWidget* temporalCalibrationWidget = new SpinBoxGroupWidget(this, DoublePropertyTimeCalibration::New(mServices->tracking()));
 
 	int line = 0;
 	layout->addWidget(this->createHorizontalLine(), line++, 0, 1, 1);

@@ -65,7 +65,7 @@ public:
 						ctkPluginContext* context);
 
 	PatientModelServicePtr getDataManager();
-	TrackingServicePtr getToolManager();
+	TrackingServicePtr tracking();
 	SpaceProviderPtr getSpaceProvider();
 	ctkPluginContext* mContext;
 

@@ -106,10 +106,17 @@ public:
 
 	virtual CoordinateSystem getCoordinateSystem();
 
+	//Moved from Image
+	// methods for defining and storing clip planes. Data does not use these data, this is up to the mapper
+	virtual void addPersistentClipPlane(vtkPlanePtr plane);
+	virtual std::vector<vtkPlanePtr> getAllClipPlanes();
+	virtual void clearPersistentClipPlanes();
+	virtual void setInteractiveClipPlane(vtkPlanePtr plane); ///< set a plane that is not saved
 
 signals:
 	void transformChanged(); ///< emitted when transform is changed
 	void propertiesChanged(); ///< emitted when one of the metadata properties (uid, name etc) changes
+	void clipPlanesChanged();
 
 protected slots:
 	virtual void transformChangedSlot()
@@ -125,6 +132,9 @@ protected:
 
 	REGISTRATION_STATUS mRegistrationStatus;
 	RegistrationHistoryPtr m_rMd_History;
+	//Moved from Image
+	std::vector<vtkPlanePtr> mPersistentClipPlanes;
+	vtkPlanePtr mInteractiveClipPlane;
 
 private:
 	Data(const Data& other);

@@ -69,7 +69,7 @@ Q_OBJECT
 
 public:
 
-	ImageLandmarksWidget(RegServices services, QWidget* parent, QString objectName,
+	ImageLandmarksWidget(RegServicesPtr services, QWidget* parent, QString objectName,
 		QString windowTitle, bool useRegistrationFixedPropertyInsteadOfActiveImage = false); ///< sets up layout and connects signals and slots
 	virtual ~ImageLandmarksWidget(); ///< empty
 

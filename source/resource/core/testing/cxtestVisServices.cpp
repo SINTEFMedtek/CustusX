@@ -30,7 +30,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxtestDummyDataManager.h"
+#include "cxtestVisServices.h"
 
 #include "cxDataFactory.h"
 #include "cxDummyToolManager.h"
@@ -43,52 +43,76 @@ namespace cxtest
 {
 
 
-TestServicesType createDummyCoreServices()
+//TestServicesType createDummyCoreServices()
+//{
+//	TestServicesType retval;
+//	retval.mPatientModelService.reset(new PatientModelServiceMock());
+//	cx::TrackingServicePtr trackingService = cx::DummyToolManager::create();
+
+//	cx::SpaceProviderPtr spaceProvider;
+//	spaceProvider.reset(new cx::SpaceProviderImpl(trackingService, retval.mPatientModelService));
+//	retval.mSpaceProvider = spaceProvider;
+//	retval.mTrackingService = trackingService;
+//	return retval;
+//}
+
+TestVisServicesPtr TestVisServices::create()
 {
-	TestServicesType retval;
-	retval.mPatientModelService.reset(new PatientModelServiceMock());
+	return TestVisServicesPtr(new TestVisServices());
+}
+
+TestVisServices::TestVisServices() :
+	cx::VisServices()
+{
+	cx::reporter()->initialize();
+	this->mPatientModelService.reset(new PatientModelServiceMock());
 	cx::TrackingServicePtr trackingService = cx::DummyToolManager::create();
 
 	cx::SpaceProviderPtr spaceProvider;
-	spaceProvider.reset(new cx::SpaceProviderImpl(trackingService, retval.mPatientModelService));
-	retval.mSpaceProvider = spaceProvider;
-	retval.mTrackingService = trackingService;
-	return retval;
+	spaceProvider.reset(new cx::SpaceProviderImpl(trackingService, this->mPatientModelService));
+	this->mSpaceProvider = spaceProvider;
+	this->mTrackingService = trackingService;
 }
 
-void destroyDummyCoreServices(TestServicesType& services)
+TestVisServices::~TestVisServices()
 {
-	requireUnique(services.mSpaceProvider, "SpaceProvider");
-	services.mSpaceProvider.reset();
-
-	requireUnique(services.mPatientModelService, "PatientModelService");
-	services.mPatientModelService.reset();
-
-	requireUnique(services.mTrackingService, "TrackingService");
-	services.mTrackingService.reset();
-
 	cx::Reporter::shutdown();
 }
 
-TestServicesPtr TestServices::create()
-{
-	return TestServicesPtr(new TestServices());
-}
+//void destroyDummyCoreServices(TestServicesType& services)
+//{
+//	requireUnique(services.mSpaceProvider, "SpaceProvider");
+//	services.mSpaceProvider.reset();
 
-TestServices::TestServices()
-{
-	cx::reporter()->initialize();
+//	requireUnique(services.mPatientModelService, "PatientModelService");
+//	services.mPatientModelService.reset();
 
-	TestServicesType data = createDummyCoreServices();
+//	requireUnique(services.mTrackingService, "TrackingService");
+//	services.mTrackingService.reset();
 
-	mPatientModelService = data.mPatientModelService;
-	mSpaceProvider = data.mSpaceProvider;
-	mTrackingService = data.mTrackingService;
-}
+//	cx::Reporter::shutdown();
+//}
 
-TestServices::~TestServices()
-{
-	destroyDummyCoreServices(*this);
-}
+//TestServicesPtr TestServices::create()
+//{
+//	return TestServicesPtr(new TestServices());
+//}
+
+//TestServices::TestServices()
+//{
+//	cx::reporter()->initialize();
+
+//	TestServicesType data = createDummyCoreServices();
+
+//	mPatientModelService = data.mPatientModelService;
+//	mSpaceProvider = data.mSpaceProvider;
+//	mTrackingService = data.mTrackingService;
+//}
+
+//TestServices::~TestServices()
+//{
+//	destroyDummyCoreServices(*this);
+//}
+
 
 } // namespace cx
