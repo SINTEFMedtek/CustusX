@@ -31,13 +31,17 @@
 #include "cxVLCRecorder.h"
 #include "cxImportDataDialog.h"
 #include "cxExportDataDialog.h"
+#include "cxScreenShotImageWriter.h"
+#include "cxViewCollectionWidget.h"
+#include "cxViewCollectionImageWriter.h"
 
 namespace cx
 {
 
 MainWindowActions::MainWindowActions(VisServicesPtr services, QWidget *parent) :
 	QObject(parent),
-	mServices(services)
+	mServices(services),
+	mScreenShotWriter(ScreenShotImageWriter::create(services->patient()))
 {
 	this->createActions();
 }
@@ -293,31 +297,26 @@ void MainWindowActions::importDataSlot()
 
 void MainWindowActions::shootScreen()
 {
-	QDesktopWidget* desktop = qApp->desktop();
-	QList<QScreen*> screens = qApp->screens();
-
-	for (int i=0; i<desktop->screenCount(); ++i)
-	{
-		QWidget* screenWidget = desktop->screen(i);
-		WId screenWinId = screenWidget->winId();
-		QRect geo = desktop->screenGeometry(i);
-		QString name = "";
-		if (desktop->screenCount()>1)
-        {
-			name = screens[i]->name().split(" ").join("");
-            //On windows screens[i]->name() is "\\.\DISPLAY1",
-            //Have to remove unvalid chars for the filename
-            name.replace("\\", "");
-            name.replace(".", "");
-        }
-		this->saveScreenShot(screens[i]->grabWindow(screenWinId, geo.left(), geo.top(), geo.width(), geo.height()), name);
-	}
+	mScreenShotWriter->grabAllScreensToFile();
 }
 
 void MainWindowActions::shootWindow()
 {
-	QScreen* screen = qApp->primaryScreen();
-	this->saveScreenShot(screen->grabWindow(this->parentWidget()->winId()));
+	this->shootOneLayout(0);
+
+//	int index=0;
+//	while (mServices->view()->getLayoutWidget(NULL, index))
+//		this->shootOneLayout(index++);
+}
+
+void MainWindowActions::shootOneLayout(int index)
+{
+	QWidget* widget = mServices->view()->getLayoutWidget(NULL, index);
+	ViewCollectionWidget* vcWidget = dynamic_cast<ViewCollectionWidget*>(widget);
+
+	ViewCollectionImageWriter grabber(vcWidget);
+	QImage pm = grabber.grab();
+	mScreenShotWriter->save(pm, QString("_layout%1").arg(index));
 }
 
 void MainWindowActions::recordFullscreen()
@@ -354,25 +353,6 @@ void MainWindowActions::onStartLogConsole()
 //	std::cout << "MainWindowActions::onStartLogConsole() " << fullname << std::endl;
 	mLocalVideoServerProcess.reset(new ProcessWrapper(QString("LogConsole")));
 	mLocalVideoServerProcess->launchWithRelativePath(fullname, QStringList());
-}
-
-void MainWindowActions::saveScreenShot(QPixmap pixmap, QString id)
-{
-	QString ending = "png";
-	if (!id.isEmpty())
-		ending = id + "." + ending;
-	QString path = patientService()->generateFilePath("Screenshots", ending);
-	QtConcurrent::run(boost::bind(&MainWindowActions::saveScreenShotThreaded, this, pixmap.toImage(), path));
-}
-
-/**Intended to be called in a separate thread.
- * \sa saveScreenShot()
- */
-void MainWindowActions::saveScreenShotThreaded(QImage pixmap, QString filename)
-{
-	pixmap.save(filename, "png");
-	report("Saved screenshot to " + filename);
-	reporter()->playScreenShotSound();
 }
 
 void MainWindowActions::toggleStreamingSlot()

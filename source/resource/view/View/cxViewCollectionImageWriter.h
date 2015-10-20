@@ -29,8 +29,8 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXSCREENVIDEOPROVIDER_H
-#define CXSCREENVIDEOPROVIDER_H
+#ifndef CXVIEWCOLLECTIONIMAGEWRITER_H
+#define CXVIEWCOLLECTIONIMAGEWRITER_H
 
 #include <QObject>
 #include <QPointer>
@@ -38,7 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 #include "cxVisServices.h"
 #include "cxForwardDeclarations.h"
-#include "cxScreenShotImageWriter.h"
 
 typedef vtkSmartPointer<class vtkWindowToImageFilter> vtkWindowToImageFilterPtr;
 typedef vtkSmartPointer<class vtkPNGWriter> vtkPNGWriterPtr;
@@ -46,48 +45,23 @@ typedef vtkSmartPointer<class vtkUnsignedCharArray> vtkUnsignedCharArrayPtr;
 
 namespace cx
 {
+class ViewCollectionWidget;
 
-class SecondaryViewLayoutWindow: public QWidget
+/**
+ *
+ */
+class ViewCollectionImageWriter
 {
-Q_OBJECT
-
 public:
-	SecondaryViewLayoutWindow(QWidget* parent, ViewServicePtr viewService);
-	~SecondaryViewLayoutWindow() {}
-
-	void tryShowOnSecondaryScreen();
-
-protected:
-	virtual void showEvent(QShowEvent* event);
-	virtual void hideEvent(QCloseEvent* event);
-	virtual void closeEvent(QCloseEvent *event);
+	explicit ViewCollectionImageWriter(ViewCollectionWidget* widget);
+	QImage grab();
 private:
-	QString toString(QRect r) const;
-	int findSmallestSecondaryScreen();
+	vtkImageDataPtr view2vtkImageData(ViewPtr view);
+	QImage vtkImageData2QImage(vtkImageDataPtr input);
 
-	ViewServicePtr mViewService;
-};
-
-class ScreenVideoProvider : public QObject
-{
-	Q_OBJECT
-public:
-	ScreenVideoProvider(VisServicesPtr services);
-
-	void saveScreenShot(QImage image, QString id);
-	QByteArray generatePNGEncoding(QImage image);
-//	void saveScreenShotThreaded(QImage pixmap, QString filename);
-	QPixmap grabScreen(unsigned screenid);
-	void showSecondaryLayout();
-	QImage grabSecondaryLayout();
-private:
-	VisServicesPtr mServices;
-	QPointer<class SecondaryViewLayoutWindow> mSecondaryViewLayoutWindow;
-//	new SecondaryViewLayoutWindow(this)
-	ScreenShotImageWriter mWriter;
+	ViewCollectionWidget* mWidget;
 };
 
 } // namespace cx
 
-
-#endif // CXSCREENVIDEOPROVIDER_H
+#endif // CXVIEWCOLLECTIONIMAGEWRITER_H

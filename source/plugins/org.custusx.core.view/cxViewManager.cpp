@@ -182,7 +182,9 @@ NavigationPtr ViewManager::getNavigation()
 
 QWidget *ViewManager::getLayoutWidget(QWidget* parent, int index)
 {
-	CX_ASSERT(index < mLayoutWidgets.size());
+	if (index >= mLayoutWidgets.size())
+		return NULL;
+//	CX_ASSERT(index < mLayoutWidgets.size()); // removed: must be allowed to iterate until NULL
 	if (!mLayoutWidgets[index])
 	{
         bool optimizedViews = settings()->value("optimizedViews").toBool();

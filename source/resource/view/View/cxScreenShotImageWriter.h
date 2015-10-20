@@ -29,8 +29,8 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXSCREENVIDEOPROVIDER_H
-#define CXSCREENVIDEOPROVIDER_H
+#ifndef CXSCREENSHOTIMAGEWRITER_H
+#define CXSCREENSHOTIMAGEWRITER_H
 
 #include <QObject>
 #include <QPointer>
@@ -38,56 +38,30 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 #include "cxVisServices.h"
 #include "cxForwardDeclarations.h"
-#include "cxScreenShotImageWriter.h"
-
-typedef vtkSmartPointer<class vtkWindowToImageFilter> vtkWindowToImageFilterPtr;
-typedef vtkSmartPointer<class vtkPNGWriter> vtkPNGWriterPtr;
-typedef vtkSmartPointer<class vtkUnsignedCharArray> vtkUnsignedCharArrayPtr;
 
 namespace cx
 {
+typedef boost::shared_ptr<class ScreenShotImageWriter> ScreenShotImageWriterPtr;
 
-class SecondaryViewLayoutWindow: public QWidget
+/**
+ *
+ */
+class ScreenShotImageWriter
 {
-Q_OBJECT
-
 public:
-	SecondaryViewLayoutWindow(QWidget* parent, ViewServicePtr viewService);
-	~SecondaryViewLayoutWindow() {}
+	static ScreenShotImageWriterPtr create(PatientModelServicePtr patient) { return ScreenShotImageWriterPtr(new ScreenShotImageWriter(patient)); }
+	void grabAllScreensToFile();
 
-	void tryShowOnSecondaryScreen();
+	void save(QImage image, QString id);
+	QString getName(unsigned screenid);
+	QPixmap grab(unsigned screenid);
 
-protected:
-	virtual void showEvent(QShowEvent* event);
-	virtual void hideEvent(QCloseEvent* event);
-	virtual void closeEvent(QCloseEvent *event);
+	ScreenShotImageWriter(PatientModelServicePtr patient);
+
 private:
-	QString toString(QRect r) const;
-	int findSmallestSecondaryScreen();
-
-	ViewServicePtr mViewService;
-};
-
-class ScreenVideoProvider : public QObject
-{
-	Q_OBJECT
-public:
-	ScreenVideoProvider(VisServicesPtr services);
-
-	void saveScreenShot(QImage image, QString id);
-	QByteArray generatePNGEncoding(QImage image);
-//	void saveScreenShotThreaded(QImage pixmap, QString filename);
-	QPixmap grabScreen(unsigned screenid);
-	void showSecondaryLayout();
-	QImage grabSecondaryLayout();
-private:
-	VisServicesPtr mServices;
-	QPointer<class SecondaryViewLayoutWindow> mSecondaryViewLayoutWindow;
-//	new SecondaryViewLayoutWindow(this)
-	ScreenShotImageWriter mWriter;
+	PatientModelServicePtr mPatient;
 };
 
 } // namespace cx
 
-
-#endif // CXSCREENVIDEOPROVIDER_H
+#endif // CXSCREENSHOTIMAGEWRITER_H

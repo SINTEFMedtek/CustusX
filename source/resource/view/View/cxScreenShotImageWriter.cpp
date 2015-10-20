@@ -29,7 +29,8 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include "cxScreenVideoProvider.h"
+#include "cxScreenShotImageWriter.h"
+
 
 #include <QPixmap>
 #include "cxPatientModelService.h"
@@ -54,87 +55,82 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-SecondaryViewLayoutWindow::SecondaryViewLayoutWindow(QWidget* parent, ViewServicePtr viewService) :
-	QWidget(parent),
-	mViewService(viewService)
+namespace // unnamed
 {
-	this->setLayout(new QVBoxLayout(this));
-	this->layout()->setMargin(0);
-	this->setWindowTitle("View Layout");
+/**Intended to be called in a separate thread.
+ * \sa saveScreenShot()
+ */
+void saveScreenShotThreaded(QImage pixmap, QString filename)
+{
+	pixmap.save(filename, "png");
+	report("Saved screenshot to " + filename);
+	reporter()->playScreenShotSound();
+}
+} // unnamed ns
+
+ScreenShotImageWriter::ScreenShotImageWriter(PatientModelServicePtr patient) :
+	mPatient(patient)
+{
 }
 
-void SecondaryViewLayoutWindow::showEvent(QShowEvent* event)
+void ScreenShotImageWriter::grabAllScreensToFile()
 {
-	QWidget* widget = mViewService->getLayoutWidget(this, 1);
-	this->layout()->addWidget(widget);
-	if (mViewService->getActiveLayout(1).isEmpty())
-		mViewService->setActiveLayout("LAYOUT_OBLIQUE_3DAnyDual_x1", 1);
+	QDesktopWidget* desktop = qApp->desktop();
+	QList<QScreen*> screens = qApp->screens();
+
+	for (int i=0; i<desktop->screenCount(); ++i)
+	{
+		QPixmap pm = this->grab(i);
+		QString name = this->getName(i);
+		this->save(pm.toImage(), name);
+	}
 }
 
-void SecondaryViewLayoutWindow::hideEvent(QCloseEvent* event)
+void ScreenShotImageWriter::save(QImage image, QString id)
 {
-	mViewService->setActiveLayout("", 1);
+	QString ending = "png";
+	if (!id.isEmpty())
+		ending = id + "." + ending;
+	QString path = mPatient->generateFilePath("Screenshots", ending);
+	QtConcurrent::run(boost::bind(&saveScreenShotThreaded, image, path));
 }
 
-void SecondaryViewLayoutWindow::closeEvent(QCloseEvent *event)
+QPixmap ScreenShotImageWriter::grab(unsigned screenid)
 {
-	mViewService->setActiveLayout("", 1);
+	QDesktopWidget* desktop = qApp->desktop();
+	QList<QScreen*> screens = qApp->screens();
+
+	QWidget* screenWidget = desktop->screen(screenid);
+	WId screenWinId = screenWidget->winId();
+	QRect geo = desktop->screenGeometry(screenid);
+//	QString name = "";
+//	if (desktop->screenCount()>1)
+//	{
+//		name = screens[screenid]->name().split(" ").join("");
+//		//On windows screens[i]->name() is "\\.\DISPLAY1",
+//		//Have to remove unvalid chars for the filename
+//		name.replace("\\", "");
+//		name.replace(".", "");
+//	}
+	QPixmap pixmap = screens[screenid]->grabWindow(screenWinId, geo.left(), geo.top(), geo.width(), geo.height());
+	return pixmap;
 }
 
-
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
-
-ScreenVideoProvider::ScreenVideoProvider(VisServicesPtr services) :
-	mServices(services),
-	mWriter(services->patient())
+QString ScreenShotImageWriter::getName(unsigned screenid)
 {
+	QDesktopWidget* desktop = qApp->desktop();
+	QList<QScreen*> screens = qApp->screens();
 
+	QString name = "";
+	if (desktop->screenCount()>1)
+	{
+		name = screens[screenid]->name().split(" ").join("");
+		//On windows screens[i]->name() is "\\.\DISPLAY1",
+		//Have to remove unvalid chars for the filename
+		name.replace("\\", "");
+		name.replace(".", "");
+	}
+	return name;
 }
-
-
-void ScreenVideoProvider::saveScreenShot(QImage image, QString id)
-{
-	mWriter.save(image,id);
-}
-
-QByteArray ScreenVideoProvider::generatePNGEncoding(QImage image)
-{
-	QByteArray ba;
-	QBuffer buffer(&ba);
-	buffer.open(QIODevice::WriteOnly);
-	image.save(&buffer, "PNG"); // writes image into ba in PNG format//	QString ending = "png";
-	return ba;
-}
-
-QPixmap ScreenVideoProvider::grabScreen(unsigned screenid)
-{
-	return mWriter.grab(screenid);
-}
-
-
-\
-void ScreenVideoProvider::showSecondaryLayout()
-{
-	std::cout << "show window" << std::endl;
-	if (!mSecondaryViewLayoutWindow)
-		mSecondaryViewLayoutWindow = new SecondaryViewLayoutWindow(NULL, mServices->view());
-	mSecondaryViewLayoutWindow->show();
-
-	QRect rect = QRect(QPoint(50,50), QSize(320,568));
-	mSecondaryViewLayoutWindow->setGeometry(rect);
-	mSecondaryViewLayoutWindow->move(rect.topLeft());
-}
-
-QImage ScreenVideoProvider::grabSecondaryLayout()
-{
-	QWidget* widget = mServices->view()->getLayoutWidget(NULL, 1);
-	ViewCollectionWidget* vcWidget = dynamic_cast<ViewCollectionWidget*>(widget);
-
-	ViewCollectionImageWriter grabber(vcWidget);
-	return grabber.grab();
-}
-
 
 } // namespace cx

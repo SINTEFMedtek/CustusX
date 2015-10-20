@@ -18,6 +18,7 @@ namespace cx
 {
 typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 typedef boost::shared_ptr<class ProcessWrapper> ProcessWrapperPtr;
+typedef boost::shared_ptr<class ScreenShotImageWriter> ScreenShotImageWriterPtr;
 
 /**
  * Contains the actions previously located inside the
@@ -80,13 +81,13 @@ private:
 
 	QString mLastImportDataFolder;
 	ProcessWrapperPtr mLocalVideoServerProcess;
+	ScreenShotImageWriterPtr mScreenShotWriter;
 
 	void createPatientActions();
 	void createTrackingActions();
 	QString getExistingSessionFolder();
 	QWidget* parentWidget();
-	void saveScreenShot(QPixmap pixmap, QString id="");
-	void saveScreenShotThreaded(QImage pixmap, QString filename);
+	void shootOneLayout(int index);
 
 	template <class T>
 	QAction* createAction(QString uid, QString text, QIcon icon,

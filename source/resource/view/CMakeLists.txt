@@ -5,6 +5,7 @@
 cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
     View/cxView
     View/cxViewCollectionWidget
+	View/cxViewCollectionVideoSource
 
     View/internal/cxViewRepCollection
     View/internal/ViewMixed/cxViewCollectionWidgetMixed
@@ -82,7 +83,9 @@ cx_add_class( CX_RESOURCE_VISUALIZATION_FILES
     View/internal/ViewWidget/cxViewCache.h
     View/internal/ViewWidget/cxViewLinkingViewWidget
     View/internal/ViewContainer/cxViewLinkingViewContainerItem
-    cxViewServiceNull
+	View/cxViewCollectionImageWriter
+	View/cxScreenShotImageWriter
+	cxViewServiceNull
     cxViewServiceProxy
     cxVisServices
     cxNavigation
