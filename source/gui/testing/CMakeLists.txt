@@ -55,6 +55,7 @@ if(BUILD_TESTING)
         cxGUIExtenderService
         cxPluginUtilities
         cxCatch
+        cxtest_org_custusx_core_patientmodel
     )
     cx_add_tests_to_catch(cxtestGui)
 

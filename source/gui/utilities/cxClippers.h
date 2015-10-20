@@ -30,49 +30,49 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXCLIPPERSWIDGET_H
-#define CXCLIPPERSWIDGET_H
+#ifndef CXCLIPPERS_H
+#define CXCLIPPERS_H
 
-#include "cxGuiExport.h"
-
-#include "cxBaseWidget.h"
+#include <QStringList>
 #include "cxForwardDeclarations.h"
-#include "cxStringProperty.h"
+#include "cxPatientStorage.h"
 
-namespace cx
-{
-typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
+namespace cx {
 typedef boost::shared_ptr<class Clippers> ClippersPtr;
+typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
 
-//--------------------------------------
-
-/**\brief Widget for managing clippers.
+/**\brief Clipper container. Used by ClippersWidget.
  *
  *  \date Oct, 2015
  *  \author Ole Vegard Solberg, SINTEF
  */
-class cxGui_EXPORT ClippersWidget: public BaseWidget
+class Clippers : public QObject
 {
-Q_OBJECT
+	Q_OBJECT
 public:
-	ClippersWidget(VisServicesPtr services, QWidget* parent);
+	Clippers(VisServicesPtr services);
+	void importList(QString clippers);
+	QString exportList();
+	InteractiveClipperPtr getClipper(QString clipperName);
+	void add(QString clipperName, InteractiveClipperPtr clipper);
+	void remove(QString clipperName);
+	bool exists(QString clipperName);
+	int size() {return mClippers.size();}
+	QStringList getClipperNames();
+
+signals:
+	void changed();
 
 protected:
 	VisServicesPtr mServices;
-	QVBoxLayout* mLayout;
-	StringPropertyPtr mClipperSelector;
+	PatientStorage mStorage;
+	std::map<QString, InteractiveClipperPtr> mClippers;
+	QStringList mClipperList;
 
-	ClippersPtr mClippers;
-	InteractiveClipperPtr mCurrentClipper;
-
-	void setupUI();
-	void initClipperSelector();
-	QString getNameBaseOfCurrentClipper();
-protected slots:
-	void newClipperButtonClicked();
-	void clipperChanged();
-private slots:
-	void clippersChanged();
+	void createDefaultClippers();
+	QStringList getInitialClipperNames();
 };
+
 }//cx
-#endif // CXCLIPPERSWIDGET_H
+
+#endif // CXCLIPPERS_H

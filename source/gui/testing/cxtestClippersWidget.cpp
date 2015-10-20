@@ -31,8 +31,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "catch.hpp"
 #include "cxClippersWidget.h"
+#include "cxClippers.h"
 #include "cxVisServices.h"
 #include "cxtestDirectSignalListener.h"
+#include "cxTypeConversions.h"
+#include "cxDataLocations.h"
+#include "cxLogger.h"
+#include "cxtestSessionStorageTestFixture.h"
 
 namespace cxtest
 {
@@ -46,26 +51,62 @@ public:
 	ClippersWidgetFixture(cx::VisServicesPtr services, QWidget* parent) :
 		ClippersWidget(services, parent)
 	{}
+	void initWithDefaultClippers()
+	{
+		this->mClippers->importList(QString());
+	}
 };
 
+class ClippersFixture : public cx::Clippers
+{
+public:
+	ClippersFixture() :
+		Clippers(cx::VisServices::getNullObjects())
+	{}
+	QStringList getInitialClipperNames()
+	{
+		return cx::Clippers::getInitialClipperNames();
+	}
+	void initWithDefaultClippers()
+	{
+		this->importList(QString());
+	}
+};
 
 TEST_CASE_METHOD(cxtest::ClippersWidgetFixture, "ClippersWidget: Init default clippers", "[unit][gui][widget]")
 {
-	REQUIRE(this->getInitialClipperNames().size() == 6);
+	this->mClippers->importList(QString());//Init with default clippers
+
 	REQUIRE(this->mClippers->size() == 6);
 	REQUIRE_FALSE(this->mClipperSelector->getValue().isEmpty());
 }
 
+TEST_CASE_METHOD(cxtest::ClippersFixture, "Clippers: Init default clippers", "[unit][gui][widget]")
+{
+	this->initWithDefaultClippers();
+	REQUIRE(this->getInitialClipperNames().size() == 6);
+	REQUIRE(this->size() == 6);
+}
+
 TEST_CASE_METHOD(cxtest::ClippersWidgetFixture, "ClippersWidget: Select clipper", "[unit][gui][widget]")
 {
-	QString clipperName = this->getInitialClipperNames().at(3);
+	this->mClippers->importList(QString());//Init with default clippers
+
+	ClippersFixture clippersFixture;
+	QStringList defaultNames = clippersFixture.getInitialClipperNames();
+
+	QString clipperName = defaultNames.at(3);
+	REQUIRE_FALSE(clipperName.isEmpty());
+	this->mClipperSelector->setValue(clipperName);
+
+	clipperName = defaultNames.at(2);
 	REQUIRE_FALSE(clipperName.isEmpty());
 
 	cxtest::DirectSignalListener clippersChangedSignal(this->mClipperSelector.get(), SIGNAL(changed()));
 	this->mClipperSelector->setValue(clipperName);
 	CHECK(clippersChangedSignal.isReceived());
 
-	REQUIRE(mClippers->at(clipperName));
+	REQUIRE(mCurrentClipper);
 }
 
 TEST_CASE_METHOD(cxtest::ClippersWidgetFixture, "ClippersWidget: Create new clipper", "[unit][gui][widget]")
@@ -82,6 +123,7 @@ TEST_CASE_METHOD(cxtest::ClippersWidgetFixture, "ClippersWidget: Create new clip
 
 TEST_CASE_METHOD(cxtest::ClippersWidgetFixture, "ClippersWidget: Automatic naming of new clipper", "[unit][gui][widget]")
 {
+	this->initWithDefaultClippers();
 	QString clipperName = mClipperSelector->getValue();
 	this->newClipperButtonClicked();
 
@@ -97,10 +139,22 @@ TEST_CASE_METHOD(cxtest::ClippersWidgetFixture, "ClippersWidget: Automatic namin
 	CHECK(clipperName3.endsWith("3"));
 }
 
-TEST_CASE_METHOD(cxtest::ClippersWidgetFixture, "Selected clipper is remembered", "[unit][gui][widget]")
+TEST_CASE_METHOD(cxtest::ClippersWidgetFixture, "ClippersWidget: Load clipper names", "[unit][gui][widget]")
 {
-	QString clipperName = this->getInitialClipperNames().at(3);
+	this->initWithDefaultClippers();
+	QStringList range = this->mClipperSelector->getValueRange();
+	CHECK(range.size() == 6);
 }
 
+//TEST_CASE_METHOD(cxtest::ClippersWidgetFixture, "ClippersWidget: New patient gets default clippers", "[unit][gui][widget]")
+//{
+//	cxtest::SessionStorageTestFixture storageFixture;
+
+//	storageFixture.createSessions();
+//	storageFixture.loadSession1();
+
+//	QStringList range = this->mClipperSelector->getValueRange();
+//	CHECK(range.size() == 6);
+//}
 
 }//cxtest

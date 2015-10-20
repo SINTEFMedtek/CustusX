@@ -31,64 +31,33 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxClippersWidget.h"
-#include <boost/foreach.hpp>
 #include <QPushButton>
 #include "cxLabeledComboBoxWidget.h"
 #include "cxInteractiveClipper.h"
 #include "cxVisServices.h"
 #include "cxLogger.h"
-#include "cxEnumConverter.h"
 #include "cxProfile.h"
-#include "cxClippingWidget.h"//To use StringPropertyClipPlane. Fix
+#include "cxClippers.h"
 
 namespace cx
 {
 
 ClippersWidget::ClippersWidget(VisServicesPtr services, QWidget* parent) :
 	BaseWidget(parent, "ClippersWidget", "Clippers"),
-	mServices(services)
+	mServices(services),
+	mClippers(new Clippers(services))
 {
-	this->setupDataStructures();
 	this->setupUI();
-}
+	connect(mClippers.get(), &Clippers::changed, this, &ClippersWidget::clippersChanged);
 
-void ClippersWidget::setupDataStructures()
-{
-	mClippers.reset(new std::map<QString, InteractiveClipperPtr>());
-	createDefaultClippers();
-}
-
-void ClippersWidget::createDefaultClippers()
-{
-	QStringList clipperNames = this->getInitialClipperNames();
-
-	BOOST_FOREACH(QString name, clipperNames)
-	{
-		InteractiveClipperPtr interactiveClipper = InteractiveClipperPtr(new InteractiveClipper(mServices));
-
-		PLANE_TYPE plane = string2enum<PLANE_TYPE> (name);
-		interactiveClipper->setSlicePlane(plane);
-		(*mClippers.get())[name] = interactiveClipper;
-	}
-}
-
-QStringList ClippersWidget::getInitialClipperNames()
-{
-	InteractiveClipperPtr interactiveClipper = InteractiveClipperPtr(new InteractiveClipper(mServices));
-	StringPropertyBasePtr planeAdapter = StringPropertyClipPlane::New(interactiveClipper);
-	QStringList clipperNames = planeAdapter->getValueRange();
-	return clipperNames;
 }
 
 void ClippersWidget::initClipperSelector()
 {
-
 	XmlOptionFile mOptions = profile()->getXmlSettings().descend("clippers");
 
-	QStringList range = this->getInitialClipperNames();
+	QStringList range = mClippers->getClipperNames();
 	mClipperSelector = StringProperty::initialize("clipperSelector", "Clipper", "Select clipper", "", range, mOptions.getElement());
-	if(mClipperSelector->getValue().isEmpty())
-		mClipperSelector->setValue(this->getInitialClipperNames().first());
 	connect(mClipperSelector.get(), &Property::changed, this, &ClippersWidget::clipperChanged);
 }
 
@@ -98,14 +67,20 @@ void ClippersWidget::setupUI()
 	LabeledComboBoxWidget* clipperSelectorBox = new LabeledComboBoxWidget(this, mClipperSelector);
 
 	QPushButton* newClipperButton = new QPushButton("Create clipper", this);
-	newClipperButton->setToolTip("Create new clipper");
+	newClipperButton->setToolTip("Create new clipper based on currently selected");
 
-	QVBoxLayout* layout = new QVBoxLayout(this);
-	layout->addWidget(newClipperButton);
-	layout->addWidget(clipperSelectorBox);
-	layout->addStretch();
+	mLayout = new QVBoxLayout(this);
+	mLayout->addWidget(newClipperButton);
+	mLayout->addWidget(clipperSelectorBox);
+	mLayout->addStretch();
 
 	connect(newClipperButton, &QPushButton::clicked, this, &ClippersWidget::newClipperButtonClicked);
+}
+
+void ClippersWidget::clippersChanged()
+{
+	CX_LOG_DEBUG() << "ClippersWidget::clippersChanged()";
+	mClipperSelector->setValueRange(mClippers->getClipperNames());
 }
 
 void ClippersWidget::clipperChanged()
@@ -114,7 +89,7 @@ void ClippersWidget::clipperChanged()
 	if(clipperName.isEmpty())
 		return;
 
-	InteractiveClipperPtr clipper = mClippers->at(clipperName);
+	mCurrentClipper = mClippers->getClipper(clipperName);
 }
 
 void ClippersWidget::newClipperButtonClicked()
@@ -124,10 +99,10 @@ void ClippersWidget::newClipperButtonClicked()
 	QString clipperName = nameBase;
 
 	int i = 2;
-	while(mClippers->find(clipperName) != mClippers->end())
+	while(mClippers->exists(clipperName))
 		clipperName = nameBase + QString(" %1").arg(i++);
 
-	(*mClippers.get())[clipperName] = interactiveClipper;
+	mClippers->add(clipperName, interactiveClipper);
 
 	QStringList range = mClipperSelector->getValueRange();
 	range << clipperName;
