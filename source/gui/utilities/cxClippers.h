@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QStringList>
 #include "cxForwardDeclarations.h"
-#include "cxPatientStorage.h"
+//#include "cxPatientStorage.h"
 
 namespace cx {
 typedef boost::shared_ptr<class Clippers> ClippersPtr;
@@ -65,9 +65,10 @@ signals:
 
 protected:
 	VisServicesPtr mServices;
-	PatientStorage mStorage;
+//	PatientStorage mStorage;
 	std::map<QString, InteractiveClipperPtr> mClippers;
-	QStringList mClipperList;
+	QStringList mClipperList;//remove
+//	StringPropertyPtr mClipperList;
 
 	void createDefaultClippers();
 	QStringList getInitialClipperNames();

@@ -36,33 +36,48 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxInteractiveClipper.h"
 #include "cxEnumConverter.h"
 #include "cxClippingWidget.h"//To use StringPropertyClipPlane. Fix
+#include "cxXmlOptionItem.h"
+#include "cxProfile.h"
+#include "cxStringProperty.h"
+#include "cxXmlOptionItem.h"
 
 
 namespace cx
 {
 
 Clippers::Clippers(VisServicesPtr services) :
-	mServices(services),
-	mStorage(services->session(), "Clippers")
+	mServices(services)
+//	mStorage(services->session(), "Clippers")
 {
-	mStorage.storeVariable("clipperList", boost::bind(&Clippers::exportList, this), boost::bind(&Clippers::importList, this, _1));
+	this->createDefaultClippers();
+//	mStorage.storeVariable("clipperList", boost::bind(&Clippers::exportList, this), boost::bind(&Clippers::importList, this, _1));
+
+	XmlOptionFile mOptions = profile()->getXmlSettings().descend("clippers");
+
+
+	//TODO: Store clippers in profile file instead of patient file
+//	QString defaultValue = this->getInitialClipperNames().join(';');
+//	mClipperList = StringProperty::initialize("clipperList", "Clipper List",
+//										"List of clippers",
+//										defaultValue, mOptions.getElement());
+
+
+
+//	XmlOptionItem xmlStore = XmlOptionItem("clipperList", mOptions.toElement());
+//	this->importList(xmlStore.readValue(this->getInitialClipperNames().join(';')));
 }
 
 void Clippers::importList(QString clippers)
 {
-	CX_LOG_DEBUG() << "Clippers::importList: " << clippers;
 	mClipperList.clear();
 	if(!clippers.isEmpty())
 		mClipperList = clippers.split(';');
 
-	if(mClipperList.isEmpty())
-		this->createDefaultClippers();
 	emit changed();
 }
 
 QString Clippers::exportList()
 {
-	CX_LOG_DEBUG() << "Clippers::exportList: " << mClipperList.join(';');
 	return mClipperList.join(';');
 }
 

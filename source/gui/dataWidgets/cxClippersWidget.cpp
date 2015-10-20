@@ -81,6 +81,15 @@ void ClippersWidget::clippersChanged()
 {
 	CX_LOG_DEBUG() << "ClippersWidget::clippersChanged()";
 	mClipperSelector->setValueRange(mClippers->getClipperNames());
+
+	QStringList range = mClipperSelector->getValueRange();
+	if(!range.contains(mClipperSelector->getValue()))
+	{
+		if(range.isEmpty())
+			mClipperSelector->setValue("");
+		else
+			mClipperSelector->setValue(range.first());
+	}
 }
 
 void ClippersWidget::clipperChanged()
