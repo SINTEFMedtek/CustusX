@@ -302,11 +302,11 @@ void MainWindowActions::shootScreen()
 
 void MainWindowActions::shootWindow()
 {
-	this->shootOneLayout(0);
+//	this->shootOneLayout(0);
 
-//	int index=0;
-//	while (mServices->view()->getLayoutWidget(NULL, index))
-//		this->shootOneLayout(index++);
+	int index=0;
+	while (mServices->view()->getLayoutWidget(NULL, index))
+		this->shootOneLayout(index++);
 }
 
 void MainWindowActions::shootOneLayout(int index)

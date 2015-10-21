@@ -58,6 +58,8 @@ public:
 private:
 	vtkImageDataPtr view2vtkImageData(ViewPtr view);
 	QImage vtkImageData2QImage(vtkImageDataPtr input);
+	void printViewport(vtkRendererPtr renderer);
+	void drawImageAtPos(QImage& target, vtkImageDataPtr image, QPoint pos);
 
 	ViewCollectionWidget* mWidget;
 };
