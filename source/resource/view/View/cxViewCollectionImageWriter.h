@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMainWindow>
 #include "vtkSmartPointer.h"
 #include "cxVisServices.h"
+#include "cxLayoutData.h"
 #include "cxForwardDeclarations.h"
 
 typedef vtkSmartPointer<class vtkWindowToImageFilter> vtkWindowToImageFilterPtr;
@@ -47,20 +48,19 @@ namespace cx
 {
 class ViewCollectionWidget;
 
-/**
+/** Write the previously rendered contents of the input ViewCollectionWidget
+ *  to a vtkImageData.
  *
  */
 class ViewCollectionImageWriter
 {
 public:
 	explicit ViewCollectionImageWriter(ViewCollectionWidget* widget);
-	QImage grab();
+    vtkImageDataPtr grab();
+    static QImage vtkImageData2QImage(vtkImageDataPtr input);
 private:
 	vtkImageDataPtr view2vtkImageData(ViewPtr view);
-	QImage vtkImageData2QImage(vtkImageDataPtr input);
-	void printViewport(vtkRendererPtr renderer);
-	void drawImageAtPos(QImage& target, vtkImageDataPtr image, QPoint pos);
-
+    void drawImageAtPos(vtkImageDataPtr target, vtkImageDataPtr image, QPoint pos);
 	ViewCollectionWidget* mWidget;
 };
 

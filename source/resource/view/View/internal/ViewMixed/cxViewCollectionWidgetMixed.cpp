@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewUtilities.h"
 #include "vtkRenderWindow.h"
 #include "cxGLHelpers.h"
-
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -152,6 +152,17 @@ void ViewCollectionWidgetMixed::setGridMargin(int val)
 	mLayout->setMargin(val);
 }
 
+int ViewCollectionWidgetMixed::getGridSpacing() const
+{
+    return mLayout->spacing();
+}
+
+int ViewCollectionWidgetMixed::getGridMargin() const
+{
+    return mLayout->margin();
+}
+
+
 std::vector<ViewPtr> ViewCollectionWidgetMixed::getViews()
 {
 	std::vector<ViewPtr> retval = mBaseLayout->getViews();
@@ -162,7 +173,25 @@ std::vector<ViewPtr> ViewCollectionWidgetMixed::getViews()
 
 LayoutRegion ViewCollectionWidgetMixed::getLayoutRegion(QString view)
 {
-	return mRegions[view];
+    return mRegions[view];
+}
+
+QPoint ViewCollectionWidgetMixed::getPosition(ViewPtr view)
+{
+    for (unsigned i=0; i<mOverlays.size(); ++i)
+    {
+        if (mOverlays[i]->getView()==view)
+        {
+            QPoint p = mOverlays[i]->mapToGlobal(QPoint(0,0));
+            p = this->mapFromGlobal(p);
+            return p;
+        }
+    }
+
+    QPoint p = mBaseLayout->getPosition(view);
+    p = mBaseLayout->mapToGlobal(p);
+    p = this->mapFromGlobal(p);
+    return p;
 }
 
 } /* namespace cx */

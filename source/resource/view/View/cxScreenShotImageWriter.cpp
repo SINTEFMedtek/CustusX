@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPNGWriter.h"
 #include "vtkUnsignedCharArray.h"
 #include <QPainter>
-#include "cxViewCollectionImageWriter.h"
+//#include "cxViewCollectionImageWriter.h"
 
 namespace cx
 {

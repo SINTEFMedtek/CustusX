@@ -133,7 +133,7 @@ QImage ScreenVideoProvider::grabSecondaryLayout()
 	ViewCollectionWidget* vcWidget = dynamic_cast<ViewCollectionWidget*>(widget);
 
 	ViewCollectionImageWriter grabber(vcWidget);
-	return grabber.grab();
+    return ViewCollectionImageWriter::vtkImageData2QImage(grabber.grab());
 }
 
 

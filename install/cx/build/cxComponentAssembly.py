@@ -46,6 +46,7 @@ class LibraryAssembly(object):
         self.addComponent(cxComponents.IGSTK())
         self.addComponent(cxComponents.CTK())
         self.addComponent(cxComponents.OpenCLUtilityLibrary())
+        self.addComponent(cxComponents.QHTTPServer())
         self.addComponent(cxComponents.TubeSegmentationFramework());
         if (platform.system() == 'Linux') or (platform.system() == 'Darwin'):
             self.addComponent(cxComponents.LevelSetSegmentation());

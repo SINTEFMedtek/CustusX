@@ -279,6 +279,27 @@ class OpenCV(CppComponent):
         builder.configureCMake()
 # ---------------------------------------------------------
 
+class QHTTPServer(CppComponent):
+    def name(self):
+        return "QHTTPServer"
+    def help(self):
+        return 'https://github.com/nikhilm/qhttpserver'
+    def path(self):
+        return self.controlData.getExternalPath() + "/QHTTPServer"
+    def getBuildType(self):
+        return self.controlData.getBuildExternalsType()
+    def _rawCheckout(self):
+        self._getBuilder().gitClone('git@github.com:SINTEFMedtek/qhttpserver.git', 'QHTTPServer')
+    def update(self):
+        self._getBuilder().gitCheckout('master')
+    def configure(self):
+        builder = self._getBuilder()
+        add = builder.addCMakeOption
+        add('BUILD_TESTING:BOOL', False)
+        add('BUILD_EXAMPLES:BOOL', False)
+        builder.configureCMake()
+# ---------------------------------------------------------
+
 class Eigen(CppComponent):
     def name(self):
         return "eigen"

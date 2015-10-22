@@ -315,7 +315,7 @@ void MainWindowActions::shootOneLayout(int index)
 	ViewCollectionWidget* vcWidget = dynamic_cast<ViewCollectionWidget*>(widget);
 
 	ViewCollectionImageWriter grabber(vcWidget);
-	QImage pm = grabber.grab();
+    QImage pm = ViewCollectionImageWriter::vtkImageData2QImage(grabber.grab());
 	mScreenShotWriter->save(pm, QString("_layout%1").arg(index));
 }
 

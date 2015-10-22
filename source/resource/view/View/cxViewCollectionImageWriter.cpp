@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPNGWriter.h"
 #include "vtkUnsignedCharArray.h"
 #include <QPainter>
+#include "cxVolumeHelpers.h"
 
 namespace cx
 {
@@ -59,96 +60,38 @@ ViewCollectionImageWriter::ViewCollectionImageWriter(ViewCollectionWidget* widge
 
 }
 
-QImage ViewCollectionImageWriter::grab()
+vtkImageDataPtr ViewCollectionImageWriter::grab()
 {
 	std::vector<ViewPtr> views = mWidget->getViews();
-	QSize size = mWidget->size();
-	CX_LOG_CHANNEL_DEBUG("CA") << "grab layout size " << size.width() << "," << size.height();
+    Eigen::Array3i target_size(mWidget->width(), mWidget->height(), 1);
+    vtkImageDataPtr target = generateVtkImageData(target_size, Vector3D(1,1,1), 150, 3);
 
-//	QImage target(QSize(320, 568), QImage::Format_RGB888);
-	QImage target(size, QImage::Format_RGB888);
-	target.fill(QColor("red"));
-//	QPainter painter(&target);
-
-	LayoutRegion totalRegion = mWidget->getLayoutRegion(views[0]->getUid());
-	for (unsigned i=1; i<views.size(); ++i)
-	{
-		totalRegion = merge(totalRegion, mWidget->getLayoutRegion(views[i]->getUid()));
-	}
-
-//	mWidget->render();
-
-	CX_LOG_CHANNEL_DEBUG("CA") << "views: " << views.size();
 	for (unsigned i=0; i<views.size(); ++i)
 	{
-		CX_LOG_CHANNEL_DEBUG("CA") << "view " << i;
-		vtkImageDataPtr vtkImage = this->view2vtkImageData(views[i]);
-
-//		vtkPNGWriterPtr pngWriter = vtkPNGWriterPtr::New();
-//		pngWriter->SetFileName("/Users/christiana/Patients/Laboratory/2015-10-20_19-06_Laboratory_15.cx3/tst.png");
-//		pngWriter->SetInputData(vtkImage);
-//		pngWriter->Write();
-
-//		QImage qImage = vtkImageData2QImage(vtkImage);
-//		qImage = qImage.mirrored(false, true);
-
-		this->printViewport(views[i]->getRenderer());
-
-		LayoutRegion region = mWidget->getLayoutRegion(views[i]->getUid());
-		CX_LOG_CHANNEL_DEBUG("CA") << QString("  region %1 %2, %3 %4 ")
-									  .arg(region.pos.col).arg(region.pos.row)
-									  .arg(region.span.col).arg(region.span.row);
-
-		QPoint pos;
-		pos.setX(double(region.pos.col) / double(totalRegion.span.col) * target.size().width());
-		pos.setY(double(region.pos.row) / double(totalRegion.span.row) * target.size().height());
-		CX_LOG_CHANNEL_DEBUG("CA") << "  pos: " << pos.x() << ", " << pos.y();
-
+        vtkImageDataPtr vtkImage = this->view2vtkImageData(views[i]);
+        QPoint pos = mWidget->getPosition(views[i]);
 		this->drawImageAtPos(target, vtkImage, pos);
+    }
 
-//		painter.drawImage(pos, qImage);
-	}
-
-	return target;
+    return target;
 }
 
-void ViewCollectionImageWriter::drawImageAtPos(QImage& target, vtkImageDataPtr image, QPoint pos)
+void ViewCollectionImageWriter::drawImageAtPos(vtkImageDataPtr target, vtkImageDataPtr image, QPoint pos)
 {
-	// draw each line in image to target, at pos
-//	unsigned char* src = reinterpret_cast<unsigned char*>(image->GetScalarPointer());
-	unsigned char* dst = target.bits();
-	Eigen::Array3i dim(image->GetDimensions());
-	int depth = 3;
+    unsigned char* src = reinterpret_cast<unsigned char*>(image->GetScalarPointer());
+    unsigned char* dst = reinterpret_cast<unsigned char*>(target->GetScalarPointer());
+    Eigen::Array3i dim_src(image->GetDimensions());
+    int depth = 3;
+    CX_ASSERT(target->GetNumberOfScalarComponents()==depth);
+    CX_ASSERT(image->GetNumberOfScalarComponents()==depth);
 
-	CX_LOG_CHANNEL_DEBUG("CA") << "    target: " << target.width() << "," << target.height() << " - " << target.depth();
-	CX_LOG_CHANNEL_DEBUG("CA") << "    dims:   " << dim;
-	CX_LOG_CHANNEL_DEBUG("CA") << "    pos:    " << pos.x() << ", " << pos.y();
-//	image->Print(std::cout);
-	std::vector<uchar> flat(dim[0]*depth, 100);
-
-	CX_LOG_CHANNEL_DEBUG("CA") << "    bytesperline:   " <<target.bytesPerLine() ;
-	CX_LOG_CHANNEL_DEBUG("CA") << "    assumed bytes/line:   " << depth * target.width() ;
-
-	for (int y=0; y<dim[1]; ++y)
+    for (int y=0; y<dim_src[1]; ++y)
 	{
-		uchar* dstline = target.scanLine(pos.y()+y) + depth * pos.x();
-//		uchar* dstline = dst + depth * (target.width()*(pos.y()+y) + pos.x());
-//		uchar* srcline = src + (dim[0]*depth*y); // increment?
-		unsigned char* srcline = reinterpret_cast<unsigned char*>(image->GetScalarPointer(0,y,0));
-//		memcpy(dstline, srcline, dim[0]*depth);
-		memcpy(dstline, &*flat.begin(), dim[0]*depth);
-	}
+        unsigned char* src = reinterpret_cast<unsigned char*>(image->GetScalarPointer(0,y,0));
+        unsigned char* dst = reinterpret_cast<unsigned char*>(target->GetScalarPointer(pos.x(),pos.y()+y,0));
+        memcpy(dst, src, dim_src[0]*depth);
+    }
 
-}
-
-void ViewCollectionImageWriter::printViewport(vtkRendererPtr renderer)
-{
-	Eigen::Array4d vp(renderer->GetViewport());
-
-	CX_LOG_CHANNEL_DEBUG("CA") << "  norm viewport" << vp;
-	renderer->NormalizedViewportToViewport(vp.data()[0], vp.data()[1]);
-	renderer->NormalizedViewportToViewport(vp.data()[2], vp.data()[3]);
-	CX_LOG_CHANNEL_DEBUG("CA") << "  viewport" << vp;
 }
 
 vtkImageDataPtr ViewCollectionImageWriter::view2vtkImageData(ViewPtr view)
@@ -159,20 +102,22 @@ vtkImageDataPtr ViewCollectionImageWriter::view2vtkImageData(ViewPtr view)
 	w2i->SetViewport(vp.data());
 	w2i->SetReadFrontBuffer(false);
 	w2i->Update();
-	CX_LOG_CHANNEL_DEBUG("CA") << "Updated view " << vp;
 	vtkImageDataPtr image = w2i->GetOutput();
 	return image;
 }
 
 QImage ViewCollectionImageWriter::vtkImageData2QImage(vtkImageDataPtr input)
 {
-//	input->Print(std::cout);
-	unsigned char* ptr = reinterpret_cast<unsigned char*>(input->GetScalarPointer());
-	Eigen::Array3i dim(input->GetDimensions());
-//	int len = image->GetNumberOfScalarComponents() * image->GetScalarSize() * dim[0] * dim[1];
+    CX_ASSERT(input->GetNumberOfScalarComponents()==3);
+    CX_ASSERT(input->GetScalarType() == VTK_UNSIGNED_CHAR);
 
-	QImage retval(ptr, dim[0], dim[1], QImage::Format_RGB888);
-	return retval;
+    unsigned char* ptr = reinterpret_cast<unsigned char*>(input->GetScalarPointer());
+	Eigen::Array3i dim(input->GetDimensions());
+
+    // important: input the line length. This will not copy the buffer.
+    QImage retval(ptr, dim[0], dim[1], dim[0]*3, QImage::Format_RGB888);
+    // copy contents into image, then flip according to conventions vtk<->qt.
+    return retval.copy().mirrored(false, true);
 }
 
 

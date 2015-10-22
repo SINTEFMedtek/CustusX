@@ -36,6 +36,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxViewContainerItem.h"
 #include "cxViewContainer.h"
+#include "vtkRenderer.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -103,6 +105,16 @@ void ViewCollectionWidgetUsingViewContainer::setGridMargin(int val)
 	mViewContainer->getGridLayout()->setMargin(val);
 }
 
+int ViewCollectionWidgetUsingViewContainer::getGridSpacing() const
+{
+    return mViewContainer->getGridLayout()->spacing();
+}
+
+int ViewCollectionWidgetUsingViewContainer::getGridMargin() const
+{
+    return mViewContainer->getGridLayout()->margin();
+}
+
 std::vector<ViewPtr> ViewCollectionWidgetUsingViewContainer::getViews()
 {
 	return mViews;
@@ -111,6 +123,15 @@ std::vector<ViewPtr> ViewCollectionWidgetUsingViewContainer::getViews()
 LayoutRegion ViewCollectionWidgetUsingViewContainer::getLayoutRegion(QString view)
 {
 	return mRegions[view];
+}
+
+QPoint ViewCollectionWidgetUsingViewContainer::getPosition(ViewPtr view)
+{
+    Eigen::Array2i p_vc(view->getRenderer()->GetOrigin());
+    QPoint p(p_vc[0], p_vc[1]);
+    p = mViewContainer->mapToGlobal(p);
+    p = this->mapFromGlobal(p);
+    return p;
 }
 
 

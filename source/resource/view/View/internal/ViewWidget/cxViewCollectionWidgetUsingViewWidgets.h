@@ -65,11 +65,15 @@ public:
 	virtual void render();
 	virtual void setGridSpacing(int val);
 	virtual void setGridMargin(int val);
-	virtual std::vector<ViewPtr> getViews();
+    virtual int getGridSpacing() const;
+    virtual int getGridMargin() const;
+    virtual std::vector<ViewPtr> getViews();
 	virtual LayoutRegion getLayoutRegion(QString view);
+    virtual QPoint getPosition(ViewPtr view);
 
 private:
 	ViewWidget* retrieveView(View::Type type);
+    ViewWidget* WidgetFromView(ViewPtr view);
 
 	boost::shared_ptr<ViewCache<ViewWidget> > mViewCache2D;
 	boost::shared_ptr<ViewCache<ViewWidget> > mViewCache3D;
