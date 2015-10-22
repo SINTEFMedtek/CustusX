@@ -43,6 +43,7 @@ class QTableWidget;
 namespace cx
 {
 typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
+typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
 
 class ClipperWidget : public BaseWidget
 {
@@ -55,18 +56,42 @@ protected:
 private slots:
 	void setClipPlaneInDatas();
 	void setupDataSelectorUI();
+	void enable(bool checked);
+	void dataTypeSelectorClicked(bool checked);
+	void selectAllTableData(bool checked);
+	void dataSelectorClicked(bool checked);
 private:
 	void setupUI();
 
 	InteractiveClipperPtr mClipper;
-//	StringPropertyBasePtr mPlaneAdapter;
+	StringPropertyBasePtr mPlaneAdapter;
 	QVBoxLayout* mLayout;
 	QCheckBox* mUseClipperCheckBox;
+	QCheckBox *mAttachedToTool;
+	QCheckBox *mSelectAllData;
+	QCheckBox *mInvertPlane;
+
+	QCheckBox *mShowImages;
+	QCheckBox *mShowMeshes;
+	QCheckBox *mShowMetrics;
+	QCheckBox *mShowTrackedStreams;
+
 	VisServicesPtr mServices;
 	std::map<QString, DataPtr> mDataToClip;
 	QTableWidget *mDataTableWidget;
 	QMap<QString, QCheckBox*> mCheckBoxes;
 	std::map<QString, DataPtr> getDatas();
+	bool mInitializedWithClipper;
+	StringPropertySelectToolPtr mToolSelector;
+	void setupDataStructures();
+	void connectToNewClipper();
+	QGroupBox *dataTableWidget();
+	QLayout *planeLayout();
+	QLayout *toolLayout();
+	QString getDataTypeRegExp();
+	void removeAllClipPlanes();
+	void checkOldCheckBoxesThatAreStillWalid(QMap<QString, QCheckBox*> oldCheckBoxes);
+	void createNewCheckboxesBasedOnData();
 };
 
 }

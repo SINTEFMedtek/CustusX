@@ -32,78 +32,204 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QListWidget>
 #include <QTableWidget>
-//#include <QMap>
+#include <QGroupBox>
 #include "cxClipperWidget.h"
 #include "cxClippingWidget.h" //Using StringPropertyClipPlane. Fix
 #include "cxLabeledComboBoxWidget.h"
 #include "cxInteractiveClipper.h"
 #include "cxVisServices.h"
 #include "cxPatientModelService.h"
-//#include "cxData.h"
 #include "cxImage.h"
 #include "cxMesh.h"
 #include "cxLogger.h"
+#include "cxStringPropertySelectTool.h"
+#include "cxSelectDataStringPropertyBase.h"
 
 namespace cx
 {
 
 ClipperWidget::ClipperWidget(VisServicesPtr services, QWidget* parent) :
 	BaseWidget(parent, "ClipperWidget", "Clipper"),
-	mServices(services)
+	mServices(services),
+	mInitializedWithClipper(false)
 {
-	this->setupUI();
+	this->setEnabled(false);
+	this->setupDataStructures();
 
 	connect(mServices->patient().get(), &PatientModelService::dataAddedOrRemoved, this, &OptimizedUpdateWidget::setModified);
 }
 
-void ClipperWidget::setupUI()
+void ClipperWidget::setupDataStructures()
 {
-//	QGroupBox* activeClipGroupBox = new QGroupBox("Interactive clipper");
-//	activeClipGroupBox->setToolTip(this->toolTip());
-//	layout->addWidget(activeClipGroupBox);
-//	QVBoxLayout* activeClipLayout = new QVBoxLayout(activeClipGroupBox);
-
-
 	mLayout = new QVBoxLayout(this);
-
-	//Skip plane selector for now
-//	mPlaneAdapter = StringPropertyClipPlane::New(mClipper);
-//	LabeledComboBoxWidget* planeSelector = new LabeledComboBoxWidget(this, mPlaneAdapter);
-//	mLayout->addWidget(planeSelector);
-
-
 	mUseClipperCheckBox = new QCheckBox("Enable");
 	mUseClipperCheckBox->setToolTip("Enable/disable interactive clipper.");
+	mUseClipperCheckBox->setChecked(true);
 
-	mLayout->addWidget(mUseClipperCheckBox);
+	mAttachedToTool = new QCheckBox("Attach to tool");
+	mAttachedToTool->setEnabled(true);
+	mSelectAllData = new QCheckBox("Select all");
+	mInvertPlane = new QCheckBox("Invert plane");
 
+	mShowImages = new QCheckBox("Images");
+	mShowMeshes = new QCheckBox("Meshes");
+	mShowMetrics = new QCheckBox("Metrics");
+	mShowTrackedStreams = new QCheckBox("TrackedStreams");
+	mShowImages->setChecked(true);
+	mShowMeshes->setChecked(true);
 
+	connect(mSelectAllData, &QCheckBox::clicked, this, &ClipperWidget::selectAllTableData);
+
+	connect(mShowImages, &QCheckBox::clicked, this, &ClipperWidget::dataTypeSelectorClicked);
+	connect(mShowMeshes, &QCheckBox::clicked, this, &ClipperWidget::dataTypeSelectorClicked);
+	connect(mShowMetrics, &QCheckBox::clicked, this, &ClipperWidget::dataTypeSelectorClicked);
+	connect(mShowTrackedStreams, &QCheckBox::clicked, this, &ClipperWidget::dataTypeSelectorClicked);
+
+	//TODO: Need active tool in addition to tool list. Also need to connect this to mClipper
+	mToolSelector = StringPropertySelectTool::New(mServices->tracking());
+	mToolSelector->setValueName("Tool");
 	mDataTableWidget = new QTableWidget(this);
-	mLayout->addWidget(mDataTableWidget);
+}
+
+void ClipperWidget::setupUI()
+{
+	if(!mClipper || mInitializedWithClipper)
+		return;
+	mInitializedWithClipper = true;
+
+	mLayout->addLayout(this->planeLayout());
+	mLayout->addLayout(this->toolLayout());
+	mLayout->addWidget(this->dataTableWidget());
+	mLayout->addWidget(mUseClipperCheckBox);
 
 	mLayout->addStretch();
 
 	if(mClipper)
-		connect(mUseClipperCheckBox, &QCheckBox::toggled, mClipper.get(), &InteractiveClipper::useClipper);
+		connect(mUseClipperCheckBox, &QCheckBox::toggled, this, &ClipperWidget::enable);
+
+}
+
+void ClipperWidget::enable(bool checked)
+{
+	if(checked)
+		this->setClipPlaneInDatas();
+	else
+		this->removeAllClipPlanes();
+
+	mClipper->useClipper(checked);
+}
+
+QLayout *ClipperWidget::planeLayout()
+{
+	mPlaneAdapter = StringPropertyClipPlane::New(mClipper);
+	LabeledComboBoxWidget* planeSelector = new LabeledComboBoxWidget(this, mPlaneAdapter);
+
+	QHBoxLayout *layout = new QHBoxLayout();
+
+	layout->addWidget(planeSelector);
+	layout->addWidget(mInvertPlane);
+	return layout;
+}
+
+
+QLayout *ClipperWidget::toolLayout()
+{
+	LabeledComboBoxWidget* toolSelectorWidget = new LabeledComboBoxWidget(this, mToolSelector);
+
+	QHBoxLayout *layout = new QHBoxLayout();
+	layout->addWidget(toolSelectorWidget);
+	layout->addWidget(mAttachedToTool);
+	return layout;
+}
+
+
+QGroupBox *ClipperWidget::dataTableWidget()
+{
+	QGroupBox *groupBox = new QGroupBox("Structures to clip");
+	QVBoxLayout *layout = new QVBoxLayout();
+	QHBoxLayout *selectCheckBoxes = new QHBoxLayout();
+
+	selectCheckBoxes->addWidget(mShowImages);
+	selectCheckBoxes->addWidget(mShowMeshes);
+	selectCheckBoxes->addWidget(mShowTrackedStreams);
+	selectCheckBoxes->addWidget(mShowMetrics);
+
+	layout->addLayout(selectCheckBoxes);
+
+	layout->addWidget(mDataTableWidget);
+	layout->addWidget(mSelectAllData);
+
+	groupBox->setLayout(layout);
+
+	return groupBox;
+}
+
+void ClipperWidget::connectToNewClipper()
+{
+	if(mClipper)
+	{
+		connect(mUseClipperCheckBox, &QCheckBox::toggled, this, &ClipperWidget::enable);
+		mPlaneAdapter = StringPropertyClipPlane::New(mClipper);
+		this->setEnabled(true);
+		this->setupUI();
+		this->setupDataSelectorUI();
+	}
+	else
+		this->setEnabled(false);
 
 }
 
 void ClipperWidget::setClipper(InteractiveClipperPtr clipper)
 {
 	if(mClipper)
-		disconnect(mUseClipperCheckBox, &QCheckBox::toggled, mClipper.get(), &InteractiveClipper::useClipper);
+		disconnect(mUseClipperCheckBox, &QCheckBox::toggled, this, &ClipperWidget::enable);
 
 	mClipper = clipper;
 
-	connect(mUseClipperCheckBox, &QCheckBox::toggled, mClipper.get(), &InteractiveClipper::useClipper);
+	this->connectToNewClipper();
+}
 
-	this->setupDataSelectorUI();
+void ClipperWidget::checkOldCheckBoxesThatAreStillWalid(QMap<QString, QCheckBox*> oldCheckBoxes)
+{
+	QMap<QString, QCheckBox*>::Iterator checkboxIter = oldCheckBoxes.begin();
+	for(; checkboxIter != oldCheckBoxes.end(); ++checkboxIter)
+	{
+		if(mCheckBoxes.contains(checkboxIter.key()))
+			mCheckBoxes[checkboxIter.key()]->setChecked(checkboxIter.value()->isChecked());
+	}
+}
+
+void ClipperWidget::createNewCheckboxesBasedOnData()
+{
+	mCheckBoxes.clear();
+
+	std::map<QString, DataPtr> datas = this->getDatas();
+	std::map<QString, DataPtr>::iterator iter = datas.begin();
+
+	int row = 0;
+
+	for(; iter != datas.end(); ++iter)
+	{
+		DataPtr data = iter->second;
+		QCheckBox *checkbox = new QCheckBox();
+		checkbox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+		mDataTableWidget->setCellWidget(row, 0, checkbox);
+
+		QTableWidgetItem *descriptionItem = new QTableWidgetItem(data->getName());
+		mDataTableWidget->setItem(row++, 1, descriptionItem);
+
+		connect(checkbox, &QCheckBox::clicked, this, &ClipperWidget::dataSelectorClicked);
+		mCheckBoxes[data->getUid()] = checkbox;
+	}
 }
 
 void ClipperWidget::setupDataSelectorUI()
 {
 	if(!mClipper)
+	{
+		this->setEnabled(false);
 		return;
+	}
 
 	std::map<QString, DataPtr> datas = this->getDatas();
 
@@ -116,51 +242,40 @@ void ClipperWidget::setupDataSelectorUI()
 	mDataTableWidget->setColumnWidth(1, 300);
 //	mDataTableWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);//test
 
-	int row = 0;
-	std::map<QString, DataPtr>::iterator iter = datas.begin();
-
-	mCheckBoxes.clear();
-
-	for(; iter != datas.end(); ++iter)
-	{
-		DataPtr data = iter->second;
-		QCheckBox *checkbox = new QCheckBox();
-		checkbox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-		mDataTableWidget->setCellWidget(row, 0, checkbox);
-
-		QTableWidgetItem *descriptionItem = new QTableWidgetItem(data->getName());
-		mDataTableWidget->setItem(row++, 1, descriptionItem);
-
-		connect(checkbox, &QCheckBox::clicked, this, &ClipperWidget::setClipPlaneInDatas);
-		mCheckBoxes[data->getUid()] = checkbox;
-	}
+	QMap<QString, QCheckBox*> oldCheckBoxes = mCheckBoxes;
+	createNewCheckboxesBasedOnData();
+	checkOldCheckBoxesThatAreStillWalid(oldCheckBoxes);
 }
 
+QString ClipperWidget::getDataTypeRegExp()
+{
+	QStringList dataTypes;
+	if(mShowImages->isChecked())
+		dataTypes << "image";
+	if(mShowMeshes->isChecked())
+		dataTypes << "mesh";
+	if(mShowTrackedStreams->isChecked())
+		dataTypes << "trackedStream";
+	if(mShowMetrics->isChecked())
+		dataTypes << ".*Metric$";
+	QString typeRegExp = dataTypes.join('|');
+
+	return typeRegExp;
+}
 
 std::map<QString, DataPtr> ClipperWidget::getDatas()
 {
+	//TODO: Move SelectDataStringPropertyBase::filterOnType() to a utility file?
 	std::map<QString, DataPtr> datas = mServices->patient()->getData();
-//	std::map<QString, ImagePtr> images = mServices->patient()->getDataOfType<Image>();
-//	std::map<QString, MeshPtr> meshes = mServices->patient()->getDataOfType<Mesh>();
-
-//	std::map<QString, DataPtr> datas;
-
-//	std::map<QString, ImagePtr>::iterator imageIter;
-//	for(imageIter = images.begin(); imageIter != images.end(); ++imageIter)
-//	{
-//		datas[imageIter->first] = imageIter->second;
-//	}
-
-//	std::map<QString, MeshPtr>::iterator meshIter;
-//	for(meshIter = meshes.begin(); meshIter != meshes.end(); ++meshIter)
-//	{
-//		datas[meshIter->first] = meshIter->second;
-//	}
-
-
-	//TODO: Use SelectDataStringPropertyBase::filterOnType() to filter data on type
-
+	datas = SelectDataStringPropertyBase::filterOnType(datas, this->getDataTypeRegExp());
 	return datas;
+}
+
+void ClipperWidget::dataSelectorClicked(bool checked)
+{
+	if(!checked)
+		mSelectAllData->setChecked(false);
+	this->setClipPlaneInDatas();
 }
 
 void ClipperWidget::setClipPlaneInDatas()
@@ -179,9 +294,43 @@ void ClipperWidget::setClipPlaneInDatas()
 
 }
 
+void ClipperWidget::removeAllClipPlanes()
+{
+	QMap<QString, QCheckBox*>::const_iterator iter = mCheckBoxes.constBegin();
+	 while (iter != mCheckBoxes.constEnd())
+	 {
+		 DataPtr data = mServices->patient()->getData(iter.key());
+		 mClipper->removeClipPlaneFromData(data);
+		 ++iter;
+	 }
+}
+
+void ClipperWidget::selectAllTableData(bool checked)
+{
+	this->removeAllClipPlanes();
+
+	QMap<QString, QCheckBox*>::const_iterator iter = mCheckBoxes.constBegin();
+	 while (iter != mCheckBoxes.constEnd())
+	 {
+		 iter.value()->setChecked(checked);
+		 ++iter;
+	 }
+
+	 this->setClipPlaneInDatas();
+}
+
+void ClipperWidget::dataTypeSelectorClicked(bool checked)
+{
+	if(checked)
+		mSelectAllData->setChecked(false);
+
+	this->removeAllClipPlanes();
+	this->setupDataSelectorUI();
+	this->setClipPlaneInDatas();
+}
+
 void ClipperWidget::prePaintEvent()
 {
-	CX_LOG_DEBUG() << "ClipperWidget::prePaintEvent()";
 	this->setupDataSelectorUI();
 }
 
