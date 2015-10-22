@@ -69,13 +69,11 @@ public:
     virtual int getGridSpacing() const;
     virtual int getGridMargin() const;
     virtual std::vector<ViewPtr> getViews();
-	virtual LayoutRegion getLayoutRegion(QString view);
     virtual QPoint getPosition(ViewPtr view);
 
 private:
 	std::vector<ViewPtr> mViews;
 	class ViewContainer* mViewContainer;
-	std::map<QString, LayoutRegion> mRegions;
 };
 
 

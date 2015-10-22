@@ -73,14 +73,12 @@ ViewPtr ViewCollectionWidgetUsingViewContainer::addView(View::Type type, LayoutR
 
 	viewItem->getView()->setType(type);
 	mViews.push_back(view);
-	mRegions[viewItem->getView()->getUid()] = region;
 	return view;
 }
 
 void ViewCollectionWidgetUsingViewContainer::clearViews()
 {
 	mViews.clear();
-	mRegions.clear();
 	mViewContainer->hide();
 	mViewContainer->clear();
 }
@@ -118,11 +116,6 @@ int ViewCollectionWidgetUsingViewContainer::getGridMargin() const
 std::vector<ViewPtr> ViewCollectionWidgetUsingViewContainer::getViews()
 {
 	return mViews;
-}
-
-LayoutRegion ViewCollectionWidgetUsingViewContainer::getLayoutRegion(QString view)
-{
-	return mRegions[view];
 }
 
 QPoint ViewCollectionWidgetUsingViewContainer::getPosition(ViewPtr view)

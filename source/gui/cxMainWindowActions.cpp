@@ -305,13 +305,13 @@ void MainWindowActions::shootWindow()
 //	this->shootOneLayout(0);
 
 	int index=0;
-	while (mServices->view()->getLayoutWidget(NULL, index))
+    while (mServices->view()->getLayoutWidget(index))
 		this->shootOneLayout(index++);
 }
 
 void MainWindowActions::shootOneLayout(int index)
 {
-	QWidget* widget = mServices->view()->getLayoutWidget(NULL, index);
+    QWidget* widget = mServices->view()->getLayoutWidget(index);
 	ViewCollectionWidget* vcWidget = dynamic_cast<ViewCollectionWidget*>(widget);
 
 	ViewCollectionImageWriter grabber(vcWidget);

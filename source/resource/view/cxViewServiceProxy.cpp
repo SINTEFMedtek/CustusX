@@ -138,9 +138,14 @@ bool ViewServiceProxy::renderingIsEnabled() const
 	return mViewService->renderingIsEnabled();
 }
 
-QWidget* ViewServiceProxy::getLayoutWidget(QWidget* parent, int index)
+QWidget* ViewServiceProxy::createLayoutWidget(QWidget* parent, int index)
 {
-	return mViewService->getLayoutWidget(parent, index);
+    return mViewService->createLayoutWidget(parent, index);
+}
+
+QWidget* ViewServiceProxy::getLayoutWidget(int index)
+{
+    return mViewService->getLayoutWidget(index);
 }
 
 QString ViewServiceProxy::getActiveLayout(int widgetIndex) const

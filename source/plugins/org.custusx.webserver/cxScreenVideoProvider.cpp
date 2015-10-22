@@ -65,7 +65,7 @@ SecondaryViewLayoutWindow::SecondaryViewLayoutWindow(QWidget* parent, ViewServic
 
 void SecondaryViewLayoutWindow::showEvent(QShowEvent* event)
 {
-	QWidget* widget = mViewService->getLayoutWidget(this, 1);
+    QWidget* widget = mViewService->createLayoutWidget(this, 1);
 	this->layout()->addWidget(widget);
 	if (mViewService->getActiveLayout(1).isEmpty())
 		mViewService->setActiveLayout("LAYOUT_OBLIQUE_3DAnyDual_x1", 1);
@@ -129,7 +129,9 @@ void ScreenVideoProvider::showSecondaryLayout()
 
 QImage ScreenVideoProvider::grabSecondaryLayout()
 {
-	QWidget* widget = mServices->view()->getLayoutWidget(NULL, 1);
+    QWidget* widget = mServices->view()->getLayoutWidget(1);
+    if (!widget)
+        return QImage();
 	ViewCollectionWidget* vcWidget = dynamic_cast<ViewCollectionWidget*>(widget);
 
 	ViewCollectionImageWriter grabber(vcWidget);

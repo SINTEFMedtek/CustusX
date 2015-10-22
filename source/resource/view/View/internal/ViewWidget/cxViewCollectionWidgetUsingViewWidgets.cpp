@@ -69,8 +69,6 @@ ViewPtr LayoutWidgetUsingViewWidgets::addView(View::Type type, LayoutRegion regi
 	view->show();
 
 	mViews.push_back(view);
-	mRegions[view->getView()->getUid()] = region;
-
 	return view->getView();
 }
 
@@ -97,7 +95,6 @@ void LayoutWidgetUsingViewWidgets::clearViews()
 		mLayout->removeWidget(mViews[i]);
 	}
 	mViews.clear();
-	mRegions.clear();
 
 	view_utils::setStretchFactors(mLayout, LayoutRegion(0, 0, 10, 10), 0);
 }
@@ -171,11 +168,6 @@ std::vector<ViewPtr> LayoutWidgetUsingViewWidgets::getViews()
 	for (unsigned i=0; i<mViews.size(); ++i)
 		retval.push_back(mViews[i]->getView());
 	return retval;
-}
-
-LayoutRegion LayoutWidgetUsingViewWidgets::getLayoutRegion(QString view)
-{
-	return mRegions[view];
 }
 
 } // cx
