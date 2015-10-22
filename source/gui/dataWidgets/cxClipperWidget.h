@@ -30,52 +30,45 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXCLIPPERSWIDGET_H
-#define CXCLIPPERSWIDGET_H
+#ifndef CXCLIPPERWIDGET_H
+#define CXCLIPPERWIDGET_H
 
-#include "cxGuiExport.h"
-
+#include <QVBoxLayout>
+#include <QCheckBox>
 #include "cxBaseWidget.h"
+#include "cxStringPropertyBase.h"
 #include "cxForwardDeclarations.h"
-#include "cxStringProperty.h"
+class QTableWidget;
 
 namespace cx
 {
 typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
-typedef boost::shared_ptr<class Clippers> ClippersPtr;
-class ClipperWidget;
 
-//--------------------------------------
-
-/**\brief Widget for managing clippers.
- *
- *  \date Oct, 2015
- *  \author Ole Vegard Solberg, SINTEF
- */
-class cxGui_EXPORT ClippersWidget: public BaseWidget
+class ClipperWidget : public BaseWidget
 {
 	Q_OBJECT
 public:
-	ClippersWidget(VisServicesPtr services, QWidget* parent);
-
+	ClipperWidget(VisServicesPtr services, QWidget *parent);
+	void setClipper(InteractiveClipperPtr clipper);
 protected:
-	VisServicesPtr mServices;
-	QVBoxLayout* mLayout;
-	StringPropertyPtr mClipperSelector;
-
-	ClippersPtr mClippers;
-	InteractiveClipperPtr mCurrentClipper;
-	ClipperWidget *mClipperWidget;
-
-	void setupUI();
-//	void setupClipperUI();
-	void initClipperSelector();
-	QString getNameBaseOfCurrentClipper();
-protected slots:
-	void newClipperButtonClicked();
-	void clipperChanged();
+	virtual void prePaintEvent();
 private slots:
-	void clippersChanged();
+	void setClipPlaneInDatas();
+	void setupDataSelectorUI();
+private:
+	void setupUI();
+
+	InteractiveClipperPtr mClipper;
+//	StringPropertyBasePtr mPlaneAdapter;
+	QVBoxLayout* mLayout;
+	QCheckBox* mUseClipperCheckBox;
+	VisServicesPtr mServices;
+	std::map<QString, DataPtr> mDataToClip;
+	QTableWidget *mDataTableWidget;
+	QMap<QString, QCheckBox*> mCheckBoxes;
+	std::map<QString, DataPtr> getDatas();
 };
-}//cx
-#endif // CXCLIPPERSWIDGET_H
+
+}
+
+#endif // CXCLIPPERWIDGET_H

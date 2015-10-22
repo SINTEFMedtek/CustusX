@@ -71,6 +71,8 @@ public:
 	DataPtr getData() const;
 	void setData(DataPtr data);
 
+	void addClipPlaneToData(DataPtr data);
+	void removeClipPlaneFromData(DataPtr data);
 signals:
 	void changed();
 public slots:

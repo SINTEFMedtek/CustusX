@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogger.h"
 #include "cxProfile.h"
 #include "cxClippers.h"
+#include "cxClipperWidget.h"
 
 namespace cx
 {
@@ -45,7 +46,8 @@ namespace cx
 ClippersWidget::ClippersWidget(VisServicesPtr services, QWidget* parent) :
 	BaseWidget(parent, "ClippersWidget", "Clippers"),
 	mServices(services),
-	mClippers(new Clippers(services))
+	mClippers(new Clippers(services)),
+	mClipperWidget(new ClipperWidget(services, this))
 {
 	this->setupUI();
 	connect(mClippers.get(), &Clippers::changed, this, &ClippersWidget::clippersChanged);
@@ -59,6 +61,7 @@ void ClippersWidget::initClipperSelector()
 	QStringList range = mClippers->getClipperNames();
 	mClipperSelector = StringProperty::initialize("clipperSelector", "Clipper", "Select clipper", "", range, mOptions.getElement());
 	connect(mClipperSelector.get(), &Property::changed, this, &ClippersWidget::clipperChanged);
+	this->clippersChanged();
 }
 
 void ClippersWidget::setupUI()
@@ -72,14 +75,17 @@ void ClippersWidget::setupUI()
 	mLayout = new QVBoxLayout(this);
 	mLayout->addWidget(newClipperButton);
 	mLayout->addWidget(clipperSelectorBox);
-	mLayout->addStretch();
 
 	connect(newClipperButton, &QPushButton::clicked, this, &ClippersWidget::newClipperButtonClicked);
+
+
+	mLayout->addWidget(mClipperWidget);
+
+	mLayout->addStretch();
 }
 
 void ClippersWidget::clippersChanged()
 {
-	CX_LOG_DEBUG() << "ClippersWidget::clippersChanged()";
 	mClipperSelector->setValueRange(mClippers->getClipperNames());
 
 	QStringList range = mClipperSelector->getValueRange();
@@ -99,7 +105,16 @@ void ClippersWidget::clipperChanged()
 		return;
 
 	mCurrentClipper = mClippers->getClipper(clipperName);
+//	this->setupClipperUI();
+	mClipperWidget->setClipper(mCurrentClipper);
 }
+
+//void ClippersWidget::setupClipperUI()
+//{
+//	ClipperWidget *clipperWidget = new ClipperWidget(mCurrentClipper, this);
+////	mLayout->addWidget(clipperWidget);
+////	mLayout->addStretch();
+//}
 
 void ClippersWidget::newClipperButtonClicked()
 {

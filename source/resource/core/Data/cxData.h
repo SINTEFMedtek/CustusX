@@ -113,6 +113,8 @@ public:
 	virtual void clearPersistentClipPlanes();
 	virtual void setInteractiveClipPlane(vtkPlanePtr plane); ///< set a plane that is not saved
 
+	void addInteractiveClipPlane(vtkPlanePtr plane);
+	void removeInteractiveClipPlane(vtkPlanePtr plane);
 signals:
 	void transformChanged(); ///< emitted when transform is changed
 	void propertiesChanged(); ///< emitted when one of the metadata properties (uid, name etc) changes
@@ -132,14 +134,15 @@ protected:
 
 	REGISTRATION_STATUS mRegistrationStatus;
 	RegistrationHistoryPtr m_rMd_History;
-	//Moved from Image
 	std::vector<vtkPlanePtr> mPersistentClipPlanes;
+	std::vector<vtkPlanePtr> mInteractiveClipPlanes;
 	vtkPlanePtr mInteractiveClipPlane;
 
 private:
 	Data(const Data& other);
 	Data& operator=(const Data& other);
 
+	void addPlane(vtkPlanePtr plane, std::vector<vtkPlanePtr> &planes);
 };
 
 typedef boost::shared_ptr<Data> DataPtr;

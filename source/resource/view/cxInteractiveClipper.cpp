@@ -143,6 +143,21 @@ void InteractiveClipper::setData(DataPtr data)
 	emit changed();
 }
 
+//TODO: Rewrite data to hold several interactive clip planes, with set/remove specifix planes form here
+void InteractiveClipper::addClipPlaneToData(DataPtr data)
+{
+//	CX_LOG_DEBUG() <<"InteractiveClipper::addClipPlaneToData: " << data->getName();
+	if (data)
+		data->addInteractiveClipPlane(mSlicePlaneClipper->getClipPlane());
+}
+
+void InteractiveClipper::removeClipPlaneFromData(DataPtr data)
+{
+//	CX_LOG_DEBUG() <<"InteractiveClipper::removeClipPlaneFromData: " << data->getName();
+	if (data)
+		data->removeInteractiveClipPlane(mSlicePlaneClipper->getClipPlane());
+}
+
 void InteractiveClipper::changedSlot()
 {
 	if (!mData)
