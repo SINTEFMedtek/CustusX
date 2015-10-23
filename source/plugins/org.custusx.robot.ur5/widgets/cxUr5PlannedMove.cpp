@@ -7,6 +7,7 @@
 #include <QApplication>
 
 
+
 namespace cx
 {
 
@@ -19,11 +20,18 @@ Ur5PlannedMoveTab::Ur5PlannedMoveTab(Ur5RobotPtr Ur5Robot, QWidget *parent) :
     connect(openVTKButton,SIGNAL(clicked()),this, SLOT(openVTKfileSlot()));
     connect(runVTKButton,SIGNAL(clicked()),this,SLOT(runVTKfileSlot()));
     connect(blendRadiusLineEdit,SIGNAL(textChanged(QString)),this,SLOT(blendRadiusChangedSlot()));
+
+    connect(sendMessageButton,&QPushButton::clicked,this,&Ur5PlannedMoveTab::sendMessageSlot);
 }
 
 Ur5PlannedMoveTab::~Ur5PlannedMoveTab()
 {
 
+}
+
+void Ur5PlannedMoveTab::sendMessageSlot()
+{
+    mUr5Robot->sendMessage(textEditor->toPlainText());
 }
 
 void Ur5PlannedMoveTab::setupUi(QWidget *parent)
@@ -33,6 +41,7 @@ void Ur5PlannedMoveTab::setupUi(QWidget *parent)
 
     setMoveVTKWidget(mainLayout);
     setMoveSettingsWidget(mainLayout);
+    setTextEditorWidget(mainLayout);
 }
 
 void Ur5PlannedMoveTab::blendRadiusChangedSlot()
@@ -99,6 +108,22 @@ void Ur5PlannedMoveTab::setMoveSettingsWidget(QVBoxLayout *parent)
     velAccLayout->addWidget(new QLabel("Blend radius"));
     velAccLayout->addWidget(blendRadiusLineEdit,2,1,1,1);
     velAccLayout->addWidget(new QLabel("m"));
+}
+
+void Ur5PlannedMoveTab::setTextEditorWidget(QVBoxLayout *parent)
+{
+    QGroupBox* group = new QGroupBox("Ur5 Script");
+    group->setFlat(true);
+    parent->addWidget(group);
+
+    QGridLayout *textEditLayout = new QGridLayout();
+    group->setLayout(textEditLayout);
+
+    textEditor = new QTextEdit();
+    textEditLayout->addWidget(textEditor,0,0,2,2);
+
+    sendMessageButton = new QPushButton(tr("Send message"));
+    textEditLayout->addWidget(sendMessageButton,2,1,1,1);
 }
 
 void Ur5PlannedMoveTab::runVTKfileSlot()
