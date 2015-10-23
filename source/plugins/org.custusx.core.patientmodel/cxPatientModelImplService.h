@@ -117,6 +117,7 @@ private:
 
 	std::map<QString, ToolPtr> mProbeTools;
 	ToolPtr getProbeTool(QString videoSourceUid);
+	void reEmitActiveTrackedStream(TrackedStreamPtr trackedStream);
 };
 typedef boost::shared_ptr<PatientModelImplService> PatientModelImplServicePtr;
 

@@ -10,8 +10,6 @@ if(BUILD_TESTING)
         cxtestTestToolMesh.cpp
         cxtestCatchTrackingService.cpp
         cxtestCatchProbe.cpp
-        cxtestProbeFixture.h
-        cxtestProbeFixture.cpp
         )
 
     qt5_wrap_cpp(CX_TEST_CATCH_org_custusx_core_tracking_MOC_SOURCE_FILES ${CX_TEST_CATCH_org_custusx_core_tracking_MOC_SOURCE_FILES})
@@ -23,7 +21,11 @@ if(BUILD_TESTING)
         .
         ${CMAKE_CURRENT_BINARY_DIR}
     )
-    target_link_libraries(cxtest_org_custusx_core_tracking PRIVATE org_custusx_core_tracking cxCatch)
+    target_link_libraries(
+        cxtest_org_custusx_core_tracking
+        PRIVATE
+        cxtestUtilities
+        org_custusx_core_tracking cxCatch)
     cx_add_tests_to_catch(cxtest_org_custusx_core_tracking)
         
 endif(BUILD_TESTING)

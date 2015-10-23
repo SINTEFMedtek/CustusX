@@ -173,7 +173,7 @@ DataPtr DataManagerImpl::getActiveData() const
 
 void DataManagerImpl::setActiveData(DataPtr activeData)
 {
-	if(getActiveData() == activeData)
+	if (!activeData)
 		return;
 
 	mActiveData.removeAll(activeData);
@@ -674,8 +674,9 @@ QList<DataPtr> DataManagerImpl::getActiveDataList() const
 QStringList DataManagerImpl::getActiveDataStringList() const
 {
 	QStringList retval;
-	for(int i = 0; i < mActiveData.size(); ++i)
-		retval << mActiveData.at(i)->getUid();
+	if(!mActiveData.isEmpty())
+		for(int i = 0; i < mActiveData.size(); ++i)
+			retval << mActiveData.at(i)->getUid();
 	return retval;
 }
 

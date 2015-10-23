@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelServiceNull.h"
 #include "cxImage.h"
 #include "cxMesh.h"
+#include "cxTrackedStream.h"
 #include "cxRegistrationTransform.h"
 #include <QDir>
 #include "cxTime.h"
@@ -80,6 +81,18 @@ DataPtr PatientModelService::getActiveData() const
 	if(this->getActiveDataList().isEmpty())
 		return DataPtr();
 	return this->getActiveDataList().last();
+}
+
+ImagePtr PatientModelService::getDerivedActiveImage() const
+{
+	DataPtr activeData = this->getActiveData();
+	ImagePtr retval;
+	TrackedStreamPtr stream = boost::dynamic_pointer_cast<TrackedStream>(activeData);
+	if(stream)
+		retval = stream->getChangingImage();
+	else
+		retval = boost::dynamic_pointer_cast<Image>(activeData);
+	return retval;
 }
 
 void PatientModelService::setActiveData(QString uid)

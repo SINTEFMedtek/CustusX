@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxNullDeleter.h"
 #include "cxLogger.h"
 #include "cxLandmark.h"
+#include "cxData.h"
 
 namespace cx
 {
@@ -76,6 +77,7 @@ void PatientModelServiceProxy::onServiceAdded(PatientModelService* service)
 	connect(service, &PatientModelService::centerChanged, this, &PatientModelService::centerChanged);
 	connect(service, &PatientModelService::dataAddedOrRemoved, this, &PatientModelService::dataAddedOrRemoved);
 	connect(service, &PatientModelService::activeImageChanged, this, &PatientModelService::activeImageChanged);
+	connect(service, &PatientModelService::activeDataChanged, this, &PatientModelService::activeDataChanged);
 	connect(service, &PatientModelService::landmarkPropertiesChanged, this, &PatientModelService::landmarkPropertiesChanged);
 	connect(service, &PatientModelService::clinicalApplicationChanged, this, &PatientModelService::clinicalApplicationChanged);
 	connect(service, &PatientModelService::rMprChanged, this, &PatientModelService::rMprChanged);
@@ -88,6 +90,8 @@ void PatientModelServiceProxy::onServiceAdded(PatientModelService* service)
 
 	emit dataAddedOrRemoved();
 	emit activeImageChanged(service->getActiveImageUid());
+	DataPtr activeData = service->getActiveData();
+	emit activeDataChanged(activeData ? activeData->getUid() : "");
 	emit landmarkPropertiesChanged();
 	emit clinicalApplicationChanged();
 	emit rMprChanged();
@@ -99,6 +103,7 @@ void PatientModelServiceProxy::onServiceRemoved(PatientModelService *service)
 	disconnect(service, &PatientModelService::centerChanged, this, &PatientModelService::centerChanged);
 	disconnect(service, &PatientModelService::dataAddedOrRemoved, this, &PatientModelService::dataAddedOrRemoved);
 	disconnect(service, &PatientModelService::activeImageChanged, this, &PatientModelService::activeImageChanged);
+	disconnect(service, &PatientModelService::activeDataChanged, this, &PatientModelService::activeDataChanged);
 	disconnect(service, &PatientModelService::landmarkPropertiesChanged, this, &PatientModelService::landmarkPropertiesChanged);
 	disconnect(service, &PatientModelService::clinicalApplicationChanged, this, &PatientModelService::clinicalApplicationChanged);
 	disconnect(service, &PatientModelService::rMprChanged, this, &PatientModelService::rMprChanged);
@@ -110,6 +115,7 @@ void PatientModelServiceProxy::onServiceRemoved(PatientModelService *service)
 
 	emit dataAddedOrRemoved();
 	emit activeImageChanged("");
+	emit activeDataChanged("");
 	emit landmarkPropertiesChanged();
 	emit clinicalApplicationChanged();
 	emit rMprChanged();

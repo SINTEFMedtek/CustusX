@@ -53,8 +53,8 @@ TransferFunction2DColorWidget::TransferFunction2DColorWidget(PatientModelService
   mDataLevel.reset(new DoublePropertyImageTFDataLevel);
 
   mActiveImageProxy = ActiveImageProxy::New(patientModelService);
-  connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &TransferFunction2DColorWidget::activeImageChangedSlot);
   connect(mActiveImageProxy.get(), &ActiveImageProxy::transferFunctionsChanged, this, &TransferFunction2DColorWidget::activeImageChangedSlot);
+  connect(mPatientModelService.get(), &PatientModelService::activeDataChanged, this, &TransferFunction2DColorWidget::activeImageChangedSlot);
 
   mTransferFunctionColorWidget->setSizePolicy(QSizePolicy::Expanding,
                                               QSizePolicy::Fixed);
@@ -73,9 +73,15 @@ TransferFunction2DColorWidget::TransferFunction2DColorWidget(PatientModelService
   this->setLayout(layout);
 }
 
+TransferFunction2DColorWidget::~TransferFunction2DColorWidget()
+{
+	disconnect(mPatientModelService.get(), &PatientModelService::activeDataChanged, this, &TransferFunction2DColorWidget::activeImageChangedSlot);
+}
+
 void TransferFunction2DColorWidget::activeImageChangedSlot()
 {
-  ImagePtr image = mPatientModelService->getActiveData<Image>();
+	ImagePtr image = mPatientModelService->getDerivedActiveImage();
+
   ImageTFDataPtr tf;
   if (image)
     tf = image->getLookupTable2D();

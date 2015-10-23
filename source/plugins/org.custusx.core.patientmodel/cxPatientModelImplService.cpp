@@ -59,6 +59,7 @@ PatientModelImplService::PatientModelImplService(ctkPluginContext *context) :
 
 	connect(this->dataService().get(), &DataManager::dataAddedOrRemoved, this, &PatientModelService::dataAddedOrRemoved);
 	connect(this->dataService().get(), &DataManager::activeImageChanged, this, &PatientModelService::activeImageChanged);
+	connect(this->dataService().get(), &DataManager::activeDataChanged, this, &PatientModelService::activeDataChanged);
 	connect(this->dataService().get(), &DataManager::rMprChanged, this, &PatientModelService::rMprChanged);
 	connect(this->dataService().get(), &DataManager::streamLoaded, this, &PatientModelService::streamLoaded);
 	connect(this->dataService().get(), &DataManager::clinicalApplicationChanged, this, &PatientModelService::clinicalApplicationChanged);
@@ -116,6 +117,7 @@ PatientModelImplService::~PatientModelImplService()
 	{
 		disconnect(this->dataService().get(), &DataManager::dataAddedOrRemoved, this, &PatientModelService::dataAddedOrRemoved);
 		disconnect(this->dataService().get(), &DataManager::activeImageChanged, this, &PatientModelService::activeImageChanged);
+		disconnect(this->dataService().get(), &DataManager::activeDataChanged, this, &PatientModelService::activeDataChanged);
 		disconnect(this->dataService().get(), &DataManager::rMprChanged, this, &PatientModelService::rMprChanged);
 		disconnect(this->dataService().get(), &DataManager::streamLoaded, this, &PatientModelService::streamLoaded);
 		disconnect(this->dataService().get(), &DataManager::clinicalApplicationChanged, this, &PatientModelService::clinicalApplicationChanged);
@@ -295,7 +297,6 @@ void PatientModelImplService::newProbe(const ToolPtr tool)
 
 void PatientModelImplService::videoSourceAdded(VideoSourcePtr source)
 {
-
 	ToolPtr tool = this->getProbeTool(source->getUid());
 	if(!tool)
 		return;
@@ -312,6 +313,13 @@ void PatientModelImplService::videoSourceAdded(VideoSourcePtr source)
 	//Only load trackedStream, don't save it
 	this->dataService()->loadData(trackedStream);
 	emit videoAddedToTrackedStream();
+	this->reEmitActiveTrackedStream(trackedStream);
+}
+
+void PatientModelImplService::reEmitActiveTrackedStream(TrackedStreamPtr trackedStream)
+{
+	if(this->getActiveData<TrackedStream>() == trackedStream)
+		this->setActiveData(trackedStream);
 }
 
 ToolPtr PatientModelImplService::getProbeTool(QString videoSourceUid)

@@ -102,10 +102,10 @@ void DataListWidget::itemSelectionChangedSlot()
 {
   QList<QListWidgetItem*> items = this->selectedItems();
   if (items.empty())
-    return;
-  ImagePtr image = mPatientModelService->getData<Image>(items[0]->data(Qt::UserRole).toString());
-  if (image)
-	mPatientModelService->setActiveData(image);
+	return;
+  DataPtr data = mPatientModelService->getData(items[0]->data(Qt::UserRole).toString());
+  if (data)
+	mPatientModelService->setActiveData(data);
 
 }
 

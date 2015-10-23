@@ -34,7 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxDataLocations.h"
 #include "cxLogicManager.h"
-#include "cxSessionStorageServiceImpl.h"
+#include "cxSessionStorageServiceProxy.h"
+#include "cxPatientModelServiceProxy.h"
 
 namespace cxtest
 {
@@ -45,7 +46,8 @@ SessionStorageTestFixture::SessionStorageTestFixture() :
 	cx::DataLocations::setTestMode();
 	cx::LogicManager::initialize();
 	ctkPluginContext* context = cx::LogicManager::getInstance()->getPluginContext();
-	mSessionStorageService = cx::SessionStorageServicePtr (new cx::SessionStorageServiceImpl(context));
+	mSessionStorageService = cx::SessionStorageServiceProxy::create(context);
+	mPatientModelService = cx::PatientModelServiceProxy::create(context);
 
 	mSession1 = QString("/temp/TestPatient1.cx3");
 	mSession2 = QString("/temp/TestPatient2.cx3");

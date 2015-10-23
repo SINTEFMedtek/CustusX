@@ -48,10 +48,11 @@ SlicePropertiesWidget::SlicePropertiesWidget(PatientModelServicePtr patientModel
 	TabbedWidget(parent, "SlicePropertiesWidget", "Slice Properties")
 {
 	this->setToolTip("2D Image properties");
-	this->insertWidgetAtTop(new DataSelectWidget(visualizationService, patientModelService, this, StringPropertyActiveImage::New(patientModelService)));
-	this->addTab(new VolumeInfoWidget(patientModelService, this), "Info");//Not neccesary as this is part of Volume Properties?
+	StringPropertyActiveDataPtr activeDataProperty = StringPropertyActiveData::New(patientModelService, "image|trackedStream");
+	this->insertWidgetAtTop(new DataSelectWidget(visualizationService, patientModelService, this, activeDataProperty));
 	this->addTab(new ColorWidget(patientModelService, this), "Color");
 	this->addTab(new OverlayWidget(patientModelService, visualizationService, this), "Overlay");
+//	this->addTab(new VolumeInfoWidget(patientModelService, this), "Info");//Not neccesary as this is part of Volume Properties?
 }
 
 SlicePropertiesWidget::~SlicePropertiesWidget()

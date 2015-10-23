@@ -41,6 +41,32 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
+StringPropertyActiveData::StringPropertyActiveData(PatientModelServicePtr patientModelService, QString typeRegexp) :
+	SelectDataStringPropertyBase(patientModelService, typeRegexp)
+{
+	mValueName = "Active Data";
+	mHelp = "Select the active data obejct";
+	connect(mPatientModelService.get(), &PatientModelService::activeImageChanged, this, &StringPropertyActiveImage::changed);
+}
+
+bool StringPropertyActiveData::setValue(const QString& value)
+{
+	DataPtr newData = mPatientModelService->getData(value);
+	if (newData==mPatientModelService->getActiveData())
+		return false;
+	mPatientModelService->setActiveData(newData);
+	return true;
+}
+
+QString StringPropertyActiveData::getValue() const
+{
+	QString retval = "";
+	DataPtr activeData = mPatientModelService->getActiveData();
+	if(activeData)
+		retval = activeData->getUid();
+	return retval;
+}
+
 StringPropertyActiveImage::StringPropertyActiveImage(PatientModelServicePtr patientModelService) :
 	SelectDataStringPropertyBase(patientModelService, "image")
 {

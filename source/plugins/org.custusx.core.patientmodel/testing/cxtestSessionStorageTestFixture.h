@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
+typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
 }
 
 namespace cxtest
@@ -59,6 +60,7 @@ public:
 	void saveSession();
 
 	cx::SessionStorageServicePtr mSessionStorageService;
+	cx::PatientModelServicePtr mPatientModelService;
 private:
 	bool mSessionsCreated;
 	QString mSession1;

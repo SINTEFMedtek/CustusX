@@ -118,6 +118,7 @@ public:
 	// active image
 	virtual QList<DataPtr> getActiveDataList() const = 0;
 	DataPtr getActiveData() const;
+	ImagePtr getDerivedActiveImage() const;///< In addition to returning Image this also provides derived (changing) images from TrackedStream
 	template <class DATA>
 	boost::shared_ptr<DATA> getActiveData() const;
 	virtual void setActiveData(DataPtr activeData) = 0; ///< used for system state
