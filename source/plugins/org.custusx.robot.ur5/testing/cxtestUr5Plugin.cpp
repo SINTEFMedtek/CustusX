@@ -73,4 +73,23 @@ TEST_CASE("Ur5Plugin: Read VTK data", "[manual][plugins][org.custusx.robot.ur5]"
     fixture.mUr5Robot.openVTKfile(path2);
 }
 
+TEST_CASE("Ur5Plugin: Compute the jacobian of the robot at given jointPosition")
+{
+    Ur5TestFixture fixture;
+
+    Eigen::RowVectorXd jointPositions(6);
+    jointPositions << 0.7722,-1.7453,1.7070,-1.5739,-1.6277,0.0717;
+    //jointPositions = fixture.mUr5Robot.getCurrentState().jointPosition;
+
+    Eigen::MatrixXd J(6,6);
+    J = fixture.jacobianUr5(jointPositions);
+
+    Eigen::RowVectorXd movePose(6);
+    movePose << 0.1,0,0,0,0,0;
+
+    std::cout << J.determinant() << std::endl;
+    std::cout << jointPositions << std::endl;
+    std::cout << (J.inverse()*movePose.transpose()) << std::endl;
+}
+
 } //cxtest

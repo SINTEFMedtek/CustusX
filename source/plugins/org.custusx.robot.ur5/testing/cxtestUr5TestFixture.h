@@ -49,6 +49,7 @@ public:
     cx::Ur5Connection mUr5Connection;
 
     QByteArray getTestData(int packetSize);
+    Eigen::MatrixXd jacobianUr5(Eigen::RowVectorXd jointPositions);
 };
 
 } //cxtest
