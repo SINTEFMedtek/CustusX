@@ -42,9 +42,10 @@ class QHttpResponse;
 
 namespace cx
 {
-class ScreenVideoProvider;
-typedef boost::shared_ptr<class NetworkService> NetworkServicePtr;
-typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
+//class ScreenVideoProvider;
+typedef boost::shared_ptr<class RemoteAPI> RemoteAPIPtr;
+typedef boost::shared_ptr<class HttpRequestHandler> HttpRequestHandlerPtr;
+//typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
 
 /**
  * Activator for the Network plugin
@@ -68,44 +69,34 @@ public:
 	void start(ctkPluginContext* context);
 	void stop(ctkPluginContext* context);
 
-private slots:
-	void handle_request(QHttpRequest *req, QHttpResponse *resp);
-
-	void handle_view3D(QHttpRequest *req, QHttpResponse *resp);
-	void handle_default(QHttpRequest *req, QHttpResponse *resp);
-	void handle_screenshot(QHttpRequest *req, QHttpResponse *resp);
-	void handle_viewshot(QHttpRequest *req, QHttpResponse *resp);
-
-	void handle_stream(QHttpRequest *req, QHttpResponse *resp);
-	void handle_helloworld(QHttpRequest *req, QHttpResponse *resp);
-	void handle_users_reply(QHttpRequest *req, QHttpResponse *resp);
 
 private:
-	ScreenVideoProvider* mScreenVideo;
+	HttpRequestHandlerPtr mRequestHandler;
+	RemoteAPIPtr mAPI;
 	QHttpServer *server;
-	RegisteredServicePtr mRegistration;
+//	RegisteredServicePtr mRegistration;
 };
 
-class Responder : public QObject
-{
-	Q_OBJECT
+//class Responder : public QObject
+//{
+//	Q_OBJECT
 
-public:
-	Responder(QHttpRequest *req, QHttpResponse *resp);
-	~Responder();
+//public:
+//	Responder(QHttpRequest *req, QHttpResponse *resp);
+//	~Responder();
 
-signals:
-	void done();
+//signals:
+//	void done();
 
-private slots:
-	void accumulate(const QByteArray &data);
-	void reply();
+//private slots:
+//	void accumulate(const QByteArray &data);
+//	void reply();
 
-private:
-	QScopedPointer<QHttpRequest> m_req;
-	QHttpResponse *m_resp;
+//private:
+//	QScopedPointer<QHttpRequest> m_req;
+//	QHttpResponse *m_resp;
 
-};
+//};
 
 } // namespace cx
 

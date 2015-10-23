@@ -7,6 +7,9 @@ set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 set(PLUGIN_SRCS
   cxWebServerPluginActivator.cpp
   cxScreenVideoProvider.cpp
+  cxHttpRequestHandler.cpp
+  cxRemoteAPI.cpp
+  cxLayoutVideoSource.cpp
 )
 
 include_directories(/opt/local/Library/Frameworks/QtNetwork.framework/Headers/)
@@ -15,6 +18,9 @@ include_directories(/opt/local/Library/Frameworks/QtNetwork.framework/Headers/)
 set(PLUGIN_MOC_SRCS
   cxWebServerPluginActivator.h
   cxScreenVideoProvider.h
+  cxHttpRequestHandler.h
+  cxRemoteAPI.h
+  cxLayoutVideoSource.h
 )
 
 # Qt Designer files which should be processed by Qts uic
