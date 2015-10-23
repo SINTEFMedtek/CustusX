@@ -25,46 +25,31 @@ public:
 
     Ur5State getCurrentState();
     Ur5State getPreviousState();
-    void setCurrentState(Ur5State currentState);
-    void setPreviousState(Ur5State previousState);
-
-    QString getAddress();
-    void setAddress(QString IPaddress);
 
     void move(QString typeOfMovement, Ur5State targetState, double acc, double vel, double rad = 0, double t = 0);
     void move(QString typeOfMovement, Eigen::RowVectorXd targetState, double acc, double vel, double rad = 0, double t = 0);
     void stopMove(QString typeOfStop,double acc);
 
-    void addToMoveQueue(Eigen::RowVectorXd target);
-
     void addToProgramQueue(QString string);
     void clearProgramQueue();
-
-    void runProgramQueue(std::vector<QString> programQueue);
-
-    void printMoveQueue();
-    void printProgramQueue();
 
     void openVTKfile(QString filename);
     void moveProgram(QString typeOfProgram,double acceleration, double velocity, double radius, double t = 0);
 
     void setBlendRadius(double blendRadius);
 
-    std::vector<QString> getProgramQueue();
-
-
     void sendMessage(QString message);
 
 public slots:
     void connectToRobot(QString IPaddress);
     void disconnectFromRobot();
-    void updateCurrentState();
     void shutdown();
-
 
 private slots:
     void nextMove();
     void atTargetSlot();
+    void updateCurrentState();
+
 
 signals:
     void transform(QString devicename, Transform3D transform, double timestamp);
@@ -79,6 +64,21 @@ signals:
     void atTarget();
 
 private:
+    void setCurrentState(Ur5State currentState);
+    void setPreviousState(Ur5State previousState);
+
+    QString getAddress();
+    void setAddress(QString IPaddress);
+
+    void addToMoveQueue(Eigen::RowVectorXd target);
+
+    void runProgramQueue(std::vector<QString> programQueue);
+
+    void printMoveQueue();
+    void printProgramQueue();
+
+    std::vector<QString> getProgramQueue();
+
     int rtPort = 30003;
     int secPort = 30002;
     QString IPaddress;
