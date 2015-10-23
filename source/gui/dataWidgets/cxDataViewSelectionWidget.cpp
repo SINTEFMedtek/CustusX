@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewService.h"
 #include "cxViewGroupData.h"
 #include "cxLogger.h"
+#include "cxActiveData.h"
 
 namespace cx
 {
@@ -100,13 +101,15 @@ void DataListWidget::populate(QStringList dataUids)
 
 void DataListWidget::itemSelectionChangedSlot()
 {
-  QList<QListWidgetItem*> items = this->selectedItems();
-  if (items.empty())
-	return;
-  DataPtr data = mPatientModelService->getData(items[0]->data(Qt::UserRole).toString());
-  if (data)
-	mPatientModelService->setActiveData(data);
-
+	QList<QListWidgetItem*> items = this->selectedItems();
+	if (items.empty())
+		return;
+	DataPtr data = mPatientModelService->getData(items[0]->data(Qt::UserRole).toString());
+	if (data)
+	{
+		ActiveDataPtr activeData = mPatientModelService->getActiveData();
+		activeData->setActive(data);
+	}
 }
 
 void DataListWidget::populateData(QString uid, bool indent, QListWidgetItem* after)
@@ -485,8 +488,8 @@ protected:
 
 };
 
-DataViewSelectionWidget::DataViewSelectionWidget(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget* parent) :
-	mVisualizationService(visualizationService)
+DataViewSelectionWidget::DataViewSelectionWidget(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget* parent) :
+	mViewService(viewService)
 {
   // TODO Auto-generated constructor stub
   QHBoxLayout* layout = new QHBoxLayout(this);
@@ -531,17 +534,17 @@ DataViewSelectionWidget::DataViewSelectionWidget(PatientModelServicePtr patientM
   allLayout->addWidget(mAllDataListWidget);
   layout->addLayout(allLayout);
 
-  connect(mVisualizationService.get(), SIGNAL(activeViewChanged()), this, SLOT(viewGroupChangedSlot()));
+  connect(mViewService.get(), SIGNAL(activeViewChanged()), this, SLOT(viewGroupChangedSlot()));
   this->viewGroupChangedSlot();
 }
 
 void DataViewSelectionWidget::viewGroupChangedSlot()
 {
-  int vg = mVisualizationService->getActiveGroupId();
+  int vg = mViewService->getActiveGroupId();
   if (vg<0)
     vg = 0;
 
-  ViewGroupDataPtr group = mVisualizationService->getGroup(vg);
+  ViewGroupDataPtr group = mViewService->getGroup(vg);
   if (group)
 	  mSelectedDataListWidget->setViewGroupData(group);
 

@@ -47,29 +47,24 @@ CoreServicesPtr CoreServices::create(ctkPluginContext* context)
 
 CoreServices::CoreServices(ctkPluginContext* context)
 {
-	patientModelService	= PatientModelServicePtr(new PatientModelServiceProxy(context));
-	trackingService		= TrackingServicePtr(new TrackingServiceProxy(context));
-	videoService		= VideoServicePtr(new VideoServiceProxy(context));
-	spaceProvider.reset(new SpaceProviderImpl(trackingService, patientModelService));
-	sessionStorageService = SessionStorageServiceProxy::create(context);
+	mPatientModelService	= PatientModelServicePtr(new PatientModelServiceProxy(context));
+	mTrackingService		= TrackingServicePtr(new TrackingServiceProxy(context));
+	mVideoService			= VideoServicePtr(new VideoServiceProxy(context));
+	mSpaceProvider.reset(new SpaceProviderImpl(mTrackingService, mPatientModelService));
+	mSessionStorageService	= SessionStorageServiceProxy::create(context);
 }
 
-CoreServicesPtr CoreServices::getNull()
+CoreServicesPtr CoreServices::getNullObjects()
 {
 	return CoreServicesPtr(new CoreServices());
 }
 
-CoreServices CoreServices::getNullObjects()
-{
-	return CoreServices();
-}
-
 CoreServices::CoreServices()
 {
-	patientModelService	= PatientModelService::getNullObject();
-	trackingService		= TrackingService::getNullObject();
-	videoService		= VideoService::getNullObject();
-	spaceProvider.reset(new SpaceProviderImpl(trackingService, patientModelService));
-	sessionStorageService = SessionStorageService::getNullObject();
+	mPatientModelService	= PatientModelService::getNullObject();
+	mTrackingService		= TrackingService::getNullObject();
+	mVideoService			= VideoService::getNullObject();
+	mSpaceProvider.reset(new SpaceProviderImpl(mTrackingService, mPatientModelService));
+	mSessionStorageService	= SessionStorageService::getNullObject();
 }
 } // cx

@@ -41,6 +41,7 @@ public:
 
 		vtkPolyDataPtr getMovingPoints(); ///< the moving data (one of target or source, depending on inversion)
 		vtkPolyDataPtr getFixedPoints(); ///< the fixed data (one of target or source, depending on inversion)
+		vtkPolyDataPtr getDifferenceLines(); ///< Lines connecting the moving and fixed data, according to LTS.
 
 		vtkPointsPtr mSortedSourcePoints; ///< source points sorted according to distance to target, #mSortedSourcePoints==#mSortedTargetPoints
 		vtkPointsPtr mSortedTargetPoints; ///< source points projected onto the target points (closest points) #mSortedSourcePoints==#mSortedTargetPoints
@@ -59,11 +60,13 @@ public:
 	typedef boost::shared_ptr<Context> ContextPtr;
 
 	SeansVesselReg();
-//	SeansVesselReg(int lts_ratio, double stop_delta, double lambda, double sigma, bool lin_flag, int sample,
-//		int single_point_thre, bool verbose);
 	~SeansVesselReg();
 
-	bool execute(DataPtr source, DataPtr target, QString logPath);
+	bool initialize(DataPtr source, DataPtr target, QString logPath);
+	bool isValid() const;
+	bool execute();
+	bool performOneRegistration();
+
 	Transform3D getLinearResult(ContextPtr context=ContextPtr());
 	double getResultMetric(ContextPtr context=ContextPtr());
 	double getResultLtsRatio(ContextPtr context=ContextPtr());
@@ -74,6 +77,9 @@ public:
 	{
 		mt_verbose = on;
 	}
+	vtkPolyDataPtr getDifferenceLines(); ///< Lines connecting the moving and fixed data, according to LTS.
+	void notifyPreRegistrationWarnings();
+
 
 	bool mt_auto_lts;
 	int mt_ltsRatio;
@@ -87,11 +93,13 @@ public:
 	int mt_maximumNumberOfIterations;
 	bool mt_verbose;
 	double mt_maximumDurationSeconds;
+	double margin;
+	QString m_logPath;
 
 	// debug interface:
 	ContextPtr createContext(DataPtr source, DataPtr target);
 	void performOneRegistration(ContextPtr context, bool linear);
-	void computeDistances(ContextPtr context);
+	void computeDistances(ContextPtr context = ContextPtr());
 	static vtkPolyDataPtr convertToPolyData(vtkPointsPtr input);
 
 	/**
@@ -104,7 +112,7 @@ public:
 	static vtkPolyDataPtr extractPolyData(ImagePtr image, int p_neighborhoodFilterThreshold,
 		double p_BoundingBox[6]);
 private:
-	Transform3D getLinearTransform(vtkGeneralTransformPtr myConcatenation);
+	Transform3D getLinearTransform(vtkGeneralTransformPtr concatenation);
 
 protected:
 	bool runAlgorithm(ContextPtr context, vtkGeneralTransformPtr myConcatenation, int largeSteps, double fraction);

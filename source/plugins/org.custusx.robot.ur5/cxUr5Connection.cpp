@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 #include <QFile>
 #include <set>
+#include <QTcpSocket>
 
 #include "cxLogger.h"
 #include "cxUtilHelpers.h"
@@ -43,9 +44,11 @@ namespace cx
 {
 
 Ur5Connection::Ur5Connection(QString address, int port)
-{
-    mIp = address;
-    mPort = port;
+{   
+    info.host = address;
+    info.port = port;
+
+    setConnectionInfo(info);
 }
 
 Ur5Connection::Ur5Connection()
@@ -56,15 +59,22 @@ Ur5Connection::~Ur5Connection()
 {
 }
 
+void Ur5Connection::setProtocol(QString protocolName)
+{
+
+}
+
 void Ur5Connection::setAddress(QString address, int port)
 {
-    mIp = address;
-    mPort = port;
+    info.host = address;
+    info.port = port;
+
+    setConnectionInfo(info);
 }
 
 bool Ur5Connection::isConnectedToRobot()
 {
-    return (mSocket && mSocket->isConnected());
+    return (mSocket && mSocket->waitForConnected());
 }
 
 bool Ur5Connection::sendMessage(QString message)
@@ -90,7 +100,9 @@ void Ur5Connection::internalDataAvailable()
 
     if(!isPotentialPacket(mSocket->bytesAvailable()))
     {
-        mSocket->skip(mSocket->bytesAvailable());
+        char *voidData = new char[mSocket->bytesAvailable()];
+        int retval = mSocket->read(voidData, mSocket->bytesAvailable());
+        delete[] voidData;
         return;
     }
 

@@ -38,6 +38,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationTransform.h"
 #include <QDir>
 #include "cxTime.h"
+#include "cxReporter.h"
+#include "cxActiveData.h"
 
 namespace cx
 {
@@ -51,9 +53,8 @@ PatientModelServicePtr PatientModelService::getNullObject()
 
 DataPtr PatientModelService::getData(const QString& uid) const
 {
-	//TODO: Should active be remaned to activeImage
 	if (uid=="active")
-		return this->getActiveData<Image>();
+		return this->getActiveData()->getActive();
 
 	std::map<QString, DataPtr> all = this->getData();
 	std::map<QString, DataPtr>::const_iterator iter = all.find(uid);
@@ -62,42 +63,9 @@ DataPtr PatientModelService::getData(const QString& uid) const
 	return iter->second;
 }
 
-QString PatientModelService::getActiveImageUid()
-{
-	ImagePtr image = this->getActiveData<Image>();
-	if (image)
-		return image->getUid();
-	else
-		return "";
-}
-
 Transform3D PatientModelService::get_rMpr() const
 {
 	return this->get_rMpr_History()->getCurrentRegistration().mValue;
-}
-
-DataPtr PatientModelService::getActiveData() const
-{
-	if(this->getActiveDataList().isEmpty())
-		return DataPtr();
-	return this->getActiveDataList().last();
-}
-
-ImagePtr PatientModelService::getDerivedActiveImage() const
-{
-	DataPtr activeData = this->getActiveData();
-	ImagePtr retval;
-	TrackedStreamPtr stream = boost::dynamic_pointer_cast<TrackedStream>(activeData);
-	if(stream)
-		retval = stream->getChangingImage();
-	else
-		retval = boost::dynamic_pointer_cast<Image>(activeData);
-	return retval;
-}
-
-void PatientModelService::setActiveData(QString uid)
-{
-	this->setActiveData(this->getData(uid));
 }
 
 void PatientModelService::updateRegistration_rMpr(const QDateTime& oldTime, const RegistrationTransform& newTransform, bool continuous)

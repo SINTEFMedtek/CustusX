@@ -76,8 +76,6 @@ void PatientModelServiceProxy::onServiceAdded(PatientModelService* service)
 
 	connect(service, &PatientModelService::centerChanged, this, &PatientModelService::centerChanged);
 	connect(service, &PatientModelService::dataAddedOrRemoved, this, &PatientModelService::dataAddedOrRemoved);
-	connect(service, &PatientModelService::activeImageChanged, this, &PatientModelService::activeImageChanged);
-	connect(service, &PatientModelService::activeDataChanged, this, &PatientModelService::activeDataChanged);
 	connect(service, &PatientModelService::landmarkPropertiesChanged, this, &PatientModelService::landmarkPropertiesChanged);
 	connect(service, &PatientModelService::clinicalApplicationChanged, this, &PatientModelService::clinicalApplicationChanged);
 	connect(service, &PatientModelService::rMprChanged, this, &PatientModelService::rMprChanged);
@@ -89,9 +87,6 @@ void PatientModelServiceProxy::onServiceAdded(PatientModelService* service)
 		reportWarning("PatientModelServiceProxy::onServiceAdded mPatientModelService->isNull()");
 
 	emit dataAddedOrRemoved();
-	emit activeImageChanged(service->getActiveImageUid());
-	DataPtr activeData = service->getActiveData();
-	emit activeDataChanged(activeData ? activeData->getUid() : "");
 	emit landmarkPropertiesChanged();
 	emit clinicalApplicationChanged();
 	emit rMprChanged();
@@ -102,8 +97,6 @@ void PatientModelServiceProxy::onServiceRemoved(PatientModelService *service)
 {
 	disconnect(service, &PatientModelService::centerChanged, this, &PatientModelService::centerChanged);
 	disconnect(service, &PatientModelService::dataAddedOrRemoved, this, &PatientModelService::dataAddedOrRemoved);
-	disconnect(service, &PatientModelService::activeImageChanged, this, &PatientModelService::activeImageChanged);
-	disconnect(service, &PatientModelService::activeDataChanged, this, &PatientModelService::activeDataChanged);
 	disconnect(service, &PatientModelService::landmarkPropertiesChanged, this, &PatientModelService::landmarkPropertiesChanged);
 	disconnect(service, &PatientModelService::clinicalApplicationChanged, this, &PatientModelService::clinicalApplicationChanged);
 	disconnect(service, &PatientModelService::rMprChanged, this, &PatientModelService::rMprChanged);
@@ -114,17 +107,10 @@ void PatientModelServiceProxy::onServiceRemoved(PatientModelService *service)
 	mPatientModelService = PatientModelService::getNullObject();
 
 	emit dataAddedOrRemoved();
-	emit activeImageChanged("");
-	emit activeDataChanged("");
 	emit landmarkPropertiesChanged();
 	emit clinicalApplicationChanged();
 	emit rMprChanged();
 	emit patientChanged();
-}
-
-QList<DataPtr> PatientModelServiceProxy::getActiveDataList() const
-{
-	return mPatientModelService->getActiveDataList();
 }
 
 void PatientModelServiceProxy::insertData(DataPtr data)
@@ -160,11 +146,6 @@ std::map<QString, LandmarkProperty> PatientModelServiceProxy::getLandmarkPropert
 void PatientModelServiceProxy::setLandmarkName(QString uid, QString name)
 {
 	mPatientModelService->setLandmarkName(uid, name);
-}
-
-void PatientModelServiceProxy::setActiveData(DataPtr activeData)
-{
-	mPatientModelService->setActiveData(activeData);
 }
 
 void PatientModelServiceProxy::autoSave()
@@ -235,6 +216,11 @@ void PatientModelServiceProxy::setLandmarkActive(QString uid, bool active)
 RegistrationHistoryPtr PatientModelServiceProxy::get_rMpr_History() const
 {
 	return mPatientModelService->get_rMpr_History();
+}
+
+ActiveDataPtr PatientModelServiceProxy::getActiveData() const
+{
+	return mPatientModelService->getActiveData();
 }
 
 CLINICAL_VIEW PatientModelServiceProxy::getClinicalApplication() const

@@ -61,7 +61,7 @@ class cxGui_EXPORT TransferFunctionColorWidget : public BaseWidget
   Q_OBJECT
   
 public:
-  TransferFunctionColorWidget(PatientModelServicePtr patientModelService, QWidget* parent);
+  TransferFunctionColorWidget(ActiveDataPtr activeData, QWidget* parent);
   virtual ~TransferFunctionColorWidget();
   
   void setData(ImagePtr image, ImageTFDataPtr tfData);

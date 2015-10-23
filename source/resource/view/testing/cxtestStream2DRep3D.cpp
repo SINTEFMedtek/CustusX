@@ -30,7 +30,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "catch.hpp"
-#include "cxtestDummyDataManager.h"
+#include "cxtestVisServices.h"
 #include "cxStream2DRep3D.h"
 #include "cxTrackedStream.h"
 #include "cxDummyTool.h"
@@ -38,14 +38,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 TEST_CASE("Stream2DRep3D init", "[unit][resource]")
 {
-	cxtest::TestServicesPtr mServices = cxtest::TestServices::create();
+	cxtest::TestVisServicesPtr mServices = cxtest::TestVisServices::create();
 	cx::Stream2DRep3DPtr rep = cx::Stream2DRep3D::New(mServices->spaceProvider());
 	REQUIRE(rep);
 }
 
 TEST_CASE("Stream2DRep3D Set TrackedStream", "[unit][resource]")
 {
-	cxtest::TestServicesPtr mServices = cxtest::TestServices::create();
+	cxtest::TestVisServicesPtr mServices = cxtest::TestVisServices::create();
 	cx::Stream2DRep3DPtr rep = cx::Stream2DRep3D::New(mServices->spaceProvider());
 	REQUIRE(rep);
 

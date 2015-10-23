@@ -37,61 +37,147 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogger.h"
 #include "cxTime.h"
 #include "cxTool.h"
+#include <QDateTime>
+#include "cxTime.h"
+#include "cxXMLNodeWrapper.h"
 
 namespace cx
 {
-RecordSession::RecordSession(QString uid, double startTime, double stopTime, QString description) :
-    mStartTime(startTime),
-    mStopTime(stopTime),
-    mDescription(description)
+
+RecordSession::RecordSession()
 {
-	mUid = uid;
-	mDescription.append("_"+mUid+"");
+
 }
+
+RecordSession::RecordSession(int id, QString category) :
+	mId(id),
+	mCategory(category)
+{
+	mTimestamp = QDateTime::currentDateTime();
+}
+
 
 RecordSession::~RecordSession()
 {}
 
-QString RecordSession::getUid()
+void RecordSession::startNewInterval()
 {
-	return mUid;
+	QDateTime time = QDateTime::currentDateTime();
+	mIntervals.push_back(IntervalType(time, time));
 }
 
-QString RecordSession::getDescription()
+void RecordSession::stopLastInterval()
 {
-	return mDescription;
+	if (mIntervals.empty())
+		return;
+	QDateTime time = QDateTime::currentDateTime();
+	mIntervals.back().second = time;
 }
 
-double RecordSession::getStartTime()
+void RecordSession::cancelLastInterval()
 {
-	return mStartTime;
+	if (mIntervals.empty())
+		return;
+	mIntervals.pop_back();
 }
 
-double RecordSession::getStopTime()
+QDateTime RecordSession::getTimestamp() const
 {
-	return mStopTime;
+	return mTimestamp;
 }
 
-void RecordSession::addXml(QDomNode& parentNode)
+QString RecordSession::getHumanDescription() const
 {
-	QDomDocument doc = parentNode.ownerDocument();
+	QString format("hh:mm");
+	QString ts = this->getTimestamp().toString(format);
 
-	parentNode.toElement().setAttribute("uid", mUid);
-
-	QDomElement startNode = doc.createElement("start");
-	startNode.appendChild(doc.createTextNode(qstring_cast(mStartTime)));
-	parentNode.appendChild(startNode);
-
-	QDomElement stopNode = doc.createElement("stop");
-	stopNode.appendChild(doc.createTextNode(qstring_cast(mStopTime)));
-	parentNode.appendChild(stopNode);
-
-	QDomElement descriptionNode = doc.createElement("description");
-	descriptionNode.appendChild(doc.createTextNode(mDescription));
-	parentNode.appendChild(descriptionNode);
+	return QString("%1 %2 %3")
+			.arg(mCategory)
+			.arg(mId)
+			.arg(ts);
 }
 
-void RecordSession::parseXml(QDomNode& parentNode)
+QString RecordSession::getUid() const
+{
+	QString timestamp = this->getTimestamp().toString(timestampSecondsFormat());
+
+	return QString("%1_%2")
+			.arg(mId, 2, 10, QChar('0'))
+			.arg(timestamp);
+}
+
+QString RecordSession::getDescription() const
+{
+	QString timestamp = this->getTimestamp().toString(timestampSecondsFormat());
+	return QString("%1_%2_%3")
+			.arg(mCategory)
+			.arg(mId)
+			.arg(timestamp);
+}
+
+void RecordSession::addXml(QDomNode& node)
+{
+	XMLNodeAdder adder(node);
+	adder.node().toElement().setAttribute("uid", this->getUid());
+	adder.addTextToElement("category", mCategory);
+
+	for (unsigned i=0; i<mIntervals.size(); ++i)
+	{
+		QDomElement interval = adder.addElement("interval");
+		interval.setAttribute("start", this->datetime2timestamp(mIntervals[i].first));
+		interval.setAttribute("stop", this->datetime2timestamp(mIntervals[i].second));
+	}
+}
+
+void RecordSession::parseXml(QDomNode& node)
+{
+	if (node.isNull())
+	{
+		reportWarning("RecordSession::parseXml() node is null");
+		return;
+	}
+
+	if (this->isOldStyleXmlFormat(node))
+	{
+		this->parseXml_oldstyle(node);
+		return;
+	}
+
+	XMLNodeParser parser(node);
+
+	QDomElement base = node.toElement();
+
+	this->setIdAndTimestampFromUid(base.attribute("uid"));
+	mCategory = parser.parseTextFromElement("category");
+
+	std::vector<QDomElement> intervals = parser.getDuplicateElements("interval");
+	for (unsigned i=0; i<intervals.size(); ++i)
+	{
+		QDomElement source = intervals[i].toElement();
+		IntervalType interval;
+		bool ok;
+		interval.first = this->timestamp2datetime(source.attribute("start"));
+		interval.second = this->timestamp2datetime(source.attribute("stop"));
+		mIntervals.push_back(interval);
+	}
+}
+
+QDateTime RecordSession::timestamp2datetime(QString in) const
+{
+	return QDateTime::fromString(in, timestampMilliSecondsFormat());
+}
+
+QString RecordSession::datetime2timestamp(QDateTime in) const
+{
+	return in.toString(timestampMilliSecondsFormat());
+}
+
+bool RecordSession::isOldStyleXmlFormat(QDomNode& node)
+{
+	return node.firstChildElement("description").isElement();
+}
+
+void RecordSession::parseXml_oldstyle(QDomNode& parentNode)
 {
 	if (parentNode.isNull())
 	{
@@ -101,29 +187,59 @@ void RecordSession::parseXml(QDomNode& parentNode)
 
 	QDomElement base = parentNode.toElement();
 
-	mUid = base.attribute("uid");
+	QString uid = base.attribute("uid");
+
 	bool ok;
-	mStartTime = parentNode.namedItem("start").toElement().text().toDouble(&ok);
-	mStopTime = parentNode.namedItem("stop").toElement().text().toDouble(&ok);
-	mDescription = parentNode.namedItem("description").toElement().text();
+	double starttime = parentNode.namedItem("start").toElement().text().toDouble(&ok);
+	double stoptime = parentNode.namedItem("stop").toElement().text().toDouble(&ok);
+	QString description = parentNode.namedItem("description").toElement().text();
+
+	mCategory = description.split("_"+uid).first();
+	this->setIdAndTimestampFromUid(uid);
+	mIntervals.push_back(std::make_pair(QDateTime::fromMSecsSinceEpoch(starttime),
+										QDateTime::fromMSecsSinceEpoch(stoptime)));
 }
 
-TimedTransformMap RecordSession::getToolHistory_prMt(ToolPtr tool, RecordSessionPtr session)
+void RecordSession::setIdAndTimestampFromUid(QString uid)
 {
-	if(!tool)
-		reportError("RecordSession::getToolHistory_prMt(): Tool missing.");
+	mId = uid.split("_").first().toInt();
+	mTimestamp = QDateTime::fromString(uid.split("_").last(), timestampSecondsFormat());
+}
 
+TimedTransformMap RecordSession::getToolHistory_prMt(ToolPtr tool, RecordSessionPtr session, bool verbose)
+{
 	TimedTransformMap retval;
 
 	if(tool && session)
-		retval = tool->getSessionHistory(session->getStartTime(), session->getStopTime());
-
-	if(retval.empty() && session)
 	{
-		reportError("RecordSession::getToolHistory_prMt(): Could not find any tracking data from session "+session->getUid()+".");
+		for (unsigned i=0; i<session->mIntervals.size(); ++i)
+		{
+			TimedTransformMap values;
+			values = tool->getSessionHistory(session->mIntervals[i].first.toMSecsSinceEpoch(),
+											 session->mIntervals[i].second.toMSecsSinceEpoch());
+			retval.insert(values.begin(), values.end());
+		}
+	}
+
+	if(retval.empty() && session && verbose)
+	{
+		CX_LOG_ERROR() << QString("Could not find any tracking data for tool [%1] in session [%2]. ")
+						  .arg(tool.get() ? tool->getName() : "NULL")
+						  .arg(session.get() ? session->getHumanDescription() : "NULL");
 	}
 
 	return retval;
 }
+
+std::pair<QDateTime, QDateTime> RecordSession::getInterval(int i)
+{
+	return mIntervals[i];
+}
+
+unsigned RecordSession::getIntervalCount() const
+{
+	return mIntervals.size();
+}
+
 
 }//namespace cx

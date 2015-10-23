@@ -36,9 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTimer>
 #include <QTime>
 #include <QHostAddress>
-#include "igtlOSUtil.h"
-#include "igtlImageMessage.h"
-#include "igtlServerSocket.h"
 #include "vtkImageData.h"
 #include "vtkSmartPointer.h"
 #include "vtkMetaImageReader.h"
@@ -387,7 +384,7 @@ void ImageStreamerOpenCV::send()
 		return;
 	}
 	PackagePtr package(new Package());
-	package->mIgtLinkImageMessage = this->getImageMessage();
+	package->mImage = this->getImageMessage();
 	mSender->send(package);
 	mAvailableImage = false;
 
@@ -396,38 +393,23 @@ void ImageStreamerOpenCV::send()
 //		std::cout << "=== ImageStreamerOpenCV   send: " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
 }
 
-IGTLinkImageMessage::Pointer ImageStreamerOpenCV::getImageMessage()
+ImagePtr ImageStreamerOpenCV::getImageMessage()
 {
-	IGTLinkImageMessage::Pointer imgMsg = IGTLinkImageMessage::New();
-
 #ifdef CX_USE_OpenCV
 	if (!mVideoCapture->isOpened())
-		return IGTLinkImageMessage::Pointer();
+		return ImagePtr();
 
 	QTime start = QTime::currentTime();
 
 	cv::Mat frame_source;
 	//  mVideoCapture >> frame_source;
 	if (!mVideoCapture->retrieve(frame_source, 0))
-		return IGTLinkImageMessage::Pointer();
+		return ImagePtr();
 
 	if (this->thread() == QCoreApplication::instance()->thread() && !mSender)
 	{
 		cv::imshow("ImageStreamerOpenCV", frame_source);
 	}
-
-	//  std::cout << "grab" << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
-	//  return igtl::ImageMessage::Pointer();
-
-	igtl::TimeStamp::Pointer timestamp;
-	timestamp = igtl::TimeStamp::New();
-	//  double now = 1.0/1000*(double)QDateTime::currentDateTime().toMSecsSinceEpoch();
-	double grabTime = 1.0 / 1000 * (double) mLastGrabTime.toMSecsSinceEpoch();
-	timestamp->SetTime(grabTime);
-	static QDateTime lastlastGrabTime = mLastGrabTime;
-//	std::cout << "OpenCV stamp:\t" << mLastGrabTime.toString("hh:mm:ss.zzz").toStdString() << std::endl;
-//	std::cout << "OpenCV diff:\t" <<lastlastGrabTime.msecsTo(mLastGrabTime) << "\tdelay:\t" << mLastGrabTime.msecsTo(QDateTime::currentDateTime()) << std::endl;
-	lastlastGrabTime = mLastGrabTime;
 
 	cv::Mat frame = frame_source;
 	if (( frame.cols!=mRescaleSize.width() )|| (frame.rows!=mRescaleSize.height()))
@@ -435,118 +417,117 @@ IGTLinkImageMessage::Pointer ImageStreamerOpenCV::getImageMessage()
 		cv::resize(frame_source, frame, cv::Size(mRescaleSize.width(), mRescaleSize.height()), 0, 0, CV_INTER_LINEAR);
 	}
 
-	//  std::cout << "grab " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
-//	std::cout << "WH=("<< frame.cols << "," << frame.rows << ")" << ", Channels,Depth=("<< frame.channels() << "," << frame.depth() << ")" << std::endl;
+	vtkImageDataPtr raw = this->convertTovtkImageData(frame);
+	ImagePtr image(new Image("openCV", raw));
+	image->setAcquisitionTime(mLastGrabTime);
+	return image;
+#else
+	return ImagePtr();
+#endif
+}
 
+vtkImageDataPtr ImageStreamerOpenCV::convertTovtkImageData(cv::Mat& frame)
+{
+	vtkImageDataPtr retval = vtkImageDataPtr::New();
 
-	int size[] =
-    { 1, 1, 1 }; // spacing (mm/pixel)
-	size[0] = frame.cols;
-	size[1] = frame.rows;
+	Eigen::Array3i dim(frame.cols, frame.rows, 1);
+//	Eigen::Array3f spacing(1,1);
+	retval->SetDimensions(dim.data());
+	retval->SetSpacing(1,1,1);
 
-	float spacingF[] =
-	{ 1.0, 1.0, 1.0 }; // spacing (mm/pixel)
-	int* svsize = size;
-	int svoffset[] =
-	{ 0, 0, 0 }; // sub-volume offset
-	int scalarType = -1;
+	int dataType = -1;
 
-	if (frame.channels() == 3 || frame.channels() == 4)
+//	if (frame.channels() == 3 || frame.channels() == 4) // dropped support for alpha - dont think openCV uses this.
+	if (frame.channels() == 3)
 	{
-		scalarType = IGTLinkImageMessage::TYPE_UINT32;// scalar type
+		dataType = VTK_UNSIGNED_CHAR;
 	}
 	else if (frame.channels() == 1)
 	{
-		if (frame.depth() == 16)
+		// dropped support: must iterate over using shorts later on.
+//		if (frame.depth() == 16)
+//		{
+//			dataType = VTK_UNSIGNED_SHORT;
+//		}
+		if (frame.depth() == 8)
 		{
-			scalarType = IGTLinkImageMessage::TYPE_UINT16;// scalar type
-		}
-		else if (frame.depth() == 8)
-		{
-			scalarType = IGTLinkImageMessage::TYPE_UINT8;// scalar type
+			dataType = VTK_UNSIGNED_CHAR;
 		}
 	}
 
-	if (scalarType == -1)
+	if (dataType == -1)
 	{
 		std::cerr << "unknown image type" << std::endl;
-		return IGTLinkImageMessage::Pointer();
+		return vtkImageDataPtr();
 	}
+
+	retval->AllocateScalars(dataType, frame.channels());
+
 	//------------------------------------------------------------
 	// Create a new IMAGE type message
 //	IGTLinkImageMessage::Pointer imgMsg = IGTLinkImageMessage::New();
-	imgMsg->SetDimensions(size);
-	imgMsg->SetSpacing(spacingF);
-	imgMsg->SetScalarType(scalarType);
-	imgMsg->SetSubVolume(svsize, svoffset);
-	imgMsg->AllocateScalars();
-	imgMsg->SetTimeStamp(timestamp);
+//	imgMsg->SetDimensions(size);
+//	imgMsg->SetSpacing(spacingF);
+//	imgMsg->SetScalarType(scalarType);
+//	imgMsg->SetSubVolume(svsize, svoffset);
+//	imgMsg->AllocateScalars();
+//	imgMsg->SetTimeStamp(timestamp);
 
-	unsigned char* destPtr = reinterpret_cast<unsigned char*> (imgMsg->GetScalarPointer());
+	unsigned char* dest = reinterpret_cast<unsigned char*> (retval->GetScalarPointer());
 	uchar* src = frame.data;
-	//  std::cout << "pre copy " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
-	int N = size[0] * size[1];
-	QString colorFormat;
+	int N = frame.rows * frame.cols;
+//	QString colorFormat;
 
-	if (frame.channels() >= 3)
+	if (frame.channels() == 3)
 	{
 		if (frame.isContinuous())
 		{
 			// 3-channel continous colors
 			for (int i = 0; i < N; ++i)
 			{
-				*destPtr++ = 255;
-				*destPtr++ = src[2];
-				*destPtr++ = src[1];
-				*destPtr++ = src[0];
+//				*destPtr++ = 255;
+				*dest++ = src[2]; // R
+				*dest++ = src[1]; // G
+				*dest++ = src[0]; // B
 				src += 3;
 			}
 		}
 		else
 		{
 //			std::cout << "noncontinous conversion, rows=" << size[1] << std::endl;
-			for (int i=0; i<size[1]; ++i)
+			for (int i=0; i<dim[1]; ++i)
 			{
 				 const uchar* src = frame.ptr<uchar>(i);
-				 for (int j=0; j<size[0]; ++j)
+				 for (int j=0; j<dim[0]; ++j)
 				 {
-						*destPtr++ = 255;
-						*destPtr++ = src[2];
-						*destPtr++ = src[1];
-						*destPtr++ = src[0];
+//						*destPtr++ = 255;
+						*dest++ = src[2];
+						*dest++ = src[1];
+						*dest++ = src[0];
 						src += 3;
 				 }
 			}
 		}
-		colorFormat = "ARGB";
+//		colorFormat = "ARGB";
 	}
 	if (frame.channels() == 1)
 	{
 		if (!frame.isContinuous())
 		{
 			std::cout << "Error: Non-continous frame data." << std::endl;
-			return IGTLinkImageMessage::Pointer();
+			return vtkImageDataPtr();
 		}
 
 		// BW camera
 		for (int i = 0; i < N; ++i)
 		{
-			*destPtr++ = *src++;
+			*dest++ = *src++;
 		}
-		colorFormat = "R";
+//		colorFormat = "R";
 	}
 
-	imgMsg->SetDeviceName(cstring_cast(QString("cxOpenCV [%1]").arg(colorFormat)));
+	return retval;
 
-	//------------------------------------------------------------
-	// Get randome orientation matrix and set it.
-	igtl::Matrix4x4 matrix;
-	GetRandomTestMatrix(matrix);
-	imgMsg->SetMatrix(matrix);
-
-//	  std::cout << "   grab+process " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
-#endif
-	return imgMsg;
 }
 
 //------------------------------------------------------------

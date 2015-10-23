@@ -38,23 +38,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx {
 
+RegServicesPtr RegServices::create(ctkPluginContext* context)
+{
+	return RegServicesPtr(new RegServices(context));
+}
+
 RegServices::RegServices(ctkPluginContext* context) :
 	VisServices(context)
 {
 	registrationService	 = RegistrationServicePtr(new RegistrationServiceProxy(context));
-//	visualizationService = VisualizationServicePtr(new VisualizationServiceProxy(context));
 	acquisitionService	 = AcquisitionServicePtr(new AcquisitionServiceProxy(context));
 }
 
-RegServices RegServices::getNullObjects()
+RegServicesPtr RegServices::getNullObjects()
 {
-	return RegServices();
+	return RegServicesPtr(new RegServices());
 }
 
 RegServices::RegServices()
 {
 	registrationService		= RegistrationService::getNullObject();
-//	visualizationService	= VisualizationService::getNullObject();
 	acquisitionService		= AcquisitionService::getNullObject();
 }
 } // cx

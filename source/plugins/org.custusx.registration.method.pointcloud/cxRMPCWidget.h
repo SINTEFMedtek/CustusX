@@ -37,12 +37,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationBaseWidget.h"
 #include "cxForwardDeclarations.h"
 #include "cxXmlOptionItem.h"
-
+#include "cxICPRegistrationBaseWidget.h"
 
 namespace cx
 {
 class WidgetObscuredListener;
-class RecordTrackingWidget;
+class ICPWidget;
 typedef boost::shared_ptr<class Acquisition> AcquisitionPtr;
 typedef boost::shared_ptr<class StringPropertySelectMesh> StringPropertySelectMeshPtr;
 typedef boost::shared_ptr<class ToolRep3D> ToolRep3DPtr;
@@ -51,38 +51,44 @@ typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
 //typedef boost::shared_ptr<class BronchoscopyRegistration> BronchoscopyRegistrationPtr;
 typedef std::map<QString, ToolPtr> ToolMap;
 typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
+typedef boost::shared_ptr<class SeansVesselReg> SeansVesselRegPtr;
+typedef boost::shared_ptr<class MeshInView> MeshInViewPtr;
+typedef boost::shared_ptr<class SpaceListener> SpaceListenerPtr;
 
 /**
  *
- * \brief Register a point cloud to a surface
+ * Register a point cloud in patient space to a point cloud in reference space.
  *
- * \date 2015-09-06
+ * The moving data are assumed to be in patient space, and are used to correct
+ * the patient registration prMt. The moving data iself are also affected, in order
+ * to keep the relation of moving relative to patient.
+ *
+ * \date 2015-09-16
  * \author Christian Askeland
  */
-class RMPCWidget: public RegistrationBaseWidget
+class RMPCWidget: public ICPRegistrationBaseWidget
 {
 	Q_OBJECT
 
 public:
-	RMPCWidget(RegServices services, QWidget *parent);
-	virtual ~RMPCWidget()
-	{
-	}
-	virtual QString defaultWhatsThis() const;
-private slots:
-	void registerSlot();
+	RMPCWidget(RegServicesPtr services, QWidget *parent);
+	virtual ~RMPCWidget() {}
+
+protected:
+	virtual void initializeRegistrator();
+	virtual void inputChanged();
+	virtual void applyRegistration(Transform3D delta);
+	virtual void onShown();
+	virtual void setup();
+
+	virtual double getDefaultAutoLTS() const { return false; }
+
 private:
-	RegServices mServices;
-	QVBoxLayout* mVerticalLayout;
-	QLabel* mLabel;
-	XmlOptionFile mOptions;
-	MeshPtr mMesh;
+	StringPropertyBasePtr mFixedImage;
+	StringPropertyBasePtr mMovingImage;
 
-	QVBoxLayout* createVBoxInGroupBox(QVBoxLayout* parent, QString header);
-
-	StringPropertySelectMeshPtr mSurfaceSelector;
-	QPushButton* mRegisterButton;
-	RecordTrackingWidget* mRecordTrackingWidget;
+	SpaceListenerPtr mSpaceListenerMoving;
+	SpaceListenerPtr mSpaceListenerFixed;
 };
 
 } //namespace cx

@@ -122,7 +122,7 @@ void VisualizationTab::init()
   mAnyplaneViewOffset = DoubleProperty::initialize("AnyplaneViewOffset",
 														 "View Offset",
 														 "Position of virtual tool tip in anyplane view, % from top.",
-														 anyplaneViewOffset, DoubleRange(0.1,0.5,0.05), 2, QDomNode());
+														 anyplaneViewOffset, DoubleRange(-0.5,0.5,0.05), 2, QDomNode());
   mAnyplaneViewOffset->setInternal2Display(100);
 
   bool followTooltip = settings()->value("Navigation/followTooltip").value<bool>();
@@ -494,7 +494,7 @@ void ToolConfigTab::globalConfigurationFileChangedSlot(QString key)
 // PreferencesDialog
 //------------------------------------------------------------------------------
 
-PreferencesDialog::PreferencesDialog(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget *parent) :
+PreferencesDialog::PreferencesDialog(ViewServicePtr viewService, PatientModelServicePtr patientModelService, QWidget *parent) :
   QDialog(parent)
 {
   mActionGroup = new QActionGroup(this);
@@ -505,7 +505,7 @@ PreferencesDialog::PreferencesDialog(VisualizationServicePtr visualizationServic
 
   mButtonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Apply | QDialogButtonBox::Cancel);
 
-  this->addTab(new GeneralTab(visualizationService, patientModelService), tr("General"));
+  this->addTab(new GeneralTab(viewService, patientModelService), tr("General"));
   this->addTab(new PerformanceTab, tr("Performance"));
   this->addTab(new AutomationTab, tr("Automation"));
   this->addTab(new VisualizationTab(patientModelService), tr("Visualization"));

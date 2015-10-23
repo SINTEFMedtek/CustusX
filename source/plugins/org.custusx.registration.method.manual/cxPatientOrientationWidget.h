@@ -58,7 +58,7 @@ class PatientOrientationWidget : public RegistrationBaseWidget
   Q_OBJECT
 
 public:
-	PatientOrientationWidget(RegServices services, QWidget* parent, QString objectName, QString windowTitle);
+	PatientOrientationWidget(RegServicesPtr services, QWidget* parent, QString objectName, QString windowTitle);
   ~PatientOrientationWidget();
 
 private slots:

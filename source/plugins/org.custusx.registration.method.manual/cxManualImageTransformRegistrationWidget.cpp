@@ -41,10 +41,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ManualImageTransformRegistrationWidget::ManualImageTransformRegistrationWidget(RegServices services, QWidget *parent, QString objectName) :
+ManualImageTransformRegistrationWidget::ManualImageTransformRegistrationWidget(RegServicesPtr services, QWidget *parent, QString objectName) :
 	ManualImageRegistrationWidget(services, parent, objectName, "Manual Image Transform Registration")
 {
-	StringPropertyBasePtr movingImage(new StringPropertyRegistrationMovingImage(services.registrationService, services.patientModelService));
+	StringPropertyBasePtr movingImage(new StringPropertyRegistrationMovingImage(services->registration(), services->patient()));
 
 	LabeledComboBoxWidget* moving = new LabeledComboBoxWidget(this, movingImage);
 
@@ -70,7 +70,7 @@ void ManualImageTransformRegistrationWidget::setMatrixFromWidget(Transform3D M)
 	Transform3D rMMd = M;
 
 	Transform3D delta_pre_rMd = rMMd * rMd.inv(); // gives delta on the r (left) side.
-	mServices.registrationService->applyImage2ImageRegistration(delta_pre_rMd, "Manual Image rMd");
+	mServices->registration()->applyImage2ImageRegistration(delta_pre_rMd, "Manual Image rMd");
 }
 
 } //cx

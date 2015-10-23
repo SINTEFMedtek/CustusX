@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackedStream.h"
 #include "cxTypeConversions.h"
 #include "cxPatientModelServiceProxy.h"
+#include "cxActiveData.h"
 
 namespace cx
 {
@@ -46,22 +47,25 @@ StringPropertyActiveData::StringPropertyActiveData(PatientModelServicePtr patien
 {
 	mValueName = "Active Data";
 	mHelp = "Select the active data obejct";
-	connect(mPatientModelService.get(), &PatientModelService::activeImageChanged, this, &StringPropertyActiveImage::changed);
+
+	mActiveData = mPatientModelService->getActiveData();
+	connect(mActiveData.get(), &ActiveData::activeDataChanged, this, &StringPropertyActiveData::changed);
 }
 
 bool StringPropertyActiveData::setValue(const QString& value)
 {
 	DataPtr newData = mPatientModelService->getData(value);
-	if (newData==mPatientModelService->getActiveData())
+	if (newData == mActiveData->getActive())
 		return false;
-	mPatientModelService->setActiveData(newData);
+	mActiveData->setActive(newData);
 	return true;
 }
 
 QString StringPropertyActiveData::getValue() const
 {
 	QString retval = "";
-	DataPtr activeData = mPatientModelService->getActiveData();
+	DataPtr activeData = mActiveData->getActiveUsingRegexp(mTypeRegexp);
+
 	if(activeData)
 		retval = activeData->getUid();
 	return retval;
@@ -72,21 +76,23 @@ StringPropertyActiveImage::StringPropertyActiveImage(PatientModelServicePtr pati
 {
 	mValueName = "Active Volume";
 	mHelp = "Select the active volume";
-	connect(mPatientModelService.get(), &PatientModelService::activeImageChanged, this, &StringPropertyActiveImage::changed);
+
+	mActiveData = mPatientModelService->getActiveData();
+	connect(mActiveData.get(), &ActiveData::activeImageChanged, this, &StringPropertyActiveImage::changed);
 }
 
 bool StringPropertyActiveImage::setValue(const QString& value)
 {
   ImagePtr newImage = mPatientModelService->getData<Image>(value);
-  if (newImage==mPatientModelService->getActiveData<Image>())
+  if (newImage==mActiveData->getActive<Image>())
 	return false;
-  mPatientModelService->setActiveData(newImage);
+  mActiveData->setActive(newImage);
   return true;
 }
 
 QString StringPropertyActiveImage::getValue() const
 {
-	return mPatientModelService->getActiveImageUid();
+	return mActiveData->getActiveImageUid();
 }
 
 //---------------------------------------------------------

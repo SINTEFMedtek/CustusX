@@ -68,7 +68,7 @@ typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 typedef boost::shared_ptr<class Navigation> NavigationPtr;
 typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
 
-typedef boost::shared_ptr<class ViewManager> VisualizationServiceOldPtr;
+typedef boost::shared_ptr<class ViewManager> ViewManagerPtr;
 
 /**
  * \file
@@ -130,7 +130,7 @@ class org_custusx_core_view_EXPORT ViewManager: public QObject
 {
 Q_OBJECT
 public:
-	static VisualizationServiceOldPtr create(VisServicesPtr backend);
+	static ViewManagerPtr create(VisServicesPtr backend);
 	virtual ~ViewManager();
 
 	ViewPtr get3DView(int group = 0, int index = 0);
@@ -180,6 +180,7 @@ signals:
 	void activeLayoutChanged(); ///< emitted when the active layout changes
 	void activeViewChanged(); ///< emitted when the active view changes
 	void renderingEnabledChanged(); ///< emitted then rendering is enabled/disabled
+	void pointSampled(Vector3D p_r);
 
 protected slots:
 	void settingsChangedSlot(QString key);

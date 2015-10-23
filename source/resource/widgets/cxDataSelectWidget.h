@@ -43,7 +43,7 @@ namespace cx
 {
 typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
 typedef boost::shared_ptr<class SelectDataStringPropertyBase> SelectDataStringPropertyBasePtr;
-typedef boost::shared_ptr<class VisualizationService> VisualizationServicePtr;
+typedef boost::shared_ptr<class ViewService> ViewServicePtr;
 
 /** Widget for selecting/showing/removing a Data.
   *
@@ -59,7 +59,7 @@ class cxResourceWidgets_EXPORT DataSelectWidget : public BaseWidget
 {
     Q_OBJECT
 public:
-	DataSelectWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent, SelectDataStringPropertyBasePtr data, QGridLayout* gridLayout = NULL, int row=0);
+	DataSelectWidget(ViewServicePtr viewService, PatientModelServicePtr patientModelService, QWidget* parent, SelectDataStringPropertyBasePtr data, QGridLayout* gridLayout = NULL, int row=0);
 	~DataSelectWidget();
 
 signals:
@@ -78,7 +78,7 @@ private:
     ViewGroupDataPtr mCurrentViewGroup;
     QAction* mToggleShowAction;
     QAction* mRemoveAction;
-	VisualizationServicePtr mVisualizationService;
+	ViewServicePtr mViewService;
 	PatientModelServicePtr mPatientModelService;
 };
 

@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx {
 
-PlateImageRegistrationWidget::PlateImageRegistrationWidget(RegServices services, QWidget* parent) :
+PlateImageRegistrationWidget::PlateImageRegistrationWidget(RegServicesPtr services, QWidget* parent) :
 	FastImageRegistrationWidget(services, parent, "org_custusx_registration_method_plate_image_landmarks", "Plate Registration Image landmarks")
 {
 	this->setToolTip("Registration using a custom plate object");
@@ -47,14 +47,14 @@ PlateImageRegistrationWidget::~PlateImageRegistrationWidget()
 
 void PlateImageRegistrationWidget::editLandmarkButtonClickedSlot()
 {
-	mServices.patientModelService->setLandmarkActive(mActiveLandmark, true);
+	mServices->patient()->setLandmarkActive(mActiveLandmark, true);
 	ImageLandmarksWidget::editLandmarkButtonClickedSlot();
 }
 
 void PlateImageRegistrationWidget::performRegistration()
 {
 	FastImageRegistrationWidget::performRegistration();
-	mServices.registrationService->doFastRegistration_Translation();
+	mServices->registration()->doFastRegistration_Translation();
 }
 
 } //cx

@@ -56,13 +56,13 @@ public:
 	  * Encode the image into a IGTLink message, containing
 	  * image data, uid and timstamp
 	  */
-	IGTLinkImageMessage::Pointer encode(ImagePtr image);
+	igtl::ImageMessage::Pointer encode(ImagePtr image);
 	/**
 	  * Decode the IGTLink message to create an image containing
 	  * image data, uid and timstamp. The color format is also
 	  * converted to RGBX
 	  */
-	ImagePtr decode(IGTLinkImageMessage::Pointer msg);
+//	ImagePtr decode(IGTLinkImageMessage::Pointer msg);
 	ImagePtr decode(igtl::ImageMessage::Pointer msg);
 
 	/**

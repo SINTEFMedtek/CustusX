@@ -60,20 +60,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxProfile.h"
 #include "cxSettings.h"
 #include "cxDefinitionStrings.h"
+#include "cxActiveData.h"
 
 
 namespace cx
 {
 
-DataManagerImplPtr DataManagerImpl::create()
+DataManagerImplPtr DataManagerImpl::create(ActiveDataPtr activeData)
 {
 	DataManagerImplPtr retval;
-	retval.reset(new DataManagerImpl());
+	retval.reset(new DataManagerImpl(activeData));
 	return retval;
 }
 
-DataManagerImpl::DataManagerImpl() :
-	mClinicalApplication(mdNEUROLOGICAL)
+DataManagerImpl::DataManagerImpl(ActiveDataPtr activeData) :
+	mClinicalApplication(mdNEUROLOGICAL),
+	mActiveData(activeData)
 {
 	m_rMpr_History.reset(new RegistrationHistory());
 	connect(m_rMpr_History.get(), &RegistrationHistory::currentChanged, this, &DataManager::rMprChanged);
@@ -113,7 +115,6 @@ void DataManagerImpl::clear()
 {
 	mData.clear();
 	mCenter = Vector3D(0, 0, 0);
-	mActiveData.clear();
 	mLandmarkProperties.clear();
 
 	m_rMpr_History->clear();
@@ -121,8 +122,6 @@ void DataManagerImpl::clear()
 
 	emit dataAddedOrRemoved();
 	emit centerChanged();
-	emit activeImageChanged("");
-	emit activeDataChanged("");
 	emit landmarkPropertiesChanged();
 }
 
@@ -162,31 +161,6 @@ void DataManagerImpl::setCenter(const Vector3D& center)
 {
 	mCenter = center;
 	emit centerChanged();
-}
-
-DataPtr DataManagerImpl::getActiveData() const
-{
-	if(mActiveData.isEmpty())
-		return DataPtr();
-	return mActiveData.last();
-}
-
-void DataManagerImpl::setActiveData(DataPtr activeData)
-{
-	if (!activeData)
-		return;
-
-	mActiveData.removeAll(activeData);
-	mActiveData.append(activeData);
-
-	this->emitSignals(activeData);
-}
-
-void DataManagerImpl::emitSignals(DataPtr activeData)
-{
-	this->emitActiveDataChanged();
-	if(activeData && activeData->getType() == "image")
-		this->emitActiveImageChanged();
 }
 
 void DataManagerImpl::setLandmarkNames(std::vector<QString> names)
@@ -329,11 +303,6 @@ void DataManagerImpl::addXml(QDomNode& parentNode)
 
 	m_rMpr_History->addXml(dataManagerNode);
 
-	QDomElement activeImageNode = doc.createElement("activeImageUid");
-	if(!mActiveData.isEmpty())
-		activeImageNode.appendChild(doc.createTextNode(this->getActiveDataStringList().join(" ")));
-	dataManagerNode.appendChild(activeImageNode);
-
 	QDomElement landmarkPropsNode = doc.createElement("landmarkprops");
 	LandmarkPropertyMap::iterator it = mLandmarkProperties.begin();
 	for (; it != mLandmarkProperties.end(); ++it)
@@ -413,13 +382,6 @@ void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString rootPath)
 	child = dataManagerNode.firstChild();
 	while (!child.isNull())
 	{
-		if (child.toElement().tagName() == "activeImageUid")
-		{
-			const QString activeDataList = child.toElement().text();
-			if (!activeDataList.isEmpty())
-				this->loadActiveData(activeDataList);
-		}
-		//TODO add activeMesh
 		if (child.toElement().tagName() == "center")
 		{
 			const QString centerString = child.toElement().text();
@@ -587,54 +549,10 @@ void DataManagerImpl::generateUidAndName(QString* _uid, QString* _name)
 	}
 }
 
-void DataManagerImpl::emitActiveImageChanged()
-{
-	DataPtr activeImage = DataManager::getActiveData<Image>();
-	QString uid = getChangedUid(activeImage);
-	emit activeImageChanged(uid);
-}
-
-void DataManagerImpl::emitActiveDataChanged()
-{
-	DataPtr activeData = this->getActiveData();
-	QString uid = getChangedUid(activeData);
-	emit activeDataChanged(uid);
-}
-
-QString DataManagerImpl::getChangedUid(DataPtr activeData)
-{
-	QString uid = "";
-	if(activeData)
-		uid = activeData->getUid();
-	return uid;
-}
-
-void DataManagerImpl::removeActiveData(DataPtr dataToBeRemoved)
-{
-	if(!dataToBeRemoved)
-		reportWarning("DataManagerImpl::removeActiveData: No data");
-	if(!mActiveData.contains(dataToBeRemoved))
-		return;
-
-	bool resendActiveImage = false;
-	bool resendActiveData = false;
-	if (DataManager::getActiveData<Image>() == dataToBeRemoved)
-		resendActiveImage = true;
-	if(this->getActiveData() == dataToBeRemoved)
-		resendActiveData = true;
-
-	mActiveData.removeAll(dataToBeRemoved);
-
-	if(resendActiveImage)
-		emitActiveImageChanged();
-	if(resendActiveData)
-		emitActiveDataChanged();
-}
-
 void DataManagerImpl::removeData(const QString& uid, QString basePath)
 {
 	DataPtr dataToBeRemoved = this->getData(uid);
-	removeActiveData(dataToBeRemoved);
+	mActiveData->remove(dataToBeRemoved);
 
 	mData.erase(uid);
 
@@ -663,30 +581,6 @@ void DataManagerImpl::deleteFiles(DataPtr data, QString basePath)
 			continue;
 		report(QString("Removing %1 from disk").arg(files[i]));
 		QFile(files[i]).remove();
-	}
-}
-
-QList<DataPtr> DataManagerImpl::getActiveDataList() const
-{
-	return mActiveData;
-}
-
-QStringList DataManagerImpl::getActiveDataStringList() const
-{
-	QStringList retval;
-	if(!mActiveData.isEmpty())
-		for(int i = 0; i < mActiveData.size(); ++i)
-			retval << mActiveData.at(i)->getUid();
-	return retval;
-}
-
-void DataManagerImpl::loadActiveData(const QString activeDatas)
-{
-	QStringList activeDataList = activeDatas.split(" ");
-	for(int i = 0; i < activeDataList.size(); ++i)
-	{
-		DataPtr data = this->getData(activeDataList.at(i));
-		this->setActiveData(data);
 	}
 }
 

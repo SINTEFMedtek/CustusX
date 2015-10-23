@@ -95,7 +95,7 @@ public:
 namespace cx
 {
 typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
-typedef boost::shared_ptr<class VisualizationService> VisualizationServicePtr;
+typedef boost::shared_ptr<class ViewService> ViewServicePtr;
 /**
  * \class BaseWidget
  *
@@ -125,8 +125,7 @@ public:
 	 * If layout is used, a QToolButton is created and added to it.
 	 * If tip is empty, it is set equal to text.
 	 */
-	template<class T>
-	QAction* createAction(QObject* parent, QIcon iconName, QString text, QString tip, T slot, QLayout* layout=NULL, QToolButton* button = new QToolButton())
+	QAction* createAction2(QObject* parent, QIcon iconName, QString text, QString tip, QLayout* layout=NULL, QToolButton* button = new QToolButton())
 	{
 		if (tip.isEmpty())
 			tip = text;
@@ -134,7 +133,6 @@ public:
 	  action->setStatusTip(tip);
 	  action->setWhatsThis(tip);
 	  action->setToolTip(tip);
-	  connect(action, SIGNAL(triggered()), this, slot);
 	  if (layout)
 	  {
 		  button->setDefaultAction(action);
@@ -142,6 +140,19 @@ public:
 	  }
 	  return action;
 	}
+
+	/**Shorthand method for action creation.
+	 * If layout is used, a QToolButton is created and added to it.
+	 * If tip is empty, it is set equal to text.
+	 */
+	template<class T>
+	QAction* createAction(QObject* parent, QIcon iconName, QString text, QString tip, T slot, QLayout* layout=NULL, QToolButton* button = new QToolButton())
+	{
+	  QAction* action = createAction2(parent, iconName, text, tip, layout, button);
+	  connect(action, SIGNAL(triggered()), this, slot);
+	  return action;
+	}
+
 
 public slots:
     void adjustSizeSlot();

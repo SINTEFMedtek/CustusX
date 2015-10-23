@@ -54,10 +54,10 @@ namespace cx
 {
 
 
-MeshInfoWidget::MeshInfoWidget(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget* parent) :
+MeshInfoWidget::MeshInfoWidget(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget* parent) :
 	InfoWidget(parent, "MeshInfoWidget", "Mesh Properties"),
 	mPatientModelService(patientModelService),
-	mVisualizationService(visualizationService)
+	mViewService(viewService)
 {
 	this->addWidgets(patientModelService);
 	this->meshSelectedSlot();
@@ -222,14 +222,14 @@ void MeshInfoWidget::addWidgets(PatientModelServicePtr patientModelService)
 
 	int gridLayoutRow = 1;
 
-	gridLayout->addWidget(new DataSelectWidget(mVisualizationService, mPatientModelService, this, mSelectMeshWidget), gridLayoutRow++, 0, 1, 2);
+	gridLayout->addWidget(new DataSelectWidget(mViewService, mPatientModelService, this, mSelectMeshWidget), gridLayoutRow++, 0, 1, 2);
 	new LabeledLineEditWidget(this, mUidAdapter, gridLayout, gridLayoutRow++);
 	new LabeledLineEditWidget(this, mNameAdapter, gridLayout, gridLayoutRow++);
     new LabeledComboBoxWidget(this, mParentFrameAdapter, gridLayout, gridLayoutRow++);
 
     gridLayout->addWidget(optionsWidget, gridLayoutRow++, 0, 1, 2);
     gridLayout->addWidget(new QLabel("Visualization size:", this), gridLayoutRow, 0);
-    gridLayout->addWidget(createDataWidget(mVisualizationService, mPatientModelService, this, mVisSizeWidget),gridLayoutRow++,1);
+    gridLayout->addWidget(createDataWidget(mViewService, mPatientModelService, this, mVisSizeWidget),gridLayoutRow++,1);
     gridLayout->addWidget(glyphWidget, gridLayoutRow++, 0, 1, 2);
 	gridLayout->addWidget(mTableWidget, gridLayoutRow++, 0, 1, 2);
 	gridLayout->addWidget(importTransformButton, gridLayoutRow++, 0, 1, 2);

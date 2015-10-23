@@ -57,7 +57,7 @@ Message::Message(QString text, MESSAGE_LEVEL messageLevel, int timeoutTime) :
   mMessageLevel(messageLevel),
   mTimeoutTime(timeoutTime),
   mTimeStamp(QDateTime::currentDateTime()),
-  mMuted(false),
+  mMuted(true),
   mChannel("console")
 {
 	this->setThreadName();

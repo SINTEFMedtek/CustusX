@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx {
 
-CompactFilterSetupWidget::CompactFilterSetupWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent, XmlOptionFile options, bool addFrame) :
+CompactFilterSetupWidget::CompactFilterSetupWidget(ViewServicePtr viewService, PatientModelServicePtr patientModelService, QWidget* parent, XmlOptionFile options, bool addFrame) :
     BaseWidget(parent, "FilterSetupWidget", "FilterSetup")
 {
 	mFrame = NULL;
@@ -47,7 +47,7 @@ CompactFilterSetupWidget::CompactFilterSetupWidget(VisualizationServicePtr visua
 	QVBoxLayout* toptopLayout = new QVBoxLayout(this);
 	toptopLayout->setMargin(0);
 
-	mOptionsWidget = new OptionsWidget(visualizationService, patientModelService, this);
+	mOptionsWidget = new OptionsWidget(viewService, patientModelService, this);
 
 	if (addFrame)
 	{

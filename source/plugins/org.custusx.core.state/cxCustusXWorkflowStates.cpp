@@ -49,7 +49,7 @@ namespace cx
 NavigationWorkflowState::NavigationWorkflowState(QState* parent, StateServiceBackendPtr backend) :
 				WorkflowState(parent, "NavigationUid", "Navigation", backend)
 {
-	connect(mBackend->getPatientService().get(), SIGNAL(patientChanged()), this, SLOT(canEnterSlot()));
+	connect(mBackend->patient().get(), SIGNAL(patientChanged()), this, SLOT(canEnterSlot()));
 }
 
 void NavigationWorkflowState::onEntry(QEvent * event)
@@ -59,7 +59,7 @@ void NavigationWorkflowState::onEntry(QEvent * event)
 
 bool NavigationWorkflowState::canEnter() const
 {
-	return mBackend->getPatientService()->isPatientValid();
+	return mBackend->patient()->isPatientValid();
 }
 
 // --------------------------------------------------------
@@ -71,7 +71,7 @@ bool NavigationWorkflowState::canEnter() const
 RegistrationWorkflowState::RegistrationWorkflowState(QState* parent, StateServiceBackendPtr backend) :
 				WorkflowState(parent, "RegistrationUid", "Registration", backend)
 {
-	connect(mBackend->getPatientService().get(), SIGNAL(patientChanged()), this, SLOT(canEnterSlot()));
+	connect(mBackend->patient().get(), SIGNAL(patientChanged()), this, SLOT(canEnterSlot()));
 }
 ;
 
@@ -79,7 +79,7 @@ bool RegistrationWorkflowState::canEnter() const
 {
 // We need to perform patient orientation prior to
 // running and us acq. Thus we need access to the reg mode.
-	return mBackend->getPatientService()->isPatientValid();
+	return mBackend->patient()->isPatientValid();
 }
 ;
 
@@ -92,12 +92,12 @@ bool RegistrationWorkflowState::canEnter() const
 PreOpPlanningWorkflowState::PreOpPlanningWorkflowState(QState* parent, StateServiceBackendPtr backend) :
 				WorkflowState(parent, "PreOpPlanningUid", "Preoperative Planning", backend)
 {
-	connect(mBackend->getPatientService().get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(canEnterSlot()));
+	connect(mBackend->patient().get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(canEnterSlot()));
 }
 
 bool PreOpPlanningWorkflowState::canEnter() const
 {
-	return !mBackend->getPatientService()->getData().empty();
+	return !mBackend->patient()->getData().empty();
 }
 
 // --------------------------------------------------------
@@ -109,7 +109,7 @@ bool PreOpPlanningWorkflowState::canEnter() const
 IntraOpImagingWorkflowState::IntraOpImagingWorkflowState(QState* parent, StateServiceBackendPtr backend) :
 				WorkflowState(parent, "IntraOpImagingUid", "Intraoperative Imaging", backend)
 {
-	connect(mBackend->getPatientService().get(), SIGNAL(patientChanged()), this, SLOT(canEnterSlot()));
+	connect(mBackend->patient().get(), SIGNAL(patientChanged()), this, SLOT(canEnterSlot()));
 }
 
 void IntraOpImagingWorkflowState::onEntry(QEvent * event)
@@ -119,7 +119,7 @@ void IntraOpImagingWorkflowState::onEntry(QEvent * event)
 
 bool IntraOpImagingWorkflowState::canEnter() const
 {
-	return mBackend->getPatientService()->isPatientValid();
+	return mBackend->patient()->isPatientValid();
 }
 
 // --------------------------------------------------------
@@ -131,12 +131,12 @@ bool IntraOpImagingWorkflowState::canEnter() const
 PostOpControllWorkflowState::PostOpControllWorkflowState(QState* parent, StateServiceBackendPtr backend) :
 				WorkflowState(parent, "PostOpControllUid", "Postoperative Control", backend)
 {
-	connect(mBackend->getPatientService().get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(canEnterSlot()));
+	connect(mBackend->patient().get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(canEnterSlot()));
 }
 
 bool PostOpControllWorkflowState::canEnter() const
 {
-	return !mBackend->getPatientService()->getData().empty();
+	return !mBackend->patient()->getData().empty();
 }
 
 }

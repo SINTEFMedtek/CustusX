@@ -41,144 +41,151 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-VisualizationServicePtr VisualizationServiceProxy::create(ctkPluginContext *pluginContext)
+ViewServicePtr ViewServiceProxy::create(ctkPluginContext *pluginContext)
 {
-	return VisualizationServicePtr(new VisualizationServiceProxy(pluginContext));
+	return ViewServicePtr(new ViewServiceProxy(pluginContext));
 }
 
-VisualizationServiceProxy::VisualizationServiceProxy(ctkPluginContext *pluginContext) :
+ViewServiceProxy::ViewServiceProxy(ctkPluginContext *pluginContext) :
 	mPluginContext(pluginContext),
-	mVisualizationService(VisualizationService::getNullObject())
+	mViewService(ViewService::getNullObject())
 {
 	this->initServiceListener();
 }
 
-ViewPtr VisualizationServiceProxy::get3DView(int group, int index)
+ViewPtr ViewServiceProxy::get3DView(int group, int index)
 {
-	return mVisualizationService->get3DView(group, index);
+	return mViewService->get3DView(group, index);
 }
 
-int VisualizationServiceProxy::getActiveGroupId() const
+int ViewServiceProxy::getActiveGroupId() const
 {
-	return mVisualizationService->getActiveGroupId();
+	return mViewService->getActiveGroupId();
 }
 
-ViewGroupDataPtr VisualizationServiceProxy::getGroup(int groupIdx) const
+ViewGroupDataPtr ViewServiceProxy::getGroup(int groupIdx) const
 {
-	return mVisualizationService->getGroup(groupIdx);
+	return mViewService->getGroup(groupIdx);
 }
 
-void VisualizationServiceProxy::initServiceListener()
+void ViewServiceProxy::setRegistrationMode(REGISTRATION_STATUS mode)
 {
-	mServiceListener.reset(new ServiceTrackerListener<VisualizationService>(
+	mViewService->setRegistrationMode(mode);
+}
+
+void ViewServiceProxy::initServiceListener()
+{
+	mServiceListener.reset(new ServiceTrackerListener<ViewService>(
 								 mPluginContext,
-								 boost::bind(&VisualizationServiceProxy::onServiceAdded, this, _1),
-								 boost::function<void (VisualizationService*)>(),
-								 boost::bind(&VisualizationServiceProxy::onServiceRemoved, this, _1)
+								 boost::bind(&ViewServiceProxy::onServiceAdded, this, _1),
+								 boost::function<void (ViewService*)>(),
+								 boost::bind(&ViewServiceProxy::onServiceRemoved, this, _1)
 								 ));
 	mServiceListener->open();
 }
-void VisualizationServiceProxy::onServiceAdded(VisualizationService* service)
+void ViewServiceProxy::onServiceAdded(ViewService* service)
 {
-	mVisualizationService.reset(service, null_deleter());
+	mViewService.reset(service, null_deleter());
 
-	connect(service, &VisualizationService::activeViewChanged, this, &VisualizationService::activeViewChanged);
-	connect(service, &VisualizationService::fps, this, &VisualizationService::fps);
-	connect(service, &VisualizationService::activeLayoutChanged, this, &VisualizationService::activeLayoutChanged);
-	connect(service, &VisualizationService::renderingEnabledChanged, this, &VisualizationService::renderingEnabledChanged);
+	connect(service, &ViewService::activeViewChanged, this, &ViewService::activeViewChanged);
+	connect(service, &ViewService::fps, this, &ViewService::fps);
+	connect(service, &ViewService::activeLayoutChanged, this, &ViewService::activeLayoutChanged);
+	connect(service, &ViewService::renderingEnabledChanged, this, &ViewService::renderingEnabledChanged);
+	connect(service, &ViewService::pointSampled, this, &ViewService::pointSampled);
 
 	emit activeLayoutChanged();
 	emit activeViewChanged();
 	emit renderingEnabledChanged();
 }
 
-void VisualizationServiceProxy::onServiceRemoved(VisualizationService *service)
+void ViewServiceProxy::onServiceRemoved(ViewService *service)
 {
-	disconnect(service, &VisualizationService::activeViewChanged, this, &VisualizationService::activeViewChanged);
-	disconnect(service, &VisualizationService::fps, this, &VisualizationService::fps);
-	disconnect(service, &VisualizationService::activeLayoutChanged, this, &VisualizationService::activeLayoutChanged);
-	disconnect(service, &VisualizationService::renderingEnabledChanged, this, &VisualizationService::renderingEnabledChanged);
+	disconnect(service, &ViewService::activeViewChanged, this, &ViewService::activeViewChanged);
+	disconnect(service, &ViewService::fps, this, &ViewService::fps);
+	disconnect(service, &ViewService::activeLayoutChanged, this, &ViewService::activeLayoutChanged);
+	disconnect(service, &ViewService::renderingEnabledChanged, this, &ViewService::renderingEnabledChanged);
+	disconnect(service, &ViewService::pointSampled, this, &ViewService::pointSampled);
 
-	mVisualizationService = VisualizationService::getNullObject();
+	mViewService = ViewService::getNullObject();
 
 	emit activeLayoutChanged();
 	emit activeViewChanged();
 	emit renderingEnabledChanged();
 }
 
-bool VisualizationServiceProxy::isNull()
+bool ViewServiceProxy::isNull()
 {
-	return mVisualizationService->isNull();
+	return mViewService->isNull();
 }
 
-void VisualizationServiceProxy::aboutToStop()
+void ViewServiceProxy::aboutToStop()
 {
-    mVisualizationService->aboutToStop();
+    mViewService->aboutToStop();
 }
 
-void VisualizationServiceProxy::autoShowData(cx::DataPtr data)
+void ViewServiceProxy::autoShowData(cx::DataPtr data)
 {
-	mVisualizationService->autoShowData(data);
+	mViewService->autoShowData(data);
 }
 
-void VisualizationServiceProxy::enableRender(bool val)
+void ViewServiceProxy::enableRender(bool val)
 {
-	mVisualizationService->enableRender(val);
+	mViewService->enableRender(val);
 }
 
-bool VisualizationServiceProxy::renderingIsEnabled() const
+bool ViewServiceProxy::renderingIsEnabled() const
 {
-	return mVisualizationService->renderingIsEnabled();
+	return mViewService->renderingIsEnabled();
 }
 
-QWidget* VisualizationServiceProxy::getLayoutWidget(QWidget* parent, int index)
+QWidget* ViewServiceProxy::getLayoutWidget(QWidget* parent, int index)
 {
-	return mVisualizationService->getLayoutWidget(parent, index);
+	return mViewService->getLayoutWidget(parent, index);
 }
 
-QString VisualizationServiceProxy::getActiveLayout(int widgetIndex) const
+QString ViewServiceProxy::getActiveLayout(int widgetIndex) const
 {
-	return mVisualizationService->getActiveLayout(widgetIndex);
+	return mViewService->getActiveLayout(widgetIndex);
 }
 
-void VisualizationServiceProxy::setActiveLayout(const QString& uid, int widgetIndex)
+void ViewServiceProxy::setActiveLayout(const QString& uid, int widgetIndex)
 {
-	mVisualizationService->setActiveLayout(uid, widgetIndex);
+	mViewService->setActiveLayout(uid, widgetIndex);
 }
 
-InteractiveClipperPtr VisualizationServiceProxy::getClipper()
+InteractiveClipperPtr ViewServiceProxy::getClipper()
 {
-	return mVisualizationService->getClipper();
+	return mViewService->getClipper();
 }
 
-InteractiveCropperPtr VisualizationServiceProxy::getCropper()
+InteractiveCropperPtr ViewServiceProxy::getCropper()
 {
-	return mVisualizationService->getCropper();
+	return mViewService->getCropper();
 }
 
-CyclicActionLoggerPtr VisualizationServiceProxy::getRenderTimer()
+CyclicActionLoggerPtr ViewServiceProxy::getRenderTimer()
 {
-	return mVisualizationService->getRenderTimer();
+	return mViewService->getRenderTimer();
 }
 
-NavigationPtr VisualizationServiceProxy::getNavigation()
+NavigationPtr ViewServiceProxy::getNavigation()
 {
-	return mVisualizationService->getNavigation();
+	return mViewService->getNavigation();
 }
 
-LayoutRepositoryPtr VisualizationServiceProxy::getLayoutRepository()
+LayoutRepositoryPtr ViewServiceProxy::getLayoutRepository()
 {
-	return mVisualizationService->getLayoutRepository();
+	return mViewService->getLayoutRepository();
 }
 
-CameraControlPtr VisualizationServiceProxy::getCameraControl()
+CameraControlPtr ViewServiceProxy::getCameraControl()
 {
-	return mVisualizationService->getCameraControl();
+	return mViewService->getCameraControl();
 }
 
-QActionGroup* VisualizationServiceProxy::createInteractorStyleActionGroup()
+QActionGroup* ViewServiceProxy::createInteractorStyleActionGroup()
 {
-	return mVisualizationService->createInteractorStyleActionGroup();
+	return mViewService->createInteractorStyleActionGroup();
 }
 
 } //cx

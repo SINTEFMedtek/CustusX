@@ -33,27 +33,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTransferFunction2DOpacityWidget.h"
 #include "cxDoubleWidgets.h"
 #include "cxImageLUT2D.h"
-#include "cxPatientModelService.h"
+#include "cxActiveData.h"
 
 namespace cx
 {
 
-TransferFunction2DOpacityWidget::TransferFunction2DOpacityWidget(PatientModelServicePtr patientModelService, QWidget* parent) :
-  BaseWidget(parent, "TransferFunction2DOpacityWidget", "2D Opacity"),
-  mPatientModelService(patientModelService)
+TransferFunction2DOpacityWidget::TransferFunction2DOpacityWidget(ActiveDataPtr activeData, QWidget* parent) :
+	BaseWidget(parent, "TransferFunction2DOpacityWidget", "2D Opacity"),
+	mActiveData(activeData)
 {
 	this->setToolTip("Set a 2D opacity transfer function");
   QVBoxLayout* layout = new QVBoxLayout(this);
 
-  mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(patientModelService, this);
+  mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(mActiveData, this);
   mTransferFunctionAlphaWidget->setReadOnly(true);
 
   mDataAlpha.reset(new DoublePropertyImageTFDataAlpha);
   mDataLLR.reset(new DoublePropertyImageTFDataLLR);
 
-  mActiveImageProxy = ActiveImageProxy::New(patientModelService);
+  mActiveImageProxy = ActiveImageProxy::New(mActiveData);
   connect(mActiveImageProxy.get(), &ActiveImageProxy::transferFunctionsChanged, this, &TransferFunction2DOpacityWidget::activeImageChangedSlot);
-  connect(mPatientModelService.get(), &PatientModelService::activeDataChanged, this, &TransferFunction2DOpacityWidget::activeImageChangedSlot);
+  connect(mActiveData.get(), &ActiveData::activeDataChanged, this, &TransferFunction2DOpacityWidget::activeImageChangedSlot);
 
   mTransferFunctionAlphaWidget->setSizePolicy(QSizePolicy::MinimumExpanding,
                                               QSizePolicy::MinimumExpanding);
@@ -70,12 +70,12 @@ TransferFunction2DOpacityWidget::TransferFunction2DOpacityWidget(PatientModelSer
 
 TransferFunction2DOpacityWidget::~TransferFunction2DOpacityWidget()
 {
-	disconnect(mPatientModelService.get(), &PatientModelService::activeDataChanged, this, &TransferFunction2DOpacityWidget::activeImageChangedSlot);
+	disconnect(mActiveData.get(), &ActiveData::activeDataChanged, this, &TransferFunction2DOpacityWidget::activeImageChangedSlot);
 }
 
 void TransferFunction2DOpacityWidget::activeImageChangedSlot()
 {
-	ImagePtr image = mPatientModelService->getDerivedActiveImage();
+	ImagePtr image = mActiveData->getDerivedActiveImage();
   ImageTFDataPtr tf;
   if (image)
     tf = image->getLookupTable2D();

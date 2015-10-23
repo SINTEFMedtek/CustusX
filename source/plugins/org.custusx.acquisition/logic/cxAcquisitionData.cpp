@@ -127,7 +127,8 @@ void AcquisitionData::parseXml(QDomNode& dataNode)
 	QDomElement recodesessionNode = recordsessionsNode.firstChildElement("recordSession");
 	for (; !recodesessionNode.isNull(); recodesessionNode = recodesessionNode.nextSiblingElement("recordSession"))
 	{
-		RecordSessionPtr session(new RecordSession("", 0,0,""));
+//		RecordSessionPtr session(new RecordSession("", 0,0,""));
+		RecordSessionPtr session(new RecordSession());
 		session->parseXml(recodesessionNode);
 		this->addRecordSession(session);
 	}
@@ -136,7 +137,7 @@ void AcquisitionData::parseXml(QDomNode& dataNode)
 /**generate a unique uid for use with a recordsession
  *
  */
-QString AcquisitionData::getNewUid()
+int AcquisitionData::getNewSessionId()
 {
 	QString retval;
 	int max = 0;
@@ -148,12 +149,8 @@ QString AcquisitionData::getNewUid()
 		max = std::max(max, index.toInt());
 	}
 
-	//  retval = qstring_cast(max + 1);
-	retval = QString("%1").arg(max + 1, 2, 10, QChar('0'));
-	retval += "_" + QDateTime::currentDateTime().toString(timestampSecondsFormat());
-	return retval;
+	return max+1;
 }
-
 
 ///--------------------------------------------------------
 ///--------------------------------------------------------
@@ -164,8 +161,8 @@ Acquisition::Acquisition(AcquisitionDataPtr pluginData, QObject* parent) :
   mReady(true),
   mInfoText("")
 {
-	connect(this->getServices()->getToolManager().get(), &TrackingService::stateChanged, this, &Acquisition::checkIfReadySlot);
-	connect(this->getServices()->getToolManager().get(), &TrackingService::activeToolChanged, this, &Acquisition::checkIfReadySlot);
+	connect(this->getServices()->tracking().get(), &TrackingService::stateChanged, this, &Acquisition::checkIfReadySlot);
+	connect(this->getServices()->tracking().get(), &TrackingService::activeToolChanged, this, &Acquisition::checkIfReadySlot);
 	this->checkIfReadySlot();
 }
 
@@ -175,10 +172,10 @@ Acquisition::~Acquisition()
 
 bool Acquisition::isReady(AcquisitionService::TYPES context) const
 {
+			return true;
 	if (!context.testFlag(AcquisitionService::tTRACKING))
 		return true;
 	return mReady;
-//	return true;
 }
 
 QString Acquisition::getInfoText(AcquisitionService::TYPES context) const
@@ -190,8 +187,8 @@ QString Acquisition::getInfoText(AcquisitionService::TYPES context) const
 
 void Acquisition::checkIfReadySlot()
 {
-	bool tracking = this->getServices()->getToolManager()->getState()>=Tool::tsTRACKING;
-	ToolPtr tool = this->getServices()->getToolManager()->getActiveTool();
+	bool tracking = this->getServices()->tracking()->getState()>=Tool::tsTRACKING;
+	ToolPtr tool = this->getServices()->tracking()->getActiveTool();
 
 	QString mWhatsMissing;
 	mWhatsMissing.clear();
@@ -215,22 +212,13 @@ void Acquisition::checkIfReadySlot()
 
 void Acquisition::setReady(bool val, QString text)
 {
-	std::cout << "Acquisition::setReady " << text << std::endl;
 	mReady = val;
 	mInfoText = text;
 
 	emit readinessChanged();
 }
 
-void Acquisition::toggleRecord(AcquisitionService::TYPES context)
-{
-	if (this->getState()==AcquisitionService::sRUNNING)
-		this->stopRecord();
-	else
-		this->startRecord(context);
-}
-
-void Acquisition::startRecord(AcquisitionService::TYPES context)
+void Acquisition::startRecord(AcquisitionService::TYPES context, QString category, RecordSessionPtr session)
 {
 	if (this->getState()!=AcquisitionService::sNOT_RUNNING)
 	{
@@ -238,11 +226,18 @@ void Acquisition::startRecord(AcquisitionService::TYPES context)
 		return;
 	}
 
-	double startTime = getMilliSecondsSinceEpoch();
 	mCurrentContext = context;
-	mLatestSession.reset(new cx::RecordSession(mPluginData->getNewUid(), startTime, startTime, settings()->value("Ultrasound/acquisitionName").toString()));
+
+	if (session)
+		mLatestSession = session;
+	else
+		mLatestSession.reset(new cx::RecordSession(mPluginData->getNewSessionId(), category));
+
+	mLatestSession->startNewInterval();
+
 	reporter()->playStartSound();
 	this->setState(AcquisitionService::sRUNNING);
+	emit started();
 }
 
 void Acquisition::stopRecord()
@@ -252,11 +247,12 @@ void Acquisition::stopRecord()
 		return;
 	}
 
-	mLatestSession->setStopTime(getMilliSecondsSinceEpoch());
-	mPluginData->addRecordSession(mLatestSession);
-//	trackingService()->savePositionHistory(); //asks all the tools to save their transforms and timestamps
+	mLatestSession->stopLastInterval();
+	if (!mPluginData->getRecordSession(mLatestSession->getUid()))
+		mPluginData->addRecordSession(mLatestSession);
 	reporter()->playStopSound();
 	this->setState(AcquisitionService::sNOT_RUNNING);
+	emit acquisitionStopped();
 }
 
 void Acquisition::cancelRecord()
@@ -267,8 +263,10 @@ void Acquisition::cancelRecord()
 	}
 	reporter()->playCancelSound();
 	mLatestSession.reset();
+	mLatestSession->cancelLastInterval();
 	mCurrentContext = AcquisitionService::TYPES();
 	this->setState(AcquisitionService::sNOT_RUNNING);
+	emit cancelled();
 }
 
 void Acquisition::startPostProcessing()
@@ -286,13 +284,13 @@ void Acquisition::setState(AcquisitionService::STATE newState)
 	AcquisitionService::STATE lastState = mCurrentState;
 	mCurrentState = newState;
 
-	// emit some helper signals
-	if (lastState!=AcquisitionService::sRUNNING && newState==AcquisitionService::sRUNNING)
-		emit started();
-	else if (lastState==AcquisitionService::sRUNNING && newState!=AcquisitionService::sRUNNING && mLatestSession)
-		emit acquisitionStopped();
-	else if (lastState==AcquisitionService::sRUNNING && newState!=AcquisitionService::sRUNNING && !mLatestSession)
-		emit cancelled();
+//	// emit some helper signals
+//	if (lastState!=AcquisitionService::sRUNNING && newState==AcquisitionService::sRUNNING)
+//		emit started();
+//	else if (lastState==AcquisitionService::sRUNNING && newState!=AcquisitionService::sRUNNING && mLatestSession)
+//		emit acquisitionStopped();
+//	else if (lastState==AcquisitionService::sRUNNING && newState!=AcquisitionService::sRUNNING && !mLatestSession)
+//		emit cancelled();
 
 	emit stateChanged();
 }

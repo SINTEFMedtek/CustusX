@@ -69,7 +69,7 @@ private:
 	std::vector<cx::ImagePtr> mOutput; // valid after (threaded)reconstruct() has been run
 	bool mVerbose;
 	cx::PatientModelServicePtr mPatientModelService;
-	cx::VisualizationServicePtr mVisualizationService;
+	cx::ViewServicePtr mViewService;
 };
 
 

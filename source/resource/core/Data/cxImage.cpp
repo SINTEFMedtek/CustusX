@@ -762,35 +762,6 @@ DoubleBoundingBox3D Image::getCroppingBox() const
 	return mCroppingBox_d;
 }
 
-// methods for defining and storing clip planes. Image does not use these data, this is up to the mapper
-void Image::addPersistentClipPlane(vtkPlanePtr plane)
-{
-	if (std::count(mPersistentClipPlanes.begin(), mPersistentClipPlanes.end(), plane))
-		return;
-	mPersistentClipPlanes.push_back(plane);
-	emit clipPlanesChanged();
-}
-
-std::vector<vtkPlanePtr> Image::getAllClipPlanes()
-{
-	std::vector<vtkPlanePtr> retval = mPersistentClipPlanes;
-	if (mInteractiveClipPlane)
-		retval.push_back(mInteractiveClipPlane);
-	return retval;
-}
-
-void Image::clearPersistentClipPlanes()
-{
-	mPersistentClipPlanes.clear();
-	emit clipPlanesChanged();
-}
-
-void Image::setInteractiveClipPlane(vtkPlanePtr plane)
-{
-	mInteractiveClipPlane = plane;
-	emit clipPlanesChanged();
-}
-
 /**Do the following operations on mBaseVtkImageData:
  *  * Reset the origin to zero.
  *  * Reset the extent to have its lower-left corner in zero.

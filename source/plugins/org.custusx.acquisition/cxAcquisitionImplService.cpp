@@ -63,9 +63,9 @@ AcquisitionImplService::AcquisitionImplService(ctkPluginContext *context) :
 	connect(mUsAcquisition.get(), &USAcquisition::saveDataCompleted, this, &AcquisitionService::saveDataCompleted);
 	connect(mUsAcquisition.get(), &USAcquisition::readinessChanged, this, &AcquisitionService::usReadinessChanged);
 
-	connect(mServices->getSession().get(), &SessionStorageService::cleared, this, &AcquisitionImplService::duringClearPatientSlot);
-	connect(mServices->getSession().get(), &SessionStorageService::isLoading, this, &AcquisitionImplService::duringLoadPatientSlot);
-	connect(mServices->getSession().get(), &SessionStorageService::isSaving, this, &AcquisitionImplService::duringSavePatientSlot);
+	connect(mServices->session().get(), &SessionStorageService::cleared, this, &AcquisitionImplService::duringClearPatientSlot);
+	connect(mServices->session().get(), &SessionStorageService::isLoading, this, &AcquisitionImplService::duringLoadPatientSlot);
+	connect(mServices->session().get(), &SessionStorageService::isSaving, this, &AcquisitionImplService::duringSavePatientSlot);
 }
 
 AcquisitionImplService::~AcquisitionImplService()
@@ -135,14 +135,9 @@ AcquisitionService::STATE AcquisitionImplService::getState() const
 	return mAcquisition->getState();
 }
 
-void AcquisitionImplService::toggleRecord(TYPES context)
+void AcquisitionImplService::startRecord(TYPES context, QString category, RecordSessionPtr session)
 {
-	mAcquisition->toggleRecord(context);
-}
-
-void AcquisitionImplService::startRecord(TYPES context)
-{
-	mAcquisition->startRecord(context);
+	mAcquisition->startRecord(context, category, session);
 }
 
 void AcquisitionImplService::stopRecord()

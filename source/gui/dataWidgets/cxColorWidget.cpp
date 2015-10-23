@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxColorWidget.h"
 #include "cxTransferFunctionPresetWidget.h"
 #include "cxTransferFunction2DColorWidget.h"
+#include "cxPatientModelService.h"
 
 namespace cx {
 
@@ -42,7 +43,7 @@ ColorWidget::ColorWidget(PatientModelServicePtr patientModelService, QWidget* pa
 	this->setToolTip("Set 2D image properties");
 	QVBoxLayout* layout = new QVBoxLayout(this);
 	layout->setMargin(0);
-	layout->addWidget(new TransferFunction2DColorWidget(patientModelService, this), 0);
+	layout->addWidget(new TransferFunction2DColorWidget(patientModelService->getActiveData(), this), 0);
 	layout->addStretch(1);
 	layout->addWidget(new TransferFunctionPresetWidget(patientModelService, this, false), 0);
 }

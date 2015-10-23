@@ -71,14 +71,12 @@ TemporalCalibrationWidget::TemporalCalibrationWidget(VisServicesPtr services, Ac
 
 	this->setToolTip("Temporal calibration from a vertical periodic movement of an US probe");
   mAlgorithm.reset(new TemporalCalibration);
-  connect(mServices->getPatientService().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
+  connect(mServices->patient().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
 
   connect(acquisitionService.get(), SIGNAL(saveDataCompleted(QString)), this, SLOT(selectData(QString)));
 
   cx::AcquisitionService::TYPES context(cx::AcquisitionService::tTRACKING | cx::AcquisitionService::tUS);
-  mRecordSessionWidget = new RecordSessionWidget(acquisitionService, this, context, "temporal_calib");
-
-  mRecordSessionWidget->setDescriptionVisibility(false);
+  mRecordSessionWidget = new RecordSessionWidget(acquisitionService, this, context, "temp_cal");
 
   QVBoxLayout* topLayout = new QVBoxLayout(this);
 
@@ -88,8 +86,8 @@ TemporalCalibrationWidget::TemporalCalibrationWidget(VisServicesPtr services, Ac
   acqLabel->setToolTip(this->toolTip());
   topLayout->addWidget(mInfoLabel);
   topLayout->addWidget(mRecordSessionWidget);
-  topLayout->addWidget(new LabeledComboBoxWidget(this, StringPropertyActiveProbeConfiguration::New(mServices->getToolManager())));
-  topLayout->addWidget(new SpinBoxGroupWidget(this, DoublePropertyTimeCalibration::New(mServices->getToolManager())));
+  topLayout->addWidget(new LabeledComboBoxWidget(this, StringPropertyActiveProbeConfiguration::New(mServices->tracking())));
+  topLayout->addWidget(new SpinBoxGroupWidget(this, DoublePropertyTimeCalibration::New(mServices->tracking())));
 
   topLayout->addWidget(this->createHorizontalLine());
 
@@ -134,7 +132,7 @@ void TemporalCalibrationWidget::showEvent(QShowEvent* event)
 
 void TemporalCalibrationWidget::patientChangedSlot()
 {
-  QString filename = mServices->getPatientService()->getActivePatientFolder() + "/US_Acq/";
+  QString filename = mServices->patient()->getActivePatientFolder() + "/US_Acq/";
   mFileSelectWidget->setPath(filename);
 }
 
@@ -151,7 +149,7 @@ void TemporalCalibrationWidget::selectData(QString filename)
 void TemporalCalibrationWidget::calibrateSlot()
 {
   if (mVerbose->isChecked())
-	mAlgorithm->setDebugFolder(mServices->getPatientService()->getActivePatientFolder()+"/Logs/");
+	mAlgorithm->setDebugFolder(mServices->patient()->getActivePatientFolder()+"/Logs/");
   else
     mAlgorithm->setDebugFolder("");
 

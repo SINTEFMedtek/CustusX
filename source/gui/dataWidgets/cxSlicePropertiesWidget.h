@@ -60,7 +60,7 @@ class cxGui_EXPORT SlicePropertiesWidget : public TabbedWidget
   Q_OBJECT
 
 public:
-	SlicePropertiesWidget(cx::PatientModelServicePtr patientModelService, cx::VisualizationServicePtr visualizationService, QWidget* parent);
+	SlicePropertiesWidget(cx::PatientModelServicePtr patientModelService, cx::ViewServicePtr viewService, QWidget* parent);
 	virtual ~SlicePropertiesWidget();
 
 protected:

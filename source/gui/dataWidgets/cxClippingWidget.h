@@ -42,8 +42,7 @@ class QCheckBox;
 
 namespace cx
 {
-typedef boost::shared_ptr<class StringPropertySelectImage> StringPropertySelectImagePtr;
-
+typedef boost::shared_ptr<class StringPropertySelectData> StringPropertySelectDataPtr;
 typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
 
 /**
@@ -91,7 +90,7 @@ class cxGui_EXPORT ClippingWidget: public BaseWidget
 Q_OBJECT
 
 public:
-	ClippingWidget(cx::PatientModelServicePtr patientModelService, QWidget* parent);
+	ClippingWidget(VisServicesPtr services, QWidget* parent);
 
 private:
 	InteractiveClipperPtr mInteractiveClipper;
@@ -99,8 +98,8 @@ private:
 	QCheckBox* mUseClipperCheckBox;
 	QCheckBox* mInvertPlaneCheckBox;
 	StringPropertyBasePtr mPlaneAdapter;
-	StringPropertySelectImagePtr mImageAdapter;
-	PatientModelServicePtr mPatientModelService;
+	StringPropertySelectDataPtr mImageAdapter;
+	VisServicesPtr mServices;
 private slots:
 	void setupUI();
 	void clipperChangedSlot();

@@ -58,7 +58,7 @@ class PrepareVesselsWidget : public RegistrationBaseWidget
   Q_OBJECT
 
 public:
-	PrepareVesselsWidget(RegServices services, QWidget* parent);
+	PrepareVesselsWidget(RegServicesPtr services, QWidget* parent);
   virtual ~PrepareVesselsWidget();
 
 protected:

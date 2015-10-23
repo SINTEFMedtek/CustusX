@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ManualPatientRegistrationWidget::ManualPatientRegistrationWidget(RegServices services, QWidget* parent, QString objectName) :
+ManualPatientRegistrationWidget::ManualPatientRegistrationWidget(RegServicesPtr services, QWidget* parent, QString objectName) :
 				BaseWidget(parent, objectName, "Manual Patient Registration"),
 				mVerticalLayout(new QVBoxLayout(this)),
 				mServices(services)
@@ -52,7 +52,7 @@ ManualPatientRegistrationWidget::ManualPatientRegistrationWidget(RegServices ser
 	mMatrixWidget = new Transform3DWidget(this);
 	mVerticalLayout->addWidget(mMatrixWidget);
 	connect(mMatrixWidget, SIGNAL(changed()), this, SLOT(matrixWidgetChanged()));
-	connect(services.patientModelService.get(), SIGNAL(rMprChanged()), this, SLOT(patientMatrixChanged()));
+	connect(services->patient().get(), SIGNAL(rMprChanged()), this, SLOT(patientMatrixChanged()));
 	mMatrixWidget->setEditable(true);
 
 	mVerticalLayout->addStretch();
@@ -72,7 +72,7 @@ void ManualPatientRegistrationWidget::showEvent(QShowEvent* event)
 void ManualPatientRegistrationWidget::matrixWidgetChanged()
 {
 	Transform3D rMpr = mMatrixWidget->getMatrix();
-	mServices.registrationService->applyPatientRegistration(rMpr, "Manual Patient");
+	mServices->registration()->applyPatientRegistration(rMpr, "Manual Patient");
 }
 
 ///** Called when the valid patient registration matrix in the system has changed.
@@ -83,7 +83,7 @@ void ManualPatientRegistrationWidget::patientMatrixChanged()
 {
 	mLabel->setText(this->getDescription());
 	mMatrixWidget->blockSignals(true);
-	mMatrixWidget->setMatrix(mServices.patientModelService->get_rMpr());
+	mMatrixWidget->setMatrix(mServices->patient()->get_rMpr());
 	mMatrixWidget->blockSignals(false);
 }
 

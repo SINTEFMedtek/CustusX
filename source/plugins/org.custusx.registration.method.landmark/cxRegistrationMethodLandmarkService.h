@@ -51,7 +51,7 @@ class org_custusx_registration_method_landmark_EXPORT RegistrationMethodLandmark
 {
 	Q_INTERFACES(cx::RegistrationMethodService)
 public:
-	RegistrationMethodLandmarkImageToImageService(RegServices services) :
+	RegistrationMethodLandmarkImageToImageService(RegServicesPtr services) :
 		RegistrationMethodService(services) {}
 	virtual ~RegistrationMethodLandmarkImageToImageService() {}
 	virtual QString getRegistrationType() {return QString("ImageToImage");}
@@ -72,7 +72,7 @@ class org_custusx_registration_method_landmark_EXPORT RegistrationMethodLandmark
 {
 	Q_INTERFACES(cx::RegistrationMethodService)
 public:
-	RegistrationMethodLandmarkImageToPatientService(RegServices services) :
+	RegistrationMethodLandmarkImageToPatientService(RegServicesPtr services) :
 		RegistrationMethodService(services) {}
 	virtual ~RegistrationMethodLandmarkImageToPatientService() {}
 	virtual QString getRegistrationType() {return QString("ImageToPatient");}
@@ -93,7 +93,7 @@ class org_custusx_registration_method_landmark_EXPORT RegistrationMethodFastLand
 {
 	Q_INTERFACES(cx::RegistrationMethodService)
 public:
-	RegistrationMethodFastLandmarkImageToPatientService(RegServices services) :
+	RegistrationMethodFastLandmarkImageToPatientService(RegServicesPtr services) :
 		RegistrationMethodService(services) {}
 	virtual ~RegistrationMethodFastLandmarkImageToPatientService() {}
 	virtual QString getRegistrationType() {return QString("ImageToPatient");}

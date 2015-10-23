@@ -76,8 +76,10 @@ public:
 
     void updateCurrentState(QByteArray buffer);
 
+    void setProtocol(QString protocolname);
+
 private slots:
-    virtual void internalDataAvailable();
+    void internalDataAvailable();
 
 signals:
     void stateChanged();
@@ -91,6 +93,8 @@ private:
     Ur5MessageEncoder mMessageEncoder;
     Ur5MessageDecoder mMessageDecoder;
     Ur5State mCurrentState,mTargetState,mPreviousState;
+
+    ConnectionInfo info;
 };
 
 

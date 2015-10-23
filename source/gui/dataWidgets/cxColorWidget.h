@@ -37,7 +37,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxBaseWidget.h"
 
-namespace cx {
+namespace cx
+{
+typedef boost::shared_ptr<class ActiveData> ActiveDataPtr;
+
 /**
  * \file
  * \addtogroup cx_gui

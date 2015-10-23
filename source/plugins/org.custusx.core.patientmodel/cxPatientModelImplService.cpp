@@ -48,18 +48,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackedStream.h"
 #include "cxReporter.h"
 #include "cxVideoSource.h"
+#include "cxActiveData.h"
 
 namespace cx
 {
 
 PatientModelImplService::PatientModelImplService(ctkPluginContext *context) :
-	mContext(context )
+	mContext(context)
 {
 	this->createInterconnectedDataAndSpace();
 
 	connect(this->dataService().get(), &DataManager::dataAddedOrRemoved, this, &PatientModelService::dataAddedOrRemoved);
-	connect(this->dataService().get(), &DataManager::activeImageChanged, this, &PatientModelService::activeImageChanged);
-	connect(this->dataService().get(), &DataManager::activeDataChanged, this, &PatientModelService::activeDataChanged);
 	connect(this->dataService().get(), &DataManager::rMprChanged, this, &PatientModelService::rMprChanged);
 	connect(this->dataService().get(), &DataManager::streamLoaded, this, &PatientModelService::streamLoaded);
 	connect(this->dataService().get(), &DataManager::clinicalApplicationChanged, this, &PatientModelService::clinicalApplicationChanged);
@@ -79,16 +78,16 @@ void PatientModelImplService::createInterconnectedDataAndSpace()
 
 	// build object(s):
 	PatientModelServicePtr patientModelService = PatientModelServiceProxy::create(mContext);
+	SessionStorageServicePtr session = SessionStorageServiceProxy::create(mContext);
 
-	mDataService = DataManagerImpl::create();
+	mActiveData.reset(new ActiveData(patientModelService, session));
+	mDataService = DataManagerImpl::create(mActiveData);
 
 	SpaceProviderPtr spaceProvider(new cx::SpaceProviderImpl(mTrackingService, patientModelService));
 	mDataService->setSpaceProvider(spaceProvider);
 
 	mDataFactory.reset(new DataFactory(patientModelService, spaceProvider));
 	mDataService->setDataFactory(mDataFactory);
-
-	SessionStorageServicePtr session = SessionStorageServiceProxy::create(mContext);
 
 	mPatientData.reset(new PatientData(mDataService, session));
 }
@@ -116,8 +115,6 @@ PatientModelImplService::~PatientModelImplService()
 	if(dataService())
 	{
 		disconnect(this->dataService().get(), &DataManager::dataAddedOrRemoved, this, &PatientModelService::dataAddedOrRemoved);
-		disconnect(this->dataService().get(), &DataManager::activeImageChanged, this, &PatientModelService::activeImageChanged);
-		disconnect(this->dataService().get(), &DataManager::activeDataChanged, this, &PatientModelService::activeDataChanged);
 		disconnect(this->dataService().get(), &DataManager::rMprChanged, this, &PatientModelService::rMprChanged);
 		disconnect(this->dataService().get(), &DataManager::streamLoaded, this, &PatientModelService::streamLoaded);
 		disconnect(this->dataService().get(), &DataManager::clinicalApplicationChanged, this, &PatientModelService::clinicalApplicationChanged);
@@ -183,16 +180,6 @@ void PatientModelImplService::autoSave()
 bool PatientModelImplService::isNull()
 {
 	return false;
-}
-
-QList<DataPtr> PatientModelImplService::getActiveDataList() const
-{
-	return dataService()->getActiveDataList();
-}
-
-void PatientModelImplService::setActiveData(DataPtr activeData)
-{
-	dataService()->setActiveData(activeData);
 }
 
 CLINICAL_VIEW PatientModelImplService::getClinicalApplication() const
@@ -271,6 +258,11 @@ RegistrationHistoryPtr PatientModelImplService::get_rMpr_History() const
 	return this->dataService()->get_rMpr_History();
 }
 
+ActiveDataPtr PatientModelImplService::getActiveData() const
+{
+	return mActiveData;
+}
+
 DataServicePtr PatientModelImplService::dataService() const
 {
 	return mDataService;
@@ -318,8 +310,8 @@ void PatientModelImplService::videoSourceAdded(VideoSourcePtr source)
 
 void PatientModelImplService::reEmitActiveTrackedStream(TrackedStreamPtr trackedStream)
 {
-	if(this->getActiveData<TrackedStream>() == trackedStream)
-		this->setActiveData(trackedStream);
+	if(mActiveData->getActive<TrackedStream>() == trackedStream)
+		mActiveData->setActive(trackedStream);
 }
 
 ToolPtr PatientModelImplService::getProbeTool(QString videoSourceUid)

@@ -69,16 +69,21 @@ class BronchoscopyRegistrationWidget: public RegistrationBaseWidget
 	BronchoscopyRegistrationPtr mBronchoscopyRegistration;
 
 public:
-	BronchoscopyRegistrationWidget(RegServices services, QWidget *parent);
+	BronchoscopyRegistrationWidget(RegServicesPtr services, QWidget *parent);
 	virtual ~BronchoscopyRegistrationWidget()
 	{
 	}
 	virtual QString defaultWhatsThis() const;
+
+protected:
+	virtual void prePaintEvent();
 private slots:
 	void processCenterlineSlot();
 	void registerSlot();
 private:
-	RegServices mServices;
+	void setup();
+
+	RegServicesPtr mServices;
 	QVBoxLayout* mVerticalLayout;
 	BoolPropertyPtr mUseLocalRegistration;
 	BoolPropertyPtr mUseSubsetOfGenerations;

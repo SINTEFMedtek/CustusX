@@ -93,28 +93,9 @@ public:
 	virtual SpaceProviderPtr getSpaceProvider() = 0;
 	virtual DataFactoryPtr getDataFactory() = 0;
 
-
 	// global data (move to separate class if list grows)
 	virtual Vector3D getCenter() const = 0; ///< current common center point for user viewing.
 	virtual void setCenter(const Vector3D& center) = 0;
-
-	// state information
-	virtual DataPtr getActiveData() const = 0;
-	template <class DATA>
-	boost::shared_ptr<DATA> getActiveData() const
-	{
-		boost::shared_ptr<DATA> retval;
-		QList<DataPtr> activeDataList = this->getActiveDataList();
-		for(int i = activeDataList.size() - 1; i >= 0; --i)
-		{
-			retval = boost::dynamic_pointer_cast<DATA>(activeDataList.at(i));
-			if(retval)
-				return retval;
-		}
-		return retval;
-	}
-	virtual void setActiveData(DataPtr activeData) = 0; ///< used for system state
-	virtual QList<DataPtr> getActiveDataList() const = 0;
 
 	virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const;
 
@@ -145,8 +126,6 @@ public:
 signals:
 	void centerChanged(); ///< emitted when center is changed.
 	void dataAddedOrRemoved();
-	void activeImageChanged(const QString& uId); ///< emitted when the active image is changed
-	void activeDataChanged(const QString& uId);
 	void landmarkPropertiesChanged(); ///< emitted when global info about a landmark changed
 	void clinicalApplicationChanged();
 	void streamLoaded();

@@ -33,28 +33,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTransferFunction2DColorWidget.h"
 #include "cxDoubleWidgets.h"
 #include "cxImageLUT2D.h"
-#include "cxPatientModelService.h"
+#include "cxActiveData.h"
 
 namespace cx
 {
 
-TransferFunction2DColorWidget::TransferFunction2DColorWidget(PatientModelServicePtr patientModelService, QWidget* parent) :
+TransferFunction2DColorWidget::TransferFunction2DColorWidget(ActiveDataPtr activeData, QWidget* parent) :
   BaseWidget(parent, "TransferFunction2DColorWidget", "2D Color"),
-  mPatientModelService(patientModelService)
+  mActiveData(activeData)
 {
 	this->setToolTip("Set a 2D color transfer function");
   QVBoxLayout* layout = new QVBoxLayout(this);
 
-  mTransferFunctionColorWidget = new TransferFunctionColorWidget(patientModelService, this);
-  mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(patientModelService, this);
+  mTransferFunctionColorWidget = new TransferFunctionColorWidget(mActiveData, this);
+  mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(mActiveData, this);
   mTransferFunctionAlphaWidget->setReadOnly(true);
 
   mDataWindow.reset(new DoublePropertyImageTFDataWindow);
   mDataLevel.reset(new DoublePropertyImageTFDataLevel);
 
-  mActiveImageProxy = ActiveImageProxy::New(patientModelService);
+  mActiveImageProxy = ActiveImageProxy::New(mActiveData);
   connect(mActiveImageProxy.get(), &ActiveImageProxy::transferFunctionsChanged, this, &TransferFunction2DColorWidget::activeImageChangedSlot);
-  connect(mPatientModelService.get(), &PatientModelService::activeDataChanged, this, &TransferFunction2DColorWidget::activeImageChangedSlot);
+  connect(mActiveData.get(), &ActiveData::activeDataChanged, this, &TransferFunction2DColorWidget::activeImageChangedSlot);
 
   mTransferFunctionColorWidget->setSizePolicy(QSizePolicy::Expanding,
                                               QSizePolicy::Fixed);
@@ -75,12 +75,12 @@ TransferFunction2DColorWidget::TransferFunction2DColorWidget(PatientModelService
 
 TransferFunction2DColorWidget::~TransferFunction2DColorWidget()
 {
-	disconnect(mPatientModelService.get(), &PatientModelService::activeDataChanged, this, &TransferFunction2DColorWidget::activeImageChangedSlot);
+	disconnect(mActiveData.get(), &ActiveData::activeDataChanged, this, &TransferFunction2DColorWidget::activeImageChangedSlot);
 }
 
 void TransferFunction2DColorWidget::activeImageChangedSlot()
 {
-	ImagePtr image = mPatientModelService->getDerivedActiveImage();
+	ImagePtr image = mActiveData->getDerivedActiveImage();
 
   ImageTFDataPtr tf;
   if (image)

@@ -66,7 +66,7 @@ class cxGui_EXPORT ShadingWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  ShadingWidget(PatientModelServicePtr patientModelService, QWidget* parent, bool connectToActiveImage = true);
+  ShadingWidget(ActiveDataPtr activeData, QWidget* parent, bool connectToActiveImage = true);
   ~ShadingWidget();
 
 public slots:
@@ -81,7 +81,7 @@ protected:
   QCheckBox* mShadingCheckBox;
 
   bool mInitialized;///< Is TransferFunctionWidget initialized
-  PatientModelServicePtr mPatientModelService;
+  ActiveDataPtr mActiveData;
   ActiveImageProxyPtr mActiveImageProxy;
   ImagePtr mImage;
   ImagePropertiesWidgetPtr mImagePropertiesWidget;

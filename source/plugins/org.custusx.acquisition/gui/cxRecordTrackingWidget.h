@@ -46,11 +46,12 @@ class WidgetObscuredListener;
 typedef boost::shared_ptr<class Acquisition> AcquisitionPtr;
 typedef boost::shared_ptr<class StringPropertySelectMesh> StringPropertySelectMeshPtr;
 typedef boost::shared_ptr<class ToolRep3D> ToolRep3DPtr;
-typedef boost::shared_ptr<class RecordSessionWidget> RecordSessionWidgetPtr;
+class RecordSessionWidget;
 typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
 //typedef boost::shared_ptr<class BronchoscopyRegistration> BronchoscopyRegistrationPtr;
 typedef std::map<QString, ToolPtr> ToolMap;
 typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
+typedef boost::shared_ptr<class SelectRecordSession> SelectRecordSessionPtr;
 
 /**
  *
@@ -64,37 +65,45 @@ class org_custusx_acquisition_EXPORT RecordTrackingWidget: public QWidget
 	Q_OBJECT
 
 public:
-	RecordTrackingWidget(XmlOptionFile options, AcquisitionServicePtr acquisitionService, VisServices services, QWidget *parent);
+	RecordTrackingWidget(XmlOptionFile options,
+						 AcquisitionServicePtr acquisitionService,
+						 VisServicesPtr services,
+						 QString category,
+						 QWidget *parent);
 	virtual ~RecordTrackingWidget()	{}
 
 	ToolPtr getSuitableRecordingTool();
 	TimedTransformMap getRecordedTrackerData_prMt();
-	void ShowLastRecordingInView();
-	StringPropertyPtr getSessionSelector() { return mSessionSelector; }
+	StringPropertyPtr getSessionSelector();
+	SelectRecordSessionPtr getSelectRecordSession() { return mSelectRecordSession; }
+	void displayToolSelector(bool on);
+
+signals:
+	void acquisitionCompleted(); ///< aquisition complete, and widget internal state is updated accordingly
 
 private slots:
 	void acquisitionStarted();
 	void acquisitionStopped();
+	void acquisitionCancelled();
 	void obscuredSlot(bool obscured);
 
-	void acquisitionCancelled();
-	void recordedSessionsChanged();
 private:
-	VisServices mServices;
+	VisServicesPtr mServices;
 	AcquisitionServicePtr mAcquisitionService;
 	XmlOptionFile mOptions;
 
-	RecordSessionWidgetPtr mRecordSessionWidget;
-	StringPropertyPtr mSessionSelector;
+	RecordSessionWidget* mRecordSessionWidget;
+	QWidget* mToolSelectorWidget;
 	ToolPtr mRecordingTool;
+	SelectRecordSessionPtr mSelectRecordSession;
 	StringPropertySelectToolPtr mToolSelector;
+	BoolPropertyPtr mMergeWithExistingSession;
 
 	boost::shared_ptr<WidgetObscuredListener> mObscuredListener;
 
-	void initSessionSelector();
-	QStringList getSessionList();
-//	void initializeTrackingService();
 	ToolRep3DPtr getToolRepIn3DView();
+	void onToolChanged();
+	void onMergeChanged();
 };
 
 } //namespace cx

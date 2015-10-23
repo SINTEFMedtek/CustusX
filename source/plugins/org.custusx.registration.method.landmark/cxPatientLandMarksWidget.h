@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXPATIENTLANDMARKSWIDGET_H
 
 #include "cxLandmarkRegistrationWidget.h"
+#include "org_custusx_registration_method_landmark_Export.h"
 
 namespace cx
 {
@@ -48,12 +49,12 @@ typedef boost::shared_ptr<class ActiveToolProxy> ActiveToolProxyPtr;
  * \date Feb 3, 2009
  * \\author Janne Beate Bakeng, SINTEF
  */
-class PatientLandMarksWidget: public LandmarkRegistrationWidget
+class org_custusx_registration_method_landmark_EXPORT PatientLandMarksWidget: public LandmarkRegistrationWidget
 {
 Q_OBJECT
 
 public:
-	PatientLandMarksWidget(RegServices services, QWidget* parent, QString objectName,
+	PatientLandMarksWidget(RegServicesPtr services, QWidget* parent, QString objectName,
 		QString windowTitle); ///< sets up layout and connects signals and slots
 	virtual ~PatientLandMarksWidget(); ///< empty
 

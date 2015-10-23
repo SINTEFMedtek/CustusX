@@ -60,6 +60,15 @@ TrackedStream::TrackedStream(const QString& uid, const QString& name, const Tool
 	setVideoSource(videosource);
 }
 
+TrackedStream::~TrackedStream()
+{
+	if(mVideoSource)
+	{
+		disconnect(mVideoSource.get(), &VideoSource::newFrame, this, &TrackedStream::newFrame);
+		disconnect(mVideoSource.get(), &VideoSource::streaming, this, &TrackedStream::streaming);
+	}
+}
+
 void TrackedStream::setProbeTool(const ToolPtr &probeTool)
 {
 	if(mProbeTool)

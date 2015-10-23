@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxFastOrientationRegistrationWidget.h"
 #include "cxFastImageRegistrationWidget.h"
 #include "cxFastPatientRegistrationWidget.h"
+#include "cxFastLandmarkPatientRegistrationWidget.h"
 
 #include "cxTabbedWidget.h"
 
@@ -79,7 +80,7 @@ QWidget *RegistrationMethodFastLandmarkImageToPatientService::createWidget()
 	FastImageRegistrationWidget* imageLandmarkWidget = new FastImageRegistrationWidget(mServices, tabWidget, "org_custusx_registration_method_fast_landmark_image_to_patient_image_landmarks_widget", "Fast Image Registration - Landmarks", true);
 	FastPatientRegistrationWidget* patientLandmarkWidget = new FastPatientRegistrationWidget(mServices, tabWidget);
 
-	LandmarkPatientRegistrationWidget* registrationWidget = new LandmarkPatientRegistrationWidget(mServices, tabWidget, "org_custusx_registration_method_fast_landmark_image_to_patient_registration_widget", "Fast Image Registration");
+	LandmarkPatientRegistrationWidget* registrationWidget = new FastLandmarkPatientRegistrationWidget(mServices, tabWidget, "org_custusx_registration_method_fast_landmark_image_to_patient_registration_widget", "Fast Image Registration");
 
 	tabWidget->addTab(orientationWidget, "Orientation");
 	tabWidget->addTab(imageLandmarkWidget, "Image landmark(s)");

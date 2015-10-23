@@ -39,15 +39,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-class cxResourceVisualization_EXPORT VisualizationServiceNull : public VisualizationService
+class cxResourceVisualization_EXPORT ViewServiceNull : public ViewService
 {
 public:
-	VisualizationServiceNull();
+	ViewServiceNull();
 
 	virtual ViewPtr get3DView(int group = 0, int index = 0);
 
 	virtual int getActiveGroupId() const;
 	virtual ViewGroupDataPtr getGroup(int groupIdx) const;
+	virtual void setRegistrationMode(REGISTRATION_STATUS mode);
 
 	virtual void autoShowData(DataPtr data);
 	virtual void enableRender(bool val);

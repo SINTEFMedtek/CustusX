@@ -50,7 +50,7 @@ FilterImpl::FilterImpl(VisServicesPtr services) :
 
 PatientModelServicePtr FilterImpl::patientService()
 {
-	return mServices->getPatientService();
+	return mServices->patient();
 }
 
 QString FilterImpl::getUid() const
@@ -131,7 +131,7 @@ ImagePtr FilterImpl::getCopiedInputImage(int index)
 
 void FilterImpl::updateThresholdFromImageChange(QString uid, DoublePropertyPtr threshold)
 {
-	ImagePtr image = mServices->getPatientService()->getData<Image>(uid);
+	ImagePtr image = mServices->patient()->getData<Image>(uid);
 	if(!image)
 		return;
 	threshold->setValueRange(DoubleRange(image->getMin(), image->getMax(), 1));
@@ -149,7 +149,7 @@ void FilterImpl::updateThresholdFromImageChange(QString uid, DoublePropertyPtr t
 
 void FilterImpl::updateThresholdPairFromImageChange(QString uid, DoublePairPropertyPtr threshold)
 {
-	ImagePtr image = mServices->getPatientService()->getData<Image>(uid);
+	ImagePtr image = mServices->patient()->getData<Image>(uid);
 	if(!image)
 		return;
 	threshold->setValueRange(DoubleRange(image->getMin(), image->getMax(), 1));

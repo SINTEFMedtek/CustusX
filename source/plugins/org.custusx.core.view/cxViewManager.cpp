@@ -41,7 +41,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkImageData.h>
-#include "cxViewWrapper2D.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "cxLayoutData.h"
@@ -76,13 +75,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxNavigation.h"
 #include "cxPatientModelService.h"
 
-
 namespace cx
 {
 
-VisualizationServiceOldPtr ViewManager::create(VisServicesPtr backend)
+ViewManagerPtr ViewManager::create(VisServicesPtr backend)
 {
-	VisualizationServiceOldPtr retval;
+	ViewManagerPtr retval;
 	retval.reset(new ViewManager(backend));
 	return retval;
 }
@@ -117,7 +115,7 @@ ViewManager::ViewManager(VisServicesPtr backend) :
 	mActiveLayout = QStringList() << "" << "";
 	mLayoutWidgets.resize(mActiveLayout.size(), NULL);
 
-	mInteractiveCropper.reset(new InteractiveCropper(mBackend/*patientModelService*/));
+	mInteractiveCropper.reset(new InteractiveCropper(mBackend->patient()->getActiveData()));
 	mInteractiveClipper.reset(new InteractiveClipper(mBackend));
 	connect(this, SIGNAL(activeLayoutChanged()), mInteractiveClipper.get(), SIGNAL(changed()));
 	connect(mInteractiveCropper.get(), SIGNAL(changed()), mRenderLoop.get(), SLOT(requestPreRenderSignal()));
@@ -333,7 +331,7 @@ void ViewManager::addXml(QDomNode& parentNode)
 
 	if (mInteractiveClipper)
 	{
-		QString clippedImage = (mInteractiveClipper->getImage()) ? mInteractiveClipper->getImage()->getUid() : "";
+		QString clippedImage = (mInteractiveClipper->getData()) ? mInteractiveClipper->getData()->getUid() : "";
 		base.addTextToElement("clippedImage", clippedImage);
 	}
 }
@@ -343,7 +341,7 @@ void ViewManager::parseXml(QDomNode viewmanagerNode)
 	XMLNodeParser base(viewmanagerNode);
 
 	QString clippedImage = base.parseTextFromElement("clippedImage");
-	mInteractiveClipper->setImage(mBackend->getPatientService()->getData<Image>(clippedImage));
+	mInteractiveClipper->setData(mBackend->patient()->getData<Image>(clippedImage));
 
 	base.parseDoubleFromElementWithDefault("global2DZoom", mGlobal2DZoomVal->get().toDouble());
 
@@ -528,6 +526,7 @@ ViewWrapperPtr ViewManager::createViewWrapper(ViewPtr view, LayoutViewData viewD
 	{
 		ViewWrapper2DPtr wrapper(new ViewWrapper2D(view, mBackend));
 		wrapper->initializePlane(viewData.mPlane);
+		connect(wrapper.get(), &ViewWrapper2D::pointSampled, this, &ViewManager::pointSampled);
 		return wrapper;
 	}
 	else if (viewData.mType == View::VIEW_3D)
@@ -621,7 +620,7 @@ int ViewManager::findGroupContaining3DViewGivenGuess(int preferredGroup)
 
 void ViewManager::autoShowData(DataPtr data)
 {
-	if (settings()->value("Automation/autoShowNewData").toBool())
+    if (settings()->value("Automation/autoShowNewData").toBool()  && data)
 	{
 		this->getViewGroups()[0]->getData()->addDataSorted(data->getUid());
 	}

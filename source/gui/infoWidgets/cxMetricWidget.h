@@ -89,7 +89,7 @@ class cxGui_EXPORT MetricWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  MetricWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent);
+  MetricWidget(ViewServicePtr viewService, PatientModelServicePtr patientModelService, QWidget* parent);
   virtual ~MetricWidget();
 
 signals:
@@ -123,14 +123,14 @@ protected:
   QAction* mToolMetricAction;
   QAction* mExportFramesAction;
   PatientModelServicePtr mPatientModelService;
-  VisualizationServicePtr mVisualizationService;
+  ViewServicePtr mViewService;
 
 private:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
   virtual void hideEvent(QHideEvent* event);
   void enablebuttons();
-  MetricBasePtr createMetricWrapper(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, DataPtr data);
-  std::vector<MetricBasePtr> createMetricWrappers(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService);
+  MetricBasePtr createMetricWrapper(ViewServicePtr viewService, PatientModelServicePtr patientModelService, DataPtr data);
+  std::vector<MetricBasePtr> createMetricWrappers(ViewServicePtr viewService, PatientModelServicePtr patientModelService);
   virtual void prePaintEvent();
   std::set<QString> getSelectedUids();
   void createActions(QActionGroup* group);

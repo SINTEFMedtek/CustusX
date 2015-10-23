@@ -107,7 +107,7 @@ private:
 
 	VideoSourcePtr mActiveVideoSource;
 	VideoSourcePtr mEmptyVideoSource;
-	USAcquisitionVideoPlaybackPtr mUSAcquisitionVideoPlayback;
+    std::vector<USAcquisitionVideoPlaybackPtr> mUSAcquisitionVideoPlaybacks;
 	VideoServiceBackendPtr mBackend;
 
 	void initServiceListener();
