@@ -78,8 +78,9 @@ public:
 	QByteArray generatePNGEncoding(QImage image);
 //	void saveScreenShotThreaded(QImage pixmap, QString filename);
 	QPixmap grabScreen(unsigned screenid);
-	void showSecondaryLayout();
+    void showSecondaryLayout(QSize size, QString layout);
 	QImage grabSecondaryLayout();
+    void closeSecondaryLayout();
 private:
 	VisServicesPtr mServices;
 	QPointer<class SecondaryViewLayoutWindow> mSecondaryViewLayoutWindow;

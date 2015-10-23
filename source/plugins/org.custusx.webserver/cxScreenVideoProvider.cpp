@@ -115,16 +115,25 @@ QPixmap ScreenVideoProvider::grabScreen(unsigned screenid)
 
 
 \
-void ScreenVideoProvider::showSecondaryLayout()
+void ScreenVideoProvider::showSecondaryLayout(QSize size, QString layout)
 {
 	std::cout << "show window" << std::endl;
 	if (!mSecondaryViewLayoutWindow)
 		mSecondaryViewLayoutWindow = new SecondaryViewLayoutWindow(NULL, mServices->view());
 	mSecondaryViewLayoutWindow->show();
 
-	QRect rect = QRect(QPoint(50,50), QSize(320,568));
+//    QRect rect = QRect(QPoint(50,50), QSize(320,568));
+    QRect rect = QRect(QPoint(50,50), size);
 	mSecondaryViewLayoutWindow->setGeometry(rect);
 	mSecondaryViewLayoutWindow->move(rect.topLeft());
+    if (!layout.isEmpty())
+        mServices->view()->setActiveLayout(layout, 1);
+}
+
+void ScreenVideoProvider::closeSecondaryLayout()
+{
+    mSecondaryViewLayoutWindow->hide();
+    delete mSecondaryViewLayoutWindow;
 }
 
 QImage ScreenVideoProvider::grabSecondaryLayout()

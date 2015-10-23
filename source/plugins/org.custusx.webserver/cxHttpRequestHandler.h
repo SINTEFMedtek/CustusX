@@ -41,7 +41,6 @@ class QHttpResponse;
 namespace cx
 {
 typedef boost::shared_ptr<class RemoteAPI> RemoteAPIPtr;
-class ScreenVideoProvider;
 
 /**
  *
@@ -54,19 +53,33 @@ public:
 public slots:
 	void handle_request(QHttpRequest *req, QHttpResponse *resp);
 
-private slots:
-	void handle_view3D(QHttpRequest *req, QHttpResponse *resp);
-	void handle_default(QHttpRequest *req, QHttpResponse *resp);
-	void handle_screenshot(QHttpRequest *req, QHttpResponse *resp);
-	void handle_viewshot(QHttpRequest *req, QHttpResponse *resp);
+private:
+    void process_mainpage(QHttpRequest *req, QHttpResponse *resp);
 
-//	void handle_stream(QHttpRequest *req, QHttpResponse *resp);
-	void handle_helloworld(QHttpRequest *req, QHttpResponse *resp);
-	void handle_users_reply(QHttpRequest *req, QHttpResponse *resp);
+    void handle_screen(QHttpRequest *req, QHttpResponse *resp);
+    void process_screen(QHttpRequest *req, QHttpResponse *resp);
+
+    void handle_layout(QHttpRequest *req, QHttpResponse *resp);
+    void process_display(QHttpRequest *req, QHttpResponse *resp);
+    void process_stream(QHttpRequest *req, QHttpResponse *resp);
+    void process_layout(QHttpRequest *req, QHttpResponse *resp);
+
+    void reply_mainpage(QHttpResponse *resp);
+    void reply_screenshot(QHttpResponse *resp);
+    void reply_notfound(QHttpResponse *resp);
+    void reply_method_not_allowed(QHttpResponse *resp);
+    void reply_layout_list(QHttpResponse *resp);
+    void get_display_image(QHttpResponse *resp);
+    void create_display(QHttpRequest *req, QHttpResponse *resp);
+    void delete_display(QHttpResponse *resp);
+    void create_stream(QHttpRequest *req, QHttpResponse *resp);
+    void delete_stream(QHttpResponse *resp);
 
 private:
 	RemoteAPIPtr mApi;
-	ScreenVideoProvider* mScreenVideo;
+
+    QByteArray generatePNGEncoding(QImage image);
+
 };
 
 } // namespace cx

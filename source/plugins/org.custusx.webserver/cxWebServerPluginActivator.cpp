@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxHttpRequestHandler.h"
 #include "cxRemoteAPI.h"
+#include "cxLogger.h"
 
 #include <QPixmap>
 
@@ -65,7 +66,8 @@ NetworkPluginActivator::~NetworkPluginActivator()
 
 void NetworkPluginActivator::start(ctkPluginContext* context)
 {
-	std::cout << "STARTING WEB SERVER" << std::endl;
+    int port = 8085;
+    CX_LOG_INFO() << QString("Starting REST server on port %1...").arg(port);
 	server = new QHttpServer;
 	mAPI.reset(new RemoteAPI(VisServices::create(context)));
 	mRequestHandler.reset(new HttpRequestHandler(mAPI));
@@ -73,7 +75,7 @@ void NetworkPluginActivator::start(ctkPluginContext* context)
 			mRequestHandler.get(), SLOT(handle_request(QHttpRequest*, QHttpResponse*)));
 
 	// let's go
-	server->listen(8085);
+    server->listen(port);
 
 	//mRegistration = RegisteredService::create<NetworkServiceImpl>(context, NetworkService_iid);
 }

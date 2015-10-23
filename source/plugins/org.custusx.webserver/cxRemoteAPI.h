@@ -39,6 +39,7 @@ namespace cx
 {
 typedef boost::shared_ptr<class RemoteAPI> RemoteAPIPtr;
 typedef boost::shared_ptr<class LayoutVideoSource> LayoutVideoSourcePtr;
+class ScreenVideoProvider;
 
 /**
  * API indended to be callable from external applications,
@@ -52,10 +53,14 @@ public:
 
 	QStringList getAvailableLayouts() const;
 	void createLayoutWidget(QSize size, QString layout);
-	LayoutVideoSourcePtr startStreaming();
+    void closeLayoutWidget();
+    LayoutVideoSourcePtr startStreaming(); ///< stop streaming by destroying the returned object
+    QImage grabLayout();
+    QImage grabScreen();
 
 private:
 	VisServicesPtr mServices;
+    ScreenVideoProvider* mScreenVideo;
 };
 
 } // namespace cx
