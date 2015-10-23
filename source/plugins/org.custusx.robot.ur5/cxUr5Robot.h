@@ -52,6 +52,9 @@ public:
 
     std::vector<QString> getProgramQueue();
 
+
+    void sendMessage(QString message);
+
 public slots:
     void connectToRobot(QString IPaddress);
     void disconnectFromRobot();
@@ -88,7 +91,6 @@ private:
 
     bool atTargetState();
 
-    void sendMessage(QString message);
     void connectToPort(int port);
     void disconnectFromPort(int port);
     bool moveInProgress;
