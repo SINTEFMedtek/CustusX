@@ -71,6 +71,7 @@ void ClippersWidget::setupUI()
 
 	QPushButton* newClipperButton = new QPushButton("Create clipper", this);
 	newClipperButton->setToolTip("Create new clipper based on currently selected");
+	newClipperButton->setEnabled(false);//TODO: Disabled for now
 
 	mLayout = new QVBoxLayout(this);
 	mLayout->addWidget(newClipperButton);

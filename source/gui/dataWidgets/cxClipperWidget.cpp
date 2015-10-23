@@ -51,7 +51,8 @@ namespace cx
 ClipperWidget::ClipperWidget(VisServicesPtr services, QWidget* parent) :
 	BaseWidget(parent, "ClipperWidget", "Clipper"),
 	mServices(services),
-	mInitializedWithClipper(false)
+	mInitializedWithClipper(false),
+	planeSelector(NULL)
 {
 	this->setEnabled(false);
 	this->setupDataStructures();
@@ -121,8 +122,9 @@ void ClipperWidget::enable(bool checked)
 
 QLayout *ClipperWidget::planeLayout()
 {
+	std::cout << "ClipperWidget::planeLayout()";
 	mPlaneAdapter = StringPropertyClipPlane::New(mClipper);
-	LabeledComboBoxWidget* planeSelector = new LabeledComboBoxWidget(this, mPlaneAdapter);
+	planeSelector = new LabeledComboBoxWidget(this, mPlaneAdapter);
 
 	QHBoxLayout *layout = new QHBoxLayout();
 
@@ -168,8 +170,13 @@ void ClipperWidget::connectToNewClipper()
 {
 	if(mClipper)
 	{
+		mUseClipperCheckBox->setChecked(mClipper->getUseClipper());
 		connect(mUseClipperCheckBox, &QCheckBox::toggled, this, &ClipperWidget::enable);
-		mPlaneAdapter = StringPropertyClipPlane::New(mClipper);
+		if(planeSelector)
+		{
+			mPlaneAdapter->setClipper(mClipper);
+			planeSelector->setModified();
+		}
 		this->setEnabled(true);
 		this->setupUI();
 		this->setupDataSelectorUI();
@@ -189,13 +196,14 @@ void ClipperWidget::setClipper(InteractiveClipperPtr clipper)
 	this->connectToNewClipper();
 }
 
-void ClipperWidget::checkOldCheckBoxesThatAreStillWalid(QMap<QString, QCheckBox*> oldCheckBoxes)
+void ClipperWidget::initCheckboxesBasedOnClipper()
 {
-	QMap<QString, QCheckBox*>::Iterator checkboxIter = oldCheckBoxes.begin();
-	for(; checkboxIter != oldCheckBoxes.end(); ++checkboxIter)
+	std::map<QString, DataPtr> datas = mClipper->getDatas();
+	std::map<QString, DataPtr>::iterator iter = datas.begin();
+	for(; iter != datas.end(); ++iter)
 	{
-		if(mCheckBoxes.contains(checkboxIter.key()))
-			mCheckBoxes[checkboxIter.key()]->setChecked(checkboxIter.value()->isChecked());
+		if(mCheckBoxes.contains(iter->first))
+			mCheckBoxes[iter->first]->setChecked(true);
 	}
 }
 
@@ -242,9 +250,8 @@ void ClipperWidget::setupDataSelectorUI()
 	mDataTableWidget->setColumnWidth(1, 300);
 //	mDataTableWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);//test
 
-	QMap<QString, QCheckBox*> oldCheckBoxes = mCheckBoxes;
 	createNewCheckboxesBasedOnData();
-	checkOldCheckBoxesThatAreStillWalid(oldCheckBoxes);
+	initCheckboxesBasedOnClipper();
 }
 
 QString ClipperWidget::getDataTypeRegExp()
@@ -280,15 +287,16 @@ void ClipperWidget::dataSelectorClicked(bool checked)
 
 void ClipperWidget::setClipPlaneInDatas()
 {
-
+	if(!mClipper)
+		return;
 	QMap<QString, QCheckBox*>::const_iterator iter = mCheckBoxes.constBegin();
 	 while (iter != mCheckBoxes.constEnd())
 	 {
 		 DataPtr data = mServices->patient()->getData(iter.key());
 		 if(iter.value()->isChecked())
-			 mClipper->addClipPlaneToData(data);
+			 mClipper->addData(data);
 		 else
-			 mClipper->removeClipPlaneFromData(data);
+			 mClipper->removeData(data);
 		 ++iter;
 	 }
 
@@ -300,7 +308,7 @@ void ClipperWidget::removeAllClipPlanes()
 	 while (iter != mCheckBoxes.constEnd())
 	 {
 		 DataPtr data = mServices->patient()->getData(iter.key());
-		 mClipper->removeClipPlaneFromData(data);
+		 mClipper->removeData(data);
 		 ++iter;
 	 }
 }

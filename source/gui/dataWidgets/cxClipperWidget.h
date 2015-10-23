@@ -44,6 +44,9 @@ namespace cx
 {
 typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
 typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
+typedef boost::shared_ptr<class StringPropertyClipPlane> StringPropertyClipPlanePtr;
+
+class LabeledComboBoxWidget;
 
 class ClipperWidget : public BaseWidget
 {
@@ -64,7 +67,8 @@ private:
 	void setupUI();
 
 	InteractiveClipperPtr mClipper;
-	StringPropertyBasePtr mPlaneAdapter;
+	StringPropertyClipPlanePtr mPlaneAdapter;
+	LabeledComboBoxWidget* planeSelector;
 	QVBoxLayout* mLayout;
 	QCheckBox* mUseClipperCheckBox;
 	QCheckBox *mAttachedToTool;
@@ -90,7 +94,7 @@ private:
 	QLayout *toolLayout();
 	QString getDataTypeRegExp();
 	void removeAllClipPlanes();
-	void checkOldCheckBoxesThatAreStillWalid(QMap<QString, QCheckBox*> oldCheckBoxes);
+	void initCheckboxesBasedOnClipper();
 	void createNewCheckboxesBasedOnData();
 };
 

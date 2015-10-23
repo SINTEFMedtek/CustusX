@@ -88,6 +88,11 @@ QStringList StringPropertyClipPlane::getValueRange() const
 	return retval;
 }
 
+void StringPropertyClipPlane::setClipper(InteractiveClipperPtr clipper)
+{
+	mInteractiveClipper = clipper;
+}
+
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 ///--------------------------------------------------------

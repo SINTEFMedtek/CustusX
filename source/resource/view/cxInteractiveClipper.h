@@ -71,8 +71,9 @@ public:
 	DataPtr getData() const;
 	void setData(DataPtr data);
 
-	void addClipPlaneToData(DataPtr data);
-	void removeClipPlaneFromData(DataPtr data);
+	void addData(DataPtr data);
+	void removeData(DataPtr data);
+	std::map<QString, DataPtr> getDatas();
 signals:
 	void changed();
 public slots:
@@ -89,6 +90,9 @@ private:
 	bool mUseClipper;
 	DataPtr mData;
 	CoreServicesPtr mServices;
+	std::map<QString, DataPtr> mDatas;
+	void removeAllInterActiveClipPlanes();
+	void addAllInteractiveClipPlanes();
 };
 typedef boost::shared_ptr<InteractiveClipper> InteractiveClipperPtr;
 

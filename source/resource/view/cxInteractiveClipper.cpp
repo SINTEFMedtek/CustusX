@@ -143,23 +143,49 @@ void InteractiveClipper::setData(DataPtr data)
 	emit changed();
 }
 
-//TODO: Rewrite data to hold several interactive clip planes, with set/remove specifix planes form here
-void InteractiveClipper::addClipPlaneToData(DataPtr data)
+void InteractiveClipper::addData(DataPtr data)
 {
-//	CX_LOG_DEBUG() <<"InteractiveClipper::addClipPlaneToData: " << data->getName();
-	if (data)
-		data->addInteractiveClipPlane(mSlicePlaneClipper->getClipPlane());
+	if(!data)
+		return;
+	mDatas[data->getUid()] = data;
+	emit changed();
 }
 
-void InteractiveClipper::removeClipPlaneFromData(DataPtr data)
+void InteractiveClipper::removeData(DataPtr data)
 {
-//	CX_LOG_DEBUG() <<"InteractiveClipper::removeClipPlaneFromData: " << data->getName();
-	if (data)
-		data->removeInteractiveClipPlane(mSlicePlaneClipper->getClipPlane());
+	if(!data)
+		return;
+	std::map<QString, DataPtr>::iterator iter = mDatas.find(data->getUid());
+	if(iter != mDatas.end())
+		mDatas.erase(iter);
+}
+
+std::map<QString, DataPtr> InteractiveClipper::getDatas()
+{
+	return mDatas;
+}
+
+void InteractiveClipper::addAllInteractiveClipPlanes()
+{
+	std::map<QString, DataPtr>::iterator iter = mDatas.begin();
+	for(; iter != mDatas.end(); ++iter)
+		iter->second->addInteractiveClipPlane(mSlicePlaneClipper->getClipPlane());
+}
+
+void InteractiveClipper::removeAllInterActiveClipPlanes()
+{
+	std::map<QString, DataPtr>::iterator iter = mDatas.begin();
+	for(; iter != mDatas.end(); ++iter)
+		iter->second->removeInteractiveClipPlane(mSlicePlaneClipper->getClipPlane());
 }
 
 void InteractiveClipper::changedSlot()
 {
+	if (mUseClipper)
+		this->addAllInteractiveClipPlanes();
+	else
+		this->removeAllInterActiveClipPlanes();
+
 	if (!mData)
 		return;
 
