@@ -61,6 +61,19 @@ ClipperWidget::ClipperWidget(VisServicesPtr services, QWidget* parent) :
 	connect(mServices->patient().get(), &PatientModelService::dataAddedOrRemoved, this, &OptimizedUpdateWidget::setModified);
 }
 
+ClipperWidget::~ClipperWidget()
+{
+	disconnect(mSelectAllData, &QCheckBox::clicked, this, &ClipperWidget::selectAllTableData);
+	disconnect(mShowImages, &QCheckBox::clicked, this, &ClipperWidget::dataTypeSelectorClicked);
+	connect(mShowMeshes, &QCheckBox::clicked, this, &ClipperWidget::dataTypeSelectorClicked);
+	connect(mShowMetrics, &QCheckBox::clicked, this, &ClipperWidget::dataTypeSelectorClicked);
+	connect(mShowTrackedStreams, &QCheckBox::clicked, this, &ClipperWidget::dataTypeSelectorClicked);
+	connect(mUseClipperCheckBox, &QCheckBox::toggled, this, &ClipperWidget::enable);
+	connect(mToolSelector.get(), &StringPropertySelectTool::changed, this, &ClipperWidget::onToolChanged);
+
+	connect(mServices->patient().get(), &PatientModelService::dataAddedOrRemoved, this, &OptimizedUpdateWidget::setModified);
+}
+
 void ClipperWidget::setupDataStructures()
 {
 	mLayout = new QVBoxLayout(this);
@@ -80,6 +93,10 @@ void ClipperWidget::setupDataStructures()
 	mShowImages->setChecked(true);
 	mShowMeshes->setChecked(true);
 
+	//TODO: Need active tool in addition to tool list.
+	mToolSelector = StringPropertySelectTool::New(mServices->tracking());
+	mToolSelector->setValueName("Tool");
+
 	connect(mSelectAllData, &QCheckBox::clicked, this, &ClipperWidget::selectAllTableData);
 
 	connect(mShowImages, &QCheckBox::clicked, this, &ClipperWidget::dataTypeSelectorClicked);
@@ -87,9 +104,9 @@ void ClipperWidget::setupDataStructures()
 	connect(mShowMetrics, &QCheckBox::clicked, this, &ClipperWidget::dataTypeSelectorClicked);
 	connect(mShowTrackedStreams, &QCheckBox::clicked, this, &ClipperWidget::dataTypeSelectorClicked);
 
-	//TODO: Need active tool in addition to tool list. Also need to connect this to mClipper
-	mToolSelector = StringPropertySelectTool::New(mServices->tracking());
-	mToolSelector->setValueName("Tool");
+	connect(mUseClipperCheckBox, &QCheckBox::toggled, this, &ClipperWidget::enable);
+	connect(mToolSelector.get(), &StringPropertySelectTool::changed, this, &ClipperWidget::onToolChanged);
+
 	mDataTableWidget = new QTableWidget(this);
 }
 
@@ -113,6 +130,8 @@ void ClipperWidget::setupUI()
 
 void ClipperWidget::enable(bool checked)
 {
+	if(!mClipper)
+		return;
 	mClipper->useClipper(checked);
 }
 
@@ -167,9 +186,9 @@ void ClipperWidget::connectToNewClipper()
 	{
 		mUseClipperCheckBox->setChecked(mClipper->getUseClipper());
 		mInvertPlane->setChecked(mClipper->getInvertPlane());
-		connect(mUseClipperCheckBox, &QCheckBox::toggled, this, &ClipperWidget::enable);
+//		connect(mUseClipperCheckBox, &QCheckBox::toggled, this, &ClipperWidget::enable);
+//		connect(mToolSelector.get(), &StringPropertySelectTool::changed, this, &ClipperWidget::onToolChanged);
 		connect(mInvertPlane, &QCheckBox::toggled, mClipper.get(), &InteractiveClipper::invertPlane);
-		connect(mToolSelector.get(), &StringPropertySelectTool::changed, this, &ClipperWidget::onToolChanged);
 		if(planeSelector)
 		{
 			mPlaneAdapter->setClipper(mClipper);
@@ -199,7 +218,7 @@ void ClipperWidget::setClipper(InteractiveClipperPtr clipper)
 {
 	if(mClipper)
 	{
-		disconnect(mUseClipperCheckBox, &QCheckBox::toggled, this, &ClipperWidget::enable);
+//		disconnect(mUseClipperCheckBox, &QCheckBox::toggled, this, &ClipperWidget::enable);
 		disconnect(mInvertPlane, &QCheckBox::toggled, mClipper.get(), &InteractiveClipper::invertPlane);
 	}
 

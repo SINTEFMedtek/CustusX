@@ -53,6 +53,7 @@ class ClipperWidget : public BaseWidget
 	Q_OBJECT
 public:
 	ClipperWidget(VisServicesPtr services, QWidget *parent);
+	~ClipperWidget();
 	void setClipper(InteractiveClipperPtr clipper);
 protected:
 	virtual void prePaintEvent();
