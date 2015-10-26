@@ -115,7 +115,7 @@ bool InteractiveClipper::getInvertPlane() const
 void InteractiveClipper::useClipper(bool on)
 {
 	mUseClipper = on;
-	emit changed();
+	this->updateClipPlanesInData();
 }
 void InteractiveClipper::invertPlane(bool on)
 {
@@ -148,7 +148,7 @@ void InteractiveClipper::addData(DataPtr data)
 	if(!data)
 		return;
 	mDatas[data->getUid()] = data;
-	emit changed();
+	this->updateClipPlanesInData();
 }
 
 void InteractiveClipper::removeData(DataPtr data)
@@ -158,6 +158,17 @@ void InteractiveClipper::removeData(DataPtr data)
 	std::map<QString, DataPtr>::iterator iter = mDatas.find(data->getUid());
 	if(iter != mDatas.end())
 		mDatas.erase(iter);
+	this->updateClipPlanesInData();
+}
+
+void InteractiveClipper::updateClipPlanesInData()
+{
+	if (mUseClipper)
+		this->addAllInteractiveClipPlanes();
+	else
+		this->removeAllInterActiveClipPlanes();
+
+	emit changed();
 }
 
 std::map<QString, DataPtr> InteractiveClipper::getDatas()
@@ -181,11 +192,6 @@ void InteractiveClipper::removeAllInterActiveClipPlanes()
 
 void InteractiveClipper::changedSlot()
 {
-	if (mUseClipper)
-		this->addAllInteractiveClipPlanes();
-	else
-		this->removeAllInterActiveClipPlanes();
-
 	if (!mData)
 		return;
 

@@ -112,17 +112,11 @@ void ClipperWidget::setupUI()
 
 void ClipperWidget::enable(bool checked)
 {
-	if(checked)
-		this->setClipPlaneInDatas();
-	else
-		this->removeAllClipPlanes();
-
 	mClipper->useClipper(checked);
 }
 
 QLayout *ClipperWidget::planeLayout()
 {
-	std::cout << "ClipperWidget::planeLayout()";
 	mPlaneAdapter = StringPropertyClipPlane::New(mClipper);
 	planeSelector = new LabeledComboBoxWidget(this, mPlaneAdapter);
 

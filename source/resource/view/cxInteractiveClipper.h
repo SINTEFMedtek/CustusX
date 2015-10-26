@@ -93,6 +93,7 @@ private:
 	std::map<QString, DataPtr> mDatas;
 	void removeAllInterActiveClipPlanes();
 	void addAllInteractiveClipPlanes();
+	void updateClipPlanesInData();
 };
 typedef boost::shared_ptr<InteractiveClipper> InteractiveClipperPtr;
 
