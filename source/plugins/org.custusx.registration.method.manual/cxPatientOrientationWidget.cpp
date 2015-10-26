@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-PatientOrientationWidget::PatientOrientationWidget(RegServices services, QWidget* parent, QString objectName, QString windowTitle) :
+PatientOrientationWidget::PatientOrientationWidget(RegServicesPtr services, QWidget* parent, QString objectName, QString windowTitle) :
 	RegistrationBaseWidget(services, parent, objectName, windowTitle),
 	mPatientOrientationButton(new QPushButton("Patient Orientation")),
 	mInvertButton(new QCheckBox("Back face"))
@@ -62,7 +62,7 @@ PatientOrientationWidget::PatientOrientationWidget(RegServices services, QWidget
 
   connect(settings(), &Settings::valueChangedFor, this, &PatientOrientationWidget::globalConfigurationFileChangedSlot);
 
-  mActiveToolProxy =  ActiveToolProxy::New(services.trackingService);
+  mActiveToolProxy =  ActiveToolProxy::New(services->tracking());
   connect(mActiveToolProxy.get(), SIGNAL(toolVisible(bool)), this, SLOT(enableToolSampleButtonSlot()));
   connect(mActiveToolProxy.get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(enableToolSampleButtonSlot()));
   this->enableToolSampleButtonSlot();
@@ -95,15 +95,14 @@ Transform3D PatientOrientationWidget::get_tMtm() const
 
 void PatientOrientationWidget::setPatientOrientationSlot()
 {
-	Transform3D prMt = mServices.trackingService->getActiveTool()->get_prMt();
-	mServices.registrationService->applyPatientOrientation(this->get_tMtm(), prMt);
+	Transform3D prMt = mServices->tracking()->getActiveTool()->get_prMt();
+	mServices->registration()->applyPatientOrientation(this->get_tMtm(), prMt);
 }
 
 void PatientOrientationWidget::enableToolSampleButtonSlot()
 {
-  ToolPtr tool = mServices.trackingService->getActiveTool();
-  bool enabled = false;
-  enabled = tool &&
+  ToolPtr tool = mServices->tracking()->getActiveTool();
+  bool enabled = tool &&
 	  tool->getVisible() &&
 	  (!tool->hasType(Tool::TOOL_MANUAL) || settings()->value("giveManualToolPhysicalProperties").toBool()); // enable only for non-manual tools.
 

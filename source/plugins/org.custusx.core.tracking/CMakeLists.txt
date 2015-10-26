@@ -1,50 +1,21 @@
 project(org_custusx_core_tracking)
 
-cx_initialize_IGSTK()
-
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
 
 set(PLUGIN_SRCS
     cxTrackingPluginActivator.cpp
     cxTrackingImplService.cpp
-    cxManualToolAdapter.h
-    cxManualToolAdapter.cpp
-    cxToolConfigurationParser.h
-    cxToolConfigurationParser.cpp
-    cxTrackerConfigurationImpl.h
-    cxTrackerConfigurationImpl.cpp
     cxTrackingSystemDummyService.cpp
-    trackingSystemPlayback/cxPlaybackTool.h
-    trackingSystemPlayback/cxPlaybackTool.cpp
     trackingSystemPlayback/cxTrackingSystemPlaybackService.cpp
-    trackingSystemIGSTK/cxToolUsingIGSTK.h
-    trackingSystemIGSTK/cxToolUsingIGSTK.cpp
-    trackingSystemIGSTK/cxIgstkTracker.h
-    trackingSystemIGSTK/cxIgstkTracker.cpp
-    trackingSystemIGSTK/cxIgstkTool.h
-    trackingSystemIGSTK/cxIgstkTool.cpp
-    trackingSystemIGSTK/cxIgstkToolManager.h
-    trackingSystemIGSTK/cxIgstkToolManager.cpp
-    trackingSystemIGSTK/cxIgstkTrackerThread.h
-    trackingSystemIGSTK/cxIgstkTrackerThread.cpp
-    trackingSystemIGSTK/cxTrackingSystemIGSTKService.cpp
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
     cxTrackingPluginActivator.h
     cxTrackingImplService.h
-    trackingSystemIGSTK/cxToolUsingIGSTK.h
-    trackingSystemIGSTK/cxIgstkTracker.h
-    cxManualToolAdapter.h
     cxTrackingSystemDummyService.h
-    trackingSystemPlayback/cxPlaybackTool.h
     trackingSystemPlayback/cxTrackingSystemPlaybackService.h
-    trackingSystemIGSTK/cxIgstkTool.h
-    trackingSystemIGSTK/cxIgstkToolManager.h
-    trackingSystemIGSTK/cxIgstkTrackerThread.h
-    trackingSystemIGSTK/cxTrackingSystemIGSTKService.h
 )
 
 # Qt Designer files which should be processed by Qts uic
@@ -62,9 +33,6 @@ set(PLUGIN_target_libraries
     cxResource
     cxPluginUtilities
     ${PLUGIN_target_libraries}
-
-    PRIVATE
-    IGSTK
 )
 
 set(PLUGIN_OUTPUT_DIR "")
@@ -87,7 +55,6 @@ ctkMacroBuildPlugin(
 target_include_directories(org_custusx_core_tracking
     PUBLIC
     .
-    ./trackingSystemIGSTK
     ./trackingSystemPlayback
     ${CMAKE_CURRENT_BINARY_DIR}
 )

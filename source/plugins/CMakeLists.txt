@@ -10,6 +10,8 @@ set(CX_PLUGINS
   org.custusx.core.patientmodel:ON
   org.custusx.core.view:ON
   org.custusx.core.tracking:ON
+  org.custusx.core.tracking.system.igstk:ON
+  org.custusx.core.openigtlink:ON
   org.custusx.core.video:ON
   org.custusx.core.state:ON
   org.custusx.dicom:ON
@@ -19,6 +21,7 @@ set(CX_PLUGINS
   org.custusx.registration.gui:ON
   org.custusx.registration.method.manual:ON
   org.custusx.registration.method.landmark:ON
+  org.custusx.registration.method.pointcloud:ON
   org.custusx.registration.method.bronchoscopy:ON
   org.custusx.filter.routetotarget:ON
   org.custusx.registration.method.vessel:ON

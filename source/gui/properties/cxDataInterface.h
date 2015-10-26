@@ -85,7 +85,7 @@ class cxGui_EXPORT DoublePropertyActiveImageBase : public DoublePropertyBase
 {
   Q_OBJECT
 public:
-  DoublePropertyActiveImageBase(PatientModelServicePtr patientModelService);
+  DoublePropertyActiveImageBase(ActiveDataPtr activeData);
   virtual ~DoublePropertyActiveImageBase() {}
   virtual double getValue() const;
   virtual bool setValue(double val);
@@ -98,7 +98,7 @@ protected:
 
   ImagePtr mImage;
   ActiveImageProxyPtr mActiveImageProxy;
-  PatientModelServicePtr mPatientModelService;
+  ActiveDataPtr mActiveData;
 };
 
 /**
@@ -127,82 +127,6 @@ public:
   virtual void setValueInternal(double val);
   virtual DoubleRange getValueRange() const;
 };
-
-/**
- * \brief Base class for all Properties that selects a real time source.
- */
-class cxGui_EXPORT StringPropertySelectRTSourceBase : public StringPropertyBase
-{
-  Q_OBJECT
-public:
-  StringPropertySelectRTSourceBase(PatientModelServicePtr patientModelService);
-  virtual ~StringPropertySelectRTSourceBase();
-
-public: // optional methods
-  virtual QStringList getValueRange() const;
-  virtual QString convertInternal2Display(QString internal);
-
-protected:
-  PatientModelServicePtr mPatientModelService;
-};
-typedef boost::shared_ptr<class StringPropertySelectRTSourceBase> StringPropertySelectRTSourceBasePtr;
-
-
-typedef boost::shared_ptr<class StringPropertySelectRTSource> StringPropertySelectRTSourcePtr;
-
-/**
- * \brief Adapter that selects and stores an rtsource.
- * The rtsource is stored internally in the adapter.
- * Use setValue/getValue plus changed() to access it.
- */
-class cxGui_EXPORT StringPropertySelectRTSource : public StringPropertySelectRTSourceBase
-{
-  Q_OBJECT
-public:
-  static StringPropertySelectRTSourceBasePtr New(PatientModelServicePtr patientModelService) { return StringPropertySelectRTSourceBasePtr(new StringPropertySelectRTSource(patientModelService)); }
-  StringPropertySelectRTSource(PatientModelServicePtr patientModelService);
-  virtual ~StringPropertySelectRTSource() {}
-
-public: // basic methods
-  virtual QString getDisplayName() const;
-  virtual bool setValue(const QString& value);
-  virtual QString getValue() const;
-
-public: // optional methods
-  virtual QString getHelp() const;
-
-public: // interface extension
-  VideoSourcePtr getRTSource();
-  void setValueName(const QString name);
-
-private slots:
-  void setDefaultSlot();
-
-private:
-  VideoSourcePtr mRTSource;
-  QString mValueName;
-};
-
-typedef boost::shared_ptr<class StringPropertyActiveVideoSource> StringPropertyActiveVideoSourcePtr;
-/**
- * \brief Adapter for controlling the active video source in cx::VideoServiceOld
- */
-class cxGui_EXPORT StringPropertyActiveVideoSource : public StringPropertyBase
-{
-  Q_OBJECT
-public:
-  static StringPropertyActiveVideoSourcePtr New() { return StringPropertyActiveVideoSourcePtr(new StringPropertyActiveVideoSource()); }
-  StringPropertyActiveVideoSource();
-  virtual ~StringPropertyActiveVideoSource() {}
-
-public: // basic methods
-  virtual QString getDisplayName() const;
-  virtual bool setValue(const QString& value);
-  virtual QString getValue() const;
-  virtual QStringList getValueRange() const;
-  virtual QString getHelp() const;
-};
-
 
 typedef boost::shared_ptr<class StringPropertyParentFrame> StringPropertyParentFramePtr;
 
@@ -358,6 +282,95 @@ protected:
   ImagePtr mData;
   PatientModelServicePtr mPatientModelService;
 };
+
+
+typedef boost::shared_ptr<class StringPropertyGlyphOrientationArray> StringPropertyGlyphOrientationArrayPtr;
+
+/**
+ * \brief Adapter that selects the glyph orientation array.
+ */
+class cxGui_EXPORT StringPropertyGlyphOrientationArray : public StringPropertyBase
+{
+  Q_OBJECT
+public:
+  static StringPropertyGlyphOrientationArrayPtr New(PatientModelServicePtr patientModelService) { return StringPropertyGlyphOrientationArrayPtr(new StringPropertyGlyphOrientationArray(patientModelService)); }
+  StringPropertyGlyphOrientationArray(PatientModelServicePtr patientModelService);
+  virtual ~StringPropertyGlyphOrientationArray();
+  void setData(MeshPtr data);
+
+public: // basic methods
+  virtual QString getDisplayName() const;
+  virtual bool setValue(const QString& value);
+  virtual QString getValue() const;
+
+public: // optional methods
+  virtual QString getHelp() const;
+  virtual QStringList getValueRange() const;
+
+protected:
+  MeshPtr mData;
+  PatientModelServicePtr mPatientModelService;
+};
+
+
+typedef boost::shared_ptr<class StringPropertyGlyphColorArray> StringPropertyGlyphColorArrayPtr;
+
+/**
+ * \brief Adapter that selects the glyph color array.
+ */
+class cxGui_EXPORT StringPropertyGlyphColorArray : public StringPropertyBase
+{
+  Q_OBJECT
+public:
+  static StringPropertyGlyphColorArrayPtr New(PatientModelServicePtr patientModelService) { return StringPropertyGlyphColorArrayPtr(new StringPropertyGlyphColorArray(patientModelService)); }
+  StringPropertyGlyphColorArray(PatientModelServicePtr patientModelService);
+  virtual ~StringPropertyGlyphColorArray();
+  void setData(MeshPtr data);
+
+public: // basic methods
+  virtual QString getDisplayName() const;
+  virtual bool setValue(const QString& value);
+  virtual QString getValue() const;
+
+public: // optional methods
+  virtual QString getHelp() const;
+  virtual QStringList getValueRange() const;
+
+protected:
+  MeshPtr mData;
+  PatientModelServicePtr mPatientModelService;
+};
+
+
+
+typedef boost::shared_ptr<class StringPropertyGlyphLUT> StringPropertyGlyphLUTPtr;
+
+/**
+ * \brief Adapter that selects the glyph color LUT.
+ */
+class cxGui_EXPORT StringPropertyGlyphLUT : public StringPropertyBase
+{
+  Q_OBJECT
+public:
+  static StringPropertyGlyphLUTPtr New(PatientModelServicePtr patientModelService) { return StringPropertyGlyphLUTPtr(new StringPropertyGlyphLUT(patientModelService)); }
+  StringPropertyGlyphLUT(PatientModelServicePtr patientModelService);
+  virtual ~StringPropertyGlyphLUT();
+  void setData(MeshPtr data);
+
+public: // basic methods
+  virtual QString getDisplayName() const;
+  virtual bool setValue(const QString& value);
+  virtual QString getValue() const;
+
+public: // optional methods
+  virtual QString getHelp() const;
+  virtual QStringList getValueRange() const;
+
+protected:
+  MeshPtr mData;
+  PatientModelServicePtr mPatientModelService;
+};
+
 
 } // namespace cx
 

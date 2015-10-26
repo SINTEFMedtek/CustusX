@@ -51,7 +51,7 @@ VisualizationPluginActivator::~VisualizationPluginActivator()
 
 void VisualizationPluginActivator::start(ctkPluginContext* context)
 {
-	mRegistration = RegisteredService::create<VisualizationImplService>(context, VisualizationService_iid);
+	mRegistration = RegisteredService::create<ViewImplService>(context, ViewService_iid);
 }
 
 void VisualizationPluginActivator::stop(ctkPluginContext* context)

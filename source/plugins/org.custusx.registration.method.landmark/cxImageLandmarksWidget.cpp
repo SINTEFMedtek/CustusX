@@ -53,27 +53,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationService.h"
 #include "cxPatientModelService.h"
 #include "cxViewService.h"
-#include "cxViewGroupData.h"
 #include "cxRepContainer.h"
 #include "cxTrackingService.h"
 #include "cxLandmarkListener.h"
+#include "cxActiveData.h"
 
 namespace cx
 {
-ImageLandmarksWidget::ImageLandmarksWidget(RegServices services, QWidget* parent,
+ImageLandmarksWidget::ImageLandmarksWidget(RegServicesPtr services, QWidget* parent,
 	QString objectName, QString windowTitle, bool useRegistrationFixedPropertyInsteadOfActiveImage) :
 	LandmarkRegistrationWidget(services, parent, objectName, windowTitle),
 	mUseRegistrationFixedPropertyInsteadOfActiveImage(useRegistrationFixedPropertyInsteadOfActiveImage)
 {
 	if(mUseRegistrationFixedPropertyInsteadOfActiveImage)
-		mCurrentProperty.reset(new StringPropertyRegistrationFixedImage(services.registrationService, services.patientModelService));
+		mCurrentProperty.reset(new StringPropertyRegistrationFixedImage(services->registration(), services->patient()));
 	else
-		mCurrentProperty = StringPropertySelectData::New(mServices.patientModelService);
+		mCurrentProperty = StringPropertySelectData::New(mServices->patient());
 	connect(mCurrentProperty.get(), &Property::changed, this, &ImageLandmarksWidget::onCurrentImageChanged);
 
 	mLandmarkListener->useOnlyOneSourceUpdatedFromOutside();
 
-	mActiveToolProxy = ActiveToolProxy::New(services.trackingService);
+	mActiveToolProxy = ActiveToolProxy::New(services->tracking());
 	connect(mActiveToolProxy.get(), SIGNAL(toolVisible(bool)), this, SLOT(enableButtons()));
 	connect(mActiveToolProxy.get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(enableButtons()));
 
@@ -116,15 +116,15 @@ void ImageLandmarksWidget::onCurrentImageChanged()
 	mLandmarkListener->setLandmarkSource(data);
 	this->enableButtons();
 
-	if (data && !mServices.registrationService->getFixedData())
-		mServices.registrationService->setFixedData(data);
+	if (data && !mServices->registration()->getFixedData())
+		mServices->registration()->setFixedData(data);
 
 	this->setModified();
 }
 
 PickerRepPtr ImageLandmarksWidget::getPickerRep()
 {
-	return mServices.visualizationService->get3DReps(0, 0)->findFirst<PickerRep>();
+	return mServices->view()->get3DReps(0, 0)->findFirst<PickerRep>();
 }
 
 DataPtr ImageLandmarksWidget::getCurrentData() const
@@ -145,7 +145,7 @@ void ImageLandmarksWidget::addLandmarkButtonClickedSlot()
 	if (!image)
 		return;
 
-	QString uid = mServices.patientModelService->addLandmark();
+	QString uid = mServices->patient()->addLandmark();
 	Vector3D pos_r = PickerRep->getPosition();
 	Vector3D pos_d = image->get_rMd().inv().coord(pos_r);
 	image->getLandmarks()->setLandmark(Landmark(uid, pos_d));
@@ -212,12 +212,13 @@ void ImageLandmarksWidget::enableButtons()
 
 void ImageLandmarksWidget::showEvent(QShowEvent* event)
 {
-	mServices.visualizationService->getGroup(0)->setRegistrationMode(rsIMAGE_REGISTRATED);
+	mServices->view()->setRegistrationMode(rsIMAGE_REGISTRATED);
 	LandmarkRegistrationWidget::showEvent(event);
 
 	if(!mUseRegistrationFixedPropertyInsteadOfActiveImage)
 	{
-		ImagePtr image = mServices.patientModelService->getActiveImage();
+		ActiveDataPtr activeData = mServices->patient()->getActiveData();
+		ImagePtr image = activeData->getActive<Image>();
 		if (image)
 			mCurrentProperty->setValue(image->getUid());
 	}
@@ -225,7 +226,7 @@ void ImageLandmarksWidget::showEvent(QShowEvent* event)
 
 void ImageLandmarksWidget::hideEvent(QHideEvent* event)
 {
-	mServices.visualizationService->getGroup(0)->setRegistrationMode(rsNOT_REGISTRATED);
+	mServices->view()->setRegistrationMode(rsNOT_REGISTRATED);
 	LandmarkRegistrationWidget::hideEvent(event);
 
 }

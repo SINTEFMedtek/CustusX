@@ -80,7 +80,7 @@ class LibraryAssembly(object):
     
     def process(self, checkout=False, configure_clean=False, configure=False, clean=False, build=False):
         '''
-        checkout, configure, build
+        checkout, configure, make
         '''
         selectedLibraries = [lib for lib in self.libraries if lib.name() in self.selectedLibraryNames]
                     

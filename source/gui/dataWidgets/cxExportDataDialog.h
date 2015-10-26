@@ -65,6 +65,7 @@ private:
   QPushButton* mOkButton;
   QCheckBox* mNiftiFormatCheckBox;
   PatientModelServicePtr mPatientModelService;
+  PATIENT_COORDINATE_SYSTEM getExternalSpace();
 };
 }//namespace cx
 

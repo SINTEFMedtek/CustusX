@@ -43,6 +43,7 @@ SelectDataStringPropertyBase::SelectDataStringPropertyBase(PatientModelServicePt
 	mPatientModelService(patientModelService)
 {
 	mValueName = "Select data";
+	mUidRegexp = "";
 	mHelp = mValueName;
 	connect(mPatientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SIGNAL(changed()));
 }
@@ -66,10 +67,35 @@ std::map<QString, DataPtr> SelectDataStringPropertyBase::filterOnType(std::map<Q
 	return input;
 }
 
+/**
+	* Erase all data with uid not conforming to input regexp.
+	*/
+std::map<QString, DataPtr> SelectDataStringPropertyBase::filterOnUid(std::map<QString, DataPtr> input, QString regexp) const
+{
+
+	QRegExp reg(regexp);
+
+	std::map<QString, DataPtr>::iterator iter, current;
+	for (iter=input.begin(); iter!=input.end(); )
+	{
+		current = iter++; // increment iterator before erasing!
+		if (!current->second->getUid().contains(reg))
+			input.erase(current);
+	}
+
+	return input;
+}
+
+void SelectDataStringPropertyBase::setUidRegexp(QString regexp)
+{
+	mUidRegexp = regexp;
+}
+
 QStringList SelectDataStringPropertyBase::getValueRange() const
 {
 	std::map<QString, DataPtr> data = mPatientModelService->getData();
 	data = this->filterOnType(data, mTypeRegexp);
+	data = this->filterOnUid(data, mUidRegexp);
 	std::vector<DataPtr> sorted = sortOnGroupsAndAcquisitionTime(data);
 	QStringList retval;
 	retval << "";
@@ -110,6 +136,11 @@ void SelectDataStringPropertyBase::setValueName(QString val)
 DataPtr SelectDataStringPropertyBase::getData() const
 {
 	return mPatientModelService->getData(this->getValue());
+}
+
+DataPtr SelectDataStringPropertyBase::getData(QString uid) const
+{
+	return mPatientModelService->getData(uid);
 }
 
 } //cx

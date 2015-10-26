@@ -237,7 +237,7 @@ std::vector<TimelineEvent> PlaybackWidget::convertRegistrationHistoryToEvents(Re
 						tr[i].mTimestamp.toMSecsSinceEpoch()));
 	}
 
-	std::vector<ParentSpace> ps = reg->getParentSpaces();
+//	std::vector<ParentSpace> ps = reg->getParentSpaces();
 
 	return events;
 }
@@ -360,16 +360,16 @@ void PlaybackWidget::toolManagerInitializedSlot()
 /**strip leading zeros from a hh:mm:ss-formatted time
  *
  */
-QString PlaybackWidget::stripLeadingZeros(QString time)
-{
-	QStringList split = time.split(":");
-	bool ok = false;
-	while (!split.empty() && (split.front().toInt(&ok)==0) && ok)
-	{
-		split.pop_front();
-	}
-	return split.join(":");
-}
+//QString PlaybackWidget::stripLeadingZeros(QString time)
+//{
+//	QStringList split = time.split(":");
+//	bool ok = false;
+//	while (!split.empty() && (split.front().toInt(&ok)==0) && ok)
+//	{
+//		split.pop_front();
+//	}
+//	return split.join(":");
+//}
 
 /**Convert a millisecond count to a hh:mm:ss:zzz time.
  *
@@ -448,10 +448,10 @@ void PlaybackWidget::playSlot()
 		mTimer->start();
 	}
 }
-void PlaybackWidget::pauseSlot()
-{
-	mTimer->pause();
-}
+//void PlaybackWidget::pauseSlot()
+//{
+//	mTimer->pause();
+//}
 void PlaybackWidget::stopSlot()
 {
 	mTimer->stop();

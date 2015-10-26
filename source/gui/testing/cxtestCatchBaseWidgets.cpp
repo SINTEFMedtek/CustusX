@@ -75,6 +75,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSlicePropertiesWidget.h"
 #include "cxVolumePropertiesWidget.h"
 #include "cxTrackingService.h"
+#include "cxPatientModelServiceProxy.h"
 
 //All these widgets in the plugins folder should also be tested
 //#include "cxAllFiltersWidget.h"
@@ -148,25 +149,26 @@ TEST_CASE("BaseWidget's children in gui/dataWidgets correctly constructed", "[un
 	init();
 	QWidget* testParent = new QWidget();
 	cx::PatientModelServicePtr patientModelService = cx::PatientModelService::getNullObject(); //mock PatientModelService with the null object
-	cx::VisualizationServicePtr visualizationService = cx::VisualizationService::getNullObject(); //mock
+	cx::ViewServicePtr viewService = cx::ViewService::getNullObject(); //mock
 	cx::TrackingServicePtr trackingService = cx::TrackingService::getNullObject(); //mock
+	cx::VisServicesPtr services = cx::VisServices::getNullObjects();
 
 	testAndDeleteBaseWidgetChild(new cx::ActiveToolWidget(trackingService, testParent));
-	testAndDeleteBaseWidgetChild(new cx::ActiveVolumeWidget(patientModelService, visualizationService, testParent));
-	testAndDeleteBaseWidgetChild(new cx::ClippingWidget(patientModelService, testParent));
+	testAndDeleteBaseWidgetChild(new cx::ActiveVolumeWidget(patientModelService, viewService, testParent));
+	testAndDeleteBaseWidgetChild(new cx::ClippingWidget(services, testParent));
 	testAndDeleteBaseWidgetChild(new cx::ColorWidget(patientModelService, testParent));
-	testAndDeleteBaseWidgetChild(new cx::CroppingWidget(patientModelService, visualizationService, testParent));
+	testAndDeleteBaseWidgetChild(new cx::CroppingWidget(patientModelService, viewService, testParent));
 //	testAndDeleteBaseWidgetChild(new cx::DataSelectWidget(testParent));//special case: Needs a SelectDataStringPropertyBasePtr moc object
-	testAndDeleteBaseWidgetChild(new cx::EraserWidget(patientModelService, visualizationService, testParent));
+	testAndDeleteBaseWidgetChild(new cx::EraserWidget(patientModelService, viewService, testParent));
 	testAndDeleteBaseWidgetChild(new cx::FrameTreeWidget(patientModelService, testParent));
-	testAndDeleteBaseWidgetChild(new cx::MetricWidget(visualizationService, patientModelService, testParent));
+	testAndDeleteBaseWidgetChild(new cx::MetricWidget(viewService, patientModelService, testParent));
 	testAndDeleteBaseWidgetChild(new cx::NavigationWidget(testParent));
-	testAndDeleteBaseWidgetChild(new cx::OverlayWidget(patientModelService, testParent));
+	testAndDeleteBaseWidgetChild(new cx::OverlayWidget(patientModelService, viewService, testParent));
 	testAndDeleteBaseWidgetChild(new cx::PlaybackWidget(testParent));
 	testAndDeleteBaseWidgetChild(new cx::PointSamplingWidget(testParent));
 //	testAndDeleteBaseWidgetChild(new cx::ProbeConfigWidget(testParent));
 	testAndDeleteBaseWidgetChild(new cx::SamplerWidget(testParent));
-	testAndDeleteBaseWidgetChild(new cx::ShadingWidget(patientModelService, testParent));
+	testAndDeleteBaseWidgetChild(new cx::ShadingWidget(patientModelService->getActiveData(), testParent));
 //	testAndDeleteBaseWidgetChild(new cx::SimulateUSWidget(testParent));
 	testAndDeleteBaseWidgetChild(new cx::ToolPropertiesWidget(testParent));
 	testAndDeleteBaseWidgetChild(new cx::TrackPadWidget(testParent));
@@ -207,39 +209,40 @@ TEST_CASE("FileWatcherWidgets are correctly constructed", "[unit][gui][widget][n
 TEST_CASE("TabbedWidgets are correctly constructed", "[unit][gui][widget][not_win32]")
 {
 	init();
-//	ctkPluginContext *pluginContext = cx::LogicManager::getInstance()->getPluginContext();
-	cx::PatientModelServicePtr patientModelService = cx::PatientModelService::getNullObject(); //mock PatientModelService with null object
-	cx::VisualizationServicePtr visualizationService = cx::VisualizationService::getNullObject(); //mock
+	ctkPluginContext *pluginContext = cx::LogicManager::getInstance()->getPluginContext();
+	cx::VisServicesPtr services = cx::VisServices::create(pluginContext);
 	//cxTabbedWidgets
-	testAndDeleteBaseWidgetChild(new cx::SlicePropertiesWidget(patientModelService, visualizationService, NULL));
-	testAndDeleteBaseWidgetChild(new cx::VolumePropertiesWidget(patientModelService, visualizationService, NULL));
+	testAndDeleteBaseWidgetChild(new cx::SlicePropertiesWidget(services->patient(), services->view(), NULL));
+	testAndDeleteBaseWidgetChild(new cx::VolumePropertiesWidget(services, NULL));
 	shutdown();
 }
 
 TEST_CASE("InfoWidgets are correctly constructed", "[unit][gui][widget][not_win32]")
 {
 	init();
-//	ctkPluginContext *pluginContext = cx::LogicManager::getInstance()->getPluginContext();
-	cx::PatientModelServicePtr patientModelService = cx::PatientModelService::getNullObject(); //mock PatientModelService with null object
-	cx::VisualizationServicePtr visualizationService = cx::VisualizationService::getNullObject(); //mock
+	ctkPluginContext *pluginContext = cx::LogicManager::getInstance()->getPluginContext();
+	cx::PatientModelServicePtr patientModelService = cx::PatientModelServiceProxy::create(pluginContext);
+	cx::ViewServicePtr viewService = cx::ViewService::getNullObject(); //mock
 	//cxInfoWidgets
 	testAndDeleteBaseWidgetChild(new cx::VolumeInfoWidget(patientModelService, NULL));
-	testAndDeleteBaseWidgetChild(new cx::MeshInfoWidget(patientModelService, visualizationService, NULL));
+	testAndDeleteBaseWidgetChild(new cx::MeshInfoWidget(patientModelService, viewService, NULL));
 	shutdown();
 }
 
 TEST_CASE("TransferFunction widgets are correctly constructed", "[unit][gui][widget][not_win32]")
 {
 	init();
-	cx::PatientModelServicePtr patientModelService = cx::PatientModelService::getNullObject(); //mock PatientModelService with null object
-	testAndDeleteBaseWidgetChild(new cx::TransferFunction2DColorWidget(patientModelService, NULL));
-	testAndDeleteBaseWidgetChild(new cx::TransferFunction2DOpacityWidget(patientModelService, NULL));
-	testAndDeleteBaseWidgetChild(new cx::TransferFunctionWidget(patientModelService, NULL));
-	testAndDeleteBaseWidgetChild(new cx::TransferFunctionAlphaWidget(patientModelService, NULL));
-	testAndDeleteBaseWidgetChild(new cx::TransferFunctionColorWidget(patientModelService, NULL));
-	testAndDeleteBaseWidgetChild(new cx::TransferFunctionWidget(patientModelService, NULL));
-	testAndDeleteBaseWidgetChild(new cx::TransferFunction2DWidget(patientModelService, NULL));
-	testAndDeleteBaseWidgetChild(new cx::TransferFunction3DWidget(patientModelService, NULL));
+	cx::PatientModelServicePtr mockPatientModelService = cx::PatientModelService::getNullObject();
+	cx::ActiveDataPtr mockActiveData = mockPatientModelService->getActiveData();
+
+	testAndDeleteBaseWidgetChild(new cx::TransferFunction2DColorWidget(mockActiveData, NULL));
+	testAndDeleteBaseWidgetChild(new cx::TransferFunction2DOpacityWidget(mockActiveData, NULL));
+	testAndDeleteBaseWidgetChild(new cx::TransferFunctionWidget(mockPatientModelService, NULL));
+	testAndDeleteBaseWidgetChild(new cx::TransferFunctionAlphaWidget(mockActiveData, NULL));
+	testAndDeleteBaseWidgetChild(new cx::TransferFunctionColorWidget(mockActiveData, NULL));
+	testAndDeleteBaseWidgetChild(new cx::TransferFunctionWidget(mockPatientModelService, NULL));
+	testAndDeleteBaseWidgetChild(new cx::TransferFunction2DWidget(mockActiveData, NULL));
+	testAndDeleteBaseWidgetChild(new cx::TransferFunction3DWidget(mockActiveData, NULL));
 	shutdown();
 }
 

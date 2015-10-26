@@ -34,9 +34,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelServiceNull.h"
 #include "cxImage.h"
 #include "cxMesh.h"
+#include "cxTrackedStream.h"
 #include "cxRegistrationTransform.h"
 #include <QDir>
 #include "cxTime.h"
+#include "cxReporter.h"
+#include "cxActiveData.h"
 
 namespace cx
 {
@@ -51,7 +54,7 @@ PatientModelServicePtr PatientModelService::getNullObject()
 DataPtr PatientModelService::getData(const QString& uid) const
 {
 	if (uid=="active")
-		return this->getActiveImage();
+		return this->getActiveData()->getActive();
 
 	std::map<QString, DataPtr> all = this->getData();
 	std::map<QString, DataPtr>::const_iterator iter = all.find(uid);
@@ -60,24 +63,20 @@ DataPtr PatientModelService::getData(const QString& uid) const
 	return iter->second;
 }
 
-QString PatientModelService::getActiveImageUid()
-{
-	ImagePtr image = this->getActiveImage();
-	if (image)
-		return image->getUid();
-	else
-		return "";
-}
-
 Transform3D PatientModelService::get_rMpr() const
 {
 	return this->get_rMpr_History()->getCurrentRegistration().mValue;
 }
 
-void PatientModelService::updateRegistration_rMpr(const QDateTime& oldTime, const RegistrationTransform& newTransform)
+void PatientModelService::updateRegistration_rMpr(const QDateTime& oldTime, const RegistrationTransform& newTransform, bool continuous)
 {
+	//Block signals from RegistrationHistory when running continuous registration,
+	//because these trigger RegistrationHistoryWidget::prePaintEvent() that uses too much time.
+	this->get_rMpr_History()->blockSignals(continuous);
+
 	this->get_rMpr_History()->updateRegistration(oldTime, newTransform);
-	this->autoSave();
+	if(!continuous)
+		this->autoSave();
 }
 
 VideoSourcePtr PatientModelService::getStream(const QString& uid) const

@@ -39,7 +39,7 @@ void USReconstructInputDataAlgorithm::transformTrackingPositionsTo_prMu(USRecons
 {
     // Transform from image coordinate syst with origin in upper left corner
     // to t (tool) space. TODO check is u is ul corner or ll corner.
-    Transform3D tMu = data->mProbeData.get_tMu() * data->mProbeData.get_uMv();
+    Transform3D tMu = data->mProbeDefinition.get_tMu() * data->mProbeDefinition.get_uMv();
 
     //mPos is prMt
     for (unsigned i = 0; i < data->mPositions.size(); i++)
@@ -54,7 +54,7 @@ void USReconstructInputDataAlgorithm::transformFramePositionsTo_rMu(USReconstruc
 {
 	Transform3D rMpr = data->rMpr;
     // Transform from image coordinate syst with origin in upper left corner to t (tool) space.
-    Transform3D tMv = data->mProbeData.get_tMu() * data->mProbeData.get_uMv();
+    Transform3D tMv = data->mProbeDefinition.get_tMu() * data->mProbeDefinition.get_uMv();
 
 	//mFrames is prMt
     for (unsigned i = 0; i < data->mFrames.size(); i++)

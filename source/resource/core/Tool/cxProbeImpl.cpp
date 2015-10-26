@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVector3D.h"
 
 #include "cxDataLocations.h"
-#include "cxCreateProbeDataFromConfiguration.h"
+#include "cxCreateProbeDefinitionFromConfiguration.h"
 
 namespace cx
 {
@@ -58,7 +58,7 @@ ProbeImplPtr ProbeImpl::New(QString instrumentUid, QString scannerUid, ProbeXmlC
 
 bool ProbeImpl::isValid() const
 {
-	return this->getProbeData("active").getType() != ProbeDefinition::tNONE;
+	return this->getProbeDefinition("active").getType() != ProbeDefinition::tNONE;
 }
 
 QStringList ProbeImpl::getAvailableVideoSources()
@@ -80,18 +80,18 @@ VideoSourcePtr ProbeImpl::getRTSource(QString uid) const
 	return mSource.begin()->second;
 }
 
-ProbeDefinition ProbeImpl::getProbeData(QString uid) const
+ProbeDefinition ProbeImpl::getProbeDefinition(QString uid) const
 {
 	ProbeDefinition retval;
 
 	if (uid=="active")
 		uid = mActiveUid;
-	if (mProbeData.count(uid))
-		retval = mProbeData.find(uid)->second;
-	else if (mProbeData.count("default"))
-		retval = mProbeData.find("default")->second;
+	if (mProbeDefinition.count(uid))
+		retval = mProbeDefinition.find(uid)->second;
+	else if (mProbeDefinition.count("default"))
+		retval = mProbeDefinition.find("default")->second;
 	else
-		retval = mProbeData.begin()->second;
+		retval = mProbeDefinition.begin()->second;
 
 	// ensure uid is matching the requested uid even if not found.
 	retval.setUid(uid);
@@ -101,7 +101,7 @@ ProbeDefinition ProbeImpl::getProbeData(QString uid) const
 ProbeSectorPtr ProbeImpl::getSector(QString uid)
 {
 	ProbeSectorPtr retval(new ProbeSector());
-	retval->setData(this->getProbeData(uid));
+	retval->setData(this->getProbeDefinition(uid));
 	return retval;
 }
 
@@ -143,7 +143,7 @@ QString ProbeImpl::getConfigName(QString configString) ///< get a name for the g
 
 QString ProbeImpl::getConfigId() const
 {
-	if (this->getProbeData().getUseDigitalVideo())
+	if (this->getProbeDefinition().getUseDigitalVideo())
 		return "Digital";
 	return mConfigurationId;
 }
@@ -176,7 +176,7 @@ void ProbeImpl::setTemporalCalibration(double val)
 {
 	mOverrideTemporalCalibration = true;
 	mTemporalCalibration = val;
-	for (std::map<QString, ProbeDefinition>::iterator iter=mProbeData.begin(); iter!=mProbeData.end(); ++iter)
+	for (std::map<QString, ProbeDefinition>::iterator iter=mProbeDefinition.begin(); iter!=mProbeDefinition.end(); ++iter)
 		iter->second.setTemporalCalibration(mTemporalCalibration);
 }
 
@@ -185,17 +185,17 @@ void ProbeImpl::setSoundSpeedCompensationFactor(double factor)
 	if(similar(mSoundSpeedCompensationFactor, factor))
 		return;
 	mSoundSpeedCompensationFactor = factor;
-	for (std::map<QString, ProbeDefinition>::iterator iter=mProbeData.begin(); iter!=mProbeData.end(); ++iter)
+	for (std::map<QString, ProbeDefinition>::iterator iter=mProbeDefinition.begin(); iter!=mProbeDefinition.end(); ++iter)
 		iter->second.applySoundSpeedCompensationFactor(mSoundSpeedCompensationFactor);
 	emit sectorChanged();
 }
 
-void ProbeImpl::setProbeSector(ProbeDefinition probeSector)
+void ProbeImpl::setProbeDefinition(ProbeDefinition probeDefinition)
 {
-	if (probeSector.getUid().isEmpty())
-		probeSector.setUid(mActiveUid);
+	if (probeDefinition.getUid().isEmpty())
+		probeDefinition.setUid(mActiveUid);
 
-	mProbeData[probeSector.getUid()] = probeSector;
+	mProbeDefinition[probeDefinition.getUid()] = probeDefinition;
 	emit sectorChanged();
 }
 
@@ -232,7 +232,7 @@ void ProbeImpl::removeRTSource(VideoSourcePtr source)
 		return;
 
 	mSource.erase(source->getUid());
-	mProbeData.erase(source->getUid());
+	mProbeDefinition.erase(source->getUid());
 	this->applyConfig();//May need to re-create config, as the old ProbeDefinition may be deleted
 }
 
@@ -270,7 +270,7 @@ void ProbeImpl::saveCurrentConfig(QString uid, QString name)
 	ProbeXmlConfigParser::Configuration config = this->getConfiguration();
 	config.mConfigId = uid;
 	config.mName = name;
-	config = createConfigurationFromProbeData(config, this->getProbeData("active"));
+	config = createConfigurationFromProbeDefinition(config, this->getProbeDefinition("active"));
 
 	mXml->saveCurrentConfig(config);
 	this->applyNewConfigurationWithId(uid);
@@ -317,9 +317,9 @@ ProbeImpl::ProbeImpl(QString instrumentUid, QString scannerUid) :
 		mOverrideTemporalCalibration(false),
 		mTemporalCalibration(0.0)
 {
-	ProbeDefinition probeData;
-	mProbeData[probeData.getUid()] = probeData;
-	mActiveUid = probeData.getUid();
+	ProbeDefinition probeDefinition;
+	mProbeDefinition[probeDefinition.getUid()] = probeDefinition;
+	mActiveUid = probeDefinition.getUid();
 }
 
 void ProbeImpl::initProbeXmlConfigParser(ProbeXmlConfigParserPtr xml = ProbeXmlConfigParserPtr())
@@ -389,10 +389,10 @@ void ProbeImpl::setConfigId(QString uid)
 
 void ProbeImpl::updateProbeSector()
 {
-	if(this->isValidConfigId() && !this->getProbeData().getUseDigitalVideo())
+	if(this->isValidConfigId() && !this->getProbeDefinition().getUseDigitalVideo())
 	{
 		ProbeDefinition probeSector = this->createProbeSector();
-		this->setProbeSector(probeSector);
+		this->setProbeDefinition(probeSector);
 	}
 }
 
@@ -405,7 +405,7 @@ bool ProbeImpl::isValidConfigId()
 ProbeDefinition ProbeImpl::createProbeSector()
 {
 	ProbeXmlConfigParser::Configuration config = this->getConfiguration();
-	ProbeDefinition probeSector = createProbeDataFromConfiguration(config);
+	ProbeDefinition probeSector = createProbeDefinitionFromConfiguration(config);
 	probeSector.setUid(mActiveUid);
 	return probeSector;
 }

@@ -73,8 +73,7 @@ public:
 	virtual Transform3D get_rMpr() const; ///< get the patient registration transform
 	virtual RegistrationHistoryPtr get_rMpr_History() const;
 
-	virtual ImagePtr getActiveImage() const; ///< used for system state
-	virtual void setActiveImage(ImagePtr activeImage); ///< used for system state
+	virtual ActiveDataPtr getActiveData() const;
 
 	virtual CLINICAL_VIEW getClinicalApplication() const;
 	virtual void setClinicalApplication(CLINICAL_VIEW application);
@@ -85,7 +84,7 @@ public:
 	virtual QString getActivePatientFolder() const;
 	virtual bool isPatientValid() const;
 	virtual DataPtr importData(QString fileName, QString &infoText);
-	virtual void exportPatient(bool niftiFormat);
+	virtual void exportPatient(PATIENT_COORDINATE_SYSTEM externalSpace);
 	virtual void removeData(QString uid);
 	virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const;
 
@@ -106,8 +105,11 @@ private:
 	void createInterconnectedDataAndSpace();
 	void shutdownInterconnectedDataAndSpace();
 
-	DataManagerImplPtr dataService() const;
+	virtual DataServicePtr dataService() const;
 	PatientDataPtr patientData() const;
+
+	ToolPtr getProbeTool(QString videoSourceUid);
+	void reEmitActiveTrackedStream(TrackedStreamPtr trackedStream);
 
 	DataManagerImplPtr mDataService;
 	PatientDataPtr mPatientData;
@@ -116,7 +118,9 @@ private:
 	TrackingServicePtr mTrackingService;
 
 	std::map<QString, ToolPtr> mProbeTools;
-	ToolPtr getProbeTool(QString videoSourceUid);
+
+	ActiveDataPtr mActiveData;
+
 };
 typedef boost::shared_ptr<PatientModelImplService> PatientModelImplServicePtr;
 

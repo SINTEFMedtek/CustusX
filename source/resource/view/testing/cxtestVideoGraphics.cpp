@@ -93,7 +93,7 @@ TEST_CASE_METHOD(cxtest::VideoGraphicsFixture, "VideoGraphics: Test Sector", "[u
 	vtkImageDataPtr expected = this->readImageData("US_small_sector_masked.png", "input expected");
 
 	cx::ProbeSector probeSector;
-	probeSector.mData = this->readProbeData(imageFilename);
+	probeSector.mData = this->readProbeDefinition(imageFilename);
 
 	mVideoGraphics->setClip(probeSector.getSector());
     mMachine->setImageErrorThreshold(250); // ad hoc solution for failing test.

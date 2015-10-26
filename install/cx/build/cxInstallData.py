@@ -51,9 +51,7 @@ class Common(object):
     Modify these to change behaviour
     '''
     def __init__(self):
-        #self.root_dir = None
         self.m32bit = False
-        #self._initPaths()
         self.main_branch = "master"
         self.static = False # build as shared or static libraries
         self.jom = False
@@ -74,7 +72,6 @@ class Common(object):
         self.build_user_doc = False
         self.mGraphviz = False
         self.git_tag = None # if none, use main_branch
-        self.force_connect_sublibraries = False
 
         self.publish_release_target                 = cx.utils.cxSSH.RemoteServerID("example.com", "/path/to/folder")
         self.publish_developer_documentation_target = cx.utils.cxSSH.RemoteServerID("example.com", "/path/to/folder")
@@ -101,40 +98,22 @@ class Common(object):
         print 'Settings:'
         print '    system_base_name:', self.system_base_name
         print '    root path: %s ' % self.getRootDir()
-        #print '    ExternalDir:', self.getExternalPath()
-        #print '    WorkingDir:', self.getWorkingPath()
         print '    build type:', self.getBuildType()
         print '    platform:', platform.system()
         print '    git tag:', self.git_tag
         print '    git branch:', self.main_branch
         print ''
-        #print '    User:', getpass.getuser()
         print '    CMakeGenerator:', self.getCMakeGenerator()
-        #if('Eclipse' in self.getCMakeGenerator()):
-        #    print '    Eclipse version:', self.getEclipseVersion()
-        #print '    BuildShared:', self.getBuildShared()
-        #print '    BuildExternalsType:', self.getBuildExternalsType()
         print '    BuildTesting:', self.mBuildTesting
         print '    Coverage:', self.mCoverage
         print '    Make dependency graph:', self.mGraphviz
-        #print '    Threads:', self.threads
-        #print '    32 bit:', self.m32bit
-        if self.force_connect_sublibraries:
-            print '    force_connect_sublibraries:', self.force_connect_sublibraries
-        #print '    short_pathnames:', self.short_pathnames
         print ''
-
-    def getArgParser_root_dir(self):
-        p = cx.utils.cxArgParse.ArgumentParser(add_help=False)
-        p.add_argument('--root_dir', default=None, help='root folder [deprecated, will always use cxrepo/../.. = %s]' % self.getRootDir())
-        p.add_argument('--print_control_data', action='store_true', default=False, help='Print all control data at startup')
-        return p
 
     def getArgParser_core_build(self):
         p = cx.utils.cxArgParse.ArgumentParser(add_help=False)
         p.add_argument('-j', '--threads', type=int, default=1, dest='threads', help='Number of make threads')
         p.add_argument('-g', '--git_tag', default=None, metavar='TAG', dest='git_tag', help='Git tag to use when checking out core repositories. None means checkout default branch.')
-        p.add_argument('-t', '--build_type', default=self.build_type, dest='build_type', choices=self._getAllowedBuildTypes(), help='Build type')
+        p.add_argument('-t', '--build_type', default=self.build_type, dest='build_type', choices=self._getAllowedBuildTypes(), help='Build type, default=Debug')
         p.add_boolean_inverter('--b32', default=self.m32bit, dest='m32bit', help='Build 32 bit.')
         p.add_argument('--main_branch', default=self.main_branch, dest='main_branch', help='Default branch to checkout/pull, for projects not using a custom branch or tag, default=%s. When empty, checkout is skipped.' % self.main_branch)
         p.add_boolean_inverter('--static', default=self.static, dest='static', help='Link statically.')        
@@ -143,10 +122,10 @@ class Common(object):
         p.add_boolean_inverter('--ninja', default=self.ninja, dest='ninja', help='Use ninja to build.')
         if platform.system() == 'Darwin':
             p.add_boolean_inverter('--xcode', default=self.xcode, dest='xcode', help='Generate xcode targets')
-        p.add_boolean_inverter('--force_connect_sublibraries', default=self.force_connect_sublibraries, dest='force_connect_sublibraries', help='Force libs such as gestreamer and tsf to be connected to cx, during configuration step.')        
         p.add_boolean_inverter('--short_pathnames', default=self.short_pathnames, dest='short_pathnames', help='Create shorter pathnames where possible. Workaround for the path length limitation on Windows.')
         p.add_boolean_inverter('--graph', default=self.mGraphviz, dest='mGraphviz', help='Make dependency graph.')
         p.add_argument('-ev', '--eclipse_version', default='3.6', dest='eclipse_version', choices=['3.2', '3.3', '3.4', '3.5', '3.6', '3.7', '4.2', '4.3'], help='The Eclipse version number')
+        p.add_argument('--print_control_data', action='store_true', default=False, help='Print all control data at startup')
         return p
 
     def getArgParser_extended_build(self):
@@ -157,7 +136,6 @@ class Common(object):
         return p
 
     def applyCommandLine(self, arguments):
-        arguments = self.getArgParser_root_dir().parse_known_args(args=arguments, namespace=self)[1]
         arguments = self.getArgParser_core_build().parse_known_args(args=arguments, namespace=self)[1]
         arguments = self.getArgParser_extended_build().parse_known_args(args=arguments, namespace=self)[1]
         if self.print_control_data:

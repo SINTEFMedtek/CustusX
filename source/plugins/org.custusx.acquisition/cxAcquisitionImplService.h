@@ -64,11 +64,10 @@ public:
 	virtual RecordSessionPtr getLatestSession();
 	virtual std::vector<RecordSessionPtr> getSessions();
 
-	virtual bool isReady() const;
-	virtual QString getInfoText() const;
+	virtual bool isReady(TYPES context) const;
+	virtual QString getInfoText(TYPES context) const;
 	virtual STATE getState() const;
-	virtual void toggleRecord();
-	virtual void startRecord();
+	virtual void startRecord(TYPES context, QString category, RecordSessionPtr session);
 	virtual void stopRecord();
 	virtual void cancelRecord();
 	virtual void startPostProcessing();

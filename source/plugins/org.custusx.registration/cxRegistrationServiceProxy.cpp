@@ -126,9 +126,19 @@ void RegistrationServiceProxy::applyImage2ImageRegistration(Transform3D delta_pr
 	mRegistrationService->applyImage2ImageRegistration(delta_pre_rMd, description);
 }
 
+void RegistrationServiceProxy::applyContinuousImage2ImageRegistration(Transform3D delta_pre_rMd, QString description)
+{
+	mRegistrationService->applyContinuousImage2ImageRegistration(delta_pre_rMd, description);
+}
+
 void RegistrationServiceProxy::applyPatientRegistration(Transform3D rMpr_new, QString description)
 {
 	mRegistrationService->applyPatientRegistration( rMpr_new, description);
+}
+
+void RegistrationServiceProxy::applyContinuousPatientRegistration(Transform3D rMpr_new, QString description)
+{
+	mRegistrationService->applyContinuousPatientRegistration( rMpr_new, description);
 }
 
 void RegistrationServiceProxy::applyPatientOrientation(const Transform3D &tMtm, const Transform3D &prMt)

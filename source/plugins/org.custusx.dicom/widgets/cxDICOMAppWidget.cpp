@@ -120,9 +120,18 @@ public:
 //----------------------------------------------------------------------------
 // DICOMAppWidgetPrivate methods
 
-DICOMAppWidgetPrivate::DICOMAppWidgetPrivate(DICOMAppWidget* parent): q_ptr(parent)
+DICOMAppWidgetPrivate::DICOMAppWidgetPrivate(DICOMAppWidget* parent):
+    q_ptr(parent),
+    TopLayout(NULL),
+    TreeView(NULL),
+    ToolBar(NULL),
+    ThumbnailsWidget(NULL),
+    ThumbnailWidthSlider(NULL),
+    ActionImport(NULL),
+    ActionQuery(NULL),
+    ActionRemove(NULL),
+    QueryRetrieveWidget(NULL)
 {
-	QueryRetrieveWidget = NULL;
   DICOMDatabase = QSharedPointer<ctkDICOMDatabase> (new ctkDICOMDatabase);
   ThumbnailGenerator = QSharedPointer <ctkDICOMThumbnailGenerator> (new ctkDICOMThumbnailGenerator);
   DICOMDatabase->setThumbnailGenerator(ThumbnailGenerator.data());
@@ -348,13 +357,13 @@ DICOMAppWidget::DICOMAppWidget(QWidget* _parent):Superclass(_parent),
 //  d->QueryRetrieveWidget->setWindowModality ( Qt::ApplicationModal );
 
   connect(d->TreeView->selectionModel(),
-		  SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
+		  &QItemSelectionModel::selectionChanged,
 		  this,
-		  SLOT(onSelectionChanged(const QItemSelection&, const QItemSelection&)));
+		  &DICOMAppWidget::onSelectionChanged);
   connect(d->TreeView->selectionModel(),
-		  SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)),
+		  &QItemSelectionModel::currentChanged,
 		  this,
-		  SLOT(onCurrentChanged(const QModelIndex&, const QModelIndex&)));
+		  &DICOMAppWidget::onCurrentChanged);
 
   //connect signal and slots
   connect(d->TreeView, SIGNAL(clicked(QModelIndex)), this, SLOT(onModelSelected(QModelIndex)));
@@ -443,7 +452,7 @@ void DICOMAppWidget::setDatabaseDirectory(const QString& directory)
 	CX_LOG_CHANNEL_INFO("dicom") << "Open Database " << databaseFileName.toStdString() << ", open= " << d->DICOMDatabase->isOpen();
 //	std::cout << "open database " << databaseFileName.toStdString() << ", open= " << d->DICOMDatabase->isOpen() << std::endl;
 	}
-  catch (std::exception e)
+  catch (std::exception& e)
     {
 	  CX_LOG_CHANNEL_ERROR("dicom") << "Database error: " << qPrintable(d->DICOMDatabase->lastError());
 //    std::cerr << "Database error: " << qPrintable(d->DICOMDatabase->lastError()) << "\n";

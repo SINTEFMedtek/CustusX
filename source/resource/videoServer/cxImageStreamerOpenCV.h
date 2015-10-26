@@ -42,9 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTcpSocket>
 #include <QDateTime>
 #include <QSize>
-#include "igtlImageMessage.h"
 #include <QStringList>
-#include "cxIGTLinkImageMessage.h"
 #include "cxSender.h"
 #include "cxStreamer.h"
 
@@ -56,6 +54,7 @@ class QTimer;
 namespace cv
 {
 	class VideoCapture;
+	class Mat;
 }
 
 namespace cx
@@ -114,11 +113,12 @@ private slots:
 
 private:
 	void dumpProperties();
-	IGTLinkImageMessage::Pointer getImageMessage();
+	ImagePtr getImageMessage();
 	void dumpProperty(int val, QString name);
 
 	void initialize_local();
 	void deinitialize_local();
+	vtkImageDataPtr convertTovtkImageData(cv::Mat& frame);
 
 	QSize mRescaleSize;
 

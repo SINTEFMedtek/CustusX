@@ -90,7 +90,7 @@ private:
 	bool mShowSector;
 
 	ToolPtr mTool;
-	ProbeSector mProbeData;
+	ProbeSector mProbeDefinition;
 	VideoSourcePtr mData;
 
 	TextDisplayPtr mStatusText;

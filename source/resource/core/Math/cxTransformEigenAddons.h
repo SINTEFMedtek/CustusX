@@ -56,5 +56,6 @@ const;
 std::ostream& put(std::ostream& s, int indent=0, char newline='\n') const;
 static Transform fromString(const QString& text, bool* ok=0); ///< construct a transform matrix from a string containing 16 whitespace-separated numbers, vtk ordering
 static Transform fromVtkMatrix(vtkMatrix4x4Ptr m);
+static Transform fromFloatArray(float m[4][4]);
 
 //! @endcond

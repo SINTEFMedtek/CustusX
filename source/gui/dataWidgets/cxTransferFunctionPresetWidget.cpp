@@ -39,12 +39,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxActiveImageProxy.h"
 #include "cxPatientModelService.h"
 #include "cxLogger.h"
+#include "cxActiveData.h"
 
 namespace cx {
 
 TransferFunctionPresetWidget::TransferFunctionPresetWidget(PatientModelServicePtr patientModelService, QWidget* parent, bool is3D) :
-		PresetWidget(parent), mIs3D(is3D),
-		mPatientModelService(patientModelService)
+	PresetWidget(parent), mIs3D(is3D),
+	mActiveData(patientModelService->getActiveData())
 {
 	this->setToolTip("Select a predefined transfer function");
 	this->setObjectName("TransferFunctionPresetWidget");
@@ -63,7 +64,7 @@ TransferFunctionPresetWidget::TransferFunctionPresetWidget(PatientModelServicePt
 	mApplyToAll = settings()->value("applyTransferFunctionPresetsToAll").toBool();
 	this->updateToggles();
 
-	mActiveImageProxy = ActiveImageProxy::New(patientModelService);
+	mActiveImageProxy = ActiveImageProxy::New(mActiveData);
 	connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this,
 			&TransferFunctionPresetWidget::populatePresetListSlot);
 	connect(mActiveImageProxy.get(), &ActiveImageProxy::propertiesChanged, this,
@@ -92,8 +93,8 @@ void TransferFunctionPresetWidget::updateToggles()
 
 void TransferFunctionPresetWidget::populatePresetListSlot()
 {
-	if (mPatientModelService->getActiveImage())
-		PresetWidget::populatePresetList(mPresets->getPresetList(mPatientModelService->getActiveImage()->getModality()));
+	if (mActiveData->getActive<Image>())
+		PresetWidget::populatePresetList(mPresets->getPresetList(mActiveData->getActive<Image>()->getModality()));
 	else
 		//No active image, show all available presets for debug/overview purposes
 		PresetWidget::populatePresetList(mPresets->getPresetList("UNKNOWN"));
@@ -101,7 +102,7 @@ void TransferFunctionPresetWidget::populatePresetListSlot()
 
 void TransferFunctionPresetWidget::presetsBoxChangedSlot(const QString& presetName)
 {
-	ImagePtr activeImage = mPatientModelService->getActiveImage();
+	ImagePtr activeImage = mActiveData->getActive<Image>();
 	if (activeImage) {
 		TransferFunctions3DPresetsPtr preset = boost::dynamic_pointer_cast<TransferFunctions3DPresets>(mPresets);
 		preset->load(presetName, activeImage, this->use2D(), this->use3D());
@@ -111,7 +112,7 @@ void TransferFunctionPresetWidget::presetsBoxChangedSlot(const QString& presetNa
 void TransferFunctionPresetWidget::resetSlot()
 {
 	PresetWidget::resetSlot();
-	ImagePtr activeImage = mPatientModelService->getActiveImage();
+	ImagePtr activeImage = mActiveData->getActive<Image>();
 	activeImage->resetTransferFunctions(this->use2D(), this->use3D());
 }
 
@@ -131,7 +132,7 @@ void TransferFunctionPresetWidget::saveSlot()
 	if (!ok || text.isEmpty())
 		return;
 
-	ImagePtr activeImage = mPatientModelService->getActiveImage();
+	ImagePtr activeImage = mActiveData->getActive<Image>();
 	preset->save(text, activeImage, this->use2D(), this->use3D());
 
 	this->populatePresetListSlot();

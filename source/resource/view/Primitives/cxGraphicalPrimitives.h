@@ -40,6 +40,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTransform3D.h"
 #include "cxViewportListener.h"
 #include <vtkPolyDataAlgorithm.h>
+#include <vtkGlyph3DMapper.h>
+#include <vtkColorSeries.h>
+#include <vtkLookupTable.h>
+#include <vtkMapper.h>
 
 class QColor;
 typedef vtkSmartPointer<class vtkPolyDataAlgorithm> vtkPolyDataAlgorithmPtr;
@@ -49,6 +53,45 @@ typedef vtkSmartPointer<class vtkArrowSource> vtkArrowSourcePtr;
 namespace cx
 {
 
+
+class cxResourceVisualization_EXPORT GraphicalGeometricBase
+{
+public:
+    GraphicalGeometricBase(vtkPolyDataAlgorithmPtr source = vtkPolyDataAlgorithmPtr(),
+                           vtkRendererPtr renderer = vtkRendererPtr());
+    ~GraphicalGeometricBase();
+
+    void setRenderer(vtkRendererPtr renderer = vtkRendererPtr());
+    void setSource(vtkPolyDataAlgorithmPtr source);
+    void setBackfaceCulling(bool val);
+    void setVisibility(bool visible);
+    void setFrontfaceCulling(bool val);
+    void setRepresentation();
+    void setColor(double red, double green, double blue);
+    void setColor(Vector3D color);
+    void setPosition(Vector3D point);
+
+
+    void setOpacity(double val);
+    void setUserMatrix(vtkMatrix4x4 *matrix);
+    void setPointSize(int pointSize);
+    void setScalarVisibility(bool show);
+
+    vtkActorPtr getActor();
+    vtkPolyDataPtr getPolyData();
+    Vector3D getPosition() const;
+    vtkPolyDataAlgorithmPtr getSource();
+
+protected:
+    vtkPolyDataAlgorithmPtr mSource;
+    vtkPropertyPtr mProperty;
+    vtkActorPtr mActor;
+    vtkPolyDataPtr mData;
+    vtkRendererPtr mRenderer;
+    virtual vtkMapperPtr getMapper()=0;
+};
+
+
 /**
  * \addtogroup cx_resource_view
  * @{
@@ -56,32 +99,50 @@ namespace cx
 
 /** \brief Helper for rendering a a polydata in 3D
  */
-class cxResourceVisualization_EXPORT GraphicalPolyData3D
+class cxResourceVisualization_EXPORT GraphicalPolyData3D : public GraphicalGeometricBase
 {
 public:
-	GraphicalPolyData3D(
-			vtkPolyDataAlgorithmPtr source = vtkPolyDataAlgorithmPtr(),
-			vtkRendererPtr renderer = vtkRendererPtr());
-	void setRenderer(vtkRendererPtr renderer = vtkRendererPtr());
-	void setSource(vtkPolyDataAlgorithmPtr source);
-	void setData(vtkPolyDataPtr data);
-	~GraphicalPolyData3D();
-	void setColor(Vector3D color);
-	void setPosition(Vector3D point);
-	Vector3D getPosition() const;
-
-	vtkActorPtr getActor();
-	vtkPolyDataPtr getPolyData();
-	vtkPolyDataAlgorithmPtr getSource();
+    GraphicalPolyData3D(vtkPolyDataAlgorithmPtr source = vtkPolyDataAlgorithmPtr(),
+                      vtkRendererPtr renderer = vtkRendererPtr());
+    void setIsWireFrame(bool val);
+    void setRepresentation();
+    void setData(vtkPolyDataPtr data);
+    vtkMapperPtr getMapper();
 
 private:
-	vtkPolyDataAlgorithmPtr mSource;
-	vtkPolyDataPtr mData;
-	vtkPolyDataMapperPtr mMapper;
-	vtkActorPtr mActor;
-	vtkRendererPtr mRenderer;
+    vtkPolyDataMapperPtr mMapper;
+    bool mIsWireFrame;
 };
 typedef boost::shared_ptr<GraphicalPolyData3D> GraphicalPolyData3DPtr;
+
+
+/**
+ * \addtogroup cx_resource_view
+ * @{
+ */
+
+/** \brief Helper for rendering a a glyph in 3D
+ */
+class cxResourceVisualization_EXPORT GraphicalGlyph3DData : public GraphicalGeometricBase
+{
+public:
+    GraphicalGlyph3DData(vtkPolyDataAlgorithmPtr source = vtkPolyDataAlgorithmPtr(),
+                         vtkRendererPtr renderer = vtkRendererPtr());
+    void setData(vtkPolyDataPtr data);
+    void setOrientationArray(const char* orientationArray);
+    void setColorArray(const char* colorArray);
+    void setLUT(const char* lut);
+    void setScaleFactor(double scaleFactor);
+    vtkMapperPtr getMapper();
+
+private:
+    vtkGlyph3DMapperPtr mMapper;
+};
+typedef boost::shared_ptr<GraphicalGlyph3DData> GraphicalGlyph3DDataPtr;
+
+
+
+
 
 
 /** \brief Helper for rendering a point in 3D
@@ -96,7 +157,7 @@ class cxResourceVisualization_EXPORT GraphicalPoint3D
 //		void setColor(Vector3D color);
 		void setColor(QColor color);
 		void setValue(Vector3D point);
-		Vector3D getValue() const;
+        Vector3D getValue() const;
 		vtkActorPtr getActor();
 		vtkPolyDataPtr getPolyData();
 

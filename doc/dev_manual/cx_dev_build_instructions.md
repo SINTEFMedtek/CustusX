@@ -23,7 +23,7 @@ Prerequisites {#prerequisites}
 ------------------------
 
  * [CMake](http://www.cmake.org/)
- * [Qt5](http://qt-project.org/)
+ * [Qt5](http://qt-project.org/) including the sqlite plugin.
  * [openCL](https://www.khronos.org/opencl/)
  * [boost](http://www.boost.org/)
  * [doxygen](http://www.doxygen.org/)
@@ -39,6 +39,8 @@ For convenience, setup scripts for some platforms are available in the
 repository. They will help setup a machine from scratch, but might give 
 you more than you expected. Look for your platform in 
 [install/platforms](https://github.com/SINTEFMedtek/CustusX/tree/master/install/platforms).
+
+If you run into trouble, try building VTK, then CTK and run an example application, ctkPluginBrowser for instance. There is a wealth of resources on the net describing how to compile these projects. If this fails, try the specific resources on CustusX.
 
 ## Superbuild Folder Structure {#build_instructions_folder_structure}
 

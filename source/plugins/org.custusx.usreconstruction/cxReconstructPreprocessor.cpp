@@ -132,7 +132,7 @@ void ReconstructPreprocessor::alignTimeSeries()
 void ReconstructPreprocessor::cropInputData()
 {
 	//IntBoundingBox3D
-	ProbeDefinition sector = mFileData.mProbeData.mData;
+	ProbeDefinition sector = mFileData.mProbeDefinition.mData;
 	IntBoundingBox3D cropbox(sector.getClipRect_p().begin());
 	cropbox = this->reduceCropboxToImageSize(cropbox, sector.getSize());
 	Eigen::Vector3i shift = cropbox.corner(0,0,0).cast<int>();
@@ -152,7 +152,7 @@ void ReconstructPreprocessor::cropInputData()
 	sector.setClipRect_p(clipRect_p);
 	sector.setOrigin_p(origin_p);
 	sector.setSize(QSize(size[0], size[1]));
-	mFileData.mProbeData.setData(sector);
+	mFileData.mProbeDefinition.setData(sector);
 }
 
 IntBoundingBox3D ReconstructPreprocessor::reduceCropboxToImageSize(IntBoundingBox3D cropbox, QSize size)

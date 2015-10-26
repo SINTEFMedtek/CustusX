@@ -6,16 +6,17 @@ set(PLUGIN_SRCS
     cxRegistrationMethodLandmarkPluginActivator.cpp
     cxRegistrationMethodLandmarkService.h
     cxRegistrationMethodLandmarkService.cpp
-    cxFastImageRegistrationWidget.cpp
     cxImageLandmarksWidget.cpp
     cxLandmarkRegistrationWidget.cpp
     cxLandmarkPatientRegistrationWidget.cpp
     cxLandmarkImage2ImageRegistrationWidget.cpp
-    cxFastPatientRegistrationWidget.h
-    cxFastPatientRegistrationWidget.cpp
-    cxFastOrientationRegistrationWidget.cpp
     cxLandmarkListener.cpp
     cxPatientLandMarksWidget.cpp
+    fast/cxFastImageRegistrationWidget.cpp
+    fast/cxFastPatientRegistrationWidget.cpp
+    fast/cxFastOrientationRegistrationWidget.cpp
+	fast/cxFastLandmarkPatientRegistrationWidget.cpp
+	fast/cxFastLandmarkPatientRegistrationWidget.h
 )
 
 # Files which should be processed by Qts moc
@@ -25,8 +26,9 @@ set(PLUGIN_MOC_SRCS
     cxImageLandmarksWidget.h
     cxLandmarkPatientRegistrationWidget.h
     cxLandmarkImage2ImageRegistrationWidget.h
-    cxFastImageRegistrationWidget.h
-    cxFastOrientationRegistrationWidget.h
+    fast/cxFastPatientRegistrationWidget.h
+    fast/cxFastImageRegistrationWidget.h
+    fast/cxFastOrientationRegistrationWidget.h
     cxLandmarkListener.h
     cxPatientLandMarksWidget.h
 )
@@ -70,6 +72,7 @@ ctkMacroBuildPlugin(
 target_include_directories(org_custusx_registration_method_landmark
     PUBLIC
     .
+    ./fast
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
@@ -79,3 +82,5 @@ cx_add_non_source_file("doc/org_custusx_registration_method_landmark.h")
 cx_add_non_source_file("doc/org_custusx_registration_method_landmark_image_to_image.md")
 cx_add_non_source_file("doc/org_custusx_registration_method_landmark_image_to_patient.md")
 cx_add_non_source_file("doc/org_custusx_registration_method_fast_landmark_image_to_patient.md")
+
+add_subdirectory(testing)

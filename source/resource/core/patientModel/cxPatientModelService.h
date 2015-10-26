@@ -100,32 +100,12 @@ public:
 
 	// extended Data interface
 	template <class DATA>
-	std::map<QString, boost::shared_ptr<DATA> > getDataOfType() const
-	{
-		std::map<QString, DataPtr> data = this->getData();
-		std::map<QString, boost::shared_ptr<DATA> > retval;
-		for (std::map<QString, DataPtr>::const_iterator i=data.begin(); i!=data.end(); ++i)
-		{
-			boost::shared_ptr<DATA> val = boost::dynamic_pointer_cast<DATA>(i->second);
-			if (val)
-				retval[val->getUid()] = val;
-		}
-		return retval;
-	}
+	std::map<QString, boost::shared_ptr<DATA> > getDataOfType() const;
 	DataPtr getData(const QString& uid) const;
 	template <class DATA>
-	boost::shared_ptr<DATA> getData(const QString& uid) const
-	{
-		return boost::dynamic_pointer_cast<DATA>(this->getData(uid));
-	}
+	boost::shared_ptr<DATA> getData(const QString& uid) const;
 	template<class DATA>
-	boost::shared_ptr<DATA> createSpecificData(QString uid, QString name="")
-	{
-		DataPtr retval = this->createData(DATA::getTypeName(), uid, name);
-		return boost::dynamic_pointer_cast<DATA>(retval);
-	}
-
-	QString getActiveImageUid();
+	boost::shared_ptr<DATA> createSpecificData(QString uid, QString name="");
 
 	// streams
 	virtual std::map<QString, VideoSourcePtr> getStreams() const = 0;
@@ -133,9 +113,10 @@ public:
 	// patient registration
 	virtual Transform3D get_rMpr() const;
 	virtual RegistrationHistoryPtr get_rMpr_History() const = 0;
-	// active image
-	virtual ImagePtr getActiveImage() const = 0; ///< used for system state
-	virtual void setActiveImage(ImagePtr activeImage) = 0; ///< used for system state
+
+	// active data
+	virtual ActiveDataPtr getActiveData() const = 0;
+
 	// landmarks
 	virtual LandmarksPtr getPatientLandmarks() const = 0; ///< landmark defined in patient space
 	/** Get all defined landmarks.
@@ -147,14 +128,14 @@ public:
 	virtual void setLandmarkActive(QString uid, bool active) = 0;
 	virtual QString addLandmark() = 0;
 	// utility
-	virtual void updateRegistration_rMpr(const QDateTime& oldTime, const RegistrationTransform& newTransform);
+	virtual void updateRegistration_rMpr(const QDateTime& oldTime, const RegistrationTransform& newTransform, bool continuous);
 
 	virtual QString getActivePatientFolder() const = 0;
 	QString generateFilePath(QString folderName, QString ending);
 
 	virtual bool isPatientValid() const = 0;
 	virtual DataPtr importData(QString fileName, QString &infoText) = 0;
-	virtual void exportPatient(bool niftiFormat) = 0;
+	virtual void exportPatient(PATIENT_COORDINATE_SYSTEM externalSpace) = 0;
 
 	virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const = 0;
 
@@ -164,8 +145,6 @@ public:
 	virtual CLINICAL_VIEW getClinicalApplication() const = 0;
 	virtual void setClinicalApplication(CLINICAL_VIEW application) = 0;
 
-//	virtual QDomElement getCurrentWorkingElement(QString path) = 0;
-
 	virtual void autoSave() = 0;//TODO remove, and integrate into other functions
 	virtual bool isNull() = 0;
 
@@ -174,13 +153,41 @@ public:
 signals:
 	void centerChanged(); ///< emitted when center is changed.
 	void dataAddedOrRemoved();
-	void activeImageChanged(const QString& uId);
 	void landmarkPropertiesChanged(); ///< emitted when global info about a landmark changed
 	void clinicalApplicationChanged();
 	void rMprChanged();
 	void streamLoaded();
 	void patientChanged();
+	void videoAddedToTrackedStream();
 };
+
+
+template <class DATA>
+std::map<QString, boost::shared_ptr<DATA> > PatientModelService::getDataOfType() const
+{
+	std::map<QString, DataPtr> data = this->getData();
+	std::map<QString, boost::shared_ptr<DATA> > retval;
+	for (std::map<QString, DataPtr>::const_iterator i=data.begin(); i!=data.end(); ++i)
+	{
+		boost::shared_ptr<DATA> val = boost::dynamic_pointer_cast<DATA>(i->second);
+		if (val)
+			retval[val->getUid()] = val;
+	}
+	return retval;
+}
+
+template <class DATA>
+boost::shared_ptr<DATA> PatientModelService::getData(const QString& uid) const
+{
+	return boost::dynamic_pointer_cast<DATA>(this->getData(uid));
+}
+
+template<class DATA>
+boost::shared_ptr<DATA> PatientModelService::createSpecificData(QString uid, QString name)
+{
+	DataPtr retval = this->createData(DATA::getTypeName(), uid, name);
+	return boost::dynamic_pointer_cast<DATA>(retval);
+}
 
 } // namespace cx
 Q_DECLARE_INTERFACE(cx::PatientModelService, PatientModelService_iid)

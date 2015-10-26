@@ -298,8 +298,8 @@ void Image::setVtkImageData(const vtkImageDataPtr& data, bool resetTransferFunct
 
 vtkImageDataPtr Image::get8bitGrayScaleVtkImageData()
 {
-	double windowWidth = mImageLookupTable2D->getWindow();
-	double windowLevel = mImageLookupTable2D->getLevel();
+	double windowWidth = this->getUnmodifiedLookupTable2D()->getWindow();
+	double windowLevel = this->getUnmodifiedLookupTable2D()->getLevel();
 	return convertImageDataTo8Bit(this->getGrayScaleVtkImageData(), windowWidth, windowLevel);
 }
 
@@ -423,7 +423,6 @@ int Image::getMax()
 		{
 			return mMaxRGBIntensity;
 		}
-		QDateTime before = QDateTime::currentDateTime();
 		double max = 0.0;
 		switch (mBaseImageData->GetScalarType())
 		{
@@ -763,35 +762,6 @@ DoubleBoundingBox3D Image::getCroppingBox() const
 	return mCroppingBox_d;
 }
 
-// methods for defining and storing clip planes. Image does not use these data, this is up to the mapper
-void Image::addPersistentClipPlane(vtkPlanePtr plane)
-{
-	if (std::count(mPersistentClipPlanes.begin(), mPersistentClipPlanes.end(), plane))
-		return;
-	mPersistentClipPlanes.push_back(plane);
-	emit clipPlanesChanged();
-}
-
-std::vector<vtkPlanePtr> Image::getAllClipPlanes()
-{
-	std::vector<vtkPlanePtr> retval = mPersistentClipPlanes;
-	if (mInteractiveClipPlane)
-		retval.push_back(mInteractiveClipPlane);
-	return retval;
-}
-
-void Image::clearPersistentClipPlanes()
-{
-	mPersistentClipPlanes.clear();
-	emit clipPlanesChanged();
-}
-
-void Image::setInteractiveClipPlane(vtkPlanePtr plane)
-{
-	mInteractiveClipPlane = plane;
-	emit clipPlanesChanged();
-}
-
 /**Do the following operations on mBaseVtkImageData:
  *  * Reset the origin to zero.
  *  * Reset the extent to have its lower-left corner in zero.
@@ -884,14 +854,15 @@ vtkImageDataPtr Image::createDummyImageData(int axisSize, int maxVoxelValue)
 	return dummyImageData;
 }
 
-void Image::setInterpolationTypeToNearest()
-{
-	this->setInterpolationType(VTK_NEAREST_INTERPOLATION);
-}
-void Image::setInterpolationTypeToLinear()
-{
-	this->setInterpolationType(VTK_LINEAR_INTERPOLATION);
-}
+//void Image::setInterpolationTypeToNearest()
+//{
+//	this->setInterpolationType(VTK_NEAREST_INTERPOLATION);
+//}
+//void Image::setInterpolationTypeToLinear()
+//{
+//	this->setInterpolationType(VTK_LINEAR_INTERPOLATION);
+//}
+
 void Image::setInterpolationType(int val)
 {
 	if (mThresholdPreview)
@@ -926,8 +897,8 @@ vtkImageDataPtr Image::resample(long maxVoxels)
 		resampler->GetOutput()->GetScalarRange();
 		retval = resampler->GetOutput();
 
-		long voxelsDown = retval->GetNumberOfPoints();
-		long voxelsOrig = this->getBaseVtkImageData()->GetNumberOfPoints();
+//		long voxelsDown = retval->GetNumberOfPoints();
+//		long voxelsOrig = this->getBaseVtkImageData()->GetNumberOfPoints();
 //		report("Created downsampled volume in Image: "
 //									 + this->getName()
 //									 + " below " + qstring_cast(voxelsDown/1000/1000) + "M. "

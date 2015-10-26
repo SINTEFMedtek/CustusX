@@ -59,7 +59,12 @@ ProbeAdapterRTSource::ProbeAdapterRTSource(QString uid, ProbePtr probe, VideoSou
 }
 
 ProbeAdapterRTSource::~ProbeAdapterRTSource()
-{}
+{
+	disconnect(mBase.get(), &VideoSource::streaming, this, &VideoSource::streaming);
+	disconnect(mBase.get(), &VideoSource::connected, this, &VideoSource::connected);
+	disconnect(mBase.get(), &VideoSource::newFrame, this, &VideoSource::newFrame);
+	disconnect(mBase.get(), &VideoSource::newFrame, this, &ProbeAdapterRTSource::newFrameSlot);
+}
 
 QString ProbeAdapterRTSource::getUid()
 {
@@ -81,7 +86,7 @@ double ProbeAdapterRTSource::getTimestamp()
 	QString uid = mBase->getUid();
 	ProbePtr probe = mProbe.lock();
 	if (probe)
-		return mBase->getTimestamp() - probe->getProbeData(uid).getTemporalCalibration();
+		return mBase->getTimestamp() - probe->getProbeDefinition(uid).getTemporalCalibration();
 	else
 		return mBase->getTimestamp();
 }
@@ -137,7 +142,7 @@ void ProbeAdapterRTSource::newFrameSlot()
 	mRedirecter->Update();
 
 	QString uid = mBase->getUid();
-	ProbeDefinition data = probe->getProbeData(uid);
+	ProbeDefinition data = probe->getProbeDefinition(uid);
 	QSize dimProbe = data.getSize();
 	QSize dimImage(mRedirecter->GetOutput()->GetDimensions()[0], mRedirecter->GetOutput()->GetDimensions()[1]);
 
@@ -152,7 +157,7 @@ void ProbeAdapterRTSource::newFrameSlot()
 		            .arg(uid));
 
 		data.resample(dimImage);
-		probe->setProbeSector(data);
+		probe->setProbeDefinition(data);
 	}
 
 }
@@ -166,7 +171,7 @@ void ProbeAdapterRTSource::probeChangedSlot()
 	mRedirecter->Update();
 
 	QString uid = mBase->getUid();
-	mRedirecter->SetOutputSpacing(probe->getProbeData(uid).getSpacing().begin());
+	mRedirecter->SetOutputSpacing(probe->getProbeDefinition(uid).getSpacing().begin());
 
 	mRedirecter->Update();
 }

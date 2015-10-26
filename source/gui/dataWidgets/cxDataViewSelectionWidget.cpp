@@ -48,16 +48,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewService.h"
 #include "cxViewGroupData.h"
 #include "cxLogger.h"
-
-
-//TODO: remove
-#include "cxLegacySingletons.h"
+#include "cxActiveData.h"
 
 namespace cx
 {
 
-DataListWidget::DataListWidget(QWidget* parent) :
-    QListWidget(parent)
+DataListWidget::DataListWidget(PatientModelServicePtr patientModelService, QWidget* parent) :
+	QListWidget(parent),
+	mPatientModelService(patientModelService)
 {
 //  connect(this, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(toolClickedSlot(QListWidgetItem*)));
 
@@ -103,18 +101,20 @@ void DataListWidget::populate(QStringList dataUids)
 
 void DataListWidget::itemSelectionChangedSlot()
 {
-  QList<QListWidgetItem*> items = this->selectedItems();
-  if (items.empty())
-    return;
-  ImagePtr image = patientService()->getData<Image>(items[0]->data(Qt::UserRole).toString());
-  if (image)
-	patientService()->setActiveImage(image);
-
+	QList<QListWidgetItem*> items = this->selectedItems();
+	if (items.empty())
+		return;
+	DataPtr data = mPatientModelService->getData(items[0]->data(Qt::UserRole).toString());
+	if (data)
+	{
+		ActiveDataPtr activeData = mPatientModelService->getActiveData();
+		activeData->setActive(data);
+	}
 }
 
 void DataListWidget::populateData(QString uid, bool indent, QListWidgetItem* after)
 {
-  DataPtr data = patientService()->getData(uid);
+  DataPtr data = mPatientModelService->getData(uid);
   if (!data)
     return;
 
@@ -124,10 +124,7 @@ void DataListWidget::populateData(QString uid, bool indent, QListWidgetItem* aft
   if (indent)
     item->setText("    " + item->text());
 
-  if (boost::dynamic_pointer_cast<Image>(data))
-    item->setIcon(QIcon(":/icons/volume.png"));
-  else
-    item->setIcon(QIcon(":/icons/surface.png"));
+  item->setIcon(data->getIcon());
 
   if (after)
   {
@@ -151,13 +148,13 @@ void DataListWidget::populateData(QString uid, bool indent, QListWidgetItem* aft
 //---------------------------------------------------------------------------------------------------------------------
 
 
-AllDataListWidget::AllDataListWidget(QWidget* parent) :
-    DataListWidget(parent)
+AllDataListWidget::AllDataListWidget(PatientModelServicePtr patientModelService, QWidget* parent) :
+	DataListWidget(patientModelService, parent)
 {
   this->setDropIndicatorShown(false);
   this->setDragEnabled(true);
 
-  connect(patientService().get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(populateAllDataList()));
+  connect(mPatientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(populateAllDataList()));
 }
 
 AllDataListWidget::~AllDataListWidget()
@@ -178,7 +175,7 @@ void AllDataListWidget::populateAllDataList()
   this->clear();
 
   //add actions to the actiongroups and the contextmenu
-  std::vector<DataPtr> sorted = sortOnGroupsAndAcquisitionTime(patientService()->getData());
+  std::vector<DataPtr> sorted = sortOnGroupsAndAcquisitionTime(mPatientModelService->getData());
   QString lastDataActionUid = "________________________";
   for (std::vector<DataPtr>::iterator iter=sorted.begin(); iter!=sorted.end(); ++iter)
   {
@@ -206,8 +203,8 @@ void AllDataListWidget::populateAllDataList()
 
 
 
-SelectedDataListWidget::SelectedDataListWidget(QWidget* parent) :
-    DataListWidget(parent)
+SelectedDataListWidget::SelectedDataListWidget(PatientModelServicePtr patientModelService, QWidget* parent) :
+	DataListWidget(patientModelService, parent)
 {
   this->setContextMenuPolicy(Qt::CustomContextMenu);
 
@@ -235,7 +232,7 @@ void SelectedDataListWidget::userChangedListSlot()
   mViewGroupData->clearData();
   for (int i=0; i<data.size(); ++i)
   {
-	DataPtr current = patientService()->getData(data[i]);
+	DataPtr current = mPatientModelService->getData(data[i]);
     if (!current)
       continue;
 	mViewGroupData->addData(current->getUid());
@@ -491,13 +488,14 @@ protected:
 
 };
 
-DataViewSelectionWidget::DataViewSelectionWidget(QWidget* parent)
+DataViewSelectionWidget::DataViewSelectionWidget(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget* parent) :
+	mViewService(viewService)
 {
   // TODO Auto-generated constructor stub
   QHBoxLayout* layout = new QHBoxLayout(this);
 
-  mSelectedDataListWidget = new SelectedDataListWidget(this);
-  mAllDataListWidget = new AllDataListWidget(this);
+  mSelectedDataListWidget = new SelectedDataListWidget(patientModelService, this);
+  mAllDataListWidget = new AllDataListWidget(patientModelService, this);
 #if 0
   TestClass* test = new TestClass(this);
   test->addItem("test1");
@@ -536,17 +534,17 @@ DataViewSelectionWidget::DataViewSelectionWidget(QWidget* parent)
   allLayout->addWidget(mAllDataListWidget);
   layout->addLayout(allLayout);
 
-  connect(viewService().get(), SIGNAL(activeViewChanged()), this, SLOT(viewGroupChangedSlot()));
+  connect(mViewService.get(), SIGNAL(activeViewChanged()), this, SLOT(viewGroupChangedSlot()));
   this->viewGroupChangedSlot();
 }
 
 void DataViewSelectionWidget::viewGroupChangedSlot()
 {
-  int vg = viewService()->getActiveGroupId();
+  int vg = mViewService->getActiveGroupId();
   if (vg<0)
     vg = 0;
 
-  ViewGroupDataPtr group = viewService()->getGroup(vg);
+  ViewGroupDataPtr group = mViewService->getGroup(vg);
   if (group)
 	  mSelectedDataListWidget->setViewGroupData(group);
 

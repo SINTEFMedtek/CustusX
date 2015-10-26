@@ -73,7 +73,6 @@ void LogConsole::initializeGeometry()
 void LogConsole::setDefaultGeometry()
 {
 	QDesktopWidget* desktop = dynamic_cast<QApplication*>(QApplication::instance())->desktop();
-	QScreen* screen__ = qApp->screens()[0];
 	QRect screen = desktop->screenGeometry(desktop->primaryScreen());
 	screen.adjust(screen.width()*0.5, screen.height()*0.25, 0, 0);
 	this->setGeometry(screen);

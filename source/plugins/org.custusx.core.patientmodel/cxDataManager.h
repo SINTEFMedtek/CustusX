@@ -93,14 +93,10 @@ public:
 	virtual SpaceProviderPtr getSpaceProvider() = 0;
 	virtual DataFactoryPtr getDataFactory() = 0;
 
-
 	// global data (move to separate class if list grows)
 	virtual Vector3D getCenter() const = 0; ///< current common center point for user viewing.
 	virtual void setCenter(const Vector3D& center) = 0;
 
-	// state information
-	virtual ImagePtr getActiveImage() const; ///< used for system state
-	virtual void setActiveImage(ImagePtr activeImage); ///< used for system state
 	virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const;
 
 	virtual QString addLandmark() = 0;
@@ -130,7 +126,6 @@ public:
 signals:
 	void centerChanged(); ///< emitted when center is changed.
 	void dataAddedOrRemoved();
-	void activeImageChanged(const QString& uId); ///< emitted when the active image is changed
 	void landmarkPropertiesChanged(); ///< emitted when global info about a landmark changed
 	void clinicalApplicationChanged();
 	void streamLoaded();

@@ -53,6 +53,7 @@ class cxResource_EXPORT TrackedStream : public Data
 public:
 	static TrackedStreamPtr create(const QString& uid, const QString& name = "");
 	TrackedStream(const QString &uid, const QString &name, const ToolPtr &probe, const VideoSourcePtr &videoSource);
+	~TrackedStream();
 
 	void setProbeTool(const ToolPtr &probeTool);
 	ToolPtr getProbeTool();
@@ -72,13 +73,16 @@ public:
 
 	ImagePtr getChangingImage();
 	bool is3D();
+	bool is2D();
 	bool hasVideo() const;
+	bool isStreaming() const;
 signals:
 	void streamChanged(QString uid);
 	void newTool(ToolPtr tool);
 	void newVideoSource(VideoSourcePtr videoSource);
 	void newFrame();
 	void streaming(bool on); ///< emitted when streaming started/stopped
+	void newPosition();
 
 private slots:
 	void newFrameSlot();

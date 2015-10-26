@@ -63,17 +63,17 @@ public:
 	virtual ~DummyProbe() {}
 	virtual bool isValid() const
 	{
-		return mProbeData.getType() != ProbeDefinition::tNONE;
+		return mProbeDefinition.getType() != ProbeDefinition::tNONE;
 	}
 	virtual QStringList getAvailableVideoSources() { return QStringList() << "active"; }
-	virtual ProbeDefinition getProbeData(QString uid="active") const
+	virtual ProbeDefinition getProbeDefinition(QString uid="active") const
 	{
-		return mProbeData;
+		return mProbeDefinition;
 	}
 	virtual ProbeSectorPtr getSector(QString uid="active")
 	{
 		ProbeSectorPtr retval(new ProbeSector());
-		retval->setData(this->getProbeData());
+		retval->setData(this->getProbeDefinition());
 		return retval;
 	}
 	virtual VideoSourcePtr getRTSource(QString uid="active") const
@@ -82,7 +82,7 @@ public:
 	}
 
 	virtual void setActiveStream(QString uid) {}
-	virtual QString getActiveStream() const { return mProbeData.getUid(); }
+	virtual QString getActiveStream() const { return mProbeDefinition.getUid(); }
 
 	virtual void addXml(QDomNode& dataNode) {}
 	virtual void parseXml(QDomNode& dataNode) {}
@@ -97,9 +97,9 @@ public:
 	virtual void applyNewConfigurationWithId(QString uid) {}
 	virtual void setTemporalCalibration(double val) {}
 	virtual void setSoundSpeedCompensationFactor(double val) {}
-	virtual void setProbeSector(ProbeDefinition probeSector)
+	virtual void setProbeDefinition(ProbeDefinition probeDefinition)
 	{
-		mProbeData = probeSector;
+		mProbeDefinition = probeDefinition;
 		emit sectorChanged();
 	}
 	virtual void setRTSource(VideoSourcePtr source)
@@ -116,7 +116,7 @@ public:
 	}
 
 private:
-	ProbeDefinition mProbeData;
+	ProbeDefinition mProbeDefinition;
 	VideoSourcePtr mVideoSource;
 };
 
@@ -153,9 +153,9 @@ signals:
 
 struct cxResource_EXPORT DummyToolTestUtilities
 {
-	static DummyToolPtr createDummyTool(ProbeDefinition probeData = ProbeDefinition());
-	static ProbeDefinition createProbeDataLinear(double depth=40, double width=50, Eigen::Array2i frameSize=Eigen::Array2i(80,40));
-	static ProbeDefinition createProbeData(ProbeDefinition::TYPE, double depth=40, double width=50, Eigen::Array2i frameSize=Eigen::Array2i(80,40));
+	static DummyToolPtr createDummyTool(ProbeDefinition probeDefinition = ProbeDefinition());
+	static ProbeDefinition createProbeDefinitionLinear(double depth=40, double width=50, Eigen::Array2i frameSize=Eigen::Array2i(80,40));
+	static ProbeDefinition createProbeDefinition(ProbeDefinition::TYPE, double depth=40, double width=50, Eigen::Array2i frameSize=Eigen::Array2i(80,40));
 };
 
 /**\brief Implementation of a Tool used for testing.
@@ -187,17 +187,17 @@ public:
 	{
 		return mProbe;
 	}
-	void setProbeSector( ProbeDefinition probeData )
+	void setProbeSector( ProbeDefinition probeDefinition )
 	{
-		mProbeData = probeData;
+		mProbeDefinition = probeDefinition;
 		mProbe.reset(new DummyProbe());
-		mProbe->setProbeSector(mProbeData);
+		mProbe->setProbeDefinition(mProbeDefinition);
 		emit toolProbeSector();
 	}
 	void setProbeSector(ProbePtr probe)
 	{
 		mProbe = probe;
-		mProbeData = probe->getProbeData();
+		mProbeDefinition = probe->getProbeDefinition();
 		emit toolProbeSector();
 	}
 	virtual double getTimestamp() const { return getMilliSecondsSinceEpoch(); }
@@ -239,7 +239,7 @@ private:
 	static int mTransformCount;
 //	Type mType;
 	std::set<Type> mTypes;
-	ProbeDefinition mProbeData;
+	ProbeDefinition mProbeDefinition;
 	ProbePtr mProbe;
 	DummyToolThread* mThread;
 };

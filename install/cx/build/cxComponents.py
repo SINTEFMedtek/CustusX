@@ -162,7 +162,6 @@ class ITK(CppComponent):
         add = builder.addCMakeOption
         add('BUILD_TESTING:BOOL', self.controlData.mBuildExAndTest)
         add('BUILD_EXAMPLES:BOOL', self.controlData.mBuildExAndTest)
-#        add('Module_ITKVtkGlue:BOOL', True)
         builder.configureCMake()
 # ---------------------------------------------------------
 
@@ -189,14 +188,9 @@ class VTK(CppComponent):
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
-        add('VTK_USE_PARALLEL:BOOL', True)
-        # Note: DVTK_REQUIRED_OBJCXX_FLAGS is required on v5.6 in order to avoid garbage-collection (!)
+        add('VTK_USE_PARALLEL:BOOL', 'ON')
         add('VTK_REQUIRED_OBJCXX_FLAGS:STRING', "")
-        #add('VTK_USE_GUISUPPORT:BOOL', True)
-        #add('VTK_USE_QT:BOOL', True)
-        #add('VTK_USE_QVTK:BOOL', True)
-        add('VTK_USE_RPATH:BOOL', True)
-#        add('DESIRED_QT_VERSION:STRING', 4)
+        add('VTK_USE_RPATH:BOOL', 'ON')
         
         use_qt5 = True
         if use_qt5:
@@ -205,15 +199,16 @@ class VTK(CppComponent):
 #            add('QT_QMAKE_EXECUTABLE:PATH', "%s/bin/qmake"%qt5_root)
             add('VTK_Group_Qt:BOOL', "ON")
 #            add('CMAKE_PREFIX_PATH:PATH', "%s/lib/cmake"%qt5_root)
+            add('CMAKE_PREFIX_PATH:PATH', "/opt/local/libexec/qt5-mac")
         else:
             add('DESIRED_QT_VERSION:STRING', 4)
-            add('Module_vtkGUISupportQt:BOOL', True)
-            add('VTK_USE_PARALLEL:BOOL', True)
-            add('VTK_USE_RPATH:BOOL', True)        
+            add('Module_vtkGUISupportQt:BOOL', 'ON')
+            add('VTK_USE_PARALLEL:BOOL', 'ON')
+            add('VTK_USE_RPATH:BOOL', 'ON')        
         
         add('BUILD_TESTING:BOOL', self.controlData.mBuildExAndTest)
         add('BUILD_EXAMPLES:BOOL', self.controlData.mBuildExAndTest)
-        add('Module_vtkGUISupportQt:BOOL', True)
+        add('Module_vtkGUISupportQt:BOOL', 'ON')
         builder.configureCMake()
 # ---------------------------------------------------------
 
@@ -239,18 +234,18 @@ class CTK(CppComponent):
         repo = self._getRepo()
         branch = 'CTK-CX-modifications'
         self._getBuilder().gitSetRemoteURL(repo, branch=branch)
-        #latestTestedSHA = '3fe3cdbe9d0ef95b3810a12484f035ae1f66524c'
-        #self._getBuilder().gitCheckoutBranch(branch)
-        self._getBuilder().gitCheckout('1056228ab4aeefa9bf6db4fc32a8826db283475a')
+        #self._getBuilder().gitCheckout('1056228ab4aeefa9bf6db4fc32a8826db283475a') 
+        self._getBuilder().gitCheckout('f9478bdb4d5ecc6357b3a579a4bf8a927debd5e3') # new 2015-10-19
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
         add('CTK_QT_VERSION:STRING', 5)
-        add('CTK_ENABLE_DICOM:BOOL', True)
-        add('CTK_LIB_DICOM/Widgets:BOOL', True)
-        add('CTK_ENABLE_PluginFramework:BOOL', True)
+        add('CTK_ENABLE_DICOM:BOOL', 'ON')
+        add('CTK_LIB_DICOM/Widgets:BOOL', 'ON')
+        add('CTK_ENABLE_PluginFramework:BOOL', 'ON')
         #add('CTK_BUILD_SHARED_LIBS:BOOL', self.controlData.getBuildShared())
-        add('CTK_BUILD_SHARED_LIBS:BOOL', True)
+        add('CTK_BUILD_SHARED_LIBS:BOOL', 'ON')
+        add('CMAKE_PREFIX_PATH:PATH', "/opt/local/libexec/qt5-mac")
         builder.configureCMake()
         PrintFormatter.printInfo('Build CTK during configure step, in order to create CTKConfig.cmake')
         self.build()
@@ -280,6 +275,7 @@ class OpenCV(CppComponent):
         add('WITH_TIFF:BOOL', False)
         add('BUILD_JASPER:BOOL', False)
         add('WITH_JASPER:BOOL', False)
+        add('WITH_FFMPEG:BOOL', False)
         builder.configureCMake()
 # ---------------------------------------------------------
 
@@ -336,8 +332,7 @@ class OpenIGTLink(CppComponent):
         builder.configureCMake()
     def addConfigurationToDownstreamLib(self, builder):
         add = builder.addCMakeOption
-        if self.controlData.force_connect_sublibraries:
-            add('BUILD_OPEN_IGTLINK_SERVER:BOOL', True);
+        add('BUILD_OPEN_IGTLINK_SERVER:BOOL', 'ON');
 # ---------------------------------------------------------
 
 
@@ -414,6 +409,7 @@ class CustusX(CppComponent):
         add('SSC_USE_GCOV:BOOL', self.controlData.mCoverage);
         add('CX_SYSTEM_BASE_NAME:STRING', self.controlData.system_base_name)
         add('CX_SYSTEM_DEFAULT_APPLICATION:STRING', self.controlData.system_base_name)
+        add('CMAKE_PREFIX_PATH:PATH', "/opt/local/libexec/qt5-mac")
         
         
         libs = self.assembly.libraries
@@ -449,15 +445,14 @@ class TubeSegmentationFramework(CppComponent):
         add('USE_C++11:BOOL', False)
         add('SIPL_USE_GTK:BOOL', False)
         add('sipl_use_gtk:BOOL', False) #variables in cmake are case sensitive, SIPL uses this options
-        add('TSF_USE_EXTRNAL_OUL:BOOL', True)
+        add('TSF_USE_EXTRNAL_OUL:BOOL', 'ON')
         add('TSF_EXTERNAL_OUL_PATH:PATH', self._createSibling(OpenCLUtilityLibrary).findPackagePath())
         if(platform.system() == 'Windows'):
-            add('BUILD_SHARED_LIBS:BOOL', False) #On windows we build TSF as static, because TSF and SIPL does not export symbols
+            add('BUILD_SHARED_LIBS:BOOL', 'OFF') #On windows we build TSF as static, because TSF and SIPL does not export symbols
         builder.configureCMake()
     def addConfigurationToDownstreamLib(self, builder):
         add = builder.addCMakeOption
-        if self.controlData.force_connect_sublibraries:
-            add('CX_PLUGIN_org.custusx.filter.tubesegmentation:BOOL', platform.system() != 'Windows');
+        add('CX_PLUGIN_org.custusx.filter.tubesegmentation:BOOL', platform.system() != 'Windows');
 
  # ---------------------------------------------------------
 
@@ -480,14 +475,13 @@ class LevelSetSegmentation(CppComponent):
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
-        add('sipl_use_gtk:BOOL', False)
-        add('LS_USE_EXTRNAL_OUL:BOOL', True)
+        add('sipl_use_gtk:BOOL', 'OFF')
+        add('LS_USE_EXTRNAL_OUL:BOOL', 'ON')
         add('LS_EXTERNAL_OUL_PATH:PATH', self._createSibling(OpenCLUtilityLibrary).findPackagePath())
         builder.configureCMake()
     def addConfigurationToDownstreamLib(self, builder):
         add = builder.addCMakeOption
-        if self.controlData.force_connect_sublibraries:
-            add('CX_PLUGIN_org.custusx.filter.levelset:BOOL', platform.system() == 'Linux');
+        add('CX_PLUGIN_org.custusx.filter.levelset:BOOL', platform.system() == 'Linux');
         
 # ---------------------------------------------------------
 

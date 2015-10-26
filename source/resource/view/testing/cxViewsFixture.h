@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxtestresourcevisualization_export.h"
 
-#include "cxtestDummyDataManager.h"
+#include "cxtestVisServices.h"
 #include "cxMessageListener.h"
 #include "cxForwardDeclarations.h"
 #include "cxDefinitions.h"
@@ -97,7 +97,7 @@ private:
 	RenderTesterPtr getRenderTesterForView(int viewIndex);
 
 	QString mShaderFolder;
-	cxtest::TestServicesPtr mServices;
+	cxtest::TestVisServicesPtr mServices;
 	cx::MessageListenerPtr mMessageListener;
 	ViewsWindowPtr mWindow;
 };

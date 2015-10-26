@@ -42,6 +42,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTool.h"
 #include "cxPatientModelService.h"
 #include "cxVolumeProperty.h"
+#include "cxReporter.h"
+#include "cxSettings.h"
 
 //To be removed
 #include "cxImageTF3D.h"
@@ -61,6 +63,7 @@ StreamRep3D::StreamRep3D(SpaceProviderPtr spaceProvider, PatientModelServicePtr 
 	mTrackedStream(TrackedStreamPtr()),
 	mPatientModelService(patientModelService)
 {
+	this->setVisualizerType();
 }
 
 void StreamRep3D::setTrackedStream(TrackedStreamPtr trackedStream)
@@ -123,6 +126,17 @@ TrackedStreamPtr StreamRep3D::getTrackedStream()
 QString StreamRep3D::getType() const
 {
 	return "StreamRep3D";
+}
+
+void StreamRep3D::setVisualizerType()
+{
+	QString visualizerType = settings()->value("View3D/ImageRender3DVisualizer").toString();
+	if(visualizerType == "vtkVolumeTextureMapper3D")
+		this->setUseVolumeTextureMapper();
+	else if(visualizerType == "vtkGPUVolumeRayCastMapper")
+		this->setUseGPUVolumeRayCastMapper();
+	else
+		reportError(QString("StreamRep3D::setVisualizerType(): No visualizer found for string=%1").arg(visualizerType));
 }
 
 } //cx

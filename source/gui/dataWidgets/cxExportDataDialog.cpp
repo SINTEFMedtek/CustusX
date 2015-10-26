@@ -62,10 +62,10 @@ ExportDataDialog::ExportDataDialog(PatientModelServicePtr patientModelService, Q
   QVBoxLayout* layout = new QVBoxLayout(this);
   this->setWindowTitle("Export Patient Data");
 
-  mNiftiFormatCheckBox = new QCheckBox("Use NIfTI-1/ITK-Snap axis definition", this);
+  mNiftiFormatCheckBox = new QCheckBox("Use RAS NIfTI-1/ITK-Snap axis definition", this);
   mNiftiFormatCheckBox->setToolTip(""
-	  "Use X=Left->Right Y=Posterior->Anterior Z=Inferior->Superior, as in ITK-Snap.\n"
-	  "This is different from normal DICOM.");
+	  "Use RAS (X=Left->Right Y=Posterior->Anterior Z=Inferior->Superior), as in ITK-Snap.\n"
+	  "This is different from LPS (DICOM).");
   mNiftiFormatCheckBox->setChecked(true);
   mNiftiFormatCheckBox->setEnabled(true);
 
@@ -88,9 +88,14 @@ ExportDataDialog::~ExportDataDialog()
 {
 }
 
+PATIENT_COORDINATE_SYSTEM ExportDataDialog::getExternalSpace()
+{
+	return mNiftiFormatCheckBox->isChecked() ? pcsRAS : pcsLPS;
+}
+
 void ExportDataDialog::acceptedSlot()
 {
-	mPatientModelService->exportPatient(mNiftiFormatCheckBox->isChecked());
+	mPatientModelService->exportPatient(this->getExternalSpace());
 }
 
 }//namespace cx

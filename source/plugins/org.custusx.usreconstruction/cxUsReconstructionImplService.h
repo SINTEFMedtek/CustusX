@@ -77,7 +77,7 @@ class org_custusx_usreconstruction_EXPORT UsReconstructionImplService : public U
 	Q_INTERFACES(cx::UsReconstructionService)
 
 public:
-	UsReconstructionImplService(ctkPluginContext* pluginContext, PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, XmlOptionFile settings);
+	UsReconstructionImplService(ctkPluginContext* pluginContext, PatientModelServicePtr patientModelService, ViewServicePtr viewService, XmlOptionFile settings);
 	virtual ~UsReconstructionImplService();
 	virtual bool isNull();
 
@@ -144,7 +144,7 @@ private:
 	std::vector<ReconstructionExecuterPtr> mExecuters;
 
 	PatientModelServicePtr mPatientModelService;
-	VisualizationServicePtr mVisualizationService;
+	ViewServicePtr mViewService;
 };
 
 /**

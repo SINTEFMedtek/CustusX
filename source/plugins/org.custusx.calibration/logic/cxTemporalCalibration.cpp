@@ -488,7 +488,7 @@ double TemporalCalibration::findCorrelation(USFrameDataPtr data, int frame_a, in
 	int maxShift_pix = maxShift / mFileData.mUsRaw->getSpacing()[1];
 	int lastVal_pix = lastVal / mFileData.mUsRaw->getSpacing()[1];
 
-	int line_index_x = mFileData.mProbeData.mData.getOrigin_p()[0];
+	int line_index_x = mFileData.mProbeDefinition.mData.getOrigin_p()[0];
 
   int dimY = mFileData.mUsRaw->getDimensions()[1];
 

@@ -66,7 +66,7 @@ class cxGui_EXPORT CroppingWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  CroppingWidget(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget* parent);
+  CroppingWidget(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget* parent);
 
 private:
   void hideOldAndShowNewVolume(ImagePtr oldImage, ImagePtr newImage);///< This only works with view group 0
@@ -77,7 +77,7 @@ private:
   QCheckBox* mShowBoxCheckBox;
   QLabel* mBoundingBoxDimensions;
   PatientModelServicePtr mPatientModelService;
-  VisualizationServicePtr mVisualizationService;
+  ViewServicePtr mViewService;
 
 private slots:
   void setupUI();

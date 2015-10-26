@@ -35,7 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxResourceExport.h"
 
-//#include "cxTransform3D.h"
 #include "cxDefinitions.h"
 #include "cxForwardDeclarations.h"
 #include <vector>
@@ -66,6 +65,8 @@ struct cxResource_EXPORT CoordinateSystem
 };
 cxResource_EXPORT bool operator==(const CoordinateSystem& lhs, const CoordinateSystem& rhs);
 typedef CoordinateSystem Space;
+
+
 
 }//namespace cx
 #endif /* CXCOORDINATESYSTEMHELPERS_H_ */

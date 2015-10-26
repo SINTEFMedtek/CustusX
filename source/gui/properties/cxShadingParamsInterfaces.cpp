@@ -32,26 +32,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxShadingParamsInterfaces.h"
 #include "cxImage.h"
-#include "cxPatientModelService.h"
+#include "cxActiveData.h"
 
 namespace cx
 {
-DoublePropertyShadingBase::DoublePropertyShadingBase(PatientModelServicePtr patientModelService) :
-	mPatientModelService(patientModelService)
+DoublePropertyShadingBase::DoublePropertyShadingBase(ActiveDataPtr activeData) :
+	mActiveData(activeData)
 {
-	mActiveImageProxy = ActiveImageProxy::New(patientModelService);
+	mActiveImageProxy = ActiveImageProxy::New(mActiveData);
 	connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &DoublePropertyShadingBase::activeImageChanged);
 	connect(mActiveImageProxy.get(), &ActiveImageProxy::transferFunctionsChanged, this, &Property::changed);
 }
 
 void DoublePropertyShadingBase::activeImageChanged()
 {  
-  mImage = mPatientModelService->getActiveImage();
+  mImage = mActiveData->getActive<Image>();
   emit changed();
 }
 
-DoublePropertyShadingAmbient::DoublePropertyShadingAmbient(PatientModelServicePtr patientModelService) :
-	DoublePropertyShadingBase(patientModelService)
+DoublePropertyShadingAmbient::DoublePropertyShadingAmbient(ActiveDataPtr activeData) :
+	DoublePropertyShadingBase(activeData)
 {
 }
 
@@ -73,8 +73,8 @@ bool DoublePropertyShadingAmbient::setValue(double val)
 }
 
 
-DoublePropertyShadingDiffuse::DoublePropertyShadingDiffuse(PatientModelServicePtr patientModelService) :
-	DoublePropertyShadingBase(patientModelService)
+DoublePropertyShadingDiffuse::DoublePropertyShadingDiffuse(ActiveDataPtr activeData) :
+	DoublePropertyShadingBase(activeData)
 {
 
 }
@@ -96,10 +96,9 @@ bool DoublePropertyShadingDiffuse::setValue(double val)
 }
 
 
-DoublePropertyShadingSpecular::DoublePropertyShadingSpecular(PatientModelServicePtr patientModelService) :
-	DoublePropertyShadingBase(patientModelService)
+DoublePropertyShadingSpecular::DoublePropertyShadingSpecular(ActiveDataPtr activeData) :
+	DoublePropertyShadingBase(activeData)
 {
-
 }
 
 double DoublePropertyShadingSpecular::getValue() const
@@ -119,8 +118,8 @@ bool DoublePropertyShadingSpecular::setValue(double val)
 }
 
 
-DoublePropertyShadingSpecularPower::DoublePropertyShadingSpecularPower(PatientModelServicePtr patientModelService) :
-	DoublePropertyShadingBase(patientModelService)
+DoublePropertyShadingSpecularPower::DoublePropertyShadingSpecularPower(ActiveDataPtr activeData) :
+	DoublePropertyShadingBase(activeData)
 {
 }
 

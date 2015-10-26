@@ -39,16 +39,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVolumeHelpers.h"
 #include "cxActiveImageProxy.h"
 #include "cxPatientModelService.h"
+#include "cxActiveData.h"
 
 namespace cx
 {
 
 VolumeInfoWidget::VolumeInfoWidget(PatientModelServicePtr patientModelService, QWidget* parent) :
   InfoWidget(parent, "VolumeInfoWidget", "Volume Info"),
-  mPatientModelService(patientModelService)
+  mPatientModelService(patientModelService),
+  mActiveData(patientModelService->getActiveData())
 {
 	this->setToolTip("Display volume info");
-	mActiveImageProxy = ActiveImageProxy::New(patientModelService);
+	mActiveImageProxy = ActiveImageProxy::New(mActiveData);
 	connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &VolumeInfoWidget::updateSlot);
 
 	this->addWidgets();
@@ -81,7 +83,7 @@ void VolumeInfoWidget::addWidgets()
 
 void VolumeInfoWidget::updateSlot()
 {
-	ImagePtr image = mPatientModelService->getActiveImage();
+	ImagePtr image = mActiveData->getActive<Image>();
 	mParentFrameAdapter->setData(image);
 	mNameAdapter->setData(image);
 	mUidAdapter->setData(image);

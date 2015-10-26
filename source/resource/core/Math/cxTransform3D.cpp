@@ -44,9 +44,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx_transform3D_internal
 {
 
-/**provide an array of the transform indices, vtk / row-major ordering
- *
- */
 boost::array<double, 16> flatten(const Eigen::Affine3d* self)
 {
 	boost::array<double, 16> retval;
@@ -67,6 +64,16 @@ void fill(Eigen::Affine3d* self, vtkMatrix4x4Ptr m)
 		for (int c = 0; c < 4; ++c)
 			(*self)(r, c) = m->GetElement(r, c);
 }
+
+void fill(Eigen::Affine3d* self, float m[4][4])
+{
+    if (!m)
+        return;
+    for (int r = 0; r < 4; ++r)
+        for (int c = 0; c < 4; ++c)
+            (*self)(r, c) = m[r][c];
+}
+
 
 /**fill the transform with raw data in vtk / row-major ordering form.
  *
@@ -161,9 +168,6 @@ bool similar(const Transform3D& a, const Transform3D& b, double tol)
 }
 // --------------------------------------------------------
 
-/**Transform bb using the transform m.
- * Only the two defining corners are actually transformed.
- */
 DoubleBoundingBox3D transform(const Transform3D& m, const DoubleBoundingBox3D& bb)
 {
 	Vector3D a = m.coord(bb.bottomLeft());
@@ -171,8 +175,6 @@ DoubleBoundingBox3D transform(const Transform3D& m, const DoubleBoundingBox3D& b
 	return DoubleBoundingBox3D(a, b);
 }
 
-/**Create a transform representing a scale in x,y,z
- */
 Transform3D createTransformScale(const Vector3D& scale_)
 {
 	Transform3D retval = Transform3D::Identity();
@@ -180,8 +182,6 @@ Transform3D createTransformScale(const Vector3D& scale_)
 	return retval;
 }
 
-/**Create a transform representing a translation
- */
 Transform3D createTransformTranslate(const Vector3D& translation)
 {
 	Transform3D retval = Transform3D::Identity();
@@ -189,8 +189,6 @@ Transform3D createTransformTranslate(const Vector3D& translation)
 	return retval;
 }
 
-/**Create a transform representing a rotation about the X-axis with an input angle.
- */
 Transform3D createTransformRotateX(const double angle)
 {
 	Transform3D retval = Transform3D::Identity();
@@ -198,8 +196,6 @@ Transform3D createTransformRotateX(const double angle)
 	return retval;
 }
 
-/**Create a transform representing a rotation about the Y-axis with an input angle.
- */
 Transform3D createTransformRotateY(const double angle)
 {
 	Transform3D retval = Transform3D::Identity();
@@ -207,8 +203,6 @@ Transform3D createTransformRotateY(const double angle)
 	return retval;
 }
 
-/**Create a transform representing a rotation about the Z-axis with an input angle.
- */
 Transform3D createTransformRotateZ(const double angle)
 {
 	Transform3D retval = Transform3D::Identity();
@@ -216,11 +210,6 @@ Transform3D createTransformRotateZ(const double angle)
 	return retval;
 }
 
-/**Normalize volume defined by in to volume defined by out.
- *
- * This is intended for creating transforms from one viewport to another, i.e.
- * the two boxes should be aligned and differ only in translation + scaling.
- */
 Transform3D createTransformNormalize(const DoubleBoundingBox3D& in, const DoubleBoundingBox3D& out)
 {
 	// translate input bottomleft to origin, scale, translate back to output bottomleft.
@@ -243,12 +232,6 @@ Transform3D createTransformNormalize(const DoubleBoundingBox3D& in, const Double
 	return M;
 }
 
-/**Create a transform to a space defined by an origin and two perpendicular unit vectors that
- * for the x-y plane.
- * The original space is A and the space defined by ijc are B
- * The returned transform M_AB converts a point in B to A:
- * 		p_A = M_AB * p_B
- */
 Transform3D createTransformIJC(const Vector3D& ivec, const Vector3D& jvec, const Vector3D& center)
 {
 	Transform3D t = Transform3D::Identity();
@@ -258,6 +241,21 @@ Transform3D createTransformIJC(const Vector3D& ivec, const Vector3D& jvec, const
 	t.matrix().col(3).head(3) = center;
 	return t;
 }
+
+
+cxResource_EXPORT Transform3D createTransformLPS2RAS()
+{
+	return createTransformRotateZ(M_PI);
+}
+
+cxResource_EXPORT Transform3D createTransformFromReferenceToExternal(PATIENT_COORDINATE_SYSTEM external)
+{
+	if (external==pcsRAS)
+		return createTransformLPS2RAS();
+	else
+		return Transform3D::Identity();
+}
+
 
 
 } // namespace cx

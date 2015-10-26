@@ -59,9 +59,9 @@ namespace cx
 {
 
 
-UsReconstructionImplService::UsReconstructionImplService(ctkPluginContext *pluginContext, PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, XmlOptionFile settings) :
+UsReconstructionImplService::UsReconstructionImplService(ctkPluginContext *pluginContext, PatientModelServicePtr patientModelService, ViewServicePtr viewService, XmlOptionFile settings) :
 	mPatientModelService(patientModelService),
-	mVisualizationService(visualizationService)
+	mViewService(viewService)
 {
 	mSettings = settings;
 	mSettings.getElement("algorithms");
@@ -123,7 +123,7 @@ void UsReconstructionImplService::startReconstruction()
 	USReconstructInputData fileData = mOriginalFileData;
 	fileData.mUsRaw = mOriginalFileData.mUsRaw->copy();
 
-	ReconstructionExecuterPtr executer(new ReconstructionExecuter(mPatientModelService, mVisualizationService));
+	ReconstructionExecuterPtr executer(new ReconstructionExecuter(mPatientModelService, mViewService));
 	connect(executer.get(), SIGNAL(reconstructAboutToStart()), this, SIGNAL(reconstructAboutToStart()));
 	connect(executer.get(), SIGNAL(reconstructStarted()), this, SIGNAL(reconstructStarted()));
 	connect(executer.get(), SIGNAL(reconstructFinished()), this, SIGNAL(reconstructFinished()));
@@ -145,7 +145,6 @@ void UsReconstructionImplService::reconstructFinishedSlot()
 {
 	mOriginalFileData.mUsRaw->purgeAll();
 
-	std::set<cx::TimedAlgorithmPtr> retval;
 	for (unsigned i=0; i<mExecuters.size(); ++i)
 	{
 		if (mExecuters[i]->getThread()->isFinished())

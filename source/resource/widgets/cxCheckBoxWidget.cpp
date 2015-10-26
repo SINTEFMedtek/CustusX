@@ -92,6 +92,7 @@ void CheckBoxWidget::prePaintEvent()
 
 	mCheckBox->setChecked(mData->getValue());
 	mCheckBox->setToolTip(mData->getHelp());
+	mLabel->setToolTip(mData->getHelp());
 
 	mCheckBox->blockSignals(false);
 }

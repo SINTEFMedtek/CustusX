@@ -44,14 +44,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-SlicePropertiesWidget::SlicePropertiesWidget(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget* parent) :
-		TabbedWidget(parent, "SlicePropertiesWidget", "Slice Properties")
+SlicePropertiesWidget::SlicePropertiesWidget(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget* parent) :
+	TabbedWidget(parent, "SlicePropertiesWidget", "Slice Properties")
 {
 	this->setToolTip("2D Image properties");
-	this->insertWidgetAtTop(new DataSelectWidget(visualizationService, patientModelService, this, StringPropertyActiveImage::New(patientModelService)));
-  this->addTab(new VolumeInfoWidget(patientModelService, this), "Info");
-  this->addTab(new ColorWidget(patientModelService, this), "Color");
-  this->addTab(new OverlayWidget(patientModelService, this), "Overlay");
+	StringPropertyActiveDataPtr activeDataProperty = StringPropertyActiveData::New(patientModelService, "image|trackedStream");
+	this->insertWidgetAtTop(new DataSelectWidget(viewService, patientModelService, this, activeDataProperty));
+	this->addTab(new ColorWidget(patientModelService, this), "Color");
+	this->addTab(new OverlayWidget(patientModelService, viewService, this), "Overlay");
+//	this->addTab(new VolumeInfoWidget(patientModelService, this), "Info");//Not neccesary as this is part of Volume Properties?
 }
 
 SlicePropertiesWidget::~SlicePropertiesWidget()

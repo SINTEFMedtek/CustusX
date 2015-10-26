@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QFileInfo>
 #include <QTextStream>
 #include <QDomElement>
+#include <QDataStream>
 #include <QStringList>
 #include <QMutex>
 #include <QBuffer>
@@ -355,16 +356,26 @@ QDomElement XmlOptionFile::safeGetElement(QDomElement parent, QString childName)
 
 void XmlOptionFile::printDocument()
 {
-	QTextStream stream(stdout);
-	stream << "\n" << mDocument.toString(4) << "\n";
+    printDocument(mDocument);
 }
 
 void XmlOptionFile::printElement()
 {
-	QTextStream stream(stdout);
-	stream << "\n";
-	mCurrentElement.save(stream, 4);
-	stream << "\n";
+    printElement(mCurrentElement);
+}
+
+void XmlOptionFile::printDocument(QDomDocument document)
+{
+    QTextStream stream(stdout);
+    stream << "\nTEST" << document.toString(4) << "\n";
+}
+
+void XmlOptionFile::printElement(QDomElement element)
+{
+    QTextStream stream(stdout);
+    stream << "\n";
+    element.save(stream, 4);
+    stream << "\n";
 }
 
 QDomDocument XmlOptionFile::getDocument()

@@ -55,8 +55,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ElastixWidget::ElastixWidget(RegServices services, QWidget* parent) :
-	RegistrationBaseWidget(services, parent, "org_custusx_registration_method_commandline_elastix_widget", "ElastiX Registration")
+ElastixWidget::ElastixWidget(RegServicesPtr services, QWidget* parent) :
+	RegistrationBaseWidget(services, parent, "org_custusx_registration_method_commandline_elastix_widget", "ElastiX Registration"),
+	mRegisterButton(NULL),
+	mParameterFileWidget0(NULL),
+	mFilePreviewWidget(NULL),
+	mTimedAlgorithmProgressBar(NULL),
+	mOptionsWidget(NULL)
 {
 	this->setModified();
 }
@@ -89,9 +94,9 @@ void ElastixWidget::createUI()
 	QGridLayout* entryLayout = new QGridLayout;
 	entryLayout->setColumnStretch(1, 1);
 
-	mFixedImage.reset(new StringPropertyRegistrationFixedImage(mServices.registrationService, mServices.patientModelService));
+	mFixedImage.reset(new StringPropertyRegistrationFixedImage(mServices->registration(), mServices->patient()));
 	new LabeledComboBoxWidget(this, mFixedImage, entryLayout, 0);
-	mMovingImage.reset(new StringPropertyRegistrationMovingImage(mServices.registrationService, mServices.patientModelService));
+	mMovingImage.reset(new StringPropertyRegistrationMovingImage(mServices->registration(), mServices->patient()));
 	new LabeledComboBoxWidget(this, mMovingImage, entryLayout, 1);
 
 	new LabeledComboBoxWidget(this, mElastixManager->getParameters()->getCurrentPreset(), entryLayout, 2);

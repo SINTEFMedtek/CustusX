@@ -57,8 +57,18 @@ RecordSessionPtr AcquisitionService::getSession(QString uid)
             retval = sessions[i];
     }
 
-    if(!retval)
-        reporter()->sendError("Did not find an record session.");
+//    if(!retval)
+//		reporter()->sendError("Did not find record session " + uid);
 	return retval;
 }
+
+//void AcquisitionService::toggleRecord(AcquisitionService::TYPES context, QString category)
+//{
+//	if (this->getState()==AcquisitionService::sRUNNING)
+//		this->stopRecord();
+//	else
+//		this->startRecord(context, category);
+//}
+
+
 } //cx

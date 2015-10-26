@@ -45,8 +45,6 @@ namespace cx
 AcquisitionImplService::AcquisitionImplService(ctkPluginContext *context) :
 	mContext(context),
 	mUsReconstructService(new UsReconstructionServiceProxy(context))
-//	mPatientModelService(new PatientModelServiceProxy(context)),
-//	mSession(SessionStorageServiceProxy::create(context))
 {
 	mServices = VisServices::create(context);
 	mAcquisitionData.reset(new AcquisitionData(mServices, mUsReconstructService));
@@ -57,6 +55,7 @@ AcquisitionImplService::AcquisitionImplService(ctkPluginContext *context) :
 	connect(mAcquisition.get(), &Acquisition::cancelled, this, &AcquisitionService::cancelled);
 	connect(mAcquisition.get(), &Acquisition::stateChanged, this, &AcquisitionService::stateChanged);
 	connect(mAcquisition.get(), &Acquisition::acquisitionStopped, this, &AcquisitionService::acquisitionStopped);
+	connect(mAcquisition.get(), &Acquisition::readinessChanged, this, &AcquisitionService::usReadinessChanged);
 
 	connect(mAcquisitionData.get(), &AcquisitionData::recordedSessionsChanged, this, &AcquisitionService::recordedSessionsChanged);
 
@@ -64,9 +63,9 @@ AcquisitionImplService::AcquisitionImplService(ctkPluginContext *context) :
 	connect(mUsAcquisition.get(), &USAcquisition::saveDataCompleted, this, &AcquisitionService::saveDataCompleted);
 	connect(mUsAcquisition.get(), &USAcquisition::readinessChanged, this, &AcquisitionService::usReadinessChanged);
 
-	connect(mServices->getSession().get(), &SessionStorageService::cleared, this, &AcquisitionImplService::duringClearPatientSlot);
-	connect(mServices->getSession().get(), &SessionStorageService::isLoading, this, &AcquisitionImplService::duringLoadPatientSlot);
-	connect(mServices->getSession().get(), &SessionStorageService::isSaving, this, &AcquisitionImplService::duringSavePatientSlot);
+	connect(mServices->session().get(), &SessionStorageService::cleared, this, &AcquisitionImplService::duringClearPatientSlot);
+	connect(mServices->session().get(), &SessionStorageService::isLoading, this, &AcquisitionImplService::duringLoadPatientSlot);
+	connect(mServices->session().get(), &SessionStorageService::isSaving, this, &AcquisitionImplService::duringSavePatientSlot);
 }
 
 AcquisitionImplService::~AcquisitionImplService()
@@ -89,11 +88,6 @@ void AcquisitionImplService::duringSavePatientSlot(QDomElement& node)
 	XMLNodeAdder root(node);
 	QDomElement managerNode = root.descend("managers").node().toElement();
 	this->addXml(managerNode);
-
-//	QDomElement managerNode = mPatientModelService->getCurrentWorkingElement("managers");
-//	if(managerNode.isNull())
-//		reportWarning("AcquisitionImplService::duringSavePatientSlot() Try managers node. Got null node");
-//	this->addXml(managerNode);
 }
 
 void AcquisitionImplService::duringLoadPatientSlot(QDomElement& node)
@@ -102,11 +96,6 @@ void AcquisitionImplService::duringLoadPatientSlot(QDomElement& node)
 	QDomElement stateManagerNode = root.descend("managers/stateManager").node().toElement();
 	if (!stateManagerNode.isNull())
 		this->parseXml(stateManagerNode);
-
-//	QDomElement stateManagerNode = mPatientModelService->getCurrentWorkingElement("managers/stateManager");
-//	if(stateManagerNode.isNull())
-//		reportWarning("AcquisitionImplService::duringSavePatientSlot() Try stateManagerNode node. Got null node");
-//	this->parseXml(stateManagerNode);
 }
 
 RecordSessionPtr AcquisitionImplService::getLatestSession()
@@ -119,14 +108,26 @@ std::vector<RecordSessionPtr> AcquisitionImplService::getSessions()
 	return mAcquisition->getPluginData()->getRecordSessions();
 }
 
-bool AcquisitionImplService::isReady() const
+bool AcquisitionImplService::isReady(TYPES context) const
 {
-	return mUsAcquisition->isReady();
+	return mUsAcquisition->isReady(context)
+			&& mAcquisition->isReady(context);
 }
 
-QString AcquisitionImplService::getInfoText() const
+QString AcquisitionImplService::getInfoText(TYPES context) const
 {
-	return mUsAcquisition->getInfoText();
+	QString text;
+	text = mAcquisition->getInfoText(context) + "<br>" + mUsAcquisition->getInfoText(context);
+
+	// remove redundant line breaks
+	QStringList list = text.split("<br>", QString::SkipEmptyParts);
+	text = list.join("<br>");
+
+	//Make sure we have at least 2 lines to avoid "bouncing buttons"
+	if (list.size() < 2)
+		text.append("<br>");
+
+	return text;
 }
 
 AcquisitionService::STATE AcquisitionImplService::getState() const
@@ -134,14 +135,9 @@ AcquisitionService::STATE AcquisitionImplService::getState() const
 	return mAcquisition->getState();
 }
 
-void AcquisitionImplService::toggleRecord()
+void AcquisitionImplService::startRecord(TYPES context, QString category, RecordSessionPtr session)
 {
-	mAcquisition->toggleRecord();
-}
-
-void AcquisitionImplService::startRecord()
-{
-	mAcquisition->startRecord();
+	mAcquisition->startRecord(context, category, session);
 }
 
 void AcquisitionImplService::stopRecord()

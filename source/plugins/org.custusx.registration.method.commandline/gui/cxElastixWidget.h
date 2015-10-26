@@ -66,7 +66,7 @@ class ElastixWidget: public RegistrationBaseWidget
 {
 Q_OBJECT
 public:
-	ElastixWidget(RegServices services, QWidget* parent = NULL);
+	ElastixWidget(RegServicesPtr services, QWidget* parent = NULL);
 	virtual ~ElastixWidget();
 
 public slots:

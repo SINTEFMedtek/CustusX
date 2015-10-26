@@ -53,7 +53,7 @@ class cxResourceWidgets_EXPORT OptionsWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	OptionsWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent);
+	OptionsWidget(ViewServicePtr viewService, PatientModelServicePtr patientModelService, QWidget* parent);
 
 	/**
 	  * Set options for a given uid. Setting different uid will change the widget
@@ -77,7 +77,7 @@ private:
 	std::vector<PropertyPtr> mOptions;
 	QString mUid;
 	bool mShowAdvanced;
-	VisualizationServicePtr mVisualizationService;
+	ViewServicePtr mViewService;
 	PatientModelServicePtr mPatientModelService;
 };
 } /* namespace cx */

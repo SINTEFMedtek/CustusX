@@ -60,8 +60,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-MetricBase::MetricBase(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService) :
-	mVisualizationService(visualizationService),
+MetricBase::MetricBase(ViewServicePtr viewService, PatientModelServicePtr patientModelService) :
+	mViewService(viewService),
 	mPatientModelService(patientModelService)
 {
 }
@@ -85,7 +85,7 @@ void MetricBase::addColorWidget(QVBoxLayout* layout)
 													 "Set color of metric",
 													 this->getData()->getColor(), QDomNode());
 	QHBoxLayout* line = new QHBoxLayout;
-	line->addWidget(createDataWidget(mVisualizationService, mPatientModelService, NULL, mColorSelector));
+	line->addWidget(createDataWidget(mViewService, mPatientModelService, NULL, mColorSelector));
 	line->addStretch();
 	line->setMargin(0);
 	layout->addLayout(line);
@@ -197,18 +197,18 @@ void MetricReferenceArgumentListGui::update()
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-PointMetricWrapper::PointMetricWrapper(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, PointMetricPtr data) :
-	MetricBase(visualizationService, patientModelService),
+PointMetricWrapper::PointMetricWrapper(ViewServicePtr viewService, PatientModelServicePtr patientModelService, PointMetricPtr data) :
+	MetricBase(viewService, patientModelService),
 	mData(data)
 {
 	mInternalUpdate = false;
-	connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
-	connect(mPatientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataChangedSlot()));
+//	connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
+//	connect(mPatientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataChangedSlot()));
 }
 
 PointMetricWrapper::~PointMetricWrapper()
 {
-	disconnect(mPatientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataChangedSlot()));
+//	disconnect(mPatientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataChangedSlot()));
 }
 
 QWidget* PointMetricWrapper::createWidget()
@@ -231,7 +231,7 @@ QWidget* PointMetricWrapper::createWidget()
 
 	this->addColorWidget(topLayout);
 	topLayout->addStretch();
-	this->dataChangedSlot();
+//	this->dataChangedSlot();
 
 	return widget;
 }
@@ -319,9 +319,9 @@ void PointMetricWrapper::coordinateChanged()
 	mData->setCoordinate(mCoordinate->getValue());
 }
 
-void PointMetricWrapper::dataChangedSlot()
-{
-}
+//void PointMetricWrapper::dataChangedSlot()
+//{
+//}
 
 void PointMetricWrapper::update()
 {
@@ -335,8 +335,8 @@ void PointMetricWrapper::update()
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-PlaneMetricWrapper::PlaneMetricWrapper(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, PlaneMetricPtr data) :
-	MetricBase(visualizationService, patientModelService),
+PlaneMetricWrapper::PlaneMetricWrapper(ViewServicePtr viewService, PatientModelServicePtr patientModelService, PlaneMetricPtr data) :
+	MetricBase(viewService, patientModelService),
 	mData(data)
 {
 	mArguments.setArguments(data->getArguments());
@@ -386,7 +386,7 @@ QString PlaneMetricWrapper::getArguments() const
 
 void PlaneMetricWrapper::dataChangedSlot()
 {
-	mInternalUpdate = true;
+//	mInternalUpdate = true;
 	mInternalUpdate = false;
 }
 
@@ -399,8 +399,8 @@ void PlaneMetricWrapper::update()
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-DistanceMetricWrapper::DistanceMetricWrapper(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, DistanceMetricPtr data) :
-	MetricBase(visualizationService, patientModelService),
+DistanceMetricWrapper::DistanceMetricWrapper(ViewServicePtr viewService, PatientModelServicePtr patientModelService, DistanceMetricPtr data) :
+	MetricBase(viewService, patientModelService),
 	mData(data)
 {
 	mArguments.setArguments(data->getArguments());
@@ -443,7 +443,7 @@ QString DistanceMetricWrapper::getArguments() const
 
 void DistanceMetricWrapper::dataChangedSlot()
 {
-	mInternalUpdate = true;
+//	mInternalUpdate = true;
 	mInternalUpdate = false;
 }
 
@@ -457,8 +457,8 @@ void DistanceMetricWrapper::update()
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-AngleMetricWrapper::AngleMetricWrapper(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, AngleMetricPtr data) :
-	MetricBase(visualizationService, patientModelService),
+AngleMetricWrapper::AngleMetricWrapper(ViewServicePtr viewService, PatientModelServicePtr patientModelService, AngleMetricPtr data) :
+	MetricBase(viewService, patientModelService),
 	mData(data)
 {
 	mArguments.setArguments(data->getArguments());
@@ -484,7 +484,7 @@ QWidget* AngleMetricWrapper::createWidget()
 	mArguments.addWidgets(hLayout);
 
 	mUseSimpleVisualization =  this->createUseSimpleVisualizationSelector();
-	topLayout->addWidget(createDataWidget(mVisualizationService, mPatientModelService, widget, mUseSimpleVisualization));
+	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mUseSimpleVisualization));
 
 	this->addColorWidget(topLayout);
 	topLayout->addStretch();
@@ -541,8 +541,8 @@ void AngleMetricWrapper::update()
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-DonutMetricWrapper::DonutMetricWrapper(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, DonutMetricPtr data) :
-	MetricBase(visualizationService, patientModelService),
+DonutMetricWrapper::DonutMetricWrapper(ViewServicePtr viewService, PatientModelServicePtr patientModelService, DonutMetricPtr data) :
+	MetricBase(viewService, patientModelService),
 	mData(data)
 {
 	mArguments.setArguments(data->getArguments());
@@ -562,13 +562,13 @@ QWidget* DonutMetricWrapper::createWidget()
 	mArguments.addWidgets(hLayout);
 
 	mRadius =  this->createRadiusSelector();
-	topLayout->addWidget(createDataWidget(mVisualizationService, mPatientModelService, widget, mRadius));
+	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mRadius));
 	mThickness =  this->createThicknessSelector();
-	topLayout->addWidget(createDataWidget(mVisualizationService, mPatientModelService, widget, mThickness));
+	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mThickness));
 	mFlat =  this->createFlatSelector();
-	topLayout->addWidget(createDataWidget(mVisualizationService, mPatientModelService, widget, mFlat));
+	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mFlat));
 	mHeight =  this->createHeightSelector();
-	topLayout->addWidget(createDataWidget(mVisualizationService, mPatientModelService, widget, mHeight));
+	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mHeight));
 
 	this->addColorWidget(topLayout);
 	topLayout->addStretch();
@@ -691,8 +691,8 @@ BoolPropertyPtr DonutMetricWrapper::createFlatSelector() const
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-SphereMetricWrapper::SphereMetricWrapper(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, SphereMetricPtr data) :
-	MetricBase(visualizationService, patientModelService),
+SphereMetricWrapper::SphereMetricWrapper(ViewServicePtr viewService, PatientModelServicePtr patientModelService, SphereMetricPtr data) :
+	MetricBase(viewService, patientModelService),
 	mData(data)
 {
 	mArguments.setArguments(data->getArguments());
@@ -712,7 +712,7 @@ QWidget* SphereMetricWrapper::createWidget()
 	mArguments.addWidgets(hLayout);
 
 	mRadius =  this->createRadiusSelector();
-	topLayout->addWidget(createDataWidget(mVisualizationService, mPatientModelService, widget, mRadius));
+	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mRadius));
 
 	this->addColorWidget(topLayout);
 	topLayout->addStretch();

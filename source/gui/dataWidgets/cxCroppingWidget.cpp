@@ -52,16 +52,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxViewGroupData.h"
 #include "cxReporter.h"
+#include "cxActiveData.h"
 
 namespace cx
 {
 
-CroppingWidget::CroppingWidget(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget* parent) :
+CroppingWidget::CroppingWidget(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget* parent) :
 		BaseWidget(parent, "CroppingWidget", "Crop"),
 		mPatientModelService(patientModelService),
-		mVisualizationService(visualizationService)
+		mViewService(viewService)
 {
-	connect(visualizationService.get(), &ViewService::activeLayoutChanged, this, &CroppingWidget::setupUI);
+	connect(viewService.get(), &ViewService::activeLayoutChanged, this, &CroppingWidget::setupUI);
 	this->setupUI();
 }
 
@@ -135,22 +136,23 @@ void CroppingWidget::cropperChangedSlot()
 
 ImagePtr CroppingWidget::cropClipButtonClickedSlot()
 {
-  ImagePtr image = mPatientModelService->getActiveImage();
+	ActiveDataPtr activeData = mPatientModelService->getActiveData();
+	ImagePtr image = activeData->getActive<Image>();
 
-  ImagePtr retval = cropImage(patientService(), image);
-  mPatientModelService->insertData(retval);
+	ImagePtr retval = cropImage(patientService(), image);
+	mPatientModelService->insertData(retval);
 
-  this->hideOldAndShowNewVolume(image, retval);
+	this->hideOldAndShowNewVolume(image, retval);
 
-  return retval;
+	return retval;
 }
 
 void CroppingWidget::hideOldAndShowNewVolume(ImagePtr oldImage, ImagePtr newImage)
 {
-//	int groupNr = mVisualizationService->getActiveGroup();//Gives -1 when we are inside the CroppingWidget
+//	int groupNr = mViewService->getActiveGroup();//Gives -1 when we are inside the CroppingWidget
 	int groupNr = 0;
 
-	ViewGroupDataPtr viewGroup = mVisualizationService->getGroup(0);
+	ViewGroupDataPtr viewGroup = mViewService->getGroup(0);
 	if(!viewGroup)
 	{
 		reportWarning(QString("CroppingWidget: Hide old and show new volume failed. Can't get view group %1.").arg(groupNr));

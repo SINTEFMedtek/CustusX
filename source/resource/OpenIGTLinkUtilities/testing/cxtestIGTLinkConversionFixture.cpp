@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxtestIGTLinkConversionFixture.h"
+#include "cxIGTLinkConversionSonixCXLegacy.h"
 
 #include "catch.hpp"
 
@@ -92,8 +93,8 @@ void IGTLinkConversionFixture::testDecodeEncodeColorImage(Val3VectorType values,
     cx::ImagePtr input(new cx::Image(QString("%1 [%2]").arg(coreUid).arg(colorFormat), rawImage));
     input->setAcquisitionTime(time);
 
-    cx::IGTLinkConversion converter;
-    cx::IGTLinkImageMessage::Pointer msg = converter.encode(input);
+	cx::IGTLinkConversionSonixCXLegacy converter;
+	igtl::ImageMessage::Pointer msg = converter.encode(input);
     cx::ImagePtr output = converter.decode(msg);
 
     CHECK(output);

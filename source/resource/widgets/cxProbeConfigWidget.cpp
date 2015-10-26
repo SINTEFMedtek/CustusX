@@ -55,7 +55,7 @@ ProbeConfigWidget::ProbeConfigWidget(VisServicesPtr services, QWidget* parent) :
 	this->setToolTip("Edit ultrasound probe configuration");
 
 	QVBoxLayout* topLayout = new QVBoxLayout(this);
-	TrackingServicePtr ts = mServices->getToolManager();
+	TrackingServicePtr ts = mServices->tracking();
 	mActiveProbeConfig = StringPropertyActiveProbeConfiguration::New(ts);
 	connect(mActiveProbeConfig.get(), &StringPropertyActiveProbeConfiguration::changed, this, &ProbeConfigWidget::activeProbeConfigurationChangedSlot);
 	mActiveProbeConfigWidget = new LabeledComboBoxWidget(this, mActiveProbeConfig);
@@ -216,7 +216,7 @@ void ProbeConfigWidget::activeProbeConfigurationChangedSlot()
 	cx::ProbePtr probe = mActiveProbeConfig->getTool()->getProbe();
 	if (!probe)
 		return;
-	ProbeDefinition data = probe->getProbeData();
+	ProbeDefinition data = probe->getProbeDefinition();
 	mUpdating= true;
 
 	DoubleBoundingBox3D range(0, data.getSize().width(), 0, data.getSize().height());
@@ -261,7 +261,7 @@ void ProbeConfigWidget::guiProbeSectorChanged()
 	cx::ProbePtr probe = mActiveProbeConfig->getTool()->getProbe();
 	if (!probe)
 		return;
-	ProbeDefinition data = probe->getProbeData();
+	ProbeDefinition data = probe->getProbeDefinition();
 
 //	double sx = data.getSpacing()[0]; // mm/pix
 	double sy = data.getSpacing()[1];
@@ -271,7 +271,7 @@ void ProbeConfigWidget::guiProbeSectorChanged()
 	if (mSyncBoxToSector->isChecked())
 		data.updateClipRectFromSector();
 
-	probe->setProbeSector(data);
+	probe->setProbeDefinition(data);
 }
 
 void ProbeConfigWidget::guiImageSettingsChanged()
@@ -284,11 +284,11 @@ void ProbeConfigWidget::guiImageSettingsChanged()
 	cx::ProbePtr probe = mActiveProbeConfig->getTool()->getProbe();
 	if (!probe)
 		return;
-	ProbeDefinition data = probe->getProbeData();
+	ProbeDefinition data = probe->getProbeDefinition();
 
 	data.setClipRect_p(mBBWidget->getValue());
 
-	probe->setProbeSector(data);
+	probe->setProbeDefinition(data);
 }
 
 void ProbeConfigWidget::guiOriginSettingsChanged()
@@ -301,7 +301,7 @@ void ProbeConfigWidget::guiOriginSettingsChanged()
 	cx::ProbePtr probe = mActiveProbeConfig->getTool()->getProbe();
 	if (!probe)
 		return;
-	ProbeDefinition data = probe->getProbeData();
+	ProbeDefinition data = probe->getProbeDefinition();
 
 	// if sync: move clip rect accordingly
 	if (mSyncBoxToSector->isChecked())
@@ -313,7 +313,7 @@ void ProbeConfigWidget::guiOriginSettingsChanged()
 
 	data.setOrigin_p(mOrigin->getValue());
 
-	probe->setProbeSector(data);
+	probe->setProbeDefinition(data);
 }
 
 

@@ -27,6 +27,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
     Data/cxLandmark
     Data/cxActiveImageProxy
     Data/cxTrackedStream
+    Data/cxActiveData
 
     Video/cxVideoSource.h
     Video/cxVideoRecorder
@@ -35,6 +36,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
     Video/cxVideoService
     Video/cxStreamerService
     Video/cxBasicVideoSource
+	Video/cxStringPropertyActiveVideoSource
 
     Tool/cxTool
     Tool/cxToolProxy
@@ -50,6 +52,9 @@ cx_add_class_qt_moc(cxResource_SOURCE
     Tool/cxTrackingService
     Tool/cxActiveToolProxy
     Tool/cxTrackingSystemService.h
+    Tool/cxTracker
+    Tool/cxManualToolAdapter
+    Tool/cxPlaybackTool
 
 	properties/cxProperty
 	properties/cxPropertyNull.h
@@ -94,6 +99,9 @@ cx_add_class_qt_moc(cxResource_SOURCE
     settings/cxStateServiceProxy
     settings/cxSessionStorageService
 	settings/cxProfile
+	settings/cxPatientStorage
+    settings/cxWorkflowStateMachine
+    settings/cxWorkflowState
 
     algorithms/cxTimedAlgorithm.h
     algorithms/cxThreadedTimedAlgorithm.h
@@ -107,10 +115,14 @@ cx_add_class_qt_moc(cxResource_SOURCE
     utilities/cxSpaceListenerImpl
     utilities/cxSyncedValue
     utilities/cxSpaceProvider
+    utilities/cxSocket
+    utilities/cxSocketConnection
 
     patientModel/cxPatientModelService
 
     usReconstructionTypes/cxSavingVideoRecorder
+
+	network/cxNetworkService
 )
 
 cx_add_class(cxResource_SOURCE
@@ -119,15 +131,18 @@ cx_add_class(cxResource_SOURCE
     cxCoreServices
 
     Tool/cxProbeSector
-    Tool/cxProbeData
+    Tool/cxProbeDefinition
     Tool/ProbeXmlConfigParser.h
     Tool/ProbeXmlConfigParserImpl
     Tool/ProbeXmlConfigParserMock
-    Tool/cxCreateProbeDataFromConfiguration
+    Tool/cxCreateProbeDefinitionFromConfiguration
     Tool/cxTrackingPositionFilter
     Tool/cxTrackerConfiguration
     Tool/cxToolNull
     Tool/cxProbeImpl
+    Tool/cxToolFileParser
+    Tool/cxToolConfigurationParser
+    Tool/cxTrackerConfigurationImpl
 
     Data/cxDataMetric
     Data/cxDataReaderWriter
@@ -199,6 +214,8 @@ cx_add_class(cxResource_SOURCE
     settings/cxDataLocations
     settings/cxSettings
     settings/cxSessionStorageServiceProxy
+    settings/cxRequestEnterStateTransition.h
+    settings/cxStateServiceBackend
 
     vesselReg/SeansVesselReg.cxx
     vesselReg/SeansVesselReg.hxx
@@ -299,6 +316,7 @@ target_include_directories(cxResource
     ./utilities
     ./registration
     ./patientModel
+	./network
     ./usReconstructionTypes
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}/settings

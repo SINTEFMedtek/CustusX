@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-LandmarkListener::LandmarkListener(RegServices services) :
+LandmarkListener::LandmarkListener(RegServicesPtr services) :
 	mServices(services),
 	mImage2Image(false),
 	mUseOnlyOneSourceUpdatedFromOutside(false)
@@ -47,14 +47,14 @@ LandmarkListener::LandmarkListener(RegServices services) :
 	mFixedLandmarkSource = ImageLandmarksSource::New();
 	mMovingLandmarkSource = ImageLandmarksSource::New();
 
-	connect(mServices.registrationService.get(), &RegistrationService::fixedDataChanged, this, &LandmarkListener::updateFixed);
-	connect(mServices.registrationService.get(), &RegistrationService::movingDataChanged, this, &LandmarkListener::updateMoving);
+	connect(mServices->registration().get(), &RegistrationService::fixedDataChanged, this, &LandmarkListener::updateFixed);
+	connect(mServices->registration().get(), &RegistrationService::movingDataChanged, this, &LandmarkListener::updateMoving);
 }
 
 LandmarkListener::~LandmarkListener()
 {
-	disconnect(mServices.registrationService.get(), &RegistrationService::fixedDataChanged, this, &LandmarkListener::updateFixed);
-	disconnect(mServices.registrationService.get(), &RegistrationService::movingDataChanged, this, &LandmarkListener::updateMoving);
+	disconnect(mServices->registration().get(), &RegistrationService::fixedDataChanged, this, &LandmarkListener::updateFixed);
+	disconnect(mServices->registration().get(), &RegistrationService::movingDataChanged, this, &LandmarkListener::updateMoving);
 }
 
 void LandmarkListener::useI2IRegistration(bool useI2I)
@@ -65,19 +65,19 @@ void LandmarkListener::useI2IRegistration(bool useI2I)
 void LandmarkListener::useOnlyOneSourceUpdatedFromOutside(bool useOnlyOneSourceUpdatedFromOutside)
 {
 	mUseOnlyOneSourceUpdatedFromOutside = useOnlyOneSourceUpdatedFromOutside;
-	disconnect(mServices.registrationService.get(), &RegistrationService::fixedDataChanged, this, &LandmarkListener::updateFixed);
-	disconnect(mServices.registrationService.get(), &RegistrationService::movingDataChanged, this, &LandmarkListener::updateMoving);
+	disconnect(mServices->registration().get(), &RegistrationService::fixedDataChanged, this, &LandmarkListener::updateFixed);
+	disconnect(mServices->registration().get(), &RegistrationService::movingDataChanged, this, &LandmarkListener::updateMoving);
 }
 
 
 void LandmarkListener::updateFixed()
 {
-	mFixedLandmarkSource->setData(mServices.registrationService->getFixedData());
+	mFixedLandmarkSource->setData(mServices->registration()->getFixedData());
 }
 
 void LandmarkListener::updateMoving()
 {
-	mMovingLandmarkSource->setData(mServices.registrationService->getMovingData());
+	mMovingLandmarkSource->setData(mServices->registration()->getMovingData());
 }
 
 void LandmarkListener::setLandmarkSource(DataPtr data)
@@ -94,10 +94,10 @@ DataPtr LandmarkListener::getLandmarkSource()
 
 void LandmarkListener::showRep()
 {
-	if(!mServices.visualizationService->get3DView(0, 0))
+	if(!mServices->view()->get3DView(0, 0))
 		return;
 
-	LandmarkRepPtr rep = mServices.visualizationService->get3DReps(0, 0)->findFirst<LandmarkRep>();
+	LandmarkRepPtr rep = mServices->view()->get3DReps(0, 0)->findFirst<LandmarkRep>();
 
 	if (rep)
 	{
@@ -110,16 +110,16 @@ void LandmarkListener::showRep()
 		else if(mImage2Image)
 			rep->setSecondarySource(mMovingLandmarkSource);//I2I reg
 		else
-			rep->setSecondarySource(PatientLandmarksSource::New(mServices.patientModelService));//I2P reg
+			rep->setSecondarySource(PatientLandmarksSource::New(mServices->patient()));//I2P reg
 	}
 }
 
 void LandmarkListener::hideRep()
 {
-	if(!mServices.visualizationService->get3DView(0, 0))
+	if(!mServices->view()->get3DView(0, 0))
 		return;
 
-	LandmarkRepPtr rep = mServices.visualizationService->get3DReps(0, 0)->findFirst<LandmarkRep>();
+	LandmarkRepPtr rep = mServices->view()->get3DReps(0, 0)->findFirst<LandmarkRep>();
 	if (rep)
 	{
 		rep->setPrimarySource(LandmarksSourcePtr());

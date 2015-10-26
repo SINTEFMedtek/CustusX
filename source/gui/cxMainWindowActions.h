@@ -41,7 +41,6 @@ private slots:
 	//data menu
 	void exportDataSlot();
 	void importDataSlot(); ///< loads data(images) into the datamanager
-	void deleteDataSlot(); ///< deletes data(image) from the patient
 
 	void togglePointPickerActionSlot();
 	void updatePointPickerActionSlot();

@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkImageData.h>
 #include "cxImage.h"
 #include "cxUtilHelpers.h"
-#include "cxCreateProbeDataFromConfiguration.h"
+#include "cxCreateProbeDefinitionFromConfiguration.h"
 #include "cxVolumeHelpers.h"
 #include "cxUSFrameData.h"
 
@@ -79,22 +79,22 @@ USReconstructInputData UsReconstructionFileReader::readAllFiles(QString fileName
   //Read US images
   retval.mUsRaw = this->readUsDataFile(fileName);
 
-  std::pair<QString, ProbeDefinition>  probeDataFull = this->readProbeDataBackwardsCompatible(changeExtension(fileName, "mhd"), calFilesPath);
-  ProbeDefinition  probeData = probeDataFull.second;
+  std::pair<QString, ProbeDefinition>  probeDefinitionFull = this->readProbeDefinitionBackwardsCompatible(changeExtension(fileName, "mhd"), calFilesPath);
+  ProbeDefinition  probeDefinition = probeDefinitionFull.second;
   // override spacing with spacing from image file. This is because the raw spacing from probe calib might have been changed by changing the sound speed.
-	bool spacingOK = similar(probeData.getSpacing()[0], retval.mUsRaw->getSpacing()[0], 0.001)
-								&& similar(probeData.getSpacing()[1], retval.mUsRaw->getSpacing()[1], 0.001);
+    bool spacingOK = similar(probeDefinition.getSpacing()[0], retval.mUsRaw->getSpacing()[0], 0.001)
+                                && similar(probeDefinition.getSpacing()[1], retval.mUsRaw->getSpacing()[1], 0.001);
   if (!spacingOK)
   {
       reportWarning(""
     	  "Mismatch in spacing values from calibration and recorded image.\n"
     	  "This might be valid if the sound speed was changed prior to recording.\n"
-				"Probe definition: "+ qstring_cast(probeData.getSpacing()) + ", Acquired Image: " + qstring_cast(retval.mUsRaw->getSpacing())
+                "Probe definition: "+ qstring_cast(probeDefinition.getSpacing()) + ", Acquired Image: " + qstring_cast(retval.mUsRaw->getSpacing())
     	  );
   }
-	probeData.setSpacing(Vector3D(retval.mUsRaw->getSpacing()));
-  retval.mProbeData.setData(probeData);
-  retval.mProbeUid = probeDataFull.first;
+    probeDefinition.setSpacing(Vector3D(retval.mUsRaw->getSpacing()));
+  retval.mProbeDefinition.setData(probeDefinition);
+  retval.mProbeUid = probeDefinitionFull.first;
 
   retval.mFrames = this->readFrameTimestamps(fileName);
   retval.mPositions = this->readPositions(fileName);
@@ -130,9 +130,9 @@ bool UsReconstructionFileReader::valid(USReconstructInputData input)
  * or from ProbeCalibConfigs.xml file for backwards compatibility.
  *
  */
-std::pair<QString, ProbeDefinition>  UsReconstructionFileReader::readProbeDataBackwardsCompatible(QString mhdFileName, QString calFilesPath)
+std::pair<QString, ProbeDefinition>  UsReconstructionFileReader::readProbeDefinitionBackwardsCompatible(QString mhdFileName, QString calFilesPath)
 {
-	std::pair<QString, ProbeDefinition>  retval = this->readProbeDataFromFile(mhdFileName);
+	std::pair<QString, ProbeDefinition>  retval = this->readProbeDefinitionFromFile(mhdFileName);
 
 	if (retval.second.getType()==ProbeDefinition::tNONE)
 	{
@@ -141,7 +141,7 @@ std::pair<QString, ProbeDefinition>  UsReconstructionFileReader::readProbeDataBa
 		QStringList probeConfigPath;
 		this->readCustomMhdTags(mhdFileName, &probeConfigPath, &caliFilename);
 		ProbeXmlConfigParser::Configuration configuration = this->readProbeConfiguration(calFilesPath, probeConfigPath);
-		retval.second = createProbeDataFromConfiguration(configuration);
+		retval.second = createProbeDefinitionFromConfiguration(configuration);
 	}
 
 	return retval;
@@ -223,7 +223,7 @@ ProbeXmlConfigParser::Configuration UsReconstructionFileReader::readProbeConfigu
   return configuration;
 }
 
-std::pair<QString, ProbeDefinition> UsReconstructionFileReader::readProbeDataFromFile(QString mhdFileName)
+std::pair<QString, ProbeDefinition> UsReconstructionFileReader::readProbeDefinitionFromFile(QString mhdFileName)
 {
 	std::pair<QString, ProbeDefinition>  retval;
 	QString filename = changeExtension(mhdFileName, "probedata.xml");

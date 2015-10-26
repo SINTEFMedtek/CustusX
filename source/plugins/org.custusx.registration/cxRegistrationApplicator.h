@@ -57,12 +57,12 @@ public:
   RegistrationApplicator(const std::map<QString, DataPtr>& source);
   ~RegistrationApplicator();
 
-  virtual void updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data);
+  virtual void updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data, bool silent = false);
 
 private:
   std::map<QString, DataPtr> mSource;
   void changeParentSpace(QDateTime oldTime, std::vector<DataPtr> data, QString oldParentSpace, ParentSpace newParentSpace);
-  void updateTransform(QDateTime oldTime, std::vector<DataPtr> data, RegistrationTransform delta_pre_rMd);
+  void updateTransform(QDateTime oldTime, std::vector<DataPtr> data, RegistrationTransform delta_pre_rMd, bool silent = false);
   void changeParentSpace(QDateTime oldTime, DataPtr data, ParentSpace newParentSpace);
   QString generateNewSpaceUid() const;
 };

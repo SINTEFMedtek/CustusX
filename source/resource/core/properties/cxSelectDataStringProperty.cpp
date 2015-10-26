@@ -37,30 +37,62 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackedStream.h"
 #include "cxTypeConversions.h"
 #include "cxPatientModelServiceProxy.h"
+#include "cxActiveData.h"
 
 namespace cx
 {
+
+StringPropertyActiveData::StringPropertyActiveData(PatientModelServicePtr patientModelService, QString typeRegexp) :
+	SelectDataStringPropertyBase(patientModelService, typeRegexp)
+{
+	mValueName = "Active Data";
+	mHelp = "Select the active data obejct";
+
+	mActiveData = mPatientModelService->getActiveData();
+	connect(mActiveData.get(), &ActiveData::activeDataChanged, this, &StringPropertyActiveData::changed);
+}
+
+bool StringPropertyActiveData::setValue(const QString& value)
+{
+	DataPtr newData = mPatientModelService->getData(value);
+	if (newData == mActiveData->getActive())
+		return false;
+	mActiveData->setActive(newData);
+	return true;
+}
+
+QString StringPropertyActiveData::getValue() const
+{
+	QString retval = "";
+	DataPtr activeData = mActiveData->getActiveUsingRegexp(mTypeRegexp);
+
+	if(activeData)
+		retval = activeData->getUid();
+	return retval;
+}
 
 StringPropertyActiveImage::StringPropertyActiveImage(PatientModelServicePtr patientModelService) :
 	SelectDataStringPropertyBase(patientModelService, "image")
 {
 	mValueName = "Active Volume";
 	mHelp = "Select the active volume";
-	connect(mPatientModelService.get(), &PatientModelService::activeImageChanged, this, &StringPropertyActiveImage::changed);
+
+	mActiveData = mPatientModelService->getActiveData();
+	connect(mActiveData.get(), &ActiveData::activeImageChanged, this, &StringPropertyActiveImage::changed);
 }
 
 bool StringPropertyActiveImage::setValue(const QString& value)
 {
   ImagePtr newImage = mPatientModelService->getData<Image>(value);
-  if (newImage==mPatientModelService->getActiveImage())
+  if (newImage==mActiveData->getActive<Image>())
 	return false;
-  mPatientModelService->setActiveImage(newImage);
+  mActiveData->setActive(newImage);
   return true;
 }
 
 QString StringPropertyActiveImage::getValue() const
 {
-	return mPatientModelService->getActiveImageUid();
+	return mActiveData->getActiveImageUid();
 }
 
 //---------------------------------------------------------
@@ -99,8 +131,8 @@ ImagePtr StringPropertySelectImage::getImage()
 //---------------------------------------------------------
 
 
-StringPropertySelectData::StringPropertySelectData(PatientModelServicePtr patientModelService) :
-	SelectDataStringPropertyBase(patientModelService, ".*")
+StringPropertySelectData::StringPropertySelectData(PatientModelServicePtr patientModelService, QString typeRegexp) :
+	SelectDataStringPropertyBase(patientModelService, typeRegexp)
 {
 }
 
@@ -168,7 +200,7 @@ MeshPtr StringPropertySelectMesh::getMesh()
 //---------------------------------------------------------
 
 StringPropertySelectTrackedStream::StringPropertySelectTrackedStream(PatientModelServicePtr patientModelService) :
-	SelectDataStringPropertyBase(patientModelService, "TrackedStream")
+	SelectDataStringPropertyBase(patientModelService, "trackedStream")
 {
 	mValueName = "Select stream";
 	mHelp = "Select a tracked stream";

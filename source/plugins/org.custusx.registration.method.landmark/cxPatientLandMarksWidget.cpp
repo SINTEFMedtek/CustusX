@@ -46,20 +46,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxReporter.h"
 #include "cxLandmark.h"
-#include "cxViewGroupData.h"
 #include "cxImage.h"
+#include "cxActiveData.h"
 
 namespace cx
 {
 
-PatientLandMarksWidget::PatientLandMarksWidget(RegServices services,
+PatientLandMarksWidget::PatientLandMarksWidget(RegServicesPtr services,
 	QWidget* parent, QString objectName, QString windowTitle) :
 	LandmarkRegistrationWidget(services, parent, objectName, windowTitle),
 	mToolSampleButton(new QPushButton("Sample Tool", this))
 {
 	mLandmarkListener->useI2IRegistration(false);
 
-	connect(services.patientModelService.get(), &PatientModelService::rMprChanged, this, &PatientLandMarksWidget::setModified);
+	connect(services->patient().get(), &PatientModelService::rMprChanged, this, &PatientLandMarksWidget::setModified);
 
 	//buttons
 	mToolSampleButton->setDisabled(true);
@@ -67,26 +67,20 @@ PatientLandMarksWidget::PatientLandMarksWidget(RegServices services,
 
 	mRemoveLandmarkButton = new QPushButton("Clear", this);
 	mRemoveLandmarkButton->setToolTip("Clear selected landmark");
-	//  mRemoveLandmarkButton->setDisabled(true);
 	connect(mRemoveLandmarkButton, &QPushButton::clicked, this, &PatientLandMarksWidget::removeLandmarkButtonClickedSlot);
 
 	//toolmanager
-	mActiveToolProxy = ActiveToolProxy::New(services.trackingService);
+	mActiveToolProxy = ActiveToolProxy::New(services->tracking());
 	connect(mActiveToolProxy.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateToolSampleButton()));
 	connect(mActiveToolProxy.get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(updateToolSampleButton()));
 
 	connect(settings(), &Settings::valueChangedFor, this, &PatientLandMarksWidget::globalConfigurationFileChangedSlot);
 
 	//layout
-//	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mFixedProperty));
 	mVerticalLayout->addWidget(mLandmarkTableWidget);
 	mVerticalLayout->addWidget(mToolSampleButton);
 	mVerticalLayout->addWidget(mAvarageAccuracyLabel);
-
-	QHBoxLayout* buttonsLayout = new QHBoxLayout;
-//	buttonsLayout->addWidget(mRegisterButton);
-	buttonsLayout->addWidget(mRemoveLandmarkButton);
-	mVerticalLayout->addLayout(buttonsLayout);
+	mVerticalLayout->addWidget(mRemoveLandmarkButton);
 
 	this->updateToolSampleButton();
 }
@@ -103,13 +97,12 @@ void PatientLandMarksWidget::globalConfigurationFileChangedSlot(QString key)
 
 void PatientLandMarksWidget::updateToolSampleButton()
 {
-	ToolPtr tool = mServices.trackingService->getActiveTool();
+	ToolPtr tool = mServices->tracking()->getActiveTool();
 
-	bool enabled = false;
-	enabled = tool && tool->getVisible() && (!tool->hasType(Tool::TOOL_MANUAL) || settings()->value("giveManualToolPhysicalProperties").toBool()); // enable only for non-manual tools.
+	bool enabled = tool && tool->getVisible() && (!tool->hasType(Tool::TOOL_MANUAL) || settings()->value("giveManualToolPhysicalProperties").toBool()); // enable only for non-manual tools.
 	mToolSampleButton->setEnabled(enabled);
 
-	if (mServices.trackingService->getActiveTool())
+	if (mServices->tracking()->getActiveTool())
 		mToolSampleButton->setText("Sample " + qstring_cast(tool->getName()));
 	else
 		mToolSampleButton->setText("No tool");
@@ -117,7 +110,7 @@ void PatientLandMarksWidget::updateToolSampleButton()
 
 void PatientLandMarksWidget::toolSampleButtonClickedSlot()
 {
-	ToolPtr tool = mServices.trackingService->getActiveTool();
+	ToolPtr tool = mServices->tracking()->getActiveTool();
 
 	if (!tool)
 	{
@@ -129,10 +122,10 @@ void PatientLandMarksWidget::toolSampleButtonClickedSlot()
 	Vector3D p_pr = lastTransform_prMt.coord(Vector3D(0, 0, tool->getTooltipOffset()));
 
 	// TODO: do we want to allow sampling points not defined in image??
-	if (mActiveLandmark.isEmpty() && !mServices.patientModelService->getLandmarkProperties().empty())
-		mActiveLandmark = mServices.patientModelService->getLandmarkProperties().begin()->first;
+	if (mActiveLandmark.isEmpty() && !mServices->patient()->getLandmarkProperties().empty())
+		mActiveLandmark = mServices->patient()->getLandmarkProperties().begin()->first;
 
-	mServices.patientModelService->getPatientLandmarks()->setLandmark(Landmark(mActiveLandmark, p_pr));
+	mServices->patient()->getPatientLandmarks()->setLandmark(Landmark(mActiveLandmark, p_pr));
 	reporter()->playSampleSound();
 
 	this->activateLandmark(this->getNextLandmark());
@@ -142,22 +135,20 @@ void PatientLandMarksWidget::toolSampleButtonClickedSlot()
 
 void PatientLandMarksWidget::showEvent(QShowEvent* event)
 {
-//	std::cout << "PatientLandMarksWidget::showEvent" << std::endl;
-	mServices.visualizationService->getGroup(0)->setRegistrationMode(rsPATIENT_REGISTRATED);
+	mServices->view()->setRegistrationMode(rsPATIENT_REGISTRATED);
 	LandmarkRegistrationWidget::showEvent(event);
 }
 
 void PatientLandMarksWidget::hideEvent(QHideEvent* event)
 {
-//	std::cout << "PatientLandMarksWidget::hideEvent" << std::endl;
-	mServices.visualizationService->getGroup(0)->setRegistrationMode(rsNOT_REGISTRATED);
+	mServices->view()->setRegistrationMode(rsNOT_REGISTRATED);
 	LandmarkRegistrationWidget::hideEvent(event);
 }
 
 void PatientLandMarksWidget::removeLandmarkButtonClickedSlot()
 {
 	QString next = this->getNextLandmark();
-	mServices.patientModelService->getPatientLandmarks()->removeLandmark(mActiveLandmark);
+	mServices->patient()->getPatientLandmarks()->removeLandmark(mActiveLandmark);
 	this->activateLandmark(next);
 }
 
@@ -180,7 +171,7 @@ void PatientLandMarksWidget::prePaintEvent()
  */
 LandmarkMap PatientLandMarksWidget::getTargetLandmarks() const
 {
-	return mServices.patientModelService->getPatientLandmarks()->getLandmarks();
+	return mServices->patient()->getPatientLandmarks()->getLandmarks();
 }
 
 /** Return transform from target space to reference space
@@ -188,25 +179,26 @@ LandmarkMap PatientLandMarksWidget::getTargetLandmarks() const
  */
 Transform3D PatientLandMarksWidget::getTargetTransform() const
 {
-	Transform3D rMpr = mServices.patientModelService->get_rMpr();
+	Transform3D rMpr = mServices->patient()->get_rMpr();
 	return rMpr;
 }
 
 void PatientLandMarksWidget::setTargetLandmark(QString uid, Vector3D p_target)
 {
-	mServices.patientModelService->getPatientLandmarks()->setLandmark(Landmark(uid, p_target));
+	mServices->patient()->getPatientLandmarks()->setLandmark(Landmark(uid, p_target));
 	reporter()->playSampleSound();
 }
 
 void PatientLandMarksWidget::performRegistration()
 {
-	if (!mServices.registrationService->getFixedData())
-		mServices.registrationService->setFixedData(mServices.patientModelService->getActiveImage());
+	ActiveDataPtr activeData = mServices->patient()->getActiveData();
+	if (!mServices->registration()->getFixedData())
+		mServices->registration()->setFixedData(activeData->getActive<Image>());
 
-	if (mServices.patientModelService->getPatientLandmarks()->getLandmarks().size() < 3)
+	if (mServices->patient()->getPatientLandmarks()->getLandmarks().size() < 3)
 		return;
 
-	mServices.registrationService->doPatientRegistration();
+	mServices->registration()->doPatientRegistration();
 
 	this->updateAverageAccuracyLabel();
 }

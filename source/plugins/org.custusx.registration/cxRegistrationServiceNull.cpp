@@ -87,7 +87,17 @@ void RegistrationServiceNull::applyImage2ImageRegistration(Transform3D delta_pre
 	printWarning();
 }
 
+void RegistrationServiceNull::applyContinuousImage2ImageRegistration(Transform3D delta_pre_rMd, QString description)
+{
+	printWarning();
+}
+
 void RegistrationServiceNull::applyPatientRegistration(Transform3D rMpr_new, QString description)
+{
+	printWarning();
+}
+
+void RegistrationServiceNull::applyContinuousPatientRegistration(Transform3D rMpr_new, QString description)
 {
 	printWarning();
 }

@@ -60,8 +60,7 @@ typedef boost::shared_ptr<class ProcessedUSInputData> ProcessedUSInputDataPtr;
  * \{
  */
 
-//typedef class ReconstructionMethodService* ReconstructionMethodServicePtr;
-//typedef boost::shared_ptr<class ReconstructionMethodService> ReconstructionMethodServicePtr;
+typedef boost::shared_ptr<class ReconstructionMethodService> ReconstructionMethodServicePtr;
 
 /**
  * \brief Abstract interface for reconstruction algorithm.

@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-TransferFunctionAlphaWidget::TransferFunctionAlphaWidget(PatientModelServicePtr patientModelService, QWidget* parent) :
+TransferFunctionAlphaWidget::TransferFunctionAlphaWidget(ActiveDataPtr activeData, QWidget* parent) :
   BaseWidget(parent, "TransferFunctionAlphaWidget", "Alpha Transfer Function"),
   mBorder(5),
   mReadOnly(false)
@@ -60,7 +60,7 @@ TransferFunctionAlphaWidget::TransferFunctionAlphaWidget(PatientModelServicePtr 
 	this->setToolTip("Set the alpha part of a transfer function");
 	this->setFocusPolicy(Qt::StrongFocus);
 
-	mActiveImageProxy = ActiveImageProxy::New(patientModelService);
+	mActiveImageProxy = ActiveImageProxy::New(activeData);
   connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(activeImageTransferFunctionsChangedSlot()));
 
   mSelectedAlphaPoint.reset();
@@ -291,16 +291,14 @@ void TransferFunctionAlphaWidget::paintHistogram(QPainter& painter)
 
 	painter.setPen(QColor(140, 140, 210));
 
-	int x = 0;
-	int y = 0;
 	double numElementsInBinWithMostElements = log(histogram->GetOutput()->GetPointData()->GetScalars()->GetRange()[1]+1);
 	double barHeightMult = (this->height() - mBorder*2) / numElementsInBinWithMostElements;
 
 	double posMult = (this->width() - mBorder*2) / double(histogramSize);
 	for (int i = mImage->getMin(); i <= mImage->getMax(); i++)
 	{
-	  x = ((i- mImage->getMin()) * posMult); //Offset with min value
-	  y = log(double(static_cast<int*>(histogram->GetOutput()->GetScalarPointer(i - mImage->getMin(), 0, 0))[0]+1)) * barHeightMult;
+	  int x = ((i- mImage->getMin()) * posMult); //Offset with min value
+	  int y = log(double(static_cast<int*>(histogram->GetOutput()->GetScalarPointer(i - mImage->getMin(), 0, 0))[0]+1)) * barHeightMult;
 	  if (y > 0)
 	  {
 		painter.drawLine(x + mBorder, height() - mBorder,

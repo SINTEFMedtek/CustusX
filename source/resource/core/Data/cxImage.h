@@ -148,18 +148,13 @@ public:
 	{
 		return "image";
 	}
+	virtual QIcon getIcon() {return QIcon(":/icons/volume.png");}
 
 	// methods for defining and storing a cropping box. Image does not use these data, this is up to the mapper
 	virtual void setCropping(bool on);
 	virtual bool getCropping() const;
 	virtual void setCroppingBox(const DoubleBoundingBox3D& bb_d);
 	virtual DoubleBoundingBox3D getCroppingBox() const;
-
-	// methods for defining and storing clip planes. Image does not use these data, this is up to the mapper
-	virtual void addPersistentClipPlane(vtkPlanePtr plane);
-	virtual std::vector<vtkPlanePtr> getAllClipPlanes();
-	virtual void clearPersistentClipPlanes();
-	virtual void setInteractiveClipPlane(vtkPlanePtr plane); ///< set a plane that is not saved
 
 	void mergevtkSettingsIntosscTransform();
 
@@ -169,8 +164,8 @@ public:
 
 	static vtkImageDataPtr createDummyImageData(int axisSize, int maxVoxelValue); ///< Create a moc object of vtkImageData
 
-	void setInterpolationTypeToNearest();
-	void setInterpolationTypeToLinear();
+//	void setInterpolationTypeToNearest();
+//	void setInterpolationTypeToLinear();
 	void setInterpolationType(int val);
 	int getInterpolationType() const;
 
@@ -185,7 +180,6 @@ public:
 signals:
 	void vtkImageDataChanged(); ///< emitted when the vktimagedata are invalidated and must be retrieved anew.
 	void transferFunctionsChanged(); ///< emitted when image transfer functions in 2D or 3D are changed.
-	void clipPlanesChanged();
 	void cropBoxChanged();
 
 protected slots:
@@ -206,8 +200,7 @@ protected:
 
 	bool mUseCropping; ///< image should be cropped using mCroppingBox
 	DoubleBoundingBox3D mCroppingBox_d; ///< box defining the cropping size.
-	std::vector<vtkPlanePtr> mPersistentClipPlanes;
-	vtkPlanePtr mInteractiveClipPlane;
+
 	QString mModality; ///< modality of the image, defined as DICOM tag (0008,0060), Section 3, C.7.3.1.1.1
 	QString mImageType; ///< type of the image, defined as DICOM tag (0008,0008) (mainly value 3, but might be a merge of value 4), Section 3, C.7.6.1.1.2
 	double mMaxRGBIntensity;

@@ -10,6 +10,9 @@ if(BUILD_TESTING)
         cxtestCatchToolMetric.cpp
         cxtestCatchDistanceMetric.cpp
         cxtestMetricFixture.cpp
+        cxtestPatientStorage.cpp
+        cxtestSessionStorageTestFixture.h
+        cxtestSessionStorageTestFixture.cpp
     )
 
     qt5_wrap_cpp(CX_TEST_CATCH_org_custusx_core_patientmodel_MOC_SOURCE_FILES ${CX_TEST_CATCH_org_custusx_core_patientmodel_MOC_SOURCE_FILES})
@@ -21,7 +24,13 @@ if(BUILD_TESTING)
         .
         ${CMAKE_CURRENT_BINARY_DIR}
     )
-    target_link_libraries(cxtest_org_custusx_core_patientmodel PRIVATE org_custusx_core_patientmodel cxtestResource cxCatch)
+    target_link_libraries(cxtest_org_custusx_core_patientmodel
+        PRIVATE
+        org_custusx_core_patientmodel
+        cxLogicManager
+        cxtestResource
+        cxtestUtilities
+        cxCatch)
     cx_add_tests_to_catch(cxtest_org_custusx_core_patientmodel)
 
 endif(BUILD_TESTING)

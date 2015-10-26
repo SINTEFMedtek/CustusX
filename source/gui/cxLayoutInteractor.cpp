@@ -205,7 +205,7 @@ QActionGroup* LayoutInteractor::createLayoutActionGroup(int widgetIndex)
 
 	// add separator
 	QAction* sep = new QAction(retval);
-	sep->setSeparator(this);
+    sep->setSeparator(true);
 	//retval->addAction(sep);
 
 	if (defaultLayouts != layouts.size())
@@ -241,7 +241,7 @@ QAction* LayoutInteractor::addLayoutAction(QString layout, QActionGroup* group, 
 	if (data.isEmpty())
 	{
 		QAction* sep = new QAction(group);
-		sep->setSeparator(this);
+        sep->setSeparator(true);
 	}
 	QAction* action = new QAction(data.getName(), group);
 	action->setEnabled(!data.isEmpty());

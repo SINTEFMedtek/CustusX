@@ -72,7 +72,8 @@ public:
 	void removeRecordSession(RecordSessionPtr session);
 	std::vector<RecordSessionPtr> getRecordSessions();
 	RecordSessionPtr getRecordSession(QString uid);
-	QString getNewUid();
+//	QString getNewUid();
+	int getNewSessionId();
 
 	VisServicesPtr getServices() { return mServices; }
 	UsReconstructionServicePtr getReconstructer() { return mReconstructer; }
@@ -107,13 +108,13 @@ public:
 	Acquisition(AcquisitionDataPtr pluginData, QObject* parent = 0);
 	virtual ~Acquisition();
 
-	/** Start or stop recording, depending on current state.
-	  */
-	void toggleRecord();
+	bool isReady(AcquisitionService::TYPES) const;
+	QString getInfoText(AcquisitionService::TYPES) const;
+
 	/** Start recording.
 	  * Change state to running, create session object.
 	  */
-	void startRecord();
+	void startRecord(AcquisitionService::TYPES context, QString category, RecordSessionPtr session);
 	/** Stop recording.
 	  * Change state to not_running, finalize session object and keep it available.
 	  */
@@ -141,6 +142,7 @@ public:
 	  */
 	AcquisitionService::STATE getState() const { return mCurrentState; }
 	AcquisitionDataPtr getPluginData() { return mPluginData; }
+	AcquisitionService::TYPES getCurrentContext() const { return mCurrentContext; }
 
 signals:
 	/** Emitted each time start/stop/cancel/startpp/stoppp is called.
@@ -157,13 +159,24 @@ signals:
 	  * without valid recording data.
 	  */
 	void cancelled();
+	/** Emitted if the readiness of the acq is changed.
+	  * Use isReady() and getInfoText() get more info.
+	  */
+	void readinessChanged();
 
 private:
 	RecordSessionPtr mLatestSession;
 	void setState(AcquisitionService::STATE newState);
 	AcquisitionService::STATE mCurrentState;
+	AcquisitionService::TYPES mCurrentContext;
 	AcquisitionDataPtr mPluginData;
 
+	bool mReady;
+	QString mInfoText;
+
+	void setReady(bool val, QString text);
+	void checkIfReadySlot();
+	VisServicesPtr getServices();
 };
 typedef boost::shared_ptr<Acquisition> AcquisitionPtr;
 

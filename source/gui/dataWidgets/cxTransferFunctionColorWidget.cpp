@@ -53,14 +53,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-TransferFunctionColorWidget::TransferFunctionColorWidget(PatientModelServicePtr patientModelService, QWidget* parent) :
+TransferFunctionColorWidget::TransferFunctionColorWidget(ActiveDataPtr activeData, QWidget* parent) :
   BaseWidget(parent, "TransferFunctionColorWidget", "Color Transfer Function"),
 	mCurrentClickPos(INT_MIN,INT_MIN),
   mBorder(5)
 {
 	this->setToolTip("Set the color part of a transfer function");
   this->setFocusPolicy(Qt::StrongFocus);
-	mActiveImageProxy = ActiveImageProxy::New(patientModelService);
+	mActiveImageProxy = ActiveImageProxy::New(activeData);
   connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(activeImageTransferFunctionsChangedSlot()));
 
   mSelectedPoint.reset();
@@ -190,7 +190,6 @@ int TransferFunctionColorWidget::imageIntensity2screenX(int intensity)
 
 int TransferFunctionColorWidget::screenX2imageIntensity(int screenX)
 {
-//	int retval =
 	double i = mImage->getMin() + mImage->getRange() * double(screenX - mPlotArea.left()) /(mPlotArea.width()-1);
 	int retval = int(i+0.5);
 	return retval;
@@ -334,6 +333,8 @@ TransferFunctionColorWidget::ColorPoint TransferFunctionColorWidget::getCurrentC
 TransferFunctionColorWidget::ColorPoint TransferFunctionColorWidget::getCurrentColorPoint(int clickX)
 {
   ColorPoint point;
+  if(!mImage)
+	  return point;
   point.intensity = screenX2imageIntensity(clickX);
   point.intensity = constrainValue(point.intensity, mImage->getMin(), mImage->getMax());
 

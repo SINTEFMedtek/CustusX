@@ -118,14 +118,14 @@ std::vector<RecordSessionPtr> AcquisitionServiceProxy::getSessions()
 	return mAcquisitionService->getSessions();
 }
 
-bool AcquisitionServiceProxy::isReady() const
+bool AcquisitionServiceProxy::isReady(TYPES context) const
 {
-	return mAcquisitionService->isReady();
+	return mAcquisitionService->isReady(context);
 }
 
-QString AcquisitionServiceProxy::getInfoText() const
+QString AcquisitionServiceProxy::getInfoText(TYPES context) const
 {
-	return mAcquisitionService->getInfoText();
+	return mAcquisitionService->getInfoText(context);
 }
 
 AcquisitionService::STATE AcquisitionServiceProxy::getState() const
@@ -133,14 +133,9 @@ AcquisitionService::STATE AcquisitionServiceProxy::getState() const
 	return mAcquisitionService->getState();
 }
 
-void AcquisitionServiceProxy::toggleRecord()
+void AcquisitionServiceProxy::startRecord(TYPES context, QString category, RecordSessionPtr session)
 {
-	mAcquisitionService->toggleRecord();
-}
-
-void AcquisitionServiceProxy::startRecord()
-{
-	mAcquisitionService->startRecord();
+	mAcquisitionService->startRecord(context, category, session);
 }
 
 void AcquisitionServiceProxy::stopRecord()

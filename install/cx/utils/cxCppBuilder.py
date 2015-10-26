@@ -85,7 +85,7 @@ class CppBuilder:
         runShell('git remote set-url origin %s' % new_remote_origin_repository)
         runShell('git fetch')
         # old (1.7) syntax - update if needed to 'git branch --set-upstream-to origin/<branch>' 
-        runShell('git branch --set-upstream %s origin/%s' % (branch, branch))
+        runShell('git branch --set-upstream %s origin/%s' % (branch, branch), ignoreFailure=True) # can fail if branch does not exist, might happen if a nonstandard branch is selected.
         #runShell('git branch -u origin/%s' % branch)
 
     def _gitSubmoduleUpdate(self):
@@ -182,8 +182,8 @@ class CppBuilder:
     def addCMakeOption(self, key, value):
         self.cmakeOptions[key] = value
 
-    def configureCMake(self, options=''):        
-        self._addDefaultCmakeOptions()                
+    def configureCMake(self, options=''): 
+        self._addDefaultCmakeOptions()
         generator = self.controlData.getCMakeGenerator()
         optionsFromAssembly = self._assembleOptions()
         self._printOptions()        
@@ -206,7 +206,7 @@ class CppBuilder:
         add('CMAKE_ECLIPSE_GENERATE_LINKED_RESOURCES', False)            
     
     def _assembleOptions(self):
-        return " ".join(["-D%s=%s"%(key,val) for key,val in self.cmakeOptions.iteritems()])
+        return " ".join(['-D%s="%s"'%(key,val) for key,val in self.cmakeOptions.iteritems()])
     
     def _printOptions(self):
         options = "".join(["    %s = %s\n"%(key,val) for key,val in self.cmakeOptions.iteritems()])

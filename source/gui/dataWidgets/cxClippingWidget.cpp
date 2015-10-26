@@ -41,10 +41,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxInteractiveClipper.h"
 #include "cxSelectDataStringProperty.h"
 #include "cxImage.h"
-#include "cxLegacySingletons.h"
 #include "cxPatientModelService.h"
-#include "cxLogicManager.h"
 #include "cxViewService.h"
+#include "cxVisServices.h"
 
 namespace cx
 {
@@ -89,11 +88,11 @@ QStringList StringPropertyClipPlane::getValueRange() const
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
-ClippingWidget::ClippingWidget(PatientModelServicePtr patientModelService, QWidget* parent) :
+ClippingWidget::ClippingWidget(VisServicesPtr services, QWidget* parent) :
 	BaseWidget(parent, "ClippingWidget", "Clip"),
-	mPatientModelService(patientModelService)
+	mServices(services)
 {
-	connect(viewService().get(), &ViewService::activeLayoutChanged, this, &ClippingWidget::setupUI);
+	connect(mServices->view().get(), &ViewService::activeLayoutChanged, this, &ClippingWidget::setupUI);
 	this->setupUI();
 }
 
@@ -102,14 +101,14 @@ void ClippingWidget::setupUI()
 	if (mInteractiveClipper)
 		return;
 
-	mInteractiveClipper = viewService()->getClipper();
+	mInteractiveClipper = mServices->view()->getClipper();
 
 	if (!mInteractiveClipper)
 		return;
 
 	connect(mInteractiveClipper.get(), SIGNAL(changed()), this, SLOT(clipperChangedSlot()));
 
-	mImageAdapter = StringPropertySelectImage::New(mPatientModelService);
+	mImageAdapter = StringPropertySelectData::New(mServices->patient());
 	LabeledComboBoxWidget* imageCombo = new LabeledComboBoxWidget(this, mImageAdapter);
 	connect(mImageAdapter.get(), SIGNAL(changed()), this, SLOT(imageChangedSlot()));
 
@@ -156,13 +155,13 @@ void ClippingWidget::clipperChangedSlot()
 {
 	mUseClipperCheckBox->setChecked(mInteractiveClipper->getUseClipper());
 	mInvertPlaneCheckBox->setChecked(mInteractiveClipper->getInvertPlane());
-	if (mInteractiveClipper->getImage())
-		mImageAdapter->setValue(mInteractiveClipper->getImage()->getUid());
+	if (mInteractiveClipper->getData())
+		mImageAdapter->setValue(mInteractiveClipper->getData()->getUid());
 }
 
 void ClippingWidget::imageChangedSlot()
 {
-	mInteractiveClipper->setImage(mPatientModelService->getData<Image>(mImageAdapter->getValue()));
+	mInteractiveClipper->setData(mServices->patient()->getData(mImageAdapter->getValue()));
 }
 
 void ClippingWidget::clearButtonClickedSlot()

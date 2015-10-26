@@ -71,7 +71,7 @@ double DoublePropertyTimeCalibration::getValue() const
 {
   if (!mTool || !mTool->getProbe())
     return 0;
-  return mTool->getProbe()->getProbeData().getTemporalCalibration();
+  return mTool->getProbe()->getProbeDefinition().getTemporalCalibration();
 }
 
 QString DoublePropertyTimeCalibration::getHelp() const

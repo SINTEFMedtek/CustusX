@@ -38,10 +38,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxSettings.h"
 #include "cxImage.h"
-#include "cxLegacySingletons.h"
 #include "cxSpaceProvider.h"
 #include "cxSpaceListener.h"
 #include "cxPatientModelService.h"
+#include "cxActiveData.h"
+#include "cxLegacySingletons.h"
 
 namespace cx
 {
@@ -135,7 +136,8 @@ void SamplerWidget::prePaintEvent()
 	int w=1;
 	QString coord = QString("%1, %2, %3").arg(p[0], w, 'f', 1).arg(p[1], w, 'f', 1).arg(p[2], w, 'f', 1);
 
-	ImagePtr image = patientService()->getActiveImage();
+	ActiveDataPtr activeData = patientService()->getActiveData();
+	ImagePtr image = activeData->getActive<Image>();
 	if (image)
 	{
 		Vector3D p = spaceProvider()->getActiveToolTipPoint(Space(csDATA_VOXEL,"active"), true);

@@ -62,12 +62,17 @@ namespace cx
 {
 
 USAcqusitionWidget::USAcqusitionWidget(AcquisitionServicePtr acquisitionService, VisServicesPtr services, UsReconstructionServicePtr usReconstructionService, QWidget* parent) :
-	RecordBaseWidget(acquisitionService, parent, settings()->value("Ultrasound/acquisitionName").toString()),
-	mUsReconstructionService(usReconstructionService)
+	BaseWidget(parent, "org_custusx_acquisition_widgets_acquisition", "US Acquisition"),
+	mUsReconstructionService(usReconstructionService),
+	mAcquisitionService(acquisitionService),
+	mLayout(new QVBoxLayout(this))
 {
-	this->setObjectName("org_custusx_acquisition_widgets_acquisition");
-	this->setWindowTitle("US Acquisition");
 	this->setToolTip("Record and reconstruct US data");
+
+	QString desc = settings()->value("Ultrasound/acquisitionName").toString();
+	AcquisitionService::TYPES context(AcquisitionService::tUS);
+	mRecordSessionWidget = new RecordSessionWidget(mAcquisitionService, this, context, desc);
+	mLayout->addWidget(mRecordSessionWidget);
 
 	mServices = services;
 	connect(mUsReconstructionService.get(), &UsReconstructionService::reconstructAboutToStart, this, &USAcqusitionWidget::reconstructAboutToStartSlot);
@@ -82,8 +87,6 @@ USAcqusitionWidget::USAcqusitionWidget(AcquisitionServicePtr acquisitionService,
 	connect(mAcquisitionService.get(), &AcquisitionService::acquisitionDataReady, this, &USAcqusitionWidget::acquisitionDataReadySlot);
 	connect(mAcquisitionService.get(), &AcquisitionService::saveDataCompleted, mUsReconstructionService.get(), &UsReconstructionService::newDataOnDisk);
 
-	mRecordSessionWidget->setDescriptionVisibility(false);
-
 	QHBoxLayout* timerLayout = new QHBoxLayout;
 	mLayout->addLayout(timerLayout);
 	mDisplayTimerWidget = new DisplayTimerWidget(this);
@@ -95,9 +98,9 @@ USAcqusitionWidget::USAcqusitionWidget(AcquisitionServicePtr acquisitionService,
 	QGridLayout* editsLayout = new QGridLayout;
 	editsLayout->setColumnStretch(0,0);
 	editsLayout->setColumnStretch(1,1);
-	RecordBaseWidget::mLayout->addLayout(editsLayout);
+	mLayout->addLayout(editsLayout);
 
-	new LabeledComboBoxWidget(this, StringPropertyActiveProbeConfiguration::New(mServices->getToolManager()), editsLayout, 0);
+	new LabeledComboBoxWidget(this, StringPropertyActiveProbeConfiguration::New(mServices->tracking()), editsLayout, 0);
 	sscCreateDataWidget(this, mUsReconstructionService->getParam("Preset"), editsLayout, 1);
 
 	QAction* optionsAction = this->createAction(this,
@@ -136,12 +139,12 @@ QWidget* USAcqusitionWidget::createOptionsWidget()
 	QGridLayout* layout = new QGridLayout(retval);
 	layout->setMargin(0);
 
-	SoundSpeedConverterWidget* soundSpeedWidget = new SoundSpeedConverterWidget(mServices->getToolManager(), this);
+	SoundSpeedConverterWidget* soundSpeedWidget = new SoundSpeedConverterWidget(mServices->tracking(), this);
 
 	ProbeConfigWidget* probeWidget = new ProbeConfigWidget(mServices, this);
 	probeWidget->getActiveProbeConfigWidget()->setVisible(false);
 
-	SpinBoxGroupWidget* temporalCalibrationWidget = new SpinBoxGroupWidget(this, DoublePropertyTimeCalibration::New(mServices->getToolManager()));
+	SpinBoxGroupWidget* temporalCalibrationWidget = new SpinBoxGroupWidget(this, DoublePropertyTimeCalibration::New(mServices->tracking()));
 
 	int line = 0;
 	layout->addWidget(this->createHorizontalLine(), line++, 0, 1, 1);

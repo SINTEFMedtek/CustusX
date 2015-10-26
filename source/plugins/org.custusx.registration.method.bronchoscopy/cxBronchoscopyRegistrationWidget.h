@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
+class RecordTrackingWidget;
 class WidgetObscuredListener;
 typedef boost::shared_ptr<class Acquisition> AcquisitionPtr;
 typedef boost::shared_ptr<class StringPropertySelectMesh> StringPropertySelectMeshPtr;
@@ -68,46 +69,35 @@ class BronchoscopyRegistrationWidget: public RegistrationBaseWidget
 	BronchoscopyRegistrationPtr mBronchoscopyRegistration;
 
 public:
-	BronchoscopyRegistrationWidget(RegServices services, QWidget *parent);
+	BronchoscopyRegistrationWidget(RegServicesPtr services, QWidget *parent);
 	virtual ~BronchoscopyRegistrationWidget()
 	{
 	}
 	virtual QString defaultWhatsThis() const;
+
+protected:
+	virtual void prePaintEvent();
 private slots:
 	void processCenterlineSlot();
 	void registerSlot();
-	void acquisitionStarted();
-	void acquisitionStopped();
-    void obscuredSlot(bool obscured);
-
-	void acquisitionCancelled();
-	void recordedSessionsChanged();
 private:
-	RegServices mServices;
+	void setup();
+
+	RegServicesPtr mServices;
 	QVBoxLayout* mVerticalLayout;
-	QLabel* mLabel;
 	BoolPropertyPtr mUseLocalRegistration;
 	BoolPropertyPtr mUseSubsetOfGenerations;
 	DoublePropertyPtr mMaxNumberOfGenerations;
 	XmlOptionFile mOptions;
 	MeshPtr mMesh;
 
-//	AcquisitionPtr mAcquisition;
-	RecordSessionWidgetPtr mRecordSessionWidget;
 	StringPropertySelectMeshPtr mSelectMeshWidget;
-	StringPropertyPtr mSessionSelector;
 	QPushButton* mProcessCenterlineButton;
 	QPushButton* mRegisterButton;
     ToolPtr mTool;
-	StringPropertySelectToolPtr mSelectToolWidget;
-//    TrackedCenterlineWidget* mTrackedCenterLine;
 
-	boost::shared_ptr<WidgetObscuredListener> mObscuredListener;
+	RecordTrackingWidget* mRecordTrackingWidget;
 
-    ToolRep3DPtr getToolRepIn3DView(ToolPtr tool);
-
-	void initSessionSelector();
-	QStringList getSessionList();
 	void initializeTrackingService();
 
 	void createMaxNumberOfGenerations(QDomElement root);

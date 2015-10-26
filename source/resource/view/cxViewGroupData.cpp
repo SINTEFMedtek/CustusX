@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataMetric.h"
 #include "cxView.h"
 #include "cxImage.h"
+#include "cxTrackedStream.h"
 #include "cxInteractiveClipper.h"
 #include "boost/bind.hpp"
 #include "cxXMLNodeWrapper.h"
@@ -217,7 +218,7 @@ ViewGroupData::ViewGroupData(CoreServicesPtr services) :
 	mCamera3D(CameraData::create())
 {
 	if(mServices)
-		connect(mServices->patientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &ViewGroupData::purgeDataNotExistingInPatientModelService);
+		connect(mServices->patient().get(), &PatientModelService::dataAddedOrRemoved, this, &ViewGroupData::purgeDataNotExistingInPatientModelService);
 	mVideoSource = "active";
 	mGroup2DZoom = SyncedValue::create(1);
 	mGlobal2DZoom = mGroup2DZoom;
@@ -234,7 +235,7 @@ void ViewGroupData::purgeDataNotExistingInPatientModelService()
 	for (unsigned i = 0; i < mData.size(); )
 	{
 		QString uid = mData[i].first;
-		if (!mServices->patientModelService->getData(uid))
+		if (!mServices->patient()->getData(uid))
 		{
 			if (this->contains(uid))
 			{
@@ -341,7 +342,7 @@ void ViewGroupData::clearData()
 
 DataPtr ViewGroupData::getData(QString uid) const
 {
-	DataPtr data = mServices->patientModelService->getData(uid);
+	DataPtr data = mServices->patient()->getData(uid);
 	if (!data)
 	{
 		reportError("Couldn't find the data: [" + uid + "] in the datamanager.");
@@ -394,6 +395,40 @@ std::vector<ImagePtr> ViewGroupData::getImages(DataViewProperties properties) co
 std::vector<MeshPtr> ViewGroupData::getMeshes(DataViewProperties properties) const
 {
 	return this->getDataOfType<Mesh>(properties);
+}
+
+std::vector<TrackedStreamPtr> ViewGroupData::getTrackedStreams(DataViewProperties properties) const
+{
+	return this->getDataOfType<TrackedStream>(properties);
+}
+
+std::vector<TrackedStreamPtr> ViewGroupData::getTracked2DStreams(DataViewProperties properties) const
+{
+	std::vector<TrackedStreamPtr> streams = this->getTrackedStreams(properties);
+	std::vector<TrackedStreamPtr> retval;
+
+	for(int i = 0; i < streams.size(); ++i)
+	{
+		if(streams[i]->is2D() )
+			retval.push_back(streams[i]);
+	}
+	return retval;
+}
+
+std::vector<ImagePtr> ViewGroupData::getImagesAndChangingImagesFromTrackedStreams(DataViewProperties properties, bool include2D) const
+{
+	std::vector<ImagePtr> images = this->getImages(properties);
+	std::vector<TrackedStreamPtr> streams = this->getTrackedStreams(properties);
+
+	for(int i = 0; i < streams.size(); ++i)
+	{
+		ImagePtr changingImage = streams[i]->getChangingImage();
+		if(streams[i]->is3D())
+			images.push_back(changingImage);
+		if(include2D && streams[i]->is2D())
+			images.push_back(changingImage);
+	}
+	return images;
 }
 
 ViewGroupData::Options ViewGroupData::getOptions() const

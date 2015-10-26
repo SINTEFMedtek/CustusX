@@ -62,7 +62,7 @@ class RegistrationHistoryWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  RegistrationHistoryWidget(RegServices services, QWidget* parent, bool compact = false);
+  RegistrationHistoryWidget(RegServicesPtr servicesPtr, QWidget* parent, bool compact = false);
   virtual ~RegistrationHistoryWidget();
   virtual QString defaultWhatsThis() const;
 
@@ -71,9 +71,9 @@ protected slots:
   void removeSlot();
   void forwardSlot();
   void fastForwardSlot();
-  void updateSlot();
   void reconnectSlot();
 
+  virtual void prePaintEvent();
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
   virtual void hideEvent(QCloseEvent* event); ///<disconnects stuff
@@ -105,7 +105,7 @@ private:
   std::vector<RegistrationHistoryPtr> getAllRegistrationHistories();
   std::vector<RegistrationTransform> mergeHistory(const std::vector<RegistrationHistoryPtr>& allHistories);
 
-  RegServices mServices;
+  RegServicesPtr mServices;
 };
 
 /**

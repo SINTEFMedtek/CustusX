@@ -64,11 +64,14 @@ Transform3D TransformFile::read(bool* ok)
 		return retval;
 	}
 	bool localOk = true;
-	QString positionString = file.readLine();
-	positionString += " " + file.readLine();
-	positionString += " " + file.readLine();
-	positionString += " " + file.readLine();
-	retval = Transform3D::fromString(positionString, &localOk);
+    if(!file.atEnd())
+    {
+        QString positionString = file.readLine();
+        positionString += " " + file.readLine();
+        positionString += " " + file.readLine();
+        positionString += " " + file.readLine();
+        retval = Transform3D::fromString(positionString, &localOk);
+    }
 	if (!localOk)
 	{
 		if (!ok)

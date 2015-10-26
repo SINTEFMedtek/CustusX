@@ -38,9 +38,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx {
 
-OptionsWidget::OptionsWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent) :
+OptionsWidget::OptionsWidget(ViewServicePtr viewService, PatientModelServicePtr patientModelService, QWidget* parent) :
 		mShowAdvanced(false),
-		mVisualizationService(visualizationService),
+		mViewService(viewService),
 		mPatientModelService(patientModelService)
 {
 	this->setSizePolicy(this->sizePolicy().horizontalPolicy(), QSizePolicy::Fixed);
@@ -141,7 +141,7 @@ void OptionsWidget::populate(bool showAdvanced)
 			else
 			{
 				groupWidget = it->second;
-				groupLayout = (QGridLayout*) groupWidget->layout();
+				groupLayout = dynamic_cast<QGridLayout*>(groupWidget->layout());
 			}
 
 			//count groupwidgets items to determine row
@@ -149,7 +149,7 @@ void OptionsWidget::populate(bool showAdvanced)
 
 			//make dataadaptewidget and add to existing group
 			blockSignals(true);
-			createDataWidget(mVisualizationService, mPatientModelService, groupWidget, mOptions[i], groupLayout, ++itemsInGroup);
+			createDataWidget(mViewService, mPatientModelService, groupWidget, mOptions[i], groupLayout, ++itemsInGroup);
 			blockSignals(false);
 		}
 	}

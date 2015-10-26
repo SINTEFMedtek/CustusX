@@ -46,9 +46,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-RegistrationHistoryWidget::RegistrationHistoryWidget(RegServices services, QWidget* parent, bool compact) :
+RegistrationHistoryWidget::RegistrationHistoryWidget(RegServicesPtr servicesPtr, QWidget* parent, bool compact) :
 	BaseWidget(parent, "RegistrationHistoryWidget", "Registration History"),
-	mServices(services)
+	mServices(servicesPtr)
 {
 	this->setWhatsThis(this->defaultWhatsThis());
 	this->setToolTip(this->defaultWhatsThis());
@@ -127,10 +127,10 @@ void RegistrationHistoryWidget::showEvent(QShowEvent* event)
 	QWidget::showEvent(event);
 
 	this->reconnectSlot();
-	connect(mServices.patientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &RegistrationHistoryWidget::reconnectSlot);
-	connect(mServices.patientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &RegistrationHistoryWidget::updateSlot);
+	connect(mServices->patient().get(), &PatientModelService::dataAddedOrRemoved, this, &RegistrationHistoryWidget::reconnectSlot);
+	connect(mServices->patient().get(), &PatientModelService::dataAddedOrRemoved, this, &RegistrationHistoryWidget::setModified);
 
-	updateSlot();
+	setModified();
 }
 
 void RegistrationHistoryWidget::hideEvent(QCloseEvent* event)
@@ -139,24 +139,24 @@ void RegistrationHistoryWidget::hideEvent(QCloseEvent* event)
 
 	for (unsigned i = 0; i < mHistories.size(); ++i)
 	{
-		disconnect(mHistories[i].get(), SIGNAL(currentChanged()), this, SLOT(updateSlot()));
+		disconnect(mHistories[i].get(), &RegistrationHistory::currentChanged, this, &RegistrationHistoryWidget::setModified);
 	}
-	disconnect(mServices.patientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &RegistrationHistoryWidget::reconnectSlot);
-	disconnect(mServices.patientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &RegistrationHistoryWidget::updateSlot);
+	disconnect(mServices->patient().get(), &PatientModelService::dataAddedOrRemoved, this, &RegistrationHistoryWidget::reconnectSlot);
+	disconnect(mServices->patient().get(), &PatientModelService::dataAddedOrRemoved, this, &RegistrationHistoryWidget::setModified);
 }
 
 void RegistrationHistoryWidget::reconnectSlot()
 {
 	for (unsigned i = 0; i < mHistories.size(); ++i)
 	{
-		disconnect(mHistories[i].get(), SIGNAL(currentChanged()), this, SLOT(updateSlot()));
+		disconnect(mHistories[i].get(), &RegistrationHistory::currentChanged, this, &RegistrationHistoryWidget::setModified);
 	}
 
 	mHistories = this->getAllRegistrationHistories();
 
 	for (unsigned i = 0; i < mHistories.size(); ++i)
 	{
-		connect(mHistories[i].get(), SIGNAL(currentChanged()), this, SLOT(updateSlot()));
+		connect(mHistories[i].get(), &RegistrationHistory::currentChanged, this, &RegistrationHistoryWidget::setModified);
 	}
 }
 
@@ -235,9 +235,9 @@ void RegistrationHistoryWidget::setActiveTime(QDateTime active)
 std::vector<RegistrationHistoryPtr> RegistrationHistoryWidget::getAllRegistrationHistories()
 {
 	std::vector<RegistrationHistoryPtr> retval;
-	retval.push_back(mServices.patientModelService->get_rMpr_History());
+	retval.push_back(mServices->patient()->get_rMpr_History());
 
-	std::map<QString, DataPtr> data = mServices.patientModelService->getData();
+	std::map<QString, DataPtr> data = mServices->patient()->getData();
 	for (std::map<QString, DataPtr>::iterator iter = data.begin(); iter != data.end(); ++iter)
 	{
 		retval.push_back(iter->second->get_rMd_History());
@@ -396,10 +396,11 @@ void RegistrationHistoryWidget::fastForwardSlot()
 	}
 }
 
-void RegistrationHistoryWidget::updateSlot()
+void RegistrationHistoryWidget::prePaintEvent()
 {
-	std::vector<RegistrationHistoryPtr> raw = getAllRegistrationHistories();
-	std::vector<RegistrationTransform> history = mergeHistory(raw);
+	//Not used?
+//	std::vector<RegistrationHistoryPtr> raw = getAllRegistrationHistories();
+//	std::vector<RegistrationTransform> history = mergeHistory(raw);
 
 	TimeMap times = this->getRegistrationTimes();
 	std::map<QDateTime, QString>::iterator current = this->findCurrentActiveIter(times);

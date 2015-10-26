@@ -66,13 +66,13 @@ vtkLookupTablePtr getCreateLut(int tableRangeMin, int tableRangeMax, double hueR
 
 ViewsFixture::ViewsFixture(QString displayText)
 {
-	mServices = cxtest::TestServices::create();
+	mServices = cxtest::TestVisServices::create();
 	mMessageListener = cx::MessageListener::createWithQueue();
 
 	mShaderFolder = cx::DataLocations::findConfigFolder("/shaders");
 
 	// Initialize dummy toolmanager.
-	mServices->trackingService()->setState(cx::Tool::tsTRACKING);
+	mServices->tracking()->setState(cx::Tool::tsTRACKING);
 
 	mWindow.reset(new ViewsWindow());
 	mWindow->setDescription(displayText);
@@ -88,7 +88,7 @@ ViewsFixture::~ViewsFixture()
 
 cx::DummyToolPtr ViewsFixture::dummyTool()
 {
-	return boost::dynamic_pointer_cast<cx::DummyTool>(mServices->trackingService()->getActiveTool());
+	return boost::dynamic_pointer_cast<cx::DummyTool>(mServices->tracking()->getActiveTool());
 }
 
 void ViewsFixture::clear()
@@ -139,9 +139,9 @@ void ViewsFixture::defineSlice(const QString& uid, const QString& imageFilename,
 
 cx::SliceProxyPtr ViewsFixture::createSliceProxy(cx::PLANE_TYPE plane)
 {
-	cx::ToolPtr tool = mServices->trackingService()->getActiveTool();
+	cx::ToolPtr tool = mServices->tracking()->getActiveTool();
 
-	cx::SliceProxyPtr proxy = cx::SliceProxy::create(mServices->patientModelService());
+	cx::SliceProxyPtr proxy = cx::SliceProxy::create(mServices->patient());
 	proxy->setTool(tool);
 	proxy->initializeFromPlane(plane, false, cx::Vector3D(0,0,-1), false, 1, 0);
 	return proxy;
@@ -151,11 +151,11 @@ cx::ImagePtr ViewsFixture::loadImage(const QString& imageFilename)
 {
 	QString filename = cxtest::Utilities::getDataRoot(imageFilename);
 	QString dummy;
-	cx::DataPtr data = mServices->patientModelService()->importData(filename, dummy);
+	cx::DataPtr data = mServices->patient()->importData(filename, dummy);
 	cx::ImagePtr image = boost::dynamic_pointer_cast<cx::Image>(data);
 	cx::Vector3D center = image->boundingBox().center();
 	center = image->get_rMd().coord(center);
-	mServices->patientModelService()->setCenter(center);
+	mServices->patient()->setCenter(center);
 
 	if (!image)
 		return cx::ImagePtr();
@@ -169,7 +169,7 @@ cx::ImagePtr ViewsFixture::loadImage(const QString& imageFilename)
 
 void ViewsFixture::fixToolToCenter()
 {
-	cx::Vector3D c = mServices->patientModelService()->getCenter();
+	cx::Vector3D c = mServices->patient()->getCenter();
 	cx::Transform3D prMt = cx::createTransformTranslate(c);
 	dummyTool()->setToolPositionMovement(std::vector<cx::Transform3D>(1, prMt));
 	dummyTool()->set_prMt(prMt);

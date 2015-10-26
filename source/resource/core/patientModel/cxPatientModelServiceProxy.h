@@ -73,8 +73,7 @@ public:
 
 	virtual RegistrationHistoryPtr get_rMpr_History() const;
 
-	virtual ImagePtr getActiveImage() const;
-	virtual void setActiveImage(ImagePtr activeImage);
+	virtual ActiveDataPtr getActiveData() const;
 
 	virtual CLINICAL_VIEW getClinicalApplication() const;
 	virtual void setClinicalApplication(CLINICAL_VIEW application);
@@ -84,7 +83,7 @@ public:
 	virtual QString getActivePatientFolder() const;
 	virtual bool isPatientValid() const;
 	virtual DataPtr importData(QString fileName, QString &infoText);
-	virtual void exportPatient(bool niftiFormat);
+	virtual void exportPatient(PATIENT_COORDINATE_SYSTEM externalSpace);
 	virtual void removeData(QString uid);
 
 	virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const;

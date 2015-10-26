@@ -58,6 +58,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewService.h"
 #include "cxImage.h"
 #include "cxProfile.h"
+#include "cxHelperWidgets.h"
+#include "cxStringPropertyActiveVideoSource.h"
 
 namespace cx
 {
@@ -69,11 +71,11 @@ VideoConnectionWidget::VideoConnectionWidget(VisServicesPtr services, QWidget* p
 	this->setToolTip("Connect to a video source");
 	mOptions = profile()->getXmlSettings().descend("video");
 
-	QString defaultConnection = mServices->videoService->getConnectionMethod();
+	QString defaultConnection = mServices->video()->getConnectionMethod();
 	mConnectionSelector = StringProperty::initialize("Connection", "", "Method for connecting to Video Server", defaultConnection, QStringList(), mOptions.getElement("video"));
 	connect(mConnectionSelector.get(), SIGNAL(changed()), this, SLOT(selectGuiForConnectionMethodSlot()));
 
-	connect(mServices->videoService.get(), &VideoService::connected, this, &VideoConnectionWidget::serverStatusChangedSlot);
+	connect(mServices->video().get(), &VideoService::connected, this, &VideoConnectionWidget::serverStatusChangedSlot);
 
 	mStackedWidget = new QStackedWidget(this);
 	mStackedWidgetFrame = this->wrapStackedWidgetInAFrame();
@@ -90,8 +92,8 @@ VideoConnectionWidget::VideoConnectionWidget(VisServicesPtr services, QWidget* p
 	mToptopLayout->addWidget(sscCreateDataWidget(this, mActiveVideoSourceSelector));
 	mToptopLayout->addStretch();
 
-	connect(mServices->videoService.get(), SIGNAL(StreamerServiceAdded(StreamerService*)), this, SLOT(onServiceAdded(StreamerService*)));
-	connect(mServices->videoService.get(), SIGNAL(StreamerServiceRemoved(StreamerService*)), this, SLOT(onServiceRemoved(StreamerService*)));
+	connect(mServices->video().get(), SIGNAL(StreamerServiceAdded(StreamerService*)), this, SLOT(onServiceAdded(StreamerService*)));
+	connect(mServices->video().get(), SIGNAL(StreamerServiceRemoved(StreamerService*)), this, SLOT(onServiceRemoved(StreamerService*)));
 
 	this->addExistingStreamerServices(); //Need to add StreamerServices already existing at this point, since we will only get signals when new Services are added
 
@@ -100,16 +102,16 @@ VideoConnectionWidget::VideoConnectionWidget(VisServicesPtr services, QWidget* p
 
 VideoConnectionWidget::~VideoConnectionWidget()
 {
-	if (mServices->videoService)
+	if (mServices->video())
 	{
-		disconnect(mServices->videoService.get(), SIGNAL(StreamerServiceAdded(StreamerService*)), this, SLOT(onServiceAdded(StreamerService*)));
-		disconnect(mServices->videoService.get(), SIGNAL(StreamerServiceRemoved(StreamerService*)), this, SLOT(onServiceRemoved(StreamerService*)));
+		disconnect(mServices->video().get(), SIGNAL(StreamerServiceAdded(StreamerService*)), this, SLOT(onServiceAdded(StreamerService*)));
+		disconnect(mServices->video().get(), SIGNAL(StreamerServiceRemoved(StreamerService*)), this, SLOT(onServiceRemoved(StreamerService*)));
 	}
 }
 
 void VideoConnectionWidget::addExistingStreamerServices()
 {
-    QList<StreamerServicePtr> services = mServices->videoService->getStreamerServices();
+	QList<StreamerServicePtr> services = mServices->video()->getStreamerServices();
     foreach(StreamerServicePtr service, services)
 	{
         this->onServiceAdded(service.get());
@@ -132,7 +134,7 @@ QWidget* VideoConnectionWidget::createStreamerWidget(StreamerService* service)
 	QDomElement element = mOptions.getElement("video");
 	std::vector<PropertyPtr> adapters = service->getSettings(element);
 
-	OptionsWidget* widget = new OptionsWidget(mServices->visualizationService, mServices->patientModelService, this);
+	OptionsWidget* widget = new OptionsWidget(mServices->view(), mServices->patient(), this);
 	widget->setOptions(service->getType(), adapters, false);
 	widget->setObjectName(service->getType());
 	widget->setFocusPolicy(Qt::StrongFocus); // needed for help system: focus is used to display help text
@@ -182,7 +184,7 @@ void VideoConnectionWidget::removeServiceWidget(QString name)
 
 StringPropertyActiveVideoSourcePtr VideoConnectionWidget::initializeActiveVideoSourceSelector()
 {
-	return StringPropertyActiveVideoSource::New();
+	return StringPropertyActiveVideoSource::create(mServices->video());
 }
 
 QFrame* VideoConnectionWidget::wrapStackedWidgetInAFrame()
@@ -214,7 +216,7 @@ void VideoConnectionWidget::selectGuiForConnectionMethodSlot()
 	QString name = mConnectionSelector->getValue();
 	//Need to set connection method in VideoConnectionManager before calling
 	//useDirectLink(), useLocalServer() and useRemoteServer()
-	mServices->videoService->setConnectionMethod(name);
+	mServices->video()->setConnectionMethod(name);
 
 	QWidget* serviceWidget = mStreamerServiceWidgets[name];
 	if(serviceWidget)
@@ -226,10 +228,10 @@ void VideoConnectionWidget::selectGuiForConnectionMethodSlot()
 
 void VideoConnectionWidget::toggleConnectServer()
 {
-	if (mServices->videoService->isConnected())
-		mServices->videoService->closeConnection();
+	if (mServices->video()->isConnected())
+		mServices->video()->closeConnection();
 	else
-		mServices->videoService->openConnection();
+		mServices->video()->openConnection();
 }
 
 QPushButton* VideoConnectionWidget::initializeConnectButton()
@@ -252,8 +254,8 @@ QPushButton* VideoConnectionWidget::initializeImportStreamImageButton()
 
 void VideoConnectionWidget::serverStatusChangedSlot()
 {
-	mImportStreamImageButton->setEnabled(mServices->videoService->isConnected());
-	if (mServices->videoService->isConnected())
+	mImportStreamImageButton->setEnabled(mServices->video()->isConnected());
+	if (mServices->video()->isConnected())
 		mConnectButton->setText("Disconnect Server");
 	else
 		mConnectButton->setText("Connect Server");
@@ -263,13 +265,13 @@ void VideoConnectionWidget::serverStatusChangedSlot()
 
 void VideoConnectionWidget::importStreamImageSlot()
 {
-	if (!mServices->videoService->isConnected())
+	if (!mServices->video()->isConnected())
 	{
 		reportWarning("Video is not connected");
 		return;
 	}
 	Transform3D rMd = Transform3D::Identity();
-	ToolPtr probe = mServices->trackingService->getFirstProbe();
+	ToolPtr probe = mServices->tracking()->getFirstProbe();
 	VideoSourcePtr videoSource;
 	if (probe)
 	{
@@ -277,7 +279,7 @@ void VideoConnectionWidget::importStreamImageSlot()
 		rMd = calculate_rMd_ForAProbeImage(probe);
 	}
 	else
-		videoSource = mServices->videoService->getActiveVideoSource();
+		videoSource = mServices->video()->getActiveVideoSource();
 
 	if (!videoSource)
 	{
@@ -306,7 +308,7 @@ void VideoConnectionWidget::importStreamImageSlot()
 Transform3D VideoConnectionWidget::calculate_rMd_ForAProbeImage(ToolPtr probe)
 {
 	Transform3D rMd = Transform3D::Identity();
-	Transform3D rMpr = mServices->patientModelService->get_rMpr();
+	Transform3D rMpr = mServices->patient()->get_rMpr();
 	Transform3D prMt = probe->get_prMt();
 	Transform3D tMu = probe->getProbe()->getSector()->get_tMu();
 	Transform3D uMv = probe->getProbe()->getSector()->get_uMv();
@@ -334,12 +336,12 @@ void VideoConnectionWidget::saveAndImportSnapshot(vtkImageDataPtr input, QString
 	vtkImageDataPtr copiedImage = vtkImageDataPtr::New();
 	copiedImage->DeepCopy(input);
 
-	ImagePtr output = mServices->patientModelService->createSpecificData<Image>(filename);
+	ImagePtr output = mServices->patient()->createSpecificData<Image>(filename);
 	output->setVtkImageData(input);
 	output->get_rMd_History()->setRegistration(rMd);
-	mServices->patientModelService->insertData(output);
+	mServices->patient()->insertData(output);
 
-	mServices->visualizationService->autoShowData(output);
+	mServices->view()->autoShowData(output);
 	report(QString("Saved snapshot %1 from active video source").arg(output->getName()));
 }
 

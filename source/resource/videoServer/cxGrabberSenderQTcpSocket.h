@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include <boost/shared_ptr.hpp>
 #include <qtcpsocket.h>
+#include "igtlImageMessage.h"
 #include "cxIGTLinkImageMessage.h"
 #include "cxIGTLinkUSStatusMessage.h"
 #include "cxImage.h"
@@ -63,7 +64,7 @@ public:
 	bool isReady() const;
 
 protected:
-	virtual void send(IGTLinkImageMessage::Pointer msg);
+	virtual void send(igtl::ImageMessage::Pointer msg);
 	virtual void send(IGTLinkUSStatusMessage::Pointer msg);
 	virtual void send(ImagePtr msg);
 	virtual void send(ProbeDefinitionPtr msg);

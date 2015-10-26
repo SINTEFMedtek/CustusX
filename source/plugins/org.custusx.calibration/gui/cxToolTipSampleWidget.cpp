@@ -63,9 +63,9 @@ ToolTipSampleWidget::ToolTipSampleWidget(VisServicesPtr services, QWidget* paren
   QVBoxLayout* toplayout = new QVBoxLayout(this);
 
   this->setToolTip("Sample the tool tip position");
-  mCoordinateSystems = StringPropertySelectCoordinateSystem::New(services->getToolManager());
-  mTools = StringPropertySelectTool::New(mServices->getToolManager());
-	mData = StringPropertySelectData::New(mServices->getPatientService());
+  mCoordinateSystems = StringPropertySelectCoordinateSystem::New(services->tracking());
+  mTools = StringPropertySelectTool::New(mServices->tracking());
+	mData = StringPropertySelectData::New(mServices->patient());
 
   mCoordinateSystemComboBox = new LabeledComboBoxWidget(this, mCoordinateSystems);
   mToolComboBox = new LabeledComboBoxWidget(this, mTools);
@@ -96,8 +96,8 @@ ToolTipSampleWidget::~ToolTipSampleWidget()
 void ToolTipSampleWidget::saveFileSlot()
 {
   QString configPath = profile()->getPath();
-  if(mServices->getPatientService()->isPatientValid())
-	configPath = mServices->getPatientService()->getActivePatientFolder();
+  if(mServices->patient()->isPatientValid())
+	configPath = mServices->patient()->getActivePatientFolder();
 
   QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"),
                              configPath+"/SampledPoints.txt",
@@ -115,7 +115,7 @@ void ToolTipSampleWidget::sampleSlot()
   QFile samplingFile(mSaveToFileNameLabel->text());
 
   CoordinateSystem to = this->getSelectedCoordinateSystem();
-  Vector3D toolPoint = mServices->getSpaceProvider()->getActiveToolTipPoint(to, false);
+  Vector3D toolPoint = mServices->spaceProvider()->getActiveToolTipPoint(to, false);
 
   if(!samplingFile.open(QIODevice::WriteOnly | (mTruncateFile ? QIODevice::Truncate : QIODevice::Append)))
   {
@@ -171,13 +171,13 @@ CoordinateSystem ToolTipSampleWidget::getSelectedCoordinateSystem()
   switch (retval.mId)
   {
   case csDATA:
-	retval = mServices->getSpaceProvider()->getD(mData->getData());
+	retval = mServices->spaceProvider()->getD(mData->getData());
     break;
   case csTOOL:
-	retval = mServices->getSpaceProvider()->getT(mTools->getTool());
+	retval = mServices->spaceProvider()->getT(mTools->getTool());
     break;
   case csSENSOR:
-	retval = mServices->getSpaceProvider()->getT(mTools->getTool());
+	retval = mServices->spaceProvider()->getT(mTools->getTool());
     break;
   default:
     retval.mRefObject = "";

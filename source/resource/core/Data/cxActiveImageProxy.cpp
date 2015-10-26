@@ -32,27 +32,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxActiveImageProxy.h"
 #include "cxImage.h"
-#include "cxPatientModelService.h"
 #include "cxLandmark.h"
+#include "cxActiveData.h"
 
 namespace cx
 {
 
-ActiveImageProxy::ActiveImageProxy(PatientModelServicePtr patientModelService) :
-	mPatientModelService(patientModelService)
+ActiveImageProxy::ActiveImageProxy(ActiveDataPtr activeData) :
+	mActiveData(activeData)
 {
-	connect(mPatientModelService.get(), &PatientModelService::activeImageChanged, this,
+	connect(mActiveData.get(), &ActiveData::activeImageChanged, this,
 			&ActiveImageProxy::activeImageChangedSlot);
-	connect(mPatientModelService.get(), &PatientModelService::activeImageChanged, this,
+	connect(mActiveData.get(), &ActiveData::activeImageChanged, this,
 			&ActiveImageProxy::activeImageChanged);
 }
 
-
 ActiveImageProxy::~ActiveImageProxy()
 {
-	disconnect(mPatientModelService.get(), &PatientModelService::activeImageChanged, this,
+	disconnect(mActiveData.get(), &ActiveData::activeImageChanged, this,
 			   &ActiveImageProxy::activeImageChangedSlot);
-	disconnect(mPatientModelService.get(), &PatientModelService::activeImageChanged, this,
+	disconnect(mActiveData.get(), &ActiveData::activeImageChanged, this,
 			   &ActiveImageProxy::activeImageChanged);
 }
 
@@ -72,7 +71,7 @@ void ActiveImageProxy::activeImageChangedSlot(const QString& uid)
 		disconnect(mImage.get(), SIGNAL(clipPlanesChanged()), this, SIGNAL(clipPlanesChanged()));
 		disconnect(mImage.get(), SIGNAL(cropBoxChanged()), this, SIGNAL(cropBoxChanged()));
 	}
-	mImage = mPatientModelService->getActiveImage();
+	mImage = mActiveData->getActive<Image>();
 	if (mImage)
 	{
 		connect(mImage.get(), SIGNAL(transformChanged()), this, SIGNAL(transformChanged()));

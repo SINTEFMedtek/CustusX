@@ -51,7 +51,7 @@ ToolManualCalibrationWidget::ToolManualCalibrationWidget(VisServicesPtr services
   //toptopLayout->setMargin(0);
 
   this->setToolTip("Edit tool calibration matrix sMt");
-  mTool = StringPropertySelectTool::New(mServices->getToolManager());
+  mTool = StringPropertySelectTool::New(mServices->tracking());
   mToptopLayout->addWidget(sscCreateDataWidget(this, mTool));
 
   mToptopLayout->addWidget(new QLabel("<font color=red>Caution: sMt is changed directly by this control.</font>"));
@@ -71,7 +71,7 @@ ToolManualCalibrationWidget::ToolManualCalibrationWidget(VisServicesPtr services
 
   mToptopLayout->addStretch();
 
-  connect(mServices->getToolManager().get(), &TrackingService::stateChanged, this, &ToolManualCalibrationWidget::toolCalibrationChanged);
+  connect(mServices->tracking().get(), &TrackingService::stateChanged, this, &ToolManualCalibrationWidget::toolCalibrationChanged);
 }
 
 void ToolManualCalibrationWidget::toolCalibrationChanged()

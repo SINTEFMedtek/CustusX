@@ -91,17 +91,17 @@ void DummyFilter::createInputTypes()
 {
 	SelectDataStringPropertyBasePtr temp;
 
-	temp = StringPropertySelectData::New(mServices->getPatientService());
+	temp = StringPropertySelectData::New(mServices->patient());
 	temp->setValueName("Input");
 	temp->setHelp("Dummy data input for a dummy algorithm");
 	mInputTypes.push_back(temp);
 
-	temp = StringPropertySelectImage::New(mServices->getPatientService());
+	temp = StringPropertySelectImage::New(mServices->patient());
 	temp->setValueName("Image");
 	temp->setHelp("Dummy image input for a dummy algorithm");
 	mInputTypes.push_back(temp);
 
-	temp = StringPropertySelectMesh::New(mServices->getPatientService());
+	temp = StringPropertySelectMesh::New(mServices->patient());
 	temp->setValueName("Mesh");
 	temp->setHelp("Dummy mesh input for a dummy algorithm");
 	mInputTypes.push_back(temp);
@@ -111,7 +111,7 @@ void DummyFilter::createOutputTypes()
 {
 	SelectDataStringPropertyBasePtr temp;
 
-	temp = StringPropertySelectData::New(mServices->getPatientService());
+	temp = StringPropertySelectData::New(mServices->patient());
 	temp->setValueName("Output");
 	temp->setHelp("Dummy output from the dummy algorithm");
 	mOutputTypes.push_back(temp);

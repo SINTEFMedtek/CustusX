@@ -59,7 +59,6 @@ class BuildScript(object):
     def addArgParsers(self):
         'subclasses can add argparse instances to self.additionalparsers here'
         self.additionalParsers.append(shell.getArgParser())
-        self.additionalParsers.append(self.controlData().getArgParser_root_dir())
 
     def _createArgumentParser(self):        
         return argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter, 

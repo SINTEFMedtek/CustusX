@@ -68,12 +68,4 @@ TrackedStreamPtr DataManager::getTrackedStream(const QString &uid) const
 	return boost::dynamic_pointer_cast<TrackedStream>(this->getData(uid));
 }
 
-ImagePtr DataManager::getActiveImage() const
-{
-	return ImagePtr();
-} ///< used for system state
-void DataManager::setActiveImage(ImagePtr activeImage)
-{
-} ///< used for system state
-
 } // namespace cx

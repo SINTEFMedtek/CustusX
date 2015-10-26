@@ -79,9 +79,6 @@ ToolRep3D::ToolRep3D(SpaceProviderPtr spaceProvider) :
 	mProbeSectorPolyDataMapper = vtkPolyDataMapperPtr::New();
 	mProbeSectorActor = vtkActorPtr::New();
 
-	bool useMask = true; // if true, use mask instead of texture to render the sector. Mask is identical to the algo used in reconstruction.
-	mRTStream.reset(new VideoSourceGraphics(mSpaceProvider, useMask));
-
 	mTracer = ToolTracer::create(mSpaceProvider);
 }
 
@@ -247,9 +244,6 @@ void ToolRep3D::addRepActorsToViewRenderer(ViewPtr view)
 
 	if (mViewportListener)
 		mViewportListener->startListen(view->getRenderer());
-
-	if (mRTStream)
-		view->getRenderer()->AddActor(mRTStream->getActor());
 }
 
 void ToolRep3D::removeRepActorsFromViewRenderer(ViewPtr view)
@@ -257,8 +251,6 @@ void ToolRep3D::removeRepActorsFromViewRenderer(ViewPtr view)
 	view->getRenderer()->RemoveActor(mTracer->getActor());
 	view->getRenderer()->RemoveActor(mToolActor);
 	view->getRenderer()->RemoveActor(mProbeSectorActor);
-	if (mRTStream)
-		view->getRenderer()->RemoveActor(mRTStream->getActor());
 
 	mTooltipPoint.reset(new GraphicalPoint3D());
 	mOffsetPoint.reset(new GraphicalPoint3D());
@@ -328,7 +320,7 @@ void ToolRep3D::probeSectorChanged()
 
 	if (this->showProbe())
 	{
-		mProbeSector->setData(mTool->getProbe()->getProbeData());
+		mProbeSector->setData(mTool->getProbe()->getProbeDefinition());
 		Transform3D tMu = mProbeSector->get_tMu();
 
 		mProbeSectorPolyDataMapper->SetInputData(mProbeSector->getSectorLinesOnly());
@@ -338,14 +330,6 @@ void ToolRep3D::probeSectorChanged()
 		}
 		mProbeSectorActor->SetUserMatrix((rMpr * prMt * tMu).getVtkMatrix());
 		mProbeSectorActor->SetVisibility(mTool->getVisible());
-
-		if (mRTStream)
-		{
-			mRTStream->setTool(mTool);
-			ProbePtr probe = mTool->getProbe();
-			if (probe)
-				mRTStream->setRealtimeStream(probe->getRTSource());
-		}
 	}
 	else
 		mProbeSectorActor->SetVisibility(false);
@@ -431,7 +415,7 @@ void ToolRep3D::tooltipOffsetSlot(double val)
 
 bool ToolRep3D::showProbe()
 {
-	return mTool && (mTool->hasType(Tool::TOOL_US_PROBE)) && (mTool->getProbe()->getProbeData().getType()!=ProbeDefinition::tNONE);
+	return mTool && (mTool->hasType(Tool::TOOL_US_PROBE)) && (mTool->getProbe()->getProbeDefinition().getType()!=ProbeDefinition::tNONE);
 }
 
 } // namespace cx

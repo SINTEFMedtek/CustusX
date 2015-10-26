@@ -60,22 +60,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxProfile.h"
 #include "cxSettings.h"
 #include "cxDefinitionStrings.h"
+#include "cxActiveData.h"
 
 
 namespace cx
 {
 
-DataManagerImplPtr DataManagerImpl::create()
+DataManagerImplPtr DataManagerImpl::create(ActiveDataPtr activeData)
 {
 	DataManagerImplPtr retval;
-	retval.reset(new DataManagerImpl());
+	retval.reset(new DataManagerImpl(activeData));
 	return retval;
 }
 
-DataManagerImpl::DataManagerImpl()
+DataManagerImpl::DataManagerImpl(ActiveDataPtr activeData) :
+	mClinicalApplication(mdNEUROLOGICAL),
+	mActiveData(activeData)
 {
 	m_rMpr_History.reset(new RegistrationHistory());
-	connect(m_rMpr_History.get(), SIGNAL(currentChanged()), this, SIGNAL(rMprChanged()));
+	connect(m_rMpr_History.get(), &RegistrationHistory::currentChanged, this, &DataManager::rMprChanged);
 	mPatientLandmarks = Landmarks::create();
 
 	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(settingsChangedSlot(QString)));
@@ -112,7 +115,6 @@ void DataManagerImpl::clear()
 {
 	mData.clear();
 	mCenter = Vector3D(0, 0, 0);
-	mActiveImage.reset();
 	mLandmarkProperties.clear();
 
 	m_rMpr_History->clear();
@@ -120,7 +122,6 @@ void DataManagerImpl::clear()
 
 	emit dataAddedOrRemoved();
 	emit centerChanged();
-	emit activeImageChanged("");
 	emit landmarkPropertiesChanged();
 }
 
@@ -160,25 +161,6 @@ void DataManagerImpl::setCenter(const Vector3D& center)
 {
 	mCenter = center;
 	emit centerChanged();
-}
-
-ImagePtr DataManagerImpl::getActiveImage() const
-{
-	return mActiveImage;
-}
-void DataManagerImpl::setActiveImage(ImagePtr activeImage)
-{
-	if (mActiveImage == activeImage)
-		return;
-
-	mActiveImage = activeImage;
-
-	QString uid = "";
-	if (mActiveImage)
-		uid = mActiveImage->getUid();
-
-	emit activeImageChanged(uid);
-//	report("Active image set to " + qstring_cast(uid));
 }
 
 void DataManagerImpl::setLandmarkNames(std::vector<QString> names)
@@ -231,6 +213,8 @@ DataPtr DataManagerImpl::loadData(const QString& uid, const QString& path)
 		return mData[uid];
 
 	QString type = DataReaderWriter().findDataTypeFromFile(path);
+	if(!mDataFactory)
+		reportError("DataManagerImpl::loadData() Got no DataFactory");
 	DataPtr data = mDataFactory->create(type, uid);
 
 	if (!data)
@@ -319,11 +303,6 @@ void DataManagerImpl::addXml(QDomNode& parentNode)
 
 	m_rMpr_History->addXml(dataManagerNode);
 
-	QDomElement activeImageNode = doc.createElement("activeImageUid");
-	if (mActiveImage)
-		activeImageNode.appendChild(doc.createTextNode(mActiveImage->getUid()));
-	dataManagerNode.appendChild(activeImageNode);
-
 	QDomElement landmarkPropsNode = doc.createElement("landmarkprops");
 	LandmarkPropertyMap::iterator it = mLandmarkProperties.begin();
 	for (; it != mLandmarkProperties.end(); ++it)
@@ -403,16 +382,6 @@ void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString rootPath)
 	child = dataManagerNode.firstChild();
 	while (!child.isNull())
 	{
-		if (child.toElement().tagName() == "activeImageUid")
-		{
-			const QString activeImageString = child.toElement().text();
-			if (!activeImageString.isEmpty())
-			{
-				ImagePtr image = this->getImage(activeImageString);
-				this->setActiveImage(image);
-			}
-		}
-		//TODO add activeMesh
 		if (child.toElement().tagName() == "center")
 		{
 			const QString centerString = child.toElement().text();
@@ -501,13 +470,6 @@ QString DataManagerImpl::findAbsolutePath(QDir relativePath, QString rootPath)
 	return absolutePath;
 }
 
-void DataManagerImpl::vtkImageDataChangedSlot()
-{
-	QString uid = "";
-	if (mActiveImage)
-		uid = mActiveImage->getUid();
-}
-
 CLINICAL_VIEW DataManagerImpl::getClinicalApplication() const
 {
 	return mClinicalApplication;
@@ -589,14 +551,12 @@ void DataManagerImpl::generateUidAndName(QString* _uid, QString* _name)
 
 void DataManagerImpl::removeData(const QString& uid, QString basePath)
 {
-	if (this->getActiveImage() && this->getActiveImage()->getUid() == uid)
-		this->setActiveImage(ImagePtr());
-
-	DataPtr data = this->getData(uid);
+	DataPtr dataToBeRemoved = this->getData(uid);
+	mActiveData->remove(dataToBeRemoved);
 
 	mData.erase(uid);
 
-	this->deleteFiles(data, basePath);
+	this->deleteFiles(dataToBeRemoved, basePath);
 
 	emit dataAddedOrRemoved(); // this should alert everybody interested in the data as a collection.
 	report("Removed data [" + uid + "].");
@@ -609,11 +569,10 @@ void DataManagerImpl::deleteFiles(DataPtr data, QString basePath)
 	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
 	QStringList files;
 	if (!data->getFilename().isEmpty())
-		files << QDir(basePath).absoluteFilePath(data->getFilename());
-
-	if (image)
 	{
-		files <<  changeExtension(files[0], "raw");
+		files << QDir(basePath).absoluteFilePath(data->getFilename());
+		if (image)
+			files <<  changeExtension(files[0], "raw");
 	}
 
 	for (int i=0; i<files.size(); ++i)

@@ -32,12 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "catch.hpp"
 
-//#include "cxImage.h"
-//#include "cxIGTLinkImageMessage.h"
-//#include "cxIGTLinkUSStatusMessage.h"
-//#include "cxIGTLinkConversion.h"
-//#include "cxVolumeHelpers.h"
-//#include "vtkImageData.h"
+#include "cxIGTLinkConversionImage.h"
 
 
 #include "cxtestIGTLinkConversionFixture.h"
@@ -72,8 +67,8 @@ TEST_CASE_METHOD(IGTLinkConversionFixture, "IGTLinkConversion: Decode/encode ima
 	cx::ImagePtr input(new cx::Image("my_uid", rawImage));
 	input->setAcquisitionTime(time);
 
-	cx::IGTLinkConversion converter;
-	cx::IGTLinkImageMessage::Pointer msg = converter.encode(input);
+	cx::IGTLinkConversionImage converter;
+	igtl::ImageMessage::Pointer msg = converter.encode(input, pcsLPS);
 	cx::ImagePtr output = converter.decode(msg);
 
 	CHECK(output);
@@ -139,7 +134,7 @@ TEST_CASE_METHOD(IGTLinkConversionFixture, "IGTLinkConversion: Decode/encode col
 	this->testDecodeEncodeColorImage(values, "ARGB");
 }
 
-TEST_CASE_METHOD(IGTLinkConversionFixture, "IGTLinkConversion: Decode/encode ProbeData", "[unit][resource][OpenIGTLinkUtilities]")
+TEST_CASE_METHOD(IGTLinkConversionFixture, "IGTLinkConversion: Decode/encode ProbeDefinition", "[unit][resource][OpenIGTLinkUtilities]")
 {
 	// generate probe data input
 	cx::ProbeDefinitionPtr input(new cx::ProbeDefinition());
@@ -158,8 +153,9 @@ TEST_CASE_METHOD(IGTLinkConversionFixture, "IGTLinkConversion: Decode/encode Pro
 
 	// convert the data to igtlink and back
 	cx::IGTLinkConversion converter;
+	cx::IGTLinkConversionImage imageconverter;
 	cx::IGTLinkUSStatusMessage::Pointer msg = converter.encode(input);
-	cx::IGTLinkImageMessage::Pointer imageMessage = converter.encode(imageInput);
+	igtl::ImageMessage::Pointer imageMessage = imageconverter.encode(imageInput, pcsLPS);
 	cx::ProbeDefinitionPtr output = converter.decode(msg, imageMessage, cx::ProbeDefinitionPtr(new cx::ProbeDefinition()));
 
 	// compare input<->output

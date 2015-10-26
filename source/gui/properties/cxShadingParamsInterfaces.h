@@ -54,17 +54,15 @@ class cxGui_EXPORT DoublePropertyShadingBase : public DoublePropertyBase
 {
   Q_OBJECT 
 public:
-  DoublePropertyShadingBase(PatientModelServicePtr patientModelService);
+  DoublePropertyShadingBase(ActiveDataPtr activeData);
   virtual ~DoublePropertyShadingBase() {}
-  //virtual double getValue() const;
-  //virtual bool setValue(double val);
   virtual void connectValueSignals(bool on) {}  
 private slots:
   void activeImageChanged();
 protected:
   ImagePtr mImage;
   ActiveImageProxyPtr mActiveImageProxy;
-  PatientModelServicePtr mPatientModelService;
+  ActiveDataPtr mActiveData;
 };
   
 /** Interface for setting the ambient parameter for the shading.
@@ -73,7 +71,7 @@ class cxGui_EXPORT DoublePropertyShadingAmbient : public DoublePropertyShadingBa
 {
   Q_OBJECT
 public:
-  DoublePropertyShadingAmbient(PatientModelServicePtr patientModelService);
+  DoublePropertyShadingAmbient(ActiveDataPtr activeData);
   virtual ~DoublePropertyShadingAmbient() {}
   virtual QString getDisplayName() const { return "Ambient"; }
   DoubleRange getValueRange() const  { return DoubleRange(0.0, 1.0, 0.01); }
@@ -87,7 +85,7 @@ class cxGui_EXPORT DoublePropertyShadingDiffuse : public DoublePropertyShadingBa
 {
   Q_OBJECT
 public:
-  DoublePropertyShadingDiffuse(PatientModelServicePtr patientModelService);
+  DoublePropertyShadingDiffuse(ActiveDataPtr activeData);
   virtual ~DoublePropertyShadingDiffuse() {}
   virtual QString getDisplayName() const { return "Diffuse"; }
   DoubleRange getValueRange() const  { return DoubleRange(0.0, 1.0, 0.01); }
@@ -101,7 +99,7 @@ class cxGui_EXPORT DoublePropertyShadingSpecular : public DoublePropertyShadingB
 {
   Q_OBJECT
 public:
-  DoublePropertyShadingSpecular(PatientModelServicePtr patientModelService);
+  DoublePropertyShadingSpecular(ActiveDataPtr activeData);
   virtual ~DoublePropertyShadingSpecular() {}
   virtual QString getDisplayName() const { return "Specular"; }
   DoubleRange getValueRange() const  { return DoubleRange(0.0, 4.0, 0.01); }
@@ -115,7 +113,7 @@ class cxGui_EXPORT DoublePropertyShadingSpecularPower : public DoublePropertySha
 {
   Q_OBJECT
 public:
-  DoublePropertyShadingSpecularPower(PatientModelServicePtr patientModelService);
+  DoublePropertyShadingSpecularPower(ActiveDataPtr activeData);
   virtual ~DoublePropertyShadingSpecularPower() {}
   virtual QString getDisplayName() const { return "Specular Power"; }
   DoubleRange getValueRange() const  { return DoubleRange(0.0, 50.0, 0.01); }

@@ -82,6 +82,7 @@ public:
 	{
 		return "mesh";
 	}
+	virtual QIcon getIcon() {return QIcon(":/icons/surface.png");}
 
 	virtual DoubleBoundingBox3D boundingBox() const;
 	void setColor(const QColor& color);///< Set the color of the mesh
@@ -92,6 +93,14 @@ public:
 	bool getIsWireframe() const;///< true=wireframe, false=surface
 	vtkPolyDataPtr getTransformedPolyData(Transform3D tranform);///< Create a new transformed polydata
 	bool isFiberBundle() const;
+    bool showGlyph();
+    bool hasGlyph();
+    double getVisSize();
+    const char * getOrientationArray();
+    const char * getColorArray();
+    const char * getGlyphLUT();
+    QStringList getOrientationArrayList();
+    QStringList getColorArrayList();
 
 	virtual void save(const QString &basePath);
 signals:
@@ -99,13 +108,26 @@ signals:
 public slots:
 	void setBackfaceCullingSlot(bool backfaceCulling);///< Set backface culling on/off in mesh visualization
 	void setFrontfaceCullingSlot(bool backfaceCulling);///< Set frontface culling on/off in mesh visualization
-
+    void setShowGlyph(bool val);
+    void setVisSize(double size);
+    void setOrientationArray(const char * orientationArray);
+    void setColorArray(const char * colorArray);
+    void setGlyphLUT(const char * glyphLUT);
 private:
 	vtkPolyDataPtr mVtkPolyData;
 	QColor mColor;
 	bool mWireframe;
 	bool mBackfaceCulling; ///< If backface culling is on, polygons facing outwards are not drawn.
 	bool mFrontfaceCulling; ///< If frontface culling is on, polygons facing inwards are not drawn.
+    bool mHasGlyph;
+    double mVisSize;
+    bool mShowGlyph;
+    bool shouldGlyphBeEnableByDefault();
+    std::string mOrientationArray;
+    std::string mColorArray;
+    std::string mGlyphLUT;
+    QStringList mOrientationArrayList;
+    QStringList mColorArrayList;
 };
 
 typedef boost::shared_ptr<Mesh> MeshPtr;

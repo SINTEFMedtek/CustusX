@@ -55,7 +55,7 @@ class cxGui_EXPORT OverlayWidget : public BaseWidget
 	Q_OBJECT
 
 public:
-	OverlayWidget(PatientModelServicePtr patientModelService, QWidget* parent);
+	OverlayWidget(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget* parent);
 };
 
 /**

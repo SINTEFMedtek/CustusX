@@ -38,70 +38,89 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
+ThreadMethodInvoker::ThreadMethodInvoker(QObject* parent) :
+    QObject(parent)
+{
+}
+
+void ThreadMethodInvoker::callInLogThread(ActionType action)
+{
+    QMutexLocker sentry(&mActionsMutex);
+    mPendingActions.push_back(action);
+    sentry.unlock();
+
+    this->invokePendingAction();
+}
+
+void ThreadMethodInvoker::invokePendingAction()
+{
+    QMetaObject::invokeMethod(this, "pendingAction", Qt::QueuedConnection);
+}
+
+void ThreadMethodInvoker::pendingAction()
+{
+    while (this->executeAction());
+}
+
+bool ThreadMethodInvoker::executeAction()
+{
+    ActionType action = this->popAction();
+    if (!action)
+        return false;
+
+    action();
+    return true;
+}
+
+ThreadMethodInvoker::ActionType ThreadMethodInvoker::popAction()
+{
+    QMutexLocker sentry(&mActionsMutex);
+    ActionType action;
+
+    if (mPendingActions.isEmpty())
+        return action;
+
+    action = mPendingActions.front();
+    mPendingActions.pop_front();
+    return action;
+}
+
+} // namespace cx
+
+
+
+
+namespace cx
+{
+
 LogThread::LogThread(QObject* parent) :
 	QObject(parent)
 {
+    mQueue = new ThreadMethodInvoker(this);
 	mRepository = MessageRepository::create();
 }
 
 void LogThread::installObserver(MessageObserverPtr observer, bool resend)
 {
-	PendingActionType action = boost::bind(&MessageRepository::install, mRepository.get(), observer, resend);
+	ActionType action = boost::bind(&MessageRepository::install, mRepository, observer, resend);
 	this->callInLogThread(action);
 }
 
 void LogThread::uninstallObserver(MessageObserverPtr observer)
 {
-	PendingActionType action = boost::bind(&MessageRepository::uninstall, mRepository.get(), observer);
+	ActionType action = boost::bind(&MessageRepository::uninstall, mRepository, observer);
 	this->callInLogThread(action);
 }
 
 void LogThread::setLoggingFolder(QString absoluteLoggingFolderPath)
 {
-	PendingActionType action = boost::bind(&LogThread::executeSetLoggingFolder, this, absoluteLoggingFolderPath);
+	ActionType action = boost::bind(&LogThread::executeSetLoggingFolder, this, absoluteLoggingFolderPath);
 	this->callInLogThread(action);
 }
 
-void LogThread::callInLogThread(PendingActionType& action)
+void LogThread::callInLogThread(ThreadMethodInvoker::ActionType action)
 {
-	QMutexLocker sentry(&mActionsMutex);
-	mPendingActions.push_back(action);
-	sentry.unlock();
-
-	this->invokePendingAction();
-}
-
-void LogThread::invokePendingAction()
-{
-	QMetaObject::invokeMethod(this, "pendingAction", Qt::QueuedConnection);
-}
-
-void LogThread::pendingAction()
-{
-	while (this->executeAction());
-}
-
-bool LogThread::executeAction()
-{
-	PendingActionType action = this->popAction();
-	if (!action)
-		return false;
-
-	action();
-	return true;
-}
-
-LogThread::PendingActionType LogThread::popAction()
-{
-	QMutexLocker sentry(&mActionsMutex);
-	PendingActionType action;
-
-	if (mPendingActions.isEmpty())
-		return action;
-
-	action = mPendingActions.front();
-	mPendingActions.pop_front();
-	return action;
+    mQueue->callInLogThread(action);
 }
 
 void LogThread::processMessage(Message message)

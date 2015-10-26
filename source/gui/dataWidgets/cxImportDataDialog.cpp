@@ -90,10 +90,10 @@ ImportDataDialog::ImportDataDialog(PatientModelServicePtr patientModelService, Q
   mParentFrameCombo = new LabeledComboBoxWidget(this, mParentFrameAdapter);
   layout->addWidget(mParentFrameCombo);
 
-  mNiftiFormatCheckBox = new QCheckBox("Use NIfTI-1/ITK-Snap axis definition", this);
+  mNiftiFormatCheckBox = new QCheckBox("Convert from RAS to LPS coordinates", this);
   mNiftiFormatCheckBox->setToolTip(""
-	  "Use X=Left->Right Y=Posterior->Anterior Z=Inferior->Superior, as in ITK-Snap.\n"
-	  "This is different from normal DICOM.");
+	  "Use RAS (X=Left->Right Y=Posterior->Anterior Z=Inferior->Superior), as in ITK-Snap.\n"
+	  "This is different from DICOM/CustusX, which uses LPS (left-posterior-superior).");
   mNiftiFormatCheckBox->setChecked(false);
   mNiftiFormatCheckBox->setEnabled(false);
   mTransformFromParentFrameCheckBox = new QCheckBox("Import transform from Parent", this);
@@ -246,10 +246,12 @@ void ImportDataDialog::convertFromNifti1Coordinates()
     return;
   if(!mData)
     return;
-  Transform3D rMd = mData->get_rMd();
-  rMd = rMd * createTransformRotateZ(M_PI);
+  Transform3D sMd = mData->get_rMd();
+  Transform3D sMr = createTransformFromReferenceToExternal(pcsRAS);
+//  rMd = createTransformRotateZ(M_PI) * rMd;
+  Transform3D rMd = sMr.inv() * sMd;
   mData->get_rMd_History()->setRegistration(rMd);
-  report("Nifti import: rotated input data " + mData->getName() + " 180* around Z-axis.");
+  report("Nifti import: Converted data " + mData->getName() + " from LPS to RAS coordinates.");
 }
 
 /** Apply the transform from the parent frame to the imported data.

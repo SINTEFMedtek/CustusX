@@ -105,6 +105,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxTrackedStream.h"
 #include "cxStreamRep3D.h"
+#include "cxStream2DRep3D.h"
+#include "cxActiveData.h"
 
 namespace cx
 {
@@ -130,18 +132,18 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ViewPtr view, VisServicesPtr servic
 
 	this->initializeMultiVolume3DRepProducer();
 
-	mLandmarkRep = LandmarkRep::New(mServices->getPatientService());
+	mLandmarkRep = LandmarkRep::New(mServices->patient());
 	mLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
 	mLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
 
-	mPickerRep = PickerRep::New(mServices->getPatientService());
+	mPickerRep = PickerRep::New(mServices->patient());
 
-	connect(mPickerRep.get(), SIGNAL(pointPicked(Vector3D)), this, SLOT(PickerRepPointPickedSlot(Vector3D)));
-	connect(mPickerRep.get(), SIGNAL(dataPicked(QString)), this, SLOT(PickerRepDataPickedSlot(QString)));
+	connect(mPickerRep.get(), SIGNAL(pointPicked(Vector3D)), this, SLOT(pickerRepPointPickedSlot(Vector3D)));
+//	connect(mPickerRep.get(), SIGNAL(dataPicked(QString)), this, SLOT(pickerRepDataPickedSlot(QString)));
 	mPickerRep->setSphereRadius(settings()->value("View3D/sphereRadius").toDouble());
 	mPickerRep->setEnabled(false);
 	mView->addRep(mPickerRep);
-	connect(mServices->getToolManager().get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(activeToolChangedSlot()));
+	connect(mServices->tracking().get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(activeToolChangedSlot()));
 	this->activeToolChangedSlot();
 
 	// plane type text rep
@@ -157,8 +159,8 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ViewPtr view, VisServicesPtr servic
 	//data name text rep
 	this->updateMetricNamesRep();
 
-	connect(mServices->getToolManager().get(), &TrackingService::stateChanged, this, &ViewWrapper3D::toolsAvailableSlot);
-	connect(mServices->getPatientService().get(), &PatientModelService::activeImageChanged, this, &ViewWrapper3D::activeImageChangedSlot);
+	connect(mServices->tracking().get(), &TrackingService::stateChanged, this, &ViewWrapper3D::toolsAvailableSlot);
+	connect(mServices->patient()->getActiveData().get(), &ActiveData::activeImageChanged, this, &ViewWrapper3D::activeImageChangedSlot);
 	this->toolsAvailableSlot();
 
 	mAnnotationMarker = RepManager::getInstance()->getCachedRep<OrientationAnnotation3DRep>();
@@ -272,13 +274,13 @@ void ViewWrapper3D::updateMetricNamesRep()
 	}
 }
 
-void ViewWrapper3D::PickerRepPointPickedSlot(Vector3D p_r)
+void ViewWrapper3D::pickerRepPointPickedSlot(Vector3D p_r)
 {
 	NavigationPtr nav = this->getNavigation();
 	nav->centerToPosition(p_r, Navigation::v2D);
 }
 
-void ViewWrapper3D::PickerRepDataPickedSlot(QString uid)
+void ViewWrapper3D::pickerRepDataPickedSlot(QString uid)
 {
 	//std::cout << "picked: " << uid << std::endl;
 }
@@ -339,7 +341,7 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
 	QAction* showRefTool = new QAction("Show Reference Tool", &contextMenu);
 	showRefTool->setDisabled(true);
 	showRefTool->setCheckable(true);
-	ToolPtr refTool = mServices->getToolManager()->getReferenceTool();
+	ToolPtr refTool = mServices->tracking()->getReferenceTool();
 	if (refTool)
 	{
 		showRefTool->setText("Show " + refTool->getName());
@@ -425,7 +427,7 @@ void ViewWrapper3D::setViewGroup(ViewGroupDataPtr group)
 
 void ViewWrapper3D::showToolPathSlot(bool checked)
 {
-	ToolPtr tool = mServices->getToolManager()->getActiveTool();
+	ToolPtr tool = mServices->tracking()->getActiveTool();
 	ToolRep3DPtr activeRep3D = RepContainer(mView->getReps()).findFirst<ToolRep3D>(tool);
 	if (activeRep3D)
 	{
@@ -461,7 +463,7 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 		AxisConnectorPtr axis;
 
 		// reference space
-		axis.reset(new AxisConnector(CoordinateSystem(csREF), mServices->getSpaceProvider()));
+		axis.reset(new AxisConnector(CoordinateSystem(csREF), mServices->spaceProvider()));
 		axis->mRep->setAxisLength(0.12);
 		axis->mRep->setShowAxesLabels(true);
 		axis->mRep->setCaption("ref", Vector3D(1, 0, 0));
@@ -472,7 +474,7 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 		std::vector<DataPtr> data = mGroupData->getData();
 		for (unsigned i = 0; i < data.size(); ++i)
 		{
-			axis.reset(new AxisConnector(CoordinateSystem(csDATA, data[i]->getUid()), mServices->getSpaceProvider()));
+			axis.reset(new AxisConnector(CoordinateSystem(csDATA, data[i]->getUid()), mServices->spaceProvider()));
 			axis->mRep->setAxisLength(0.08);
 			axis->mRep->setShowAxesLabels(false);
 			axis->mRep->setCaption(data[i]->getName(), Vector3D(1, 0, 0));
@@ -481,13 +483,13 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 		}
 
 		// tool spaces
-		TrackingService::ToolMap tools = mServices->getToolManager()->getTools();
+		TrackingService::ToolMap tools = mServices->tracking()->getTools();
 		TrackingService::ToolMap::iterator iter;
 		for (iter = tools.begin(); iter != tools.end(); ++iter)
 		{
 			ToolPtr tool = iter->second;
 
-			axis.reset(new AxisConnector(CoordinateSystem(csTOOL, tool->getUid()), mServices->getSpaceProvider()));
+			axis.reset(new AxisConnector(CoordinateSystem(csTOOL, tool->getUid()), mServices->spaceProvider()));
 			axis->mRep->setAxisLength(0.08);
 			axis->mRep->setShowAxesLabels(false);
 			axis->mRep->setCaption("t", Vector3D(0.7, 1, 0.7));
@@ -497,7 +499,7 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 
 			mAxis.push_back(axis);
 
-			axis.reset(new AxisConnector(CoordinateSystem(csSENSOR, tool->getUid()), mServices->getSpaceProvider()));
+			axis.reset(new AxisConnector(CoordinateSystem(csSENSOR, tool->getUid()), mServices->spaceProvider()));
 			axis->mRep->setAxisLength(0.05);
 			axis->mRep->setShowAxesLabels(false);
 			axis->mRep->setCaption("s", Vector3D(1, 1, 0));
@@ -567,7 +569,7 @@ void ViewWrapper3D::fillSlicePlanesActionSlot(bool checked)
 
 void ViewWrapper3D::dataViewPropertiesChangedSlot(QString uid)
 {
-	DataPtr data = mServices->getPatientService()->getData(uid);
+	DataPtr data = mServices->patient()->getData(uid);
 	DataViewProperties properties = mGroupData->getProperties(uid);
 
 	if (properties.hasVolume3D())
@@ -650,24 +652,19 @@ RepPtr ViewWrapper3D::createTrackedStreamRep(TrackedStreamPtr trackedStream)
 		disconnect(trackedStream.get(), &TrackedStream::streamChanged, this, &ViewWrapper3D::dataViewPropertiesChangedSlot);
 	if(trackedStream->is3D())
 	{
-//		std::cout << "ViewWrapper3D::createDataRep3D. Create StreamRep3D" << std::endl;
-		StreamRep3DPtr rep = StreamRep3D::New(mServices->getSpaceProvider(), mServices->getPatientService());
-		QString visualizerType = settings()->value("View3D/ImageRender3DVisualizer").toString();
-		if(visualizerType == "vtkVolumeTextureMapper3D")
-			rep->setUseVolumeTextureMapper();
-		else if(visualizerType == "vtkGPUVolumeRayCastMapper")
-			rep->setUseGPUVolumeRayCastMapper();
-		else
-		{
-			reportError(QString("No visualizer found for string=%1").arg(visualizerType));
-				return RepPtr();
-		}
+		StreamRep3DPtr rep = StreamRep3D::New(mServices->spaceProvider(), mServices->patient());
+		rep->setTrackedStream(trackedStream);
+		return rep;
+	}
+	else if (trackedStream->is2D())
+	{
+		Stream2DRep3DPtr rep = Stream2DRep3D::New(mServices->spaceProvider());
 		rep->setTrackedStream(trackedStream);
 		return rep;
 	}
 	else
 	{
-		std::cout << "ViewWrapper3D::createDataRep3D. StreamRep2D not implemented yet" << std::endl;
+		reportWarning("ViewWrapper3D::createDataRep3D. TrackedStream is not 2D or 3D");
 		return RepPtr();
 	}
 }
@@ -737,7 +734,7 @@ void ViewWrapper3D::activeImageChangedSlot(QString uid)
 {
 	if(!mGroupData)
 		return;
-	ImagePtr image = mServices->getPatientService()->getActiveImage();
+	ImagePtr image = mServices->patient()->getData<Image>(uid);
 
 	// only show landmarks belonging to image visible in this view:
 	std::vector<ImagePtr> images = mGroupData->getImages(DataViewProperties::create3D());
@@ -747,13 +744,13 @@ void ViewWrapper3D::activeImageChangedSlot(QString uid)
 
 void ViewWrapper3D::showRefToolSlot(bool checked)
 {
-	ToolPtr refTool = mServices->getToolManager()->getReferenceTool();
+	ToolPtr refTool = mServices->tracking()->getReferenceTool();
 	if (!refTool)
 		return;
 	ToolRep3DPtr refRep = RepContainer(mView->getReps()).findFirst<ToolRep3D>(refTool);
 	if (!refRep)
 	{
-		refRep = ToolRep3D::New(mServices->getSpaceProvider(), refTool->getUid() + "_rep3d_" + this->mView->getUid());
+		refRep = ToolRep3D::New(mServices->spaceProvider(), refTool->getUid() + "_rep3d_" + this->mView->getUid());
 		refRep->setTool(refTool);
 	}
 
@@ -784,10 +781,10 @@ void ViewWrapper3D::updateSlices()
 
 	mSlices3DRep = Slices3DRep::New("MultiSliceRep_" + mView->getName());
 	for (unsigned i=0; i<planes.size(); ++i)
-		mSlices3DRep->addPlane(planes[i], mServices->getPatientService());
+		mSlices3DRep->addPlane(planes[i], mServices->patient());
 	mSlices3DRep->setShaderPath(DataLocations::findConfigFolder("/shaders"));
 	mSlices3DRep->setImages(images);
-	mSlices3DRep->setTool(mServices->getToolManager()->getActiveTool());
+	mSlices3DRep->setTool(mServices->tracking()->getActiveTool());
 
 	mView->addRep(mSlices3DRep);
 }
@@ -799,7 +796,7 @@ ViewPtr ViewWrapper3D::getView()
 
 void ViewWrapper3D::activeToolChangedSlot()
 {
-	ToolPtr activeTool = mServices->getToolManager()->getActiveTool();
+	ToolPtr activeTool = mServices->tracking()->getActiveTool();
 	mPickerRep->setTool(activeTool);
 	if (mSlices3DRep)
 		mSlices3DRep->setTool(activeTool);
@@ -809,7 +806,7 @@ void ViewWrapper3D::toolsAvailableSlot()
 {
 	std::vector<ToolRep3DPtr> reps = RepContainer::findReps<ToolRep3D>(mView->getReps());
 
-	TrackingService::ToolMap tools = mServices->getToolManager()->getTools();
+	TrackingService::ToolMap tools = mServices->tracking()->getTools();
 	TrackingService::ToolMap::iterator iter;
 	for (iter = tools.begin(); iter != tools.end(); ++iter)
 	{
@@ -833,7 +830,7 @@ void ViewWrapper3D::toolsAvailableSlot()
 
 		if (!toolRep)
 		{
-			toolRep = ToolRep3D::New(mServices->getSpaceProvider(), tool->getUid() + "_rep3d_" + this->mView->getUid());
+			toolRep = ToolRep3D::New(mServices->spaceProvider(), tool->getUid() + "_rep3d_" + this->mView->getUid());
 			if (settings()->value("showToolPath").toBool())
 				toolRep->getTracer()->start();
 		}

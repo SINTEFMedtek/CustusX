@@ -111,7 +111,7 @@ USReconstructInputData UsReconstructionFileMaker::getReconstructData(ImageDataCo
 
 	if (tool && tool->getProbe())
 	{
-		retval.mProbeData.setData(tool->getProbe()->getProbeData());
+		retval.mProbeDefinition.setData(tool->getProbe()->getProbeDefinition());
 	}
 
 	if (tool)
@@ -362,7 +362,7 @@ QString UsReconstructionFileMaker::writeToNewFolder(QString path, bool compressi
 	this->writeTrackerTransforms(path, session, mReconstructData.mPositions);
 	this->writeUSTimestamps(path, session, mReconstructData.mFrames);
 	this->writeUSTransforms(path, session, mReconstructData.mFrames);
-	this->writeProbeConfiguration(path, session, mReconstructData.mProbeData.mData, mReconstructData.mProbeUid);
+	this->writeProbeConfiguration(path, session, mReconstructData.mProbeDefinition.mData, mReconstructData.mProbeUid);
 	this->writeMask(path, session, mReconstructData.getMask());
 	this->writeREADMEFile(path, session);
 

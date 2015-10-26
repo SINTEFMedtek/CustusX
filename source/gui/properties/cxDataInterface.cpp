@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVideoService.h"
 #include "cxPatientModelService.h"
 #include "cxActiveToolProxy.h"
+#include "cxActiveData.h"
 
 //TODO: remove
 #include "cxLegacySingletons.h"
@@ -80,16 +81,16 @@ DoubleRange DoublePropertyActiveToolOffset::getValueRange() const
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-DoublePropertyActiveImageBase::DoublePropertyActiveImageBase(PatientModelServicePtr patientModelService) :
-	mPatientModelService(patientModelService)
+DoublePropertyActiveImageBase::DoublePropertyActiveImageBase(ActiveDataPtr activeData) :
+	mActiveData(activeData)
 {
-	mActiveImageProxy = ActiveImageProxy::New(patientModelService);
+	mActiveImageProxy = ActiveImageProxy::New(mActiveData);
 	connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &DoublePropertyActiveImageBase::activeImageChanged);
 	connect(mActiveImageProxy.get(), &ActiveImageProxy::transferFunctionsChanged, this, &Property::changed);
 }
 void DoublePropertyActiveImageBase::activeImageChanged()
 {
-  mImage = mPatientModelService->getActiveImage();
+  mImage = mActiveData->getActive<Image>();
   emit changed();
 }
 double DoublePropertyActiveImageBase::getValue() const
@@ -143,151 +144,6 @@ DoubleRange DoubleProperty2DLevel::getValueRange() const
 
   double max = mImage->getMax();
   return DoubleRange(1,max,max/1000.0);
-}
-
-////---------------------------------------------------------
-////---------------------------------------------------------
-////---------------------------------------------------------
-
-StringPropertySelectRTSourceBase::StringPropertySelectRTSourceBase(PatientModelServicePtr patientModelService) :
-	mPatientModelService(patientModelService)
-{
-	connect(mPatientModelService.get(), &PatientModelService::streamLoaded, this, &Property::changed);
-}
-
-StringPropertySelectRTSourceBase::~StringPropertySelectRTSourceBase()
-{
-	disconnect(mPatientModelService.get(), &PatientModelService::streamLoaded, this, &Property::changed);
-}
-
-QStringList StringPropertySelectRTSourceBase::getValueRange() const
-{
-  std::map<QString, VideoSourcePtr> streams = mPatientModelService->getStreams();
-  QStringList retval;
-  retval << "<no real time source>";
-  std::map<QString, VideoSourcePtr>::iterator it = streams.begin();
-  for (; it !=streams.end(); ++it)
-    retval << qstring_cast(it->second->getUid());
-  return retval;
-}
-
-QString StringPropertySelectRTSourceBase::convertInternal2Display(QString internal)
-{
-  VideoSourcePtr rtSource = mPatientModelService->getStream(internal);
-  if (!rtSource)
-    return "<no real time source>";
-  return qstring_cast(rtSource->getName());
-}
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
-
-StringPropertyActiveVideoSource::StringPropertyActiveVideoSource()
-{
-	connect(videoService().get(), &VideoService::activeVideoSourceChanged, this, &Property::changed);
-}
-
-QString StringPropertyActiveVideoSource::getDisplayName() const
-{
-	return "Stream";
-}
-
-bool StringPropertyActiveVideoSource::setValue(const QString& value)
-{
-	if (value == this->getValue())
-		return false;
-	videoService()->setActiveVideoSource(value);
-	emit changed();
-	return true;
-}
-
-QString StringPropertyActiveVideoSource::getValue() const
-{
-	return videoService()->getActiveVideoSource()->getUid();
-}
-
-QStringList StringPropertyActiveVideoSource::getValueRange() const
-{
-	std::vector<VideoSourcePtr> sources = videoService()->getVideoSources();
-	QStringList retval;
-	for (unsigned i=0; i<sources.size(); ++i)
-		retval << sources[i]->getUid();
-	return retval;
-}
-
-QString StringPropertyActiveVideoSource::getHelp() const
-{
-	return "Select the active video source.";
-}
-
-
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
-
-
-StringPropertySelectRTSource::StringPropertySelectRTSource(PatientModelServicePtr patientModelService) :
-	StringPropertySelectRTSourceBase(patientModelService),
-    mValueName("Select Real Time Source")
-{
-	connect(patientModelService.get(), &PatientModelService::streamLoaded, this, &StringPropertySelectRTSource::setDefaultSlot);
-	this->setDefaultSlot();
-}
-
-QString StringPropertySelectRTSource::getDisplayName() const
-{
-  return mValueName;
-}
-
-bool StringPropertySelectRTSource::setValue(const QString& value)
-{
-  if(mRTSource && (mRTSource->getUid() == value))
-    return false;
-
-  if(mRTSource)
-	  disconnect(mRTSource.get(), &VideoSource::streaming, this, &Property::changed);
-
-  VideoSourcePtr rtSource = mPatientModelService->getStream(value);
-  if(!rtSource)
-    return false;
-
-  mRTSource = rtSource;
-  connect(mRTSource.get(), &VideoSource::streaming, this, &Property::changed);
-
-  emit changed();
-  return true;
-}
-
-QString StringPropertySelectRTSource::getValue() const
-{
-  if(!mRTSource)
-    return "<no real time source>";
-  return mRTSource->getUid();
-}
-
-QString StringPropertySelectRTSource::getHelp() const
-{
-  return "Select a real time source";
-}
-
-VideoSourcePtr StringPropertySelectRTSource::getRTSource()
-{
-  return mRTSource;
-}
-
-void StringPropertySelectRTSource::setValueName(const QString name)
-{
-  mValueName = name;
-}
-
-void StringPropertySelectRTSource::setDefaultSlot()
-{
-  std::map<QString, VideoSourcePtr> streams = mPatientModelService->getStreams();
-  std::map<QString, VideoSourcePtr>::iterator it = streams.begin();
-  if(it != streams.end())
-  {
-    this->setValue(it->first);
-  }
 }
 
 
@@ -581,4 +437,214 @@ QStringList StringPropertyImageType::getValueRange() const
 	return QStringList::fromSet(QSet<QString>::fromList(retval));
 }
 
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+StringPropertyGlyphOrientationArray::StringPropertyGlyphOrientationArray(PatientModelServicePtr patientModelService) :
+    mPatientModelService(patientModelService)
+{
+    connect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &Property::changed);
+}
+
+StringPropertyGlyphOrientationArray::~StringPropertyGlyphOrientationArray()
+{
+    disconnect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &Property::changed);
+}
+
+void StringPropertyGlyphOrientationArray::setData(MeshPtr data)
+{
+    if (mData)
+        disconnect(mData.get(), &Data::propertiesChanged, this, &Property::changed);
+    mData = data;
+    if (mData)
+        connect(mData.get(), &Data::propertiesChanged, this, &Property::changed);
+    emit changed();
+}
+
+QString StringPropertyGlyphOrientationArray::getDisplayName() const
+{
+    return "Set glyph orientation array";
+}
+
+bool StringPropertyGlyphOrientationArray::setValue(const QString& value)
+{
+    if (!mData)
+        return false;
+    mData->setOrientationArray(value.toStdString().c_str());
+    return true;
+}
+
+QString StringPropertyGlyphOrientationArray::getValue() const
+{
+    if (!mData)
+        return "";
+    return mData->getOrientationArray();
+}
+
+QString StringPropertyGlyphOrientationArray::getHelp() const
+{
+    if (!mData)
+        return "";
+    return "Select which array to use for orientation of the glyphs.";
+}
+
+QStringList StringPropertyGlyphOrientationArray::getValueRange() const
+{
+    if (!mData)
+    {
+        QStringList retval;
+        retval << "";
+        return retval;
+    }
+    return mData->getOrientationArrayList();
+}
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+StringPropertyGlyphColorArray::StringPropertyGlyphColorArray(PatientModelServicePtr patientModelService) :
+    mPatientModelService(patientModelService)
+{
+    connect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &Property::changed);
+}
+
+StringPropertyGlyphColorArray::~StringPropertyGlyphColorArray()
+{
+    disconnect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &Property::changed);
+}
+
+void StringPropertyGlyphColorArray::setData(MeshPtr data)
+{
+    if (mData)
+        disconnect(mData.get(), &Data::propertiesChanged, this, &Property::changed);
+    mData = data;
+    if (mData)
+        connect(mData.get(), &Data::propertiesChanged, this, &Property::changed);
+    emit changed();
+}
+
+QString StringPropertyGlyphColorArray::getDisplayName() const
+{
+    return "Set glyph color array";
+}
+
+bool StringPropertyGlyphColorArray::setValue(const QString& value)
+{
+    if (!mData)
+        return false;
+    mData->setColorArray(value.toStdString().c_str());
+    return true;
+}
+
+QString StringPropertyGlyphColorArray::getValue() const
+{
+    if (!mData)
+        return "";
+    return mData->getColorArray();
+}
+
+QString StringPropertyGlyphColorArray::getHelp() const
+{
+    if (!mData)
+        return "";
+    return "Select which array to use for coloring the glyphs.";
+}
+
+QStringList StringPropertyGlyphColorArray::getValueRange() const
+{
+    if (!mData)
+    {
+        QStringList retval;
+        retval << "";
+        return retval;
+    }
+    return mData->getColorArrayList();
+}
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+StringPropertyGlyphLUT::StringPropertyGlyphLUT(PatientModelServicePtr patientModelService) :
+    mPatientModelService(patientModelService)
+{
+    connect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &Property::changed);
+}
+
+StringPropertyGlyphLUT::~StringPropertyGlyphLUT()
+{
+    disconnect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &Property::changed);
+}
+
+void StringPropertyGlyphLUT::setData(MeshPtr data)
+{
+    if (mData)
+        disconnect(mData.get(), &Data::propertiesChanged, this, &Property::changed);
+    mData = data;
+    if (mData)
+        connect(mData.get(), &Data::propertiesChanged, this, &Property::changed);
+    emit changed();
+}
+
+QString StringPropertyGlyphLUT::getDisplayName() const
+{
+    return "Set glyph color LUT";
+}
+
+bool StringPropertyGlyphLUT::setValue(const QString& value)
+{
+    if (!mData)
+        return false;
+    mData->setGlyphLUT(value.toStdString().c_str());
+    return true;
+}
+
+QString StringPropertyGlyphLUT::getValue() const
+{
+    if (!mData)
+        return "";
+    return mData->getGlyphLUT();
+}
+
+QString StringPropertyGlyphLUT::getHelp() const
+{
+    if (!mData)
+        return "";
+    return "Select which color LUT to use for coloring the glyphs.";
+}
+
+QStringList StringPropertyGlyphLUT::getValueRange() const
+{
+    QStringList retval;
+
+    retval <<
+    "Spectrum"<<
+    "Warm"<<
+    "Cool"<<
+    "Blues"<<
+    "Wild Flower"<<
+    "Citrus"<<
+
+    "Brewer Diverging Purple-Orange"<<
+    "Brewer Diverging Spectral"<<
+    "Brewer Diverging Brown-Blue-Green"<<
+
+    "Brewer Sequential Blue-Green"<<
+    "Brewer Sequential Yellow-Orange-Brown"<<
+    "Brewer Sequential Blue-Purple"<<
+
+    "Brewer Qualitative Accent"<<
+    "Brewer Qualitative Dark2"<<
+    "Brewer Qualitative Set2"<<
+    "Brewer Qualitative Pastel2"<<
+    "Brewer Qualitative Pastel1"<<
+    "Brewer Qualitative Set1"<<
+    "Brewer Qualitative Paired"<<
+    "Brewer Qualitative Set3";
+
+    return retval;
+}
+
 } // namespace cx
+

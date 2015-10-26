@@ -108,11 +108,11 @@ class org_custusx_usreconstruction_EXPORT ThreadedTimedReconstructCore: public c
 {
 Q_OBJECT
 public:
-	static ThreadedTimedReconstructCorePtr create(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, ReconstructCorePtr reconstructer)
+	static ThreadedTimedReconstructCorePtr create(PatientModelServicePtr patientModelService, ViewServicePtr viewService, ReconstructCorePtr reconstructer)
 	{
-		return ThreadedTimedReconstructCorePtr(new ThreadedTimedReconstructCore(patientModelService, visualizationService, reconstructer));
+		return ThreadedTimedReconstructCorePtr(new ThreadedTimedReconstructCore(patientModelService, viewService, reconstructer));
 	}
-	ThreadedTimedReconstructCore(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, ReconstructCorePtr reconstructer);
+	ThreadedTimedReconstructCore(PatientModelServicePtr patientModelService, ViewServicePtr viewService, ReconstructCorePtr reconstructer);
 	virtual ~ThreadedTimedReconstructCore();
 
 private slots:
@@ -123,7 +123,7 @@ private:
 	virtual void calculate();
 	ReconstructCorePtr mReconstructer;
 	PatientModelServicePtr mPatientModelService;
-	VisualizationServicePtr mVisualizationService;
+	ViewServicePtr mViewService;
 };
 
 

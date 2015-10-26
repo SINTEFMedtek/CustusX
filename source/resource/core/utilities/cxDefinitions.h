@@ -102,7 +102,7 @@ namespace cx
 
 	enum cxResource_EXPORT COORDINATE_SYSTEM
 	{
-		csREF, ///< the data reference space (r)
+		csREF, ///< the data reference space (r) using LPS (left-posterior-superior) coordinates.
 		csDATA, ///< a datas space (d)
 		csPATIENTREF, ///< the patient/tool reference space (pr)
 		csTOOL, ///< a tools rspace (t)
@@ -111,6 +111,16 @@ namespace cx
 		csDATA_VOXEL, ///< the data voxel space (dv)
 		csCOUNT
 	};
+
+	/** http://www.slicer.org/slicerWiki/index.php/Coordinate_systems
+	 */
+	enum cxResource_EXPORT PATIENT_COORDINATE_SYSTEM
+	{
+		pcsLPS, ///< Left-Posterior-Superior, used internally by CustusX, also DICOM, ITK.
+		pcsRAS, ///< Right-Anterior-Superior, used by Slicer3D, ITK-Snap, nifti.
+		pcsCOUNT
+	};
+
 
 	enum cxResource_EXPORT TRACKING_SYSTEM
 	{

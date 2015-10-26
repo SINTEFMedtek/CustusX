@@ -124,8 +124,9 @@ void MessageRepository::install(MessageObserverPtr observer, bool resend)
 
 	if (resend)
 	{
-		for (QList<Message>::iterator i=mMessages.begin(); i!=mMessages.end(); ++i)
-			observer->sendMessage(*i);
+		for (unsigned i = 0; i < mMessages.size(); ++i)
+			observer->sendMessage(mMessages[i]);
+
 	}
 }
 

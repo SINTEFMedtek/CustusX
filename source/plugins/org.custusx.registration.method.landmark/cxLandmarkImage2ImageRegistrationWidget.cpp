@@ -50,13 +50,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationProperties.h"
 #include "cxRegistrationService.h"
 #include "cxViewService.h"
-#include "cxViewGroupData.h"
 #include "cxRepContainer.h"
 #include "cxLandmarkListener.h"
 
 namespace cx
 {
-LandmarkImage2ImageRegistrationWidget::LandmarkImage2ImageRegistrationWidget(RegServices services,
+LandmarkImage2ImageRegistrationWidget::LandmarkImage2ImageRegistrationWidget(RegServicesPtr services,
 	QWidget* parent, QString objectName, QString windowTitle) :
 	LandmarkRegistrationWidget(services, parent, objectName, windowTitle)
 {
@@ -64,8 +63,8 @@ LandmarkImage2ImageRegistrationWidget::LandmarkImage2ImageRegistrationWidget(Reg
 
 	mLandmarkListener->useI2IRegistration();
 
-	mFixedProperty.reset(new StringPropertyRegistrationFixedImage(services.registrationService, services.patientModelService));
-	mMovingProperty.reset(new StringPropertyRegistrationMovingImage(services.registrationService, services.patientModelService));
+	mFixedProperty.reset(new StringPropertyRegistrationFixedImage(services->registration(), services->patient()));
+	mMovingProperty.reset(new StringPropertyRegistrationMovingImage(services->registration(), services->patient()));
 
 	mTranslationCheckBox = new QCheckBox("Translation only", this);
 	mTranslationCheckBox->setChecked(settings()->value("registration/I2ILandmarkTranslation", false).toBool());
@@ -110,13 +109,13 @@ QString LandmarkImage2ImageRegistrationWidget::defaultWhatsThis() const
 
 void LandmarkImage2ImageRegistrationWidget::showEvent(QShowEvent* event)
 {
-	mServices.visualizationService->getGroup(0)->setRegistrationMode(rsIMAGE_REGISTRATED);
+	mServices->view()->setRegistrationMode(rsIMAGE_REGISTRATED);
 	LandmarkRegistrationWidget::showEvent(event);
 }
 
 void LandmarkImage2ImageRegistrationWidget::hideEvent(QHideEvent* event)
 {
-	mServices.visualizationService->getGroup(0)->setRegistrationMode(rsNOT_REGISTRATED);
+	mServices->view()->setRegistrationMode(rsNOT_REGISTRATED);
 	LandmarkRegistrationWidget::hideEvent(event);
 }
 
@@ -126,7 +125,7 @@ void LandmarkImage2ImageRegistrationWidget::prePaintEvent()
 
 LandmarkMap LandmarkImage2ImageRegistrationWidget::getTargetLandmarks() const
 {
-	ImagePtr moving = boost::dynamic_pointer_cast<Image>(mServices.registrationService->getMovingData());
+	ImagePtr moving = boost::dynamic_pointer_cast<Image>(mServices->registration()->getMovingData());
 
 	if (moving)
 		return moving->getLandmarks()->getLandmarks();
@@ -136,7 +135,7 @@ LandmarkMap LandmarkImage2ImageRegistrationWidget::getTargetLandmarks() const
 
 void LandmarkImage2ImageRegistrationWidget::performRegistration()
 {
-	mServices.registrationService->doImageRegistration(mTranslationCheckBox->isChecked());
+	mServices->registration()->doImageRegistration(mTranslationCheckBox->isChecked());
 	this->updateAverageAccuracyLabel();
 }
 
@@ -145,14 +144,14 @@ void LandmarkImage2ImageRegistrationWidget::performRegistration()
  */
 Transform3D LandmarkImage2ImageRegistrationWidget::getTargetTransform() const
 {
-	if (!mServices.registrationService->getMovingData())
+	if (!mServices->registration()->getMovingData())
 		return Transform3D::Identity();
-	return mServices.registrationService->getMovingData()->get_rMd();
+	return mServices->registration()->getMovingData()->get_rMd();
 }
 
 void LandmarkImage2ImageRegistrationWidget::setTargetLandmark(QString uid, Vector3D p_target)
 {
-	ImagePtr image = boost::dynamic_pointer_cast<Image>(mServices.registrationService->getMovingData());
+	ImagePtr image = boost::dynamic_pointer_cast<Image>(mServices->registration()->getMovingData());
 	if (!image)
 		return;
 	image->getLandmarks()->setLandmark(Landmark(uid, p_target));
@@ -160,7 +159,7 @@ void LandmarkImage2ImageRegistrationWidget::setTargetLandmark(QString uid, Vecto
 
 QString LandmarkImage2ImageRegistrationWidget::getTargetName() const
 {
-	DataPtr image = mServices.registrationService->getMovingData();
+	DataPtr image = mServices->registration()->getMovingData();
 	if (!image)
 		return "None";
 	return image->getName();

@@ -43,8 +43,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxLogger.h"
 #include "cxIGTLinkConversion.h"
+#include "cxIGTLinkConversionImage.h"
 #include "cxCyclicActionLogger.h"
 #include "cxUtilHelpers.h"
+#include "cxTime.h"
 #include "cxSender.h"
 
 namespace cx
@@ -274,11 +276,34 @@ bool IGTLinkClientStreamer::ReceiveSonixStatus(QTcpSocket* socket, igtl::Message
 	return true;
 }
 
+namespace
+{
+QDateTime my_decode_timestamp(igtl::MessageBase* msg)
+{
+	// get timestamp from igtl second-format:
+	igtl::TimeStamp::Pointer timestamp = igtl::TimeStamp::New();
+	msg->GetTimeStamp(timestamp);
+	double timestampMS = timestamp->GetTimeStamp() * 1000;
+	return QDateTime::fromMSecsSinceEpoch(timestampMS);
+}
+
+void write_time_info(igtl::ImageMessage::Pointer imgMsg)
+{
+	int kb = imgMsg->GetPackSize()/1024;
+//	CX_LOG_CHANNEL_DEBUG("igtl_rec_test") << "unpacked: , " << kb << " kByte, name=" << imgMsg->GetDeviceName();
+	QDateTime org_ts = my_decode_timestamp(imgMsg.GetPointer());
+	QDateTime now_ts = QDateTime::currentDateTime();
+	QString format = timestampMilliSecondsFormatNice();
+	CX_LOG_CHANNEL_DEBUG("igtl_rec_test") << "received " << kb << "kByte"
+										  << ", time=(" << org_ts.toString(format) << "->" << now_ts.toString(format) << ")"
+										  << ", lag=" << org_ts.msecsTo(now_ts) << "ms";
+}
+}
+
 bool IGTLinkClientStreamer::ReceiveImage(QTcpSocket* socket, igtl::MessageHeader::Pointer& header)
 {
 	// Create a message buffer to receive transform data
-	IGTLinkImageMessage::Pointer imgMsg;
-	imgMsg = IGTLinkImageMessage::New();
+	igtl::ImageMessage::Pointer imgMsg = igtl::ImageMessage::New();
 	imgMsg->SetMessageHeader(header);
 	imgMsg->AllocatePack();
 
@@ -296,6 +321,8 @@ bool IGTLinkClientStreamer::ReceiveImage(QTcpSocket* socket, igtl::MessageHeader
 	// If you want to skip CRC check, call Unpack() without argument.
 	int c = imgMsg->Unpack();
 
+	write_time_info(imgMsg);
+
 	if (c & (igtl::MessageHeader::UNPACK_BODY | igtl::MessageHeader::UNPACK_UNDEF)) // if CRC check is OK or skipped
 	{
 		this->addToQueue(imgMsg);
@@ -312,17 +339,19 @@ void IGTLinkClientStreamer::addToQueue(IGTLinkUSStatusMessage::Pointer msg)
 	mUnsentUSStatusMessage = msg;
 }
 
-void IGTLinkClientStreamer::addToQueue(IGTLinkImageMessage::Pointer msg)
+void IGTLinkClientStreamer::addToQueue(igtl::ImageMessage::Pointer msg)
 {
 	IGTLinkConversion converter;
+	IGTLinkConversionImage imageconverter;
 
 	PackagePtr package(new Package());
-	package->mIgtLinkImageMessage = msg;
+	package->mImage = imageconverter.decode(msg);
 
 	// if us status not sent, do it here
 	if (mUnsentUSStatusMessage)
 	{
-		package->mIgtLinkUSStatusMessage = mUnsentUSStatusMessage;
+		CX_LOG_WARNING() << "default constructed probe definition used as input.";
+		package->mProbe = converter.decode(mUnsentUSStatusMessage, msg, ProbeDefinitionPtr(new ProbeDefinition()));
 		mUnsentUSStatusMessage = IGTLinkUSStatusMessage::Pointer();
 	}
 

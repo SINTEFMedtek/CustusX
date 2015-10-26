@@ -60,6 +60,15 @@ TrackedStream::TrackedStream(const QString& uid, const QString& name, const Tool
 	setVideoSource(videosource);
 }
 
+TrackedStream::~TrackedStream()
+{
+	if(mVideoSource)
+	{
+		disconnect(mVideoSource.get(), &VideoSource::newFrame, this, &TrackedStream::newFrame);
+		disconnect(mVideoSource.get(), &VideoSource::streaming, this, &TrackedStream::streaming);
+	}
+}
+
 void TrackedStream::setProbeTool(const ToolPtr &probeTool)
 {
 	if(mProbeTool)
@@ -75,19 +84,20 @@ void TrackedStream::setProbeTool(const ToolPtr &probeTool)
 void TrackedStream::toolTransformAndTimestamp(Transform3D prMt, double timestamp)
 {
 	//tMu calculation in ProbeSector differ from the one used here
-//	Transform3D tMu = mProbeData.get_tMu();
+//	Transform3D tMu = mProbeDefinition.get_tMu();
 	Transform3D tMu = this->get_tMu();
 	Transform3D rMpr = mSpaceProvider->get_rMpr();
 	Transform3D rMu = rMpr * prMt * tMu;
 
 	if (mImage)
 		mImage->get_rMd_History()->setRegistration(rMu);
+	emit newPosition();
 }
 
 Transform3D TrackedStream::get_tMu()
 {
 	//Made tMu by copying and modifying code from ProbeSector::get_tMu()
-	ProbeDefinition probeDefinition = mProbeTool->getProbe()->getProbeData();
+	ProbeDefinition probeDefinition = mProbeTool->getProbe()->getProbeDefinition();
 	Vector3D origin_p = probeDefinition.getOrigin_p();
 	Vector3D spacing = probeDefinition.getSpacing();
 	Vector3D origin_u(origin_p[0]*spacing[0], origin_p[1]*spacing[1], origin_p[2]*spacing[2]);
@@ -170,7 +180,7 @@ QString TrackedStream::getType() const
 
 QString TrackedStream::getTypeName()
 {
-	return "TrackedStream";
+	return "trackedStream";
 }
 
 ImagePtr TrackedStream::getChangingImage()
@@ -190,11 +200,26 @@ bool TrackedStream::is3D()
 		return false;
 }
 
+bool TrackedStream::is2D()
+{
+	if(this->hasVideo() && ( mVideoSource->getVtkImageData()->GetDataDimension() == 2) )
+		return true;
+	else
+		return false;
+}
+
 bool TrackedStream::hasVideo() const
 {
 	if(!mVideoSource || !mVideoSource->getVtkImageData())
 		return false;
 	return true;
+}
+
+bool TrackedStream::isStreaming() const
+{
+	if (this->hasVideo())
+		return mVideoSource->isStreaming();
+	return false;
 }
 
 } //cx

@@ -148,7 +148,7 @@ TEST_CASE("ElastiX should register kaisa to a translated+resampled version of sa
 	parameters->getCurrentPreset()->setValue(elastixPreset);
 
 
-	cx::RegServices services = cx::RegServices::getNullObjects();
+	cx::RegServicesPtr services = cx::RegServices::getNullObjects();
 
 	cx::ElastixSingleThreadedRunner runner(services);
 	REQUIRE(runner.registerLinear(kaisa_padded, kaisa_resliced_linear, parameters, &result));

@@ -24,5 +24,8 @@ sudo apt-get -y upgrade
 # https://devtalk.nvidia.com/default/topic/734098/linux/-boinc-ubuntu-nvidia-no-usable-gpus-found-/
 sudo apt-get -y install nvidia-modprobe
 
+# needed to compile VTK on a Ubuntu 14.04 dated 2015-08+
+sudo apt-get -y install libxnvctrl-dev 
+
 
 

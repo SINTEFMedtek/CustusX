@@ -62,11 +62,11 @@ class cxResource_EXPORT ActiveImageProxy: public QObject
 {
 Q_OBJECT
 public:
-	static ActiveImageProxyPtr New(PatientModelServicePtr patientModelService)
+	static ActiveImageProxyPtr New(ActiveDataPtr activeData)
 	{
-		return ActiveImageProxyPtr(new ActiveImageProxy(patientModelService));
+		return ActiveImageProxyPtr(new ActiveImageProxy(activeData));
 	}
-	ActiveImageProxy(PatientModelServicePtr patientModelService);
+	ActiveImageProxy(ActiveDataPtr activeData);
 	~ActiveImageProxy();
 
 signals:
@@ -86,7 +86,7 @@ private slots:
 	void activeImageChangedSlot(const QString&);
 private:
 	ImagePtr mImage;
-	PatientModelServicePtr mPatientModelService;
+	ActiveDataPtr mActiveData;
 };
 
 /**

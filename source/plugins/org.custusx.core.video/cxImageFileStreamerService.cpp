@@ -34,7 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxStringProperty.h"
 #include "cxDoubleProperty.h"
 #include "cxBoolProperty.h"
-#include "cxIGTLinkClientStreamer.h"
 #include "cxMHDImageStreamer.h"
 #include "cxLocalServerStreamerServer.h"
 #include "cxTypeConversions.h"

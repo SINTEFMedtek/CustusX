@@ -44,16 +44,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImageTF3D.h"
 #include "cxShadingParamsInterfaces.h"
 #include "cxImagePropertiesWidget.h"
-#include "cxPatientModelService.h"
-#include "cxLogicManager.h"
+#include "cxActiveData.h"
 
 namespace cx
 {
 
-ShadingWidget::ShadingWidget(PatientModelServicePtr patientModelService, QWidget* parent,  bool connectToActiveImage) :
+ShadingWidget::ShadingWidget(ActiveDataPtr activeData, QWidget* parent,  bool connectToActiveImage) :
 	BaseWidget(parent, "ShadingWidget", "Shading"),
 	mLayout(new QVBoxLayout(this)),
-	mPatientModelService(patientModelService),
+	mActiveData(activeData),
 	mActiveImageProxy(ActiveImageProxyPtr()),
 	mImage(ImagePtr()),
 	mImagePropertiesWidget(ImagePropertiesWidgetPtr())
@@ -73,10 +72,10 @@ void ShadingWidget::init(bool connectToActiveImage)
 
   QGridLayout* shadingLayput = new QGridLayout();
 	shadingLayput->addWidget(mShadingCheckBox, 0,0);
-  SliderGroupWidget* shadingAmbientWidget = new SliderGroupWidget(this, DoublePropertyBasePtr(new DoublePropertyShadingAmbient(mPatientModelService)), shadingLayput, 1);
-  SliderGroupWidget* shadingDiffuseWidget = new SliderGroupWidget(this, DoublePropertyBasePtr(new DoublePropertyShadingDiffuse(mPatientModelService)), shadingLayput, 2);
-  SliderGroupWidget* shadingSpecularWidget = new SliderGroupWidget(this, DoublePropertyBasePtr(new DoublePropertyShadingSpecular(mPatientModelService)), shadingLayput, 3);
-  SliderGroupWidget* shadingSpecularPowerWidget = new SliderGroupWidget(this, DoublePropertyBasePtr(new DoublePropertyShadingSpecularPower(mPatientModelService)), shadingLayput, 4);
+  SliderGroupWidget* shadingAmbientWidget = new SliderGroupWidget(this, DoublePropertyBasePtr(new DoublePropertyShadingAmbient(mActiveData)), shadingLayput, 1);
+  SliderGroupWidget* shadingDiffuseWidget = new SliderGroupWidget(this, DoublePropertyBasePtr(new DoublePropertyShadingDiffuse(mActiveData)), shadingLayput, 2);
+  SliderGroupWidget* shadingSpecularWidget = new SliderGroupWidget(this, DoublePropertyBasePtr(new DoublePropertyShadingSpecular(mActiveData)), shadingLayput, 3);
+  SliderGroupWidget* shadingSpecularPowerWidget = new SliderGroupWidget(this, DoublePropertyBasePtr(new DoublePropertyShadingSpecularPower(mActiveData)), shadingLayput, 4);
 
   shadingAmbientWidget->setEnabled(false);
   shadingDiffuseWidget->setEnabled(false);
@@ -85,7 +84,7 @@ void ShadingWidget::init(bool connectToActiveImage)
 
 	if (connectToActiveImage)
 	{
-		mActiveImageProxy = ActiveImageProxy::New(mPatientModelService);
+		mActiveImageProxy = ActiveImageProxy::New(mActiveData);
 		connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &ShadingWidget::activeImageChangedSlot);
 		connect(mActiveImageProxy.get(), &ActiveImageProxy::transferFunctionsChanged, this, &ShadingWidget::activeImageChangedSlot);
 	}
@@ -104,7 +103,7 @@ void ShadingWidget::shadingToggledSlot(bool val)
 
 void ShadingWidget::activeImageChangedSlot()
 {
-	ImagePtr activeImage = mPatientModelService->getActiveImage();
+	ImagePtr activeImage = mActiveData->getActive<Image>();
 	this->imageChangedSlot(activeImage);
 }
 

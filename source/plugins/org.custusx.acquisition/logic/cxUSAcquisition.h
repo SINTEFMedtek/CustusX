@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 #include "cxForwardDeclarations.h"
+#include "cxAcquisitionService.h"
 
 namespace cx
 {
@@ -81,8 +82,8 @@ public:
 	USAcquisition(AcquisitionPtr base, QObject* parent = 0);
 	virtual ~USAcquisition();
 	int getNumberOfSavingThreads() const;
-	bool isReady() const { return mReady; }
-	QString getInfoText() const { return mInfoText; }
+	bool isReady(AcquisitionService::TYPES context) const;
+	QString getInfoText(AcquisitionService::TYPES context) const;
 
 signals:
 	void acquisitionDataReady(); ///< emitted when data is acquired and sent to the reconstruction module

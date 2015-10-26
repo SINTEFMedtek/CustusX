@@ -48,17 +48,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackedStream.h"
 #include "cxReporter.h"
 #include "cxVideoSource.h"
+#include "cxActiveData.h"
 
 namespace cx
 {
 
 PatientModelImplService::PatientModelImplService(ctkPluginContext *context) :
-	mContext(context )
+	mContext(context)
 {
 	this->createInterconnectedDataAndSpace();
 
 	connect(this->dataService().get(), &DataManager::dataAddedOrRemoved, this, &PatientModelService::dataAddedOrRemoved);
-	connect(this->dataService().get(), &DataManager::activeImageChanged, this, &PatientModelService::activeImageChanged);
 	connect(this->dataService().get(), &DataManager::rMprChanged, this, &PatientModelService::rMprChanged);
 	connect(this->dataService().get(), &DataManager::streamLoaded, this, &PatientModelService::streamLoaded);
 	connect(this->dataService().get(), &DataManager::clinicalApplicationChanged, this, &PatientModelService::clinicalApplicationChanged);
@@ -78,16 +78,16 @@ void PatientModelImplService::createInterconnectedDataAndSpace()
 
 	// build object(s):
 	PatientModelServicePtr patientModelService = PatientModelServiceProxy::create(mContext);
+	SessionStorageServicePtr session = SessionStorageServiceProxy::create(mContext);
 
-	mDataService = DataManagerImpl::create();
+	mActiveData.reset(new ActiveData(patientModelService, session));
+	mDataService = DataManagerImpl::create(mActiveData);
 
 	SpaceProviderPtr spaceProvider(new cx::SpaceProviderImpl(mTrackingService, patientModelService));
 	mDataService->setSpaceProvider(spaceProvider);
 
 	mDataFactory.reset(new DataFactory(patientModelService, spaceProvider));
 	mDataService->setDataFactory(mDataFactory);
-
-	SessionStorageServicePtr session = SessionStorageServiceProxy::create(mContext);
 
 	mPatientData.reset(new PatientData(mDataService, session));
 }
@@ -117,7 +117,6 @@ PatientModelImplService::~PatientModelImplService()
 	if(dataService())
 	{
 		disconnect(this->dataService().get(), &DataManager::dataAddedOrRemoved, this, &PatientModelService::dataAddedOrRemoved);
-		disconnect(this->dataService().get(), &DataManager::activeImageChanged, this, &PatientModelService::activeImageChanged);
 		disconnect(this->dataService().get(), &DataManager::rMprChanged, this, &PatientModelService::rMprChanged);
 		disconnect(this->dataService().get(), &DataManager::streamLoaded, this, &PatientModelService::streamLoaded);
 		disconnect(this->dataService().get(), &DataManager::clinicalApplicationChanged, this, &PatientModelService::clinicalApplicationChanged);
@@ -185,16 +184,6 @@ bool PatientModelImplService::isNull()
 	return false;
 }
 
-ImagePtr PatientModelImplService::getActiveImage() const
-{
-	return dataService()->getActiveImage();
-}
-
-void PatientModelImplService::setActiveImage(ImagePtr activeImage)
-{
-	dataService()->setActiveImage(activeImage);
-}
-
 CLINICAL_VIEW PatientModelImplService::getClinicalApplication() const
 {
 	return dataService()->getClinicalApplication();
@@ -230,9 +219,9 @@ DataPtr PatientModelImplService::importData(QString fileName, QString &infoText)
 	return this->patientData()->importData(fileName, infoText);
 }
 
-void PatientModelImplService::exportPatient(bool niftiFormat)
+void PatientModelImplService::exportPatient(PATIENT_COORDINATE_SYSTEM externalSpace)
 {
-	this->patientData()->exportPatient(niftiFormat);
+	this->patientData()->exportPatient(externalSpace);
 }
 
 void PatientModelImplService::removeData(QString uid)
@@ -271,8 +260,12 @@ RegistrationHistoryPtr PatientModelImplService::get_rMpr_History() const
 	return this->dataService()->get_rMpr_History();
 }
 
+ActiveDataPtr PatientModelImplService::getActiveData() const
+{
+	return mActiveData;
+}
 
-DataManagerImplPtr PatientModelImplService::dataService() const
+DataServicePtr PatientModelImplService::dataService() const
 {
 	return mDataService;
 }
@@ -298,13 +291,8 @@ void PatientModelImplService::newProbe(const ToolPtr tool)
 
 void PatientModelImplService::videoSourceAdded(VideoSourcePtr source)
 {
-
 	ToolPtr tool = this->getProbeTool(source->getUid());
 	if(!tool)
-		return;
-
-	//Temporary code turning off generation of TrackedStream for video sources that are not 3D
-	if (!source || !source->getVtkImageData() || source->getVtkImageData()->GetDataDimension() != 3)
 		return;
 
 	QString uid = source->getUid() + tool->getUid();
@@ -318,7 +306,14 @@ void PatientModelImplService::videoSourceAdded(VideoSourcePtr source)
 
 	//Only load trackedStream, don't save it
 	this->dataService()->loadData(trackedStream);
-//	this->insertData(trackedStream);
+	emit videoAddedToTrackedStream();
+	this->reEmitActiveTrackedStream(trackedStream);
+}
+
+void PatientModelImplService::reEmitActiveTrackedStream(TrackedStreamPtr trackedStream)
+{
+	if(mActiveData->getActive<TrackedStream>() == trackedStream)
+		mActiveData->setActive(trackedStream);
 }
 
 ToolPtr PatientModelImplService::getProbeTool(QString videoSourceUid)

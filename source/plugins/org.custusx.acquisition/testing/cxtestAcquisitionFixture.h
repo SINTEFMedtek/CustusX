@@ -81,6 +81,7 @@ private:
 	void tearDown();
 
 	void initVideo();
+	cx::AcquisitionService::TYPES getContext();
 	void verifyFileData(cx::USReconstructInputData data);
 
 	cx::USReconstructInputData mMemOutputData;

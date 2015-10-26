@@ -199,7 +199,7 @@ TEST_CASE("Visual rendering: Several empty views in a sequence.",
 }
 
 TEST_CASE("Visual rendering: Show 3D volume - vtkGPU render",
-		  "[unit][resource][visualization][not_win32][not_win64][not_mavericks]")
+		  "[unit][resource][visualization][not_win32][not_win64][unstable]")
 {
 	cxtest::ViewsFixture fixture;
 	ImageTestList imagenames;
@@ -331,8 +331,9 @@ TEST_CASE("Visual rendering: Show ACS, 3 volumes, centered hidden tool",
 	}
 }
 
+//Tagged as unstable as it sometimes fail in Linux
 TEST_CASE("Visual rendering: Show Axial GPU slice, 1 volume",
-		  "[unit][resource][visualization][not_win32][not_win64]")
+		  "[unit][resource][visualization][not_win32][not_win64][unstable]")
 {
 	cxtest::ViewsFixture fixture;
 	ImageTestList imagenames;
@@ -349,8 +350,9 @@ TEST_CASE("Visual rendering: Show Axial GPU slice, 1 volume",
 	CHECK(fixture.getFractionOfBrightPixelsInView(0,20,2) > 0.02);
 }
 
+//Tagged as unstable as it sometimes fail in Linux
 TEST_CASE("Visual rendering: Show Axial GPU slice, 2 volumes",
-		  "[unit][resource][visualization][not_win32][not_win64]")
+		  "[unit][resource][visualization][not_win32][not_win64][unstable]")
 {
 	cxtest::ViewsFixture fixture;
 	ImageTestList imagenames;

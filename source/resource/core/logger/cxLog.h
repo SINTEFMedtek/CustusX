@@ -93,7 +93,7 @@ protected:
   virtual LogThreadPtr createWorker() = 0;
 
 protected slots:
-  void onEmittedMessage(Message message) {}
+  virtual void onEmittedMessage(Message message) {}
 
 protected:
   Log();

@@ -43,17 +43,17 @@ VisServicesPtr VisServices::create(ctkPluginContext* context)
 VisServices::VisServices(ctkPluginContext* context) :
 	CoreServices(context)
 {
-	visualizationService = VisualizationServicePtr(new VisualizationServiceProxy(context));
+	mViewService = ViewServicePtr(new ViewServiceProxy(context));
 }
 
-VisServices VisServices::getNullObjects()
+VisServicesPtr VisServices::getNullObjects()
 {
-	return VisServices();
+	return VisServicesPtr(new VisServices());
 }
 
 VisServices::VisServices() :
 	CoreServices()
 {
-	visualizationService = cx::VisualizationService::getNullObject();
+	mViewService = cx::ViewService::getNullObject();
 }
 } // cx

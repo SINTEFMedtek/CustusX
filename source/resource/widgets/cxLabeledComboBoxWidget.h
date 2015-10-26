@@ -71,6 +71,8 @@ private slots:
 	void comboIndexChanged(int val);
 
 private:
+	QIcon getIcon(QString uid);
+
 	QLabel* mLabel;
 	QComboBox* mCombo;
 	StringPropertyBasePtr mData;

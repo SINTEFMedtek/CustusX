@@ -40,7 +40,6 @@ class Controller(cxBuildScript.BuildScript):
     def setDefaults(self):                
         super(Controller, self).setDefaults()
         self.controlData().setBuildType("Release")
-        self.controlData().force_connect_sublibraries = True
         self.controlData().build_user_doc = True
         shell.setRedirectOutput(True)
            
@@ -51,7 +50,6 @@ class Controller(cxBuildScript.BuildScript):
         
     def applyArgumentParsers(self, arguments):
         arguments = super(Controller, self).applyArgumentParsers(arguments)
-
         self._initializeInstallationObjects()
         return arguments
  

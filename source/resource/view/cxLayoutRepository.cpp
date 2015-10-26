@@ -215,6 +215,24 @@ void LayoutRepository::addDefaults()
 		layout.setView(1, ptSAGITTAL, LayoutRegion(2, 3));
 		this->addDefault(layout);
 	}
+    {
+        // A 3DCS
+        LayoutData layout = LayoutData::create("LAYOUT_A_3DCS", "A 3DCS", 3, 4);
+        layout.setView(1, ptAXIAL, LayoutRegion(0, 0, 3, 3));
+        layout.setView(0, View::VIEW_3D, LayoutRegion(0, 3));
+        layout.setView(1, ptCORONAL, LayoutRegion(1, 3));
+        layout.setView(1, ptSAGITTAL, LayoutRegion(2, 3));
+        this->addDefault(layout);
+    }
+    {
+        // 3D 3DAC
+        LayoutData layout = LayoutData::create("LAYOUT_3D_3DAC", "3D 3DAC", 3, 5);
+        layout.setView(0, View::VIEW_3D, LayoutRegion(0, 0, 3, 3));
+        layout.setView(1, View::VIEW_3D, LayoutRegion(0, 3, 1, 2));
+        layout.setView(2, ptAXIAL, LayoutRegion(1, 3, 1, 2));
+        layout.setView(2, ptCORONAL, LayoutRegion(2, 3, 1, 2));
+        this->addDefault(layout);
+    }
 	{
 		// 3D Any
 		LayoutData layout = LayoutData::create("LAYOUT_3D_AD", "3D AnyDual", 2, 4);

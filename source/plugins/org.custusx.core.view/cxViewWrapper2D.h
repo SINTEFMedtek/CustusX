@@ -88,8 +88,15 @@ public:
 
 	virtual void updateView();
 
+
+    ImagePtr getImageToDisplay();
+
+signals:
+	void pointSampled(Vector3D p_r);
+
 protected slots:
 	virtual void dataViewPropertiesChangedSlot(QString uid);
+
 private slots:
 	void activeToolChangedSlot(); ///< makes sure the reps are connected to the right tool
 	void viewportChanged();
@@ -102,9 +109,10 @@ private slots:
 	void settingsChangedSlot(QString key);
 	void optionChangedSlot();
 
+protected slots:
+	void samplePoint(Vector3D click_vp);
 private:
-	void moveManualTool(QPoint point);
-
+	void moveManualTool(Vector3D vp, Vector3D delta_vp);
 	virtual void appendToContextMenu(QMenu& contextMenu);
 	void addReps();
 	DoubleBoundingBox3D getViewport() const;
@@ -116,12 +124,27 @@ private:
 	void changeOrientationType(ORIENTATION_TYPE type);
 
 	virtual void imageAdded(ImagePtr image);
-	virtual void imageRemoved(const QString& uid);
+    //virtual void imageRemoved(const QString& uid);
 
 	virtual void dataAdded(DataPtr data);
 	virtual void dataRemoved(const QString& uid);
 
-	void resetMultiSlicer();
+    void recreateMultiSlicer();
+    void updateItemsFromViewGroup(QString &text);
+
+    void setDataNameText(QString &text);
+    void updateDataNameText(QString &text);
+
+    void createAndAddSliceRep();
+    void removeAndResetSliceRep();
+
+    bool useGPU2DRendering();
+    void createAndAddMultiSliceRep();
+    void removeAndResetMultiSliceRep();
+
+	std::vector<ImagePtr> getImagesToView();
+	bool isAnyplane();
+
 	Texture3DSlicerRepPtr mMultiSliceRep;
 	DataRepContainerPtr mDataRepContainer;
 
@@ -141,7 +164,7 @@ private:
 	Zoom2DHandlerPtr mZoom2D;
 
 	SyncedValuePtr mOrientationMode;
-	Vector3D mClickPos;
+	Vector3D mLastClickPos_vp;
 
 	QActionGroup* mOrientationActionGroup;
 };

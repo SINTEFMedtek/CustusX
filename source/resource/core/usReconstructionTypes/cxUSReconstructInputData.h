@@ -70,7 +70,7 @@ struct cxResource_EXPORT USReconstructInputData
 	USFrameDataPtr mUsRaw;///<All imported US data frames with pointers to each frame
 	std::vector<TimedPosition> mFrames;
 	std::vector<TimedPosition> mPositions;
-	ProbeSector mProbeData;
+	ProbeSector mProbeDefinition;
 	QString mProbeUid;
 	Transform3D rMpr; ///< patient registration
 

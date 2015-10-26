@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxUsReconstructionFileReader.h"
 #include "cxTestVideoSource.h"
 #include "cxTrackingService.h"
+#include "cxReporter.h"
 //#include "cxProbeImpl.h"
 #include "cxUSFrameData.h"
 #include "cxPlaybackTime.h"
@@ -56,11 +57,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-USAcquisitionVideoPlayback::USAcquisitionVideoPlayback(VideoServiceBackendPtr backend) :
+USAcquisitionVideoPlayback::USAcquisitionVideoPlayback(VideoServiceBackendPtr backend, QString type) :
 	QObject(NULL),
-	mVideoSourceUid("playback")
+    mVideoSourceUid("playback " + type)
 {
-	mBackend = backend;
+    mType=type;
+    mBackend = backend;
 	mVideoSource.reset(new BasicVideoSource(mVideoSourceUid));
 	mVideoSource->setStatusString(QString("No US Acquisition"));
 
@@ -71,9 +73,10 @@ USAcquisitionVideoPlayback::~USAcquisitionVideoPlayback()
 {
 }
 
+
 VideoSourcePtr USAcquisitionVideoPlayback::getVideoSource()
 {
-	return mVideoSource;
+       return mVideoSource;
 }
 
 bool USAcquisitionVideoPlayback::isActive() const
@@ -137,15 +140,20 @@ std::vector<TimelineEvent> USAcquisitionVideoPlayback::getEvents()
  */
 QStringList USAcquisitionVideoPlayback::getAbsolutePathToFtsFiles(QString folder)
 {
-	return getAbsolutePathToFiles(folder, QStringList("*.fts"), true);
+    return getAbsolutePathToFiles(folder,QStringList(QString("*_").append(mType)), true);
+}
+
+QString USAcquisitionVideoPlayback::getType() const
+{
+    return mType;
 }
 
 void USAcquisitionVideoPlayback::timerChangedSlot()
 {
-	TimelineEvent event;
-	for (unsigned i=0; i<mEvents.size(); ++i)
-	{
-		if (mEvents[i].isInside(mTimer->getTime().toMSecsSinceEpoch()))
+    TimelineEvent event;
+    for (unsigned i=0; i<mEvents.size(); ++i)
+    {
+        if (mEvents[i].isInside(mTimer->getTime().toMSecsSinceEpoch()))
 		{
 			event = mEvents[i];
 			break;
@@ -191,19 +199,19 @@ void USAcquisitionVideoPlayback::usDataLoadFinishedSlot()
 {
 	// file read operation has completed: read and clear
 	mCurrentData = mUSImageDataFutureResult.result();
-	mCurrentData.mProbeData.mData.setUid(mVideoSourceUid);
+	mCurrentData.mProbeDefinition.mData.setUid(mVideoSourceUid);
 	// clear result so we can check for it next run
 	mUSImageDataReader.reset();
 
 	mVideoSource->start();
 
 	// set the probe sector from file data:
-	ToolPtr tool = mBackend->getToolManager()->getFirstProbe();
+	ToolPtr tool = mBackend->tracking()->getFirstProbe();
 	if (tool)
 	{
 		ProbePtr probe = tool->getProbe();
 		if (probe)
-			probe->setProbeSector(mCurrentData.mProbeData.mData);
+			probe->setProbeDefinition(mCurrentData.mProbeDefinition.mData);
 	}
 
 	// create a vector to allow for quick search

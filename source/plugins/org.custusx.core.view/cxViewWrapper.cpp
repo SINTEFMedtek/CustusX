@@ -37,7 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxPatientModelService.h"
 #include "cxViewGroup.h" //for class Navigation
-#include "cxMesh.h"
 #include "cxTypeConversions.h"
 #include "cxImageAlgorithms.h"
 #include "cxDataMetric.h"
@@ -47,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxInteractiveClipper.h"
 #include "cxVisServices.h"
 #include "cxNavigation.h"
+#include "cxActiveData.h"
 
 namespace cx
 {
@@ -61,7 +61,7 @@ DataViewPropertiesInteractor::DataViewPropertiesInteractor(VisServicesPtr servic
 void DataViewPropertiesInteractor::addDataActions(QWidget* parent)
 {
 	//add actions to the actiongroups and the contextmenu
-	std::vector<DataPtr> sorted = sortOnGroupsAndAcquisitionTime(mServices->getPatientService()->getData());
+	std::vector<DataPtr> sorted = sortOnGroupsAndAcquisitionTime(mServices->patient()->getData());
 	mLastDataActionUid = "________________________";
 	for (std::vector<DataPtr>::iterator iter=sorted.begin(); iter!=sorted.end(); ++iter)
 	{
@@ -76,16 +76,11 @@ void DataViewPropertiesInteractor::setDataViewProperties(DataViewProperties prop
 
 void DataViewPropertiesInteractor::addDataAction(QString uid, QWidget* parent)
 {
-	DataPtr data = mServices->getPatientService()->getData(uid);
+	DataPtr data = mServices->patient()->getData(uid);
 
 	QAction* action = new QAction(qstring_cast(data->getName()), parent);
 
-	if (boost::dynamic_pointer_cast<Image>(data))
-		action->setIcon(QIcon(":/icons/volume.png"));
-	else if (boost::dynamic_pointer_cast<Mesh>(data))
-		action->setIcon(QIcon(":/icons/surface.png"));
-	else if (boost::dynamic_pointer_cast<DataMetric>(data))
-		action->setIcon(QIcon(":/icons/metric.png"));
+	action->setIcon(data->getIcon());
 
 //  std::cout << "base " << mLastDataActionUid << "  " << uid << std::endl;
 	if (uid.contains(mLastDataActionUid))
@@ -113,8 +108,7 @@ void DataViewPropertiesInteractor::dataActionSlot()
 		return;
 
 	QString uid = theAction->data().toString();
-	DataPtr data = mServices->getPatientService()->getData(uid);
-	ImagePtr image = mServices->getPatientService()->getData<Image>(data->getUid());
+	DataPtr data = mServices->patient()->getData(uid);
 
 	bool firstData = mGroupData->getData(DataViewProperties::createFull()).empty();
 
@@ -125,8 +119,11 @@ void DataViewPropertiesInteractor::dataActionSlot()
 		DataViewProperties props = old.addFlagsIn(mProperties);
 		mGroupData->setProperties(uid, props);
 
-		if (image)
-			mServices->getPatientService()->setActiveImage(image);
+		if (data)
+		{
+			ActiveDataPtr activeData = mServices->patient()->getActiveData();
+			activeData->setActive(data);
+		}
 	}
 	else
 	{

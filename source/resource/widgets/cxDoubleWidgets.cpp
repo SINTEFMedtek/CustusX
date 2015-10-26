@@ -269,9 +269,9 @@ void ScalarInteractionWidget::prePaintEvent()
 
 void ScalarInteractionWidget::enableAll(bool enable)
 {
-	if(this)
-		QWidget::setEnabled(enable);
-	if(mSlider)
+    QWidget::setEnabled(enable);
+
+    if(mSlider)
 		mSlider->setEnabled(enable);
 	if(mSpinBox)
 		mSpinBox->setEnabled(enable);

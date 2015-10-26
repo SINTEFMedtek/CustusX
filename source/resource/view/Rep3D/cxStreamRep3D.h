@@ -41,7 +41,7 @@ namespace cx
 {
 typedef boost::shared_ptr<class VideoSourceGraphics> VideoSourceGraphicsPtr;
 
-/** \brief Display a stream (2D/3D) in 3D
+/** \brief Display a 3D stream in 3D
  *
  * \ingroup cx_resource_view
  * \ingroup cx_resource_view_rep3D
@@ -64,12 +64,13 @@ private slots:
 	void newVideoSource(VideoSourcePtr videoSource);
 private:
 	StreamRep3D(SpaceProviderPtr spaceProvider, PatientModelServicePtr patientModelService);
+	void initTransferFunction(ImagePtr image);
+	void setVisualizerType();
 
 	TrackedStreamPtr mTrackedStream;
 	VideoSourcePtr mVideoSource;
 
 	PatientModelServicePtr mPatientModelService;
-	void initTransferFunction(ImagePtr image);
 };
 
 } //cx

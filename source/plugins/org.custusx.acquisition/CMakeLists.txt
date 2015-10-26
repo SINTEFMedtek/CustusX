@@ -19,12 +19,6 @@ set(PLUGIN_SRCS
     cxAcquisitionImplService.h
     cxAcquisitionImplService.cpp
     cxAcquisitionServicePluginActivator.cpp
-    cxRecordSessionWidget.h
-    cxRecordSessionWidget.cpp
-    cxTrackedCenterlineWidget.h
-    cxTrackedCenterlineWidget.cpp
-    cxRecordBaseWidget.h
-    cxRecordBaseWidget.cpp
     cxRecordSession.h
     cxRecordSession.cpp
 
@@ -42,6 +36,9 @@ set(PLUGIN_SRCS
     gui/cxSoundSpeedConversionWidget.cpp
 	gui/cxStringPropertySelectRecordSession.h
 	gui/cxStringPropertySelectRecordSession.cpp
+    gui/cxRecordSessionWidget.cpp
+    gui/cxRecordTrackingWidget.cpp
+	gui/cxRecordSessionSelector.cpp
 )
 
 # Files which should be processed by Qts moc
@@ -49,9 +46,6 @@ set(PLUGIN_MOC_SRCS
     cxAcquisitionService.h
     cxAcquisitionServiceProxy.h
     cxAcquisitionServicePluginActivator.h
-    cxRecordSessionWidget.h
-    cxTrackedCenterlineWidget.h
-    cxRecordBaseWidget.h
 
     logic/cxAcquisitionData.h
     logic/cxUSAcquisition.h
@@ -60,6 +54,9 @@ set(PLUGIN_MOC_SRCS
     gui/cxUSAcqusitionWidget.h
 	gui/cxStringPropertySelectRecordSession.h
     gui/cxAcquisitionPlugin.h
+    gui/cxRecordSessionWidget.h
+    gui/cxRecordTrackingWidget.h
+	gui/cxRecordSessionSelector.h
 )
 
 # Qt Designer files which should be processed by Qts uic

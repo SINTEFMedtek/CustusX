@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxNullDeleter.h"
 #include "cxLogger.h"
 #include "cxLandmark.h"
+#include "cxData.h"
 
 namespace cx
 {
@@ -75,19 +76,17 @@ void PatientModelServiceProxy::onServiceAdded(PatientModelService* service)
 
 	connect(service, &PatientModelService::centerChanged, this, &PatientModelService::centerChanged);
 	connect(service, &PatientModelService::dataAddedOrRemoved, this, &PatientModelService::dataAddedOrRemoved);
-	connect(service, &PatientModelService::activeImageChanged, this, &PatientModelService::activeImageChanged);
 	connect(service, &PatientModelService::landmarkPropertiesChanged, this, &PatientModelService::landmarkPropertiesChanged);
 	connect(service, &PatientModelService::clinicalApplicationChanged, this, &PatientModelService::clinicalApplicationChanged);
 	connect(service, &PatientModelService::rMprChanged, this, &PatientModelService::rMprChanged);
 	connect(service, &PatientModelService::streamLoaded, this, &PatientModelService::streamLoaded);
-
 	connect(service, &PatientModelService::patientChanged, this, &PatientModelService::patientChanged);
+	connect(service, &PatientModelService::videoAddedToTrackedStream, this, &PatientModelService::videoAddedToTrackedStream);
 
 	if(mPatientModelService->isNull())
 		reportWarning("PatientModelServiceProxy::onServiceAdded mPatientModelService->isNull()");
 
 	emit dataAddedOrRemoved();
-	emit activeImageChanged(service->getActiveImageUid());
 	emit landmarkPropertiesChanged();
 	emit clinicalApplicationChanged();
 	emit rMprChanged();
@@ -98,18 +97,16 @@ void PatientModelServiceProxy::onServiceRemoved(PatientModelService *service)
 {
 	disconnect(service, &PatientModelService::centerChanged, this, &PatientModelService::centerChanged);
 	disconnect(service, &PatientModelService::dataAddedOrRemoved, this, &PatientModelService::dataAddedOrRemoved);
-	disconnect(service, &PatientModelService::activeImageChanged, this, &PatientModelService::activeImageChanged);
 	disconnect(service, &PatientModelService::landmarkPropertiesChanged, this, &PatientModelService::landmarkPropertiesChanged);
 	disconnect(service, &PatientModelService::clinicalApplicationChanged, this, &PatientModelService::clinicalApplicationChanged);
 	disconnect(service, &PatientModelService::rMprChanged, this, &PatientModelService::rMprChanged);
 	disconnect(service, &PatientModelService::streamLoaded, this, &PatientModelService::streamLoaded);
-
 	disconnect(service, &PatientModelService::patientChanged, this, &PatientModelService::patientChanged);
+	disconnect(service, &PatientModelService::videoAddedToTrackedStream, this, &PatientModelService::videoAddedToTrackedStream);
 
 	mPatientModelService = PatientModelService::getNullObject();
 
 	emit dataAddedOrRemoved();
-	emit activeImageChanged("");
 	emit landmarkPropertiesChanged();
 	emit clinicalApplicationChanged();
 	emit rMprChanged();
@@ -151,16 +148,6 @@ void PatientModelServiceProxy::setLandmarkName(QString uid, QString name)
 	mPatientModelService->setLandmarkName(uid, name);
 }
 
-ImagePtr PatientModelServiceProxy::getActiveImage() const
-{
-	return mPatientModelService->getActiveImage();
-}
-
-void PatientModelServiceProxy::setActiveImage(ImagePtr activeImage)
-{
-	mPatientModelService->setActiveImage(activeImage);
-}
-
 void PatientModelServiceProxy::autoSave()
 {
 	mPatientModelService->autoSave();
@@ -191,9 +178,9 @@ DataPtr PatientModelServiceProxy::importData(QString fileName, QString &infoText
 	return mPatientModelService->importData(fileName, infoText);
 }
 
-void PatientModelServiceProxy::exportPatient(bool niftiFormat)
+void PatientModelServiceProxy::exportPatient(PATIENT_COORDINATE_SYSTEM externalSpace)
 {
-	return mPatientModelService->exportPatient(niftiFormat);
+	return mPatientModelService->exportPatient(externalSpace);
 }
 
 void PatientModelServiceProxy::removeData(QString uid)
@@ -229,6 +216,11 @@ void PatientModelServiceProxy::setLandmarkActive(QString uid, bool active)
 RegistrationHistoryPtr PatientModelServiceProxy::get_rMpr_History() const
 {
 	return mPatientModelService->get_rMpr_History();
+}
+
+ActiveDataPtr PatientModelServiceProxy::getActiveData() const
+{
+	return mPatientModelService->getActiveData();
 }
 
 CLINICAL_VIEW PatientModelServiceProxy::getClinicalApplication() const
