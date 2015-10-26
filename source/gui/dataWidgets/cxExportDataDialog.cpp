@@ -90,7 +90,7 @@ ExportDataDialog::~ExportDataDialog()
 
 PATIENT_COORDINATE_SYSTEM ExportDataDialog::getExternalSpace()
 {
-	return mNiftiFormatCheckBox->isChecked() ? pcsLPS : pcsRAS;
+	return mNiftiFormatCheckBox->isChecked() ? pcsRAS : pcsLPS;
 }
 
 void ExportDataDialog::acceptedSlot()
