@@ -30,6 +30,7 @@ if(BUILD_TESTING)
         cxtestTestTransferFunctions.cpp
         cxtestOpenCLAndGui.cpp
 		cxtestProfileChange.cpp
+		cxtestClippersWidget.cpp
     )
 
     qt5_wrap_cpp(CXTEST_SOURCES_TO_MOC ${CXTEST_SOURCES_TO_MOC})
@@ -54,6 +55,7 @@ if(BUILD_TESTING)
         cxGUIExtenderService
         cxPluginUtilities
         cxCatch
+        cxtest_org_custusx_core_patientmodel
     )
     cx_add_tests_to_catch(cxtestGui)
 

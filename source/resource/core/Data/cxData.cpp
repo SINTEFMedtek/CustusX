@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTime.h"
 #include "cxLandmark.h"
 #include "cxCoordinateSystemHelpers.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -201,17 +202,26 @@ CoordinateSystem Data::getCoordinateSystem()
 // methods for defining and storing clip planes. Data does not use these data, this is up to the mapper
 void Data::addPersistentClipPlane(vtkPlanePtr plane)
 {
-	if (std::count(mPersistentClipPlanes.begin(), mPersistentClipPlanes.end(), plane))
-		return;
-	mPersistentClipPlanes.push_back(plane);
-	emit clipPlanesChanged();
+	this->addPlane(plane, mPersistentClipPlanes);
 }
 
+void Data::addPlane(vtkPlanePtr plane, std::vector<vtkPlanePtr> &planes)
+{
+	if (std::count(planes.begin(), planes.end(), plane))
+		return;
+	planes.push_back(plane);
+	emit clipPlanesChanged();
+}
 std::vector<vtkPlanePtr> Data::getAllClipPlanes()
 {
 	std::vector<vtkPlanePtr> retval = mPersistentClipPlanes;
+
+	for(int i = 0; i < mInteractiveClipPlanes.size(); ++i)
+		retval.push_back(mInteractiveClipPlanes[i]);
+
 	if (mInteractiveClipPlane)
 		retval.push_back(mInteractiveClipPlane);
+
 	return retval;
 }
 
@@ -227,5 +237,19 @@ void Data::setInteractiveClipPlane(vtkPlanePtr plane)
 	emit clipPlanesChanged();
 }
 
+void Data::addInteractiveClipPlane(vtkPlanePtr plane)
+{
+	this->addPlane(plane, mInteractiveClipPlanes);
+}
 
+void Data::removeInteractiveClipPlane(vtkPlanePtr plane)
+{
+	for(int i = 0; i < mInteractiveClipPlanes.size(); ++i)
+	{
+		if(mInteractiveClipPlanes[i] == plane)
+			mInteractiveClipPlanes.erase(mInteractiveClipPlanes.begin() + i);
+	}
+
+	emit clipPlanesChanged();
+}
 } // namespace cx

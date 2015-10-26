@@ -30,35 +30,50 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxLogQDebugRedirecter.h"
-#include "cxReporter.h"
+#ifndef CXCLIPPERS_H
+#define CXCLIPPERS_H
 
-namespace cx
+#include <QStringList>
+#include "cxForwardDeclarations.h"
+//#include "cxPatientStorage.h"
+
+namespace cx {
+typedef boost::shared_ptr<class Clippers> ClippersPtr;
+typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
+
+/**\brief Clipper container. Used by ClippersWidget.
+ *
+ *  \date Oct, 2015
+ *  \author Ole Vegard Solberg, SINTEF
+ */
+class Clippers : public QObject
 {
+	Q_OBJECT
+public:
+	Clippers(VisServicesPtr services);
+	void importList(QString clippers);
+	QString exportList();
+	InteractiveClipperPtr getClipper(QString clipperName);
+	void add(QString clipperName, InteractiveClipperPtr clipper);
+	void remove(QString clipperName);
+	bool exists(QString clipperName);
+	int size() {return mClippers.size();}
+	QStringList getClipperNames();
 
-void convertQtMessagesToCxMessages(QtMsgType type, const QMessageLogContext &, const QString &msg)
-{
-	MESSAGE_LEVEL level = mlINFO;
-	switch (type)
-	{
-	case QtDebugMsg:
-		level = mlDEBUG;
-		break;
-	case QtWarningMsg:
-		level = mlWARNING;
-		break;
-	case QtCriticalMsg:
-		level = mlERROR;
-		break;
-	case QtFatalMsg:
-		level = mlERROR;
-		//abort(); here we hope for the best instead of aborting...
-	}
+signals:
+	void changed();
 
-	Message message("[QT] "+msg, level);
-	message.mChannel = "qdebug";
-	reporter()->sendMessage(message);
-}
+protected:
+	VisServicesPtr mServices;
+//	PatientStorage mStorage;
+	std::map<QString, InteractiveClipperPtr> mClippers;
+	QStringList mClipperList;//remove
+//	StringPropertyPtr mClipperList;
 
+	void createDefaultClippers();
+	QStringList getInitialClipperNames();
+};
 
-} //End namespace cx
+}//cx
+
+#endif // CXCLIPPERS_H
