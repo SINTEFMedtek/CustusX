@@ -46,7 +46,8 @@ namespace cx
 
 InteractiveClipper::InteractiveClipper(CoreServicesPtr services) :
 	mUseClipper(false),
-	mServices(services)
+	mServices(services),
+	mUseActiveTool(true)
 {
 
 	// create a slice planes proxy containing all slice definitions,
@@ -237,13 +238,24 @@ std::vector<PLANE_TYPE> InteractiveClipper::getAvailableSlicePlanes() const
 
 void InteractiveClipper::activeToolChangedSlot()
 {
-	ToolPtr activTool = mServices->tracking()->getActiveTool();
+	ToolPtr activeTool = mServices->tracking()->getActiveTool();
 
+	if(mUseActiveTool)
+		this->setTool(activeTool);
+}
+
+void InteractiveClipper::setTool(ToolPtr tool)
+{
 	SlicePlanesProxy::DataMap data = mSlicePlanesProxy->getData();
 	for (SlicePlanesProxy::DataMap::iterator iter = data.begin(); iter != data.end(); ++iter)
 	{
-		iter->second.mSliceProxy->setTool(activTool);
+		iter->second.mSliceProxy->setTool(tool);
 	}
+}
+
+void InteractiveClipper::useActiveTool(bool on)
+{
+	mUseActiveTool = on;
 }
 
 } // namespace cx

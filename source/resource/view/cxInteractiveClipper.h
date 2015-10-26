@@ -74,6 +74,8 @@ public:
 	void addData(DataPtr data);
 	void removeData(DataPtr data);
 	std::map<QString, DataPtr> getDatas();
+	void setTool(ToolPtr tool);
+	void useActiveTool(bool on);
 signals:
 	void changed();
 public slots:
@@ -91,6 +93,7 @@ private:
 	DataPtr mData;
 	CoreServicesPtr mServices;
 	std::map<QString, DataPtr> mDatas;
+	bool mUseActiveTool;
 	void removeAllInterActiveClipPlanes();
 	void addAllInteractiveClipPlanes();
 	void updateClipPlanesInData();

@@ -63,6 +63,7 @@ private slots:
 	void dataTypeSelectorClicked(bool checked);
 	void selectAllTableData(bool checked);
 	void dataSelectorClicked(bool checked);
+	void onToolChanged();
 private:
 	void setupUI();
 

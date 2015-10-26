@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogger.h"
 #include "cxStringPropertySelectTool.h"
 #include "cxSelectDataStringPropertyBase.h"
+#include "cxTrackingService.h"
 
 namespace cx
 {
@@ -168,6 +169,7 @@ void ClipperWidget::connectToNewClipper()
 		mInvertPlane->setChecked(mClipper->getInvertPlane());
 		connect(mUseClipperCheckBox, &QCheckBox::toggled, this, &ClipperWidget::enable);
 		connect(mInvertPlane, &QCheckBox::toggled, mClipper.get(), &InteractiveClipper::invertPlane);
+		connect(mToolSelector.get(), &StringPropertySelectTool::changed, this, &ClipperWidget::onToolChanged);
 		if(planeSelector)
 		{
 			mPlaneAdapter->setClipper(mClipper);
@@ -180,6 +182,17 @@ void ClipperWidget::connectToNewClipper()
 	else
 		this->setEnabled(false);
 
+}
+
+void ClipperWidget::onToolChanged()
+{
+	if(!mClipper)
+		return;
+	ToolPtr tool = mToolSelector->getTool();
+	if(!tool)
+		tool = mServices->tracking()->getActiveTool();
+	mClipper->useActiveTool(false);
+	mClipper->setTool(tool);
 }
 
 void ClipperWidget::setClipper(InteractiveClipperPtr clipper)
