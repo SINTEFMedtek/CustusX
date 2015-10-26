@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXCLIPPERWIDGET_H
 #define CXCLIPPERWIDGET_H
 
+#include "cxGuiExport.h"
+
 #include <QVBoxLayout>
 #include <QCheckBox>
 #include "cxBaseWidget.h"
@@ -48,7 +50,7 @@ typedef boost::shared_ptr<class StringPropertyClipPlane> StringPropertyClipPlane
 
 class LabeledComboBoxWidget;
 
-class ClipperWidget : public BaseWidget
+class cxGui_EXPORT ClipperWidget : public BaseWidget
 {
 	Q_OBJECT
 public:
