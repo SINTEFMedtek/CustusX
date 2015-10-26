@@ -171,7 +171,9 @@ void ClipperWidget::connectToNewClipper()
 	if(mClipper)
 	{
 		mUseClipperCheckBox->setChecked(mClipper->getUseClipper());
+		mInvertPlane->setChecked(mClipper->getInvertPlane());
 		connect(mUseClipperCheckBox, &QCheckBox::toggled, this, &ClipperWidget::enable);
+		connect(mInvertPlane, &QCheckBox::toggled, mClipper.get(), &InteractiveClipper::invertPlane);
 		if(planeSelector)
 		{
 			mPlaneAdapter->setClipper(mClipper);
@@ -189,7 +191,10 @@ void ClipperWidget::connectToNewClipper()
 void ClipperWidget::setClipper(InteractiveClipperPtr clipper)
 {
 	if(mClipper)
+	{
 		disconnect(mUseClipperCheckBox, &QCheckBox::toggled, this, &ClipperWidget::enable);
+		disconnect(mInvertPlane, &QCheckBox::toggled, mClipper.get(), &InteractiveClipper::invertPlane);
+	}
 
 	mClipper = clipper;
 
