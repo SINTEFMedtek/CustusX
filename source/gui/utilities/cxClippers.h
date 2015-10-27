@@ -33,9 +33,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXCLIPPERS_H
 #define CXCLIPPERS_H
 
+#include "cxGuiExport.h"
+
 #include <QStringList>
 #include "cxForwardDeclarations.h"
-//#include "cxPatientStorage.h"
 
 namespace cx {
 typedef boost::shared_ptr<class Clippers> ClippersPtr;
@@ -46,7 +47,7 @@ typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
  *  \date Oct, 2015
  *  \author Ole Vegard Solberg, SINTEF
  */
-class Clippers : public QObject
+class cxGui_EXPORT Clippers : public QObject
 {
 	Q_OBJECT
 public:

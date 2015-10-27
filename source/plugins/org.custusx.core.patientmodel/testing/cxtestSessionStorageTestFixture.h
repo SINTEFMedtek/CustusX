@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTESTSESSIONSTORAGETESTFIXTURE_H
 #define CXTESTSESSIONSTORAGETESTFIXTURE_H
 
+#include "cxtest_org_custusx_core_patientmodel_export.h"
+
 #include <QString>
 #include <boost/shared_ptr.hpp>
 
@@ -45,7 +47,7 @@ typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
 namespace cxtest
 {
 
-class SessionStorageTestFixture
+class CXTEST_ORG_CUSTUSX_CORE_PATIENTMODEL_EXPORT SessionStorageTestFixture
 {
 public:
 	SessionStorageTestFixture();
