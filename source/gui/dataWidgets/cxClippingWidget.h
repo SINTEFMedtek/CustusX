@@ -44,6 +44,7 @@ namespace cx
 {
 typedef boost::shared_ptr<class StringPropertySelectData> StringPropertySelectDataPtr;
 typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
+typedef boost::shared_ptr<class StringPropertyClipPlane> StringPropertyClipPlanePtr;
 
 /**
  * \file
@@ -57,9 +58,9 @@ class cxGui_EXPORT StringPropertyClipPlane: public StringPropertyBase
 {
 Q_OBJECT
 public:
-	static StringPropertyBasePtr New(InteractiveClipperPtr clipper)
+	static StringPropertyClipPlanePtr New(InteractiveClipperPtr clipper)
 	{
-		return StringPropertyBasePtr(new StringPropertyClipPlane(clipper));
+		return StringPropertyClipPlanePtr(new StringPropertyClipPlane(clipper));
 	}
 	StringPropertyClipPlane(InteractiveClipperPtr clipper);
 	virtual ~StringPropertyClipPlane() {}
@@ -74,9 +75,11 @@ public:
 	// optional methods
 	virtual QString getHelp() const;
 	virtual QStringList getValueRange() const;
+	void setClipper(InteractiveClipperPtr clipper);
 
 	InteractiveClipperPtr mInteractiveClipper;
 };
+
 
 /*
  * \class ClippingWidget
@@ -98,7 +101,7 @@ private:
 	QCheckBox* mUseClipperCheckBox;
 	QCheckBox* mInvertPlaneCheckBox;
 	StringPropertyBasePtr mPlaneAdapter;
-	StringPropertySelectDataPtr mImageAdapter;
+	StringPropertySelectDataPtr mDataAdapter;
 	VisServicesPtr mServices;
 private slots:
 	void setupUI();

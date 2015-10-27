@@ -30,44 +30,52 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXTESTSESSIONSTORAGETESTFIXTURE_H
-#define CXTESTSESSIONSTORAGETESTFIXTURE_H
+#ifndef CXCLIPPERSWIDGET_H
+#define CXCLIPPERSWIDGET_H
 
-#include "cxtest_org_custusx_core_patientmodel_export.h"
+#include "cxGuiExport.h"
 
-#include <QString>
-#include <boost/shared_ptr.hpp>
+#include "cxBaseWidget.h"
+#include "cxForwardDeclarations.h"
+#include "cxStringProperty.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
-typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
-}
+typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
+typedef boost::shared_ptr<class Clippers> ClippersPtr;
+class ClipperWidget;
 
-namespace cxtest
-{
+//--------------------------------------
 
-class CXTEST_ORG_CUSTUSX_CORE_PATIENTMODEL_EXPORT SessionStorageTestFixture
+/**\brief Widget for managing clippers.
+ *
+ *  \date Oct, 2015
+ *  \author Ole Vegard Solberg, SINTEF
+ */
+class cxGui_EXPORT ClippersWidget: public BaseWidget
 {
+	Q_OBJECT
 public:
-	SessionStorageTestFixture();
+	ClippersWidget(VisServicesPtr services, QWidget* parent);
 
-	~SessionStorageTestFixture();
+protected:
+	VisServicesPtr mServices;
+	QVBoxLayout* mLayout;
+	StringPropertyPtr mClipperSelector;
 
-	void createSessions();
-	void loadSession1();
-	void loadSession2();
-	void reloadSession1();
-	void reloadSession2();
-	void saveSession();
+	ClippersPtr mClippers;
+	InteractiveClipperPtr mCurrentClipper;
+	ClipperWidget *mClipperWidget;
 
-	cx::SessionStorageServicePtr mSessionStorageService;
-	cx::PatientModelServicePtr mPatientModelService;
-private:
-	bool mSessionsCreated;
-	QString mSession1;
-	QString mSession2;
+	void setupUI();
+//	void setupClipperUI();
+	void initClipperSelector();
+	QString getNameBaseOfCurrentClipper();
+protected slots:
+	void newClipperButtonClicked();
+	void clipperChanged();
+private slots:
+	void clippersChanged();
 };
-
-} //cxtest
-#endif // CXTESTSESSIONSTORAGETESTFIXTURE_H
+}//cx
+#endif // CXCLIPPERSWIDGET_H

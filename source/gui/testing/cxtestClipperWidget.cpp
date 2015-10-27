@@ -29,45 +29,12 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#include "catch.hpp"
+#include "cxClipperWidget.h"
 
-#ifndef CXTESTSESSIONSTORAGETESTFIXTURE_H
-#define CXTESTSESSIONSTORAGETESTFIXTURE_H
 
-#include "cxtest_org_custusx_core_patientmodel_export.h"
 
-#include <QString>
-#include <boost/shared_ptr.hpp>
+//TEST_CASE_METHOD("ClipperWidget: Init", "[unit][gui][widget]")
+//{
 
-namespace cx
-{
-typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
-typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
-}
-
-namespace cxtest
-{
-
-class CXTEST_ORG_CUSTUSX_CORE_PATIENTMODEL_EXPORT SessionStorageTestFixture
-{
-public:
-	SessionStorageTestFixture();
-
-	~SessionStorageTestFixture();
-
-	void createSessions();
-	void loadSession1();
-	void loadSession2();
-	void reloadSession1();
-	void reloadSession2();
-	void saveSession();
-
-	cx::SessionStorageServicePtr mSessionStorageService;
-	cx::PatientModelServicePtr mPatientModelService;
-private:
-	bool mSessionsCreated;
-	QString mSession1;
-	QString mSession2;
-};
-
-} //cxtest
-#endif // CXTESTSESSIONSTORAGETESTFIXTURE_H
+//}

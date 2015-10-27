@@ -44,6 +44,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxViewService.h"
 #include "cxVisServices.h"
+#include "cxStringProperty.h"
+#include "cxLogger.h"
+#include "cxHelperWidgets.h"
+
+#include <boost/foreach.hpp>
 
 namespace cx
 {
@@ -78,10 +83,14 @@ QStringList StringPropertyClipPlane::getValueRange() const
 {
 	std::vector<PLANE_TYPE> planes = mInteractiveClipper->getAvailableSlicePlanes();
 	QStringList retval;
-	//retval << ""; // removed this. No idea why we need an empty entry.
 	for (unsigned i = 0; i < planes.size(); ++i)
 		retval << qstring_cast(planes[i]);
 	return retval;
+}
+
+void StringPropertyClipPlane::setClipper(InteractiveClipperPtr clipper)
+{
+	mInteractiveClipper = clipper;
 }
 
 ///--------------------------------------------------------
@@ -101,16 +110,16 @@ void ClippingWidget::setupUI()
 	if (mInteractiveClipper)
 		return;
 
-	mInteractiveClipper = mServices->view()->getClipper();
+	mInteractiveClipper.reset(new InteractiveClipper(mServices));
 
 	if (!mInteractiveClipper)
 		return;
 
 	connect(mInteractiveClipper.get(), SIGNAL(changed()), this, SLOT(clipperChangedSlot()));
 
-	mImageAdapter = StringPropertySelectData::New(mServices->patient());
-	LabeledComboBoxWidget* imageCombo = new LabeledComboBoxWidget(this, mImageAdapter);
-	connect(mImageAdapter.get(), SIGNAL(changed()), this, SLOT(imageChangedSlot()));
+	mDataAdapter = StringPropertySelectData::New(mServices->patient());
+	LabeledComboBoxWidget* imageCombo = new LabeledComboBoxWidget(this, mDataAdapter);
+	connect(mDataAdapter.get(), SIGNAL(changed()), this, SLOT(imageChangedSlot()));
 
 	this->setToolTip("Interactive volume clipping");
 
@@ -156,12 +165,12 @@ void ClippingWidget::clipperChangedSlot()
 	mUseClipperCheckBox->setChecked(mInteractiveClipper->getUseClipper());
 	mInvertPlaneCheckBox->setChecked(mInteractiveClipper->getInvertPlane());
 	if (mInteractiveClipper->getData())
-		mImageAdapter->setValue(mInteractiveClipper->getData()->getUid());
+		mDataAdapter->setValue(mInteractiveClipper->getData()->getUid());
 }
 
 void ClippingWidget::imageChangedSlot()
 {
-	mInteractiveClipper->setData(mServices->patient()->getData(mImageAdapter->getValue()));
+	mInteractiveClipper->setData(mServices->patient()->getData(mDataAdapter->getValue()));
 }
 
 void ClippingWidget::clearButtonClickedSlot()
