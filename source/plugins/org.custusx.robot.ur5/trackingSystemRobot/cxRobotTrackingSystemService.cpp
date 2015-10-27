@@ -19,7 +19,8 @@ std::vector<ToolPtr> toVector(std::map<QString, RobotToolPtr> map)
 RobotTrackingSystemService::RobotTrackingSystemService(Ur5RobotPtr robot) :
     mState(Tool::tsNONE),
     mTimer(0),
-    mUr5Robot(robot)
+    mUr5Robot(robot),
+    tps(0.1)
 {
     if(robot == NULL)
         return;
