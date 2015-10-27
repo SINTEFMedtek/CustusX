@@ -79,8 +79,8 @@ private:
 
     std::vector<QString> getProgramQueue();
 
-    int rtPort = 30003;
-    int secPort = 30002;
+    int rtPort;
+    int secPort;
     QString IPaddress;
     Ur5Connection mSecMonitor,mRTMonitor;
     Ur5ProgramEncoder mProgramEncoder;

@@ -48,9 +48,8 @@ namespace cx
  *
  * \ingroup org_custusx_robot_ur5
  *
- * \date 2014-05-02
- * \author Christian Askeland
- * \author Andreas Østvik
+ * \date 2015-10-27
+ *  * \author Andreas Østvik
  */
 class org_custusx_robot_ur5_EXPORT Ur5Widget : public QWidget
 {

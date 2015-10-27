@@ -3,7 +3,11 @@
 namespace cx
 {
 
-Ur5Robot::Ur5Robot()
+Ur5Robot::Ur5Robot():
+    moveInProgress(false),
+    mBlendRadius(0.001),
+    rtPort(30003),
+    secPort(30002)
 {
     moveInProgress = false;
 
