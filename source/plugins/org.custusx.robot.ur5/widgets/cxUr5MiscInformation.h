@@ -17,6 +17,14 @@ public:
     Ur5MiscInformationTab(Ur5RobotPtr Ur5Robot, QWidget *parent = 0);
     virtual ~Ur5MiscInformationTab();
 
+private slots:
+    void updateForceSlot();
+    void updatePositionSlot();
+
+private:
+    void setupUi(QWidget *parent);
+    Ur5RobotPtr mUr5Robot;
+
     QLineEdit *FxLineEdit, *FyLineEdit, *FzLineEdit;
     QLineEdit *FLineEdit;
     QLineEdit *TxLineEdit, *TyLineEdit, *TzLineEdit;
@@ -29,15 +37,6 @@ public:
 
     QLineEdit *txPosLineEdit, *tyPosLineEdit, *tzPosLineEdit;
     QLineEdit *trxLineEdit, *tryLineEdit, *trzLineEdit;
-
-
-protected slots:
-    void updateForceSlot();
-    void updatePositionSlot();
-
-private:
-    void setupUi(QWidget *parent);
-    Ur5RobotPtr mUr5Robot;
 };
 
 
