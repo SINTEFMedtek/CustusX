@@ -37,48 +37,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxBaseWidget.h"
 #include "cxForwardDeclarations.h"
-#include "cxStringPropertyBase.h"
 class QCheckBox;
 
 namespace cx
 {
 typedef boost::shared_ptr<class StringPropertySelectData> StringPropertySelectDataPtr;
 typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
-typedef boost::shared_ptr<class StringPropertyClipPlane> StringPropertyClipPlanePtr;
 
 /**
  * \file
  * \addtogroup cx_gui
  * @{
  */
-
-/** Adapter that connects to the current active image.
- */
-class cxGui_EXPORT StringPropertyClipPlane: public StringPropertyBase
-{
-Q_OBJECT
-public:
-	static StringPropertyClipPlanePtr New(InteractiveClipperPtr clipper)
-	{
-		return StringPropertyClipPlanePtr(new StringPropertyClipPlane(clipper));
-	}
-	StringPropertyClipPlane(InteractiveClipperPtr clipper);
-	virtual ~StringPropertyClipPlane() {}
-
-public:
-	// basic methods
-	virtual QString getDisplayName() const;
-	virtual bool setValue(const QString& value);
-	virtual QString getValue() const;
-
-public:
-	// optional methods
-	virtual QString getHelp() const;
-	virtual QStringList getValueRange() const;
-	void setClipper(InteractiveClipperPtr clipper);
-
-	InteractiveClipperPtr mInteractiveClipper;
-};
 
 
 /*

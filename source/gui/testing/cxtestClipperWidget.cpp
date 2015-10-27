@@ -249,7 +249,7 @@ TEST_CASE_METHOD(cxtest::ClipperWidgetFixture, "ClipperWidget: Select all data i
 	REQUIRE_FALSE(this->mSelectAllData->isChecked());
 }
 
-TEST_CASE_METHOD(cxtest::ClipperWidgetFixture, "ClipperWidget: Select all data is unchecked when changing clipper", "[unit][gui][widget]")
+TEST_CASE_METHOD(cxtest::ClipperWidgetFixture, "ClipperWidget: Select all data is updated when changing clipper", "[unit][gui][widget]")
 {
 	this->createTestPatientWithData();
 	this->setClipper(testClipper);

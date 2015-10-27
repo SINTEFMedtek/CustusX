@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogger.h"
 #include "cxInteractiveClipper.h"
 #include "cxEnumConverter.h"
-#include "cxClippingWidget.h"//To use StringPropertyClipPlane. Fix
+#include "cxStringPropertyClipPlane.h"
 #include "cxXmlOptionItem.h"
 #include "cxProfile.h"
 #include "cxStringProperty.h"
