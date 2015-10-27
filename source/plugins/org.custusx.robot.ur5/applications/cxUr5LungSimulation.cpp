@@ -34,7 +34,8 @@ void Ur5LungSimulation::lungMovementSlot(double t1, double t2, double t3, double
     lungMovementTiming << t1, t2, t3, t4;
 
     this->startExpirationSequence();
-    QTimer::singleShot((t3+t4)*1000,this,&Ur5LungSimulation::startInspirationSequence);
+
+    QTimer::singleShot((t3+t4)*1000,this,SLOT(Ur5LungSimulation::startInspirationSequence));
 
     CX_LOG_INFO() << "Lung simulation started";
 }
