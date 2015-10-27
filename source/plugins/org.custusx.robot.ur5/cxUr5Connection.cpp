@@ -43,14 +43,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-Ur5Connection::Ur5Connection(QString address, int port)
-{   
-    info.host = address;
-    info.port = port;
-
-    setConnectionInfo(info);
-}
-
 Ur5Connection::Ur5Connection()
 {
 }
