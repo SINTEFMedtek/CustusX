@@ -31,10 +31,55 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "catch.hpp"
 #include "cxClipperWidget.h"
+#include "cxVisServices.h"
+#include "cxClippers.h"
+#include "cxInteractiveClipper.h"
 
+namespace cxtest
+{
 
+class ClipperWidgetFixture : public cx::ClipperWidget
+{
+public:
+	ClipperWidgetFixture() :
+		ClipperWidget(cx::VisServices::getNullObjects(), NULL)
+	{
+		cx::ClippersPtr clippers = cx::ClippersPtr(new cx::Clippers(mServices));
+		QString clipperName = clippers->getClipperNames().first();
+		testClipper = clippers->getClipper(clipperName);
 
-//TEST_CASE_METHOD("ClipperWidget: Init", "[unit][gui][widget]")
-//{
+		clipperName = clippers->getClipperNames().last();
+		testClipper2 = clippers->getClipper(clipperName);
+	}
 
-//}
+	cx::InteractiveClipperPtr testClipper;
+	cx::InteractiveClipperPtr testClipper2;
+};
+
+}//cxtest
+
+TEST_CASE_METHOD(cxtest::ClipperWidgetFixture, "ClipperWidget: Set clipper", "[unit][gui][widget]")
+{
+	CHECK_FALSE(mClipper);
+	this->setClipper(testClipper);
+	CHECK(mClipper);
+}
+
+TEST_CASE_METHOD(cxtest::ClipperWidgetFixture, "ClipperWidget: Enable clipper", "[unit][gui][widget]")
+{
+	this->setClipper(testClipper);
+	this->mUseClipperCheckBox->setChecked(true);
+	CHECK(mUseClipperCheckBox->isChecked());
+	CHECK(testClipper->getUseClipper());
+
+	this->mUseClipperCheckBox->setChecked(false);
+	CHECK_FALSE(testClipper->getUseClipper());
+
+	this->setClipper(testClipper2);
+	this->mUseClipperCheckBox->setChecked(true);
+	CHECK(testClipper2->getUseClipper());
+
+	this->setClipper(testClipper);
+	CHECK_FALSE(testClipper->getUseClipper());
+	CHECK_FALSE(mUseClipperCheckBox->isChecked());
+}
