@@ -30,44 +30,51 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXTESTSESSIONSTORAGETESTFIXTURE_H
-#define CXTESTSESSIONSTORAGETESTFIXTURE_H
+#ifndef CXCLIPPERS_H
+#define CXCLIPPERS_H
 
-#include "cxtest_org_custusx_core_patientmodel_export.h"
+#include "cxGuiExport.h"
 
-#include <QString>
-#include <boost/shared_ptr.hpp>
+#include <QStringList>
+#include "cxForwardDeclarations.h"
 
-namespace cx
+namespace cx {
+typedef boost::shared_ptr<class Clippers> ClippersPtr;
+typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
+
+/**\brief Clipper container. Used by ClippersWidget.
+ *
+ *  \date Oct, 2015
+ *  \author Ole Vegard Solberg, SINTEF
+ */
+class cxGui_EXPORT Clippers : public QObject
 {
-typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
-typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
-}
-
-namespace cxtest
-{
-
-class CXTEST_ORG_CUSTUSX_CORE_PATIENTMODEL_EXPORT SessionStorageTestFixture
-{
+	Q_OBJECT
 public:
-	SessionStorageTestFixture();
+	Clippers(VisServicesPtr services);
+	void importList(QString clippers);
+	QString exportList();
+	InteractiveClipperPtr getClipper(QString clipperName);
+	void add(QString clipperName, InteractiveClipperPtr clipper);
+	void remove(QString clipperName);
+	bool exists(QString clipperName);
+	int size() {return mClippers.size();}
+	QStringList getClipperNames();
 
-	~SessionStorageTestFixture();
+signals:
+	void changed();
 
-	void createSessions();
-	void loadSession1();
-	void loadSession2();
-	void reloadSession1();
-	void reloadSession2();
-	void saveSession();
+protected:
+	VisServicesPtr mServices;
+//	PatientStorage mStorage;
+	std::map<QString, InteractiveClipperPtr> mClippers;
+	QStringList mClipperList;//remove
+//	StringPropertyPtr mClipperList;
 
-	cx::SessionStorageServicePtr mSessionStorageService;
-	cx::PatientModelServicePtr mPatientModelService;
-private:
-	bool mSessionsCreated;
-	QString mSession1;
-	QString mSession2;
+	void createDefaultClippers();
+	QStringList getInitialClipperNames();
 };
 
-} //cxtest
-#endif // CXTESTSESSIONSTORAGETESTFIXTURE_H
+}//cx
+
+#endif // CXCLIPPERS_H

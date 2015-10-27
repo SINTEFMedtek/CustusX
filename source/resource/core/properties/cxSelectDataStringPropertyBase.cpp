@@ -51,7 +51,7 @@ SelectDataStringPropertyBase::SelectDataStringPropertyBase(PatientModelServicePt
 /**
 	* Erase all data with type not conforming to input regexp.
 	*/
-std::map<QString, DataPtr> SelectDataStringPropertyBase::filterOnType(std::map<QString, DataPtr> input, QString regexp) const
+std::map<QString, DataPtr> SelectDataStringPropertyBase::filterOnType(std::map<QString, DataPtr> input, QString regexp)
 {
 	QRegExp reg(regexp);
 
@@ -94,7 +94,7 @@ void SelectDataStringPropertyBase::setUidRegexp(QString regexp)
 QStringList SelectDataStringPropertyBase::getValueRange() const
 {
 	std::map<QString, DataPtr> data = mPatientModelService->getData();
-	data = this->filterOnType(data, mTypeRegexp);
+	data = SelectDataStringPropertyBase::filterOnType(data, mTypeRegexp);
 	data = this->filterOnUid(data, mUidRegexp);
 	std::vector<DataPtr> sorted = sortOnGroupsAndAcquisitionTime(data);
 	QStringList retval;
