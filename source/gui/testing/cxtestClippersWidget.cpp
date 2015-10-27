@@ -48,9 +48,6 @@ public:
 	ClippersWidgetFixture() :
 		ClippersWidget(cx::VisServices::getNullObjects(), NULL)
 	{}
-	ClippersWidgetFixture(cx::VisServicesPtr services, QWidget* parent) :
-		ClippersWidget(services, parent)
-	{}
 };
 
 class ClippersFixture : public cx::Clippers

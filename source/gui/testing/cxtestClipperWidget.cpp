@@ -34,15 +34,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVisServices.h"
 #include "cxClippers.h"
 #include "cxInteractiveClipper.h"
+#include "cxtestSessionStorageTestFixture.h"
+#include "cxPatientModelService.h"
 
 namespace cxtest
 {
+
+typedef boost::shared_ptr<class VisServicesFixture> VisServicesFixturePtr;
+class VisServicesFixture : public cx::VisServices
+{
+public:
+	void setPatient(cx::PatientModelServicePtr patient)
+	{
+		mPatientModelService = patient;
+	}
+};
 
 class ClipperWidgetFixture : public cx::ClipperWidget
 {
 public:
 	ClipperWidgetFixture() :
-		ClipperWidget(cx::VisServices::getNullObjects(), NULL)
+		ClipperWidget(cxtest::VisServicesFixture::getNullObjects(), NULL)
 	{
 		cx::ClippersPtr clippers = cx::ClippersPtr(new cx::Clippers(mServices));
 		QString clipperName = clippers->getClipperNames().first();
@@ -52,11 +64,26 @@ public:
 		testClipper2 = clippers->getClipper(clipperName);
 	}
 
+	void setPatientService(cx::PatientModelServicePtr patient)
+	{
+		cxtest::VisServicesFixturePtr services = boost::static_pointer_cast<cxtest::VisServicesFixture>(mServices);
+		services->setPatient(patient);
+	}
+
+	void createTestPatient()
+	{
+		cxtest::SessionStorageTestFixture storageFixture;
+		cx::PatientModelServicePtr patientService = storageFixture.mPatientModelService;
+		storageFixture.createSessions();
+		storageFixture.loadSession1();
+
+		this->setPatientService(patientService);//Use real patient service instead of null object
+	}
+
 	cx::InteractiveClipperPtr testClipper;
 	cx::InteractiveClipperPtr testClipper2;
 };
 
-}//cxtest
 
 TEST_CASE_METHOD(cxtest::ClipperWidgetFixture, "ClipperWidget: Set clipper", "[unit][gui][widget]")
 {
@@ -83,3 +110,78 @@ TEST_CASE_METHOD(cxtest::ClipperWidgetFixture, "ClipperWidget: Enable clipper", 
 	CHECK_FALSE(testClipper->getUseClipper());
 	CHECK_FALSE(mUseClipperCheckBox->isChecked());
 }
+
+TEST_CASE_METHOD(cxtest::ClipperWidgetFixture, "ClipperWidget: Insert data", "[unit][gui][widget]")
+{
+	cxtest::SessionStorageTestFixture storageFixture;
+	cx::PatientModelServicePtr patientService = storageFixture.mPatientModelService;
+	storageFixture.createSessions();
+	storageFixture.loadSession1();
+
+	this->setPatientService(patientService);//Use real patient service instead of null object
+
+	CHECK(this->getDatas().size() == 0);
+	CHECK(this->mCheckBoxes.size() == 0);
+
+	TestDataStructures testData;
+	patientService->insertData(testData.mesh1);
+	patientService->insertData(testData.image1);
+
+	CHECK(this->getDatas().size() == 2);
+
+	this->setClipper(testClipper);
+	CHECK(this->mCheckBoxes.size() == 2);
+
+	patientService->insertData(testData.image2);
+	this->prePaintEvent();//Force update of data structures
+	CHECK(this->getDatas().size() == 3);
+	CHECK(this->mCheckBoxes.size() == 3);
+}
+
+TEST_CASE_METHOD(cxtest::ClipperWidgetFixture, "ClipperWidget: Turn clipping on/off for a mesh", "[unit][gui][widget]")
+{
+	cxtest::SessionStorageTestFixture storageFixture;
+	cx::PatientModelServicePtr patientService = storageFixture.mPatientModelService;
+	storageFixture.createSessions();
+	storageFixture.loadSession1();
+
+	this->setPatientService(patientService);//Use real patient service instead of null object
+
+	TestDataStructures testData;
+	patientService->insertData(testData.mesh1);
+	patientService->insertData(testData.image1);
+	patientService->insertData(testData.image2);
+
+	this->setClipper(testClipper);
+
+	this->mUseClipperCheckBox->setChecked(true);
+
+	QString uid = testData.mesh1->getUid();
+
+	CHECK(this->mCheckBoxes.size() == 3);
+	REQUIRE(this->mCheckBoxes.contains(uid));
+	QCheckBox *checkBox = this->mCheckBoxes[uid];
+	REQUIRE(checkBox);
+	REQUIRE_FALSE(checkBox->isChecked());
+
+
+	std::vector<vtkPlanePtr> clipPlanes = testData.mesh1->getAllClipPlanes();
+	REQUIRE(clipPlanes.size() == 0);
+
+	CHECK(testClipper->getDatas().size() == 0);
+
+	checkBox->click();
+	clipPlanes = testData.mesh1->getAllClipPlanes();
+	CHECK(testClipper->getDatas().size() == 1);
+	REQUIRE(clipPlanes.size() == 1);
+
+
+	checkBox->click();
+	REQUIRE_FALSE(checkBox->isChecked());
+	clipPlanes = testData.mesh1->getAllClipPlanes();
+	CHECK(testClipper->getDatas().size() == 0);
+	REQUIRE(clipPlanes.size() == 0);
+
+}
+
+}//cxtest

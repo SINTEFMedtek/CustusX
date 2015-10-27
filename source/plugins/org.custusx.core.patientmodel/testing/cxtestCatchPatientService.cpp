@@ -45,23 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxActiveData.h"
 #include "cxTypeConversions.h"
 
-namespace {
-
-struct testDataStructures
-{
-	cx::ImagePtr image1;
-	cx::ImagePtr image2;
-	cx::MeshPtr mesh1;
-	testDataStructures()
-	{
-		vtkImageDataPtr dummyImageData = cx::Image::createDummyImageData(2, 1);
-		image1 = cx::ImagePtr(new cx::Image("imageUid1", dummyImageData, "imageName1"));
-		image2 = cx::ImagePtr(new cx::Image("imageUid2", dummyImageData, "imageName2"));
-		mesh1 = cx::Mesh::create("meshUid1","meshName1");
-	}
-};
-
-} // namespace
+namespace cxtest {
 
 TEST_CASE("DataManagerImpl setup/shutdown works multiple times", "[unit]")
 {
@@ -77,9 +61,9 @@ TEST_CASE("DataManagerImpl setup/shutdown works multiple times", "[unit]")
 
 TEST_CASE("ActiveData: save/load in patient file", "[unit]")
 {
-	cxtest::SessionStorageTestFixture storageFixture;
+	SessionStorageTestFixture storageFixture;
 	cx::PatientModelServicePtr patientModelService = storageFixture.mPatientModelService;
-	testDataStructures testData;
+	TestDataStructures testData;
 	cx::ActiveDataPtr activeData = patientModelService->getActiveData();
 
 	storageFixture.createSessions();
@@ -117,9 +101,9 @@ TEST_CASE("ActiveData: save/load in patient file", "[unit]")
 
 TEST_CASE("ActiveData: Set using uid", "[unit]")
 {
-	cxtest::SessionStorageTestFixture storageFixture;
+	SessionStorageTestFixture storageFixture;
 	cx::PatientModelServicePtr patientModelService = storageFixture.mPatientModelService;
-	testDataStructures testData;
+	TestDataStructures testData;
 	cx::ActiveDataPtr activeData = patientModelService->getActiveData();
 
 	patientModelService->insertData(testData.image1);
@@ -130,9 +114,9 @@ TEST_CASE("ActiveData: Set using uid", "[unit]")
 
 TEST_CASE("StringPropertyActiveData works", "[unit][resource][core]")
 {
-	cxtest::SessionStorageTestFixture storageFixture;
+	SessionStorageTestFixture storageFixture;
 	cx::PatientModelServicePtr patientModelService = storageFixture.mPatientModelService;
-	testDataStructures testData;
+	TestDataStructures testData;
 	cx::ActiveDataPtr activeData = patientModelService->getActiveData();
 	CHECK_FALSE(activeData->getActive());
 
@@ -146,3 +130,5 @@ TEST_CASE("StringPropertyActiveData works", "[unit][resource][core]")
 	CHECK(activeData->getActive());
 	REQUIRE(activeDataProperty->getValue() == testData.image1->getUid());
 }
+
+} //cxtest
