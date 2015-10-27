@@ -57,9 +57,7 @@ public:
 	ClipperWidget(VisServicesPtr services, QWidget *parent);
 	~ClipperWidget();
 	void setClipper(InteractiveClipperPtr clipper);
-protected:
-	virtual void prePaintEvent();
-private slots:
+protected slots:
 	void setClipPlaneInDatas();
 	void setupDataSelectorUI();
 	void enable(bool checked);
@@ -67,8 +65,9 @@ private slots:
 	void selectAllTableData(bool checked);
 	void dataSelectorClicked(bool checked);
 	void onToolChanged();
-private:
+protected:
 	void setupUI();
+	virtual void prePaintEvent();
 
 	InteractiveClipperPtr mClipper;
 	StringPropertyClipPlanePtr mPlaneAdapter;
