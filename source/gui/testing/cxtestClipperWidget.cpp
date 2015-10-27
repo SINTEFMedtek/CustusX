@@ -72,7 +72,6 @@ public:
 
 	void createTestPatient()
 	{
-		cxtest::SessionStorageTestFixture storageFixture;
 		cx::PatientModelServicePtr patientService = storageFixture.mPatientModelService;
 		storageFixture.createSessions();
 		storageFixture.loadSession1();
@@ -80,8 +79,30 @@ public:
 		this->setPatientService(patientService);//Use real patient service instead of null object
 	}
 
+	void createTestPatientWithData()
+	{
+		this->createTestPatient();
+		cx::PatientModelServicePtr patientService = storageFixture.mPatientModelService;
+		patientService->insertData(testData.mesh1);
+		patientService->insertData(testData.image1);
+		patientService->insertData(testData.image2);
+	}
+
+	QCheckBox *requireGetCheckBoxForMesh1()
+	{
+		QString uid = testData.mesh1->getUid();
+
+		REQUIRE(this->mCheckBoxes.contains(uid));
+		QCheckBox *checkBox = this->mCheckBoxes[uid];
+		REQUIRE(checkBox);
+		return checkBox;
+	}
+
 	cx::InteractiveClipperPtr testClipper;
 	cx::InteractiveClipperPtr testClipper2;
+
+	SessionStorageTestFixture storageFixture;
+	TestDataStructures testData;
 };
 
 
@@ -113,17 +134,12 @@ TEST_CASE_METHOD(cxtest::ClipperWidgetFixture, "ClipperWidget: Enable clipper", 
 
 TEST_CASE_METHOD(cxtest::ClipperWidgetFixture, "ClipperWidget: Insert data", "[unit][gui][widget]")
 {
-	cxtest::SessionStorageTestFixture storageFixture;
+	this->createTestPatient();
 	cx::PatientModelServicePtr patientService = storageFixture.mPatientModelService;
-	storageFixture.createSessions();
-	storageFixture.loadSession1();
-
-	this->setPatientService(patientService);//Use real patient service instead of null object
 
 	CHECK(this->getDatas().size() == 0);
 	CHECK(this->mCheckBoxes.size() == 0);
 
-	TestDataStructures testData;
 	patientService->insertData(testData.mesh1);
 	patientService->insertData(testData.image1);
 
@@ -140,30 +156,12 @@ TEST_CASE_METHOD(cxtest::ClipperWidgetFixture, "ClipperWidget: Insert data", "[u
 
 TEST_CASE_METHOD(cxtest::ClipperWidgetFixture, "ClipperWidget: Turn clipping on/off for a mesh", "[unit][gui][widget]")
 {
-	cxtest::SessionStorageTestFixture storageFixture;
-	cx::PatientModelServicePtr patientService = storageFixture.mPatientModelService;
-	storageFixture.createSessions();
-	storageFixture.loadSession1();
-
-	this->setPatientService(patientService);//Use real patient service instead of null object
-
-	TestDataStructures testData;
-	patientService->insertData(testData.mesh1);
-	patientService->insertData(testData.image1);
-	patientService->insertData(testData.image2);
-
+	this->createTestPatientWithData();
 	this->setClipper(testClipper);
-
 	this->mUseClipperCheckBox->setChecked(true);
 
-	QString uid = testData.mesh1->getUid();
-
-	CHECK(this->mCheckBoxes.size() == 3);
-	REQUIRE(this->mCheckBoxes.contains(uid));
-	QCheckBox *checkBox = this->mCheckBoxes[uid];
-	REQUIRE(checkBox);
+	QCheckBox *checkBox = this->requireGetCheckBoxForMesh1();
 	REQUIRE_FALSE(checkBox->isChecked());
-
 
 	std::vector<vtkPlanePtr> clipPlanes = testData.mesh1->getAllClipPlanes();
 	REQUIRE(clipPlanes.size() == 0);
@@ -175,13 +173,97 @@ TEST_CASE_METHOD(cxtest::ClipperWidgetFixture, "ClipperWidget: Turn clipping on/
 	CHECK(testClipper->getDatas().size() == 1);
 	REQUIRE(clipPlanes.size() == 1);
 
-
 	checkBox->click();
 	REQUIRE_FALSE(checkBox->isChecked());
 	clipPlanes = testData.mesh1->getAllClipPlanes();
 	CHECK(testClipper->getDatas().size() == 0);
 	REQUIRE(clipPlanes.size() == 0);
+}
 
+TEST_CASE_METHOD(cxtest::ClipperWidgetFixture, "ClipperWidget: Remember clipping in mesh when changing clipper", "[unit][gui][widget]")
+{
+	this->createTestPatientWithData();
+	this->setClipper(testClipper);
+	this->mUseClipperCheckBox->setChecked(true);
+
+	QCheckBox *checkBox = this->requireGetCheckBoxForMesh1();
+	checkBox->click();
+	CHECK(checkBox->isChecked());
+
+	std::vector<vtkPlanePtr> clipPlanes = testData.mesh1->getAllClipPlanes();
+	CHECK(clipPlanes.size() == 1);
+	CHECK(testClipper->getDatas().size() == 1);
+
+	this->setClipper(testClipper2);
+	checkBox = this->requireGetCheckBoxForMesh1();
+	CHECK_FALSE(checkBox->isChecked());
+	clipPlanes = testData.mesh1->getAllClipPlanes();
+	CHECK(clipPlanes.size() == 1);
+	CHECK(testClipper2->getDatas().size() == 0);
+
+	this->setClipper(testClipper);
+
+	checkBox = this->requireGetCheckBoxForMesh1();
+	CHECK(checkBox->isChecked());
+}
+
+TEST_CASE_METHOD(cxtest::ClipperWidgetFixture, "ClipperWidget: Data type selector can turn images on/off", "[unit][gui][widget]")
+{
+	this->createTestPatientWithData();
+
+	REQUIRE(this->mShowImages->isChecked());
+	REQUIRE(this->mShowMeshes->isChecked());
+	CHECK(this->getDatas().size() == 3);
+
+	this->mShowImages->click();
+	REQUIRE_FALSE(this->mShowImages->isChecked());
+	CHECK(this->getDatas().size() == 1);
+
+	this->mShowImages->click();
+	CHECK(this->getDatas().size() == 3);
+}
+
+TEST_CASE_METHOD(cxtest::ClipperWidgetFixture, "ClipperWidget: Select all data checks mesh checkbox", "[unit][gui][widget]")
+{
+	this->createTestPatientWithData();
+	this->setClipper(testClipper);
+
+	QCheckBox *checkBox = this->requireGetCheckBoxForMesh1();
+	CHECK_FALSE(checkBox->isChecked());
+
+	REQUIRE_FALSE(this->mSelectAllData->isChecked());
+	this->mSelectAllData->click();
+	REQUIRE(this->mSelectAllData->isChecked());
+	CHECK(checkBox->isChecked());
+}
+
+TEST_CASE_METHOD(cxtest::ClipperWidgetFixture, "ClipperWidget: Select all data is unchecked when mesh is unchecked", "[unit][gui][widget]")
+{
+	this->createTestPatientWithData();
+	this->setClipper(testClipper);
+
+	this->mSelectAllData->click();
+
+	QCheckBox *checkBox = this->requireGetCheckBoxForMesh1();
+	checkBox->click();
+	REQUIRE_FALSE(this->mSelectAllData->isChecked());
+}
+
+TEST_CASE_METHOD(cxtest::ClipperWidgetFixture, "ClipperWidget: Select all data is unchecked when changing clipper", "[unit][gui][widget]")
+{
+	this->createTestPatientWithData();
+	this->setClipper(testClipper);
+	this->mUseClipperCheckBox->click();
+
+	this->mSelectAllData->click();
+	CHECK(this->mSelectAllData->isChecked());
+
+	this->setClipper(testClipper2);
+
+	REQUIRE_FALSE(this->mSelectAllData->isChecked());
+
+	this->setClipper(testClipper);
+	CHECK(this->mSelectAllData->isChecked());
 }
 
 }//cxtest

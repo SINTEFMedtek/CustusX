@@ -229,13 +229,21 @@ void ClipperWidget::setClipper(InteractiveClipperPtr clipper)
 
 void ClipperWidget::initCheckboxesBasedOnClipper()
 {
+	int counter = 0;
 	std::map<QString, DataPtr> datas = mClipper->getDatas();
 	std::map<QString, DataPtr>::iterator iter = datas.begin();
 	for(; iter != datas.end(); ++iter)
 	{
 		if(mCheckBoxes.contains(iter->first))
+		{
+			++counter;
 			mCheckBoxes[iter->first]->setChecked(true);
+		}
 	}
+	if(counter == this->getDatas().size())
+		mSelectAllData->setChecked(true);
+	else
+		mSelectAllData->setChecked(false);
 }
 
 void ClipperWidget::createNewCheckboxesBasedOnData()
@@ -360,9 +368,6 @@ void ClipperWidget::selectAllTableData(bool checked)
 
 void ClipperWidget::dataTypeSelectorClicked(bool checked)
 {
-	if(checked)
-		mSelectAllData->setChecked(false);
-
 	this->removeAllClipPlanes();
 	this->setupDataSelectorUI();
 	this->setClipPlaneInDatas();
