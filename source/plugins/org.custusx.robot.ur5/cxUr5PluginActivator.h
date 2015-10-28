@@ -30,60 +30,48 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXCLIPPINGWIDGET_H_
-#define CXCLIPPINGWIDGET_H_
+#ifndef CXUR5PLUGINACTIVATOR_H_
+#define CXUR5PLUGINACTIVATOR_H_
 
-#include "cxGuiExport.h"
-
-#include "cxBaseWidget.h"
-#include "cxForwardDeclarations.h"
-class QCheckBox;
+#include <ctkPluginActivator.h>
+#include "boost/shared_ptr.hpp"
+#include "cxUr5Robot.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class StringPropertySelectData> StringPropertySelectDataPtr;
-typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
+
+typedef boost::shared_ptr<class Ur5GUIExtenderService> Ur5GUIExtenderServicePtr;
+typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
 
 /**
- * \file
- * \addtogroup cx_gui
- * @{
- */
-
-
-/*
- * \class ClippingWidget
+ * Activator for the UR5 plugin
  *
- * \date Aug 25, 2010
- * \author Christian Askeland, SINTEF
+ * \ingroup org_custusx_robot_ur5
+ *
+ * \date 2014-04-15
+ * \author Christian Askeland
  */
-
-class cxGui_EXPORT ClippingWidget: public BaseWidget
+class Ur5PluginActivator :  public QObject, public ctkPluginActivator
 {
-Q_OBJECT
+	Q_OBJECT
+	Q_INTERFACES(ctkPluginActivator)
+	Q_PLUGIN_METADATA(IID "org_custusx_robot_ur5")
 
 public:
-	ClippingWidget(VisServicesPtr services, QWidget* parent);
+
+	Ur5PluginActivator();
+	~Ur5PluginActivator();
+
+	void start(ctkPluginContext* context);
+	void stop(ctkPluginContext* context);
 
 private:
-	InteractiveClipperPtr mInteractiveClipper;
+    RegisteredServicePtr mRegistrationGui;
+    RegisteredServicePtr mRegistrationTracking;
 
-	QCheckBox* mUseClipperCheckBox;
-	QCheckBox* mInvertPlaneCheckBox;
-	StringPropertyBasePtr mPlaneAdapter;
-	StringPropertySelectDataPtr mDataAdapter;
-	VisServicesPtr mServices;
-private slots:
-	void setupUI();
-	void clipperChangedSlot();
-	void clearButtonClickedSlot();
-	void saveButtonClickedSlot();
-	void imageChangedSlot();
+    Ur5RobotPtr mUr5Robot;
 };
 
-/**
- * @}
- */
-}//namespace cx
+} // namespace cx
 
-#endif /* CXCLIPPINGWIDGET_H_ */
+#endif /* CXUR5PLUGINACTIVATOR_H_ */

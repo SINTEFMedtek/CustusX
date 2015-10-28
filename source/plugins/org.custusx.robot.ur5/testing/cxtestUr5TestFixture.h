@@ -30,61 +30,28 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXTESTSESSIONSTORAGETESTFIXTURE_H
-#define CXTESTSESSIONSTORAGETESTFIXTURE_H
+#ifndef CXTESTUR5TESTFIXTURE_H
+#define CXTESTUR5TESTFIXTURE_H
 
-#include "cxtest_org_custusx_core_patientmodel_export.h"
+#include "cxUr5Robot.h"
 
-#include <QString>
-#include <boost/shared_ptr.hpp>
-#include "cxForwardDeclarations.h"
-#include "cxImage.h"
-#include "cxMesh.h"
-
-namespace cx
-{
-typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
-typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
-}
+#include "cxtest_org_custusx_robot_ur5_export.h"
 
 namespace cxtest
 {
 
-struct TestDataStructures
-{
-	cx::ImagePtr image1;
-	cx::ImagePtr image2;
-	cx::MeshPtr mesh1;
-	TestDataStructures()
-	{
-		vtkImageDataPtr dummyImageData = cx::Image::createDummyImageData(2, 1);
-		image1 = cx::ImagePtr(new cx::Image("imageUid1", dummyImageData, "imageName1"));
-		image2 = cx::ImagePtr(new cx::Image("imageUid2", dummyImageData, "imageName2"));
-		mesh1 = cx::Mesh::create("meshUid1","meshName1");
-	}
-};
-
-class CXTEST_ORG_CUSTUSX_CORE_PATIENTMODEL_EXPORT SessionStorageTestFixture
+class CXTEST_ORG_CUSTUSX_ROBOT_UR5_EXPORT Ur5TestFixture
 {
 public:
-	SessionStorageTestFixture();
+    Ur5TestFixture();
 
-	~SessionStorageTestFixture();
+    cx::Ur5Robot mUr5Robot;
+    cx::Ur5Connection mUr5Connection;
 
-	void createSessions();
-	void loadSession1();
-	void loadSession2();
-	void reloadSession1();
-	void reloadSession2();
-	void saveSession();
-
-	cx::SessionStorageServicePtr mSessionStorageService;
-	cx::PatientModelServicePtr mPatientModelService;
-private:
-	bool mSessionsCreated;
-	QString mSession1;
-	QString mSession2;
+    QByteArray getTestData(int packetSize);
+    Eigen::MatrixXd jacobianUr5(Eigen::RowVectorXd jointPositions);
 };
 
 } //cxtest
-#endif // CXTESTSESSIONSTORAGETESTFIXTURE_H
+
+#endif // CXTESTUR5TESTFIXTURE_H

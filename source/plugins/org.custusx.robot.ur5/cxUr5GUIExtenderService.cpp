@@ -30,60 +30,26 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXCLIPPINGWIDGET_H_
-#define CXCLIPPINGWIDGET_H_
-
-#include "cxGuiExport.h"
-
-#include "cxBaseWidget.h"
-#include "cxForwardDeclarations.h"
-class QCheckBox;
+#include "cxUr5GUIExtenderService.h"
+#include "ctkPluginContext.h"
+#include "cxUr5Widget.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class StringPropertySelectData> StringPropertySelectDataPtr;
-typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
-
-/**
- * \file
- * \addtogroup cx_gui
- * @{
- */
-
-
-/*
- * \class ClippingWidget
- *
- * \date Aug 25, 2010
- * \author Christian Askeland, SINTEF
- */
-
-class cxGui_EXPORT ClippingWidget: public BaseWidget
+Ur5GUIExtenderService::Ur5GUIExtenderService(ctkPluginContext *context, Ur5RobotPtr robot) :
+  mContext(context),
+  mUr5Robot(robot)
 {
-Q_OBJECT
+}
 
-public:
-	ClippingWidget(VisServicesPtr services, QWidget* parent);
+std::vector<GUIExtenderService::CategorizedWidget> Ur5GUIExtenderService::createWidgets() const
+{
+	std::vector<CategorizedWidget> retval;
 
-private:
-	InteractiveClipperPtr mInteractiveClipper;
+    retval.push_back(GUIExtenderService::CategorizedWidget(new Ur5Widget(mUr5Robot), "Utility"));
 
-	QCheckBox* mUseClipperCheckBox;
-	QCheckBox* mInvertPlaneCheckBox;
-	StringPropertyBasePtr mPlaneAdapter;
-	StringPropertySelectDataPtr mDataAdapter;
-	VisServicesPtr mServices;
-private slots:
-	void setupUI();
-	void clipperChangedSlot();
-	void clearButtonClickedSlot();
-	void saveButtonClickedSlot();
-	void imageChangedSlot();
-};
+	return retval;
+}
 
-/**
- * @}
- */
-}//namespace cx
 
-#endif /* CXCLIPPINGWIDGET_H_ */
+} /* namespace cx */

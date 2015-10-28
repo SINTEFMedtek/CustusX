@@ -30,61 +30,74 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXTESTSESSIONSTORAGETESTFIXTURE_H
-#define CXTESTSESSIONSTORAGETESTFIXTURE_H
+#ifndef CXUR5CONNECTION_H
+#define CXUR5CONNECTION_H
 
-#include "cxtest_org_custusx_core_patientmodel_export.h"
+#include "cxSocketConnection.h"
+#include "org_custusx_robot_ur5_Export.h"
+#include "cxTransform3D.h"
+#include "cxVector3D.h"
+#include "cxUr5State.h"
+#include "cxUr5MessageDecoder.h"
+#include "cxUr5MessageEncoder.h"
+#include "cxUr5ProgramEncoder.h"
 
-#include <QString>
-#include <boost/shared_ptr.hpp>
-#include "cxForwardDeclarations.h"
-#include "cxImage.h"
-#include "cxMesh.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
-typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
-}
+/**
+ * Class that handles UR5 robot TCP connection.
+ *
+ * \ingroup org_custusx_robot_ur5
+ *
+ * \author Ole Vegard Solberg, SINTEF
+ * \author Andreas Østvik
+ * \date 2015-06-25
+ */
+typedef boost::shared_ptr<class Ur5Connection> Ur5ConnectionPtr;
 
-namespace cxtest
+class org_custusx_robot_ur5_EXPORT Ur5Connection : public SocketConnection
 {
+    Q_OBJECT
 
-struct TestDataStructures
-{
-	cx::ImagePtr image1;
-	cx::ImagePtr image2;
-	cx::MeshPtr mesh1;
-	TestDataStructures()
-	{
-		vtkImageDataPtr dummyImageData = cx::Image::createDummyImageData(2, 1);
-		image1 = cx::ImagePtr(new cx::Image("imageUid1", dummyImageData, "imageName1"));
-		image2 = cx::ImagePtr(new cx::Image("imageUid2", dummyImageData, "imageName2"));
-		mesh1 = cx::Mesh::create("meshUid1","meshName1");
-	}
-};
-
-class CXTEST_ORG_CUSTUSX_CORE_PATIENTMODEL_EXPORT SessionStorageTestFixture
-{
 public:
-	SessionStorageTestFixture();
+    Ur5Connection(QString address, int port);
+    Ur5Connection();
+    ~Ur5Connection();
 
-	~SessionStorageTestFixture();
+    void setAddress(QString address, int port);
+    bool isConnectedToRobot();
 
-	void createSessions();
-	void loadSession1();
-	void loadSession2();
-	void reloadSession1();
-	void reloadSession2();
-	void saveSession();
+    Ur5State getCurrentState();
+    Ur5State getTargetState();
+    Ur5State getPreviousState();
 
-	cx::SessionStorageServicePtr mSessionStorageService;
-	cx::PatientModelServicePtr mPatientModelService;
+    bool sendMessage(QString message);
+
+    void updateCurrentState(QByteArray buffer);
+
+    void setProtocol(QString protocolname);
+
+private slots:
+    void internalDataAvailable();
+
+signals:
+    void stateChanged();
+
 private:
-	bool mSessionsCreated;
-	QString mSession1;
-	QString mSession2;
+    void clearCurrentTCP();
+
+    bool waitForUpdate();
+    bool isPotentialPacket(qint64 bytes);
+
+    Ur5MessageEncoder mMessageEncoder;
+    Ur5MessageDecoder mMessageDecoder;
+    Ur5State mCurrentState,mTargetState,mPreviousState;
+
+    ConnectionInfo info;
 };
 
-} //cxtest
-#endif // CXTESTSESSIONSTORAGETESTFIXTURE_H
+
+} // cx
+
+#endif // CXUR5CONNECTION_H

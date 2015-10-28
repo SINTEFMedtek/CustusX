@@ -30,60 +30,46 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXCLIPPINGWIDGET_H_
-#define CXCLIPPINGWIDGET_H_
+#include "cxUr5PluginActivator.h"
 
-#include "cxGuiExport.h"
+#include <QtPlugin>
+#include <iostream>
 
-#include "cxBaseWidget.h"
-#include "cxForwardDeclarations.h"
-class QCheckBox;
+#include "cxUr5GUIExtenderService.h"
+#include "cxRegisteredService.h"
+#include "trackingSystemRobot/cxRobotTrackingSystemService.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class StringPropertySelectData> StringPropertySelectDataPtr;
-typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
 
-/**
- * \file
- * \addtogroup cx_gui
- * @{
- */
-
-
-/*
- * \class ClippingWidget
- *
- * \date Aug 25, 2010
- * \author Christian Askeland, SINTEF
- */
-
-class cxGui_EXPORT ClippingWidget: public BaseWidget
+Ur5PluginActivator::Ur5PluginActivator()
 {
-Q_OBJECT
+    std::cout << "Created Ur5PluginActivator" << std::endl;
+}
 
-public:
-	ClippingWidget(VisServicesPtr services, QWidget* parent);
+Ur5PluginActivator::~Ur5PluginActivator()
+{}
 
-private:
-	InteractiveClipperPtr mInteractiveClipper;
+void Ur5PluginActivator::start(ctkPluginContext* context)
+{   
+    mUr5Robot = Ur5RobotPtr(new Ur5Robot);
 
-	QCheckBox* mUseClipperCheckBox;
-	QCheckBox* mInvertPlaneCheckBox;
-	StringPropertyBasePtr mPlaneAdapter;
-	StringPropertySelectDataPtr mDataAdapter;
-	VisServicesPtr mServices;
-private slots:
-	void setupUI();
-	void clipperChangedSlot();
-	void clearButtonClickedSlot();
-	void saveButtonClickedSlot();
-	void imageChangedSlot();
-};
+    Ur5GUIExtenderService* gui = new Ur5GUIExtenderService(context,mUr5Robot);
+    RobotTrackingSystemService* tracking = new RobotTrackingSystemService(mUr5Robot);
 
-/**
- * @}
- */
-}//namespace cx
+    mRegistrationGui = RegisteredService::create<Ur5GUIExtenderService>(context,gui, GUIExtenderService_iid);
+    mRegistrationTracking = RegisteredService::create<RobotTrackingSystemService>(context,tracking,TrackingSystemService_iid);
+}
 
-#endif /* CXCLIPPINGWIDGET_H_ */
+void Ur5PluginActivator::stop(ctkPluginContext* context)
+{
+    mRegistrationGui.reset();
+    mRegistrationTracking.reset();
+
+	Q_UNUSED(context);
+}
+
+} // namespace cx
+
+
+

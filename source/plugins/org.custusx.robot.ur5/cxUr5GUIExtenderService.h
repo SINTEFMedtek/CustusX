@@ -30,60 +30,44 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXCLIPPINGWIDGET_H_
-#define CXCLIPPINGWIDGET_H_
+#ifndef CXUR5GUIEXTENDERSERVICE_H_
+#define CXUR5GUIEXTENDERSERVICE_H_
 
-#include "cxGuiExport.h"
+#include "cxGUIExtenderService.h"
+#include "org_custusx_robot_ur5_Export.h"
+#include "cxUr5Robot.h"
 
-#include "cxBaseWidget.h"
-#include "cxForwardDeclarations.h"
-class QCheckBox;
+class ctkPluginContext;
 
 namespace cx
 {
-typedef boost::shared_ptr<class StringPropertySelectData> StringPropertySelectDataPtr;
-typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
 
 /**
- * \file
- * \addtogroup cx_gui
- * @{
- */
-
-
-/*
- * \class ClippingWidget
+ * Implementation of UR5 service.
  *
- * \date Aug 25, 2010
- * \author Christian Askeland, SINTEF
+ * \ingroup org_custusx_robot_ur5
+ *
+ * \date 2014-04-01
+ * \author Christian Askeland
  */
-
-class cxGui_EXPORT ClippingWidget: public BaseWidget
+class org_custusx_robot_ur5_EXPORT Ur5GUIExtenderService : public GUIExtenderService
 {
-Q_OBJECT
-
+	Q_INTERFACES(cx::GUIExtenderService)
 public:
-	ClippingWidget(VisServicesPtr services, QWidget* parent);
+    Ur5GUIExtenderService(ctkPluginContext *context, Ur5RobotPtr robot);
+	virtual ~Ur5GUIExtenderService() {};
+
+	std::vector<CategorizedWidget> createWidgets() const;
 
 private:
-	InteractiveClipperPtr mInteractiveClipper;
+  ctkPluginContext* mContext;
+  Ur5RobotPtr mUr5Robot;
 
-	QCheckBox* mUseClipperCheckBox;
-	QCheckBox* mInvertPlaneCheckBox;
-	StringPropertyBasePtr mPlaneAdapter;
-	StringPropertySelectDataPtr mDataAdapter;
-	VisServicesPtr mServices;
-private slots:
-	void setupUI();
-	void clipperChangedSlot();
-	void clearButtonClickedSlot();
-	void saveButtonClickedSlot();
-	void imageChangedSlot();
+
 };
+typedef boost::shared_ptr<Ur5GUIExtenderService> Ur5GUIExtenderServicePtr;
 
-/**
- * @}
- */
-}//namespace cx
+} /* namespace cx */
 
-#endif /* CXCLIPPINGWIDGET_H_ */
+#endif /* CXUR5GUIEXTENDERSERVICE_H_ */
+

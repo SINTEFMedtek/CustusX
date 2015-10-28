@@ -30,60 +30,43 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXCLIPPINGWIDGET_H_
-#define CXCLIPPINGWIDGET_H_
+#ifndef CXUR5WIDGET_H_
+#define CXUR5WIDGET_H_
 
-#include "cxGuiExport.h"
+#include <QWidget>
 
-#include "cxBaseWidget.h"
-#include "cxForwardDeclarations.h"
-class QCheckBox;
+#include "cxUr5Robot.h"
+#include "org_custusx_robot_ur5_Export.h"
+#include "cxTrackingService.h"
+
+class ctkPluginContext;
 
 namespace cx
 {
-typedef boost::shared_ptr<class StringPropertySelectData> StringPropertySelectDataPtr;
-typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
-
 /**
- * \file
- * \addtogroup cx_gui
- * @{
- */
-
-
-/*
- * \class ClippingWidget
+ * Widget for use in the UR5 plugin
  *
- * \date Aug 25, 2010
- * \author Christian Askeland, SINTEF
+ * \ingroup org_custusx_robot_ur5
+ *
+ * \date 2015-10-27
+ *  * \author Andreas Østvik
  */
-
-class cxGui_EXPORT ClippingWidget: public BaseWidget
+class org_custusx_robot_ur5_EXPORT Ur5Widget : public QWidget
 {
-Q_OBJECT
-
+    Q_OBJECT
 public:
-	ClippingWidget(VisServicesPtr services, QWidget* parent);
+    Ur5Widget(Ur5RobotPtr robot, QWidget* parent = 0);
+    virtual ~Ur5Widget();
 
 private:
-	InteractiveClipperPtr mInteractiveClipper;
+    void setupUi(QWidget *parent);
+    Ur5RobotPtr mUr5Robot;
 
-	QCheckBox* mUseClipperCheckBox;
-	QCheckBox* mInvertPlaneCheckBox;
-	StringPropertyBasePtr mPlaneAdapter;
-	StringPropertySelectDataPtr mDataAdapter;
-	VisServicesPtr mServices;
-private slots:
-	void setupUI();
-	void clipperChangedSlot();
-	void clearButtonClickedSlot();
-	void saveButtonClickedSlot();
-	void imageChangedSlot();
+
 };
 
-/**
- * @}
- */
-}//namespace cx
 
-#endif /* CXCLIPPINGWIDGET_H_ */
+} /* namespace cx */
+
+
+#endif /* CXUR5WIDGET_H_ */

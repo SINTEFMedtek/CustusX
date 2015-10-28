@@ -30,61 +30,46 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXTESTSESSIONSTORAGETESTFIXTURE_H
-#define CXTESTSESSIONSTORAGETESTFIXTURE_H
+#ifndef CXSTRINGPROPERTYCLIPPLANE_H
+#define CXSTRINGPROPERTYCLIPPLANE_H
 
-#include "cxtest_org_custusx_core_patientmodel_export.h"
-
-#include <QString>
-#include <boost/shared_ptr.hpp>
+#include "cxGuiExport.h"
+#include "cxStringPropertyBase.h"
 #include "cxForwardDeclarations.h"
-#include "cxImage.h"
-#include "cxMesh.h"
+#include "cxInteractiveClipper.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
-typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
-}
+typedef boost::shared_ptr<class StringPropertyClipPlane> StringPropertyClipPlanePtr;
 
-namespace cxtest
+/** Adapter that connects to the current active image.
+ */
+class cxGui_EXPORT StringPropertyClipPlane: public StringPropertyBase
 {
-
-struct TestDataStructures
-{
-	cx::ImagePtr image1;
-	cx::ImagePtr image2;
-	cx::MeshPtr mesh1;
-	TestDataStructures()
-	{
-		vtkImageDataPtr dummyImageData = cx::Image::createDummyImageData(2, 1);
-		image1 = cx::ImagePtr(new cx::Image("imageUid1", dummyImageData, "imageName1"));
-		image2 = cx::ImagePtr(new cx::Image("imageUid2", dummyImageData, "imageName2"));
-		mesh1 = cx::Mesh::create("meshUid1","meshName1");
-	}
-};
-
-class CXTEST_ORG_CUSTUSX_CORE_PATIENTMODEL_EXPORT SessionStorageTestFixture
-{
+Q_OBJECT
 public:
-	SessionStorageTestFixture();
+	static StringPropertyClipPlanePtr New(InteractiveClipperPtr clipper)
+	{
+		return StringPropertyClipPlanePtr(new StringPropertyClipPlane(clipper));
+	}
+	StringPropertyClipPlane(InteractiveClipperPtr clipper);
+	virtual ~StringPropertyClipPlane() {}
 
-	~SessionStorageTestFixture();
+public:
+	// basic methods
+	virtual QString getDisplayName() const;
+	virtual bool setValue(const QString& value);
+	virtual QString getValue() const;
 
-	void createSessions();
-	void loadSession1();
-	void loadSession2();
-	void reloadSession1();
-	void reloadSession2();
-	void saveSession();
+public:
+	// optional methods
+	virtual QString getHelp() const;
+	virtual QStringList getValueRange() const;
+	void setClipper(InteractiveClipperPtr clipper);
 
-	cx::SessionStorageServicePtr mSessionStorageService;
-	cx::PatientModelServicePtr mPatientModelService;
-private:
-	bool mSessionsCreated;
-	QString mSession1;
-	QString mSession2;
+	InteractiveClipperPtr mInteractiveClipper;
 };
 
-} //cxtest
-#endif // CXTESTSESSIONSTORAGETESTFIXTURE_H
+}//cx
+
+#endif // CXSTRINGPROPERTYCLIPPLANE_H

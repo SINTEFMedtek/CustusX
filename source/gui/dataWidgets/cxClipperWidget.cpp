@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTableWidget>
 #include <QGroupBox>
 #include "cxClipperWidget.h"
-#include "cxClippingWidget.h" //Using StringPropertyClipPlane. Fix
+#include "cxStringPropertyClipPlane.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxInteractiveClipper.h"
 #include "cxVisServices.h"
@@ -186,8 +186,6 @@ void ClipperWidget::connectToNewClipper()
 	{
 		mUseClipperCheckBox->setChecked(mClipper->getUseClipper());
 		mInvertPlane->setChecked(mClipper->getInvertPlane());
-//		connect(mUseClipperCheckBox, &QCheckBox::toggled, this, &ClipperWidget::enable);
-//		connect(mToolSelector.get(), &StringPropertySelectTool::changed, this, &ClipperWidget::onToolChanged);
 		connect(mInvertPlane, &QCheckBox::toggled, mClipper.get(), &InteractiveClipper::invertPlane);
 		if(planeSelector)
 		{
@@ -218,7 +216,6 @@ void ClipperWidget::setClipper(InteractiveClipperPtr clipper)
 {
 	if(mClipper)
 	{
-//		disconnect(mUseClipperCheckBox, &QCheckBox::toggled, this, &ClipperWidget::enable);
 		disconnect(mInvertPlane, &QCheckBox::toggled, mClipper.get(), &InteractiveClipper::invertPlane);
 	}
 
@@ -229,13 +226,21 @@ void ClipperWidget::setClipper(InteractiveClipperPtr clipper)
 
 void ClipperWidget::initCheckboxesBasedOnClipper()
 {
+	int counter = 0;
 	std::map<QString, DataPtr> datas = mClipper->getDatas();
 	std::map<QString, DataPtr>::iterator iter = datas.begin();
 	for(; iter != datas.end(); ++iter)
 	{
 		if(mCheckBoxes.contains(iter->first))
+		{
+			++counter;
 			mCheckBoxes[iter->first]->setChecked(true);
+		}
 	}
+	if(counter == this->getDatas().size())
+		mSelectAllData->setChecked(true);
+	else
+		mSelectAllData->setChecked(false);
 }
 
 void ClipperWidget::createNewCheckboxesBasedOnData()
@@ -360,9 +365,6 @@ void ClipperWidget::selectAllTableData(bool checked)
 
 void ClipperWidget::dataTypeSelectorClicked(bool checked)
 {
-	if(checked)
-		mSelectAllData->setChecked(false);
-
 	this->removeAllClipPlanes();
 	this->setupDataSelectorUI();
 	this->setClipPlaneInDatas();

@@ -8,6 +8,7 @@ cx_add_class_qt_moc(cxGui_SRCS
 	#----------------------
 	properties/cxDataInterface
 	properties/cxShadingParamsInterfaces
+	properties/cxStringPropertyClipPlane
     #----------------------
     dataWidgets/cxVolumePropertiesWidget
     dataWidgets/cxVolumeInfoWidget
