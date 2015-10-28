@@ -37,7 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QGroupBox>
 #include "cxStringPropertyBase.h"
 #include "cxLabeledComboBoxWidget.h"
-#include "cxDefinitionStrings.h"
 #include "cxInteractiveClipper.h"
 #include "cxSelectDataStringProperty.h"
 #include "cxImage.h"

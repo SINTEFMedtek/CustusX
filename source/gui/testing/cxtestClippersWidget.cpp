@@ -129,7 +129,10 @@ TEST_CASE_METHOD(cxtest::ClippersWidgetFixture, "ClippersWidget: Automatic namin
 TEST_CASE_METHOD(cxtest::ClippersWidgetFixture, "ClippersWidget: Load clipper names", "[unit][gui][widget]")
 {
 	QStringList range = this->mClipperSelector->getValueRange();
-	CHECK(range.size() == 6);
+	REQUIRE(range.size() == 6);
+	QString clipperName = range.first();
+	INFO(QString("clipperName: %1").arg(clipperName));
+	CHECK(clipperName.length() > 1);
 }
 
 TEST_CASE_METHOD(cxtest::ClippersWidgetFixture, "ClippersWidget: New patient gets default clippers", "[unit][gui][widget]")

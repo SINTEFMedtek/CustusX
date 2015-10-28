@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxStringPropertyClipPlane.h"
 #include "cxEnumConverter.h"
+#include "cxDefinitionStrings.h"
 
 namespace cx
 {
