@@ -46,7 +46,8 @@ namespace cx
 
 InteractiveClipper::InteractiveClipper(CoreServicesPtr services) :
 	mUseClipper(false),
-	mServices(services)
+	mServices(services),
+	mUseActiveTool(true)
 {
 
 	// create a slice planes proxy containing all slice definitions,
@@ -115,7 +116,7 @@ bool InteractiveClipper::getInvertPlane() const
 void InteractiveClipper::useClipper(bool on)
 {
 	mUseClipper = on;
-	emit changed();
+	this->updateClipPlanesInData();
 }
 void InteractiveClipper::invertPlane(bool on)
 {
@@ -141,6 +142,56 @@ void InteractiveClipper::setData(DataPtr data)
 		mData->setInteractiveClipPlane(vtkPlanePtr());
 	mData = data;
 	emit changed();
+}
+
+void InteractiveClipper::addData(DataPtr data)
+{
+	if(!data)
+		return;
+	mDatas[data->getUid()] = data;
+	this->updateClipPlanesInData();
+}
+
+void InteractiveClipper::removeData(DataPtr data)
+{
+	if(!data)
+		return;
+	std::map<QString, DataPtr>::iterator iter = mDatas.find(data->getUid());
+	if(iter != mDatas.end())
+	{
+		mDatas.erase(iter);
+		iter->second->removeInteractiveClipPlane(mSlicePlaneClipper->getClipPlane());
+	}
+	this->updateClipPlanesInData();
+}
+
+void InteractiveClipper::updateClipPlanesInData()
+{
+	if (mUseClipper)
+		this->addAllInteractiveClipPlanes();
+	else
+		this->removeAllInterActiveClipPlanes();
+
+	emit changed();
+}
+
+std::map<QString, DataPtr> InteractiveClipper::getDatas()
+{
+	return mDatas;
+}
+
+void InteractiveClipper::addAllInteractiveClipPlanes()
+{
+	std::map<QString, DataPtr>::iterator iter = mDatas.begin();
+	for(; iter != mDatas.end(); ++iter)
+		iter->second->addInteractiveClipPlane(mSlicePlaneClipper->getClipPlane());
+}
+
+void InteractiveClipper::removeAllInterActiveClipPlanes()
+{
+	std::map<QString, DataPtr>::iterator iter = mDatas.begin();
+	for(; iter != mDatas.end(); ++iter)
+		iter->second->removeInteractiveClipPlane(mSlicePlaneClipper->getClipPlane());
 }
 
 void InteractiveClipper::changedSlot()
@@ -190,13 +241,24 @@ std::vector<PLANE_TYPE> InteractiveClipper::getAvailableSlicePlanes() const
 
 void InteractiveClipper::activeToolChangedSlot()
 {
-	ToolPtr activTool = mServices->tracking()->getActiveTool();
+	ToolPtr activeTool = mServices->tracking()->getActiveTool();
 
+	if(mUseActiveTool)
+		this->setTool(activeTool);
+}
+
+void InteractiveClipper::setTool(ToolPtr tool)
+{
 	SlicePlanesProxy::DataMap data = mSlicePlanesProxy->getData();
 	for (SlicePlanesProxy::DataMap::iterator iter = data.begin(); iter != data.end(); ++iter)
 	{
-		iter->second.mSliceProxy->setTool(activTool);
+		iter->second.mSliceProxy->setTool(tool);
 	}
+}
+
+void InteractiveClipper::useActiveTool(bool on)
+{
+	mUseActiveTool = on;
 }
 
 } // namespace cx

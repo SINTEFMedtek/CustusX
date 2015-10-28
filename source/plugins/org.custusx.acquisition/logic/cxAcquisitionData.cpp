@@ -76,13 +76,10 @@ void AcquisitionData::addRecordSession(RecordSessionPtr session)
 
 void AcquisitionData::removeRecordSession(RecordSessionPtr session)
 {
-	std::vector<RecordSessionPtr>::iterator it = mRecordSessions.begin();
-	while (it != mRecordSessions.end())
+	for(int i = 0; i < mRecordSessions.size(); ++i)
 	{
-		std::vector<RecordSessionPtr>::iterator current = it;
-		++it;
-		if((*current)->getUid() == session->getUid())
-			mRecordSessions.erase(current);
+		if(mRecordSessions[i]->getUid() == session->getUid())
+			mRecordSessions.erase(mRecordSessions.begin() + i);
 	}
 	emit recordedSessionsChanged();
 }

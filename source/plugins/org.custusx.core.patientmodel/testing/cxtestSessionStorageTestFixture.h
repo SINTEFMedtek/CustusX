@@ -33,8 +33,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTESTSESSIONSTORAGETESTFIXTURE_H
 #define CXTESTSESSIONSTORAGETESTFIXTURE_H
 
+#include "cxtest_org_custusx_core_patientmodel_export.h"
+
 #include <QString>
 #include <boost/shared_ptr.hpp>
+#include "cxForwardDeclarations.h"
+#include "cxImage.h"
+#include "cxMesh.h"
 
 namespace cx
 {
@@ -45,7 +50,21 @@ typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
 namespace cxtest
 {
 
-class SessionStorageTestFixture
+struct TestDataStructures
+{
+	cx::ImagePtr image1;
+	cx::ImagePtr image2;
+	cx::MeshPtr mesh1;
+	TestDataStructures()
+	{
+		vtkImageDataPtr dummyImageData = cx::Image::createDummyImageData(2, 1);
+		image1 = cx::ImagePtr(new cx::Image("imageUid1", dummyImageData, "imageName1"));
+		image2 = cx::ImagePtr(new cx::Image("imageUid2", dummyImageData, "imageName2"));
+		mesh1 = cx::Mesh::create("meshUid1","meshName1");
+	}
+};
+
+class CXTEST_ORG_CUSTUSX_CORE_PATIENTMODEL_EXPORT SessionStorageTestFixture
 {
 public:
 	SessionStorageTestFixture();
