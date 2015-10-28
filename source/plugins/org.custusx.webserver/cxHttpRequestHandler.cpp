@@ -62,6 +62,29 @@ HttpRequestHandler::HttpRequestHandler(RemoteAPIPtr api) : mApi(api)
 
 void HttpRequestHandler::handle_request(QHttpRequest *req, QHttpResponse *resp)
 {
+	mRequests.push_front(RequestType(req,resp));
+	req->storeBody();
+	connect(req, SIGNAL(end()), this, SLOT(onRequestSuccessful()));
+}
+
+void HttpRequestHandler::onRequestSuccessful()
+{
+	for (QList<RequestType>::iterator iter = mRequests.begin(); iter!=mRequests.end(); )
+	{
+		if (iter->req->successful())
+		{
+			this->handle_complete_request(iter->req, iter->resp);
+			iter = mRequests.erase(iter);
+		}
+		else
+		{
+			++iter;
+		}
+	}
+}
+
+void HttpRequestHandler::handle_complete_request(QHttpRequest *req, QHttpResponse *resp)
+{
     /* v2 - insert into front page
 	   GET    /                                              : default page: short server info
 	   GET    /screen                                        : get screenshot
@@ -160,7 +183,7 @@ void HttpRequestHandler::process_stream(QHttpRequest *req, QHttpResponse *resp)
 void HttpRequestHandler::process_display(QHttpRequest *req, QHttpResponse *resp)
 {
     CX_ASSERT(req->path()=="/layout/display");
-    std::cout << "process_display" << std::endl;
+	std::cout << "process_display, success=" << req->successful() << std::endl;
 
 //    PUT    /layout/display?width=536,height=320,layout=mg_def  : create layout display of given size and layout
 //    GET    /layout/display                                  : get image of layout
@@ -168,7 +191,7 @@ void HttpRequestHandler::process_display(QHttpRequest *req, QHttpResponse *resp)
 
     if (req->method()==QHttpRequest::HTTP_GET)
     {
-        this->get_display_image(resp);
+		this->get_display_image(resp);
     }
     else if (req->method()==QHttpRequest::HTTP_PUT)
     {
@@ -222,7 +245,7 @@ void HttpRequestHandler::get_display_image(QHttpResponse *resp)
 void HttpRequestHandler::create_display(QHttpRequest *req, QHttpResponse *resp)
 {
     // example test line:
-    // curl -H 'Content-Type: application/json' -X PUT -d '{"width":"600","height":"300","layout":"LAYOUT_GROUP_RT"}' http://localhost:8085/layout/display
+	// curl -H 'Content-Type: application/json' -X PUT -d '{"width":600,"height":300,"layout":"LAYOUT_US_Acquisition"}' http://localhost:8085/layout/display
 //    QByteArray body = req->body();
     QJsonDocument doc = QJsonDocument::fromJson(req->body());
     CX_LOG_CHANNEL_DEBUG("CA") << "JSON: " << QString(req->body());
@@ -230,6 +253,7 @@ void HttpRequestHandler::create_display(QHttpRequest *req, QHttpResponse *resp)
     size.setWidth(doc.object()["width"].toInt());
     size.setHeight(doc.object()["height"].toInt());
     QString layout = doc.object()["layout"].toString();
+
     CX_LOG_CHANNEL_DEBUG("CA") << "size " << size.width() << "," << size.height() << ", layout " << layout;
 
     mApi->createLayoutWidget(size, layout);

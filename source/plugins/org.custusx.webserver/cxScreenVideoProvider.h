@@ -86,6 +86,7 @@ private:
 	QPointer<class SecondaryViewLayoutWindow> mSecondaryViewLayoutWindow;
 //	new SecondaryViewLayoutWindow(this)
 	ScreenShotImageWriter mWriter;
+	void setWidgetToNiceSizeInLowerRightCorner(QSize size);
 };
 
 } // namespace cx

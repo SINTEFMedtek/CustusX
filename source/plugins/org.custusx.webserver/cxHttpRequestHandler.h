@@ -53,8 +53,11 @@ public:
 public slots:
 	void handle_request(QHttpRequest *req, QHttpResponse *resp);
 
+private slots:
+	void onRequestSuccessful();
 private:
-    void process_mainpage(QHttpRequest *req, QHttpResponse *resp);
+	void handle_complete_request(QHttpRequest *req, QHttpResponse *resp);
+	void process_mainpage(QHttpRequest *req, QHttpResponse *resp);
 
     void handle_screen(QHttpRequest *req, QHttpResponse *resp);
     void process_screen(QHttpRequest *req, QHttpResponse *resp);
@@ -76,6 +79,14 @@ private:
     void delete_stream(QHttpResponse *resp);
 
 private:
+	struct RequestType
+	{
+		RequestType(QHttpRequest *req_, QHttpResponse *resp_) : req(req_), resp(resp_) {}
+		QHttpRequest *req;
+		QHttpResponse *resp;
+	};
+	QList<RequestType> mRequests;
+
 	RemoteAPIPtr mApi;
 
     QByteArray generatePNGEncoding(QImage image);

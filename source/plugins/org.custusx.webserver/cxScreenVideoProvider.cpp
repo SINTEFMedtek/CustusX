@@ -117,17 +117,34 @@ QPixmap ScreenVideoProvider::grabScreen(unsigned screenid)
 \
 void ScreenVideoProvider::showSecondaryLayout(QSize size, QString layout)
 {
-	std::cout << "show window" << std::endl;
+//	std::cout << "show window" << std::endl;
 	if (!mSecondaryViewLayoutWindow)
 		mSecondaryViewLayoutWindow = new SecondaryViewLayoutWindow(NULL, mServices->view());
 	mSecondaryViewLayoutWindow->show();
 
-//    QRect rect = QRect(QPoint(50,50), QSize(320,568));
-    QRect rect = QRect(QPoint(50,50), size);
-	mSecondaryViewLayoutWindow->setGeometry(rect);
-	mSecondaryViewLayoutWindow->move(rect.topLeft());
+	this->setWidgetToNiceSizeInLowerRightCorner(size);
+
     if (!layout.isEmpty())
         mServices->view()->setActiveLayout(layout, 1);
+}
+
+void ScreenVideoProvider::setWidgetToNiceSizeInLowerRightCorner(QSize size)
+{
+	QDesktopWidget* desktop = qApp->desktop();
+	QList<QScreen*> screens = qApp->screens();
+
+	QWidget* screen = desktop->screen(desktop->screenNumber(mSecondaryViewLayoutWindow));
+	QRect geo = screen->geometry();
+
+	if (size.width()==0 || size.height()==0)
+	{
+		size = QSize(geo.width()/3, geo.height()/3);
+	}
+
+	QRect rect = QRect(QPoint(geo.width()-size.width(),geo.height()-size.height()), size);
+	mSecondaryViewLayoutWindow->setGeometry(rect);
+	rect = mSecondaryViewLayoutWindow->frameGeometry();
+	mSecondaryViewLayoutWindow->move(geo.width()-rect.width(),geo.height()-rect.height());
 }
 
 void ScreenVideoProvider::closeSecondaryLayout()
