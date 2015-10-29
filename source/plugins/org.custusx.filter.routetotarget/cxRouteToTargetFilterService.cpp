@@ -102,8 +102,6 @@ void RouteToTargetFilter::createInputTypes()
 	connect(targetPoint.get(), SIGNAL(dataChanged(QString)), this, SLOT(pointMetricChangedSlot(QString)));
 	mInputTypes.push_back(targetPoint);
 
-
-
 }
 
 void RouteToTargetFilter::createOutputTypes()
