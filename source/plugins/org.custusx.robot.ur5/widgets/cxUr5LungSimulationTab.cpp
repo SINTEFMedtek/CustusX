@@ -133,7 +133,8 @@ void Ur5LungSimulationTab::setStopPosLineEdit()
 
 void Ur5LungSimulationTab::startSimulationSlot()
 {  
-    mLungSimulation = new Ur5LungSimulation(mUr5Robot);
+    if(this->isParametersSet())
+    {
     mUr5Robot->clearProgramQueue();
 
     for(int i=0;i<500;i++)
@@ -144,6 +145,11 @@ void Ur5LungSimulationTab::startSimulationSlot()
 
     mLungSimulation->lungMovement(inspirationTimeLineEdit->text().toDouble(),inspiratoryPauseTimeLineEdit->text().toDouble(),
                                   expirationTimeLineEdit->text().toDouble(),expiratoryPauseTimeLineEdit->text().toDouble());
+    }
+    else
+    {
+        CX_LOG_INFO() << "All parameters not set";
+    }
 }
 
 void Ur5LungSimulationTab::stopSimulationSlot()
