@@ -17,6 +17,9 @@ Ur5LungSimulation::Ur5LungSimulation(Ur5RobotPtr Ur5Robot) :
 {
     connect(this,&Ur5LungSimulation::lungMovement,this,&Ur5LungSimulation::lungMovementSlot);
     connect(this,&Ur5LungSimulation::stopLungMovement,this,&Ur5LungSimulation::stopLungMove);
+
+    inspiration = new QTimer(this);
+    expiration = new QTimer(this);
 }
 
 Ur5LungSimulation::~Ur5LungSimulation()
