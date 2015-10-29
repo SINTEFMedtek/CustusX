@@ -150,6 +150,7 @@ void Ur5LungSimulationTab::stopSimulationSlot()
 {
     mUr5Robot->clearProgramQueue();
     mLungSimulation->stopLungMovement();
+    mUr5Robot->stopMove("stopj",0.5);
 }
 
 bool Ur5LungSimulationTab::isParametersSet()
