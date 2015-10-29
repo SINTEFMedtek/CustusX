@@ -24,6 +24,8 @@ Ur5LungSimulationTab::Ur5LungSimulationTab(Ur5RobotPtr Ur5Robot,QWidget *parent)
     connect(setStopPosButton, &QPushButton::clicked,this,&Ur5LungSimulationTab::setStopPosLineEdit);
     connect(startMoveButton, &QPushButton::clicked,this,&Ur5LungSimulationTab::startSimulationSlot);
     connect(stopMoveButton, &QPushButton::clicked,this,&Ur5LungSimulationTab::stopSimulationSlot);
+
+    mLungSimulation = new Ur5LungSimulation(mUr5Robot);
 }
 
 Ur5LungSimulationTab::~Ur5LungSimulationTab()
