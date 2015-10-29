@@ -211,7 +211,8 @@ void Ur5Robot::addToProgramQueue(QString str)
 
 void Ur5Robot::clearProgramQueue()
 {
-    mProgramEncoder.programQueue.clear();
+    if(!mProgramEncoder.programQueue.empty())
+        mProgramEncoder.programQueue.clear();
 }
 
 void Ur5Robot::stopMove(QString typeOfStop, double acc)
