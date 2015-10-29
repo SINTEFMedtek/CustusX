@@ -150,6 +150,12 @@ void Ur5LungSimulationTab::stopSimulationSlot()
     mLungSimulation->stopLungMovement();
 }
 
+bool Ur5LungSimulationTab::isParametersSet()
+{
+    return(!(inspirationTimeLineEdit->text().isEmpty()) && !(expirationTimeLineEdit->text().isEmpty()) &&
+           !(expiratoryPauseTimeLineEdit->text().isEmpty()) && !(inspiratoryPauseTimeLineEdit->text().isEmpty()) &&
+           !(stopPosLineEdit->text().isEmpty()) && !(startPosLineEdit->text().isEmpty()));
+}
 
 } // cx
 
