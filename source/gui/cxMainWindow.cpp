@@ -549,7 +549,7 @@ void MainWindow::aboutSlot()
 	QString doc_path = DataLocations::getDocPath();
 	QString appName = qApp->applicationDisplayName();
 	QString url_website = DataLocations::getWebsiteURL();
-	QString url_license = QString("file://%1/license.txt").arg(doc_path);
+	QString url_license = QString("file://%1/License.txt").arg(doc_path);
 	QString url_config = QString("file://%1/cxConfigDescription.txt").arg(doc_path);
 
 	QString text(""
