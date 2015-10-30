@@ -149,6 +149,8 @@ private slots:
 private:
 	SliceProxy(PatientModelServicePtr dataManager);
 	Transform3D getSyntheticToolPos(const Vector3D& center) const;
+	void initCutplane();
+
 	ToolPtr mTool;
 	boost::scoped_ptr<SliceComputer> mCutplane;
 	Vector3D mDefaultCenter; ///< use this center when no tool is available

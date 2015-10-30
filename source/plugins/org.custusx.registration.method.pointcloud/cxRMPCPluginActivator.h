@@ -33,8 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXRMPCPLUGINACTIVATOR_H
 #define CXRMPCPLUGINACTIVATOR_H
 
-#include "org_custusx_registration_method_pointcloud_Export.h"
-
 #include <ctkPluginActivator.h>
 #include "boost/shared_ptr.hpp"
 
@@ -57,7 +55,7 @@ typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
  * \date 2015-09-06
  * \author Christian Askeland
  */
-class org_custusx_registration_method_pointcloud_EXPORT RMPCPluginActivator :  public QObject, public ctkPluginActivator
+class RMPCPluginActivator :  public QObject, public ctkPluginActivator
 {
   Q_OBJECT
   Q_INTERFACES(ctkPluginActivator)

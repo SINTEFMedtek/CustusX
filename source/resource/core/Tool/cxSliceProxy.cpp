@@ -59,10 +59,18 @@ SliceProxy::SliceProxy(PatientModelServicePtr dataManager) :
 	//TODO connect to toolmanager rMpr changed
 	mDefaultCenter = mDataManager->getCenter();
 	this->centerChangedSlot();
+
+	this->initCutplane();
 }
 
 SliceProxy::~SliceProxy()
 {
+}
+
+void SliceProxy::initCutplane()
+{
+	mCutplane->setFixedCenter(mDefaultCenter);
+	mCutplane->setToolPosition(getSyntheticToolPos(mDefaultCenter));
 }
 
 void SliceProxy::setTool(ToolPtr tool)
@@ -167,15 +175,6 @@ void SliceProxy::centerChangedSlot()
 		Vector3D c = mDataManager->getCenter();
 		mCutplane->setFixedCenter(c);
 		//std::cout << "center changed: " + string_cast(c) << std::endl;
-	}
-	else
-	{
-		// If no tool is available, ensure only dummy values are used.
-		// It is very important that this volume is completely frozen in order
-		// to avoid any confusion - the user must know it is nonnavigable.
-		mCutplane->setFixedCenter(mDefaultCenter);
-		mCutplane->setToolPosition(getSyntheticToolPos(mDefaultCenter));
-		//std::cout << "center changed: " + string_cast(mDefaultCenter) << std::endl;
 	}
 
 	changed();
