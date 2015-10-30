@@ -42,7 +42,10 @@ namespace cx
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-StringPropertySelectTool::StringPropertySelectTool(TrackingServicePtr trackingService)
+StringPropertySelectTool::StringPropertySelectTool(TrackingServicePtr trackingService) :
+	mProvideActiveTool(false),
+	mActiveToolSelected(false),
+	mActiveToolName("<Active Tool>")
 {
 	mTrackingService = trackingService;
 	connect(mTrackingService.get(), &TrackingService::stateChanged, this, &Property::changed);
@@ -67,6 +70,14 @@ QString StringPropertySelectTool::getDisplayName() const
 
 bool StringPropertySelectTool::setValue(const QString& value)
 {
+	if(value == mActiveToolName)
+	{
+		mActiveToolSelected = true;
+		return true;
+	}
+	else
+		mActiveToolSelected = false;
+
   if(mTool && value==mTool->getUid())
 	return false;
   ToolPtr temp = mTrackingService->getTool(value);
@@ -80,6 +91,8 @@ bool StringPropertySelectTool::setValue(const QString& value)
 
 QString StringPropertySelectTool::getValue() const
 {
+	if(mActiveToolSelected)
+		return mActiveToolName;
   if(!mTool)
 	return "<no tool>";
   return mTool->getUid();
@@ -92,6 +105,8 @@ QString StringPropertySelectTool::getHelp() const
 
 ToolPtr StringPropertySelectTool::getTool() const
 {
+	if(mActiveToolSelected)
+		return mTrackingService->getActiveTool();
   return mTool;
 }
 
@@ -100,6 +115,10 @@ QStringList StringPropertySelectTool::getValueRange() const
 	TrackingService::ToolMap tools = mTrackingService->getTools();
 
 	QStringList retval;
+
+	if(mProvideActiveTool)
+		retval << mActiveToolName;
+
 	for (TrackingService::ToolMap::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
 		retval << iter->second->getUid();
 	return retval;
@@ -107,12 +126,24 @@ QStringList StringPropertySelectTool::getValueRange() const
 
 QString StringPropertySelectTool::convertInternal2Display(QString internal)
 {
+	if(internal == mActiveToolName)
+		return mActiveToolName;
   ToolPtr tool = mTrackingService->getTool(internal);
   if (!tool)
   {
 	return "<no tool>";
   }
   return qstring_cast(tool->getName());
+}
+
+void StringPropertySelectTool::provideActiveTool(bool on)
+{
+	mProvideActiveTool = on;
+}
+
+void StringPropertySelectTool::setActiveTool()
+{
+	mActiveToolSelected = true;
 }
 
 } // namespace cx

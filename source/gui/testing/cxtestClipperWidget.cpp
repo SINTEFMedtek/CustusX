@@ -36,6 +36,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxInteractiveClipper.h"
 #include "cxtestSessionStorageTestFixture.h"
 #include "cxPatientModelService.h"
+#include "cxStringPropertySelectTool.h"
+#include "cxTrackingServiceProxy.h"
+#include "cxSlicePlanes3DRep.h"
+#include "cxSliceProxy.h"
+
+#include "cxLogicManager.h"
 
 namespace cxtest
 {
@@ -48,13 +54,20 @@ public:
 	{
 		mPatientModelService = patient;
 	}
+	void setTracking(cx::TrackingServicePtr tracking)
+	{
+		mTrackingService = tracking;
+	}
 };
 
 class ClipperWidgetFixture : public cx::ClipperWidget
 {
 public:
 	ClipperWidgetFixture() :
+//		mPluginContext(cx::LogicManager::getInstance()->getPluginContext()),
 		ClipperWidget(cxtest::VisServicesFixture::getNullObjects(), NULL)
+//		ClipperWidget(cx::VisServices::create(cx::LogicManager::getInstance()->getPluginContext()), NULL)
+//		ClipperWidget(cx::VisServices::create(cx::logicManager()->getPluginContext()), NULL)
 	{
 		cx::ClippersPtr clippers = cx::ClippersPtr(new cx::Clippers(mServices));
 		QString clipperName = clippers->getClipperNames().first();
@@ -70,13 +83,20 @@ public:
 		services->setPatient(patient);
 	}
 
+	void setTrackingService(cx::TrackingServicePtr tracking)
+	{
+		cxtest::VisServicesFixturePtr services = boost::static_pointer_cast<cxtest::VisServicesFixture>(mServices);
+		services->setTracking(tracking);
+	}
+
 	void createTestPatient()
 	{
 		cx::PatientModelServicePtr patientService = storageFixture.mPatientModelService;
 		storageFixture.createSessions();
 		storageFixture.loadSession1();
 
-		this->setPatientService(patientService);//Use real patient service instead of null object
+		//Use real services instead of null object
+		this->setPatientService(patientService);
 	}
 
 	void createTestPatientWithData()
@@ -103,6 +123,20 @@ public:
 
 	SessionStorageTestFixture storageFixture;
 	TestDataStructures testData;
+//	ctkPluginContext* mPluginContext;
+};
+
+typedef boost::shared_ptr<class InteractiveClipperFixture> InteractiveClipperFixturePtr;
+class InteractiveClipperFixture : public cx::InteractiveClipper
+{
+public:
+	InteractiveClipperFixture(cx::CoreServicesPtr services) :
+		InteractiveClipper(services)
+	{}
+	cx::SlicePlanesProxyPtr getSlicePlanesProxy()
+	{
+		return mSlicePlanesProxy;
+	}
 };
 
 
@@ -265,5 +299,55 @@ TEST_CASE_METHOD(cxtest::ClipperWidgetFixture, "ClipperWidget: Select all data i
 	this->setClipper(testClipper);
 	CHECK(this->mSelectAllData->isChecked());
 }
+
+TEST_CASE_METHOD(cxtest::ClipperWidgetFixture, "ClipperWidget: Attach to tool on/off", "[unit][gui][widget]")
+{
+	this->setClipper(testClipper);
+	REQUIRE(mAttachedToTool->isChecked());
+	mAttachedToTool->click();
+	REQUIRE_FALSE(mAttachedToTool->isChecked());
+}
+
+TEST_CASE("InteractiveClipper: Attach to tool/no tool updates all SliceProxy objects", "[unit][gui][widget]")
+{
+	cx::LogicManager::initialize();
+
+	cx::CoreServicesPtr services = cx::CoreServices::create(cx::logicManager()->getPluginContext());
+	InteractiveClipperFixturePtr fixture = InteractiveClipperFixturePtr(new InteractiveClipperFixture(services));
+
+	cx::ToolPtr tool;
+	tool = services->tracking()->getActiveTool();
+	fixture->setTool(tool);
+
+	cx::SlicePlanesProxy::DataMap data = fixture->getSlicePlanesProxy()->getData();
+	for (cx::SlicePlanesProxy::DataMap::iterator iter = data.begin(); iter != data.end(); ++iter)
+	{
+		CHECK(iter->second.mSliceProxy->getTool());
+	}
+
+	tool = cx::ToolPtr();
+	fixture->setTool(tool);
+
+	data = fixture->getSlicePlanesProxy()->getData();
+	for (cx::SlicePlanesProxy::DataMap::iterator iter = data.begin(); iter != data.end(); ++iter)
+	{
+		CHECK_FALSE(iter->second.mSliceProxy->getTool());
+	}
+
+	cx::LogicManager::shutdown();
+}
+
+//TEST_CASE_METHOD(cxtest::ClipperWidgetFixture, "ClipperWidget: Active tool selected", "[unit][gui][widget]")
+//{
+//	this->setClipper(testClipper);
+//	ctkPluginContext* context = cx::LogicManager::getInstance()->getPluginContext();
+//	cx::TrackingServicePtr trackingService = cx::TrackingServiceProxy::create(context);
+////	this->setTrackingService(trackingService);
+
+//	cx::ToolPtr tool = mToolSelector->getTool();
+//	CHECK(tool);
+//	cx::ToolPtr activeTool = mServices->tracking()->getActiveTool();
+//	REQUIRE(tool == activeTool);
+//}
 
 }//cxtest
