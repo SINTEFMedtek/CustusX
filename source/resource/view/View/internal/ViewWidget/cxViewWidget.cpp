@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewLinkingViewWidget.h"
 #include "cxTypeConversions.h"
 #include "cxGLHelpers.h"
-
+#include "cxOSXHelper.h"
 
 namespace cx
 {
@@ -56,6 +56,7 @@ ViewWidget::ViewWidget(const QString& uid, const QString& name, QWidget *parent,
 	this->SetRenderWindow(mView->getRenderWindow());
 	mView->getRenderWindow()->GetInteractor()->EnableRenderOff();
 	mView->clear();
+	disableGLHiDPI(this->winId());
 }
 
 void ViewWidget::customContextMenuRequestedSlot(const QPoint& point)
