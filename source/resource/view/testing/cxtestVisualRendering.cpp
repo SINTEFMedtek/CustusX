@@ -183,7 +183,7 @@ TEST_CASE("Visual rendering: Empty view",
 }
 
 TEST_CASE("Visual rendering: Several empty views in a sequence.",
-		  "[unit][resource][visualization]")
+		  "[integration][resource][visualization]")
 {
 	int numberOfIterations = 2;
 	for (unsigned i=0; i<numberOfIterations; ++i)
