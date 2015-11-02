@@ -166,6 +166,7 @@ TEST_CASE("Visual rendering: Empty QVTKWidget",
     cxtest::Utilities::sleep_sec(3);
 }
 
+//Moved to integration, as test may fail by lack of resources when running as unit test
 TEST_CASE("Visual rendering: Empty view",
 		  "[integration][resource][visualization]")
 {
@@ -182,6 +183,7 @@ TEST_CASE("Visual rendering: Empty view",
 
 }
 
+//Moved to integration, as test may fail by lack of resources when running as unit test
 TEST_CASE("Visual rendering: Several empty views in a sequence.",
 		  "[integration][resource][visualization]")
 {
