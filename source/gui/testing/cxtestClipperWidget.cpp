@@ -142,6 +142,10 @@ public:
 	{
 		return mSelectAllData;
 	}
+	cx::StringPropertySelectToolPtr getToolSelector()
+	{
+		return mToolSelector;
+	}
 
 	QCheckBox *requireGetCheckBoxForMesh1()
 	{
@@ -387,28 +391,59 @@ TEST_CASE("InteractiveClipper: Attach to tool/no tool updates all SliceProxy obj
 	cx::LogicManager::shutdown();
 }
 
+TEST_CASE("ClipperWidget: Active tool selected as default", "[unit][gui][widget]")
+{
+	SessionStorageHelper helper;
+	ClipperWidgetFixturePtr fixture = ClipperWidgetFixturePtr(new cxtest::ClipperWidgetFixture(helper.getServices()));
 
-//TEST_CASE("ClipperWidget: Active tool selected", "[unit][gui][widget]")
-//{
-//	cx::LogicManager::initialize();
+	cx::ToolPtr tool = fixture->getToolSelector()->getTool();
+	CHECK(tool);
+	cx::ToolPtr activeTool = helper.getServices()->tracking()->getActiveTool();
+	REQUIRE(tool == activeTool);
+}
 
-//	cx::ClipperWidgetPtr fixture = cx::ClipperWidgetPtr(new cx::ClipperWidget(cx::logicManager()->getPluginContext()), NULL);
+TEST_CASE("ClipperWidget: Select tool other than active works", "[unit][gui][widget]")
+{
+	SessionStorageHelper helper;
+	ClipperWidgetFixturePtr fixture = ClipperWidgetFixturePtr(new cxtest::ClipperWidgetFixture(helper.getServices()));
 
+	cx::StringPropertySelectToolPtr toolSelector = fixture->getToolSelector();
 
-//	cx::LogicManager::shutdown();
-//}
+	QStringList toolNames = toolSelector->getValueRange();
+	REQUIRE(toolNames.size() > 1);
 
-//TEST_CASE_METHOD(cxtest::ClipperWidgetFixture, "ClipperWidget: Active tool selected", "[unit][gui][widget]")
-//{
-//	this->setClipper(testClipper);
-//	ctkPluginContext* context = cx::LogicManager::getInstance()->getPluginContext();
-//	cx::TrackingServicePtr trackingService = cx::TrackingServiceProxy::create(context);
-////	this->setTrackingService(trackingService);
+	QString toolName = toolNames[1];
+	REQUIRE_FALSE(toolName.contains("Active"));
+	toolSelector->setValue(toolName);
 
-//	cx::ToolPtr tool = mToolSelector->getTool();
-//	CHECK(tool);
-//	cx::ToolPtr activeTool = mServices->tracking()->getActiveTool();
-//	REQUIRE(tool == activeTool);
-//}
+	cx::ToolPtr tool = toolSelector->getTool();
+	CHECK(tool);
+	REQUIRE(tool == helper.getServices()->tracking()->getTool(toolName));
+}
+
+TEST_CASE("ClipperWidget: Select active tool works", "[unit][gui][widget]")
+{
+	SessionStorageHelper helper;
+	ClipperWidgetFixturePtr fixture = ClipperWidgetFixturePtr(new cxtest::ClipperWidgetFixture(helper.getServices()));
+
+	cx::StringPropertySelectToolPtr toolSelector = fixture->getToolSelector();
+
+	QStringList toolNames = toolSelector->getValueRange();
+
+	QString toolName = toolNames[1];
+	QString activeToolName = toolNames[0];
+
+	REQUIRE_FALSE(toolName.contains("Active"));
+	REQUIRE(activeToolName.contains("Active"));
+
+	toolSelector->setValue(toolName);
+	toolSelector->setValue(activeToolName);
+
+	cx::ToolPtr tool = toolSelector->getTool();
+	cx::ToolPtr activeTool = helper.getServices()->tracking()->getActiveTool();
+	CHECK(activeTool);
+	REQUIRE(tool == activeTool);
+
+}
 
 }//cxtest
