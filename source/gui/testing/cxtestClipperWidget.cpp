@@ -46,6 +46,31 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cxtest
 {
 
+class SessionStorageHelper
+{
+public:
+	void createTestPatient()
+	{
+		storageFixture.createSessions();
+		storageFixture.loadSession1();
+	}
+
+	void createTestPatientWithData()
+	{
+		createTestPatient();
+		storageFixture.mPatientModelService->insertData(testData.mesh1);
+		storageFixture.mPatientModelService->insertData(testData.image1);
+		storageFixture.mPatientModelService->insertData(testData.image2);
+	}
+
+	cx::VisServicesPtr getServices()
+	{
+		return cx::VisServices::create(cx::logicManager()->getPluginContext());
+	}
+	SessionStorageTestFixture storageFixture;
+	TestDataStructures testData;
+};
+
 typedef boost::shared_ptr<class VisServicesFixture> VisServicesFixturePtr;
 class VisServicesFixture : public cx::VisServices
 {
@@ -60,14 +85,22 @@ public:
 	}
 };
 
+typedef boost::shared_ptr<class ClipperWidgetFixture> ClipperWidgetFixturePtr;
 class ClipperWidgetFixture : public cx::ClipperWidget
 {
 public:
 	ClipperWidgetFixture() :
-//		mPluginContext(cx::LogicManager::getInstance()->getPluginContext()),
 		ClipperWidget(cxtest::VisServicesFixture::getNullObjects(), NULL)
-//		ClipperWidget(cx::VisServices::create(cx::LogicManager::getInstance()->getPluginContext()), NULL)
-//		ClipperWidget(cx::VisServices::create(cx::logicManager()->getPluginContext()), NULL)
+	{
+		init();
+	}
+	ClipperWidgetFixture(cx::VisServicesPtr services) :
+		ClipperWidget(services, NULL)
+	{
+		init();
+	}
+
+	void init()
 	{
 		cx::ClippersPtr clippers = cx::ClippersPtr(new cx::Clippers(mServices));
 		QString clipperName = clippers->getClipperNames().first();
@@ -77,35 +110,37 @@ public:
 		testClipper2 = clippers->getClipper(clipperName);
 	}
 
-	void setPatientService(cx::PatientModelServicePtr patient)
+	std::map<QString, cx::DataPtr> getDataMap()
 	{
-		cxtest::VisServicesFixturePtr services = boost::static_pointer_cast<cxtest::VisServicesFixture>(mServices);
-		services->setPatient(patient);
+		return this->getDatas();
 	}
-
-	void setTrackingService(cx::TrackingServicePtr tracking)
+	QMap<QString, QCheckBox*> getCheckBoxes()
 	{
-		cxtest::VisServicesFixturePtr services = boost::static_pointer_cast<cxtest::VisServicesFixture>(mServices);
-		services->setTracking(tracking);
+		return mCheckBoxes;
 	}
-
-	void createTestPatient()
+	void forceDataStructuresUpdate()
 	{
-		cx::PatientModelServicePtr patientService = storageFixture.mPatientModelService;
-		storageFixture.createSessions();
-		storageFixture.loadSession1();
-
-		//Use real services instead of null object
-		this->setPatientService(patientService);
+		this->prePaintEvent();
 	}
-
-	void createTestPatientWithData()
+	void checkUseClipperCheckBox()
 	{
-		this->createTestPatient();
-		cx::PatientModelServicePtr patientService = storageFixture.mPatientModelService;
-		patientService->insertData(testData.mesh1);
-		patientService->insertData(testData.image1);
-		patientService->insertData(testData.image2);
+		this->mUseClipperCheckBox->setChecked(true);
+	}
+	QCheckBox *getUseClipperCheckBox()
+	{
+		return mUseClipperCheckBox;
+	}
+	QCheckBox *getShowImages()
+	{
+		return mShowImages;
+	}
+	QCheckBox *getShowMeshes()
+	{
+		return mShowMeshes;
+	}
+	QCheckBox *getSelectAllData()
+	{
+		return mSelectAllData;
 	}
 
 	QCheckBox *requireGetCheckBoxForMesh1()
@@ -121,9 +156,7 @@ public:
 	cx::InteractiveClipperPtr testClipper;
 	cx::InteractiveClipperPtr testClipper2;
 
-	SessionStorageTestFixture storageFixture;
 	TestDataStructures testData;
-//	ctkPluginContext* mPluginContext;
 };
 
 typedef boost::shared_ptr<class InteractiveClipperFixture> InteractiveClipperFixturePtr;
@@ -166,138 +199,158 @@ TEST_CASE_METHOD(cxtest::ClipperWidgetFixture, "ClipperWidget: Enable clipper", 
 	CHECK_FALSE(mUseClipperCheckBox->isChecked());
 }
 
-TEST_CASE_METHOD(cxtest::ClipperWidgetFixture, "ClipperWidget: Insert data", "[unit][gui][widget]")
+TEST_CASE("ClipperWidget: Insert data", "[unit][gui][widget]")
 {
-	this->createTestPatient();
-	cx::PatientModelServicePtr patientService = storageFixture.mPatientModelService;
+	SessionStorageHelper helper;
+	helper.createTestPatient();
+	ClipperWidgetFixturePtr fixture = ClipperWidgetFixturePtr(new cxtest::ClipperWidgetFixture(helper.getServices()));
 
-	CHECK(this->getDatas().size() == 0);
-	CHECK(this->mCheckBoxes.size() == 0);
+	cx::PatientModelServicePtr patientService = helper.storageFixture.mPatientModelService;
 
-	patientService->insertData(testData.mesh1);
-	patientService->insertData(testData.image1);
+	CHECK(fixture->getDataMap().size() == 0);
+	CHECK(fixture->getCheckBoxes().size() == 0);
 
-	CHECK(this->getDatas().size() == 2);
+	patientService->insertData(helper.testData.mesh1);
+	patientService->insertData(helper.testData.image1);
 
-	this->setClipper(testClipper);
-	CHECK(this->mCheckBoxes.size() == 2);
+	CHECK(fixture->getDataMap().size() == 2);
 
-	patientService->insertData(testData.image2);
-	this->prePaintEvent();//Force update of data structures
-	CHECK(this->getDatas().size() == 3);
-	CHECK(this->mCheckBoxes.size() == 3);
+	fixture->setClipper(fixture->testClipper);
+	CHECK(fixture->getCheckBoxes().size() == 2);
+
+	patientService->insertData(helper.testData.image2);
+	fixture->forceDataStructuresUpdate();
+	CHECK(fixture->getDataMap().size() == 3);
+	CHECK(fixture->getCheckBoxes().size() == 3);
 }
 
-TEST_CASE_METHOD(cxtest::ClipperWidgetFixture, "ClipperWidget: Turn clipping on/off for a mesh", "[unit][gui][widget]")
+TEST_CASE("ClipperWidget: Turn clipping on/off for a mesh", "[unit][gui][widget]")
 {
-	this->createTestPatientWithData();
-	this->setClipper(testClipper);
-	this->mUseClipperCheckBox->setChecked(true);
+	SessionStorageHelper helper;
+	helper.createTestPatientWithData();
+	ClipperWidgetFixturePtr fixture = ClipperWidgetFixturePtr(new cxtest::ClipperWidgetFixture(helper.getServices()));
 
-	QCheckBox *checkBox = this->requireGetCheckBoxForMesh1();
+	fixture->setClipper(fixture->testClipper);
+	fixture->checkUseClipperCheckBox();
+
+	QCheckBox *checkBox = fixture->requireGetCheckBoxForMesh1();
 	REQUIRE_FALSE(checkBox->isChecked());
 
-	std::vector<vtkPlanePtr> clipPlanes = testData.mesh1->getAllClipPlanes();
+	std::vector<vtkPlanePtr> clipPlanes = helper.testData.mesh1->getAllClipPlanes();
 	REQUIRE(clipPlanes.size() == 0);
 
-	CHECK(testClipper->getDatas().size() == 0);
+	CHECK(fixture->testClipper->getDatas().size() == 0);
 
 	checkBox->click();
-	clipPlanes = testData.mesh1->getAllClipPlanes();
-	CHECK(testClipper->getDatas().size() == 1);
+	clipPlanes = helper.testData.mesh1->getAllClipPlanes();
+	CHECK(fixture->testClipper->getDatas().size() == 1);
 	REQUIRE(clipPlanes.size() == 1);
 
 	checkBox->click();
 	REQUIRE_FALSE(checkBox->isChecked());
-	clipPlanes = testData.mesh1->getAllClipPlanes();
-	CHECK(testClipper->getDatas().size() == 0);
+	clipPlanes = helper.testData.mesh1->getAllClipPlanes();
+	CHECK(fixture->testClipper->getDatas().size() == 0);
 	REQUIRE(clipPlanes.size() == 0);
 }
 
-TEST_CASE_METHOD(cxtest::ClipperWidgetFixture, "ClipperWidget: Remember clipping in mesh when changing clipper", "[unit][gui][widget]")
+TEST_CASE("ClipperWidget: Remember clipping in mesh when changing clipper", "[unit][gui][widget]")
 {
-	this->createTestPatientWithData();
-	this->setClipper(testClipper);
-	this->mUseClipperCheckBox->setChecked(true);
+	SessionStorageHelper helper;
+	helper.createTestPatientWithData();
+	ClipperWidgetFixturePtr fixture = ClipperWidgetFixturePtr(new cxtest::ClipperWidgetFixture(helper.getServices()));
 
-	QCheckBox *checkBox = this->requireGetCheckBoxForMesh1();
+	fixture->setClipper(fixture->testClipper);
+	fixture->checkUseClipperCheckBox();
+
+	QCheckBox *checkBox = fixture->requireGetCheckBoxForMesh1();
 	checkBox->click();
 	CHECK(checkBox->isChecked());
 
-	std::vector<vtkPlanePtr> clipPlanes = testData.mesh1->getAllClipPlanes();
+	std::vector<vtkPlanePtr> clipPlanes = helper.testData.mesh1->getAllClipPlanes();
 	CHECK(clipPlanes.size() == 1);
-	CHECK(testClipper->getDatas().size() == 1);
+	CHECK(fixture->testClipper->getDatas().size() == 1);
 
-	this->setClipper(testClipper2);
-	checkBox = this->requireGetCheckBoxForMesh1();
+	fixture->setClipper(fixture->testClipper2);
+	checkBox = fixture->requireGetCheckBoxForMesh1();
 	CHECK_FALSE(checkBox->isChecked());
-	clipPlanes = testData.mesh1->getAllClipPlanes();
+	clipPlanes = helper.testData.mesh1->getAllClipPlanes();
 	CHECK(clipPlanes.size() == 1);
-	CHECK(testClipper2->getDatas().size() == 0);
+	CHECK(fixture->testClipper2->getDatas().size() == 0);
 
-	this->setClipper(testClipper);
+	fixture->setClipper(fixture->testClipper);
 
-	checkBox = this->requireGetCheckBoxForMesh1();
+	checkBox = fixture->requireGetCheckBoxForMesh1();
 	CHECK(checkBox->isChecked());
 }
 
-TEST_CASE_METHOD(cxtest::ClipperWidgetFixture, "ClipperWidget: Data type selector can turn images on/off", "[unit][gui][widget]")
+TEST_CASE("ClipperWidget: Data type selector can turn images on/off", "[unit][gui][widget]")
 {
-	this->createTestPatientWithData();
+	SessionStorageHelper helper;
+	helper.createTestPatientWithData();
+	ClipperWidgetFixturePtr fixture = ClipperWidgetFixturePtr(new cxtest::ClipperWidgetFixture(helper.getServices()));
 
-	REQUIRE(this->mShowImages->isChecked());
-	REQUIRE(this->mShowMeshes->isChecked());
-	CHECK(this->getDatas().size() == 3);
+	REQUIRE(fixture->getShowImages()->isChecked());
+	REQUIRE(fixture->getShowMeshes()->isChecked());
+	CHECK(fixture->getDataMap().size() == 3);
 
-	this->mShowImages->click();
-	REQUIRE_FALSE(this->mShowImages->isChecked());
-	CHECK(this->getDatas().size() == 1);
+	fixture->getShowImages()->click();
+	REQUIRE_FALSE(fixture->getShowImages()->isChecked());
+	CHECK(fixture->getDataMap().size() == 1);
 
-	this->mShowImages->click();
-	CHECK(this->getDatas().size() == 3);
+	fixture->getShowImages()->click();
+	CHECK(fixture->getDataMap().size() == 3);
 }
 
-TEST_CASE_METHOD(cxtest::ClipperWidgetFixture, "ClipperWidget: Select all data checks mesh checkbox", "[unit][gui][widget]")
+TEST_CASE("ClipperWidget: Select all data checks mesh checkbox", "[unit][gui][widget]")
 {
-	this->createTestPatientWithData();
-	this->setClipper(testClipper);
+	SessionStorageHelper helper;
+	helper.createTestPatientWithData();
+	ClipperWidgetFixturePtr fixture = ClipperWidgetFixturePtr(new cxtest::ClipperWidgetFixture(helper.getServices()));
 
-	QCheckBox *checkBox = this->requireGetCheckBoxForMesh1();
+	fixture->setClipper(fixture->testClipper);
+
+	QCheckBox *checkBox = fixture->requireGetCheckBoxForMesh1();
 	CHECK_FALSE(checkBox->isChecked());
 
-	REQUIRE_FALSE(this->mSelectAllData->isChecked());
-	this->mSelectAllData->click();
-	REQUIRE(this->mSelectAllData->isChecked());
+	REQUIRE_FALSE(fixture->getSelectAllData()->isChecked());
+	fixture->getSelectAllData()->click();
+	REQUIRE(fixture->getSelectAllData()->isChecked());
 	CHECK(checkBox->isChecked());
 }
 
-TEST_CASE_METHOD(cxtest::ClipperWidgetFixture, "ClipperWidget: Select all data is unchecked when mesh is unchecked", "[unit][gui][widget]")
+TEST_CASE("ClipperWidget: Select all data is unchecked when mesh is unchecked", "[unit][gui][widget]")
 {
-	this->createTestPatientWithData();
-	this->setClipper(testClipper);
+	SessionStorageHelper helper;
+	helper.createTestPatientWithData();
+	ClipperWidgetFixturePtr fixture = ClipperWidgetFixturePtr(new cxtest::ClipperWidgetFixture(helper.getServices()));
 
-	this->mSelectAllData->click();
+	fixture->setClipper(fixture->testClipper);
 
-	QCheckBox *checkBox = this->requireGetCheckBoxForMesh1();
+	fixture->getSelectAllData()->click();
+
+	QCheckBox *checkBox = fixture->requireGetCheckBoxForMesh1();
 	checkBox->click();
-	REQUIRE_FALSE(this->mSelectAllData->isChecked());
+	REQUIRE_FALSE(fixture->getSelectAllData()->isChecked());
 }
 
-TEST_CASE_METHOD(cxtest::ClipperWidgetFixture, "ClipperWidget: Select all data is updated when changing clipper", "[unit][gui][widget]")
+TEST_CASE("ClipperWidget: Select all data is updated when changing clipper", "[unit][gui][widget]")
 {
-	this->createTestPatientWithData();
-	this->setClipper(testClipper);
-	this->mUseClipperCheckBox->click();
+	SessionStorageHelper helper;
+	helper.createTestPatientWithData();
+	ClipperWidgetFixturePtr fixture = ClipperWidgetFixturePtr(new cxtest::ClipperWidgetFixture(helper.getServices()));
 
-	this->mSelectAllData->click();
-	CHECK(this->mSelectAllData->isChecked());
+	fixture->setClipper(fixture->testClipper);
+	fixture->getUseClipperCheckBox()->click();
 
-	this->setClipper(testClipper2);
+	fixture->getSelectAllData()->click();
+	CHECK(fixture->getSelectAllData()->isChecked());
 
-	REQUIRE_FALSE(this->mSelectAllData->isChecked());
+	fixture->setClipper(fixture->testClipper2);
 
-	this->setClipper(testClipper);
-	CHECK(this->mSelectAllData->isChecked());
+	REQUIRE_FALSE(fixture->getSelectAllData()->isChecked());
+
+	fixture->setClipper(fixture->testClipper);
+	CHECK(fixture->getSelectAllData()->isChecked());
 }
 
 TEST_CASE_METHOD(cxtest::ClipperWidgetFixture, "ClipperWidget: Attach to tool on/off", "[unit][gui][widget]")
@@ -320,22 +373,30 @@ TEST_CASE("InteractiveClipper: Attach to tool/no tool updates all SliceProxy obj
 	fixture->setTool(tool);
 
 	cx::SlicePlanesProxy::DataMap data = fixture->getSlicePlanesProxy()->getData();
-	for (cx::SlicePlanesProxy::DataMap::iterator iter = data.begin(); iter != data.end(); ++iter)
-	{
+	cx::SlicePlanesProxy::DataMap::iterator iter;
+	for (iter = data.begin(); iter != data.end(); ++iter)
 		CHECK(iter->second.mSliceProxy->getTool());
-	}
 
 	tool = cx::ToolPtr();
 	fixture->setTool(tool);
 
 	data = fixture->getSlicePlanesProxy()->getData();
-	for (cx::SlicePlanesProxy::DataMap::iterator iter = data.begin(); iter != data.end(); ++iter)
-	{
+	for (iter = data.begin(); iter != data.end(); ++iter)
 		CHECK_FALSE(iter->second.mSliceProxy->getTool());
-	}
 
 	cx::LogicManager::shutdown();
 }
+
+
+//TEST_CASE("ClipperWidget: Active tool selected", "[unit][gui][widget]")
+//{
+//	cx::LogicManager::initialize();
+
+//	cx::ClipperWidgetPtr fixture = cx::ClipperWidgetPtr(new cx::ClipperWidget(cx::logicManager()->getPluginContext()), NULL);
+
+
+//	cx::LogicManager::shutdown();
+//}
 
 //TEST_CASE_METHOD(cxtest::ClipperWidgetFixture, "ClipperWidget: Active tool selected", "[unit][gui][widget]")
 //{
