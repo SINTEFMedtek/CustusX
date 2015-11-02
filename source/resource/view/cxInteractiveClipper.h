@@ -85,7 +85,7 @@ private slots:
 	void changedSlot();
 	void activeToolChangedSlot();
 
-private:
+protected:
 	PLANE_TYPE getPlaneType();
 	SlicePlaneClipperPtr mSlicePlaneClipper;
 	SlicePlanesProxyPtr mSlicePlanesProxy;

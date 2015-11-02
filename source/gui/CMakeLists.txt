@@ -8,13 +8,14 @@ cx_add_class_qt_moc(cxGui_SRCS
 	#----------------------
 	properties/cxDataInterface
 	properties/cxShadingParamsInterfaces
+	properties/cxStringPropertyClipPlane
     #----------------------
     dataWidgets/cxVolumePropertiesWidget
     dataWidgets/cxVolumeInfoWidget
     dataWidgets/cxShadingWidget
     dataWidgets/cxCroppingWidget
     dataWidgets/cxClippingWidget
-    dataWidgets/cxClippersWidget
+    dataWidgets/cxManageClippersWidget
     dataWidgets/cxClipperWidget
     dataWidgets/cxSlicePropertiesWidget
     dataWidgets/cxMeshInfoWidget

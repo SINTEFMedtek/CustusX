@@ -30,7 +30,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxClippersWidget.h"
+#include "cxManageClippersWidget.h"
 #include <QPushButton>
 #include "cxLabeledComboBoxWidget.h"
 #include "cxInteractiveClipper.h"
@@ -43,28 +43,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ClippersWidget::ClippersWidget(VisServicesPtr services, QWidget* parent) :
-	BaseWidget(parent, "ClippersWidget", "Clippers"),
+ManageClippersWidget::ManageClippersWidget(VisServicesPtr services, QWidget* parent) :
+	BaseWidget(parent, "ManageClippersWidget", "Manage Clippers"),
 	mServices(services),
 	mClippers(new Clippers(services)),
 	mClipperWidget(new ClipperWidget(services, this))
 {
 	this->setupUI();
-	connect(mClippers.get(), &Clippers::changed, this, &ClippersWidget::clippersChanged);
+	connect(mClippers.get(), &Clippers::changed, this, &ManageClippersWidget::clippersChanged);
 
 }
 
-void ClippersWidget::initClipperSelector()
+void ManageClippersWidget::initClipperSelector()
 {
 	XmlOptionFile mOptions = profile()->getXmlSettings().descend("clippers");
 
 	QStringList range = mClippers->getClipperNames();
 	mClipperSelector = StringProperty::initialize("clipperSelector", "Clipper", "Select clipper", "", range, mOptions.getElement());
-	connect(mClipperSelector.get(), &Property::changed, this, &ClippersWidget::clipperChanged);
+	connect(mClipperSelector.get(), &Property::changed, this, &ManageClippersWidget::clipperChanged);
 	this->clippersChanged();
 }
 
-void ClippersWidget::setupUI()
+void ManageClippersWidget::setupUI()
 {
 	initClipperSelector();
 	LabeledComboBoxWidget* clipperSelectorBox = new LabeledComboBoxWidget(this, mClipperSelector);
@@ -77,7 +77,7 @@ void ClippersWidget::setupUI()
 	mLayout->addWidget(newClipperButton);
 	mLayout->addWidget(clipperSelectorBox);
 
-	connect(newClipperButton, &QPushButton::clicked, this, &ClippersWidget::newClipperButtonClicked);
+	connect(newClipperButton, &QPushButton::clicked, this, &ManageClippersWidget::newClipperButtonClicked);
 
 
 	mLayout->addWidget(mClipperWidget);
@@ -85,7 +85,7 @@ void ClippersWidget::setupUI()
 	mLayout->addStretch();
 }
 
-void ClippersWidget::clippersChanged()
+void ManageClippersWidget::clippersChanged()
 {
 	mClipperSelector->setValueRange(mClippers->getClipperNames());
 
@@ -99,7 +99,7 @@ void ClippersWidget::clippersChanged()
 	}
 }
 
-void ClippersWidget::clipperChanged()
+void ManageClippersWidget::clipperChanged()
 {
 	QString clipperName = mClipperSelector->getValue();
 	if(clipperName.isEmpty())
@@ -117,7 +117,7 @@ void ClippersWidget::clipperChanged()
 ////	mLayout->addStretch();
 //}
 
-void ClippersWidget::newClipperButtonClicked()
+void ManageClippersWidget::newClipperButtonClicked()
 {
 	InteractiveClipperPtr interactiveClipper = InteractiveClipperPtr(new InteractiveClipper(mServices));
 	QString nameBase = getNameBaseOfCurrentClipper();
@@ -135,7 +135,7 @@ void ClippersWidget::newClipperButtonClicked()
 	mClipperSelector->setValue(clipperName);
 }
 
-QString ClippersWidget::getNameBaseOfCurrentClipper()
+QString ManageClippersWidget::getNameBaseOfCurrentClipper()
 {
 	QString nameBase = mClipperSelector->getValue();
 	nameBase.remove(QRegExp(" [0-9]{1,2}$"));

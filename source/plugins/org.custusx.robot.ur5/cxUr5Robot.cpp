@@ -211,7 +211,8 @@ void Ur5Robot::addToProgramQueue(QString str)
 
 void Ur5Robot::clearProgramQueue()
 {
-    mProgramEncoder.programQueue.clear();
+    if(!mProgramEncoder.programQueue.empty())
+        mProgramEncoder.programQueue.clear();
 }
 
 void Ur5Robot::stopMove(QString typeOfStop, double acc)
@@ -291,6 +292,16 @@ void Ur5Robot::setBlendRadius(double blendRadius)
 std::vector<QString> Ur5Robot::getProgramQueue()
 {
     return this->mProgramEncoder.programQueue;
+}
+
+bool Ur5Robot::isValidWorkspace()
+{
+    return(abs(this->getCurrentState().jointPosition.maxCoeff())<=2*3.15);
+}
+
+bool Ur5Robot::isValidWorkspace(Eigen::RowVectorXd jointPosition)
+{
+    return(abs(jointPosition.maxCoeff())<=2*3.15);
 }
 
 

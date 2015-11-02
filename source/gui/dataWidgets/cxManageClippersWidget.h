@@ -29,75 +29,53 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXSTRINGPROPERTYSELECTTOOL_H
-#define CXSTRINGPROPERTYSELECTTOOL_H
 
-#include "cxResourceExport.h"
+#ifndef CXMANAGECLIPPERSWIDGET_H
+#define CXMANAGECLIPPERSWIDGET_H
 
-#include "cxStringPropertyBase.h"
+#include "cxGuiExport.h"
+
+#include "cxBaseWidget.h"
 #include "cxForwardDeclarations.h"
-
-/**
- * \file
- * \addtogroup cx_resource_core_properties
- * @{
- */
+#include "cxStringProperty.h"
 
 namespace cx
 {
+typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
+typedef boost::shared_ptr<class Clippers> ClippersPtr;
+class ClipperWidget;
 
-typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
+//--------------------------------------
 
-/**
- * \brief Adapter that selects and stores a tool.
- * The tool is stored internally in the adapter.
- * Use setValue/getValue plus changed() to access it.
+/**\brief Widget for managing clippers.
  *
+ *  \date Oct, 2015
+ *  \author Ole Vegard Solberg, SINTEF
  */
-class cxResource_EXPORT StringPropertySelectTool : public StringPropertyBase
+class cxGui_EXPORT ManageClippersWidget: public BaseWidget
 {
-  Q_OBJECT
+	Q_OBJECT
 public:
-  static StringPropertySelectToolPtr New(TrackingServicePtr trackingService)
-  {
-	  return StringPropertySelectToolPtr(new StringPropertySelectTool(trackingService));
-  }
-  StringPropertySelectTool(TrackingServicePtr trackingService);
-  virtual ~StringPropertySelectTool() {}
+	ManageClippersWidget(VisServicesPtr services, QWidget* parent);
 
-  void setHelp(QString help);
-  void setValueName(QString name);
+protected:
+	VisServicesPtr mServices;
+	QVBoxLayout* mLayout;
+	StringPropertyPtr mClipperSelector;
 
-public: // basic methods
-  virtual QString getDisplayName() const;
-  virtual bool setValue(const QString& value);
-  virtual QString getValue() const;
+	ClippersPtr mClippers;
+	InteractiveClipperPtr mCurrentClipper;
+	ClipperWidget *mClipperWidget;
 
-  virtual QStringList getValueRange() const;
-  virtual QString convertInternal2Display(QString internal);
-
-public: // optional methods
-  virtual QString getHelp() const;
-
-public: // interface extension
-  ToolPtr getTool() const;
-
-  void provideActiveTool(bool on);
-  void setActiveTool();
-private:
-  TrackingServicePtr mTrackingService;
-  QString mValueName;
-  QString mHelp;
-  ToolPtr mTool;
-  bool mProvideActiveTool;
-  bool mActiveToolSelected;
-  const QString mActiveToolName;
+	void setupUI();
+//	void setupClipperUI();
+	void initClipperSelector();
+	QString getNameBaseOfCurrentClipper();
+protected slots:
+	void newClipperButtonClicked();
+	void clipperChanged();
+private slots:
+	void clippersChanged();
 };
-
-} // namespace cx
-
-/**
- * @}
- */
-
-#endif // CXSTRINGPROPERTYSELECTTOOL_H
+}//cx
+#endif // CXMANAGECLIPPERSWIDGET_H

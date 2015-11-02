@@ -48,6 +48,7 @@ private:
     Ur5MessageEncoder mMessageEncoder;
     Eigen::RowVectorXd jointStartPosition, jointStopPosition;
 
+    bool isParametersSet();
 
 };
 

@@ -30,52 +30,46 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXCLIPPERSWIDGET_H
-#define CXCLIPPERSWIDGET_H
+#ifndef CXSTRINGPROPERTYCLIPPLANE_H
+#define CXSTRINGPROPERTYCLIPPLANE_H
 
 #include "cxGuiExport.h"
-
-#include "cxBaseWidget.h"
+#include "cxStringPropertyBase.h"
 #include "cxForwardDeclarations.h"
-#include "cxStringProperty.h"
+#include "cxInteractiveClipper.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
-typedef boost::shared_ptr<class Clippers> ClippersPtr;
-class ClipperWidget;
+typedef boost::shared_ptr<class StringPropertyClipPlane> StringPropertyClipPlanePtr;
 
-//--------------------------------------
-
-/**\brief Widget for managing clippers.
- *
- *  \date Oct, 2015
- *  \author Ole Vegard Solberg, SINTEF
+/** Adapter that connects to the current active image.
  */
-class cxGui_EXPORT ClippersWidget: public BaseWidget
+class cxGui_EXPORT StringPropertyClipPlane: public StringPropertyBase
 {
-	Q_OBJECT
+Q_OBJECT
 public:
-	ClippersWidget(VisServicesPtr services, QWidget* parent);
+	static StringPropertyClipPlanePtr New(InteractiveClipperPtr clipper)
+	{
+		return StringPropertyClipPlanePtr(new StringPropertyClipPlane(clipper));
+	}
+	StringPropertyClipPlane(InteractiveClipperPtr clipper);
+	virtual ~StringPropertyClipPlane() {}
 
-protected:
-	VisServicesPtr mServices;
-	QVBoxLayout* mLayout;
-	StringPropertyPtr mClipperSelector;
+public:
+	// basic methods
+	virtual QString getDisplayName() const;
+	virtual bool setValue(const QString& value);
+	virtual QString getValue() const;
 
-	ClippersPtr mClippers;
-	InteractiveClipperPtr mCurrentClipper;
-	ClipperWidget *mClipperWidget;
+public:
+	// optional methods
+	virtual QString getHelp() const;
+	virtual QStringList getValueRange() const;
+	void setClipper(InteractiveClipperPtr clipper);
 
-	void setupUI();
-//	void setupClipperUI();
-	void initClipperSelector();
-	QString getNameBaseOfCurrentClipper();
-protected slots:
-	void newClipperButtonClicked();
-	void clipperChanged();
-private slots:
-	void clippersChanged();
+	InteractiveClipperPtr mInteractiveClipper;
 };
+
 }//cx
-#endif // CXCLIPPERSWIDGET_H
+
+#endif // CXSTRINGPROPERTYCLIPPLANE_H

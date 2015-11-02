@@ -46,7 +46,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-BasicVideoSource::BasicVideoSource(QString uid)
+BasicVideoSource::BasicVideoSource(QString uid) :
+	mStreaming(false)
 {
 	mStatus = "USE_DEFAULT";
 	mRedirecter = vtkSmartPointer<vtkImageChangeInformation>::New(); // used for forwarding only.

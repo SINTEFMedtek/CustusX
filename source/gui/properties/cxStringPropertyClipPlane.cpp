@@ -29,75 +29,52 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXSTRINGPROPERTYSELECTTOOL_H
-#define CXSTRINGPROPERTYSELECTTOOL_H
 
-#include "cxResourceExport.h"
-
-#include "cxStringPropertyBase.h"
-#include "cxForwardDeclarations.h"
-
-/**
- * \file
- * \addtogroup cx_resource_core_properties
- * @{
- */
+#include "cxStringPropertyClipPlane.h"
+#include "cxEnumConverter.h"
+#include "cxDefinitionStrings.h"
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
-
-/**
- * \brief Adapter that selects and stores a tool.
- * The tool is stored internally in the adapter.
- * Use setValue/getValue plus changed() to access it.
- *
- */
-class cxResource_EXPORT StringPropertySelectTool : public StringPropertyBase
+StringPropertyClipPlane::StringPropertyClipPlane(InteractiveClipperPtr clipper) :
+	mInteractiveClipper(clipper)
 {
-  Q_OBJECT
-public:
-  static StringPropertySelectToolPtr New(TrackingServicePtr trackingService)
-  {
-	  return StringPropertySelectToolPtr(new StringPropertySelectTool(trackingService));
-  }
-  StringPropertySelectTool(TrackingServicePtr trackingService);
-  virtual ~StringPropertySelectTool() {}
+	connect(mInteractiveClipper.get(), SIGNAL(changed()), this, SIGNAL(changed()));
+}
 
-  void setHelp(QString help);
-  void setValueName(QString name);
+QString StringPropertyClipPlane::getDisplayName() const
+{
+	return "Slice Plane";
+}
+bool StringPropertyClipPlane::setValue(const QString& value)
+{
+	PLANE_TYPE plane = string2enum<PLANE_TYPE> (value);
+	if (plane == mInteractiveClipper->getSlicePlane())
+		return false;
+	mInteractiveClipper->setSlicePlane(plane);
+	return true;
+}
+QString StringPropertyClipPlane::getValue() const
+{
+	return qstring_cast(mInteractiveClipper->getSlicePlane());
+}
+QString StringPropertyClipPlane::getHelp() const
+{
+	return "Chose the slice plane to clip with.";
+}
+QStringList StringPropertyClipPlane::getValueRange() const
+{
+	std::vector<PLANE_TYPE> planes = mInteractiveClipper->getAvailableSlicePlanes();
+	QStringList retval;
+	for (unsigned i = 0; i < planes.size(); ++i)
+		retval << qstring_cast(planes[i]);
+	return retval;
+}
 
-public: // basic methods
-  virtual QString getDisplayName() const;
-  virtual bool setValue(const QString& value);
-  virtual QString getValue() const;
+void StringPropertyClipPlane::setClipper(InteractiveClipperPtr clipper)
+{
+	mInteractiveClipper = clipper;
+}
 
-  virtual QStringList getValueRange() const;
-  virtual QString convertInternal2Display(QString internal);
-
-public: // optional methods
-  virtual QString getHelp() const;
-
-public: // interface extension
-  ToolPtr getTool() const;
-
-  void provideActiveTool(bool on);
-  void setActiveTool();
-private:
-  TrackingServicePtr mTrackingService;
-  QString mValueName;
-  QString mHelp;
-  ToolPtr mTool;
-  bool mProvideActiveTool;
-  bool mActiveToolSelected;
-  const QString mActiveToolName;
-};
-
-} // namespace cx
-
-/**
- * @}
- */
-
-#endif // CXSTRINGPROPERTYSELECTTOOL_H
+}//cx

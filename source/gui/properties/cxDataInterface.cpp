@@ -37,7 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackingService.h"
 #include "cxTypeConversions.h"
 #include "cxDefinitionStrings.h"
-#include "cxEnumConverter.h"
 #include "cxTool.h"
 #include "cxImageAlgorithms.h"
 #include "cxRegistrationTransform.h"

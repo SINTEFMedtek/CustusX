@@ -268,7 +268,7 @@ endmacro(cx_opengl_version)
 ###############################################################################
 function(getListOfVarsStartingWith _prefix _varResult)
     get_cmake_property(_vars VARIABLES)
-    string (REGEX MATCHALL "(^|;)${_prefix}[A-Za-z0-9/_\\.:]*" _matchedVars "${_vars}")
+    string (REGEX MATCHALL "(^|;)${_prefix}[A-Za-z0-9/_\\.:-]*" _matchedVars "${_vars}")
     set (${_varResult} ${_matchedVars} PARENT_SCOPE)
 endfunction()
 
@@ -470,3 +470,24 @@ function(cx_add_non_source_files_to_project_file)
 	get_property(NON_SOURCE_FILES GLOBAL PROPERTY CX_NON_SOURCE_FILES)
 	add_custom_target(NonSourceFiles SOURCES ${NON_SOURCE_FILES})
 endfunction()
+
+###############################################################################
+#
+# Set Retina display resolution on the input TARGET
+#
+#   http://blog.qt.io/blog/2013/04/25/retina-display-support-for-mac-os-ios-and-x11/
+#   http://mpiannucci.com/view/cmakeretina
+#   https://blog.inventic.eu/2013/02/problem-with-qt-application-on-macos-retina-display/
+#
+# Must be combined with disabling retina on VTK/GL windows, as described in
+#   http://public.kitware.com/pipermail/vtkusers/2015-February/090117.html
+#
+##
+###############################################################################
+function(cx_set_target_high_resolution TARGET)
+	if(APPLE)
+		set_target_properties(${TARGET} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CustusX_SOURCE_DIR}/CMake/MacOSXBundleInfo_cx_custom.plist.in)
+#        set(MACOSX_BUNDLE_INFO_PLIST ${CustusX_SOURCE_DIR}/CMake/MacOSXBundleInfo_cx_custom.plist.in)
+	endif(APPLE)
+endfunction()
+

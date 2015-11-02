@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTableWidget>
 #include <QGroupBox>
 #include "cxClipperWidget.h"
-#include "cxClippingWidget.h" //Using StringPropertyClipPlane. Fix
+#include "cxStringPropertyClipPlane.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxInteractiveClipper.h"
 #include "cxVisServices.h"
@@ -82,7 +82,7 @@ void ClipperWidget::setupDataStructures()
 	mUseClipperCheckBox->setChecked(true);
 
 	mAttachedToTool = new QCheckBox("Attach to tool");
-	mAttachedToTool->setEnabled(true);
+	mAttachedToTool->setChecked(true);
 	mSelectAllData = new QCheckBox("Select all");
 	mInvertPlane = new QCheckBox("Invert plane");
 
@@ -96,6 +96,8 @@ void ClipperWidget::setupDataStructures()
 	//TODO: Need active tool in addition to tool list.
 	mToolSelector = StringPropertySelectTool::New(mServices->tracking());
 	mToolSelector->setValueName("Tool");
+	mToolSelector->provideActiveTool(true);
+	mToolSelector->setActiveTool();
 
 	connect(mSelectAllData, &QCheckBox::clicked, this, &ClipperWidget::selectAllTableData);
 
@@ -106,6 +108,7 @@ void ClipperWidget::setupDataStructures()
 
 	connect(mUseClipperCheckBox, &QCheckBox::toggled, this, &ClipperWidget::enable);
 	connect(mToolSelector.get(), &StringPropertySelectTool::changed, this, &ClipperWidget::onToolChanged);
+	connect(mAttachedToTool, &QCheckBox::toggled, this, &ClipperWidget::onToolChanged);
 
 	mDataTableWidget = new QTableWidget(this);
 }
@@ -186,8 +189,6 @@ void ClipperWidget::connectToNewClipper()
 	{
 		mUseClipperCheckBox->setChecked(mClipper->getUseClipper());
 		mInvertPlane->setChecked(mClipper->getInvertPlane());
-//		connect(mUseClipperCheckBox, &QCheckBox::toggled, this, &ClipperWidget::enable);
-//		connect(mToolSelector.get(), &StringPropertySelectTool::changed, this, &ClipperWidget::onToolChanged);
 		connect(mInvertPlane, &QCheckBox::toggled, mClipper.get(), &InteractiveClipper::invertPlane);
 		if(planeSelector)
 		{
@@ -209,16 +210,22 @@ void ClipperWidget::onToolChanged()
 		return;
 	ToolPtr tool = mToolSelector->getTool();
 	if(!tool)
+	{
+		mClipper->useActiveTool(true);
 		tool = mServices->tracking()->getActiveTool();
-	mClipper->useActiveTool(false);
-	mClipper->setTool(tool);
+	}
+	else
+		mClipper->useActiveTool(false);
+	if(mAttachedToTool->isChecked())
+		mClipper->setTool(tool);
+	else
+		mClipper->setTool(ToolPtr());
 }
 
 void ClipperWidget::setClipper(InteractiveClipperPtr clipper)
 {
 	if(mClipper)
 	{
-//		disconnect(mUseClipperCheckBox, &QCheckBox::toggled, this, &ClipperWidget::enable);
 		disconnect(mInvertPlane, &QCheckBox::toggled, mClipper.get(), &InteractiveClipper::invertPlane);
 	}
 
@@ -229,13 +236,21 @@ void ClipperWidget::setClipper(InteractiveClipperPtr clipper)
 
 void ClipperWidget::initCheckboxesBasedOnClipper()
 {
+	int counter = 0;
 	std::map<QString, DataPtr> datas = mClipper->getDatas();
 	std::map<QString, DataPtr>::iterator iter = datas.begin();
 	for(; iter != datas.end(); ++iter)
 	{
 		if(mCheckBoxes.contains(iter->first))
+		{
+			++counter;
 			mCheckBoxes[iter->first]->setChecked(true);
+		}
 	}
+	if(counter == this->getDatas().size())
+		mSelectAllData->setChecked(true);
+	else
+		mSelectAllData->setChecked(false);
 }
 
 void ClipperWidget::createNewCheckboxesBasedOnData()
@@ -360,9 +375,6 @@ void ClipperWidget::selectAllTableData(bool checked)
 
 void ClipperWidget::dataTypeSelectorClicked(bool checked)
 {
-	if(checked)
-		mSelectAllData->setChecked(false);
-
 	this->removeAllClipPlanes();
 	this->setupDataSelectorUI();
 	this->setClipPlaneInDatas();
