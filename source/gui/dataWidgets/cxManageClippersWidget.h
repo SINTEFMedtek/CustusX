@@ -30,8 +30,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXCLIPPERSWIDGET_H
-#define CXCLIPPERSWIDGET_H
+#ifndef CXMANAGECLIPPERSWIDGET_H
+#define CXMANAGECLIPPERSWIDGET_H
 
 #include "cxGuiExport.h"
 
@@ -52,11 +52,11 @@ class ClipperWidget;
  *  \date Oct, 2015
  *  \author Ole Vegard Solberg, SINTEF
  */
-class cxGui_EXPORT ClippersWidget: public BaseWidget
+class cxGui_EXPORT ManageClippersWidget: public BaseWidget
 {
 	Q_OBJECT
 public:
-	ClippersWidget(VisServicesPtr services, QWidget* parent);
+	ManageClippersWidget(VisServicesPtr services, QWidget* parent);
 
 protected:
 	VisServicesPtr mServices;
@@ -78,4 +78,4 @@ private slots:
 	void clippersChanged();
 };
 }//cx
-#endif // CXCLIPPERSWIDGET_H
+#endif // CXMANAGECLIPPERSWIDGET_H
