@@ -78,13 +78,13 @@ void Ur5LungSimulationTab::setSettingsLayout(QVBoxLayout *parent)
     mainLayout->addWidget(new QLabel("s"), row, 2,1,1);
 
     row++;
-    inspiratoryPauseTimeLineEdit = new QLineEdit(tr("1"));
+    inspiratoryPauseTimeLineEdit = new QLineEdit(tr("0"));
     mainLayout->addWidget(new QLabel("Inspiratory pause time: "), row, 0, 1, 1);
     mainLayout->addWidget(inspiratoryPauseTimeLineEdit,row,1,1,1);
     mainLayout->addWidget(new QLabel("s"), row, 2,1,1);
 
     row++;
-    expirationTimeLineEdit = new QLineEdit(tr("1"));
+    expirationTimeLineEdit = new QLineEdit(tr("1.5"));
     mainLayout->addWidget(new QLabel("Expiration time: "), row, 0, 1, 1);
     mainLayout->addWidget(expirationTimeLineEdit,row,1,1,1);
     mainLayout->addWidget(new QLabel("s"),row,2,1,1);
@@ -113,27 +113,36 @@ void Ur5LungSimulationTab::setMoveLayout(QVBoxLayout *parent)
     mainLayout->addWidget(stopMoveButton,row,1,1,1);
 }
 
+//void Ur5LungSimulationTab::setStartPosLineEdit()
+//{
+//    jointStartPosition = mUr5Robot->getCurrentState().jointPosition;
+//    QString str("(");
+//    for(int i = 0; i<5; i++)
+//        str.append(QString::number(jointStartPosition(i))+",");
+//    startPosLineEdit->setText(str.append(QString::number(jointStartPosition(5))+")"));
+//}
+
 void Ur5LungSimulationTab::setStartPosLineEdit()
 {
     jointStartPosition = mUr5Robot->getCurrentState().jointPosition;
     QString str("(");
-    for(int i = 0; i<5; i++)
-        str.append(QString::number(jointStartPosition(i))+",");
-    startPosLineEdit->setText(str.append(QString::number(jointStartPosition(5))+")"));
+    for(int i = 0; i<2; i++)
+        str.append(QString::number(mUr5Robot->getCurrentState().cartAxis(i))+",");
+    startPosLineEdit->setText(str.append(QString::number(mUr5Robot->getCurrentState().cartAxis(2))+")"));
 }
 
 void Ur5LungSimulationTab::setStopPosLineEdit()
 {
     jointStopPosition = mUr5Robot->getCurrentState().jointPosition;
     QString str("(");
-    for(int i = 0; i<5; i++)
-        str.append(QString::number(jointStopPosition(i))+",");
-    stopPosLineEdit->setText(str.append(QString::number(jointStopPosition(5))+")"));
+    for(int i = 0; i<2; i++)
+        str.append(QString::number(mUr5Robot->getCurrentState().cartAxis(i))+",");
+    stopPosLineEdit->setText(str.append(QString::number(mUr5Robot->getCurrentState().cartAxis(2))+")"));
 }
 
 void Ur5LungSimulationTab::startSimulationSlot()
 {  
-    if(this->isParametersSet())
+    if(this->isParametersSet() && mUr5Robot->isValidWorkspace(jointStartPosition) && mUr5Robot->isValidWorkspace(jointStopPosition))
     {
     mUr5Robot->clearProgramQueue();
 
@@ -148,7 +157,7 @@ void Ur5LungSimulationTab::startSimulationSlot()
     }
     else
     {
-        CX_LOG_INFO() << "All parameters not set";
+        CX_LOG_INFO() << "All parameters not set or invalid positions.";
     }
 }
 
