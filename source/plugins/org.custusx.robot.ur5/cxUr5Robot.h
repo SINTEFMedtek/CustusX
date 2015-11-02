@@ -40,6 +40,9 @@ public:
 
     void sendMessage(QString message);
 
+    bool isValidWorkspace();
+    bool isValidWorkspace(Eigen::RowVectorXd jointPosition);
+
 public slots:
     void connectToRobot(QString IPaddress);
     void disconnectFromRobot();
