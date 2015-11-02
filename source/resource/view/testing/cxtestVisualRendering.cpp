@@ -167,7 +167,7 @@ TEST_CASE("Visual rendering: Empty QVTKWidget",
 }
 
 TEST_CASE("Visual rendering: Empty view",
-		  "[unit][resource][visualization]")
+		  "[integration][resource][visualization]")
 {
 	cxtest::ViewsFixture fixture;
 
