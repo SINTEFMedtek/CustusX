@@ -294,6 +294,16 @@ std::vector<QString> Ur5Robot::getProgramQueue()
     return this->mProgramEncoder.programQueue;
 }
 
+bool Ur5Robot::isValidWorkspace()
+{
+    return(abs(this->getCurrentState().jointPosition.maxCoeff())<=2*3.15);
+}
+
+bool Ur5Robot::isValidWorkspace(Eigen::RowVectorXd jointPosition)
+{
+    return(abs(jointPosition.maxCoeff())<=2*3.15);
+}
+
 
 } // cx
 
