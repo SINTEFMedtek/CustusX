@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxProfile.h"
 #include "cxClippers.h"
 #include "cxClipperWidget.h"
+#include "cxViewService.h"
 
 namespace cx
 {
@@ -46,19 +47,23 @@ namespace cx
 ManageClippersWidget::ManageClippersWidget(VisServicesPtr services, QWidget* parent) :
 	BaseWidget(parent, "ManageClippersWidget", "Manage Clippers"),
 	mServices(services),
-	mClippers(new Clippers(services)),
 	mClipperWidget(new ClipperWidget(services, this))
 {
 	this->setupUI();
-	connect(mClippers.get(), &Clippers::changed, this, &ManageClippersWidget::clippersChanged);
+	connect(getClippers().get(), &Clippers::changed, this, &ManageClippersWidget::clippersChanged);
 
+}
+
+ClippersPtr ManageClippersWidget::getClippers()
+{
+	return mServices->view()->getClippers();
 }
 
 void ManageClippersWidget::initClipperSelector()
 {
 	XmlOptionFile mOptions = profile()->getXmlSettings().descend("clippers");
 
-	QStringList range = mClippers->getClipperNames();
+	QStringList range = getClippers()->getClipperNames();
 	mClipperSelector = StringProperty::initialize("clipperSelector", "Clipper", "Select clipper", "", range, mOptions.getElement());
 	connect(mClipperSelector.get(), &Property::changed, this, &ManageClippersWidget::clipperChanged);
 	this->clippersChanged();
@@ -87,7 +92,7 @@ void ManageClippersWidget::setupUI()
 
 void ManageClippersWidget::clippersChanged()
 {
-	mClipperSelector->setValueRange(mClippers->getClipperNames());
+	mClipperSelector->setValueRange(getClippers()->getClipperNames());
 
 	QStringList range = mClipperSelector->getValueRange();
 	if(!range.contains(mClipperSelector->getValue()))
@@ -105,7 +110,7 @@ void ManageClippersWidget::clipperChanged()
 	if(clipperName.isEmpty())
 		return;
 
-	mCurrentClipper = mClippers->getClipper(clipperName);
+	mCurrentClipper = getClippers()->getClipper(clipperName);
 //	this->setupClipperUI();
 	mClipperWidget->setClipper(mCurrentClipper);
 }
@@ -124,10 +129,10 @@ void ManageClippersWidget::newClipperButtonClicked()
 	QString clipperName = nameBase;
 
 	int i = 2;
-	while(mClippers->exists(clipperName))
+	while(getClippers()->exists(clipperName))
 		clipperName = nameBase + QString(" %1").arg(i++);
 
-	mClippers->add(clipperName, interactiveClipper);
+	getClippers()->add(clipperName, interactiveClipper);
 
 	QStringList range = mClipperSelector->getValueRange();
 	range << clipperName;

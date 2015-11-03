@@ -57,6 +57,7 @@ set(PLUGIN_target_libraries
     cxResource
     cxResourceVisualization
     cxPluginUtilities
+    cxGui
     )
 
 set(PLUGIN_OUTPUT_DIR "")

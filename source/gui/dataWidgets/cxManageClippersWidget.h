@@ -63,7 +63,6 @@ protected:
 	QVBoxLayout* mLayout;
 	StringPropertyPtr mClipperSelector;
 
-	ClippersPtr mClippers;
 	InteractiveClipperPtr mCurrentClipper;
 	ClipperWidget *mClipperWidget;
 
@@ -71,6 +70,7 @@ protected:
 //	void setupClipperUI();
 	void initClipperSelector();
 	QString getNameBaseOfCurrentClipper();
+	ClippersPtr getClippers();
 protected slots:
 	void newClipperButtonClicked();
 	void clipperChanged();
