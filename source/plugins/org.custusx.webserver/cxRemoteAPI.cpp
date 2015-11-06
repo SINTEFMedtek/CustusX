@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLayoutRepository.h"
 #include <QStringList>
 #include "cxScreenVideoProvider.h"
+#include "cxLayoutVideoSource.h"
 
 namespace cx
 {
@@ -63,7 +64,9 @@ void RemoteAPI::closeLayoutWidget()
 
 LayoutVideoSourcePtr RemoteAPI::startStreaming()
 {
-    return LayoutVideoSourcePtr();
+    LayoutVideoSourcePtr source(new LayoutVideoSource(mScreenVideo->getSecondaryLayoutWidget()));
+//    source->start();
+    return source;
 }
 
 QImage RemoteAPI::grabLayout()

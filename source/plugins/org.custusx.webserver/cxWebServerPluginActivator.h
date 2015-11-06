@@ -48,18 +48,12 @@ typedef boost::shared_ptr<class HttpRequestHandler> HttpRequestHandlerPtr;
 //typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
 
 /**
- * Activator for the Network plugin
- *
- * \ingroup org_custusx_core_network
- *
- * \date 2015-09-24
- * \author Janne Beate Bakeng
  */
 class NetworkPluginActivator :  public QObject, public ctkPluginActivator
 {
 	Q_OBJECT
 	Q_INTERFACES(ctkPluginActivator)
-    Q_PLUGIN_METADATA(IID "org_custusx_core_network")
+    Q_PLUGIN_METADATA(IID "org_custusx_webserver")
 
 public:
 
@@ -76,27 +70,6 @@ private:
 	QHttpServer *server;
 //	RegisteredServicePtr mRegistration;
 };
-
-//class Responder : public QObject
-//{
-//	Q_OBJECT
-
-//public:
-//	Responder(QHttpRequest *req, QHttpResponse *resp);
-//	~Responder();
-
-//signals:
-//	void done();
-
-//private slots:
-//	void accumulate(const QByteArray &data);
-//	void reply();
-
-//private:
-//	QScopedPointer<QHttpRequest> m_req;
-//	QHttpResponse *m_resp;
-
-//};
 
 } // namespace cx
 

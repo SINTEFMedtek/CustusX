@@ -56,6 +56,7 @@ public:
 	~SecondaryViewLayoutWindow() {}
 
 	void tryShowOnSecondaryScreen();
+    int mSecondaryLayoutId;
 
 protected:
 	virtual void showEvent(QShowEvent* event);
@@ -74,7 +75,8 @@ class ScreenVideoProvider : public QObject
 public:
 	ScreenVideoProvider(VisServicesPtr services);
 
-	void saveScreenShot(QImage image, QString id);
+    class ViewCollectionWidget* getSecondaryLayoutWidget();
+    void saveScreenShot(QImage image, QString id);
 	QByteArray generatePNGEncoding(QImage image);
 //	void saveScreenShotThreaded(QImage pixmap, QString filename);
 	QPixmap grabScreen(unsigned screenid);

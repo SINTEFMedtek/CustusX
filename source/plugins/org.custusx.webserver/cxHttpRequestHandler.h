@@ -35,6 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include "cxVisServices.h"
 
+#include "org_custusx_webserver_Export.h"
+
 class QHttpRequest;
 class QHttpResponse;
 
@@ -45,7 +47,7 @@ typedef boost::shared_ptr<class RemoteAPI> RemoteAPIPtr;
 /**
  *
  */
-class HttpRequestHandler : public QObject
+class org_custusx_webserver_EXPORT HttpRequestHandler : public QObject
 {
 	Q_OBJECT
 public:
@@ -53,9 +55,7 @@ public:
 public slots:
 	void handle_request(QHttpRequest *req, QHttpResponse *resp);
 
-private slots:
-	void onRequestSuccessful();
-private:
+protected:
 	void handle_complete_request(QHttpRequest *req, QHttpResponse *resp);
 	void process_mainpage(QHttpRequest *req, QHttpResponse *resp);
 
@@ -75,9 +75,14 @@ private:
     void get_display_image(QHttpResponse *resp);
     void create_display(QHttpRequest *req, QHttpResponse *resp);
     void delete_display(QHttpResponse *resp);
-    void create_stream(QHttpRequest *req, QHttpResponse *resp);
-    void delete_stream(QHttpResponse *resp);
+    virtual void create_stream(QHttpRequest *req, QHttpResponse *resp);
+    virtual void delete_stream(QHttpResponse *resp);
 
+protected:
+	RemoteAPIPtr mApi;
+
+private slots:
+	void onRequestSuccessful();
 private:
 	struct RequestType
 	{
@@ -87,7 +92,6 @@ private:
 	};
 	QList<RequestType> mRequests;
 
-	RemoteAPIPtr mApi;
 
     QByteArray generatePNGEncoding(QImage image);
 

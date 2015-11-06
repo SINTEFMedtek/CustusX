@@ -1,6 +1,7 @@
 project(org_custusx_webserver)
 
 find_package(Qt5Network REQUIRED)
+find_package(QHttpServer REQUIRED)
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
@@ -39,8 +40,7 @@ set(PLUGIN_target_libraries
     cxPluginUtilities
 	cxResource
 	cxResourceVisualization
-	#org_custusx_core_openigtlink #todo remove
-	qhttpserver
+	${QHTTPSERVERCPP_LIBRARY_DIRS}
     )
 
 set(PLUGIN_OUTPUT_DIR "")
@@ -64,6 +64,7 @@ target_include_directories(org_custusx_webserver
     PUBLIC
     .
     ${CMAKE_CURRENT_BINARY_DIR}
+    ${QHTTPSERVERCPP_INCLUDE_DIR}
 )
 
 

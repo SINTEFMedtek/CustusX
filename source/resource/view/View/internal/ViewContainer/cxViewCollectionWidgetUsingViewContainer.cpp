@@ -91,6 +91,7 @@ void ViewCollectionWidgetUsingViewContainer::setModified()
 void ViewCollectionWidgetUsingViewContainer::render()
 {
 	mViewContainer->renderAll();
+    emit rendered();
 }
 
 void ViewCollectionWidgetUsingViewContainer::setGridSpacing(int val)

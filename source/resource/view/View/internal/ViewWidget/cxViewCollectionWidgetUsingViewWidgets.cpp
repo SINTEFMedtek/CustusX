@@ -115,6 +115,8 @@ void LayoutWidgetUsingViewWidgets::render()
 		ViewWidget* current = mViews[i];
 		current->render(); // render only changed scenegraph (shaky but smooth)
 	}
+
+    emit rendered();
 }
 
 QPoint LayoutWidgetUsingViewWidgets::getPosition(ViewPtr view)

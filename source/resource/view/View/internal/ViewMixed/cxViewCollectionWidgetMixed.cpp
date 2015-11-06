@@ -136,6 +136,8 @@ void ViewCollectionWidgetMixed::render()
 	{
 		mOverlays[i]->render();
 	}
+
+    emit rendered();
 }
 
 void ViewCollectionWidgetMixed::setGridSpacing(int val)

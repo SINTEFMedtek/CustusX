@@ -32,10 +32,47 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXLAYOUTVIDEOSOURCE_H
 #define CXLAYOUTVIDEOSOURCE_H
 
-class cxLayoutVideoSource
+#include "cxVideoSource.h"
+#include "org_custusx_webserver_Export.h"
+#include <QPointer>
+
+namespace cx
 {
+class ViewCollectionWidget;
+
+/**
+ * Stream images rendered to the input ViewCollectionWidget.
+ */
+class org_custusx_webserver_EXPORT LayoutVideoSource : public VideoSource
+{
+    Q_OBJECT
 public:
-	cxLayoutVideoSource();
+    explicit LayoutVideoSource(ViewCollectionWidget* widget);
+
+
+    virtual QString getUid();
+    virtual QString getName();
+    virtual vtkImageDataPtr getVtkImageData();
+    virtual double getTimestamp();
+
+    virtual QString getInfoString() const { return ""; }
+    virtual QString getStatusString() const { return ""; }
+
+    virtual void start();
+    virtual void stop();
+
+    virtual bool validData() const;
+    virtual bool isConnected() const;
+    virtual bool isStreaming() const;
+
+private:
+    QPointer<ViewCollectionWidget> mWidget;
+    void onRendered();
+    vtkImageDataPtr mGrabbed;
+    QDateTime mTimestamp;
+    bool mStreaming;
 };
+
+} // namespace cx
 
 #endif // CXLAYOUTVIDEOSOURCE_H

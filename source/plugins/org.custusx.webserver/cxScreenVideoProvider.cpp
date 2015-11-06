@@ -56,7 +56,8 @@ namespace cx
 
 SecondaryViewLayoutWindow::SecondaryViewLayoutWindow(QWidget* parent, ViewServicePtr viewService) :
 	QWidget(parent),
-	mViewService(viewService)
+    mViewService(viewService),
+    mSecondaryLayoutId(1)
 {
 	this->setLayout(new QVBoxLayout(this));
 	this->layout()->setMargin(0);
@@ -67,18 +68,18 @@ void SecondaryViewLayoutWindow::showEvent(QShowEvent* event)
 {
     QWidget* widget = mViewService->createLayoutWidget(this, 1);
 	this->layout()->addWidget(widget);
-	if (mViewService->getActiveLayout(1).isEmpty())
+    if (mViewService->getActiveLayout(mSecondaryLayoutId).isEmpty())
 		mViewService->setActiveLayout("LAYOUT_OBLIQUE_3DAnyDual_x1", 1);
 }
 
 void SecondaryViewLayoutWindow::hideEvent(QCloseEvent* event)
 {
-	mViewService->setActiveLayout("", 1);
+    mViewService->setActiveLayout("", mSecondaryLayoutId);
 }
 
 void SecondaryViewLayoutWindow::closeEvent(QCloseEvent *event)
 {
-	mViewService->setActiveLayout("", 1);
+    mViewService->setActiveLayout("", mSecondaryLayoutId);
 }
 
 
@@ -88,7 +89,7 @@ void SecondaryViewLayoutWindow::closeEvent(QCloseEvent *event)
 
 ScreenVideoProvider::ScreenVideoProvider(VisServicesPtr services) :
 	mServices(services),
-	mWriter(services->patient())
+    mWriter(services->patient())
 {
 
 }
@@ -125,7 +126,7 @@ void ScreenVideoProvider::showSecondaryLayout(QSize size, QString layout)
 	this->setWidgetToNiceSizeInLowerRightCorner(size);
 
     if (!layout.isEmpty())
-        mServices->view()->setActiveLayout(layout, 1);
+        mServices->view()->setActiveLayout(layout, mSecondaryViewLayoutWindow->mSecondaryLayoutId);
 }
 
 void ScreenVideoProvider::setWidgetToNiceSizeInLowerRightCorner(QSize size)
@@ -155,14 +156,21 @@ void ScreenVideoProvider::closeSecondaryLayout()
 
 QImage ScreenVideoProvider::grabSecondaryLayout()
 {
-    QWidget* widget = mServices->view()->getLayoutWidget(1);
+    ViewCollectionWidget* widget = this->getSecondaryLayoutWidget();
     if (!widget)
         return QImage();
-	ViewCollectionWidget* vcWidget = dynamic_cast<ViewCollectionWidget*>(widget);
 
-	ViewCollectionImageWriter grabber(vcWidget);
+    ViewCollectionImageWriter grabber(widget);
     return ViewCollectionImageWriter::vtkImageData2QImage(grabber.grab());
 }
 
+ViewCollectionWidget* ScreenVideoProvider::getSecondaryLayoutWidget()
+{
+    if (!mSecondaryViewLayoutWindow)
+        return NULL;
+    QWidget* widget = mServices->view()->getLayoutWidget(mSecondaryViewLayoutWindow->mSecondaryLayoutId);
+    ViewCollectionWidget* vcWidget = dynamic_cast<ViewCollectionWidget*>(widget);
+    return vcWidget;
+}
 
 } // namespace cx

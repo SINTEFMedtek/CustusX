@@ -78,6 +78,8 @@ public:
 	virtual std::vector<ViewPtr> getViews() = 0;
     virtual QPoint getPosition(ViewPtr view) = 0;
 
+signals:
+    void rendered();
 protected:
 	ViewCollectionWidget(QWidget* parent) : QWidget(parent) {}
 };

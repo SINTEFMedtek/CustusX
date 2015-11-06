@@ -30,7 +30,90 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxLayoutVideoSource.h"
+#include "cxViewCollectionImageWriter.h"
+#include "cxViewCollectionWidget.h"
+#include "vtkImageData.h"
 
-cxLayoutVideoSource::cxLayoutVideoSource()
+namespace cx
 {
+
+LayoutVideoSource::LayoutVideoSource(ViewCollectionWidget* widget) :
+    mWidget(widget),
+    mStreaming(false)
+{
+    connect(mWidget.data(), &ViewCollectionWidget::rendered, this, &LayoutVideoSource::onRendered);
 }
+
+QString LayoutVideoSource::getUid()
+{
+    return QString("LayoutVideoSource%1").arg(reinterpret_cast<long>(this));
+}
+
+QString LayoutVideoSource::getName()
+{
+    return QString("LayoutVideoSource");
+}
+
+double LayoutVideoSource::getTimestamp()
+{
+    return mTimestamp.toMSecsSinceEpoch();
+}
+
+void LayoutVideoSource::start()
+{
+    if (mStreaming)
+        return;
+
+    mStreaming = true;
+    emit streaming(mStreaming);
+}
+
+void LayoutVideoSource::stop()
+{
+    if (!mStreaming)
+        return;
+
+    mGrabbed = vtkImageDataPtr();
+    mStreaming = false;
+    emit streaming(mStreaming);
+}
+
+bool LayoutVideoSource::validData() const
+{
+    return mStreaming;
+}
+
+bool LayoutVideoSource::isConnected() const
+{
+    return true;
+}
+
+bool LayoutVideoSource::isStreaming() const
+{
+    return mStreaming;
+}
+
+void LayoutVideoSource::onRendered()
+{
+    if (!mStreaming)
+        return;
+
+    mGrabbed = vtkImageDataPtr();
+    mTimestamp = QDateTime::currentDateTime();
+    emit newFrame();
+}
+
+vtkImageDataPtr LayoutVideoSource::getVtkImageData()
+{
+    if (!mStreaming)
+        return vtkImageDataPtr();
+
+    if (!mGrabbed)
+    {
+        ViewCollectionImageWriter grabber(mWidget);
+        mGrabbed = grabber.grab();
+    }
+    return mGrabbed;
+}
+
+} // namespace cx

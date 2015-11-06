@@ -35,6 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include "cxVisServices.h"
 
+#include "org_custusx_webserver_Export.h"
+
 namespace cx
 {
 typedef boost::shared_ptr<class RemoteAPI> RemoteAPIPtr;
@@ -45,7 +47,7 @@ class ScreenVideoProvider;
  * API indended to be callable from external applications,
  * e.g. over http or igtl.
  */
-class RemoteAPI : public QObject
+class org_custusx_webserver_EXPORT RemoteAPI : public QObject
 {
 	Q_OBJECT
 public:
