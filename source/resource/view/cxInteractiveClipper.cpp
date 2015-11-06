@@ -32,30 +32,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxInteractiveClipper.h"
 
-#include "cxVolumetricRep.h"
-
 #include "cxSliceComputer.h"
-
 #include "cxSlicePlaneClipper.h"
 #include "cxSlicePlanes3DRep.h"
 #include "cxSliceProxy.h"
-#include "cxImage.h"
+#include "cxData.h"
 #include "cxTrackingService.h"
-
 #include "cxCoreServices.h"
-
+#include "cxLogger.h"
 
 namespace cx
 {
 
-InteractiveClipper::InteractiveClipper(CoreServicesPtr backend) :
+InteractiveClipper::InteractiveClipper(CoreServicesPtr services) :
 	mUseClipper(false),
-	mBackend(backend)
+	mServices(services),
+	mUseActiveTool(true)
 {
 
 	// create a slice planes proxy containing all slice definitions,
 	// for use with the clipper
-	PatientModelServicePtr dm = mBackend->patient();
+	PatientModelServicePtr dm = mServices->patient();
 	mSlicePlanesProxy = SlicePlanesProxyPtr(new SlicePlanesProxy());
 	mSlicePlanesProxy->addSimpleSlicePlane(ptSAGITTAL, dm);
 	mSlicePlanesProxy->addSimpleSlicePlane(ptCORONAL, dm);
@@ -68,7 +65,7 @@ InteractiveClipper::InteractiveClipper(CoreServicesPtr backend) :
 
 	connect(mSlicePlaneClipper.get(), SIGNAL(slicePlaneChanged()), this, SLOT(changedSlot()));
 	connect(this, SIGNAL(changed()), this, SLOT(changedSlot()));
-	connect(mBackend->tracking().get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(activeToolChangedSlot()));
+	connect(mServices->tracking().get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(activeToolChangedSlot()));
 
 	this->activeToolChangedSlot();
 	this->changedSlot();
@@ -89,16 +86,16 @@ void InteractiveClipper::setSlicePlane(PLANE_TYPE plane)
 
 void InteractiveClipper::saveClipPlaneToVolume()
 {
-	if (!mImage)
+	if (!mData)
 		return;
 
-	mImage->addPersistentClipPlane(mSlicePlaneClipper->getClipPlaneCopy());
+	mData->addPersistentClipPlane(mSlicePlaneClipper->getClipPlaneCopy());
 }
 void InteractiveClipper::clearClipPlanesInVolume()
 {
-	if (!mImage)
+	if (!mData)
 		return;
-	mImage->clearPersistentClipPlanes();
+	mData->clearPersistentClipPlanes();
 }
 
 PLANE_TYPE InteractiveClipper::getSlicePlane()
@@ -119,7 +116,7 @@ bool InteractiveClipper::getInvertPlane() const
 void InteractiveClipper::useClipper(bool on)
 {
 	mUseClipper = on;
-	emit changed();
+	this->updateClipPlanesInData();
 }
 void InteractiveClipper::invertPlane(bool on)
 {
@@ -134,22 +131,72 @@ PLANE_TYPE InteractiveClipper::getPlaneType()
 	return mSlicePlaneClipper->getSlicer()->getComputer().getPlaneType();
 }
 
-ImagePtr InteractiveClipper::getImage() const
+DataPtr InteractiveClipper::getData() const
 {
-	return mImage;
+	return mData;
 }
 
-void InteractiveClipper::setImage(ImagePtr image)
+void InteractiveClipper::setData(DataPtr data)
 {
-	if (mImage)
-		mImage->setInteractiveClipPlane(vtkPlanePtr());
-	mImage = image;
+	if (mData)
+		mData->setInteractiveClipPlane(vtkPlanePtr());
+	mData = data;
 	emit changed();
+}
+
+void InteractiveClipper::addData(DataPtr data)
+{
+	if(!data)
+		return;
+	mDatas[data->getUid()] = data;
+	this->updateClipPlanesInData();
+}
+
+void InteractiveClipper::removeData(DataPtr data)
+{
+	if(!data)
+		return;
+	std::map<QString, DataPtr>::iterator iter = mDatas.find(data->getUid());
+	if(iter != mDatas.end())
+	{
+		mDatas.erase(iter);
+		iter->second->removeInteractiveClipPlane(mSlicePlaneClipper->getClipPlane());
+	}
+	this->updateClipPlanesInData();
+}
+
+void InteractiveClipper::updateClipPlanesInData()
+{
+	if (mUseClipper)
+		this->addAllInteractiveClipPlanes();
+	else
+		this->removeAllInterActiveClipPlanes();
+
+	emit changed();
+}
+
+std::map<QString, DataPtr> InteractiveClipper::getDatas()
+{
+	return mDatas;
+}
+
+void InteractiveClipper::addAllInteractiveClipPlanes()
+{
+	std::map<QString, DataPtr>::iterator iter = mDatas.begin();
+	for(; iter != mDatas.end(); ++iter)
+		iter->second->addInteractiveClipPlane(mSlicePlaneClipper->getClipPlane());
+}
+
+void InteractiveClipper::removeAllInterActiveClipPlanes()
+{
+	std::map<QString, DataPtr>::iterator iter = mDatas.begin();
+	for(; iter != mDatas.end(); ++iter)
+		iter->second->removeInteractiveClipPlane(mSlicePlaneClipper->getClipPlane());
 }
 
 void InteractiveClipper::changedSlot()
 {
-	if (!mImage)
+	if (!mData)
 		return;
 
 	if (mUseClipper)
@@ -172,11 +219,11 @@ void InteractiveClipper::changedSlot()
 
 		// reset plane anyway. It might be the same planeType but a different sliceProxy.
 		mSlicePlaneClipper->setSlicer(mSlicePlanesProxy->getData()[currentPlane].mSliceProxy);
-		mImage->setInteractiveClipPlane(mSlicePlaneClipper->getClipPlane());
+		mData->setInteractiveClipPlane(mSlicePlaneClipper->getClipPlane());
 	}
 	else
 	{
-		mImage->setInteractiveClipPlane(vtkPlanePtr());
+		mData->setInteractiveClipPlane(vtkPlanePtr());
 	}
 
 }
@@ -194,13 +241,24 @@ std::vector<PLANE_TYPE> InteractiveClipper::getAvailableSlicePlanes() const
 
 void InteractiveClipper::activeToolChangedSlot()
 {
-	ToolPtr activTool = mBackend->tracking()->getActiveTool();
+	ToolPtr activeTool = mServices->tracking()->getActiveTool();
 
+	if(mUseActiveTool)
+		this->setTool(activeTool);
+}
+
+void InteractiveClipper::setTool(ToolPtr tool)
+{
 	SlicePlanesProxy::DataMap data = mSlicePlanesProxy->getData();
 	for (SlicePlanesProxy::DataMap::iterator iter = data.begin(); iter != data.end(); ++iter)
 	{
-		iter->second.mSliceProxy->setTool(activTool);
+		iter->second.mSliceProxy->setTool(tool);
 	}
+}
+
+void InteractiveClipper::useActiveTool(bool on)
+{
+	mUseActiveTool = on;
 }
 
 } // namespace cx

@@ -331,7 +331,7 @@ void ViewManager::addXml(QDomNode& parentNode)
 
 	if (mInteractiveClipper)
 	{
-		QString clippedImage = (mInteractiveClipper->getImage()) ? mInteractiveClipper->getImage()->getUid() : "";
+		QString clippedImage = (mInteractiveClipper->getData()) ? mInteractiveClipper->getData()->getUid() : "";
 		base.addTextToElement("clippedImage", clippedImage);
 	}
 }
@@ -341,7 +341,7 @@ void ViewManager::parseXml(QDomNode viewmanagerNode)
 	XMLNodeParser base(viewmanagerNode);
 
 	QString clippedImage = base.parseTextFromElement("clippedImage");
-	mInteractiveClipper->setImage(mBackend->patient()->getData<Image>(clippedImage));
+	mInteractiveClipper->setData(mBackend->patient()->getData<Image>(clippedImage));
 
 	base.parseDoubleFromElementWithDefault("global2DZoom", mGlobal2DZoomVal->get().toDouble());
 

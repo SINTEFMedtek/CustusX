@@ -80,9 +80,11 @@ protected:
 
     MeshPtr mMesh;
 
+	void clearClipping();
 private slots:
     void meshChangedSlot();
     void transformChangedSlot();
+	void clipPlanesChangedSlot();
 };
 
 

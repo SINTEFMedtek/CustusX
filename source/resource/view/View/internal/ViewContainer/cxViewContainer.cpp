@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewContainerItem.h"
 #include "cxTypeConversions.h"
 #include "cxGLHelpers.h"
+#include "cxOSXHelper.h"
 
 namespace cx
 {
@@ -54,6 +55,7 @@ ViewContainer::ViewContainer(QWidget *parent, Qt::WindowFlags f) :
 	mMTimeHash = 0;
 	mMouseEventTarget = NULL;
 	this->setLayout(new QGridLayout);
+	disableGLHiDPI(this->winId());
 }
 
 ViewContainer::~ViewContainer()

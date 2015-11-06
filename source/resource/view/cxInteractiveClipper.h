@@ -59,7 +59,7 @@ class cxResourceVisualization_EXPORT InteractiveClipper: public QObject
 {
 Q_OBJECT
 public:
-	InteractiveClipper(CoreServicesPtr backend);
+	InteractiveClipper(CoreServicesPtr services);
 
 	void setSlicePlane(PLANE_TYPE plane);
 	void saveClipPlaneToVolume(); ///< save the current clip to image
@@ -68,9 +68,14 @@ public:
 	bool getUseClipper() const;
 	bool getInvertPlane() const;
 	std::vector<PLANE_TYPE> getAvailableSlicePlanes() const;
-	ImagePtr getImage() const;
-	void setImage(ImagePtr image);
+	DataPtr getData() const;
+	void setData(DataPtr data);
 
+	void addData(DataPtr data);
+	void removeData(DataPtr data);
+	std::map<QString, DataPtr> getDatas();
+	void setTool(ToolPtr tool);
+	void useActiveTool(bool on);
 signals:
 	void changed();
 public slots:
@@ -80,13 +85,18 @@ private slots:
 	void changedSlot();
 	void activeToolChangedSlot();
 
-private:
+protected:
 	PLANE_TYPE getPlaneType();
 	SlicePlaneClipperPtr mSlicePlaneClipper;
 	SlicePlanesProxyPtr mSlicePlanesProxy;
 	bool mUseClipper;
-	ImagePtr mImage;
-	CoreServicesPtr mBackend;
+	DataPtr mData;
+	CoreServicesPtr mServices;
+	std::map<QString, DataPtr> mDatas;
+	bool mUseActiveTool;
+	void removeAllInterActiveClipPlanes();
+	void addAllInteractiveClipPlanes();
+	void updateClipPlanesInData();
 };
 typedef boost::shared_ptr<InteractiveClipper> InteractiveClipperPtr;
 

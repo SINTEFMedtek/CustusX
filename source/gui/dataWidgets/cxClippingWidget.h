@@ -37,13 +37,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxBaseWidget.h"
 #include "cxForwardDeclarations.h"
-#include "cxStringPropertyBase.h"
 class QCheckBox;
 
 namespace cx
 {
-typedef boost::shared_ptr<class StringPropertySelectImage> StringPropertySelectImagePtr;
-
+typedef boost::shared_ptr<class StringPropertySelectData> StringPropertySelectDataPtr;
 typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
 
 /**
@@ -52,32 +50,6 @@ typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
  * @{
  */
 
-/** Adapter that connects to the current active image.
- */
-class cxGui_EXPORT StringPropertyClipPlane: public StringPropertyBase
-{
-Q_OBJECT
-public:
-	static StringPropertyBasePtr New(InteractiveClipperPtr clipper)
-	{
-		return StringPropertyBasePtr(new StringPropertyClipPlane(clipper));
-	}
-	StringPropertyClipPlane(InteractiveClipperPtr clipper);
-	virtual ~StringPropertyClipPlane() {}
-
-public:
-	// basic methods
-	virtual QString getDisplayName() const;
-	virtual bool setValue(const QString& value);
-	virtual QString getValue() const;
-
-public:
-	// optional methods
-	virtual QString getHelp() const;
-	virtual QStringList getValueRange() const;
-
-	InteractiveClipperPtr mInteractiveClipper;
-};
 
 /*
  * \class ClippingWidget
@@ -91,7 +63,7 @@ class cxGui_EXPORT ClippingWidget: public BaseWidget
 Q_OBJECT
 
 public:
-	ClippingWidget(cx::PatientModelServicePtr patientModelService, QWidget* parent);
+	ClippingWidget(VisServicesPtr services, QWidget* parent);
 
 private:
 	InteractiveClipperPtr mInteractiveClipper;
@@ -99,8 +71,8 @@ private:
 	QCheckBox* mUseClipperCheckBox;
 	QCheckBox* mInvertPlaneCheckBox;
 	StringPropertyBasePtr mPlaneAdapter;
-	StringPropertySelectImagePtr mImageAdapter;
-	PatientModelServicePtr mPatientModelService;
+	StringPropertySelectDataPtr mDataAdapter;
+	VisServicesPtr mServices;
 private slots:
 	void setupUI();
 	void clipperChangedSlot();

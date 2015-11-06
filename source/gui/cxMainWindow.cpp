@@ -69,8 +69,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMetricWidget.h"
 #include "cxPlaybackWidget.h"
 #include "cxEraserWidget.h"
-#include "cxAllFiltersWidget.h"
+#include "cxFiltersWidget.h"
 #include "cxPluginFrameworkWidget.h"
+#include "cxManageClippersWidget.h"
 
 namespace cx
 {
@@ -111,7 +112,7 @@ MainWindow::MainWindow() :
 	this->addAsDockWidget(new EraserWidget(mServices->patient(), mServices->view(), this), "Properties");
 	this->addAsDockWidget(new MetricWidget(mServices->view(), mServices->patient(), this), "Utility");
 	this->addAsDockWidget(new SlicePropertiesWidget(mServices->patient(), mServices->view(), this), "Properties");
-	this->addAsDockWidget(new VolumePropertiesWidget(mServices->patient(), mServices->view(), this), "Properties");
+	this->addAsDockWidget(new VolumePropertiesWidget(mServices, this), "Properties");
 	this->addAsDockWidget(new MeshInfoWidget(mServices->patient(), mServices->view(), this), "Properties");
 	this->addAsDockWidget(new StreamPropertiesWidget(mServices->patient(), mServices->view(), this), "Properties");
 	this->addAsDockWidget(new TrackPadWidget(this), "Utility");
@@ -123,7 +124,8 @@ MainWindow::MainWindow() :
 	this->addAsDockWidget(new FrameTreeWidget(mServices->patient(), this), "Browsing");
 	this->addAsDockWidget(new ToolManagerWidget(this), "Debugging");
 	this->addAsDockWidget(new PluginFrameworkWidget(this), "Browsing");
-	this->addAsDockWidget(new AllFiltersWidget(VisServices::create(logicManager()->getPluginContext()), this), "Algorithms");
+    this->addAsDockWidget(new FiltersWidget(VisServices::create(logicManager()->getPluginContext()), this), "Algorithms");
+	this->addAsDockWidget(new ManageClippersWidget(mServices, this), "Properties");
 
 	connect(patientService().get(), &PatientModelService::patientChanged, this, &MainWindow::patientChangedSlot);
 	connect(qApp, &QApplication::focusChanged, this, &MainWindow::focusChanged);
@@ -547,7 +549,7 @@ void MainWindow::aboutSlot()
 	QString doc_path = DataLocations::getDocPath();
 	QString appName = qApp->applicationDisplayName();
 	QString url_website = DataLocations::getWebsiteURL();
-	QString url_license = QString("file://%1/license.txt").arg(doc_path);
+	QString url_license = QString("file://%1/License.txt").arg(doc_path);
 	QString url_config = QString("file://%1/cxConfigDescription.txt").arg(doc_path);
 
 	QString text(""

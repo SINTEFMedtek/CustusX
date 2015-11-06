@@ -42,11 +42,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx {
 enum CX_SOCKETCONNECTION_STATE
 {
-	scsINACTIVE,
-	scsCONNECTED,
-	scsLISTENING,
-	scsCONNECTING,
-	scsCOUNT
+    scsINACTIVE,
+    scsCONNECTED,
+    scsLISTENING,
+    scsCONNECTING,
+    scsCOUNT
 };
 } // namespace cx
 
@@ -57,13 +57,13 @@ SNW_DECLARE_ENUM_STRING_CONVERTERS(cx, CX_SOCKETCONNECTION_STATE);
   */
 #define assertRunningInObjectThread() \
 { \
-	if (QThread::currentThread()!=this->thread()) \
-	{ \
-		CX_LOG_ERROR() \
-			<< QString("Method should be called in the object's thread [%1] only, current thread = [%2]") \
-			.arg(this->thread()->objectName()) \
-			.arg(QThread::currentThread()->objectName()); \
-	}		\
+    if (QThread::currentThread()!=this->thread()) \
+    { \
+        CX_LOG_ERROR() \
+            << QString("Method should be called in the object's thread [%1] only, current thread = [%2]") \
+            .arg(this->thread()->objectName()) \
+            .arg(QThread::currentThread()->objectName()); \
+    }		\
 } \
 
 
@@ -78,32 +78,32 @@ class cxResource_EXPORT SocketConnection : public QObject
 public:
     explicit SocketConnection(QObject *parent = 0);
 
-	struct cxResource_EXPORT ConnectionInfo
-	{
-		QString role;
-		QString protocol;
-		QString host;
-		int port;
+    struct cxResource_EXPORT ConnectionInfo
+    {
+        QString role;
+        QString protocol;
+        QString host;
+        int port;
 
-		bool operator==(const ConnectionInfo& rhs) const;
-		bool isServer() const;
-		bool isClient() const;
-		QString getDescription() const;
-	};
+        bool operator==(const ConnectionInfo& rhs) const;
+        bool isServer() const;
+        bool isClient() const;
+        QString getDescription() const;
+    };
 
-	ConnectionInfo getConnectionInfo(); ///< thread-safe
-	CX_SOCKETCONNECTION_STATE getState(); ///< thread-safe
-	virtual void setConnectionInfo(ConnectionInfo info); ///< thread-safe
+    ConnectionInfo getConnectionInfo(); ///< thread-safe
+    CX_SOCKETCONNECTION_STATE getState(); ///< thread-safe
+    virtual void setConnectionInfo(ConnectionInfo info); ///< thread-safe
 
-	virtual void requestConnect(); ///< not thread-safe: use invoke
-	virtual void requestDisconnect(); ///< not thread-safe: use invoke
+    virtual void requestConnect(); ///< not thread-safe: use invoke
+    virtual void requestDisconnect(); ///< not thread-safe: use invoke
 
 public slots:
-	bool sendData(const char* data, qint64 maxSize); ///< not thread-safe
+    bool sendData(const char* data, qint64 maxSize); ///< not thread-safe
 
 signals:
-	void connectionInfoChanged();
-	void stateChanged(CX_SOCKETCONNECTION_STATE status);
+    void connectionInfoChanged();
+    void stateChanged(CX_SOCKETCONNECTION_STATE status);
     void connected();
     void disconnected();
     void error();
@@ -115,25 +115,25 @@ private slots:
     virtual void internalDataAvailable() = 0;
 
 protected:
-	virtual void setProtocol(QString protocolname) = 0;
-	SocketConnectorPtr createConnector(ConnectionInfo info);
-	bool socketIsConnected();
+    virtual void setProtocol(QString protocolname) = 0;
+    SocketConnectorPtr createConnector(ConnectionInfo info);
+    bool socketIsConnected();
     bool enoughBytesAvailableOnSocket(int bytes) const;
     bool socketReceive(void *packPointer, int packSize) const;
-	QStringList getAllServerHostnames();
-	void setCurrentConnectionInfo();
-	void stateChange(CX_SOCKETCONNECTION_STATE newState);
-	CX_SOCKETCONNECTION_STATE computeState();
+    QStringList getAllServerHostnames();
+    void setCurrentConnectionInfo();
+    void stateChange(CX_SOCKETCONNECTION_STATE newState);
+    CX_SOCKETCONNECTION_STATE computeState();
 //	void onServerStateChanged(CX_SOCKETCONNECTION_STATE state);
 
-	QTcpSocket* mSocket;
+    QTcpSocket* mSocket;
 
-	CX_SOCKETCONNECTION_STATE mCurrentState;
-	QMutex mNextConnectionInfoMutex;
-	ConnectionInfo mNextConnectionInfo; ///< info to be used for the next connect(), mutexed.
+    CX_SOCKETCONNECTION_STATE mCurrentState;
+    QMutex mNextConnectionInfoMutex;
+    ConnectionInfo mNextConnectionInfo; ///< info to be used for the next connect(), mutexed.
 
 private:
-	SocketConnectorPtr mConnector;
+    SocketConnectorPtr mConnector;
 };
 
 } //namespace cx

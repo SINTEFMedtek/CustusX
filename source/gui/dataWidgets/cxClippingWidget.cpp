@@ -37,63 +37,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QGroupBox>
 #include "cxStringPropertyBase.h"
 #include "cxLabeledComboBoxWidget.h"
-#include "cxDefinitionStrings.h"
 #include "cxInteractiveClipper.h"
 #include "cxSelectDataStringProperty.h"
 #include "cxImage.h"
-#include "cxLegacySingletons.h"
 #include "cxPatientModelService.h"
-#include "cxLogicManager.h"
 #include "cxViewService.h"
+#include "cxVisServices.h"
+#include "cxStringProperty.h"
+#include "cxLogger.h"
+#include "cxHelperWidgets.h"
+#include "cxStringPropertyClipPlane.h"
 
 namespace cx
 {
 
-StringPropertyClipPlane::StringPropertyClipPlane(InteractiveClipperPtr clipper) :
-	mInteractiveClipper(clipper)
-{
-	connect(mInteractiveClipper.get(), SIGNAL(changed()), this, SIGNAL(changed()));
-}
-
-QString StringPropertyClipPlane::getDisplayName() const
-{
-	return "Slice Plane";
-}
-bool StringPropertyClipPlane::setValue(const QString& value)
-{
-	PLANE_TYPE plane = string2enum<PLANE_TYPE> (value);
-	if (plane == mInteractiveClipper->getSlicePlane())
-		return false;
-	mInteractiveClipper->setSlicePlane(plane);
-	return true;
-}
-QString StringPropertyClipPlane::getValue() const
-{
-	return qstring_cast(mInteractiveClipper->getSlicePlane());
-}
-QString StringPropertyClipPlane::getHelp() const
-{
-	return "Chose the slice plane to clip with.";
-}
-QStringList StringPropertyClipPlane::getValueRange() const
-{
-	std::vector<PLANE_TYPE> planes = mInteractiveClipper->getAvailableSlicePlanes();
-	QStringList retval;
-	//retval << ""; // removed this. No idea why we need an empty entry.
-	for (unsigned i = 0; i < planes.size(); ++i)
-		retval << qstring_cast(planes[i]);
-	return retval;
-}
-
-///--------------------------------------------------------
-///--------------------------------------------------------
-///--------------------------------------------------------
-
-ClippingWidget::ClippingWidget(PatientModelServicePtr patientModelService, QWidget* parent) :
+ClippingWidget::ClippingWidget(VisServicesPtr services, QWidget* parent) :
 	BaseWidget(parent, "ClippingWidget", "Clip"),
-	mPatientModelService(patientModelService)
+	mServices(services)
 {
-	connect(viewService().get(), &ViewService::activeLayoutChanged, this, &ClippingWidget::setupUI);
+	connect(mServices->view().get(), &ViewService::activeLayoutChanged, this, &ClippingWidget::setupUI);
 	this->setupUI();
 }
 
@@ -102,16 +64,16 @@ void ClippingWidget::setupUI()
 	if (mInteractiveClipper)
 		return;
 
-	mInteractiveClipper = viewService()->getClipper();
+	mInteractiveClipper.reset(new InteractiveClipper(mServices));
 
 	if (!mInteractiveClipper)
 		return;
 
 	connect(mInteractiveClipper.get(), SIGNAL(changed()), this, SLOT(clipperChangedSlot()));
 
-	mImageAdapter = StringPropertySelectImage::New(mPatientModelService);
-	LabeledComboBoxWidget* imageCombo = new LabeledComboBoxWidget(this, mImageAdapter);
-	connect(mImageAdapter.get(), SIGNAL(changed()), this, SLOT(imageChangedSlot()));
+	mDataAdapter = StringPropertySelectData::New(mServices->patient());
+	LabeledComboBoxWidget* imageCombo = new LabeledComboBoxWidget(this, mDataAdapter);
+	connect(mDataAdapter.get(), SIGNAL(changed()), this, SLOT(imageChangedSlot()));
 
 	this->setToolTip("Interactive volume clipping");
 
@@ -156,13 +118,13 @@ void ClippingWidget::clipperChangedSlot()
 {
 	mUseClipperCheckBox->setChecked(mInteractiveClipper->getUseClipper());
 	mInvertPlaneCheckBox->setChecked(mInteractiveClipper->getInvertPlane());
-	if (mInteractiveClipper->getImage())
-		mImageAdapter->setValue(mInteractiveClipper->getImage()->getUid());
+	if (mInteractiveClipper->getData())
+		mDataAdapter->setValue(mInteractiveClipper->getData()->getUid());
 }
 
 void ClippingWidget::imageChangedSlot()
 {
-	mInteractiveClipper->setImage(mPatientModelService->getData<Image>(mImageAdapter->getValue()));
+	mInteractiveClipper->setData(mServices->patient()->getData(mDataAdapter->getValue()));
 }
 
 void ClippingWidget::clearButtonClickedSlot()

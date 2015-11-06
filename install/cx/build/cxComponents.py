@@ -235,7 +235,7 @@ class CTK(CppComponent):
         branch = 'CTK-CX-modifications'
         self._getBuilder().gitSetRemoteURL(repo, branch=branch)
         #self._getBuilder().gitCheckout('1056228ab4aeefa9bf6db4fc32a8826db283475a') 
-        self._getBuilder().gitCheckout('71991737acc831dd5533c708d0139624dde2dc96') # new 2015-09-28
+        self._getBuilder().gitCheckout('f9478bdb4d5ecc6357b3a579a4bf8a927debd5e3') # new 2015-10-19
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption

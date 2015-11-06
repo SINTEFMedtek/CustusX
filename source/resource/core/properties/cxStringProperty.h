@@ -30,7 +30,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-
 #ifndef CXSTRINGPROPERTY_H_
 #define CXSTRINGPROPERTY_H_
 
@@ -46,7 +45,8 @@ namespace cx
 
 typedef boost::shared_ptr<class StringProperty> StringPropertyPtr;
 
-/**\brief Represents one option of the string type.
+/**
+ * \brief Represents one option of the string type.
  *  The data are stored within a xml document.
  *
  *  The option node has this layout:
@@ -63,8 +63,7 @@ public:
 	/** Make sure one given option exists witin root.
 	 * If not present, fill inn the input defaults.
 	 */
-	static StringPropertyPtr initialize(const QString& uid, QString name, QString help, QString value,
-		QStringList range, QDomNode root = QDomNode());
+    static StringPropertyPtr initialize(const QString& uid, QString name, QString help, QString value, QStringList range, QDomNode root = QDomNode());
 	static StringPropertyPtr initialize(const QString& uid, QString name, QString help, QString value, QDomNode root = QDomNode());
 
 public:
@@ -102,9 +101,6 @@ private:
 	bool mIsReadOnly;
 	bool mAllowOnlyValuesInRange;
 };
-
-// --------------------------------------------------------
-// --------------------------------------------------------
 
 
 } // namespace cx

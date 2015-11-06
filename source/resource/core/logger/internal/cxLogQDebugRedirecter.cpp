@@ -55,7 +55,7 @@ void convertQtMessagesToCxMessages(QtMsgType type, const QMessageLogContext &, c
 		//abort(); here we hope for the best instead of aborting...
 	}
 
-	Message message(msg, level);
+	Message message("[QT] "+msg, level);
 	message.mChannel = "qdebug";
 	reporter()->sendMessage(message);
 }

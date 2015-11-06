@@ -29,64 +29,55 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXFILTERWIDGET_H
-#define CXFILTERWIDGET_H
 
-#include "cxGuiExport.h"
 
-#include "cxBaseWidget.h"
-#include "cxFilter.h"
-#include "cxFilterTimedAlgorithm.h"
-#include "cxOptionsWidget.h"
+#include "cxUr5Widget.h"
+#include "cxUr5Connection.h"
+
+#include "widgets/cxUr5MiscInformation.h"
+#include "widgets/cxUr5Initialize.h"
+#include "widgets/cxUr5ManualMove.h"
+#include "widgets/cxUr5PlannedMove.h"
+#include "widgets/cxUr5LungSimulationTab.h"
+
+#include <QLabel>
+#include <QSlider>
+#include <QSpinBox>
+#include <QPushButton>
+#include <QVBoxLayout>
+#include <QTimer>
+#include "cxLogger.h"
+
 
 namespace cx
 {
-typedef boost::shared_ptr<class WidgetObscuredListener> WidgetObscuredListenerPtr;
-typedef boost::shared_ptr<class VisServices> VisServicesPtr;
-class TimedAlgorithmProgressBar;
-class FilterPresetWidget;
 
-/** Helper widget for displaying the input/output/options part of a Filter.
- * Intended to be included in other Filter widgets.
- *
- * \ingroup cx_gui
- * \date Nov 18, 2012
- * \author Christian Askeland, SINTEF
- * \author Janne Beate Bakeng, SINTEF
- */
-class cxGui_EXPORT FilterSetupWidget : public BaseWidget
+Ur5Widget::Ur5Widget(Ur5RobotPtr robot, QWidget* parent) :
+    QWidget(parent),
+    mUr5Robot(robot)
 {
-	Q_OBJECT
-public:
-	FilterSetupWidget(VisServicesPtr services, QWidget* parent, XmlOptionFile options, bool addFrame);
-	void setFilter(FilterPtr filter);
-	QString generateHelpText() const;
-	/** Compact Mode: one group, hide main input/output
-	  */
-	void setCompact(bool on);
-	void toggleDetailed();
-
-private slots:
-	void obscuredSlot(bool obscured);
-	void showAdvancedOptions(int state);
-	void rebuildOptions();
-
-private:
-
-	VisServicesPtr mServices;
-	XmlOptionFile mOptions;
-	FilterPtr mCurrentFilter;
-
-	OptionsWidget* mInputsWidget;
-	OptionsWidget* mOutputsWidget;
-	OptionsWidget* mOptionsWidget;
-	FilterPresetWidget*  mPresetWidget;
-	QGroupBox* 	   mOptionsGroupBox;
-	QCheckBox*	   mAdvancedButton;
-	QGroupBox* 	   mFrame;
-	boost::shared_ptr<WidgetObscuredListener> mObscuredListener;
-};
-
+    setupUi(this);
 }
 
-#endif // CXFILTERWIDGET_H
+Ur5Widget::~Ur5Widget()
+{
+}
+
+void Ur5Widget::setupUi(QWidget *Ur5Widget)
+{
+    Ur5Widget->setObjectName("Ur5Widget");
+    Ur5Widget->setWindowTitle("UR5 Robot");
+
+    QLayout* Ur5WidgetLayout = new QVBoxLayout(Ur5Widget);
+    QTabWidget* tabWidget = new QTabWidget(Ur5Widget);
+    Ur5WidgetLayout->addWidget(tabWidget);
+    tabWidget->addTab(new Ur5InitializeTab(mUr5Robot), tr("Initialize"));
+    tabWidget->addTab(new Ur5ManualMoveTab(mUr5Robot),tr("Manual movement"));
+    tabWidget->addTab(new Ur5PlannedMoveTab(mUr5Robot),tr("Planned movement"));
+    tabWidget->addTab(new Ur5LungSimulationTab(mUr5Robot),tr("Lung simulation"));
+    //tabWidget->addTab(new Ur5MiscInformationTab(mUr5Robot),tr("Misc information"));
+
+    QMetaObject::connectSlotsByName(Ur5Widget);
+}
+
+} /* namespace cx */

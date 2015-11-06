@@ -82,11 +82,16 @@ public: // optional methods
 public: // interface extension
   ToolPtr getTool() const;
 
+  void provideActiveTool(bool on);
+  void setActiveTool();
 private:
   TrackingServicePtr mTrackingService;
   QString mValueName;
   QString mHelp;
   ToolPtr mTool;
+  bool mProvideActiveTool;
+  bool mActiveToolSelected;
+  const QString mActiveToolName;
 };
 
 } // namespace cx

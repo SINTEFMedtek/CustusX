@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVolumeHelpers.h"
 #include "cxTypeConversions.h"
 #include "cxPatientModelService.h"
+#include "cxVisServices.h"
 
 namespace cx
 {
@@ -71,19 +72,19 @@ ActiveVolumeWidget::ActiveVolumeWidget(PatientModelServicePtr patientModelServic
 /// -------------------------------------------------------
 /// -------------------------------------------------------
 
-VolumePropertiesWidget::VolumePropertiesWidget(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget *parent) :
+VolumePropertiesWidget::VolumePropertiesWidget(VisServicesPtr services, QWidget *parent) :
 		TabbedWidget(parent, "VolumePropertiesWidget", "Volume Properties")
 {
 	this->setToolTip("Volume properties");
-	this->insertWidgetAtTop(new ActiveVolumeWidget(patientModelService, viewService, this));
+	this->insertWidgetAtTop(new ActiveVolumeWidget(services->patient(), services->view(), this));
 
 	bool connectToActiveImage = true;
 
-	this->addTab(new VolumeInfoWidget(patientModelService, this), "Info");
-	this->addTab(new TransferFunctionWidget(patientModelService, this, connectToActiveImage), QString("Transfer Functions"));
-	this->addTab(new ShadingWidget(patientModelService->getActiveData(), this, connectToActiveImage), "Properties");
-	this->addTab(new CroppingWidget(patientModelService, viewService, this), "Crop");
-	this->addTab(new ClippingWidget(patientModelService, this), "Clip");
+	this->addTab(new VolumeInfoWidget(services->patient(), this), "Info");
+	this->addTab(new TransferFunctionWidget(services->patient(), this, connectToActiveImage), QString("Transfer Functions"));
+	this->addTab(new ShadingWidget(services->patient()->getActiveData(), this, connectToActiveImage), "Properties");
+	this->addTab(new CroppingWidget(services->patient(), services->view(), this), "Crop");
+	this->addTab(new ClippingWidget(services, this), "Clip");
 }
 
 }//namespace
