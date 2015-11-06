@@ -70,7 +70,7 @@ vtkImageDataPtr ViewCollectionImageWriter::grab()
 	{
         vtkImageDataPtr vtkImage = this->view2vtkImageData(views[i]);
         QPoint pos = mWidget->getPosition(views[i]);
-		this->drawImageAtPos(target, vtkImage, pos);
+        this->drawImageAtPos(target, vtkImage, pos);
     }
 
     return target;

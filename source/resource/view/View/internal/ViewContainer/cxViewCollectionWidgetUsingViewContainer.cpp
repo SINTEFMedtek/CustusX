@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewContainerItem.h"
 #include "cxViewContainer.h"
 #include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
 #include "cxLogger.h"
 
 namespace cx
@@ -121,7 +122,12 @@ std::vector<ViewPtr> ViewCollectionWidgetUsingViewContainer::getViews()
 
 QPoint ViewCollectionWidgetUsingViewContainer::getPosition(ViewPtr view)
 {
+    Eigen::Array2i size(view->getRenderWindow()->GetSize());
+    Eigen::Array2i size_renderer(view->getRenderer()->GetSize());
     Eigen::Array2i p_vc(view->getRenderer()->GetOrigin());
+    p_vc[1] += size_renderer[1] - 1; // upper left corner (add extent = size-1)
+    p_vc[1] = size[1] - p_vc[1] - 1; // flip y axis vtk->qt
+
     QPoint p(p_vc[0], p_vc[1]);
     p = mViewContainer->mapToGlobal(p);
     p = this->mapFromGlobal(p);
