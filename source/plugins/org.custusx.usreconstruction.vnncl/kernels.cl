@@ -109,10 +109,12 @@ int2 findClosestPlanes_ver2(__local close_plane_t *close_planes,
 
     int2 ret;
     float abs_dist;
+    float dist;
     int found = 0;
     for(int i = 0; i < N_PLANES; i++)
     {
-        abs_dist = fabs(dot(voxel, plane_eqs[i]));
+        dist = dot(voxel, plane_eqs[i]);
+        abs_dist =fabs(dist);
 
         // Check if the plane is closer than the one farthest away we have included so far
         if(abs_dist < max_dist && abs_dist<radius)
@@ -129,7 +131,7 @@ int2 findClosestPlanes_ver2(__local close_plane_t *close_planes,
             {
 
                 // If yes, swap out the one with the longest distance for this plane
-                tmp.dist = abs_dist;
+                tmp.dist = dist;
                 tmp.plane_id = i;
                 CLOSE_PLANE_IDX(close_planes, max_idx) = tmp;
                 found++;
@@ -734,7 +736,7 @@ performInterpolation_anisotropic(__local close_plane_t *close_planes,
 
 	if(n_close_planes == 0)
 	{
-		return 1; //black, different than 0-black
+        return 1; //black, different than 0-black
 	}
 	for(int i = 0; i < n_close_planes; i++)
 	{
@@ -758,16 +760,20 @@ performInterpolation_anisotropic(__local close_plane_t *close_planes,
 		int2 rounded_p = round_int(p);
 		if(!isValidPixel(rounded_p, mask, in_size))
 		{
+            return 255;
 			continue;
+
 		}
 		
-		CLOSE_PLANE_IDX(close_planes, i).intensity = bilinearInterpolation(p.x,
+        CLOSE_PLANE_IDX(close_planes, i).intensity = image[rounded_p.y*in_size.x +rounded_p.x]; /*bilinearInterpolation(p.x,
 				p.y,
 				image,
-				in_size.x);
+                in_size.x);*/
 	}
 
-	return max((unsigned char)1, anisotropicFilter(close_planes, n_close_planes));
+    unsigned char temp = anisotropicFilter(close_planes, n_close_planes);
+    if(temp < 1) return 255;
+    return temp;
 
 }
 
