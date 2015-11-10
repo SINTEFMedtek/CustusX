@@ -40,9 +40,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxClippers.h"
 #include "cxClipperWidget.h"
 #include "cxViewService.h"
+#include "cxSelectClippersForDataWidget.h"
 
 namespace cx
 {
+
+ClippingPropertiesWidget::ClippingPropertiesWidget(VisServicesPtr services, QWidget *parent) :
+		TabbedWidget(parent, "ClippingPropertiesWidget", "Clipping Properties")
+{
+	this->setToolTip("Clipping properties");
+
+	this->addTab(new SelectClippersForDataWidget(services, this), "Select clippers");
+	this->addTab(new ManageClippersWidget(services, this), "Edit clippers");
+}
 
 ManageClippersWidget::ManageClippersWidget(VisServicesPtr services, QWidget* parent) :
 	BaseWidget(parent, "ManageClippersWidget", "Manage Clippers"),

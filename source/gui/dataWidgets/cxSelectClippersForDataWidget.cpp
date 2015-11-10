@@ -41,6 +41,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogger.h"
 #include "cxInteractiveClipper.h"
 #include "cxActiveData.h"
+#include "cxSelectDataStringProperty.h"
+#include "cxDataSelectWidget.h"
 
 namespace cx
 {
@@ -58,11 +60,14 @@ SelectClippersForDataWidget::SelectClippersForDataWidget(VisServicesPtr services
 
 void SelectClippersForDataWidget::initUI()
 {
+	StringPropertyActiveDataPtr activeDataProperty = StringPropertyActiveData::New(mServices->patient());
+
 	mClipperTableWidget = new QTableWidget(this);
 
 	mHeading = new QLabel("Active clippers");
 
 	mLayout = new QVBoxLayout(this);
+	mLayout->addWidget(new DataSelectWidget(mServices->view(), mServices->patient(), this, activeDataProperty));
 	mLayout->addWidget(mHeading);
 	mLayout->addWidget(mClipperTableWidget);
 

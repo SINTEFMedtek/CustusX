@@ -38,12 +38,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxBaseWidget.h"
 #include "cxForwardDeclarations.h"
 #include "cxStringProperty.h"
+#include "cxTabbedWidget.h"
 
 namespace cx
 {
 typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
 typedef boost::shared_ptr<class Clippers> ClippersPtr;
 class ClipperWidget;
+
+/**
+ * \brief Widget for displaying and changing clipper properties.
+ * \ingroup cx_gui
+ *
+ *  \date 10 Nov, 2015
+ *  \author Ole Vegard Solberg, SINTEF
+ */
+class cxGui_EXPORT ClippingPropertiesWidget : public TabbedWidget
+{
+  Q_OBJECT
+public:
+	ClippingPropertiesWidget(VisServicesPtr services, QWidget* parent);
+  virtual ~ClippingPropertiesWidget() {}
+};
 
 //--------------------------------------
 
