@@ -46,7 +46,7 @@ namespace cx
  *  \date 02 Nov, 2015
  *  \author Ole Vegard Solberg, SINTEF
  */
-class SelectClippersForDataWidget: public BaseWidget
+class cxGui_EXPORT SelectClippersForDataWidget: public BaseWidget
 {
 	Q_OBJECT
 	void createDataCheckBox(int row, QString clipperName);
