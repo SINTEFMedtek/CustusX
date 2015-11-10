@@ -45,7 +45,7 @@ namespace cx
 {
 
 InteractiveClipper::InteractiveClipper(CoreServicesPtr services) :
-	mUseClipper(false),
+	mUseClipper(true),
 	mServices(services),
 	mUseActiveTool(true)
 {
@@ -163,6 +163,11 @@ void InteractiveClipper::removeData(DataPtr data)
 		iter->second->removeInteractiveClipPlane(mSlicePlaneClipper->getClipPlane());
 	}
 	this->updateClipPlanesInData();
+}
+
+bool InteractiveClipper::exists(DataPtr data)
+{
+	return mDatas.count(data->getUid());
 }
 
 void InteractiveClipper::updateClipPlanesInData()

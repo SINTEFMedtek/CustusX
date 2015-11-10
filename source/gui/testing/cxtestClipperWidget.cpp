@@ -40,36 +40,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackingServiceProxy.h"
 #include "cxSlicePlanes3DRep.h"
 #include "cxSliceProxy.h"
+#include "cxtestSessionStorageHelper.h"
 
 #include "cxLogicManager.h"
 
 namespace cxtest
 {
-
-class SessionStorageHelper
-{
-public:
-	void createTestPatient()
-	{
-		storageFixture.createSessions();
-		storageFixture.loadSession1();
-	}
-
-	void createTestPatientWithData()
-	{
-		createTestPatient();
-		storageFixture.mPatientModelService->insertData(testData.mesh1);
-		storageFixture.mPatientModelService->insertData(testData.image1);
-		storageFixture.mPatientModelService->insertData(testData.image2);
-	}
-
-	cx::VisServicesPtr getServices()
-	{
-		return cx::VisServices::create(cx::logicManager()->getPluginContext());
-	}
-	SessionStorageTestFixture storageFixture;
-	TestDataStructures testData;
-};
 
 typedef boost::shared_ptr<class VisServicesFixture> VisServicesFixturePtr;
 class VisServicesFixture : public cx::VisServices
