@@ -29,75 +29,31 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXSTRINGPROPERTYSELECTTOOL_H
-#define CXSTRINGPROPERTYSELECTTOOL_H
 
-#include "cxResourceExport.h"
+#include "cxtestSessionStorageHelper.h"
+#include "cxPatientModelService.h"
+#include "cxVisServices.h"
+#include "cxLogicManager.h"
 
-#include "cxStringPropertyBase.h"
-#include "cxForwardDeclarations.h"
-
-/**
- * \file
- * \addtogroup cx_resource_core_properties
- * @{
- */
-
-namespace cx
+namespace cxtest
 {
 
-typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
-
-/**
- * \brief Adapter that selects and stores a tool.
- * The tool is stored internally in the adapter.
- * Use setValue/getValue plus changed() to access it.
- *
- */
-class cxResource_EXPORT StringPropertySelectTool : public StringPropertyBase
+void SessionStorageHelper::createTestPatient()
 {
-  Q_OBJECT
-public:
-  static StringPropertySelectToolPtr New(TrackingServicePtr trackingService)
-  {
-	  return StringPropertySelectToolPtr(new StringPropertySelectTool(trackingService));
-  }
-  StringPropertySelectTool(TrackingServicePtr trackingService);
-  virtual ~StringPropertySelectTool() {}
+	storageFixture.createSessions();
+	storageFixture.loadSession1();
+}
 
-  void setHelp(QString help);
-  void setValueName(QString name);
+void SessionStorageHelper::createTestPatientWithData()
+{
+	createTestPatient();
+	storageFixture.mPatientModelService->insertData(testData.mesh1);
+	storageFixture.mPatientModelService->insertData(testData.image1);
+	storageFixture.mPatientModelService->insertData(testData.image2);
+}
 
-public: // basic methods
-  virtual QString getDisplayName() const;
-  virtual bool setValue(const QString& value);
-  virtual QString getValue() const;
-
-  virtual QStringList getValueRange() const;
-  virtual QString convertInternal2Display(QString internal);
-
-public: // optional methods
-  virtual QString getHelp() const;
-
-public: // interface extension
-  ToolPtr getTool() const;
-
-  void provideActiveTool(bool on);
-  void setActiveTool();
-private:
-  TrackingServicePtr mTrackingService;
-  QString mValueName;
-  QString mHelp;
-  ToolPtr mTool;
-  bool mProvideActiveTool;
-  bool mActiveToolSelected;
-  const QString mActiveToolName;
-};
-
-} // namespace cx
-
-/**
- * @}
- */
-
-#endif // CXSTRINGPROPERTYSELECTTOOL_H
+cx::VisServicesPtr SessionStorageHelper::getServices()
+{
+	return cx::VisServices::create(cx::logicManager()->getPluginContext());
+}
+} //cxtest

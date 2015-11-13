@@ -49,6 +49,7 @@ typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
 
 namespace cxtest
 {
+typedef boost::shared_ptr<class SessionStorageTestFixture> SessionStorageTestFixturePtr;
 
 struct TestDataStructures
 {
@@ -80,6 +81,7 @@ public:
 
 	cx::SessionStorageServicePtr mSessionStorageService;
 	cx::PatientModelServicePtr mPatientModelService;
+	cx::VisServicesPtr mServices;
 private:
 	bool mSessionsCreated;
 	QString mSession1;

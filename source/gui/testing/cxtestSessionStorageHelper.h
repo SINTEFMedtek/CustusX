@@ -29,75 +29,32 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXSTRINGPROPERTYSELECTTOOL_H
-#define CXSTRINGPROPERTYSELECTTOOL_H
 
-#include "cxResourceExport.h"
+#ifndef CXTESTSESSIONSTORAGEHELPER_H
+#define CXTESTSESSIONSTORAGEHELPER_H
 
-#include "cxStringPropertyBase.h"
 #include "cxForwardDeclarations.h"
+#include "cxtestSessionStorageTestFixture.h"
 
-/**
- * \file
- * \addtogroup cx_resource_core_properties
- * @{
- */
-
-namespace cx
+namespace cxtest
 {
 
-typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
-
-/**
- * \brief Adapter that selects and stores a tool.
- * The tool is stored internally in the adapter.
- * Use setValue/getValue plus changed() to access it.
+/**\brief Helper class providing a simple patient with data. Used by tests.
  *
+ *  \date Oct, 2015
+ *  \author Ole Vegard Solberg, SINTEF
  */
-class cxResource_EXPORT StringPropertySelectTool : public StringPropertyBase
+class SessionStorageHelper
 {
-  Q_OBJECT
 public:
-  static StringPropertySelectToolPtr New(TrackingServicePtr trackingService)
-  {
-	  return StringPropertySelectToolPtr(new StringPropertySelectTool(trackingService));
-  }
-  StringPropertySelectTool(TrackingServicePtr trackingService);
-  virtual ~StringPropertySelectTool() {}
+	void createTestPatient();
+	void createTestPatientWithData();
+	cx::VisServicesPtr getServices();
 
-  void setHelp(QString help);
-  void setValueName(QString name);
-
-public: // basic methods
-  virtual QString getDisplayName() const;
-  virtual bool setValue(const QString& value);
-  virtual QString getValue() const;
-
-  virtual QStringList getValueRange() const;
-  virtual QString convertInternal2Display(QString internal);
-
-public: // optional methods
-  virtual QString getHelp() const;
-
-public: // interface extension
-  ToolPtr getTool() const;
-
-  void provideActiveTool(bool on);
-  void setActiveTool();
-private:
-  TrackingServicePtr mTrackingService;
-  QString mValueName;
-  QString mHelp;
-  ToolPtr mTool;
-  bool mProvideActiveTool;
-  bool mActiveToolSelected;
-  const QString mActiveToolName;
+	SessionStorageTestFixture storageFixture;
+	TestDataStructures testData;
 };
 
-} // namespace cx
+}//cxtest
 
-/**
- * @}
- */
-
-#endif // CXSTRINGPROPERTYSELECTTOOL_H
+#endif // CXTESTSESSIONSTORAGEHELPER_H

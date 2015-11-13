@@ -30,7 +30,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "catch.hpp"
-#include "cxClippersWidget.h"
+#include "cxManageClippersWidget.h"
 #include "cxClippers.h"
 #include "cxVisServices.h"
 #include "cxtestDirectSignalListener.h"
@@ -38,16 +38,52 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataLocations.h"
 #include "cxLogger.h"
 #include "cxtestSessionStorageTestFixture.h"
+#include "cxLogicManager.h"
+#include "cxViewService.h"
 
 namespace cxtest
 {
 
-class ClippersWidgetFixture : public cx::ClippersWidget
+typedef boost::shared_ptr<class ManageClippersWidgetFixture> ManageClippersWidgetFixturePtr;
+class ManageClippersWidgetFixture : public cx::ManageClippersWidget
 {
 public:
-	ClippersWidgetFixture() :
-		ClippersWidget(cx::VisServices::getNullObjects(), NULL)
+	ManageClippersWidgetFixture() :
+		ManageClippersWidget(cx::VisServices::getNullObjects(), NULL)
 	{}
+	ManageClippersWidgetFixture(cx::VisServicesPtr services) :
+		ManageClippersWidget(services, NULL)
+	{}
+	cx::StringPropertyPtr getClipperSelector()
+	{
+		return mClipperSelector;
+	}
+	cx::InteractiveClipperPtr getCurrentClipper()
+	{
+		return mCurrentClipper;
+	}
+	void newClipperButtonClicked()
+	{
+		cx::ManageClippersWidget::newClipperButtonClicked();
+	}
+};
+
+class ManageClippersWidgetTestHelper
+{
+public:
+	ManageClippersWidgetTestHelper()
+	{
+		cx::LogicManager::initialize();
+		services = cx::VisServices::create(cx::logicManager()->getPluginContext());
+		fixture = ManageClippersWidgetFixturePtr(new ManageClippersWidgetFixture(services));
+	}
+	~ManageClippersWidgetTestHelper()
+	{
+		cx::LogicManager::shutdown();
+	}
+
+	ManageClippersWidgetFixturePtr fixture;
+	cx::VisServicesPtr services;
 };
 
 class ClippersFixture : public cx::Clippers
@@ -62,90 +98,103 @@ public:
 	}
 };
 
-TEST_CASE_METHOD(cxtest::ClippersWidgetFixture, "ClippersWidget: Init default clippers", "[unit][gui][widget]")
+TEST_CASE("VisServices: Init default clippers", "[unit][gui][widget][clip]")
 {
-	this->mClippers->importList(QString());//Init with default clippers
+	ManageClippersWidgetTestHelper helper;
 
-	REQUIRE(this->mClippers->size() == 6);
-//	REQUIRE_FALSE(this->mClipperSelector->getValue().isEmpty());//TODO; fix
+	cx::ClippersPtr clippers = helper.services->view()->getClippers();
+	REQUIRE(clippers);
+	clippers->importList(QString());//Init with default clippers
+
+	REQUIRE(clippers->size() == 6);
 }
 
-TEST_CASE_METHOD(cxtest::ClippersFixture, "Clippers: Init default clippers", "[unit][gui][widget]")
+TEST_CASE_METHOD(cxtest::ClippersFixture, "Clippers: Init default clippers", "[unit][gui][widget][clip]")
 {
 	REQUIRE(this->getInitialClipperNames().size() == 6);
 	REQUIRE(this->size() == 6);
 }
 
-TEST_CASE_METHOD(cxtest::ClippersWidgetFixture, "ClippersWidget: Select clipper", "[unit][gui][widget]")
+TEST_CASE("ClippersWidget: Select clipper", "[unit][gui][widget][clip]")
 {
-	this->mClippers->importList(QString());//Init with default clippers
+	ManageClippersWidgetTestHelper helper;
+	helper.services->view()->getClippers()->importList(QString());//Init with default clippers
 
 	ClippersFixture clippersFixture;
 	QStringList defaultNames = clippersFixture.getInitialClipperNames();
 
 	QString clipperName = defaultNames.at(3);
 	REQUIRE_FALSE(clipperName.isEmpty());
-	this->mClipperSelector->setValue(clipperName);
+	helper.fixture->getClipperSelector()->setValue(clipperName);
 
 	clipperName = defaultNames.at(2);
 	REQUIRE_FALSE(clipperName.isEmpty());
 
-	cxtest::DirectSignalListener clippersChangedSignal(this->mClipperSelector.get(), SIGNAL(changed()));
-	this->mClipperSelector->setValue(clipperName);
+	cxtest::DirectSignalListener clippersChangedSignal(helper.fixture->getClipperSelector().get(), SIGNAL(changed()));
+	helper.fixture->getClipperSelector()->setValue(clipperName);
 	CHECK(clippersChangedSignal.isReceived());
 
-	REQUIRE(mCurrentClipper);
+	REQUIRE(helper.fixture->getCurrentClipper());
 }
 
-TEST_CASE_METHOD(cxtest::ClippersWidgetFixture, "ClippersWidget: Create new clipper", "[unit][gui][widget]")
+TEST_CASE("ClippersWidget: Create new clipper", "[unit][gui][widget][clip]")
 {
-	int initNumClippers = this->mClippers->size();
-	CHECK(mClipperSelector->getValueRange().size() == initNumClippers);
+	ManageClippersWidgetTestHelper helper;
+	ManageClippersWidgetFixturePtr fixture = helper.fixture;
 
-	this->newClipperButtonClicked();
+	int initNumClippers = helper.services->view()->getClippers()->size();
+	CHECK(fixture->getClipperSelector()->getValueRange().size() == initNumClippers);
 
-	int numClippers = this->mClippers->size();
+	fixture->newClipperButtonClicked();
+
+	int numClippers = helper.services->view()->getClippers()->size();
 	CHECK(numClippers == initNumClippers + 1);
-	CHECK(mClipperSelector->getValueRange().size() == numClippers);
+	CHECK(fixture->getClipperSelector()->getValueRange().size() == numClippers);
 }
 
-TEST_CASE_METHOD(cxtest::ClippersWidgetFixture, "ClippersWidget: Automatic naming of new clipper", "[unit][gui][widget]")
+TEST_CASE("ClippersWidget: Automatic naming of new clipper", "[unit][gui][widget][clip]")
 {
-	QString clipperName = mClipperSelector->getValue();
-	this->newClipperButtonClicked();
+	ManageClippersWidgetTestHelper helper;
+	ManageClippersWidgetFixturePtr fixture = helper.fixture;
 
-	QString clipperName2 = mClipperSelector->getValue();
+	QString clipperName = fixture->getClipperSelector()->getValue();
+	fixture->newClipperButtonClicked();
+
+	QString clipperName2 = fixture->getClipperSelector()->getValue();
 	CHECK(clipperName2 != clipperName);
 	CHECK(clipperName2.endsWith("2"));
 
-	this->newClipperButtonClicked();
+	fixture->newClipperButtonClicked();
 
-	QString clipperName3 = mClipperSelector->getValue();
+	QString clipperName3 = fixture->getClipperSelector()->getValue();
 	CHECK(clipperName3 != clipperName);
 	CHECK(clipperName3 != clipperName2);
 	CHECK(clipperName3.endsWith("3"));
 }
 
-TEST_CASE_METHOD(cxtest::ClippersWidgetFixture, "ClippersWidget: Load clipper names", "[unit][gui][widget]")
+TEST_CASE("ClippersWidget: Load clipper names", "[unit][gui][widget][clip]")
 {
-	QStringList range = this->mClipperSelector->getValueRange();
+	ManageClippersWidgetTestHelper helper;
+
+	QStringList range = helper.fixture->getClipperSelector()->getValueRange();
 	REQUIRE(range.size() == 6);
 	QString clipperName = range.first();
 	INFO(QString("clipperName: %1").arg(clipperName));
 	CHECK(clipperName.length() > 1);
 }
 
-TEST_CASE_METHOD(cxtest::ClippersWidgetFixture, "ClippersWidget: New patient gets default clippers", "[unit][gui][widget]")
+TEST_CASE("ClippersWidget: New patient gets default clippers", "[unit][gui][widget][clip]")
 {
 	cxtest::SessionStorageTestFixture storageFixture;
+	ManageClippersWidgetFixturePtr fixture = ManageClippersWidgetFixturePtr(new ManageClippersWidgetFixture(storageFixture.mServices));
 	storageFixture.createSessions();
 	storageFixture.loadSession1();
 
-	QStringList range = this->mClipperSelector->getValueRange();
+	QStringList range = fixture->getClipperSelector()->getValueRange();
 	CHECK(range.size() == 6);
 }
 
-//TEST_CASE_METHOD(cxtest::ClippersWidgetFixture, "ClippersWidget: Clipper is set on new patient", "[unit][gui][widget]")
+//TEST_CASE_METHOD(cxtest::ManageClippersWidgetFixture, "ClippersWidget: Clipper is set on new patient", "[unit][gui][widget][clip]")
 //{
 //	cxtest::SessionStorageTestFixture storageFixture;
 //	storageFixture.createSessions();
@@ -154,7 +203,7 @@ TEST_CASE_METHOD(cxtest::ClippersWidgetFixture, "ClippersWidget: New patient get
 //	REQUIRE_FALSE(this->mClipperSelector->getValue().isEmpty());
 //}
 
-//TEST_CASE_METHOD(cxtest::ClippersWidgetFixture, "ClippersWidget: New clipper name is saved/loaded", "[unit][gui][widget]")
+//TEST_CASE_METHOD(cxtest::ManageClippersWidgetFixture, "ClippersWidget: New clipper name is saved/loaded", "[unit][gui][widget][clip]")
 //{
 //	cxtest::SessionStorageTestFixture storageFixture;
 //	storageFixture.createSessions();

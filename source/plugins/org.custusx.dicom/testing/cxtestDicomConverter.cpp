@@ -239,6 +239,7 @@ TEST_CASE("DicomConverter: Convert Kaisa", "[integration][plugins][org.custusx.d
 }
 
 
+#ifdef CX_CUSTUS_SINTEF
 TEST_CASE("DicomConverter: US data from SW, missing position data", "[integration][plugins][org.custusx.dicom]")
 {
     //Transform matrix should be identity and not zero
@@ -261,3 +262,4 @@ TEST_CASE("DicomConverter: US data from SW, missing position data", "[integratio
     fixture.checkImagesEqual(referenceImage, referenceImage); //
     fixture.checkImagesEqual(convertedImage, referenceImage);
 }
+#endif

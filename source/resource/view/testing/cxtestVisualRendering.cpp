@@ -166,8 +166,9 @@ TEST_CASE("Visual rendering: Empty QVTKWidget",
     cxtest::Utilities::sleep_sec(3);
 }
 
+//Moved to unstable, as test sometimes fail
 TEST_CASE("Visual rendering: Empty view",
-		  "[unit][resource][visualization]")
+		  "[unstable][resource][visualization]")
 {
 	cxtest::ViewsFixture fixture;
 
@@ -182,8 +183,9 @@ TEST_CASE("Visual rendering: Empty view",
 
 }
 
+//Moved to unstable, as test sometimes fail
 TEST_CASE("Visual rendering: Several empty views in a sequence.",
-		  "[unit][resource][visualization]")
+		  "[unstable][resource][visualization]")
 {
 	int numberOfIterations = 2;
 	for (unsigned i=0; i<numberOfIterations; ++i)

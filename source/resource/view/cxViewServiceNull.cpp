@@ -100,4 +100,9 @@ LayoutRepositoryPtr ViewServiceNull::getLayoutRepository() { return LayoutReposi
 CameraControlPtr ViewServiceNull::getCameraControl() { return CameraControlPtr(); }
 QActionGroup* ViewServiceNull::createInteractorStyleActionGroup() { return mActionGroup; }
 
+cx::ClippersPtr cx::ViewServiceNull::getClippers()
+{
+	return ClippersPtr();
+}
+
 } //cx

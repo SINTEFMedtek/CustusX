@@ -725,7 +725,7 @@ unsigned char anisotropicFilter(__local const close_plane_t *pixels, int n_plane
 	for(int i = 0; i < n_planes; i++)
 	{
 		float tmp = CLOSE_PLANE_IDX(pixels, i).intensity - mean_value;
-		variance += mad(tmp, tmp, variance);
+        variance = mad(tmp, tmp, variance);
 	}
 
 	// We want high variance regions to have a sharp weight function

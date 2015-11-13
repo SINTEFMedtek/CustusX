@@ -29,75 +29,47 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXSTRINGPROPERTYSELECTTOOL_H
-#define CXSTRINGPROPERTYSELECTTOOL_H
 
-#include "cxResourceExport.h"
+#ifndef CXSELECTCLIPPERSFORDATAWIDGET_H
+#define CXSELECTCLIPPERSFORDATAWIDGET_H
 
-#include "cxStringPropertyBase.h"
+#include "cxGuiExport.h"
+
+#include "cxBaseWidget.h"
 #include "cxForwardDeclarations.h"
-
-/**
- * \file
- * \addtogroup cx_resource_core_properties
- * @{
- */
+class QTableWidget;
 
 namespace cx
 {
-
-typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
-
-/**
- * \brief Adapter that selects and stores a tool.
- * The tool is stored internally in the adapter.
- * Use setValue/getValue plus changed() to access it.
+/**\brief Turn clippers on/off for a spesific data structure.
  *
+ *  \date 02 Nov, 2015
+ *  \author Ole Vegard Solberg, SINTEF
  */
-class cxResource_EXPORT StringPropertySelectTool : public StringPropertyBase
+class cxGui_EXPORT SelectClippersForDataWidget: public BaseWidget
 {
-  Q_OBJECT
+	Q_OBJECT
+	void createDataCheckBox(int row, QString clipperName);
+	QCheckBox *createCheckBox(QString clipperName);
+	void addDataToClippers();
+	void updateHeading();
 public:
-  static StringPropertySelectToolPtr New(TrackingServicePtr trackingService)
-  {
-	  return StringPropertySelectToolPtr(new StringPropertySelectTool(trackingService));
-  }
-  StringPropertySelectTool(TrackingServicePtr trackingService);
-  virtual ~StringPropertySelectTool() {}
-
-  void setHelp(QString help);
-  void setValueName(QString name);
-
-public: // basic methods
-  virtual QString getDisplayName() const;
-  virtual bool setValue(const QString& value);
-  virtual QString getValue() const;
-
-  virtual QStringList getValueRange() const;
-  virtual QString convertInternal2Display(QString internal);
-
-public: // optional methods
-  virtual QString getHelp() const;
-
-public: // interface extension
-  ToolPtr getTool() const;
-
-  void provideActiveTool(bool on);
-  void setActiveTool();
-private:
-  TrackingServicePtr mTrackingService;
-  QString mValueName;
-  QString mHelp;
-  ToolPtr mTool;
-  bool mProvideActiveTool;
-  bool mActiveToolSelected;
-  const QString mActiveToolName;
+	SelectClippersForDataWidget(VisServicesPtr services, QWidget *parent);
+protected slots:
+	void clipDataClicked(bool checked);
+	void updateCheckboxesFromClippers();
+protected:
+	VisServicesPtr mServices;
+	ActiveDataPtr mActiveData;
+	QVBoxLayout* mLayout;
+	QLabel *mHeading;
+	QTableWidget *mClipperTableWidget;
+	QMap<QString, QCheckBox*> mDataCheckBoxes;
+	void createNewCheckBoxesBasedOnClippers();
+	void initUI();
+	void setupClipperSelectorUI();
 };
 
-} // namespace cx
+}//cx
 
-/**
- * @}
- */
-
-#endif // CXSTRINGPROPERTYSELECTTOOL_H
+#endif // CXSELECTCLIPPERSFORDATAWIDGET_H
