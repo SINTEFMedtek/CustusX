@@ -50,6 +50,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkUnsignedCharArray.h"
 #include <QPainter>
 #include "cxVolumeHelpers.h"
+#include "vtkImageImport.h"
+#include <QTime>
 
 namespace cx
 {
@@ -62,7 +64,7 @@ ViewCollectionImageWriter::ViewCollectionImageWriter(ViewCollectionWidget* widge
 
 vtkImageDataPtr ViewCollectionImageWriter::grab()
 {
-	std::vector<ViewPtr> views = mWidget->getViews();
+    std::vector<ViewPtr> views = mWidget->getViews();
     Eigen::Array3i target_size(mWidget->width(), mWidget->height(), 1);
     vtkImageDataPtr target = generateVtkImageData(target_size, Vector3D(1,1,1), 150, 3);
 
@@ -94,17 +96,63 @@ void ViewCollectionImageWriter::drawImageAtPos(vtkImageDataPtr target, vtkImageD
 
 }
 
+// the vtk canonical way
+//vtkImageDataPtr ViewCollectionImageWriter::view2vtkImageData(ViewPtr view)
+//{
+//    Eigen::Array4d vp(view->getRenderer()->GetViewport());
+//	vtkWindowToImageFilterPtr w2i = vtkWindowToImageFilterPtr::New();
+//    w2i->ShouldRerenderOff();
+//	w2i->SetInput(view->getRenderWindow());
+//	w2i->SetViewport(vp.data());
+//	w2i->SetReadFrontBuffer(false);
+//    CX_LOG_CHANNEL_DEBUG("CA") << "   - 2";
+//    w2i->Update();
+//    CX_LOG_CHANNEL_DEBUG("CA") << "   - 3 -upd";
+//    vtkImageDataPtr image = w2i->GetOutput();
+//    return image;
+//}
+
+// alternative to vtkWindowToImageFilter, effectively reimplementing parts of that filter (for debugging speed)
 vtkImageDataPtr ViewCollectionImageWriter::view2vtkImageData(ViewPtr view)
 {
-	Eigen::Array4d vp(view->getRenderer()->GetViewport());
-	vtkWindowToImageFilterPtr w2i = vtkWindowToImageFilterPtr::New();
-	w2i->SetInput(view->getRenderWindow());
-	w2i->SetViewport(vp.data());
-	w2i->SetReadFrontBuffer(false);
-	w2i->Update();
-	vtkImageDataPtr image = w2i->GetOutput();
-	return image;
+	vtkRenderWindowPtr renderWindow = view->getRenderWindow();
+	vtkRendererPtr renderer = view->getRenderer();
+    Eigen::Array4d vp(renderer->GetViewport()); // need the viewport in pixels
+
+    Eigen::Array2i origin(renderer->GetOrigin());
+    Eigen::Array2i size(renderer->GetSize());
+    Eigen::Array<int,6,1> extent;
+    extent[0] = 0;
+    extent[1] = size[0]-1;
+    extent[2] = 0;
+    extent[3] = size[1]-1;
+    extent[4] = 0;
+    extent[5] = 0;
+    int frontBuffer = false;
+
+    unsigned char *pixels;
+//    QTime qtimer = QTime::currentTime();
+
+//    CX_LOG_CHANNEL_DEBUG("CA") << "   renderWindow->GetPixelData0";
+    renderWindow->MakeCurrent();
+//    CX_LOG_CHANNEL_DEBUG("CA") << "   after makecurrent";
+    pixels = renderWindow->GetPixelData(origin[0], origin[1], origin[0]+size[0]-1, origin[1]+size[1]-1, frontBuffer);
+//    CX_LOG_CHANNEL_DEBUG("CA") << "   renderWindow->GetPixelData2";
+
+//    std::cout << "ViewCollectionImageWriter::view2vtkImageData qtimer ms=" << qtimer.msecsTo(QTime::currentTime()) << std::endl;
+
+    typedef vtkSmartPointer<vtkImageImport> vtkImageImportPtr;
+    vtkImageImportPtr import = vtkImageImportPtr::New();
+    import->SetDataScalarTypeToUnsignedChar();
+    import->SetNumberOfScalarComponents(3);
+    import->SetDataExtent(extent.data());
+    import->SetWholeExtent(extent.data());
+    bool takeOwnership = true;
+    import->SetImportVoidPointer(pixels, !takeOwnership);
+    import->Update();
+    return import->GetOutput();
 }
+
 
 QImage ViewCollectionImageWriter::vtkImageData2QImage(vtkImageDataPtr input)
 {

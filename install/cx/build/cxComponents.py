@@ -540,13 +540,16 @@ class QHttpServer(CppComponent):
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def _rawCheckout(self):
-        self._getBuilder().gitClone('git@github.com:SINTEFMedtek/qhttpserver.git %s' % self.sourceFolder())
+        self._getBuilder().gitClone('%s %s' % (self._getRepo(), self.sourceFolder()))
     def update(self):
-        self._getBuilder().gitCheckout('5eb5a89f23a3948162bf8fcaa94363777d723482') # latest tested SHA
+        self._getBuilder().gitSetRemoteURL(self._getRepo(), branch='master')
+        self._getBuilder().gitCheckout('37e8a7a993d3636707d5b7cb8826cd1dba12432a') # latest tested SHA
 #    def configure(self):
 #        builder = self._getBuilder()
 #        changeDir(self.buildPath())
 #        shell.run('qmake %s' % self.sourcePath())
+    def _getRepo(self):
+        return 'git@github.com:SINTEFMedtek/qhttpserver.git'
     def configure(self):
         builder = self._getBuilder()
         builder.configureCMake()    
