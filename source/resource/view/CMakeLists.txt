@@ -5,7 +5,6 @@
 cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
     View/cxView
     View/cxViewCollectionWidget
-	View/cxViewCollectionVideoSource
 
     View/internal/cxViewRepCollection
     View/internal/ViewMixed/cxViewCollectionWidgetMixed
@@ -79,6 +78,7 @@ endif()
 
 cx_add_class( CX_RESOURCE_VISUALIZATION_FILES
     View/cxLayoutData
+	View/cxViewCollectionVideoSource
     View/internal/cxViewUtilities
     View/internal/ViewWidget/cxViewCache.h
     View/internal/ViewWidget/cxViewLinkingViewWidget

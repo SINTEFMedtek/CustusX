@@ -1,7 +1,8 @@
 project(org_custusx_webserver)
 
 find_package(Qt5Network REQUIRED)
-find_package(QHttpServer REQUIRED)
+find_package(qhttpserver REQUIRED)
+#message(STATUS "qhttpserver: " ${qhttpserver_DIR} ", " ${qhttpserver_FOUND})
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
@@ -12,8 +13,6 @@ set(PLUGIN_SRCS
   cxRemoteAPI.cpp
   cxLayoutVideoSource.cpp
 )
-
-include_directories(/opt/local/Library/Frameworks/QtNetwork.framework/Headers/)
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
@@ -40,7 +39,7 @@ set(PLUGIN_target_libraries
     cxPluginUtilities
 	cxResource
 	cxResourceVisualization
-	${QHTTPSERVERCPP_LIBRARY_DIRS}
+	qhttpserver
     )
 
 set(PLUGIN_OUTPUT_DIR "")
@@ -64,7 +63,6 @@ target_include_directories(org_custusx_webserver
     PUBLIC
     .
     ${CMAKE_CURRENT_BINARY_DIR}
-    ${QHTTPSERVERCPP_INCLUDE_DIR}
 )
 
 

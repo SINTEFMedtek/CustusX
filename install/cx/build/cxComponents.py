@@ -279,27 +279,6 @@ class OpenCV(CppComponent):
         builder.configureCMake()
 # ---------------------------------------------------------
 
-class QHTTPServer(CppComponent):
-    def name(self):
-        return "QHTTPServer"
-    def help(self):
-        return 'https://github.com/nikhilm/qhttpserver'
-    def path(self):
-        return self.controlData.getExternalPath() + "/QHTTPServer"
-    def getBuildType(self):
-        return self.controlData.getBuildExternalsType()
-    def _rawCheckout(self):
-        self._getBuilder().gitClone('git@github.com:SINTEFMedtek/qhttpserver.git', 'QHTTPServer')
-    def update(self):
-        self._getBuilder().gitCheckout('master')
-    def configure(self):
-        builder = self._getBuilder()
-        add = builder.addCMakeOption
-        add('BUILD_TESTING:BOOL', False)
-        add('BUILD_EXAMPLES:BOOL', False)
-        builder.configureCMake()
-# ---------------------------------------------------------
-
 class Eigen(CppComponent):
     def name(self):
         return "eigen"
@@ -558,31 +537,30 @@ class QHttpServer(CppComponent):
         return 'https://github.com/nikhilm/qhttpserver'
     def path(self):
         return self.controlData.getExternalPath() + "/QHttpServer"
-    def sourceFolder(self):
-        return 'QHttpServer'
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def _rawCheckout(self):
         self._getBuilder().gitClone('git@github.com:SINTEFMedtek/qhttpserver.git %s' % self.sourceFolder())
     def update(self):
         self._getBuilder().gitCheckout('5eb5a89f23a3948162bf8fcaa94363777d723482') # latest tested SHA
-    def configure(self):
-        builder = self._getBuilder()
-        changeDir(self.buildPath())
-        shell.run('qmake %s' % self.sourcePath())
+#    def configure(self):
+#        builder = self._getBuilder()
+#        changeDir(self.buildPath())
+#        shell.run('qmake %s' % self.sourcePath())
     def configure(self):
         builder = self._getBuilder()
         builder.configureCMake()    
-    def build(self):
-        changeDir(self.buildPath())
-        shell.run('make')
-    def makeClean(self):
-        changeDir(self.buildPath())
-        shell.run('make clean')
+#    def build(self):
+#        changeDir(self.buildPath())
+#        shell.run('make')
+#    def makeClean(self):
+#        changeDir(self.buildPath())
+#        shell.run('make clean')
     def addConfigurationToDownstreamLib(self, builder):
         add = builder.addCMakeOption
-        add('QHTTPSERVERCPP_LIBRARY_DIR:PATH', self.buildPath()+'/lib')
-        add('QHTTPSERVERCPP_INCLUDE_DIR:PATH', self.sourcePath()+'/src')
-        add('QHttpServer_ROOT_DIR:PATH', self.path())
+        add('qhttpserver_DIR:PATH', self.buildPath())
+        #add('QHTTPSERVERCPP_LIBRARY_DIR:PATH', self.buildPath()+'/lib')
+        #add('QHTTPSERVERCPP_INCLUDE_DIR:PATH', self.sourcePath()+'/src')
+        #add('QHttpServer_ROOT_DIR:PATH', self.path())
         #add('CX_PLUGIN_org.custusx.filter.levelset:BOOL', platform.system() == 'Linux');
 
