@@ -42,6 +42,7 @@ LayoutVideoSource::LayoutVideoSource(ViewCollectionWidget* widget) :
     mWidget(widget),
     mStreaming(false)
 {
+	CX_ASSERT(widget);
     connect(mWidget.data(), &ViewCollectionWidget::rendered, this, &LayoutVideoSource::onRendered);
 }
 
