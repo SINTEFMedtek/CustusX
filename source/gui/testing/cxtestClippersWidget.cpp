@@ -98,7 +98,7 @@ public:
 	}
 };
 
-TEST_CASE("VisServices: Init default clippers", "[unit][gui][widget]")
+TEST_CASE("VisServices: Init default clippers", "[unit][gui][widget][clip]")
 {
 	ManageClippersWidgetTestHelper helper;
 
@@ -109,13 +109,13 @@ TEST_CASE("VisServices: Init default clippers", "[unit][gui][widget]")
 	REQUIRE(clippers->size() == 6);
 }
 
-TEST_CASE_METHOD(cxtest::ClippersFixture, "Clippers: Init default clippers", "[unit][gui][widget]")
+TEST_CASE_METHOD(cxtest::ClippersFixture, "Clippers: Init default clippers", "[unit][gui][widget][clip]")
 {
 	REQUIRE(this->getInitialClipperNames().size() == 6);
 	REQUIRE(this->size() == 6);
 }
 
-TEST_CASE("ClippersWidget: Select clipper", "[unit][gui][widget]")
+TEST_CASE("ClippersWidget: Select clipper", "[unit][gui][widget][clip]")
 {
 	ManageClippersWidgetTestHelper helper;
 	helper.services->view()->getClippers()->importList(QString());//Init with default clippers
@@ -137,7 +137,7 @@ TEST_CASE("ClippersWidget: Select clipper", "[unit][gui][widget]")
 	REQUIRE(helper.fixture->getCurrentClipper());
 }
 
-TEST_CASE("ClippersWidget: Create new clipper", "[unit][gui][widget]")
+TEST_CASE("ClippersWidget: Create new clipper", "[unit][gui][widget][clip]")
 {
 	ManageClippersWidgetTestHelper helper;
 	ManageClippersWidgetFixturePtr fixture = helper.fixture;
@@ -152,7 +152,7 @@ TEST_CASE("ClippersWidget: Create new clipper", "[unit][gui][widget]")
 	CHECK(fixture->getClipperSelector()->getValueRange().size() == numClippers);
 }
 
-TEST_CASE("ClippersWidget: Automatic naming of new clipper", "[unit][gui][widget]")
+TEST_CASE("ClippersWidget: Automatic naming of new clipper", "[unit][gui][widget][clip]")
 {
 	ManageClippersWidgetTestHelper helper;
 	ManageClippersWidgetFixturePtr fixture = helper.fixture;
@@ -172,7 +172,7 @@ TEST_CASE("ClippersWidget: Automatic naming of new clipper", "[unit][gui][widget
 	CHECK(clipperName3.endsWith("3"));
 }
 
-TEST_CASE("ClippersWidget: Load clipper names", "[unit][gui][widget]")
+TEST_CASE("ClippersWidget: Load clipper names", "[unit][gui][widget][clip]")
 {
 	ManageClippersWidgetTestHelper helper;
 
@@ -183,7 +183,7 @@ TEST_CASE("ClippersWidget: Load clipper names", "[unit][gui][widget]")
 	CHECK(clipperName.length() > 1);
 }
 
-TEST_CASE("ClippersWidget: New patient gets default clippers", "[unit][gui][widget]")
+TEST_CASE("ClippersWidget: New patient gets default clippers", "[unit][gui][widget][clip]")
 {
 	cxtest::SessionStorageTestFixture storageFixture;
 	ManageClippersWidgetFixturePtr fixture = ManageClippersWidgetFixturePtr(new ManageClippersWidgetFixture(storageFixture.mServices));
@@ -194,7 +194,7 @@ TEST_CASE("ClippersWidget: New patient gets default clippers", "[unit][gui][widg
 	CHECK(range.size() == 6);
 }
 
-//TEST_CASE_METHOD(cxtest::ManageClippersWidgetFixture, "ClippersWidget: Clipper is set on new patient", "[unit][gui][widget]")
+//TEST_CASE_METHOD(cxtest::ManageClippersWidgetFixture, "ClippersWidget: Clipper is set on new patient", "[unit][gui][widget][clip]")
 //{
 //	cxtest::SessionStorageTestFixture storageFixture;
 //	storageFixture.createSessions();
@@ -203,7 +203,7 @@ TEST_CASE("ClippersWidget: New patient gets default clippers", "[unit][gui][widg
 //	REQUIRE_FALSE(this->mClipperSelector->getValue().isEmpty());
 //}
 
-//TEST_CASE_METHOD(cxtest::ManageClippersWidgetFixture, "ClippersWidget: New clipper name is saved/loaded", "[unit][gui][widget]")
+//TEST_CASE_METHOD(cxtest::ManageClippersWidgetFixture, "ClippersWidget: New clipper name is saved/loaded", "[unit][gui][widget][clip]")
 //{
 //	cxtest::SessionStorageTestFixture storageFixture;
 //	storageFixture.createSessions();

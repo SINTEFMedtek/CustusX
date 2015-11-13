@@ -112,10 +112,13 @@ InteractiveClipperPtr Clippers::getClipper(QString clipperName)
 
 void Clippers::add(QString clipperName, InteractiveClipperPtr clipper)
 {
+	if(!clipper)
+		return;
 	if(!this->exists(clipperName))
 	{
 		mClippers[clipperName] = clipper;
 		mClipperList << clipperName;
+		connect(clipper.get(), &InteractiveClipper::changed, this, &Clippers::changed);
 	}
 	else
 		CX_LOG_WARNING() << "Cannot add clipper: " << clipperName << " already exists";
@@ -123,10 +126,17 @@ void Clippers::add(QString clipperName, InteractiveClipperPtr clipper)
 
 void Clippers::remove(QString clipperName)
 {
+	if(this->exists(clipperName))
+	{
+		InteractiveClipperPtr clipper = mClippers[clipperName];
+		disconnect(clipper.get(), &InteractiveClipper::changed, this, &Clippers::changed);
+	}
+
 	mClippers.erase(clipperName);
 	int index = mClipperList.indexOf(clipperName);
 	if(index >= 0)
 		mClipperList.removeAt(index);
+	emit changed();
 }
 
 bool Clippers::exists(QString clipperName)

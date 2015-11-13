@@ -156,6 +156,7 @@ void SelectClippersForDataWidget::addDataToClippers()
 	ClippersPtr clippers = mServices->view()->getClippers();
 	DataPtr activeData = mActiveData->getActive<Data>();
 
+	clippers->blockSignals(true);
 	QMap<QString, QCheckBox*>::const_iterator iter = mDataCheckBoxes.constBegin();
 	 while (iter != mDataCheckBoxes.constEnd())
 	 {
@@ -167,6 +168,7 @@ void SelectClippersForDataWidget::addDataToClippers()
 			 clipper->removeData(activeData);
 		 ++iter;
 	 }
+	 clippers->blockSignals(false);
 }
 }//cx
 

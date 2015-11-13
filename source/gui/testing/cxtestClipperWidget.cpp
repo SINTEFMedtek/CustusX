@@ -153,14 +153,14 @@ public:
 };
 
 
-TEST_CASE_METHOD(cxtest::ClipperWidgetFixture, "ClipperWidget: Set clipper", "[unit][gui][widget]")
+TEST_CASE_METHOD(cxtest::ClipperWidgetFixture, "ClipperWidget: Set clipper", "[unit][gui][widget][clip]")
 {
 	CHECK_FALSE(mClipper);
 	this->setClipper(testClipper);
 	CHECK(mClipper);
 }
 
-TEST_CASE_METHOD(cxtest::ClipperWidgetFixture, "ClipperWidget: Enable clipper", "[unit][gui][widget]")
+TEST_CASE_METHOD(cxtest::ClipperWidgetFixture, "ClipperWidget: Enable clipper", "[unit][gui][widget][clip]")
 {
 	this->setClipper(testClipper);
 	this->mUseClipperCheckBox->setChecked(true);
@@ -179,7 +179,7 @@ TEST_CASE_METHOD(cxtest::ClipperWidgetFixture, "ClipperWidget: Enable clipper", 
 	CHECK_FALSE(mUseClipperCheckBox->isChecked());
 }
 
-TEST_CASE("ClipperWidget: Insert data", "[unit][gui][widget]")
+TEST_CASE("ClipperWidget: Insert data", "[unit][gui][widget][clip]")
 {
 	SessionStorageHelper helper;
 	helper.createTestPatient();
@@ -204,7 +204,7 @@ TEST_CASE("ClipperWidget: Insert data", "[unit][gui][widget]")
 	CHECK(fixture->getCheckBoxes().size() == 3);
 }
 
-TEST_CASE("ClipperWidget: Turn clipping on/off for a mesh", "[unit][gui][widget]")
+TEST_CASE("ClipperWidget: Turn clipping on/off for a mesh", "[unit][gui][widget][clip]")
 {
 	SessionStorageHelper helper;
 	helper.createTestPatientWithData();
@@ -233,7 +233,7 @@ TEST_CASE("ClipperWidget: Turn clipping on/off for a mesh", "[unit][gui][widget]
 	REQUIRE(clipPlanes.size() == 0);
 }
 
-TEST_CASE("ClipperWidget: Remember clipping in mesh when changing clipper", "[unit][gui][widget]")
+TEST_CASE("ClipperWidget: Remember clipping in mesh when changing clipper", "[unit][gui][widget][clip]")
 {
 	SessionStorageHelper helper;
 	helper.createTestPatientWithData();
@@ -263,7 +263,7 @@ TEST_CASE("ClipperWidget: Remember clipping in mesh when changing clipper", "[un
 	CHECK(checkBox->isChecked());
 }
 
-TEST_CASE("ClipperWidget: Data type selector can turn images on/off", "[unit][gui][widget]")
+TEST_CASE("ClipperWidget: Data type selector can turn images on/off", "[unit][gui][widget][clip]")
 {
 	SessionStorageHelper helper;
 	helper.createTestPatientWithData();
@@ -281,7 +281,7 @@ TEST_CASE("ClipperWidget: Data type selector can turn images on/off", "[unit][gu
 	CHECK(fixture->getDataMap().size() == 3);
 }
 
-TEST_CASE("ClipperWidget: Select all data checks mesh checkbox", "[unit][gui][widget]")
+TEST_CASE("ClipperWidget: Select all data checks mesh checkbox", "[unit][gui][widget][clip]")
 {
 	SessionStorageHelper helper;
 	helper.createTestPatientWithData();
@@ -298,7 +298,7 @@ TEST_CASE("ClipperWidget: Select all data checks mesh checkbox", "[unit][gui][wi
 	CHECK(checkBox->isChecked());
 }
 
-TEST_CASE("ClipperWidget: Select all data is unchecked when mesh is unchecked", "[unit][gui][widget]")
+TEST_CASE("ClipperWidget: Select all data is unchecked when mesh is unchecked", "[unit][gui][widget][clip]")
 {
 	SessionStorageHelper helper;
 	helper.createTestPatientWithData();
@@ -313,7 +313,7 @@ TEST_CASE("ClipperWidget: Select all data is unchecked when mesh is unchecked", 
 	REQUIRE_FALSE(fixture->getSelectAllData()->isChecked());
 }
 
-TEST_CASE("ClipperWidget: Select all data is updated when changing clipper", "[unit][gui][widget]")
+TEST_CASE("ClipperWidget: Select all data is updated when changing clipper", "[unit][gui][widget][clip]")
 {
 	SessionStorageHelper helper;
 	helper.createTestPatientWithData();
@@ -333,7 +333,7 @@ TEST_CASE("ClipperWidget: Select all data is updated when changing clipper", "[u
 	CHECK(fixture->getSelectAllData()->isChecked());
 }
 
-TEST_CASE_METHOD(cxtest::ClipperWidgetFixture, "ClipperWidget: Attach to tool on/off", "[unit][gui][widget]")
+TEST_CASE_METHOD(cxtest::ClipperWidgetFixture, "ClipperWidget: Attach to tool on/off", "[unit][gui][widget][clip]")
 {
 	this->setClipper(testClipper);
 	REQUIRE(mAttachedToTool->isChecked());
@@ -341,7 +341,7 @@ TEST_CASE_METHOD(cxtest::ClipperWidgetFixture, "ClipperWidget: Attach to tool on
 	REQUIRE_FALSE(mAttachedToTool->isChecked());
 }
 
-TEST_CASE("InteractiveClipper: Attach to tool/no tool updates all SliceProxy objects", "[unit][gui][widget]")
+TEST_CASE("InteractiveClipper: Attach to tool/no tool updates all SliceProxy objects", "[unit][gui][widget][clip]")
 {
 	cx::LogicManager::initialize();
 
@@ -367,7 +367,7 @@ TEST_CASE("InteractiveClipper: Attach to tool/no tool updates all SliceProxy obj
 	cx::LogicManager::shutdown();
 }
 
-TEST_CASE("ClipperWidget: Active tool selected as default", "[unit][gui][widget]")
+TEST_CASE("ClipperWidget: Active tool selected as default", "[unit][gui][widget][clip]")
 {
 	SessionStorageHelper helper;
 	ClipperWidgetFixturePtr fixture = ClipperWidgetFixturePtr(new cxtest::ClipperWidgetFixture(helper.getServices()));
@@ -378,7 +378,7 @@ TEST_CASE("ClipperWidget: Active tool selected as default", "[unit][gui][widget]
 	REQUIRE(tool == activeTool);
 }
 
-TEST_CASE("ClipperWidget: Select tool other than active works", "[unit][gui][widget]")
+TEST_CASE("ClipperWidget: Select tool other than active works", "[unit][gui][widget][clip]")
 {
 	SessionStorageHelper helper;
 	ClipperWidgetFixturePtr fixture = ClipperWidgetFixturePtr(new cxtest::ClipperWidgetFixture(helper.getServices()));
@@ -397,7 +397,7 @@ TEST_CASE("ClipperWidget: Select tool other than active works", "[unit][gui][wid
 	REQUIRE(tool == helper.getServices()->tracking()->getTool(toolName));
 }
 
-TEST_CASE("ClipperWidget: Select active tool works", "[unit][gui][widget]")
+TEST_CASE("ClipperWidget: Select active tool works", "[unit][gui][widget][clip]")
 {
 	SessionStorageHelper helper;
 	ClipperWidgetFixturePtr fixture = ClipperWidgetFixturePtr(new cxtest::ClipperWidgetFixture(helper.getServices()));

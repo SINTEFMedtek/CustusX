@@ -96,13 +96,13 @@ struct SelectClippersForDataWidgetHelper
     SessionStorageHelper sessionHelper;
 };
 
-TEST_CASE("SelectClippersForDataWidget: Init", "[unit][gui][widget]")
+TEST_CASE("SelectClippersForDataWidget: Init", "[unit][gui][widget][clip]")
 {
 	SelectClippersForDataWidgetHelper helper;
 	REQUIRE(helper.fixture->getDataCheckBoxes().size() >= 6);
 }
 
-TEST_CASE("SelectClippersForDataWidget: Using checkboxes updates clippers", "[unit][gui][widget]")
+TEST_CASE("SelectClippersForDataWidget: Using checkboxes updates clippers", "[unit][gui][widget][clip]")
 {
 	SelectClippersForDataWidgetHelper helper;
 
@@ -119,13 +119,21 @@ TEST_CASE("SelectClippersForDataWidget: Using checkboxes updates clippers", "[un
 	REQUIRE_FALSE(clipper->exists(activeData));
 }
 
-TEST_CASE("SelectClippersForDataWidget: CheckBoxes are updated from clipper", "[unit][gui][widget]")
+TEST_CASE("SelectClippersForDataWidget: CheckBoxes are updated when clipper changes", "[unit][gui][widget][clip]")
 {
 	SelectClippersForDataWidgetHelper helper;
 
 	cx::DataPtr activeData = helper.getActiveData();
 	cx::InteractiveClipperPtr clipper = helper.getTestClipper();
+	QString clipperName = helper.getTestClipperName();
 	QMap<QString, QCheckBox*> dataCheckBoxes = helper.fixture->getDataCheckBoxes();
+
+	QCheckBox *dataCheckBox = dataCheckBoxes[clipperName];
+
+	REQUIRE_FALSE(dataCheckBox->isChecked());
+	clipper->addData(activeData);
+
+	REQUIRE(dataCheckBox->isChecked());
 }
 
 
