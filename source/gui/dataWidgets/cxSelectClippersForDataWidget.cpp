@@ -75,15 +75,6 @@ void SelectClippersForDataWidget::initUI()
 	this->createNewCheckBoxesBasedOnClippers();
 }
 
-void SelectClippersForDataWidget::updateHeading()
-{
-	DataPtr activeData = mActiveData->getActive<Data>();
-	if (activeData)
-		mHeading->setText("Active clippers for: " + activeData->getUid());
-	else
-		mHeading->setText("Active clippers");
-}
-
 void SelectClippersForDataWidget::setupClipperSelectorUI()
 {
 	ClippersPtr clippers = mServices->view()->getClippers();
@@ -131,7 +122,6 @@ QCheckBox *SelectClippersForDataWidget::createCheckBox(QString clipperName)
 
 void SelectClippersForDataWidget::updateCheckboxesFromClippers()
 {
-	this->updateHeading();
 	ClippersPtr clippers = mServices->view()->getClippers();
 	QStringList clipperNames = clippers->getClipperNames();
 	DataPtr activeData = mActiveData->getActive<Data>();

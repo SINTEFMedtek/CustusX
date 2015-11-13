@@ -52,7 +52,6 @@ class cxGui_EXPORT SelectClippersForDataWidget: public BaseWidget
 	void createDataCheckBox(int row, QString clipperName);
 	QCheckBox *createCheckBox(QString clipperName);
 	void addDataToClippers();
-	void updateHeading();
 public:
 	SelectClippersForDataWidget(VisServicesPtr services, QWidget *parent);
 protected slots:
