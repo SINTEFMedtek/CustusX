@@ -39,10 +39,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ctkPluginActivator.h>
 
 typedef boost::shared_ptr<class QObject> QObjectPtr;
-typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
 
 namespace cx
 {
+typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
+
 /**
  * Activator for the registration plugin
  *
