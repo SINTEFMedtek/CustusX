@@ -38,9 +38,12 @@ namespace cx
 
 void convertQtMessagesToCxMessages(QtMsgType type, const QMessageLogContext &, const QString &msg)
 {
-	MESSAGE_LEVEL level = mlINFO;
+	MESSAGE_LEVEL level;// = mlINFO;
 	switch (type)
 	{
+	case QtInfoMsg:
+		level = mlINFO;
+		break;
 	case QtDebugMsg:
 		level = mlDEBUG;
 		break;
@@ -53,6 +56,8 @@ void convertQtMessagesToCxMessages(QtMsgType type, const QMessageLogContext &, c
 	case QtFatalMsg:
 		level = mlERROR;
 		//abort(); here we hope for the best instead of aborting...
+	default:
+		level = mlINFO;
 	}
 
 	Message message("[QT] "+msg, level);
