@@ -73,6 +73,7 @@ public:
     virtual QString getActiveLayout(int widgetIndex) const;
 	virtual void setActiveLayout(const QString& uid, int widgetIndex);
 	virtual InteractiveClipperPtr getClipper();
+	virtual ClippersPtr getClippers();
 	virtual InteractiveCropperPtr getCropper();
 	virtual CyclicActionLoggerPtr getRenderTimer();
 	virtual NavigationPtr getNavigation();
@@ -95,6 +96,7 @@ private:
 	ctkPluginContext *mContext;
 	ViewManagerPtr mBase;
 	SessionStorageServicePtr mSession;
+	ClippersPtr mClippers;
 
 	ViewManager* viewManager() const { return mBase.get(); }
 };

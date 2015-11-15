@@ -73,6 +73,7 @@ public:
 
 	void addData(DataPtr data);
 	void removeData(DataPtr data);
+	bool exists(DataPtr data);
 	std::map<QString, DataPtr> getDatas();
 	void setTool(ToolPtr tool);
 	void useActiveTool(bool on);

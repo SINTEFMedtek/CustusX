@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogicManager.h"
 #include "cxSessionStorageServiceProxy.h"
 #include "cxPatientModelServiceProxy.h"
+#include "cxVisServices.h"
 
 namespace cxtest
 {
@@ -48,6 +49,7 @@ SessionStorageTestFixture::SessionStorageTestFixture() :
 	ctkPluginContext* context = cx::LogicManager::getInstance()->getPluginContext();
 	mSessionStorageService = cx::SessionStorageServiceProxy::create(context);
 	mPatientModelService = cx::PatientModelServiceProxy::create(context);
+	mServices = cx::VisServices::create(context);
 
 	mSession1 = QString("/temp/TestPatient1.cx3");
 	mSession2 = QString("/temp/TestPatient2.cx3");

@@ -51,6 +51,7 @@ typedef boost::shared_ptr<class ViewGroup> ViewGroupPtr;
 typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
 typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
 typedef boost::shared_ptr<class InteractiveCropper> InteractiveCropperPtr;
+typedef boost::shared_ptr<class Clippers> ClippersPtr;
 
 typedef boost::shared_ptr<class CyclicActionLogger> CyclicActionLoggerPtr;
 typedef boost::shared_ptr<class Navigation> NavigationPtr;
@@ -89,6 +90,7 @@ public:
 	virtual void setActiveLayout(const QString& uid, int widgetIndex=0) = 0;
 	virtual void deactivateLayout();
 	virtual InteractiveClipperPtr getClipper() = 0;
+	virtual ClippersPtr getClippers() = 0;
 	virtual InteractiveCropperPtr getCropper() = 0;
 	virtual CyclicActionLoggerPtr getRenderTimer() = 0;
 	virtual NavigationPtr getNavigation() = 0;

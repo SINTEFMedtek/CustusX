@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxXMLNodeWrapper.h"
 #include "cxLogger.h"
 #include "cxViewGroupData.h"
+#include "cxClippers.h"
 
 namespace cx
 {
@@ -51,6 +52,7 @@ ViewImplService::ViewImplService(ctkPluginContext *context) :
 	VisServicesPtr services = VisServices::create(context);
 	mSession = SessionStorageServiceProxy::create(mContext);
 	mBase = ViewManager::create(services);
+	mClippers = ClippersPtr(new Clippers(services));
 
 	if(!viewManager())
 		std::cout << "ViewImplService got no viewManager" << std::endl;
@@ -141,6 +143,11 @@ void ViewImplService::setActiveLayout(const QString& uid, int widgetIndex)
 InteractiveClipperPtr ViewImplService::getClipper()
 {
 	return viewManager()->getClipper();
+}
+
+ClippersPtr ViewImplService::getClippers()
+{
+	return this->mClippers;
 }
 
 InteractiveCropperPtr ViewImplService::getCropper()

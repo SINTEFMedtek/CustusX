@@ -193,4 +193,9 @@ QActionGroup* ViewServiceProxy::createInteractorStyleActionGroup()
 	return mViewService->createInteractorStyleActionGroup();
 }
 
+cx::ClippersPtr ViewServiceProxy::getClippers()
+{
+	return mViewService->getClippers();
+}
+
 } //cx

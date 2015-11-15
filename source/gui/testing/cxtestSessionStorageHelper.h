@@ -30,68 +30,31 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXMANAGECLIPPERSWIDGET_H
-#define CXMANAGECLIPPERSWIDGET_H
+#ifndef CXTESTSESSIONSTORAGEHELPER_H
+#define CXTESTSESSIONSTORAGEHELPER_H
 
-#include "cxGuiExport.h"
-
-#include "cxBaseWidget.h"
 #include "cxForwardDeclarations.h"
-#include "cxStringProperty.h"
-#include "cxTabbedWidget.h"
+#include "cxtestSessionStorageTestFixture.h"
 
-namespace cx
+namespace cxtest
 {
-typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
-typedef boost::shared_ptr<class Clippers> ClippersPtr;
-class ClipperWidget;
 
-/**
- * \brief Widget for displaying and changing clipper properties.
- * \ingroup cx_gui
- *
- *  \date 10 Nov, 2015
- *  \author Ole Vegard Solberg, SINTEF
- */
-class cxGui_EXPORT ClippingPropertiesWidget : public TabbedWidget
-{
-  Q_OBJECT
-public:
-	ClippingPropertiesWidget(VisServicesPtr services, QWidget* parent);
-  virtual ~ClippingPropertiesWidget() {}
-};
-
-//--------------------------------------
-
-/**\brief Widget for managing clippers.
+/**\brief Helper class providing a simple patient with data. Used by tests.
  *
  *  \date Oct, 2015
  *  \author Ole Vegard Solberg, SINTEF
  */
-class cxGui_EXPORT ManageClippersWidget: public BaseWidget
+class SessionStorageHelper
 {
-	Q_OBJECT
 public:
-	ManageClippersWidget(VisServicesPtr services, QWidget* parent);
+	void createTestPatient();
+	void createTestPatientWithData();
+	cx::VisServicesPtr getServices();
 
-protected:
-	VisServicesPtr mServices;
-	QVBoxLayout* mLayout;
-	StringPropertyPtr mClipperSelector;
-
-	InteractiveClipperPtr mCurrentClipper;
-	ClipperWidget *mClipperWidget;
-
-	void setupUI();
-//	void setupClipperUI();
-	void initClipperSelector();
-	QString getNameBaseOfCurrentClipper();
-	ClippersPtr getClippers();
-protected slots:
-	void newClipperButtonClicked();
-	void clipperChanged();
-private slots:
-	void clippersChanged();
+	SessionStorageTestFixture storageFixture;
+	TestDataStructures testData;
 };
-}//cx
-#endif // CXMANAGECLIPPERSWIDGET_H
+
+}//cxtest
+
+#endif // CXTESTSESSIONSTORAGEHELPER_H

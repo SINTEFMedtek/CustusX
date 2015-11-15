@@ -30,68 +30,46 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXMANAGECLIPPERSWIDGET_H
-#define CXMANAGECLIPPERSWIDGET_H
+#ifndef CXSELECTCLIPPERSFORDATAWIDGET_H
+#define CXSELECTCLIPPERSFORDATAWIDGET_H
 
 #include "cxGuiExport.h"
 
 #include "cxBaseWidget.h"
 #include "cxForwardDeclarations.h"
-#include "cxStringProperty.h"
-#include "cxTabbedWidget.h"
+class QTableWidget;
 
 namespace cx
 {
-typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
-typedef boost::shared_ptr<class Clippers> ClippersPtr;
-class ClipperWidget;
-
-/**
- * \brief Widget for displaying and changing clipper properties.
- * \ingroup cx_gui
+/**\brief Turn clippers on/off for a spesific data structure.
  *
- *  \date 10 Nov, 2015
+ *  \date 02 Nov, 2015
  *  \author Ole Vegard Solberg, SINTEF
  */
-class cxGui_EXPORT ClippingPropertiesWidget : public TabbedWidget
-{
-  Q_OBJECT
-public:
-	ClippingPropertiesWidget(VisServicesPtr services, QWidget* parent);
-  virtual ~ClippingPropertiesWidget() {}
-};
-
-//--------------------------------------
-
-/**\brief Widget for managing clippers.
- *
- *  \date Oct, 2015
- *  \author Ole Vegard Solberg, SINTEF
- */
-class cxGui_EXPORT ManageClippersWidget: public BaseWidget
+class cxGui_EXPORT SelectClippersForDataWidget: public BaseWidget
 {
 	Q_OBJECT
+	void createDataCheckBox(int row, QString clipperName);
+	QCheckBox *createCheckBox(QString clipperName);
+	void addDataToClippers();
+	void updateHeading();
 public:
-	ManageClippersWidget(VisServicesPtr services, QWidget* parent);
-
+	SelectClippersForDataWidget(VisServicesPtr services, QWidget *parent);
+protected slots:
+	void clipDataClicked(bool checked);
+	void updateCheckboxesFromClippers();
 protected:
 	VisServicesPtr mServices;
+	ActiveDataPtr mActiveData;
 	QVBoxLayout* mLayout;
-	StringPropertyPtr mClipperSelector;
-
-	InteractiveClipperPtr mCurrentClipper;
-	ClipperWidget *mClipperWidget;
-
-	void setupUI();
-//	void setupClipperUI();
-	void initClipperSelector();
-	QString getNameBaseOfCurrentClipper();
-	ClippersPtr getClippers();
-protected slots:
-	void newClipperButtonClicked();
-	void clipperChanged();
-private slots:
-	void clippersChanged();
+	QLabel *mHeading;
+	QTableWidget *mClipperTableWidget;
+	QMap<QString, QCheckBox*> mDataCheckBoxes;
+	void createNewCheckBoxesBasedOnClippers();
+	void initUI();
+	void setupClipperSelectorUI();
 };
+
 }//cx
-#endif // CXMANAGECLIPPERSWIDGET_H
+
+#endif // CXSELECTCLIPPERSFORDATAWIDGET_H

@@ -30,68 +30,30 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXMANAGECLIPPERSWIDGET_H
-#define CXMANAGECLIPPERSWIDGET_H
+#include "cxtestSessionStorageHelper.h"
+#include "cxPatientModelService.h"
+#include "cxVisServices.h"
+#include "cxLogicManager.h"
 
-#include "cxGuiExport.h"
-
-#include "cxBaseWidget.h"
-#include "cxForwardDeclarations.h"
-#include "cxStringProperty.h"
-#include "cxTabbedWidget.h"
-
-namespace cx
+namespace cxtest
 {
-typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
-typedef boost::shared_ptr<class Clippers> ClippersPtr;
-class ClipperWidget;
 
-/**
- * \brief Widget for displaying and changing clipper properties.
- * \ingroup cx_gui
- *
- *  \date 10 Nov, 2015
- *  \author Ole Vegard Solberg, SINTEF
- */
-class cxGui_EXPORT ClippingPropertiesWidget : public TabbedWidget
+void SessionStorageHelper::createTestPatient()
 {
-  Q_OBJECT
-public:
-	ClippingPropertiesWidget(VisServicesPtr services, QWidget* parent);
-  virtual ~ClippingPropertiesWidget() {}
-};
+	storageFixture.createSessions();
+	storageFixture.loadSession1();
+}
 
-//--------------------------------------
-
-/**\brief Widget for managing clippers.
- *
- *  \date Oct, 2015
- *  \author Ole Vegard Solberg, SINTEF
- */
-class cxGui_EXPORT ManageClippersWidget: public BaseWidget
+void SessionStorageHelper::createTestPatientWithData()
 {
-	Q_OBJECT
-public:
-	ManageClippersWidget(VisServicesPtr services, QWidget* parent);
+	createTestPatient();
+	storageFixture.mPatientModelService->insertData(testData.mesh1);
+	storageFixture.mPatientModelService->insertData(testData.image1);
+	storageFixture.mPatientModelService->insertData(testData.image2);
+}
 
-protected:
-	VisServicesPtr mServices;
-	QVBoxLayout* mLayout;
-	StringPropertyPtr mClipperSelector;
-
-	InteractiveClipperPtr mCurrentClipper;
-	ClipperWidget *mClipperWidget;
-
-	void setupUI();
-//	void setupClipperUI();
-	void initClipperSelector();
-	QString getNameBaseOfCurrentClipper();
-	ClippersPtr getClippers();
-protected slots:
-	void newClipperButtonClicked();
-	void clipperChanged();
-private slots:
-	void clippersChanged();
-};
-}//cx
-#endif // CXMANAGECLIPPERSWIDGET_H
+cx::VisServicesPtr SessionStorageHelper::getServices()
+{
+	return cx::VisServices::create(cx::logicManager()->getPluginContext());
+}
+} //cxtest
