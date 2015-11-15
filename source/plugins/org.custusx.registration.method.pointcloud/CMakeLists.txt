@@ -10,13 +10,14 @@ set(PLUGIN_SRCS
 	cxRMPCFromPointerService.cpp
 	cxRMPCWidget.cpp
 	cxRMPCFromPointerWidget.cpp
+
+	cxRMPCService.h
+	cxRMPCFromPointerService.h
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
     cxRMPCPluginActivator.h
-	cxRMPCService.h
-	cxRMPCFromPointerService.h
 	cxRMPCWidget.h
 	cxRMPCFromPointerWidget.h
 )
