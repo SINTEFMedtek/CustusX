@@ -30,52 +30,15 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXCLIPPERSWIDGET_H
-#define CXCLIPPERSWIDGET_H
-
-#include "cxGuiExport.h"
-
-#include "cxBaseWidget.h"
-#include "cxForwardDeclarations.h"
-#include "cxStringProperty.h"
+#include "cxOSXHelper.h"
+#include <Cocoa/Cocoa.h>
 
 namespace cx
 {
-typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
-typedef boost::shared_ptr<class Clippers> ClippersPtr;
-class ClipperWidget;
-
-//--------------------------------------
-
-/**\brief Widget for managing clippers.
- *
- *  \date Oct, 2015
- *  \author Ole Vegard Solberg, SINTEF
- */
-class cxGui_EXPORT ClippersWidget: public BaseWidget
+void disableGLHiDPI( long a_id )
 {
-	Q_OBJECT
-public:
-	ClippersWidget(VisServicesPtr services, QWidget* parent);
+     NSView* view = reinterpret_cast<NSView*>( a_id );
+     [view setWantsBestResolutionOpenGLSurface:NO];
+}
 
-protected:
-	VisServicesPtr mServices;
-	QVBoxLayout* mLayout;
-	StringPropertyPtr mClipperSelector;
-
-	ClippersPtr mClippers;
-	InteractiveClipperPtr mCurrentClipper;
-	ClipperWidget *mClipperWidget;
-
-	void setupUI();
-//	void setupClipperUI();
-	void initClipperSelector();
-	QString getNameBaseOfCurrentClipper();
-protected slots:
-	void newClipperButtonClicked();
-	void clipperChanged();
-private slots:
-	void clippersChanged();
-};
-}//cx
-#endif // CXCLIPPERSWIDGET_H
+} // namespace cx

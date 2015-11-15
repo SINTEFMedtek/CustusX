@@ -15,7 +15,7 @@ cx_add_class_qt_moc(cxGui_SRCS
     dataWidgets/cxShadingWidget
     dataWidgets/cxCroppingWidget
     dataWidgets/cxClippingWidget
-    dataWidgets/cxClippersWidget
+    dataWidgets/cxManageClippersWidget
     dataWidgets/cxClipperWidget
     dataWidgets/cxSlicePropertiesWidget
     dataWidgets/cxMeshInfoWidget

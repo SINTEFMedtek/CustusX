@@ -49,6 +49,7 @@ typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
 
 namespace cxtest
 {
+typedef boost::shared_ptr<class SessionStorageTestFixture> SessionStorageTestFixturePtr;
 
 struct TestDataStructures
 {

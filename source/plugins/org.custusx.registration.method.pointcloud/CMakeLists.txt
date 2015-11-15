@@ -3,8 +3,7 @@ project(org_custusx_registration_method_pointcloud)
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
 set(PLUGIN_SRCS
-    cxRMPCPluginActivator.h
-    cxRMPCPluginActivator.cpp
+	cxRMPCPluginActivator.cpp
 
 	cxRMPCService.cpp
 	cxRMPCFromPointerService.cpp
@@ -17,7 +16,7 @@ set(PLUGIN_SRCS
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
-    cxRMPCPluginActivator.h
+	cxRMPCPluginActivator.h
 	cxRMPCWidget.h
 	cxRMPCFromPointerWidget.h
 )

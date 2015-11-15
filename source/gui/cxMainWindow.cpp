@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxEraserWidget.h"
 #include "cxFiltersWidget.h"
 #include "cxPluginFrameworkWidget.h"
-#include "cxClippersWidget.h"
+#include "cxManageClippersWidget.h"
 
 namespace cx
 {
@@ -125,7 +125,7 @@ MainWindow::MainWindow() :
 	this->addAsDockWidget(new ToolManagerWidget(this), "Debugging");
 	this->addAsDockWidget(new PluginFrameworkWidget(this), "Browsing");
     this->addAsDockWidget(new FiltersWidget(VisServices::create(logicManager()->getPluginContext()), this), "Algorithms");
-	this->addAsDockWidget(new ClippersWidget(mServices, this), "Properties");
+	this->addAsDockWidget(new ManageClippersWidget(mServices, this), "Properties");
 
 	connect(patientService().get(), &PatientModelService::patientChanged, this, &MainWindow::patientChangedSlot);
 	connect(qApp, &QApplication::focusChanged, this, &MainWindow::focusChanged);
@@ -549,7 +549,7 @@ void MainWindow::aboutSlot()
 	QString doc_path = DataLocations::getDocPath();
 	QString appName = qApp->applicationDisplayName();
 	QString url_website = DataLocations::getWebsiteURL();
-	QString url_license = QString("file://%1/license.txt").arg(doc_path);
+	QString url_license = QString("file://%1/License.txt").arg(doc_path);
 	QString url_config = QString("file://%1/cxConfigDescription.txt").arg(doc_path);
 
 	QString text(""

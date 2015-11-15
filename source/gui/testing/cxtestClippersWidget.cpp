@@ -30,7 +30,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "catch.hpp"
-#include "cxClippersWidget.h"
+#include "cxManageClippersWidget.h"
 #include "cxClippers.h"
 #include "cxVisServices.h"
 #include "cxtestDirectSignalListener.h"
@@ -42,11 +42,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cxtest
 {
 
-class ClippersWidgetFixture : public cx::ClippersWidget
+class ClippersWidgetFixture : public cx::ManageClippersWidget
 {
 public:
 	ClippersWidgetFixture() :
-		ClippersWidget(cx::VisServices::getNullObjects(), NULL)
+		ManageClippersWidget(cx::VisServices::getNullObjects(), NULL)
 	{}
 };
 

@@ -32,10 +32,12 @@ private slots:
 
 private:
     Ur5RobotPtr mUr5Robot;
-    QTimer *inspiration, *expiration;
+    QTimer *inspiration, *expiration, *inspirationTiming, *expirationTiming;
     Eigen::RowVectorXd lungMovementTiming;
 
     std::vector<QString> mProgramQueue;
+
+    void stopTimers();
 };
 
 } // cx

@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QLayout>
 #include <vector>
 #include "cxTypeConversions.h"
+#include "cxOSXHelper.h"
 
 namespace cx
 {

@@ -76,6 +76,13 @@ if(CX_BUILD_MEHDI_VTKMULTIVOLUME)
         )
 endif()
 
+if (CX_APPLE)
+  set(CX_RESOURCE_VISUALIZATION_FILES
+    ${CX_RESOURCE_VISUALIZATION_FILES}
+    View/internal/cxOSXHelper.mm
+    )
+endif()
+
 cx_add_class( CX_RESOURCE_VISUALIZATION_FILES
     View/cxLayoutData
 	View/cxViewCollectionVideoSource
