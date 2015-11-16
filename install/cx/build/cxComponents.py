@@ -577,7 +577,7 @@ class QHttpServer(CppComponent):
         self._getBuilder().gitClone('%s %s' % (self._getRepo(), self.sourceFolder()))
     def update(self):
         self._getBuilder().gitSetRemoteURL(self._getRepo(), branch='master')
-        self._getBuilder().gitCheckout('37e8a7a993d3636707d5b7cb8826cd1dba12432a') # latest tested SHA
+        self._getBuilder().gitCheckout('5b7d7e15cfda2bb2097b6c0ceab99eeb50b4f639') # latest tested SHA
 #    def configure(self):
 #        builder = self._getBuilder()
 #        changeDir(self.buildPath())
