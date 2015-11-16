@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxBaseWidget.h"
 #include "cxStringPropertyBase.h"
 #include "cxForwardDeclarations.h"
+#include "cxData.h"
 class QTableWidget;
 
 namespace cx
@@ -53,17 +54,17 @@ class LabeledComboBoxWidget;
 class cxGui_EXPORT ClipperWidget : public BaseWidget
 {
 	Q_OBJECT
+	void updateCheckBoxFromClipper(QCheckBox *checkbox, DataPtr data);
 public:
 	ClipperWidget(VisServicesPtr services, QWidget *parent);
 	~ClipperWidget();
 	void setClipper(InteractiveClipperPtr clipper);
 protected slots:
-	void setClipPlaneInDatas();
 	void setupDataSelectorUI();
 	void enable(bool checked);
 	void dataTypeSelectorClicked(bool checked);
 	void selectAllTableData(bool checked);
-	void dataSelectorClicked(bool checked);
+	void dataSelectorClicked(QCheckBox *checkBox, DataPtr data);
 	void onToolChanged();
 protected:
 	void setupUI();
@@ -86,7 +87,6 @@ protected:
 	VisServicesPtr mServices;
 	std::map<QString, DataPtr> mDataToClip;
 	QTableWidget *mDataTableWidget;
-	QMap<QString, QCheckBox*> mCheckBoxes;
 	std::map<QString, DataPtr> getDatas();
 	bool mInitializedWithClipper;
 	StringPropertySelectToolPtr mToolSelector;
@@ -96,8 +96,7 @@ protected:
 	QLayout *planeLayout();
 	QLayout *toolLayout();
 	QString getDataTypeRegExp();
-	void removeAllClipPlanes();
-	void initCheckboxesBasedOnClipper();
+	void updateSelectAllCheckbox();
 	void createNewCheckboxesBasedOnData();
 };
 

@@ -30,6 +30,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
+#include "boost/bind.hpp"
 #include <QListWidget>
 #include <QTableWidget>
 #include <QGroupBox>
@@ -57,6 +58,7 @@ ClipperWidget::ClipperWidget(VisServicesPtr services, QWidget* parent) :
 {
 	this->setEnabled(false);
 	this->setupDataStructures();
+	createNewCheckboxesBasedOnData();
 
 	connect(mServices->patient().get(), &PatientModelService::dataAddedOrRemoved, this, &OptimizedUpdateWidget::setModified);
 }
@@ -93,7 +95,6 @@ void ClipperWidget::setupDataStructures()
 	mShowImages->setChecked(true);
 	mShowMeshes->setChecked(true);
 
-	//TODO: Need active tool in addition to tool list.
 	mToolSelector = StringPropertySelectTool::New(mServices->tracking());
 	mToolSelector->setValueName("Tool");
 	mToolSelector->provideActiveTool(true);
@@ -234,29 +235,25 @@ void ClipperWidget::setClipper(InteractiveClipperPtr clipper)
 	this->connectToNewClipper();
 }
 
-void ClipperWidget::initCheckboxesBasedOnClipper()
+void ClipperWidget::updateSelectAllCheckbox()
 {
-	int counter = 0;
-	std::map<QString, DataPtr> datas = mClipper->getDatas();
-	std::map<QString, DataPtr>::iterator iter = datas.begin();
-	for(; iter != datas.end(); ++iter)
-	{
-		if(mCheckBoxes.contains(iter->first))
-		{
-			++counter;
-			mCheckBoxes[iter->first]->setChecked(true);
-		}
-	}
-	if(counter == this->getDatas().size())
+	if(this->getDatas().size() == mClipper->getDatas().size())
 		mSelectAllData->setChecked(true);
 	else
 		mSelectAllData->setChecked(false);
 }
 
+void ClipperWidget::updateCheckBoxFromClipper(QCheckBox *checkbox, DataPtr data)
+{
+	if(!mClipper)
+		return;
+	std::map<QString, DataPtr> datas = mClipper->getDatas();
+	bool checked = datas.count(data->getUid());
+	checkbox->setChecked(checked);
+}
+
 void ClipperWidget::createNewCheckboxesBasedOnData()
 {
-	mCheckBoxes.clear();
-
 	std::map<QString, DataPtr> datas = this->getDatas();
 	std::map<QString, DataPtr>::iterator iter = datas.begin();
 
@@ -272,8 +269,9 @@ void ClipperWidget::createNewCheckboxesBasedOnData()
 		QTableWidgetItem *descriptionItem = new QTableWidgetItem(data->getName());
 		mDataTableWidget->setItem(row++, 1, descriptionItem);
 
-		connect(checkbox, &QCheckBox::clicked, this, &ClipperWidget::dataSelectorClicked);
-		mCheckBoxes[data->getUid()] = checkbox;
+		boost::function<void()> func = boost::bind(&ClipperWidget::dataSelectorClicked, this, checkbox, data);
+		connect(checkbox, &QCheckBox::clicked, this, func);
+		this->updateCheckBoxFromClipper(checkbox, data);
 	}
 }
 
@@ -287,7 +285,7 @@ void ClipperWidget::setupDataSelectorUI()
 
 	std::map<QString, DataPtr> datas = this->getDatas();
 
-	mDataTableWidget->setColumnCount(2);;
+	mDataTableWidget->setColumnCount(2);
 	mDataTableWidget->setRowCount(datas.size());
 
 	QStringList horizontalHeaders;
@@ -297,7 +295,7 @@ void ClipperWidget::setupDataSelectorUI()
 //	mDataTableWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);//test
 
 	createNewCheckboxesBasedOnData();
-	initCheckboxesBasedOnClipper();
+	updateSelectAllCheckbox();
 }
 
 QString ClipperWidget::getDataTypeRegExp()
@@ -324,60 +322,35 @@ std::map<QString, DataPtr> ClipperWidget::getDatas()
 	return datas;
 }
 
-void ClipperWidget::dataSelectorClicked(bool checked)
+void ClipperWidget::dataSelectorClicked(QCheckBox *checkBox, DataPtr data)
 {
-	if(!checked)
-		mSelectAllData->setChecked(false);
-	this->setClipPlaneInDatas();
-}
+	bool checked = checkBox->isChecked();
 
-void ClipperWidget::setClipPlaneInDatas()
-{
-	if(!mClipper)
-		return;
-	QMap<QString, QCheckBox*>::const_iterator iter = mCheckBoxes.constBegin();
-	 while (iter != mCheckBoxes.constEnd())
-	 {
-		 DataPtr data = mServices->patient()->getData(iter.key());
-		 if(iter.value()->isChecked())
-			 mClipper->addData(data);
-		 else
-			 mClipper->removeData(data);
-		 ++iter;
-	 }
-
-}
-
-void ClipperWidget::removeAllClipPlanes()
-{
-	QMap<QString, QCheckBox*>::const_iterator iter = mCheckBoxes.constBegin();
-	 while (iter != mCheckBoxes.constEnd())
-	 {
-		 DataPtr data = mServices->patient()->getData(iter.key());
-		 mClipper->removeData(data);
-		 ++iter;
-	 }
+	if(checked)
+		mClipper->addData(data);
+	else
+		mClipper->removeData(data);
 }
 
 void ClipperWidget::selectAllTableData(bool checked)
 {
-	this->removeAllClipPlanes();
+	std::map<QString, DataPtr> datas = this->getDatas();
+	std::map<QString, DataPtr>::iterator iter = datas.begin();
 
-	QMap<QString, QCheckBox*>::const_iterator iter = mCheckBoxes.constBegin();
-	 while (iter != mCheckBoxes.constEnd())
-	 {
-		 iter.value()->setChecked(checked);
-		 ++iter;
-	 }
-
-	 this->setClipPlaneInDatas();
+	for(; iter != datas.end(); ++iter)
+	{
+		DataPtr data = iter->second;
+		if(checked)
+			mClipper->addData(data);
+		else
+			mClipper->removeData(data);
+	}
+	this->setModified();
 }
 
 void ClipperWidget::dataTypeSelectorClicked(bool checked)
 {
-	this->removeAllClipPlanes();
-	this->setupDataSelectorUI();
-	this->setClipPlaneInDatas();
+	this->setModified();
 }
 
 void ClipperWidget::prePaintEvent()
