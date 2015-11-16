@@ -220,6 +220,13 @@ ImagePtr IGTLinkConversionSonixCXLegacy::decode(ImagePtr msg)
 	return retval;
 }
 
+bool IGTLinkConversionSonixCXLegacy::guessIsSonixLegacyFormat(QString deviceName)
+{
+    QString dummy;
+    QString format = this->extractColorFormat(deviceName, &dummy);
+    return !format.isEmpty();
+}
+
 QString IGTLinkConversionSonixCXLegacy::extractColorFormat(QString deviceName, QString* cleanedDeviceName)
 {
 	QString format = "";

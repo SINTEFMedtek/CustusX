@@ -44,10 +44,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogger.h"
 #include "cxIGTLinkConversion.h"
 #include "cxIGTLinkConversionImage.h"
+#include "cxIGTLinkConversionSonixCXLegacy.h"
 #include "cxCyclicActionLogger.h"
 #include "cxUtilHelpers.h"
 #include "cxTime.h"
 #include "cxSender.h"
+#include "vtkImageData.h"
 
 namespace cx
 {
@@ -321,7 +323,7 @@ bool IGTLinkClientStreamer::ReceiveImage(QTcpSocket* socket, igtl::MessageHeader
 	// If you want to skip CRC check, call Unpack() without argument.
 	int c = imgMsg->Unpack();
 
-	write_time_info(imgMsg);
+//	write_time_info(imgMsg);
 
 	if (c & (igtl::MessageHeader::UNPACK_BODY | igtl::MessageHeader::UNPACK_UNDEF)) // if CRC check is OK or skipped
 	{
@@ -343,16 +345,31 @@ void IGTLinkClientStreamer::addToQueue(igtl::ImageMessage::Pointer msg)
 {
 	IGTLinkConversion converter;
 	IGTLinkConversionImage imageconverter;
+    IGTLinkConversionSonixCXLegacy cxconverter;
 
-	PackagePtr package(new Package());
-	package->mImage = imageconverter.decode(msg);
+    PackagePtr package(new Package());
+
+    if (cxconverter.guessIsSonixLegacyFormat(msg->GetDeviceName()))
+    {
+        package->mImage = cxconverter.decode(msg);
+    }
+    else
+    {
+        package->mImage = imageconverter.decode(msg);
+    }
 
 	// if us status not sent, do it here
 	if (mUnsentUSStatusMessage)
 	{
 		CX_LOG_WARNING() << "default constructed probe definition used as input.";
-		package->mProbe = converter.decode(mUnsentUSStatusMessage, msg, ProbeDefinitionPtr(new ProbeDefinition()));
-		mUnsentUSStatusMessage = IGTLinkUSStatusMessage::Pointer();
+        package->mProbe = converter.decode(mUnsentUSStatusMessage, msg, ProbeDefinitionPtr(new ProbeDefinition()));
+
+        if (cxconverter.guessIsSonixLegacyFormat(mUnsentUSStatusMessage->GetDeviceName()))
+        {
+            package->mProbe = cxconverter.decode(package->mProbe);
+        }
+
+        mUnsentUSStatusMessage = IGTLinkUSStatusMessage::Pointer();
 	}
 
 	mSender->send(package);
