@@ -31,6 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxLogQDebugRedirecter.h"
+
+#include <QtGlobal>
 #include "cxReporter.h"
 
 namespace cx
@@ -41,10 +43,12 @@ void convertQtMessagesToCxMessages(QtMsgType type, const QMessageLogContext &, c
 	MESSAGE_LEVEL level;// = mlINFO;
 	switch (type)
 	{
-	case QtInfoMsg:
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
+    case QtInfoMsg:
 		level = mlINFO;
 		break;
-	case QtDebugMsg:
+#endif
+    case QtDebugMsg:
 		level = mlDEBUG;
 		break;
 	case QtWarningMsg:
