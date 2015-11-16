@@ -66,6 +66,10 @@ public:
 	virtual void render();
 	virtual void setGridSpacing(int val);
 	virtual void setGridMargin(int val);
+    virtual int getGridSpacing() const;
+    virtual int getGridMargin() const;
+    virtual std::vector<ViewPtr> getViews();
+    virtual QPoint getPosition(ViewPtr view);
 
 private:
 	std::vector<ViewPtr> mViews;

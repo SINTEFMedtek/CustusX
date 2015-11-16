@@ -72,7 +72,14 @@ public:
 	virtual void render() = 0;
 	virtual void setGridSpacing(int val) = 0;
 	virtual void setGridMargin(int val) = 0;
+    virtual int getGridSpacing() const = 0;
+    virtual int getGridMargin() const = 0;
 
+	virtual std::vector<ViewPtr> getViews() = 0;
+    virtual QPoint getPosition(ViewPtr view) = 0;
+
+signals:
+    void rendered();
 protected:
 	ViewCollectionWidget(QWidget* parent) : QWidget(parent) {}
 };

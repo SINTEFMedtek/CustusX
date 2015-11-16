@@ -107,6 +107,28 @@ macro(cx_initialize_TSF)
 endmacro()
 
 ###############################################################################
+# Initialize FAST library
+# Find the package and run the include USE file.
+###############################################################################
+macro(cx_initialize_FAST)
+    find_package(FAST QUIET)
+    if(FAST_FOUND)
+        message("=========================================")
+        message("FAST was found!!!!!")
+        message("${FAST_SOURCE_DIR}")
+        message("${FAST_INCLUDE_DIRS}")
+        message("${FAST_LIBRARY_DIRS}")
+        message("${FAST_LIBRARY}")
+        message("=========================================")
+        include(${FAST_USE_FILE})
+    else()
+        message("=========================================")
+        message("FAST was NOT found")
+        message("=========================================")
+    endif()
+endmacro()
+
+###############################################################################
 # Initialize OpenCLUtilityLibrary
 #
 # Find the package and run the include USE file.

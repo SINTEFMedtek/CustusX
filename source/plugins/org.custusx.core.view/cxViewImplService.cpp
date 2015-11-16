@@ -120,9 +120,14 @@ bool ViewImplService::renderingIsEnabled() const
 	return viewManager()->renderingIsEnabled();
 }
 
-QWidget* ViewImplService::getLayoutWidget(QWidget* parent, int index)
+QWidget* ViewImplService::createLayoutWidget(QWidget* parent, int index)
 {
-	return viewManager()->getLayoutWidget(parent, index);
+    return viewManager()->createLayoutWidget(parent, index);
+}
+
+QWidget* ViewImplService::getLayoutWidget(int index)
+{
+    return viewManager()->getLayoutWidget(index);
 }
 
 QString ViewImplService::getActiveLayout(int widgetIndex) const
