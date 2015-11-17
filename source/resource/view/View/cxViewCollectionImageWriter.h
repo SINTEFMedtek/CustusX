@@ -60,7 +60,15 @@ public:
     static QImage vtkImageData2QImage(vtkImageDataPtr input);
 private:
 	vtkImageDataPtr view2vtkImageData(ViewPtr view);
+	/**
+	 * Draw image inside target. pos is given in vtk coordinates inside target.
+	 * image is assumed to fit inside target at the indicated position. */
     void drawImageAtPos(vtkImageDataPtr target, vtkImageDataPtr image, QPoint pos);
+    /**
+     * Get view position in vtk coords, lower left corner*/
+    QPoint getVtkPositionOfView(ViewPtr view);
+    QPoint qt2vtk(QPoint qpos);
+
 	ViewCollectionWidget* mWidget;
 };
 

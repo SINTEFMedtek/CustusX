@@ -76,6 +76,10 @@ public:
     virtual int getGridMargin() const = 0;
 
 	virtual std::vector<ViewPtr> getViews() = 0;
+	/**
+	 * Get the position of the Upper Left corner of the view,
+	 * given in qt-coordinates of this (the ViewCollectionWidget).
+	 */
     virtual QPoint getPosition(ViewPtr view) = 0;
 
 signals:

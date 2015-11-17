@@ -71,12 +71,29 @@ vtkImageDataPtr ViewCollectionImageWriter::grab()
 	for (unsigned i=0; i<views.size(); ++i)
 	{
         vtkImageDataPtr vtkImage = this->view2vtkImageData(views[i]);
-        QPoint pos = mWidget->getPosition(views[i]);
-        this->drawImageAtPos(target, vtkImage, pos);
+        QPoint vtkpos = this->getVtkPositionOfView(views[i]);
+        this->drawImageAtPos(target, vtkImage, vtkpos);
     }
 
     return target;
 }
+
+QPoint ViewCollectionImageWriter::getVtkPositionOfView(ViewPtr view)
+{
+	QPoint qpos_ul = mWidget->getPosition(view); // UL position in qt-space of mWidget
+	Eigen::Array2i size(view->getRenderWindow()->GetSize());
+	QPoint qpos_ll = qpos_ul + QPoint(0, size[1]-1); // LL position in qt-space of mWidget
+	QPoint vtkpos_ll = this->qt2vtk(qpos_ll);
+	return vtkpos_ll;
+}
+
+QPoint ViewCollectionImageWriter::qt2vtk(QPoint qpos)
+{
+	int H = mWidget->height();
+	QPoint vtkpos(qpos.x(), H-1-qpos.y());
+	return vtkpos;
+}
+
 
 void ViewCollectionImageWriter::drawImageAtPos(vtkImageDataPtr target, vtkImageDataPtr image, QPoint pos)
 {
@@ -93,7 +110,6 @@ void ViewCollectionImageWriter::drawImageAtPos(vtkImageDataPtr target, vtkImageD
         unsigned char* dst = reinterpret_cast<unsigned char*>(target->GetScalarPointer(pos.x(),pos.y()+y,0));
         memcpy(dst, src, dim_src[0]*depth);
     }
-
 }
 
 // the vtk canonical way
