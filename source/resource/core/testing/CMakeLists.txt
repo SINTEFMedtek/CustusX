@@ -35,6 +35,7 @@ if(BUILD_TESTING)
         cxtestVisServices.h
         cxtestVisServices.cpp
         cxtestActiveData.cpp
+        cxtestStreamedTimestampSynchronizer.cpp
     )
 
     set(CX_TESTRESOURCE_LINK_LIBS

@@ -352,6 +352,9 @@ void IGTLinkClientStreamer::addToQueue(igtl::ImageMessage::Pointer msg)
     if (cxconverter.guessIsSonixLegacyFormat(msg->GetDeviceName()))
     {
         package->mImage = cxconverter.decode(msg);
+        //Should only be needed if time stamp is set on another computer that is
+        //not synched with the one running this code: e.g. The Ultrasonix scanner
+        mStreamSynchronizer.syncToCurrentTime(package->mImage);
     }
     else
     {
