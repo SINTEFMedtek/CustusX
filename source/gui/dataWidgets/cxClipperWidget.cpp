@@ -53,8 +53,8 @@ namespace cx
 ClipperWidget::ClipperWidget(VisServicesPtr services, QWidget* parent) :
 	BaseWidget(parent, "ClipperWidget", "Clipper"),
 	mServices(services),
-	mInitializedWithClipper(false),
-	planeSelector(NULL)
+	mInitializedWithClipper(false)
+//	planeSelector(NULL)
 {
 	this->setEnabled(false);
 	this->setupDataStructures();
@@ -141,12 +141,12 @@ void ClipperWidget::enable(bool checked)
 
 QLayout *ClipperWidget::planeLayout()
 {
-	mPlaneAdapter = StringPropertyClipPlane::New(mClipper);
-	planeSelector = new LabeledComboBoxWidget(this, mPlaneAdapter);
+//	mPlaneAdapter = StringPropertyClipPlane::New(mClipper);
+//	planeSelector = new LabeledComboBoxWidget(this, mPlaneAdapter);
 
 	QHBoxLayout *layout = new QHBoxLayout();
 
-	layout->addWidget(planeSelector);
+//	layout->addWidget(planeSelector);
 	layout->addWidget(mInvertPlane);
 	return layout;
 }
@@ -191,11 +191,11 @@ void ClipperWidget::connectToNewClipper()
 		mUseClipperCheckBox->setChecked(mClipper->getUseClipper());
 		mInvertPlane->setChecked(mClipper->getInvertPlane());
 		connect(mInvertPlane, &QCheckBox::toggled, mClipper.get(), &InteractiveClipper::invertPlane);
-		if(planeSelector)
-		{
-			mPlaneAdapter->setClipper(mClipper);
-			planeSelector->setModified();
-		}
+//		if(planeSelector)
+//		{
+//			mPlaneAdapter->setClipper(mClipper);
+//			planeSelector->setModified();
+//		}
 		this->setEnabled(true);
 		this->setupUI();
 		this->setupDataSelectorUI();
