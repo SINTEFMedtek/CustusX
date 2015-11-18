@@ -70,24 +70,8 @@ public:
     ImagePtr decode(igtl::ImageMessage::Pointer msg);
 	Transform3D decode(igtl::TransformMessage::Pointer msg);
 
-//	igtl::ImageMessage::Pointer encode(ImagePtr image);
-
-    //CustusX message formats
-//    /**
-//	  * Encode the image into a IGTLink message, containing
-//	  * image data, uid and timstamp
-//	  */
-//	IGTLinkImageMessage::Pointer encode(ImagePtr image);
-//	/**
-//	  * Decode the IGTLink message to create an image containing
-//	  * image data, uid and timstamp. The color format is also
-//	  * converted to RGBX
-//	  */
-//	ImagePtr decode(igtl::ImageMessage::Pointer msg);
-
 	/**
-	  * Encode the input ProbeDefinition into an IGTLink message.
-	  */
+      * Encode the input ProbeDefinition into an IGTLink message. */
 	IGTLinkUSStatusMessage::Pointer encode(ProbeDefinitionPtr);
 	/**
 	  * Decode the input probe and image messages to create a
@@ -97,25 +81,8 @@ public:
 	  * are missing are simply not filled in (i.e. keep the values
 	  * already present in base.)
 	  *
-	  * Some or all of the input messages can be NULL.
-	  */
-//    ProbeDefinitionPtr decode(IGTLinkUSStatusMessage::Pointer probeMessage, IGTLinkImageMessage::Pointer imageMsg, ProbeDefinitionPtr base)
-//    {
-//        CX_LOG_ERROR() << "THIS CODE SHOULD BE REMOVED!!!!";
-//		return ProbeDefinitionPtr();
-//    }
+      * Some or all of the input messages can be NULL. */
 	ProbeDefinitionPtr decode(IGTLinkUSStatusMessage::Pointer probeMessage, igtl::ImageMessage::Pointer imageMsg, ProbeDefinitionPtr base);
-
-//	/**
-//	  * Decode the image to standard format with standard color RGBX encoding.
-//	  *
-//	  * Find the substring [XYZW] in the msg uid, where each letter can be
-//	  * one of RGBAX. The letters describe the image components. Rearrange
-//	  * to standard RGBX format, strip format from uid,
-//	  * and return as new image.
-//	  */
-//	ImagePtr decode(ImagePtr msg);
-//	ProbeDefinitionPtr decode(ProbeDefinitionPtr msg);
 
 private:
     QString convertIGTLinkStatusCodes(const int code);

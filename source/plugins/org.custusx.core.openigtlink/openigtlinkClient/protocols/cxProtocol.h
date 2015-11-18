@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
+typedef boost::shared_ptr<class StreamedTimestampSynchronizer> StreamedTimestampSynchronizerPtr;
 
 /**
  * An Application layer protocol for sending/receiving CustusX objects.
@@ -63,6 +64,11 @@ public:
     virtual bool readyToReceiveData() = 0;
 	virtual EncodedPackagePtr encode(ImagePtr image) = 0;
 	virtual EncodedPackagePtr encode(MeshPtr data) = 0;
+    /**
+     * Assume the clock on the remote side is not synced,
+     * take steps to synchronize incoming timestamps if needed.
+     */
+    virtual void setSynchronizeRemoteClock(bool on);
 
 protected slots:
     virtual void processPack() = 0;
@@ -76,7 +82,7 @@ signals:
 
 protected:
     EncodedPackagePtr mPack;
-
+    StreamedTimestampSynchronizerPtr mStreamSynchronizer;
 };
 typedef boost::shared_ptr<Protocol> ProtocolPtr;
 

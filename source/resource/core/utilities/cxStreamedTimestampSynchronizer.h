@@ -48,6 +48,16 @@ namespace cx
  * Process a stream of incoming timestamps, and generate a mean shift
  * that synchronizes their time to this computer.
  *
+ * Use case: Timestamp series coming from another remote computer not synced
+ * to the clock of this computer should be run through this algorithm. This
+ * because CustusX stores its own timestamps during acquisition.
+ *
+ * If the remote is in sync, either because it is localhost or otherwise synced
+ * using e.g. "sudo ntpdate -u time.euro.apple.com" on both machines or similar,
+ * this is not necessary.
+ *
+ * \sa http://openigtlink.org/protocols/v2_timestamp.html
+ *
  */
 class cxResource_EXPORT StreamedTimestampSynchronizer
 {
@@ -64,6 +74,11 @@ public:
      * the shift estimate.
      */
     void addTimestamp(QDateTime timestamp);
+    /**
+     * Overloaded method, input is QDateTime::fromMSecsSinceEpoch(timestamp)
+     */
+    void addTimestamp(double timestamp);
+
     /**
      * Get the current shift, i.e. the correction to be applied
      * to timestamps in order to synchronize them with this computer

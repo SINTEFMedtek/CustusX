@@ -96,12 +96,18 @@ double StreamedTimestampSynchronizer::getShift() const
     return mLastComputedTimestampShift;
 }
 
+
 void StreamedTimestampSynchronizer::addTimestamp(QDateTime timestamp)
 {
     double delta = timestamp.msecsTo(QDateTime::currentDateTime());
     mDeltaWindow.push_back(delta);
     while (mDeltaWindow.size() > mMaxWindowSize)
         mDeltaWindow.pop_front();
+}
+
+void StreamedTimestampSynchronizer::addTimestamp(double timestamp)
+{
+    this->addTimestamp(QDateTime::fromMSecsSinceEpoch(timestamp));
 }
 
 

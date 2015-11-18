@@ -6,6 +6,7 @@
 #include "cxIGTLinkConversionBase.h"
 #include "cxIGTLinkConversion.h"
 #include "cxIGTLinkConversionPolyData.h"
+#include "cxStreamedTimestampSynchronizer.h"
 
 namespace cx
 {
@@ -109,9 +110,15 @@ void OpenIGTLinkProtocol::translate(const igtl::TransformMessage::Pointer body)
     Transform3D prMs = converter.decode(body);
 
     IGTLinkConversionBase baseConverter;
-    double timestamp_ms = baseConverter.decode_timestamp(body).toMSecsSinceEpoch();
+    QDateTime timestamp = baseConverter.decode_timestamp(body);
 
-    emit transform(deviceName, prMs, timestamp_ms);
+    if (mStreamSynchronizer)
+    {
+        mStreamSynchronizer->addTimestamp(timestamp);
+        timestamp = timestamp.addMSecs(mStreamSynchronizer->getShift());
+    }
+
+    emit transform(deviceName, prMs, timestamp.toMSecsSinceEpoch());
 }
 
 void OpenIGTLinkProtocol::translate(const igtl::PolyDataMessage::Pointer body)
@@ -129,6 +136,10 @@ void OpenIGTLinkProtocol::translate(const igtl::ImageMessage::Pointer body)
 
     IGTLinkConversionImage imageConverter;
     ImagePtr retval = imageConverter.decode(body);
+
+    if (mStreamSynchronizer)
+        mStreamSynchronizer->syncToCurrentTime(retval);
+
     emit image(retval);
 }
 

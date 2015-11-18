@@ -3,6 +3,7 @@
 #include "cxIGTLinkConversion.h"
 #include "cxLogger.h"
 #include "cxIGTLinkConversionBase.h"
+#include "cxStreamedTimestampSynchronizer.h"
 
 namespace cx{
 
@@ -138,6 +139,13 @@ double PlusProtocol::getSyncedTimestampForTransformsAndImages(double currentOrig
     if(currentOriginalTimestamp != mLastKnownOriginalTimestamp)
     {
         double currentLocalTimestamp = this->getCurrentTimestamp();
+
+        if (mStreamSynchronizer)
+        {
+            mStreamSynchronizer->addTimestamp(currentOriginalTimestamp);
+            currentLocalTimestamp = currentOriginalTimestamp + mStreamSynchronizer->getShift();
+        }
+
         mLastKnownOriginalTimestamp = currentOriginalTimestamp;
         mLastKnownLocalTimestamp = currentLocalTimestamp;
     }

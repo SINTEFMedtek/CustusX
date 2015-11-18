@@ -352,9 +352,6 @@ void IGTLinkClientStreamer::addToQueue(igtl::ImageMessage::Pointer msg)
     if (cxconverter.guessIsSonixLegacyFormat(msg->GetDeviceName()))
     {
         package->mImage = cxconverter.decode(msg);
-        //Should only be needed if time stamp is set on another computer that is
-        //not synched with the one running this code: e.g. The Ultrasonix scanner
-        mStreamSynchronizer.syncToCurrentTime(package->mImage);
     }
     else
     {
@@ -364,8 +361,7 @@ void IGTLinkClientStreamer::addToQueue(igtl::ImageMessage::Pointer msg)
 	// if us status not sent, do it here
 	if (mUnsentUSStatusMessage)
 	{
-		CX_LOG_WARNING() << "default constructed probe definition used as input.";
-        package->mProbe = converter.decode(mUnsentUSStatusMessage, msg, ProbeDefinitionPtr(new ProbeDefinition()));
+        package->mProbe = converter.decode(mUnsentUSStatusMessage, msg, ProbeDefinitionPtr());
 
         if (cxconverter.guessIsSonixLegacyFormat(mUnsentUSStatusMessage->GetDeviceName()))
         {
@@ -374,6 +370,10 @@ void IGTLinkClientStreamer::addToQueue(igtl::ImageMessage::Pointer msg)
 
         mUnsentUSStatusMessage = IGTLinkUSStatusMessage::Pointer();
 	}
+
+    //Should only be needed if time stamp is set on another computer that is
+    //not synched with the one running this code: e.g. The Ultrasonix scanner
+    mStreamSynchronizer.syncToCurrentTime(package->mImage);
 
 	mSender->send(package);
 }

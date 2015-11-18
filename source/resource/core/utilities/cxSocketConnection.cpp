@@ -64,6 +64,8 @@ namespace cx
 
     bool SocketConnection::ConnectionInfo::isServer() const { return role.toLower()=="server"; }
     bool SocketConnection::ConnectionInfo::isClient() const { return !this->isServer(); }
+    bool SocketConnection::ConnectionInfo::isLocalhostConnection() const { return host.toLower().contains("localhost"); }
+
     QString SocketConnection::ConnectionInfo::getDescription() const
     {
         QString postfix;
@@ -205,23 +207,6 @@ void SocketConnection::internalError(QAbstractSocket::SocketError socketError)
 
     this->stateChange(this->computeState());
 }
-
-//void SocketConnection::internalDataAvailable()
-//{
-//    if(!this->socketIsConnected())
-//        return;
-
-//	// How many bytes?
-//	qint64 maxAvailableBytes = mSocket->bytesAvailable();
-
-//    char* inMessage = new char [maxAvailableBytes];
-//    if(!this->socketReceive(inMessage, maxAvailableBytes))
-//        return;
-
-//    CX_LOG_INFO() << "SocketConnection incoming message: " << QString(inMessage);
-
-//    //TODO: Do something with received message
-//}
 
 bool SocketConnection::socketIsConnected()
 {

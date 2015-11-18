@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxUtilHelpers.h"
 #include "cxMesh.h"
+#include "cxSocket.h"
 
 namespace cx
 {
@@ -139,7 +140,8 @@ void NetworkConnection::setProtocol(QString protocolname)
     connect(protocol.get(), &Protocol::calibration, this, &NetworkConnection::calibration);
     connect(protocol.get(), &Protocol::probedefinition, this, &NetworkConnection::probedefinition);
 
-    CX_LOG_CHANNEL_SUCCESS(CX_OPENIGTLINK_CHANNEL_NAME) << "IGTL Dialect set to " << protocolname;
+    mProtocol->setSynchronizeRemoteClock(!mConnector->getInfo().isLocalhostConnection());
+    CX_LOG_CHANNEL_SUCCESS(CX_OPENIGTLINK_CHANNEL_NAME) << "Protocol set to " << protocolname;
 
 }
 

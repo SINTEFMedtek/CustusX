@@ -79,6 +79,7 @@ public:
     virtual void activate() = 0;
     virtual void deactivate() = 0;
     virtual CX_SOCKETCONNECTION_STATE getState() = 0;
+    virtual SocketConnection::ConnectionInfo getInfo() const = 0;
 signals:
     void stateChanged(CX_SOCKETCONNECTION_STATE);
 };
@@ -92,6 +93,7 @@ public:
     virtual void activate();
     virtual void deactivate();
     virtual CX_SOCKETCONNECTION_STATE getState();
+    virtual SocketConnection::ConnectionInfo getInfo() const { return mInfo; }
 
 private:
     void internalConnected();
@@ -112,6 +114,7 @@ public:
     virtual void activate();
     virtual void deactivate();
     virtual CX_SOCKETCONNECTION_STATE getState();
+    virtual SocketConnection::ConnectionInfo getInfo() const { return mInfo; }
 
 private:
     bool startListen();
