@@ -29,54 +29,93 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-
-#ifndef CXVIEWCOLLECTIONWIDGETUSINGVIEWCONTAINER_H_
-#define CXVIEWCOLLECTIONWIDGETUSINGVIEWCONTAINER_H_
-
-#include "cxResourceVisualizationExport.h"
-
-#include "cxView.h"
-#include "cxLayoutData.h"
+#include "cxLayoutVideoSource.h"
+#include "cxViewCollectionImageWriter.h"
 #include "cxViewCollectionWidget.h"
-
-
-class QGridLayout;
+#include "vtkImageData.h"
+#include "cxLogger.h"
 
 namespace cx
 {
 
-/**
- * Widget for displaying Views, using only a single QVTKWidget/vtkRenderWindow,
- * but one vtkRenderer for each View inside.
- *
- * \date 2014-09-26
- * \author Christian Askeland
- * \ingroup cx_resource_view_internal
- */
-class cxResourceVisualization_EXPORT ViewCollectionWidgetUsingViewContainer : public ViewCollectionWidget
+LayoutVideoSource::LayoutVideoSource(ViewCollectionWidget* widget) :
+    mWidget(widget),
+    mStreaming(false)
 {
-	Q_OBJECT
-public:
-	ViewCollectionWidgetUsingViewContainer(QWidget* parent);
-    virtual ~ViewCollectionWidgetUsingViewContainer();
+	CX_ASSERT(widget);
+    connect(mWidget.data(), &ViewCollectionWidget::rendered, this, &LayoutVideoSource::onRendered);
+}
 
-	ViewPtr addView(View::Type type, LayoutRegion region);
-	void clearViews();
-	virtual void setModified();
-	virtual void render();
-	virtual void setGridSpacing(int val);
-	virtual void setGridMargin(int val);
-    virtual int getGridSpacing() const;
-    virtual int getGridMargin() const;
-    virtual std::vector<ViewPtr> getViews();
-    virtual QPoint getPosition(ViewPtr view);
+QString LayoutVideoSource::getUid()
+{
+    return QString("LayoutVideoSource%1").arg(reinterpret_cast<long>(this));
+}
 
-private:
-	std::vector<ViewPtr> mViews;
-	class ViewContainer* mViewContainer;
-};
+QString LayoutVideoSource::getName()
+{
+    return QString("LayoutVideoSource");
+}
 
+double LayoutVideoSource::getTimestamp()
+{
+    return mTimestamp.toMSecsSinceEpoch();
+}
 
+void LayoutVideoSource::start()
+{
+    if (mStreaming)
+        return;
+
+    mStreaming = true;
+    emit streaming(mStreaming);
+}
+
+void LayoutVideoSource::stop()
+{
+    if (!mStreaming)
+        return;
+
+    mGrabbed = vtkImageDataPtr();
+    mStreaming = false;
+    emit streaming(mStreaming);
+}
+
+bool LayoutVideoSource::validData() const
+{
+    return mStreaming;
+}
+
+bool LayoutVideoSource::isConnected() const
+{
+    return true;
+}
+
+bool LayoutVideoSource::isStreaming() const
+{
+    return mStreaming;
+}
+
+void LayoutVideoSource::onRendered()
+{
+    if (!mStreaming)
+        return;
+
+    mGrabbed = vtkImageDataPtr();
+    mTimestamp = QDateTime::currentDateTime();
+    emit newFrame();
+}
+
+vtkImageDataPtr LayoutVideoSource::getVtkImageData()
+{
+    if (!mStreaming)
+        return vtkImageDataPtr();
+
+    if (!mGrabbed)
+    {
+        ViewCollectionImageWriter grabber(mWidget);
+        mGrabbed = grabber.grab();
+    }
+    return mGrabbed;
+}
 
 } // namespace cx
-#endif /* CXVIEWCOLLECTIONWIDGETUSINGVIEWCONTAINER_H_ */

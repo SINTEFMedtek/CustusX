@@ -89,7 +89,8 @@ bool ViewServiceNull::renderingIsEnabled() const
 	return false;
 }
 
-QWidget* ViewServiceNull::getLayoutWidget(QWidget *parent, int index) { return NULL; }
+QWidget* ViewServiceNull::createLayoutWidget(QWidget *parent, int index) { return NULL; }
+QWidget* ViewServiceNull::getLayoutWidget(int index) { return NULL; }
 QString ViewServiceNull::getActiveLayout(int widgetIndex) const { return ""; }
 void ViewServiceNull::setActiveLayout(const QString& uid, int widgetIndex) {}
 InteractiveClipperPtr ViewServiceNull::getClipper() { return InteractiveClipperPtr(); }

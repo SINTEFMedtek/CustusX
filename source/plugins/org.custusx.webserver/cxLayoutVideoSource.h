@@ -29,54 +29,50 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXLAYOUTVIDEOSOURCE_H
+#define CXLAYOUTVIDEOSOURCE_H
 
-#ifndef CXVIEWCOLLECTIONWIDGETUSINGVIEWCONTAINER_H_
-#define CXVIEWCOLLECTIONWIDGETUSINGVIEWCONTAINER_H_
-
-#include "cxResourceVisualizationExport.h"
-
-#include "cxView.h"
-#include "cxLayoutData.h"
-#include "cxViewCollectionWidget.h"
-
-
-class QGridLayout;
+#include "cxVideoSource.h"
+#include "org_custusx_webserver_Export.h"
+#include <QPointer>
 
 namespace cx
 {
+class ViewCollectionWidget;
 
 /**
- * Widget for displaying Views, using only a single QVTKWidget/vtkRenderWindow,
- * but one vtkRenderer for each View inside.
- *
- * \date 2014-09-26
- * \author Christian Askeland
- * \ingroup cx_resource_view_internal
+ * Stream images rendered to the input ViewCollectionWidget.
  */
-class cxResourceVisualization_EXPORT ViewCollectionWidgetUsingViewContainer : public ViewCollectionWidget
+class org_custusx_webserver_EXPORT LayoutVideoSource : public VideoSource
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	ViewCollectionWidgetUsingViewContainer(QWidget* parent);
-    virtual ~ViewCollectionWidgetUsingViewContainer();
+    explicit LayoutVideoSource(ViewCollectionWidget* widget);
 
-	ViewPtr addView(View::Type type, LayoutRegion region);
-	void clearViews();
-	virtual void setModified();
-	virtual void render();
-	virtual void setGridSpacing(int val);
-	virtual void setGridMargin(int val);
-    virtual int getGridSpacing() const;
-    virtual int getGridMargin() const;
-    virtual std::vector<ViewPtr> getViews();
-    virtual QPoint getPosition(ViewPtr view);
+
+    virtual QString getUid();
+    virtual QString getName();
+    virtual vtkImageDataPtr getVtkImageData();
+    virtual double getTimestamp();
+
+    virtual QString getInfoString() const { return ""; }
+    virtual QString getStatusString() const { return ""; }
+
+    virtual void start();
+    virtual void stop();
+
+    virtual bool validData() const;
+    virtual bool isConnected() const;
+    virtual bool isStreaming() const;
 
 private:
-	std::vector<ViewPtr> mViews;
-	class ViewContainer* mViewContainer;
+    QPointer<ViewCollectionWidget> mWidget;
+    void onRendered();
+    vtkImageDataPtr mGrabbed;
+    QDateTime mTimestamp;
+    bool mStreaming;
 };
 
-
-
 } // namespace cx
-#endif /* CXVIEWCOLLECTIONWIDGETUSINGVIEWCONTAINER_H_ */
+
+#endif // CXLAYOUTVIDEOSOURCE_H

@@ -31,6 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxLogQDebugRedirecter.h"
+
+#include <QtGlobal>
 #include "cxReporter.h"
 
 namespace cx
@@ -38,10 +40,15 @@ namespace cx
 
 void convertQtMessagesToCxMessages(QtMsgType type, const QMessageLogContext &, const QString &msg)
 {
-	MESSAGE_LEVEL level = mlINFO;
+	MESSAGE_LEVEL level;// = mlINFO;
 	switch (type)
 	{
-	case QtDebugMsg:
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
+    case QtInfoMsg:
+		level = mlINFO;
+		break;
+#endif
+    case QtDebugMsg:
 		level = mlDEBUG;
 		break;
 	case QtWarningMsg:
@@ -53,6 +60,8 @@ void convertQtMessagesToCxMessages(QtMsgType type, const QMessageLogContext &, c
 	case QtFatalMsg:
 		level = mlERROR;
 		//abort(); here we hope for the best instead of aborting...
+	default:
+		level = mlINFO;
 	}
 
 	Message message("[QT] "+msg, level);

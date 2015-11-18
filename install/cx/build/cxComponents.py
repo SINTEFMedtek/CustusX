@@ -564,4 +564,40 @@ class CustusXData(CppComponent):
         pass
 # ---------------------------------------------------------
 
+class QHttpServer(CppComponent):
+    def name(self):
+        return "QHttpServer"
+    def help(self):
+        return 'https://github.com/nikhilm/qhttpserver'
+    def path(self):
+        return self.controlData.getExternalPath() + "/QHttpServer"
+    def getBuildType(self):
+        return self.controlData.getBuildExternalsType()
+    def _rawCheckout(self):
+        self._getBuilder().gitClone('%s %s' % (self._getRepo(), self.sourceFolder()))
+    def update(self):
+        self._getBuilder().gitSetRemoteURL(self._getRepo(), branch='master')
+        self._getBuilder().gitCheckout('5b7d7e15cfda2bb2097b6c0ceab99eeb50b4f639') # latest tested SHA
+#    def configure(self):
+#        builder = self._getBuilder()
+#        changeDir(self.buildPath())
+#        shell.run('qmake %s' % self.sourcePath())
+    def _getRepo(self):
+        return 'git@github.com:SINTEFMedtek/qhttpserver.git'
+    def configure(self):
+        builder = self._getBuilder()
+        builder.configureCMake()    
+#    def build(self):
+#        changeDir(self.buildPath())
+#        shell.run('make')
+#    def makeClean(self):
+#        changeDir(self.buildPath())
+#        shell.run('make clean')
+    def addConfigurationToDownstreamLib(self, builder):
+        add = builder.addCMakeOption
+        add('qhttpserver_DIR:PATH', self.buildPath())
+        #add('QHTTPSERVERCPP_LIBRARY_DIR:PATH', self.buildPath()+'/lib')
+        #add('QHTTPSERVERCPP_INCLUDE_DIR:PATH', self.sourcePath()+'/src')
+        #add('QHttpServer_ROOT_DIR:PATH', self.path())
+        #add('CX_PLUGIN_org.custusx.filter.levelset:BOOL', platform.system() == 'Linux');
 

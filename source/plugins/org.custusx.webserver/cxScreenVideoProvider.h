@@ -29,54 +29,69 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXSCREENVIDEOPROVIDER_H
+#define CXSCREENVIDEOPROVIDER_H
 
-#ifndef CXVIEWCOLLECTIONWIDGETUSINGVIEWCONTAINER_H_
-#define CXVIEWCOLLECTIONWIDGETUSINGVIEWCONTAINER_H_
+#include <QObject>
+#include <QPointer>
+#include <QMainWindow>
+#include "vtkSmartPointer.h"
+#include "cxVisServices.h"
+#include "cxForwardDeclarations.h"
+#include "cxScreenShotImageWriter.h"
 
-#include "cxResourceVisualizationExport.h"
-
-#include "cxView.h"
-#include "cxLayoutData.h"
-#include "cxViewCollectionWidget.h"
-
-
-class QGridLayout;
+typedef vtkSmartPointer<class vtkWindowToImageFilter> vtkWindowToImageFilterPtr;
+typedef vtkSmartPointer<class vtkPNGWriter> vtkPNGWriterPtr;
+typedef vtkSmartPointer<class vtkUnsignedCharArray> vtkUnsignedCharArrayPtr;
 
 namespace cx
 {
 
-/**
- * Widget for displaying Views, using only a single QVTKWidget/vtkRenderWindow,
- * but one vtkRenderer for each View inside.
- *
- * \date 2014-09-26
- * \author Christian Askeland
- * \ingroup cx_resource_view_internal
- */
-class cxResourceVisualization_EXPORT ViewCollectionWidgetUsingViewContainer : public ViewCollectionWidget
+class SecondaryViewLayoutWindow: public QWidget
+{
+Q_OBJECT
+
+public:
+	SecondaryViewLayoutWindow(QWidget* parent, ViewServicePtr viewService);
+	~SecondaryViewLayoutWindow() {}
+
+	void tryShowOnSecondaryScreen();
+    int mSecondaryLayoutId;
+
+protected:
+	virtual void showEvent(QShowEvent* event);
+	virtual void hideEvent(QCloseEvent* event);
+	virtual void closeEvent(QCloseEvent *event);
+private:
+	QString toString(QRect r) const;
+	int findSmallestSecondaryScreen();
+
+	ViewServicePtr mViewService;
+};
+
+class ScreenVideoProvider : public QObject
 {
 	Q_OBJECT
 public:
-	ViewCollectionWidgetUsingViewContainer(QWidget* parent);
-    virtual ~ViewCollectionWidgetUsingViewContainer();
+	ScreenVideoProvider(VisServicesPtr services);
 
-	ViewPtr addView(View::Type type, LayoutRegion region);
-	void clearViews();
-	virtual void setModified();
-	virtual void render();
-	virtual void setGridSpacing(int val);
-	virtual void setGridMargin(int val);
-    virtual int getGridSpacing() const;
-    virtual int getGridMargin() const;
-    virtual std::vector<ViewPtr> getViews();
-    virtual QPoint getPosition(ViewPtr view);
-
+    class ViewCollectionWidget* getSecondaryLayoutWidget();
+    void saveScreenShot(QImage image, QString id);
+	QByteArray generatePNGEncoding(QImage image);
+//	void saveScreenShotThreaded(QImage pixmap, QString filename);
+	QPixmap grabScreen(unsigned screenid);
+    void showSecondaryLayout(QSize size, QString layout);
+	QImage grabSecondaryLayout();
+    void closeSecondaryLayout();
 private:
-	std::vector<ViewPtr> mViews;
-	class ViewContainer* mViewContainer;
+	VisServicesPtr mServices;
+	QPointer<class SecondaryViewLayoutWindow> mSecondaryViewLayoutWindow;
+//	new SecondaryViewLayoutWindow(this)
+	ScreenShotImageWriter mWriter;
+	void setWidgetToNiceSizeInLowerRightCorner(QSize size);
 };
 
-
-
 } // namespace cx
-#endif /* CXVIEWCOLLECTIONWIDGETUSINGVIEWCONTAINER_H_ */
+
+
+#endif // CXSCREENVIDEOPROVIDER_H

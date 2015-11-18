@@ -29,54 +29,41 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXVIEWCOLLECTIONIMAGEWRITER_H
+#define CXVIEWCOLLECTIONIMAGEWRITER_H
 
-#ifndef CXVIEWCOLLECTIONWIDGETUSINGVIEWCONTAINER_H_
-#define CXVIEWCOLLECTIONWIDGETUSINGVIEWCONTAINER_H_
-
-#include "cxResourceVisualizationExport.h"
-
-#include "cxView.h"
+#include <QObject>
+#include <QPointer>
+#include <QMainWindow>
+#include "vtkSmartPointer.h"
+#include "cxVisServices.h"
 #include "cxLayoutData.h"
-#include "cxViewCollectionWidget.h"
+#include "cxForwardDeclarations.h"
 
-
-class QGridLayout;
+typedef vtkSmartPointer<class vtkWindowToImageFilter> vtkWindowToImageFilterPtr;
+typedef vtkSmartPointer<class vtkPNGWriter> vtkPNGWriterPtr;
+typedef vtkSmartPointer<class vtkUnsignedCharArray> vtkUnsignedCharArrayPtr;
 
 namespace cx
 {
+class ViewCollectionWidget;
 
-/**
- * Widget for displaying Views, using only a single QVTKWidget/vtkRenderWindow,
- * but one vtkRenderer for each View inside.
+/** Write the previously rendered contents of the input ViewCollectionWidget
+ *  to a vtkImageData.
  *
- * \date 2014-09-26
- * \author Christian Askeland
- * \ingroup cx_resource_view_internal
  */
-class cxResourceVisualization_EXPORT ViewCollectionWidgetUsingViewContainer : public ViewCollectionWidget
+class ViewCollectionImageWriter
 {
-	Q_OBJECT
 public:
-	ViewCollectionWidgetUsingViewContainer(QWidget* parent);
-    virtual ~ViewCollectionWidgetUsingViewContainer();
-
-	ViewPtr addView(View::Type type, LayoutRegion region);
-	void clearViews();
-	virtual void setModified();
-	virtual void render();
-	virtual void setGridSpacing(int val);
-	virtual void setGridMargin(int val);
-    virtual int getGridSpacing() const;
-    virtual int getGridMargin() const;
-    virtual std::vector<ViewPtr> getViews();
-    virtual QPoint getPosition(ViewPtr view);
-
+	explicit ViewCollectionImageWriter(ViewCollectionWidget* widget);
+    vtkImageDataPtr grab();
+    static QImage vtkImageData2QImage(vtkImageDataPtr input);
 private:
-	std::vector<ViewPtr> mViews;
-	class ViewContainer* mViewContainer;
+	vtkImageDataPtr view2vtkImageData(ViewPtr view);
+    void drawImageAtPos(vtkImageDataPtr target, vtkImageDataPtr image, QPoint pos);
+	ViewCollectionWidget* mWidget;
 };
 
-
-
 } // namespace cx
-#endif /* CXVIEWCOLLECTIONWIDGETUSINGVIEWCONTAINER_H_ */
+
+#endif // CXVIEWCOLLECTIONIMAGEWRITER_H

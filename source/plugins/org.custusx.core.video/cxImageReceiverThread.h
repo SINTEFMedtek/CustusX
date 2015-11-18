@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMutex>
 #include <QDateTime>
 #include "cxForwardDeclarations.h"
+//#include "cxStreamedTimestampSynchronizer.h"
 
 namespace cx
 {
@@ -102,7 +103,6 @@ protected:
 	 */
 	void addImageToQueue(ImagePtr imgMsg);
 	void addSonixStatusToQueue(ProbeDefinitionPtr msg); ///< add the message to a thread-safe queue
-	void calibrateTimeStamp(ImagePtr imgMsg); ///< Calibrate the time stamps of the incoming message based on the computer clock. Calibration is based on an average of several of the last messages. The calibration is updated every 20-30 sec.
 
 private slots:
 
@@ -111,7 +111,7 @@ private slots:
 
 private:
 	void reportFPS(QString streamUid);
-	bool imageComesFromSonix(ImagePtr imgMsg);
+//	bool imageComesFromSonix(ImagePtr imgMsg);
 	bool attemptInitialize();
 
 	std::map<QString, cx::CyclicActionLoggerPtr> mFPSTimer;
@@ -120,10 +120,7 @@ private:
 	std::list<ImagePtr> mMutexedImageMessageQueue;
 	std::list<ProbeDefinitionPtr> mMutexedSonixStatusMessageQueue;
 
-	double mLastReferenceTimestampDiff;
-	bool mGeneratingTimeCalibration;
-	QDateTime mLastSyncTime;
-	std::vector<double> mLastTimeStamps;
+//    StreamedTimestampSynchronizer mStreamSynchronizer;
 
 	StreamerServicePtr mStreamerInterface;
 	StreamerPtr mImageStreamer;

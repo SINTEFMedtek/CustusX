@@ -29,62 +29,9 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#include "catch.hpp"
 
-#ifndef CXVIEWCOLLECTIONWIDGET_H_
-#define CXVIEWCOLLECTIONWIDGET_H_
-
-#include "cxResourceVisualizationExport.h"
-
-#include "cxView.h"
-#include "cxLayoutData.h"
-#include <QWidget>
-
-
-class QGridLayout;
-
-namespace cx
+TEST_CASE("ExamplePlugin: Check nothing", "[unit][plugins][org.custusx.example][hide]")
 {
-
-/**
- * Widget for displaying Views.
- *
- * This is the main class for displaying visualizations.
- * Add Views using addView(), then add Reps to the Views.
- *
- * \ingroup cx_resource_view
- * \date 2013-11-05
- * \date 2014-09-26
- * \author christiana
- */
-
-class cxResourceVisualization_EXPORT ViewCollectionWidget : public QWidget
-{
-	Q_OBJECT
-public:
-	static QPointer<ViewCollectionWidget> createViewWidgetLayout(QWidget* parent = NULL);
-	static QPointer<ViewCollectionWidget> createOptimizedLayout(QWidget* parent = NULL);
-
-	virtual ~ViewCollectionWidget() {}
-
-	virtual ViewPtr addView(View::Type type, LayoutRegion region) = 0;
-	virtual void clearViews() = 0;
-	virtual void setModified() = 0;
-	virtual void render() = 0;
-	virtual void setGridSpacing(int val) = 0;
-	virtual void setGridMargin(int val) = 0;
-    virtual int getGridSpacing() const = 0;
-    virtual int getGridMargin() const = 0;
-
-	virtual std::vector<ViewPtr> getViews() = 0;
-    virtual QPoint getPosition(ViewPtr view) = 0;
-
-signals:
-    void rendered();
-protected:
-	ViewCollectionWidget(QWidget* parent) : QWidget(parent) {}
-};
-
-
-} // namespace cx
-
-#endif // CXVIEWCOLLECTIONWIDGET_H_
+	CHECK(true);
+}

@@ -1,27 +1,27 @@
-project(org_custusx_registration_method_pointcloud)
+project(org_custusx_webserver)
+
+find_package(Qt5Network REQUIRED)
+find_package(qhttpserver REQUIRED)
+#message(STATUS "qhttpserver: " ${qhttpserver_DIR} ", " ${qhttpserver_FOUND})
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
 set(PLUGIN_SRCS
-	cxRMPCPluginActivator.cpp
-
-	cxRMPCService.cpp
-	cxRMPCFromPointerService.cpp
-	cxRMPCWidget.cpp
-	cxRMPCFromPointerWidget.cpp
-
-	cxRMPCService.h
-	cxRMPCFromPointerService.h
+  cxWebServerPluginActivator.cpp
+  cxScreenVideoProvider.cpp
+  cxHttpRequestHandler.cpp
+  cxRemoteAPI.cpp
+  cxLayoutVideoSource.cpp
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
-	cxRMPCPluginActivator.h
-	cxRMPCWidget.h
-	cxRMPCFromPointerWidget.h
+  cxWebServerPluginActivator.h
+  cxScreenVideoProvider.h
+  cxHttpRequestHandler.h
+  cxRemoteAPI.h
+  cxLayoutVideoSource.h
 )
-
-cx_create_export_header(${PROJECT_NAME})
 
 # Qt Designer files which should be processed by Qts uic
 set(PLUGIN_UI_FORMS
@@ -31,14 +31,16 @@ set(PLUGIN_UI_FORMS
 set(PLUGIN_resources
 )
 
+
 #Compute the plugin dependencies
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
     ${PLUGIN_target_libraries}   
-    cxResourceWidgets
-	org_custusx_registration
-	org_custusx_registration_method_vessel
-	)
+    cxPluginUtilities
+	cxResource
+	cxResourceVisualization
+	qhttpserver
+    )
 
 set(PLUGIN_OUTPUT_DIR "")
 if(CX_WINDOWS)
@@ -57,13 +59,12 @@ ctkMacroBuildPlugin(
   OUTPUT_DIR ${PLUGIN_OUTPUT_DIR}
 )
 
-target_include_directories(org_custusx_registration_method_pointcloud
+target_include_directories(org_custusx_webserver
     PUBLIC
     .
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-cx_doc_define_plugin_user_docs("${PROJECT_NAME}" "${CMAKE_CURRENT_SOURCE_DIR}/doc")
-cx_add_non_source_file("doc/org_custusx_registration_method_pointcloud.md")
-cx_add_non_source_file("doc/org_custusx_registration_method_pointcloud.h")
+
+add_subdirectory(testing)
 

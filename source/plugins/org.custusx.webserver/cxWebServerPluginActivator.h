@@ -30,61 +30,47 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXVIEWCOLLECTIONWIDGET_H_
-#define CXVIEWCOLLECTIONWIDGET_H_
+#ifndef CXNETWORKPLUGINACTIVATOR_H_
+#define CXNETWORKPLUGINACTIVATOR_H_
 
-#include "cxResourceVisualizationExport.h"
+#include <ctkPluginActivator.h>
+#include "boost/shared_ptr.hpp"
 
-#include "cxView.h"
-#include "cxLayoutData.h"
-#include <QWidget>
-
-
-class QGridLayout;
+class QHttpServer;
+class QHttpRequest;
+class QHttpResponse;
 
 namespace cx
 {
+//class ScreenVideoProvider;
+typedef boost::shared_ptr<class RemoteAPI> RemoteAPIPtr;
+typedef boost::shared_ptr<class HttpRequestHandler> HttpRequestHandlerPtr;
+//typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
 
 /**
- * Widget for displaying Views.
- *
- * This is the main class for displaying visualizations.
- * Add Views using addView(), then add Reps to the Views.
- *
- * \ingroup cx_resource_view
- * \date 2013-11-05
- * \date 2014-09-26
- * \author christiana
  */
-
-class cxResourceVisualization_EXPORT ViewCollectionWidget : public QWidget
+class NetworkPluginActivator :  public QObject, public ctkPluginActivator
 {
 	Q_OBJECT
+	Q_INTERFACES(ctkPluginActivator)
+    Q_PLUGIN_METADATA(IID "org_custusx_webserver")
+
 public:
-	static QPointer<ViewCollectionWidget> createViewWidgetLayout(QWidget* parent = NULL);
-	static QPointer<ViewCollectionWidget> createOptimizedLayout(QWidget* parent = NULL);
 
-	virtual ~ViewCollectionWidget() {}
+    NetworkPluginActivator();
+    ~NetworkPluginActivator();
 
-	virtual ViewPtr addView(View::Type type, LayoutRegion region) = 0;
-	virtual void clearViews() = 0;
-	virtual void setModified() = 0;
-	virtual void render() = 0;
-	virtual void setGridSpacing(int val) = 0;
-	virtual void setGridMargin(int val) = 0;
-    virtual int getGridSpacing() const = 0;
-    virtual int getGridMargin() const = 0;
+	void start(ctkPluginContext* context);
+	void stop(ctkPluginContext* context);
 
-	virtual std::vector<ViewPtr> getViews() = 0;
-    virtual QPoint getPosition(ViewPtr view) = 0;
 
-signals:
-    void rendered();
-protected:
-	ViewCollectionWidget(QWidget* parent) : QWidget(parent) {}
+private:
+	HttpRequestHandlerPtr mRequestHandler;
+	RemoteAPIPtr mAPI;
+	QHttpServer *server;
+//	RegisteredServicePtr mRegistration;
 };
-
 
 } // namespace cx
 
-#endif // CXVIEWCOLLECTIONWIDGET_H_
+#endif /* CXNETWORKPLUGINACTIVATOR_H_ */

@@ -29,54 +29,59 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#include "cxRemoteAPI.h"
 
-#ifndef CXVIEWCOLLECTIONWIDGETUSINGVIEWCONTAINER_H_
-#define CXVIEWCOLLECTIONWIDGETUSINGVIEWCONTAINER_H_
-
-#include "cxResourceVisualizationExport.h"
-
-#include "cxView.h"
-#include "cxLayoutData.h"
-#include "cxViewCollectionWidget.h"
-
-
-class QGridLayout;
+#include "cxViewService.h"
+#include "cxLayoutRepository.h"
+#include <QStringList>
+#include "cxScreenVideoProvider.h"
+#include "cxLayoutVideoSource.h"
 
 namespace cx
 {
 
-/**
- * Widget for displaying Views, using only a single QVTKWidget/vtkRenderWindow,
- * but one vtkRenderer for each View inside.
- *
- * \date 2014-09-26
- * \author Christian Askeland
- * \ingroup cx_resource_view_internal
- */
-class cxResourceVisualization_EXPORT ViewCollectionWidgetUsingViewContainer : public ViewCollectionWidget
+RemoteAPI::RemoteAPI(VisServicesPtr services) : mServices(services)
 {
-	Q_OBJECT
-public:
-	ViewCollectionWidgetUsingViewContainer(QWidget* parent);
-    virtual ~ViewCollectionWidgetUsingViewContainer();
+    mScreenVideo = new ScreenVideoProvider(mServices);
+}
 
-	ViewPtr addView(View::Type type, LayoutRegion region);
-	void clearViews();
-	virtual void setModified();
-	virtual void render();
-	virtual void setGridSpacing(int val);
-	virtual void setGridMargin(int val);
-    virtual int getGridSpacing() const;
-    virtual int getGridMargin() const;
-    virtual std::vector<ViewPtr> getViews();
-    virtual QPoint getPosition(ViewPtr view);
+QStringList RemoteAPI::getAvailableLayouts() const
+{
+    std::vector<QString> val;
+    val = mServices->view()->getLayoutRepository()->getAvailable();
+    return QStringList::fromVector(QVector<QString>::fromStdVector(val));
+}
 
-private:
-	std::vector<ViewPtr> mViews;
-	class ViewContainer* mViewContainer;
-};
+void RemoteAPI::createLayoutWidget(QSize size, QString layout)
+{
+    mScreenVideo->showSecondaryLayout(size, layout);
+}
 
+void RemoteAPI::closeLayoutWidget()
+{
+    mScreenVideo->closeSecondaryLayout();
+}
+
+LayoutVideoSourcePtr RemoteAPI::startStreaming()
+{
+    LayoutVideoSourcePtr source(new LayoutVideoSource(mScreenVideo->getSecondaryLayoutWidget()));
+//    source->start();
+    return source;
+}
+
+QImage RemoteAPI::grabLayout()
+{
+    QImage image = mScreenVideo->grabSecondaryLayout();
+//    mScreenVideo->saveScreenShot(image, "webimage_view");
+    return image;
+}
+
+QImage RemoteAPI::grabScreen()
+{
+    QImage image = mScreenVideo->grabScreen(0).toImage();
+    //	mScreenVideo->saveScreenShot(pm, "webimage");
+    return image;
+}
 
 
 } // namespace cx
-#endif /* CXVIEWCOLLECTIONWIDGETUSINGVIEWCONTAINER_H_ */

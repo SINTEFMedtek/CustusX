@@ -180,9 +180,18 @@ NavigationPtr ViewManager::getNavigation()
 	return NavigationPtr(new Navigation(mBackend, mCameraControl));
 }
 
-QWidget *ViewManager::getLayoutWidget(QWidget* parent, int index)
+QWidget *ViewManager::getLayoutWidget(int index)
 {
-	CX_ASSERT(index < mLayoutWidgets.size());
+    if (index >= mLayoutWidgets.size())
+        return NULL;
+   return mLayoutWidgets[index];
+}
+
+QWidget *ViewManager::createLayoutWidget(QWidget* parent, int index)
+{
+	if (index >= mLayoutWidgets.size())
+		return NULL;
+//	CX_ASSERT(index < mLayoutWidgets.size()); // removed: must be allowed to iterate until NULL
 	if (!mLayoutWidgets[index])
 	{
         bool optimizedViews = settings()->value("optimizedViews").toBool();

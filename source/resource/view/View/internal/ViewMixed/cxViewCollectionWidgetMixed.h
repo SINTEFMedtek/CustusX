@@ -79,6 +79,10 @@ public:
 	virtual void render();
 	virtual void setGridSpacing(int val);
 	virtual void setGridMargin(int val);
+    virtual int getGridSpacing() const;
+    virtual int getGridMargin() const;
+    virtual std::vector<ViewPtr> getViews();
+    virtual QPoint getPosition(ViewPtr view);
 
 private:
 	void addWidgetToLayout(QGridLayout* layout, QWidget* widget, LayoutRegion region);
@@ -87,7 +91,6 @@ private:
 	LayoutRegion mTotalRegion;
 	QGridLayout* mLayout;
     ViewCollectionWidget* mBaseLayout;
-	std::vector<LayoutRegion> mOverlayRegions;
 	std::vector<ViewWidget*> mOverlays;
 
 	boost::shared_ptr<ViewCache<ViewWidget> > mViewCacheOverlay;

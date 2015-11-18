@@ -77,6 +77,11 @@ public:
 
 	ProbeDefinitionPtr decode(ProbeDefinitionPtr msg);
 
+    /**
+     * Return true if the device name if on a format indicating that the message is legacy.
+     */
+    bool guessIsSonixLegacyFormat(QString deviceName);
+
 private:	/** Extract the color format string from enclosing brackets inside
 	  * another string, i.e find "RGBA" from "Device[RGBA]".
 	  * Also return the input without format string as cleanedDeviceName.

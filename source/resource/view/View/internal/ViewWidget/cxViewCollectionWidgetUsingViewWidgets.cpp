@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewCollectionWidgetUsingViewWidgets.h"
 #include "cxGLHelpers.h"
 #include "cxViewUtilities.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -68,7 +69,6 @@ ViewPtr LayoutWidgetUsingViewWidgets::addView(View::Type type, LayoutRegion regi
 	view->show();
 
 	mViews.push_back(view);
-
 	return view->getView();
 }
 
@@ -115,6 +115,33 @@ void LayoutWidgetUsingViewWidgets::render()
 		ViewWidget* current = mViews[i];
 		current->render(); // render only changed scenegraph (shaky but smooth)
 	}
+
+    emit rendered();
+}
+
+QPoint LayoutWidgetUsingViewWidgets::getPosition(ViewPtr view)
+{
+    ViewWidget* widget = this->WidgetFromView(view);
+    if (!widget)
+    {
+        CX_LOG_ERROR() << "Did not find view in layout " << view->getUid();
+        return QPoint(0,0);
+    }
+
+    QPoint p = widget->mapToGlobal(QPoint(0,0));
+    p = this->mapFromGlobal(p);
+    return p;
+}
+
+ViewWidget* LayoutWidgetUsingViewWidgets::WidgetFromView(ViewPtr view)
+{
+    for (unsigned i=0; i<mViews.size(); ++i)
+    {
+        ViewWidget* current = mViews[i];
+        if (current->getView()==view)
+            return current;
+    }
+    return NULL;
 }
 
 void LayoutWidgetUsingViewWidgets::setGridSpacing(int val)
@@ -125,6 +152,24 @@ void LayoutWidgetUsingViewWidgets::setGridSpacing(int val)
 void LayoutWidgetUsingViewWidgets::setGridMargin(int val)
 {
 	mLayout->setMargin(val);
+}
+
+int LayoutWidgetUsingViewWidgets::getGridSpacing() const
+{
+    return mLayout->spacing();
+}
+
+int LayoutWidgetUsingViewWidgets::getGridMargin() const
+{
+    return mLayout->margin();
+}
+
+std::vector<ViewPtr> LayoutWidgetUsingViewWidgets::getViews()
+{
+	std::vector<ViewPtr> retval;
+	for (unsigned i=0; i<mViews.size(); ++i)
+		retval.push_back(mViews[i]->getView());
+	return retval;
 }
 
 } // cx

@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewUtilities.h"
 #include "vtkRenderWindow.h"
 #include "cxGLHelpers.h"
-
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -78,7 +78,6 @@ ViewPtr ViewCollectionWidgetMixed::addView(View::Type type, LayoutRegion region)
 		overlay->getView()->setType(type);
 		overlay->show();
 		mOverlays.push_back(overlay);
-		mOverlayRegions.push_back(region);
 		view = overlay->getView();
 		this->addWidgetToLayout(mLayout, overlay, region);
 	}
@@ -137,6 +136,8 @@ void ViewCollectionWidgetMixed::render()
 	{
 		mOverlays[i]->render();
 	}
+
+    emit rendered();
 }
 
 void ViewCollectionWidgetMixed::setGridSpacing(int val)
@@ -149,6 +150,43 @@ void ViewCollectionWidgetMixed::setGridMargin(int val)
 {
 	mBaseLayout->setGridMargin(0);
 	mLayout->setMargin(val);
+}
+
+int ViewCollectionWidgetMixed::getGridSpacing() const
+{
+    return mLayout->spacing();
+}
+
+int ViewCollectionWidgetMixed::getGridMargin() const
+{
+    return mLayout->margin();
+}
+
+
+std::vector<ViewPtr> ViewCollectionWidgetMixed::getViews()
+{
+	std::vector<ViewPtr> retval = mBaseLayout->getViews();
+	for (unsigned i=0; i<mOverlays.size(); ++i)
+		retval.push_back(mOverlays[i]->getView());
+	return retval;
+}
+
+QPoint ViewCollectionWidgetMixed::getPosition(ViewPtr view)
+{
+    for (unsigned i=0; i<mOverlays.size(); ++i)
+    {
+        if (mOverlays[i]->getView()==view)
+        {
+            QPoint p = mOverlays[i]->mapToGlobal(QPoint(0,0));
+            p = this->mapFromGlobal(p);
+            return p;
+        }
+    }
+
+    QPoint p = mBaseLayout->getPosition(view);
+    p = mBaseLayout->mapToGlobal(p);
+    p = this->mapFromGlobal(p);
+    return p;
 }
 
 } /* namespace cx */

@@ -167,6 +167,8 @@ void InteractiveClipper::removeData(DataPtr data)
 
 bool InteractiveClipper::exists(DataPtr data)
 {
+	if(!data)
+		return false;
 	return mDatas.count(data->getUid());
 }
 

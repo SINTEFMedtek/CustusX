@@ -30,53 +30,64 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXVIEWCOLLECTIONWIDGETUSINGVIEWCONTAINER_H_
-#define CXVIEWCOLLECTIONWIDGETUSINGVIEWCONTAINER_H_
+#ifndef STREAMEDTIMESTAMPSYNCHRONIZER_H
+#define STREAMEDTIMESTAMPSYNCHRONIZER_H
 
-#include "cxResourceVisualizationExport.h"
-
-#include "cxView.h"
-#include "cxLayoutData.h"
-#include "cxViewCollectionWidget.h"
+#include "cxResourceExport.h"
 
 
-class QGridLayout;
+#include <vector>
+#include "boost/shared_ptr.hpp"
+#include <QDateTime>
+#include "cxForwardDeclarations.h"
 
 namespace cx
 {
 
 /**
- * Widget for displaying Views, using only a single QVTKWidget/vtkRenderWindow,
- * but one vtkRenderer for each View inside.
+ * Process a stream of incoming timestamps, and generate a mean shift
+ * that synchronizes their time to this computer.
  *
- * \date 2014-09-26
- * \author Christian Askeland
- * \ingroup cx_resource_view_internal
  */
-class cxResourceVisualization_EXPORT ViewCollectionWidgetUsingViewContainer : public ViewCollectionWidget
+class cxResource_EXPORT StreamedTimestampSynchronizer
 {
-	Q_OBJECT
 public:
-	ViewCollectionWidgetUsingViewContainer(QWidget* parent);
-    virtual ~ViewCollectionWidgetUsingViewContainer();
+    StreamedTimestampSynchronizer();
+    /**
+     * Utility for updating the shift based on the incoming image timestamp,
+     * and also synchronizing the image timestamp (i.e. shifting it).
+     */
+    void syncToCurrentTime(ImagePtr imgMsg);
 
-	ViewPtr addView(View::Type type, LayoutRegion region);
-	void clearViews();
-	virtual void setModified();
-	virtual void render();
-	virtual void setGridSpacing(int val);
-	virtual void setGridMargin(int val);
-    virtual int getGridSpacing() const;
-    virtual int getGridMargin() const;
-    virtual std::vector<ViewPtr> getViews();
-    virtual QPoint getPosition(ViewPtr view);
+    /**
+     * Insert a new timestamp. Use it to update
+     * the shift estimate.
+     */
+    void addTimestamp(QDateTime timestamp);
+    /**
+     * Get the current shift, i.e. the correction to be applied
+     * to timestamps in order to synchronize them with this computer
+     * clock.
+     */
+    double getShift() const;
 
 private:
-	std::vector<ViewPtr> mViews;
-	class ViewContainer* mViewContainer;
+    /** Calibrate the time stamps of the incoming message based on the computer
+     * clock. Calibration is based on an average of several of the last messages.
+     * The calibration is updated every 20-30 sec.
+     */
+    template<class ITER>
+    double average(ITER begin, ITER end) const;
+
+    mutable double mLastComputedTimestampShift;
+    QList<double> mDeltaWindow;
+    int mMaxWindowSize;
 };
 
 
+/**
+ * @}
+ */
+} //end namespace cx
 
-} // namespace cx
-#endif /* CXVIEWCOLLECTIONWIDGETUSINGVIEWCONTAINER_H_ */
+#endif // STREAMEDTIMESTAMPSYNCHRONIZER_H

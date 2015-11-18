@@ -29,54 +29,39 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXSCREENSHOTIMAGEWRITER_H
+#define CXSCREENSHOTIMAGEWRITER_H
 
-#ifndef CXVIEWCOLLECTIONWIDGETUSINGVIEWCONTAINER_H_
-#define CXVIEWCOLLECTIONWIDGETUSINGVIEWCONTAINER_H_
-
-#include "cxResourceVisualizationExport.h"
-
-#include "cxView.h"
-#include "cxLayoutData.h"
-#include "cxViewCollectionWidget.h"
-
-
-class QGridLayout;
+#include <QObject>
+#include <QPointer>
+#include <QMainWindow>
+#include "vtkSmartPointer.h"
+#include "cxVisServices.h"
+#include "cxForwardDeclarations.h"
 
 namespace cx
 {
+typedef boost::shared_ptr<class ScreenShotImageWriter> ScreenShotImageWriterPtr;
 
 /**
- * Widget for displaying Views, using only a single QVTKWidget/vtkRenderWindow,
- * but one vtkRenderer for each View inside.
  *
- * \date 2014-09-26
- * \author Christian Askeland
- * \ingroup cx_resource_view_internal
  */
-class cxResourceVisualization_EXPORT ViewCollectionWidgetUsingViewContainer : public ViewCollectionWidget
+class ScreenShotImageWriter
 {
-	Q_OBJECT
 public:
-	ViewCollectionWidgetUsingViewContainer(QWidget* parent);
-    virtual ~ViewCollectionWidgetUsingViewContainer();
+	static ScreenShotImageWriterPtr create(PatientModelServicePtr patient) { return ScreenShotImageWriterPtr(new ScreenShotImageWriter(patient)); }
+	void grabAllScreensToFile();
 
-	ViewPtr addView(View::Type type, LayoutRegion region);
-	void clearViews();
-	virtual void setModified();
-	virtual void render();
-	virtual void setGridSpacing(int val);
-	virtual void setGridMargin(int val);
-    virtual int getGridSpacing() const;
-    virtual int getGridMargin() const;
-    virtual std::vector<ViewPtr> getViews();
-    virtual QPoint getPosition(ViewPtr view);
+	void save(QImage image, QString id);
+	QString getName(unsigned screenid);
+	QPixmap grab(unsigned screenid);
+
+	ScreenShotImageWriter(PatientModelServicePtr patient);
 
 private:
-	std::vector<ViewPtr> mViews;
-	class ViewContainer* mViewContainer;
+	PatientModelServicePtr mPatient;
 };
 
-
-
 } // namespace cx
-#endif /* CXVIEWCOLLECTIONWIDGETUSINGVIEWCONTAINER_H_ */
+
+#endif // CXSCREENSHOTIMAGEWRITER_H

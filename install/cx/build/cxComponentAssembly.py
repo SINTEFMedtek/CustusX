@@ -46,6 +46,7 @@ class LibraryAssembly(object):
         self.addComponent(cxComponents.IGSTK())
         self.addComponent(cxComponents.CTK())
         self.addComponent(cxComponents.OpenCLUtilityLibrary())
+        self.addComponent(cxComponents.QHttpServer())
         if (platform.system() == 'Linux') or (platform.system() == 'Windows'):
             self.addComponent(cxComponents.FAST())
             self.addComponent(cxComponents.TubeSegmentationFramework());

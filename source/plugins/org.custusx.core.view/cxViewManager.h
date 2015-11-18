@@ -154,7 +154,8 @@ public:
 	  * Return the top widget, it should be added to the calling gui.
 	  */
 //	void initialize();
-	QWidget* getLayoutWidget(QWidget* parent, int index);
+    QWidget* createLayoutWidget(QWidget* parent, int index);
+    QWidget* getLayoutWidget(int index);
 
 	void enableRender(bool val);
 	bool renderingIsEnabled() const;
