@@ -521,6 +521,18 @@ Get all available tools. Download, install and setup CustusX environment for the
 .EXAMPLE
 Get-Tools full' -tools @('git', 'jom')
 Get git and jom. Download, install and setup CustusX environment for them.
+
+.EXAMPLE
+Get-Tools download
+Download tools.
+
+.EXAMPLE
+Get-Tools install
+Install tools.
+
+.EXAMPLE
+Get-Tools environment
+Setup CustusX environment for them.
 #>
 Function Get-Tools {
 

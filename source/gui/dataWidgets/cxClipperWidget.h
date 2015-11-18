@@ -71,8 +71,8 @@ protected:
 	virtual void prePaintEvent();
 
 	InteractiveClipperPtr mClipper;
-	StringPropertyClipPlanePtr mPlaneAdapter;
-	LabeledComboBoxWidget* planeSelector;
+//	StringPropertyClipPlanePtr mPlaneAdapter;
+//	LabeledComboBoxWidget* planeSelector;
 	QVBoxLayout* mLayout;
 	QCheckBox* mUseClipperCheckBox;
 	QCheckBox *mAttachedToTool;
