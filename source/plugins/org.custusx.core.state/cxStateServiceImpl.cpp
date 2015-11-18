@@ -164,13 +164,13 @@ void StateServiceImpl::fillDefaultSettings()
 	this->fillDefault("Ultrasound/CompressAcquisition", true);
 	this->fillDefault("View3D/sphereRadius", 1.0);
 	this->fillDefault("View3D/labelSize", 2.5);
-	this->fillDefault("View3D/showOrientationAnnotation", true);
 	this->fillDefault("Navigation/anyplaneViewOffset", 0.25);
 	this->fillDefault("Navigation/followTooltip", true);
 	this->fillDefault("Navigation/followTooltipBoundary", 0.1);
 
 	this->fillDefault("showSectorInRTView", true);
-	this->fillDefault("View3D/stereoType", stFRAME_SEQUENTIAL);
+    this->fillDefault("View/showOrientationAnnotation", true);
+    this->fillDefault("View3D/stereoType", stFRAME_SEQUENTIAL);
 	this->fillDefault("View3D/eyeAngle", 4.0);
 	this->fillDefault("View/showDataText", true);
 	this->fillDefault("View/showLabels", true);
