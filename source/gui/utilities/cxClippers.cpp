@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxProfile.h"
 #include "cxStringProperty.h"
 #include "cxXmlOptionItem.h"
+#include "cxXMLNodeWrapper.h"
 
 
 namespace cx
@@ -52,7 +53,7 @@ Clippers::Clippers(VisServicesPtr services) :
 	this->createDefaultClippers();
 //	mStorage.storeVariable("clipperList", boost::bind(&Clippers::exportList, this), boost::bind(&Clippers::importList, this, _1));
 
-	XmlOptionFile mOptions = profile()->getXmlSettings().descend("clippers");
+//	XmlOptionFile mOptions = profile()->getXmlSettings().descend("clippers");
 
 
 	//TODO: Store clippers in profile file instead of patient file
@@ -65,6 +66,41 @@ Clippers::Clippers(VisServicesPtr services) :
 
 //	XmlOptionItem xmlStore = XmlOptionItem("clipperList", mOptions.toElement());
 //	this->importList(xmlStore.readValue(this->getInitialClipperNames().join(';')));
+}
+
+void Clippers::addXml(QDomNode& parentNode)
+{
+	XMLNodeAdder parent(parentNode);
+	XMLNodeAdder clippersNode(parent.addElement("clippers"));
+
+	std::map<QString, InteractiveClipperPtr>::iterator iter = mClippers.begin();
+	for (; iter != mClippers.end(); ++iter)
+	{
+		QDomElement clipperNode = clippersNode.addElement("clipper");
+		clipperNode.setAttribute("name", iter->first);
+		iter->second->addXml(clipperNode);
+	}
+}
+
+void Clippers::parseXml(QDomNode parentNode)
+{
+	XMLNodeParser base(parentNode);
+
+	QDomElement clippersNode = base.parseElement("clippers");
+	QDomNode clipperNode = clippersNode.firstChild();
+	while (!clipperNode.isNull())
+	{
+		if (clipperNode.toElement().tagName() != "clipper")
+		{
+			clipperNode = clipperNode.nextSibling();
+			continue;
+		}
+		QString clipperName = clipperNode.toElement().attribute("name");
+		InteractiveClipperPtr clipper = this->getClipper(clipperName);
+		clipper->parseXml(clipperNode);
+
+		clipperNode = clipperNode.nextSibling();
+	}
 }
 
 void Clippers::importList(QString clippers)
@@ -107,7 +143,12 @@ InteractiveClipperPtr Clippers::getClipper(QString clipperName)
 {
 	if(this->exists(clipperName))
 		return mClippers.at(clipperName);
-	return InteractiveClipperPtr();
+	else
+	{
+		InteractiveClipperPtr clipper = InteractiveClipperPtr(new InteractiveClipper(mServices));
+		this->add(clipperName, clipper);
+		return clipper;
+	}
 }
 
 void Clippers::add(QString clipperName, InteractiveClipperPtr clipper)
