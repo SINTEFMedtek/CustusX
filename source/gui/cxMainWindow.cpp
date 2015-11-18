@@ -72,6 +72,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxFiltersWidget.h"
 #include "cxPluginFrameworkWidget.h"
 #include "cxManageClippersWidget.h"
+#include "cxBrowserWidget.h"
 
 namespace cx
 {
@@ -126,6 +127,8 @@ MainWindow::MainWindow() :
 	this->addAsDockWidget(new PluginFrameworkWidget(this), "Browsing");
     this->addAsDockWidget(new FiltersWidget(VisServices::create(logicManager()->getPluginContext()), this), "Algorithms");
 	this->addAsDockWidget(new ClippingPropertiesWidget(mServices, this), "Properties");
+
+	this->addAsDockWidget(new BrowserWidget(this), "Browsing");
 
 	connect(patientService().get(), &PatientModelService::patientChanged, this, &MainWindow::patientChangedSlot);
 	connect(qApp, &QApplication::focusChanged, this, &MainWindow::focusChanged);
