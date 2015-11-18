@@ -35,7 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtPlugin>
 #include <iostream>
 
-//#include "cxNetworkServiceImpl.h"
 #include "cxRegisteredService.h"
 #include <QtConcurrent>
 #include <QNetworkAccessManager>
@@ -43,7 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <qhttpserver.h>
 #include <qhttprequest.h>
 #include <qhttpresponse.h>
-//#include "cxLogger.h"
 #include "cxScreenVideoProvider.h"
 
 #include "cxPatientModelService.h"
@@ -82,55 +80,11 @@ void NetworkPluginActivator::start(ctkPluginContext* context)
 
 void NetworkPluginActivator::stop(ctkPluginContext* context)
 {
+	delete server;
+	server = NULL;
 //	mRegistration.reset();
 	Q_UNUSED(context);
 }
-
-
-
-
-
-//Responder::Responder(QHttpRequest *req, QHttpResponse *resp)
-//	: m_req(req)
-//	, m_resp(resp)
-//{
-//	QRegExp exp("^/user/([a-z]+$)");
-//	if (exp.indexIn(req->path()) == -1)
-//	{
-//		resp->writeHead(403);
-//		resp->end(QByteArray("You aren't allowed here!"));
-//		/// @todo There should be a way to tell request to stop streaming data
-//		return;
-//	}
-
-//	resp->setHeader("Content-Type", "text/html");
-//	resp->writeHead(200);
-
-//	QString name = exp.capturedTexts()[1];
-//	QString bodyStart = tr("<html><head><title>BodyData App</title></head><body><h1>Hello %1!</h1><p>").arg(name);
-//	resp->write(bodyStart.toUtf8());
-
-//	connect(req, SIGNAL(data(const QByteArray&)), this, SLOT(accumulate(const QByteArray&)));
-//	connect(req, SIGNAL(end()), this, SLOT(reply()));
-//	connect(m_resp, SIGNAL(done()), this, SLOT(deleteLater()));
-//}
-
-//Responder::~Responder()
-//{
-//	std::cout << "Responder::~Responder" << std::endl;
-//}
-
-//void Responder::accumulate(const QByteArray &data)
-//{
-//	std::cout << "Responder::accumulate" << std::endl;
-//	m_resp->write(data);
-//}
-
-//void Responder::reply()
-//{
-//	std::cout << "Responder::reply" << std::endl;
-//	m_resp->end(QByteArray("</p></body></html>"));
-//}
 
 
 } // namespace cx
