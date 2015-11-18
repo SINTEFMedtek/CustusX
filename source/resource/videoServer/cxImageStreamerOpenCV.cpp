@@ -365,11 +365,13 @@ void ImageStreamerOpenCV::grab()
 	{
 		return;
 	}
+
 	mGrabbing = true;
 	// grab images from camera to opencv internal buffer, do not process
-	mVideoCapture->grab();
-	mLastGrabTime = QDateTime::currentDateTime();
-	mAvailableImage = true;
+	bool success = mVideoCapture->grab();
+	if (success)
+		mLastGrabTime = QDateTime::currentDateTime();
+	mAvailableImage = success;
 	mGrabbing = false;
 #endif
 }
