@@ -43,31 +43,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-class AbsDoubleLess
-{
-public:
-	AbsDoubleLess(double center) : mCenter(center) { };
-
-  bool operator()(const double& d1, const double& d2)
-  {
-	return fabs(d1 - mCenter) < fabs(d2 - mCenter);
-  }
-
-  double mCenter;
-};
-
-///--------------------------------------------------------
-///--------------------------------------------------------
-///--------------------------------------------------------
-
 ImageReceiverThread::ImageReceiverThread(StreamerServicePtr streamerInterface, QObject* parent) :
 		QObject(parent),
 		mStreamerInterface(streamerInterface)
 {
 	this->setObjectName("imagereceiver worker");
-	mGeneratingTimeCalibration = false;
-	mLastReferenceTimestampDiff = 0.0;
-	mLastTimeStamps.reserve(20);
 }
 
 void ImageReceiverThread::initialize()
@@ -131,15 +111,14 @@ void ImageReceiverThread::addSonixStatusToQueueSlot()
 void ImageReceiverThread::addImageToQueue(ImagePtr imgMsg)
 {
 	this->reportFPS(imgMsg->getUid());
-//	if(this->imageComesFromActiveVideoSource(imgMsg))
-//		this->reportFPS();
 
-	bool needToCalibrateMsgTimeStamp = this->imageComesFromSonix(imgMsg);
+//	bool needToCalibrateMsgTimeStamp = this->imageComesFromSonix(imgMsg);
 
-	//Should only be needed if time stamp is set on another computer that is
-	//not synched with the one running this code: e.g. The Ultrasonix scanner
-	if (needToCalibrateMsgTimeStamp)
-		this->calibrateTimeStamp(imgMsg);
+// moved to IGTLinkClientStreamer
+//	//Should only be needed if time stamp is set on another computer that is
+//	//not synched with the one running this code: e.g. The Ultrasonix scanner
+//	if (needToCalibrateMsgTimeStamp)
+//        mStreamSynchronizer.syncToCurrentTime(imgMsg);
 
 	QMutexLocker sentry(&mImageMutex);
 	mMutexedImageMessageQueue.push_back(imgMsg);
@@ -164,11 +143,6 @@ ImagePtr ImageReceiverThread::getLastImageMessage()
 	ImagePtr retval = mMutexedImageMessageQueue.front();
 	mMutexedImageMessageQueue.pop_front();
 
-	// this happens when the main thread is busy. This is bad, but happens a lot during operation.
-	// Removed this in order to remove spam from console
-//	static int mQueueSizeOnLastGet = 0;
-//	int queueSize = mMutexedImageMessageQueue.size();
-//	mQueueSizeOnLastGet = queueSize;
 	return retval;
 }
 
@@ -180,44 +154,6 @@ ProbeDefinitionPtr ImageReceiverThread::getLastSonixStatusMessage()
 	ProbeDefinitionPtr retval = mMutexedSonixStatusMessageQueue.front();
 	mMutexedSonixStatusMessageQueue.pop_front();
 	return retval;
-}
-
-void ImageReceiverThread::calibrateTimeStamp(ImagePtr imgMsg)
-{
-	QDateTime timestamp_dt = imgMsg->getAcquisitionTime();
-	double timestamp_ms = timestamp_dt.toMSecsSinceEpoch();
-
-	if (similar(mLastReferenceTimestampDiff, 0.0, 0.000001))
-		mLastReferenceTimestampDiff = timestamp_dt.msecsTo(QDateTime::currentDateTime());
-
-	// Start collecting time stamps if 20 sec since last calibration time
-	if(mLastSyncTime.isNull() || ( mLastSyncTime.msecsTo(QDateTime::currentDateTime()) > 2000) )
-		mGeneratingTimeCalibration = true;
-
-	if(mGeneratingTimeCalibration)
-		mLastTimeStamps.push_back(timestamp_dt.msecsTo(QDateTime::currentDateTime()));
-
-	// Perform time calibration if enough time stamps have been collected
-	if(mLastTimeStamps.size() >= 20)
-	{
-		std::sort(mLastTimeStamps.begin(), mLastTimeStamps.end(), AbsDoubleLess(mLastReferenceTimestampDiff));
-
-		mLastTimeStamps.resize(15);
-
-		double sumTimes = 0;
-	  for (std::vector<double>::const_iterator citer = mLastTimeStamps.begin(); citer != mLastTimeStamps.end(); ++citer)
-	  {
-	  	sumTimes += *citer;
-	  }
-	  mLastReferenceTimestampDiff = sumTimes / 15.0;
-
-		//Reset
-		mLastTimeStamps.clear();
-		mLastSyncTime = QDateTime::currentDateTime();
-		mGeneratingTimeCalibration = false;
-	}
-	imgMsg->setAcquisitionTime(QDateTime::fromMSecsSinceEpoch(timestamp_ms + mLastReferenceTimestampDiff));
-
 }
 
 void ImageReceiverThread::reportFPS(QString streamUid)
@@ -239,10 +175,10 @@ void ImageReceiverThread::reportFPS(QString streamUid)
 	}
 }
 
-bool ImageReceiverThread::imageComesFromSonix(ImagePtr imgMsg)
-{
-	return imgMsg->getUid().contains("Sonix", Qt::CaseInsensitive);
-}
+//bool ImageReceiverThread::imageComesFromSonix(ImagePtr imgMsg)
+//{
+//	return imgMsg->getUid().contains("Sonix", Qt::CaseInsensitive);
+//}
 
 QString ImageReceiverThread::hostDescription() const
 {

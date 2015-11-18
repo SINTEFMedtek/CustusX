@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QAbstractSocket>
 #include "cxIGTLinkImageMessage.h"
 #include "cxIGTLinkUSStatusMessage.h"
+#include "cxStreamedTimestampSynchronizer.h"
 
 class QTcpSocket;
 
@@ -91,7 +92,8 @@ private:
 	bool mHeadingReceived;
 	QString mAddress;
 	int mPort;
-	boost::shared_ptr<QTcpSocket> mSocket;
+    StreamedTimestampSynchronizer mStreamSynchronizer;
+    boost::shared_ptr<QTcpSocket> mSocket;
 	igtl::MessageHeader::Pointer mHeaderMsg;
 	IGTLinkUSStatusMessage::Pointer mUnsentUSStatusMessage; ///< received message, will be added to queue when next image arrives
 

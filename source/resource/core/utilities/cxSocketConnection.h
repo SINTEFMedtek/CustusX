@@ -88,9 +88,14 @@ public:
         bool operator==(const ConnectionInfo& rhs) const;
         bool isServer() const;
         bool isClient() const;
+        bool isLocalhostConnection() const;
         QString getDescription() const;
     };
 
+    /**
+     * Return the connection info for the *next* connection.
+     * Any existing connection might have other values.
+     */
     ConnectionInfo getConnectionInfo(); ///< thread-safe
     CX_SOCKETCONNECTION_STATE getState(); ///< thread-safe
     virtual void setConnectionInfo(ConnectionInfo info); ///< thread-safe
@@ -124,7 +129,6 @@ protected:
     void setCurrentConnectionInfo();
     void stateChange(CX_SOCKETCONNECTION_STATE newState);
     CX_SOCKETCONNECTION_STATE computeState();
-//	void onServerStateChanged(CX_SOCKETCONNECTION_STATE state);
 
     QTcpSocket* mSocket;
 
@@ -132,7 +136,7 @@ protected:
     QMutex mNextConnectionInfoMutex;
     ConnectionInfo mNextConnectionInfo; ///< info to be used for the next connect(), mutexed.
 
-private:
+protected:
     SocketConnectorPtr mConnector;
 };
 

@@ -30,6 +30,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "catch.hpp"
+#include <QTableWidget>
 #include "cxClipperWidget.h"
 #include "cxVisServices.h"
 #include "cxClippers.h"
@@ -92,7 +93,21 @@ public:
 	}
 	QMap<QString, QCheckBox*> getCheckBoxes()
 	{
-		return mCheckBoxes;
+		QMap<QString, QCheckBox*> checkBoxes;
+
+		int rows = mDataTableWidget->rowCount();
+
+		for (int row = 0; row < rows; ++row)
+		{
+			QTableWidgetItem *descriptionItem = mDataTableWidget->item(row, 1);
+			REQUIRE(descriptionItem);
+			QString name = descriptionItem->text();
+			QCheckBox *checkbox = dynamic_cast<QCheckBox*>(mDataTableWidget->cellWidget(row, 0));
+			REQUIRE(checkbox);
+			checkBoxes[name] = checkbox;
+		}
+
+		return checkBoxes;
 	}
 	void forceDataStructuresUpdate()
 	{
@@ -125,12 +140,34 @@ public:
 
 	QCheckBox *requireGetCheckBoxForMesh1()
 	{
-		QString uid = testData.mesh1->getUid();
+		QString uid = testData.mesh1->getName();
+		return requireGetCheckBoxForData(uid);
+	}
 
-		REQUIRE(this->mCheckBoxes.contains(uid));
-		QCheckBox *checkBox = this->mCheckBoxes[uid];
-		REQUIRE(checkBox);
-		return checkBox;
+	QCheckBox *requireGetCheckBoxForImage1()
+	{
+		QString uid = testData.image1->getName();
+		return requireGetCheckBoxForData(uid);
+	}
+
+	QCheckBox *requireGetCheckBoxForData(QString uid)
+	{
+		QCheckBox *checkbox = NULL;
+		int rows = mDataTableWidget->rowCount();
+
+		for (int row = 0; row < rows; ++row)
+		{
+			QTableWidgetItem *descriptionItem = mDataTableWidget->item(row, 1);
+			REQUIRE(descriptionItem);
+			QString name = descriptionItem->text();
+			if(name == uid)
+			{
+				checkbox = dynamic_cast<QCheckBox*>(mDataTableWidget->cellWidget(row, 0));
+				break;
+			}
+		}
+		REQUIRE(checkbox);
+		return checkbox;
 	}
 
 	cx::InteractiveClipperPtr testClipper;
@@ -233,6 +270,25 @@ TEST_CASE("ClipperWidget: Turn clipping on/off for a mesh", "[unit][gui][widget]
 	REQUIRE(clipPlanes.size() == 0);
 }
 
+TEST_CASE("ClipperWidget: Turn clipping on/off for an image", "[unit][gui][widget][clip]")
+{
+	SessionStorageHelper helper;
+	helper.createTestPatientWithData();
+	ClipperWidgetFixturePtr fixture = ClipperWidgetFixturePtr(new cxtest::ClipperWidgetFixture(helper.getServices()));
+
+	fixture->setClipper(fixture->testClipper);
+	QCheckBox *checkBox = fixture->requireGetCheckBoxForImage1();
+	REQUIRE_FALSE(checkBox->isChecked());
+	checkBox->click();
+
+	std::vector<vtkPlanePtr> clipPlanes = helper.testData.image1->getAllClipPlanes();
+	CHECK(fixture->testClipper->getDatas().size() == 1);
+
+	checkBox->click();
+	clipPlanes = helper.testData.image1->getAllClipPlanes();
+	CHECK(fixture->testClipper->getDatas().size() == 0);
+}
+
 TEST_CASE("ClipperWidget: Remember clipping in mesh when changing clipper", "[unit][gui][widget][clip]")
 {
 	SessionStorageHelper helper;
@@ -295,6 +351,8 @@ TEST_CASE("ClipperWidget: Select all data checks mesh checkbox", "[unit][gui][wi
 	REQUIRE_FALSE(fixture->getSelectAllData()->isChecked());
 	fixture->getSelectAllData()->click();
 	REQUIRE(fixture->getSelectAllData()->isChecked());
+	fixture->forceDataStructuresUpdate();
+	checkBox = fixture->requireGetCheckBoxForMesh1();
 	CHECK(checkBox->isChecked());
 }
 
@@ -307,9 +365,13 @@ TEST_CASE("ClipperWidget: Select all data is unchecked when mesh is unchecked", 
 	fixture->setClipper(fixture->testClipper);
 
 	fixture->getSelectAllData()->click();
+	REQUIRE(fixture->getSelectAllData()->isChecked());
 
+	fixture->forceDataStructuresUpdate();
 	QCheckBox *checkBox = fixture->requireGetCheckBoxForMesh1();
+	REQUIRE(checkBox->isChecked());
 	checkBox->click();
+	fixture->forceDataStructuresUpdate();
 	REQUIRE_FALSE(fixture->getSelectAllData()->isChecked());
 }
 
@@ -419,7 +481,6 @@ TEST_CASE("ClipperWidget: Select active tool works", "[unit][gui][widget][clip]"
 	cx::ToolPtr activeTool = helper.getServices()->tracking()->getActiveTool();
 	CHECK(activeTool);
 	REQUIRE(tool == activeTool);
-
 }
 
 }//cxtest

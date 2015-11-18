@@ -87,16 +87,6 @@ Transform3D IGTLinkConversion::decode(igtl::TransformMessage::Pointer msg)
 
 //--------------------------------CustusX messages---------------------------------------
 
-//IGTLinkImageMessage::Pointer IGTLinkConversion::encode(ImagePtr image)
-//{
-//	return IGTLinkConversionSonixCXLegacy().encode(image);
-//}
-
-//ImagePtr IGTLinkConversion::decode(IGTLinkImageMessage::Pointer message)
-//{
-//    return this->decode(igtl::ImageMessage::Pointer(message));
-//}
-
 IGTLinkUSStatusMessage::Pointer IGTLinkConversion::encode(ProbeDefinitionPtr input)
 {
 	IGTLinkUSStatusMessage::Pointer retval = IGTLinkUSStatusMessage::New();

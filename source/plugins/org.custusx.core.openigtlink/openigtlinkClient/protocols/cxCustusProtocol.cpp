@@ -36,6 +36,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxIGTLinkConversionSonixCXLegacy.h"
 #include "cxImage.h"
 #include "cxLogger.h"
+#include "cxStreamedTimestampSynchronizer.h"
+
 
 namespace cx
 {
@@ -58,16 +60,18 @@ void CustusProtocol::translate(const igtl::ImageMessage::Pointer body)
 	IGTLinkConversionSonixCXLegacy cxconverter;
 	ImagePtr imagePtr = cxconverter.decode(body);
 	imagePtr = cxconverter.decode(imagePtr);
+
+    if (mStreamSynchronizer)
+        mStreamSynchronizer->syncToCurrentTime(imagePtr);
+
     emit image(imagePtr);
 
     if(mUnsentUSStatusMessage)
     {
-		CX_LOG_WARNING() << "default constructed probe definition used as input.";
-        ProbeDefinitionPtr definition = converter.decode(mUnsentUSStatusMessage, body, ProbeDefinitionPtr(new ProbeDefinition()));
+        ProbeDefinitionPtr definition = converter.decode(mUnsentUSStatusMessage, body, ProbeDefinitionPtr());
 		definition = cxconverter.decode(definition);
-		QString devicename = "TODO";
         mUnsentUSStatusMessage = IGTLinkUSStatusMessage::New();
-        emit probedefinition(devicename, definition);
+        emit probedefinition(definition->getUid(), definition);
     }
 }
 

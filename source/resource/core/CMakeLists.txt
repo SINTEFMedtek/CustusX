@@ -190,6 +190,8 @@ cx_add_class(cxResource_SOURCE
     utilities/cxSharedPointerChecker
     utilities/cxNullDeleter.h
     utilities/cxSpaceProviderImpl
+    utilities/cxStreamedTimestampSynchronizer
+
 
 	logger/cxAudio.h
 	logger/cxLogger
