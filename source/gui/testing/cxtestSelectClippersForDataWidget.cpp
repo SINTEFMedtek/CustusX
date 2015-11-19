@@ -53,6 +53,14 @@ struct SelectClippersForDataWidgetFixture : cx::SelectClippersForDataWidget
 
 	QMap<QString, QCheckBox*> getDataCheckBoxes()
 	{
+		return this->getCheckBoxes(0);
+	}
+	QMap<QString, QCheckBox*> getInvertCheckBoxes()
+	{
+		return this->getCheckBoxes(2);
+	}
+	QMap<QString, QCheckBox*> getCheckBoxes(int column)
+	{
 		QMap<QString, QCheckBox*> checkBoxes;
 
 		int rows = mClipperTableWidget->rowCount();
@@ -62,13 +70,14 @@ struct SelectClippersForDataWidgetFixture : cx::SelectClippersForDataWidget
 			QTableWidgetItem *descriptionItem = mClipperTableWidget->item(row, 1);
 			REQUIRE(descriptionItem);
 			QString name = descriptionItem->text();
-			QCheckBox *checkbox = dynamic_cast<QCheckBox*>(mClipperTableWidget->cellWidget(row, 0));
+			QCheckBox *checkbox = dynamic_cast<QCheckBox*>(mClipperTableWidget->cellWidget(row, column));
 			REQUIRE(checkbox);
 			checkBoxes[name] = checkbox;
 		}
 
 		return checkBoxes;
 	}
+
 	void forceDataStructuresUpdate()
 	{
 		this->prePaintEvent();
@@ -123,7 +132,7 @@ TEST_CASE("SelectClippersForDataWidget: Init", "[unit][gui][widget][clip]")
 	REQUIRE(helper.fixture->getDataCheckBoxes().size() >= 6);
 }
 
-TEST_CASE("SelectClippersForDataWidget: Using checkboxes updates clippers", "[unit][gui][widget][clip]")
+TEST_CASE("SelectClippersForDataWidget: Using data checkboxes updates clippers", "[unit][gui][widget][clip]")
 {
 	SelectClippersForDataWidgetHelper helper;
 
@@ -140,7 +149,23 @@ TEST_CASE("SelectClippersForDataWidget: Using checkboxes updates clippers", "[un
 	REQUIRE_FALSE(clipper->exists(activeData));
 }
 
-TEST_CASE("SelectClippersForDataWidget: CheckBoxes are updated when clipper changes", "[unit][gui][widget][clip]")
+TEST_CASE("SelectClippersForDataWidget: Using invert checkboxes updates clippers", "[unit][gui][widget][clip]")
+{
+	SelectClippersForDataWidgetHelper helper;
+
+	cx::InteractiveClipperPtr clipper = helper.getTestClipper();
+	QString clipperName = helper.getTestClipperName();
+
+	QMap<QString, QCheckBox*> invertCheckBoxes = helper.fixture->getInvertCheckBoxes();
+	QCheckBox *invertCheckBox = invertCheckBoxes[clipperName];
+	REQUIRE_FALSE(clipper->getInvertPlane());
+	invertCheckBox->click();
+	REQUIRE(clipper->getInvertPlane());
+	invertCheckBox->click();
+	REQUIRE_FALSE(clipper->getInvertPlane());
+}
+
+TEST_CASE("SelectClippersForDataWidget: Data checkboxes are updated when clipper changes", "[unit][gui][widget][clip]")
 {
 	SelectClippersForDataWidgetHelper helper;
 
