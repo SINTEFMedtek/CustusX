@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "catch.hpp"
 #include <QCheckBox>
+#include <QTableWidget>
 #include "cxSelectClippersForDataWidget.h"
 #include "cxLogicManager.h"
 #include "cxVisServices.h"
@@ -49,10 +50,30 @@ struct SelectClippersForDataWidgetFixture : cx::SelectClippersForDataWidget
     SelectClippersForDataWidgetFixture(cx::VisServicesPtr services) :
         cx::SelectClippersForDataWidget(services, NULL)
     {}
-    QMap<QString, QCheckBox*> getDataCheckBoxes()
-    {
-        return mDataCheckBoxes;
-    }
+
+	QMap<QString, QCheckBox*> getDataCheckBoxes()
+	{
+		QMap<QString, QCheckBox*> checkBoxes;
+
+		int rows = mClipperTableWidget->rowCount();
+
+		for (int row = 0; row < rows; ++row)
+		{
+			QTableWidgetItem *descriptionItem = mClipperTableWidget->item(row, 1);
+			REQUIRE(descriptionItem);
+			QString name = descriptionItem->text();
+			QCheckBox *checkbox = dynamic_cast<QCheckBox*>(mClipperTableWidget->cellWidget(row, 0));
+			REQUIRE(checkbox);
+			checkBoxes[name] = checkbox;
+		}
+
+		return checkBoxes;
+	}
+	void forceDataStructuresUpdate()
+	{
+		this->prePaintEvent();
+	}
+
 };
 
 struct SelectClippersForDataWidgetHelper
@@ -133,6 +154,9 @@ TEST_CASE("SelectClippersForDataWidget: CheckBoxes are updated when clipper chan
 	REQUIRE_FALSE(dataCheckBox->isChecked());
 	clipper->addData(activeData);
 
+	helper.fixture->forceDataStructuresUpdate();
+	dataCheckBoxes = helper.fixture->getDataCheckBoxes();
+	dataCheckBox = dataCheckBoxes[clipperName];
 	REQUIRE(dataCheckBox->isChecked());
 }
 

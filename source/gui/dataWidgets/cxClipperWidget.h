@@ -45,7 +45,6 @@ class QTableWidget;
 
 namespace cx
 {
-typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
 typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
 typedef boost::shared_ptr<class StringPropertyClipPlane> StringPropertyClipPlanePtr;
 

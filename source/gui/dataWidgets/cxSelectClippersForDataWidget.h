@@ -41,6 +41,7 @@ class QTableWidget;
 
 namespace cx
 {
+
 /**\brief Turn clippers on/off for a spesific data structure.
  *
  *  \date 02 Nov, 2015
@@ -51,22 +52,23 @@ class cxGui_EXPORT SelectClippersForDataWidget: public BaseWidget
 	Q_OBJECT
 	void createDataCheckBox(int row, QString clipperName);
 	QCheckBox *createCheckBox(QString clipperName);
-	void addDataToClippers();
+	void updateCheckBoxesFromClipper(QCheckBox *dataCheckBox, QCheckBox *invertCheckBox, QString clipperName);
+	cx::InteractiveClipperPtr getClipper(QString clipperName);
 public:
 	SelectClippersForDataWidget(VisServicesPtr services, QWidget *parent);
 protected slots:
-	void clipDataClicked(bool checked);
-	void updateCheckboxesFromClippers();
+	void clipDataClicked(QCheckBox *checkBox, QString clipperName);
+	void invertClicked(QCheckBox *checkBox, QString clipperName);
 protected:
 	VisServicesPtr mServices;
 	ActiveDataPtr mActiveData;
 	QVBoxLayout* mLayout;
 	QLabel *mHeading;
 	QTableWidget *mClipperTableWidget;
-	QMap<QString, QCheckBox*> mDataCheckBoxes;
 	void createNewCheckBoxesBasedOnClippers();
 	void initUI();
 	void setupClipperSelectorUI();
+	virtual void prePaintEvent();
 };
 
 }//cx

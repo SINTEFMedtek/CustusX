@@ -41,7 +41,6 @@ class QDomNode;
 
 namespace cx {
 typedef boost::shared_ptr<class Clippers> ClippersPtr;
-typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
 
 /**\brief Clipper container. Used by ClippersWidget.
  *
