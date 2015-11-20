@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxInteractiveClipper.h"
 #include "cxActiveData.h"
 #include "cxtestSessionStorageHelper.h"
+#include "cxSelectDataStringProperty.h"
 
 namespace cxtest
 {
@@ -48,8 +49,9 @@ namespace cxtest
 struct SelectClippersForDataWidgetFixture : cx::SelectClippersForDataWidget
 {
     SelectClippersForDataWidgetFixture(cx::VisServicesPtr services) :
-        cx::SelectClippersForDataWidget(services, NULL)
-    {}
+		cx::SelectClippersForDataWidget(services, NULL)
+	{
+	}
 
 	QMap<QString, QCheckBox*> getDataCheckBoxes()
 	{
@@ -78,9 +80,18 @@ struct SelectClippersForDataWidgetFixture : cx::SelectClippersForDataWidget
 		return checkBoxes;
 	}
 
+	void requireActiveData()
+	{
+		REQUIRE_FALSE(mServices->patient()->isNull());
+		REQUIRE_FALSE(mActiveDataProperty->getValue().isNull());
+		CHECK(mActiveDataProperty->getData());
+		REQUIRE(mServices->patient()->getData(mActiveDataProperty->getValue()));
+	}
+
 	void forceDataStructuresUpdate()
 	{
 		this->prePaintEvent();
+//		std::cout << "active data: " << mActiveDataProperty->getValue().toStdString() << std::endl;
 	}
 
 };
@@ -90,6 +101,7 @@ struct SelectClippersForDataWidgetHelper
 	SelectClippersForDataWidgetHelper()
     {
         fixture = new SelectClippersForDataWidgetFixture(sessionHelper.getServices());
+		sessionHelper.createTestPatientWithData();
     }
     ~SelectClippersForDataWidgetHelper()
     {}
@@ -170,6 +182,8 @@ TEST_CASE("SelectClippersForDataWidget: Data checkboxes are updated when clipper
 	SelectClippersForDataWidgetHelper helper;
 
 	cx::DataPtr activeData = helper.getActiveData();
+	REQUIRE(activeData);
+	std::cout << "active data: " << activeData->getUid().toStdString() << std::endl;
 	cx::InteractiveClipperPtr clipper = helper.getTestClipper();
 	QString clipperName = helper.getTestClipperName();
 	QMap<QString, QCheckBox*> dataCheckBoxes = helper.fixture->getDataCheckBoxes();
@@ -180,6 +194,8 @@ TEST_CASE("SelectClippersForDataWidget: Data checkboxes are updated when clipper
 	clipper->addData(activeData);
 
 	helper.fixture->forceDataStructuresUpdate();
+	helper.fixture->requireActiveData();
+
 	dataCheckBoxes = helper.fixture->getDataCheckBoxes();
 	dataCheckBox = dataCheckBoxes[clipperName];
 	REQUIRE(dataCheckBox->isChecked());

@@ -42,6 +42,8 @@ class QTableWidget;
 namespace cx
 {
 
+typedef boost::shared_ptr<class SelectDataStringPropertyBase> SelectDataStringPropertyBasePtr;
+
 /**\brief Turn clippers on/off for a spesific data structure.
  *
  *  \date 02 Nov, 2015
@@ -56,12 +58,13 @@ class cxGui_EXPORT SelectClippersForDataWidget: public BaseWidget
 	cx::InteractiveClipperPtr getClipper(QString clipperName);
 public:
 	SelectClippersForDataWidget(VisServicesPtr services, QWidget *parent);
+	void setActiveDataProperty(SelectDataStringPropertyBasePtr property);
 protected slots:
 	void clipDataClicked(QCheckBox *checkBox, QString clipperName);
 	void invertClicked(QCheckBox *checkBox, QString clipperName);
 protected:
+	SelectDataStringPropertyBasePtr mActiveDataProperty;
 	VisServicesPtr mServices;
-	ActiveDataPtr mActiveData;
 	QVBoxLayout* mLayout;
 	QLabel *mHeading;
 	QTableWidget *mClipperTableWidget;
@@ -69,6 +72,14 @@ protected:
 	void initUI();
 	void setupClipperSelectorUI();
 	virtual void prePaintEvent();
+};
+
+class SelectClippersForImageWidget : public BaseWidget
+{
+	Q_OBJECT
+public:
+	SelectClippersForImageWidget(VisServicesPtr services, QWidget *parent);
+
 };
 
 }//cx
