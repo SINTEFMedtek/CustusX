@@ -64,18 +64,26 @@ public:
 	// utility methods for accessing the nodes:
 	TreeNodePtr getTopNode();
 
+public slots:
+	void update();
+	void invalidate();
 
 signals:
-	void modelReset();
+	void changed();
+	void invalidated();
 private:
 	std::vector<TreeNodePtr> mNodes;
 	TreeRepositoryWeakPtr mSelf;
+	bool mInvalid;
 
 	TreeRepository();
 	void rebuild();
+	void insertTopNode();
 	void insertDataNode(DataPtr data);
 	void insertSpaceNode(CoordinateSystem space);
-
+	void insertToolNode(ToolPtr tool);
+	void startListen();
+	void stopListen();
 };
 
 } // namespace cx

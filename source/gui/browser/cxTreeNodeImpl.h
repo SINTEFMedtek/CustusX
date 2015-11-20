@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxForwardDeclarations.h"
 #include "cxTreeNode.h"
 #include "cxCoordinateSystemHelpers.h"
+#include <QVariant>
 
 namespace cx
 {
@@ -58,12 +59,13 @@ public:
 	virtual std::vector<TreeNodePtr> getChildren() const;
 
 //	virtual QString getType() const = 0;
-//	virtual void activate() = 0;
-//	virtual void getIcon() const = 0;
+	virtual void activate() {}
 //	virtual bool getViewGroupVisibility(int index) const = 0;
 //	virtual void setViewGroupVisibility(int index, bool value) = 0;
 //	virtual bool visible() const = 0; // if need be, might get away simply populating from a root node
 //	QWidget* getPropertiesWidget() const = 0; // later
+	virtual QVariant getColor() const { return QVariant(); }
+	virtual QVariant getFont() const { return QVariant(); }
 
 protected:
 	TreeRepositoryWeakPtr mRepository;

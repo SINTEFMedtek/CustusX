@@ -29,45 +29,50 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include "cxTopTreeNode.h"
+#ifndef CXTOOLTREENODE_H
+#define CXTOOLTREENODE_H
 
-#include "cxPatientModelService.h"
-#include "cxDefinitions.h"
-#include "cxData.h"
-#include "cxLegacySingletons.h"
-#include "cxTreeRepository.h"
-#include "cxLogger.h"
+#include <vector>
+#include <boost/weak_ptr.hpp>
+#include <boost/shared_ptr.hpp>
+#include <QString>
+#include <QObject>
+#include "cxForwardDeclarations.h"
+#include "cxTreeNode.h"
+#include "cxCoordinateSystemHelpers.h"
+#include "cxTreeNodeImpl.h"
 
 namespace cx
 {
 
+class TreeNode;
+typedef boost::weak_ptr<TreeNode> TreeNodeWeakPtr;
+typedef boost::shared_ptr<TreeNode> TreeNodePtr;
 
-TopTreeNode::TopTreeNode(TreeRepositoryWeakPtr repo) :
-	TreeNodeImpl(repo)
+
+class ToolTreeNode : public TreeNodeImpl
 {
+  Q_OBJECT
+public:
+	ToolTreeNode(TreeRepositoryWeakPtr repo, ToolPtr tool);
+	virtual ~ToolTreeNode() {}
+	virtual QString getUid() const;
+	virtual QString getName() const;
+//	virtual QString getType() const = 0;
+	virtual TreeNodePtr getParent() const;
+	virtual void activate();
+	virtual QIcon getIcon() const;
+//	virtual bool getViewGroupVisibility(int index) const = 0;
+//	virtual void setViewGroupVisibility(int index, bool value) = 0;
+//	virtual bool visible() const = 0; // if need be, might get away simply populating from a root node
+//	QWidget* getPropertiesWidget() const = 0; // later
+	virtual QVariant getColor() const;
+	virtual QVariant getFont() const;
 
-}
-
-QString TopTreeNode::getUid() const
-{
-	return "node::invisible_top";
-}
-
-QString TopTreeNode::getName() const
-{
-	return "";
-}
-
-TreeNodePtr TopTreeNode::getParent() const
-{
-	return TreeNodePtr();
-}
-
-QIcon TopTreeNode::getIcon() const
-{
-	return QIcon();
-}
-
+private:
+	ToolPtr mTool;
+};
 
 } // namespace cx
 
+#endif // CXTOOLTREENODE_H

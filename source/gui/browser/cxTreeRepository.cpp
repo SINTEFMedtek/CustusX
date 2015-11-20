@@ -38,7 +38,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataTreeNode.h"
 #include "cxSpaceTreeNode.h"
 #include "cxTopTreeNode.h"
+#include "cxToolTreeNode.h"
 #include "cxLogger.h"
+#include "cxTrackingService.h"
+#include "cxActiveData.h"
 
 namespace cx
 {
@@ -47,23 +50,48 @@ TreeRepositoryPtr TreeRepository::create()
 {
 	TreeRepositoryPtr retval(new TreeRepository());
 	retval->mSelf = retval;
-	retval->rebuild();
-	CX_LOG_CHANNEL_DEBUG("CA") << "  - create repo: " << retval.get();
+	retval->insertTopNode();
 	return retval;
 }
 
-TreeRepository::TreeRepository()
+TreeRepository::TreeRepository() :
+	mInvalid(true)
 {
+	this->startListen();
 }
 
 TreeRepository::~TreeRepository()
 {
-	CX_LOG_CHANNEL_DEBUG("CA") << "  - destroy repo: " << this;
+	this->stopListen();
+}
+
+void TreeRepository::update()
+{
+	if (mInvalid)
+		this->rebuild();
+	mInvalid = true;
+}
+
+void TreeRepository::invalidate()
+{
+	mInvalid = true;
+	emit invalidated();
+}
+
+void TreeRepository::startListen()
+{
+	connect(patientService().get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(invalidate()));
+	connect(trackingService().get(), &TrackingService::stateChanged, this, &TreeRepository::invalidate);
+	connect(patientService()->getActiveData().get(), &ActiveData::activeDataChanged, this, &TreeRepository::changed);
+}
+void TreeRepository::stopListen()
+{
+	disconnect(trackingService().get(), &TrackingService::stateChanged, this, &TreeRepository::invalidate);
+	disconnect(patientService().get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(invalidate()));
 }
 
 std::vector<TreeNodePtr> TreeRepository::getNodes()
 {
-//	CX_LOG_CHANNEL_DEBUG("CA") << "TreeRepository::getNodes() " << mNodes.size();
 	return mNodes;
 }
 
@@ -74,8 +102,6 @@ TreeNodePtr TreeRepository::getNode(QString uid)
 		if (mNodes[i]->getUid()==uid)
 			return mNodes[i];
 	}
-
-//	CX_LOG_CHANNEL_DEBUG("CA") << "search failed - did not find uid="+uid;
 	return TreeNodePtr();
 }
 
@@ -89,12 +115,20 @@ TreeNodePtr TreeRepository::getTopNode()
 	return TreeNodePtr();
 }
 
-void TreeRepository::rebuild()
+void TreeRepository::insertTopNode()
 {
-	mNodes.clear();
 	TreeNodePtr topnode(new TopTreeNode(mSelf));
 	mNodes.push_back(topnode);
 	CX_LOG_CHANNEL_DEBUG("CA") << "  - built topnode";
+}
+
+void TreeRepository::rebuild()
+{
+	mNodes.clear();
+	this->insertTopNode();
+
+	this->insertSpaceNode(CoordinateSystem(csREF));
+	CX_LOG_CHANNEL_DEBUG("CA") << "  - built refspacenode";
 
 	std::map<QString, DataPtr> source = patientService()->getData();
 	for (std::map<QString, DataPtr>::const_iterator iter = source.begin(); iter != source.end(); ++iter)
@@ -105,14 +139,30 @@ void TreeRepository::rebuild()
 	for (std::map<QString, DataPtr>::const_iterator iter = source.begin(); iter != source.end(); ++iter)
 	{
 		QString space = iter->second->getParentSpace();
+		if (space.isEmpty())
+			continue;
 		if (source.count(space))
 			continue;
 		this->insertSpaceNode(CoordinateSystem(csDATA, space));
 	}
 	CX_LOG_CHANNEL_DEBUG("CA") << "  - built spacenodes";
 
-	this->insertSpaceNode(CoordinateSystem(csREF));
-	CX_LOG_CHANNEL_DEBUG("CA") << "  - built refspacenode";
+	this->insertSpaceNode(CoordinateSystem(csPATIENTREF));
+
+	std::map<QString, ToolPtr> tools = trackingService()->getTools();
+	for (std::map<QString, ToolPtr>::const_iterator iter = tools.begin(); iter != tools.end(); ++iter)
+	{
+		this->insertToolNode(iter->second);
+	}
+}
+
+void TreeRepository::insertToolNode(ToolPtr tool)
+{
+	if (this->getNode(tool->getUid()))
+		return;
+
+	TreeNodePtr node(new ToolTreeNode(mSelf, tool));
+	mNodes.push_back(node);
 }
 
 void TreeRepository::insertDataNode(DataPtr data)

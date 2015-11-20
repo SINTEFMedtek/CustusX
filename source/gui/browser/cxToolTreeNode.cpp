@@ -29,45 +29,79 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include "cxTopTreeNode.h"
-
+#include "cxToolTreeNode.h"
 #include "cxPatientModelService.h"
 #include "cxDefinitions.h"
 #include "cxData.h"
 #include "cxLegacySingletons.h"
 #include "cxTreeRepository.h"
 #include "cxLogger.h"
+#include "cxTrackingService.h"
+#include <QFont>
 
 namespace cx
 {
 
 
-TopTreeNode::TopTreeNode(TreeRepositoryWeakPtr repo) :
-	TreeNodeImpl(repo)
+ToolTreeNode::ToolTreeNode(TreeRepositoryWeakPtr repo, ToolPtr tool) :
+	TreeNodeImpl(repo), mTool(tool)
 {
 
 }
 
-QString TopTreeNode::getUid() const
+QString ToolTreeNode::getUid() const
 {
-	return "node::invisible_top";
+	return mTool->getUid();
 }
 
-QString TopTreeNode::getName() const
+QString ToolTreeNode::getName() const
 {
-	return "";
+	return mTool->getName();
 }
 
-TreeNodePtr TopTreeNode::getParent() const
+TreeNodePtr ToolTreeNode::getParent() const
 {
+	if (mTool->hasType(Tool::TOOL_REFERENCE))
+		return this->repo()->getNode(CoordinateSystem(csPATIENTREF).toString());
+//		return this->repo()->getNode(CoordinateSystem(csREF).toString());
+	ToolPtr ref = trackingService()->getReferenceTool();
+	if (ref)
+		return this->repo()->getNode(ref->getUid());
 	return TreeNodePtr();
 }
 
-QIcon TopTreeNode::getIcon() const
+void ToolTreeNode::activate()
 {
-	return QIcon();
+	trackingService()->setActiveTool(mTool->getUid());
 }
 
+QIcon ToolTreeNode::getIcon() const
+{
+	return QIcon(":icons/polaris-green.png");
+//	return mTool->getIcon();
+}
+
+QVariant ToolTreeNode::getColor() const
+{
+	if (!mTool->isInitialized())
+		return QColor("darkgray");
+	if (mTool->getVisible())
+		return QColor("green");
+	else
+		return QColor("red");
+
+	CX_LOG_CHANNEL_DEBUG("CA") << "tool " << mTool->getName() << ": init=" << mTool->isInitialized() << ", v=" << mTool->getVisible();
+}
+
+QVariant ToolTreeNode::getFont() const
+{
+	if (trackingService()->getActiveTool()==mTool)
+	{
+		QFont font;
+		font.setBold(true);
+		return font;
+	}
+	return QVariant();
+}
 
 } // namespace cx
-

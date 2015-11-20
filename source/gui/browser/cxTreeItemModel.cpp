@@ -14,6 +14,7 @@
 #include "cxTypeConversions.h"
 #include "cxTreeRepository.h"
 #include "cxLogger.h"
+#include <QVariant>
 
 namespace cx
 {
@@ -24,7 +25,24 @@ TreeItemModel::TreeItemModel(QObject* parent) : QAbstractItemModel(parent)
 {
 	mSelectionModel = NULL;
 
-	this->buildTree();
+	mRepository = TreeRepository::create();
+	connect(mRepository.get(), &TreeRepository::invalidated, this, &TreeItemModel::hasBeenReset);
+	connect(mRepository.get(), &TreeRepository::changed, this, &TreeItemModel::onRepositoryChanged);
+}
+
+void TreeItemModel::onRepositoryChanged()
+{
+	emit dataChanged(QModelIndex(),QModelIndex());
+}
+
+
+void TreeItemModel::update()
+{
+//	CX_LOG_CHANNEL_DEBUG("CA") << "TreeItemModel::buildTree() B";
+	this->beginResetModel();
+	mRepository->update();
+	this->endResetModel();
+//	CX_LOG_CHANNEL_DEBUG("CA") << "TreeItemModel::buildTree() E";
 }
 
 
@@ -32,16 +50,6 @@ void TreeItemModel::setSelectionModel(QItemSelectionModel* selectionModel)
 {
 	mSelectionModel = selectionModel;
 	connect(mSelectionModel, SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(currentItemChangedSlot(const QModelIndex&, const QModelIndex&)));
-}
-
-void TreeItemModel::buildTree()
-{
-	CX_LOG_CHANNEL_DEBUG("CA") << "TreeItemModel::buildTree() B";
-	this->beginResetModel();
-	mRepository = TreeRepository::create();
-	this->endResetModel();
-	emit hasBeenReset();
-	CX_LOG_CHANNEL_DEBUG("CA") << "TreeItemModel::buildTree() E";
 }
 
 TreeItemModel::~TreeItemModel()
@@ -56,7 +64,6 @@ void TreeItemModel::currentItemChangedSlot(const QModelIndex& current, const QMo
 		return;
 	item->activate();
 }
-
 
 void TreeItemModel::treeItemChangedSlot()
 {
@@ -93,21 +100,37 @@ int TreeItemModel::rowCount(const QModelIndex& parent) const
 
 QVariant TreeItemModel::data(const QModelIndex& index, int role) const
 {
+	int namepos = 0;
+	int iconpos = 0;
+
 	if (role==Qt::DisplayRole)
 	{
 		TreeNode *item = this->itemFromIndex(index);
-		if (index.column()==0)
+		if (index.column()==namepos)
 			return item->getName();
 //		if (index.column()==1)
 //			return item->getType();
 //		if (index.column()==2)
 //			return item->getData();
 	}
+	if (role==Qt::DecorationRole)
+	{
+		TreeNode *item = this->itemFromIndex(index);
+		if (index.column()==iconpos)
+			return item->getIcon();
+	}
 	if (role==Qt::FontRole)
 	{
-//		TreeItem *item = this->itemFromIndex(index);
-//		return item->getFont();
-		return QVariant();
+		TreeNode *item = this->itemFromIndex(index);
+		return item->getFont();
+	}
+	if (role==Qt::ForegroundRole)
+	{
+		if (index.column()==namepos)
+		{
+			TreeNode *item = this->itemFromIndex(index);
+			return item->getColor();
+		}
 	}
 	return QVariant();
 }
@@ -170,6 +193,8 @@ QModelIndex TreeItemModel::parent(const QModelIndex& index) const
 
 	return createIndex(row, 0, parentItem);
 }
+
+
 
 }//end namespace cx
 

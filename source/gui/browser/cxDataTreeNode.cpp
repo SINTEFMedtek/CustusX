@@ -36,6 +36,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLegacySingletons.h"
 #include "cxTreeRepository.h"
 #include "cxLogger.h"
+#include "cxDataMetric.h"
+#include "cxActiveData.h"
+#include <QFont>
 
 namespace cx
 {
@@ -44,7 +47,6 @@ namespace cx
 DataTreeNode::DataTreeNode(TreeRepositoryWeakPtr repo, DataPtr data) :
 	TreeNodeImpl(repo), mData(data)
 {
-
 }
 
 QString DataTreeNode::getUid() const
@@ -59,11 +61,43 @@ QString DataTreeNode::getName() const
 
 TreeNodePtr DataTreeNode::getParent() const
 {
+	if (mData->getParentSpace().isEmpty())
+		return this->repo()->getNode(CoordinateSystem(csREF).toString());
 	TreeNodePtr node = this->repo()->getNode(mData->getParentSpace());
 	if (node)
 		return node;
 	node = this->repo()->getNode(CoordinateSystem(csDATA, mData->getParentSpace()).toString());
 	return node;
 }
+
+void DataTreeNode::activate()
+{
+	patientService()->getActiveData()->setActive(mData);
+}
+
+QIcon DataTreeNode::getIcon() const
+{
+	return mData->getIcon();
+}
+
+QVariant DataTreeNode::getColor() const
+{
+	DataMetricPtr metric = boost::dynamic_pointer_cast<DataMetric>(mData);
+	if (metric)
+		return metric->getColor();
+	return QColor("black");
+}
+
+QVariant DataTreeNode::getFont() const
+{
+	if (patientService()->getActiveData()->getActive()==mData)
+	{
+		QFont font;
+		font.setBold(true);
+		return font;
+	}
+	return QVariant();
+}
+
 
 } // namespace cx

@@ -58,6 +58,7 @@ public:
 	virtual QString getUid() const;
 	virtual QString getName() const;
 	virtual TreeNodePtr getParent() const;
+	virtual QIcon getIcon() const;
 
 private:
 };

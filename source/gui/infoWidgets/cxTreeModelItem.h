@@ -19,109 +19,106 @@
 namespace cx
 {
 
-class BrowserItemModel;
+//class BrowserItemModel;
 
-/**
- * \file
- * \addtogroup cxGUI
- * @{
- */
-
-
-class TreeItem;
-typedef boost::weak_ptr<TreeItem> TreeItemWeakPtr;
-typedef boost::shared_ptr<TreeItem> TreeItemPtr;
+///**
+// * \file
+// * \addtogroup cxGUI
+// * @{
+// */
 
 
-class TreeItem : public QObject
-{
-  Q_OBJECT
-public:
-  virtual ~TreeItem() {}
-  virtual TreeItemPtr getChild(int row) = 0;
-  virtual TreeItemPtr addChild(TreeItemPtr child) = 0;
-  virtual QString getName() const = 0;
-  virtual QString getType() const = 0;
-  virtual QString getData() const = 0;
-  virtual QFont getFont() const = 0;
-  virtual int getChildCount() const = 0;
-  virtual int getColumnCount() const = 0;
-  virtual TreeItemWeakPtr getParent() = 0;
-  virtual void activate() = 0;
-  virtual BrowserItemModel* getModel() = 0;
+//class TreeItem;
+//typedef boost::weak_ptr<TreeItem> TreeItemWeakPtr;
+//typedef boost::shared_ptr<TreeItem> TreeItemPtr;
 
-signals:
-  void changed();
-};
 
-class TreeItemImpl : public TreeItem
-{
-public:
-  virtual ~TreeItemImpl() {}
-  static TreeItemPtr create(BrowserItemModel* model);
-  static TreeItemPtr create(TreeItemWeakPtr parent, QString name, QString type, QString val);
-  virtual TreeItemPtr addChild(TreeItemPtr child);
-  virtual TreeItemPtr getChild(int row);
-  virtual QString getName() const;
-  virtual QString getType() const;
-  virtual QString getData() const;
-  virtual QFont getFont() const { return QFont(); }
+//class TreeItem : public QObject
+//{
+//  Q_OBJECT
+//public:
+//  virtual ~TreeItem() {}
+//  virtual TreeItemPtr getChild(int row) = 0;
+//  virtual TreeItemPtr addChild(TreeItemPtr child) = 0;
+//  virtual QString getName() const = 0;
+//  virtual QString getType() const = 0;
+//  virtual QString getData() const = 0;
+//  virtual QFont getFont() const = 0;
+//  virtual int getChildCount() const = 0;
+//  virtual int getColumnCount() const = 0;
+//  virtual TreeItemWeakPtr getParent() = 0;
+//  virtual void activate() = 0;
+//  virtual BrowserItemModel* getModel() = 0;
 
-  virtual int getChildCount() const;
-  virtual int getColumnCount() const;
-  //QVariant data(int column) const;
-  virtual TreeItemWeakPtr getParent();
-  virtual void activate();
-  virtual BrowserItemModel* getModel() { return mModel; }
+//signals:
+//  void changed();
+//};
 
-protected:
-  TreeItemImpl(TreeItemWeakPtr parent, QString name, QString type, QString val);
-  TreeItemWeakPtr mParent;
-  std::vector<TreeItemPtr> mChildren;
+//class TreeItemImpl : public TreeItem
+//{
+//public:
+//  virtual ~TreeItemImpl() {}
+//  static TreeItemPtr create(BrowserItemModel* model);
+//  static TreeItemPtr create(TreeItemWeakPtr parent, QString name, QString type, QString val);
+//  virtual TreeItemPtr addChild(TreeItemPtr child);
+//  virtual TreeItemPtr getChild(int row);
+//  virtual QString getName() const;
+//  virtual QString getType() const;
+//  virtual QString getData() const;
+//  virtual QFont getFont() const { return QFont(); }
 
-  QString mName;
-  QString mType;
-  QString mData;
-  BrowserItemModel* mModel;
-};
+//  virtual int getChildCount() const;
+//  virtual int getColumnCount() const;
+//  //QVariant data(int column) const;
+//  virtual TreeItemWeakPtr getParent();
+//  virtual void activate();
+//  virtual BrowserItemModel* getModel() { return mModel; }
 
-class TreeItemImage : public TreeItemImpl
-{
-public:
-  static TreeItemPtr create(TreeItemWeakPtr parent, QString uid);
-  virtual ~TreeItemImage();
-  virtual QString getName() const;
-  virtual void activate();
-  virtual QFont getFont() const;
+//protected:
+//  TreeItemImpl(TreeItemWeakPtr parent, QString name, QString type, QString val);
+//  TreeItemWeakPtr mParent;
+//  std::vector<TreeItemPtr> mChildren;
 
-private:
-  TreeItemImage(TreeItemWeakPtr parent, QString uid);
-  QString mUid;
-};
+//  QString mName;
+//  QString mType;
+//  QString mData;
+//  BrowserItemModel* mModel;
+//};
 
-class TreeItemToolManager : public TreeItemImpl
-{
-public:
-  static TreeItemPtr create(TreeItemWeakPtr parent);
-  virtual ~TreeItemToolManager() {}
-private:
-  TreeItemToolManager(TreeItemWeakPtr parent) : TreeItemImpl(parent,"tracking","manager","Tool Manager")  {}
-};
+//class TreeItemImage : public TreeItemImpl
+//{
+//public:
+//  static TreeItemPtr create(TreeItemWeakPtr parent, QString uid);
+//  virtual ~TreeItemImage();
+//  virtual QString getName() const;
+//  virtual void activate();
+//  virtual QFont getFont() const;
 
-class TreeItemTool : public TreeItemImpl
-{
-public:
-  static TreeItemPtr create(TreeItemWeakPtr parent, ToolPtr tool);
-  virtual ~TreeItemTool();
-  virtual QString getName() const;
-private:
-  TreeItemTool(TreeItemWeakPtr parent, ToolPtr tool) : TreeItemImpl(parent,"","tool",""), mTool(tool) {}
-  ToolPtr mTool;
-};
+//private:
+//  TreeItemImage(TreeItemWeakPtr parent, QString uid);
+//  QString mUid;
+//};
 
-/**
- * @}
- */
+//class TreeItemToolManager : public TreeItemImpl
+//{
+//public:
+//  static TreeItemPtr create(TreeItemWeakPtr parent);
+//  virtual ~TreeItemToolManager() {}
+//private:
+//  TreeItemToolManager(TreeItemWeakPtr parent) : TreeItemImpl(parent,"tracking","manager","Tool Manager")  {}
+//};
+
+//class TreeItemTool : public TreeItemImpl
+//{
+//public:
+//  static TreeItemPtr create(TreeItemWeakPtr parent, ToolPtr tool);
+//  virtual ~TreeItemTool();
+//  virtual QString getName() const;
+//private:
+//  TreeItemTool(TreeItemWeakPtr parent, ToolPtr tool) : TreeItemImpl(parent,"","tool",""), mTool(tool) {}
+//  ToolPtr mTool;
+//};
+
 }
 
 #endif /* CXTREEMODELITEM_H_ */

@@ -9,6 +9,7 @@ cx_add_class_qt_moc(cxGui_SRCS
 	browser/cxDataTreeNode
 	browser/cxSpaceTreeNode
 	browser/cxTopTreeNode
+	browser/cxToolTreeNode
 	browser/cxTreeNodeImpl
 		filterWidgets/cxFilterSetupWidget
         filterWidgets/cxFiltersWidget

@@ -48,13 +48,15 @@ signals:
   void hasBeenReset();
 
 public slots:
-  void buildTree();
+  void update();
   void treeItemChangedSlot();
 
 private slots:
   void currentItemChangedSlot(const QModelIndex& current, const QModelIndex& previous);
+  void onRepositoryChanged();
 
 private:
+//  void buildTree();
   TreeRepositoryPtr mRepository;
 //  TreeItemPtr mTree;
   QItemSelectionModel* mSelectionModel;

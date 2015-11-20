@@ -64,6 +64,10 @@ TreeNodePtr SpaceTreeNode::getParent() const
 	{
 		return this->repo()->getTopNode();
 	}
+	if (mSpace.mId == csPATIENTREF)
+	{
+		return this->repo()->getNode(CoordinateSystem(csREF).toString());
+	}
 	else if (mSpace.mId == csDATA)
 	{
 		return this->repo()->getNode(CoordinateSystem(csREF).toString());
@@ -74,5 +78,12 @@ TreeNodePtr SpaceTreeNode::getParent() const
 		return TreeNodePtr();
 	}
 }
+
+QIcon SpaceTreeNode::getIcon() const
+{
+	return QIcon(":/icons/metric_frame.png");
+}
+
+
 
 } // namespace cx

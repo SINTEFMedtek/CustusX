@@ -17,53 +17,6 @@ namespace cx
 {
 
 class TreeItemModel;
-class TreeItem;
-typedef boost::weak_ptr<TreeItem> TreeItemWeakPtr;
-typedef boost::shared_ptr<TreeItem> TreeItemPtr;
-
-/**
- * \ingroup cxGUI
- *
- */
-class BrowserItemModel : public QAbstractItemModel
-{
-  Q_OBJECT
-public:
-  BrowserItemModel(QObject* parent = 0);
-  virtual ~BrowserItemModel();
-  void setSelectionModel(QItemSelectionModel* selectionModel);
-
-  virtual int columnCount (const QModelIndex& parent = QModelIndex() ) const;
-  virtual int rowCount(const QModelIndex& parent = QModelIndex() ) const;
-
-  virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole ) const;
-  virtual Qt::ItemFlags flags(const QModelIndex& index ) const;
-  virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const;
-
-  virtual QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex() ) const;
-  virtual QModelIndex parent(const QModelIndex& index ) const;
-
-  //  virtual bool hasChildren(const QModelIndex& parent = QModelIndex() ) const;
-  //  virtual bool    setData ( const QModelIndex & index, const QVariant & value, int role = Qt::EditRole )
-  StringPropertyPtr getFilter();
-
-signals:
-  void hasBeenReset();
-
-public slots:
-  void buildTree();
-  void treeItemChangedSlot();
-
-private slots:
-  void currentItemChangedSlot(const QModelIndex& current, const QModelIndex& previous);
-
-private:
-  TreeItemPtr mTree;
-  QItemSelectionModel* mSelectionModel;
-  StringPropertyPtr mFilter;
-  TreeItem* itemFromIndex(const QModelIndex& index) const;
-  void fillModelTreeFromViewManager(TreeItemPtr root);
-};
 
 /**
  * \class BrowserWidget
@@ -84,7 +37,6 @@ public:
   ~BrowserWidget();
 
 protected slots:
-  void populateTreeWidget(); ///< fills the tree
   void resetView(); // called when tree is reset
 
 protected:
@@ -97,6 +49,9 @@ protected:
   //QTreeWidget* mTreeWidget; ///< the treestructure containing the images, meshes and tools
   QVBoxLayout* mVerticalLayout; ///< vertical layout is used
 
+protected:
+	virtual void prePaintEvent();
+  
 private:
   BrowserWidget();
 };
