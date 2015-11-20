@@ -3,7 +3,14 @@
 ###########################################################
 
 cx_add_class_qt_moc(cxGui_SRCS
-        filterWidgets/cxFilterSetupWidget
+	browser/cxTreeNode
+	browser/cxTreeRepository
+	browser/cxTreeItemModel
+	browser/cxDataTreeNode
+	browser/cxSpaceTreeNode
+	browser/cxTopTreeNode
+	browser/cxTreeNodeImpl
+		filterWidgets/cxFilterSetupWidget
         filterWidgets/cxFiltersWidget
 	#----------------------
 	properties/cxDataInterface
@@ -111,7 +118,8 @@ target_include_directories(cxGui
     ./streamingWidgets
     ./toolWidgets
     ./utilities
-    ./pluginFrameworkWidgets
+	./browser
+	./pluginFrameworkWidgets
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CustusX_SOURCE_DIR}/source/ThirdParty
 )

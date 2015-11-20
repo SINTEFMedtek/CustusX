@@ -16,6 +16,7 @@ class QTreeView;
 namespace cx
 {
 
+class TreeItemModel;
 class TreeItem;
 typedef boost::weak_ptr<TreeItem> TreeItemWeakPtr;
 typedef boost::shared_ptr<TreeItem> TreeItemPtr;
@@ -82,8 +83,6 @@ public:
   BrowserWidget(QWidget* parent);
   ~BrowserWidget();
 
-  virtual QString defaultWhatsThis() const;
-
 protected slots:
   void populateTreeWidget(); ///< fills the tree
   void resetView(); // called when tree is reset
@@ -92,7 +91,7 @@ protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
   virtual void closeEvent(QCloseEvent* event); ///<disconnects stuff
 
-  BrowserItemModel* mModel;
+  TreeItemModel* mModel;
   QTreeView* mTreeView;
   //gui
   //QTreeWidget* mTreeWidget; ///< the treestructure containing the images, meshes and tools

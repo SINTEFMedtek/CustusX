@@ -14,6 +14,7 @@
 #include "cxImage.h"
 #include "cxLegacySingletons.h"
 #include "cxPatientModelService.h"
+#include "cxActiveData.h"
 
 namespace cx
 {
@@ -94,7 +95,7 @@ TreeItemImage::TreeItemImage(TreeItemWeakPtr parent, QString uid) :
 QFont TreeItemImage::getFont() const
 {
   QFont retval;
-  QString image = patientService()->getActiveImageUid();
+  QString image = patientService()->getActiveData()->getActiveImageUid();
   if (image==mUid)
   {
     retval.setBold(true);
@@ -121,7 +122,7 @@ QString TreeItemImage::getName() const
 
 void TreeItemImage::activate()
 {
-  patientService()->setActiveData(mUid);
+  patientService()->getActiveData()->setActive(mUid);
 }
 
 ///--------------------------------------------------------

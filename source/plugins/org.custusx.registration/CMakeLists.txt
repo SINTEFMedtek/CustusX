@@ -51,6 +51,7 @@ set(PLUGIN_target_libraries
     cxResource
     cxResourceWidgets
     cxPluginUtilities
+	cxResourceVisualization
     ${ITK_LIBRARIES}
 #TODO: Remove these dependencies
     org_custusx_acquisition

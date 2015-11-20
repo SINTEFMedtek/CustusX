@@ -17,6 +17,7 @@
 #include "cxViewGroupData.h"
 #include "cxLegacySingletons.h"
 #include "cxTypeConversions.h"
+#include "cxTreeItemModel.h"
 
 namespace cx
 {
@@ -298,31 +299,22 @@ QModelIndex BrowserItemModel::parent(const QModelIndex& index) const
 
 BrowserWidget::BrowserWidget(QWidget* parent) :
     BaseWidget(parent, "BrowserWidget", "Browser"),
-    //mTreeWidget(new QTreeWidget(this)),
     mVerticalLayout(new QVBoxLayout(this))
 {
-  mModel = new BrowserItemModel(this);
+  mModel = new TreeItemModel(this);
   connect(mModel, SIGNAL(hasBeenReset()), this, SLOT(resetView()));
 
-  mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mModel->getFilter()));
+//  mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mModel->getFilter()));
 
   //layout
-  mTreeView = new QTreeView(this);;
+  mTreeView = new QTreeView(this);
   mTreeView->setModel(mModel);
   mModel->setSelectionModel(mTreeView->selectionModel());
   mVerticalLayout->addWidget(mTreeView);
 }
+
 BrowserWidget::~BrowserWidget()
 {
-}
-
-QString BrowserWidget::defaultWhatsThis() const
-{
-  return "<html>"
-      "<h3>Browser</h3>"
-      "<p>Lets you browse different aspects of the system.</p>"
-      "<p><i></i></p>"
-      "</html>";
 }
 
 
