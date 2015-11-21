@@ -75,10 +75,22 @@ void ToolTreeNode::activate()
 	trackingService()->setActiveTool(mTool->getUid());
 }
 
+QString ToolTreeNode::getType() const
+{
+	return "tool";
+}
+
 QIcon ToolTreeNode::getIcon() const
 {
-	return QIcon(":icons/polaris-green.png");
-//	return mTool->getIcon();
+	if (mTool->hasType(Tool::TOOL_US_PROBE))
+		return QIcon(":icons/tool_us_probe.png");
+	if (mTool->hasType(Tool::TOOL_POINTER))
+		return QIcon(":icons/tool_pointer.png");
+	if (mTool->hasType(Tool::TOOL_REFERENCE))
+		return QIcon(":icons/tool_reference.png");
+	if (mTool->hasType(Tool::TOOL_MANUAL))
+		return QIcon(":icons/tool_manual.png");
+	return QIcon(":icons/tool_pointer.png");
 }
 
 QVariant ToolTreeNode::getColor() const

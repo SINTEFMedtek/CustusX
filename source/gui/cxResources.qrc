@@ -106,5 +106,12 @@
         <file>icons/Video-icon_red.png</file>
         <file>icons/Video-icon_gray.png</file>
         <file>icons/CustusX/CustusX.png</file>
+        <file>icons/space_reference.png</file>
+        <file>icons/space_patient_reference.png</file>
+        <file>icons/tool_pointer.png</file>
+        <file>icons/tool_us_probe.png</file>
+        <file>icons/tool_reference.png</file>
+        <file>icons/tool_manual.png</file>
+        <file>icons/space_generic.png</file>
     </qresource>
 </RCC>

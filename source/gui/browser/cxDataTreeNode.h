@@ -58,12 +58,12 @@ public:
 	virtual ~DataTreeNode() {}
 	virtual QString getUid() const;
 	virtual QString getName() const;
-//	virtual QString getType() const = 0;
+	virtual QString getType() const;
 	virtual TreeNodePtr getParent() const;
 	virtual void activate();
 	virtual QIcon getIcon() const;
-//	virtual bool getViewGroupVisibility(int index) const = 0;
-//	virtual void setViewGroupVisibility(int index, bool value) = 0;
+	virtual QVariant getViewGroupVisibility(int index) const;
+	virtual void setViewGroupVisibility(int index, bool value);
 //	virtual bool visible() const = 0; // if need be, might get away simply populating from a root node
 //	QWidget* getPropertiesWidget() const = 0; // later
 	virtual QVariant getColor() const;

@@ -38,6 +38,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogger.h"
 #include "cxDataMetric.h"
 #include "cxActiveData.h"
+#include "cxViewService.h"
+#include "cxViewGroupData.h"
 #include <QFont>
 
 namespace cx
@@ -57,6 +59,11 @@ QString DataTreeNode::getUid() const
 QString DataTreeNode::getName() const
 {
 	return mData->getName();
+}
+
+QString DataTreeNode::getType() const
+{
+	return "data";
 }
 
 TreeNodePtr DataTreeNode::getParent() const
@@ -97,6 +104,25 @@ QVariant DataTreeNode::getFont() const
 		return font;
 	}
 	return QVariant();
+}
+
+QVariant DataTreeNode::getViewGroupVisibility(int index) const
+{
+	DataViewProperties props = viewService()->getGroup(index)->getProperties(mData->getUid());
+	if (props.empty())
+		return Qt::CheckState(0);
+	if ((props.hasVolume3D() || props.hasSlice3D()) && props.hasSlice2D())
+		return Qt::CheckState(2);
+	return Qt::CheckState(1);
+//	return true;
+}
+
+void DataTreeNode::setViewGroupVisibility(int index, bool value)
+{
+	if (value)
+		viewService()->getGroup(index)->setProperties(mData->getUid(), DataViewProperties::createDefault());
+	else
+		viewService()->getGroup(index)->setProperties(mData->getUid(), DataViewProperties());
 }
 
 

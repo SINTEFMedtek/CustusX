@@ -75,7 +75,8 @@ void BrowserWidget::prePaintEvent()
 void BrowserWidget::resetView()
 {
 	mTreeView->expandToDepth(4);
-	mTreeView->resizeColumnToContents(0);
+	for (unsigned i=0; i<4; ++i)
+		mTreeView->resizeColumnToContents(i);
 }
 
 

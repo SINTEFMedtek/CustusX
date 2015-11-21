@@ -57,6 +57,7 @@ public:
 	virtual ~TopTreeNode() {}
 	virtual QString getUid() const;
 	virtual QString getName() const;
+	virtual QString getType() const;
 	virtual TreeNodePtr getParent() const;
 	virtual QIcon getIcon() const;
 

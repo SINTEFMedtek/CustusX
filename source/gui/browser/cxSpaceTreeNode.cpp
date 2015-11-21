@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxData.h"
 #include "cxLegacySingletons.h"
 #include "cxTreeRepository.h"
+#include <QDebug>
 
 namespace cx
 {
@@ -56,6 +57,11 @@ QString SpaceTreeNode::getUid() const
 QString SpaceTreeNode::getName() const
 {
 	return mSpace.toString();
+}
+
+QString SpaceTreeNode::getType() const
+{
+	return "space";
 }
 
 TreeNodePtr SpaceTreeNode::getParent() const
@@ -81,7 +87,18 @@ TreeNodePtr SpaceTreeNode::getParent() const
 
 QIcon SpaceTreeNode::getIcon() const
 {
-	return QIcon(":/icons/metric_frame.png");
+	if (mSpace.mId == csREF)
+	{
+		return QIcon(":/icons/space_reference.png");
+	}
+	if (mSpace.mId == csPATIENTREF)
+	{
+		return QIcon(":/icons/space_patient_reference.png");
+	}
+	else
+	{
+		return QIcon(":/icons/space_generic.png");
+	}
 }
 
 

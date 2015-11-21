@@ -34,6 +34,7 @@ public:
   virtual int rowCount(const QModelIndex& parent = QModelIndex() ) const;
 
   virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole ) const;
+  virtual bool setData(const QModelIndex& index, const QVariant& value, int role);
   virtual Qt::ItemFlags flags(const QModelIndex& index ) const;
   virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const;
 
@@ -56,6 +57,7 @@ private slots:
   void onRepositoryChanged();
 
 private:
+  int mViewGroupCount;
 //  void buildTree();
   TreeRepositoryPtr mRepository;
 //  TreeItemPtr mTree;

@@ -58,6 +58,11 @@ QString TopTreeNode::getName() const
 	return "";
 }
 
+QString TopTreeNode::getType() const
+{
+	return "top";
+}
+
 TreeNodePtr TopTreeNode::getParent() const
 {
 	return TreeNodePtr();

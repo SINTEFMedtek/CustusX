@@ -24,6 +24,7 @@ namespace cx
 TreeItemModel::TreeItemModel(QObject* parent) : QAbstractItemModel(parent)
 {
 	mSelectionModel = NULL;
+	mViewGroupCount = 3;
 
 	mRepository = TreeRepository::create();
 	connect(mRepository.get(), &TreeRepository::invalidated, this, &TreeItemModel::hasBeenReset);
@@ -86,7 +87,7 @@ int TreeItemModel::columnCount(const QModelIndex& parent) const
 	TreeNode *parentItem = this->itemFromIndex(parent);
 	if (parent.column() > 0) // ignore for all but first column
 		return 0;
-	return 1;
+	return 1+mViewGroupCount;
 	//  return parentItem->getColumnCount();
 }
 
@@ -108,6 +109,28 @@ QVariant TreeItemModel::data(const QModelIndex& index, int role) const
 		TreeNode *item = this->itemFromIndex(index);
 		if (index.column()==namepos)
 			return item->getName();
+//		if (index.column()<mViewGroupCount+1)
+//			return item->getViewGroupVisibility(index.column()-1);
+//		if (index.column()==1)
+//			return item->getType();
+//		if (index.column()==2)
+//			return item->getData();
+	}
+	if (role==Qt::CheckStateRole)
+	{
+		TreeNode *item = this->itemFromIndex(index);
+		if (index.column()>0 && index.column()<mViewGroupCount+1)
+			return item->getViewGroupVisibility(index.column()-1);
+	}
+	if (role==Qt::ToolTipRole || role==Qt::StatusTipRole)
+	{
+		TreeNode *item = this->itemFromIndex(index);
+		if (index.column()==namepos)
+			return QString("%1 of type %2").arg(item->getName()).arg(item->getType());
+		if (index.column()>0 && index.column()<mViewGroupCount+1)
+			return QString("Set visibility of %1 in view group %2").arg(item->getName()).arg(index.column()-1);
+//		if (index.column()<mViewGroupCount+1)
+//			return item->getViewGroupVisibility(index.column()-1);
 //		if (index.column()==1)
 //			return item->getType();
 //		if (index.column()==2)
@@ -135,9 +158,24 @@ QVariant TreeItemModel::data(const QModelIndex& index, int role) const
 	return QVariant();
 }
 
+bool TreeItemModel::setData(const QModelIndex& index, const QVariant& value, int role)
+{
+	if (role==Qt::CheckStateRole)
+	{
+		TreeNode *item = this->itemFromIndex(index);
+		if (index.column()>0 && index.column()<mViewGroupCount+1)
+			item->setViewGroupVisibility(index.column()-1, value.value<int>());
+		return true;
+	}
+	return false;
+}
+
 Qt::ItemFlags TreeItemModel::flags(const QModelIndex& index) const
 {
-	return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+	if (index.column()>0)
+		return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable;
+	else
+		return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
 
 QVariant TreeItemModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -146,6 +184,8 @@ QVariant TreeItemModel::headerData(int section, Qt::Orientation orientation, int
 	{
 		if (section==0)
 			return "Item";
+		if (section>0 && section-1<mViewGroupCount)
+			return QString("V%1").arg(section);
 //		if (section==1)
 //			return "Type";
 //		if (section==2)

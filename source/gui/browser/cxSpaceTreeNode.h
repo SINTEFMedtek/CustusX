@@ -58,7 +58,7 @@ public:
 	virtual ~SpaceTreeNode() {}
 	virtual QString getUid() const;
 	virtual QString getName() const;
-//	virtual QString getType() const = 0;
+	virtual QString getType() const;
 	virtual TreeNodePtr getParent() const;
 //	virtual void activate() = 0;
 	virtual QIcon getIcon() const;

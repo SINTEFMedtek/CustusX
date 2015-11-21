@@ -58,7 +58,7 @@ public:
 	virtual ~ToolTreeNode() {}
 	virtual QString getUid() const;
 	virtual QString getName() const;
-//	virtual QString getType() const = 0;
+	virtual QString getType() const;
 	virtual TreeNodePtr getParent() const;
 	virtual void activate();
 	virtual QIcon getIcon() const;
