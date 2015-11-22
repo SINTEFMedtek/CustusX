@@ -32,12 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTREENODEIMPL_H
 #define CXTREENODEIMPL_H
 
-#include <vector>
-#include <boost/weak_ptr.hpp>
-#include <boost/shared_ptr.hpp>
-#include <QString>
-#include <QObject>
-#include "cxForwardDeclarations.h"
 #include "cxTreeNode.h"
 #include "cxCoordinateSystemHelpers.h"
 #include <QVariant>
@@ -58,7 +52,6 @@ public:
 	virtual ~TreeNodeImpl() {}
 	virtual std::vector<TreeNodePtr> getChildren() const;
 
-//	virtual QString getType() const = 0;
 	virtual void activate() {}
 	virtual QVariant getViewGroupVisibility(int index) const { return QVariant(); }
 	virtual void setViewGroupVisibility(int index, bool value) {}
@@ -69,6 +62,7 @@ public:
 
 protected:
 	TreeRepositoryWeakPtr mRepository;
+	VisServicesPtr getServices() const;
 
 	TreeRepositoryPtr repo();
 	const TreeRepositoryPtr repo() const;

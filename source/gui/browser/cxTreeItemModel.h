@@ -26,7 +26,7 @@ class TreeItemModel : public QAbstractItemModel
 {
   Q_OBJECT
 public:
-  TreeItemModel(QObject* parent = 0);
+  TreeItemModel(VisServicesPtr services, QObject* parent = 0);
   virtual ~TreeItemModel();
   void setSelectionModel(QItemSelectionModel* selectionModel);
 
@@ -62,6 +62,7 @@ private:
   TreeRepositoryPtr mRepository;
 //  TreeItemPtr mTree;
   QItemSelectionModel* mSelectionModel;
+  VisServicesPtr mServices;
 //  StringPropertyPtr mFilter;
   TreeNode* itemFromIndex(const QModelIndex& index) const;
   void fillModelTreeFromViewManager(TreeNodePtr root);

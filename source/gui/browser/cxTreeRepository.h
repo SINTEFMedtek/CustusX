@@ -55,7 +55,7 @@ class TreeRepository : public QObject
 {
 	Q_OBJECT
 public:
-	static TreeRepositoryPtr create();
+	static TreeRepositoryPtr create(VisServicesPtr services);
 	~TreeRepository();
 
 	std::vector<TreeNodePtr> getNodes();
@@ -63,6 +63,7 @@ public:
 
 	// utility methods for accessing the nodes:
 	TreeNodePtr getTopNode();
+	VisServicesPtr getServices();
 
 public slots:
 	void update();
@@ -75,8 +76,9 @@ private:
 	std::vector<TreeNodePtr> mNodes;
 	TreeRepositoryWeakPtr mSelf;
 	bool mInvalid;
+	VisServicesPtr mServices;
 
-	TreeRepository();
+	explicit TreeRepository(VisServicesPtr services);
 	void rebuild();
 	void insertTopNode();
 	void insertDataNode(DataPtr data);

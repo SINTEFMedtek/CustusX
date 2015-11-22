@@ -31,12 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxSpaceTreeNode.h"
 #include "cxLogger.h"
-#include "cxPatientModelService.h"
-#include "cxDefinitions.h"
-#include "cxData.h"
-#include "cxLegacySingletons.h"
 #include "cxTreeRepository.h"
-#include <QDebug>
+#include <QIcon>
 
 namespace cx
 {

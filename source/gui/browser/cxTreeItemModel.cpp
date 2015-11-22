@@ -10,7 +10,6 @@
 #include "cxViewService.h"
 #include "cxRep.h"
 #include "cxViewGroupData.h"
-#include "cxLegacySingletons.h"
 #include "cxTypeConversions.h"
 #include "cxTreeRepository.h"
 #include "cxLogger.h"
@@ -21,12 +20,14 @@ namespace cx
 
 
 
-TreeItemModel::TreeItemModel(QObject* parent) : QAbstractItemModel(parent)
+TreeItemModel::TreeItemModel(VisServicesPtr services, QObject* parent) :
+	QAbstractItemModel(parent),
+	mServices(services)
 {
 	mSelectionModel = NULL;
 	mViewGroupCount = 3;
 
-	mRepository = TreeRepository::create();
+	mRepository = TreeRepository::create(services);
 	connect(mRepository.get(), &TreeRepository::invalidated, this, &TreeItemModel::hasBeenReset);
 	connect(mRepository.get(), &TreeRepository::changed, this, &TreeItemModel::onRepositoryChanged);
 }

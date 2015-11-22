@@ -30,13 +30,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxToolTreeNode.h"
-#include "cxPatientModelService.h"
-#include "cxDefinitions.h"
-#include "cxData.h"
-#include "cxLegacySingletons.h"
 #include "cxTreeRepository.h"
 #include "cxLogger.h"
 #include "cxTrackingService.h"
+#include "cxVisServices.h"
+#include <QIcon>
 #include <QFont>
 
 namespace cx
@@ -64,7 +62,7 @@ TreeNodePtr ToolTreeNode::getParent() const
 	if (mTool->hasType(Tool::TOOL_REFERENCE))
 		return this->repo()->getNode(CoordinateSystem(csPATIENTREF).toString());
 //		return this->repo()->getNode(CoordinateSystem(csREF).toString());
-	ToolPtr ref = trackingService()->getReferenceTool();
+	ToolPtr ref = this->getServices()->tracking()->getReferenceTool();
 	if (ref)
 		return this->repo()->getNode(ref->getUid());
 	return TreeNodePtr();
@@ -72,7 +70,7 @@ TreeNodePtr ToolTreeNode::getParent() const
 
 void ToolTreeNode::activate()
 {
-	trackingService()->setActiveTool(mTool->getUid());
+	this->getServices()->tracking()->setActiveTool(mTool->getUid());
 }
 
 QString ToolTreeNode::getType() const
@@ -107,7 +105,7 @@ QVariant ToolTreeNode::getColor() const
 
 QVariant ToolTreeNode::getFont() const
 {
-	if (trackingService()->getActiveTool()==mTool)
+	if (this->getServices()->tracking()->getActiveTool()==mTool)
 	{
 		QFont font;
 		font.setBold(true);

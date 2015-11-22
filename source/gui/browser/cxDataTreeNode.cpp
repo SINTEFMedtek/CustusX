@@ -33,13 +33,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxDefinitions.h"
 #include "cxData.h"
-#include "cxLegacySingletons.h"
 #include "cxTreeRepository.h"
 #include "cxLogger.h"
 #include "cxDataMetric.h"
 #include "cxActiveData.h"
 #include "cxViewService.h"
 #include "cxViewGroupData.h"
+#include "cxVisServices.h"
 #include <QFont>
 
 namespace cx
@@ -79,7 +79,7 @@ TreeNodePtr DataTreeNode::getParent() const
 
 void DataTreeNode::activate()
 {
-	patientService()->getActiveData()->setActive(mData);
+	this->getServices()->patient()->getActiveData()->setActive(mData);
 }
 
 QIcon DataTreeNode::getIcon() const
@@ -97,7 +97,7 @@ QVariant DataTreeNode::getColor() const
 
 QVariant DataTreeNode::getFont() const
 {
-	if (patientService()->getActiveData()->getActive()==mData)
+	if (this->getServices()->patient()->getActiveData()->getActive()==mData)
 	{
 		QFont font;
 		font.setBold(true);
@@ -108,7 +108,7 @@ QVariant DataTreeNode::getFont() const
 
 QVariant DataTreeNode::getViewGroupVisibility(int index) const
 {
-	DataViewProperties props = viewService()->getGroup(index)->getProperties(mData->getUid());
+	DataViewProperties props = this->getServices()->view()->getGroup(index)->getProperties(mData->getUid());
 	if (props.empty())
 		return Qt::CheckState(0);
 	if ((props.hasVolume3D() || props.hasSlice3D()) && props.hasSlice2D())
@@ -120,9 +120,9 @@ QVariant DataTreeNode::getViewGroupVisibility(int index) const
 void DataTreeNode::setViewGroupVisibility(int index, bool value)
 {
 	if (value)
-		viewService()->getGroup(index)->setProperties(mData->getUid(), DataViewProperties::createDefault());
+		this->getServices()->view()->getGroup(index)->setProperties(mData->getUid(), DataViewProperties::createDefault());
 	else
-		viewService()->getGroup(index)->setProperties(mData->getUid(), DataViewProperties());
+		this->getServices()->view()->getGroup(index)->setProperties(mData->getUid(), DataViewProperties());
 }
 
 

@@ -31,12 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxTopTreeNode.h"
 
-#include "cxPatientModelService.h"
-#include "cxDefinitions.h"
-#include "cxData.h"
-#include "cxLegacySingletons.h"
-#include "cxTreeRepository.h"
-#include "cxLogger.h"
+#include <QIcon>
 
 namespace cx
 {

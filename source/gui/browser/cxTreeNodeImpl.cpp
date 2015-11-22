@@ -30,10 +30,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxTreeNodeImpl.h"
-#include "cxPatientModelService.h"
-#include "cxDefinitions.h"
-#include "cxData.h"
-#include "cxLegacySingletons.h"
 #include "cxTreeRepository.h"
 #include "cxLogger.h"
 
@@ -58,6 +54,11 @@ std::vector<TreeNodePtr> TreeNodeImpl::getChildren() const
 			retval.push_back(all[i]);
 //	CX_LOG_CHANNEL_DEBUG("CA") << QString("  - data node %1 children: %2").arg(this->getName()).arg(retval.size());
 	return retval;
+}
+
+VisServicesPtr TreeNodeImpl::getServices() const
+{
+	return this->repo()->getServices();
 }
 
 TreeRepositoryPtr TreeNodeImpl::repo()

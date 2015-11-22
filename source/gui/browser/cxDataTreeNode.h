@@ -32,14 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDATATREENODE_H
 #define CXDATATREENODE_H
 
-#include <vector>
-#include <boost/weak_ptr.hpp>
-#include <boost/shared_ptr.hpp>
-#include <QString>
-#include <QObject>
-#include "cxForwardDeclarations.h"
-#include "cxTreeNode.h"
-#include "cxCoordinateSystemHelpers.h"
 #include "cxTreeNodeImpl.h"
 
 namespace cx

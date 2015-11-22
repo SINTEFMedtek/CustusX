@@ -128,7 +128,7 @@ MainWindow::MainWindow() :
     this->addAsDockWidget(new FiltersWidget(VisServices::create(logicManager()->getPluginContext()), this), "Algorithms");
 	this->addAsDockWidget(new ClippingPropertiesWidget(mServices, this), "Properties");
 
-	this->addAsDockWidget(new BrowserWidget(this), "Browsing");
+	this->addAsDockWidget(new BrowserWidget(this, mServices), "Browsing");
 
 	connect(patientService().get(), &PatientModelService::patientChanged, this, &MainWindow::patientChangedSlot);
 	connect(qApp, &QApplication::focusChanged, this, &MainWindow::focusChanged);

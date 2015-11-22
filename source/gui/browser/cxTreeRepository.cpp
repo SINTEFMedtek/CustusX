@@ -30,7 +30,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxTreeRepository.h"
-#include "cxLegacySingletons.h"
 #include "cxPatientModelService.h"
 #include "cxDefinitions.h"
 #include "cxData.h"
@@ -42,20 +41,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogger.h"
 #include "cxTrackingService.h"
 #include "cxActiveData.h"
+#include "cxVisServices.h"
 
 namespace cx
 {
 
-TreeRepositoryPtr TreeRepository::create()
+TreeRepositoryPtr TreeRepository::create(VisServicesPtr services)
 {
-	TreeRepositoryPtr retval(new TreeRepository());
+	TreeRepositoryPtr retval(new TreeRepository(services));
 	retval->mSelf = retval;
 	retval->insertTopNode();
 	return retval;
 }
 
-TreeRepository::TreeRepository() :
-	mInvalid(true)
+TreeRepository::TreeRepository(VisServicesPtr services) :
+	mInvalid(true),
+	mServices(services)
 {
 	this->startListen();
 }
@@ -80,14 +81,15 @@ void TreeRepository::invalidate()
 
 void TreeRepository::startListen()
 {
-	connect(patientService().get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(invalidate()));
-	connect(trackingService().get(), &TrackingService::stateChanged, this, &TreeRepository::invalidate);
-	connect(patientService()->getActiveData().get(), &ActiveData::activeDataChanged, this, &TreeRepository::changed);
+	connect(this->getServices()->patient().get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(invalidate()));
+	connect(this->getServices()->tracking().get(), &TrackingService::stateChanged, this, &TreeRepository::invalidate);
+	connect(this->getServices()->patient()->getActiveData().get(), &ActiveData::activeDataChanged, this, &TreeRepository::changed);
 }
 void TreeRepository::stopListen()
 {
-	disconnect(trackingService().get(), &TrackingService::stateChanged, this, &TreeRepository::invalidate);
-	disconnect(patientService().get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(invalidate()));
+	disconnect(this->getServices()->patient()->getActiveData().get(), &ActiveData::activeDataChanged, this, &TreeRepository::changed);
+	disconnect(this->getServices()->tracking().get(), &TrackingService::stateChanged, this, &TreeRepository::invalidate);
+	disconnect(this->getServices()->patient().get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(invalidate()));
 }
 
 std::vector<TreeNodePtr> TreeRepository::getNodes()
@@ -115,6 +117,11 @@ TreeNodePtr TreeRepository::getTopNode()
 	return TreeNodePtr();
 }
 
+VisServicesPtr TreeRepository::getServices()
+{
+	return mServices;
+}
+
 void TreeRepository::insertTopNode()
 {
 	TreeNodePtr topnode(new TopTreeNode(mSelf));
@@ -130,7 +137,7 @@ void TreeRepository::rebuild()
 	this->insertSpaceNode(CoordinateSystem(csREF));
 	CX_LOG_CHANNEL_DEBUG("CA") << "  - built refspacenode";
 
-	std::map<QString, DataPtr> source = patientService()->getData();
+	std::map<QString, DataPtr> source = this->getServices()->patient()->getData();
 	for (std::map<QString, DataPtr>::const_iterator iter = source.begin(); iter != source.end(); ++iter)
 	{
 		this->insertDataNode(iter->second);
@@ -149,7 +156,7 @@ void TreeRepository::rebuild()
 
 	this->insertSpaceNode(CoordinateSystem(csPATIENTREF));
 
-	std::map<QString, ToolPtr> tools = trackingService()->getTools();
+	std::map<QString, ToolPtr> tools = this->getServices()->tracking()->getTools();
 	for (std::map<QString, ToolPtr>::const_iterator iter = tools.begin(); iter != tools.end(); ++iter)
 	{
 		this->insertToolNode(iter->second);
