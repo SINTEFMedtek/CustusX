@@ -48,14 +48,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxActiveToolProxy.h"
 #include "cxActiveData.h"
 
-//TODO: remove
-#include "cxLegacySingletons.h"
-
 namespace cx
 {
-DoublePropertyActiveToolOffset::DoublePropertyActiveToolOffset()
+DoublePropertyActiveToolOffset::DoublePropertyActiveToolOffset(ActiveToolProxyPtr activeTool) :
+	mActiveTool(activeTool)
 {
-  mActiveTool = ActiveToolProxy::New(trackingService());
+//  mActiveTool = ActiveToolProxy::New(trackingService());
   connect(mActiveTool.get(), &ActiveToolProxy::tooltipOffset, this, &Property::changed);
 }
 
@@ -75,6 +73,46 @@ DoubleRange DoublePropertyActiveToolOffset::getValueRange() const
   double range = 200;
   return DoubleRange(0,range,1);
 }
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+DoublePropertyToolOffset::DoublePropertyToolOffset(ToolPtr tool) :
+	mTool(tool)
+{
+//  mActiveTool = ActiveToolProxy::New(trackingService());
+//  connect(mTool.get(), &Tool::tooltipOffset, this, &Property::changed);
+	this->setTool(tool);
+}
+
+void DoublePropertyToolOffset::setTool(ToolPtr tool)
+{
+	if (mTool)
+		disconnect(mTool.get(), &Tool::tooltipOffset, this, &Property::changed);
+	mTool = tool;
+	if (mTool)
+		connect(mTool.get(), &Tool::tooltipOffset, this, &Property::changed);
+	emit changed();
+}
+
+double DoublePropertyToolOffset::getValue() const
+{
+	return mTool->getTooltipOffset();
+}
+
+bool DoublePropertyToolOffset::setValue(double val)
+{
+  mTool->setTooltipOffset(val);
+  return true;
+}
+
+DoubleRange DoublePropertyToolOffset::getValueRange() const
+{
+  double range = 200;
+  return DoubleRange(0,range,1);
+}
+
 
 //---------------------------------------------------------
 //---------------------------------------------------------

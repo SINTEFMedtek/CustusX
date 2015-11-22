@@ -73,6 +73,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPluginFrameworkWidget.h"
 #include "cxManageClippersWidget.h"
 #include "cxBrowserWidget.h"
+#include "cxActiveToolProxy.h"
 
 namespace cx
 {
@@ -117,7 +118,7 @@ MainWindow::MainWindow() :
 	this->addAsDockWidget(new SelectedMeshInfoWidget(mServices->patient(), mServices->view(), this), "Properties");
 	this->addAsDockWidget(new StreamPropertiesWidget(mServices->patient(), mServices->view(), this), "Properties");
 	this->addAsDockWidget(new TrackPadWidget(this), "Utility");
-	this->addAsDockWidget(new ToolPropertiesWidget(this), "Properties");
+	this->addAsDockWidget(new ActiveToolPropertiesWidget(mServices->tracking(), mServices->spaceProvider(), this), "Properties");
 	this->addAsDockWidget(new NavigationWidget(this), "Properties");
 	this->addAsDockWidget(new ConsoleWidget(this, "ConsoleWidget", "Console"), "Utility");
 	this->addAsDockWidget(new ConsoleWidget(this, "ConsoleWidget2", "Extra Console"), "Utility");
@@ -531,7 +532,8 @@ void MainWindow::createToolBars()
 	samplerWidgetToolBar->addWidget(new SamplerWidget(this));
 
 	QToolBar* toolOffsetToolBar = this->registerToolBar("Tool Offset");
-	SpinBoxAndSliderGroupWidget* offsetWidget = new SpinBoxAndSliderGroupWidget(this, DoublePropertyActiveToolOffset::create());
+	DoublePropertyBasePtr offset = DoublePropertyActiveToolOffset::create(ActiveToolProxy::New(mServices->tracking()));
+	SpinBoxAndSliderGroupWidget* offsetWidget = new SpinBoxAndSliderGroupWidget(this, offset);
 	offsetWidget->showLabel(false);
 	toolOffsetToolBar->addWidget(offsetWidget);
 

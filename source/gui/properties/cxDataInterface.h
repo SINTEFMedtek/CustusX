@@ -57,12 +57,12 @@ class cxGui_EXPORT DoublePropertyActiveToolOffset : public DoublePropertyBase
 {
   Q_OBJECT
 public:
-	static boost::shared_ptr<DoublePropertyActiveToolOffset> create()
+	static boost::shared_ptr<DoublePropertyActiveToolOffset> create(ActiveToolProxyPtr activeTool)
 	{
-		return boost::shared_ptr<DoublePropertyActiveToolOffset>(new DoublePropertyActiveToolOffset());
+		return boost::shared_ptr<DoublePropertyActiveToolOffset>(new DoublePropertyActiveToolOffset(activeTool));
 	}
 
-  DoublePropertyActiveToolOffset();
+  DoublePropertyActiveToolOffset(ActiveToolProxyPtr activeTool);
   virtual ~DoublePropertyActiveToolOffset() {}
   virtual QString getDisplayName() const { return "Offset"; }
   virtual QString getHelp() const
@@ -76,6 +76,36 @@ public:
 
 protected:
   ActiveToolProxyPtr mActiveTool;
+};
+
+/**
+ * \brief Interface to the tool offset of a tool
+ */
+class cxGui_EXPORT DoublePropertyToolOffset : public DoublePropertyBase
+{
+  Q_OBJECT
+public:
+	static boost::shared_ptr<DoublePropertyToolOffset> create(ToolPtr tool)
+	{
+		return boost::shared_ptr<DoublePropertyToolOffset>(new DoublePropertyToolOffset(tool));
+	}
+
+  DoublePropertyToolOffset(ToolPtr tool);
+  virtual ~DoublePropertyToolOffset() {}
+  virtual QString getDisplayName() const { return "Offset"; }
+  virtual QString getHelp() const
+  {
+	  return "Tool tip virtual offset, in mm.";
+  }
+  virtual double getValue() const;
+  virtual bool setValue(double val);
+  virtual void connectValueSignals(bool on) {}
+  DoubleRange getValueRange() const;
+
+  void setTool(ToolPtr tool);
+
+protected:
+  ToolPtr mTool;
 };
 
 /**

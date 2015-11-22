@@ -50,24 +50,66 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxToolProperty.h"
 #include "cxActiveToolWidget.h"
 #include "cxManualTool.h"
-#include "cxLegacySingletons.h"
 #include "cxSpaceProvider.h"
 #include "cxSpaceEditWidget.h"
-#include "cxLegacySingletons.h"
+#include "cxToolProperty.h"
+#include "cxSpaceProvider.h"
+#include "cxLogger.h"
 
 namespace cx
 {
-  
-ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
-  BaseWidget(parent, "ToolPropertiesWidget", "Tool Properties")
+
+
+ActiveToolPropertiesWidget::ActiveToolPropertiesWidget(TrackingServicePtr trackingService, SpaceProviderPtr spaceProvider, QWidget* parent) :
+	BaseWidget(parent, "ToolPropertiesWidget", "Tool Properties")
 {
+
+	QVBoxLayout* layout = new QVBoxLayout(this);
+	layout->setMargin(0);
+	ActiveToolWidget* activeToolWidget = new ActiveToolWidget(trackingService, this);
+	layout->addWidget(activeToolWidget);
+
+	StringPropertyBasePtr selector = activeToolWidget->getSelector();
+
+	ToolPropertiesWidget* info = new ToolPropertiesWidget(selector, trackingService, spaceProvider, this);
+	info->layout()->setMargin(0);
+	layout->addWidget(info);
+}
+
+ActiveToolPropertiesWidget::~ActiveToolPropertiesWidget()
+{}
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+ToolPropertiesWidget::ToolPropertiesWidget(StringPropertyBasePtr toolSelector,
+										   TrackingServicePtr trackingService,
+										   SpaceProviderPtr spaceProvider,
+										   QWidget* parent) :
+  BaseWidget(parent, "ToolCorePropertiesWidget", "Tool Properties"),
+  mSelector(toolSelector),
+  mTrackingService(trackingService),
+  mSpaceProvider(spaceProvider),
+  mManualToolWidget(NULL)
+{
+	mToptopLayout = new QVBoxLayout(this);
+	this->setModified();
+}
+
+ToolPropertiesWidget::~ToolPropertiesWidget()
+{
+}
+
+void ToolPropertiesWidget::setupUI()
+{
+	if (mManualToolWidget) // already created
+		return;
+
 	this->setToolTip("Tool properties");
   //layout
-  mToptopLayout = new QVBoxLayout(this);
   //toptopLayout->setMargin(0);
 
-  mToptopLayout->addWidget(new ActiveToolWidget(trackingService(), this));
-  
   QHBoxLayout* generalLayout = new QHBoxLayout;
   mReferenceStatusLabel = new QLabel("Reference frame <undefined>", this);
   generalLayout->addWidget(mReferenceStatusLabel);
@@ -77,7 +119,7 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   mToptopLayout->addLayout(generalLayout);
 
   QGroupBox* activeGroup = new QGroupBox(this);
-  activeGroup->setTitle("Active Tool");
+  activeGroup->setTitle("Tool");
   mToptopLayout->addWidget(activeGroup);
   QVBoxLayout* activeGroupLayout = new QVBoxLayout;
   activeGroup->setLayout(activeGroupLayout);
@@ -99,20 +141,18 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   manualGroupLayout->setMargin(0);
   mManualToolWidget = new Transform3DWidget(manualGroup);
   manualGroupLayout->addWidget(mManualToolWidget);
-  connect(trackingService()->getManualTool().get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(manualToolChanged()));
-  connect(trackingService()->getManualTool().get(), SIGNAL(toolVisible(bool)), this, SLOT(manualToolChanged()));
   connect(mManualToolWidget, SIGNAL(changed()), this, SLOT(manualToolWidgetChanged()));
 
   mSpaceSelector = SpaceProperty::initialize("selectSpace",
-      "Space",
+	  "Space",
 	  "Select coordinate system to store position in.");
-  mSpaceSelector->setSpaceProvider(spaceProvider());
+  mSpaceSelector->setSpaceProvider(mSpaceProvider);
   connect(mSpaceSelector.get(), &SpaceProperty::valueWasSet, this, &ToolPropertiesWidget::spacesChangedSlot);
   connect(mSpaceSelector.get(), &SpaceProperty::valueWasSet, this, &ToolPropertiesWidget::setModified);
-  mSpaceSelector->setValue(spaceProvider()->getPr());
+  mSpaceSelector->setValue(mSpaceProvider->getPr());
   manualGroupLayout->addWidget(new SpaceEditWidget(this, mSpaceSelector));
 
-  TrackingServicePtr ts = trackingService();
+  TrackingServicePtr ts = mTrackingService;
   mUSSectorConfigBox = new LabeledComboBoxWidget(this, StringPropertyActiveProbeConfiguration::New(ts));
   mToptopLayout->addWidget(mUSSectorConfigBox);
   mUSSectorConfigBox->hide();
@@ -120,39 +160,39 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   QGridLayout* gridLayout = new QGridLayout;
   activeGroupLayout->addLayout(gridLayout);
 
-  new SpinBoxAndSliderGroupWidget(this, DoublePropertyBasePtr(new DoublePropertyActiveToolOffset), gridLayout, 0);
+  mToolOffset = DoublePropertyToolOffset::create(mTool);
+  gridLayout->addWidget(new SpinBoxAndSliderGroupWidget(this, mToolOffset));
 
   mToptopLayout->addStretch();
 
-  connect(trackingService().get(), &TrackingService::stateChanged, this, &ToolPropertiesWidget::referenceToolChangedSlot);
-
-  connect(trackingService().get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(activeToolChangedSlot()));
-
-  connect(trackingService().get(), &TrackingService::stateChanged, this, &ToolPropertiesWidget::updateSlot);
-  connect(trackingService().get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(updateSlot()));
+  connect(ts.get(), &TrackingService::stateChanged, this, &ToolPropertiesWidget::referenceToolChangedSlot);
+  connect(mSelector.get(), &StringPropertyBase::changed, this, &ToolPropertiesWidget::activeToolChangedSlot);
+  connect(ts.get(), &TrackingService::stateChanged, this, &ToolPropertiesWidget::setModified);
 
   this->activeToolChangedSlot();
   this->referenceToolChangedSlot();
-  this->updateSlot();
-  this->manualToolChanged();
   this->spacesChangedSlot();
 }
 
-ToolPropertiesWidget::~ToolPropertiesWidget()
+void ToolPropertiesWidget::prePaintEvent()
 {
+	this->setupUI();
+	this->updateFrontend();
+	this->toolPositionChanged();
 }
 
-void ToolPropertiesWidget::manualToolChanged()
+void ToolPropertiesWidget::toolPositionChanged()
 {
-	if (!trackingService()->getManualTool())
+	if (!mTool)
 		return;
-  mManualGroup->setVisible(trackingService()->getManualTool()->getVisible());
+
+	mManualGroup->setVisible(mTool->getVisible());
   mManualToolWidget->blockSignals(true);
 
-  Transform3D prMt = trackingService()->getManualTool()->get_prMt();
+  Transform3D prMt = mTool->get_prMt();
   CoordinateSystem space_q = mSpaceSelector->getValue();
-  CoordinateSystem space_mt = spaceProvider()->getTO(trackingService()->getManualTool());
-  Transform3D qMt = spaceProvider()->get_toMfrom(space_mt, space_q);
+  CoordinateSystem space_mt = mSpaceProvider->getTO(mTool);
+  Transform3D qMt = mSpaceProvider->get_toMfrom(space_mt, space_q);
 
   mManualToolWidget->setMatrix(qMt);
   mManualToolWidget->blockSignals(false);
@@ -160,14 +200,17 @@ void ToolPropertiesWidget::manualToolChanged()
 
 void ToolPropertiesWidget::manualToolWidgetChanged()
 {
+	if (!mTool)
+		return;
+
 	Transform3D qMt = mManualToolWidget->getMatrix();
   CoordinateSystem space_q = mSpaceSelector->getValue();
-  CoordinateSystem space_mt = spaceProvider()->getTO(trackingService()->getManualTool());
-  CoordinateSystem space_pr = spaceProvider()->getPr();
-  Transform3D qMpr = spaceProvider()->get_toMfrom(space_pr, space_q);
+  CoordinateSystem space_mt = mSpaceProvider->getTO(mTool);
+  CoordinateSystem space_pr = mSpaceProvider->getPr();
+  Transform3D qMpr = mSpaceProvider->get_toMfrom(space_pr, space_q);
   Transform3D prMt = qMpr.inv() * qMt;
 
-  trackingService()->getManualTool()->set_prMt(prMt);
+  mTool->set_prMt(prMt);
 }
 
 void ToolPropertiesWidget::spacesChangedSlot()
@@ -179,48 +222,49 @@ void ToolPropertiesWidget::spacesChangedSlot()
 	mSpaceSelector->setHelp(QString("The space q to display tool position in,\n"
 	                                "qMt"));
 	this->setModified();
-	this->manualToolChanged();
+	this->toolPositionChanged();
 }
 
 void ToolPropertiesWidget::activeToolChangedSlot()
 {
-  if (mActiveTool)
-    disconnect(mActiveTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateSlot()));
-
-  mActiveTool = trackingService()->getActiveTool();
-
-  if(mActiveTool && mActiveTool->hasType(Tool::TOOL_US_PROBE))
+  if (mTool)
   {
-    mUSSectorConfigBox->show();
-    mToptopLayout->update();
-  }
-  else
-  {
-    mUSSectorConfigBox->hide();
-    mToptopLayout->update();
+	  disconnect(mTool.get(), &Tool::toolVisible, this, &ToolPropertiesWidget::setModified);
+	  disconnect(mTool.get(), &Tool::toolTransformAndTimestamp, this, &ToolPropertiesWidget::setModified);
   }
 
-  if (mActiveTool)
-    connect(mActiveTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateSlot()));
+  mTool = mTrackingService->getTool(mSelector->getValue());
+
+  if (mTool)
+  {
+	  connect(mTool.get(), &Tool::toolVisible, this, &ToolPropertiesWidget::setModified);
+	  connect(mTool.get(), &Tool::toolTransformAndTimestamp, this, &ToolPropertiesWidget::setModified);
+  }
+
+  mToolOffset->setTool(mTool);
+  mUSSectorConfigBox->setVisible(mTool && mTool->hasType(Tool::TOOL_US_PROBE));
+  mToptopLayout->update();
+
+  this->setModified();
 }
 
 void ToolPropertiesWidget::referenceToolChangedSlot()
 {
   if (mReferenceTool)
-    disconnect(mReferenceTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateSlot()));
+	disconnect(mReferenceTool.get(), &Tool::toolVisible, this, &ToolPropertiesWidget::setModified);
 
-  mReferenceTool = trackingService()->getReferenceTool();
+  mReferenceTool = mTrackingService->getReferenceTool();
 
   if (mReferenceTool)
-    connect(mReferenceTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateSlot()));
+	  connect(mReferenceTool.get(), &Tool::toolVisible, this, &ToolPropertiesWidget::setModified);
 }
 
-void ToolPropertiesWidget::updateSlot()
+void ToolPropertiesWidget::updateFrontend()
 {
-  if (mActiveTool)
+  if (mTool)
   {
-    mToolNameLabel->setText(qstring_cast(mActiveTool->getName()));
-    QString text = mActiveTool->getVisible() ? "Visible" : "Not Visible";
+	mToolNameLabel->setText(qstring_cast(mTool->getName()));
+	QString text = mTool->getVisible() ? "Visible" : "Not Visible";
     mActiveToolVisibleLabel->setText(text);
   }
   else
@@ -231,7 +275,7 @@ void ToolPropertiesWidget::updateSlot()
 
   if (mReferenceTool)
   {
-    QString text = mReferenceTool->getVisible() ? "visible" : "not visible";
+	QString text = mReferenceTool->getVisible() ? "Visible" : "Not Visible";
     mReferenceStatusLabel->setText("Reference " + text);
   }
   else
@@ -240,11 +284,11 @@ void ToolPropertiesWidget::updateSlot()
   }
 
   QString status = "Unconfigured";
-  if (trackingService()->getState()==Tool::tsCONFIGURED)
+  if (mTrackingService->getState()==Tool::tsCONFIGURED)
     status = "Configured";
-  if (trackingService()->getState()==Tool::tsINITIALIZED)
+  if (mTrackingService->getState()==Tool::tsINITIALIZED)
 	status = "Initialized";
-  if (trackingService()->getState()==Tool::tsTRACKING)
+  if (mTrackingService->getState()==Tool::tsTRACKING)
 	status = "Tracking";
   mTrackingSystemStatusLabel->setText("Tracking status: " + status);
 }

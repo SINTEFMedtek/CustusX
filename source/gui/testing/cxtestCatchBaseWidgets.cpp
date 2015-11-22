@@ -76,6 +76,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVolumePropertiesWidget.h"
 #include "cxTrackingService.h"
 #include "cxPatientModelServiceProxy.h"
+#include "cxtestSpaceProviderMock.h"
 
 //All these widgets in the plugins folder should also be tested
 //#include "cxAllFiltersWidget.h"
@@ -151,6 +152,7 @@ TEST_CASE("BaseWidget's children in gui/dataWidgets correctly constructed", "[un
 	cx::PatientModelServicePtr patientModelService = cx::PatientModelService::getNullObject(); //mock PatientModelService with the null object
 	cx::ViewServicePtr viewService = cx::ViewService::getNullObject(); //mock
 	cx::TrackingServicePtr trackingService = cx::TrackingService::getNullObject(); //mock
+	cx::SpaceProviderPtr spaceProvider(new  cxtest::SpaceProviderMock()); //mock
 	cx::VisServicesPtr services = cx::VisServices::getNullObjects();
 
 	testAndDeleteBaseWidgetChild(new cx::ActiveToolWidget(trackingService, testParent));
@@ -170,7 +172,7 @@ TEST_CASE("BaseWidget's children in gui/dataWidgets correctly constructed", "[un
 	testAndDeleteBaseWidgetChild(new cx::SamplerWidget(testParent));
 	testAndDeleteBaseWidgetChild(new cx::ShadingWidget(patientModelService->getActiveData(), testParent));
 //	testAndDeleteBaseWidgetChild(new cx::SimulateUSWidget(testParent));
-	testAndDeleteBaseWidgetChild(new cx::ToolPropertiesWidget(testParent));
+	testAndDeleteBaseWidgetChild(new cx::ActiveToolPropertiesWidget(trackingService, spaceProvider, testParent));
 	testAndDeleteBaseWidgetChild(new cx::TrackPadWidget(testParent));
 	testAndDeleteBaseWidgetChild(new cx::Transform3DWidget(testParent));
 

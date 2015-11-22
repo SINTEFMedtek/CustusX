@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataInterface.h"
 #include "cxHelperWidgets.h"
 #include "cxViewService.h"
+#include "cxActiveToolProxy.h"
 
 //TODO: remove
 #include "cxLegacySingletons.h"
@@ -64,7 +65,8 @@ NavigationWidget::NavigationWidget(QWidget* parent) :
   mCameraGroupLayout->addWidget(toolBar);
   toolBar->addActions(viewService()->createInteractorStyleActionGroup()->actions());
 
-  QWidget* toolOffsetWidget = new SliderGroupWidget(this, DoublePropertyActiveToolOffset::create());
+  DoublePropertyBasePtr offset = DoublePropertyActiveToolOffset::create(ActiveToolProxy::New(trackingService()));
+  QWidget* toolOffsetWidget = new SliderGroupWidget(this, offset);
 
   //layout
   this->setLayout(mVerticalLayout);

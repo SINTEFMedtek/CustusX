@@ -40,6 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
+typedef boost::shared_ptr<class StringPropertyBase> StringPropertyBasePtr;
+
 /**
  * \class ActiveToolWidget
  *
@@ -55,6 +57,10 @@ class cxResourceWidgets_EXPORT ActiveToolWidget : public BaseWidget
 public:
   ActiveToolWidget(TrackingServicePtr trackingService, QWidget* parent);
   virtual ~ActiveToolWidget() {}
+  StringPropertyBasePtr getSelector() { return mSelector; }
+
+private:
+  StringPropertyBasePtr mSelector;
 };
 
 }

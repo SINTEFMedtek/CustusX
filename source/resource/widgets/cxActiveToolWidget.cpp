@@ -47,7 +47,9 @@ ActiveToolWidget::ActiveToolWidget(TrackingServicePtr trackingService, QWidget* 
   this->setObjectName("ActiveToolWidget");
   layout->setMargin(0);
 
-  LabeledComboBoxWidget*  combo = new LabeledComboBoxWidget(this, StringPropertyActiveTool::New(trackingService));
+  mSelector = StringPropertyActiveTool::New(trackingService);
+
+  LabeledComboBoxWidget*  combo = new LabeledComboBoxWidget(this, mSelector);
   layout->addWidget(combo);
 }
 

@@ -37,6 +37,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QIcon>
 #include <QFont>
 #include <QLabel>
+#include "cxToolPropertiesWidget.h"
+#include "cxStringPropertySelectTool.h"
 
 namespace cx
 {
@@ -117,7 +119,15 @@ QVariant ToolTreeNode::getFont() const
 
 QWidget* ToolTreeNode::createPropertiesWidget() const
 {
-	return new QLabel(QString("Tool widget %1 ").arg(mTool->getName()));
+	StringPropertySelectToolPtr selector = StringPropertySelectTool::New(this->getServices()->tracking());
+	selector->setValue(mTool->getUid());
+	return new ToolPropertiesWidget(selector,
+							  this->getServices()->tracking(),
+							  this->getServices()->spaceProvider(),
+							  NULL);
+
+//	return new ToolPropertiesWidget(NULL);
+//	return new QLabel(QString("Tool widget %1 ").arg(mTool->getName()));
 }
 
 

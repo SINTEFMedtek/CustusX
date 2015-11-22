@@ -53,7 +53,18 @@ class UsConfigGui;
 
 namespace cx
 {
+typedef boost::shared_ptr<class DoublePropertyToolOffset> DoublePropertyToolOffsetPtr;
 class LabeledComboBoxWidget;
+
+
+class cxGui_EXPORT ActiveToolPropertiesWidget : public BaseWidget
+{
+  Q_OBJECT
+
+public:
+  ActiveToolPropertiesWidget(TrackingServicePtr trackingService, SpaceProviderPtr spaceProvider, QWidget* parent);
+  virtual ~ActiveToolPropertiesWidget();
+};
 
 /**
  * \class ToolPropertiesWidget
@@ -67,34 +78,39 @@ class cxGui_EXPORT ToolPropertiesWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  ToolPropertiesWidget(QWidget* parent);
+	ToolPropertiesWidget(StringPropertyBasePtr tool, TrackingServicePtr trackingService, SpaceProviderPtr spaceProvider, QWidget* parent);
   virtual ~ToolPropertiesWidget();
 
 signals:
 
 protected slots:
-  void updateSlot();
   void activeToolChangedSlot();
   void referenceToolChangedSlot();
-  void manualToolChanged();
   void manualToolWidgetChanged();
   void spacesChangedSlot();
 
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
   virtual void hideEvent(QCloseEvent* event); ///<disconnects stuff
+  void setupUI();
+  virtual void prePaintEvent();
 
 private:
   ToolPropertiesWidget();
+  void toolPositionChanged();
+  void updateFrontend();
 //  void populateUSSectorConfigBox();
-
+  StringPropertyBasePtr mSelector;
+  TrackingServicePtr mTrackingService;
+  SpaceProviderPtr mSpaceProvider;
   ToolPtr mReferenceTool;
-  ToolPtr mActiveTool;
+  ToolPtr mTool;
 
   QVBoxLayout* mToptopLayout;
   QGroupBox* mManualGroup;
   Transform3DWidget* mManualToolWidget;
   SpacePropertyPtr mSpaceSelector;
+  DoublePropertyToolOffsetPtr mToolOffset;
 
 //  SliderGroupWidget* mToolOffsetWidget;
   QLabel* mActiveToolVisibleLabel;
@@ -103,8 +119,6 @@ private:
   QLabel* mTrackingSystemStatusLabel;
   
   LabeledComboBoxWidget* mUSSectorConfigBox;
-//  QLabel* mUSSectorConfigLabel;   ///< Label for the mUSSectorConfigBox
-//  QComboBox* mUSSectorConfigBox;  ///< List of US sector config parameters: depth (and width)
 };
 
 }//end namespace cx
