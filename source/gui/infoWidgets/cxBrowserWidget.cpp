@@ -34,6 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTreeView>
 #include "cxTreeItemModel.h"
 #include "cxLogger.h"
+#include <QSplitter>
+#include <QLabel>
+#include "cxTreeNode.h"
 
 namespace cx
 {
@@ -45,7 +48,8 @@ BrowserWidget::BrowserWidget(QWidget* parent, VisServicesPtr services) :
 {
 	this->setModified();
 	mModel = new TreeItemModel(services, this);
-	connect(mModel, SIGNAL(hasBeenReset()), this, SLOT(setModified()));
+	connect(mModel, &TreeItemModel::hasBeenReset, this, &BrowserWidget::setModified);
+	connect(mModel, &TreeItemModel::currentItemChanged, this, &BrowserWidget::onCurrentItemChanged);
 	//  mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mModel->getFilter()));
 
 	//layout
@@ -53,8 +57,16 @@ BrowserWidget::BrowserWidget(QWidget* parent, VisServicesPtr services) :
 	mTreeView->setRootIsDecorated(false);
 	mTreeView->setModel(mModel);
 	mModel->setSelectionModel(mTreeView->selectionModel());
-	mVerticalLayout->addWidget(mTreeView);
 
+
+	QSplitter *splitter = new QSplitter(Qt::Horizontal);
+	mSplitter = splitter;
+
+	mVerticalLayout->addWidget(mSplitter);
+	mSplitter->addWidget(mTreeView);
+
+	mPropertiesWidget = new ReplacableContentWidget(this);
+	mSplitter->addWidget(mPropertiesWidget);
 }
 
 BrowserWidget::~BrowserWidget()
@@ -65,20 +77,10 @@ BrowserWidget::~BrowserWidget()
 void BrowserWidget::showEvent(QShowEvent* event)
 {
 	QWidget::showEvent(event);
-	//  connect(patientService().get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(populateTreeWidget()));
-	//  connect(viewService().get(), SIGNAL(imageDeletedFromViews(ssc::ImagePtr)), this, SLOT(populateTreeWidget()));
-	//  connect(viewService().get(), SIGNAL(activeLayoutChanged()), this, SLOT(populateTreeWidget()));
-	//  connect(viewService().get(), SIGNAL(activeViewChanged()), this, SLOT(populateTreeWidget()));
-
-	//  this->populateTreeWidget();
 }
 void BrowserWidget::closeEvent(QCloseEvent* event)
 {
 	QWidget::closeEvent(event);
-	//  disconnect(patientService().get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(populateTreeWidget()));
-	//  disconnect(viewService().get(), SIGNAL(imageDeletedFromViews(ssc::ImagePtr)), this, SLOT(populateTreeWidget()));
-	//  disconnect(viewService().get(), SIGNAL(activeLayoutChanged()), this, SLOT(populateTreeWidget()));
-	//  disconnect(viewService().get(), SIGNAL(activeViewChanged()), this, SLOT(populateTreeWidget()));
 }
 
 void BrowserWidget::prePaintEvent()
@@ -95,5 +97,10 @@ void BrowserWidget::resetView()
 		mTreeView->resizeColumnToContents(i);
 }
 
+void BrowserWidget::onCurrentItemChanged()
+{
+	QWidget* widget = mModel->getCurrentItem()->createPropertiesWidget();
+	mPropertiesWidget->setWidget(widget);
+}
 
 }//end namespace cx

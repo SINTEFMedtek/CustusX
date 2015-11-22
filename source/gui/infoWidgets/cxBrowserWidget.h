@@ -39,11 +39,49 @@ class QTreeWidget;
 class QVBoxLayout;
 class QTreeWidgetItem;
 class QTreeView;
+class QSplitter;
 
 namespace cx
 {
 
 class TreeItemModel;
+
+/** Widget wrapping another widget that can be replaced,
+ *  the previous content being destroyed.
+ *
+ */
+class ReplacableContentWidget : public QWidget
+{
+public:
+	ReplacableContentWidget(QWidget* parent) : QWidget(parent), mWidget(NULL)
+	{
+		mLayout = new QVBoxLayout(this);
+		mLayout->setMargin(0);
+	}
+
+	void setWidget(QWidget* widget)
+	{
+		if (mWidget)
+		{
+			mLayout->takeAt(0);
+			delete mWidget;
+		}
+		mWidget = widget;
+		if (mWidget)
+		{
+			mLayout->addWidget(mWidget);
+		}
+	}
+
+	QWidget* getWidget()
+	{
+		return mWidget;
+	}
+
+private:
+	QVBoxLayout* mLayout;
+	QWidget* mWidget;
+};
 
 /**
  * \class BrowserWidget
@@ -78,8 +116,11 @@ protected:
 	virtual void prePaintEvent();
   
 private:
+  void onCurrentItemChanged();
   BrowserWidget();
   VisServicesPtr mServices;
+  QSplitter* mSplitter;
+  ReplacableContentWidget* mPropertiesWidget;
 };
 }//end namespace cx
 

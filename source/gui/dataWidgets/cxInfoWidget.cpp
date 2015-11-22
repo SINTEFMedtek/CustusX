@@ -45,6 +45,7 @@ InfoWidget::InfoWidget(QWidget* parent, QString objectName, QString windowTitle)
 {
 	toptopLayout = new QVBoxLayout(this);
 	gridLayout = new QGridLayout;
+	gridLayout->setMargin(0);
 	toptopLayout->addLayout(gridLayout);
 
 	mTableWidget = new QTableWidget(this);

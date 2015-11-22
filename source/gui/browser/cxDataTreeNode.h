@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
+
 class TreeNode;
 typedef boost::weak_ptr<TreeNode> TreeNodeWeakPtr;
 typedef boost::shared_ptr<TreeNode> TreeNodePtr;
@@ -57,7 +58,7 @@ public:
 	virtual QVariant getViewGroupVisibility(int index) const;
 	virtual void setViewGroupVisibility(int index, bool value);
 //	virtual bool visible() const = 0; // if need be, might get away simply populating from a root node
-//	QWidget* getPropertiesWidget() const = 0; // later
+	QWidget* createPropertiesWidget() const;
 	virtual QVariant getColor() const;
 	virtual QVariant getFont() const;
 

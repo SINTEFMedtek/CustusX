@@ -56,7 +56,23 @@ class QStringList;
 
 namespace cx
 {
-typedef boost::shared_ptr<class ImagePropertiesWidget> ImagePropertiesWidgetPtr;
+typedef boost::shared_ptr<class ImageRenderPropertiesWidget> ImageRenderPropertiesWidgetPtr;
+
+class cxGui_EXPORT ImageRenderPropertiesWidget : public BaseWidget
+{
+	Q_OBJECT
+
+public:
+	ImageRenderPropertiesWidget(QWidget* parent);
+	void imageChanged(ImagePtr image);
+public slots:
+private slots:
+	void interpolationTypeChanged(int index);
+
+private:
+	QComboBox* mInterpolationType;
+	ImagePtr mImage;
+};
 
 /**
  * \ingroup cx_gui
@@ -84,7 +100,7 @@ protected:
   ActiveDataPtr mActiveData;
   ActiveImageProxyPtr mActiveImageProxy;
   ImagePtr mImage;
-  ImagePropertiesWidgetPtr mImagePropertiesWidget;
+  ImageRenderPropertiesWidgetPtr mImagePropertiesWidget;
 };
 }
 

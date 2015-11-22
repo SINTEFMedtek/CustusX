@@ -71,6 +71,7 @@ TransferFunction2DColorWidget::TransferFunction2DColorWidget(ActiveDataPtr activ
   new SliderGroupWidget(this, mDataLevel,  gridLayout, 1);
 
   this->setLayout(layout);
+  this->activeImageChangedSlot();
 }
 
 TransferFunction2DColorWidget::~TransferFunction2DColorWidget()

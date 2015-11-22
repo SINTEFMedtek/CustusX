@@ -11,11 +11,11 @@ modification, are permitted provided that the following conditions are met:
    this list of conditions and the following disclaimer.
 
 2. Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
+   this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
 
 3. Neither the name of the copyright holder nor the names of its contributors 
-   may be used to endorse or promote products derived from this software 
+   may be used to endorse or promote products derived from this software
    without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
@@ -39,26 +39,24 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxBaseWidget.h"
 #include "cxActiveImageProxy.h"
+#include "cxTabbedWidget.h"
 
 class QComboBox;
 
 namespace cx
 {
 
-class cxGui_EXPORT ImagePropertiesWidget : public BaseWidget
+/**
+ * \brief Widget for displaying and manipulating various Image properties.
+ * \ingroup cx_gui
+ *
+ */
+class cxGui_EXPORT ImagePropertiesWidget : public TabbedWidget
 {
 	Q_OBJECT
-
 public:
-	ImagePropertiesWidget(QWidget* parent);
-	void imageChanged(ImagePtr image);
-public slots:
-private slots:
-	void interpolationTypeChanged(int index);
-
-private:
-	QComboBox* mInterpolationType;
-	ImagePtr mImage;
+	ImagePropertiesWidget(VisServicesPtr services, QWidget* parent);
+	virtual ~ImagePropertiesWidget() {}
 };
 
 }//end namespace cx

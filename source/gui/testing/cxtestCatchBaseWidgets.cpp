@@ -225,7 +225,7 @@ TEST_CASE("InfoWidgets are correctly constructed", "[unit][gui][widget][not_win3
 	cx::ViewServicePtr viewService = cx::ViewService::getNullObject(); //mock
 	//cxInfoWidgets
 	testAndDeleteBaseWidgetChild(new cx::VolumeInfoWidget(patientModelService, NULL));
-	testAndDeleteBaseWidgetChild(new cx::MeshInfoWidget(patientModelService, viewService, NULL));
+	testAndDeleteBaseWidgetChild(new cx::SelectedMeshInfoWidget(patientModelService, viewService, NULL));
 	shutdown();
 }
 

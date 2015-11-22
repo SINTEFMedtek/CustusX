@@ -45,12 +45,15 @@ public:
   //  virtual bool    setData ( const QModelIndex & index, const QVariant & value, int role = Qt::EditRole )
 //  StringPropertyPtr getFilter();
 
+  TreeNodePtr getCurrentItem();
+  
 signals:
   void hasBeenReset();
+  void currentItemChanged();
 
 public slots:
   void update();
-  void treeItemChangedSlot();
+//  void treeItemChangedSlot();
 
 private slots:
   void currentItemChangedSlot(const QModelIndex& current, const QModelIndex& previous);

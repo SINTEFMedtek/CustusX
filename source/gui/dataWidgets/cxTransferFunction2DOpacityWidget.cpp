@@ -66,6 +66,7 @@ TransferFunction2DOpacityWidget::TransferFunction2DOpacityWidget(ActiveDataPtr a
   new SliderGroupWidget(this, mDataLLR,    gridLayout, 3);
 
   this->setLayout(layout);
+  this->activeImageChangedSlot();
 }
 
 TransferFunction2DOpacityWidget::~TransferFunction2DOpacityWidget()

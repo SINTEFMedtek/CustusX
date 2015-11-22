@@ -51,7 +51,9 @@ void TreeItemModel::update()
 void TreeItemModel::setSelectionModel(QItemSelectionModel* selectionModel)
 {
 	mSelectionModel = selectionModel;
-	connect(mSelectionModel, SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(currentItemChangedSlot(const QModelIndex&, const QModelIndex&)));
+	connect(mSelectionModel, &QItemSelectionModel::currentChanged,
+			this, &TreeItemModel::currentItemChangedSlot);
+//	connect(mSelectionModel, SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(currentItemChangedSlot(const QModelIndex&, const QModelIndex&)));
 }
 
 TreeItemModel::~TreeItemModel()
@@ -60,19 +62,20 @@ TreeItemModel::~TreeItemModel()
 
 void TreeItemModel::currentItemChangedSlot(const QModelIndex& current, const QModelIndex& previous)
 {
-	//std::cout << "item changed" << std::endl;
 	TreeNode *item = this->itemFromIndex(current);
 	if (!item)
 		return;
 	item->activate();
+	emit currentItemChanged();
 }
 
-void TreeItemModel::treeItemChangedSlot()
+TreeNodePtr TreeItemModel::getCurrentItem()
 {
-	CX_LOG_CHANNEL_DEBUG("CA") << "in use!";
-	TreeNode* item = dynamic_cast<TreeNode*>(sender());
-	QModelIndex index = this->createIndex(0,0,item);
-	emit dataChanged(index, index);
+	QModelIndex mi = mSelectionModel->currentIndex();
+	TreeNode *item = this->itemFromIndex(mi);
+	if (!item)
+		return TreeNodePtr();
+	return mRepository->getNode(item->getUid());
 }
 
 TreeNode *TreeItemModel::itemFromIndex(const QModelIndex& index) const

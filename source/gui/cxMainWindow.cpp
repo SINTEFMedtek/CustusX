@@ -114,7 +114,7 @@ MainWindow::MainWindow() :
 	this->addAsDockWidget(new MetricWidget(mServices->view(), mServices->patient(), this), "Utility");
 	this->addAsDockWidget(new SlicePropertiesWidget(mServices->patient(), mServices->view(), this), "Properties");
 	this->addAsDockWidget(new VolumePropertiesWidget(mServices, this), "Properties");
-	this->addAsDockWidget(new MeshInfoWidget(mServices->patient(), mServices->view(), this), "Properties");
+	this->addAsDockWidget(new SelectedMeshInfoWidget(mServices->patient(), mServices->view(), this), "Properties");
 	this->addAsDockWidget(new StreamPropertiesWidget(mServices->patient(), mServices->view(), this), "Properties");
 	this->addAsDockWidget(new TrackPadWidget(this), "Utility");
 	this->addAsDockWidget(new ToolPropertiesWidget(this), "Properties");

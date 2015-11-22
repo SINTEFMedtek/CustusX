@@ -155,6 +155,7 @@ AllDataListWidget::AllDataListWidget(PatientModelServicePtr patientModelService,
   this->setDragEnabled(true);
 
   connect(mPatientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(populateAllDataList()));
+  this->populateAllDataList();
 }
 
 AllDataListWidget::~AllDataListWidget()

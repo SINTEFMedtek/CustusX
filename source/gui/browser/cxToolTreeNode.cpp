@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVisServices.h"
 #include <QIcon>
 #include <QFont>
+#include <QLabel>
 
 namespace cx
 {
@@ -113,5 +114,11 @@ QVariant ToolTreeNode::getFont() const
 	}
 	return QVariant();
 }
+
+QWidget* ToolTreeNode::createPropertiesWidget() const
+{
+	return new QLabel(QString("Tool widget %1 ").arg(mTool->getName()));
+}
+
 
 } // namespace cx

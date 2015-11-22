@@ -53,13 +53,37 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-
-MeshInfoWidget::MeshInfoWidget(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget* parent) :
-	InfoWidget(parent, "MeshInfoWidget", "Mesh Properties"),
-	mPatientModelService(patientModelService),
-	mViewService(viewService)
+SelectedMeshInfoWidget::SelectedMeshInfoWidget(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget* parent) :
+	BaseWidget(parent, "MeshInfoWidget", "Mesh Properties")
 {
-	this->addWidgets(patientModelService);
+	StringPropertySelectMeshPtr meshSelector = StringPropertySelectMesh::New(patientModelService);
+	meshSelector->setValueName("Surface: ");
+
+	QVBoxLayout* layout = new QVBoxLayout(this);
+	layout->setMargin(0);
+	layout->addWidget(new DataSelectWidget(viewService, patientModelService, this, meshSelector));
+
+	MeshInfoWidget* info = new MeshInfoWidget(meshSelector, patientModelService, viewService, this);
+	info->layout()->setMargin(0);
+	layout->addWidget(info);
+}
+
+SelectedMeshInfoWidget::~SelectedMeshInfoWidget()
+{}
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+MeshInfoWidget::MeshInfoWidget(StringPropertySelectMeshPtr meshSelector,
+							   PatientModelServicePtr patientModelService,
+							   ViewServicePtr viewService,
+							   QWidget* parent) :
+	InfoWidget(parent, "MeshCoreInfoWidget", "Mesh Properties"),
+	mPatientModelService(patientModelService),
+	mViewService(viewService),
+	mSelectMeshWidget(meshSelector)
+{
+	this->addWidgets();
 	this->meshSelectedSlot();
 }
 
@@ -165,10 +189,10 @@ void MeshInfoWidget::hideEvent(QCloseEvent* event)
   QWidget::closeEvent(event);
 }
 
-void MeshInfoWidget::addWidgets(PatientModelServicePtr patientModelService)
+void MeshInfoWidget::addWidgets()
 {
-    mSelectMeshWidget = StringPropertySelectMesh::New(patientModelService);
-    mSelectMeshWidget->setValueName("Surface: ");
+//	mSelectMeshWidget = StringPropertySelectMesh::New(mPatientModelService);
+//    mSelectMeshWidget->setValueName("Surface: ");
 	connect(mSelectMeshWidget.get(), &Property::changed, this, &MeshInfoWidget::meshSelectedSlot);
 
 	XmlOptionFile options = profile()->getXmlSettings().descend("MeshInfoWidget");
@@ -196,6 +220,7 @@ void MeshInfoWidget::addWidgets(PatientModelServicePtr patientModelService)
 
 	QWidget* optionsWidget = new QWidget(this);
 	QHBoxLayout* optionsLayout = new QHBoxLayout(optionsWidget);
+	optionsLayout->setMargin(0);
 	mBackfaceCullingCheckBox = new QCheckBox("Backface culling");
 	mBackfaceCullingCheckBox->setToolTip("Set backface culling on. This makes transparent meshes work, but only draws outside mesh walls (eg. navigating inside meshes will not work).");
 	optionsLayout->addWidget(mBackfaceCullingCheckBox);
@@ -213,6 +238,7 @@ void MeshInfoWidget::addWidgets(PatientModelServicePtr patientModelService)
     int gridGlyphLayoutRow = 1;
     QWidget* glyphWidget = new QWidget(this);
     QGridLayout* glyphLayout = new QGridLayout(glyphWidget);
+	glyphLayout->setMargin(0);
     mGlyphVisualizationCheckBox = new QCheckBox("Enable glyph visualization");
     mGlyphVisualizationCheckBox->setToolTip("Enable glyph visualization");
     glyphLayout->addWidget(mGlyphVisualizationCheckBox, gridGlyphLayoutRow++,0);
@@ -222,7 +248,7 @@ void MeshInfoWidget::addWidgets(PatientModelServicePtr patientModelService)
 
 	int gridLayoutRow = 1;
 
-	gridLayout->addWidget(new DataSelectWidget(mViewService, mPatientModelService, this, mSelectMeshWidget), gridLayoutRow++, 0, 1, 2);
+//	gridLayout->addWidget(new DataSelectWidget(mViewService, mPatientModelService, this, mSelectMeshWidget), gridLayoutRow++, 0, 1, 2);
 	new LabeledLineEditWidget(this, mUidAdapter, gridLayout, gridLayoutRow++);
 	new LabeledLineEditWidget(this, mNameAdapter, gridLayout, gridLayoutRow++);
     new LabeledComboBoxWidget(this, mParentFrameAdapter, gridLayout, gridLayoutRow++);

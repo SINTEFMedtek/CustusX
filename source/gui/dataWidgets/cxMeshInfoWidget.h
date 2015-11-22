@@ -46,6 +46,15 @@ namespace cx
 {
 typedef boost::shared_ptr<class StringPropertySelectMesh> StringPropertySelectMeshPtr;
 
+class cxGui_EXPORT SelectedMeshInfoWidget : public BaseWidget
+{
+  Q_OBJECT
+
+public:
+	SelectedMeshInfoWidget(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget* parent);
+  virtual ~SelectedMeshInfoWidget();
+};
+
 /**
  * \class MeshInfoWidget
  *
@@ -62,7 +71,9 @@ class cxGui_EXPORT MeshInfoWidget : public InfoWidget
   Q_OBJECT
 
 public:
-	MeshInfoWidget(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget* parent);
+	MeshInfoWidget(StringPropertySelectMeshPtr meshSelector,
+				   PatientModelServicePtr patientModelService, ViewServicePtr viewService,
+				   QWidget* parent);
   virtual ~MeshInfoWidget();
 
 protected slots:
@@ -77,7 +88,7 @@ protected:
   virtual void hideEvent(QCloseEvent* event); ///<disconnects stuff
 
 private:
-	void addWidgets(cx::PatientModelServicePtr patientModelService);
+	void addWidgets();
 
   MeshPtr mMesh;
   StringPropertyParentFramePtr mParentFrameAdapter;

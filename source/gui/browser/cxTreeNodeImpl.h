@@ -59,6 +59,7 @@ public:
 //	QWidget* getPropertiesWidget() const = 0; // later
 	virtual QVariant getColor() const { return QVariant(); }
 	virtual QVariant getFont() const { return QVariant(); }
+	QWidget* createPropertiesWidget() const { return NULL; }
 
 protected:
 	TreeRepositoryWeakPtr mRepository;

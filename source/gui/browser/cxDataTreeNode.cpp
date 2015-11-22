@@ -41,6 +41,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewGroupData.h"
 #include "cxVisServices.h"
 #include <QFont>
+#include <QLabel>
+#include "cxMesh.h"
+#include "cxMeshInfoWidget.h"
+#include "cxImagePropertiesWidget.h"
+#include "cxImage.h"
+#include "cxSelectDataStringProperty.h"
 
 namespace cx
 {
@@ -123,6 +129,25 @@ void DataTreeNode::setViewGroupVisibility(int index, bool value)
 		this->getServices()->view()->getGroup(index)->setProperties(mData->getUid(), DataViewProperties::createDefault());
 	else
 		this->getServices()->view()->getGroup(index)->setProperties(mData->getUid(), DataViewProperties());
+}
+
+QWidget* DataTreeNode::createPropertiesWidget() const
+{
+	if (boost::dynamic_pointer_cast<Mesh>(mData))
+	{
+		StringPropertySelectMeshPtr meshSelector = StringPropertySelectMesh::New(this->getServices()->patient());
+		meshSelector->setValue(mData->getUid());
+		return new MeshInfoWidget(meshSelector,
+								  this->getServices()->patient(),
+								  this->getServices()->view(),
+								  NULL);
+	}
+	if (boost::dynamic_pointer_cast<Image>(mData))
+	{
+		return new ImagePropertiesWidget(this->getServices(),
+								  NULL);
+	}
+	return new QLabel(QString("Data widget %1 ").arg(mData->getName()));
 }
 
 
