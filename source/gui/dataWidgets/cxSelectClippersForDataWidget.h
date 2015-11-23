@@ -74,12 +74,22 @@ protected:
 	virtual void prePaintEvent();
 };
 
+/// -------------------------------------------------------
+
 class SelectClippersForImageWidget : public BaseWidget
 {
 	Q_OBJECT
 public:
 	SelectClippersForImageWidget(VisServicesPtr services, QWidget *parent);
+};
 
+/// -------------------------------------------------------
+
+class SelectClippersForMeshWidget : public BaseWidget
+{
+	Q_OBJECT
+public:
+	SelectClippersForMeshWidget(VisServicesPtr services, QWidget *parent);
 };
 
 }//cx

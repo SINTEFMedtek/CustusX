@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 SelectClippersForImageWidget::SelectClippersForImageWidget(VisServicesPtr services, QWidget* parent) :
-	BaseWidget(parent, "SelectClippersForDataWidget", "Select Clippers")
+	BaseWidget(parent, "SelectClippersForImageWidget", "Select Clippers")
 {
 	StringPropertyActiveImagePtr activeImageProperty = StringPropertyActiveImage::New(services->patient());
 
@@ -59,6 +59,23 @@ SelectClippersForImageWidget::SelectClippersForImageWidget(VisServicesPtr servic
 
 	mLayout->addWidget(selectClippersWidget);
 }
+
+/// -------------------------------------------------------
+
+SelectClippersForMeshWidget::SelectClippersForMeshWidget(VisServicesPtr services, QWidget* parent) :
+	BaseWidget(parent, "SelectClippersForMeshWidget", "Select Clippers")
+{
+	StringPropertyActiveDataPtr activeMeshProperty = StringPropertyActiveData::New(services->patient(), "mesh");
+
+	QVBoxLayout *mLayout = new QVBoxLayout(this);
+
+	SelectClippersForDataWidget *selectClippersWidget = new SelectClippersForDataWidget(services, this);
+	selectClippersWidget->setActiveDataProperty(activeMeshProperty);
+
+	mLayout->addWidget(selectClippersWidget);
+}
+
+/// -------------------------------------------------------
 
 SelectClippersForDataWidget::SelectClippersForDataWidget(VisServicesPtr services, QWidget* parent) :
 	BaseWidget(parent, "SelectClippersForDataWidget", "Select Clippers"),

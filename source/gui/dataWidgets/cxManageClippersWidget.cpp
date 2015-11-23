@@ -50,7 +50,6 @@ ClippingPropertiesWidget::ClippingPropertiesWidget(VisServicesPtr services, QWid
 {
 	this->setToolTip("Clipping properties");
 
-	this->addTab(new SelectClippersForDataWidget(services, this), "Select clippers");
 	this->addTab(new ManageClippersWidget(services, this), "Edit clippers");
 }
 
