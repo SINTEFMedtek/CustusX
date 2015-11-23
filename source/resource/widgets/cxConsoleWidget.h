@@ -41,7 +41,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTextBrowser>
 #include <QTextCharFormat>
 #include "cxStringProperty.h"
-#include "cxPopupToolbarWidget.h"
 class QTableWidget;
 class QTableWidgetItem;
 
@@ -52,6 +51,7 @@ class QStackedLayout;
 
 namespace cx
 {
+class PopupToolbarWidget;
 typedef boost::shared_ptr<class MessageListener> MessageListenerPtr;
 
 class LogMessageDisplayWidget : public QWidget
@@ -110,65 +110,6 @@ private:
 	bool mScrollToBottomEnabled;
 };
 
-//class PopupButton : public QFrame
-//{
-//	Q_OBJECT
-//public:
-//	PopupButton(QWidget *parent = NULL);
-//	bool getShowPopup() const;
-
-//signals:
-//	void popup(bool show);
-//private slots:
-//	void onTriggered();
-//protected:
-////	void mouseMoveEvent(QMouseEvent* event);
-//private:
-//	QAction* mAction;
-//	QToolButton* mShowHeaderButton;
-//};
-
-///**
-// * A toolbar that pops up inside a layout,
-// * controlled by a popup button floating
-// * over the parent widget.
-// *
-// * Add buttons to the toolbar by adding to getToolbar()
-// *
-// */
-//class PopupToolbarWidget : public QWidget
-//{
-//	Q_OBJECT
-//public:
-//	PopupToolbarWidget(QWidget* parent);
-//	/**
-//	 * Return true if the popup is activated, i.e. the popup
-//	 * is pressed and the toolbar is visible.
-//	 */
-//	bool popupIsVisible() const;
-//	/**
-//	 * Return an empty widget inside the toolbar. It can
-//	 * be filled with buttons or anything else.
-//	 */
-//	QWidget* getToolbar();
-//	/**
-//	 * Call after parent gui construction is complete -
-//	 * required because we want to draw the popup button
-//	 * on top of the parent layout.
-//	 * Hack!
-//	 */
-//	void refresh() { this->onPopup(); }
-//signals:
-//	/**
-//	 * emitted on popup show/hide.
-//	 */
-//	void popup(bool show);
-//private:
-//	void onPopup();
-//	QWidget* mButtonWidget;
-//	QHBoxLayout* mControlLayout;
-//	PopupButton* mShowControlsButton;
-//};
 
 /**\brief Widget for displaying status messages.
  *
@@ -233,9 +174,6 @@ private:
 	MessageListenerPtr mMessageListener;
 	boost::shared_ptr<class MessageFilterConsole> mMessageFilter;
 	XmlOptionFile mOptions;
-//	QWidget* mButtonWidget;
-//	QHBoxLayout* mControlLayout;
-//	PopupButton* mShowControlsButton;
 	PopupToolbarWidget* mPopupWidget;
 
 	LogPtr mLog;

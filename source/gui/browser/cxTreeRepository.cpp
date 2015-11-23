@@ -58,6 +58,11 @@ TreeRepository::TreeRepository(VisServicesPtr services) :
 	mInvalid(true),
 	mServices(services)
 {
+	mAllModes << "spaces" << "flat";
+	mMode = mAllModes.front();
+	mAllNodeTypes << "data" << "metrics" << "volumes" << "models" << "tools";
+	mVisibleNodeTypes << mAllNodeTypes;
+
 	this->startListen();
 }
 

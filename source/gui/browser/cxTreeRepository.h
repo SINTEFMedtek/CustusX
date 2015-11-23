@@ -65,6 +65,14 @@ public:
 	TreeNodePtr getTopNode();
 	VisServicesPtr getServices();
 
+
+	QString getMode() const { return mMode; }
+	void setMode(QString val) { if (mMode==val) return; mMode = val; this->invalidate(); }
+	QStringList getAllModes() const { return mAllModes; }
+	QStringList getVisibleNodeTypes() const { return mVisibleNodeTypes; }
+	void setVisibleNodeTypes(QStringList val) { if (mVisibleNodeTypes==val) return; mVisibleNodeTypes = val; this->invalidate(); }
+	QStringList getAllNodeTypes() const { return mAllNodeTypes; }
+
 public slots:
 	void update();
 	void invalidate();
@@ -77,6 +85,11 @@ private:
 	TreeRepositoryWeakPtr mSelf;
 	bool mInvalid;
 	VisServicesPtr mServices;
+
+	QString mMode;
+	QStringList mAllModes;
+	QStringList mVisibleNodeTypes;
+	QStringList mAllNodeTypes;
 
 	explicit TreeRepository(VisServicesPtr services);
 	void rebuild();

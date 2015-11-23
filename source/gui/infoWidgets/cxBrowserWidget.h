@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxBaseWidget.h"
 #include "cxForwardDeclarations.h"
+#include "cxPopupToolbarWidget.h"
+#include "cxXmlOptionItem.h"
 
 class QTreeWidget;
 class QVBoxLayout;
@@ -44,7 +46,9 @@ class QSplitter;
 namespace cx
 {
 
+class PopupToolbarWidget;
 class TreeItemModel;
+typedef boost::shared_ptr<class TreeRepository> TreeRepositoryPtr;
 
 /** Widget wrapping another widget that can be replaced,
  *  the previous content being destroyed.
@@ -110,17 +114,27 @@ protected:
 
   TreeItemModel* mModel;
   QTreeView* mTreeView;
-  QVBoxLayout* mVerticalLayout; ///< vertical layout is used
+//  QVBoxLayout* mVerticalLayout; ///< vertical layout is used
 
 protected:
 	virtual void prePaintEvent();
   
 private:
+  void onNodeVisibilityChanged(QString nodeType, bool value);
   void onCurrentItemChanged();
+  void createFilterSelector();
+  void onFilterSelectorChanged();
+  void createButtonWidget(QWidget* widget);
   BrowserWidget();
   VisServicesPtr mServices;
   QSplitter* mSplitter;
   ReplacableContentWidget* mPropertiesWidget;
+  PopupToolbarWidget* mPopupWidget;
+//  XmlOptionFile mOptions;
+
+  StringPropertyPtr mFilterSelector;
+//  QStringList mFilters;
+
 };
 }//end namespace cx
 

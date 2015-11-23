@@ -60,6 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPushButton>
 #include "cxProfile.h"
 #include "cxTime.h"
+#include "cxPopupToolbarWidget.h"
 
 namespace cx
 {
@@ -323,119 +324,6 @@ void SimpleLogMessageDisplayWidget::format(const Message& message)
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
-//PopupButton::PopupButton(QWidget* parent)
-//{
-////	this->setMouseTracking(true);
-//	//	this->setFrameStyle(QFrame::Box);
-
-//	QVBoxLayout* layout = new QVBoxLayout(this);
-//	layout->setMargin(0);
-//	this->setLayout(layout);
-
-//	//	QToolButton* expandButton = new QToolButton(this);
-//	QToolButton* expandButton = new CXSmallToolButton(this);
-//	mShowHeaderButton = expandButton;
-//	this->setFixedSize(expandButton->sizeHint());
-
-//	QAction* action = new QAction(QIcon(":icons/open_icon_library/layer-lower-3.png"), "Controls", this);
-//	QString tip = "Show Controls";
-//	action->setStatusTip(tip);
-//	action->setWhatsThis(tip);
-//	action->setToolTip(tip);
-//	connect(action, SIGNAL(triggered()), this, SLOT(onTriggered()));
-//	mAction = action;
-
-//	mShowHeaderButton->setDefaultAction(action);
-//	layout->addWidget(mShowHeaderButton);
-
-//	action->setCheckable(true);
-//}
-
-////void PopupButton::mouseMoveEvent(QMouseEvent* event)
-////{
-////	std::cout << "mouse move" << std::endl;
-////}
-
-//bool PopupButton::getShowPopup() const
-//{
-//	return mShowHeaderButton->isChecked();
-//}
-
-//void PopupButton::onTriggered()
-//{
-//	if (this->getShowPopup())
-//		mAction->setIcon(QIcon(":icons/open_icon_library/layer-raise-3.png"));
-//	else
-//		mAction->setIcon(QIcon(":icons/open_icon_library/layer-lower-3.png"));
-
-//	emit popup(this->getShowPopup());
-//}
-
-/////--------------------------------------------------------
-/////--------------------------------------------------------
-/////--------------------------------------------------------
-
-//PopupToolbarWidget::PopupToolbarWidget(QWidget* parent) :
-//	QWidget(parent)
-//{
-//	mControlLayout = new QHBoxLayout(this);
-//	mControlLayout->setMargin(0);
-////	layout->addLayout(mControlLayout);
-
-//	mShowControlsButton = new PopupButton(this->parentWidget());
-//	mControlLayout->addWidget(mShowControlsButton);
-//	connect(mShowControlsButton, &PopupButton::popup, this, &PopupToolbarWidget::onPopup);
-
-//	mButtonWidget = new QWidget(this);
-////	mButtonWidget->setVisible(false);
-//	mControlLayout->addWidget(mButtonWidget);
-
-//	mControlLayout->addStretch(1);
-
-//	this->onPopup();
-//}
-
-//QWidget* PopupToolbarWidget::getToolbar()
-//{
-//	return mButtonWidget;
-//}
-
-//bool PopupToolbarWidget::popupIsVisible() const
-//{
-//	return mButtonWidget->isVisible();
-////	return mShowControlsButton->getShowPopup();
-//}
-
-//void PopupToolbarWidget::onPopup()
-//{
-//	std::cout << "PopupToolbarWidget::onPopup()" << std::endl;
-//	bool show = mShowControlsButton->getShowPopup();
-
-////	mMessagesWidget->showHeader(show);
-//	mButtonWidget->setVisible(show);
-
-//	if (show)
-//	{
-//		mControlLayout->insertWidget(0, mShowControlsButton);
-//	}
-//	else
-//	{
-//		// remove from layout, add to top of this
-//		mControlLayout->removeWidget(mShowControlsButton);
-//		mShowControlsButton->setParent(NULL);
-//		mShowControlsButton->setParent(this->parentWidget());
-//		mShowControlsButton->setVisible(true);
-
-//	}
-
-//	emit popup(show);
-//}
-
-
-///--------------------------------------------------------
-///--------------------------------------------------------
-///--------------------------------------------------------
-
 ConsoleWidget::ConsoleWidget(QWidget* parent, QString uid, QString name, XmlOptionFile options, LogPtr log) :
 	BaseWidget(parent, uid, name),
   mSeverityAction(NULL),
@@ -488,18 +376,7 @@ void ConsoleWidget::createUI()
 	mPopupWidget = new PopupToolbarWidget(this);
 	connect(mPopupWidget, &PopupToolbarWidget::popup, this, &ConsoleWidget::updateShowHeader);
 	layout->addWidget(mPopupWidget);
-
-//	mControlLayout = new QHBoxLayout;
-//	mControlLayout->setMargin(0);
-//	layout->addLayout(mControlLayout);
-
-//	mShowControlsButton = new PopupButton(this);
-//	mControlLayout->addWidget(mShowControlsButton);
-//	connect(mShowControlsButton, &PopupButton::popup, this, &ConsoleWidget::updateShowHeader);
-
 	this->createButtonWidget(mPopupWidget->getToolbar());
-
-//	mControlLayout->addStretch(1);
 
 	mMessagesLayout = new QVBoxLayout;
 	mMessagesLayout->setMargin(0);
@@ -523,15 +400,9 @@ void ConsoleWidget::createUI()
 
 void ConsoleWidget::createButtonWidget(QWidget* widget)
 {
-//	QWidget* widget = mPopupWidget->getToolbar();
-//	mButtonWidget = new QWidget(this);
-//	mPopupWidget->layout()->addWidget(mButtonWidget);
-
 	QHBoxLayout* buttonLayout = new QHBoxLayout(widget);
 	buttonLayout->setMargin(0);
 	buttonLayout->setSpacing(0);
-
-//	widget->setLayout(buttonLayout);
 
 	this->addSeverityButtons(buttonLayout);
 	buttonLayout->addSpacing(8);
@@ -551,23 +422,7 @@ void ConsoleWidget::createButtonWidget(QWidget* widget)
 void ConsoleWidget::updateShowHeader()
 {
 	bool show = mPopupWidget->popupIsVisible();
-
 	mMessagesWidget->showHeader(show);
-//	mButtonWidget->setVisible(show);
-
-//	if (show)
-//	{
-//		mControlLayout->insertWidget(0, mShowControlsButton);
-//	}
-//	else
-//	{
-//		// remove from layout, add to top of this
-//		mControlLayout->removeWidget(mShowControlsButton);
-//		mShowControlsButton->setParent(NULL);
-//		mShowControlsButton->setParent(this);
-//		mShowControlsButton->setVisible(true);
-
-//	}
 }
 
 

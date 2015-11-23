@@ -64,6 +64,9 @@ private:
  * controlled by a popup button floating
  * over the parent widget.
  *
+ * Note: In order to get this working, set the parent layout
+ * margin and spacing to zero.
+ *
  * Add buttons to the toolbar by adding to getToolbar()
  *
  */

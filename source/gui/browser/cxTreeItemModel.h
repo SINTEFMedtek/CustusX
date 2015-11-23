@@ -46,7 +46,8 @@ public:
 //  StringPropertyPtr getFilter();
 
   TreeNodePtr getCurrentItem();
-  
+  TreeRepositoryPtr repo() { return mRepository; }
+
 signals:
   void hasBeenReset();
   void currentItemChanged();
