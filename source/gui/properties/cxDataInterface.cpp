@@ -53,7 +53,6 @@ namespace cx
 DoublePropertyActiveToolOffset::DoublePropertyActiveToolOffset(ActiveToolProxyPtr activeTool) :
 	mActiveTool(activeTool)
 {
-//  mActiveTool = ActiveToolProxy::New(trackingService());
   connect(mActiveTool.get(), &ActiveToolProxy::tooltipOffset, this, &Property::changed);
 }
 
@@ -81,8 +80,6 @@ DoubleRange DoublePropertyActiveToolOffset::getValueRange() const
 DoublePropertyToolOffset::DoublePropertyToolOffset(ToolPtr tool) :
 	mTool(tool)
 {
-//  mActiveTool = ActiveToolProxy::New(trackingService());
-//  connect(mTool.get(), &Tool::tooltipOffset, this, &Property::changed);
 	this->setTool(tool);
 }
 
