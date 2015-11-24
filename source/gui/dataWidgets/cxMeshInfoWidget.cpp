@@ -79,7 +79,7 @@ MeshInfoWidget::MeshInfoWidget(PatientModelServicePtr patientModelService, ViewS
 	this->addWidgets(patientModelService);
 	this->meshSelectedSlot();
 
-	connect(mActiveMeshProperty.get(), &SelectDataStringPropertyBase::dataChanged, this, &MeshInfoWidget::meshSelectedSlot);
+	connect(mActiveMeshProperty.get(), &Property::changed, this, &MeshInfoWidget::meshSelectedSlot);
 }
 
 MeshInfoWidget::~MeshInfoWidget()

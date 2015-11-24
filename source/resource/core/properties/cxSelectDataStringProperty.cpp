@@ -49,6 +49,7 @@ StringPropertyActiveData::StringPropertyActiveData(PatientModelServicePtr patien
 	mHelp = "Select the active data obejct";
 
 	mActiveData = mPatientModelService->getActiveData();
+	connect(mActiveData.get(), &ActiveData::activeDataChanged, this, &Property::changed);
 	connect(mActiveData.get(), &ActiveData::activeDataChanged, this, &SelectDataStringPropertyBase::dataChanged);
 }
 
@@ -78,6 +79,7 @@ StringPropertyActiveImage::StringPropertyActiveImage(PatientModelServicePtr pati
 	mHelp = "Select the active volume";
 
 	mActiveData = mPatientModelService->getActiveData();
+	connect(mActiveData.get(), &ActiveData::activeImageChanged, this, &Property::changed);
 	connect(mActiveData.get(), &ActiveData::activeImageChanged, this, &SelectDataStringPropertyBase::dataChanged);
 }
 

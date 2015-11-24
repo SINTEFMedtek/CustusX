@@ -86,14 +86,14 @@ SelectClippersForDataWidget::SelectClippersForDataWidget(VisServicesPtr services
 
 	ClippersPtr clippers = mServices->view()->getClippers();
 	connect(clippers.get(), &Clippers::changed, this, &SelectClippersForDataWidget::setModified);
-	connect(mActiveDataProperty.get(), &SelectDataStringPropertyBase::dataChanged, this, &SelectClippersForDataWidget::setModified);
+	connect(mActiveDataProperty.get(), &Property::changed, this, &SelectClippersForDataWidget::setModified);
 }
 
 void SelectClippersForDataWidget::setActiveDataProperty(SelectDataStringPropertyBasePtr property)
 {
-	disconnect(mActiveDataProperty.get(), &SelectDataStringPropertyBase::dataChanged, this, &SelectClippersForDataWidget::setModified);
+	disconnect(mActiveDataProperty.get(), &Property::changed, this, &SelectClippersForDataWidget::setModified);
 	mActiveDataProperty = property;
-	connect(mActiveDataProperty.get(), &SelectDataStringPropertyBase::dataChanged, this, &SelectClippersForDataWidget::setModified);
+	connect(mActiveDataProperty.get(), &Property::changed, this, &SelectClippersForDataWidget::setModified);
 }
 
 void SelectClippersForDataWidget::initUI()
