@@ -66,9 +66,6 @@ protected slots:
 	virtual void clearClipping();
 	virtual void applyClipping();
 
-private slots:
-	void clipPlanesChangedSlot();
-
 protected:
 	ImageMapperMonitor(vtkVolumePtr volume, ImagePtr image);
 	vtkVolumePtr mVolume;
@@ -78,6 +75,7 @@ protected:
 private:
 	std::vector<vtkPlanePtr> mPlanes;
 	vtkVolumeMapperPtr getMapper();
+	void clipPlanesChangedSlot();
 
 };
 
