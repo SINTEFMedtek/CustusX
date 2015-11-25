@@ -204,8 +204,8 @@ void InteractiveClipper::removeData(DataPtr data)
 	std::map<QString, DataPtr>::iterator iter = mDatas.find(data->getUid());
 	if(iter != mDatas.end())
 	{
-		mDatas.erase(iter);
 		iter->second->removeInteractiveClipPlane(mSlicePlaneClipper->getClipPlane());
+		mDatas.erase(iter);
 	}
 	this->updateClipPlanesInData();
 }
