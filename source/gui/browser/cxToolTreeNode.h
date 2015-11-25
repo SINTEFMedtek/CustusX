@@ -54,9 +54,6 @@ public:
 	virtual TreeNodePtr getParent() const;
 	virtual void activate();
 	virtual QIcon getIcon() const;
-//	virtual bool getViewGroupVisibility(int index) const = 0;
-//	virtual void setViewGroupVisibility(int index, bool value) = 0;
-//	virtual bool visible() const = 0; // if need be, might get away simply populating from a root node
 	QWidget* createPropertiesWidget() const;
 	virtual QVariant getColor() const;
 	virtual QVariant getFont() const;

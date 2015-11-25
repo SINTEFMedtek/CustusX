@@ -100,7 +100,7 @@ int TreeItemModel::rowCount(const QModelIndex& parent) const
 	TreeNode *parentItem = this->itemFromIndex(parent);
 	if (parent.column() > 0) // ignore for all but first column
 		return 0;
-	return parentItem->getChildren().size();
+	return parentItem->getVisibleChildren().size();
 }
 
 QVariant TreeItemModel::data(const QModelIndex& index, int role) const
@@ -201,7 +201,7 @@ QVariant TreeItemModel::headerData(int section, Qt::Orientation orientation, int
 QModelIndex TreeItemModel::index(int row, int column, const QModelIndex& parent) const
 {
 	TreeNode *parentItem = this->itemFromIndex(parent);
-	std::vector<TreeNodePtr> children = parentItem->getChildren();
+	std::vector<TreeNodePtr> children = parentItem->getVisibleChildren();
 	if (row < children.size())
 	{
 		return createIndex(row, column, children[row].get());
@@ -219,17 +219,17 @@ QModelIndex TreeItemModel::parent(const QModelIndex& index) const
 	if (!childItem)
 		return QModelIndex();
 
-	TreeNode *parentItem = childItem->getParent().get();
+	TreeNode *parentItem = childItem->getVisibleParent().get();
 
 	if (parentItem == mRepository->getTopNode().get())
 		return QModelIndex();
 
 	// find row of parent within grandparent
-	TreeNodePtr grandParent = parentItem->getParent();
+	TreeNodePtr grandParent = parentItem->getVisibleParent();
 	int row = 0;
 	if (grandParent)
 	{
-		std::vector<TreeNodePtr> parentSiblings = grandParent->getChildren();
+		std::vector<TreeNodePtr> parentSiblings = grandParent->getVisibleChildren();
 		for (row=0; row<parentSiblings.size(); ++row)
 			if (parentItem==parentSiblings[row].get())
 				break;

@@ -51,6 +51,7 @@ public:
 	virtual QString getName() const;
 	virtual QString getType() const;
 	virtual TreeNodePtr getParent() const;
+	virtual bool isVisibleNode() const;
 	virtual QIcon getIcon() const;
 
 private:

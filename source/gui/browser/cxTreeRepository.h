@@ -67,10 +67,10 @@ public:
 
 
 	QString getMode() const { return mMode; }
-	void setMode(QString val) { if (mMode==val) return; mMode = val; this->invalidate(); }
+	void setMode(QString val) { this->invalidate(); if (mMode==val) return; mMode = val; this->invalidate(); }
 	QStringList getAllModes() const { return mAllModes; }
 	QStringList getVisibleNodeTypes() const { return mVisibleNodeTypes; }
-	void setVisibleNodeTypes(QStringList val) { if (mVisibleNodeTypes==val) return; mVisibleNodeTypes = val; this->invalidate(); }
+	void setVisibleNodeTypes(QStringList val) { this->invalidate(); if (mVisibleNodeTypes==val) return; mVisibleNodeTypes = val; this->invalidate(); }
 	QStringList getAllNodeTypes() const { return mAllNodeTypes; }
 
 public slots:

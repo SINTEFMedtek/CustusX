@@ -63,6 +63,11 @@ TreeNodePtr TopTreeNode::getParent() const
 	return TreeNodePtr();
 }
 
+bool TopTreeNode::isVisibleNode() const
+{
+	return true;
+}
+
 QIcon TopTreeNode::getIcon() const
 {
 	return QIcon();

@@ -60,6 +60,17 @@ QString SpaceTreeNode::getType() const
 	return "space";
 }
 
+bool SpaceTreeNode::isVisibleNode() const
+{
+	if (mSpace.mId == csPATIENTREF)
+	{
+		bool toolsVisible = this->repo()->getVisibleNodeTypes().contains("tool");
+		return toolsVisible;
+	}
+
+	return true;
+}
+
 TreeNodePtr SpaceTreeNode::getParent() const
 {
 	if (mSpace.mId == csREF)

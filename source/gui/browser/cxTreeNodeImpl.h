@@ -51,15 +51,17 @@ public:
 	TreeNodeImpl(TreeRepositoryWeakPtr repo);
 	virtual ~TreeNodeImpl() {}
 	virtual std::vector<TreeNodePtr> getChildren() const;
+	virtual bool isVisibleNode() const;
 
 	virtual void activate() {}
 	virtual QVariant getViewGroupVisibility(int index) const { return QVariant(); }
 	virtual void setViewGroupVisibility(int index, bool value) {}
-//	virtual bool visible() const = 0; // if need be, might get away simply populating from a root node
-//	QWidget* getPropertiesWidget() const = 0; // later
 	virtual QVariant getColor() const { return QVariant(); }
 	virtual QVariant getFont() const { return QVariant(); }
-	QWidget* createPropertiesWidget() const { return NULL; }
+	virtual QWidget* createPropertiesWidget() const { return NULL; }
+
+	virtual std::vector<TreeNodePtr> getVisibleChildren() const;
+	virtual TreeNodePtr getVisibleParent() const;
 
 protected:
 	TreeRepositoryWeakPtr mRepository;

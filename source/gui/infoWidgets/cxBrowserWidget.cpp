@@ -101,7 +101,7 @@ void BrowserWidget::closeEvent(QCloseEvent* event)
 void BrowserWidget::prePaintEvent()
 {
 	mPopupWidget->refresh();
-//	CX_LOG_CHANNEL_DEBUG("CA") << "BrowserWidget::prePaintEvent()";
+	CX_LOG_CHANNEL_DEBUG("CA") << "BrowserWidget::prePaintEvent() modified";
 	mModel->update();
 	this->resetView();
 }
@@ -160,7 +160,13 @@ void BrowserWidget::createButtonWidget(QWidget* widget)
 
 void BrowserWidget::onNodeVisibilityChanged(QString nodeType, bool value)
 {
-	CX_LOG_CHANNEL_DEBUG("CA") << "BrowserWidget::onNodeVisibilityChanged " << nodeType << "  " << value;
+//	CX_LOG_CHANNEL_DEBUG("CA") << "BrowserWidget::onNodeVisibilityChanged " << nodeType << "  " << value;
+	QStringList visible = mModel->repo()->getVisibleNodeTypes();
+	if (value)
+		visible.append(nodeType);
+	else
+		visible.removeAll(nodeType);
+	mModel->repo()->setVisibleNodeTypes(visible);
 }
 
 //QStringList getVisibleNodeTypes() const { return mVisibleNodeTypes; }

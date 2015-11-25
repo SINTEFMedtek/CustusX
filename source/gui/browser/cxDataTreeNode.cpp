@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImagePropertiesWidget.h"
 #include "cxImage.h"
 #include "cxSelectDataStringProperty.h"
+#include "cxDataMetric.h"
 
 namespace cx
 {
@@ -72,15 +73,32 @@ QString DataTreeNode::getType() const
 	return "data";
 }
 
+bool DataTreeNode::isVisibleNode() const
+{
+	QStringList visible = this->repo()->getVisibleNodeTypes();
+
+	bool hasData = visible.contains(this->getType());
+	if (!hasData)
+		return false;
+
+	if (boost::dynamic_pointer_cast<Mesh>(mData) && !visible.contains("model"))
+		return false;
+	if (boost::dynamic_pointer_cast<Image>(mData) && !visible.contains("image"))
+		return false;
+	if (boost::dynamic_pointer_cast<DataMetric>(mData) && !visible.contains("metric"))
+		return false;
+
+	return true;
+}
+
 TreeNodePtr DataTreeNode::getParent() const
 {
 	if (mData->getParentSpace().isEmpty())
 		return this->repo()->getNode(CoordinateSystem(csREF).toString());
-	TreeNodePtr node = this->repo()->getNode(mData->getParentSpace());
-	if (node)
-		return node;
-	node = this->repo()->getNode(CoordinateSystem(csDATA, mData->getParentSpace()).toString());
-	return node;
+	TreeNodePtr parent = this->repo()->getNode(mData->getParentSpace());
+	if (!parent)
+		parent = this->repo()->getNode(CoordinateSystem(csDATA, mData->getParentSpace()).toString());
+	return parent;
 }
 
 void DataTreeNode::activate()

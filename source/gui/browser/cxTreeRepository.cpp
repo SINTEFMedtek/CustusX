@@ -60,7 +60,7 @@ TreeRepository::TreeRepository(VisServicesPtr services) :
 {
 	mAllModes << "spaces" << "flat";
 	mMode = mAllModes.front();
-	mAllNodeTypes << "data" << "metrics" << "volumes" << "models" << "tools";
+	mAllNodeTypes << "data" << "metric" << "image" << "model" << "tool";
 	mVisibleNodeTypes << mAllNodeTypes;
 
 	this->startListen();
@@ -73,6 +73,7 @@ TreeRepository::~TreeRepository()
 
 void TreeRepository::update()
 {
+//	CX_LOG_CHANNEL_DEBUG("CA") << "TreeRepository::update(), invalid=" << mInvalid;
 	if (mInvalid)
 		this->rebuild();
 	mInvalid = true;
@@ -80,6 +81,7 @@ void TreeRepository::update()
 
 void TreeRepository::invalidate()
 {
+//	CX_LOG_CHANNEL_DEBUG("CA") << "TreeRepository::invalidate()";
 	mInvalid = true;
 	emit invalidated();
 }

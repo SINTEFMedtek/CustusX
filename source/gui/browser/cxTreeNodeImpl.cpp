@@ -56,6 +56,57 @@ std::vector<TreeNodePtr> TreeNodeImpl::getChildren() const
 	return retval;
 }
 
+//TreeNodePtr TreeNodeImpl::getParent() const
+//{
+//	if (!this->isVisibleNode())
+//		return TreeNodePtr();
+//	CX_LOG_CHANNEL_DEBUG("CA") << "===== TreeNodeImpl::getParent() " << this->getName();
+//	TreeNodePtr parent = this->getParentIgnoreVisiblity();
+//	CX_LOG_CHANNEL_DEBUG("CA") << "    parent=  " << ((parent.get()!=NULL)?parent->getName():"NULL");
+//	while (parent && !parent->isVisibleNode())
+//	{
+//		parent = parent->getParent();
+//		CX_LOG_CHANNEL_DEBUG("CA") << "      parent=  " << ((parent.get()!=NULL)?parent->getName():"NULL");
+//	}
+//	CX_LOG_CHANNEL_DEBUG("CA") << "    parent end=  " << ((parent.get()!=NULL)?parent->getName():"NULL");
+//	return parent;
+////	return this->walkToFirstVisibleParentIncludingSelf(parent);
+//}
+
+std::vector<TreeNodePtr> TreeNodeImpl::getVisibleChildren() const
+{
+	// implement as inverse of getParent()
+	std::vector<TreeNodePtr> retval;
+	std::vector<TreeNodePtr> all = this->repo()->getNodes();
+	for (unsigned i=0; i<all.size(); ++i)
+		if (all[i]->getVisibleParent().get() == this)
+			retval.push_back(all[i]);
+	return retval;
+}
+
+TreeNodePtr TreeNodeImpl::getVisibleParent() const
+{
+	if (!this->isVisibleNode())
+		return TreeNodePtr();
+	TreeNodePtr parent = this->getParent();
+	while (parent && !parent->isVisibleNode())
+	{
+		parent = parent->getParent();
+	}
+	return parent;
+}
+
+
+bool TreeNodeImpl::isVisibleNode() const
+{
+	bool isKnown = this->repo()->getAllNodeTypes().contains(this->getType());
+	bool isVisible = this->repo()->getVisibleNodeTypes().contains(this->getType());
+//	CX_LOG_CHANNEL_DEBUG("CA") << "TreeNodeImpl::isVisibleNode() name=" << this->getName()
+//							   << " isKnown=" << isKnown
+//							   << " isVisible=" << isVisible;
+	return !isKnown || isVisible;
+}
+
 VisServicesPtr TreeNodeImpl::getServices() const
 {
 	return this->repo()->getServices();
