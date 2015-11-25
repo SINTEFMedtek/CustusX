@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTreeNode.h"
 #include "cxDataTreeNode.h"
 #include "cxSpaceTreeNode.h"
+#include "cxGroupTreeNode.h"
 #include "cxTopTreeNode.h"
 #include "cxToolTreeNode.h"
 #include "cxLogger.h"
@@ -141,15 +142,19 @@ void TreeRepository::rebuild()
 	mNodes.clear();
 	this->insertTopNode();
 
+	QStringList groups = QStringList() << "tool" << "data" << "space";
+	for (unsigned i=0; i<groups.size(); ++i)
+		this->insertGroupNode(groups[i]);
+
 	this->insertSpaceNode(CoordinateSystem(csREF));
-	CX_LOG_CHANNEL_DEBUG("CA") << "  - built refspacenode";
+//	CX_LOG_CHANNEL_DEBUG("CA") << "  - built refspacenode";
 
 	std::map<QString, DataPtr> source = this->getServices()->patient()->getData();
 	for (std::map<QString, DataPtr>::const_iterator iter = source.begin(); iter != source.end(); ++iter)
 	{
 		this->insertDataNode(iter->second);
 	}
-	CX_LOG_CHANNEL_DEBUG("CA") << "  - built datanodes";
+//	CX_LOG_CHANNEL_DEBUG("CA") << "  - built datanodes";
 	for (std::map<QString, DataPtr>::const_iterator iter = source.begin(); iter != source.end(); ++iter)
 	{
 		QString space = iter->second->getParentSpace();
@@ -159,7 +164,7 @@ void TreeRepository::rebuild()
 			continue;
 		this->insertSpaceNode(CoordinateSystem(csDATA, space));
 	}
-	CX_LOG_CHANNEL_DEBUG("CA") << "  - built spacenodes";
+//	CX_LOG_CHANNEL_DEBUG("CA") << "  - built spacenodes";
 
 	this->insertSpaceNode(CoordinateSystem(csPATIENTREF));
 
@@ -168,6 +173,22 @@ void TreeRepository::rebuild()
 	{
 		this->insertToolNode(iter->second);
 	}
+
+	CX_LOG_CHANNEL_DEBUG("CA") << "  - built all nodes";
+}
+
+void TreeRepository::insertGroupNode(QString groupname)
+{
+	if (this->getNodeForGroup(groupname))
+		return;
+
+	TreeNodePtr node(new GroupTreeNode(mSelf, groupname));
+	mNodes.push_back(node);
+}
+
+TreeNodePtr TreeRepository::getNodeForGroup(QString groupname)
+{
+	return this->getNode(QString("group_%1").arg(groupname));
 }
 
 void TreeRepository::insertToolNode(ToolPtr tool)

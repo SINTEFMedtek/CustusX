@@ -29,80 +29,36 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXTREEREPOSITORY_H
-#define CXTREEREPOSITORY_H
+#ifndef CXGROUPTREENODE_H
+#define CXGROUPTREENODE_H
 
-#include <vector>
-#include <boost/weak_ptr.hpp>
-#include <boost/shared_ptr.hpp>
-#include <QString>
-#include <QObject>
-#include "cxForwardDeclarations.h"
-#include "cxCoordinateSystemHelpers.h"
-
+#include "cxTreeNodeImpl.h"
 
 namespace cx
 {
 
 class TreeNode;
-class TreeRepository;
+typedef boost::weak_ptr<TreeNode> TreeNodeWeakPtr;
 typedef boost::shared_ptr<TreeNode> TreeNodePtr;
-typedef boost::shared_ptr<TreeRepository> TreeRepositoryPtr;
-typedef boost::weak_ptr<class TreeRepository> TreeRepositoryWeakPtr;
 
 
-class TreeRepository : public QObject
+class GroupTreeNode : public TreeNodeImpl
 {
-	Q_OBJECT
+  Q_OBJECT
 public:
-	static TreeRepositoryPtr create(VisServicesPtr services);
-	~TreeRepository();
+	GroupTreeNode(TreeRepositoryWeakPtr repo, QString typeName);
+	virtual ~GroupTreeNode() {}
+	virtual QString getUid() const;
+	virtual QString getName() const;
+	virtual QString getType() const;
+	virtual TreeNodePtr getParent() const;
+	virtual bool isVisibleNode() const;
+	virtual QIcon getIcon() const;
 
-	std::vector<TreeNodePtr> getNodes();
-	TreeNodePtr getNode(QString uid);
-
-	// utility methods for accessing the nodes:
-	TreeNodePtr getTopNode();
-	TreeNodePtr getNodeForGroup(QString groupname);
-	VisServicesPtr getServices();
-
-
-	QString getMode() const { return mMode; }
-	void setMode(QString val) { this->invalidate(); if (mMode==val) return; mMode = val; this->invalidate(); }
-	QStringList getAllModes() const { return mAllModes; }
-	QStringList getVisibleNodeTypes() const { return mVisibleNodeTypes; }
-	void setVisibleNodeTypes(QStringList val) { this->invalidate(); if (mVisibleNodeTypes==val) return; mVisibleNodeTypes = val; this->invalidate(); }
-	QStringList getAllNodeTypes() const { return mAllNodeTypes; }
-
-public slots:
-	void update();
-	void invalidate();
-
-signals:
-	void changed();
-	void invalidated();
 private:
-	std::vector<TreeNodePtr> mNodes;
-	TreeRepositoryWeakPtr mSelf;
-	bool mInvalid;
-	VisServicesPtr mServices;
-
-	QString mMode;
-	QStringList mAllModes;
-	QStringList mVisibleNodeTypes;
-	QStringList mAllNodeTypes;
-
-	explicit TreeRepository(VisServicesPtr services);
-	void rebuild();
-	void insertTopNode();
-	void insertDataNode(DataPtr data);
-	void insertSpaceNode(CoordinateSystem space);
-	void insertToolNode(ToolPtr tool);
-	void insertGroupNode(QString groupname);
-	void startListen();
-	void stopListen();
+	QString mTypeName;
 };
 
 } // namespace cx
 
-#endif // CXTREEREPOSITORY_H
+#endif // CXGROUPTREENODE_H

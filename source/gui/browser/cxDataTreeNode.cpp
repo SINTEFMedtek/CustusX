@@ -93,6 +93,9 @@ bool DataTreeNode::isVisibleNode() const
 
 TreeNodePtr DataTreeNode::getParent() const
 {
+	if (this->repo()->getMode()=="flat")
+		return this->repo()->getNodeForGroup("data");
+
 	if (mData->getParentSpace().isEmpty())
 		return this->repo()->getNode(CoordinateSystem(csREF).toString());
 	TreeNodePtr parent = this->repo()->getNode(mData->getParentSpace());

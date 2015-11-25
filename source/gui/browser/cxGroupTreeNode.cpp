@@ -29,7 +29,8 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include "cxSpaceTreeNode.h"
+#include "cxGroupTreeNode.h"
+
 #include "cxLogger.h"
 #include "cxTreeRepository.h"
 #include <QIcon>
@@ -38,79 +39,48 @@ namespace cx
 {
 
 
-SpaceTreeNode::SpaceTreeNode(TreeRepositoryWeakPtr repo, CoordinateSystem space) :
+GroupTreeNode::GroupTreeNode(TreeRepositoryWeakPtr repo, QString typeName) :
 	TreeNodeImpl(repo),
-	mSpace(space)
+	mTypeName(typeName)
 {
 
 }
 
-QString SpaceTreeNode::getUid() const
+QString GroupTreeNode::getUid() const
 {
-	return mSpace.toString();
+	return QString("group_%1").arg(mTypeName);
 }
 
-QString SpaceTreeNode::getName() const
+QString GroupTreeNode::getName() const
 {
-	return mSpace.toString();
+	return QString("%1 group").arg(mTypeName);
 }
 
-QString SpaceTreeNode::getType() const
+QString GroupTreeNode::getType() const
 {
-	return "space";
+	return "group";
 }
 
-bool SpaceTreeNode::isVisibleNode() const
+bool GroupTreeNode::isVisibleNode() const
 {
-	if (mSpace.mId == csPATIENTREF)
-	{
-		bool toolsVisible = this->repo()->getVisibleNodeTypes().contains("tool");
-		return toolsVisible;
-	}
-
-	return true;
+	if (this->repo()->getMode()!="flat")
+		return false;
+	return TreeNodeImpl::isVisibleNode();
 }
 
-TreeNodePtr SpaceTreeNode::getParent() const
+TreeNodePtr GroupTreeNode::getParent() const
 {
-	if (this->repo()->getMode()=="flat")
-		return this->repo()->getNodeForGroup("space");
-
-	if (mSpace.mId == csREF)
-	{
-		return this->repo()->getTopNode();
-	}
-	if (mSpace.mId == csPATIENTREF)
-	{
-		return this->repo()->getNode(CoordinateSystem(csREF).toString());
-	}
-	else if (mSpace.mId == csDATA)
-	{
-		return this->repo()->getNode(CoordinateSystem(csREF).toString());
-	}
-	else
-	{
-		CX_LOG_CHANNEL_DEBUG("CA") << "TBD: Not implemented";
+	if (this->repo()->getMode()!="flat")
 		return TreeNodePtr();
-	}
+	return this->repo()->getTopNode();
 }
 
-QIcon SpaceTreeNode::getIcon() const
+QIcon GroupTreeNode::getIcon() const
 {
-	if (mSpace.mId == csREF)
-	{
-		return QIcon(":/icons/space_reference.png");
-	}
-	if (mSpace.mId == csPATIENTREF)
-	{
-		return QIcon(":/icons/space_patient_reference.png");
-	}
-	else
-	{
-		return QIcon(":/icons/space_generic.png");
-	}
+	return QIcon(":icons/open_icon_library/document-open-7.png");
 }
 
 
 
 } // namespace cx
+

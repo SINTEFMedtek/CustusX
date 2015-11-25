@@ -62,6 +62,9 @@ QString ToolTreeNode::getName() const
 
 TreeNodePtr ToolTreeNode::getParent() const
 {
+	if (this->repo()->getMode()=="flat")
+		return this->repo()->getNodeForGroup("tool");
+
 	if (mTool->hasType(Tool::TOOL_REFERENCE))
 		return this->repo()->getNode(CoordinateSystem(csPATIENTREF).toString());
 //		return this->repo()->getNode(CoordinateSystem(csREF).toString());

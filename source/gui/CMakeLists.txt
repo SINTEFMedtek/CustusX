@@ -8,6 +8,7 @@ cx_add_class_qt_moc(cxGui_SRCS
 	browser/cxTreeItemModel
 	browser/cxDataTreeNode
 	browser/cxSpaceTreeNode
+	browser/cxGroupTreeNode
 	browser/cxTopTreeNode
 	browser/cxToolTreeNode
 	browser/cxTreeNodeImpl
