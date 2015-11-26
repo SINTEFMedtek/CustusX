@@ -37,8 +37,10 @@ macro(cx_install_set_generators)
 #		option (CPACK_BINARY_TGZ "Enable to build TGZ packages" OFF)
 #		option (CPACK_SOURCE_TBZ2 "Enable to build TBZ2 source packages" OFF)
 #		option (CPACK_SOURCE_TGZ "Enable to build TGZ source packages" OFF)
-		set(CPACK_GENERATOR "PackageMaker")
-	endif(APPLE)
+#		set(CPACK_GENERATOR "PackageMaker")
+#                set(CPACK_GENERATOR "Bundle")
+                set(CPACK_GENERATOR "DragNDrop")
+        endif(APPLE)
 
 	if(CX_LINUX)
 		set(CPACK_GENERATOR "TGZ")
@@ -126,6 +128,12 @@ macro(cx_install_set_relative_path)
 		# Mac handles this differently
 		SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_RPATH}:\\\$ORIGIN/")
 	endif(CX_LINUX)
+        if(CX_APPLE)
+                # Add support for Frameworks installed into the bundle:
+                # http://cmake.org/Wiki/CMake_RPATH_handling
+                SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_RPATH}:@executable_path/../Frameworks/")
+        endif(CX_APPLE)
+
 endmacro()
 
 
@@ -204,29 +212,51 @@ endmacro()
 ###############################################################################
 macro(cx_install_set_folder_structure)
 
-	cx_assert_variable_exists(${CX_SYSTEM_DEFAULT_APPLICATION})
-	cx_assert_variable_exists(${CX_SYSTEM_BASE_NAME})
+        cx_assert_variable_exists(CX_SYSTEM_DEFAULT_APPLICATION)
+        cx_assert_variable_exists(CX_SYSTEM_BASE_NAME)
 
 	set(CX_BUNDLE_NAME ${CX_SYSTEM_DEFAULT_APPLICATION})
 
-	set(CX_INSTALL_ROOT_DIR .)
-	if(APPLE)
-		set(CPACK_PACKAGING_INSTALL_PREFIX "/")
-		set(CX_INSTALL_ROOT_DIR "Applications/${CX_SYSTEM_BASE_NAME}")
+        set(CX_INSTALL_ROOT_DIR ".")
+        set(CPACK_PACKAGING_INSTALL_PREFIX "/")
+        if(APPLE)
+
+#                set(CPACK_BUNDLE_NAME ${CX_BUNDLE_NAME})
+#                set(CPACK_BUNDLE_PLIST "Info.plist")
+#                set(CPACK_BUNDLE_ICON "${PROJECT_SOURCE_DIR}/source/gui/icons/CustusX/CustusX.ico")
+#                set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY TRUE)
+
+#                set(CPACK_PACKAGING_INSTALL_PREFIX "/")
+                #set(CX_INSTALL_ROOT_DIR "Applications/${CX_SYSTEM_BASE_NAME}") - NA when creating dragndrop
 	endif(APPLE)
 	if(CX_LINUX)
-		set(CPACK_PACKAGING_INSTALL_PREFIX "/")
+#                set(CPACK_PACKAGING_INSTALL_PREFIX "/")
 		set(CX_INSTALL_ROOT_DIR ${CX_SYSTEM_BASE_NAME})
 	endif(CX_LINUX)
         if(CX_WINDOWS)
-            set(CPACK_PACKAGING_INSTALL_PREFIX "/")
-            set(CX_INSTALL_ROOT_DIR ".")
+#            set(CPACK_PACKAGING_INSTALL_PREFIX "/")
+#            set(CX_INSTALL_ROOT_DIR ".")
         endif(CX_WINDOWS)
+
+        set(CX_INSTALL_CONFIG_DIR ${CX_INSTALL_CONFIG_DIR}/config)
+        if(APPLE)
+                set(CX_INSTALL_CONFIG_DIR "${CX_INSTALL_ROOT_DIR}/${CX_BUNDLE_NAME}.app/config")
+        endif(APPLE)
 
 	set(CX_INSTALL_BINARY_DIR ${CX_INSTALL_ROOT_DIR}/bin)
 	if(APPLE)
 		set(CX_INSTALL_BINARY_DIR "${CX_INSTALL_ROOT_DIR}/${CX_BUNDLE_NAME}.app/Contents/MacOS")
 	endif(APPLE)
+
+message("-----------------CX_INSTALL_BINARY_DIR: " ${CX_INSTALL_ROOT_DIR})
+message("-----------------CX_INSTALL_BINARY_DIR: " ${CX_INSTALL_BINARY_DIR})
+message("-----------------CX_BUNDLE_NAME: " ${CX_BUNDLE_NAME})
+
+#file(TO_CMAKE_PATH ${CX_INSTALL_BINARY_DIR} CX_INSTALL_BINARY_DIR)
+
+#message("-----------------CX_INSTALL_BINARY_DIR: " ${CX_INSTALL_ROOT_DIR})
+#message("-----------------CX_INSTALL_BINARY_DIR: " ${CX_INSTALL_BINARY_DIR})
+#message("-----------------CX_BUNDLE_NAME: " ${CX_BUNDLE_NAME})
 
 #	set(CX_INSTALL_PLUGIN_DIR "${CX_INSTALL_BINARY_DIR}/plugins") - did not work: get into trouble with relative paths and fixup_bundle
 	set(CX_INSTALL_PLUGIN_DIR "${CX_INSTALL_BINARY_DIR}")
@@ -301,7 +331,7 @@ endmacro()
 #
 ###############################################################################
 function(cx_install_target TARGET_ID)
-        cx_assert_variable_exists(${CX_INSTALL_ROOT_DIR})
+        cx_assert_variable_exists(CX_INSTALL_ROOT_DIR)
 
 	if(CX_APPLE)
 		get_property(is_bundle TARGET ${TARGET_ID} PROPERTY MACOSX_BUNDLE SET)
@@ -375,7 +405,7 @@ if (NOT CX_APPLE)
 endif ()
 
 	install(DIRECTORY ${CustusX_SOURCE_DIR}/config/
-			DESTINATION ${CX_INSTALL_ROOT_DIR}/config
+                        DESTINATION ${CX_INSTALL_CONFIG_DIR}/
 			FILE_PERMISSIONS ${CX_FULL_PERMISSIONS}
 			DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS}
 			PATTERN "settings/*" EXCLUDE
@@ -385,7 +415,7 @@ endif ()
 		install(FILES
 				${OpenCLUtilityLibrary_KERNELS_DIR}/HistogramPyramids.cl
 				${OpenCLUtilityLibrary_KERNELS_DIR}/HistogramPyramids.clh
-				DESTINATION ${CX_INSTALL_ROOT_DIR}/config/tsf/)
+                                DESTINATION ${CX_INSTALL_CONFIG_DIR}/tsf/)
 	endif()
 endfunction()
 
@@ -435,11 +465,15 @@ endfunction()
 ###############################################################################
 function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS_LOCAL)
     find_qt_plugin_dir(QT_PLUGINS_DIR)
-    
-	cx_assert_variable_exists(${QT_PLUGINS_DIR})
-	cx_assert_variable_exists(${CX_INSTALL_ROOT_DIR})
-	cx_assert_variable_exists(${INSTALL_BINARY_DIR})
-	cx_assert_variable_exists(${CX_INSTALL_PLUGIN_DIR})
+    find_qt_libs_dir(QT_LIBS_DIR)
+        cx_assert_variable_exists(QT_PLUGINS_DIR)
+        cx_assert_variable_exists(QT_LIBS_DIR)
+        cx_assert_variable_exists(CX_INSTALL_ROOT_DIR)
+        cx_assert_variable_exists(INSTALL_BINARY_DIR)
+        cx_assert_variable_exists(CX_INSTALL_PLUGIN_DIR)
+
+        #Add Qt libraries (frameworks for Apple) to fixup_bundle search path
+        set(DIRS_LOCAL ${DIRS_LOCAL} ${QT_LIBS_DIR})
 
 	# Install plugins in the default location as given by http://qt-project.org/doc/qt-4.8/qt-conf.html
 	if(CX_LINUX)
@@ -457,32 +491,28 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
 
 	# Install needed Qt plugins by copying directories from the qt installation
 	install(DIRECTORY "${QT_PLUGINS_DIR}/" 
-#	install(DIRECTORY "${QT_PLUGINS_DIR}/imageformats" 
-#	                  "${QT_PLUGINS_DIR}/sqldrivers"
-#	                  "${QT_PLUGINS_DIR}/platforms"
-#	                  "${QT_PLUGINS_DIR}/iconengines"	                  
 		DESTINATION ${INSTALL_QTPLUGIN_DIR}
 		DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS})
 
 	# install runtime plugins
-        set(CX_PLUGIN_DIR "/plugins/")
+        set(CX_PLUGIN_DIR "/plugins")
         if(CX_WINDOWS)
-            set(CX_PLUGIN_DIR "/")
+            set(CX_PLUGIN_DIR "")
         endif(CX_WINDOWS)
-        install(DIRECTORY "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}${CX_PLUGIN_DIR}" # trailing slash copies contents, not plugin folder
+        install(DIRECTORY "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}${CX_PLUGIN_DIR}/" # trailing slash copies contents, not plugin folder
 		DESTINATION ${CX_INSTALL_PLUGIN_DIR}
 		DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS})
 
 	# explicitly tell which executables that should be fixed up.
-	# why: fixup_bundle seems to fail to asseble exes in some cases.
+        # why: fixup_bundle seems to fail to assemble exes in some cases.
 	foreach(TARGET ${CX_APPLE_TARGETS_TO_COPY})
 		get_filename_component(TARGET_FILENAME ${TARGET} NAME)
 		set(TARGET_FILEPATH ${INSTALL_BINARY_DIR}/${TARGET_FILENAME})
-		set(LIB_PATTERN_CODE
-			"${LIB_PATTERN_CODE}
-			set\(TEMP \"\${CMAKE_INSTALL_PREFIX}/${TARGET_FILEPATH}\"\)
-			set(PLUGINS \${PLUGINS} \${TEMP})"
-			)
+                set(LIB_PATTERN_CODE "
+    ${LIB_PATTERN_CODE}
+    set\(TEMP \"\${CMAKE_INSTALL_PREFIX}/${TARGET_FILEPATH}\"\)
+    set(PLUGINS \${PLUGINS} \${TEMP})
+                        ")
 	endforeach()
 
 	# collect all installations here. They will be used by fixup_bundle to collect dependencies.
@@ -500,16 +530,21 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
 		file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${INSTALL_QTCONF_DIR}/qt.conf\" \"\")
 		")
 
+
 	# create a code snippet : Search for the files in pattern,
 	#                         add files to PLUGINS
 	foreach(PATTERN ${INSTALL_LIBRARIES_PATTERN_LOCAL} )
+                message(STATUS "PATTERN=" ${PATTERN})
+
 		set(LIB_PATTERN_CODE
-			"${LIB_PATTERN_CODE}
-                        set(TEMP)
-			file\(GLOB_RECURSE TEMP \"\${CMAKE_INSTALL_PREFIX}/${PATTERN}\"\)
-			set(PLUGINS \${PLUGINS} \${TEMP})"
+    "${LIB_PATTERN_CODE}
+    set(TEMP)
+    file\(GLOB_RECURSE TEMP \"\${CMAKE_INSTALL_PREFIX}/${PATTERN}\"\)
+    set(PLUGINS \${PLUGINS} \${TEMP})
+    "
 			)
 	endforeach()
+
 
         if(CX_WINDOWS)
             #On Windows verify_app fails if path contains a .
@@ -524,15 +559,20 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
         # fixup_bundle resets link paths for all targets within the bundle.
         # this code appears in cmake_install.cmake in the CURRENT_BINARY_DIR. Check there when changing.
         install(CODE "
-                # Begin inserted fixup_bundle snippet
-                ${LIB_PATTERN_CODE}
-				set(CMAKE_MODULE_PATH
-					${CMAKE_MODULE_PATH}
-					${PROJECT_SOURCE_DIR}/CMake)
-				include(cxBundleUtilities)
-                fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/${APPS_LOCAL}\"   \"\${PLUGINS}\"   \"${DIRS_LOCAL}\") "
-                # End inserted fixup_bundle snippet
-                )
+    # Begin inserted fixup_bundle snippet
+    ${LIB_PATTERN_CODE}
+    set(CMAKE_MODULE_PATH
+        ${CMAKE_MODULE_PATH}
+        ${PROJECT_SOURCE_DIR}/CMake)
+    include(cxBundleUtilities)
+    message(STATUS \"CMAKE_INSTALL_PREFIX:  \${CMAKE_INSTALL_PREFIX}\")
+    message(STATUS \"APPS_LOCAL:  ${APPS_LOCAL}\")
+    message(STATUS \"PLUGINS:  \${PLUGINS}\")
+    file(TO_CMAKE_PATH \"\${CMAKE_INSTALL_PREFIX}/${APPS_LOCAL}\" _APP_PATH)
+    message(STATUS \"_APP_PATH:  \${_APP_PATH}\")
+    fixup_bundle(\"\${_APP_PATH}\"   \"\${PLUGINS}\"   \"${DIRS_LOCAL}\")
+    # End inserted fixup_bundle snippet
+    ")
 endfunction()
 
 ###############################################################################
@@ -559,10 +599,10 @@ foreach (_var IN LISTS matchedVars)
 		set(PLUGINS_DESCRIPTION "${PLUGINS_DESCRIPTION}\n		${PLUGIN_NAME} ${${_var}}")
 endforeach()
 
-	cx_assert_variable_exists(${CX_SYSTEM_BASE_NAME})
-	cx_assert_variable_exists(${CustusX_VERSION_STRING})
-	cx_assert_variable_exists(${SSC_USE_GCOV})
-	cx_assert_variable_exists(${CX_USE_OPENCL_UTILITY})
+        cx_assert_variable_exists(CX_SYSTEM_BASE_NAME)
+        cx_assert_variable_exists(CustusX_VERSION_STRING)
+        cx_assert_variable_exists(SSC_USE_GCOV)
+        cx_assert_variable_exists(CX_USE_OPENCL_UTILITY)
 	set(CONFIGURATION_TEXT
 "
 Configuration for ${CX_SYSTEM_BASE_NAME} ${CustusX_VERSION_STRING}

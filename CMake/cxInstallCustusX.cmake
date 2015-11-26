@@ -22,6 +22,15 @@
 
 include(cxInstallUtilities)
 
+if(CX_APPLE)
+#    find_package(XCTest)
+#    message(STATUS "xctest libs: " ${XCTest_LIBRARIES})
+#    message(STATUS "CMAKE_SYSTEM_FRAMEWORK_PATH: " ${CMAKE_SYSTEM_FRAMEWORK_PATH})
+    set(CX_MACOSX_DEVELOPER_FRAMEWORK_PATH "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks")
+#    message(STATUS "CMAKE_SYSTEM_FRAMEWORK_PATH: " $ENV{DEVELOPER_FRAMEWORKS_DIR})
+    
+endif()
+
 cx_install_apply_customizable_properties()
 cx_install_configuration_files()
 
@@ -36,6 +45,8 @@ if(CX_WINDOWS)
 endif()
 
 cx_install_add_library_dirs(
+    ${CX_MACOSX_DEVELOPER_FRAMEWORK_PATH}
+    ${XCTest_LIBRARIES}
     ${ULTERIUS_BIN_DIR}
     ${QT_LIBRARY_DIRS} #remove?
     ${QT_BINARY_DIR} #remove?
