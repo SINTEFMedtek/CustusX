@@ -107,7 +107,7 @@ PopupToolbarWidget::PopupToolbarWidget(QWidget* parent) :
 //	mButtonWidget->setVisible(false);
 	mControlLayout->addWidget(mButtonWidget);
 
-	mControlLayout->addStretch(1);
+//	mControlLayout->addStretch(1);
 
 	this->onPopup();
 }

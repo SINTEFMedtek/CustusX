@@ -87,6 +87,39 @@ private:
 	QWidget* mWidget;
 };
 
+/** A splitter with two subwidgets, with actions for swapping
+ * between them.
+ *
+ */
+class ControllableSplitter : public QWidget
+{
+	Q_OBJECT
+public:
+	ControllableSplitter(QWidget* parent);
+	void addLeftWidget(QWidget* widget);
+	void addRightWidget(QWidget* widget);
+	QAction* getMoveLeftAction();
+	QAction* getMoveRightAction();
+
+private:
+	void onMoveSplitterLeft();
+	void onMoveSplitterRight();
+	void shiftSplitter(int shift);
+	bool splitterShowsBoth() const;
+	void onSplitterMoved();
+
+	int getShiftState() const;
+	void setShiftState(int shiftState);
+
+	QSplitter* mSplitter;
+	QAction* mShiftSplitterLeft;
+	QAction* mShiftSplitterRight;
+//	QWidget* mLeftWidget;
+//	QWidget* mRightWidget;
+
+	double mSplitterRatio;
+};
+
 /**
  * \class BrowserWidget
  *
@@ -113,28 +146,26 @@ protected:
   virtual void closeEvent(QCloseEvent* event); ///<disconnects stuff
 
   TreeItemModel* mModel;
-  QTreeView* mTreeView;
-//  QVBoxLayout* mVerticalLayout; ///< vertical layout is used
+  QPointer<QTreeView> mTreeView;
 
 protected:
 	virtual void prePaintEvent();
   
 private:
+  BrowserWidget();
   void onNodeVisibilityChanged(QString nodeType, bool value);
   void onCurrentItemChanged();
   void createFilterSelector();
   void onFilterSelectorChanged();
   void createButtonWidget(QWidget* widget);
-  BrowserWidget();
+
   VisServicesPtr mServices;
-  QSplitter* mSplitter;
-  ReplacableContentWidget* mPropertiesWidget;
+  ControllableSplitter* mSplitter;
+  QPointer<ReplacableContentWidget> mPropertiesWidget;
   PopupToolbarWidget* mPopupWidget;
 //  XmlOptionFile mOptions;
 
   StringPropertyPtr mFilterSelector;
-//  QStringList mFilters;
-
 };
 }//end namespace cx
 

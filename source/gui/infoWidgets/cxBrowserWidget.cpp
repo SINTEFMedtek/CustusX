@@ -47,6 +47,152 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
+ControllableSplitter::ControllableSplitter(QWidget *parent) :
+	mShiftSplitterLeft(NULL),
+	mShiftSplitterRight(NULL),
+	mSplitterRatio(0.5)
+{
+	QVBoxLayout* layout = new QVBoxLayout(this);
+	layout->setMargin(0);
+	layout->setSpacing(0);
+
+	mSplitter = new QSplitter(Qt::Horizontal);
+	connect(mSplitter, &QSplitter::splitterMoved, this, &ControllableSplitter::onSplitterMoved);
+
+	layout->addWidget(mSplitter, 1);
+}
+
+void ControllableSplitter::addLeftWidget(QWidget *widget)
+{
+	mSplitter->insertWidget(0, widget);
+}
+void ControllableSplitter::addRightWidget(QWidget *widget)
+{
+	mSplitter->insertWidget(1, widget);
+}
+
+QAction* ControllableSplitter::getMoveLeftAction()
+{
+	if (!mShiftSplitterLeft)
+	{
+		QAction* action = new QAction(QIcon(":/icons/open_icon_library/arrow-left-3.png"),
+									  "Show props", this);
+		action->setToolTip("Show more properties");
+		action->setStatusTip(action->toolTip());
+		connect(action, &QAction::triggered, this, &ControllableSplitter::onMoveSplitterLeft);
+		mShiftSplitterLeft = action;
+	}
+	return mShiftSplitterLeft;
+}
+
+QAction* ControllableSplitter::getMoveRightAction()
+{
+	if (!mShiftSplitterRight)
+	{
+		QAction* action = new QAction(QIcon(":/icons/open_icon_library/arrow-right-3.png"),
+									  "Show browser", this);
+		action->setToolTip("Show more browser");
+		action->setStatusTip(action->toolTip());
+		connect(action, &QAction::triggered, this, &ControllableSplitter::onMoveSplitterRight);
+		mShiftSplitterRight = action;
+	}
+	return mShiftSplitterRight;
+}
+
+void ControllableSplitter::onMoveSplitterLeft()
+{
+	this->shiftSplitter(-1);
+}
+
+void ControllableSplitter::onMoveSplitterRight()
+{
+	this->shiftSplitter(+1);
+}
+
+void ControllableSplitter::onSplitterMoved()
+{
+	QList<int> sizes = mSplitter->sizes();
+	if (this->splitterShowsBoth())
+	{
+		mSplitterRatio = double(sizes[0]) /double(sizes[0]+sizes[1]);
+//		CX_LOG_CHANNEL_DEBUG("CA") << "moved, r=" << mSplitterRatio;
+	}
+//	CX_LOG_CHANNEL_DEBUG("CA") << "moved,sizes: " << sizes[0] << " - " << sizes[1];
+
+	mShiftSplitterLeft->setEnabled(this->getShiftState()>=0);
+	mShiftSplitterRight->setEnabled(this->getShiftState()<=0);
+}
+
+bool ControllableSplitter::splitterShowsBoth() const
+{
+	QList<int> sizes = mSplitter->sizes();
+	return (( sizes.size()==2 )&&( sizes[0]!=0 )&&( sizes[1]!=0 ));
+}
+
+int ControllableSplitter::getShiftState() const
+{
+	QList<int> sizes = mSplitter->sizes();
+
+	if(sizes[0]==0)
+		return -1;
+	else if(sizes[1]==0)
+		return 1;
+	else
+		return 0;
+}
+
+void ControllableSplitter::setShiftState(int shiftState)
+{
+	QList<int> sizes = mSplitter->sizes();
+
+	if (shiftState<0) // show props
+	{
+		sizes[0] = 0;
+		sizes[1] = 1;
+	}
+	else if (shiftState>0) // show both
+	{
+		sizes[0] = 1;
+		sizes[1] = 0;
+	}
+	else // shop browser
+	{
+		int sizesum = sizes[0]+sizes[1];
+//		CX_LOG_CHANNEL_DEBUG("CA") << "sizes: " << sizes[0] << " / " << sizes[1] << " / sum=" << sizesum << " / r=" << mSplitterRatio;
+		sizes[0] = mSplitterRatio * sizesum;
+		sizes[1] = (1.0-mSplitterRatio) * sizesum;
+	}
+	mSplitter->setSizes(sizes);
+//	CX_LOG_CHANNEL_DEBUG("CA") << "set sizes: " << sizes[0] << " / " << sizes[1];
+
+	this->onSplitterMoved();
+//	CX_LOG_CHANNEL_DEBUG("CA") << "this->getShiftState(): " << this->getShiftState();
+}
+
+void ControllableSplitter::shiftSplitter(int shift)
+{
+	// positive shift axis goes to the right, from browser to properties
+	//
+	QList<int> sizes = mSplitter->sizes();
+
+	int shiftState = this->getShiftState();
+
+//	CX_LOG_CHANNEL_DEBUG("CA") << "shiftstateA: " << shiftState;
+	shiftState += shift;
+//	CX_LOG_CHANNEL_DEBUG("CA") << "shiftstateB: " << shiftState;
+
+	this->setShiftState(shiftState);
+}
+
+} // namespace cx
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+namespace cx
+{
+
 BrowserWidget::BrowserWidget(QWidget* parent, VisServicesPtr services) :
 	BaseWidget(parent, "BrowserWidget", "Browser"),
 	mServices(services)
@@ -59,7 +205,6 @@ BrowserWidget::BrowserWidget(QWidget* parent, VisServicesPtr services) :
 	mModel = new TreeItemModel(services, this);
 	connect(mModel, &TreeItemModel::hasBeenReset, this, &BrowserWidget::setModified);
 	connect(mModel, &TreeItemModel::currentItemChanged, this, &BrowserWidget::onCurrentItemChanged);
-	//  mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mModel->getFilter()));
 
 	//layout
 	mTreeView = new QTreeView(this);
@@ -70,24 +215,19 @@ BrowserWidget::BrowserWidget(QWidget* parent, VisServicesPtr services) :
 	mPopupWidget = new PopupToolbarWidget(this);
 //	connect(mPopupWidget, &PopupToolbarWidget::popup, this, &ConsoleWidget::updateShowHeader);
 	layout->addWidget(mPopupWidget);
-	this->createButtonWidget(mPopupWidget->getToolbar());
 
-
-	QSplitter *splitter = new QSplitter(Qt::Horizontal);
-	mSplitter = splitter;
-
+	mSplitter = new ControllableSplitter(this);
 	layout->addWidget(mSplitter, 1);
-	mSplitter->addWidget(mTreeView);
-
+	mSplitter->addLeftWidget(mTreeView);
 	mPropertiesWidget = new ReplacableContentWidget(this);
-	mSplitter->addWidget(mPropertiesWidget);
+	mSplitter->addRightWidget(mPropertiesWidget);
 
+	this->createButtonWidget(mPopupWidget->getToolbar());
 }
 
 BrowserWidget::~BrowserWidget()
 {
 }
-
 
 void BrowserWidget::showEvent(QShowEvent* event)
 {
@@ -112,14 +252,6 @@ void BrowserWidget::createButtonWidget(QWidget* widget)
 	buttonLayout->setMargin(0);
 	buttonLayout->setSpacing(0);
 
-//	QIcon icon(":/icons/open_icon_library/system-run-5.png");
-//	QAction* action = this->createAction(this,
-//										 icon,
-//										 "Details", "Show detailed info on each log entry",
-//										 SLOT(updateUI()),
-//										 buttonLayout, new CXSmallToolButton());
-//	action->setCheckable(true);
-
 	QStringList allnodetypes = mModel->repo()->getAllNodeTypes();
 	QStringList visiblenodetypes = mModel->repo()->getVisibleNodeTypes();
 
@@ -134,10 +266,6 @@ void BrowserWidget::createButtonWidget(QWidget* widget)
 		QWidgetAction *checkableAction = new QWidgetAction(menu);
 		checkableAction->setDefaultWidget(checkBox);
 		menu->addAction(checkableAction);
-
-//		QAction* action = new QAction(QIcon(), QString("action%1").arg(i), this);
-//		action->setCheckable(true);
-//		menu->addAction(action);
 	}
 
 	QToolButton* visibilityButton = new CXSmallToolButton();
@@ -148,14 +276,25 @@ void BrowserWidget::createButtonWidget(QWidget* widget)
 	buttonLayout->addWidget(visibilityButton);
 
 	this->createFilterSelector();
-	LabeledComboBoxWidget* channelSelectorWidget = new LabeledComboBoxWidget(this, mFilterSelector);
-	channelSelectorWidget->showLabel(false);
+	LabeledComboBoxWidget* filterSelectorWidget = new LabeledComboBoxWidget(this, mFilterSelector);
+	filterSelectorWidget->showLabel(false);
 	buttonLayout->addSpacing(8);
-	buttonLayout->addWidget(channelSelectorWidget);
+	buttonLayout->addWidget(filterSelectorWidget);
 	buttonLayout->setStretch(buttonLayout->count()-1, 0);
 
 	buttonLayout->addSpacing(8);
+
+	// everything being added after this will be aligned to the right side
 	buttonLayout->addStretch(1);
+
+	QToolButton* button;
+	button = new CXSmallToolButton();
+	button->setDefaultAction(mSplitter->getMoveLeftAction());
+	buttonLayout->addWidget(button);
+
+	button = new CXSmallToolButton();
+	button->setDefaultAction(mSplitter->getMoveRightAction());
+	buttonLayout->addWidget(button);
 }
 
 void BrowserWidget::onNodeVisibilityChanged(QString nodeType, bool value)
@@ -168,10 +307,6 @@ void BrowserWidget::onNodeVisibilityChanged(QString nodeType, bool value)
 		visible.removeAll(nodeType);
 	mModel->repo()->setVisibleNodeTypes(visible);
 }
-
-//QStringList getVisibleNodeTypes() const { return mVisibleNodeTypes; }
-//void setVisibleNodeTypes(QStringList val) { if (mVisibleNodeTypes==val) return; mVisibleNodeTypes = val; this->invalidate(); }
-//QStringList getAllNodeTypes() const { return mAllNodeTypes; }
 
 void BrowserWidget::createFilterSelector()
 {
