@@ -69,7 +69,8 @@ SelectedMeshInfoWidget::SelectedMeshInfoWidget(PatientModelServicePtr patientMod
 }
 
 SelectedMeshInfoWidget::~SelectedMeshInfoWidget()
-{}
+{
+}
 
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -88,7 +89,8 @@ MeshInfoWidget::MeshInfoWidget(StringPropertySelectMeshPtr meshSelector,
 }
 
 MeshInfoWidget::~MeshInfoWidget()
-{}
+{
+}
 
 void MeshInfoWidget::setColorSlot()
 {

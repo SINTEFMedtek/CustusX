@@ -154,19 +154,32 @@ void DataTreeNode::setViewGroupVisibility(int index, bool value)
 
 QWidget* DataTreeNode::createPropertiesWidget() const
 {
+	WidgetTypeRepositoryPtr wrepo = this->repo()->getWidgetTypeRepository();
+
 	if (boost::dynamic_pointer_cast<Mesh>(mData))
 	{
-		StringPropertySelectMeshPtr meshSelector = StringPropertySelectMesh::New(this->getServices()->patient());
-		meshSelector->setValue(mData->getUid());
-		return new MeshInfoWidget(meshSelector,
-								  this->getServices()->patient(),
-								  this->getServices()->view(),
-								  NULL);
+		MeshInfoWidget* widget = wrepo->find<MeshInfoWidget>();
+		if (!widget)
+		{
+			StringPropertySelectMeshPtr meshSelector = StringPropertySelectMesh::New(this->getServices()->patient());
+			widget = new MeshInfoWidget(meshSelector,
+										this->getServices()->patient(),
+										this->getServices()->view(),
+										NULL);
+			wrepo->add(widget);
+		}
+		widget->getSelector()->setValue(mData->getUid());
+		return widget;
 	}
 	if (boost::dynamic_pointer_cast<Image>(mData))
 	{
-		return new ImagePropertiesWidget(this->getServices(),
-								  NULL);
+		ImagePropertiesWidget* widget = wrepo->find<ImagePropertiesWidget>();
+		if (!widget)
+		{
+			widget = new ImagePropertiesWidget(this->getServices(), NULL);
+			wrepo->add(widget);
+		}
+		return widget;
 	}
 	return new QLabel(QString("Data widget %1 ").arg(mData->getName()));
 }

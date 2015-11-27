@@ -76,6 +76,8 @@ public:
 				   QWidget* parent);
   virtual ~MeshInfoWidget();
 
+	StringPropertySelectMeshPtr getSelector() { return mSelectMeshWidget; }
+
 protected slots:
   void setColorSlot();
   void setColorSlotDelayed();

@@ -47,6 +47,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
+void WidgetTypeRepository::add(QWidget *widget)
+{
+#include <QObject>
+	mWidgets.push_back(widget);
+}
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
 TreeRepositoryPtr TreeRepository::create(XmlOptionFile options, VisServicesPtr services)
 {
 	TreeRepositoryPtr retval(new TreeRepository(options, services));
@@ -66,6 +76,7 @@ TreeRepository::TreeRepository(XmlOptionFile options, VisServicesPtr services) :
 	mAllNodeTypes << "data" << "metric" << "image" << "model" << "tool";
 	mVisibleNodeTypes = this->getVisibleNodeTypesOption().readValue(mAllNodeTypes.join(";")).split(";");
 
+	mWidgetTypeRepository.reset(new WidgetTypeRepository());
 
 	this->startListen();
 }
@@ -143,6 +154,11 @@ TreeNodePtr TreeRepository::getTopNode()
 VisServicesPtr TreeRepository::getServices()
 {
 	return mServices;
+}
+
+WidgetTypeRepositoryPtr TreeRepository::getWidgetTypeRepository()
+{
+	return mWidgetTypeRepository;
 }
 
 void TreeRepository::insertTopNode()
@@ -232,5 +248,6 @@ void TreeRepository::insertSpaceNode(CoordinateSystem space)
 	TreeNodePtr node(new SpaceTreeNode(mSelf, space));
 	mNodes.push_back(node);
 }
+
 
 } // namespace cx

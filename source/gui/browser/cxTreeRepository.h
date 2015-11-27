@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/shared_ptr.hpp>
 #include <QString>
 #include <QObject>
+#include <QWidget>
 #include "cxForwardDeclarations.h"
 #include "cxCoordinateSystemHelpers.h"
 #include "cxXmlOptionItem.h"
@@ -49,7 +50,28 @@ class TreeRepository;
 typedef boost::shared_ptr<TreeNode> TreeNodePtr;
 typedef boost::shared_ptr<TreeRepository> TreeRepositoryPtr;
 typedef boost::weak_ptr<class TreeRepository> TreeRepositoryWeakPtr;
+typedef boost::shared_ptr<class WidgetTypeRepository> WidgetTypeRepositoryPtr;
 
+class WidgetTypeRepository
+{
+public:
+	template<class WIDGET>
+	WIDGET* find()
+	{
+		for (unsigned i=0; i<mWidgets.size(); ++i)
+		{
+			WIDGET* w = dynamic_cast<WIDGET*>(mWidgets[i].data());
+			if (w)
+				return w;
+		}
+		return NULL;
+	}
+	void add(QWidget* widget);
+
+private:
+	typedef QPointer<QWidget> QWidgetPtr;
+	std::vector<QWidgetPtr> mWidgets;
+};
 
 class TreeRepository : public QObject
 {
@@ -66,6 +88,7 @@ public:
 	TreeNodePtr getNodeForGroup(QString groupname);
 	VisServicesPtr getServices();
 
+	WidgetTypeRepositoryPtr getWidgetTypeRepository();
 
 	QString getMode() const { return mMode; }
 	void setMode(QString val) { this->invalidate(); if (mMode==val) return; mMode = val; this->invalidate(); }
@@ -95,6 +118,7 @@ private:
 	QStringList mVisibleNodeTypes;
 	QStringList mAllNodeTypes;
 	XmlOptionFile mOptions;
+	WidgetTypeRepositoryPtr mWidgetTypeRepository;
 
 	explicit TreeRepository(XmlOptionFile options, VisServicesPtr services);
 	void rebuild();
