@@ -47,13 +47,12 @@ class cxResourceWidgets_EXPORT PopupButton : public QFrame
 public:
 	PopupButton(QWidget *parent = NULL);
 	bool getShowPopup() const;
+	void setShowPopup(bool val);
 
 signals:
 	void popup(bool show);
 private slots:
 	void onTriggered();
-protected:
-//	void mouseMoveEvent(QMouseEvent* event);
 private:
 	QAction* mAction;
 	QToolButton* mShowHeaderButton;
@@ -78,8 +77,14 @@ public:
 	/**
 	 * Return true if the popup is activated, i.e. the popup
 	 * is pressed and the toolbar is visible.
+	 *
+	 * Default: false.
 	 */
 	bool popupIsVisible() const;
+	/**
+	 * Show or hide the popup.
+	 */
+	void setPopupVisible(bool val);
 	/**
 	 * Return an empty widget inside the toolbar. It can
 	 * be filled with buttons or anything else.

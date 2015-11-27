@@ -20,14 +20,15 @@ namespace cx
 
 
 
-TreeItemModel::TreeItemModel(VisServicesPtr services, QObject* parent) :
+TreeItemModel::TreeItemModel(XmlOptionFile options, VisServicesPtr services, QObject* parent) :
 	QAbstractItemModel(parent),
-	mServices(services)
+	mServices(services),
+	mOptions(options)
 {
 	mSelectionModel = NULL;
 	mViewGroupCount = 3;
 
-	mRepository = TreeRepository::create(services);
+	mRepository = TreeRepository::create(options.descend("repository"), services);
 	connect(mRepository.get(), &TreeRepository::invalidated, this, &TreeItemModel::hasBeenReset);
 	connect(mRepository.get(), &TreeRepository::changed, this, &TreeItemModel::onRepositoryChanged);
 }

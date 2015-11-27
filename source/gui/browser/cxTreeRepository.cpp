@@ -47,22 +47,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-TreeRepositoryPtr TreeRepository::create(VisServicesPtr services)
+TreeRepositoryPtr TreeRepository::create(XmlOptionFile options, VisServicesPtr services)
 {
-	TreeRepositoryPtr retval(new TreeRepository(services));
+	TreeRepositoryPtr retval(new TreeRepository(options, services));
 	retval->mSelf = retval;
 	retval->insertTopNode();
 	return retval;
 }
 
-TreeRepository::TreeRepository(VisServicesPtr services) :
+TreeRepository::TreeRepository(XmlOptionFile options, VisServicesPtr services) :
 	mInvalid(true),
-	mServices(services)
+	mServices(services),
+	mOptions(options)
 {
 	mAllModes << "spaces" << "flat";
-	mMode = mAllModes.front();
+	mMode = this->getModeOption().readValue(mAllModes.front());
+
 	mAllNodeTypes << "data" << "metric" << "image" << "model" << "tool";
-	mVisibleNodeTypes << mAllNodeTypes;
+	mVisibleNodeTypes = this->getVisibleNodeTypesOption().readValue(mAllNodeTypes.join(";")).split(";");
+
 
 	this->startListen();
 }
@@ -70,6 +73,8 @@ TreeRepository::TreeRepository(VisServicesPtr services) :
 TreeRepository::~TreeRepository()
 {
 	this->stopListen();
+	this->getModeOption().writeValue(mMode);
+	this->getVisibleNodeTypesOption().writeValue(mVisibleNodeTypes.join(";"));
 }
 
 void TreeRepository::update()
@@ -98,6 +103,16 @@ void TreeRepository::stopListen()
 	disconnect(this->getServices()->patient()->getActiveData().get(), &ActiveData::activeDataChanged, this, &TreeRepository::changed);
 	disconnect(this->getServices()->tracking().get(), &TrackingService::stateChanged, this, &TreeRepository::invalidate);
 	disconnect(this->getServices()->patient().get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(invalidate()));
+}
+
+XmlOptionItem TreeRepository::getModeOption()
+{
+	return XmlOptionItem("mode", mOptions.getElement());
+}
+
+XmlOptionItem TreeRepository::getVisibleNodeTypesOption()
+{
+	return XmlOptionItem("visible_node_types", mOptions.getElement());
 }
 
 std::vector<TreeNodePtr> TreeRepository::getNodes()

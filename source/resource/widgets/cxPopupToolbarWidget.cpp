@@ -42,7 +42,6 @@ namespace cx
 
 PopupButton::PopupButton(QWidget* parent)
 {
-//	this->setMouseTracking(true);
 	//	this->setFrameStyle(QFrame::Box);
 
 	QVBoxLayout* layout = new QVBoxLayout(this);
@@ -68,14 +67,14 @@ PopupButton::PopupButton(QWidget* parent)
 	action->setCheckable(true);
 }
 
-//void PopupButton::mouseMoveEvent(QMouseEvent* event)
-//{
-//	std::cout << "mouse move" << std::endl;
-//}
-
 bool PopupButton::getShowPopup() const
 {
 	return mShowHeaderButton->isChecked();
+}
+
+void PopupButton::setShowPopup(bool val)
+{
+	mShowHeaderButton->setChecked(val);
 }
 
 void PopupButton::onTriggered()
@@ -97,17 +96,13 @@ PopupToolbarWidget::PopupToolbarWidget(QWidget* parent) :
 {
 	mControlLayout = new QHBoxLayout(this);
 	mControlLayout->setMargin(0);
-//	layout->addLayout(mControlLayout);
 
 	mShowControlsButton = new PopupButton(this->parentWidget());
 	mControlLayout->addWidget(mShowControlsButton);
 	connect(mShowControlsButton, &PopupButton::popup, this, &PopupToolbarWidget::onPopup);
 
 	mButtonWidget = new QWidget(this);
-//	mButtonWidget->setVisible(false);
 	mControlLayout->addWidget(mButtonWidget);
-
-//	mControlLayout->addStretch(1);
 
 	this->onPopup();
 }
@@ -120,15 +115,18 @@ QWidget* PopupToolbarWidget::getToolbar()
 bool PopupToolbarWidget::popupIsVisible() const
 {
 	return mButtonWidget->isVisible();
-//	return mShowControlsButton->getShowPopup();
+	//	return mShowControlsButton->getShowPopup();
+}
+
+void PopupToolbarWidget::setPopupVisible(bool val)
+{
+	mShowControlsButton->setShowPopup(val);
 }
 
 void PopupToolbarWidget::onPopup()
 {
-//	std::cout << "PopupToolbarWidget::onPopup()" << std::endl;
 	bool show = mShowControlsButton->getShowPopup();
 
-//	mMessagesWidget->showHeader(show);
 	mButtonWidget->setVisible(show);
 
 	if (show)
@@ -142,7 +140,6 @@ void PopupToolbarWidget::onPopup()
 		mShowControlsButton->setParent(NULL);
 		mShowControlsButton->setParent(this->parentWidget());
 		mShowControlsButton->setVisible(true);
-
 	}
 
 	emit popup(show);

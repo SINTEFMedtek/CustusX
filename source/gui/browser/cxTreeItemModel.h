@@ -7,7 +7,9 @@
 #include "cxImage.h"
 #include "cxTreeNode.h"
 #include "cxStringProperty.h"
+#include "cxXmlOptionItem.h"
 #include "cxLabeledComboBoxWidget.h"
+
 class QTreeWidget;
 class QVBoxLayout;
 class QTreeWidgetItem;
@@ -26,7 +28,7 @@ class TreeItemModel : public QAbstractItemModel
 {
   Q_OBJECT
 public:
-  TreeItemModel(VisServicesPtr services, QObject* parent = 0);
+  TreeItemModel(XmlOptionFile options, VisServicesPtr services, QObject* parent = 0);
   virtual ~TreeItemModel();
   void setSelectionModel(QItemSelectionModel* selectionModel);
 
@@ -41,10 +43,6 @@ public:
   virtual QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex() ) const;
   virtual QModelIndex parent(const QModelIndex& index ) const;
 
-  //  virtual bool hasChildren(const QModelIndex& parent = QModelIndex() ) const;
-  //  virtual bool    setData ( const QModelIndex & index, const QVariant & value, int role = Qt::EditRole )
-//  StringPropertyPtr getFilter();
-
   TreeNodePtr getCurrentItem();
   TreeRepositoryPtr repo() { return mRepository; }
 
@@ -54,7 +52,6 @@ signals:
 
 public slots:
   void update();
-//  void treeItemChangedSlot();
 
 private slots:
   void currentItemChangedSlot(const QModelIndex& current, const QModelIndex& previous);
@@ -62,12 +59,11 @@ private slots:
 
 private:
   int mViewGroupCount;
-//  void buildTree();
   TreeRepositoryPtr mRepository;
-//  TreeItemPtr mTree;
   QItemSelectionModel* mSelectionModel;
+  XmlOptionFile mOptions;
   VisServicesPtr mServices;
-//  StringPropertyPtr mFilter;
+
   TreeNode* itemFromIndex(const QModelIndex& index) const;
   void fillModelTreeFromViewManager(TreeNodePtr root);
 };

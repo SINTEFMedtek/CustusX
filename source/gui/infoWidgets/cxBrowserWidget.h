@@ -97,8 +97,8 @@ class ControllableSplitter : public QWidget
 public:
 	ControllableSplitter(XmlOptionFile options, QWidget* parent);
 	~ControllableSplitter();
-	void addLeftWidget(QWidget* widget);
-	void addRightWidget(QWidget* widget);
+	void addLeftWidget(QWidget* widget, QString name);
+	void addRightWidget(QWidget* widget, QString name);
 	QAction* getMoveLeftAction();
 	QAction* getMoveRightAction();
 
@@ -121,8 +121,8 @@ private:
 	QAction* mShiftSplitterLeft;
 	QAction* mShiftSplitterRight;
 	XmlOptionFile mOptions;
-//	QWidget* mLeftWidget;
-//	QWidget* mRightWidget;
+	QString mLeftName;
+	QString mRightName;
 
 	double mSplitterRatio;
 };
@@ -149,9 +149,6 @@ protected slots:
   void resetView(); // called when tree is reset
 
 protected:
-  virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
-  virtual void closeEvent(QCloseEvent* event); ///<disconnects stuff
-
   TreeItemModel* mModel;
   QPointer<QTreeView> mTreeView;
 
@@ -159,12 +156,14 @@ protected:
 	virtual void prePaintEvent();
   
 private:
-  BrowserWidget();
+  void createGUI();
   void onNodeVisibilityChanged(QString nodeType, bool value);
+  void onPopup();
   void onCurrentItemChanged();
   void createFilterSelector();
   void onFilterSelectorChanged();
   void createButtonWidget(QWidget* widget);
+  XmlOptionItem getShowToolbarOption();
 
   VisServicesPtr mServices;
   ControllableSplitter* mSplitter;

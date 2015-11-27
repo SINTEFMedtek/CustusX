@@ -62,7 +62,6 @@ Profile::Profile(QString path, SettingsPtr settings)
 Profile::~Profile()
 {
 	this->getXmlSettings().save();
-	CX_LOG_CHANNEL_DEBUG("CA") << "----------Profile::~Profile()";
 }
 
 void Profile::activate()

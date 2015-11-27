@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include "cxForwardDeclarations.h"
 #include "cxCoordinateSystemHelpers.h"
-
+#include "cxXmlOptionItem.h"
 
 namespace cx
 {
@@ -55,7 +55,7 @@ class TreeRepository : public QObject
 {
 	Q_OBJECT
 public:
-	static TreeRepositoryPtr create(VisServicesPtr services);
+	static TreeRepositoryPtr create(XmlOptionFile options, VisServicesPtr services);
 	~TreeRepository();
 
 	std::vector<TreeNodePtr> getNodes();
@@ -82,6 +82,9 @@ signals:
 	void changed();
 	void invalidated();
 private:
+	XmlOptionItem getModeOption();
+	XmlOptionItem getVisibleNodeTypesOption();
+
 	std::vector<TreeNodePtr> mNodes;
 	TreeRepositoryWeakPtr mSelf;
 	bool mInvalid;
@@ -91,8 +94,9 @@ private:
 	QStringList mAllModes;
 	QStringList mVisibleNodeTypes;
 	QStringList mAllNodeTypes;
+	XmlOptionFile mOptions;
 
-	explicit TreeRepository(VisServicesPtr services);
+	explicit TreeRepository(XmlOptionFile options, VisServicesPtr services);
 	void rebuild();
 	void insertTopNode();
 	void insertDataNode(DataPtr data);

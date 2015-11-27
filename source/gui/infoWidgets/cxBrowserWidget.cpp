@@ -86,18 +86,21 @@ XmlOptionItem ControllableSplitter::getShiftStateOption()
 	return XmlOptionItem("shift_state", mOptions.getElement());
 }
 
-void ControllableSplitter::addLeftWidget(QWidget *widget)
+void ControllableSplitter::addLeftWidget(QWidget *widget, QString name)
 {
+	mLeftName = name;
 	mSplitter->insertWidget(0, widget);
 }
-void ControllableSplitter::addRightWidget(QWidget *widget)
+void ControllableSplitter::addRightWidget(QWidget *widget, QString name)
 {
+	mRightName = name;
 	mSplitter->insertWidget(1, widget);
 }
 
 void ControllableSplitter::initializeSettings()
 {
 	this->setShiftState(this->getShiftStateOption().readValue("0").toInt());
+	this->onSplitterMoved();
 }
 
 QAction* ControllableSplitter::getMoveLeftAction()
@@ -105,8 +108,8 @@ QAction* ControllableSplitter::getMoveLeftAction()
 	if (!mShiftSplitterLeft)
 	{
 		QAction* action = new QAction(QIcon(":/icons/open_icon_library/arrow-left-3.png"),
-									  "Show props", this);
-		action->setToolTip("Show more properties");
+									  QString("Show %1").arg(mRightName), this);
+		action->setToolTip(QString("Show more %1").arg(mRightName));
 		action->setStatusTip(action->toolTip());
 		connect(action, &QAction::triggered, this, &ControllableSplitter::onMoveSplitterLeft);
 		mShiftSplitterLeft = action;
@@ -120,8 +123,8 @@ QAction* ControllableSplitter::getMoveRightAction()
 	if (!mShiftSplitterRight)
 	{
 		QAction* action = new QAction(QIcon(":/icons/open_icon_library/arrow-right-3.png"),
-									  "Show browser", this);
-		action->setToolTip("Show more browser");
+									  QString("Show %1").arg(mLeftName), this);
+		action->setToolTip(QString("Show more %1").arg(mLeftName));
 		action->setStatusTip(action->toolTip());
 		connect(action, &QAction::triggered, this, &ControllableSplitter::onMoveSplitterRight);
 		mShiftSplitterRight = action;
@@ -220,16 +223,49 @@ namespace cx
 
 BrowserWidget::BrowserWidget(QWidget* parent, VisServicesPtr services) :
 	BaseWidget(parent, "BrowserWidget", "Browser"),
-	mServices(services)
+	mServices(services),
+	mModel(NULL)
 {
 	mOptions = profile()->getXmlSettings().descend(this->objectName());
+	this->setModified();
 
+//	QVBoxLayout* layout = new QVBoxLayout(this);
+//	layout->setMargin(0);
+//	layout->setSpacing(0);
+
+//	mModel = new TreeItemModel(mOptions.descend("model"), services, this);
+//	connect(mModel, &TreeItemModel::hasBeenReset, this, &BrowserWidget::setModified);
+//	connect(mModel, &TreeItemModel::currentItemChanged, this, &BrowserWidget::onCurrentItemChanged);
+
+//	//layout
+//	mTreeView = new QTreeView(this);
+//	mTreeView->setRootIsDecorated(false);
+//	mTreeView->setModel(mModel);
+//	mModel->setSelectionModel(mTreeView->selectionModel());
+
+//	mPopupWidget = new PopupToolbarWidget(this);
+//	connect(mPopupWidget, &PopupToolbarWidget::popup, this, &BrowserWidget::onPopup);
+//	layout->addWidget(mPopupWidget);
+//	mPopupWidget->setPopupVisible(this->getShowToolbarOption().readValue(QString::number(false)).toInt());
+
+//	mPropertiesWidget = new ReplacableContentWidget(this);
+//	mPropertiesWidget->setWidget(new QLabel("<not available>"));
+
+//	mSplitter = new ControllableSplitter(mOptions.descend("splitter"), this);
+//	layout->addWidget(mSplitter, 1);
+//	mSplitter->addLeftWidget(mTreeView, "browser");
+//	mSplitter->addRightWidget(mPropertiesWidget, "properties");
+
+//	this->createButtonWidget(mPopupWidget->getToolbar());
+}
+
+void BrowserWidget::createGUI()
+{
 	QVBoxLayout* layout = new QVBoxLayout(this);
 	layout->setMargin(0);
 	layout->setSpacing(0);
 
-	this->setModified();
-	mModel = new TreeItemModel(services, this);
+	mModel = new TreeItemModel(mOptions.descend("model"), mServices, this);
 	connect(mModel, &TreeItemModel::hasBeenReset, this, &BrowserWidget::setModified);
 	connect(mModel, &TreeItemModel::currentItemChanged, this, &BrowserWidget::onCurrentItemChanged);
 
@@ -240,34 +276,34 @@ BrowserWidget::BrowserWidget(QWidget* parent, VisServicesPtr services) :
 	mModel->setSelectionModel(mTreeView->selectionModel());
 
 	mPopupWidget = new PopupToolbarWidget(this);
-//	connect(mPopupWidget, &PopupToolbarWidget::popup, this, &ConsoleWidget::updateShowHeader);
+	connect(mPopupWidget, &PopupToolbarWidget::popup, this, &BrowserWidget::onPopup);
 	layout->addWidget(mPopupWidget);
+	mPopupWidget->setPopupVisible(this->getShowToolbarOption().readValue(QString::number(false)).toInt());
 
-	mSplitter = new ControllableSplitter(mOptions, this);
-	layout->addWidget(mSplitter, 1);
-	mSplitter->addLeftWidget(mTreeView);
 	mPropertiesWidget = new ReplacableContentWidget(this);
 	mPropertiesWidget->setWidget(new QLabel("<not available>"));
-	mSplitter->addRightWidget(mPropertiesWidget);
+
+	mSplitter = new ControllableSplitter(mOptions.descend("splitter"), this);
+	layout->addWidget(mSplitter, 1);
+	mSplitter->addLeftWidget(mTreeView, "browser");
+	mSplitter->addRightWidget(mPropertiesWidget, "properties");
 
 	this->createButtonWidget(mPopupWidget->getToolbar());
+}
+
+void BrowserWidget::onPopup()
+{
+	this->getShowToolbarOption().writeValue(QString::number(mPopupWidget->popupIsVisible()));
 }
 
 BrowserWidget::~BrowserWidget()
 {
 }
 
-void BrowserWidget::showEvent(QShowEvent* event)
-{
-	QWidget::showEvent(event);
-}
-void BrowserWidget::closeEvent(QCloseEvent* event)
-{
-	QWidget::closeEvent(event);
-}
-
 void BrowserWidget::prePaintEvent()
 {
+	if (!mModel)
+		this->createGUI();
 	mPopupWidget->refresh();
 //	CX_LOG_CHANNEL_DEBUG("CA") << "BrowserWidget::prePaintEvent() modified";
 	mModel->update();
@@ -323,6 +359,11 @@ void BrowserWidget::createButtonWidget(QWidget* widget)
 	button = new CXSmallToolButton();
 	button->setDefaultAction(mSplitter->getMoveRightAction());
 	buttonLayout->addWidget(button);
+}
+
+XmlOptionItem BrowserWidget::getShowToolbarOption()
+{
+	return XmlOptionItem("show_toolbar", mOptions.getElement());
 }
 
 void BrowserWidget::onNodeVisibilityChanged(QString nodeType, bool value)
