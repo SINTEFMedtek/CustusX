@@ -17,15 +17,17 @@ import cxUtilities
 
 class CatchCustomXmlNameListParser:
     '''
-    Parser providing the test names and tags from 
+    Parser providing the test names and tags from
     the "catch --list-tests --reporter xml" call.
     Format is specified by the custusX CatchImpl class,
     i.e. an addon to the original catch.
-    '''        
+    '''
     def read(self, text):
         lxml = cxUtilities.try_lxml_import()
         self.tests = []
-        root = lxml.etree.fromstring(text)
+
+        xmltext = self._removeNonXmlLines(text)
+        root = lxml.etree.fromstring(xmltext)
         for test in root:
             #print 'keys', test.keys()
             #print test.get('name')
@@ -39,6 +41,14 @@ class CatchCustomXmlNameListParser:
         return [val['text'] for val in self.tests if val['tags'].find(tag)>=0]
     def getTests(self):
         return [val['text'] for val in self.tests]
+
+    def _removeNonXmlLines(self, text):
+        inputtext = text.splitlines()
+        newtext = ""
+        for line in inputtext:
+            if "<" in line:
+                newtext+=line
+        return newtext
 
 class CatchConsoleNameListParser:
     '''
