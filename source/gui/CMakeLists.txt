@@ -12,6 +12,7 @@ cx_add_class_qt_moc(cxGui_SRCS
 	browser/cxTopTreeNode
 	browser/cxToolTreeNode
 	browser/cxTreeNodeImpl
+	browser/cxControllableSplitter
 		filterWidgets/cxFilterSetupWidget
         filterWidgets/cxFiltersWidget
 	#----------------------
@@ -93,7 +94,8 @@ cx_add_class_qt_moc(cxGui_SRCS
 
 cx_add_class(cxGui_SRCS
 	${cxGui_SRCS}
-        cxMainWindowApplicationComponent.h
+	browser/cxReplacableContentWidget
+		cxMainWindowApplicationComponent.h
 )
 
 cx_create_export_header("cxGui")

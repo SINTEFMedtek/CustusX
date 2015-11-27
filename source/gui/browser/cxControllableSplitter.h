@@ -29,76 +29,56 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXBROWSERWIDGET_H_
-#define CXBROWSERWIDGET_H_
+#ifndef CXCONTROLLABLESPLITTER_H
+#define CXCONTROLLABLESPLITTER_H
 
-#include "cxBaseWidget.h"
-#include "cxForwardDeclarations.h"
-#include "cxPopupToolbarWidget.h"
 #include "cxXmlOptionItem.h"
-#include "cxControllableSplitter.h"
-#include "cxReplacableContentWidget.h"
-
-class QTreeWidget;
-class QVBoxLayout;
-class QTreeWidgetItem;
-class QTreeView;
+#include <QWidget>
 class QSplitter;
 
 namespace cx
 {
 
-class PopupToolbarWidget;
-class TreeItemModel;
-typedef boost::shared_ptr<class TreeRepository> TreeRepositoryPtr;
-
-
-/**
- * \class BrowserWidget
+/** A splitter with two subwidgets, with actions for swapping
+ * between them.
  *
- * \brief Shows a treestructure containing the loaded images, meshes
- * and tools.
- * \ingroup cxGUI
- *
- * \date Feb 11, 2010
- * \\author Janne Beate Bakeng, SINTEF
  */
-class BrowserWidget : public BaseWidget
+class ControllableSplitter : public QWidget
 {
-  Q_OBJECT
-
+	Q_OBJECT
 public:
-  BrowserWidget(QWidget* parent, VisServicesPtr services);
-  ~BrowserWidget();
+	ControllableSplitter(XmlOptionFile options, QWidget* parent);
+	~ControllableSplitter();
+	void addLeftWidget(QWidget* widget, QString name);
+	void addRightWidget(QWidget* widget, QString name);
+	QAction* getMoveLeftAction();
+	QAction* getMoveRightAction();
 
-protected slots:
-  void resetView(); // called when tree is reset
-
-protected:
-  TreeItemModel* mModel;
-  QPointer<QTreeView> mTreeView;
-
-protected:
-	virtual void prePaintEvent();
-  
 private:
-  void createGUI();
-  void onNodeVisibilityChanged(QString nodeType, bool value);
-  void onPopup();
-  void onCurrentItemChanged();
-  void createFilterSelector();
-  void onFilterSelectorChanged();
-  void createButtonWidget(QWidget* widget);
-  XmlOptionItem getShowToolbarOption();
+	void onMoveSplitterLeft();
+	void onMoveSplitterRight();
+	void shiftSplitter(int shift);
+	bool splitterShowsBoth() const;
+	void onSplitterMoved();
 
-  VisServicesPtr mServices;
-  ControllableSplitter* mSplitter;
-  QPointer<ReplacableContentWidget> mPropertiesWidget;
-  PopupToolbarWidget* mPopupWidget;
-  XmlOptionFile mOptions;
+	void initializeSettings();
+	int getShiftState() const;
+	void setShiftState(int shiftState);
+	void enableActions();
 
-  StringPropertyPtr mFilterSelector;
+	XmlOptionItem getSplitterRatioOption();
+	XmlOptionItem getShiftStateOption();
+
+	QSplitter* mSplitter;
+	QAction* mShiftSplitterLeft;
+	QAction* mShiftSplitterRight;
+	XmlOptionFile mOptions;
+	QString mLeftName;
+	QString mRightName;
+
+	double mSplitterRatio;
 };
+
 }//end namespace cx
 
-#endif /* CXBROWSERWIDGET_H_ */
+#endif // CXCONTROLLABLESPLITTER_H

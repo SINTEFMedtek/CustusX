@@ -1,0 +1,2 @@
+#include "cxReplacableContentWidget.h"
+

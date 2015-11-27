@@ -29,76 +29,52 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXBROWSERWIDGET_H_
-#define CXBROWSERWIDGET_H_
+#ifndef CXREPLACABLECONTENTWIDGET_H
+#define CXREPLACABLECONTENTWIDGET_H
 
-#include "cxBaseWidget.h"
-#include "cxForwardDeclarations.h"
-#include "cxPopupToolbarWidget.h"
-#include "cxXmlOptionItem.h"
-#include "cxControllableSplitter.h"
-#include "cxReplacableContentWidget.h"
-
-class QTreeWidget;
-class QVBoxLayout;
-class QTreeWidgetItem;
-class QTreeView;
-class QSplitter;
+#include <QWidget>
+#include <QVBoxLayout>
 
 namespace cx
 {
 
-class PopupToolbarWidget;
-class TreeItemModel;
-typedef boost::shared_ptr<class TreeRepository> TreeRepositoryPtr;
-
-
-/**
- * \class BrowserWidget
+/** Widget wrapping another widget that can be replaced,
+ *  the previous content being destroyed.
  *
- * \brief Shows a treestructure containing the loaded images, meshes
- * and tools.
- * \ingroup cxGUI
- *
- * \date Feb 11, 2010
- * \\author Janne Beate Bakeng, SINTEF
  */
-class BrowserWidget : public BaseWidget
+class ReplacableContentWidget : public QWidget
 {
-  Q_OBJECT
-
 public:
-  BrowserWidget(QWidget* parent, VisServicesPtr services);
-  ~BrowserWidget();
+	ReplacableContentWidget(QWidget* parent) : QWidget(parent), mWidget(NULL)
+	{
+		mLayout = new QVBoxLayout(this);
+		mLayout->setMargin(0);
+	}
 
-protected slots:
-  void resetView(); // called when tree is reset
+	void setWidget(QWidget* widget)
+	{
+		if (mWidget)
+		{
+			mLayout->takeAt(0);
+			delete mWidget;
+		}
+		mWidget = widget;
+		if (mWidget)
+		{
+			mLayout->addWidget(mWidget);
+		}
+	}
 
-protected:
-  TreeItemModel* mModel;
-  QPointer<QTreeView> mTreeView;
+	QWidget* getWidget()
+	{
+		return mWidget;
+	}
 
-protected:
-	virtual void prePaintEvent();
-  
 private:
-  void createGUI();
-  void onNodeVisibilityChanged(QString nodeType, bool value);
-  void onPopup();
-  void onCurrentItemChanged();
-  void createFilterSelector();
-  void onFilterSelectorChanged();
-  void createButtonWidget(QWidget* widget);
-  XmlOptionItem getShowToolbarOption();
-
-  VisServicesPtr mServices;
-  ControllableSplitter* mSplitter;
-  QPointer<ReplacableContentWidget> mPropertiesWidget;
-  PopupToolbarWidget* mPopupWidget;
-  XmlOptionFile mOptions;
-
-  StringPropertyPtr mFilterSelector;
+	QVBoxLayout* mLayout;
+	QWidget* mWidget;
 };
+
 }//end namespace cx
 
-#endif /* CXBROWSERWIDGET_H_ */
+#endif // CXREPLACABLECONTENTWIDGET_H
