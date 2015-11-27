@@ -43,14 +43,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QCheckBox>
 #include "boost/bind.hpp"
 #include "cxTreeRepository.h"
+#include "cxProfile.h"
+
 
 namespace cx
 {
 
-ControllableSplitter::ControllableSplitter(QWidget *parent) :
+ControllableSplitter::ControllableSplitter(XmlOptionFile options, QWidget *parent) :
 	mShiftSplitterLeft(NULL),
 	mShiftSplitterRight(NULL),
-	mSplitterRatio(0.5)
+	mSplitterRatio(0.5),
+	mOptions(options)
 {
 	QVBoxLayout* layout = new QVBoxLayout(this);
 	layout->setMargin(0);
@@ -60,6 +63,27 @@ ControllableSplitter::ControllableSplitter(QWidget *parent) :
 	connect(mSplitter, &QSplitter::splitterMoved, this, &ControllableSplitter::onSplitterMoved);
 
 	layout->addWidget(mSplitter, 1);
+
+	mSplitterRatio = this->getSplitterRatioOption().readValue(QString::number(0.5)).toDouble();
+
+	// must set geometry after sizes have been set, i.e. after return to the main loop:
+	QTimer::singleShot(0, this, &ControllableSplitter::initializeSettings);
+}
+
+ControllableSplitter::~ControllableSplitter()
+{
+	this->getSplitterRatioOption().writeValue(QString::number(mSplitterRatio));
+	this->getShiftStateOption().writeValue(QString::number(this->getShiftState()));
+}
+
+XmlOptionItem ControllableSplitter::getSplitterRatioOption()
+{
+	return XmlOptionItem("splitter_ratio", mOptions.getElement());
+}
+
+XmlOptionItem ControllableSplitter::getShiftStateOption()
+{
+	return XmlOptionItem("shift_state", mOptions.getElement());
 }
 
 void ControllableSplitter::addLeftWidget(QWidget *widget)
@@ -69,6 +93,11 @@ void ControllableSplitter::addLeftWidget(QWidget *widget)
 void ControllableSplitter::addRightWidget(QWidget *widget)
 {
 	mSplitter->insertWidget(1, widget);
+}
+
+void ControllableSplitter::initializeSettings()
+{
+	this->setShiftState(this->getShiftStateOption().readValue("0").toInt());
 }
 
 QAction* ControllableSplitter::getMoveLeftAction()
@@ -81,6 +110,7 @@ QAction* ControllableSplitter::getMoveLeftAction()
 		action->setStatusTip(action->toolTip());
 		connect(action, &QAction::triggered, this, &ControllableSplitter::onMoveSplitterLeft);
 		mShiftSplitterLeft = action;
+		this->enableActions();
 	}
 	return mShiftSplitterLeft;
 }
@@ -95,6 +125,7 @@ QAction* ControllableSplitter::getMoveRightAction()
 		action->setStatusTip(action->toolTip());
 		connect(action, &QAction::triggered, this, &ControllableSplitter::onMoveSplitterRight);
 		mShiftSplitterRight = action;
+		this->enableActions();
 	}
 	return mShiftSplitterRight;
 }
@@ -113,14 +144,17 @@ void ControllableSplitter::onSplitterMoved()
 {
 	QList<int> sizes = mSplitter->sizes();
 	if (this->splitterShowsBoth())
-	{
 		mSplitterRatio = double(sizes[0]) /double(sizes[0]+sizes[1]);
-//		CX_LOG_CHANNEL_DEBUG("CA") << "moved, r=" << mSplitterRatio;
-	}
-//	CX_LOG_CHANNEL_DEBUG("CA") << "moved,sizes: " << sizes[0] << " - " << sizes[1];
 
-	mShiftSplitterLeft->setEnabled(this->getShiftState()>=0);
-	mShiftSplitterRight->setEnabled(this->getShiftState()<=0);
+	this->enableActions();
+}
+
+void ControllableSplitter::enableActions()
+{
+	if (mShiftSplitterLeft)
+		mShiftSplitterLeft->setEnabled(this->getShiftState()>=0);
+	if (mShiftSplitterRight)
+		mShiftSplitterRight->setEnabled(this->getShiftState()<=0);
 }
 
 bool ControllableSplitter::splitterShowsBoth() const
@@ -158,29 +192,20 @@ void ControllableSplitter::setShiftState(int shiftState)
 	else // shop browser
 	{
 		int sizesum = sizes[0]+sizes[1];
-//		CX_LOG_CHANNEL_DEBUG("CA") << "sizes: " << sizes[0] << " / " << sizes[1] << " / sum=" << sizesum << " / r=" << mSplitterRatio;
 		sizes[0] = mSplitterRatio * sizesum;
 		sizes[1] = (1.0-mSplitterRatio) * sizesum;
 	}
 	mSplitter->setSizes(sizes);
-//	CX_LOG_CHANNEL_DEBUG("CA") << "set sizes: " << sizes[0] << " / " << sizes[1];
 
 	this->onSplitterMoved();
-//	CX_LOG_CHANNEL_DEBUG("CA") << "this->getShiftState(): " << this->getShiftState();
 }
 
 void ControllableSplitter::shiftSplitter(int shift)
 {
 	// positive shift axis goes to the right, from browser to properties
-	//
-	QList<int> sizes = mSplitter->sizes();
 
 	int shiftState = this->getShiftState();
-
-//	CX_LOG_CHANNEL_DEBUG("CA") << "shiftstateA: " << shiftState;
 	shiftState += shift;
-//	CX_LOG_CHANNEL_DEBUG("CA") << "shiftstateB: " << shiftState;
-
 	this->setShiftState(shiftState);
 }
 
@@ -197,6 +222,8 @@ BrowserWidget::BrowserWidget(QWidget* parent, VisServicesPtr services) :
 	BaseWidget(parent, "BrowserWidget", "Browser"),
 	mServices(services)
 {
+	mOptions = profile()->getXmlSettings().descend(this->objectName());
+
 	QVBoxLayout* layout = new QVBoxLayout(this);
 	layout->setMargin(0);
 	layout->setSpacing(0);
@@ -216,10 +243,11 @@ BrowserWidget::BrowserWidget(QWidget* parent, VisServicesPtr services) :
 //	connect(mPopupWidget, &PopupToolbarWidget::popup, this, &ConsoleWidget::updateShowHeader);
 	layout->addWidget(mPopupWidget);
 
-	mSplitter = new ControllableSplitter(this);
+	mSplitter = new ControllableSplitter(mOptions, this);
 	layout->addWidget(mSplitter, 1);
 	mSplitter->addLeftWidget(mTreeView);
 	mPropertiesWidget = new ReplacableContentWidget(this);
+	mPropertiesWidget->setWidget(new QLabel("<not available>"));
 	mSplitter->addRightWidget(mPropertiesWidget);
 
 	this->createButtonWidget(mPopupWidget->getToolbar());
@@ -241,7 +269,7 @@ void BrowserWidget::closeEvent(QCloseEvent* event)
 void BrowserWidget::prePaintEvent()
 {
 	mPopupWidget->refresh();
-	CX_LOG_CHANNEL_DEBUG("CA") << "BrowserWidget::prePaintEvent() modified";
+//	CX_LOG_CHANNEL_DEBUG("CA") << "BrowserWidget::prePaintEvent() modified";
 	mModel->update();
 	this->resetView();
 }

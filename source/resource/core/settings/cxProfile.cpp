@@ -59,6 +59,12 @@ Profile::Profile(QString path, SettingsPtr settings)
 	mSettings = settings;
 }
 
+Profile::~Profile()
+{
+	this->getXmlSettings().save();
+	CX_LOG_CHANNEL_DEBUG("CA") << "----------Profile::~Profile()";
+}
+
 void Profile::activate()
 {
 	// this will trigger lots of change signals. Do after Profile object is in place.

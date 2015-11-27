@@ -125,7 +125,7 @@ bool PopupToolbarWidget::popupIsVisible() const
 
 void PopupToolbarWidget::onPopup()
 {
-	std::cout << "PopupToolbarWidget::onPopup()" << std::endl;
+//	std::cout << "PopupToolbarWidget::onPopup()" << std::endl;
 	bool show = mShowControlsButton->getShowPopup();
 
 //	mMessagesWidget->showHeader(show);

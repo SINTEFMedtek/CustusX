@@ -134,7 +134,7 @@ void TreeRepository::insertTopNode()
 {
 	TreeNodePtr topnode(new TopTreeNode(mSelf));
 	mNodes.push_back(topnode);
-	CX_LOG_CHANNEL_DEBUG("CA") << "  - built topnode";
+//	CX_LOG_CHANNEL_DEBUG("CA") << "  - built topnode";
 }
 
 void TreeRepository::rebuild()
@@ -174,7 +174,7 @@ void TreeRepository::rebuild()
 		this->insertToolNode(iter->second);
 	}
 
-	CX_LOG_CHANNEL_DEBUG("CA") << "  - built all nodes";
+//	CX_LOG_CHANNEL_DEBUG("CA") << "  - built all nodes";
 }
 
 void TreeRepository::insertGroupNode(QString groupname)

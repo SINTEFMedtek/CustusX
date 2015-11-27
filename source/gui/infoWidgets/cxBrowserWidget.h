@@ -95,7 +95,8 @@ class ControllableSplitter : public QWidget
 {
 	Q_OBJECT
 public:
-	ControllableSplitter(QWidget* parent);
+	ControllableSplitter(XmlOptionFile options, QWidget* parent);
+	~ControllableSplitter();
 	void addLeftWidget(QWidget* widget);
 	void addRightWidget(QWidget* widget);
 	QAction* getMoveLeftAction();
@@ -108,12 +109,18 @@ private:
 	bool splitterShowsBoth() const;
 	void onSplitterMoved();
 
+	void initializeSettings();
 	int getShiftState() const;
 	void setShiftState(int shiftState);
+	void enableActions();
+
+	XmlOptionItem getSplitterRatioOption();
+	XmlOptionItem getShiftStateOption();
 
 	QSplitter* mSplitter;
 	QAction* mShiftSplitterLeft;
 	QAction* mShiftSplitterRight;
+	XmlOptionFile mOptions;
 //	QWidget* mLeftWidget;
 //	QWidget* mRightWidget;
 
@@ -163,7 +170,7 @@ private:
   ControllableSplitter* mSplitter;
   QPointer<ReplacableContentWidget> mPropertiesWidget;
   PopupToolbarWidget* mPopupWidget;
-//  XmlOptionFile mOptions;
+  XmlOptionFile mOptions;
 
   StringPropertyPtr mFilterSelector;
 };

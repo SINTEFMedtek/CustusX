@@ -63,6 +63,7 @@ class cxResource_EXPORT Profile : public QObject
 {
 public:
 	Profile(QString path, SettingsPtr settings);
+	~Profile();
 	void activate(); /// internal use
 
 	/**
