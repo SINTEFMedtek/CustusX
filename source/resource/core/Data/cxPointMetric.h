@@ -80,6 +80,7 @@ public:
 	{
 		return "pointMetric";
 	}
+	virtual QIcon getIcon() {return QIcon(":/icons/metric_point.png");}
 	virtual Vector3D getRefCoord() const;
 	virtual QString getAsSingleLineString() const;
 

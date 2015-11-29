@@ -56,6 +56,7 @@ public:
 	virtual QIcon getIcon() const;
 	QWidget* createPropertiesWidget() const;
 	virtual QVariant getColor() const;
+	virtual bool useColoredName() const { return true; }
 	virtual QVariant getFont() const;
 
 private:

@@ -67,6 +67,7 @@ public:
 	virtual void setViewGroupVisibility(int index, bool value) = 0;
 	virtual QWidget* createPropertiesWidget() const = 0;
 	virtual QVariant getColor() const = 0;
+	virtual bool  useColoredName() const = 0;
 	virtual QVariant getFont() const = 0;
 
 	virtual std::vector<TreeNodePtr> getVisibleChildren() const = 0;

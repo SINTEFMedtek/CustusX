@@ -57,6 +57,7 @@ public:
 	virtual QVariant getViewGroupVisibility(int index) const { return QVariant(); }
 	virtual void setViewGroupVisibility(int index, bool value) {}
 	virtual QVariant getColor() const { return QVariant(); }
+	virtual bool  useColoredName() const { return false; }
 	virtual QVariant getFont() const { return QVariant(); }
 	virtual QWidget* createPropertiesWidget() const { return NULL; }
 
@@ -69,6 +70,8 @@ protected:
 
 	TreeRepositoryPtr repo();
 	const TreeRepositoryPtr repo() const;
+
+	QIcon addBackgroundColorToIcon(QIcon input, QColor color) const;
 };
 
 } // namespace cx

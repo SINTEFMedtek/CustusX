@@ -26,6 +26,9 @@ TreeItemModel::TreeItemModel(XmlOptionFile options, VisServicesPtr services, QOb
 	mOptions(options)
 {
 	mSelectionModel = NULL;
+	mNameIndex = 1;
+	mColorIndex = 0;
+	mViewGroupIndex = 2;
 	mViewGroupCount = 3;
 
 	mRepository = TreeRepository::create(options.descend("repository"), services);
@@ -89,87 +92,98 @@ TreeNode *TreeItemModel::itemFromIndex(const QModelIndex& index) const
 
 int TreeItemModel::columnCount(const QModelIndex& parent) const
 {
-	TreeNode *parentItem = this->itemFromIndex(parent);
-	if (parent.column() > 0) // ignore for all but first column
-		return 0;
-	return 1+mViewGroupCount;
-	//  return parentItem->getColumnCount();
+//	if (parent.isValid() && (parent.column() != mNameIndex)) // ignore for all but first column
+//		return 0;
+	return mViewGroupIndex+mViewGroupCount;
 }
 
 int TreeItemModel::rowCount(const QModelIndex& parent) const
 {
+//	if (parent.isValid() && (parent.column() != mNameIndex)) // ignore for all but first column
+//		return 0;
 	TreeNode *parentItem = this->itemFromIndex(parent);
-	if (parent.column() > 0) // ignore for all but first column
-		return 0;
 	return parentItem->getVisibleChildren().size();
 }
 
+
 QVariant TreeItemModel::data(const QModelIndex& index, int role) const
 {
-	int namepos = 0;
-	int iconpos = 0;
-
 	if (role==Qt::DisplayRole)
 	{
-		TreeNode *item = this->itemFromIndex(index);
-		if (index.column()==namepos)
+		if (index.column()==mNameIndex)
+		{
+			TreeNode *item = this->itemFromIndex(index);
 			return item->getName();
-//		if (index.column()<mViewGroupCount+1)
-//			return item->getViewGroupVisibility(index.column()-1);
-//		if (index.column()==1)
-//			return item->getType();
-//		if (index.column()==2)
-//			return item->getData();
+		}
 	}
 	if (role==Qt::CheckStateRole)
 	{
-		TreeNode *item = this->itemFromIndex(index);
-		if (index.column()>0 && index.column()<mViewGroupCount+1)
-			return item->getViewGroupVisibility(index.column()-1);
+		if (this->isViewGroupColumn(index.column()))
+		{
+			TreeNode *item = this->itemFromIndex(index);
+			return item->getViewGroupVisibility(this->viewGroupFromColumn(index.column()));
+		}
 	}
 	if (role==Qt::ToolTipRole || role==Qt::StatusTipRole)
 	{
 		TreeNode *item = this->itemFromIndex(index);
-		if (index.column()==namepos)
+		if (index.column()==mNameIndex)
 			return QString("%1 of type %2").arg(item->getName()).arg(item->getType());
-		if (index.column()>0 && index.column()<mViewGroupCount+1)
-			return QString("Set visibility of %1 in view group %2").arg(item->getName()).arg(index.column()-1);
-//		if (index.column()<mViewGroupCount+1)
-//			return item->getViewGroupVisibility(index.column()-1);
-//		if (index.column()==1)
-//			return item->getType();
-//		if (index.column()==2)
-//			return item->getData();
+		if (this->isViewGroupColumn(index.column()))
+			return QString("Set visibility of %1 in view group %2")
+					.arg(item->getName()).arg(this->viewGroupFromColumn(index.column()));
 	}
 	if (role==Qt::DecorationRole)
 	{
 		TreeNode *item = this->itemFromIndex(index);
-		if (index.column()==iconpos)
+		if (index.column()==mNameIndex)
 			return item->getIcon();
+		if (index.column()==mColorIndex)
+		{
+			if (item->getColor().canConvert<QColor>())
+					return this->getColorIcon(item->getColor().value<QColor>());
+		}
 	}
 	if (role==Qt::FontRole)
 	{
-		TreeNode *item = this->itemFromIndex(index);
-		return item->getFont();
+		if (index.column()==mNameIndex)
+		{
+			TreeNode *item = this->itemFromIndex(index);
+			return item->getFont();
+		}
 	}
 	if (role==Qt::ForegroundRole)
 	{
-		if (index.column()==namepos)
+		if (index.column()==mNameIndex)
 		{
 			TreeNode *item = this->itemFromIndex(index);
-			return item->getColor();
+//			if (item->useColoredName())
+			{
+				QVariant color = item->getColor();
+				if (color.canConvert<QColor>())
+				{
+					QColor oldColor = color.value<QColor>().toHsv();
+					QColor newColor = this->adjustColorToContrastWithWhite(oldColor);
+//					CX_LOG_CHANNEL_DEBUG("CA") << "color " << item->getName() << "";
+//					qDebug() << "color " << item->getName() << " " << oldColor << " new=" << newColor;
+					return newColor;
+				}
+			}
 		}
 	}
 	return QVariant();
 }
 
+
 bool TreeItemModel::setData(const QModelIndex& index, const QVariant& value, int role)
 {
 	if (role==Qt::CheckStateRole)
 	{
-		TreeNode *item = this->itemFromIndex(index);
-		if (index.column()>0 && index.column()<mViewGroupCount+1)
-			item->setViewGroupVisibility(index.column()-1, value.value<int>());
+		if (this->isViewGroupColumn(index.column()))
+		{
+			TreeNode *item = this->itemFromIndex(index);
+			item->setViewGroupVisibility(this->viewGroupFromColumn(index.column()), value.value<int>());
+		}
 		return true;
 	}
 	return false;
@@ -183,18 +197,28 @@ Qt::ItemFlags TreeItemModel::flags(const QModelIndex& index) const
 		return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
 
+bool TreeItemModel::isViewGroupColumn(int col) const
+{
+	return ( (0<=(col-mViewGroupIndex))
+			&&
+			((col-mViewGroupIndex) < mViewGroupCount)
+			);
+}
+int TreeItemModel::viewGroupFromColumn(int col) const
+{
+	return (col-mViewGroupIndex);
+}
+
 QVariant TreeItemModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
 	if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
 	{
-		if (section==0)
+		if (section==mNameIndex)
 			return "Item";
-		if (section>0 && section-1<mViewGroupCount)
-			return QString("V%1").arg(section);
-//		if (section==1)
-//			return "Type";
-//		if (section==2)
-//			return "Details";
+		if (section==mColorIndex)
+			return ""; // keep short + out of the way of the toolbar button
+		if (this->isViewGroupColumn(section))
+			return QString("V%1").arg(this->viewGroupFromColumn(section));
 	}
 	return QVariant();
 }
@@ -236,7 +260,43 @@ QModelIndex TreeItemModel::parent(const QModelIndex& index) const
 				break;
 	}
 
-	return createIndex(row, 0, parentItem);
+	return createIndex(row, mNameIndex, parentItem);
+}
+
+QIcon TreeItemModel::getColorIcon(QColor color) const
+{
+	QImage image(QSize(128,128), QImage::Format_RGBA8888);
+	QPainter painter(&image);
+	painter.fillRect(image.rect(), QColor("white"));
+	painter.setBrush(QBrush(color));
+	painter.drawRoundedRect(image.rect(), 75, 75, Qt::RelativeSize);
+//	painter.drawEllipse(image.rect());
+	return QIcon(QPixmap::fromImage(image));
+}
+
+QColor TreeItemModel::adjustColorToContrastWithWhite(QColor color) const
+{
+	// use some tricks in HSV space to get contrasting colors while
+	// keeping the original color as much as possible.
+	//
+	// for colors: strengthen the saturation: s' = s+(1-s)/2
+	// for for grayscale: lower value, or give up for whites:
+	//           if s<0.1: v = max(0.7, v)
+	double h = color.hueF();
+	double s = color.hsvSaturationF();
+	double v = color.valueF();
+
+	double isChromatic = s > 0.1; // out definition
+	if (isChromatic)
+	{
+		s = s+(1.0-s)/2;
+	}
+	else
+	{
+		v = std::min(0.6, v);
+	}
+
+	return QColor::fromHsvF(h,s,v);
 }
 
 

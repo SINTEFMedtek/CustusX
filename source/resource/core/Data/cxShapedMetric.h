@@ -67,6 +67,7 @@ public:
 
 	virtual bool isValid() const;
 	virtual QString getAsSingleLineString() const;
+	virtual QIcon getIcon() {return QIcon(":/icons/metric_torus.png");}
 
 	void setRadius(double val);
 	double getRadius() const;

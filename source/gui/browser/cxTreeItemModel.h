@@ -58,14 +58,20 @@ private slots:
   void onRepositoryChanged();
 
 private:
-  int mViewGroupCount;
+  int mViewGroupCount, mViewGroupIndex, mColorIndex, mNameIndex;
+
   TreeRepositoryPtr mRepository;
   QItemSelectionModel* mSelectionModel;
   XmlOptionFile mOptions;
   VisServicesPtr mServices;
 
+  bool isViewGroupColumn(int col) const;
+  int viewGroupFromColumn(int col) const;
+
   TreeNode* itemFromIndex(const QModelIndex& index) const;
   void fillModelTreeFromViewManager(TreeNodePtr root);
+  QIcon getColorIcon(QColor color) const;
+  QColor adjustColorToContrastWithWhite(QColor color) const;
 };
 
 }//end namespace cx

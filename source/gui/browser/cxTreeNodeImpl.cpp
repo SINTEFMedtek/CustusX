@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTreeNodeImpl.h"
 #include "cxTreeRepository.h"
 #include "cxLogger.h"
+#include <QIcon>
+#include <QPainter>
 
 
 namespace cx
@@ -122,6 +124,15 @@ const TreeRepositoryPtr TreeNodeImpl::repo() const
 	return mRepository.lock();
 }
 
+QIcon TreeNodeImpl::addBackgroundColorToIcon(QIcon input, QColor color) const
+{
+	QPixmap org = input.pixmap(input.actualSize(QSize(1000,1000)));
+	QImage image(org.size(), QImage::Format_RGBA8888);
+	QPainter painter(&image);
+	painter.fillRect(image.rect(), color);
+	painter.drawPixmap(0,0,org);
+	return QIcon(QPixmap::fromImage(image));
+}
 
 } // namespace cx
 

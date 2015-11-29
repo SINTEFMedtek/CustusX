@@ -70,6 +70,7 @@ void BrowserWidget::createGUI()
 	//layout
 	mTreeView = new QTreeView(this);
 	mTreeView->setRootIsDecorated(false);
+	mTreeView->setTreePosition(1);
 	mTreeView->setModel(mModel);
 	mModel->setSelectionModel(mTreeView->selectionModel());
 

@@ -111,6 +111,9 @@ void DataTreeNode::activate()
 
 QIcon DataTreeNode::getIcon() const
 {
+	DataMetricPtr metric = boost::dynamic_pointer_cast<DataMetric>(mData);
+	if (metric)
+		return this->addBackgroundColorToIcon(mData->getIcon(), metric->getColor());
 	return mData->getIcon();
 }
 
@@ -119,7 +122,11 @@ QVariant DataTreeNode::getColor() const
 	DataMetricPtr metric = boost::dynamic_pointer_cast<DataMetric>(mData);
 	if (metric)
 		return metric->getColor();
-	return QColor("black");
+	MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(mData);
+	if (mesh)
+		return mesh->getColor();
+	return QVariant();
+//	return QColor("black");
 }
 
 QVariant DataTreeNode::getFont() const

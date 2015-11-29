@@ -82,6 +82,7 @@ public:
 	{
 		return "SphereMetric";
 	}
+	virtual QIcon getIcon() {return QIcon(":/icons/metric_sphere.png");}
 	virtual QString getValueAsString() const;
 	virtual bool showValueInGraphics() const { return false; }
 
