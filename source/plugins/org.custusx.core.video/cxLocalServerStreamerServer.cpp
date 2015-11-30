@@ -84,6 +84,7 @@ FilePathPropertyPtr LocalServerStreamerArguments::getLocalServerNameOption(QDomE
 
 	QStringList paths = QStringList() << qApp->applicationDirPath();
 #ifdef __APPLE__
+    // special case for running from the build tree, server built as bundle.
 	paths << QString("%1/%2.app/Contents/MacOS").arg(DataLocations::getBundlePath()).arg(filename);
 #endif
 
