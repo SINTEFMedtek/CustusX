@@ -96,7 +96,9 @@ void MeshInfoWidget::setColorSlot()
 
 void MeshInfoWidget::setColorSlotDelayed()
 {
-  mMesh->setColor(mColorAdapter->getValue());
+	if(!mMesh)
+	  return;
+	mMesh->setColor(mColorAdapter->getValue());
 }
 
 void MeshInfoWidget::meshSelectedSlot()
