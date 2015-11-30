@@ -318,7 +318,7 @@ class CustusXInstaller:
 #/usr/bin/hdiutil attach -quiet -nobrowse -noverify -noautoopen -mountpoint right_here bar.cdr
 
 #        installfolder = '%s' % self.install_root
-        shell.changeDir(self.install_root)
+        shell.changeDir(self.getInstalledFolder())
         
         shell.run('cp -r %s/*.app %s' % (mount_point, self.getInstalledFolder()+"/"))
 
