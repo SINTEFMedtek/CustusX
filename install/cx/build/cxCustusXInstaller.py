@@ -39,7 +39,8 @@ class CustusXInstaller:
         'root dir for user data'
         self.root_dir = root_dir
         if platform.system() == 'Darwin':
-            self.install_root = '/Applications'
+            self.install_root = '%s/Installed' % self.root_dir
+#            self.install_root = '/Applications'
         if (platform.system() == 'Linux'):
             self.install_root = '%s/Installed' % self.root_dir
         if(platform.system() == 'Windows'):
@@ -304,7 +305,7 @@ class CustusXInstaller:
             pkgName = coreName + '.mpkg'
         PrintFormatter.printInfo("install DragNDrop package %s" % (dmgfile))
 
-        temp_path = '%s/temp/Install' % self.root_dir
+        temp_path = '%s/temp/Install' % self.root_dir   
         shell.removeTree(temp_path)
         shell.changeDir(temp_path)
         
@@ -318,7 +319,8 @@ class CustusXInstaller:
 
 #        installfolder = '%s' % self.install_root
         shell.changeDir(self.install_root)
-        shell.run('cp -r %s/*.app %s' % (mount_point, self.install_root))
+        
+        shell.run('cp -r %s/*.app %s' % (mount_point, self.getInstalledFolder()+"/"))
 
         shell.run('hdiutil detach %s' % mount_point)
         
