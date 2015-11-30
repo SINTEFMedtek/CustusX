@@ -33,7 +33,7 @@ function(cx_install_documentation_files)
 	install(FILES
 			${CustusX_BINARY_DIR}/doc/cx_user_doc.qhc
 			${CustusX_BINARY_DIR}/doc/cx_user_doc.qch
-			DESTINATION ${CX_INSTALL_ROOT_DIR}/doc/)
+                        DESTINATION ${CX_INSTALL_DOC_DIR}/)
 endfunction()
 
 ###############################################################################

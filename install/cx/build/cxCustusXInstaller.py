@@ -275,7 +275,7 @@ class CustusXInstaller:
         shell.run('cp -r %s/* %s' % (unpackedfolder, installfolder))
         PrintFormatter.printInfo('Installed \n\t%s\nto folder \n\t%s ' % (filename, installfolder))
 
-    def _installDMG(self, dmgfile, pkgName=None):
+    def _installDMG_PackageMaker(self, dmgfile, pkgName=None):
         '''
         Install the given pkg inside the dmg file.
         '''
@@ -291,3 +291,41 @@ class CustusXInstaller:
         shell.run('sudo installer -pkg /Volumes/%s/%s -target %s' % (coreName, pkgName, target))
         shell.run('hdiutil detach /Volumes/%s' % coreName)
         PrintFormatter.printInfo("Installed %s" % pkgName)
+
+    def _installDMG(self, dmgfile, pkgName=None):
+        '''
+        Install the given pkg inside the dmg file.
+        '''
+        path = os.path.dirname(dmgfile)
+        basename = os.path.basename(dmgfile)
+        changeDir(path)
+        coreName = os.path.splitext(basename)[0]
+        if not pkgName:
+            pkgName = coreName + '.mpkg'
+        PrintFormatter.printInfo("install DragNDrop package %s" % (dmgfile))
+
+        temp_path = '%s/temp/Install' % self.root_dir
+        shell.removeTree(temp_path)
+        shell.changeDir(temp_path)
+        
+        converted_installer = "%s/%s" % (temp_path, coreName)
+        mount_point = "%s/%s" % (temp_path, coreName)
+
+        shell.run('hdiutil convert -quiet %s -format UDTO -o %s' % (dmgfile, converted_installer))
+        shell.run('hdiutil attach -quiet -nobrowse -noverify -noautoopen -mountpoint %s %s.cdr' % (mount_point, converted_installer))
+#/usr/bin/hdiutil convert -quiet foo.dmg -format UDTO -o bar
+#/usr/bin/hdiutil attach -quiet -nobrowse -noverify -noautoopen -mountpoint right_here bar.cdr
+
+#        installfolder = '%s' % self.install_root
+        shell.changeDir(self.install_root)
+        shell.run('cp -r %s/*.app %s' % (mount_point, self.install_root))
+
+        shell.run('hdiutil detach %s' % mount_point)
+        
+        
+#        shell.run('hdiutil attach -mountpoint /Volumes/%s %s' % (coreName, dmgfile))
+#        target = '/'  # TODO: mount on another (test) volume - this one requires sudo
+#        shell.run('sudo installer -pkg /Volumes/%s/%s -target %s' % (coreName, pkgName, target))
+#        shell.run('hdiutil detach /Volumes/%s' % coreName)
+        
+        PrintFormatter.printInfo("Installed %s" % dmgfile)

@@ -10,11 +10,11 @@
 
 # Select the installed location of configuration files, relative to executable. 
 # MUST match the values in CPack install for CustusX!!
-if (APPLE) 
-    set(CX_CONFIG_ROOT_RELATIVE_INSTALLED ./config)
-else (APPLE) # Windows and Linux
-    set(CX_CONFIG_ROOT_RELATIVE_INSTALLED ../config)
-endif (APPLE)
+#if (APPLE)
+#    set(CX_CONFIG_ROOT_RELATIVE_INSTALLED ./config)
+#else (APPLE) # Windows and Linux
+#    set(CX_CONFIG_ROOT_RELATIVE_INSTALLED ../config)
+#endif (APPLE)
 
 # location of configuration files during development (in the source tree)
 set (CX_CONFIG_ROOT ${CustusX_SOURCE_DIR}/config)
@@ -29,11 +29,11 @@ set (CX_LARGE_DATA_ROOT ${CustusX_SOURCE_DIR}/largedata CACHE PATH "path to Cust
 # location of documentation files during compilation
 set (CX_DOC_ROOT ${CustusX_BINARY_DIR}/doc)
 # location of documentation files after install, relative to executable
-if (APPLE)
-    set(CX_DOC_ROOT_RELATIVE_INSTALLED ./doc)
-else (APPLE) # Windows and Linux
-    set(CX_DOC_ROOT_RELATIVE_INSTALLED ../doc)
-endif (APPLE)
+#if (APPLE)
+#    set(CX_DOC_ROOT_RELATIVE_INSTALLED ./doc)
+#else (APPLE) # Windows and Linux
+#    set(CX_DOC_ROOT_RELATIVE_INSTALLED ../doc)
+#endif (APPLE)
   
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/cxConfig.h.in"

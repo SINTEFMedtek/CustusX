@@ -187,8 +187,8 @@ endmacro()
 #                                    lib*.so
 #                                    liborg_plugin*.so
 #   bundle/bundle.app/Contents/Resources/qt.conf
-#   bundle/doc/something.txt
-#   bundle/config/...
+#   bundle/bundle.app/doc/something.txt
+#   bundle/bundle.app/config/...
 #
 # Structure on windows:
 #
@@ -238,18 +238,30 @@ macro(cx_install_set_folder_structure)
 #            set(CX_INSTALL_ROOT_DIR ".")
         endif(CX_WINDOWS)
 
-        set(CX_INSTALL_CONFIG_DIR ${CX_INSTALL_CONFIG_DIR}/config)
+
+        set(CX_INSTALL_BINARY_DIR "${CX_INSTALL_ROOT_DIR}/bin")
+        set(CX_INSTALL_CONFIG_DIR "${CX_INSTALL_ROOT_DIR}/config")
+        set(CX_INSTALL_DOC_DIR    "${CX_INSTALL_ROOT_DIR}/doc")
+        set(CX_INSTALL_PLUGIN_DIR "${CX_INSTALL_BINARY_DIR}")
+
         if(APPLE)
-                set(CX_INSTALL_CONFIG_DIR "${CX_INSTALL_ROOT_DIR}/${CX_BUNDLE_NAME}.app/config")
+                set(CX_INSTALL_BUNDLE_CONTENTS_DIR "${CX_INSTALL_ROOT_DIR}/${CX_BUNDLE_NAME}.app/Contents")
+                set(CX_INSTALL_BINARY_DIR "${CX_INSTALL_BUNDLE_CONTENTS_DIR}/MacOS")
+                set(CX_INSTALL_CONFIG_DIR "${CX_INSTALL_BUNDLE_CONTENTS_DIR}/config")
+                set(CX_INSTALL_DOC_DIR    "${CX_INSTALL_BUNDLE_CONTENTS_DIR}/doc")
+                set(CX_INSTALL_PLUGIN_DIR "${CX_INSTALL_BINARY_DIR}")
         endif(APPLE)
 
-	set(CX_INSTALL_BINARY_DIR ${CX_INSTALL_ROOT_DIR}/bin)
-	if(APPLE)
-		set(CX_INSTALL_BINARY_DIR "${CX_INSTALL_ROOT_DIR}/${CX_BUNDLE_NAME}.app/Contents/MacOS")
-	endif(APPLE)
+        set(CX_CONFIG_ROOT_RELATIVE_INSTALLED ../config)
+        set(CX_DOC_ROOT_RELATIVE_INSTALLED ../doc)
 
-message("-----------------CX_INSTALL_BINARY_DIR: " ${CX_INSTALL_ROOT_DIR})
+        # Turn off installation of CTK plugins. We do this ourselves using fixup_bundle
+        set(CX_CTK_PLUGIN_NO_INSTALL NO_INSTALL)
+
+
+message("-----------------CX_INSTALL_ROOT_DIR: " ${CX_INSTALL_ROOT_DIR})
 message("-----------------CX_INSTALL_BINARY_DIR: " ${CX_INSTALL_BINARY_DIR})
+message("-----------------CX_INSTALL_CONFIG_DIR: " ${CX_INSTALL_CONFIG_DIR})
 message("-----------------CX_BUNDLE_NAME: " ${CX_BUNDLE_NAME})
 
 #file(TO_CMAKE_PATH ${CX_INSTALL_BINARY_DIR} CX_INSTALL_BINARY_DIR)
@@ -259,7 +271,6 @@ message("-----------------CX_BUNDLE_NAME: " ${CX_BUNDLE_NAME})
 #message("-----------------CX_BUNDLE_NAME: " ${CX_BUNDLE_NAME})
 
 #	set(CX_INSTALL_PLUGIN_DIR "${CX_INSTALL_BINARY_DIR}/plugins") - did not work: get into trouble with relative paths and fixup_bundle
-	set(CX_INSTALL_PLUGIN_DIR "${CX_INSTALL_BINARY_DIR}")
 
 endmacro()
 
