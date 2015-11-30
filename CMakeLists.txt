@@ -78,6 +78,7 @@ ctkMacroBuildPlugin(
   UI_FORMS ${PLUGIN_UI_FORMS}
   RESOURCES ${PLUGIN_resources}
   TARGET_LIBRARIES ${PLUGIN_target_libraries}
+  ${CX_CTK_PLUGIN_NO_INSTALL}
 )
 
 #add_subdirectory(testing)
