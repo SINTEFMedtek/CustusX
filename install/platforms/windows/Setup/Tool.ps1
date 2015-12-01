@@ -121,6 +121,18 @@ Function Get-ToolList{
 			   "", 
 			   "Old way to write tests in CustusX."
 			   )
+    # GLEW 1.13.0
+    $toollist += New-Object Tool(
+			   "GLEW", 
+			   "http://downloads.sourceforge.net/project/glew/glew/1.13.0/glew-1.13.0-win32.zip?r=&ts=1447931029&use_mirror=vorboss", 
+			   "$ToolFolder\GLEW.zip", 
+			   "ZIP", 
+			   "$ToolFolder\glew-1.13.0\bin\Release\x64", 
+			   "",
+			   "$ToolFolder",
+			   "", 
+			   "Library needed for FAST."
+			   )
     # git 1.7.10 (x86?)
     $toollist += New-Object Tool(
 				"git", 
@@ -144,10 +156,10 @@ Function Get-ToolList{
 				"", 
 				"ninja", 
 				"Enables support for compiling using more than one core.")
-    # CMake 3.0.1 (x86)
+    # CMake 3.4.0 (x86)
     $toollist += New-Object Tool(
-				"cmake", 
-				"http://www.cmake.org/files/v3.0/cmake-3.0.1-win32-x86.exe", 
+				"cmake",
+                "https://cmake.org/files/v3.4/cmake-3.4.0-win32-x86.exe",
 				"$ToolFolder\cmake-installer.exe", 
 				"NSIS package", 
 				"$script:CX_PROGRAM_FILES_X86\CMake\bin",
@@ -257,7 +269,7 @@ Function Get-ToolList{
     # Universal Silent Switch Finder 1.5.0.0
     $toollist += New-Object Tool(
 				"ussf", 
-				"http://download.softpedia.com/dl/2f06f2807bcc03275a125f4f0e7eae3e/5589272f/100180984/software/system/ussf.exe",
+				"http://download.softpedia.com/dl/8436f0a93044a58adc3a4708cdb84193/564d9c39/100180984/software/system/ussf.exe",
 				"$ToolFolder\ussf.exe", 
 				"", 
 				"$ToolFolder", 

@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSCREENSHOTIMAGEWRITER_H
 #define CXSCREENSHOTIMAGEWRITER_H
 
+#include "cxResourceVisualizationExport.h"
+
 #include <QObject>
 #include <QPointer>
 #include <QMainWindow>
@@ -46,7 +48,7 @@ typedef boost::shared_ptr<class ScreenShotImageWriter> ScreenShotImageWriterPtr;
 /**
  *
  */
-class ScreenShotImageWriter
+class cxResourceVisualization_EXPORT ScreenShotImageWriter
 {
 public:
 	static ScreenShotImageWriterPtr create(PatientModelServicePtr patient) { return ScreenShotImageWriterPtr(new ScreenShotImageWriter(patient)); }

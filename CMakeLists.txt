@@ -16,6 +16,9 @@ if (POLICY CMP0042)
 	cmake_policy(SET CMP0042 NEW)
 endif()
 
+cmake_policy(SET CMP0020 NEW)
+
+
 set(CMAKE_MODULE_PATH
     ${CMAKE_MODULE_PATH}
     ${PROJECT_SOURCE_DIR}/CMake)

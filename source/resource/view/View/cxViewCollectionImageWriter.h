@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVIEWCOLLECTIONIMAGEWRITER_H
 #define CXVIEWCOLLECTIONIMAGEWRITER_H
 
+#include "cxResourceVisualizationExport.h"
+
 #include <QObject>
 #include <QPointer>
 #include <QMainWindow>
@@ -52,7 +54,7 @@ class ViewCollectionWidget;
  *  to a vtkImageData.
  *
  */
-class ViewCollectionImageWriter
+class cxResourceVisualization_EXPORT ViewCollectionImageWriter
 {
 public:
 	explicit ViewCollectionImageWriter(ViewCollectionWidget* widget);

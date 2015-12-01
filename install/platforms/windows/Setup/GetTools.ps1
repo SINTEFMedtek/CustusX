@@ -196,6 +196,32 @@ Function Run-Installer{
         $destination = $shell_app.namespace($destinationFolder)
         $destination.Copyhere($zip_file.items(),0x14) #0x4 hides dialogbox, 0x10 overwrites existing files, 0x14 combines both
         
+        if($tool.get_name() -eq "GLEW")
+        {
+            #installing 64 bits version
+            #as descibed here:
+            #http://glew.sourceforge.net/install.html
+            $glew_dll = "$destinationFolder\glew-1.13.0\bin\Release\x64\glew32.dll"
+            $glew_lib = "$destinationFolder\glew-1.13.0\lib\Release\x64\glew32.lib"
+            $glew_h = "$destinationFolder\glew-1.13.0\include\GL\glew.h"
+            $wglew_h = "$destinationFolder\glew-1.13.0\include\GL\wglew.h"
+            
+            $to_system_root = "$env:SystemRoot\system32"
+            $to_VC_lib = "$script:CX_MSVC_VC\lib"
+            $to_VC_include = "$script:CX_MSVC_VC\include"
+            $to_VC_include_gl = "$to_VC_include\GL"
+            
+            #create new folder
+            $shell_app.namespace($to_VC_include).NewFolder("GL")
+            
+            #move files
+            $shell_app.namespace($to_system_root).Copyhere($glew_dll, 0x4)
+            $shell_app.namespace($to_VC_lib).Copyhere($glew_lib, 0x4)
+            $shell_app.namespace("$to_VC_include_gl").Copyhere($glew_h, 0x4)
+            $shell_app.namespace("$to_VC_include_gl").Copyhere($wglew_h, 0x4)
+            
+        }
+        
         $success = $true
     }
     elseif($packageType -eq "TarGz"){
@@ -542,8 +568,8 @@ param (
     [ValidateSet('full', 'download', 'install', 'environment')]
     [string[]]$mode,
     ## Manually picking tools
-    [Parameter(Mandatory=$false, HelpMessage="Select tool(s). (7-Zip, cppunit, ninja, git, cmake, python, eclipse, qt, boost, MSVC2013, console2, nsis, firefox, cuda, ussf)")]
-    [ValidateSet('7-Zip', 'cppunit', 'ninja', 'git', 'cmake', 'python', 'eclipse', 'qt', 'boost', 'MSVC2013', 'console2', 'nsis', 'firefox', 'cuda', 'ussf')]
+    [Parameter(Mandatory=$false, HelpMessage="Select tool(s). (7-Zip, cppunit, glew, ninja, git, cmake, python, eclipse, qt, boost, MSVC2013, console2, nsis, firefox, cuda, ussf)")]
+    [ValidateSet('7-Zip', 'cppunit', 'glew', 'ninja', 'git', 'cmake', 'python', 'eclipse', 'qt', 'boost', 'MSVC2013', 'console2', 'nsis', 'firefox', 'cuda', 'ussf')]
     [string[]]$tools
 )
 #Information 

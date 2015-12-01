@@ -528,7 +528,11 @@ class FAST(CppComponent):
         add('BUILD_TESTS:BOOL', False)
         add('VTK_INTEROP:BOOL', True)
         add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
-        add('EIGEN3_INCLUDE_DIR:PATH', '%s' % self._createSibling(Eigen).sourcePath())        
+        add('EIGEN3_INCLUDE_DIR:PATH', '%s' % self._createSibling(Eigen).sourcePath())    
+        if(platform.system() == 'Windows'):
+            add('GLEW_INCLUDE_PATH:PATH', "")
+            add('GLEW_LIBRARY:PATH', '%s' % os.path.expandvars("%SystemRoot%") + "/system32/glew32.dll" )
+            add('BUILD_SHARED_LIBS:BOOL', 'OFF') #On windows we build FAST as static, because it does not export symbols
         builder.configureCMake()
     def findPackagePath(self):
         return self.buildPath()

@@ -54,6 +54,8 @@ set(PLUGIN_UI_FORMS
 set(PLUGIN_resources
 )
 
+find_package(GLEW)
+
 #Compute the plugin dependencies
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries
@@ -63,6 +65,10 @@ set(PLUGIN_target_libraries
     PRIVATE
     OpenCLUtilityLibrary
     FAST
+    ${GLEW_LIBRARY}
+    ${OPENCL_LIBRARIES}
+    Qt5::Widgets
+    Qt5::OpenGL
     cxResource
     cxResourceFilter
 	cxResourceVisualization
