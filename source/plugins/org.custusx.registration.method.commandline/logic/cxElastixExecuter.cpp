@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QProcess>
 #include <QFile>
 #include <QDir>
+#include <QtGlobal>
 
 #include "cxTypeConversions.h"
 #include "cxTime.h"
@@ -120,8 +121,16 @@ bool ElastixExecuter::setInput(QString application,
 	QString commandLine = cmd.join(" ");
 	report(QString("Executing registration with command line: [%1]").arg(commandLine));
 
+#ifdef Q_OS_LINUX
+	// hack that inserts . into library path for linux. Solveds issue with elastix lib not being fixed up on linux.
+	QString path = QFileInfo(application).absolutePath();
+	QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+	env.insert("LD_LIBRARY_PATH", path);
+	mProcess->setProcessEnvironment(env);
+
 	mProcess->start(commandLine);
 	return true;
+#endif
 }
 
 void ElastixExecuter::execute()
