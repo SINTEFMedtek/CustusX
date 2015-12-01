@@ -14,6 +14,8 @@ cx_add_class_qt_moc(cxGui_SRCS
 	browser/cxTreeNodeImpl
 	browser/cxControllableSplitter
 	browser/cxShowDataTreeNode
+	browser/cxViewServiceTreeNode
+	browser/cxViewGroupTreeNode
 		filterWidgets/cxFilterSetupWidget
         filterWidgets/cxFiltersWidget
 	#----------------------

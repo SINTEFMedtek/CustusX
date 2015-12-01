@@ -44,6 +44,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxActiveData.h"
 #include "cxVisServices.h"
 #include "cxShowDataTreeNode.h"
+#include "cxViewServiceTreeNode.h"
+#include "cxViewGroupTreeNode.h"
+#include "cxViewService.h"
 
 namespace cx
 {
@@ -74,7 +77,7 @@ TreeRepository::TreeRepository(XmlOptionFile options, VisServicesPtr services) :
 	mAllModes << "spaces" << "flat";
 	mMode = this->getModeOption().readValue(mAllModes.front());
 
-	mAllNodeTypes << "data" << "metric" << "image" << "model" << "tool";
+	mAllNodeTypes << "data" << "metric" << "image" << "model" << "tool" << "view";
 	mVisibleNodeTypes = this->getVisibleNodeTypesOption().readValue(mAllNodeTypes.join(";")).split(";");
 
 	mWidgetTypeRepository.reset(new WidgetTypeRepository());
@@ -174,7 +177,7 @@ void TreeRepository::rebuild()
 	mNodes.clear();
 	this->insertTopNode();
 
-	QStringList groups = QStringList() << "tool" << "data" << "space";
+	QStringList groups = QStringList() << "tool" << "data" << "space" << "view";
 	for (unsigned i=0; i<groups.size(); ++i)
 		this->insertGroupNode(groups[i]);
 
@@ -206,6 +209,11 @@ void TreeRepository::rebuild()
 		this->insertToolNode(iter->second);
 	}
 
+	for (unsigned i=0; i<this->getServices()->view()->groupCount(); ++i)
+	{
+		this->appendNode(new ViewGroupTreeNode(mSelf, i));
+	}
+
 //	CX_LOG_CHANNEL_DEBUG("CA") << "  - built all nodes";
 }
 
@@ -213,7 +221,10 @@ void TreeRepository::insertGroupNode(QString groupname)
 {
 	if (this->getNodeForGroup(groupname))
 		return;
-	this->appendNode(new GroupTreeNode(mSelf, groupname));
+	if (groupname=="view")
+		this->appendNode(new ViewServiceTreeNode(mSelf));
+	else
+		this->appendNode(new GroupTreeNode(mSelf, groupname));
 }
 
 TreeNodePtr TreeRepository::getNodeForGroup(QString groupname)
@@ -243,7 +254,9 @@ void TreeRepository::insertDataNode(DataPtr data)
 void TreeRepository::appendNode(TreeNode* rawNode)
 {
 	TreeNodePtr node(rawNode);
-	mNodes.push_back(node);
+
+	if (!this->getNode(node->getUid()))
+		mNodes.push_back(node);
 }
 
 void TreeRepository::insertSpaceNode(CoordinateSystem space)
