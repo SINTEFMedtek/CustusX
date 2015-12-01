@@ -44,6 +44,7 @@ public:
   virtual QModelIndex parent(const QModelIndex& index ) const;
 
   TreeNodePtr getCurrentItem();
+  TreeNodePtr getNodeFromIndex(const QModelIndex& index);
   TreeRepositoryPtr repo() { return mRepository; }
 
 signals:

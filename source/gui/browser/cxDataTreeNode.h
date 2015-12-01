@@ -61,6 +61,7 @@ public:
 	QWidget* createPropertiesWidget() const;
 	virtual QVariant getColor() const;
 	virtual QVariant getFont() const;
+	virtual bool isDefaultExpanded() const;
 
 private:
 	DataPtr mData;

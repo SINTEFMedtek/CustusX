@@ -90,6 +90,7 @@ private:
   void onFilterSelectorChanged();
   void createButtonWidget(QWidget* widget);
   XmlOptionItem getShowToolbarOption();
+  void expandDefault(QModelIndex index);
 
   VisServicesPtr mServices;
   ControllableSplitter* mSplitter;

@@ -140,6 +140,11 @@ QVariant DataTreeNode::getFont() const
 	return QVariant();
 }
 
+bool DataTreeNode::isDefaultExpanded() const
+{
+	return (this->repo()->getMode()!="flat");
+}
+
 QVariant DataTreeNode::getViewGroupVisibility(int index) const
 {
 	DataViewProperties props = this->getServices()->view()->getGroup(index)->getProperties(mData->getUid());

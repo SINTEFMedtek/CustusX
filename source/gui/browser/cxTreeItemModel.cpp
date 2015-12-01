@@ -76,13 +76,22 @@ void TreeItemModel::currentItemChangedSlot(const QModelIndex& current, const QMo
 TreeNodePtr TreeItemModel::getCurrentItem()
 {
 	QModelIndex mi = mSelectionModel->currentIndex();
-	TreeNode *item = this->itemFromIndex(mi);
+	return this->getNodeFromIndex(mi);
+//	TreeNode *item = this->itemFromIndex(mi);
+//	if (!item)
+//		return TreeNodePtr();
+//	return mRepository->getNode(item->getUid());
+}
+
+TreeNodePtr TreeItemModel::getNodeFromIndex(const QModelIndex& index)
+{
+	TreeNode *item = this->itemFromIndex(index);
 	if (!item)
 		return TreeNodePtr();
 	return mRepository->getNode(item->getUid());
 }
 
-TreeNode *TreeItemModel::itemFromIndex(const QModelIndex& index) const
+TreeNode* TreeItemModel::itemFromIndex(const QModelIndex& index) const
 {
 	if (!index.isValid())
 		return mRepository->getTopNode().get();

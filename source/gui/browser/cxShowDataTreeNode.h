@@ -29,52 +29,86 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXTREENODEIMPL_H
-#define CXTREENODEIMPL_H
+#ifndef CXSHOWDATATREENODE_H
+#define CXSHOWDATATREENODE_H
 
-#include "cxTreeNode.h"
-#include "cxCoordinateSystemHelpers.h"
-#include <QVariant>
+#include "cxTreeNodeImpl.h"
+#include "cxViewGroupData.h"
 
 namespace cx
 {
+
 
 class TreeNode;
 typedef boost::weak_ptr<TreeNode> TreeNodeWeakPtr;
 typedef boost::shared_ptr<TreeNode> TreeNodePtr;
 
-
-class TreeNodeImpl : public TreeNode
+class ShowDataTreeNodeBase : public TreeNodeImpl
 {
   Q_OBJECT
 public:
-	TreeNodeImpl(TreeRepositoryWeakPtr repo);
-	virtual ~TreeNodeImpl() {}
-	virtual std::vector<TreeNodePtr> getChildren() const;
+	ShowDataTreeNodeBase(TreeRepositoryWeakPtr repo, DataPtr data);
+	virtual ~ShowDataTreeNodeBase() {}
+//	virtual QString getUid() const;
+//	virtual QString getName() const;
+//	virtual QString getType() const;
+	virtual TreeNodePtr getParent() const;
 	virtual bool isVisibleNode() const;
-
-	virtual void activate() {}
-	virtual QVariant getViewGroupVisibility(int index) const { return QVariant(); }
-	virtual void setViewGroupVisibility(int index, bool value) {}
-	virtual QVariant getColor() const { return QVariant(); }
-	virtual bool  useColoredName() const { return false; }
-	virtual QVariant getFont() const { return QVariant(); }
-	virtual QWidget* createPropertiesWidget() const { return NULL; }
-	virtual bool isDefaultExpanded() const { return true; }
-
-	virtual std::vector<TreeNodePtr> getVisibleChildren() const;
-	virtual TreeNodePtr getVisibleParent() const;
+	virtual void activate();
+	virtual QIcon getIcon() const;
+	virtual QVariant getViewGroupVisibility(int index) const;
+	virtual void setViewGroupVisibility(int index, bool value);
+	QWidget* createPropertiesWidget() const;
+	virtual QVariant getColor() const;
+	virtual QVariant getFont() const;
 
 protected:
-	TreeRepositoryWeakPtr mRepository;
-	VisServicesPtr getServices() const;
+	virtual DataViewProperties getDefiningDataViewProperties() const = 0;
+	DataPtr mData;
+};
 
-	TreeRepositoryPtr repo();
-	const TreeRepositoryPtr repo() const;
+class ShowVolumeDataTreeNode : public ShowDataTreeNodeBase
+{
+  Q_OBJECT
+public:
+	ShowVolumeDataTreeNode(TreeRepositoryWeakPtr repo, DataPtr data);
+	virtual ~ShowVolumeDataTreeNode() {}
+	virtual QString getUid() const;
+	virtual QString getName() const;
+	virtual QString getType() const;
 
-	QIcon addBackgroundColorToIcon(QIcon input, QColor color) const;
+protected:
+	virtual DataViewProperties getDefiningDataViewProperties() const;
+};
+
+class ShowSlice2DDataTreeNode : public ShowDataTreeNodeBase
+{
+  Q_OBJECT
+public:
+	ShowSlice2DDataTreeNode(TreeRepositoryWeakPtr repo, DataPtr data);
+	virtual ~ShowSlice2DDataTreeNode() {}
+	virtual QString getUid() const;
+	virtual QString getName() const;
+	virtual QString getType() const;
+
+protected:
+	virtual DataViewProperties getDefiningDataViewProperties() const;
+};
+
+class ShowSlice3DDataTreeNode : public ShowDataTreeNodeBase
+{
+  Q_OBJECT
+public:
+	ShowSlice3DDataTreeNode(TreeRepositoryWeakPtr repo, DataPtr data);
+	virtual ~ShowSlice3DDataTreeNode() {}
+	virtual QString getUid() const;
+	virtual QString getName() const;
+	virtual QString getType() const;
+
+protected:
+	virtual DataViewProperties getDefiningDataViewProperties() const;
 };
 
 } // namespace cx
 
-#endif // CXTREENODEIMPL_H
+#endif // CXSHOWDATATREENODE_H

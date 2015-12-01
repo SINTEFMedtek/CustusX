@@ -69,7 +69,7 @@ void BrowserWidget::createGUI()
 
 	//layout
 	mTreeView = new QTreeView(this);
-	mTreeView->setRootIsDecorated(false);
+//	mTreeView->setRootIsDecorated(false);
 	mTreeView->setTreePosition(1);
 	mTreeView->setModel(mModel);
 	mModel->setSelectionModel(mTreeView->selectionModel());
@@ -195,9 +195,30 @@ void BrowserWidget::onFilterSelectorChanged()
 	mModel->repo()->setMode(mFilterSelector->getValue());
 }
 
+void BrowserWidget::expandDefault(QModelIndex index)
+{
+	TreeNodePtr node = mModel->getNodeFromIndex(index);
+//	CX_LOG_CHANNEL_DEBUG("CA") << "check expand " << node->getName() << ", " <<  node->isDefaultExpanded();
+	if (!node->isDefaultExpanded())
+		return;
+
+//	CX_LOG_CHANNEL_DEBUG("CA") << "   did expand" << node->getName();
+	mTreeView->expand(index);
+
+	int rc = mModel->rowCount(index);
+	for (int r=0; r<rc; ++r)
+	{
+		QModelIndex child = mModel->index(r, 0, index);
+		this->expandDefault(child);
+	}
+}
+
 void BrowserWidget::resetView()
 {
-	mTreeView->expandToDepth(4);
+	mTreeView->setRootIsDecorated(mModel->repo()->getMode()!="spaces");
+	this->expandDefault(QModelIndex());
+//	mTreeView->expandToDepth(4);
+		
 	for (unsigned i=0; i<4; ++i)
 		mTreeView->resizeColumnToContents(i);
 }

@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackingService.h"
 #include "cxActiveData.h"
 #include "cxVisServices.h"
+#include "cxShowDataTreeNode.h"
 
 namespace cx
 {
@@ -212,9 +213,7 @@ void TreeRepository::insertGroupNode(QString groupname)
 {
 	if (this->getNodeForGroup(groupname))
 		return;
-
-	TreeNodePtr node(new GroupTreeNode(mSelf, groupname));
-	mNodes.push_back(node);
+	this->appendNode(new GroupTreeNode(mSelf, groupname));
 }
 
 TreeNodePtr TreeRepository::getNodeForGroup(QString groupname)
@@ -226,9 +225,7 @@ void TreeRepository::insertToolNode(ToolPtr tool)
 {
 	if (this->getNode(tool->getUid()))
 		return;
-
-	TreeNodePtr node(new ToolTreeNode(mSelf, tool));
-	mNodes.push_back(node);
+	this->appendNode(new ToolTreeNode(mSelf, tool));
 }
 
 void TreeRepository::insertDataNode(DataPtr data)
@@ -236,7 +233,16 @@ void TreeRepository::insertDataNode(DataPtr data)
 	if (this->getNode(data->getUid()))
 		return;
 
-	TreeNodePtr node(new DataTreeNode(mSelf, data));
+	this->appendNode(new DataTreeNode(mSelf, data));
+
+	this->appendNode(new ShowVolumeDataTreeNode(mSelf, data));
+	this->appendNode(new ShowSlice2DDataTreeNode(mSelf, data));
+	this->appendNode(new ShowSlice3DDataTreeNode(mSelf, data));
+}
+
+void TreeRepository::appendNode(TreeNode* rawNode)
+{
+	TreeNodePtr node(rawNode);
 	mNodes.push_back(node);
 }
 
@@ -244,9 +250,7 @@ void TreeRepository::insertSpaceNode(CoordinateSystem space)
 {
 	if (this->getNode(space.toString()) || this->getNode(space.mRefObject))
 		return;
-
-	TreeNodePtr node(new SpaceTreeNode(mSelf, space));
-	mNodes.push_back(node);
+	this->appendNode(new SpaceTreeNode(mSelf, space));
 }
 
 

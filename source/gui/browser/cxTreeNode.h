@@ -69,6 +69,7 @@ public:
 	virtual QVariant getColor() const = 0;
 	virtual bool  useColoredName() const = 0;
 	virtual QVariant getFont() const = 0;
+	virtual bool isDefaultExpanded() const = 0;
 
 	virtual std::vector<TreeNodePtr> getVisibleChildren() const = 0;
 	virtual TreeNodePtr getVisibleParent() const = 0;

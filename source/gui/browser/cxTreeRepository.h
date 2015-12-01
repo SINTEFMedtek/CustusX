@@ -127,6 +127,7 @@ private:
 	void insertSpaceNode(CoordinateSystem space);
 	void insertToolNode(ToolPtr tool);
 	void insertGroupNode(QString groupname);
+	void appendNode(TreeNode* rawNode);
 	void startListen();
 	void stopListen();
 };
