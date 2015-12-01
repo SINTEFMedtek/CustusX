@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxProfile.h"
 #include "cxFilePathProperty.h"
 #include "cxLogger.h"
+#include <QApplication>
 
 namespace cx
 {
@@ -62,12 +63,21 @@ ElastixParameters::ElastixParameters(XmlOptionFile options)
 
 void ElastixParameters::addDefaultPresets()
 {
-	FilePathPropertyPtr exe = this->getExecutable();
-	exe->setValue(cx::DataLocations::findConfigFilePath("run_elastix.sh", this->getConfigUid()+"/elastix/bin"));
-	FilePathPropertyPtr par0 = this->getParameterFile("0");
-	par0->setValue("elastix/par/p_Rigid.txt");
+    FilePathPropertyPtr exe = this->getExecutable();
 
-	this->addDefaultPreset("elastix/p_Rigid", exe->getValue(), QStringList() << par0->getValue());
+    if (DataLocations::isRunFromBuildFolder())
+    {
+        exe->setValue(cx::DataLocations::findConfigFilePath("run_elastix.sh", this->getConfigUid()+"/elastix/bin"));
+    }
+    else
+    {
+        exe->setValue(DataLocations::findExecutableInStandardLocations("elastix"));
+    }
+
+    FilePathPropertyPtr par0 = this->getParameterFile("0");
+    par0->setValue("elastix/par/p_Rigid.txt");
+
+    this->addDefaultPreset("elastix/p_Rigid", exe->getValue(), QStringList() << par0->getValue());
 }
 
 void ElastixParameters::addDefaultPreset(QString name, QString executable, QStringList parameterFiles)
@@ -151,8 +161,16 @@ void ElastixParameters::saveCurrentPreset(QString name)
 
 FilePathPropertyPtr ElastixParameters::getExecutable()
 {
-	QStringList paths = DataLocations::getRootConfigPaths();
-	paths = DataLocations::appendStringToAllElements(paths, "/"+this->getConfigUid());
+    QStringList paths;
+    if (DataLocations::isRunFromBuildFolder())
+    {
+        paths = DataLocations::getRootConfigPaths();
+        paths = DataLocations::appendStringToAllElements(paths, "/"+this->getConfigUid());
+    }
+    else
+    {
+        paths << qApp->applicationDirPath();
+    }
 
 	QDomElement root;
 	FilePathPropertyPtr retval;
