@@ -52,9 +52,12 @@ std::vector<TreeNodePtr> TreeNodeImpl::getChildren() const
 	std::vector<TreeNodePtr> retval;
 	std::vector<TreeNodePtr> all = this->repo()->getNodes();
 	for (unsigned i=0; i<all.size(); ++i)
-		if (all[i]->getParent().get() == this)
+	{
+		TreeNodePtr p = all[i]->getParent();
+		if (p && (p->getUid() == this->getUid()))
 			retval.push_back(all[i]);
 //	CX_LOG_CHANNEL_DEBUG("CA") << QString("  - data node %1 children: %2").arg(this->getName()).arg(retval.size());
+	}
 	return retval;
 }
 
@@ -81,8 +84,11 @@ std::vector<TreeNodePtr> TreeNodeImpl::getVisibleChildren() const
 	std::vector<TreeNodePtr> retval;
 	std::vector<TreeNodePtr> all = this->repo()->getNodes();
 	for (unsigned i=0; i<all.size(); ++i)
-		if (all[i]->getVisibleParent().get() == this)
+	{
+		TreeNodePtr vp = all[i]->getVisibleParent();
+		if (vp && (vp->getUid() == this->getUid()))
 			retval.push_back(all[i]);
+	}
 	return retval;
 }
 

@@ -29,82 +29,50 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include "cxViewGroupTreeNode.h"
-#include "cxTreeRepository.h"
-#include "cxLogger.h"
-#include "cxTrackingService.h"
-#include "cxVisServices.h"
-#include <QIcon>
-#include <QFont>
-#include <QLabel>
+
+#ifndef CXVIEWGROUPPROPERTIESWIDGET_H
+#define CXVIEWGROUPPROPERTIESWIDGET_H
+
+#include "cxGuiExport.h"
+
+#include "cxBaseWidget.h"
+
+#include <vector>
+#include "cxForwardDeclarations.h"
 #include "cxDoubleProperty.h"
-#include "cxViewGroupPropertiesWidget.h"
-#include "cxViewService.h"
 
 namespace cx
 {
 
-
-ViewGroupTreeNode::ViewGroupTreeNode(TreeRepositoryWeakPtr repo, int groupIndex) :
-	TreeNodeImpl(repo), mGroupIndex(groupIndex)
+/**
+ */
+class cxGui_EXPORT ViewGroupPropertiesWidget : public BaseWidget
 {
+  Q_OBJECT
 
-}
+public:
+	ViewGroupPropertiesWidget(DoublePropertyBasePtr selector, ViewServicePtr viewService, QWidget* parent);
+  virtual ~ViewGroupPropertiesWidget();
 
-QString ViewGroupTreeNode::getUid() const
-{
-	return QString("view_%1").arg(mGroupIndex);
-}
-
-QString ViewGroupTreeNode::getName() const
-{
-	return QString("View %1").arg(mGroupIndex);
-}
-
-TreeNodePtr ViewGroupTreeNode::getParent() const
-{
-	if (this->repo()->getMode()=="flat")
-		return this->repo()->getNodeForGroup("view");
-	return TreeNodePtr();
-}
-
-void ViewGroupTreeNode::activate()
-{
-//	this->getServices()->view()->set... need a method for setting active view group
-}
-
-QString ViewGroupTreeNode::getType() const
-{
-	return "view";
-}
-
-QIcon ViewGroupTreeNode::getIcon() const
-{
-	return QIcon(":icons/open_icon_library/eye.png.png");
-}
-
-QVariant ViewGroupTreeNode::getColor() const
-{
-	return QColor("blue");
-}
-
-QVariant ViewGroupTreeNode::getFont() const
-{
-	return QVariant();
-}
-
-QWidget* ViewGroupTreeNode::createPropertiesWidget() const
-{
-	DoublePropertyPtr selector;
-	selector = DoubleProperty::initialize("viewgroupindex", "View", "",
-										  mGroupIndex,
-										  DoubleRange(0, this->getServices()->view()->groupCount(), 1),
-										  0);
-	return new ViewGroupPropertiesWidget(selector,
-							  this->getServices()->view(),
-							  NULL);
-}
+signals:
 
 
-} // namespace cx
+protected:
+  void setupUI();
+  virtual void prePaintEvent();
 
+private:
+  void onSelectorChanged();
+  void updateFrontend();
+
+  DoublePropertyBasePtr mSelector;
+  ViewServicePtr mViewService;
+  QVBoxLayout* mLayout;
+  QWidget* mWidget;
+
+};
+
+}//end namespace cx
+
+
+#endif // CXVIEWGROUPPROPERTIESWIDGET_H

@@ -35,5 +35,37 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
+CachedTreeNode::CachedTreeNode(TreeNodePtr base) : mBase(base)
+{
+
+}
+
+QString CachedTreeNode::getUid() const
+{
+	if (mUid.isEmpty())
+		mUid = mBase->getUid();
+	return mUid;
+}
+
+QString CachedTreeNode::getType() const
+{
+	if (mType.isEmpty())
+		mType = mBase->getType();
+	return mType;
+}
+
+std::vector<TreeNodePtr> CachedTreeNode::getVisibleChildren() const
+{
+	return mBase->getVisibleChildren();
+}
+
+TreeNodePtr CachedTreeNode::getVisibleParent() const
+{
+//	return mBase->getVisibleParent();
+	if (!mVisibleParent.lock())
+		mVisibleParent = mBase->getVisibleParent();
+	return mVisibleParent.lock();
+}
+
 
 } // namespace cx

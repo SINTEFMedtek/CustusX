@@ -39,6 +39,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString>
 #include <QObject>
 #include "cxForwardDeclarations.h"
+#include <QIcon>
+#include <QVariant>
 
 namespace cx
 {
@@ -74,8 +76,46 @@ public:
 	virtual std::vector<TreeNodePtr> getVisibleChildren() const = 0;
 	virtual TreeNodePtr getVisibleParent() const = 0;
 
-signals:
-  void changed();
+//signals:
+//  void changed();
+};
+
+/**
+ * Cache for some often-used parts of TreeNode,
+ * that is unchanged between each reset.
+ */
+class CachedTreeNode : public TreeNode
+{
+  Q_OBJECT
+public:
+	explicit CachedTreeNode(TreeNodePtr base);
+	virtual ~CachedTreeNode() {}
+	virtual std::vector<TreeNodePtr> getChildren() const { return mBase->getChildren(); }
+	virtual QString getUid() const;
+	virtual QString getName() const { return mBase->getName(); }
+	virtual QString getType() const;
+	virtual TreeNodePtr getParent() const { return mBase->getParent(); }
+	virtual bool isVisibleNode() const { return mBase->isVisibleNode(); }
+	virtual void activate() { mBase->activate(); }
+	virtual QIcon getIcon() const { return mBase->getIcon(); }
+	virtual QVariant getViewGroupVisibility(int index) const { return mBase->getViewGroupVisibility(index); }
+	virtual void setViewGroupVisibility(int index, bool value) { mBase->setViewGroupVisibility(index, value); }
+	virtual QWidget* createPropertiesWidget() const { return mBase->createPropertiesWidget(); }
+	virtual QVariant getColor() const { return mBase->getColor(); }
+	virtual bool  useColoredName() const { return mBase->useColoredName(); }
+	virtual QVariant getFont() const { return mBase->getFont(); }
+	virtual bool isDefaultExpanded() const { return mBase->isDefaultExpanded(); }
+
+	virtual std::vector<TreeNodePtr> getVisibleChildren() const;
+	virtual TreeNodePtr getVisibleParent() const;
+
+private:
+	mutable QString mUid;
+	mutable QString mType;
+//	mutable std::vector<TreeNodeWeakPtr> mVisibleChildren;
+	mutable TreeNodeWeakPtr mVisibleParent;
+
+	TreeNodePtr mBase;
 };
 
 } // namespace cx

@@ -29,82 +29,55 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include "cxViewGroupTreeNode.h"
-#include "cxTreeRepository.h"
-#include "cxLogger.h"
-#include "cxTrackingService.h"
-#include "cxVisServices.h"
-#include <QIcon>
-#include <QFont>
-#include <QLabel>
-#include "cxDoubleProperty.h"
-#include "cxViewGroupPropertiesWidget.h"
-#include "cxViewService.h"
 
+#include "cxViewGroupPropertiesWidget.h"
+#include <QLabel>
 namespace cx
 {
 
+ViewGroupPropertiesWidget::ViewGroupPropertiesWidget(DoublePropertyBasePtr selector,
+													 ViewServicePtr viewService,
+													 QWidget* parent) :
+	BaseWidget(parent, "ViewGroupPropertiesWidget", "View Properties"),
+	mSelector(selector),
+	mViewService(viewService),
+	mWidget(NULL)
+{
+	mLayout = new QVBoxLayout(this);
+	this->setModified();
+}
 
-ViewGroupTreeNode::ViewGroupTreeNode(TreeRepositoryWeakPtr repo, int groupIndex) :
-	TreeNodeImpl(repo), mGroupIndex(groupIndex)
+ViewGroupPropertiesWidget::~ViewGroupPropertiesWidget()
+{
+}
+
+void ViewGroupPropertiesWidget::setupUI()
+{
+	if (mWidget) // already created
+		return;
+
+	mLayout->addWidget(new QLabel("view group props"));
+	mLayout->addStretch();
+
+	connect(mSelector.get(), &DoublePropertyBase::changed, this, &ViewGroupPropertiesWidget::onSelectorChanged);
+
+	this->onSelectorChanged();
+}
+
+void ViewGroupPropertiesWidget::prePaintEvent()
+{
+	this->setupUI();
+	this->updateFrontend();
+	//	this->toolPositionChanged();
+}
+
+void ViewGroupPropertiesWidget::onSelectorChanged()
+{
+}
+
+void ViewGroupPropertiesWidget::updateFrontend()
 {
 
 }
 
-QString ViewGroupTreeNode::getUid() const
-{
-	return QString("view_%1").arg(mGroupIndex);
-}
-
-QString ViewGroupTreeNode::getName() const
-{
-	return QString("View %1").arg(mGroupIndex);
-}
-
-TreeNodePtr ViewGroupTreeNode::getParent() const
-{
-	if (this->repo()->getMode()=="flat")
-		return this->repo()->getNodeForGroup("view");
-	return TreeNodePtr();
-}
-
-void ViewGroupTreeNode::activate()
-{
-//	this->getServices()->view()->set... need a method for setting active view group
-}
-
-QString ViewGroupTreeNode::getType() const
-{
-	return "view";
-}
-
-QIcon ViewGroupTreeNode::getIcon() const
-{
-	return QIcon(":icons/open_icon_library/eye.png.png");
-}
-
-QVariant ViewGroupTreeNode::getColor() const
-{
-	return QColor("blue");
-}
-
-QVariant ViewGroupTreeNode::getFont() const
-{
-	return QVariant();
-}
-
-QWidget* ViewGroupTreeNode::createPropertiesWidget() const
-{
-	DoublePropertyPtr selector;
-	selector = DoubleProperty::initialize("viewgroupindex", "View", "",
-										  mGroupIndex,
-										  DoubleRange(0, this->getServices()->view()->groupCount(), 1),
-										  0);
-	return new ViewGroupPropertiesWidget(selector,
-							  this->getServices()->view(),
-							  NULL);
-}
-
-
-} // namespace cx
-
+} // cx

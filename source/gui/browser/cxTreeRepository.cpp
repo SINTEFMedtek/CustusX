@@ -53,7 +53,7 @@ namespace cx
 
 void WidgetTypeRepository::add(QWidget *widget)
 {
-#include <QObject>
+//#include <QObject>
 	mWidgets.push_back(widget);
 }
 
@@ -167,8 +167,9 @@ WidgetTypeRepositoryPtr TreeRepository::getWidgetTypeRepository()
 
 void TreeRepository::insertTopNode()
 {
-	TreeNodePtr topnode(new TopTreeNode(mSelf));
-	mNodes.push_back(topnode);
+//	TreeNodePtr topnode(new TopTreeNode(mSelf));
+//	mNodes.push_back(topnode);
+	this->appendNode(new TopTreeNode(mSelf));
 //	CX_LOG_CHANNEL_DEBUG("CA") << "  - built topnode";
 }
 
@@ -182,14 +183,12 @@ void TreeRepository::rebuild()
 		this->insertGroupNode(groups[i]);
 
 	this->insertSpaceNode(CoordinateSystem(csREF));
-//	CX_LOG_CHANNEL_DEBUG("CA") << "  - built refspacenode";
 
 	std::map<QString, DataPtr> source = this->getServices()->patient()->getData();
 	for (std::map<QString, DataPtr>::const_iterator iter = source.begin(); iter != source.end(); ++iter)
 	{
 		this->insertDataNode(iter->second);
 	}
-//	CX_LOG_CHANNEL_DEBUG("CA") << "  - built datanodes";
 	for (std::map<QString, DataPtr>::const_iterator iter = source.begin(); iter != source.end(); ++iter)
 	{
 		QString space = iter->second->getParentSpace();
@@ -199,7 +198,6 @@ void TreeRepository::rebuild()
 			continue;
 		this->insertSpaceNode(CoordinateSystem(csDATA, space));
 	}
-//	CX_LOG_CHANNEL_DEBUG("CA") << "  - built spacenodes";
 
 	this->insertSpaceNode(CoordinateSystem(csPATIENTREF));
 
@@ -214,7 +212,8 @@ void TreeRepository::rebuild()
 		this->appendNode(new ViewGroupTreeNode(mSelf, i));
 	}
 
-//	CX_LOG_CHANNEL_DEBUG("CA") << "  - built all nodes";
+//	for (unsigned i=0; i<mNodes.size(); ++i)
+//		CX_LOG_CHANNEL_DEBUG("CA") << "  node: " << mNodes[i]->getUid();
 }
 
 void TreeRepository::insertGroupNode(QString groupname)
@@ -253,7 +252,8 @@ void TreeRepository::insertDataNode(DataPtr data)
 
 void TreeRepository::appendNode(TreeNode* rawNode)
 {
-	TreeNodePtr node(rawNode);
+	TreeNodePtr bnode(rawNode);
+	TreeNodePtr node(new CachedTreeNode(bnode));
 
 	if (!this->getNode(node->getUid()))
 		mNodes.push_back(node);
