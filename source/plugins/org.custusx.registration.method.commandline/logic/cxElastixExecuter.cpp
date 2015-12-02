@@ -127,10 +127,9 @@ bool ElastixExecuter::setInput(QString application,
 	QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
 	env.insert("LD_LIBRARY_PATH", path);
 	mProcess->setProcessEnvironment(env);
-
-	mProcess->start(commandLine);
-	return true;
 #endif
+    mProcess->start(commandLine);
+    return true;
 }
 
 void ElastixExecuter::execute()
