@@ -116,7 +116,7 @@ cxResource_EXPORT void reportVolatile(QString msg);
 
 /** Log to a named channel
  * Usage:
- *          CX_LOG_INFO("channel_name") << "Message " << "to output";
+ *          CX_LOG_CHANNEL_INFO("channel_name") << "Message " << "to output";
  * Will be written to the file channel_name.txt
  */
 #define CX_LOG_CHANNEL_DEBUG(channel)   CX_LOG_CHANNEL_SEVERITY_INTERNAL(channel, cx::mlDEBUG).logger()

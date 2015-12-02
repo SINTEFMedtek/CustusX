@@ -188,11 +188,15 @@ void BronchoscopyRegistrationWidget::registerSlot()
     }
 
 	Transform3D new_rMpr;
-	double maxDistanceForLocalRegistration = 30; //mm
-	if(mUseLocalRegistration->getValue())
+    double maxDistanceForLocalRegistration = 30; //mm
+    if(mUseLocalRegistration->getValue()){
+        std::cout << "Running local registration with max distance " << maxDistanceForLocalRegistration << " mm." << std::endl;
 		new_rMpr = Transform3D(mBronchoscopyRegistration->runBronchoscopyRegistration(trackerRecordedData_prMt,old_rMpr,maxDistanceForLocalRegistration));
-	else
+    }
+    else{
+        std::cout << "Running global registration." << std::endl;
 		new_rMpr = Transform3D(mBronchoscopyRegistration->runBronchoscopyRegistration(trackerRecordedData_prMt,old_rMpr,0));
+    }
 
     new_rMpr = new_rMpr*old_rMpr;//output
 	mServices->registration()->applyPatientRegistration(new_rMpr, "Bronchoscopy centerline to tracking data");

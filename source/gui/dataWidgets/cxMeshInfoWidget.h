@@ -40,20 +40,31 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMesh.h"
 #include "cxDataInterface.h"
 #include "cxInfoWidget.h"
+#include "cxTabbedWidget.h"
 
 
 namespace cx
 {
-typedef boost::shared_ptr<class StringPropertySelectMesh> StringPropertySelectMeshPtr;
+typedef boost::shared_ptr<class SelectDataStringPropertyBase> SelectDataStringPropertyBasePtr;
 
-class cxGui_EXPORT SelectedMeshInfoWidget : public BaseWidget
+class cxGui_EXPORT ActiveMeshPropertiesWidget : public TabbedWidget
 {
   Q_OBJECT
-
 public:
-	SelectedMeshInfoWidget(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget* parent);
-  virtual ~SelectedMeshInfoWidget();
+	ActiveMeshPropertiesWidget(VisServicesPtr services, QWidget* parent);
+  virtual ~ActiveMeshPropertiesWidget() {}
 };
+
+/// -------------------------------------------------------
+
+//class cxGui_EXPORT SelectedMeshInfoWidget : public BaseWidget
+//{
+//  Q_OBJECT
+
+//public:
+//	SelectedMeshInfoWidget(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget* parent);
+//  virtual ~SelectedMeshInfoWidget();
+//};
 
 /**
  * \class MeshInfoWidget
@@ -71,12 +82,12 @@ class cxGui_EXPORT MeshInfoWidget : public InfoWidget
   Q_OBJECT
 
 public:
-	MeshInfoWidget(StringPropertySelectMeshPtr meshSelector,
+	MeshInfoWidget(SelectDataStringPropertyBasePtr meshSelector,
 				   PatientModelServicePtr patientModelService, ViewServicePtr viewService,
 				   QWidget* parent);
   virtual ~MeshInfoWidget();
 
-	StringPropertySelectMeshPtr getSelector() { return mSelectMeshWidget; }
+	SelectDataStringPropertyBasePtr getSelector() { return mMeshSelector; }
 
 protected slots:
   void setColorSlot();
@@ -96,7 +107,7 @@ private:
   StringPropertyParentFramePtr mParentFrameAdapter;
   StringPropertyDataNameEditablePtr mNameAdapter;
   StringPropertyDataUidEditablePtr mUidAdapter;
-  StringPropertySelectMeshPtr mSelectMeshWidget;
+  SelectDataStringPropertyBasePtr mMeshSelector;
   ColorPropertyPtr mColorAdapter;
   QCheckBox* mBackfaceCullingCheckBox;
   QCheckBox* mFrontfaceCullingCheckBox;

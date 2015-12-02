@@ -110,6 +110,7 @@ void ClipperWidget::setupDataStructures()
 	connect(mUseClipperCheckBox, &QCheckBox::toggled, this, &ClipperWidget::enable);
 	connect(mToolSelector.get(), &StringPropertySelectTool::changed, this, &ClipperWidget::onToolChanged);
 	connect(mAttachedToTool, &QCheckBox::toggled, this, &ClipperWidget::onToolChanged);
+	connect(mServices->tracking().get(), &TrackingService::activeToolChanged, this, &ClipperWidget::onToolChanged);
 
 	mDataTableWidget = new QTableWidget(this);
 }

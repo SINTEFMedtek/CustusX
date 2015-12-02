@@ -143,7 +143,7 @@ target_link_libraries(cxGui
 	cxResourceFilter
 	)
 
-cx_doc_define_plugin_user_docs("${PROJECT_NAME}" "${CMAKE_CURRENT_SOURCE_DIR}/doc")
+cx_doc_define_user_docs("${CMAKE_CURRENT_SOURCE_DIR}/doc")
 cx_add_non_source_file("doc/preferences.md")
 
 add_subdirectory(testing)

@@ -47,28 +47,62 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
+SelectClippersForImageWidget::SelectClippersForImageWidget(VisServicesPtr services, QWidget* parent) :
+	BaseWidget(parent, "SelectClippersForImageWidget", "Select Clippers")
+{
+	StringPropertyActiveImagePtr activeImageProperty = StringPropertyActiveImage::New(services->patient());
+
+	QVBoxLayout *mLayout = new QVBoxLayout(this);
+
+	SelectClippersForDataWidget *selectClippersWidget = new SelectClippersForDataWidget(services, this);
+	selectClippersWidget->setActiveDataProperty(activeImageProperty);
+
+	mLayout->addWidget(selectClippersWidget);
+}
+
+/// -------------------------------------------------------
+
+SelectClippersForMeshWidget::SelectClippersForMeshWidget(VisServicesPtr services, QWidget* parent) :
+	BaseWidget(parent, "SelectClippersForMeshWidget", "Select Clippers")
+{
+	StringPropertyActiveDataPtr activeMeshProperty = StringPropertyActiveData::New(services->patient(), "mesh");
+
+	QVBoxLayout *mLayout = new QVBoxLayout(this);
+
+	SelectClippersForDataWidget *selectClippersWidget = new SelectClippersForDataWidget(services, this);
+	selectClippersWidget->setActiveDataProperty(activeMeshProperty);
+
+	mLayout->addWidget(selectClippersWidget);
+}
+
+/// -------------------------------------------------------
+
 SelectClippersForDataWidget::SelectClippersForDataWidget(VisServicesPtr services, QWidget* parent) :
 	BaseWidget(parent, "SelectClippersForDataWidget", "Select Clippers"),
 	mServices(services),
-	mActiveData(services->patient()->getActiveData())
+	mActiveDataProperty(StringPropertyActiveData::New(services->patient()))
 {
 	this->initUI();
 
 	ClippersPtr clippers = mServices->view()->getClippers();
 	connect(clippers.get(), &Clippers::changed, this, &SelectClippersForDataWidget::setModified);
-	connect(mActiveData.get(), &ActiveData::activeDataChanged, this, &SelectClippersForDataWidget::setModified);
+	connect(mActiveDataProperty.get(), &Property::changed, this, &SelectClippersForDataWidget::setModified);
+}
+
+void SelectClippersForDataWidget::setActiveDataProperty(SelectDataStringPropertyBasePtr property)
+{
+	disconnect(mActiveDataProperty.get(), &Property::changed, this, &SelectClippersForDataWidget::setModified);
+	mActiveDataProperty = property;
+	connect(mActiveDataProperty.get(), &Property::changed, this, &SelectClippersForDataWidget::setModified);
 }
 
 void SelectClippersForDataWidget::initUI()
 {
-	StringPropertyActiveDataPtr activeDataProperty = StringPropertyActiveData::New(mServices->patient());
-
 	mClipperTableWidget = new QTableWidget(this);
 
 	mHeading = new QLabel("Active clippers");
 
 	mLayout = new QVBoxLayout(this);
-	mLayout->addWidget(new DataSelectWidget(mServices->view(), mServices->patient(), this, activeDataProperty));
 	mLayout->addWidget(mHeading);
 	mLayout->addWidget(mClipperTableWidget);
 
@@ -121,7 +155,7 @@ void SelectClippersForDataWidget::createDataCheckBox(int row, QString clipperNam
 void SelectClippersForDataWidget::updateCheckBoxesFromClipper(QCheckBox *dataCheckBox, QCheckBox *invertCheckBox, QString clipperName)
 {
 	cx::InteractiveClipperPtr clipper = this->getClipper(clipperName);
-	DataPtr activeData = mActiveData->getActive<Data>();
+	DataPtr activeData = mActiveDataProperty->getData();
 
 	bool checkData = clipper->exists(activeData);
 	dataCheckBox->setChecked(checkData);
@@ -146,7 +180,7 @@ cx::InteractiveClipperPtr SelectClippersForDataWidget::getClipper(QString clippe
 
 void SelectClippersForDataWidget::clipDataClicked(QCheckBox *checkBox, QString clipperName)
 {
-	DataPtr activeData = mActiveData->getActive<Data>();
+	DataPtr activeData = mActiveDataProperty->getData();
 	cx::InteractiveClipperPtr clipper = this->getClipper(clipperName);
 	bool checked = checkBox->isChecked();
 

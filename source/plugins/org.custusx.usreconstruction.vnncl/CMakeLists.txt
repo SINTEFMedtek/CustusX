@@ -35,7 +35,7 @@ install(FILES
 	${CustusX_SOURCE_DIR}/source/plugins/org.custusx.usreconstruction.vnncl/kernels.cl
 	${CustusX_SOURCE_DIR}/source/plugins/org.custusx.usreconstruction.vnncl/kernels.cl.h
 	DESTINATION
-	${CX_INSTALL_ROOT_DIR}/config/shaders/)
+        ${CX_INSTALL_CONFIG_DIR}/shaders/)
 
 #Compute the plugin dependencies
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
@@ -62,6 +62,7 @@ ctkMacroBuildPlugin(
   RESOURCES ${PLUGIN_resources}
   TARGET_LIBRARIES ${PLUGIN_target_libraries}
   OUTPUT_DIR ${PLUGIN_OUTPUT_DIR}
+  ${CX_CTK_PLUGIN_NO_INSTALL}
 )
 
 target_include_directories(org_custusx_usreconstruction_vnncl

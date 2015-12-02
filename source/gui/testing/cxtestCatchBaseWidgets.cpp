@@ -223,11 +223,12 @@ TEST_CASE("InfoWidgets are correctly constructed", "[unit][gui][widget][not_win3
 {
 	init();
 	ctkPluginContext *pluginContext = cx::LogicManager::getInstance()->getPluginContext();
+	cx::VisServicesPtr services = cx::VisServices::create(pluginContext);
 	cx::PatientModelServicePtr patientModelService = cx::PatientModelServiceProxy::create(pluginContext);
 	cx::ViewServicePtr viewService = cx::ViewService::getNullObject(); //mock
 	//cxInfoWidgets
 	testAndDeleteBaseWidgetChild(new cx::VolumeInfoWidget(patientModelService, NULL));
-	testAndDeleteBaseWidgetChild(new cx::SelectedMeshInfoWidget(patientModelService, viewService, NULL));
+	testAndDeleteBaseWidgetChild(new cx::ActiveMeshPropertiesWidget(services, NULL));
 	shutdown();
 }
 

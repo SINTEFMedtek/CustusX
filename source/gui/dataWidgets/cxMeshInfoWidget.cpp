@@ -49,40 +49,62 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxLogger.h"
 #include "cxProfile.h"
+#include "cxVisServices.h"
+#include "cxSelectClippersForDataWidget.h"
 
 namespace cx
 {
-
-SelectedMeshInfoWidget::SelectedMeshInfoWidget(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget* parent) :
-	BaseWidget(parent, "MeshInfoWidget", "Mesh Properties")
+ActiveMeshPropertiesWidget::ActiveMeshPropertiesWidget(VisServicesPtr services, QWidget *parent) :
+		TabbedWidget(parent, "MeshInfoWidget", "Mesh Properties")
 {
-	StringPropertySelectMeshPtr meshSelector = StringPropertySelectMesh::New(patientModelService);
-	meshSelector->setValueName("Surface: ");
+	this->setToolTip("Mesh properties");
 
-	QVBoxLayout* layout = new QVBoxLayout(this);
-	layout->setMargin(0);
-	layout->addWidget(new DataSelectWidget(viewService, patientModelService, this, meshSelector));
+	StringPropertyActiveDataPtr activeMeshProperty = StringPropertyActiveData::New(services->patient(), "mesh");
+	activeMeshProperty->setValueName("Active Mesh");
 
-	MeshInfoWidget* info = new MeshInfoWidget(meshSelector, patientModelService, viewService, this);
-	info->layout()->setMargin(0);
-	layout->addWidget(info);
+	this->insertWidgetAtTop(new DataSelectWidget(services->view(), services->patient(), this, activeMeshProperty));
+
+	this->addTab(new MeshInfoWidget(activeMeshProperty, services->patient(), services->view(), this), "Info");
+	this->addTab(new SelectClippersForMeshWidget(services, this), "Clip");
 }
 
-SelectedMeshInfoWidget::~SelectedMeshInfoWidget()
-{
-}
+//<<<<<<< HEAD
+//SelectedMeshInfoWidget::SelectedMeshInfoWidget(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget* parent) :
+//	BaseWidget(parent, "MeshInfoWidget", "Mesh Properties")
+//{
+//	StringPropertySelectMeshPtr meshSelector = StringPropertySelectMesh::New(patientModelService);
+//	meshSelector->setValueName("Surface: ");
+
+//	QVBoxLayout* layout = new QVBoxLayout(this);
+//	layout->setMargin(0);
+//	layout->addWidget(new DataSelectWidget(viewService, patientModelService, this, meshSelector));
+
+//	MeshInfoWidget* info = new MeshInfoWidget(meshSelector, patientModelService, viewService, this);
+//	info->layout()->setMargin(0);
+//	layout->addWidget(info);
+//}
+
+//SelectedMeshInfoWidget::~SelectedMeshInfoWidget()
+//{
+//}
+
+
+
+
+
+
 
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-MeshInfoWidget::MeshInfoWidget(StringPropertySelectMeshPtr meshSelector,
+MeshInfoWidget::MeshInfoWidget(SelectDataStringPropertyBasePtr meshSelector,
 							   PatientModelServicePtr patientModelService,
 							   ViewServicePtr viewService,
 							   QWidget* parent) :
 	InfoWidget(parent, "MeshCoreInfoWidget", "Mesh Properties"),
 	mPatientModelService(patientModelService),
 	mViewService(viewService),
-	mSelectMeshWidget(meshSelector)
+	mMeshSelector(meshSelector)
 {
 	this->addWidgets();
 	this->meshSelectedSlot();
@@ -103,12 +125,14 @@ void MeshInfoWidget::setColorSlot()
 
 void MeshInfoWidget::setColorSlotDelayed()
 {
-  mMesh->setColor(mColorAdapter->getValue());
+	if(!mMesh)
+	  return;
+	mMesh->setColor(mColorAdapter->getValue());
 }
 
 void MeshInfoWidget::meshSelectedSlot()
 {
-	if (mMesh == mSelectMeshWidget->getMesh())
+	if (mMesh == mMeshSelector->getData())
 	return;
 
 	if(mMesh)
@@ -120,7 +144,7 @@ void MeshInfoWidget::meshSelectedSlot()
 		disconnect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
     }
 
-	mMesh = mSelectMeshWidget->getMesh();
+	mMesh = boost::dynamic_pointer_cast<Mesh>(mMeshSelector->getData());
 
 	if (!mMesh)
 	{
@@ -172,7 +196,8 @@ void MeshInfoWidget::importTransformSlot()
   
 void MeshInfoWidget::meshChangedSlot()
 {
-    if(!mMesh) return;
+	if(!mMesh)
+		return;
 	mBackfaceCullingCheckBox->setChecked(mMesh->getBackfaceCulling());
 	mFrontfaceCullingCheckBox->setChecked(mMesh->getFrontfaceCulling());
     mGlyphVisualizationCheckBox->setChecked(mMesh->showGlyph());
@@ -193,9 +218,7 @@ void MeshInfoWidget::hideEvent(QCloseEvent* event)
 
 void MeshInfoWidget::addWidgets()
 {
-//	mSelectMeshWidget = StringPropertySelectMesh::New(mPatientModelService);
-//    mSelectMeshWidget->setValueName("Surface: ");
-	connect(mSelectMeshWidget.get(), &Property::changed, this, &MeshInfoWidget::meshSelectedSlot);
+	connect(mMeshSelector.get(), &Property::changed, this, &MeshInfoWidget::meshSelectedSlot);
 
 	XmlOptionFile options = profile()->getXmlSettings().descend("MeshInfoWidget");
 	QString uid("Color");
@@ -203,8 +226,10 @@ void MeshInfoWidget::addWidgets()
 	QString help("Color of the mesh.");
 	QColor color("red");
 
-	if(mSelectMeshWidget->getMesh())
-		color = mSelectMeshWidget->getMesh()->getColor();
+	MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(mMeshSelector->getData());
+
+	if(mesh)
+		color = mesh->getColor();
 
 	mColorAdapter = ColorProperty::initialize(uid, name, help, color, options.getElement());
 	connect(mColorAdapter.get(), SIGNAL(changed()), this, SLOT(setColorSlot()));
@@ -250,7 +275,6 @@ void MeshInfoWidget::addWidgets()
 
 	int gridLayoutRow = 1;
 
-//	gridLayout->addWidget(new DataSelectWidget(mViewService, mPatientModelService, this, mSelectMeshWidget), gridLayoutRow++, 0, 1, 2);
 	new LabeledLineEditWidget(this, mUidAdapter, gridLayout, gridLayoutRow++);
 	new LabeledLineEditWidget(this, mNameAdapter, gridLayout, gridLayoutRow++);
     new LabeledComboBoxWidget(this, mParentFrameAdapter, gridLayout, gridLayoutRow++);

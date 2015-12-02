@@ -222,6 +222,25 @@
 get_filename_component(BundleUtilities_cmake_dir "${CMAKE_CURRENT_LIST_FILE}" PATH)
 include(GetPrerequisites)
 
+###############################################################################
+# Clean /./ - like structures from a path list
+#
+## Input variables:
+#    INPUT_PATH : List of paths to file.
+#
+## Output variables:
+#    RESULT_PATH : List of cleaned paths to files
+###############################################################################
+function(cx_clean_path INPUT_PATH RESULT_PATH)
+    set(_TEMP_INPUT ${INPUT_PATH})
+    set(_TEMP_RETVAL "")
+    foreach(_ITER ${_TEMP_INPUT})
+        string(REPLACE "/./" "/" _ITER ${_ITER})
+        list(APPEND _TEMP_RETVAL ${_ITER})
+    endforeach()
+    set(${RESULT_PATH} ${_TEMP_RETVAL} PARENT_SCOPE)
+endfunction()
+
 
 function(get_bundle_main_executable bundle result_var)
   set(result "error: '${bundle}/Contents/Info.plist' file does not exist")
@@ -779,6 +798,12 @@ function(fixup_bundle_item resolved_embedded_item exepath dirs)
 endfunction()
 
 function(fixup_bundle app libs dirs)
+
+cx_clean_path("${app}" app)
+cx_clean_path("${libs}" libs)
+cx_clean_path("${dirs}" dirs)
+
+
   message(STATUS "-----------------------------")
   message(STATUS "fixup_bundle")
   message(STATUS "-----------------------------")

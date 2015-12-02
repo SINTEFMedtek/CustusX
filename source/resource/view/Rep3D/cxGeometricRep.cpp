@@ -54,7 +54,7 @@ GeometricRep::GeometricRep() :
     RepImpl()
 {
     mGraphicalPolyDataPtr.reset(new GraphicalPolyData3D());
-    mGraphicalGlyph3DDataPtr.reset(new GraphicalGlyph3DData());
+	mGraphicalGlyph3DDataPtr.reset(new GraphicalGlyph3DData());
 
 }
 GeometricRep::~GeometricRep()
@@ -83,18 +83,19 @@ void GeometricRep::setMesh(MeshPtr mesh)
         return;
     if (mMesh)
     {
-        disconnect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
-        disconnect(mMesh.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
-		disconnect(mMesh.get(), SIGNAL(clipPlanesChanged()), this, SLOT(clipPlanesChangedSlot()));
+		disconnect(mMesh.get(), &Mesh::meshChanged, this, &GeometricRep::meshChangedSlot);
+		disconnect(mMesh.get(), &Data::transformChanged, this, &GeometricRep::transformChangedSlot);
+		disconnect(mMesh.get(), &Data::clipPlanesChanged, this, &GeometricRep::clipPlanesChangedSlot);
     }
     mMesh = mesh;
     if (mMesh)
     {
-        connect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
-        connect(mMesh.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
-		connect(mMesh.get(), SIGNAL(clipPlanesChanged()), this, SLOT(clipPlanesChangedSlot()));
+		connect(mMesh.get(), &Mesh::meshChanged, this, &GeometricRep::meshChangedSlot);
+		connect(mMesh.get(), &Data::transformChanged, this, &GeometricRep::transformChangedSlot);
+		connect(mMesh.get(), &Data::clipPlanesChanged, this, &GeometricRep::clipPlanesChangedSlot);
         this->meshChangedSlot();
         this->transformChangedSlot();
+		this->clipPlanesChangedSlot();
     }
 }
 

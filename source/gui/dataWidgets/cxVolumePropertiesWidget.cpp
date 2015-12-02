@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxPatientModelService.h"
 #include "cxVisServices.h"
+#include "cxSelectClippersForDataWidget.h"
 
 namespace cx
 {
@@ -84,7 +85,7 @@ VolumePropertiesWidget::VolumePropertiesWidget(VisServicesPtr services, QWidget 
 	this->addTab(new TransferFunctionWidget(services->patient(), this, connectToActiveImage), QString("Transfer Functions"));
 	this->addTab(new ShadingWidget(services->patient()->getActiveData(), this, connectToActiveImage), "Properties");
 	this->addTab(new CroppingWidget(services->patient(), services->view(), this), "Crop");
-	this->addTab(new ClippingWidget(services, this), "Clip");
+	this->addTab(new SelectClippersForImageWidget(services, this), "Clip");
 }
 
 }//namespace
