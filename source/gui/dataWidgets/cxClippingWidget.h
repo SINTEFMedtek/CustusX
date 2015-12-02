@@ -42,7 +42,6 @@ class QCheckBox;
 namespace cx
 {
 typedef boost::shared_ptr<class StringPropertySelectData> StringPropertySelectDataPtr;
-typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
 
 /**
  * \file

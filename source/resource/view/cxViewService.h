@@ -46,10 +46,6 @@ class QActionGroup;
 namespace cx
 {
 
-typedef boost::shared_ptr<class ViewService> ViewServicePtr;
-typedef boost::shared_ptr<class ViewGroup> ViewGroupPtr;
-typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
-typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
 typedef boost::shared_ptr<class InteractiveCropper> InteractiveCropperPtr;
 typedef boost::shared_ptr<class Clippers> ClippersPtr;
 

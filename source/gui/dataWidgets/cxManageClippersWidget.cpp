@@ -121,16 +121,8 @@ void ManageClippersWidget::clipperChanged()
 		return;
 
 	mCurrentClipper = getClippers()->getClipper(clipperName);
-//	this->setupClipperUI();
 	mClipperWidget->setClipper(mCurrentClipper);
 }
-
-//void ClippersWidget::setupClipperUI()
-//{
-//	ClipperWidget *clipperWidget = new ClipperWidget(mCurrentClipper, this);
-////	mLayout->addWidget(clipperWidget);
-////	mLayout->addStretch();
-//}
 
 void ManageClippersWidget::newClipperButtonClicked()
 {

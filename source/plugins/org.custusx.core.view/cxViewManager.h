@@ -59,7 +59,6 @@ class ViewCollectionWidget;
 class ViewWrapper;
 typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
 typedef boost::shared_ptr<class InteractiveCropper> InteractiveCropperPtr;
-typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
 typedef boost::shared_ptr<class CyclicActionLogger> CyclicActionLoggerPtr;
 typedef boost::shared_ptr<class CameraStyleInteractor> CameraStyleInteractorPtr;
 typedef boost::shared_ptr<class RenderLoop> RenderLoopPtr;

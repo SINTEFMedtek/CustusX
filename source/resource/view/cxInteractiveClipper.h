@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include "cxDefinitions.h"
 #include "cxForwardDeclarations.h"
+class QDomNode;
 
 namespace cx
 {
@@ -57,7 +58,9 @@ typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
  */
 class cxResourceVisualization_EXPORT InteractiveClipper: public QObject
 {
-Q_OBJECT
+	Q_OBJECT
+	QString getDataUids();
+	void setDataUids(QString uids);
 public:
 	InteractiveClipper(CoreServicesPtr services);
 
@@ -77,6 +80,8 @@ public:
 	std::map<QString, DataPtr> getDatas();
 	void setTool(ToolPtr tool);
 	void useActiveTool(bool on);
+	void parseXml(QDomNode dataNode);
+	void addXml(QDomNode &dataNode);
 signals:
 	void changed();
 public slots:
