@@ -81,7 +81,7 @@ void BrowserWidget::createGUI()
 	mPopupWidget->setPopupVisible(this->getShowToolbarOption().readValue(QString::number(false)).toInt());
 
 	mPropertiesWidget = new ReplacableContentWidget(this);
-	mPropertiesWidget->setWidget(new QLabel("<not available>"));
+	mPropertiesWidget->setWidget(new QLabel("no\nproperties\nselected"));
 
 	mSplitter = new ControllableSplitter(mOptions.descend("splitter"), this);
 	layout->addWidget(mSplitter, 1);
@@ -110,6 +110,28 @@ void BrowserWidget::prePaintEvent()
 	this->resetView();
 }
 
+void BrowserWidget::updateNodeName()
+{
+	TreeNodePtr node =  mModel->getCurrentItem();
+
+	if (mName->actions().empty())
+		mName->addAction(node->getIcon(), QLineEdit::LeadingPosition);
+	else
+		mName->actions().front()->setIcon(node->getIcon());
+
+
+	mName->setText(node->getName());
+//	mName->addAction(node->getIcon(), QLineEdit::LeadingPosition);
+
+	int height = mName->height();
+
+	QFontMetrics fm(QFont("", 0));
+	mName->setFixedSize(fm.width(mName->text())+height*2, height);
+
+//    this->adjustSize();
+}
+
+
 void BrowserWidget::createButtonWidget(QWidget* widget)
 {
 	QHBoxLayout* buttonLayout = new QHBoxLayout(widget);
@@ -131,6 +153,10 @@ void BrowserWidget::createButtonWidget(QWidget* widget)
 
 	// everything being added after this will be aligned to the right side
 	buttonLayout->addStretch(1);
+
+	mName = new QLineEdit;
+	mName->setReadOnly(true);
+	buttonLayout->addWidget(mName);
 
 	QToolButton* button;
 	button = new CXSmallToolButton();
@@ -177,6 +203,7 @@ void BrowserWidget::resetView()
 
 void BrowserWidget::onCurrentItemChanged()
 {
+	this->updateNodeName();
 	QWidget* widget = mModel->getCurrentItem()->createPropertiesWidget();
 	mPropertiesWidget->setWidget(widget);
 }

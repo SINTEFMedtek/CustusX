@@ -44,6 +44,7 @@ class QVBoxLayout;
 class QTreeWidgetItem;
 class QTreeView;
 class QSplitter;
+class QLineEdit;
 
 namespace cx
 {
@@ -88,12 +89,16 @@ private:
   void createButtonWidget(QWidget* widget);
   XmlOptionItem getShowToolbarOption();
   void expandDefault(QModelIndex index);
+  void updateNodeName();
 
   VisServicesPtr mServices;
   ControllableSplitter* mSplitter;
   QPointer<ReplacableContentWidget> mPropertiesWidget;
   PopupToolbarWidget* mPopupWidget;
   XmlOptionFile mOptions;
+//  QLabel* mNameLabel;
+  QLineEdit* mName;
+
 
   StringPropertyPtr mFilterSelector;
 };
