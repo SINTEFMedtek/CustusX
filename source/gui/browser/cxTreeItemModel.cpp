@@ -14,6 +14,7 @@
 #include "cxTreeRepository.h"
 #include "cxLogger.h"
 #include <QVariant>
+#include "cxStringListProperty.h"
 
 namespace cx
 {
@@ -30,6 +31,9 @@ TreeItemModel::TreeItemModel(XmlOptionFile options, VisServicesPtr services, QOb
 	mColorIndex = 0;
 	mViewGroupIndex = 2;
 	mViewGroupCount = 3;
+
+	this->createShowColumnsProperty();
+	this->onShowColumnsChanged();
 
 	mRepository = TreeRepository::create(options.descend("repository"), services);
 	connect(mRepository.get(), &TreeRepository::invalidated, this, &TreeItemModel::hasBeenReset);
@@ -51,13 +55,59 @@ void TreeItemModel::update()
 //	CX_LOG_CHANNEL_DEBUG("CA") << "TreeItemModel::buildTree() E";
 }
 
+void TreeItemModel::createShowColumnsProperty()
+{
+	QStringList range = QStringList() << "color" << "vg0" << "vg1" << "vg2" << "vg3";
+	QStringList defvals = range;
+	defvals.pop_back();
+	defvals.pop_back();
+//	QStringList range = QStringList() << "Color"
+//									  << "View Group 0"
+//									  << "View Group 1"
+//									  << "View Group 2"
+//									  << "View Group 3";
+	mShowColumnsProperty = StringListProperty::initialize("visible_columns",
+														"Columns",
+														"Select visible columns",
+														range,
+														range,
+														 mOptions.getElement());
+	connect(mShowColumnsProperty.get(), &Property::changed, this, &TreeItemModel::onShowColumnsChanged);
+}
+
+void TreeItemModel::onShowColumnsChanged()
+{
+	this->beginResetModel();
+
+	int none = 1000;
+	QStringList cols = mShowColumnsProperty->getValue();
+
+	mColumnCount = 0;
+	mNameIndex = mColumnCount++;
+	mColorIndex = cols.contains("color") ? mColumnCount++ : none;
+	mViewGroupCount = 0;
+	while (cols.contains(QString("vg%1").arg(mViewGroupCount)))
+		++mViewGroupCount;
+	mViewGroupIndex = (mViewGroupCount>0) ? mColumnCount : none;
+	mColumnCount += mViewGroupCount;
+
+//	CX_LOG_CHANNEL_DEBUG("CA") << "mColorIndex: " << mColorIndex;
+//	CX_LOG_CHANNEL_DEBUG("CA") << "mNameIndex: " << mNameIndex;
+//	CX_LOG_CHANNEL_DEBUG("CA") << "mViewGroupIndex: " << mViewGroupIndex;
+//	CX_LOG_CHANNEL_DEBUG("CA") << "mViewGroupCount: " << mViewGroupCount;
+//	CX_LOG_CHANNEL_DEBUG("CA") << "mColumnCount: " << mColumnCount;
+
+	this->endResetModel();
+	emit hasBeenReset();
+}
+
+
 
 void TreeItemModel::setSelectionModel(QItemSelectionModel* selectionModel)
 {
 	mSelectionModel = selectionModel;
 	connect(mSelectionModel, &QItemSelectionModel::currentChanged,
 			this, &TreeItemModel::currentItemChangedSlot);
-//	connect(mSelectionModel, SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(currentItemChangedSlot(const QModelIndex&, const QModelIndex&)));
 }
 
 TreeItemModel::~TreeItemModel()
@@ -77,10 +127,6 @@ TreeNodePtr TreeItemModel::getCurrentItem()
 {
 	QModelIndex mi = mSelectionModel->currentIndex();
 	return this->getNodeFromIndex(mi);
-//	TreeNode *item = this->itemFromIndex(mi);
-//	if (!item)
-//		return TreeNodePtr();
-//	return mRepository->getNode(item->getUid());
 }
 
 TreeNodePtr TreeItemModel::getNodeFromIndex(const QModelIndex& index)
@@ -103,7 +149,7 @@ int TreeItemModel::columnCount(const QModelIndex& parent) const
 {
 //	if (parent.isValid() && (parent.column() != mNameIndex)) // ignore for all but first column
 //		return 0;
-	return mViewGroupIndex+mViewGroupCount;
+	return mColumnCount;
 }
 
 int TreeItemModel::rowCount(const QModelIndex& parent) const

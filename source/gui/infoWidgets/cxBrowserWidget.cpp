@@ -71,7 +71,7 @@ void BrowserWidget::createGUI()
 	//layout
 	mTreeView = new QTreeView(this);
 //	mTreeView->setRootIsDecorated(false);
-	mTreeView->setTreePosition(1);
+//	mTreeView->setTreePosition(1);
 	mTreeView->setModel(mModel);
 	mModel->setSelectionModel(mTreeView->selectionModel());
 
@@ -149,6 +149,11 @@ void BrowserWidget::createButtonWidget(QWidget* widget)
 	buttonLayout->addWidget(mode);
 	buttonLayout->setStretch(buttonLayout->count()-1, 0);
 
+	StringListSelectWidget* columns = new StringListSelectWidget(this, mModel->getShowColumnsProperty());
+	columns->showLabel(false);
+	columns->setIcon(QIcon(":/icons/open_icon_library/eye.png.png"));
+	buttonLayout->addWidget(columns);
+
 	buttonLayout->addSpacing(8);
 
 	// everything being added after this will be aligned to the right side
@@ -197,7 +202,7 @@ void BrowserWidget::resetView()
 	this->expandDefault(QModelIndex());
 //	mTreeView->expandToDepth(4);
 		
-	for (unsigned i=0; i<4; ++i)
+	for (unsigned i=0; i<mModel->columnCount(); ++i)
 		mTreeView->resizeColumnToContents(i);
 }
 

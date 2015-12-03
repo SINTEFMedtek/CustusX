@@ -91,7 +91,7 @@ public:
 
 	WidgetTypeRepositoryPtr getWidgetTypeRepository();
 
-	QString getMode() const;// { return mMode; }
+	QString getMode() const;
 	StringPropertyPtr getModeProperty() { return mModeProperty; }
 	QStringList getVisibleNodeTypes() const;
 	StringListPropertyPtr getVisibilityProperty() { return mVisibilityProperty; }

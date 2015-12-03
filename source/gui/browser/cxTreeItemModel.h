@@ -18,6 +18,7 @@ class QTreeView;
 namespace cx
 {
 
+typedef boost::shared_ptr<class StringListProperty> StringListPropertyPtr;
 typedef boost::shared_ptr<class TreeRepository> TreeRepositoryPtr;
 
 /**
@@ -46,6 +47,7 @@ public:
   TreeNodePtr getCurrentItem();
   TreeNodePtr getNodeFromIndex(const QModelIndex& index);
   TreeRepositoryPtr repo() { return mRepository; }
+  StringListPropertyPtr getShowColumnsProperty() { return mShowColumnsProperty; }
 
 signals:
   void hasBeenReset();
@@ -59,12 +61,13 @@ private slots:
   void onRepositoryChanged();
 
 private:
-  int mViewGroupCount, mViewGroupIndex, mColorIndex, mNameIndex;
+  int mViewGroupCount, mViewGroupIndex, mColorIndex, mNameIndex, mColumnCount;
 
   TreeRepositoryPtr mRepository;
   QItemSelectionModel* mSelectionModel;
   XmlOptionFile mOptions;
   VisServicesPtr mServices;
+  StringListPropertyPtr mShowColumnsProperty;
 
   bool isViewGroupColumn(int col) const;
   int viewGroupFromColumn(int col) const;
@@ -73,6 +76,8 @@ private:
   void fillModelTreeFromViewManager(TreeNodePtr root);
   QIcon getColorIcon(QColor color) const;
   QColor adjustColorToContrastWithWhite(QColor color) const;
+  void createShowColumnsProperty();
+  void onShowColumnsChanged();
 };
 
 }//end namespace cx
