@@ -32,6 +32,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxViewGroupPropertiesWidget.h"
 #include <QLabel>
+#include "cxStringListSelectWidget.h"
+#include "cxViewService.h"
+#include "cxViewGroupData.h"
+
 namespace cx
 {
 
@@ -51,10 +55,21 @@ ViewGroupPropertiesWidget::~ViewGroupPropertiesWidget()
 {
 }
 
+ViewGroupDataPtr ViewGroupPropertiesWidget::getViewGroup()
+{
+	return mViewService->getGroup(mSelector->getValue());
+}
+
 void ViewGroupPropertiesWidget::setupUI()
 {
 	if (mWidget) // already created
 		return;
+
+	ViewGroupDataPtr viewGroup = this->getViewGroup();
+	StringListSelectWidget* slices3D = new StringListSelectWidget(this, viewGroup->getSliceDefinitionProperty());
+//	slices3D->showLabel(false);
+//	slices3D->setIcon(QIcon(":/icons/open_icon_library/eye.png.png"));
+	mLayout->addWidget(slices3D);
 
 	mLayout->addWidget(new QLabel("view group props"));
 	mLayout->addStretch();

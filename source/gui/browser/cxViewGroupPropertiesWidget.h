@@ -64,6 +64,7 @@ protected:
 private:
   void onSelectorChanged();
   void updateFrontend();
+  ViewGroupDataPtr getViewGroup();
 
   DoublePropertyBasePtr mSelector;
   ViewServicePtr mViewService;

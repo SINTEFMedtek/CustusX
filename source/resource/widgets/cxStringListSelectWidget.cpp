@@ -60,6 +60,7 @@ StringListSelectWidget::StringListSelectWidget(QWidget* parent, StringListProper
 
 	mMenu = new QMenu(this);
 	mButton = new CXSmallToolButton();
+	mButton->setIcon(QIcon(":icons/open_icon_library/go-down-4.png"));
 	mButton->setPopupMode(QToolButton::InstantPopup);
 	mButton->setMenu(mMenu);
 

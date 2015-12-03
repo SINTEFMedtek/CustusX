@@ -50,6 +50,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSyncedValue.h"
 #include "cxCoreServices.h"
 #include "cxLogger.h"
+#include "cxDefinitionStrings.h"
+#include "cxStringListProperty.h"
 
 namespace cx
 {
@@ -223,9 +225,7 @@ ViewGroupData::ViewGroupData(CoreServicesPtr services) :
 	mGroup2DZoom = SyncedValue::create(1);
 	mGlobal2DZoom = mGroup2DZoom;
 
-	mSliceDefinitions.add(ptAXIAL);
-	mSliceDefinitions.add(ptCORONAL);
-	mSliceDefinitions.add(ptSAGITTAL);
+	this->createSliceDefinitionProperty();
 }
 
 //Remove all data, and wait to emit signals until all data is removed
@@ -456,6 +456,38 @@ SyncedValuePtr ViewGroupData::getGlobal2DZoom()
 	return mGlobal2DZoom;
 }
 
+void ViewGroupData::createSliceDefinitionProperty()
+{
+	QStringList slicedefs;
+	for (int i=0; i<ptCOUNT; ++i)
+		slicedefs << enum2string(PLANE_TYPE(i));
+	QStringList slicedefaults;
+	slicedefaults << enum2string(ptAXIAL) << enum2string(ptCORONAL) << enum2string(ptSAGITTAL);
+	mSliceDefinitionProperty = StringListProperty::initialize("slice_definition_3D",
+														"3D Slices",
+														"Select slice planes to view in 3D",
+														slicedefaults,
+														slicedefs);
+	connect(mSliceDefinitionProperty.get(), &Property::changed, this, &ViewGroupData::optionsChanged);
+}
+
+PlaneTypeCollection ViewGroupData::getSliceDefinitions()
+{
+	QStringList val = mSliceDefinitionProperty->getValue();
+	return PlaneTypeCollection::fromString(val.join("/"));
+}
+
+void ViewGroupData::setSliceDefinitions(PlaneTypeCollection val)
+{
+	QStringList val_list = val.toString().split("/");
+	mSliceDefinitionProperty->setValue(val_list);
+}
+
+StringListPropertyPtr ViewGroupData::getSliceDefinitionProperty()
+{
+	return mSliceDefinitionProperty;
+}
+
 void ViewGroupData::addXml(QDomNode& dataNode)
 {
 	XMLNodeAdder base(dataNode);
@@ -468,7 +500,7 @@ void ViewGroupData::addXml(QDomNode& dataNode)
 	}
 
 	base.addObjectToElement("camera3D", this->getCamera3D());
-	base.addTextToElement("slicesPlanes3D", mSliceDefinitions.toString());
+	base.addTextToElement("slicesPlanes3D", this->getSliceDefinitions().toString());
 }
 
 void ViewGroupData::parseXml(QDomNode dataNode)
@@ -476,7 +508,7 @@ void ViewGroupData::parseXml(QDomNode dataNode)
 	XMLNodeParser base(dataNode);
 
 	QString sliceText = base.parseTextFromElement("slicesPlanes3D");
-	mSliceDefinitions = PlaneTypeCollection::fromString(sliceText, mSliceDefinitions);
+	this->setSliceDefinitions(PlaneTypeCollection::fromString(sliceText, this->getSliceDefinitions()));
 
 	std::vector<QDomElement> dataElems = base.getDuplicateElements("data");
 	for (unsigned i=0; i<dataElems.size(); ++i)
