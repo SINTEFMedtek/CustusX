@@ -140,7 +140,7 @@ void BrowserWidget::createButtonWidget(QWidget* widget)
 
 	StringListSelectWidget* visibility = new StringListSelectWidget(this, mModel->repo()->getVisibilityProperty());
 	visibility->showLabel(false);
-	visibility->setIcon(QIcon(":/icons/open_icon_library/eye.png.png"));
+	visibility->setIcon(QIcon(":/icons/open_icon_library/arrange_vertical.png"));
 	buttonLayout->addWidget(visibility);
 
 	LabeledComboBoxWidget* mode = new LabeledComboBoxWidget(this, mModel->repo()->getModeProperty());
@@ -151,7 +151,7 @@ void BrowserWidget::createButtonWidget(QWidget* widget)
 
 	StringListSelectWidget* columns = new StringListSelectWidget(this, mModel->getShowColumnsProperty());
 	columns->showLabel(false);
-	columns->setIcon(QIcon(":/icons/open_icon_library/eye.png.png"));
+	columns->setIcon(QIcon(":/icons/open_icon_library/arrange_horizontal.png"));
 	buttonLayout->addWidget(columns);
 
 	buttonLayout->addSpacing(8);

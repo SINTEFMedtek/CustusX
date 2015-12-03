@@ -61,6 +61,12 @@ void TreeItemModel::createShowColumnsProperty()
 	QStringList defvals = range;
 	defvals.pop_back();
 	defvals.pop_back();
+
+	std::map<QString, QString> names;
+	names["color"] = "Color";
+	for (unsigned i=0; i<4; ++i)
+		names[QString("vg%1").arg(i)] = QString("View Group %1").arg(i);
+
 //	QStringList range = QStringList() << "Color"
 //									  << "View Group 0"
 //									  << "View Group 1"
@@ -72,6 +78,7 @@ void TreeItemModel::createShowColumnsProperty()
 														range,
 														range,
 														 mOptions.getElement());
+	mShowColumnsProperty->setDisplayNames(names);
 	connect(mShowColumnsProperty.get(), &Property::changed, this, &TreeItemModel::onShowColumnsChanged);
 }
 

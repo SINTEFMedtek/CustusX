@@ -121,9 +121,10 @@ void StringListSelectWidget::prePaintEvent()
 
 		for (int i=0; i<range.size(); ++i)
 		{
-			QString text = range[i];
-			mCheckBoxes.push_back(new QCheckBox(text, mMenu));
-			boost::function<void(bool)> func = boost::bind(&StringListSelectWidget::onCheckToggled, this, text, _1);
+			QString uid = range[i];
+			QString name = mData->convertInternal2Display(uid);
+			mCheckBoxes.push_back(new QCheckBox(name, mMenu));
+			boost::function<void(bool)> func = boost::bind(&StringListSelectWidget::onCheckToggled, this, uid, _1);
 			connect(mCheckBoxes[i], &QCheckBox::toggled, func);
 			QWidgetAction *checkableAction = new QWidgetAction(mMenu);
 			checkableAction->setDefaultWidget(mCheckBoxes[i]);

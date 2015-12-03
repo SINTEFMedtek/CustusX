@@ -113,5 +113,7 @@
         <file>icons/tool_reference.png</file>
         <file>icons/tool_manual.png</file>
         <file>icons/space_generic.png</file>
+        <file>icons/open_icon_library/arrange_horizontal.png</file>
+        <file>icons/open_icon_library/arrange_vertical.png</file>
     </qresource>
 </RCC>
