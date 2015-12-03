@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "boost/bind.hpp"
 #include "cxTreeRepository.h"
 #include "cxProfile.h"
+#include "cxStringListSelectWidget.h"
 
 namespace cx
 {
@@ -115,34 +116,15 @@ void BrowserWidget::createButtonWidget(QWidget* widget)
 	buttonLayout->setMargin(0);
 	buttonLayout->setSpacing(0);
 
-	QStringList allnodetypes = mModel->repo()->getAllNodeTypes();
-	QStringList visiblenodetypes = mModel->repo()->getVisibleNodeTypes();
+	StringListSelectWidget* visibility = new StringListSelectWidget(this, mModel->repo()->getVisibilityProperty());
+	visibility->showLabel(false);
+	visibility->setIcon(QIcon(":/icons/open_icon_library/eye.png.png"));
+	buttonLayout->addWidget(visibility);
 
-	QMenu* menu = new QMenu(this);
-	for (int i=0; i<allnodetypes.size(); ++i)
-	{
-		QString text = allnodetypes[i];
-		QCheckBox *checkBox = new QCheckBox(text, menu);
-		checkBox->setChecked(visiblenodetypes.contains(text));
-		boost::function<void(bool)> func = boost::bind(&BrowserWidget::onNodeVisibilityChanged, this, text, _1);
-		connect(checkBox, &QCheckBox::toggled, func);
-		QWidgetAction *checkableAction = new QWidgetAction(menu);
-		checkableAction->setDefaultWidget(checkBox);
-		menu->addAction(checkableAction);
-	}
-
-	QToolButton* visibilityButton = new CXSmallToolButton();
-	visibilityButton->setIcon(QIcon(":/icons/open_icon_library/eye.png.png"));
-	visibilityButton->setToolTip("Select nodes to display");
-	visibilityButton->setPopupMode(QToolButton::InstantPopup);
-	visibilityButton->setMenu(menu);
-	buttonLayout->addWidget(visibilityButton);
-
-	this->createFilterSelector();
-	LabeledComboBoxWidget* filterSelectorWidget = new LabeledComboBoxWidget(this, mFilterSelector);
-	filterSelectorWidget->showLabel(false);
+	LabeledComboBoxWidget* mode = new LabeledComboBoxWidget(this, mModel->repo()->getModeProperty());
+	mode->showLabel(false);
 	buttonLayout->addSpacing(8);
-	buttonLayout->addWidget(filterSelectorWidget);
+	buttonLayout->addWidget(mode);
 	buttonLayout->setStretch(buttonLayout->count()-1, 0);
 
 	buttonLayout->addSpacing(8);
@@ -163,36 +145,6 @@ void BrowserWidget::createButtonWidget(QWidget* widget)
 XmlOptionItem BrowserWidget::getShowToolbarOption()
 {
 	return XmlOptionItem("show_toolbar", mOptions.getElement());
-}
-
-void BrowserWidget::onNodeVisibilityChanged(QString nodeType, bool value)
-{
-//	CX_LOG_CHANNEL_DEBUG("CA") << "BrowserWidget::onNodeVisibilityChanged " << nodeType << "  " << value;
-	QStringList visible = mModel->repo()->getVisibleNodeTypes();
-	if (value)
-		visible.append(nodeType);
-	else
-		visible.removeAll(nodeType);
-	mModel->repo()->setVisibleNodeTypes(visible);
-}
-
-void BrowserWidget::createFilterSelector()
-{
-	QStringList filters = mModel->repo()->getAllModes();
-	QString filterval = mModel->repo()->getMode();
-
-	StringPropertyPtr retval;
-	retval = StringProperty::initialize("FilterSelector",
-											  "", "Item display mode",
-											  filterval, filters, QDomNode());
-	connect(retval.get(), &StringPropertyBase::changed, this, &BrowserWidget::onFilterSelectorChanged);
-	mFilterSelector = retval;
-}
-
-
-void BrowserWidget::onFilterSelectorChanged()
-{
-	mModel->repo()->setMode(mFilterSelector->getValue());
 }
 
 void BrowserWidget::expandDefault(QModelIndex index)

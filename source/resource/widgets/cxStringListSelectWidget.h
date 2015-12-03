@@ -29,74 +29,55 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXBROWSERWIDGET_H_
-#define CXBROWSERWIDGET_H_
 
+#ifndef CXSTRINGLISTSELECTWIDGET_H
+#define CXSTRINGLISTSELECTWIDGET_H
+
+#include "cxResourceWidgetsExport.h"
+
+#include <QWidget>
+#include <QSlider>
+#include <QLineEdit>
+#include <QLabel>
+#include <QGridLayout>
+#include "cxStringListProperty.h"
 #include "cxBaseWidget.h"
-#include "cxForwardDeclarations.h"
-#include "cxPopupToolbarWidget.h"
-#include "cxXmlOptionItem.h"
-#include "cxControllableSplitter.h"
-#include "cxReplacableContentWidget.h"
-
-class QTreeWidget;
-class QVBoxLayout;
-class QTreeWidgetItem;
-class QTreeView;
-class QSplitter;
 
 namespace cx
 {
 
-class PopupToolbarWidget;
-class TreeItemModel;
-typedef boost::shared_ptr<class TreeRepository> TreeRepositoryPtr;
 
-
-/**
- * \class BrowserWidget
+/** \brief Composite widget for string list selection.
  *
- * \brief Shows a treestructure containing the loaded images, meshes
- * and tools.
- * \ingroup cxGUI
- *
- * \date Feb 11, 2010
- * \\author Janne Beate Bakeng, SINTEF
+ * \ingroup cx_resource_widgets
  */
-class BrowserWidget : public BaseWidget
+class cxResourceWidgets_EXPORT StringListSelectWidget: public BaseWidget
 {
-  Q_OBJECT
-
+Q_OBJECT
 public:
-  BrowserWidget(QWidget* parent, VisServicesPtr services);
-  ~BrowserWidget();
+	StringListSelectWidget(QWidget* parent, StringListPropertyPtr property, QGridLayout* gridLayout = 0, int row = 0);
+	virtual ~StringListSelectWidget() {}
 
-protected slots:
-  void resetView(); // called when tree is reset
-
-protected:
-  TreeItemModel* mModel;
-  QPointer<QTreeView> mTreeView;
+	void showLabel(bool on);
+	void setIcon(QIcon icon);
 
 protected:
-	virtual void prePaintEvent();
-  
+	QHBoxLayout* mTopLayout;
+
+private slots:
+	void prePaintEvent();
+
 private:
-  void createGUI();
-  void onPopup();
-  void onCurrentItemChanged();
-  void createButtonWidget(QWidget* widget);
-  XmlOptionItem getShowToolbarOption();
-  void expandDefault(QModelIndex index);
+	void onCheckToggled(QString nodeType, bool value);
 
-  VisServicesPtr mServices;
-  ControllableSplitter* mSplitter;
-  QPointer<ReplacableContentWidget> mPropertiesWidget;
-  PopupToolbarWidget* mPopupWidget;
-  XmlOptionFile mOptions;
-
-  StringPropertyPtr mFilterSelector;
+	QLabel* mLabel;
+	QToolButton* mButton;
+	QMenu* mMenu;
+	StringListPropertyPtr mData;
+	QStringList mCachedRange;
+	std::vector<QCheckBox*> mCheckBoxes;
 };
-}//end namespace cx
 
-#endif /* CXBROWSERWIDGET_H_ */
+} // namespace cx
+
+#endif // CXSTRINGLISTSELECTWIDGET_H

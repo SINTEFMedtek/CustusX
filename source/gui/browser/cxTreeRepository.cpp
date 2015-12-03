@@ -47,13 +47,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewServiceTreeNode.h"
 #include "cxViewGroupTreeNode.h"
 #include "cxViewService.h"
+#include "cxStringListProperty.h"
+#include "cxStringProperty.h"
 
 namespace cx
 {
 
 void WidgetTypeRepository::add(QWidget *widget)
 {
-//#include <QObject>
 	mWidgets.push_back(widget);
 }
 
@@ -74,22 +75,42 @@ TreeRepository::TreeRepository(XmlOptionFile options, VisServicesPtr services) :
 	mServices(services),
 	mOptions(options)
 {
-	mAllModes << "spaces" << "flat";
-	mMode = this->getModeOption().readValue(mAllModes.front());
-
-	mAllNodeTypes << "data" << "metric" << "image" << "model" << "tool" << "view";
-	mVisibleNodeTypes = this->getVisibleNodeTypesOption().readValue(mAllNodeTypes.join(";")).split(";");
+	this->createVisibilityProperty();
+	this->createModeProperty();
 
 	mWidgetTypeRepository.reset(new WidgetTypeRepository());
 
 	this->startListen();
 }
 
+void TreeRepository::createVisibilityProperty()
+{
+	QStringList allNodeTypes = QStringList() << "data" << "metric" << "image" << "model" << "tool" << "view";
+	mVisibilityProperty = StringListProperty::initialize("visible_node_types",
+														"Visibility",
+														"Select visible node types",
+														allNodeTypes,
+														allNodeTypes,
+														 mOptions.getElement());
+	connect(mVisibilityProperty.get(), &StringListProperty::changed, this, &TreeRepository::invalidate);
+}
+
+void TreeRepository::createModeProperty()
+{
+	QStringList allModes = QStringList() << "spaces" << "flat";
+
+	mModeProperty = StringProperty::initialize("mode",
+											   "mode",
+											   "Node display mode",
+											   allModes.front(),
+											   allModes,
+											   mOptions.getElement());
+	connect(mModeProperty.get(), &Property::changed, this, &TreeRepository::invalidate);
+}
+
 TreeRepository::~TreeRepository()
 {
 	this->stopListen();
-	this->getModeOption().writeValue(mMode);
-	this->getVisibleNodeTypesOption().writeValue(mVisibleNodeTypes.join(";"));
 }
 
 void TreeRepository::update()
@@ -118,16 +139,6 @@ void TreeRepository::stopListen()
 	disconnect(this->getServices()->patient()->getActiveData().get(), &ActiveData::activeDataChanged, this, &TreeRepository::changed);
 	disconnect(this->getServices()->tracking().get(), &TrackingService::stateChanged, this, &TreeRepository::invalidate);
 	disconnect(this->getServices()->patient().get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(invalidate()));
-}
-
-XmlOptionItem TreeRepository::getModeOption()
-{
-	return XmlOptionItem("mode", mOptions.getElement());
-}
-
-XmlOptionItem TreeRepository::getVisibleNodeTypesOption()
-{
-	return XmlOptionItem("visible_node_types", mOptions.getElement());
 }
 
 std::vector<TreeNodePtr> TreeRepository::getNodes()
@@ -165,9 +176,24 @@ WidgetTypeRepositoryPtr TreeRepository::getWidgetTypeRepository()
 	return mWidgetTypeRepository;
 }
 
+QString TreeRepository::getMode() const
+{
+	return mModeProperty->getValue();
+}
+
+QStringList TreeRepository::getVisibleNodeTypes() const
+{
+	return mVisibilityProperty->getValue();
+}
+
+QStringList TreeRepository::getAllNodeTypes() const
+{
+	return mVisibilityProperty->getValueRange();
+}
+
 void TreeRepository::insertTopNode()
 {
-//	TreeNodePtr topnode(new TopTreeNode(mSelf));
+	//	TreeNodePtr topnode(new TopTreeNode(mSelf));
 //	mNodes.push_back(topnode);
 	this->appendNode(new TopTreeNode(mSelf));
 //	CX_LOG_CHANNEL_DEBUG("CA") << "  - built topnode";

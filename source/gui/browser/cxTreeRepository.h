@@ -49,6 +49,7 @@ class TreeNode;
 class TreeRepository;
 typedef boost::shared_ptr<TreeNode> TreeNodePtr;
 typedef boost::shared_ptr<TreeRepository> TreeRepositoryPtr;
+typedef boost::shared_ptr<class StringListProperty> StringListPropertyPtr;
 typedef boost::weak_ptr<class TreeRepository> TreeRepositoryWeakPtr;
 typedef boost::shared_ptr<class WidgetTypeRepository> WidgetTypeRepositoryPtr;
 
@@ -90,12 +91,11 @@ public:
 
 	WidgetTypeRepositoryPtr getWidgetTypeRepository();
 
-	QString getMode() const { return mMode; }
-	void setMode(QString val) { this->invalidate(); if (mMode==val) return; mMode = val; this->invalidate(); }
-	QStringList getAllModes() const { return mAllModes; }
-	QStringList getVisibleNodeTypes() const { return mVisibleNodeTypes; }
-	void setVisibleNodeTypes(QStringList val) { this->invalidate(); if (mVisibleNodeTypes==val) return; mVisibleNodeTypes = val; this->invalidate(); }
-	QStringList getAllNodeTypes() const { return mAllNodeTypes; }
+	QString getMode() const;// { return mMode; }
+	StringPropertyPtr getModeProperty() { return mModeProperty; }
+	QStringList getVisibleNodeTypes() const;
+	StringListPropertyPtr getVisibilityProperty() { return mVisibilityProperty; }
+	QStringList getAllNodeTypes() const;
 
 public slots:
 	void update();
@@ -105,18 +105,17 @@ signals:
 	void changed();
 	void invalidated();
 private:
-	XmlOptionItem getModeOption();
-	XmlOptionItem getVisibleNodeTypesOption();
+	void createVisibilityProperty();
+	void createModeProperty();
 
 	std::vector<TreeNodePtr> mNodes;
 	TreeRepositoryWeakPtr mSelf;
 	bool mInvalid;
 	VisServicesPtr mServices;
 
-	QString mMode;
-	QStringList mAllModes;
-	QStringList mVisibleNodeTypes;
-	QStringList mAllNodeTypes;
+	StringPropertyPtr mModeProperty;
+	StringListPropertyPtr mVisibilityProperty;
+
 	XmlOptionFile mOptions;
 	WidgetTypeRepositoryPtr mWidgetTypeRepository;
 
