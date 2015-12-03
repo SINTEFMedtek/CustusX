@@ -145,6 +145,11 @@ bool DataTreeNode::isDefaultExpanded() const
 	return (this->repo()->getMode()!="flat");
 }
 
+void DataTreeNode::remove()
+{
+	this->getServices()->patient()->removeData(mData->getUid());
+}
+
 QVariant DataTreeNode::getViewGroupVisibility(int index) const
 {
 	DataViewProperties props = this->getServices()->view()->getGroup(index)->getProperties(mData->getUid());

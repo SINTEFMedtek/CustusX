@@ -73,6 +73,9 @@ public:
 	virtual QVariant getFont() const = 0;
 	virtual bool isDefaultExpanded() const = 0;
 
+	virtual bool isRemovable() const = 0;
+	virtual void remove() = 0;
+
 	virtual std::vector<TreeNodePtr> getVisibleChildren() const = 0;
 	virtual TreeNodePtr getVisibleParent() const = 0;
 
@@ -105,6 +108,9 @@ public:
 	virtual bool  useColoredName() const { return mBase->useColoredName(); }
 	virtual QVariant getFont() const { return mBase->getFont(); }
 	virtual bool isDefaultExpanded() const { return mBase->isDefaultExpanded(); }
+
+	virtual bool isRemovable() const { return mBase->isRemovable(); }
+	virtual void remove() { mBase->remove(); }
 
 	virtual std::vector<TreeNodePtr> getVisibleChildren() const;
 	virtual TreeNodePtr getVisibleParent() const;

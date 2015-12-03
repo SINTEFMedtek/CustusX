@@ -51,6 +51,7 @@ namespace cx
 
 class PopupToolbarWidget;
 class TreeItemModel;
+class EraseDataToolButton;
 typedef boost::shared_ptr<class TreeRepository> TreeRepositoryPtr;
 
 
@@ -90,6 +91,7 @@ private:
   XmlOptionItem getShowToolbarOption();
   void expandDefault(QModelIndex index);
   void updateNodeName();
+  void eraseCurrentNode();
 
   VisServicesPtr mServices;
   ControllableSplitter* mSplitter;
@@ -98,7 +100,7 @@ private:
   XmlOptionFile mOptions;
 //  QLabel* mNameLabel;
   QLineEdit* mName;
-
+  EraseDataToolButton* mRemoveButton;
 
   StringPropertyPtr mFilterSelector;
 };

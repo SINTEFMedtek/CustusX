@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTreeRepository.h"
 #include "cxProfile.h"
 #include "cxStringListSelectWidget.h"
+#include "cxDataSelectWidget.h"
 
 namespace cx
 {
@@ -159,6 +160,10 @@ void BrowserWidget::createButtonWidget(QWidget* widget)
 	// everything being added after this will be aligned to the right side
 	buttonLayout->addStretch(1);
 
+	mRemoveButton = new EraseDataToolButton(this);
+	connect(mRemoveButton, &EraseDataToolButton::eraseData, this, &BrowserWidget::eraseCurrentNode);
+	buttonLayout->addWidget(mRemoveButton);
+
 	mName = new QLineEdit;
 	mName->setReadOnly(true);
 	buttonLayout->addWidget(mName);
@@ -208,9 +213,24 @@ void BrowserWidget::resetView()
 
 void BrowserWidget::onCurrentItemChanged()
 {
+	TreeNodePtr node = mModel->getCurrentItem();
+	mRemoveButton->setEnabled(node && node->isRemovable());
 	this->updateNodeName();
-	QWidget* widget = mModel->getCurrentItem()->createPropertiesWidget();
-	mPropertiesWidget->setWidget(widget);
+
+	if (node)
+	{
+		QWidget* widget = node->createPropertiesWidget();
+		mPropertiesWidget->setWidget(widget);
+	}
+}
+
+void BrowserWidget::eraseCurrentNode()
+{
+	TreeNodePtr node = mModel->getCurrentItem();
+	if (!node)
+		return;
+
+	node->remove();
 }
 
 }//end namespace cx

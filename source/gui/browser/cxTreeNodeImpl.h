@@ -62,6 +62,9 @@ public:
 	virtual QWidget* createPropertiesWidget() const { return NULL; }
 	virtual bool isDefaultExpanded() const { return true; }
 
+	virtual bool isRemovable() const { return false; }
+	virtual void remove() { }
+
 	virtual std::vector<TreeNodePtr> getVisibleChildren() const;
 	virtual TreeNodePtr getVisibleParent() const;
 

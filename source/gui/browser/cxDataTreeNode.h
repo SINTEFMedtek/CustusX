@@ -63,6 +63,9 @@ public:
 	virtual QVariant getFont() const;
 	virtual bool isDefaultExpanded() const;
 
+	virtual bool isRemovable() const { return true; }
+	virtual void remove();
+
 private:
 	DataPtr mData;
 };
