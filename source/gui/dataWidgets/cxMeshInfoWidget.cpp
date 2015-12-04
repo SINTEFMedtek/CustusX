@@ -138,8 +138,8 @@ void MeshInfoWidget::meshSelectedSlot()
 	if(mMesh)
 	{
         mMesh->setVisSize((double) mVisSizeWidget->getValue());
-        disconnect(mBackfaceCullingCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setBackfaceCullingSlot(bool)));
-		disconnect(mFrontfaceCullingCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setFrontfaceCullingSlot(bool)));
+//        disconnect(mBackfaceCullingCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setBackfaceCullingSlot(bool)));
+//		disconnect(mFrontfaceCullingCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setFrontfaceCullingSlot(bool)));
         disconnect(mGlyphVisualizationCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setShowGlyph(bool)));
 		disconnect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
     }
@@ -158,14 +158,14 @@ void MeshInfoWidget::meshSelectedSlot()
 		return;
 	}
 
-	mBackfaceCullingCheckBox->setChecked(mMesh->getBackfaceCulling());
-	mFrontfaceCullingCheckBox->setChecked(mMesh->getFrontfaceCulling());
+//	mBackfaceCullingCheckBox->setChecked(mMesh->getBackfaceCulling());
+//	mFrontfaceCullingCheckBox->setChecked(mMesh->getFrontfaceCulling());
     mGlyphVisualizationCheckBox->setChecked(mMesh->showGlyph());
     mGlyphVisualizationCheckBox->setEnabled(mMesh->hasGlyph());
     mVisSizeWidget->setValue(mMesh->getVisSize());
 
-	connect(mBackfaceCullingCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setBackfaceCullingSlot(bool)));
-	connect(mFrontfaceCullingCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setFrontfaceCullingSlot(bool)));
+//	connect(mBackfaceCullingCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setBackfaceCullingSlot(bool)));
+//	connect(mFrontfaceCullingCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setFrontfaceCullingSlot(bool)));
     connect(mGlyphVisualizationCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setShowGlyph(bool)));
 
     connect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
@@ -200,7 +200,7 @@ void MeshInfoWidget::meshChangedSlot()
 		return;
 	mBackfaceCullingCheckBox->setChecked(mMesh->getBackfaceCulling());
 	mFrontfaceCullingCheckBox->setChecked(mMesh->getFrontfaceCulling());
-    mGlyphVisualizationCheckBox->setChecked(mMesh->showGlyph());
+	mGlyphVisualizationCheckBox->setChecked(mMesh->showGlyph());
     mGlyphVisualizationCheckBox->setEnabled(mMesh->hasGlyph());
 	mColorAdapter->setValue(mMesh->getColor());
     mMesh->setVisSize((double) mVisSizeWidget->getValue());

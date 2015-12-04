@@ -125,18 +125,22 @@ void PerformanceTab::init()
   m3DVisualizer->setDisplayNames(this->getAvailableVisualizerDisplayNames());
 
   bool useGPU2DRender = settings()->value("useGPU2DRendering").toBool();
-	mGPU2DRenderCheckBox = new QCheckBox("2D Overlay");
-	mGPU2DRenderCheckBox->setChecked(useGPU2DRender);
-	mGPU2DRenderCheckBox->setToolTip("<p>Use a GPU-based 2D renderer instead of "
-									 "the software-based one, if available.</p>"
-									 "<p>This enables multiple volume rendering in 2D.<p>");
+  mGPU2DRenderCheckBox = new QCheckBox("2D Overlay");
+  mGPU2DRenderCheckBox->setChecked(useGPU2DRender);
+  mGPU2DRenderCheckBox->setToolTip("<p>Use a GPU-based 2D renderer instead of "
+								   "the software-based one, if available.</p>"
+								   "<p>This enables multiple volume rendering in 2D.<p>");
 
-    bool optimizedViews = settings()->value("optimizedViews").toBool();
-      mOptimizedViewsCheckBox = new QCheckBox("Optimized Views");
-      mOptimizedViewsCheckBox->setChecked(optimizedViews);
-      mOptimizedViewsCheckBox->setToolTip("<p>Merge all non-3D views into a single vtkRenderWindow</p>"
-                                       "<p>This speeds up render on some platforms, still experimental.<p>");
+  bool optimizedViews = settings()->value("optimizedViews").toBool();
+  mOptimizedViewsCheckBox = new QCheckBox("Optimized Views");
+  mOptimizedViewsCheckBox->setChecked(optimizedViews);
+  mOptimizedViewsCheckBox->setToolTip("<p>Merge all non-3D views into a single vtkRenderWindow</p>"
+									  "<p>This speeds up render on some platforms, still experimental.<p>");
 
+  bool useGPU3DDepthPeeling = settings()->value("View3D/depthPeeling").toBool();
+  mGPU3DDepthPeelingCheckBox = new QCheckBox("Use GPU 3D depth peeling");
+  mGPU3DDepthPeelingCheckBox->setChecked(useGPU3DDepthPeeling);
+  mGPU3DDepthPeelingCheckBox->setToolTip("Use a GPU-based 3D depth peeling to correctly visualize translucent surfaces.");
 
   //Layout
   mMainLayout = new QGridLayout;
@@ -147,8 +151,9 @@ void PerformanceTab::init()
   mMainLayout->addWidget(mSmartRenderCheckBox, 2, 0);
   mMainLayout->addWidget(mGPU2DRenderCheckBox, 5, 0);
   mMainLayout->addWidget(mOptimizedViewsCheckBox, 6, 0);
-  new SpinBoxGroupWidget(this, mStillUpdateRate, mMainLayout, 7);
-  mMainLayout->addWidget(sscCreateDataWidget(this, m3DVisualizer), 8, 0, 1, 2);
+  mMainLayout->addWidget(mGPU3DDepthPeelingCheckBox, 7, 0);
+  new SpinBoxGroupWidget(this, mStillUpdateRate, mMainLayout, 8);
+  mMainLayout->addWidget(sscCreateDataWidget(this, m3DVisualizer), 9, 0, 1, 2);
 
   mMainLayout->setColumnStretch(0, 2);
   mMainLayout->setColumnStretch(1, 2);
@@ -195,7 +200,7 @@ void PerformanceTab::saveParametersSlot()
   settings()->setValue("View3D/maxRenderSize",     mMaxRenderSize->getValue());
   settings()->setValue("smartRender",       mSmartRenderCheckBox->isChecked());
   settings()->setValue("stillUpdateRate",   mStillUpdateRate->getValue());
-//  settings()->setValue("View3D/depthPeeling", mGPU3DDepthPeelingCheckBox->isChecked());
+  settings()->setValue("View3D/depthPeeling", mGPU3DDepthPeelingCheckBox->isChecked());
   settings()->setValue("View3D/ImageRender3DVisualizer",   m3DVisualizer->getValue());
 }
 
