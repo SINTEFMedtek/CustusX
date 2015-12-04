@@ -109,8 +109,8 @@ private:
   StringPropertyDataUidEditablePtr mUidAdapter;
   SelectDataStringPropertyBasePtr mMeshSelector;
   ColorPropertyPtr mColorAdapter;
-//  QCheckBox* mBackfaceCullingCheckBox;
-//  QCheckBox* mFrontfaceCullingCheckBox;
+  QCheckBox* mBackfaceCullingCheckBox;
+  QCheckBox* mFrontfaceCullingCheckBox;
   DoublePropertyPtr mVisSizeWidget;
   QCheckBox* mGlyphVisualizationCheckBox;
   StringPropertyGlyphOrientationArrayPtr mGlyphOrientationArrayAdapter;
