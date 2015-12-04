@@ -109,8 +109,8 @@ void MeshInfoWidget::meshSelectedSlot()
 	if(mMesh)
 	{
         mMesh->setVisSize((double) mVisSizeWidget->getValue());
-        disconnect(mBackfaceCullingCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setBackfaceCullingSlot(bool)));
-		disconnect(mFrontfaceCullingCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setFrontfaceCullingSlot(bool)));
+//        disconnect(mBackfaceCullingCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setBackfaceCullingSlot(bool)));
+//		disconnect(mFrontfaceCullingCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setFrontfaceCullingSlot(bool)));
         disconnect(mGlyphVisualizationCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setShowGlyph(bool)));
 		disconnect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
     }
@@ -129,14 +129,14 @@ void MeshInfoWidget::meshSelectedSlot()
 		return;
 	}
 
-	mBackfaceCullingCheckBox->setChecked(mMesh->getBackfaceCulling());
-	mFrontfaceCullingCheckBox->setChecked(mMesh->getFrontfaceCulling());
+//	mBackfaceCullingCheckBox->setChecked(mMesh->getBackfaceCulling());
+//	mFrontfaceCullingCheckBox->setChecked(mMesh->getFrontfaceCulling());
     mGlyphVisualizationCheckBox->setChecked(mMesh->showGlyph());
     mGlyphVisualizationCheckBox->setEnabled(mMesh->hasGlyph());
     mVisSizeWidget->setValue(mMesh->getVisSize());
 
-	connect(mBackfaceCullingCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setBackfaceCullingSlot(bool)));
-	connect(mFrontfaceCullingCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setFrontfaceCullingSlot(bool)));
+//	connect(mBackfaceCullingCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setBackfaceCullingSlot(bool)));
+//	connect(mFrontfaceCullingCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setFrontfaceCullingSlot(bool)));
     connect(mGlyphVisualizationCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setShowGlyph(bool)));
 
     connect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
@@ -168,8 +168,8 @@ void MeshInfoWidget::importTransformSlot()
 void MeshInfoWidget::meshChangedSlot()
 {
     if(!mMesh) return;
-	mBackfaceCullingCheckBox->setChecked(mMesh->getBackfaceCulling());
-	mFrontfaceCullingCheckBox->setChecked(mMesh->getFrontfaceCulling());
+//	mBackfaceCullingCheckBox->setChecked(mMesh->getBackfaceCulling());
+//	mFrontfaceCullingCheckBox->setChecked(mMesh->getFrontfaceCulling());
     mGlyphVisualizationCheckBox->setChecked(mMesh->showGlyph());
     mGlyphVisualizationCheckBox->setEnabled(mMesh->hasGlyph());
 	mColorAdapter->setValue(mMesh->getColor());
@@ -215,12 +215,12 @@ void MeshInfoWidget::addWidgets(PatientModelServicePtr patientModelService)
 
 	QWidget* optionsWidget = new QWidget(this);
 	QHBoxLayout* optionsLayout = new QHBoxLayout(optionsWidget);
-	mBackfaceCullingCheckBox = new QCheckBox("Backface culling");
-	mBackfaceCullingCheckBox->setToolTip("Set backface culling on. This makes transparent meshes work, but only draws outside mesh walls (eg. navigating inside meshes will not work).");
-	optionsLayout->addWidget(mBackfaceCullingCheckBox);
-	mFrontfaceCullingCheckBox = new QCheckBox("Frontface culling");
-	mFrontfaceCullingCheckBox->setToolTip("Set frontface culling on. Can be used to make transparent meshes work from inside the meshes.");
-	optionsLayout->addWidget(mFrontfaceCullingCheckBox);
+//	mBackfaceCullingCheckBox = new QCheckBox("Backface culling");
+//	mBackfaceCullingCheckBox->setToolTip("Set backface culling on. This makes transparent meshes work, but only draws outside mesh walls (eg. navigating inside meshes will not work).");
+//	optionsLayout->addWidget(mBackfaceCullingCheckBox);
+//	mFrontfaceCullingCheckBox = new QCheckBox("Frontface culling");
+//	mFrontfaceCullingCheckBox->setToolTip("Set frontface culling on. Can be used to make transparent meshes work from inside the meshes.");
+//	optionsLayout->addWidget(mFrontfaceCullingCheckBox);
     optionsLayout->addWidget(sscCreateDataWidget(this, mColorAdapter));
 
     optionsLayout->addStretch(1);

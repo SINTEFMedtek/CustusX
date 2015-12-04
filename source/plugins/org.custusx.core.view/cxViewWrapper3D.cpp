@@ -934,13 +934,16 @@ void ViewWrapper3D::setTranslucentRenderingToDepthPeeling(bool setDepthPeeling)
 	bool success = true;
 	if(setDepthPeeling)
 	{
-		//IsDepthPeelingSupported function don't seem to work
-		/*if (!IsDepthPeelingSupported(mView->getRenderWindow(), mView->getRenderer(), true))
+
+		//IsDepthPeelingSupported function don't seem to work on OSX (error messages or seg. fault)
+#ifndef __APPLE__
+		if (!IsDepthPeelingSupported(mView->getRenderWindow(), mView->getRenderer(), true))
 		{
 			reportWarning("GPU do not support depth peeling. Rendering of translucent surfaces is not supported");
 			success = false;
 		}
-		else*/ if (!SetupEnvironmentForDepthPeeling(mView->getRenderWindow(), mView->getRenderer(), 100, 0.1))
+#endif
+		if (success && !SetupEnvironmentForDepthPeeling(mView->getRenderWindow(), mView->getRenderer(), 100, 0.1))
 		{
 			reportWarning("Error setting depth peeling");
 			success = false;
